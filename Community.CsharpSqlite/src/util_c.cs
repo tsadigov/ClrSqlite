@@ -19,6 +19,70 @@ namespace Community.CsharpSqlite
     public partial class StringExtensions
     {
 
+
+        /*
+        ** Convert an SQL-style quoted string into a normal string by removing
+        ** the quote characters.  The conversion is done in-place.  If the
+        ** input does not begin with a quote character, then this routine
+        ** is a no-op.
+        **
+        ** The input string must be zero-terminated.  A new zero-terminator
+        ** is added to the dequoted string.
+        **
+        ** The return value is -1 if no dequoting occurs or the length of the
+        ** dequoted string, exclusive of the zero terminator, if dequoting does
+        ** occur.
+        **
+        ** 2002-Feb-14: This routine is extended to remove MS-Access style
+        ** brackets from around identifers.  For example:  "[a-b-c]" becomes
+        ** "a-b-c".
+        */
+        public static int sqlite3Dequote(ref string z)
+        {
+            char quote;
+            int i;
+            if (z == null || z == "")
+                return -1;
+            quote = z[0];
+            switch (quote)
+            {
+                case '\'':
+                    break;
+                case '"':
+                    break;
+                case '`':
+                    break;                /* For MySQL compatibility */
+                case '[':
+                    quote = ']';
+                    break;  /* For MS SqlServer compatibility */
+                default:
+                    return -1;
+            }
+            StringBuilder sbZ = new StringBuilder(z.Length);
+            for (i = 1; i < z.Length; i++) //z[i] != 0; i++)
+            {
+                if (z[i] == quote)
+                {
+                    if (i < z.Length - 1 && (z[i + 1] == quote))
+                    {
+                        sbZ.Append(quote);
+                        i++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    sbZ.Append(z[i]);
+                }
+            }
+            z = sbZ.ToString();
+            return sbZ.Length;
+        }
+
+
         /*
     ** Compute a string length that is limited to what can be stored in
     ** lower 30 bits of a 32-bit signed integer.
@@ -245,68 +309,6 @@ dummy += (uint)x;
         pParse.zErrMsg = zMsg;
         pParse.rc = SQLITE_ERROR;
       }
-    }
-
-    /*
-    ** Convert an SQL-style quoted string into a normal string by removing
-    ** the quote characters.  The conversion is done in-place.  If the
-    ** input does not begin with a quote character, then this routine
-    ** is a no-op.
-    **
-    ** The input string must be zero-terminated.  A new zero-terminator
-    ** is added to the dequoted string.
-    **
-    ** The return value is -1 if no dequoting occurs or the length of the
-    ** dequoted string, exclusive of the zero terminator, if dequoting does
-    ** occur.
-    **
-    ** 2002-Feb-14: This routine is extended to remove MS-Access style
-    ** brackets from around identifers.  For example:  "[a-b-c]" becomes
-    ** "a-b-c".
-    */
-    static int sqlite3Dequote( ref string z )
-    {
-      char quote;
-      int i;
-      if ( z == null || z == "" )
-        return -1;
-      quote = z[0];
-      switch ( quote )
-      {
-        case '\'':
-          break;
-        case '"':
-          break;
-        case '`':
-          break;                /* For MySQL compatibility */
-        case '[':
-          quote = ']';
-          break;  /* For MS SqlServer compatibility */
-        default:
-          return -1;
-      }
-      StringBuilder sbZ = new StringBuilder( z.Length );
-      for ( i = 1; i < z.Length; i++ ) //z[i] != 0; i++)
-      {
-        if ( z[i] == quote )
-        {
-          if ( i < z.Length - 1 && ( z[i + 1] == quote ) )
-          {
-            sbZ.Append( quote );
-            i++;
-          }
-          else
-          {
-            break;
-          }
-        }
-        else
-        {
-          sbZ.Append( z[i] );
-        }
-      }
-      z = sbZ.ToString();
-      return sbZ.Length;
     }
 
     /* Convenient short-hand */

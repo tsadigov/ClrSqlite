@@ -509,9 +509,9 @@ namespace Community.CsharpSqlite
             && ( ( c = pToken.z[0] ) == '\'' || c == '"' || c == '[' || c == '`' ) )
             {
 #if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-sqlite3Dequote(ref pNew.u._zToken);
+StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
 #else
-              sqlite3Dequote( ref pNew.u.zToken );
+              StringExtensions.sqlite3Dequote( ref pNew.u.zToken );
 #endif
               if ( c == '"' )
                 pNew.flags |= EP_DblQuoted;
@@ -1296,7 +1296,7 @@ return null;
         Debug.Assert( pItem.zName == null );
         pItem.zName = pName.z.Substring( 0, pName.n );//sqlite3DbStrNDup(pParse.db, pName.z, pName.n);
         if ( dequote != 0 && !String.IsNullOrEmpty( pItem.zName ) )
-          sqlite3Dequote( ref pItem.zName );
+          StringExtensions.sqlite3Dequote( ref pItem.zName );
       }
     }
 

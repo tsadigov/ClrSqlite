@@ -159,7 +159,7 @@ static void renameParentFunc(
       zParent = zIdx + n < zInput.Length ? zInput.Substring( zIdx, n ) : "";//sqlite3DbStrNDup(db, zIdx, n);
       if ( String.IsNullOrEmpty( zParent ) )
         break;
-      sqlite3Dequote( ref zParent );
+      StringExtensions.sqlite3Dequote( ref zParent );
       if ( zOld.Equals( zParent, StringComparison.InvariantCultureIgnoreCase ) )
       {
         string zOut = sqlite3MPrintf( db, "%s%.*s\"%w\"",
