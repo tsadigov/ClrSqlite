@@ -700,7 +700,7 @@ return r;
     */
     static void sqlite3VdbeMemSetDouble( Mem pMem, double val )
     {
-      if ( sqlite3IsNaN( val ) )
+      if ( MathExtensions.sqlite3IsNaN( val ) )
       {
         sqlite3VdbeMemSetNull( pMem );
       }

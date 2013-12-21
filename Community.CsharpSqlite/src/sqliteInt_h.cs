@@ -3801,9 +3801,9 @@ const sqlite3_mem_methods *sqlite3MemGetMemsys5(void);
     //void sqlite3StatusSet(int, int);
 
     //#if !SQLITE_OMIT_FLOATING_POINT
-    //  int sqlite3IsNaN(double);
+    //  int MathExtensions.sqlite3IsNaN(double);
     //#else
-    //# define sqlite3IsNaN(X)  0
+    //# define MathExtensions.sqlite3IsNaN(X)  0
     //#endif
 
     //void sqlite3VXPrintf(StrAccum*, int, const char*, va_list);

@@ -310,7 +310,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
         //Debug.Assert( sizeof( u64 ) == 8 );
         //Debug.Assert( sizeof( u64 ) == sizeof( double ) );
         //memcpy( &y, x, 8 );
-        //Debug.Assert( sqlite3IsNaN( y ) );
+        //Debug.Assert( MathExtensions.sqlite3IsNaN( y ) );
       }
 #endif
 #endif

@@ -2322,7 +2322,7 @@ return null;
         double value = 0;
         //string zV;
         sqlite3AtoF( z, ref value, sqlite3Strlen30( z ), SQLITE_UTF8 );
-        Debug.Assert( !sqlite3IsNaN( value ) ); /* The new AtoF never returns NaN */
+        Debug.Assert( !MathExtensions.sqlite3IsNaN( value ) ); /* The new AtoF never returns NaN */
         if ( negateFlag )
           value = -value;
         //zV = dup8bytes(v,  value);

@@ -1132,7 +1132,7 @@ start = sqlite3Hwtime();
           case OP_Real:
             {            /* same as TK_FLOAT, ref2-prerelease */
               pOut.flags = MEM_Real;
-              Debug.Assert( !sqlite3IsNaN( pOp.p4.pReal ) );
+              Debug.Assert( !MathExtensions.sqlite3IsNaN( pOp.p4.pReal ) );
               pOut.r = pOp.p4.pReal;
               break;
             }
@@ -1645,7 +1645,7 @@ pOp.p1 = pOut.n;
 pOut->u.i = rB;
 MemSetTypeFlag(pOut, MEM_Int);
 #else
-                if ( sqlite3IsNaN( rB ) )
+                if ( MathExtensions.sqlite3IsNaN( rB ) )
                 {
                   goto arithmetic_result_is_null;
                 }

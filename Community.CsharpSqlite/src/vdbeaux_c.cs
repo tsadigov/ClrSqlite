@@ -3657,7 +3657,7 @@ swapMixedEndianFloat(x);
 #else
               pMem.r = BitConverter.Int64BitsToDouble( (long)x );// memcpy(pMem.r, x, sizeof(x))
 #endif
-              pMem.flags = (u16)( sqlite3IsNaN( pMem.r ) ? MEM_Null : MEM_Real );
+              pMem.flags = (u16)( MathExtensions.sqlite3IsNaN( pMem.r ) ? MEM_Null : MEM_Real );
             }
             return 8;
           }
