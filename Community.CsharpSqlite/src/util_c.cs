@@ -19,6 +19,60 @@ namespace Community.CsharpSqlite
     public partial class StringExtensions
     {
 
+        private static Community.CsharpSqlite.Sqlite3.SQLite3UpperToLower UpperToLower {
+            get { return Sqlite3.UpperToLower; }
+        }
+        /* Convenient short-hand */
+        //#define UpperToLower sqlite3UpperToLower
+
+        /*
+        ** Some systems have stricmp().  Others have strcasecmp().  Because
+        ** there is no consistency, we will define our own.
+        **
+        ** IMPLEMENTATION-OF: R-20522-24639 The sqlite3_strnicmp() API allows
+        ** applications and extensions to compare the contents of two buffers
+        ** containing UTF-8 strings in a case-independent fashion, using the same
+        ** definition of case independence that SQLite uses internally when
+        ** comparing identifiers.
+        */
+
+        public static int sqlite3StrNICmp(string zLeft, int offsetLeft, string zRight, int N)
+        {
+            //register unsigned char *a, *b;
+            //a = (unsigned char )zLeft;
+            //b = (unsigned char )zRight;
+            int a = 0, b = 0;
+            while (N-- > 0 && a < zLeft.Length - offsetLeft && b < zRight.Length && zLeft[a + offsetLeft] != 0 && UpperToLower[zLeft[a + offsetLeft]] == UpperToLower[zRight[b]])
+            {
+                a++;
+                b++;
+            }
+            return N < 0 ? 0 : ((a < zLeft.Length - offsetLeft) ? UpperToLower[zLeft[a + offsetLeft]] : 0) - UpperToLower[zRight[b]];
+        }
+
+        public static int sqlite3StrNICmp(string zLeft, string zRight, int N)
+        {
+            //register unsigned char *a, *b;
+            //a = (unsigned char )zLeft;
+            //b = (unsigned char )zRight;
+            int a = 0, b = 0;
+            while (N-- > 0 && a < zLeft.Length && b < zRight.Length && (zLeft[a] == zRight[b] || (zLeft[a] != 0 && zLeft[a] < 256 && zRight[b] < 256 && UpperToLower[zLeft[a]] == UpperToLower[zRight[b]])))
+            {
+                a++;
+                b++;
+            }
+            if (N < 0)
+                return 0;
+            if (a == zLeft.Length && b == zRight.Length)
+                return 0;
+            if (a == zLeft.Length)
+                return -UpperToLower[zRight[b]];
+            if (b == zRight.Length)
+                return UpperToLower[zLeft[a]];
+            return (zLeft[a] < 256 ? UpperToLower[zLeft[a]] : zLeft[a]) - (zRight[b] < 256 ? UpperToLower[zRight[b]] : zRight[b]);
+        }
+
+
 
         /*
         ** Convert an SQL-style quoted string into a normal string by removing
@@ -311,57 +365,7 @@ dummy += (uint)x;
       }
     }
 
-    /* Convenient short-hand */
-    //#define UpperToLower sqlite3UpperToLower
-
-    /*
-    ** Some systems have stricmp().  Others have strcasecmp().  Because
-    ** there is no consistency, we will define our own.
-    **
-    ** IMPLEMENTATION-OF: R-20522-24639 The sqlite3_strnicmp() API allows
-    ** applications and extensions to compare the contents of two buffers
-    ** containing UTF-8 strings in a case-independent fashion, using the same
-    ** definition of case independence that SQLite uses internally when
-    ** comparing identifiers.
-    */
-
-    static int sqlite3StrNICmp( string zLeft, int offsetLeft, string zRight, int N )
-    {
-      //register unsigned char *a, *b;
-      //a = (unsigned char )zLeft;
-      //b = (unsigned char )zRight;
-      int a = 0, b = 0;
-      while ( N-- > 0 && a < zLeft.Length - offsetLeft && b < zRight.Length && zLeft[a + offsetLeft] != 0 && UpperToLower[zLeft[a + offsetLeft]] == UpperToLower[zRight[b]] )
-      {
-        a++;
-        b++;
-      }
-      return N < 0 ? 0 : ( ( a < zLeft.Length - offsetLeft ) ? UpperToLower[zLeft[a + offsetLeft]] : 0 ) - UpperToLower[zRight[b]];
-    }
-
-    static int sqlite3StrNICmp( string zLeft, string zRight, int N )
-    {
-      //register unsigned char *a, *b;
-      //a = (unsigned char )zLeft;
-      //b = (unsigned char )zRight;
-      int a = 0, b = 0;
-      while ( N-- > 0 && a < zLeft.Length && b < zRight.Length && ( zLeft[a] == zRight[b] || ( zLeft[a] != 0 && zLeft[a] < 256 && zRight[b] < 256 && UpperToLower[zLeft[a]] == UpperToLower[zRight[b]] ) ) )
-      {
-        a++;
-        b++;
-      }
-      if ( N < 0 )
-        return 0;
-      if ( a == zLeft.Length && b == zRight.Length )
-        return 0;
-      if ( a == zLeft.Length )
-        return -UpperToLower[zRight[b]];
-      if ( b == zRight.Length )
-        return UpperToLower[zLeft[a]];
-      return ( zLeft[a] < 256 ? UpperToLower[zLeft[a]] : zLeft[a] ) - ( zRight[b] < 256 ? UpperToLower[zRight[b]] : zRight[b] );
-    }
-
-
+  
     /*
     ** The string z[] is an text representation of a real number.
     ** Convert this string to a double and write it into *pResult.

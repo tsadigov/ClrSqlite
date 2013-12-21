@@ -256,7 +256,7 @@ namespace Community.CsharpSqlite
                   case 'c':
                   case 'C':
                     {
-                      if ( nId == 6 && sqlite3StrNICmp( zSql, zIdx, "create", 6 ) == 0 )
+                      if ( nId == 6 && StringExtensions.sqlite3StrNICmp( zSql, zIdx, "create", 6 ) == 0 )
                       {
                         token = tkCREATE;
                       }
@@ -269,15 +269,15 @@ namespace Community.CsharpSqlite
                   case 't':
                   case 'T':
                     {
-                      if ( nId == 7 && sqlite3StrNICmp( zSql, zIdx, "trigger", 7 ) == 0 )
+                      if ( nId == 7 && StringExtensions.sqlite3StrNICmp( zSql, zIdx, "trigger", 7 ) == 0 )
                       {
                         token = tkTRIGGER;
                       }
-                      else if ( nId == 4 && sqlite3StrNICmp( zSql, zIdx, "temp", 4 ) == 0 )
+                      else if ( nId == 4 && StringExtensions.sqlite3StrNICmp( zSql, zIdx, "temp", 4 ) == 0 )
                       {
                         token = tkTEMP;
                       }
-                      else if ( nId == 9 && sqlite3StrNICmp( zSql, zIdx, "temporary", 9 ) == 0 )
+                      else if ( nId == 9 && StringExtensions.sqlite3StrNICmp( zSql, zIdx, "temporary", 9 ) == 0 )
                       {
                         token = tkTEMP;
                       }
@@ -290,13 +290,13 @@ namespace Community.CsharpSqlite
                   case 'e':
                   case 'E':
                     {
-                      if ( nId == 3 && sqlite3StrNICmp( zSql, zIdx, "end", 3 ) == 0 )
+                      if ( nId == 3 && StringExtensions.sqlite3StrNICmp( zSql, zIdx, "end", 3 ) == 0 )
                       {
                         token = tkEND;
                       }
                       else
 #if !SQLITE_OMIT_EXPLAIN
-                        if ( nId == 7 && sqlite3StrNICmp( zSql, zIdx, "explain", 7 ) == 0 )
+                        if ( nId == 7 && StringExtensions.sqlite3StrNICmp( zSql, zIdx, "explain", 7 ) == 0 )
                         {
                           token = tkEXPLAIN;
                         }

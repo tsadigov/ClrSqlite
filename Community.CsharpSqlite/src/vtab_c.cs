@@ -594,11 +594,11 @@ namespace Community.CsharpSqlite
             //if ( zType )
             //  continue;
             nType = StringExtensions.sqlite3Strlen30( zType );
-            if ( sqlite3StrNICmp( "hidden", 0, zType.ToString(), 6 ) != 0 || ( zType.Length > 6 && zType[6] != ' ' ) )
+            if ( StringExtensions.sqlite3StrNICmp( "hidden", 0, zType.ToString(), 6 ) != 0 || ( zType.Length > 6 && zType[6] != ' ' ) )
             {
               for ( i = 0; i < nType; i++ )
               {
-                if ( ( 0 == sqlite3StrNICmp( " hidden", zType.ToString().Substring( i ), 7 ) )
+                if ( ( 0 == StringExtensions.sqlite3StrNICmp( " hidden", zType.ToString().Substring( i ), 7 ) )
                  && ( i+7 == zType.Length || (zType[i + 7] == '\0' || zType[i + 7] == ' ' ))
                 )
                 {

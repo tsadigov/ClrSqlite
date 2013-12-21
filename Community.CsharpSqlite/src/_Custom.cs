@@ -607,7 +607,7 @@ const long ERROR_HANDLE_DISK_FULL = 39L;
 const long ERROR_NOT_SUPPORTED = 50L;
 const long ERROR_DISK_FULL = 112L;
 
-private class SQLite3UpperToLower
+public class SQLite3UpperToLower
 {
   static int[] sqlite3UpperToLower = new int[]  {
 #if SQLITE_ASCII
@@ -652,7 +652,7 @@ private class SQLite3UpperToLower
 }
 
 static SQLite3UpperToLower sqlite3UpperToLower = new SQLite3UpperToLower();
-static SQLite3UpperToLower UpperToLower = sqlite3UpperToLower;
+public static SQLite3UpperToLower UpperToLower = sqlite3UpperToLower;
 
   }
 }

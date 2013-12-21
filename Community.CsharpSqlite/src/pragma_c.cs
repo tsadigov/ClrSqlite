@@ -60,7 +60,7 @@ namespace Community.CsharpSqlite
       n = StringExtensions.sqlite3Strlen30( z );
       for ( i = 0; i < ArraySize( iLength ); i++ )
       {
-        if ( iLength[i] == n && sqlite3StrNICmp( zText.Substring( iOffset[i] ), z, n ) == 0 )
+        if ( iLength[i] == n && StringExtensions.sqlite3StrNICmp( zText.Substring( iOffset[i] ), z, n ) == 0 )
         {
           return iValue[i];
         }
@@ -726,7 +726,7 @@ new VdbeOpList( OP_ResultRow,   1, 1,        0),
                       int n = StringExtensions.sqlite3Strlen30( zRight );
                       for ( eMode = 0; ( zMode = sqlite3JournalModename( eMode ) ) != null; eMode++ )
                       {
-                        if ( sqlite3StrNICmp( zRight, zMode, n ) == 0 )
+                        if ( StringExtensions.sqlite3StrNICmp( zRight, zMode, n ) == 0 )
                           break;
                       }
                       if ( null == zMode )
@@ -1847,13 +1847,13 @@ new VdbeOpList( OP_ResultRow,       1,  1,  0)
                                                                     if ( zLeft.Equals( "activate_extensions" ,StringComparison.InvariantCultureIgnoreCase )  )
                                                                     {
 #if SQLITE_HAS_CODEC
-                                                                      if ( !String.IsNullOrEmpty( zRight ) && zRight.Length > 4 && sqlite3StrNICmp( zRight, "see-", 4 ) == 0 )
+                                                                      if ( !String.IsNullOrEmpty( zRight ) && zRight.Length > 4 && StringExtensions.sqlite3StrNICmp( zRight, "see-", 4 ) == 0 )
                                                                       {
                                                                         sqlite3_activate_see( zRight.Substring( 4 ) );
                                                                       }
 #endif
 #if SQLITE_ENABLE_CEROD
-if( sqlite3StrNICmp(zRight, "cerod-", 6)==0 ){
+if( StringExtensions.sqlite3StrNICmp(zRight, "cerod-", 6)==0 ){
 sqlite3_activate_cerod(&zRight[6]);
 }
 #endif

@@ -3734,7 +3734,7 @@ static int SQLITE_CANTOPEN_BKPT() {return SQLITE_CANTOPEN;}
 */
     //int sqlite3StrICmp(string , string );
     //int StringExtensions.sqlite3Strlen30(const char);
-    //#define sqlite3StrNICmp sqlite3_strnicmp
+    //#define StringExtensions.sqlite3StrNICmp sqlite3_strnicmp
 
     //int sqlite3MallocInit(void);
     //void sqlite3MallocEnd(void);

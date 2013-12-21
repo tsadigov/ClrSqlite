@@ -861,7 +861,7 @@ break;
     )
     {
       int n = ( nKey1 < nKey2 ) ? nKey1 : nKey2;
-      int r = sqlite3StrNICmp( pKey1, pKey2, ( nKey1 < nKey2 ) ? nKey1 : nKey2 );
+      int r = StringExtensions.sqlite3StrNICmp( pKey1, pKey2, ( nKey1 < nKey2 ) ? nKey1 : nKey2 );
       UNUSED_PARAMETER( NotUsed );
       if ( 0 == r )
       {
