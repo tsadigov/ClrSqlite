@@ -1581,7 +1581,7 @@ pOp.p1 = pOut.n;
                     {
                       if ( iA == 0 )
                         goto arithmetic_result_is_null;
-                      if ( iA == -1 && iB == SMALLEST_INT64 )
+                      if ( iA == -1 && iB == IntegerExtensions.SMALLEST_INT64 )
                       {
                         fp_math = true; // goto fp_math
                         break;
@@ -3999,7 +3999,7 @@ op_column_out:
                     ** point number. */
                     Debug.Assert( ( pIn3.flags & MEM_Real ) != 0 );
 
-                    if ( iKey == SMALLEST_INT64 && ( pIn3.r < (double)iKey || pIn3.r > 0 ) )
+                    if ( iKey == IntegerExtensions.SMALLEST_INT64 && ( pIn3.r < (double)iKey || pIn3.r > 0 ) )
                     {
                       /* The P3 value is too large in magnitude to be expressed as an
                       ** integer. */

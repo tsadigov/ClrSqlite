@@ -595,15 +595,6 @@ const int ;//#define SQLITE_UTF16NATIVE  SQLITE_UTF16LE
     static u8 SQLITE_UTF16NATIVE = ( SQLITE_BIGENDIAN != 0 ? SQLITE_UTF16BE : SQLITE_UTF16LE );//#define SQLITE_UTF16NATIVE (SQLITE_BIGENDIAN?SQLITE_UTF16BE:SQLITE_UTF16LE)
 #endif
 
-    /*
-** Constants for the largest and smallest possible 64-bit signed integers.
-** These macros are designed to work correctly on both 32-bit and 64-bit
-** compilers.
-*/
-    //#define LARGEST_INT64  (0xffffffff|(((i64)0x7fffffff)<<32))
-    //#define SMALLEST_INT64 (((i64)-1) - LARGEST_INT64)
-    const i64 LARGEST_INT64 = i64.MaxValue;//( 0xffffffff | ( ( (i64)0x7fffffff ) << 32 ) );
-    const i64 SMALLEST_INT64 = i64.MinValue;//( ( ( i64 ) - 1 ) - LARGEST_INT64 );
 
     /*
     ** Round up a number to the next larger multiple of 8.  This is used
@@ -4664,5 +4655,20 @@ static void IOTRACE( string X, params object[] ap ) { if ( SQLite3IoTrace ) { pr
 //# define sqlite3Isxdigit(x)  isxdigit((unsigned char)(x))
 //# define sqlite3Tolower(x)   tolower((unsigned char)(x))
 #endif
+    }
+
+
+    public class IntegerExtensions
+    {
+        /*
+** Constants for the largest and smallest possible 64-bit signed integers.
+** These macros are designed to work correctly on both 32-bit and 64-bit
+** compilers.
+*/
+        //#define LARGEST_INT64  (0xffffffff|(((i64)0x7fffffff)<<32))
+        //#define SMALLEST_INT64 (((i64)-1) - LARGEST_INT64)
+        public const i64 LARGEST_INT64 = i64.MaxValue;//( 0xffffffff | ( ( (i64)0x7fffffff ) << 32 ) );
+        public const i64 SMALLEST_INT64 = i64.MinValue;//( ( ( i64 ) - 1 ) - LARGEST_INT64 );
+
     }
 }

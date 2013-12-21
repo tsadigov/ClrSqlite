@@ -437,7 +437,7 @@ dummy += (uint)x;
         nDigits++;
       }
       /* copy max significant digits to significand */
-      while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( LARGEST_INT64 - 9 ) / 10 ) )
+      while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( IntegerExtensions.LARGEST_INT64 - 9 ) / 10 ) )
       {
         s = s * 10 + ( z[zDx] - '0' );
         zDx += incr;
@@ -460,7 +460,7 @@ dummy += (uint)x;
         zDx += incr;
         /* copy digits from after decimal to significand
         ** (decrease exponent by d to shift decimal right) */
-        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( LARGEST_INT64 - 9 ) / 10 ) )
+        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( IntegerExtensions.LARGEST_INT64 - 9 ) / 10 ) )
         {
           s = s * 10 + ( z[zDx] - '0' );
           zDx += incr;
@@ -539,7 +539,7 @@ do_atof_calc:
         /* attempt to reduce exponent */
         if ( esign > 0 )
         {
-          while ( s < ( LARGEST_INT64 / 10 ) && e > 0 )
+          while ( s < ( IntegerExtensions.LARGEST_INT64 / 10 ) && e > 0 )
           {
             e--;
             s *= 10;
@@ -715,9 +715,9 @@ return !sqlite3Atoi64(z, pResult, length, enc);
       {
         u = u * 10 + (u64)(c - '0');
       }
-      if ( u > LARGEST_INT64 )
+      if ( u > IntegerExtensions.LARGEST_INT64 )
       {
-        pNum = SMALLEST_INT64;
+        pNum = IntegerExtensions.SMALLEST_INT64;
       }
       else if ( neg != 0)
       {
@@ -739,7 +739,7 @@ return !sqlite3Atoi64(z, pResult, length, enc);
       else if ( i - zDx < 19 * incr )
       {
         /* Less than 19 digits, so we know that it fits in 64 bits */
-        Debug.Assert( u <= LARGEST_INT64 );
+        Debug.Assert( u <= IntegerExtensions.LARGEST_INT64 );
         return 0;
       }
       else
@@ -749,7 +749,7 @@ return !sqlite3Atoi64(z, pResult, length, enc);
         if ( c < 0 )
         {
           /* zNum is less than 9223372036854775808 so it fits */
-          Debug.Assert( u <= LARGEST_INT64 );
+          Debug.Assert( u <= IntegerExtensions.LARGEST_INT64 );
           return 0;
         }
         else if ( c > 0 )
@@ -761,8 +761,8 @@ return !sqlite3Atoi64(z, pResult, length, enc);
         {
           /* zNum is exactly 9223372036854775808.  Fits if negative.  The
           ** special case 2 overflow if positive */
-          Debug.Assert( u - 1 == LARGEST_INT64 );
-          Debug.Assert( ( pNum ) == SMALLEST_INT64 );
+          Debug.Assert( u - 1 == IntegerExtensions.LARGEST_INT64 );
+          Debug.Assert( ( pNum ) == IntegerExtensions.SMALLEST_INT64 );
           return neg != 0 ? 0 : 2;
         }
       }
@@ -1591,17 +1591,17 @@ return n;
       testcase( iB == 0 );
       if ( iB >= 0 )
       {
-        testcase( iA > 0 && LARGEST_INT64 - iA == iB );
-        testcase( iA > 0 && LARGEST_INT64 - iA == iB - 1 );
-        if ( iA > 0 && LARGEST_INT64 - iA < iB )
+        testcase( iA > 0 && IntegerExtensions.LARGEST_INT64 - iA == iB );
+        testcase( iA > 0 && IntegerExtensions.LARGEST_INT64 - iA == iB - 1 );
+        if ( iA > 0 && IntegerExtensions.LARGEST_INT64 - iA < iB )
           return 1;
         pA += iB;
       }
       else
       {
-        testcase( iA < 0 && -( iA + LARGEST_INT64 ) == iB + 1 );
-        testcase( iA < 0 && -( iA + LARGEST_INT64 ) == iB + 2 );
-        if ( iA < 0 && -( iA + LARGEST_INT64 ) > iB + 1 )
+        testcase( iA < 0 && -( iA + IntegerExtensions.LARGEST_INT64 ) == iB + 1 );
+        testcase( iA < 0 && -( iA + IntegerExtensions.LARGEST_INT64 ) == iB + 2 );
+        if ( iA < 0 && -( iA + IntegerExtensions.LARGEST_INT64 ) > iB + 1 )
           return 1;
         pA += iB;
       }
@@ -1609,8 +1609,8 @@ return n;
     }
     static int sqlite3SubInt64( ref i64 pA, i64 iB )
     {
-      testcase( iB == SMALLEST_INT64 + 1 );
-      if ( iB == SMALLEST_INT64 )
+      testcase( iB == IntegerExtensions.SMALLEST_INT64 + 1 );
+      if ( iB == IntegerExtensions.SMALLEST_INT64 )
       {
         testcase( ( pA ) == ( -1 ) );
         testcase( ( pA ) == 0 );

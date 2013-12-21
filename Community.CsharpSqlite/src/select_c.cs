@@ -4513,7 +4513,7 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
       /* Set the limiter.
       */
       iEnd = sqlite3VdbeMakeLabel( v );
-      p.nSelectRow = (double)LARGEST_INT64;
+      p.nSelectRow = (double)IntegerExtensions.LARGEST_INT64;
       computeLimitRegisters( pParse, p, iEnd );
 
       /* Open a virtual index to use for the distinct set.

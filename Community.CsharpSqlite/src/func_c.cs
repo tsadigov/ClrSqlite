@@ -390,11 +390,11 @@ namespace Community.CsharpSqlite
       ** handle the rounding directly,
       ** otherwise use printf.
       */
-      if ( n == 0 && r >= 0 && r < LARGEST_INT64 - 1 )
+      if ( n == 0 && r >= 0 && r < IntegerExtensions.LARGEST_INT64 - 1 )
       {
         r = (double)( (sqlite_int64)( r + 0.5 ) );
       }
-      else if ( n == 0 && r < 0 && ( -r ) < LARGEST_INT64 - 1 )
+      else if ( n == 0 && r < 0 && ( -r ) < IntegerExtensions.LARGEST_INT64 - 1 )
       {
         r = -(double)( (sqlite_int64)( ( -r ) + 0.5 ) );
       }

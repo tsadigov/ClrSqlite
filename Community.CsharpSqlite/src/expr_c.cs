@@ -2360,7 +2360,7 @@ return null;
           //char* zV;
           if ( negFlag )
           {
-            value = c == 2 ? SMALLEST_INT64 : -value;
+            value = c == 2 ? IntegerExtensions.SMALLEST_INT64 : -value;
           }
           sqlite3VdbeAddOp4( v, OP_Int64, 0, iMem, 0, value, P4_INT64 );
         }

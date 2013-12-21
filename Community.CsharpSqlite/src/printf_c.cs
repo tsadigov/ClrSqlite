@@ -524,7 +524,7 @@ const int SQLITE_PRINT_BUF_SIZE = 50;
               }
               if ( v < 0 )
               {
-                if ( v == SMALLEST_INT64 )
+                if ( v == IntegerExtensions.SMALLEST_INT64 )
                 {
                   longvalue = ( (long)( (u64)1 ) << 63 );
                 }

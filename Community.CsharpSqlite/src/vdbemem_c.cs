@@ -425,8 +425,8 @@ return r;
 ** So we define our own static constants here using nothing
 ** larger than a 32-bit integer constant.
 */
-      const i64 maxInt = LARGEST_INT64;
-      const i64 minInt = SMALLEST_INT64;
+      const i64 maxInt = IntegerExtensions.LARGEST_INT64;
+      const i64 minInt = IntegerExtensions.SMALLEST_INT64;
 
       if ( r < (double)minInt )
       {
@@ -559,8 +559,8 @@ return r;
       ** true and could be omitted.  But we leave it in because other
       ** architectures might behave differently.
       */
-      if ( pMem.r == (double)pMem.u.i && pMem.u.i > SMALLEST_INT64
-      && ALWAYS( pMem.u.i < LARGEST_INT64 ) )
+      if ( pMem.r == (double)pMem.u.i && pMem.u.i > IntegerExtensions.SMALLEST_INT64
+      && ALWAYS( pMem.u.i < IntegerExtensions.LARGEST_INT64 ) )
       {
         pMem.flags |= MEM_Int;
       }
@@ -1504,11 +1504,11 @@ if( NEVER(op==TK_REGISTER) ) op = pExpr.op2;
         if ( SQLITE_OK == sqlite3ValueFromExpr( db, pExpr.pLeft, enc, affinity, ref pVal ) )
         {
           sqlite3VdbeMemNumerify( pVal );
-          if ( pVal.u.i == SMALLEST_INT64 )
+          if ( pVal.u.i == IntegerExtensions.SMALLEST_INT64 )
           {
             pVal.flags &= MEM_Int;
             pVal.flags |= MEM_Real;
-            pVal.r = (double)LARGEST_INT64;
+            pVal.r = (double)IntegerExtensions.LARGEST_INT64;
           }
           else
           {
