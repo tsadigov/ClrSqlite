@@ -162,7 +162,7 @@ namespace Community.CsharpSqlite
       val = 0;
       while ( N-- != 0 )
       {
-        if ( !sqlite3Isdigit( zDate[zIndex] ) )
+        if ( !CharExtensions.sqlite3Isdigit( zDate[zIndex] ) )
         {
           goto end_getDigits;
         }
@@ -266,11 +266,11 @@ zulu_time:
           return 1;
         }
         zIndex += 2;// zDate += 2;
-        if ( zIndex + 1 < zDate.Length && zDate[zIndex] == '.' && sqlite3Isdigit( zDate[zIndex + 1] ) )
+        if ( zIndex + 1 < zDate.Length && zDate[zIndex] == '.' && CharExtensions.sqlite3Isdigit( zDate[zIndex + 1] ) )
         {
           double rScale = 1.0;
           zIndex++;// zDate++;
-          while ( zIndex < zDate.Length && sqlite3Isdigit( zDate[zIndex] )
+          while ( zIndex < zDate.Length && CharExtensions.sqlite3Isdigit( zDate[zIndex] )
           )
           {
             ms = ms * 10.0 + zDate[zIndex] - '0';
@@ -835,7 +835,7 @@ zulu_time:
               DateTime tx;
               sqlite3_int64 day;
               int z2Index = 0;
-              if ( !sqlite3Isdigit( z2[z2Index] ) )
+              if ( !CharExtensions.sqlite3Isdigit( z2[z2Index] ) )
                 z2Index++;// z2++;
               tx = new DateTime();// memset( &tx, 0, sizeof(tx));
               if ( parseHhMmSs( z2.Substring( z2Index ), tx ) != 0 )

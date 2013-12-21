@@ -2259,8 +2259,8 @@ static int sqlite3ParseUri(
     {
       iIn++;
       if( c=='%' 
-       && sqlite3Isxdigit(zUri[iIn]) 
-       && sqlite3Isxdigit(zUri[iIn+1]) 
+       && CharExtensions.sqlite3Isxdigit(zUri[iIn]) 
+       && CharExtensions.sqlite3Isxdigit(zUri[iIn+1]) 
       ){
         int octet = (sqlite3HexToInt(zUri[iIn++]) << 4);
         octet += sqlite3HexToInt(zUri[iIn++]);

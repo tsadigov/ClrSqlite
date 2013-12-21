@@ -53,7 +53,7 @@ namespace Community.CsharpSqlite
       int[] iLength = new int[] { 2, 2, 3, 5, 3, 4, 4 };
       u8[] iValue = new u8[] { 1, 0, 0, 0, 1, 1, 2 };
       int i, n;
-      if ( sqlite3Isdigit( z[0] ) )
+      if ( CharExtensions.sqlite3Isdigit( z[0] ) )
       {
         return (u8)sqlite3Atoi( z );
       }

@@ -35,7 +35,7 @@ static int atoi( string inStr )
   int i;
   for ( i = 0; i < inStr.Length; i++ )
   {
-    if ( !sqlite3Isdigit( inStr[i] ) && inStr[i] != '-' )
+    if ( !CharExtensions.sqlite3Isdigit( inStr[i] ) && inStr[i] != '-' )
       break;
   }
   int result = 0;

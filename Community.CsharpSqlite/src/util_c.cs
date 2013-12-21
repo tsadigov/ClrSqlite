@@ -437,7 +437,7 @@ dummy += (uint)x;
         nDigits++;
       }
       /* copy max significant digits to significand */
-      while ( zDx < length && sqlite3Isdigit( z[zDx] ) && s < ( ( LARGEST_INT64 - 9 ) / 10 ) )
+      while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( LARGEST_INT64 - 9 ) / 10 ) )
       {
         s = s * 10 + ( z[zDx] - '0' );
         zDx += incr;
@@ -445,7 +445,7 @@ dummy += (uint)x;
       }
       /* skip non-significant significand digits
       ** (increase exponent by d to shift decimal left) */
-      while ( zDx < length && sqlite3Isdigit( z[zDx] ) )
+      while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) )
       {
         zDx += incr;
         nDigits++;
@@ -460,7 +460,7 @@ dummy += (uint)x;
         zDx += incr;
         /* copy digits from after decimal to significand
         ** (decrease exponent by d to shift decimal right) */
-        while ( zDx < length && sqlite3Isdigit( z[zDx] ) && s < ( ( LARGEST_INT64 - 9 ) / 10 ) )
+        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( LARGEST_INT64 - 9 ) / 10 ) )
         {
           s = s * 10 + ( z[zDx] - '0' );
           zDx += incr;
@@ -469,7 +469,7 @@ dummy += (uint)x;
         }
 
         /* skip non-significant digits */
-        while ( zDx < length && sqlite3Isdigit( z[zDx] ) )
+        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) )
         {
           zDx += incr;
           nDigits++;
@@ -498,7 +498,7 @@ dummy += (uint)x;
         }
 
         /* copy digits to exponent */
-        while ( zDx < length && sqlite3Isdigit( z[zDx] ) )
+        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) )
         {
           e = e * 10 + ( z[zDx] - '0' );
           zDx += incr;

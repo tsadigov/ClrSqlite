@@ -131,7 +131,7 @@ namespace Community.CsharpSqlite
           {
             if ( nToken > 1 )
             {
-              Debug.Assert( sqlite3Isdigit( zRawSql[izRawSql + 1] ) );
+              Debug.Assert( CharExtensions.sqlite3Isdigit( zRawSql[izRawSql + 1] ) );
               sqlite3GetInt32( zRawSql, izRawSql + 1, ref idx );
             }
             else

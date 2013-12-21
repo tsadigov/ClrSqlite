@@ -71,6 +71,40 @@ namespace Community.CsharpSqlite
         {
             return x < 256 && (sqlite3CtypeMap[(byte) (x)] & 0x01) != 0;
         }
+
+        //# define sqlite3Isalnum(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x06)
+        public static bool sqlite3Isalnum(byte x)
+        {
+            return (sqlite3CtypeMap[(byte)(x)] & 0x06) != 0;
+        }
+        public static bool sqlite3Isalnum(char x)
+        {
+            return x < 256 && (sqlite3CtypeMap[(byte)(x)] & 0x06) != 0;
+        }
+
+        //# define sqlite3Isalpha(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x02)
+
+        //# define sqlite3Isdigit(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x04)
+        public static bool sqlite3Isdigit(byte x)
+        {
+            return (sqlite3CtypeMap[((byte)x)] & 0x04) != 0;
+        }
+        public static bool sqlite3Isdigit(char x)
+        {
+            return x < 256 && (sqlite3CtypeMap[((byte)x)] & 0x04) != 0;
+        }
+
+        //# define sqlite3Isxdigit(x)  (sqlite3CtypeMap[(unsigned char)(x)]&0x08)
+        public static bool sqlite3Isxdigit(byte x)
+        {
+            return (sqlite3CtypeMap[((byte)x)] & 0x08) != 0;
+        }
+        public static bool sqlite3Isxdigit(char x)
+        {
+            return x < 256 && (sqlite3CtypeMap[((byte)x)] & 0x08) != 0;
+        }
+
+        //# define sqlite3Tolower(x)   (sqlite3UpperToLower[(unsigned char)(x)])
 #endif
     }
 
@@ -3710,39 +3744,7 @@ static int SQLITE_CANTOPEN_BKPT() {return SQLITE_CANTOPEN;}
     */
 #if SQLITE_ASCII
    
-    //# define sqlite3Isalnum(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x06)
-    static bool sqlite3Isalnum( byte x )
-    {
-      return ( sqlite3CtypeMap[(byte)( x )] & 0x06 ) != 0;
-    }
-    static bool sqlite3Isalnum( char x )
-    {
-      return x < 256 && ( sqlite3CtypeMap[(byte)( x )] & 0x06 ) != 0;
-    }
 
-    //# define sqlite3Isalpha(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x02)
-
-    //# define sqlite3Isdigit(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x04)
-    static bool sqlite3Isdigit( byte x )
-    {
-      return ( sqlite3CtypeMap[( (byte)x )] & 0x04 ) != 0;
-    }
-    static bool sqlite3Isdigit( char x )
-    {
-      return x < 256 && ( sqlite3CtypeMap[( (byte)x )] & 0x04 ) != 0;
-    }
-
-    //# define sqlite3Isxdigit(x)  (sqlite3CtypeMap[(unsigned char)(x)]&0x08)
-    static bool sqlite3Isxdigit( byte x )
-    {
-      return ( sqlite3CtypeMap[( (byte)x )] & 0x08 ) != 0;
-    }
-    static bool sqlite3Isxdigit( char x )
-    {
-      return x < 256 && ( sqlite3CtypeMap[( (byte)x )] & 0x08 ) != 0;
-    }
-
-    //# define sqlite3Tolower(x)   (sqlite3UpperToLower[(unsigned char)(x)])
 #else
 //# define sqlite3Toupper(x)   toupper((unsigned char)(x))
 //# define CharExtensions.sqlite3Isspace(x)   isspace((unsigned char)(x))

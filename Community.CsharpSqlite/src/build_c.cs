@@ -1589,10 +1589,10 @@ primary_key_exit:
       i = pIdx;
       for ( j = 0; j < zIdent.Length; j++ )
       {
-        if ( !sqlite3Isalnum( zIdent[j] ) && zIdent[j] != '_' )
+        if ( !CharExtensions.sqlite3Isalnum( zIdent[j] ) && zIdent[j] != '_' )
           break;
       }
-      needQuote = sqlite3Isdigit( zIdent[0] ) || sqlite3KeywordCode( zIdent, j ) != TK_ID;
+      needQuote = CharExtensions.sqlite3Isdigit( zIdent[0] ) || sqlite3KeywordCode( zIdent, j ) != TK_ID;
       if ( !needQuote )
       {
         needQuote = ( j < zIdent.Length && zIdent[j] != 0 );

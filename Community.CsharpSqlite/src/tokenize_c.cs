@@ -342,7 +342,7 @@ namespace Community.CsharpSqlite
         case '.':
           {
 #if !SQLITE_OMIT_FLOATING_POINT
-            if ( !sqlite3Isdigit( z[iOffset + 1] ) )
+            if ( !CharExtensions.sqlite3Isdigit( z[iOffset + 1] ) )
 #endif
             {
               tokenType = TK_DOT;
@@ -374,27 +374,27 @@ namespace Community.CsharpSqlite
             testcase( z[iOffset] == '8' );
             testcase( z[iOffset] == '9' );
             tokenType = TK_INTEGER;
-            for ( i = 0; z.Length > iOffset + i && sqlite3Isdigit( z[iOffset + i] ); i++ )
+            for ( i = 0; z.Length > iOffset + i && CharExtensions.sqlite3Isdigit( z[iOffset + i] ); i++ )
             {
             }
 #if !SQLITE_OMIT_FLOATING_POINT
             if ( z.Length > iOffset + i && z[iOffset + i] == '.' )
             {
               i++;
-              while ( z.Length > iOffset + i && sqlite3Isdigit( z[iOffset + i] ) )
+              while ( z.Length > iOffset + i && CharExtensions.sqlite3Isdigit( z[iOffset + i] ) )
               {
                 i++;
               }
               tokenType = TK_FLOAT;
             }
             if ( z.Length > iOffset + i + 1 && ( z[iOffset + i] == 'e' || z[iOffset + i] == 'E' ) &&
-            ( sqlite3Isdigit( z[iOffset + i + 1] )
-            || z.Length > iOffset + i + 2 && ( ( z[iOffset + i + 1] == '+' || z[iOffset + i + 1] == '-' ) && sqlite3Isdigit( z[iOffset + i + 2] ) )
+            ( CharExtensions.sqlite3Isdigit( z[iOffset + i + 1] )
+            || z.Length > iOffset + i + 2 && ( ( z[iOffset + i + 1] == '+' || z[iOffset + i + 1] == '-' ) && CharExtensions.sqlite3Isdigit( z[iOffset + i + 2] ) )
             )
             )
             {
               i += 2;
-              while ( z.Length > iOffset + i && sqlite3Isdigit( z[iOffset + i] ) )
+              while ( z.Length > iOffset + i && CharExtensions.sqlite3Isdigit( z[iOffset + i] ) )
               {
                 i++;
               }
@@ -420,14 +420,14 @@ namespace Community.CsharpSqlite
         case '?':
           {
             tokenType = TK_VARIABLE;
-            for ( i = 1; z.Length > iOffset + i && sqlite3Isdigit( z[iOffset + i] ); i++ )
+            for ( i = 1; z.Length > iOffset + i && CharExtensions.sqlite3Isdigit( z[iOffset + i] ); i++ )
             {
             }
             return i;
           }
         case '#':
           {
-            for ( i = 1; z.Length > iOffset + i && sqlite3Isdigit( z[iOffset + i] ); i++ )
+            for ( i = 1; z.Length > iOffset + i && CharExtensions.sqlite3Isdigit( z[iOffset + i] ); i++ )
             {
             }
             if ( i > 1 )
@@ -498,7 +498,7 @@ namespace Community.CsharpSqlite
             if ( z.Length > iOffset + 1 && z[iOffset + 1] == '\'' )
             {
               tokenType = TK_BLOB;
-                for ( i = 2; z.Length > iOffset + i && sqlite3Isxdigit( z[iOffset + i] ); i++ )
+                for ( i = 2; z.Length > iOffset + i && CharExtensions.sqlite3Isxdigit( z[iOffset + i] ); i++ )
                 {
                 }
                 if ( iOffset + i == z.Length || z[iOffset + i] != '\'' || i % 2 != 0 )
