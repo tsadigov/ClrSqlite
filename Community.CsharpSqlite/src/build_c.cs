@@ -343,7 +343,7 @@ p.zName, P4_STATIC );
       int i;
       int nName;
       Debug.Assert( zName != null );
-      nName = sqlite3Strlen30( zName );
+      nName = StringExtensions.sqlite3Strlen30( zName );
       /* All mutexes are required for schema access.  Make sure we hold them. */
       Debug.Assert( zDatabase != null || sqlite3BtreeHoldsAllMutexes( db ) );
       for ( i = OMIT_TEMPDB; i < db.nDb; i++ )
@@ -418,7 +418,7 @@ p.zName, P4_STATIC );
     {
       Index p = null;
       int i;
-      int nName = sqlite3Strlen30( zName );
+      int nName = StringExtensions.sqlite3Strlen30( zName );
       /* All mutexes are required for schema access.  Make sure we hold them. */
       Debug.Assert( zDb != null || sqlite3BtreeHoldsAllMutexes( db ) );
       for ( i = OMIT_TEMPDB; i < db.nDb; i++ )
@@ -463,7 +463,7 @@ p.zName, P4_STATIC );
       Debug.Assert( sqlite3SchemaMutexHeld( db, iDb, null ) );
       pHash = db.aDb[iDb].pSchema.idxHash;
 
-      len = sqlite3Strlen30( zIdxName );
+      len = StringExtensions.sqlite3Strlen30( zIdxName );
       pIndex = sqlite3HashInsert( ref pHash, zIdxName, len, (Index)null );
       if ( ALWAYS(pIndex) )
       {
@@ -637,19 +637,19 @@ p.zName, P4_STATIC );
         //
 #if !NDEBUG || SQLITE_COVERAGE_TEST
         //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
-        //ref pIndex.pSchema.idxHash, zName, sqlite3Strlen30(zName), 0
+        //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
         //  );
         Index pOld = sqlite3HashInsert(
-      ref pIndex.pSchema.idxHash, zName, sqlite3Strlen30( zName ), (Index)null
+      ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30( zName ), (Index)null
         );
         Debug.Assert( db == null || sqlite3SchemaMutexHeld( db, 0, pIndex.pSchema ) );
         Debug.Assert( pOld == pIndex || pOld == null );
 #else
     //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
-    //ref pIndex.pSchema.idxHash, zName, sqlite3Strlen30(zName), 0
+    //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
     //  );
       sqlite3HashInsert(
-    ref pIndex.pSchema.idxHash, zName, sqlite3Strlen30(zName),(Index)null
+    ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName),(Index)null
       );
 #endif
         //}
@@ -690,7 +690,7 @@ p.zName, P4_STATIC );
       testcase( zTabName.Length == 0 );  /* Zero-length table names are allowed */
       pDb = db.aDb[iDb];
       p = sqlite3HashInsert( ref pDb.pSchema.tblHash, zTabName,
-      sqlite3Strlen30( zTabName ), (Table)null );
+      StringExtensions.sqlite3Strlen30( zTabName ), (Table)null );
       sqlite3DeleteTable( db, ref p );
       db.flags |= SQLITE_InternChanges;
     }
@@ -751,11 +751,11 @@ p.zName, P4_STATIC );
       if ( zName != null )
       {
         Db pDb;
-        int n = sqlite3Strlen30( zName );
+        int n = StringExtensions.sqlite3Strlen30( zName );
         for ( i = ( db.nDb - 1 ); i >= 0; i-- )
         {
           pDb = db.aDb[i];
-          if ( ( OMIT_TEMPDB == 0 || i != 1 ) && n == sqlite3Strlen30( pDb.zName ) &&
+          if ( ( OMIT_TEMPDB == 0 || i != 1 ) && n == StringExtensions.sqlite3Strlen30( pDb.zName ) &&
           pDb.zName.Equals( zName, StringComparison.InvariantCultureIgnoreCase ) )
           {
             break;
@@ -1666,7 +1666,7 @@ primary_key_exit:
       //}
       //sqlite3_snprintf(n, zStmt,"CREATE TABLE ");
       zStmt.Append( "CREATE TABLE " );
-      k = sqlite3Strlen30( zStmt );
+      k = StringExtensions.sqlite3Strlen30( zStmt );
       identPut( zStmt, ref k, p.zName );
       zStmt.Append( '(' );//zStmt[k++] = '(';
       for ( i = 0; i < p.nCol; i++ )
@@ -1683,7 +1683,7 @@ primary_key_exit:
         string zType;
 
         zStmt.Append( zSep );//  sqlite3_snprintf(n-k, zStmt[k], zSep);
-        k = sqlite3Strlen30( zStmt );//  k += strlen(zStmt[k]);
+        k = StringExtensions.sqlite3Strlen30( zStmt );//  k += strlen(zStmt[k]);
         zSep = zSep2;
         identPut( zStmt, ref k, pCol.zName );
         Debug.Assert( pCol.affinity - SQLITE_AFF_TEXT >= 0 );
@@ -1695,7 +1695,7 @@ primary_key_exit:
         testcase( pCol.affinity == SQLITE_AFF_REAL );
 
         zType = azType[pCol.affinity - SQLITE_AFF_TEXT];
-        len = sqlite3Strlen30( zType );
+        len = StringExtensions.sqlite3Strlen30( zType );
         Debug.Assert( pCol.affinity == SQLITE_AFF_NONE
         || pCol.affinity == sqlite3AffinityType( zType ) );
         zStmt.Append( zType );// memcpy( &zStmt[k], zType, len );
@@ -1937,7 +1937,7 @@ primary_key_exit:
         Schema pSchema = p.pSchema;
         Debug.Assert( sqlite3SchemaMutexHeld( db, iDb, null ) );
         pOld = sqlite3HashInsert( ref pSchema.tblHash, p.zName,
-        sqlite3Strlen30( p.zName ), p );
+        StringExtensions.sqlite3Strlen30( p.zName ), p );
         if ( pOld != null )
         {
           Debug.Assert( p == pOld );  /* Malloc must have failed inside HashInsert() */
@@ -2598,7 +2598,7 @@ exit_drop_table:
       //nByte = sizeof(*pFKey) + (nCol-1)*sizeof(pFKey.aCol[0]) + pTo.n + 1;
       //if( pToCol ){
       //  for(i=0; i<pToCol.nExpr; i++){
-      //    nByte += sqlite3Strlen30(pToCol->a[i].zName) + 1;
+      //    nByte += StringExtensions.sqlite3Strlen30(pToCol->a[i].zName) + 1;
       //  }
       //}
       pFKey = new FKey();//sqlite3DbMallocZero(db, nByte );
@@ -2648,7 +2648,7 @@ exit_drop_table:
       {
         for ( i = 0; i < nCol; i++ )
         {
-          int n = sqlite3Strlen30( pToCol.a[i].zName );
+          int n = StringExtensions.sqlite3Strlen30( pToCol.a[i].zName );
           if ( pFKey.aCol[i] == null )
             pFKey.aCol[i] = new FKey.sColMap();
           pFKey.aCol[i].zCol = pToCol.a[i].zName;
@@ -2663,7 +2663,7 @@ exit_drop_table:
 
       Debug.Assert( sqlite3SchemaMutexHeld( db, 0, p.pSchema ) );
       pNextTo = sqlite3HashInsert( ref p.pSchema.fkeyHash,
-          pFKey.zTo, sqlite3Strlen30( pFKey.zTo ), pFKey
+          pFKey.zTo, StringExtensions.sqlite3Strlen30( pFKey.zTo ), pFKey
       );
       //if( pNextTo==pFKey ){
       //  db.mallocFailed = 1;
@@ -3016,7 +3016,7 @@ goto exit_create_index;
       if ( pList == null )
       {
         nullId.z = pTab.aCol[pTab.nCol - 1].zName;
-        nullId.n = sqlite3Strlen30( nullId.z );
+        nullId.n = StringExtensions.sqlite3Strlen30( nullId.z );
         pList = sqlite3ExprListAppend( pParse, null, null );
         if ( pList == null )
           goto exit_create_index;
@@ -3037,7 +3037,7 @@ goto exit_create_index;
           ** failure we have quit before reaching this point. */
           if ( ALWAYS( pColl != null ) )
           {
-            nExtra += ( 1 + sqlite3Strlen30( pColl.zName ) );
+            nExtra += ( 1 + StringExtensions.sqlite3Strlen30( pColl.zName ) );
           }
         }
       }
@@ -3045,7 +3045,7 @@ goto exit_create_index;
       /*
       ** Allocate the index structure.
       */
-      nName = sqlite3Strlen30( zName );
+      nName = StringExtensions.sqlite3Strlen30( zName );
       nCol = pList.nExpr;
       pIndex = new Index();
       // sqlite3DbMallocZero( db,
@@ -3132,7 +3132,7 @@ goto exit_create_index;
         {
           int nColl;
           zColl = pListItem.pExpr.pColl.zName;
-          nColl = sqlite3Strlen30( zColl );
+          nColl = StringExtensions.sqlite3Strlen30( zColl );
           Debug.Assert( nExtra >= nColl );
           zExtra = new StringBuilder( zColl.Substring( 0, nColl ) );// memcpy( zExtra, zColl, nColl );
           zColl = zExtra.ToString();
@@ -3235,7 +3235,7 @@ goto exit_create_index;
         Index p;
         Debug.Assert( sqlite3SchemaMutexHeld( db, 0, pIndex.pSchema ) );
         p = sqlite3HashInsert( ref pIndex.pSchema.idxHash,
-        pIndex.zName, sqlite3Strlen30( pIndex.zName ),
+        pIndex.zName, StringExtensions.sqlite3Strlen30( pIndex.zName ),
         pIndex );
         if ( p != null )
         {

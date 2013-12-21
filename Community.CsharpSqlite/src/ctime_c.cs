@@ -388,7 +388,7 @@ namespace Community.CsharpSqlite
       int i, n = 0;
       if ( zOptName.StartsWith( "SQLITE_", System.StringComparison.InvariantCultureIgnoreCase ) )
         n = 7;
-      //n = sqlite3Strlen30(zOptName);
+      //n = StringExtensions.sqlite3Strlen30(zOptName);
 
       /* Since ArraySize(azCompileOpt) is normally in single digits, a
       ** linear search is adequate.  No need for a binary search. */

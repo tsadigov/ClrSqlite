@@ -638,7 +638,7 @@ break;
             testcase( pExpr.op == TK_CONST_FUNC );
             Debug.Assert( !ExprHasProperty( pExpr, EP_xIsSelect ) );
             zId = pExpr.u.zToken;
-            nId = sqlite3Strlen30( zId );
+            nId = StringExtensions.sqlite3Strlen30( zId );
             pDef = sqlite3FindFunction( pParse.db, zId, nId, n, enc, 0 );
             if ( pDef == null )
             {

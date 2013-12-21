@@ -537,7 +537,7 @@ sqlite3Dequote(ref pNew.u._zToken);
     {
       Token x = new Token();
       x.z = zToken;
-      x.n = !String.IsNullOrEmpty( zToken ) ? sqlite3Strlen30( zToken ) : 0;
+      x.n = !String.IsNullOrEmpty( zToken ) ? StringExtensions.sqlite3Strlen30( zToken ) : 0;
       return sqlite3ExprAlloc( db, op, x, 0 );
     }
 
@@ -716,7 +716,7 @@ sqlite3Dequote(ref pNew.u._zToken);
         pExpr.iColumn = (ynVar)( ++pParse.nVar );
   }else{
     ynVar x = 0;
-    int n = sqlite3Strlen30(z);
+    int n = StringExtensions.sqlite3Strlen30(z);
     if( z[0]=='?' ){
         /* Wildcard of the form "?nnn".  Convert "nnn" to an integer and
         ** use it as the variable number */
@@ -897,7 +897,7 @@ sqlite3DbFree( db, ref p.u._zToken );
       int nByte = dupedExprStructSize( p, flags ) & 0xfff;
       if ( !ExprHasProperty( p, EP_IntValue ) && p.u.zToken != null )
       {
-        nByte += sqlite3Strlen30( p.u.zToken ) + 1;
+        nByte += StringExtensions.sqlite3Strlen30( p.u.zToken ) + 1;
       }
       return ROUND8( nByte );
     }
@@ -972,7 +972,7 @@ sqlite3DbFree( db, ref p.u._zToken );
           int nToken;
           if ( !ExprHasProperty( p, EP_IntValue ) && !String.IsNullOrEmpty( p.u.zToken ) )
           {
-            nToken = sqlite3Strlen30( p.u.zToken );
+            nToken = StringExtensions.sqlite3Strlen30( p.u.zToken );
           }
           else
           {
@@ -2321,7 +2321,7 @@ return null;
       {
         double value = 0;
         //string zV;
-        sqlite3AtoF( z, ref value, sqlite3Strlen30( z ), SQLITE_UTF8 );
+        sqlite3AtoF( z, ref value, StringExtensions.sqlite3Strlen30( z ), SQLITE_UTF8 );
         Debug.Assert( !MathExtensions.sqlite3IsNaN( value ) ); /* The new AtoF never returns NaN */
         if ( negateFlag )
           value = -value;
@@ -2354,7 +2354,7 @@ return null;
         i64 value = 0;
         string z = pExpr.u.zToken;
         Debug.Assert( !String.IsNullOrEmpty( z ) );
-        c = sqlite3Atoi64( z, ref value, sqlite3Strlen30( z ), SQLITE_UTF8 );
+        c = sqlite3Atoi64( z, ref value, StringExtensions.sqlite3Strlen30( z ), SQLITE_UTF8 );
         if ( c == 0 || ( c == 2 && negFlag ) )
         {
           //char* zV;
@@ -2810,7 +2810,7 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
             Debug.Assert( pExpr.u.zToken[0] == 'x' || pExpr.u.zToken[0] == 'X' );
             Debug.Assert( pExpr.u.zToken[1] == '\'' );
             z = pExpr.u.zToken.Substring( 2 );
-            n = sqlite3Strlen30( z ) - 1;
+            n = StringExtensions.sqlite3Strlen30( z ) - 1;
             Debug.Assert( z[n] == '\'' );
             zBlob = sqlite3HexToBlob( sqlite3VdbeDb( v ), z, n );
             sqlite3VdbeAddOp4( v, OP_Blob, n / 2, target, 0, zBlob, P4_DYNAMIC );
@@ -3050,7 +3050,7 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
             nFarg = pFarg != null ? pFarg.nExpr : 0;
             Debug.Assert( !ExprHasProperty( pExpr, EP_IntValue ) );
             zId = pExpr.u.zToken;
-            nId = sqlite3Strlen30( zId );
+            nId = StringExtensions.sqlite3Strlen30( zId );
             pDef = sqlite3FindFunction( pParse.db, zId, nId, nFarg, enc, 0 );
             if ( pDef == null )
             {
@@ -4289,7 +4289,7 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
                   pItem.iMem = ++pParse.nMem;
                   Debug.Assert( !ExprHasProperty( pExpr, EP_IntValue ) );
                   pItem.pFunc = sqlite3FindFunction( pParse.db,
-                  pExpr.u.zToken, sqlite3Strlen30( pExpr.u.zToken ),
+                  pExpr.u.zToken, StringExtensions.sqlite3Strlen30( pExpr.u.zToken ),
                   pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0 );
                   if ( ( pExpr.flags & EP_Distinct ) != 0 )
                   {

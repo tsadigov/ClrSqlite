@@ -1196,7 +1196,7 @@ pOp.cnt = 0;
       }
       else
       {
-        //if (n == 0) n =  n = sqlite3Strlen30(zP4);
+        //if (n == 0) n =  n = StringExtensions.sqlite3Strlen30(zP4);
         pOp.p4.z = _p4.z;// sqlite3DbStrNDup(p.db, zP4, n);
         pOp.p4type = P4_DYNAMIC;
       }
@@ -1317,13 +1317,13 @@ if( p.nOp==0 ) return dummy;
             int i, j;
             KeyInfo pKeyInfo = pOp.p4.pKeyInfo;
             sqlite3_snprintf( nTemp, zTemp, "keyinfo(%d", pKeyInfo.nField );
-            i = sqlite3Strlen30( zTemp );
+            i = StringExtensions.sqlite3Strlen30( zTemp );
             for ( j = 0; j < pKeyInfo.nField; j++ )
             {
               CollSeq pColl = pKeyInfo.aColl[j];
               if ( pColl != null )
               {
-                int n = sqlite3Strlen30( pColl.zName );
+                int n = StringExtensions.sqlite3Strlen30( pColl.zName );
                 if ( i + n > nTemp )
                 {
                   zTemp.Append( ",..." ); // memcpy( &zTemp[i], ",...", 4 );
@@ -1758,7 +1758,7 @@ void sqlite3VdbeLeave(Vdbe *p){
           pMem.flags = MEM_Static | MEM_Str | MEM_Term;
           pMem.z = sqlite3OpcodeName( pOp.opcode );  /* Opcode */
           Debug.Assert( pMem.z != null );
-          pMem.n = sqlite3Strlen30( pMem.z );
+          pMem.n = StringExtensions.sqlite3Strlen30( pMem.z );
           pMem.type = SQLITE_TEXT;
           pMem.enc = SQLITE_UTF8;
           if ( p.pResultSet[i_pMem] == null )
@@ -1828,7 +1828,7 @@ void sqlite3VdbeLeave(Vdbe *p){
         else
         {
           Debug.Assert( pMem.z != null );
-          pMem.n = sqlite3Strlen30( pMem.z );
+          pMem.n = StringExtensions.sqlite3Strlen30( pMem.z );
           pMem.enc = SQLITE_UTF8;
         }
         pMem.type = SQLITE_TEXT;
@@ -1861,7 +1861,7 @@ void sqlite3VdbeLeave(Vdbe *p){
           {
             pMem.flags = MEM_Str | MEM_Term;
             pMem.z = pOp.zComment;
-            pMem.n = pMem.z == null ? 0 : sqlite3Strlen30( pMem.z );
+            pMem.n = pMem.z == null ? 0 : StringExtensions.sqlite3Strlen30( pMem.z );
             pMem.enc = SQLITE_UTF8;
             pMem.type = SQLITE_TEXT;
           }
@@ -2440,7 +2440,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       ** that case we do not support atomic multi-file commits, so use the
       ** simple case then too.
       */
-      if ( 0 == sqlite3Strlen30( sqlite3BtreeGetFilename( db.aDb[0].pBt ) )
+      if ( 0 == StringExtensions.sqlite3Strlen30( sqlite3BtreeGetFilename( db.aDb[0].pBt ) )
       || nTrans <= 1 )
       {
         for ( i = 0; rc == SQLITE_OK && i < db.nDb; i++ )
@@ -2535,8 +2535,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             {
               needSync = true;
             }
-            rc = sqlite3OsWrite( pMaster, Encoding.UTF8.GetBytes( zFile ), sqlite3Strlen30( zFile ), offset );
-            offset += sqlite3Strlen30( zFile );
+            rc = sqlite3OsWrite( pMaster, Encoding.UTF8.GetBytes( zFile ), StringExtensions.sqlite3Strlen30( zFile ), offset );
+            offset += StringExtensions.sqlite3Strlen30( zFile );
             if ( rc != SQLITE_OK )
             {
               sqlite3OsCloseFree( pMaster );

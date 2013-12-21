@@ -223,7 +223,7 @@ namespace Community.CsharpSqlite
       }
       Debug.Assert( sqlite3SchemaMutexHeld( db, iDb, null ) );
       if ( sqlite3HashFind( ( db.aDb[iDb].pSchema.trigHash ),
-      zName, sqlite3Strlen30( zName ), (Trigger)null ) != null )
+      zName, StringExtensions.sqlite3Strlen30( zName ), (Trigger)null ) != null )
       {
         if ( noErr == 0 )
         {
@@ -347,7 +347,7 @@ trigger_cleanup:
         pStepList = pStepList.pNext;
       }
       nameToken.z = pTrig.zName;
-      nameToken.n = sqlite3Strlen30( nameToken.z );
+      nameToken.n = StringExtensions.sqlite3Strlen30( nameToken.z );
       if ( sqlite3FixInit( sFix, pParse, iDb, "trigger", nameToken ) != 0
       && sqlite3FixTriggerStep( sFix, pTrig.step_list ) != 0 )
       {
@@ -383,7 +383,7 @@ trigger_cleanup:
         Trigger pLink = pTrig;
         Hash pHash = db.aDb[iDb].pSchema.trigHash;
         Debug.Assert( sqlite3SchemaMutexHeld( db, iDb, null ) );
-        pTrig = sqlite3HashInsert( ref pHash, zName, sqlite3Strlen30( zName ), pTrig );
+        pTrig = sqlite3HashInsert( ref pHash, zName, StringExtensions.sqlite3Strlen30( zName ), pTrig );
         if ( pTrig != null )
         {
           //db.mallocFailed = 1;
@@ -391,7 +391,7 @@ trigger_cleanup:
         else if ( pLink.pSchema == pLink.pTabSchema )
         {
           Table pTab;
-          int n = sqlite3Strlen30( pLink.table );
+          int n = StringExtensions.sqlite3Strlen30( pLink.table );
           pTab = sqlite3HashFind( pLink.pTabSchema.tblHash, pLink.table, n, (Table)null );
           Debug.Assert( pTab != null );
           pLink.pNext = pTab.pTrigger;
@@ -599,7 +599,7 @@ triggerfinish_cleanup:
       Debug.Assert( pName.nSrc == 1 );
       zDb = pName.a[0].zDatabase;
       zName = pName.a[0].zName;
-      nName = sqlite3Strlen30( zName );
+      nName = StringExtensions.sqlite3Strlen30( zName );
       Debug.Assert( zDb != null || sqlite3BtreeHoldsAllMutexes( db ) );
       for ( i = OMIT_TEMPDB; i < db.nDb; i++ )
       {
@@ -636,7 +636,7 @@ drop_trigger_cleanup:
     */
     static Table tableOfTrigger( Trigger pTrigger )
     {
-      int n = sqlite3Strlen30( pTrigger.table );
+      int n = StringExtensions.sqlite3Strlen30( pTrigger.table );
       return sqlite3HashFind( pTrigger.pTabSchema.tblHash, pTrigger.table, n, (Table)null );
     }
 
@@ -712,7 +712,7 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
 
       Debug.Assert( sqlite3SchemaMutexHeld( db, iDb, null ) );
       pHash = ( db.aDb[iDb].pSchema.trigHash );
-      pTrigger = sqlite3HashInsert( ref pHash, zName, sqlite3Strlen30( zName ), (Trigger)null );
+      pTrigger = sqlite3HashInsert( ref pHash, zName, StringExtensions.sqlite3Strlen30( zName ), (Trigger)null );
       if ( ALWAYS( pTrigger != null ) )
       {
         if ( pTrigger.pSchema == pTrigger.pTabSchema )

@@ -1535,7 +1535,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
         /* Make sure the column name is unique.  If the name is not unique,
         ** append a integer to the name so that it becomes unique.
         */
-        nName = sqlite3Strlen30( zName );
+        nName = StringExtensions.sqlite3Strlen30( zName );
         for ( j = cnt = 0; j < i; j++ )
         {
           if ( aCol[j].zName.Equals( zName, StringComparison.InvariantCultureIgnoreCase ) )
@@ -3889,7 +3889,7 @@ break;
                 }
                 pNew = sqlite3ExprListAppend( pParse, pNew, pExpr );
                 sColname.z = zColname;
-                sColname.n = sqlite3Strlen30( zColname );
+                sColname.n = StringExtensions.sqlite3Strlen30( zColname );
                 sqlite3ExprListSetName( pParse, pNew, sColname, 0 );
                 sqlite3DbFree( db, ref zToFree );
               }

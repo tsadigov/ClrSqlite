@@ -309,7 +309,7 @@ return SQLITE_OK;
         else
           pMem.z = pMem.r.ToString( CultureInfo.InvariantCulture) + ".0";
       }
-      pMem.n = sqlite3Strlen30( pMem.z );
+      pMem.n = StringExtensions.sqlite3Strlen30( pMem.z );
       pMem.enc = SQLITE_UTF8;
       pMem.flags |= MEM_Str | MEM_Term;
       sqlite3VdbeChangeEncoding( pMem, enc );
@@ -1534,7 +1534,7 @@ if( NEVER(op==TK_REGISTER) ) op = pExpr.op2;
         if ( null == pVal )
           goto no_mem;
         zVal = pExpr.u.zToken.Substring( 2 );
-        nVal = sqlite3Strlen30( zVal ) - 1;
+        nVal = StringExtensions.sqlite3Strlen30( zVal ) - 1;
         Debug.Assert( zVal[nVal] == '\'' );
         byte[] blob = sqlite3HexToBlob( db, zVal, nVal );
         sqlite3VdbeMemSetStr( pVal, Encoding.UTF8.GetString( blob, 0, blob.Length ), nVal / 2, 0, SQLITE_DYNAMIC );

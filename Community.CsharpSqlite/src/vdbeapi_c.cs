@@ -1527,7 +1527,7 @@ return bindText(pStmt, i, zData, nData, xDel, SQLITE_UTF16NATIVE);
 
     public static int sqlite3_bind_parameter_index( sqlite3_stmt pStmt, string zName )
     {
-      return sqlite3VdbeParameterIndex( (Vdbe)pStmt, zName, sqlite3Strlen30( zName ) );
+      return sqlite3VdbeParameterIndex( (Vdbe)pStmt, zName, StringExtensions.sqlite3Strlen30( zName ) );
     }
 
     /*

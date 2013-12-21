@@ -61,7 +61,7 @@ namespace Community.CsharpSqlite
       Module pMod;
 
       sqlite3_mutex_enter( db.mutex );
-      nName = sqlite3Strlen30( zName );
+      nName = StringExtensions.sqlite3Strlen30( zName );
       pMod = new Module();//  (Module)sqlite3DbMallocRaw( db, sizeof( Module ) + nName + 1 );
       if ( pMod != null )
       {
@@ -445,7 +445,7 @@ namespace Community.CsharpSqlite
         zWhere = sqlite3MPrintf( db, "name='%q' AND type='table'", pTab.zName );
         sqlite3VdbeAddParseSchemaOp( v, iDb, zWhere );
         sqlite3VdbeAddOp4( v, OP_VCreate, iDb, 0, 0,
-                             pTab.zName, sqlite3Strlen30( pTab.zName ) + 1 );
+                             pTab.zName, StringExtensions.sqlite3Strlen30( pTab.zName ) + 1 );
       }
 
       /* If we are rereading the sqlite_master table create the in-memory
@@ -458,7 +458,7 @@ namespace Community.CsharpSqlite
         Table pOld;
         Schema pSchema = pTab.pSchema;
         string zName = pTab.zName;
-        int nName = sqlite3Strlen30( zName );
+        int nName = StringExtensions.sqlite3Strlen30( zName );
         Debug.Assert( sqlite3SchemaMutexHeld( db, 0, pSchema ) );
         pOld = sqlite3HashInsert( ref pSchema.tblHash, zName, nName, pTab );
         if ( pOld != null )
@@ -593,7 +593,7 @@ namespace Community.CsharpSqlite
             int i = 0;
             //if ( zType )
             //  continue;
-            nType = sqlite3Strlen30( zType );
+            nType = StringExtensions.sqlite3Strlen30( zType );
             if ( sqlite3StrNICmp( "hidden", 0, zType.ToString(), 6 ) != 0 || ( zType.Length > 6 && zType[6] != ' ' ) )
             {
               for ( i = 0; i < nType; i++ )
@@ -653,7 +653,7 @@ namespace Community.CsharpSqlite
 
       /* Locate the required virtual table module */
       zMod = pTab.azModuleArg[0];
-      pMod = (Module)sqlite3HashFind( db.aModule, zMod, sqlite3Strlen30( zMod ), (Module)null );
+      pMod = (Module)sqlite3HashFind( db.aModule, zMod, StringExtensions.sqlite3Strlen30( zMod ), (Module)null );
 
       if ( null == pMod )
       {
@@ -730,7 +730,7 @@ namespace Community.CsharpSqlite
 
       /* Locate the required virtual table module */
       zMod = pTab.azModuleArg[0];
-      pMod = (Module)sqlite3HashFind( db.aModule, zMod, sqlite3Strlen30( zMod ), (Module)null );
+      pMod = (Module)sqlite3HashFind( db.aModule, zMod, StringExtensions.sqlite3Strlen30( zMod ), (Module)null );
 
       /* If the module has been registered and includes a Create method, 
       ** invoke it now. If the module has not been registered, return an 
@@ -1136,7 +1136,7 @@ namespace Community.CsharpSqlite
       /* Create a new ephemeral function definition for the overloaded
       ** function */
       //sqlite3DbMallocZero(db, sizeof(*pNew)
-      //      + sqlite3Strlen30(pDef.zName) + 1);
+      //      + StringExtensions.sqlite3Strlen30(pDef.zName) + 1);
       //if ( pNew == null )
       //{
       //  return pDef;
@@ -1144,7 +1144,7 @@ namespace Community.CsharpSqlite
       pNew = pDef.Copy();
       pNew.zName = pDef.zName;
       //pNew.zName = (char )&pNew[1];
-      //memcpy(pNew.zName, pDef.zName, sqlite3Strlen30(pDef.zName)+1);
+      //memcpy(pNew.zName, pDef.zName, StringExtensions.sqlite3Strlen30(pDef.zName)+1);
       pNew.xFunc = xFunc;
       pNew.pUserData = pArg;
       pNew.flags |= SQLITE_FUNC_EPHEM;

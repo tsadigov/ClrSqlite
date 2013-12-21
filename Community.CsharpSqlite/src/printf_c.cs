@@ -742,7 +742,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                   buf[2] = 'f';// "Inf"
                   bufpt = 3;
                 }
-                length = sqlite3Strlen30( bufpt );// sqlite3Strlen30(bufpt);
+                length = StringExtensions.sqlite3Strlen30( bufpt );// StringExtensions.sqlite3Strlen30(bufpt);
                 bufpt = 0;
                 break;
               }
@@ -938,7 +938,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
             }
             else
             {
-              length = sqlite3Strlen30( bufpt );
+              length = StringExtensions.sqlite3Strlen30( bufpt );
             }
             bufpt = 0;
             break;
@@ -1087,7 +1087,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       }
       if ( N < 0 )
       {
-        N = sqlite3Strlen30( z );
+        N = StringExtensions.sqlite3Strlen30( z );
       }
       if ( N == 0 || NEVER( z == null ) )
       {

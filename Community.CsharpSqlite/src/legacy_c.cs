@@ -211,7 +211,7 @@ exec_out:
       rc = sqlite3ApiExit( db, rc );
       if ( rc != SQLITE_OK && ALWAYS( rc == sqlite3_errcode( db ) ) && pzErrMsg != null )
       {
-        //int nErrMsg = 1 + sqlite3Strlen30(sqlite3_errmsg(db));
+        //int nErrMsg = 1 + StringExtensions.sqlite3Strlen30(sqlite3_errmsg(db));
         //pzErrMsg = sqlite3Malloc(nErrMsg);
         //if (pzErrMsg)
         //{

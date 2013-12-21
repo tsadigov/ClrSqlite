@@ -2800,7 +2800,7 @@ static void pagerReportSize(Pager X){}
       //        goto delmaster_out;
       //      }
       //    }
-      //    zJournal += ( sqlite3Strlen30( zJournal ) + 1 );
+      //    zJournal += ( StringExtensions.sqlite3Strlen30( zJournal ) + 1 );
       //   }
       //
       //sqlite3OsClose(pMaster);
@@ -4934,12 +4934,12 @@ static Pgno sqlite3PagerPagenumber( DbPage pPg )    {      return pPg.pgno;    }
         //zPathname[0] = 0; /* Make sure initialized even if FullPathname() fails */
         rc = sqlite3OsFullPathname( pVfs, zFilename, nPathname, zPathname );
 
-        nPathname = sqlite3Strlen30( zPathname );
-        z = zUri = zFilename;//.Substring(sqlite3Strlen30( zFilename ) );
+        nPathname = StringExtensions.sqlite3Strlen30( zPathname );
+        z = zUri = zFilename;//.Substring(StringExtensions.sqlite3Strlen30( zFilename ) );
         //while ( *z )
         //{
-        //  z += sqlite3Strlen30( z ) + 1;
-        //  z += sqlite3Strlen30( z ) + 1;
+        //  z += StringExtensions.sqlite3Strlen30( z ) + 1;
+        //  z += StringExtensions.sqlite3Strlen30( z ) + 1;
         //}
         nUri = zUri.Length;//        &z[1] - zUri;
         if ( rc == SQLITE_OK && nPathname + 8 > pVfs.mxPathname )

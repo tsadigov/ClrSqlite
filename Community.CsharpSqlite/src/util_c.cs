@@ -16,6 +16,43 @@ namespace Community.CsharpSqlite
   using sqlite_int64 = System.Int64;
   using System.Globalization;
 
+    public partial class StringExtensions
+    {
+
+        /*
+    ** Compute a string length that is limited to what can be stored in
+    ** lower 30 bits of a 32-bit signed integer.
+    **
+    ** The value returned will never be negative.  Nor will it ever be greater
+    ** than the actual length of the string.  For very long strings (greater
+    ** than 1GiB) the value returned might be less than the true string length.
+    */
+        public static int sqlite3Strlen30(int z)
+        {
+            return 0x3fffffff & z;
+        }
+        public static int sqlite3Strlen30(StringBuilder z)
+        {
+            //string z2 = z;
+            if (z == null)
+                return 0;
+            //while( *z2 ){ z2++; }
+            //return 0x3fffffff & (int)(z2 - z);
+            int iLen = z.ToString().IndexOf('\0');
+            return 0x3fffffff & (iLen == -1 ? z.Length : iLen);
+        }
+        public static int sqlite3Strlen30(string z)
+        {
+            //string z2 = z;
+            if (z == null)
+                return 0;
+            //while( *z2 ){ z2++; }
+            //return 0x3fffffff & (int)(z2 - z);
+            int iLen = z.IndexOf('\0');
+            return 0x3fffffff & (iLen == -1 ? z.Length : iLen);
+        }
+
+    }
 
     public partial class MathExtensions
     {
@@ -117,39 +154,6 @@ dummy += (uint)x;
 #endif
 
 
-
-    /*
-** Compute a string length that is limited to what can be stored in
-** lower 30 bits of a 32-bit signed integer.
-**
-** The value returned will never be negative.  Nor will it ever be greater
-** than the actual length of the string.  For very long strings (greater
-** than 1GiB) the value returned might be less than the true string length.
-*/
-    static int sqlite3Strlen30( int z )
-    {
-      return 0x3fffffff & z;
-    }
-    static int sqlite3Strlen30( StringBuilder z )
-    {
-      //string z2 = z;
-      if ( z == null )
-        return 0;
-      //while( *z2 ){ z2++; }
-      //return 0x3fffffff & (int)(z2 - z);
-      int iLen = z.ToString().IndexOf( '\0' );
-      return 0x3fffffff & ( iLen == -1 ? z.Length : iLen );
-    }
-    static int sqlite3Strlen30( string z )
-    {
-      //string z2 = z;
-      if ( z == null )
-        return 0;
-      //while( *z2 ){ z2++; }
-      //return 0x3fffffff & (int)(z2 - z);
-      int iLen = z.IndexOf( '\0' );
-      return 0x3fffffff & (iLen == -1 ? z.Length : iLen);
-    }
 
 
     /*
@@ -1677,7 +1681,7 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
   zOk = sqlite3_uri_parameter(zBaseFilename, "8_3_names");
   if( zOk != null && sqlite3GetBoolean(zOk) ){
     int i, sz;
-    sz = sqlite3Strlen30(z);
+    sz = StringExtensions.sqlite3Strlen30(z);
     for(i=sz-1; i>0 && z[i]!='/' && z[i]!='.'; i--){}
     if( z[i]=='.' && ALWAYS(sz>i+4) ) memcpy(&z[i+1], &z[sz-3], 4);
   }

@@ -197,7 +197,7 @@ sqlite3ValueFree(ref pTmp);
     )
     {
       CollSeq[] pColl;
-      int nName = sqlite3Strlen30( zName );
+      int nName = StringExtensions.sqlite3Strlen30( zName );
       pColl = sqlite3HashFind( db.aCollSeq, zName, nName, (CollSeq[])null );
 
       if ( ( null == pColl ) && create != 0 )
@@ -356,7 +356,7 @@ sqlite3ValueFree(ref pTmp);
     )
     {
       FuncDef pOther;
-      int nName = sqlite3Strlen30( pDef.zName );
+      int nName = StringExtensions.sqlite3Strlen30( pDef.zName );
       u8 c1 = (u8)pDef.zName[0];
       int h = ( sqlite3UpperToLower[c1] + nName ) % ArraySize( pHash.a );
       pOther = functionSearch( pHash, h, pDef.zName, nName );

@@ -57,7 +57,7 @@ namespace Community.CsharpSqlite
       {
         return (u8)sqlite3Atoi( z );
       }
-      n = sqlite3Strlen30( z );
+      n = StringExtensions.sqlite3Strlen30( z );
       for ( i = 0; i < ArraySize( iLength ); i++ )
       {
         if ( iLength[i] == n && sqlite3StrNICmp( zText.Substring( iOffset[i] ), z, n ) == 0 )
@@ -723,7 +723,7 @@ new VdbeOpList( OP_ResultRow,   1, 1,        0),
                     else
                     {
                       string zMode;
-                      int n = sqlite3Strlen30( zRight );
+                      int n = StringExtensions.sqlite3Strlen30( zRight );
                       for ( eMode = 0; ( zMode = sqlite3JournalModename( eMode ) ) != null; eMode++ )
                       {
                         if ( sqlite3StrNICmp( zRight, zMode, n ) == 0 )
@@ -1807,12 +1807,12 @@ new VdbeOpList( OP_ResultRow,       1,  1,  0)
                                                               // needed to support key/rekey/hexrekey with pragma cmds
                                                               if ( zLeft.Equals( "key" ,StringComparison.InvariantCultureIgnoreCase )  && !String.IsNullOrEmpty( zRight ) )
                                                               {
-                                                                sqlite3_key( db, zRight, sqlite3Strlen30( zRight ) );
+                                                                sqlite3_key( db, zRight, StringExtensions.sqlite3Strlen30( zRight ) );
                                                               }
                                                               else
                                                                 if ( zLeft.Equals( "rekey" ,StringComparison.InvariantCultureIgnoreCase )  && !String.IsNullOrEmpty( zRight ) )
                                                                 {
-                                                                  sqlite3_rekey( db, zRight, sqlite3Strlen30( zRight ) );
+                                                                  sqlite3_rekey( db, zRight, StringExtensions.sqlite3Strlen30( zRight ) );
                                                                 }
                                                                 else
                                                                   if ( !String.IsNullOrEmpty( zRight ) && ( zLeft.Equals( "hexkey" ,StringComparison.InvariantCultureIgnoreCase )  ||

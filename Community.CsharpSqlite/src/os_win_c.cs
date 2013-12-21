@@ -1885,7 +1885,7 @@ static int winOpenSharedMemory(winFile *pDbFd){
   p = sqlite3_malloc( sizeof(*p) );
   if( p==0 ) return SQLITE_NOMEM;
   memset(p, 0, sizeof(*p));
-  nName = sqlite3Strlen30(pDbFd->zPath);
+  nName = StringExtensions.sqlite3Strlen30(pDbFd->zPath);
   pNew = sqlite3_malloc( sizeof(*pShmNode) + nName + 15 );
   if( pNew==0 ){
     sqlite3_free(p);
@@ -2435,7 +2435,7 @@ shmpage_out:
       /* Check that the output buffer is large enough for the temporary file 
       ** name. If it is not, return SQLITE_ERROR.
       */
-      //if( (sqlite3Strlen30(zTempPath) + sqlite3Strlen30(SQLITE_TEMP_FILE_PREFIX) + 17) >= nBuf ){
+      //if( (StringExtensions.sqlite3Strlen30(zTempPath) + StringExtensions.sqlite3Strlen30(SQLITE_TEMP_FILE_PREFIX) + 17) >= nBuf ){
       //  return SQLITE_ERROR;
       //}
 
@@ -2448,11 +2448,11 @@ shmpage_out:
       }
       //  zBuf[j] = 0;
       zBuf.Append( Path.GetTempPath() + SQLITE_TEMP_FILE_PREFIX + zRandom.ToString() );
-      //for(i=sqlite3Strlen30(zTempPath); i>0 && zTempPath[i-1]=='\\'; i--){}
+      //for(i=StringExtensions.sqlite3Strlen30(zTempPath); i>0 && zTempPath[i-1]=='\\'; i--){}
       //zTempPath[i] = 0;
       //sqlite3_snprintf(nBuf-17, zBuf,
       //                 "%s\\"SQLITE_TEMP_FILE_PREFIX, zTempPath);
-      //j = sqlite3Strlen30(zBuf);
+      //j = StringExtensions.sqlite3Strlen30(zBuf);
       //sqlite3_randomness(15, zBuf[j]);
       //for(i=0; i<15; i++, j++){
       //  zBuf[j] = (char)zChars[ ((unsigned char)zBuf[j])%(sizeof(zChars)-1) ];

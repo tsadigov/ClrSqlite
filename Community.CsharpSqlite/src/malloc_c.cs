@@ -1033,7 +1033,7 @@ sqlite3MemdebugSetType(pNew, MEMTYPE_DB |
     //  if( z==0 ){
     //    return 0;
     //  }
-    //  n = sqlite3Strlen30(z) + 1;
+    //  n = StringExtensions.sqlite3Strlen30(z) + 1;
     //  Debug.Assert( (n&0x7fffffff)==n );
     //  zNew = sqlite3DbMallocRaw(db, (int)n);
     //  if( zNew ){

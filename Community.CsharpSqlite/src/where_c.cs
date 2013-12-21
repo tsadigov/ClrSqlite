@@ -1501,7 +1501,7 @@ return 1;
         ////if ( 0 == db.mallocFailed )
         {
           int c, pC;    /* Last character before the first wildcard */
-          pC = pStr2.u.zToken[sqlite3Strlen30( pStr2.u.zToken ) - 1];
+          pC = pStr2.u.zToken[StringExtensions.sqlite3Strlen30( pStr2.u.zToken ) - 1];
           c = pC;
           if ( noCase )
           {
@@ -1515,7 +1515,7 @@ return 1;
               isComplete = false;   /* EV: R-64339-08207 */
             c = sqlite3UpperToLower[c];
           }
-          pStr2.u.zToken = pStr2.u.zToken.Substring( 0, sqlite3Strlen30( pStr2.u.zToken ) - 1 ) + (char)( c + 1 );// pC = c + 1;
+          pStr2.u.zToken = pStr2.u.zToken.Substring( 0, StringExtensions.sqlite3Strlen30( pStr2.u.zToken ) - 1 ) + (char)( c + 1 );// pC = c + 1;
         }
         pColl = sqlite3FindCollSeq( db, SQLITE_UTF8, noCase ? "NOCASE" : "BINARY", 0 );
         pNewExpr1 = sqlite3PExpr( pParse, TK_GE,
@@ -5620,7 +5620,7 @@ OP_IdxLT             /* 2: (end_constraints && bRev) */
         z = pTabItem.zAlias;
         if ( z == null )
           z = pTabItem.pTab.zName;
-        n = sqlite3Strlen30( z );
+        n = StringExtensions.sqlite3Strlen30( z );
         if ( true ) //n+nQPlan < sizeof(sqlite3_query_plan)-10 )
         {
           if ( ( pLevel.plan.wsFlags & WHERE_IDX_ONLY ) != 0 )
@@ -5645,7 +5645,7 @@ OP_IdxLT             /* 2: (end_constraints && bRev) */
         }
         else if ( ( pLevel.plan.wsFlags & WHERE_INDEXED ) != 0 )
         {
-          n = sqlite3Strlen30( pLevel.plan.u.pIdx.zName );
+          n = StringExtensions.sqlite3Strlen30( pLevel.plan.u.pIdx.zName );
           if ( true ) //n+nQPlan < sizeof(sqlite3_query_plan)-2 )//if( n+nQPlan < sizeof(sqlite3_query_plan)-2 )
           {
             sqlite3_query_plan.Append( pLevel.plan.u.pIdx.zName ); //memcpy(&sqlite3_query_plan[nQPlan], pLevel.plan.u.pIdx.zName, n);

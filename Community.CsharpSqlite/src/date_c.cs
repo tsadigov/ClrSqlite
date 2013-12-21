@@ -451,7 +451,7 @@ zulu_time:
         setDateTimeToCurrent( context, p );
         return 0;
       }
-      else if ( sqlite3AtoF( zDate, ref r, sqlite3Strlen30( zDate ), SQLITE_UTF8 ) )
+      else if ( sqlite3AtoF( zDate, ref r, StringExtensions.sqlite3Strlen30( zDate ), SQLITE_UTF8 ) )
       {
         p.iJD = (sqlite3_int64)( r * 86400000.0 + 0.5 );
         p.validJD = 1;
@@ -748,7 +748,7 @@ zulu_time:
             ** date is already on the appropriate weekday, this is a no-op.
             */
             if ( z.ToString().StartsWith( "weekday " )
-            && sqlite3AtoF( z.ToString().Substring( 8 ), ref r, sqlite3Strlen30( z.ToString().Substring( 8 ) ), SQLITE_UTF8 )
+            && sqlite3AtoF( z.ToString().Substring( 8 ), ref r, StringExtensions.sqlite3Strlen30( z.ToString().Substring( 8 ) ), SQLITE_UTF8 )
             && ( n = (int)r ) == r && n >= 0 && r < 7 )
             {
               sqlite3_int64 Z;
@@ -856,7 +856,7 @@ zulu_time:
             while ( sqlite3Isspace( z[n] ) )
               n++;// z++;
             z = z.Remove( 0, n );
-            n = sqlite3Strlen30( z );
+            n = StringExtensions.sqlite3Strlen30( z );
             if ( n > 10 || n < 3 )
               break;
             if ( z[n - 1] == 's' )
@@ -1187,7 +1187,7 @@ zulu_time:
                     s = 59.999;
                   sqlite3_snprintf( 7, zdtTemp, "%06.3f", s );
                   z.Append( zdtTemp );
-                  j = sqlite3Strlen30( z );
+                  j = StringExtensions.sqlite3Strlen30( z );
                   break;
                 }
               case 'H':
@@ -1226,7 +1226,7 @@ zulu_time:
                 {
                   sqlite3_snprintf( 20, zdtTemp, "%.16g", x.iJD / 86400000.0 );
                   z.Append( zdtTemp );
-                  j = sqlite3Strlen30( z );
+                  j = StringExtensions.sqlite3Strlen30( z );
                   break;
                 }
               case 'm':
@@ -1244,7 +1244,7 @@ zulu_time:
                   sqlite3_snprintf( 30, zdtTemp, "%lld",
                                (i64)( x.iJD / 1000 - 21086676 * (i64)10000 ) );
                   z.Append( zdtTemp );
-                  j = sqlite3Strlen30( z );
+                  j = StringExtensions.sqlite3Strlen30( z );
                   break;
                 }
               case 'S':
@@ -1261,7 +1261,7 @@ zulu_time:
                 {
                   sqlite3_snprintf( 5, zdtTemp, "%04d", x.Y );
                   z.Append( zdtTemp );
-                  j = sqlite3Strlen30( z );
+                  j = StringExtensions.sqlite3Strlen30( z );
                   break;
                 }
               default:

@@ -668,7 +668,7 @@ namespace Community.CsharpSqlite
     */
     static FKey sqlite3FkReferences( Table pTab )
     {
-      int nName = sqlite3Strlen30( pTab.zName );
+      int nName = StringExtensions.sqlite3Strlen30( pTab.zName );
       return sqlite3HashFind( pTab.pSchema.fkeyHash, pTab.zName, nName, (FKey)null );
     }
 
@@ -1132,8 +1132,8 @@ namespace Community.CsharpSqlite
           tToCol.z = pIdx != null ? pTab.aCol[pIdx.aiColumn[i]].zName : "oid";
           tFromCol.z = pFKey.pFrom.aCol[iFromCol].zName;
 
-          tToCol.n = sqlite3Strlen30( tToCol.z );
-          tFromCol.n = sqlite3Strlen30( tFromCol.z );
+          tToCol.n = StringExtensions.sqlite3Strlen30( tToCol.z );
+          tFromCol.n = StringExtensions.sqlite3Strlen30( tFromCol.z );
 
           /* Create the expression "OLD.zToCol = zFromCol". It is important
           ** that the "OLD.zToCol" term is on the LHS of the = operator, so
@@ -1201,7 +1201,7 @@ namespace Community.CsharpSqlite
         sqlite3DbFree( db, ref aiCol );
 
         zFrom = pFKey.pFrom.zName;
-        nFrom = sqlite3Strlen30( zFrom );
+        nFrom = StringExtensions.sqlite3Strlen30( zFrom );
 
         if ( action == OE_Restrict )
         {
@@ -1347,7 +1347,7 @@ namespace Community.CsharpSqlite
           {
             FKey p = pFKey.pNextTo;
             string z = ( p != null ? pFKey.pNextTo.zTo : pFKey.zTo );
-            sqlite3HashInsert( ref pTab.pSchema.fkeyHash, z, sqlite3Strlen30( z ), p );
+            sqlite3HashInsert( ref pTab.pSchema.fkeyHash, z, StringExtensions.sqlite3Strlen30( z ), p );
           }
           if ( pFKey.pNextTo != null )
           {

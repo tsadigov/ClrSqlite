@@ -500,13 +500,13 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
         }
 
         sqlite3_snprintf( 100, zCsr, "%c", c );
-        zBuf.Append( zCsr );//zCsr += sqlite3Strlen30(zCsr);
+        zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         sqlite3_snprintf( 100, zCsr, "%d[", pMem.n );
-        zBuf.Append( zCsr );//zCsr += sqlite3Strlen30(zCsr);
+        zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         for ( i = 0; i < 16 && i < pMem.n; i++ )
         {
           sqlite3_snprintf( 100, zCsr, "%02X", ( (int)pMem.zBLOB[i] & 0xFF ) );
-          zBuf.Append( zCsr );//zCsr += sqlite3Strlen30(zCsr);
+          zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         }
         for ( i = 0; i < 16 && i < pMem.n; i++ )
         {
@@ -518,11 +518,11 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
         }
 
         sqlite3_snprintf( 100, zCsr, "]%s", encnames[pMem.enc] );
-        zBuf.Append( zCsr );//zCsr += sqlite3Strlen30(zCsr);
+        zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         if ( ( f & MEM_Zero ) != 0 )
         {
           sqlite3_snprintf( 100, zCsr, "+%dz", pMem.u.nZero );
-          zBuf.Append( zCsr );//zCsr += sqlite3Strlen30(zCsr);
+          zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         }
         //*zCsr = '\0';
       }
@@ -552,7 +552,7 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
         //k = 2;
         sqlite3_snprintf( 100, zCsr, "%d", pMem.n );//zBuf[k], "%d", pMem.n );
         zBuf.Append( zCsr );
-        //k += sqlite3Strlen30( &zBuf[k] );
+        //k += StringExtensions.sqlite3Strlen30( &zBuf[k] );
         zBuf.Append( '[' );// zBuf[k++] = '[';
         for ( j = 0; j < 15 && j < pMem.n; j++ )
         {
@@ -569,7 +569,7 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
         zBuf.Append( ']' );//zBuf[k++] = ']';
         sqlite3_snprintf( 100, zCsr, encnames[pMem.enc] );//& zBuf[k], encnames[pMem.enc] );
         zBuf.Append( zCsr );
-        //k += sqlite3Strlen30( &zBuf[k] );
+        //k += StringExtensions.sqlite3Strlen30( &zBuf[k] );
         //zBuf[k++] = 0;
       }
     }
@@ -1147,7 +1147,7 @@ start = sqlite3Hwtime();
             {         /* same as TK_STRING, ref2-prerelease */
               Debug.Assert( pOp.p4.z != null );
               pOp.opcode = OP_String;
-              pOp.p1 = sqlite3Strlen30( pOp.p4.z );
+              pOp.p1 = StringExtensions.sqlite3Strlen30( pOp.p4.z );
 
 #if !SQLITE_OMIT_UTF16
 if( encoding!=SQLITE_UTF8 ){
@@ -3163,7 +3163,7 @@ op_column_out:
                 }
                 else
                 {
-                  nName = sqlite3Strlen30( zName );
+                  nName = StringExtensions.sqlite3Strlen30( zName );
 
 #if !SQLITE_OMIT_VIRTUALTABLE
                   /* This call is Ok even if this savepoint is actually a transaction
@@ -6394,7 +6394,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
               pOut = aMem[pOp.p2];
               pOut.flags = MEM_Str | MEM_Static | MEM_Term;
               pOut.z = sqlite3JournalModename( eNew );
-              pOut.n = sqlite3Strlen30( pOut.z );
+              pOut.n = StringExtensions.sqlite3Strlen30( pOut.z );
               pOut.enc = SQLITE_UTF8;
               sqlite3VdbeChangeEncoding( pOut, encoding );
               break;

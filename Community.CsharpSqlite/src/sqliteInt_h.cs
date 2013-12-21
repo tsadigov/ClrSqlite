@@ -3733,7 +3733,7 @@ static int SQLITE_CANTOPEN_BKPT() {return SQLITE_CANTOPEN;}
 ** Internal function prototypes
 */
     //int sqlite3StrICmp(string , string );
-    //int sqlite3Strlen30(const char);
+    //int StringExtensions.sqlite3Strlen30(const char);
     //#define sqlite3StrNICmp sqlite3_strnicmp
 
     //int sqlite3MallocInit(void);

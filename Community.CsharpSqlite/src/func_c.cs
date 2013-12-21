@@ -406,7 +406,7 @@ namespace Community.CsharpSqlite
           sqlite3_result_error_nomem( context );
           return;
         }
-        sqlite3AtoF( zBuf, ref r, sqlite3Strlen30( zBuf ), SQLITE_UTF8 );
+        sqlite3AtoF( zBuf, ref r, StringExtensions.sqlite3Strlen30( zBuf ), SQLITE_UTF8 );
         //sqlite3_free( ref zBuf );
       }
       sqlite3_result_double( context, r );
@@ -1961,7 +1961,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
     static void setLikeOptFlag( sqlite3 db, string zName, int flagVal )
     {
       FuncDef pDef;
-      pDef = sqlite3FindFunction( db, zName, sqlite3Strlen30( zName ),
+      pDef = sqlite3FindFunction( db, zName, StringExtensions.sqlite3Strlen30( zName ),
       2, SQLITE_UTF8, 0 );
       if ( ALWAYS( pDef != null ) )
       {
@@ -2012,7 +2012,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
         return false;
       }
       Debug.Assert( !ExprHasProperty( pExpr, EP_xIsSelect ) );
-      pDef = sqlite3FindFunction( db, pExpr.u.zToken, sqlite3Strlen30( pExpr.u.zToken ),
+      pDef = sqlite3FindFunction( db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30( pExpr.u.zToken ),
       2, SQLITE_UTF8, 0 );
       if ( NEVER( pDef == null ) || ( pDef.flags & SQLITE_FUNC_LIKE ) == 0 )
       {

@@ -1348,7 +1348,7 @@ return 1;
       ( xFunc == null && ( xFinal != null && xStep == null ) ) ||
       ( xFunc == null && ( xFinal == null && xStep != null ) ) ||
       ( nArg < -1 || nArg > SQLITE_MAX_FUNCTION_ARG ) ||
-      ( 255 < ( nName = sqlite3Strlen30( zFunctionName ) ) ) )
+      ( 255 < ( nName = StringExtensions.sqlite3Strlen30( zFunctionName ) ) ) )
       {
         return SQLITE_MISUSE_BKPT();
       }
@@ -1525,7 +1525,7 @@ return rc;
     int nArg
     )
     {
-      int nName = sqlite3Strlen30( zName );
+      int nName = StringExtensions.sqlite3Strlen30( zName );
       int rc;
       sqlite3_mutex_enter( db.mutex );
       if ( sqlite3FindFunction( db, zName, nName, nArg, SQLITE_UTF8, 0 ) == null )
@@ -1981,7 +1981,7 @@ return z;
     {
       CollSeq pColl;
       int enc2;
-      int nName = sqlite3Strlen30( zName );
+      int nName = StringExtensions.sqlite3Strlen30( zName );
 
       Debug.Assert( sqlite3_mutex_held( db.mutex ) );
 
@@ -2204,7 +2204,7 @@ static int sqlite3ParseUri(
   string zVfs = zDefaultVfs;
   StringBuilder zFile = null;
   char c;
-  int nUri = sqlite3Strlen30(zUri);
+  int nUri = StringExtensions.sqlite3Strlen30(zUri);
   pzErrMsg = null;
   ppVfs = null;
 
@@ -2310,11 +2310,11 @@ static int sqlite3ParseUri(
     ** here. Options that are interpreted here include "vfs" and those that
     ** correspond to flags that may be passed to the sqlite3_open_v2()
     ** method. */
-    zOpt = zFile.ToString().Substring(sqlite3Strlen30( zFile ) + 1);
+    zOpt = zFile.ToString().Substring(StringExtensions.sqlite3Strlen30( zFile ) + 1);
     while( zOpt.Length>0 ){
-      int nOpt = sqlite3Strlen30(zOpt);
+      int nOpt = StringExtensions.sqlite3Strlen30(zOpt);
       string zVal = zOpt.Substring( nOpt );//zOpt[nOpt + 1];
-      int nVal = sqlite3Strlen30(zVal);
+      int nVal = StringExtensions.sqlite3Strlen30(zVal);
 
       if( nOpt==3 && memcmp("vfs", zOpt, 3)==0 ){
         zVfs = zVal;
@@ -2355,7 +2355,7 @@ static int sqlite3ParseUri(
           int mode = 0;
           for(i=0; aMode[i].z!= null; i++){
             string z = aMode[i].z;
-            if( nVal==sqlite3Strlen30(z) && 0==memcmp(zVal, z, nVal) ){
+            if( nVal==StringExtensions.sqlite3Strlen30(z) && 0==memcmp(zVal, z, nVal) ){
               mode = aMode[i].mode;
               break;
             }
@@ -2398,7 +2398,7 @@ static int sqlite3ParseUri(
     zFile = null;
   }
   pFlags = flags;
-  pzFile = zFile == null ? null : zFile.ToString().Substring( 0, sqlite3Strlen30( zFile.ToString() ) );
+  pzFile = zFile == null ? null : zFile.ToString().Substring( 0, StringExtensions.sqlite3Strlen30( zFile.ToString() ) );
   return rc;
 }
 
@@ -3353,7 +3353,7 @@ error_out:
           case SQLITE_TESTCTRL_ISKEYWORD:
             {
               string zWord = (string)va_arg( ap, "char*" );
-              int n = sqlite3Strlen30( zWord );
+              int n = StringExtensions.sqlite3Strlen30( zWord );
               rc = ( sqlite3KeywordCode( zWord, n ) != TK_ID ) ? SQLITE_N_KEYWORD : 0;
               break;
             }
@@ -3416,12 +3416,12 @@ error_out:
 */
 static string sqlite3_uri_parameter(string zFilename, string zParam){
   Debugger.Break();
-  //zFilename += sqlite3Strlen30(zFilename) + 1;
+  //zFilename += StringExtensions.sqlite3Strlen30(zFilename) + 1;
   //while( zFilename[0] ){
   //  int x = strcmp(zFilename, zParam);
-  //  zFilename += sqlite3Strlen30(zFilename) + 1;
+  //  zFilename += StringExtensions.sqlite3Strlen30(zFilename) + 1;
   //  if( x==0 ) return zFilename;
-  //  zFilename += sqlite3Strlen30(zFilename) + 1;
+  //  zFilename += StringExtensions.sqlite3Strlen30(zFilename) + 1;
   //}
   return null;
 }

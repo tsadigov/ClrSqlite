@@ -109,7 +109,7 @@ for(i=0; i<nCol; i++){
 if( argv[i]==null ){
 z = null;
 }else{
-int n = sqlite3Strlen30(argv[i])+1;
+int n = StringExtensions.sqlite3Strlen30(argv[i])+1;
 //z = sqlite3_malloc( n );
 //if( z==0 ) goto malloc_failed;
 z= argv[i];//memcpy(z, argv[i], n);
