@@ -113,7 +113,7 @@ namespace Community.CsharpSqlite
     ** locale of "C". They are implemented as macros in sqliteInt.h.
     */
 #if SQLITE_ASCII
-    static byte[] sqlite3CtypeMap = new byte[] {
+   public static byte[] sqlite3CtypeMap = new byte[] {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  /* 00..07    ........ */
   0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00,  /* 08..0f    ........ */
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  /* 10..17    ........ */

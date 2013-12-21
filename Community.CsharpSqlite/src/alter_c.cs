@@ -803,7 +803,7 @@ return;
   {
     //  char zEnd = zCol[pColDef.n-1];
     int savedDbFlags = db.flags;
-    //      while( zEnd>zCol && (*zEnd==';' || sqlite3Isspace(*zEnd)) ){
+    //      while( zEnd>zCol && (*zEnd==';' || CharExtensions.sqlite3Isspace(*zEnd)) ){
     //    zEnd-- = '\0';
     //  }
     db.flags |= SQLITE_PreferBuiltin;

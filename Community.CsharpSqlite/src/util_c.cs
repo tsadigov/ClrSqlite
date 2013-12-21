@@ -415,7 +415,7 @@ dummy += (uint)x;
       if ( enc == SQLITE_UTF16BE )
         zDx++;
 
-      while ( zDx < length && sqlite3Isspace( z[zDx] ) )
+      while ( zDx < length && CharExtensions.sqlite3Isspace( z[zDx] ) )
         zDx++;
       if ( zDx >= length )
         return false;
@@ -509,7 +509,7 @@ dummy += (uint)x;
       /* skip trailing spaces */
       if ( nDigits > 0 && eValid > 0 )
       {
-        while ( zDx < length && sqlite3Isspace( z[zDx] ) )
+        while ( zDx < length && CharExtensions.sqlite3Isspace( z[zDx] ) )
           zDx += incr;
       }
 
@@ -690,7 +690,7 @@ return !sqlite3Atoi64(z, pResult, length, enc);
 
       if ( enc == SQLITE_UTF16BE )
         zDx++;
-      while ( zDx < length && sqlite3Isspace( zNum[zDx] ) )
+      while ( zDx < length && CharExtensions.sqlite3Isspace( zNum[zDx] ) )
         zDx += incr;
       if ( zDx < length )
       {

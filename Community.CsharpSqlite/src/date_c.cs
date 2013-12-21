@@ -205,7 +205,7 @@ end_getDigits:
       int nHr = 0;
       int nMn = 0;
       char c;
-      zDate = zDate.Trim();// while ( sqlite3Isspace( *(u8)zDate ) ) { zDate++; }
+      zDate = zDate.Trim();// while ( CharExtensions.sqlite3Isspace( *(u8)zDate ) ) { zDate++; }
       p.tz = 0;
       c = zDate.Length == 0 ? '\0' : zDate[0];
       if ( c == '-' )
@@ -235,7 +235,7 @@ end_getDigits:
       if ( zDate.Length == 6 )
         zDate = "";
       else if ( zDate.Length > 6 )
-        zDate = zDate.Substring( 6 ).Trim();// while ( sqlite3Isspace( *(u8)zDate ) ) { zDate++; }
+        zDate = zDate.Substring( 6 ).Trim();// while ( CharExtensions.sqlite3Isspace( *(u8)zDate ) ) { zDate++; }
 zulu_time:
       return zDate != "" ? 1 : 0;
     }
@@ -377,7 +377,7 @@ zulu_time:
         return 1;
       }
       zIndex += 10;// zDate += 10;
-      while ( zIndex < zDate.Length && ( sqlite3Isspace( zDate[zIndex] ) || 'T' == zDate[zIndex] ) )
+      while ( zIndex < zDate.Length && ( CharExtensions.sqlite3Isspace( zDate[zIndex] ) || 'T' == zDate[zIndex] ) )
       {
         zIndex++;
       }//zDate++; }
@@ -815,7 +815,7 @@ zulu_time:
         case '9':
           {
             double rRounder;
-            for ( n = 1; n < z.Length && z[n] != ':' && !sqlite3Isspace( z[n] ); n++ )
+            for ( n = 1; n < z.Length && z[n] != ':' && !CharExtensions.sqlite3Isspace( z[n] ); n++ )
             {
             }
             if ( !sqlite3AtoF( z.ToString(), ref r, n, SQLITE_UTF8 ) )
@@ -853,7 +853,7 @@ zulu_time:
               break;
             }
             //z += n;
-            while ( sqlite3Isspace( z[n] ) )
+            while ( CharExtensions.sqlite3Isspace( z[n] ) )
               n++;// z++;
             z = z.Remove( 0, n );
             n = StringExtensions.sqlite3Strlen30( z );

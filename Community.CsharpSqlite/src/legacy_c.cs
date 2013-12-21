@@ -189,7 +189,7 @@ namespace Community.CsharpSqlite
               if ( ( zSql = zLeftover ) != "" )
               {
                 int zindex = 0;
-                while ( zindex < zSql.Length && sqlite3Isspace( zSql[zindex] ) )
+                while ( zindex < zSql.Length && CharExtensions.sqlite3Isspace( zSql[zindex] ) )
                   zindex++;
                 if ( zindex != 0 )
                   zSql = zindex < zSql.Length ? zSql.Substring( zindex ) : "";

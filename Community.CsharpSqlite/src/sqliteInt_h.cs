@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -39,7 +40,41 @@ namespace Community.CsharpSqlite
 {
   using sqlite3_value = Sqlite3.Mem;
 
-  public partial class Sqlite3
+   
+
+    public partial class CharExtensions
+    {
+        static byte[] sqlite3CtypeMap
+        {
+            get
+            {
+                return Sqlite3.sqlite3CtypeMap;
+            }
+        }
+        /*
+    ** The following macros mimic the standard library functions toupper(),
+    ** isspace(), isalnum(), isdigit() and isxdigit(), respectively. The
+    ** sqlite versions only work for ASCII characters, regardless of locale.
+    */
+#if SQLITE_ASCII
+        //# define sqlite3Toupper(x)  ((x)&~(sqlite3CtypeMap[(unsigned char)(x)]&0x20))
+
+        //# define CharExtensions.sqlite3Isspace(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x01)
+        //private 
+        public  static bool sqlite3Isspace(byte x)
+        {
+            return (Sqlite3.sqlite3CtypeMap[(byte) (x)] & 0x01) != 0;
+        }
+
+        //private
+        public static bool sqlite3Isspace(char x)
+        {
+            return x < 256 && (sqlite3CtypeMap[(byte) (x)] & 0x01) != 0;
+        }
+#endif
+    }
+
+    public partial class Sqlite3
   {
     /*
     ** 2001 September 15
@@ -3674,18 +3709,7 @@ static int SQLITE_CANTOPEN_BKPT() {return SQLITE_CANTOPEN;}
     ** sqlite versions only work for ASCII characters, regardless of locale.
     */
 #if SQLITE_ASCII
-    //# define sqlite3Toupper(x)  ((x)&~(sqlite3CtypeMap[(unsigned char)(x)]&0x20))
-
-    //# define sqlite3Isspace(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x01)
-    static bool sqlite3Isspace( byte x )
-    {
-      return ( sqlite3CtypeMap[(byte)( x )] & 0x01 ) != 0;
-    }
-    static bool sqlite3Isspace( char x )
-    {
-      return x < 256 && ( sqlite3CtypeMap[(byte)( x )] & 0x01 ) != 0;
-    }
-
+   
     //# define sqlite3Isalnum(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x06)
     static bool sqlite3Isalnum( byte x )
     {
@@ -3721,7 +3745,7 @@ static int SQLITE_CANTOPEN_BKPT() {return SQLITE_CANTOPEN;}
     //# define sqlite3Tolower(x)   (sqlite3UpperToLower[(unsigned char)(x)])
 #else
 //# define sqlite3Toupper(x)   toupper((unsigned char)(x))
-//# define sqlite3Isspace(x)   isspace((unsigned char)(x))
+//# define CharExtensions.sqlite3Isspace(x)   isspace((unsigned char)(x))
 //# define sqlite3Isalnum(x)   isalnum((unsigned char)(x))
 //# define sqlite3Isalpha(x)   isalpha((unsigned char)(x))
 //# define sqlite3Isdigit(x)   isdigit((unsigned char)(x))

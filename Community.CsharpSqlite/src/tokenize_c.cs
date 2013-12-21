@@ -140,7 +140,7 @@ namespace Community.CsharpSqlite
             testcase( z[iOffset + 0] == '\n' );
             testcase( z[iOffset + 0] == '\f' );
             testcase( z[iOffset + 0] == '\r' );
-            for ( i = 1; z.Length > iOffset + i && sqlite3Isspace( z[iOffset + i] ); i++ )
+            for ( i = 1; z.Length > iOffset + i && CharExtensions.sqlite3Isspace( z[iOffset + i] ); i++ )
             {
             }
             tokenType = TK_SPACE;
@@ -464,7 +464,7 @@ namespace Community.CsharpSqlite
                 do
                 {
                   i++;
-                } while ( ( iOffset + i ) < z.Length && ( c = (byte)z[iOffset + i] ) != 0 && !sqlite3Isspace( c ) && c != ')' );
+                } while ( ( iOffset + i ) < z.Length && ( c = (byte)z[iOffset + i] ) != 0 && !CharExtensions.sqlite3Isspace( c ) && c != ')' );
                 if ( c == ')' )
                 {
                   i++;

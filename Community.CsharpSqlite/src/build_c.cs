@@ -2038,7 +2038,7 @@ primary_key_exit:
       sEnd.n = 0;
       n = (int)( pBegin.z.Length - sEnd.z.Length );//sEnd.z - pBegin.z;
       z = pBegin.z;
-      while ( ALWAYS( n > 0 ) && sqlite3Isspace( z[n - 1] ) )
+      while ( ALWAYS( n > 0 ) && CharExtensions.sqlite3Isspace( z[n - 1] ) )
       {
         n--;
       }

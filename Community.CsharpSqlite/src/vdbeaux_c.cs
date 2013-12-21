@@ -1895,7 +1895,7 @@ void sqlite3VdbeLeave(Vdbe *p){
       if ( pOp.opcode == OP_Trace && pOp.p4.z != null )
       {
         string z = pOp.p4.z;
-        z = z.Trim();// while ( sqlite3Isspace( *(u8)z ) ) z++;
+        z = z.Trim();// while ( CharExtensions.sqlite3Isspace( *(u8)z ) ) z++;
         Console.Write( "SQL: [%s]\n", z );
       }
     }
@@ -1917,9 +1917,9 @@ if ( pOp.opcode == OP_Trace && pOp.p4.z != null )
 int i, j;
 string z = "";//char z[1000];
 sqlite3_snprintf( 1000, z, "%s", pOp.p4.z );
-//for(i=0; sqlite3Isspace(z[i]); i++){}
+//for(i=0; CharExtensions.sqlite3Isspace(z[i]); i++){}
 //for(j=0; z[i]; i++){
-//if( sqlite3Isspace(z[i]) ){
+//if( CharExtensions.sqlite3Isspace(z[i]) ){
 //if( z[i-1]!=' ' ){
 //z[j++] = ' ';
 //}
