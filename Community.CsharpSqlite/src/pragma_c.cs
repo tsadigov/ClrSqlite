@@ -55,7 +55,7 @@ namespace Community.CsharpSqlite
       int i, n;
       if ( CharExtensions.sqlite3Isdigit( z[0] ) )
       {
-        return (u8)refaactorrConverter__sqlite3Atoi( z );
+        return (u8)Converter.sqlite3Atoi( z );
       }
       n = StringExtensions.sqlite3Strlen30( z );
       for ( i = 0; i < ArraySize( iLength ); i++ )
@@ -512,7 +512,7 @@ new VdbeOpList( OP_ResultRow,   1, 1,        0),
         }
         else
         {
-          int size = sqlite3AbsInt32(refaactorrConverter__sqlite3Atoi( zRight ));
+          int size = sqlite3AbsInt32(Converter.sqlite3Atoi( zRight ));
           sqlite3BeginWriteOperation( pParse, 0, iDb );
           sqlite3VdbeAddOp2( v, OP_Integer, size, 1 );
           sqlite3VdbeAddOp3( v, OP_SetCookie, iDb, BTREE_DEFAULT_CACHE_SIZE, 1 );
@@ -546,7 +546,7 @@ new VdbeOpList( OP_ResultRow,   1, 1,        0),
             /* Malloc may fail when setting the page-size, as there is an internal
             ** buffer that the pager module resizes using sqlite3_realloc().
             */
-            db.nextPagesize = refaactorrConverter__sqlite3Atoi( zRight );
+            db.nextPagesize = Converter.sqlite3Atoi( zRight );
             if ( SQLITE_NOMEM == sqlite3BtreeSetPageSize( pBt, db.nextPagesize, -1, 0 ) )
             {
               ////        db.mallocFailed = 1;
@@ -612,7 +612,7 @@ new VdbeOpList( OP_ResultRow,   1, 1,        0),
               }
               else
               {
-                sqlite3VdbeAddOp3( v, OP_MaxPgcnt, iDb, iReg, refaactorrConverter__sqlite3Atoi( zRight ) );
+                sqlite3VdbeAddOp3( v, OP_MaxPgcnt, iDb, iReg, Converter.sqlite3Atoi( zRight ) );
               }
               sqlite3VdbeAddOp2( v, OP_ResultRow, iReg, 1 );
               sqlite3VdbeSetNumCols( v, 1 );
@@ -862,7 +862,7 @@ new VdbeOpList( OP_SetCookie,      0,               BTREE_INCR_VACUUM, 1),    /*
                           {
                             goto pragma_out;
                           }
-                          if ( zRight == null || !sqlite3GetInt32( zRight, ref iLimit ) || iLimit <= 0 )
+                          if ( zRight == null || !Converter.sqlite3GetInt32( zRight, ref iLimit ) || iLimit <= 0 )
                           {
                             iLimit = 0x7fffffff;
                           }
@@ -903,7 +903,7 @@ new VdbeOpList( OP_SetCookie,      0,               BTREE_INCR_VACUUM, 1),    /*
                             }
                             else
                             {
-                              int size = sqlite3AbsInt32(refaactorrConverter__sqlite3Atoi( zRight ));
+                              int size = sqlite3AbsInt32(Converter.sqlite3Atoi( zRight ));
                               pDb.pSchema.cache_size = size;
                               sqlite3BtreeSetCacheSize( pDb.pBt, pDb.pSchema.cache_size );
                             }
@@ -1385,7 +1385,7 @@ new  VdbeOpList( OP_ResultRow,   3, 1,        0),
                                                       mxErr = SQLITE_INTEGRITY_CHECK_ERROR_MAX;
                                                       if ( zRight != null )
                                                       {
-                                                        sqlite3GetInt32( zRight, ref mxErr );
+                                                        Converter.sqlite3GetInt32( zRight, ref mxErr );
                                                         if ( mxErr <= 0 )
                                                         {
                                                           mxErr = SQLITE_INTEGRITY_CHECK_ERROR_MAX;
@@ -1661,7 +1661,7 @@ new VdbeOpList( OP_SetCookie,      0,  0,  1),    /* 2 */
 };
                                                             int addr = sqlite3VdbeAddOpList( v, ArraySize( setCookie ), setCookie );
                                                             sqlite3VdbeChangeP1( v, addr, iDb );
-                                                            sqlite3VdbeChangeP1( v, addr + 1, refaactorrConverter__sqlite3Atoi( zRight ) );
+                                                            sqlite3VdbeChangeP1( v, addr + 1, Converter.sqlite3Atoi( zRight ) );
                                                             sqlite3VdbeChangeP1( v, addr + 2, iDb );
                                                             sqlite3VdbeChangeP2( v, addr + 2, iCookie );
                                                           }

@@ -1197,7 +1197,7 @@ return (pPager->pWal!=0);
       int rc = sqlite3OsRead( fd, ac, ac.Length, offset );
       if ( rc == SQLITE_OK )
       {
-        pRes = sqlite3Get4byte( ac );
+        pRes = Converter.sqlite3Get4byte( ac );
       }
       else
         pRes = 0;
@@ -1215,19 +1215,19 @@ return (pPager->pWal!=0);
       A[1] = (byte)ac[offset + 1];
       A[2] = (byte)ac[offset + 2];
       A[3] = (byte)ac[offset + 3];
-      sqlite3Put4byte( A, 0, val );
+      Converter.sqlite3Put4byte( A, 0, val );
     }
     static void put32bits( byte[] ac, int offset, int val )
     {
-      sqlite3Put4byte( ac, offset, (u32)val );
+      Converter.sqlite3Put4byte( ac, offset, (u32)val );
     }
     static void put32bits( byte[] ac, u32 val )
     {
-      sqlite3Put4byte( ac, 0U, val );
+      Converter.sqlite3Put4byte( ac, 0U, val );
     }
     static void put32bits( byte[] ac, int offset, u32 val )
     {
-      sqlite3Put4byte( ac, offset, val );
+      Converter.sqlite3Put4byte( ac, offset, val );
     }
 
     /*
@@ -3297,7 +3297,7 @@ delmaster_out:
       u32 change_counter;
 
       /* Increment the value just read and write it back to byte 24. */
-      change_counter = sqlite3Get4byte( pPg.pPager.dbFileVers, 0 ) + 1;
+      change_counter = Converter.sqlite3Get4byte( pPg.pPager.dbFileVers, 0 ) + 1;
       put32bits(  pPg.pData, 24, change_counter );
 
       /* Also store the SQLite version number in bytes 96..99 and in

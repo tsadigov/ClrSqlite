@@ -3199,7 +3199,7 @@ new _yyRuleInfo( 251, 2 ),
             {
               yygotominor.yy118.pExpr = sqlite3PExpr( pParse, TK_REGISTER, 0, 0, yymsp[0].minor.yy0 );
               if ( yygotominor.yy118.pExpr != null )
-                sqlite3GetInt32( yymsp[0].minor.yy0.z, 1, ref yygotominor.yy118.pExpr.iTable );
+                Converter.sqlite3GetInt32( yymsp[0].minor.yy0.z, 1, ref yygotominor.yy118.pExpr.iTable );
             }
             spanSet( yygotominor.yy118, yymsp[0].minor.yy0, yymsp[0].minor.yy0 );
           }

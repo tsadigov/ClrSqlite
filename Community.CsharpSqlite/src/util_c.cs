@@ -403,74 +403,6 @@ dummy += (uint)x;
 
 
     /*
-    ** If zNum represents an integer that will fit in 32-bits, then set
-    ** pValue to that integer and return true.  Otherwise return false.
-    **
-    ** Any non-numeric characters that following zNum are ignored.
-    ** This is different from sqlite3Atoi64() which requires the
-    ** input number to be zero-terminated.
-    */
-    static bool sqlite3GetInt32( string zNum, ref int pValue )
-    {
-      return sqlite3GetInt32( zNum, 0, ref pValue );
-    }
-    static bool sqlite3GetInt32( string zNum, int iZnum, ref int pValue )
-    {
-      sqlite_int64 v = 0;
-      int i, c;
-      int neg = 0;
-      if ( zNum[iZnum] == '-' )
-      {
-        neg = 1;
-        iZnum++;
-      }
-      else if ( zNum[iZnum] == '+' )
-      {
-        iZnum++;
-      }
-      while ( iZnum < zNum.Length && zNum[iZnum] == '0' )
-        iZnum++;
-      for ( i = 0; i < 11 && i + iZnum < zNum.Length && ( c = zNum[iZnum + i] - '0' ) >= 0 && c <= 9; i++ )
-      {
-        v = v * 10 + c;
-      }
-
-      /* The longest decimal representation of a 32 bit integer is 10 digits:
-      **
-      **             1234567890
-      **     2^31 . 2147483648
-      */
-      testcase( i == 10 );
-      if ( i > 10 )
-      {
-        return false;
-      }
-      testcase( v - neg == 2147483647 );
-      if ( v - neg > 2147483647 )
-      {
-        return false;
-      }
-      if ( neg != 0 )
-      {
-        v = -v;
-      }
-      pValue = (int)v;
-      return true;
-    }
-
-    /*
-    ** Return a 32-bit integer value extracted from a string.  If the
-    ** string is not an integer, just return 0.
-    */
-    static int refaactorrConverter__sqlite3Atoi( string z )
-    {
-      int x = 0;
-      if ( !String.IsNullOrEmpty( z ) )
-        sqlite3GetInt32( z, ref x );
-      return x;
-    }
-
-    /*
     ** The variable-length integer encoding is as follows:
     **
     ** KEY:
@@ -1040,65 +972,6 @@ return n;
     }
 
 
-    /*
-    ** Read or write a four-byte big-endian integer value.
-    */
-    static u32 sqlite3Get4byte( u8[] p, int p_offset, int offset )
-    {
-      offset += p_offset;
-      return ( offset + 3 > p.Length ) ? 0 : (u32)( ( p[0 + offset] << 24 ) | ( p[1 + offset] << 16 ) | ( p[2 + offset] << 8 ) | p[3 + offset] );
-    }
-    static u32 sqlite3Get4byte( u8[] p, int offset )
-    {
-      return ( offset + 3 > p.Length ) ? 0 : (u32)( ( p[0 + offset] << 24 ) | ( p[1 + offset] << 16 ) | ( p[2 + offset] << 8 ) | p[3 + offset] );
-    }
-    static u32 sqlite3Get4byte( u8[] p, u32 offset )
-    {
-      return ( offset + 3 > p.Length ) ? 0 : (u32)( ( p[0 + offset] << 24 ) | ( p[1 + offset] << 16 ) | ( p[2 + offset] << 8 ) | p[3 + offset] );
-    }
-    static u32 sqlite3Get4byte( u8[] p )
-    {
-      return (u32)( ( p[0] << 24 ) | ( p[1] << 16 ) | ( p[2] << 8 ) | p[3] );
-    }
-    static void sqlite3Put4byte( byte[] p, int v )
-    {
-      p[0] = (byte)( v >> 24 & 0xFF );
-      p[1] = (byte)( v >> 16 & 0xFF );
-      p[2] = (byte)( v >> 8 & 0xFF );
-      p[3] = (byte)( v & 0xFF );
-    }
-    static void sqlite3Put4byte( byte[] p, int offset, int v )
-    {
-      p[0 + offset] = (byte)( v >> 24 & 0xFF );
-      p[1 + offset] = (byte)( v >> 16 & 0xFF );
-      p[2 + offset] = (byte)( v >> 8 & 0xFF );
-      p[3 + offset] = (byte)( v & 0xFF );
-    }
-    static void sqlite3Put4byte( byte[] p, u32 offset, u32 v )
-    {
-      p[0 + offset] = (byte)( v >> 24 & 0xFF );
-      p[1 + offset] = (byte)( v >> 16 & 0xFF );
-      p[2 + offset] = (byte)( v >> 8 & 0xFF );
-      p[3 + offset] = (byte)( v & 0xFF );
-    }
-    static void sqlite3Put4byte( byte[] p, int offset, u64 v )
-    {
-      p[0 + offset] = (byte)( v >> 24 & 0xFF );
-      p[1 + offset] = (byte)( v >> 16 & 0xFF );
-      p[2 + offset] = (byte)( v >> 8 & 0xFF );
-      p[3 + offset] = (byte)( v & 0xFF );
-    }
-    static void sqlite3Put4byte( byte[] p, u64 v )
-    {
-      p[0] = (byte)( v >> 24 & 0xFF );
-      p[1] = (byte)( v >> 16 & 0xFF );
-      p[2] = (byte)( v >> 8 & 0xFF );
-      p[3] = (byte)( v & 0xFF );
-    }
-
-
-
-
 
     /*
 ** Log an error that is an API call on a connection pointer that should
@@ -1292,7 +1165,136 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
     public partial class Converter
 
 {
-          
+
+
+
+    /*
+    ** If zNum represents an integer that will fit in 32-bits, then set
+    ** pValue to that integer and return true.  Otherwise return false.
+    **
+    ** Any non-numeric characters that following zNum are ignored.
+    ** This is different from sqlite3Atoi64() which requires the
+    ** input number to be zero-terminated.
+    */
+    public static bool sqlite3GetInt32(string zNum, ref int pValue)
+    {
+        return sqlite3GetInt32(zNum, 0, ref pValue);
+    }
+    public static bool sqlite3GetInt32(string zNum, int iZnum, ref int pValue)
+    {
+        sqlite_int64 v = 0;
+        int i, c;
+        int neg = 0;
+        if (zNum[iZnum] == '-')
+        {
+            neg = 1;
+            iZnum++;
+        }
+        else if (zNum[iZnum] == '+')
+        {
+            iZnum++;
+        }
+        while (iZnum < zNum.Length && zNum[iZnum] == '0')
+            iZnum++;
+        for (i = 0; i < 11 && i + iZnum < zNum.Length && (c = zNum[iZnum + i] - '0') >= 0 && c <= 9; i++)
+        {
+            v = v * 10 + c;
+        }
+
+        /* The longest decimal representation of a 32 bit integer is 10 digits:
+        **
+        **             1234567890
+        **     2^31 . 2147483648
+        */
+        testcase(i == 10);
+        if (i > 10)
+        {
+            return false;
+        }
+        testcase(v - neg == 2147483647);
+        if (v - neg > 2147483647)
+        {
+            return false;
+        }
+        if (neg != 0)
+        {
+            v = -v;
+        }
+        pValue = (int)v;
+        return true;
+    }
+
+    /*
+    ** Return a 32-bit integer value extracted from a string.  If the
+    ** string is not an integer, just return 0.
+    */
+    public static int sqlite3Atoi(string z)
+    {
+        int x = 0;
+        if (!String.IsNullOrEmpty(z))
+            sqlite3GetInt32(z, ref x);
+        return x;
+    }
+
+    /*
+    ** Read or write a four-byte big-endian integer value.
+    */
+    public static u32 sqlite3Get4byte(u8[] p, int p_offset, int offset)
+    {
+        offset += p_offset;
+        return (offset + 3 > p.Length) ? 0 : (u32)((p[0 + offset] << 24) | (p[1 + offset] << 16) | (p[2 + offset] << 8) | p[3 + offset]);
+    }
+    public static u32 sqlite3Get4byte(u8[] p, int offset)
+    {
+        return (offset + 3 > p.Length) ? 0 : (u32)((p[0 + offset] << 24) | (p[1 + offset] << 16) | (p[2 + offset] << 8) | p[3 + offset]);
+    }
+    public static u32 sqlite3Get4byte(u8[] p, u32 offset)
+    {
+        return (offset + 3 > p.Length) ? 0 : (u32)((p[0 + offset] << 24) | (p[1 + offset] << 16) | (p[2 + offset] << 8) | p[3 + offset]);
+    }
+    public static u32 sqlite3Get4byte(u8[] p)
+    {
+        return (u32)((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]);
+    }
+    public static void sqlite3Put4byte(byte[] p, int v)
+    {
+        p[0] = (byte)(v >> 24 & 0xFF);
+        p[1] = (byte)(v >> 16 & 0xFF);
+        p[2] = (byte)(v >> 8 & 0xFF);
+        p[3] = (byte)(v & 0xFF);
+    }
+    public static void sqlite3Put4byte(byte[] p, int offset, int v)
+    {
+        p[0 + offset] = (byte)(v >> 24 & 0xFF);
+        p[1 + offset] = (byte)(v >> 16 & 0xFF);
+        p[2 + offset] = (byte)(v >> 8 & 0xFF);
+        p[3 + offset] = (byte)(v & 0xFF);
+    }
+    public static void sqlite3Put4byte(byte[] p, u32 offset, u32 v)
+    {
+        p[0 + offset] = (byte)(v >> 24 & 0xFF);
+        p[1 + offset] = (byte)(v >> 16 & 0xFF);
+        p[2 + offset] = (byte)(v >> 8 & 0xFF);
+        p[3 + offset] = (byte)(v & 0xFF);
+    }
+    public static void sqlite3Put4byte(byte[] p, int offset, u64 v)
+    {
+        p[0 + offset] = (byte)(v >> 24 & 0xFF);
+        p[1 + offset] = (byte)(v >> 16 & 0xFF);
+        p[2 + offset] = (byte)(v >> 8 & 0xFF);
+        p[3 + offset] = (byte)(v & 0xFF);
+    }
+    public static void sqlite3Put4byte(byte[] p, u64 v)
+    {
+        p[0] = (byte)(v >> 24 & 0xFF);
+        p[1] = (byte)(v >> 16 & 0xFF);
+        p[2] = (byte)(v >> 8 & 0xFF);
+        p[3] = (byte)(v & 0xFF);
+    }
+
+
+
+
     /*
     ** The string z[] is an text representation of a real number.
     ** Convert this string to a double and write it into *pResult.

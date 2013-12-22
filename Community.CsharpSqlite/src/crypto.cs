@@ -608,7 +608,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
         BtShared pBt = db.aDb[0].pBt.pBt;
         byte[] zDbHeader = sqlite3MemMalloc( (int)pBt.pageSize );// pBt.pPager.pCodec.buffer;
         sqlite3PagerReadFileheader( pBt.pPager, zDbHeader.Length, zDbHeader );
-        if ( sqlite3Get4byte( zDbHeader ) > 0 ) // Existing Database, need to reset some values
+        if ( Converter.sqlite3Get4byte( zDbHeader ) > 0 ) // Existing Database, need to reset some values
         {
           CODEC2( pBt.pPager, zDbHeader, 2, SQLITE_DECRYPT, ref zDbHeader );
           byte nReserve = zDbHeader[20];
@@ -618,8 +618,8 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
             pBt.pageSize = 0;
           pBt.pageSizeFixed = true;
 #if !SQLITE_OMIT_AUTOVACUUM
-          pBt.autoVacuum = sqlite3Get4byte( zDbHeader, 36 + 4 * 4 ) != 0;
-          pBt.incrVacuum = sqlite3Get4byte( zDbHeader, 36 + 7 * 4 ) != 0;
+          pBt.autoVacuum = Converter.sqlite3Get4byte( zDbHeader, 36 + 4 * 4 ) != 0;
+          pBt.incrVacuum = Converter.sqlite3Get4byte( zDbHeader, 36 + 7 * 4 ) != 0;
 #endif
           sqlite3PagerSetPagesize( pBt.pPager, ref pBt.pageSize, nReserve );
           pBt.usableSize = (u16)( pBt.pageSize - nReserve );

@@ -123,7 +123,7 @@ namespace Community.CsharpSqlite
 #endif
         Debug.Assert( db.init.busy != 0 );
         db.init.iDb = iDb;
-        db.init.newTnum = refaactorrConverter__sqlite3Atoi( argv[1] );
+        db.init.newTnum = Converter.sqlite3Atoi( argv[1] );
         db.init.orphanTrigger = 0;
         //TESTONLY(rcp = ) sqlite3_prepare(db, argv[2], -1, &pStmt, 0);
 #if !NDEBUG || SQLITE_COVERAGE_TEST
@@ -182,7 +182,7 @@ sqlite3_prepare(db, argv[2], -1, ref pStmt, 0);
           /* Do Nothing */
           ;
         }
-        else if ( sqlite3GetInt32( argv[1], ref pIndex.tnum ) == false )
+        else if ( Converter.sqlite3GetInt32( argv[1], ref pIndex.tnum ) == false )
         {
           corruptSchema( pData, argv[0], "invalid rootpage" );
         }

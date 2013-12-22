@@ -478,7 +478,7 @@ namespace Community.CsharpSqlite
       if ( pToken != null )
       {
         if ( op != TK_INTEGER || pToken.z == null || pToken.z.Length == 0
-        || sqlite3GetInt32( pToken.z.ToString(), ref iValue ) == false )
+        || Converter.sqlite3GetInt32( pToken.z.ToString(), ref iValue ) == false )
         {
           nExtra = pToken.n + 1;
           Debug.Assert( iValue >= 0 );
@@ -1488,7 +1488,7 @@ return null;
       /* If an expression is an integer literal that fits in a signed 32-bit
       ** integer, then the EP_IntValue flag will have already been set */
       Debug.Assert( p.op != TK_INTEGER || ( p.flags & EP_IntValue ) != 0
-               || !sqlite3GetInt32( p.u.zToken, ref rc ) );
+               || !Converter.sqlite3GetInt32( p.u.zToken, ref rc ) );
 
       if ( ( p.flags & EP_IntValue ) != 0 )
       {

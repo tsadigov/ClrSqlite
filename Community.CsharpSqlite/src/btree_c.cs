@@ -903,14 +903,14 @@ static void ptrmapPut( BtShared pBt, Pgno key, u8 eType, Pgno parent, ref int pR
   Debug.Assert( offset <= (int)pBt.usableSize - 5 );
   pPtrmap = sqlite3PagerGetData( pDbPage );
 
-  if ( eType != pPtrmap[offset] || sqlite3Get4byte( pPtrmap, offset + 1 ) != parent )
+  if ( eType != pPtrmap[offset] || Converter.sqlite3Get4byte( pPtrmap, offset + 1 ) != parent )
   {
     TRACE( "PTRMAP_UPDATE: %d->(%d,%d)\n", key, eType, parent );
     pRC = rc = sqlite3PagerWrite( pDbPage );
     if ( rc == SQLITE_OK )
     {
       pPtrmap[offset] = eType;
-      sqlite3Put4byte( pPtrmap, offset + 1, parent );
+      Converter.sqlite3Put4byte( pPtrmap, offset + 1, parent );
     }
   }
 
@@ -955,7 +955,7 @@ static int ptrmapGet( BtShared pBt, Pgno key, ref u8 pEType, ref Pgno pPgno )
   pEType = pPtrmap[offset];
   // Under C# pPgno will always exist. No need to test; //
   //if ( pPgno != 0 )
-  pPgno = sqlite3Get4byte( pPtrmap, offset + 1 );
+  pPgno = Converter.sqlite3Get4byte( pPtrmap, offset + 1 );
 
   sqlite3PagerUnref( pDbPage );
   if ( pEType < 1 || pEType > 5 )
@@ -1268,7 +1268,7 @@ static void ptrmapPutOvflPtr( MemPage pPage, int pCell, ref int pRC )
   Debug.Assert( ( info.nData + ( pPage.intKey != 0 ? 0 : info.nKey ) ) == info.nPayload );
   if ( info.iOverflow != 0 )
   {
-    Pgno ovfl = sqlite3Get4byte( pPage.aData, pCell, info.iOverflow );
+    Pgno ovfl = Converter.sqlite3Get4byte( pPage.aData, pCell, info.iOverflow );
     ptrmapPut( pPage.pBt, ovfl, PTRMAP_OVERFLOW1, pPage.pgno, ref pRC );
   }
 }
@@ -1283,7 +1283,7 @@ static void ptrmapPutOvflPtr( MemPage pPage, u8[] pCell, ref int pRC )
   Debug.Assert( ( info.nData + ( pPage.intKey != 0 ? 0 : info.nKey ) ) == info.nPayload );
   if ( info.iOverflow != 0 )
   {
-    Pgno ovfl = sqlite3Get4byte( pCell, info.iOverflow );
+    Pgno ovfl = Converter.sqlite3Get4byte( pCell, info.iOverflow );
     ptrmapPut( pPage.pBt, ovfl, PTRMAP_OVERFLOW1, pPage.pgno, ref pRC );
   }
 }
@@ -2201,8 +2201,8 @@ pBt.secureDelete = true;
       nReserve = zDbHeader[20];
       pBt.pageSizeFixed = true;
 #if !SQLITE_OMIT_AUTOVACUUM
-      pBt.autoVacuum = sqlite3Get4byte( zDbHeader, 36 + 4 * 4 ) != 0;
-      pBt.incrVacuum = sqlite3Get4byte( zDbHeader, 36 + 7 * 4 ) != 0;
+      pBt.autoVacuum = Converter.sqlite3Get4byte( zDbHeader, 36 + 4 * 4 ) != 0;
+      pBt.incrVacuum = Converter.sqlite3Get4byte( zDbHeader, 36 + 7 * 4 ) != 0;
 #endif
     }
     rc = sqlite3PagerSetPagesize( pBt.pPager, ref pBt.pageSize, nReserve );
@@ -2680,7 +2680,7 @@ static int lockBtree( BtShared pBt )
   /* Do some checking to help insure the file we opened really is
   ** a valid database file.
   */
-  nPage = nPageHeader = sqlite3Get4byte( pPage1.aData, 28 );//get4byte(28+(u8*)pPage1->aData);
+  nPage = nPageHeader = Converter.sqlite3Get4byte( pPage1.aData, 28 );//get4byte(28+(u8*)pPage1->aData);
   sqlite3PagerPagecount( pBt.pPager, out nPageFile );
   if ( nPage == 0 || memcmp( pPage1.aData, 24, pPage1.aData, 92, 4 ) != 0 )//memcmp(24 + (u8*)pPage1.aData, 92 + (u8*)pPage1.aData, 4) != 0)
   {
@@ -2783,8 +2783,8 @@ rc = SQLITE_NOTADB;
     pBt.pageSize = pageSize;
     pBt.usableSize = usableSize;
 #if !SQLITE_OMIT_AUTOVACUUM
-    pBt.autoVacuum = ( sqlite3Get4byte( page1, 36 + 4 * 4 ) != 0 );
-    pBt.incrVacuum = ( sqlite3Get4byte( page1, 36 + 7 * 4 ) != 0 );
+    pBt.autoVacuum = ( Converter.sqlite3Get4byte( page1, 36 + 4 * 4 ) != 0 );
+    pBt.incrVacuum = ( Converter.sqlite3Get4byte( page1, 36 + 7 * 4 ) != 0 );
 #endif
   }
 
@@ -2876,8 +2876,8 @@ static int newDatabase( BtShared pBt )
 #if !SQLITE_OMIT_AUTOVACUUM
   Debug.Assert( pBt.autoVacuum == true || pBt.autoVacuum == false );
   Debug.Assert( pBt.incrVacuum == true || pBt.incrVacuum == false );
-  sqlite3Put4byte( data, 36 + 4 * 4, pBt.autoVacuum ? 1 : 0 );
-  sqlite3Put4byte( data, 36 + 7 * 4, pBt.incrVacuum ? 1 : 0 );
+  Converter.sqlite3Put4byte( data, 36 + 4 * 4, pBt.autoVacuum ? 1 : 0 );
+  Converter.sqlite3Put4byte( data, 36 + 7 * 4, pBt.incrVacuum ? 1 : 0 );
 #endif
   pBt.nPage = 1;
   data[31] = 1;
@@ -3042,12 +3042,12 @@ pBt.isExclusive = (u8)(wrflag>1);
 ** re-read the database size from page 1 if a savepoint or transaction
 ** rollback occurs within the transaction.
 */
-      if ( pBt.nPage != sqlite3Get4byte( pPage1.aData, 28 ) )
+      if ( pBt.nPage != Converter.sqlite3Get4byte( pPage1.aData, 28 ) )
       {
         rc = sqlite3PagerWrite( pPage1.pDbPage );
         if ( rc == SQLITE_OK )
         {
-          sqlite3Put4byte( pPage1.aData, (u32)28, pBt.nPage );
+          Converter.sqlite3Put4byte( pPage1.aData, (u32)28, pBt.nPage );
         }
       }
     }
@@ -3101,14 +3101,14 @@ static int setChildPtrmaps( MemPage pPage )
 
     if ( 0 == pPage.leaf )
     {
-      Pgno childPgno = sqlite3Get4byte( pPage.aData, pCell );
+      Pgno childPgno = Converter.sqlite3Get4byte( pPage.aData, pCell );
       ptrmapPut( pBt, childPgno, PTRMAP_BTREE, pgno, ref rc );
     }
   }
 
   if ( 0 == pPage.leaf )
   {
-    Pgno childPgno = sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 );
+    Pgno childPgno = Converter.sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 );
     ptrmapPut( pBt, childPgno, PTRMAP_BTREE, pgno, ref rc );
   }
 
@@ -3138,11 +3138,11 @@ static int modifyPagePointer( MemPage pPage, Pgno iFrom, Pgno iTo, u8 eType )
   if ( eType == PTRMAP_OVERFLOW2 )
   {
     /* The pointer is always the first 4 bytes of the page in this case.  */
-    if ( sqlite3Get4byte( pPage.aData ) != iFrom )
+    if ( Converter.sqlite3Get4byte( pPage.aData ) != iFrom )
     {
       return SQLITE_CORRUPT_BKPT();
     }
-    sqlite3Put4byte( pPage.aData, iTo );
+    Converter.sqlite3Put4byte( pPage.aData, iTo );
   }
   else
   {
@@ -3162,18 +3162,18 @@ static int modifyPagePointer( MemPage pPage, Pgno iFrom, Pgno iTo, u8 eType )
         btreeParseCellPtr( pPage, pCell, ref info );
         if ( info.iOverflow != 0 )
         {
-          if ( iFrom == sqlite3Get4byte( pPage.aData, pCell, info.iOverflow ) )
+          if ( iFrom == Converter.sqlite3Get4byte( pPage.aData, pCell, info.iOverflow ) )
           {
-            sqlite3Put4byte( pPage.aData, pCell + info.iOverflow, (int)iTo );
+            Converter.sqlite3Put4byte( pPage.aData, pCell + info.iOverflow, (int)iTo );
             break;
           }
         }
       }
       else
       {
-        if ( sqlite3Get4byte( pPage.aData, pCell ) == iFrom )
+        if ( Converter.sqlite3Get4byte( pPage.aData, pCell ) == iFrom )
         {
-          sqlite3Put4byte( pPage.aData, pCell, (int)iTo );
+          Converter.sqlite3Put4byte( pPage.aData, pCell, (int)iTo );
           break;
         }
       }
@@ -3182,11 +3182,11 @@ static int modifyPagePointer( MemPage pPage, Pgno iFrom, Pgno iTo, u8 eType )
     if ( i == nCell )
     {
       if ( eType != PTRMAP_BTREE ||
-      sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 ) != iFrom )
+      Converter.sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 ) != iFrom )
       {
         return SQLITE_CORRUPT_BKPT();
       }
-      sqlite3Put4byte( pPage.aData, pPage.hdrOffset + 8, iTo );
+      Converter.sqlite3Put4byte( pPage.aData, pPage.hdrOffset + 8, iTo );
     }
 
     pPage.isInit = isInitOrig;
@@ -3251,7 +3251,7 @@ int isCommit             /* isCommit flag passed to sqlite3PagerMovepage */
   }
   else
   {
-    Pgno nextOvfl = sqlite3Get4byte( pDbPage.aData );
+    Pgno nextOvfl = Converter.sqlite3Get4byte( pDbPage.aData );
     if ( nextOvfl != 0 )
     {
       ptrmapPut( pBt, nextOvfl, PTRMAP_OVERFLOW2, iFreePage, ref rc );
@@ -3323,7 +3323,7 @@ static int incrVacuumStep( BtShared pBt, Pgno nFin, Pgno iLastPg )
     u8 eType = 0;
     Pgno iPtrPage = 0;
 
-    nFreeList = sqlite3Get4byte( pBt.pPage1.aData, 36 );
+    nFreeList = Converter.sqlite3Get4byte( pBt.pPage1.aData, 36 );
     if ( nFreeList == 0 )
     {
       return SQLITE_DONE;
@@ -3457,7 +3457,7 @@ static int sqlite3BtreeIncrVacuum( Btree p )
     if ( rc == SQLITE_OK )
     {
       rc = sqlite3PagerWrite( pBt.pPage1.pDbPage );
-      sqlite3Put4byte( pBt.pPage1.aData, (u32)28, pBt.nPage );//put4byte(&pBt->pPage1->aData[28], pBt->nPage);
+      Converter.sqlite3Put4byte( pBt.pPage1.aData, (u32)28, pBt.nPage );//put4byte(&pBt->pPage1->aData[28], pBt->nPage);
     }
   }
   sqlite3BtreeLeave( p );
@@ -3507,7 +3507,7 @@ int nRef=0;
       return SQLITE_CORRUPT_BKPT();
     }
 
-    nFree = sqlite3Get4byte( pBt.pPage1.aData, 36 );
+    nFree = Converter.sqlite3Get4byte( pBt.pPage1.aData, 36 );
     nEntry = (int)pBt.usableSize / 5;
     nPtrmap = (Pgno)( ( nFree - nOrig + PTRMAP_PAGENO( pBt, nOrig ) + (Pgno)nEntry ) / nEntry );
     nFin = nOrig - nFree - nPtrmap;
@@ -3529,9 +3529,9 @@ int nRef=0;
     if ( ( rc == SQLITE_DONE || rc == SQLITE_OK ) && nFree > 0 )
     {
       rc = sqlite3PagerWrite( pBt.pPage1.pDbPage );
-      sqlite3Put4byte( pBt.pPage1.aData, 32, 0 );
-      sqlite3Put4byte( pBt.pPage1.aData, 36, 0 );
-      sqlite3Put4byte( pBt.pPage1.aData, (u32)28, nFin );
+      Converter.sqlite3Put4byte( pBt.pPage1.aData, 32, 0 );
+      Converter.sqlite3Put4byte( pBt.pPage1.aData, 36, 0 );
+      Converter.sqlite3Put4byte( pBt.pPage1.aData, (u32)28, nFin );
       sqlite3PagerTruncateImage( pBt.pPager, nFin );
       pBt.nPage = nFin;
     }
@@ -3824,7 +3824,7 @@ sqlite3BtreeTripAllCursors(p, rc);
     ** sure pPage1.aData is set correctly. */
     if ( btreeGetPage( pBt, 1, ref pPage1, 0 ) == SQLITE_OK )
     {
-      Pgno nPage = sqlite3Get4byte( pPage1.aData, 28 );
+      Pgno nPage = Converter.sqlite3Get4byte( pPage1.aData, 28 );
       testcase( nPage == 0 );
       if ( nPage == 0 )
         sqlite3PagerPagecount( pBt.pPager, out nPage );
@@ -3906,7 +3906,7 @@ static int sqlite3BtreeSavepoint( Btree p, int op, int iSavepoint )
       if ( iSavepoint < 0 && pBt.initiallyEmpty )
         pBt.nPage = 0;
       rc = newDatabase( pBt );
-      pBt.nPage = sqlite3Get4byte( pBt.pPage1.aData, 28 );
+      pBt.nPage = Converter.sqlite3Get4byte( pBt.pPage1.aData, 28 );
       /* The database size was written into the offset 28 of the header
       ** when the transaction started, so we know that the value at offset
       ** 28 is nonzero. */
@@ -4302,7 +4302,7 @@ out Pgno pPgnoNext          /* OUT: Next overflow page number */
     Debug.Assert( rc == SQLITE_OK || pPage == null );
     if ( rc == SQLITE_OK )
     {
-      next = sqlite3Get4byte( pPage.aData );
+      next = Converter.sqlite3Get4byte( pPage.aData );
     }
   }
 
@@ -4461,7 +4461,7 @@ int eOp             /* zero to read. non-zero to write. */
     u32 ovflSize = (u32)( pBt.usableSize - 4 );  /* Bytes content per ovfl page */
     Pgno nextPage;
 
-    nextPage = sqlite3Get4byte( aPayload, pCur.info.nLocal + pCur.info.iCell + pCur.info.nHeader );
+    nextPage = Converter.sqlite3Get4byte( aPayload, pCur.info.nLocal + pCur.info.iCell + pCur.info.nHeader );
 
 #if !SQLITE_OMIT_INCRBLOB
 /* If the isIncrblobHandle flag is set and the BtCursor.aOverflow[]
@@ -4531,7 +4531,7 @@ nextPage = pCur.aOverflow[iIdx+1];
         if ( rc == SQLITE_OK )
         {
           aPayload = sqlite3PagerGetData( pDbPage );
-          nextPage = sqlite3Get4byte( aPayload );
+          nextPage = Converter.sqlite3Get4byte( aPayload );
           if ( a + offset > ovflSize )
           {
             a = (int)( ovflSize - offset );
@@ -4894,7 +4894,7 @@ static int moveToRoot( BtCursor pCur )
     Pgno subpage;
     if ( pRoot.pgno != 1 )
       return SQLITE_CORRUPT_BKPT();
-    subpage = sqlite3Get4byte( pRoot.aData, pRoot.hdrOffset + 8 );
+    subpage = Converter.sqlite3Get4byte( pRoot.aData, pRoot.hdrOffset + 8 );
     pCur.eState = CURSOR_VALID;
     rc = moveToChild( pCur, subpage );
   }
@@ -4923,7 +4923,7 @@ static int moveToLeftmost( BtCursor pCur )
   while ( rc == SQLITE_OK && 0 == ( pPage = pCur.apPage[pCur.iPage] ).leaf )
   {
     Debug.Assert( pCur.aiIdx[pCur.iPage] < pPage.nCell );
-    pgno = sqlite3Get4byte( pPage.aData, findCell( pPage, pCur.aiIdx[pCur.iPage] ) );
+    pgno = Converter.sqlite3Get4byte( pPage.aData, findCell( pPage, pCur.aiIdx[pCur.iPage] ) );
     rc = moveToChild( pCur, pgno );
   }
   return rc;
@@ -4949,7 +4949,7 @@ static int moveToRightmost( BtCursor pCur )
   Debug.Assert( pCur.eState == CURSOR_VALID );
   while ( rc == SQLITE_OK && 0 == ( pPage = pCur.apPage[pCur.iPage] ).leaf )
   {
-    pgno = sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 );
+    pgno = Converter.sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 );
     pCur.aiIdx[pCur.iPage] = pPage.nCell;
     rc = moveToChild( pCur, pgno );
   }
@@ -5260,11 +5260,11 @@ ref int pRes             /* Write search results here */
     }
     else if ( lwr >= pPage.nCell )
     {
-      chldPg = sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 );
+      chldPg = Converter.sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 );
     }
     else
     {
-      chldPg = sqlite3Get4byte( pPage.aData, findCell( pPage, lwr ) );
+      chldPg = Converter.sqlite3Get4byte( pPage.aData, findCell( pPage, lwr ) );
     }
     if ( chldPg == 0 )
     {
@@ -5344,7 +5344,7 @@ static int sqlite3BtreeNext( BtCursor pCur, ref int pRes )
   {
     if ( 0 == pPage.leaf )
     {
-      rc = moveToChild( pCur, sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 ) );
+      rc = moveToChild( pCur, Converter.sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 ) );
       if ( rc != 0 )
         return rc;
       rc = moveToLeftmost( pCur );
@@ -5419,7 +5419,7 @@ static int sqlite3BtreePrevious( BtCursor pCur, ref int pRes )
   if ( 0 == pPage.leaf )
   {
     int idx = pCur.aiIdx[pCur.iPage];
-    rc = moveToChild( pCur, sqlite3Get4byte( pPage.aData, findCell( pPage, idx ) ) );
+    rc = moveToChild( pCur, Converter.sqlite3Get4byte( pPage.aData, findCell( pPage, idx ) ) );
     if ( rc != 0 )
     {
       return rc;
@@ -5496,7 +5496,7 @@ u8 exact
   Debug.Assert( sqlite3_mutex_held( pBt.mutex ) );
   pPage1 = pBt.pPage1;
   mxPage = btreePagecount( pBt );
-  n = sqlite3Get4byte( pPage1.aData, 36 );
+  n = Converter.sqlite3Get4byte( pPage1.aData, 36 );
   testcase( n == mxPage - 1 );
   if ( n >= mxPage )
   {
@@ -5536,7 +5536,7 @@ u8 exact
     rc = sqlite3PagerWrite( pPage1.pDbPage );
     if ( rc != 0 )
       return rc;
-    sqlite3Put4byte( pPage1.aData, (u32)36, n - 1 );
+    Converter.sqlite3Put4byte( pPage1.aData, (u32)36, n - 1 );
 
     /* The code within this loop is run only once if the 'searchList' variable
     ** is not true. Otherwise, it runs once for each trunk-page on the
@@ -5547,11 +5547,11 @@ u8 exact
       pPrevTrunk = pTrunk;
       if ( pPrevTrunk != null )
       {
-        iTrunk = sqlite3Get4byte( pPrevTrunk.aData, 0 );
+        iTrunk = Converter.sqlite3Get4byte( pPrevTrunk.aData, 0 );
       }
       else
       {
-        iTrunk = sqlite3Get4byte( pPage1.aData, 32 );
+        iTrunk = Converter.sqlite3Get4byte( pPage1.aData, 32 );
       }
       testcase( iTrunk == mxPage );
       if ( iTrunk > mxPage )
@@ -5568,7 +5568,7 @@ u8 exact
         goto end_allocate_page;
       }
 
-      k = sqlite3Get4byte( pTrunk.aData, 4 ); /* # of leaves on this trunk page */
+      k = Converter.sqlite3Get4byte( pTrunk.aData, 4 ); /* # of leaves on this trunk page */
       if ( k == 0 && 0 == searchList )
       {
         /* The trunk has no leaves and the list is not being searched.
@@ -5637,7 +5637,7 @@ u8 exact
           ** page in this case.
           */
           MemPage pNewTrunk = new MemPage();
-          Pgno iNewTrunk = sqlite3Get4byte( pTrunk.aData, 8 );
+          Pgno iNewTrunk = Converter.sqlite3Get4byte( pTrunk.aData, 8 );
           if ( iNewTrunk > mxPage )
           {
             rc = SQLITE_CORRUPT_BKPT();
@@ -5660,13 +5660,13 @@ u8 exact
           pNewTrunk.aData[0 + 1] = pTrunk.aData[0 + 1];
           pNewTrunk.aData[0 + 2] = pTrunk.aData[0 + 2];
           pNewTrunk.aData[0 + 3] = pTrunk.aData[0 + 3];
-          sqlite3Put4byte( pNewTrunk.aData, (u32)4, (u32)( k - 1 ) );
+          Converter.sqlite3Put4byte( pNewTrunk.aData, (u32)4, (u32)( k - 1 ) );
           Buffer.BlockCopy( pTrunk.aData, 12, pNewTrunk.aData, 8, (int)( k - 1 ) * 4 );//memcpy( pNewTrunk.aData[8], ref pTrunk.aData[12], ( k - 1 ) * 4 );
           releasePage( pNewTrunk );
           if ( null == pPrevTrunk )
           {
             Debug.Assert( sqlite3PagerIswriteable( pPage1.pDbPage ) );
-            sqlite3Put4byte( pPage1.aData, (u32)32, iNewTrunk );
+            Converter.sqlite3Put4byte( pPage1.aData, (u32)32, iNewTrunk );
           }
           else
           {
@@ -5675,7 +5675,7 @@ u8 exact
             {
               goto end_allocate_page;
             }
-            sqlite3Put4byte( pPrevTrunk.aData, (u32)0, iNewTrunk );
+            Converter.sqlite3Put4byte( pPrevTrunk.aData, (u32)0, iNewTrunk );
           }
         }
         pTrunk = null;
@@ -5693,10 +5693,10 @@ u8 exact
           u32 i;
           int dist;
           closest = 0;
-          dist = sqlite3AbsInt32( (int)(sqlite3Get4byte( aData, 8 ) - nearby ));
+          dist = sqlite3AbsInt32( (int)(Converter.sqlite3Get4byte( aData, 8 ) - nearby ));
           for ( i = 1; i < k; i++ )
           {
-            int d2 = sqlite3AbsInt32( (int)(sqlite3Get4byte( aData, 8 + i * 4 ) - nearby ));
+            int d2 = sqlite3AbsInt32( (int)(Converter.sqlite3Get4byte( aData, 8 + i * 4 ) - nearby ));
             if ( d2 < dist )
             {
               closest = i;
@@ -5709,7 +5709,7 @@ u8 exact
           closest = 0;
         }
 
-        iPage = sqlite3Get4byte( aData, 8 + closest * 4 );
+        iPage = Converter.sqlite3Get4byte( aData, 8 + closest * 4 );
         testcase( iPage == mxPage );
         if ( iPage > mxPage )
         {
@@ -5731,7 +5731,7 @@ u8 exact
           {
             Buffer.BlockCopy( aData, (int)( 4 + k * 4 ), aData, 8 + (int)closest * 4, 4 );//memcpy( aData[8 + closest * 4], ref aData[4 + k * 4], 4 );
           }
-          sqlite3Put4byte( aData, (u32)4, ( k - 1 ) );// sqlite3Put4byte( aData, 4, k - 1 );
+          Converter.sqlite3Put4byte( aData, (u32)4, ( k - 1 ) );// sqlite3Put4byte( aData, 4, k - 1 );
           noContent = !btreeGetHasContent( pBt, pPgno ) ? 1 : 0;
           rc = btreeGetPage( pBt, pPgno, ref ppPage, noContent );
           if ( rc == SQLITE_OK )
@@ -5785,7 +5785,7 @@ u8 exact
       }
     }
 #endif
-    sqlite3Put4byte( pBt.pPage1.aData, (u32)28, pBt.nPage );
+    Converter.sqlite3Put4byte( pBt.pPage1.aData, (u32)28, pBt.nPage );
     pPgno = pBt.nPage;
 
     Debug.Assert( pPgno != PENDING_BYTE_PAGE( pBt ) );
@@ -5861,8 +5861,8 @@ static int freePage2( BtShared pBt, MemPage pMemPage, Pgno iPage )
   rc = sqlite3PagerWrite( pPage1.pDbPage );
   if ( rc != 0 )
     goto freepage_out;
-  nFree = (int)sqlite3Get4byte( pPage1.aData, 36 );
-  sqlite3Put4byte( pPage1.aData, 36, nFree + 1 );
+  nFree = (int)Converter.sqlite3Get4byte( pPage1.aData, 36 );
+  Converter.sqlite3Put4byte( pPage1.aData, 36, nFree + 1 );
 
   if ( pBt.secureDelete )
   {
@@ -5903,14 +5903,14 @@ if (false)
   {
     u32 nLeaf;                /* Initial number of leaf cells on trunk page */
 
-    iTrunk = sqlite3Get4byte( pPage1.aData, 32 );
+    iTrunk = Converter.sqlite3Get4byte( pPage1.aData, 32 );
     rc = btreeGetPage( pBt, iTrunk, ref pTrunk, 0 );
     if ( rc != SQLITE_OK )
     {
       goto freepage_out;
     }
 
-    nLeaf = sqlite3Get4byte( pTrunk.aData, 4 );
+    nLeaf = Converter.sqlite3Get4byte( pTrunk.aData, 4 );
     Debug.Assert( pBt.usableSize > 32 );
     if ( nLeaf > (u32)pBt.usableSize / 4 - 2 )
     {
@@ -5936,8 +5936,8 @@ if (false)
       rc = sqlite3PagerWrite( pTrunk.pDbPage );
       if ( rc == SQLITE_OK )
       {
-        sqlite3Put4byte( pTrunk.aData, (u32)4, nLeaf + 1 );
-        sqlite3Put4byte( pTrunk.aData, (u32)8 + nLeaf * 4, iPage );
+        Converter.sqlite3Put4byte( pTrunk.aData, (u32)4, nLeaf + 1 );
+        Converter.sqlite3Put4byte( pTrunk.aData, (u32)8 + nLeaf * 4, iPage );
         if ( pPage != null && !pBt.secureDelete )
         {
           sqlite3PagerDontWrite( pPage.pDbPage );
@@ -5964,9 +5964,9 @@ if (false)
   {
     goto freepage_out;
   }
-  sqlite3Put4byte( pPage.aData, iTrunk );
-  sqlite3Put4byte( pPage.aData, 4, 0 );
-  sqlite3Put4byte( pPage1.aData, (u32)32, iPage );
+  Converter.sqlite3Put4byte( pPage.aData, iTrunk );
+  Converter.sqlite3Put4byte( pPage.aData, 4, 0 );
+  Converter.sqlite3Put4byte( pPage1.aData, (u32)32, iPage );
   TRACE( "FREE-PAGE: %d new trunk page replacing %d\n", pPage.pgno, iTrunk );
 
 freepage_out:
@@ -6004,7 +6004,7 @@ static int clearCell( MemPage pPage, int pCell )
   {
     return SQLITE_OK;  /* No overflow pages. Return without doing anything */
   }
-  ovflPgno = sqlite3Get4byte( pPage.aData, pCell, info.iOverflow );
+  ovflPgno = Converter.sqlite3Get4byte( pPage.aData, pCell, info.iOverflow );
   Debug.Assert( pBt.usableSize > 4 );
   ovflPageSize = (u16)( pBt.usableSize - 4 );
   nOvfl = (int)( ( info.nPayload - info.nLocal + ovflPageSize - 1 ) / ovflPageSize );
@@ -6204,12 +6204,12 @@ ref int pnSize            /* Write cell size here */
       //Debug.Assert( pPrior < pPage.aData || pPrior >= &pPage.aData[pBt.pageSize]
       //      || sqlite3PagerIswriteable(pPage.pDbPage) );
 
-      sqlite3Put4byte( pPrior, pPriorIndex, pgnoOvfl );
+      Converter.sqlite3Put4byte( pPrior, pPriorIndex, pgnoOvfl );
       releasePage( pToRelease );
       pToRelease = pOvfl;
       pPrior = pOvfl.aData;
       pPriorIndex = 0;
-      sqlite3Put4byte( pPrior, 0 );
+      Converter.sqlite3Put4byte( pPrior, 0 );
       pPayload = pOvfl.aData;
       pPayloadIndex = 4; //&pOvfl.aData[4];
       spaceLeft = (int)pBt.usableSize - 4;
@@ -6370,7 +6370,7 @@ ref int pRC         /* Read and write return code from here */
     }
     if ( iChild != 0 )
     {
-      sqlite3Put4byte( pCell, iChild );
+      Converter.sqlite3Put4byte( pCell, iChild );
     }
     j = pPage.nOverflow++;
     Debug.Assert( j < pPage.aOvfl.Length );//(int)(sizeof(pPage.aOvfl)/sizeof(pPage.aOvfl[0])) );
@@ -6405,7 +6405,7 @@ ref int pRC         /* Read and write return code from here */
     Buffer.BlockCopy( pCell, nSkip, data, idx + nSkip, sz - nSkip ); //memcpy( data[idx + nSkip], pCell + nSkip, sz - nSkip );
     if ( iChild != 0 )
     {
-      sqlite3Put4byte( data, idx, iChild );
+      Converter.sqlite3Put4byte( data, idx, iChild );
     }
     //ptr = &data[end];
     //endPtr = &data[ins];
@@ -6679,7 +6679,7 @@ if (false)
     null, pPage.pgno, ref rc );
 
     /* Set the right-child pointer of pParent to point to the new page. */
-    sqlite3Put4byte( pParent.aData, pParent.hdrOffset + 8, pgnoNew );
+    Converter.sqlite3Put4byte( pParent.aData, pParent.hdrOffset + 8, pgnoNew );
 
     /* Release the reference to the new page. */
     releasePage( pNew );
@@ -6938,7 +6938,7 @@ TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
   {
     pRight = findCell( pParent, i + nxDiv - pParent.nOverflow );
   }
-  pgno = sqlite3Get4byte( pParent.aData, pRight );
+  pgno = Converter.sqlite3Get4byte( pParent.aData, pRight );
   while ( true )
   {
     rc = getAndInitPage( pBt, pgno, ref apOld[i] );
@@ -6954,14 +6954,14 @@ TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
     if ( i + nxDiv == pParent.aOvfl[0].idx && pParent.nOverflow != 0 )
     {
       apDiv[i] = 0;// = pParent.aOvfl[0].pCell;
-      pgno = sqlite3Get4byte( pParent.aOvfl[0].pCell, apDiv[i] );
+      pgno = Converter.sqlite3Get4byte( pParent.aOvfl[0].pCell, apDiv[i] );
       szNew[i] = cellSizePtr( pParent, apDiv[i] );
       pParent.nOverflow = 0;
     }
     else
     {
       apDiv[i] = findCell( pParent, i + nxDiv - pParent.nOverflow );
-      pgno = sqlite3Get4byte( pParent.aData, apDiv[i] );
+      pgno = Converter.sqlite3Get4byte( pParent.aData, apDiv[i] );
       szNew[i] = cellSizePtr( pParent, apDiv[i] );
 
       /* Drop the cell from the parent page. apDiv[i] still points to
@@ -7309,7 +7309,7 @@ if (false)
   nNew >= 5 ? apNew[4].pgno : 0, nNew >= 5 ? szNew[4] : 0 );
 
   Debug.Assert( sqlite3PagerIswriteable( pParent.pDbPage ) );
-  sqlite3Put4byte( pParent.aData, pRight, apNew[nNew - 1].pgno );
+  Converter.sqlite3Put4byte( pParent.aData, pRight, apNew[nNew - 1].pgno );
 
   /*
   ** Evenly distribute the data in apCell[] across the new pages.
@@ -7523,7 +7523,7 @@ if (false)
         {
           if ( 0 == leafCorrection )
           {
-            ptrmapPut( pBt, sqlite3Get4byte( apCell[i] ), PTRMAP_BTREE, pNew.pgno, ref rc );
+            ptrmapPut( pBt, Converter.sqlite3Get4byte( apCell[i] ), PTRMAP_BTREE, pNew.pgno, ref rc );
           }
           if ( szCell[i] > pNew.minLocal )
           {
@@ -7536,7 +7536,7 @@ if (false)
       {
         for ( i = 0; i < nNew; i++ )
         {
-          u32 key = sqlite3Get4byte( apNew[i].aData, 8 );
+          u32 key = Converter.sqlite3Get4byte( apNew[i].aData, 8 );
           ptrmapPut( pBt, key, PTRMAP_BTREE, apNew[i].pgno, ref rc );
         }
       }
@@ -7638,7 +7638,7 @@ if (false)
 
   /* Zero the contents of pRoot. Then install pChild as the right-child. */
   zeroPage( pRoot, pChild.aData[0] & ~PTF_LEAF );
-  sqlite3Put4byte( pRoot.aData, pRoot.hdrOffset + 8, pgnoChild );
+  Converter.sqlite3Put4byte( pRoot.aData, pRoot.hdrOffset + 8, pgnoChild );
 
   ppChild = pChild;
   return SQLITE_OK;
@@ -8307,7 +8307,7 @@ ref int pnChange      /* Add number of Cells freed to this counter */
     pCell = pPage.aData; //        pCell = findCell( pPage, i );
     if ( 0 == pPage.leaf )
     {
-      rc = clearDatabasePage( pBt, sqlite3Get4byte( pCell, iCell ), 1, ref pnChange );
+      rc = clearDatabasePage( pBt, Converter.sqlite3Get4byte( pCell, iCell ), 1, ref pnChange );
       if ( rc != 0 )
         goto cleardatabasepage_out;
     }
@@ -8317,7 +8317,7 @@ ref int pnChange      /* Add number of Cells freed to this counter */
   }
   if ( 0 == pPage.leaf )
   {
-    rc = clearDatabasePage( pBt, sqlite3Get4byte( pPage.aData, 8 ), 1, ref pnChange );
+    rc = clearDatabasePage( pBt, Converter.sqlite3Get4byte( pPage.aData, 8 ), 1, ref pnChange );
     if ( rc != 0 )
       goto cleardatabasepage_out;
   }
@@ -8549,7 +8549,7 @@ static void sqlite3BtreeGetMeta( Btree p, int idx, ref u32 pMeta )
   Debug.Assert( pBt.pPage1 != null );
   Debug.Assert( idx >= 0 && idx <= 15 );
 
-  pMeta = sqlite3Get4byte( pBt.pPage1.aData, 36 + idx * 4 );
+  pMeta = Converter.sqlite3Get4byte( pBt.pPage1.aData, 36 + idx * 4 );
 
   /* If auto-vacuum is disabled in this build and this is an auto-vacuum
   ** database, mark the database as read-only.  */
@@ -8577,7 +8577,7 @@ static int sqlite3BtreeUpdateMeta( Btree p, int idx, u32 iMeta )
   rc = sqlite3PagerWrite( pBt.pPage1.pDbPage );
   if ( rc == SQLITE_OK )
   {
-    sqlite3Put4byte( pP1, 36 + idx * 4, iMeta );
+    Converter.sqlite3Put4byte( pP1, 36 + idx * 4, iMeta );
 #if !SQLITE_OMIT_AUTOVACUUM
     if ( idx == BTREE_INCR_VACUUM )
     {
@@ -8657,11 +8657,11 @@ static int sqlite3BtreeCount( BtCursor pCur, ref i64 pnEntry )
     iIdx = pCur.aiIdx[pCur.iPage];
     if ( iIdx == pPage.nCell )
     {
-      rc = moveToChild( pCur, sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 ) );
+      rc = moveToChild( pCur, Converter.sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 ) );
     }
     else
     {
-      rc = moveToChild( pCur, sqlite3Get4byte( pPage.aData, findCell( pPage, iIdx ) ) );
+      rc = moveToChild( pCur, Converter.sqlite3Get4byte( pPage.aData, findCell( pPage, iIdx ) ) );
     }
   }
 
@@ -8840,7 +8840,7 @@ string zContext        /* Context for error messages */
     pOvflData = sqlite3PagerGetData( pOvflPage );
     if ( isFreeList != 0 )
     {
-      int n = (int)sqlite3Get4byte( pOvflData, 4 );
+      int n = (int)Converter.sqlite3Get4byte( pOvflData, 4 );
 #if !SQLITE_OMIT_AUTOVACUUM
       if ( pCheck.pBt.autoVacuum )
       {
@@ -8857,7 +8857,7 @@ string zContext        /* Context for error messages */
       {
         for ( i = 0; i < n; i++ )
         {
-          Pgno iFreePage = sqlite3Get4byte( pOvflData, 8 + i * 4 );
+          Pgno iFreePage = Converter.sqlite3Get4byte( pOvflData, 8 + i * 4 );
 #if !SQLITE_OMIT_AUTOVACUUM
           if ( pCheck.pBt.autoVacuum )
           {
@@ -8878,12 +8878,12 @@ string zContext        /* Context for error messages */
       */
       if ( pCheck.pBt.autoVacuum && N > 0 )
       {
-        i = (int)sqlite3Get4byte( pOvflData );
+        i = (int)Converter.sqlite3Get4byte( pOvflData );
         checkPtrmap( pCheck, (u32)i, PTRMAP_OVERFLOW2, (u32)iPage, zContext );
       }
     }
 #endif
-    iPage = (int)sqlite3Get4byte( pOvflData );
+    iPage = (int)Converter.sqlite3Get4byte( pOvflData );
     sqlite3PagerUnref( pOvflPage );
   }
 }
@@ -9001,7 +9001,7 @@ object _pnParentMaxKey  /* C# Needed to determine if content passed*/
     )
     {
       int nPage = (int)( sz - info.nLocal + usableSize - 5 ) / ( usableSize - 4 );
-      Pgno pgnoOvfl = sqlite3Get4byte( pCell, iCell, info.iOverflow );
+      Pgno pgnoOvfl = Converter.sqlite3Get4byte( pCell, iCell, info.iOverflow );
 #if !SQLITE_OMIT_AUTOVACUUM
       if ( pBt.autoVacuum )
       {
@@ -9015,7 +9015,7 @@ object _pnParentMaxKey  /* C# Needed to determine if content passed*/
     */
     if ( 0 == pPage.leaf )
     {
-      pgno = (int)sqlite3Get4byte( pCell, iCell ); //sqlite3Get4byte( pCell );
+      pgno = (int)Converter.sqlite3Get4byte( pCell, iCell ); //sqlite3Get4byte( pCell );
 #if !SQLITE_OMIT_AUTOVACUUM
       if ( pBt.autoVacuum )
       {
@@ -9036,7 +9036,7 @@ object _pnParentMaxKey  /* C# Needed to determine if content passed*/
   }
   if ( 0 == pPage.leaf )
   {
-    pgno = (int)sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 );
+    pgno = (int)Converter.sqlite3Get4byte( pPage.aData, pPage.hdrOffset + 8 );
     sqlite3_snprintf( 200, zContext,
     "On page %d at right child: ", iPage );
 #if !SQLITE_OMIT_AUTOVACUUM
@@ -9235,8 +9235,8 @@ ref int pnErr  /* Write number of errors seen to this variable */
 
   /* Check the integrity of the freelist
   */
-  checkList( sCheck, 1, (int)sqlite3Get4byte( pBt.pPage1.aData, 32 ),
-  (int)sqlite3Get4byte( pBt.pPage1.aData, 36 ), "Main freelist: " );
+  checkList( sCheck, 1, (int)Converter.sqlite3Get4byte( pBt.pPage1.aData, 32 ),
+  (int)Converter.sqlite3Get4byte( pBt.pPage1.aData, 36 ), "Main freelist: " );
 
   /* Check all the tables.
   */
