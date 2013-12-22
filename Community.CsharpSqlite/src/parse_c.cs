@@ -2707,7 +2707,7 @@ new _yyRuleInfo( 251, 2 ),
         case 112: /* cmd ::= select */
           //#line 396 "parse.y"
           {
-            SelectDest dest = new SelectDest( SRT_Output, '\0', 0, 0, 0 );
+            SelectDest dest = new SelectDest( SelectResultType.Output, '\0', 0, 0, 0 );
             sqlite3Select( pParse, yymsp[0].minor.yy387, ref dest );
             sqlite3SelectDelete( pParse.db, ref yymsp[0].minor.yy387 );
           }

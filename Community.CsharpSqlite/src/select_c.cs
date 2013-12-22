@@ -58,9 +58,9 @@ namespace Community.CsharpSqlite
     /*
     ** Initialize a SelectDest structure.
     */
-    static void sqlite3SelectDestInit( SelectDest pDest, int eDest, int iParm )
+    static void sqlite3SelectDestInit( SelectDest pDest, SelectResultType eDest, int iParm )
     {
-      pDest.eDest = (u8)eDest;
+      pDest.eDest = eDest;
       pDest.iParm = iParm;
       pDest.affinity = '\0';
       pDest.iMem = 0;
@@ -611,8 +611,8 @@ namespace Community.CsharpSqlite
     int nExpr           /* Number of result columns returned by SELECT */
     )
     {
-      int eDest = pDest.eDest;
-      if ( nExpr > 1 && ( eDest == SRT_Mem || eDest == SRT_Set ) )
+      var eDest = pDest.eDest;
+      if ( nExpr > 1 && ( eDest == SelectResultType.Mem || eDest == SelectResultType.Set ) )
       {
         sqlite3ErrorMsg( pParse, "only a single result allowed for " +
         "a SELECT that is part of an expression" );
@@ -651,7 +651,7 @@ namespace Community.CsharpSqlite
       int i;
       bool hasDistinct;         /* True if the DISTINCT keyword is present */
       int regResult;            /* Start of memory holding result set */
-      int eDest = pDest.eDest;  /* How to dispose of results */
+      SelectResultType eDest = pDest.eDest;  /* How to dispose of results */
       int iParm = pDest.iParm;  /* First argument to disposal method */
       int nResultCol;           /* Number of result columns */
 
@@ -693,13 +693,13 @@ namespace Community.CsharpSqlite
           sqlite3VdbeAddOp3( v, OP_Column, srcTab, i, regResult + i );
         }
       }
-      else if ( eDest != SRT_Exists )
+      else if ( eDest != SelectResultType.Exists )
       {
         /* If the destination is an EXISTS(...) expression, the actual
         ** values returned by the SELECT are not required.
         */
         sqlite3ExprCacheClear( pParse );
-        sqlite3ExprCodeExprList( pParse, pEList, regResult, eDest == SRT_Output );
+        sqlite3ExprCodeExprList( pParse, pEList, regResult, eDest == SelectResultType.Output );
       }
       nColumn = nResultCol;
 
@@ -724,7 +724,7 @@ namespace Community.CsharpSqlite
         ** table iParm.
         */
 #if !SQLITE_OMIT_COMPOUND_SELECT
-        case SRT_Union:
+        case SelectResultType.Union:
           {
             int r1;
             r1 = sqlite3GetTempReg( pParse );
@@ -738,7 +738,7 @@ namespace Community.CsharpSqlite
         ** saving that record, use it as a key to delete elements from
         ** the temporary table iParm.
         */
-        case SRT_Except:
+        case SelectResultType.Except:
           {
             sqlite3VdbeAddOp3( v, OP_IdxDelete, iParm, regResult, nColumn );
             break;
@@ -747,12 +747,12 @@ namespace Community.CsharpSqlite
 
         /* Store the result as data using a unique key.
 */
-        case SRT_Table:
-        case SRT_EphemTab:
+        case SelectResultType.Table:
+        case SelectResultType.EphemTab:
           {
             int r1 = sqlite3GetTempReg( pParse );
-            testcase( eDest == SRT_Table );
-            testcase( eDest == SRT_EphemTab );
+            testcase( eDest == SelectResultType.Table );
+            testcase( eDest == SelectResultType.EphemTab );
             sqlite3VdbeAddOp3( v, OP_MakeRecord, regResult, nColumn, r1 );
             if ( pOrderBy != null )
             {
@@ -775,7 +775,7 @@ namespace Community.CsharpSqlite
 ** then there should be a single item on the stack.  Write this
 ** item into the set table with bogus data.
 */
-        case SRT_Set:
+        case SelectResultType.Set:
           {
             Debug.Assert( nColumn == 1 );
             p.affinity = sqlite3CompareAffinity( pEList.a[0].pExpr, pDest.affinity );
@@ -800,7 +800,7 @@ namespace Community.CsharpSqlite
 
         /* If any row exist in the result set, record that fact and abort.
         */
-        case SRT_Exists:
+        case SelectResultType.Exists:
           {
             sqlite3VdbeAddOp2( v, OP_Integer, 1, iParm );
             /* The LIMIT clause will terminate the loop for us */
@@ -811,7 +811,7 @@ namespace Community.CsharpSqlite
         ** store the results in the appropriate memory cell and break out
         ** of the scan loop.
         */
-        case SRT_Mem:
+        case SelectResultType.Mem:
           {
             Debug.Assert( nColumn == 1 );
             if ( pOrderBy != null )
@@ -831,11 +831,11 @@ namespace Community.CsharpSqlite
 ** case of a subroutine, the subroutine itself is responsible for
 ** popping the data from the stack.
 */
-        case SRT_Coroutine:
-        case SRT_Output:
+        case SelectResultType.Coroutine:
+        case SelectResultType.Output:
           {
-            testcase( eDest == SRT_Coroutine );
-            testcase( eDest == SRT_Output );
+            testcase( eDest == SelectResultType.Coroutine );
+            testcase( eDest == SelectResultType.Output );
             if ( pOrderBy != null )
             {
               int r1 = sqlite3GetTempReg( pParse );
@@ -843,7 +843,7 @@ namespace Community.CsharpSqlite
               pushOntoSorter( pParse, pOrderBy, p, r1 );
               sqlite3ReleaseTempReg( pParse, r1 );
             }
-            else if ( eDest == SRT_Coroutine )
+            else if ( eDest == SelectResultType.Coroutine )
             {
               sqlite3VdbeAddOp1( v, OP_Yield, pDest.iParm );
             }
@@ -863,7 +863,7 @@ namespace Community.CsharpSqlite
 */
         default:
           {
-            Debug.Assert( eDest == SRT_Discard );
+            Debug.Assert( eDest == SelectResultType.Discard );
             break;
           }
 #endif
@@ -1062,7 +1062,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       int pseudoTab = 0;
       ExprList pOrderBy = p.pOrderBy;
 
-      int eDest = pDest.eDest;
+      var eDest = pDest.eDest;
       int iParm = pDest.iParm;
 
       int regRow;
@@ -1070,7 +1070,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 
       iTab = pOrderBy.iECursor;
       regRow = sqlite3GetTempReg( pParse );
-      if ( eDest == SRT_Output || eDest == SRT_Coroutine )
+      if ( eDest == SelectResultType.Output || eDest == SelectResultType.Coroutine )
       {
         pseudoTab = pParse.nTab++;
         sqlite3VdbeAddOp3( v, OP_OpenPseudo, pseudoTab, regRow, nColumn );
@@ -1085,18 +1085,18 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       sqlite3VdbeAddOp3( v, OP_Column, iTab, pOrderBy.nExpr + 1, regRow );
       switch ( eDest )
       {
-        case SRT_Table:
-        case SRT_EphemTab:
+        case SelectResultType.Table:
+        case SelectResultType.EphemTab:
           {
-            testcase( eDest == SRT_Table );
-            testcase( eDest == SRT_EphemTab );
+            testcase( eDest == SelectResultType.Table );
+            testcase( eDest == SelectResultType.EphemTab );
             sqlite3VdbeAddOp2( v, OP_NewRowid, iParm, regRowid );
             sqlite3VdbeAddOp3( v, OP_Insert, iParm, regRow, regRowid );
             sqlite3VdbeChangeP5( v, OPFLAG_APPEND );
             break;
           }
 #if !SQLITE_OMIT_SUBQUERY
-        case SRT_Set:
+        case SelectResultType.Set:
           {
             Debug.Assert( nColumn == 1 );
             sqlite3VdbeAddOp4( v, OP_MakeRecord, regRow, 1, regRowid, p.affinity, 1 );
@@ -1104,7 +1104,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
             sqlite3VdbeAddOp2( v, OP_IdxInsert, iParm, regRowid );
             break;
           }
-        case SRT_Mem:
+        case SelectResultType.Mem:
           {
             Debug.Assert( nColumn == 1 );
             sqlite3ExprCodeMove( pParse, regRow, iParm, 1 );
@@ -1115,9 +1115,9 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
         default:
           {
             int i;
-            Debug.Assert( eDest == SRT_Output || eDest == SRT_Coroutine );
-            testcase( eDest == SRT_Output );
-            testcase( eDest == SRT_Coroutine );
+            Debug.Assert( eDest == SelectResultType.Output || eDest == SelectResultType.Coroutine );
+            testcase( eDest == SelectResultType.Output );
+            testcase( eDest == SelectResultType.Coroutine );
             for ( i = 0; i < nColumn; i++ )
             {
               Debug.Assert( regRow != pDest.iMem + i );
@@ -1127,7 +1127,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
                 sqlite3VdbeChangeP5( v, OPFLAG_CLEARCACHE );
               }
             }
-            if ( eDest == SRT_Output )
+            if ( eDest == SelectResultType.Output )
             {
               sqlite3VdbeAddOp2( v, OP_ResultRow, pDest.iMem, nColumn );
               sqlite3ExprCacheAffinityChange( pParse, pDest.iMem, nColumn );
@@ -1147,7 +1147,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       sqlite3VdbeResolveLabel( v, addrContinue );
       sqlite3VdbeAddOp2( v, OP_Next, iTab, addr );
       sqlite3VdbeResolveLabel( v, addrBreak );
-      if ( eDest == SRT_Output || eDest == SRT_Coroutine )
+      if ( eDest == SelectResultType.Output || eDest == SelectResultType.Coroutine )
       {
         sqlite3VdbeAddOp2( v, OP_Close, pseudoTab, 0 );
       }
@@ -1879,12 +1879,12 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 
       /* Create the destination temporary table if necessary
       */
-      if ( dest.eDest == SRT_EphemTab )
+      if ( dest.eDest == SelectResultType.EphemTab )
       {
         Debug.Assert( p.pEList != null );
         sqlite3VdbeAddOp2( v, OP_OpenEphemeral, dest.iParm, p.pEList.nExpr );
         sqlite3VdbeChangeP5( v, BTREE_UNORDERED );
-        dest.eDest = SRT_Table;
+        dest.eDest = SelectResultType.Table;
       }
 
       /* Make sure all SELECTs in the statement have the same number of elements
@@ -1958,15 +1958,15 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
         case TK_UNION:
           {
             int unionTab;    /* VdbeCursor number of the temporary table holding result */
-            u8 op = 0;      /* One of the SRT_ operations to apply to self */
-            int priorOp;     /* The SRT_ operation to apply to prior selects */
+            SelectResultType op = 0;      /* One of the SelectResultType. operations to apply to self */
+            SelectResultType priorOp;     /* The SelectResultType. operation to apply to prior selects */
             Expr pLimit, pOffset; /* Saved values of p.nLimit and p.nOffset */
             int addr;
             SelectDest uniondest = new SelectDest();
 
             testcase( p.tk_op == TK_EXCEPT );
             testcase( p.tk_op == TK_UNION );
-            priorOp = SRT_Union;
+            priorOp = SelectResultType.Union;
             if ( dest.eDest == priorOp && ALWAYS( null == p.pLimit && null == p.pOffset ) )
             {
               /* We can reuse a temporary table generated by a SELECT to our
@@ -2007,12 +2007,12 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
             */
             if ( p.tk_op == TK_EXCEPT )
             {
-              op = SRT_Except;
+              op = SelectResultType.Except;
             }
             else
             {
               Debug.Assert( p.tk_op == TK_UNION );
-              op = SRT_Union;
+              op = SelectResultType.Union;
             }
             p.pPrior = null;
             pLimit = p.pLimit;
@@ -2045,7 +2045,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
             {
               int iCont, iBreak, iStart;
               Debug.Assert( p.pEList != null );
-              if ( dest.eDest == SRT_Output )
+              if ( dest.eDest == SelectResultType.Output )
               {
                 Select pFirst = p;
                 while ( pFirst.pPrior != null )
@@ -2092,7 +2092,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 
             /* Code the SELECTs to our left into temporary table "tab1".
             */
-            sqlite3SelectDestInit( intersectdest, SRT_Union, tab1 );
+            sqlite3SelectDestInit( intersectdest, SelectResultType.Union, tab1 );
             explainSetInteger( ref iSub1, pParse.iNextSelectId );
             rc = sqlite3Select( pParse, pPrior, ref intersectdest );
             if ( rc != 0 )
@@ -2125,7 +2125,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
             ** tables.
             */
             Debug.Assert( p.pEList != null );
-            if ( dest.eDest == SRT_Output )
+            if ( dest.eDest == SelectResultType.Output )
             {
               Select pFirst = p;
               while ( pFirst.pPrior != null )
@@ -2283,13 +2283,13 @@ multi_select_end:
       {
         /* Store the result as data using a unique key.
         */
-        case SRT_Table:
-        case SRT_EphemTab:
+        case SelectResultType.Table:
+        case SelectResultType.EphemTab:
           {
             int r1 = sqlite3GetTempReg( pParse );
             int r2 = sqlite3GetTempReg( pParse );
-            testcase( pDest.eDest == SRT_Table );
-            testcase( pDest.eDest == SRT_EphemTab );
+            testcase( pDest.eDest == SelectResultType.Table );
+            testcase( pDest.eDest == SelectResultType.EphemTab );
             sqlite3VdbeAddOp3( v, OP_MakeRecord, pIn.iMem, pIn.nMem, r1 );
             sqlite3VdbeAddOp2( v, OP_NewRowid, pDest.iParm, r2 );
             sqlite3VdbeAddOp3( v, OP_Insert, pDest.iParm, r1, r2 );
@@ -2304,7 +2304,7 @@ multi_select_end:
 ** then there should be a single item on the stack.  Write this
 ** item into the set table with bogus data.
 */
-        case SRT_Set:
+        case SelectResultType.Set:
           {
             int r1;
             Debug.Assert( pIn.nMem == 1 );
@@ -2321,7 +2321,7 @@ multi_select_end:
 #if FALSE  //* Never occurs on an ORDER BY query */
 /* If any row exist in the result set, record that fact and abort.
 */
-case SRT_Exists: {
+case SelectResultType.Exists: {
 sqlite3VdbeAddOp2(v, OP_Integer, 1, pDest.iParm);
 /* The LIMIT clause will terminate the loop for us */
 break;
@@ -2332,7 +2332,7 @@ break;
 ** store the results in the appropriate memory cell and break out
 ** of the scan loop.
 */
-        case SRT_Mem:
+        case SelectResultType.Mem:
           {
             Debug.Assert( pIn.nMem == 1 );
             sqlite3ExprCodeMove( pParse, pIn.iMem, pDest.iParm, 1 );
@@ -2344,7 +2344,7 @@ break;
         /* The results are stored in a sequence of registers
 ** starting at pDest.iMem.  Then the co-routine yields.
 */
-        case SRT_Coroutine:
+        case SelectResultType.Coroutine:
           {
             if ( pDest.iMem == 0 )
             {
@@ -2357,16 +2357,16 @@ break;
           }
 
         /* If none of the above, then the result destination must be
-        ** SRT_Output.  This routine is never called with any other
-        ** destination other than the ones handled above or SRT_Output.
+        ** SelectResultType.Output.  This routine is never called with any other
+        ** destination other than the ones handled above or SelectResultType.Output.
         **
-        ** For SRT_Output, results are stored in a sequence of registers.
+        ** For SelectResultType.Output, results are stored in a sequence of registers.
         ** Then the OP_ResultRow opcode is used to cause sqlite3_step() to
         ** return the next row of result.
         */
         default:
           {
-            Debug.Assert( pDest.eDest == SRT_Output );
+            Debug.Assert( pDest.eDest == SelectResultType.Output );
             sqlite3VdbeAddOp2( v, OP_ResultRow, pIn.iMem, pIn.nMem );
             sqlite3ExprCacheAffinityChange( pParse, pIn.iMem, pIn.nMem );
             break;
@@ -2684,8 +2684,8 @@ break;
       regEofB = ++pParse.nMem;
       regOutA = ++pParse.nMem;
       regOutB = ++pParse.nMem;
-      sqlite3SelectDestInit( destA, SRT_Coroutine, regAddrA );
-      sqlite3SelectDestInit( destB, SRT_Coroutine, regAddrB );
+      sqlite3SelectDestInit( destA, SelectResultType.Coroutine, regAddrA );
+      sqlite3SelectDestInit( destB, SelectResultType.Coroutine, regAddrB );
 
       /* Jump past the various subroutines and coroutines to the main
       ** merge loop
@@ -2847,7 +2847,7 @@ break;
 
       /* Set the number of output columns
       */
-      if ( pDest.eDest == SRT_Output )
+      if ( pDest.eDest == SelectResultType.Output )
       {
         Select pFirst = pPrior;
         while ( pFirst.pPrior != null )
@@ -4244,41 +4244,41 @@ break;
     **
     **     pDest.eDest    Result
     **     ------------    -------------------------------------------
-    **     SRT_Output      Generate a row of output (using the OP_ResultRow
+    **     SelectResultType.Output      Generate a row of output (using the OP_ResultRow
     **                     opcode) for each row in the result set.
     **
-    **     SRT_Mem         Only valid if the result is a single column.
+    **     SelectResultType.Mem         Only valid if the result is a single column.
     **                     Store the first column of the first result row
     **                     in register pDest.iParm then abandon the rest
     **                     of the query.  This destination implies "LIMIT 1".
     **
-    **     SRT_Set         The result must be a single column.  Store each
+    **     SelectResultType.Set         The result must be a single column.  Store each
     **                     row of result as the key in table pDest.iParm.
     **                     Apply the affinity pDest.affinity before storing
     **                     results.  Used to implement "IN (SELECT ...)".
     **
-    **     SRT_Union       Store results as a key in a temporary table pDest.iParm.
+    **     SelectResultType.Union       Store results as a key in a temporary table pDest.iParm.
     **
-    **     SRT_Except      Remove results from the temporary table pDest.iParm.
+    **     SelectResultType.Except      Remove results from the temporary table pDest.iParm.
     **
-    **     SRT_Table       Store results in temporary table pDest.iParm.
-    **                     This is like SRT_EphemTab except that the table
+    **     SelectResultType.Table       Store results in temporary table pDest.iParm.
+    **                     This is like SelectResultType.EphemTab except that the table
     **                     is assumed to already be open.
     **
-    **     SRT_EphemTab    Create an temporary table pDest.iParm and store
+    **     SelectResultType.EphemTab    Create an temporary table pDest.iParm and store
     **                     the result there. The cursor is left open after
-    **                     returning.  This is like SRT_Table except that
+    **                     returning.  This is like SelectResultType.Table except that
     **                     this destination uses OP_OpenEphemeral to create
     **                     the table first.
     **
-    **     SRT_Coroutine   Generate a co-routine that returns a new row of
+    **     SelectResultType.Coroutine   Generate a co-routine that returns a new row of
     **                     results each time it is invoked.  The entry point
     **                     of the co-routine is stored in register pDest.iParm.
     **
-    **     SRT_Exists      Store a 1 in memory cell pDest.iParm if the result
+    **     SelectResultType.Exists      Store a 1 in memory cell pDest.iParm if the result
     **                     set is not empty.
     **
-    **     SRT_Discard     Throw the results away.  This is used by SELECT
+    **     SelectResultType.Discard     Throw the results away.  This is used by SELECT
     **                     statements within triggers whose only purpose is
     **                     the side-effects of functions.
     **
@@ -4331,10 +4331,10 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
 #endif
       sAggInfo = new AggInfo();// memset(sAggInfo, 0, sAggInfo).Length;
 
-      if ( pDest.eDest <= SRT_Discard ) //IgnorableOrderby(pDest))
+      if ( pDest.eDest <= SelectResultType.Discard ) //IgnorableOrderby(pDest))
       {
-        Debug.Assert( pDest.eDest == SRT_Exists || pDest.eDest == SRT_Union ||
-        pDest.eDest == SRT_Except || pDest.eDest == SRT_Discard );
+        Debug.Assert( pDest.eDest == SelectResultType.Exists || pDest.eDest == SelectResultType.Union ||
+        pDest.eDest == SelectResultType.Except || pDest.eDest == SelectResultType.Discard );
         /* If ORDER BY makes no difference in the output then neither does
         ** DISTINCT so it can be removed too. */
         sqlite3ExprListDelete( db, ref p.pOrderBy );
@@ -4403,7 +4403,7 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
         }
         else
         {
-          sqlite3SelectDestInit( dest, SRT_EphemTab, pItem.iCursor );
+          sqlite3SelectDestInit( dest, SelectResultType.EphemTab, pItem.iCursor );
           Debug.Assert( 0 == pItem.isPopulated );
           explainSetInteger( ref pItem.iSelectId, (int)pParse.iNextSelectId );
           sqlite3Select( pParse, pSub, ref dest );
@@ -4416,7 +4416,7 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
         //}
         pParse.nHeight -= sqlite3SelectExprHeight( p );
         pTabList = p.pSrc;
-        if ( !( pDest.eDest <= SRT_Discard ) )//        if( null==IgnorableOrderby(pDest) )
+        if ( !( pDest.eDest <= SelectResultType.Discard ) )//        if( null==IgnorableOrderby(pDest) )
         {
           pOrderBy = p.pOrderBy;
         }
@@ -4505,7 +4505,7 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
 
       /* If the output is destined for a temporary table, open that table.
       */
-      if ( pDest.eDest == SRT_EphemTab )
+      if ( pDest.eDest == SelectResultType.EphemTab )
       {
         sqlite3VdbeAddOp2( v, OP_OpenEphemeral, pDest.iParm, pEList.nExpr );
       }
@@ -5043,7 +5043,7 @@ select_end:
 
       /* Identify column names if results of the SELECT are to be output.
       */
-      if ( rc == SQLITE_OK && pDest.eDest == SRT_Output )
+      if ( rc == SQLITE_OK && pDest.eDest == SelectResultType.Output )
       {
         generateColumnNames( pParse, pTabList, pEList );
       }

@@ -2004,7 +2004,7 @@ return null;
               ExprList pEList;
 
               Debug.Assert( !isRowid );
-              sqlite3SelectDestInit( dest, SRT_Set, pExpr.iTable );
+              sqlite3SelectDestInit( dest, SelectResultType.Set, pExpr.iTable );
               dest.affinity = (char)affinity;
               Debug.Assert( ( pExpr.iTable & 0x0000FFFF ) == pExpr.iTable );
               pExpr.x.pSelect.iLimit = 0;
@@ -2114,7 +2114,7 @@ return null;
             sqlite3SelectDestInit( dest, 0, ++pParse.nMem );
             if ( pExpr.op == TK_SELECT )
             {
-              dest.eDest = SRT_Mem;
+              dest.eDest = SelectResultType.Mem;
               sqlite3VdbeAddOp2( v, OP_Null, 0, dest.iParm );
 #if SQLITE_DEBUG
               VdbeComment( v, "Init subquery result" );
@@ -2122,7 +2122,7 @@ return null;
             }
             else
             {
-              dest.eDest = SRT_Exists;
+              dest.eDest = SelectResultType.Exists;
               sqlite3VdbeAddOp2( v, OP_Integer, 0, dest.iParm );
 #if SQLITE_DEBUG
               VdbeComment( v, "Init EXISTS result" );

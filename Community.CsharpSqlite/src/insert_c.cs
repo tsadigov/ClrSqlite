@@ -676,7 +676,7 @@ isView = false;
 #if SQLITE_DEBUG
         VdbeComment( v, "SELECT eof flag" );
 #endif
-        sqlite3SelectDestInit( dest, SRT_Coroutine, ++pParse.nMem );
+        sqlite3SelectDestInit( dest, SelectResultType.Coroutine, ++pParse.nMem );
         addrSelect = sqlite3VdbeCurrentAddr( v ) + 2;
         sqlite3VdbeAddOp2( v, OP_Integer, addrSelect - 1, dest.iParm );
         j1 = sqlite3VdbeAddOp2( v, OP_Goto, 0, 0 );

@@ -909,7 +909,7 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
             {
               SelectDest sDest = new SelectDest();
               Select pSelect = sqlite3SelectDup( db, pStep.pSelect, 0 );
-              sqlite3SelectDestInit( sDest, SRT_Discard, 0 );
+              sqlite3SelectDestInit( sDest, SelectResultType.Discard, 0 );
               sqlite3Select( pParse, pSelect, ref sDest );
               sqlite3SelectDelete( db, ref pSelect );
               break;

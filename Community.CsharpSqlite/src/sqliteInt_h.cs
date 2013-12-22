@@ -2938,7 +2938,7 @@ set { _op = value; }
         {
             public ExprList pEList; /* The fields of the result */
             public u8 tk_op; /* One of: TK_UNION TK_ALL TK_INTERSECT TK_EXCEPT */
-            public char affinity; /* MakeRecord with this affinity for SRT_Set */
+            public char affinity; /* MakeRecord with this affinity for SelectResultType.Set */
             public SelectFlags selFlags; /* Various SF_* values */
             public SrcList pSrc; /* The FROM clause */
             public Expr pWhere; /* The WHERE clause */
@@ -3012,26 +3012,27 @@ set { _op = value; }
     ** The results of a select can be distributed in several ways.  The
     ** "SRT" prefix means "SELECT Result Type".
     */
-        private const int SRT_Union = 1; //#define SRT_Union        1  /* Store result as keys in an index */
-        private const int SRT_Except = 2; //#define SRT_Except      2  /* Remove result from a UNION index */
-        private const int SRT_Exists = 3; //#define SRT_Exists      3  /* Store 1 if the result is not empty */
-        private const int SRT_Discard = 4; //#define SRT_Discard    4  /* Do not save the results anywhere */
+        public enum SelectResultType{
+        Union = 1, //#define SelectResultType.Union        1  /* Store result as keys in an index */
+        Except = 2, //#define SelectResultType.Except      2  /* Remove result from a UNION index */
+        Exists = 3, //#define SelectResultType.Exists      3  /* Store 1 if the result is not empty */
+        Discard = 4, //#define SelectResultType.Discard    4  /* Do not save the results anywhere */
 
         /* The ORDER BY clause is ignored for all of the above */
-        //#define IgnorableOrderby(X) ((X->eDest)<=SRT_Discard)
+        //#define IgnorableOrderby(X) ((X->eDest)<=SelectResultType.Discard)
 
-        private const int SRT_Output = 5; //#define SRT_Output      5  /* Output each row of result */
-        private const int SRT_Mem = 6; //#define SRT_Mem            6  /* Store result in a memory cell */
-        private const int SRT_Set = 7; //#define SRT_Set            7  /* Store results as keys in an index */
+        Output = 5, //#define SelectResultType.Output      5  /* Output each row of result */
+        Mem = 6, //#define SelectResultType.Mem            6  /* Store result in a memory cell */
+        Set = 7, //#define SelectResultType.Set            7  /* Store results as keys in an index */
 
-        private const int SRT_Table = 8;
-            //#define SRT_Table        8  /* Store result as data with an automatic rowid */
+        Table = 8,
+            //#define SelectResultType.Table        8  /* Store result as data with an automatic rowid */
 
-        private const int SRT_EphemTab = 9;
-            //#define SRT_EphemTab  9  /* Create transient tab and store like SRT_Table /
+        EphemTab = 9,
+            //#define SelectResultType.EphemTab  9  /* Create transient tab and store like SelectResultType.Table /
 
-        private const int SRT_Coroutine = 10; //#define SRT_Coroutine   10  /* Generate a single row of result */
-
+        Coroutine = 10 //#define SelectResultType.Coroutine   10  /* Generate a single row of result */
+    }
         /*
     ** A structure used to customize the behavior of sqlite3Select(). See
     ** comments above sqlite3Select() for details.
@@ -3039,8 +3040,8 @@ set { _op = value; }
         //typedef struct SelectDest SelectDest;
         public class SelectDest
         {
-            public u8 eDest; /* How to dispose of the results */
-            public char affinity; /* Affinity used when eDest==SRT_Set */
+            public SelectResultType eDest; /* How to dispose of the results */
+            public char affinity; /* Affinity used when eDest==SelectResultType.Set */
             public int iParm; /* A parameter used by the eDest disposal method */
             public int iMem; /* Base register where results are written */
             public int nMem; /* Number of registers allocated */
@@ -3054,7 +3055,7 @@ set { _op = value; }
                 this.nMem = 0;
             }
 
-            public SelectDest(u8 eDest, char affinity, int iParm)
+            public SelectDest(SelectResultType eDest, char affinity, int iParm)
             {
                 this.eDest = eDest;
                 this.affinity = affinity;
@@ -3063,7 +3064,7 @@ set { _op = value; }
                 this.nMem = 0;
             }
 
-            public SelectDest(u8 eDest, char affinity, int iParm, int iMem, int nMem)
+            public SelectDest(SelectResultType eDest, char affinity, int iParm, int iMem, int nMem)
             {
                 this.eDest = eDest;
                 this.affinity = affinity;

@@ -1856,7 +1856,7 @@ primary_key_exit:
           sqlite3VdbeAddOp3( v, OP_OpenWrite, 1, pParse.regRoot, iDb );
           sqlite3VdbeChangeP5( v, 1 );
           pParse.nTab = 2;
-          sqlite3SelectDestInit( dest, SRT_Table, 1 );
+          sqlite3SelectDestInit( dest, SelectResultType.Table, 1 );
           sqlite3Select( pParse, pSelect, ref dest );
           sqlite3VdbeAddOp1( v, OP_Close, 1 );
           if ( pParse.nErr == 0 )

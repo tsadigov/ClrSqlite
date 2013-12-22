@@ -752,7 +752,7 @@ sqlite3AuthContextPop(sContext);
 
       /* fill the ephemeral table
       */
-      sqlite3SelectDestInit( dest, SRT_Table, ephemTab );
+      sqlite3SelectDestInit( dest, SelectResultType.Table, ephemTab );
       sqlite3Select( pParse, pSelect, ref dest );
 
       /* Generate code to scan the ephemeral table and call VUpdate. */

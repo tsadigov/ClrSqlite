@@ -143,7 +143,7 @@ namespace Community.CsharpSqlite
         //}
         pDup = sqlite3SelectNew( pParse, null, pFrom, pWhere, null, null, null, 0, null, null );
       }
-      sqlite3SelectDestInit( dest, SRT_EphemTab, iCur );
+      sqlite3SelectDestInit( dest, SelectResultType.EphemTab, iCur );
       sqlite3Select( pParse, pDup, ref dest );
       sqlite3SelectDelete( db, ref pDup );
     }
