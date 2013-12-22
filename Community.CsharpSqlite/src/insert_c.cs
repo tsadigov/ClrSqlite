@@ -1957,7 +1957,7 @@ insert_cleanup:
       {
         return 0;   /* SELECT may not be a compound query */
       }
-      if ( ( pSelect.selFlags & SF_Distinct ) != 0 )
+      if ( ( pSelect.selFlags & SelectFlags.Distinct ) != 0 )
       {
         return 0;   /* SELECT may not be DISTINCT */
       }

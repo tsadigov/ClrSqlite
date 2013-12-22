@@ -1193,13 +1193,13 @@ sqlite3DbFree( db, ref p.u._zToken );
       pNew.pGroupBy = sqlite3ExprListDup( db, p.pGroupBy, flags );
       pNew.pHaving = sqlite3ExprDup( db, p.pHaving, flags );
       pNew.pOrderBy = sqlite3ExprListDup( db, p.pOrderBy, flags );
-      pNew.op = p.op;
+      pNew.tk_op = p.tk_op;
       pNew.pPrior = sqlite3SelectDup( db, p.pPrior, flags );
       pNew.pLimit = sqlite3ExprDup( db, p.pLimit, flags );
       pNew.pOffset = sqlite3ExprDup( db, p.pOffset, flags );
       pNew.iLimit = 0;
       pNew.iOffset = 0;
-      pNew.selFlags = (u16)( p.selFlags & ~SF_UsesEphemeral );
+      pNew.selFlags = ( p.selFlags & ~SelectFlags.UsesEphemeral );
       pNew.pRightmost = null;
       pNew.addrOpenEphm[0] = -1;
       pNew.addrOpenEphm[1] = -1;
@@ -1664,10 +1664,10 @@ return null;
         return 0;                   /* right-hand side of IN is SELECT */
       if ( p.pPrior != null )
         return 0;              /* Not a compound SELECT */
-      if ( ( p.selFlags & ( SF_Distinct | SF_Aggregate ) ) != 0 )
+      if ( ( p.selFlags & ( SelectFlags.Distinct | SelectFlags.Aggregate ) ) != 0 )
       {
-        testcase( ( p.selFlags & ( SF_Distinct | SF_Aggregate ) ) == SF_Distinct );
-        testcase( ( p.selFlags & ( SF_Distinct | SF_Aggregate ) ) == SF_Aggregate );
+        testcase( ( p.selFlags & ( SelectFlags.Distinct | SelectFlags.Aggregate ) ) == SelectFlags.Distinct );
+        testcase( ( p.selFlags & ( SelectFlags.Distinct | SelectFlags.Aggregate ) ) == SelectFlags.Aggregate );
         return 0; /* No DISTINCT keyword and no aggregate functions */
       }
       Debug.Assert( p.pGroupBy == null );         /* Has no GROUP BY clause */

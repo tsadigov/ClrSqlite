@@ -2937,9 +2937,9 @@ set { _op = value; }
         public class Select
         {
             public ExprList pEList; /* The fields of the result */
-            public u8 op; /* One of: TK_UNION TK_ALL TK_INTERSECT TK_EXCEPT */
+            public u8 tk_op; /* One of: TK_UNION TK_ALL TK_INTERSECT TK_EXCEPT */
             public char affinity; /* MakeRecord with this affinity for SRT_Set */
-            public u16 selFlags; /* Various SF_* values */
+            public SelectFlags selFlags; /* Various SF_* values */
             public SrcList pSrc; /* The FROM clause */
             public Expr pWhere; /* The WHERE clause */
             public ExprList pGroupBy; /* The GROUP BY clause */
@@ -2999,13 +2999,14 @@ set { _op = value; }
         //#define SF_UsesEphemeral   0x0008  /* Uses the OpenEphemeral opcode */
         //#define SF_Expanded        0x0010  /* sqlite3SelectExpand() called on this */
         //#define SF_HasTypeInfo     0x0020  /* FROM subqueries have Table metadata */
-        private const int SF_Distinct = 0x0001; /* Output should be DISTINCT */
-        private const int SF_Resolved = 0x0002; /* Identifiers have been resolved */
-        private const int SF_Aggregate = 0x0004; /* Contains aggregate functions */
-        private const int SF_UsesEphemeral = 0x0008; /* Uses the OpenEphemeral opcode */
-        private const int SF_Expanded = 0x0010; /* sqlite3SelectExpand() called on this */
-        private const int SF_HasTypeInfo = 0x0020; /* FROM subqueries have Table metadata */
-
+        public enum SelectFlags:ushort{
+        Distinct = 0x0001, /* Output should be DISTINCT */
+        Resolved = 0x0002, /* Identifiers have been resolved */
+        Aggregate = 0x0004, /* Contains aggregate functions */
+        UsesEphemeral = 0x0008, /* Uses the OpenEphemeral opcode */
+        Expanded = 0x0010, /* sqlite3SelectExpand() called on this */
+        HasTypeInfo = 0x0020 /* FROM subqueries have Table metadata */
+    }
 
         /*
     ** The results of a select can be distributed in several ways.  The

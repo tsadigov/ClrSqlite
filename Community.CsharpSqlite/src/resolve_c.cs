@@ -1120,7 +1120,7 @@ return WRC_Prune;
 
 
       Debug.Assert( p != null );
-      if ( ( p.selFlags & SF_Resolved ) != 0 )
+      if ( ( p.selFlags & SelectFlags.Resolved ) != 0 )
       {
         return WRC_Prune;
       }
@@ -1136,7 +1136,7 @@ return WRC_Prune;
       ** sqlite3SelectPrep() will invoke both sqlite3SelectExpand() and
       ** this routine in the correct order.
       */
-      if ( ( p.selFlags & SF_Expanded ) == 0 )
+      if ( ( p.selFlags & SelectFlags.Expanded ) == 0 )
       {
         sqlite3SelectPrep( pParse, p, pOuterNC );
         return ( pParse.nErr != 0 /*|| db.mallocFailed != 0 */ ) ? WRC_Abort : WRC_Prune;
@@ -1147,9 +1147,9 @@ return WRC_Prune;
       pLeftmost = p;
       while ( p != null )
       {
-        Debug.Assert( ( p.selFlags & SF_Expanded ) != 0 );
-        Debug.Assert( ( p.selFlags & SF_Resolved ) == 0 );
-        p.selFlags |= SF_Resolved;
+        Debug.Assert( ( p.selFlags & SelectFlags.Expanded ) != 0 );
+        Debug.Assert( ( p.selFlags & SelectFlags.Resolved ) == 0 );
+        p.selFlags |= SelectFlags.Resolved;
 
         /* Resolve the expressions in the LIMIT and OFFSET clauses. These
         ** are not allowed to refer to any names, so pass an empty NameContext.
@@ -1201,11 +1201,11 @@ return WRC_Prune;
         /* If there are no aggregate functions in the result-set, and no GROUP BY
         ** expression, do not allow aggregates in any of the other expressions.
         */
-        Debug.Assert( ( p.selFlags & SF_Aggregate ) == 0 );
+        Debug.Assert( ( p.selFlags & SelectFlags.Aggregate ) == 0 );
         pGroupBy = p.pGroupBy;
         if ( pGroupBy != null || sNC.hasAgg != 0 )
         {
-          p.selFlags |= SF_Aggregate;
+          p.selFlags |= SelectFlags.Aggregate;
         }
         else
         {

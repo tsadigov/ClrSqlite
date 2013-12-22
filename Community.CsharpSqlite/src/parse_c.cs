@@ -2725,7 +2725,7 @@ new _yyRuleInfo( 251, 2 ),
           {
             if ( yymsp[0].minor.yy387 != null )
             {
-              yymsp[0].minor.yy387.op = (u8)yymsp[-1].minor.yy4;
+              yymsp[0].minor.yy387.tk_op = (u8)yymsp[-1].minor.yy4;
               yymsp[0].minor.yy387.pPrior = yymsp[-2].minor.yy387;
             }
             else

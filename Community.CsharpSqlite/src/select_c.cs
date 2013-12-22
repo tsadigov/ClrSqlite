@@ -110,8 +110,8 @@ namespace Community.CsharpSqlite
       pNew.pGroupBy = pGroupBy;
       pNew.pHaving = pHaving;
       pNew.pOrderBy = pOrderBy;
-      pNew.selFlags = (u16)( isDistinct != 0 ? SF_Distinct : 0 );
-      pNew.op = TK_SELECT;
+      pNew.selFlags = ( isDistinct != 0 ? SelectFlags.Distinct : 0 );
+      pNew.tk_op = TK_SELECT;
       pNew.pLimit = pLimit;
       pNew.pOffset = pOffset;
       Debug.Assert( pOffset == null || pLimit != null );
@@ -1593,7 +1593,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       ExprList_item[] a;
 
       Debug.Assert( pSelect != null );
-      Debug.Assert( ( pSelect.selFlags & SF_Resolved ) != 0 );
+      Debug.Assert( ( pSelect.selFlags & SelectFlags.Resolved ) != 0 );
       Debug.Assert( nCol == pSelect.pEList.nExpr /*|| db.mallocFailed != 0 */ );
       //      if ( db.mallocFailed != 0 ) return;
       sNC = new NameContext();// memset( &sNC, 0, sizeof( sNC ) );
@@ -1862,14 +1862,14 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       if ( pPrior.pOrderBy != null )
       {
         sqlite3ErrorMsg( pParse, "ORDER BY clause should come after %s not before",
-        selectOpName( p.op ) );
+        selectOpName( p.tk_op ) );
         rc = 1;
         goto multi_select_end;
       }
       if ( pPrior.pLimit != null )
       {
         sqlite3ErrorMsg( pParse, "LIMIT clause should come after %s not before",
-        selectOpName( p.op ) );
+        selectOpName( p.tk_op ) );
         rc = 1;
         goto multi_select_end;
       }
@@ -1894,7 +1894,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       if ( p.pEList.nExpr != pPrior.pEList.nExpr )
       {
         sqlite3ErrorMsg( pParse, "SELECTs to the left and right of %s" +
-        " do not have the same number of result columns", selectOpName( p.op ) );
+        " do not have the same number of result columns", selectOpName( p.tk_op ) );
         rc = 1;
         goto multi_select_end;
       }
@@ -1908,7 +1908,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 
       /* Generate code for the left and right SELECT statements.
       */
-      switch ( p.op )
+      switch ( p.tk_op )
       {
         case TK_ALL:
           {
@@ -1964,8 +1964,8 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
             int addr;
             SelectDest uniondest = new SelectDest();
 
-            testcase( p.op == TK_EXCEPT );
-            testcase( p.op == TK_UNION );
+            testcase( p.tk_op == TK_EXCEPT );
+            testcase( p.tk_op == TK_UNION );
             priorOp = SRT_Union;
             if ( dest.eDest == priorOp && ALWAYS( null == p.pLimit && null == p.pOffset ) )
             {
@@ -1988,7 +1988,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
               addr = sqlite3VdbeAddOp2( v, OP_OpenEphemeral, unionTab, 0 );
               Debug.Assert( p.addrOpenEphm[0] == -1 );
               p.addrOpenEphm[0] = addr;
-              p.pRightmost.selFlags |= SF_UsesEphemeral;
+              p.pRightmost.selFlags |= SelectFlags.UsesEphemeral;
               Debug.Assert( p.pEList != null );
             }
 
@@ -2005,13 +2005,13 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 
             /* Code the current SELECT statement
             */
-            if ( p.op == TK_EXCEPT )
+            if ( p.tk_op == TK_EXCEPT )
             {
               op = SRT_Except;
             }
             else
             {
-              Debug.Assert( p.op == TK_UNION );
+              Debug.Assert( p.tk_op == TK_UNION );
               op = SRT_Union;
             }
             p.pPrior = null;
@@ -2029,7 +2029,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
             pDelete = p.pPrior;
             p.pPrior = pPrior;
             p.pOrderBy = null;
-            if ( p.op == TK_UNION )
+            if ( p.tk_op == TK_UNION )
               p.nSelectRow += pPrior.nSelectRow;
             sqlite3ExprDelete( db, ref p.pLimit );
             p.pLimit = pLimit;
@@ -2067,7 +2067,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
             break;
           }
         default:
-          Debug.Assert( p.op == TK_INTERSECT );
+          Debug.Assert( p.tk_op == TK_INTERSECT );
           {
             int tab1, tab2;
             int iCont, iBreak, iStart;
@@ -2087,7 +2087,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
             addr = sqlite3VdbeAddOp2( v, OP_OpenEphemeral, tab1, 0 );
             Debug.Assert( p.addrOpenEphm[0] == -1 );
             p.addrOpenEphm[0] = addr;
-            p.pRightmost.selFlags |= SF_UsesEphemeral;
+            p.pRightmost.selFlags |= SelectFlags.UsesEphemeral;
             Debug.Assert( p.pEList != null );
 
             /* Code the SELECTs to our left into temporary table "tab1".
@@ -2151,7 +2151,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
           }
       }
 
-      explainComposite( pParse, p.op, iSub1, iSub2, p.op != TK_ALL );
+      explainComposite( pParse, p.tk_op, iSub1, iSub2, p.tk_op != TK_ALL );
 
       /* Compute collating sequences used by
       ** temporary tables needed to implement the compound select.
@@ -2162,7 +2162,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       ** SELECT might also skip this part if it has no ORDER BY clause and
       ** no temp tables are required.
       */
-      if ( ( p.selFlags & SF_UsesEphemeral ) != 0 )
+      if ( ( p.selFlags & SelectFlags.UsesEphemeral ) != 0 )
       {
         int i;                        /* Loop counter */
         KeyInfo pKeyInfo;             /* Collating sequence for the result set */
@@ -2531,7 +2531,7 @@ break;
 
       /* Patch up the ORDER BY clause
       */
-      op = p.op;
+      op = p.tk_op;
       pPrior = p.pPrior;
       Debug.Assert( pPrior.pOrderBy == null );
       pOrderBy = p.pOrderBy;
@@ -2865,7 +2865,7 @@ break;
 
       /*** TBD:  Insert subroutine calls to close cursors on incomplete
       **** subqueries ****/
-      explainComposite( pParse, p.op, iSub1, iSub2, false );
+      explainComposite( pParse, p.tk_op, iSub1, iSub2, false );
       return SQLITE_OK;
     }
 #endif
@@ -3144,13 +3144,13 @@ break;
       }
       if ( pSubSrc.nSrc == 0 )
         return 0;                        /* Restriction (7)  */
-      if ( ( pSub.selFlags & SF_Distinct ) != 0 )
+      if ( ( pSub.selFlags & SelectFlags.Distinct ) != 0 )
         return 0;     /* Restriction (5)  */
       if ( pSub.pLimit != null && ( pSrc.nSrc > 1 || isAgg ) )
       {
         return 0;         /* Restrictions (8)(9) */
       }
-      if ( ( p.selFlags & SF_Distinct ) != 0 && subqueryIsAgg )
+      if ( ( p.selFlags & SelectFlags.Distinct ) != 0 && subqueryIsAgg )
       {
         return 0;         /* Restriction (6)  */
       }
@@ -3162,7 +3162,7 @@ break;
         return 0;                /* Restriction (16) */
       if ( pSub.pLimit != null && p.pWhere != null )
         return 0;              /* Restriction (19) */
-      if ( pSub.pLimit != null && ( p.selFlags & SF_Distinct ) != 0 )
+      if ( pSub.pLimit != null && ( p.selFlags & SelectFlags.Distinct ) != 0 )
       {
         return 0;         /* Restriction (21) */
       }
@@ -3217,16 +3217,16 @@ break;
         {
           return 0;  /* Restriction 20 */
         }
-        if ( isAgg || ( p.selFlags & SF_Distinct ) != 0 || pSrc.nSrc != 1 )
+        if ( isAgg || ( p.selFlags & SelectFlags.Distinct ) != 0 || pSrc.nSrc != 1 )
         {
           return 0;
         }
         for ( pSub1 = pSub; pSub1 != null; pSub1 = pSub1.pPrior )
         {
-          testcase( ( pSub1.selFlags & ( SF_Distinct | SF_Aggregate ) ) == SF_Distinct );
-          testcase( ( pSub1.selFlags & ( SF_Distinct | SF_Aggregate ) ) == SF_Aggregate );
-          if ( ( pSub1.selFlags & ( SF_Distinct | SF_Aggregate ) ) != 0
-          || ( pSub1.pPrior != null && pSub1.op != TK_ALL )
+          testcase( ( pSub1.selFlags & ( SelectFlags.Distinct | SelectFlags.Aggregate ) ) == SelectFlags.Distinct );
+          testcase( ( pSub1.selFlags & ( SelectFlags.Distinct | SelectFlags.Aggregate ) ) == SelectFlags.Aggregate );
+          if ( ( pSub1.selFlags & ( SelectFlags.Distinct | SelectFlags.Aggregate ) ) != 0
+          || ( pSub1.pPrior != null && pSub1.tk_op != TK_ALL )
           || NEVER( pSub1.pSrc == null ) || pSub1.pSrc.nSrc != 1
           )
           {
@@ -3300,7 +3300,7 @@ break;
         p.pLimit = pLimit;
         p.pOrderBy = pOrderBy;
         p.pSrc = pSrc;
-        p.op = TK_ALL;
+        p.tk_op = TK_ALL;
         p.pRightmost = null;
         if ( pNew == null )
         {
@@ -3494,7 +3494,7 @@ break;
         /* The flattened query is distinct if either the inner or the
         ** outer query is distinct.
         */
-        pParent.selFlags = (u16)( pParent.selFlags | pSub.selFlags & SF_Distinct );
+        pParent.selFlags = ( pParent.selFlags | pSub.selFlags & SelectFlags.Distinct );
 
         /*
         ** SELECT ... FROM (SELECT ... LIMIT a OFFSET b) LIMIT x OFFSET y;
@@ -3665,11 +3665,11 @@ break;
       //{
       //  return WRC_Abort;
       //}
-      if ( NEVER( p.pSrc == null ) || ( p.selFlags & SF_Expanded ) != 0 )
+      if ( NEVER( p.pSrc == null ) || ( p.selFlags & SelectFlags.Expanded ) != 0 )
       {
         return WRC_Prune;
       }
-      p.selFlags |= SF_Expanded;
+      p.selFlags |= SelectFlags.Expanded;
       pTabList = p.pSrc;
       pEList = p.pEList;
 
@@ -3978,10 +3978,10 @@ break;
       SrcList pTabList;
       SrcList_item pFrom;
 
-      Debug.Assert( ( p.selFlags & SF_Resolved ) != 0 );
-      if ( ( p.selFlags & SF_HasTypeInfo ) == 0 )
+      Debug.Assert( ( p.selFlags & SelectFlags.Resolved ) != 0 );
+      if ( ( p.selFlags & SelectFlags.HasTypeInfo ) == 0 )
       {
-        p.selFlags |= SF_HasTypeInfo;
+        p.selFlags |= SelectFlags.HasTypeInfo;
         pParse = pWalker.pParse;
         pTabList = p.pSrc;
         for ( i = 0; i < pTabList.nSrc; i++ )//, pFrom++ )
@@ -4045,7 +4045,7 @@ break;
       if ( NEVER( p == null ) )
         return;
       db = pParse.db;
-      if ( ( p.selFlags & SF_HasTypeInfo ) != 0 )
+      if ( ( p.selFlags & SelectFlags.HasTypeInfo ) != 0 )
         return;
       sqlite3SelectExpand( pParse, p );
       if ( pParse.nErr != 0 /*|| db.mallocFailed != 0 */ )
@@ -4339,7 +4339,7 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
         ** DISTINCT so it can be removed too. */
         sqlite3ExprListDelete( db, ref p.pOrderBy );
         p.pOrderBy = null;
-        p.selFlags = (u16)( p.selFlags & ~SF_Distinct );
+        p.selFlags = ( p.selFlags & ~SelectFlags.Distinct );
       }
       sqlite3SelectPrep( pParse, p, null );
       pOrderBy = p.pOrderBy;
@@ -4349,7 +4349,7 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
       {
         goto select_end;
       }
-      isAgg = ( p.selFlags & SF_Aggregate ) != 0;
+      isAgg = ( p.selFlags & SelectFlags.Aggregate ) != 0;
       Debug.Assert( pEList != null );
 
       /* Begin generating code.
@@ -4391,13 +4391,13 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
         pParse.nHeight += sqlite3SelectExprHeight( p );
 
         /* Check to see if the subquery can be absorbed into the parent. */
-        isAggSub = ( pSub.selFlags & SF_Aggregate ) != 0;
+        isAggSub = ( pSub.selFlags & SelectFlags.Aggregate ) != 0;
         if ( flattenSubquery( pParse, p, i, isAgg, isAggSub ) != 0 )
         {
           if ( isAggSub )
           {
             isAgg = true;
-            p.selFlags |= SF_Aggregate;
+            p.selFlags |= SelectFlags.Aggregate;
           }
           i = -1;
         }
@@ -4426,7 +4426,7 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
       pWhere = p.pWhere;
       pGroupBy = p.pGroupBy;
       pHaving = p.pHaving;
-      isDistinct = ( p.selFlags & SF_Distinct ) != 0;
+      isDistinct = ( p.selFlags & SelectFlags.Distinct ) != 0;
 
 #if  !SQLITE_OMIT_COMPOUND_SELECT
       /* If there is are a sequence of queries, do the earlier ones first.
@@ -4460,12 +4460,12 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
       /* If possible, rewrite the query to use GROUP BY instead of DISTINCT.
 ** GROUP BY might use an index, DISTINCT never does.
 */
-      Debug.Assert( p.pGroupBy == null || ( p.selFlags & SF_Aggregate ) != 0 );
-      if ( ( p.selFlags & ( SF_Distinct | SF_Aggregate ) ) == SF_Distinct )
+      Debug.Assert( p.pGroupBy == null || ( p.selFlags & SelectFlags.Aggregate ) != 0 );
+      if ( ( p.selFlags & ( SelectFlags.Distinct | SelectFlags.Aggregate ) ) == SelectFlags.Distinct )
       {
         p.pGroupBy = sqlite3ExprListDup( db, p.pEList, 0 );
         pGroupBy = p.pGroupBy;
-        p.selFlags = (u16)( p.selFlags & ~SF_Distinct );
+        p.selFlags = ( p.selFlags & ~SelectFlags.Distinct );
       }
 
       /* If there is both a GROUP BY and an ORDER BY clause and they are
@@ -4518,7 +4518,7 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
 
       /* Open a virtual index to use for the distinct set.
       */
-      if ( ( p.selFlags & SF_Distinct ) != 0 )
+      if ( ( p.selFlags & SelectFlags.Distinct ) != 0 )
       {
         KeyInfo pKeyInfo;
         Debug.Assert( isAgg || pGroupBy != null );
@@ -4710,7 +4710,7 @@ if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
             int nGroupBy;
 
             explainTempTable( pParse,
-            isDistinct && 0 == ( p.selFlags & SF_Distinct ) ? "DISTINCT" : "GROUP BY" );
+            isDistinct && 0 == ( p.selFlags & SelectFlags.Distinct ) ? "DISTINCT" : "GROUP BY" );
 
             groupBySort = 1;
             nGroupBy = pGroupBy.nExpr;
