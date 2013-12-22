@@ -406,7 +406,7 @@ namespace Community.CsharpSqlite
           sqlite3_result_error_nomem( context );
           return;
         }
-        sqlite3AtoF( zBuf, ref r, StringExtensions.sqlite3Strlen30( zBuf ), SQLITE_UTF8 );
+        Converter.sqlite3AtoF( zBuf, ref r, StringExtensions.sqlite3Strlen30( zBuf ), SqliteEncoding.UTF8 );
         //sqlite3_free( ref zBuf );
       }
       sqlite3_result_double( context, r );
@@ -1962,7 +1962,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
     {
       FuncDef pDef;
       pDef = sqlite3FindFunction( db, zName, StringExtensions.sqlite3Strlen30( zName ),
-      2, SQLITE_UTF8, 0 );
+      2, SqliteEncoding.UTF8, 0 );
       if ( ALWAYS( pDef != null ) )
       {
         pDef.flags = (byte)flagVal;
@@ -1985,9 +1985,9 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
       {
         pInfo = likeInfoNorm;
       }
-      sqlite3CreateFunc( db, "like", 2, SQLITE_UTF8, pInfo, (dxFunc)likeFunc, null, null, null );
-      sqlite3CreateFunc( db, "like", 3, SQLITE_UTF8, pInfo, (dxFunc)likeFunc, null, null, null );
-      sqlite3CreateFunc( db, "glob", 2, SQLITE_UTF8,
+      sqlite3CreateFunc( db, "like", 2, SqliteEncoding.UTF8, pInfo, (dxFunc)likeFunc, null, null, null );
+      sqlite3CreateFunc( db, "like", 3, SqliteEncoding.UTF8, pInfo, (dxFunc)likeFunc, null, null, null );
+      sqlite3CreateFunc( db, "glob", 2, SqliteEncoding.UTF8,
       globInfo, (dxFunc)likeFunc, null, null, null );
       setLikeOptFlag( db, "glob", SQLITE_FUNC_LIKE | SQLITE_FUNC_CASE );
       setLikeOptFlag( db, "like",
@@ -2013,7 +2013,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
       }
       Debug.Assert( !ExprHasProperty( pExpr, EP_xIsSelect ) );
       pDef = sqlite3FindFunction( db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30( pExpr.u.zToken ),
-      2, SQLITE_UTF8, 0 );
+      2, SqliteEncoding.UTF8, 0 );
       if ( NEVER( pDef == null ) || ( pDef.flags & SQLITE_FUNC_LIKE ) == 0 )
       {
         return false;
@@ -2079,11 +2079,11 @@ FUNCTION("coalesce",           1, 0, 0, null             ),
 FUNCTION("coalesce",           0, 0, 0, null             ),
 /*  FUNCTION(coalesce,          -1, 0, 0, ifnullFunc       ), */
 // use versionFunc here just for a dummy placeholder
-new FuncDef(-1,SQLITE_UTF8,SQLITE_FUNC_COALESCE,null,null,versionFunc,null,null,"coalesce",null,null), 
+new FuncDef(-1,SqliteEncoding.UTF8,SQLITE_FUNC_COALESCE,null,null,versionFunc,null,null,"coalesce",null,null), 
 FUNCTION("hex",                1, 0, 0, hexFunc          ),
 /*  FUNCTION(ifnull,             2, 0, 0, ifnullFunc       ), */
 // use versionFunc here just for a dummy placeholder
-new FuncDef(2,SQLITE_UTF8,SQLITE_FUNC_COALESCE,null,null,versionFunc,null,null,"ifnull",null,null),
+new FuncDef(2,SqliteEncoding.UTF8,SQLITE_FUNC_COALESCE,null,null,versionFunc,null,null,"ifnull",null,null),
 FUNCTION("random",             0, 0, 0, randomFunc       ),
 FUNCTION("randomblob",         1, 0, 0, randomBlob       ),
 FUNCTION("nullif",             2, 0, 1, nullifFunc       ),
@@ -2112,7 +2112,7 @@ AGGREGATE("total",             1, 0, 0, sumStep,         totalFinalize    ),
 AGGREGATE("avg",               1, 0, 0, sumStep,         avgFinalize    ),
 /*AGGREGATE("count",             0, 0, 0, countStep,       countFinalize  ), */
 /* AGGREGATE(count,             0, 0, 0, countStep,       countFinalize  ), */
-new FuncDef( 0,SQLITE_UTF8,SQLITE_FUNC_COUNT,null,null,null,countStep,countFinalize,"count",null,null),
+new FuncDef( 0,SqliteEncoding.UTF8,SQLITE_FUNC_COUNT,null,null,null,countStep,countFinalize,"count",null,null),
 AGGREGATE("count",             1, 0, 0, countStep,       countFinalize  ),
 AGGREGATE("group_concat",      1, 0, 0, groupConcatStep, groupConcatFinalize),
 AGGREGATE("group_concat",      2, 0, 0, groupConcatStep, groupConcatFinalize),

@@ -83,7 +83,7 @@ namespace Community.CsharpSqlite
       if ( null == pTab.pSelect )
       {
         sqlite3_value pValue = new sqlite3_value();
-        int enc = ENC( sqlite3VdbeDb( v ) );
+        SqliteEncoding enc = ENC( sqlite3VdbeDb( v ) );
         Column pCol = pTab.aCol[i];
 #if SQLITE_DEBUG
         VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );

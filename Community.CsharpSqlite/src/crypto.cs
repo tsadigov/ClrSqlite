@@ -349,7 +349,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
           int n = c_ctx.pass_sz - 3; /* adjust for leading x' and tailing ' */
           string z = c_ctx.pass.Substring( 2 );// + 2; /* adjust lead offset of x' */
           CODEC_TRACE( "codec_key_derive: deriving key from hex\n" );
-          c_ctx.key = sqlite3HexToBlob( null, z, n );
+          c_ctx.key = Converter.sqlite3HexToBlob( null, z, n );
         }
         else
         {

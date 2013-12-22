@@ -577,7 +577,7 @@ scratch_overflow:
       {
         p = sqlite3GlobalConfig.m.xMalloc( n );
       }
-      sqlite3MemdebugSetType( p, MEMTYPE_SCRATCH );
+      sqlite3MemdebugSetType( p, MemType.SCRATCH );
 #if SQLITE_THREADSAFE && !(NDEBUG)
       scratchAllocOut = ( p != null ) ? 1 : 0;
 #endif
@@ -590,9 +590,9 @@ scratch_overflow:
 
         if ( sqlite3GlobalConfig.pScratch2 == null || sqlite3GlobalConfig.pScratch2.Length < p.Length )
         {
-          Debug.Assert( sqlite3MemdebugHasType( p, MEMTYPE_SCRATCH ) );
-          Debug.Assert( sqlite3MemdebugNoType( p, ~MEMTYPE_SCRATCH ) );
-          sqlite3MemdebugSetType( p, MEMTYPE_HEAP );
+          Debug.Assert( sqlite3MemdebugHasType( p, MemType.SCRATCH ) );
+          Debug.Assert( sqlite3MemdebugNoType( p, ~MemType.SCRATCH ) );
+          sqlite3MemdebugSetType( p, MemType.HEAP );
           if ( sqlite3GlobalConfig.bMemstat )
           {
             int iSize = sqlite3MallocSize( p );
@@ -641,9 +641,9 @@ scratch_overflow:
     //  sqlite3_mutex_leave(mem0.mutex);
     //}else{
     //  /* Release memory back to the heap */
-    //  Debug.Assert( sqlite3MemdebugHasType(p, MEMTYPE_SCRATCH) );
-    //  Debug.Assert( sqlite3MemdebugNoType(p, ~MEMTYPE_SCRATCH) );
-    //  sqlite3MemdebugSetType(p, MEMTYPE_HEAP);
+    //  Debug.Assert( sqlite3MemdebugHasType(p, MemType.SCRATCH) );
+    //  Debug.Assert( sqlite3MemdebugNoType(p, ~MemType.SCRATCH) );
+    //  sqlite3MemdebugSetType(p, MemType.HEAP);
     //  if( sqlite3GlobalConfig.bMemstat ){
     //    int iSize = sqlite3MallocSize(p);
     //    sqlite3_mutex_enter(mem0.mutex);
@@ -680,8 +680,8 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
 */
     //int sqlite3MallocSize(void* p)
     //{
-    //  Debug.Assert(sqlite3MemdebugHasType(p, MEMTYPE_HEAP));
-    //  Debug.Assert( sqlite3MemdebugNoType(p, MEMTYPE_DB) );
+    //  Debug.Assert(sqlite3MemdebugHasType(p, MemType.HEAP));
+    //  Debug.Assert( sqlite3MemdebugNoType(p, MemType.DB) );
     //  return sqlite3GlobalConfig.m.xSize(p);
     //}
     static int sqlite3MallocSize( byte[][] p )
@@ -708,9 +708,9 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
       }
       else
       {
-        Debug.Assert( sqlite3MemdebugHasType( p, MEMTYPE_DB ) );
-        Debug.Assert( sqlite3MemdebugHasType( p, MEMTYPE_LOOKASIDE | MEMTYPE_HEAP ) );
-        Debug.Assert( db != null || sqlite3MemdebugNoType( p, MEMTYPE_LOOKASIDE ) );
+        Debug.Assert( sqlite3MemdebugHasType( p, MemType.DB ) );
+        Debug.Assert( sqlite3MemdebugHasType( p, MemType.LOOKASIDE | MemType.HEAP ) );
+        Debug.Assert( db != null || sqlite3MemdebugNoType( p, MemType.LOOKASIDE ) );
         return sqlite3GlobalConfig.m.xSize( p );
       }
     }
@@ -722,8 +722,8 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
     {
       if ( p == null )
         return;
-      Debug.Assert( sqlite3MemdebugNoType( p, MEMTYPE_DB ) );
-      Debug.Assert( sqlite3MemdebugHasType( p, MEMTYPE_HEAP ) );
+      Debug.Assert( sqlite3MemdebugNoType( p, MemType.DB ) );
+      Debug.Assert( sqlite3MemdebugHasType( p, MemType.HEAP ) );
       if ( sqlite3GlobalConfig.bMemstat )
       {
         sqlite3_mutex_enter( mem0.mutex );
@@ -783,10 +783,10 @@ db.lookaside.nOut--;
 }else
 #endif
         //{
-        //  Debug.Assert( sqlite3MemdebugHasType( p, MEMTYPE_DB ) );
-        //  Debug.Assert( sqlite3MemdebugHasType( p, MEMTYPE_LOOKASIDE | MEMTYPE_HEAP ) );
-        //  Debug.Assert( db != null || sqlite3MemdebugNoType( p, MEMTYPE_LOOKASIDE ) );
-        //  sqlite3MemdebugSetType( p, MEMTYPE_HEAP );
+        //  Debug.Assert( sqlite3MemdebugHasType( p, MemType.DB ) );
+        //  Debug.Assert( sqlite3MemdebugHasType( p, MemType.LOOKASIDE | MemType.HEAP ) );
+        //  Debug.Assert( db != null || sqlite3MemdebugNoType( p, MemType.LOOKASIDE ) );
+        //  sqlite3MemdebugSetType( p, MemType.HEAP );
         //  sqlite3_free( ref p );
         //}
       }
@@ -830,8 +830,8 @@ db.lookaside.nOut--;
         {
           sqlite3MallocAlarm( nDiff );
         }
-        Debug.Assert( sqlite3MemdebugHasType( pOld, MEMTYPE_HEAP ) );
-        Debug.Assert( sqlite3MemdebugNoType( pOld, ~MEMTYPE_HEAP ) );
+        Debug.Assert( sqlite3MemdebugHasType( pOld, MemType.HEAP ) );
+        Debug.Assert( sqlite3MemdebugNoType( pOld, ~MemType.HEAP ) );
         pNew = sqlite3GlobalConfig.m.xRealloc( pOld, nNew );
         if ( pNew == null && mem0.alarmCallback != null )
         {
@@ -953,8 +953,8 @@ return (void)pBuf;
       //  db->mallocFailed = 1;
       //}
 #if !SQLITE_OMIT_LOOKASIDE
-sqlite3MemdebugSetType(p, MEMTYPE_DB |
-((db !=null && db.lookaside.bEnabled) ? MEMTYPE_LOOKASIDE : MEMTYPE_HEAP));
+sqlite3MemdebugSetType(p, MemType.DB |
+((db !=null && db.lookaside.bEnabled) ? MemType.LOOKASIDE : MemType.HEAP));
 #endif
       return p;
     }
@@ -988,17 +988,17 @@ sqlite3DbFree(db, ref p);
       {
         {
 #endif
-          Debug.Assert( sqlite3MemdebugHasType( p, MEMTYPE_DB ) );
-          Debug.Assert( sqlite3MemdebugHasType( p, MEMTYPE_LOOKASIDE | MEMTYPE_HEAP ) );
-          sqlite3MemdebugSetType( p, MEMTYPE_HEAP );
+          Debug.Assert( sqlite3MemdebugHasType( p, MemType.DB ) );
+          Debug.Assert( sqlite3MemdebugHasType( p, MemType.LOOKASIDE | MemType.HEAP ) );
+          sqlite3MemdebugSetType( p, MemType.HEAP );
           pNew = sqlite3_realloc( p, n );
           //if( null==pNew ){
-          //sqlite3MemdebugSetType(p, MEMTYPE_DB|MEMTYPE_HEAP);
+          //sqlite3MemdebugSetType(p, MemType.DB|MemType.HEAP);
           //  db->mallocFailed = 1;
           //}
 #if !SQLITE_OMIT_LOOKASIDE
-sqlite3MemdebugSetType(pNew, MEMTYPE_DB | 
-(db.lookaside.bEnabled ? MEMTYPE_LOOKASIDE : MEMTYPE_HEAP));
+sqlite3MemdebugSetType(pNew, MemType.DB | 
+(db.lookaside.bEnabled ? MemType.LOOKASIDE : MemType.HEAP));
 #endif
         }
       }

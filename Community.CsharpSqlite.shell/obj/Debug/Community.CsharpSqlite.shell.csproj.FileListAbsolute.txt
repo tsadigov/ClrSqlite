@@ -1,5 +1,5 @@
-C:\Users\Administrator\Desktop\DBE\sqlite\csharp-sqlite_3_7_7_1_71\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.exe
-C:\Users\Administrator\Desktop\DBE\sqlite\csharp-sqlite_3_7_7_1_71\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.pdb
-C:\Users\Administrator\Desktop\DBE\sqlite\csharp-sqlite_3_7_7_1_71\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.exe
-C:\Users\Administrator\Desktop\DBE\sqlite\csharp-sqlite_3_7_7_1_71\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.pdb
 C:\Users\Administrator\Desktop\DBE\sqlite\csharp-sqlite_3_7_7_1_71\Community.CsharpSqlite.shell\obj\Debug\Community.CsharpSqlite.shell.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Desktop\DBE\sqlite\csharp-sqlite_3_7_7_1_71\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.1.exe
+C:\Users\Administrator\Desktop\DBE\sqlite\csharp-sqlite_3_7_7_1_71\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.1.pdb
+C:\Users\Administrator\Desktop\DBE\sqlite\csharp-sqlite_3_7_7_1_71\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.1.exe
+C:\Users\Administrator\Desktop\DBE\sqlite\csharp-sqlite_3_7_7_1_71\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.1.pdb

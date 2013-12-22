@@ -633,7 +633,7 @@ break;
             int nId;                    /* Number of characters in function name */
             string zId;                 /* The function name. */
             FuncDef pDef;              /* Information about the function */
-            u8 enc = (u8)pParse.db.aDbStatic[0].pSchema.enc;// ENC( pParse.db );   /* The database encoding */
+            SqliteEncoding enc = pParse.db.aDbStatic[0].pSchema.enc;// ENC( pParse.db );   /* The database encoding */
 
             testcase( pExpr.op == TK_CONST_FUNC );
             Debug.Assert( !ExprHasProperty( pExpr, EP_xIsSelect ) );

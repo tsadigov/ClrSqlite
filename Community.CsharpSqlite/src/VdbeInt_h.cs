@@ -229,7 +229,7 @@ set { _flags = value; }
       public u16 flags;             /* Some combination of MEM_Null, MEM_Str, MEM_Dyn, etc. */
 #endif
       public u8 type;               /* One of SQLITE_NULL, SQLITE_TEXT, SQLITE_INTEGER, etc */
-      public u8 enc;                /* SQLITE_UTF8, SQLITE_UTF16BE, SQLITE_UTF16LE */
+      public SqliteEncoding enc;                /* SqliteEncoding.UTF8, SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE */
 #if SQLITE_DEBUG
       public Mem pScopyFrom;        /* This Mem is a shallow copy of pScopyFrom */
       public object pFiller;        /* So that sizeof(Mem) is a multiple of 8 */
@@ -247,7 +247,7 @@ set { _flags = value; }
       {
       }
 
-      public Mem( sqlite3 db, string z, double r, int i, int n, u16 flags, u8 type, u8 enc
+      public Mem( sqlite3 db, string z, double r, int i, int n, u16 flags, u8 type, SqliteEncoding enc
 #if SQLITE_DEBUG
          , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
 #endif

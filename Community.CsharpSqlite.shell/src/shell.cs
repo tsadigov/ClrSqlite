@@ -1273,7 +1273,7 @@ if( db ) sqlite3_interrupt(db);
       db = p.db;
       if ( db != null && Sqlite3.sqlite3_errcode( db ) == Sqlite3.SQLITE_OK )
       {
-        Sqlite3.sqlite3_create_function( db, "shellstatic", 0, Sqlite3.SQLITE_UTF8, 0,
+        Sqlite3.sqlite3_create_function( db, "shellstatic", 0, SqliteEncoding.UTF8, 0,
         (Sqlite3.dxFunc)shellstaticFunc, null, null );
       }
       if ( db == null || Sqlite3.SQLITE_OK != Sqlite3.sqlite3_errcode( db ) )

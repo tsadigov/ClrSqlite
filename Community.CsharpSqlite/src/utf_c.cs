@@ -270,7 +270,7 @@ fprintf(stderr, "INPUT:  %s\n", zBuf);
 ** differently from the others.
 */
 Debugger.Break (); // TODO -
-//if( pMem->enc!=SQLITE_UTF8 && desiredEnc!=SQLITE_UTF8 ){
+//if( pMem->enc!=SqliteEncoding.UTF8 && desiredEnc!=SqliteEncoding.UTF8 ){
 //  u8 temp;
 //  int rc;
 //  rc = sqlite3VdbeMemMakeWriteable(pMem);
@@ -291,7 +291,7 @@ Debugger.Break (); // TODO -
 //}
 
 /* Set len to the maximum number of bytes required in the output buffer. */
-if( desiredEnc==SQLITE_UTF8 ){
+if( desiredEnc==SqliteEncoding.UTF8 ){
 /* When converting from UTF-16, the maximum growth results from
 ** translating a 2-byte character to a 4-byte UTF-8 character.
 ** A single byte is required for the output string
@@ -323,8 +323,8 @@ Debugger.Break (); // TODO -
 //}
 //z = zOut;
 
-//if( pMem->enc==SQLITE_UTF8 ){
-//  if( desiredEnc==SQLITE_UTF16LE ){
+//if( pMem->enc==SqliteEncoding.UTF8 ){
+//  if( desiredEnc==SqliteEncoding.UTF16LE ){
 //    /* UTF-8 -> UTF-16 Little-endian */
 //    while( zIn<zTerm ){
 ///* c = sqlite3Utf8Read(zIn, zTerm, (const u8**)&zIn); */
@@ -332,7 +332,7 @@ Debugger.Break (); // TODO -
 //      WRITE_UTF16LE(z, c);
 //    }
 //  }else{
-//    Debug.Assert( desiredEnc==SQLITE_UTF16BE );
+//    Debug.Assert( desiredEnc==SqliteEncoding.UTF16BE );
 //    /* UTF-8 -> UTF-16 Big-endian */
 //    while( zIn<zTerm ){
 ///* c = sqlite3Utf8Read(zIn, zTerm, (const u8**)&zIn); */
@@ -343,8 +343,8 @@ Debugger.Break (); // TODO -
 //  pMem->n = (int)(z - zOut);
 //  *z++ = 0;
 //}else{
-//  Debug.Assert( desiredEnc==SQLITE_UTF8 );
-//  if( pMem->enc==SQLITE_UTF16LE ){
+//  Debug.Assert( desiredEnc==SqliteEncoding.UTF8 );
+//  if( pMem->enc==SqliteEncoding.UTF16LE ){
 //    /* UTF-16 Little-endian -> UTF-8 */
 //    while( zIn<zTerm ){
 //      READ_UTF16LE(zIn, zIn<zTerm, c); 
@@ -360,7 +360,7 @@ Debugger.Break (); // TODO -
 //  pMem->n = (int)(z - zOut);
 //}
 //*z = 0;
-//Debug.Assert( (pMem->n+(desiredEnc==SQLITE_UTF8?1:2))<=len );
+//Debug.Assert( (pMem->n+(desiredEnc==SqliteEncoding.UTF8?1:2))<=len );
 
 //sqlite3VdbeMemRelease(pMem);
 //pMem->flags &= ~(MEM_Static|MEM_Dyn|MEM_Ephem);
@@ -399,10 +399,10 @@ if( pMem->n>1 ){
 //  u8 b1 = *(u8 *)pMem.z;
 //  u8 b2 = *(((u8 *)pMem.z) + 1);
 if( b01[0]==0xFE && b01[1]==0xFF ){//  if( b1==0xFE && b2==0xFF ){
-bom = SQLITE_UTF16BE;
+bom = SqliteEncoding.UTF16BE;
 }
 if( b01[0]==0xFF && b01[1]==0xFE ){  //  if( b1==0xFF && b2==0xFE ){
-bom = SQLITE_UTF16LE;
+bom = SqliteEncoding.UTF16LE;
 }
 }
 
@@ -502,13 +502,13 @@ return rc;
 **
 ** NULL is returned if there is an allocation error.
 */
-static string sqlite3Utf16to8(sqlite3 db, string z, int nByte, u8 enc){
+static string sqlite3Utf16to8(sqlite3 db, string z, int nByte, SqliteEncoding enc){
 Debugger.Break (); // TODO -
 Mem m = Pool.Allocate_Mem();
 //  memset(&m, 0, sizeof(m));
 //  m.db = db;
 //  sqlite3VdbeMemSetStr(&m, z, nByte, enc, SQLITE_STATIC);
-//  sqlite3VdbeChangeEncoding(&m, SQLITE_UTF8);
+//  sqlite3VdbeChangeEncoding(&m, SqliteEncoding.UTF8);
 //  if( db.mallocFailed !=0{
 //    sqlite3VdbeMemRelease(&m);
 //    m.z = 0;
@@ -531,11 +531,11 @@ Mem m = Pool.Allocate_Mem();
 ** flag set.
 */
 #if SQLITE_ENABLE_STAT2
-char *sqlite3Utf8to16(sqlite3 db, u8 enc, char *z, int n, int *pnOut){
+char *sqlite3Utf8to16(sqlite3 db, SqliteEncoding enc, char *z, int n, int *pnOut){
   Mem m;
   memset(&m, 0, sizeof(m));
   m.db = db;
-  sqlite3VdbeMemSetStr(&m, z, n, SQLITE_UTF8, SQLITE_STATIC);
+  sqlite3VdbeMemSetStr(&m, z, n, SqliteEncoding.UTF8, SQLITE_STATIC);
   if( sqlite3VdbeMemTranslate(&m, enc) ){
     assert( db->mallocFailed );
     return 0;
@@ -556,7 +556,7 @@ int sqlite3Utf16ByteLen(const void *zIn, int nChar){
   unsigned char const *z = zIn;
   int n = 0;
   
-  if( SQLITE_UTF16NATIVE==SQLITE_UTF16BE ){
+  if( SqliteEncoding.UTF16NATIVE==SqliteEncoding.UTF16BE ){
     while( n<nChar ){
       READ_UTF16BE(z, 1, c);
       n++;

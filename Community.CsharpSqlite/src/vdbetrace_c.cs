@@ -167,13 +167,13 @@ namespace Community.CsharpSqlite
           else if ( ( pVar.flags & MEM_Str ) != 0 )
           {
 #if !SQLITE_OMIT_UTF16
-u8 enc = ENC(db);
-if( enc!=SQLITE_UTF8 ){
+SqliteEncoding enc = ENC(db);
+if( enc!=SqliteEncoding.UTF8 ){
 Mem utf8;
 memset(&utf8, 0, sizeof(utf8));
 utf8.db = db;
 sqlite3VdbeMemSetStr(&utf8, pVar.z, pVar.n, enc, SQLITE_STATIC);
-sqlite3VdbeChangeEncoding(&utf8, SQLITE_UTF8);
+sqlite3VdbeChangeEncoding(&utf8, SqliteEncoding.UTF8);
 sqlite3XPrintf(_out, "'%.*q'", utf8.n, utf8.z);
 sqlite3VdbeMemRelease(&utf8);
 }else

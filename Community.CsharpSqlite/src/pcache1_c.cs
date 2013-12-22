@@ -316,7 +316,7 @@ namespace Community.CsharpSqlite
           sqlite3StatusAdd( SQLITE_STATUS_PAGECACHE_OVERFLOW, sz );
           sqlite3_mutex_leave( pcache1.mutex );
         }
-        sqlite3MemdebugSetType( p, MEMTYPE_PCACHE );
+        sqlite3MemdebugSetType( p, MemType.PCACHE );
       }
       return p;
     }
@@ -344,8 +344,8 @@ namespace Community.CsharpSqlite
       else
       {
         int iSize;
-        Debug.Assert( sqlite3MemdebugHasType( p, MEMTYPE_PCACHE ) );
-        sqlite3MemdebugSetType( p, MEMTYPE_HEAP );
+        Debug.Assert( sqlite3MemdebugHasType( p, MemType.PCACHE ) );
+        sqlite3MemdebugSetType( p, MemType.HEAP );
         iSize = sqlite3MallocSize( p.pData );
         sqlite3_mutex_enter( pcache1.mutex );
         sqlite3StatusAdd( SQLITE_STATUS_PAGECACHE_OVERFLOW, -iSize );
@@ -363,10 +363,10 @@ static int pcache1MemSize(object p){
     return pcache1.szSlot;
   }else{
     int iSize;
-    Debug.Assert( sqlite3MemdebugHasType(p, MEMTYPE_PCACHE) );
-    sqlite3MemdebugSetType(p, MEMTYPE_HEAP);
+    Debug.Assert( sqlite3MemdebugHasType(p, MemType.PCACHE) );
+    sqlite3MemdebugSetType(p, MemType.HEAP);
     iSize = sqlite3MallocSize(p);
-    sqlite3MemdebugSetType(p, MEMTYPE_PCACHE);
+    sqlite3MemdebugSetType(p, MemType.PCACHE);
     return iSize;
   }
 }

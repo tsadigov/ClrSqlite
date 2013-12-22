@@ -451,7 +451,7 @@ zulu_time:
         setDateTimeToCurrent( context, p );
         return 0;
       }
-      else if ( sqlite3AtoF( zDate, ref r, StringExtensions.sqlite3Strlen30( zDate ), SQLITE_UTF8 ) )
+      else if ( Converter.sqlite3AtoF( zDate, ref r, StringExtensions.sqlite3Strlen30( zDate ), SqliteEncoding.UTF8 ) )
       {
         p.iJD = (sqlite3_int64)( r * 86400000.0 + 0.5 );
         p.validJD = 1;
@@ -748,7 +748,7 @@ zulu_time:
             ** date is already on the appropriate weekday, this is a no-op.
             */
             if ( z.ToString().StartsWith( "weekday " )
-            && sqlite3AtoF( z.ToString().Substring( 8 ), ref r, StringExtensions.sqlite3Strlen30( z.ToString().Substring( 8 ) ), SQLITE_UTF8 )
+            && Converter.sqlite3AtoF( z.ToString().Substring( 8 ), ref r, StringExtensions.sqlite3Strlen30( z.ToString().Substring( 8 ) ), SqliteEncoding.UTF8 )
             && ( n = (int)r ) == r && n >= 0 && r < 7 )
             {
               sqlite3_int64 Z;
@@ -818,7 +818,7 @@ zulu_time:
             for ( n = 1; n < z.Length && z[n] != ':' && !CharExtensions.sqlite3Isspace( z[n] ); n++ )
             {
             }
-            if ( !sqlite3AtoF( z.ToString(), ref r, n, SQLITE_UTF8 ) )
+            if ( !Converter.sqlite3AtoF( z.ToString(), ref r, n, SqliteEncoding.UTF8 ) )
             {
               rc = 1;
               break;

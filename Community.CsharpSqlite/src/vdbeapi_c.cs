@@ -215,12 +215,12 @@ return ( p == null || p.expired ) ? 1 : 0;
 
     public static int sqlite3_value_bytes( sqlite3_value pVal )
     {
-      return sqlite3ValueBytes( pVal, SQLITE_UTF8 );
+      return sqlite3ValueBytes( pVal, SqliteEncoding.UTF8 );
     }
 
     public static int sqlite3_value_bytes16( sqlite3_value pVal )
     {
-      return sqlite3ValueBytes( pVal, SQLITE_UTF16NATIVE );
+      return sqlite3ValueBytes( pVal, SqliteEncoding.UTF16NATIVE );
     }
 
     public static double sqlite3_value_double( sqlite3_value pVal )
@@ -240,18 +240,18 @@ return ( p == null || p.expired ) ? 1 : 0;
 
     public static string sqlite3_value_text( sqlite3_value pVal )
     {
-      return sqlite3ValueText( pVal, SQLITE_UTF8 );
+      return sqlite3ValueText( pVal, SqliteEncoding.UTF8 );
     }
 
 #if  !SQLITE_OMIT_UTF16
 public static string sqlite3_value_text16(sqlite3_value pVal){
-return sqlite3ValueText(pVal, SQLITE_UTF16NATIVE);
+return sqlite3ValueText(pVal, SqliteEncoding.UTF16NATIVE);
 }
 public static string  sqlite3_value_text16be(sqlite3_value pVal){
-return sqlite3ValueText(pVal, SQLITE_UTF16BE);
+return sqlite3ValueText(pVal, SqliteEncoding.UTF16BE);
 }
 public static string sqlite3_value_text16le(sqlite3_value pVal){
-return sqlite3ValueText(pVal, SQLITE_UTF16LE);
+return sqlite3ValueText(pVal, SqliteEncoding.UTF16LE);
 }
 #endif // * SQLITE_OMIT_UTF16 */
 
@@ -273,7 +273,7 @@ return sqlite3ValueText(pVal, SQLITE_UTF16LE);
     string z,               /* String pointer */
     int o,                  /* offset into string */
     int n,                  /* Bytes in string, or negative */
-    u8 enc,                 /* Encoding of z.  0 for BLOBs */
+    SqliteEncoding enc,                 /* Encoding of z.  0 for BLOBs */
     dxDel xDel //void (*xDel)(void)     /* Destructor function */
     )
     {
@@ -286,7 +286,7 @@ return sqlite3ValueText(pVal, SQLITE_UTF16LE);
     sqlite3_context pCtx,   /* Function context */
     string z,               /* String pointer */
     int n,                  /* Bytes in string, or negative */
-    u8 enc,                 /* Encoding of z.  0 for BLOBs */
+    SqliteEncoding enc,                 /* Encoding of z.  0 for BLOBs */
     dxDel xDel //void (*xDel)(void)     /* Destructor function */
     )
     {
@@ -317,7 +317,7 @@ return sqlite3ValueText(pVal, SQLITE_UTF16LE);
     public static void sqlite3_result_error( sqlite3_context pCtx, string z, int n )
     {
       Debug.Assert( sqlite3_mutex_held( pCtx.s.db.mutex ) );
-      setResultStrOrError( pCtx, z, n, SQLITE_UTF8, SQLITE_TRANSIENT );
+      setResultStrOrError( pCtx, z, n, SqliteEncoding.UTF8, SQLITE_TRANSIENT );
       pCtx.isError = SQLITE_ERROR;
     }
 
@@ -325,7 +325,7 @@ return sqlite3ValueText(pVal, SQLITE_UTF16LE);
 //void sqlite3_result_error16(sqlite3_context pCtx, string z, int n){
 //  Debug.Assert( sqlite3_mutex_held(pCtx.s.db.mutex) );
 //  pCtx.isError = SQLITE_ERROR;
-//  sqlite3VdbeMemSetStr(pCtx.s, z, n, SQLITE_UTF16NATIVE, SQLITE_TRANSIENT);
+//  sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16NATIVE, SQLITE_TRANSIENT);
 //}
 #endif
 
@@ -356,7 +356,7 @@ return sqlite3ValueText(pVal, SQLITE_UTF16LE);
     )
     {
       Debug.Assert( sqlite3_mutex_held( pCtx.s.db.mutex ) );
-      setResultStrOrError( pCtx, z, o, n, SQLITE_UTF8, xDel );
+      setResultStrOrError( pCtx, z, o, n, SqliteEncoding.UTF8, xDel );
     }
 
     public static void sqlite3_result_text(
@@ -367,7 +367,7 @@ return sqlite3ValueText(pVal, SQLITE_UTF16LE);
     )
     {
       Debug.Assert( sqlite3_mutex_held( pCtx.s.db.mutex ) );
-      setResultStrOrError( pCtx, z.ToString(), n, SQLITE_UTF8, xDel );
+      setResultStrOrError( pCtx, z.ToString(), n, SqliteEncoding.UTF8, xDel );
     }
 
 
@@ -379,7 +379,7 @@ return sqlite3ValueText(pVal, SQLITE_UTF16LE);
     )
     {
       Debug.Assert( sqlite3_mutex_held( pCtx.s.db.mutex ) );
-      setResultStrOrError( pCtx, z, n, SQLITE_UTF8, xDel );
+      setResultStrOrError( pCtx, z, n, SqliteEncoding.UTF8, xDel );
     }
 #if  !SQLITE_OMIT_UTF16
 void sqlite3_result_text16(
@@ -389,7 +389,7 @@ int n,
 dxDel xDel
 ){
 Debug.Assert( sqlite3_mutex_held(pCtx.s.db.mutex) );
-sqlite3VdbeMemSetStr(pCtx.s, z, n, SQLITE_UTF16NATIVE, xDel);
+sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16NATIVE, xDel);
 }
 void sqlite3_result_text16be(
 sqlite3_context pCtx,
@@ -398,7 +398,7 @@ int n,
 dxDel xDel
 ){
 Debug.Assert( sqlite3_mutex_held(pCtx.s.db.mutex) );
-sqlite3VdbeMemSetStr(pCtx.s, z, n, SQLITE_UTF16BE, xDel);
+sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16BE, xDel);
 }
 void sqlite3_result_text16le(
 sqlite3_context pCtx,
@@ -407,7 +407,7 @@ int n,
 dxDel xDel
 ){
 Debug.Assert( sqlite3_mutex_held(pCtx.s.db.mutex) );
-sqlite3VdbeMemSetStr(pCtx.s, z, n, SQLITE_UTF16LE, xDel);
+sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16LE, xDel);
 }
 #endif // * SQLITE_OMIT_UTF16 */
 
@@ -429,7 +429,7 @@ sqlite3VdbeMemSetStr(pCtx.s, z, n, SQLITE_UTF16LE, xDel);
       if ( ( pCtx.s.flags & MEM_Null ) != 0 )
       {
         setResultStrOrError( pCtx, sqlite3ErrStr( errCode ), -1,
-        SQLITE_UTF8, SQLITE_STATIC );
+        SqliteEncoding.UTF8, SQLITE_STATIC );
       }
     }
 
@@ -440,7 +440,7 @@ sqlite3VdbeMemSetStr(pCtx.s, z, n, SQLITE_UTF16LE, xDel);
       Debug.Assert( sqlite3_mutex_held( pCtx.s.db.mutex ) );
       pCtx.isError = SQLITE_ERROR;
       setResultStrOrError( pCtx, "string or blob too big", -1,
-      SQLITE_UTF8, SQLITE_STATIC );
+      SqliteEncoding.UTF8, SQLITE_STATIC );
     }
 
     /* An SQLITE_NOMEM error. */
@@ -1276,7 +1276,7 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
     byte[] zData,         /* Pointer to the data to be bound */
     int nData,            /* Number of bytes of data to be bound */
     dxDel xDel,           /* Destructor for the data */
-    u8 encoding          /* Encoding for the data */
+    SqliteEncoding encoding          /* Encoding for the data */
     )
     {
       Vdbe p = pStmt;
@@ -1311,7 +1311,7 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
     string zData,         /* Pointer to the data to be bound */
     int nData,            /* Number of bytes of data to be bound */
     dxDel xDel,           /* Destructor for the data */
-    u8 encoding          /* Encoding for the data */
+    SqliteEncoding encoding          /* Encoding for the data */
     )
     {
       Vdbe p = pStmt;
@@ -1392,7 +1392,7 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
     dxDel xDel
     )
     {
-      return bindText( pStmt, i, zData, nData, xDel, SQLITE_UTF8 );
+      return bindText( pStmt, i, zData, nData, xDel, SqliteEncoding.UTF8 );
     }
 
     public static int sqlite3_bind_blob(
@@ -1414,7 +1414,7 @@ string zData,
 int nData,
 dxDel xDel
 ){
-return bindText(pStmt, i, zData, nData, xDel, SQLITE_UTF16NATIVE);
+return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
 }
 #endif // * SQLITE_OMIT_UTF16 */
 

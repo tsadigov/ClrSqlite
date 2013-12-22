@@ -784,7 +784,7 @@ return;
   if ( pDflt != null )
   {
     sqlite3_value pVal = null;
-    if ( sqlite3ValueFromExpr( db, pDflt, SQLITE_UTF8, SQLITE_AFF_NONE, ref pVal ) != 0 )
+    if ( sqlite3ValueFromExpr( db, pDflt, SqliteEncoding.UTF8, SQLITE_AFF_NONE, ref pVal ) != 0 )
     {
       //        db.mallocFailed = 1;
       return;

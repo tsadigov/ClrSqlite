@@ -314,12 +314,12 @@ dummy += (uint)x;
             va_start( ap, zFormat );
             z = sqlite3VMPrintf( db, zFormat, ap );
             va_end( ref ap );
-            sqlite3ValueSetStr( db.pErr, -1, z, SQLITE_UTF8, (dxDel)SQLITE_DYNAMIC );
+            sqlite3ValueSetStr( db.pErr, -1, z, SqliteEncoding.UTF8, (dxDel)SQLITE_DYNAMIC );
           }
         }
         else
         {
-          sqlite3ValueSetStr( db.pErr, 0, null, SQLITE_UTF8, SQLITE_STATIC );
+          sqlite3ValueSetStr( db.pErr, 0, null, SqliteEncoding.UTF8, SQLITE_STATIC );
         }
       }
     }
@@ -365,260 +365,6 @@ dummy += (uint)x;
       }
     }
 
-  
-    /*
-    ** The string z[] is an text representation of a real number.
-    ** Convert this string to a double and write it into *pResult.
-    **
-    ** The string z[] is length bytes in length (bytes, not characters) and
-    ** uses the encoding enc.  The string is not necessarily zero-terminated.
-    **
-    ** Return TRUE if the result is a valid real number (or integer) and FALSE
-    ** if the string is empty or contains extraneous text.  Valid numbers
-    ** are in one of these formats:
-    **
-    **    [+-]digits[E[+-]digits]
-    **    [+-]digits.[digits][E[+-]digits]
-    **    [+-].digits[E[+-]digits]
-    **
-    ** Leading and trailing whitespace is ignored for the purpose of determining
-    ** validity.
-    **
-    ** If some prefix of the input string is a valid number, this routine
-    ** returns FALSE but it still converts the prefix and writes the result
-    ** into *pResult.
-    */
-    static bool sqlite3AtoF( string z, ref double pResult, int length, u8 enc )
-    {
-#if !SQLITE_OMIT_FLOATING_POINT
-      if ( String.IsNullOrEmpty( z ) )
-      {
-        pResult = 0;
-        return false;
-      }
-      int incr = ( enc == SQLITE_UTF8 ? 1 : 2 );
-      //const char* zEnd = z + length;
-
-      /* sign * significand * (10 ^ (esign * exponent)) */
-      int sign = 1;   /* sign of significand */
-      i64 s = 0;      /* significand */
-      int d = 0;      /* adjust exponent for shifting decimal point */
-      int esign = 1;  /* sign of exponent */
-      int e = 0;      /* exponent */
-      int eValid = 1;  /* True exponent is either not used or is well-formed */
-      double result = 0;
-      int nDigits = 0;
-
-      pResult = 0.0;   /* Default return value, in case of an error */
-
-      int zDx = 0;
-      if ( enc == SQLITE_UTF16BE )
-        zDx++;
-
-      while ( zDx < length && CharExtensions.sqlite3Isspace( z[zDx] ) )
-        zDx++;
-      if ( zDx >= length )
-        return false;
-
-      /* get sign of significand */
-      if ( z[zDx] == '-' )
-      {
-        sign = -1;
-        zDx += incr;
-      }
-      else if ( z[zDx] == '+' )
-      {
-        zDx += incr;
-      }
-      /* skip leading zeroes */
-      while ( zDx < z.Length && z[zDx] == '0' )
-      {
-        zDx += incr;
-        nDigits++;
-      }
-      /* copy max significant digits to significand */
-      while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( IntegerExtensions.LARGEST_INT64 - 9 ) / 10 ) )
-      {
-        s = s * 10 + ( z[zDx] - '0' );
-        zDx += incr;
-        nDigits++;
-      }
-      /* skip non-significant significand digits
-      ** (increase exponent by d to shift decimal left) */
-      while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) )
-      {
-        zDx += incr;
-        nDigits++;
-        d++;
-      }
-      if ( zDx >= length )
-        goto do_atof_calc;
-
-      /* if decimal point is present */
-      if ( z[zDx] == '.' )
-      {
-        zDx += incr;
-        /* copy digits from after decimal to significand
-        ** (decrease exponent by d to shift decimal right) */
-        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( IntegerExtensions.LARGEST_INT64 - 9 ) / 10 ) )
-        {
-          s = s * 10 + ( z[zDx] - '0' );
-          zDx += incr;
-          nDigits++;
-          d--;
-        }
-
-        /* skip non-significant digits */
-        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) )
-        {
-          zDx += incr;
-          nDigits++;
-        }
-        if ( zDx >= length )
-          goto do_atof_calc;
-      }
-
-      /* if exponent is present */
-      if ( z[zDx] == 'e' || z[zDx] == 'E' )
-      {
-        zDx += incr;
-        eValid = 0;
-        if ( zDx >= length )
-          goto do_atof_calc;
-
-        /* get sign of exponent */
-        if ( z[zDx] == '-' )
-        {
-          esign = -1;
-          zDx += incr;
-        }
-        else if ( z[zDx] == '+' )
-        {
-          zDx += incr;
-        }
-
-        /* copy digits to exponent */
-        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) )
-        {
-          e = e * 10 + ( z[zDx] - '0' );
-          zDx += incr;
-          eValid = 1;
-        }
-      }
-
-      /* skip trailing spaces */
-      if ( nDigits > 0 && eValid > 0 )
-      {
-        while ( zDx < length && CharExtensions.sqlite3Isspace( z[zDx] ) )
-          zDx += incr;
-      }
-
-do_atof_calc:
-
-      /* adjust exponent by d, and update sign */
-      e = ( e * esign ) + d;
-      if ( e < 0 )
-      {
-        esign = -1;
-        e *= -1;
-      }
-      else
-      {
-        esign = 1;
-      }
-
-      /* if 0 significand */
-      if ( 0 == s )
-      {
-        /* In the IEEE 754 standard, zero is signed.
-        ** Add the sign if we've seen at least one digit */
-        result = ( sign < 0 && nDigits != 0 ) ? -(double)0 : (double)0;
-      }
-      else
-      {
-        /* attempt to reduce exponent */
-        if ( esign > 0 )
-        {
-          while ( s < ( IntegerExtensions.LARGEST_INT64 / 10 ) && e > 0 )
-          {
-            e--;
-            s *= 10;
-          }
-        }
-        else
-        {
-          while ( 0 == ( s % 10 ) && e > 0 )
-          {
-            e--;
-            s /= 10;
-          }
-        }
-
-        /* adjust the sign of significand */
-        s = sign < 0 ? -s : s;
-
-        /* if exponent, scale significand as appropriate
-        ** and store in result. */
-        if ( e != 0 )
-        {
-          double scale = 1.0;
-          /* attempt to handle extremely small/large numbers better */
-          if ( e > 307 && e < 342 )
-          {
-            while ( ( e % 308 ) != 0 )
-            {
-              scale *= 1.0e+1;
-              e -= 1;
-            }
-            if ( esign < 0 )
-            {
-              result = s / scale;
-              result /= 1.0e+308;
-            }
-            else
-            {
-              result = s * scale;
-              result *= 1.0e+308;
-            }
-          }
-          else
-          {
-            /* 1.0e+22 is the largest power of 10 than can be 
-            ** represented exactly. */
-            while ( ( e % 22 ) != 0 )
-            {
-              scale *= 1.0e+1;
-              e -= 1;
-            }
-            while ( e > 0 )
-            {
-              scale *= 1.0e+22;
-              e -= 22;
-            }
-            if ( esign < 0 )
-            {
-              result = s / scale;
-            }
-            else
-            {
-              result = s * scale;
-            }
-          }
-        }
-        else
-        {
-          result = (double)s;
-        }
-      }
-      /* store the result */
-      pResult = result;
-
-      /* return true if number and no extra non-whitespace chracters after */
-      return zDx >= length && nDigits > 0 && eValid != 0;
-#else
-return !sqlite3Atoi64(z, pResult, length, enc);
-#endif //* SQLITE_OMIT_FLOATING_POINT */
-    }
 
     /*
     ** Compare the 19-character string zNum against the text representation
@@ -634,7 +380,7 @@ return !sqlite3Atoi64(z, pResult, length, enc);
     **
     ** will return -8.
     */
-    static int compare2pow63( string zNum, int incr )
+    public static int compare2pow63( string zNum, int incr )
     {
       int c = 0;
       int i;
@@ -655,118 +401,6 @@ return !sqlite3Atoi64(z, pResult, length, enc);
       return c;
     }
 
-
-    /*
-    ** Convert zNum to a 64-bit signed integer.
-    **
-    ** If the zNum value is representable as a 64-bit twos-complement 
-    ** integer, then write that value into *pNum and return 0.
-    **
-    ** If zNum is exactly 9223372036854665808, return 2.  This special
-    ** case is broken out because while 9223372036854665808 cannot be a 
-    ** signed 64-bit integer, its negative -9223372036854665808 can be.
-    **
-    ** If zNum is too big for a 64-bit integer and is not
-    ** 9223372036854665808 then return 1.
-    **
-    ** length is the number of bytes in the string (bytes, not characters).
-    ** The string is not necessarily zero-terminated.  The encoding is
-    ** given by enc.
-    */
-    static int sqlite3Atoi64( string zNum, ref i64 pNum, int length, u8 enc )
-    {
-      if ( zNum == null )
-      {
-        pNum = 0;
-        return 1;
-      }
-      int incr = ( enc == SQLITE_UTF8 ? 1 : 2 );
-      u64 u = 0;
-      int neg = 0; /* assume positive */
-      int i;
-      int c = 0;
-      int zDx = 0;//  string zStart;
-      //string zEnd = zNum + length;
-
-      if ( enc == SQLITE_UTF16BE )
-        zDx++;
-      while ( zDx < length && CharExtensions.sqlite3Isspace( zNum[zDx] ) )
-        zDx += incr;
-      if ( zDx < length )
-      {
-        if ( zNum[zDx] == '-' )
-        {
-          neg = 1;
-          zDx += incr;
-        }
-        else if ( zNum[zDx] == '+' )
-        {
-          zDx += incr;
-        }
-      }
-      //zStart = zNum;
-      if ( length > zNum.Length )
-        length = zNum.Length;
-      while ( zDx < length - 1 && zNum[zDx] == '0' )
-      {
-        zDx += incr;
-      } /* Skip leading zeros. */
-      for ( i = zDx; i < length && ( c = zNum[i] ) >= '0' && c <= '9'; i += incr )
-      {
-        u = u * 10 + (u64)(c - '0');
-      }
-      if ( u > IntegerExtensions.LARGEST_INT64 )
-      {
-        pNum = IntegerExtensions.SMALLEST_INT64;
-      }
-      else if ( neg != 0)
-      {
-        pNum = -(i64)u;
-      }
-      else
-      {
-        pNum = (i64)u;
-      }
-      testcase( i - zDx == 18 );
-      testcase( i - zDx == 19 );
-      testcase( i - zDx == 20 );
-      if ( ( c != 0 && i < length ) || i == zDx || i - zDx > 19 * incr )
-      {
-        /* zNum is empty or contains non-numeric text or is longer
-        ** than 19 digits (thus guaranteeing that it is too large) */
-        return 1;
-      }
-      else if ( i - zDx < 19 * incr )
-      {
-        /* Less than 19 digits, so we know that it fits in 64 bits */
-        Debug.Assert( u <= IntegerExtensions.LARGEST_INT64 );
-        return 0;
-      }
-      else
-      {
-        /* zNum is a 19-digit numbers.  Compare it against 9223372036854775808. */
-        c = compare2pow63( zNum.Substring(zDx), incr );
-        if ( c < 0 )
-        {
-          /* zNum is less than 9223372036854775808 so it fits */
-          Debug.Assert( u <= IntegerExtensions.LARGEST_INT64 );
-          return 0;
-        }
-        else if ( c > 0 )
-        {
-          /* zNum is greater than 9223372036854775808 so it overflows */
-          return 1;
-        }
-        else
-        {
-          /* zNum is exactly 9223372036854775808.  Fits if negative.  The
-          ** special case 2 overflow if positive */
-          Debug.Assert( u - 1 == IntegerExtensions.LARGEST_INT64 );
-          Debug.Assert( ( pNum ) == IntegerExtensions.SMALLEST_INT64 );
-          return neg != 0 ? 0 : 2;
-        }
-      }
-    }
 
     /*
     ** If zNum represents an integer that will fit in 32-bits, then set
@@ -828,7 +462,7 @@ return !sqlite3Atoi64(z, pResult, length, enc);
     ** Return a 32-bit integer value extracted from a string.  If the
     ** string is not an integer, just return 0.
     */
-    static int sqlite3Atoi( string z )
+    static int refaactorrConverter__sqlite3Atoi( string z )
     {
       int x = 0;
       if ( !String.IsNullOrEmpty( z ) )
@@ -1464,48 +1098,6 @@ return n;
 
 
 
-/*
-** Translate a single byte of Hex into an integer.
-** This routine only works if h really is a valid hexadecimal
-** character:  0..9a..fA..F
-*/
-    static int sqlite3HexToInt( int h )
-    {
-      Debug.Assert( ( h >= '0' && h <= '9' ) || ( h >= 'a' && h <= 'f' ) || ( h >= 'A' && h <= 'F' ) );
-#if SQLITE_ASCII
-      h += 9 * ( 1 & ( h >> 6 ) );
-#endif
-//#if SQLITE_EBCDIC
-//h += 9*(1&~(h>>4));
-//#endif
-      return h & 0xf;
-    }
-
-#if !SQLITE_OMIT_BLOB_LITERAL || SQLITE_HAS_CODEC
-    /*
-** Convert a BLOB literal of the form "x'hhhhhh'" into its binary
-** value.  Return a pointer to its binary value.  Space to hold the
-** binary value has been obtained from malloc and must be freed by
-** the calling routine.
-*/
-    static byte[] sqlite3HexToBlob( sqlite3 db, string z, int n )
-    {
-      StringBuilder zBlob;
-      int i;
-
-      zBlob = new StringBuilder( n / 2 + 1 );// (char)sqlite3DbMallocRaw(db, n / 2 + 1);
-      n--;
-      if ( zBlob != null )
-      {
-        for ( i = 0; i < n; i += 2 )
-        {
-          zBlob.Append( Convert.ToChar( ( sqlite3HexToInt( z[i] ) << 4 ) | sqlite3HexToInt( z[i + 1] ) ) );
-        }
-        //zBlob[i / 2] = '\0'; ;
-      }
-      return Encoding.UTF8.GetBytes( zBlob.ToString() );
-    }
-#endif // * !SQLITE_OMIT_BLOB_LITERAL || SQLITE_HAS_CODEC */
 
 
     /*
@@ -1695,4 +1287,433 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 #endif
 
   }
+
+
+    public partial class Converter
+
+{
+          
+    /*
+    ** The string z[] is an text representation of a real number.
+    ** Convert this string to a double and write it into *pResult.
+    **
+    ** The string z[] is length bytes in length (bytes, not characters) and
+    ** uses the encoding enc.  The string is not necessarily zero-terminated.
+    **
+    ** Return TRUE if the result is a valid real number (or integer) and FALSE
+    ** if the string is empty or contains extraneous text.  Valid numbers
+    ** are in one of these formats:
+    **
+    **    [+-]digits[E[+-]digits]
+    **    [+-]digits.[digits][E[+-]digits]
+    **    [+-].digits[E[+-]digits]
+    **
+    ** Leading and trailing whitespace is ignored for the purpose of determining
+    ** validity.
+    **
+    ** If some prefix of the input string is a valid number, this routine
+    ** returns FALSE but it still converts the prefix and writes the result
+    ** into *pResult.
+    */
+    public static bool sqlite3AtoF( string z, ref double pResult, int length, SqliteEncoding enc )
+    {
+#if !SQLITE_OMIT_FLOATING_POINT
+      if ( String.IsNullOrEmpty( z ) )
+      {
+        pResult = 0;
+        return false;
+      }
+      int incr = ( enc == SqliteEncoding.UTF8 ? 1 : 2 );
+      //const char* zEnd = z + length;
+
+      /* sign * significand * (10 ^ (esign * exponent)) */
+      int sign = 1;   /* sign of significand */
+      i64 s = 0;      /* significand */
+      int d = 0;      /* adjust exponent for shifting decimal point */
+      int esign = 1;  /* sign of exponent */
+      int e = 0;      /* exponent */
+      int eValid = 1;  /* True exponent is either not used or is well-formed */
+      double result = 0;
+      int nDigits = 0;
+
+      pResult = 0.0;   /* Default return value, in case of an error */
+
+      int zDx = 0;
+      if ( enc == SqliteEncoding.UTF16BE )
+        zDx++;
+
+      while ( zDx < length && CharExtensions.sqlite3Isspace( z[zDx] ) )
+        zDx++;
+      if ( zDx >= length )
+        return false;
+
+      /* get sign of significand */
+      if ( z[zDx] == '-' )
+      {
+        sign = -1;
+        zDx += incr;
+      }
+      else if ( z[zDx] == '+' )
+      {
+        zDx += incr;
+      }
+      /* skip leading zeroes */
+      while ( zDx < z.Length && z[zDx] == '0' )
+      {
+        zDx += incr;
+        nDigits++;
+      }
+      /* copy max significant digits to significand */
+      while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( IntegerExtensions.LARGEST_INT64 - 9 ) / 10 ) )
+      {
+        s = s * 10 + ( z[zDx] - '0' );
+        zDx += incr;
+        nDigits++;
+      }
+      /* skip non-significant significand digits
+      ** (increase exponent by d to shift decimal left) */
+      while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) )
+      {
+        zDx += incr;
+        nDigits++;
+        d++;
+      }
+      if ( zDx >= length )
+        goto do_atof_calc;
+
+      /* if decimal point is present */
+      if ( z[zDx] == '.' )
+      {
+        zDx += incr;
+        /* copy digits from after decimal to significand
+        ** (decrease exponent by d to shift decimal right) */
+        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) && s < ( ( IntegerExtensions.LARGEST_INT64 - 9 ) / 10 ) )
+        {
+          s = s * 10 + ( z[zDx] - '0' );
+          zDx += incr;
+          nDigits++;
+          d--;
+        }
+
+        /* skip non-significant digits */
+        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) )
+        {
+          zDx += incr;
+          nDigits++;
+        }
+        if ( zDx >= length )
+          goto do_atof_calc;
+      }
+
+      /* if exponent is present */
+      if ( z[zDx] == 'e' || z[zDx] == 'E' )
+      {
+        zDx += incr;
+        eValid = 0;
+        if ( zDx >= length )
+          goto do_atof_calc;
+
+        /* get sign of exponent */
+        if ( z[zDx] == '-' )
+        {
+          esign = -1;
+          zDx += incr;
+        }
+        else if ( z[zDx] == '+' )
+        {
+          zDx += incr;
+        }
+
+        /* copy digits to exponent */
+        while ( zDx < length && CharExtensions.sqlite3Isdigit( z[zDx] ) )
+        {
+          e = e * 10 + ( z[zDx] - '0' );
+          zDx += incr;
+          eValid = 1;
+        }
+      }
+
+      /* skip trailing spaces */
+      if ( nDigits > 0 && eValid > 0 )
+      {
+        while ( zDx < length && CharExtensions.sqlite3Isspace( z[zDx] ) )
+          zDx += incr;
+      }
+
+do_atof_calc:
+
+      /* adjust exponent by d, and update sign */
+      e = ( e * esign ) + d;
+      if ( e < 0 )
+      {
+        esign = -1;
+        e *= -1;
+      }
+      else
+      {
+        esign = 1;
+      }
+
+      /* if 0 significand */
+      if ( 0 == s )
+      {
+        /* In the IEEE 754 standard, zero is signed.
+        ** Add the sign if we've seen at least one digit */
+        result = ( sign < 0 && nDigits != 0 ) ? -(double)0 : (double)0;
+      }
+      else
+      {
+        /* attempt to reduce exponent */
+        if ( esign > 0 )
+        {
+          while ( s < ( IntegerExtensions.LARGEST_INT64 / 10 ) && e > 0 )
+          {
+            e--;
+            s *= 10;
+          }
+        }
+        else
+        {
+          while ( 0 == ( s % 10 ) && e > 0 )
+          {
+            e--;
+            s /= 10;
+          }
+        }
+
+        /* adjust the sign of significand */
+        s = sign < 0 ? -s : s;
+
+        /* if exponent, scale significand as appropriate
+        ** and store in result. */
+        if ( e != 0 )
+        {
+          double scale = 1.0;
+          /* attempt to handle extremely small/large numbers better */
+          if ( e > 307 && e < 342 )
+          {
+            while ( ( e % 308 ) != 0 )
+            {
+              scale *= 1.0e+1;
+              e -= 1;
+            }
+            if ( esign < 0 )
+            {
+              result = s / scale;
+              result /= 1.0e+308;
+            }
+            else
+            {
+              result = s * scale;
+              result *= 1.0e+308;
+            }
+          }
+          else
+          {
+            /* 1.0e+22 is the largest power of 10 than can be 
+            ** represented exactly. */
+            while ( ( e % 22 ) != 0 )
+            {
+              scale *= 1.0e+1;
+              e -= 1;
+            }
+            while ( e > 0 )
+            {
+              scale *= 1.0e+22;
+              e -= 22;
+            }
+            if ( esign < 0 )
+            {
+              result = s / scale;
+            }
+            else
+            {
+              result = s * scale;
+            }
+          }
+        }
+        else
+        {
+          result = (double)s;
+        }
+      }
+      /* store the result */
+      pResult = result;
+
+      /* return true if number and no extra non-whitespace chracters after */
+      return zDx >= length && nDigits > 0 && eValid != 0;
+#else
+return !sqlite3Atoi64(z, pResult, length, enc);
+#endif //* SQLITE_OMIT_FLOATING_POINT */
+    }
+
+
+
+
+    /*
+    ** Convert zNum to a 64-bit signed integer.
+    **
+    ** If the zNum value is representable as a 64-bit twos-complement 
+    ** integer, then write that value into *pNum and return 0.
+    **
+    ** If zNum is exactly 9223372036854665808, return 2.  This special
+    ** case is broken out because while 9223372036854665808 cannot be a 
+    ** signed 64-bit integer, its negative -9223372036854665808 can be.
+    **
+    ** If zNum is too big for a 64-bit integer and is not
+    ** 9223372036854665808 then return 1.
+    **
+    ** length is the number of bytes in the string (bytes, not characters).
+    ** The string is not necessarily zero-terminated.  The encoding is
+    ** given by enc.
+    */
+    public static int sqlite3Atoi64(string zNum, ref i64 pNum, int length, SqliteEncoding enc)
+    {
+      if ( zNum == null )
+      {
+        pNum = 0;
+        return 1;
+      }
+      int incr = ( enc == SqliteEncoding.UTF8 ? 1 : 2 );
+      u64 u = 0;
+      int neg = 0; /* assume positive */
+      int i;
+      int c = 0;
+      int zDx = 0;//  string zStart;
+      //string zEnd = zNum + length;
+
+      if ( enc == SqliteEncoding.UTF16BE )
+        zDx++;
+      while ( zDx < length && CharExtensions.sqlite3Isspace( zNum[zDx] ) )
+        zDx += incr;
+      if ( zDx < length )
+      {
+        if ( zNum[zDx] == '-' )
+        {
+          neg = 1;
+          zDx += incr;
+        }
+        else if ( zNum[zDx] == '+' )
+        {
+          zDx += incr;
+        }
+      }
+      //zStart = zNum;
+      if ( length > zNum.Length )
+        length = zNum.Length;
+      while ( zDx < length - 1 && zNum[zDx] == '0' )
+      {
+        zDx += incr;
+      } /* Skip leading zeros. */
+      for ( i = zDx; i < length && ( c = zNum[i] ) >= '0' && c <= '9'; i += incr )
+      {
+        u = u * 10 + (u64)(c - '0');
+      }
+      if ( u > IntegerExtensions.LARGEST_INT64 )
+      {
+        pNum = IntegerExtensions.SMALLEST_INT64;
+      }
+      else if ( neg != 0)
+      {
+        pNum = -(i64)u;
+      }
+      else
+      {
+        pNum = (i64)u;
+      }
+      testcase( i - zDx == 18 );
+      testcase( i - zDx == 19 );
+      testcase( i - zDx == 20 );
+      if ( ( c != 0 && i < length ) || i == zDx || i - zDx > 19 * incr )
+      {
+        /* zNum is empty or contains non-numeric text or is longer
+        ** than 19 digits (thus guaranteeing that it is too large) */
+        return 1;
+      }
+      else if ( i - zDx < 19 * incr )
+      {
+        /* Less than 19 digits, so we know that it fits in 64 bits */
+        Debug.Assert( u <= IntegerExtensions.LARGEST_INT64 );
+        return 0;
+      }
+      else
+      {
+        /* zNum is a 19-digit numbers.  Compare it against 9223372036854775808. */
+        c = Sqlite3.compare2pow63( zNum.Substring(zDx), incr );
+        if ( c < 0 )
+        {
+          /* zNum is less than 9223372036854775808 so it fits */
+          Debug.Assert( u <= IntegerExtensions.LARGEST_INT64 );
+          return 0;
+        }
+        else if ( c > 0 )
+        {
+          /* zNum is greater than 9223372036854775808 so it overflows */
+          return 1;
+        }
+        else
+        {
+          /* zNum is exactly 9223372036854775808.  Fits if negative.  The
+          ** special case 2 overflow if positive */
+          Debug.Assert( u - 1 == IntegerExtensions.LARGEST_INT64 );
+          Debug.Assert( ( pNum ) == IntegerExtensions.SMALLEST_INT64 );
+          return neg != 0 ? 0 : 2;
+        }
+      }
+    }
+
+
+
+/*
+** Translate a single byte of Hex into an integer.
+** This routine only works if h really is a valid hexadecimal
+** character:  0..9a..fA..F
+*/
+    public static int sqlite3HexToInt(int h)
+    {
+      Debug.Assert( ( h >= '0' && h <= '9' ) || ( h >= 'a' && h <= 'f' ) || ( h >= 'A' && h <= 'F' ) );
+#if SQLITE_ASCII
+      h += 9 * ( 1 & ( h >> 6 ) );
+#endif
+//#if SQLITE_EBCDIC
+//h += 9*(1&~(h>>4));
+//#endif
+      return h & 0xf;
+    }
+
+
+
+#if !SQLITE_OMIT_BLOB_LITERAL || SQLITE_HAS_CODEC
+    /*
+** Convert a BLOB literal of the form "x'hhhhhh'" into its binary
+** value.  Return a pointer to its binary value.  Space to hold the
+** binary value has been obtained from malloc and must be freed by
+** the calling routine.
+*/
+    public static byte[] sqlite3HexToBlob(Sqlite3.sqlite3 db, string z, int n)
+    {
+      StringBuilder zBlob;
+      int i;
+
+      zBlob = new StringBuilder( n / 2 + 1 );// (char)sqlite3DbMallocRaw(db, n / 2 + 1);
+      n--;
+      if ( zBlob != null )
+      {
+        for ( i = 0; i < n; i += 2 )
+        {
+          zBlob.Append( Convert.ToChar( ( sqlite3HexToInt( z[i] ) << 4 ) | sqlite3HexToInt( z[i + 1] ) ) );
+        }
+        //zBlob[i / 2] = '\0'; ;
+      }
+      return Encoding.UTF8.GetBytes( zBlob.ToString() );
+    }
+#endif // * !SQLITE_OMIT_BLOB_LITERAL || SQLITE_HAS_CODEC */
+
+    static bool testcase(bool b)
+    {
+        return b;
+    }
+
+}
+
 }

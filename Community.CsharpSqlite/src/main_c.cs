@@ -916,7 +916,7 @@ break;
     ** Invoke the destructor function associated with FuncDef p, if any. Except,
     ** if this is not the last copy of the function, do not invoke it. Multiple
     ** copies of a single function are created when create_function() is called
-    ** with SQLITE_ANY as the encoding.
+    ** with SqliteEncoding.ANY as the encoding.
     */
     static void functionDestroy( sqlite3 db, FuncDef p )
     {
@@ -1331,7 +1331,7 @@ return 1;
     sqlite3 db,
     string zFunctionName,
     int nArg,
-    u8 enc,
+    SqliteEncoding enc,
     object pUserData,
     dxFunc xFunc, //)(sqlite3_context*,int,sqlite3_value *),
     dxStep xStep,//)(sqlite3_context*,int,sqlite3_value *),
@@ -1354,30 +1354,30 @@ return 1;
       }
 
 #if !SQLITE_OMIT_UTF16
-/* If SQLITE_UTF16 is specified as the encoding type, transform this
-** to one of SQLITE_UTF16LE or SQLITE_UTF16BE using the
-** SQLITE_UTF16NATIVE macro. SQLITE_UTF16 is not used internally.
+/* If SqliteEncoding.UTF16 is specified as the encoding type, transform this
+** to one of SqliteEncoding.UTF16LE or SqliteEncoding.UTF16BE using the
+** SQLITE_UTF16NATIVE macro. SqliteEncoding.UTF16 is not used internally.
 **
-** If SQLITE_ANY is specified, add three versions of the function
+** If SqliteEncoding.ANY is specified, add three versions of the function
 ** to the hash table.
 */
-if( enc==SQLITE_UTF16 ){
-enc = SQLITE_UTF16NATIVE;
-}else if( enc==SQLITE_ANY ){
+if( enc==SqliteEncoding.UTF16 ){
+enc = SqliteEncoding.UTF16NATIVE;
+}else if( enc==SqliteEncoding.ANY ){
 int rc;
-rc = sqlite3CreateFunc(db, zFunctionName, nArg, SQLITE_UTF8,
+rc = sqlite3CreateFunc(db, zFunctionName, nArg, SqliteEncoding.UTF8,
 pUserData, xFunc, xStep, xFinal, pDestructor);
 if( rc==SQLITE_OK ){
-rc = sqlite3CreateFunc(db, zFunctionName, nArg, SQLITE_UTF16LE,
+rc = sqlite3CreateFunc(db, zFunctionName, nArg, SqliteEncoding.UTF16LE,
 pUserData, xFunc, xStep, xFinal, pDestructor);
 }
 if( rc!=SQLITE_OK ){
 return rc;
 }
-enc = SQLITE_UTF16BE;
+enc = SqliteEncoding.UTF16BE;
 }
 #else
-      enc = SQLITE_UTF8;
+      enc = SqliteEncoding.UTF8;
 #endif
 
       /* Check if an existing function is being overridden or deleted. If so,
@@ -1433,7 +1433,7 @@ enc = SQLITE_UTF16BE;
     sqlite3 db,
     string zFunc,
     int nArg,
-    u8 enc,
+    SqliteEncoding enc,
     object p,
     dxFunc xFunc, //)(sqlite3_context*,int,sqlite3_value *),
     dxStep xStep,//)(sqlite3_context*,int,sqlite3_value *),
@@ -1448,7 +1448,7 @@ enc = SQLITE_UTF16BE;
     sqlite3 db,
     string zFunc,
     int nArg,
-    int enc,
+    SqliteEncoding enc,
     object p,
     dxFunc xFunc, //)(sqlite3_context*,int,sqlite3_value *),
     dxStep xStep,//)(sqlite3_context*,int,sqlite3_value *),
@@ -1469,7 +1469,7 @@ enc = SQLITE_UTF16BE;
         pArg.xDestroy = xDestroy;
         pArg.pUserData = p;
       }
-      rc = sqlite3CreateFunc( db, zFunc, nArg, (byte)enc, p, xFunc, xStep, xFinal, pArg );
+      rc = sqlite3CreateFunc( db, zFunc, nArg, enc, p, xFunc, xStep, xFinal, pArg );
       if ( pArg != null && pArg.nRef == 0 )
       {
         Debug.Assert( rc != SQLITE_OK );
@@ -1497,7 +1497,7 @@ int rc;
 string zFunc8;
 sqlite3_mutex_enter(db.mutex);
 Debug.Assert( 0==db.mallocFailed );
-zFunc8 = sqlite3Utf16to8(db, zFunctionName, -1, SQLITE_UTF16NATIVE);
+zFunc8 = sqlite3Utf16to8(db, zFunctionName, -1, SqliteEncoding.UTF16NATIVE);
 rc = sqlite3CreateFunc(db, zFunc8, nArg, eTextRep, p, xFunc, xStep, xFinal, null);
 sqlite3DbFree(db,ref zFunc8);
 rc = sqlite3ApiExit(db, rc);
@@ -1528,9 +1528,9 @@ return rc;
       int nName = StringExtensions.sqlite3Strlen30( zName );
       int rc;
       sqlite3_mutex_enter( db.mutex );
-      if ( sqlite3FindFunction( db, zName, nName, nArg, SQLITE_UTF8, 0 ) == null )
+      if ( sqlite3FindFunction( db, zName, nName, nArg, SqliteEncoding.UTF8, 0 ) == null )
       {
-        sqlite3CreateFunc( db, zName, nArg, SQLITE_UTF8,
+        sqlite3CreateFunc( db, zName, nArg, SqliteEncoding.UTF8,
         0, (dxFunc)sqlite3InvalidFunction, null, null, null );
       }
       rc = sqlite3ApiExit( db, SQLITE_OK );
@@ -1922,7 +1922,7 @@ z = (void )outOfMem;
 z = sqlite3_value_text16(db->pErr);
 if( z==0 ){
 sqlite3ValueSetStr(db->pErr, -1, sqlite3ErrStr(db->errCode),
-SQLITE_UTF8, SQLITE_STATIC);
+SqliteEncoding.UTF8, SQLITE_STATIC);
 z = sqlite3_value_text16(db->pErr);
 }
 /* A malloc() may have failed within the call to sqlite3_value_text16()
@@ -1972,31 +1972,31 @@ return z;
     static int createCollation(
     sqlite3 db,
     string zName,
-    u8 enc,
-    u8 collType,
+    SqliteEncoding enc,
+    CollationType collType,
     object pCtx,
     dxCompare xCompare,//)(void*,int,const void*,int,const void),
     dxDelCollSeq xDel//)(void)
     )
     {
       CollSeq pColl;
-      int enc2;
+      SqliteEncoding enc2;
       int nName = StringExtensions.sqlite3Strlen30( zName );
 
       Debug.Assert( sqlite3_mutex_held( db.mutex ) );
 
-      /* If SQLITE_UTF16 is specified as the encoding type, transform this
-      ** to one of SQLITE_UTF16LE or SQLITE_UTF16BE using the
-      ** SQLITE_UTF16NATIVE macro. SQLITE_UTF16 is not used internally.
+      /* If SqliteEncoding.UTF16 is specified as the encoding type, transform this
+      ** to one of SqliteEncoding.UTF16LE or SqliteEncoding.UTF16BE using the
+      ** SqliteEncoding.UTF16NATIVE macro. SqliteEncoding.UTF16 is not used internally.
       */
       enc2 = enc;
-      testcase( enc2 == SQLITE_UTF16 );
-      testcase( enc2 == SQLITE_UTF16_ALIGNED );
-      if ( enc2 == SQLITE_UTF16 || enc2 == SQLITE_UTF16_ALIGNED )
+      testcase( enc2 == SqliteEncoding.UTF16 );
+      testcase( enc2 == SqliteEncoding.UTF16_ALIGNED );
+      if ( enc2 == SqliteEncoding.UTF16 || enc2 == SqliteEncoding.UTF16_ALIGNED )
       {
-        enc2 = SQLITE_UTF16NATIVE;
+        enc2 = SqliteEncoding.UTF16NATIVE;
       }
-      if ( enc2 < SQLITE_UTF8 || enc2 > SQLITE_UTF16BE )
+      if ( enc2 < SqliteEncoding.UTF8 || enc2 > SqliteEncoding.UTF16BE )
       {
         return SQLITE_MISUSE_BKPT();
       }
@@ -2005,7 +2005,7 @@ return z;
       ** sequence. If so, and there are active VMs, return busy. If there
       ** are no active VMs, invalidate any pre-compiled statements.
       */
-      pColl = sqlite3FindCollSeq( db, (u8)enc2, zName, 0 );
+      pColl = sqlite3FindCollSeq( db, enc2, zName, 0 );
       if ( pColl != null && pColl.xCmp != null )
       {
         if ( db.activeVdbeCnt != 0 )
@@ -2022,7 +2022,7 @@ return z;
         ** Also, collation destructor - CollSeq.xDel() - function may need
         ** to be called.
         */
-        if ( ( pColl.enc & ~SQLITE_UTF16_ALIGNED ) == enc2 )
+        if ( ( pColl.enc & ~SqliteEncoding.UTF16_ALIGNED ) == enc2 )
         {
           CollSeq[] aColl = sqlite3HashFind( db.aCollSeq, zName, nName, (CollSeq[])null );
           int j;
@@ -2041,13 +2041,13 @@ return z;
         }
       }
 
-      pColl = sqlite3FindCollSeq( db, (u8)enc2, zName, 1 );
+      pColl = sqlite3FindCollSeq( db, enc2, zName, 1 );
       //if ( pColl == null )
       //  return SQLITE_NOMEM;
       pColl.xCmp = xCompare;
       pColl.pUser = pCtx;
       pColl.xDel = xDel;
-      pColl.enc = (u8)( enc2 | ( enc & SQLITE_UTF16_ALIGNED ) );
+      pColl.enc = ( enc2 | ( enc & SqliteEncoding.UTF16_ALIGNED ) );
       pColl.type = collType;
       sqlite3Error( db, SQLITE_OK, 0 );
       return SQLITE_OK;
@@ -2262,8 +2262,8 @@ static int sqlite3ParseUri(
        && CharExtensions.sqlite3Isxdigit(zUri[iIn]) 
        && CharExtensions.sqlite3Isxdigit(zUri[iIn+1]) 
       ){
-        int octet = (sqlite3HexToInt(zUri[iIn++]) << 4);
-        octet += sqlite3HexToInt(zUri[iIn++]);
+        int octet = (Converter.sqlite3HexToInt(zUri[iIn++]) << 4);
+        octet += Converter.sqlite3HexToInt(zUri[iIn++]);
 
         Debug.Assert( octet >= 0 && octet < 256 );
         if ( octet == 0 )
@@ -2540,23 +2540,23 @@ static int sqlite3ParseUri(
       ** and UTF-16, so add a version for each to avoid any unnecessary
       ** conversions. The only error that can occur here is a malloc() failure.
       */
-      createCollation( db, "BINARY", SQLITE_UTF8, SQLITE_COLL_BINARY, 0,
+      createCollation( db, "BINARY", SqliteEncoding.UTF8, CollationType.BINARY, 0,
                binCollFunc, null );
-      createCollation( db, "BINARY", SQLITE_UTF16BE, SQLITE_COLL_BINARY, 0,
+      createCollation( db, "BINARY", SqliteEncoding.UTF16BE, CollationType.BINARY, 0,
               binCollFunc, null );
-      createCollation( db, "BINARY", SQLITE_UTF16LE, SQLITE_COLL_BINARY, 0,
+      createCollation( db, "BINARY", SqliteEncoding.UTF16LE, CollationType.BINARY, 0,
               binCollFunc, null );
-      createCollation( db, "RTRIM", SQLITE_UTF8, SQLITE_COLL_USER, 1,
+      createCollation( db, "RTRIM", SqliteEncoding.UTF8, CollationType.USER, 1,
               binCollFunc, null );
       //if ( db.mallocFailed != 0 )
       //{
       //  goto opendb_out;
       //}
-      db.pDfltColl = sqlite3FindCollSeq( db, SQLITE_UTF8, "BINARY", 0 );
+      db.pDfltColl = sqlite3FindCollSeq( db, SqliteEncoding.UTF8, "BINARY", 0 );
       Debug.Assert( db.pDfltColl != null );
 
       /* Also add a UTF-8 case-insensitive collation sequence. */
-      createCollation( db, "NOCASE", SQLITE_UTF8, SQLITE_COLL_NOCASE, 0,
+      createCollation( db, "NOCASE", SqliteEncoding.UTF8, CollationType.NOCASE, 0,
                nocaseCollatingFunc, null );
 
   /* Parse the filename/URI argument. */
@@ -2732,14 +2732,14 @@ rc = sqlite3_initialize();
 if( rc !=0) return rc;
 #endif
 pVal = sqlite3ValueNew(0);
-sqlite3ValueSetStr(pVal, -1, zFilename, SQLITE_UTF16NATIVE, SQLITE_STATIC);
-zFilename8 = sqlite3ValueText(pVal, SQLITE_UTF8);
+sqlite3ValueSetStr(pVal, -1, zFilename, SqliteEncoding.UTF16NATIVE, SQLITE_STATIC);
+zFilename8 = sqlite3ValueText(pVal, SqliteEncoding.UTF8);
 if( zFilename8 ){
 rc = openDatabase(zFilename8, ppDb,
 SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
 Debug.Assert(*ppDb || rc==SQLITE_NOMEM );
 if( rc==SQLITE_OK && !DbHasProperty(*ppDb, 0, DB_SchemaLoaded) ){
-ENC(*ppDb) = SQLITE_UTF16NATIVE;
+ENC(*ppDb) = SqliteEncoding.UTF16NATIVE;
 }
 }else{
 rc = SQLITE_NOMEM;
@@ -2756,7 +2756,7 @@ return sqlite3ApiExit(0, rc);
     static int sqlite3_create_collation(
     sqlite3 db,
     string zName,
-    int enc,
+    SqliteEncoding enc,
     object pCtx,
     dxCompare xCompare
     )
@@ -2764,7 +2764,7 @@ return sqlite3ApiExit(0, rc);
       int rc;
       sqlite3_mutex_enter( db.mutex );
       //Debug.Assert( 0 == db.mallocFailed );
-      rc = createCollation( db, zName, (u8)enc, SQLITE_COLL_USER, pCtx, xCompare, null );
+      rc = createCollation( db, zName, enc, CollationType.USER, pCtx, xCompare, null );
       rc = sqlite3ApiExit( db, rc );
       sqlite3_mutex_leave( db.mutex );
       return rc;
@@ -2776,7 +2776,7 @@ return sqlite3ApiExit(0, rc);
     static int sqlite3_create_collation_v2(
     sqlite3 db,
     string zName,
-    int enc,
+    SqliteEncoding enc,
     object pCtx,
     dxCompare xCompare, //int(*xCompare)(void*,int,const void*,int,const void),
     dxDelCollSeq xDel  //void(*xDel)(void)
@@ -2785,7 +2785,7 @@ return sqlite3ApiExit(0, rc);
       int rc;
       sqlite3_mutex_enter( db.mutex );
       //Debug.Assert( 0 == db.mallocFailed );
-      rc = createCollation( db, zName, (u8)enc, SQLITE_COLL_USER, pCtx, xCompare, xDel );
+      rc = createCollation( db, zName, enc, CollationType.USER, pCtx, xCompare, xDel );
       rc = sqlite3ApiExit( db, rc );
       sqlite3_mutex_leave( db.mutex );
       return rc;
@@ -2806,9 +2806,9 @@ return sqlite3ApiExit(0, rc);
 //  string zName8;
 //  sqlite3_mutex_enter(db.mutex);
 //  Debug.Assert( 0==db.mallocFailed );
-//  zName8 = sqlite3Utf16to8(db, zName, -1, SQLITE_UTF16NATIVE);
+//  zName8 = sqlite3Utf16to8(db, zName, -1, SqliteEncoding.UTF16NATIVE);
 //  if( zName8 ){
-//    rc = createCollation(db, zName8, (u8)enc, SQLITE_COLL_USER, pCtx, xCompare, 0);
+//    rc = createCollation(db, zName8, (u8)enc, CollationType.USER, pCtx, xCompare, 0);
 //    sqlite3DbFree(db,ref zName8);
 //  }
 //  rc = sqlite3ApiExit(db, rc);

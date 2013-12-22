@@ -1049,7 +1049,7 @@ goto begin_table_error;
         1 : SQLITE_MAX_FILE_FORMAT;
         sqlite3VdbeAddOp2( v, OP_Integer, fileFormat, reg3 );
         sqlite3VdbeAddOp3( v, OP_SetCookie, iDb, BTREE_FILE_FORMAT, reg3 );
-        sqlite3VdbeAddOp2( v, OP_Integer, ENC( db ), reg3 );
+        sqlite3VdbeAddOp2( v, OP_Integer, (int)ENC( db ), reg3 );
         sqlite3VdbeAddOp3( v, OP_SetCookie, iDb, BTREE_TEXT_ENCODING, reg3 );
         sqlite3VdbeJumpHere( v, j1 );
 
@@ -1500,7 +1500,7 @@ primary_key_exit:
     static CollSeq sqlite3LocateCollSeq( Parse pParse, string zName )
     {
       sqlite3 db = pParse.db;
-      u8 enc = db.aDb[0].pSchema.enc;// ENC(db);
+      SqliteEncoding enc = db.aDb[0].pSchema.enc;// ENC(db);
       u8 initbusy = db.init.busy;
       CollSeq pColl;
 

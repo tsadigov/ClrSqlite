@@ -55,7 +55,7 @@ namespace Community.CsharpSqlite
       int i, n;
       if ( CharExtensions.sqlite3Isdigit( z[0] ) )
       {
-        return (u8)sqlite3Atoi( z );
+        return (u8)refaactorrConverter__sqlite3Atoi( z );
       }
       n = StringExtensions.sqlite3Strlen30( z );
       for ( i = 0; i < ArraySize( iLength ); i++ )
@@ -385,9 +385,9 @@ new sPragmaType( "foreign_keys",             SQLITE_ForeignKeys ),
     class EncName
     {
       public string zName;
-      public u8 enc;
+      public SqliteEncoding enc;
 
-      public EncName( string zName, u8 enc )
+      public EncName( string zName, SqliteEncoding enc )
       {
         this.zName = zName;
         this.enc = enc;
@@ -395,12 +395,12 @@ new sPragmaType( "foreign_keys",             SQLITE_ForeignKeys ),
     };
 
     static EncName[] encnames = new EncName[]  {
-new EncName( "UTF8",     SQLITE_UTF8        ),
-new EncName( "UTF-8",    SQLITE_UTF8        ),/* Must be element [1] */
-new EncName( "UTF-16le (not supported)", SQLITE_UTF16LE     ),/* Must be element [2] */
-new EncName( "UTF-16be (not supported)", SQLITE_UTF16BE     ), /* Must be element [3] */
-new EncName( "UTF16le (not supported)",  SQLITE_UTF16LE     ),
-new EncName( "UTF16be (not supported)",  SQLITE_UTF16BE     ),
+new EncName( "UTF8",     SqliteEncoding.UTF8        ),
+new EncName( "UTF-8",    SqliteEncoding.UTF8        ),/* Must be element [1] */
+new EncName( "UTF-16le (not supported)", SqliteEncoding.UTF16LE     ),/* Must be element [2] */
+new EncName( "UTF-16be (not supported)", SqliteEncoding.UTF16BE     ), /* Must be element [3] */
+new EncName( "UTF16le (not supported)",  SqliteEncoding.UTF16LE     ),
+new EncName( "UTF16be (not supported)",  SqliteEncoding.UTF16BE     ),
 new EncName( "UTF-16 (not supported)",   0                  ), /* SQLITE_UTF16NATIVE */
 new EncName( "UTF16",    0                  ), /* SQLITE_UTF16NATIVE */
 new EncName( null, 0 )
@@ -512,7 +512,7 @@ new VdbeOpList( OP_ResultRow,   1, 1,        0),
         }
         else
         {
-          int size = sqlite3AbsInt32(sqlite3Atoi( zRight ));
+          int size = sqlite3AbsInt32(refaactorrConverter__sqlite3Atoi( zRight ));
           sqlite3BeginWriteOperation( pParse, 0, iDb );
           sqlite3VdbeAddOp2( v, OP_Integer, size, 1 );
           sqlite3VdbeAddOp3( v, OP_SetCookie, iDb, BTREE_DEFAULT_CACHE_SIZE, 1 );
@@ -546,7 +546,7 @@ new VdbeOpList( OP_ResultRow,   1, 1,        0),
             /* Malloc may fail when setting the page-size, as there is an internal
             ** buffer that the pager module resizes using sqlite3_realloc().
             */
-            db.nextPagesize = sqlite3Atoi( zRight );
+            db.nextPagesize = refaactorrConverter__sqlite3Atoi( zRight );
             if ( SQLITE_NOMEM == sqlite3BtreeSetPageSize( pBt, db.nextPagesize, -1, 0 ) )
             {
               ////        db.mallocFailed = 1;
@@ -612,7 +612,7 @@ new VdbeOpList( OP_ResultRow,   1, 1,        0),
               }
               else
               {
-                sqlite3VdbeAddOp3( v, OP_MaxPgcnt, iDb, iReg, sqlite3Atoi( zRight ) );
+                sqlite3VdbeAddOp3( v, OP_MaxPgcnt, iDb, iReg, refaactorrConverter__sqlite3Atoi( zRight ) );
               }
               sqlite3VdbeAddOp2( v, OP_ResultRow, iReg, 1 );
               sqlite3VdbeSetNumCols( v, 1 );
@@ -766,7 +766,7 @@ new VdbeOpList( OP_ResultRow,   1, 1,        0),
                       i64 iLimit = -2;
                       if ( !String.IsNullOrEmpty( zRight ) )
                       {
-                        sqlite3Atoi64( zRight, ref iLimit, 1000000, SQLITE_UTF8 );
+                        Converter.sqlite3Atoi64( zRight, ref iLimit, 1000000, SqliteEncoding.UTF8 );
                         if ( iLimit < -1 )
                           iLimit = -1;
                       }
@@ -903,7 +903,7 @@ new VdbeOpList( OP_SetCookie,      0,               BTREE_INCR_VACUUM, 1),    /*
                             }
                             else
                             {
-                              int size = sqlite3AbsInt32(sqlite3Atoi( zRight ));
+                              int size = sqlite3AbsInt32(refaactorrConverter__sqlite3Atoi( zRight ));
                               pDb.pSchema.cache_size = size;
                               sqlite3BtreeSetCacheSize( pDb.pBt, pDb.pSchema.cache_size );
                             }
@@ -1565,10 +1565,10 @@ new VdbeOpList( OP_ResultRow,    2,  1,  0),
                                                           sqlite3VdbeSetNumCols( v, 1 );
                                                           sqlite3VdbeSetColName( v, 0, COLNAME_NAME, "encoding", SQLITE_STATIC );
                                                           sqlite3VdbeAddOp2( v, OP_String8, 0, 1 );
-                                                          Debug.Assert( encnames[SQLITE_UTF8].enc == SQLITE_UTF8 );
-                                                          Debug.Assert( encnames[SQLITE_UTF16LE].enc == SQLITE_UTF16LE );
-                                                          Debug.Assert( encnames[SQLITE_UTF16BE].enc == SQLITE_UTF16BE );
-                                                          sqlite3VdbeChangeP4( v, -1, encnames[ENC( pParse.db )].zName, P4_STATIC );
+                                                          Debug.Assert( encnames[(int)SqliteEncoding.UTF8].enc == SqliteEncoding.UTF8 );
+                                                          Debug.Assert( encnames[(int)SqliteEncoding.UTF16LE].enc == SqliteEncoding.UTF16LE );
+                                                          Debug.Assert( encnames[(int)SqliteEncoding.UTF16BE].enc == SqliteEncoding.UTF16BE );
+                                                          sqlite3VdbeChangeP4( v, -1, encnames[(int)ENC( pParse.db )].zName, P4_STATIC );
                                                           sqlite3VdbeAddOp2( v, OP_ResultRow, 1, 1 );
                                                         }
 #if !SQLITE_OMIT_UTF16
@@ -1589,7 +1589,7 @@ for ( iEnc = 0 ; encnames[iEnc].zName != null ; iEnc++ )
 {
 if ( zRight.Equals( encnames[iEnc].zName ,StringComparison.InvariantCultureIgnoreCase ) )
 {
-pParse.db.aDbStatic[0].pSchema.enc = encnames[iEnc].enc != 0 ? encnames[iEnc].enc : SQLITE_UTF16NATIVE;
+pParse.db.aDbStatic[0].pSchema.enc = encnames[iEnc].enc != 0 ? encnames[iEnc].enc : SqliteEncoding.UTF16NATIVE;
 break;
 }
 }
@@ -1661,7 +1661,7 @@ new VdbeOpList( OP_SetCookie,      0,  0,  1),    /* 2 */
 };
                                                             int addr = sqlite3VdbeAddOpList( v, ArraySize( setCookie ), setCookie );
                                                             sqlite3VdbeChangeP1( v, addr, iDb );
-                                                            sqlite3VdbeChangeP1( v, addr + 1, sqlite3Atoi( zRight ) );
+                                                            sqlite3VdbeChangeP1( v, addr + 1, refaactorrConverter__sqlite3Atoi( zRight ) );
                                                             sqlite3VdbeChangeP1( v, addr + 2, iDb );
                                                             sqlite3VdbeChangeP2( v, addr + 2, iCookie );
                                                           }
@@ -1755,7 +1755,7 @@ new VdbeOpList( OP_ResultRow,       1,  1,  0)
   */
   if( sqlite3StrICmp(zLeft, "wal_autocheckpoint")==0 ){
     if( zRight ){
-      sqlite3_wal_autocheckpoint(db, sqlite3Atoi(zRight));
+      sqlite3_wal_autocheckpoint(db, refaactorrConverter__sqlite3Atoi(zRight));
     }
     returnSingleInt(pParse, "wal_autocheckpoint", 
        db->xWalCallback==sqlite3WalDefaultHook ? 

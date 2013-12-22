@@ -55,8 +55,8 @@ namespace Community.CsharpSqlite
           {
             zObj = "?";
 #if SQLITE_OMIT_UTF16
-            if (ENC(db) != SQLITE_UTF8)
-              zObj =encnames[(ENC(db))].zName;
+            if (ENC(db) != SqliteEncoding.UTF8)
+              zObj =encnames[((int)ENC(db))].zName;
 #endif
           }
           sqlite3SetString( ref pData.pzErrMsg, db,
@@ -123,7 +123,7 @@ namespace Community.CsharpSqlite
 #endif
         Debug.Assert( db.init.busy != 0 );
         db.init.iDb = iDb;
-        db.init.newTnum = sqlite3Atoi( argv[1] );
+        db.init.newTnum = refaactorrConverter__sqlite3Atoi( argv[1] );
         db.init.orphanTrigger = 0;
         //TESTONLY(rcp = ) sqlite3_prepare(db, argv[2], -1, &pStmt, 0);
 #if !NDEBUG || SQLITE_COVERAGE_TEST
@@ -344,18 +344,18 @@ sqlite3_prepare(db, argv[2], -1, ref pStmt, 0);
       {  /* text encoding */
         if ( iDb == 0 )
         {
-          u8 encoding;
+          SqliteEncoding encoding;
           /* If opening the main database, set ENC(db). */
-          encoding = (u8)( meta[BTREE_TEXT_ENCODING - 1] & 3 );
+          encoding = (SqliteEncoding)( meta[BTREE_TEXT_ENCODING - 1] & 3 );
           if ( encoding == 0 )
-            encoding = SQLITE_UTF8;
+            encoding = SqliteEncoding.UTF8;
           db.aDb[0].pSchema.enc = encoding; //ENC( db ) = encoding;
-          db.pDfltColl = sqlite3FindCollSeq( db, SQLITE_UTF8, "BINARY", 0 );
+          db.pDfltColl = sqlite3FindCollSeq( db, SqliteEncoding.UTF8, "BINARY", 0 );
         }
         else
         {
           /* If opening an attached database, the encoding much match ENC(db) */
-          if ( meta[BTREE_TEXT_ENCODING - 1] != ENC( db ) )
+            if ((SqliteEncoding)meta[BTREE_TEXT_ENCODING - 1] != ENC(db))
           {
             sqlite3SetString( ref pzErrMsg, db, "attached databases must use the same" +
             " text encoding as main database" );
@@ -1020,7 +1020,7 @@ if( !sqlite3SafetyCheckOk(db) ){
 return SQLITE_MISUSE_BKPT;
 }
 sqlite3_mutex_enter(db.mutex);
-zSql8 = sqlite3Utf16to8(db, zSql, nBytes, SQLITE_UTF16NATIVE);
+zSql8 = sqlite3Utf16to8(db, zSql, nBytes, SqliteEncoding.UTF16NATIVE);
 if( zSql8 !=""){
 rc = sqlite3LockAndPrepare(db, zSql8, -1, saveSqlFlag, null, ref ppStmt, ref zTail8);
 }

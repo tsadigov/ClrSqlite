@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite
     ** Invoke the 'collation needed' callback to request a collation sequence
     ** in the encoding enc of name zName, length nName.
     */
-    static void callCollNeeded( sqlite3 db, int enc, string zName )
+    static void callCollNeeded( sqlite3 db, SqliteEncoding enc, string zName )
     {
       Debug.Assert( db.xCollNeeded == null || db.xCollNeeded16 == null );
       if ( db.xCollNeeded != null )
@@ -49,15 +49,15 @@ namespace Community.CsharpSqlite
         string zExternal = zName;// sqlite3DbStrDup(db, zName);
         if ( zExternal == null )
           return;
-        db.xCollNeeded( db.pCollNeededArg, db, enc, zExternal );
+        db.xCollNeeded( db.pCollNeededArg, db,(int) enc, zExternal );
         sqlite3DbFree( db, ref zExternal );
       }
 #if !SQLITE_OMIT_UTF16
 if( db.xCollNeeded16!=null ){
 string zExternal;
 sqlite3_value pTmp = sqlite3ValueNew(db);
-sqlite3ValueSetStr(pTmp, -1, zName, SQLITE_UTF8, SQLITE_STATIC);
-zExternal = sqlite3ValueText(pTmp, SQLITE_UTF16NATIVE);
+sqlite3ValueSetStr(pTmp, -1, zName, SqliteEncoding.UTF8, SQLITE_STATIC);
+zExternal = sqlite3ValueText(pTmp, SqliteEncoding.UTF16NATIVE);
 if( zExternal!="" ){
 db.xCollNeeded16( db.pCollNeededArg, db, db.aDbStatic[0].pSchema.enc, zExternal );//(int)ENC(db), zExternal);
 }
@@ -78,7 +78,7 @@ sqlite3ValueFree(ref pTmp);
       CollSeq pColl2;
       string z = pColl.zName;
       int i;
-      byte[] aEnc = { SQLITE_UTF16BE, SQLITE_UTF16LE, SQLITE_UTF8 };
+      SqliteEncoding[] aEnc = { SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE, SqliteEncoding.UTF8 };
       for ( i = 0; i < 3; i++ )
       {
         pColl2 = sqlite3FindCollSeq( db, aEnc[i], z, 0 );
@@ -108,7 +108,7 @@ sqlite3ValueFree(ref pTmp);
     */
     static CollSeq sqlite3GetCollSeq(
     sqlite3 db,         /* The database connection */
-    u8 enc,             /* The desired encoding for the collating sequence */
+    SqliteEncoding enc,             /* The desired encoding for the collating sequence */
     CollSeq pColl,      /* Collating sequence with native encoding, or NULL */
     string zName        /* Collating sequence name */
     )
@@ -208,13 +208,13 @@ sqlite3ValueFree(ref pTmp);
           CollSeq pDel = null;
           pColl[0] = new CollSeq();
           pColl[0].zName = zName;
-          pColl[0].enc = SQLITE_UTF8;
+          pColl[0].enc = SqliteEncoding.UTF8;
           pColl[1] = new CollSeq();
           pColl[1].zName = zName;
-          pColl[1].enc = SQLITE_UTF16LE;
+          pColl[1].enc = SqliteEncoding.UTF16LE;
           pColl[2] = new CollSeq();
           pColl[2].zName = zName;
-          pColl[2].enc = SQLITE_UTF16BE;
+          pColl[2].enc = SqliteEncoding.UTF16BE;
           //memcpy(pColl[0].zName, zName, nName);
           //pColl[0].zName[nName] = 0;
           CollSeq[] pDelArray = sqlite3HashInsert( ref db.aCollSeq, pColl[0].zName, nName, pColl );
@@ -253,7 +253,7 @@ sqlite3ValueFree(ref pTmp);
     */
     static CollSeq sqlite3FindCollSeq(
     sqlite3 db,
-    u8 enc,
+    SqliteEncoding enc,
     string zName,
     u8 create
     )
@@ -265,15 +265,15 @@ sqlite3ValueFree(ref pTmp);
       }
       else
       {
-        pColl = new CollSeq[enc];
-        pColl[enc - 1] = db.pDfltColl;
+        pColl = new CollSeq[(int)enc];
+        pColl[(int)enc - 1] = db.pDfltColl;
       }
-      Debug.Assert( SQLITE_UTF8 == 1 && SQLITE_UTF16LE == 2 && SQLITE_UTF16BE == 3 );
-      Debug.Assert( enc >= SQLITE_UTF8 && enc <= SQLITE_UTF16BE );
+      Debug.Assert(SqliteEncoding.UTF8 == (SqliteEncoding)1 && SqliteEncoding.UTF16LE == (SqliteEncoding)2 && SqliteEncoding.UTF16BE == (SqliteEncoding)3);
+      Debug.Assert( enc >= SqliteEncoding.UTF8 && enc <= SqliteEncoding.UTF16BE );
       if ( pColl != null )
       {
         enc -= 1; // if (pColl != null) pColl += enc - 1;
-        return pColl[enc];
+        return pColl[(int)enc];
       }
       else
         return null;
@@ -300,7 +300,7 @@ sqlite3ValueFree(ref pTmp);
     ** 6: An exact match.
     **
     */
-    static int matchQuality( FuncDef p, int nArg, int enc )
+    static int matchQuality( FuncDef p, int nArg, SqliteEncoding enc )
     {
       int match = 0;
       if ( p.nArg == -1 || p.nArg == nArg
@@ -316,8 +316,8 @@ sqlite3ValueFree(ref pTmp);
         {
           match += 2;
         }
-        else if ( ( enc == SQLITE_UTF16LE && p.iPrefEnc == SQLITE_UTF16BE ) ||
-        ( enc == SQLITE_UTF16BE && p.iPrefEnc == SQLITE_UTF16LE ) )
+        else if ( ( enc == SqliteEncoding.UTF16LE && p.iPrefEnc == SqliteEncoding.UTF16BE ) ||
+        ( enc == SqliteEncoding.UTF16BE && p.iPrefEnc == SqliteEncoding.UTF16LE ) )
         {
           match += 1;
         }
@@ -400,7 +400,7 @@ sqlite3ValueFree(ref pTmp);
     string zName,         /* Name of the function.  Not null-terminated */
     int nName,            /* Number of characters in the name */
     int nArg,             /* Number of arguments.  -1 means any number */
-    u8 enc,              /* Preferred text encoding */
+    SqliteEncoding enc,              /* Preferred text encoding */
     u8 createFlag       /* Create new entry if true and does not otherwise exist */
     )
     {
@@ -409,7 +409,7 @@ sqlite3ValueFree(ref pTmp);
       int bestScore = 0;
       int h;              /* Hash value */
 
-      Debug.Assert( enc == SQLITE_UTF8 || enc == SQLITE_UTF16LE || enc == SQLITE_UTF16BE );
+      Debug.Assert( enc == SqliteEncoding.UTF8 || enc == SqliteEncoding.UTF16LE || enc == SqliteEncoding.UTF16BE );
       h = ( sqlite3UpperToLower[(u8)zName[0]] + nName ) % ArraySize( db.aFunc.a );
 
 
@@ -551,7 +551,7 @@ FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
         sqlite3HashInit( p.idxHash );
         sqlite3HashInit( p.trigHash );
         sqlite3HashInit( p.fkeyHash );
-        p.enc = SQLITE_UTF8;
+        p.enc = SqliteEncoding.UTF8;
       }
       return p;
     }

@@ -443,7 +443,7 @@ attach_end:
 */
 static FuncDef detach_func = new FuncDef(
 1,                   /* nArg */
-SQLITE_UTF8,         /* iPrefEnc */
+SqliteEncoding.UTF8,         /* iPrefEnc */
 0,                   /* flags */
 null,                /* pUserData */
 null,                /* pNext */
@@ -466,7 +466,7 @@ static void sqlite3Detach( Parse pParse, Expr pDbname )
 */
 static FuncDef attach_func = new FuncDef(
 3,                /* nArg */
-SQLITE_UTF8,      /* iPrefEnc */
+SqliteEncoding.UTF8,      /* iPrefEnc */
 0,                /* flags */
 null,             /* pUserData */
 null,             /* pNext */

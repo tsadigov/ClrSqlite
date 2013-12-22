@@ -1517,7 +1517,7 @@ return 1;
           }
           pStr2.u.zToken = pStr2.u.zToken.Substring( 0, StringExtensions.sqlite3Strlen30( pStr2.u.zToken ) - 1 ) + (char)( c + 1 );// pC = c + 1;
         }
-        pColl = sqlite3FindCollSeq( db, SQLITE_UTF8, noCase ? "NOCASE" : "BINARY", 0 );
+        pColl = sqlite3FindCollSeq( db, SqliteEncoding.UTF8, noCase ? "NOCASE" : "BINARY", 0 );
         pNewExpr1 = sqlite3PExpr( pParse, TK_GE,
         sqlite3ExprSetColl( sqlite3ExprDup( db, pLeft, 0 ), pColl ),
         pStr1, 0 );
@@ -2738,11 +2738,11 @@ WhereCost pCost            /* Lowest cost query plan */
             byte[] blob = sqlite3_value_blob( pVal );
             z = Encoding.UTF8.GetString( blob, 0, blob.Length );
             pColl = db.pDfltColl;
-            Debug.Assert( pColl.enc == SQLITE_UTF8 );
+            Debug.Assert( pColl.enc == SqliteEncoding.UTF8 );
           }
           else
           {
-            pColl = sqlite3GetCollSeq( db, SQLITE_UTF8, null, pIdx.azColl[0] );
+            pColl = sqlite3GetCollSeq( db, SqliteEncoding.UTF8, null, pIdx.azColl[0] );
             if ( pColl == null )
             {
               sqlite3ErrorMsg( pParse, "no such collation sequence: %s",
@@ -2766,7 +2766,7 @@ WhereCost pCost            /* Lowest cost query plan */
             if ( ( eSampletype != eType ) )
               break;
 #if !SQLITE_OMIT_UTF16
-if( pColl.enc!=SQLITE_UTF8 ){
+if( pColl.enc!=SqliteEncoding.UTF8 ){
 int nSample;
 string zSample;
 zSample = sqlite3Utf8to16(
@@ -2830,7 +2830,7 @@ sqlite3DbFree(db, ref zSample);
         pp = sqlite3VdbeGetValue( pParse.pReprepare, iVar, (u8)aff );
         return SQLITE_OK;
       }
-      return sqlite3ValueFromExpr( pParse.db, pExpr, SQLITE_UTF8, aff, ref pp );
+      return sqlite3ValueFromExpr( pParse.db, pExpr, SqliteEncoding.UTF8, aff, ref pp );
     }
 #endif
 

@@ -55,7 +55,7 @@ namespace Community.CsharpSqlite
     /*
     ** If pMem is an object with a valid string representation, this routine
     ** ensures the internal encoding for the string representation is
-    ** 'desiredEnc', one of SQLITE_UTF8, SQLITE_UTF16LE or SQLITE_UTF16BE.
+    ** 'desiredEnc', one of SqliteEncoding.UTF8, SqliteEncoding.UTF16LE or SqliteEncoding.UTF16BE.
     **
     ** If pMem is not a string object, or the encoding of the string
     ** representation is already stored using the requested encoding, then this
@@ -65,12 +65,12 @@ namespace Community.CsharpSqlite
     ** SQLITE_NOMEM may be returned if a malloc() fails during conversion
     ** between formats.
     */
-    static int sqlite3VdbeChangeEncoding( Mem pMem, int desiredEnc )
+    static int sqlite3VdbeChangeEncoding(Mem pMem, SqliteEncoding desiredEnc)
     {
       int rc;
       Debug.Assert( ( pMem.flags & MEM_RowSet ) == 0 );
-      Debug.Assert( desiredEnc == SQLITE_UTF8 || desiredEnc == SQLITE_UTF16LE
-      || desiredEnc == SQLITE_UTF16BE );
+      Debug.Assert( desiredEnc == SqliteEncoding.UTF8 || desiredEnc == SqliteEncoding.UTF16LE
+      || desiredEnc == SqliteEncoding.UTF16BE );
       if ( ( pMem.flags & MEM_Str ) == 0 || pMem.enc == desiredEnc )
       {
         if ( String.IsNullOrEmpty( pMem.z ) && pMem.zBLOB != null )
@@ -267,7 +267,7 @@ return SQLITE_OK;
     ** keys are strings. In the former case a NULL pointer is returned the
     ** user and the later is an internal programming error.
     */
-    static int sqlite3VdbeMemStringify( Mem pMem, int enc )
+    static int sqlite3VdbeMemStringify( Mem pMem, SqliteEncoding enc )
     {
       int rc = SQLITE_OK;
       int fg = pMem.flags;
@@ -310,7 +310,7 @@ return SQLITE_OK;
           pMem.z = pMem.r.ToString( CultureInfo.InvariantCulture) + ".0";
       }
       pMem.n = StringExtensions.sqlite3Strlen30( pMem.z );
-      pMem.enc = SQLITE_UTF8;
+      pMem.enc = SqliteEncoding.UTF8;
       pMem.flags |= MEM_Str | MEM_Term;
       sqlite3VdbeChangeEncoding( pMem, enc );
       return rc;
@@ -477,7 +477,7 @@ return r;
         i64 value = 0;
         Debug.Assert( pMem.z != null || pMem.n == 0 );
         testcase( pMem.z == null );
-        sqlite3Atoi64( pMem.z, ref value, pMem.n, pMem.enc );
+        Converter.sqlite3Atoi64( pMem.z, ref value, pMem.n, pMem.enc );
         return value;
       }
       else if ( ( flags & ( MEM_Blob ) ) != 0 )
@@ -485,7 +485,7 @@ return r;
         i64 value = 0;
         Debug.Assert( pMem.zBLOB != null || pMem.n == 0 );
         testcase( pMem.zBLOB == null );
-        sqlite3Atoi64( Encoding.UTF8.GetString( pMem.zBLOB, 0, pMem.n ), ref value, pMem.n, pMem.enc );
+        Converter.sqlite3Atoi64( Encoding.UTF8.GetString( pMem.zBLOB, 0, pMem.n ), ref value, pMem.n, pMem.enc );
         return value;
       }
       else
@@ -516,7 +516,7 @@ return r;
       {
         /* (double)0 In case of SQLITE_OMIT_FLOATING_POINT... */
         double val = (double)0;
-        sqlite3AtoF( pMem.z, ref val, pMem.n, pMem.enc );
+        Converter.sqlite3AtoF( pMem.z, ref val, pMem.n, pMem.enc );
         return val;
       }
       else if ( ( pMem.flags & ( MEM_Blob ) ) != 0 )
@@ -524,7 +524,7 @@ return r;
         /* (double)0 In case of SQLITE_OMIT_FLOATING_POINT... */
         double val = (double)0;
         Debug.Assert( pMem.zBLOB != null || pMem.n == 0 );
-        sqlite3AtoF( Encoding.UTF8.GetString( pMem.zBLOB, 0, pMem.n ), ref val, pMem.n, pMem.enc );
+        Converter.sqlite3AtoF( Encoding.UTF8.GetString( pMem.zBLOB, 0, pMem.n ), ref val, pMem.n, pMem.enc );
         return val;
       }
       else
@@ -610,7 +610,7 @@ return r;
         Debug.Assert( pMem.db == null || sqlite3_mutex_held( pMem.db.mutex ) );
         if ( ( pMem.flags & MEM_Blob ) != 0 && pMem.z == null )
         {
-          if ( 0 == sqlite3Atoi64( Encoding.UTF8.GetString( pMem.zBLOB, 0, pMem.zBLOB.Length ), ref pMem.u.i, pMem.n, pMem.enc ) )
+          if ( 0 == Converter.sqlite3Atoi64( Encoding.UTF8.GetString( pMem.zBLOB, 0, pMem.zBLOB.Length ), ref pMem.u.i, pMem.n, pMem.enc ) )
             MemSetTypeFlag( pMem, MEM_Int );
           else
           {
@@ -619,7 +619,7 @@ return r;
             sqlite3VdbeIntegerAffinity( pMem );
           }
         }
-        else if ( 0 == sqlite3Atoi64( pMem.z, ref pMem.u.i, pMem.n, pMem.enc ) )
+        else if ( 0 == Converter.sqlite3Atoi64( pMem.z, ref pMem.u.i, pMem.n, pMem.enc ) )
         {
           MemSetTypeFlag( pMem, MEM_Int );
         }
@@ -671,7 +671,7 @@ return r;
       if ( n < 0 )
         n = 0;
       pMem.u.nZero = n;
-      pMem.enc = SQLITE_UTF8;
+      pMem.enc = SqliteEncoding.UTF8;
 #if SQLITE_OMIT_INCRBLOB
       sqlite3VdbeMemGrow( pMem, n, 0 );
       //if( pMem.z!= null ){
@@ -874,7 +874,7 @@ return r;
     Mem pMem,           /* Memory cell to set to string value */
     byte[] zBlob,       /* Blob pointer */
     int n,              /* Bytes in Blob */
-    u8 enc,             /* 0 for BLOBs */
+    SqliteEncoding enc,             /* 0 for BLOBs */
     dxDel xDel          /* Destructor function */
     )
     {
@@ -886,7 +886,7 @@ return r;
     byte[] zBlob,       /* Blob pointer */
     int offset,         /* offset into string */
     int n,              /* Bytes in string, or negative */
-    u8 enc,             /* Encoding of z.  0 for BLOBs */
+    SqliteEncoding enc,             /* Encoding of z.  0 for BLOBs */
     dxDel xDel//)(void*)/* Destructor function */
     )
     {
@@ -914,7 +914,7 @@ return r;
       if ( nByte < 0 )
       {
         Debug.Assert( enc != 0 );
-        if ( enc == SQLITE_UTF8 )
+        if ( enc == SqliteEncoding.UTF8 )
         {
           for ( nByte = 0; nByte <= iLimit && nByte < zBlob.Length - offset && zBlob[offset + nByte] != 0; nByte++ )
           {
@@ -940,7 +940,7 @@ return r;
       }
       pMem.n = nByte;
       pMem.flags = MEM_Blob | MEM_Term;
-      pMem.enc = ( enc == 0 ? SQLITE_UTF8 : enc );
+      pMem.enc = ( enc == 0 ? SqliteEncoding.UTF8 : enc );
       pMem.type = ( enc == 0 ? SQLITE_BLOB : SQLITE_TEXT );
 
       if ( nByte > iLimit )
@@ -955,7 +955,7 @@ return r;
     Mem pMem,           /* Memory cell to set to string value */
     string z,           /* String pointer */
     int n,              /* Bytes in string, or negative */
-    u8 enc,             /* Encoding of z.  0 for BLOBs */
+    SqliteEncoding enc,             /* Encoding of z.  0 for BLOBs */
     dxDel xDel          /* Destructor function */
     )
     {
@@ -967,7 +967,7 @@ return r;
     string z,           /* String pointer */
     int offset,         /* offset into string */
     int n,              /* Bytes in string, or negative */
-    u8 enc,             /* Encoding of z.  0 for BLOBs */
+    SqliteEncoding enc,             /* Encoding of z.  0 for BLOBs */
     dxDel xDel//)(void*)/* Destructor function */
     )
     {
@@ -997,7 +997,7 @@ return r;
       if ( nByte < 0 )
       {
         Debug.Assert( enc != 0 );
-        if ( enc == SQLITE_UTF8 )
+        if ( enc == SqliteEncoding.UTF8 )
         {
           for ( nByte = 0; nByte <= iLimit && nByte < z.Length - offset && z[offset + nByte] != 0; nByte++ )
           {
@@ -1021,7 +1021,7 @@ return r;
         u32 nAlloc = (u32)nByte;
         if ( ( flags & MEM_Term ) != 0 )
         {
-          nAlloc += (u32)( enc == SQLITE_UTF8 ? 1 : 2 );
+          nAlloc += (u32)( enc == SqliteEncoding.UTF8 ? 1 : 2 );
         }
         if ( nByte > iLimit )
         {
@@ -1085,11 +1085,11 @@ return r;
       }
       pMem.n = nByte;
       pMem.flags = flags;
-      pMem.enc = ( enc == 0 ? SQLITE_UTF8 : enc );
+      pMem.enc = ( (byte)enc == 0 ? SqliteEncoding.UTF8 : enc );
       pMem.type = ( enc == 0 ? SQLITE_BLOB : SQLITE_TEXT );
 
 #if !SQLITE_OMIT_UTF16
-if( pMem.enc!=SQLITE_UTF8 && sqlite3VdbeMemHandleBom(pMem)!=0 ){
+if( pMem.enc!=SqliteEncoding.UTF8 && sqlite3VdbeMemHandleBom(pMem)!=0 ){
 return SQLITE_NOMEM;
 }
 #endif
@@ -1196,8 +1196,8 @@ return SQLITE_NOMEM;
         }
 
         Debug.Assert( pMem1.enc == pMem2.enc );
-        Debug.Assert( pMem1.enc == SQLITE_UTF8 ||
-        pMem1.enc == SQLITE_UTF16LE || pMem1.enc == SQLITE_UTF16BE );
+        Debug.Assert( pMem1.enc == SqliteEncoding.UTF8 ||
+        pMem1.enc == SqliteEncoding.UTF16LE || pMem1.enc == SqliteEncoding.UTF16BE );
 
         /* The collation sequence must be defined at this point, even if
         ** the user deletes the collation sequence after the vdbe program is
@@ -1333,20 +1333,20 @@ return SQLITE_NOMEM;
     /* This function is only available internally, it is not part of the
     ** external API. It works in a similar way to sqlite3_value_text(),
     ** except the data returned is in the encoding specified by the second
-    ** parameter, which must be one of SQLITE_UTF16BE, SQLITE_UTF16LE or
-    ** SQLITE_UTF8.
+    ** parameter, which must be one of SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE or
+    ** SqliteEncoding.UTF8.
     **
-    ** (2006-02-16:)  The enc value can be or-ed with SQLITE_UTF16_ALIGNED.
+    ** (2006-02-16:)  The enc value can be or-ed with SqliteEncoding.UTF16_ALIGNED.
     ** If that is the case, then the result must be aligned on an even byte
     ** boundary.
     */
-    static string sqlite3ValueText( sqlite3_value pVal, int enc )
+    static string sqlite3ValueText( sqlite3_value pVal, SqliteEncoding enc )
     {
       if ( pVal == null )
         return null;
 
       Debug.Assert( pVal.db == null || sqlite3_mutex_held( pVal.db.mutex ) );
-      Debug.Assert( ( enc & 3 ) == ( enc & ~SQLITE_UTF16_ALIGNED ) );
+      Debug.Assert( ( enc & (SqliteEncoding)3 ) == ( enc & ~SqliteEncoding.UTF16_ALIGNED ) );
       Debug.Assert( ( pVal.flags & MEM_RowSet ) == 0 );
 
       if ( ( pVal.flags & MEM_Null ) != 0 )
@@ -1359,11 +1359,11 @@ return SQLITE_NOMEM;
         sqlite3VdbeMemExpandBlob( pVal ); // expandBlob(pVal);
       if ( ( pVal.flags & MEM_Str ) != 0 )
       {
-        if ( sqlite3VdbeChangeEncoding( pVal, enc & ~SQLITE_UTF16_ALIGNED ) != SQLITE_OK )
+        if ( sqlite3VdbeChangeEncoding( pVal, enc & ~SqliteEncoding.UTF16_ALIGNED ) != SQLITE_OK )
         {
           return null; // Encoding Error
         }
-        if ( ( enc & SQLITE_UTF16_ALIGNED ) != 0 && 1 == ( 1 & ( pVal.z[0] ) ) )  //1==(1&SQLITE_PTR_TO_INT(pVal.z))
+        if ( ( enc & SqliteEncoding.UTF16_ALIGNED ) != 0 && 1 == ( 1 & ( pVal.z[0] ) ) )  //1==(1&SQLITE_PTR_TO_INT(pVal.z))
         {
           Debug.Assert( ( pVal.flags & ( MEM_Ephem | MEM_Static ) ) != 0 );
           if ( sqlite3VdbeMemMakeWriteable( pVal ) != SQLITE_OK )
@@ -1379,10 +1379,10 @@ return SQLITE_NOMEM;
         sqlite3VdbeMemStringify( pVal, enc );
         //  assert( 0==(1&SQLITE_PTR_TO_INT(pVal->z)) );
       }
-      Debug.Assert( pVal.enc == ( enc & ~SQLITE_UTF16_ALIGNED ) || pVal.db == null
+      Debug.Assert( pVal.enc == ( enc & ~SqliteEncoding.UTF16_ALIGNED ) || pVal.db == null
         //|| pVal.db.mallocFailed != 0
       );
-      if ( pVal.enc == ( enc & ~SQLITE_UTF16_ALIGNED ) )
+      if ( pVal.enc == ( enc & ~SqliteEncoding.UTF16_ALIGNED ) )
       {
         return pVal.z;
       }
@@ -1421,7 +1421,7 @@ return SQLITE_NOMEM;
     static int sqlite3ValueFromExpr(
     sqlite3 db,              /* The database connection */
     Expr pExpr,              /* The expression to evaluate */
-    int enc,                   /* Encoding to use */
+    SqliteEncoding enc,                   /* Encoding to use */
     char affinity,              /* Affinity to use */
     ref sqlite3_value ppVal     /* Write the new value here */
     )
@@ -1475,26 +1475,26 @@ if( NEVER(op==TK_REGISTER) ) op = pExpr.op2;
         {
           zVal = sqlite3MPrintf( db, "%s%s", zNeg, pExpr.u.zToken );
           //if ( zVal == null ) goto no_mem;
-          sqlite3ValueSetStr( pVal, -1, zVal, SQLITE_UTF8, SQLITE_DYNAMIC );
+          sqlite3ValueSetStr( pVal, -1, zVal, SqliteEncoding.UTF8, SQLITE_DYNAMIC );
           if ( op == TK_FLOAT )
             pVal.type = SQLITE_FLOAT;
         }
         if ( ( op == TK_INTEGER || op == TK_FLOAT ) && affinity == SQLITE_AFF_NONE )
         {
-          sqlite3ValueApplyAffinity( pVal, SQLITE_AFF_NUMERIC, SQLITE_UTF8 );
+          sqlite3ValueApplyAffinity( pVal, SQLITE_AFF_NUMERIC, SqliteEncoding.UTF8 );
         }
         else
         {
-          sqlite3ValueApplyAffinity( pVal, affinity, SQLITE_UTF8 );
+          sqlite3ValueApplyAffinity( pVal, affinity, SqliteEncoding.UTF8 );
         }
         if ( ( pVal.flags & ( MEM_Int | MEM_Real ) ) != 0 )
           pVal.flags = (ushort)( pVal.flags & ~MEM_Str );
-        if ( enc != SQLITE_UTF8 )
+        if ( enc != SqliteEncoding.UTF8 )
         {
           sqlite3VdbeChangeEncoding( pVal, enc );
         }
       }
-      if ( enc != SQLITE_UTF8 )
+      if ( enc != SqliteEncoding.UTF8 )
       {
         sqlite3VdbeChangeEncoding( pVal, enc );
       }
@@ -1536,7 +1536,7 @@ if( NEVER(op==TK_REGISTER) ) op = pExpr.op2;
         zVal = pExpr.u.zToken.Substring( 2 );
         nVal = StringExtensions.sqlite3Strlen30( zVal ) - 1;
         Debug.Assert( zVal[nVal] == '\'' );
-        byte[] blob = sqlite3HexToBlob( db, zVal, nVal );
+        byte[] blob = Converter.sqlite3HexToBlob( db, zVal, nVal );
         sqlite3VdbeMemSetStr( pVal, Encoding.UTF8.GetString( blob, 0, blob.Length ), nVal / 2, 0, SQLITE_DYNAMIC );
       }
 #endif
@@ -1564,7 +1564,7 @@ no_mem:
     sqlite3_value v,     /* Value to be set */
     int n,               /* Length of string z */
     string z,            /* Text of the new string */
-    u8 enc,              /* Encoding to use */
+    SqliteEncoding enc,              /* Encoding to use */
     dxDel xDel//)(void*) /* Destructor for the string */
     )
     {
@@ -1587,7 +1587,7 @@ no_mem:
     ** Return the number of bytes in the sqlite3_value object assuming
     ** that it uses the encoding "enc"
     */
-    static int sqlite3ValueBytes( sqlite3_value pVal, int enc )
+    static int sqlite3ValueBytes( sqlite3_value pVal, SqliteEncoding enc )
     {
       Mem p = (Mem)pVal;
       if ( ( p.flags & MEM_Blob ) != 0 || sqlite3ValueText( pVal, enc ) != null )

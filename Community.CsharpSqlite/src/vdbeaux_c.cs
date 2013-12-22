@@ -1760,7 +1760,7 @@ void sqlite3VdbeLeave(Vdbe *p){
           Debug.Assert( pMem.z != null );
           pMem.n = StringExtensions.sqlite3Strlen30( pMem.z );
           pMem.type = SQLITE_TEXT;
-          pMem.enc = SQLITE_UTF8;
+          pMem.enc = SqliteEncoding.UTF8;
           if ( p.pResultSet[i_pMem] == null )
           {
             p.pResultSet[i_pMem] = sqlite3Malloc( p.pResultSet[i_pMem] );
@@ -1823,13 +1823,13 @@ void sqlite3VdbeLeave(Vdbe *p){
         z = displayP4( pOp, pMem.z, 32 );
         if ( z != pMem.z )
         {
-          sqlite3VdbeMemSetStr( pMem, z, -1, SQLITE_UTF8, null );
+          sqlite3VdbeMemSetStr( pMem, z, -1, SqliteEncoding.UTF8, null );
         }
         else
         {
           Debug.Assert( pMem.z != null );
           pMem.n = StringExtensions.sqlite3Strlen30( pMem.z );
-          pMem.enc = SQLITE_UTF8;
+          pMem.enc = SqliteEncoding.UTF8;
         }
         pMem.type = SQLITE_TEXT;
         if ( p.pResultSet[i_pMem] == null )
@@ -1849,7 +1849,7 @@ void sqlite3VdbeLeave(Vdbe *p){
           pMem.n = 2;
           pMem.z = pOp.p5.ToString( "x2" );  //sqlite3_snprintf( 3, pMem.z, "%.2x", pOp.p5 );   /* P5 */
           pMem.type = SQLITE_TEXT;
-          pMem.enc = SQLITE_UTF8;
+          pMem.enc = SqliteEncoding.UTF8;
           if ( p.pResultSet[i_pMem] == null )
           {
             p.pResultSet[i_pMem] = sqlite3Malloc( p.pResultSet[i_pMem] );
@@ -1862,7 +1862,7 @@ void sqlite3VdbeLeave(Vdbe *p){
             pMem.flags = MEM_Str | MEM_Term;
             pMem.z = pOp.zComment;
             pMem.n = pMem.z == null ? 0 : StringExtensions.sqlite3Strlen30( pMem.z );
-            pMem.enc = SQLITE_UTF8;
+            pMem.enc = SqliteEncoding.UTF8;
             pMem.type = SQLITE_TEXT;
           }
           else
@@ -2367,7 +2367,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       //}
       Debug.Assert( p.aColName != null );
       pColName = p.aColName[idx + var * p.nResColumn];
-      rc = sqlite3VdbeMemSetStr( pColName, zName, -1, SQLITE_UTF8, xDel );
+      rc = sqlite3VdbeMemSetStr( pColName, zName, -1, SqliteEncoding.UTF8, xDel );
       Debug.Assert( rc != 0 || null == zName || ( pColName.flags & MEM_Term ) != 0 );
       return rc;
     }
@@ -3082,7 +3082,7 @@ static void checkActiveVdbeCnt( sqlite3 db ){}
         //if ( p.zErrMsg != 0 ) // Always exists under C#
         {
           sqlite3BeginBenignMalloc();
-          sqlite3ValueSetStr( db.pErr, -1, p.zErrMsg == null ? "" : p.zErrMsg, SQLITE_UTF8, SQLITE_TRANSIENT );
+          sqlite3ValueSetStr( db.pErr, -1, p.zErrMsg == null ? "" : p.zErrMsg, SqliteEncoding.UTF8, SQLITE_TRANSIENT );
           sqlite3EndBenignMalloc();
           db.errCode = p.rc;
           sqlite3DbFree( db, ref p.zErrMsg );
@@ -3106,7 +3106,7 @@ static void checkActiveVdbeCnt( sqlite3 db ){}
         ** called), set the database error in this case as well.
         */
         sqlite3Error( db, p.rc, 0 );
-        sqlite3ValueSetStr( db.pErr, -1, p.zErrMsg, SQLITE_UTF8, SQLITE_TRANSIENT );
+        sqlite3ValueSetStr( db.pErr, -1, p.zErrMsg, SqliteEncoding.UTF8, SQLITE_TRANSIENT );
         sqlite3DbFree( db, ref p.zErrMsg );
         p.zErrMsg = "";
       }
@@ -4283,7 +4283,7 @@ idx_rowid_corruption:
           if ( pRet != null )
           {
             sqlite3VdbeMemCopy( (Mem)pRet, pMem );
-            sqlite3ValueApplyAffinity( pRet, (char)aff, SQLITE_UTF8 );
+            sqlite3ValueApplyAffinity( pRet, (char)aff, SqliteEncoding.UTF8 );
             sqlite3VdbeMemStoreType( (Mem)pRet );
           }
           return pRet;

@@ -356,12 +356,12 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
       {
         double rValue = 0.0;
         i64 iValue = 0;
-        u8 enc = pRec.enc;
+        SqliteEncoding enc = pRec.enc;
         if ( ( pRec.flags & MEM_Str ) == 0 )
           return;
-        if ( sqlite3AtoF( pRec.z, ref rValue, pRec.n, enc ) == false )
+        if ( Converter.sqlite3AtoF( pRec.z, ref rValue, pRec.n, enc ) == false )
           return;
-        if ( 0 == sqlite3Atoi64( pRec.z, ref iValue, pRec.n, enc ) )
+        if ( 0 == Converter.sqlite3Atoi64( pRec.z, ref iValue, pRec.n, enc ) )
         {
           pRec.u.i = iValue;
           pRec.flags |= MEM_Int;
@@ -395,7 +395,7 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
     static void applyAffinity(
     Mem pRec,          /* The value to apply affinity to */
     char affinity,      /* The affinity to be applied */
-    int enc              /* Use this text encoding */
+    SqliteEncoding enc              /* Use this text encoding */
     )
     {
       if ( affinity == SQLITE_AFF_TEXT )
@@ -455,7 +455,7 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
     static void sqlite3ValueApplyAffinity(
     sqlite3_value pVal,
     char affinity,
-    int enc
+    SqliteEncoding enc
     )
     {
       applyAffinity( (Mem)pVal, affinity, enc );
@@ -734,7 +734,7 @@ static int checkSavepointCount( sqlite3 db ) { return 1; }
       int rc = SQLITE_OK;        /* Value to return */
       sqlite3 db = p.db;         /* The database */
       u8 resetSchemaOnFault = 0; /* Reset schema after an error if positive */
-      u8 encoding = ENC( db );   /* The database encoding */
+      SqliteEncoding encoding = ENC( db );   /* The database encoding */
 #if !SQLITE_OMIT_PROGRESS_CALLBACK
       bool checkProgress;        /* True if progress callbacks are enabled */
       int nProgressOps = 0;      /* Opcodes executed since progress callback. */
@@ -1150,8 +1150,8 @@ start = sqlite3Hwtime();
               pOp.p1 = StringExtensions.sqlite3Strlen30( pOp.p4.z );
 
 #if !SQLITE_OMIT_UTF16
-if( encoding!=SQLITE_UTF8 ){
-rc = sqlite3VdbeMemSetStr(pOut, pOp.p4.z, -1, SQLITE_UTF8, SQLITE_STATIC);
+if( encoding!=SqliteEncoding.UTF8 ){
+rc = sqlite3VdbeMemSetStr(pOut, pOp.p4.z, -1, SqliteEncoding.UTF8, SQLITE_STATIC);
 if( rc==SQLITE_TOOBIG ) goto too_big;
 if( SQLITE_OK!=sqlite3VdbeChangeEncoding(pOut, encoding) ) goto no_mem;
 Debug.Assert( pOut.zMalloc==pOut.z );
@@ -1187,7 +1187,7 @@ pOp.p1 = pOut.n;
               pOut.z = pOp.p4.z;
               pOut.n = pOp.p1;
 #if SQLITE_OMIT_UTF16
-              pOut.enc = SQLITE_UTF8;
+              pOut.enc = SqliteEncoding.UTF8;
 #else             
               pOut.enc = encoding;
 #endif
@@ -3090,7 +3090,7 @@ op_column_out:
                 pOut.u.nZero = nZero;
                 pOut.flags |= MEM_Zero;
               }
-              pOut.enc = SQLITE_UTF8;  /* In case the blob is ever converted to text */
+              pOut.enc = SqliteEncoding.UTF8;  /* In case the blob is ever converted to text */
               REGISTER_TRACE( p, pOp.p3, pOut );
 #if SQLITE_TEST
               UPDATE_MAX_BLOBSIZE( pOut );
@@ -4939,7 +4939,7 @@ const int MAX_ROWID = i32.MaxValue;//#   define MAX_ROWID 0x7fffffff
                 rc = sqlite3BtreeData( pCrsr, 0, (u32)n, pOut.zBLOB );
               }
               MemSetTypeFlag( pOut, MEM_Blob );
-              pOut.enc = SQLITE_UTF8;  /* In case the blob is ever cast to text */
+              pOut.enc = SqliteEncoding.UTF8;  /* In case the blob is ever cast to text */
 #if SQLITE_TEST
               UPDATE_MAX_BLOBSIZE( pOut );
 #endif
@@ -5746,7 +5746,7 @@ const int MAX_ROWID = i32.MaxValue;//#   define MAX_ROWID 0x7fffffff
               }
               else
               {
-                sqlite3VdbeMemSetStr( pIn1, z, -1, SQLITE_UTF8, null ); //sqlite3_free );
+                sqlite3VdbeMemSetStr( pIn1, z, -1, SqliteEncoding.UTF8, null ); //sqlite3_free );
               }
 #if SQLITE_TEST
               UPDATE_MAX_BLOBSIZE( pIn1 );
@@ -6395,7 +6395,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
               pOut.flags = MEM_Str | MEM_Static | MEM_Term;
               pOut.z = sqlite3JournalModename( eNew );
               pOut.n = StringExtensions.sqlite3Strlen30( pOut.z );
-              pOut.enc = SQLITE_UTF8;
+              pOut.enc = SqliteEncoding.UTF8;
               sqlite3VdbeChangeEncoding( pOut, encoding );
               break;
             };

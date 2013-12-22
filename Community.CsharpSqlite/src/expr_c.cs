@@ -721,7 +721,7 @@ StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
         /* Wildcard of the form "?nnn".  Convert "nnn" to an integer and
         ** use it as the variable number */
         i64 i = 0;
-        bool bOk = 0 == sqlite3Atoi64( z.Substring( 1 ), ref i, n - 1, SQLITE_UTF8 );
+        bool bOk = 0 == Converter.sqlite3Atoi64( z.Substring( 1 ), ref i, n - 1, SqliteEncoding.UTF8 );
         pExpr.iColumn = x=(ynVar)i;
         testcase( i == 0 );
         testcase( i == 1 );
@@ -2321,7 +2321,7 @@ return null;
       {
         double value = 0;
         //string zV;
-        sqlite3AtoF( z, ref value, StringExtensions.sqlite3Strlen30( z ), SQLITE_UTF8 );
+        Converter.sqlite3AtoF( z, ref value, StringExtensions.sqlite3Strlen30( z ), SqliteEncoding.UTF8 );
         Debug.Assert( !MathExtensions.sqlite3IsNaN( value ) ); /* The new AtoF never returns NaN */
         if ( negateFlag )
           value = -value;
@@ -2354,7 +2354,7 @@ return null;
         i64 value = 0;
         string z = pExpr.u.zToken;
         Debug.Assert( !String.IsNullOrEmpty( z ) );
-        c = sqlite3Atoi64( z, ref value, StringExtensions.sqlite3Strlen30( z ), SQLITE_UTF8 );
+        c = Converter.sqlite3Atoi64( z, ref value, StringExtensions.sqlite3Strlen30( z ), SqliteEncoding.UTF8 );
         if ( c == 0 || ( c == 2 && negFlag ) )
         {
           //char* zV;
@@ -2812,7 +2812,7 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
             z = pExpr.u.zToken.Substring( 2 );
             n = StringExtensions.sqlite3Strlen30( z ) - 1;
             Debug.Assert( z[n] == '\'' );
-            zBlob = sqlite3HexToBlob( sqlite3VdbeDb( v ), z, n );
+            zBlob = Converter.sqlite3HexToBlob( sqlite3VdbeDb( v ), z, n );
             sqlite3VdbeAddOp4( v, OP_Blob, n / 2, target, 0, zBlob, P4_DYNAMIC );
             break;
           }
@@ -3033,7 +3033,7 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
             string zId;            /* The function name */
             int constMask = 0;     /* Mask of function arguments that are constant */
             int i;                 /* Loop counter */
-            u8 enc = ENC( db );    /* The text encoding used by this database */
+            SqliteEncoding enc = ENC( db );    /* The text encoding used by this database */
             CollSeq pColl = null;  /* A collating sequence */
 
             Debug.Assert( !ExprHasProperty( pExpr, EP_xIsSelect ) );
@@ -4279,7 +4279,7 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
               {
                 /* pExpr is original.  Make a new entry in pAggInfo.aFunc[]
                 */
-                u8 enc = pParse.db.aDbStatic[0].pSchema.enc;// ENC(pParse.db);
+                SqliteEncoding enc = pParse.db.aDbStatic[0].pSchema.enc;// ENC(pParse.db);
                 i = addAggInfoFunc( pParse.db, pAggInfo );
                 if ( i >= 0 )
                 {
