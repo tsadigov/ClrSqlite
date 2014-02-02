@@ -45,12 +45,14 @@ namespace Community.CsharpSqlite
     }
     public static sqlite3StatType sqlite3Stat = new sqlite3StatType();
 
-    /* The "wsdStat" macro will resolve to the status information
-    ** state vector.  If writable static data is unsupported on the target,
-    ** we have to locate the state vector at run-time.  In the more common
-    ** case where writable static data is supported, wsdStat can refer directly
-    ** to the "sqlite3Stat" state vector declared above.
-    */
+    ///<summary>
+///The "wsdStat" macro will resolve to the status information
+/// state vector.  If writable static data is unsupported on the target,
+/// we have to locate the state vector at run-time.  In the more common
+/// case where writable static data is supported, wsdStat can refer directly
+/// to the "sqlite3Stat" state vector declared above.
+///
+///</summary>
 #if SQLITE_OMIT_WSD
 //# define wsdStatInit  sqlite3StatType *x = &GLOBAL(sqlite3StatType,sqlite3Stat)
 //# define wsdStat x[0]
@@ -63,9 +65,9 @@ namespace Community.CsharpSqlite
     static sqlite3StatType wsdStat = sqlite3Stat;
 #endif
 
-    /*
-** Return the current value of a status parameter.
-*/
+    ///<summary>
+/// Return the current value of a status parameter.
+///</summary>
     static int sqlite3StatusValue( int op )
     {
       wsdStatInit();
@@ -73,10 +75,11 @@ namespace Community.CsharpSqlite
       return wsdStat.nowValue[op];
     }
 
-    /*
-    ** Add N to the value of a status record.  It is assumed that the
-    ** caller holds appropriate locks.
-    */
+    ///<summary>
+/// Add N to the value of a status record.  It is assumed that the
+/// caller holds appropriate locks.
+///
+///</summary>
     static void sqlite3StatusAdd( int op, int N )
     {
       wsdStatInit();
@@ -88,9 +91,10 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Set the value of a status to X.
-    */
+    ///<summary>
+/// Set the value of a status to X.
+///
+///</summary>
     static void sqlite3StatusSet( int op, int X )
     {
       wsdStatInit();
@@ -102,13 +106,14 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Query status information.
-    **
-    ** This implementation assumes that reading or writing an aligned
-    ** 32-bit integer is an atomic operation.  If that assumption is not true,
-    ** then this routine is not threadsafe.
-    */
+    ///<summary>
+/// Query status information.
+///
+/// This implementation assumes that reading or writing an aligned
+/// 32-bit integer is an atomic operation.  If that assumption is not true,
+/// then this routine is not threadsafe.
+///
+///</summary>
     static int sqlite3_status( int op, ref int pCurrent, ref int pHighwater, int resetFlag )
     {
       wsdStatInit();

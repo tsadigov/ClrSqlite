@@ -11,35 +11,37 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-    /*
-    ** 2001 September 15
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    **
-    ** Memory allocation functions used throughout sqlite.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2001 September 15
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+///
+/// Memory allocation functions used throughout sqlite.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
     //#include <stdarg.h>
 
-    /*
-    ** Attempt to release up to n bytes of non-essential memory currently
-    ** held by SQLite. An example of non-essential memory is memory used to
-    ** cache database pages that are not currently in use.
-    */
+    ///<summary>
+/// Attempt to release up to n bytes of non-essential memory currently
+/// held by SQLite. An example of non-essential memory is memory used to
+/// cache database pages that are not currently in use.
+///
+///</summary>
     static int sqlite3_release_memory( int n )
     {
 #if SQLITE_ENABLE_MEMORY_MANAGEMENT
@@ -139,11 +141,12 @@ return nRet;
     //#define mem0 GLOBAL(struct Mem0Global, mem0)
     static Mem0Global mem0 = new Mem0Global();
 
-    /*
-    ** This routine runs when the memory allocator sees that the
-    ** total memory allocation is about to exceed the soft heap
-    ** limit.
-    */
+    ///<summary>
+/// This routine runs when the memory allocator sees that the
+/// total memory allocation is about to exceed the soft heap
+/// limit.
+///
+///</summary>
     static void softHeapLimitEnforcer(
     object NotUsed,
     sqlite3_int64 NotUsed2,
@@ -155,10 +158,10 @@ return nRet;
     }
 
 #if !SQLITE_OMIT_DEPRECATED
-/*
-** Deprecated external interface.  Internal/core SQLite code
-** should call sqlite3MemoryAlarm.
-*/
+///<summary>
+/// Deprecated external interface.  Internal/core SQLite code
+/// should call sqlite3MemoryAlarm.
+///</summary>
 int sqlite3_memory_alarm(
 void(*xCallback)(void *pArg, sqlite3_int64 used,int N),
 void *pArg,
@@ -168,10 +171,10 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
 }
 #endif
 
-    /*
-** Set the soft heap-size limit for the library. Passing a zero or 
-** negative value indicates no limit.
-*/
+    ///<summary>
+/// Set the soft heap-size limit for the library. Passing a zero or
+/// negative value indicates no limit.
+///</summary>
     static sqlite3_int64 sqlite3_soft_heap_limit64( sqlite3_int64 n )
     {
       sqlite3_int64 priorLimit;
@@ -204,9 +207,10 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
       sqlite3_soft_heap_limit64( n );
     }
 
-    /*
-    ** Initialize the memory allocation subsystem.
-    */
+    ///<summary>
+/// Initialize the memory allocation subsystem.
+///
+///</summary>
     static int sqlite3MallocInit()
     {
       if ( sqlite3GlobalConfig.m.xMalloc == null )
@@ -243,19 +247,21 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
       return sqlite3GlobalConfig.m.xInit( sqlite3GlobalConfig.m.pAppData );
     }
 
-    /*
-    ** Return true if the heap is currently under memory pressure - in other
-    ** words if the amount of heap used is close to the limit set by
-    ** sqlite3_soft_heap_limit().
-    */
+    ///<summary>
+/// Return true if the heap is currently under memory pressure - in other
+/// words if the amount of heap used is close to the limit set by
+/// sqlite3_soft_heap_limit().
+///
+///</summary>
     static bool sqlite3HeapNearlyFull()
     {
       return mem0.nearlyFull;
     }
 
-    /*
-    ** Deinitialize the memory allocation subsystem.
-    */
+    ///<summary>
+/// Deinitialize the memory allocation subsystem.
+///
+///</summary>
     static void sqlite3MallocEnd()
     {
       if ( sqlite3GlobalConfig.m.xShutdown != null )
@@ -265,9 +271,10 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
       mem0 = new Mem0Global();//memset(&mem0, 0, sizeof(mem0));
     }
 
-    /*
-    ** Return the amount of memory currently checked out.
-    */
+    ///<summary>
+/// Return the amount of memory currently checked out.
+///
+///</summary>
     static sqlite3_int64 sqlite3_memory_used()
     {
       int n = 0, mx = 0;
@@ -277,11 +284,12 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
       return res;
     }
 
-    /*
-    ** Return the maximum amount of memory that has ever been
-    ** checked out since either the beginning of this process
-    ** or since the most recent reset.
-    */
+    ///<summary>
+/// Return the maximum amount of memory that has ever been
+/// checked out since either the beginning of this process
+/// or since the most recent reset.
+///
+///</summary>
     static sqlite3_int64 sqlite3_memory_highwater( int resetFlag )
     {
       int n = 0, mx = 0;
@@ -291,9 +299,10 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
       return res;
     }
 
-    /*
-    ** Change the alarm callback
-    */
+    ///<summary>
+/// Change the alarm callback
+///
+///</summary>
     static int sqlite3MemoryAlarm(
     dxalarmCallback xCallback, //void(*xCallback)(object pArg, sqlite3_int64 used,int N),
     object pArg,
@@ -311,9 +320,10 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
       return SQLITE_OK;
     }
 
-    /*
-    ** Trigger the alarm 
-    */
+    ///<summary>
+/// Trigger the alarm
+///
+///</summary>
     static void sqlite3MallocAlarm( int nByte )
     {
       dxalarmCallback xCallback;//void (*xCallback)(void*,sqlite3_int64,int);
@@ -332,10 +342,11 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
       mem0.alarmArg = pArg;
     }
 
-    /*
-    ** Do a memory allocation with statistics and alarms.  Assume the
-    ** lock is already held.
-    */
+    ///<summary>
+/// Do a memory allocation with statistics and alarms.  Assume the
+/// lock is already held.
+///
+///</summary>
     static int mallocWithAlarm( int n, ref int[] pp )
     {
       int nFull;
@@ -402,10 +413,11 @@ p = sqlite3GlobalConfig.m.xMalloc(nFull);
       return nFull;
     }
 
-    /*
-    ** Allocate memory.  This routine is like sqlite3_malloc() except that it
-    ** assumes the memory subsystem has already been initialized.
-    */
+    ///<summary>
+/// Allocate memory.  This routine is like sqlite3_malloc() except that it
+/// assumes the memory subsystem has already been initialized.
+///
+///</summary>
     static Mem sqlite3Malloc( Mem pMem )
     {
       return sqlite3GlobalConfig.m.xMallocMem( pMem );
@@ -483,25 +495,26 @@ p = sqlite3GlobalConfig.m.xMalloc(nFull);
       return sqlite3Malloc( n );
     }
 
-    /*
-    ** Each thread may only have a single outstanding allocation from
-    ** xScratchMalloc().  We verify this constraint in the single-threaded
-    ** case by setting scratchAllocOut to 1 when an allocation
-    ** is outstanding clearing it when the allocation is freed.
-    */
+    ///<summary>
+/// Each thread may only have a single outstanding allocation from
+/// xScratchMalloc().  We verify this constraint in the single-threaded
+/// case by setting scratchAllocOut to 1 when an allocation
+/// is outstanding clearing it when the allocation is freed.
+///
+///</summary>
 #if SQLITE_THREADSAFE && !(NDEBUG)
     static int scratchAllocOut = 0;
 #endif
 
 
-    /*
-** Allocate memory that is to be used and released right away.
-** This routine is similar to alloca() in that it is not intended
-** for situations where the memory might be held long-term.  This
-** routine is intended to get memory to old large transient data
-** structures that would not normally fit on the stack of an
-** embedded processor.
-*/
+    ///<summary>
+/// Allocate memory that is to be used and released right away.
+/// This routine is similar to alloca() in that it is not intended
+/// for situations where the memory might be held long-term.  This
+/// routine is intended to get memory to old large transient data
+/// structures that would not normally fit on the stack of an
+/// embedded processor.
+///</summary>
     static byte[][] sqlite3ScratchMalloc( byte[][] apCell, int n )
     {
       apCell = sqlite3GlobalConfig.pScratch2;
@@ -661,9 +674,10 @@ scratch_overflow:
       }
     }
 
-    /*
-    ** TRUE if p is a lookaside memory allocation from db
-    */
+    ///<summary>
+/// TRUE if p is a lookaside memory allocation from db
+///
+///</summary>
 #if !SQLITE_OMIT_LOOKASIDE
 static int isLookaside(sqlite3 db, object  *p){
 return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
@@ -676,10 +690,10 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
     }
 #endif
 
-    /*
-** Return the size of a memory allocation previously obtained from
-** sqlite3Malloc() or sqlite3_malloc().
-*/
+    ///<summary>
+/// Return the size of a memory allocation previously obtained from
+/// sqlite3Malloc() or sqlite3_malloc().
+///</summary>
     //int sqlite3MallocSize(void* p)
     //{
     //  Debug.Assert(sqlite3MemdebugHasType(p, MemType.HEAP));
@@ -717,9 +731,10 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
       }
     }
 
-    /*
-    ** Free memory previously obtained from sqlite3Malloc().
-    */
+    ///<summary>
+/// Free memory previously obtained from sqlite3Malloc().
+///
+///</summary>
     static void sqlite3_free( ref byte[] p )
     {
       if ( p == null )
@@ -758,10 +773,11 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
       p = null;
     }
 
-    /*
-    ** Free memory that might be associated with a particular database
-    ** connection.
-    */
+    ///<summary>
+/// Free memory that might be associated with a particular database
+/// connection.
+///
+///</summary>
     static void sqlite3DbFree( sqlite3 db, ref byte[] p )
     {
       Debug.Assert( db == null || sqlite3_mutex_held( db.mutex ) );
@@ -794,9 +810,10 @@ db.lookaside.nOut--;
       }
     }
 
-    /*
-    ** Change the size of an existing memory allocation
-    */
+    ///<summary>
+/// Change the size of an existing memory allocation
+///
+///</summary>
     static byte[] sqlite3Realloc( byte[] pOld, int nBytes )
     {
       int nOld, nNew, nDiff;
@@ -854,10 +871,11 @@ db.lookaside.nOut--;
       return pNew;
     }
 
-    /*
-    ** The public interface to sqlite3Realloc.  Make sure that the memory
-    ** subsystem is initialized prior to invoking sqliteRealloc.
-    */
+    ///<summary>
+/// The public interface to sqlite3Realloc.  Make sure that the memory
+/// subsystem is initialized prior to invoking sqliteRealloc.
+///
+///</summary>
     static byte[] sqlite3_realloc( byte[] pOld, int n )
     {
 #if !SQLITE_OMIT_AUTOINIT
@@ -868,9 +886,10 @@ db.lookaside.nOut--;
     }
 
 
-    /*
-    ** Allocate and zero memory.
-    */
+    ///<summary>
+/// Allocate and zero memory.
+///
+///</summary>
     static byte[] sqlite3MallocZero( int n )
     {
       byte[] p = sqlite3Malloc( n );
@@ -881,10 +900,11 @@ db.lookaside.nOut--;
       return p;
     }
 
-    /*
-    ** Allocate and zero memory.  If the allocation fails, make
-    ** the mallocFailed flag in the connection pointer.
-    */
+    ///<summary>
+/// Allocate and zero memory.  If the allocation fails, make
+/// the mallocFailed flag in the connection pointer.
+///
+///</summary>
     static Mem sqlite3DbMallocZero( sqlite3 db, Mem m )
     {
       return new Mem();
@@ -900,24 +920,25 @@ db.lookaside.nOut--;
       return p;
     }
 
-    /*
-    ** Allocate and zero memory.  If the allocation fails, make
-    ** the mallocFailed flag in the connection pointer.
-    **
-    ** If db!=0 and db->mallocFailed is true (indicating a prior malloc
-    ** failure on the same database connection) then always return 0.
-    ** Hence for a particular database connection, once malloc starts
-    ** failing, it fails consistently until mallocFailed is reset.
-    ** This is an important assumption.  There are many places in the
-    ** code that do things like this:
-    **
-    **         int *a = (int)sqlite3DbMallocRaw(db, 100);
-    **         int *b = (int)sqlite3DbMallocRaw(db, 200);
-    **         if( b ) a[10] = 9;
-    **
-    ** In other words, if a subsequent malloc (ex: "b") worked, it is assumed
-    ** that all prior mallocs (ex: "a") worked too.
-    */
+    ///<summary>
+/// Allocate and zero memory.  If the allocation fails, make
+/// the mallocFailed flag in the connection pointer.
+///
+/// If db!=0 and db->mallocFailed is true (indicating a prior malloc
+/// failure on the same database connection) then always return 0.
+/// Hence for a particular database connection, once malloc starts
+/// failing, it fails consistently until mallocFailed is reset.
+/// This is an important assumption.  There are many places in the
+/// code that do things like this:
+///
+///         int *a = (int)sqlite3DbMallocRaw(db, 100);
+///         int *b = (int)sqlite3DbMallocRaw(db, 200);
+///         if( b ) a[10] = 9;
+///
+/// In other words, if a subsequent malloc (ex: "b") worked, it is assumed
+/// that all prior mallocs (ex: "a") worked too.
+///
+///</summary>
     static byte[] sqlite3DbMallocRaw( sqlite3 db, int n )
     {
       byte[] p;

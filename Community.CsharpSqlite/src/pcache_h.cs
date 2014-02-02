@@ -63,7 +63,9 @@ namespace Community.CsharpSqlite
 
       public PgHdr pDirtyNext;      /* Next element in list of dirty pages */
       public PgHdr pDirtyPrev;      /* Previous element in list of dirty pages */
-      public PgHdr1 pPgHdr1;        /* Cache page header this this page */
+      public PgHdr1 pPgHdr1;        ///<summary>
+///Cache page header this this page
+///</summary>
 
       public static implicit operator bool( PgHdr b )
       {

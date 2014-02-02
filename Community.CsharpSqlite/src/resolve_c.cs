@@ -20,60 +20,62 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-    /*
-    ** 2008 August 18
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    **
-    ** This file contains routines used for walking the parser tree and
-    ** resolve all identifiers by associating them with a particular
-    ** table and column.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2008 August 18
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+///
+/// This file contains routines used for walking the parser tree and
+/// resolve all identifiers by associating them with a particular
+/// table and column.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
     //#include <stdlib.h>
     //#include <string.h>
 
-    /*
-    ** Turn the pExpr expression into an alias for the iCol-th column of the
-    ** result set in pEList.
-    **
-    ** If the result set column is a simple column reference, then this routine
-    ** makes an exact copy.  But for any other kind of expression, this
-    ** routine make a copy of the result set column as the argument to the
-    ** TK_AS operator.  The TK_AS operator causes the expression to be
-    ** evaluated just once and then reused for each alias.
-    **
-    ** The reason for suppressing the TK_AS term when the expression is a simple
-    ** column reference is so that the column reference will be recognized as
-    ** usable by indices within the WHERE clause processing logic.
-    **
-    ** Hack:  The TK_AS operator is inhibited if zType[0]=='G'.  This means
-    ** that in a GROUP BY clause, the expression is evaluated twice.  Hence:
-    **
-    **     SELECT random()%5 AS x, count(*) FROM tab GROUP BY x
-    **
-    ** Is equivalent to:
-    **
-    **     SELECT random()%5 AS x, count(*) FROM tab GROUP BY random()%5
-    **
-    ** The result of random()%5 in the GROUP BY clause is probably different
-    ** from the result in the result-set.  We might fix this someday.  Or
-    ** then again, we might not...
-    */
+    ///<summary>
+/// Turn the pExpr expression into an alias for the iCol-th column of the
+/// result set in pEList.
+///
+/// If the result set column is a simple column reference, then this routine
+/// makes an exact copy.  But for any other kind of expression, this
+/// routine make a copy of the result set column as the argument to the
+/// TK_AS operator.  The TK_AS operator causes the expression to be
+/// evaluated just once and then reused for each alias.
+///
+/// The reason for suppressing the TK_AS term when the expression is a simple
+/// column reference is so that the column reference will be recognized as
+/// usable by indices within the WHERE clause processing logic.
+///
+/// Hack:  The TK_AS operator is inhibited if zType[0]=='G'.  This means
+/// that in a GROUP BY clause, the expression is evaluated twice.  Hence:
+///
+///     SELECT random()%5 AS x, count(*) FROM tab GROUP BY x
+///
+/// Is equivalent to:
+///
+///     SELECT random()%5 AS x, count(*) FROM tab GROUP BY random()%5
+///
+/// The result of random()%5 in the GROUP BY clause is probably different
+/// from the result in the result-set.  We might fix this someday.  Or
+/// then again, we might not...
+///
+///</summary>
     static void resolveAlias(
     Parse pParse,         /* Parsing context */
     ExprList pEList,      /* A result set */
@@ -138,33 +140,34 @@ namespace Community.CsharpSqlite
       sqlite3DbFree( db, ref pDup );
     }
 
-    /*
-    ** Given the name of a column of the form X.Y.Z or Y.Z or just Z, look up
-    ** that name in the set of source tables in pSrcList and make the pExpr
-    ** expression node refer back to that source column.  The following changes
-    ** are made to pExpr:
-    **
-    **    pExpr->iDb           Set the index in db->aDb[] of the database X
-    **                         (even if X is implied).
-    **    pExpr->iTable        Set to the cursor number for the table obtained
-    **                         from pSrcList.
-    **    pExpr->pTab          Points to the Table structure of X.Y (even if
-    **                         X and/or Y are implied.)
-    **    pExpr->iColumn       Set to the column number within the table.
-    **    pExpr->op            Set to TK_COLUMN.
-    **    pExpr->pLeft         Any expression this points to is deleted
-    **    pExpr->pRight        Any expression this points to is deleted.
-    **
-    ** The zDb variable is the name of the database (the "X").  This value may be
-    ** NULL meaning that name is of the form Y.Z or Z.  Any available database
-    ** can be used.  The zTable variable is the name of the table (the "Y").  This
-    ** value can be NULL if zDb is also NULL.  If zTable is NULL it
-    ** means that the form of the name is Z and that columns from any table
-    ** can be used.
-    **
-    ** If the name cannot be resolved unambiguously, leave an error message
-    ** in pParse and return WRC_Abort.  Return WRC_Prune on success.
-    */
+    ///<summary>
+/// Given the name of a column of the form X.Y.Z or Y.Z or just Z, look up
+/// that name in the set of source tables in pSrcList and make the pExpr
+/// expression node refer back to that source column.  The following changes
+/// are made to pExpr:
+///
+///    pExpr->iDb           Set the index in db->aDb[] of the database X
+///                         (even if X is implied).
+///    pExpr->iTable        Set to the cursor number for the table obtained
+///                         from pSrcList.
+///    pExpr->pTab          Points to the Table structure of X.Y (even if
+///                         X and/or Y are implied.)
+///    pExpr->iColumn       Set to the column number within the table.
+///    pExpr->op            Set to TK_COLUMN.
+///    pExpr->pLeft         Any expression this points to is deleted
+///    pExpr->pRight        Any expression this points to is deleted.
+///
+/// The zDb variable is the name of the database (the "X").  This value may be
+/// NULL meaning that name is of the form Y.Z or Z.  Any available database
+/// can be used.  The zTable variable is the name of the table (the "Y").  This
+/// value can be NULL if zDb is also NULL.  If zTable is NULL it
+/// means that the form of the name is Z and that columns from any table
+/// can be used.
+///
+/// If the name cannot be resolved unambiguously, leave an error message
+/// in pParse and return WRC_Abort.  Return WRC_Prune on success.
+///
+///</summary>
     static int lookupName(
     Parse pParse,       /* The parsing context */
     string zDb,         /* Name of the database containing table, or NULL */
@@ -499,10 +502,11 @@ lookupname_end:
       }
     }
 
-    /*
-    ** Allocate and return a pointer to an expression to load the column iCol
-    ** from datasource iSrc in SrcList pSrc.
-    */
+    ///<summary>
+/// Allocate and return a pointer to an expression to load the column iCol
+/// from datasource iSrc in SrcList pSrc.
+///
+///</summary>
     static Expr sqlite3CreateColumnExpr( sqlite3 db, SrcList pSrc, int iSrc, int iCol )
     {
       Expr p = sqlite3ExprAlloc( db, TK_COLUMN, null, 0 );
@@ -527,17 +531,18 @@ lookupname_end:
       return p;
     }
 
-    /*
-    ** This routine is callback for sqlite3WalkExpr().
-    **
-    ** Resolve symbolic names into TK_COLUMN operators for the current
-    ** node in the expression tree.  Return 0 to continue the search down
-    ** the tree or 2 to abort the tree walk.
-    **
-    ** This routine also does error checking and name resolution for
-    ** function names.  The operator for aggregate functions is changed
-    ** to TK_AGG_FUNCTION.
-    */
+    ///<summary>
+/// This routine is callback for sqlite3WalkExpr().
+///
+/// Resolve symbolic names into TK_COLUMN operators for the current
+/// node in the expression tree.  Return 0 to continue the search down
+/// the tree or 2 to abort the tree walk.
+///
+/// This routine also does error checking and name resolution for
+/// function names.  The operator for aggregate functions is changed
+/// to TK_AGG_FUNCTION.
+///
+///</summary>
     static int resolveExprStep( Walker pWalker, ref Expr pExpr )
     {
       NameContext pNC;
@@ -745,18 +750,19 @@ return WRC_Prune;
       return ( pParse.nErr != 0 /* || pParse.db.mallocFailed != 0 */ ) ? WRC_Abort : WRC_Continue;
     }
 
-    /*
-    ** pEList is a list of expressions which are really the result set of the
-    ** a SELECT statement.  pE is a term in an ORDER BY or GROUP BY clause.
-    ** This routine checks to see if pE is a simple identifier which corresponds
-    ** to the AS-name of one of the terms of the expression list.  If it is,
-    ** this routine return an integer between 1 and N where N is the number of
-    ** elements in pEList, corresponding to the matching entry.  If there is
-    ** no match, or if pE is not a simple identifier, then this routine
-    ** return 0.
-    **
-    ** pEList has been resolved.  pE has not.
-    */
+    ///<summary>
+/// pEList is a list of expressions which are really the result set of the
+/// a SELECT statement.  pE is a term in an ORDER BY or GROUP BY clause.
+/// This routine checks to see if pE is a simple identifier which corresponds
+/// to the AS-name of one of the terms of the expression list.  If it is,
+/// this routine return an integer between 1 and N where N is the number of
+/// elements in pEList, corresponding to the matching entry.  If there is
+/// no match, or if pE is not a simple identifier, then this routine
+/// return 0.
+///
+/// pEList has been resolved.  pE has not.
+///
+///</summary>
     static int resolveAsName(
     Parse pParse,     /* Parsing context for error messages */
     ExprList pEList,  /* List of expressions to scan */
@@ -783,24 +789,25 @@ return WRC_Prune;
       return 0;
     }
 
-    /*
-    ** pE is a pointer to an expression which is a single term in the
-    ** ORDER BY of a compound SELECT.  The expression has not been
-    ** name resolved.
-    **
-    ** At the point this routine is called, we already know that the
-    ** ORDER BY term is not an integer index into the result set.  That
-    ** case is handled by the calling routine.
-    **
-    ** Attempt to match pE against result set columns in the left-most
-    ** SELECT statement.  Return the index i of the matching column,
-    ** as an indication to the caller that it should sort by the i-th column.
-    ** The left-most column is 1.  In other words, the value returned is the
-    ** same integer value that would be used in the SQL statement to indicate
-    ** the column.
-    **
-    ** If there is no match, return 0.  Return -1 if an error occurs.
-    */
+    ///<summary>
+/// pE is a pointer to an expression which is a single term in the
+/// ORDER BY of a compound SELECT.  The expression has not been
+/// name resolved.
+///
+/// At the point this routine is called, we already know that the
+/// ORDER BY term is not an integer index into the result set.  That
+/// case is handled by the calling routine.
+///
+/// Attempt to match pE against result set columns in the left-most
+/// SELECT statement.  Return the index i of the matching column,
+/// as an indication to the caller that it should sort by the i-th column.
+/// The left-most column is 1.  In other words, the value returned is the
+/// same integer value that would be used in the SQL statement to indicate
+/// the column.
+///
+/// If there is no match, return 0.  Return -1 if an error occurs.
+///
+///</summary>
     static int resolveOrderByTermToExprList(
     Parse pParse,     /* Parsing context for error messages */
     Select pSelect,   /* The SELECT statement with the ORDER BY clause */
@@ -849,9 +856,10 @@ return WRC_Prune;
       return 0;
     }
 
-    /*
-    ** Generate an ORDER BY or GROUP BY term out-of-range error.
-    */
+    ///<summary>
+/// Generate an ORDER BY or GROUP BY term out-of-range error.
+///
+///</summary>
     static void resolveOutOfRangeError(
     Parse pParse,         /* The error context into which to write the error */
     string zType,     /* "ORDER" or "GROUP" */
@@ -864,21 +872,22 @@ return WRC_Prune;
       "between 1 and %d", i, zType, mx );
     }
 
-    /*
-    ** Analyze the ORDER BY clause in a compound SELECT statement.   Modify
-    ** each term of the ORDER BY clause is a constant integer between 1
-    ** and N where N is the number of columns in the compound SELECT.
-    **
-    ** ORDER BY terms that are already an integer between 1 and N are
-    ** unmodified.  ORDER BY terms that are integers outside the range of
-    ** 1 through N generate an error.  ORDER BY terms that are expressions
-    ** are matched against result set expressions of compound SELECT
-    ** beginning with the left-most SELECT and working toward the right.
-    ** At the first match, the ORDER BY expression is transformed into
-    ** the integer column number.
-    **
-    ** Return the number of errors seen.
-    */
+    ///<summary>
+/// Analyze the ORDER BY clause in a compound SELECT statement.   Modify
+/// each term of the ORDER BY clause is a constant integer between 1
+/// and N where N is the number of columns in the compound SELECT.
+///
+/// ORDER BY terms that are already an integer between 1 and N are
+/// unmodified.  ORDER BY terms that are integers outside the range of
+/// 1 through N generate an error.  ORDER BY terms that are expressions
+/// are matched against result set expressions of compound SELECT
+/// beginning with the left-most SELECT and working toward the right.
+/// At the first match, the ORDER BY expression is transformed into
+/// the integer column number.
+///
+/// Return the number of errors seen.
+///
+///</summary>
     static int resolveCompoundOrderBy(
     Parse pParse,        /* Parsing context.  Leave error messages here */
     Select pSelect       /* The SELECT statement containing the ORDER BY */
@@ -980,16 +989,17 @@ return WRC_Prune;
       return 0;
     }
 
-    /*
-    ** Check every term in the ORDER BY or GROUP BY clause pOrderBy of
-    ** the SELECT statement pSelect.  If any term is reference to a
-    ** result set expression (as determined by the ExprList.a.iCol field)
-    ** then convert that term into a copy of the corresponding result set
-    ** column.
-    **
-    ** If any errors are detected, add an error message to pParse and
-    ** return non-zero.  Return zero if no errors are seen.
-    */
+    ///<summary>
+/// Check every term in the ORDER BY or GROUP BY clause pOrderBy of
+/// the SELECT statement pSelect.  If any term is reference to a
+/// result set expression (as determined by the ExprList.a.iCol field)
+/// then convert that term into a copy of the corresponding result set
+/// column.
+///
+/// If any errors are detected, add an error message to pParse and
+/// return non-zero.  Return zero if no errors are seen.
+///
+///</summary>
     static int sqlite3ResolveOrderGroupBy(
     Parse pParse,        /* Parsing context.  Leave error messages here */
     Select pSelect,      /* The SELECT statement containing the clause */
@@ -1029,24 +1039,25 @@ return WRC_Prune;
       return 0;
     }
 
-    /*
-    ** pOrderBy is an ORDER BY or GROUP BY clause in SELECT statement pSelect.
-    ** The Name context of the SELECT statement is pNC.  zType is either
-    ** "ORDER" or "GROUP" depending on which type of clause pOrderBy is.
-    **
-    ** This routine resolves each term of the clause into an expression.
-    ** If the order-by term is an integer I between 1 and N (where N is the
-    ** number of columns in the result set of the SELECT) then the expression
-    ** in the resolution is a copy of the I-th result-set expression.  If
-    ** the order-by term is an identify that corresponds to the AS-name of
-    ** a result-set expression, then the term resolves to a copy of the
-    ** result-set expression.  Otherwise, the expression is resolved in
-    ** the usual way - using sqlite3ResolveExprNames().
-    **
-    ** This routine returns the number of errors.  If errors occur, then
-    ** an appropriate error message might be left in pParse.  (OOM errors
-    ** excepted.)
-    */
+    ///<summary>
+/// pOrderBy is an ORDER BY or GROUP BY clause in SELECT statement pSelect.
+/// The Name context of the SELECT statement is pNC.  zType is either
+/// "ORDER" or "GROUP" depending on which type of clause pOrderBy is.
+///
+/// This routine resolves each term of the clause into an expression.
+/// If the order-by term is an integer I between 1 and N (where N is the
+/// number of columns in the result set of the SELECT) then the expression
+/// in the resolution is a copy of the I-th result-set expression.  If
+/// the order-by term is an identify that corresponds to the AS-name of
+/// a result-set expression, then the term resolves to a copy of the
+/// result-set expression.  Otherwise, the expression is resolved in
+/// the usual way - using sqlite3ResolveExprNames().
+///
+/// This routine returns the number of errors.  If errors occur, then
+/// an appropriate error message might be left in pParse.  (OOM errors
+/// excepted.)
+///
+///</summary>
     static int resolveOrderGroupBy(
     NameContext pNC,     /* The name context of the SELECT statement */
     Select pSelect,      /* The SELECT statement holding pOrderBy */
@@ -1102,9 +1113,10 @@ return WRC_Prune;
       return sqlite3ResolveOrderGroupBy( pParse, pSelect, pOrderBy, zType );
     }
 
-    /*
-    ** Resolve names in the SELECT statement p and all of its descendents.
-    */
+    ///<summary>
+/// Resolve names in the SELECT statement p and all of its descendents.
+///
+///</summary>
     static int resolveSelectStep( Walker pWalker, Select p )
     {
       NameContext pOuterNC;  /* Context that contains this SELECT */
@@ -1296,54 +1308,55 @@ return WRC_Prune;
       return WRC_Prune;
     }
 
-    /*
-    ** This routine walks an expression tree and resolves references to
-    ** table columns and result-set columns.  At the same time, do error
-    ** checking on function usage and set a flag if any aggregate functions
-    ** are seen.
-    **
-    ** To resolve table columns references we look for nodes (or subtrees) of the
-    ** form X.Y.Z or Y.Z or just Z where
-    **
-    **      X:   The name of a database.  Ex:  "main" or "temp" or
-    **           the symbolic name assigned to an ATTACH-ed database.
-    **
-    **      Y:   The name of a table in a FROM clause.  Or in a trigger
-    **           one of the special names "old" or "new".
-    **
-    **      Z:   The name of a column in table Y.
-    **
-    ** The node at the root of the subtree is modified as follows:
-    **
-    **    Expr.op        Changed to TK_COLUMN
-    **    Expr.pTab      Points to the Table object for X.Y
-    **    Expr.iColumn   The column index in X.Y.  -1 for the rowid.
-    **    Expr.iTable    The VDBE cursor number for X.Y
-    **
-    **
-    ** To resolve result-set references, look for expression nodes of the
-    ** form Z (with no X and Y prefix) where the Z matches the right-hand
-    ** size of an AS clause in the result-set of a SELECT.  The Z expression
-    ** is replaced by a copy of the left-hand side of the result-set expression.
-    ** Table-name and function resolution occurs on the substituted expression
-    ** tree.  For example, in:
-    **
-    **      SELECT a+b AS x, c+d AS y FROM t1 ORDER BY x;
-    **
-    ** The "x" term of the order by is replaced by "a+b" to render:
-    **
-    **      SELECT a+b AS x, c+d AS y FROM t1 ORDER BY a+b;
-    **
-    ** Function calls are checked to make sure that the function is
-    ** defined and that the correct number of arguments are specified.
-    ** If the function is an aggregate function, then the pNC.hasAgg is
-    ** set and the opcode is changed from TK_FUNCTION to TK_AGG_FUNCTION.
-    ** If an expression contains aggregate functions then the EP_Agg
-    ** property on the expression is set.
-    **
-    ** An error message is left in pParse if anything is amiss.  The number
-    ** if errors is returned.
-    */
+    ///<summary>
+/// This routine walks an expression tree and resolves references to
+/// table columns and result-set columns.  At the same time, do error
+/// checking on function usage and set a flag if any aggregate functions
+/// are seen.
+///
+/// To resolve table columns references we look for nodes (or subtrees) of the
+/// form X.Y.Z or Y.Z or just Z where
+///
+///      X:   The name of a database.  Ex:  "main" or "temp" or
+///           the symbolic name assigned to an ATTACH-ed database.
+///
+///      Y:   The name of a table in a FROM clause.  Or in a trigger
+///           one of the special names "old" or "new".
+///
+///      Z:   The name of a column in table Y.
+///
+/// The node at the root of the subtree is modified as follows:
+///
+///    Expr.op        Changed to TK_COLUMN
+///    Expr.pTab      Points to the Table object for X.Y
+///    Expr.iColumn   The column index in X.Y.  -1 for the rowid.
+///    Expr.iTable    The VDBE cursor number for X.Y
+///
+///
+/// To resolve result-set references, look for expression nodes of the
+/// form Z (with no X and Y prefix) where the Z matches the right-hand
+/// size of an AS clause in the result-set of a SELECT.  The Z expression
+/// is replaced by a copy of the left-hand side of the result-set expression.
+/// Table-name and function resolution occurs on the substituted expression
+/// tree.  For example, in:
+///
+///      SELECT a+b AS x, c+d AS y FROM t1 ORDER BY x;
+///
+/// The "x" term of the order by is replaced by "a+b" to render:
+///
+///      SELECT a+b AS x, c+d AS y FROM t1 ORDER BY a+b;
+///
+/// Function calls are checked to make sure that the function is
+/// defined and that the correct number of arguments are specified.
+/// If the function is an aggregate function, then the pNC.hasAgg is
+/// set and the opcode is changed from TK_FUNCTION to TK_AGG_FUNCTION.
+/// If an expression contains aggregate functions then the EP_Agg
+/// property on the expression is set.
+///
+/// An error message is left in pParse if anything is amiss.  The number
+/// if errors is returned.
+///
+///</summary>
     static int sqlite3ResolveExprNames(
     NameContext pNC,       /* Namespace to resolve expressions in. */
     ref Expr pExpr         /* The expression to be analyzed. */

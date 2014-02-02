@@ -14,34 +14,36 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    ** 2001 September 15
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains C code routines that are called by the parser
-    ** to handle SELECT statements in SQLite.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2001 September 15
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains C code routines that are called by the parser
+/// to handle SELECT statements in SQLite.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
 
 
-    /*
-    ** Delete all the content of a Select structure but do not deallocate
-    ** the select structure itself.
-    */
+    ///<summary>
+/// Delete all the content of a Select structure but do not deallocate
+/// the select structure itself.
+///
+///</summary>
     static void clearSelect( sqlite3 db, Select p )
     {
       sqlite3ExprListDelete( db, ref p.pEList );
@@ -68,10 +70,11 @@ namespace Community.CsharpSqlite
     }
 
 
-    /*
-    ** Allocate a new Select structure and return a pointer to that
-    ** structure.
-    */
+    ///<summary>
+/// Allocate a new Select structure and return a pointer to that
+/// structure.
+///
+///</summary>
     // OVERLOADS, so I don't need to rewrite parse.c
     static Select sqlite3SelectNew( Parse pParse, int null_2, SrcList pSrc, int null_4, int null_5, int null_6, int null_7, int isDistinct, int null_9, int null_10 )
     {
@@ -140,23 +143,24 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Given 1 to 3 identifiers preceeding the JOIN keyword, determine the
-    ** type of join.  Return an integer constant that expresses that type
-    ** in terms of the following bit values:
-    **
-    **     JT_INNER
-    **     JT_CROSS
-    **     JT_OUTER
-    **     JT_NATURAL
-    **     JT_LEFT
-    **     JT_RIGHT
-    **
-    ** A full outer join is the combination of JT_LEFT and JT_RIGHT.
-    **
-    ** If an illegal or unsupported join type is seen, then still return
-    ** a join type, but put an error in the pParse structure.
-    */
+    ///<summary>
+/// Given 1 to 3 identifiers preceeding the JOIN keyword, determine the
+/// type of join.  Return an integer constant that expresses that type
+/// in terms of the following bit values:
+///
+///     JT_INNER
+///     JT_CROSS
+///     JT_OUTER
+///     JT_NATURAL
+///     JT_LEFT
+///     JT_RIGHT
+///
+/// A full outer join is the combination of JT_LEFT and JT_RIGHT.
+///
+/// If an illegal or unsupported join type is seen, then still return
+/// a join type, but put an error in the pParse structure.
+///
+///</summary>
 
     class Keyword
     {
@@ -246,10 +250,11 @@ namespace Community.CsharpSqlite
       return jointype;
     }
 
-    /*
-    ** Return the index of a column in a table.  Return -1 if the column
-    ** is not contained in the table.
-    */
+    ///<summary>
+/// Return the index of a column in a table.  Return -1 if the column
+/// is not contained in the table.
+///
+///</summary>
     static int columnIndex( Table pTab, string zCol )
     {
       int i;
@@ -262,15 +267,16 @@ namespace Community.CsharpSqlite
     }
 
 
-    /*
-    ** Search the first N tables in pSrc, from left to right, looking for a
-    ** table that has a column named zCol.  
-    **
-    ** When found, set *piTab and *piCol to the table index and column index
-    ** of the matching column and return TRUE.
-    **
-    ** If not found, return FALSE.
-    */
+    ///<summary>
+/// Search the first N tables in pSrc, from left to right, looking for a
+/// table that has a column named zCol.
+///
+/// When found, set *piTab and *piCol to the table index and column index
+/// of the matching column and return TRUE.
+///
+/// If not found, return FALSE.
+///
+///</summary>
     static int tableAndColumnIndex(
     SrcList pSrc,        /* Array of tables to search */
     int N,               /* Number of tables in pSrc.a[] to search */
@@ -299,17 +305,18 @@ namespace Community.CsharpSqlite
       return 0;
     }
 
-    /*
-    ** This function is used to add terms implied by JOIN syntax to the
-    ** WHERE clause expression of a SELECT statement. The new term, which
-    ** is ANDed with the existing WHERE clause, is of the form:
-    **
-    **    (vtab1.col1 = tab2.col2)
-    **
-    ** where tab1 is the iSrc'th table in SrcList pSrc and tab2 is the 
-    ** (iSrc+1)'th. Column col1 is column iColLeft of tab1, and col2 is
-    ** column iColRight of tab2.
-    */
+    ///<summary>
+/// This function is used to add terms implied by JOIN syntax to the
+/// WHERE clause expression of a SELECT statement. The new term, which
+/// is ANDed with the existing WHERE clause, is of the form:
+///
+///    (vtab1.col1 = tab2.col2)
+///
+/// where tab1 is the iSrc'th table in SrcList pSrc and tab2 is the
+/// (iSrc+1)'th. Column col1 is column iColLeft of tab1, and col2 is
+/// column iColRight of tab2.
+///
+///</summary>
     static void addWhereTerm(
     Parse pParse,                   /* Parsing context */
     SrcList pSrc,                   /* List of tables in FROM clause */
@@ -345,32 +352,33 @@ namespace Community.CsharpSqlite
       ppWhere = sqlite3ExprAnd( db, ppWhere, pEq );
     }
 
-    /*
-    ** Set the EP_FromJoin property on all terms of the given expression.
-    ** And set the Expr.iRightJoinTable to iTable for every term in the
-    ** expression.
-    **
-    ** The EP_FromJoin property is used on terms of an expression to tell
-    ** the LEFT OUTER JOIN processing logic that this term is part of the
-    ** join restriction specified in the ON or USING clause and not a part
-    ** of the more general WHERE clause.  These terms are moved over to the
-    ** WHERE clause during join processing but we need to remember that they
-    ** originated in the ON or USING clause.
-    **
-    ** The Expr.iRightJoinTable tells the WHERE clause processing that the
-    ** expression depends on table iRightJoinTable even if that table is not
-    ** explicitly mentioned in the expression.  That information is needed
-    ** for cases like this:
-    **
-    **    SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.b AND t1.x=5
-    **
-    ** The where clause needs to defer the handling of the t1.x=5
-    ** term until after the t2 loop of the join.  In that way, a
-    ** NULL t2 row will be inserted whenever t1.x!=5.  If we do not
-    ** defer the handling of t1.x=5, it will be processed immediately
-    ** after the t1 loop and rows with t1.x!=5 will never appear in
-    ** the output, which is incorrect.
-    */
+    ///<summary>
+/// Set the EP_FromJoin property on all terms of the given expression.
+/// And set the Expr.iRightJoinTable to iTable for every term in the
+/// expression.
+///
+/// The EP_FromJoin property is used on terms of an expression to tell
+/// the LEFT OUTER JOIN processing logic that this term is part of the
+/// join restriction specified in the ON or USING clause and not a part
+/// of the more general WHERE clause.  These terms are moved over to the
+/// WHERE clause during join processing but we need to remember that they
+/// originated in the ON or USING clause.
+///
+/// The Expr.iRightJoinTable tells the WHERE clause processing that the
+/// expression depends on table iRightJoinTable even if that table is not
+/// explicitly mentioned in the expression.  That information is needed
+/// for cases like this:
+///
+///    SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.b AND t1.x=5
+///
+/// The where clause needs to defer the handling of the t1.x=5
+/// term until after the t2 loop of the join.  In that way, a
+/// NULL t2 row will be inserted whenever t1.x!=5.  If we do not
+/// defer the handling of t1.x=5, it will be processed immediately
+/// after the t1 loop and rows with t1.x!=5 will never appear in
+/// the output, which is incorrect.
+///
+///</summary>
     static void setJoinExpr( Expr p, int iTable )
     {
       while ( p != null )
@@ -384,20 +392,21 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** This routine processes the join information for a SELECT statement.
-    ** ON and USING clauses are converted into extra terms of the WHERE clause.
-    ** NATURAL joins also create extra WHERE clause terms.
-    **
-    ** The terms of a FROM clause are contained in the Select.pSrc structure.
-    ** The left most table is the first entry in Select.pSrc.  The right-most
-    ** table is the last entry.  The join operator is held in the entry to
-    ** the left.  Thus entry 0 contains the join operator for the join between
-    ** entries 0 and 1.  Any ON or USING clauses associated with the join are
-    ** also attached to the left entry.
-    **
-    ** This routine returns the number of errors encountered.
-    */
+    ///<summary>
+/// This routine processes the join information for a SELECT statement.
+/// ON and USING clauses are converted into extra terms of the WHERE clause.
+/// NATURAL joins also create extra WHERE clause terms.
+///
+/// The terms of a FROM clause are contained in the Select.pSrc structure.
+/// The left most table is the first entry in Select.pSrc.  The right-most
+/// table is the last entry.  The join operator is held in the entry to
+/// the left.  Thus entry 0 contains the join operator for the join between
+/// entries 0 and 1.  Any ON or USING clauses associated with the join are
+/// also attached to the left entry.
+///
+/// This routine returns the number of errors encountered.
+///
+///</summary>
     static int sqliteProcessJoin( Parse pParse, Select p )
     {
       SrcList pSrc;                  /* All tables in the FROM clause */
@@ -503,10 +512,11 @@ namespace Community.CsharpSqlite
       return 0;
     }
 
-    /*
-    ** Insert code into "v" that will push the record on the top of the
-    ** stack into the sorter.
-    */
+    ///<summary>
+/// Insert code into "v" that will push the record on the top of the
+/// stack into the sorter.
+///
+///</summary>
     static void pushOntoSorter(
     Parse pParse,         /* Parser context */
     ExprList pOrderBy,    /* The ORDER BY clause */
@@ -548,9 +558,10 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Add code to implement the OFFSET
-    */
+    ///<summary>
+/// Add code to implement the OFFSET
+///
+///</summary>
     static void codeOffset(
     Vdbe v,          /* Generate code into this VM */
     Select p,        /* The SELECT statement being coded */
@@ -570,15 +581,16 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Add code that will check to make sure the N registers starting at iMem
-    ** form a distinct entry.  iTab is a sorting index that holds previously
-    ** seen combinations of the N values.  A new entry is made in iTab
-    ** if the current N values are new.
-    **
-    ** A jump to addrRepeat is made and the N+1 values are popped from the
-    ** stack if the top N elements are not distinct.
-    */
+    ///<summary>
+/// Add code that will check to make sure the N registers starting at iMem
+/// form a distinct entry.  iTab is a sorting index that holds previously
+/// seen combinations of the N values.  A new entry is made in iTab
+/// if the current N values are new.
+///
+/// A jump to addrRepeat is made and the N+1 values are popped from the
+/// stack if the top N elements are not distinct.
+///
+///</summary>
     static void codeDistinct(
     Parse pParse,     /* Parsing and code generating context */
     int iTab,          /* A sorting index used to test for distinctness */
@@ -599,13 +611,13 @@ namespace Community.CsharpSqlite
     }
 
 #if !SQLITE_OMIT_SUBQUERY
-    /*
-** Generate an error message when a SELECT is used within a subexpression
-** (example:  "a IN (SELECT * FROM table)") but it has more than 1 result
-** column.  We do this in a subroutine because the error used to occur
-** in multiple places.  (The error only occurs in one place now, but we
-** retain the subroutine to minimize code disruption.)
-*/
+    ///<summary>
+/// Generate an error message when a SELECT is used within a subexpression
+/// (example:  "a IN (SELECT * FROM table)") but it has more than 1 result
+/// column.  We do this in a subroutine because the error used to occur
+/// in multiple places.  (The error only occurs in one place now, but we
+/// retain the subroutine to minimize code disruption.)
+///</summary>
     static bool checkForMultiColumnSelectError(
     Parse pParse,       /* Parse context. */
     SelectDest pDest,   /* Destination of SELECT results */
@@ -626,15 +638,15 @@ namespace Community.CsharpSqlite
     }
 #endif
 
-    /*
-** This routine generates the code for the inside of the inner loop
-** of a SELECT.
-**
-** If srcTab and nColumn are both zero, then the pEList expressions
-** are evaluated in order to get the data for this row.  If nColumn>0
-** then data is pulled from srcTab and pEList is used only to get the
-** datatypes for each column.
-*/
+    ///<summary>
+/// This routine generates the code for the inside of the inner loop
+/// of a SELECT.
+///
+/// If srcTab and nColumn are both zero, then the pEList expressions
+/// are evaluated in order to get the data for this row.  If nColumn>0
+/// then data is pulled from srcTab and pEList is used only to get the
+/// datatypes for each column.
+///</summary>
     static void selectInnerLoop(
     Parse pParse,          /* The parser context */
     Select p,              /* The complete select statement being coded */
@@ -880,21 +892,22 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Given an expression list, generate a KeyInfo structure that records
-    ** the collating sequence for each expression in that expression list.
-    **
-    ** If the ExprList is an ORDER BY or GROUP BY clause then the resulting
-    ** KeyInfo structure is appropriate for initializing a virtual index to
-    ** implement that clause.  If the ExprList is the result set of a SELECT
-    ** then the KeyInfo structure is appropriate for initializing a virtual
-    ** index to implement a DISTINCT test.
-    **
-    ** Space to hold the KeyInfo structure is obtain from malloc.  The calling
-    ** function is responsible for seeing that this structure is eventually
-    ** freed.  Add the KeyInfo structure to the P4 field of an opcode using
-    ** P4_KEYINFO_HANDOFF is the usual way of dealing with this.
-    */
+    ///<summary>
+/// Given an expression list, generate a KeyInfo structure that records
+/// the collating sequence for each expression in that expression list.
+///
+/// If the ExprList is an ORDER BY or GROUP BY clause then the resulting
+/// KeyInfo structure is appropriate for initializing a virtual index to
+/// implement that clause.  If the ExprList is the result set of a SELECT
+/// then the KeyInfo structure is appropriate for initializing a virtual
+/// index to implement a DISTINCT test.
+///
+/// Space to hold the KeyInfo structure is obtain from malloc.  The calling
+/// function is responsible for seeing that this structure is eventually
+/// freed.  Add the KeyInfo structure to the P4 field of an opcode using
+/// P4_KEYINFO_HANDOFF is the usual way of dealing with this.
+///
+///</summary>
     static KeyInfo keyInfoFromExprList( Parse pParse, ExprList pList )
     {
       sqlite3 db = pParse.db;
@@ -929,9 +942,9 @@ namespace Community.CsharpSqlite
     }
 
 #if !SQLITE_OMIT_COMPOUND_SELECT
-    /*
-** Name of the connection operator, used for error messages.
-*/
+    ///<summary>
+/// Name of the connection operator, used for error messages.
+///</summary>
     static string selectOpName( int id )
     {
       string z;
@@ -975,13 +988,13 @@ namespace Community.CsharpSqlite
       }
     }
 
-/*
-** Assign expression b to lvalue a. A second, no-op, version of this macro
-** is provided when SQLITE_OMIT_EXPLAIN is defined. This allows the code
-** in sqlite3Select() to assign values to structure member variables that
-** only exist if SQLITE_OMIT_EXPLAIN is not defined without polluting the
-** code with #if !directives.
-*/
+///<summary>
+/// Assign expression b to lvalue a. A second, no-op, version of this macro
+/// is provided when SQLITE_OMIT_EXPLAIN is defined. This allows the code
+/// in sqlite3Select() to assign values to structure member variables that
+/// only exist if SQLITE_OMIT_EXPLAIN is not defined without polluting the
+/// code with #if !directives.
+///</summary>
 //# define explainSetInteger(a, b) a = b
     static void explainSetInteger( ref int a, int b )
     {
@@ -1001,20 +1014,21 @@ static void explainSetInteger(ref int a, int b){ a = b;}
 #endif
 
 #if !(SQLITE_OMIT_EXPLAIN) && !(SQLITE_OMIT_COMPOUND_SELECT)
-/*
-    ** Unless an "EXPLAIN QUERY PLAN" command is being processed, this function
-    ** is a no-op. Otherwise, it adds a single row of output to the EQP result,
-    ** where the caption is of one of the two forms:
-    **
-    **   "COMPOSITE SUBQUERIES iSub1 and iSub2 (op)"
-    **   "COMPOSITE SUBQUERIES iSub1 and iSub2 USING TEMP B-TREE (op)"
-    **
-    ** where iSub1 and iSub2 are the integers passed as the corresponding
-    ** function parameters, and op is the text representation of the parameter
-    ** of the same name. The parameter "op" must be one of TK_UNION, TK_EXCEPT,
-    ** TK_INTERSECT or TK_ALL. The first form is used if argument bUseTmp is 
-    ** false, or the second form if it is true.
-    */
+///<summary>
+/// Unless an "EXPLAIN QUERY PLAN" command is being processed, this function
+/// is a no-op. Otherwise, it adds a single row of output to the EQP result,
+/// where the caption is of one of the two forms:
+///
+///   "COMPOSITE SUBQUERIES iSub1 and iSub2 (op)"
+///   "COMPOSITE SUBQUERIES iSub1 and iSub2 USING TEMP B-TREE (op)"
+///
+/// where iSub1 and iSub2 are the integers passed as the corresponding
+/// function parameters, and op is the text representation of the parameter
+/// of the same name. The parameter "op" must be one of TK_UNION, TK_EXCEPT,
+/// TK_INTERSECT or TK_ALL. The first form is used if argument bUseTmp is
+/// false, or the second form if it is true.
+///
+///</summary>
     static void explainComposite(
     Parse pParse,                   /* Parse context */
     int op,                         /* One of TK_UNION, TK_EXCEPT etc. */
@@ -1042,12 +1056,12 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 #endif
 
 
-    /*
-** If the inner loop was generated using a non-null pOrderBy argument,
-** then the results were placed in a sorter.  After the loop is terminated
-** we need to run the sorter and output the results.  The following
-** routine generates the code needed to do that.
-*/
+    ///<summary>
+/// If the inner loop was generated using a non-null pOrderBy argument,
+/// then the results were placed in a sorter.  After the loop is terminated
+/// we need to run the sorter and output the results.  The following
+/// routine generates the code needed to do that.
+///</summary>
     static void generateSortTail(
     Parse pParse,     /* Parsing context */
     Select p,         /* The SELECT statement */
@@ -1155,24 +1169,25 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 
     }
 
-    /*
-    ** Return a pointer to a string containing the 'declaration type' of the
-    ** expression pExpr. The string may be treated as static by the caller.
-    **
-    ** The declaration type is the exact datatype definition extracted from the
-    ** original CREATE TABLE statement if the expression is a column. The
-    ** declaration type for a ROWID field is INTEGER. Exactly when an expression
-    ** is considered a column can be complex in the presence of subqueries. The
-    ** result-set expression in all of the following SELECT statements is
-    ** considered a column by this function.
-    **
-    **   SELECT col FROM tbl;
-    **   SELECT (SELECT col FROM tbl;
-    **   SELECT (SELECT col FROM tbl);
-    **   SELECT abc FROM (SELECT col AS abc FROM tbl);
-    **
-    ** The declaration type for any expression other than a column is NULL.
-    */
+    ///<summary>
+/// Return a pointer to a string containing the 'declaration type' of the
+/// expression pExpr. The string may be treated as static by the caller.
+///
+/// The declaration type is the exact datatype definition extracted from the
+/// original CREATE TABLE statement if the expression is a column. The
+/// declaration type for a ROWID field is INTEGER. Exactly when an expression
+/// is considered a column can be complex in the presence of subqueries. The
+/// result-set expression in all of the following SELECT statements is
+/// considered a column by this function.
+///
+///   SELECT col FROM tbl;
+///   SELECT (SELECT col FROM tbl;
+///   SELECT (SELECT col FROM tbl);
+///   SELECT abc FROM (SELECT col AS abc FROM tbl);
+///
+/// The declaration type for any expression other than a column is NULL.
+///
+///</summary>
     static string columnType(
     NameContext pNC,
     Expr pExpr,
@@ -1318,10 +1333,11 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       return zType;
     }
 
-    /*
-    ** Generate code that will tell the VDBE the declaration types of columns
-    ** in the result set.
-    */
+    ///<summary>
+/// Generate code that will tell the VDBE the declaration types of columns
+/// in the result set.
+///
+///</summary>
     static void generateColumnTypes(
     Parse pParse,      /* Parser context */
     SrcList pTabList,  /* List of tables */
@@ -1360,11 +1376,12 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 #endif //* SQLITE_OMIT_DECLTYPE */
     }
 
-    /*
-    ** Generate code that will tell the VDBE the names of columns
-    ** in the result set.  This information is used to provide the
-    ** azCol[] values in the callback.
-    */
+    ///<summary>
+/// Generate code that will tell the VDBE the names of columns
+/// in the result set.  This information is used to provide the
+/// azCol[] values in the callback.
+///
+///</summary>
     static void generateColumnNames(
     Parse pParse,      /* Parser context */
     SrcList pTabList,  /* List of tables */
@@ -1450,19 +1467,20 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       generateColumnTypes( pParse, pTabList, pEList );
     }
 
-    /*
-    ** Given a an expression list (which is really the list of expressions
-    ** that form the result set of a SELECT statement) compute appropriate
-    ** column names for a table that would hold the expression list.
-    **
-    ** All column names will be unique.
-    **
-    ** Only the column names are computed.  Column.zType, Column.zColl,
-    ** and other fields of Column are zeroed.
-    **
-    ** Return SQLITE_OK on success.  If a memory allocation error occurs,
-    ** store NULL in paCol and 0 in pnCol and return SQLITE_NOMEM.
-    */
+    ///<summary>
+/// Given a an expression list (which is really the list of expressions
+/// that form the result set of a SELECT statement) compute appropriate
+/// column names for a table that would hold the expression list.
+///
+/// All column names will be unique.
+///
+/// Only the column names are computed.  Column.zType, Column.zColl,
+/// and other fields of Column are zeroed.
+///
+/// Return SQLITE_OK on success.  If a memory allocation error occurs,
+/// store NULL in paCol and 0 in pnCol and return SQLITE_NOMEM.
+///
+///</summary>
     static int selectColumnsFromExprList(
     Parse pParse,          /* Parsing context */
     ExprList pEList,       /* Expr list from which to derive column names */
@@ -1567,17 +1585,18 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       return SQLITE_OK;
     }
 
-    /*
-    ** Add type and collation information to a column list based on
-    ** a SELECT statement.
-    **
-    ** The column list presumably came from selectColumnNamesFromExprList().
-    ** The column list has only names, not types or collations.  This
-    ** routine goes through and adds the types and collations.
-    **
-    ** This routine requires that all identifiers in the SELECT
-    ** statement be resolved.
-    */
+    ///<summary>
+/// Add type and collation information to a column list based on
+/// a SELECT statement.
+///
+/// The column list presumably came from selectColumnNamesFromExprList().
+/// The column list has only names, not types or collations.  This
+/// routine goes through and adds the types and collations.
+///
+/// This routine requires that all identifiers in the SELECT
+/// statement be resolved.
+///
+///</summary>
     static void selectAddColumnTypeAndCollation(
     Parse pParse,         /* Parsing contexts */
     int nCol,             /* Number of columns */
@@ -1617,10 +1636,11 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       }
     }
 
-    /*
-    ** Given a SELECT statement, generate a Table structure that describes
-    ** the result set of that SELECT.
-    */
+    ///<summary>
+/// Given a SELECT statement, generate a Table structure that describes
+/// the result set of that SELECT.
+///
+///</summary>
     static Table sqlite3ResultSetOfSelect( Parse pParse, Select pSelect )
     {
       Table pTab;
@@ -1658,10 +1678,11 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       return pTab;
     }
 
-    /*
-    ** Get a VDBE for the given parser context.  Create a new one if necessary.
-    ** If an error occurs, return NULL and leave a message in pParse.
-    */
+    ///<summary>
+/// Get a VDBE for the given parser context.  Create a new one if necessary.
+/// If an error occurs, return NULL and leave a message in pParse.
+///
+///</summary>
     static Vdbe sqlite3GetVdbe( Parse pParse )
     {
       Vdbe v = pParse.pVdbe;
@@ -1679,24 +1700,25 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
     }
 
 
-    /*
-    ** Compute the iLimit and iOffset fields of the SELECT based on the
-    ** pLimit and pOffset expressions.  pLimit and pOffset hold the expressions
-    ** that appear in the original SQL statement after the LIMIT and OFFSET
-    ** keywords.  Or NULL if those keywords are omitted. iLimit and iOffset
-    ** are the integer memory register numbers for counters used to compute
-    ** the limit and offset.  If there is no limit and/or offset, then
-    ** iLimit and iOffset are negative.
-    **
-    ** This routine changes the values of iLimit and iOffset only if
-    ** a limit or offset is defined by pLimit and pOffset.  iLimit and
-    ** iOffset should have been preset to appropriate default values
-    ** (usually but not always -1) prior to calling this routine.
-    ** Only if pLimit!=0 or pOffset!=0 do the limit registers get
-    ** redefined.  The UNION ALL operator uses this property to force
-    ** the reuse of the same limit and offset registers across multiple
-    ** SELECT statements.
-    */
+    ///<summary>
+/// Compute the iLimit and iOffset fields of the SELECT based on the
+/// pLimit and pOffset expressions.  pLimit and pOffset hold the expressions
+/// that appear in the original SQL statement after the LIMIT and OFFSET
+/// keywords.  Or NULL if those keywords are omitted. iLimit and iOffset
+/// are the integer memory register numbers for counters used to compute
+/// the limit and offset.  If there is no limit and/or offset, then
+/// iLimit and iOffset are negative.
+///
+/// This routine changes the values of iLimit and iOffset only if
+/// a limit or offset is defined by pLimit and pOffset.  iLimit and
+/// iOffset should have been preset to appropriate default values
+/// (usually but not always -1) prior to calling this routine.
+/// Only if pLimit!=0 or pOffset!=0 do the limit registers get
+/// redefined.  The UNION ALL operator uses this property to force
+/// the reuse of the same limit and offset registers across multiple
+/// SELECT statements.
+///
+///</summary>
     static void computeLimitRegisters( Parse pParse, Select p, int iBreak )
     {
       Vdbe v = null;
@@ -1795,7 +1817,9 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
     }
 #endif // * SQLITE_OMIT_COMPOUND_SELECT */
 
-    /* Forward reference */
+    ///<summary>
+///Forward reference
+///</summary>
     //static int multiSelectOrderBy(
     //  Parse* pParse,        /* Parsing context */
     //  Select* p,            /* The right-most of SELECTs to be coded */
@@ -1803,37 +1827,37 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
     //);
 
 #if !SQLITE_OMIT_COMPOUND_SELECT
-    /*
-** This routine is called to process a compound query form from
-** two or more separate queries using UNION, UNION ALL, EXCEPT, or
-** INTERSECT
-**
-** "p" points to the right-most of the two queries.  the query on the
-** left is p.pPrior.  The left query could also be a compound query
-** in which case this routine will be called recursively.
-**
-** The results of the total query are to be written into a destination
-** of type eDest with parameter iParm.
-**
-** Example 1:  Consider a three-way compound SQL statement.
-**
-**     SELECT a FROM t1 UNION SELECT b FROM t2 UNION SELECT c FROM t3
-**
-** This statement is parsed up as follows:
-**
-**     SELECT c FROM t3
-**      |
-**      `----.  SELECT b FROM t2
-**                |
-**                `-----.  SELECT a FROM t1
-**
-** The arrows in the diagram above represent the Select.pPrior pointer.
-** So if this routine is called with p equal to the t3 query, then
-** pPrior will be the t2 query.  p.op will be TK_UNION in this case.
-**
-** Notice that because of the way SQLite parses compound SELECTs, the
-** individual selects always group from left to right.
-*/
+    ///<summary>
+/// This routine is called to process a compound query form from
+/// two or more separate queries using UNION, UNION ALL, EXCEPT, or
+/// INTERSECT
+///
+/// "p" points to the right-most of the two queries.  the query on the
+/// left is p.pPrior.  The left query could also be a compound query
+/// in which case this routine will be called recursively.
+///
+/// The results of the total query are to be written into a destination
+/// of type eDest with parameter iParm.
+///
+/// Example 1:  Consider a three-way compound SQL statement.
+///
+///     SELECT a FROM t1 UNION SELECT b FROM t2 UNION SELECT c FROM t3
+///
+/// This statement is parsed up as follows:
+///
+///     SELECT c FROM t3
+///      |
+///      `----.  SELECT b FROM t2
+///                |
+///                `-----.  SELECT a FROM t1
+///
+/// The arrows in the diagram above represent the Select.pPrior pointer.
+/// So if this routine is called with p equal to the t3 query, then
+/// pPrior will be the t2 query.  p.op will be TK_UNION in this case.
+///
+/// Notice that because of the way SQLite parses compound SELECTs, the
+/// individual selects always group from left to right.
+///</summary>
     static int multiSelect(
     Parse pParse,             /* Parsing context */
     Select p,                 /* The right-most of SELECTs to be coded */
@@ -2389,91 +2413,92 @@ break;
       return addr;
     }
 
-    /*
-    ** Alternative compound select code generator for cases when there
-    ** is an ORDER BY clause.
-    **
-    ** We assume a query of the following form:
-    **
-    **      <selectA>  <operator>  <selectB>  ORDER BY <orderbylist>
-    **
-    ** <operator> is one of UNION ALL, UNION, EXCEPT, or INTERSECT.  The idea
-    ** is to code both <selectA> and <selectB> with the ORDER BY clause as
-    ** co-routines.  Then run the co-routines in parallel and merge the results
-    ** into the output.  In addition to the two coroutines (called selectA and
-    ** selectB) there are 7 subroutines:
-    **
-    **    outA:    Move the output of the selectA coroutine into the output
-    **             of the compound query.
-    **
-    **    outB:    Move the output of the selectB coroutine into the output
-    **             of the compound query.  (Only generated for UNION and
-    **             UNION ALL.  EXCEPT and INSERTSECT never output a row that
-    **             appears only in B.)
-    **
-    **    AltB:    Called when there is data from both coroutines and A<B.
-    **
-    **    AeqB:    Called when there is data from both coroutines and A==B.
-    **
-    **    AgtB:    Called when there is data from both coroutines and A>B.
-    **
-    **    EofA:    Called when data is exhausted from selectA.
-    **
-    **    EofB:    Called when data is exhausted from selectB.
-    **
-    ** The implementation of the latter five subroutines depend on which
-    ** <operator> is used:
-    **
-    **
-    **             UNION ALL         UNION            EXCEPT          INTERSECT
-    **          -------------  -----------------  --------------  -----------------
-    **   AltB:   outA, nextA      outA, nextA       outA, nextA         nextA
-    **
-    **   AeqB:   outA, nextA         nextA             nextA         outA, nextA
-    **
-    **   AgtB:   outB, nextB      outB, nextB          nextB            nextB
-    **
-    **   EofA:   outB, nextB      outB, nextB          halt             halt
-    **
-    **   EofB:   outA, nextA      outA, nextA       outA, nextA         halt
-    **
-    ** In the AltB, AeqB, and AgtB subroutines, an EOF on A following nextA
-    ** causes an immediate jump to EofA and an EOF on B following nextB causes
-    ** an immediate jump to EofB.  Within EofA and EofB, and EOF on entry or
-    ** following nextX causes a jump to the end of the select processing.
-    **
-    ** Duplicate removal in the UNION, EXCEPT, and INTERSECT cases is handled
-    ** within the output subroutine.  The regPrev register set holds the previously
-    ** output value.  A comparison is made against this value and the output
-    ** is skipped if the next results would be the same as the previous.
-    **
-    ** The implementation plan is to implement the two coroutines and seven
-    ** subroutines first, then put the control logic at the bottom.  Like this:
-    **
-    **          goto Init
-    **     coA: coroutine for left query (A)
-    **     coB: coroutine for right query (B)
-    **    outA: output one row of A
-    **    outB: output one row of B (UNION and UNION ALL only)
-    **    EofA: ...
-    **    EofB: ...
-    **    AltB: ...
-    **    AeqB: ...
-    **    AgtB: ...
-    **    Init: initialize coroutine registers
-    **          yield coA
-    **          if eof(A) goto EofA
-    **          yield coB
-    **          if eof(B) goto EofB
-    **    Cmpr: Compare A, B
-    **          Jump AltB, AeqB, AgtB
-    **     End: ...
-    **
-    ** We call AltB, AeqB, AgtB, EofA, and EofB "subroutines" but they are not
-    ** actually called using Gosub and they do not Return.  EofA and EofB loop
-    ** until all data is exhausted then jump to the "end" labe.  AltB, AeqB,
-    ** and AgtB jump to either L2 or to one of EofA or EofB.
-    */
+    ///<summary>
+/// Alternative compound select code generator for cases when there
+/// is an ORDER BY clause.
+///
+/// We assume a query of the following form:
+///
+///      <selectA>  <operator>  <selectB>  ORDER BY <orderbylist>
+///
+/// <operator> is one of UNION ALL, UNION, EXCEPT, or INTERSECT.  The idea
+/// is to code both <selectA> and <selectB> with the ORDER BY clause as
+/// co-routines.  Then run the co-routines in parallel and merge the results
+/// into the output.  In addition to the two coroutines (called selectA and
+/// selectB) there are 7 subroutines:
+///
+///    outA:    Move the output of the selectA coroutine into the output
+///             of the compound query.
+///
+///    outB:    Move the output of the selectB coroutine into the output
+///             of the compound query.  (Only generated for UNION and
+///             UNION ALL.  EXCEPT and INSERTSECT never output a row that
+///             appears only in B.)
+///
+///    AltB:    Called when there is data from both coroutines and A<B.
+///
+///    AeqB:    Called when there is data from both coroutines and A==B.
+///
+///    AgtB:    Called when there is data from both coroutines and A>B.
+///
+///    EofA:    Called when data is exhausted from selectA.
+///
+///    EofB:    Called when data is exhausted from selectB.
+///
+/// The implementation of the latter five subroutines depend on which
+/// <operator> is used:
+///
+///
+///             UNION ALL         UNION            EXCEPT          INTERSECT
+///          -------------  -----------------  --------------  -----------------
+///   AltB:   outA, nextA      outA, nextA       outA, nextA         nextA
+///
+///   AeqB:   outA, nextA         nextA             nextA         outA, nextA
+///
+///   AgtB:   outB, nextB      outB, nextB          nextB            nextB
+///
+///   EofA:   outB, nextB      outB, nextB          halt             halt
+///
+///   EofB:   outA, nextA      outA, nextA       outA, nextA         halt
+///
+/// In the AltB, AeqB, and AgtB subroutines, an EOF on A following nextA
+/// causes an immediate jump to EofA and an EOF on B following nextB causes
+/// an immediate jump to EofB.  Within EofA and EofB, and EOF on entry or
+/// following nextX causes a jump to the end of the select processing.
+///
+/// Duplicate removal in the UNION, EXCEPT, and INTERSECT cases is handled
+/// within the output subroutine.  The regPrev register set holds the previously
+/// output value.  A comparison is made against this value and the output
+/// is skipped if the next results would be the same as the previous.
+///
+/// The implementation plan is to implement the two coroutines and seven
+/// subroutines first, then put the control logic at the bottom.  Like this:
+///
+///          goto Init
+///     coA: coroutine for left query (A)
+///     coB: coroutine for right query (B)
+///    outA: output one row of A
+///    outB: output one row of B (UNION and UNION ALL only)
+///    EofA: ...
+///    EofB: ...
+///    AltB: ...
+///    AeqB: ...
+///    AgtB: ...
+///    Init: initialize coroutine registers
+///          yield coA
+///          if eof(A) goto EofA
+///          yield coB
+///          if eof(B) goto EofB
+///    Cmpr: Compare A, B
+///          Jump AltB, AeqB, AgtB
+///     End: ...
+///
+/// We call AltB, AeqB, AgtB, EofA, and EofB "subroutines" but they are not
+/// actually called using Gosub and they do not Return.  EofA and EofB loop
+/// until all data is exhausted then jump to the "end" labe.  AltB, AeqB,
+/// and AgtB jump to either L2 or to one of EofA or EofB.
+///
+///</summary>
 #if !SQLITE_OMIT_COMPOUND_SELECT
     static int multiSelectOrderBy(
     Parse pParse,         /* Parsing context */
@@ -2871,23 +2896,26 @@ break;
     }
 #endif
 #if !(SQLITE_OMIT_SUBQUERY) || !(SQLITE_OMIT_VIEW)
-    /* Forward Declarations */
+    ///<summary>
+///Forward Declarations
+///</summary>
     //static void substExprList(sqlite3*, ExprList*, int, ExprList);
     //static void substSelect(sqlite3*, Select *, int, ExprList );
 
-    /*
-    ** Scan through the expression pExpr.  Replace every reference to
-    ** a column in table number iTable with a copy of the iColumn-th
-    ** entry in pEList.  (But leave references to the ROWID column
-    ** unchanged.)
-    **
-    ** This routine is part of the flattening procedure.  A subquery
-    ** whose result set is defined by pEList appears as entry in the
-    ** FROM clause of a SELECT such that the VDBE cursor assigned to that
-    ** FORM clause entry is iTable.  This routine make the necessary
-    ** changes to pExpr so that it refers directly to the source table
-    ** of the subquery rather the result set of the subquery.
-    */
+    ///<summary>
+/// Scan through the expression pExpr.  Replace every reference to
+/// a column in table number iTable with a copy of the iColumn-th
+/// entry in pEList.  (But leave references to the ROWID column
+/// unchanged.)
+///
+/// This routine is part of the flattening procedure.  A subquery
+/// whose result set is defined by pEList appears as entry in the
+/// FROM clause of a SELECT such that the VDBE cursor assigned to that
+/// FORM clause entry is iTable.  This routine make the necessary
+/// changes to pExpr so that it refers directly to the source table
+/// of the subquery rather the result set of the subquery.
+///
+///</summary>
     static Expr substExpr(
     sqlite3 db,        /* Report malloc errors to this connection */
     Expr pExpr,        /* Expr in which substitution occurs */
@@ -2981,116 +3009,116 @@ break;
 #endif //* !SQLITE_OMIT_SUBQUERY) || !SQLITE_OMIT_VIEW) */
 
 #if !(SQLITE_OMIT_SUBQUERY) || !(SQLITE_OMIT_VIEW)
-    /*
-** This routine attempts to flatten subqueries in order to speed
-** execution.  It returns 1 if it makes changes and 0 if no flattening
-** occurs.
-**
-** To understand the concept of flattening, consider the following
-** query:
-**
-**     SELECT a FROM (SELECT x+y AS a FROM t1 WHERE z<100) WHERE a>5
-**
-** The default way of implementing this query is to execute the
-** subquery first and store the results in a temporary table, then
-** run the outer query on that temporary table.  This requires two
-** passes over the data.  Furthermore, because the temporary table
-** has no indices, the WHERE clause on the outer query cannot be
-** optimized.
-**
-** This routine attempts to rewrite queries such as the above into
-** a single flat select, like this:
-**
-**     SELECT x+y AS a FROM t1 WHERE z<100 AND a>5
-**
-** The code generated for this simpification gives the same result
-** but only has to scan the data once.  And because indices might
-** exist on the table t1, a complete scan of the data might be
-** avoided.
-**
-** Flattening is only attempted if all of the following are true:
-**
-**   (1)  The subquery and the outer query do not both use aggregates.
-**
-**   (2)  The subquery is not an aggregate or the outer query is not a join.
-**
-**   (3)  The subquery is not the right operand of a left outer join
-**        (Originally ticket #306.  Strengthened by ticket #3300)
-**
-**   (4)  The subquery is not DISTINCT.
-**
-**  (*)  At one point restrictions (4) and (5) defined a subset of DISTINCT
-**        sub-queries that were excluded from this optimization. Restriction 
-**        (4) has since been expanded to exclude all DISTINCT subqueries.
-**
-**   (6)  The subquery does not use aggregates or the outer query is not
-**        DISTINCT.
-**
-**   (7)  The subquery has a FROM clause.
-**
-**   (8)  The subquery does not use LIMIT or the outer query is not a join.
-**
-**   (9)  The subquery does not use LIMIT or the outer query does not use
-**        aggregates.
-**
-**  (10)  The subquery does not use aggregates or the outer query does not
-**        use LIMIT.
-**
-**  (11)  The subquery and the outer query do not both have ORDER BY clauses.
-**
-**  (*)  Not implemented.  Subsumed into restriction (3).  Was previously
-**        a separate restriction deriving from ticket #350.
-**
-**  (13)  The subquery and outer query do not both use LIMIT.
-**
-**  (14)  The subquery does not use OFFSET.
-**
-**  (15)  The outer query is not part of a compound select or the
-**        subquery does not have a LIMIT clause.
-**        (See ticket #2339 and ticket [02a8e81d44]).
-**
-**  (16)  The outer query is not an aggregate or the subquery does
-**        not contain ORDER BY.  (Ticket #2942)  This used to not matter
-**        until we introduced the group_concat() function.
-**
-**  (17)  The sub-query is not a compound select, or it is a UNION ALL
-**        compound clause made up entirely of non-aggregate queries, and
-**        the parent query:
-**
-**          * is not itself part of a compound select,
-**          * is not an aggregate or DISTINCT query, and
-**          * has no other tables or sub-selects in the FROM clause.
-**
-**        The parent and sub-query may contain WHERE clauses. Subject to
-**        rules (11), (13) and (14), they may also contain ORDER BY,
-**        LIMIT and OFFSET clauses.
-**
-**  (18)  If the sub-query is a compound select, then all terms of the
-**        ORDER by clause of the parent must be simple references to
-**        columns of the sub-query.
-**
-**  (19)  The subquery does not use LIMIT or the outer query does not
-**        have a WHERE clause.
-**
-**  (20)  If the sub-query is a compound select, then it must not use
-**        an ORDER BY clause.  Ticket #3773.  We could relax this constraint
-**        somewhat by saying that the terms of the ORDER BY clause must
-**        appear as unmodified result columns in the outer query.  But
-**        have other optimizations in mind to deal with that case.
-**
-**  (21)  The subquery does not use LIMIT or the outer query is not
-**        DISTINCT.  (See ticket [752e1646fc]).
-**
-** In this routine, the "p" parameter is a pointer to the outer query.
-** The subquery is p.pSrc.a[iFrom].  isAgg is true if the outer query
-** uses aggregates and subqueryIsAgg is true if the subquery uses aggregates.
-**
-** If flattening is not attempted, this routine is a no-op and returns 0.
-** If flattening is attempted this routine returns 1.
-**
-** All of the expression analysis must occur on both the outer query and
-** the subquery before this routine runs.
-*/
+    ///<summary>
+/// This routine attempts to flatten subqueries in order to speed
+/// execution.  It returns 1 if it makes changes and 0 if no flattening
+/// occurs.
+///
+/// To understand the concept of flattening, consider the following
+/// query:
+///
+///     SELECT a FROM (SELECT x+y AS a FROM t1 WHERE z<100) WHERE a>5
+///
+/// The default way of implementing this query is to execute the
+/// subquery first and store the results in a temporary table, then
+/// run the outer query on that temporary table.  This requires two
+/// passes over the data.  Furthermore, because the temporary table
+/// has no indices, the WHERE clause on the outer query cannot be
+/// optimized.
+///
+/// This routine attempts to rewrite queries such as the above into
+/// a single flat select, like this:
+///
+///     SELECT x+y AS a FROM t1 WHERE z<100 AND a>5
+///
+/// The code generated for this simpification gives the same result
+/// but only has to scan the data once.  And because indices might
+/// exist on the table t1, a complete scan of the data might be
+/// avoided.
+///
+/// Flattening is only attempted if all of the following are true:
+///
+///   (1)  The subquery and the outer query do not both use aggregates.
+///
+///   (2)  The subquery is not an aggregate or the outer query is not a join.
+///
+///   (3)  The subquery is not the right operand of a left outer join
+///        (Originally ticket #306.  Strengthened by ticket #3300)
+///
+///   (4)  The subquery is not DISTINCT.
+///
+///  (*)  At one point restrictions (4) and (5) defined a subset of DISTINCT
+///        sub-queries that were excluded from this optimization. Restriction
+///        (4) has since been expanded to exclude all DISTINCT subqueries.
+///
+///   (6)  The subquery does not use aggregates or the outer query is not
+///        DISTINCT.
+///
+///   (7)  The subquery has a FROM clause.
+///
+///   (8)  The subquery does not use LIMIT or the outer query is not a join.
+///
+///   (9)  The subquery does not use LIMIT or the outer query does not use
+///        aggregates.
+///
+///  (10)  The subquery does not use aggregates or the outer query does not
+///        use LIMIT.
+///
+///  (11)  The subquery and the outer query do not both have ORDER BY clauses.
+///
+///  (*)  Not implemented.  Subsumed into restriction (3).  Was previously
+///        a separate restriction deriving from ticket #350.
+///
+///  (13)  The subquery and outer query do not both use LIMIT.
+///
+///  (14)  The subquery does not use OFFSET.
+///
+///  (15)  The outer query is not part of a compound select or the
+///        subquery does not have a LIMIT clause.
+///        (See ticket #2339 and ticket [02a8e81d44]).
+///
+///  (16)  The outer query is not an aggregate or the subquery does
+///        not contain ORDER BY.  (Ticket #2942)  This used to not matter
+///        until we introduced the group_concat() function.
+///
+///  (17)  The sub-query is not a compound select, or it is a UNION ALL
+///        compound clause made up entirely of non-aggregate queries, and
+///        the parent query:
+///
+///          * is not itself part of a compound select,
+///          * is not an aggregate or DISTINCT query, and
+///          * has no other tables or sub-selects in the FROM clause.
+///
+///        The parent and sub-query may contain WHERE clauses. Subject to
+///        rules (11), (13) and (14), they may also contain ORDER BY,
+///        LIMIT and OFFSET clauses.
+///
+///  (18)  If the sub-query is a compound select, then all terms of the
+///        ORDER by clause of the parent must be simple references to
+///        columns of the sub-query.
+///
+///  (19)  The subquery does not use LIMIT or the outer query does not
+///        have a WHERE clause.
+///
+///  (20)  If the sub-query is a compound select, then it must not use
+///        an ORDER BY clause.  Ticket #3773.  We could relax this constraint
+///        somewhat by saying that the terms of the ORDER BY clause must
+///        appear as unmodified result columns in the outer query.  But
+///        have other optimizations in mind to deal with that case.
+///
+///  (21)  The subquery does not use LIMIT or the outer query is not
+///        DISTINCT.  (See ticket [752e1646fc]).
+///
+/// In this routine, the "p" parameter is a pointer to the outer query.
+/// The subquery is p.pSrc.a[iFrom].  isAgg is true if the outer query
+/// uses aggregates and subqueryIsAgg is true if the subquery uses aggregates.
+///
+/// If flattening is not attempted, this routine is a no-op and returns 0.
+/// If flattening is attempted this routine returns 1.
+///
+/// All of the expression analysis must occur on both the outer query and
+/// the subquery before this routine runs.
+///</summary>
     static int flattenSubquery(
     Parse pParse,        /* Parsing context */
     Select p,            /* The parent or outer SELECT statement */
@@ -3519,17 +3547,17 @@ break;
     }
 #endif //* !SQLITE_OMIT_SUBQUERY) || !SQLITE_OMIT_VIEW) */
 
-    /*
-** Analyze the SELECT statement passed as an argument to see if it
-** is a min() or max() query. Return WHERE_ORDERBY_MIN or WHERE_ORDERBY_MAX if
-** it is, or 0 otherwise. At present, a query is considered to be
-** a min()/max() query if:
-**
-**   1. There is a single object in the FROM clause.
-**
-**   2. There is a single expression in the result set, and it is
-**      either min(x) or max(x), where x is a column reference.
-*/
+    ///<summary>
+/// Analyze the SELECT statement passed as an argument to see if it
+/// is a min() or max() query. Return WHERE_ORDERBY_MIN or WHERE_ORDERBY_MAX if
+/// it is, or 0 otherwise. At present, a query is considered to be
+/// a min()/max() query if:
+///
+///   1. There is a single object in the FROM clause.
+///
+///   2. There is a single expression in the result set, and it is
+///      either min(x) or max(x), where x is a column reference.
+///</summary>
     static u8 minMaxQuery( Select p )
     {
       Expr pExpr;
@@ -3559,17 +3587,18 @@ break;
       return WHERE_ORDERBY_NORMAL;
     }
 
-    /*
-    ** The select statement passed as the first argument is an aggregate query.
-    ** The second argment is the associated aggregate-info object. This
-    ** function tests if the SELECT is of the form:
-    **
-    **   SELECT count() FROM <tbl>
-    **
-    ** where table is a database table, not a sub-select or view. If the query
-    ** does match this pattern, then a pointer to the Table object representing
-    ** <tbl> is returned. Otherwise, 0 is returned.
-    */
+    ///<summary>
+/// The select statement passed as the first argument is an aggregate query.
+/// The second argment is the associated aggregate-info object. This
+/// function tests if the SELECT is of the form:
+///
+///   SELECT count() FROM <tbl>
+///
+/// where table is a database table, not a sub-select or view. If the query
+/// does match this pattern, then a pointer to the Table object representing
+/// <tbl> is returned. Otherwise, 0 is returned.
+///
+///</summary>
     static Table isSimpleCount( Select p, AggInfo pAggInfo )
     {
       Table pTab;
@@ -3599,13 +3628,14 @@ break;
       return pTab;
     }
 
-    /*
-    ** If the source-list item passed as an argument was augmented with an
-    ** INDEXED BY clause, then try to locate the specified index. If there
-    ** was such a clause and the named index cannot be found, return
-    ** SQLITE_ERROR and leave an error in pParse. Otherwise, populate
-    ** pFrom.pIndex and return SQLITE_OK.
-    */
+    ///<summary>
+/// If the source-list item passed as an argument was augmented with an
+/// INDEXED BY clause, then try to locate the specified index. If there
+/// was such a clause and the named index cannot be found, return
+/// SQLITE_ERROR and leave an error in pParse. Otherwise, populate
+/// pFrom.pIndex and return SQLITE_OK.
+///
+///</summary>
     static int sqlite3IndexedByLookup( Parse pParse, SrcList_item pFrom )
     {
       if ( pFrom.pTab != null && pFrom.zIndex != null && pFrom.zIndex.Length != 0 )
@@ -3629,30 +3659,31 @@ break;
       return SQLITE_OK;
     }
 
-    /*
-    ** This routine is a Walker callback for "expanding" a SELECT statement.
-    ** "Expanding" means to do the following:
-    **
-    **    (1)  Make sure VDBE cursor numbers have been assigned to every
-    **         element of the FROM clause.
-    **
-    **    (2)  Fill in the pTabList.a[].pTab fields in the SrcList that
-    **         defines FROM clause.  When views appear in the FROM clause,
-    **         fill pTabList.a[].x.pSelect with a copy of the SELECT statement
-    **         that implements the view.  A copy is made of the view's SELECT
-    **         statement so that we can freely modify or delete that statement
-    **         without worrying about messing up the presistent representation
-    **         of the view.
-    **
-    **    (3)  Add terms to the WHERE clause to accomodate the NATURAL keyword
-    **         on joins and the ON and USING clause of joins.
-    **
-    **    (4)  Scan the list of columns in the result set (pEList) looking
-    **         for instances of the "*" operator or the TABLE.* operator.
-    **         If found, expand each "*" to be every column in every table
-    **         and TABLE.* to be every column in TABLE.
-    **
-    */
+    ///<summary>
+/// This routine is a Walker callback for "expanding" a SELECT statement.
+/// "Expanding" means to do the following:
+///
+///    (1)  Make sure VDBE cursor numbers have been assigned to every
+///         element of the FROM clause.
+///
+///    (2)  Fill in the pTabList.a[].pTab fields in the SrcList that
+///         defines FROM clause.  When views appear in the FROM clause,
+///         fill pTabList.a[].x.pSelect with a copy of the SELECT statement
+///         that implements the view.  A copy is made of the view's SELECT
+///         statement so that we can freely modify or delete that statement
+///         without worrying about messing up the presistent representation
+///         of the view.
+///
+///    (3)  Add terms to the WHERE clause to accomodate the NATURAL keyword
+///         on joins and the ON and USING clause of joins.
+///
+///    (4)  Scan the list of columns in the result set (pEList) looking
+///         for instances of the "*" operator or the TABLE.* operator.
+///         If found, expand each "*" to be every column in every table
+///         and TABLE.* to be every column in TABLE.
+///
+///
+///</summary>
     static int selectExpander( Walker pWalker, Select p )
     {
       Parse pParse = pWalker.pParse;
@@ -3920,34 +3951,36 @@ break;
       return WRC_Continue;
     }
 
-    /*
-    ** No-op routine for the parse-tree walker.
-    **
-    ** When this routine is the Walker.xExprCallback then expression trees
-    ** are walked without any actions being taken at each node.  Presumably,
-    ** when this routine is used for Walker.xExprCallback then
-    ** Walker.xSelectCallback is set to do something useful for every
-    ** subquery in the parser tree.
-    */
+    ///<summary>
+/// No-op routine for the parse-tree walker.
+///
+/// When this routine is the Walker.xExprCallback then expression trees
+/// are walked without any actions being taken at each node.  Presumably,
+/// when this routine is used for Walker.xExprCallback then
+/// Walker.xSelectCallback is set to do something useful for every
+/// subquery in the parser tree.
+///
+///</summary>
     static int exprWalkNoop( Walker NotUsed, ref Expr NotUsed2 )
     {
       UNUSED_PARAMETER2( NotUsed, NotUsed2 );
       return WRC_Continue;
     }
 
-    /*
-    ** This routine "expands" a SELECT statement and all of its subqueries.
-    ** For additional information on what it means to "expand" a SELECT
-    ** statement, see the comment on the selectExpand worker callback above.
-    **
-    ** Expanding a SELECT statement is the first step in processing a
-    ** SELECT statement.  The SELECT statement must be expanded before
-    ** name resolution is performed.
-    **
-    ** If anything goes wrong, an error message is written into pParse.
-    ** The calling function can detect the problem by looking at pParse.nErr
-    ** and/or pParse.db.mallocFailed.
-    */
+    ///<summary>
+/// This routine "expands" a SELECT statement and all of its subqueries.
+/// For additional information on what it means to "expand" a SELECT
+/// statement, see the comment on the selectExpand worker callback above.
+///
+/// Expanding a SELECT statement is the first step in processing a
+/// SELECT statement.  The SELECT statement must be expanded before
+/// name resolution is performed.
+///
+/// If anything goes wrong, an error message is written into pParse.
+/// The calling function can detect the problem by looking at pParse.nErr
+/// and/or pParse.db.mallocFailed.
+///
+///</summary>
     static void sqlite3SelectExpand( Parse pParse, Select pSelect )
     {
       Walker w = new Walker();
@@ -3959,19 +3992,19 @@ break;
 
 
 #if !SQLITE_OMIT_SUBQUERY
-    /*
-** This is a Walker.xSelectCallback callback for the sqlite3SelectTypeInfo()
-** interface.
-**
-** For each FROM-clause subquery, add Column.zType and Column.zColl
-** information to the Table ure that represents the result set
-** of that subquery.
-**
-** The Table ure that represents the result set was coned
-** by selectExpander() but the type and collation information was omitted
-** at that point because identifiers had not yet been resolved.  This
-** routine is called after identifier resolution.
-*/
+    ///<summary>
+/// This is a Walker.xSelectCallback callback for the sqlite3SelectTypeInfo()
+/// interface.
+///
+/// For each FROM-clause subquery, add Column.zType and Column.zColl
+/// information to the Table ure that represents the result set
+/// of that subquery.
+///
+/// The Table ure that represents the result set was coned
+/// by selectExpander() but the type and collation information was omitted
+/// at that point because identifiers had not yet been resolved.  This
+/// routine is called after identifier resolution.
+///</summary>
     static int selectAddSubqueryTypeInfo( Walker pWalker, Select p )
     {
       Parse pParse;
@@ -4005,13 +4038,13 @@ break;
 #endif
 
 
-    /*
-** This routine adds datatype and collating sequence information to
-** the Table ures of all FROM-clause subqueries in a
-** SELECT statement.
-**
-** Use this routine after name resolution.
-*/
+    ///<summary>
+/// This routine adds datatype and collating sequence information to
+/// the Table ures of all FROM-clause subqueries in a
+/// SELECT statement.
+///
+/// Use this routine after name resolution.
+///</summary>
     static void sqlite3SelectAddTypeInfo( Parse pParse, Select pSelect )
     {
 #if !SQLITE_OMIT_SUBQUERY
@@ -4024,18 +4057,19 @@ break;
     }
 
 
-    /*
-    ** This routine sets of a SELECT statement for processing.  The
-    ** following is accomplished:
-    **
-    **     *  VDBE VdbeCursor numbers are assigned to all FROM-clause terms.
-    **     *  Ephemeral Table objects are created for all FROM-clause subqueries.
-    **     *  ON and USING clauses are shifted into WHERE statements
-    **     *  Wildcards "*" and "TABLE.*" in result sets are expanded.
-    **     *  Identifiers in expression are matched to tables.
-    **
-    ** This routine acts recursively on all subqueries within the SELECT.
-    */
+    ///<summary>
+/// This routine sets of a SELECT statement for processing.  The
+/// following is accomplished:
+///
+///     *  VDBE VdbeCursor numbers are assigned to all FROM-clause terms.
+///     *  Ephemeral Table objects are created for all FROM-clause subqueries.
+///     *  ON and USING clauses are shifted into WHERE statements
+///     *  Wildcards "*" and "TABLE.*" in result sets are expanded.
+///     *  Identifiers in expression are matched to tables.
+///
+/// This routine acts recursively on all subqueries within the SELECT.
+///
+///</summary>
     static void sqlite3SelectPrep(
     Parse pParse,         /* The parser context */
     Select p,             /* The SELECT statement being coded. */
@@ -4057,13 +4091,14 @@ break;
       sqlite3SelectAddTypeInfo( pParse, p );
     }
 
-    /*
-    ** Reset the aggregate accumulator.
-    **
-    ** The aggregate accumulator is a set of memory cells that hold
-    ** intermediate results while calculating an aggregate.  This
-    ** routine simply stores NULLs in all of those memory cells.
-    */
+    ///<summary>
+/// Reset the aggregate accumulator.
+///
+/// The aggregate accumulator is a set of memory cells that hold
+/// intermediate results while calculating an aggregate.  This
+/// routine simply stores NULLs in all of those memory cells.
+///
+///</summary>
     static void resetAccumulator( Parse pParse, AggInfo pAggInfo )
     {
       Vdbe v = pParse.pVdbe;
@@ -4101,10 +4136,11 @@ break;
       }
     }
 
-    /*
-    ** Invoke the OP_AggFinalize opcode for every aggregate function
-    ** in the AggInfo structure.
-    */
+    ///<summary>
+/// Invoke the OP_AggFinalize opcode for every aggregate function
+/// in the AggInfo structure.
+///
+///</summary>
     static void finalizeAggFunctions( Parse pParse, AggInfo pAggInfo )
     {
       Vdbe v = pParse.pVdbe;
@@ -4207,10 +4243,11 @@ break;
       sqlite3ExprCacheClear( pParse );
     }
 
-    /*
-    ** Add a single OP_Explain instruction to the VDBE to explain a simple
-    ** count() query ("SELECT count() FROM pTab").
-    */
+    ///<summary>
+/// Add a single OP_Explain instruction to the VDBE to explain a simple
+/// count() query ("SELECT count() FROM pTab").
+///
+///</summary>
 #if !SQLITE_OMIT_EXPLAIN
     static void explainSimpleCount(
       Parse pParse,                  /* Parse context */
@@ -4236,60 +4273,61 @@ break;
     static void explainSimpleCount(Parse a, Table b, Index c){}
 #endif
 
-    /*
-    ** Generate code for the SELECT statement given in the p argument.
-    **
-    ** The results are distributed in various ways depending on the
-    ** contents of the SelectDest structure pointed to by argument pDest
-    ** as follows:
-    **
-    **     pDest.eDest    Result
-    **     ------------    -------------------------------------------
-    **     SelectResultType.Output      Generate a row of output (using the OP_ResultRow
-    **                     opcode) for each row in the result set.
-    **
-    **     SelectResultType.Mem         Only valid if the result is a single column.
-    **                     Store the first column of the first result row
-    **                     in register pDest.iParm then abandon the rest
-    **                     of the query.  This destination implies "LIMIT 1".
-    **
-    **     SelectResultType.Set         The result must be a single column.  Store each
-    **                     row of result as the key in table pDest.iParm.
-    **                     Apply the affinity pDest.affinity before storing
-    **                     results.  Used to implement "IN (SELECT ...)".
-    **
-    **     SelectResultType.Union       Store results as a key in a temporary table pDest.iParm.
-    **
-    **     SelectResultType.Except      Remove results from the temporary table pDest.iParm.
-    **
-    **     SelectResultType.Table       Store results in temporary table pDest.iParm.
-    **                     This is like SelectResultType.EphemTab except that the table
-    **                     is assumed to already be open.
-    **
-    **     SelectResultType.EphemTab    Create an temporary table pDest.iParm and store
-    **                     the result there. The cursor is left open after
-    **                     returning.  This is like SelectResultType.Table except that
-    **                     this destination uses OP_OpenEphemeral to create
-    **                     the table first.
-    **
-    **     SelectResultType.Coroutine   Generate a co-routine that returns a new row of
-    **                     results each time it is invoked.  The entry point
-    **                     of the co-routine is stored in register pDest.iParm.
-    **
-    **     SelectResultType.Exists      Store a 1 in memory cell pDest.iParm if the result
-    **                     set is not empty.
-    **
-    **     SelectResultType.Discard     Throw the results away.  This is used by SELECT
-    **                     statements within triggers whose only purpose is
-    **                     the side-effects of functions.
-    **
-    ** This routine returns the number of errors.  If any errors are
-    ** encountered, then an appropriate error message is left in
-    ** pParse.zErrMsg.
-    **
-    ** This routine does NOT free the Select structure passed in.  The
-    ** calling function needs to do that.
-    */
+    ///<summary>
+/// Generate code for the SELECT statement given in the p argument.
+///
+/// The results are distributed in various ways depending on the
+/// contents of the SelectDest structure pointed to by argument pDest
+/// as follows:
+///
+///     pDest.eDest    Result
+///     ------------    -------------------------------------------
+///     SelectResultType.Output      Generate a row of output (using the OP_ResultRow
+///                     opcode) for each row in the result set.
+///
+///     SelectResultType.Mem         Only valid if the result is a single column.
+///                     Store the first column of the first result row
+///                     in register pDest.iParm then abandon the rest
+///                     of the query.  This destination implies "LIMIT 1".
+///
+///     SelectResultType.Set         The result must be a single column.  Store each
+///                     row of result as the key in table pDest.iParm.
+///                     Apply the affinity pDest.affinity before storing
+///                     results.  Used to implement "IN (SELECT ...)".
+///
+///     SelectResultType.Union       Store results as a key in a temporary table pDest.iParm.
+///
+///     SelectResultType.Except      Remove results from the temporary table pDest.iParm.
+///
+///     SelectResultType.Table       Store results in temporary table pDest.iParm.
+///                     This is like SelectResultType.EphemTab except that the table
+///                     is assumed to already be open.
+///
+///     SelectResultType.EphemTab    Create an temporary table pDest.iParm and store
+///                     the result there. The cursor is left open after
+///                     returning.  This is like SelectResultType.Table except that
+///                     this destination uses OP_OpenEphemeral to create
+///                     the table first.
+///
+///     SelectResultType.Coroutine   Generate a co-routine that returns a new row of
+///                     results each time it is invoked.  The entry point
+///                     of the co-routine is stored in register pDest.iParm.
+///
+///     SelectResultType.Exists      Store a 1 in memory cell pDest.iParm if the result
+///                     set is not empty.
+///
+///     SelectResultType.Discard     Throw the results away.  This is used by SELECT
+///                     statements within triggers whose only purpose is
+///                     the side-effects of functions.
+///
+/// This routine returns the number of errors.  If any errors are
+/// encountered, then an appropriate error message is left in
+/// pParse.zErrMsg.
+///
+/// This routine does NOT free the Select structure passed in.  The
+/// calling function needs to do that.
+///
+///</summary>
     static SelectDest sdDummy = null;
     static bool bDummy = false;
 

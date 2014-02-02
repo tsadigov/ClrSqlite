@@ -38,14 +38,18 @@ namespace Community.CsharpSqlite
     //#include "sqliteInt.h"
 
 
-    /* All threads share a single random number generator.
-    ** This structure is the current state of the generator.
-    */
+    ///<summary>
+///All threads share a single random number generator.
+/// This structure is the current state of the generator.
+///
+///</summary>
     public class sqlite3PrngType
     {
       public bool isInit;      /* True if initialized */
       public int i;
-      public int j;            /* State variables */
+      public int j;            ///<summary>
+///State variables
+///</summary>
       public u8[] s = new u8[256];          /* State variables */
 
       public sqlite3PrngType Copy()
@@ -57,22 +61,23 @@ namespace Community.CsharpSqlite
       }
     }
     public static sqlite3PrngType sqlite3Prng = new sqlite3PrngType();
-    /*
-    ** Get a single 8-bit random value from the RC4 PRNG.  The Mutex
-    ** must be held while executing this routine.
-    **
-    ** Why not just use a library random generator like lrand48() for this?
-    ** Because the OP_NewRowid opcode in the VDBE depends on having a very
-    ** good source of random numbers.  The lrand48() library function may
-    ** well be good enough.  But maybe not.  Or maybe lrand48() has some
-    ** subtle problems on some systems that could cause problems.  It is hard
-    ** to know.  To minimize the risk of problems due to bad lrand48()
-    ** implementations, SQLite uses this random number generator based
-    ** on RC4, which we know works very well.
-    **
-    ** (Later):  Actually, OP_NewRowid does not depend on a good source of
-    ** randomness any more.  But we will leave this code in all the same.
-    */
+    ///<summary>
+/// Get a single 8-bit random value from the RC4 PRNG.  The Mutex
+/// must be held while executing this routine.
+///
+/// Why not just use a library random generator like lrand48() for this?
+/// Because the OP_NewRowid opcode in the VDBE depends on having a very
+/// good source of random numbers.  The lrand48() library function may
+/// well be good enough.  But maybe not.  Or maybe lrand48() has some
+/// subtle problems on some systems that could cause problems.  It is hard
+/// to know.  To minimize the risk of problems due to bad lrand48()
+/// implementations, SQLite uses this random number generator based
+/// on RC4, which we know works very well.
+///
+/// (Later):  Actually, OP_NewRowid does not depend on a good source of
+/// randomness any more.  But we will leave this code in all the same.
+///
+///</summary>
     static u8 randomu8()
     {
       u8 t;
@@ -133,9 +138,10 @@ struct sqlite3PrngType *p = &GLOBAL(struct sqlite3PrngType, sqlite3Prng);
       return wsdPrng.s[t];
     }
 
-    /*
-    ** Return N random u8s.
-    */
+    ///<summary>
+/// Return N random u8s.
+///
+///</summary>
     static void sqlite3_randomness( int N, ref i64 pBuf )
     {
       u8[] zBuf = new u8[N];
@@ -167,15 +173,15 @@ struct sqlite3PrngType *p = &GLOBAL(struct sqlite3PrngType, sqlite3Prng);
     }
 
 #if !SQLITE_OMIT_BUILTIN_TEST
-    /*
-** For testing purposes, we sometimes want to preserve the state of
-** PRNG and restore the PRNG to its saved state at a later time, or
-** to reset the PRNG to its initial state.  These routines accomplish
-** those tasks.
-**
-** The sqlite3_test_control() interface calls these routines to
-** control the PRNG.
-*/
+    ///<summary>
+/// For testing purposes, we sometimes want to preserve the state of
+/// PRNG and restore the PRNG to its saved state at a later time, or
+/// to reset the PRNG to its initial state.  These routines accomplish
+/// those tasks.
+///
+/// The sqlite3_test_control() interface calls these routines to
+/// control the PRNG.
+///</summary>
     static sqlite3PrngType sqlite3SavedPrng = null;
     static void sqlite3PrngSaveState()
     {

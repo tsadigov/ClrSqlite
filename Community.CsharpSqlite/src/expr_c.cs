@@ -22,45 +22,47 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    ** 2001 September 15
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains routines used for analyzing expressions and
-    ** for generating VDBE code that evaluates expressions in SQLite.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2001 September 15
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains routines used for analyzing expressions and
+/// for generating VDBE code that evaluates expressions in SQLite.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
 
-    /*
-    ** Return the 'affinity' of the expression pExpr if any.
-    **
-    ** If pExpr is a column, a reference to a column via an 'AS' alias,
-    ** or a sub-select with a column as the return value, then the
-    ** affinity of that column is returned. Otherwise, 0x00 is returned,
-    ** indicating no affinity for the expression.
-    **
-    ** i.e. the WHERE clause expresssions in the following statements all
-    ** have an affinity:
-    **
-    ** CREATE TABLE t1(a);
-    ** SELECT * FROM t1 WHERE a;
-    ** SELECT a AS b FROM t1 WHERE b;
-    ** SELECT * FROM t1 WHERE (select a from t1);
-    */
+    ///<summary>
+/// Return the 'affinity' of the expression pExpr if any.
+///
+/// If pExpr is a column, a reference to a column via an 'AS' alias,
+/// or a sub-select with a column as the return value, then the
+/// affinity of that column is returned. Otherwise, 0x00 is returned,
+/// indicating no affinity for the expression.
+///
+/// i.e. the WHERE clause expresssions in the following statements all
+/// have an affinity:
+///
+/// CREATE TABLE t1(a);
+/// SELECT * FROM t1 WHERE a;
+/// SELECT a AS b FROM t1 WHERE b;
+/// SELECT * FROM t1 WHERE (select a from t1);
+///
+///</summary>
     static char sqlite3ExprAffinity( Expr pExpr )
     {
       int op = pExpr.op;
@@ -91,10 +93,11 @@ namespace Community.CsharpSqlite
       return pExpr.affinity;
     }
 
-    /*
-    ** Set the explicit collating sequence for an expression to the
-    ** collating sequence supplied in the second argument.
-    */
+    ///<summary>
+/// Set the explicit collating sequence for an expression to the
+/// collating sequence supplied in the second argument.
+///
+///</summary>
     static Expr sqlite3ExprSetColl( Expr pExpr, CollSeq pColl )
     {
       if ( pExpr != null && pColl != null )
@@ -105,13 +108,14 @@ namespace Community.CsharpSqlite
       return pExpr;
     }
 
-    /*
-    ** Set the collating sequence for expression pExpr to be the collating
-    ** sequence named by pToken.   Return a pointer to the revised expression.
-    ** The collating sequence is marked as "explicit" using the EP_ExpCollate
-    ** flag.  An explicit collating sequence will override implicit
-    ** collating sequences.
-    */
+    ///<summary>
+/// Set the collating sequence for expression pExpr to be the collating
+/// sequence named by pToken.   Return a pointer to the revised expression.
+/// The collating sequence is marked as "explicit" using the EP_ExpCollate
+/// flag.  An explicit collating sequence will override implicit
+/// collating sequences.
+///
+///</summary>
     static Expr sqlite3ExprSetCollByToken( Parse pParse, Expr pExpr, Token pCollName )
     {
       string zColl;            /* Dequoted name of collation sequence */
@@ -124,10 +128,11 @@ namespace Community.CsharpSqlite
       return pExpr;
     }
 
-    /*
-    ** Return the default collation sequence for the expression pExpr. If
-    ** there is no default collation type, return 0.
-    */
+    ///<summary>
+/// Return the default collation sequence for the expression pExpr. If
+/// there is no default collation type, return 0.
+///
+///</summary>
     static CollSeq sqlite3ExprCollSeq( Parse pParse, Expr pExpr )
     {
       CollSeq pColl = null;
@@ -169,11 +174,12 @@ namespace Community.CsharpSqlite
       return pColl;
     }
 
-    /*
-    ** pExpr is an operand of a comparison operator.  aff2 is the
-    ** type affinity of the other operand.  This routine returns the
-    ** type affinity that should be used for the comparison operator.
-    */
+    ///<summary>
+/// pExpr is an operand of a comparison operator.  aff2 is the
+/// type affinity of the other operand.  This routine returns the
+/// type affinity that should be used for the comparison operator.
+///
+///</summary>
     static char sqlite3CompareAffinity( Expr pExpr, char aff2 )
     {
       char aff1 = sqlite3ExprAffinity( pExpr );
@@ -207,10 +213,11 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** pExpr is a comparison operator.  Return the type affinity that should
-    ** be applied to both operands prior to doing the comparison.
-    */
+    ///<summary>
+/// pExpr is a comparison operator.  Return the type affinity that should
+/// be applied to both operands prior to doing the comparison.
+///
+///</summary>
     static char comparisonAffinity( Expr pExpr )
     {
       char aff;
@@ -234,12 +241,13 @@ namespace Community.CsharpSqlite
       return aff;
     }
 
-    /*
-    ** pExpr is a comparison expression, eg. '=', '<', IN(...) etc.
-    ** idx_affinity is the affinity of an indexed column. Return true
-    ** if the index with affinity idx_affinity may be used to implement
-    ** the comparison in pExpr.
-    */
+    ///<summary>
+/// pExpr is a comparison expression, eg. '=', '<', IN(...) etc.
+/// idx_affinity is the affinity of an indexed column. Return true
+/// if the index with affinity idx_affinity may be used to implement
+/// the comparison in pExpr.
+///
+///</summary>
     static bool sqlite3IndexAffinityOk( Expr pExpr, char idx_affinity )
     {
       char aff = comparisonAffinity( pExpr );
@@ -254,10 +262,11 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Return the P5 value that should be used for a binary comparison
-    ** opcode (OP_Eq, OP_Ge etc.) used to compare pExpr1 and pExpr2.
-    */
+    ///<summary>
+/// Return the P5 value that should be used for a binary comparison
+/// opcode (OP_Eq, OP_Ge etc.) used to compare pExpr1 and pExpr2.
+///
+///</summary>
     static u8 binaryCompareP5( Expr pExpr1, Expr pExpr2, int jumpIfNull )
     {
       u8 aff = (u8)sqlite3ExprAffinity( pExpr2 );
@@ -265,18 +274,19 @@ namespace Community.CsharpSqlite
       return aff;
     }
 
-    /*
-    ** Return a pointer to the collation sequence that should be used by
-    ** a binary comparison operator comparing pLeft and pRight.
-    **
-    ** If the left hand expression has a collating sequence type, then it is
-    ** used. Otherwise the collation sequence for the right hand expression
-    ** is used, or the default (BINARY) if neither expression has a collating
-    ** type.
-    **
-    ** Argument pRight (but not pLeft) may be a null pointer. In this case,
-    ** it is not considered.
-    */
+    ///<summary>
+/// Return a pointer to the collation sequence that should be used by
+/// a binary comparison operator comparing pLeft and pRight.
+///
+/// If the left hand expression has a collating sequence type, then it is
+/// used. Otherwise the collation sequence for the right hand expression
+/// is used, or the default (BINARY) if neither expression has a collating
+/// type.
+///
+/// Argument pRight (but not pLeft) may be a null pointer. In this case,
+/// it is not considered.
+///
+///</summary>
     static CollSeq sqlite3BinaryCompareCollSeq(
     Parse pParse,
     Expr pLeft,
@@ -306,9 +316,10 @@ namespace Community.CsharpSqlite
       return pColl;
     }
 
-    /*
-    ** Generate code for a comparison operator.
-    */
+    ///<summary>
+/// Generate code for a comparison operator.
+///
+///</summary>
     static int codeCompare(
     Parse pParse,    /* The parsing (and code generating) context */
     Expr pLeft,      /* The left operand */
@@ -332,11 +343,11 @@ namespace Community.CsharpSqlite
     }
 
 #if SQLITE_MAX_EXPR_DEPTH //>0
-    /*
-** Check that argument nHeight is less than or equal to the maximum
-** expression depth allowed. If it is not, leave an error message in
-** pParse.
-*/
+    ///<summary>
+/// Check that argument nHeight is less than or equal to the maximum
+/// expression depth allowed. If it is not, leave an error message in
+/// pParse.
+///</summary>
     static int sqlite3ExprCheckHeight( Parse pParse, int nHeight )
     {
       int rc = SQLITE_OK;
@@ -351,15 +362,17 @@ namespace Community.CsharpSqlite
       return rc;
     }
 
-    /* The following three functions, heightOfExpr(), heightOfExprList()
-    ** and heightOfSelect(), are used to determine the maximum height
-    ** of any expression tree referenced by the structure passed as the
-    ** first argument.
-    **
-    ** If this maximum height is greater than the current value pointed
-    ** to by pnHeight, the second parameter, then set pnHeight to that
-    ** value.
-    */
+    ///<summary>
+///The following three functions, heightOfExpr(), heightOfExprList()
+/// and heightOfSelect(), are used to determine the maximum height
+/// of any expression tree referenced by the structure passed as the
+/// first argument.
+///
+/// If this maximum height is greater than the current value pointed
+/// to by pnHeight, the second parameter, then set pnHeight to that
+/// value.
+///
+///</summary>
     static void heightOfExpr( Expr p, ref int pnHeight )
     {
       if ( p != null )
@@ -396,13 +409,14 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Set the Expr.nHeight variable in the structure passed as an
-    ** argument. An expression with no children, Expr.x.pList or
-    ** Expr.x.pSelect member has a height of 1. Any other expression
-    ** has a height equal to the maximum height of any other
-    ** referenced Expr plus one.
-    */
+    ///<summary>
+/// Set the Expr.nHeight variable in the structure passed as an
+/// argument. An expression with no children, Expr.x.pList or
+/// Expr.x.pSelect member has a height of 1. Any other expression
+/// has a height equal to the maximum height of any other
+/// referenced Expr plus one.
+///
+///</summary>
     static void exprSetHeight( Expr p )
     {
       int nHeight = 0;
@@ -419,21 +433,23 @@ namespace Community.CsharpSqlite
       p.nHeight = nHeight + 1;
     }
 
-    /*
-    ** Set the Expr.nHeight variable using the exprSetHeight() function. If
-    ** the height is greater than the maximum allowed expression depth,
-    ** leave an error in pParse.
-    */
+    ///<summary>
+/// Set the Expr.nHeight variable using the exprSetHeight() function. If
+/// the height is greater than the maximum allowed expression depth,
+/// leave an error in pParse.
+///
+///</summary>
     static void sqlite3ExprSetHeight( Parse pParse, Expr p )
     {
       exprSetHeight( p );
       sqlite3ExprCheckHeight( pParse, p.nHeight );
     }
 
-    /*
-    ** Return the maximum height of any expression tree referenced
-    ** by the select statement passed as an argument.
-    */
+    ///<summary>
+/// Return the maximum height of any expression tree referenced
+/// by the select statement passed as an argument.
+///
+///</summary>
     static int sqlite3SelectExprHeight( Select p )
     {
       int nHeight = 0;
@@ -444,26 +460,26 @@ namespace Community.CsharpSqlite
 //#define exprSetHeight(y)
 #endif //* SQLITE_MAX_EXPR_DEPTH>0 */
 
-    /*
-** This routine is the core allocator for Expr nodes.
-**
-** Construct a new expression node and return a pointer to it.  Memory
-** for this node and for the pToken argument is a single allocation
-** obtained from sqlite3DbMalloc().  The calling function
-** is responsible for making sure the node eventually gets freed.
-**
-** If dequote is true, then the token (if it exists) is dequoted.
-** If dequote is false, no dequoting is performance.  The deQuote
-** parameter is ignored if pToken is NULL or if the token does not
-** appear to be quoted.  If the quotes were of the form "..." (double-quotes)
-** then the EP_DblQuoted flag is set on the expression node.
-**
-** Special case:  If op==TK_INTEGER and pToken points to a string that
-** can be translated into a 32-bit integer, then the token is not
-** stored in u.zToken.  Instead, the integer values is written
-** into u.iValue and the EP_IntValue flag is set.  No extra storage
-** is allocated to hold the integer text and the dequote flag is ignored.
-*/
+    ///<summary>
+/// This routine is the core allocator for Expr nodes.
+///
+/// Construct a new expression node and return a pointer to it.  Memory
+/// for this node and for the pToken argument is a single allocation
+/// obtained from sqlite3DbMalloc().  The calling function
+/// is responsible for making sure the node eventually gets freed.
+///
+/// If dequote is true, then the token (if it exists) is dequoted.
+/// If dequote is false, no dequoting is performance.  The deQuote
+/// parameter is ignored if pToken is NULL or if the token does not
+/// appear to be quoted.  If the quotes were of the form "..." (double-quotes)
+/// then the EP_DblQuoted flag is set on the expression node.
+///
+/// Special case:  If op==TK_INTEGER and pToken points to a string that
+/// can be translated into a 32-bit integer, then the token is not
+/// stored in u.zToken.  Instead, the integer values is written
+/// into u.iValue and the EP_IntValue flag is set.  No extra storage
+/// is allocated to hold the integer text and the dequote flag is ignored.
+///</summary>
     static Expr sqlite3ExprAlloc(
     sqlite3 db,           /* Handle for sqlite3DbMallocZero() (may be null) */
     int op,               /* Expression opcode */
@@ -525,10 +541,11 @@ StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
       return pNew;
     }
 
-    /*
-    ** Allocate a new expression node from a zero-terminated token that has
-    ** already been dequoted.
-    */
+    ///<summary>
+/// Allocate a new expression node from a zero-terminated token that has
+/// already been dequoted.
+///
+///</summary>
     static Expr sqlite3Expr(
     sqlite3 db,           /* Handle for sqlite3DbMallocZero() (may be null) */
     int op,               /* Expression opcode */
@@ -584,13 +601,14 @@ StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
       }
     }
 
-    /*
-    ** Allocate a Expr node which joins as many as two subtrees.
-    **
-    ** One or both of the subtrees can be NULL.  Return a pointer to the new
-    ** Expr node.  Or, if an OOM error occurs, set pParse->db->mallocFailed,
-    ** free the subtrees and return NULL.
-    */
+    ///<summary>
+/// Allocate a Expr node which joins as many as two subtrees.
+///
+/// One or both of the subtrees can be NULL.  Return a pointer to the new
+/// Expr node.  Or, if an OOM error occurs, set pParse->db->mallocFailed,
+/// free the subtrees and return NULL.
+///
+///</summary>
     // OVERLOADS, so I don't need to rewrite parse.c
     static Expr sqlite3PExpr( Parse pParse, int op, int null_3, int null_4, int null_5 )
     {
@@ -651,10 +669,11 @@ StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
       }
     }
 
-    /*
-     ** Construct a new expression node for a function with multiple
-     ** arguments.
-     */
+    ///<summary>
+/// Construct a new expression node for a function with multiple
+/// arguments.
+///
+///</summary>
     // OVERLOADS, so I don't need to rewrite parse.c
     static Expr sqlite3ExprFunction( Parse pParse, int null_2, Token pToken )
     {
@@ -682,22 +701,23 @@ StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
       return pNew;
     }
 
-    /*
-    ** Assign a variable number to an expression that encodes a wildcard
-    ** in the original SQL statement.
-    **
-    ** Wildcards consisting of a single "?" are assigned the next sequential
-    ** variable number.
-    **
-    ** Wildcards of the form "?nnn" are assigned the number "nnn".  We make
-    ** sure "nnn" is not too be to avoid a denial of service attack when
-    ** the SQL statement comes from an external source.
-    **
-    ** Wildcards of the form ":aaa", "@aaa" or "$aaa" are assigned the same number
-    ** as the previous instance of the same wildcard.  Or if this is the first
-    ** instance of the wildcard, the next sequenial variable number is
-    ** assigned.
-    */
+    ///<summary>
+/// Assign a variable number to an expression that encodes a wildcard
+/// in the original SQL statement.
+///
+/// Wildcards consisting of a single "?" are assigned the next sequential
+/// variable number.
+///
+/// Wildcards of the form "?nnn" are assigned the number "nnn".  We make
+/// sure "nnn" is not too be to avoid a denial of service attack when
+/// the SQL statement comes from an external source.
+///
+/// Wildcards of the form ":aaa", "@aaa" or "$aaa" are assigned the same number
+/// as the previous instance of the same wildcard.  Or if this is the first
+/// instance of the wildcard, the next sequenial variable number is
+/// assigned.
+///
+///</summary>
     static void sqlite3ExprAssignVarNumber( Parse pParse, Expr pExpr )
     {
       sqlite3 db = pParse.db;
@@ -777,9 +797,10 @@ StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
       }
     }
 
-    /*
-    ** Recursively delete an expression tree.
-    */
+    ///<summary>
+/// Recursively delete an expression tree.
+///
+///</summary>
     static void sqlite3ExprDelete( sqlite3 db, ref Expr p )
     {
       if ( p == null )
@@ -813,11 +834,12 @@ sqlite3DbFree( db, ref p.u._zToken );
       }
     }
 
-    /*
-    ** Return the number of bytes allocated for the expression structure
-    ** passed as the first argument. This is always one of EXPR_FULLSIZE,
-    ** EXPR_REDUCEDSIZE or EXPR_TOKENONLYSIZE.
-    */
+    ///<summary>
+/// Return the number of bytes allocated for the expression structure
+/// passed as the first argument. This is always one of EXPR_FULLSIZE,
+/// EXPR_REDUCEDSIZE or EXPR_TOKENONLYSIZE.
+///
+///</summary>
     static int exprStructSize( Expr p )
     {
       if ( ExprHasProperty( p, EP_TokenOnly ) )
@@ -827,40 +849,41 @@ sqlite3DbFree( db, ref p.u._zToken );
       return EXPR_FULLSIZE;
     }
 
-    /*
-    ** The dupedExpr*Size() routines each return the number of bytes required
-    ** to store a copy of an expression or expression tree.  They differ in
-    ** how much of the tree is measured.
-    **
-    **     dupedExprStructSize()     Size of only the Expr structure
-    **     dupedExprNodeSize()       Size of Expr + space for token
-    **     dupedExprSize()           Expr + token + subtree components
-    **
-    ***************************************************************************
-    **
-    ** The dupedExprStructSize() function returns two values OR-ed together:
-    ** (1) the space required for a copy of the Expr structure only and
-    ** (2) the EP_xxx flags that indicate what the structure size should be.
-    ** The return values is always one of:
-    **
-    **      EXPR_FULLSIZE
-    **      EXPR_REDUCEDSIZE   | EP_Reduced
-    **      EXPR_TOKENONLYSIZE | EP_TokenOnly
-    **
-    ** The size of the structure can be found by masking the return value
-    ** of this routine with 0xfff.  The flags can be found by masking the
-    ** return value with EP_Reduced|EP_TokenOnly.
-    **
-    ** Note that with flags==EXPRDUP_REDUCE, this routines works on full-size
-    ** (unreduced) Expr objects as they or originally constructed by the parser.
-    ** During expression analysis, extra information is computed and moved into
-    ** later parts of teh Expr object and that extra information might get chopped
-    ** off if the expression is reduced.  Note also that it does not work to
-    ** make a EXPRDUP_REDUCE copy of a reduced expression.  It is only legal
-    ** to reduce a pristine expression tree from the parser.  The implementation
-    ** of dupedExprStructSize() contain multiple Debug.Assert() statements that attempt
-    ** to enforce this constraint.
-    */
+    ///<summary>
+/// The dupedExpr*Size() routines each return the number of bytes required
+/// to store a copy of an expression or expression tree.  They differ in
+/// how much of the tree is measured.
+///
+///     dupedExprStructSize()     Size of only the Expr structure
+///     dupedExprNodeSize()       Size of Expr + space for token
+///     dupedExprSize()           Expr + token + subtree components
+///
+///
+///
+/// The dupedExprStructSize() function returns two values OR-ed together:
+/// (1) the space required for a copy of the Expr structure only and
+/// (2) the EP_xxx flags that indicate what the structure size should be.
+/// The return values is always one of:
+///
+///      EXPR_FULLSIZE
+///      EXPR_REDUCEDSIZE   | EP_Reduced
+///      EXPR_TOKENONLYSIZE | EP_TokenOnly
+///
+/// The size of the structure can be found by masking the return value
+/// of this routine with 0xfff.  The flags can be found by masking the
+/// return value with EP_Reduced|EP_TokenOnly.
+///
+/// Note that with flags==EXPRDUP_REDUCE, this routines works on full-size
+/// (unreduced) Expr objects as they or originally constructed by the parser.
+/// During expression analysis, extra information is computed and moved into
+/// later parts of teh Expr object and that extra information might get chopped
+/// off if the expression is reduced.  Note also that it does not work to
+/// make a EXPRDUP_REDUCE copy of a reduced expression.  It is only legal
+/// to reduce a pristine expression tree from the parser.  The implementation
+/// of dupedExprStructSize() contain multiple Debug.Assert() statements that attempt
+/// to enforce this constraint.
+///
+///</summary>
     static int dupedExprStructSize( Expr p, int flags )
     {
       int nSize;
@@ -887,11 +910,12 @@ sqlite3DbFree( db, ref p.u._zToken );
       return nSize;
     }
 
-    /*
-    ** This function returns the space in bytes required to store the copy
-    ** of the Expr structure and a copy of the Expr.u.zToken string (if that
-    ** string is defined.)
-    */
+    ///<summary>
+/// This function returns the space in bytes required to store the copy
+/// of the Expr structure and a copy of the Expr.u.zToken string (if that
+/// string is defined.)
+///
+///</summary>
     static int dupedExprNodeSize( Expr p, int flags )
     {
       int nByte = dupedExprStructSize( p, flags ) & 0xfff;
@@ -902,19 +926,20 @@ sqlite3DbFree( db, ref p.u._zToken );
       return ROUND8( nByte );
     }
 
-    /*
-    ** Return the number of bytes required to create a duplicate of the
-    ** expression passed as the first argument. The second argument is a
-    ** mask containing EXPRDUP_XXX flags.
-    **
-    ** The value returned includes space to create a copy of the Expr struct
-    ** itself and the buffer referred to by Expr.u.zToken, if any.
-    **
-    ** If the EXPRDUP_REDUCE flag is set, then the return value includes
-    ** space to duplicate all Expr nodes in the tree formed by Expr.pLeft
-    ** and Expr.pRight variables (but not for any structures pointed to or
-    ** descended from the Expr.x.pList or Expr.x.pSelect variables).
-    */
+    ///<summary>
+/// Return the number of bytes required to create a duplicate of the
+/// expression passed as the first argument. The second argument is a
+/// mask containing EXPRDUP_XXX flags.
+///
+/// The value returned includes space to create a copy of the Expr struct
+/// itself and the buffer referred to by Expr.u.zToken, if any.
+///
+/// If the EXPRDUP_REDUCE flag is set, then the return value includes
+/// space to duplicate all Expr nodes in the tree formed by Expr.pLeft
+/// and Expr.pRight variables (but not for any structures pointed to or
+/// descended from the Expr.x.pList or Expr.x.pSelect variables).
+///
+///</summary>
     static int dupedExprSize( Expr p, int flags )
     {
       int nByte = 0;
@@ -929,14 +954,15 @@ sqlite3DbFree( db, ref p.u._zToken );
       return nByte;
     }
 
-    /*
-    ** This function is similar to sqlite3ExprDup(), except that if pzBuffer
-    ** is not NULL then *pzBuffer is assumed to point to a buffer large enough
-    ** to store the copy of expression p, the copies of p->u.zToken
-    ** (if applicable), and the copies of the p->pLeft and p->pRight expressions,
-    ** if any. Before returning, *pzBuffer is set to the first byte passed the
-    ** portion of the buffer copied into by this function.
-    */
+    ///<summary>
+/// This function is similar to sqlite3ExprDup(), except that if pzBuffer
+/// is not NULL then *pzBuffer is assumed to point to a buffer large enough
+/// to store the copy of expression p, the copies of p->u.zToken
+/// (if applicable), and the copies of the p->pLeft and p->pRight expressions,
+/// if any. Before returning, *pzBuffer is set to the first byte passed the
+/// portion of the buffer copied into by this function.
+///
+///</summary>
     static Expr exprDup( sqlite3 db, Expr p, int flags, ref Expr pzBuffer )
     {
       Expr pNew = null;                      /* Value to return */
@@ -1047,23 +1073,24 @@ sqlite3DbFree( db, ref p.u._zToken );
       return pNew;
     }
 
-    /*
-    ** The following group of routines make deep copies of expressions,
-    ** expression lists, ID lists, and select statements.  The copies can
-    ** be deleted (by being passed to their respective ...Delete() routines)
-    ** without effecting the originals.
-    **
-    ** The expression list, ID, and source lists return by sqlite3ExprListDup(),
-    ** sqlite3IdListDup(), and sqlite3SrcListDup() can not be further expanded
-    ** by subsequent calls to sqlite*ListAppend() routines.
-    **
-    ** Any tables that the SrcList might point to are not duplicated.
-    **
-    ** The flags parameter contains a combination of the EXPRDUP_XXX flags.
-    ** If the EXPRDUP_REDUCE flag is set, then the structure returned is a
-    ** truncated version of the usual Expr structure that will be stored as
-    ** part of the in-memory representation of the database schema.
-    */
+    ///<summary>
+/// The following group of routines make deep copies of expressions,
+/// expression lists, ID lists, and select statements.  The copies can
+/// be deleted (by being passed to their respective ...Delete() routines)
+/// without effecting the originals.
+///
+/// The expression list, ID, and source lists return by sqlite3ExprListDup(),
+/// sqlite3IdListDup(), and sqlite3SrcListDup() can not be further expanded
+/// by subsequent calls to sqlite*ListAppend() routines.
+///
+/// Any tables that the SrcList might point to are not duplicated.
+///
+/// The flags parameter contains a combination of the EXPRDUP_XXX flags.
+/// If the EXPRDUP_REDUCE flag is set, then the structure returned is a
+/// truncated version of the usual Expr structure that will be stored as
+/// part of the in-memory representation of the database schema.
+///
+///</summary>
     static Expr sqlite3ExprDup( sqlite3 db, Expr p, int flags )
     {
       Expr ExprDummy = null;
@@ -1104,12 +1131,13 @@ sqlite3DbFree( db, ref p.u._zToken );
       return pNew;
     }
 
-    /*
-    ** If cursors, triggers, views and subqueries are all omitted from
-    ** the build, then none of the following routines, except for
-    ** sqlite3SelectDup(), can be called. sqlite3SelectDup() is sometimes
-    ** called with a NULL argument.
-    */
+    ///<summary>
+/// If cursors, triggers, views and subqueries are all omitted from
+/// the build, then none of the following routines, except for
+/// sqlite3SelectDup(), can be called. sqlite3SelectDup() is sometimes
+/// called with a NULL argument.
+///
+///</summary>
 #if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_TRIGGER  || !SQLITE_OMIT_SUBQUERY
     static SrcList sqlite3SrcListDup( sqlite3 db, SrcList p, int flags )
     {
@@ -1214,14 +1242,14 @@ return null;
 #endif
 
 
-    /*
-** Add a new element to the end of an expression list.  If pList is
-** initially NULL, then create a new expression list.
-**
-** If a memory allocation error occurs, the entire list is freed and
-** NULL is returned.  If non-NULL is returned, then it is guaranteed
-** that the new entry was successfully appended.
-*/
+    ///<summary>
+/// Add a new element to the end of an expression list.  If pList is
+/// initially NULL, then create a new expression list.
+///
+/// If a memory allocation error occurs, the entire list is freed and
+/// NULL is returned.  If non-NULL is returned, then it is guaranteed
+/// that the new entry was successfully appended.
+///</summary>
     // OVERLOADS, so I don't need to rewrite parse.c
     static ExprList sqlite3ExprListAppend( Parse pParse, int null_2, Expr pExpr )
     {
@@ -1272,14 +1300,15 @@ return null;
       //  return null;
     }
 
-    /*
-    ** Set the ExprList.a[].zName element of the most recently added item
-    ** on the expression list.
-    **
-    ** pList might be NULL following an OOM error.  But pName should never be
-    ** NULL.  If a memory allocation fails, the pParse.db.mallocFailed flag
-    ** is set.
-    */
+    ///<summary>
+/// Set the ExprList.a[].zName element of the most recently added item
+/// on the expression list.
+///
+/// pList might be NULL following an OOM error.  But pName should never be
+/// NULL.  If a memory allocation fails, the pParse.db.mallocFailed flag
+/// is set.
+///
+///</summary>
     static void sqlite3ExprListSetName(
     Parse pParse,          /* Parsing context */
     ExprList pList,        /* List to which to add the span. */
@@ -1300,14 +1329,15 @@ return null;
       }
     }
 
-    /*
-    ** Set the ExprList.a[].zSpan element of the most recently added item
-    ** on the expression list.
-    **
-    ** pList might be NULL following an OOM error.  But pSpan should never be
-    ** NULL.  If a memory allocation fails, the pParse.db.mallocFailed flag
-    ** is set.
-    */
+    ///<summary>
+/// Set the ExprList.a[].zSpan element of the most recently added item
+/// on the expression list.
+///
+/// pList might be NULL following an OOM error.  But pSpan should never be
+/// NULL.  If a memory allocation fails, the pParse.db.mallocFailed flag
+/// is set.
+///
+///</summary>
     static void sqlite3ExprListSetSpan(
     Parse pParse,          /* Parsing context */
     ExprList pList,        /* List to which to add the span. */
@@ -1327,10 +1357,11 @@ return null;
       }
     }
 
-    /*
-    ** If the expression list pEList contains more than iLimit elements,
-    ** leave an error message in pParse.
-    */
+    ///<summary>
+/// If the expression list pEList contains more than iLimit elements,
+/// leave an error message in pParse.
+///
+///</summary>
     static void sqlite3ExprListCheckLength(
     Parse pParse,
     ExprList pEList,
@@ -1347,9 +1378,10 @@ return null;
     }
 
 
-    /*
-    ** Delete an entire expression list.
-    */
+    ///<summary>
+/// Delete an entire expression list.
+///
+///</summary>
     static void sqlite3ExprListDelete( sqlite3 db, ref ExprList pList )
     {
       int i;
@@ -1371,19 +1403,20 @@ return null;
       sqlite3DbFree( db, ref pList );
     }
 
-    /*
-    ** These routines are Walker callbacks.  Walker.u.pi is a pointer
-    ** to an integer.  These routines are checking an expression to see
-    ** if it is a constant.  Set *Walker.u.pi to 0 if the expression is
-    ** not constant.
-    **
-    ** These callback routines are used to implement the following:
-    **
-    **     sqlite3ExprIsConstant()
-    **     sqlite3ExprIsConstantNotJoin()
-    **     sqlite3ExprIsConstantOrFunction()
-    **
-    */
+    ///<summary>
+/// These routines are Walker callbacks.  Walker.u.pi is a pointer
+/// to an integer.  These routines are checking an expression to see
+/// if it is a constant.  Set *Walker.u.pi to 0 if the expression is
+/// not constant.
+///
+/// These callback routines are used to implement the following:
+///
+///     sqlite3ExprIsConstant()
+///     sqlite3ExprIsConstantNotJoin()
+///     sqlite3ExprIsConstantOrFunction()
+///
+///
+///</summary>
     static int exprNodeIsConstant( Walker pWalker, ref Expr pExpr )
     {
       /* If pWalker.u.i is 3 then any term of the expression that comes from
@@ -1437,50 +1470,54 @@ return null;
       return w.u.i;
     }
 
-    /*
-    ** Walk an expression tree.  Return 1 if the expression is constant
-    ** and 0 if it involves variables or function calls.
-    **
-    ** For the purposes of this function, a double-quoted string (ex: "abc")
-    ** is considered a variable but a single-quoted string (ex: 'abc') is
-    ** a constant.
-    */
+    ///<summary>
+/// Walk an expression tree.  Return 1 if the expression is constant
+/// and 0 if it involves variables or function calls.
+///
+/// For the purposes of this function, a double-quoted string (ex: "abc")
+/// is considered a variable but a single-quoted string (ex: 'abc') is
+/// a constant.
+///
+///</summary>
     static int sqlite3ExprIsConstant( Expr p )
     {
       return exprIsConst( p, 1 );
     }
 
-    /*
-    ** Walk an expression tree.  Return 1 if the expression is constant
-    ** that does no originate from the ON or USING clauses of a join.
-    ** Return 0 if it involves variables or function calls or terms from
-    ** an ON or USING clause.
-    */
+    ///<summary>
+/// Walk an expression tree.  Return 1 if the expression is constant
+/// that does no originate from the ON or USING clauses of a join.
+/// Return 0 if it involves variables or function calls or terms from
+/// an ON or USING clause.
+///
+///</summary>
     static int sqlite3ExprIsConstantNotJoin( Expr p )
     {
       return exprIsConst( p, 3 );
     }
 
-    /*
-    ** Walk an expression tree.  Return 1 if the expression is constant
-    ** or a function call with constant arguments.  Return and 0 if there
-    ** are any variables.
-    **
-    ** For the purposes of this function, a double-quoted string (ex: "abc")
-    ** is considered a variable but a single-quoted string (ex: 'abc') is
-    ** a constant.
-    */
+    ///<summary>
+/// Walk an expression tree.  Return 1 if the expression is constant
+/// or a function call with constant arguments.  Return and 0 if there
+/// are any variables.
+///
+/// For the purposes of this function, a double-quoted string (ex: "abc")
+/// is considered a variable but a single-quoted string (ex: 'abc') is
+/// a constant.
+///
+///</summary>
     static int sqlite3ExprIsConstantOrFunction( Expr p )
     {
       return exprIsConst( p, 2 );
     }
 
-    /*
-    ** If the expression p codes a constant integer that is small enough
-    ** to fit in a 32-bit integer, return 1 and put the value of the integer
-    ** in pValue.  If the expression is not an integer or if it is too big
-    ** to fit in a signed 32-bit integer, return 0 and leave pValue unchanged.
-    */
+    ///<summary>
+/// If the expression p codes a constant integer that is small enough
+/// to fit in a 32-bit integer, return 1 and put the value of the integer
+/// in pValue.  If the expression is not an integer or if it is too big
+/// to fit in a signed 32-bit integer, return 0 and leave pValue unchanged.
+///
+///</summary>
     static int sqlite3ExprIsInteger( Expr p, ref int pValue )
     {
       int rc = 0;
@@ -1518,20 +1555,21 @@ return null;
       return rc;
     }
 
-    /*
-    ** Return FALSE if there is no chance that the expression can be NULL.
-    **
-    ** If the expression might be NULL or if the expression is too complex
-    ** to tell return TRUE.  
-    **
-    ** This routine is used as an optimization, to skip OP_IsNull opcodes
-    ** when we know that a value cannot be NULL.  Hence, a false positive
-    ** (returning TRUE when in fact the expression can never be NULL) might
-    ** be a small performance hit but is otherwise harmless.  On the other
-    ** hand, a false negative (returning FALSE when the result could be NULL)
-    ** will likely result in an incorrect answer.  So when in doubt, return
-    ** TRUE.
-    */
+    ///<summary>
+/// Return FALSE if there is no chance that the expression can be NULL.
+///
+/// If the expression might be NULL or if the expression is too complex
+/// to tell return TRUE.
+///
+/// This routine is used as an optimization, to skip OP_IsNull opcodes
+/// when we know that a value cannot be NULL.  Hence, a false positive
+/// (returning TRUE when in fact the expression can never be NULL) might
+/// be a small performance hit but is otherwise harmless.  On the other
+/// hand, a false negative (returning FALSE when the result could be NULL)
+/// will likely result in an incorrect answer.  So when in doubt, return
+/// TRUE.
+///
+///</summary>
     static int sqlite3ExprCanBeNull( Expr p )
     {
       u8 op;
@@ -1554,13 +1592,14 @@ return null;
       }
     }
 
-    /*
-    ** Generate an OP_IsNull instruction that tests register iReg and jumps
-    ** to location iDest if the value in iReg is NULL.  The value in iReg 
-    ** was computed by pExpr.  If we can look at pExpr at compile-time and
-    ** determine that it can never generate a NULL, then the OP_IsNull operation
-    ** can be omitted.
-    */
+    ///<summary>
+/// Generate an OP_IsNull instruction that tests register iReg and jumps
+/// to location iDest if the value in iReg is NULL.  The value in iReg
+/// was computed by pExpr.  If we can look at pExpr at compile-time and
+/// determine that it can never generate a NULL, then the OP_IsNull operation
+/// can be omitted.
+///
+///</summary>
     static void sqlite3ExprCodeIsNullJump(
     Vdbe v,            /* The VDBE under construction */
     Expr pExpr,        /* Only generate OP_IsNull if this expr can be NULL */
@@ -1574,16 +1613,17 @@ return null;
       }
     }
 
-    /*
-    ** Return TRUE if the given expression is a constant which would be
-    ** unchanged by OP_Affinity with the affinity given in the second
-    ** argument.
-    **
-    ** This routine is used to determine if the OP_Affinity operation
-    ** can be omitted.  When in doubt return FALSE.  A false negative
-    ** is harmless.  A false positive, however, can result in the wrong
-    ** answer.
-    */
+    ///<summary>
+/// Return TRUE if the given expression is a constant which would be
+/// unchanged by OP_Affinity with the affinity given in the second
+/// argument.
+///
+/// This routine is used to determine if the OP_Affinity operation
+/// can be omitted.  When in doubt return FALSE.  A false negative
+/// is harmless.  A false positive, however, can result in the wrong
+/// answer.
+///
+///</summary>
     static int sqlite3ExprNeedsNoAffinityChange( Expr p, char aff )
     {
       u8 op;
@@ -1642,18 +1682,19 @@ return null;
     }
 
 
-    /*
-    ** Return true if we are able to the IN operator optimization on a
-    ** query of the form
-    **
-    **       x IN (SELECT ...)
-    **
-    ** Where the SELECT... clause is as specified by the parameter to this
-    ** routine.
-    **
-    ** The Select object passed in has already been preprocessed and no
-    ** errors have been found.
-    */
+    ///<summary>
+/// Return true if we are able to the IN operator optimization on a
+/// query of the form
+///
+///       x IN (SELECT ...)
+///
+/// Where the SELECT... clause is as specified by the parameter to this
+/// routine.
+///
+/// The Select object passed in has already been preprocessed and no
+/// errors have been found.
+///
+///</summary>
 #if !SQLITE_OMIT_SUBQUERY
     static int isCandidateForInOpt( Select p )
     {
@@ -1698,60 +1739,60 @@ return null;
     }
 #endif //* SQLITE_OMIT_SUBQUERY */
 
-    /*
-** This function is used by the implementation of the IN (...) operator.
-** It's job is to find or create a b-tree structure that may be used
-** either to test for membership of the (...) set or to iterate through
-** its members, skipping duplicates.
-**
-** The index of the cursor opened on the b-tree (database table, database index
-** or ephermal table) is stored in pX->iTable before this function returns.
-** The returned value of this function indicates the b-tree type, as follows:
-**
-**   IN_INDEX_ROWID - The cursor was opened on a database table.
-**   IN_INDEX_INDEX - The cursor was opened on a database index.
-**   IN_INDEX_EPH -   The cursor was opened on a specially created and
-**                    populated epheremal table.
-**
-** An existing b-tree may only be used if the SELECT is of the simple
-** form:
-**
-**     SELECT <column> FROM <table>
-**
-** If the prNotFound parameter is 0, then the b-tree will be used to iterate
-** through the set members, skipping any duplicates. In this case an
-** epheremal table must be used unless the selected <column> is guaranteed
-** to be unique - either because it is an INTEGER PRIMARY KEY or it
-** has a UNIQUE constraint or UNIQUE index.
-**
-** If the prNotFound parameter is not 0, then the b-tree will be used
-** for fast set membership tests. In this case an epheremal table must
-** be used unless <column> is an INTEGER PRIMARY KEY or an index can
-** be found with <column> as its left-most column.
-**
-** When the b-tree is being used for membership tests, the calling function
-** needs to know whether or not the structure contains an SQL NULL 
-** value in order to correctly evaluate expressions like "X IN (Y, Z)".
-** If there is any chance that the (...) might contain a NULL value at
-** runtime, then a register is allocated and the register number written
-** to *prNotFound. If there is no chance that the (...) contains a
-** NULL value, then *prNotFound is left unchanged.
-**
-** If a register is allocated and its location stored in *prNotFound, then
-** its initial value is NULL.  If the (...) does not remain constant
-** for the duration of the query (i.e. the SELECT within the (...)
-** is a correlated subquery) then the value of the allocated register is
-** reset to NULL each time the subquery is rerun. This allows the
-** caller to use vdbe code equivalent to the following:
-**
-**   if( register==NULL ){
-**     has_null = <test if data structure contains null>
-**     register = 1
-**   }
-**
-** in order to avoid running the <test if data structure contains null>
-** test more often than is necessary.
-*/
+    ///<summary>
+/// This function is used by the implementation of the IN (...) operator.
+/// It's job is to find or create a b-tree structure that may be used
+/// either to test for membership of the (...) set or to iterate through
+/// its members, skipping duplicates.
+///
+/// The index of the cursor opened on the b-tree (database table, database index
+/// or ephermal table) is stored in pX->iTable before this function returns.
+/// The returned value of this function indicates the b-tree type, as follows:
+///
+///   IN_INDEX_ROWID - The cursor was opened on a database table.
+///   IN_INDEX_INDEX - The cursor was opened on a database index.
+///   IN_INDEX_EPH -   The cursor was opened on a specially created and
+///                    populated epheremal table.
+///
+/// An existing b-tree may only be used if the SELECT is of the simple
+/// form:
+///
+///     SELECT <column> FROM <table>
+///
+/// If the prNotFound parameter is 0, then the b-tree will be used to iterate
+/// through the set members, skipping any duplicates. In this case an
+/// epheremal table must be used unless the selected <column> is guaranteed
+/// to be unique - either because it is an INTEGER PRIMARY KEY or it
+/// has a UNIQUE constraint or UNIQUE index.
+///
+/// If the prNotFound parameter is not 0, then the b-tree will be used
+/// for fast set membership tests. In this case an epheremal table must
+/// be used unless <column> is an INTEGER PRIMARY KEY or an index can
+/// be found with <column> as its left-most column.
+///
+/// When the b-tree is being used for membership tests, the calling function
+/// needs to know whether or not the structure contains an SQL NULL
+/// value in order to correctly evaluate expressions like "X IN (Y, Z)".
+/// If there is any chance that the (...) might contain a NULL value at
+/// runtime, then a register is allocated and the register number written
+/// to *prNotFound. If there is no chance that the (...) contains a
+/// NULL value, then *prNotFound is left unchanged.
+///
+/// If a register is allocated and its location stored in *prNotFound, then
+/// its initial value is NULL.  If the (...) does not remain constant
+/// for the duration of the query (i.e. the SELECT within the (...)
+/// is a correlated subquery) then the value of the allocated register is
+/// reset to NULL each time the subquery is rerun. This allows the
+/// caller to use vdbe code equivalent to the following:
+///
+///   if( register==NULL ){
+///     has_null = <test if data structure contains null>
+///     register = 1
+///   }
+///
+/// in order to avoid running the <test if data structure contains null>
+/// test more often than is necessary.
+///</summary>
 #if !SQLITE_OMIT_SUBQUERY
     static int sqlite3FindInIndex( Parse pParse, Expr pX, ref int prNotFound )
     {
@@ -1880,39 +1921,39 @@ return null;
     }
 #endif
 
-    /*
-** Generate code for scalar subqueries used as a subquery expression, EXISTS,
-** or IN operators.  Examples:
-**
-**     (SELECT a FROM b)          -- subquery
-**     EXISTS (SELECT a FROM b)   -- EXISTS subquery
-**     x IN (4,5,11)              -- IN operator with list on right-hand side
-**     x IN (SELECT a FROM b)     -- IN operator with subquery on the right
-**
-** The pExpr parameter describes the expression that contains the IN
-** operator or subquery.
-**
-** If parameter isRowid is non-zero, then expression pExpr is guaranteed
-** to be of the form "<rowid> IN (?, ?, ?)", where <rowid> is a reference
-** to some integer key column of a table B-Tree. In this case, use an
-** intkey B-Tree to store the set of IN(...) values instead of the usual
-** (slower) variable length keys B-Tree.
-**
-** If rMayHaveNull is non-zero, that means that the operation is an IN
-** (not a SELECT or EXISTS) and that the RHS might contains NULLs.
-** Furthermore, the IN is in a WHERE clause and that we really want
-** to iterate over the RHS of the IN operator in order to quickly locate
-** all corresponding LHS elements.  All this routine does is initialize
-** the register given by rMayHaveNull to NULL.  Calling routines will take
-** care of changing this register value to non-NULL if the RHS is NULL-free.
-**
-** If rMayHaveNull is zero, that means that the subquery is being used
-** for membership testing only.  There is no need to initialize any
-** registers to indicate the presense or absence of NULLs on the RHS.
-**
-** For a SELECT or EXISTS operator, return the register that holds the
-** result.  For IN operators or if an error occurs, the return value is 0.
-*/
+    ///<summary>
+/// Generate code for scalar subqueries used as a subquery expression, EXISTS,
+/// or IN operators.  Examples:
+///
+///     (SELECT a FROM b)          -- subquery
+///     EXISTS (SELECT a FROM b)   -- EXISTS subquery
+///     x IN (4,5,11)              -- IN operator with list on right-hand side
+///     x IN (SELECT a FROM b)     -- IN operator with subquery on the right
+///
+/// The pExpr parameter describes the expression that contains the IN
+/// operator or subquery.
+///
+/// If parameter isRowid is non-zero, then expression pExpr is guaranteed
+/// to be of the form "<rowid> IN (?, ?, ?)", where <rowid> is a reference
+/// to some integer key column of a table B-Tree. In this case, use an
+/// intkey B-Tree to store the set of IN(...) values instead of the usual
+/// (slower) variable length keys B-Tree.
+///
+/// If rMayHaveNull is non-zero, that means that the operation is an IN
+/// (not a SELECT or EXISTS) and that the RHS might contains NULLs.
+/// Furthermore, the IN is in a WHERE clause and that we really want
+/// to iterate over the RHS of the IN operator in order to quickly locate
+/// all corresponding LHS elements.  All this routine does is initialize
+/// the register given by rMayHaveNull to NULL.  Calling routines will take
+/// care of changing this register value to non-NULL if the RHS is NULL-free.
+///
+/// If rMayHaveNull is zero, that means that the subquery is being used
+/// for membership testing only.  There is no need to initialize any
+/// registers to indicate the presense or absence of NULLs on the RHS.
+///
+/// For a SELECT or EXISTS operator, return the register that holds the
+/// result.  For IN operators or if an error occurs, the return value is 0.
+///</summary>
 #if !SQLITE_OMIT_SUBQUERY
     static int sqlite3CodeSubselect(
     Parse pParse,          /* Parsing context */
@@ -2295,9 +2336,9 @@ return null;
     }
 #endif //* SQLITE_OMIT_SUBQUERY */
 
-    /*
-** Duplicate an 8-byte value
-*/
+    ///<summary>
+/// Duplicate an 8-byte value
+///</summary>
     //static char *dup8bytes(Vdbe v, string in){
     //  char *out = sqlite3DbMallocRaw(sqlite3VdbeDb(v), 8);
     //  if( out ){
@@ -2307,14 +2348,14 @@ return null;
     //}
 
 #if !SQLITE_OMIT_FLOATING_POINT
-    /*
-** Generate an instruction that will put the floating point
-** value described by z[0..n-1] into register iMem.
-**
-** The z[] string will probably not be zero-terminated.  But the
-** z[n] character is guaranteed to be something that does not look
-** like the continuation of the number.
-*/
+    ///<summary>
+/// Generate an instruction that will put the floating point
+/// value described by z[0..n-1] into register iMem.
+///
+/// The z[] string will probably not be zero-terminated.  But the
+/// z[n] character is guaranteed to be something that does not look
+/// like the continuation of the number.
+///</summary>
     static void codeReal( Vdbe v, string z, bool negateFlag, int iMem )
     {
       if ( ALWAYS( !String.IsNullOrEmpty( z ) ) )
@@ -2331,12 +2372,13 @@ return null;
     }
 #endif
 
-    /*
-    ** Generate an instruction that will put the integer describe by
-    ** text z[0..n-1] into register iMem.
-    **
-    ** Expr.u.zToken is always UTF8 and zero-terminated.
-    */
+    ///<summary>
+/// Generate an instruction that will put the integer describe by
+/// text z[0..n-1] into register iMem.
+///
+/// Expr.u.zToken is always UTF8 and zero-terminated.
+///
+///</summary>
     static void codeInteger( Parse pParse, Expr pExpr, bool negFlag, int iMem )
     {
       Vdbe v = pParse.pVdbe;
@@ -2375,9 +2417,10 @@ sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
       }
     }
 
-    /*
-    ** Clear a cache entry.
-    */
+    ///<summary>
+/// Clear a cache entry.
+///
+///</summary>
     static void cacheEntryClear( Parse pParse, yColCache p )
     {
       if ( p.tempReg != 0 )
@@ -2391,10 +2434,11 @@ sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
     }
 
 
-    /*
-    ** Record in the column cache that a particular column from a
-    ** particular table is stored in a particular register.
-    */
+    ///<summary>
+/// Record in the column cache that a particular column from a
+/// particular table is stored in a particular register.
+///
+///</summary>
     static void sqlite3ExprCacheStore( Parse pParse, int iTab, int iCol, int iReg )
     {
       int i;
@@ -2476,10 +2520,11 @@ return;
       }
     }
 
-    /*
-    ** Indicate that registers between iReg..iReg+nReg-1 are being overwritten.
-    ** Purge the range of registers from the column cache.
-    */
+    ///<summary>
+/// Indicate that registers between iReg..iReg+nReg-1 are being overwritten.
+/// Purge the range of registers from the column cache.
+///
+///</summary>
     static void sqlite3ExprCacheRemove( Parse pParse, int iReg, int nReg )
     {
       int i;
@@ -2497,21 +2542,23 @@ return;
       }
     }
 
-    /*
-    ** Remember the current column cache context.  Any new entries added
-    ** added to the column cache after this call are removed when the
-    ** corresponding pop occurs.
-    */
+    ///<summary>
+/// Remember the current column cache context.  Any new entries added
+/// added to the column cache after this call are removed when the
+/// corresponding pop occurs.
+///
+///</summary>
     static void sqlite3ExprCachePush( Parse pParse )
     {
       pParse.iCacheLevel++;
     }
 
-    /*
-    ** Remove from the column cache any entries that were added since the
-    ** the previous N Push operations.  In other words, restore the cache
-    ** to the state it was in N Pushes ago.
-    */
+    ///<summary>
+/// Remove from the column cache any entries that were added since the
+/// the previous N Push operations.  In other words, restore the cache
+/// to the state it was in N Pushes ago.
+///
+///</summary>
     static void sqlite3ExprCachePop( Parse pParse, int N )
     {
       int i;
@@ -2530,12 +2577,13 @@ return;
       }
     }
 
-    /*
-    ** When a cached column is reused, make sure that its register is
-    ** no longer available as a temp register.  ticket #3879:  that same
-    ** register might be in the cache in multiple places, so be sure to
-    ** get them all.
-    */
+    ///<summary>
+/// When a cached column is reused, make sure that its register is
+/// no longer available as a temp register.  ticket #3879:  that same
+/// register might be in the cache in multiple places, so be sure to
+/// get them all.
+///
+///</summary>
     static void sqlite3ExprCachePinRegister( Parse pParse, int iReg )
     {
       int i;
@@ -2550,9 +2598,10 @@ return;
       }
     }
 
-    /*
-    ** Generate code to extract the value of the iCol-th column of a table.
-    */
+    ///<summary>
+/// Generate code to extract the value of the iCol-th column of a table.
+///
+///</summary>
     static void sqlite3ExprCodeGetColumnOfTable(
       Vdbe v,         /* The VDBE under construction */
       Table pTab,     /* The table containing the value */
@@ -2576,15 +2625,16 @@ return;
       }
     }
 
-    /*
-    ** Generate code that will extract the iColumn-th column from
-    ** table pTab and store the column value in a register.  An effort
-    ** is made to store the column value in register iReg, but this is
-    ** not guaranteed.  The location of the column value is returned.
-    **
-    ** There must be an open cursor to pTab in iTable when this routine
-    ** is called.  If iColumn<0 then code is generated that extracts the rowid.
-    */
+    ///<summary>
+/// Generate code that will extract the iColumn-th column from
+/// table pTab and store the column value in a register.  An effort
+/// is made to store the column value in register iReg, but this is
+/// not guaranteed.  The location of the column value is returned.
+///
+/// There must be an open cursor to pTab in iTable when this routine
+/// is called.  If iColumn<0 then code is generated that extracts the rowid.
+///
+///</summary>
     static int sqlite3ExprCodeGetColumn(
     Parse pParse,     /* Parsing and code generating context */
     Table pTab,       /* Description of the table we are reading from */
@@ -2613,9 +2663,10 @@ return;
       return iReg;
     }
 
-    /*
-    ** Clear all column cache entries.
-    */
+    ///<summary>
+/// Clear all column cache entries.
+///
+///</summary>
     static void sqlite3ExprCacheClear( Parse pParse )
     {
       int i;
@@ -2632,19 +2683,21 @@ return;
       }
     }
 
-    /*
-    ** Record the fact that an affinity change has occurred on iCount
-    ** registers starting with iStart.
-    */
+    ///<summary>
+/// Record the fact that an affinity change has occurred on iCount
+/// registers starting with iStart.
+///
+///</summary>
     static void sqlite3ExprCacheAffinityChange( Parse pParse, int iStart, int iCount )
     {
       sqlite3ExprCacheRemove( pParse, iStart, iCount );
     }
 
-    /*
-    ** Generate code to move content from registers iFrom...iFrom+nReg-1
-    ** over to iTo..iTo+nReg-1. Keep the column cache up-to-date.
-    */
+    ///<summary>
+/// Generate code to move content from registers iFrom...iFrom+nReg-1
+/// over to iTo..iTo+nReg-1. Keep the column cache up-to-date.
+///
+///</summary>
     static void sqlite3ExprCodeMove( Parse pParse, int iFrom, int iTo, int nReg )
     {
       int i;
@@ -2663,10 +2716,11 @@ return;
       }
     }
 
-    /*
-    ** Generate code to copy content from registers iFrom...iFrom+nReg-1
-    ** over to iTo..iTo+nReg-1.
-    */
+    ///<summary>
+/// Generate code to copy content from registers iFrom...iFrom+nReg-1
+/// over to iTo..iTo+nReg-1.
+///
+///</summary>
     static void sqlite3ExprCodeCopy( Parse pParse, int iFrom, int iTo, int nReg )
     {
       int i;
@@ -2704,17 +2758,18 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
 #endif //* SQLITE_DEBUG || SQLITE_COVERAGE_TEST */
 
 
-    /*
-    ** Generate code into the current Vdbe to evaluate the given
-    ** expression.  Attempt to store the results in register "target".
-    ** Return the register where results are stored.
-    **
-    ** With this routine, there is no guarantee  that results will
-    ** be stored in target.  The result might be stored in some other
-    ** register if it is convenient to do so.  The calling function
-    ** must check the return code and move the results to the desired
-    ** register.
-    */
+    ///<summary>
+/// Generate code into the current Vdbe to evaluate the given
+/// expression.  Attempt to store the results in register "target".
+/// Return the register where results are stored.
+///
+/// With this routine, there is no guarantee  that results will
+/// be stored in target.  The result might be stored in some other
+/// register if it is convenient to do so.  The calling function
+/// must check the return code and move the results to the desired
+/// register.
+///
+///</summary>
     static int sqlite3ExprCodeTarget( Parse pParse, Expr pExpr, int target )
     {
       Vdbe v = pParse.pVdbe;    /* The VM under construction */
@@ -3393,15 +3448,16 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return inReg;
     }
 
-    /*
-    ** Generate code to evaluate an expression and store the results
-    ** into a register.  Return the register number where the results
-    ** are stored.
-    **
-    ** If the register is a temporary register that can be deallocated,
-    ** then write its number into pReg.  If the result register is not
-    ** a temporary, then set pReg to zero.
-    */
+    ///<summary>
+/// Generate code to evaluate an expression and store the results
+/// into a register.  Return the register number where the results
+/// are stored.
+///
+/// If the register is a temporary register that can be deallocated,
+/// then write its number into pReg.  If the result register is not
+/// a temporary, then set pReg to zero.
+///
+///</summary>
     static int sqlite3ExprCodeTemp( Parse pParse, Expr pExpr, ref int pReg )
     {
       int r1 = sqlite3GetTempReg( pParse );
@@ -3418,11 +3474,12 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return r2;
     }
 
-    /*
-    ** Generate code that will evaluate expression pExpr and store the
-    ** results in register target.  The results are guaranteed to appear
-    ** in register target.
-    */
+    ///<summary>
+/// Generate code that will evaluate expression pExpr and store the
+/// results in register target.  The results are guaranteed to appear
+/// in register target.
+///
+///</summary>
     static int sqlite3ExprCode( Parse pParse, Expr pExpr, int target )
     {
       int inReg;
@@ -3444,18 +3501,19 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return target;
     }
 
-    /*
-    ** Generate code that evalutes the given expression and puts the result
-    ** in register target.
-    **
-    ** Also make a copy of the expression results into another "cache" register
-    ** and modify the expression so that the next time it is evaluated,
-    ** the result is a copy of the cache register.
-    **
-    ** This routine is used for expressions that are used multiple
-    ** times.  They are evaluated once and the results of the expression
-    ** are reused.
-    */
+    ///<summary>
+/// Generate code that evalutes the given expression and puts the result
+/// in register target.
+///
+/// Also make a copy of the expression results into another "cache" register
+/// and modify the expression so that the next time it is evaluated,
+/// the result is a copy of the cache register.
+///
+/// This routine is used for expressions that are used multiple
+/// times.  They are evaluated once and the results of the expression
+/// are reused.
+///
+///</summary>
     static int sqlite3ExprCodeAndCache( Parse pParse, Expr pExpr, int target )
     {
       Vdbe v = pParse.pVdbe;
@@ -3480,23 +3538,24 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return inReg;
     }
 
-    /*
-    ** Return TRUE if pExpr is an constant expression that is appropriate
-    ** for factoring out of a loop.  Appropriate expressions are:
-    **
-    **    *  Any expression that evaluates to two or more opcodes.
-    **
-    **    *  Any OP_Integer, OP_Real, OP_String, OP_Blob, OP_Null,
-    **       or OP_Variable that does not need to be placed in a
-    **       specific register.
-    **
-    ** There is no point in factoring out single-instruction constant
-    ** expressions that need to be placed in a particular register.
-    ** We could factor them out, but then we would end up adding an
-    ** OP_SCopy instruction to move the value into the correct register
-    ** later.  We might as well just use the original instruction and
-    ** avoid the OP_SCopy.
-    */
+    ///<summary>
+/// Return TRUE if pExpr is an constant expression that is appropriate
+/// for factoring out of a loop.  Appropriate expressions are:
+///
+///    *  Any expression that evaluates to two or more opcodes.
+///
+///    *  Any OP_Integer, OP_Real, OP_String, OP_Blob, OP_Null,
+///       or OP_Variable that does not need to be placed in a
+///       specific register.
+///
+/// There is no point in factoring out single-instruction constant
+/// expressions that need to be placed in a particular register.
+/// We could factor them out, but then we would end up adding an
+/// OP_SCopy instruction to move the value into the correct register
+/// later.  We might as well just use the original instruction and
+/// avoid the OP_SCopy.
+///
+///</summary>
     static int isAppropriateForFactoring( Expr p )
     {
       if ( sqlite3ExprIsConstantNotJoin( p ) == 0 )
@@ -3548,12 +3607,13 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return 1;
     }
 
-    /*
-    ** If pExpr is a constant expression that is appropriate for
-    ** factoring out of a loop, then evaluate the expression
-    ** into a register and convert the expression into a TK_REGISTER
-    ** expression.
-    */
+    ///<summary>
+/// If pExpr is a constant expression that is appropriate for
+/// factoring out of a loop, then evaluate the expression
+/// into a register and convert the expression into a TK_REGISTER
+/// expression.
+///
+///</summary>
     static int evalConstExpr( Walker pWalker, ref Expr pExpr )
     {
       Parse pParse = pWalker.pParse;
@@ -3603,22 +3663,23 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return WRC_Continue;
     }
 
-    /*
-    ** Preevaluate constant subexpressions within pExpr and store the
-    ** results in registers.  Modify pExpr so that the constant subexpresions
-    ** are TK_REGISTER opcodes that refer to the precomputed values.
-    **
-    ** This routine is a no-op if the jump to the cookie-check code has
-    ** already occur.  Since the cookie-check jump is generated prior to
-    ** any other serious processing, this check ensures that there is no
-    ** way to accidently bypass the constant initializations.
-    **
-    ** This routine is also a no-op if the SQLITE_FactorOutConst optimization
-    ** is disabled via the sqlite3_test_control(SQLITE_TESTCTRL_OPTIMIZATIONS)
-    ** interface.  This allows test logic to verify that the same answer is
-    ** obtained for queries regardless of whether or not constants are
-    ** precomputed into registers or if they are inserted in-line.
-    */
+    ///<summary>
+/// Preevaluate constant subexpressions within pExpr and store the
+/// results in registers.  Modify pExpr so that the constant subexpresions
+/// are TK_REGISTER opcodes that refer to the precomputed values.
+///
+/// This routine is a no-op if the jump to the cookie-check code has
+/// already occur.  Since the cookie-check jump is generated prior to
+/// any other serious processing, this check ensures that there is no
+/// way to accidently bypass the constant initializations.
+///
+/// This routine is also a no-op if the SQLITE_FactorOutConst optimization
+/// is disabled via the sqlite3_test_control(SQLITE_TESTCTRL_OPTIMIZATIONS)
+/// interface.  This allows test logic to verify that the same answer is
+/// obtained for queries regardless of whether or not constants are
+/// precomputed into registers or if they are inserted in-line.
+///
+///</summary>
     static void sqlite3ExprCodeConstants( Parse pParse, Expr pExpr )
     {
       Walker w;
@@ -3633,12 +3694,13 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       sqlite3WalkExpr( w, ref pExpr );
     }
 
-    /*
-    ** Generate code that pushes the value of every element of the given
-    ** expression list into a sequence of registers beginning at target.
-    **
-    ** Return the number of elements evaluated.
-    */
+    ///<summary>
+/// Generate code that pushes the value of every element of the given
+/// expression list into a sequence of registers beginning at target.
+///
+/// Return the number of elements evaluated.
+///
+///</summary>
     static int sqlite3ExprCodeExprList(
     Parse pParse,     /* Parsing context */
     ExprList pList,   /* The expression list to be coded */
@@ -3667,18 +3729,19 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
     }
 
 
-    /*
-    ** Generate code for a BETWEEN operator.
-    **
-    **    x BETWEEN y AND z
-    **
-    ** The above is equivalent to 
-    **
-    **    x>=y AND x<=z
-    **
-    ** Code it as such, taking care to do the common subexpression
-    ** elementation of x.
-    */
+    ///<summary>
+/// Generate code for a BETWEEN operator.
+///
+///    x BETWEEN y AND z
+///
+/// The above is equivalent to
+///
+///    x>=y AND x<=z
+///
+/// Code it as such, taking care to do the common subexpression
+/// elementation of x.
+///
+///</summary>
     static void exprCodeBetween(
     Parse pParse,     /* Parsing and code generating context */
     Expr pExpr,       /* The BETWEEN expression */
@@ -3726,20 +3789,21 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       testcase( jumpIfTrue != 0 && jumpIfNull != 0 && regFree1 == 0 );
       testcase( jumpIfTrue != 0 && jumpIfNull != 0 && regFree1 != 0 );
     }
-    /*
-    ** Generate code for a boolean expression such that a jump is made
-    ** to the label "dest" if the expression is true but execution
-    ** continues straight thru if the expression is false.
-    **
-    ** If the expression evaluates to NULL (neither true nor false), then
-    ** take the jump if the jumpIfNull flag is SQLITE_JUMPIFNULL.
-    **
-    ** This code depends on the fact that certain token values (ex: TK_EQ)
-    ** are the same as opcode values (ex: OP_Eq) that implement the corresponding
-    ** operation.  Special comments in vdbe.c and the mkopcodeh.awk script in
-    ** the make process cause these values to align.  Assert()s in the code
-    ** below verify that the numbers are aligned correctly.
-    */
+    ///<summary>
+/// Generate code for a boolean expression such that a jump is made
+/// to the label "dest" if the expression is true but execution
+/// continues straight thru if the expression is false.
+///
+/// If the expression evaluates to NULL (neither true nor false), then
+/// take the jump if the jumpIfNull flag is SQLITE_JUMPIFNULL.
+///
+/// This code depends on the fact that certain token values (ex: TK_EQ)
+/// are the same as opcode values (ex: OP_Eq) that implement the corresponding
+/// operation.  Special comments in vdbe.c and the mkopcodeh.awk script in
+/// the make process cause these values to align.  Assert()s in the code
+/// below verify that the numbers are aligned correctly.
+///
+///</summary>
     static void sqlite3ExprIfTrue( Parse pParse, Expr pExpr, int dest, int jumpIfNull )
     {
       Vdbe v = pParse.pVdbe;
@@ -3864,15 +3928,16 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       sqlite3ReleaseTempReg( pParse, regFree2 );
     }
 
-    /*
-    ** Generate code for a boolean expression such that a jump is made
-    ** to the label "dest" if the expression is false but execution
-    ** continues straight thru if the expression is true.
-    **
-    ** If the expression evaluates to NULL (neither true nor false) then
-    ** jump if jumpIfNull is SQLITE_JUMPIFNULL or fall through if jumpIfNull
-    ** is 0.
-    */
+    ///<summary>
+/// Generate code for a boolean expression such that a jump is made
+/// to the label "dest" if the expression is false but execution
+/// continues straight thru if the expression is true.
+///
+/// If the expression evaluates to NULL (neither true nor false) then
+/// jump if jumpIfNull is SQLITE_JUMPIFNULL or fall through if jumpIfNull
+/// is 0.
+///
+///</summary>
     static void sqlite3ExprIfFalse( Parse pParse, Expr pExpr, int dest, int jumpIfNull )
     {
       Vdbe v = pParse.pVdbe;
@@ -4025,22 +4090,23 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       sqlite3ReleaseTempReg( pParse, regFree2 );
     }
 
-    /*
-    ** Do a deep comparison of two expression trees.  Return 0 if the two
-    ** expressions are completely identical.  Return 1 if they differ only
-    ** by a COLLATE operator at the top level.  Return 2 if there are differences
-    ** other than the top-level COLLATE operator.
-    **
-    ** Sometimes this routine will return 2 even if the two expressions
-    ** really are equivalent.  If we cannot prove that the expressions are
-    ** identical, we return 2 just to be safe.  So if this routine
-    ** returns 2, then you do not really know for certain if the two
-    ** expressions are the same.  But if you get a 0 or 1 return, then you
-    ** can be sure the expressions are the same.  In the places where
-    ** this routine is used, it does not hurt to get an extra 2 - that
-    ** just might result in some slightly slower code.  But returning
-    ** an incorrect 0 or 1 could lead to a malfunction.
-    */
+    ///<summary>
+/// Do a deep comparison of two expression trees.  Return 0 if the two
+/// expressions are completely identical.  Return 1 if they differ only
+/// by a COLLATE operator at the top level.  Return 2 if there are differences
+/// other than the top-level COLLATE operator.
+///
+/// Sometimes this routine will return 2 even if the two expressions
+/// really are equivalent.  If we cannot prove that the expressions are
+/// identical, we return 2 just to be safe.  So if this routine
+/// returns 2, then you do not really know for certain if the two
+/// expressions are the same.  But if you get a 0 or 1 return, then you
+/// can be sure the expressions are the same.  In the places where
+/// this routine is used, it does not hurt to get an extra 2 - that
+/// just might result in some slightly slower code.  But returning
+/// an incorrect 0 or 1 could lead to a malfunction.
+///
+///</summary>
     static int sqlite3ExprCompare( Expr pA, Expr pB )
     {
       if ( pA == null || pB == null )
@@ -4088,18 +4154,19 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return 0;
     }
 
-    /*
-    ** Compare two ExprList objects.  Return 0 if they are identical and 
-    ** non-zero if they differ in any way.
-    **
-    ** This routine might return non-zero for equivalent ExprLists.  The
-    ** only consequence will be disabled optimizations.  But this routine
-    ** must never return 0 if the two ExprList objects are different, or
-    ** a malfunction will result.
-    **
-    ** Two NULL pointers are considered to be the same.  But a NULL pointer
-    ** always differs from a non-NULL pointer.
-    */
+    ///<summary>
+/// Compare two ExprList objects.  Return 0 if they are identical and
+/// non-zero if they differ in any way.
+///
+/// This routine might return non-zero for equivalent ExprLists.  The
+/// only consequence will be disabled optimizations.  But this routine
+/// must never return 0 if the two ExprList objects are different, or
+/// a malfunction will result.
+///
+/// Two NULL pointers are considered to be the same.  But a NULL pointer
+/// always differs from a non-NULL pointer.
+///
+///</summary>
     static int sqlite3ExprListCompare( ExprList pA, ExprList pB )
     {
       int i;
@@ -4121,10 +4188,11 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return 0;
     }
 
-    /*
-    ** Add a new element to the pAggInfo.aCol[] array.  Return the index of
-    ** the new element.  Return a negative number if malloc fails.
-    */
+    ///<summary>
+/// Add a new element to the pAggInfo.aCol[] array.  Return the index of
+/// the new element.  Return a negative number if malloc fails.
+///
+///</summary>
     static int addAggInfoColumn( sqlite3 db, AggInfo pInfo )
     {
       int i = 0;
@@ -4140,10 +4208,11 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return i;
     }
 
-    /*
-    ** Add a new element to the pAggInfo.aFunc[] array.  Return the index of
-    ** the new element.  Return a negative number if malloc fails.
-    */
+    ///<summary>
+/// Add a new element to the pAggInfo.aFunc[] array.  Return the index of
+/// the new element.  Return a negative number if malloc fails.
+///
+///</summary>
     static int addAggInfoFunc( sqlite3 db, AggInfo pInfo )
     {
       int i = 0;
@@ -4159,11 +4228,12 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return i;
     }
 
-    /*
-    ** This is the xExprCallback for a tree walker.  It is used to
-    ** implement sqlite3ExprAnalyzeAggregates().  See sqlite3ExprAnalyzeAggregates
-    ** for additional information.
-    */
+    ///<summary>
+/// This is the xExprCallback for a tree walker.  It is used to
+/// implement sqlite3ExprAnalyzeAggregates().  See sqlite3ExprAnalyzeAggregates
+/// for additional information.
+///
+///</summary>
     static int analyzeAggregate( Walker pWalker, ref Expr pExpr )
     {
       int i;
@@ -4332,14 +4402,15 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
     }
 
 
-    /*
-    ** Analyze the given expression looking for aggregate functions and
-    ** for variables that need to be added to the pParse.aAgg[] array.
-    ** Make additional entries to the pParse.aAgg[] array as necessary.
-    **
-    ** This routine should only be called after the expression has been
-    ** analyzed by sqlite3ResolveExprNames().
-    */
+    ///<summary>
+/// Analyze the given expression looking for aggregate functions and
+/// for variables that need to be added to the pParse.aAgg[] array.
+/// Make additional entries to the pParse.aAgg[] array as necessary.
+///
+/// This routine should only be called after the expression has been
+/// analyzed by sqlite3ResolveExprNames().
+///
+///</summary>
     static void sqlite3ExprAnalyzeAggregates( NameContext pNC, ref Expr pExpr )
     {
       Walker w = new Walker();
@@ -4350,12 +4421,13 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       sqlite3WalkExpr( w, ref pExpr );
     }
 
-    /*
-    ** Call sqlite3ExprAnalyzeAggregates() for every expression in an
-    ** expression list.  Return the number of errors.
-    **
-    ** If an error is found, the analysis is cut short.
-    */
+    ///<summary>
+/// Call sqlite3ExprAnalyzeAggregates() for every expression in an
+/// expression list.  Return the number of errors.
+///
+/// If an error is found, the analysis is cut short.
+///
+///</summary>
     static void sqlite3ExprAnalyzeAggList( NameContext pNC, ExprList pList )
     {
       ExprList_item pItem;
@@ -4370,9 +4442,10 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       }
     }
 
-    /*
-    ** Allocate a single new register for use to hold some intermediate result.
-    */
+    ///<summary>
+/// Allocate a single new register for use to hold some intermediate result.
+///
+///</summary>
     static int sqlite3GetTempReg( Parse pParse )
     {
       if ( pParse.nTempReg == 0 )
@@ -4382,14 +4455,15 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       return pParse.aTempReg[--pParse.nTempReg];
     }
 
-    /*
-    ** Deallocate a register, making available for reuse for some other
-    ** purpose.
-    **
-    ** If a register is currently being used by the column cache, then
-    ** the dallocation is deferred until the column cache line that uses
-    ** the register becomes stale.
-    */
+    ///<summary>
+/// Deallocate a register, making available for reuse for some other
+/// purpose.
+///
+/// If a register is currently being used by the column cache, then
+/// the dallocation is deferred until the column cache line that uses
+/// the register becomes stale.
+///
+///</summary>
     static void sqlite3ReleaseTempReg( Parse pParse, int iReg )
     {
       if ( iReg != 0 && pParse.nTempReg < ArraySize( pParse.aTempReg ) )
@@ -4409,9 +4483,10 @@ static int usedAsColumnCache( Parse pParse, int iFrom, int iTo ){return 0;}
       }
     }
 
-    /*
-    ** Allocate or deallocate a block of nReg consecutive registers
-    */
+    ///<summary>
+/// Allocate or deallocate a block of nReg consecutive registers
+///
+///</summary>
     static int sqlite3GetTempRange( Parse pParse, int nReg )
     {
       int i, n;

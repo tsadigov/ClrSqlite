@@ -9,43 +9,45 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    ** 2001 September 15
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains C code routines that are called by the parser
-    ** in order to generate code for DELETE FROM statements.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2001 September 15
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains C code routines that are called by the parser
+/// in order to generate code for DELETE FROM statements.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
 
-    /*
-    ** While a SrcList can in general represent multiple tables and subqueries
-    ** (as in the FROM clause of a SELECT statement) in this case it contains
-    ** the name of a single table, as one might find in an INSERT, DELETE,
-    ** or UPDATE statement.  Look up that table in the symbol table and
-    ** return a pointer.  Set an error message and return NULL if the table 
-    ** name is not found or if any other error occurs.
-    **
-    ** The following fields are initialized appropriate in pSrc:
-    **
-    **    pSrc->a[0].pTab       Pointer to the Table object
-    **    pSrc->a[0].pIndex     Pointer to the INDEXED BY index, if there is one
-    **
-    */
+    ///<summary>
+/// While a SrcList can in general represent multiple tables and subqueries
+/// (as in the FROM clause of a SELECT statement) in this case it contains
+/// the name of a single table, as one might find in an INSERT, DELETE,
+/// or UPDATE statement.  Look up that table in the symbol table and
+/// return a pointer.  Set an error message and return NULL if the table
+/// name is not found or if any other error occurs.
+///
+/// The following fields are initialized appropriate in pSrc:
+///
+///    pSrc->a[0].pTab       Pointer to the Table object
+///    pSrc->a[0].pIndex     Pointer to the INDEXED BY index, if there is one
+///
+///
+///</summary>
     static Table sqlite3SrcListLookup( Parse pParse, SrcList pSrc )
     {
       SrcList_item pItem = pSrc.a[0];
@@ -65,11 +67,12 @@ namespace Community.CsharpSqlite
       return pTab;
     }
 
-    /*
-    ** Check to make sure the given table is writable.  If it is not
-    ** writable, generate an error message and return 1.  If it is
-    ** writable return 0;
-    */
+    ///<summary>
+/// Check to make sure the given table is writable.  If it is not
+/// writable, generate an error message and return 1.  If it is
+/// writable return 0;
+///
+///</summary>
     static bool sqlite3IsReadOnly( Parse pParse, Table pTab, int viewOk )
     {
       /* A table is not writable under the following circumstances:
@@ -106,11 +109,11 @@ namespace Community.CsharpSqlite
 
 
 #if !SQLITE_OMIT_VIEW && !SQLITE_OMIT_TRIGGER
-    /*
-** Evaluate a view and store its result in an ephemeral table.  The
-** pWhere argument is an optional WHERE clause that restricts the
-** set of rows in the view that are to be added to the ephemeral table.
-*/
+    ///<summary>
+/// Evaluate a view and store its result in an ephemeral table.  The
+/// pWhere argument is an optional WHERE clause that restricts the
+/// set of rows in the view that are to be added to the ephemeral table.
+///</summary>
     static void sqlite3MaterializeView(
     Parse pParse,      /* Parsing context */
     Table pView,       /* View definition */
@@ -514,9 +517,11 @@ sqlite3AuthContextPop(sContext);
       return;
     }
 
-    /* Make sure "isView" and other macros defined above are undefined. Otherwise
-    ** thely may interfere with compilation of other functions in this file
-    ** (or in another file, if this file becomes part of the amalgamation).  */
+    ///<summary>
+///Make sure "isView" and other macros defined above are undefined. Otherwise
+/// thely may interfere with compilation of other functions in this file
+/// (or in another file, if this file becomes part of the amalgamation).
+///</summary>
     //#if isView
     // #undef isView
     //#endif
@@ -524,25 +529,26 @@ sqlite3AuthContextPop(sContext);
     // #undef pTrigger
     //#endif
 
-    /*
-    ** This routine generates VDBE code that causes a single row of a
-    ** single table to be deleted.
-    **
-    ** The VDBE must be in a particular state when this routine is called.
-    ** These are the requirements:
-    **
-    **   1.  A read/write cursor pointing to pTab, the table containing the row
-    **       to be deleted, must be opened as cursor number $iCur.
-    **
-    **   2.  Read/write cursors for all indices of pTab must be open as
-    **       cursor number base+i for the i-th index.
-    **
-    **   3.  The record number of the row to be deleted must be stored in
-    **       memory cell iRowid.
-    **
-    ** This routine generates code to remove both the table record and all 
-    ** index entries that point to that record.
-    */
+    ///<summary>
+/// This routine generates VDBE code that causes a single row of a
+/// single table to be deleted.
+///
+/// The VDBE must be in a particular state when this routine is called.
+/// These are the requirements:
+///
+///   1.  A read/write cursor pointing to pTab, the table containing the row
+///       to be deleted, must be opened as cursor number $iCur.
+///
+///   2.  Read/write cursors for all indices of pTab must be open as
+///       cursor number base+i for the i-th index.
+///
+///   3.  The record number of the row to be deleted must be stored in
+///       memory cell iRowid.
+///
+/// This routine generates code to remove both the table record and all
+/// index entries that point to that record.
+///
+///</summary>
     static void sqlite3GenerateRowDelete(
     Parse pParse,      /* Parsing context */
     Table pTab,        /* Table containing the row to be deleted */
@@ -640,22 +646,23 @@ sqlite3AuthContextPop(sContext);
     }
 
 
-    /*
-    ** This routine generates VDBE code that causes the deletion of all
-    ** index entries associated with a single row of a single table.
-    **
-    ** The VDBE must be in a particular state when this routine is called.
-    ** These are the requirements:
-    **
-    **   1.  A read/write cursor pointing to pTab, the table containing the row
-    **       to be deleted, must be opened as cursor number "iCur".
-    **
-    **   2.  Read/write cursors for all indices of pTab must be open as
-    **       cursor number iCur+i for the i-th index.
-    **
-    **   3.  The "iCur" cursor must be pointing to the row that is to be
-    **       deleted.
-    */
+    ///<summary>
+/// This routine generates VDBE code that causes the deletion of all
+/// index entries associated with a single row of a single table.
+///
+/// The VDBE must be in a particular state when this routine is called.
+/// These are the requirements:
+///
+///   1.  A read/write cursor pointing to pTab, the table containing the row
+///       to be deleted, must be opened as cursor number "iCur".
+///
+///   2.  Read/write cursors for all indices of pTab must be open as
+///       cursor number iCur+i for the i-th index.
+///
+///   3.  The "iCur" cursor must be pointing to the row that is to be
+///       deleted.
+///
+///</summary>
     static void sqlite3GenerateRowIndexDelete(
     Parse pParse,     /* Parsing and code generating context */
     Table pTab,       /* Table containing the row to be deleted */

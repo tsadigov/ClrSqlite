@@ -33,11 +33,12 @@ namespace Community.CsharpSqlite
     */
     //#if !_OS_COMMON_H_
     //#define _OS_COMMON_H_
-    /*
-    ** At least two bugs have slipped in because we changed the MEMORY_DEBUG
-    ** macro to SQLITE_DEBUG and some older makefiles have not yet made the
-    ** switch.  The following code should catch this problem at compile-time.
-    */
+    ///<summary>
+/// At least two bugs have slipped in because we changed the MEMORY_DEBUG
+/// macro to SQLITE_DEBUG and some older makefiles have not yet made the
+/// switch.  The following code should catch this problem at compile-time.
+///
+///</summary>
 #if MEMORY_DEBUG
 //# error "The MEMORY_DEBUG macro is obsolete.  Use SQLITE_DEBUG instead."
 #endif
@@ -78,11 +79,11 @@ static sqlite_u3264 g_elapsed;
     const int TIMER_ELAPSED = 0; //#define TIMER_ELAPSED     ((sqlite_u3264)0)
 #endif
 
-    /*
-** If we compile with the SQLITE_TEST macro set, then the following block
-** of code will give us the ability to simulate a disk I/O error.  This
-** is used for testing the I/O recovery logic.
-*/
+    ///<summary>
+/// If we compile with the SQLITE_TEST macro set, then the following block
+/// of code will give us the ability to simulate a disk I/O error.  This
+/// is used for testing the I/O recovery logic.
+///</summary>
 #if SQLITE_TEST
 
 #if !TCLSH

@@ -11,47 +11,47 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-/*
-** 2003 April 6
-**
-** The author disclaims copyright to this source code.  In place of
-** a legal notice, here is a blessing:
-**
-**    May you do good and not evil.
-**    May you find forgiveness for yourself and forgive others.
-**    May you share freely, never taking more than you give.
-**
-*************************************************************************
-** This file contains code used to implement the ATTACH and DETACH commands.
-*************************************************************************
-**  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-**  C#-SQLite is an independent reimplementation of the SQLite software library
-**
-**  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-**
-*************************************************************************
-*/
+///<summary>
+/// 2003 April 6
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains code used to implement the ATTACH and DETACH commands.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///</summary>
 //#include "sqliteInt.h"
 
 #if !SQLITE_OMIT_ATTACH
-/*
-** Resolve an expression that was part of an ATTACH or DETACH statement. This
-** is slightly different from resolving a normal SQL expression, because simple
-** identifiers are treated as strings, not possible column names or aliases.
-**
-** i.e. if the parser sees:
-**
-**     ATTACH DATABASE abc AS def
-**
-** it treats the two expressions as literal strings 'abc' and 'def' instead of
-** looking for columns of the same name.
-**
-** This only applies to the root node of pExpr, so the statement:
-**
-**     ATTACH DATABASE abc||def AS 'db2'
-**
-** will fail because neither abc or def can be resolved.
-*/
+///<summary>
+/// Resolve an expression that was part of an ATTACH or DETACH statement. This
+/// is slightly different from resolving a normal SQL expression, because simple
+/// identifiers are treated as strings, not possible column names or aliases.
+///
+/// i.e. if the parser sees:
+///
+///     ATTACH DATABASE abc AS def
+///
+/// it treats the two expressions as literal strings 'abc' and 'def' instead of
+/// looking for columns of the same name.
+///
+/// This only applies to the root node of pExpr, so the statement:
+///
+///     ATTACH DATABASE abc||def AS 'db2'
+///
+/// will fail because neither abc or def can be resolved.
+///</summary>
 static int resolveAttachExpr( NameContext pName, Expr pExpr )
 {
   int rc = SQLITE_OK;
@@ -74,17 +74,17 @@ static int resolveAttachExpr( NameContext pName, Expr pExpr )
   return rc;
 }
 
-/*
-** An SQL user-function registered to do the work of an ATTACH statement. The
-** three arguments to the function come directly from an attach statement:
-**
-**     ATTACH DATABASE x AS y KEY z
-**
-**     SELECT sqlite_attach(x, y, z)
-**
-** If the optional "KEY z" syntax is omitted, an SQL NULL is passed as the
-** third argument.
-*/
+///<summary>
+/// An SQL user-function registered to do the work of an ATTACH statement. The
+/// three arguments to the function come directly from an attach statement:
+///
+///     ATTACH DATABASE x AS y KEY z
+///
+///     SELECT sqlite_attach(x, y, z)
+///
+/// If the optional "KEY z" syntax is omitted, an SQL NULL is passed as the
+/// third argument.
+///</summary>
 static void attachFunc(
 sqlite3_context context,
 int NotUsed,
@@ -296,14 +296,14 @@ attach_error:
     sqlite3_result_error_code( context, rc );
 }
 
-/*
-** An SQL user-function registered to do the work of an DETACH statement. The
-** three arguments to the function come directly from a detach statement:
-**
-**     DETACH DATABASE x
-**
-**     SELECT sqlite_detach(x)
-*/
+///<summary>
+/// An SQL user-function registered to do the work of an DETACH statement. The
+/// three arguments to the function come directly from a detach statement:
+///
+///     DETACH DATABASE x
+///
+///     SELECT sqlite_detach(x)
+///</summary>
 static void detachFunc(
 sqlite3_context context,
 int NotUsed,
@@ -436,11 +436,11 @@ attach_end:
   sqlite3ExprDelete( db, ref pKey );
 }
 
-/*
-** Called by the parser to compile a DETACH statement.
-**
-**     DETACH pDbname
-*/
+///<summary>
+/// Called by the parser to compile a DETACH statement.
+///
+///     DETACH pDbname
+///</summary>
 static FuncDef detach_func = new FuncDef(
 1,                   /* nArg */
 SqliteEncoding.UTF8,         /* iPrefEnc */
@@ -459,11 +459,11 @@ static void sqlite3Detach( Parse pParse, Expr pDbname )
   codeAttach( pParse, SQLITE_DETACH, detach_func, pDbname, null, null, pDbname );
 }
 
-/*
-** Called by the parser to compile an ATTACH statement.
-**
-**     ATTACH p AS pDbname KEY pKey
-*/
+///<summary>
+/// Called by the parser to compile an ATTACH statement.
+///
+///     ATTACH p AS pDbname KEY pKey
+///</summary>
 static FuncDef attach_func = new FuncDef(
 3,                /* nArg */
 SqliteEncoding.UTF8,      /* iPrefEnc */
@@ -483,13 +483,13 @@ static void sqlite3Attach( Parse pParse, Expr p, Expr pDbname, Expr pKey )
 }
 #endif // * SQLITE_OMIT_ATTACH */
 
-/*
-** Initialize a DbFixer structure.  This routine must be called prior
-** to passing the structure to one of the sqliteFixAAAA() routines below.
-**
-** The return value indicates whether or not fixation is required.  TRUE
-** means we do need to fix the database references, FALSE means we do not.
-*/
+///<summary>
+/// Initialize a DbFixer structure.  This routine must be called prior
+/// to passing the structure to one of the sqliteFixAAAA() routines below.
+///
+/// The return value indicates whether or not fixation is required.  TRUE
+/// means we do need to fix the database references, FALSE means we do not.
+///</summary>
 static int sqlite3FixInit(
 DbFixer pFix,       /* The fixer to be initialized */
 Parse pParse,       /* Error messages will be written here */
@@ -511,20 +511,20 @@ Token pName         /* Name of the view, trigger, or index */
   return 1;
 }
 
-/*
-** The following set of routines walk through the parse tree and assign
-** a specific database to all table references where the database name
-** was left unspecified in the original SQL statement.  The pFix structure
-** must have been initialized by a prior call to sqlite3FixInit().
-**
-** These routines are used to make sure that an index, trigger, or
-** view in one database does not refer to objects in a different database.
-** (Exception: indices, triggers, and views in the TEMP database are
-** allowed to refer to anything.)  If a reference is explicitly made
-** to an object in a different database, an error message is added to
-** pParse.zErrMsg and these routines return non-zero.  If everything
-** checks out, these routines return 0.
-*/
+///<summary>
+/// The following set of routines walk through the parse tree and assign
+/// a specific database to all table references where the database name
+/// was left unspecified in the original SQL statement.  The pFix structure
+/// must have been initialized by a prior call to sqlite3FixInit().
+///
+/// These routines are used to make sure that an index, trigger, or
+/// view in one database does not refer to objects in a different database.
+/// (Exception: indices, triggers, and views in the TEMP database are
+/// allowed to refer to anything.)  If a reference is explicitly made
+/// to an object in a different database, an error message is added to
+/// pParse.zErrMsg and these routines return non-zero.  If everything
+/// checks out, these routines return 0.
+///</summary>
 static int sqlite3FixSrcList(
 DbFixer pFix,       /* Context of the fixation */
 SrcList pList       /* The Source list to check and modify */

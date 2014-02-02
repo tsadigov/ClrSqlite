@@ -6,28 +6,29 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    ** 2007 August 14
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains the C functions that implement mutexes.
-    **
-    ** This file contains code that is common across all mutex implementations.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2007 August 14
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains the C functions that implement mutexes.
+///
+/// This file contains code that is common across all mutex implementations.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
 
 #if (SQLITE_DEBUG) && !(SQLITE_MUTEX_OMIT)
@@ -41,9 +42,9 @@ static  int mutexIsInit = 0;
 
 
 #if !SQLITE_MUTEX_OMIT
-/*
-** Initialize the mutex system.
-*/
+///<summary>
+/// Initialize the mutex system.
+///</summary>
 static int sqlite3MutexInit(){ 
   int rc = SQLITE_OK;
   if( null==sqlite3GlobalConfig.mutex.xMutexAlloc ){
@@ -74,10 +75,10 @@ static int sqlite3MutexInit(){
   return rc;
 }
 
-/*
-** Shutdown the mutex system. This call frees resources allocated by
-** sqlite3MutexInit().
-*/
+///<summary>
+/// Shutdown the mutex system. This call frees resources allocated by
+/// sqlite3MutexInit().
+///</summary>
 static int sqlite3MutexEnd(){
   int rc = SQLITE_OK;
   if( sqlite3GlobalConfig.mutex.xMutexEnd !=null){
@@ -91,9 +92,9 @@ static int sqlite3MutexEnd(){
   return rc;
 }
 
-/*
-** Retrieve a pointer to a static mutex or allocate a new dynamic one.
-*/
+///<summary>
+/// Retrieve a pointer to a static mutex or allocate a new dynamic one.
+///</summary>
 static sqlite3_mutex sqlite3_mutex_alloc(int id){
 #if !SQLITE_OMIT_AUTOINIT
   if( sqlite3_initialize()!=0 ) return null;
@@ -109,29 +110,29 @@ static sqlite3_mutex sqlite3MutexAlloc(int id){
   return sqlite3GlobalConfig.mutex.xMutexAlloc(id);
 }
 
-/*
-** Free a dynamic mutex.
-*/
+///<summary>
+/// Free a dynamic mutex.
+///</summary>
 static void sqlite3_mutex_free( sqlite3_mutex p){
   if( p!=null ){
     sqlite3GlobalConfig.mutex.xMutexFree( p);
   }
 }
 
-/*
-** Obtain the mutex p. If some other thread already has the mutex, block
-** until it can be obtained.
-*/
+///<summary>
+/// Obtain the mutex p. If some other thread already has the mutex, block
+/// until it can be obtained.
+///</summary>
 static void sqlite3_mutex_enter(sqlite3_mutex p){
   if( p !=null){
     sqlite3GlobalConfig.mutex.xMutexEnter(p);
   }
 }
 
-/*
-** Obtain the mutex p. If successful, return SQLITE_OK. Otherwise, if another
-** thread holds the mutex and it cannot be obtained, return SQLITE_BUSY.
-*/
+///<summary>
+/// Obtain the mutex p. If successful, return SQLITE_OK. Otherwise, if another
+/// thread holds the mutex and it cannot be obtained, return SQLITE_BUSY.
+///</summary>
 static int sqlite3_mutex_try(sqlite3_mutex p){
   int rc = SQLITE_OK;
   if( p!=null ){
@@ -140,12 +141,12 @@ static int sqlite3_mutex_try(sqlite3_mutex p){
   return rc;
 }
 
-/*
-** The sqlite3_mutex_leave() routine exits a mutex that was previously
-** entered by the same thread.  The behavior is undefined if the mutex 
-** is not currently entered. If a NULL pointer is passed as an argument
-** this function is a no-op.
-*/
+///<summary>
+/// The sqlite3_mutex_leave() routine exits a mutex that was previously
+/// entered by the same thread.  The behavior is undefined if the mutex
+/// is not currently entered. If a NULL pointer is passed as an argument
+/// this function is a no-op.
+///</summary>
 static void sqlite3_mutex_leave(sqlite3_mutex p){
   if( p !=null){
     sqlite3GlobalConfig.mutex.xMutexLeave(p);
@@ -153,10 +154,10 @@ static void sqlite3_mutex_leave(sqlite3_mutex p){
 }
 
 #if !NDEBUG
-/*
-** The sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
-** intended for use inside assert() statements.
-*/
+///<summary>
+/// The sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
+/// intended for use inside assert() statements.
+///</summary>
 static bool sqlite3_mutex_held(sqlite3_mutex p){
   return p==null || sqlite3GlobalConfig.mutex.xMutexHeld(p);
 }

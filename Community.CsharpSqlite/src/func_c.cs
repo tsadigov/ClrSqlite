@@ -15,48 +15,51 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-    /*
-    ** 2002 February 23
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains the C functions that implement various SQL
-    ** functions of SQLite.
-    **
-    ** There is only one exported symbol in this file - the function
-    ** sqliteRegisterBuildinFunctions() found at the bottom of the file.
-    ** All other code has file scope.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2002 February 23
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains the C functions that implement various SQL
+/// functions of SQLite.
+///
+/// There is only one exported symbol in this file - the function
+/// sqliteRegisterBuildinFunctions() found at the bottom of the file.
+/// All other code has file scope.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
     //#include <stdlib.h>
     //#include <assert.h>
     //#include "vdbeInt.h"
 
 
-    /*
-    ** Return the collating function associated with a function.
-    */
+    ///<summary>
+/// Return the collating function associated with a function.
+///
+///</summary>
     static CollSeq sqlite3GetFuncCollSeq( sqlite3_context context )
     {
       return context.pColl;
     }
 
-    /*
-    ** Implementation of the non-aggregate min() and max() functions
-    */
+    ///<summary>
+/// Implementation of the non-aggregate min() and max() functions
+///
+///</summary>
     static void minmaxFunc(
     sqlite3_context context,
     int argc,
@@ -89,9 +92,10 @@ namespace Community.CsharpSqlite
       sqlite3_result_value( context, argv[iBest] );
     }
 
-    /*
-    ** Return the type of the argument.
-    */
+    ///<summary>
+/// Return the type of the argument.
+///
+///</summary>
     static void typeofFunc(
     sqlite3_context context,
     int NotUsed,
@@ -122,9 +126,10 @@ namespace Community.CsharpSqlite
     }
 
 
-    /*
-    ** Implementation of the length() function
-    */
+    ///<summary>
+/// Implementation of the length() function
+///
+///</summary>
     static void lengthFunc(
     sqlite3_context context,
     int argc,
@@ -167,12 +172,13 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Implementation of the abs() function.
-    **
-    ** IMP: R-23979-26855 The abs(X) function returns the absolute value of
-    ** the numeric argument X. 
-    */
+    ///<summary>
+/// Implementation of the abs() function.
+///
+/// IMP: R-23979-26855 The abs(X) function returns the absolute value of
+/// the numeric argument X.
+///
+///</summary>
     static void absFunc(
     sqlite3_context context,
     int argc,
@@ -359,9 +365,10 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Implementation of the round() function
-    */
+    ///<summary>
+/// Implementation of the round() function
+///
+///</summary>
 #if !SQLITE_OMIT_FLOATING_POINT
     static void roundFunc(
     sqlite3_context context,
@@ -413,13 +420,13 @@ namespace Community.CsharpSqlite
     }
 #endif
 
-    /*
-** Allocate nByte bytes of space using sqlite3_malloc(). If the
-** allocation fails, call sqlite3_result_error_nomem() to notify
-** the database handle that malloc() has failed and return NULL.
-** If nByte is larger than the maximum string or blob length, then
-** raise an SQLITE_TOOBIG exception and return NULL.
-*/
+    ///<summary>
+/// Allocate nByte bytes of space using sqlite3_malloc(). If the
+/// allocation fails, call sqlite3_result_error_nomem() to notify
+/// the database handle that malloc() has failed and return NULL.
+/// If nByte is larger than the maximum string or blob length, then
+/// raise an SQLITE_TOOBIG exception and return NULL.
+///</summary>
     //static void* contextMalloc( sqlite3_context* context, i64 nByte )
     //{
     //  char* z;
@@ -443,9 +450,10 @@ namespace Community.CsharpSqlite
     //  return z;
     //}
 
-    /*
-    ** Implementation of the upper() and lower() SQL functions.
-    */
+    ///<summary>
+/// Implementation of the upper() and lower() SQL functions.
+///
+///</summary>
     static void upperFunc(
     sqlite3_context context,
     int argc,
@@ -535,9 +543,10 @@ break;
 #endif //* NOT USED */
     //#define ifnullFunc versionFunc   /* Substitute function - never called */
 
-    /*
-    ** Implementation of random().  Return a random integer.
-    */
+    ///<summary>
+/// Implementation of random().  Return a random integer.
+///
+///</summary>
     static void randomFunc(
     sqlite3_context context,
     int NotUsed,
@@ -562,10 +571,11 @@ break;
       sqlite3_result_int64( context, r );
     }
 
-    /*
-    ** Implementation of randomblob(N).  Return a random blob
-    ** that is N bytes long.
-    */
+    ///<summary>
+/// Implementation of randomblob(N).  Return a random blob
+/// that is N bytes long.
+///
+///</summary>
     static void randomBlob(
     sqlite3_context context,
     int argc,
@@ -602,10 +612,11 @@ break;
       }
     }
 
-    /*
-    ** Implementation of the last_insert_rowid() SQL function.  The return
-    ** value is the same as the sqlite3_last_insert_rowid() API function.
-    */
+    ///<summary>
+/// Implementation of the last_insert_rowid() SQL function.  The return
+/// value is the same as the sqlite3_last_insert_rowid() API function.
+///
+///</summary>
     static void last_insert_rowid(
     sqlite3_context context,
     int NotUsed,
@@ -620,13 +631,14 @@ break;
       sqlite3_result_int64( context, sqlite3_last_insert_rowid( db ) );
     }
 
-    /*
-    ** Implementation of the changes() SQL function.
-    **
-    ** IMP: R-62073-11209 The changes() SQL function is a wrapper
-    ** around the sqlite3_changes() C/C++ function and hence follows the same
-    ** rules for counting changes.
-    */
+    ///<summary>
+/// Implementation of the changes() SQL function.
+///
+/// IMP: R-62073-11209 The changes() SQL function is a wrapper
+/// around the sqlite3_changes() C/C++ function and hence follows the same
+/// rules for counting changes.
+///
+///</summary>
     static void changes(
     sqlite3_context context,
     int NotUsed,
@@ -691,8 +703,10 @@ break;
     /* The correct SQL-92 behavior is for the LIKE operator to ignore
     ** case.  Thus  'a' LIKE 'A' would be true. */
     static compareInfo likeInfoNorm = new compareInfo( '%', '_', '\0', true );
-    /* If SQLITE_CASE_SENSITIVE_LIKE is defined, then the LIKE operator
-    ** is case sensitive causing 'a' LIKE 'A' to be false */
+    ///<summary>
+///If SQLITE_CASE_SENSITIVE_LIKE is defined, then the LIKE operator
+/// is case sensitive causing 'a' LIKE 'A' to be false
+///</summary>
     static compareInfo likeInfoAlt = new compareInfo( '%', '_', '\0', false );
 
     /*
@@ -880,11 +894,12 @@ break;
       return zString.Length == 0;
     }
 
-    /*
-    ** Count the number of times that the LIKE operator (or GLOB which is
-    ** just a variation of LIKE) gets called.  This is used for testing
-    ** only.
-    */
+    ///<summary>
+/// Count the number of times that the LIKE operator (or GLOB which is
+/// just a variation of LIKE) gets called.  This is used for testing
+/// only.
+///
+///</summary>
 #if SQLITE_TEST
 #if !TCLSH
     static int sqlite3_like_count = 0;
@@ -894,18 +909,18 @@ break;
 #endif
 
 
-    /*
-** Implementation of the like() SQL function.  This function implements
-** the build-in LIKE operator.  The first argument to the function is the
-** pattern and the second argument is the string.  So, the SQL statements:
-**
-**       A LIKE B
-**
-** is implemented as like(B,A).
-**
-** This same function (with a different compareInfo structure) computes
-** the GLOB operator.
-*/
+    ///<summary>
+/// Implementation of the like() SQL function.  This function implements
+/// the build-in LIKE operator.  The first argument to the function is the
+/// pattern and the second argument is the string.  So, the SQL statements:
+///
+///       A LIKE B
+///
+/// is implemented as like(B,A).
+///
+/// This same function (with a different compareInfo structure) computes
+/// the GLOB operator.
+///</summary>
     static void likeFunc(
     sqlite3_context context,
     int argc,
@@ -963,11 +978,12 @@ break;
       }
     }
 
-    /*
-    ** Implementation of the NULLIF(x,y) function.  The result is the first
-    ** argument if the arguments are different.  The result is NULL if the
-    ** arguments are equal to each other.
-    */
+    ///<summary>
+/// Implementation of the NULLIF(x,y) function.  The result is the first
+/// argument if the arguments are different.  The result is NULL if the
+/// arguments are equal to each other.
+///
+///</summary>
     static void nullifFunc(
     sqlite3_context context,
     int NotUsed,
@@ -982,10 +998,11 @@ break;
       }
     }
 
-    /*
-    ** Implementation of the sqlite_version() function.  The result is the version
-    ** of the SQLite library that is running.
-    */
+    ///<summary>
+/// Implementation of the sqlite_version() function.  The result is the version
+/// of the SQLite library that is running.
+///
+///</summary>
     static void versionFunc(
     sqlite3_context context,
     int NotUsed,
@@ -998,11 +1015,12 @@ break;
       sqlite3_result_text( context, sqlite3_libversion(), -1, SQLITE_STATIC );
     }
 
-    /*
-    ** Implementation of the sqlite_source_id() function. The result is a string
-    ** that identifies the particular version of the source code used to build
-    ** SQLite.
-    */
+    ///<summary>
+/// Implementation of the sqlite_source_id() function. The result is a string
+/// that identifies the particular version of the source code used to build
+/// SQLite.
+///
+///</summary>
     static void sourceidFunc(
     sqlite3_context context,
     int NotUsed,
@@ -1031,11 +1049,12 @@ break;
       sqlite3_log( sqlite3_value_int( argv[0] ), "%s", sqlite3_value_text( argv[1] ) );
     }
 
-    /*
-    ** Implementation of the sqlite_compileoption_used() function.
-    ** The result is an integer that identifies if the compiler option
-    ** was used to build SQLite.
-    */
+    ///<summary>
+/// Implementation of the sqlite_compileoption_used() function.
+/// The result is an integer that identifies if the compiler option
+/// was used to build SQLite.
+///
+///</summary>
 #if !SQLITE_OMIT_COMPILEOPTION_DIAGS
     static void compileoptionusedFunc(
     sqlite3_context context,
@@ -1058,11 +1077,11 @@ break;
 #endif //* SQLITE_OMIT_COMPILEOPTION_DIAGS */
 
 
-    /*
-** Implementation of the sqlite_compileoption_get() function. 
-** The result is a string that identifies the compiler options 
-** used to build SQLite.
-*/
+    ///<summary>
+/// Implementation of the sqlite_compileoption_get() function.
+/// The result is a string that identifies the compiler options
+/// used to build SQLite.
+///</summary>
 #if !SQLITE_OMIT_COMPILEOPTION_DIAGS
     static void compileoptiongetFunc(
     sqlite3_context context,
@@ -1081,24 +1100,27 @@ break;
     }
 #endif //* SQLITE_OMIT_COMPILEOPTION_DIAGS */
 
-    /* Array for converting from half-bytes (nybbles) into ASCII hex
-** digits. */
+    ///<summary>
+///Array for converting from half-bytes (nybbles) into ASCII hex
+/// digits.
+///</summary>
     static char[] hexdigits = new char[]  {
 '0', '1', '2', '3', '4', '5', '6', '7',
 '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
 };
 
-    /*
-    ** EXPERIMENTAL - This is not an official function.  The interface may
-    ** change.  This function may disappear.  Do not write code that depends
-    ** on this function.
-    **
-    ** Implementation of the QUOTE() function.  This function takes a single
-    ** argument.  If the argument is numeric, the return value is the same as
-    ** the argument.  If the argument is NULL, the return value is the string
-    ** "NULL".  Otherwise, the argument is enclosed in single quotes with
-    ** single-quote escapes.
-    */
+    ///<summary>
+/// EXPERIMENTAL - This is not an official function.  The interface may
+/// change.  This function may disappear.  Do not write code that depends
+/// on this function.
+///
+/// Implementation of the QUOTE() function.  This function takes a single
+/// argument.  If the argument is numeric, the return value is the same as
+/// the argument.  If the argument is NULL, the return value is the string
+/// "NULL".  Otherwise, the argument is enclosed in single quotes with
+/// single-quote escapes.
+///
+///</summary>
     static void quoteFunc(
     sqlite3_context context,
     int argc,
@@ -1186,10 +1208,11 @@ break;
       }
     }
 
-    /*
-    ** The hex() function.  Interpret the argument as a blob.  Return
-    ** a hexadecimal rendering as text.
-    */
+    ///<summary>
+/// The hex() function.  Interpret the argument as a blob.  Return
+/// a hexadecimal rendering as text.
+///
+///</summary>
     static void hexFunc(
     sqlite3_context context,
     int argc,
@@ -1218,9 +1241,10 @@ break;
       }
     }
 
-    /*
-    ** The zeroblob(N) function returns a zero-filled blob of size N bytes.
-    */
+    ///<summary>
+/// The zeroblob(N) function returns a zero-filled blob of size N bytes.
+///
+///</summary>
     static void zeroblobFunc(
     sqlite3_context context,
     int argc,
@@ -1244,12 +1268,13 @@ break;
       }
     }
 
-    /*
-    ** The replace() function.  Three arguments are all strings: call
-    ** them A, B, and C. The result is also a string which is derived
-    ** from A by replacing every occurance of B with C.  The match
-    ** must be exact.  Collating sequences are not used.
-    */
+    ///<summary>
+/// The replace() function.  Three arguments are all strings: call
+/// them A, B, and C. The result is also a string which is derived
+/// from A by replacing every occurance of B with C.  The match
+/// must be exact.  Collating sequences are not used.
+///
+///</summary>
     static void replaceFunc(
     sqlite3_context context,
     int argc,
@@ -1479,10 +1504,12 @@ break;
       sqlite3_result_text( context, sb, nIn, SQLITE_TRANSIENT );
     }
 
-    /* IMP: R-25361-16150 This function is omitted from SQLite by default. It
-    ** is only available if the SQLITE_SOUNDEX compile-time option is used
-    ** when SQLite is built.
-    */
+    ///<summary>
+///IMP: R-25361-16150 This function is omitted from SQLite by default. It
+/// is only available if the SQLITE_SOUNDEX compile-time option is used
+/// when SQLite is built.
+///
+///</summary>
 #if SQLITE_SOUNDEX
 /*
 ** Compute the soundex encoding of a word.
@@ -1542,9 +1569,9 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
 #endif //* SQLITE_SOUNDEX */
 
 #if !SQLITE_OMIT_LOAD_EXTENSION
-    /*
-** A function that loads a shared-library extension then returns NULL.
-*/
+    ///<summary>
+/// A function that loads a shared-library extension then returns NULL.
+///</summary>
     static void loadExt(
     sqlite3_context context,
     int argc,
@@ -1602,16 +1629,17 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
       }
     };
 
-    /*
-    ** Routines used to compute the sum, average, and total.
-    **
-    ** The SUM() function follows the (broken) SQL standard which means
-    ** that it returns NULL if it sums over no inputs.  TOTAL returns
-    ** 0.0 in that case.  In addition, TOTAL always returns a float where
-    ** SUM might return an integer if it never encounters a floating point
-    ** value.  TOTAL never fails, but SUM might through an exception if
-    ** it overflows an integer.
-    */
+    ///<summary>
+/// Routines used to compute the sum, average, and total.
+///
+/// The SUM() function follows the (broken) SQL standard which means
+/// that it returns NULL if it sums over no inputs.  TOTAL returns
+/// 0.0 in that case.  In addition, TOTAL always returns a float where
+/// SUM might return an integer if it never encounters a floating point
+/// value.  TOTAL never fails, but SUM might through an exception if
+/// it overflows an integer.
+///
+///</summary>
     static void sumStep(
     sqlite3_context context,
     int argc,
@@ -1735,9 +1763,10 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
       }
     }
 
-    /*
-    ** Routines to implement the count() aggregate function.
-    */
+    ///<summary>
+/// Routines to implement the count() aggregate function.
+///
+///</summary>
     static void countStep(
     sqlite3_context context,
     int argc,
@@ -1767,9 +1796,10 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
       sqlite3_result_int64( context, p != null ? p.n : 0 );
     }
 
-    /*
-    ** Routines to implement min() and max() aggregate functions.
-    */
+    ///<summary>
+/// Routines to implement min() and max() aggregate functions.
+///
+///</summary>
     static void minmaxStep(
     sqlite3_context context,
     int NotUsed,
@@ -1959,9 +1989,10 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
       }
     }
 
-    /*
-    ** Set the LIKEOPT flag on the 2-argument function with the given name.
-    */
+    ///<summary>
+/// Set the LIKEOPT flag on the 2-argument function with the given name.
+///
+///</summary>
     static void setLikeOptFlag( sqlite3 db, string zName, int flagVal )
     {
       FuncDef pDef;
@@ -1973,11 +2004,12 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
       }
     }
 
-    /*
-    ** Register the built-in LIKE and GLOB functions.  The caseSensitive
-    ** parameter determines whether or not the LIKE operator is case
-    ** sensitive.  GLOB is always case sensitive.
-    */
+    ///<summary>
+/// Register the built-in LIKE and GLOB functions.  The caseSensitive
+/// parameter determines whether or not the LIKE operator is case
+/// sensitive.  GLOB is always case sensitive.
+///
+///</summary>
     static void sqlite3RegisterLikeFunctions( sqlite3 db, int caseSensitive )
     {
       compareInfo pInfo;
@@ -1998,13 +2030,14 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
       caseSensitive != 0 ? ( SQLITE_FUNC_LIKE | SQLITE_FUNC_CASE ) : SQLITE_FUNC_LIKE );
     }
 
-    /*
-    ** pExpr points to an expression which implements a function.  If
-    ** it is appropriate to apply the LIKE optimization to that function
-    ** then set aWc[0] through aWc[2] to the wildcard characters and
-    ** return TRUE.  If the function is not a LIKE-style function then
-    ** return FALSE.
-    */
+    ///<summary>
+/// pExpr points to an expression which implements a function.  If
+/// it is appropriate to apply the LIKE optimization to that function
+/// then set aWc[0] through aWc[2] to the wildcard characters and
+/// return TRUE.  If the function is not a LIKE-style function then
+/// return FALSE.
+///
+///</summary>
     static bool sqlite3IsLikeFunction( sqlite3 db, Expr pExpr, ref bool pIsNocase, char[] aWc )
     {
       FuncDef pDef;

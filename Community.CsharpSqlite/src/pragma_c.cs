@@ -13,38 +13,39 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    ** 2003 April 6
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains code used to implement the PRAGMA command.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2003 April 6
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains code used to implement the PRAGMA command.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
 
-    /*
-** Interpret the given string as a safety level.  Return 0 for OFF,
-** 1 for ON or NORMAL and 2 for FULL.  Return 1 for an empty or
-** unrecognized string argument.
-**
-** Note that the values returned are one less that the values that
-** should be passed into sqlite3BtreeSetSafetyLevel().  The is done
-** to support legacy SQL code.  The safety level used to be boolean
-** and older scripts may have used numbers 0 for OFF and 1 for ON.
-*/
+    ///<summary>
+/// Interpret the given string as a safety level.  Return 0 for OFF,
+/// 1 for ON or NORMAL and 2 for FULL.  Return 1 for an empty or
+/// unrecognized string argument.
+///
+/// Note that the values returned are one less that the values that
+/// should be passed into sqlite3BtreeSetSafetyLevel().  The is done
+/// to support legacy SQL code.  The safety level used to be boolean
+/// and older scripts may have used numbers 0 for OFF and 1 for ON.
+///</summary>
     static u8 getSafetyLevel( string z )
     {
       //                             /* 123456789 123456789 */
@@ -75,15 +76,17 @@ namespace Community.CsharpSqlite
   return (u8)( getSafetyLevel( z ) & 1 );//return getSafetyLevel(z)&1;
 }
 
-/* The sqlite3GetBoolean() function is used by other modules but the
-** remainder of this file is specific to PRAGMA processing.  So omit
-** the rest of the file if PRAGMAs are omitted from the build.
-*/
+///<summary>
+///The sqlite3GetBoolean() function is used by other modules but the
+/// remainder of this file is specific to PRAGMA processing.  So omit
+/// the rest of the file if PRAGMAs are omitted from the build.
+///</summary>
 #if !(SQLITE_OMIT_PRAGMA)
 
-    /*
-    ** Interpret the given string as a locking mode value.
-    */
+    ///<summary>
+/// Interpret the given string as a locking mode value.
+///
+///</summary>
     static int getLockingMode( string z )
     {
       if ( z != null )
@@ -97,12 +100,12 @@ namespace Community.CsharpSqlite
     }
 
 #if !SQLITE_OMIT_AUTOVACUUM
-    /*
-** Interpret the given string as an auto-vacuum mode value.
-**
-** The following strings, "none", "full" and "incremental" are
-** acceptable, as are their numeric equivalents: 0, 1 and 2 respectively.
-*/
+    ///<summary>
+/// Interpret the given string as an auto-vacuum mode value.
+///
+/// The following strings, "none", "full" and "incremental" are
+/// acceptable, as are their numeric equivalents: 0, 1 and 2 respectively.
+///</summary>
     static u8 getAutoVacuum( string z )
     {
       int i;
@@ -118,11 +121,11 @@ namespace Community.CsharpSqlite
 #endif // * if !SQLITE_OMIT_AUTOVACUUM */
 
 #if !SQLITE_OMIT_PAGER_PRAGMAS
-    /*
-** Interpret the given string as a temp db location. Return 1 for file
-** backed temporary databases, 2 for the Red-Black tree in memory database
-** and 0 to use the compile-time default.
-*/
+    ///<summary>
+/// Interpret the given string as a temp db location. Return 1 for file
+/// backed temporary databases, 2 for the Red-Black tree in memory database
+/// and 0 to use the compile-time default.
+///</summary>
     static int getTempStore( string z )
     {
       if ( z[0] >= '0' && z[0] <= '2' )
@@ -145,10 +148,10 @@ namespace Community.CsharpSqlite
 #endif // * SQLITE_PAGER_PRAGMAS */
 
 #if !SQLITE_OMIT_PAGER_PRAGMAS
-    /*
-** Invalidate temp storage, either when the temp storage is changed
-** from default, or when 'file' and the temp_store_directory has changed
-*/
+    ///<summary>
+/// Invalidate temp storage, either when the temp storage is changed
+/// from default, or when 'file' and the temp_store_directory has changed
+///</summary>
     static int invalidateTempStorage( Parse pParse )
     {
       sqlite3 db = pParse.db;
@@ -169,11 +172,11 @@ namespace Community.CsharpSqlite
 #endif // * SQLITE_PAGER_PRAGMAS */
 
 #if !SQLITE_OMIT_PAGER_PRAGMAS
-    /*
-** If the TEMP database is open, close it and mark the database schema
-** as needing reloading.  This must be done when using the SQLITE_TEMP_STORE
-** or DEFAULT_TEMP_STORE pragmas.
-*/
+    ///<summary>
+/// If the TEMP database is open, close it and mark the database schema
+/// as needing reloading.  This must be done when using the SQLITE_TEMP_STORE
+/// or DEFAULT_TEMP_STORE pragmas.
+///</summary>
     static int changeTempStorage( Parse pParse, string zStorageType )
     {
       int ts = getTempStore( zStorageType );
@@ -209,11 +212,11 @@ namespace Community.CsharpSqlite
     }
 
 #if !SQLITE_OMIT_FLAG_PRAGMAS
-    /*
-** Check to see if zRight and zLeft refer to a pragma that queries
-** or changes one of the flags in db.flags.  Return 1 if so and 0 if not.
-** Also, implement the pragma.
-*/
+    ///<summary>
+/// Check to see if zRight and zLeft refer to a pragma that queries
+/// or changes one of the flags in db.flags.  Return 1 if so and 0 if not.
+/// Also, implement the pragma.
+///</summary>
     struct sPragmaType
     {
       public string zName;  /* Name of the pragma */
@@ -311,9 +314,9 @@ new sPragmaType( "foreign_keys",             SQLITE_ForeignKeys ),
     }
 #endif // * SQLITE_OMIT_FLAG_PRAGMAS */
 
-    /*
-** Return a human-readable name for a constraint resolution action.
-*/
+    ///<summary>
+/// Return a human-readable name for a constraint resolution action.
+///</summary>
 #if !SQLITE_OMIT_FOREIGN_KEY
     static string actionName( int action )
     {
@@ -367,21 +370,22 @@ new sPragmaType( "foreign_keys",             SQLITE_ForeignKeys ),
       return azModeName[eMode];
     }
 
-    /*
-    ** Process a pragma statement.
-    **
-    ** Pragmas are of this form:
-    **
-    **      PRAGMA [database.]id [= value]
-    **
-    ** The identifier might also be a string.  The value is a string, and
-    ** identifier, or a number.  If minusFlag is true, then the value is
-    ** a number that was preceded by a minus sign.
-    **
-    ** If the left side is "database.id" then pId1 is the database name
-    ** and pId2 is the id.  If the left side is just "id" then pId1 is the
-    ** id and pId2 is any empty string.
-    */
+    ///<summary>
+/// Process a pragma statement.
+///
+/// Pragmas are of this form:
+///
+///      PRAGMA [database.]id [= value]
+///
+/// The identifier might also be a string.  The value is a string, and
+/// identifier, or a number.  If minusFlag is true, then the value is
+/// a number that was preceded by a minus sign.
+///
+/// If the left side is "database.id" then pId1 is the database name
+/// and pId2 is the id.  If the left side is just "id" then pId1 is the
+/// id and pId2 is any empty string.
+///
+///</summary>
     class EncName
     {
       public string zName;

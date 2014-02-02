@@ -55,32 +55,38 @@ namespace Community.CsharpSqlite
 #endif
 
 #if !SQLITE_AMALGAMATION
-    /* IMPLEMENTATION-OF: R-46656-45156 The sqlite3_version[] string constant
-** contains the text of SQLITE_VERSION macro. 
-*/
+    ///<summary>
+///IMPLEMENTATION-OF: R-46656-45156 The sqlite3_version[] string constant
+/// contains the text of SQLITE_VERSION macro.
+///</summary>
     public static string sqlite3_version = SQLITE_VERSION;
 #endif
 
-    /* IMPLEMENTATION-OF: R-53536-42575 The sqlite3_libversion() function returns
-** a pointer to the to the sqlite3_version[] string constant. 
-*/
+    ///<summary>
+///IMPLEMENTATION-OF: R-53536-42575 The sqlite3_libversion() function returns
+/// a pointer to the to the sqlite3_version[] string constant.
+///</summary>
     public static string sqlite3_libversion()
     {
       return sqlite3_version;
     }
 
-    /* IMPLEMENTATION-OF: R-63124-39300 The sqlite3_sourceid() function returns a
-    ** pointer to a string constant whose value is the same as the
-    ** SQLITE_SOURCE_ID C preprocessor macro. 
-    */
+    ///<summary>
+///IMPLEMENTATION-OF: R-63124-39300 The sqlite3_sourceid() function returns a
+/// pointer to a string constant whose value is the same as the
+/// SQLITE_SOURCE_ID C preprocessor macro.
+///
+///</summary>
     public static string sqlite3_sourceid()
     {
       return SQLITE_SOURCE_ID;
     }
 
-    /* IMPLEMENTATION-OF: R-35210-63508 The sqlite3_libversion_number() function
-    ** returns an integer equal to SQLITE_VERSION_NUMBER.
-    */
+    ///<summary>
+///IMPLEMENTATION-OF: R-35210-63508 The sqlite3_libversion_number() function
+/// returns an integer equal to SQLITE_VERSION_NUMBER.
+///
+///</summary>
     public static int sqlite3_libversion_number()
     {
       return SQLITE_VERSION_NUMBER;
@@ -106,46 +112,47 @@ namespace Community.CsharpSqlite
 static void sqlite3IoTrace( string X, params object[] ap ) {  }
 #endif
 
-    /*
-** If the following global variable points to a string which is the
-** name of a directory, then that directory will be used to store
-** temporary files.
-**
-** See also the "PRAGMA temp_store_directory" SQL command.
-*/
+    ///<summary>
+/// If the following global variable points to a string which is the
+/// name of a directory, then that directory will be used to store
+/// temporary files.
+///
+/// See also the "PRAGMA temp_store_directory" SQL command.
+///</summary>
     static string sqlite3_temp_directory = "";//string sqlite3_temp_directory = 0;
 
-    /*
-    ** Initialize SQLite.
-    **
-    ** This routine must be called to initialize the memory allocation,
-    ** VFS, and mutex subsystems prior to doing any serious work with
-    ** SQLite.  But as long as you do not compile with SQLITE_OMIT_AUTOINIT
-    ** this routine will be called automatically by key routines such as
-    ** sqlite3_open().
-    **
-    ** This routine is a no-op except on its very first call for the process,
-    ** or for the first call after a call to sqlite3_shutdown.
-    **
-    ** The first thread to call this routine runs the initialization to
-    ** completion.  If subsequent threads call this routine before the first
-    ** thread has finished the initialization process, then the subsequent
-    ** threads must block until the first thread finishes with the initialization.
-    **
-    ** The first thread might call this routine recursively.  Recursive
-    ** calls to this routine should not block, of course.  Otherwise the
-    ** initialization process would never complete.
-    **
-    ** Let X be the first thread to enter this routine.  Let Y be some other
-    ** thread.  Then while the initial invocation of this routine by X is
-    ** incomplete, it is required that:
-    **
-    **    *  Calls to this routine from Y must block until the outer-most
-    **       call by X completes.
-    **
-    **    *  Recursive calls to this routine from thread X return immediately
-    **       without blocking.
-    */
+    ///<summary>
+/// Initialize SQLite.
+///
+/// This routine must be called to initialize the memory allocation,
+/// VFS, and mutex subsystems prior to doing any serious work with
+/// SQLite.  But as long as you do not compile with SQLITE_OMIT_AUTOINIT
+/// this routine will be called automatically by key routines such as
+/// sqlite3_open().
+///
+/// This routine is a no-op except on its very first call for the process,
+/// or for the first call after a call to sqlite3_shutdown.
+///
+/// The first thread to call this routine runs the initialization to
+/// completion.  If subsequent threads call this routine before the first
+/// thread has finished the initialization process, then the subsequent
+/// threads must block until the first thread finishes with the initialization.
+///
+/// The first thread might call this routine recursively.  Recursive
+/// calls to this routine should not block, of course.  Otherwise the
+/// initialization process would never complete.
+///
+/// Let X be the first thread to enter this routine.  Let Y be some other
+/// thread.  Then while the initial invocation of this routine by X is
+/// incomplete, it is required that:
+///
+///    *  Calls to this routine from Y must block until the outer-most
+///       call by X completes.
+///
+///    *  Recursive calls to this routine from thread X return immediately
+///       without blocking.
+///
+///</summary>
     static int sqlite3_initialize()
     {
       //--------------------------------------------------------------------
@@ -352,15 +359,16 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
       return SQLITE_OK;
     }
 
-    /*
-    ** This API allows applications to modify the global configuration of
-    ** the SQLite library at run-time.
-    **
-    ** This routine should only be called when there are no outstanding
-    ** database connections or memory allocations.  This routine is not
-    ** threadsafe.  Failure to heed these warnings can lead to unpredictable
-    ** behavior.
-    */
+    ///<summary>
+/// This API allows applications to modify the global configuration of
+/// the SQLite library at run-time.
+///
+/// This routine should only be called when there are no outstanding
+/// database connections or memory allocations.  This routine is not
+/// threadsafe.  Failure to heed these warnings can lead to unpredictable
+/// behavior.
+///
+///</summary>
     // Overloads for ap assignments
     static int sqlite3_config( int op, sqlite3_pcache_methods ap )
     {      //  va_list ap;
@@ -644,17 +652,18 @@ break;
       return rc;
     }
 
-    /*
-    ** Set up the lookaside buffers for a database connection.
-    ** Return SQLITE_OK on success.
-    ** If lookaside is already active, return SQLITE_BUSY.
-    **
-    ** The sz parameter is the number of bytes in each lookaside slot.
-    ** The cnt parameter is the number of slots.  If pStart is NULL the
-    ** space for the lookaside memory is obtained from sqlite3_malloc().
-    ** If pStart is not NULL then it is sz*cnt bytes of memory to use for
-    ** the lookaside memory.
-    */
+    ///<summary>
+/// Set up the lookaside buffers for a database connection.
+/// Return SQLITE_OK on success.
+/// If lookaside is already active, return SQLITE_BUSY.
+///
+/// The sz parameter is the number of bytes in each lookaside slot.
+/// The cnt parameter is the number of slots.  If pStart is NULL the
+/// space for the lookaside memory is obtained from sqlite3_malloc().
+/// If pStart is not NULL then it is sz*cnt bytes of memory to use for
+/// the lookaside memory.
+///
+///</summary>
     static int setupLookaside( sqlite3 db, byte[] pBuf, int sz, int cnt )
     {
       //void* pStart;
@@ -739,9 +748,10 @@ break;
       }
     }
 
-    /*
-    ** Configuration settings for an individual database connection
-    */
+    ///<summary>
+/// Configuration settings for an individual database connection
+///
+///</summary>
     static int sqlite3_db_config( sqlite3 db, int op, params object[] ap )
     {
       int rc;
@@ -804,9 +814,10 @@ break;
     }
 
 
-    /*
-    ** Return true if the buffer z[0..n-1] contains all spaces.
-    */
+    ///<summary>
+/// Return true if the buffer z[0..n-1] contains all spaces.
+///
+///</summary>
     static bool allSpaces( string z, int iStart, int n )
     {
       while ( n > 0 && z[iStart + n - 1] == ' ' )
@@ -816,13 +827,14 @@ break;
       return n == 0;
     }
 
-    /*
-    ** This is the default collating function named "BINARY" which is always
-    ** available.
-    **
-    ** If the padFlag argument is not NULL then space padding at the end
-    ** of strings is ignored.  This implements the RTRIM collation.
-    */
+    ///<summary>
+/// This is the default collating function named "BINARY" which is always
+/// available.
+///
+/// If the padFlag argument is not NULL then space padding at the end
+/// of strings is ignored.  This implements the RTRIM collation.
+///
+///</summary>
     static int binCollFunc(
     object padFlag,
     int nKey1, string pKey1,
@@ -846,15 +858,16 @@ break;
       return rc;
     }
 
-    /*
-    ** Another built-in collating sequence: NOCASE.
-    **
-    ** This collating sequence is intended to be used for "case independant
-    ** comparison". SQLite's knowledge of upper and lower case equivalents
-    ** extends only to the 26 characters used in the English language.
-    **
-    ** At the moment there is only a UTF-8 implementation.
-    */
+    ///<summary>
+/// Another built-in collating sequence: NOCASE.
+///
+/// This collating sequence is intended to be used for "case independant
+/// comparison". SQLite's knowledge of upper and lower case equivalents
+/// extends only to the 26 characters used in the English language.
+///
+/// At the moment there is only a UTF-8 implementation.
+///
+///</summary>
     static int nocaseCollatingFunc(
     object NotUsed,
     int nKey1, string pKey1,
@@ -871,35 +884,39 @@ break;
       return r;
     }
 
-    /*
-    ** Return the ROWID of the most recent insert
-    */
+    ///<summary>
+/// Return the ROWID of the most recent insert
+///
+///</summary>
     static public sqlite_int64 sqlite3_last_insert_rowid( sqlite3 db )
     {
       return db.lastRowid;
     }
 
-    /*
-    ** Return the number of changes in the most recent call to sqlite3_exec().
-    */
+    ///<summary>
+/// Return the number of changes in the most recent call to sqlite3_exec().
+///
+///</summary>
     static public int sqlite3_changes( sqlite3 db )
     {
       return db.nChange;
     }
 
-    /*
-    ** Return the number of changes since the database handle was opened.
-    */
+    ///<summary>
+/// Return the number of changes since the database handle was opened.
+///
+///</summary>
     static public int sqlite3_total_changes( sqlite3 db )
     {
       return db.nTotalChange;
     }
 
-    /*
-    ** Close all open savepoints. This function only manipulates fields of the
-    ** database handle object, it does not close any savepoints that may be open
-    ** at the b-tree/pager level.
-    */
+    ///<summary>
+/// Close all open savepoints. This function only manipulates fields of the
+/// database handle object, it does not close any savepoints that may be open
+/// at the b-tree/pager level.
+///
+///</summary>
     static void sqlite3CloseSavepoints( sqlite3 db )
     {
       while ( db.pSavepoint != null )
@@ -913,12 +930,13 @@ break;
       db.isTransactionSavepoint = 0;
     }
 
-    /*
-    ** Invoke the destructor function associated with FuncDef p, if any. Except,
-    ** if this is not the last copy of the function, do not invoke it. Multiple
-    ** copies of a single function are created when create_function() is called
-    ** with SqliteEncoding.ANY as the encoding.
-    */
+    ///<summary>
+/// Invoke the destructor function associated with FuncDef p, if any. Except,
+/// if this is not the last copy of the function, do not invoke it. Multiple
+/// copies of a single function are created when create_function() is called
+/// with SqliteEncoding.ANY as the encoding.
+///
+///</summary>
     static void functionDestroy( sqlite3 db, FuncDef p )
     {
       FuncDestructor pDestructor = p.pDestructor;
@@ -933,9 +951,10 @@ break;
       }
     }
 
-    /*
-    ** Close an existing SQLite database
-    */
+    ///<summary>
+/// Close an existing SQLite database
+///
+///</summary>
     public static int sqlite3_close( sqlite3 db )
     {
       HashElem i;  /* Hash table iterator */
@@ -1085,9 +1104,10 @@ break;
       return SQLITE_OK;
     }
 
-    /*
-    ** Rollback all database files.
-    */
+    ///<summary>
+/// Rollback all database files.
+///
+///</summary>
     static void sqlite3RollbackAll( sqlite3 db )
     {
       int i;
@@ -1125,10 +1145,11 @@ break;
       }
     }
 
-    /*
-    ** Return a static string that describes the kind of error specified in the
-    ** argument.
-    */
+    ///<summary>
+/// Return a static string that describes the kind of error specified in the
+/// argument.
+///
+///</summary>
     static string sqlite3ErrStr( int rc )
     {
       string[] aMsg = new string[]{
@@ -1171,12 +1192,13 @@ break;
       }
     }
 
-    /*
-    ** This routine implements a busy callback that sleeps and tries
-    ** again until a timeout value is reached.  The timeout value is
-    ** an integer number of milliseconds passed in as the first
-    ** argument.
-    */
+    ///<summary>
+/// This routine implements a busy callback that sleeps and tries
+/// again until a timeout value is reached.  The timeout value is
+/// an integer number of milliseconds passed in as the first
+/// argument.
+///
+///</summary>
     static int sqliteDefaultBusyCallback(
     object ptr,               /* Database connection */
     int count                /* Number of times table has been busy */
@@ -1222,13 +1244,14 @@ return 1;
 #endif
     }
 
-    /*
-    ** Invoke the given busy handler.
-    **
-    ** This routine is called when an operation failed with a lock.
-    ** If this routine returns non-zero, the lock is retried.  If it
-    ** returns 0, the operation aborts with an SQLITE_BUSY error.
-    */
+    ///<summary>
+/// Invoke the given busy handler.
+///
+/// This routine is called when an operation failed with a lock.
+/// If this routine returns non-zero, the lock is retried.  If it
+/// returns 0, the operation aborts with an SQLITE_BUSY error.
+///
+///</summary>
     static int sqlite3InvokeBusyHandler( BusyHandler p )
     {
       int rc;
@@ -1246,10 +1269,11 @@ return 1;
       return rc;
     }
 
-    /*
-    ** This routine sets the busy callback for an Sqlite database to the
-    ** given callback function with the given argument.
-    */
+    ///<summary>
+/// This routine sets the busy callback for an Sqlite database to the
+/// given callback function with the given argument.
+///
+///</summary>
     static int sqlite3_busy_handler(
     sqlite3 db,
     dxBusy xBusy,
@@ -1265,11 +1289,11 @@ return 1;
     }
 
 #if !SQLITE_OMIT_PROGRESS_CALLBACK
-    /*
-** This routine sets the progress callback for an Sqlite database to the
-** given callback function with the given argument. The progress callback will
-** be invoked every nOps opcodes.
-*/
+    ///<summary>
+/// This routine sets the progress callback for an Sqlite database to the
+/// given callback function with the given argument. The progress callback will
+/// be invoked every nOps opcodes.
+///</summary>
     static void sqlite3_progress_handler(
     sqlite3 db,
     int nOps,
@@ -1295,10 +1319,10 @@ return 1;
 #endif
 
 
-    /*
-** This routine installs a default busy handler that waits for the
-** specified number of milliseconds before returning 0.
-*/
+    ///<summary>
+/// This routine installs a default busy handler that waits for the
+/// specified number of milliseconds before returning 0.
+///</summary>
     static public int sqlite3_busy_timeout( sqlite3 db, int ms )
     {
       if ( ms > 0 )
@@ -1313,21 +1337,23 @@ return 1;
       return SQLITE_OK;
     }
 
-    /*
-    ** Cause any pending operation to stop at its earliest opportunity.
-    */
+    ///<summary>
+/// Cause any pending operation to stop at its earliest opportunity.
+///
+///</summary>
     static void sqlite3_interrupt( sqlite3 db )
     {
       db.u1.isInterrupted = true;
     }
 
 
-    /*
-    ** This function is exactly the same as sqlite3_create_function(), except
-    ** that it is designed to be called by internal code. The difference is
-    ** that if a malloc() fails in sqlite3_create_function(), an error code
-    ** is returned and the mallocFailed flag cleared.
-    */
+    ///<summary>
+/// This function is exactly the same as sqlite3_create_function(), except
+/// that it is designed to be called by internal code. The difference is
+/// that if a malloc() fails in sqlite3_create_function(), an error code
+/// is returned and the mallocFailed flag cleared.
+///
+///</summary>
     static int sqlite3CreateFunc(
     sqlite3 db,
     string zFunctionName,
@@ -1427,9 +1453,10 @@ enc = SqliteEncoding.UTF16BE;
       return SQLITE_OK;
     }
 
-    /*
-    ** Create new user functions.
-    */
+    ///<summary>
+/// Create new user functions.
+///
+///</summary>
     static public int sqlite3_create_function(
     sqlite3 db,
     string zFunc,
@@ -1508,18 +1535,18 @@ return rc;
 #endif
 
 
-    /*
-** Declare that a function has been overloaded by a virtual table.
-**
-** If the function already exists as a regular global function, then
-** this routine is a no-op.  If the function does not exist, then create
-** a new one that always throws a run-time error.
-**
-** When virtual tables intend to provide an overloaded function, they
-** should call this routine to make sure the global function exists.
-** A global function must exist in order for name resolution to work
-** properly.
-*/
+    ///<summary>
+/// Declare that a function has been overloaded by a virtual table.
+///
+/// If the function already exists as a regular global function, then
+/// this routine is a no-op.  If the function does not exist, then create
+/// a new one that always throws a run-time error.
+///
+/// When virtual tables intend to provide an overloaded function, they
+/// should call this routine to make sure the global function exists.
+/// A global function must exist in order for name resolution to work
+/// properly.
+///</summary>
     static int sqlite3_overload_function(
     sqlite3 db,
     string zName,
@@ -1540,14 +1567,14 @@ return rc;
     }
 
 #if !SQLITE_OMIT_TRACE
-    /*
-** Register a trace function.  The pArg from the previously registered trace
-** is returned.
-**
-** A NULL trace function means that no tracing is executes.  A non-NULL
-** trace is a pointer to a function that is invoked at the start of each
-** SQL statement.
-*/
+    ///<summary>
+/// Register a trace function.  The pArg from the previously registered trace
+/// is returned.
+///
+/// A NULL trace function means that no tracing is executes.  A non-NULL
+/// trace is a pointer to a function that is invoked at the start of each
+/// SQL statement.
+///</summary>
     static object sqlite3_trace( sqlite3 db, dxTrace xTrace, object pArg )
     {// (*xTrace)(void*,const char), object pArg){
       object pOld;
@@ -1558,14 +1585,15 @@ return rc;
       sqlite3_mutex_leave( db.mutex );
       return pOld;
     }
-    /*
-    ** Register a profile function.  The pArg from the previously registered
-    ** profile function is returned.
-    **
-    ** A NULL profile function means that no profiling is executes.  A non-NULL
-    ** profile is a pointer to a function that is invoked at the conclusion of
-    ** each SQL statement that is run.
-    */
+    ///<summary>
+/// Register a profile function.  The pArg from the previously registered
+/// profile function is returned.
+///
+/// A NULL profile function means that no profiling is executes.  A non-NULL
+/// profile is a pointer to a function that is invoked at the conclusion of
+/// each SQL statement that is run.
+///
+///</summary>
     static object sqlite3_profile(
     sqlite3 db,
     dxProfile xProfile,//void (*xProfile)(void*,const char*,sqlite_u3264),
@@ -1582,12 +1610,13 @@ return rc;
     }
 #endif // * SQLITE_OMIT_TRACE */
 
-    /*** EXPERIMENTAL ***
-**
-** Register a function to be invoked when a transaction comments.
-** If the invoked function returns non-zero, then the commit becomes a
-** rollback.
-*/
+    ///<summary>
+/// EXPERIMENTAL 
+///
+/// Register a function to be invoked when a transaction comments.
+/// If the invoked function returns non-zero, then the commit becomes a
+/// rollback.
+///</summary>
     static object sqlite3_commit_hook(
     sqlite3 db,             /* Attach the hook to this database */
     dxCommitCallback xCallback,   //int (*xCallback)(void),  /* Function to invoke on each commit */
@@ -1603,10 +1632,11 @@ return rc;
       return pOld;
     }
 
-    /*
-    ** Register a callback to be invoked each time a row is updated,
-    ** inserted or deleted using this database connection.
-    */
+    ///<summary>
+/// Register a callback to be invoked each time a row is updated,
+/// inserted or deleted using this database connection.
+///
+///</summary>
     static object sqlite3_update_hook(
     sqlite3 db,             /* Attach the hook to this database */
     dxUpdateCallback xCallback,   //void (*xCallback)(void*,int,char const *,char const *,sqlite_int64),
@@ -1622,10 +1652,11 @@ return rc;
       return pRet;
     }
 
-    /*
-    ** Register a callback to be invoked each time a transaction is rolled
-    ** back by this database connection.
-    */
+    ///<summary>
+/// Register a callback to be invoked each time a transaction is rolled
+/// back by this database connection.
+///
+///</summary>
     static object sqlite3_rollback_hook(
     sqlite3 db,             /* Attach the hook to this database */
     dxRollbackCallback xCallback,   //void (*xCallback)(void), /* Callback function */
@@ -1642,12 +1673,12 @@ return rc;
     }
 
 #if !SQLITE_OMIT_WAL
-/*
-** The sqlite3_wal_hook() callback registered by sqlite3_wal_autocheckpoint().
-** Invoke sqlite3_wal_checkpoint if the number of frames in the log file
-** is greater than sqlite3.pWalArg cast to an integer (the value configured by
-** wal_autocheckpoint()).
-*/ 
+///<summary>
+/// The sqlite3_wal_hook() callback registered by sqlite3_wal_autocheckpoint().
+/// Invoke sqlite3_wal_checkpoint if the number of frames in the log file
+/// is greater than sqlite3.pWalArg cast to an integer (the value configured by
+/// wal_autocheckpoint()).
+///</summary> 
 int sqlite3WalDefaultHook(
 void *pClientData,     /* Argument */
 sqlite3 db,           /* Connection */
@@ -1663,17 +1694,17 @@ return SQLITE_OK;
 }
 #endif //* SQLITE_OMIT_WAL */
 
-    /*
-** Configure an sqlite3_wal_hook() callback to automatically checkpoint
-** a database after committing a transaction if there are nFrame or
-** more frames in the log file. Passing zero or a negative value as the
-** nFrame parameter disables automatic checkpoints entirely.
-**
-** The callback registered by this function replaces any existing callback
-** registered using sqlite3_wal_hook(). Likewise, registering a callback
-** using sqlite3_wal_hook() disables the automatic checkpoint mechanism
-** configured by this function.
-*/
+    ///<summary>
+/// Configure an sqlite3_wal_hook() callback to automatically checkpoint
+/// a database after committing a transaction if there are nFrame or
+/// more frames in the log file. Passing zero or a negative value as the
+/// nFrame parameter disables automatic checkpoints entirely.
+///
+/// The callback registered by this function replaces any existing callback
+/// registered using sqlite3_wal_hook(). Likewise, registering a callback
+/// using sqlite3_wal_hook() disables the automatic checkpoint mechanism
+/// configured by this function.
+///</summary>
     static int sqlite3_wal_autocheckpoint( sqlite3 db, int nFrame )
     {
 #if SQLITE_OMIT_WAL
@@ -1689,10 +1720,11 @@ sqlite3_wal_hook(db, 0, 0);
       return SQLITE_OK;
     }
 
-    /*
-    ** Register a callback to be invoked each time a transaction is written
-    ** into the write-ahead-log by this database connection.
-    */
+    ///<summary>
+/// Register a callback to be invoked each time a transaction is written
+/// into the write-ahead-log by this database connection.
+///
+///</summary>
     static object sqlite3_wal_hook(
     sqlite3 db,                    /* Attach the hook to this db handle */
     dxWalCallback xCallback,         //int(*xCallback)(void *, sqlite3*, const char*, int),
@@ -1713,9 +1745,10 @@ return pRet;
     }
 
 
-    /*
-    ** Checkpoint database zDb.
-    */
+    ///<summary>
+/// Checkpoint database zDb.
+///
+///</summary>
     static int sqlite3_wal_checkpoint_v2(
       sqlite3 db,                   /* Database handle */
       string zDb,                   /* Name of attached database (or NULL) */
@@ -1761,11 +1794,12 @@ return pRet;
     }
 
 
-    /*
-    ** Checkpoint database zDb. If zDb is NULL, or if the buffer zDb points
-    ** to contains a zero-length string, all attached databases are 
-    ** checkpointed.
-    */
+    ///<summary>
+/// Checkpoint database zDb. If zDb is NULL, or if the buffer zDb points
+/// to contains a zero-length string, all attached databases are
+/// checkpointed.
+///
+///</summary>
     static int sqlite3_wal_checkpoint( sqlite3 db, string zDb )
     {
       int dummy;
@@ -1773,25 +1807,25 @@ return pRet;
     }
 
 #if !SQLITE_OMIT_WAL
-/*
-** Run a checkpoint on database iDb. This is a no-op if database iDb is
-** not currently open in WAL mode.
-**
-** If a transaction is open on the database being checkpointed, this 
-** function returns SQLITE_LOCKED and a checkpoint is not attempted. If 
-** an error occurs while running the checkpoint, an SQLite error code is 
-** returned (i.e. SQLITE_IOERR). Otherwise, SQLITE_OK.
-**
-** The mutex on database handle db should be held by the caller. The mutex
-** associated with the specific b-tree being checkpointed is taken by
-** this function while the checkpoint is running.
-**
-** If iDb is passed SQLITE_MAX_ATTACHED, then all attached databases are
-** checkpointed. If an error is encountered it is returned immediately -
-** no attempt is made to checkpoint any remaining databases.
-**
-** Parameter eMode is one of SQLITE_CHECKPOINT_PASSIVE, FULL or RESTART.
-*/
+///<summary>
+/// Run a checkpoint on database iDb. This is a no-op if database iDb is
+/// not currently open in WAL mode.
+///
+/// If a transaction is open on the database being checkpointed, this
+/// function returns SQLITE_LOCKED and a checkpoint is not attempted. If
+/// an error occurs while running the checkpoint, an SQLite error code is
+/// returned (i.e. SQLITE_IOERR). Otherwise, SQLITE_OK.
+///
+/// The mutex on database handle db should be held by the caller. The mutex
+/// associated with the specific b-tree being checkpointed is taken by
+/// this function while the checkpoint is running.
+///
+/// If iDb is passed SQLITE_MAX_ATTACHED, then all attached databases are
+/// checkpointed. If an error is encountered it is returned immediately -
+/// no attempt is made to checkpoint any remaining databases.
+///
+/// Parameter eMode is one of SQLITE_CHECKPOINT_PASSIVE, FULL or RESTART.
+///</summary>
 int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
   int rc = SQLITE_OK;             /* Return code */
   int i;                          /* Used to iterate through attached dbs */
@@ -1817,26 +1851,27 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 }
 #endif //* SQLITE_OMIT_WAL */
 
-    /*
-    /*
-    ** This function returns true if main-memory should be used instead of
-    ** a temporary file for transient pager files and statement journals.
-    ** The value returned depends on the value of db->temp_store (runtime
-    ** parameter) and the compile time value of SQLITE_TEMP_STORE. The
-    ** following table describes the relationship between these two values
-    ** and this functions return value.
-    **
-    **   SQLITE_TEMP_STORE     db->temp_store     Location of temporary database
-    **   -----------------     --------------     ------------------------------
-    **   0                     any                file      (return 0)
-    **   1                     1                  file      (return 0)
-    **   1                     2                  memory    (return 1)
-    **   1                     0                  file      (return 0)
-    **   2                     1                  file      (return 0)
-    **   2                     2                  memory    (return 1)
-    **   2                     0                  memory    (return 1)
-    **   3                     any                memory    (return 1)
-    */
+    ///<summary>
+////
+/// This function returns true if main-memory should be used instead of
+/// a temporary file for transient pager files and statement journals.
+/// The value returned depends on the value of db->temp_store (runtime
+/// parameter) and the compile time value of SQLITE_TEMP_STORE. The
+/// following table describes the relationship between these two values
+/// and this functions return value.
+///
+///   SQLITE_TEMP_STORE     db->temp_store     Location of temporary database
+///   -----------------     --------------     ------------------------------
+///   0                     any                file      (return 0)
+///   1                     1                  file      (return 0)
+///   1                     2                  memory    (return 1)
+///   1                     0                  file      (return 0)
+///   2                     1                  file      (return 0)
+///   2                     2                  memory    (return 1)
+///   2                     0                  memory    (return 1)
+///   3                     any                memory    (return 1)
+///
+///</summary>
     static bool sqlite3TempInMemory( sqlite3 db )
     {
       //#if SQLITE_TEMP_STORE==1

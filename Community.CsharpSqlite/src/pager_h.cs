@@ -54,14 +54,15 @@ namespace Community.CsharpSqlite
     */
     //typedef struct PgHdr DbPage;
 
-    /*
-    ** Page number PAGER_MJ_PGNO is never used in an SQLite database (it is
-    ** reserved for working around a windows/posix incompatibility). It is
-    ** used in the journal to signify that the remainder of the journal file
-    ** is devoted to storing a master journal name - there are no more pages to
-    ** roll back. See comments for function writeMasterJournal() in pager.c
-    ** for details.
-    */
+    ///<summary>
+/// Page number PAGER_MJ_PGNO is never used in an SQLite database (it is
+/// reserved for working around a windows/posix incompatibility). It is
+/// used in the journal to signify that the remainder of the journal file
+/// is devoted to storing a master journal name - there are no more pages to
+/// roll back. See comments for function writeMasterJournal() in pager.c
+/// for details.
+///
+///</summary>
     //#define PAGER_MJ_PGNO(x) ((Pgno)((PENDING_BYTE/((x)->pageSize))+1))
     static Pgno PAGER_MJ_PGNO( Pager x )
     {

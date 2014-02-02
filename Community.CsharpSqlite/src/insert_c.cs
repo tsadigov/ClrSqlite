@@ -10,32 +10,34 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    ** 2001 September 15
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains C code routines that are called by the parser
-    ** to handle INSERT statements in SQLite.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2001 September 15
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains C code routines that are called by the parser
+/// to handle INSERT statements in SQLite.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
 
-    /*
-    ** Generate code that will open a table for reading.
-    */
+    ///<summary>
+/// Generate code that will open a table for reading.
+///
+///</summary>
     static void sqlite3OpenTable(
     Parse p,       /* Generate code into this VDBE */
     int iCur,       /* The cursor number of the table */
@@ -55,26 +57,27 @@ namespace Community.CsharpSqlite
       VdbeComment( v, "%s", pTab.zName );
     }
 
-    /*
-    ** Return a pointer to the column affinity string associated with index
-    ** pIdx. A column affinity string has one character for each column in 
-    ** the table, according to the affinity of the column:
-    **
-    **  Character      Column affinity
-    **  ------------------------------
-    **  'a'            TEXT
-    **  'b'            NONE
-    **  'c'            NUMERIC
-    **  'd'            INTEGER
-    **  'e'            REAL
-    **
-    ** An extra 'b' is appended to the end of the string to cover the
-    ** rowid that appears as the last column in every index.
-    **
-    ** Memory for the buffer containing the column index affinity string
-    ** is managed along with the rest of the Index structure. It will be
-    ** released when sqlite3DeleteIndex() is called.
-    */
+    ///<summary>
+/// Return a pointer to the column affinity string associated with index
+/// pIdx. A column affinity string has one character for each column in
+/// the table, according to the affinity of the column:
+///
+///  Character      Column affinity
+///  ------------------------------
+///  'a'            TEXT
+///  'b'            NONE
+///  'c'            NUMERIC
+///  'd'            INTEGER
+///  'e'            REAL
+///
+/// An extra 'b' is appended to the end of the string to cover the
+/// rowid that appears as the last column in every index.
+///
+/// Memory for the buffer containing the column index affinity string
+/// is managed along with the rest of the Index structure. It will be
+/// released when sqlite3DeleteIndex() is called.
+///
+///</summary>
     static string sqlite3IndexAffinityStr( Vdbe v, Index pIdx )
     {
       if ( pIdx.zColAff == null || pIdx.zColAff[0] == '\0' )
@@ -107,20 +110,21 @@ namespace Community.CsharpSqlite
       return pIdx.zColAff;
     }
 
-    /*
-    ** Set P4 of the most recently inserted opcode to a column affinity
-    ** string for table pTab. A column affinity string has one character
-    ** for each column indexed by the index, according to the affinity of the
-    ** column:
-    **
-    **  Character      Column affinity
-    **  ------------------------------
-    **  'a'            TEXT
-    **  'b'            NONE
-    **  'c'            NUMERIC
-    **  'd'            INTEGER
-    **  'e'            REAL
-    */
+    ///<summary>
+/// Set P4 of the most recently inserted opcode to a column affinity
+/// string for table pTab. A column affinity string has one character
+/// for each column indexed by the index, according to the affinity of the
+/// column:
+///
+///  Character      Column affinity
+///  ------------------------------
+///  'a'            TEXT
+///  'b'            NONE
+///  'c'            NUMERIC
+///  'd'            INTEGER
+///  'e'            REAL
+///
+///</summary>
     static void sqlite3TableAffinityStr( Vdbe v, Table pTab )
     {
       /* The first time a column affinity string for a particular table
@@ -155,13 +159,14 @@ namespace Community.CsharpSqlite
       sqlite3VdbeChangeP4( v, -1, pTab.zColAff, P4_TRANSIENT );
     }
 
-    /*
-    ** Return non-zero if the table pTab in database iDb or any of its indices
-    ** have been opened at any point in the VDBE program beginning at location
-    ** iStartAddr throught the end of the program.  This is used to see if
-    ** a statement of the form  "INSERT INTO <iDb, pTab> SELECT ..." can
-    ** run without using temporary table for the results of the SELECT.
-    */
+    ///<summary>
+/// Return non-zero if the table pTab in database iDb or any of its indices
+/// have been opened at any point in the VDBE program beginning at location
+/// iStartAddr throught the end of the program.  This is used to see if
+/// a statement of the form  "INSERT INTO <iDb, pTab> SELECT ..." can
+/// run without using temporary table for the results of the SELECT.
+///
+///</summary>
     static bool readsTable( Parse p, int iStartAddr, int iDb, Table pTab )
     {
       Vdbe v = sqlite3GetVdbe( p );
@@ -204,26 +209,26 @@ namespace Community.CsharpSqlite
     }
 
 #if !SQLITE_OMIT_AUTOINCREMENT
-    /*
-** Locate or create an AutoincInfo structure associated with table pTab
-** which is in database iDb.  Return the register number for the register
-** that holds the maximum rowid.
-**
-** There is at most one AutoincInfo structure per table even if the
-** same table is autoincremented multiple times due to inserts within
-** triggers.  A new AutoincInfo structure is created if this is the
-** first use of table pTab.  On 2nd and subsequent uses, the original
-** AutoincInfo structure is used.
-**
-** Three memory locations are allocated:
-**
-**   (1)  Register to hold the name of the pTab table.
-**   (2)  Register to hold the maximum ROWID of pTab.
-**   (3)  Register to hold the rowid in sqlite_sequence of pTab
-**
-** The 2nd register is the one that is returned.  That is all the
-** insert routine needs to know about.
-*/
+    ///<summary>
+/// Locate or create an AutoincInfo structure associated with table pTab
+/// which is in database iDb.  Return the register number for the register
+/// that holds the maximum rowid.
+///
+/// There is at most one AutoincInfo structure per table even if the
+/// same table is autoincremented multiple times due to inserts within
+/// triggers.  A new AutoincInfo structure is created if this is the
+/// first use of table pTab.  On 2nd and subsequent uses, the original
+/// AutoincInfo structure is used.
+///
+/// Three memory locations are allocated:
+///
+///   (1)  Register to hold the name of the pTab table.
+///   (2)  Register to hold the maximum ROWID of pTab.
+///   (3)  Register to hold the rowid in sqlite_sequence of pTab
+///
+/// The 2nd register is the one that is returned.  That is all the
+/// insert routine needs to know about.
+///</summary>
     static int autoIncBegin(
     Parse pParse,      /* Parsing context */
     int iDb,            /* Index of the database holding pTab */
@@ -258,10 +263,11 @@ namespace Community.CsharpSqlite
       return memId;
     }
 
-    /*
-    ** This routine generates code that will initialize all of the
-    ** register used by the autoincrement tracker.
-    */
+    ///<summary>
+/// This routine generates code that will initialize all of the
+/// register used by the autoincrement tracker.
+///
+///</summary>
     static void sqlite3AutoincrementBegin( Parse pParse )
     {
       AutoincInfo p;            /* Information about an AUTOINCREMENT */
@@ -298,14 +304,15 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Update the maximum rowid for an autoincrement calculation.
-    **
-    ** This routine should be called when the top of the stack holds a
-    ** new rowid that is about to be inserted.  If that new rowid is
-    ** larger than the maximum rowid in the memId memory cell, then the
-    ** memory cell is updated.  The stack is unchanged.
-    */
+    ///<summary>
+/// Update the maximum rowid for an autoincrement calculation.
+///
+/// This routine should be called when the top of the stack holds a
+/// new rowid that is about to be inserted.  If that new rowid is
+/// larger than the maximum rowid in the memId memory cell, then the
+/// memory cell is updated.  The stack is unchanged.
+///
+///</summary>
     static void autoIncStep( Parse pParse, int memId, int regRowid )
     {
       if ( memId > 0 )
@@ -376,108 +383,109 @@ namespace Community.CsharpSqlite
     //  int iDbDest           /* The database of pDest */
     //);
 
-    /*
-    ** This routine is call to handle SQL of the following forms:
-    **
-    **    insert into TABLE (IDLIST) values(EXPRLIST)
-    **    insert into TABLE (IDLIST) select
-    **
-    ** The IDLIST following the table name is always optional.  If omitted,
-    ** then a list of all columns for the table is substituted.  The IDLIST
-    ** appears in the pColumn parameter.  pColumn is NULL if IDLIST is omitted.
-    **
-    ** The pList parameter holds EXPRLIST in the first form of the INSERT
-    ** statement above, and pSelect is NULL.  For the second form, pList is
-    ** NULL and pSelect is a pointer to the select statement used to generate
-    ** data for the insert.
-    **
-    ** The code generated follows one of four templates.  For a simple
-    ** select with data coming from a VALUES clause, the code executes
-    ** once straight down through.  Pseudo-code follows (we call this
-    ** the "1st template"):
-    **
-    **         open write cursor to <table> and its indices
-    **         puts VALUES clause expressions onto the stack
-    **         write the resulting record into <table>
-    **         cleanup
-    **
-    ** The three remaining templates assume the statement is of the form
-    **
-    **   INSERT INTO <table> SELECT ...
-    **
-    ** If the SELECT clause is of the restricted form "SELECT * FROM <table2>" -
-    ** in other words if the SELECT pulls all columns from a single table
-    ** and there is no WHERE or LIMIT or GROUP BY or ORDER BY clauses, and
-    ** if <table2> and <table1> are distinct tables but have identical
-    ** schemas, including all the same indices, then a special optimization
-    ** is invoked that copies raw records from <table2> over to <table1>.
-    ** See the xferOptimization() function for the implementation of this
-    ** template.  This is the 2nd template.
-    **
-    **         open a write cursor to <table>
-    **         open read cursor on <table2>
-    **         transfer all records in <table2> over to <table>
-    **         close cursors
-    **         foreach index on <table>
-    **           open a write cursor on the <table> index
-    **           open a read cursor on the corresponding <table2> index
-    **           transfer all records from the read to the write cursors
-    **           close cursors
-    **         end foreach
-    **
-    ** The 3rd template is for when the second template does not apply
-    ** and the SELECT clause does not read from <table> at any time.
-    ** The generated code follows this template:
-    **
-    **         EOF <- 0
-    **         X <- A
-    **         goto B
-    **      A: setup for the SELECT
-    **         loop over the rows in the SELECT
-    **           load values into registers R..R+n
-    **           yield X
-    **         end loop
-    **         cleanup after the SELECT
-    **         EOF <- 1
-    **         yield X
-    **         goto A
-    **      B: open write cursor to <table> and its indices
-    **      C: yield X
-    **         if EOF goto D
-    **         insert the select result into <table> from R..R+n
-    **         goto C
-    **      D: cleanup
-    **
-    ** The 4th template is used if the insert statement takes its
-    ** values from a SELECT but the data is being inserted into a table
-    ** that is also read as part of the SELECT.  In the third form,
-    ** we have to use a intermediate table to store the results of
-    ** the select.  The template is like this:
-    **
-    **         EOF <- 0
-    **         X <- A
-    **         goto B
-    **      A: setup for the SELECT
-    **         loop over the tables in the SELECT
-    **           load value into register R..R+n
-    **           yield X
-    **         end loop
-    **         cleanup after the SELECT
-    **         EOF <- 1
-    **         yield X
-    **         halt-error
-    **      B: open temp table
-    **      L: yield X
-    **         if EOF goto M
-    **         insert row from R..R+n into temp table
-    **         goto L
-    **      M: open write cursor to <table> and its indices
-    **         rewind temp table
-    **      C: loop over rows of intermediate table
-    **           transfer values form intermediate table into <table>
-    **         end loop
-    **      D: cleanup
-    */
+    ///<summary>
+/// This routine is call to handle SQL of the following forms:
+///
+///    insert into TABLE (IDLIST) values(EXPRLIST)
+///    insert into TABLE (IDLIST) select
+///
+/// The IDLIST following the table name is always optional.  If omitted,
+/// then a list of all columns for the table is substituted.  The IDLIST
+/// appears in the pColumn parameter.  pColumn is NULL if IDLIST is omitted.
+///
+/// The pList parameter holds EXPRLIST in the first form of the INSERT
+/// statement above, and pSelect is NULL.  For the second form, pList is
+/// NULL and pSelect is a pointer to the select statement used to generate
+/// data for the insert.
+///
+/// The code generated follows one of four templates.  For a simple
+/// select with data coming from a VALUES clause, the code executes
+/// once straight down through.  Pseudo-code follows (we call this
+/// the "1st template"):
+///
+///         open write cursor to <table> and its indices
+///         puts VALUES clause expressions onto the stack
+///         write the resulting record into <table>
+///         cleanup
+///
+/// The three remaining templates assume the statement is of the form
+///
+///   INSERT INTO <table> SELECT ...
+///
+/// If the SELECT clause is of the restricted form "SELECT * FROM <table2>" -
+/// in other words if the SELECT pulls all columns from a single table
+/// and there is no WHERE or LIMIT or GROUP BY or ORDER BY clauses, and
+/// if <table2> and <table1> are distinct tables but have identical
+/// schemas, including all the same indices, then a special optimization
+/// is invoked that copies raw records from <table2> over to <table1>.
+/// See the xferOptimization() function for the implementation of this
+/// template.  This is the 2nd template.
+///
+///         open a write cursor to <table>
+///         open read cursor on <table2>
+///         transfer all records in <table2> over to <table>
+///         close cursors
+///         foreach index on <table>
+///           open a write cursor on the <table> index
+///           open a read cursor on the corresponding <table2> index
+///           transfer all records from the read to the write cursors
+///           close cursors
+///         end foreach
+///
+/// The 3rd template is for when the second template does not apply
+/// and the SELECT clause does not read from <table> at any time.
+/// The generated code follows this template:
+///
+///         EOF <- 0
+///         X <- A
+///         goto B
+///      A: setup for the SELECT
+///         loop over the rows in the SELECT
+///           load values into registers R..R+n
+///           yield X
+///         end loop
+///         cleanup after the SELECT
+///         EOF <- 1
+///         yield X
+///         goto A
+///      B: open write cursor to <table> and its indices
+///      C: yield X
+///         if EOF goto D
+///         insert the select result into <table> from R..R+n
+///         goto C
+///      D: cleanup
+///
+/// The 4th template is used if the insert statement takes its
+/// values from a SELECT but the data is being inserted into a table
+/// that is also read as part of the SELECT.  In the third form,
+/// we have to use a intermediate table to store the results of
+/// the select.  The template is like this:
+///
+///         EOF <- 0
+///         X <- A
+///         goto B
+///      A: setup for the SELECT
+///         loop over the tables in the SELECT
+///           load value into register R..R+n
+///           yield X
+///         end loop
+///         cleanup after the SELECT
+///         EOF <- 1
+///         yield X
+///         halt-error
+///      B: open temp table
+///      L: yield X
+///         if EOF goto M
+///         insert row from R..R+n into temp table
+///         goto L
+///      M: open write cursor to <table> and its indices
+///         rewind temp table
+///      C: loop over rows of intermediate table
+///           transfer values form intermediate table into <table>
+///         end loop
+///      D: cleanup
+///
+///</summary>
     // OVERLOADS, so I don't need to rewrite parse.c
     static void sqlite3Insert( Parse pParse, SrcList pTabList, int null_3, int null_4, IdList pColumn, int onError )
     {
@@ -1227,9 +1235,11 @@ insert_cleanup:
       sqlite3DbFree( db, ref aRegIdx );
     }
 
-    /* Make sure "isView" and other macros defined above are undefined. Otherwise
-    ** thely may interfere with compilation of other functions in this file
-    ** (or in another file, if this file becomes part of the amalgamation).  */
+    ///<summary>
+///Make sure "isView" and other macros defined above are undefined. Otherwise
+/// thely may interfere with compilation of other functions in this file
+/// (or in another file, if this file becomes part of the amalgamation).
+///</summary>
     //#if isView
     // #undef isView
     //#endif
@@ -1240,81 +1250,82 @@ insert_cleanup:
     // #undef tmask
     //#endif
 
-    /*
-    ** Generate code to do constraint checks prior to an INSERT or an UPDATE.
-    **
-    ** The input is a range of consecutive registers as follows:
-    **
-    **    1.  The rowid of the row after the update.
-    **
-    **    2.  The data in the first column of the entry after the update.
-    **
-    **    i.  Data from middle columns...
-    **
-    **    N.  The data in the last column of the entry after the update.
-    **
-    ** The regRowid parameter is the index of the register containing (1).
-    **
-    ** If isUpdate is true and rowidChng is non-zero, then rowidChng contains
-    ** the address of a register containing the rowid before the update takes
-    ** place. isUpdate is true for UPDATEs and false for INSERTs. If isUpdate
-    ** is false, indicating an INSERT statement, then a non-zero rowidChng 
-    ** indicates that the rowid was explicitly specified as part of the
-    ** INSERT statement. If rowidChng is false, it means that  the rowid is
-    ** computed automatically in an insert or that the rowid value is not 
-    ** modified by an update.
-    **
-    ** The code generated by this routine store new index entries into
-    ** registers identified by aRegIdx[].  No index entry is created for
-    ** indices where aRegIdx[i]==0.  The order of indices in aRegIdx[] is
-    ** the same as the order of indices on the linked list of indices
-    ** attached to the table.
-    **
-    ** This routine also generates code to check constraints.  NOT NULL,
-    ** CHECK, and UNIQUE constraints are all checked.  If a constraint fails,
-    ** then the appropriate action is performed.  There are five possible
-    ** actions: ROLLBACK, ABORT, FAIL, REPLACE, and IGNORE.
-    **
-    **  Constraint type  Action       What Happens
-    **  ---------------  ----------   ----------------------------------------
-    **  any              ROLLBACK     The current transaction is rolled back and
-    **                                sqlite3_exec() returns immediately with a
-    **                                return code of SQLITE_CONSTRAINT.
-    **
-    **  any              ABORT        Back out changes from the current command
-    **                                only (do not do a complete rollback) then
-    **                                cause sqlite3_exec() to return immediately
-    **                                with SQLITE_CONSTRAINT.
-    **
-    **  any              FAIL         Sqlite_exec() returns immediately with a
-    **                                return code of SQLITE_CONSTRAINT.  The
-    **                                transaction is not rolled back and any
-    **                                prior changes are retained.
-    **
-    **  any              IGNORE       The record number and data is popped from
-    **                                the stack and there is an immediate jump
-    **                                to label ignoreDest.
-    **
-    **  NOT NULL         REPLACE      The NULL value is replace by the default
-    **                                value for that column.  If the default value
-    **                                is NULL, the action is the same as ABORT.
-    **
-    **  UNIQUE           REPLACE      The other row that conflicts with the row
-    **                                being inserted is removed.
-    **
-    **  CHECK            REPLACE      Illegal.  The results in an exception.
-    **
-    ** Which action to take is determined by the overrideError parameter.
-    ** Or if overrideError==OE_Default, then the pParse.onError parameter
-    ** is used.  Or if pParse.onError==OE_Default then the onError value
-    ** for the constraint is used.
-    **
-    ** The calling routine must open a read/write cursor for pTab with
-    ** cursor number "baseCur".  All indices of pTab must also have open
-    ** read/write cursors with cursor number baseCur+i for the i-th cursor.
-    ** Except, if there is no possibility of a REPLACE action then
-    ** cursors do not need to be open for indices where aRegIdx[i]==0.
-    */
+    ///<summary>
+/// Generate code to do constraint checks prior to an INSERT or an UPDATE.
+///
+/// The input is a range of consecutive registers as follows:
+///
+///    1.  The rowid of the row after the update.
+///
+///    2.  The data in the first column of the entry after the update.
+///
+///    i.  Data from middle columns...
+///
+///    N.  The data in the last column of the entry after the update.
+///
+/// The regRowid parameter is the index of the register containing (1).
+///
+/// If isUpdate is true and rowidChng is non-zero, then rowidChng contains
+/// the address of a register containing the rowid before the update takes
+/// place. isUpdate is true for UPDATEs and false for INSERTs. If isUpdate
+/// is false, indicating an INSERT statement, then a non-zero rowidChng
+/// indicates that the rowid was explicitly specified as part of the
+/// INSERT statement. If rowidChng is false, it means that  the rowid is
+/// computed automatically in an insert or that the rowid value is not
+/// modified by an update.
+///
+/// The code generated by this routine store new index entries into
+/// registers identified by aRegIdx[].  No index entry is created for
+/// indices where aRegIdx[i]==0.  The order of indices in aRegIdx[] is
+/// the same as the order of indices on the linked list of indices
+/// attached to the table.
+///
+/// This routine also generates code to check constraints.  NOT NULL,
+/// CHECK, and UNIQUE constraints are all checked.  If a constraint fails,
+/// then the appropriate action is performed.  There are five possible
+/// actions: ROLLBACK, ABORT, FAIL, REPLACE, and IGNORE.
+///
+///  Constraint type  Action       What Happens
+///  ---------------  ----------   ----------------------------------------
+///  any              ROLLBACK     The current transaction is rolled back and
+///                                sqlite3_exec() returns immediately with a
+///                                return code of SQLITE_CONSTRAINT.
+///
+///  any              ABORT        Back out changes from the current command
+///                                only (do not do a complete rollback) then
+///                                cause sqlite3_exec() to return immediately
+///                                with SQLITE_CONSTRAINT.
+///
+///  any              FAIL         Sqlite_exec() returns immediately with a
+///                                return code of SQLITE_CONSTRAINT.  The
+///                                transaction is not rolled back and any
+///                                prior changes are retained.
+///
+///  any              IGNORE       The record number and data is popped from
+///                                the stack and there is an immediate jump
+///                                to label ignoreDest.
+///
+///  NOT NULL         REPLACE      The NULL value is replace by the default
+///                                value for that column.  If the default value
+///                                is NULL, the action is the same as ABORT.
+///
+///  UNIQUE           REPLACE      The other row that conflicts with the row
+///                                being inserted is removed.
+///
+///  CHECK            REPLACE      Illegal.  The results in an exception.
+///
+/// Which action to take is determined by the overrideError parameter.
+/// Or if overrideError==OE_Default, then the pParse.onError parameter
+/// is used.  Or if pParse.onError==OE_Default then the onError value
+/// for the constraint is used.
+///
+/// The calling routine must open a read/write cursor for pTab with
+/// cursor number "baseCur".  All indices of pTab must also have open
+/// read/write cursors with cursor number baseCur+i for the i-th cursor.
+/// Except, if there is no possibility of a REPLACE action then
+/// cursors do not need to be open for indices where aRegIdx[i]==0.
+///
+///</summary>
     static void sqlite3GenerateConstraintChecks(
     Parse pParse,       /* The parser context */
     Table pTab,         /* the table into which we are inserting */
@@ -1654,15 +1665,16 @@ insert_cleanup:
       }
     }
 
-    /*
-    ** This routine generates code to finish the INSERT or UPDATE operation
-    ** that was started by a prior call to sqlite3GenerateConstraintChecks.
-    ** A consecutive range of registers starting at regRowid contains the
-    ** rowid and the content to be inserted.
-    **
-    ** The arguments to this routine should be the same as the first six
-    ** arguments to sqlite3GenerateConstraintChecks.
-    */
+    ///<summary>
+/// This routine generates code to finish the INSERT or UPDATE operation
+/// that was started by a prior call to sqlite3GenerateConstraintChecks.
+/// A consecutive range of registers starting at regRowid contains the
+/// rowid and the content to be inserted.
+///
+/// The arguments to this routine should be the same as the first six
+/// arguments to sqlite3GenerateConstraintChecks.
+///
+///</summary>
     static void sqlite3CompleteInsertion(
     Parse pParse,       /* The parser context */
     Table pTab,         /* the table into which we are inserting */
@@ -1728,13 +1740,14 @@ insert_cleanup:
       sqlite3VdbeChangeP5( v, pik_flags );
     }
 
-    /*
-    ** Generate code that will open cursors for a table and for all
-    ** indices of that table.  The "baseCur" parameter is the cursor number used
-    ** for the table.  Indices are opened on subsequent cursors.
-    **
-    ** Return the number of indices on the table.
-    */
+    ///<summary>
+/// Generate code that will open cursors for a table and for all
+/// indices of that table.  The "baseCur" parameter is the cursor number used
+/// for the table.  Indices are opened on subsequent cursors.
+///
+/// Return the number of indices on the table.
+///
+///</summary>
     static int sqlite3OpenTableAndIndices(
     Parse pParse,   /* Parsing context */
     Table pTab,     /* Table to be opened */
@@ -1787,9 +1800,9 @@ insert_cleanup:
 
 
 #if !SQLITE_OMIT_XFER_OPT
-    /*
-** Check to collation names to see if they are compatible.
-*/
+    ///<summary>
+/// Check to collation names to see if they are compatible.
+///</summary>
     static bool xferCompatibleCollation( string z1, string z2 )
     {
       if ( z1 == null )
@@ -1804,16 +1817,17 @@ insert_cleanup:
     }
 
 
-    /*
-    ** Check to see if index pSrc is compatible as a source of data
-    ** for index pDest in an insert transfer optimization.  The rules
-    ** for a compatible index:
-    **
-    **    *   The index is over the same set of columns
-    **    *   The same DESC and ASC markings occurs on all columns
-    **    *   The same onError processing (OE_Abort, OE_Ignore, etc)
-    **    *   The same collating sequence on each column
-    */
+    ///<summary>
+/// Check to see if index pSrc is compatible as a source of data
+/// for index pDest in an insert transfer optimization.  The rules
+/// for a compatible index:
+///
+///    *   The index is over the same set of columns
+///    *   The same DESC and ASC markings occurs on all columns
+///    *   The same onError processing (OE_Abort, OE_Ignore, etc)
+///    *   The same collating sequence on each column
+///
+///</summary>
     static bool xferCompatibleIndex( Index pDest, Index pSrc )
     {
       int i;

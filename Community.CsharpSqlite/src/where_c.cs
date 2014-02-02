@@ -44,9 +44,10 @@ namespace Community.CsharpSqlite
     //#include "sqliteInt.h"
 
 
-    /*
-    ** Trace output macros
-    */
+    ///<summary>
+/// Trace output macros
+///
+///</summary>
 #if  (SQLITE_TEST) || (SQLITE_DEBUG)
     static bool sqlite3WhereTrace = false;
 #endif
@@ -190,7 +191,9 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 #if (SQLITE_SMALL_STACK)
 public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[] */
 #else
-      public WhereTerm[] aStatic = new WhereTerm[8];    /* Initial static space for a[] */
+      public WhereTerm[] aStatic = new WhereTerm[8];    ///<summary>
+///Initial static space for a[]
+///</summary>
 #endif
 
       public void CopyTo( WhereClause wc )
@@ -256,7 +259,9 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
 ///</summary>
     public class WhereMaskSet
     {
-      public int n;                        /* Number of Debug.Assigned cursor values */
+      public int n;                        ///<summary>
+///Number of Debug.Assigned cursor values
+///</summary>
       public int[] ix = new int[BMS];       /* Cursor Debug.Assigned to each bit */
 
       public void CopyTo( WhereMaskSet wms )
@@ -273,7 +278,9 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
     public class WhereCost
     {
       public WherePlan plan = new WherePlan();/* The lookup strategy */
-      public double rCost;                    /* Overall cost of pursuing this search strategy */
+      public double rCost;                    ///<summary>
+///Overall cost of pursuing this search strategy
+///</summary>
       public Bitmask used;                    /* Bitmask of cursors used by this plan */
 
       public void Clear()
@@ -317,19 +324,20 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
 
     const int WO_ALL = 0xfff;       /* Mask of all possible WO_* values */
     const int WO_SINGLE = 0x0ff;       /* Mask of all non-compound WO_* values */
-    /*
-    ** Value for wsFlags returned by bestIndex() and stored in
-    ** WhereLevel.wsFlags.  These flags determine which search
-    ** strategies are appropriate.
-    **
-    ** The least significant 12 bits is reserved as a mask for WO_ values above.
-    ** The WhereLevel.wsFlags field is usually set to WO_IN|WO_EQ|WO_ISNULL.
-    ** But if the table is the right table of a left join, WhereLevel.wsFlags
-    ** is set to WO_IN|WO_EQ.  The WhereLevel.wsFlags field can then be used as
-    ** the "op" parameter to findTerm when we are resolving equality constraints.
-    ** ISNULL constraints will then not be used on the right table of a left
-    ** join.  Tickets #2177 and #2189.
-    */
+    ///<summary>
+/// Value for wsFlags returned by bestIndex() and stored in
+/// WhereLevel.wsFlags.  These flags determine which search
+/// strategies are appropriate.
+///
+/// The least significant 12 bits is reserved as a mask for WO_ values above.
+/// The WhereLevel.wsFlags field is usually set to WO_IN|WO_EQ|WO_ISNULL.
+/// But if the table is the right table of a left join, WhereLevel.wsFlags
+/// is set to WO_IN|WO_EQ.  The WhereLevel.wsFlags field can then be used as
+/// the "op" parameter to findTerm when we are resolving equality constraints.
+/// ISNULL constraints will then not be used on the right table of a left
+/// join.  Tickets #2177 and #2189.
+///
+///</summary>
     //#define WHERE_ROWID_EQ     0x00001000  /* rowid=EXPR or rowid IN (...) */
     //#define WHERE_ROWID_RANGE  0x00002000  /* rowid<EXPR and/or rowid>EXPR */
     //#define WHERE_COLUMN_EQ    0x00010000  /* x=EXPR or x IN (...) or x IS NULL */
@@ -386,31 +394,36 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
       pWC.vmask = 0;
     }
 
-    /* Forward reference */
+    ///<summary>
+///Forward reference
+///</summary>
     //static void whereClauseClear(WhereClause);
 
-    /*
-    ** Deallocate all memory Debug.Associated with a WhereOrInfo object.
-    */
+    ///<summary>
+/// Deallocate all memory Debug.Associated with a WhereOrInfo object.
+///
+///</summary>
     static void whereOrInfoDelete( sqlite3 db, WhereOrInfo p )
     {
       whereClauseClear( p.wc );
       sqlite3DbFree( db, ref p );
     }
 
-    /*
-    ** Deallocate all memory Debug.Associated with a WhereAndInfo object.
-    */
+    ///<summary>
+/// Deallocate all memory Debug.Associated with a WhereAndInfo object.
+///
+///</summary>
     static void whereAndInfoDelete( sqlite3 db, WhereAndInfo p )
     {
       whereClauseClear( p.wc );
       sqlite3DbFree( db, ref p );
     }
 
-    /*
-    ** Deallocate a WhereClause structure.  The WhereClause structure
-    ** itself is not freed.  This routine is the inverse of whereClauseInit().
-    */
+    ///<summary>
+/// Deallocate a WhereClause structure.  The WhereClause structure
+/// itself is not freed.  This routine is the inverse of whereClauseInit().
+///
+///</summary>
     static void whereClauseClear( WhereClause pWC )
     {
       int i;
@@ -438,25 +451,26 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
       }
     }
 
-    /*
-    ** Add a single new WhereTerm entry to the WhereClause object pWC.
-    ** The new WhereTerm object is constructed from Expr p and with wtFlags.
-    ** The index in pWC.a[] of the new WhereTerm is returned on success.
-    ** 0 is returned if the new WhereTerm could not be added due to a memory
-    ** allocation error.  The memory allocation failure will be recorded in
-    ** the db.mallocFailed flag so that higher-level functions can detect it.
-    **
-    ** This routine will increase the size of the pWC.a[] array as necessary.
-    **
-    ** If the wtFlags argument includes TERM_DYNAMIC, then responsibility
-    ** for freeing the expression p is Debug.Assumed by the WhereClause object pWC.
-    ** This is true even if this routine fails to allocate a new WhereTerm.
-    **
-    ** WARNING:  This routine might reallocate the space used to store
-    ** WhereTerms.  All pointers to WhereTerms should be invalidated after
-    ** calling this routine.  Such pointers may be reinitialized by referencing
-    ** the pWC.a[] array.
-    */
+    ///<summary>
+/// Add a single new WhereTerm entry to the WhereClause object pWC.
+/// The new WhereTerm object is constructed from Expr p and with wtFlags.
+/// The index in pWC.a[] of the new WhereTerm is returned on success.
+/// 0 is returned if the new WhereTerm could not be added due to a memory
+/// allocation error.  The memory allocation failure will be recorded in
+/// the db.mallocFailed flag so that higher-level functions can detect it.
+///
+/// This routine will increase the size of the pWC.a[] array as necessary.
+///
+/// If the wtFlags argument includes TERM_DYNAMIC, then responsibility
+/// for freeing the expression p is Debug.Assumed by the WhereClause object pWC.
+/// This is true even if this routine fails to allocate a new WhereTerm.
+///
+/// WARNING:  This routine might reallocate the space used to store
+/// WhereTerms.  All pointers to WhereTerms should be invalidated after
+/// calling this routine.  Such pointers may be reinitialized by referencing
+/// the pWC.a[] array.
+///
+///</summary>
     static int whereClauseInsert( WhereClause pWC, Expr p, u8 wtFlags )
     {
       WhereTerm pTerm;
@@ -524,15 +538,17 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
       }
     }
 
-    /*
-    ** Initialize an expression mask set (a WhereMaskSet object)
-    */
+    ///<summary>
+/// Initialize an expression mask set (a WhereMaskSet object)
+///
+///</summary>
     //#define initMaskSet(P)  memset(P, 0, sizeof(*P))
 
-    /*
-    ** Return the bitmask for the given cursor number.  Return 0 if
-    ** iCursor is not in the set.
-    */
+    ///<summary>
+/// Return the bitmask for the given cursor number.  Return 0 if
+/// iCursor is not in the set.
+///
+///</summary>
     static Bitmask getMask( WhereMaskSet pMaskSet, int iCursor )
     {
       int i;
@@ -561,20 +577,21 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
       pMaskSet.ix[pMaskSet.n++] = iCursor;
     }
 
-    /*
-    ** This routine walks (recursively) an expression tree and generates
-    ** a bitmask indicating which tables are used in that expression
-    ** tree.
-    **
-    ** In order for this routine to work, the calling function must have
-    ** previously invoked sqlite3ResolveExprNames() on the expression.  See
-    ** the header comment on that routine for additional information.
-    ** The sqlite3ResolveExprNames() routines looks for column names and
-    ** sets their opcodes to TK_COLUMN and their Expr.iTable fields to
-    ** the VDBE cursor number of the table.  This routine just has to
-    ** translate the cursor numbers into bitmask values and OR all
-    ** the bitmasks together.
-    */
+    ///<summary>
+/// This routine walks (recursively) an expression tree and generates
+/// a bitmask indicating which tables are used in that expression
+/// tree.
+///
+/// In order for this routine to work, the calling function must have
+/// previously invoked sqlite3ResolveExprNames() on the expression.  See
+/// the header comment on that routine for additional information.
+/// The sqlite3ResolveExprNames() routines looks for column names and
+/// sets their opcodes to TK_COLUMN and their Expr.iTable fields to
+/// the VDBE cursor number of the table.  This routine just has to
+/// translate the cursor numbers into bitmask values and OR all
+/// the bitmasks together.
+///
+///</summary>
     //static Bitmask exprListTableUsage(WhereMaskSet*, ExprList);
     //static Bitmask exprSelectTableUsage(WhereMaskSet*, Select);
     static Bitmask exprTableUsage( WhereMaskSet pMaskSet, Expr p )
@@ -648,23 +665,25 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
       return op == TK_IN || ( op >= TK_EQ && op <= TK_GE ) || op == TK_ISNULL;
     }
 
-    /*
-    ** Swap two objects of type TYPE.
-    */
+    ///<summary>
+/// Swap two objects of type TYPE.
+///
+///</summary>
     //#define SWAP(TYPE,A,B) {TYPE t=A; A=B; B=t;}
 
-    /*
-    ** Commute a comparison operator.  Expressions of the form "X op Y"
-    ** are converted into "Y op X".
-    **
-    ** If a collation sequence is Debug.Associated with either the left or right
-    ** side of the comparison, it remains Debug.Associated with the same side after
-    ** the commutation. So "Y collate NOCASE op X" becomes
-    ** "X collate NOCASE op Y". This is because any collation sequence on
-    ** the left hand side of a comparison overrides any collation sequence
-    ** attached to the right. For the same reason the EP_ExpCollate flag
-    ** is not commuted.
-    */
+    ///<summary>
+/// Commute a comparison operator.  Expressions of the form "X op Y"
+/// are converted into "Y op X".
+///
+/// If a collation sequence is Debug.Associated with either the left or right
+/// side of the comparison, it remains Debug.Associated with the same side after
+/// the commutation. So "Y collate NOCASE op X" becomes
+/// "X collate NOCASE op Y". This is because any collation sequence on
+/// the left hand side of a comparison overrides any collation sequence
+/// attached to the right. For the same reason the EP_ExpCollate flag
+/// is not commuted.
+///
+///</summary>
     static void exprCommute( Parse pParse, Expr pExpr )
     {
       u16 expRight = (u16)( pExpr.pRight.flags & EP_ExpCollate );
@@ -687,9 +706,10 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
       }
     }
 
-    /*
-    ** Translate from TK_xx operator to WO_xx bitmask.
-    */
+    ///<summary>
+/// Translate from TK_xx operator to WO_xx bitmask.
+///
+///</summary>
     static u16 operatorMask( int op )
     {
       u16 c;
@@ -779,14 +799,17 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
       return null;
     }
 
-    /* Forward reference */
+    ///<summary>
+///Forward reference
+///</summary>
     //static void exprAnalyze(SrcList*, WhereClause*, int);
 
-    /*
-    ** Call exprAnalyze on all terms in a WHERE clause.
-    **
-    **
-    */
+    ///<summary>
+/// Call exprAnalyze on all terms in a WHERE clause.
+///
+///
+///
+///</summary>
     static void exprAnalyzeAll(
     SrcList pTabList,       /* the FROM clause */
     WhereClause pWC         /* the WHERE clause to be analyzed */
@@ -800,14 +823,14 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
     }
 
 #if  !SQLITE_OMIT_LIKE_OPTIMIZATION
-    /*
-** Check to see if the given expression is a LIKE or GLOB operator that
-** can be optimized using inequality constraints.  Return TRUE if it is
-** so and false if not.
-**
-** In order for the operator to be optimizible, the RHS must be a string
-** literal that does not begin with a wildcard.
-*/
+    ///<summary>
+/// Check to see if the given expression is a LIKE or GLOB operator that
+/// can be optimized using inequality constraints.  Return TRUE if it is
+/// so and false if not.
+///
+/// In order for the operator to be optimizible, the RHS must be a string
+/// literal that does not begin with a wildcard.
+///</summary>
     static int isLikeOrGlob(
     Parse pParse,         /* Parsing and code generating context */
     Expr pExpr,           /* Test this expression */
@@ -912,13 +935,13 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
 
 
 #if  !SQLITE_OMIT_VIRTUALTABLE
-/*
-** Check to see if the given expression is of the form
-**
-**         column MATCH expr
-**
-** If it is then return TRUE.  If not, return FALSE.
-*/
+///<summary>
+/// Check to see if the given expression is of the form
+///
+///         column MATCH expr
+///
+/// If it is then return TRUE.  If not, return FALSE.
+///</summary>
 static int isMatchOfColumn(
 Expr pExpr      /* Test this expression */
 ){
@@ -941,10 +964,10 @@ return 1;
 }
 #endif //* SQLITE_OMIT_VIRTUALTABLE */
 
-    /*
-** If the pBase expression originated in the ON or USING clause of
-** a join, then transfer the appropriate markings over to derived.
-*/
+    ///<summary>
+/// If the pBase expression originated in the ON or USING clause of
+/// a join, then transfer the appropriate markings over to derived.
+///</summary>
     static void transferJoinMarkings( Expr pDerived, Expr pBase )
     {
       pDerived.flags = (u16)( pDerived.flags | pBase.flags & EP_FromJoin );
@@ -952,82 +975,82 @@ return 1;
     }
 
 #if  !(SQLITE_OMIT_OR_OPTIMIZATION) && !(SQLITE_OMIT_SUBQUERY)
-    /*
-** Analyze a term that consists of two or more OR-connected
-** subterms.  So in:
-**
-**     ... WHERE  (a=5) AND (b=7 OR c=9 OR d=13) AND (d=13)
-**                          ^^^^^^^^^^^^^^^^^^^^
-**
-** This routine analyzes terms such as the middle term in the above example.
-** A WhereOrTerm object is computed and attached to the term under
-** analysis, regardless of the outcome of the analysis.  Hence:
-**
-**     WhereTerm.wtFlags   |=  TERM_ORINFO
-**     WhereTerm.u.pOrInfo  =  a dynamically allocated WhereOrTerm object
-**
-** The term being analyzed must have two or more of OR-connected subterms.
-** A single subterm might be a set of AND-connected sub-subterms.
-** Examples of terms under analysis:
-**
-**     (A)     t1.x=t2.y OR t1.x=t2.z OR t1.y=15 OR t1.z=t3.a+5
-**     (B)     x=expr1 OR expr2=x OR x=expr3
-**     (C)     t1.x=t2.y OR (t1.x=t2.z AND t1.y=15)
-**     (D)     x=expr1 OR (y>11 AND y<22 AND z LIKE '*hello*')
-**     (E)     (p.a=1 AND q.b=2 AND r.c=3) OR (p.x=4 AND q.y=5 AND r.z=6)
-**
-** CASE 1:
-**
-** If all subterms are of the form T.C=expr for some single column of C
-** a single table T (as shown in example B above) then create a new virtual
-** term that is an equivalent IN expression.  In other words, if the term
-** being analyzed is:
-**
-**      x = expr1  OR  expr2 = x  OR  x = expr3
-**
-** then create a new virtual term like this:
-**
-**      x IN (expr1,expr2,expr3)
-**
-** CASE 2:
-**
-** If all subterms are indexable by a single table T, then set
-**
-**     WhereTerm.eOperator              =  WO_OR
-**     WhereTerm.u.pOrInfo.indexable  |=  the cursor number for table T
-**
-** A subterm is "indexable" if it is of the form
-** "T.C <op> <expr>" where C is any column of table T and
-** <op> is one of "=", "<", "<=", ">", ">=", "IS NULL", or "IN".
-** A subterm is also indexable if it is an AND of two or more
-** subsubterms at least one of which is indexable.  Indexable AND
-** subterms have their eOperator set to WO_AND and they have
-** u.pAndInfo set to a dynamically allocated WhereAndTerm object.
-**
-** From another point of view, "indexable" means that the subterm could
-** potentially be used with an index if an appropriate index exists.
-** This analysis does not consider whether or not the index exists; that
-** is something the bestIndex() routine will determine.  This analysis
-** only looks at whether subterms appropriate for indexing exist.
-**
-** All examples A through E above all satisfy case 2.  But if a term
-** also statisfies case 1 (such as B) we know that the optimizer will
-** always prefer case 1, so in that case we pretend that case 2 is not
-** satisfied.
-**
-** It might be the case that multiple tables are indexable.  For example,
-** (E) above is indexable on tables P, Q, and R.
-**
-** Terms that satisfy case 2 are candidates for lookup by using
-** separate indices to find rowids for each subterm and composing
-** the union of all rowids using a RowSet object.  This is similar
-** to "bitmap indices" in other data_base engines.
-**
-** OTHERWISE:
-**
-** If neither case 1 nor case 2 apply, then leave the eOperator set to
-** zero.  This term is not useful for search.
-*/
+    ///<summary>
+/// Analyze a term that consists of two or more OR-connected
+/// subterms.  So in:
+///
+///     ... WHERE  (a=5) AND (b=7 OR c=9 OR d=13) AND (d=13)
+///                          ^^^^^^^^^^^^^^^^^^^^
+///
+/// This routine analyzes terms such as the middle term in the above example.
+/// A WhereOrTerm object is computed and attached to the term under
+/// analysis, regardless of the outcome of the analysis.  Hence:
+///
+///     WhereTerm.wtFlags   |=  TERM_ORINFO
+///     WhereTerm.u.pOrInfo  =  a dynamically allocated WhereOrTerm object
+///
+/// The term being analyzed must have two or more of OR-connected subterms.
+/// A single subterm might be a set of AND-connected sub-subterms.
+/// Examples of terms under analysis:
+///
+///     (A)     t1.x=t2.y OR t1.x=t2.z OR t1.y=15 OR t1.z=t3.a+5
+///     (B)     x=expr1 OR expr2=x OR x=expr3
+///     (C)     t1.x=t2.y OR (t1.x=t2.z AND t1.y=15)
+///     (D)     x=expr1 OR (y>11 AND y<22 AND z LIKE '*hello*')
+///     (E)     (p.a=1 AND q.b=2 AND r.c=3) OR (p.x=4 AND q.y=5 AND r.z=6)
+///
+/// CASE 1:
+///
+/// If all subterms are of the form T.C=expr for some single column of C
+/// a single table T (as shown in example B above) then create a new virtual
+/// term that is an equivalent IN expression.  In other words, if the term
+/// being analyzed is:
+///
+///      x = expr1  OR  expr2 = x  OR  x = expr3
+///
+/// then create a new virtual term like this:
+///
+///      x IN (expr1,expr2,expr3)
+///
+/// CASE 2:
+///
+/// If all subterms are indexable by a single table T, then set
+///
+///     WhereTerm.eOperator              =  WO_OR
+///     WhereTerm.u.pOrInfo.indexable  |=  the cursor number for table T
+///
+/// A subterm is "indexable" if it is of the form
+/// "T.C <op> <expr>" where C is any column of table T and
+/// <op> is one of "=", "<", "<=", ">", ">=", "IS NULL", or "IN".
+/// A subterm is also indexable if it is an AND of two or more
+/// subsubterms at least one of which is indexable.  Indexable AND
+/// subterms have their eOperator set to WO_AND and they have
+/// u.pAndInfo set to a dynamically allocated WhereAndTerm object.
+///
+/// From another point of view, "indexable" means that the subterm could
+/// potentially be used with an index if an appropriate index exists.
+/// This analysis does not consider whether or not the index exists; that
+/// is something the bestIndex() routine will determine.  This analysis
+/// only looks at whether subterms appropriate for indexing exist.
+///
+/// All examples A through E above all satisfy case 2.  But if a term
+/// also statisfies case 1 (such as B) we know that the optimizer will
+/// always prefer case 1, so in that case we pretend that case 2 is not
+/// satisfied.
+///
+/// It might be the case that multiple tables are indexable.  For example,
+/// (E) above is indexable on tables P, Q, and R.
+///
+/// Terms that satisfy case 2 are candidates for lookup by using
+/// separate indices to find rowids for each subterm and composing
+/// the union of all rowids using a RowSet object.  This is similar
+/// to "bitmap indices" in other data_base engines.
+///
+/// OTHERWISE:
+///
+/// If neither case 1 nor case 2 apply, then leave the eOperator set to
+/// zero.  This term is not useful for search.
+///</summary>
     static void exprAnalyzeOrTerm(
     SrcList pSrc,            /* the FROM clause */
     WhereClause pWC,         /* the complete WHERE clause */
@@ -1304,24 +1327,24 @@ return 1;
 #endif //* !SQLITE_OMIT_OR_OPTIMIZATION && !SQLITE_OMIT_SUBQUERY */
 
 
-    /*
-** The input to this routine is an WhereTerm structure with only the
-** "pExpr" field filled in.  The job of this routine is to analyze the
-** subexpression and populate all the other fields of the WhereTerm
-** structure.
-**
-** If the expression is of the form "<expr> <op> X" it gets commuted
-** to the standard form of "X <op> <expr>".
-**
-** If the expression is of the form "X <op> Y" where both X and Y are
-** columns, then the original expression is unchanged and a new virtual
-** term of the form "Y <op> X" is added to the WHERE clause and
-** analyzed separately.  The original term is marked with TERM_COPIED
-** and the new term is marked with TERM_DYNAMIC (because it's pExpr
-** needs to be freed with the WhereClause) and TERM_VIRTUAL (because it
-** is a commuted copy of a prior term.)  The original term has nChild=1
-** and the copy has idxParent set to the index of the original term.
-*/
+    ///<summary>
+/// The input to this routine is an WhereTerm structure with only the
+/// "pExpr" field filled in.  The job of this routine is to analyze the
+/// subexpression and populate all the other fields of the WhereTerm
+/// structure.
+///
+/// If the expression is of the form "<expr> <op> X" it gets commuted
+/// to the standard form of "X <op> <expr>".
+///
+/// If the expression is of the form "X <op> Y" where both X and Y are
+/// columns, then the original expression is unchanged and a new virtual
+/// term of the form "Y <op> X" is added to the WHERE clause and
+/// analyzed separately.  The original term is marked with TERM_COPIED
+/// and the new term is marked with TERM_DYNAMIC (because it's pExpr
+/// needs to be freed with the WhereClause) and TERM_VIRTUAL (because it
+/// is a commuted copy of a prior term.)  The original term has nChild=1
+/// and the copy has idxParent set to the index of the original term.
+///</summary>
     static void exprAnalyze(
     SrcList pSrc,            /* the FROM clause */
     WhereClause pWC,         /* the WHERE clause */
@@ -1637,10 +1660,11 @@ return 1;
       pTerm.prereqRight |= extraRight;
     }
 
-    /*
-    ** Return TRUE if any of the expressions in pList.a[iFirst...] contain
-    ** a reference to any table other than the iBase table.
-    */
+    ///<summary>
+/// Return TRUE if any of the expressions in pList.a[iFirst...] contain
+/// a reference to any table other than the iBase table.
+///
+///</summary>
     static bool referencesOtherTables(
     ExprList pList,          /* Search expressions in ths list */
     WhereMaskSet pMaskSet,   /* Mapping from tables to bitmaps */
@@ -1660,25 +1684,26 @@ return 1;
     }
 
 
-    /*
-    ** This routine decides if pIdx can be used to satisfy the ORDER BY
-    ** clause.  If it can, it returns 1.  If pIdx cannot satisfy the
-    ** ORDER BY clause, this routine returns 0.
-    **
-    ** pOrderBy is an ORDER BY clause from a SELECT statement.  pTab is the
-    ** left-most table in the FROM clause of that same SELECT statement and
-    ** the table has a cursor number of "_base".  pIdx is an index on pTab.
-    **
-    ** nEqCol is the number of columns of pIdx that are used as equality
-    ** constraints.  Any of these columns may be missing from the ORDER BY
-    ** clause and the match can still be a success.
-    **
-    ** All terms of the ORDER BY that match against the index must be either
-    ** ASC or DESC.  (Terms of the ORDER BY clause past the end of a UNIQUE
-    ** index do not need to satisfy this constraint.)  The pbRev value is
-    ** set to 1 if the ORDER BY clause is all DESC and it is set to 0 if
-    ** the ORDER BY clause is all ASC.
-    */
+    ///<summary>
+/// This routine decides if pIdx can be used to satisfy the ORDER BY
+/// clause.  If it can, it returns 1.  If pIdx cannot satisfy the
+/// ORDER BY clause, this routine returns 0.
+///
+/// pOrderBy is an ORDER BY clause from a SELECT statement.  pTab is the
+/// left-most table in the FROM clause of that same SELECT statement and
+/// the table has a cursor number of "_base".  pIdx is an index on pTab.
+///
+/// nEqCol is the number of columns of pIdx that are used as equality
+/// constraints.  Any of these columns may be missing from the ORDER BY
+/// clause and the match can still be a success.
+///
+/// All terms of the ORDER BY that match against the index must be either
+/// ASC or DESC.  (Terms of the ORDER BY clause past the end of a UNIQUE
+/// index do not need to satisfy this constraint.)  The pbRev value is
+/// set to 1 if the ORDER BY clause is all DESC and it is set to 0 if
+/// the ORDER BY clause is all ASC.
+///
+///</summary>
     static bool isSortingIndex(
     Parse pParse,           /* Parsing context */
     WhereMaskSet pMaskSet,  /* Mapping from table cursor numbers to bitmaps */
@@ -1846,12 +1871,13 @@ return 1;
       return logN;
     }
 
-    /*
-    ** Two routines for printing the content of an sqlite3_index_info
-    ** structure.  Used for testing and debugging only.  If neither
-    ** SQLITE_TEST or SQLITE_DEBUG are defined, then these routines
-    ** are no-ops.
-    */
+    ///<summary>
+/// Two routines for printing the content of an sqlite3_index_info
+/// structure.  Used for testing and debugging only.  If neither
+/// SQLITE_TEST or SQLITE_DEBUG are defined, then these routines
+/// are no-ops.
+///
+///</summary>
 #if  !(SQLITE_OMIT_VIRTUALTABLE) && (SQLITE_DEBUG)
 static void TRACE_IDX_INPUTS( sqlite3_index_info p )
 {
@@ -1897,20 +1923,21 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
     static void TRACE_IDX_OUTPUTS( sqlite3_index_info p ) { }
 #endif
 
-    /*
-** Required because bestIndex() is called by bestOrClauseIndex()
-*/
+    ///<summary>
+/// Required because bestIndex() is called by bestOrClauseIndex()
+///</summary>
     //static void bestIndex(
     //Parse*, WhereClause*, struct SrcList_item*, 
     //Bitmask, ExprList*, WhereCost);
 
-    /*
-    ** This routine attempts to find an scanning strategy that can be used
-    ** to optimize an 'OR' expression that is part of a WHERE clause.
-    **
-    ** The table associated with FROM clause term pSrc may be either a
-    ** regular B-Tree table or a virtual table.
-    */
+    ///<summary>
+/// This routine attempts to find an scanning strategy that can be used
+/// to optimize an 'OR' expression that is part of a WHERE clause.
+///
+/// The table associated with FROM clause term pSrc may be either a
+/// regular B-Tree table or a virtual table.
+///
+///</summary>
     static void bestOrClauseIndex(
     Parse pParse,               /* The parsing context */
     WhereClause pWC,            /* The WHERE clause */
@@ -2018,11 +2045,11 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
     }
 
 #if !SQLITE_OMIT_AUTOMATIC_INDEX
-    /*
-** Return TRUE if the WHERE clause term pTerm is of a form where it
-** could be used with an index to access pSrc, assuming an appropriate
-** index existed.
-*/
+    ///<summary>
+/// Return TRUE if the WHERE clause term pTerm is of a form where it
+/// could be used with an index to access pSrc, assuming an appropriate
+/// index existed.
+///</summary>
     static int termCanDriveIndex(
     WhereTerm pTerm,              /* WHERE clause term to check */
     SrcList_item pSrc,     /* Table we are trying to access */
@@ -2044,14 +2071,14 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 #endif
 
 #if !SQLITE_OMIT_AUTOMATIC_INDEX
-    /*
-** If the query plan for pSrc specified in pCost is a full table scan
-** and indexing is allows (if there is no NOT INDEXED clause) and it
-** possible to construct a transient index that would perform better
-** than a full table scan even when the cost of constructing the index
-** is taken into account, then alter the query plan to use the
-** transient index.
-*/
+    ///<summary>
+/// If the query plan for pSrc specified in pCost is a full table scan
+/// and indexing is allows (if there is no NOT INDEXED clause) and it
+/// possible to construct a transient index that would perform better
+/// than a full table scan even when the cost of constructing the index
+/// is taken into account, then alter the query plan to use the
+/// transient index.
+///</summary>
     static void bestAutomaticIndex(
     Parse pParse,              /* The parsing context */
     WhereClause pWC,           /* The WHERE clause */
@@ -2132,11 +2159,11 @@ WhereCost pCost            /* Lowest cost query plan */
 
 
 #if !SQLITE_OMIT_AUTOMATIC_INDEX
-    /*
-** Generate code to construct the Index object for an automatic index
-** and to set up the WhereLevel object pLevel so that the code generator
-** makes use of the automatic index.
-*/
+    ///<summary>
+/// Generate code to construct the Index object for an automatic index
+/// and to set up the WhereLevel object pLevel so that the code generator
+/// makes use of the automatic index.
+///</summary>
     static void constructAutomaticIndex(
     Parse pParse,              /* The parsing context */
     WhereClause pWC,           /* The WHERE clause */
@@ -2304,11 +2331,11 @@ WhereCost pCost            /* Lowest cost query plan */
 #endif //* SQLITE_OMIT_AUTOMATIC_INDEX */
 
 #if !SQLITE_OMIT_VIRTUALTABLE
-    /*
-** Allocate and populate an sqlite3_index_info structure. It is the
-** responsibility of the caller to eventually release the structure
-** by passing the pointer returned by this function to //sqlite3_free().
-*/
+    ///<summary>
+/// Allocate and populate an sqlite3_index_info structure. It is the
+/// responsibility of the caller to eventually release the structure
+/// by passing the pointer returned by this function to //sqlite3_free().
+///</summary>
     static sqlite3_index_info allocateIndexInfo(
     Parse pParse,
     WhereClause pWC,
@@ -2430,20 +2457,21 @@ WhereCost pCost            /* Lowest cost query plan */
       return pIdxInfo;
     }
 
-    /*
-    ** The table object reference passed as the second argument to this function
-    ** must represent a virtual table. This function invokes the xBestIndex()
-    ** method of the virtual table with the sqlite3_index_info pointer passed
-    ** as the argument.
-    **
-    ** If an error occurs, pParse is populated with an error message and a
-    ** non-zero value is returned. Otherwise, 0 is returned and the output
-    ** part of the sqlite3_index_info structure is left populated.
-    **
-    ** Whether or not an error is returned, it is the responsibility of the
-    ** caller to eventually free p.idxStr if p.needToFreeIdxStr indicates
-    ** that this is required.
-    */
+    ///<summary>
+/// The table object reference passed as the second argument to this function
+/// must represent a virtual table. This function invokes the xBestIndex()
+/// method of the virtual table with the sqlite3_index_info pointer passed
+/// as the argument.
+///
+/// If an error occurs, pParse is populated with an error message and a
+/// non-zero value is returned. Otherwise, 0 is returned and the output
+/// part of the sqlite3_index_info structure is left populated.
+///
+/// Whether or not an error is returned, it is the responsibility of the
+/// caller to eventually free p.idxStr if p.needToFreeIdxStr indicates
+/// that this is required.
+///
+///</summary>
     static int vtabBestIndex( Parse pParse, Table pTab, sqlite3_index_info p )
     {
       sqlite3_vtab pVtab = sqlite3GetVTable( pParse.db, pTab ).pVtab;
@@ -2806,22 +2834,22 @@ sqlite3DbFree(db, ref zSample);
     }
 #endif   //* #if SQLITE_ENABLE_STAT2 */
 
-    /*
-** If expression pExpr represents a literal value, set *pp to point to
-** an sqlite3_value structure containing the same value, with affinity
-** aff applied to it, before returning. It is the responsibility of the 
-** caller to eventually release this structure by passing it to 
-** sqlite3ValueFree().
-**
-** If the current parse is a recompile (sqlite3Reprepare()) and pExpr
-** is an SQL variable that currently has a non-NULL value bound to it,
-** create an sqlite3_value structure containing this value, again with
-** affinity aff applied to it, instead.
-**
-** If neither of the above apply, set *pp to NULL.
-**
-** If an error occurs, return an error code. Otherwise, SQLITE_OK.
-*/
+    ///<summary>
+/// If expression pExpr represents a literal value, set *pp to point to
+/// an sqlite3_value structure containing the same value, with affinity
+/// aff applied to it, before returning. It is the responsibility of the
+/// caller to eventually release this structure by passing it to
+/// sqlite3ValueFree().
+///
+/// If the current parse is a recompile (sqlite3Reprepare()) and pExpr
+/// is an SQL variable that currently has a non-NULL value bound to it,
+/// create an sqlite3_value structure containing this value, again with
+/// affinity aff applied to it, instead.
+///
+/// If neither of the above apply, set *pp to NULL.
+///
+/// If an error occurs, return an error code. Otherwise, SQLITE_OK.
+///</summary>
 #if SQLITE_ENABLE_STAT2
     static int valueFromExpr(
     Parse pParse,
@@ -2843,47 +2871,47 @@ sqlite3DbFree(db, ref zSample);
     }
 #endif
 
-    /*
-** This function is used to estimate the number of rows that will be visited
-** by scanning an index for a range of values. The range may have an upper
-** bound, a lower bound, or both. The WHERE clause terms that set the upper
-** and lower bounds are represented by pLower and pUpper respectively. For
-** example, assuming that index p is on t1(a):
-**
-**   ... FROM t1 WHERE a > ? AND a < ? ...
-**                    |_____|   |_____|
-**                       |         |
-**                     pLower    pUpper
-**
-** If either of the upper or lower bound is not present, then NULL is passed in
-** place of the corresponding WhereTerm.
-**
-** The nEq parameter is passed the index of the index column subject to the
-** range constraint. Or, equivalently, the number of equality constraints
-** optimized by the proposed index scan. For example, assuming index p is
-** on t1(a, b), and the SQL query is:
-**
-**   ... FROM t1 WHERE a = ? AND b > ? AND b < ? ...
-**
-** then nEq should be passed the value 1 (as the range restricted column,
-** b, is the second left-most column of the index). Or, if the query is:
-**
-**   ... FROM t1 WHERE a > ? AND a < ? ...
-**
-** then nEq should be passed 0.
-**
-** The returned value is an integer between 1 and 100, inclusive. A return
-** value of 1 indicates that the proposed range scan is expected to visit
-** approximately 1/100th (1%) of the rows selected by the nEq equality
-** constraints (if any). A return value of 100 indicates that it is expected
-** that the range scan will visit every row (100%) selected by the equality
-** constraints.
-**
-** In the absence of sqlite_stat2 ANALYZE data, each range inequality
-** reduces the search space by 3/4ths.  Hence a single constraint (x>?)
-** results in a return of 25 and a range constraint (x>? AND x<?) results
-** in a return of 6.
-*/
+    ///<summary>
+/// This function is used to estimate the number of rows that will be visited
+/// by scanning an index for a range of values. The range may have an upper
+/// bound, a lower bound, or both. The WHERE clause terms that set the upper
+/// and lower bounds are represented by pLower and pUpper respectively. For
+/// example, assuming that index p is on t1(a):
+///
+///   ... FROM t1 WHERE a > ? AND a < ? ...
+///                    |_____|   |_____|
+///                       |         |
+///                     pLower    pUpper
+///
+/// If either of the upper or lower bound is not present, then NULL is passed in
+/// place of the corresponding WhereTerm.
+///
+/// The nEq parameter is passed the index of the index column subject to the
+/// range constraint. Or, equivalently, the number of equality constraints
+/// optimized by the proposed index scan. For example, assuming index p is
+/// on t1(a, b), and the SQL query is:
+///
+///   ... FROM t1 WHERE a = ? AND b > ? AND b < ? ...
+///
+/// then nEq should be passed the value 1 (as the range restricted column,
+/// b, is the second left-most column of the index). Or, if the query is:
+///
+///   ... FROM t1 WHERE a > ? AND a < ? ...
+///
+/// then nEq should be passed 0.
+///
+/// The returned value is an integer between 1 and 100, inclusive. A return
+/// value of 1 indicates that the proposed range scan is expected to visit
+/// approximately 1/100th (1%) of the rows selected by the nEq equality
+/// constraints (if any). A return value of 100 indicates that it is expected
+/// that the range scan will visit every row (100%) selected by the equality
+/// constraints.
+///
+/// In the absence of sqlite_stat2 ANALYZE data, each range inequality
+/// reduces the search space by 3/4ths.  Hence a single constraint (x>?)
+/// results in a return of 25 and a range constraint (x>? AND x<?) results
+/// in a return of 6.
+///</summary>
     static int whereRangeScanEst(
     Parse pParse,       /* Parsing & code generating context */
     Index p,            /* The index containing the range-compared column; "x" */
@@ -3149,34 +3177,34 @@ whereEqualScanEst_cancel:
 #endif //* defined(SQLITE_ENABLE_STAT2) */
 
 
-    /*
-** Find the best query plan for accessing a particular table.  Write the
-** best query plan and its cost into the WhereCost object supplied as the
-** last parameter.
-**
-** The lowest cost plan wins.  The cost is an estimate of the amount of
-** CPU and disk I/O needed to process the requested result.
-** Factors that influence cost include:
-**
-**    *  The estimated number of rows that will be retrieved.  (The
-**       fewer the better.)
-**
-**    *  Whether or not sorting must occur.
-**
-**    *  Whether or not there must be separate lookups in the
-**       index and in the main table.
-**
-** If there was an INDEXED BY clause (pSrc->pIndex) attached to the table in
-** the SQL statement, then this function only considers plans using the 
-** named index. If no such plan is found, then the returned cost is
-** SQLITE_BIG_DBL. If a plan is found that uses the named index, 
-** then the cost is calculated in the usual way.
-**
-** If a NOT INDEXED clause (pSrc->notIndexed!=0) was attached to the table 
-** in the SELECT statement, then no indexes are considered. However, the 
-** selected plan may still take advantage of the built-in rowid primary key
-** index.
-*/
+    ///<summary>
+/// Find the best query plan for accessing a particular table.  Write the
+/// best query plan and its cost into the WhereCost object supplied as the
+/// last parameter.
+///
+/// The lowest cost plan wins.  The cost is an estimate of the amount of
+/// CPU and disk I/O needed to process the requested result.
+/// Factors that influence cost include:
+///
+///    *  The estimated number of rows that will be retrieved.  (The
+///       fewer the better.)
+///
+///    *  Whether or not sorting must occur.
+///
+///    *  Whether or not there must be separate lookups in the
+///       index and in the main table.
+///
+/// If there was an INDEXED BY clause (pSrc->pIndex) attached to the table in
+/// the SQL statement, then this function only considers plans using the
+/// named index. If no such plan is found, then the returned cost is
+/// SQLITE_BIG_DBL. If a plan is found that uses the named index,
+/// then the cost is calculated in the usual way.
+///
+/// If a NOT INDEXED clause (pSrc->notIndexed!=0) was attached to the table
+/// in the SELECT statement, then no indexes are considered. However, the
+/// selected plan may still take advantage of the built-in rowid primary key
+/// index.
+///</summary>
     static void bestBtreeIndex(
     Parse pParse,              /* The parsing context */
     WhereClause pWC,           /* The WHERE clause */
@@ -3714,12 +3742,13 @@ whereEqualScanEst_cancel:
     }
 
 
-    /*
-    ** Find the query plan for accessing table pSrc.pTab. Write the
-    ** best query plan and its cost into the WhereCost object supplied
-    ** as the last parameter. This function may calculate the cost of
-    ** both real and virtual table scans.
-    */
+    ///<summary>
+/// Find the query plan for accessing table pSrc.pTab. Write the
+/// best query plan and its cost into the WhereCost object supplied
+/// as the last parameter. This function may calculate the cost of
+/// both real and virtual table scans.
+///
+///</summary>
     static void bestIndex(
     Parse pParse,               /* The parsing context */
     WhereClause pWC,            /* The WHERE clause */
@@ -3748,32 +3777,33 @@ whereEqualScanEst_cancel:
       }
     }
 
-    /*
-    ** Disable a term in the WHERE clause.  Except, do not disable the term
-    ** if it controls a LEFT OUTER JOIN and it did not originate in the ON
-    ** or USING clause of that join.
-    **
-    ** Consider the term t2.z='ok' in the following queries:
-    **
-    **   (1)  SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.x WHERE t2.z='ok'
-    **   (2)  SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.x AND t2.z='ok'
-    **   (3)  SELECT * FROM t1, t2 WHERE t1.a=t2.x AND t2.z='ok'
-    **
-    ** The t2.z='ok' is disabled in the in (2) because it originates
-    ** in the ON clause.  The term is disabled in (3) because it is not part
-    ** of a LEFT OUTER JOIN.  In (1), the term is not disabled.
-    **
-    ** IMPLEMENTATION-OF: R-24597-58655 No tests are done for terms that are
-    ** completely satisfied by indices.
-    **
-    ** Disabling a term causes that term to not be tested in the inner loop
-    ** of the join.  Disabling is an optimization.  When terms are satisfied
-    ** by indices, we disable them to prevent redundant tests in the inner
-    ** loop.  We would get the correct results if nothing were ever disabled,
-    ** but joins might run a little slower.  The trick is to disable as much
-    ** as we can without disabling too much.  If we disabled in (1), we'd get
-    ** the wrong answer.  See ticket #813.
-    */
+    ///<summary>
+/// Disable a term in the WHERE clause.  Except, do not disable the term
+/// if it controls a LEFT OUTER JOIN and it did not originate in the ON
+/// or USING clause of that join.
+///
+/// Consider the term t2.z='ok' in the following queries:
+///
+///   (1)  SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.x WHERE t2.z='ok'
+///   (2)  SELECT * FROM t1 LEFT JOIN t2 ON t1.a=t2.x AND t2.z='ok'
+///   (3)  SELECT * FROM t1, t2 WHERE t1.a=t2.x AND t2.z='ok'
+///
+/// The t2.z='ok' is disabled in the in (2) because it originates
+/// in the ON clause.  The term is disabled in (3) because it is not part
+/// of a LEFT OUTER JOIN.  In (1), the term is not disabled.
+///
+/// IMPLEMENTATION-OF: R-24597-58655 No tests are done for terms that are
+/// completely satisfied by indices.
+///
+/// Disabling a term causes that term to not be tested in the inner loop
+/// of the join.  Disabling is an optimization.  When terms are satisfied
+/// by indices, we disable them to prevent redundant tests in the inner
+/// loop.  We would get the correct results if nothing were ever disabled,
+/// but joins might run a little slower.  The trick is to disable as much
+/// as we can without disabling too much.  If we disabled in (1), we'd get
+/// the wrong answer.  See ticket #813.
+///
+///</summary>
     static void disableTerm( WhereLevel pLevel, WhereTerm pTerm )
     {
       if ( pTerm != null
@@ -3792,17 +3822,18 @@ whereEqualScanEst_cancel:
       }
     }
 
-    /*
-    ** Code an OP_Affinity opcode to apply the column affinity string zAff
-    ** to the n registers starting at base. 
-    **
-    ** As an optimization, SQLITE_AFF_NONE entries (which are no-ops) at the
-    ** beginning and end of zAff are ignored.  If all entries in zAff are
-    ** SQLITE_AFF_NONE, then no code gets generated.
-    **
-    ** This routine makes its own copy of zAff so that the caller is free
-    ** to modify zAff after this routine returns.
-    */
+    ///<summary>
+/// Code an OP_Affinity opcode to apply the column affinity string zAff
+/// to the n registers starting at base.
+///
+/// As an optimization, SQLITE_AFF_NONE entries (which are no-ops) at the
+/// beginning and end of zAff are ignored.  If all entries in zAff are
+/// SQLITE_AFF_NONE, then no code gets generated.
+///
+/// This routine makes its own copy of zAff so that the caller is free
+/// to modify zAff after this routine returns.
+///
+///</summary>
     static void codeApplyAffinity( Parse pParse, int _base, int n, string zAff )
     {
       Vdbe v = pParse.pVdbe;
@@ -3835,17 +3866,18 @@ whereEqualScanEst_cancel:
       }
     }
 
-    /*
-    ** Generate code for a single equality term of the WHERE clause.  An equality
-    ** term can be either X=expr or X IN (...).   pTerm is the term to be
-    ** coded.
-    **
-    ** The current value for the constraint is left in register iReg.
-    **
-    ** For a constraint of the form X=expr, the expression is evaluated and its
-    ** result is left on the stack.  For constraints of the form X IN (...)
-    ** this routine sets up a loop that will iterate over all values of X.
-    */
+    ///<summary>
+/// Generate code for a single equality term of the WHERE clause.  An equality
+/// term can be either X=expr or X IN (...).   pTerm is the term to be
+/// coded.
+///
+/// The current value for the constraint is left in register iReg.
+///
+/// For a constraint of the form X=expr, the expression is evaluated and its
+/// result is left on the stack.  For constraints of the form X IN (...)
+/// this routine sets up a loop that will iterate over all values of X.
+///
+///</summary>
     static int codeEqualityTerm(
     Parse pParse,      /* The parsing context */
     WhereTerm pTerm,   /* The term of the WHERE clause to be coded */
@@ -3918,46 +3950,47 @@ whereEqualScanEst_cancel:
       return iReg;
     }
 
-    /*
-    ** Generate code for a single equality term of the WHERE clause.  An equality
-    ** term can be either X=expr or X IN (...).   pTerm is the term to be 
-    ** coded.
-    **
-    ** For example, consider table t1(a,b,c,d,e,f) with index i1(a,b,c).
-    ** Suppose the WHERE clause is this:  a==5 AND b IN (1,2,3) AND c>5 AND c<10
-    ** The index has as many as three equality constraints, but in this
-    ** example, the third "c" value is an inequality.  So only two
-    ** constraints are coded.  This routine will generate code to evaluate
-    ** a==5 and b IN (1,2,3).  The current values for a and b will be stored
-    ** in consecutive registers and the index of the first register is returned.
-    **
-    ** In the example above nEq==2.  But this subroutine works for any value
-    ** of nEq including 0.  If nEq==null, this routine is nearly a no-op.
-    ** The only thing it does is allocate the pLevel.iMem memory cell and
-    ** compute the affinity string.
-    **
-    ** This routine always allocates at least one memory cell and returns
-    ** the index of that memory cell. The code that
-    ** calls this routine will use that memory cell to store the termination
-    ** key value of the loop.  If one or more IN operators appear, then
-    ** this routine allocates an additional nEq memory cells for internal
-    ** use.
-    **
-    ** Before returning, *pzAff is set to point to a buffer containing a
-    ** copy of the column affinity string of the index allocated using
-    ** sqlite3DbMalloc(). Except, entries in the copy of the string associated
-    ** with equality constraints that use NONE affinity are set to
-    ** SQLITE_AFF_NONE. This is to deal with SQL such as the following:
-    **
-    **   CREATE TABLE t1(a TEXT PRIMARY KEY, b);
-    **   SELECT ... FROM t1 AS t2, t1 WHERE t1.a = t2.b;
-    **
-    ** In the example above, the index on t1(a) has TEXT affinity. But since
-    ** the right hand side of the equality constraint (t2.b) has NONE affinity,
-    ** no conversion should be attempted before using a t2.b value as part of
-    ** a key to search the index. Hence the first byte in the returned affinity
-    ** string in this example would be set to SQLITE_AFF_NONE.
-    */
+    ///<summary>
+/// Generate code for a single equality term of the WHERE clause.  An equality
+/// term can be either X=expr or X IN (...).   pTerm is the term to be
+/// coded.
+///
+/// For example, consider table t1(a,b,c,d,e,f) with index i1(a,b,c).
+/// Suppose the WHERE clause is this:  a==5 AND b IN (1,2,3) AND c>5 AND c<10
+/// The index has as many as three equality constraints, but in this
+/// example, the third "c" value is an inequality.  So only two
+/// constraints are coded.  This routine will generate code to evaluate
+/// a==5 and b IN (1,2,3).  The current values for a and b will be stored
+/// in consecutive registers and the index of the first register is returned.
+///
+/// In the example above nEq==2.  But this subroutine works for any value
+/// of nEq including 0.  If nEq==null, this routine is nearly a no-op.
+/// The only thing it does is allocate the pLevel.iMem memory cell and
+/// compute the affinity string.
+///
+/// This routine always allocates at least one memory cell and returns
+/// the index of that memory cell. The code that
+/// calls this routine will use that memory cell to store the termination
+/// key value of the loop.  If one or more IN operators appear, then
+/// this routine allocates an additional nEq memory cells for internal
+/// use.
+///
+/// Before returning, *pzAff is set to point to a buffer containing a
+/// copy of the column affinity string of the index allocated using
+/// sqlite3DbMalloc(). Except, entries in the copy of the string associated
+/// with equality constraints that use NONE affinity are set to
+/// SQLITE_AFF_NONE. This is to deal with SQL such as the following:
+///
+///   CREATE TABLE t1(a TEXT PRIMARY KEY, b);
+///   SELECT ... FROM t1 AS t2, t1 WHERE t1.a = t2.b;
+///
+/// In the example above, the index on t1(a) has TEXT affinity. But since
+/// the right hand side of the equality constraint (t2.b) has NONE affinity,
+/// no conversion should be attempted before using a t2.b value as part of
+/// a key to search the index. Hence the first byte in the returned affinity
+/// string in this example would be set to SQLITE_AFF_NONE.
+///
+///</summary>
     static int codeAllEqualityTerms(
     Parse pParse,        /* Parsing context */
     WhereLevel pLevel,   /* Which nested loop of the FROM we are coding */
@@ -4043,14 +4076,14 @@ whereEqualScanEst_cancel:
     }
 
 #if !SQLITE_OMIT_EXPLAIN
-    /*
-** This routine is a helper for explainIndexRange() below
-**
-** pStr holds the text of an expression that we are building up one term
-** at a time.  This routine adds a new term to the end of the expression.
-** Terms are separated by AND so add the "AND" text for second and subsequent
-** terms only.
-*/
+    ///<summary>
+/// This routine is a helper for explainIndexRange() below
+///
+/// pStr holds the text of an expression that we are building up one term
+/// at a time.  This routine adds a new term to the end of the expression.
+/// Terms are separated by AND so add the "AND" text for second and subsequent
+/// terms only.
+///</summary>
     static void explainAppendTerm(
     StrAccum pStr,              /* The text expression being built */
     int iTerm,                  /* Index of this term.  First is zero */
@@ -4065,25 +4098,26 @@ whereEqualScanEst_cancel:
       sqlite3StrAccumAppend( pStr, "?", 1 );
     }
 
-    /*
-    ** Argument pLevel describes a strategy for scanning table pTab. This 
-    ** function returns a pointer to a string buffer containing a description
-    ** of the subset of table rows scanned by the strategy in the form of an
-    ** SQL expression. Or, if all rows are scanned, NULL is returned.
-    **
-    ** For example, if the query:
-    **
-    **   SELECT * FROM t1 WHERE a=1 AND b>2;
-    **
-    ** is run and there is an index on (a, b), then this function returns a
-    ** string similar to:
-    **
-    **   "a=? AND b>?"
-    **
-    ** The returned pointer points to memory obtained from sqlite3DbMalloc().
-    ** It is the responsibility of the caller to free the buffer when it is
-    ** no longer required.
-    */
+    ///<summary>
+/// Argument pLevel describes a strategy for scanning table pTab. This
+/// function returns a pointer to a string buffer containing a description
+/// of the subset of table rows scanned by the strategy in the form of an
+/// SQL expression. Or, if all rows are scanned, NULL is returned.
+///
+/// For example, if the query:
+///
+///   SELECT * FROM t1 WHERE a=1 AND b>2;
+///
+/// is run and there is an index on (a, b), then this function returns a
+/// string similar to:
+///
+///   "a=? AND b>?"
+///
+/// The returned pointer points to memory obtained from sqlite3DbMalloc().
+/// It is the responsibility of the caller to free the buffer when it is
+/// no longer required.
+///
+///</summary>
     static string explainIndexRange( sqlite3 db, WhereLevel pLevel, Table pTab )
     {
       WherePlan pPlan = pLevel.plan;
@@ -4119,12 +4153,13 @@ whereEqualScanEst_cancel:
       return sqlite3StrAccumFinish( txt );
     }
 
-    /*
-    ** This function is a no-op unless currently processing an EXPLAIN QUERY PLAN
-    ** command. If the query being compiled is an EXPLAIN QUERY PLAN, a single
-    ** record is added to the output to describe the table scan strategy in 
-    ** pLevel.
-    */
+    ///<summary>
+/// This function is a no-op unless currently processing an EXPLAIN QUERY PLAN
+/// command. If the query being compiled is an EXPLAIN QUERY PLAN, a single
+/// record is added to the output to describe the table scan strategy in
+/// pLevel.
+///
+///</summary>
     static void explainOneScan(
     Parse pParse,                   /* Parse context */
     SrcList pTabList,               /* Table list this loop refers to */
@@ -4226,10 +4261,10 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 #endif //* SQLITE_OMIT_EXPLAIN */
 
 
-    /*
-** Generate code for the start of the iLevel-th loop in the WHERE clause
-** implementation described by pWInfo.
-*/
+    ///<summary>
+/// Generate code for the start of the iLevel-th loop in the WHERE clause
+/// implementation described by pWInfo.
+///</summary>
     static Bitmask codeOneLoopStart(
     WhereInfo pWInfo,     /* Complete information about the WHERE clause */
     int iLevel,           /* Which level of pWInfo.a[] should be coded */
@@ -4981,9 +5016,9 @@ OP_IdxLT             /* 2: (end_constraints && bRev) */
 #endif //* SQLITE_TEST */
 
 
-    /*
-** Free a WhereInfo structure
-*/
+    ///<summary>
+/// Free a WhereInfo structure
+///</summary>
     static void whereInfoFree( sqlite3 db, WhereInfo pWInfo )
     {
       if ( ALWAYS( pWInfo != null ) )
@@ -5017,94 +5052,95 @@ OP_IdxLT             /* 2: (end_constraints && bRev) */
     }
 
 
-    /*
-    ** Generate the beginning of the loop used for WHERE clause processing.
-    ** The return value is a pointer to an opaque structure that contains
-    ** information needed to terminate the loop.  Later, the calling routine
-    ** should invoke sqlite3WhereEnd() with the return value of this function
-    ** in order to complete the WHERE clause processing.
-    **
-    ** If an error occurs, this routine returns NULL.
-    **
-    ** The basic idea is to do a nested loop, one loop for each table in
-    ** the FROM clause of a select.  (INSERT and UPDATE statements are the
-    ** same as a SELECT with only a single table in the FROM clause.)  For
-    ** example, if the SQL is this:
-    **
-    **       SELECT * FROM t1, t2, t3 WHERE ...;
-    **
-    ** Then the code generated is conceptually like the following:
-    **
-    **      foreach row1 in t1 do       \    Code generated
-    **        foreach row2 in t2 do      |-- by sqlite3WhereBegin()
-    **          foreach row3 in t3 do   /
-    **            ...
-    **          end                     \    Code generated
-    **        end                        |-- by sqlite3WhereEnd()
-    **      end                         /
-    **
-    ** Note that the loops might not be nested in the order in which they
-    ** appear in the FROM clause if a different order is better able to make
-    ** use of indices.  Note also that when the IN operator appears in
-    ** the WHERE clause, it might result in additional nested loops for
-    ** scanning through all values on the right-hand side of the IN.
-    **
-    ** There are Btree cursors Debug.Associated with each table.  t1 uses cursor
-    ** number pTabList.a[0].iCursor.  t2 uses the cursor pTabList.a[1].iCursor.
-    ** And so forth.  This routine generates code to open those VDBE cursors
-    ** and sqlite3WhereEnd() generates the code to close them.
-    **
-    ** The code that sqlite3WhereBegin() generates leaves the cursors named
-    ** in pTabList pointing at their appropriate entries.  The [...] code
-    ** can use OP_Column and OP_Rowid opcodes on these cursors to extract
-    ** data from the various tables of the loop.
-    **
-    ** If the WHERE clause is empty, the foreach loops must each scan their
-    ** entire tables.  Thus a three-way join is an O(N^3) operation.  But if
-    ** the tables have indices and there are terms in the WHERE clause that
-    ** refer to those indices, a complete table scan can be avoided and the
-    ** code will run much faster.  Most of the work of this routine is checking
-    ** to see if there are indices that can be used to speed up the loop.
-    **
-    ** Terms of the WHERE clause are also used to limit which rows actually
-    ** make it to the "..." in the middle of the loop.  After each "foreach",
-    ** terms of the WHERE clause that use only terms in that loop and outer
-    ** loops are evaluated and if false a jump is made around all subsequent
-    ** inner loops (or around the "..." if the test occurs within the inner-
-    ** most loop)
-    **
-    ** OUTER JOINS
-    **
-    ** An outer join of tables t1 and t2 is conceptally coded as follows:
-    **
-    **    foreach row1 in t1 do
-    **      flag = 0
-    **      foreach row2 in t2 do
-    **        start:
-    **          ...
-    **          flag = 1
-    **      end
-    **      if flag==null then
-    **        move the row2 cursor to a null row
-    **        goto start
-    **      fi
-    **    end
-    **
-    ** ORDER BY CLAUSE PROCESSING
-    **
-    ** ppOrderBy is a pointer to the ORDER BY clause of a SELECT statement,
-    ** if there is one.  If there is no ORDER BY clause or if this routine
-    ** is called from an UPDATE or DELETE statement, then ppOrderBy is NULL.
-    **
-    ** If an index can be used so that the natural output order of the table
-    ** scan is correct for the ORDER BY clause, then that index is used and
-    ** ppOrderBy is set to NULL.  This is an optimization that prevents an
-    ** unnecessary sort of the result set if an index appropriate for the
-    ** ORDER BY clause already exists.
-    **
-    ** If the where clause loops cannot be arranged to provide the correct
-    ** output order, then the ppOrderBy is unchanged.
-    */
+    ///<summary>
+/// Generate the beginning of the loop used for WHERE clause processing.
+/// The return value is a pointer to an opaque structure that contains
+/// information needed to terminate the loop.  Later, the calling routine
+/// should invoke sqlite3WhereEnd() with the return value of this function
+/// in order to complete the WHERE clause processing.
+///
+/// If an error occurs, this routine returns NULL.
+///
+/// The basic idea is to do a nested loop, one loop for each table in
+/// the FROM clause of a select.  (INSERT and UPDATE statements are the
+/// same as a SELECT with only a single table in the FROM clause.)  For
+/// example, if the SQL is this:
+///
+///       SELECT * FROM t1, t2, t3 WHERE ...;
+///
+/// Then the code generated is conceptually like the following:
+///
+///      foreach row1 in t1 do       \    Code generated
+///        foreach row2 in t2 do      |-- by sqlite3WhereBegin()
+///          foreach row3 in t3 do   /
+///            ...
+///          end                     \    Code generated
+///        end                        |-- by sqlite3WhereEnd()
+///      end                         /
+///
+/// Note that the loops might not be nested in the order in which they
+/// appear in the FROM clause if a different order is better able to make
+/// use of indices.  Note also that when the IN operator appears in
+/// the WHERE clause, it might result in additional nested loops for
+/// scanning through all values on the right-hand side of the IN.
+///
+/// There are Btree cursors Debug.Associated with each table.  t1 uses cursor
+/// number pTabList.a[0].iCursor.  t2 uses the cursor pTabList.a[1].iCursor.
+/// And so forth.  This routine generates code to open those VDBE cursors
+/// and sqlite3WhereEnd() generates the code to close them.
+///
+/// The code that sqlite3WhereBegin() generates leaves the cursors named
+/// in pTabList pointing at their appropriate entries.  The [...] code
+/// can use OP_Column and OP_Rowid opcodes on these cursors to extract
+/// data from the various tables of the loop.
+///
+/// If the WHERE clause is empty, the foreach loops must each scan their
+/// entire tables.  Thus a three-way join is an O(N^3) operation.  But if
+/// the tables have indices and there are terms in the WHERE clause that
+/// refer to those indices, a complete table scan can be avoided and the
+/// code will run much faster.  Most of the work of this routine is checking
+/// to see if there are indices that can be used to speed up the loop.
+///
+/// Terms of the WHERE clause are also used to limit which rows actually
+/// make it to the "..." in the middle of the loop.  After each "foreach",
+/// terms of the WHERE clause that use only terms in that loop and outer
+/// loops are evaluated and if false a jump is made around all subsequent
+/// inner loops (or around the "..." if the test occurs within the inner-
+/// most loop)
+///
+/// OUTER JOINS
+///
+/// An outer join of tables t1 and t2 is conceptally coded as follows:
+///
+///    foreach row1 in t1 do
+///      flag = 0
+///      foreach row2 in t2 do
+///        start:
+///          ...
+///          flag = 1
+///      end
+///      if flag==null then
+///        move the row2 cursor to a null row
+///        goto start
+///      fi
+///    end
+///
+/// ORDER BY CLAUSE PROCESSING
+///
+/// ppOrderBy is a pointer to the ORDER BY clause of a SELECT statement,
+/// if there is one.  If there is no ORDER BY clause or if this routine
+/// is called from an UPDATE or DELETE statement, then ppOrderBy is NULL.
+///
+/// If an index can be used so that the natural output order of the table
+/// scan is correct for the ORDER BY clause, then that index is used and
+/// ppOrderBy is set to NULL.  This is an optimization that prevents an
+/// unnecessary sort of the result set if an index appropriate for the
+/// ORDER BY clause already exists.
+///
+/// If the where clause loops cannot be arranged to provide the correct
+/// output order, then the ppOrderBy is unchanged.
+///
+///</summary>
     static WhereInfo sqlite3WhereBegin(
     Parse pParse,           /* The parser context */
     SrcList pTabList,       /* A list of all tables to be scanned */

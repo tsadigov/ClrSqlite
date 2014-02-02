@@ -12,37 +12,38 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-    /*
-    ** 2003 April 6
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains code used to implement the VACUUM command.
-    **
-    ** Most of the code in this file may be omitted by defining the
-    ** SQLITE_OMIT_VACUUM macro.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2003 April 6
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains code used to implement the VACUUM command.
+///
+/// Most of the code in this file may be omitted by defining the
+/// SQLITE_OMIT_VACUUM macro.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
     //#include "vdbeInt.h"
 
 #if !SQLITE_OMIT_VACUUM && !SQLITE_OMIT_ATTACH
-    /*
-** Finalize a prepared statement.  If there was an error, store the
-** text of the error message in *pzErrMsg.  Return the result code.
-*/
+    ///<summary>
+/// Finalize a prepared statement.  If there was an error, store the
+/// text of the error message in *pzErrMsg.  Return the result code.
+///</summary>
     static int vacuumFinalize( sqlite3 db, sqlite3_stmt pStmt, string pzErrMsg )
     {
       int rc;
@@ -54,9 +55,9 @@ namespace Community.CsharpSqlite
       return rc;
     }
 
-    /*
-** Execute zSql on database db. Return an error code.
-*/
+    ///<summary>
+/// Execute zSql on database db. Return an error code.
+///</summary>
     static int execSql( sqlite3 db, string pzErrMsg, string zSql )
     {
       sqlite3_stmt pStmt = null;
@@ -83,10 +84,11 @@ sqlite3_step(pStmt);
       return vacuumFinalize( db, pStmt, pzErrMsg );
     }
 
-    /*
-    ** Execute zSql on database db. The statement returns exactly
-    ** one column. Execute this as SQL on the same database.
-    */
+    ///<summary>
+/// Execute zSql on database db. The statement returns exactly
+/// one column. Execute this as SQL on the same database.
+///
+///</summary>
     static int execExecSql( sqlite3 db, string pzErrMsg, string zSql )
     {
       sqlite3_stmt pStmt = null;
@@ -109,16 +111,17 @@ sqlite3_step(pStmt);
       return vacuumFinalize( db, pStmt, pzErrMsg );
     }
 
-    /*
-    ** The non-standard VACUUM command is used to clean up the database,
-    ** collapse free space, etc.  It is modelled after the VACUUM command
-    ** in PostgreSQL.
-    **
-    ** In version 1.0.x of SQLite, the VACUUM command would call
-    ** gdbm_reorganize() on all the database tables.  But beginning
-    ** with 2.0.0, SQLite no longer uses GDBM so this command has
-    ** become a no-op.
-    */
+    ///<summary>
+/// The non-standard VACUUM command is used to clean up the database,
+/// collapse free space, etc.  It is modelled after the VACUUM command
+/// in PostgreSQL.
+///
+/// In version 1.0.x of SQLite, the VACUUM command would call
+/// gdbm_reorganize() on all the database tables.  But beginning
+/// with 2.0.0, SQLite no longer uses GDBM so this command has
+/// become a no-op.
+///
+///</summary>
     static void sqlite3Vacuum( Parse pParse )
     {
       Vdbe v = sqlite3GetVdbe( pParse );

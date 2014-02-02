@@ -1185,8 +1185,10 @@ namespace Community.CsharpSqlite
       ** New fields may be appended in figure versions.  The iVersion
       ** value will increment whenever this happens. 
       */
-            /* New fields may be appended in figure versions.  The iVersion
-      ** value will increment whenever this happens. */
+            ///<summary>
+///New fields may be appended in figure versions.  The iVersion
+/// value will increment whenever this happens.
+///</summary>
 
             public sqlite3_vfs()
             {

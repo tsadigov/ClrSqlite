@@ -89,8 +89,10 @@ static int BITVEC_NBIT = ( BITVEC_NELEM * BITVEC_SZELEM );
 //#define BITVEC_NINT      (BITVEC_USIZE/sizeof(u32))
 static u32 BITVEC_NINT = (u32)( BITVEC_USIZE / sizeof( u32 ) );
 
-/* Maximum number of entries in hash table before
-** sub-dividing and re-hashing. */
+///<summary>
+///Maximum number of entries in hash table before
+/// sub-dividing and re-hashing.
+///</summary>
 //#define BITVEC_MXHASH    (BITVEC_NINT/2)
 static int BITVEC_MXHASH = (int)( BITVEC_NINT / 2 );
 
@@ -154,11 +156,11 @@ public class Bitvec
   }
 };
 
-/*
-** Create a new bitmap object able to handle bits between 0 and iSize,
-** inclusive.  Return a pointer to the new object.  Return NULL if
-** malloc fails.
-*/
+///<summary>
+/// Create a new bitmap object able to handle bits between 0 and iSize,
+/// inclusive.  Return a pointer to the new object.  Return NULL if
+/// malloc fails.
+///</summary>
 static Bitvec sqlite3BitvecCreate( u32 iSize )
 {
   Bitvec p;
@@ -171,11 +173,11 @@ static Bitvec sqlite3BitvecCreate( u32 iSize )
   return p;
 }
 
-/*
-** Check to see if the i-th bit is set.  Return true or false.
-** If p is NULL (if the bitmap has not been created) or if
-** i is out of range, then return false.
-*/
+///<summary>
+/// Check to see if the i-th bit is set.  Return true or false.
+/// If p is NULL (if the bitmap has not been created) or if
+/// i is out of range, then return false.
+///</summary>
 static int sqlite3BitvecTest( Bitvec p, u32 i )
 {
   if ( p == null || i == 0 )
@@ -210,18 +212,18 @@ static int sqlite3BitvecTest( Bitvec p, u32 i )
   }
 }
 
-/*
-** Set the i-th bit.  Return 0 on success and an error code if
-** anything goes wrong.
-**
-** This routine might cause sub-bitmaps to be allocated.  Failing
-** to get the memory needed to hold the sub-bitmap is the only
-** that can go wrong with an insert, assuming p and i are valid.
-**
-** The calling function must ensure that p is a valid Bitvec object
-** and that the value for "i" is within range of the Bitvec object.
-** Otherwise the behavior is undefined.
-*/
+///<summary>
+/// Set the i-th bit.  Return 0 on success and an error code if
+/// anything goes wrong.
+///
+/// This routine might cause sub-bitmaps to be allocated.  Failing
+/// to get the memory needed to hold the sub-bitmap is the only
+/// that can go wrong with an insert, assuming p and i are valid.
+///
+/// The calling function must ensure that p is a valid Bitvec object
+/// and that the value for "i" is within range of the Bitvec object.
+/// Otherwise the behavior is undefined.
+///</summary>
 static int sqlite3BitvecSet( Bitvec p, u32 i )
 {
   u32 h;
@@ -307,12 +309,12 @@ bitvec_set_end:
   return SQLITE_OK;
 }
 
-/*
-** Clear the i-th bit.
-**
-** pBuf must be a pointer to at least BITVEC_SZ bytes of temporary storage
-** that BitvecClear can use to rebuilt its hash table.
-*/
+///<summary>
+/// Clear the i-th bit.
+///
+/// pBuf must be a pointer to at least BITVEC_SZ bytes of temporary storage
+/// that BitvecClear can use to rebuilt its hash table.
+///</summary>
 static void sqlite3BitvecClear( Bitvec p, u32 i, u32[] pBuf )
 {
   if ( p == null )
@@ -358,9 +360,9 @@ static void sqlite3BitvecClear( Bitvec p, u32 i, u32[] pBuf )
   }
 }
 
-/*
-** Destroy a bitmap object.  Reclaim all memory used.
-*/
+///<summary>
+/// Destroy a bitmap object.  Reclaim all memory used.
+///</summary>
 static void sqlite3BitvecDestroy( ref Bitvec p )
 {
   if ( p == null )
@@ -386,12 +388,12 @@ static u32 sqlite3BitvecSize( Bitvec p )
 }
 
 #if !SQLITE_OMIT_BUILTIN_TEST
-/*
-** Let V[] be an array of unsigned characters sufficient to hold
-** up to N bits.  Let I be an integer between 0 and N.  0<=I<N.
-** Then the following macros can be used to set, clear, or test
-** individual bits within V.
-*/
+///<summary>
+/// Let V[] be an array of unsigned characters sufficient to hold
+/// up to N bits.  Let I be an integer between 0 and N.  0<=I<N.
+/// Then the following macros can be used to set, clear, or test
+/// individual bits within V.
+///</summary>
 //#define SETBIT(V,I)      V[I>>3] |= (1<<(I&7))
 static void SETBIT( byte[] V, int I )
 {

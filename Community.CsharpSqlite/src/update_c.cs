@@ -34,7 +34,9 @@ namespace Community.CsharpSqlite
     //#include "sqliteInt.h"
 
 #if !SQLITE_OMIT_VIRTUALTABLE
-    /* Forward declaration */
+    ///<summary>
+///Forward declaration
+///</summary>
     //static void updateVirtualTable(
     //Parse pParse,       /* The parsing context */
     //SrcList pSrc,       /* The virtual table to be modified */
@@ -47,36 +49,36 @@ namespace Community.CsharpSqlite
     //);
 #endif // * SQLITE_OMIT_VIRTUALTABLE */
 
-    /*
-** The most recently coded instruction was an OP_Column to retrieve the
-** i-th column of table pTab. This routine sets the P4 parameter of the
-** OP_Column to the default value, if any.
-**
-** The default value of a column is specified by a DEFAULT clause in the
-** column definition. This was either supplied by the user when the table
-** was created, or added later to the table definition by an ALTER TABLE
-** command. If the latter, then the row-records in the table btree on disk
-** may not contain a value for the column and the default value, taken
-** from the P4 parameter of the OP_Column instruction, is returned instead.
-** If the former, then all row-records are guaranteed to include a value
-** for the column and the P4 value is not required.
-**
-** Column definitions created by an ALTER TABLE command may only have
-** literal default values specified: a number, null or a string. (If a more
-** complicated default expression value was provided, it is evaluated
-** when the ALTER TABLE is executed and one of the literal values written
-** into the sqlite_master table.)
-**
-** Therefore, the P4 parameter is only required if the default value for
-** the column is a literal number, string or null. The sqlite3ValueFromExpr()
-** function is capable of transforming these types of expressions into
-** sqlite3_value objects.
-**
-** If parameter iReg is not negative, code an OP_RealAffinity instruction
-** on register iReg. This is used when an equivalent integer value is
-** stored in place of an 8-byte floating point value in order to save
-** space.
-*/
+    ///<summary>
+/// The most recently coded instruction was an OP_Column to retrieve the
+/// i-th column of table pTab. This routine sets the P4 parameter of the
+/// OP_Column to the default value, if any.
+///
+/// The default value of a column is specified by a DEFAULT clause in the
+/// column definition. This was either supplied by the user when the table
+/// was created, or added later to the table definition by an ALTER TABLE
+/// command. If the latter, then the row-records in the table btree on disk
+/// may not contain a value for the column and the default value, taken
+/// from the P4 parameter of the OP_Column instruction, is returned instead.
+/// If the former, then all row-records are guaranteed to include a value
+/// for the column and the P4 value is not required.
+///
+/// Column definitions created by an ALTER TABLE command may only have
+/// literal default values specified: a number, null or a string. (If a more
+/// complicated default expression value was provided, it is evaluated
+/// when the ALTER TABLE is executed and one of the literal values written
+/// into the sqlite_master table.)
+///
+/// Therefore, the P4 parameter is only required if the default value for
+/// the column is a literal number, string or null. The sqlite3ValueFromExpr()
+/// function is capable of transforming these types of expressions into
+/// sqlite3_value objects.
+///
+/// If parameter iReg is not negative, code an OP_RealAffinity instruction
+/// on register iReg. This is used when an equivalent integer value is
+/// stored in place of an 8-byte floating point value in order to save
+/// space.
+///</summary>
     static void sqlite3ColumnDefault( Vdbe v, Table pTab, int i, int iReg )
     {
       Debug.Assert( pTab != null );
@@ -665,9 +667,11 @@ sqlite3AuthContextPop(sContext);
       sqlite3ExprDelete( db, ref pWhere );
       return;
     }
-    /* Make sure "isView" and other macros defined above are undefined. Otherwise
-    ** thely may interfere with compilation of other functions in this file
-    ** (or in another file, if this file becomes part of the amalgamation).  */
+    ///<summary>
+///Make sure "isView" and other macros defined above are undefined. Otherwise
+/// thely may interfere with compilation of other functions in this file
+/// (or in another file, if this file becomes part of the amalgamation).
+///</summary>
     //#if isView
     // #undef isView
     //#endif

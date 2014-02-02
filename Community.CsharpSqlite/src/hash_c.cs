@@ -9,35 +9,38 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    ** 2001 September 22
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This is the implementation of generic hash-tables
-    ** used in SQLite.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2001 September 22
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This is the implementation of generic hash-tables
+/// used in SQLite.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
     //#include <assert.h>
 
-    /* Turn bulk memory into a hash table object by initializing the
-    ** fields of the Hash structure.
-    **
-    ** "pNew" is a pointer to the hash table that is to be initialized.
-    */
+    ///<summary>
+///Turn bulk memory into a hash table object by initializing the
+/// fields of the Hash structure.
+///
+/// "pNew" is a pointer to the hash table that is to be initialized.
+///
+///</summary>
     static void sqlite3HashInit( Hash pNew )
     {
       Debug.Assert( pNew != null );
@@ -47,10 +50,12 @@ namespace Community.CsharpSqlite
       pNew.ht = null;
     }
 
-    /* Remove all entries from a hash table.  Reclaim all memory.
-    ** Call this routine to delete a hash table or to reset a hash table
-    ** to the empty state.
-    */
+    ///<summary>
+///Remove all entries from a hash table.  Reclaim all memory.
+/// Call this routine to delete a hash table or to reset a hash table
+/// to the empty state.
+///
+///</summary>
     static void sqlite3HashClear( Hash pH )
     {
       HashElem elem;         /* For looping over all elements of the table */
@@ -70,9 +75,10 @@ namespace Community.CsharpSqlite
       pH.count = 0;
     }
 
-    /*
-    ** The hashing function.
-    */
+    ///<summary>
+/// The hashing function.
+///
+///</summary>
     static u32 strHash( string z, int nKey )
     {
       int h = 0;
@@ -86,9 +92,11 @@ namespace Community.CsharpSqlite
       return (u32)h;
     }
 
-    /* Link pNew element into the hash table pH.  If pEntry!=0 then also
-    ** insert pNew into the pEntry hash bucket.
-    */
+    ///<summary>
+///Link pNew element into the hash table pH.  If pEntry!=0 then also
+/// insert pNew into the pEntry hash bucket.
+///
+///</summary>
     static void insertElement(
     Hash pH,              /* The complete hash table */
     _ht pEntry,           /* The entry into which pNew is inserted */
@@ -132,12 +140,14 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /* Resize the hash table so that it cantains "new_size" buckets.
-    **
-    ** The hash table might fail to resize if sqlite3_malloc() fails or
-    ** if the new size is the same as the prior size.
-    ** Return TRUE if the resize occurs and false if not.
-    */
+    ///<summary>
+///Resize the hash table so that it cantains "new_size" buckets.
+///
+/// The hash table might fail to resize if sqlite3_malloc() fails or
+/// if the new size is the same as the prior size.
+/// Return TRUE if the resize occurs and false if not.
+///
+///</summary>
     static bool rehash( ref Hash pH, u32 new_size )
     {
       _ht[] new_ht;            /* The new hash table */
@@ -179,10 +189,12 @@ if( new_size==pH->htsize ) return false;
       return true;
     }
 
-    /* This function (for internal use only) locates an element in an
-    ** hash table that matches the given key.  The hash for this key has
-    ** already been computed and is passed as the 4th parameter.
-    */
+    ///<summary>
+///This function (for internal use only) locates an element in an
+/// hash table that matches the given key.  The hash for this key has
+/// already been computed and is passed as the 4th parameter.
+///
+///</summary>
     static HashElem findElementGivenHash(
     Hash pH,       /* The pH to be searched */
     string pKey,   /* The key we are searching for */
@@ -215,9 +227,11 @@ if( new_size==pH->htsize ) return false;
       return null;
     }
 
-    /* Remove a single entry from the hash table given a pointer to that
-    ** element and a hash on the element's key.
-    */
+    ///<summary>
+///Remove a single entry from the hash table given a pointer to that
+/// element and a hash on the element's key.
+///
+///</summary>
     static void removeElementGivenHash(
     Hash pH,            /* The pH containing "elem" */
     ref HashElem elem,  /* The element to be removed from the pH */
@@ -257,10 +271,12 @@ if( new_size==pH->htsize ) return false;
       }
     }
 
-    /* Attempt to locate an element of the hash table pH with a key
-    ** that matches pKey,nKey.  Return the data for this element if it is
-    ** found, or NULL if there is no match.
-    */
+    ///<summary>
+///Attempt to locate an element of the hash table pH with a key
+/// that matches pKey,nKey.  Return the data for this element if it is
+/// found, or NULL if there is no match.
+///
+///</summary>
     static T sqlite3HashFind<T>( Hash pH, string pKey, int nKey, T nullType ) where T : class
     {
       HashElem elem;  /* The element that matches key */

@@ -90,11 +90,12 @@ namespace Community.CsharpSqlite
     //#include "sqliteInt.h"
     //#include "vdbeInt.h"
 
-    /*
-    ** Invoke this macro on memory cells just prior to changing the
-    ** value of the cell.  This macro verifies that shallow copies are
-    ** not misused.
-    */
+    ///<summary>
+/// Invoke this macro on memory cells just prior to changing the
+/// value of the cell.  This macro verifies that shallow copies are
+/// not misused.
+///
+///</summary>
 #if SQLITE_DEBUG
     //# define memAboutToChange(P,M) sqlite3VdbeMemPrepareToChange(P,M)
     static void memAboutToChange( Vdbe P, Mem M )
@@ -197,11 +198,11 @@ static void memAboutToChange(Vdbe P, Mem M) {}
 #endif
 #endif
 
-    /*
-/*
-** Test a register to see if it exceeds the current maximum blob size.
-** If it does, record the new maximum blob size.
-*/
+    ///<summary>
+////
+/// Test a register to see if it exceeds the current maximum blob size.
+/// If it does, record the new maximum blob size.
+///</summary>
 #if SQLITE_TEST && !SQLITE_OMIT_BUILTIN_TEST
     static void UPDATE_MAX_BLOBSIZE( Mem P )
     {
@@ -220,17 +221,18 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
     //   if(((P).flags&(MEM_Str|MEM_Blob))==0 && sqlite3VdbeMemStringify(P,enc)) \
     //     { goto no_mem; }
 
-    /*
-    ** An ephemeral string value (signified by the MEM_Ephem flag) contains
-    ** a pointer to a dynamically allocated string where some other entity
-    ** is responsible for deallocating that string.  Because the register
-    ** does not control the string, it might be deleted without the register
-    ** knowing it.
-    **
-    ** This routine converts an ephemeral string into a dynamically allocated
-    ** string that the register itself controls.  In other words, it
-    ** converts an MEM_Ephem string into an MEM_Dyn string.
-    */
+    ///<summary>
+/// An ephemeral string value (signified by the MEM_Ephem flag) contains
+/// a pointer to a dynamically allocated string where some other entity
+/// is responsible for deallocating that string.  Because the register
+/// does not control the string, it might be deleted without the register
+/// knowing it.
+///
+/// This routine converts an ephemeral string into a dynamically allocated
+/// string that the register itself controls.  In other words, it
+/// converts an MEM_Ephem string into an MEM_Dyn string.
+///
+///</summary>
     //#define Deephemeralize(P) \
     //   if( ((P).flags&MEM_Ephem)!=0 \
     //       && sqlite3VdbeMemMakeWriteable(P) ){ goto no_mem;}
@@ -238,22 +240,24 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
     {
     }
 
-    /*
-    ** Call sqlite3VdbeMemExpandBlob() on the supplied value (type Mem)
-    ** P if required.
-    */
+    ///<summary>
+/// Call sqlite3VdbeMemExpandBlob() on the supplied value (type Mem)
+/// P if required.
+///
+///</summary>
     //#define ExpandBlob(P) (((P).flags&MEM_Zero)?sqlite3VdbeMemExpandBlob(P):0)
     static int ExpandBlob( Mem P )
     {
       return ( P.flags & MEM_Zero ) != 0 ? sqlite3VdbeMemExpandBlob( P ) : 0;
     }
 
-    /*
-    ** Argument pMem points at a register that will be passed to a
-    ** user-defined function or returned to the user as the result of a query.
-    ** This routine sets the pMem.type variable used by the sqlite3_value_*() 
-    ** routines.
-    */
+    ///<summary>
+/// Argument pMem points at a register that will be passed to a
+/// user-defined function or returned to the user as the result of a query.
+/// This routine sets the pMem.type variable used by the sqlite3_value_*()
+/// routines.
+///
+///</summary>
     static void sqlite3VdbeMemStoreType( Mem pMem )
     {
       int flags = pMem.flags;
@@ -281,10 +285,11 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
       }
     }
 
-    /*
-    ** Allocate VdbeCursor number iCur.  Return a pointer to it.  Return NULL
-    ** if we run out of memory.
-    */
+    ///<summary>
+/// Allocate VdbeCursor number iCur.  Return a pointer to it.  Return NULL
+/// if we run out of memory.
+///
+///</summary>
     static VdbeCursor allocateCursor(
     Vdbe p,               /* The virtual machine */
     int iCur,             /* Index of the new VdbeCursor */
@@ -344,12 +349,13 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
       return pCx;
     }
 
-    /*
-    ** Try to convert a value into a numeric representation if we can
-    ** do so without loss of information.  In other words, if the string
-    ** looks like a number, convert it into a number.  If it does not
-    ** look like a number, leave it alone.
-    */
+    ///<summary>
+/// Try to convert a value into a numeric representation if we can
+/// do so without loss of information.  In other words, if the string
+/// looks like a number, convert it into a number.  If it does not
+/// look like a number, leave it alone.
+///
+///</summary>
     static void applyNumericAffinity( Mem pRec )
     {
       if ( ( pRec.flags & ( MEM_Real | MEM_Int ) ) == 0 )
@@ -374,24 +380,25 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
       }
     }
 
-    /*
-    ** Processing is determine by the affinity parameter:
-    **
-    ** SQLITE_AFF_INTEGER:
-    ** SQLITE_AFF_REAL:
-    ** SQLITE_AFF_NUMERIC:
-    **    Try to convert pRec to an integer representation or a
-    **    floating-point representation if an integer representation
-    **    is not possible.  Note that the integer representation is
-    **    always preferred, even if the affinity is REAL, because
-    **    an integer representation is more space efficient on disk.
-    **
-    ** SQLITE_AFF_TEXT:
-    **    Convert pRec to a text representation.
-    **
-    ** SQLITE_AFF_NONE:
-    **    No-op.  pRec is unchanged.
-    */
+    ///<summary>
+/// Processing is determine by the affinity parameter:
+///
+/// SQLITE_AFF_INTEGER:
+/// SQLITE_AFF_REAL:
+/// SQLITE_AFF_NUMERIC:
+///    Try to convert pRec to an integer representation or a
+///    floating-point representation if an integer representation
+///    is not possible.  Note that the integer representation is
+///    always preferred, even if the affinity is REAL, because
+///    an integer representation is more space efficient on disk.
+///
+/// SQLITE_AFF_TEXT:
+///    Convert pRec to a text representation.
+///
+/// SQLITE_AFF_NONE:
+///    No-op.  pRec is unchanged.
+///
+///</summary>
     static void applyAffinity(
     Mem pRec,          /* The value to apply affinity to */
     char affinity,      /* The affinity to be applied */
@@ -431,12 +438,13 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
       }
     }
 
-    /*
-    ** Try to convert the type of a function argument or a result column
-    ** into a numeric representation.  Use either INTEGER or REAL whichever
-    ** is appropriate.  But only do the conversion if it is possible without
-    ** loss of information and return the revised type of the argument.
-    */
+    ///<summary>
+/// Try to convert the type of a function argument or a result column
+/// into a numeric representation.  Use either INTEGER or REAL whichever
+/// is appropriate.  But only do the conversion if it is possible without
+/// loss of information and return the revised type of the argument.
+///
+///</summary>
     static int sqlite3_value_numeric_type( sqlite3_value pVal )
     {
       Mem pMem = (Mem)pVal;
@@ -448,10 +456,11 @@ static void UPDATE_MAX_BLOBSIZE( Mem P ) { }
       return pMem.type;
     }
 
-    /*
-    ** Exported version of applyAffinity(). This one works on sqlite3_value*,
-    ** not the internal Mem type.
-    */
+    ///<summary>
+/// Exported version of applyAffinity(). This one works on sqlite3_value*,
+/// not the internal Mem type.
+///
+///</summary>
     static void sqlite3ValueApplyAffinity(
     sqlite3_value pVal,
     char affinity,
@@ -642,30 +651,30 @@ static void REGISTER_TRACE( Vdbe p, int R, Mem M ) { }
 
 #endif
 
-    /*
-** The CHECK_FOR_INTERRUPT macro defined here looks to see if the
-** sqlite3_interrupt() routine has been called.  If it has been, then
-** processing of the VDBE program is interrupted.
-**
-** This macro added to every instruction that does a jump in order to
-** implement a loop.  This test used to be on every single instruction,
-** but that meant we more testing that we needed.  By only testing the
-** flag on jump instructions, we get a (small) speed improvement.
-*/
+    ///<summary>
+/// The CHECK_FOR_INTERRUPT macro defined here looks to see if the
+/// sqlite3_interrupt() routine has been called.  If it has been, then
+/// processing of the VDBE program is interrupted.
+///
+/// This macro added to every instruction that does a jump in order to
+/// implement a loop.  This test used to be on every single instruction,
+/// but that meant we more testing that we needed.  By only testing the
+/// flag on jump instructions, we get a (small) speed improvement.
+///</summary>
     //#define CHECK_FOR_INTERRUPT \
     //   if( db.u1.isInterrupted ) goto abort_due_to_interrupt;
 
 #if !NDEBUG
-    /*
-** This function is only called from within an Debug.Assert() expression. It
-** checks that the sqlite3.nTransaction variable is correctly set to
-** the number of non-transaction savepoints currently in the
-** linked list starting at sqlite3.pSavepoint.
-**
-** Usage:
-**
-**     Debug.Assert( checkSavepointCount(db) );
-*/
+    ///<summary>
+/// This function is only called from within an Debug.Assert() expression. It
+/// checks that the sqlite3.nTransaction variable is correctly set to
+/// the number of non-transaction savepoints currently in the
+/// linked list starting at sqlite3.pSavepoint.
+///
+/// Usage:
+///
+///     Debug.Assert( checkSavepointCount(db) );
+///</summary>
     static int checkSavepointCount( sqlite3 db )
     {
       int n = 0;
@@ -679,11 +688,11 @@ static void REGISTER_TRACE( Vdbe p, int R, Mem M ) { }
 static int checkSavepointCount( sqlite3 db ) { return 1; }
 #endif
 
-    /*
-** Transfer error message text from an sqlite3_vtab.zErrMsg (text stored
-** in memory obtained from sqlite3_malloc) into a Vdbe.zErrMsg (text stored
-** in memory obtained from sqlite3DbMalloc).
-*/
+    ///<summary>
+/// Transfer error message text from an sqlite3_vtab.zErrMsg (text stored
+/// in memory obtained from sqlite3_malloc) into a Vdbe.zErrMsg (text stored
+/// in memory obtained from sqlite3DbMalloc).
+///</summary>
     static void importVtabErrMsg( Vdbe p, sqlite3_vtab pVtab )
     {
       sqlite3 db = p.db;

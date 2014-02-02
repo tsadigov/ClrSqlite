@@ -9,51 +9,53 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    ** 2008 August 16
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains routines used for walking the parser tree for
-    ** an SQL statement.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2008 August 16
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains routines used for walking the parser tree for
+/// an SQL statement.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
     //#include <stdlib.h>
     //#include <string.h>
 
 
-    /*
-    ** Walk an expression tree.  Invoke the callback once for each node
-    ** of the expression, while decending.  (In other words, the callback
-    ** is invoked before visiting children.)
-    **
-    ** The return value from the callback should be one of the WRC_*
-    ** constants to specify how to proceed with the walk.
-    **
-    **    WRC_Continue      Continue descending down the tree.
-    **
-    **    WRC_Prune         Do not descend into child nodes.  But allow
-    **                      the walk to continue with sibling nodes.
-    **
-    **    WRC_Abort         Do no more callbacks.  Unwind the stack and
-    **                      return the top-level walk call.
-    **
-    ** The return value from this routine is WRC_Abort to abandon the tree walk
-    ** and WRC_Continue to continue.
-    */
+    ///<summary>
+/// Walk an expression tree.  Invoke the callback once for each node
+/// of the expression, while decending.  (In other words, the callback
+/// is invoked before visiting children.)
+///
+/// The return value from the callback should be one of the WRC_
+/// constants to specify how to proceed with the walk.
+///
+///    WRC_Continue      Continue descending down the tree.
+///
+///    WRC_Prune         Do not descend into child nodes.  But allow
+///                      the walk to continue with sibling nodes.
+///
+///    WRC_Abort         Do no more callbacks.  Unwind the stack and
+///                      return the top-level walk call.
+///
+/// The return value from this routine is WRC_Abort to abandon the tree walk
+/// and WRC_Continue to continue.
+///
+///</summary>
     static int sqlite3WalkExpr( Walker pWalker, ref Expr pExpr )
     {
       int rc;
@@ -83,10 +85,11 @@ namespace Community.CsharpSqlite
       return rc & WRC_Abort;
     }
 
-    /*
-    ** Call sqlite3WalkExpr() for every expression in list p or until
-    ** an abort request is seen.
-    */
+    ///<summary>
+/// Call sqlite3WalkExpr() for every expression in list p or until
+/// an abort request is seen.
+///
+///</summary>
     static int sqlite3WalkExprList( Walker pWalker, ExprList p )
     {
       int i;
@@ -103,12 +106,13 @@ namespace Community.CsharpSqlite
       return WRC_Continue;
     }
 
-    /*
-    ** Walk all expressions associated with SELECT statement p.  Do
-    ** not invoke the SELECT callback on p, but do (of course) invoke
-    ** any expr callbacks and SELECT callbacks that come from subqueries.
-    ** Return WRC_Abort or WRC_Continue.
-    */
+    ///<summary>
+/// Walk all expressions associated with SELECT statement p.  Do
+/// not invoke the SELECT callback on p, but do (of course) invoke
+/// any expr callbacks and SELECT callbacks that come from subqueries.
+/// Return WRC_Abort or WRC_Continue.
+///
+///</summary>
     static int sqlite3WalkSelectExpr( Walker pWalker, Select p )
     {
       if ( sqlite3WalkExprList( pWalker, p.pEList ) != 0 )
@@ -128,13 +132,14 @@ namespace Community.CsharpSqlite
       return WRC_Continue;
     }
 
-    /*
-    ** Walk the parse trees associated with all subqueries in the
-    ** FROM clause of SELECT statement p.  Do not invoke the select
-    ** callback on p, but do invoke it on each FROM clause subquery
-    ** and on any subqueries further down in the tree.  Return
-    ** WRC_Abort or WRC_Continue;
-    */
+    ///<summary>
+/// Walk the parse trees associated with all subqueries in the
+/// FROM clause of SELECT statement p.  Do not invoke the select
+/// callback on p, but do invoke it on each FROM clause subquery
+/// and on any subqueries further down in the tree.  Return
+/// WRC_Abort or WRC_Continue;
+///
+///</summary>
     static int sqlite3WalkSelectFrom( Walker pWalker, Select p )
     {
       SrcList pSrc;

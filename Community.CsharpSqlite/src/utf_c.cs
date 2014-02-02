@@ -141,33 +141,34 @@ namespace Community.CsharpSqlite
     //  }                                                                   \
     //}
 
-    /*
-    ** Translate a single UTF-8 character.  Return the unicode value.
-    **
-    ** During translation, assume that the byte that zTerm points
-    ** is a 0x00.
-    **
-    ** Write a pointer to the next unread byte back into pzNext.
-    **
-    ** Notes On Invalid UTF-8:
-    **
-    **  *  This routine never allows a 7-bit character (0x00 through 0x7f) to
-    **     be encoded as a multi-byte character.  Any multi-byte character that
-    **     attempts to encode a value between 0x00 and 0x7f is rendered as 0xfffd.
-    **
-    **  *  This routine never allows a UTF16 surrogate value to be encoded.
-    **     If a multi-byte character attempts to encode a value between
-    **     0xd800 and 0xe000 then it is rendered as 0xfffd.
-    **
-    **  *  Bytes in the range of 0x80 through 0xbf which occur as the first
-    **     byte of a character are interpreted as single-byte characters
-    **     and rendered as themselves even though they are technically
-    **     invalid characters.
-    **
-    **  *  This routine accepts an infinite number of different UTF8 encodings
-    **     for unicode values 0x80 and greater.  It do not change over-length
-    **     encodings to 0xfffd as some systems recommend.
-    */
+    ///<summary>
+/// Translate a single UTF-8 character.  Return the unicode value.
+///
+/// During translation, assume that the byte that zTerm points
+/// is a 0x00.
+///
+/// Write a pointer to the next unread byte back into pzNext.
+///
+/// Notes On Invalid UTF-8:
+///
+///  *  This routine never allows a 7-bit character (0x00 through 0x7f) to
+///     be encoded as a multi-byte character.  Any multi-byte character that
+///     attempts to encode a value between 0x00 and 0x7f is rendered as 0xfffd.
+///
+///  *  This routine never allows a UTF16 surrogate value to be encoded.
+///     If a multi-byte character attempts to encode a value between
+///     0xd800 and 0xe000 then it is rendered as 0xfffd.
+///
+///  *  Bytes in the range of 0x80 through 0xbf which occur as the first
+///     byte of a character are interpreted as single-byte characters
+///     and rendered as themselves even though they are technically
+///     invalid characters.
+///
+///  *  This routine accepts an infinite number of different UTF8 encodings
+///     for unicode values 0x80 and greater.  It do not change over-length
+///     encodings to 0xfffd as some systems recommend.
+///
+///</summary>
     //#define READ_UTF8(zIn, zTerm, c)                           \
     //  c = *(zIn++);                                            \
     //  if( c>=0xc0 ){                                           \
@@ -233,15 +234,17 @@ namespace Community.CsharpSqlite
     ** If the TRANSLATE_TRACE macro is defined, the value of each Mem is
     ** printed on stderr on the way into and out of sqlite3VdbeMemTranslate().
     */
-    /* #define TRANSLATE_TRACE 1 */
+    ///<summary>
+///#define TRANSLATE_TRACE 1
+///</summary>
 
 #if !SQLITE_OMIT_UTF16
 
-/*
-** This routine transforms the internal text encoding used by pMem to
-** desiredEnc. It is an error if the string is already of the desired
-** encoding, or if pMem does not contain a string value.
-*/
+///<summary>
+/// This routine transforms the internal text encoding used by pMem to
+/// desiredEnc. It is an error if the string is already of the desired
+/// encoding, or if pMem does not contain a string value.
+///</summary>
 static int sqlite3VdbeMemTranslate(Mem pMem, int desiredEnc){
 int len;                    /* Maximum length of output string in bytes */
 Debugger.Break (); // TODO -
@@ -380,15 +383,15 @@ fprintf(stderr, "OUTPUT: %s\n", zBuf);
 return SQLITE_OK;
 }
 
-/*
-** This routine checks for a byte-order mark at the beginning of the
-** UTF-16 string stored in pMem. If one is present, it is removed and
-** the encoding of the Mem adjusted. This routine does not do any
-** byte-swapping, it just sets Mem.enc appropriately.
-**
-** The allocation (static, dynamic etc.) and encoding of the Mem may be
-** changed by this function.
-*/
+///<summary>
+/// This routine checks for a byte-order mark at the beginning of the
+/// UTF-16 string stored in pMem. If one is present, it is removed and
+/// the encoding of the Mem adjusted. This routine does not do any
+/// byte-swapping, it just sets Mem.enc appropriately.
+///
+/// The allocation (static, dynamic etc.) and encoding of the Mem may be
+/// changed by this function.
+///</summary>
 static int sqlite3VdbeMemHandleBom(Mem pMem){
 int rc = SQLITE_OK;
 int bom = 0;
@@ -450,9 +453,11 @@ return rc;
         return nByte;
     }
 
-    /* This test function is not currently used by the automated test-suite.
-    ** Hence it is only available in debug builds.
-    */
+    ///<summary>
+///This test function is not currently used by the automated test-suite.
+/// Hence it is only available in debug builds.
+///
+///</summary>
 #if SQLITE_TEST && SQLITE_DEBUG
     /*
 ** Translate UTF-8 to UTF-8.
@@ -520,16 +525,16 @@ Mem m = Pool.Allocate_Mem();
   return m.z;
 }
 
-/*
-** Convert a UTF-8 string to the UTF-16 encoding specified by parameter
-** enc. A pointer to the new string is returned, and the value of *pnOut
-** is set to the length of the returned string in bytes. The call should
-** arrange to call sqlite3DbFree() on the returned pointer when it is
-** no longer required.
-** 
-** If a malloc failure occurs, NULL is returned and the db.mallocFailed
-** flag set.
-*/
+///<summary>
+/// Convert a UTF-8 string to the UTF-16 encoding specified by parameter
+/// enc. A pointer to the new string is returned, and the value of *pnOut
+/// is set to the length of the returned string in bytes. The call should
+/// arrange to call sqlite3DbFree() on the returned pointer when it is
+/// no longer required.
+///
+/// If a malloc failure occurs, NULL is returned and the db.mallocFailed
+/// flag set.
+///</summary>
 #if SQLITE_ENABLE_STAT2
 char *sqlite3Utf8to16(sqlite3 db, SqliteEncoding enc, char *z, int n, int *pnOut){
   Mem m;

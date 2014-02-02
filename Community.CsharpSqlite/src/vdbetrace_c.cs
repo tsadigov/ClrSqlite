@@ -11,39 +11,40 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    ** 2009 November 25
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    **
-    ** This file contains code used to insert the values of host parameters
-    ** (aka "wildcards") into the SQL text output by sqlite3_trace().
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2009 November 25
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+///
+/// This file contains code used to insert the values of host parameters
+/// (aka "wildcards") into the SQL text output by sqlite3_trace().
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
     //#include "vdbeInt.h"
 
 #if !SQLITE_OMIT_TRACE
 
-    /*
-** zSql is a zero-terminated string of UTF-8 SQL text.  Return the number of
-** bytes in this text up to but excluding the first character in
-** a host parameter.  If the text contains no host parameters, return
-** the total number of bytes in the text.
-*/
+    ///<summary>
+/// zSql is a zero-terminated string of UTF-8 SQL text.  Return the number of
+/// bytes in this text up to but excluding the first character in
+/// a host parameter.  If the text contains no host parameters, return
+/// the total number of bytes in the text.
+///</summary>
     static int findNextHostParameter( string zSql, int iOffset, ref int pnToken )
     {
       int tokenType = 0;

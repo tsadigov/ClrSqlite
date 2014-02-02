@@ -32,9 +32,9 @@ namespace Community.CsharpSqlite
     //#include "vdbeInt.h"
 
 #if !SQLITE_OMIT_INCRBLOB
-/*
-** Valid sqlite3_blob* handles point to Incrblob structures.
-*/
+///<summary>
+/// Valid sqlite3_blob* handles point to Incrblob structures.
+///</summary>
 typedef struct Incrblob Incrblob;
 struct Incrblob {
   int flags;              /* Copy of "flags" passed to sqlite3_blob_open() */

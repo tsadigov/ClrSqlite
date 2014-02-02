@@ -36,7 +36,9 @@ namespace Community.CsharpSqlite
       /*   AFTEREPLACEANDEFAULTAUTOINCREMENTCASTCOLUMNCOMMITCONFLICTCROSS     */
       /*   CURRENT_TIMESTAMPRIMARYDEFERREDISTINCTDROPFAILFROMFULLGLOBYIF      */
       /*   ISNULLORDERESTRICTOUTERIGHTROLLBACKROWUNIONUSINGVACUUMVIEW         */
-      /*   INITIALLY                                                          */
+      ///<summary>
+///INITIALLY
+///</summary>
 static string zText = new string( new char[540]  {
 'R','E','I','N','D','E','X','E','D','E','S','C','A','P','E','A','C','H',
 'E','C','K','E','Y','B','E','F','O','R','E','I','G','N','O','R','E','G',

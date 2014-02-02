@@ -16,28 +16,29 @@ using va_list = System.Object;
 class Shell
 {
 
-  /*
-  ** 2001 September 15
-  **
-  ** The author disclaims copyright to this source code.  In place of
-  ** a legal notice, here is a blessing:
-  **
-  **    May you do good and not evil.
-  **    May you find forgiveness for yourself and forgive others.
-  **    May you share freely, never taking more than you give.
-  **
-  *************************************************************************
-  ** This file contains code to implement the "sqlite" command line
-  ** utility for accessing SQLite databases.
-  **
-  ** $Id: shell.c,v 1.201 2009/02/04 22:46:47 drh Exp $
-  **
-  *************************************************************************
-  **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-  **  C#-SQLite is an independent reimplementation of the SQLite software library 
-  **
-  *************************************************************************
-  */
+  ///<summary>
+/// 2001 September 15
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains code to implement the "sqlite" command line
+/// utility for accessing SQLite databases.
+///
+/// $Id: shell.c,v 1.201 2009/02/04 22:46:47 drh Exp $
+///
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///
+///
+///</summary>
   //#if (_WIN32) || (WIN32)
   ///* This needs to come before any includes for MSVC compiler */
   //#define _CRT_SECURE_NO_WARNINGS
@@ -111,19 +112,23 @@ extern int isatty();
 /* Saved resource information for the beginning of an operation */
 static struct rusage sBegin;
 
-/* True if the timer is enabled */
+///<summary>
+///True if the timer is enabled
+///</summary>
 static int enableTimer = 0;
 
-/*
-** Begin timing an operation
-*/
+///<summary>
+/// Begin timing an operation
+///</summary>
 static void beginTimer(void){
 if( enableTimer ){
 getrusage(RUSAGE_SELF, &sBegin);
 }
 }
 
-/* Return the difference of two time_structs in seconds */
+///<summary>
+///Return the difference of two time_structs in seconds
+///</summary>
 static double timeDiff(struct timeval *pStart, struct timeval *pEnd){
 return (pEnd.tv_usec - pStart.tv_usec)*0.000001 + 
 (double)(pEnd.tv_sec - pStart.tv_sec);
@@ -151,9 +156,9 @@ timeDiff(&sBegin.ru_stime, &sEnd.ru_stime));
   const bool HAS_TIMER = false;
 #endif
 
-  /*
-** Used to prevent warnings about unused parameters
-*/
+  ///<summary>
+/// Used to prevent warnings about unused parameters
+///</summary>
   //#define UNUSED_PARAMETER(x) (void)(x)
   static void UNUSED_PARAMETER<T>( T x )
   {
@@ -203,12 +208,12 @@ timeDiff(&sBegin.ru_stime, &sEnd.ru_stime));
 static FILE *iotrace = null;
 #endif
 
-  /*
-** This routine works like printf in that its first argument is a
-** format string and subsequent arguments are values to be substituted
-** in place of % fields.  The result of formatting this string
-** is written to iotrace.
-*/
+  ///<summary>
+/// This routine works like printf in that its first argument is a
+/// format string and subsequent arguments are values to be substituted
+/// in place of % fields.  The result of formatting this string
+/// is written to iotrace.
+///</summary>
 #if SQLITE_ENABLE_IOTRACE
 static void iotracePrintf(string zFormat, params object[] ap ){
 //va_list ap;
@@ -223,9 +228,9 @@ sqlite3_free(ref z);
 #endif
 
 
-  /*
-** Determines if a string is a number of not.
-*/
+  ///<summary>
+/// Determines if a string is a number of not.
+///</summary>
   static bool isNumber( string z )
   {
     int i = 0;
@@ -277,14 +282,15 @@ sqlite3_free(ref z);
     return zIdx == z.Length;
   }
 
-  /*
-  ** A global char* and an SQL function to access its current value 
-  ** from within an SQL statement. This program used to use the 
-  ** sqlite_exec_printf() API to substitue a string into an SQL statement.
-  ** The correct way to do this with sqlite3 is to use the bind API, but
-  ** since the shell is built around the callback paradigm it would be a lot
-  ** of work. Instead just use this hack, which is quite harmless.
-  */
+  ///<summary>
+/// A global char* and an SQL function to access its current value
+/// from within an SQL statement. This program used to use the
+/// sqlite_exec_printf() API to substitue a string into an SQL statement.
+/// The correct way to do this with sqlite3 is to use the bind API, but
+/// since the shell is built around the callback paradigm it would be a lot
+/// of work. Instead just use this hack, which is quite harmless.
+///
+///</summary>
   static string zShellStatic = "";
   static void shellstaticFunc(
   sqlite3_context context,
@@ -300,15 +306,16 @@ sqlite3_free(ref z);
   }
 
 
-  /*
-  ** This routine reads a line of text from FILE in, stores
-  ** the text in memory obtained from malloc() and returns a pointer
-  ** to the text.  null; is returned at end of file, or if malloc()
-  ** fails.
-  **
-  ** The interface is like "readline" but no command-line editing
-  ** is done.
-  */
+  ///<summary>
+/// This routine reads a line of text from FILE in, stores
+/// the text in memory obtained from malloc() and returns a pointer
+/// to the text.  null; is returned at end of file, or if malloc()
+/// fails.
+///
+/// The interface is like "readline" but no command-line editing
+/// is done.
+///
+///</summary>
   static string local_getline( string zPrompt, TextReader _in )
   {
     StringBuilder zIn = new StringBuilder();
@@ -431,7 +438,9 @@ if( zResult && *zResult ) add_history(zResult);
     public previous_mode_data explainPrev = new previous_mode_data();
     /* Holds the mode information just before
     ** .explain ON */
-    public StringBuilder outfile = new StringBuilder( 260 ); /* Filename for *out */
+    public StringBuilder outfile = new StringBuilder( 260 ); ///<summary>
+///Filename for *out
+///</summary>
     public string zDbFilename;    /* name of the database file */
 
     internal callback_data Copy()
@@ -473,18 +482,20 @@ if( zResult && *zResult ) add_history(zResult);
 "explain",
 };
 
-  /*
-  ** Number of elements in an array
-  */
+  ///<summary>
+/// Number of elements in an array
+///
+///</summary>
   //#define ArraySize(X)  (int)(sizeof(X)/sizeof(X[0]))
   static int ArraySize<T>( T[] X )
   {
     return X.Length;
   }
-  /*
-  ** Compute a string length that is limited to what can be stored in
-  ** lower 30 bits of a 32-bit signed integer.
-  */
+  ///<summary>
+/// Compute a string length that is limited to what can be stored in
+/// lower 30 bits of a 32-bit signed integer.
+///
+///</summary>
   static int strlen30( StringBuilder z )
   {
     //string z2 = z;
@@ -498,9 +509,10 @@ if( zResult && *zResult ) add_history(zResult);
     return 0x3fffffff & z.Length;//(int)(z2 - z);
   }
 
-  /*
-  ** Output the given string as a quoted string using SQL quoting conventions.
-  */
+  ///<summary>
+/// Output the given string as a quoted string using SQL quoting conventions.
+///
+///</summary>
   static void output_quoted_string( TextWriter _out, string z )
   {
     int i;
@@ -542,9 +554,10 @@ if( zResult && *zResult ) add_history(zResult);
     }
   }
 
-  /*
-  ** Output the given string as a quoted according to C or TCL quoting rules.
-  */
+  ///<summary>
+/// Output the given string as a quoted according to C or TCL quoting rules.
+///
+///</summary>
   static void output_c_string( TextWriter _out, string z )
   {
     char c;
@@ -616,10 +629,11 @@ if( zResult && *zResult ) add_history(zResult);
     }
   }
 
-  /*
-  ** If a field contains any character identified by a 1 in the following
-  ** array, then the string must be quoted for CSV.
-  */
+  ///<summary>
+/// If a field contains any character identified by a 1 in the following
+/// array, then the string must be quoted for CSV.
+///
+///</summary>
   static byte[] needCsvQuote = new byte[]  {
 1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,   
 1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,   
@@ -639,12 +653,13 @@ if( zResult && *zResult ) add_history(zResult);
 1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,   
 };
 
-  /*
-  ** Output a single term of CSV.  Actually, p.separator is used for
-  ** the separator, which may or may not be a comma.  p.nullvalue is
-  ** the null value.  Strings are quoted using ANSI-C rules.  Numbers
-  ** appear outside of quotes.
-  */
+  ///<summary>
+/// Output a single term of CSV.  Actually, p.separator is used for
+/// the separator, which may or may not be a comma.  p.nullvalue is
+/// the null value.  Strings are quoted using ANSI-C rules.  Numbers
+/// appear outside of quotes.
+///
+///</summary>
   static void output_csv( callback_data p, string z, int bSep )
   {
     TextWriter _out = p._out;
@@ -699,10 +714,10 @@ if( db ) sqlite3_interrupt(db);
 }
 #endif
 
-  /*
-** This is the callback routine that the SQLite library
-** invokes for each row of a query result.
-*/
+  ///<summary>
+/// This is the callback routine that the SQLite library
+/// invokes for each row of a query result.
+///</summary>
   static int callback( object pArg, sqlite3_int64 nArg, object azArgs, object azCols )
   {
     int i;
@@ -934,11 +949,12 @@ if( db ) sqlite3_interrupt(db);
     return 0;
   }
 
-  /*
-  ** Set the destination table field of the callback_data structure to
-  ** the name of the table given.  Escape any quote characters in the
-  ** table name.
-  */
+  ///<summary>
+/// Set the destination table field of the callback_data structure to
+/// the name of the table given.  Escape any quote characters in the
+/// table name.
+///
+///</summary>
   static void set_table_name( callback_data p, string zName )
   {
     int i, n;
@@ -985,14 +1001,16 @@ if( db ) sqlite3_interrupt(db);
     p.zDestTable = z;
   }
 
-  /* zIn is either a pointer to a null;-terminated string in memory obtained
-  ** from malloc(), or a null; pointer. The string pointed to by zAppend is
-  ** added to zIn, and the result returned in memory obtained from malloc().
-  ** zIn, if it was not null;, is freed.
-  **
-  ** If the third argument, quote, is not '\0', then it is used as a 
-  ** quote character for zAppend.
-  */
+  ///<summary>
+///zIn is either a pointer to a null;-terminated string in memory obtained
+/// from malloc(), or a null; pointer. The string pointed to by zAppend is
+/// added to zIn, and the result returned in memory obtained from malloc().
+/// zIn, if it was not null;, is freed.
+///
+/// If the third argument, quote, is not '\0', then it is used as a
+/// quote character for zAppend.
+///
+///</summary>
   static void appendText( StringBuilder zIn, string zAppend, char quote )
   {
     int len;
@@ -1038,13 +1056,14 @@ if( db ) sqlite3_interrupt(db);
   }
 
 
-  /*
-  ** Execute a query statement that has a single result column.  Print
-  ** that result column on a line by itself with a semicolon terminator.
-  **
-  ** This is used, for example, to show the schema of the database by
-  ** querying the sqlite.SQLITE_MASTER table.
-  */
+  ///<summary>
+/// Execute a query statement that has a single result column.  Print
+/// that result column on a line by itself with a semicolon terminator.
+///
+/// This is used, for example, to show the schema of the database by
+/// querying the sqlite.SQLITE_MASTER table.
+///
+///</summary>
   static int run_table_dump_query( TextWriter _out, sqlite3 db, string zSelect )
   {
     sqlite3_stmt pSelect = new sqlite3_stmt();
@@ -1065,12 +1084,13 @@ if( db ) sqlite3_interrupt(db);
   }
 
 
-  /*
-  ** This is a different callback routine used for dumping the database.
-  ** Each row received by this callback consists of a table name,
-  ** the table type ("index" or "table") and SQL to create the table.
-  ** This routine should print text sufficient to recreate the table.
-  */
+  ///<summary>
+/// This is a different callback routine used for dumping the database.
+/// Each row received by this callback consists of a table name,
+/// the table type ("index" or "table") and SQL to create the table.
+/// This routine should print text sufficient to recreate the table.
+///
+///</summary>
   static int dump_callback( object pArg, sqlite3_int64 nArg, object azArg, object azCol )
   {
     int rc;
@@ -1259,13 +1279,16 @@ if( db ) sqlite3_interrupt(db);
  ".width NUM NUM ...     Set column widths for \"column\" mode\n"
   ;
 
-  /* Forward reference */
+  ///<summary>
+///Forward reference
+///</summary>
   //static int process_input(callback_data p, FILE _in);
 
-  /*
-  ** Make sure the database is open.  If it is not, then open it.  If
-  ** the database fails to open, print an error message and exit.
-  */
+  ///<summary>
+/// Make sure the database is open.  If it is not, then open it.  If
+/// the database fails to open, print an error message and exit.
+///
+///</summary>
   static void open_db( callback_data p )
   {
     if ( p.db == null )
@@ -1289,15 +1312,16 @@ if( db ) sqlite3_interrupt(db);
     }
   }
 
-  /*
-  ** Do C-language style dequoting.
-  **
-  **    \t    . tab
-  **    \n    . newline
-  **    \r    . carriage return
-  **    \NNN  . ascii character NNN in octal
-  **    \\    . backslash
-  */
+  ///<summary>
+/// Do C-language style dequoting.
+///
+///    \t    . tab
+///    \n    . newline
+///    \r    . carriage return
+///    \NNN  . ascii character NNN in octal
+///    \\    . backslash
+///
+///</summary>
   static void resolve_backslashes( StringBuilder z )
   {
     int i, j;
@@ -1339,9 +1363,10 @@ if( db ) sqlite3_interrupt(db);
     z.Length = j;//z[j] = '\0';
   }
 
-  /*
-  ** Interpret zArg as a boolean value.  Return either 0 or 1.
-  */
+  ///<summary>
+/// Interpret zArg as a boolean value.  Return either 0 or 1.
+///
+///</summary>
   static int booleanValue( StringBuilder zArg )
   {
     return booleanValue( zArg.ToString() );
@@ -1366,12 +1391,13 @@ if( db ) sqlite3_interrupt(db);
     return val;
   }
 
-  /*
-  ** If an input line begins with "." then invoke this routine to
-  ** process that line.
-  **
-  ** Return 1 on error, 2 to exit, and 0 otherwise.
-  */
+  ///<summary>
+/// If an input line begins with "." then invoke this routine to
+/// process that line.
+///
+/// Return 1 on error, 2 to exit, and 0 otherwise.
+///
+///</summary>
   static int do_meta_command( StringBuilder zLine, callback_data p )
   {
     int i = 1;
@@ -2239,10 +2265,11 @@ enableTimer = booleanValue(azArg[1]);
     return rc;
   }
 
-  /*
-  ** Return TRUE if a semicolon occurs anywhere in the first N characters
-  ** of string z[].
-  */
+  ///<summary>
+/// Return TRUE if a semicolon occurs anywhere in the first N characters
+/// of string z[].
+///
+///</summary>
   static bool _contains_semicolon( string z, int N )
   {
     int i;
@@ -2254,9 +2281,10 @@ enableTimer = booleanValue(azArg[1]);
     return false;
   }
 
-  /*
-  ** Test to see if a line consists entirely of whitespace.
-  */
+  ///<summary>
+/// Test to see if a line consists entirely of whitespace.
+///
+///</summary>
   static bool _all_whitespace( string z )
   {
     return z.Trim().Length == 0;
@@ -2284,11 +2312,12 @@ enableTimer = booleanValue(azArg[1]);
     //return true;
   }
 
-  /*
-  ** Return TRUE if the line typed in is an SQL command terminator other
-  ** than a semi-colon.  The SQL Server style "go" command is understood
-  ** as is the Oracle "/".
-  */
+  ///<summary>
+/// Return TRUE if the line typed in is an SQL command terminator other
+/// than a semi-colon.  The SQL Server style "go" command is understood
+/// as is the Oracle "/".
+///
+///</summary>
   static int _is_command_terminator( string zLine )
   {
     zLine = zLine.Trim();// while ( isspace( zLine ) ) { zLine++; };
@@ -2306,10 +2335,11 @@ enableTimer = booleanValue(azArg[1]);
     return 0;
   }
 
-  /*
-  ** Return true if zSql is a complete SQL statement.  Return false if it
-  ** ends in the middle of a string literal or C-style comment.
-  */
+  ///<summary>
+/// Return true if zSql is a complete SQL statement.  Return false if it
+/// ends in the middle of a string literal or C-style comment.
+///
+///</summary>
   static int _is_complete( string zSql, int nSql )
   {
     int rc;
@@ -2322,15 +2352,16 @@ enableTimer = booleanValue(azArg[1]);
     return rc;
   }
 
-  /*
-  ** Read input from _in and process it.  If _in==0 then input
-  ** is interactive - the user is typing it it.  Otherwise, input
-  ** is coming from a file or device.  A prompt is issued and history
-  ** is saved only if input is interactive.  An interrupt signal will
-  ** cause this routine to exit immediately, unless input is interactive.
-  **
-  ** Return the number of errors.
-  */
+  ///<summary>
+/// Read input from _in and process it.  If _in==0 then input
+/// is interactive - the user is typing it it.  Otherwise, input
+/// is coming from a file or device.  A prompt is issued and history
+/// is saved only if input is interactive.  An interrupt signal will
+/// cause this routine to exit immediately, unless input is interactive.
+///
+/// Return the number of errors.
+///
+///</summary>
   static int process_input( callback_data p, TextReader _in )
   {
     StringBuilder zLine = new StringBuilder();
@@ -2468,9 +2499,10 @@ END_TIMER;
     return errCnt;
   }
 
-  /*
-  ** Return a pathname which is the user's home directory
-  */
+  ///<summary>
+/// Return a pathname which is the user's home directory
+///
+///</summary>
   static string find_home_dir()
   {
     int p = (int)Environment.OSVersion.Platform;
@@ -2556,9 +2588,10 @@ END_TIMER;
     }
   }
 
-  /*
-  ** Show available command line options
-  */
+  ///<summary>
+/// Show available command line options
+///
+///</summary>
   static string zOptions =
   "   -init filename       read/process named file\n" +
   "   -echo                print commands before execution\n" +
@@ -2592,9 +2625,10 @@ END_TIMER;
     exit( 1 );
   }
 
-  /*
-  ** Initialize the state information in data
-  */
+  ///<summary>
+/// Initialize the state information in data
+///
+///</summary>
   static void main_init( ref callback_data data )
   {
     data = new callback_data();//memset(data, 0, sizeof(*data));

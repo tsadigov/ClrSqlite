@@ -12,35 +12,37 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-    /*
-    ** 2005 May 23
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    **
-    ** This file contains functions used to access the internal hash tables
-    ** of user defined functions and collation sequences.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2005 May 23
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+///
+/// This file contains functions used to access the internal hash tables
+/// of user defined functions and collation sequences.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
+///
+///
+///
+///</summary>
 
     //#include "sqliteInt.h"
 
-    /*
-    ** Invoke the 'collation needed' callback to request a collation sequence
-    ** in the encoding enc of name zName, length nName.
-    */
+    ///<summary>
+/// Invoke the 'collation needed' callback to request a collation sequence
+/// in the encoding enc of name zName, length nName.
+///
+///</summary>
     static void callCollNeeded( sqlite3 db, SqliteEncoding enc, string zName )
     {
       Debug.Assert( db.xCollNeeded == null || db.xCollNeeded16 == null );
@@ -66,13 +68,14 @@ sqlite3ValueFree(ref pTmp);
 #endif
     }
 
-    /*
-    ** This routine is called if the collation factory fails to deliver a
-    ** collation function in the best encoding but there may be other versions
-    ** of this collation function (for other text encodings) available. Use one
-    ** of these instead if they exist. Avoid a UTF-8 <. UTF-16 conversion if
-    ** possible.
-    */
+    ///<summary>
+/// This routine is called if the collation factory fails to deliver a
+/// collation function in the best encoding but there may be other versions
+/// of this collation function (for other text encodings) available. Use one
+/// of these instead if they exist. Avoid a UTF-8 <. UTF-16 conversion if
+/// possible.
+///
+///</summary>
     static int synthCollSeq( sqlite3 db, CollSeq pColl )
     {
       CollSeq pColl2;
@@ -92,20 +95,21 @@ sqlite3ValueFree(ref pTmp);
       return SQLITE_ERROR;
     }
 
-    /*
-    ** This function is responsible for invoking the collation factory callback
-    ** or substituting a collation sequence of a different encoding when the
-    ** requested collation sequence is not available in the desired encoding.
-    **
-    ** If it is not NULL, then pColl must point to the database native encoding
-    ** collation sequence with name zName, length nName.
-    **
-    ** The return value is either the collation sequence to be used in database
-    ** db for collation type name zName, length nName, or NULL, if no collation
-    ** sequence can be found.
-    **
-    ** See also: sqlite3LocateCollSeq(), sqlite3FindCollSeq()
-    */
+    ///<summary>
+/// This function is responsible for invoking the collation factory callback
+/// or substituting a collation sequence of a different encoding when the
+/// requested collation sequence is not available in the desired encoding.
+///
+/// If it is not NULL, then pColl must point to the database native encoding
+/// collation sequence with name zName, length nName.
+///
+/// The return value is either the collation sequence to be used in database
+/// db for collation type name zName, length nName, or NULL, if no collation
+/// sequence can be found.
+///
+/// See also: sqlite3LocateCollSeq(), sqlite3FindCollSeq()
+///
+///</summary>
     static CollSeq sqlite3GetCollSeq(
     sqlite3 db,         /* The database connection */
     SqliteEncoding enc,             /* The desired encoding for the collating sequence */
@@ -136,17 +140,18 @@ sqlite3ValueFree(ref pTmp);
       return p;
     }
 
-    /*
-    ** This routine is called on a collation sequence before it is used to
-    ** check that it is defined. An undefined collation sequence exists when
-    ** a database is loaded that contains references to collation sequences
-    ** that have not been defined by sqlite3_create_collation() etc.
-    **
-    ** If required, this routine calls the 'collation needed' callback to
-    ** request a definition of the collating sequence. If this doesn't work,
-    ** an equivalent collating sequence that uses a text encoding different
-    ** from the main database is substituted, if one is available.
-    */
+    ///<summary>
+/// This routine is called on a collation sequence before it is used to
+/// check that it is defined. An undefined collation sequence exists when
+/// a database is loaded that contains references to collation sequences
+/// that have not been defined by sqlite3_create_collation() etc.
+///
+/// If required, this routine calls the 'collation needed' callback to
+/// request a definition of the collating sequence. If this doesn't work,
+/// an equivalent collating sequence that uses a text encoding different
+/// from the main database is substituted, if one is available.
+///
+///</summary>
     static int sqlite3CheckCollSeq( Parse pParse, CollSeq pColl )
     {
       if ( pColl != null )
@@ -177,19 +182,20 @@ sqlite3ValueFree(ref pTmp);
 
 
 
-    /*
-    ** Locate and return an entry from the db.aCollSeq hash table. If the entry
-    ** specified by zName and nName is not found and parameter 'create' is
-    ** true, then create a new entry. Otherwise return NULL.
-    **
-    ** Each pointer stored in the sqlite3.aCollSeq hash table contains an
-    ** array of three CollSeq structures. The first is the collation sequence
-    ** prefferred for UTF-8, the second UTF-16le, and the third UTF-16be.
-    **
-    ** Stored immediately after the three collation sequences is a copy of
-    ** the collation sequence name. A pointer to this string is stored in
-    ** each collation sequence structure.
-    */
+    ///<summary>
+/// Locate and return an entry from the db.aCollSeq hash table. If the entry
+/// specified by zName and nName is not found and parameter 'create' is
+/// true, then create a new entry. Otherwise return NULL.
+///
+/// Each pointer stored in the sqlite3.aCollSeq hash table contains an
+/// array of three CollSeq structures. The first is the collation sequence
+/// prefferred for UTF-8, the second UTF-16le, and the third UTF-16be.
+///
+/// Stored immediately after the three collation sequences is a copy of
+/// the collation sequence name. A pointer to this string is stored in
+/// each collation sequence structure.
+///
+///</summary>
     static CollSeq[] findCollSeqEntry(
     sqlite3 db,         /* Database connection */
     string zName,       /* Name of the collating sequence */
@@ -236,21 +242,22 @@ sqlite3ValueFree(ref pTmp);
       return pColl;
     }
 
-    /*
-    ** Parameter zName points to a UTF-8 encoded string nName bytes long.
-    ** Return the CollSeq* pointer for the collation sequence named zName
-    ** for the encoding 'enc' from the database 'db'.
-    **
-    ** If the entry specified is not found and 'create' is true, then create a
-    ** new entry.  Otherwise return NULL.
-    **
-    ** A separate function sqlite3LocateCollSeq() is a wrapper around
-    ** this routine.  sqlite3LocateCollSeq() invokes the collation factory
-    ** if necessary and generates an error message if the collating sequence
-    ** cannot be found.
-    **
-    ** See also: sqlite3LocateCollSeq(), sqlite3GetCollSeq()
-    */
+    ///<summary>
+/// Parameter zName points to a UTF-8 encoded string nName bytes long.
+/// Return the CollSeq* pointer for the collation sequence named zName
+/// for the encoding 'enc' from the database 'db'.
+///
+/// If the entry specified is not found and 'create' is true, then create a
+/// new entry.  Otherwise return NULL.
+///
+/// A separate function sqlite3LocateCollSeq() is a wrapper around
+/// this routine.  sqlite3LocateCollSeq() invokes the collation factory
+/// if necessary and generates an error message if the collating sequence
+/// cannot be found.
+///
+/// See also: sqlite3LocateCollSeq(), sqlite3GetCollSeq()
+///
+///</summary>
     static CollSeq sqlite3FindCollSeq(
     sqlite3 db,
     SqliteEncoding enc,
@@ -279,27 +286,29 @@ sqlite3ValueFree(ref pTmp);
         return null;
     }
 
-    /* During the search for the best function definition, this procedure
-    ** is called to test how well the function passed as the first argument
-    ** matches the request for a function with nArg arguments in a system
-    ** that uses encoding enc. The value returned indicates how well the
-    ** request is matched. A higher value indicates a better match.
-    **
-    ** The returned value is always between 0 and 6, as follows:
-    **
-    ** 0: Not a match, or if nArg<0 and the function is has no implementation.
-    ** 1: A variable arguments function that prefers UTF-8 when a UTF-16
-    **    encoding is requested, or vice versa.
-    ** 2: A variable arguments function that uses UTF-16BE when UTF-16LE is
-    **    requested, or vice versa.
-    ** 3: A variable arguments function using the same text encoding.
-    ** 4: A function with the exact number of arguments requested that
-    **    prefers UTF-8 when a UTF-16 encoding is requested, or vice versa.
-    ** 5: A function with the exact number of arguments requested that
-    **    prefers UTF-16LE when UTF-16BE is requested, or vice versa.
-    ** 6: An exact match.
-    **
-    */
+    ///<summary>
+///During the search for the best function definition, this procedure
+/// is called to test how well the function passed as the first argument
+/// matches the request for a function with nArg arguments in a system
+/// that uses encoding enc. The value returned indicates how well the
+/// request is matched. A higher value indicates a better match.
+///
+/// The returned value is always between 0 and 6, as follows:
+///
+/// 0: Not a match, or if nArg<0 and the function is has no implementation.
+/// 1: A variable arguments function that prefers UTF-8 when a UTF-16
+///    encoding is requested, or vice versa.
+/// 2: A variable arguments function that uses UTF-16BE when UTF-16LE is
+///    requested, or vice versa.
+/// 3: A variable arguments function using the same text encoding.
+/// 4: A function with the exact number of arguments requested that
+///    prefers UTF-8 when a UTF-16 encoding is requested, or vice versa.
+/// 5: A function with the exact number of arguments requested that
+///    prefers UTF-16LE when UTF-16BE is requested, or vice versa.
+/// 6: An exact match.
+///
+///
+///</summary>
     static int matchQuality( FuncDef p, int nArg, SqliteEncoding enc )
     {
       int match = 0;
@@ -325,10 +334,11 @@ sqlite3ValueFree(ref pTmp);
       return match;
     }
 
-    /*
-    ** Search a FuncDefHash for a function with the given name.  Return
-    ** a pointer to the matching FuncDef if found, or 0 if there is no match.
-    */
+    ///<summary>
+/// Search a FuncDefHash for a function with the given name.  Return
+/// a pointer to the matching FuncDef if found, or 0 if there is no match.
+///
+///</summary>
     static FuncDef functionSearch(
     FuncDefHash pHash,  /* Hash table to search */
     int h,              /* Hash of the name */
@@ -347,9 +357,10 @@ sqlite3ValueFree(ref pTmp);
       return null;
     }
 
-    /*
-    ** Insert a new FuncDef into a FuncDefHash hash table.
-    */
+    ///<summary>
+/// Insert a new FuncDef into a FuncDefHash hash table.
+///
+///</summary>
     static void sqlite3FuncDefInsert(
     FuncDefHash pHash,  /* The hash table into which to insert */
     FuncDef pDef        /* The function definition to insert */
@@ -374,26 +385,27 @@ sqlite3ValueFree(ref pTmp);
       }
     }
 
-    /*
-    ** Locate a user function given a name, a number of arguments and a flag
-    ** indicating whether the function prefers UTF-16 over UTF-8.  Return a
-    ** pointer to the FuncDef structure that defines that function, or return
-    ** NULL if the function does not exist.
-    **
-    ** If the createFlag argument is true, then a new (blank) FuncDef
-    ** structure is created and liked into the "db" structure if a
-    ** no matching function previously existed.  When createFlag is true
-    ** and the nArg parameter is -1, then only a function that accepts
-    ** any number of arguments will be returned.
-    **
-    ** If createFlag is false and nArg is -1, then the first valid
-    ** function found is returned.  A function is valid if either xFunc
-    ** or xStep is non-zero.
-    **
-    ** If createFlag is false, then a function with the required name and
-    ** number of arguments may be returned even if the eTextRep flag does not
-    ** match that requested.
-    */
+    ///<summary>
+/// Locate a user function given a name, a number of arguments and a flag
+/// indicating whether the function prefers UTF-16 over UTF-8.  Return a
+/// pointer to the FuncDef structure that defines that function, or return
+/// NULL if the function does not exist.
+///
+/// If the createFlag argument is true, then a new (blank) FuncDef
+/// structure is created and liked into the "db" structure if a
+/// no matching function previously existed.  When createFlag is true
+/// and the nArg parameter is -1, then only a function that accepts
+/// any number of arguments will be returned.
+///
+/// If createFlag is false and nArg is -1, then the first valid
+/// function found is returned.  A function is valid if either xFunc
+/// or xStep is non-zero.
+///
+/// If createFlag is false, then a function with the required name and
+/// number of arguments may be returned even if the eTextRep flag does not
+/// match that requested.
+///
+///</summary>
 
     static FuncDef sqlite3FindFunction(
     sqlite3 db,           /* An open database */
@@ -484,14 +496,15 @@ FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
       return null;
     }
 
-    /*
-    ** Free all resources held by the schema structure. The void* argument points
-    ** at a Schema struct. This function does not call sqlite3DbFree(db, ) on the
-    ** pointer itself, it just cleans up subsidiary resources (i.e. the contents
-    ** of the schema hash tables).
-    **
-    ** The Schema.cache_size variable is not cleared.
-    */
+    ///<summary>
+/// Free all resources held by the schema structure. The void* argument points
+/// at a Schema struct. This function does not call sqlite3DbFree(db, ) on the
+/// pointer itself, it just cleans up subsidiary resources (i.e. the contents
+/// of the schema hash tables).
+///
+/// The Schema.cache_size variable is not cleared.
+///
+///</summary>
     static void sqlite3SchemaClear( Schema p )
     {
       Hash temp1;

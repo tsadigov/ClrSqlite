@@ -45,10 +45,10 @@ namespace Community.CsharpSqlite
 */
 static byte[] zMagicHeader = Encoding.UTF8.GetBytes( SQLITE_FILE_HEADER );
 
-/*
-** Set this global variable to 1 to enable tracing using the TRACE
-** macro.
-*/
+///<summary>
+/// Set this global variable to 1 to enable tracing using the TRACE
+/// macro.
+///</summary>
 #if TRACE 
 static bool sqlite3BtreeTrace=false;  /* True to enable tracing */
 //# define TRACE(X)  if(sqlite3BtreeTrace){printf X;fflush(stdout);}
@@ -62,15 +62,15 @@ static void TRACE( string X, params object[] ap )
 
 
 
-/*
-** Extract a 2-byte big-endian integer from an array of unsigned bytes.
-** But if the value is zero, make it 65536.
-**
-** This routine is used to extract the "offset to cell content area" value
-** from the header of a btree page.  If the page size is 65536 and the page
-** is empty, the offset should be 65536, but the 2-byte value stores zero.
-** This routine makes the necessary adjustment to 65536.
-*/
+///<summary>
+/// Extract a 2-byte big-endian integer from an array of unsigned bytes.
+/// But if the value is zero, make it 65536.
+///
+/// This routine is used to extract the "offset to cell content area" value
+/// from the header of a btree page.  If the page size is 65536 and the page
+/// is empty, the offset should be 65536, but the 2-byte value stores zero.
+/// This routine makes the necessary adjustment to 65536.
+///</summary>
 //#define get2byteNotZero(X)  (((((int)get2byte(X))-1)&0xffff)+1)
 static int get2byteNotZero( byte[] X, int offset )
 {
@@ -78,14 +78,14 @@ static int get2byteNotZero( byte[] X, int offset )
 }
 
 #if !SQLITE_OMIT_SHARED_CACHE
-/*
-** A list of BtShared objects that are eligible for participation
-** in shared cache.  This variable has file scope during normal builds,
-** but the test harness needs to access it so we make it global for
-** test builds.
-**
-** Access to this variable is protected by SQLITE_MUTEX_STATIC_MASTER.
-*/
+///<summary>
+/// A list of BtShared objects that are eligible for participation
+/// in shared cache.  This variable has file scope during normal builds,
+/// but the test harness needs to access it so we make it global for
+/// test builds.
+///
+/// Access to this variable is protected by SQLITE_MUTEX_STATIC_MASTER.
+///</summary>
 #if SQLITE_TEST
 BtShared *SQLITE_WSD sqlite3SharedCacheList = 0;
 #else
@@ -94,13 +94,13 @@ static BtShared *SQLITE_WSD sqlite3SharedCacheList = 0;
 #endif //* SQLITE_OMIT_SHARED_CACHE */
 
 #if !SQLITE_OMIT_SHARED_CACHE
-/*
-** Enable or disable the shared pager and schema features.
-**
-** This routine has no effect on existing database connections.
-** The shared cache setting effects only future calls to
-** sqlite3_open(), sqlite3_open16(), or sqlite3_open_v2().
-*/
+///<summary>
+/// Enable or disable the shared pager and schema features.
+///
+/// This routine has no effect on existing database connections.
+/// The shared cache setting effects only future calls to
+/// sqlite3_open(), sqlite3_open16(), or sqlite3_open_v2().
+///</summary>
 int sqlite3_enable_shared_cache(int enable){
 sqlite3GlobalConfig.sharedCacheEnabled = enable;
 return SQLITE_OK;
@@ -267,12 +267,12 @@ return 0;
 }
 #endif    //* #if SQLITE_DEBUG */
 
-/*
-** Query to see if Btree handle p may obtain a lock of type eLock
-** (READ_LOCK or WRITE_LOCK) on the table with root-page iTab. Return
-** SQLITE_OK if the lock may be obtained (by calling
-** setSharedCacheTableLock()), or SQLITE_LOCKED if not.
-*/
+///<summary>
+/// Query to see if Btree handle p may obtain a lock of type eLock
+/// (READ_LOCK or WRITE_LOCK) on the table with root-page iTab. Return
+/// SQLITE_OK if the lock may be obtained (by calling
+/// setSharedCacheTableLock()), or SQLITE_LOCKED if not.
+///</summary>
 static int querySharedCacheTableLock(Btree p, Pgno iTab, u8 eLock){
 BtShared pBt = p.pBt;
 BtLock pIter;
@@ -328,23 +328,23 @@ return SQLITE_OK;
 #endif //* !SQLITE_OMIT_SHARED_CACHE */
 
 #if !SQLITE_OMIT_SHARED_CACHE
-/*
-** Add a lock on the table with root-page iTable to the shared-btree used
-** by Btree handle p. Parameter eLock must be either READ_LOCK or 
-** WRITE_LOCK.
-**
-** This function assumes the following:
-**
-**   (a) The specified Btree object p is connected to a sharable
-**       database (one with the BtShared.sharable flag set), and
-**
-**   (b) No other Btree objects hold a lock that conflicts
-**       with the requested lock (i.e. querySharedCacheTableLock() has
-**       already been called and returned SQLITE_OK).
-**
-** SQLITE_OK is returned if the lock is added successfully. SQLITE_NOMEM 
-** is returned if a malloc attempt fails.
-*/
+///<summary>
+/// Add a lock on the table with root-page iTable to the shared-btree used
+/// by Btree handle p. Parameter eLock must be either READ_LOCK or
+/// WRITE_LOCK.
+///
+/// This function assumes the following:
+///
+///   (a) The specified Btree object p is connected to a sharable
+///       database (one with the BtShared.sharable flag set), and
+///
+///   (b) No other Btree objects hold a lock that conflicts
+///       with the requested lock (i.e. querySharedCacheTableLock() has
+///       already been called and returned SQLITE_OK).
+///
+/// SQLITE_OK is returned if the lock is added successfully. SQLITE_NOMEM
+/// is returned if a malloc attempt fails.
+///</summary>
 static int setSharedCacheTableLock(Btree p, Pgno iTable, u8 eLock){
 BtShared pBt = p.pBt;
 BtLock pLock = 0;
@@ -401,14 +401,14 @@ return SQLITE_OK;
 #endif //* !SQLITE_OMIT_SHARED_CACHE */
 
 #if !SQLITE_OMIT_SHARED_CACHE
-/*
-** Release all the table locks (locks obtained via calls to
-** the setSharedCacheTableLock() procedure) held by Btree object p.
-**
-** This function assumes that Btree p has an open read or write 
-** transaction. If it does not, then the BtShared.isPending variable
-** may be incorrectly cleared.
-*/
+///<summary>
+/// Release all the table locks (locks obtained via calls to
+/// the setSharedCacheTableLock() procedure) held by Btree object p.
+///
+/// This function assumes that Btree p has an open read or write
+/// transaction. If it does not, then the BtShared.isPending variable
+/// may be incorrectly cleared.
+///</summary>
 static void clearAllSharedCacheTableLocks(Btree p){
 BtShared pBt = p.pBt;
 BtLock **ppIter = &pBt.pLock;
@@ -472,11 +472,11 @@ pLock.eLock = READ_LOCK;
 
 //static void releasePage(MemPage pPage);  /* Forward reference */
 
-/*
-***** This routine is used inside of assert() only ****
-**
-** Verify that the cursor holds the mutex on its BtShared
-*/
+///<summary>
+/// This routine is used inside of assert() only 
+///
+/// Verify that the cursor holds the mutex on its BtShared
+///</summary>
 #if SQLITE_DEBUG
 static bool cursorHoldsMutex( BtCursor p )
 {
@@ -488,19 +488,19 @@ static bool cursorHoldsMutex(BtCursor p) { return true; }
 
 
 #if !SQLITE_OMIT_INCRBLOB
-/*
-** Invalidate the overflow page-list cache for cursor pCur, if any.
-*/
+///<summary>
+/// Invalidate the overflow page-list cache for cursor pCur, if any.
+///</summary>
 static void invalidateOverflowCache(BtCursor pCur){
 Debug.Assert( cursorHoldsMutex(pCur) );
 //sqlite3_free(ref pCur.aOverflow);
 pCur.aOverflow = null;
 }
 
-/*
-** Invalidate the overflow page-list cache for all cursors opened
-** on the shared btree structure pBt.
-*/
+///<summary>
+/// Invalidate the overflow page-list cache for all cursors opened
+/// on the shared btree structure pBt.
+///</summary>
 static void invalidateAllOverflowCache(BtShared pBt){
 BtCursor p;
 Debug.Assert( sqlite3_mutex_held(pBt.mutex) );
@@ -509,19 +509,19 @@ invalidateOverflowCache(p);
 }
 }
 
-/*
-** This function is called before modifying the contents of a table
-** to invalidate any incrblob cursors that are open on the
-** row or one of the rows being modified.
-**
-** If argument isClearTable is true, then the entire contents of the
-** table is about to be deleted. In this case invalidate all incrblob
-** cursors open on any row within the table with root-page pgnoRoot.
-**
-** Otherwise, if argument isClearTable is false, then the row with
-** rowid iRow is being replaced or deleted. In this case invalidate
-** only those incrblob cursors open on that specific row.
-*/
+///<summary>
+/// This function is called before modifying the contents of a table
+/// to invalidate any incrblob cursors that are open on the
+/// row or one of the rows being modified.
+///
+/// If argument isClearTable is true, then the entire contents of the
+/// table is about to be deleted. In this case invalidate all incrblob
+/// cursors open on any row within the table with root-page pgnoRoot.
+///
+/// Otherwise, if argument isClearTable is false, then the row with
+/// rowid iRow is being replaced or deleted. In this case invalidate
+/// only those incrblob cursors open on that specific row.
+///</summary>
 static void invalidateIncrblobCursors(
 Btree pBtree,          /* The database file to check */
 i64 iRow,               /* The rowid that might be changing */
@@ -553,41 +553,41 @@ static void invalidateIncrblobCursors( Btree x, i64 y, int z )
 }
 #endif //* SQLITE_OMIT_INCRBLOB */
 
-/*
-** Set bit pgno of the BtShared.pHasContent bitvec. This is called
-** when a page that previously contained data becomes a free-list leaf
-** page.
-**
-** The BtShared.pHasContent bitvec exists to work around an obscure
-** bug caused by the interaction of two useful IO optimizations surrounding
-** free-list leaf pages:
-**
-**   1) When all data is deleted from a page and the page becomes
-**      a free-list leaf page, the page is not written to the database
-**      (as free-list leaf pages contain no meaningful data). Sometimes
-**      such a page is not even journalled (as it will not be modified,
-**      why bother journalling it?).
-**
-**   2) When a free-list leaf page is reused, its content is not read
-**      from the database or written to the journal file (why should it
-**      be, if it is not at all meaningful?).
-**
-** By themselves, these optimizations work fine and provide a handy
-** performance boost to bulk delete or insert operations. However, if
-** a page is moved to the free-list and then reused within the same
-** transaction, a problem comes up. If the page is not journalled when
-** it is moved to the free-list and it is also not journalled when it
-** is extracted from the free-list and reused, then the original data
-** may be lost. In the event of a rollback, it may not be possible
-** to restore the database to its original configuration.
-**
-** The solution is the BtShared.pHasContent bitvec. Whenever a page is
-** moved to become a free-list leaf page, the corresponding bit is
-** set in the bitvec. Whenever a leaf page is extracted from the free-list,
-** optimization 2 above is omitted if the corresponding bit is already
-** set in BtShared.pHasContent. The contents of the bitvec are cleared
-** at the end of every transaction.
-*/
+///<summary>
+/// Set bit pgno of the BtShared.pHasContent bitvec. This is called
+/// when a page that previously contained data becomes a free-list leaf
+/// page.
+///
+/// The BtShared.pHasContent bitvec exists to work around an obscure
+/// bug caused by the interaction of two useful IO optimizations surrounding
+/// free-list leaf pages:
+///
+///   1) When all data is deleted from a page and the page becomes
+///      a free-list leaf page, the page is not written to the database
+///      (as free-list leaf pages contain no meaningful data). Sometimes
+///      such a page is not even journalled (as it will not be modified,
+///      why bother journalling it?).
+///
+///   2) When a free-list leaf page is reused, its content is not read
+///      from the database or written to the journal file (why should it
+///      be, if it is not at all meaningful?).
+///
+/// By themselves, these optimizations work fine and provide a handy
+/// performance boost to bulk delete or insert operations. However, if
+/// a page is moved to the free-list and then reused within the same
+/// transaction, a problem comes up. If the page is not journalled when
+/// it is moved to the free-list and it is also not journalled when it
+/// is extracted from the free-list and reused, then the original data
+/// may be lost. In the event of a rollback, it may not be possible
+/// to restore the database to its original configuration.
+///
+/// The solution is the BtShared.pHasContent bitvec. Whenever a page is
+/// moved to become a free-list leaf page, the corresponding bit is
+/// set in the bitvec. Whenever a leaf page is extracted from the free-list,
+/// optimization 2 above is omitted if the corresponding bit is already
+/// set in BtShared.pHasContent. The contents of the bitvec are cleared
+/// at the end of every transaction.
+///</summary>
 static int btreeSetHasContent( BtShared pBt, Pgno pgno )
 {
   int rc = SQLITE_OK;
@@ -607,36 +607,36 @@ static int btreeSetHasContent( BtShared pBt, Pgno pgno )
   return rc;
 }
 
-/*
-** Query the BtShared.pHasContent vector.
-**
-** This function is called when a free-list leaf page is removed from the
-** free-list for reuse. It returns false if it is safe to retrieve the
-** page from the pager layer with the 'no-content' flag set. True otherwise.
-*/
+///<summary>
+/// Query the BtShared.pHasContent vector.
+///
+/// This function is called when a free-list leaf page is removed from the
+/// free-list for reuse. It returns false if it is safe to retrieve the
+/// page from the pager layer with the 'no-content' flag set. True otherwise.
+///</summary>
 static bool btreeGetHasContent( BtShared pBt, Pgno pgno )
 {
   Bitvec p = pBt.pHasContent;
   return ( p != null && ( pgno > sqlite3BitvecSize( p ) || sqlite3BitvecTest( p, pgno ) != 0 ) );
 }
 
-/*
-** Clear (destroy) the BtShared.pHasContent bitvec. This should be
-** invoked at the conclusion of each write-transaction.
-*/
+///<summary>
+/// Clear (destroy) the BtShared.pHasContent bitvec. This should be
+/// invoked at the conclusion of each write-transaction.
+///</summary>
 static void btreeClearHasContent( BtShared pBt )
 {
   sqlite3BitvecDestroy( ref pBt.pHasContent );
   pBt.pHasContent = null;
 }
 
-/*
-** Save the current cursor position in the variables BtCursor.nKey
-** and BtCursor.pKey. The cursor's state is set to CURSOR_REQUIRESEEK.
-**
-** The caller must ensure that the cursor is valid (has eState==CURSOR_VALID)
-** prior to calling this routine.
-*/
+///<summary>
+/// Save the current cursor position in the variables BtCursor.nKey
+/// and BtCursor.pKey. The cursor's state is set to CURSOR_REQUIRESEEK.
+///
+/// The caller must ensure that the cursor is valid (has eState==CURSOR_VALID)
+/// prior to calling this routine.
+///</summary>
 static int saveCursorPosition( BtCursor pCur )
 {
   int rc;
@@ -688,11 +688,11 @@ static int saveCursorPosition( BtCursor pCur )
   return rc;
 }
 
-/*
-** Save the positions of all cursors (except pExcept) that are open on
-** the table  with root-page iRoot. Usually, this is called just before cursor
-** pExcept is used to modify the table (BtreeDelete() or BtreeInsert()).
-*/
+///<summary>
+/// Save the positions of all cursors (except pExcept) that are open on
+/// the table  with root-page iRoot. Usually, this is called just before cursor
+/// pExcept is used to modify the table (BtreeDelete() or BtreeInsert()).
+///</summary>
 static int saveAllCursors( BtShared pBt, Pgno iRoot, BtCursor pExcept )
 {
   BtCursor p;
@@ -713,9 +713,9 @@ static int saveAllCursors( BtShared pBt, Pgno iRoot, BtCursor pExcept )
   return SQLITE_OK;
 }
 
-/*
-** Clear the current cursor position.
-*/
+///<summary>
+/// Clear the current cursor position.
+///</summary>
 static void sqlite3BtreeClearCursor( BtCursor pCur )
 {
   Debug.Assert( cursorHoldsMutex( pCur ) );
@@ -723,11 +723,11 @@ static void sqlite3BtreeClearCursor( BtCursor pCur )
   pCur.eState = CURSOR_INVALID;
 }
 
-/*
-** In this version of BtreeMoveto, pKey is a packed index record
-** such as is generated by the OP_MakeRecord opcode.  Unpack the
-** record and then call BtreeMovetoUnpacked() to do the work.
-*/
+///<summary>
+/// In this version of BtreeMoveto, pKey is a packed index record
+/// such as is generated by the OP_MakeRecord opcode.  Unpack the
+/// record and then call BtreeMovetoUnpacked() to do the work.
+///</summary>
 static int btreeMoveto(
 BtCursor pCur,     /* Cursor open on the btree to be searched */
 byte[] pKey,       /* Packed key if the btree is an index */
@@ -761,13 +761,13 @@ ref int pRes       /* Write search results here */
   return rc;
 }
 
-/*
-** Restore the cursor to the position it was in (or as close to as possible)
-** when saveCursorPosition() was called. Note that this call deletes the
-** saved position info stored by saveCursorPosition(), so there can be
-** at most one effective restoreCursorPosition() call after each
-** saveCursorPosition().
-*/
+///<summary>
+/// Restore the cursor to the position it was in (or as close to as possible)
+/// when saveCursorPosition() was called. Note that this call deletes the
+/// saved position info stored by saveCursorPosition(), so there can be
+/// at most one effective restoreCursorPosition() call after each
+/// saveCursorPosition().
+///</summary>
 static int btreeRestoreCursorPosition( BtCursor pCur )
 {
   int rc;
@@ -800,14 +800,14 @@ static int restoreCursorPosition( BtCursor pCur )
     return SQLITE_OK;
 }
 
-/*
-** Determine whether or not a cursor has moved from the position it
-** was last placed at.  Cursors can move when the row they are pointing
-** at is deleted out from under them.
-**
-** This routine returns an error code if something goes wrong.  The
-** integer pHasMoved is set to one if the cursor has moved and 0 if not.
-*/
+///<summary>
+/// Determine whether or not a cursor has moved from the position it
+/// was last placed at.  Cursors can move when the row they are pointing
+/// at is deleted out from under them.
+///
+/// This routine returns an error code if something goes wrong.  The
+/// integer pHasMoved is set to one if the cursor has moved and 0 if not.
+///</summary>
 static int sqlite3BtreeCursorHasMoved( BtCursor pCur, ref int pHasMoved )
 {
   int rc;
@@ -830,15 +830,15 @@ static int sqlite3BtreeCursorHasMoved( BtCursor pCur, ref int pHasMoved )
 }
 
 #if !SQLITE_OMIT_AUTOVACUUM
-/*
-** Given a page number of a regular database page, return the page
-** number for the pointer-map page that contains the entry for the
-** input page number.
-**
-** Return 0 (not a valid page) for pgno==1 since there is
-** no pointer map associated with page 1.  The integrity_check logic
-** requires that ptrmapPageno(*,1)!=1.
-*/
+///<summary>
+/// Given a page number of a regular database page, return the page
+/// number for the pointer-map page that contains the entry for the
+/// input page number.
+///
+/// Return 0 (not a valid page) for pgno==1 since there is
+/// no pointer map associated with page 1.  The integrity_check logic
+/// requires that ptrmapPageno(*,1)!=1.
+///</summary>
 static Pgno ptrmapPageno( BtShared pBt, Pgno pgno )
 {
   int nPagesPerMapPage;
@@ -856,16 +856,16 @@ static Pgno ptrmapPageno( BtShared pBt, Pgno pgno )
   return ret;
 }
 
-/*
-** Write an entry into the pointer map.
-**
-** This routine updates the pointer map entry for page number 'key'
-** so that it maps to type 'eType' and parent page number 'pgno'.
-**
-** If pRC is initially non-zero (non-SQLITE_OK) then this routine is
-** a no-op.  If an error occurs, the appropriate error code is written
-** into pRC.
-*/
+///<summary>
+/// Write an entry into the pointer map.
+///
+/// This routine updates the pointer map entry for page number 'key'
+/// so that it maps to type 'eType' and parent page number 'pgno'.
+///
+/// If pRC is initially non-zero (non-SQLITE_OK) then this routine is
+/// a no-op.  If an error occurs, the appropriate error code is written
+/// into pRC.
+///</summary>
 static void ptrmapPut( BtShared pBt, Pgno key, u8 eType, Pgno parent, ref int pRC )
 {
   PgHdr pDbPage = new PgHdr(); /* The pointer map page */
@@ -969,13 +969,13 @@ static int ptrmapGet( BtShared pBt, Pgno key, ref u8 pEType, ref Pgno pPgno )
 //#define ptrmapPutOvflPtr(x, y, rc)
 #endif
 
-/*
-** Given a btree page and a cell index (0 means the first cell on
-** the page, 1 means the second cell, and so forth) return a pointer
-** to the cell content.
-**
-** This routine works only for pages that do not contain overflow cells.
-*/
+///<summary>
+/// Given a btree page and a cell index (0 means the first cell on
+/// the page, 1 means the second cell, and so forth) return a pointer
+/// to the cell content.
+///
+/// This routine works only for pages that do not contain overflow cells.
+///</summary>
 //#define findCell(P,I) \
 //  ((P).aData + ((P).maskPage & get2byte((P).aData[(P).cellOffset+2*(I)])))
 static int findCell( MemPage pPage, int iCell )
@@ -1018,15 +1018,15 @@ static int findOverflowCell( MemPage pPage, int iCell )
   return findCell( pPage, iCell );
 }
 
-/*
-** Parse a cell content block and fill in the CellInfo structure.  There
-** are two versions of this function.  btreeParseCell() takes a
-** cell index as the second argument and btreeParseCellPtr()
-** takes a pointer to the body of the cell as its second argument.
-**
-** Within this file, the parseCell() macro can be called instead of
-** btreeParseCellPtr(). Using some compilers, this will be faster.
-*/
+///<summary>
+/// Parse a cell content block and fill in the CellInfo structure.  There
+/// are two versions of this function.  btreeParseCell() takes a
+/// cell index as the second argument and btreeParseCellPtr()
+/// takes a pointer to the body of the cell as its second argument.
+///
+/// Within this file, the parseCell() macro can be called instead of
+/// btreeParseCellPtr(). Using some compilers, this will be faster.
+///</summary>
 //OVERLOADS
 static void btreeParseCellPtr(
 MemPage pPage,        /* Page containing the cell */
@@ -1143,12 +1143,12 @@ ref CellInfo pInfo         /* Fill in this structure */
   parseCell( pPage, iCell, ref pInfo );
 }
 
-/*
-** Compute the total number of bytes that a Cell needs in the cell
-** data area of the btree-page.  The return number includes the cell
-** data header and the local payload, but not any overflow page or
-** the space used by the cell pointer.
-*/
+///<summary>
+/// Compute the total number of bytes that a Cell needs in the cell
+/// data area of the btree-page.  The return number includes the cell
+/// data header and the local payload, but not any overflow page or
+/// the space used by the cell pointer.
+///</summary>
 // Alternative form for C#
 static u16 cellSizePtr( MemPage pPage, int iCell )
 {
@@ -1253,11 +1253,11 @@ static int cellSize(MemPage pPage, int iCell) { return -1; }
 #endif
 
 #if !SQLITE_OMIT_AUTOVACUUM
-/*
-** If the cell pCell, part of page pPage contains a pointer
-** to an overflow page, insert an entry into the pointer-map
-** for the overflow page.
-*/
+///<summary>
+/// If the cell pCell, part of page pPage contains a pointer
+/// to an overflow page, insert an entry into the pointer-map
+/// for the overflow page.
+///</summary>
 static void ptrmapPutOvflPtr( MemPage pPage, int pCell, ref int pRC )
 {
   if ( pRC != 0 )
@@ -1290,12 +1290,12 @@ static void ptrmapPutOvflPtr( MemPage pPage, u8[] pCell, ref int pRC )
 #endif
 
 
-/*
-** Defragment the page given.  All Cells are moved to the
-** end of the page and all free space is collected into one
-** big FreeBlk that occurs in between the header and cell
-** pointer array and the cell content area.
-*/
+///<summary>
+/// Defragment the page given.  All Cells are moved to the
+/// end of the page and all free space is collected into one
+/// big FreeBlk that occurs in between the header and cell
+/// pointer array and the cell content area.
+///</summary>
 static int defragmentPage( MemPage pPage )
 {
   int i;                     /* Loop counter */
@@ -1381,19 +1381,19 @@ static int defragmentPage( MemPage pPage )
   return SQLITE_OK;
 }
 
-/*
-** Allocate nByte bytes of space from within the B-Tree page passed
-** as the first argument. Write into pIdx the index into pPage.aData[]
-** of the first byte of allocated space. Return either SQLITE_OK or
-** an error code (usually SQLITE_CORRUPT).
-**
-** The caller guarantees that there is sufficient space to make the
-** allocation.  This routine might need to defragment in order to bring
-** all the space together, however.  This routine will avoid using
-** the first two bytes past the cell pointer area since presumably this
-** allocation is being made in order to insert a new cell, so we will
-** also end up needing a new cell pointer.
-*/
+///<summary>
+/// Allocate nByte bytes of space from within the B-Tree page passed
+/// as the first argument. Write into pIdx the index into pPage.aData[]
+/// of the first byte of allocated space. Return either SQLITE_OK or
+/// an error code (usually SQLITE_CORRUPT).
+///
+/// The caller guarantees that there is sufficient space to make the
+/// allocation.  This routine might need to defragment in order to bring
+/// all the space together, however.  This routine will avoid using
+/// the first two bytes past the cell pointer area since presumably this
+/// allocation is being made in order to insert a new cell, so we will
+/// also end up needing a new cell pointer.
+///</summary>
 static int allocateSpace( MemPage pPage, int nByte, ref int pIdx )
 {
   int hdr = pPage.hdrOffset;  /* Local cache of pPage.hdrOffset */
@@ -1502,14 +1502,14 @@ static int allocateSpace( MemPage pPage, int nByte, ref int pIdx )
   return SQLITE_OK;
 }
 
-/*
-** Return a section of the pPage.aData to the freelist.
-** The first byte of the new free block is pPage.aDisk[start]
-** and the size of the block is "size" bytes.
-**
-** Most of the effort here is involved in coalesing adjacent
-** free blocks into a single big free block.
-*/
+///<summary>
+/// Return a section of the pPage.aData to the freelist.
+/// The first byte of the new free block is pPage.aDisk[start]
+/// and the size of the block is "size" bytes.
+///
+/// Most of the effort here is involved in coalesing adjacent
+/// free blocks into a single big free block.
+///</summary>
 static int freeSpace( MemPage pPage, u32 start, int size )
 {
   return freeSpace( pPage, (int)start, size );
@@ -1606,18 +1606,18 @@ static int freeSpace( MemPage pPage, int start, int size )
   return SQLITE_OK;
 }
 
-/*
-** Decode the flags byte (the first byte of the header) for a page
-** and initialize fields of the MemPage structure accordingly.
-**
-** Only the following combinations are supported.  Anything different
-** indicates a corrupt database files:
-**
-**         PTF_ZERODATA
-**         PTF_ZERODATA | PTF_LEAF
-**         PTF_LEAFDATA | PTF_INTKEY
-**         PTF_LEAFDATA | PTF_INTKEY | PTF_LEAF
-*/
+///<summary>
+/// Decode the flags byte (the first byte of the header) for a page
+/// and initialize fields of the MemPage structure accordingly.
+///
+/// Only the following combinations are supported.  Anything different
+/// indicates a corrupt database files:
+///
+///         PTF_ZERODATA
+///         PTF_ZERODATA | PTF_LEAF
+///         PTF_LEAFDATA | PTF_INTKEY
+///         PTF_LEAFDATA | PTF_INTKEY | PTF_LEAF
+///</summary>
 static int decodeFlags( MemPage pPage, int flagByte )
 {
   BtShared pBt;     /* A copy of pPage.pBt */
@@ -1650,15 +1650,15 @@ static int decodeFlags( MemPage pPage, int flagByte )
   return SQLITE_OK;
 }
 
-/*
-** Initialize the auxiliary information for a disk block.
-**
-** Return SQLITE_OK on success.  If we see that the page does
-** not contain a well-formed database page, then return
-** SQLITE_CORRUPT.  Note that a return of SQLITE_OK does not
-** guarantee that the page is well-formed.  It only shows that
-** we failed to detect any corruption.
-*/
+///<summary>
+/// Initialize the auxiliary information for a disk block.
+///
+/// Return SQLITE_OK on success.  If we see that the page does
+/// not contain a well-formed database page, then return
+/// SQLITE_CORRUPT.  Note that a return of SQLITE_OK does not
+/// guarantee that the page is well-formed.  It only shows that
+/// we failed to detect any corruption.
+///</summary>
 static int btreeInitPage( MemPage pPage )
 {
 
@@ -1778,10 +1778,10 @@ static int btreeInitPage( MemPage pPage )
   return SQLITE_OK;
 }
 
-/*
-** Set up a raw page so that it looks like a database page holding
-** no entries.
-*/
+///<summary>
+/// Set up a raw page so that it looks like a database page holding
+/// no entries.
+///</summary>
 static void zeroPage( MemPage pPage, int flags )
 {
   byte[] data = pPage.aData;
@@ -1816,10 +1816,10 @@ static void zeroPage( MemPage pPage, int flags )
 }
 
 
-/*
-** Convert a DbPage obtained from the pager into a MemPage used by
-** the btree layer.
-*/
+///<summary>
+/// Convert a DbPage obtained from the pager into a MemPage used by
+/// the btree layer.
+///</summary>
 static MemPage btreePageFromDbPage( DbPage pDbPage, Pgno pgno, BtShared pBt )
 {
   MemPage pPage = (MemPage)sqlite3PagerGetExtra( pDbPage );
@@ -1831,17 +1831,17 @@ static MemPage btreePageFromDbPage( DbPage pDbPage, Pgno pgno, BtShared pBt )
   return pPage;
 }
 
-/*
-** Get a page from the pager.  Initialize the MemPage.pBt and
-** MemPage.aData elements if needed.
-**
-** If the noContent flag is set, it means that we do not care about
-** the content of the page at this time.  So do not go to the disk
-** to fetch the content.  Just fill in the content with zeros for now.
-** If in the future we call sqlite3PagerWrite() on this page, that
-** means we have started to be concerned about content and the disk
-** read should occur at that point.
-*/
+///<summary>
+/// Get a page from the pager.  Initialize the MemPage.pBt and
+/// MemPage.aData elements if needed.
+///
+/// If the noContent flag is set, it means that we do not care about
+/// the content of the page at this time.  So do not go to the disk
+/// to fetch the content.  Just fill in the content with zeros for now.
+/// If in the future we call sqlite3PagerWrite() on this page, that
+/// means we have started to be concerned about content and the disk
+/// read should occur at that point.
+///</summary>
 static int btreeGetPage(
 BtShared pBt,        /* The btree */
 Pgno pgno,           /* Number of the page to fetch */
@@ -1860,11 +1860,11 @@ int noContent        /* Do not load page content if true */
   return SQLITE_OK;
 }
 
-/*
-** Retrieve a page from the pager cache. If the requested page is not
-** already in the pager cache return NULL. Initialize the MemPage.pBt and
-** MemPage.aData elements if needed.
-*/
+///<summary>
+/// Retrieve a page from the pager cache. If the requested page is not
+/// already in the pager cache return NULL. Initialize the MemPage.pBt and
+/// MemPage.aData elements if needed.
+///</summary>
 static MemPage btreePageLookup( BtShared pBt, Pgno pgno )
 {
   DbPage pDbPage;
@@ -1877,10 +1877,10 @@ static MemPage btreePageLookup( BtShared pBt, Pgno pgno )
   return null;
 }
 
-/*
-** Return the size of the database file in pages. If there is any kind of
-** error, return ((unsigned int)-1).
-*/
+///<summary>
+/// Return the size of the database file in pages. If there is any kind of
+/// error, return ((unsigned int)-1).
+///</summary>
 static Pgno btreePagecount( BtShared pBt )
 {
   return pBt.nPage;
@@ -1894,14 +1894,14 @@ static Pgno sqlite3BtreeLastPage( Btree p )
 
 
 
-/*
-** Get a page from the pager and initialize it.  This routine is just a
-** convenience wrapper around separate calls to btreeGetPage() and
-** btreeInitPage().
-**
-** If an error occurs, then the value ppPage is set to is undefined. It
-** may remain unchanged, or it may be set to an invalid value.
-*/
+///<summary>
+/// Get a page from the pager and initialize it.  This routine is just a
+/// convenience wrapper around separate calls to btreeGetPage() and
+/// btreeInitPage().
+///
+/// If an error occurs, then the value ppPage is set to is undefined. It
+/// may remain unchanged, or it may be set to an invalid value.
+///</summary>
 static int getAndInitPage(
 BtShared pBt,          /* The database file */
 Pgno pgno,             /* Number of the page to get */
@@ -1934,10 +1934,10 @@ ref MemPage ppPage     /* Write the page pointer here */
   return rc;
 }
 
-/*
-** Release a MemPage.  This should be called once for each prior
-** call to btreeGetPage.
-*/
+///<summary>
+/// Release a MemPage.  This should be called once for each prior
+/// call to btreeGetPage.
+///</summary>
 static void releasePage( MemPage pPage )
 {
   if ( pPage != null )
@@ -1952,14 +1952,14 @@ static void releasePage( MemPage pPage )
   }
 }
 
-/*
-** During a rollback, when the pager reloads information into the cache
-** so that the cache is restored to its original state at the start of
-** the transaction, for each page restored this routine is called.
-**
-** This routine needs to reset the extra data section at the end of the
-** page to agree with the restored data.
-*/
+///<summary>
+/// During a rollback, when the pager reloads information into the cache
+/// so that the cache is restored to its original state at the start of
+/// the transaction, for each page restored this routine is called.
+///
+/// This routine needs to reset the extra data section at the end of the
+/// page to agree with the restored data.
+///</summary>
 static void pageReinit( DbPage pData )
 {
   MemPage pPage;
@@ -1982,9 +1982,9 @@ static void pageReinit( DbPage pData )
   }
 }
 
-/*
-** Invoke the busy handler for a btree.
-*/
+///<summary>
+/// Invoke the busy handler for a btree.
+///</summary>
 static int btreeInvokeBusyHandler( object pArg )
 {
   BtShared pBt = (BtShared)pArg;

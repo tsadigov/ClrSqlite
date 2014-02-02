@@ -22,19 +22,22 @@ namespace Community.CsharpSqlite
         private static Community.CsharpSqlite.Sqlite3.SQLite3UpperToLower UpperToLower {
             get { return Sqlite3.UpperToLower; }
         }
-        /* Convenient short-hand */
+        ///<summary>
+///Convenient short-hand
+///</summary>
         //#define UpperToLower sqlite3UpperToLower
 
-        /*
-        ** Some systems have stricmp().  Others have strcasecmp().  Because
-        ** there is no consistency, we will define our own.
-        **
-        ** IMPLEMENTATION-OF: R-20522-24639 The sqlite3_strnicmp() API allows
-        ** applications and extensions to compare the contents of two buffers
-        ** containing UTF-8 strings in a case-independent fashion, using the same
-        ** definition of case independence that SQLite uses internally when
-        ** comparing identifiers.
-        */
+        ///<summary>
+/// Some systems have stricmp().  Others have strcasecmp().  Because
+/// there is no consistency, we will define our own.
+///
+/// IMPLEMENTATION-OF: R-20522-24639 The sqlite3_strnicmp() API allows
+/// applications and extensions to compare the contents of two buffers
+/// containing UTF-8 strings in a case-independent fashion, using the same
+/// definition of case independence that SQLite uses internally when
+/// comparing identifiers.
+///
+///</summary>
 
         public static int sqlite3StrNICmp(string zLeft, int offsetLeft, string zRight, int N)
         {
@@ -74,23 +77,24 @@ namespace Community.CsharpSqlite
 
 
 
-        /*
-        ** Convert an SQL-style quoted string into a normal string by removing
-        ** the quote characters.  The conversion is done in-place.  If the
-        ** input does not begin with a quote character, then this routine
-        ** is a no-op.
-        **
-        ** The input string must be zero-terminated.  A new zero-terminator
-        ** is added to the dequoted string.
-        **
-        ** The return value is -1 if no dequoting occurs or the length of the
-        ** dequoted string, exclusive of the zero terminator, if dequoting does
-        ** occur.
-        **
-        ** 2002-Feb-14: This routine is extended to remove MS-Access style
-        ** brackets from around identifers.  For example:  "[a-b-c]" becomes
-        ** "a-b-c".
-        */
+        ///<summary>
+/// Convert an SQL-style quoted string into a normal string by removing
+/// the quote characters.  The conversion is done in-place.  If the
+/// input does not begin with a quote character, then this routine
+/// is a no-op.
+///
+/// The input string must be zero-terminated.  A new zero-terminator
+/// is added to the dequoted string.
+///
+/// The return value is -1 if no dequoting occurs or the length of the
+/// dequoted string, exclusive of the zero terminator, if dequoting does
+/// occur.
+///
+/// 2002-Feb-14: This routine is extended to remove MS-Access style
+/// brackets from around identifers.  For example:  "[a-b-c]" becomes
+/// "a-b-c".
+///
+///</summary>
         public static int sqlite3Dequote(ref string z)
         {
             char quote;
@@ -137,14 +141,15 @@ namespace Community.CsharpSqlite
         }
 
 
-        /*
-    ** Compute a string length that is limited to what can be stored in
-    ** lower 30 bits of a 32-bit signed integer.
-    **
-    ** The value returned will never be negative.  Nor will it ever be greater
-    ** than the actual length of the string.  For very long strings (greater
-    ** than 1GiB) the value returned might be less than the true string length.
-    */
+        ///<summary>
+/// Compute a string length that is limited to what can be stored in
+/// lower 30 bits of a 32-bit signed integer.
+///
+/// The value returned will never be negative.  Nor will it ever be greater
+/// than the actual length of the string.  For very long strings (greater
+/// than 1GiB) the value returned might be less than the true string length.
+///
+///</summary>
         public static int sqlite3Strlen30(int z)
         {
             return 0x3fffffff & z;
@@ -274,27 +279,28 @@ dummy += (uint)x;
 
 
 
-    /*
-    ** Set the most recent error code and error string for the sqlite
-    ** handle "db". The error code is set to "err_code".
-    **
-    ** If it is not NULL, string zFormat specifies the format of the
-    ** error string in the style of the printf functions: The following
-    ** format characters are allowed:
-    **
-    **      %s      Insert a string
-    **      %z      A string that should be freed after use
-    **      %d      Insert an integer
-    **      %T      Insert a token
-    **      %S      Insert the first element of a SrcList
-    **
-    ** zFormat and any string tokens that follow it are assumed to be
-    ** encoded in UTF-8.
-    **
-    ** To clear the most recent error for sqlite handle "db", sqlite3Error
-    ** should be called with err_code set to SQLITE_OK and zFormat set
-    ** to NULL.
-    */
+    ///<summary>
+/// Set the most recent error code and error string for the sqlite
+/// handle "db". The error code is set to "err_code".
+///
+/// If it is not NULL, string zFormat specifies the format of the
+/// error string in the style of the printf functions: The following
+/// format characters are allowed:
+///
+///      %s      Insert a string
+///      %z      A string that should be freed after use
+///      %d      Insert an integer
+///      %T      Insert a token
+///      %S      Insert the first element of a SrcList
+///
+/// zFormat and any string tokens that follow it are assumed to be
+/// encoded in UTF-8.
+///
+/// To clear the most recent error for sqlite handle "db", sqlite3Error
+/// should be called with err_code set to SQLITE_OK and zFormat set
+/// to NULL.
+///
+///</summary>
     //Overloads
     static void sqlite3Error( sqlite3 db, int err_code, int noString )
     {
@@ -324,23 +330,24 @@ dummy += (uint)x;
       }
     }
 
-    /*
-    ** Add an error message to pParse.zErrMsg and increment pParse.nErr.
-    ** The following formatting characters are allowed:
-    **
-    **      %s      Insert a string
-    **      %z      A string that should be freed after use
-    **      %d      Insert an integer
-    **      %T      Insert a token
-    **      %S      Insert the first element of a SrcList
-    **
-    ** This function should be used to report any error that occurs whilst
-    ** compiling an SQL statement (i.e. within sqlite3_prepare()). The
-    ** last thing the sqlite3_prepare() function does is copy the error
-    ** stored by this function into the database handle using sqlite3Error().
-    ** Function sqlite3Error() should be used during statement execution
-    ** (sqlite3_step() etc.).
-    */
+    ///<summary>
+/// Add an error message to pParse.zErrMsg and increment pParse.nErr.
+/// The following formatting characters are allowed:
+///
+///      %s      Insert a string
+///      %z      A string that should be freed after use
+///      %d      Insert an integer
+///      %T      Insert a token
+///      %S      Insert the first element of a SrcList
+///
+/// This function should be used to report any error that occurs whilst
+/// compiling an SQL statement (i.e. within sqlite3_prepare()). The
+/// last thing the sqlite3_prepare() function does is copy the error
+/// stored by this function into the database handle using sqlite3Error().
+/// Function sqlite3Error() should be used during statement execution
+/// (sqlite3_step() etc.).
+///
+///</summary>
     static void sqlite3ErrorMsg( Parse pParse, string zFormat, params object[] ap )
     {
       string zMsg;
@@ -402,35 +409,37 @@ dummy += (uint)x;
     }
 
 
-    /*
-    ** The variable-length integer encoding is as follows:
-    **
-    ** KEY:
-    **         A = 0xxxxxxx    7 bits of data and one flag bit
-    **         B = 1xxxxxxx    7 bits of data and one flag bit
-    **         C = xxxxxxxx    8 bits of data
-    **
-    **  7 bits - A
-    ** 14 bits - BA
-    ** 21 bits - BBA
-    ** 28 bits - BBBA
-    ** 35 bits - BBBBA
-    ** 42 bits - BBBBBA
-    ** 49 bits - BBBBBBA
-    ** 56 bits - BBBBBBBA
-    ** 64 bits - BBBBBBBBC
-    */
+    ///<summary>
+/// The variable-length integer encoding is as follows:
+///
+/// KEY:
+///         A = 0xxxxxxx    7 bits of data and one flag bit
+///         B = 1xxxxxxx    7 bits of data and one flag bit
+///         C = xxxxxxxx    8 bits of data
+///
+///  7 bits - A
+/// 14 bits - BA
+/// 21 bits - BBA
+/// 28 bits - BBBA
+/// 35 bits - BBBBA
+/// 42 bits - BBBBBA
+/// 49 bits - BBBBBBA
+/// 56 bits - BBBBBBBA
+/// 64 bits - BBBBBBBBC
+///
+///</summary>
 
-    /*
-    ** Write a 64-bit variable-length integer to memory starting at p[0].
-    ** The length of data write will be between 1 and 9 bytes.  The number
-    ** of bytes written is returned.
-    **
-    ** A variable-length integer consists of the lower 7 bits of each byte
-    ** for all bytes that have the 8th bit set and one byte with the 8th
-    ** bit clear.  Except, if we get to the 9th byte, it stores the full
-    ** 8 bits and is the last byte.
-    */
+    ///<summary>
+/// Write a 64-bit variable-length integer to memory starting at p[0].
+/// The length of data write will be between 1 and 9 bytes.  The number
+/// of bytes written is returned.
+///
+/// A variable-length integer consists of the lower 7 bits of each byte
+/// for all bytes that have the 8th bit set and one byte with the 8th
+/// bit clear.  Except, if we get to the 9th byte, it stores the full
+/// 8 bits and is the last byte.
+///
+///</summary>
     static int getVarint( byte[] p, out u32 v )
     {
       v = p[0];
@@ -586,11 +595,12 @@ dummy += (uint)x;
       return n;
     }
 
-    /*
-    ** This routine is a faster version of sqlite3PutVarint() that only
-    ** works for 32-bit positive integers and which is optimized for
-    ** the common case of small integers.
-    */
+    ///<summary>
+/// This routine is a faster version of sqlite3PutVarint() that only
+/// works for 32-bit positive integers and which is optimized for
+/// the common case of small integers.
+///
+///</summary>
     static int putVarint32( byte[] p, int offset, int v )
     {
 #if !putVarint32
@@ -628,22 +638,24 @@ dummy += (uint)x;
       }
     }
 
-    /*
-    ** Bitmasks used by sqlite3GetVarint().  These precomputed constants
-    ** are defined here rather than simply putting the constant expressions
-    ** inline in order to work around bugs in the RVT compiler.
-    **
-    ** SLOT_2_0     A mask for  (0x7f<<14) | 0x7f
-    **
-    ** SLOT_4_2_0   A mask for  (0x7f<<28) | SLOT_2_0
-    */
+    ///<summary>
+/// Bitmasks used by sqlite3GetVarint().  These precomputed constants
+/// are defined here rather than simply putting the constant expressions
+/// inline in order to work around bugs in the RVT compiler.
+///
+/// SLOT_2_0     A mask for  (0x7f<<14) | 0x7f
+///
+/// SLOT_4_2_0   A mask for  (0x7f<<28) | SLOT_2_0
+///
+///</summary>
     const int SLOT_2_0 = 0x001fc07f;    //#define SLOT_2_0     0x001fc07f
     const u32 SLOT_4_2_0 = (u32)0xf01fc07f;  //#define SLOT_4_2_0   0xf01fc07f
 
-    /*
-    ** Read a 64-bit variable-length integer from memory starting at p[0].
-    ** Return the number of bytes read.  The value is stored in *v.
-    */
+    ///<summary>
+/// Read a 64-bit variable-length integer from memory starting at p[0].
+/// Return the number of bytes read.  The value is stored in *v.
+///
+///</summary>
     static u8 sqlite3GetVarint( byte[] p, int offset, out u64 v )
     {
       u32 a, b, s;
@@ -804,17 +816,18 @@ dummy += (uint)x;
     }
 
 
-    /*
-    ** Read a 32-bit variable-length integer from memory starting at p[0].
-    ** Return the number of bytes read.  The value is stored in *v.
-    **
-    ** If the varint stored in p[0] is larger than can fit in a 32-bit unsigned
-    ** integer, then set *v to 0xffffffff.
-    **
-    ** A MACRO version, getVarint32, is provided which inlines the
-    ** single-byte case.  All code should use the MACRO version as
-    ** this function assumes the single-byte case has already been handled.
-    */
+    ///<summary>
+/// Read a 32-bit variable-length integer from memory starting at p[0].
+/// Return the number of bytes read.  The value is stored in *v.
+///
+/// If the varint stored in p[0] is larger than can fit in a 32-bit unsigned
+/// integer, then set *v to 0xffffffff.
+///
+/// A MACRO version, getVarint32, is provided which inlines the
+/// single-byte case.  All code should use the MACRO version as
+/// this function assumes the single-byte case has already been handled.
+///
+///</summary>
     static u8 sqlite3GetVarint32( byte[] p, out int v )
     {
       u32 u32_v = 0;
@@ -956,10 +969,11 @@ return n;
     }
 
 
-    /*
-    ** Return the number of bytes that will be needed to store the given
-    ** 64-bit integer.
-    */
+    ///<summary>
+/// Return the number of bytes that will be needed to store the given
+/// 64-bit integer.
+///
+///</summary>
     static int sqlite3VarintLen( u64 v )
     {
       int i = 0;
@@ -973,11 +987,11 @@ return n;
 
 
 
-    /*
-** Log an error that is an API call on a connection pointer that should
-** not have been used.  The "type" of connection pointer is given as the
-** argument.  The zType is a word like "NULL" or "closed" or "invalid".
-*/
+    ///<summary>
+/// Log an error that is an API call on a connection pointer that should
+/// not have been used.  The "type" of connection pointer is given as the
+/// argument.  The zType is a word like "NULL" or "closed" or "invalid".
+///</summary>
     static void logBadConnection( string zType )
     {
       sqlite3_log( SQLITE_MISUSE,
@@ -986,20 +1000,21 @@ return n;
       );
     }
 
-    /*
-    ** Check to make sure we have a valid db pointer.  This test is not
-    ** foolproof but it does provide some measure of protection against
-    ** misuse of the interface such as passing in db pointers that are
-    ** NULL or which have been previously closed.  If this routine returns
-    ** 1 it means that the db pointer is valid and 0 if it should not be
-    ** dereferenced for any reason.  The calling function should invoke
-    ** SQLITE_MISUSE immediately.
-    **
-    ** sqlite3SafetyCheckOk() requires that the db pointer be valid for
-    ** use.  sqlite3SafetyCheckSickOrOk() allows a db pointer that failed to
-    ** open properly and is not fit for general use but which can be
-    ** used as an argument to sqlite3_errmsg() or sqlite3_close().
-    */
+    ///<summary>
+/// Check to make sure we have a valid db pointer.  This test is not
+/// foolproof but it does provide some measure of protection against
+/// misuse of the interface such as passing in db pointers that are
+/// NULL or which have been previously closed.  If this routine returns
+/// 1 it means that the db pointer is valid and 0 if it should not be
+/// dereferenced for any reason.  The calling function should invoke
+/// SQLITE_MISUSE immediately.
+///
+/// sqlite3SafetyCheckOk() requires that the db pointer be valid for
+/// use.  sqlite3SafetyCheckSickOrOk() allows a db pointer that failed to
+/// open properly and is not fit for general use but which can be
+/// used as an argument to sqlite3_errmsg() or sqlite3_close().
+///
+///</summary>
     static bool sqlite3SafetyCheckOk( sqlite3 db )
     {
       u32 magic;
@@ -1041,12 +1056,13 @@ return n;
       }
     }
 
-    /*
-    ** Attempt to add, substract, or multiply the 64-bit signed value iB against
-    ** the other 64-bit signed integer at *pA and store the result in *pA.
-    ** Return 0 on success.  Or if the operation would have resulted in an
-    ** overflow, leave *pA unchanged and return 1.
-    */
+    ///<summary>
+/// Attempt to add, substract, or multiply the 64-bit signed value iB against
+/// the other 64-bit signed integer at *pA and store the result in *pA.
+/// Return 0 on success.  Or if the operation would have resulted in an
+/// overflow, leave *pA unchanged and return 1.
+///
+///</summary>
     static int sqlite3AddInt64( ref i64 pA, i64 iB )
     {
       i64 iA = pA;
@@ -1168,14 +1184,15 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 
 
 
-    /*
-    ** If zNum represents an integer that will fit in 32-bits, then set
-    ** pValue to that integer and return true.  Otherwise return false.
-    **
-    ** Any non-numeric characters that following zNum are ignored.
-    ** This is different from sqlite3Atoi64() which requires the
-    ** input number to be zero-terminated.
-    */
+    ///<summary>
+/// If zNum represents an integer that will fit in 32-bits, then set
+/// pValue to that integer and return true.  Otherwise return false.
+///
+/// Any non-numeric characters that following zNum are ignored.
+/// This is different from sqlite3Atoi64() which requires the
+/// input number to be zero-terminated.
+///
+///</summary>
     public static bool sqlite3GetInt32(string zNum, ref int pValue)
     {
         return sqlite3GetInt32(zNum, 0, ref pValue);
@@ -1224,10 +1241,11 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
         return true;
     }
 
-    /*
-    ** Return a 32-bit integer value extracted from a string.  If the
-    ** string is not an integer, just return 0.
-    */
+    ///<summary>
+/// Return a 32-bit integer value extracted from a string.  If the
+/// string is not an integer, just return 0.
+///
+///</summary>
     public static int sqlite3Atoi(string z)
     {
         int x = 0;
@@ -1236,9 +1254,10 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
         return x;
     }
 
-    /*
-    ** Read or write a four-byte big-endian integer value.
-    */
+    ///<summary>
+/// Read or write a four-byte big-endian integer value.
+///
+///</summary>
     public static u32 sqlite3Get4byte(u8[] p, int p_offset, int offset)
     {
         offset += p_offset;
@@ -1295,28 +1314,29 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 
 
 
-    /*
-    ** The string z[] is an text representation of a real number.
-    ** Convert this string to a double and write it into *pResult.
-    **
-    ** The string z[] is length bytes in length (bytes, not characters) and
-    ** uses the encoding enc.  The string is not necessarily zero-terminated.
-    **
-    ** Return TRUE if the result is a valid real number (or integer) and FALSE
-    ** if the string is empty or contains extraneous text.  Valid numbers
-    ** are in one of these formats:
-    **
-    **    [+-]digits[E[+-]digits]
-    **    [+-]digits.[digits][E[+-]digits]
-    **    [+-].digits[E[+-]digits]
-    **
-    ** Leading and trailing whitespace is ignored for the purpose of determining
-    ** validity.
-    **
-    ** If some prefix of the input string is a valid number, this routine
-    ** returns FALSE but it still converts the prefix and writes the result
-    ** into *pResult.
-    */
+    ///<summary>
+/// The string z[] is an text representation of a real number.
+/// Convert this string to a double and write it into *pResult.
+///
+/// The string z[] is length bytes in length (bytes, not characters) and
+/// uses the encoding enc.  The string is not necessarily zero-terminated.
+///
+/// Return TRUE if the result is a valid real number (or integer) and FALSE
+/// if the string is empty or contains extraneous text.  Valid numbers
+/// are in one of these formats:
+///
+///    [+-]digits[E[+-]digits]
+///    [+-]digits.[digits][E[+-]digits]
+///    [+-].digits[E[+-]digits]
+///
+/// Leading and trailing whitespace is ignored for the purpose of determining
+/// validity.
+///
+/// If some prefix of the input string is a valid number, this routine
+/// returns FALSE but it still converts the prefix and writes the result
+/// into *pResult.
+///
+///</summary>
     public static bool sqlite3AtoF( string z, ref double pResult, int length, SqliteEncoding enc )
     {
 #if !SQLITE_OMIT_FLOATING_POINT
@@ -1552,23 +1572,24 @@ return !sqlite3Atoi64(z, pResult, length, enc);
 
 
 
-    /*
-    ** Convert zNum to a 64-bit signed integer.
-    **
-    ** If the zNum value is representable as a 64-bit twos-complement 
-    ** integer, then write that value into *pNum and return 0.
-    **
-    ** If zNum is exactly 9223372036854665808, return 2.  This special
-    ** case is broken out because while 9223372036854665808 cannot be a 
-    ** signed 64-bit integer, its negative -9223372036854665808 can be.
-    **
-    ** If zNum is too big for a 64-bit integer and is not
-    ** 9223372036854665808 then return 1.
-    **
-    ** length is the number of bytes in the string (bytes, not characters).
-    ** The string is not necessarily zero-terminated.  The encoding is
-    ** given by enc.
-    */
+    ///<summary>
+/// Convert zNum to a 64-bit signed integer.
+///
+/// If the zNum value is representable as a 64-bit twos-complement
+/// integer, then write that value into *pNum and return 0.
+///
+/// If zNum is exactly 9223372036854665808, return 2.  This special
+/// case is broken out because while 9223372036854665808 cannot be a
+/// signed 64-bit integer, its negative -9223372036854665808 can be.
+///
+/// If zNum is too big for a 64-bit integer and is not
+/// 9223372036854665808 then return 1.
+///
+/// length is the number of bytes in the string (bytes, not characters).
+/// The string is not necessarily zero-terminated.  The encoding is
+/// given by enc.
+///
+///</summary>
     public static int sqlite3Atoi64(string zNum, ref i64 pNum, int length, SqliteEncoding enc)
     {
       if ( zNum == null )
@@ -1666,11 +1687,11 @@ return !sqlite3Atoi64(z, pResult, length, enc);
 
 
 
-/*
-** Translate a single byte of Hex into an integer.
-** This routine only works if h really is a valid hexadecimal
-** character:  0..9a..fA..F
-*/
+///<summary>
+/// Translate a single byte of Hex into an integer.
+/// This routine only works if h really is a valid hexadecimal
+/// character:  0..9a..fA..F
+///</summary>
     public static int sqlite3HexToInt(int h)
     {
       Debug.Assert( ( h >= '0' && h <= '9' ) || ( h >= 'a' && h <= 'f' ) || ( h >= 'A' && h <= 'F' ) );
@@ -1686,12 +1707,12 @@ return !sqlite3Atoi64(z, pResult, length, enc);
 
 
 #if !SQLITE_OMIT_BLOB_LITERAL || SQLITE_HAS_CODEC
-    /*
-** Convert a BLOB literal of the form "x'hhhhhh'" into its binary
-** value.  Return a pointer to its binary value.  Space to hold the
-** binary value has been obtained from malloc and must be freed by
-** the calling routine.
-*/
+    ///<summary>
+/// Convert a BLOB literal of the form "x'hhhhhh'" into its binary
+/// value.  Return a pointer to its binary value.  Space to hold the
+/// binary value has been obtained from malloc and must be freed by
+/// the calling routine.
+///</summary>
     public static byte[] sqlite3HexToBlob(Sqlite3.sqlite3 db, string z, int n)
     {
       StringBuilder zBlob;

@@ -13,58 +13,59 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-    /*
-    ** 2003 October 31
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains the C functions that implement date and time
-    ** functions for SQLite.
-    **
-    ** There is only one exported symbol in this file - the function
-    ** sqlite3RegisterDateTimeFunctions() found at the bottom of the file.
-    ** All other code has file scope.
-    **
-    ** SQLite processes all times and dates as Julian Day numbers.  The
-    ** dates and times are stored as the number of days since noon
-    ** in Greenwich on November 24, 4714 B.C. according to the Gregorian
-    ** calendar system.
-    **
-    ** 1970-01-01 00:00:00 is JD 2440587.5
-    ** 2000-01-01 00:00:00 is JD 2451544.5
-    **
-    ** This implemention requires years to be expressed as a 4-digit number
-    ** which means that only dates between 0000-01-01 and 9999-12-31 can
-    ** be represented, even though julian day numbers allow a much wider
-    ** range of dates.
-    **
-    ** The Gregorian calendar system is used for all dates and times,
-    ** even those that predate the Gregorian calendar.  Historians usually
-    ** use the Julian calendar for dates prior to 1582-10-15 and for some
-    ** dates afterwards, depending on locale.  Beware of this difference.
-    **
-    ** The conversion algorithms are implemented based on descriptions
-    ** in the following text:
-    **
-    **      Jean Meeus
-    **      Astronomical Algorithms, 2nd Edition, 1998
-    **      ISBM 0-943396-61-1
-    **      Willmann-Bell, Inc
-    **      Richmond, Virginia (USA)
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2003 October 31
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains the C functions that implement date and time
+/// functions for SQLite.
+///
+/// There is only one exported symbol in this file - the function
+/// sqlite3RegisterDateTimeFunctions() found at the bottom of the file.
+/// All other code has file scope.
+///
+/// SQLite processes all times and dates as Julian Day numbers.  The
+/// dates and times are stored as the number of days since noon
+/// in Greenwich on November 24, 4714 B.C. according to the Gregorian
+/// calendar system.
+///
+/// 1970-01-01 00:00:00 is JD 2440587.5
+/// 2000-01-01 00:00:00 is JD 2451544.5
+///
+/// This implemention requires years to be expressed as a 4-digit number
+/// which means that only dates between 0000-01-01 and 9999-12-31 can
+/// be represented, even though julian day numbers allow a much wider
+/// range of dates.
+///
+/// The Gregorian calendar system is used for all dates and times,
+/// even those that predate the Gregorian calendar.  Historians usually
+/// use the Julian calendar for dates prior to 1582-10-15 and for some
+/// dates afterwards, depending on locale.  Beware of this difference.
+///
+/// The conversion algorithms are implemented based on descriptions
+/// in the following text:
+///
+///      Jean Meeus
+///      Astronomical Algorithms, 2nd Edition, 1998
+///      ISBM 0-943396-61-1
+///      Willmann-Bell, Inc
+///      Richmond, Virginia (USA)
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
     //#include <stdlib.h>
     //#include <assert.h>
@@ -87,7 +88,9 @@ namespace Community.CsharpSqlite
       public double s;          /* Seconds */
       public byte validYMD;     /* True (1) if Y,M,D are valid */
       public byte validHMS;     /* True (1) if h,m,s are valid */
-      public byte validJD;      /* True (1) if iJD is valid */
+      public byte validJD;      ///<summary>
+///True (1) if iJD is valid
+///</summary>
       public byte validTZ;      /* True (1) if tz is valid */
 
       public void CopyTo( DateTime ct )
@@ -112,19 +115,20 @@ namespace Community.CsharpSqlite
     static StringBuilder zdtTemp = new StringBuilder( 100 );
     static StringBuilder zdtBuf = new StringBuilder( 100 );
 
-    /*
-    ** Convert zDate into one or more integers.  Additional arguments
-    ** come in groups of 5 as follows:
-    **
-    **       N       number of digits in the integer
-    **       min     minimum allowed value of the integer
-    **       max     maximum allowed value of the integer
-    **       nextC   first character after the integer
-    **       pVal    where to write the integers value.
-    **
-    ** Conversions continue until one with nextC==0 is encountered.
-    ** The function returns the number of successful conversions.
-    */
+    ///<summary>
+/// Convert zDate into one or more integers.  Additional arguments
+/// come in groups of 5 as follows:
+///
+///       N       number of digits in the integer
+///       min     minimum allowed value of the integer
+///       max     maximum allowed value of the integer
+///       nextC   first character after the integer
+///       pVal    where to write the integers value.
+///
+/// Conversions continue until one with nextC==0 is encountered.
+/// The function returns the number of successful conversions.
+///
+///</summary>
     static int getDigits( string zDate, int N0, int min0, int max0, char nextC0, ref int pVal0, int N1, int min1, int max1, char nextC1, ref int pVal1 )
     {
       int c0 = getDigits( zDate + '\0', N0, min0, max0, nextC0, ref pVal0 );
@@ -183,23 +187,24 @@ end_getDigits:
       return cnt;
     }
 
-    /*
-    ** Parse a timezone extension on the end of a date-time.
-    ** The extension is of the form:
-    **
-    **        (+/-)HH:MM
-    **
-    **
-    ** Or the "zulu" notation:
-    **
-    **        Z
-    **
-    ** If the parse is successful, write the number of minutes
-    ** of change in p.tz and return 0.  If a parser error occurs,
-    ** return non-zero.
-    **
-    ** A missing specifier is not considered an error.
-    */
+    ///<summary>
+/// Parse a timezone extension on the end of a date-time.
+/// The extension is of the form:
+///
+///        (+/-)HH:MM
+///
+///
+/// Or the "zulu" notation:
+///
+///        Z
+///
+/// If the parse is successful, write the number of minutes
+/// of change in p.tz and return 0.  If a parser error occurs,
+/// return non-zero.
+///
+/// A missing specifier is not considered an error.
+///
+///</summary>
     static int parseTimezone( string zDate, DateTime p )
     {
       int sgn = 0;
@@ -241,13 +246,14 @@ zulu_time:
       return zDate != "" ? 1 : 0;
     }
 
-    /*
-    ** Parse times of the form HH:MM or HH:MM:SS or HH:MM:SS.FFFF.
-    ** The HH, MM, and SS must each be exactly 2 digits.  The
-    ** fractional seconds FFFF can be one or more digits.
-    **
-    ** Return 1 if there is a parsing error and 0 on success.
-    */
+    ///<summary>
+/// Parse times of the form HH:MM or HH:MM:SS or HH:MM:SS.FFFF.
+/// The HH, MM, and SS must each be exactly 2 digits.  The
+/// fractional seconds FFFF can be one or more digits.
+///
+/// Return 1 if there is a parsing error and 0 on success.
+///
+///</summary>
     static int parseHhMmSs( string zDate, DateTime p )
     {
       int h = 0;
@@ -296,12 +302,13 @@ zulu_time:
       return 0;
     }
 
-    /*
-    ** Convert from YYYY-MM-DD HH:MM:SS to julian day.  We always assume
-    ** that the YYYY-MM-DD is according to the Gregorian calendar.
-    **
-    ** Reference:  Meeus page 61
-    */
+    ///<summary>
+/// Convert from YYYY-MM-DD HH:MM:SS to julian day.  We always assume
+/// that the YYYY-MM-DD is according to the Gregorian calendar.
+///
+/// Reference:  Meeus page 61
+///
+///</summary>
     static void computeJD( DateTime p )
     {
       int Y, M, D, A, B, X1, X2;
@@ -344,18 +351,19 @@ zulu_time:
       }
     }
 
-    /*
-    ** Parse dates of the form
-    **
-    **     YYYY-MM-DD HH:MM:SS.FFF
-    **     YYYY-MM-DD HH:MM:SS
-    **     YYYY-MM-DD HH:MM
-    **     YYYY-MM-DD
-    **
-    ** Write the result into the DateTime structure and return 0
-    ** on success and 1 if the input string is not a well-formed
-    ** date.
-    */
+    ///<summary>
+/// Parse dates of the form
+///
+///     YYYY-MM-DD HH:MM:SS.FFF
+///     YYYY-MM-DD HH:MM:SS
+///     YYYY-MM-DD HH:MM
+///     YYYY-MM-DD
+///
+/// Write the result into the DateTime structure and return 0
+/// on success and 1 if the input string is not a well-formed
+/// date.
+///
+///</summary>
     static int parseYyyyMmDd( string zDate, DateTime p )
     {
       int Y = 0;
@@ -406,9 +414,10 @@ zulu_time:
       return 0;
     }
 
-    /*
-    ** Set the time to the current time reported by the VFS
-    */
+    ///<summary>
+/// Set the time to the current time reported by the VFS
+///
+///</summary>
     static void setDateTimeToCurrent( sqlite3_context context, DateTime p )
     {
       sqlite3 db = sqlite3_context_db_handle( context );
@@ -416,22 +425,23 @@ zulu_time:
       p.validJD = 1;
     }
 
-    /*
-    ** Attempt to parse the given string into a Julian Day Number.  Return
-    ** the number of errors.
-    **
-    ** The following are acceptable forms for the input string:
-    **
-    **      YYYY-MM-DD HH:MM:SS.FFF  +/-HH:MM
-    **      DDDD.DD
-    **      now
-    **
-    ** In the first form, the +/-HH:MM is always optional.  The fractional
-    ** seconds extension (the ".FFF") is optional.  The seconds portion
-    ** (":SS.FFF") is option.  The year and date can be omitted as long
-    ** as there is a time string.  The time string can be omitted as long
-    ** as there is a year and date.
-    */
+    ///<summary>
+/// Attempt to parse the given string into a Julian Day Number.  Return
+/// the number of errors.
+///
+/// The following are acceptable forms for the input string:
+///
+///      YYYY-MM-DD HH:MM:SS.FFF  +/-HH:MM
+///      DDDD.DD
+///      now
+///
+/// In the first form, the +/-HH:MM is always optional.  The fractional
+/// seconds extension (the ".FFF") is optional.  The seconds portion
+/// (":SS.FFF") is option.  The year and date can be omitted as long
+/// as there is a time string.  The time string can be omitted as long
+/// as there is a year and date.
+///
+///</summary>
     static int parseDateOrTime(
     sqlite3_context context,
     string zDate,
@@ -461,9 +471,10 @@ zulu_time:
       return 1;
     }
 
-    /*
-    ** Compute the Year, Month, and Day from the julian day number.
-    */
+    ///<summary>
+/// Compute the Year, Month, and Day from the julian day number.
+///
+///</summary>
     static void computeYMD( DateTime p )
     {
       int Z, A, B, C, D, E, X1;
@@ -492,9 +503,10 @@ zulu_time:
       p.validYMD = 1;
     }
 
-    /*
-    ** Compute the Hour, Minute, and Seconds from the julian day number.
-    */
+    ///<summary>
+/// Compute the Hour, Minute, and Seconds from the julian day number.
+///
+///</summary>
     static void computeHMS( DateTime p )
     {
       int s;
@@ -512,9 +524,10 @@ zulu_time:
       p.validHMS = 1;
     }
 
-    /*
-    ** Compute both YMD and HMS
-    */
+    ///<summary>
+/// Compute both YMD and HMS
+///
+///</summary>
     static void computeYMD_HMS( DateTime p )
     {
       computeYMD( p );
@@ -531,33 +544,35 @@ zulu_time:
       p.validTZ = 0;
     }
 
-    /*
-    ** On recent Windows platforms, the localtime_s() function is available
-    ** as part of the "Secure CRT". It is essentially equivalent to 
-    ** localtime_r() available under most POSIX platforms, except that the 
-    ** order of the parameters is reversed.
-    **
-    ** See http://msdn.microsoft.com/en-us/library/a442x3ye(VS.80).aspx.
-    **
-    ** If the user has not indicated to use localtime_r() or localtime_s()
-    ** already, check for an MSVC build environment that provides 
-    ** localtime_s().
-    */
+    ///<summary>
+/// On recent Windows platforms, the localtime_s() function is available
+/// as part of the "Secure CRT". It is essentially equivalent to
+/// localtime_r() available under most POSIX platforms, except that the
+/// order of the parameters is reversed.
+///
+/// See http://msdn.microsoft.com/en-us/library/a442x3ye(VS.80).aspx.
+///
+/// If the user has not indicated to use localtime_r() or localtime_s()
+/// already, check for an MSVC build environment that provides
+/// localtime_s().
+///
+///</summary>
     //#if !defined(HAVE_LOCALTIME_R) && !defined(HAVE_LOCALTIME_S) && \
     //     defined(_MSC_VER) && defined(_CRT_INSECURE_DEPRECATE)
     //#define HAVE_LOCALTIME_S 1
     //#endif
 
 #if !SQLITE_OMIT_LOCALTIME
-    /*
-    ** The following routine implements the rough equivalent of localtime_r()
-    ** using whatever operating-system specific localtime facility that
-    ** is available.  This routine returns 0 on success and
-    ** non-zero on any kind of error.
-    **
-    ** If the sqlite3GlobalConfig.bLocaltimeFault variable is true then this
-    ** routine will always fail.
-    */
+    ///<summary>
+/// The following routine implements the rough equivalent of localtime_r()
+/// using whatever operating-system specific localtime facility that
+/// is available.  This routine returns 0 on success and
+/// non-zero on any kind of error.
+///
+/// If the sqlite3GlobalConfig.bLocaltimeFault variable is true then this
+/// routine will always fail.
+///
+///</summary>
     static int osLocaltime( time_t t, tm pTm )
     {
       int rc;
@@ -590,14 +605,14 @@ zulu_time:
 
 
 #if !SQLITE_OMIT_LOCALTIME
-    /*
-** Compute the difference (in milliseconds) between localtime and UTC
-** (a.k.a. GMT) for the time value p where p is in UTC. If no error occurs,
-** return this value and set *pRc to SQLITE_OK. 
-**
-** Or, if an error does occur, set *pRc to SQLITE_ERROR. The returned value
-** is undefined in this case.
-*/
+    ///<summary>
+/// Compute the difference (in milliseconds) between localtime and UTC
+/// (a.k.a. GMT) for the time value p where p is in UTC. If no error occurs,
+/// return this value and set *pRc to SQLITE_OK.
+///
+/// Or, if an error does occur, set *pRc to SQLITE_ERROR. The returned value
+/// is undefined in this case.
+///</summary>
     static sqlite3_int64 localtimeOffset(
       DateTime p,                    /* Date at which to calculate offset */
       sqlite3_context pCtx,          /* Write error here if one occurs */
@@ -654,30 +669,30 @@ zulu_time:
     }
 #endif //* SQLITE_OMIT_LOCALTIME */
 
-    /*
-** Process a modifier to a date-time stamp.  The modifiers are
-** as follows:
-**
-**     NNN days
-**     NNN hours
-**     NNN minutes
-**     NNN.NNNN seconds
-**     NNN months
-**     NNN years
-**     start of month
-**     start of year
-**     start of week
-**     start of day
-**     weekday N
-**     unixepoch
-**     localtime
-**     utc
-**
-** Return 0 on success and 1 if there is any kind of error. If the error
-** is in a system call (i.e. localtime()), then an error message is written
-** to context pCtx. If the error is an unrecognized modifier, no error is
-** written to pCtx.
-*/
+    ///<summary>
+/// Process a modifier to a date-time stamp.  The modifiers are
+/// as follows:
+///
+///     NNN days
+///     NNN hours
+///     NNN minutes
+///     NNN.NNNN seconds
+///     NNN months
+///     NNN years
+///     start of month
+///     start of year
+///     start of week
+///     start of day
+///     weekday N
+///     unixepoch
+///     localtime
+///     utc
+///
+/// Return 0 on success and 1 if there is any kind of error. If the error
+/// is in a system call (i.e. localtime()), then an error message is written
+/// to context pCtx. If the error is an unrecognized modifier, no error is
+/// written to pCtx.
+///</summary>
     static int parseModifier( sqlite3_context pCtx, string zMod, DateTime p )
     {
       int rc = 1;
@@ -974,16 +989,18 @@ zulu_time:
     }
 
 
-    /*
-    ** The following routines implement the various date and time functions
-    ** of SQLite.
-    */
+    ///<summary>
+/// The following routines implement the various date and time functions
+/// of SQLite.
+///
+///</summary>
 
-    /*
-    **    julianday( TIMESTRING, MOD, MOD, ...)
-    **
-    ** Return the julian day number of the date specified in the arguments
-    */
+    ///<summary>
+///    julianday( TIMESTRING, MOD, MOD, ...)
+///
+/// Return the julian day number of the date specified in the arguments
+///
+///</summary>
     static void juliandayFunc(
     sqlite3_context context,
     int argc,
@@ -998,11 +1015,12 @@ zulu_time:
       }
     }
 
-    /*
-    **    datetime( TIMESTRING, MOD, MOD, ...)
-    **
-    ** Return YYYY-MM-DD HH:MM:SS
-    */
+    ///<summary>
+///    datetime( TIMESTRING, MOD, MOD, ...)
+///
+/// Return YYYY-MM-DD HH:MM:SS
+///
+///</summary>
     static void datetimeFunc(
     sqlite3_context context,
     int argc,
@@ -1020,11 +1038,12 @@ zulu_time:
       }
     }
 
-    /*
-    **    time( TIMESTRING, MOD, MOD, ...)
-    **
-    ** Return HH:MM:SS
-    */
+    ///<summary>
+///    time( TIMESTRING, MOD, MOD, ...)
+///
+/// Return HH:MM:SS
+///
+///</summary>
     static void timeFunc(
     sqlite3_context context,
     int argc,
@@ -1041,11 +1060,12 @@ zulu_time:
       }
     }
 
-    /*
-    **    date( TIMESTRING, MOD, MOD, ...)
-    **
-    ** Return YYYY-MM-DD
-    */
+    ///<summary>
+///    date( TIMESTRING, MOD, MOD, ...)
+///
+/// Return YYYY-MM-DD
+///
+///</summary>
     static void dateFunc(
     sqlite3_context context,
     int argc,
@@ -1062,25 +1082,26 @@ zulu_time:
       }
     }
 
-    /*
-    **    strftime( FORMAT, TIMESTRING, MOD, MOD, ...)
-    **
-    ** Return a string described by FORMAT.  Conversions as follows:
-    **
-    **   %d  day of month
-    **   %f  ** fractional seconds  SS.SSS
-    **   %H  hour 00-24
-    **   %j  day of year 000-366
-    **   %J  ** Julian day number
-    **   %m  month 01-12
-    **   %M  minute 00-59
-    **   %s  seconds since 1970-01-01
-    **   %S  seconds 00-59
-    **   %w  day of week 0-6  sunday==0
-    **   %W  week of year 00-53
-    **   %Y  year 0000-9999
-    **   %%  %
-    */
+    ///<summary>
+///    strftime( FORMAT, TIMESTRING, MOD, MOD, ...)
+///
+/// Return a string described by FORMAT.  Conversions as follows:
+///
+///   %d  day of month
+///   %f  ** fractional seconds  SS.SSS
+///   %H  hour 00-24
+///   %j  day of year 000-366
+///   %J  ** Julian day number
+///   %m  month 01-12
+///   %M  minute 00-59
+///   %s  seconds since 1970-01-01
+///   %S  seconds 00-59
+///   %w  day of week 0-6  sunday==0
+///   %W  week of year 00-53
+///   %Y  year 0000-9999
+///   %%  %
+///
+///</summary>
     static void strftimeFunc(
     sqlite3_context context,
     int argc,
@@ -1277,11 +1298,12 @@ zulu_time:
       }
     }
 
-    /*
-    ** current_time()
-    **
-    ** This function returns the same value as time('now').
-    */
+    ///<summary>
+/// current_time()
+///
+/// This function returns the same value as time('now').
+///
+///</summary>
     static void ctimeFunc(
     sqlite3_context context,
     int NotUsed,
@@ -1292,11 +1314,12 @@ zulu_time:
       timeFunc( context, 0, null );
     }
 
-    /*
-    ** current_date()
-    **
-    ** This function returns the same value as date('now').
-    */
+    ///<summary>
+/// current_date()
+///
+/// This function returns the same value as date('now').
+///
+///</summary>
     static void cdateFunc(
     sqlite3_context context,
     int NotUsed,
@@ -1307,11 +1330,12 @@ zulu_time:
       dateFunc( context, 0, null );
     }
 
-    /*
-    ** current_timestamp()
-    **
-    ** This function returns the same value as datetime('now').
-    */
+    ///<summary>
+/// current_timestamp()
+///
+/// This function returns the same value as datetime('now').
+///
+///</summary>
     static void ctimestampFunc(
     sqlite3_context context,
     int NotUsed,

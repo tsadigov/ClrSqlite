@@ -8,31 +8,32 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-    /*
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains the implementation for TRIGGERs
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains the implementation for TRIGGERs
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
 
 #if !SQLITE_OMIT_TRIGGER
-    /*
-** Delete a linked list of TriggerStep structures.
-*/
+    ///<summary>
+/// Delete a linked list of TriggerStep structures.
+///</summary>
     static void sqlite3DeleteTriggerStep( sqlite3 db, ref TriggerStep pTriggerStep )
     {
       while ( pTriggerStep != null )
@@ -50,20 +51,21 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Given table pTab, return a list of all the triggers attached to
-    ** the table. The list is connected by Trigger.pNext pointers.
-    **
-    ** All of the triggers on pTab that are in the same database as pTab
-    ** are already attached to pTab.pTrigger.  But there might be additional
-    ** triggers on pTab in the TEMP schema.  This routine prepends all
-    ** TEMP triggers on pTab to the beginning of the pTab.pTrigger list
-    ** and returns the combined list.
-    **
-    ** To state it another way:  This routine returns a list of all triggers
-    ** that fire off of pTab.  The list will include any TEMP triggers on
-    ** pTab as well as the triggers lised in pTab.pTrigger.
-    */
+    ///<summary>
+/// Given table pTab, return a list of all the triggers attached to
+/// the table. The list is connected by Trigger.pNext pointers.
+///
+/// All of the triggers on pTab that are in the same database as pTab
+/// are already attached to pTab.pTrigger.  But there might be additional
+/// triggers on pTab in the TEMP schema.  This routine prepends all
+/// TEMP triggers on pTab to the beginning of the pTab.pTrigger list
+/// and returns the combined list.
+///
+/// To state it another way:  This routine returns a list of all triggers
+/// that fire off of pTab.  The list will include any TEMP triggers on
+/// pTab as well as the triggers lised in pTab.pTrigger.
+///
+///</summary>
     static Trigger sqlite3TriggerList( Parse pParse, Table pTab )
     {
       Schema pTmpSchema = pParse.db.aDb[1].pSchema;
@@ -93,14 +95,15 @@ namespace Community.CsharpSqlite
       return ( pList != null ? pList : pTab.pTrigger );
     }
 
-    /*
-    ** This is called by the parser when it sees a CREATE TRIGGER statement
-    ** up to the point of the BEGIN before the trigger actions.  A Trigger
-    ** structure is generated based on the information available and stored
-    ** in pParse.pNewTrigger.  After the trigger actions have been parsed, the
-    ** sqlite3FinishTrigger() function is called to complete the trigger
-    ** construction process.
-    */
+    ///<summary>
+/// This is called by the parser when it sees a CREATE TRIGGER statement
+/// up to the point of the BEGIN before the trigger actions.  A Trigger
+/// structure is generated based on the information available and stored
+/// in pParse.pNewTrigger.  After the trigger actions have been parsed, the
+/// sqlite3FinishTrigger() function is called to complete the trigger
+/// construction process.
+///
+///</summary>
     static void sqlite3BeginTrigger(
     Parse pParse,      /* The parse context of the CREATE TRIGGER statement */
     Token pName1,      /* The name of the trigger */
@@ -317,10 +320,11 @@ trigger_cleanup:
       }
     }
 
-    /*
-    ** This routine is called after all of the trigger actions have been parsed
-    ** in order to complete the process of building the trigger.
-    */
+    ///<summary>
+/// This routine is called after all of the trigger actions have been parsed
+/// in order to complete the process of building the trigger.
+///
+///</summary>
     static void sqlite3FinishTrigger(
     Parse pParse,          /* Parser context */
     TriggerStep pStepList, /* The triggered program */
@@ -405,13 +409,14 @@ triggerfinish_cleanup:
       sqlite3DeleteTriggerStep( db, ref pStepList );
     }
 
-    /*
-    ** Turn a SELECT statement (that the pSelect parameter points to) into
-    ** a trigger step.  Return a pointer to a TriggerStep structure.
-    **
-    ** The parser calls this routine when it finds a SELECT statement in
-    ** body of a TRIGGER.
-    */
+    ///<summary>
+/// Turn a SELECT statement (that the pSelect parameter points to) into
+/// a trigger step.  Return a pointer to a TriggerStep structure.
+///
+/// The parser calls this routine when it finds a SELECT statement in
+/// body of a TRIGGER.
+///
+///</summary>
     static TriggerStep sqlite3TriggerSelectStep( sqlite3 db, Select pSelect )
     {
       TriggerStep pTriggerStep = new TriggerStep();// sqlite3DbMallocZero( db, sizeof(TriggerStep ))
@@ -453,13 +458,14 @@ triggerfinish_cleanup:
       return pTriggerStep;
     }
 
-    /*
-    ** Build a trigger step out of an INSERT statement.  Return a pointer
-    ** to the new trigger step.
-    **
-    ** The parser calls this routine when it sees an INSERT inside the
-    ** body of a trigger.
-    */
+    ///<summary>
+/// Build a trigger step out of an INSERT statement.  Return a pointer
+/// to the new trigger step.
+///
+/// The parser calls this routine when it sees an INSERT inside the
+/// body of a trigger.
+///
+///</summary>
     // OVERLOADS, so I don't need to rewrite parse.c
     static TriggerStep sqlite3TriggerInsertStep( sqlite3 db, Token pTableName, IdList pColumn, int null_4, int null_5, u8 orconf )
     {
@@ -505,11 +511,12 @@ triggerfinish_cleanup:
       return pTriggerStep;
     }
 
-    /*
-    ** Construct a trigger step that implements an UPDATE statement and return
-    ** a pointer to that trigger step.  The parser calls this routine when it
-    ** sees an UPDATE statement inside the body of a CREATE TRIGGER.
-    */
+    ///<summary>
+/// Construct a trigger step that implements an UPDATE statement and return
+/// a pointer to that trigger step.  The parser calls this routine when it
+/// sees an UPDATE statement inside the body of a CREATE TRIGGER.
+///
+///</summary>
     static TriggerStep sqlite3TriggerUpdateStep(
     sqlite3 db,         /* The database connection */
     Token pTableName,   /* Name of the table to be updated */
@@ -532,11 +539,12 @@ triggerfinish_cleanup:
       return pTriggerStep;
     }
 
-    /*
-    ** Construct a trigger step that implements a DELETE statement and return
-    ** a pointer to that trigger step.  The parser calls this routine when it
-    ** sees a DELETE statement inside the body of a CREATE TRIGGER.
-    */
+    ///<summary>
+/// Construct a trigger step that implements a DELETE statement and return
+/// a pointer to that trigger step.  The parser calls this routine when it
+/// sees a DELETE statement inside the body of a CREATE TRIGGER.
+///
+///</summary>
     static TriggerStep sqlite3TriggerDeleteStep(
     sqlite3 db,            /* Database connection */
     Token pTableName,      /* The table from which rows are deleted */
@@ -557,9 +565,10 @@ triggerfinish_cleanup:
 
 
 
-    /*
-    ** Recursively delete a Trigger structure
-    */
+    ///<summary>
+/// Recursively delete a Trigger structure
+///
+///</summary>
     static void sqlite3DeleteTrigger( sqlite3 db, ref Trigger pTrigger )
     {
       if ( pTrigger == null )
@@ -573,14 +582,15 @@ triggerfinish_cleanup:
       sqlite3DbFree( db, ref pTrigger );
     }
 
-    /*
-    ** This function is called to drop a trigger from the database schema.
-    **
-    ** This may be called directly from the parser and therefore identifies
-    ** the trigger by name.  The sqlite3DropTriggerPtr() routine does the
-    ** same job as this routine except it takes a pointer to the trigger
-    ** instead of the trigger name.
-    **/
+    ///<summary>
+/// This function is called to drop a trigger from the database schema.
+///
+/// This may be called directly from the parser and therefore identifies
+/// the trigger by name.  The sqlite3DropTriggerPtr() routine does the
+/// same job as this routine except it takes a pointer to the trigger
+/// instead of the trigger name.
+///
+///</summary>
     static void sqlite3DropTrigger( Parse pParse, SrcList pName, int noErr )
     {
       Trigger pTrigger = null;
@@ -630,10 +640,11 @@ drop_trigger_cleanup:
       sqlite3SrcListDelete( db, ref pName );
     }
 
-    /*
-    ** Return a pointer to the Table structure for the table that a trigger
-    ** is set on.
-    */
+    ///<summary>
+/// Return a pointer to the Table structure for the table that a trigger
+/// is set on.
+///
+///</summary>
     static Table tableOfTrigger( Trigger pTrigger )
     {
       int n = StringExtensions.sqlite3Strlen30( pTrigger.table );
@@ -641,9 +652,10 @@ drop_trigger_cleanup:
     }
 
 
-    /*
-    ** Drop a trigger given a pointer to that trigger.
-    */
+    ///<summary>
+/// Drop a trigger given a pointer to that trigger.
+///
+///</summary>
     static void sqlite3DropTriggerPtr( Parse pParse, Trigger pTrigger )
     {
       Table pTable;
@@ -702,9 +714,10 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
       }
     }
 
-    /*
-    ** Remove a trigger from the hash tables of the sqlite* pointer.
-    */
+    ///<summary>
+/// Remove a trigger from the hash tables of the sqlite* pointer.
+///
+///</summary>
     static void sqlite3UnlinkAndDeleteTrigger( sqlite3 db, int iDb, string zName )
     {
       Trigger pTrigger;
@@ -745,15 +758,16 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
       }
     }
 
-    /*
-    ** pEList is the SET clause of an UPDATE statement.  Each entry
-    ** in pEList is of the format <id>=<expr>.  If any of the entries
-    ** in pEList have an <id> which matches an identifier in pIdList,
-    ** then return TRUE.  If pIdList==NULL, then it is considered a
-    ** wildcard that matches anything.  Likewise if pEList==NULL then
-    ** it matches anything so always return true.  Return false only
-    ** if there is no match.
-    */
+    ///<summary>
+/// pEList is the SET clause of an UPDATE statement.  Each entry
+/// in pEList is of the format <id>=<expr>.  If any of the entries
+/// in pEList have an <id> which matches an identifier in pIdList,
+/// then return TRUE.  If pIdList==NULL, then it is considered a
+/// wildcard that matches anything.  Likewise if pEList==NULL then
+/// it matches anything so always return true.  Return false only
+/// if there is no match.
+///
+///</summary>
     static int checkColumnOverlap( IdList pIdList, ExprList pEList )
     {
       int e;
@@ -767,12 +781,13 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
       return 0;
     }
 
-    /*
-    ** Return a list of all triggers on table pTab if there exists at least
-    ** one trigger that must be fired when an operation of type 'op' is
-    ** performed on the table, and, if that operation is an UPDATE, if at
-    ** least one of the columns in pChanges is being modified.
-    */
+    ///<summary>
+/// Return a list of all triggers on table pTab if there exists at least
+/// one trigger that must be fired when an operation of type 'op' is
+/// performed on the table, and, if that operation is an UPDATE, if at
+/// least one of the columns in pChanges is being modified.
+///
+///</summary>
     static Trigger sqlite3TriggersExist(
     Parse pParse,          /* Parse context */
     Table pTab,            /* The table the contains the triggers */
@@ -805,16 +820,17 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
     }
 
 
-    /*
-    ** Convert the pStep.target token into a SrcList and return a pointer
-    ** to that SrcList.
-    **
-    ** This routine adds a specific database name, if needed, to the target when
-    ** forming the SrcList.  This prevents a trigger in one database from
-    ** referring to a target in another database.  An exception is when the
-    ** trigger is in TEMP in which case it can refer to any other database it
-    ** wants.
-    */
+    ///<summary>
+/// Convert the pStep.target token into a SrcList and return a pointer
+/// to that SrcList.
+///
+/// This routine adds a specific database name, if needed, to the target when
+/// forming the SrcList.  This prevents a trigger in one database from
+/// referring to a target in another database.  An exception is when the
+/// trigger is in TEMP in which case it can refer to any other database it
+/// wants.
+///
+///</summary>
     static SrcList targetSrcList(
     Parse pParse,       /* The parsing context */
     TriggerStep pStep   /* The trigger containing the target token */
@@ -839,10 +855,11 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
       return pSrc;
     }
 
-    /*
-    ** Generate VDBE code for the statements inside the body of a single 
-    ** trigger.
-    */
+    ///<summary>
+/// Generate VDBE code for the statements inside the body of a single
+/// trigger.
+///
+///</summary>
     static int codeTriggerProgram(
     Parse pParse,            /* The parser context */
     TriggerStep pStepList,   /* List of statements inside the trigger body */
@@ -950,11 +967,11 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
     }
 #endif
 
-    /*
-** Parse context structure pFrom has just been used to create a sub-vdbe
-** (trigger program). If an error has occurred, transfer error information
-** from pFrom to pTo.
-*/
+    ///<summary>
+/// Parse context structure pFrom has just been used to create a sub-vdbe
+/// (trigger program). If an error has occurred, transfer error information
+/// from pFrom to pTo.
+///</summary>
     static void transferParseError( Parse pTo, Parse pFrom )
     {
       Debug.Assert( String.IsNullOrEmpty( pFrom.zErrMsg ) || pFrom.nErr != 0 );
@@ -970,10 +987,11 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
       }
     }
 
-    /*
-    ** Create and populate a new TriggerPrg object with a sub-program 
-    ** implementing trigger pTrigger with ON CONFLICT policy orconf.
-    */
+    ///<summary>
+/// Create and populate a new TriggerPrg object with a sub-program
+/// implementing trigger pTrigger with ON CONFLICT policy orconf.
+///
+///</summary>
     static TriggerPrg codeRowTrigger(
       Parse pParse,        /* Current parse context */
       Trigger pTrigger,    /* Trigger to code */
@@ -1089,12 +1107,13 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
       return pPrg;
     }
 
-    /*
-    ** Return a pointer to a TriggerPrg object containing the sub-program for
-    ** trigger pTrigger with default ON CONFLICT algorithm orconf. If no such
-    ** TriggerPrg object exists, a new object is allocated and populated before
-    ** being returned.
-    */
+    ///<summary>
+/// Return a pointer to a TriggerPrg object containing the sub-program for
+/// trigger pTrigger with default ON CONFLICT algorithm orconf. If no such
+/// TriggerPrg object exists, a new object is allocated and populated before
+/// being returned.
+///
+///</summary>
     static TriggerPrg getRowTrigger(
       Parse pParse,        /* Current parse context */
       Trigger pTrigger,    /* Trigger to code */
@@ -1126,12 +1145,13 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
       return pPrg;
     }
 
-    /*
-    ** Generate code for the trigger program associated with trigger p on 
-    ** table pTab. The reg, orconf and ignoreJump parameters passed to this
-    ** function are the same as those described in the header function for
-    ** sqlite3CodeRowTrigger()
-    */
+    ///<summary>
+/// Generate code for the trigger program associated with trigger p on
+/// table pTab. The reg, orconf and ignoreJump parameters passed to this
+/// function are the same as those described in the header function for
+/// sqlite3CodeRowTrigger()
+///
+///</summary>
     static void sqlite3CodeRowTriggerDirect(
       Parse pParse,        /* Parse context */
       Trigger p,           /* Trigger to code */
@@ -1167,46 +1187,47 @@ new VdbeOpList( OP_Next,       0, ADDR(1),  0), /* 8 */
       }
     }
 
-    /*
-    ** This is called to code the required FOR EACH ROW triggers for an operation
-    ** on table pTab. The operation to code triggers for (INSERT, UPDATE or DELETE)
-    ** is given by the op paramater. The tr_tm parameter determines whether the
-    ** BEFORE or AFTER triggers are coded. If the operation is an UPDATE, then
-    ** parameter pChanges is passed the list of columns being modified.
-    **
-    ** If there are no triggers that fire at the specified time for the specified
-    ** operation on pTab, this function is a no-op.
-    **
-    ** The reg argument is the address of the first in an array of registers 
-    ** that contain the values substituted for the new.* and old.* references
-    ** in the trigger program. If N is the number of columns in table pTab
-    ** (a copy of pTab.nCol), then registers are populated as follows:
-    **
-    **   Register       Contains
-    **   ------------------------------------------------------
-    **   reg+0          OLD.rowid
-    **   reg+1          OLD.* value of left-most column of pTab
-    **   ...            ...
-    **   reg+N          OLD.* value of right-most column of pTab
-    **   reg+N+1        NEW.rowid
-    **   reg+N+2        OLD.* value of left-most column of pTab
-    **   ...            ...
-    **   reg+N+N+1      NEW.* value of right-most column of pTab
-    **
-    ** For ON DELETE triggers, the registers containing the NEW.* values will
-    ** never be accessed by the trigger program, so they are not allocated or 
-    ** populated by the caller (there is no data to populate them with anyway). 
-    ** Similarly, for ON INSERT triggers the values stored in the OLD.* registers
-    ** are never accessed, and so are not allocated by the caller. So, for an
-    ** ON INSERT trigger, the value passed to this function as parameter reg
-    ** is not a readable register, although registers (reg+N) through 
-    ** (reg+N+N+1) are.
-    **
-    ** Parameter orconf is the default conflict resolution algorithm for the
-    ** trigger program to use (REPLACE, IGNORE etc.). Parameter ignoreJump
-    ** is the instruction that control should jump to if a trigger program
-    ** raises an IGNORE exception.
-    */
+    ///<summary>
+/// This is called to code the required FOR EACH ROW triggers for an operation
+/// on table pTab. The operation to code triggers for (INSERT, UPDATE or DELETE)
+/// is given by the op paramater. The tr_tm parameter determines whether the
+/// BEFORE or AFTER triggers are coded. If the operation is an UPDATE, then
+/// parameter pChanges is passed the list of columns being modified.
+///
+/// If there are no triggers that fire at the specified time for the specified
+/// operation on pTab, this function is a no-op.
+///
+/// The reg argument is the address of the first in an array of registers
+/// that contain the values substituted for the new.* and old.* references
+/// in the trigger program. If N is the number of columns in table pTab
+/// (a copy of pTab.nCol), then registers are populated as follows:
+///
+///   Register       Contains
+///   ------------------------------------------------------
+///   reg+0          OLD.rowid
+///   reg+1          OLD.* value of left-most column of pTab
+///   ...            ...
+///   reg+N          OLD.* value of right-most column of pTab
+///   reg+N+1        NEW.rowid
+///   reg+N+2        OLD.* value of left-most column of pTab
+///   ...            ...
+///   reg+N+N+1      NEW.* value of right-most column of pTab
+///
+/// For ON DELETE triggers, the registers containing the NEW.* values will
+/// never be accessed by the trigger program, so they are not allocated or
+/// populated by the caller (there is no data to populate them with anyway).
+/// Similarly, for ON INSERT triggers the values stored in the OLD.* registers
+/// are never accessed, and so are not allocated by the caller. So, for an
+/// ON INSERT trigger, the value passed to this function as parameter reg
+/// is not a readable register, although registers (reg+N) through
+/// (reg+N+N+1) are.
+///
+/// Parameter orconf is the default conflict resolution algorithm for the
+/// trigger program to use (REPLACE, IGNORE etc.). Parameter ignoreJump
+/// is the instruction that control should jump to if a trigger program
+/// raises an IGNORE exception.
+///
+///</summary>
     static void sqlite3CodeRowTrigger(
     Parse pParse,        /* Parse context */
     Trigger pTrigger,    /* List of triggers on table pTab */

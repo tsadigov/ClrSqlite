@@ -34,22 +34,22 @@ namespace Community.CsharpSqlite
 #if !SQLITE_OMIT_ANALYZE
 //#include "sqliteInt.h"
 
-/*
-** This routine generates code that opens the sqlite_stat1 table for
-** writing with cursor iStatCur. If the library was built with the
-** SQLITE_ENABLE_STAT2 macro defined, then the sqlite_stat2 table is
-** opened for writing using cursor (iStatCur+1)
-**
-** If the sqlite_stat1 tables does not previously exist, it is created.
-** Similarly, if the sqlite_stat2 table does not exist and the library
-** is compiled with SQLITE_ENABLE_STAT2 defined, it is created. 
-**
-** Argument zWhere may be a pointer to a buffer containing a table name,
-** or it may be a NULL pointer. If it is not NULL, then all entries in
-** the sqlite_stat1 and (if applicable) sqlite_stat2 tables associated
-** with the named table are deleted. If zWhere==0, then code is generated
-** to delete all stat table entries.
-*/
+///<summary>
+/// This routine generates code that opens the sqlite_stat1 table for
+/// writing with cursor iStatCur. If the library was built with the
+/// SQLITE_ENABLE_STAT2 macro defined, then the sqlite_stat2 table is
+/// opened for writing using cursor (iStatCur+1)
+///
+/// If the sqlite_stat1 tables does not previously exist, it is created.
+/// Similarly, if the sqlite_stat2 table does not exist and the library
+/// is compiled with SQLITE_ENABLE_STAT2 defined, it is created.
+///
+/// Argument zWhere may be a pointer to a buffer containing a table name,
+/// or it may be a NULL pointer. If it is not NULL, then all entries in
+/// the sqlite_stat1 and (if applicable) sqlite_stat2 tables associated
+/// with the named table are deleted. If zWhere==0, then code is generated
+/// to delete all stat table entries.
+///</summary>
 public struct _aTable
 {
   public string zName;
@@ -135,10 +135,10 @@ string zWhereType   /* Either "tbl" or "idx" */
   }
 }
 
-/*
-** Generate code to do an analysis of all indices associated with
-** a single table.
-*/
+///<summary>
+/// Generate code to do an analysis of all indices associated with
+/// a single table.
+///</summary>
 static void analyzeOneTable(
 Parse pParse,    /* Parser context */
 Table pTab,      /* Table whose indices are to be analyzed */
@@ -423,10 +423,10 @@ return;
   sqlite3VdbeJumpHere( v, jZeroRows );
 }
 
-/*
-** Generate code that will cause the most recent index analysis to
-** be loaded into internal hash tables where is can be used.
-*/
+///<summary>
+/// Generate code that will cause the most recent index analysis to
+/// be loaded into internal hash tables where is can be used.
+///</summary>
 static void loadAnalysis( Parse pParse, int iDb )
 {
   Vdbe v = sqlite3GetVdbe( pParse );
@@ -436,9 +436,9 @@ static void loadAnalysis( Parse pParse, int iDb )
   }
 }
 
-/*
-** Generate code that will do an analysis of an entire database
-*/
+///<summary>
+/// Generate code that will do an analysis of an entire database
+///</summary>
 static void analyzeDatabase( Parse pParse, int iDb )
 {
   sqlite3 db = pParse.db;
@@ -490,18 +490,18 @@ static void analyzeTable( Parse pParse, Table pTab, Index pOnlyIdx)
   loadAnalysis( pParse, iDb );
 }
 
-/*
-** Generate code for the ANALYZE command.  The parser calls this routine
-** when it recognizes an ANALYZE command.
-**
-**        ANALYZE                            -- 1
-**        ANALYZE  <database>                -- 2
-**        ANALYZE  ?<database>.?<tablename>  -- 3
-**
-** Form 1 causes all indices in all attached databases to be analyzed.
-** Form 2 analyzes all indices the single database named.
-** Form 3 analyzes all indices associated with the named table.
-*/
+///<summary>
+/// Generate code for the ANALYZE command.  The parser calls this routine
+/// when it recognizes an ANALYZE command.
+///
+///        ANALYZE                            -- 1
+///        ANALYZE  <database>                -- 2
+///        ANALYZE  ?<database>.?<tablename>  -- 3
+///
+/// Form 1 causes all indices in all attached databases to be analyzed.
+/// Form 2 analyzes all indices the single database named.
+/// Form 3 analyzes all indices associated with the named table.
+///</summary>
 // OVERLOADS, so I don't need to rewrite parse.c
 static void sqlite3Analyze( Parse pParse, int null_2, int null_3 )
 {
@@ -596,17 +596,17 @@ public struct analysisInfo
   public string zDatabase;
 };
 
-/*
-** This callback is invoked once for each index when reading the
-** sqlite_stat1 table.  
-**
-**     argv[0] = name of the table
-**     argv[1] = name of the index (might be NULL)
-**     argv[2] = results of analysis - on integer for each column
-**
-** Entries for which argv[1]==NULL simply record the number of rows in
-** the table.
-*/
+///<summary>
+/// This callback is invoked once for each index when reading the
+/// sqlite_stat1 table.
+///
+///     argv[0] = name of the table
+///     argv[1] = name of the index (might be NULL)
+///     argv[2] = results of analysis - on integer for each column
+///
+/// Entries for which argv[1]==NULL simply record the number of rows in
+/// the table.
+///</summary>
 static int analysisLoader( object pData, sqlite3_int64 argc, object Oargv, object NotUsed )
 {
   string[] argv = (string[])Oargv;
@@ -664,10 +664,10 @@ static int analysisLoader( object pData, sqlite3_int64 argc, object Oargv, objec
   return 0;
 }
 
-/*
-** If the Index.aSample variable is not NULL, delete the aSample[] array
-** and its contents.
-*/
+///<summary>
+/// If the Index.aSample variable is not NULL, delete the aSample[] array
+/// and its contents.
+///</summary>
 static void sqlite3DeleteIndexSamples( sqlite3 db, Index pIdx )
 {
 #if SQLITE_ENABLE_STAT2

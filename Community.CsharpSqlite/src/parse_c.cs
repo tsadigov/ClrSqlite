@@ -40,10 +40,11 @@ namespace Community.CsharpSqlite
     //#line 51 "parse.y"
 
     //#include "sqliteInt.h"
-    /*
-    ** Disable all error recovery processing in the parser push-down
-    ** automaton.
-    */
+    ///<summary>
+/// Disable all error recovery processing in the parser push-down
+/// automaton.
+///
+///</summary>
     //#define YYNOERRORRECOVERY 1
     const int YYNOERRORRECOVERY = 1;
 
@@ -94,9 +95,10 @@ namespace Community.CsharpSqlite
       public int a;
       public IdList b;
     };
-    /*
-    ** An instance of this structure holds the ATTACH key and the key type.
-    */
+    ///<summary>
+/// An instance of this structure holds the ATTACH key and the key type.
+///
+///</summary>
     public struct AttachKey
     {
       public int type;
@@ -105,20 +107,24 @@ namespace Community.CsharpSqlite
 
     //#line 722 "parse.y"
 
-    /* This is a utility routine used to set the ExprSpan.zStart and
-    ** ExprSpan.zEnd values of pOut so that the span covers the complete
-    ** range of text beginning with pStart and going to the end of pEnd.
-    */
+    ///<summary>
+///This is a utility routine used to set the ExprSpan.zStart and
+/// ExprSpan.zEnd values of pOut so that the span covers the complete
+/// range of text beginning with pStart and going to the end of pEnd.
+///
+///</summary>
     static void spanSet( ExprSpan pOut, Token pStart, Token pEnd )
     {
       pOut.zStart = pStart.z;
       pOut.zEnd = pEnd.z.Substring( pEnd.n );
     }
 
-    /* Construct a new Expr object from a single identifier.  Use the
-    ** new Expr to populate pOut.  Set the span of pOut to be the identifier
-    ** that created the expression.
-    */
+    ///<summary>
+///Construct a new Expr object from a single identifier.  Use the
+/// new Expr to populate pOut.  Set the span of pOut to be the identifier
+/// that created the expression.
+///
+///</summary>
     static void spanExpr( ExprSpan pOut, Parse pParse, int op, Token pValue )
     {
       pOut.pExpr = sqlite3PExpr( pParse, op, 0, 0, pValue );
@@ -127,9 +133,11 @@ namespace Community.CsharpSqlite
     }
     //#line 817 "parse.y"
 
-    /* This routine constructs a binary expression node out of two ExprSpan
-    ** objects and uses the result to populate a new ExprSpan object.
-    */
+    ///<summary>
+///This routine constructs a binary expression node out of two ExprSpan
+/// objects and uses the result to populate a new ExprSpan object.
+///
+///</summary>
     static void spanBinaryExpr(
     ExprSpan pOut,     /* Write the result here */
     Parse pParse,      /* The parsing context.  Errors accumulate here */
@@ -144,8 +152,10 @@ namespace Community.CsharpSqlite
     }
     //#line 873 "parse.y"
 
-    /* Construct an expression node for a unary postfix operator
-    */
+    ///<summary>
+///Construct an expression node for a unary postfix operator
+///
+///</summary>
     static void spanUnaryPostfix(
     ExprSpan pOut,        /* Write the new expression node here */
     Parse pParse,         /* Parsing context to record errors */
@@ -160,8 +170,10 @@ namespace Community.CsharpSqlite
     }
     //#line 892 "parse.y"
 
-    /* A routine to convert a binary TK_IS or TK_ISNOT expression into a
-    ** unary TK_ISNULL or TK_NOTNULL expression. */
+    ///<summary>
+///A routine to convert a binary TK_IS or TK_ISNOT expression into a
+/// unary TK_ISNULL or TK_NOTNULL expression.
+///</summary>
     static void binaryToUnaryIfNull( Parse pParse, Expr pY, Expr pA, int op )
     {
       sqlite3 db = pParse.db;
@@ -927,8 +939,10 @@ namespace Community.CsharpSqlite
     };
     //typedef struct yyStackEntry yyStackEntry;
 
-    /* The state of the parser is completely contained in an instance of
-    ** the following structure */
+    ///<summary>
+///The state of the parser is completely contained in an instance of
+/// the following structure
+///</summary>
     public class yyParser
     {
       public int yyidx;                    /* Index of top element in stack */
@@ -1052,8 +1066,9 @@ public yyStackEntry *yystack;        /* The parser's stack */
 #endif // * NDEBUG */
 
 #if !NDEBUG
-    /* For tracing reduce actions, the names of all rules are required.
-*/
+    ///<summary>
+///For tracing reduce actions, the names of all rules are required.
+///</summary>
     static string[] yyRuleName = {
 /*   0 */ "input ::= cmdlist",
 /*   1 */ "cmdlist ::= cmdlist ecmd",
@@ -1411,18 +1426,18 @@ yyTracePrompt, p.yystksz);
 }
 #endif
 
-    /*
-** This function allocates a new parser.
-** The only argument is a pointer to a function which works like
-** malloc.
-**
-** Inputs:
-** A pointer to the function used to allocate memory.
-**
-** Outputs:
-** A pointer to a parser.  This pointer is used in subsequent calls
-** to sqlite3Parser and sqlite3ParserFree.
-*/
+    ///<summary>
+/// This function allocates a new parser.
+/// The only argument is a pointer to a function which works like
+/// malloc.
+///
+/// Inputs:
+/// A pointer to the function used to allocate memory.
+///
+/// Outputs:
+/// A pointer to a parser.  This pointer is used in subsequent calls
+/// to sqlite3Parser and sqlite3ParserFree.
+///</summary>
     static yyParser sqlite3ParserAlloc()
     {//void *(*mallocProc)(size_t)){
       yyParser pParser = new yyParser();
@@ -1443,11 +1458,13 @@ yyGrowStack(pParser);
       return pParser;
     }
 
-    /* The following function deletes the value associated with a
-    ** symbol.  The symbol can be either a terminal or nonterminal.
-    ** "yymajor" is the symbol code, and "yypminor" is a pointer to
-    ** the value.
-    */
+    ///<summary>
+///The following function deletes the value associated with a
+/// symbol.  The symbol can be either a terminal or nonterminal.
+/// "yymajor" is the symbol code, and "yypminor" is a pointer to
+/// the value.
+///
+///</summary>
     static void yy_destructor(
     yyParser yypParser,    /* The parser */
     YYCODETYPE yymajor,    /* Type code for object to destroy */
@@ -1554,14 +1571,15 @@ yyGrowStack(pParser);
       }
     }
 
-    /*
-    ** Pop the parser's stack once.
-    **
-    ** If there is a destructor routine associated with the token which
-    ** is popped from the stack, then call it.
-    **
-    ** Return the major token number for the symbol popped.
-    */
+    ///<summary>
+/// Pop the parser's stack once.
+///
+/// If there is a destructor routine associated with the token which
+/// is popped from the stack, then call it.
+///
+/// Return the major token number for the symbol popped.
+///
+///</summary>
     static int yy_pop_parser_stack( yyParser pParser )
     {
       YYCODETYPE yymajor;
@@ -1615,9 +1633,10 @@ pParser.yystack = null;//free(pParser.yystack);
       pParser = null;// freeProc(ref pParser);
     }
 
-    /*
-    ** Return the peak depth of the stack for a parser.
-    */
+    ///<summary>
+/// Return the peak depth of the stack for a parser.
+///
+///</summary>
 #if YYTRACKMAXSTACKDEPTH
 int sqlite3ParserStackPeak(void p){
 yyParser pParser = (yyParser*)p;
@@ -1625,14 +1644,14 @@ return pParser.yyidxMax;
 }
 #endif
 
-    /*
-** Find the appropriate action for a parser given the terminal
-** look-ahead token iLookAhead.
-**
-** If the look-ahead token is YYNOCODE, then check to see if the action is
-** independent of the look-ahead.  If it is, return the action, otherwise
-** return YY_NO_ACTION.
-*/
+    ///<summary>
+/// Find the appropriate action for a parser given the terminal
+/// look-ahead token iLookAhead.
+///
+/// If the look-ahead token is YYNOCODE, then check to see if the action is
+/// independent of the look-ahead.  If it is, return the action, otherwise
+/// return YY_NO_ACTION.
+///</summary>
     static int yy_find_shift_action(
     yyParser pParser,         /* The parser */
     YYCODETYPE iLookAhead     /* The look-ahead token */
@@ -1701,14 +1720,15 @@ return pParser.yyidxMax;
       }
     }
 
-    /*
-    ** Find the appropriate action for a parser given the non-terminal
-    ** look-ahead token iLookAhead.
-    **
-    ** If the look-ahead token is YYNOCODE, then check to see if the action is
-    ** independent of the look-ahead.  If it is, return the action, otherwise
-    ** return YY_NO_ACTION.
-    */
+    ///<summary>
+/// Find the appropriate action for a parser given the non-terminal
+/// look-ahead token iLookAhead.
+///
+/// If the look-ahead token is YYNOCODE, then check to see if the action is
+/// independent of the look-ahead.  If it is, return the action, otherwise
+/// return YY_NO_ACTION.
+///
+///</summary>
     static int yy_find_reduce_action(
     int stateno,              /* Current state number */
     YYCODETYPE iLookAhead     /* The look-ahead token */
@@ -1737,9 +1757,10 @@ return yy_default[stateno];
       return yy_action[i];
     }
 
-    /*
-    ** The following routine is called if the stack overflows.
-    */
+    ///<summary>
+/// The following routine is called if the stack overflows.
+///
+///</summary>
     static void yyStackOverflow( yyParser yypParser, YYMINORTYPE yypMinor )
     {
       Parse pParse = yypParser.pParse; // sqlite3ParserARG_FETCH;
@@ -1813,9 +1834,11 @@ return;
       }
 #endif
     }
-    /* The following table contains information about every rule that
-    ** is used during the reduce.
-    */
+    ///<summary>
+///The following table contains information about every rule that
+/// is used during the reduce.
+///
+///</summary>
     public struct _yyRuleInfo
     {
       public YYCODETYPE lhs;         /* Symbol on the left-hand side of the rule */
@@ -4101,9 +4124,10 @@ yymsp[0].minor = yygotominor;
       }
     }
 
-    /*
-    ** The following code executes when the parse fails
-    */
+    ///<summary>
+/// The following code executes when the parse fails
+///
+///</summary>
 #if !YYNOERRORRECOVERY
     static void yy_parse_failed(
     yyParser yypParser           /* The parser */
@@ -4124,9 +4148,9 @@ yymsp[0].minor = yygotominor;
     }
 #endif //* YYNOERRORRECOVERY */
 
-    /*
-** The following code executes when a syntax error first occurs.
-*/
+    ///<summary>
+/// The following code executes when a syntax error first occurs.
+///</summary>
     static void yy_syntax_error(
     yyParser yypParser,           /* The parser */
     int yymajor,                   /* The major type of the error token */
@@ -4145,9 +4169,10 @@ yymsp[0].minor = yygotominor;
       yypParser.pParse = pParse; // sqlite3ParserARG_STORE; /* Suppress warning about unused %extra_argument variable */
     }
 
-    /*
-    ** The following is executed when the parser accepts
-    */
+    ///<summary>
+/// The following is executed when the parser accepts
+///
+///</summary>
     static void yy_accept(
     yyParser yypParser           /* The parser */
     )

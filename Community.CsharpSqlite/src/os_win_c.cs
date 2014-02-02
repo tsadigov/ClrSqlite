@@ -144,7 +144,9 @@ public winShm pShm;            /* Instance of shared memory on this file */
       public object pShm;            /* DUMMY Instance of shared memory on this file */
 #endif
       public string zPath;           /* Full pathname of this file */
-      public int szChunk;            /* Chunk size configured by FCNTL_CHUNK_SIZE */
+      public int szChunk;            ///<summary>
+///Chunk size configured by FCNTL_CHUNK_SIZE
+///</summary>
 #if SQLITE_OS_WINCE
 Wstring zDeleteOnClose;  /* Name of file to delete when closing */
 HANDLE hMutex;          /* Mutex used to control access to shared lock */
@@ -190,17 +192,17 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 static int sqlite3_os_type = 0;
 #endif
 
-    /*
-** Return true (non-zero) if we are running under WinNT, Win2K, WinXP,
-** or WinCE.  Return false (zero) for Win95, Win98, or WinME.
-**
-** Here is an interesting observation:  Win95, Win98, and WinME lack
-** the LockFileEx() API.  But we can still statically link against that
-** API as long as we don't call it when running Win95/98/ME.  A call to
-** this routine is used to determine if the host is Win95/98/ME or
-** WinNT/2K/XP so that we will know whether or not we can safely call
-** the LockFileEx() API.
-*/
+    ///<summary>
+/// Return true (non-zero) if we are running under WinNT, Win2K, WinXP,
+/// or WinCE.  Return false (zero) for Win95, Win98, or WinME.
+///
+/// Here is an interesting observation:  Win95, Win98, and WinME lack
+/// the LockFileEx() API.  But we can still statically link against that
+/// API as long as we don't call it when running Win95/98/ME.  A call to
+/// this routine is used to determine if the host is Win95/98/ME or
+/// WinNT/2K/XP so that we will know whether or not we can safely call
+/// the LockFileEx() API.
+///</summary>
 #if SQLITE_OS_WINCE
 //# define isNT()  (1)
 #else
@@ -330,10 +332,11 @@ static int sqlite3_os_type = 0;
     //  return zFilenameUtf8;
     //}
 
-    /*
-    ** Convert UTF-8 to multibyte character string.  Space to hold the
-    ** returned string is obtained from malloc().
-    */
+    ///<summary>
+/// Convert UTF-8 to multibyte character string.  Space to hold the
+/// returned string is obtained from malloc().
+///
+///</summary>
     //char *sqlite3_win32_utf8_to_mbcs(string zFilename){
     //  string zFilenameMbcs;
     //  Wstring zTmpWide;
@@ -415,21 +418,21 @@ static int getLastErrorMsg(int nBuf, ref string zBuf){
   return 0;
 }
 
-/*
-**
-** This function - winLogErrorAtLine() - is only ever called via the macro
-** winLogError().
-**
-** This routine is invoked after an error occurs in an OS function.
-** It logs a message using sqlite3_log() containing the current value of
-** error code and, if possible, the human-readable equivalent from 
-** FormatMessage.
-**
-** The first argument passed to the macro should be the error code that
-** will be returned to SQLite (e.g. SQLITE_IOERR_DELETE, SQLITE_CANTOPEN). 
-** The two subsequent arguments should be the name of the OS function that
-** failed and the the associated file-system path, if any.
-*/
+///<summary>
+///
+/// This function - winLogErrorAtLine() - is only ever called via the macro
+/// winLogError().
+///
+/// This routine is invoked after an error occurs in an OS function.
+/// It logs a message using sqlite3_log() containing the current value of
+/// error code and, if possible, the human-readable equivalent from
+/// FormatMessage.
+///
+/// The first argument passed to the macro should be the error code that
+/// will be returned to SQLite (e.g. SQLITE_IOERR_DELETE, SQLITE_CANTOPEN).
+/// The two subsequent arguments should be the name of the OS function that
+/// failed and the the associated file-system path, if any.
+///</summary>
 //#define winLogError(a,b,c)     winLogErrorAtLine(a,b,c,__LINE__)
 static int winLogError( int a, string b, string c )
 {
@@ -797,9 +800,10 @@ return FALSE;
 ** by the sqlite3_io_methods object.
 ******************************************************************************/
 
-    /*
-    ** Some microsoft compilers lack this definition.
-    */
+    ///<summary>
+/// Some microsoft compilers lack this definition.
+///
+///</summary>
 #if !INVALID_SET_FILE_POINTER
     //# define INVALID_SET_FILE_POINTER ((DWORD)-1)
     const int INVALID_SET_FILE_POINTER = -1;
@@ -849,16 +853,17 @@ return FALSE;
       return 0;
     }
 
-    /*
-    ** Close a file.
-    **
-    ** It is reported that an attempt to close a handle might sometimes
-    ** fail.  This is a very unreasonable result, but windows is notorious
-    ** for being unreasonable so I do not doubt that it might happen.  If
-    ** the close fails, we pause for 100 milliseconds and try again.  As
-    ** many as MX_CLOSE_ATTEMPT attempts to close the handle are made before
-    ** giving up and returning an error.
-    */
+    ///<summary>
+/// Close a file.
+///
+/// It is reported that an attempt to close a handle might sometimes
+/// fail.  This is a very unreasonable result, but windows is notorious
+/// for being unreasonable so I do not doubt that it might happen.  If
+/// the close fails, we pause for 100 milliseconds and try again.  As
+/// many as MX_CLOSE_ATTEMPT attempts to close the handle are made before
+/// giving up and returning an error.
+///
+///</summary>
     public static int MX_CLOSE_ATTEMPT = 3;
     static int winClose( sqlite3_file id )
     {
@@ -902,11 +907,12 @@ free(pFile.zDeleteOnClose);
     }
 
 
-    /*
-    ** Read data from a file into a buffer.  Return SQLITE_OK if all
-    ** bytes were read successfully and SQLITE_IOERR if anything goes
-    ** wrong.
-    */
+    ///<summary>
+/// Read data from a file into a buffer.  Return SQLITE_OK if all
+/// bytes were read successfully and SQLITE_IOERR if anything goes
+/// wrong.
+///
+///</summary>
     static int winRead(
     sqlite3_file id,           /* File to read from */
     byte[] pBuf,               /* Write content into this buffer */
@@ -956,10 +962,11 @@ pFile.lastErrno = 1;
       return SQLITE_OK;
     }
 
-    /*
-    ** Write data from a buffer into a file.  Return SQLITE_OK on success
-    ** or some other error code on failure.
-    */
+    ///<summary>
+/// Write data from a buffer into a file.  Return SQLITE_OK on success
+/// or some other error code on failure.
+///
+///</summary>
     static int winWrite(
     sqlite3_file id,          /* File to write into */
     byte[] pBuf,              /* The bytes to be written */
@@ -1025,9 +1032,10 @@ id.lastErrno  = 1;
       return SQLITE_OK;
     }
 
-    /*
-    ** Truncate an open file to a specified size
-    */
+    ///<summary>
+/// Truncate an open file to a specified size
+///
+///</summary>
     static int winTruncate( sqlite3_file id, sqlite3_int64 nByte )
     {
       sqlite3_file pFile = id;        /* File handle object */
@@ -1096,9 +1104,9 @@ id.lastErrno  = 1;
 #endif
 #endif
 
-    /*
-** Make sure all writes to a particular file are committed to disk.
-*/
+    ///<summary>
+/// Make sure all writes to a particular file are committed to disk.
+///</summary>
     static int winSync( sqlite3_file id, int flags )
     {
 #if !(NDEBUG) || !(SQLITE_NO_SYNC) || (SQLITE_DEBUG)
@@ -1159,9 +1167,10 @@ return SQLITE_OK;
 #endif
     }
 
-    /*
-    ** Determine the current size of a file in bytes
-    */
+    ///<summary>
+/// Determine the current size of a file in bytes
+///
+///</summary>
     static int winFileSize( sqlite3_file id, ref long pSize )
     {
       //DWORD upperBits;
@@ -1186,11 +1195,12 @@ return SQLITE_OK;
     }
 
 
-    /*
-    ** Acquire a reader lock.
-    ** Different API routines are called depending on whether or not this
-    ** is Win95 or WinNT.
-    */
+    ///<summary>
+/// Acquire a reader lock.
+/// Different API routines are called depending on whether or not this
+/// is Win95 or WinNT.
+///
+///</summary>
     static int getReadLock( sqlite3_file pFile )
     {
       int res = 0;
@@ -1221,9 +1231,10 @@ pFile.lastErrno = 1;
       return res;
     }
 
-    /*
-    ** Undo a readlock
-    */
+    ///<summary>
+/// Undo a readlock
+///
+///</summary>
     static int unlockReadLock( sqlite3_file pFile )
     {
       int res = 1;
@@ -1258,32 +1269,33 @@ pFile.lastErrno = 1;
       return res;
     }
 
-    /*
-    ** Lock the file with the lock specified by parameter locktype - one
-    ** of the following:
-    **
-    **     (1) SHARED_LOCK
-    **     (2) RESERVED_LOCK
-    **     (3) PENDING_LOCK
-    **     (4) EXCLUSIVE_LOCK
-    **
-    ** Sometimes when requesting one lock state, additional lock states
-    ** are inserted in between.  The locking might fail on one of the later
-    ** transitions leaving the lock state different from what it started but
-    ** still short of its goal.  The following chart shows the allowed
-    ** transitions and the inserted intermediate states:
-    **
-    **    UNLOCKED . SHARED
-    **    SHARED . RESERVED
-    **    SHARED . (PENDING) . EXCLUSIVE
-    **    RESERVED . (PENDING) . EXCLUSIVE
-    **    PENDING . EXCLUSIVE
-    **
-    ** This routine will only increase a lock.  The winUnlock() routine
-    ** erases all locks at once and returns us immediately to locking level 0.
-    ** It is not possible to lower the locking level one step at a time.  You
-    ** must go straight to locking level 0.
-    */
+    ///<summary>
+/// Lock the file with the lock specified by parameter locktype - one
+/// of the following:
+///
+///     (1) SHARED_LOCK
+///     (2) RESERVED_LOCK
+///     (3) PENDING_LOCK
+///     (4) EXCLUSIVE_LOCK
+///
+/// Sometimes when requesting one lock state, additional lock states
+/// are inserted in between.  The locking might fail on one of the later
+/// transitions leaving the lock state different from what it started but
+/// still short of its goal.  The following chart shows the allowed
+/// transitions and the inserted intermediate states:
+///
+///    UNLOCKED . SHARED
+///    SHARED . RESERVED
+///    SHARED . (PENDING) . EXCLUSIVE
+///    RESERVED . (PENDING) . EXCLUSIVE
+///    PENDING . EXCLUSIVE
+///
+/// This routine will only increase a lock.  The winUnlock() routine
+/// erases all locks at once and returns us immediately to locking level 0.
+/// It is not possible to lower the locking level one step at a time.  You
+/// must go straight to locking level 0.
+///
+///</summary>
     static int winLock( sqlite3_file id, int locktype )
     {
       int rc = SQLITE_OK;         /* Return code from subroutines */
@@ -1482,11 +1494,12 @@ error = 1;
       return rc;
     }
 
-    /*
-    ** This routine checks if there is a RESERVED lock held on the specified
-    ** file by this or any other process. If such a lock is held, return
-    ** non-zero, otherwise zero.
-    */
+    ///<summary>
+/// This routine checks if there is a RESERVED lock held on the specified
+/// file by this or any other process. If such a lock is held, return
+/// non-zero, otherwise zero.
+///
+///</summary>
     static int winCheckReservedLock( sqlite3_file id, ref int pResOut )
     {
       int rc;
@@ -1524,17 +1537,18 @@ error = 1;
       return SQLITE_OK;
     }
 
-    /*
-    ** Lower the locking level on file descriptor id to locktype.  locktype
-    ** must be either NO_LOCK or SHARED_LOCK.
-    **
-    ** If the locking level of the file descriptor is already at or below
-    ** the requested locking level, this routine is a no-op.
-    **
-    ** It is not possible for this routine to fail if the second argument
-    ** is NO_LOCK.  If the second argument is SHARED_LOCK then this routine
-    ** might return SQLITE_IOERR;
-    */
+    ///<summary>
+/// Lower the locking level on file descriptor id to locktype.  locktype
+/// must be either NO_LOCK or SHARED_LOCK.
+///
+/// If the locking level of the file descriptor is already at or below
+/// the requested locking level, this routine is a no-op.
+///
+/// It is not possible for this routine to fail if the second argument
+/// is NO_LOCK.  If the second argument is SHARED_LOCK then this routine
+/// might return SQLITE_IOERR;
+///
+///</summary>
     static int winUnlock( sqlite3_file id, int locktype )
     {
       int type;
@@ -1586,9 +1600,10 @@ error = 1;
       return rc;
     }
 
-    /*
-    ** Control and query of the open file handle.
-    */
+    ///<summary>
+/// Control and query of the open file handle.
+///
+///</summary>
     static int winFileControl( sqlite3_file id, int op, ref sqlite3_int64 pArg )
     {
       switch ( op )
@@ -1624,16 +1639,17 @@ error = 1;
       return SQLITE_NOTFOUND;
     }
 
-    /*
-    ** Return the sector size in bytes of the underlying block device for
-    ** the specified file. This is almost always 512 bytes, but may be
-    ** larger for some devices.
-    **
-    ** SQLite code assumes this function cannot fail. It also assumes that
-    ** if two files are created in the same file-system directory (i.e.
-    ** a database and its journal file) that the sector size will be the
-    ** same for both.
-    */
+    ///<summary>
+/// Return the sector size in bytes of the underlying block device for
+/// the specified file. This is almost always 512 bytes, but may be
+/// larger for some devices.
+///
+/// SQLite code assumes this function cannot fail. It also assumes that
+/// if two files are created in the same file-system directory (i.e.
+/// a database and its journal file) that the sector size will be the
+/// same for both.
+///
+///</summary>
     static int winSectorSize( sqlite3_file id )
     {
       Debug.Assert( id != null );
@@ -1652,12 +1668,13 @@ error = 1;
 #if !SQLITE_OMIT_WAL
 
 
-/* 
-** Windows will only let you create file view mappings
-** on allocation size granularity boundaries.
-** During sqlite3_os_init() we do a GetSystemInfo()
-** to get the granularity size.
-*/
+///<summary>
+///
+/// Windows will only let you create file view mappings
+/// on allocation size granularity boundaries.
+/// During sqlite3_os_init() we do a GetSystemInfo()
+/// to get the granularity size.
+///</summary>
 SYSTEM_INFO winSysInfo;
 
 ///<summary>
@@ -1768,9 +1785,9 @@ struct winShm {
 //#define WIN_SHM_BASE   ((22+SQLITE_SHM_NLOCK)*4)        /* first lock byte */
 //#define WIN_SHM_DMS    (WIN_SHM_BASE+SQLITE_SHM_NLOCK)  /* deadman switch */
 
-/*
-** Apply advisory locks for all n bytes beginning at ofst.
-*/
+///<summary>
+/// Apply advisory locks for all n bytes beginning at ofst.
+///</summary>
 //#define _SHM_UNLCK  1
 //#define _SHM_RDLCK  2
 //#define _SHM_WRLCK  3
@@ -1817,16 +1834,18 @@ static int winShmSystemLock(
   return rc;
 }
 
-/* Forward references to VFS methods */
+///<summary>
+///Forward references to VFS methods
+///</summary>
 static int winOpen(sqlite3_vfs*,const char*,sqlite3_file*,int,int);
 static int winDelete(sqlite3_vfs *,const char*,int);
 
-/*
-** Purge the winShmNodeList list of all entries with winShmNode.nRef==0.
-**
-** This is not a VFS shared-memory method; it is a utility function called
-** by VFS shared-memory methods.
-*/
+///<summary>
+/// Purge the winShmNodeList list of all entries with winShmNode.nRef==0.
+///
+/// This is not a VFS shared-memory method; it is a utility function called
+/// by VFS shared-memory methods.
+///</summary>
 static void winShmPurge(sqlite3_vfs *pVfs, int deleteFlag){
   winShmNode **pp;
   winShmNode *p;

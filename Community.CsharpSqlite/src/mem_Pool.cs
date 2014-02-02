@@ -149,9 +149,10 @@ namespace Community.CsharpSqlite
       return pBtCursor;
     }
 #endif
-    /*
-    ** Free memory.
-    */
+    ///<summary>
+/// Free memory.
+///
+///</summary>
     // -- overloads ---------------------------------------
     static void sqlite3MemFree<T>( ref T x ) where T : class
     {
@@ -163,14 +164,15 @@ namespace Community.CsharpSqlite
     }
     //
 
-    /*
-    ** Like free() but works for allocations obtained from sqlite3MemMalloc()
-    ** or sqlite3MemRealloc().
-    **
-    ** For this low-level routine, we already know that pPrior!=0 since
-    ** cases where pPrior==0 will have been intecepted and dealt with
-    ** by higher-level routines.
-    */
+    ///<summary>
+/// Like free() but works for allocations obtained from sqlite3MemMalloc()
+/// or sqlite3MemRealloc().
+///
+/// For this low-level routine, we already know that pPrior!=0 since
+/// cases where pPrior==0 will have been intecepted and dealt with
+/// by higher-level routines.
+///
+///</summary>
 #if SQLITE_POOL_MEM
 #if TRUE
     static void sqlite3MemFreeInt( ref int[] pPrior )
@@ -321,9 +323,9 @@ for (int i = mem0.msMem.next - 1; i >= 0; i--) if (mem0.aMem[i] != null && mem0.
       return pPrior;
     }
 #else
-    /*
-** No-op versions of all memory allocation routines
-*/
+    ///<summary>
+/// No-op versions of all memory allocation routines
+///</summary>
 static byte[] sqlite3MemMalloc(int nByte) { return new byte[nByte]; }
 static int[] sqlite3MemMallocInt(int nInt) { return new int[nInt]; }
 static Mem sqlite3MemMallocMem( Mem pMem) { return new Mem(); }
@@ -342,10 +344,11 @@ static void sqlite3MemFreeBtCursor(ref BtCursor pPrior) { pPrior = null; }
       return pPrior;
     }
 
-    /*
-    ** Report the allocated size of a prior return from xMalloc()
-    ** or xRealloc().
-    */
+    ///<summary>
+/// Report the allocated size of a prior return from xMalloc()
+/// or xRealloc().
+///
+///</summary>
     static int sqlite3MemSize( byte[] pPrior )
     {
       //  sqlite3_int64 p;
@@ -356,17 +359,19 @@ static void sqlite3MemFreeBtCursor(ref BtCursor pPrior) { pPrior = null; }
       return pPrior == null ? 0 : (int)pPrior.Length;
     }
 
-    /*
-    ** Round up a request size to the next valid allocation size.
-    */
+    ///<summary>
+/// Round up a request size to the next valid allocation size.
+///
+///</summary>
     static int sqlite3MemRoundup( int n )
     {
       return n;//      ROUND8( n );
     }
 
-    /*
-    ** Initialize this module.
-    */
+    ///<summary>
+/// Initialize this module.
+///
+///</summary>
     static int sqlite3MemInit( object NotUsed )
     {
       UNUSED_PARAMETER( NotUsed );
@@ -379,9 +384,10 @@ static void sqlite3MemFreeBtCursor(ref BtCursor pPrior) { pPrior = null; }
       return SQLITE_OK;
     }
 
-    /*
-    ** Deinitialize this module.
-    */
+    ///<summary>
+/// Deinitialize this module.
+///
+///</summary>
     static void sqlite3MemShutdown( object NotUsed )
     {
 
@@ -389,12 +395,13 @@ static void sqlite3MemFreeBtCursor(ref BtCursor pPrior) { pPrior = null; }
       return;
     }
 
-    /*
-    ** This routine is the only routine in this file with external linkage.
-    **
-    ** Populate the low-level memory allocation function pointers in
-    ** sqlite3GlobalConfig.m with pointers to the routines in this file.
-    */
+    ///<summary>
+/// This routine is the only routine in this file with external linkage.
+///
+/// Populate the low-level memory allocation function pointers in
+/// sqlite3GlobalConfig.m with pointers to the routines in this file.
+///
+///</summary>
     static void sqlite3MemSetDefault()
     {
       sqlite3_mem_methods defaultMethods = new sqlite3_mem_methods(

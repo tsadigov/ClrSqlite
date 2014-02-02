@@ -72,45 +72,45 @@ public class sqlite3_backup
   public sqlite3_backup pNext;    /* Next backup associated with source pager */
 };
 
-/*
-** THREAD SAFETY NOTES:
-**
-**   Once it has been created using backup_init(), a single sqlite3_backup
-**   structure may be accessed via two groups of thread-safe entry points:
-**
-**     * Via the sqlite3_backup_XXX() API function backup_step() and
-**       backup_finish(). Both these functions obtain the source database
-**       handle mutex and the mutex associated with the source BtShared
-**       structure, in that order.
-**
-**     * Via the BackupUpdate() and BackupRestart() functions, which are
-**       invoked by the pager layer to report various state changes in
-**       the page cache associated with the source database. The mutex
-**       associated with the source database BtShared structure will always
-**       be held when either of these functions are invoked.
-**
-**   The other sqlite3_backup_XXX() API functions, backup_remaining() and
-**   backup_pagecount() are not thread-safe functions. If they are called
-**   while some other thread is calling backup_step() or backup_finish(),
-**   the values returned may be invalid. There is no way for a call to
-**   BackupUpdate() or BackupRestart() to interfere with backup_remaining()
-**   or backup_pagecount().
-**
-**   Depending on the SQLite configuration, the database handles and/or
-**   the Btree objects may have their own mutexes that require locking.
-**   Non-sharable Btrees (in-memory databases for example), do not have
-**   associated mutexes.
-*/
+///<summary>
+/// THREAD SAFETY NOTES:
+///
+///   Once it has been created using backup_init(), a single sqlite3_backup
+///   structure may be accessed via two groups of thread-safe entry points:
+///
+///     * Via the sqlite3_backup_XXX() API function backup_step() and
+///       backup_finish(). Both these functions obtain the source database
+///       handle mutex and the mutex associated with the source BtShared
+///       structure, in that order.
+///
+///     * Via the BackupUpdate() and BackupRestart() functions, which are
+///       invoked by the pager layer to report various state changes in
+///       the page cache associated with the source database. The mutex
+///       associated with the source database BtShared structure will always
+///       be held when either of these functions are invoked.
+///
+///   The other sqlite3_backup_XXX() API functions, backup_remaining() and
+///   backup_pagecount() are not thread-safe functions. If they are called
+///   while some other thread is calling backup_step() or backup_finish(),
+///   the values returned may be invalid. There is no way for a call to
+///   BackupUpdate() or BackupRestart() to interfere with backup_remaining()
+///   or backup_pagecount().
+///
+///   Depending on the SQLite configuration, the database handles and/or
+///   the Btree objects may have their own mutexes that require locking.
+///   Non-sharable Btrees (in-memory databases for example), do not have
+///   associated mutexes.
+///</summary>
 
-/*
-** Return a pointer corresponding to database zDb (i.e. "main", "temp")
-** in connection handle pDb. If such a database cannot be found, return
-** a NULL pointer and write an error message to pErrorDb.
-**
-** If the "temp" database is requested, it may need to be opened by this
-** function. If an error occurs while doing so, return 0 and write an
-** error message to pErrorDb.
-*/
+///<summary>
+/// Return a pointer corresponding to database zDb (i.e. "main", "temp")
+/// in connection handle pDb. If such a database cannot be found, return
+/// a NULL pointer and write an error message to pErrorDb.
+///
+/// If the "temp" database is requested, it may need to be opened by this
+/// function. If an error occurs while doing so, return 0 and write an
+/// error message to pErrorDb.
+///</summary>
 static Btree findBtree( sqlite3 pErrorDb, sqlite3 pDb, string zDb )
 {
   int i = sqlite3FindDbName( pDb, zDb );
@@ -151,10 +151,10 @@ static Btree findBtree( sqlite3 pErrorDb, sqlite3 pDb, string zDb )
   return pDb.aDb[i].pBt;
 }
 
-/*
-** Attempt to set the page size of the destination to match the page size
-** of the source.
-*/
+///<summary>
+/// Attempt to set the page size of the destination to match the page size
+/// of the source.
+///</summary>
 static int setDestPgsz( sqlite3_backup p )
 {
   int rc;
@@ -162,14 +162,14 @@ static int setDestPgsz( sqlite3_backup p )
   return rc;
 }
 
-/*
-** Create an sqlite3_backup process to copy the contents of zSrcDb from
-** connection handle pSrcDb to zDestDb in pDestDb. If successful, return
-** a pointer to the new sqlite3_backup object.
-**
-** If an error occurs, NULL is returned and an error code and error message
-** stored in database handle pDestDb.
-*/
+///<summary>
+/// Create an sqlite3_backup process to copy the contents of zSrcDb from
+/// connection handle pSrcDb to zDestDb in pDestDb. If successful, return
+/// a pointer to the new sqlite3_backup object.
+///
+/// If an error occurs, NULL is returned and an error code and error message
+/// stored in database handle pDestDb.
+///</summary>
 static public sqlite3_backup sqlite3_backup_init(
 sqlite3 pDestDb,                 /* Database to write to */
 string zDestDb,                  /* Name of database within pDestDb */
@@ -243,21 +243,21 @@ string zSrcDb                    /* Name of database within pSrcDb */
   return p;
 }
 
-/*
-** Argument rc is an SQLite error code. Return true if this error is
-** considered fatal if encountered during a backup operation. All errors
-** are considered fatal except for SQLITE_BUSY and SQLITE_LOCKED.
-*/
+///<summary>
+/// Argument rc is an SQLite error code. Return true if this error is
+/// considered fatal if encountered during a backup operation. All errors
+/// are considered fatal except for SQLITE_BUSY and SQLITE_LOCKED.
+///</summary>
 static bool isFatalError( int rc )
 {
   return ( rc != SQLITE_OK && rc != SQLITE_BUSY && ALWAYS( rc != SQLITE_LOCKED ) );
 }
 
-/*
-** Parameter zSrcData points to a buffer containing the data for
-** page iSrcPg from the source database. Copy this data into the
-** destination database.
-*/
+///<summary>
+/// Parameter zSrcData points to a buffer containing the data for
+/// page iSrcPg from the source database. Copy this data into the
+/// destination database.
+///</summary>
 static int backupOnePage( sqlite3_backup p, Pgno iSrcPg, byte[] zSrcData )
 {
   Pager pDestPager = sqlite3BtreePager( p.pDest );
@@ -343,14 +343,14 @@ static int backupOnePage( sqlite3_backup p, Pgno iSrcPg, byte[] zSrcData )
   return rc;
 }
 
-/*
-** If pFile is currently larger than iSize bytes, then truncate it to
-** exactly iSize bytes. If pFile is not larger than iSize bytes, then
-** this function is a no-op.
-**
-** Return SQLITE_OK if everything is successful, or an SQLite error
-** code if an error occurs.
-*/
+///<summary>
+/// If pFile is currently larger than iSize bytes, then truncate it to
+/// exactly iSize bytes. If pFile is not larger than iSize bytes, then
+/// this function is a no-op.
+///
+/// Return SQLITE_OK if everything is successful, or an SQLite error
+/// code if an error occurs.
+///</summary>
 static int backupTruncateFile( sqlite3_file pFile, int iSize )
 {
   long iCurrent = 0;
@@ -362,10 +362,10 @@ static int backupTruncateFile( sqlite3_file pFile, int iSize )
   return rc;
 }
 
-/*
-** Register this backup object with the associated source pager for
-** callbacks when pages are changed or the cache invalidated.
-*/
+///<summary>
+/// Register this backup object with the associated source pager for
+/// callbacks when pages are changed or the cache invalidated.
+///</summary>
 static void attachBackupObject( sqlite3_backup p )
 {
   sqlite3_backup pp;
@@ -376,9 +376,9 @@ static void attachBackupObject( sqlite3_backup p )
   p.isAttached = 1;
 }
 
-/*
-** Copy nPage pages from the source b-tree to the destination.
-*/
+///<summary>
+/// Copy nPage pages from the source b-tree to the destination.
+///</summary>
 static public int sqlite3_backup_step( sqlite3_backup p, int nPage )
 {
   int rc;
@@ -632,9 +632,9 @@ sqlite3BtreeCommitPhaseTwo(p.pSrc, 0);
   return rc;
 }
 
-/*
-** Release all resources associated with an sqlite3_backup* handle.
-*/
+///<summary>
+/// Release all resources associated with an sqlite3_backup* handle.
+///</summary>
 static public int sqlite3_backup_finish( sqlite3_backup p )
 {
   sqlite3_backup pp;                 /* Ptr to head of pagers backup list */
@@ -691,36 +691,36 @@ static public int sqlite3_backup_finish( sqlite3_backup p )
   return rc;
 }
 
-/*
-** Return the number of pages still to be backed up as of the most recent
-** call to sqlite3_backup_step().
-*/
+///<summary>
+/// Return the number of pages still to be backed up as of the most recent
+/// call to sqlite3_backup_step().
+///</summary>
 static int sqlite3_backup_remaining( sqlite3_backup p )
 {
   return (int)p.nRemaining;
 }
 
-/*
-** Return the total number of pages in the source database as of the most
-** recent call to sqlite3_backup_step().
-*/
+///<summary>
+/// Return the total number of pages in the source database as of the most
+/// recent call to sqlite3_backup_step().
+///</summary>
 static int sqlite3_backup_pagecount( sqlite3_backup p )
 {
   return (int)p.nPagecount;
 }
 
-/*
-** This function is called after the contents of page iPage of the
-** source database have been modified. If page iPage has already been
-** copied into the destination database, then the data written to the
-** destination is now invalidated. The destination copy of iPage needs
-** to be updated with the new data before the backup operation is
-** complete.
-**
-** It is assumed that the mutex associated with the BtShared object
-** corresponding to the source database is held when this function is
-** called.
-*/
+///<summary>
+/// This function is called after the contents of page iPage of the
+/// source database have been modified. If page iPage has already been
+/// copied into the destination database, then the data written to the
+/// destination is now invalidated. The destination copy of iPage needs
+/// to be updated with the new data before the backup operation is
+/// complete.
+///
+/// It is assumed that the mutex associated with the BtShared object
+/// corresponding to the source database is held when this function is
+/// called.
+///</summary>
 static void sqlite3BackupUpdate( sqlite3_backup pBackup, Pgno iPage, byte[] aData )
 {
   sqlite3_backup p;                   /* Iterator variable */
@@ -747,17 +747,17 @@ static void sqlite3BackupUpdate( sqlite3_backup pBackup, Pgno iPage, byte[] aDat
   }
 }
 
-/*
-** Restart the backup process. This is called when the pager layer
-** detects that the database has been modified by an external database
-** connection. In this case there is no way of knowing which of the
-** pages that have been copied into the destination database are still
-** valid and which are not, so the entire process needs to be restarted.
-**
-** It is assumed that the mutex associated with the BtShared object
-** corresponding to the source database is held when this function is
-** called.
-*/
+///<summary>
+/// Restart the backup process. This is called when the pager layer
+/// detects that the database has been modified by an external database
+/// connection. In this case there is no way of knowing which of the
+/// pages that have been copied into the destination database are still
+/// valid and which are not, so the entire process needs to be restarted.
+///
+/// It is assumed that the mutex associated with the BtShared object
+/// corresponding to the source database is held when this function is
+/// called.
+///</summary>
 static void sqlite3BackupRestart( sqlite3_backup pBackup )
 {
   sqlite3_backup p;                   /* Iterator variable */

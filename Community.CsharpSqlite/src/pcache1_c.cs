@@ -111,7 +111,9 @@ namespace Community.CsharpSqlite
       public int nRecyclable;             /* Number of pages in the LRU list */
       public int nPage;                   /* Total number of pages in apHash */
       public int nHash;                   /* Number of slots in apHash[] */
-      public PgHdr1[] apHash;             /* Hash table for fast lookup by key */
+      public PgHdr1[] apHash;             ///<summary>
+///Hash table for fast lookup by key
+///</summary>
 
       public Pgno iMaxKey;                /* Largest key seen since xTruncate() */
 
@@ -138,7 +140,9 @@ namespace Community.CsharpSqlite
       public PgHdr1 pNext;                /* Next in hash table chain */
       public PCache1 pCache;              /* Cache that currently owns this page */
       public PgHdr1 pLruNext;             /* Next in LRU list of unpinned pages */
-      public PgHdr1 pLruPrev;             /* Previous in LRU list of unpinned pages */
+      public PgHdr1 pLruPrev;             ///<summary>
+///Previous in LRU list of unpinned pages
+///</summary>
 
       // For C#
       public PgHdr pPgHdr = new PgHdr();   /* Pointer to Actual Page Header */
@@ -207,18 +211,19 @@ namespace Community.CsharpSqlite
     //#define pcache1 (GLOBAL(struct PCacheGlobal, pcache1_g))
     static PCacheGlobal pcache1 = pcache;
 
-    /*
-    ** When a PgHdr1 structure is allocated, the associated PCache1.szPage
-    ** bytes of data are located directly before it in memory (i.e. the total
-    ** size of the allocation is sizeof(PgHdr1)+PCache1.szPage byte). The
-    ** PGHDR1_TO_PAGE() macro takes a pointer to a PgHdr1 structure as
-    ** an argument and returns a pointer to the associated block of szPage
-    ** bytes. The PAGE_TO_PGHDR1() macro does the opposite: its argument is
-    ** a pointer to a block of szPage bytes of data and the return value is
-    ** a pointer to the associated PgHdr1 structure.
-    **
-    **   Debug.Assert( PGHDR1_TO_PAGE(PAGE_TO_PGHDR1(pCache, X))==X );
-    */
+    ///<summary>
+/// When a PgHdr1 structure is allocated, the associated PCache1.szPage
+/// bytes of data are located directly before it in memory (i.e. the total
+/// size of the allocation is sizeof(PgHdr1)+PCache1.szPage byte). The
+/// PGHDR1_TO_PAGE() macro takes a pointer to a PgHdr1 structure as
+/// an argument and returns a pointer to the associated block of szPage
+/// bytes. The PAGE_TO_PGHDR1() macro does the opposite: its argument is
+/// a pointer to a block of szPage bytes of data and the return value is
+/// a pointer to the associated PgHdr1 structure.
+///
+///   Debug.Assert( PGHDR1_TO_PAGE(PAGE_TO_PGHDR1(pCache, X))==X );
+///
+///</summary>
     //#define PGHDR1_TO_PAGE(p)    (void)(((char)p) - p.pCache.szPage)
     static PgHdr PGHDR1_TO_PAGE( PgHdr1 p )
     {
@@ -231,9 +236,10 @@ namespace Community.CsharpSqlite
       return p.pPgHdr1;
     }
 
-    /*
-    ** Macros to enter and leave the PCache LRU mutex.
-    */
+    ///<summary>
+/// Macros to enter and leave the PCache LRU mutex.
+///
+///</summary>
     //#define pcache1EnterMutex(X) sqlite3_mutex_enter((X).mutex)
     static void pcache1EnterMutex( PGroup X )
     {
@@ -246,17 +252,20 @@ namespace Community.CsharpSqlite
     }
 
     /******************************************************************************/
-    /******** Page Allocation/SQLITE_CONFIG_PCACHE Related Functions **************/
+    ///<summary>
+/// Page Allocation/SQLITE_CONFIG_PCACHE Related Functions 
+///</summary>
 
-    /*
-    ** This function is called during initialization if a static buffer is 
-    ** supplied to use for the page-cache by passing the SQLITE_CONFIG_PAGECACHE
-    ** verb to sqlite3_config(). Parameter pBuf points to an allocation large
-    ** enough to contain 'n' buffers of 'sz' bytes each.
-    **
-    ** This routine is called from sqlite3_initialize() and so it is guaranteed
-    ** to be serialized already.  There is no need for further mutexing.
-    */
+    ///<summary>
+/// This function is called during initialization if a static buffer is
+/// supplied to use for the page-cache by passing the SQLITE_CONFIG_PAGECACHE
+/// verb to sqlite3_config(). Parameter pBuf points to an allocation large
+/// enough to contain 'n' buffers of 'sz' bytes each.
+///
+/// This routine is called from sqlite3_initialize() and so it is guaranteed
+/// to be serialized already.  There is no need for further mutexing.
+///
+///</summary>
     static void sqlite3PCacheBufferSetup( object pBuf, int sz, int n )
     {
       if ( pcache1.isInit )
@@ -282,15 +291,16 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Malloc function used within this file to allocate space from the buffer
-    ** configured using sqlite3_config(SQLITE_CONFIG_PAGECACHE) option. If no 
-    ** such buffer exists or there is no space left in it, this function falls 
-    ** back to sqlite3Malloc().
-    **
-    ** Multiple threads can run this routine at the same time.  Global variables
-    ** in pcache1 need to be protected via mutex.
-    */
+    ///<summary>
+/// Malloc function used within this file to allocate space from the buffer
+/// configured using sqlite3_config(SQLITE_CONFIG_PAGECACHE) option. If no
+/// such buffer exists or there is no space left in it, this function falls
+/// back to sqlite3Malloc().
+///
+/// Multiple threads can run this routine at the same time.  Global variables
+/// in pcache1 need to be protected via mutex.
+///
+///</summary>
     static PgHdr pcache1Alloc( int nByte )
     {
       PgHdr p = null;
@@ -328,9 +338,10 @@ namespace Community.CsharpSqlite
       return p;
     }
 
-    /*
-    ** Free an allocated buffer obtained from pcache1Alloc().
-    */
+    ///<summary>
+/// Free an allocated buffer obtained from pcache1Alloc().
+///
+///</summary>
     static void pcache1Free( ref PgHdr p )
     {
       if ( p == null )
@@ -379,9 +390,9 @@ static int pcache1MemSize(object p){
 }
 #endif //* SQLITE_ENABLE_MEMORY_MANAGEMENT */
 
-    /*
-** Allocate a new page object initially associated with cache pCache.
-*/
+    ///<summary>
+/// Allocate a new page object initially associated with cache pCache.
+///</summary>
     static PgHdr1 pcache1AllocPage( PCache1 pCache )
     {
       //int nByte = sizeof( PgHdr1 ) + pCache.szPage;
@@ -405,13 +416,14 @@ static int pcache1MemSize(object p){
       return p;
     }
 
-    /*
-    ** Free a page object allocated by pcache1AllocPage().
-    **
-    ** The pointer is allowed to be NULL, which is prudent.  But it turns out
-    ** that the current implementation happens to never call this routine
-    ** with a NULL pointer, so we mark the NULL test with ALWAYS().
-    */
+    ///<summary>
+/// Free a page object allocated by pcache1AllocPage().
+///
+/// The pointer is allowed to be NULL, which is prudent.  But it turns out
+/// that the current implementation happens to never call this routine
+/// with a NULL pointer, so we mark the NULL test with ALWAYS().
+///
+///</summary>
     static void pcache1FreePage( ref PgHdr1 p )
     {
       if ( ALWAYS( p ) )
@@ -425,19 +437,21 @@ static int pcache1MemSize(object p){
       }
     }
 
-    /*
-    ** Malloc function used by SQLite to obtain space from the buffer configured
-    ** using sqlite3_config(SQLITE_CONFIG_PAGECACHE) option. If no such buffer
-    ** exists, this function falls back to sqlite3Malloc().
-    */
+    ///<summary>
+/// Malloc function used by SQLite to obtain space from the buffer configured
+/// using sqlite3_config(SQLITE_CONFIG_PAGECACHE) option. If no such buffer
+/// exists, this function falls back to sqlite3Malloc().
+///
+///</summary>
     static PgHdr sqlite3PageMalloc( int sz )
     {
       return pcache1Alloc( sz );
     }
 
-    /*
-    ** Free an allocated buffer obtained from sqlite3PageMalloc().
-    */
+    ///<summary>
+/// Free an allocated buffer obtained from sqlite3PageMalloc().
+///
+///</summary>
     static void sqlite3PageFree( ref byte[] p )
     {
       if ( p != null )
@@ -480,14 +494,17 @@ static int pcache1MemSize(object p){
     }
 
     /******************************************************************************/
-    /******** General Implementation Functions ************************************/
+    ///<summary>
+/// General Implementation Functions 
+///</summary>
 
-    /*
-    ** This function is used to resize the hash table used by the cache passed
-    ** as the first argument.
-    **
-    ** The PCache mutex must be held when this function is called.
-    */
+    ///<summary>
+/// This function is used to resize the hash table used by the cache passed
+/// as the first argument.
+///
+/// The PCache mutex must be held when this function is called.
+///
+///</summary>
     static int pcache1ResizeHash( PCache1 p )
     {
       PgHdr1[] apNew;
@@ -536,15 +553,16 @@ static int pcache1MemSize(object p){
       return ( p.apHash != null ? SQLITE_OK : SQLITE_NOMEM );
     }
 
-    /*
-    ** This function is used internally to remove the page pPage from the 
-    ** PGroup LRU list, if is part of it. If pPage is not part of the PGroup
-    ** LRU list, then this function is a no-op.
-    **
-    ** The PGroup mutex must be held when this function is called.
-    **
-    ** If pPage is NULL then this routine is a no-op.
-    */
+    ///<summary>
+/// This function is used internally to remove the page pPage from the
+/// PGroup LRU list, if is part of it. If pPage is not part of the PGroup
+/// LRU list, then this function is a no-op.
+///
+/// The PGroup mutex must be held when this function is called.
+///
+/// If pPage is NULL then this routine is a no-op.
+///
+///</summary>
     static void pcache1PinPage( PgHdr1 pPage )
     {
       PCache1 pCache;
@@ -580,12 +598,13 @@ static int pcache1MemSize(object p){
     }
 
 
-    /*
-    ** Remove the page supplied as an argument from the hash table 
-    ** (PCache1.apHash structure) that it is currently stored in.
-    **
-    ** The PGroup mutex must be held when this function is called.
-    */
+    ///<summary>
+/// Remove the page supplied as an argument from the hash table
+/// (PCache1.apHash structure) that it is currently stored in.
+///
+/// The PGroup mutex must be held when this function is called.
+///
+///</summary>
     static void pcache1RemoveFromHash( PgHdr1 pPage )
     {
       int h;
@@ -604,10 +623,11 @@ static int pcache1MemSize(object p){
       pCache.nPage--;
     }
 
-    /*
-    ** If there are currently more than nMaxPage pages allocated, try
-    ** to recycle pages to reduce the number allocated to nMaxPage.
-    */
+    ///<summary>
+/// If there are currently more than nMaxPage pages allocated, try
+/// to recycle pages to reduce the number allocated to nMaxPage.
+///
+///</summary>
     static void pcache1EnforceMaxPage( PGroup pGroup )
     {
       Debug.Assert( sqlite3_mutex_held( pGroup.mutex ) );
@@ -672,11 +692,14 @@ static int pcache1MemSize(object p){
     }
 
     /******************************************************************************/
-    /******** sqlite3_pcache Methods **********************************************/
+    ///<summary>
+/// sqlite3_pcache Methods 
+///</summary>
 
-    /*
-    ** Implementation of the sqlite3_pcache.xInit method.
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xInit method.
+///
+///</summary>
     static int pcache1Init<T>( T NotUsed )
     {
       UNUSED_PARAMETER( NotUsed );
@@ -692,11 +715,12 @@ static int pcache1MemSize(object p){
       return SQLITE_OK;
     }
 
-    /*
-    ** Implementation of the sqlite3_pcache.xShutdown method.
-    ** Note that the static mutex allocated in xInit does 
-    ** not need to be freed.
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xShutdown method.
+/// Note that the static mutex allocated in xInit does
+/// not need to be freed.
+///
+///</summary>
     static void pcache1Shutdown<T>( T NotUsed )
     {
       UNUSED_PARAMETER( NotUsed );
@@ -704,11 +728,12 @@ static int pcache1MemSize(object p){
       pcache1 = new PCacheGlobal();//;memset( &pcache1, 0, sizeof( pcache1 ) );
     }
 
-    /*
-    ** Implementation of the sqlite3_pcache.xCreate method.
-    **
-    ** Allocate a new cache.
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xCreate method.
+///
+/// Allocate a new cache.
+///
+///</summary>
     static sqlite3_pcache pcache1Create( int szPage, bool bPurgeable )
     {
       PCache1 pCache;      /* The newly created page cache */
@@ -762,11 +787,12 @@ static int pcache1MemSize(object p){
       return (sqlite3_pcache)pCache;
     }
 
-    /*
-    ** Implementation of the sqlite3_pcache.xCachesize method. 
-    **
-    ** Configure the cache_size limit for a cache.
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xCachesize method.
+///
+/// Configure the cache_size limit for a cache.
+///
+///</summary>
     static void pcache1Cachesize( sqlite3_pcache p, int nMax )
     {
       PCache1 pCache = (PCache1)p;
@@ -783,9 +809,10 @@ static int pcache1MemSize(object p){
       }
     }
 
-    /*
-    ** Implementation of the sqlite3_pcache.xPagecount method. 
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xPagecount method.
+///
+///</summary>
     static int pcache1Pagecount( sqlite3_pcache p )
     {
       int n;
@@ -796,60 +823,61 @@ static int pcache1MemSize(object p){
       return n;
     }
 
-    /*
-    ** Implementation of the sqlite3_pcache.xFetch method. 
-    **
-    ** Fetch a page by key value.
-    **
-    ** Whether or not a new page may be allocated by this function depends on
-    ** the value of the createFlag argument.  0 means do not allocate a new
-    ** page.  1 means allocate a new page if space is easily available.  2 
-    ** means to try really hard to allocate a new page.
-    **
-    ** For a non-purgeable cache (a cache used as the storage for an in-memory
-    ** database) there is really no difference between createFlag 1 and 2.  So
-    ** the calling function (pcache.c) will never have a createFlag of 1 on
-    ** a non-purgable cache.
-    **
-    ** There are three different approaches to obtaining space for a page,
-    ** depending on the value of parameter createFlag (which may be 0, 1 or 2).
-    **
-    **   1. Regardless of the value of createFlag, the cache is searched for a 
-    **      copy of the requested page. If one is found, it is returned.
-    **
-    **   2. If createFlag==0 and the page is not already in the cache, NULL is
-    **      returned.
-    **
-    **   3. If createFlag is 1, and the page is not already in the cache, then
-    **      return NULL (do not allocate a new page) if any of the following
-    **      conditions are true:
-    **
-    **       (a) the number of pages pinned by the cache is greater than
-    **           PCache1.nMax, or
-    **
-    **       (b) the number of pages pinned by the cache is greater than
-    **           the sum of nMax for all purgeable caches, less the sum of 
-    **           nMin for all other purgeable caches, or
-    **
-    **   4. If none of the first three conditions apply and the cache is marked
-    **      as purgeable, and if one of the following is true:
-    **
-    **       (a) The number of pages allocated for the cache is already 
-    **           PCache1.nMax, or
-    **
-    **       (b) The number of pages allocated for all purgeable caches is
-    **           already equal to or greater than the sum of nMax for all
-    **           purgeable caches,
-    **
-    **       (c) The system is under memory pressure and wants to avoid
-    **           unnecessary pages cache entry allocations
-    **
-    **      then attempt to recycle a page from the LRU list. If it is the right
-    **      size, return the recycled buffer. Otherwise, free the buffer and
-    **      proceed to step 5. 
-    **
-    **   5. Otherwise, allocate and return a new page buffer.
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xFetch method.
+///
+/// Fetch a page by key value.
+///
+/// Whether or not a new page may be allocated by this function depends on
+/// the value of the createFlag argument.  0 means do not allocate a new
+/// page.  1 means allocate a new page if space is easily available.  2
+/// means to try really hard to allocate a new page.
+///
+/// For a non-purgeable cache (a cache used as the storage for an in-memory
+/// database) there is really no difference between createFlag 1 and 2.  So
+/// the calling function (pcache.c) will never have a createFlag of 1 on
+/// a non-purgable cache.
+///
+/// There are three different approaches to obtaining space for a page,
+/// depending on the value of parameter createFlag (which may be 0, 1 or 2).
+///
+///   1. Regardless of the value of createFlag, the cache is searched for a
+///      copy of the requested page. If one is found, it is returned.
+///
+///   2. If createFlag==0 and the page is not already in the cache, NULL is
+///      returned.
+///
+///   3. If createFlag is 1, and the page is not already in the cache, then
+///      return NULL (do not allocate a new page) if any of the following
+///      conditions are true:
+///
+///       (a) the number of pages pinned by the cache is greater than
+///           PCache1.nMax, or
+///
+///       (b) the number of pages pinned by the cache is greater than
+///           the sum of nMax for all purgeable caches, less the sum of
+///           nMin for all other purgeable caches, or
+///
+///   4. If none of the first three conditions apply and the cache is marked
+///      as purgeable, and if one of the following is true:
+///
+///       (a) The number of pages allocated for the cache is already
+///           PCache1.nMax, or
+///
+///       (b) The number of pages allocated for all purgeable caches is
+///           already equal to or greater than the sum of nMax for all
+///           purgeable caches,
+///
+///       (c) The system is under memory pressure and wants to avoid
+///           unnecessary pages cache entry allocations
+///
+///      then attempt to recycle a page from the LRU list. If it is the right
+///      size, return the recycled buffer. Otherwise, free the buffer and
+///      proceed to step 5.
+///
+///   5. Otherwise, allocate and return a new page buffer.
+///
+///</summary>
     static PgHdr pcache1Fetch( sqlite3_pcache p, Pgno iKey, int createFlag )
     {
       int nPinned;
@@ -970,11 +998,12 @@ fetch_out:
     }
 
 
-    /*
-    ** Implementation of the sqlite3_pcache.xUnpin method.
-    **
-    ** Mark a page as unpinned (eligible for asynchronous recycling).
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xUnpin method.
+///
+/// Mark a page as unpinned (eligible for asynchronous recycling).
+///
+///</summary>
     static void pcache1Unpin( sqlite3_pcache p, PgHdr pPg, bool reuseUnlikely )
     {
       PCache1 pCache = (PCache1)p;
@@ -1015,9 +1044,10 @@ fetch_out:
       pcache1LeaveMutex( pCache.pGroup );
     }
 
-    /*
-    ** Implementation of the sqlite3_pcache.xRekey method. 
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xRekey method.
+///
+///</summary>
     static void pcache1Rekey(
       sqlite3_pcache p,
       PgHdr pPg,
@@ -1057,13 +1087,14 @@ fetch_out:
       pcache1LeaveMutex( pCache.pGroup );
     }
 
-    /*
-    ** Implementation of the sqlite3_pcache.xTruncate method. 
-    **
-    ** Discard all unpinned pages in the cache with a page number equal to
-    ** or greater than parameter iLimit. Any pinned pages with a page number
-    ** equal to or greater than iLimit are implicitly unpinned.
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xTruncate method.
+///
+/// Discard all unpinned pages in the cache with a page number equal to
+/// or greater than parameter iLimit. Any pinned pages with a page number
+/// equal to or greater than iLimit are implicitly unpinned.
+///
+///</summary>
     static void pcache1Truncate( sqlite3_pcache p, Pgno iLimit )
     {
       PCache1 pCache = (PCache1)p;
@@ -1076,11 +1107,12 @@ fetch_out:
       pcache1LeaveMutex( pCache.pGroup );
     }
 
-    /*
-    ** Implementation of the sqlite3_pcache.xDestroy method. 
-    **
-    ** Destroy a cache allocated using pcache1Create().
-    */
+    ///<summary>
+/// Implementation of the sqlite3_pcache.xDestroy method.
+///
+/// Destroy a cache allocated using pcache1Create().
+///
+///</summary>
     static void pcache1Destroy( ref sqlite3_pcache p )
     {
       PCache1 pCache = (PCache1)p;

@@ -215,12 +215,12 @@ const int COLNAME_N = 1;     /* Number of COLNAME_xxx symbols */
 # endif
 #endif
 
-    /*
-** The following macro converts a relative address in the p2 field
-** of a VdbeOp structure into a negative number so that
-** sqlite3VdbeAddOpList() knows that the address is relative.  Calling
-** the macro again restores the address.
-*/
+    ///<summary>
+/// The following macro converts a relative address in the p2 field
+/// of a VdbeOp structure into a negative number so that
+/// sqlite3VdbeAddOpList() knows that the address is relative.  Calling
+/// the macro again restores the address.
+///</summary>
     //#define ADDR(X)  (-1-(X))
     static int ADDR( int x )
     {
@@ -236,10 +236,11 @@ const int COLNAME_N = 1;     /* Number of COLNAME_xxx symbols */
     ** Prototypes for the VDBE interface.  See comments on the implementation
     ** for a description of what each of these routines does.
     */
-    /*
-    ** Prototypes for the VDBE interface.  See comments on the implementation
-    ** for a description of what each of these routines does.
-    */
+    ///<summary>
+/// Prototypes for the VDBE interface.  See comments on the implementation
+/// for a description of what each of these routines does.
+///
+///</summary>
     //Vdbe *sqlite3VdbeCreate(sqlite3);
     //int sqlite3VdbeAddOp0(Vdbe*,int);
     //int sqlite3VdbeAddOp1(Vdbe*,int,int);

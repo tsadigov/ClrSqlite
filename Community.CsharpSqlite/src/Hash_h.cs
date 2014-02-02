@@ -68,7 +68,9 @@ namespace Community.CsharpSqlite
     {
       public u32 htsize = 31;     /* Number of buckets in the hash table */
       public u32 count;           /* Number of entries in this table */
-      public HashElem first;      /* The first element of the array */
+      public HashElem first;      ///<summary>
+///The first element of the array
+///</summary>
       public _ht[] ht;
       public Hash Copy()
       {
@@ -105,18 +107,19 @@ namespace Community.CsharpSqlite
     //void *sqlite3HashFind(const Hash*, string pKey, int nKey);
     //void sqlite3HashClear(Hash);
 
-    /*
-    ** Macros for looping over all elements of a hash table.  The idiom is
-    ** like this:
-    **
-    **   Hash h;
-    **   HashElem p;
-    **   ...
-    **   for(p=sqliteHashFirst(&h); p; p=sqliteHashNext(p)){
-    **     SomeStructure pData = sqliteHashData(p);
-    **     // do something with pData
-    **   }
-    */
+    ///<summary>
+/// Macros for looping over all elements of a hash table.  The idiom is
+/// like this:
+///
+///   Hash h;
+///   HashElem p;
+///   ...
+///   for(p=sqliteHashFirst(&h); p; p=sqliteHashNext(p)){
+///     SomeStructure pData = sqliteHashData(p);
+///     // do something with pData
+///   }
+///
+///</summary>
     //#define sqliteHashFirst(H)  ((H).first)
     static HashElem sqliteHashFirst( Hash H )
     {

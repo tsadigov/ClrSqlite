@@ -41,10 +41,11 @@ namespace Community.CsharpSqlite
     //#include "sqliteInt.h"
     //#include "vdbeInt.h"
 
-    /*
-    ** Call sqlite3VdbeMemExpandBlob() on the supplied value (type Mem*)
-    ** P if required.
-    */
+    ///<summary>
+/// Call sqlite3VdbeMemExpandBlob() on the supplied value (type Mem*)
+/// P if required.
+///
+///</summary>
     //#define expandBlob(P) (((P)->flags&MEM_Zero)?sqlite3VdbeMemExpandBlob(P):0)
     static void expandBlob( Mem P )
     {
@@ -52,19 +53,20 @@ namespace Community.CsharpSqlite
         sqlite3VdbeMemExpandBlob( P );
     } // TODO -- Convert to inline for speed
 
-    /*
-    ** If pMem is an object with a valid string representation, this routine
-    ** ensures the internal encoding for the string representation is
-    ** 'desiredEnc', one of SqliteEncoding.UTF8, SqliteEncoding.UTF16LE or SqliteEncoding.UTF16BE.
-    **
-    ** If pMem is not a string object, or the encoding of the string
-    ** representation is already stored using the requested encoding, then this
-    ** routine is a no-op.
-    **
-    ** SQLITE_OK is returned if the conversion is successful (or not required).
-    ** SQLITE_NOMEM may be returned if a malloc() fails during conversion
-    ** between formats.
-    */
+    ///<summary>
+/// If pMem is an object with a valid string representation, this routine
+/// ensures the internal encoding for the string representation is
+/// 'desiredEnc', one of SqliteEncoding.UTF8, SqliteEncoding.UTF16LE or SqliteEncoding.UTF16BE.
+///
+/// If pMem is not a string object, or the encoding of the string
+/// representation is already stored using the requested encoding, then this
+/// routine is a no-op.
+///
+/// SQLITE_OK is returned if the conversion is successful (or not required).
+/// SQLITE_NOMEM may be returned if a malloc() fails during conversion
+/// between formats.
+///
+///</summary>
     static int sqlite3VdbeChangeEncoding(Mem pMem, SqliteEncoding desiredEnc)
     {
       int rc;
@@ -93,19 +95,20 @@ return rc;
 #endif
     }
 
-    /*
-    ** Make sure pMem.z points to a writable allocation of at least
-    ** n bytes.
-    **
-    ** If the memory cell currently contains string or blob data
-    ** and the third argument passed to this function is true, the
-    ** current content of the cell is preserved. Otherwise, it may
-    ** be discarded.
-    **
-    ** This function sets the MEM_Dyn flag and clears any xDel callback.
-    ** It also clears MEM_Ephem and MEM_Static. If the preserve flag is
-    ** not set, Mem.n is zeroed.
-    */
+    ///<summary>
+/// Make sure pMem.z points to a writable allocation of at least
+/// n bytes.
+///
+/// If the memory cell currently contains string or blob data
+/// and the third argument passed to this function is true, the
+/// current content of the cell is preserved. Otherwise, it may
+/// be discarded.
+///
+/// This function sets the MEM_Dyn flag and clears any xDel callback.
+/// It also clears MEM_Ephem and MEM_Static. If the preserve flag is
+/// not set, Mem.n is zeroed.
+///
+///</summary>
     static int sqlite3VdbeMemGrow( Mem pMem, int n, int preserve )
     {
       // TODO -- What do we want to do about this routine?
@@ -187,10 +190,11 @@ return rc;
 
       return SQLITE_OK;
     }
-    /*
-    ** If the given Mem* has a zero-filled tail, turn it into an ordinary
-    ** blob stored in dynamically allocated space.
-    */
+    ///<summary>
+/// If the given Mem* has a zero-filled tail, turn it into an ordinary
+/// blob stored in dynamically allocated space.
+///
+///</summary>
 #if !SQLITE_OMIT_INCRBLOB
 static int sqlite3VdbeMemExpandBlob( Mem pMem )
 {
@@ -232,9 +236,9 @@ return SQLITE_OK;
 #endif
 
 
-    /*
-** Make sure the given Mem is \u0000 terminated.
-*/
+    ///<summary>
+/// Make sure the given Mem is \u0000 terminated.
+///</summary>
     static int sqlite3VdbeMemNulTerminate( Mem pMem )
     {
       Debug.Assert( pMem.db == null || sqlite3_mutex_held( pMem.db.mutex ) );
@@ -254,19 +258,20 @@ return SQLITE_OK;
       return SQLITE_OK;
     }
 
-    /*
-    ** Add MEM_Str to the set of representations for the given Mem.  Numbers
-    ** are converted using sqlite3_snprintf().  Converting a BLOB to a string
-    ** is a no-op.
-    **
-    ** Existing representations MEM_Int and MEM_Real are *not* invalidated.
-    **
-    ** A MEM_Null value will never be passed to this function. This function is
-    ** used for converting values to text for returning to the user (i.e. via
-    ** sqlite3_value_text()), or for ensuring that values to be used as btree
-    ** keys are strings. In the former case a NULL pointer is returned the
-    ** user and the later is an internal programming error.
-    */
+    ///<summary>
+/// Add MEM_Str to the set of representations for the given Mem.  Numbers
+/// are converted using sqlite3_snprintf().  Converting a BLOB to a string
+/// is a no-op.
+///
+/// Existing representations MEM_Int and MEM_Real are *not* invalidated.
+///
+/// A MEM_Null value will never be passed to this function. This function is
+/// used for converting values to text for returning to the user (i.e. via
+/// sqlite3_value_text()), or for ensuring that values to be used as btree
+/// keys are strings. In the former case a NULL pointer is returned the
+/// user and the later is an internal programming error.
+///
+///</summary>
     static int sqlite3VdbeMemStringify( Mem pMem, SqliteEncoding enc )
     {
       int rc = SQLITE_OK;
@@ -316,14 +321,15 @@ return SQLITE_OK;
       return rc;
     }
 
-    /*
-    ** Memory cell pMem contains the context of an aggregate function.
-    ** This routine calls the finalize method for that function.  The
-    ** result of the aggregate is stored back into pMem.
-    **
-    ** Return SQLITE_ERROR if the finalizer reports an error.  SQLITE_OK
-    ** otherwise.
-    */
+    ///<summary>
+/// Memory cell pMem contains the context of an aggregate function.
+/// This routine calls the finalize method for that function.  The
+/// result of the aggregate is stored back into pMem.
+///
+/// Return SQLITE_ERROR if the finalizer reports an error.  SQLITE_OK
+/// otherwise.
+///
+///</summary>
     static int sqlite3VdbeMemFinalize( Mem pMem, FuncDef pFunc )
     {
       int rc = SQLITE_OK;
@@ -346,11 +352,12 @@ return SQLITE_OK;
       return rc;
     }
 
-    /*
-    ** If the memory cell contains a string value that must be freed by
-    ** invoking an external callback, free it now. Calling this function
-    ** does not free any Mem.zMalloc buffer.
-    */
+    ///<summary>
+/// If the memory cell contains a string value that must be freed by
+/// invoking an external callback, free it now. Calling this function
+/// does not free any Mem.zMalloc buffer.
+///
+///</summary>
     static void sqlite3VdbeMemReleaseExternal( Mem p )
     {
       Debug.Assert( p.db == null || sqlite3_mutex_held( p.db.mutex ) );
@@ -386,11 +393,12 @@ return SQLITE_OK;
       p.zBLOB = null;
     }
 
-    /*
-    ** Release any memory held by the Mem. This may leave the Mem in an
-    ** inconsistent state, for example with (Mem.z==0) and
-    ** (Mem.type==SQLITE_TEXT).
-    */
+    ///<summary>
+/// Release any memory held by the Mem. This may leave the Mem in an
+/// inconsistent state, for example with (Mem.z==0) and
+/// (Mem.type==SQLITE_TEXT).
+///
+///</summary>
     static void sqlite3VdbeMemRelease( Mem p )
     {
       sqlite3VdbeMemReleaseExternal( p );
@@ -400,18 +408,19 @@ return SQLITE_OK;
       p.xDel = null;
     }
 
-    /*
-    ** Convert a 64-bit IEEE double into a 64-bit signed integer.
-    ** If the double is too large, return 0x8000000000000000.
-    **
-    ** Most systems appear to do this simply by assigning
-    ** variables and without the extra range tests.  But
-    ** there are reports that windows throws an expection
-    ** if the floating point value is out of range. (See ticket #2880.)
-    ** Because we do not completely understand the problem, we will
-    ** take the conservative approach and always do range tests
-    ** before attempting the conversion.
-    */
+    ///<summary>
+/// Convert a 64-bit IEEE double into a 64-bit signed integer.
+/// If the double is too large, return 0x8000000000000000.
+///
+/// Most systems appear to do this simply by assigning
+/// variables and without the extra range tests.  But
+/// there are reports that windows throws an expection
+/// if the floating point value is out of range. (See ticket #2880.)
+/// Because we do not completely understand the problem, we will
+/// take the conservative approach and always do range tests
+/// before attempting the conversion.
+///
+///</summary>
     static i64 doubleToInt64( double r )
     {
 #if SQLITE_OMIT_FLOATING_POINT
@@ -447,17 +456,18 @@ return r;
 #endif
     }
 
-    /*
-    ** Return some kind of integer value which is the best we can do
-    ** at representing the value that *pMem describes as an integer.
-    ** If pMem is an integer, then the value is exact.  If pMem is
-    ** a floating-point then the value returned is the integer part.
-    ** If pMem is a string or blob, then we make an attempt to convert
-    ** it into a integer and return that.  If pMem represents an
-    ** an SQL-NULL value, return 0.
-    **
-    ** If pMem represents a string value, its encoding might be changed.
-    */
+    ///<summary>
+/// Return some kind of integer value which is the best we can do
+/// at representing the value that *pMem describes as an integer.
+/// If pMem is an integer, then the value is exact.  If pMem is
+/// a floating-point then the value returned is the integer part.
+/// If pMem is a string or blob, then we make an attempt to convert
+/// it into a integer and return that.  If pMem represents an
+/// an SQL-NULL value, return 0.
+///
+/// If pMem represents a string value, its encoding might be changed.
+///
+///</summary>
     static i64 sqlite3VdbeIntValue( Mem pMem )
     {
       int flags;
@@ -494,12 +504,13 @@ return r;
       }
     }
 
-    /*
-    ** Return the best representation of pMem that we can get into a
-    ** double.  If pMem is already a double or an integer, return its
-    ** value.  If it is a string or blob, try to convert it to a double.
-    ** If it is a NULL, return 0.0.
-    */
+    ///<summary>
+/// Return the best representation of pMem that we can get into a
+/// double.  If pMem is already a double or an integer, return its
+/// value.  If it is a string or blob, try to convert it to a double.
+/// If it is a NULL, return 0.0.
+///
+///</summary>
     static double sqlite3VdbeRealValue( Mem pMem )
     {
       Debug.Assert( pMem.db == null || sqlite3_mutex_held( pMem.db.mutex ) );
@@ -534,10 +545,11 @@ return r;
       }
     }
 
-    /*
-    ** The MEM structure is already a MEM_Real.  Try to also make it a
-    ** MEM_Int if we can.
-    */
+    ///<summary>
+/// The MEM structure is already a MEM_Real.  Try to also make it a
+/// MEM_Int if we can.
+///
+///</summary>
     static void sqlite3VdbeIntegerAffinity( Mem pMem )
     {
       Debug.Assert( ( pMem.flags & MEM_Real ) != 0 );
@@ -566,9 +578,10 @@ return r;
       }
     }
 
-    /*
-    ** Convert pMem to type integer.  Invalidate any prior representations.
-    */
+    ///<summary>
+/// Convert pMem to type integer.  Invalidate any prior representations.
+///
+///</summary>
     static int sqlite3VdbeMemIntegerify( Mem pMem )
     {
       Debug.Assert( pMem.db == null || sqlite3_mutex_held( pMem.db.mutex ) );
@@ -580,10 +593,11 @@ return r;
       return SQLITE_OK;
     }
 
-    /*
-    ** Convert pMem so that it is of type MEM_Real.
-    ** Invalidate any prior representations.
-    */
+    ///<summary>
+/// Convert pMem so that it is of type MEM_Real.
+/// Invalidate any prior representations.
+///
+///</summary>
     static int sqlite3VdbeMemRealify( Mem pMem )
     {
       Debug.Assert( pMem.db == null || sqlite3_mutex_held( pMem.db.mutex ) );
@@ -594,14 +608,15 @@ return r;
       return SQLITE_OK;
     }
 
-    /*
-    ** Convert pMem so that it has types MEM_Real or MEM_Int or both.
-    ** Invalidate any prior representations.
-    **
-    ** Every effort is made to force the conversion, even if the input
-    ** is a string that does not look completely like a number.  Convert
-    ** as much of the string as we can and ignore the rest.
-    */
+    ///<summary>
+/// Convert pMem so that it has types MEM_Real or MEM_Int or both.
+/// Invalidate any prior representations.
+///
+/// Every effort is made to force the conversion, even if the input
+/// is a string that does not look completely like a number.  Convert
+/// as much of the string as we can and ignore the rest.
+///
+///</summary>
     static int sqlite3VdbeMemNumerify( Mem pMem )
     {
       if ( ( pMem.flags & ( MEM_Int | MEM_Real | MEM_Null ) ) == 0 )
@@ -636,9 +651,9 @@ return r;
     }
 
 #if !SQLITE_OMIT_FLOATING_POINT
-    /*
-** Delete any previous value and set the value stored in pMem to NULL.
-*/
+    ///<summary>
+/// Delete any previous value and set the value stored in pMem to NULL.
+///</summary>
     static void sqlite3VdbeMemSetNull( Mem pMem )
     {
       if ( ( pMem.flags & MEM_Frame ) != 0 )
@@ -658,10 +673,10 @@ return r;
     }
 #endif
 
-    /*
-** Delete any previous value and set the value to be a BLOB of length
-** n containing all zeros.
-*/
+    ///<summary>
+/// Delete any previous value and set the value to be a BLOB of length
+/// n containing all zeros.
+///</summary>
     static void sqlite3VdbeMemSetZeroBlob( Mem pMem, int n )
     {
       sqlite3VdbeMemRelease( pMem );
@@ -682,10 +697,11 @@ return r;
 #endif
     }
 
-    /*
-    ** Delete any previous value and set the value stored in pMem to val,
-    ** manifest type INTEGER.
-    */
+    ///<summary>
+/// Delete any previous value and set the value stored in pMem to val,
+/// manifest type INTEGER.
+///
+///</summary>
     static void sqlite3VdbeMemSetInt64( Mem pMem, i64 val )
     {
       sqlite3VdbeMemRelease( pMem );
@@ -694,10 +710,11 @@ return r;
       pMem.type = SQLITE_INTEGER;
     }
 
-    /*
-    ** Delete any previous value and set the value stored in pMem to val,
-    ** manifest type REAL.
-    */
+    ///<summary>
+/// Delete any previous value and set the value stored in pMem to val,
+/// manifest type REAL.
+///
+///</summary>
     static void sqlite3VdbeMemSetDouble( Mem pMem, double val )
     {
       if ( MathExtensions.sqlite3IsNaN( val ) )
@@ -713,10 +730,11 @@ return r;
       }
     }
 
-    /*
-    ** Delete any previous value and set the value of pMem to be an
-    ** empty boolean index.
-    */
+    ///<summary>
+/// Delete any previous value and set the value of pMem to be an
+/// empty boolean index.
+///
+///</summary>
     static void sqlite3VdbeMemSetRowSet( Mem pMem )
     {
       sqlite3 db = pMem.db;
@@ -783,17 +801,18 @@ return r;
     }
 #endif //* SQLITE_DEBUG */
 
-    /*
-** Size of struct Mem not including the Mem.zMalloc member.
-*/
+    ///<summary>
+/// Size of struct Mem not including the Mem.zMalloc member.
+///</summary>
     //#define MEMCELLSIZE (size_t)(&(((Mem *)0).zMalloc))
 
-    /*
-    ** Make an shallow copy of pFrom into pTo.  Prior contents of
-    ** pTo are freed.  The pFrom.z field is not duplicated.  If
-    ** pFrom.z is used, then pTo.z points to the same thing as pFrom.z
-    ** and flags gets srcType (either MEM_Ephem or MEM_Static).
-    */
+    ///<summary>
+/// Make an shallow copy of pFrom into pTo.  Prior contents of
+/// pTo are freed.  The pFrom.z field is not duplicated.  If
+/// pFrom.z is used, then pTo.z points to the same thing as pFrom.z
+/// and flags gets srcType (either MEM_Ephem or MEM_Static).
+///
+///</summary>
     static void sqlite3VdbeMemShallowCopy( Mem pTo, Mem pFrom, int srcType )
     {
       Debug.Assert( ( pFrom.flags & MEM_RowSet ) == 0 );
@@ -808,10 +827,11 @@ return r;
       }
     }
 
-    /*
-    ** Make a full copy of pFrom into pTo.  Prior contents of pTo are
-    ** freed before the copy is made.
-    */
+    ///<summary>
+/// Make a full copy of pFrom into pTo.  Prior contents of pTo are
+/// freed before the copy is made.
+///
+///</summary>
     static int sqlite3VdbeMemCopy( Mem pTo, Mem pFrom )
     {
       int rc = SQLITE_OK;
@@ -836,12 +856,13 @@ return r;
 
 
 
-    /*
-    ** Transfer the contents of pFrom to pTo. Any existing value in pTo is
-    ** freed. If pFrom contains ephemeral data, a copy is made.
-    **
-    ** pFrom contains an SQL NULL when this routine returns.
-    */
+    ///<summary>
+/// Transfer the contents of pFrom to pTo. Any existing value in pTo is
+/// freed. If pFrom contains ephemeral data, a copy is made.
+///
+/// pFrom contains an SQL NULL when this routine returns.
+///
+///</summary>
     static void sqlite3VdbeMemMove( Mem pTo, Mem pFrom )
     {
       Debug.Assert( pFrom.db == null || sqlite3_mutex_held( pFrom.db.mutex ) );
@@ -855,21 +876,22 @@ return r;
       sqlite3_free( ref pFrom.zBLOB ); //pFrom.zMalloc=0;
     }
 
-    /*
-    ** Change the value of a Mem to be a string or a BLOB.
-    **
-    ** The memory management strategy depends on the value of the xDel
-    ** parameter. If the value passed is SQLITE_TRANSIENT, then the
-    ** string is copied into a (possibly existing) buffer managed by the
-    ** Mem structure. Otherwise, any existing buffer is freed and the
-    ** pointer copied.
-    **
-    ** If the string is too large (if it exceeds the SQLITE_LIMIT_LENGTH
-    ** size limit) then no memory allocation occurs.  If the string can be
-    ** stored without allocating memory, then it is.  If a memory allocation
-    ** is required to store the string, then value of pMem is unchanged.  In
-    ** either case, SQLITE_TOOBIG is returned.
-    */
+    ///<summary>
+/// Change the value of a Mem to be a string or a BLOB.
+///
+/// The memory management strategy depends on the value of the xDel
+/// parameter. If the value passed is SQLITE_TRANSIENT, then the
+/// string is copied into a (possibly existing) buffer managed by the
+/// Mem structure. Otherwise, any existing buffer is freed and the
+/// pointer copied.
+///
+/// If the string is too large (if it exceeds the SQLITE_LIMIT_LENGTH
+/// size limit) then no memory allocation occurs.  If the string can be
+/// stored without allocating memory, then it is.  If a memory allocation
+/// is required to store the string, then value of pMem is unchanged.  In
+/// either case, SQLITE_TOOBIG is returned.
+///
+///</summary>
     static int sqlite3VdbeMemSetBlob(
     Mem pMem,           /* Memory cell to set to string value */
     byte[] zBlob,       /* Blob pointer */
@@ -1102,15 +1124,16 @@ return SQLITE_NOMEM;
       return SQLITE_OK;
     }
 
-    /*
-    ** Compare the values contained by the two memory cells, returning
-    ** negative, zero or positive if pMem1 is less than, equal to, or greater
-    ** than pMem2. Sorting order is NULL's first, followed by numbers (integers
-    ** and reals) sorted numerically, followed by text ordered by the collating
-    ** sequence pColl and finally blob's ordered by memcmp().
-    **
-    ** Two NULL values are considered equal by this function.
-    */
+    ///<summary>
+/// Compare the values contained by the two memory cells, returning
+/// negative, zero or positive if pMem1 is less than, equal to, or greater
+/// than pMem2. Sorting order is NULL's first, followed by numbers (integers
+/// and reals) sorted numerically, followed by text ordered by the collating
+/// sequence pColl and finally blob's ordered by memcmp().
+///
+/// Two NULL values are considered equal by this function.
+///
+///</summary>
     static int sqlite3MemCompare( Mem pMem1, Mem pMem2, CollSeq pColl )
     {
       int rc;
@@ -1254,19 +1277,20 @@ return SQLITE_NOMEM;
       return rc;
     }
 
-    /*
-    ** Move data out of a btree key or data field and into a Mem structure.
-    ** The data or key is taken from the entry that pCur is currently pointing
-    ** to.  offset and amt determine what portion of the data or key to retrieve.
-    ** key is true to get the key or false to get data.  The result is written
-    ** into the pMem element.
-    **
-    ** The pMem structure is assumed to be uninitialized.  Any prior content
-    ** is overwritten without being freed.
-    **
-    ** If this routine fails for any reason (malloc returns NULL or unable
-    ** to read from the disk) then the pMem is left in an inconsistent state.
-    */
+    ///<summary>
+/// Move data out of a btree key or data field and into a Mem structure.
+/// The data or key is taken from the entry that pCur is currently pointing
+/// to.  offset and amt determine what portion of the data or key to retrieve.
+/// key is true to get the key or false to get data.  The result is written
+/// into the pMem element.
+///
+/// The pMem structure is assumed to be uninitialized.  Any prior content
+/// is overwritten without being freed.
+///
+/// If this routine fails for any reason (malloc returns NULL or unable
+/// to read from the disk) then the pMem is left in an inconsistent state.
+///
+///</summary>
     static int sqlite3VdbeMemFromBtree(
     BtCursor pCur,    /* Cursor pointing at record to retrieve. */
     int offset,       /* Offset from the start of data to return bytes from. */
@@ -1330,16 +1354,18 @@ return SQLITE_NOMEM;
       return rc;
     }
 
-    /* This function is only available internally, it is not part of the
-    ** external API. It works in a similar way to sqlite3_value_text(),
-    ** except the data returned is in the encoding specified by the second
-    ** parameter, which must be one of SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE or
-    ** SqliteEncoding.UTF8.
-    **
-    ** (2006-02-16:)  The enc value can be or-ed with SqliteEncoding.UTF16_ALIGNED.
-    ** If that is the case, then the result must be aligned on an even byte
-    ** boundary.
-    */
+    ///<summary>
+///This function is only available internally, it is not part of the
+/// external API. It works in a similar way to sqlite3_value_text(),
+/// except the data returned is in the encoding specified by the second
+/// parameter, which must be one of SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE or
+/// SqliteEncoding.UTF8.
+///
+/// (2006-02-16:)  The enc value can be or-ed with SqliteEncoding.UTF16_ALIGNED.
+/// If that is the case, then the result must be aligned on an even byte
+/// boundary.
+///
+///</summary>
     static string sqlite3ValueText( sqlite3_value pVal, SqliteEncoding enc )
     {
       if ( pVal == null )
@@ -1392,9 +1418,10 @@ return SQLITE_NOMEM;
       }
     }
 
-    /*
-    ** Create a new sqlite3_value object.
-    */
+    ///<summary>
+/// Create a new sqlite3_value object.
+///
+///</summary>
     static sqlite3_value sqlite3ValueNew( sqlite3 db )
     {
       Mem p = null;
@@ -1408,16 +1435,17 @@ return SQLITE_NOMEM;
       return p;
     }
 
-    /*
-    ** Create a new sqlite3_value object, containing the value of pExpr.
-    **
-    ** This only works for very simple expressions that consist of one constant
-    ** token (i.e. "5", "5.1", "'a string'"). If the expression can
-    ** be converted directly into a value, then the value is allocated and
-    ** a pointer written to ppVal. The caller is responsible for deallocating
-    ** the value by passing it to sqlite3ValueFree() later on. If the expression
-    ** cannot be converted to a value, then ppVal is set to NULL.
-    */
+    ///<summary>
+/// Create a new sqlite3_value object, containing the value of pExpr.
+///
+/// This only works for very simple expressions that consist of one constant
+/// token (i.e. "5", "5.1", "'a string'"). If the expression can
+/// be converted directly into a value, then the value is allocated and
+/// a pointer written to ppVal. The caller is responsible for deallocating
+/// the value by passing it to sqlite3ValueFree() later on. If the expression
+/// cannot be converted to a value, then ppVal is set to NULL.
+///
+///</summary>
     static int sqlite3ValueFromExpr(
     sqlite3 db,              /* The database connection */
     Expr pExpr,              /* The expression to evaluate */
@@ -1557,9 +1585,10 @@ no_mem:
       return SQLITE_NOMEM;
     }
 
-    /*
-    ** Change the string value of an sqlite3_value object
-    */
+    ///<summary>
+/// Change the string value of an sqlite3_value object
+///
+///</summary>
     static void sqlite3ValueSetStr(
     sqlite3_value v,     /* Value to be set */
     int n,               /* Length of string z */
@@ -1572,9 +1601,10 @@ no_mem:
         sqlite3VdbeMemSetStr( v, z, n, enc, xDel );
     }
 
-    /*
-    ** Free an sqlite3_value object
-    */
+    ///<summary>
+/// Free an sqlite3_value object
+///
+///</summary>
     static void sqlite3ValueFree( ref sqlite3_value v )
     {
       if ( v == null )

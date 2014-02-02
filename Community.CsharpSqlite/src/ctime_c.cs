@@ -32,14 +32,15 @@ namespace Community.CsharpSqlite
 
     //#include "sqliteInt.h"
 
-    /*
-    ** An array of names of all compile-time options.  This array should 
-    ** be sorted A-Z.
-    **
-    ** This array looks large, but in a typical installation actually uses
-    ** only a handful of compile-time options, so most times this array is usually
-    ** rather short and uses little memory space.
-    */
+    ///<summary>
+/// An array of names of all compile-time options.  This array should
+/// be sorted A-Z.
+///
+/// This array looks large, but in a typical installation actually uses
+/// only a handful of compile-time options, so most times this array is usually
+/// rather short and uses little memory space.
+///
+///</summary>
     static string[] azCompileOpt = {
 
 /* These macros are provided to "stringify" the value of the define
@@ -374,13 +375,14 @@ namespace Community.CsharpSqlite
 #endif
 };
 
-    /*
-    ** Given the name of a compile-time option, return true if that option
-    ** was used and false if not.
-    **
-    ** The name can optionally begin with "SQLITE_" but the "SQLITE_" prefix
-    ** is not required for a match.
-    */
+    ///<summary>
+/// Given the name of a compile-time option, return true if that option
+/// was used and false if not.
+///
+/// The name can optionally begin with "SQLITE_" but the "SQLITE_" prefix
+/// is not required for a match.
+///
+///</summary>
     static int sqlite3_compileoption_used( string zOptName )
     {
       if ( zOptName.EndsWith( "=" ) )

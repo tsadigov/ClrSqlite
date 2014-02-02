@@ -225,11 +225,11 @@ namespace Community.CsharpSqlite
 //int sqlite3BtreeCheckpoint(Btree*, int, int *, int );
 #endif
 
-    /*
-** If we are not using shared cache, then there is no need to
-** use mutexes to access the BtShared structures.  So make the
-** Enter and Leave procedures no-ops.
-*/
+    ///<summary>
+/// If we are not using shared cache, then there is no need to
+/// use mutexes to access the BtShared structures.  So make the
+/// Enter and Leave procedures no-ops.
+///</summary>
 #if !SQLITE_OMIT_SHARED_CACHE
 //void sqlite3BtreeEnter(Btree);
 //void sqlite3BtreeEnterAll(sqlite3);

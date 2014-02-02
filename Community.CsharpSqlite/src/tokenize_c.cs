@@ -80,22 +80,23 @@ namespace Community.CsharpSqlite
     //#include "keywordhash.h"
 
 
-    /*
-    ** If X is a character that can be used in an identifier then
-    ** IdChar(X) will be true.  Otherwise it is false.
-    **
-    ** For ASCII, any character with the high-order bit set is
-    ** allowed in an identifier.  For 7-bit characters,
-    ** sqlite3IsIdChar[X] must be 1.
-    **
-    ** For EBCDIC, the rules are more complex but have the same
-    ** end result.
-    **
-    ** Ticket #1066.  the SQL standard does not allow '$' in the
-    ** middle of identfiers.  But many SQL implementations do.
-    ** SQLite will allow '$' in identifiers for compatibility.
-    ** But the feature is undocumented.
-    */
+    ///<summary>
+/// If X is a character that can be used in an identifier then
+/// IdChar(X) will be true.  Otherwise it is false.
+///
+/// For ASCII, any character with the high-order bit set is
+/// allowed in an identifier.  For 7-bit characters,
+/// sqlite3IsIdChar[X] must be 1.
+///
+/// For EBCDIC, the rules are more complex but have the same
+/// end result.
+///
+/// Ticket #1066.  the SQL standard does not allow '$' in the
+/// middle of identfiers.  But many SQL implementations do.
+/// SQLite will allow '$' in identifiers for compatibility.
+/// But the feature is undocumented.
+///
+///</summary>
 #if SQLITE_ASCII
     //#define IdChar(C)  ((sqlite3CtypeMap[(unsigned char)C]&0x46)!=0)
 #endif
@@ -119,10 +120,10 @@ namespace Community.CsharpSqlite
 //#endif
 
 
-    /*
-** Return the length of the token that begins at z[iOffset + 0].
-** Store the token type in *tokenType before returning.
-*/
+    ///<summary>
+/// Return the length of the token that begins at z[iOffset + 0].
+/// Store the token type in *tokenType before returning.
+///</summary>
     static int sqlite3GetToken( string z, int iOffset, ref int tokenType )
     {
       int i;

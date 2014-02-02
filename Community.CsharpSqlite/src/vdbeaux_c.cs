@@ -65,19 +65,20 @@ namespace Community.CsharpSqlite
     //#include "sqliteInt.h"
     //#include "vdbeInt.h"
 
-    /*
-    ** When debugging the code generator in a symbolic debugger, one can
-    ** set the sqlite3VdbeAddopTrace to 1 and all opcodes will be printed
-    ** as they are added to the instruction stream.
-    */
+    ///<summary>
+/// When debugging the code generator in a symbolic debugger, one can
+/// set the sqlite3VdbeAddopTrace to 1 and all opcodes will be printed
+/// as they are added to the instruction stream.
+///
+///</summary>
 #if  SQLITE_DEBUG
     static bool sqlite3VdbeAddopTrace = false;
 #endif
 
 
-    /*
-** Create a new virtual database engine.
-*/
+    ///<summary>
+/// Create a new virtual database engine.
+///</summary>
     static Vdbe sqlite3VdbeCreate( sqlite3 db )
     {
       Vdbe p;
@@ -96,9 +97,10 @@ namespace Community.CsharpSqlite
       return p;
     }
 
-    /*
-    ** Remember the SQL string for a prepared statement.
-    */
+    ///<summary>
+/// Remember the SQL string for a prepared statement.
+///
+///</summary>
     static void sqlite3VdbeSetSql( Vdbe p, string z, int n, int isPrepareV2 )
     {
       Debug.Assert( isPrepareV2 == 1 || isPrepareV2 == 0 );
@@ -112,18 +114,20 @@ if( 0==isPrepareV2 ) return;
       p.isPrepareV2 = isPrepareV2 != 0;
     }
 
-    /*
-    ** Return the SQL associated with a prepared statement
-    */
+    ///<summary>
+/// Return the SQL associated with a prepared statement
+///
+///</summary>
     static string sqlite3_sql( sqlite3_stmt pStmt )
     {
       Vdbe p = (Vdbe)pStmt;
       return ( p != null && p.isPrepareV2 ? p.zSql : "" );
     }
 
-    /*
-    ** Swap all content between two VDBE structures.
-    */
+    ///<summary>
+/// Swap all content between two VDBE structures.
+///
+///</summary>
     static void sqlite3VdbeSwap( Vdbe pA, Vdbe pB )
     {
       Vdbe tmp = new Vdbe();
@@ -154,15 +158,15 @@ if( 0==isPrepareV2 ) return;
     }
 #endif
 
-    /*
-** Resize the Vdbe.aOp array so that it is at least one op larger than
-** it was.
-**
-** If an out-of-memory error occurs while resizing the array, return
-** SQLITE_NOMEM. In this case Vdbe.aOp and Vdbe.nOpAlloc remain
-** unchanged (this is so that any opcodes already allocated can be
-** correctly deallocated along with the rest of the Vdbe).
-*/
+    ///<summary>
+/// Resize the Vdbe.aOp array so that it is at least one op larger than
+/// it was.
+///
+/// If an out-of-memory error occurs while resizing the array, return
+/// SQLITE_NOMEM. In this case Vdbe.aOp and Vdbe.nOpAlloc remain
+/// unchanged (this is so that any opcodes already allocated can be
+/// correctly deallocated along with the rest of the Vdbe).
+///</summary>
     static int growOpArray( Vdbe p )
     {
       //VdbeOp pNew;
@@ -181,22 +185,23 @@ if( 0==isPrepareV2 ) return;
       return ( p.aOp != null ? SQLITE_OK : SQLITE_NOMEM ); //  return (pNew ? SQLITE_OK : SQLITE_NOMEM);
     }
 
-    /*
-    ** Add a new instruction to the list of instructions current in the
-    ** VDBE.  Return the address of the new instruction.
-    **
-    ** Parameters:
-    **
-    **    p               Pointer to the VDBE
-    **
-    **    op              The opcode for this instruction
-    **
-    **    p1, p2, p3      Operands
-    **
-    ** Use the sqlite3VdbeResolveLabel() function to fix an address and
-    ** the sqlite3VdbeChangeP4() function to change the value of the P4
-    ** operand.
-    */
+    ///<summary>
+/// Add a new instruction to the list of instructions current in the
+/// VDBE.  Return the address of the new instruction.
+///
+/// Parameters:
+///
+///    p               Pointer to the VDBE
+///
+///    op              The opcode for this instruction
+///
+///    p1, p2, p3      Operands
+///
+/// Use the sqlite3VdbeResolveLabel() function to fix an address and
+/// the sqlite3VdbeChangeP4() function to change the value of the P4
+/// operand.
+///
+///</summary>
     static int sqlite3VdbeAddOp3( Vdbe p, int op, int p1, int p2, int p3 )
     {
       int i;
@@ -253,9 +258,10 @@ pOp.cnt = 0;
     }
 
 
-    /*
-    ** Add an opcode that includes the p4 value as a pointer.
-    */
+    ///<summary>
+/// Add an opcode that includes the p4 value as a pointer.
+///
+///</summary>
     //P4_INT32
     static int sqlite3VdbeAddOp4( Vdbe p, int op, int p1, int p2, int p3, i32 pP4, int p4type )
     {
@@ -396,13 +402,14 @@ pOp.cnt = 0;
     //    return addr;
     //  }
 
-    /*
-    ** Add an OP_ParseSchema opcode.  This routine is broken out from
-    ** sqlite3VdbeAddOp4() since it needs to also local all btrees.
-    **
-    ** The zWhere string must have been obtained from sqlite3_malloc().
-    ** This routine will take ownership of the allocated memory.
-    */
+    ///<summary>
+/// Add an OP_ParseSchema opcode.  This routine is broken out from
+/// sqlite3VdbeAddOp4() since it needs to also local all btrees.
+///
+/// The zWhere string must have been obtained from sqlite3_malloc().
+/// This routine will take ownership of the allocated memory.
+///
+///</summary>
     static void sqlite3VdbeAddParseSchemaOp( Vdbe p, int iDb, string zWhere )
     {
       int j;
@@ -412,9 +419,10 @@ pOp.cnt = 0;
         sqlite3VdbeUsesBtree( p, j );
     }
 
-    /*
-    ** Add an opcode that includes the p4 value as an integer.
-    */
+    ///<summary>
+/// Add an opcode that includes the p4 value as an integer.
+///
+///</summary>
     static int sqlite3VdbeAddOp4Int(
     Vdbe p,             /* Add the opcode to this VM */
     int op,             /* The new opcode */
@@ -430,20 +438,21 @@ pOp.cnt = 0;
       sqlite3VdbeChangeP4( p, addr, _p4, P4_INT32 );
       return addr;
     }
-    /*
-    ** Create a new symbolic label for an instruction that has yet to be
-    ** coded.  The symbolic label is really just a negative number.  The
-    ** label can be used as the P2 value of an operation.  Later, when
-    ** the label is resolved to a specific address, the VDBE will scan
-    ** through its operation list and change all values of P2 which match
-    ** the label into the resolved address.
-    **
-    ** The VDBE knows that a P2 value is a label because labels are
-    ** always negative and P2 values are suppose to be non-negative.
-    ** Hence, a negative P2 value is a label that has yet to be resolved.
-    **
-    ** Zero is returned if a malloc() fails.
-    */
+    ///<summary>
+/// Create a new symbolic label for an instruction that has yet to be
+/// coded.  The symbolic label is really just a negative number.  The
+/// label can be used as the P2 value of an operation.  Later, when
+/// the label is resolved to a specific address, the VDBE will scan
+/// through its operation list and change all values of P2 which match
+/// the label into the resolved address.
+///
+/// The VDBE knows that a P2 value is a label because labels are
+/// always negative and P2 values are suppose to be non-negative.
+/// Hence, a negative P2 value is a label that has yet to be resolved.
+///
+/// Zero is returned if a malloc() fails.
+///
+///</summary>
     static int sqlite3VdbeMakeLabel( Vdbe p )
     {
       int i;
@@ -467,11 +476,12 @@ pOp.cnt = 0;
       return -1 - i;
     }
 
-    /*
-    ** Resolve label "x" to be the address of the next instruction to
-    ** be inserted.  The parameter "x" must have been obtained from
-    ** a prior call to sqlite3VdbeMakeLabel().
-    */
+    ///<summary>
+/// Resolve label "x" to be the address of the next instruction to
+/// be inserted.  The parameter "x" must have been obtained from
+/// a prior call to sqlite3VdbeMakeLabel().
+///
+///</summary>
     static void sqlite3VdbeResolveLabel( Vdbe p, int x )
     {
       int j = -1 - x;
@@ -483,9 +493,10 @@ pOp.cnt = 0;
       }
     }
 
-    /*
-    ** Mark the VDBE as one that can only be run one time.
-    */
+    ///<summary>
+/// Mark the VDBE as one that can only be run one time.
+///
+///</summary>
     static void sqlite3VdbeRunOnlyOnce( Vdbe p )
     {
       p.runOnlyOnce = 1;
@@ -627,19 +638,19 @@ pOp.cnt = 0;
     }
 #endif //* SQLITE_DEBUG - the sqlite3AssertMayAbort() function */
 
-    /*
-** Loop through the program looking for P2 values that are negative
-** on jump instructions.  Each such value is a label.  Resolve the
-** label by setting the P2 value to its correct non-zero value.
-**
-** This routine is called once after all opcodes have been inserted.
-**
-** Variable *pMaxFuncArgs is set to the maximum value of any P2 argument 
-** to an OP_Function, OP_AggStep or OP_VFilter opcode. This is used by 
-** sqlite3VdbeMakeReady() to size the Vdbe.apArg[] array.
-**
-** The Op.opflags field is set on all opcodes.
-*/
+    ///<summary>
+/// Loop through the program looking for P2 values that are negative
+/// on jump instructions.  Each such value is a label.  Resolve the
+/// label by setting the P2 value to its correct non-zero value.
+///
+/// This routine is called once after all opcodes have been inserted.
+///
+/// Variable *pMaxFuncArgs is set to the maximum value of any P2 argument
+/// to an OP_Function, OP_AggStep or OP_VFilter opcode. This is used by
+/// sqlite3VdbeMakeReady() to size the Vdbe.apArg[] array.
+///
+/// The Op.opflags field is set on all opcodes.
+///</summary>
     static void resolveP2Values( Vdbe p, ref int pMaxFuncArgs )
     {
       int i;
@@ -690,26 +701,28 @@ pOp.cnt = 0;
       pMaxFuncArgs = nMaxArgs;
     }
 
-    /*
-    ** Return the address of the next instruction to be inserted.
-    */
+    ///<summary>
+/// Return the address of the next instruction to be inserted.
+///
+///</summary>
     static int sqlite3VdbeCurrentAddr( Vdbe p )
     {
       Debug.Assert( p.magic == VDBE_MAGIC_INIT );
       return p.nOp;
     }
 
-    /*
-    ** This function returns a pointer to the array of opcodes associated with
-    ** the Vdbe passed as the first argument. It is the callers responsibility
-    ** to arrange for the returned array to be eventually freed using the 
-    ** vdbeFreeOpArray() function.
-    **
-    ** Before returning, *pnOp is set to the number of entries in the returned
-    ** array. Also, *pnMaxArg is set to the larger of its current value and 
-    ** the number of entries in the Vdbe.apArg[] array required to execute the 
-    ** returned program.
-    */
+    ///<summary>
+/// This function returns a pointer to the array of opcodes associated with
+/// the Vdbe passed as the first argument. It is the callers responsibility
+/// to arrange for the returned array to be eventually freed using the
+/// vdbeFreeOpArray() function.
+///
+/// Before returning, *pnOp is set to the number of entries in the returned
+/// array. Also, *pnMaxArg is set to the larger of its current value and
+/// the number of entries in the Vdbe.apArg[] array required to execute the
+/// returned program.
+///
+///</summary>
     static VdbeOp[] sqlite3VdbeTakeOpArray( Vdbe p, ref int pnOp, ref int pnMaxArg )
     {
       VdbeOp[] aOp = p.aOp;
@@ -724,10 +737,11 @@ pOp.cnt = 0;
       return aOp;
     }
 
-    /*
-    ** Add a whole list of operations to the operation stack.  Return the
-    ** address of the first operation added.
-    */
+    ///<summary>
+/// Add a whole list of operations to the operation stack.  Return the
+/// address of the first operation added.
+///
+///</summary>
     static int sqlite3VdbeAddOpList( Vdbe p, int nOp, VdbeOpList[] aOp )
     {
       int addr;
@@ -775,12 +789,13 @@ pOp.cnt = 0;
       return addr;
     }
 
-    /*
-    ** Change the value of the P1 operand for a specific instruction.
-    ** This routine is useful when a large program is loaded from a
-    ** static array using sqlite3VdbeAddOpList but we want to make a
-    ** few minor changes to the program.
-    */
+    ///<summary>
+/// Change the value of the P1 operand for a specific instruction.
+/// This routine is useful when a large program is loaded from a
+/// static array using sqlite3VdbeAddOpList but we want to make a
+/// few minor changes to the program.
+///
+///</summary>
     static void sqlite3VdbeChangeP1( Vdbe p, int addr, int val )
     {
       Debug.Assert( p != null );
@@ -791,10 +806,11 @@ pOp.cnt = 0;
       }
     }
 
-    /*
-    ** Change the value of the P2 operand for a specific instruction.
-    ** This routine is useful for setting a jump destination.
-    */
+    ///<summary>
+/// Change the value of the P2 operand for a specific instruction.
+/// This routine is useful for setting a jump destination.
+///
+///</summary>
     static void sqlite3VdbeChangeP2( Vdbe p, int addr, int val )
     {
       Debug.Assert( p != null );
@@ -805,9 +821,10 @@ pOp.cnt = 0;
       }
     }
 
-    /*
-    ** Change the value of the P3 operand for a specific instruction.
-    */
+    ///<summary>
+/// Change the value of the P3 operand for a specific instruction.
+///
+///</summary>
     static void sqlite3VdbeChangeP3( Vdbe p, int addr, int val )
     {
       Debug.Assert( p != null );
@@ -818,10 +835,11 @@ pOp.cnt = 0;
       }
     }
 
-    /*
-    ** Change the value of the P5 operand for the most recently
-    ** added operation.
-    */
+    ///<summary>
+/// Change the value of the P5 operand for the most recently
+/// added operation.
+///
+///</summary>
     static void sqlite3VdbeChangeP5( Vdbe p, u8 val )
     {
       Debug.Assert( p != null );
@@ -832,10 +850,11 @@ pOp.cnt = 0;
       }
     }
 
-    /*
-    ** Change the P2 operand of instruction addr so that it points to
-    ** the address of the next instruction to be coded.
-    */
+    ///<summary>
+/// Change the P2 operand of instruction addr so that it points to
+/// the address of the next instruction to be coded.
+///
+///</summary>
     static void sqlite3VdbeJumpHere( Vdbe p, int addr )
     {
       Debug.Assert( addr >= 0 );
@@ -843,10 +862,11 @@ pOp.cnt = 0;
     }
 
 
-    /*
-    ** If the input FuncDef structure is ephemeral, then free it.  If
-    ** the FuncDef is not ephermal, then do nothing.
-    */
+    ///<summary>
+/// If the input FuncDef structure is ephemeral, then free it.  If
+/// the FuncDef is not ephermal, then do nothing.
+///
+///</summary>
     static void freeEphemeralFunction( sqlite3 db, FuncDef pDef )
     {
       if ( ALWAYS( pDef ) && ( pDef.flags & SQLITE_FUNC_EPHEM ) != 0 )
@@ -858,9 +878,10 @@ pOp.cnt = 0;
 
     //static void vdbeFreeOpArray(sqlite3 *, Op *, int);
 
-    /*
-    ** Delete a P4 value if necessary.
-    */
+    ///<summary>
+/// Delete a P4 value if necessary.
+///
+///</summary>
     static void freeP4( sqlite3 db, int p4type, object p4 )
     {
       if ( p4 != null )
@@ -921,11 +942,12 @@ pOp.cnt = 0;
       }
     }
 
-    /*
-    ** Free the space allocated for aOp and any p4 values allocated for the
-    ** opcodes contained within. If aOp is not NULL it is assumed to contain 
-    ** nOp entries. 
-    */
+    ///<summary>
+/// Free the space allocated for aOp and any p4 values allocated for the
+/// opcodes contained within. If aOp is not NULL it is assumed to contain
+/// nOp entries.
+///
+///</summary>
     static void vdbeFreeOpArray( sqlite3 db, ref Op[] aOp, int nOp )
     {
       if ( aOp != null )
@@ -943,11 +965,12 @@ pOp.cnt = 0;
       }
     }
 
-    /*
-    ** Link the SubProgram object passed as the second argument into the linked
-    ** list at Vdbe.pSubProgram. This list is used to delete all sub-program
-    ** objects when the VM is no longer required.
-    */
+    ///<summary>
+/// Link the SubProgram object passed as the second argument into the linked
+/// list at Vdbe.pSubProgram. This list is used to delete all sub-program
+/// objects when the VM is no longer required.
+///
+///</summary>
     static void sqlite3VdbeLinkSubProgram( Vdbe pVdbe, SubProgram p )
     {
       p.pNext = pVdbe.pProgram;
@@ -973,31 +996,32 @@ pOp.cnt = 0;
       }
     }
 
-    /*
-    ** Change the value of the P4 operand for a specific instruction.
-    ** This routine is useful when a large program is loaded from a
-    ** static array using sqlite3VdbeAddOpList but we want to make a
-    ** few minor changes to the program.
-    **
-    ** If n>=0 then the P4 operand is dynamic, meaning that a copy of
-    ** the string is made into memory obtained from sqlite3Malloc().
-    ** A value of n==0 means copy bytes of zP4 up to and including the
-    ** first null byte.  If n>0 then copy n+1 bytes of zP4.
-    **
-    ** If n==P4_KEYINFO it means that zP4 is a pointer to a KeyInfo structure.
-    ** A copy is made of the KeyInfo structure into memory obtained from
-    ** sqlite3Malloc, to be freed when the Vdbe is finalized.
-    ** n==P4_KEYINFO_HANDOFF indicates that zP4 points to a KeyInfo structure
-    ** stored in memory that the caller has obtained from sqlite3Malloc. The
-    ** caller should not free the allocation, it will be freed when the Vdbe is
-    ** finalized.
-    **
-    ** Other values of n (P4_STATIC, P4_COLLSEQ etc.) indicate that zP4 points
-    ** to a string or structure that is guaranteed to exist for the lifetime of
-    ** the Vdbe. In these cases we can just copy the pointer.
-    **
-    ** If addr<0 then change P4 on the most recently inserted instruction.
-    */
+    ///<summary>
+/// Change the value of the P4 operand for a specific instruction.
+/// This routine is useful when a large program is loaded from a
+/// static array using sqlite3VdbeAddOpList but we want to make a
+/// few minor changes to the program.
+///
+/// If n>=0 then the P4 operand is dynamic, meaning that a copy of
+/// the string is made into memory obtained from sqlite3Malloc().
+/// A value of n==0 means copy bytes of zP4 up to and including the
+/// first null byte.  If n>0 then copy n+1 bytes of zP4.
+///
+/// If n==P4_KEYINFO it means that zP4 is a pointer to a KeyInfo structure.
+/// A copy is made of the KeyInfo structure into memory obtained from
+/// sqlite3Malloc, to be freed when the Vdbe is finalized.
+/// n==P4_KEYINFO_HANDOFF indicates that zP4 points to a KeyInfo structure
+/// stored in memory that the caller has obtained from sqlite3Malloc. The
+/// caller should not free the allocation, it will be freed when the Vdbe is
+/// finalized.
+///
+/// Other values of n (P4_STATIC, P4_COLLSEQ etc.) indicate that zP4 points
+/// to a string or structure that is guaranteed to exist for the lifetime of
+/// the Vdbe. In these cases we can just copy the pointer.
+///
+/// If addr<0 then change P4 on the most recently inserted instruction.
+///
+///</summary>
 
     //P4_COLLSEQ
     static void sqlite3VdbeChangeP4( Vdbe p, int addr, CollSeq pColl, int n )
@@ -1203,12 +1227,12 @@ pOp.cnt = 0;
     }
 
 #if !NDEBUG
-    /*
-** Change the comment on the the most recently coded instruction.  Or
-** insert a No-op and add the comment to that new instruction.  This
-** makes the code easier to read during debugging.  None of this happens
-** in a production build.
-*/
+    ///<summary>
+/// Change the comment on the the most recently coded instruction.  Or
+/// insert a No-op and add the comment to that new instruction.  This
+/// makes the code easier to read during debugging.  None of this happens
+/// in a production build.
+///</summary>
     static void sqlite3VdbeComment( Vdbe p, string zFormat, params object[] ap )
     {
       if ( null == p )
@@ -1254,27 +1278,27 @@ pOp.cnt = 0;
 #endif  //* NDEBUG */
 
 
-    /*
-** Return the opcode for a given address.  If the address is -1, then
-** return the most recently inserted opcode.
-**
-** If a memory allocation error has occurred prior to the calling of this
-** routine, then a pointer to a dummy VdbeOp will be returned.  That opcode
-** is readable but not writable, though it is cast to a writable value.
-** The return of a dummy opcode allows the call to continue functioning
-** after a OOM fault without having to check to see if the return from 
-** this routine is a valid pointer.  But because the dummy.opcode is 0,
-** dummy will never be written to.  This is verified by code inspection and
-** by running with Valgrind.
-**
-** About the #if SQLITE_OMIT_TRACE:  Normally, this routine is never called
-** unless p->nOp>0.  This is because in the absense of SQLITE_OMIT_TRACE,
-** an OP_Trace instruction is always inserted by sqlite3VdbeGet() as soon as
-** a new VDBE is created.  So we are free to set addr to p->nOp-1 without
-** having to double-check to make sure that the result is non-negative. But
-** if SQLITE_OMIT_TRACE is defined, the OP_Trace is omitted and we do need to
-** check the value of p->nOp-1 before continuing.
-*/
+    ///<summary>
+/// Return the opcode for a given address.  If the address is -1, then
+/// return the most recently inserted opcode.
+///
+/// If a memory allocation error has occurred prior to the calling of this
+/// routine, then a pointer to a dummy VdbeOp will be returned.  That opcode
+/// is readable but not writable, though it is cast to a writable value.
+/// The return of a dummy opcode allows the call to continue functioning
+/// after a OOM fault without having to check to see if the return from
+/// this routine is a valid pointer.  But because the dummy.opcode is 0,
+/// dummy will never be written to.  This is verified by code inspection and
+/// by running with Valgrind.
+///
+/// About the #if SQLITE_OMIT_TRACE:  Normally, this routine is never called
+/// unless p->nOp>0.  This is because in the absense of SQLITE_OMIT_TRACE,
+/// an OP_Trace instruction is always inserted by sqlite3VdbeGet() as soon as
+/// a new VDBE is created.  So we are free to set addr to p->nOp-1 without
+/// having to double-check to make sure that the result is non-negative. But
+/// if SQLITE_OMIT_TRACE is defined, the OP_Trace is omitted and we do need to
+/// check the value of p->nOp-1 before continuing.
+///</summary>
     const VdbeOp dummy = null;  /* Ignore the MSVC warning about no initializer */
     static VdbeOp sqlite3VdbeGetOp( Vdbe p, int addr )
     {
@@ -1300,10 +1324,10 @@ if( p.nOp==0 ) return dummy;
     }
 
 #if !SQLITE_OMIT_EXPLAIN || !NDEBUG || VDBE_PROFILE || SQLITE_DEBUG
-    /*
-** Compute a string that describes the P4 parameter for an opcode.
-** Use zTemp for any required temporary buffer space.
-*/
+    ///<summary>
+/// Compute a string that describes the P4 parameter for an opcode.
+/// Use zTemp for any required temporary buffer space.
+///</summary>
     static StringBuilder zTemp = new StringBuilder( 100 );
     static string displayP4( Op pOp, string zBuffer, int nTemp )
     {
@@ -1432,13 +1456,14 @@ if( p.nOp==0 ) return dummy;
     }
 #endif
 
-    /*
-    ** Declare to the Vdbe that the BTree object at db->aDb[i] is used.
-    **
-    ** The prepared statements need to know in advance the complete set of
-    ** attached databases that they will be using.  A mask of these databases
-    ** is maintained in p->btreeMask and is used for locking and other purposes.
-    */
+    ///<summary>
+/// Declare to the Vdbe that the BTree object at db->aDb[i] is used.
+///
+/// The prepared statements need to know in advance the complete set of
+/// attached databases that they will be using.  A mask of these databases
+/// is maintained in p->btreeMask and is used for locking and other purposes.
+///
+///</summary>
     static void sqlite3VdbeUsesBtree( Vdbe p, int i )
     {
       Debug.Assert( i >= 0 && i < p.db.nDb && i < (int)sizeof( yDbMask ) * 8 );
@@ -1539,9 +1564,9 @@ void sqlite3VdbeLeave(Vdbe *p){
     }
 #endif
 
-    /*
-** Release an array of N Mem elements
-*/
+    ///<summary>
+/// Release an array of N Mem elements
+///</summary>
     static void releaseMemArray( Mem[] p, int N )
     {
       releaseMemArray( p, 0, N );
@@ -1601,10 +1626,11 @@ void sqlite3VdbeLeave(Vdbe *p){
       }
     }
 
-    /*
-    ** Delete a VdbeFrame object and its contents. VdbeFrame objects are
-    ** allocated by the OP_Program opcode in sqlite3VdbeExec().
-    */
+    ///<summary>
+/// Delete a VdbeFrame object and its contents. VdbeFrame objects are
+/// allocated by the OP_Program opcode in sqlite3VdbeExec().
+///
+///</summary>
     static void sqlite3VdbeFrameDelete( VdbeFrame p )
     {
       int i;
@@ -1934,27 +1960,27 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 }
 #endif // * !SQLITE_OMIT_TRACE  && SQLITE_ENABLE_IOTRACE */
 
-    /*
-** Allocate space from a fixed size buffer and return a pointer to
-** that space.  If insufficient space is available, return NULL.
-**
-** The pBuf parameter is the initial value of a pointer which will
-** receive the new memory.  pBuf is normally NULL.  If pBuf is not
-** NULL, it means that memory space has already been allocated and that
-** this routine should not allocate any new memory.  When pBuf is not
-** NULL simply return pBuf.  Only allocate new memory space when pBuf
-** is NULL.
-**
-** nByte is the number of bytes of space needed.
-**
-** *ppFrom points to available space and pEnd points to the end of the
-** available space.  When space is allocated, *ppFrom is advanced past
-** the end of the allocated space.
-**
-** *pnByte is a counter of the number of bytes of space that have failed
-** to allocate.  If there is insufficient space in *ppFrom to satisfy the
-** request, then increment *pnByte by the amount of the request.
-*/
+    ///<summary>
+/// Allocate space from a fixed size buffer and return a pointer to
+/// that space.  If insufficient space is available, return NULL.
+///
+/// The pBuf parameter is the initial value of a pointer which will
+/// receive the new memory.  pBuf is normally NULL.  If pBuf is not
+/// NULL, it means that memory space has already been allocated and that
+/// this routine should not allocate any new memory.  When pBuf is not
+/// NULL simply return pBuf.  Only allocate new memory space when pBuf
+/// is NULL.
+///
+/// nByte is the number of bytes of space needed.
+///
+/// *ppFrom points to available space and pEnd points to the end of the
+/// available space.  When space is allocated, *ppFrom is advanced past
+/// the end of the allocated space.
+///
+/// *pnByte is a counter of the number of bytes of space that have failed
+/// to allocate.  If there is insufficient space in *ppFrom to satisfy the
+/// request, then increment *pnByte by the amount of the request.
+///</summary>
     //static void* allocSpace(
     //  void* pBuf,          /* Where return pointer will be stored */
     //  int nByte,           /* Number of bytes to allocate */
@@ -1978,10 +2004,11 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
     //  return pBuf;
     //}
 
-    /*
-    ** Rewind the VDBE back to the beginning in preparation for
-    ** running it.
-    */
+    ///<summary>
+/// Rewind the VDBE back to the beginning in preparation for
+/// running it.
+///
+///</summary>
     static void sqlite3VdbeRewind(Vdbe p){
     #if (SQLITE_DEBUG) || (VDBE_PROFILE)
       int i;
@@ -2018,24 +2045,25 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
     #endif
     }
 
-    /*
-    ** Prepare a virtual machine for execution for the first time after
-    ** creating the virtual machine.  This involves things such
-    ** as allocating stack space and initializing the program counter.
-    ** After the VDBE has be prepped, it can be executed by one or more
-    ** calls to sqlite3VdbeExec().  
-    **
-    ** This function may be called exact once on a each virtual machine.
-    ** After this routine is called the VM has been "packaged" and is ready
-    ** to run.  After this routine is called, futher calls to 
-    ** sqlite3VdbeAddOp() functions are prohibited.  This routine disconnects
-    ** the Vdbe from the Parse object that helped generate it so that the
-    ** the Vdbe becomes an independent entity and the Parse object can be
-    ** destroyed.
-    **
-    ** Use the sqlite3VdbeRewind() procedure to restore a virtual machine back
-    ** to its initial state after it has been run.
-    */
+    ///<summary>
+/// Prepare a virtual machine for execution for the first time after
+/// creating the virtual machine.  This involves things such
+/// as allocating stack space and initializing the program counter.
+/// After the VDBE has be prepped, it can be executed by one or more
+/// calls to sqlite3VdbeExec().
+///
+/// This function may be called exact once on a each virtual machine.
+/// After this routine is called the VM has been "packaged" and is ready
+/// to run.  After this routine is called, futher calls to
+/// sqlite3VdbeAddOp() functions are prohibited.  This routine disconnects
+/// the Vdbe from the Parse object that helped generate it so that the
+/// the Vdbe becomes an independent entity and the Parse object can be
+/// destroyed.
+///
+/// Use the sqlite3VdbeRewind() procedure to restore a virtual machine back
+/// to its initial state after it has been run.
+///
+///</summary>
     static void sqlite3VdbeMakeReady(
     Vdbe p,                        /* The VDBE */
     Parse pParse                   /* Parsing context */
@@ -2190,10 +2218,11 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
         sqlite3VdbeRewind( p );
     }
 
-    /*
-    ** Close a VDBE cursor and release all the resources that cursor
-    ** happens to hold.
-    */
+    ///<summary>
+/// Close a VDBE cursor and release all the resources that cursor
+/// happens to hold.
+///
+///</summary>
     static void sqlite3VdbeFreeCursor( Vdbe p, VdbeCursor pCx )
     {
       if ( pCx == null )
@@ -2222,11 +2251,12 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       }
 #endif
     }
-    /*
-    ** Copy the values stored in the VdbeFrame structure to its Vdbe. This
-    ** is used, for example, when a trigger sub-program is halted to restore
-    ** control to the main program.
-    */
+    ///<summary>
+/// Copy the values stored in the VdbeFrame structure to its Vdbe. This
+/// is used, for example, when a trigger sub-program is halted to restore
+/// control to the main program.
+///
+///</summary>
     static int sqlite3VdbeFrameRestore( VdbeFrame pFrame )
     {
       Vdbe v = pFrame.v;
@@ -2241,14 +2271,15 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       return pFrame.pc;
     }
 
-    /*
-    ** Close all cursors.
-    **
-    ** Also release any dynamic memory held by the VM in the Vdbe.aMem memory 
-    ** cell array. This is necessary as the memory cell array may contain
-    ** pointers to VdbeFrame objects, which may in turn contain pointers to
-    ** open cursors.
-    */
+    ///<summary>
+/// Close all cursors.
+///
+/// Also release any dynamic memory held by the VM in the Vdbe.aMem memory
+/// cell array. This is necessary as the memory cell array may contain
+/// pointers to VdbeFrame objects, which may in turn contain pointers to
+/// open cursors.
+///
+///</summary>
     static void closeAllCursors( Vdbe p )
     {
       if ( p.pFrame != null )
@@ -2286,13 +2317,14 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       }
 
     }
-    /*
-    ** Clean up the VM after execution.
-    **
-    ** This routine will automatically close any cursors, lists, and/or
-    ** sorters that were left open.  It also deletes the values of
-    ** variables in the aVar[] array.
-    */
+    ///<summary>
+/// Clean up the VM after execution.
+///
+/// This routine will automatically close any cursors, lists, and/or
+/// sorters that were left open.  It also deletes the values of
+/// variables in the aVar[] array.
+///
+///</summary>
     static void Cleanup( Vdbe p )
     {
       sqlite3 db = p.db;
@@ -2309,12 +2341,13 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       p.pResultSet = null;
     }
 
-    /*
-    ** Set the number of result columns that will be returned by this SQL
-    ** statement. This is now set at compile time, rather than during
-    ** execution of the vdbe program so that sqlite3_column_count() can
-    ** be called on an SQL statement before sqlite3_step().
-    */
+    ///<summary>
+/// Set the number of result columns that will be returned by this SQL
+/// statement. This is now set at compile time, rather than during
+/// execution of the vdbe program so that sqlite3_column_count() can
+/// be called on an SQL statement before sqlite3_step().
+///
+///</summary>
     static void sqlite3VdbeSetNumCols( Vdbe p, int nResColumn )
     {
       Mem pColName;
@@ -2336,16 +2369,17 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       }
     }
 
-    /*
-    ** Set the name of the idx'th column to be returned by the SQL statement.
-    ** zName must be a pointer to a nul terminated string.
-    **
-    ** This call must be made after a call to sqlite3VdbeSetNumCols().
-    **
-    ** The final parameter, xDel, must be one of SQLITE_DYNAMIC, SQLITE_STATIC
-    ** or SQLITE_TRANSIENT. If it is SQLITE_DYNAMIC, then the buffer pointed
-    ** to by zName will be freed by sqlite3DbFree() when the vdbe is destroyed.
-    */
+    ///<summary>
+/// Set the name of the idx'th column to be returned by the SQL statement.
+/// zName must be a pointer to a nul terminated string.
+///
+/// This call must be made after a call to sqlite3VdbeSetNumCols().
+///
+/// The final parameter, xDel, must be one of SQLITE_DYNAMIC, SQLITE_STATIC
+/// or SQLITE_TRANSIENT. If it is SQLITE_DYNAMIC, then the buffer pointed
+/// to by zName will be freed by sqlite3DbFree() when the vdbe is destroyed.
+///
+///</summary>
 
 
     static int sqlite3VdbeSetColName(
@@ -2628,15 +2662,16 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       return rc;
     }
 
-    /*
-    ** This routine checks that the sqlite3.activeVdbeCnt count variable
-    ** matches the number of vdbe's in the list sqlite3.pVdbe that are
-    ** currently active. An Debug.Assertion fails if the two counts do not match.
-    ** This is an internal self-check only - it is not an essential processing
-    ** step.
-    **
-    ** This is a no-op if NDEBUG is defined.
-    */
+    ///<summary>
+/// This routine checks that the sqlite3.activeVdbeCnt count variable
+/// matches the number of vdbe's in the list sqlite3.pVdbe that are
+/// currently active. An Debug.Assertion fails if the two counts do not match.
+/// This is an internal self-check only - it is not an essential processing
+/// step.
+///
+/// This is a no-op if NDEBUG is defined.
+///
+///</summary>
 #if !NDEBUG
     static void checkActiveVdbeCnt( sqlite3 db )
     {
@@ -2662,22 +2697,22 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 static void checkActiveVdbeCnt( sqlite3 db ){}
 #endif
 
-    /*
-** For every Btree that in database connection db which
-** has been modified, "trip" or invalidate each cursor in
-** that Btree might have been modified so that the cursor
-** can never be used again.  This happens when a rollback
-*** occurs.  We have to trip all the other cursors, even
-** cursor from other VMs in different database connections,
-** so that none of them try to use the data at which they
-** were pointing and which now may have been changed due
-** to the rollback.
-**
-** Remember that a rollback can delete tables complete and
-** reorder rootpages.  So it is not sufficient just to save
-** the state of the cursor.  We have to invalidate the cursor
-** so that it is never used again.
-*/
+    ///<summary>
+/// For every Btree that in database connection db which
+/// has been modified, "trip" or invalidate each cursor in
+/// that Btree might have been modified so that the cursor
+/// can never be used again.  This happens when a rollback
+/// occurs.  We have to trip all the other cursors, even
+/// cursor from other VMs in different database connections,
+/// so that none of them try to use the data at which they
+/// were pointing and which now may have been changed due
+/// to the rollback.
+///
+/// Remember that a rollback can delete tables complete and
+/// reorder rootpages.  So it is not sufficient just to save
+/// the state of the cursor.  We have to invalidate the cursor
+/// so that it is never used again.
+///</summary>
     static void invalidateCursorsOnModifiedBtrees( sqlite3 db )
     {
       int i;
@@ -2765,16 +2800,17 @@ static void checkActiveVdbeCnt( sqlite3 db ){}
       return rc;
     }
 
-    /*
-    ** This function is called when a transaction opened by the database 
-    ** handle associated with the VM passed as an argument is about to be 
-    ** committed. If there are outstanding deferred foreign key constraint
-    ** violations, return SQLITE_ERROR. Otherwise, SQLITE_OK.
-    **
-    ** If there are outstanding FK violations and this function returns 
-    ** SQLITE_ERROR, set the result of the VM to SQLITE_CONSTRAINT and write
-    ** an error message to it. Then return SQLITE_ERROR.
-    */
+    ///<summary>
+/// This function is called when a transaction opened by the database
+/// handle associated with the VM passed as an argument is about to be
+/// committed. If there are outstanding deferred foreign key constraint
+/// violations, return SQLITE_ERROR. Otherwise, SQLITE_OK.
+///
+/// If there are outstanding FK violations and this function returns
+/// SQLITE_ERROR, set the result of the VM to SQLITE_CONSTRAINT and write
+/// an error message to it. Then return SQLITE_ERROR.
+///
+///</summary>
 #if !SQLITE_OMIT_FOREIGN_KEY
     static int sqlite3VdbeCheckFk( Vdbe p, int deferred )
     {
@@ -2790,19 +2826,19 @@ static void checkActiveVdbeCnt( sqlite3 db ){}
     }
 #endif
 
-    /*
-** This routine is called the when a VDBE tries to halt.  If the VDBE
-** has made changes and is in autocommit mode, then commit those
-** changes.  If a rollback is needed, then do the rollback.
-**
-** This routine is the only way to move the state of a VM from
-** SQLITE_MAGIC_RUN to SQLITE_MAGIC_HALT.  It is harmless to
-** call this on a VM that is in the SQLITE_MAGIC_HALT state.
-**
-** Return an error code.  If the commit could not complete because of
-** lock contention, return SQLITE_BUSY.  If SQLITE_BUSY is returned, it
-** means the close did not happen and needs to be repeated.
-*/
+    ///<summary>
+/// This routine is called the when a VDBE tries to halt.  If the VDBE
+/// has made changes and is in autocommit mode, then commit those
+/// changes.  If a rollback is needed, then do the rollback.
+///
+/// This routine is the only way to move the state of a VM from
+/// SQLITE_MAGIC_RUN to SQLITE_MAGIC_HALT.  It is harmless to
+/// call this on a VM that is in the SQLITE_MAGIC_HALT state.
+///
+/// Return an error code.  If the commit could not complete because of
+/// lock contention, return SQLITE_BUSY.  If SQLITE_BUSY is returned, it
+/// means the close did not happen and needs to be repeated.
+///</summary>
     static int sqlite3VdbeHalt( Vdbe p )
     {
       int rc;                         /* Used to store transient return codes */
@@ -3041,26 +3077,28 @@ static void checkActiveVdbeCnt( sqlite3 db ){}
     }
 
 
-    /*
-    ** Each VDBE holds the result of the most recent sqlite3_step() call
-    ** in p.rc.  This routine sets that result back to SQLITE_OK.
-    */
+    ///<summary>
+/// Each VDBE holds the result of the most recent sqlite3_step() call
+/// in p.rc.  This routine sets that result back to SQLITE_OK.
+///
+///</summary>
     static void sqlite3VdbeResetStepResult( Vdbe p )
     {
       p.rc = SQLITE_OK;
     }
 
-    /*
-    ** Clean up a VDBE after execution but do not delete the VDBE just yet.
-    ** Write any error messages into pzErrMsg.  Return the result code.
-    **
-    ** After this routine is run, the VDBE should be ready to be executed
-    ** again.
-    **
-    ** To look at it another way, this routine resets the state of the
-    ** virtual machine from VDBE_MAGIC_RUN or VDBE_MAGIC_HALT back to
-    ** VDBE_MAGIC_INIT.
-    */
+    ///<summary>
+/// Clean up a VDBE after execution but do not delete the VDBE just yet.
+/// Write any error messages into pzErrMsg.  Return the result code.
+///
+/// After this routine is run, the VDBE should be ready to be executed
+/// again.
+///
+/// To look at it another way, this routine resets the state of the
+/// virtual machine from VDBE_MAGIC_RUN or VDBE_MAGIC_HALT back to
+/// VDBE_MAGIC_INIT.
+///
+///</summary>
     static int sqlite3VdbeReset( Vdbe p )
     {
       sqlite3 db;
@@ -3143,10 +3181,11 @@ fclose(out);
       return p.rc & db.errMask;
     }
 
-    /*
-    ** Clean up and delete a VDBE after execution.  Return an integer which is
-    ** the result code.  Write any error message text into pzErrMsg.
-    */
+    ///<summary>
+/// Clean up and delete a VDBE after execution.  Return an integer which is
+/// the result code.  Write any error message text into pzErrMsg.
+///
+///</summary>
     static int sqlite3VdbeFinalize( ref Vdbe p )
     {
       int rc = SQLITE_OK;
@@ -3159,12 +3198,13 @@ fclose(out);
       return rc;
     }
 
-    /*
-    ** Call the destructor for each auxdata entry in pVdbeFunc for which
-    ** the corresponding bit in mask is clear.  Auxdata entries beyond 31
-    ** are always destroyed.  To destroy all auxdata entries, call this
-    ** routine with mask==0.
-    */
+    ///<summary>
+/// Call the destructor for each auxdata entry in pVdbeFunc for which
+/// the corresponding bit in mask is clear.  Auxdata entries beyond 31
+/// are always destroyed.  To destroy all auxdata entries, call this
+/// routine with mask==0.
+///
+///</summary>
     static void sqlite3VdbeDeleteAuxData( VdbeFunc pVdbeFunc, int mask )
     {
       int i;
@@ -3182,12 +3222,13 @@ fclose(out);
       }
     }
 
-    /*
-    ** Free all memory associated with the Vdbe passed as the second argument.
-    ** The difference between this function and sqlite3VdbeDelete() is that
-    ** VdbeDelete() also unlinks the Vdbe from the list of VMs associated with
-    ** the database connection.
-    */
+    ///<summary>
+/// Free all memory associated with the Vdbe passed as the second argument.
+/// The difference between this function and sqlite3VdbeDelete() is that
+/// VdbeDelete() also unlinks the Vdbe from the list of VMs associated with
+/// the database connection.
+///
+///</summary>
     static void sqlite3VdbeDeleteObject( sqlite3 db, ref Vdbe p )
     {
       SubProgram pSub, pNext;
@@ -3212,9 +3253,10 @@ fclose(out);
       //sqlite3DbFree( db, p );
     }
 
-    /*
-    ** Delete an entire VDBE.
-    */
+    ///<summary>
+/// Delete an entire VDBE.
+///
+///</summary>
     static void sqlite3VdbeDelete( ref Vdbe p )
     {
       sqlite3 db;
@@ -3295,47 +3337,48 @@ fclose(out);
       return SQLITE_OK;
     }
 
-    /*
-    ** The following functions:
-    **
-    ** sqlite3VdbeSerialType()
-    ** sqlite3VdbeSerialTypeLen()
-    ** sqlite3VdbeSerialLen()
-    ** sqlite3VdbeSerialPut()
-    ** sqlite3VdbeSerialGet()
-    **
-    ** encapsulate the code that serializes values for storage in SQLite
-    ** data and index records. Each serialized value consists of a
-    ** 'serial-type' and a blob of data. The serial type is an 8-byte unsigned
-    ** integer, stored as a varint.
-    **
-    ** In an SQLite index record, the serial type is stored directly before
-    ** the blob of data that it corresponds to. In a table record, all serial
-    ** types are stored at the start of the record, and the blobs of data at
-    ** the end. Hence these functions allow the caller to handle the
-    ** serial-type and data blob seperately.
-    **
-    ** The following table describes the various storage classes for data:
-    **
-    **   serial type        bytes of data      type
-    **   --------------     ---------------    ---------------
-    **      0                     0            NULL
-    **      1                     1            signed integer
-    **      2                     2            signed integer
-    **      3                     3            signed integer
-    **      4                     4            signed integer
-    **      5                     6            signed integer
-    **      6                     8            signed integer
-    **      7                     8            IEEE float
-    **      8                     0            Integer constant 0
-    **      9                     0            Integer constant 1
-    **     10,11                               reserved for expansion
-    **    N>=12 and even       (N-12)/2        BLOB
-    **    N>=13 and odd        (N-13)/2        text
-    **
-    ** The 8 and 9 types were added in 3.3.0, file format 4.  Prior versions
-    ** of SQLite will not understand those serial types.
-    */
+    ///<summary>
+/// The following functions:
+///
+/// sqlite3VdbeSerialType()
+/// sqlite3VdbeSerialTypeLen()
+/// sqlite3VdbeSerialLen()
+/// sqlite3VdbeSerialPut()
+/// sqlite3VdbeSerialGet()
+///
+/// encapsulate the code that serializes values for storage in SQLite
+/// data and index records. Each serialized value consists of a
+/// 'serial-type' and a blob of data. The serial type is an 8-byte unsigned
+/// integer, stored as a varint.
+///
+/// In an SQLite index record, the serial type is stored directly before
+/// the blob of data that it corresponds to. In a table record, all serial
+/// types are stored at the start of the record, and the blobs of data at
+/// the end. Hence these functions allow the caller to handle the
+/// serial-type and data blob seperately.
+///
+/// The following table describes the various storage classes for data:
+///
+///   serial type        bytes of data      type
+///   --------------     ---------------    ---------------
+///      0                     0            NULL
+///      1                     1            signed integer
+///      2                     2            signed integer
+///      3                     3            signed integer
+///      4                     4            signed integer
+///      5                     6            signed integer
+///      6                     8            signed integer
+///      7                     8            IEEE float
+///      8                     0            Integer constant 0
+///      9                     0            Integer constant 1
+///     10,11                               reserved for expansion
+///    N>=12 and even       (N-12)/2        BLOB
+///    N>=13 and odd        (N-13)/2        text
+///
+/// The 8 and 9 types were added in 3.3.0, file format 4.  Prior versions
+/// of SQLite will not understand those serial types.
+///
+///</summary>
 
     /*
     ** Return the serial-type for the value stored in pMem.
@@ -3409,9 +3452,10 @@ fclose(out);
       return (u32)( ( n * 2 ) + 12 + ( ( ( flags & MEM_Str ) != 0 ) ? 1 : 0 ) );
     }
 
-    /*
-    ** Return the length of the data corresponding to the supplied serial-type.
-    */
+    ///<summary>
+/// Return the length of the data corresponding to the supplied serial-type.
+///
+///</summary>
     static u32[] aSize = new u32[] { 0, 1, 2, 3, 4, 6, 8, 8, 0, 0, 0, 0 };
     static u32 sqlite3VdbeSerialTypeLen( u32 serial_type )
     {
@@ -3425,40 +3469,41 @@ fclose(out);
       }
     }
 
-    /*
-    ** If we are on an architecture with mixed-endian floating
-    ** points (ex: ARM7) then swap the lower 4 bytes with the
-    ** upper 4 bytes.  Return the result.
-    **
-    ** For most architectures, this is a no-op.
-    **
-    ** (later):  It is reported to me that the mixed-endian problem
-    ** on ARM7 is an issue with GCC, not with the ARM7 chip.  It seems
-    ** that early versions of GCC stored the two words of a 64-bit
-    ** float in the wrong order.  And that error has been propagated
-    ** ever since.  The blame is not necessarily with GCC, though.
-    ** GCC might have just copying the problem from a prior compiler.
-    ** I am also told that newer versions of GCC that follow a different
-    ** ABI get the byte order right.
-    **
-    ** Developers using SQLite on an ARM7 should compile and run their
-    ** application using -DSQLITE_DEBUG=1 at least once.  With DEBUG
-    ** enabled, some Debug.Asserts below will ensure that the byte order of
-    ** floating point values is correct.
-    **
-    ** (2007-08-30)  Frank van Vugt has studied this problem closely
-    ** and has send his findings to the SQLite developers.  Frank
-    ** writes that some Linux kernels offer floating point hardware
-    ** emulation that uses only 32-bit mantissas instead of a full
-    ** 48-bits as required by the IEEE standard.  (This is the
-    ** CONFIG_FPE_FASTFPE option.)  On such systems, floating point
-    ** byte swapping becomes very complicated.  To avoid problems,
-    ** the necessary byte swapping is carried out using a 64-bit integer
-    ** rather than a 64-bit float.  Frank assures us that the code here
-    ** works for him.  We, the developers, have no way to independently
-    ** verify this, but Frank seems to know what he is talking about
-    ** so we trust him.
-    */
+    ///<summary>
+/// If we are on an architecture with mixed-endian floating
+/// points (ex: ARM7) then swap the lower 4 bytes with the
+/// upper 4 bytes.  Return the result.
+///
+/// For most architectures, this is a no-op.
+///
+/// (later):  It is reported to me that the mixed-endian problem
+/// on ARM7 is an issue with GCC, not with the ARM7 chip.  It seems
+/// that early versions of GCC stored the two words of a 64-bit
+/// float in the wrong order.  And that error has been propagated
+/// ever since.  The blame is not necessarily with GCC, though.
+/// GCC might have just copying the problem from a prior compiler.
+/// I am also told that newer versions of GCC that follow a different
+/// ABI get the byte order right.
+///
+/// Developers using SQLite on an ARM7 should compile and run their
+/// application using -DSQLITE_DEBUG=1 at least once.  With DEBUG
+/// enabled, some Debug.Asserts below will ensure that the byte order of
+/// floating point values is correct.
+///
+/// (2007-08-30)  Frank van Vugt has studied this problem closely
+/// and has send his findings to the SQLite developers.  Frank
+/// writes that some Linux kernels offer floating point hardware
+/// emulation that uses only 32-bit mantissas instead of a full
+/// 48-bits as required by the IEEE standard.  (This is the
+/// CONFIG_FPE_FASTFPE option.)  On such systems, floating point
+/// byte swapping becomes very complicated.  To avoid problems,
+/// the necessary byte swapping is carried out using a 64-bit integer
+/// rather than a 64-bit float.  Frank assures us that the code here
+/// works for him.  We, the developers, have no way to independently
+/// verify this, but Frank seems to know what he is talking about
+/// so we trust him.
+///
+///</summary>
 #if  SQLITE_MIXED_ENDIAN_64BIT_FLOAT
 //static u64 floatSwap(u64 in){
 //  union {
@@ -3478,24 +3523,24 @@ fclose(out);
     //# define swapMixedEndianFloat(X)
 #endif
 
-    /*
-** Write the serialized data blob for the value stored in pMem into
-** buf. It is assumed that the caller has allocated sufficient space.
-** Return the number of bytes written.
-**
-** nBuf is the amount of space left in buf[].  nBuf must always be
-** large enough to hold the entire field.  Except, if the field is
-** a blob with a zero-filled tail, then buf[] might be just the right
-** size to hold everything except for the zero-filled tail.  If buf[]
-** is only big enough to hold the non-zero prefix, then only write that
-** prefix into buf[].  But if buf[] is large enough to hold both the
-** prefix and the tail then write the prefix and set the tail to all
-** zeros.
-**
-** Return the number of bytes actually written into buf[].  The number
-** of bytes in the zero-filled tail is included in the return value only
-** if those bytes were zeroed in buf[].
-*/
+    ///<summary>
+/// Write the serialized data blob for the value stored in pMem into
+/// buf. It is assumed that the caller has allocated sufficient space.
+/// Return the number of bytes written.
+///
+/// nBuf is the amount of space left in buf[].  nBuf must always be
+/// large enough to hold the entire field.  Except, if the field is
+/// a blob with a zero-filled tail, then buf[] might be just the right
+/// size to hold everything except for the zero-filled tail.  If buf[]
+/// is only big enough to hold the non-zero prefix, then only write that
+/// prefix into buf[].  But if buf[] is large enough to hold both the
+/// prefix and the tail then write the prefix and set the tail to all
+/// zeros.
+///
+/// Return the number of bytes actually written into buf[].  The number
+/// of bytes in the zero-filled tail is included in the return value only
+/// if those bytes were zeroed in buf[].
+///</summary>
     static u32 sqlite3VdbeSerialPut( byte[] buf, int offset, int nBuf, Mem pMem, int file_format )
     {
       u32 serial_type = sqlite3VdbeSerialType( pMem, file_format );
@@ -3562,10 +3607,11 @@ swapMixedEndianFloat( v );
       return 0;
     }
 
-    /*
-    ** Deserialize the data blob pointed to by buf as serial type serial_type
-    ** and store the result in pMem.  Return the number of bytes read.
-    */
+    ///<summary>
+/// Deserialize the data blob pointed to by buf as serial type serial_type
+/// and store the result in pMem.  Return the number of bytes read.
+///
+///</summary>
     static u32 sqlite3VdbeSerialGet(
     byte[] buf,         /* Buffer to deserialize from */
     int offset,         /* Offset into Buffer */
@@ -3831,19 +3877,20 @@ swapMixedEndianFloat(x);
       return 0;
     }
 
-    /*
-    ** Given the nKey-byte encoding of a record in pKey[], parse the
-    ** record into a UnpackedRecord structure.  Return a pointer to
-    ** that structure.
-    **
-    ** The calling function might provide szSpace bytes of memory
-    ** space at pSpace.  This space can be used to hold the returned
-    ** VDbeParsedRecord structure if it is large enough.  If it is
-    ** not big enough, space is obtained from sqlite3Malloc().
-    **
-    ** The returned structure should be closed by a call to
-    ** sqlite3VdbeDeleteUnpackedRecord().
-    */
+    ///<summary>
+/// Given the nKey-byte encoding of a record in pKey[], parse the
+/// record into a UnpackedRecord structure.  Return a pointer to
+/// that structure.
+///
+/// The calling function might provide szSpace bytes of memory
+/// space at pSpace.  This space can be used to hold the returned
+/// VDbeParsedRecord structure if it is large enough.  If it is
+/// not big enough, space is obtained from sqlite3Malloc().
+///
+/// The returned structure should be closed by a call to
+/// sqlite3VdbeDeleteUnpackedRecord().
+///
+///</summary>
     static UnpackedRecord sqlite3VdbeRecordUnpack(
     KeyInfo pKeyInfo,   /* Information about the record format */
     int nKey,           /* Size of the binary record */
@@ -3937,32 +3984,33 @@ swapMixedEndianFloat(x);
       }
     }
 
-    /*
-    ** This function compares the two table rows or index records
-    ** specified by {nKey1, pKey1} and pPKey2.  It returns a negative, zero
-    ** or positive integer if key1 is less than, equal to or
-    ** greater than key2.  The {nKey1, pKey1} key must be a blob
-    ** created by th OP_MakeRecord opcode of the VDBE.  The pPKey2
-    ** key must be a parsed key such as obtained from
-    ** sqlite3VdbeParseRecord.
-    **
-    ** Key1 and Key2 do not have to contain the same number of fields.
-    ** The key with fewer fields is usually compares less than the
-    ** longer key.  However if the UNPACKED_INCRKEY flags in pPKey2 is set
-    ** and the common prefixes are equal, then key1 is less than key2.
-    ** Or if the UNPACKED_MATCH_PREFIX flag is set and the prefixes are
-    ** equal, then the keys are considered to be equal and
-    ** the parts beyond the common prefix are ignored.
-    **
-    ** If the UNPACKED_IGNORE_ROWID flag is set, then the last byte of
-    ** the header of pKey1 is ignored.  It is assumed that pKey1 is
-    ** an index key, and thus ends with a rowid value.  The last byte
-    ** of the header will therefore be the serial type of the rowid:
-    ** one of 1, 2, 3, 4, 5, 6, 8, or 9 - the integer serial types.
-    ** The serial type of the final rowid will always be a single byte.
-    ** By ignoring this last byte of the header, we force the comparison
-    ** to ignore the rowid at the end of key1.
-    */
+    ///<summary>
+/// This function compares the two table rows or index records
+/// specified by {nKey1, pKey1} and pPKey2.  It returns a negative, zero
+/// or positive integer if key1 is less than, equal to or
+/// greater than key2.  The {nKey1, pKey1} key must be a blob
+/// created by th OP_MakeRecord opcode of the VDBE.  The pPKey2
+/// key must be a parsed key such as obtained from
+/// sqlite3VdbeParseRecord.
+///
+/// Key1 and Key2 do not have to contain the same number of fields.
+/// The key with fewer fields is usually compares less than the
+/// longer key.  However if the UNPACKED_INCRKEY flags in pPKey2 is set
+/// and the common prefixes are equal, then key1 is less than key2.
+/// Or if the UNPACKED_MATCH_PREFIX flag is set and the prefixes are
+/// equal, then the keys are considered to be equal and
+/// the parts beyond the common prefix are ignored.
+///
+/// If the UNPACKED_IGNORE_ROWID flag is set, then the last byte of
+/// the header of pKey1 is ignored.  It is assumed that pKey1 is
+/// an index key, and thus ends with a rowid value.  The last byte
+/// of the header will therefore be the serial type of the rowid:
+/// one of 1, 2, 3, 4, 5, 6, 8, or 9 - the integer serial types.
+/// The serial type of the final rowid will always be a single byte.
+/// By ignoring this last byte of the header, we force the comparison
+/// to ignore the rowid at the end of key1.
+///
+///</summary>
 
     static Mem mem1 = new Mem();
     // ALTERNATE FORM for C#
@@ -4087,14 +4135,15 @@ swapMixedEndianFloat(x);
       return rc;
     }
 
-    /*
-    ** pCur points at an index entry created using the OP_MakeRecord opcode.
-    ** Read the rowid (the last field in the record) and store it in *rowid.
-    ** Return SQLITE_OK if everything works, or an error code otherwise.
-    **
-    ** pCur might be pointing to text obtained from a corrupt database file.
-    ** So the content cannot be trusted.  Do appropriate checks on the content.
-    */
+    ///<summary>
+/// pCur points at an index entry created using the OP_MakeRecord opcode.
+/// Read the rowid (the last field in the record) and store it in *rowid.
+/// Return SQLITE_OK if everything works, or an error code otherwise.
+///
+/// pCur might be pointing to text obtained from a corrupt database file.
+/// So the content cannot be trusted.  Do appropriate checks on the content.
+///
+///</summary>
     static int sqlite3VdbeIdxRowid( sqlite3 db, BtCursor pCur, ref i64 rowid )
     {
       i64 nCellKey = 0;
@@ -4171,17 +4220,18 @@ idx_rowid_corruption:
       return SQLITE_CORRUPT_BKPT();
     }
 
-    /*
-    ** Compare the key of the index entry that cursor pC is pointing to against
-    ** the key string in pUnpacked.  Write into *pRes a number
-    ** that is negative, zero, or positive if pC is less than, equal to,
-    ** or greater than pUnpacked.  Return SQLITE_OK on success.
-    **
-    ** pUnpacked is either created without a rowid or is truncated so that it
-    ** omits the rowid at the end.  The rowid at the end of the index entry
-    ** is ignored as well.  Hence, this routine only compares the prefixes 
-    ** of the keys prior to the final rowid, not the entire key.
-    */
+    ///<summary>
+/// Compare the key of the index entry that cursor pC is pointing to against
+/// the key string in pUnpacked.  Write into *pRes a number
+/// that is negative, zero, or positive if pC is less than, equal to,
+/// or greater than pUnpacked.  Return SQLITE_OK on success.
+///
+/// pUnpacked is either created without a rowid or is truncated so that it
+/// omits the rowid at the end.  The rowid at the end of the index entry
+/// is ignored as well.  Hence, this routine only compares the prefixes
+/// of the keys prior to the final rowid, not the entire key.
+///
+///</summary>
     static int sqlite3VdbeIdxKeyCompare(
     VdbeCursor pC,              /* The cursor to compare against */
     UnpackedRecord pUnpacked,   /* Unpacked version of key to compare against */
@@ -4217,10 +4267,11 @@ idx_rowid_corruption:
       return SQLITE_OK;
     }
 
-    /*
-    ** This routine sets the value to be returned by subsequent calls to
-    ** sqlite3_changes() on the database handle 'db'.
-    */
+    ///<summary>
+/// This routine sets the value to be returned by subsequent calls to
+/// sqlite3_changes() on the database handle 'db'.
+///
+///</summary>
     static void sqlite3VdbeSetChanges( sqlite3 db, int nChange )
     {
       Debug.Assert( sqlite3_mutex_held( db.mutex ) );
@@ -4228,25 +4279,27 @@ idx_rowid_corruption:
       db.nTotalChange += nChange;
     }
 
-    /*
-    ** Set a flag in the vdbe to update the change counter when it is finalised
-    ** or reset.
-    */
+    ///<summary>
+/// Set a flag in the vdbe to update the change counter when it is finalised
+/// or reset.
+///
+///</summary>
     static void sqlite3VdbeCountChanges( Vdbe v )
     {
       v.changeCntOn = true;
     }
 
-    /*
-    ** Mark every prepared statement associated with a database connection
-    ** as expired.
-    **
-    ** An expired statement means that recompilation of the statement is
-    ** recommend.  Statements expire when things happen that make their
-    ** programs obsolete.  Removing user-defined functions or collating
-    ** sequences, or changing an authorization function are the types of
-    ** things that make prepared statements obsolete.
-    */
+    ///<summary>
+/// Mark every prepared statement associated with a database connection
+/// as expired.
+///
+/// An expired statement means that recompilation of the statement is
+/// recommend.  Statements expire when things happen that make their
+/// programs obsolete.  Removing user-defined functions or collating
+/// sequences, or changing an authorization function are the types of
+/// things that make prepared statements obsolete.
+///
+///</summary>
     static void sqlite3ExpirePreparedStatements( sqlite3 db )
     {
       Vdbe p;
@@ -4256,21 +4309,23 @@ idx_rowid_corruption:
       }
     }
 
-    /*
-    ** Return the database associated with the Vdbe.
-    */
+    ///<summary>
+/// Return the database associated with the Vdbe.
+///
+///</summary>
     static sqlite3 sqlite3VdbeDb( Vdbe v )
     {
       return v.db;
     }
-    /*
-    ** Return a pointer to an sqlite3_value structure containing the value bound
-    ** parameter iVar of VM v. Except, if the value is an SQL NULL, return 
-    ** 0 instead. Unless it is NULL, apply affinity aff (one of the SQLITE_AFF_*
-    ** constants) to the value before returning it.
-    **
-    ** The returned value must be freed by the caller using sqlite3ValueFree().
-    */
+    ///<summary>
+/// Return a pointer to an sqlite3_value structure containing the value bound
+/// parameter iVar of VM v. Except, if the value is an SQL NULL, return
+/// 0 instead. Unless it is NULL, apply affinity aff (one of the SQLITE_AFF_
+/// constants) to the value before returning it.
+///
+/// The returned value must be freed by the caller using sqlite3ValueFree().
+///
+///</summary>
     static sqlite3_value sqlite3VdbeGetValue( Vdbe v, int iVar, u8 aff )
     {
       Debug.Assert( iVar > 0 );

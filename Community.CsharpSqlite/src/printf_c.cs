@@ -203,24 +203,25 @@ new et_info(   'T',  0, 2, etTOKEN,      0,  0 ),
 new et_info(   'S',  0, 2, etSRCLIST,    0,  0 ),
 new et_info(   'r', 10, 3, etORDINAL,    0,  0 ),
 };
-    /*
-    ** If SQLITE_OMIT_FLOATING_POINT is defined, then none of the floating point
-    ** conversions will work.
-    */
+    ///<summary>
+/// If SQLITE_OMIT_FLOATING_POINT is defined, then none of the floating point
+/// conversions will work.
+///
+///</summary>
 #if  !SQLITE_OMIT_FLOATING_POINT
-    /*
-** "*val" is a double such that 0.1 <= *val < 10.0
-** Return the ascii code for the leading digit of *val, then
-** multiply "*val" by 10.0 to renormalize.
-**
-** Example:
-**     input:     *val = 3.14159
-**     output:    *val = 1.4159    function return = '3'
-**
-** The counter *cnt is incremented each time.  After counter exceeds
-** 16 (the number of significant digits in a 64-bit float) '0' is
-** always returned.
-*/
+    ///<summary>
+/// "*val" is a double such that 0.1 <= *val < 10.0
+/// Return the ascii code for the leading digit of *val, then
+/// multiply "*val" by 10.0 to renormalize.
+///
+/// Example:
+///     input:     *val = 3.14159
+///     output:    *val = 1.4159    function return = '3'
+///
+/// The counter *cnt is incremented each time.  After counter exceeds
+/// 16 (the number of significant digits in a 64-bit float) '0' is
+/// always returned.
+///</summary>
     static char et_getdigit( ref LONGDOUBLE_TYPE val, ref int cnt )
     {
       int digit;
@@ -264,33 +265,34 @@ const int SQLITE_PRINT_BUF_SIZE = 50;
 #endif
     const int etBUFSIZE = SQLITE_PRINT_BUF_SIZE; /* Size of the output buffer */
 
-    /*
-    ** The root program.  All variations call this core.
-    **
-    ** INPUTS:
-    **   func   This is a pointer to a function taking three arguments
-    **            1. A pointer to anything.  Same as the "arg" parameter.
-    **            2. A pointer to the list of characters to be output
-    **               (Note, this list is NOT null terminated.)
-    **            3. An integer number of characters to be output.
-    **               (Note: This number might be zero.)
-    **
-    **   arg    This is the pointer to anything which will be passed as the
-    **          first argument to "func".  Use it for whatever you like.
-    **
-    **   fmt    This is the format string, as in the usual print.
-    **
-    **   ap     This is a pointer to a list of arguments.  Same as in
-    **          vfprint.
-    **
-    ** OUTPUTS:
-    **          The return value is the total number of characters sent to
-    **          the function "func".  Returns -1 on a error.
-    **
-    ** Note that the order in which automatic variables are declared below
-    ** seems to make a big difference in determining how fast this beast
-    ** will run.
-    */
+    ///<summary>
+/// The root program.  All variations call this core.
+///
+/// INPUTS:
+///   func   This is a pointer to a function taking three arguments
+///            1. A pointer to anything.  Same as the "arg" parameter.
+///            2. A pointer to the list of characters to be output
+///               (Note, this list is NOT null terminated.)
+///            3. An integer number of characters to be output.
+///               (Note: This number might be zero.)
+///
+///   arg    This is the pointer to anything which will be passed as the
+///          first argument to "func".  Use it for whatever you like.
+///
+///   fmt    This is the format string, as in the usual print.
+///
+///   ap     This is a pointer to a list of arguments.  Same as in
+///          vfprint.
+///
+/// OUTPUTS:
+///          The return value is the total number of characters sent to
+///          the function "func".  Returns -1 on a error.
+///
+/// Note that the order in which automatic variables are declared below
+/// seems to make a big difference in determining how fast this beast
+/// will run.
+///
+///</summary>
     static char[] buf = new char[etBUFSIZE];       /* Conversion buffer */
     static void sqlite3VXPrintf(
     StrAccum pAccum,             /* Accumulate results here */
@@ -1071,11 +1073,14 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
         //  sqlite3DbFree(db,ref  zExtra);
         //}
       }/* End for loop over the format string */
-    } /* End of function */
+    } ///<summary>
+///End of function
+///</summary>
 
-    /*
-    ** Append N bytes of text from z to the StrAccum object.
-    */
+    ///<summary>
+/// Append N bytes of text from z to the StrAccum object.
+///
+///</summary>
 
     static void sqlite3StrAccumAppend( StrAccum p, string z, int N )
     {
@@ -1133,11 +1138,12 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       //p.nChar += N;
     }
 
-    /*
-    ** Finish off a string by making sure it is zero-terminated.
-    ** Return a pointer to the resulting string.  Return a NULL
-    ** pointer if any kind of error was encountered.
-    */
+    ///<summary>
+/// Finish off a string by making sure it is zero-terminated.
+/// Return a pointer to the resulting string.  Return a NULL
+/// pointer if any kind of error was encountered.
+///
+///</summary>
     static string sqlite3StrAccumFinish( StrAccum p )
     {
       //if ( p->zText )
@@ -1166,9 +1172,10 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       return p.zText.ToString();
     }
 
-    /*
-    ** Reset an StrAccum string.  Reclaim all malloced memory.
-    */
+    ///<summary>
+/// Reset an StrAccum string.  Reclaim all malloced memory.
+///
+///</summary>
     static void sqlite3StrAccumReset( StrAccum p )
     {
       //if ( p.zText.ToString() != p.zBase.ToString() )
@@ -1204,10 +1211,11 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       //p.tooBig = 0;
       //p.mallocFailed = 0;
     }
-    /*
-    ** Print into memory obtained from sqliteMalloc().  Use the internal
-    ** %-conversion extensions.
-    */
+    ///<summary>
+/// Print into memory obtained from sqliteMalloc().  Use the internal
+/// %-conversion extensions.
+///
+///</summary>
     static StrAccum acc = new StrAccum( SQLITE_PRINT_BUF_SIZE );
     static string sqlite3VMPrintf( sqlite3 db, string zFormat, params va_list[] ap )
     {
@@ -1229,10 +1237,11 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       return sqlite3StrAccumFinish( acc );
     }
 
-    /*
-    ** Print into memory obtained from sqliteMalloc().  Use the internal
-    ** %-conversion extensions.
-    */
+    ///<summary>
+/// Print into memory obtained from sqliteMalloc().  Use the internal
+/// %-conversion extensions.
+///
+///</summary>
     static string sqlite3MPrintf( sqlite3 db, string zFormat, params va_list[] ap )
     {
       string z;
@@ -1246,14 +1255,15 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       return z;
     }
 
-    /*
-    ** Like sqlite3MPrintf(), but call sqlite3DbFree() on zStr after formatting
-    ** the string and before returnning.  This routine is intended to be used
-    ** to modify an existing string.  For example:
-    **
-    **       x = sqlite3MPrintf(db, x, "prefix %s suffix", x);
-    **
-    */
+    ///<summary>
+/// Like sqlite3MPrintf(), but call sqlite3DbFree() on zStr after formatting
+/// the string and before returnning.  This routine is intended to be used
+/// to modify an existing string.  For example:
+///
+///       x = sqlite3MPrintf(db, x, "prefix %s suffix", x);
+///
+///
+///</summary>
     static string sqlite3MAppendf( sqlite3 db, string zStr, string zFormat, params  va_list[] ap )
     {
       string z;
@@ -1268,10 +1278,11 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       return z;
     }
 
-    /*
-    ** Print into memory obtained from sqlite3Malloc().  Omit the internal
-    ** %-conversion extensions.
-    */
+    ///<summary>
+/// Print into memory obtained from sqlite3Malloc().  Omit the internal
+/// %-conversion extensions.
+///
+///</summary>
     static string sqlite3_vmprintf( string zFormat, params  va_list[] ap )
     {
       //StrAccum acc = new StrAccum( SQLITE_PRINT_BUF_SIZE );
@@ -1285,10 +1296,11 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       return sqlite3StrAccumFinish( acc );
     }
 
-    /*
-    ** Print into memory obtained from sqlite3Malloc()().  Omit the internal
-    ** %-conversion extensions.
-    */
+    ///<summary>
+/// Print into memory obtained from sqlite3Malloc()().  Omit the internal
+/// %-conversion extensions.
+///
+///</summary>
     static public string sqlite3_mprintf( string zFormat, params va_list[] ap )
     { //, ...){
       string z;
@@ -1306,19 +1318,20 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       return z;
     }
 
-    /*
-    ** sqlite3_snprintf() works like snprintf() except that it ignores the
-    ** current locale settings.  This is important for SQLite because we
-    ** are not able to use a "," as the decimal point in place of "." as
-    ** specified by some locales.
-    **
-    ** Oops:  The first two arguments of sqlite3_snprintf() are backwards
-    ** from the snprintf() standard.  Unfortunately, it is too late to change
-    ** this without breaking compatibility, so we just have to live with the
-    ** mistake.
-    **
-    ** sqlite3_vsnprintf() is the varargs version.
-    */
+    ///<summary>
+/// sqlite3_snprintf() works like snprintf() except that it ignores the
+/// current locale settings.  This is important for SQLite because we
+/// are not able to use a "," as the decimal point in place of "." as
+/// specified by some locales.
+///
+/// Oops:  The first two arguments of sqlite3_snprintf() are backwards
+/// from the snprintf() standard.  Unfortunately, it is too late to change
+/// this without breaking compatibility, so we just have to live with the
+/// mistake.
+///
+/// sqlite3_vsnprintf() is the varargs version.
+///
+///</summary>
     static public void sqlite3_vsnprintf( int n, StringBuilder zBuf, string zFormat, params va_list[] ap )
     {
       //StrAccum acc = new StrAccum( SQLITE_PRINT_BUF_SIZE );
@@ -1367,15 +1380,16 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
     //  return ( zBuf = z );
     //}
 
-    /*
-    ** This is the routine that actually formats the sqlite3_log() message.
-    ** We house it in a separate routine from sqlite3_log() to avoid using
-    ** stack space on small-stack systems when logging is disabled.
-    **
-    ** sqlite3_log() must render into a static buffer.  It cannot dynamically
-    ** allocate memory because it might be called while the memory allocator
-    ** mutex is held.
-    */
+    ///<summary>
+/// This is the routine that actually formats the sqlite3_log() message.
+/// We house it in a separate routine from sqlite3_log() to avoid using
+/// stack space on small-stack systems when logging is disabled.
+///
+/// sqlite3_log() must render into a static buffer.  It cannot dynamically
+/// allocate memory because it might be called while the memory allocator
+/// mutex is held.
+///
+///</summary>
     static void renderLogMsg( int iErrCode, string zFormat, params object[] ap )
     {
       //StrAccum acc;                          /* String accumulator */
@@ -1388,9 +1402,10 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
       sqlite3StrAccumFinish( acc ) );
     }
 
-    /*
-    ** Format and write a message to the log if logging is enabled.
-    */
+    ///<summary>
+/// Format and write a message to the log if logging is enabled.
+///
+///</summary>
     static void sqlite3_log( int iErrCode, string zFormat, params va_list[] ap )
     {
       if ( sqlite3GlobalConfig.xLog != null )

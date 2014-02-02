@@ -12,7 +12,9 @@ namespace Community.CsharpSqlite
   public partial class Sqlite3
   {
     /* Automatically generated.  Do not edit */
-    /* See the mkopcodec.awk script for details. */
+    ///<summary>
+///See the mkopcodec.awk script for details.
+///</summary>
 #if !SQLITE_OMIT_EXPLAIN || !NDEBUG || VDBE_PROFILE || SQLITE_DEBUG
     static string sqlite3OpcodeName( int i )
     {

@@ -30,12 +30,13 @@ namespace Community.CsharpSqlite
     //#if !_HWTIME_H_
     //#define _HWTIME_H_
 
-    /*
-    ** The following routine only works on pentium-class (or newer) processors.
-    ** It uses the RDTSC opcode to read the cycle count value out of the
-    ** processor and returns that value.  This can be used for high-res
-    ** profiling.
-    */
+    ///<summary>
+/// The following routine only works on pentium-class (or newer) processors.
+/// It uses the RDTSC opcode to read the cycle count value out of the
+/// processor and returns that value.  This can be used for high-res
+/// profiling.
+///
+///</summary>
 #if ((__GNUC__) || (_MSC_VER)) &&       ((i386) || (__i386__) || (_M_IX86))
 
 #if (__GNUC__)

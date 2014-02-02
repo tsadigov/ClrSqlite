@@ -33,57 +33,57 @@ namespace Community.CsharpSqlite
 */
 //#include "sqliteInt.h"
 
-/*
-** All of the code in this file may be omitted by defining a single
-** macro.
-*/
+///<summary>
+/// All of the code in this file may be omitted by defining a single
+/// macro.
+///</summary>
 #if !SQLITE_OMIT_AUTHORIZATION
 
-/*
-** Set or clear the access authorization function.
-**
-** The access authorization function is be called during the compilation
-** phase to verify that the user has read and/or write access permission on
-** various fields of the database.  The first argument to the auth function
-** is a copy of the 3rd argument to this routine.  The second argument
-** to the auth function is one of these constants:
-**
-**       SQLITE_CREATE_INDEX
-**       SQLITE_CREATE_TABLE
-**       SQLITE_CREATE_TEMP_INDEX
-**       SQLITE_CREATE_TEMP_TABLE
-**       SQLITE_CREATE_TEMP_TRIGGER
-**       SQLITE_CREATE_TEMP_VIEW
-**       SQLITE_CREATE_TRIGGER
-**       SQLITE_CREATE_VIEW
-**       SQLITE_DELETE
-**       SQLITE_DROP_INDEX
-**       SQLITE_DROP_TABLE
-**       SQLITE_DROP_TEMP_INDEX
-**       SQLITE_DROP_TEMP_TABLE
-**       SQLITE_DROP_TEMP_TRIGGER
-**       SQLITE_DROP_TEMP_VIEW
-**       SQLITE_DROP_TRIGGER
-**       SQLITE_DROP_VIEW
-**       SQLITE_INSERT
-**       SQLITE_PRAGMA
-**       SQLITE_READ
-**       SQLITE_SELECT
-**       SQLITE_TRANSACTION
-**       SQLITE_UPDATE
-**
-** The third and fourth arguments to the auth function are the name of
-** the table and the column that are being accessed.  The auth function
-** should return either SQLITE_OK, SQLITE_DENY, or SQLITE_IGNORE.  If
-** SQLITE_OK is returned, it means that access is allowed.  SQLITE_DENY
-** means that the SQL statement will never-run - the sqlite3_exec() call
-** will return with an error.  SQLITE_IGNORE means that the SQL statement
-** should run but attempts to read the specified column will return NULL
-** and attempts to write the column will be ignored.
-**
-** Setting the auth function to NULL disables this hook.  The default
-** setting of the auth function is NULL.
-*/
+///<summary>
+/// Set or clear the access authorization function.
+///
+/// The access authorization function is be called during the compilation
+/// phase to verify that the user has read and/or write access permission on
+/// various fields of the database.  The first argument to the auth function
+/// is a copy of the 3rd argument to this routine.  The second argument
+/// to the auth function is one of these constants:
+///
+///       SQLITE_CREATE_INDEX
+///       SQLITE_CREATE_TABLE
+///       SQLITE_CREATE_TEMP_INDEX
+///       SQLITE_CREATE_TEMP_TABLE
+///       SQLITE_CREATE_TEMP_TRIGGER
+///       SQLITE_CREATE_TEMP_VIEW
+///       SQLITE_CREATE_TRIGGER
+///       SQLITE_CREATE_VIEW
+///       SQLITE_DELETE
+///       SQLITE_DROP_INDEX
+///       SQLITE_DROP_TABLE
+///       SQLITE_DROP_TEMP_INDEX
+///       SQLITE_DROP_TEMP_TABLE
+///       SQLITE_DROP_TEMP_TRIGGER
+///       SQLITE_DROP_TEMP_VIEW
+///       SQLITE_DROP_TRIGGER
+///       SQLITE_DROP_VIEW
+///       SQLITE_INSERT
+///       SQLITE_PRAGMA
+///       SQLITE_READ
+///       SQLITE_SELECT
+///       SQLITE_TRANSACTION
+///       SQLITE_UPDATE
+///
+/// The third and fourth arguments to the auth function are the name of
+/// the table and the column that are being accessed.  The auth function
+/// should return either SQLITE_OK, SQLITE_DENY, or SQLITE_IGNORE.  If
+/// SQLITE_OK is returned, it means that access is allowed.  SQLITE_DENY
+/// means that the SQL statement will never-run - the sqlite3_exec() call
+/// will return with an error.  SQLITE_IGNORE means that the SQL statement
+/// should run but attempts to read the specified column will return NULL
+/// and attempts to write the column will be ignored.
+///
+/// Setting the auth function to NULL disables this hook.  The default
+/// setting of the auth function is NULL.
+///</summary>
 int sqlite3_set_authorizer(
 sqlite3 db,
 int (*xAuth)(void*,int,const char*,const char*,const char*,const char),
@@ -97,24 +97,24 @@ sqlite3_mutex_leave(db->mutex);
 return SQLITE_OK;
 }
 
-/*
-** Write an error message into pParse->zErrMsg that explains that the
-** user-supplied authorization function returned an illegal value.
-*/
+///<summary>
+/// Write an error message into pParse->zErrMsg that explains that the
+/// user-supplied authorization function returned an illegal value.
+///</summary>
 static void sqliteAuthBadReturnCode(Parse *pParse){
 sqlite3ErrorMsg(pParse, "authorizer malfunction");
 pParse->rc = SQLITE_ERROR;
 }
 
-/*
-** Invoke the authorization callback for permission to read column zCol from
-** table zTab in database zDb. This function assumes that an authorization
-** callback has been registered (i.e. that sqlite3.xAuth is not NULL).
-**
-** If SQLITE_IGNORE is returned and pExpr is not NULL, then pExpr is changed
-** to an SQL NULL expression. Otherwise, if pExpr is NULL, then SQLITE_IGNORE
-** is treated as SQLITE_DENY. In this case an error is left in pParse.
-*/
+///<summary>
+/// Invoke the authorization callback for permission to read column zCol from
+/// table zTab in database zDb. This function assumes that an authorization
+/// callback has been registered (i.e. that sqlite3.xAuth is not NULL).
+///
+/// If SQLITE_IGNORE is returned and pExpr is not NULL, then pExpr is changed
+/// to an SQL NULL expression. Otherwise, if pExpr is NULL, then SQLITE_IGNORE
+/// is treated as SQLITE_DENY. In this case an error is left in pParse.
+///</summary>
 int sqlite3AuthReadCol(
   Parse *pParse,                  /* The parser context */
   string zTab,               /* Table name */
@@ -139,15 +139,15 @@ sqliteAuthBadReturnCode(pParse);
   return rc;
 }
 
-/*
-** The pExpr should be a TK_COLUMN expression.  The table referred to
-** is in pTabList or else it is the NEW or OLD table of a trigger.
-** Check to see if it is OK to read this particular column.
-**
-** If the auth function returns SQLITE_IGNORE, change the TK_COLUMN
-** instruction into a TK_NULL.  If the auth function returns SQLITE_DENY,
-** then generate an error.
-*/
+///<summary>
+/// The pExpr should be a TK_COLUMN expression.  The table referred to
+/// is in pTabList or else it is the NEW or OLD table of a trigger.
+/// Check to see if it is OK to read this particular column.
+///
+/// If the auth function returns SQLITE_IGNORE, change the TK_COLUMN
+/// instruction into a TK_NULL.  If the auth function returns SQLITE_DENY,
+/// then generate an error.
+///</summary>
 void sqlite3AuthRead(
 Parse *pParse,        /* The parser context */
 Expr *pExpr,          /* The expression to check authorization on */
@@ -198,12 +198,12 @@ pExpr->op = TK_NULL;
 }
 }
 
-/*
-** Do an authorization check using the code and arguments given.  Return
-** either SQLITE_OK (zero) or SQLITE_IGNORE or SQLITE_DENY.  If SQLITE_DENY
-** is returned, then the error count and error message in pParse are
-** modified appropriately.
-*/
+///<summary>
+/// Do an authorization check using the code and arguments given.  Return
+/// either SQLITE_OK (zero) or SQLITE_IGNORE or SQLITE_DENY.  If SQLITE_DENY
+/// is returned, then the error count and error message in pParse are
+/// modified appropriately.
+///</summary>
 int sqlite3AuthCheck(
 Parse *pParse,
 int code,
@@ -235,11 +235,11 @@ sqliteAuthBadReturnCode(pParse);
 return rc;
 }
 
-/*
-** Push an authorization context.  After this routine is called, the
-** zArg3 argument to authorization callbacks will be zContext until
-** popped.  Or if pParse==0, this routine is a no-op.
-*/
+///<summary>
+/// Push an authorization context.  After this routine is called, the
+/// zArg3 argument to authorization callbacks will be zContext until
+/// popped.  Or if pParse==0, this routine is a no-op.
+///</summary>
 void sqlite3AuthContextPush(
 Parse *pParse,
 AuthContext *pContext,

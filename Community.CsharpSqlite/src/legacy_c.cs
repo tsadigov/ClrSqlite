@@ -35,16 +35,17 @@ namespace Community.CsharpSqlite
 
     //#include "sqliteInt.h"
 
-    /*
-    ** Execute SQL code.  Return one of the SQLITE_ success/failure
-    ** codes.  Also write an error message into memory obtained from
-    ** malloc() and make pzErrMsg point to that message.
-    **
-    ** If the SQL is a query, then for each row in the query result
-    ** the xCallback() function is called.  pArg becomes the first
-    ** argument to xCallback().  If xCallback=NULL then no callback
-    ** is invoked, even for queries.
-    */
+    ///<summary>
+/// Execute SQL code.  Return one of the SQLITE_ success/failure
+/// codes.  Also write an error message into memory obtained from
+/// malloc() and make pzErrMsg point to that message.
+///
+/// If the SQL is a query, then for each row in the query result
+/// the xCallback() function is called.  pArg becomes the first
+/// argument to xCallback().  If xCallback=NULL then no callback
+/// is invoked, even for queries.
+///
+///</summary>
     //C# Alias
     static public int exec( sqlite3 db,             /* The database on which the SQL executes */    string zSql,            /* The SQL to be executed */    int NoCallback, int NoArgs, int NoErrors )
     {

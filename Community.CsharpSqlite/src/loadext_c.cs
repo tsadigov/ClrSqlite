@@ -144,21 +144,21 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
     //#define sqlite3_blob_write     0
 #endif
 
-    /*
-** The following structure contains pointers to all SQLite API routines.
-** A pointer to this structure is passed into extensions when they are
-** loaded so that the extension can make calls back into the SQLite
-** library.
-**
-** When adding new APIs, add them to the bottom of this structure
-** in order to preserve backwards compatibility.
-**
-** Extensions that use newer APIs should first call the
-** sqlite3_libversion_number() to make sure that the API they
-** intend to use is supported by the library.  Extensions should
-** also check to make sure that the pointer to the function is
-** not NULL before calling it.
-*/
+    ///<summary>
+/// The following structure contains pointers to all SQLite API routines.
+/// A pointer to this structure is passed into extensions when they are
+/// loaded so that the extension can make calls back into the SQLite
+/// library.
+///
+/// When adding new APIs, add them to the bottom of this structure
+/// in order to preserve backwards compatibility.
+///
+/// Extensions that use newer APIs should first call the
+/// sqlite3_libversion_number() to make sure that the API they
+/// intend to use is supported by the library.  Extensions should
+/// also check to make sure that the pointer to the function is
+/// not NULL before calling it.
+///</summary>
     public class sqlite3_api_routines
     {
       public sqlite3 context_db_handle;
@@ -415,18 +415,19 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
     //#endif
     //};
 
-    /*
-    ** Attempt to load an SQLite extension library contained in the file
-    ** zFile.  The entry point is zProc.  zProc may be 0 in which case a
-    ** default entry point name (sqlite3_extension_init) is used.  Use
-    ** of the default name is recommended.
-    **
-    ** Return SQLITE_OK on success and SQLITE_ERROR if something goes wrong.
-    **
-    ** If an error occurs and pzErrMsg is not 0, then fill pzErrMsg with
-    ** error message text.  The calling function should free this memory
-    ** by calling sqlite3DbFree(db, ).
-    */
+    ///<summary>
+/// Attempt to load an SQLite extension library contained in the file
+/// zFile.  The entry point is zProc.  zProc may be 0 in which case a
+/// default entry point name (sqlite3_extension_init) is used.  Use
+/// of the default name is recommended.
+///
+/// Return SQLITE_OK on success and SQLITE_ERROR if something goes wrong.
+///
+/// If an error occurs and pzErrMsg is not 0, then fill pzErrMsg with
+/// error message text.  The calling function should free this memory
+/// by calling sqlite3DbFree(db, ).
+///
+///</summary>
     static int sqlite3LoadExtension(
     sqlite3 db,           /* Load the extension into this database connection */
     string zFile,         /* Name of the shared library containing extension */
@@ -528,10 +529,11 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
       return rc;
     }
 
-    /*
-    ** Call this routine when the database connection is closing in order
-    ** to clean up loaded extensions
-    */
+    ///<summary>
+/// Call this routine when the database connection is closing in order
+/// to clean up loaded extensions
+///
+///</summary>
     static void sqlite3CloseExtensions( sqlite3 db )
     {
       int i;
@@ -594,12 +596,14 @@ const sqlite3_api_routines sqlite3Apis = null;
       }
     }
     static sqlite3AutoExtList sqlite3Autoext = new sqlite3AutoExtList( 0, null );
-    /* The "wsdAutoext" macro will resolve to the autoextension
-    ** state vector.  If writable static data is unsupported on the target,
-    ** we have to locate the state vector at run-time.  In the more common
-    ** case where writable static data is supported, wsdStat can refer directly
-    ** to the "sqlite3Autoext" state vector declared above.
-    */
+    ///<summary>
+///The "wsdAutoext" macro will resolve to the autoextension
+/// state vector.  If writable static data is unsupported on the target,
+/// we have to locate the state vector at run-time.  In the more common
+/// case where writable static data is supported, wsdStat can refer directly
+/// to the "sqlite3Autoext" state vector declared above.
+///
+///</summary>
 #if SQLITE_OMIT_WSD
 //# define wsdAutoextInit \
 sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
@@ -613,10 +617,10 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
     static sqlite3AutoExtList wsdAutoext = sqlite3Autoext;
 #endif
 
-    /*
-** Register a statically linked extension that is automatically
-** loaded by every new database connection.
-*/
+    ///<summary>
+/// Register a statically linked extension that is automatically
+/// loaded by every new database connection.
+///</summary>
     static int sqlite3_auto_extension( dxInit xInit )
     {
       int rc = SQLITE_OK;
@@ -659,9 +663,10 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
       }
     }
 
-    /*
-    ** Reset the automatic extension loading mechanism.
-    */
+    ///<summary>
+/// Reset the automatic extension loading mechanism.
+///
+///</summary>
     static void sqlite3_reset_auto_extension()
     {
 #if !SQLITE_OMIT_AUTOINIT

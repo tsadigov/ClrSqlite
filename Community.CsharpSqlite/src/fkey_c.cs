@@ -139,63 +139,65 @@ namespace Community.CsharpSqlite
 **   sqlite3FkDelete()   - Delete an FKey structure.
 */
 
-    /*
-    ** VDBE Calling Convention
-    ** -----------------------
-    **
-    ** Example:
-    **
-    **   For the following INSERT statement:
-    **
-    **     CREATE TABLE t1(a, b INTEGER PRIMARY KEY, c);
-    **     INSERT INTO t1 VALUES(1, 2, 3.1);
-    **
-    **   Register (x):        2    (type integer)
-    **   Register (x+1):      1    (type integer)
-    **   Register (x+2):      NULL (type NULL)
-    **   Register (x+3):      3.1  (type real)
-    */
+    ///<summary>
+/// VDBE Calling Convention
+/// -----------------------
+///
+/// Example:
+///
+///   For the following INSERT statement:
+///
+///     CREATE TABLE t1(a, b INTEGER PRIMARY KEY, c);
+///     INSERT INTO t1 VALUES(1, 2, 3.1);
+///
+///   Register (x):        2    (type integer)
+///   Register (x+1):      1    (type integer)
+///   Register (x+2):      NULL (type NULL)
+///   Register (x+3):      3.1  (type real)
+///
+///</summary>
 
-    /*
-    ** A foreign key constraint requires that the key columns in the parent
-    ** table are collectively subject to a UNIQUE or PRIMARY KEY constraint.
-    ** Given that pParent is the parent table for foreign key constraint pFKey, 
-    ** search the schema a unique index on the parent key columns. 
-    **
-    ** If successful, zero is returned. If the parent key is an INTEGER PRIMARY 
-    ** KEY column, then output variable *ppIdx is set to NULL. Otherwise, *ppIdx 
-    ** is set to point to the unique index. 
-    ** 
-    ** If the parent key consists of a single column (the foreign key constraint
-    ** is not a composite foreign key), refput variable *paiCol is set to NULL.
-    ** Otherwise, it is set to point to an allocated array of size N, where
-    ** N is the number of columns in the parent key. The first element of the
-    ** array is the index of the child table column that is mapped by the FK
-    ** constraint to the parent table column stored in the left-most column
-    ** of index *ppIdx. The second element of the array is the index of the
-    ** child table column that corresponds to the second left-most column of
-    ** *ppIdx, and so on.
-    **
-    ** If the required index cannot be found, either because:
-    **
-    **   1) The named parent key columns do not exist, or
-    **
-    **   2) The named parent key columns do exist, but are not subject to a
-    **      UNIQUE or PRIMARY KEY constraint, or
-    **
-    **   3) No parent key columns were provided explicitly as part of the
-    **      foreign key definition, and the parent table does not have a
-    **      PRIMARY KEY, or
-    **
-    **   4) No parent key columns were provided explicitly as part of the
-    **      foreign key definition, and the PRIMARY KEY of the parent table 
-    **      consists of a different number of columns to the child key in 
-    **      the child table.
-    **
-    ** then non-zero is returned, and a "foreign key mismatch" error loaded
-    ** into pParse. If an OOM error occurs, non-zero is returned and the
-    ** pParse.db.mallocFailed flag is set.
-    */
+    ///<summary>
+/// A foreign key constraint requires that the key columns in the parent
+/// table are collectively subject to a UNIQUE or PRIMARY KEY constraint.
+/// Given that pParent is the parent table for foreign key constraint pFKey,
+/// search the schema a unique index on the parent key columns.
+///
+/// If successful, zero is returned. If the parent key is an INTEGER PRIMARY
+/// KEY column, then output variable *ppIdx is set to NULL. Otherwise, *ppIdx
+/// is set to point to the unique index.
+///
+/// If the parent key consists of a single column (the foreign key constraint
+/// is not a composite foreign key), refput variable *paiCol is set to NULL.
+/// Otherwise, it is set to point to an allocated array of size N, where
+/// N is the number of columns in the parent key. The first element of the
+/// array is the index of the child table column that is mapped by the FK
+/// constraint to the parent table column stored in the left-most column
+/// of index *ppIdx. The second element of the array is the index of the
+/// child table column that corresponds to the second left-most column of
+/// *ppIdx, and so on.
+///
+/// If the required index cannot be found, either because:
+///
+///   1) The named parent key columns do not exist, or
+///
+///   2) The named parent key columns do exist, but are not subject to a
+///      UNIQUE or PRIMARY KEY constraint, or
+///
+///   3) No parent key columns were provided explicitly as part of the
+///      foreign key definition, and the parent table does not have a
+///      PRIMARY KEY, or
+///
+///   4) No parent key columns were provided explicitly as part of the
+///      foreign key definition, and the PRIMARY KEY of the parent table
+///      consists of a different number of columns to the child key in
+///      the child table.
+///
+/// then non-zero is returned, and a "foreign key mismatch" error loaded
+/// into pParse. If an OOM error occurs, non-zero is returned and the
+/// pParse.db.mallocFailed flag is set.
+///
+///</summary>
     static int locateFkeyIndex(
       Parse pParse,                  /* Parse context to store any error in */
       Table pParent,                 /* Parent table of FK constraint pFKey */
@@ -331,32 +333,33 @@ namespace Community.CsharpSqlite
       return 0;
     }
 
-    /*
-    ** This function is called when a row is inserted into or deleted from the 
-    ** child table of foreign key constraint pFKey. If an SQL UPDATE is executed 
-    ** on the child table of pFKey, this function is invoked twice for each row
-    ** affected - once to "delete" the old row, and then again to "insert" the
-    ** new row.
-    **
-    ** Each time it is called, this function generates VDBE code to locate the
-    ** row in the parent table that corresponds to the row being inserted into 
-    ** or deleted from the child table. If the parent row can be found, no 
-    ** special action is taken. Otherwise, if the parent row can *not* be
-    ** found in the parent table:
-    **
-    **   Operation | FK type   | Action taken
-    **   --------------------------------------------------------------------------
-    **   INSERT      immediate   Increment the "immediate constraint counter".
-    **
-    **   DELETE      immediate   Decrement the "immediate constraint counter".
-    **
-    **   INSERT      deferred    Increment the "deferred constraint counter".
-    **
-    **   DELETE      deferred    Decrement the "deferred constraint counter".
-    **
-    ** These operations are identified in the comment at the top of this file 
-    ** (fkey.c) as "I.1" and "D.1".
-    */
+    ///<summary>
+/// This function is called when a row is inserted into or deleted from the
+/// child table of foreign key constraint pFKey. If an SQL UPDATE is executed
+/// on the child table of pFKey, this function is invoked twice for each row
+/// affected - once to "delete" the old row, and then again to "insert" the
+/// new row.
+///
+/// Each time it is called, this function generates VDBE code to locate the
+/// row in the parent table that corresponds to the row being inserted into
+/// or deleted from the child table. If the parent row can be found, no
+/// special action is taken. Otherwise, if the parent row can *not* be
+/// found in the parent table:
+///
+///   Operation | FK type   | Action taken
+///   --------------------------------------------------------------------------
+///   INSERT      immediate   Increment the "immediate constraint counter".
+///
+///   DELETE      immediate   Decrement the "immediate constraint counter".
+///
+///   INSERT      deferred    Increment the "deferred constraint counter".
+///
+///   DELETE      deferred    Decrement the "deferred constraint counter".
+///
+/// These operations are identified in the comment at the top of this file
+/// (fkey.c) as "I.1" and "D.1".
+///
+///</summary>
     static void fkLookupParent(
       Parse pParse,         /* Parse context */
       int iDb,              /* Index of database housing pTab */
@@ -500,34 +503,35 @@ namespace Community.CsharpSqlite
       sqlite3VdbeAddOp1( v, OP_Close, iCur );
     }
 
-    /*
-    ** This function is called to generate code executed when a row is deleted
-    ** from the parent table of foreign key constraint pFKey and, if pFKey is 
-    ** deferred, when a row is inserted into the same table. When generating
-    ** code for an SQL UPDATE operation, this function may be called twice -
-    ** once to "delete" the old row and once to "insert" the new row.
-    **
-    ** The code generated by this function scans through the rows in the child
-    ** table that correspond to the parent table row being deleted or inserted.
-    ** For each child row found, one of the following actions is taken:
-    **
-    **   Operation | FK type   | Action taken
-    **   --------------------------------------------------------------------------
-    **   DELETE      immediate   Increment the "immediate constraint counter".
-    **                           Or, if the ON (UPDATE|DELETE) action is RESTRICT,
-    **                           throw a "foreign key constraint failed" exception.
-    **
-    **   INSERT      immediate   Decrement the "immediate constraint counter".
-    **
-    **   DELETE      deferred    Increment the "deferred constraint counter".
-    **                           Or, if the ON (UPDATE|DELETE) action is RESTRICT,
-    **                           throw a "foreign key constraint failed" exception.
-    **
-    **   INSERT      deferred    Decrement the "deferred constraint counter".
-    **
-    ** These operations are identified in the comment at the top of this file 
-    ** (fkey.c) as "I.2" and "D.2".
-    */
+    ///<summary>
+/// This function is called to generate code executed when a row is deleted
+/// from the parent table of foreign key constraint pFKey and, if pFKey is
+/// deferred, when a row is inserted into the same table. When generating
+/// code for an SQL UPDATE operation, this function may be called twice -
+/// once to "delete" the old row and once to "insert" the new row.
+///
+/// The code generated by this function scans through the rows in the child
+/// table that correspond to the parent table row being deleted or inserted.
+/// For each child row found, one of the following actions is taken:
+///
+///   Operation | FK type   | Action taken
+///   --------------------------------------------------------------------------
+///   DELETE      immediate   Increment the "immediate constraint counter".
+///                           Or, if the ON (UPDATE|DELETE) action is RESTRICT,
+///                           throw a "foreign key constraint failed" exception.
+///
+///   INSERT      immediate   Decrement the "immediate constraint counter".
+///
+///   DELETE      deferred    Increment the "deferred constraint counter".
+///                           Or, if the ON (UPDATE|DELETE) action is RESTRICT,
+///                           throw a "foreign key constraint failed" exception.
+///
+///   INSERT      deferred    Decrement the "deferred constraint counter".
+///
+/// These operations are identified in the comment at the top of this file
+/// (fkey.c) as "I.2" and "D.2".
+///
+///</summary>
     static void fkScanChildren(
       Parse pParse,                   /* Parse context */
       SrcList pSrc,                   /* SrcList containing the table to scan */
@@ -652,34 +656,36 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** This function returns a pointer to the head of a linked list of FK
-    ** constraints for which table pTab is the parent table. For example,
-    ** given the following schema:
-    **
-    **   CREATE TABLE t1(a PRIMARY KEY);
-    **   CREATE TABLE t2(b REFERENCES t1(a);
-    **
-    ** Calling this function with table "t1" as an argument returns a pointer
-    ** to the FKey structure representing the foreign key constraint on table
-    ** "t2". Calling this function with "t2" as the argument would return a
-    ** NULL pointer (as there are no FK constraints for which t2 is the parent
-    ** table).
-    */
+    ///<summary>
+/// This function returns a pointer to the head of a linked list of FK
+/// constraints for which table pTab is the parent table. For example,
+/// given the following schema:
+///
+///   CREATE TABLE t1(a PRIMARY KEY);
+///   CREATE TABLE t2(b REFERENCES t1(a);
+///
+/// Calling this function with table "t1" as an argument returns a pointer
+/// to the FKey structure representing the foreign key constraint on table
+/// "t2". Calling this function with "t2" as the argument would return a
+/// NULL pointer (as there are no FK constraints for which t2 is the parent
+/// table).
+///
+///</summary>
     static FKey sqlite3FkReferences( Table pTab )
     {
       int nName = StringExtensions.sqlite3Strlen30( pTab.zName );
       return sqlite3HashFind( pTab.pSchema.fkeyHash, pTab.zName, nName, (FKey)null );
     }
 
-    /*
-    ** The second argument is a Trigger structure allocated by the 
-    ** fkActionTrigger() routine. This function deletes the Trigger structure
-    ** and all of its sub-components.
-    **
-    ** The Trigger structure or any of its sub-components may be allocated from
-    ** the lookaside buffer belonging to database handle dbMem.
-    */
+    ///<summary>
+/// The second argument is a Trigger structure allocated by the
+/// fkActionTrigger() routine. This function deletes the Trigger structure
+/// and all of its sub-components.
+///
+/// The Trigger structure or any of its sub-components may be allocated from
+/// the lookaside buffer belonging to database handle dbMem.
+///
+///</summary>
     static void fkTriggerDelete( sqlite3 dbMem, Trigger p )
     {
       if ( p != null )
@@ -693,23 +699,24 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** This function is called to generate code that runs when table pTab is
-    ** being dropped from the database. The SrcList passed as the second argument
-    ** to this function contains a single entry guaranteed to resolve to
-    ** table pTab.
-    **
-    ** Normally, no code is required. However, if either
-    **
-    **   (a) The table is the parent table of a FK constraint, or
-    **   (b) The table is the child table of a deferred FK constraint and it is
-    **       determined at runtime that there are outstanding deferred FK 
-    **       constraint violations in the database,
-    **
-    ** then the equivalent of "DELETE FROM <tbl>" is executed before dropping
-    ** the table from the database. Triggers are disabled while running this
-    ** DELETE, but foreign key actions are not.
-    */
+    ///<summary>
+/// This function is called to generate code that runs when table pTab is
+/// being dropped from the database. The SrcList passed as the second argument
+/// to this function contains a single entry guaranteed to resolve to
+/// table pTab.
+///
+/// Normally, no code is required. However, if either
+///
+///   (a) The table is the parent table of a FK constraint, or
+///   (b) The table is the child table of a deferred FK constraint and it is
+///       determined at runtime that there are outstanding deferred FK
+///       constraint violations in the database,
+///
+/// then the equivalent of "DELETE FROM <tbl>" is executed before dropping
+/// the table from the database. Triggers are disabled while running this
+/// DELETE, but foreign key actions are not.
+///
+///</summary>
     static void sqlite3FkDropTable( Parse pParse, SrcList pName, Table pTab )
     {
       sqlite3 db = pParse.db;
@@ -758,26 +765,27 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** This function is called when inserting, deleting or updating a row of
-    ** table pTab to generate VDBE code to perform foreign key constraint 
-    ** processing for the operation.
-    **
-    ** For a DELETE operation, parameter regOld is passed the index of the
-    ** first register in an array of (pTab.nCol+1) registers containing the
-    ** rowid of the row being deleted, followed by each of the column values
-    ** of the row being deleted, from left to right. Parameter regNew is passed
-    ** zero in this case.
-    **
-    ** For an INSERT operation, regOld is passed zero and regNew is passed the
-    ** first register of an array of (pTab.nCol+1) registers containing the new
-    ** row data.
-    **
-    ** For an UPDATE operation, this function is called twice. Once before
-    ** the original record is deleted from the table using the calling convention
-    ** described for DELETE. Then again after the original record is deleted
-    ** but before the new record is inserted using the INSERT convention. 
-    */
+    ///<summary>
+/// This function is called when inserting, deleting or updating a row of
+/// table pTab to generate VDBE code to perform foreign key constraint
+/// processing for the operation.
+///
+/// For a DELETE operation, parameter regOld is passed the index of the
+/// first register in an array of (pTab.nCol+1) registers containing the
+/// rowid of the row being deleted, followed by each of the column values
+/// of the row being deleted, from left to right. Parameter regNew is passed
+/// zero in this case.
+///
+/// For an INSERT operation, regOld is passed zero and regNew is passed the
+/// first register of an array of (pTab.nCol+1) registers containing the new
+/// row data.
+///
+/// For an UPDATE operation, this function is called twice. Once before
+/// the original record is deleted from the table using the calling convention
+/// described for DELETE. Then again after the original record is deleted
+/// but before the new record is inserted using the INSERT convention.
+///
+///</summary>
     static void sqlite3FkCheck(
       Parse pParse,                   /* Parse context */
       Table pTab,                     /* Row is being deleted from this table */
@@ -947,10 +955,11 @@ namespace Community.CsharpSqlite
       return ( ( x ) > 31 ) ? 0xffffffff : ( (u32)1 << ( x ) );
     }
 
-    /*
-    ** This function is called before generating code to update or delete a 
-    ** row contained in table pTab.
-    */
+    ///<summary>
+/// This function is called before generating code to update or delete a
+/// row contained in table pTab.
+///
+///</summary>
     static u32 sqlite3FkOldmask(
       Parse pParse,                  /* Parse context */
       Table pTab                     /* Table being modified */
@@ -981,20 +990,21 @@ namespace Community.CsharpSqlite
       return mask;
     }
 
-    /*
-    ** This function is called before generating code to update or delete a 
-    ** row contained in table pTab. If the operation is a DELETE, then
-    ** parameter aChange is passed a NULL value. For an UPDATE, aChange points
-    ** to an array of size N, where N is the number of columns in table pTab.
-    ** If the i'th column is not modified by the UPDATE, then the corresponding 
-    ** entry in the aChange[] array is set to -1. If the column is modified,
-    ** the value is 0 or greater. Parameter chngRowid is set to true if the
-    ** UPDATE statement modifies the rowid fields of the table.
-    **
-    ** If any foreign key processing will be required, this function returns
-    ** true. If there is no foreign key related processing, this function 
-    ** returns false.
-    */
+    ///<summary>
+/// This function is called before generating code to update or delete a
+/// row contained in table pTab. If the operation is a DELETE, then
+/// parameter aChange is passed a NULL value. For an UPDATE, aChange points
+/// to an array of size N, where N is the number of columns in table pTab.
+/// If the i'th column is not modified by the UPDATE, then the corresponding
+/// entry in the aChange[] array is set to -1. If the column is modified,
+/// the value is 0 or greater. Parameter chngRowid is set to true if the
+/// UPDATE statement modifies the rowid fields of the table.
+///
+/// If any foreign key processing will be required, this function returns
+/// true. If there is no foreign key related processing, this function
+/// returns false.
+///
+///</summary>
     static int sqlite3FkRequired(
       Parse pParse,                  /* Parse context */
       Table pTab,                    /* Table being modified */
@@ -1056,35 +1066,36 @@ namespace Community.CsharpSqlite
       return 0;
     }
 
-    /*
-    ** This function is called when an UPDATE or DELETE operation is being 
-    ** compiled on table pTab, which is the parent table of foreign-key pFKey.
-    ** If the current operation is an UPDATE, then the pChanges parameter is
-    ** passed a pointer to the list of columns being modified. If it is a
-    ** DELETE, pChanges is passed a NULL pointer.
-    **
-    ** It returns a pointer to a Trigger structure containing a trigger
-    ** equivalent to the ON UPDATE or ON DELETE action specified by pFKey.
-    ** If the action is "NO ACTION" or "RESTRICT", then a NULL pointer is
-    ** returned (these actions require no special handling by the triggers
-    ** sub-system, code for them is created by fkScanChildren()).
-    **
-    ** For example, if pFKey is the foreign key and pTab is table "p" in 
-    ** the following schema:
-    **
-    **   CREATE TABLE p(pk PRIMARY KEY);
-    **   CREATE TABLE c(ck REFERENCES p ON DELETE CASCADE);
-    **
-    ** then the returned trigger structure is equivalent to:
-    **
-    **   CREATE TRIGGER ... DELETE ON p BEGIN
-    **     DELETE FROM c WHERE ck = old.pk;
-    **   END;
-    **
-    ** The returned pointer is cached as part of the foreign key object. It
-    ** is eventually freed along with the rest of the foreign key object by 
-    ** sqlite3FkDelete().
-    */
+    ///<summary>
+/// This function is called when an UPDATE or DELETE operation is being
+/// compiled on table pTab, which is the parent table of foreign-key pFKey.
+/// If the current operation is an UPDATE, then the pChanges parameter is
+/// passed a pointer to the list of columns being modified. If it is a
+/// DELETE, pChanges is passed a NULL pointer.
+///
+/// It returns a pointer to a Trigger structure containing a trigger
+/// equivalent to the ON UPDATE or ON DELETE action specified by pFKey.
+/// If the action is "NO ACTION" or "RESTRICT", then a NULL pointer is
+/// returned (these actions require no special handling by the triggers
+/// sub-system, code for them is created by fkScanChildren()).
+///
+/// For example, if pFKey is the foreign key and pTab is table "p" in
+/// the following schema:
+///
+///   CREATE TABLE p(pk PRIMARY KEY);
+///   CREATE TABLE c(ck REFERENCES p ON DELETE CASCADE);
+///
+/// then the returned trigger structure is equivalent to:
+///
+///   CREATE TRIGGER ... DELETE ON p BEGIN
+///     DELETE FROM c WHERE ck = old.pk;
+///   END;
+///
+/// The returned pointer is cached as part of the foreign key object. It
+/// is eventually freed along with the rest of the foreign key object by
+/// sqlite3FkDelete().
+///
+///</summary>
     static Trigger fkActionTrigger(
       Parse pParse,                  /* Parse context */
       Table pTab,                    /* Table being updated or deleted from */
@@ -1291,10 +1302,11 @@ namespace Community.CsharpSqlite
       return pTrigger;
     }
 
-    /*
-    ** This function is called when deleting or updating a row to implement
-    ** any required CASCADE, SET NULL or SET DEFAULT actions.
-    */
+    ///<summary>
+/// This function is called when deleting or updating a row to implement
+/// any required CASCADE, SET NULL or SET DEFAULT actions.
+///
+///</summary>
     static void sqlite3FkActions(
       Parse pParse,                  /* Parse context */
       Table pTab,                    /* Table being updated or deleted from */

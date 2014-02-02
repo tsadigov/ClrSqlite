@@ -127,7 +127,9 @@ namespace Community.CsharpSqlite
       public u32 cacheStatus;      /* Cache is valid if this matches Vdbe.cacheCtr */
       public Pgno payloadSize;     /* Total number of bytes in the record */
       public u32[] aType;          /* Type values for all entries in the record */
-      public u32[] aOffset;        /* Cached offsets to the start of each columns data */
+      public u32[] aOffset;        ///<summary>
+///Cached offsets to the start of each columns data
+///</summary>
       public int aRow;             /* Pointer to Data for the current row, if all on one page */
 
       public VdbeCursor Copy()
@@ -246,7 +248,9 @@ set { _flags = value; }
       public SumCtx _SumCtx;        /* Used when C# overload Z as Sum context */
       public SubProgram[] _SubProgram;/* Used when C# overload Z as SubProgram*/
       public StrAccum _StrAccum;    /* Used when C# overload Z as STR context */
-      public object _MD5Context;    /* Used when C# overload Z as MD5 context */
+      public object _MD5Context;    ///<summary>
+///Used when C# overload Z as MD5 context
+///</summary>
 
       public Mem()
       {
@@ -353,9 +357,9 @@ const int MEM_Zero = 0x4000;
     const int MEM_Zero = 0x0000;
 #endif
 
-    /*
-** Clear any existing type flags from a Mem and replace them with f
-*/
+    ///<summary>
+/// Clear any existing type flags from a Mem and replace them with f
+///</summary>
     //#define MemSetTypeFlag(p, f) \
     //   ((p)->flags = ((p)->flags&~(MEM_TypeMask|MEM_Zero))|f)
     static void MemSetTypeFlag( Mem p, int f )
@@ -498,8 +502,12 @@ static bool memIsValid( Mem M ) { return true; }
       public VdbeFrame pFrame;       /* Parent frame */
       public VdbeFrame pDelFrame;    /* List of frame objects to free on VM reset */
       public int nFrame;             /* Number of frames in pFrame list */
-      public u32 expmask;            /* Binding to these vars invalidates VM */
-      public SubProgram pProgram;    /* Linked list of all sub-programs used by VM */
+      public u32 expmask;            ///<summary>
+///Binding to these vars invalidates VM
+///</summary>
+      public SubProgram pProgram;    ///<summary>
+///Linked list of all sub-programs used by VM
+///</summary>
 
       public Vdbe Copy()
       {
@@ -584,9 +592,10 @@ ct.pLruNext=pLruNext;
     const u32 VDBE_MAGIC_RUN = 0xbdf20da3;   /* VDBE is ready to execute */
     const u32 VDBE_MAGIC_HALT = 0x519c2973;   /* VDBE has completed execution */
     const u32 VDBE_MAGIC_DEAD = 0xb606c3c8;   /* The VDBE has been deallocated */
-    /*
-    ** Function prototypes
-    */
+    ///<summary>
+/// Function prototypes
+///
+///</summary>
     //void sqlite3VdbeFreeCursor(Vdbe *, VdbeCursor);
     //void sqliteVdbePopStack(Vdbe*,int);
     //int sqlite3VdbeCursorMoveto(VdbeCursor);

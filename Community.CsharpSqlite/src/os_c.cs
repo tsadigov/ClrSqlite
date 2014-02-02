@@ -37,23 +37,24 @@ namespace Community.CsharpSqlite
     //#include "sqliteInt.h"
     //#undef _SQLITE_OS_C_
 
-    /*
-    ** The default SQLite sqlite3_vfs implementations do not allocate
-    ** memory (actually, os_unix.c allocates a small amount of memory
-    ** from within OsOpen()), but some third-party implementations may.
-    ** So we test the effects of a malloc() failing and the sqlite3OsXXX()
-    ** function returning SQLITE_IOERR_NOMEM using the DO_OS_MALLOC_TEST macro.
-    **
-    ** The following functions are instrumented for malloc() failure
-    ** testing:
-    **
-    **     sqlite3OsOpen()
-    **     sqlite3OsRead()
-    **     sqlite3OsWrite()
-    **     sqlite3OsSync()
-    **     sqlite3OsLock()
-    **
-    */
+    ///<summary>
+/// The default SQLite sqlite3_vfs implementations do not allocate
+/// memory (actually, os_unix.c allocates a small amount of memory
+/// from within OsOpen()), but some third-party implementations may.
+/// So we test the effects of a malloc() failing and the sqlite3OsXXX()
+/// function returning SQLITE_IOERR_NOMEM using the DO_OS_MALLOC_TEST macro.
+///
+/// The following functions are instrumented for malloc() failure
+/// testing:
+///
+///     sqlite3OsOpen()
+///     sqlite3OsRead()
+///     sqlite3OsWrite()
+///     sqlite3OsSync()
+///     sqlite3OsLock()
+///
+///
+///</summary>
 #if (SQLITE_TEST)
     static int sqlite3_memdebug_vfs_oom_test = 1;
 
@@ -72,12 +73,12 @@ namespace Community.CsharpSqlite
 #endif
 
 
-    /*
-** The following routines are convenience wrappers around methods
-** of the sqlite3_file object.  This is mostly just syntactic sugar. All
-** of this would be completely automatic if SQLite were coded using
-** C++ instead of plain old C.
-*/
+    ///<summary>
+/// The following routines are convenience wrappers around methods
+/// of the sqlite3_file object.  This is mostly just syntactic sugar. All
+/// of this would be completely automatic if SQLite were coded using
+/// C++ instead of plain old C.
+///</summary>
     static int sqlite3OsClose( sqlite3_file pId )
     {
       int rc = SQLITE_OK;
@@ -166,10 +167,11 @@ out object pp                 /* OUT: Pointer to mapping */
       return id.pMethods.xShmMap( id, iPage, pgsz, bExtend, out pp );
     }
 
-    /*
-    ** The next group of routines are convenience wrappers around the
-    ** VFS methods.
-    */
+    ///<summary>
+/// The next group of routines are convenience wrappers around the
+/// VFS methods.
+///
+///</summary>
     static int sqlite3OsOpen(
     sqlite3_vfs pVfs,
     string zPath,
@@ -310,10 +312,11 @@ out object pp                 /* OUT: Pointer to mapping */
     static sqlite3_vfs vfsList;
     //#define vfsList GLOBAL(sqlite3_vfs *, vfsList)
 
-    /*
-    ** Locate a VFS by name.  If no name is given, simply return the
-    ** first VFS on the list.
-    */
+    ///<summary>
+/// Locate a VFS by name.  If no name is given, simply return the
+/// first VFS on the list.
+///
+///</summary>
     static bool isInit = false;
 
     static sqlite3_vfs sqlite3_vfs_find( string zVfs )
@@ -342,9 +345,10 @@ out object pp                 /* OUT: Pointer to mapping */
       return pVfs;
     }
 
-    /*
-    ** Unlink a VFS from the linked list
-    */
+    ///<summary>
+/// Unlink a VFS from the linked list
+///
+///</summary>
     static void vfsUnlink( sqlite3_vfs pVfs )
     {
       Debug.Assert( sqlite3_mutex_held( sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER ) ) );
@@ -370,11 +374,12 @@ out object pp                 /* OUT: Pointer to mapping */
       }
     }
 
-    /*
-    ** Register a VFS with the system.  It is harmless to register the same
-    ** VFS multiple times.  The new VFS becomes the default if makeDflt is
-    ** true.
-    */
+    ///<summary>
+/// Register a VFS with the system.  It is harmless to register the same
+/// VFS multiple times.  The new VFS becomes the default if makeDflt is
+/// true.
+///
+///</summary>
     static int sqlite3_vfs_register( sqlite3_vfs pVfs, int makeDflt )
     {
       sqlite3_mutex mutex;

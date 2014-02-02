@@ -241,20 +241,24 @@ namespace Community.CsharpSqlite
     */
     //#include "sqliteInt.h"
 
-    /* The following value is the maximum cell size assuming a maximum page
-    ** size give above.
-    */
+    ///<summary>
+///The following value is the maximum cell size assuming a maximum page
+/// size give above.
+///
+///</summary>
     //#define MX_CELL_SIZE(pBt)  ((int)(pBt->pageSize-8))
     static int MX_CELL_SIZE( BtShared pBt )
     {
       return (int)( pBt.pageSize - 8 );
     }
 
-    /* The maximum number of cells on a single page of the database.  This
-    ** assumes a minimum cell size of 6 bytes  (4 bytes for the cell itself
-    ** plus 2 bytes for the index to the cell in the page header).  Such
-    ** small cells will be rare, but they are possible.
-    */
+    ///<summary>
+///The maximum number of cells on a single page of the database.  This
+/// assumes a minimum cell size of 6 bytes  (4 bytes for the cell itself
+/// plus 2 bytes for the index to the cell in the page header).  Such
+/// small cells will be rare, but they are possible.
+///
+///</summary>
     //#define MX_CELL(pBt) ((pBt.pageSize-8)/6)
     static int MX_CELL( BtShared pBt )
     {
@@ -306,7 +310,9 @@ namespace Community.CsharpSqlite
 ///</summary>
     public struct _OvflCell
     {   /* Cells that will not fit on aData[] */
-      public u8[] pCell;       /* Pointers to the body of the overflow cell */
+      public u8[] pCell;       ///<summary>
+///Pointers to the body of the overflow cell
+///</summary>
       public u16 idx;            /* Insert this cell before idx-th non-overflow cell */
       public _OvflCell Copy()
       {
@@ -339,7 +345,9 @@ namespace Community.CsharpSqlite
       public BtShared pBt;        /* Pointer to BtShared that this page is part of */
       public byte[] aData;        /* Pointer to disk image of the page data */
       public DbPage pDbPage;      /* Pager page handle */
-      public Pgno pgno;           /* Page number for this page */
+      public Pgno pgno;           ///<summary>
+///Page number for this page
+///</summary>
 
       //public byte[] aData
       //{
@@ -544,7 +552,9 @@ public u8 isPending;            /* If waiting for read-locks to clear */
       public u32 nPayload;  /* Total amount of payload */
       public u16 nHeader;   /* Size of the cell content header in bytes */
       public u16 nLocal;    /* Amount of payload held locally */
-      public u16 iOverflow; /* Offset to overflow page number.  Zero if no overflow */
+      public u16 iOverflow; ///<summary>
+///Offset to overflow page number.  Zero if no overflow
+///</summary>
       public u16 nSize;     /* Size of the cell content on the main b-tree page */
       public bool Equals( CellInfo ci )
       {
@@ -611,8 +621,12 @@ public Pgno[] aOverflow;         /* Cache of overflow page locations */
 public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 #endif
       public i16 iPage;                                          /* Index of current page in apPage */
-      public u16[] aiIdx = new u16[BTCURSOR_MAX_DEPTH];           /* Current index in apPage[i] */
-      public MemPage[] apPage = new MemPage[BTCURSOR_MAX_DEPTH]; /* Pages from root to current page */
+      public u16[] aiIdx = new u16[BTCURSOR_MAX_DEPTH];           ///<summary>
+///Current index in apPage[i]
+///</summary>
+      public MemPage[] apPage = new MemPage[BTCURSOR_MAX_DEPTH]; ///<summary>
+///Pages from root to current page
+///</summary>
 
       public void Clear()
       {
@@ -672,9 +686,10 @@ aOverflow= null;
     const int CURSOR_REQUIRESEEK = 2;
     const int CURSOR_FAULT = 3;
 
-    /*
-    ** The database page the PENDING_BYTE occupies. This page is never used.
-    */
+    ///<summary>
+/// The database page the PENDING_BYTE occupies. This page is never used.
+///
+///</summary>
     //# define PENDING_BYTE_PAGE(pBt) PAGER_MJ_PGNO(pBt)
     // TODO -- Convert PENDING_BYTE_PAGE to inline
     static u32 PENDING_BYTE_PAGE( BtShared pBt )
@@ -682,21 +697,22 @@ aOverflow= null;
       return (u32)PAGER_MJ_PGNO( pBt.pPager );
     }
 
-    /*
-    ** These macros define the location of the pointer-map entry for a
-    ** database page. The first argument to each is the number of usable
-    ** bytes on each page of the database (often 1024). The second is the
-    ** page number to look up in the pointer map.
-    **
-    ** PTRMAP_PAGENO returns the database page number of the pointer-map
-    ** page that stores the required pointer. PTRMAP_PTROFFSET returns
-    ** the offset of the requested map entry.
-    **
-    ** If the pgno argument passed to PTRMAP_PAGENO is a pointer-map page,
-    ** then pgno is returned. So (pgno==PTRMAP_PAGENO(pgsz, pgno)) can be
-    ** used to test if pgno is a pointer-map page. PTRMAP_ISPAGE implements
-    ** this test.
-    */
+    ///<summary>
+/// These macros define the location of the pointer-map entry for a
+/// database page. The first argument to each is the number of usable
+/// bytes on each page of the database (often 1024). The second is the
+/// page number to look up in the pointer map.
+///
+/// PTRMAP_PAGENO returns the database page number of the pointer-map
+/// page that stores the required pointer. PTRMAP_PTROFFSET returns
+/// the offset of the requested map entry.
+///
+/// If the pgno argument passed to PTRMAP_PAGENO is a pointer-map page,
+/// then pgno is returned. So (pgno==PTRMAP_PAGENO(pgsz, pgno)) can be
+/// used to test if pgno is a pointer-map page. PTRMAP_ISPAGE implements
+/// this test.
+///
+///</summary>
     //#define PTRMAP_PAGENO(pBt, pgno) ptrmapPageno(pBt, pgno)
     static Pgno PTRMAP_PAGENO( BtShared pBt, Pgno pgno )
     {
@@ -754,9 +770,11 @@ aOverflow= null;
     const int PTRMAP_OVERFLOW2 = 4;
     const int PTRMAP_BTREE = 5;
 
-    /* A bunch of Debug.Assert() statements to check the transaction state variables
-    ** of handle p (type Btree*) are internally consistent.
-    */
+    ///<summary>
+///A bunch of Debug.Assert() statements to check the transaction state variables
+/// of handle p (type Btree*) are internally consistent.
+///
+///</summary>
 #if DEBUG
     //#define btreeIntegrity(p) \
     //  Debug.Assert( p.pBt.inTransaction!=TRANS_NONE || p.pBt.nTransaction==0 ); \
@@ -802,9 +820,10 @@ public static bool ISAUTOVACUUM =false;
       public StrAccum errMsg = new StrAccum( 100 ); /* Accumulate the error message text here */
     };
 
-    /*
-    ** Read or write a two- and four-byte big-endian integer values.
-    */
+    ///<summary>
+/// Read or write a two- and four-byte big-endian integer values.
+///
+///</summary>
     //#define get2byte(x)   ((x)[0]<<8 | (x)[1])
     static int get2byte( byte[] p, int offset )
     {

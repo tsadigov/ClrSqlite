@@ -122,11 +122,12 @@ namespace Community.CsharpSqlite
       public RowSetEntry[] aEntry = new RowSetEntry[ROWSET_ENTRY_PER_CHUNK]; /* Allocated entries */
     };
 
-    /*
-    ** A RowSet in an instance of the following structure.
-    **
-    ** A typedef of this structure if found in sqliteInt.h.
-    */
+    ///<summary>
+/// A RowSet in an instance of the following structure.
+///
+/// A typedef of this structure if found in sqliteInt.h.
+///
+///</summary>
     public class RowSet
     {
       public RowSetChunk pChunk;            /* List of all chunk allocations */
@@ -153,18 +154,19 @@ namespace Community.CsharpSqlite
       }
     };
 
-    /*
-    ** Turn bulk memory into a RowSet object.  N bytes of memory
-    ** are available at pSpace.  The db pointer is used as a memory context
-    ** for any subsequent allocations that need to occur.
-    ** Return a pointer to the new RowSet object.
-    **
-    ** It must be the case that N is sufficient to make a Rowset.  If not
-    ** an assertion fault occurs.
-    **
-    ** If N is larger than the minimum, use the surplus as an initial
-    ** allocation of entries available to be filled.
-    */
+    ///<summary>
+/// Turn bulk memory into a RowSet object.  N bytes of memory
+/// are available at pSpace.  The db pointer is used as a memory context
+/// for any subsequent allocations that need to occur.
+/// Return a pointer to the new RowSet object.
+///
+/// It must be the case that N is sufficient to make a Rowset.  If not
+/// an assertion fault occurs.
+///
+/// If N is larger than the minimum, use the surplus as an initial
+/// allocation of entries available to be filled.
+///
+///</summary>
     static RowSet sqlite3RowSetInit( sqlite3 db, object pSpace, u32 N )
     {
       RowSet p = new RowSet( db, (int)N );
@@ -182,11 +184,12 @@ namespace Community.CsharpSqlite
       return p;
     }
 
-    /*
-    ** Deallocate all chunks from a RowSet.  This frees all memory that
-    ** the RowSet has allocated over its lifetime.  This routine is
-    ** the destructor for the RowSet.
-    */
+    ///<summary>
+/// Deallocate all chunks from a RowSet.  This frees all memory that
+/// the RowSet has allocated over its lifetime.  This routine is
+/// the destructor for the RowSet.
+///
+///</summary>
     static void sqlite3RowSetClear( RowSet p )
     {
       RowSetChunk pChunk, pNextChunk;
@@ -203,12 +206,13 @@ namespace Community.CsharpSqlite
       p.isSorted = true;
     }
 
-    /*
-    ** Insert a new value into a RowSet.
-    **
-    ** The mallocFailed flag of the database connection is set if a
-    ** memory allocation fails.
-    */
+    ///<summary>
+/// Insert a new value into a RowSet.
+///
+/// The mallocFailed flag of the database connection is set if a
+/// memory allocation fails.
+///
+///</summary>
     static void sqlite3RowSetInsert( RowSet p, i64 rowid )
     {
       RowSetEntry pEntry;       /* The new entry */
@@ -249,12 +253,13 @@ namespace Community.CsharpSqlite
       p.pLast = pEntry;
     }
 
-    /*
-    ** Merge two lists of RowSetEntry objects.  Remove duplicates.
-    **
-    ** The input lists are connected via pRight pointers and are
-    ** assumed to each already be in sorted order.
-    */
+    ///<summary>
+/// Merge two lists of RowSetEntry objects.  Remove duplicates.
+///
+/// The input lists are connected via pRight pointers and are
+/// assumed to each already be in sorted order.
+///
+///</summary>
     static RowSetEntry rowSetMerge(
     RowSetEntry pA,    /* First sorted list to be merged */
     RowSetEntry pB     /* Second sorted list to be merged */
@@ -298,9 +303,10 @@ namespace Community.CsharpSqlite
       return head.pRight;
     }
 
-    /*
-    ** Sort all elements on the pEntry list of the RowSet into ascending order.
-    */
+    ///<summary>
+/// Sort all elements on the pEntry list of the RowSet into ascending order.
+///
+///</summary>
     static void rowSetSort( RowSet p )
     {
       u32 i;
@@ -331,11 +337,12 @@ namespace Community.CsharpSqlite
       p.isSorted = true;
     }
 
-    /*
-    ** The input, pIn, is a binary tree (or subtree) of RowSetEntry objects.
-    ** Convert this tree into a linked list connected by the pRight pointers
-    ** and return pointers to the first and last elements of the new list.
-    */
+    ///<summary>
+/// The input, pIn, is a binary tree (or subtree) of RowSetEntry objects.
+/// Convert this tree into a linked list connected by the pRight pointers
+/// and return pointers to the first and last elements of the new list.
+///
+///</summary>
     static void rowSetTreeToList(
     RowSetEntry pIn,            /* Root of the input tree */
     ref RowSetEntry ppFirst,    /* Write head of the output list here */
@@ -365,19 +372,20 @@ namespace Community.CsharpSqlite
     }
 
 
-    /*
-    ** Convert a sorted list of elements (connected by pRight) into a binary
-    ** tree with depth of iDepth.  A depth of 1 means the tree contains a single
-    ** node taken from the head of *ppList.  A depth of 2 means a tree with
-    ** three nodes.  And so forth.
-    **
-    ** Use as many entries from the input list as required and update the
-    ** *ppList to point to the unused elements of the list.  If the input
-    ** list contains too few elements, then construct an incomplete tree
-    ** and leave *ppList set to NULL.
-    **
-    ** Return a pointer to the root of the constructed binary tree.
-    */
+    ///<summary>
+/// Convert a sorted list of elements (connected by pRight) into a binary
+/// tree with depth of iDepth.  A depth of 1 means the tree contains a single
+/// node taken from the head of *ppList.  A depth of 2 means a tree with
+/// three nodes.  And so forth.
+///
+/// Use as many entries from the input list as required and update the
+/// *ppList to point to the unused elements of the list.  If the input
+/// list contains too few elements, then construct an incomplete tree
+/// and leave *ppList set to NULL.
+///
+/// Return a pointer to the root of the constructed binary tree.
+///
+///</summary>
     static RowSetEntry rowSetNDeepTree(
     ref RowSetEntry ppList,
     int iDepth
@@ -408,10 +416,11 @@ namespace Community.CsharpSqlite
       return p;
     }
 
-    /*
-    ** Convert a sorted list of elements into a binary tree. Make the tree
-    ** as deep as it needs to be in order to contain the entire list.
-    */
+    ///<summary>
+/// Convert a sorted list of elements into a binary tree. Make the tree
+/// as deep as it needs to be in order to contain the entire list.
+///
+///</summary>
     static RowSetEntry rowSetListToTree( RowSetEntry pList )
     {
       int iDepth;          /* Depth of the tree so far */
@@ -433,11 +442,12 @@ namespace Community.CsharpSqlite
       return p;
     }
 
-    /*
-    ** Convert the list in p.pEntry into a sorted list if it is not
-    ** sorted already.  If there is a binary tree on p.pTree, then
-    ** convert it into a list too and merge it into the p.pEntry list.
-    */
+    ///<summary>
+/// Convert the list in p.pEntry into a sorted list if it is not
+/// sorted already.  If there is a binary tree on p.pTree, then
+/// convert it into a list too and merge it into the p.pEntry list.
+///
+///</summary>
     static void rowSetToList( RowSet p )
     {
       if ( !p.isSorted )
@@ -454,14 +464,15 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** Extract the smallest element from the RowSet.
-    ** Write the element into *pRowid.  Return 1 on success.  Return
-    ** 0 if the RowSet is already empty.
-    **
-    ** After this routine has been called, the sqlite3RowSetInsert()
-    ** routine may not be called again.
-    */
+    ///<summary>
+/// Extract the smallest element from the RowSet.
+/// Write the element into *pRowid.  Return 1 on success.  Return
+/// 0 if the RowSet is already empty.
+///
+/// After this routine has been called, the sqlite3RowSetInsert()
+/// routine may not be called again.
+///
+///</summary>
     static int sqlite3RowSetNext( RowSet p, ref i64 pRowid )
     {
       rowSetToList( p );

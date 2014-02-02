@@ -263,20 +263,20 @@ const int SQLITE_DEFAULT_MEMSTATUS = 1;
 const int NDEBUG = 1;//# define NDEBUG 1
 #endif
 
-        /*
-** The testcase() macro is used to aid in coverage testing.  When
-** doing coverage testing, the condition inside the argument to
-** testcase() must be evaluated both true and false in order to
-** get full branch coverage.  The testcase() macro is inserted
-** to help ensure adequate test coverage in places where simple
-** condition/decision coverage is inadequate.  For example, testcase()
-** can be used to make sure boundary values are tested.  For
-** bitmask tests, testcase() can be used to make sure each bit
-** is significant and used at least once.  On switch statements
-** where multiple cases go to the same block of code, testcase()
-** can insure that all cases are evaluated.
-**
-*/
+        ///<summary>
+/// The testcase() macro is used to aid in coverage testing.  When
+/// doing coverage testing, the condition inside the argument to
+/// testcase() must be evaluated both true and false in order to
+/// get full branch coverage.  The testcase() macro is inserted
+/// to help ensure adequate test coverage in places where simple
+/// condition/decision coverage is inadequate.  For example, testcase()
+/// can be used to make sure boundary values are tested.  For
+/// bitmask tests, testcase() can be used to make sure each bit
+/// is significant and used at least once.  On switch statements
+/// where multiple cases go to the same block of code, testcase()
+/// can insure that all cases are evaluated.
+///
+///</summary>
 #if SQLITE_COVERAGE_TEST
 void sqlite3Coverage(int);
 //# define testcase(X)  if( X ){ sqlite3Coverage(__LINE__); }
@@ -313,21 +313,21 @@ void sqlite3Coverage(int);
 //# define VVA_ONLY(X)
 #endif
 
-        /*
-** The ALWAYS and NEVER macros surround boolean expressions which
-** are intended to always be true or false, respectively.  Such
-** expressions could be omitted from the code completely.  But they
-** are included in a few cases in order to enhance the resilience
-** of SQLite to unexpected behavior - to make the code "self-healing"
-** or "ductile" rather than being "brittle" and crashing at the first
-** hint of unplanned behavior.
-**
-** In other words, ALWAYS and NEVER are added for defensive code.
-**
-** When doing coverage testing ALWAYS and NEVER are hard-coded to
-** be true and false so that the unreachable code then specify will
-** not be counted as untested code.
-*/
+        ///<summary>
+/// The ALWAYS and NEVER macros surround boolean expressions which
+/// are intended to always be true or false, respectively.  Such
+/// expressions could be omitted from the code completely.  But they
+/// are included in a few cases in order to enhance the resilience
+/// of SQLite to unexpected behavior - to make the code "self-healing"
+/// or "ductile" rather than being "brittle" and crashing at the first
+/// hint of unplanned behavior.
+///
+/// In other words, ALWAYS and NEVER are added for defensive code.
+///
+/// When doing coverage testing ALWAYS and NEVER are hard-coded to
+/// be true and false so that the unreachable code then specify will
+/// not be counted as untested code.
+///</summary>
 #if SQLITE_COVERAGE_TEST
 //# define ALWAYS(X)      (1)
 //# define NEVER(X)       (0)
@@ -432,12 +432,13 @@ void sqlite3Coverage(int);
             return (((X) & ~(i64) 0xffffffff) != 0);
         } //#define IS_BIG_INT(X)  (((X)&~(i64)0xffffffff)!=0)
 
-        /*
-    ** The macro unlikely() is a hint that surrounds a boolean
-    ** expression that is usually false.  Macro likely() surrounds
-    ** a boolean expression that is usually true.  GCC is able to
-    ** use these hints to generate better code, sometimes.
-    */
+        ///<summary>
+/// The macro unlikely() is a hint that surrounds a boolean
+/// expression that is usually false.  Macro likely() surrounds
+/// a boolean expression that is usually true.  GCC is able to
+/// use these hints to generate better code, sometimes.
+///
+///</summary>
 #if (__GNUC__) && FALSE
 //# define likely(X)    __builtin_expect((X),1)
 //# define unlikely(X)  __builtin_expect((X),0)
@@ -629,19 +630,21 @@ const int ;//#define SQLITE_UTF16NATIVE  SqliteEncoding.UTF16LE
 #endif
 
 
-        /*
-    ** Round up a number to the next larger multiple of 8.  This is used
-    ** to force 8-byte alignment on 64-bit architectures.
-    */
+        ///<summary>
+/// Round up a number to the next larger multiple of 8.  This is used
+/// to force 8-byte alignment on 64-bit architectures.
+///
+///</summary>
         //#define ROUND8(x)     (((x)+7)&~7)
         private static int ROUND8(int x)
         {
             return (x + 7) & ~7;
         }
 
-        /*
-    ** Round down to the nearest multiple of 8
-    */
+        ///<summary>
+/// Round down to the nearest multiple of 8
+///
+///</summary>
         //#define ROUNDDOWN8(x) ((x)&~7)
         private static int ROUNDDOWN8(int x)
         {
@@ -689,9 +692,10 @@ const int ;//#define SQLITE_UTF16NATIVE  SqliteEncoding.UTF16LE
         private const string MASTER_NAME = "sqlite_master"; //#define MASTER_NAME       "sqlite_master"
         private const string TEMP_MASTER_NAME = "sqlite_temp_master"; //#define TEMP_MASTER_NAME  "sqlite_temp_master"
 
-        /*
-    ** The root-page of the master database table.
-    */
+        ///<summary>
+/// The root-page of the master database table.
+///
+///</summary>
         private const int MASTER_ROOT = 1; //#define MASTER_ROOT       1
 
         /*
@@ -704,10 +708,11 @@ const int ;//#define SQLITE_UTF16NATIVE  SqliteEncoding.UTF16LE
             return ((OMIT_TEMPDB == 0) && (x == 1) ? TEMP_MASTER_NAME : MASTER_NAME);
         }
 
-        /*
-    ** A convenience macro that returns the number of elements in
-    ** an array.
-    */
+        ///<summary>
+/// A convenience macro that returns the number of elements in
+/// an array.
+///
+///</summary>
         //#define ArraySize(X)    ((int)(sizeof(X)/sizeof(X[0])))
         private static int ArraySize<T>(T[] x)
         {
@@ -748,22 +753,22 @@ void *sqlite3_wsd_find(void *K, int L);
         private static Sqlite3Config sqlite3GlobalConfig;
 #endif
 
-        /*
-** The following macros are used to suppress compiler warnings and to
-** make it clear to human readers when a function parameter is deliberately
-** left unused within the body of a function. This usually happens when
-** a function is called via a function pointer. For example the
-** implementation of an SQL aggregate step callback may not use the
-** parameter indicating the number of arguments passed to the aggregate,
-** if it knows that this is enforced elsewhere.
-**
-** When a function parameter is not used at all within the body of a function,
-** it is generally named "NotUsed" or "NotUsed2" to make things even clearer.
-** However, these macros may also be used to suppress warnings related to
-** parameters that may or may not be used depending on compilation options.
-** For example those parameters only used in Debug.Assert() statements. In these
-** cases the parameters are named as per the usual conventions.
-*/
+        ///<summary>
+/// The following macros are used to suppress compiler warnings and to
+/// make it clear to human readers when a function parameter is deliberately
+/// left unused within the body of a function. This usually happens when
+/// a function is called via a function pointer. For example the
+/// implementation of an SQL aggregate step callback may not use the
+/// parameter indicating the number of arguments passed to the aggregate,
+/// if it knows that this is enforced elsewhere.
+///
+/// When a function parameter is not used at all within the body of a function,
+/// it is generally named "NotUsed" or "NotUsed2" to make things even clearer.
+/// However, these macros may also be used to suppress warnings related to
+/// parameters that may or may not be used depending on compilation options.
+/// For example those parameters only used in Debug.Assert() statements. In these
+/// cases the parameters are named as per the usual conventions.
+///</summary>
         //#define UNUSED_PARAMETER(x) (void)(x)
         private static void UNUSED_PARAMETER<T>(T x)
         {
@@ -883,8 +888,12 @@ void *sqlite3_wsd_find(void *K, int L);
             public Table pSeqTab; /* The sqlite_sequence table used by AUTOINCREMENT */
             public u8 file_format; /* Schema format version for this file */
             public SqliteEncoding enc; /* Text encoding used by this database */
-            public u16 flags; /* Flags associated with this schema */
-            public int cache_size; /* Number of pages to use in the cache */
+            public u16 flags; ///<summary>
+///Flags associated with this schema
+///</summary>
+            public int cache_size; ///<summary>
+///Number of pages to use in the cache
+///</summary>
 
             public Schema Copy()
             {
@@ -911,10 +920,11 @@ void *sqlite3_wsd_find(void *K, int L);
             }
         };
 
-        /*
-    ** These macros can be used to test, set, or clear bits in the
-    ** Db.pSchema->flags field.
-    */
+        ///<summary>
+/// These macros can be used to test, set, or clear bits in the
+/// Db.pSchema->flags field.
+///
+///</summary>
         //#define DbHasProperty(D,I,P)     (((D)->aDb[I].pSchema->flags&(P))==(P))
         private static bool DbHasProperty(sqlite3 D, int I, ushort P)
         {
@@ -1162,9 +1172,10 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
 #endif
         };
 
-        /*
-    ** A macro to discover the encoding of a database.
-    */
+        ///<summary>
+/// A macro to discover the encoding of a database.
+///
+///</summary>
         //#define ENC(db) ((db)->aDb[0].pSchema->enc)
         private static SqliteEncoding ENC(sqlite3 db)
         {
@@ -1290,7 +1301,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public dxFinal xFinalize; //)(sqlite3_context);                /* Aggregate finalizer */
             public string zName; /* SQL name of the function. */
             public FuncDef pHash; /* Next with a different name but the same hash */
-            public FuncDestructor pDestructor; /* Reference counted destructor function */
+            public FuncDestructor pDestructor; ///<summary>
+///Reference counted destructor function
+///</summary>
 
             public FuncDef()
             {
@@ -1416,31 +1429,32 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
         private const int SQLITE_FUNC_COALESCE = 0x40; /* Built-in coalesce() or ifnull() function */
 
 
-        /*
-    ** The following three macros, FUNCTION(), LIKEFUNC() and AGGREGATE() are
-    ** used to create the initializers for the FuncDef structures.
-    **
-    **   FUNCTION(zName, nArg, iArg, bNC, xFunc)
-    **     Used to create a scalar function definition of a function zName
-    **     implemented by C function xFunc that accepts nArg arguments. The
-    **     value passed as iArg is cast to a (void) and made available
-    **     as the user-data (sqlite3_user_data()) for the function. If
-    **     argument bNC is true, then the SQLITE_FUNC_NEEDCOLL flag is set.
-    **
-    **   AGGREGATE(zName, nArg, iArg, bNC, xStep, xFinal)
-    **     Used to create an aggregate function definition implemented by
-    **     the C functions xStep and xFinal. The first four parameters
-    **     are interpreted in the same way as the first 4 parameters to
-    **     FUNCTION().
-    **
-    **   LIKEFUNC(zName, nArg, pArg, flags)
-    **     Used to create a scalar function definition of a function zName
-    **     that accepts nArg arguments and is implemented by a call to C
-    **     function likeFunc. Argument pArg is cast to a (void ) and made
-    **     available as the function user-data (sqlite3_user_data()). The
-    **     FuncDef.flags variable is set to the value passed as the flags
-    **     parameter.
-    */
+        ///<summary>
+/// The following three macros, FUNCTION(), LIKEFUNC() and AGGREGATE() are
+/// used to create the initializers for the FuncDef structures.
+///
+///   FUNCTION(zName, nArg, iArg, bNC, xFunc)
+///     Used to create a scalar function definition of a function zName
+///     implemented by C function xFunc that accepts nArg arguments. The
+///     value passed as iArg is cast to a (void) and made available
+///     as the user-data (sqlite3_user_data()) for the function. If
+///     argument bNC is true, then the SQLITE_FUNC_NEEDCOLL flag is set.
+///
+///   AGGREGATE(zName, nArg, iArg, bNC, xStep, xFinal)
+///     Used to create an aggregate function definition implemented by
+///     the C functions xStep and xFinal. The first four parameters
+///     are interpreted in the same way as the first 4 parameters to
+///     FUNCTION().
+///
+///   LIKEFUNC(zName, nArg, pArg, flags)
+///     Used to create a scalar function definition of a function zName
+///     that accepts nArg arguments and is implemented by a call to C
+///     function likeFunc. Argument pArg is cast to a (void ) and made
+///     available as the function user-data (sqlite3_user_data()). The
+///     FuncDef.flags variable is set to the value passed as the flags
+///     parameter.
+///
+///</summary>
         //#define FUNCTION(zName, nArg, iArg, bNC, xFunc) \
         //  {nArg, SqliteEncoding.UTF8, bNC*SQLITE_FUNC_NEEDCOLL, \
         //SQLITE_INT_TO_PTR(iArg), 0, xFunc, 0, 0, #zName, 0, 0}
@@ -1530,7 +1544,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public u8 isPrimKey; /* True if this column is part of the PRIMARY KEY */
             public char affinity; /* One of the SQLITE_AFF_... values */
 #if !SQLITE_OMIT_VIRTUALTABLE
-            public u8 isHidden; /* True if this column is 'hidden' */
+            public u8 isHidden; ///<summary>
+///True if this column is 'hidden'
+///</summary>
 #endif
 
             public Column Copy()
@@ -1570,7 +1586,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public string zName; /* Name of the collating sequence, UTF-8 encoded */
             public SqliteEncoding enc; /* Text encoding handled by xCmp() */
             public CollationType type; /* One of the CollationType.... values below */
-            public object pUser; /* First argument to xCmp() */
+            public object pUser; ///<summary>
+///First argument to xCmp()
+///</summary>
             public dxCompare xCmp; //)(void*,int, const void*, int, const void);
             public dxDelCollSeq xDel; //)(void);  /* Destructor for pUser */
 
@@ -1763,7 +1781,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public string[] azModuleArg; /* Text of all module args. [0] is module name */
 #endif
             public Trigger pTrigger; /* List of SQL triggers on this table */
-            public Schema pSchema; /* Schema that contains this table */
+            public Schema pSchema; ///<summary>
+///Schema that contains this table
+///</summary>
             public Table pNextZombie; /* Next on the Parse.pZombieTab list */
 
             public Table Copy()
@@ -1811,7 +1831,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
         private const int TF_HasPrimaryKey = 0x04; /* Table has a primary key */
         private const int TF_Autoincrement = 0x08; /* Integer primary key is autoincrement */
         private const int TF_Virtual = 0x10; /* Is a virtual table */
-        private const int TF_NeedMetadata = 0x20; /* aCol[].zType and aCol[].pColl missing */
+        private const int TF_NeedMetadata = 0x20; ///<summary>
+///aCol[].zType and aCol[].pColl missing
+///</summary>
 
         ///<summary>
 /// Test to see whether or not a table is a virtual table.  This is
@@ -1877,7 +1899,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public u8[] aAction = new u8[2]; ///<summary>
 ///ON DELETE and ON UPDATE actions, respectively
 ///</summary>
-            public Trigger[] apTrigger = new Trigger[2]; /* Triggers for aAction[] actions */
+            public Trigger[] apTrigger = new Trigger[2]; ///<summary>
+///Triggers for aAction[] actions
+///</summary>
 
             public class sColMap
             {
@@ -1963,7 +1987,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public sqlite3 db; /* The database connection */
             public SqliteEncoding enc; /* Text encoding - one of the SQLITE_UTF* values */
             public u16 nField; /* Number of entries in aColl[] */
-            public u8[] aSortOrder; /* Sort order for each column.  May be NULL */
+            public u8[] aSortOrder; ///<summary>
+///Sort order for each column.  May be NULL
+///</summary>
             public CollSeq[] aColl = new CollSeq[1]; /* Collating sequence for each term of the key */
 
             public KeyInfo Copy()
@@ -2057,7 +2083,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public Index pNext; /* The next index associated with the same table */
             public Schema pSchema; /* Schema containing this index */
             public u8[] aSortOrder; /* Array of size Index.nColumn. True==DESC, False==ASC */
-            public string[] azColl; /* Array of collation sequence names for index */
+            public string[] azColl; ///<summary>
+///Array of collation sequence names for index
+///</summary>
             public IndexSample[] aSample; /* Array of SQLITE_INDEX_SAMPLES samples */
 
             public Index Copy()
@@ -2123,7 +2151,9 @@ set { _n = value; }
 }
 #else
             public string z; /* Text of the token.  Not NULL-terminated! */
-            public Int32 n; /* Number of characters in this token */
+            public Int32 n; ///<summary>
+///Number of characters in this token
+///</summary>
 #endif
 
             public Token()
@@ -2209,7 +2239,9 @@ set { _n = value; }
 ** aggregate functions */
 
             public AggInfo_func[] aFunc;
-            public int nFunc; /* Number of entries in aFunc[] */
+            public int nFunc; ///<summary>
+///Number of entries in aFunc[]
+///</summary>
             public int nFuncAlloc; /* Number of slots allocated for aFunc[] */
 
             public AggInfo Copy()
@@ -2390,7 +2422,9 @@ public int iValue;            /* Non-negative integer value if EP_IntValue */
             public Table pTab; /* Table for TK_COLUMN expressions. */
 #if SQLITE_MAX_EXPR_DEPTH //>0
             public int nHeight; /* Height of the tree headed by this node */
-            public Table pZombieTab; /* List of Table objects to delete after code gen */
+            public Table pZombieTab; ///<summary>
+///List of Table objects to delete after code gen
+///</summary>
 #endif
 
 #if DEBUG_CLASS
@@ -2511,12 +2545,13 @@ set { _op = value; }
         private const u8 EP2_MallocedToken = 0x0001;
         private const u8 EP2_Irreducible = 0x0002;
 
-        /*
-    ** The pseudo-routine sqlite3ExprSetIrreducible sets the EP2_Irreducible
-    ** flag on an expression structure.  This flag is used for VV&A only.  The
-    ** routine is implemented as a macro that only works when in debugging mode,
-    ** so as not to burden production code.
-    */
+        ///<summary>
+/// The pseudo-routine sqlite3ExprSetIrreducible sets the EP2_Irreducible
+/// flag on an expression structure.  This flag is used for VV&A only.  The
+/// routine is implemented as a macro that only works when in debugging mode,
+/// so as not to burden production code.
+///
+///</summary>
 #if SQLITE_DEBUG
     //# define ExprSetIrreducible(X)  (X)->flags2 |= EP2_Irreducible
     static void ExprSetIrreducible( Expr X )
@@ -2530,10 +2565,10 @@ set { _op = value; }
         }
 #endif
 
-        /*
-** These macros can be used to test, set, or clear bits in the
-** Expr.flags field.
-*/
+        ///<summary>
+/// These macros can be used to test, set, or clear bits in the
+/// Expr.flags field.
+///</summary>
         //#define ExprHasProperty(E,P)     (((E)->flags&(P))==(P))
         private static bool ExprHasProperty(Expr E, int P)
         {
@@ -2605,7 +2640,9 @@ set { _op = value; }
         {
             public int nExpr; /* Number of expressions on the list */
             public int nAlloc; /* Number of entries allocated below */
-            public int iECursor; /* VDBE VdbeCursor associated with this ExprList */
+            public int iECursor; ///<summary>
+///VDBE VdbeCursor associated with this ExprList
+///</summary>
             public ExprList_item[] a; /* One entry for each expression */
 
             public ExprList Copy()
@@ -2662,7 +2699,9 @@ set { _op = value; }
         public class IdList
         {
             public IdList_item[] a;
-            public int nId; /* Number of identifiers on the list */
+            public int nId; ///<summary>
+///Number of identifiers on the list
+///</summary>
             public int nAlloc; /* Number of entries allocated for a[] below */
 
             public IdList Copy()
@@ -2740,7 +2779,9 @@ set { _op = value; }
         public class SrcList
         {
             public i16 nSrc; /* Number of tables or subqueries in the FROM clause */
-            public i16 nAlloc; /* Number of entries allocated in a[] below */
+            public i16 nAlloc; ///<summary>
+///Number of entries allocated in a[] below
+///</summary>
             public SrcList_item[] a; /* One entry for each identifier on the list */
 
             public SrcList Copy()
@@ -2792,7 +2833,9 @@ set { _op = value; }
             public u32 nEq; ///<summary>
 ///Number of == constraints
 ///</summary>
-            public double nRow; /* Estimated number of rows (for EQP) */
+            public double nRow; ///<summary>
+///Estimated number of rows (for EQP)
+///</summary>
 
             public class _u
             {
@@ -3003,7 +3046,9 @@ set { _op = value; }
             public Expr pOffset; /* OFFSET expression. NULL means not used. */
             public int iLimit;
             public int iOffset; /* Memory registers holding LIMIT & OFFSET counters */
-            public int[] addrOpenEphm = new int[3]; /* OP_OpenEphem opcodes related to this select */
+            public int[] addrOpenEphm = new int[3]; ///<summary>
+///OP_OpenEphem opcodes related to this select
+///</summary>
             public double nSelectRow; /* Estimated number of result rows */
 
             public Select Copy()
@@ -3154,24 +3199,24 @@ set { _op = value; }
         private const int SQLITE_N_COLCACHE = 10;
 #endif
 
-        /*
-** At least one instance of the following structure is created for each 
-** trigger that may be fired while parsing an INSERT, UPDATE or DELETE
-** statement. All such objects are stored in the linked list headed at
-** Parse.pTriggerPrg and deleted once statement compilation has been
-** completed.
-**
-** A Vdbe sub-program that implements the body and WHEN clause of trigger
-** TriggerPrg.pTrigger, assuming a default ON CONFLICT clause of
-** TriggerPrg.orconf, is stored in the TriggerPrg.pProgram variable.
-** The Parse.pTriggerPrg list never contains two entries with the same
-** values for both pTrigger and orconf.
-**
-** The TriggerPrg.aColmask[0] variable is set to a mask of old.* columns
-** accessed (or set to 0 for triggers fired as a result of INSERT 
-** statements). Similarly, the TriggerPrg.aColmask[1] variable is set to
-** a mask of new.* columns used by the program.
-*/
+        ///<summary>
+/// At least one instance of the following structure is created for each
+/// trigger that may be fired while parsing an INSERT, UPDATE or DELETE
+/// statement. All such objects are stored in the linked list headed at
+/// Parse.pTriggerPrg and deleted once statement compilation has been
+/// completed.
+///
+/// A Vdbe sub-program that implements the body and WHEN clause of trigger
+/// TriggerPrg.pTrigger, assuming a default ON CONFLICT clause of
+/// TriggerPrg.orconf, is stored in the TriggerPrg.pProgram variable.
+/// The Parse.pTriggerPrg list never contains two entries with the same
+/// values for both pTrigger and orconf.
+///
+/// The TriggerPrg.aColmask[0] variable is set to a mask of old.* columns
+/// accessed (or set to 0 for triggers fired as a result of INSERT
+/// statements). Similarly, the TriggerPrg.aColmask[1] variable is set to
+/// a mask of new.* columns used by the program.
+///</summary>
 
         public class TriggerPrg
         {
@@ -3296,7 +3341,9 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 #endif
             public int nHeight; /* Expression tree height of current sub-select */
             public Table pZombieTab; /* List of Table objects to delete after code gen */
-            public TriggerPrg pTriggerPrg; /* Linked list of coded triggers */
+            public TriggerPrg pTriggerPrg; ///<summary>
+///Linked list of coded triggers
+///</summary>
 #if !SQLITE_OMIT_EXPLAIN
             public int iSelectId;
             public int iNextSelectId;
@@ -3479,7 +3526,9 @@ the <column-list> is stored here */
 
             public Schema pSchema; /* Schema containing the trigger */
             public Schema pTabSchema; /* Schema containing the table */
-            public TriggerStep step_list; /* Link list of trigger program steps             */
+            public TriggerStep step_list; ///<summary>
+///Link list of trigger program steps
+///</summary>
             public Trigger pNext; /* Next trigger associated with the table */
 
             public Trigger Copy()
@@ -3567,7 +3616,9 @@ the <column-list> is stored here */
             public ExprList pExprList; /* SET clause for UPDATE.  VALUES clause for INSERT */
             public IdList pIdList; /* Column names for INSERT */
             public TriggerStep pNext; /* Next in the link-list */
-            public TriggerStep pLast; /* Last element in link-list. Valid for 1st elem only */
+            public TriggerStep pLast; ///<summary>
+///Last element in link-list. Valid for 1st elem only
+///</summary>
 
             public TriggerStep()
             {
@@ -3812,10 +3863,11 @@ the <column-list> is stored here */
         private const int WRC_Abort = 2;
 
 
-        /*
-    ** Assuming zIn points to the first byte of a UTF-8 character,
-    ** advance zIn to point to the first byte of the next UTF-8 character.
-    */
+        ///<summary>
+/// Assuming zIn points to the first byte of a UTF-8 character,
+/// advance zIn to point to the first byte of the next UTF-8 character.
+///
+///</summary>
         //#define SQLITE_SKIP_UTF8(zIn) {                        \
         //  if( (*(zIn++))>=0xc0 ){                              \
         //    while( (*zIn & 0xc0)==0x80 ){ zIn++; }             \
@@ -3846,13 +3898,14 @@ the <column-list> is stored here */
             }
         }
 
-        /*
-    ** The SQLITE_*_BKPT macros are substitutes for the error codes with
-    ** the same name but without the _BKPT suffix.  These macros invoke
-    ** routines that report the line-number on which the error originated
-    ** using sqlite3_log().  The routines also provide a convenient place
-    ** to set a debugger breakpoint.
-    */
+        ///<summary>
+/// The SQLITE_*_BKPT macros are substitutes for the error codes with
+/// the same name but without the _BKPT suffix.  These macros invoke
+/// routines that report the line-number on which the error originated
+/// using sqlite3_log().  The routines also provide a convenient place
+/// to set a debugger breakpoint.
+///
+///</summary>
         //int sqlite3CorruptError(int);
         //int sqlite3MisuseError(int);
         //int sqlite3CantopenError(int);
@@ -3923,14 +3976,15 @@ the <column-list> is stored here */
         //void sqlite3BenignMallocHooks(void ()(void), object  ()(void));
         //int sqlite3HeapNearlyFull(void);
 
-        /*
-    ** On systems with ample stack space and that support alloca(), make
-    ** use of alloca() to obtain space for large automatic objects.  By default,
-    ** obtain space from malloc().
-    **
-    ** The alloca() routine never returns NULL.  This will cause code paths
-    ** that deal with sqlite3StackAlloc() failures to be unreachable.
-    */
+        ///<summary>
+/// On systems with ample stack space and that support alloca(), make
+/// use of alloca() to obtain space for large automatic objects.  By default,
+/// obtain space from malloc().
+///
+/// The alloca() routine never returns NULL.  This will cause code paths
+/// that deal with sqlite3StackAlloc() failures to be unreachable.
+///
+///</summary>
 #if SQLITE_USE_ALLOCA
 //# define sqlite3StackAllocRaw(D,N)   alloca(N)
 //# define sqlite3StackAllocZero(D,N)  memset(alloca(N), 0, N)
@@ -4341,23 +4395,24 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
         //u8 sqlite3GetVarint32(const unsigned char *, u32 );
         //int sqlite3VarintLen(u64 v);
 
-        /*
-    ** The header of a record consists of a sequence variable-length integers.
-    ** These integers are almost always small and are encoded as a single byte.
-    ** The following macros take advantage this fact to provide a fast encode
-    ** and decode of the integers in a record header.  It is faster for the common
-    ** case where the integer is a single byte.  It is a little slower when the
-    ** integer is two or more bytes.  But overall it is faster.
-    **
-    ** The following expressions are equivalent:
-    **
-    **     x = sqlite3GetVarint32( A, B );
-    **     x = putVarint32( A, B );
-    **
-    **     x = getVarint32( A, B );
-    **     x = putVarint32( A, B );
-    **
-    */
+        ///<summary>
+/// The header of a record consists of a sequence variable-length integers.
+/// These integers are almost always small and are encoded as a single byte.
+/// The following macros take advantage this fact to provide a fast encode
+/// and decode of the integers in a record header.  It is faster for the common
+/// case where the integer is a single byte.  It is a little slower when the
+/// integer is two or more bytes.  But overall it is faster.
+///
+/// The following expressions are equivalent:
+///
+///     x = sqlite3GetVarint32( A, B );
+///     x = putVarint32( A, B );
+///
+///     x = getVarint32( A, B );
+///     x = putVarint32( A, B );
+///
+///
+///</summary>
         //#define getVarint32(A,B)  (u8)((*(A)<(u8)0x80) ? ((B) = (u32)*(A)),1 : sqlite3GetVarint32((A), (u32 )&(B)))
         //#define putVarint32(A,B)  (u8)(((u32)(B)<(u32)0x80) ? (*(A) = (unsigned char)(B)),1 : sqlite3PutVarint32((A), (B)))
         //#define getVarint    sqlite3GetVarint
@@ -4469,9 +4524,10 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
         //void sqlite3BackupRestart(sqlite3_backup );
         //void sqlite3BackupUpdate(sqlite3_backup *, Pgno, const u8 );
 
-        /*
-    ** The interface to the LEMON-generated parser
-    */
+        ///<summary>
+/// The interface to the LEMON-generated parser
+///
+///</summary>
         //void *sqlite3ParserAlloc(void*()(size_t));
         //void sqlite3ParserFree(void*, void()(void));
         //void sqlite3Parser(void*, int, Token, Parse);
@@ -4654,11 +4710,12 @@ static void sqlite3FkDelete(sqlite3 a, Table b) {}
         private const int SQLITE_FAULTINJECTOR_MALLOC = 0; //#define SQLITE_FAULTINJECTOR_MALLOC     0
         private const int SQLITE_FAULTINJECTOR_COUNT = 1; //#define SQLITE_FAULTINJECTOR_COUNT      1
 
-        /*
-    ** The interface to the code in fault.c used for identifying "benign"
-    ** malloc failures. This is only present if SQLITE_OMIT_BUILTIN_TEST
-    ** is not defined.
-    */
+        ///<summary>
+/// The interface to the code in fault.c used for identifying "benign"
+/// malloc failures. This is only present if SQLITE_OMIT_BUILTIN_TEST
+/// is not defined.
+///
+///</summary>
 #if !SQLITE_OMIT_BUILTIN_TEST
         //void sqlite3BeginBenignMalloc(void);
         //void sqlite3EndBenignMalloc(void);
@@ -4723,11 +4780,11 @@ void sqlite3ConnectionClosed(sqlite3 db);
     //  void sqlite3ParserTrace(FILE*, char );
 #endif
 
-        /*
-** If the SQLITE_ENABLE IOTRACE exists then the global variable
-** sqlite3IoTrace is a pointer to a printf-like routine used to
-** print I/O tracing messages.
-*/
+        ///<summary>
+/// If the SQLITE_ENABLE IOTRACE exists then the global variable
+/// sqlite3IoTrace is a pointer to a printf-like routine used to
+/// print I/O tracing messages.
+///</summary>
 #if SQLITE_ENABLE_IOTRACE
 static bool SQLite3IoTrace = false;
 //#define IOTRACE(A)  if( sqlite3IoTrace ){ sqlite3IoTrace A; }
@@ -4747,34 +4804,34 @@ static void IOTRACE( string X, params object[] ap ) { if ( SQLite3IoTrace ) { pr
         }
 #endif
 
-        /*
-** These routines are available for the mem2.c debugging memory allocator
-** only.  They are used to verify that different "types" of memory
-** allocations are properly tracked by the system.
-**
-** sqlite3MemdebugSetType() sets the "type" of an allocation to one of
-** the MEMTYPE_* macros defined below.  The type must be a bitmask with
-** a single bit set.
-**
-** sqlite3MemdebugHasType() returns true if any of the bits in its second
-** argument match the type set by the previous sqlite3MemdebugSetType().
-** sqlite3MemdebugHasType() is intended for use inside Debug.Assert() statements.
-**
-** sqlite3MemdebugNoType() returns true if none of the bits in its second
-** argument match the type set by the previous sqlite3MemdebugSetType().
-**
-** Perhaps the most important point is the difference between MEMTYPE_HEAP
-** and MEMTYPE_LOOKASIDE.  If an allocation is MEMTYPE_LOOKASIDE, that means
-** it might have been allocated by lookaside, except the allocation was
-** too large or lookaside was already full.  It is important to verify
-** that allocations that might have been satisfied by lookaside are not
-** passed back to non-lookaside free() routines.  Asserts such as the
-** example above are placed on the non-lookaside free() routines to verify
-** this constraint. 
-**
-** All of this is no-op for a production build.  It only comes into
-** play when the SQLITE_MEMDEBUG compile-time option is used.
-*/
+        ///<summary>
+/// These routines are available for the mem2.c debugging memory allocator
+/// only.  They are used to verify that different "types" of memory
+/// allocations are properly tracked by the system.
+///
+/// sqlite3MemdebugSetType() sets the "type" of an allocation to one of
+/// the MEMTYPE_* macros defined below.  The type must be a bitmask with
+/// a single bit set.
+///
+/// sqlite3MemdebugHasType() returns true if any of the bits in its second
+/// argument match the type set by the previous sqlite3MemdebugSetType().
+/// sqlite3MemdebugHasType() is intended for use inside Debug.Assert() statements.
+///
+/// sqlite3MemdebugNoType() returns true if none of the bits in its second
+/// argument match the type set by the previous sqlite3MemdebugSetType().
+///
+/// Perhaps the most important point is the difference between MEMTYPE_HEAP
+/// and MEMTYPE_LOOKASIDE.  If an allocation is MEMTYPE_LOOKASIDE, that means
+/// it might have been allocated by lookaside, except the allocation was
+/// too large or lookaside was already full.  It is important to verify
+/// that allocations that might have been satisfied by lookaside are not
+/// passed back to non-lookaside free() routines.  Asserts such as the
+/// example above are placed on the non-lookaside free() routines to verify
+/// this constraint.
+///
+/// All of this is no-op for a production build.  It only comes into
+/// play when the SQLITE_MEMDEBUG compile-time option is used.
+///</summary>
 #if SQLITE_MEMDEBUG
 //  void sqlite3MemdebugSetType(void*,u8);
 //  int sqlite3MemdebugHasType(void*,u8);

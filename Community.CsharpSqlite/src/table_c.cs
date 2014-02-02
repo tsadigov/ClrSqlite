@@ -39,10 +39,10 @@ namespace Community.CsharpSqlite
 
 #if !SQLITE_OMIT_GET_TABLE
 
-/*
-** This structure is used to pass data from sqlite3_get_table() through
-** to the callback function is uses to build the result.
-*/
+///<summary>
+/// This structure is used to pass data from sqlite3_get_table() through
+/// to the callback function is uses to build the result.
+///</summary>
 class TabResult {
 public string[] azResult;
 public string zErrMsg;
@@ -54,11 +54,11 @@ public int nData;
 public int rc;
 };
 
-/*
-** This routine is called once for each row in the result table.  Its job
-** is to fill in the TabResult structure appropriately, allocating new
-** memory as necessary.
-*/
+///<summary>
+/// This routine is called once for each row in the result table.  Its job
+/// is to fill in the TabResult structure appropriately, allocating new
+/// memory as necessary.
+///</summary>
 static public int sqlite3_get_table_cb( object pArg, i64 nCol, object Oargv, object Ocolv )
 {
 string[] argv = (string[])Oargv;

@@ -17,40 +17,41 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-    /*
-    ** 2004 May 26
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    **
-    ** This file contains code use to implement APIs that are part of the
-    ** VDBE.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2004 May 26
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+///
+/// This file contains code use to implement APIs that are part of the
+/// VDBE.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
     //#include "vdbeInt.h"
 
 #if !SQLITE_OMIT_DEPRECATED
-/*
-** Return TRUE (non-zero) of the statement supplied as an argument needs
-** to be recompiled.  A statement needs to be recompiled whenever the
-** execution environment changes in a way that would alter the program
-** that sqlite3_prepare() generates.  For example, if new functions or
-** collating sequences are registered or if an authorizer function is
-** added or changed.
-*/
+///<summary>
+/// Return TRUE (non-zero) of the statement supplied as an argument needs
+/// to be recompiled.  A statement needs to be recompiled whenever the
+/// execution environment changes in a way that would alter the program
+/// that sqlite3_prepare() generates.  For example, if new functions or
+/// collating sequences are registered or if an authorizer function is
+/// added or changed.
+///</summary>
 static int sqlite3_expired( sqlite3_stmt pStmt )
 {
 Vdbe p = (Vdbe)pStmt;
@@ -58,11 +59,11 @@ return ( p == null || p.expired ) ? 1 : 0;
 }
 #endif
 
-    /*
-** Check on a Vdbe to make sure it has not been finalized.  Log
-** an error and return true if it has been finalized (or is otherwise
-** invalid).  Return false if it is ok.
-*/
+    ///<summary>
+/// Check on a Vdbe to make sure it has not been finalized.  Log
+/// an error and return true if it has been finalized (or is otherwise
+/// invalid).  Return false if it is ok.
+///</summary>
     static bool vdbeSafety( Vdbe p )
     {
       if ( p.db == null )
@@ -88,15 +89,16 @@ return ( p == null || p.expired ) ? 1 : 0;
       }
     }
 
-    /*
-    ** The following routine destroys a virtual machine that is created by
-    ** the sqlite3_compile() routine. The integer returned is an SQLITE_
-    ** success/failure code that describes the result of executing the virtual
-    ** machine.
-    **
-    ** This routine sets the error code and string returned by
-    ** sqlite3_errcode(), sqlite3_errmsg() and sqlite3_errmsg16().
-    */
+    ///<summary>
+/// The following routine destroys a virtual machine that is created by
+/// the sqlite3_compile() routine. The integer returned is an SQLITE_
+/// success/failure code that describes the result of executing the virtual
+/// machine.
+///
+/// This routine sets the error code and string returned by
+/// sqlite3_errcode(), sqlite3_errmsg() and sqlite3_errmsg16().
+///
+///</summary>
     public static int sqlite3_finalize( sqlite3_stmt pStmt )
     {
       int rc;
@@ -126,14 +128,15 @@ return ( p == null || p.expired ) ? 1 : 0;
       return rc;
     }
 
-    /*
-    ** Terminate the current execution of an SQL statement and reset it
-    ** back to its starting state so that it can be reused. A success code from
-    ** the prior execution is returned.
-    **
-    ** This routine sets the error code and string returned by
-    ** sqlite3_errcode(), sqlite3_errmsg() and sqlite3_errmsg16().
-    */
+    ///<summary>
+/// Terminate the current execution of an SQL statement and reset it
+/// back to its starting state so that it can be reused. A success code from
+/// the prior execution is returned.
+///
+/// This routine sets the error code and string returned by
+/// sqlite3_errcode(), sqlite3_errmsg() and sqlite3_errmsg16().
+///
+///</summary>
     public static int sqlite3_reset( sqlite3_stmt pStmt )
     {
       int rc;
@@ -154,9 +157,10 @@ return ( p == null || p.expired ) ? 1 : 0;
       return rc;
     }
 
-    /*
-    ** Set all the parameters in the compiled SQL statement to NULL.
-    */
+    ///<summary>
+/// Set all the parameters in the compiled SQL statement to NULL.
+///
+///</summary>
     public static int sqlite3_clear_bindings( sqlite3_stmt pStmt )
     {
       int i;
@@ -180,10 +184,12 @@ return ( p == null || p.expired ) ? 1 : 0;
     }
 
 
-    /**************************** sqlite3_value_  *******************************
-    ** The following routines extract information from a Mem or sqlite3_value
-    ** structure.
-    */
+    ///<summary>
+/// sqlite3_value_  
+/// The following routines extract information from a Mem or sqlite3_value
+/// structure.
+///
+///</summary>
     public static byte[] sqlite3_value_blob( sqlite3_value pVal )
     {
       Mem p = pVal;
@@ -260,14 +266,16 @@ return sqlite3ValueText(pVal, SqliteEncoding.UTF16LE);
       return pval.type;
     }
 
-    /**************************** sqlite3_result_  *******************************
-    ** The following routines are used by user-defined functions to specify
-    ** the function result.
-    **
-    ** The setStrOrError() funtion calls sqlite3VdbeMemSetStr() to store the
-    ** result as a string or blob but if the string or blob is too large, it
-    ** then sets the error code to SQLITE_TOOBIG
-    */
+    ///<summary>
+/// sqlite3_result_  
+/// The following routines are used by user-defined functions to specify
+/// the function result.
+///
+/// The setStrOrError() funtion calls sqlite3VdbeMemSetStr() to store the
+/// result as a string or blob but if the string or blob is too large, it
+/// then sets the error code to SQLITE_TOOBIG
+///
+///</summary>
     static void setResultStrOrError(
     sqlite3_context pCtx,   /* Function context */
     string z,               /* String pointer */
@@ -433,7 +441,9 @@ sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16LE, xDel);
       }
     }
 
-    /* Force an SQLITE_TOOBIG error. */
+    ///<summary>
+///Force an SQLITE_TOOBIG error.
+///</summary>
 
     public static void sqlite3_result_error_toobig( sqlite3_context pCtx )
     {
@@ -443,7 +453,9 @@ sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16LE, xDel);
       SqliteEncoding.UTF8, SQLITE_STATIC );
     }
 
-    /* An SQLITE_NOMEM error. */
+    ///<summary>
+///An SQLITE_NOMEM error.
+///</summary>
     public static void sqlite3_result_error_nomem( sqlite3_context pCtx )
     {
       Debug.Assert( sqlite3_mutex_held( pCtx.s.db.mutex ) );
@@ -452,10 +464,11 @@ sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16LE, xDel);
       //pCtx.s.db.mallocFailed = 1;
     }
 
-    /*
-    ** This function is called after a transaction has been committed. It 
-    ** invokes callbacks registered with sqlite3_wal_hook() as required.
-    */
+    ///<summary>
+/// This function is called after a transaction has been committed. It
+/// invokes callbacks registered with sqlite3_wal_hook() as required.
+///
+///</summary>
     static int doWalCallbacks( sqlite3 db )
     {
       int rc = SQLITE_OK;
@@ -618,20 +631,21 @@ end_of_step:
       return ( rc & db.errMask );
     }
 
-/*
-** The maximum number of times that a statement will try to reparse
-** itself before giving up and returning SQLITE_SCHEMA.
-*/
+///<summary>
+/// The maximum number of times that a statement will try to reparse
+/// itself before giving up and returning SQLITE_SCHEMA.
+///</summary>
 #if !SQLITE_MAX_SCHEMA_RETRY
 //# define SQLITE_MAX_SCHEMA_RETRY 5
     public const int SQLITE_MAX_SCHEMA_RETRY = 5;
 #endif
 
-    /*
-    ** This is the top-level implementation of sqlite3_step().  Call
-    ** sqlite3Step() to do most of the work.  If a schema error occurs,
-    ** call sqlite3Reprepare() and try again.
-    */
+    ///<summary>
+/// This is the top-level implementation of sqlite3_step().  Call
+/// sqlite3Step() to do most of the work.  If a schema error occurs,
+/// call sqlite3Reprepare() and try again.
+///
+///</summary>
     public static int sqlite3_step( sqlite3_stmt pStmt )
     {
       int rc = SQLITE_OK;      /* Result from sqlite3Step() */
@@ -681,40 +695,43 @@ end_of_step:
       return rc;
     }
 
-    /*
-    ** Extract the user data from a sqlite3_context structure and return a
-    ** pointer to it.
-    **
-    ** IMPLEMENTATION-OF: R-46798-50301 The sqlite3_context_db_handle() interface
-    ** returns a copy of the pointer to the database connection (the 1st
-    ** parameter) of the sqlite3_create_function() and
-    ** sqlite3_create_function16() routines that originally registered the
-    ** application defined function.
-    */
+    ///<summary>
+/// Extract the user data from a sqlite3_context structure and return a
+/// pointer to it.
+///
+/// IMPLEMENTATION-OF: R-46798-50301 The sqlite3_context_db_handle() interface
+/// returns a copy of the pointer to the database connection (the 1st
+/// parameter) of the sqlite3_create_function() and
+/// sqlite3_create_function16() routines that originally registered the
+/// application defined function.
+///
+///</summary>
     public static object sqlite3_user_data( sqlite3_context p )
     {
       Debug.Assert( p != null && p.pFunc != null );
       return p.pFunc.pUserData;
     }
 
-    /*
-    ** Extract the user data from a sqlite3_context structure and return a
-    ** pointer to it.
-    */
+    ///<summary>
+/// Extract the user data from a sqlite3_context structure and return a
+/// pointer to it.
+///
+///</summary>
     public static sqlite3 sqlite3_context_db_handle( sqlite3_context p )
     {
       Debug.Assert( p != null && p.pFunc != null );
       return p.s.db;
     }
 
-    /*
-    ** The following is the implementation of an SQL function that always
-    ** fails with an error message stating that the function is used in the
-    ** wrong context.  The sqlite3_overload_function() API might construct
-    ** SQL function that use this routine so that the functions will exist
-    ** for name resolution but are actually overloaded by the xFindFunction
-    ** method of virtual tables.
-    */
+    ///<summary>
+/// The following is the implementation of an SQL function that always
+/// fails with an error message stating that the function is used in the
+/// wrong context.  The sqlite3_overload_function() API might construct
+/// SQL function that use this routine so that the functions will exist
+/// for name resolution but are actually overloaded by the xFindFunction
+/// method of virtual tables.
+///
+///</summary>
     public static void sqlite3InvalidFunction(
     sqlite3_context context, /* The function calling context */
     int NotUsed,                /* Number of arguments to the function */
@@ -730,11 +747,12 @@ end_of_step:
       //sqlite3_free( ref zErr );
     }
 
-    /*
-    ** Allocate or return the aggregate context for a user function.  A new
-    ** context is allocated on the first call.  Subsequent calls return the
-    ** same context that was returned on prior calls.
-    */
+    ///<summary>
+/// Allocate or return the aggregate context for a user function.  A new
+/// context is allocated on the first call.  Subsequent calls return the
+/// same context that was returned on prior calls.
+///
+///</summary>
     public static Mem sqlite3_aggregate_context( sqlite3_context p, int nByte )
     {
       Mem pMem;
@@ -767,10 +785,11 @@ end_of_step:
       return pMem._Mem;
     }
 
-    /*
-    ** Return the auxillary data pointer, if any, for the iArg'th argument to
-    ** the user-function defined by pCtx.
-    */
+    ///<summary>
+/// Return the auxillary data pointer, if any, for the iArg'th argument to
+/// the user-function defined by pCtx.
+///
+///</summary>
     public static object sqlite3_get_auxdata( sqlite3_context pCtx, int iArg )
     {
       VdbeFunc pVdbeFunc;
@@ -784,11 +803,12 @@ end_of_step:
       return pVdbeFunc.apAux[iArg].pAux;
     }
 
-    /*
-    ** Set the auxillary data pointer and delete function, for the iArg'th
-    ** argument to the user-function defined by pCtx. Any previous value is
-    ** deleted by calling the delete function specified when it was set.
-    */
+    ///<summary>
+/// Set the auxillary data pointer and delete function, for the iArg'th
+/// argument to the user-function defined by pCtx. Any previous value is
+/// deleted by calling the delete function specified when it was set.
+///
+///</summary>
     public static void sqlite3_set_auxdata(
     sqlite3_context pCtx,
     int iArg,
@@ -839,15 +859,15 @@ failed:
     }
 
 #if !SQLITE_OMIT_DEPRECATED
-/*
-** Return the number of times the Step function of a aggregate has been
-** called.
-**
-** This function is deprecated.  Do not use it for new code.  It is
-** provide only to avoid breaking legacy code.  New aggregate function
-** implementations should keep their own counts within their aggregate
-** context.
-*/
+///<summary>
+/// Return the number of times the Step function of a aggregate has been
+/// called.
+///
+/// This function is deprecated.  Do not use it for new code.  It is
+/// provide only to avoid breaking legacy code.  New aggregate function
+/// implementations should keep their own counts within their aggregate
+/// context.
+///</summary>
 static int sqlite3_aggregate_count( sqlite3_context p )
 {
 Debug.Assert( p != null && p.pMem != null && p.pFunc != null && p.pFunc.xStep != null );
@@ -855,19 +875,20 @@ return p.pMem.n;
 }
 #endif
 
-    /*
-** Return the number of columns in the result set for the statement pStmt.
-*/
+    ///<summary>
+/// Return the number of columns in the result set for the statement pStmt.
+///</summary>
     public static int sqlite3_column_count( sqlite3_stmt pStmt )
     {
       Vdbe pVm = pStmt;
       return pVm != null ? (int)pVm.nResColumn : 0;
     }
 
-    /*
-    ** Return the number of values available from the current row of the
-    ** currently executing statement pStmt.
-    */
+    ///<summary>
+/// Return the number of values available from the current row of the
+/// currently executing statement pStmt.
+///
+///</summary>
     public static int sqlite3_data_count( sqlite3_stmt pStmt )
     {
       Vdbe pVm = pStmt;
@@ -877,12 +898,13 @@ return p.pMem.n;
     }
 
 
-    /*
-    ** Check to see if column iCol of the given statement is valid.  If
-    ** it is, return a pointer to the Mem for the value of that column.
-    ** If iCol is not valid, return a pointer to a Mem which has a value
-    ** of NULL.
-    */
+    ///<summary>
+/// Check to see if column iCol of the given statement is valid.  If
+/// it is, return a pointer to the Mem for the value of that column.
+/// If iCol is not valid, return a pointer to a Mem which has a value
+/// of NULL.
+///
+///</summary>
     static Mem columnMem( sqlite3_stmt pStmt, int i )
     {
       Vdbe pVm;
@@ -932,24 +954,25 @@ return p.pMem.n;
       return pOut;
     }
 
-    /*
-    ** This function is called after invoking an sqlite3_value_XXX function on a
-    ** column value (i.e. a value returned by evaluating an SQL expression in the
-    ** select list of a SELECT statement) that may cause a malloc() failure. If
-    ** malloc() has failed, the threads mallocFailed flag is cleared and the result
-    ** code of statement pStmt set to SQLITE_NOMEM.
-    **
-    ** Specifically, this is called from within:
-    **
-    **     sqlite3_column_int()
-    **     sqlite3_column_int64()
-    **     sqlite3_column_text()
-    **     sqlite3_column_text16()
-    **     sqlite3_column_real()
-    **     sqlite3_column_bytes()
-    **     sqlite3_column_bytes16()
-    **     sqlite3_column_blob()
-    */
+    ///<summary>
+/// This function is called after invoking an sqlite3_value_XXX function on a
+/// column value (i.e. a value returned by evaluating an SQL expression in the
+/// select list of a SELECT statement) that may cause a malloc() failure. If
+/// malloc() has failed, the threads mallocFailed flag is cleared and the result
+/// code of statement pStmt set to SQLITE_NOMEM.
+///
+/// Specifically, this is called from within:
+///
+///     sqlite3_column_int()
+///     sqlite3_column_int64()
+///     sqlite3_column_text()
+///     sqlite3_column_text16()
+///     sqlite3_column_real()
+///     sqlite3_column_bytes()
+///     sqlite3_column_bytes16()
+///     sqlite3_column_blob()
+///
+///</summary>
     static void columnMallocFailure( sqlite3_stmt pStmt )
     {
       /* If malloc() failed during an encoding conversion within an
@@ -965,10 +988,12 @@ return p.pMem.n;
       }
     }
 
-    /**************************** sqlite3_column_  *******************************
-    ** The following routines are used to access elements of the current row
-    ** in the result set.
-    */
+    ///<summary>
+/// sqlite3_column_  
+/// The following routines are used to access elements of the current row
+/// in the result set.
+///
+///</summary>
     public static byte[] sqlite3_column_blob( sqlite3_stmt pStmt, int i )
     {
       byte[] val;
@@ -1052,27 +1077,30 @@ return p.pMem.n;
 
     /* The following function is experimental and subject to change or
     ** removal */
-    /*int sqlite3_column_numeric_type(sqlite3_stmt pStmt, int i){
-    **  return sqlite3_value_numeric_type( columnMem(pStmt,i) );
-    **}
-    */
+    ///<summary>
+///int sqlite3_column_numeric_type(sqlite3_stmt pStmt, int i){
+///  return sqlite3_value_numeric_type( columnMem(pStmt,i) );
+///}
+///
+///</summary>
 
-    /*
-    ** Convert the N-th element of pStmt.pColName[] into a string using
-    ** xFunc() then return that string.  If N is out of range, return 0.
-    **
-    ** There are up to 5 names for each column.  useType determines which
-    ** name is returned.  Here are the names:
-    **
-    **    0      The column name as it should be displayed for output
-    **    1      The datatype name for the column
-    **    2      The name of the database that the column derives from
-    **    3      The name of the table that the column derives from
-    **    4      The name of the table column that the result column derives from
-    **
-    ** If the result is not a simple column reference (if it is an expression
-    ** or a constant) then useTypes 2, 3, and 4 return NULL.
-    */
+    ///<summary>
+/// Convert the N-th element of pStmt.pColName[] into a string using
+/// xFunc() then return that string.  If N is out of range, return 0.
+///
+/// There are up to 5 names for each column.  useType determines which
+/// name is returned.  Here are the names:
+///
+///    0      The column name as it should be displayed for output
+///    1      The datatype name for the column
+///    2      The name of the database that the column derives from
+///    3      The name of the table that the column derives from
+///    4      The name of the table column that the result column derives from
+///
+/// If the result is not a simple column reference (if it is an expression
+/// or a constant) then useTypes 2, 3, and 4 return NULL.
+///
+///</summary>
     public static string columnName(
     sqlite3_stmt pStmt,
     int N,
@@ -1108,10 +1136,11 @@ return p.pMem.n;
       return ret;
     }
 
-    /*
-    ** Return the name of the Nth column of the result set returned by SQL
-    ** statement pStmt.
-    */
+    ///<summary>
+/// Return the name of the Nth column of the result set returned by SQL
+/// statement pStmt.
+///
+///</summary>
     public static string sqlite3_column_name( sqlite3_stmt pStmt, int N )
     {
       return columnName(
@@ -1124,10 +1153,10 @@ pStmt, N,  sqlite3_value_text16, COLNAME_NAME);
 }
 #endif
 
-    /*
-** Constraint:  If you have ENABLE_COLUMN_METADATA then you must
-** not define OMIT_DECLTYPE.
-*/
+    ///<summary>
+/// Constraint:  If you have ENABLE_COLUMN_METADATA then you must
+/// not define OMIT_DECLTYPE.
+///</summary>
 #if SQLITE_OMIT_DECLTYPE && SQLITE_ENABLE_COLUMN_METADATA
 # error "Must not define both SQLITE_OMIT_DECLTYPE and SQLITE_ENABLE_COLUMN_METADATA"
 #endif
@@ -1205,21 +1234,23 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
 #endif // * SQLITE_ENABLE_COLUMN_METADATA */
 
 
-    /******************************* sqlite3_bind_  ***************************
-**
-** Routines used to attach values to wildcards in a compiled SQL statement.
-*/
-    /*
-    ** Unbind the value bound to variable i in virtual machine p. This is the
-    ** the same as binding a NULL value to the column. If the "i" parameter is
-    ** out of range, then SQLITE_RANGE is returned. Othewise SQLITE_OK.
-    **
-    ** A successful evaluation of this routine acquires the mutex on p.
-    ** the mutex is released if any kind of error occurs.
-    **
-    ** The error code stored in database p.db is overwritten with the return
-    ** value in any case.
-    */
+    ///<summary>
+/// sqlite3_bind_  
+///
+/// Routines used to attach values to wildcards in a compiled SQL statement.
+///</summary>
+    ///<summary>
+/// Unbind the value bound to variable i in virtual machine p. This is the
+/// the same as binding a NULL value to the column. If the "i" parameter is
+/// out of range, then SQLITE_RANGE is returned. Othewise SQLITE_OK.
+///
+/// A successful evaluation of this routine acquires the mutex on p.
+/// the mutex is released if any kind of error occurs.
+///
+/// The error code stored in database p.db is overwritten with the return
+/// value in any case.
+///
+///</summary>
     public static int vdbeUnbind( Vdbe p, int i )
     {
       Mem pVar;
@@ -1267,9 +1298,10 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
       return SQLITE_OK;
     }
 
-    /*
-    ** Bind a text or BLOB value.
-    */
+    ///<summary>
+/// Bind a text or BLOB value.
+///
+///</summary>
     static int bindBlob(
     sqlite3_stmt pStmt,   /* The statement to bind against */
     int i,                /* Index of the parameter to bind */
@@ -1302,9 +1334,10 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
       return rc;
     }
 
-    /*
-    ** Bind a text value.
-    */
+    ///<summary>
+/// Bind a text value.
+///
+///</summary>
     public static int bindText(
     sqlite3_stmt pStmt,   /* The statement to bind against */
     int i,                /* Index of the parameter to bind */
@@ -1473,22 +1506,24 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
       return rc;
     }
 
-    /*
-    ** Return the number of wildcards that can be potentially bound to.
-    ** This routine is added to support DBD::SQLite.
-    */
+    ///<summary>
+/// Return the number of wildcards that can be potentially bound to.
+/// This routine is added to support DBD::SQLite.
+///
+///</summary>
     public static int sqlite3_bind_parameter_count( sqlite3_stmt pStmt )
     {
       Vdbe p = (Vdbe)pStmt;
       return ( p != null ) ? (int)p.nVar : 0;
     }
 
-    /*
-    ** Return the name of a wildcard parameter.  Return NULL if the index
-    ** is out of range or if the wildcard is unnamed.
-    **
-    ** The result is always UTF-8.
-    */
+    ///<summary>
+/// Return the name of a wildcard parameter.  Return NULL if the index
+/// is out of range or if the wildcard is unnamed.
+///
+/// The result is always UTF-8.
+///
+///</summary>
     public static string sqlite3_bind_parameter_name( sqlite3_stmt pStmt, int i )
     {
       Vdbe p = (Vdbe)pStmt;
@@ -1499,11 +1534,12 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
       return p.azVar[i - 1];
     }
 
-    /*
-    ** Given a wildcard parameter name, return the index of the variable
-    ** with that name.  If there is no variable with the given name,
-    ** return 0.
-    */
+    ///<summary>
+/// Given a wildcard parameter name, return the index of the variable
+/// with that name.  If there is no variable with the given name,
+/// return 0.
+///
+///</summary>
     public static int sqlite3VdbeParameterIndex( Vdbe p, string zName, int nName )
     {
       int i;
@@ -1530,9 +1566,10 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
       return sqlite3VdbeParameterIndex( (Vdbe)pStmt, zName, StringExtensions.sqlite3Strlen30( zName ) );
     }
 
-    /*
-    ** Transfer all bindings from the first statement over to the second.
-    */
+    ///<summary>
+/// Transfer all bindings from the first statement over to the second.
+///
+///</summary>
     public static int sqlite3TransferBindings( sqlite3_stmt pFromStmt, sqlite3_stmt pToStmt )
     {
       Vdbe pFrom = (Vdbe)pFromStmt;
@@ -1550,18 +1587,18 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
     }
 
 #if !SQLITE_OMIT_DEPRECATED
-/*
-** Deprecated external interface.  Internal/core SQLite code
-** should call sqlite3TransferBindings.
-**
-** Is is misuse to call this routine with statements from different
-** database connections.  But as this is a deprecated interface, we
-** will not bother to check for that condition.
-**
-** If the two statements contain a different number of bindings, then
-** an SQLITE_ERROR is returned.  Nothing else can go wrong, so otherwise
-** SQLITE_OK is returned.
-*/
+///<summary>
+/// Deprecated external interface.  Internal/core SQLite code
+/// should call sqlite3TransferBindings.
+///
+/// Is is misuse to call this routine with statements from different
+/// database connections.  But as this is a deprecated interface, we
+/// will not bother to check for that condition.
+///
+/// If the two statements contain a different number of bindings, then
+/// an SQLITE_ERROR is returned.  Nothing else can go wrong, so otherwise
+/// SQLITE_OK is returned.
+///</summary>
 static int sqlite3_transfer_bindings( sqlite3_stmt pFromStmt, sqlite3_stmt pToStmt )
 {
 Vdbe pFrom = (Vdbe)pFromStmt;
@@ -1580,33 +1617,35 @@ return sqlite3TransferBindings( pFromStmt, pToStmt );
 }
 #endif
 
-    /*
-** Return the sqlite3* database handle to which the prepared statement given
-** in the argument belongs.  This is the same database handle that was
-** the first argument to the sqlite3_prepare() that was used to create
-** the statement in the first place.
-*/
+    ///<summary>
+/// Return the sqlite3* database handle to which the prepared statement given
+/// in the argument belongs.  This is the same database handle that was
+/// the first argument to the sqlite3_prepare() that was used to create
+/// the statement in the first place.
+///</summary>
     public static sqlite3 sqlite3_db_handle( sqlite3_stmt pStmt )
     {
       return pStmt != null ? ( (Vdbe)pStmt ).db : null;
     }
 
 
-    /*
-    ** Return true if the prepared statement is guaranteed to not modify the
-    ** database.
-    */
+    ///<summary>
+/// Return true if the prepared statement is guaranteed to not modify the
+/// database.
+///
+///</summary>
     static bool sqlite3_stmt_readonly( sqlite3_stmt pStmt )
     {
       return pStmt != null ? ( (Vdbe)pStmt ).readOnly : true;
     }
 
-    /*
-    ** Return a pointer to the next prepared statement after pStmt associated
-    ** with database connection pDb.  If pStmt is NULL, return the first
-    ** prepared statement for the database connection.  Return NULL if there
-    ** are no more.
-    */
+    ///<summary>
+/// Return a pointer to the next prepared statement after pStmt associated
+/// with database connection pDb.  If pStmt is NULL, return the first
+/// prepared statement for the database connection.  Return NULL if there
+/// are no more.
+///
+///</summary>
 
     public static sqlite3_stmt sqlite3_next_stmt( sqlite3 pDb, sqlite3_stmt pStmt )
     {

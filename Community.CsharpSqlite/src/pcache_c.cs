@@ -50,7 +50,9 @@ namespace Community.CsharpSqlite
       public dxStress xStress; //int (*xStress)(void*,PgHdr*);       /* Call to try make a page clean */
       public object pStress;                     /* Argument to xStress */
       public sqlite3_pcache pCache;              /* Pluggable cache module */
-      public PgHdr pPage1;                       /* Reference to page 1 */
+      public PgHdr pPage1;                       ///<summary>
+///Reference to page 1
+///</summary>
 
       public int nRef                            /* Number of referenced pages */
       {
@@ -86,7 +88,9 @@ static void expensive_assert( bool x ) { Debug.Assert( x ); }
     //# define expensive_assert(X)
 #endif
 
-    /********************************** Linked List Management ********************/
+    ///<summary>
+/// Linked List Management 
+///</summary>
 
 #if !NDEBUG &&  SQLITE_ENABLE_EXPENSIVE_ASSERT
 /*
@@ -105,9 +109,9 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 }
 #endif //* !NDEBUG && SQLITE_ENABLE_EXPENSIVE_ASSERT */
 
-    /*
-** Remove page pPage from the list of dirty pages.
-*/
+    ///<summary>
+/// Remove page pPage from the list of dirty pages.
+///</summary>
     static void pcacheRemoveFromDirtyList( PgHdr pPage )
     {
       PCache p = pPage.pCache;
@@ -152,10 +156,11 @@ expensive_assert( pcacheCheckSynced(p) );
 #endif
     }
 
-    /*
-    ** Add page pPage to the head of the dirty list (PCache1.pDirty is set to
-    ** pPage).
-    */
+    ///<summary>
+/// Add page pPage to the head of the dirty list (PCache1.pDirty is set to
+/// pPage).
+///
+///</summary>
     static void pcacheAddToDirtyList( PgHdr pPage )
     {
       PCache p = pPage.pCache;
@@ -182,10 +187,11 @@ expensive_assert( pcacheCheckSynced(p) );
 #endif
     }
 
-    /*
-    ** Wrapper around the pluggable caches xUnpin method. If the cache is
-    ** being used for an in-memory database, this function is a no-op.
-    */
+    ///<summary>
+/// Wrapper around the pluggable caches xUnpin method. If the cache is
+/// being used for an in-memory database, this function is a no-op.
+///
+///</summary>
     static void pcacheUnpin( PgHdr p )
     {
       PCache pCache = p.pCache;
@@ -199,11 +205,13 @@ expensive_assert( pcacheCheckSynced(p) );
       }
     }
 
-    /*************************************************** General Interfaces ******
-    **
-    ** Initialize and shutdown the page cache subsystem. Neither of these
-    ** functions are threadsafe.
-    */
+    ///<summary>
+/// General Interfaces 
+///
+/// Initialize and shutdown the page cache subsystem. Neither of these
+/// functions are threadsafe.
+///
+///</summary>
     static int sqlite3PcacheInitialize()
     {
       if ( sqlite3GlobalConfig.pcache.xInit == null )
@@ -224,20 +232,22 @@ expensive_assert( pcacheCheckSynced(p) );
       }
     }
 
-    /*
-    ** Return the size in bytes of a PCache object.
-    */
+    ///<summary>
+/// Return the size in bytes of a PCache object.
+///
+///</summary>
     static int sqlite3PcacheSize()
     {
       return 4;
     }// sizeof( PCache ); }
 
-    /*
-    ** Create a new PCache object. Storage space to hold the object
-    ** has already been allocated and is passed in as the p pointer.
-    ** The caller discovers how much space needs to be allocated by
-    ** calling sqlite3PcacheSize().
-    */
+    ///<summary>
+/// Create a new PCache object. Storage space to hold the object
+/// has already been allocated and is passed in as the p pointer.
+/// The caller discovers how much space needs to be allocated by
+/// calling sqlite3PcacheSize().
+///
+///</summary>
     static void sqlite3PcacheOpen(
     int szPage,                  /* Size of every page */
     int szExtra,                 /* Extra space associated with each page */
@@ -256,10 +266,11 @@ expensive_assert( pcacheCheckSynced(p) );
       p.nMax = 100;
     }
 
-    /*
-    ** Change the page size for PCache object. The caller must ensure that there
-    ** are no outstanding page references when this function is called.
-    */
+    ///<summary>
+/// Change the page size for PCache object. The caller must ensure that there
+/// are no outstanding page references when this function is called.
+///
+///</summary>
     static void sqlite3PcacheSetPageSize( PCache pCache, int szPage )
     {
       Debug.Assert( pCache.nRef == 0 && pCache.pDirty == null );
@@ -271,9 +282,10 @@ expensive_assert( pcacheCheckSynced(p) );
       pCache.szPage = szPage;
     }
 
-    /*
-    ** Try to obtain a page from the cache.
-    */
+    ///<summary>
+/// Try to obtain a page from the cache.
+///
+///</summary>
     static int sqlite3PcacheFetch(
     PCache pCache,       /* Obtain the page from this cache */
     u32 pgno,            /* Page number to obtain */
@@ -384,10 +396,11 @@ expensive_assert( pcacheCheckSynced(pCache) );
       return ( pPage == null && eCreate != 0 ) ? SQLITE_NOMEM : SQLITE_OK;
     }
 
-    /*
-    ** Decrement the reference count on a page. If the page is clean and the
-    ** reference count drops to 0, then it is made elible for recycling.
-    */
+    ///<summary>
+/// Decrement the reference count on a page. If the page is clean and the
+/// reference count drops to 0, then it is made elible for recycling.
+///
+///</summary>
     static void sqlite3PcacheRelease( PgHdr p )
     {
       Debug.Assert( p.nRef > 0 );
@@ -409,20 +422,22 @@ expensive_assert( pcacheCheckSynced(pCache) );
       }
     }
 
-    /*
-    ** Increase the reference count of a supplied page by 1.
-    */
+    ///<summary>
+/// Increase the reference count of a supplied page by 1.
+///
+///</summary>
     static void sqlite3PcacheRef( PgHdr p )
     {
       Debug.Assert( p.nRef > 0 );
       p.nRef++;
     }
 
-    /*
-    ** Drop a page from the cache. There must be exactly one reference to the
-    ** page. This function deletes that reference, so after it returns the
-    ** page pointed to by p is invalid.
-    */
+    ///<summary>
+/// Drop a page from the cache. There must be exactly one reference to the
+/// page. This function deletes that reference, so after it returns the
+/// page pointed to by p is invalid.
+///
+///</summary>
     static void sqlite3PcacheDrop( PgHdr p )
     {
       PCache pCache;
@@ -440,10 +455,11 @@ expensive_assert( pcacheCheckSynced(pCache) );
       sqlite3GlobalConfig.pcache.xUnpin( pCache.pCache, p, true );
     }
 
-    /*
-    ** Make sure the page is marked as dirty. If it isn't dirty already,
-    ** make it so.
-    */
+    ///<summary>
+/// Make sure the page is marked as dirty. If it isn't dirty already,
+/// make it so.
+///
+///</summary>
     static void sqlite3PcacheMakeDirty( PgHdr p )
     {
       p.flags &= ~PGHDR_DONT_WRITE;
@@ -455,10 +471,11 @@ expensive_assert( pcacheCheckSynced(pCache) );
       }
     }
 
-    /*
-    ** Make sure the page is marked as clean. If it isn't clean already,
-    ** make it so.
-    */
+    ///<summary>
+/// Make sure the page is marked as clean. If it isn't clean already,
+/// make it so.
+///
+///</summary>
     static void sqlite3PcacheMakeClean( PgHdr p )
     {
       if ( ( p.flags & PGHDR_DIRTY ) != 0 )
@@ -472,9 +489,10 @@ expensive_assert( pcacheCheckSynced(pCache) );
       }
     }
 
-    /*
-    ** Make every page in the cache clean.
-    */
+    ///<summary>
+/// Make every page in the cache clean.
+///
+///</summary>
     static void sqlite3PcacheCleanAll( PCache pCache )
     {
       PgHdr p;
@@ -484,9 +502,10 @@ expensive_assert( pcacheCheckSynced(pCache) );
       }
     }
 
-    /*
-    ** Clear the PGHDR_NEED_SYNC flag from all dirty pages.
-    */
+    ///<summary>
+/// Clear the PGHDR_NEED_SYNC flag from all dirty pages.
+///
+///</summary>
     static void sqlite3PcacheClearSyncFlags( PCache pCache )
     {
       PgHdr p;
@@ -497,9 +516,10 @@ expensive_assert( pcacheCheckSynced(pCache) );
       pCache.pSynced = pCache.pDirtyTail;
     }
 
-    /*
-    ** Change the page number of page p to newPgno.
-    */
+    ///<summary>
+/// Change the page number of page p to newPgno.
+///
+///</summary>
     static void sqlite3PcacheMove( PgHdr p, Pgno newPgno )
     {
       PCache pCache = p.pCache;
@@ -514,15 +534,16 @@ expensive_assert( pcacheCheckSynced(pCache) );
       }
     }
 
-    /*
-    ** Drop every cache entry whose page number is greater than "pgno". The
-    ** caller must ensure that there are no outstanding references to any pages
-    ** other than page 1 with a page number greater than pgno.
-    **
-    ** If there is a reference to page 1 and the pgno parameter passed to this
-    ** function is 0, then the data area associated with page 1 is zeroed, but
-    ** the page object is not dropped.
-    */
+    ///<summary>
+/// Drop every cache entry whose page number is greater than "pgno". The
+/// caller must ensure that there are no outstanding references to any pages
+/// other than page 1 with a page number greater than pgno.
+///
+/// If there is a reference to page 1 and the pgno parameter passed to this
+/// function is 0, then the data area associated with page 1 is zeroed, but
+/// the page object is not dropped.
+///
+///</summary>
     static void sqlite3PcacheTruncate( PCache pCache, u32 pgno )
     {
       if ( pCache.pCache != null )
@@ -553,9 +574,10 @@ expensive_assert( pcacheCheckSynced(pCache) );
       }
     }
 
-    /*
-    ** Close a cache.
-    */
+    ///<summary>
+/// Close a cache.
+///
+///</summary>
     static void sqlite3PcacheClose( PCache pCache )
     {
       if ( pCache.pCache != null )
@@ -564,9 +586,10 @@ expensive_assert( pcacheCheckSynced(pCache) );
       }
     }
 
-    /*
-    ** Discard the contents of the cache.
-    */
+    ///<summary>
+/// Discard the contents of the cache.
+///
+///</summary>
     static void sqlite3PcacheClear( PCache pCache )
     {
       sqlite3PcacheTruncate( pCache, 0 );
@@ -611,16 +634,17 @@ expensive_assert( pcacheCheckSynced(pCache) );
       return result.pDirty;
     }
 
-    /*
-    ** Sort the list of pages in accending order by pgno.  Pages are
-    ** connected by pDirty pointers.  The pDirtyPrev pointers are
-    ** corrupted by this sort.
-    **
-    ** Since there cannot be more than 2^31 distinct pages in a database,
-    ** there cannot be more than 31 buckets required by the merge sorter.
-    ** One extra bucket is added to catch overflow in case something
-    ** ever changes to make the previous sentence incorrect.
-    */
+    ///<summary>
+/// Sort the list of pages in accending order by pgno.  Pages are
+/// connected by pDirty pointers.  The pDirtyPrev pointers are
+/// corrupted by this sort.
+///
+/// Since there cannot be more than 2^31 distinct pages in a database,
+/// there cannot be more than 31 buckets required by the merge sorter.
+/// One extra bucket is added to catch overflow in case something
+/// ever changes to make the previous sentence incorrect.
+///
+///</summary>
     //#define N_SORT_BUCKET  32
     const int N_SORT_BUCKET = 32;
 
@@ -664,9 +688,10 @@ expensive_assert( pcacheCheckSynced(pCache) );
       return p;
     }
 
-    /*
-    ** Return a list of all dirty pages in the cache, sorted by page number.
-    */
+    ///<summary>
+/// Return a list of all dirty pages in the cache, sorted by page number.
+///
+///</summary>
     static PgHdr sqlite3PcacheDirtyList( PCache pCache )
     {
       PgHdr p;
@@ -677,25 +702,28 @@ expensive_assert( pcacheCheckSynced(pCache) );
       return pcacheSortDirtyList( pCache.pDirty );
     }
 
-    /*
-    ** Return the total number of referenced pages held by the cache.
-    */
+    ///<summary>
+/// Return the total number of referenced pages held by the cache.
+///
+///</summary>
     static int sqlite3PcacheRefCount( PCache pCache )
     {
       return pCache.nRef;
     }
 
-    /*
-    ** Return the number of references to the page supplied as an argument.
-    */
+    ///<summary>
+/// Return the number of references to the page supplied as an argument.
+///
+///</summary>
     static int sqlite3PcachePageRefcount( PgHdr p )
     {
       return p.nRef;
     }
 
-    /*
-    ** Return the total number of pages in the cache.
-    */
+    ///<summary>
+/// Return the total number of pages in the cache.
+///
+///</summary>
     static int sqlite3PcachePagecount( PCache pCache )
     {
       int nPage = 0;

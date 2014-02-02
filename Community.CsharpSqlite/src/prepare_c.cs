@@ -13,34 +13,36 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-    /*
-    ** 2005 May 25
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains the implementation of the sqlite3_prepare()
-    ** interface, and routines that contribute to loading the database schema
-    ** from disk.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2005 May 25
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains the implementation of the sqlite3_prepare()
+/// interface, and routines that contribute to loading the database schema
+/// from disk.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
+///
+///
+///
+///</summary>
     //#include "sqliteInt.h"
 
-    /*
-    ** Fill the InitData structure with an error message that indicates
-    ** that the database is corrupt.
-    */
+    ///<summary>
+/// Fill the InitData structure with an error message that indicates
+/// that the database is corrupt.
+///
+///</summary>
     static void corruptSchema(
     InitData pData, /* Initialization context */
     string zObj,    /* Object being parsed at the point of error */
@@ -72,18 +74,19 @@ namespace Community.CsharpSqlite
       }
     }
 
-    /*
-    ** This is the callback routine for the code that initializes the
-    ** database.  See sqlite3Init() below for additional information.
-    ** This routine is also called from the OP_ParseSchema opcode of the VDBE.
-    **
-    ** Each callback contains the following information:
-    **
-    **     argv[0] = name of thing being created
-    **     argv[1] = root page number for table or index. 0 for trigger or view.
-    **     argv[2] = SQL text for the CREATE statement.
-    **
-    */
+    ///<summary>
+/// This is the callback routine for the code that initializes the
+/// database.  See sqlite3Init() below for additional information.
+/// This routine is also called from the OP_ParseSchema opcode of the VDBE.
+///
+/// Each callback contains the following information:
+///
+///     argv[0] = name of thing being created
+///     argv[1] = root page number for table or index. 0 for trigger or view.
+///     argv[2] = SQL text for the CREATE statement.
+///
+///
+///</summary>
     static int sqlite3InitCallback( object pInit, sqlite3_int64 argc, object p2, object NotUsed )
     {
       string[] argv = (string[])p2;
@@ -190,14 +193,15 @@ sqlite3_prepare(db, argv[2], -1, ref pStmt, 0);
       return 0;
     }
 
-    /*
-    ** Attempt to read the database schema and initialize internal
-    ** data structures for a single database file.  The index of the
-    ** database file is given by iDb.  iDb==0 is used for the main
-    ** database.  iDb==1 should never be used.  iDb>=2 is used for
-    ** auxiliary databases.  Return one of the SQLITE_ error codes to
-    ** indicate success or failure.
-    */
+    ///<summary>
+/// Attempt to read the database schema and initialize internal
+/// data structures for a single database file.  The index of the
+/// database file is given by iDb.  iDb==0 is used for the main
+/// database.  iDb==1 should never be used.  iDb>=2 is used for
+/// auxiliary databases.  Return one of the SQLITE_ error codes to
+/// indicate success or failure.
+///
+///</summary>
     static int sqlite3InitOne( sqlite3 db, int iDb, ref string pzErrMsg )
     {
       int rc;
@@ -476,16 +480,17 @@ error_out:
       return rc;
     }
 
-    /*
-    ** Initialize all database files - the main database file, the file
-    ** used to store temporary tables, and any additional database files
-    ** created using ATTACH statements.  Return a success code.  If an
-    ** error occurs, write an error message into pzErrMsg.
-    **
-    ** After a database is initialized, the DB_SchemaLoaded bit is set
-    ** bit is set in the flags field of the Db structure. If the database
-    ** file was of zero-length, then the DB_Empty flag is also set.
-    */
+    ///<summary>
+/// Initialize all database files - the main database file, the file
+/// used to store temporary tables, and any additional database files
+/// created using ATTACH statements.  Return a success code.  If an
+/// error occurs, write an error message into pzErrMsg.
+///
+/// After a database is initialized, the DB_SchemaLoaded bit is set
+/// bit is set in the flags field of the Db structure. If the database
+/// file was of zero-length, then the DB_Empty flag is also set.
+///
+///</summary>
     static int sqlite3Init( sqlite3 db, ref string pzErrMsg )
     {
       int i, rc;
@@ -530,10 +535,11 @@ error_out:
       return rc;
     }
 
-    /*
-    ** This routine is a no-op if the database schema is already initialised.
-    ** Otherwise, the schema is loaded. An error code is returned.
-    */
+    ///<summary>
+/// This routine is a no-op if the database schema is already initialised.
+/// Otherwise, the schema is loaded. An error code is returned.
+///
+///</summary>
     static int sqlite3ReadSchema( Parse pParse )
     {
       int rc = SQLITE_OK;
@@ -552,11 +558,12 @@ error_out:
     }
 
 
-    /*
-    ** Check schema cookies in all databases.  If any cookie is out
-    ** of date set pParse->rc to SQLITE_SCHEMA.  If all schema cookies
-    ** make no changes to pParse->rc.
-    */
+    ///<summary>
+/// Check schema cookies in all databases.  If any cookie is out
+/// of date set pParse->rc to SQLITE_SCHEMA.  If all schema cookies
+/// make no changes to pParse->rc.
+///
+///</summary>
     static void schemaIsValid( Parse pParse )
     {
       sqlite3 db = pParse.db;
@@ -607,13 +614,14 @@ error_out:
       }
     }
 
-    /*
-    ** Convert a schema pointer into the iDb index that indicates
-    ** which database file in db.aDb[] the schema refers to.
-    **
-    ** If the same database is attached more than once, the first
-    ** attached database is returned.
-    */
+    ///<summary>
+/// Convert a schema pointer into the iDb index that indicates
+/// which database file in db.aDb[] the schema refers to.
+///
+/// If the same database is attached more than once, the first
+/// attached database is returned.
+///
+///</summary>
     static int sqlite3SchemaToIndex( sqlite3 db, Schema pSchema )
     {
       int i = -1000000;
@@ -643,9 +651,10 @@ error_out:
       return i;
     }
 
-    /*
-    ** Compile the UTF-8 encoded SQL statement zSql into a statement handle.
-    */
+    ///<summary>
+/// Compile the UTF-8 encoded SQL statement zSql into a statement handle.
+///
+///</summary>
     static int sqlite3Prepare(
     sqlite3 db,               /* Database handle. */
     string zSql,              /* UTF-8 encoded SQL statement. */
@@ -887,14 +896,15 @@ end_prepare:
       return rc;
     }
 
-    /*
-    ** Rerun the compilation of a statement after a schema change.
-    **
-    ** If the statement is successfully recompiled, return SQLITE_OK. Otherwise,
-    ** if the statement cannot be recompiled because another connection has
-    ** locked the sqlite3_master table, return SQLITE_LOCKED. If any other error
-    ** occurs, return SQLITE_SCHEMA.
-    */
+    ///<summary>
+/// Rerun the compilation of a statement after a schema change.
+///
+/// If the statement is successfully recompiled, return SQLITE_OK. Otherwise,
+/// if the statement cannot be recompiled because another connection has
+/// locked the sqlite3_master table, return SQLITE_LOCKED. If any other error
+/// occurs, return SQLITE_SCHEMA.
+///
+///</summary>
     static int sqlite3Reprepare( Vdbe p )
     {
       int rc;
@@ -941,14 +951,15 @@ end_prepare:
       string sOut = null;
       return sqlite3_prepare( db, zSql, nBytes, ref ppStmt, ref sOut );
     }
-    /*
-    ** Two versions of the official API.  Legacy and new use.  In the legacy
-    ** version, the original SQL text is not saved in the prepared statement
-    ** and so if a schema change occurs, SQLITE_SCHEMA is returned by
-    ** sqlite3_step().  In the new version, the original SQL text is retained
-    ** and the statement is automatically recompiled if an schema change
-    ** occurs.
-    */
+    ///<summary>
+/// Two versions of the official API.  Legacy and new use.  In the legacy
+/// version, the original SQL text is not saved in the prepared statement
+/// and so if a schema change occurs, SQLITE_SCHEMA is returned by
+/// sqlite3_step().  In the new version, the original SQL text is retained
+/// and the statement is automatically recompiled if an schema change
+/// occurs.
+///
+///</summary>
       static public int sqlite3_prepare(
     sqlite3 db,           /* Database handle. */
     string zSql,          /* UTF-8 encoded SQL statement. */
@@ -995,9 +1006,9 @@ end_prepare:
 
 #if !SQLITE_OMIT_UTF16
 
-/*
-** Compile the UTF-16 encoded SQL statement zSql into a statement handle.
-*/
+///<summary>
+/// Compile the UTF-16 encoded SQL statement zSql into a statement handle.
+///</summary>
 static int sqlite3Prepare16(
 sqlite3 db,              /* Database handle. */
 string zSql,             /* UTF-15 encoded SQL statement. */
@@ -1041,14 +1052,14 @@ sqlite3_mutex_leave(db.mutex);
 return rc;
 }
 
-/*
-** Two versions of the official API.  Legacy and new use.  In the legacy
-** version, the original SQL text is not saved in the prepared statement
-** and so if a schema change occurs, SQLITE_SCHEMA is returned by
-** sqlite3_step().  In the new version, the original SQL text is retained
-** and the statement is automatically recompiled if an schema change
-** occurs.
-*/
+///<summary>
+/// Two versions of the official API.  Legacy and new use.  In the legacy
+/// version, the original SQL text is not saved in the prepared statement
+/// and so if a schema change occurs, SQLITE_SCHEMA is returned by
+/// sqlite3_step().  In the new version, the original SQL text is retained
+/// and the statement is automatically recompiled if an schema change
+/// occurs.
+///</summary>
 public static int sqlite3_prepare16(
 sqlite3 db,               /* Database handle. */
 string zSql,              /* UTF-16 encoded SQL statement. */

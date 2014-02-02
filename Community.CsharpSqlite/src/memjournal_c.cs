@@ -45,14 +45,16 @@ namespace Community.CsharpSqlite
     //typedef struct FilePoint FilePoint;
     //typedef struct FileChunk FileChunk;
 
-    /* Space to hold the rollback journal is allocated in increments of
-    ** this many bytes.
-    **
-    ** The size chosen is a little less than a power of two.  That way,
-    ** the FileChunk object will have a size that almost exactly fills
-    ** a power-of-two allocation.  This mimimizes wasted space in power-of-two
-    ** memory allocators.
-    */
+    ///<summary>
+///Space to hold the rollback journal is allocated in increments of
+/// this many bytes.
+///
+/// The size chosen is a little less than a power of two.  That way,
+/// the FileChunk object will have a size that almost exactly fills
+/// a power-of-two allocation.  This mimimizes wasted space in power-of-two
+/// memory allocators.
+///
+///</summary>
     //#define JOURNAL_CHUNKSIZE ((int)(1024-sizeof(FileChunk*)))
     const int JOURNAL_CHUNKSIZE = 4096;
 
@@ -93,10 +95,11 @@ namespace Community.CsharpSqlite
       public FileChunk pChunk;      /* Specific chunk into which cursor points */
     };
 
-    /*
-    ** This subclass is a subclass of sqlite3_file.  Each open memory-journal
-    ** is an instance of this class.
-    */
+    ///<summary>
+/// This subclass is a subclass of sqlite3_file.  Each open memory-journal
+/// is an instance of this class.
+///
+///</summary>
     public partial class sqlite3_file
     {
       //public sqlite3_io_methods pMethods; /* Parent class. MUST BE FIRST */
@@ -105,10 +108,11 @@ namespace Community.CsharpSqlite
       public FilePoint readpoint;           /* Pointer to the end of the last xRead() */
     };
 
-    /*
-    ** Read data from the in-memory journal file.  This is the implementation
-    ** of the sqlite3_vfs.xRead method.
-    */
+    ///<summary>
+/// Read data from the in-memory journal file.  This is the implementation
+/// of the sqlite3_vfs.xRead method.
+///
+///</summary>
     static int memjrnlRead(
     sqlite3_file pJfd,     /* The journal file from which to read */
     byte[] zBuf,           /* Put the results here */
@@ -158,9 +162,10 @@ namespace Community.CsharpSqlite
       return SQLITE_OK;
     }
 
-    /*
-    ** Write data to the file.
-    */
+    ///<summary>
+/// Write data to the file.
+///
+///</summary>
     static int memjrnlWrite(
     sqlite3_file pJfd,    /* The journal file into which to write */
     byte[] zBuf,          /* Take data to be written from here */
@@ -216,9 +221,10 @@ namespace Community.CsharpSqlite
       return SQLITE_OK;
     }
 
-    /*
-    ** Truncate the file.
-    */
+    ///<summary>
+/// Truncate the file.
+///
+///</summary>
     static int memjrnlTruncate( sqlite3_file pJfd, sqlite3_int64 size )
     {
       MemJournal p = (MemJournal)pJfd;
@@ -236,9 +242,10 @@ namespace Community.CsharpSqlite
       return SQLITE_OK;
     }
 
-    /*
-    ** Close the file.
-    */
+    ///<summary>
+/// Close the file.
+///
+///</summary>
     static int memjrnlClose( MemJournal pJfd )
     {
       memjrnlTruncate( pJfd, 0 );
@@ -246,14 +253,15 @@ namespace Community.CsharpSqlite
     }
 
 
-    /*
-    ** Sync the file.
-    **
-    ** Syncing an in-memory journal is a no-op.  And, in fact, this routine
-    ** is never called in a working implementation.  This implementation
-    ** exists purely as a contingency, in case some malfunction in some other
-    ** part of SQLite causes Sync to be called by mistake.
-    */
+    ///<summary>
+/// Sync the file.
+///
+/// Syncing an in-memory journal is a no-op.  And, in fact, this routine
+/// is never called in a working implementation.  This implementation
+/// exists purely as a contingency, in case some malfunction in some other
+/// part of SQLite causes Sync to be called by mistake.
+///
+///</summary>
     static int memjrnlSync( sqlite3_file NotUsed, int NotUsed2 )
     {
       UNUSED_PARAMETER2( NotUsed, NotUsed2 );
@@ -270,9 +278,10 @@ namespace Community.CsharpSqlite
       return SQLITE_OK;
     }
 
-    /*
-    ** Table of methods for MemJournal sqlite3_file object.
-    */
+    ///<summary>
+/// Table of methods for MemJournal sqlite3_file object.
+///
+///</summary>
     static sqlite3_io_methods MemJournalMethods = new sqlite3_io_methods(
     1,                /* iVersion */
     (dxClose)memjrnlClose,       /* xClose */
@@ -293,9 +302,10 @@ namespace Community.CsharpSqlite
     null                         /* xShmUnlock */
       );
 
-    /*
-    ** Open a journal file.
-    */
+    ///<summary>
+/// Open a journal file.
+///
+///</summary>
     static void sqlite3MemJournalOpen( sqlite3_file pJfd )
     {
       MemJournal p = (MemJournal)pJfd;
@@ -306,10 +316,11 @@ namespace Community.CsharpSqlite
       p.pMethods = MemJournalMethods;//(sqlite3_io_methods*)&MemJournalMethods;
     }
 
-    /*
-    ** Return true if the file-handle passed as an argument is
-    ** an in-memory journal
-    */
+    ///<summary>
+/// Return true if the file-handle passed as an argument is
+/// an in-memory journal
+///
+///</summary>
     static bool sqlite3IsMemJournal( sqlite3_file pJfd )
     {
       return pJfd.pMethods == MemJournalMethods;

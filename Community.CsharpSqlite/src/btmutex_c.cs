@@ -4,30 +4,30 @@ namespace Community.CsharpSqlite
 {
   public partial class Sqlite3
   {
-/*
-** 2007 August 27
-**
-** The author disclaims copyright to this source code.  In place of
-** a legal notice, here is a blessing:
-**
-**    May you do good and not evil.
-**    May you find forgiveness for yourself and forgive others.
-**    May you share freely, never taking more than you give.
-**
-*************************************************************************
-**
-** This file contains code used to implement mutexes on Btree objects.
-** This code really belongs in btree.c.  But btree.c is getting too
-** big and we want to break it down some.  This packaged seemed like
-** a good breakout.
- *************************************************************************
-**  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-**  C#-SQLite is an independent reimplementation of the SQLite software library
-**
-**  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
-**
-*************************************************************************
-*/
+///<summary>
+/// 2007 August 27
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+///
+/// This file contains code used to implement mutexes on Btree objects.
+/// This code really belongs in btree.c.  But btree.c is getting too
+/// big and we want to break it down some.  This packaged seemed like
+/// a good breakout.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
+///
+///
+///</summary>
 //#include "btreeInt.h"
 #if !SQLITE_OMIT_SHARED_CACHE
 #if SQLITE_THREADSAFE
@@ -274,15 +274,15 @@ int sqlite3SchemaMutexHeld(sqlite3 db, int iDb, Schema *pSchema){
 #endif //* NDEBUG */
 
 #else //* SQLITE_THREADSAFE>0 above.  SQLITE_THREADSAFE==0 below */
-/*
-** The following are special cases for mutex enter routines for use
-** in single threaded applications that use shared cache.  Except for
-** these two routines, all mutex operations are no-ops in that case and
-** are null #defines in btree.h.
-**
-** If shared cache is disabled, then all btree mutex routines, including
-** the ones below, are no-ops and are null #defines in btree.h.
-*/
+///<summary>
+/// The following are special cases for mutex enter routines for use
+/// in single threaded applications that use shared cache.  Except for
+/// these two routines, all mutex operations are no-ops in that case and
+/// are null #defines in btree.h.
+///
+/// If shared cache is disabled, then all btree mutex routines, including
+/// the ones below, are no-ops and are null #defines in btree.h.
+///</summary>
 
 void sqlite3BtreeEnter(Btree *p){
   p->pBt->db = p->db;
