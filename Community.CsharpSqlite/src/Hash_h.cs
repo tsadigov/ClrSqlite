@@ -29,31 +29,35 @@ namespace Community.CsharpSqlite
     //#if !_SQLITE_HASH_H_
     //#define _SQLITE_HASH_H_
 
-    /* Forward declarations of structures. */
+    ///<summary>
+///Forward declarations of structures.
+///</summary>
     //typedef struct Hash Hash;
     //typedef struct HashElem HashElem;
 
-    /* A complete hash table is an instance of the following structure.
-    ** The internals of this structure are intended to be opaque -- client
-    ** code should not attempt to access or modify the fields of this structure
-    ** directly.  Change this structure only by using the routines below.
-    ** However, some of the "procedures" and "functions" for modifying and
-    ** accessing this structure are really macros, so we can't really make
-    ** this structure opaque.
-    **
-    ** All elements of the hash table are on a single doubly-linked list.
-    ** Hash.first points to the head of this list.
-    **
-    ** There are Hash.htsize buckets.  Each bucket points to a spot in
-    ** the global doubly-linked list.  The contents of the bucket are the
-    ** element pointed to plus the next _ht.count-1 elements in the list.
-    **
-    ** Hash.htsize and Hash.ht may be zero.  In that case lookup is done
-    ** by a linear search of the global list.  For small tables, the
-    ** Hash.ht table is never allocated because if there are few elements
-    ** in the table, it is faster to do a linear search than to manage
-    ** the hash table.
-    */
+    ///<summary>
+///A complete hash table is an instance of the following structure.
+/// The internals of this structure are intended to be opaque -- client
+/// code should not attempt to access or modify the fields of this structure
+/// directly.  Change this structure only by using the routines below.
+/// However, some of the "procedures" and "functions" for modifying and
+/// accessing this structure are really macros, so we can't really make
+/// this structure opaque.
+///
+/// All elements of the hash table are on a single doubly-linked list.
+/// Hash.first points to the head of this list.
+///
+/// There are Hash.htsize buckets.  Each bucket points to a spot in
+/// the global doubly-linked list.  The contents of the bucket are the
+/// element pointed to plus the next _ht.count-1 elements in the list.
+///
+/// Hash.htsize and Hash.ht may be zero.  In that case lookup is done
+/// by a linear search of the global list.  For small tables, the
+/// Hash.ht table is never allocated because if there are few elements
+/// in the table, it is faster to do a linear search than to manage
+/// the hash table.
+///
+///</summary>
     public class _ht
     {            /* the hash table */
       public int count;               /* Number of entries with this hash */

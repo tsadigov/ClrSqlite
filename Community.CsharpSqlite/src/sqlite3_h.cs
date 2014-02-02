@@ -684,17 +684,18 @@ namespace Community.CsharpSqlite
         private const int SQLITE_SYNC_FULL = 0x00003;
         private const int SQLITE_SYNC_DATAONLY = 0x00010;
 
-        /*
-    ** CAPI3REF: OS Interface Open File Handle
-    **
-    ** An [sqlite3_file] object represents an open file in the 
-    ** [sqlite3_vfs | OS interface layer].  Individual OS interface
-    ** implementations will
-    ** want to subclass this object by appending additional fields
-    ** for their own use.  The pMethods entry is a pointer to an
-    ** [sqlite3_io_methods] object that defines methods for performing
-    ** I/O operations on the open file.
-    */
+        ///<summary>
+/// CAPI3REF: OS Interface Open File Handle
+///
+/// An [sqlite3_file] object represents an open file in the
+/// [sqlite3_vfs | OS interface layer].  Individual OS interface
+/// implementations will
+/// want to subclass this object by appending additional fields
+/// for their own use.  The pMethods entry is a pointer to an
+/// [sqlite3_io_methods] object that defines methods for performing
+/// I/O operations on the open file.
+///
+///</summary>
         //typedef struct sqlite3_file sqlite3_file;
         //struct sqlite3_file {
         //  const struct sqlite3_io_methods *pMethods;  /* Methods for an open file */
@@ -704,96 +705,97 @@ namespace Community.CsharpSqlite
             public sqlite3_io_methods pMethods; /* Must be first */
         }
 
-        /*
-        ** CAPI3REF: OS Interface File Virtual Methods Object
-        **
-        ** Every file opened by the [sqlite3_vfs.xOpen] method populates an
-        ** [sqlite3_file] object (or, more commonly, a subclass of the
-        ** [sqlite3_file] object) with a pointer to an instance of this object.
-        ** This object defines the methods used to perform various operations
-        ** against the open file represented by the [sqlite3_file] object.
-        **
-        ** If the [sqlite3_vfs.xOpen] method sets the sqlite3_file.pMethods element 
-        ** to a non-NULL pointer, then the sqlite3_io_methods.xClose method
-        ** may be invoked even if the [sqlite3_vfs.xOpen] reported that it failed.  The
-        ** only way to prevent a call to xClose following a failed [sqlite3_vfs.xOpen]
-        ** is for the [sqlite3_vfs.xOpen] to set the sqlite3_file.pMethods element
-        ** to NULL.
-        **
-        ** The flags argument to xSync may be one of [SQLITE_SYNC_NORMAL] or
-        ** [SQLITE_SYNC_FULL].  The first choice is the normal fsync().
-        ** The second choice is a Mac OS X style fullsync.  The [SQLITE_SYNC_DATAONLY]
-        ** flag may be ORed in to indicate that only the data of the file
-        ** and not its inode needs to be synced.
-        **
-        ** The integer values to xLock() and xUnlock() are one of
-        ** <ul>
-        ** <li> [SQLITE_LOCK_NONE],
-        ** <li> [SQLITE_LOCK_SHARED],
-        ** <li> [SQLITE_LOCK_RESERVED],
-        ** <li> [SQLITE_LOCK_PENDING], or
-        ** <li> [SQLITE_LOCK_EXCLUSIVE].
-        ** </ul>
-        ** xLock() increases the lock. xUnlock() decreases the lock.
-        ** The xCheckReservedLock() method checks whether any database connection,
-        ** either in this process or in some other process, is holding a RESERVED,
-        ** PENDING, or EXCLUSIVE lock on the file.  It returns true
-        ** if such a lock exists and false otherwise.
-        **
-        ** The xFileControl() method is a generic interface that allows custom
-        ** VFS implementations to directly control an open file using the
-        ** [sqlite3_file_control()] interface.  The second "op" argument is an
-        ** integer opcode.  The third argument is a generic pointer intended to
-        ** point to a structure that may contain arguments or space in which to
-        ** write return values.  Potential uses for xFileControl() might be
-        ** functions to enable blocking locks with timeouts, to change the
-        ** locking strategy (for example to use dot-file locks), to inquire
-        ** about the status of a lock, or to break stale locks.  The SQLite
-        ** core reserves all opcodes less than 100 for its own use.
-        ** A [SQLITE_FCNTL_LOCKSTATE | list of opcodes] less than 100 is available.
-        ** Applications that define a custom xFileControl method should use opcodes
-        ** greater than 100 to avoid conflicts.  VFS implementations should
-        ** return [SQLITE_NOTFOUND] for file control opcodes that they do not
-        ** recognize.
-        **
-        ** The xSectorSize() method returns the sector size of the
-        ** device that underlies the file.  The sector size is the
-        ** minimum write that can be performed without disturbing
-        ** other bytes in the file.  The xDeviceCharacteristics()
-        ** method returns a bit vector describing behaviors of the
-        ** underlying device:
-        **
-        ** <ul>
-        ** <li> [SQLITE_IOCAP_ATOMIC]
-        ** <li> [SQLITE_IOCAP_ATOMIC512]
-        ** <li> [SQLITE_IOCAP_ATOMIC1K]
-        ** <li> [SQLITE_IOCAP_ATOMIC2K]
-        ** <li> [SQLITE_IOCAP_ATOMIC4K]
-        ** <li> [SQLITE_IOCAP_ATOMIC8K]
-        ** <li> [SQLITE_IOCAP_ATOMIC16K]
-        ** <li> [SQLITE_IOCAP_ATOMIC32K]
-        ** <li> [SQLITE_IOCAP_ATOMIC64K]
-        ** <li> [SQLITE_IOCAP_SAFE_APPEND]
-        ** <li> [SQLITE_IOCAP_SEQUENTIAL]
-        ** </ul>
-        **
-        ** The SQLITE_IOCAP_ATOMIC property means that all writes of
-        ** any size are atomic.  The SQLITE_IOCAP_ATOMICnnn values
-        ** mean that writes of blocks that are nnn bytes in size and
-        ** are aligned to an address which is an integer multiple of
-        ** nnn are atomic.  The SQLITE_IOCAP_SAFE_APPEND value means
-        ** that when data is appended to a file, the data is appended
-        ** first then the size of the file is extended, never the other
-        ** way around.  The SQLITE_IOCAP_SEQUENTIAL property means that
-        ** information is written to disk in the same order as calls
-        ** to xWrite().
-        **
-        ** If xRead() returns SQLITE_IOERR_SHORT_READ it must also fill
-        ** in the unread portions of the buffer with zeros.  A VFS that
-        ** fails to zero-fill short reads might seem to work.  However,
-        ** failure to zero-fill short reads will eventually lead to
-        ** database corruption.
-        */
+        ///<summary>
+/// CAPI3REF: OS Interface File Virtual Methods Object
+///
+/// Every file opened by the [sqlite3_vfs.xOpen] method populates an
+/// [sqlite3_file] object (or, more commonly, a subclass of the
+/// [sqlite3_file] object) with a pointer to an instance of this object.
+/// This object defines the methods used to perform various operations
+/// against the open file represented by the [sqlite3_file] object.
+///
+/// If the [sqlite3_vfs.xOpen] method sets the sqlite3_file.pMethods element
+/// to a non-NULL pointer, then the sqlite3_io_methods.xClose method
+/// may be invoked even if the [sqlite3_vfs.xOpen] reported that it failed.  The
+/// only way to prevent a call to xClose following a failed [sqlite3_vfs.xOpen]
+/// is for the [sqlite3_vfs.xOpen] to set the sqlite3_file.pMethods element
+/// to NULL.
+///
+/// The flags argument to xSync may be one of [SQLITE_SYNC_NORMAL] or
+/// [SQLITE_SYNC_FULL].  The first choice is the normal fsync().
+/// The second choice is a Mac OS X style fullsync.  The [SQLITE_SYNC_DATAONLY]
+/// flag may be ORed in to indicate that only the data of the file
+/// and not its inode needs to be synced.
+///
+/// The integer values to xLock() and xUnlock() are one of
+/// <ul>
+/// <li> [SQLITE_LOCK_NONE],
+/// <li> [SQLITE_LOCK_SHARED],
+/// <li> [SQLITE_LOCK_RESERVED],
+/// <li> [SQLITE_LOCK_PENDING], or
+/// <li> [SQLITE_LOCK_EXCLUSIVE].
+/// </ul>
+/// xLock() increases the lock. xUnlock() decreases the lock.
+/// The xCheckReservedLock() method checks whether any database connection,
+/// either in this process or in some other process, is holding a RESERVED,
+/// PENDING, or EXCLUSIVE lock on the file.  It returns true
+/// if such a lock exists and false otherwise.
+///
+/// The xFileControl() method is a generic interface that allows custom
+/// VFS implementations to directly control an open file using the
+/// [sqlite3_file_control()] interface.  The second "op" argument is an
+/// integer opcode.  The third argument is a generic pointer intended to
+/// point to a structure that may contain arguments or space in which to
+/// write return values.  Potential uses for xFileControl() might be
+/// functions to enable blocking locks with timeouts, to change the
+/// locking strategy (for example to use dot-file locks), to inquire
+/// about the status of a lock, or to break stale locks.  The SQLite
+/// core reserves all opcodes less than 100 for its own use.
+/// A [SQLITE_FCNTL_LOCKSTATE | list of opcodes] less than 100 is available.
+/// Applications that define a custom xFileControl method should use opcodes
+/// greater than 100 to avoid conflicts.  VFS implementations should
+/// return [SQLITE_NOTFOUND] for file control opcodes that they do not
+/// recognize.
+///
+/// The xSectorSize() method returns the sector size of the
+/// device that underlies the file.  The sector size is the
+/// minimum write that can be performed without disturbing
+/// other bytes in the file.  The xDeviceCharacteristics()
+/// method returns a bit vector describing behaviors of the
+/// underlying device:
+///
+/// <ul>
+/// <li> [SQLITE_IOCAP_ATOMIC]
+/// <li> [SQLITE_IOCAP_ATOMIC512]
+/// <li> [SQLITE_IOCAP_ATOMIC1K]
+/// <li> [SQLITE_IOCAP_ATOMIC2K]
+/// <li> [SQLITE_IOCAP_ATOMIC4K]
+/// <li> [SQLITE_IOCAP_ATOMIC8K]
+/// <li> [SQLITE_IOCAP_ATOMIC16K]
+/// <li> [SQLITE_IOCAP_ATOMIC32K]
+/// <li> [SQLITE_IOCAP_ATOMIC64K]
+/// <li> [SQLITE_IOCAP_SAFE_APPEND]
+/// <li> [SQLITE_IOCAP_SEQUENTIAL]
+/// </ul>
+///
+/// The SQLITE_IOCAP_ATOMIC property means that all writes of
+/// any size are atomic.  The SQLITE_IOCAP_ATOMICnnn values
+/// mean that writes of blocks that are nnn bytes in size and
+/// are aligned to an address which is an integer multiple of
+/// nnn are atomic.  The SQLITE_IOCAP_SAFE_APPEND value means
+/// that when data is appended to a file, the data is appended
+/// first then the size of the file is extended, never the other
+/// way around.  The SQLITE_IOCAP_SEQUENTIAL property means that
+/// information is written to disk in the same order as calls
+/// to xWrite().
+///
+/// If xRead() returns SQLITE_IOERR_SHORT_READ it must also fill
+/// in the unread portions of the buffer with zeros.  A VFS that
+/// fails to zero-fill short reads might seem to work.  However,
+/// failure to zero-fill short reads will eventually lead to
+/// database corruption.
+///
+///</summary>
         //typedef struct sqlite3_io_methods sqlite3_io_methods;
         //struct sqlite3_io_methods {
         //  int iVersion;
@@ -952,163 +954,164 @@ namespace Community.CsharpSqlite
     */
         //typedef struct sqlite3_mutex sqlite3_mutex;
 
-        /*
-    ** CAPI3REF: OS Interface Object
-    **
-    ** An instance of the sqlite3_vfs object defines the interface between
-    ** the SQLite core and the underlying operating system.  The "vfs"
-    ** in the name of the object stands for "virtual file system".  See
-    ** the [VFS | VFS documentation] for further information.
-    **
-    ** The value of the iVersion field is initially 1 but may be larger in
-    ** future versions of SQLite.  Additional fields may be appended to this
-    ** object when the iVersion value is increased.  Note that the structure
-    ** of the sqlite3_vfs object changes in the transaction between
-    ** SQLite version 3.5.9 and 3.6.0 and yet the iVersion field was not
-    ** modified.
-    **
-    ** The szOsFile field is the size of the subclassed [sqlite3_file]
-    ** structure used by this VFS.  mxPathname is the maximum length of
-    ** a pathname in this VFS.
-    **
-    ** Registered sqlite3_vfs objects are kept on a linked list formed by
-    ** the pNext pointer.  The [sqlite3_vfs_register()]
-    ** and [sqlite3_vfs_unregister()] interfaces manage this list
-    ** in a thread-safe way.  The [sqlite3_vfs_find()] interface
-    ** searches the list.  Neither the application code nor the VFS
-    ** implementation should use the pNext pointer.
-    **
-    ** The pNext field is the only field in the sqlite3_vfs
-    ** structure that SQLite will ever modify.  SQLite will only access
-    ** or modify this field while holding a particular static mutex.
-    ** The application should never modify anything within the sqlite3_vfs
-    ** object once the object has been registered.
-    **
-    ** The zName field holds the name of the VFS module.  The name must
-    ** be unique across all VFS modules.
-    **
-    ** [[sqlite3_vfs.xOpen]
-    ** ^SQLite guarantees that the zFilename parameter to xOpen
-    ** is either a NULL pointer or string obtained
-    ** from xFullPathname() with an optional suffix added.
-    ** ^If a suffix is added to the zFilename parameter, it will
-    ** consist of a single "-" character followed by no more than
-    ** 10 alphanumeric and/or "-" characters.
-    ** ^SQLite further guarantees that
-    ** the string will be valid and unchanged until xClose() is
-    ** called. Because of the previous sentence,
-    ** the [sqlite3_file] can safely store a pointer to the
-    ** filename if it needs to remember the filename for some reason.
-    ** If the zFilename parameter to xOpen is a NULL pointer then xOpen
-    ** must invent its own temporary name for the file.  ^Whenever the 
-    ** xFilename parameter is NULL it will also be the case that the
-    ** flags parameter will include [SQLITE_OPEN_DELETEONCLOSE].
-    **
-    ** The flags argument to xOpen() includes all bits set in
-    ** the flags argument to [sqlite3_open_v2()].  Or if [sqlite3_open()]
-    ** or [sqlite3_open16()] is used, then flags includes at least
-    ** [SQLITE_OPEN_READWRITE] | [SQLITE_OPEN_CREATE]. 
-    ** If xOpen() opens a file read-only then it sets *pOutFlags to
-    ** include [SQLITE_OPEN_READONLY].  Other bits in *pOutFlags may be set.
-    **
-    ** ^(SQLite will also add one of the following flags to the xOpen()
-    ** call, depending on the object being opened:
-    **
-    ** <ul>
-    ** <li>  [SQLITE_OPEN_MAIN_DB]
-    ** <li>  [SQLITE_OPEN_MAIN_JOURNAL]
-    ** <li>  [SQLITE_OPEN_TEMP_DB]
-    ** <li>  [SQLITE_OPEN_TEMP_JOURNAL]
-    ** <li>  [SQLITE_OPEN_TRANSIENT_DB]
-    ** <li>  [SQLITE_OPEN_SUBJOURNAL]
-    ** <li>  [SQLITE_OPEN_MASTER_JOURNAL]
-    ** <li>  [SQLITE_OPEN_WAL]
-    ** </ul>)^
-    **
-    ** The file I/O implementation can use the object type flags to
-    ** change the way it deals with files.  For example, an application
-    ** that does not care about crash recovery or rollback might make
-    ** the open of a journal file a no-op.  Writes to this journal would
-    ** also be no-ops, and any attempt to read the journal would return
-    ** SQLITE_IOERR.  Or the implementation might recognize that a database
-    ** file will be doing page-aligned sector reads and writes in a random
-    ** order and set up its I/O subsystem accordingly.
-    **
-    ** SQLite might also add one of the following flags to the xOpen method:
-    **
-    ** <ul>
-    ** <li> [SQLITE_OPEN_DELETEONCLOSE]
-    ** <li> [SQLITE_OPEN_EXCLUSIVE]
-    ** </ul>
-    **
-    ** The [SQLITE_OPEN_DELETEONCLOSE] flag means the file should be
-    ** deleted when it is closed.  ^The [SQLITE_OPEN_DELETEONCLOSE]
-    ** will be set for TEMP databases and their journals, transient
-    ** databases, and subjournals.
-    **
-    ** ^The [SQLITE_OPEN_EXCLUSIVE] flag is always used in conjunction
-    ** with the [SQLITE_OPEN_CREATE] flag, which are both directly
-    ** analogous to the O_EXCL and O_CREAT flags of the POSIX open()
-    ** API.  The SQLITE_OPEN_EXCLUSIVE flag, when paired with the 
-    ** SQLITE_OPEN_CREATE, is used to indicate that file should always
-    ** be created, and that it is an error if it already exists.
-    ** It is <i>not</i> used to indicate the file should be opened 
-    ** for exclusive access.
-    **
-    ** ^At least szOsFile bytes of memory are allocated by SQLite
-    ** to hold the  [sqlite3_file] structure passed as the third
-    ** argument to xOpen.  The xOpen method does not have to
-    ** allocate the structure; it should just fill it in.  Note that
-    ** the xOpen method must set the sqlite3_file.pMethods to either
-    ** a valid [sqlite3_io_methods] object or to NULL.  xOpen must do
-    ** this even if the open fails.  SQLite expects that the sqlite3_file.pMethods
-    ** element will be valid after xOpen returns regardless of the success
-    ** or failure of the xOpen call.
-    **
-    ** [[sqlite3_vfs.xAccess]
-    ** ^The flags argument to xAccess() may be [SQLITE_ACCESS_EXISTS]
-    ** to test for the existence of a file, or [SQLITE_ACCESS_READWRITE] to
-    ** test whether a file is readable and writable, or [SQLITE_ACCESS_READ]
-    ** to test whether a file is at least readable.   The file can be a
-    ** directory.
-    **
-    ** ^SQLite will always allocate at least mxPathname+1 bytes for the
-    ** output buffer xFullPathname.  The exact size of the output buffer
-    ** is also passed as a parameter to both  methods. If the output buffer
-    ** is not large enough, [SQLITE_CANTOPEN] should be returned. Since this is
-    ** handled as a fatal error by SQLite, vfs implementations should endeavor
-    ** to prevent this by setting mxPathname to a sufficiently large value.
-    **
-    ** The xRandomness(), xSleep(), xCurrentTime(), and xCurrentTimeInt64()
-    ** interfaces are not strictly a part of the filesystem, but they are
-    ** included in the VFS structure for completeness.
-    ** The xRandomness() function attempts to return nBytes bytes
-    ** of good-quality randomness into zOut.  The return value is
-    ** the actual number of bytes of randomness obtained.
-    ** The xSleep() method causes the calling thread to sleep for at
-    ** least the number of microseconds given.  ^The xCurrentTime()
-    ** method returns a Julian Day Number for the current date and time as
-    ** a floating point value.
-    ** ^The xCurrentTimeInt64() method returns, as an integer, the Julian
-    ** Day Number multiplied by 86400000 (the number of milliseconds in 
-    ** a 24-hour day).  
-    ** ^SQLite will use the xCurrentTimeInt64() method to get the current
-    ** date and time if that method is available (if iVersion is 2 or 
-    ** greater and the function pointer is not NULL) and will fall back
-    ** to xCurrentTime() if xCurrentTimeInt64() is unavailable.
-    **
-    ** ^The xSetSystemCall(), xGetSystemCall(), and xNestSystemCall() interfaces
-    ** are not used by the SQLite core.  These optional interfaces are provided
-    ** by some VFSes to facilitate testing of the VFS code. By overriding 
-    ** system calls with functions under its control, a test program can
-    ** simulate faults and error conditions that would otherwise be difficult
-    ** or impossible to induce.  The set of system calls that can be overridden
-    ** varies from one VFS to another, and from one version of the same VFS to the
-    ** next.  Applications that use these interfaces must be prepared for any
-    ** or all of these interfaces to be NULL or for their behavior to change
-    ** from one release to the next.  Applications must not attempt to access
-    ** any of these methods if the iVersion of the VFS is less than 3.
-    */
+        ///<summary>
+/// CAPI3REF: OS Interface Object
+///
+/// An instance of the sqlite3_vfs object defines the interface between
+/// the SQLite core and the underlying operating system.  The "vfs"
+/// in the name of the object stands for "virtual file system".  See
+/// the [VFS | VFS documentation] for further information.
+///
+/// The value of the iVersion field is initially 1 but may be larger in
+/// future versions of SQLite.  Additional fields may be appended to this
+/// object when the iVersion value is increased.  Note that the structure
+/// of the sqlite3_vfs object changes in the transaction between
+/// SQLite version 3.5.9 and 3.6.0 and yet the iVersion field was not
+/// modified.
+///
+/// The szOsFile field is the size of the subclassed [sqlite3_file]
+/// structure used by this VFS.  mxPathname is the maximum length of
+/// a pathname in this VFS.
+///
+/// Registered sqlite3_vfs objects are kept on a linked list formed by
+/// the pNext pointer.  The [sqlite3_vfs_register()]
+/// and [sqlite3_vfs_unregister()] interfaces manage this list
+/// in a thread-safe way.  The [sqlite3_vfs_find()] interface
+/// searches the list.  Neither the application code nor the VFS
+/// implementation should use the pNext pointer.
+///
+/// The pNext field is the only field in the sqlite3_vfs
+/// structure that SQLite will ever modify.  SQLite will only access
+/// or modify this field while holding a particular static mutex.
+/// The application should never modify anything within the sqlite3_vfs
+/// object once the object has been registered.
+///
+/// The zName field holds the name of the VFS module.  The name must
+/// be unique across all VFS modules.
+///
+/// [[sqlite3_vfs.xOpen]
+/// ^SQLite guarantees that the zFilename parameter to xOpen
+/// is either a NULL pointer or string obtained
+/// from xFullPathname() with an optional suffix added.
+/// ^If a suffix is added to the zFilename parameter, it will
+/// consist of a single "-" character followed by no more than
+/// 10 alphanumeric and/or "-" characters.
+/// ^SQLite further guarantees that
+/// the string will be valid and unchanged until xClose() is
+/// called. Because of the previous sentence,
+/// the [sqlite3_file] can safely store a pointer to the
+/// filename if it needs to remember the filename for some reason.
+/// If the zFilename parameter to xOpen is a NULL pointer then xOpen
+/// must invent its own temporary name for the file.  ^Whenever the
+/// xFilename parameter is NULL it will also be the case that the
+/// flags parameter will include [SQLITE_OPEN_DELETEONCLOSE].
+///
+/// The flags argument to xOpen() includes all bits set in
+/// the flags argument to [sqlite3_open_v2()].  Or if [sqlite3_open()]
+/// or [sqlite3_open16()] is used, then flags includes at least
+/// [SQLITE_OPEN_READWRITE] | [SQLITE_OPEN_CREATE].
+/// If xOpen() opens a file read-only then it sets *pOutFlags to
+/// include [SQLITE_OPEN_READONLY].  Other bits in *pOutFlags may be set.
+///
+/// ^(SQLite will also add one of the following flags to the xOpen()
+/// call, depending on the object being opened:
+///
+/// <ul>
+/// <li>  [SQLITE_OPEN_MAIN_DB]
+/// <li>  [SQLITE_OPEN_MAIN_JOURNAL]
+/// <li>  [SQLITE_OPEN_TEMP_DB]
+/// <li>  [SQLITE_OPEN_TEMP_JOURNAL]
+/// <li>  [SQLITE_OPEN_TRANSIENT_DB]
+/// <li>  [SQLITE_OPEN_SUBJOURNAL]
+/// <li>  [SQLITE_OPEN_MASTER_JOURNAL]
+/// <li>  [SQLITE_OPEN_WAL]
+/// </ul>)^
+///
+/// The file I/O implementation can use the object type flags to
+/// change the way it deals with files.  For example, an application
+/// that does not care about crash recovery or rollback might make
+/// the open of a journal file a no-op.  Writes to this journal would
+/// also be no-ops, and any attempt to read the journal would return
+/// SQLITE_IOERR.  Or the implementation might recognize that a database
+/// file will be doing page-aligned sector reads and writes in a random
+/// order and set up its I/O subsystem accordingly.
+///
+/// SQLite might also add one of the following flags to the xOpen method:
+///
+/// <ul>
+/// <li> [SQLITE_OPEN_DELETEONCLOSE]
+/// <li> [SQLITE_OPEN_EXCLUSIVE]
+/// </ul>
+///
+/// The [SQLITE_OPEN_DELETEONCLOSE] flag means the file should be
+/// deleted when it is closed.  ^The [SQLITE_OPEN_DELETEONCLOSE]
+/// will be set for TEMP databases and their journals, transient
+/// databases, and subjournals.
+///
+/// ^The [SQLITE_OPEN_EXCLUSIVE] flag is always used in conjunction
+/// with the [SQLITE_OPEN_CREATE] flag, which are both directly
+/// analogous to the O_EXCL and O_CREAT flags of the POSIX open()
+/// API.  The SQLITE_OPEN_EXCLUSIVE flag, when paired with the
+/// SQLITE_OPEN_CREATE, is used to indicate that file should always
+/// be created, and that it is an error if it already exists.
+/// It is <i>not</i> used to indicate the file should be opened
+/// for exclusive access.
+///
+/// ^At least szOsFile bytes of memory are allocated by SQLite
+/// to hold the  [sqlite3_file] structure passed as the third
+/// argument to xOpen.  The xOpen method does not have to
+/// allocate the structure; it should just fill it in.  Note that
+/// the xOpen method must set the sqlite3_file.pMethods to either
+/// a valid [sqlite3_io_methods] object or to NULL.  xOpen must do
+/// this even if the open fails.  SQLite expects that the sqlite3_file.pMethods
+/// element will be valid after xOpen returns regardless of the success
+/// or failure of the xOpen call.
+///
+/// [[sqlite3_vfs.xAccess]
+/// ^The flags argument to xAccess() may be [SQLITE_ACCESS_EXISTS]
+/// to test for the existence of a file, or [SQLITE_ACCESS_READWRITE] to
+/// test whether a file is readable and writable, or [SQLITE_ACCESS_READ]
+/// to test whether a file is at least readable.   The file can be a
+/// directory.
+///
+/// ^SQLite will always allocate at least mxPathname+1 bytes for the
+/// output buffer xFullPathname.  The exact size of the output buffer
+/// is also passed as a parameter to both  methods. If the output buffer
+/// is not large enough, [SQLITE_CANTOPEN] should be returned. Since this is
+/// handled as a fatal error by SQLite, vfs implementations should endeavor
+/// to prevent this by setting mxPathname to a sufficiently large value.
+///
+/// The xRandomness(), xSleep(), xCurrentTime(), and xCurrentTimeInt64()
+/// interfaces are not strictly a part of the filesystem, but they are
+/// included in the VFS structure for completeness.
+/// The xRandomness() function attempts to return nBytes bytes
+/// of good-quality randomness into zOut.  The return value is
+/// the actual number of bytes of randomness obtained.
+/// The xSleep() method causes the calling thread to sleep for at
+/// least the number of microseconds given.  ^The xCurrentTime()
+/// method returns a Julian Day Number for the current date and time as
+/// a floating point value.
+/// ^The xCurrentTimeInt64() method returns, as an integer, the Julian
+/// Day Number multiplied by 86400000 (the number of milliseconds in
+/// a 24-hour day).
+/// ^SQLite will use the xCurrentTimeInt64() method to get the current
+/// date and time if that method is available (if iVersion is 2 or
+/// greater and the function pointer is not NULL) and will fall back
+/// to xCurrentTime() if xCurrentTimeInt64() is unavailable.
+///
+/// ^The xSetSystemCall(), xGetSystemCall(), and xNestSystemCall() interfaces
+/// are not used by the SQLite core.  These optional interfaces are provided
+/// by some VFSes to facilitate testing of the VFS code. By overriding
+/// system calls with functions under its control, a test program can
+/// simulate faults and error conditions that would otherwise be difficult
+/// or impossible to induce.  The set of system calls that can be overridden
+/// varies from one VFS to another, and from one version of the same VFS to the
+/// next.  Applications that use these interfaces must be prepared for any
+/// or all of these interfaces to be NULL or for their behavior to change
+/// from one release to the next.  Applications must not attempt to access
+/// any of these methods if the iVersion of the VFS is less than 3.
+///
+///</summary>
         //typedef struct sqlite3_vfs sqlite3_vfs;
         //typedef void (*sqlite3_syscall_ptr)(void);
         //struct sqlite3_vfs {
@@ -1458,75 +1461,76 @@ namespace Community.CsharpSqlite
     */
         //SQLITE_API int sqlite3_db_config(sqlite3*, int op, ...);
 
-        /*
-    ** CAPI3REF: Memory Allocation Routines
-    **
-    ** An instance of this object defines the interface between SQLite
-    ** and low-level memory allocation routines.
-    **
-    ** This object is used in only one place in the SQLite interface.
-    ** A pointer to an instance of this object is the argument to
-    ** [sqlite3_config()] when the configuration option is
-    ** [SQLITE_CONFIG_MALLOC] or [SQLITE_CONFIG_GETMALLOC].  
-    ** By creating an instance of this object
-    ** and passing it to [sqlite3_config]([SQLITE_CONFIG_MALLOC])
-    ** during configuration, an application can specify an alternative
-    ** memory allocation subsystem for SQLite to use for all of its
-    ** dynamic memory needs.
-    **
-    ** Note that SQLite comes with several [built-in memory allocators]
-    ** that are perfectly adequate for the overwhelming majority of applications
-    ** and that this object is only useful to a tiny minority of applications
-    ** with specialized memory allocation requirements.  This object is
-    ** also used during testing of SQLite in order to specify an alternative
-    ** memory allocator that simulates memory out-of-memory conditions in
-    ** order to verify that SQLite recovers gracefully from such
-    ** conditions.
-    **
-    ** The xMalloc and xFree methods must work like the
-    ** malloc() and free() functions from the standard C library.
-    ** The xRealloc method must work like realloc() from the standard C library
-    ** with the exception that if the second argument to xRealloc is zero,
-    ** xRealloc must be a no-op - it must not perform any allocation or
-    ** deallocation.  ^SQLite guarantees that the second argument to
-    ** xRealloc is always a value returned by a prior call to xRoundup.
-    ** And so in cases where xRoundup always returns a positive number,
-    ** xRealloc can perform exactly as the standard library realloc() and
-    ** still be in compliance with this specification.
-    **
-    ** xSize should return the allocated size of a memory allocation
-    ** previously obtained from xMalloc or xRealloc.  The allocated size
-    ** is always at least as big as the requested size but may be larger.
-    **
-    ** The xRoundup method returns what would be the allocated size of
-    ** a memory allocation given a particular requested size.  Most memory
-    ** allocators round up memory allocations at least to the next multiple
-    ** of 8.  Some allocators round up to a larger multiple or to a power of 2.
-    ** Every memory allocation request coming in through [sqlite3_malloc()]
-    ** or [sqlite3_realloc()] first calls xRoundup.  If xRoundup returns 0, 
-    ** that causes the corresponding memory allocation to fail.
-    **
-    ** The xInit method initializes the memory allocator.  (For example,
-    ** it might allocate any require mutexes or initialize internal data
-    ** structures.  The xShutdown method is invoked (indirectly) by
-    ** [sqlite3_shutdown()] and should deallocate any resources acquired
-    ** by xInit.  The pAppData pointer is used as the only parameter to
-    ** xInit and xShutdown.
-    **
-    ** SQLite holds the [SQLITE_MUTEX_STATIC_MASTER] mutex when it invokes
-    ** the xInit method, so the xInit method need not be threadsafe.  The
-    ** xShutdown method is only called from [sqlite3_shutdown()] so it does
-    ** not need to be threadsafe either.  For all other methods, SQLite
-    ** holds the [SQLITE_MUTEX_STATIC_MEM] mutex as long as the
-    ** [SQLITE_CONFIG_MEMSTATUS] configuration option is turned on (which
-    ** it is by default) and so the methods are automatically serialized.
-    ** However, if [SQLITE_CONFIG_MEMSTATUS] is disabled, then the other
-    ** methods must be threadsafe or else make their own arrangements for
-    ** serialization.
-    **
-    ** SQLite will never invoke xInit() more than once without an intervening
-    ** call to xShutdown().
-    */
+        ///<summary>
+/// CAPI3REF: Memory Allocation Routines
+///
+/// An instance of this object defines the interface between SQLite
+/// and low-level memory allocation routines.
+///
+/// This object is used in only one place in the SQLite interface.
+/// A pointer to an instance of this object is the argument to
+/// [sqlite3_config()] when the configuration option is
+/// [SQLITE_CONFIG_MALLOC] or [SQLITE_CONFIG_GETMALLOC].
+/// By creating an instance of this object
+/// and passing it to [sqlite3_config]([SQLITE_CONFIG_MALLOC])
+/// during configuration, an application can specify an alternative
+/// memory allocation subsystem for SQLite to use for all of its
+/// dynamic memory needs.
+///
+/// Note that SQLite comes with several [built-in memory allocators]
+/// that are perfectly adequate for the overwhelming majority of applications
+/// and that this object is only useful to a tiny minority of applications
+/// with specialized memory allocation requirements.  This object is
+/// also used during testing of SQLite in order to specify an alternative
+/// memory allocator that simulates memory out-of-memory conditions in
+/// order to verify that SQLite recovers gracefully from such
+/// conditions.
+///
+/// The xMalloc and xFree methods must work like the
+/// malloc() and free() functions from the standard C library.
+/// The xRealloc method must work like realloc() from the standard C library
+/// with the exception that if the second argument to xRealloc is zero,
+/// xRealloc must be a no-op - it must not perform any allocation or
+/// deallocation.  ^SQLite guarantees that the second argument to
+/// xRealloc is always a value returned by a prior call to xRoundup.
+/// And so in cases where xRoundup always returns a positive number,
+/// xRealloc can perform exactly as the standard library realloc() and
+/// still be in compliance with this specification.
+///
+/// xSize should return the allocated size of a memory allocation
+/// previously obtained from xMalloc or xRealloc.  The allocated size
+/// is always at least as big as the requested size but may be larger.
+///
+/// The xRoundup method returns what would be the allocated size of
+/// a memory allocation given a particular requested size.  Most memory
+/// allocators round up memory allocations at least to the next multiple
+/// of 8.  Some allocators round up to a larger multiple or to a power of 2.
+/// Every memory allocation request coming in through [sqlite3_malloc()]
+/// or [sqlite3_realloc()] first calls xRoundup.  If xRoundup returns 0,
+/// that causes the corresponding memory allocation to fail.
+///
+/// The xInit method initializes the memory allocator.  (For example,
+/// it might allocate any require mutexes or initialize internal data
+/// structures.  The xShutdown method is invoked (indirectly) by
+/// [sqlite3_shutdown()] and should deallocate any resources acquired
+/// by xInit.  The pAppData pointer is used as the only parameter to
+/// xInit and xShutdown.
+///
+/// SQLite holds the [SQLITE_MUTEX_STATIC_MASTER] mutex when it invokes
+/// the xInit method, so the xInit method need not be threadsafe.  The
+/// xShutdown method is only called from [sqlite3_shutdown()] so it does
+/// not need to be threadsafe either.  For all other methods, SQLite
+/// holds the [SQLITE_MUTEX_STATIC_MEM] mutex as long as the
+/// [SQLITE_CONFIG_MEMSTATUS] configuration option is turned on (which
+/// it is by default) and so the methods are automatically serialized.
+/// However, if [SQLITE_CONFIG_MEMSTATUS] is disabled, then the other
+/// methods must be threadsafe or else make their own arrangements for
+/// serialization.
+///
+/// SQLite will never invoke xInit() more than once without an intervening
+/// call to xShutdown().
+///
+///</summary>
         //typedef struct sqlite3_mem_methods sqlite3_mem_methods;
         //struct sqlite3_mem_methods {
         //  void *(*xMalloc)(int);         /* Memory allocation function */
@@ -5139,22 +5143,23 @@ namespace Community.CsharpSqlite
     //typedef struct sqlite3_vtab_cursor sqlite3_vtab_cursor;
     //typedef struct sqlite3_module sqlite3_module;
 
-    /*
-    ** CAPI3REF: Virtual Table Object
-    ** KEYWORDS: sqlite3_module {virtual table module}
-    **
-    ** This structure, sometimes called a "virtual table module", 
-    ** defines the implementation of a [virtual tables].  
-    ** This structure consists mostly of methods for the module.
-    **
-    ** ^A virtual table module is created by filling in a persistent
-    ** instance of this structure and passing a pointer to that instance
-    ** to [sqlite3_create_module()] or [sqlite3_create_module_v2()].
-    ** ^The registration remains valid until it is replaced by a different
-    ** module or until the [database connection] closes.  The content
-    ** of this structure must not change while it is registered with
-    ** any database connection.
-    */
+    ///<summary>
+/// CAPI3REF: Virtual Table Object
+/// KEYWORDS: sqlite3_module {virtual table module}
+///
+/// This structure, sometimes called a "virtual table module",
+/// defines the implementation of a [virtual tables].
+/// This structure consists mostly of methods for the module.
+///
+/// ^A virtual table module is created by filling in a persistent
+/// instance of this structure and passing a pointer to that instance
+/// to [sqlite3_create_module()] or [sqlite3_create_module_v2()].
+/// ^The registration remains valid until it is replaced by a different
+/// module or until the [database connection] closes.  The content
+/// of this structure must not change while it is registered with
+/// any database connection.
+///
+///</summary>
     //struct sqlite3_module {
     //  int iVersion;
     //  int (*xCreate)(sqlite3*, object  *pAux,
@@ -5319,59 +5324,60 @@ namespace Community.CsharpSqlite
     }
 
 
-    /*
-    ** CAPI3REF: Virtual Table Indexing Information
-    ** KEYWORDS: sqlite3_index_info
-    **
-    ** The sqlite3_index_info structure and its substructures is used as part
-    ** of the [virtual table] interface to
-    ** pass information into and receive the reply from the [xBestIndex]
-    ** method of a [virtual table module].  The fields under **Inputs** are the
-    ** inputs to xBestIndex and are read-only.  xBestIndex inserts its
-    ** results into the **Outputs** fields.
-    **
-    ** ^(The aConstraint[] array records WHERE clause constraints of the form:
-    **
-    ** <blockquote>column OP expr</blockquote>
-    **
-    ** where OP is =, &lt;, &lt;=, &gt;, or &gt;=.)^  ^(The particular operator is
-    ** stored in aConstraint[].op using one of the
-    ** [SQLITE_INDEX_CONSTRAINT_EQ | SQLITE_INDEX_CONSTRAINT_ values].)^
-    ** ^(The index of the column is stored in
-    ** aConstraint[].iColumn.)^  ^(aConstraint[].usable is TRUE if the
-    ** expr on the right-hand side can be evaluated (and thus the constraint
-    ** is usable) and false if it cannot.)^
-    **
-    ** ^The optimizer automatically inverts terms of the form "expr OP column"
-    ** and makes other simplifications to the WHERE clause in an attempt to
-    ** get as many WHERE clause terms into the form shown above as possible.
-    ** ^The aConstraint[] array only reports WHERE clause terms that are
-    ** relevant to the particular virtual table being queried.
-    **
-    ** ^Information about the ORDER BY clause is stored in aOrderBy[].
-    ** ^Each term of aOrderBy records a column of the ORDER BY clause.
-    **
-    ** The [xBestIndex] method must fill aConstraintUsage[] with information
-    ** about what parameters to pass to xFilter.  ^If argvIndex>0 then
-    ** the right-hand side of the corresponding aConstraint[] is evaluated
-    ** and becomes the argvIndex-th entry in argv.  ^(If aConstraintUsage[].omit
-    ** is true, then the constraint is assumed to be fully handled by the
-    ** virtual table and is not checked again by SQLite.)^
-    **
-    ** ^The idxNum and idxPtr values are recorded and passed into the
-    ** [xFilter] method.
-    ** ^[sqlite3_free()] is used to free idxPtr if and only if
-    ** needToFreeIdxPtr is true.
-    **
-    ** ^The orderByConsumed means that output from [xFilter]/[xNext] will occur in
-    ** the correct order to satisfy the ORDER BY clause so that no separate
-    ** sorting step is required.
-    **
-    ** ^The estimatedCost value is an estimate of the cost of doing the
-    ** particular lookup.  A full scan of a table with N entries should have
-    ** a cost of N.  A binary search of a table of N entries should have a
-    ** cost of approximately log(N).
-    */
+    ///<summary>
+/// CAPI3REF: Virtual Table Indexing Information
+/// KEYWORDS: sqlite3_index_info
+///
+/// The sqlite3_index_info structure and its substructures is used as part
+/// of the [virtual table] interface to
+/// pass information into and receive the reply from the [xBestIndex]
+/// method of a [virtual table module].  The fields under **Inputs** are the
+/// inputs to xBestIndex and are read-only.  xBestIndex inserts its
+/// results into the **Outputs** fields.
+///
+/// ^(The aConstraint[] array records WHERE clause constraints of the form:
+///
+/// <blockquote>column OP expr</blockquote>
+///
+/// where OP is =, &lt;, &lt;=, &gt;, or &gt;=.)^  ^(The particular operator is
+/// stored in aConstraint[].op using one of the
+/// [SQLITE_INDEX_CONSTRAINT_EQ | SQLITE_INDEX_CONSTRAINT_ values].)^
+/// ^(The index of the column is stored in
+/// aConstraint[].iColumn.)^  ^(aConstraint[].usable is TRUE if the
+/// expr on the right-hand side can be evaluated (and thus the constraint
+/// is usable) and false if it cannot.)^
+///
+/// ^The optimizer automatically inverts terms of the form "expr OP column"
+/// and makes other simplifications to the WHERE clause in an attempt to
+/// get as many WHERE clause terms into the form shown above as possible.
+/// ^The aConstraint[] array only reports WHERE clause terms that are
+/// relevant to the particular virtual table being queried.
+///
+/// ^Information about the ORDER BY clause is stored in aOrderBy[].
+/// ^Each term of aOrderBy records a column of the ORDER BY clause.
+///
+/// The [xBestIndex] method must fill aConstraintUsage[] with information
+/// about what parameters to pass to xFilter.  ^If argvIndex>0 then
+/// the right-hand side of the corresponding aConstraint[] is evaluated
+/// and becomes the argvIndex-th entry in argv.  ^(If aConstraintUsage[].omit
+/// is true, then the constraint is assumed to be fully handled by the
+/// virtual table and is not checked again by SQLite.)^
+///
+/// ^The idxNum and idxPtr values are recorded and passed into the
+/// [xFilter] method.
+/// ^[sqlite3_free()] is used to free idxPtr if and only if
+/// needToFreeIdxPtr is true.
+///
+/// ^The orderByConsumed means that output from [xFilter]/[xNext] will occur in
+/// the correct order to satisfy the ORDER BY clause so that no separate
+/// sorting step is required.
+///
+/// ^The estimatedCost value is an estimate of the cost of doing the
+/// particular lookup.  A full scan of a table with N entries should have
+/// a cost of N.  A binary search of a table of N entries should have a
+/// cost of approximately log(N).
+///
+///</summary>
     //struct sqlite3_index_info {
     //  /* Inputs */
     //  int nConstraint;           /* Number of entries in aConstraint */
@@ -5493,24 +5499,25 @@ namespace Community.CsharpSqlite
     //  void(*xDestroy)(void)     /* Module destructor function */
     //);
 
-    /*
-    ** CAPI3REF: Virtual Table Instance Object
-    ** KEYWORDS: sqlite3_vtab
-    **
-    ** Every [virtual table module] implementation uses a subclass
-    ** of this object to describe a particular instance
-    ** of the [virtual table].  Each subclass will
-    ** be tailored to the specific needs of the module implementation.
-    ** The purpose of this superclass is to define certain fields that are
-    ** common to all module implementations.
-    **
-    ** ^Virtual tables methods can set an error message by assigning a
-    ** string obtained from [sqlite3_mprintf()] to zErrMsg.  The method should
-    ** take care that any prior string is freed by a call to [sqlite3_free()]
-    ** prior to assigning a new string to zErrMsg.  ^After the error message
-    ** is delivered up to the client application, the string will be automatically
-    ** freed by sqlite3_free() and the zErrMsg field will be zeroed.
-    */
+    ///<summary>
+/// CAPI3REF: Virtual Table Instance Object
+/// KEYWORDS: sqlite3_vtab
+///
+/// Every [virtual table module] implementation uses a subclass
+/// of this object to describe a particular instance
+/// of the [virtual table].  Each subclass will
+/// be tailored to the specific needs of the module implementation.
+/// The purpose of this superclass is to define certain fields that are
+/// common to all module implementations.
+///
+/// ^Virtual tables methods can set an error message by assigning a
+/// string obtained from [sqlite3_mprintf()] to zErrMsg.  The method should
+/// take care that any prior string is freed by a call to [sqlite3_free()]
+/// prior to assigning a new string to zErrMsg.  ^After the error message
+/// is delivered up to the client application, the string will be automatically
+/// freed by sqlite3_free() and the zErrMsg field will be zeroed.
+///
+///</summary>
     //struct sqlite3_vtab {
     //  const sqlite3_module *pModule;  /* The module for this virtual table */
     //  int nRef;                       /* NO LONGER USED */
@@ -5525,23 +5532,24 @@ namespace Community.CsharpSqlite
       /* Virtual table implementations will typically add additional fields */
     };
 
-    /*
-    ** CAPI3REF: Virtual Table Cursor Object
-    ** KEYWORDS: sqlite3_vtab_cursor {virtual table cursor}
-    **
-    ** Every [virtual table module] implementation uses a subclass of the
-    ** following structure to describe cursors that point into the
-    ** [virtual table] and are used
-    ** to loop through the virtual table.  Cursors are created using the
-    ** [sqlite3_module.xOpen | xOpen] method of the module and are destroyed
-    ** by the [sqlite3_module.xClose | xClose] method.  Cursors are used
-    ** by the [xFilter], [xNext], [xEof], [xColumn], and [xRowid] methods
-    ** of the module.  Each module implementation will define
-    ** the content of a cursor structure to suit its own needs.
-    **
-    ** This superclass exists in order to define fields of the cursor that
-    ** are common to all implementations.
-    */
+    ///<summary>
+/// CAPI3REF: Virtual Table Cursor Object
+/// KEYWORDS: sqlite3_vtab_cursor {virtual table cursor}
+///
+/// Every [virtual table module] implementation uses a subclass of the
+/// following structure to describe cursors that point into the
+/// [virtual table] and are used
+/// to loop through the virtual table.  Cursors are created using the
+/// [sqlite3_module.xOpen | xOpen] method of the module and are destroyed
+/// by the [sqlite3_module.xClose | xClose] method.  Cursors are used
+/// by the [xFilter], [xNext], [xEof], [xColumn], and [xRowid] methods
+/// of the module.  Each module implementation will define
+/// the content of a cursor structure to suit its own needs.
+///
+/// This superclass exists in order to define fields of the cursor that
+/// are common to all implementations.
+///
+///</summary>
     //struct sqlite3_vtab_cursor {
     //  sqlite3_vtab *pVtab;      /* Virtual table of this cursor */
     //  /* Virtual table implementations will typically add additional fields */
@@ -5952,71 +5960,72 @@ namespace Community.CsharpSqlite
     //SQLITE_API int sqlite3_mutex_try(sqlite3_mutex);
     //SQLITE_API void sqlite3_mutex_leave(sqlite3_mutex);
 
-    /*
-    ** CAPI3REF: Mutex Methods Object
-    **
-    ** An instance of this structure defines the low-level routines
-    ** used to allocate and use mutexes.
-    **
-    ** Usually, the default mutex implementations provided by SQLite are
-    ** sufficient, however the user has the option of substituting a custom
-    ** implementation for specialized deployments or systems for which SQLite
-    ** does not provide a suitable implementation. In this case, the user
-    ** creates and populates an instance of this structure to pass
-    ** to sqlite3_config() along with the [SQLITE_CONFIG_MUTEX] option.
-    ** Additionally, an instance of this structure can be used as an
-    ** output variable when querying the system for the current mutex
-    ** implementation, using the [SQLITE_CONFIG_GETMUTEX] option.
-    **
-    ** ^The xMutexInit method defined by this structure is invoked as
-    ** part of system initialization by the sqlite3_initialize() function.
-    ** ^The xMutexInit routine is called by SQLite exactly once for each
-    ** effective call to [sqlite3_initialize()].
-    **
-    ** ^The xMutexEnd method defined by this structure is invoked as
-    ** part of system shutdown by the sqlite3_shutdown() function. The
-    ** implementation of this method is expected to release all outstanding
-    ** resources obtained by the mutex methods implementation, especially
-    ** those obtained by the xMutexInit method.  ^The xMutexEnd()
-    ** interface is invoked exactly once for each call to [sqlite3_shutdown()].
-    **
-    ** ^(The remaining seven methods defined by this structure (xMutexAlloc,
-    ** xMutexFree, xMutexEnter, xMutexTry, xMutexLeave, xMutexHeld and
-    ** xMutexNotheld) implement the following interfaces (respectively):
-    **
-    ** <ul>
-    **   <li>  [sqlite3_mutex_alloc()] </li>
-    **   <li>  [sqlite3_mutex_free()] </li>
-    **   <li>  [sqlite3_mutex_enter()] </li>
-    **   <li>  [sqlite3_mutex_try()] </li>
-    **   <li>  [sqlite3_mutex_leave()] </li>
-    **   <li>  [sqlite3_mutex_held()] </li>
-    **   <li>  [sqlite3_mutex_notheld()] </li>
-    ** </ul>)^
-    **
-    ** The only difference is that the public sqlite3_XXX functions enumerated
-    ** above silently ignore any invocations that pass a NULL pointer instead
-    ** of a valid mutex handle. The implementations of the methods defined
-    ** by this structure are not required to handle this case, the results
-    ** of passing a NULL pointer instead of a valid mutex handle are undefined
-    ** (i.e. it is acceptable to provide an implementation that segfaults if
-    ** it is passed a NULL pointer).
-    **
-    ** The xMutexInit() method must be threadsafe.  ^It must be harmless to
-    ** invoke xMutexInit() multiple times within the same process and without
-    ** intervening calls to xMutexEnd().  Second and subsequent calls to
-    ** xMutexInit() must be no-ops.
-    **
-    ** ^xMutexInit() must not use SQLite memory allocation ([sqlite3_malloc()]
-    ** and its associates).  ^Similarly, xMutexAlloc() must not use SQLite memory
-    ** allocation for a static mutex.  ^However xMutexAlloc() may use SQLite
-    ** memory allocation for a fast or recursive mutex.
-    **
-    ** ^SQLite will invoke the xMutexEnd() method when [sqlite3_shutdown()] is
-    ** called, but only if the prior call to xMutexInit returned SQLITE_OK.
-    ** If xMutexInit fails in any way, it is expected to clean up after itself
-    ** prior to returning.
-    */
+    ///<summary>
+/// CAPI3REF: Mutex Methods Object
+///
+/// An instance of this structure defines the low-level routines
+/// used to allocate and use mutexes.
+///
+/// Usually, the default mutex implementations provided by SQLite are
+/// sufficient, however the user has the option of substituting a custom
+/// implementation for specialized deployments or systems for which SQLite
+/// does not provide a suitable implementation. In this case, the user
+/// creates and populates an instance of this structure to pass
+/// to sqlite3_config() along with the [SQLITE_CONFIG_MUTEX] option.
+/// Additionally, an instance of this structure can be used as an
+/// output variable when querying the system for the current mutex
+/// implementation, using the [SQLITE_CONFIG_GETMUTEX] option.
+///
+/// ^The xMutexInit method defined by this structure is invoked as
+/// part of system initialization by the sqlite3_initialize() function.
+/// ^The xMutexInit routine is called by SQLite exactly once for each
+/// effective call to [sqlite3_initialize()].
+///
+/// ^The xMutexEnd method defined by this structure is invoked as
+/// part of system shutdown by the sqlite3_shutdown() function. The
+/// implementation of this method is expected to release all outstanding
+/// resources obtained by the mutex methods implementation, especially
+/// those obtained by the xMutexInit method.  ^The xMutexEnd()
+/// interface is invoked exactly once for each call to [sqlite3_shutdown()].
+///
+/// ^(The remaining seven methods defined by this structure (xMutexAlloc,
+/// xMutexFree, xMutexEnter, xMutexTry, xMutexLeave, xMutexHeld and
+/// xMutexNotheld) implement the following interfaces (respectively):
+///
+/// <ul>
+///   <li>  [sqlite3_mutex_alloc()] </li>
+///   <li>  [sqlite3_mutex_free()] </li>
+///   <li>  [sqlite3_mutex_enter()] </li>
+///   <li>  [sqlite3_mutex_try()] </li>
+///   <li>  [sqlite3_mutex_leave()] </li>
+///   <li>  [sqlite3_mutex_held()] </li>
+///   <li>  [sqlite3_mutex_notheld()] </li>
+/// </ul>)^
+///
+/// The only difference is that the public sqlite3_XXX functions enumerated
+/// above silently ignore any invocations that pass a NULL pointer instead
+/// of a valid mutex handle. The implementations of the methods defined
+/// by this structure are not required to handle this case, the results
+/// of passing a NULL pointer instead of a valid mutex handle are undefined
+/// (i.e. it is acceptable to provide an implementation that segfaults if
+/// it is passed a NULL pointer).
+///
+/// The xMutexInit() method must be threadsafe.  ^It must be harmless to
+/// invoke xMutexInit() multiple times within the same process and without
+/// intervening calls to xMutexEnd().  Second and subsequent calls to
+/// xMutexInit() must be no-ops.
+///
+/// ^xMutexInit() must not use SQLite memory allocation ([sqlite3_malloc()]
+/// and its associates).  ^Similarly, xMutexAlloc() must not use SQLite memory
+/// allocation for a static mutex.  ^However xMutexAlloc() may use SQLite
+/// memory allocation for a fast or recursive mutex.
+///
+/// ^SQLite will invoke the xMutexEnd() method when [sqlite3_shutdown()] is
+/// called, but only if the prior call to xMutexInit returned SQLITE_OK.
+/// If xMutexInit fails in any way, it is expected to clean up after itself
+/// prior to returning.
+///
+///</summary>
     //typedef struct sqlite3_mutex_methods sqlite3_mutex_methods;
     //struct sqlite3_mutex_methods {
     //  int (*xMutexInit)(void);
@@ -6570,156 +6579,157 @@ namespace Community.CsharpSqlite
     */
     //typedef struct sqlite3_pcache sqlite3_pcache;
 
-    /*
-    ** CAPI3REF: Application Defined Page Cache.
-    ** KEYWORDS: {page cache}
-    **
-    ** ^(The [sqlite3_config]([SQLITE_CONFIG_PCACHE], ...) interface can
-    ** register an alternative page cache implementation by passing in an 
-    ** instance of the sqlite3_pcache_methods structure.)^
-    ** In many applications, most of the heap memory allocated by 
-    ** SQLite is used for the page cache.
-    ** By implementing a 
-    ** custom page cache using this API, an application can better control
-    ** the amount of memory consumed by SQLite, the way in which 
-    ** that memory is allocated and released, and the policies used to 
-    ** determine exactly which parts of a database file are cached and for 
-    ** how long.
-    **
-    ** The alternative page cache mechanism is an
-    ** extreme measure that is only needed by the most demanding applications.
-    ** The built-in page cache is recommended for most uses.
-    **
-    ** ^(The contents of the sqlite3_pcache_methods structure are copied to an
-    ** internal buffer by SQLite within the call to [sqlite3_config].  Hence
-    ** the application may discard the parameter after the call to
-    ** [sqlite3_config()] returns.)^
-    **
-    ** [[the xInit() page cache method]]
-    ** ^(The xInit() method is called once for each effective 
-    ** call to [sqlite3_initialize()])^
-    ** (usually only once during the lifetime of the process). ^(The xInit()
-    ** method is passed a copy of the sqlite3_pcache_methods.pArg value.)^
-    ** The intent of the xInit() method is to set up global data structures 
-    ** required by the custom page cache implementation. 
-    ** ^(If the xInit() method is NULL, then the 
-    ** built-in default page cache is used instead of the application defined
-    ** page cache.)^
-    **
-    ** [[the xShutdown() page cache method]]
-    ** ^The xShutdown() method is called by [sqlite3_shutdown()].
-    ** It can be used to clean up 
-    ** any outstanding resources before process shutdown, if required.
-    ** ^The xShutdown() method may be NULL.
-    **
-    ** ^SQLite automatically serializes calls to the xInit method,
-    ** so the xInit method need not be threadsafe.  ^The
-    ** xShutdown method is only called from [sqlite3_shutdown()] so it does
-    ** not need to be threadsafe either.  All other methods must be threadsafe
-    ** in multithreaded applications.
-    **
-    ** ^SQLite will never invoke xInit() more than once without an intervening
-    ** call to xShutdown().
-    **
-    ** [[the xCreate() page cache methods]]
-    ** ^SQLite invokes the xCreate() method to construct a new cache instance.
-    ** SQLite will typically create one cache instance for each open database file,
-    ** though this is not guaranteed. ^The
-    ** first parameter, szPage, is the size in bytes of the pages that must
-    ** be allocated by the cache.  ^szPage will not be a power of two.  ^szPage
-    ** will the page size of the database file that is to be cached plus an
-    ** increment (here called "R") of less than 250.  SQLite will use the
-    ** extra R bytes on each page to store metadata about the underlying
-    ** database page on disk.  The value of R depends
-    ** on the SQLite version, the target platform, and how SQLite was compiled.
-    ** ^(R is constant for a particular build of SQLite. Except, there are two
-    ** distinct values of R when SQLite is compiled with the proprietary
-    ** ZIPVFS extension.)^  ^The second argument to
-    ** xCreate(), bPurgeable, is true if the cache being created will
-    ** be used to cache database pages of a file stored on disk, or
-    ** false if it is used for an in-memory database. The cache implementation
-    ** does not have to do anything special based with the value of bPurgeable;
-    ** it is purely advisory.  ^On a cache where bPurgeable is false, SQLite will
-    ** never invoke xUnpin() except to deliberately delete a page.
-    ** ^In other words, calls to xUnpin() on a cache with bPurgeable set to
-    ** false will always have the "discard" flag set to true.  
-    ** ^Hence, a cache created with bPurgeable false will
-    ** never contain any unpinned pages.
-    **
-    ** [[the xCachesize() page cache method]]
-    ** ^(The xCachesize() method may be called at any time by SQLite to set the
-    ** suggested maximum cache-size (number of pages stored by) the cache
-    ** instance passed as the first argument. This is the value configured using
-    ** the SQLite "[PRAGMA cache_size]" command.)^  As with the bPurgeable
-    ** parameter, the implementation is not required to do anything with this
-    ** value; it is advisory only.
-    **
-    ** [[the xPagecount() page cache methods]]
-    ** The xPagecount() method must return the number of pages currently
-    ** stored in the cache, both pinned and unpinned.
-    ** 
-    ** [[the xFetch() page cache methods]]
-    ** The xFetch() method locates a page in the cache and returns a pointer to 
-    ** the page, or a NULL pointer.
-    ** A "page", in this context, means a buffer of szPage bytes aligned at an
-    ** 8-byte boundary. The page to be fetched is determined by the key. ^The
-    ** minimum key value is 1.  After it has been retrieved using xFetch, the page 
-    ** is considered to be "pinned".
-    **
-    ** If the requested page is already in the page cache, then the page cache
-    ** implementation must return a pointer to the page buffer with its content
-    ** intact.  If the requested page is not already in the cache, then the
-    ** cache implementation should use the value of the createFlag
-    ** parameter to help it determined what action to take:
-    **
-    ** <table border=1 width=85% align=center>
-    ** <tr><th> createFlag <th> Behaviour when page is not already in cache
-    ** <tr><td> 0 <td> Do not allocate a new page.  Return NULL.
-    ** <tr><td> 1 <td> Allocate a new page if it easy and convenient to do so.
-    **                 Otherwise return NULL.
-    ** <tr><td> 2 <td> Make every effort to allocate a new page.  Only return
-    **                 NULL if allocating a new page is effectively impossible.
-    ** </table>
-    **
-    ** ^(SQLite will normally invoke xFetch() with a createFlag of 0 or 1.  SQLite
-    ** will only use a createFlag of 2 after a prior call with a createFlag of 1
-    ** failed.)^  In between the to xFetch() calls, SQLite may
-    ** attempt to unpin one or more cache pages by spilling the content of
-    ** pinned pages to disk and synching the operating system disk cache.
-    **
-    ** [[the xUnpin() page cache method]]
-    ** ^xUnpin() is called by SQLite with a pointer to a currently pinned page
-    ** as its second argument.  If the third parameter, discard, is non-zero,
-    ** then the page must be evicted from the cache.
-    ** ^If the discard parameter is
-    ** zero, then the page may be discarded or retained at the discretion of
-    ** page cache implementation. ^The page cache implementation
-    ** may choose to evict unpinned pages at any time.
-    **
-    ** The cache must not perform any reference counting. A single 
-    ** call to xUnpin() unpins the page regardless of the number of prior calls 
-    ** to xFetch().
-    **
-    ** [[the xRekey() page cache methods]]
-    ** The xRekey() method is used to change the key value associated with the
-    ** page passed as the second argument. If the cache
-    ** previously contains an entry associated with newKey, it must be
-    ** discarded. ^Any prior cache entry associated with newKey is guaranteed not
-    ** to be pinned.
-    **
-    ** When SQLite calls the xTruncate() method, the cache must discard all
-    ** existing cache entries with page numbers (keys) greater than or equal
-    ** to the value of the iLimit parameter passed to xTruncate(). If any
-    ** of these pages are pinned, they are implicitly unpinned, meaning that
-    ** they can be safely discarded.
-    **
-    ** [[the xDestroy() page cache method]]
-    ** ^The xDestroy() method is used to delete a cache allocated by xCreate().
-    ** All resources associated with the specified cache should be freed. ^After
-    ** calling the xDestroy() method, SQLite considers the [sqlite3_pcache*]
-    ** handle invalid, and will not use it with any other sqlite3_pcache_methods
-    ** functions.
-    */
+    ///<summary>
+/// CAPI3REF: Application Defined Page Cache.
+/// KEYWORDS: {page cache}
+///
+/// ^(The [sqlite3_config]([SQLITE_CONFIG_PCACHE], ...) interface can
+/// register an alternative page cache implementation by passing in an
+/// instance of the sqlite3_pcache_methods structure.)^
+/// In many applications, most of the heap memory allocated by
+/// SQLite is used for the page cache.
+/// By implementing a
+/// custom page cache using this API, an application can better control
+/// the amount of memory consumed by SQLite, the way in which
+/// that memory is allocated and released, and the policies used to
+/// determine exactly which parts of a database file are cached and for
+/// how long.
+///
+/// The alternative page cache mechanism is an
+/// extreme measure that is only needed by the most demanding applications.
+/// The built-in page cache is recommended for most uses.
+///
+/// ^(The contents of the sqlite3_pcache_methods structure are copied to an
+/// internal buffer by SQLite within the call to [sqlite3_config].  Hence
+/// the application may discard the parameter after the call to
+/// [sqlite3_config()] returns.)^
+///
+/// [[the xInit() page cache method]]
+/// ^(The xInit() method is called once for each effective
+/// call to [sqlite3_initialize()])^
+/// (usually only once during the lifetime of the process). ^(The xInit()
+/// method is passed a copy of the sqlite3_pcache_methods.pArg value.)^
+/// The intent of the xInit() method is to set up global data structures
+/// required by the custom page cache implementation.
+/// ^(If the xInit() method is NULL, then the
+/// built-in default page cache is used instead of the application defined
+/// page cache.)^
+///
+/// [[the xShutdown() page cache method]]
+/// ^The xShutdown() method is called by [sqlite3_shutdown()].
+/// It can be used to clean up
+/// any outstanding resources before process shutdown, if required.
+/// ^The xShutdown() method may be NULL.
+///
+/// ^SQLite automatically serializes calls to the xInit method,
+/// so the xInit method need not be threadsafe.  ^The
+/// xShutdown method is only called from [sqlite3_shutdown()] so it does
+/// not need to be threadsafe either.  All other methods must be threadsafe
+/// in multithreaded applications.
+///
+/// ^SQLite will never invoke xInit() more than once without an intervening
+/// call to xShutdown().
+///
+/// [[the xCreate() page cache methods]]
+/// ^SQLite invokes the xCreate() method to construct a new cache instance.
+/// SQLite will typically create one cache instance for each open database file,
+/// though this is not guaranteed. ^The
+/// first parameter, szPage, is the size in bytes of the pages that must
+/// be allocated by the cache.  ^szPage will not be a power of two.  ^szPage
+/// will the page size of the database file that is to be cached plus an
+/// increment (here called "R") of less than 250.  SQLite will use the
+/// extra R bytes on each page to store metadata about the underlying
+/// database page on disk.  The value of R depends
+/// on the SQLite version, the target platform, and how SQLite was compiled.
+/// ^(R is constant for a particular build of SQLite. Except, there are two
+/// distinct values of R when SQLite is compiled with the proprietary
+/// ZIPVFS extension.)^  ^The second argument to
+/// xCreate(), bPurgeable, is true if the cache being created will
+/// be used to cache database pages of a file stored on disk, or
+/// false if it is used for an in-memory database. The cache implementation
+/// does not have to do anything special based with the value of bPurgeable;
+/// it is purely advisory.  ^On a cache where bPurgeable is false, SQLite will
+/// never invoke xUnpin() except to deliberately delete a page.
+/// ^In other words, calls to xUnpin() on a cache with bPurgeable set to
+/// false will always have the "discard" flag set to true.
+/// ^Hence, a cache created with bPurgeable false will
+/// never contain any unpinned pages.
+///
+/// [[the xCachesize() page cache method]]
+/// ^(The xCachesize() method may be called at any time by SQLite to set the
+/// suggested maximum cache-size (number of pages stored by) the cache
+/// instance passed as the first argument. This is the value configured using
+/// the SQLite "[PRAGMA cache_size]" command.)^  As with the bPurgeable
+/// parameter, the implementation is not required to do anything with this
+/// value; it is advisory only.
+///
+/// [[the xPagecount() page cache methods]]
+/// The xPagecount() method must return the number of pages currently
+/// stored in the cache, both pinned and unpinned.
+///
+/// [[the xFetch() page cache methods]]
+/// The xFetch() method locates a page in the cache and returns a pointer to
+/// the page, or a NULL pointer.
+/// A "page", in this context, means a buffer of szPage bytes aligned at an
+/// 8-byte boundary. The page to be fetched is determined by the key. ^The
+/// minimum key value is 1.  After it has been retrieved using xFetch, the page
+/// is considered to be "pinned".
+///
+/// If the requested page is already in the page cache, then the page cache
+/// implementation must return a pointer to the page buffer with its content
+/// intact.  If the requested page is not already in the cache, then the
+/// cache implementation should use the value of the createFlag
+/// parameter to help it determined what action to take:
+///
+/// <table border=1 width=85% align=center>
+/// <tr><th> createFlag <th> Behaviour when page is not already in cache
+/// <tr><td> 0 <td> Do not allocate a new page.  Return NULL.
+/// <tr><td> 1 <td> Allocate a new page if it easy and convenient to do so.
+///                 Otherwise return NULL.
+/// <tr><td> 2 <td> Make every effort to allocate a new page.  Only return
+///                 NULL if allocating a new page is effectively impossible.
+/// </table>
+///
+/// ^(SQLite will normally invoke xFetch() with a createFlag of 0 or 1.  SQLite
+/// will only use a createFlag of 2 after a prior call with a createFlag of 1
+/// failed.)^  In between the to xFetch() calls, SQLite may
+/// attempt to unpin one or more cache pages by spilling the content of
+/// pinned pages to disk and synching the operating system disk cache.
+///
+/// [[the xUnpin() page cache method]]
+/// ^xUnpin() is called by SQLite with a pointer to a currently pinned page
+/// as its second argument.  If the third parameter, discard, is non-zero,
+/// then the page must be evicted from the cache.
+/// ^If the discard parameter is
+/// zero, then the page may be discarded or retained at the discretion of
+/// page cache implementation. ^The page cache implementation
+/// may choose to evict unpinned pages at any time.
+///
+/// The cache must not perform any reference counting. A single
+/// call to xUnpin() unpins the page regardless of the number of prior calls
+/// to xFetch().
+///
+/// [[the xRekey() page cache methods]]
+/// The xRekey() method is used to change the key value associated with the
+/// page passed as the second argument. If the cache
+/// previously contains an entry associated with newKey, it must be
+/// discarded. ^Any prior cache entry associated with newKey is guaranteed not
+/// to be pinned.
+///
+/// When SQLite calls the xTruncate() method, the cache must discard all
+/// existing cache entries with page numbers (keys) greater than or equal
+/// to the value of the iLimit parameter passed to xTruncate(). If any
+/// of these pages are pinned, they are implicitly unpinned, meaning that
+/// they can be safely discarded.
+///
+/// [[the xDestroy() page cache method]]
+/// ^The xDestroy() method is used to delete a cache allocated by xCreate().
+/// All resources associated with the specified cache should be freed. ^After
+/// calling the xDestroy() method, SQLite considers the [sqlite3_pcache*]
+/// handle invalid, and will not use it with any other sqlite3_pcache_methods
+/// functions.
+///
+///</summary>
     //typedef struct sqlite3_pcache_methods sqlite3_pcache_methods;
     //struct sqlite3_pcache_methods {
     //  void *pArg;
@@ -7470,12 +7480,12 @@ namespace Community.CsharpSqlite
   }
 
 
-    /*
-** CAPI3REF: Text Encodings
-**
-** These constant define integer codes that represent the various
-** text encodings supported by SQLite.
-*/
+    ///<summary>
+/// CAPI3REF: Text Encodings
+///
+/// These constant define integer codes that represent the various
+/// text encodings supported by SQLite.
+///</summary>
     //#define SQLITE_UTF8           1
     //#define SQLITE_UTF16LE        2
     //#define SQLITE_UTF16BE        3

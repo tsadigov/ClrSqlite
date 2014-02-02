@@ -507,19 +507,20 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
     //#define MAX_SECTOR_SIZE 0x10000
     const int MAX_SECTOR_SIZE = 0x10000;
 
-    /*
-    ** An instance of the following structure is allocated for each active
-    ** savepoint and statement transaction in the system. All such structures
-    ** are stored in the Pager.aSavepoint[] array, which is allocated and
-    ** resized using sqlite3Realloc().
-    **
-    ** When a savepoint is created, the PagerSavepoint.iHdrOffset field is
-    ** set to 0. If a journal-header is written into the main journal while
-    ** the savepoint is active, then iHdrOffset is set to the byte offset
-    ** immediately following the last journal record written into the main
-    ** journal before the journal-header. This is required during savepoint
-    ** rollback (see pagerPlaybackSavepoint()).
-    */
+    ///<summary>
+/// An instance of the following structure is allocated for each active
+/// savepoint and statement transaction in the system. All such structures
+/// are stored in the Pager.aSavepoint[] array, which is allocated and
+/// resized using sqlite3Realloc().
+///
+/// When a savepoint is created, the PagerSavepoint.iHdrOffset field is
+/// set to 0. If a journal-header is written into the main journal while
+/// the savepoint is active, then iHdrOffset is set to the byte offset
+/// immediately following the last journal record written into the main
+/// journal before the journal-header. This is required during savepoint
+/// rollback (see pagerPlaybackSavepoint()).
+///
+///</summary>
     //typedef struct PagerSavepoint PagerSavepoint;
     public class PagerSavepoint
     {

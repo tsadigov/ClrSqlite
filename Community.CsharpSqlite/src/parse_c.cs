@@ -47,44 +47,48 @@ namespace Community.CsharpSqlite
     //#define YYNOERRORRECOVERY 1
     const int YYNOERRORRECOVERY = 1;
 
-    /*
-    ** Make yytestcase() the same as testcase()
-    */
+    ///<summary>
+/// Make yytestcase() the same as testcase()
+///
+///</summary>
     //#define yytestcase(X) testcase(X)
     static void yytestcase<T>( T X )
     {
       testcase( X );
     }
 
-    /*
-    ** An instance of this structure holds information about the
-    ** LIMIT clause of a SELECT statement.
-    */
+    ///<summary>
+/// An instance of this structure holds information about the
+/// LIMIT clause of a SELECT statement.
+///
+///</summary>
     public struct LimitVal
     {
       public Expr pLimit;    /* The LIMIT expression.  NULL if there is no limit */
       public Expr pOffset;   /* The OFFSET expression.  NULL if there is none */
     };
 
-    /*
-    ** An instance of this structure is used to store the LIKE,
-    ** GLOB, NOT LIKE, and NOT GLOB operators.
-    */
+    ///<summary>
+/// An instance of this structure is used to store the LIKE,
+/// GLOB, NOT LIKE, and NOT GLOB operators.
+///
+///</summary>
     public struct LikeOp
     {
       public Token eOperator;  /* "like" or "glob" or "regexp" */
       public bool not;         /* True if the NOT keyword is present */
     };
 
-    /*
-    ** An instance of the following structure describes the event of a
-    ** TRIGGER.  "a" is the event type, one of TK_UPDATE, TK_INSERT,
-    ** TK_DELETE, or TK_INSTEAD.  If the event is of the form
-    **
-    **      UPDATE ON (a,b,c)
-    **
-    ** Then the "b" IdList records the list "a,b,c".
-    */
+    ///<summary>
+/// An instance of the following structure describes the event of a
+/// TRIGGER.  "a" is the event type, one of TK_UPDATE, TK_INSERT,
+/// TK_DELETE, or TK_INSTEAD.  If the event is of the form
+///
+///      UPDATE ON (a,b,c)
+///
+/// Then the "b" IdList records the list "a,b,c".
+///
+///</summary>
     public struct TrigEvent
     {
       public int a;
@@ -200,40 +204,41 @@ namespace Community.CsharpSqlite
 #if !INTERFACE
     //# define INTERFACE 1
 #endif
-    /* The next thing included is series of defines which control
-** various aspects of the generated parser.
-**    YYCODETYPE         is the data type used for storing terminal
-**                       and nonterminal numbers.  "unsigned char" is
-**                       used if there are fewer than 250 terminals
-**                       and nonterminals.  "int" is used otherwise.
-**    YYNOCODE           is a number of type YYCODETYPE which corresponds
-**                       to no legal terminal or nonterminal number.  This
-**                       number is used to fill in empty slots of the hash
-**                       table.
-**    YYFALLBACK         If defined, this indicates that one or more tokens
-**                       have fall-back values which should be used if the
-**                       original value of the token will not parse.
-**    YYACTIONTYPE       is the data type used for storing terminal
-**                       and nonterminal numbers.  "unsigned char" is
-**                       used if there are fewer than 250 rules and
-**                       states combined.  "int" is used otherwise.
-**    sqlite3ParserTOKENTYPE     is the data type used for minor tokens given
-**                       directly to the parser from the tokenizer.
-**    YYMINORTYPE        is the data type used for all minor tokens.
-**                       This is typically a union of many types, one of
-**                       which is sqlite3ParserTOKENTYPE.  The entry in the union
-**                       for base tokens is called "yy0".
-**    YYSTACKDEPTH       is the maximum depth of the parser's stack.  If
-**                       zero the stack is dynamically sized using realloc()
-**    sqlite3ParserARG_SDECL     A static variable declaration for the %extra_argument
-**    sqlite3ParserARG_PDECL     A parameter declaration for the %extra_argument
-**    sqlite3ParserARG_STORE     Code to store %extra_argument into yypParser
-**    sqlite3ParserARG_FETCH     Code to extract %extra_argument from yypParser
-**    YYNSTATE           the combined number of states.
-**    YYNRULE            the number of rules in the grammar
-**    YYERRORSYMBOL      is the code number of the error symbol.  If not
-**                       defined, then do no error processing.
-*/
+    ///<summary>
+///The next thing included is series of defines which control
+/// various aspects of the generated parser.
+///    YYCODETYPE         is the data type used for storing terminal
+///                       and nonterminal numbers.  "unsigned char" is
+///                       used if there are fewer than 250 terminals
+///                       and nonterminals.  "int" is used otherwise.
+///    YYNOCODE           is a number of type YYCODETYPE which corresponds
+///                       to no legal terminal or nonterminal number.  This
+///                       number is used to fill in empty slots of the hash
+///                       table.
+///    YYFALLBACK         If defined, this indicates that one or more tokens
+///                       have fall-back values which should be used if the
+///                       original value of the token will not parse.
+///    YYACTIONTYPE       is the data type used for storing terminal
+///                       and nonterminal numbers.  "unsigned char" is
+///                       used if there are fewer than 250 rules and
+///                       states combined.  "int" is used otherwise.
+///    sqlite3ParserTOKENTYPE     is the data type used for minor tokens given
+///                       directly to the parser from the tokenizer.
+///    YYMINORTYPE        is the data type used for all minor tokens.
+///                       This is typically a union of many types, one of
+///                       which is sqlite3ParserTOKENTYPE.  The entry in the union
+///                       for base tokens is called "yy0".
+///    YYSTACKDEPTH       is the maximum depth of the parser's stack.  If
+///                       zero the stack is dynamically sized using realloc()
+///    sqlite3ParserARG_SDECL     A static variable declaration for the %extra_argument
+///    sqlite3ParserARG_PDECL     A parameter declaration for the %extra_argument
+///    sqlite3ParserARG_STORE     Code to store %extra_argument into yypParser
+///    sqlite3ParserARG_FETCH     Code to extract %extra_argument from yypParser
+///    YYNSTATE           the combined number of states.
+///    YYNRULE            the number of rules in the grammar
+///    YYERRORSYMBOL      is the code number of the error symbol.  If not
+///                       defined, then do no error processing.
+///</summary>
     //#define YYCODETYPE unsigned short char
     const int YYNOCODE = 253;
     //#define YYACTIONTYPE unsigned short int
@@ -815,16 +820,18 @@ namespace Community.CsharpSqlite
 /*   620 */   672,  671,  669,  668,  642,  639,  638,  634,  633,  631,
 };
 
-    /* The next table maps tokens into fallback tokens.  If a construct
-    ** like the following:
-    **
-    **      %fallback ID X Y Z.
-    **
-    ** appears in the grammar, then ID becomes a fallback token for X, Y,
-    ** and Z.  Whenever one of the tokens X, Y, or Z is input to the parser
-    ** but it does not parse, the type of the token is changed to ID and
-    ** the parse is retried before an error is thrown.
-    */
+    ///<summary>
+///The next table maps tokens into fallback tokens.  If a construct
+/// like the following:
+///
+///      %fallback ID X Y Z.
+///
+/// appears in the grammar, then ID becomes a fallback token for X, Y,
+/// and Z.  Whenever one of the tokens X, Y, or Z is input to the parser
+/// but it does not parse, the type of the token is changed to ID and
+/// the parse is retried before an error is thrown.
+///
+///</summary>
 #if YYFALLBACK || TRUE
     static YYCODETYPE[] yyFallback = new YYCODETYPE[]{
 0,  /*          $ => nothing */
@@ -897,18 +904,19 @@ namespace Community.CsharpSqlite
 };
 #endif // * YYFALLBACK */
 
-    /* The following structure represents a single element of the
-** parser's stack.  Information stored includes:
-**
-**   +  The state number for the parser at this level of the stack.
-**
-**   +  The value of the token stored at this level of the stack.
-**      (In other words, the "major" token.)
-**
-**   +  The semantic value stored at this level of the stack.  This is
-**      the information used by the action routines in the grammar.
-**      It is sometimes called the "minor" token.
-*/
+    ///<summary>
+///The following structure represents a single element of the
+/// parser's stack.  Information stored includes:
+///
+///   +  The state number for the parser at this level of the stack.
+///
+///   +  The value of the token stored at this level of the stack.
+///      (In other words, the "major" token.)
+///
+///   +  The semantic value stored at this level of the stack.  This is
+///      the information used by the action routines in the grammar.
+///      It is sometimes called the "minor" token.
+///</summary>
     public class yyStackEntry
     {
       public YYACTIONTYPE stateno;       /* The state-number */
@@ -1756,9 +1764,10 @@ return yy_default[stateno];
       yypParser.pParse = pParse;//      sqlite3ParserARG_STORE; /* Suppress warning about unused %extra_argument var */
     }
 
-    /*
-    ** Perform a shift action.
-    */
+    ///<summary>
+/// Perform a shift action.
+///
+///</summary>
     static void yy_shift(
     yyParser yypParser,          /* The parser to be shifted */
     int yyNewState,               /* The new state to shift in */
@@ -4157,25 +4166,27 @@ yymsp[0].minor = yygotominor;
       yypParser.pParse = pParse;//      sqlite3ParserARG_STORE; /* Suppress warning about unused %extra_argument variable */
     }
 
-    /* The main parser program.
-    ** The first argument is a pointer to a structure obtained from
-    ** "sqlite3ParserAlloc" which describes the current state of the parser.
-    ** The second argument is the major token number.  The third is
-    ** the minor token.  The fourth optional argument is whatever the
-    ** user wants (and specified in the grammar) and is available for
-    ** use by the action routines.
-    **
-    ** Inputs:
-    ** <ul>
-    ** <li> A pointer to the parser (an opaque structure.)
-    ** <li> The major token number.
-    ** <li> The minor token number.
-    ** <li> An option argument of a grammar-specified type.
-    ** </ul>
-    **
-    ** Outputs:
-    ** None.
-    */
+    ///<summary>
+///The main parser program.
+/// The first argument is a pointer to a structure obtained from
+/// "sqlite3ParserAlloc" which describes the current state of the parser.
+/// The second argument is the major token number.  The third is
+/// the minor token.  The fourth optional argument is whatever the
+/// user wants (and specified in the grammar) and is available for
+/// use by the action routines.
+///
+/// Inputs:
+/// <ul>
+/// <li> A pointer to the parser (an opaque structure.)
+/// <li> The major token number.
+/// <li> The minor token number.
+/// <li> An option argument of a grammar-specified type.
+/// </ul>
+///
+/// Outputs:
+/// None.
+///
+///</summary>
     static void sqlite3Parser(
     yyParser yyp,                   /* The parser */
     int yymajor,                     /* The major token code number */

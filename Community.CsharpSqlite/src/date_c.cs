@@ -73,9 +73,10 @@ namespace Community.CsharpSqlite
 #if !SQLITE_OMIT_DATETIME_FUNCS
 
 
-    /*
-    ** A structure for holding a single date and time.
-    */
+    ///<summary>
+/// A structure for holding a single date and time.
+///
+///</summary>
     //typedef struct DateTime DateTime;
     public class DateTime
     {

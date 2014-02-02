@@ -38,11 +38,11 @@ namespace Community.CsharpSqlite
 
 #if !SQLITE_OMIT_LOAD_EXTENSION
 
-    /*
-** Some API routines are omitted when various features are
-** excluded from a build of SQLite.  Substitute a NULL pointer
-** for any missing APIs.
-*/
+    ///<summary>
+/// Some API routines are omitted when various features are
+/// excluded from a build of SQLite.  Substitute a NULL pointer
+/// for any missing APIs.
+///</summary>
 #if !SQLITE_ENABLE_COLUMN_METADATA
     //# define sqlite3_column_database_name   0
     //# define sqlite3_column_database_name16 0
@@ -575,13 +575,13 @@ const sqlite3_api_routines sqlite3Apis = null;
 #endif
 
 
-    /*
-** The following object holds the list of automatically loaded
-** extensions.
-**
-** This list is shared across threads.  The SQLITE_MUTEX_STATIC_MASTER
-** mutex must be held while accessing this list.
-*/
+    ///<summary>
+/// The following object holds the list of automatically loaded
+/// extensions.
+///
+/// This list is shared across threads.  The SQLITE_MUTEX_STATIC_MASTER
+/// mutex must be held while accessing this list.
+///</summary>
     //typedef struct sqlite3AutoExtList sqlite3AutoExtList;
     public class sqlite3AutoExtList
     {

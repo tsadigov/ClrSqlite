@@ -70,9 +70,10 @@ namespace Community.CsharpSqlite
     */
     //typedef struct VdbeOp Op;
 
-    /*
-    ** Boolean values
-    */
+    ///<summary>
+/// Boolean values
+///
+///</summary>
     //typedef unsigned char Bool;
 
     /*
@@ -137,27 +138,28 @@ namespace Community.CsharpSqlite
     //typedef struct VdbeCursor VdbeCursor;
 
 
-    /*
-    ** When a sub-program is executed (OP_Program), a structure of this type
-    ** is allocated to store the current value of the program counter, as
-    ** well as the current memory cell array and various other frame specific
-    ** values stored in the Vdbe struct. When the sub-program is finished, 
-    ** these values are copied back to the Vdbe from the VdbeFrame structure,
-    ** restoring the state of the VM to as it was before the sub-program
-    ** began executing.
-    **
-    ** The memory for a VdbeFrame object is allocated and managed by a memory
-    ** cell in the parent (calling) frame. When the memory cell is deleted or
-    ** overwritten, the VdbeFrame object is not freed immediately. Instead, it
-    ** is linked into the Vdbe.pDelFrame list. The contents of the Vdbe.pDelFrame
-    ** list is deleted when the VM is reset in VdbeHalt(). The reason for doing
-    ** this instead of deleting the VdbeFrame immediately is to avoid recursive
-    ** calls to sqlite3VdbeMemRelease() when the memory cells belonging to the
-    ** child frame are released.
-    **
-    ** The currently executing frame is stored in Vdbe.pFrame. Vdbe.pFrame is
-    ** set to NULL if the currently executing frame is the main program.
-    */
+    ///<summary>
+/// When a sub-program is executed (OP_Program), a structure of this type
+/// is allocated to store the current value of the program counter, as
+/// well as the current memory cell array and various other frame specific
+/// values stored in the Vdbe struct. When the sub-program is finished,
+/// these values are copied back to the Vdbe from the VdbeFrame structure,
+/// restoring the state of the VM to as it was before the sub-program
+/// began executing.
+///
+/// The memory for a VdbeFrame object is allocated and managed by a memory
+/// cell in the parent (calling) frame. When the memory cell is deleted or
+/// overwritten, the VdbeFrame object is not freed immediately. Instead, it
+/// is linked into the Vdbe.pDelFrame list. The contents of the Vdbe.pDelFrame
+/// list is deleted when the VM is reset in VdbeHalt(). The reason for doing
+/// this instead of deleting the VdbeFrame immediately is to avoid recursive
+/// calls to sqlite3VdbeMemRelease() when the memory cells belonging to the
+/// child frame are released.
+///
+/// The currently executing frame is stored in Vdbe.pFrame. Vdbe.pFrame is
+/// set to NULL if the currently executing frame is the main program.
+///
+///</summary>
     //typedef struct VdbeFrame VdbeFrame;
     public class VdbeFrame
     {
@@ -183,9 +185,10 @@ namespace Community.CsharpSqlite
     };
 
     //#define VdbeFrameMem(p) ((Mem )&((u8 )p)[ROUND8(sizeof(VdbeFrame))])
-    /*
-    ** A value for VdbeCursor.cacheValid that means the cache is always invalid.
-    */
+    ///<summary>
+/// A value for VdbeCursor.cacheValid that means the cache is always invalid.
+///
+///</summary>
     const int CACHE_STALE = 0;
 
     /*
@@ -196,7 +199,9 @@ namespace Community.CsharpSqlite
     public class Mem
     {
       public sqlite3 db;            /* The associated database connection */
-      public string z;              /* String value */
+      public string z;              ///<summary>
+///String value
+///</summary>
       public double r;              /* Real value */
       public struct union_ip
       {
@@ -358,10 +363,11 @@ const int MEM_Zero = 0x4000;
       p.flags = (u16)( p.flags & ~( MEM_TypeMask | MEM_Zero ) | f );
     }// TODO -- Convert back to inline for speed
 
-    /*
-    ** Return true if a memory cell is not marked as invalid.  This macro
-    ** is for use inside Debug.Assert() statements only.
-    */
+    ///<summary>
+/// Return true if a memory cell is not marked as invalid.  This macro
+/// is for use inside Debug.Assert() statements only.
+///
+///</summary>
 #if SQLITE_DEBUG
     //#define memIsValid(M)  ((M)->flags & MEM_Invalid)==0
     static bool memIsValid( Mem M )
@@ -372,15 +378,16 @@ const int MEM_Zero = 0x4000;
 static bool memIsValid( Mem M ) { return true; }
 #endif
 
-    /* A VdbeFunc is just a FuncDef (defined in sqliteInt.h) that contains
-** additional information about auxiliary information bound to arguments
-** of the function.  This is used to implement the sqlite3_get_auxdata()
-** and sqlite3_set_auxdata() APIs.  The "auxdata" is some auxiliary data
-** that can be associated with a constant argument to a function.  This
-** allows functions such as "regexp" to compile their constant regular
-** expression argument once and reused the compiled code for multiple
-** invocations.
-*/
+    ///<summary>
+///A VdbeFunc is just a FuncDef (defined in sqliteInt.h) that contains
+/// additional information about auxiliary information bound to arguments
+/// of the function.  This is used to implement the sqlite3_get_auxdata()
+/// and sqlite3_set_auxdata() APIs.  The "auxdata" is some auxiliary data
+/// that can be associated with a constant argument to a function.  This
+/// allows functions such as "regexp" to compile their constant regular
+/// expression argument once and reused the compiled code for multiple
+/// invocations.
+///</summary>
     public class AuxData
     {
       public object pAux;                     /* Aux data for the i-th argument */
@@ -394,19 +401,20 @@ static bool memIsValid( Mem M ) { return true; }
       public AuxData[] apAux = new AuxData[2]; /* One slot for each function argument */
     };
 
-    /*
-    ** The "context" argument for a installable function.  A pointer to an
-    ** instance of this structure is the first argument to the routines used
-    ** implement the SQL functions.
-    **
-    ** There is a typedef for this structure in sqlite.h.  So all routines,
-    ** even the public interface to SQLite, can use a pointer to this structure.
-    ** But this file is the only place where the internal details of this
-    ** structure are known.
-    **
-    ** This structure is defined inside of vdbeInt.h because it uses substructures
-    ** (Mem) which are only defined there.
-    */
+    ///<summary>
+/// The "context" argument for a installable function.  A pointer to an
+/// instance of this structure is the first argument to the routines used
+/// implement the SQL functions.
+///
+/// There is a typedef for this structure in sqlite.h.  So all routines,
+/// even the public interface to SQLite, can use a pointer to this structure.
+/// But this file is the only place where the internal details of this
+/// structure are known.
+///
+/// This structure is defined inside of vdbeInt.h because it uses substructures
+/// (Mem) which are only defined there.
+///
+///</summary>
     public class sqlite3_context
     {
       public FuncDef pFunc;        /* Pointer to function information.  MUST BE FIRST */

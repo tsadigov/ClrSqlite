@@ -41,19 +41,21 @@ namespace Community.CsharpSqlite
     */
     //typedef struct Vdbe Vdbe;
 
-    /*
-    ** The names of the following types declared in vdbeInt.h are required
-    ** for the VdbeOp definition.
-    */
+    ///<summary>
+/// The names of the following types declared in vdbeInt.h are required
+/// for the VdbeOp definition.
+///
+///</summary>
     //typedef struct VdbeFunc VdbeFunc;
     //typedef struct Mem Mem;
     //typedef struct SubProgram SubProgram;
 
-    /*
-    ** A single instruction of the virtual machine has an opcode
-    ** and as many as three operands.  The instruction is recorded
-    ** as an instance of the following structure:
-    */
+    ///<summary>
+/// A single instruction of the virtual machine has an opcode
+/// and as many as three operands.  The instruction is recorded
+/// as an instance of the following structure:
+///
+///</summary>
     public class union_p4
     {             /* fourth parameter */
       public int i;                /* Integer value if p4type==P4_INT32 */
@@ -115,9 +117,10 @@ public u64 cycles;         /* Total time spend executing this instruction */
     };
     //typedef struct VdbeOp VdbeOp;
 
-    /*
-    ** A sub-routine used to implement a trigger program.
-    */
+    ///<summary>
+/// A sub-routine used to implement a trigger program.
+///
+///</summary>
     public class SubProgram
     {
       public VdbeOp[] aOp;          /* Array of opcodes for sub-program */

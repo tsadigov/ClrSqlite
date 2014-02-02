@@ -8,31 +8,32 @@ namespace Community.CsharpSqlite
   using sqlite3_pcache = Sqlite3.PCache1;
   public partial class Sqlite3
   {
-    /*
-    ** 2008 November 05
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    **
-    ** This file implements the default page cache implementation (the
-    ** sqlite3_pcache interface). It also contains part of the implementation
-    ** of the SQLITE_CONFIG_PAGECACHE and sqlite3_release_memory() features.
-    ** If the default page cache implementation is overriden, then neither of
-    ** these two features are available.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    */
+    ///<summary>
+/// 2008 November 05
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+///
+/// This file implements the default page cache implementation (the
+/// sqlite3_pcache interface). It also contains part of the implementation
+/// of the SQLITE_CONFIG_PAGECACHE and sqlite3_release_memory() features.
+/// If the default page cache implementation is overriden, then neither of
+/// these two features are available.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+///
+///
+///
+///</summary>
 
     //#include "sqliteInt.h"
 
@@ -41,28 +42,30 @@ namespace Community.CsharpSqlite
     //typedef struct PgFreeslot PgFreeslot;
     //typedef struct PGroup PGroup;
 
-    /* Each page cache (or PCache) belongs to a PGroup.  A PGroup is a set 
-    ** of one or more PCaches that are able to recycle each others unpinned
-    ** pages when they are under memory pressure.  A PGroup is an instance of
-    ** the following object.
-    **
-    ** This page cache implementation works in one of two modes:
-    **
-    **   (1)  Every PCache is the sole member of its own PGroup.  There is
-    **        one PGroup per PCache.
-    **
-    **   (2)  There is a single global PGroup that all PCaches are a member
-    **        of.
-    **
-    ** Mode 1 uses more memory (since PCache instances are not able to rob
-    ** unused pages from other PCaches) but it also operates without a mutex,
-    ** and is therefore often faster.  Mode 2 requires a mutex in order to be
-    ** threadsafe, but is able recycle pages more efficient.
-    **
-    ** For mode (1), PGroup.mutex is NULL.  For mode (2) there is only a single
-    ** PGroup which is the pcache1.grp global variable and its mutex is
-    ** SQLITE_MUTEX_STATIC_LRU.
-    */
+    ///<summary>
+///Each page cache (or PCache) belongs to a PGroup.  A PGroup is a set
+/// of one or more PCaches that are able to recycle each others unpinned
+/// pages when they are under memory pressure.  A PGroup is an instance of
+/// the following object.
+///
+/// This page cache implementation works in one of two modes:
+///
+///   (1)  Every PCache is the sole member of its own PGroup.  There is
+///        one PGroup per PCache.
+///
+///   (2)  There is a single global PGroup that all PCaches are a member
+///        of.
+///
+/// Mode 1 uses more memory (since PCache instances are not able to rob
+/// unused pages from other PCaches) but it also operates without a mutex,
+/// and is therefore often faster.  Mode 2 requires a mutex in order to be
+/// threadsafe, but is able recycle pages more efficient.
+///
+/// For mode (1), PGroup.mutex is NULL.  For mode (2) there is only a single
+/// PGroup which is the pcache1.grp global variable and its mutex is
+/// SQLITE_MUTEX_STATIC_LRU.
+///
+///</summary>
     public class PGroup
     {
       public sqlite3_mutex mutex;           /* MUTEX_STATIC_LRU or NULL */
@@ -78,14 +81,16 @@ namespace Community.CsharpSqlite
       }
     };
 
-    /* Each page cache is an instance of the following object.  Every
-    ** open database file (including each in-memory database and each
-    ** temporary or transient database) has a single page cache which
-    ** is an instance of this object.
-    **
-    ** Pointers to structures of this type are cast and returned as 
-    ** opaque sqlite3_pcache* handles.
-    */
+    ///<summary>
+///Each page cache is an instance of the following object.  Every
+/// open database file (including each in-memory database and each
+/// temporary or transient database) has a single page cache which
+/// is an instance of this object.
+///
+/// Pointers to structures of this type are cast and returned as
+/// opaque sqlite3_pcache* handles.
+///
+///</summary>
     public class PCache1
     {
       /* Cache configuration parameters. Page size (szPage) and the purgeable
@@ -120,12 +125,13 @@ namespace Community.CsharpSqlite
       }
     };
 
-    /*
-    ** Each cache entry is represented by an instance of the following 
-    ** structure. A buffer of PgHdr1.pCache.szPage bytes is allocated 
-    ** directly before this structure in memory (see the PGHDR1_TO_PAGE() 
-    ** macro below).
-    */
+    ///<summary>
+/// Each cache entry is represented by an instance of the following
+/// structure. A buffer of PgHdr1.pCache.szPage bytes is allocated
+/// directly before this structure in memory (see the PGHDR1_TO_PAGE()
+/// macro below).
+///
+///</summary>
     public class PgHdr1
     {
       public Pgno iKey;                   /* Key value (page number) */
@@ -147,10 +153,11 @@ namespace Community.CsharpSqlite
 
     };
 
-    /*
-    ** Free slots in the allocator used to divide up the buffer provided using
-    ** the SQLITE_CONFIG_PAGECACHE mechanism.
-    */
+    ///<summary>
+/// Free slots in the allocator used to divide up the buffer provided using
+/// the SQLITE_CONFIG_PAGECACHE mechanism.
+///
+///</summary>
     public class PgFreeslot
     {
       public PgFreeslot pNext;  /* Next free slot */

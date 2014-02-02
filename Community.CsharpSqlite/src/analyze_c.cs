@@ -11,26 +11,26 @@ namespace Community.CsharpSqlite
 
   public partial class Sqlite3
   {
-/*
-** 2005 July 8
-**
-** The author disclaims copyright to this source code.  In place of
-** a legal notice, here is a blessing:
-**
-**    May you do good and not evil.
-**    May you find forgiveness for yourself and forgive others.
-**    May you share freely, never taking more than you give.
-**
-*************************************************************************
-** This file contains code associated with the ANALYZE command.
-*************************************************************************
-**  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-**  C#-SQLite is an independent reimplementation of the SQLite software library
-**
-**  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
-**
-*************************************************************************
-*/
+///<summary>
+/// 2005 July 8
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This file contains code associated with the ANALYZE command.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
+///
+///
+///</summary>
 #if !SQLITE_OMIT_ANALYZE
 //#include "sqliteInt.h"
 
@@ -585,10 +585,10 @@ static void sqlite3Analyze( Parse pParse, Token pName1, Token pName2 )
   }
 }
 
-/*
-** Used to pass information from the analyzer reader through to the
-** callback routine.
-*/
+///<summary>
+/// Used to pass information from the analyzer reader through to the
+/// callback routine.
+///</summary>
 //typedef struct analysisInfo analysisInfo;
 public struct analysisInfo
 {

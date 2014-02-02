@@ -68,62 +68,65 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
     //typedef struct WhereAndInfo WhereAndInfo;
     //typedef struct WhereCost WhereCost;
 
-    /*
-    ** The query generator uses an array of instances of this structure to
-    ** help it analyze the subexpressions of the WHERE clause.  Each WHERE
-    ** clause subexpression is separated from the others by AND operators,
-    ** usually, or sometimes subexpressions separated by OR.
-    **
-    ** All WhereTerms are collected into a single WhereClause structure.
-    ** The following identity holds:
-    **
-    **        WhereTerm.pWC.a[WhereTerm.idx] == WhereTerm
-    **
-    ** When a term is of the form:
-    **
-    **              X <op> <expr>
-    **
-    ** where X is a column name and <op> is one of certain operators,
-    ** then WhereTerm.leftCursor and WhereTerm.u.leftColumn record the
-    ** cursor number and column number for X.  WhereTerm.eOperator records
-    ** the <op> using a bitmask encoding defined by WO_xxx below.  The
-    ** use of a bitmask encoding for the operator allows us to search
-    ** quickly for terms that match any of several different operators.
-    **
-    ** A WhereTerm might also be two or more subterms connected by OR:
-    **
-    **         (t1.X <op> <expr>) OR (t1.Y <op> <expr>) OR ....
-    **
-    ** In this second case, wtFlag as the TERM_ORINFO set and eOperator==WO_OR
-    ** and the WhereTerm.u.pOrInfo field points to auxiliary information that
-    ** is collected about the
-    **
-    ** If a term in the WHERE clause does not match either of the two previous
-    ** categories, then eOperator==0.  The WhereTerm.pExpr field is still set
-    ** to the original subexpression content and wtFlags is set up appropriately
-    ** but no other fields in the WhereTerm object are meaningful.
-    **
-    ** When eOperator!=0, prereqRight and prereqAll record sets of cursor numbers,
-    ** but they do so indirectly.  A single WhereMaskSet structure translates
-    ** cursor number into bits and the translated bit is stored in the prereq
-    ** fields.  The translation is used in order to maximize the number of
-    ** bits that will fit in a Bitmask.  The VDBE cursor numbers might be
-    ** spread out over the non-negative integers.  For example, the cursor
-    ** numbers might be 3, 8, 9, 10, 20, 23, 41, and 45.  The WhereMaskSet
-    ** translates these sparse cursor numbers into consecutive integers
-    ** beginning with 0 in order to make the best possible use of the available
-    ** bits in the Bitmask.  So, in the example above, the cursor numbers
-    ** would be mapped into integers 0 through 7.
-    **
-    ** The number of terms in a join is limited by the number of bits
-    ** in prereqRight and prereqAll.  The default is 64 bits, hence SQLite
-    ** is only able to process joins with 64 or fewer tables.
-    */
+    ///<summary>
+/// The query generator uses an array of instances of this structure to
+/// help it analyze the subexpressions of the WHERE clause.  Each WHERE
+/// clause subexpression is separated from the others by AND operators,
+/// usually, or sometimes subexpressions separated by OR.
+///
+/// All WhereTerms are collected into a single WhereClause structure.
+/// The following identity holds:
+///
+///        WhereTerm.pWC.a[WhereTerm.idx] == WhereTerm
+///
+/// When a term is of the form:
+///
+///              X <op> <expr>
+///
+/// where X is a column name and <op> is one of certain operators,
+/// then WhereTerm.leftCursor and WhereTerm.u.leftColumn record the
+/// cursor number and column number for X.  WhereTerm.eOperator records
+/// the <op> using a bitmask encoding defined by WO_xxx below.  The
+/// use of a bitmask encoding for the operator allows us to search
+/// quickly for terms that match any of several different operators.
+///
+/// A WhereTerm might also be two or more subterms connected by OR:
+///
+///         (t1.X <op> <expr>) OR (t1.Y <op> <expr>) OR ....
+///
+/// In this second case, wtFlag as the TERM_ORINFO set and eOperator==WO_OR
+/// and the WhereTerm.u.pOrInfo field points to auxiliary information that
+/// is collected about the
+///
+/// If a term in the WHERE clause does not match either of the two previous
+/// categories, then eOperator==0.  The WhereTerm.pExpr field is still set
+/// to the original subexpression content and wtFlags is set up appropriately
+/// but no other fields in the WhereTerm object are meaningful.
+///
+/// When eOperator!=0, prereqRight and prereqAll record sets of cursor numbers,
+/// but they do so indirectly.  A single WhereMaskSet structure translates
+/// cursor number into bits and the translated bit is stored in the prereq
+/// fields.  The translation is used in order to maximize the number of
+/// bits that will fit in a Bitmask.  The VDBE cursor numbers might be
+/// spread out over the non-negative integers.  For example, the cursor
+/// numbers might be 3, 8, 9, 10, 20, 23, 41, and 45.  The WhereMaskSet
+/// translates these sparse cursor numbers into consecutive integers
+/// beginning with 0 in order to make the best possible use of the available
+/// bits in the Bitmask.  So, in the example above, the cursor numbers
+/// would be mapped into integers 0 through 7.
+///
+/// The number of terms in a join is limited by the number of bits
+/// in prereqRight and prereqAll.  The default is 64 bits, hence SQLite
+/// is only able to process joins with 64 or fewer tables.
+///
+///</summary>
     //typedef struct WhereTerm WhereTerm;
     public class WhereTerm
     {
       public Expr pExpr;              /* Pointer to the subexpression that is this term */
-      public int iParent;             /* Disable pWC.a[iParent] when this term disabled */
+      public int iParent;             ///<summary>
+///Disable pWC.a[iParent] when this term disabled
+///</summary>
       public int leftCursor;          /* Cursor number of X in "X <op> <expr>" */
       public class _u
       {
@@ -165,13 +168,16 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 #if SQLITE_ENABLE_STAT2
     const int TERM_VNULL = 0x80;  /* Manufactured x>NULL or x<=NULL term */
 #else
-    const int TERM_VNULL = 0x00;  /* Disabled if not using stat2 */
+    const int TERM_VNULL = 0x00;  ///<summary>
+///Disabled if not using stat2
+///</summary>
 #endif
 
-    /*
-    ** An instance of the following structure holds all information about a
-    ** WHERE clause.  Mostly this is a container for one or more WhereTerms.
-    */
+    ///<summary>
+/// An instance of the following structure holds all information about a
+/// WHERE clause.  Mostly this is a container for one or more WhereTerms.
+///
+///</summary>
     public class WhereClause
     {
       public Parse pParse;                              /* The parser context */
@@ -200,51 +206,54 @@ public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[
       }
     };
 
-    /*
-    ** A WhereTerm with eOperator==WO_OR has its u.pOrInfo pointer set to
-    ** a dynamically allocated instance of the following structure.
-    */
+    ///<summary>
+/// A WhereTerm with eOperator==WO_OR has its u.pOrInfo pointer set to
+/// a dynamically allocated instance of the following structure.
+///
+///</summary>
     public class WhereOrInfo
     {
       public WhereClause wc = new WhereClause();/* Decomposition into subterms */
       public Bitmask indexable;                 /* Bitmask of all indexable tables in the clause */
     };
 
-    /*
-    ** A WhereTerm with eOperator==WO_AND has its u.pAndInfo pointer set to
-    ** a dynamically allocated instance of the following structure.
-    */
+    ///<summary>
+/// A WhereTerm with eOperator==WO_AND has its u.pAndInfo pointer set to
+/// a dynamically allocated instance of the following structure.
+///
+///</summary>
     public class WhereAndInfo
     {
       public WhereClause wc = new WhereClause();          /* The subexpression broken out */
     };
 
-    /*
-    ** An instance of the following structure keeps track of a mapping
-    ** between VDBE cursor numbers and bits of the bitmasks in WhereTerm.
-    **
-    ** The VDBE cursor numbers are small integers contained in
-    ** SrcList_item.iCursor and Expr.iTable fields.  For any given WHERE
-    ** clause, the cursor numbers might not begin with 0 and they might
-    ** contain gaps in the numbering sequence.  But we want to make maximum
-    ** use of the bits in our bitmasks.  This structure provides a mapping
-    ** from the sparse cursor numbers into consecutive integers beginning
-    ** with 0.
-    **
-    ** If WhereMaskSet.ix[A]==B it means that The A-th bit of a Bitmask
-    ** corresponds VDBE cursor number B.  The A-th bit of a bitmask is 1<<A.
-    **
-    ** For example, if the WHERE clause expression used these VDBE
-    ** cursors:  4, 5, 8, 29, 57, 73.  Then the  WhereMaskSet structure
-    ** would map those cursor numbers into bits 0 through 5.
-    **
-    ** Note that the mapping is not necessarily ordered.  In the example
-    ** above, the mapping might go like this:  4.3, 5.1, 8.2, 29.0,
-    ** 57.5, 73.4.  Or one of 719 other combinations might be used. It
-    ** does not really matter.  What is important is that sparse cursor
-    ** numbers all get mapped into bit numbers that begin with 0 and contain
-    ** no gaps.
-    */
+    ///<summary>
+/// An instance of the following structure keeps track of a mapping
+/// between VDBE cursor numbers and bits of the bitmasks in WhereTerm.
+///
+/// The VDBE cursor numbers are small integers contained in
+/// SrcList_item.iCursor and Expr.iTable fields.  For any given WHERE
+/// clause, the cursor numbers might not begin with 0 and they might
+/// contain gaps in the numbering sequence.  But we want to make maximum
+/// use of the bits in our bitmasks.  This structure provides a mapping
+/// from the sparse cursor numbers into consecutive integers beginning
+/// with 0.
+///
+/// If WhereMaskSet.ix[A]==B it means that The A-th bit of a Bitmask
+/// corresponds VDBE cursor number B.  The A-th bit of a bitmask is 1<<A.
+///
+/// For example, if the WHERE clause expression used these VDBE
+/// cursors:  4, 5, 8, 29, 57, 73.  Then the  WhereMaskSet structure
+/// would map those cursor numbers into bits 0 through 5.
+///
+/// Note that the mapping is not necessarily ordered.  In the example
+/// above, the mapping might go like this:  4.3, 5.1, 8.2, 29.0,
+/// 57.5, 73.4.  Or one of 719 other combinations might be used. It
+/// does not really matter.  What is important is that sparse cursor
+/// numbers all get mapped into bit numbers that begin with 0 and contain
+/// no gaps.
+///
+///</summary>
     public class WhereMaskSet
     {
       public int n;                        /* Number of Debug.Assigned cursor values */

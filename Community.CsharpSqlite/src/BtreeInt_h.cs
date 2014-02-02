@@ -281,28 +281,29 @@ namespace Community.CsharpSqlite
     const string SQLITE_FILE_HEADER = "SQLite format 3\0";
 #endif
 
-    /*
-** Page type flags.  An ORed combination of these flags appear as the
-** first byte of on-disk image of every BTree page.
-*/
+    ///<summary>
+/// Page type flags.  An ORed combination of these flags appear as the
+/// first byte of on-disk image of every BTree page.
+///</summary>
     const byte PTF_INTKEY = 0x01;
     const byte PTF_ZERODATA = 0x02;
     const byte PTF_LEAFDATA = 0x04;
     const byte PTF_LEAF = 0x08;
 
-    /*
-    ** As each page of the file is loaded into memory, an instance of the following
-    ** structure is appended and initialized to zero.  This structure stores
-    ** information about the page that is decoded from the raw file page.
-    **
-    ** The pParent field points back to the parent page.  This allows us to
-    ** walk up the BTree from any leaf to the root.  Care must be taken to
-    ** unref() the parent page pointer when this page is no longer referenced.
-    ** The pageDestructor() routine handles that chore.
-    **
-    ** Access to all fields of this structure is controlled by the mutex
-    ** stored in MemPage.pBt.mutex.
-    */
+    ///<summary>
+/// As each page of the file is loaded into memory, an instance of the following
+/// structure is appended and initialized to zero.  This structure stores
+/// information about the page that is decoded from the raw file page.
+///
+/// The pParent field points back to the parent page.  This allows us to
+/// walk up the BTree from any leaf to the root.  Care must be taken to
+/// unref() the parent page pointer when this page is no longer referenced.
+/// The pageDestructor() routine handles that chore.
+///
+/// Access to all fields of this structure is controlled by the mutex
+/// stored in MemPage.pBt.mutex.
+///
+///</summary>
     public struct _OvflCell
     {   /* Cells that will not fit on aData[] */
       public u8[] pCell;       /* Pointers to the body of the overflow cell */
@@ -372,11 +373,12 @@ namespace Community.CsharpSqlite
       }
     };
 
-    /*
-    ** The in-memory image of a disk page has the auxiliary information appended
-    ** to the end.  EXTRA_SIZE is the number of bytes of space needed to hold
-    ** that extra information.
-    */
+    ///<summary>
+/// The in-memory image of a disk page has the auxiliary information appended
+/// to the end.  EXTRA_SIZE is the number of bytes of space needed to hold
+/// that extra information.
+///
+///</summary>
     const int EXTRA_SIZE = 0;// No used in C#, since we use create a class; was MemPage.Length;
 
     /*
@@ -394,7 +396,9 @@ namespace Community.CsharpSqlite
       BtLock pNext;         /* Next in BtShared.pLock list */
     };
 
-    /* Candidate values for BtLock.eLock */
+    ///<summary>
+///Candidate values for BtLock.eLock
+///</summary>
     //#define READ_LOCK     1
     //#define WRITE_LOCK    2
     const int READ_LOCK = 1;
@@ -437,13 +441,14 @@ BtLock lock;              /* Object used to lock page 1 */
 #endif
     };
 
-    /*
-    ** Btree.inTrans may take one of the following values.
-    **
-    ** If the shared-data extension is enabled, there may be multiple users
-    ** of the Btree structure. At most one of these may open a write transaction,
-    ** but any number may have active read transactions.
-    */
+    ///<summary>
+/// Btree.inTrans may take one of the following values.
+///
+/// If the shared-data extension is enabled, there may be multiple users
+/// of the Btree structure. At most one of these may open a write transaction,
+/// but any number may have active read transactions.
+///
+///</summary>
     const byte TRANS_NONE = 0;
     const byte TRANS_READ = 1;
     const byte TRANS_WRITE = 2;
@@ -523,11 +528,12 @@ public u8 isPending;            /* If waiting for read-locks to clear */
       public byte[] pTmpSpace;        /* BtShared.pageSize bytes of space for tmp use */
     };
 
-    /*
-    ** An instance of the following structure is used to hold information
-    ** about a cell.  The parseCellPtr() function fills in this structure
-    ** based on information extract from the raw disk page.
-    */
+    ///<summary>
+/// An instance of the following structure is used to hold information
+/// about a cell.  The parseCellPtr() function fills in this structure
+/// based on information extract from the raw disk page.
+///
+///</summary>
     //typedef struct CellInfo CellInfo;
     public struct CellInfo
     {
@@ -556,15 +562,16 @@ public u8 isPending;            /* If waiting for read-locks to clear */
       }
     };
 
-    /*
-    ** Maximum depth of an SQLite B-Tree structure. Any B-Tree deeper than
-    ** this will be declared corrupt. This value is calculated based on a
-    ** maximum database size of 2^31 pages a minimum fanout of 2 for a
-    ** root-node and 3 for all other internal nodes.
-    **
-    ** If a tree that appears to be taller than this is encountered, it is
-    ** assumed that the database is corrupt.
-    */
+    ///<summary>
+/// Maximum depth of an SQLite B-Tree structure. Any B-Tree deeper than
+/// this will be declared corrupt. This value is calculated based on a
+/// maximum database size of 2^31 pages a minimum fanout of 2 for a
+/// root-node and 3 for all other internal nodes.
+///
+/// If a tree that appears to be taller than this is encountered, it is
+/// assumed that the database is corrupt.
+///
+///</summary>
     //#define BTCURSOR_MAX_DEPTH 20
     const int BTCURSOR_MAX_DEPTH = 20;
 
@@ -778,10 +785,10 @@ public static bool ISAUTOVACUUM =false;
 #endif
 
 
-    /*
-** This structure is passed around through all the sanity checking routines
-** in order to keep track of some global state information.
-*/
+    ///<summary>
+/// This structure is passed around through all the sanity checking routines
+/// in order to keep track of some global state information.
+///</summary>
     //typedef struct IntegrityCk IntegrityCk;
     public class IntegrityCk
     {

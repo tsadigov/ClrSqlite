@@ -94,10 +94,12 @@ static u32 BITVEC_NINT = (u32)( BITVEC_USIZE / sizeof( u32 ) );
 //#define BITVEC_MXHASH    (BITVEC_NINT/2)
 static int BITVEC_MXHASH = (int)( BITVEC_NINT / 2 );
 
-/* Hashing function for the aHash representation.
-** Empirical testing showed that the *37 multiplier
-** (an arbitrary prime)in the hash function provided
-** no fewer collisions than the no-op *1. */
+///<summary>
+///Hashing function for the aHash representation.
+/// Empirical testing showed that the *37 multiplier
+/// (an arbitrary prime)in the hash function provided
+/// no fewer collisions than the no-op *1.
+///</summary>
 //#define BITVEC_HASH(X)   (((X)*1)%BITVEC_NINT)
 static u32 BITVEC_HASH( u32 X )
 {
@@ -107,27 +109,27 @@ static u32 BITVEC_HASH( u32 X )
 static int BITVEC_NPTR = (int)( BITVEC_USIZE / 4 );//sizeof(Bitvec *));
 
 
-/*
-** A bitmap is an instance of the following structure.
-**
-** This bitmap records the existence of zero or more bits
-** with values between 1 and iSize, inclusive.
-**
-** There are three possible representations of the bitmap.
-** If iSize<=BITVEC_NBIT, then Bitvec.u.aBitmap[] is a straight
-** bitmap.  The least significant bit is bit 1.
-**
-** If iSize>BITVEC_NBIT and iDivisor==0 then Bitvec.u.aHash[] is
-** a hash table that will hold up to BITVEC_MXHASH distinct values.
-**
-** Otherwise, the value i is redirected into one of BITVEC_NPTR
-** sub-bitmaps pointed to by Bitvec.u.apSub[].  Each subbitmap
-** handles up to iDivisor separate values of i.  apSub[0] holds
-** values between 1 and iDivisor.  apSub[1] holds values between
-** iDivisor+1 and 2*iDivisor.  apSub[N] holds values between
-** N*iDivisor+1 and (N+1)*iDivisor.  Each subbitmap is normalized
-** to hold deal with values between 1 and iDivisor.
-*/
+///<summary>
+/// A bitmap is an instance of the following structure.
+///
+/// This bitmap records the existence of zero or more bits
+/// with values between 1 and iSize, inclusive.
+///
+/// There are three possible representations of the bitmap.
+/// If iSize<=BITVEC_NBIT, then Bitvec.u.aBitmap[] is a straight
+/// bitmap.  The least significant bit is bit 1.
+///
+/// If iSize>BITVEC_NBIT and iDivisor==0 then Bitvec.u.aHash[] is
+/// a hash table that will hold up to BITVEC_MXHASH distinct values.
+///
+/// Otherwise, the value i is redirected into one of BITVEC_NPTR
+/// sub-bitmaps pointed to by Bitvec.u.apSub[].  Each subbitmap
+/// handles up to iDivisor separate values of i.  apSub[0] holds
+/// values between 1 and iDivisor.  apSub[1] holds values between
+/// iDivisor+1 and 2*iDivisor.  apSub[N] holds values between
+/// N*iDivisor+1 and (N+1)*iDivisor.  Each subbitmap is normalized
+/// to hold deal with values between 1 and iDivisor.
+///</summary>
 public class _u
 {
   public BITVEC_TELEM[] aBitmap = new byte[BITVEC_NELEM];   /* Bitmap representation */

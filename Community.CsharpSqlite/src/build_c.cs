@@ -69,10 +69,10 @@ namespace Community.CsharpSqlite
     }
 
 #if !SQLITE_OMIT_SHARED_CACHE
-/*
-** The TableLock structure is only used by the sqlite3TableLock() and
-** codeTableLocks() functions.
-*/
+///<summary>
+/// The TableLock structure is only used by the sqlite3TableLock() and
+/// codeTableLocks() functions.
+///</summary>
 //struct TableLock {
 //  int iDb;             /* The database containing the table to be locked */
 //  int iTab;            /* The root page of the table to be locked */

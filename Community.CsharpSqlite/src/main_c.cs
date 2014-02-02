@@ -718,9 +718,10 @@ break;
       return SQLITE_OK;
     }
 
-    /*
-    ** Return the mutex associated with a database connection.
-    */
+    ///<summary>
+/// Return the mutex associated with a database connection.
+///
+///</summary>
     static sqlite3_mutex sqlite3_db_mutex( sqlite3 db )
     {
       return db.mutex;

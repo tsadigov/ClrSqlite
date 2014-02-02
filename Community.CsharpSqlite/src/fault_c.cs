@@ -39,9 +39,9 @@ namespace Community.CsharpSqlite
     //#include "sqliteInt.h"
 
 #if !SQLITE_OMIT_BUILTIN_TEST
-    /*
-** Global variables.
-*/
+    ///<summary>
+/// Global variables.
+///</summary>
     //typedef struct BenignMallocHooks BenignMallocHooks;
     public struct BenignMallocHooks//
     {

@@ -152,10 +152,10 @@ static int memcmp( string A, string B, int Limit )
 
 
 static Regex oRegex = null;
-/*
-** The regexp() function.  two arguments are both strings
-** Collating sequences are not used.
-*/
+///<summary>
+/// The regexp() function.  two arguments are both strings
+/// Collating sequences are not used.
+///</summary>
 static void regexpFunc(
 sqlite3_context context,
 int argc,

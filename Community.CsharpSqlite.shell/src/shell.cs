@@ -370,12 +370,13 @@ sqlite3_free(ref z);
 
 
 
-  /*
-  ** Retrieve a single line of input text.
-  **
-  ** zPrior is a string of prior text retrieved.  If not the empty
-  ** string, then issue a continuation prompt.
-  */
+  ///<summary>
+/// Retrieve a single line of input text.
+///
+/// zPrior is a string of prior text retrieved.  If not the empty
+/// string, then issue a continuation prompt.
+///
+///</summary>
   static string one_input_line( StringBuilder zPrior, TextReader _in )
   {
     string zPrompt;

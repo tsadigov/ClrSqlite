@@ -39,8 +39,9 @@ namespace Community.CsharpSqlite
 //#include "sqliteInt.h"
 //#include "btreeInt.h"
 
-/* Macro to find the minimum of two numeric values.
-*/
+///<summary>
+///Macro to find the minimum of two numeric values.
+///</summary>
 #if !MIN
 //# define MIN(x,y) ((x)<(y)?(x):(y))
 #endif

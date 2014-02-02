@@ -189,9 +189,9 @@ namespace Community.CsharpSqlite
     }
 #endif // * SQLITE_PAGER_PRAGMAS */
 
-    /*
-** Generate code to return a single integer value.
-*/
+    ///<summary>
+/// Generate code to return a single integer value.
+///</summary>
     static void returnSingleInt( Parse pParse, string zLabel, i64 value )
     {
       Vdbe v = sqlite3GetVdbe( pParse );
@@ -341,11 +341,11 @@ new sPragmaType( "foreign_keys",             SQLITE_ForeignKeys ),
     }
 #endif
 
-    /*
-** Parameter eMode must be one of the PAGER_JOURNALMODE_XXX constants
-** defined in pager.h. This function returns the associated lowercase
-** journal-mode name.
-*/
+    ///<summary>
+/// Parameter eMode must be one of the PAGER_JOURNALMODE_XXX constants
+/// defined in pager.h. This function returns the associated lowercase
+/// journal-mode name.
+///</summary>
     static string sqlite3JournalModename( int eMode )
     {
       string[] azModeName = {

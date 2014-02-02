@@ -123,10 +123,11 @@ BOOL bExclusive;    /* Indicates an exclusive lock has been obtained */
 
     private static LockingStrategy lockingStrategy = HelperMethods.IsRunningMediumTrust() ? new MediumTrustLockingStrategy() : new LockingStrategy();
 
-    /*
-    ** The winFile structure is a subclass of sqlite3_file* specific to the win32
-    ** portability layer.
-    */
+    ///<summary>
+/// The winFile structure is a subclass of sqlite3_file* specific to the win32
+/// portability layer.
+///
+///</summary>
     //typedef struct sqlite3_file sqlite3_file;
     public partial class sqlite3_file
     {
@@ -1659,19 +1660,19 @@ error = 1;
 */
 SYSTEM_INFO winSysInfo;
 
-/*
-** Helper functions to obtain and relinquish the global mutex. The
-** global mutex is used to protect the winLockInfo objects used by 
-** this file, all of which may be shared by multiple threads.
-**
-** Function winShmMutexHeld() is used to Debug.Assert() that the global mutex 
-** is held when required. This function is only used as part of Debug.Assert() 
-** statements. e.g.
-**
-**   winShmEnterMutex()
-**     Debug.Assert( winShmMutexHeld() );
-**   winShmLeaveMutex()
-*/
+///<summary>
+/// Helper functions to obtain and relinquish the global mutex. The
+/// global mutex is used to protect the winLockInfo objects used by
+/// this file, all of which may be shared by multiple threads.
+///
+/// Function winShmMutexHeld() is used to Debug.Assert() that the global mutex
+/// is held when required. This function is only used as part of Debug.Assert()
+/// statements. e.g.
+///
+///   winShmEnterMutex()
+///     Debug.Assert( winShmMutexHeld() );
+///   winShmLeaveMutex()
+///</summary>
 static void winShmEnterMutex(void){
   sqlite3_mutex_enter(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER));
 }
@@ -1712,7 +1713,9 @@ struct winShmNode {
   string zFilename;           /* Name of the file */
   winFile hFile;             /* File handle from winOpen */
 
-  int szRegion;              /* Size of shared-memory regions */
+  int szRegion;              ///<summary>
+///Size of shared-memory regions
+///</summary>
   int nRegion;               /* Size of array apRegion */
   struct ShmRegion {
     HANDLE hMap;             /* File handle from CreateFileMapping */
@@ -1728,11 +1731,11 @@ struct winShmNode {
 #endif
 };
 
-/*
-** A global array of all winShmNode objects.
-**
-** The winShmMutexHeld() must be true while reading or writing this list.
-*/
+///<summary>
+/// A global array of all winShmNode objects.
+///
+/// The winShmMutexHeld() must be true while reading or writing this list.
+///</summary>
 static winShmNode *winShmNodeList = 0;
 
 /*

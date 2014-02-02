@@ -120,9 +120,10 @@ NULL pointers replaced by SQL NULL.  %Q */
     const int etORDINAL = 16; /* %r . 1st, 2nd, 3rd, 4th, etc.  English only */
     const int etINVALID = 0; /* Any unrecognized conversion type */
 
-    /*
-    ** An "etByte" is an 8-bit unsigned value.
-    */
+    ///<summary>
+/// An "etByte" is an 8-bit unsigned value.
+///
+///</summary>
     //typedef unsigned char etByte;
 
     /*

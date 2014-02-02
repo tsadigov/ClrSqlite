@@ -638,10 +638,11 @@ break;
       sqlite3_result_int( context, sqlite3_changes( db ) );
     }
 
-    /*
-    ** Implementation of the total_changes() SQL function.  The return value is
-    ** the same as the sqlite3_total_changes() API function.
-    */
+    ///<summary>
+/// Implementation of the total_changes() SQL function.  The return value is
+/// the same as the sqlite3_total_changes() API function.
+///
+///</summary>
     static void total_changes(
     sqlite3_context context,
     int NotUsed,
@@ -1571,10 +1572,10 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
     }
 #endif
 
-    /*
-** An instance of the following structure holds the context of a
-** sum() or avg() aggregate computation.
-*/
+    ///<summary>
+/// An instance of the following structure holds the context of a
+/// sum() or avg() aggregate computation.
+///</summary>
     //typedef struct SumCtx SumCtx;
     public class SumCtx
     {
@@ -1694,10 +1695,11 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
       sqlite3_result_double( context, p != null ? p.rSum : (double)0 );
     }
 
-    /*
-    ** The following structure keeps track of state information for the
-    ** count() aggregate function.
-    */
+    ///<summary>
+/// The following structure keeps track of state information for the
+/// count() aggregate function.
+///
+///</summary>
     //typedef struct CountCtx CountCtx;
     public class CountCtx
     {
@@ -1823,9 +1825,10 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
       }
     }
 
-    /*
-    ** group_concat(EXPR, ?SEPARATOR?)
-    */
+    ///<summary>
+/// group_concat(EXPR, ?SEPARATOR?)
+///
+///</summary>
     static void groupConcatStep(
     sqlite3_context context,
     int argc,
@@ -1900,11 +1903,12 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
       }
     }
 
-    /*
-    ** This routine does per-connection function registration.  Most
-    ** of the built-in functions above are part of the global function set.
-    ** This routine only deals with those that are not global.
-    */
+    ///<summary>
+/// This routine does per-connection function registration.  Most
+/// of the built-in functions above are part of the global function set.
+/// This routine only deals with those that are not global.
+///
+///</summary>
     public struct sFuncs
     {
       public string zName;

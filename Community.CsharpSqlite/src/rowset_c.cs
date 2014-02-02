@@ -90,16 +90,18 @@ namespace Community.CsharpSqlite
     */
     //#define ROWSET_ALLOCATION_SIZE 1024
     const int ROWSET_ALLOCATION_SIZE = 1024;
-    /*
-    ** The number of rowset entries per allocation chunk.
-    */
+    ///<summary>
+/// The number of rowset entries per allocation chunk.
+///
+///</summary>
     //#define ROWSET_ENTRY_PER_CHUNK  \
     //                     ((ROWSET_ALLOCATION_SIZE-8)/sizeof(struct RowSetEntry))
     const int ROWSET_ENTRY_PER_CHUNK = 63;
 
-    /*
-    ** Each entry in a RowSet is an instance of the following object.
-    */
+    ///<summary>
+/// Each entry in a RowSet is an instance of the following object.
+///
+///</summary>
     public class RowSetEntry
     {
       public i64 v;                /* ROWID value for this entry */
@@ -107,12 +109,13 @@ namespace Community.CsharpSqlite
       public RowSetEntry pLeft;    /* Left subtree (smaller entries) */
     };
 
-    /*
-    ** Index entries are allocated in large chunks (instances of the
-    ** following structure) to reduce memory allocation overhead.  The
-    ** chunks are kept on a linked list so that they can be deallocated
-    ** when the RowSet is destroyed.
-    */
+    ///<summary>
+/// Index entries are allocated in large chunks (instances of the
+/// following structure) to reduce memory allocation overhead.  The
+/// chunks are kept on a linked list so that they can be deallocated
+/// when the RowSet is destroyed.
+///
+///</summary>
     public class RowSetChunk
     {
       public RowSetChunk pNextChunk;             /* Next chunk on list of them all */

@@ -299,7 +299,9 @@ int sqlite3WalTrace = 0;
 ////#define WAL_NREADER            (SQLITE_SHM_NLOCK-3)
 
 
-/* Object declarations */
+///<summary>
+///Object declarations
+///</summary>
 typedef struct WalIndexHdr WalIndexHdr;
 typedef struct WalIterator WalIterator;
 typedef struct WalCkptInfo WalCkptInfo;

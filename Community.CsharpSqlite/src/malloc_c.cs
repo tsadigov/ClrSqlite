@@ -52,9 +52,10 @@ return nRet;
 #endif
     }
 
-    /*
-    ** State information local to the memory allocation subsystem.
-    */
+    ///<summary>
+/// State information local to the memory allocation subsystem.
+///
+///</summary>
     //static SQLITE_WSD struct Mem0Global {
     public class Mem0Global
     {/* Number of free pages for scratch and page-cache memory */
@@ -79,10 +80,11 @@ return nRet;
       ** which pages are available.
       */
       //u32 *aScratchFree;
-      /*
-      ** True if heap is nearly "full" where "full" is defined by the
-      ** sqlite3_soft_heap_limit() setting.
-      */
+      ///<summary>
+/// True if heap is nearly "full" where "full" is defined by the
+/// sqlite3_soft_heap_limit() setting.
+///
+///</summary>
       public bool nearlyFull;
 
       public byte[][][] aByte;

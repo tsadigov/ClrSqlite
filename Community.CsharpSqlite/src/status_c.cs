@@ -33,9 +33,10 @@ namespace Community.CsharpSqlite
     //#include "sqliteInt.h"
     //#include "vdbeInt.h"
 
-    /*
-    ** Variables in which to record status information.
-    */
+    ///<summary>
+/// Variables in which to record status information.
+///
+///</summary>
     //typedef struct sqlite3StatType sqlite3StatType;
     public class sqlite3StatType
     {

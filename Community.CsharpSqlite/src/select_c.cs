@@ -127,9 +127,10 @@ namespace Community.CsharpSqlite
       return pNew;
     }
 
-    /*
-    ** Delete the given Select structure and all of its substructures.
-    */
+    ///<summary>
+/// Delete the given Select structure and all of its substructures.
+///
+///</summary>
     static void sqlite3SelectDelete( sqlite3 db, ref Select p )
     {
       if ( p != null )

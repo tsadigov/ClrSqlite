@@ -56,8 +56,10 @@ namespace Community.CsharpSqlite
     //#define JOURNAL_CHUNKSIZE ((int)(1024-sizeof(FileChunk*)))
     const int JOURNAL_CHUNKSIZE = 4096;
 
-    /* Macro to find the minimum of two numeric values.
-    */
+    ///<summary>
+///Macro to find the minimum of two numeric values.
+///
+///</summary>
     //#if !MIN
     //# define MIN(x,y) ((x)<(y)?(x):(y))
     //#endif
@@ -70,19 +72,21 @@ namespace Community.CsharpSqlite
       return ( x < y ) ? x : (int)y;
     }
 
-    /*
-    ** The rollback journal is composed of a linked list of these structures.
-    */
+    ///<summary>
+/// The rollback journal is composed of a linked list of these structures.
+///
+///</summary>
     public class FileChunk
     {
       public FileChunk pNext;                             /* Next chunk in the journal */
       public byte[] zChunk = new byte[JOURNAL_CHUNKSIZE]; /* Content of this chunk */
     };
 
-    /*
-    ** An instance of this object serves as a cursor into the rollback journal.
-    ** The cursor can be either for reading or writing.
-    */
+    ///<summary>
+/// An instance of this object serves as a cursor into the rollback journal.
+/// The cursor can be either for reading or writing.
+///
+///</summary>
     public class FilePoint
     {
       public long iOffset;           /* Offset from the beginning of the file */

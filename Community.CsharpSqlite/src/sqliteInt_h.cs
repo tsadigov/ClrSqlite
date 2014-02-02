@@ -663,15 +663,16 @@ const int ;//#define SQLITE_UTF16NATIVE  SqliteEncoding.UTF16LE
         //# define EIGHT_BYTE_ALIGNMENT(X)   ((((char)(X) - (char)0)&7)==0)
         //#endif
 
-        /*
-    ** An instance of the following structure is used to store the busy-handler
-    ** callback for a given sqlite handle.
-    **
-    ** The sqlite.busyHandler member of the sqlite struct contains the busy
-    ** callback for the database handle. Each pager opened via the sqlite
-    ** handle is passed a pointer to sqlite.busyHandler. The busy-handler
-    ** callback is currently invoked only from within pager.c.
-    */
+        ///<summary>
+/// An instance of the following structure is used to store the busy-handler
+/// callback for a given sqlite handle.
+///
+/// The sqlite.busyHandler member of the sqlite struct contains the busy
+/// callback for the database handle. Each pager opened via the sqlite
+/// handle is passed a pointer to sqlite.busyHandler. The busy-handler
+/// callback is currently invoked only from within pager.c.
+///
+///</summary>
         //typedef struct BusyHandler BusyHandler;
         public class BusyHandler
         {
@@ -821,11 +822,12 @@ void *sqlite3_wsd_find(void *K, int L);
         //typedef struct WhereInfo WhereInfo;
         //typedef struct WhereLevel WhereLevel;
 
-        /*
-    ** Defer sourcing vdbe.h and btree.h until after the "u8" and
-    ** "BusyHandler" typedefs. vdbe.h also requires a few of the opaque
-    ** pointer types (i.e. FuncDef) defined above.
-    */
+        ///<summary>
+/// Defer sourcing vdbe.h and btree.h until after the "u8" and
+/// "BusyHandler" typedefs. vdbe.h also requires a few of the opaque
+/// pointer types (i.e. FuncDef) defined above.
+///
+///</summary>
         //#include "btree.h"
         //#include "vdbe.h"
         //#include "pager.h"
@@ -834,13 +836,14 @@ void *sqlite3_wsd_find(void *K, int L);
         //#include "os.h"
         //#include "mutex.h"
 
-        /*
-    ** Each database file to be accessed by the system is an instance
-    ** of the following structure.  There are normally two of these structures
-    ** in the sqlite.aDb[] array.  aDb[0] is the main database file and
-    ** aDb[1] is the database file used to hold temporary tables.  Additional
-    ** databases may be attached.
-    */
+        ///<summary>
+/// Each database file to be accessed by the system is an instance
+/// of the following structure.  There are normally two of these structures
+/// in the sqlite.aDb[] array.  aDb[0] is the main database file and
+/// aDb[1] is the database file used to hold temporary tables.  Additional
+/// databases may be attached.
+///
+///</summary>
 
         public class Db
         {
@@ -948,33 +951,35 @@ void *sqlite3_wsd_find(void *K, int L);
         private const u16 DB_UnresetViews = 0x0002;
         private const u16 DB_Empty = 0x0004;
 
-        /*
-    ** The number of different kinds of things that can be limited
-    ** using the sqlite3_limit() interface.
-    */
+        ///<summary>
+/// The number of different kinds of things that can be limited
+/// using the sqlite3_limit() interface.
+///
+///</summary>
         //#define SQLITE_N_LIMIT (SQLITE_LIMIT_TRIGGER_DEPTH+1)
         private const int SQLITE_N_LIMIT = SQLITE_LIMIT_TRIGGER_DEPTH + 1;
 
-        /*
-    ** Lookaside malloc is a set of fixed-size buffers that can be used
-    ** to satisfy small transient memory allocation requests for objects
-    ** associated with a particular database connection.  The use of
-    ** lookaside malloc provides a significant performance enhancement
-    ** (approx 10%) by avoiding numerous malloc/free requests while parsing
-    ** SQL statements.
-    **
-    ** The Lookaside structure holds configuration information about the
-    ** lookaside malloc subsystem.  Each available memory allocation in
-    ** the lookaside subsystem is stored on a linked list of LookasideSlot
-    ** objects.
-    **
-    ** Lookaside allocations are only allowed for objects that are associated
-    ** with a particular database connection.  Hence, schema information cannot
-    ** be stored in lookaside because in shared cache mode the schema information
-    ** is shared by multiple database connections.  Therefore, while parsing
-    ** schema information, the Lookaside.bEnabled flag is cleared so that
-    ** lookaside allocations are not used to construct the schema objects.
-    */
+        ///<summary>
+/// Lookaside malloc is a set of fixed-size buffers that can be used
+/// to satisfy small transient memory allocation requests for objects
+/// associated with a particular database connection.  The use of
+/// lookaside malloc provides a significant performance enhancement
+/// (approx 10%) by avoiding numerous malloc/free requests while parsing
+/// SQL statements.
+///
+/// The Lookaside structure holds configuration information about the
+/// lookaside malloc subsystem.  Each available memory allocation in
+/// the lookaside subsystem is stored on a linked list of LookasideSlot
+/// objects.
+///
+/// Lookaside allocations are only allowed for objects that are associated
+/// with a particular database connection.  Hence, schema information cannot
+/// be stored in lookaside because in shared cache mode the schema information
+/// is shared by multiple database connections.  Therefore, while parsing
+/// schema information, the Lookaside.bEnabled flag is cleared so that
+/// lookaside allocations are not used to construct the schema objects.
+///
+///</summary>
 
         public class Lookaside
         {
@@ -994,12 +999,13 @@ void *sqlite3_wsd_find(void *K, int L);
             public LookasideSlot pNext; /* Next buffer in the list of free buffers */
         };
 
-        /*
-    ** A hash table for function definitions.
-    **
-    ** Hash each FuncDef structure into one of the FuncDefHash.a[] slots.
-    ** Collisions are on the FuncDef.pHash chain.
-    */
+        ///<summary>
+/// A hash table for function definitions.
+///
+/// Hash each FuncDef structure into one of the FuncDefHash.a[] slots.
+/// Collisions are on the FuncDef.pHash chain.
+///
+///</summary>
 
         public class FuncDefHash
         {
@@ -1057,7 +1063,9 @@ void *sqlite3_wsd_find(void *K, int L);
             public u32 magic; /* Magic number for detect library misuse */
             public int nChange; /* Value returned by sqlite3_changes() */
             public int nTotalChange; /* Value returned by sqlite3_total_changes() */
-            public sqlite3_mutex mutex; /* Connection mutex */
+            public sqlite3_mutex mutex; ///<summary>
+///Connection mutex
+///</summary>
             public int[] aLimit = new int[SQLITE_N_LIMIT]; /* Limits */
 
             public class sqlite3InitInfo
@@ -1094,7 +1102,9 @@ void *sqlite3_wsd_find(void *K, int L);
             public dxCollNeeded xCollNeeded16; //)(void*,sqlite3*,int eTextRep,const void);
             public object pCollNeededArg;
             public sqlite3_value pErr; /* Most recent error message */
-            public string zErrMsg; /* Most recent error message (UTF-8 encoded) */
+            public string zErrMsg; ///<summary>
+///Most recent error message (UTF-8 encoded)
+///</summary>
             public string zErrMsg16; /* Most recent error message (UTF-16 encoded) */
 
             public struct _u1
@@ -1239,11 +1249,12 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
         private const int SQLITE_IdxRealAsInt = 0x80;
         private const int SQLITE_OptMask = 0xff;
 
-        /*
-    ** Possible values for the sqlite.magic field.
-    ** The numbers are obtained at random and have no special meaning, other
-    ** than being distinct from one another.
-    */
+        ///<summary>
+/// Possible values for the sqlite.magic field.
+/// The numbers are obtained at random and have no special meaning, other
+/// than being distinct from one another.
+///
+///</summary>
 
         private const int SQLITE_MAGIC_OPEN = 0x1029a697;
             //#define SQLITE_MAGIC_OPEN     0xa029a697  /* Database is open */
@@ -1358,20 +1369,21 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             }
         };
 
-        /*
-    ** This structure encapsulates a user-function destructor callback (as
-    ** configured using create_function_v2()) and a reference counter. When
-    ** create_function_v2() is called to create a function with a destructor,
-    ** a single object of this type is allocated. FuncDestructor.nRef is set to 
-    ** the number of FuncDef objects created (either 1 or 3, depending on whether
-    ** or not the specified encoding is SqliteEncoding.ANY). The FuncDef.pDestructor
-    ** member of each of the new FuncDef objects is set to point to the allocated
-    ** FuncDestructor.
-    **
-    ** Thereafter, when one of the FuncDef objects is deleted, the reference
-    ** count on this object is decremented. When it reaches 0, the destructor
-    ** is invoked and the FuncDestructor structure freed.
-    */
+        ///<summary>
+/// This structure encapsulates a user-function destructor callback (as
+/// configured using create_function_v2()) and a reference counter. When
+/// create_function_v2() is called to create a function with a destructor,
+/// a single object of this type is allocated. FuncDestructor.nRef is set to
+/// the number of FuncDef objects created (either 1 or 3, depending on whether
+/// or not the specified encoding is SqliteEncoding.ANY). The FuncDef.pDestructor
+/// member of each of the new FuncDef objects is set to point to the allocated
+/// FuncDestructor.
+///
+/// Thereafter, when one of the FuncDef objects is deleted, the reference
+/// count on this object is decremented. When it reaches 0, the destructor
+/// is invoked and the FuncDestructor structure freed.
+///
+///</summary>
         //struct FuncDestructor {
         //  int nRef;
         //  void (*xDestroy)(void );
@@ -1458,12 +1470,13 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             return new FuncDef(zName, SqliteEncoding.UTF8, nArg, arg, (u8) (nc*SQLITE_FUNC_NEEDCOLL), xStep, xFinal);
         }
 
-        /*
-    ** All current savepoints are stored in a linked list starting at
-    ** sqlite3.pSavepoint. The first element in the list is the most recently
-    ** opened savepoint. Savepoints are added to the list by the vdbe
-    ** OP_Savepoint instruction.
-    */
+        ///<summary>
+/// All current savepoints are stored in a linked list starting at
+/// sqlite3.pSavepoint. The first element in the list is the most recently
+/// opened savepoint. Savepoints are added to the list by the vdbe
+/// OP_Savepoint instruction.
+///
+///</summary>
         //struct Savepoint {
         //  string zName;                        /* Savepoint name (nul-terminated) */
         //  i64 nDeferredCons;                  /* Number of deferred fk violations */
@@ -1476,19 +1489,21 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public Savepoint pNext; /* Parent savepoint (if any) */
         };
 
-        /*
-    ** The following are used as the second parameter to sqlite3Savepoint(),
-    ** and as the P1 argument to the OP_Savepoint instruction.
-    */
+        ///<summary>
+/// The following are used as the second parameter to sqlite3Savepoint(),
+/// and as the P1 argument to the OP_Savepoint instruction.
+///
+///</summary>
         private const int SAVEPOINT_BEGIN = 0; //#define SAVEPOINT_BEGIN      0
         private const int SAVEPOINT_RELEASE = 1; //#define SAVEPOINT_RELEASE    1
         private const int SAVEPOINT_ROLLBACK = 2; //#define SAVEPOINT_ROLLBACK   2
 
-        /*
-    ** Each SQLite module (virtual table definition) is defined by an
-    ** instance of the following structure, stored in the sqlite3.aModule
-    ** hash table.
-    */
+        ///<summary>
+/// Each SQLite module (virtual table definition) is defined by an
+/// instance of the following structure, stored in the sqlite3.aModule
+/// hash table.
+///
+///</summary>
 
         public class Module
         {
@@ -1498,10 +1513,11 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public smdxDestroy xDestroy; //)(void );/* Module destructor function */
         };
 
-        /*
-    ** information about each column of an SQL table is held in an instance
-    ** of this structure.
-    */
+        ///<summary>
+/// information about each column of an SQL table is held in an instance
+/// of this structure.
+///
+///</summary>
 
         public class Column
         {
@@ -1526,27 +1542,28 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             }
         };
 
-        /*
-    ** A "Collating Sequence" is defined by an instance of the following
-    ** structure. Conceptually, a collating sequence consists of a name and
-    ** a comparison routine that defines the order of that sequence.
-    **
-    ** There may two separate implementations of the collation function, one
-    ** that processes text in UTF-8 encoding (CollSeq.xCmp) and another that
-    ** processes text encoded in UTF-16 (CollSeq.xCmp16), using the machine
-    ** native byte order. When a collation sequence is invoked, SQLite selects
-    ** the version that will require the least expensive encoding
-    ** translations, if any.
-    **
-    ** The CollSeq.pUser member variable is an extra parameter that passed in
-    ** as the first argument to the UTF-8 comparison function, xCmp.
-    ** CollSeq.pUser16 is the equivalent for the UTF-16 comparison function,
-    ** xCmp16.
-    **
-    ** If both CollSeq.xCmp and CollSeq.xCmp16 are NULL, it means that the
-    ** collating sequence is undefined.  Indices built on an undefined
-    ** collating sequence may not be read or written.
-    */
+        ///<summary>
+/// A "Collating Sequence" is defined by an instance of the following
+/// structure. Conceptually, a collating sequence consists of a name and
+/// a comparison routine that defines the order of that sequence.
+///
+/// There may two separate implementations of the collation function, one
+/// that processes text in UTF-8 encoding (CollSeq.xCmp) and another that
+/// processes text encoded in UTF-16 (CollSeq.xCmp16), using the machine
+/// native byte order. When a collation sequence is invoked, SQLite selects
+/// the version that will require the least expensive encoding
+/// translations, if any.
+///
+/// The CollSeq.pUser member variable is an extra parameter that passed in
+/// as the first argument to the UTF-8 comparison function, xCmp.
+/// CollSeq.pUser16 is the equivalent for the UTF-16 comparison function,
+/// xCmp16.
+///
+/// If both CollSeq.xCmp and CollSeq.xCmp16 are NULL, it means that the
+/// collating sequence is undefined.  Indices built on an undefined
+/// collating sequence may not be read or written.
+///
+///</summary>
 
         public class CollSeq
         {
@@ -1619,10 +1636,11 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
     */
         private const int SQLITE_AFF_MASK = 0x67; //#define SQLITE_AFF_MASK     0x67
 
-        /*
-    ** Additional bit values that can be ORed with an affinity without
-    ** changing the affinity.
-    */
+        ///<summary>
+/// Additional bit values that can be ORed with an affinity without
+/// changing the affinity.
+///
+///</summary>
 
         private const int SQLITE_JUMPIFNULL = 0x08;
             //#define SQLITE_JUMPIFNULL   0x08  /* jumps if either operand is NULL */
@@ -1632,48 +1650,49 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
 
         private const int SQLITE_NULLEQ = 0x80; //#define SQLITE_NULLEQ       0x80  /* NULL=NULL */
 
-        /*
-    ** An object of this type is created for each virtual table present in
-    ** the database schema. 
-    **
-    ** If the database schema is shared, then there is one instance of this
-    ** structure for each database connection (sqlite3) that uses the shared
-    ** schema. This is because each database connection requires its own unique
-    ** instance of the sqlite3_vtab* handle used to access the virtual table 
-    ** implementation. sqlite3_vtab* handles can not be shared between 
-    ** database connections, even when the rest of the in-memory database 
-    ** schema is shared, as the implementation often stores the database
-    ** connection handle passed to it via the xConnect() or xCreate() method
-    ** during initialization internally. This database connection handle may
-    ** then be used by the virtual table implementation to access real tables 
-    ** within the database. So that they appear as part of the callers 
-    ** transaction, these accesses need to be made via the same database 
-    ** connection as that used to execute SQL operations on the virtual table.
-    **
-    ** All VTable objects that correspond to a single table in a shared
-    ** database schema are initially stored in a linked-list pointed to by
-    ** the Table.pVTable member variable of the corresponding Table object.
-    ** When an sqlite3_prepare() operation is required to access the virtual
-    ** table, it searches the list for the VTable that corresponds to the
-    ** database connection doing the preparing so as to use the correct
-    ** sqlite3_vtab* handle in the compiled query.
-    **
-    ** When an in-memory Table object is deleted (for example when the
-    ** schema is being reloaded for some reason), the VTable objects are not 
-    ** deleted and the sqlite3_vtab* handles are not xDisconnect()ed 
-    ** immediately. Instead, they are moved from the Table.pVTable list to
-    ** another linked list headed by the sqlite3.pDisconnect member of the
-    ** corresponding sqlite3 structure. They are then deleted/xDisconnected 
-    ** next time a statement is prepared using said sqlite3*. This is done
-    ** to avoid deadlock issues involving multiple sqlite3.mutex mutexes.
-    ** Refer to comments above function sqlite3VtabUnlockList() for an
-    ** explanation as to why it is safe to add an entry to an sqlite3.pDisconnect
-    ** list without holding the corresponding sqlite3.mutex mutex.
-    **
-    ** The memory for objects of this type is always allocated by 
-    ** sqlite3DbMalloc(), using the connection handle stored in VTable.db as 
-    ** the first argument.
-    */
+        ///<summary>
+/// An object of this type is created for each virtual table present in
+/// the database schema.
+///
+/// If the database schema is shared, then there is one instance of this
+/// structure for each database connection (sqlite3) that uses the shared
+/// schema. This is because each database connection requires its own unique
+/// instance of the sqlite3_vtab* handle used to access the virtual table
+/// implementation. sqlite3_vtab* handles can not be shared between
+/// database connections, even when the rest of the in-memory database
+/// schema is shared, as the implementation often stores the database
+/// connection handle passed to it via the xConnect() or xCreate() method
+/// during initialization internally. This database connection handle may
+/// then be used by the virtual table implementation to access real tables
+/// within the database. So that they appear as part of the callers
+/// transaction, these accesses need to be made via the same database
+/// connection as that used to execute SQL operations on the virtual table.
+///
+/// All VTable objects that correspond to a single table in a shared
+/// database schema are initially stored in a linked-list pointed to by
+/// the Table.pVTable member variable of the corresponding Table object.
+/// When an sqlite3_prepare() operation is required to access the virtual
+/// table, it searches the list for the VTable that corresponds to the
+/// database connection doing the preparing so as to use the correct
+/// sqlite3_vtab* handle in the compiled query.
+///
+/// When an in-memory Table object is deleted (for example when the
+/// schema is being reloaded for some reason), the VTable objects are not
+/// deleted and the sqlite3_vtab* handles are not xDisconnect()ed
+/// immediately. Instead, they are moved from the Table.pVTable list to
+/// another linked list headed by the sqlite3.pDisconnect member of the
+/// corresponding sqlite3 structure. They are then deleted/xDisconnected
+/// next time a statement is prepared using said sqlite3*. This is done
+/// to avoid deadlock issues involving multiple sqlite3.mutex mutexes.
+/// Refer to comments above function sqlite3VtabUnlockList() for an
+/// explanation as to why it is safe to add an entry to an sqlite3.pDisconnect
+/// list without holding the corresponding sqlite3.mutex mutex.
+///
+/// The memory for objects of this type is always allocated by
+/// sqlite3DbMalloc(), using the connection handle stored in VTable.db as
+/// the first argument.
+///
+///</summary>
 
         public class VTable
         {
@@ -1794,11 +1813,12 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
         private const int TF_Virtual = 0x10; /* Is a virtual table */
         private const int TF_NeedMetadata = 0x20; /* aCol[].zType and aCol[].pColl missing */
 
-        /*
-    ** Test to see whether or not a table is a virtual table.  This is
-    ** done as a macro so that it will be optimized out when virtual
-    ** table support is omitted from the build.
-    */
+        ///<summary>
+/// Test to see whether or not a table is a virtual table.  This is
+/// done as a macro so that it will be optimized out when virtual
+/// table support is omitted from the build.
+///
+///</summary>
 #if !SQLITE_OMIT_VIRTUALTABLE
 //#  define IsVirtual(X)      (((X)->tabFlags & TF_Virtual)!=0)
         private static bool IsVirtual(Table X)
@@ -1854,7 +1874,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public int nCol; /* Number of columns in this key */
             /* EV: R-30323-21917 */
             public u8 isDeferred; /* True if constraint checking is deferred till COMMIT */
-            public u8[] aAction = new u8[2]; /* ON DELETE and ON UPDATE actions, respectively */
+            public u8[] aAction = new u8[2]; ///<summary>
+///ON DELETE and ON UPDATE actions, respectively
+///</summary>
             public Trigger[] apTrigger = new Trigger[2]; /* Triggers for aAction[] actions */
 
             public class sColMap
@@ -1879,31 +1901,32 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
 
         };
 
-        /*
-    ** SQLite supports many different ways to resolve a constraint
-    ** error.  ROLLBACK processing means that a constraint violation
-    ** causes the operation in process to fail and for the current transaction
-    ** to be rolled back.  ABORT processing means the operation in process
-    ** fails and any prior changes from that one operation are backed out,
-    ** but the transaction is not rolled back.  FAIL processing means that
-    ** the operation in progress stops and returns an error code.  But prior
-    ** changes due to the same operation are not backed out and no rollback
-    ** occurs.  IGNORE means that the particular row that caused the constraint
-    ** error is not inserted or updated.  Processing continues and no error
-    ** is returned.  REPLACE means that preexisting database rows that caused
-    ** a UNIQUE constraint violation are removed so that the new insert or
-    ** update can proceed.  Processing continues and no error is reported.
-    **
-    ** RESTRICT, SETNULL, and CASCADE actions apply only to foreign keys.
-    ** RESTRICT is the same as ABORT for IMMEDIATE foreign keys and the
-    ** same as ROLLBACK for DEFERRED keys.  SETNULL means that the foreign
-    ** key is set to NULL.  CASCADE means that a DELETE or UPDATE of the
-    ** referenced table row is propagated into the row that holds the
-    ** foreign key.
-    **
-    ** The following symbolic values are used to record which type
-    ** of action to take.
-    */
+        ///<summary>
+/// SQLite supports many different ways to resolve a constraint
+/// error.  ROLLBACK processing means that a constraint violation
+/// causes the operation in process to fail and for the current transaction
+/// to be rolled back.  ABORT processing means the operation in process
+/// fails and any prior changes from that one operation are backed out,
+/// but the transaction is not rolled back.  FAIL processing means that
+/// the operation in progress stops and returns an error code.  But prior
+/// changes due to the same operation are not backed out and no rollback
+/// occurs.  IGNORE means that the particular row that caused the constraint
+/// error is not inserted or updated.  Processing continues and no error
+/// is returned.  REPLACE means that preexisting database rows that caused
+/// a UNIQUE constraint violation are removed so that the new insert or
+/// update can proceed.  Processing continues and no error is reported.
+///
+/// RESTRICT, SETNULL, and CASCADE actions apply only to foreign keys.
+/// RESTRICT is the same as ABORT for IMMEDIATE foreign keys and the
+/// same as ROLLBACK for DEFERRED keys.  SETNULL means that the foreign
+/// key is set to NULL.  CASCADE means that a DELETE or UPDATE of the
+/// referenced table row is propagated into the row that holds the
+/// foreign key.
+///
+/// The following symbolic values are used to record which type
+/// of action to take.
+///
+///</summary>
         private const int OE_None = 0; //#define OE_None     0   /* There is no constraint to check */
 
         private const int OE_Rollback = 1;
@@ -1928,11 +1951,12 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
         private const int OE_Default = 99; //#define OE_Default  99  /* Do whatever the default action is */
 
 
-        /*
-    ** An instance of the following structure is passed as the first
-    ** argument to sqlite3VdbeKeyCompare and is used to control the
-    ** comparison of the two index keys.
-    */
+        ///<summary>
+/// An instance of the following structure is passed as the first
+/// argument to sqlite3VdbeKeyCompare and is used to control the
+/// comparison of the two index keys.
+///
+///</summary>
 
         public class KeyInfo
         {
@@ -1986,34 +2010,37 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
         private const int UNPACKED_IGNORE_ROWID = 0x0004; /* Ignore trailing rowid on key1 */
         private const int UNPACKED_INCRKEY = 0x0008; /* Make this key an epsilon larger */
         private const int UNPACKED_PREFIX_MATCH = 0x0010; /* A prefix match is considered OK */
-        private const int UNPACKED_PREFIX_SEARCH = 0x0020; /* A prefix match is considered OK */
+        private const int UNPACKED_PREFIX_SEARCH = 0x0020; ///<summary>
+///A prefix match is considered OK
+///</summary>
 
-        /*
-    ** Each SQL index is represented in memory by an
-    ** instance of the following structure.
-    **
-    ** The columns of the table that are to be indexed are described
-    ** by the aiColumn[] field of this structure.  For example, suppose
-    ** we have the following table and index:
-    **
-    **     CREATE TABLE Ex1(c1 int, c2 int, c3 text);
-    **     CREATE INDEX Ex2 ON Ex1(c3,c1);
-    **
-    ** In the Table structure describing Ex1, nCol==3 because there are
-    ** three columns in the table.  In the Index structure describing
-    ** Ex2, nColumn==2 since 2 of the 3 columns of Ex1 are indexed.
-    ** The value of aiColumn is {2, 0}.  aiColumn[0]==2 because the
-    ** first column to be indexed (c3) has an index of 2 in Ex1.aCol[].
-    ** The second column to be indexed (c1) has an index of 0 in
-    ** Ex1.aCol[], hence Ex2.aiColumn[1]==0.
-    **
-    ** The Index.onError field determines whether or not the indexed columns
-    ** must be unique and what to do if they are not.  When Index.onError=OE_None,
-    ** it means this is not a unique index.  Otherwise it is a unique index
-    ** and the value of Index.onError indicate the which conflict resolution
-    ** algorithm to employ whenever an attempt is made to insert a non-unique
-    ** element.
-    */
+        ///<summary>
+/// Each SQL index is represented in memory by an
+/// instance of the following structure.
+///
+/// The columns of the table that are to be indexed are described
+/// by the aiColumn[] field of this structure.  For example, suppose
+/// we have the following table and index:
+///
+///     CREATE TABLE Ex1(c1 int, c2 int, c3 text);
+///     CREATE INDEX Ex2 ON Ex1(c3,c1);
+///
+/// In the Table structure describing Ex1, nCol==3 because there are
+/// three columns in the table.  In the Index structure describing
+/// Ex2, nColumn==2 since 2 of the 3 columns of Ex1 are indexed.
+/// The value of aiColumn is {2, 0}.  aiColumn[0]==2 because the
+/// first column to be indexed (c3) has an index of 2 in Ex1.aCol[].
+/// The second column to be indexed (c1) has an index of 0 in
+/// Ex1.aCol[], hence Ex2.aiColumn[1]==0.
+///
+/// The Index.onError field determines whether or not the indexed columns
+/// must be unique and what to do if they are not.  When Index.onError=OE_None,
+/// it means this is not a unique index.  Otherwise it is a unique index
+/// and the value of Index.onError indicate the which conflict resolution
+/// algorithm to employ whenever an attempt is made to insert a non-unique
+/// element.
+///
+///</summary>
 
         public class Index
         {
@@ -2045,10 +2072,11 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             }
         };
 
-        /*
-    ** Each sample stored in the sqlite_stat2 table is represented in memory 
-    ** using a structure of this type.
-    */
+        ///<summary>
+/// Each sample stored in the sqlite_stat2 table is represented in memory
+/// using a structure of this type.
+///
+///</summary>
 
         public class IndexSample
         {
@@ -2065,14 +2093,15 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public u8 nByte; /* Size in byte of text or blob. */
         };
 
-        /*
-    ** Each token coming out of the lexer is an instance of
-    ** this structure.  Tokens are also used as part of an expression.
-    **
-    ** Note if Token.z==0 then Token.dyn and Token.n are undefined and
-    ** may contain random values.  Do not make any assumptions about Token.dyn
-    ** and Token.n when Token.z==0.
-    */
+        ///<summary>
+/// Each token coming out of the lexer is an instance of
+/// this structure.  Tokens are also used as part of an expression.
+///
+/// Note if Token.z==0 then Token.dyn and Token.n are undefined and
+/// may contain random values.  Do not make any assumptions about Token.dyn
+/// and Token.n when Token.z==0.
+///
+///</summary>
 
         public class Token
         {
@@ -2125,19 +2154,20 @@ set { _n = value; }
             }
         }
 
-        /*
-    ** An instance of this structure contains information needed to generate
-    ** code for a SELECT that contains aggregate functions.
-    **
-    ** If Expr.op==TK_AGG_COLUMN or TK_AGG_FUNCTION then Expr.pAggInfo is a
-    ** pointer to this structure.  The Expr.iColumn field is the index in
-    ** AggInfo.aCol[] or AggInfo.aFunc[] of information needed to generate
-    ** code for that node.
-    **
-    ** AggInfo.pGroupBy and AggInfo.aFunc.pExpr point to fields within the
-    ** original Select structure that describes the SELECT statement.  These
-    ** fields do not need to be freed when deallocating the AggInfo structure.
-    */
+        ///<summary>
+/// An instance of this structure contains information needed to generate
+/// code for a SELECT that contains aggregate functions.
+///
+/// If Expr.op==TK_AGG_COLUMN or TK_AGG_FUNCTION then Expr.pAggInfo is a
+/// pointer to this structure.  The Expr.iColumn field is the index in
+/// AggInfo.aCol[] or AggInfo.aFunc[] of information needed to generate
+/// code for that node.
+///
+/// AggInfo.pGroupBy and AggInfo.aFunc.pExpr point to fields within the
+/// original Select structure that describes the SELECT statement.  These
+/// fields do not need to be freed when deallocating the AggInfo structure.
+///
+///</summary>
 
         public class AggInfo_col
         {
@@ -2196,16 +2226,17 @@ set { _n = value; }
             }
         };
 
-        /*
-    ** The datatype ynVar is a signed integer, either 16-bit or 32-bit.
-    ** Usually it is 16-bits.  But if SQLITE_MAX_VARIABLE_NUMBER is greater
-    ** than 32767 we have to make it 32-bit.  16-bit is preferred because
-    ** it uses less memory in the Expr object, which is a big memory user
-    ** in systems with lots of prepared statements.  And few applications
-    ** need more than about 10 or 20 variables.  But some extreme users want
-    ** to have prepared statements with over 32767 variables, and for them
-    ** the option is available (at compile-time).
-    */
+        ///<summary>
+/// The datatype ynVar is a signed integer, either 16-bit or 32-bit.
+/// Usually it is 16-bits.  But if SQLITE_MAX_VARIABLE_NUMBER is greater
+/// than 32767 we have to make it 32-bit.  16-bit is preferred because
+/// it uses less memory in the Expr object, which is a big memory user
+/// in systems with lots of prepared statements.  And few applications
+/// need more than about 10 or 20 variables.  But some extreme users want
+/// to have prepared statements with over 32767 variables, and for them
+/// the option is available (at compile-time).
+///
+///</summary>
         //#if SQLITE_MAX_VARIABLE_NUMBER<=32767
         //typedef i16 ynVar;
         //#else
@@ -2288,7 +2319,9 @@ set { _op = value; }
 #else
             public u8 op; /* Operation performed by this node */
 #endif
-            public char affinity; /* The affinity of the column or 0 if not a column */
+            public char affinity; ///<summary>
+///The affinity of the column or 0 if not a column
+///</summary>
 #if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
 public u16 _flags;                            /* Various flags.  EP_* See below */
 public u16 flags
@@ -2323,7 +2356,9 @@ public int iValue;            /* Non-negative integer value if EP_IntValue */
       ** access them will result in a segfault or malfunction.
       *********************************************************************/
 
-            public Expr pLeft; /* Left subnode */
+            public Expr pLeft; ///<summary>
+///Left subnode
+///</summary>
             public Expr pRight; /* Right subnode */
 
             public struct _x
@@ -2537,21 +2572,23 @@ set { _op = value; }
         private const int EXPR_REDUCEDSIZE = 24;
         private const int EXPR_TOKENONLYSIZE = 8;
 
-        /*
-    ** Flags passed to the sqlite3ExprDup() function. See the header comment
-    ** above sqlite3ExprDup() for details.
-    */
+        ///<summary>
+/// Flags passed to the sqlite3ExprDup() function. See the header comment
+/// above sqlite3ExprDup() for details.
+///
+///</summary>
         //#define EXPRDUP_REDUCE         0x0001  /* Used reduced-size Expr nodes */
         private const int EXPRDUP_REDUCE = 0x0001;
 
-        /*
-    ** A list of expressions.  Each expression may optionally have a
-    ** name.  An expr/name combination can be used in several ways, such
-    ** as the list of "expr AS ID" fields following a "SELECT" or in the
-    ** list of "ID = expr" items in an UPDATE.  A list of expressions can
-    ** also be used as the argument to a function, in which case the a.zName
-    ** field is not used.
-    */
+        ///<summary>
+/// A list of expressions.  Each expression may optionally have a
+/// name.  An expr/name combination can be used in several ways, such
+/// as the list of "expr AS ID" fields following a "SELECT" or in the
+/// list of "ID = expr" items in an UPDATE.  A list of expressions can
+/// also be used as the argument to a function, in which case the a.zName
+/// field is not used.
+///
+///</summary>
 
         public class ExprList_item
         {
@@ -2585,11 +2622,12 @@ set { _op = value; }
 
         };
 
-        /*
-    ** An instance of this structure is used by the parser to record both
-    ** the parse tree for an expression and the span of input text for an
-    ** expression.
-    */
+        ///<summary>
+/// An instance of this structure is used by the parser to record both
+/// the parse tree for an expression and the span of input text for an
+/// expression.
+///
+///</summary>
 
         public class ExprSpan
         {
@@ -2598,21 +2636,22 @@ set { _op = value; }
             public string zEnd; /* One character past the end of input text */
         };
 
-        /*
-    ** An instance of this structure can hold a simple list of identifiers,
-    ** such as the list "a,b,c" in the following statements:
-    **
-    **      INSERT INTO t(a,b,c) VALUES ...;
-    **      CREATE INDEX idx ON t(a,b,c);
-    **      CREATE TRIGGER trig BEFORE UPDATE ON t(a,b,c) ...;
-    **
-    ** The IdList.a.idx field is used when the IdList represents the list of
-    ** column names after a table name in an INSERT statement.  In the statement
-    **
-    **     INSERT INTO t(a,b,c) ...
-    **
-    ** If "a" is the k-th column of table "t", then IdList.a[0].idx==k.
-    */
+        ///<summary>
+/// An instance of this structure can hold a simple list of identifiers,
+/// such as the list "a,b,c" in the following statements:
+///
+///      INSERT INTO t(a,b,c) VALUES ...;
+///      CREATE INDEX idx ON t(a,b,c);
+///      CREATE TRIGGER trig BEFORE UPDATE ON t(a,b,c) ...;
+///
+/// The IdList.a.idx field is used when the IdList represents the list of
+/// column names after a table name in an INSERT statement.  In the statement
+///
+///     INSERT INTO t(a,b,c) ...
+///
+/// If "a" is the k-th column of table "t", then IdList.a[0].idx==k.
+///
+///</summary>
 
         public class IdList_item
         {
@@ -2648,32 +2687,34 @@ set { _op = value; }
     */
         //typedef u64 Bitmask;
 
-        /*
-    ** The number of bits in a Bitmask.  "BMS" means "BitMask Size".
-    */
+        ///<summary>
+/// The number of bits in a Bitmask.  "BMS" means "BitMask Size".
+///
+///</summary>
         //#define BMS  ((int)(sizeof(Bitmask)*8))
         private const int BMS = ((int) (sizeof (Bitmask)*8));
 
 
-        /*
-    ** The following structure describes the FROM clause of a SELECT statement.
-    ** Each table or subquery in the FROM clause is a separate element of
-    ** the SrcList.a[] array.
-    **
-    ** With the addition of multiple database support, the following structure
-    ** can also be used to describe a particular table such as the table that
-    ** is modified by an INSERT, DELETE, or UPDATE statement.  In standard SQL,
-    ** such a table must be a simple name: ID.  But in SQLite, the table can
-    ** now be identified by a database name, a dot, then the table name: ID.ID.
-    **
-    ** The jointype starts out showing the join type between the current table
-    ** and the next table on the list.  The parser builds the list this way.
-    ** But sqlite3SrcListShiftJoinType() later shifts the jointypes so that each
-    ** jointype expresses the join between the table and the previous table.
-    **
-    ** In the colUsed field, the high-order bit (bit 63) is set if the table
-    ** contains more than 63 columns and the 64-th or later column is used.
-    */
+        ///<summary>
+/// The following structure describes the FROM clause of a SELECT statement.
+/// Each table or subquery in the FROM clause is a separate element of
+/// the SrcList.a[] array.
+///
+/// With the addition of multiple database support, the following structure
+/// can also be used to describe a particular table such as the table that
+/// is modified by an INSERT, DELETE, or UPDATE statement.  In standard SQL,
+/// such a table must be a simple name: ID.  But in SQLite, the table can
+/// now be identified by a database name, a dot, then the table name: ID.ID.
+///
+/// The jointype starts out showing the join type between the current table
+/// and the next table on the list.  The parser builds the list this way.
+/// But sqlite3SrcListShiftJoinType() later shifts the jointypes so that each
+/// jointype expresses the join between the table and the previous table.
+///
+/// In the colUsed field, the high-order bit (bit 63) is set if the table
+/// contains more than 63 columns and the 64-th or later column is used.
+///
+///</summary>
 
         public class SrcList_item
         {
@@ -2716,9 +2757,10 @@ set { _op = value; }
             }
         };
 
-        /*
-    ** Permitted values of the SrcList.a.jointype field
-    */
+        ///<summary>
+/// Permitted values of the SrcList.a.jointype field
+///
+///</summary>
         private const int JT_INNER = 0x0001; //#define JT_INNER     0x0001    /* Any kind of inner or cross join */
         private const int JT_CROSS = 0x0002; //#define JT_CROSS     0x0002    /* Explicit use of the CROSS keyword */
         private const int JT_NATURAL = 0x0004; //#define JT_NATURAL   0x0004    /* True for a "natural" join */
@@ -2728,25 +2770,28 @@ set { _op = value; }
         private const int JT_ERROR = 0x0040; //#define JT_ERROR     0x0040    /* unknown or unsupported join type */
 
 
-        /*
-    ** A WherePlan object holds information that describes a lookup
-    ** strategy.
-    **
-    ** This object is intended to be opaque outside of the where.c module.
-    ** It is included here only so that that compiler will know how big it
-    ** is.  None of the fields in this object should be used outside of
-    ** the where.c module.
-    **
-    ** Within the union, pIdx is only used when wsFlags&WHERE_INDEXED is true.
-    ** pTerm is only used when wsFlags&WHERE_MULTI_OR is true.  And pVtabIdx
-    ** is only used when wsFlags&WHERE_VIRTUALTABLE is true.  It is never the
-    ** case that more than one of these conditions is true.
-    */
+        ///<summary>
+/// A WherePlan object holds information that describes a lookup
+/// strategy.
+///
+/// This object is intended to be opaque outside of the where.c module.
+/// It is included here only so that that compiler will know how big it
+/// is.  None of the fields in this object should be used outside of
+/// the where.c module.
+///
+/// Within the union, pIdx is only used when wsFlags&WHERE_INDEXED is true.
+/// pTerm is only used when wsFlags&WHERE_MULTI_OR is true.  And pVtabIdx
+/// is only used when wsFlags&WHERE_VIRTUALTABLE is true.  It is never the
+/// case that more than one of these conditions is true.
+///
+///</summary>
 
         public class WherePlan
         {
             public u32 wsFlags; /* WHERE_* flags that describe the strategy */
-            public u32 nEq; /* Number of == constraints */
+            public u32 nEq; ///<summary>
+///Number of == constraints
+///</summary>
             public double nRow; /* Estimated number of rows (for EQP) */
 
             public class _u
@@ -2769,19 +2814,20 @@ set { _op = value; }
             }
         };
 
-        /*
-    ** For each nested loop in a WHERE clause implementation, the WhereInfo
-    ** structure contains a single instance of this structure.  This structure
-    ** is intended to be private the the where.c module and should not be
-    ** access or modified by other modules.
-    **
-    ** The pIdxInfo field is used to help pick the best index on a
-    ** virtual table.  The pIdxInfo pointer contains indexing
-    ** information for the i-th table in the FROM clause before reordering.
-    ** All the pIdxInfo pointers are freed by whereInfoFree() in where.c.
-    ** All other information in the i-th WhereLevel object for the i-th table
-    ** after FROM clause ordering.
-    */
+        ///<summary>
+/// For each nested loop in a WHERE clause implementation, the WhereInfo
+/// structure contains a single instance of this structure.  This structure
+/// is intended to be private the the where.c module and should not be
+/// access or modified by other modules.
+///
+/// The pIdxInfo field is used to help pick the best index on a
+/// virtual table.  The pIdxInfo pointer contains indexing
+/// information for the i-th table in the FROM clause before reordering.
+/// All the pIdxInfo pointers are freed by whereInfoFree() in where.c.
+/// All other information in the i-th WhereLevel object for the i-th table
+/// after FROM clause ordering.
+///
+///</summary>
 
         public class InLoop
         {
@@ -2800,7 +2846,9 @@ set { _op = value; }
             public int addrCont; /* Jump here to continue with the next loop cycle */
             public int addrFirst; /* First instruction of interior of the loop */
             public u8 iFrom; /* Which entry in the FROM clause */
-            public u8 op, p5; /* Opcode and P5 of the opcode that ends the loop */
+            public u8 op, p5; ///<summary>
+///Opcode and P5 of the opcode that ends the loop
+///</summary>
             public int p1, p2; /* Operands of the opcode used to ends the loop */
 
             public class _u
@@ -2826,10 +2874,11 @@ set { _op = value; }
             public sqlite3_index_info pIdxInfo; /* Index info for n-th source table */
         };
 
-        /*
-    ** Flags appropriate for the wctrlFlags parameter of sqlite3WhereBegin()
-    ** and the WhereInfo.wctrlFlags member.
-    */
+        ///<summary>
+/// Flags appropriate for the wctrlFlags parameter of sqlite3WhereBegin()
+/// and the WhereInfo.wctrlFlags member.
+///
+///</summary>
         //#define WHERE_ORDERBY_NORMAL   0x0000 /* No-op */
         //#define WHERE_ORDERBY_MIN      0x0001 /* ORDER BY processing for min() func */
         //#define WHERE_ORDERBY_MAX      0x0002 /* ORDER BY processing for max() func */
@@ -2849,13 +2898,14 @@ set { _op = value; }
         private const int WHERE_FORCE_TABLE = 0x0040;
         private const int WHERE_ONETABLE_ONLY = 0x0080;
 
-        /*
-    ** The WHERE clause processing routine has two halves.  The
-    ** first part does the start of the WHERE loop and the second
-    ** half does the tail of the WHERE loop.  An instance of
-    ** this structure is returned by the first half and passed
-    ** into the second half to give some continuity.
-    */
+        ///<summary>
+/// The WHERE clause processing routine has two halves.  The
+/// first part does the start of the WHERE loop and the second
+/// half does the tail of the WHERE loop.  An instance of
+/// this structure is returned by the first half and passed
+/// into the second half to give some continuity.
+///
+///</summary>
 
         public class WhereInfo
         {
@@ -2876,27 +2926,28 @@ set { _op = value; }
                 /* Information about each nest loop in the WHERE */
         };
 
-        /*
-    ** A NameContext defines a context in which to resolve table and column
-    ** names.  The context consists of a list of tables (the pSrcList) field and
-    ** a list of named expression (pEList).  The named expression list may
-    ** be NULL.  The pSrc corresponds to the FROM clause of a SELECT or
-    ** to the table being operated on by INSERT, UPDATE, or DELETE.  The
-    ** pEList corresponds to the result set of a SELECT and is NULL for
-    ** other statements.
-    **
-    ** NameContexts can be nested.  When resolving names, the inner-most
-    ** context is searched first.  If no match is found, the next outer
-    ** context is checked.  If there is still no match, the next context
-    ** is checked.  This process continues until either a match is found
-    ** or all contexts are check.  When a match is found, the nRef member of
-    ** the context containing the match is incremented.
-    **
-    ** Each subquery gets a new NameContext.  The pNext field points to the
-    ** NameContext in the parent query.  Thus the process of scanning the
-    ** NameContext list corresponds to searching through successively outer
-    ** subqueries looking for a match.
-    */
+        ///<summary>
+/// A NameContext defines a context in which to resolve table and column
+/// names.  The context consists of a list of tables (the pSrcList) field and
+/// a list of named expression (pEList).  The named expression list may
+/// be NULL.  The pSrc corresponds to the FROM clause of a SELECT or
+/// to the table being operated on by INSERT, UPDATE, or DELETE.  The
+/// pEList corresponds to the result set of a SELECT and is NULL for
+/// other statements.
+///
+/// NameContexts can be nested.  When resolving names, the inner-most
+/// context is searched first.  If no match is found, the next outer
+/// context is checked.  If there is still no match, the next context
+/// is checked.  This process continues until either a match is found
+/// or all contexts are check.  When a match is found, the nRef member of
+/// the context containing the match is incremented.
+///
+/// Each subquery gets a new NameContext.  The pNext field points to the
+/// NameContext in the parent query.  Thus the process of scanning the
+/// NameContext list corresponds to searching through successively outer
+/// subqueries looking for a match.
+///
+///</summary>
 
         public class NameContext
         {
@@ -2989,10 +3040,11 @@ set { _op = value; }
             }
         };
 
-        /*
-    ** Allowed values for Select.selFlags.  The "SF" prefix stands for
-    ** "Select Flag".
-    */
+        ///<summary>
+/// Allowed values for Select.selFlags.  The "SF" prefix stands for
+/// "Select Flag".
+///
+///</summary>
         //#define SF_Distinct        0x0001  /* Output should be DISTINCT */
         //#define SF_Resolved        0x0002  /* Identifiers have been resolved */
         //#define SF_Aggregate       0x0004  /* Contains aggregate functions */
@@ -3033,10 +3085,11 @@ set { _op = value; }
 
         Coroutine = 10 //#define SelectResultType.Coroutine   10  /* Generate a single row of result */
     }
-        /*
-    ** A structure used to customize the behavior of sqlite3Select(). See
-    ** comments above sqlite3Select() for details.
-    */
+        ///<summary>
+/// A structure used to customize the behavior of sqlite3Select(). See
+/// comments above sqlite3Select() for details.
+///
+///</summary>
         //typedef struct SelectDest SelectDest;
         public class SelectDest
         {
@@ -3092,9 +3145,10 @@ set { _op = value; }
             public int regCtr; /* Memory register holding the rowid counter */
         };
 
-        /*
-    ** Size of the column cache
-    */
+        ///<summary>
+/// Size of the column cache
+///
+///</summary>
 #if !SQLITE_N_COLCACHE
         //# define SQLITE_N_COLCACHE 10
         private const int SQLITE_N_COLCACHE = 10;
@@ -3128,31 +3182,33 @@ set { _op = value; }
             public TriggerPrg pNext; /* Next entry in Parse.pTriggerPrg list */
         };
 
-        /*
-    ** The yDbMask datatype for the bitmask of all attached databases.
-    */
+        ///<summary>
+/// The yDbMask datatype for the bitmask of all attached databases.
+///
+///</summary>
         //#if SQLITE_MAX_ATTACHED>30
         //  typedef sqlite3_uint64 yDbMask;
         //#else
         //  typedef unsigned int yDbMask;
         //#endif
 
-        /*
-    ** An SQL parser context.  A copy of this structure is passed through
-    ** the parser and down into all the parser action routine in order to
-    ** carry around information that is global to the entire parse.
-    **
-    ** The structure is divided into two parts.  When the parser and code
-    ** generate call themselves recursively, the first part of the structure
-    ** is constant but the second part is reset at the beginning and end of
-    ** each recursion.
-    **
-    ** The nTableLock and aTableLock variables are only used if the shared-cache
-    ** feature is enabled (if sqlite3Tsd()->useSharedData is true). They are
-    ** used to store the set of table-locks required by the statement being
-    ** compiled. Function sqlite3TableLock() is used to add entries to the
-    ** list.
-    */
+        ///<summary>
+/// An SQL parser context.  A copy of this structure is passed through
+/// the parser and down into all the parser action routine in order to
+/// carry around information that is global to the entire parse.
+///
+/// The structure is divided into two parts.  When the parser and code
+/// generate call themselves recursively, the first part of the structure
+/// is constant but the second part is reset at the beginning and end of
+/// each recursion.
+///
+/// The nTableLock and aTableLock variables are only used if the shared-cache
+/// feature is enabled (if sqlite3Tsd()->useSharedData is true). They are
+/// used to store the set of table-locks required by the statement being
+/// compiled. Function sqlite3TableLock() is used to add entries to the
+/// list.
+///
+///</summary>
 
         public class yColCache
         {
@@ -3377,9 +3433,10 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
             public Parse pParse; /* The Parse structure */
         };
 
-        /*
-    ** Bitfield flags for P5 value in OP_Insert and OP_Delete
-    */
+        ///<summary>
+/// Bitfield flags for P5 value in OP_Insert and OP_Delete
+///
+///</summary>
         //#define OPFLAG_NCHANGE       0x01    /* Set to update db->nChange */
         //#define OPFLAG_LASTROWID     0x02    /* Set to update db->lastRowid */
         //#define OPFLAG_ISUPDATE      0x04    /* This OP_Insert is an sql UPDATE */
@@ -3449,13 +3506,14 @@ the <column-list> is stored here */
             }
         };
 
-        /*
-    ** A trigger is either a BEFORE or an AFTER trigger.  The following constants
-    ** determine which.
-    **
-    ** If there are multiple triggers, you might of some BEFORE and some AFTER.
-    ** In that cases, the constants below can be ORed together.
-    */
+        ///<summary>
+/// A trigger is either a BEFORE or an AFTER trigger.  The following constants
+/// determine which.
+///
+/// If there are multiple triggers, you might of some BEFORE and some AFTER.
+/// In that cases, the constants below can be ORed together.
+///
+///</summary>
         private const u8 TRIGGER_BEFORE = 1; //#define TRIGGER_BEFORE  1
         private const u8 TRIGGER_AFTER = 2; //#define TRIGGER_AFTER   2
 
@@ -3528,11 +3586,12 @@ the <column-list> is stored here */
             }
         };
 
-        /*
-    ** The following structure contains information used by the sqliteFix...
-    ** routines as they walk the parse tree to make database references
-    ** explicit.
-    */
+        ///<summary>
+/// The following structure contains information used by the sqliteFix...
+/// routines as they walk the parse tree to make database references
+/// explicit.
+///
+///</summary>
         //typedef struct DbFixer DbFixer;
         public class DbFixer
         {
@@ -3542,10 +3601,11 @@ the <column-list> is stored here */
             public Token pName; /* Name of the container - used for error messages */
         };
 
-        /*
-    ** An objected used to accumulate the text of a string where we
-    ** do not necessarily know how big the string will be in the end.
-    */
+        ///<summary>
+/// An objected used to accumulate the text of a string where we
+/// do not necessarily know how big the string will be in the end.
+///
+///</summary>
 
         public class StrAccum
         {
@@ -3585,10 +3645,11 @@ the <column-list> is stored here */
             }
         };
 
-        /*
-    ** A pointer to this structure is used to communicate information
-    ** from sqlite3Init and OP_ParseSchema into the sqlite3InitCallback.
-    */
+        ///<summary>
+/// A pointer to this structure is used to communicate information
+/// from sqlite3Init and OP_ParseSchema into the sqlite3InitCallback.
+///
+///</summary>
 
         public class InitData
         {
@@ -3598,11 +3659,12 @@ the <column-list> is stored here */
             public int rc; /* Result code stored here */
         }
 
-        /*
-    ** Structure containing global configuration data for the SQLite library.
-    **
-    ** This structure also contains some state information.
-    */
+        ///<summary>
+/// Structure containing global configuration data for the SQLite library.
+///
+/// This structure also contains some state information.
+///
+///</summary>
 
         public class Sqlite3Config
         {
