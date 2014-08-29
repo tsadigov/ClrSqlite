@@ -51,7 +51,7 @@ namespace Community.CsharpSqlite {
 		static int execSql(sqlite3 db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
 			#if !NDEBUG
-			      int rc;
+						      int rc;
       //VVA_ONLY( int rc; )
 #endif
 			if(zSql==null) {
@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 				return sqlite3_errcode(db);
 			}
 			#if !NDEBUG
-			      rc = sqlite3_step( pStmt );
+						      rc = sqlite3_step( pStmt );
       //VVA_ONLY( rc = ) sqlite3_step(pStmt);
       Debug.Assert( rc != SQLITE_ROW );
 #else
@@ -282,7 +282,7 @@ namespace Community.CsharpSqlite {
 				#if !SQLITE_OMIT_AUTOVACUUM
 				sqlite3BtreeSetAutoVacuum(pMain,sqlite3BtreeGetAutoVacuum(pTemp));
 				#endif
-			/* Restore the original value of db.flags *//* Currently there is an SQL level transaction open on the vacuum
+				/* Restore the original value of db.flags *//* Currently there is an SQL level transaction open on the vacuum
       ** database. No locks are held on any other files (since the main file
       ** was committed at the btree level). So it safe to end the transaction
       ** by manually setting the autoCommit flag to true and detaching the

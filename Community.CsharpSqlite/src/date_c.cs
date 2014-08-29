@@ -529,15 +529,15 @@ namespace Community.CsharpSqlite {
 			sqlite3_mutex_leave(mutex);
 			rc=pX==null?1:0;
 			#else
-			#if !SQLITE_OMIT_BUILTIN_TEST
-			  if( sqlite3GlobalConfig.bLocaltimeFault ) return 1;
+						#if !SQLITE_OMIT_BUILTIN_TEST
+						  if( sqlite3GlobalConfig.bLocaltimeFault ) return 1;
 #endif
-			#if (HAVE_LOCALTIME_R) && HAVE_LOCALTIME_R
-			  rc = localtime_r(t, pTm)==0;
+						#if (HAVE_LOCALTIME_R) && HAVE_LOCALTIME_R
+						  rc = localtime_r(t, pTm)==0;
 #else
-			  rc = localtime_s(pTm, t);
+						  rc = localtime_s(pTm, t);
 #endif
-			#endif
+						#endif
 			return rc;
 		}
 		#endif
@@ -1167,7 +1167,7 @@ namespace Community.CsharpSqlite {
 		}
 		#endif
 		#if SQLITE_OMIT_DATETIME_FUNCS
-		/*
+				/*
 ** If the library is compiled to omit the full-scale date and time
 ** handling (to get a smaller binary), the following minimal version
 ** of the functions current_time(), current_date() and current_timestamp()
@@ -1194,13 +1194,13 @@ db = sqlite3_context_db_handle(context);
   sqlite3OsCurrentTimeInt64(db->pVfs, &iT);
   t = iT/1000 - 10000*(sqlite3_int64)21086676;
 #if HAVE_GMTIME_R
-		//  {
+				//  {
 //    struct tm sNow;
 //    gmtime_r(&t, sNow);
 //    strftime(zdtBuf, 20, zFormat, sNow);
 //  }
 #else
-		//  {
+				//  {
 //    struct tm pTm;
 //    sqlite3_mutex_enter(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER));
 //    pTm = gmtime(&t);
@@ -1208,7 +1208,7 @@ db = sqlite3_context_db_handle(context);
 //    sqlite3_mutex_leave(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER));
 //  }
 #endif
-		
+				
 //  sqlite3_result_text(context, zdtBuf, -1, SQLITE_TRANSIENT);
 //}
 #endif
@@ -1228,14 +1228,14 @@ db = sqlite3_context_db_handle(context);
 				FUNCTION("current_timestamp",0,0,0,(dxFunc)ctimestampFunc),
 				FUNCTION("current_date",0,0,0,(dxFunc)cdateFunc),
 			#else
-			STR_FUNCTION("current_time",      0, "%H:%M:%S",          0, currentTimeFunc),
+						STR_FUNCTION("current_time",      0, "%H:%M:%S",          0, currentTimeFunc),
 STR_FUNCTION("current_date",      0, "%Y-%m-%d",          0, currentTimeFunc),
 STR_FUNCTION("current_timestamp", 0, "%Y-%m-%d %H:%M:%S", 0, currentTimeFunc),
 #endif
 			};
 			int i;
 			#if SQLITE_OMIT_WSD
-			FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
+						FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
 FuncDef[] aFunc = (FuncDef)GLOBAL( FuncDef, aDateTimeFuncs );
 #else
 			FuncDefHash pHash=sqlite3GlobalFunctions;

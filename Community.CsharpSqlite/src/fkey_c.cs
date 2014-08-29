@@ -689,7 +689,7 @@ namespace Community.CsharpSqlite {
 						aiCol[i]=-1;
 					}
 					#if !SQLITE_OMIT_AUTHORIZATION
-					      /* Request permission to read the parent key columns. If the 
+										      /* Request permission to read the parent key columns. If the 
       ** authorization callback returns SQLITE_IGNORE, behave as if any
       ** values read from the parent table are NULL. */
       if( db.xAuth ){
@@ -978,11 +978,11 @@ namespace Community.CsharpSqlite {
 						pWhen=sqlite3PExpr(pParse,TK_NOT,pWhen,0,0);
 						pTrigger.pWhen=sqlite3ExprDup(db,pWhen,EXPRDUP_REDUCE);
 					}
-				/* Re-enable the lookaside buffer, if it was disabled earlier. *///if ( db.mallocFailed == 1 )
-				//{
-				//  fkTriggerDelete( db, pTrigger );
-				//  return 0;
-				//}
+					/* Re-enable the lookaside buffer, if it was disabled earlier. *///if ( db.mallocFailed == 1 )
+					//{
+					//  fkTriggerDelete( db, pTrigger );
+					//  return 0;
+					//}
 				}
 				db.lookaside.bEnabled=enableLookaside;
 				sqlite3ExprDelete(db,ref pWhere);
@@ -1053,11 +1053,11 @@ namespace Community.CsharpSqlite {
 					if(pFKey.pNextTo!=null) {
 						pFKey.pNextTo.pPrevTo=pFKey.pPrevTo;
 					}
-				/* EV: R-30323-21917 Each foreign key constraint in SQLite is
+					/* EV: R-30323-21917 Each foreign key constraint in SQLite is
         ** classified as either immediate or deferred.
         *//* Delete any triggers created to implement actions for this FK. */
-				#if !SQLITE_OMIT_TRIGGER
-				#endif
+					#if !SQLITE_OMIT_TRIGGER
+					#endif
 				}
 				Debug.Assert(pFKey.isDeferred==0||pFKey.isDeferred==1);
 				fkTriggerDelete(db,pFKey.apTrigger[0]);

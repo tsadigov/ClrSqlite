@@ -312,7 +312,7 @@ namespace Community.CsharpSqlite {
 				goto attach_end;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
-			if( pAuthArg ){
+						if( pAuthArg ){
 char *zAuthArg;
 if( pAuthArg->op==TK_STRING ){
   zAuthArg = pAuthArg->u.zToken;

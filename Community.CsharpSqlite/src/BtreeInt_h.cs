@@ -418,7 +418,7 @@ namespace Community.CsharpSqlite {
 			/* List of other sharable Btrees from the same db */public Btree pPrev;
 		/* Back pointer of the same list */
 		#if !SQLITE_OMIT_SHARED_CACHE
-		BtLock lock;              /* Object used to lock page 1 */
+				BtLock lock;              /* Object used to lock page 1 */
 #endif
 		};
 
@@ -499,7 +499,7 @@ namespace Community.CsharpSqlite {
 			/* Non-recursive mutex required to access this object */public Bitvec pHasContent;
 			/* Set of pages moved to free-list this transaction */
 			#if !SQLITE_OMIT_SHARED_CACHE
-			public int nRef;                /* Number of references to this structure */
+						public int nRef;                /* Number of references to this structure */
 public BtShared pNext;          /* Next on a list of sharable BtShared structs */
 public BtLock pLock;            /* List of locks held on this shared-btree struct */
 public Btree pWriter;           /* Btree with currently open write transaction */
@@ -586,7 +586,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			/* True if info.nKey is valid */public int eState;
 			/* One of the CURSOR_XXX constants (see below) */
 			#if !SQLITE_OMIT_INCRBLOB
-			public Pgno[] aOverflow;         /* Cache of overflow page locations */
+						public Pgno[] aOverflow;         /* Cache of overflow page locations */
 public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 #endif
 			public i16 iPage;
@@ -613,7 +613,7 @@ public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 				nKey=0;
 				skipNext=0;
 				#if !SQLITE_OMIT_INCRBLOB
-				isIncrblobHandle=false;
+								isIncrblobHandle=false;
 aOverflow= null;
 #endif
 				iPage=0;
@@ -735,7 +735,7 @@ aOverflow= null;
 		///
 		///</summary>
 		#if DEBUG
-		    //define btreeIntegrity(p) \
+				    //define btreeIntegrity(p) \
     //  Debug.Assert( p.pBt.inTransaction!=TRANS_NONE || p.pBt.nTransaction==0 ); \
     //  Debug.Assert( p.pBt.inTransaction>=p.inTrans );
     static void btreeIntegrity( Btree p )
@@ -757,7 +757,7 @@ aOverflow= null;
 		#if !SQLITE_OMIT_AUTOVACUUM
 		//#define ISAUTOVACUUM (pBt.autoVacuum)
 		#else
-		//define ISAUTOVACUUM 0
+				//define ISAUTOVACUUM 0
 public static bool ISAUTOVACUUM =false;
 #endif
 		///<summary>

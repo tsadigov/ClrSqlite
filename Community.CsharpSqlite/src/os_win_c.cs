@@ -64,13 +64,13 @@ namespace Community.CsharpSqlite {
 ** desktops but not so well in embedded systems.
 *///#include <winbase.h>
 		#if __CYGWIN__
-		// include <sys/cygwin.h>
+				// include <sys/cygwin.h>
 #endif
 		/*
 ** Macros used to determine whether or not to use threads.
 */
 		#if THREADSAFE
-		// define SQLITE_W32_THREADS 1
+				// define SQLITE_W32_THREADS 1
 #endif
 		/*
 ** Include code that is common to all os_*.c files
@@ -87,7 +87,7 @@ namespace Community.CsharpSqlite {
 ** reduced API.
 */
 		#if SQLITE_OS_WINCE
-		// define AreFileApisANSI() 1
+				// define AreFileApisANSI() 1
 // define GetDiskFreeSpaceW() 0
 #endif
 		/* Forward references *///typedef struct winShm winShm;           /* A connection to shared-memory */
@@ -97,7 +97,7 @@ namespace Community.CsharpSqlite {
     ** with some code of our own.
     */
 		#if SQLITE_OS_WINCE
-		typedef struct winceLock {
+				typedef struct winceLock {
 int nReaders;       /* Number of reader locks obtained */
 BOOL bPending;      /* Indicates a pending lock has been obtained */
 BOOL bReserved;     /* Indicates a reserved lock has been obtained */
@@ -121,7 +121,7 @@ BOOL bExclusive;    /* Indicates an exclusive lock has been obtained */
 			/* The Windows errno from the last I/O error */public DWORD sectorSize;
 			/* Sector size of the device file is on */
 			#if !SQLITE_OMIT_WAL
-			public winShm pShm;            /* Instance of shared memory on this file */
+						public winShm pShm;            /* Instance of shared memory on this file */
 #else
 			public object pShm;
 			/* DUMMY Instance of shared memory on this file */
@@ -132,7 +132,7 @@ BOOL bExclusive;    /* Indicates an exclusive lock has been obtained */
 			///Chunk size configured by FCNTL_CHUNK_SIZE
 			///</summary>
 			#if SQLITE_OS_WINCE
-			Wstring zDeleteOnClose;  /* Name of file to delete when closing */
+						Wstring zDeleteOnClose;  /* Name of file to delete when closing */
 HANDLE hMutex;          /* Mutex used to control access to shared lock */
 HANDLE hShared;         /* Shared memory segment used for locking */
 winceLock local;        /* Locks obtained by this instance of sqlite3_file */
@@ -167,7 +167,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
     ** can manually set this value to 1 to emulate Win98 behavior.
     */
 		#if SQLITE_TEST
-		    int sqlite3_os_type = 0;
+				    int sqlite3_os_type = 0;
 #else
 		static int sqlite3_os_type=0;
 		#endif
@@ -183,7 +183,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 		/// the LockFileEx() API.
 		///</summary>
 		#if SQLITE_OS_WINCE
-		// define isNT()  (1)
+				// define isNT()  (1)
 #else
 		static bool isNT() {
 			//if (sqlite3_os_type == 0)
@@ -331,7 +331,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 			//                       0,
 			//                       0);
 			#if SQLITE_SILVERLIGHT
-			      zBuf = "Unknown error";
+						      zBuf = "Unknown error";
 #else
 			zBuf=Marshal.GetLastWin32Error().ToString();
 			//new Win32Exception( Marshal.GetLastWin32Error() ).Message;
@@ -400,7 +400,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 			/* Loop counter */DWORD iErrno;
 			// = GetLastError();  /* Error code */
 			#if SQLITE_SILVERLIGHT
-			      iErrno = (int)ERROR_NOT_SUPPORTED;
+						      iErrno = (int)ERROR_NOT_SUPPORTED;
 #else
 			iErrno=(u32)Marshal.GetLastWin32Error();
 			#endif
@@ -416,7 +416,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 			return errcode;
 		}
 		#if SQLITE_OS_WINCE
-		/*************************************************************************
+				/*************************************************************************
 ** This section contains code for WinCE only.
 */
 /*
@@ -772,7 +772,7 @@ return FALSE;
 			}
 			catch(Exception e) {
 				#if SQLITE_SILVERLIGHT
-				        pFile.lastErrno = 1;
+								        pFile.lastErrno = 1;
 #else
 				pFile.lastErrno=(u32)Marshal.GetLastWin32Error();
 				#endif
@@ -800,7 +800,7 @@ return FALSE;
 			Debug.Assert(id!=null);
 			Debug.Assert(pFile.pShm==null);
 			#if SQLITE_DEBUG
-			      OSTRACE( "CLOSE %d (%s)\n", pFile.fs.GetHashCode(), pFile.fs.Name );
+						      OSTRACE( "CLOSE %d (%s)\n", pFile.fs.GetHashCode(), pFile.fs.Name );
 #endif
 			do {
 				pFile.fs.Close();
@@ -811,7 +811,7 @@ return FALSE;
 			while(!rc&&++cnt<MX_CLOSE_ATTEMPT);
 			//, 1) );
 			#if SQLITE_OS_WINCE
-			//define WINCE_DELETION_ATTEMPTS 3
+						//define WINCE_DELETION_ATTEMPTS 3
 winceDestroyLock(pFile);
 if( pFile.zDeleteOnClose ){
 int cnt = 0;
@@ -826,7 +826,7 @@ free(pFile.zDeleteOnClose);
 }
 #endif
 			#if SQLITE_TEST
-			      OSTRACE( "CLOSE %d %s\n", pFile.fs.GetHashCode(), rc ? "ok" : "failed" );
+						      OSTRACE( "CLOSE %d %s\n", pFile.fs.GetHashCode(), rc ? "ok" : "failed" );
       OpenCounter( -1 );
 #endif
 			return rc?SQLITE_OK:winLogError(SQLITE_IOERR_CLOSE,"winClose",pFile.zPath);
@@ -843,11 +843,11 @@ free(pFile.zDeleteOnClose);
 			int nRead;
 			/* Number of bytes actually read from file */Debug.Assert(id!=null);
 			#if SQLITE_TEST
-			      if ( SimulateIOError() )
+						      if ( SimulateIOError() )
         return SQLITE_IOERR_READ;
 #endif
 			#if SQLITE_DEBUG
-			      OSTRACE( "READ %d lock=%d\n", pFile.fs.GetHashCode(), pFile.locktype );
+						      OSTRACE( "READ %d lock=%d\n", pFile.fs.GetHashCode(), pFile.locktype );
 #endif
 			if(!id.fs.CanRead)
 				return SQLITE_IOERR_READ;
@@ -860,7 +860,7 @@ free(pFile.zDeleteOnClose);
 			}
 			catch(Exception e) {
 				#if SQLITE_SILVERLIGHT
-				pFile.lastErrno = 1;
+								pFile.lastErrno = 1;
 #else
 				pFile.lastErrno=(u32)Marshal.GetLastWin32Error();
 				#endif
@@ -884,13 +884,13 @@ free(pFile.zDeleteOnClose);
 			/* File handle */Debug.Assert(amt>0);
 			Debug.Assert(pFile!=null);
 			#if SQLITE_TEST
-			      if ( SimulateIOError() )
+						      if ( SimulateIOError() )
         return SQLITE_IOERR_WRITE;
       if ( SimulateDiskfullError() )
         return SQLITE_FULL;
 #endif
 			#if SQLITE_DEBUG
-			      OSTRACE( "WRITE %d lock=%d\n", id.fs.GetHashCode(), id.locktype );
+						      OSTRACE( "WRITE %d lock=%d\n", id.fs.GetHashCode(), id.locktype );
 #endif
 			rc=seekWinFile(pFile,offset);
 			//if( rc==0 ){
@@ -914,7 +914,7 @@ free(pFile.zDeleteOnClose);
 			}
 			if(rc==0||amt>(int)wrote) {
 				#if SQLITE_SILVERLIGHT
-				id.lastErrno  = 1;
+								id.lastErrno  = 1;
 #else
 				id.lastErrno=(u32)Marshal.GetLastWin32Error();
 				#endif
@@ -936,10 +936,10 @@ free(pFile.zDeleteOnClose);
 			/* File handle object */int rc=SQLITE_OK;
 			/* Return code for this function */Debug.Assert(pFile!=null);
 			#if SQLITE_DEBUG
-			      OSTRACE( "TRUNCATE %d %lld\n", id.fs.Name, nByte );
+						      OSTRACE( "TRUNCATE %d %lld\n", id.fs.Name, nByte );
 #endif
 			#if SQLITE_TEST
-			      if ( SimulateIOError() )
+						      if ( SimulateIOError() )
         return SQLITE_IOERR_TRUNCATE;
       if ( SimulateIOError() )
         return SQLITE_IOERR_TRUNCATE;
@@ -965,7 +965,7 @@ free(pFile.zDeleteOnClose);
 			}
 			catch(IOException e) {
 				#if SQLITE_SILVERLIGHT
-				id.lastErrno  = 1;
+								id.lastErrno  = 1;
 #else
 				id.lastErrno=(u32)Marshal.GetLastWin32Error();
 				#endif
@@ -975,18 +975,18 @@ free(pFile.zDeleteOnClose);
 			return rc;
 		}
 		#if SQLITE_TEST
-		    /*
+				    /*
 ** Count the number of fullsyncs and normal syncs.  This is used to test
 ** that syncs and fullsyncs are occuring at the right times.
 */
 #if !TCLSH
-		    static int sqlite3_sync_count = 0;
+				    static int sqlite3_sync_count = 0;
     static int sqlite3_fullsync_count = 0;
 #else
-		    static tcl.lang.Var.SQLITE3_GETSET sqlite3_sync_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_sync_count" );
+				    static tcl.lang.Var.SQLITE3_GETSET sqlite3_sync_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_sync_count" );
     static tcl.lang.Var.SQLITE3_GETSET sqlite3_fullsync_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite_fullsync_count" );
 #endif
-		#endif
+				#endif
 		///<summary>
 		/// Make sure all writes to a particular file are committed to disk.
 		///</summary>
@@ -995,7 +995,7 @@ free(pFile.zDeleteOnClose);
 			sqlite3_file pFile=(sqlite3_file)id;
 			bool rc;
 			#else
-			UNUSED_PARAMETER(id);
+						UNUSED_PARAMETER(id);
 #endif
 			Debug.Assert(pFile!=null);
 			/* Check that one of SQLITE_SYNC_NORMAL or FULL was passed */Debug.Assert((flags&0x0F)==SQLITE_SYNC_NORMAL||(flags&0x0F)==SQLITE_SYNC_FULL);
@@ -1004,29 +1004,29 @@ free(pFile.zDeleteOnClose);
   ** line is to test that doing so does not cause any problems.
   */
 			#if SQLITE_TEST
-			        if ( SimulateDiskfullError() )
+						        if ( SimulateDiskfullError() )
         return SQLITE_FULL;
 #endif
 			#if !SQLITE_TEST
 			UNUSED_PARAMETER(flags);
 			#else
-			      if ( (flags&0x0F)==SQLITE_SYNC_FULL )
+						      if ( (flags&0x0F)==SQLITE_SYNC_FULL )
       {
 #if !TCLSH
-			        sqlite3_fullsync_count++;
+						        sqlite3_fullsync_count++;
       }
       sqlite3_sync_count++;
 #else
-			        sqlite3_fullsync_count.iValue++;
+						        sqlite3_fullsync_count.iValue++;
       }
       sqlite3_sync_count.iValue++;
 #endif
-			#endif
+						#endif
 			/* If we compiled with the SQLITE_NO_SYNC flag, then syncing is a
 ** no-op
 */
 			#if SQLITE_NO_SYNC
-			return SQLITE_OK;
+						return SQLITE_OK;
 #else
 			pFile.fs.Flush();
 			return SQLITE_OK;
@@ -1051,7 +1051,7 @@ free(pFile.zDeleteOnClose);
 			//  DWORD error;
 			Debug.Assert(id!=null);
 			#if SQLITE_TEST
-			      if ( SimulateIOError() )
+						      if ( SimulateIOError() )
         return SQLITE_IOERR_FSTAT;
 #endif
 			//lowerBits = GetFileSize(pFile.fs.Name, upperBits);
@@ -1089,7 +1089,7 @@ free(pFile.zDeleteOnClose);
 			//}
 			if(res==0) {
 				#if SQLITE_SILVERLIGHT
-				pFile.lastErrno = 1;
+								pFile.lastErrno = 1;
 #else
 				pFile.lastErrno=(u32)Marshal.GetLastWin32Error();
 				#endif
@@ -1121,7 +1121,7 @@ free(pFile.zDeleteOnClose);
 			#endif
 			if(res==0) {
 				#if SQLITE_SILVERLIGHT
-				pFile.lastErrno = 1;
+								pFile.lastErrno = 1;
 #else
 				pFile.lastErrno=(u32)Marshal.GetLastWin32Error();
 				#endif
@@ -1165,7 +1165,7 @@ free(pFile.zDeleteOnClose);
 			DWORD error=NO_ERROR;
 			Debug.Assert(id!=null);
 			#if SQLITE_DEBUG
-			      OSTRACE( "LOCK %d %d was %d(%d)\n",
+						      OSTRACE( "LOCK %d %d was %d(%d)\n",
       pFile.fs.GetHashCode(), locktype, pFile.locktype, pFile.sharedLockByte );
 #endif
 			/* If there is already a lock of this type or more restrictive on the
@@ -1196,7 +1196,7 @@ free(pFile.zDeleteOnClose);
             ** held by another reader process who will release it momentarily.
             */
 						#if SQLITE_DEBUG
-						            OSTRACE( "could not get a PENDING lock. cnt=%d\n", cnt );
+												            OSTRACE( "could not get a PENDING lock. cnt=%d\n", cnt );
 #endif
 						Thread.Sleep(1);
 					}
@@ -1204,7 +1204,7 @@ free(pFile.zDeleteOnClose);
 				gotPendingLock=(res!=0);
 				if(0==res) {
 					#if SQLITE_SILVERLIGHT
-					error = 1;
+										error = 1;
 #else
 					error=(u32)Marshal.GetLastWin32Error();
 					#endif
@@ -1219,7 +1219,7 @@ free(pFile.zDeleteOnClose);
 				}
 				else {
 					#if SQLITE_SILVERLIGHT
-					error = 1;
+										error = 1;
 #else
 					error=(u32)Marshal.GetLastWin32Error();
 					#endif
@@ -1237,7 +1237,7 @@ free(pFile.zDeleteOnClose);
 				catch(Exception e) {
 					res=0;
 					#if SQLITE_SILVERLIGHT
-					error = 1;
+										error = 1;
 #else
 					error=(u32)Marshal.GetLastWin32Error();
 					#endif
@@ -1247,7 +1247,7 @@ free(pFile.zDeleteOnClose);
 				}
 				else {
 					#if SQLITE_SILVERLIGHT
-					error = 1;
+										error = 1;
 #else
 					error=(u32)Marshal.GetLastWin32Error();
 					#endif
@@ -1263,7 +1263,7 @@ free(pFile.zDeleteOnClose);
 				Debug.Assert(pFile.locktype>=SHARED_LOCK);
 				res=unlockReadLock(pFile);
 				#if SQLITE_DEBUG
-				        OSTRACE( "unreadlock = %d\n", res );
+								        OSTRACE( "unreadlock = %d\n", res );
 #endif
 				//res = LockFile(pFile.fs.SafeFileHandle.DangerousGetHandle().ToInt32(), SHARED_FIRST, 0, SHARED_SIZE, 0);
 				try {
@@ -1279,12 +1279,12 @@ free(pFile.zDeleteOnClose);
 				}
 				else {
 					#if SQLITE_SILVERLIGHT
-					error = 1;
+										error = 1;
 #else
 					error=(u32)Marshal.GetLastWin32Error();
 					#endif
 					#if SQLITE_DEBUG
-					          OSTRACE( "error-code = %d\n", error );
+										          OSTRACE( "error-code = %d\n", error );
 #endif
 					getReadLock(pFile);
 				}
@@ -1301,7 +1301,7 @@ free(pFile.zDeleteOnClose);
 			}
 			else {
 				#if SQLITE_DEBUG
-				        OSTRACE( "LOCK FAILED %d trying for %d but got %d\n", pFile.fs.GetHashCode(),
+								        OSTRACE( "LOCK FAILED %d trying for %d but got %d\n", pFile.fs.GetHashCode(),
         locktype, newLocktype );
 #endif
 				pFile.lastErrno=error;
@@ -1325,7 +1325,7 @@ free(pFile.zDeleteOnClose);
 			if(pFile.locktype>=RESERVED_LOCK) {
 				rc=1;
 				#if SQLITE_DEBUG
-				        OSTRACE( "TEST WR-LOCK %d %d (local)\n", pFile.fs.Name, rc );
+								        OSTRACE( "TEST WR-LOCK %d %d (local)\n", pFile.fs.Name, rc );
 #endif
 			}
 			else {
@@ -1340,7 +1340,7 @@ free(pFile.zDeleteOnClose);
 				rc=1-rc;
 				// !rc
 				#if SQLITE_DEBUG
-				        OSTRACE( "TEST WR-LOCK %d %d (remote)\n", pFile.fs.GetHashCode(), rc );
+								        OSTRACE( "TEST WR-LOCK %d %d (remote)\n", pFile.fs.GetHashCode(), rc );
 #endif
 			}
 			pResOut=rc;
@@ -1365,7 +1365,7 @@ free(pFile.zDeleteOnClose);
 			Debug.Assert(pFile!=null);
 			Debug.Assert(locktype<=SHARED_LOCK);
 			#if SQLITE_DEBUG
-			      OSTRACE( "UNLOCK %d to %d was %d(%d)\n", pFile.fs.GetHashCode(), locktype,
+						      OSTRACE( "UNLOCK %d to %d was %d(%d)\n", pFile.fs.GetHashCode(), locktype,
       pFile.locktype, pFile.sharedLockByte );
 #endif
 			type=pFile.locktype;
@@ -1452,7 +1452,7 @@ free(pFile.zDeleteOnClose);
 			return 0;
 		}
 		#if !SQLITE_OMIT_WAL
-		
+				
 
 ///<summary>
 ///
@@ -1483,11 +1483,11 @@ static void winShmLeaveMutex(void){
   sqlite3_mutex_leave(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER));
 }
 #if SQLITE_DEBUG
-		static int winShmMutexHeld(void) {
+				static int winShmMutexHeld(void) {
   return sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER));
 }
 #endif
-		
+				
 /*
 ** Object used to represent a single file opened and mmapped to provide
 ** shared memory.  When multiple threads all reference the same
@@ -1530,9 +1530,9 @@ struct winShmNode {
   winShm *pFirst;            /* All winShm objects pointing to this */
   winShmNode *pNext;         /* Next in list of all winShmNode objects */
 #if SQLITE_DEBUG
-		  u8 nextShmId;              /* Next available winShm.id value */
+				  u8 nextShmId;              /* Next available winShm.id value */
 #endif
-		};
+				};
 
 ///<summary>
 /// A global array of all winShmNode objects.
@@ -1561,9 +1561,9 @@ struct winShm {
   u16 sharedMask;            /* Mask of shared locks held */
   u16 exclMask;              /* Mask of exclusive locks held */
 #if SQLITE_DEBUG
-		  u8 id;                     /* Id of this connection with its winShmNode */
+				  u8 id;                     /* Id of this connection with its winShmNode */
 #endif
-		};
+				};
 
 /*
 ** Constants used for locking
@@ -1758,9 +1758,9 @@ static int winOpenSharedMemory(winFile *pDbFd){
   /* Make the new connection a child of the winShmNode */
   p->pShmNode = pShmNode;
 #if SQLITE_DEBUG
-		  p->id = pShmNode->nextShmId++;
+				  p->id = pShmNode->nextShmId++;
 #endif
-		  pShmNode->nRef++;
+				  pShmNode->nRef++;
   pDbFd->pShm = p;
   winShmLeaveMutex();
 
@@ -2148,7 +2148,7 @@ shmpage_out:
       ** function failing. 
       */
 			#if SQLITE_TEST
-			      if ( SimulateIOError() )
+						      if ( SimulateIOError() )
         return SQLITE_IOERR;
 #endif
 			//if( sqlite3_temp_directory ){
@@ -2206,7 +2206,7 @@ shmpage_out:
 			//}
 			//zBuf[j] = 0;
 			#if SQLITE_DEBUG
-			      OSTRACE( "TEMP FILENAME: %s\n", zBuf.ToString() );
+						      OSTRACE( "TEMP FILENAME: %s\n", zBuf.ToString() );
 #endif
 			return SQLITE_OK;
 		}
@@ -2222,7 +2222,7 @@ shmpage_out:
 			FileOptions dwFlagsAndAttributes;
 			#endif
 			#if SQLITE_OS_WINCE
-			int isTemp = 0;
+						int isTemp = 0;
 #endif
 			//winFile* pFile = (winFile)id;
 			string zConverted;
@@ -2306,7 +2306,7 @@ shmpage_out:
 			// FILE_SHARE_READ | FILE_SHARE_WRITE;
 			if(isDelete) {
 				#if SQLITE_OS_WINCE
-				dwFlagsAndAttributes = FILE_ATTRIBUTE_HIDDEN;
+								dwFlagsAndAttributes = FILE_ATTRIBUTE_HIDDEN;
 isTemp = 1;
 #else
 				#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
@@ -2326,7 +2326,7 @@ isTemp = 1;
 			/* Reports from the internet are that performance is always
       ** better if FILE_FLAG_RANDOM_ACCESS is used.  Ticket #2699. */
 			#if SQLITE_OS_WINCE
-			dwFlagsAndAttributes |= FileOptions.RandomAccess; // FILE_FLAG_RANDOM_ACCESS;
+						dwFlagsAndAttributes |= FileOptions.RandomAccess; // FILE_FLAG_RANDOM_ACCESS;
 #endif
 			if(isNT()) {
 				//h = CreateFileW((WCHAR)zConverted,
@@ -2345,14 +2345,14 @@ isTemp = 1;
 					try {
 						retries--;
 						#if WINDOWS_PHONE || SQLITE_SILVERLIGHT
-						 fs = new IsolatedStorageFileStream(zConverted, dwCreationDisposition, dwDesiredAccess, dwShareMode, IsolatedStorageFile.GetUserStoreForApplication());
+												 fs = new IsolatedStorageFileStream(zConverted, dwCreationDisposition, dwDesiredAccess, dwShareMode, IsolatedStorageFile.GetUserStoreForApplication());
 #elif !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
 						fs=new FileStream(zConverted,dwCreationDisposition,dwDesiredAccess,dwShareMode,4096,dwFlagsAndAttributes);
 						#else
-						            fs = new FileStream( zConverted, dwCreationDisposition, dwDesiredAccess, dwShareMode, 4096);
+												            fs = new FileStream( zConverted, dwCreationDisposition, dwDesiredAccess, dwShareMode, 4096);
 #endif
 						#if SQLITE_DEBUG
-						            OSTRACE( "OPEN %d (%s)\n", fs.GetHashCode(), fs.Name );
+												            OSTRACE( "OPEN %d (%s)\n", fs.GetHashCode(), fs.Name );
 #endif
 					}
 					catch(Exception e) {
@@ -2382,12 +2382,12 @@ isTemp = 1;
 			#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
 			fs.SafeFileHandle.IsInvalid
 			#else
-			 !fs.CanRead
+						 !fs.CanRead
 #endif
 			)//(h == INVALID_HANDLE_VALUE)
 			 {
 				#if SQLITE_SILVERLIGHT
-				pFile.lastErrno = 1;
+								pFile.lastErrno = 1;
 #else
 				//      pFile.lastErrno = GetLastError();
 				pFile.lastErrno=(u32)Marshal.GetLastWin32Error();
@@ -2420,7 +2420,7 @@ isTemp = 1;
 			pFile.zPath=zName;
 			pFile.sectorSize=(ulong)getSectorSize(pVfs,zUtf8Name);
 			#if SQLITE_OS_WINCE
-			if( isReadWrite && eType==SQLITE_OPEN_MAIN_DB
+						if( isReadWrite && eType==SQLITE_OPEN_MAIN_DB
 && !winceCreateLock(zName, pFile)
 ){
 CloseHandle(h);
@@ -2433,8 +2433,8 @@ pFile.zDeleteOnClose = zConverted;
 #endif
 			{
 				// free(zConverted);
-			#if SQLITE_TEST
-			      OpenCounter( +1 );
+				#if SQLITE_TEST
+							      OpenCounter( +1 );
 #endif
 			}
 			return rc;
@@ -2459,7 +2459,7 @@ pFile.zDeleteOnClose = zConverted;
 			UNUSED_PARAMETER(pVfs);
 			UNUSED_PARAMETER(syncDir);
 			#if SQLITE_TEST
-			      if ( SimulateIOError() )
+						      if ( SimulateIOError() )
         return SQLITE_IOERR_DELETE;
 #endif
 			zConverted=convertUtf8Filename(zFilename);
@@ -2475,9 +2475,9 @@ pFile.zDeleteOnClose = zConverted;
 				//       && (Sleep(100), 1) );
 				 {
 					#if WINDOWS_PHONE
-					           if ( !System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForApplication().FileExists( zFilename ) )
+										           if ( !System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForApplication().FileExists( zFilename ) )
 #elif SQLITE_SILVERLIGHT
-					            if (!IsolatedStorageFile.GetUserStoreForApplication().FileExists(zFilename))
+										            if (!IsolatedStorageFile.GetUserStoreForApplication().FileExists(zFilename))
 #else
 					if(!File.Exists(zFilename))
 					#endif
@@ -2487,9 +2487,9 @@ pFile.zDeleteOnClose = zConverted;
 					}
 					try {
 						#if WINDOWS_PHONE
-						              System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(zFilename);
+												              System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(zFilename);
 #elif SQLITE_SILVERLIGHT
-						              IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(zFilename);
+												              IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(zFilename);
 #else
 						File.Delete(zConverted);
 						#endif
@@ -2532,12 +2532,12 @@ pFile.zDeleteOnClose = zConverted;
 			}
 			//free(zConverted);
 			#if SQLITE_DEBUG
-			      OSTRACE( "DELETE \"%s\"\n", zFilename );
+						      OSTRACE( "DELETE \"%s\"\n", zFilename );
 #endif
 			if(rc==SQLITE_OK)
 				return rc;
 			#if SQLITE_SILVERLIGHT
-			      error = (int)ERROR_NOT_SUPPORTED;
+						      error = (int)ERROR_NOT_SUPPORTED;
 #else
 			error=Marshal.GetLastWin32Error();
 			#endif
@@ -2552,7 +2552,7 @@ pFile.zDeleteOnClose = zConverted;
 			//  void *zConverted;
 			UNUSED_PARAMETER(pVfs);
 			#if SQLITE_TEST
-			      if ( SimulateIOError() )
+						      if ( SimulateIOError() )
       {
         pResOut = -1;
         return SQLITE_IOERR_ACCESS;
@@ -2568,9 +2568,9 @@ pFile.zDeleteOnClose = zConverted;
 			// Do a quick test to prevent the try/catch block
 			if(flags==SQLITE_ACCESS_EXISTS) {
 				#if WINDOWS_PHONE
-				          pResOut = System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForApplication().FileExists(zFilename) ? 1 : 0;
+								          pResOut = System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForApplication().FileExists(zFilename) ? 1 : 0;
 #elif SQLITE_SILVERLIGHT
-				          pResOut = IsolatedStorageFile.GetUserStoreForApplication().FileExists(zFilename) ? 1 : 0;
+								          pResOut = IsolatedStorageFile.GetUserStoreForApplication().FileExists(zFilename) ? 1 : 0;
 #else
 				pResOut=File.Exists(zFilename)?1:0;
 				#endif
@@ -2603,7 +2603,7 @@ pFile.zDeleteOnClose = zConverted;
 				//  }
 				//}
 				#if WINDOWS_PHONE || WINDOWS_MOBILE || SQLITE_SILVERLIGHT
-				        if (new DirectoryInfo(zFilename).Exists)
+								        if (new DirectoryInfo(zFilename).Exists)
 #else
 				attr=File.GetAttributes(zFilename);
 				// GetFileAttributesW( (WCHAR)zConverted );
@@ -2661,13 +2661,13 @@ pFile.zDeleteOnClose = zConverted;
     ** bytes in size.
     */static int winFullPathname(sqlite3_vfs pVfs,/* Pointer to vfs object */string zRelative,/* Possibly relative input path */int nFull,/* Size of output buffer in bytes */StringBuilder zFull/* Output buffer */) {
 			#if __CYGWIN__
-			SimulateIOError( return SQLITE_ERROR );
+						SimulateIOError( return SQLITE_ERROR );
 UNUSED_PARAMETER(nFull);
 cygwin_conv_to_full_win32_path(zRelative, zFull);
 return SQLITE_OK;
 #endif
 			#if SQLITE_OS_WINCE
-			SimulateIOError( return SQLITE_ERROR );
+						SimulateIOError( return SQLITE_ERROR );
 UNUSED_PARAMETER(nFull);
 /* WinCE has no concept of a relative pathname, or so I am told. */
 sqlite3_snprintf(pVfs.mxPathname, zFull, "%s", zRelative);
@@ -2688,7 +2688,7 @@ return SQLITE_OK;
       ** current working directory has been unlinked.
       */
 			#if SQLITE_TEST
-			      if ( SimulateIOError() )
+						      if ( SimulateIOError() )
         return SQLITE_ERROR;
 #endif
 			UNUSED_PARAMETER(nFull);
@@ -2705,7 +2705,7 @@ return SQLITE_OK;
 				// will happen on exit; was   free(zConverted);
 				try {
 					#if WINDOWS_PHONE || SQLITE_SILVERLIGHT
-					          zOut = zRelative;
+										          zOut = zRelative;
 #else
 					zOut=Path.GetFullPath(zRelative);
 					// was unicodeToUtf8(zTemp);
@@ -2755,13 +2755,13 @@ return SQLITE_OK;
     ** file.
     */static int getSectorSize(sqlite3_vfs pVfs,string zRelative/* UTF-8 file name */) {
 			#if FALSE
-			int bytesPerSector = SQLITE_DEFAULT_SECTOR_SIZE;
+						int bytesPerSector = SQLITE_DEFAULT_SECTOR_SIZE;
 /* GetDiskFreeSpace is not supported under WINCE */
 #if SQLITE_OS_WINCE
-			UNUSED_PARAMETER(pVfs);
+						UNUSED_PARAMETER(pVfs);
 UNUSED_PARAMETER(zRelative);
 #else
-			StringBuilder zFullpath = new StringBuilder( MAX_PATH + 1 );
+						StringBuilder zFullpath = new StringBuilder( MAX_PATH + 1 );
 int rc;
 //bool dwRet = false;
 //int dwDummy = 0;
@@ -2774,9 +2774,9 @@ int rc;
 SimulateIOErrorBenign(1);
 rc = winFullPathname( pVfs, zRelative, MAX_PATH, zFullpath );
 #if SQLITE_TEST
-			SimulateIOError( return SQLITE_ERROR )
+						SimulateIOError( return SQLITE_ERROR )
 #endif
-			if ( rc == SQLITE_OK )
+						if ( rc == SQLITE_OK )
 {
 StringBuilder zConverted = new StringBuilder( convertUtf8Filename( zFullpath.ToString() ) );
 if ( zConverted.Length != 0 )
@@ -2835,7 +2835,7 @@ zConverted.Length = i;
 bytesPerSector = GetbytesPerSector( zConverted );
 }
 #endif
-			return bytesPerSector == 0 ? SQLITE_DEFAULT_SECTOR_SIZE : bytesPerSector;
+						return bytesPerSector == 0 ? SQLITE_DEFAULT_SECTOR_SIZE : bytesPerSector;
 #endif
 			return SQLITE_DEFAULT_SECTOR_SIZE;
 		}
@@ -2901,7 +2901,7 @@ bytesPerSector = GetbytesPerSector( zConverted );
 			return 0;
 		}
 		#else
-		static object winDlOpen(ref sqlite3_vfs vfs, string zFilename) { return null; }
+				static object winDlOpen(ref sqlite3_vfs vfs, string zFilename) { return null; }
 static int winDlError(ref sqlite3_vfs vfs, int nByte, ref string zErrMsg) { return 0; }
 static object winDlSym(ref sqlite3_vfs vfs, object data, string zSymbol) { return null; }
 static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
@@ -2926,7 +2926,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 			int n=0;
 			UNUSED_PARAMETER(pVfs);
 			#if (SQLITE_TEST)
-			      n = nBuf;
+						      n = nBuf;
       Array.Clear( zBuf, 0, n );// memset( zBuf, 0, nBuf );
 #else
 			byte[] sBuf=BitConverter.GetBytes(System.DateTime.Now.Ticks);
@@ -2944,7 +2944,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 				#if !SQLITE_SILVERLIGHT
 				processId=(u32)Process.GetCurrentProcess().Id;
 				#else
-				processId = 28376023;
+								processId = 28376023;
 #endif
 				put32bits(zBuf,n,processId);
 				//(memcpy(&zBuf[n], pid, sizeof(pid));
@@ -2984,12 +2984,12 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
     ** sqlite3OsCurrentTime() during testing.
     */
 		#if SQLITE_TEST
-		#if !TCLSH
-		    static int sqlite3_current_time = 0;//  /* Fake system time in seconds since 1970. */
+				#if !TCLSH
+				    static int sqlite3_current_time = 0;//  /* Fake system time in seconds since 1970. */
 #else
-		    static tcl.lang.Var.SQLITE3_GETSET sqlite3_current_time = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_current_time" );
+				    static tcl.lang.Var.SQLITE3_GETSET sqlite3_current_time = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_current_time" );
 #endif
-		#endif
+				#endif
 		/*
 ** Find the current time (in Universal Coordinated Time).  Write into *piNow
 ** the current time and date as a Julian Day number times 86_400_000.  In
@@ -3004,7 +3004,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
       *///var ft = new FILETIME();
 			const sqlite3_int64 winFiletimeEpoch=23058135*(sqlite3_int64)8640000;
 			#if SQLITE_TEST
-			      const sqlite3_int64 unixEpoch = 24405875 * (sqlite3_int64)8640000;
+						      const sqlite3_int64 unixEpoch = 24405875 * (sqlite3_int64)8640000;
 #endif
 			///* 2^32 - to avoid use of LL and warnings in gcc */
 			//const sqlite3_int64 max32BitValue =
@@ -3026,18 +3026,18 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 			//   (sqlite3_int64)ft.dwLowDateTime)/(sqlite3_int64)10000;
 			piNow=winFiletimeEpoch+System.DateTime.UtcNow.ToFileTimeUtc()/(sqlite3_int64)10000;
 			#if SQLITE_TEST
-			#if !TCLSH
-			      if ( ( sqlite3_current_time) != 0 )
+						#if !TCLSH
+						      if ( ( sqlite3_current_time) != 0 )
       {
         piNow = 1000 * (sqlite3_int64)sqlite3_current_time + unixEpoch;
       }
 #else
-			      if ( ( sqlite3_current_time.iValue ) != 0 )
+						      if ( ( sqlite3_current_time.iValue ) != 0 )
       {
         piNow = 1000 * (sqlite3_int64)sqlite3_current_time.iValue + unixEpoch;
       }
 #endif
-			#endif
+						#endif
 			UNUSED_PARAMETER(pVfs);
 			return 0;
 		}
@@ -3093,7 +3093,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
     ** Initialize and deinitialize the operating system interface.
     */static int sqlite3_os_init() {
 			#if !SQLITE_OMIT_WAL
-			/* get memory map allocation granularity */
+						/* get memory map allocation granularity */
 memset(&winSysInfo, 0, sizeof(SYSTEM_INFO));
 GetSystemInfo(&winSysInfo);
 Debug.Assert(winSysInfo.dwAllocationGranularity > 0);
@@ -3133,7 +3133,7 @@ Debug.Assert(winSysInfo.dwAllocationGranularity > 0);
 				ovlp.EventHandle=IntPtr.Zero;
 				return LockFileEx(pFile.fs.Handle,LOCKFILE_FAIL_IMMEDIATELY,0,(uint)length,0,ref ovlp)?1:0;
 				#else
-				            return 1;
+								            return 1;
 #endif
 			}
 			public virtual void UnlockFile(sqlite3_file pFile,long offset,long length) {
@@ -3168,7 +3168,7 @@ Debug.Assert(winSysInfo.dwAllocationGranularity > 0);
 			// this is where it needs to check if it's running in an ASP.Net MediumTrust or lower environment
 			// in order to pick the appropriate locking strategy
 			#if SQLITE_SILVERLIGHT
-			return true;
+						return true;
 #else
 			return false;
 			#endif

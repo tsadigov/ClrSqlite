@@ -267,7 +267,7 @@ namespace Community.CsharpSqlite {
 				pTable.azModuleArg[i]=zArg;
 				//pTable.azModuleArg[i + 1] = null;
 				//azModuleArg[i+1] = 0;
-			//pTable.azModuleArg = azModuleArg;
+				//pTable.azModuleArg = azModuleArg;
 			}
 		}
 		///<summary>
@@ -298,7 +298,7 @@ namespace Community.CsharpSqlite {
 			pParse.sNameToken.n=pParse.sNameToken.z.Length;
 			//      (int)[pModuleName.n] - pName1.z );
 			#if !SQLITE_OMIT_AUTHORIZATION
-			  /* Creating a virtual table invokes the authorization callback twice.
+						  /* Creating a virtual table invokes the authorization callback twice.
   ** The first invocation, to obtain permission to INSERT a row into the
   ** sqlite_master table, has already been made by sqlite3StartTable().
   ** The second call, to obtain permission to create the table, is made now.
@@ -973,10 +973,10 @@ namespace Community.CsharpSqlite {
 				Array.Resize(ref pToplevel.apVtabLock,n);
 				// pToplevel.apVtabLock= apVtabLock;
 				pToplevel.apVtabLock[pToplevel.nVtabLock++]=pTab;
-			//else
-			//{
-			//  pToplevel.db.mallocFailed = 1;
-			//}
+				//else
+				//{
+				//  pToplevel.db.mallocFailed = 1;
+				//}
 			}
 		}
 		static int[] aMap=new int[] {

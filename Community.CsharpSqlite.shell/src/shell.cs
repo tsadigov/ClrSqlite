@@ -58,7 +58,7 @@ class Shell {
 	//# include <unistd.h>
 	//#endif
 	#if (HAVE_READLINE)
-	/ include <readline/readline.h>
+		/ include <readline/readline.h>
 / include <readline/history.h>
 #else
 	//# define readline(p) local_getline(p,stdin)
@@ -79,19 +79,19 @@ class Shell {
 	//#define isatty(h) _isatty(h)
 	//#define access(f,m) _access((f),(m))
 	#else
-	/* Make sure isatty() has a prototype.
+		/* Make sure isatty() has a prototype.
 */
 extern int isatty();
 #endif
 	#if (_WIN32_WCE)
-	/* Windows CE (arm-wince-mingw32ce-gcc) does not provide isatty()
+		/* Windows CE (arm-wince-mingw32ce-gcc) does not provide isatty()
 * thus we always assume that we have a console. That can be
 * overridden with the -batch command line option.
 */
 /define isatty(x) 1
 #endif
 	#if !(_WIN32) && !(WIN32) && !(__OS2__) && !(__RTP__) && !(_WRS_KERNEL)
-	/include <sys/time.h>
+		/include <sys/time.h>
 /include <sys/resource.h>
 
 /* Saved resource information for the beginning of an operation */
@@ -177,7 +177,7 @@ timeDiff(&sBegin.ru_stime, &sEnd.ru_stime));
   ** Write I/O traces to the following stream.
   */
 	#if SQLITE_ENABLE_IOTRACE
-	static FILE *iotrace = null;
+		static FILE *iotrace = null;
 #endif
 	///<summary>
 	/// This routine works like printf in that its first argument is a
@@ -186,7 +186,7 @@ timeDiff(&sBegin.ru_stime, &sEnd.ru_stime));
 	/// is written to iotrace.
 	///</summary>
 	#if SQLITE_ENABLE_IOTRACE
-	static void iotracePrintf(string zFormat, params object[] ap ){
+		static void iotracePrintf(string zFormat, params object[] ap ){
 //va_list ap;
 string z;
 if( iotrace==null ) return;
@@ -339,7 +339,7 @@ sqlite3_free(ref z);
 		}
 		zResult=readline(zPrompt);
 		#if (HAVE_READLINE)
-		if( zResult && *zResult ) add_history(zResult);
+				if( zResult && *zResult ) add_history(zResult);
 #endif
 		return zResult;
 	}
@@ -837,7 +837,7 @@ sqlite3_free(ref z);
 		}
 	}
 	#if SIGINT
-	/*
+		/*
 ** This routine runs when the user presses Ctrl-C
 */
 static void interrupt_handler(int NotUsed){
@@ -1265,14 +1265,14 @@ if( db ) sqlite3_interrupt(db);
   ** Text of a help message
   */static string zHelp=".backup ?DB? FILE      Backup DB (default \"main\") to FILE\n"+".bail ON|OFF           Stop after hitting an error.  Default OFF\n"+".databases             List names and files of attached databases\n"+".dump ?TABLE? ...      Dump the database in an SQL text format\n"+".echo ON|OFF           Turn command echo on or off\n"+".exit                  Exit this program\n"+".explain ON|OFF        Turn output mode suitable for EXPLAIN on or off.\n"+".header(s) ON|OFF      Turn display of headers on or off\n"+".help                  Show this message\n"+".import FILE TABLE     Import data from FILE into TABLE\n"+".indices TABLE         Show names of all indices on TABLE\n"+
 	#if SQLITE_ENABLE_IOTRACE
-	".iotrace FILE          Enable I/O diagnostic logging to FILE\n" +
+		".iotrace FILE          Enable I/O diagnostic logging to FILE\n" +
 #endif
 	#if !SQLITE_OMIT_LOAD_EXTENSION
 	".load FILE ?ENTRY?     Load an extension library\n"+
 	#endif
 	".mode MODE ?TABLE?     Set output mode where MODE is one of:\n"+"                         csv      Comma-separated values\n"+"                         column   Left-aligned columns.  (See .width)\n"+"                         html     HTML <table> code\n"+"                         insert   SQL insert statements for TABLE\n"+"                         line     One value per line\n"+"                         list     Values delimited by .separator string\n"+"                         tabs     Tab-separated values\n"+"                         tcl      TCL list elements\n"+".nullvalue STRING      Print STRING in place of null; values\n"+".output FILENAME       Send output to FILENAME\n"+".output stdout         Send output to the screen\n"+".prompt MAIN CONTINUE  Replace the standard prompts\n"+".quit                  Exit this program\n"+".read FILENAME         Execute SQL in FILENAME\n"+".restore ?DB? FILE     Restore content of DB (default \"main\") from FILE\n"+".schema ?TABLE?        Show the CREATE statements\n"+".separator STRING      Change separator used by output mode and .import\n"+".show                  Show the current values for various settings\n"+".tables ?PATTERN?      List names of tables matching a LIKE pattern\n"+".timeout MS            Try opening locked tables for MS milliseconds\n"+
 	#if HAS_TIMER
-	".timer ON|OFF          Turn the CPU timer measurement on or off\n" +
+		".timer ON|OFF          Turn the CPU timer measurement on or off\n" +
 #endif
 	".width NUM NUM ...     Set column widths for \"column\" mode\n";
 	///<summary>
@@ -1718,7 +1718,7 @@ int i, j;                     /* Loop counters */int nSep;
 												}
 												else
 													#if SQLITE_ENABLE_IOTRACE
-													if( c=='i' && strncmp(azArg[0], "iotrace", n)==0 ){
+																										if( c=='i' && strncmp(azArg[0], "iotrace", n)==0 ){
 extern void (*sqlite3IoTrace)(const char*, ...);
 if( iotrace && iotrace!=stdout ) fclose(iotrace);
 iotrace = 0;
@@ -2033,7 +2033,7 @@ sqlite3IoTrace = iotracePrintf;
 																									}
 																									else
 																										#if HAS_TIMER
-																										if( c=='t' && n>=5 && strncmp(azArg[0], "timer", n)==0 && nArg>1 ){
+																																																				if( c=='t' && n>=5 && strncmp(azArg[0], "timer", n)==0 && nArg>1 ){
 enableTimer = booleanValue(azArg[1]);
 }else
 #endif
@@ -2220,11 +2220,11 @@ enableTimer = booleanValue(azArg[1]);
 				p.cnt=0;
 				open_db(p);
 				#if !(_WIN32) && !(WIN32) && !(__OS2__) && !(__RTP__) && !(_WRS_KERNEL)
-				BEGIN_TIMER;
+								BEGIN_TIMER;
 #endif
 				rc=Sqlite3.sqlite3_exec(p.db,zSql.ToString(),(dxCallback)callback,p,ref zErrMsg);
 				#if !(_WIN32) && !(WIN32) && !(__OS2__) && !(__RTP__) && !(_WRS_KERNEL)
-				END_TIMER;
+								END_TIMER;
 #endif
 				if(rc!=0||zErrMsg!="") {
 					string zPrefix="";
@@ -2366,7 +2366,7 @@ enableTimer = booleanValue(azArg[1]);
     ** else is done.
     */
 		#if SIGINT
-		signal(SIGINT, interrupt_handler);
+				signal(SIGINT, interrupt_handler);
 #endif
 		/* Do an initial pass through the command-line argument to locate
 ** the name of the database file, the name of the initialization file,
@@ -2390,7 +2390,7 @@ enableTimer = booleanValue(azArg[1]);
 		}
 		if(i<argc) {
 			#if (SQLITE_OS_OS2) && SQLITE_OS_OS2
-			data.zDbFilename = (string )convertCpPathToUtf8( argv[i++] );
+						data.zDbFilename = (string )convertCpPathToUtf8( argv[i++] );
 #else
 			data.zDbFilename=argv[i++];
 			#endif
@@ -2399,7 +2399,7 @@ enableTimer = booleanValue(azArg[1]);
 			#if !SQLITE_OMIT_MEMORYDB
 			data.zDbFilename=":memory:";
 			#else
-			data.zDbFilename = "";
+						data.zDbFilename = "";
 #endif
 		}
 		if(i<argc) {
@@ -2407,7 +2407,7 @@ enableTimer = booleanValue(azArg[1]);
 		}
 		data._out=stdout;
 		#if SQLITE_OMIT_MEMORYDB
-		if( data.zDbFilename=="" ){
+				if( data.zDbFilename=="" ){
 fprintf(stderr, "C-SQLite: Error, no database filename specified\n");
 exit(0);
 return 0;
@@ -2539,7 +2539,7 @@ return 0;
 					//}
 				}
 				#if (HAVE_READLINE)
-				if( zHistory ) read_history(zHistory);
+								if( zHistory ) read_history(zHistory);
 #endif
 				rc=process_input(data,null);
 				if(zHistory!=null) {

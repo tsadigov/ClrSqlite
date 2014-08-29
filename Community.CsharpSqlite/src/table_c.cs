@@ -33,7 +33,7 @@ namespace Community.CsharpSqlite {
 	//#include <stdlib.h>
 	//#include <string.h>
 	#if !SQLITE_OMIT_GET_TABLE
-	
+		
 ///<summary>
 /// This structure is used to pass data from sqlite3_get_table() through
 /// to the callback function is uses to build the result.
