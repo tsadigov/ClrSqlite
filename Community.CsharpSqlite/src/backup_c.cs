@@ -86,24 +86,7 @@ namespace Community.CsharpSqlite {
 					}
 				}
 			}
-			public///<summary>
-			/// Restart the backup process. This is called when the pager layer
-			/// detects that the database has been modified by an external database
-			/// connection. In this case there is no way of knowing which of the
-			/// pages that have been copied into the destination database are still
-			/// valid and which are not, so the entire process needs to be restarted.
-			///
-			/// It is assumed that the mutex associated with the BtShared object
-			/// corresponding to the source database is held when this function is
-			/// called.
-			///</summary>
-			void sqlite3BackupRestart() {
-				sqlite3_backup p;
-				/* Iterator variable */for(p=this;p!=null;p=p.pNext) {
-					Debug.Assert(sqlite3_mutex_held(p.pSrc.pBt.mutex));
-					p.iNext=1;
-				}
-			}
+			
 			///<summary>
 			/// Copy nPage pages from the source b-tree to the destination.
 			///</summary>
@@ -262,7 +245,7 @@ namespace Community.CsharpSqlite {
     ** "committing" a read-only transaction cannot fail.
     */if(bCloseTrans!=0) {
 						#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																									      //TESTONLY( int rc2 );
+																																																															      //TESTONLY( int rc2 );
       //TESTONLY( rc2  = ) sqlite3BtreeCommitPhaseOne(p.pSrc, 0);
       //TESTONLY( rc2 |= ) sqlite3BtreeCommitPhaseTwo(p.pSrc);
       int rc2;

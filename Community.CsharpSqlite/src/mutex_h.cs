@@ -60,26 +60,26 @@ namespace Community.CsharpSqlite {
 		//#  endif
 		//#endif
 		#if WINDOWS_PHONE && SQLITE_THREADSAFE
-																				#error Cannot compile with both WINDOWS_PHONE and SQLITE_THREADSAFE
-																				#endif
+																						#error Cannot compile with both WINDOWS_PHONE and SQLITE_THREADSAFE
+																						#endif
 		#if SQLITE_SILVERLIGHT && SQLITE_THREADSAFE
-																				#error Cannot compile with both SQLITE_SILVERLIGHT and SQLITE_THREADSAFE
-																				#endif
+																						#error Cannot compile with both SQLITE_SILVERLIGHT and SQLITE_THREADSAFE
+																						#endif
 		#if SQLITE_THREADSAFE && SQLITE_MUTEX_NOOP
-																				#error Cannot compile with both SQLITE_THREADSAFE and SQLITE_MUTEX_NOOP
-																				#endif
+																						#error Cannot compile with both SQLITE_THREADSAFE and SQLITE_MUTEX_NOOP
+																						#endif
 		#if SQLITE_THREADSAFE && SQLITE_MUTEX_OMIT
-																				#error Cannot compile with both SQLITE_THREADSAFE and SQLITE_MUTEX_OMIT
-																				#endif
+																						#error Cannot compile with both SQLITE_THREADSAFE and SQLITE_MUTEX_OMIT
+																						#endif
 		#if SQLITE_MUTEX_OMIT && SQLITE_MUTEX_NOOP
-																				#error Cannot compile with both SQLITE_MUTEX_OMIT and SQLITE_MUTEX_NOOP
-																				#endif
+																						#error Cannot compile with both SQLITE_MUTEX_OMIT and SQLITE_MUTEX_NOOP
+																						#endif
 		#if SQLITE_MUTEX_OMIT && SQLITE_MUTEX_W32
-																				#error Cannot compile with both SQLITE_MUTEX_OMIT and SQLITE_MUTEX_W32
-																				#endif
+																						#error Cannot compile with both SQLITE_MUTEX_OMIT and SQLITE_MUTEX_W32
+																						#endif
 		#if SQLITE_MUTEX_NOOP && SQLITE_MUTEX_W32
-																				#error Cannot compile with both SQLITE_MUTEX_NOOP and SQLITE_MUTEX_W32
-																				#endif
+																						#error Cannot compile with both SQLITE_MUTEX_NOOP and SQLITE_MUTEX_W32
+																						#endif
 		#if SQLITE_MUTEX_OMIT
 		/*
 ** If this is a no-op implementation, implement everything as macros.
@@ -108,7 +108,7 @@ namespace Community.CsharpSqlite {
 		static void sqlite3_mutex_leave(sqlite3_mutex m) {
 		}
 		//#define sqlite3_mutex_leave(X)
-		static bool sqlite3_mutex_held(sqlite3_mutex m) {
+		public static bool sqlite3_mutex_held(sqlite3_mutex m) {
 			return true;
 		}
 		//#define sqlite3_mutex_held(X)     ((void)(X),1)

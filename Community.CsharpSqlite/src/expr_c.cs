@@ -144,85 +144,13 @@ namespace Community.CsharpSqlite {
 			return pColl;
 		}
 		///<summary>
-		/// pExpr is an operand of a comparison operator.  aff2 is the
-		/// type affinity of the other operand.  This routine returns the
-		/// type affinity that should be used for the comparison operator.
-		///
-		///</summary>
-		static char sqlite3CompareAffinity(Expr pExpr,char aff2) {
-			char aff1=sqlite3ExprAffinity(pExpr);
-			if(aff1!='\0'&&aff2!='\0') {
-				/* Both sides of the comparison are columns. If one has numeric
-        ** affinity, use that. Otherwise use no affinity.
-        */if(aff1>=SQLITE_AFF_NUMERIC||aff2>=SQLITE_AFF_NUMERIC)//        if (sqlite3IsNumericAffinity(aff1) || sqlite3IsNumericAffinity(aff2))
-				 {
-					return SQLITE_AFF_NUMERIC;
-				}
-				else {
-					return SQLITE_AFF_NONE;
-				}
-			}
-			else
-				if(aff1=='\0'&&aff2=='\0') {
-					/* Neither side of the comparison is a column.  Compare the
-        ** results directly.
-        */return SQLITE_AFF_NONE;
-				}
-				else {
-					/* One side is a column, the other is not. Use the columns affinity. */Debug.Assert(aff1==0||aff2==0);
-					return (aff1!='\0'?aff1:aff2);
-				}
-		}
-		///<summary>
-		/// pExpr is a comparison operator.  Return the type affinity that should
-		/// be applied to both operands prior to doing the comparison.
-		///
-		///</summary>
-		static char comparisonAffinity(Expr pExpr) {
-			char aff;
-			Debug.Assert(pExpr.op==TK_EQ||pExpr.op==TK_IN||pExpr.op==TK_LT||pExpr.op==TK_GT||pExpr.op==TK_GE||pExpr.op==TK_LE||pExpr.op==TK_NE||pExpr.op==TK_IS||pExpr.op==TK_ISNOT);
-			Debug.Assert(pExpr.pLeft!=null);
-			aff=sqlite3ExprAffinity(pExpr.pLeft);
-			if(pExpr.pRight!=null) {
-				aff=sqlite3CompareAffinity(pExpr.pRight,aff);
-			}
-			else
-				if(ExprHasProperty(pExpr,EP_xIsSelect)) {
-					aff=sqlite3CompareAffinity(pExpr.x.pSelect.pEList.a[0].pExpr,aff);
-				}
-				else
-					if(aff=='\0') {
-						aff=SQLITE_AFF_NONE;
-					}
-			return aff;
-		}
-		///<summary>
-		/// pExpr is a comparison expression, eg. '=', '<', IN(...) etc.
-		/// idx_affinity is the affinity of an indexed column. Return true
-		/// if the index with affinity idx_affinity may be used to implement
-		/// the comparison in pExpr.
-		///
-		///</summary>
-		static bool sqlite3IndexAffinityOk(Expr pExpr,char idx_affinity) {
-			char aff=comparisonAffinity(pExpr);
-			switch(aff) {
-			case SQLITE_AFF_NONE:
-			return true;
-			case SQLITE_AFF_TEXT:
-			return idx_affinity==SQLITE_AFF_TEXT;
-			default:
-			return idx_affinity>=SQLITE_AFF_NUMERIC;
-			// sqlite3IsNumericAffinity(idx_affinity);
-			}
-		}
-		///<summary>
 		/// Return the P5 value that should be used for a binary comparison
 		/// opcode (OP_Eq, OP_Ge etc.) used to compare pExpr1 and pExpr2.
 		///
 		///</summary>
 		static u8 binaryCompareP5(Expr pExpr1,Expr pExpr2,int jumpIfNull) {
 			u8 aff=(u8)sqlite3ExprAffinity(pExpr2);
-			aff=(u8)((u8)sqlite3CompareAffinity(pExpr1,(char)aff)|(u8)jumpIfNull);
+			aff=(u8)((u8)pExpr1.sqlite3CompareAffinity((char)aff)|(u8)jumpIfNull);
 			return aff;
 		}
 		///<summary>
@@ -287,41 +215,15 @@ namespace Community.CsharpSqlite {
 			}
 			return rc;
 		}
-		///<summary>
-		///The following three functions, heightOfExpr(), heightOfExprList()
-		/// and heightOfSelect(), are used to determine the maximum height
-		/// of any expression tree referenced by the structure passed as the
-		/// first argument.
-		///
-		/// If this maximum height is greater than the current value pointed
-		/// to by pnHeight, the second parameter, then set pnHeight to that
-		/// value.
-		///
-		///</summary>
-		static void heightOfExpr(Expr p,ref int pnHeight) {
-			if(p!=null) {
-				if(p.nHeight>pnHeight) {
-					pnHeight=p.nHeight;
-				}
-			}
-		}
-		static void heightOfExprList(ExprList p,ref int pnHeight) {
-			if(p!=null) {
-				int i;
-				for(i=0;i<p.nExpr;i++) {
-					heightOfExpr(p.a[i].pExpr,ref pnHeight);
-				}
-			}
-		}
 		static void heightOfSelect(Select p,ref int pnHeight) {
 			if(p!=null) {
-				heightOfExpr(p.pWhere,ref pnHeight);
-				heightOfExpr(p.pHaving,ref pnHeight);
-				heightOfExpr(p.pLimit,ref pnHeight);
-				heightOfExpr(p.pOffset,ref pnHeight);
-				heightOfExprList(p.pEList,ref pnHeight);
-				heightOfExprList(p.pGroupBy,ref pnHeight);
-				heightOfExprList(p.pOrderBy,ref pnHeight);
+				p.pWhere.heightOfExpr(ref pnHeight);
+				p.pHaving.heightOfExpr(ref pnHeight);
+				p.pLimit.heightOfExpr(ref pnHeight);
+				p.pOffset.heightOfExpr(ref pnHeight);
+				p.pEList.heightOfExprList(ref pnHeight);
+				p.pGroupBy.heightOfExprList(ref pnHeight);
+				p.pOrderBy.heightOfExprList(ref pnHeight);
 				heightOfSelect(p.pPrior,ref pnHeight);
 			}
 		}
@@ -335,13 +237,14 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static void exprSetHeight(Expr p) {
 			int nHeight=0;
-			heightOfExpr(p.pLeft,ref nHeight);
-			heightOfExpr(p.pRight,ref nHeight);
+
+			p.pLeft.heightOfExpr(ref nHeight);
+			p.pRight.heightOfExpr(ref nHeight);
 			if(ExprHasProperty(p,EP_xIsSelect)) {
 				heightOfSelect(p.x.pSelect,ref nHeight);
 			}
 			else {
-				heightOfExprList(p.x.pList,ref nHeight);
+				p.x.pList.heightOfExprList(ref nHeight);
 			}
 			p.nHeight=nHeight+1;
 		}
@@ -366,7 +269,7 @@ namespace Community.CsharpSqlite {
 			return nHeight;
 		}
 		#else
-																				//define exprSetHeight(y)
+																						//define exprSetHeight(y)
 #endif
 		///<summary>
 		/// This routine is the core allocator for Expr nodes.
@@ -420,7 +323,7 @@ namespace Community.CsharpSqlite {
 						//pNew.u.zToken[pToken.n] = 0;
 						if(dequote!=0&&nExtra>=3&&((c=pToken.z[0])=='\''||c=='"'||c=='['||c=='`')) {
 							#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																						StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
+																																																																													StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
 #else
 							StringExtensions.sqlite3Dequote(ref pNew.u.zToken);
 							#endif
@@ -649,7 +552,7 @@ namespace Community.CsharpSqlite {
 				sqlite3ExprDelete(db,ref p.pRight);
 				if(!ExprHasProperty(p,EP_Reduced)&&(p.flags2&EP2_MallocedToken)!=0) {
 					#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																		sqlite3DbFree( db, ref p.u._zToken );
+																																																							sqlite3DbFree( db, ref p.u._zToken );
 #else
 					sqlite3DbFree(db,ref p.u.zToken);
 					#endif
@@ -677,98 +580,6 @@ namespace Community.CsharpSqlite {
 			if(ExprHasProperty(p,EP_Reduced))
 				return EXPR_REDUCEDSIZE;
 			return EXPR_FULLSIZE;
-		}
-		///<summary>
-		/// The dupedExpr*Size() routines each return the number of bytes required
-		/// to store a copy of an expression or expression tree.  They differ in
-		/// how much of the tree is measured.
-		///
-		///     dupedExprStructSize()     Size of only the Expr structure
-		///     dupedExprNodeSize()       Size of Expr + space for token
-		///     dupedExprSize()           Expr + token + subtree components
-		///
-		///
-		///
-		/// The dupedExprStructSize() function returns two values OR-ed together:
-		/// (1) the space required for a copy of the Expr structure only and
-		/// (2) the EP_xxx flags that indicate what the structure size should be.
-		/// The return values is always one of:
-		///
-		///      EXPR_FULLSIZE
-		///      EXPR_REDUCEDSIZE   | EP_Reduced
-		///      EXPR_TOKENONLYSIZE | EP_TokenOnly
-		///
-		/// The size of the structure can be found by masking the return value
-		/// of this routine with 0xfff.  The flags can be found by masking the
-		/// return value with EP_Reduced|EP_TokenOnly.
-		///
-		/// Note that with flags==EXPRDUP_REDUCE, this routines works on full-size
-		/// (unreduced) Expr objects as they or originally constructed by the parser.
-		/// During expression analysis, extra information is computed and moved into
-		/// later parts of teh Expr object and that extra information might get chopped
-		/// off if the expression is reduced.  Note also that it does not work to
-		/// make a EXPRDUP_REDUCE copy of a reduced expression.  It is only legal
-		/// to reduce a pristine expression tree from the parser.  The implementation
-		/// of dupedExprStructSize() contain multiple Debug.Assert() statements that attempt
-		/// to enforce this constraint.
-		///
-		///</summary>
-		static int dupedExprStructSize(Expr p,int flags) {
-			int nSize;
-			Debug.Assert(flags==EXPRDUP_REDUCE||flags==0);
-			/* Only one flag value allowed */if(0==(flags&EXPRDUP_REDUCE)) {
-				nSize=EXPR_FULLSIZE;
-			}
-			else {
-				Debug.Assert(!ExprHasAnyProperty(p,EP_TokenOnly|EP_Reduced));
-				Debug.Assert(!ExprHasProperty(p,EP_FromJoin));
-				Debug.Assert((p.flags2&EP2_MallocedToken)==0);
-				Debug.Assert((p.flags2&EP2_Irreducible)==0);
-				if(p.pLeft!=null||p.pRight!=null||p.pColl!=null||p.x.pList!=null||p.x.pSelect!=null) {
-					nSize=EXPR_REDUCEDSIZE|EP_Reduced;
-				}
-				else {
-					nSize=EXPR_TOKENONLYSIZE|EP_TokenOnly;
-				}
-			}
-			return nSize;
-		}
-		///<summary>
-		/// This function returns the space in bytes required to store the copy
-		/// of the Expr structure and a copy of the Expr.u.zToken string (if that
-		/// string is defined.)
-		///
-		///</summary>
-		static int dupedExprNodeSize(Expr p,int flags) {
-			int nByte=dupedExprStructSize(p,flags)&0xfff;
-			if(!ExprHasProperty(p,EP_IntValue)&&p.u.zToken!=null) {
-				nByte+=StringExtensions.sqlite3Strlen30(p.u.zToken)+1;
-			}
-			return ROUND8(nByte);
-		}
-		///<summary>
-		/// Return the number of bytes required to create a duplicate of the
-		/// expression passed as the first argument. The second argument is a
-		/// mask containing EXPRDUP_XXX flags.
-		///
-		/// The value returned includes space to create a copy of the Expr struct
-		/// itself and the buffer referred to by Expr.u.zToken, if any.
-		///
-		/// If the EXPRDUP_REDUCE flag is set, then the return value includes
-		/// space to duplicate all Expr nodes in the tree formed by Expr.pLeft
-		/// and Expr.pRight variables (but not for any structures pointed to or
-		/// descended from the Expr.x.pList or Expr.x.pSelect variables).
-		///
-		///</summary>
-		static int dupedExprSize(Expr p,int flags) {
-			int nByte=0;
-			if(p!=null) {
-				nByte=dupedExprNodeSize(p,flags);
-				if((flags&EXPRDUP_REDUCE)!=0) {
-					nByte+=dupedExprSize(p.pLeft,flags)+dupedExprSize(p.pRight,flags);
-				}
-			}
-			return nByte;
 		}
 		///<summary>
 		/// This function is similar to sqlite3ExprDup(), except that if pzBuffer
@@ -802,7 +613,7 @@ namespace Community.CsharpSqlite {
           ** by pNew. This is either EXPR_FULLSIZE, EXPR_REDUCEDSIZE or
           ** EXPR_TOKENONLYSIZE. nToken is set to the number of bytes consumed
           ** by the copy of the p->u.zToken string (if any).
-          */int nStructSize=dupedExprStructSize(p,flags);
+          */int nStructSize=p.dupedExprStructSize(flags);
 					int nNewSize=nStructSize&0xfff;
 					int nToken;
 					if(!ExprHasProperty(p,EP_IntValue)&&!String.IsNullOrEmpty(p.u.zToken)) {
@@ -1025,7 +836,7 @@ namespace Community.CsharpSqlite {
 			return pNew;
 		}
 		#else
-																				Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
+																						Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
 Debug.Assert( p==null );
 return null;
 }
@@ -1206,115 +1017,6 @@ return null;
 			pWalker.u.i=0;
 			return WRC_Abort;
 		}
-		static int exprIsConst(Expr p,int initFlag) {
-			Walker w=new Walker();
-			w.u.i=initFlag;
-			w.xExprCallback=exprNodeIsConstant;
-			w.xSelectCallback=selectNodeIsConstant;
-			sqlite3WalkExpr(w,ref p);
-			return w.u.i;
-		}
-		///<summary>
-		/// Walk an expression tree.  Return 1 if the expression is constant
-		/// and 0 if it involves variables or function calls.
-		///
-		/// For the purposes of this function, a double-quoted string (ex: "abc")
-		/// is considered a variable but a single-quoted string (ex: 'abc') is
-		/// a constant.
-		///
-		///</summary>
-		static int sqlite3ExprIsConstant(Expr p) {
-			return exprIsConst(p,1);
-		}
-		///<summary>
-		/// Walk an expression tree.  Return 1 if the expression is constant
-		/// that does no originate from the ON or USING clauses of a join.
-		/// Return 0 if it involves variables or function calls or terms from
-		/// an ON or USING clause.
-		///
-		///</summary>
-		static int sqlite3ExprIsConstantNotJoin(Expr p) {
-			return exprIsConst(p,3);
-		}
-		///<summary>
-		/// Walk an expression tree.  Return 1 if the expression is constant
-		/// or a function call with constant arguments.  Return and 0 if there
-		/// are any variables.
-		///
-		/// For the purposes of this function, a double-quoted string (ex: "abc")
-		/// is considered a variable but a single-quoted string (ex: 'abc') is
-		/// a constant.
-		///
-		///</summary>
-		static int sqlite3ExprIsConstantOrFunction(Expr p) {
-			return exprIsConst(p,2);
-		}
-		///<summary>
-		/// If the expression p codes a constant integer that is small enough
-		/// to fit in a 32-bit integer, return 1 and put the value of the integer
-		/// in pValue.  If the expression is not an integer or if it is too big
-		/// to fit in a signed 32-bit integer, return 0 and leave pValue unchanged.
-		///
-		///</summary>
-		static int sqlite3ExprIsInteger(Expr p,ref int pValue) {
-			int rc=0;
-			/* If an expression is an integer literal that fits in a signed 32-bit
-      ** integer, then the EP_IntValue flag will have already been set */Debug.Assert(p.op!=TK_INTEGER||(p.flags&EP_IntValue)!=0||!Converter.sqlite3GetInt32(p.u.zToken,ref rc));
-			if((p.flags&EP_IntValue)!=0) {
-				pValue=(int)p.u.iValue;
-				return 1;
-			}
-			switch(p.op) {
-			case TK_UPLUS: {
-				rc=sqlite3ExprIsInteger(p.pLeft,ref pValue);
-				break;
-			}
-			case TK_UMINUS: {
-				int v=0;
-				if(sqlite3ExprIsInteger(p.pLeft,ref v)!=0) {
-					pValue=-v;
-					rc=1;
-				}
-				break;
-			}
-			default:
-			break;
-			}
-			return rc;
-		}
-		///<summary>
-		/// Return FALSE if there is no chance that the expression can be NULL.
-		///
-		/// If the expression might be NULL or if the expression is too complex
-		/// to tell return TRUE.
-		///
-		/// This routine is used as an optimization, to skip OP_IsNull opcodes
-		/// when we know that a value cannot be NULL.  Hence, a false positive
-		/// (returning TRUE when in fact the expression can never be NULL) might
-		/// be a small performance hit but is otherwise harmless.  On the other
-		/// hand, a false negative (returning FALSE when the result could be NULL)
-		/// will likely result in an incorrect answer.  So when in doubt, return
-		/// TRUE.
-		///
-		///</summary>
-		static int sqlite3ExprCanBeNull(Expr p) {
-			u8 op;
-			while(p.op==TK_UPLUS||p.op==TK_UMINUS) {
-				p=p.pLeft;
-			}
-			op=p.op;
-			if(op==TK_REGISTER)
-				op=p.op2;
-			switch(op) {
-			case TK_INTEGER:
-			case TK_STRING:
-			case TK_FLOAT:
-			case TK_BLOB:
-			return 0;
-			default:
-			return 1;
-			}
-		}
 		///<summary>
 		/// Generate an OP_IsNull instruction that tests register iReg and jumps
 		/// to location iDest if the value in iReg is NULL.  The value in iReg
@@ -1324,7 +1026,7 @@ return null;
 		///
 		///</summary>
 		static void sqlite3ExprCodeIsNullJump(Vdbe v,/* The VDBE under construction */Expr pExpr,/* Only generate OP_IsNull if this expr can be NULL */int iReg,/* Test the value in this register for NULL */int iDest/* Jump here if the value is null */) {
-			if(sqlite3ExprCanBeNull(pExpr)!=0) {
+			if(pExpr.sqlite3ExprCanBeNull()!=0) {
 				sqlite3VdbeAddOp2(v,OP_IsNull,iReg,iDest);
 			}
 		}
@@ -1531,7 +1233,7 @@ return null;
 					/* Check that the affinity that will be used to perform the
           ** comparison is the same as the affinity of the column. If
           ** it is not, it is not possible to use any index.
-          */char aff=comparisonAffinity(pX);
+          */char aff=pX.comparisonAffinity();
 					bool affinity_ok=(pTab.aCol[iCol].affinity==aff||aff==SQLITE_AFF_NONE);
 					for(pIdx=pTab.pIndex;pIdx!=null&&eType==0&&affinity_ok;pIdx=pIdx.pNext) {
 						if((pIdx.aiColumn[0]==iCol)&&(sqlite3FindCollSeq(db,ENC(db),pIdx.azColl[0],0)==pReq)&&(mustBeUnique==false||(pIdx.nColumn==1&&pIdx.onError!=OE_None))) {
@@ -1543,7 +1245,7 @@ return null;
 							sqlite3VdbeAddOp2(v,OP_Integer,1,iMem);
 							sqlite3VdbeAddOp4(v,OP_OpenRead,iTab,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 							#if SQLITE_DEBUG
-																																																																						              VdbeComment( v, "%s", pIdx.zName );
+																																																																													              VdbeComment( v, "%s", pIdx.zName );
 #endif
 							eType=IN_INDEX_INDEX;
 							sqlite3VdbeJumpHere(v,iAddr);
@@ -1720,11 +1422,11 @@ return null;
                 ** disable the test that was generated above that makes sure
                 ** this code only executes once.  Because for a non-constant
                 ** expression we need to rerun this code each time.
-                */if(testAddr!=0&&sqlite3ExprIsConstant(pE2)==0) {
+                */if(testAddr!=0&&pE2.sqlite3ExprIsConstant()==0) {
 								sqlite3VdbeChangeToNoop(v,testAddr-1,2);
 								testAddr=0;
 							}
-							/* Evaluate the expression and insert it into the temp table */if(isRowid&&sqlite3ExprIsInteger(pE2,ref iValToIns)!=0) {
+							/* Evaluate the expression and insert it into the temp table */if(isRowid&&pE2.sqlite3ExprIsInteger(ref iValToIns)!=0) {
 								sqlite3VdbeAddOp3(v,OP_InsertInt,pExpr.iTable,r2,iValToIns);
 							}
 							else {
@@ -1768,14 +1470,14 @@ return null;
 					dest.eDest=SelectResultType.Mem;
 					sqlite3VdbeAddOp2(v,OP_Null,0,dest.iParm);
 					#if SQLITE_DEBUG
-																																																		              VdbeComment( v, "Init subquery result" );
+																																																							              VdbeComment( v, "Init subquery result" );
 #endif
 				}
 				else {
 					dest.eDest=SelectResultType.Exists;
 					sqlite3VdbeAddOp2(v,OP_Integer,0,dest.iParm);
 					#if SQLITE_DEBUG
-																																																		              VdbeComment( v, "Init EXISTS result" );
+																																																							              VdbeComment( v, "Init EXISTS result" );
 #endif
 				}
 				sqlite3ExprDelete(pParse.db,ref pSel.pLimit);
@@ -1828,7 +1530,7 @@ return null;
 			/* Figure out the affinity to use to create a key from the results
       ** of the expression. affinityStr stores a static string suitable for
       ** P4 of OP_MakeRecord.
-      */affinity=comparisonAffinity(pExpr);
+      */affinity=pExpr.comparisonAffinity();
 			/* Code the LHS, the <expr> from "<expr> IN (...)".
       */sqlite3ExprCachePush(pParse);
 			r1=sqlite3GetTempReg(pParse);
@@ -1964,7 +1666,7 @@ return null;
 				}
 				else {
 					#if SQLITE_OMIT_FLOATING_POINT
-																																																		sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
+																																																							sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
 #else
 					codeReal(v,z,negFlag,iMem);
 					#endif
@@ -2006,10 +1708,10 @@ return null;
       ** that the object will never already be in cache.  Verify this guarantee.
       */
 			#if !NDEBUG
-																														      for ( i = 0; i < SQLITE_N_COLCACHE; i++ )//p=pParse.aColCache... p++)
+																																	      for ( i = 0; i < SQLITE_N_COLCACHE; i++ )//p=pParse.aColCache... p++)
       {
 #if FALSE
-																														p = pParse.aColCache[i];
+																																	p = pParse.aColCache[i];
 if ( p.iReg != 0 && p.iTable == iTab && p.iColumn == iCol )
 {
 cacheEntryClear( pParse, p );
@@ -2019,7 +1721,7 @@ p.lru = pParse.iCacheCnt++;
 return;
 }
 #endif
-																														        Debug.Assert( p.iReg == 0 || p.iTable != iTab || p.iColumn != iCol );
+																																	        Debug.Assert( p.iReg == 0 || p.iTable != iTab || p.iColumn != iCol );
       }
 #endif
 			/* Find an empty slot and replace it */for(i=0;i<SQLITE_N_COLCACHE;i++)//p=pParse.aColCache... p++)
@@ -2225,7 +1927,7 @@ return;
 			}
 		}
 		#if (SQLITE_DEBUG) || (SQLITE_COVERAGE_TEST)
-																				    /*
+																						    /*
 ** Return true if any register in the range iFrom..iTo (inclusive)
 ** is used as part of the column cache.
 **
@@ -2605,7 +2307,7 @@ return;
 					}
 				#endif
 				for(i=0;i<nFarg;i++) {
-					if(i<32&&sqlite3ExprIsConstant(pFarg.a[i].pExpr)!=0) {
+					if(i<32&&pFarg.a[i].pExpr.sqlite3ExprIsConstant()!=0) {
 						constMask|=(1<<i);
 					}
 					if((pDef.flags&SQLITE_FUNC_NEEDCOLL)!=0&&null==pColl) {
@@ -2754,7 +2456,7 @@ return;
 				/* The X expression */Expr pTest=null;
 				/* X==Ei (form A) or just Ei (form B) */
 				#if !NDEBUG
-																																								            int iCacheLevel = pParse.iCacheLevel;
+																																												            int iCacheLevel = pParse.iCacheLevel;
             //VVA_ONLY( int iCacheLevel = pParse.iCacheLevel; )
 #endif
 				Debug.Assert(!ExprHasProperty(pExpr,EP_xIsSelect)&&pExpr.x.pList!=null);
@@ -2807,7 +2509,7 @@ return;
 					sqlite3VdbeAddOp2(v,OP_Null,0,target);
 				}
 				#if !NDEBUG
-																																								            Debug.Assert( /* db.mallocFailed != 0 || */ pParse.nErr > 0
+																																												            Debug.Assert( /* db.mallocFailed != 0 || */ pParse.nErr > 0
             || pParse.iCacheLevel == iCacheLevel );
 #endif
 				sqlite3VdbeResolveLabel(v,endLabel);
@@ -2915,65 +2617,6 @@ return;
 			return inReg;
 		}
 		///<summary>
-		/// Return TRUE if pExpr is an constant expression that is appropriate
-		/// for factoring out of a loop.  Appropriate expressions are:
-		///
-		///    *  Any expression that evaluates to two or more opcodes.
-		///
-		///    *  Any OP_Integer, OP_Real, OP_String, OP_Blob, OP_Null,
-		///       or OP_Variable that does not need to be placed in a
-		///       specific register.
-		///
-		/// There is no point in factoring out single-instruction constant
-		/// expressions that need to be placed in a particular register.
-		/// We could factor them out, but then we would end up adding an
-		/// OP_SCopy instruction to move the value into the correct register
-		/// later.  We might as well just use the original instruction and
-		/// avoid the OP_SCopy.
-		///
-		///</summary>
-		static int isAppropriateForFactoring(Expr p) {
-			if(sqlite3ExprIsConstantNotJoin(p)==0) {
-				return 0;
-				/* Only constant expressions are appropriate for factoring */}
-			if((p.flags&EP_FixedDest)==0) {
-				return 1;
-				/* Any constant without a fixed destination is appropriate */}
-			while(p.op==TK_UPLUS)
-				p=p.pLeft;
-			switch(p.op) {
-			#if !SQLITE_OMIT_BLOB_LITERAL
-			case TK_BLOB:
-			#endif
-			case TK_VARIABLE:
-			case TK_INTEGER:
-			case TK_FLOAT:
-			case TK_NULL:
-			case TK_STRING: {
-				testcase(p.op==TK_BLOB);
-				testcase(p.op==TK_VARIABLE);
-				testcase(p.op==TK_INTEGER);
-				testcase(p.op==TK_FLOAT);
-				testcase(p.op==TK_NULL);
-				testcase(p.op==TK_STRING);
-				/* Single-instruction constants with a fixed destination are
-            ** better done in-line.  If we factor them, they will just end
-            ** up generating an OP_SCopy to move the value to the destination
-            ** register. */return 0;
-			}
-			case TK_UMINUS: {
-				if(p.pLeft.op==TK_FLOAT||p.pLeft.op==TK_INTEGER) {
-					return 0;
-				}
-				break;
-			}
-			default: {
-				break;
-			}
-			}
-			return 1;
-		}
-		///<summary>
 		/// If pExpr is a constant expression that is appropriate for
 		/// factoring out of a loop, then evaluate the expression
 		/// into a register and convert the expression into a TK_REGISTER
@@ -3009,7 +2652,7 @@ return;
 				break;
 			}
 			}
-			if(isAppropriateForFactoring(pExpr)!=0) {
+			if(pExpr.isAppropriateForFactoring()!=0) {
 				int r1=++pParse.nMem;
 				int r2;
 				r2=sqlite3ExprCodeTarget(pParse,pExpr,r1);
@@ -3228,7 +2871,7 @@ return;
 				break;
 			}
 			#if SQLITE_OMIT_SUBQUERY
-																														        case TK_IN:
+																																	        case TK_IN:
           {
             int destIfFalse = sqlite3VdbeMakeLabel( v );
             int destIfNull = jumpIfNull != 0 ? dest : destIfFalse;
@@ -3366,7 +3009,7 @@ return;
 				break;
 			}
 			#if SQLITE_OMIT_SUBQUERY
-																														        case TK_IN:
+																																	        case TK_IN:
           {
             if ( jumpIfNull != 0 )
             {

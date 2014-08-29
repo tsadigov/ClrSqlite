@@ -51,7 +51,7 @@ namespace Community.CsharpSqlite {
 			if(pExpr!=null) {
 				if(pExpr.op!=TK_ID) {
 					rc=sqlite3ResolveExprNames(pName,ref pExpr);
-					if(rc==SQLITE_OK&&sqlite3ExprIsConstant(pExpr)==0) {
+					if(rc==SQLITE_OK&&pExpr.sqlite3ExprIsConstant()==0) {
 						sqlite3ErrorMsg(pName.pParse,"invalid name: \"%s\"",pExpr.u.zToken);
 						return SQLITE_ERROR;
 					}
