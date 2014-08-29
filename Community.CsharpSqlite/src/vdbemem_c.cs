@@ -42,7 +42,7 @@ namespace Community.CsharpSqlite {
 		//#define expandBlob(P) (((P)->flags&MEM_Zero)?sqlite3VdbeMemExpandBlob(P):0)
 		static void expandBlob(Mem P) {
 			if((P.flags&MEM_Zero)!=0)
-				sqlite3VdbeMemExpandBlob(P);
+				P.sqlite3VdbeMemExpandBlob();
 		}
 		// TODO -- Convert to inline for speed
 		///<summary>
@@ -72,7 +72,7 @@ namespace Community.CsharpSqlite {
 			#if SQLITE_OMIT_UTF16
 			return SQLITE_ERROR;
 			#else
-																								
+																											
 /* MemTranslate() may return SQLITE_OK or SQLITE_NOMEM. If NOMEM is returned,
 ** then the encoding of the value may not have changed.
 */
@@ -163,7 +163,7 @@ return rc;
 					//pMem.z[pMem->n + 1] = 0;
 					pMem.flags|=MEM_Term;
 				#if SQLITE_DEBUG
-																																        pMem.pScopyFrom = null;
+																																				        pMem.pScopyFrom = null;
 #endif
 			}
 			return SQLITE_OK;
@@ -174,7 +174,7 @@ return rc;
 		///
 		///</summary>
 		#if !SQLITE_OMIT_INCRBLOB
-																static int sqlite3VdbeMemExpandBlob( Mem pMem )
+																		static int sqlite3VdbeMemExpandBlob( Mem pMem )
 {
 if ( ( pMem.flags & MEM_Zero ) != 0 )
 {
@@ -386,7 +386,7 @@ return SQLITE_OK;
 		///</summary>
 		static i64 doubleToInt64(double r) {
 			#if SQLITE_OMIT_FLOATING_POINT
-																								/* When floating-point is omitted, double and int64 are the same thing */
+																											/* When floating-point is omitted, double and int64 are the same thing */
 return r;
 #else
 			/*
@@ -525,7 +525,7 @@ return r;
 			Debug.Assert((pMem.flags&MEM_RowSet)==0);
 			//assert( EIGHT_BYTE_ALIGNMENT(pMem) );
 			pMem.u.i=sqlite3VdbeIntValue(pMem);
-			MemSetTypeFlag(pMem,MEM_Int);
+			pMem.MemSetTypeFlag(MEM_Int);
 			return SQLITE_OK;
 		}
 		///<summary>
@@ -537,7 +537,7 @@ return r;
 			Debug.Assert(pMem.db==null||sqlite3_mutex_held(pMem.db.mutex));
 			//assert( EIGHT_BYTE_ALIGNMENT(pMem) );
 			pMem.r=sqlite3VdbeRealValue(pMem);
-			MemSetTypeFlag(pMem,MEM_Real);
+			pMem.MemSetTypeFlag(MEM_Real);
 			return SQLITE_OK;
 		}
 		///<summary>
@@ -555,20 +555,20 @@ return r;
 				Debug.Assert(pMem.db==null||sqlite3_mutex_held(pMem.db.mutex));
 				if((pMem.flags&MEM_Blob)!=0&&pMem.z==null) {
 					if(0==Converter.sqlite3Atoi64(Encoding.UTF8.GetString(pMem.zBLOB,0,pMem.zBLOB.Length),ref pMem.u.i,pMem.n,pMem.enc))
-						MemSetTypeFlag(pMem,MEM_Int);
+						pMem.MemSetTypeFlag(MEM_Int);
 					else {
 						pMem.r=sqlite3VdbeRealValue(pMem);
-						MemSetTypeFlag(pMem,MEM_Real);
+						pMem.MemSetTypeFlag(MEM_Real);
 						sqlite3VdbeIntegerAffinity(pMem);
 					}
 				}
 				else
 					if(0==Converter.sqlite3Atoi64(pMem.z,ref pMem.u.i,pMem.n,pMem.enc)) {
-						MemSetTypeFlag(pMem,MEM_Int);
+						pMem.MemSetTypeFlag(MEM_Int);
 					}
 					else {
 						pMem.r=sqlite3VdbeRealValue(pMem);
-						MemSetTypeFlag(pMem,MEM_Real);
+						pMem.MemSetTypeFlag(MEM_Real);
 						sqlite3VdbeIntegerAffinity(pMem);
 					}
 			}
@@ -589,7 +589,7 @@ return r;
 			if((pMem.flags&MEM_RowSet)!=0) {
 				sqlite3RowSetClear(pMem.u.pRowSet);
 			}
-			MemSetTypeFlag(pMem,MEM_Null);
+			pMem.MemSetTypeFlag(MEM_Null);
 			sqlite3_free(ref pMem.zBLOB);
 			pMem.z=null;
 			pMem.type=SQLITE_NULL;
@@ -685,7 +685,7 @@ return r;
 			return false;
 		}
 		#if SQLITE_DEBUG
-																    /*
+																		    /*
 ** This routine prepares a memory cell for modication by breaking
 ** its link to a shallow copy and by marking any current shallow
 ** copies of this cell as invalid.
@@ -938,7 +938,7 @@ return r;
 			pMem.enc=((byte)enc==0?SqliteEncoding.UTF8:enc);
 			pMem.type=(enc==0?SQLITE_BLOB:SQLITE_TEXT);
 			#if !SQLITE_OMIT_UTF16
-																								if( pMem.enc!=SqliteEncoding.UTF8 && sqlite3VdbeMemHandleBom(pMem)!=0 ){
+																											if( pMem.enc!=SqliteEncoding.UTF8 && sqlite3VdbeMemHandleBom(pMem)!=0 ){
 return SQLITE_NOMEM;
 }
 #endif
@@ -1149,7 +1149,7 @@ return SQLITE_NOMEM;
 			Debug.Assert((MEM_Blob>>3)==MEM_Str);
 			pVal.flags|=(u16)((pVal.flags&MEM_Blob)>>3);
 			if((pVal.flags&MEM_Zero)!=0)
-				sqlite3VdbeMemExpandBlob(pVal);
+				pVal.sqlite3VdbeMemExpandBlob();
 			// expandBlob(pVal);
 			if((pVal.flags&MEM_Str)!=0) {
 				if(sqlite3VdbeChangeEncoding(pVal,enc&~SqliteEncoding.UTF16_ALIGNED)!=SQLITE_OK) {
@@ -1221,7 +1221,7 @@ return SQLITE_NOMEM;
       ** when SQLITE_ENABLE_STAT2 is omitted.
       */
 			#if SQLITE_ENABLE_STAT2
-																								      if ( op == TK_REGISTER )
+																											      if ( op == TK_REGISTER )
         op = pExpr.op2;
 #else
 			if(NEVER(op==TK_REGISTER))

@@ -74,7 +74,7 @@ namespace Community.CsharpSqlite {
 			/* Mask of the OPFLG_* flags in opcodes.h */public u8 p5;
 			/* Fifth parameter is an unsigned character */
 			#if DEBUG_CLASS_VDBEOP || DEBUG_CLASS_ALL
-																								public int _p1;              /* First operand */
+																											public int _p1;              /* First operand */
 public int p1
 {
 get { return _p1; }
@@ -102,10 +102,10 @@ set { _p3 = value; }
 			#endif
 			public union_p4 p4=new union_p4();
 		#if SQLITE_DEBUG || DEBUG
-																      public string zComment;     /* Comment to improve readability */
+																		      public string zComment;     /* Comment to improve readability */
 #endif
 		#if VDBE_PROFILE
-																public int cnt;             /* Number of times this instruction was executed */
+																		public int cnt;             /* Number of times this instruction was executed */
 public u64 cycles;         /* Total time spend executing this instruction */
 #endif
 		};
@@ -191,10 +191,10 @@ public u64 cycles;         /* Total time spend executing this instruction */
 		const int COLNAME_TABLE=3;
 		const int COLNAME_COLUMN=4;
 		#if SQLITE_ENABLE_COLUMN_METADATA
-																const int COLNAME_N = 5;     /* Number of COLNAME_xxx symbols */
+																		const int COLNAME_N = 5;     /* Number of COLNAME_xxx symbols */
 #else
 		#if SQLITE_OMIT_DECLTYPE
-																const int COLNAME_N = 1;     /* Number of COLNAME_xxx symbols */
+																		const int COLNAME_N = 1;     /* Number of COLNAME_xxx symbols */
 #else
 		const int COLNAME_N=2;
 		#endif
@@ -273,7 +273,7 @@ public u64 cycles;         /* Total time spend executing this instruction */
 		//void sqlite3VdbeLinkSubProgram(Vdbe *, SubProgram );
 		//#endif
 		#if !NDEBUG
-																    //void sqlite3VdbeComment(Vdbe*, const char*, ...);
+																		    //void sqlite3VdbeComment(Vdbe*, const char*, ...);
     static void VdbeComment( Vdbe v, string zFormat, params object[] ap )
     {
       sqlite3VdbeComment( v, zFormat, ap );

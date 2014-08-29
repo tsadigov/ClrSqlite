@@ -216,7 +216,7 @@ namespace Community.CsharpSqlite {
 			};
 			int i;
 			#if SQLITE_OMIT_WSD
-																								  FuncDefHash pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
+																											  FuncDefHash pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
   FuncDef[] aFunc = GLOBAL(FuncDef, aAlterTableFuncs);
 #else
 			FuncDefHash pHash=sqlite3GlobalFunctions;

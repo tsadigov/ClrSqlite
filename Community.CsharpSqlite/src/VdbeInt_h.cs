@@ -26,8 +26,8 @@ using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite {
 	using Op=Sqlite3.VdbeOp;
-    using System.Text;
-    using sqlite3_value = Sqlite3.Mem;
+	using System.Text;
+	using sqlite3_value=Sqlite3.Mem;
 	public partial class Sqlite3 {
 		/*
     ** 2003 September 6
@@ -186,7 +186,7 @@ namespace Community.CsharpSqlite {
 			public double r;
 			/* Real value */public struct union_ip {
 				#if DEBUG_CLASS_MEM || DEBUG_CLASS_ALL
-																																public i64 _i;              /* First operand */
+																																				public i64 _i;              /* First operand */
 public i64 i
 {
 get { return _i; }
@@ -206,7 +206,7 @@ set { _i = value; }
 			/* BLOB value */public int n;
 			/* Number of characters in string value, excluding '\0' */
 			#if DEBUG_CLASS_MEM || DEBUG_CLASS_ALL
-																								public u16 _flags;              /* First operand */
+																											public u16 _flags;              /* First operand */
 public u16 flags
 {
 get { return _flags; }
@@ -220,7 +220,7 @@ set { _flags = value; }
 			/* One of SQLITE_NULL, SQLITE_TEXT, SQLITE_INTEGER, etc */public SqliteEncoding enc;
 			/* SqliteEncoding.UTF8, SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE */
 			#if SQLITE_DEBUG
-																								      public Mem pScopyFrom;        /* This Mem is a shallow copy of pScopyFrom */
+																											      public Mem pScopyFrom;        /* This Mem is a shallow copy of pScopyFrom */
       public object pFiller;        /* So that sizeof(Mem) is a multiple of 8 */
 #endif
 			public dxDel xDel;
@@ -238,7 +238,7 @@ set { _flags = value; }
 			}
 			public Mem(sqlite3 db,string z,double r,int i,int n,u16 flags,u8 type,SqliteEncoding enc
 			#if SQLITE_DEBUG
-																								         , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
+																											         , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
 #endif
 			) {
 				this.db=db;
@@ -248,7 +248,7 @@ set { _flags = value; }
 				this.n=n;
 				this.flags=flags;
 				#if SQLITE_DEBUG
-																																        this.pScopyFrom = pScopyFrom;
+																																				        this.pScopyFrom = pScopyFrom;
         this.pFiller = pFiller;
 #endif
 				this.type=type;
@@ -273,8 +273,33 @@ set { _flags = value; }
 				ct.enc=enc;
 				ct.xDel=xDel;
 			}
-		};
-
+			public///<summary>
+			/// Return true if a memory cell is not marked as invalid.  This macro
+			/// is for use inside Debug.Assert() statements only.
+			///
+			///</summary>
+			#if SQLITE_DEBUG
+																			    //define memIsValid(M)  ((M)->flags & MEM_Invalid)==0
+    static bool memIsValid( Mem M )
+    {
+      return ( ( M ).flags & MEM_Invalid ) == 0;
+    }
+#else
+			bool memIsValid() {
+				return true;
+			}
+			public int sqlite3VdbeMemExpandBlob() {
+				return SQLITE_OK;
+			}
+			public///<summary>
+			/// Clear any existing type flags from a Mem and replace them with f
+			///</summary>
+			//#define MemSetTypeFlag(p, f) \
+			//   ((p)->flags = ((p)->flags&~(MEM_TypeMask|MEM_Zero))|f)
+			void MemSetTypeFlag(int f) {
+				this.flags=(u16)(this.flags&~(MEM_TypeMask|MEM_Zero)|f);
+			}
+		}
 		/* One or more of the following flags are set to indicate the validOK
     ** representations of the value stored in the Mem struct.
     **
@@ -324,34 +349,11 @@ set { _flags = value; }
 		const int MEM_Ephem=0x1000;
 		const int MEM_Agg=0x2000;
 		#if !SQLITE_OMIT_INCRBLOB
-																const int MEM_Zero = 0x4000;  
+																		const int MEM_Zero = 0x4000;  
 #else
 		const int MEM_Zero=0x0000;
 		#endif
-		///<summary>
-		/// Clear any existing type flags from a Mem and replace them with f
-		///</summary>
-		//#define MemSetTypeFlag(p, f) \
-		//   ((p)->flags = ((p)->flags&~(MEM_TypeMask|MEM_Zero))|f)
-		static void MemSetTypeFlag(Mem p,int f) {
-			p.flags=(u16)(p.flags&~(MEM_TypeMask|MEM_Zero)|f);
-		}
 		// TODO -- Convert back to inline for speed
-		///<summary>
-		/// Return true if a memory cell is not marked as invalid.  This macro
-		/// is for use inside Debug.Assert() statements only.
-		///
-		///</summary>
-		#if SQLITE_DEBUG
-																    //define memIsValid(M)  ((M)->flags & MEM_Invalid)==0
-    static bool memIsValid( Mem M )
-    {
-      return ( ( M ).flags & MEM_Invalid ) == 0;
-    }
-#else
-		static bool memIsValid(Mem M) {
-			return true;
-		}
 		#endif
 		///<summary>
 		///A VdbeFunc is just a FuncDef (defined in sqliteInt.h) that contains
@@ -555,7 +557,7 @@ set { _flags = value; }
 			/* Text of the SQL statement that generated this */public object pFree;
 			/* Free this when deleting the vdbe */
 			#if SQLITE_DEBUG
-																								      public FILE trace;             /* Write an execution trace here, if not NULL */
+																											      public FILE trace;             /* Write an execution trace here, if not NULL */
 #endif
 			public VdbeFrame pFrame;
 			/* Parent frame */public VdbeFrame pDelFrame;
@@ -618,7 +620,7 @@ set { _flags = value; }
 				ct.zSql=zSql;
 				ct.pFree=pFree;
 				#if SQLITE_DEBUG
-																																        ct.trace = trace;
+																																				        ct.trace = trace;
 #endif
 				ct.nFkConstraint=nFkConstraint;
 				ct.nStmtDefCons=nStmtDefCons;
@@ -628,16 +630,80 @@ set { _flags = value; }
 				ct.expmask=expmask;
 				ct.pProgram=pProgram;
 				#if SQLITE_SSE
-																																ct.fetchId=fetchId;
+																																				ct.fetchId=fetchId;
 ct.lru=lru;
 #endif
 				#if SQLITE_ENABLE_MEMORY_MANAGEMENT
-																																ct.pLruPrev=pLruPrev;
+																																				ct.pLruPrev=pLruPrev;
 ct.pLruNext=pLruNext;
 #endif
 			}
-		};
-
+			public///<summary>
+			/// Function prototypes
+			///
+			///</summary>
+			//void sqlite3VdbeFreeCursor(Vdbe *, VdbeCursor);
+			//void sqliteVdbePopStack(Vdbe*,int);
+			//int sqlite3VdbeCursorMoveto(VdbeCursor);
+			//#if (SQLITE_DEBUG) || defined(VDBE_PROFILE)
+			//void sqlite3VdbePrintOp(FILE*, int, Op);
+			//#endif
+			//u32 sqlite3VdbeSerialTypeLen(u32);
+			//u32 sqlite3VdbeSerialType(Mem*, int);
+			//u32sqlite3VdbeSerialPut(unsigned char*, int, Mem*, int);
+			//u32 sqlite3VdbeSerialGet(const unsigned char*, u32, Mem);
+			//void sqlite3VdbeDeleteAuxData(VdbeFunc*, int);
+			//int sqlite2BtreeKeyCompare(BtCursor *, const void *, int, int, int );
+			//int sqlite3VdbeIdxKeyCompare(VdbeCursor*,UnpackedRecord*,int);
+			//int sqlite3VdbeIdxRowid(sqlite3 *, i64 );
+			//int sqlite3MemCompare(const Mem*, const Mem*, const CollSeq);
+			//int sqlite3VdbeExec(Vdbe);
+			//int sqlite3VdbeList(Vdbe);
+			//int sqlite3VdbeHalt(Vdbe);
+			//int sqlite3VdbeChangeEncoding(Mem *, int);
+			//int sqlite3VdbeMemTooBig(Mem);
+			//int sqlite3VdbeMemCopy(Mem*, const Mem);
+			//void sqlite3VdbeMemShallowCopy(Mem*, const Mem*, int);
+			//void sqlite3VdbeMemMove(Mem*, Mem);
+			//int sqlite3VdbeMemNulTerminate(Mem);
+			//int sqlite3VdbeMemSetStr(Mem*, const char*, int, u8, void()(void));
+			//void sqlite3VdbeMemSetInt64(Mem*, i64);
+			#if SQLITE_OMIT_FLOATING_POINT
+																			// define sqlite3VdbeMemSetDouble sqlite3VdbeMemSetInt64
+#else
+			//void sqlite3VdbeMemSetDouble(Mem*, double);
+			#endif
+			//void sqlite3VdbeMemSetNull(Mem);
+			//void sqlite3VdbeMemSetZeroBlob(Mem*,int);
+			//void sqlite3VdbeMemSetRowSet(Mem);
+			//int sqlite3VdbeMemMakeWriteable(Mem);
+			//int sqlite3VdbeMemStringify(Mem*, int);
+			//i64 sqlite3VdbeIntValue(Mem);
+			//int sqlite3VdbeMemIntegerify(Mem);
+			//double sqlite3VdbeRealValue(Mem);
+			//void sqlite3VdbeIntegerAffinity(Mem);
+			//int sqlite3VdbeMemRealify(Mem);
+			//int sqlite3VdbeMemNumerify(Mem);
+			//int sqlite3VdbeMemFromBtree(BtCursor*,int,int,int,Mem);
+			//void sqlite3VdbeMemRelease(Mem p);
+			//void sqlite3VdbeMemReleaseExternal(Mem p);
+			//int sqlite3VdbeMemFinalize(Mem*, FuncDef);
+			//string sqlite3OpcodeName(int);
+			//int sqlite3VdbeMemGrow(Mem pMem, int n, int preserve);
+			//int sqlite3VdbeCloseStatement(Vdbe *, int);
+			//void sqlite3VdbeFrameDelete(VdbeFrame);
+			//int sqlite3VdbeFrameRestore(VdbeFrame );
+			//void sqlite3VdbeMemStoreType(Mem *pMem);  
+			#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
+																			  //void sqlite3VdbeEnter(Vdbe);
+  //void sqlite3VdbeLeave(Vdbe);
+#else
+			//# define sqlite3VdbeEnter(X)
+			void sqlite3VdbeEnter() {
+			}
+			public void sqlite3VdbeLeave() {
+			}
+		}
 		/*
     ** The following are allowed values for Vdbe.magic
     *///#define VDBE_MAGIC_INIT     0x26bceaa5    /* Building a VDBE program */
@@ -648,95 +714,27 @@ ct.pLruNext=pLruNext;
 		/* Building a VDBE program */const u32 VDBE_MAGIC_RUN=0xbdf20da3;
 		/* VDBE is ready to execute */const u32 VDBE_MAGIC_HALT=0x519c2973;
 		/* VDBE has completed execution */const u32 VDBE_MAGIC_DEAD=0xb606c3c8;
-		/* The VDBE has been deallocated *////<summary>
-		/// Function prototypes
-		///
-		///</summary>
-		//void sqlite3VdbeFreeCursor(Vdbe *, VdbeCursor);
-		//void sqliteVdbePopStack(Vdbe*,int);
-		//int sqlite3VdbeCursorMoveto(VdbeCursor);
-		//#if (SQLITE_DEBUG) || defined(VDBE_PROFILE)
-		//void sqlite3VdbePrintOp(FILE*, int, Op);
-		//#endif
-		//u32 sqlite3VdbeSerialTypeLen(u32);
-		//u32 sqlite3VdbeSerialType(Mem*, int);
-		//u32sqlite3VdbeSerialPut(unsigned char*, int, Mem*, int);
-		//u32 sqlite3VdbeSerialGet(const unsigned char*, u32, Mem);
-		//void sqlite3VdbeDeleteAuxData(VdbeFunc*, int);
-		//int sqlite2BtreeKeyCompare(BtCursor *, const void *, int, int, int );
-		//int sqlite3VdbeIdxKeyCompare(VdbeCursor*,UnpackedRecord*,int);
-		//int sqlite3VdbeIdxRowid(sqlite3 *, i64 );
-		//int sqlite3MemCompare(const Mem*, const Mem*, const CollSeq);
-		//int sqlite3VdbeExec(Vdbe);
-		//int sqlite3VdbeList(Vdbe);
-		//int sqlite3VdbeHalt(Vdbe);
-		//int sqlite3VdbeChangeEncoding(Mem *, int);
-		//int sqlite3VdbeMemTooBig(Mem);
-		//int sqlite3VdbeMemCopy(Mem*, const Mem);
-		//void sqlite3VdbeMemShallowCopy(Mem*, const Mem*, int);
-		//void sqlite3VdbeMemMove(Mem*, Mem);
-		//int sqlite3VdbeMemNulTerminate(Mem);
-		//int sqlite3VdbeMemSetStr(Mem*, const char*, int, u8, void()(void));
-		//void sqlite3VdbeMemSetInt64(Mem*, i64);
-		#if SQLITE_OMIT_FLOATING_POINT
-																// define sqlite3VdbeMemSetDouble sqlite3VdbeMemSetInt64
-#else
-		//void sqlite3VdbeMemSetDouble(Mem*, double);
-		#endif
-		//void sqlite3VdbeMemSetNull(Mem);
-		//void sqlite3VdbeMemSetZeroBlob(Mem*,int);
-		//void sqlite3VdbeMemSetRowSet(Mem);
-		//int sqlite3VdbeMemMakeWriteable(Mem);
-		//int sqlite3VdbeMemStringify(Mem*, int);
-		//i64 sqlite3VdbeIntValue(Mem);
-		//int sqlite3VdbeMemIntegerify(Mem);
-		//double sqlite3VdbeRealValue(Mem);
-		//void sqlite3VdbeIntegerAffinity(Mem);
-		//int sqlite3VdbeMemRealify(Mem);
-		//int sqlite3VdbeMemNumerify(Mem);
-		//int sqlite3VdbeMemFromBtree(BtCursor*,int,int,int,Mem);
-		//void sqlite3VdbeMemRelease(Mem p);
-		//void sqlite3VdbeMemReleaseExternal(Mem p);
-		//int sqlite3VdbeMemFinalize(Mem*, FuncDef);
-		//string sqlite3OpcodeName(int);
-		//int sqlite3VdbeMemGrow(Mem pMem, int n, int preserve);
-		//int sqlite3VdbeCloseStatement(Vdbe *, int);
-		//void sqlite3VdbeFrameDelete(VdbeFrame);
-		//int sqlite3VdbeFrameRestore(VdbeFrame );
-		//void sqlite3VdbeMemStoreType(Mem *pMem);  
-		#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
-																  //void sqlite3VdbeEnter(Vdbe);
-  //void sqlite3VdbeLeave(Vdbe);
-#else
-		//# define sqlite3VdbeEnter(X)
-		static void sqlite3VdbeEnter(Vdbe p) {
-		}
-		//# define sqlite3VdbeLeave(X)
-		static void sqlite3VdbeLeave(Vdbe p) {
-		}
-		#endif
-		#if SQLITE_DEBUG
-																    //void sqlite3VdbeMemPrepareToChange(Vdbe*,Mem);
+	/* The VDBE has been deallocated *///# define sqlite3VdbeLeave(X)
+	#endif
+	#if SQLITE_DEBUG
+																	    //void sqlite3VdbeMemPrepareToChange(Vdbe*,Mem);
 #endif
-		#if !SQLITE_OMIT_FOREIGN_KEY
-		//int sqlite3VdbeCheckFk(Vdbe *, int);
-		#else
-																// define sqlite3VdbeCheckFk(p,i) 0
+	#if !SQLITE_OMIT_FOREIGN_KEY
+	//int sqlite3VdbeCheckFk(Vdbe *, int);
+	#else
+																	// define sqlite3VdbeCheckFk(p,i) 0
 static int sqlite3VdbeCheckFk( Vdbe p, int i ) { return 0; }
 #endif
-		//int sqlite3VdbeMemTranslate(Mem*, u8);
-		//#if SQLITE_DEBUG
-		//  void sqlite3VdbePrintSql(Vdbe);
-		//  void sqlite3VdbeMemPrettyPrint(Mem pMem, string zBuf);
-		//#endif
-		//int sqlite3VdbeMemHandleBom(Mem pMem);
-		#if !SQLITE_OMIT_INCRBLOB
-																//  int sqlite3VdbeMemExpandBlob(Mem );
+	//int sqlite3VdbeMemTranslate(Mem*, u8);
+	//#if SQLITE_DEBUG
+	//  void sqlite3VdbePrintSql(Vdbe);
+	//  void sqlite3VdbeMemPrettyPrint(Mem pMem, string zBuf);
+	//#endif
+	//int sqlite3VdbeMemHandleBom(Mem pMem);
+	#if !SQLITE_OMIT_INCRBLOB
+																	//  int sqlite3VdbeMemExpandBlob(Mem );
 #else
-		//  #define sqlite3VdbeMemExpandBlob(x) SQLITE_OK
-		static int sqlite3VdbeMemExpandBlob(Mem x) {
-			return SQLITE_OK;
-		}
+	//  #define sqlite3VdbeMemExpandBlob(x) SQLITE_OK
 	#endif
 	//#endif //* !_VDBEINT_H_) */
 	}

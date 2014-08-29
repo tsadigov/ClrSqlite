@@ -200,7 +200,7 @@ namespace Community.CsharpSqlite {
 				},
 			};
 			#else
-																								      /* If triggers are not supported by this compile then the statement machine
+																											      /* If triggers are not supported by this compile then the statement machine
   ** used to detect the end of a statement is much simplier
   */
       u8[][] trans = new u8[][]   {
@@ -287,7 +287,7 @@ namespace Community.CsharpSqlite {
 						for(nId=1;(zIdx+nId)<zSql.Length&&IdChar((u8)zSql[zIdx+nId]);nId++) {
 						}
 						#if SQLITE_OMIT_TRIGGER
-																																																                token = tkOTHER;
+																																																						                token = tkOTHER;
 #else
 						switch(zSql[zIdx]) {
 						case 'c':
@@ -356,7 +356,7 @@ namespace Community.CsharpSqlite {
 			//return state==1;
 		}
 	#if !SQLITE_OMIT_UTF16
-								/*
+									/*
 ** This routine is the same as the sqlite3_complete() routine described
 ** above, except that the parameter is required to be UTF-16 encoded, not
 ** UTF-8.
@@ -367,10 +367,10 @@ char const *zSql8;
 int rc = SQLITE_NOMEM;
 
 #if !SQLITE_OMIT_AUTOINIT
-								rc = sqlite3_initialize();
+									rc = sqlite3_initialize();
 if( rc !=0) return rc;
 #endif
-								pVal = sqlite3ValueNew(0);
+									pVal = sqlite3ValueNew(0);
 sqlite3ValueSetStr(pVal, -1, zSql, SqliteEncoding.UTF16NATIVE, SQLITE_STATIC);
 zSql8 = sqlite3ValueText(pVal, SqliteEncoding.UTF8);
 if( zSql8 ){
