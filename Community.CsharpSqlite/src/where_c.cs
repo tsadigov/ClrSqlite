@@ -40,10 +40,10 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if (SQLITE_TEST) || (SQLITE_DEBUG)
-																						    static bool sqlite3WhereTrace = false;
+																								    static bool sqlite3WhereTrace = false;
 #endif
 		#if (SQLITE_TEST) && (SQLITE_DEBUG) && TRACE
-																						// define WHERETRACE(X)  if(sqlite3WhereTrace) sqlite3DebugPrintf X
+																								// define WHERETRACE(X)  if(sqlite3WhereTrace) sqlite3DebugPrintf X
 static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace ) sqlite3DebugPrintf( X, ap ); }
 #else
 		//# define WHERETRACE(X)
@@ -140,7 +140,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		//#define TERM_ANDINFO    0x20   /* Need to free the WhereTerm.u.pAndInfo obj */
 		//#define TERM_OR_OK      0x40   /* Used during OR-clause processing */
 		#if SQLITE_ENABLE_STAT2
-																						    //  define TERM_VNULL    0x80   /* Manufactured x>NULL or x<=NULL term */
+																								    //  define TERM_VNULL    0x80   /* Manufactured x>NULL or x<=NULL term */
 #else
 		//#  define TERM_VNULL    0x00   /* Disabled if not using stat2 */
 		#endif
@@ -153,7 +153,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/* Need to free the WhereTerm.u.pAndInfo obj */const int TERM_OR_OK=0x40;
 		/* Used during OR-clause processing */
 		#if SQLITE_ENABLE_STAT2
-																						    const int TERM_VNULL = 0x80;  /* Manufactured x>NULL or x<=NULL term */
+																								    const int TERM_VNULL = 0x80;  /* Manufactured x>NULL or x<=NULL term */
 #else
 		const int TERM_VNULL=0x00;
 		///<summary>
@@ -175,7 +175,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			/* Number of entries in a[] */public WhereTerm[] a;
 			/* Each a[] describes a term of the WHERE cluase */
 			#if (SQLITE_SMALL_STACK)
-																																	public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[] */
+																																				public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[] */
 #else
 			public WhereTerm[] aStatic=new WhereTerm[8];
 			///<summary>
@@ -192,8 +192,141 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				wc.a=(WhereTerm[])this.a.Clone();
 				wc.aStatic=(WhereTerm[])this.aStatic.Clone();
 			}
-		};
-
+			public///<summary>
+			/// Deallocate a WhereClause structure.  The WhereClause structure
+			/// itself is not freed.  This routine is the inverse of whereClauseInit().
+			///
+			///</summary>
+			void whereClauseClear() {
+				int i;
+				WhereTerm a;
+				sqlite3 db=this.pParse.db;
+				for(i=this.nTerm-1;i>=0;i--)//, a++)
+				 {
+					a=this.a[i];
+					if((a.wtFlags&TERM_DYNAMIC)!=0) {
+						sqlite3ExprDelete(db,ref a.pExpr);
+					}
+					if((a.wtFlags&TERM_ORINFO)!=0) {
+						whereOrInfoDelete(db,a.u.pOrInfo);
+					}
+					else
+						if((a.wtFlags&TERM_ANDINFO)!=0) {
+							whereAndInfoDelete(db,a.u.pAndInfo);
+						}
+				}
+				if(this.a!=this.aStatic) {
+					sqlite3DbFree(db,ref this.a);
+				}
+			}
+			public void whereClauseInit(/* The WhereClause to be initialized */Parse pParse,/* The parsing context */WhereMaskSet pMaskSet/* Mapping from table cursor numbers to bitmasks */) {
+				this.pParse=pParse;
+				this.pMaskSet=pMaskSet;
+				this.nTerm=0;
+				this.nSlot=ArraySize(this.aStatic)-1;
+				this.a=this.aStatic;
+				this.vmask=0;
+			}
+			public///<summary>
+			/// Add a single new WhereTerm entry to the WhereClause object pWC.
+			/// The new WhereTerm object is constructed from Expr p and with wtFlags.
+			/// The index in pWC.a[] of the new WhereTerm is returned on success.
+			/// 0 is returned if the new WhereTerm could not be added due to a memory
+			/// allocation error.  The memory allocation failure will be recorded in
+			/// the db.mallocFailed flag so that higher-level functions can detect it.
+			///
+			/// This routine will increase the size of the pWC.a[] array as necessary.
+			///
+			/// If the wtFlags argument includes TERM_DYNAMIC, then responsibility
+			/// for freeing the expression p is Debug.Assumed by the WhereClause object pWC.
+			/// This is true even if this routine fails to allocate a new WhereTerm.
+			///
+			/// WARNING:  This routine might reallocate the space used to store
+			/// WhereTerms.  All pointers to WhereTerms should be invalidated after
+			/// calling this routine.  Such pointers may be reinitialized by referencing
+			/// the pWC.a[] array.
+			///
+			///</summary>
+			int whereClauseInsert(Expr p,u8 wtFlags) {
+				WhereTerm pTerm;
+				int idx;
+				testcase(wtFlags&TERM_VIRTUAL);
+				/* EV: R-00211-15100 */if(this.nTerm>=this.nSlot) {
+					//WhereTerm pOld = pWC.a;
+					sqlite3 db=this.pParse.db;
+					Array.Resize(ref this.a,this.nSlot*2);
+					//pWC.a = sqlite3DbMallocRaw(db, sizeof(pWC.a[0])*pWC.nSlot*2 );
+					//if( pWC.a==null ){
+					//  if( wtFlags & TERM_DYNAMIC ){
+					//    sqlite3ExprDelete(db, ref p);
+					//  }
+					//  pWC.a = pOld;
+					//  return 0;
+					//}
+					//memcpy(pWC.a, pOld, sizeof(pWC.a[0])*pWC.nTerm);
+					//if( pOld!=pWC.aStatic ){
+					//  sqlite3DbFree(db, ref pOld);
+					//}
+					//pWC.nSlot = sqlite3DbMallocSize(db, pWC.a)/sizeof(pWC.a[0]);
+					this.nSlot=this.a.Length-1;
+				}
+				this.a[idx=this.nTerm++]=new WhereTerm();
+				pTerm=this.a[idx];
+				pTerm.pExpr=p;
+				pTerm.wtFlags=wtFlags;
+				pTerm.pWC=this;
+				pTerm.iParent=-1;
+				return idx;
+			}
+			public void whereSplit(Expr pExpr,int op) {
+				this.op=(u8)op;
+				if(pExpr==null)
+					return;
+				if(pExpr.op!=op) {
+					this.whereClauseInsert(pExpr,0);
+				}
+				else {
+					this.whereSplit(pExpr.pLeft,op);
+					this.whereSplit(pExpr.pRight,op);
+				}
+			}
+			public WhereTerm findTerm(/* The WHERE clause to be searched */int iCur,/* Cursor number of LHS */int iColumn,/* Column number of LHS */Bitmask notReady,/* RHS must not overlap with this mask */u32 op,/* Mask of WO_xx values describing operator */Index pIdx/* Must be compatible with this index, if not NULL */) {
+				WhereTerm pTerm;
+				int k;
+				Debug.Assert(iCur>=0);
+				op&=WO_ALL;
+				for(k=this.nTerm;k!=0;k--)//, pTerm++)
+				 {
+					pTerm=this.a[this.nTerm-k];
+					if(pTerm.leftCursor==iCur&&(pTerm.prereqRight&notReady)==0&&pTerm.u.leftColumn==iColumn&&(pTerm.eOperator&op)!=0) {
+						if(pIdx!=null&&pTerm.eOperator!=WO_ISNULL) {
+							Expr pX=pTerm.pExpr;
+							CollSeq pColl;
+							char idxaff;
+							int j;
+							Parse pParse=this.pParse;
+							idxaff=pIdx.pTable.aCol[iColumn].affinity;
+							if(!pX.sqlite3IndexAffinityOk(idxaff))
+								continue;
+							/* Figure out the collation sequence required from an index for
+            ** it to be useful for optimising expression pX. Store this
+            ** value in variable pColl.
+            */Debug.Assert(pX.pLeft!=null);
+							pColl=sqlite3BinaryCompareCollSeq(pParse,pX.pLeft,pX.pRight);
+							Debug.Assert(pColl!=null||pParse.nErr!=0);
+							for(j=0;pIdx.aiColumn[j]!=iColumn;j++) {
+								if(NEVER(j>=pIdx.nColumn))
+									return null;
+							}
+							if(pColl!=null&&!pColl.zName.Equals(pIdx.azColl[j],StringComparison.InvariantCultureIgnoreCase))
+								continue;
+						}
+						return pTerm;
+					}
+				}
+				return null;
+			}
+		}
 		///<summary>
 		/// A WhereTerm with eOperator==WO_OR has its u.pOrInfo pointer set to
 		/// a dynamically allocated instance of the following structure.
@@ -352,15 +485,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		const int WHERE_TEMP_INDEX=0x20000000;
 		/*
     ** Initialize a preallocated WhereClause structure.
-    */static void whereClauseInit(WhereClause pWC,/* The WhereClause to be initialized */Parse pParse,/* The parsing context */WhereMaskSet pMaskSet/* Mapping from table cursor numbers to bitmasks */) {
-			pWC.pParse=pParse;
-			pWC.pMaskSet=pMaskSet;
-			pWC.nTerm=0;
-			pWC.nSlot=ArraySize(pWC.aStatic)-1;
-			pWC.a=pWC.aStatic;
-			pWC.vmask=0;
-		}
-		///<summary>
+    *////<summary>
 		///Forward reference
 		///</summary>
 		//static void whereClauseClear(WhereClause);
@@ -369,7 +494,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///
 		///</summary>
 		static void whereOrInfoDelete(sqlite3 db,WhereOrInfo p) {
-			whereClauseClear(p.wc);
+			p.wc.whereClauseClear();
 			sqlite3DbFree(db,ref p);
 		}
 		///<summary>
@@ -377,86 +502,8 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///
 		///</summary>
 		static void whereAndInfoDelete(sqlite3 db,WhereAndInfo p) {
-			whereClauseClear(p.wc);
+			p.wc.whereClauseClear();
 			sqlite3DbFree(db,ref p);
-		}
-		///<summary>
-		/// Deallocate a WhereClause structure.  The WhereClause structure
-		/// itself is not freed.  This routine is the inverse of whereClauseInit().
-		///
-		///</summary>
-		static void whereClauseClear(WhereClause pWC) {
-			int i;
-			WhereTerm a;
-			sqlite3 db=pWC.pParse.db;
-			for(i=pWC.nTerm-1;i>=0;i--)//, a++)
-			 {
-				a=pWC.a[i];
-				if((a.wtFlags&TERM_DYNAMIC)!=0) {
-					sqlite3ExprDelete(db,ref a.pExpr);
-				}
-				if((a.wtFlags&TERM_ORINFO)!=0) {
-					whereOrInfoDelete(db,a.u.pOrInfo);
-				}
-				else
-					if((a.wtFlags&TERM_ANDINFO)!=0) {
-						whereAndInfoDelete(db,a.u.pAndInfo);
-					}
-			}
-			if(pWC.a!=pWC.aStatic) {
-				sqlite3DbFree(db,ref pWC.a);
-			}
-		}
-		///<summary>
-		/// Add a single new WhereTerm entry to the WhereClause object pWC.
-		/// The new WhereTerm object is constructed from Expr p and with wtFlags.
-		/// The index in pWC.a[] of the new WhereTerm is returned on success.
-		/// 0 is returned if the new WhereTerm could not be added due to a memory
-		/// allocation error.  The memory allocation failure will be recorded in
-		/// the db.mallocFailed flag so that higher-level functions can detect it.
-		///
-		/// This routine will increase the size of the pWC.a[] array as necessary.
-		///
-		/// If the wtFlags argument includes TERM_DYNAMIC, then responsibility
-		/// for freeing the expression p is Debug.Assumed by the WhereClause object pWC.
-		/// This is true even if this routine fails to allocate a new WhereTerm.
-		///
-		/// WARNING:  This routine might reallocate the space used to store
-		/// WhereTerms.  All pointers to WhereTerms should be invalidated after
-		/// calling this routine.  Such pointers may be reinitialized by referencing
-		/// the pWC.a[] array.
-		///
-		///</summary>
-		static int whereClauseInsert(WhereClause pWC,Expr p,u8 wtFlags) {
-			WhereTerm pTerm;
-			int idx;
-			testcase(wtFlags&TERM_VIRTUAL);
-			/* EV: R-00211-15100 */if(pWC.nTerm>=pWC.nSlot) {
-				//WhereTerm pOld = pWC.a;
-				sqlite3 db=pWC.pParse.db;
-				Array.Resize(ref pWC.a,pWC.nSlot*2);
-				//pWC.a = sqlite3DbMallocRaw(db, sizeof(pWC.a[0])*pWC.nSlot*2 );
-				//if( pWC.a==null ){
-				//  if( wtFlags & TERM_DYNAMIC ){
-				//    sqlite3ExprDelete(db, ref p);
-				//  }
-				//  pWC.a = pOld;
-				//  return 0;
-				//}
-				//memcpy(pWC.a, pOld, sizeof(pWC.a[0])*pWC.nTerm);
-				//if( pOld!=pWC.aStatic ){
-				//  sqlite3DbFree(db, ref pOld);
-				//}
-				//pWC.nSlot = sqlite3DbMallocSize(db, pWC.a)/sizeof(pWC.a[0]);
-				pWC.nSlot=pWC.a.Length-1;
-			}
-			pWC.a[idx=pWC.nTerm++]=new WhereTerm();
-			pTerm=pWC.a[idx];
-			pTerm.pExpr=p;
-			pTerm.wtFlags=wtFlags;
-			pTerm.pWC=pWC;
-			pTerm.iParent=-1;
-			return idx;
 		}
 		/*
     ** This routine identifies subexpressions in the WHERE clause where
@@ -474,19 +521,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
     ** In the previous sentence and in the diagram, "slot[]" refers to
     ** the WhereClause.a[] array.  The slot[] array grows as needed to contain
     ** all terms of the WHERE clause.
-    */static void whereSplit(WhereClause pWC,Expr pExpr,int op) {
-			pWC.op=(u8)op;
-			if(pExpr==null)
-				return;
-			if(pExpr.op!=op) {
-				whereClauseInsert(pWC,pExpr,0);
-			}
-			else {
-				whereSplit(pWC,pExpr.pLeft,op);
-				whereSplit(pWC,pExpr.pRight,op);
-			}
-		}
-		///<summary>
+    *////<summary>
 		/// Initialize an expression mask set (a WhereMaskSet object)
 		///
 		///</summary>
@@ -661,43 +696,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
     ** where X is a reference to the iColumn of table iCur and <op> is one of
     ** the WO_xx operator codes specified by the op parameter.
     ** Return a pointer to the term.  Return 0 if not found.
-    */static WhereTerm findTerm(WhereClause pWC,/* The WHERE clause to be searched */int iCur,/* Cursor number of LHS */int iColumn,/* Column number of LHS */Bitmask notReady,/* RHS must not overlap with this mask */u32 op,/* Mask of WO_xx values describing operator */Index pIdx/* Must be compatible with this index, if not NULL */) {
-			WhereTerm pTerm;
-			int k;
-			Debug.Assert(iCur>=0);
-			op&=WO_ALL;
-			for(k=pWC.nTerm;k!=0;k--)//, pTerm++)
-			 {
-				pTerm=pWC.a[pWC.nTerm-k];
-				if(pTerm.leftCursor==iCur&&(pTerm.prereqRight&notReady)==0&&pTerm.u.leftColumn==iColumn&&(pTerm.eOperator&op)!=0) {
-					if(pIdx!=null&&pTerm.eOperator!=WO_ISNULL) {
-						Expr pX=pTerm.pExpr;
-						CollSeq pColl;
-						char idxaff;
-						int j;
-						Parse pParse=pWC.pParse;
-						idxaff=pIdx.pTable.aCol[iColumn].affinity;
-						if(!pX.sqlite3IndexAffinityOk(idxaff))
-							continue;
-						/* Figure out the collation sequence required from an index for
-            ** it to be useful for optimising expression pX. Store this
-            ** value in variable pColl.
-            */Debug.Assert(pX.pLeft!=null);
-						pColl=sqlite3BinaryCompareCollSeq(pParse,pX.pLeft,pX.pRight);
-						Debug.Assert(pColl!=null||pParse.nErr!=0);
-						for(j=0;pIdx.aiColumn[j]!=iColumn;j++) {
-							if(NEVER(j>=pIdx.nColumn))
-								return null;
-						}
-						if(pColl!=null&&!pColl.zName.Equals(pIdx.azColl[j],StringComparison.InvariantCultureIgnoreCase))
-							continue;
-					}
-					return pTerm;
-				}
-			}
-			return null;
-		}
-		///<summary>
+    *////<summary>
 		///Forward reference
 		///</summary>
 		//static void exprAnalyze(SrcList*, WhereClause*, int);
@@ -935,8 +934,8 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				return;
 			pTerm.wtFlags|=TERM_ORINFO;
 			pOrWc=pOrInfo.wc;
-			whereClauseInit(pOrWc,pWC.pParse,pMaskSet);
-			whereSplit(pOrWc,pExpr,TK_OR);
+			pOrWc.whereClauseInit(pWC.pParse,pMaskSet);
+			pOrWc.whereSplit(pExpr,TK_OR);
 			exprAnalyzeAll(pSrc,pOrWc);
 			//      if ( db.mallocFailed != 0 ) return;
 			Debug.Assert(pOrWc.nTerm>=2);
@@ -963,8 +962,8 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 						pOrTerm.wtFlags|=TERM_ANDINFO;
 						pOrTerm.eOperator=WO_AND;
 						pAndWC=pAndInfo.wc;
-						whereClauseInit(pAndWC,pWC.pParse,pMaskSet);
-						whereSplit(pAndWC,pOrTerm.pExpr,TK_AND);
+						pAndWC.whereClauseInit(pWC.pParse,pMaskSet);
+						pAndWC.whereSplit(pOrTerm.pExpr,TK_AND);
 						exprAnalyzeAll(pSrc,pAndWC);
 						//testcase( db.mallocFailed );
 						////if ( 0 == db.mallocFailed )
@@ -1128,7 +1127,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 						transferJoinMarkings(pNew,pExpr);
 						Debug.Assert(!ExprHasProperty(pNew,EP_xIsSelect));
 						pNew.x.pList=pList;
-						idxNew=whereClauseInsert(pWC,pNew,TERM_VIRTUAL|TERM_DYNAMIC);
+						idxNew=pWC.whereClauseInsert(pNew,TERM_VIRTUAL|TERM_DYNAMIC);
 						testcase(idxNew==0);
 						exprAnalyze(pSrc,pWC,idxNew);
 						pTerm=pWC.a[idxTerm];
@@ -1229,7 +1228,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 						//  sqlite3ExprDelete( db, ref pDup );
 						//  return;
 						//}
-						idxNew=whereClauseInsert(pWC,pDup,TERM_VIRTUAL|TERM_DYNAMIC);
+						idxNew=pWC.whereClauseInsert(pDup,TERM_VIRTUAL|TERM_DYNAMIC);
 						if(idxNew==0)
 							return;
 						pNew=pWC.a[idxNew];
@@ -1281,7 +1280,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 						Expr pNewExpr;
 						int idxNew;
 						pNewExpr=sqlite3PExpr(pParse,ops[i],sqlite3ExprDup(db,pExpr.pLeft,0),sqlite3ExprDup(db,pList.a[i].pExpr,0),null);
-						idxNew=whereClauseInsert(pWC,pNewExpr,TERM_VIRTUAL|TERM_DYNAMIC);
+						idxNew=pWC.whereClauseInsert(pNewExpr,TERM_VIRTUAL|TERM_DYNAMIC);
 						testcase(idxNew==0);
 						exprAnalyze(pSrc,pWC,idxNew);
 						pTerm=pWC.a[idxTerm];
@@ -1340,11 +1339,11 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				}
 				pColl=sqlite3FindCollSeq(db,SqliteEncoding.UTF8,noCase?"NOCASE":"BINARY",0);
 				pNewExpr1=sqlite3PExpr(pParse,TK_GE,sqlite3ExprSetColl(sqlite3ExprDup(db,pLeft,0),pColl),pStr1,0);
-				idxNew1=whereClauseInsert(pWC,pNewExpr1,TERM_VIRTUAL|TERM_DYNAMIC);
+				idxNew1=pWC.whereClauseInsert(pNewExpr1,TERM_VIRTUAL|TERM_DYNAMIC);
 				testcase(idxNew1==0);
 				exprAnalyze(pSrc,pWC,idxNew1);
 				pNewExpr2=sqlite3PExpr(pParse,TK_LT,sqlite3ExprSetColl(sqlite3ExprDup(db,pLeft,0),pColl),pStr2,null);
-				idxNew2=whereClauseInsert(pWC,pNewExpr2,TERM_VIRTUAL|TERM_DYNAMIC);
+				idxNew2=pWC.whereClauseInsert(pNewExpr2,TERM_VIRTUAL|TERM_DYNAMIC);
 				testcase(idxNew2==0);
 				exprAnalyze(pSrc,pWC,idxNew2);
 				pTerm=pWC.a[idxTerm];
@@ -1373,7 +1372,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				if((prereqExpr&prereqColumn)==0) {
 					Expr pNewExpr;
 					pNewExpr=sqlite3PExpr(pParse,TK_MATCH,null,sqlite3ExprDup(db,pRight,0),null);
-					idxNew=whereClauseInsert(pWC,pNewExpr,TERM_VIRTUAL|TERM_DYNAMIC);
+					idxNew=pWC.whereClauseInsert(pNewExpr,TERM_VIRTUAL|TERM_DYNAMIC);
 					testcase(idxNew==0);
 					pNewTerm=pWC.a[idxNew];
 					pNewTerm.prereqRight=prereqExpr;
@@ -1389,7 +1388,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			}
 			#endif
 			#if SQLITE_ENABLE_STAT2
-																																	      /* When sqlite_stat2 histogram data is available an operator of the
+																																				      /* When sqlite_stat2 histogram data is available an operator of the
   ** form "x IS NOT NULL" can sometimes be evaluated more efficiently
   ** as "x>NULL" if x is not an INTEGER PRIMARY KEY.  So construct a
   ** virtual term of that form.
@@ -1595,7 +1594,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///
 		///</summary>
 		#if !(SQLITE_OMIT_VIRTUALTABLE) && (SQLITE_DEBUG)
-																						static void TRACE_IDX_INPUTS( sqlite3_index_info p )
+																								static void TRACE_IDX_INPUTS( sqlite3_index_info p )
 {
 int i;
 if ( !sqlite3WhereTrace ) return;
@@ -1680,7 +1679,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 						pOrTerm=pOrWC.a[_pOrWC];
 						WhereCost sTermCost=null;
 						#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																		            WHERETRACE( "... Multi-index OR testing for term %d of %d....\n",
+																																																																								            WHERETRACE( "... Multi-index OR testing for term %d of %d....\n",
             _pOrWC, pOrWC.nTerm - _pOrWC//( pOrTerm - pOrWC.a ), ( pTerm - pWC.a )
             );
 #endif
@@ -1711,7 +1710,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 					/* If there is an ORDER BY clause, increase the scan cost to account
           ** for the cost of the sort. */if(pOrderBy!=null) {
 						#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																		            WHERETRACE( "... sorting increases OR cost %.9g to %.9g\n",
+																																																																								            WHERETRACE( "... sorting increases OR cost %.9g to %.9g\n",
             rTotal, rTotal + nRow * estLog( nRow ) );
 #endif
 						rTotal+=nRow*estLog(nRow);
@@ -1720,7 +1719,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
           ** less than the current cost stored in pCost, replace the contents
           ** of pCost. */
 					#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																							          WHERETRACE( "... multi-index OR cost=%.9g nrow=%.9g\n", rTotal, nRow );
+																																																												          WHERETRACE( "... multi-index OR cost=%.9g nrow=%.9g\n", rTotal, nRow );
 #endif
 					if(rTotal<pCost.rCost) {
 						pCost.rCost=rTotal;
@@ -1796,7 +1795,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 				pTerm=pWC.a[ipTerm];
 				if(termCanDriveIndex(pTerm,pSrc,notReady)!=0) {
 					#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																							          WHERETRACE( "auto-index reduces cost from %.2f to %.2f\n",
+																																																												          WHERETRACE( "auto-index reduces cost from %.2f to %.2f\n",
           pCost.rCost, costTempIdx );
 #endif
 					pCost.rCost=costTempIdx;
@@ -1808,7 +1807,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 			}
 		}
 		#else
-																						// define bestAutomaticIndex(A,B,C,D,E)  /* no-op */
+																								// define bestAutomaticIndex(A,B,C,D,E)  /* no-op */
 static void bestAutomaticIndex(
 Parse pParse,              /* The parsing context */
 WhereClause pWC,           /* The WHERE clause */
@@ -1972,7 +1971,7 @@ WhereCost pCost            /* Lowest cost query plan */
 			int nOrderBy;
 			sqlite3_index_info pIdxInfo;
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																	      WHERETRACE( "Recomputing index info for %s...\n", pSrc.pTab.zName );
+																																				      WHERETRACE( "Recomputing index info for %s...\n", pSrc.pTab.zName );
 #endif
 			/* Count the number of possible WHERE clause constraints referring
 ** to this virtual table */for(i=nTerm=0;i<pWC.nTerm;i++)//, pTerm++ )
@@ -2082,7 +2081,7 @@ WhereCost pCost            /* Lowest cost query plan */
 			int i;
 			int rc;
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																	      WHERETRACE( "xBestIndex for %s\n", pTab.zName );
+																																				      WHERETRACE( "xBestIndex for %s\n", pTab.zName );
 #endif
 			TRACE_IDX_INPUTS(p);
 			rc=pVtab.pModule.xBestIndex(pVtab,ref p);
@@ -2263,7 +2262,7 @@ WhereCost pCost            /* Lowest cost query plan */
 ** SQLITE_NOMEM is returned and *piRegion is undefined.
 */
 		#if SQLITE_ENABLE_STAT2
-																						    static int whereRangeRegion(
+																								    static int whereRangeRegion(
     Parse pParse,               /* Database connection */
     Index pIdx,                 /* Index to consider domain of */
     sqlite3_value pVal,         /* Value to consider */
@@ -2352,7 +2351,7 @@ WhereCost pCost            /* Lowest cost query plan */
             if ( ( eSampletype != eType ) )
               break;
 #if !SQLITE_OMIT_UTF16
-																						if( pColl.enc!=SqliteEncoding.UTF8 ){
+																								if( pColl.enc!=SqliteEncoding.UTF8 ){
 int nSample;
 string zSample;
 zSample = sqlite3Utf8to16(
@@ -2368,7 +2367,7 @@ c = pColl.xCmp(pColl.pUser, nSample, zSample, n, z);
 sqlite3DbFree(db, ref zSample);
 }else
 #endif
-																						            {
+																								            {
               c = pColl.xCmp( pColl.pUser, aSample[i].nByte, aSample[i].u.z, n, z );
             }
             if ( c - roundUp >= 0 )
@@ -2399,7 +2398,7 @@ sqlite3DbFree(db, ref zSample);
 		/// If an error occurs, return an error code. Otherwise, SQLITE_OK.
 		///</summary>
 		#if SQLITE_ENABLE_STAT2
-																						    static int valueFromExpr(
+																								    static int valueFromExpr(
     Parse pParse,
     Expr pExpr,
     char aff,
@@ -2462,7 +2461,7 @@ sqlite3DbFree(db, ref zSample);
 		static int whereRangeScanEst(Parse pParse,/* Parsing & code generating context */Index p,/* The index containing the range-compared column; "x" */int nEq,/* index into p.aCol[] of the range-compared column */WhereTerm pLower,/* Lower bound on the range. ex: "x>123" Might be NULL */WhereTerm pUpper,/* Upper bound on the range. ex: "x<455" Might be NULL */out int piEst/* OUT: Return value */) {
 			int rc=SQLITE_OK;
 			#if SQLITE_ENABLE_STAT2
-																																	
+																																				
       if ( nEq == 0 && p.aSample != null )
       {
         sqlite3_value pLowerVal = null;
@@ -2548,7 +2547,7 @@ range_est_fallback:
 			return rc;
 		}
 		#if SQLITE_ENABLE_STAT2
-																						    /*
+																								    /*
 ** Estimate the number of rows that will be returned based on
 ** an equality constraint x=VALUE and where that VALUE occurs in
 ** the histogram data.  This only works when x is the left-most
@@ -2618,7 +2617,7 @@ whereEqualScanEst_cancel:
     }
 #endif
 		#if SQLITE_ENABLE_STAT2
-																						    /*
+																								    /*
 ** Estimate the number of rows that will be returned based on
 ** an IN constraint where the right-hand side of the IN operator
 ** is a list of values.  Example:
@@ -2880,11 +2879,11 @@ whereEqualScanEst_cancel:
 				/* True if not a covering index */WhereTerm pTerm;
 				/* A single term of the WHERE clause */
 				#if SQLITE_ENABLE_STAT2
-																																												        WhereTerm pFirstTerm = null;  /* First term matching the index */
+																																																        WhereTerm pFirstTerm = null;  /* First term matching the index */
 #endif
 				/* Determine the values of nEq and nInMul */for(nEq=0;nEq<pProbe.nColumn;nEq++) {
 					int j=pProbe.aiColumn[nEq];
-					pTerm=findTerm(pWC,iCur,j,notReady,eqTermMask,pIdx);
+					pTerm=pWC.findTerm(iCur,j,notReady,eqTermMask,pIdx);
 					if(pTerm==null)
 						break;
 					wsFlags|=(WHERE_COLUMN_EQ|WHERE_ROWID_EQ);
@@ -2905,16 +2904,16 @@ whereEqualScanEst_cancel:
 							wsFlags|=WHERE_COLUMN_NULL;
 						}
 					#if SQLITE_ENABLE_STAT2
-																																																							          if ( nEq == 0 && pProbe.aSample != null )
+																																																												          if ( nEq == 0 && pProbe.aSample != null )
             pFirstTerm = pTerm;
 #endif
 					used|=pTerm.prereqRight;
 				}
 				/* Determine the value of estBound. */if(nEq<pProbe.nColumn&&pProbe.bUnordered==0) {
 					int j=pProbe.aiColumn[nEq];
-					if(findTerm(pWC,iCur,j,notReady,WO_LT|WO_LE|WO_GT|WO_GE,pIdx)!=null) {
-						WhereTerm pTop=findTerm(pWC,iCur,j,notReady,WO_LT|WO_LE,pIdx);
-						WhereTerm pBtm=findTerm(pWC,iCur,j,notReady,WO_GT|WO_GE,pIdx);
+					if(pWC.findTerm(iCur,j,notReady,WO_LT|WO_LE|WO_GT|WO_GE,pIdx)!=null) {
+						WhereTerm pTop=pWC.findTerm(iCur,j,notReady,WO_LT|WO_LE,pIdx);
+						WhereTerm pBtm=pWC.findTerm(iCur,j,notReady,WO_GT|WO_GE,pIdx);
 						whereRangeScanEst(pParse,pProbe,nEq,pBtm,pTop,out estBound);
 						if(pTop!=null) {
 							nBound=1;
@@ -2978,7 +2977,7 @@ whereEqualScanEst_cancel:
 					nInMul=(int)(nRow/aiRowEst[nEq]);
 				}
 				#if SQLITE_ENABLE_STAT2
-																																												        /* If the constraint is of the form x=VALUE and histogram
+																																																        /* If the constraint is of the form x=VALUE and histogram
     ** data is available for column x, then it might be possible
     ** to get a better estimate on the number of rows based on
     ** VALUE and how common that value is according to the histogram.
@@ -3120,7 +3119,7 @@ whereEqualScanEst_cancel:
 						nRow=2;
 				}
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																												        WHERETRACE(
+																																																        WHERETRACE(
         "%s(%s): nEq=%d nInMul=%d estBound=%d bSort=%d bLookup=%d wsFlags=0x%x\n" +
       "         notReady=0x%llx log10N=%.1f nRow=%.1f cost=%.1f used=0x%llx\n",
         pSrc.pTab.zName, ( pIdx != null ? pIdx.zName : "ipk" ),
@@ -3155,7 +3154,7 @@ whereEqualScanEst_cancel:
 			Debug.Assert(pCost.plan.u.pIdx==null||(pCost.plan.wsFlags&WHERE_ROWID_EQ)==0);
 			Debug.Assert(pSrc.pIndex==null||pCost.plan.u.pIdx==null||pCost.plan.u.pIdx==pSrc.pIndex);
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																	      WHERETRACE( "best index is: %s\n",
+																																				      WHERETRACE( "best index is: %s\n",
       ( ( pCost.plan.wsFlags & WHERE_NOT_FULLSCAN ) == 0 ? "none" :
       pCost.plan.u.pIdx != null ? pCost.plan.u.pIdx.zName : "ipk" )
       );
@@ -3399,7 +3398,7 @@ whereEqualScanEst_cancel:
 			for(j=0;j<nEq;j++) {
 				int r1;
 				int k=pIdx.aiColumn[j];
-				pTerm=findTerm(pWC,iCur,k,notReady,pLevel.plan.wsFlags,pIdx);
+				pTerm=pWC.findTerm(iCur,k,notReady,pLevel.plan.wsFlags,pIdx);
 				if(NEVER(pTerm==null))
 					break;
 				/* The following true for indices with redundant columns. 
@@ -3569,7 +3568,7 @@ whereEqualScanEst_cancel:
 			}
 		}
 		#else
-																						// define explainOneScan(u,v,w,x,y,z)
+																								// define explainOneScan(u,v,w,x,y,z)
 static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,  u16 z){}
 #endif
 		///<summary>
@@ -3619,7 +3618,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				pLevel.iLeftJoin=++pParse.nMem;
 				sqlite3VdbeAddOp2(v,OP_Integer,0,pLevel.iLeftJoin);
 				#if SQLITE_DEBUG
-																																												        VdbeComment( v, "init LEFT JOIN no-match flag" );
+																																																        VdbeComment( v, "init LEFT JOIN no-match flag" );
 #endif
 			}
 			#if !SQLITE_OMIT_VIRTUALTABLE
@@ -3668,7 +3667,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
           **          we reference multiple rows using a "rowid IN (...)"
           **          construct.
           */iReleaseReg=sqlite3GetTempReg(pParse);
-					pTerm=findTerm(pWC,iCur,-1,notReady,WO_EQ|WO_IN,null);
+					pTerm=pWC.findTerm(iCur,-1,notReady,WO_EQ|WO_IN,null);
 					Debug.Assert(pTerm!=null);
 					Debug.Assert(pTerm.pExpr!=null);
 					Debug.Assert(pTerm.leftCursor==iCur);
@@ -3680,7 +3679,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 					sqlite3VdbeAddOp3(v,OP_NotExists,iCur,addrNxt,iRowidReg);
 					sqlite3ExprCacheStore(pParse,iCur,-1,iRowidReg);
 					#if SQLITE_DEBUG
-																																																							          VdbeComment( v, "pk" );
+																																																												          VdbeComment( v, "pk" );
 #endif
 					pLevel.op=OP_Noop;
 				}
@@ -3692,8 +3691,8 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 						int memEndValue=0;
 						WhereTerm pStart,pEnd;
 						Debug.Assert(omitTable==0);
-						pStart=findTerm(pWC,iCur,-1,notReady,WO_GT|WO_GE,null);
-						pEnd=findTerm(pWC,iCur,-1,notReady,WO_LT|WO_LE,null);
+						pStart=pWC.findTerm(iCur,-1,notReady,WO_GT|WO_GE,null);
+						pEnd=pWC.findTerm(iCur,-1,notReady,WO_LT|WO_LE,null);
 						if(bRev!=0) {
 							pTerm=pStart;
 							pStart=pEnd;
@@ -3720,7 +3719,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							r1=sqlite3ExprCodeTemp(pParse,pX.pRight,ref rTemp);
 							sqlite3VdbeAddOp3(v,aMoveOp[pX.op-TK_GT],iCur,addrBrk,r1);
 							#if SQLITE_DEBUG
-																																																																													            VdbeComment( v, "pk" );
+																																																																																				            VdbeComment( v, "pk" );
 #endif
 							sqlite3ExprCacheAffinityChange(pParse,r1,1);
 							sqlite3ReleaseTempReg(pParse,rTemp);
@@ -3844,11 +3843,11 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							/* Find any inequality constraint terms for the start and end
           ** of the range.
           */if((pLevel.plan.wsFlags&WHERE_TOP_LIMIT)!=0) {
-								pRangeEnd=findTerm(pWC,iCur,k,notReady,(WO_LT|WO_LE),pIdx);
+								pRangeEnd=pWC.findTerm(iCur,k,notReady,(WO_LT|WO_LE),pIdx);
 								nExtraReg=1;
 							}
 							if((pLevel.plan.wsFlags&WHERE_BTM_LIMIT)!=0) {
-								pRangeStart=findTerm(pWC,iCur,k,notReady,(WO_GT|WO_GE),pIdx);
+								pRangeStart=pWC.findTerm(iCur,k,notReady,(WO_GT|WO_GE),pIdx);
 								nExtraReg=1;
 							}
 							/* Generate code to evaluate all constraint terms using == or IN
@@ -4163,7 +4162,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				pLevel.addrFirst=sqlite3VdbeCurrentAddr(v);
 				sqlite3VdbeAddOp2(v,OP_Integer,1,pLevel.iLeftJoin);
 				#if SQLITE_DEBUG
-																																												        VdbeComment( v, "record LEFT JOIN hit" );
+																																																        VdbeComment( v, "record LEFT JOIN hit" );
 #endif
 				sqlite3ExprCacheClear(pParse);
 				for(j=0;j<pWC.nTerm;j++)//, pTerm++)
@@ -4186,19 +4185,19 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 			return notReady;
 		}
 		#if (SQLITE_TEST)
-																						    /*
+																								    /*
 ** The following variable holds a text description of query plan generated
 ** by the most recent call to sqlite3WhereBegin().  Each call to WhereBegin
 ** overwrites the previous.  This information is used for testing and
 ** analysis only.
 */
 #if !TCLSH
-																						    //char sqlite3_query_plan[BMS*2*40];  /* Text of the join */
+																								    //char sqlite3_query_plan[BMS*2*40];  /* Text of the join */
     static StringBuilder sqlite3_query_plan;
 #else
-																						    static tcl.lang.Var.SQLITE3_GETSET sqlite3_query_plan = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_query_plan" );
+																								    static tcl.lang.Var.SQLITE3_GETSET sqlite3_query_plan = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_query_plan" );
 #endif
-																						    static int nQPlan = 0;              /* Next free slow in _query_plan[] */
+																								    static int nQPlan = 0;              /* Next free slow in _query_plan[] */
 
 #endif
 		///<summary>
@@ -4223,7 +4222,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 						}
 					}
 				}
-				whereClauseClear(pWInfo.pWC);
+				pWInfo.pWC.whereClauseClear();
 				sqlite3DbFree(db,ref pWInfo);
 			}
 		}
@@ -4379,9 +4378,9 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       ** subexpression is separated by an AND operator.
       */pMaskSet=new WhereMaskSet();
 			//initMaskSet(pMaskSet);
-			whereClauseInit(pWC,pParse,pMaskSet);
+			pWC.whereClauseInit(pParse,pMaskSet);
 			sqlite3ExprCodeConstants(pParse,pWhere);
-			whereSplit(pWC,pWhere,TK_AND);
+			pWC.whereSplit(pWhere,TK_AND);
 			/* IMP: R-15842-53296 *//* Special case: a WHERE clause that is constant.  Evaluate the
       ** expression and either jump over all of the code or fall thru.
       */if(pWhere!=null&&(nTabList==0||pWhere.sqlite3ExprIsConstantNotJoin()!=0)) {
@@ -4418,7 +4417,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				#endif
 			}
 			#if !NDEBUG
-																																	      {
+																																				      {
         Bitmask toTheLeft = 0;
         for ( i = 0; i < pTabList.nSrc; i++ )
         {
@@ -4454,7 +4453,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       */notReady=~(Bitmask)0;
 			andFlags=~0;
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																	      WHERETRACE( "*** Optimizer Start ***\n" );
+																																				      WHERETRACE( "*** Optimizer Start ***\n" );
 #endif
 			for(i=iFrom=0;i<nTabList;i++)//, pLevel++ )
 			 {
@@ -4471,7 +4470,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				// memset( &bestPlan, 0, sizeof( bestPlan ) );
 				bestPlan.rCost=SQLITE_BIG_DBL;
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																												        WHERETRACE( "*** Begin search for loop %d ***\n", i );
+																																																        WHERETRACE( "*** Begin search for loop %d ***\n", i );
 #endif
 				/* Loop through the remaining entries in the FROM clause to find the
 ** next nested loop. The loop tests all FROM clause entries
@@ -4539,7 +4538,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 						if(pTabItem.pIndex==null)
 							nUnconstrained++;
 						#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																		            WHERETRACE( "=== trying table %d with isOptimal=%d ===\n",
+																																																																								            WHERETRACE( "=== trying table %d with isOptimal=%d ===\n",
             j, isOptimal );
 #endif
 						Debug.Assert(pTabItem.pTab!=null);
@@ -4580,7 +4579,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
             **       cost must be the same and the number of rows must be lower.
             */if((sCost.used&notReady)==0/* (1) */&&(bestJ<0||(notIndexed&m)!=0/* (2) */||(bestPlan.plan.wsFlags&WHERE_NOT_FULLSCAN)==0||(sCost.plan.wsFlags&WHERE_NOT_FULLSCAN)!=0)&&(nUnconstrained==0||pTabItem.pIndex==null/* (3) */||NEVER((sCost.plan.wsFlags&WHERE_NOT_FULLSCAN)!=0))&&(bestJ<0||sCost.rCost<bestPlan.rCost/* (4) */||(sCost.rCost<=bestPlan.rCost&&sCost.plan.nRow<bestPlan.plan.nRow))) {
 							#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																													              WHERETRACE( "=== table %d is best so far" +
+																																																																																				              WHERETRACE( "=== table %d is best so far" +
               " with cost=%g and nRow=%g\n",
               j, sCost.rCost, sCost.plan.nRow );
 #endif
@@ -4594,7 +4593,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				Debug.Assert(bestJ>=0);
 				Debug.Assert((notReady&getMask(pMaskSet,pTabList.a[bestJ].iCursor))!=0);
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																												        WHERETRACE( "*** Optimizer selects table %d for loop %d" +
+																																																        WHERETRACE( "*** Optimizer selects table %d for loop %d" +
         " with cost=%g and nRow=%g\n",
         bestJ, i,//pLevel-pWInfo.a,
         bestPlan.rCost, bestPlan.plan.nRow );
@@ -4635,7 +4634,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				}
 			}
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																	      WHERETRACE( "*** Optimizer Finished ***\n" );
+																																				      WHERETRACE( "*** Optimizer Finished ***\n" );
 #endif
 			if(pParse.nErr!=0/*|| db.mallocFailed != 0 */) {
 				goto whereBeginError;
@@ -4712,7 +4711,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 						Debug.Assert(iIdxCur>=0);
 						sqlite3VdbeAddOp4(v,OP_OpenRead,iIdxCur,pIx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 						#if SQLITE_DEBUG
-																																																																		            VdbeComment( v, "%s", pIx.zName );
+																																																																								            VdbeComment( v, "%s", pIx.zName );
 #endif
 					}
 				sqlite3CodeVerifySchema(pParse,iDb);
@@ -4731,18 +4730,18 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				pWInfo.iContinue=pLevel.addrCont;
 			}
 			#if SQLITE_TEST
-																																	      /* Record in the query plan information about the current table
+																																				      /* Record in the query plan information about the current table
 ** and the index used to access it (if any).  If the table itself
 ** is not used, its name is just '{}'.  If no index is used
 ** the index is listed as "{}".  If the primary key is used the
 ** index name is '*'.
 */
 #if !TCLSH
-																																	      sqlite3_query_plan.Length = 0;
+																																				      sqlite3_query_plan.Length = 0;
 #else
-																																	      sqlite3_query_plan.sValue = "";
+																																				      sqlite3_query_plan.sValue = "";
 #endif
-																																	      for ( i = 0; i < nTabList; i++ )
+																																				      for ( i = 0; i < nTabList; i++ )
       {
         string z;
         int n;
@@ -4795,11 +4794,11 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       //}
       //sqlite3_query_plan[nQPlan] = 0;
 #if !TCLSH
-																																	      sqlite3_query_plan = new StringBuilder( sqlite3_query_plan.ToString().Trim() );
+																																				      sqlite3_query_plan = new StringBuilder( sqlite3_query_plan.ToString().Trim() );
 #else
-																																	      sqlite3_query_plan.Trim();
+																																				      sqlite3_query_plan.Trim();
 #endif
-																																	      nQPlan = 0;
+																																				      nQPlan = 0;
 #endif
 			/* Record the continuation address in the WhereInfo structure.  Then
 ** clean up and return.

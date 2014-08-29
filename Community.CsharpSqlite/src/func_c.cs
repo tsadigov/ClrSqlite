@@ -407,7 +407,7 @@ namespace Community.CsharpSqlite {
 			}
 		}
 		#if FALSE
-																						/*
+																								/*
 ** The COALESCE() and IFNULL() functions used to be implemented as shown
 ** here.  But now they are implemented as VDBE code so that unused arguments
 ** do not have to be computed.  This legacy implementation is retained as
@@ -722,12 +722,12 @@ break;
 		///
 		///</summary>
 		#if SQLITE_TEST
-																						#if !TCLSH
-																						    static int sqlite3_like_count = 0;
+																								#if !TCLSH
+																								    static int sqlite3_like_count = 0;
 #else
-																						    static tcl.lang.Var.SQLITE3_GETSET sqlite3_like_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_like_count" );
+																								    static tcl.lang.Var.SQLITE3_GETSET sqlite3_like_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_like_count" );
 #endif
-																						#endif
+																								#endif
 		///<summary>
 		/// Implementation of the like() SQL function.  This function implements
 		/// the build-in LIKE operator.  The first argument to the function is the
@@ -772,12 +772,12 @@ break;
 			if(zA!=null&&zB!=null) {
 				compareInfo pInfo=(compareInfo)sqlite3_user_data(context);
 				#if SQLITE_TEST
-																																												#if !TCLSH
-																																												        sqlite3_like_count++;
+																																																#if !TCLSH
+																																																        sqlite3_like_count++;
 #else
-																																												        sqlite3_like_count.iValue++;
+																																																        sqlite3_like_count.iValue++;
 #endif
-																																												#endif
+																																																#endif
 				context.sqlite3_result_int(patternCompare(zB,zA,pInfo,escape)?1:0);
 			}
 		}
@@ -1221,7 +1221,7 @@ break;
 		///
 		///</summary>
 		#if SQLITE_SOUNDEX
-																						/*
+																								/*
 ** Compute the soundex encoding of a word.
 **
 ** IMP: R-59782-00072 The soundex(X) function returns a string that is the
@@ -1443,7 +1443,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
 				p.n++;
 			}
 			#if !SQLITE_OMIT_DEPRECATED
-																																	/* The sqlite3_aggregate_count() function is deprecated.  But just to make
+																																				/* The sqlite3_aggregate_count() function is deprecated.  But just to make
 ** sure it still operates correctly, verify that its count agrees with our
 ** internal count when using count(*) and when the total count can be
 ** expressed as a 32-bit integer. */
@@ -1739,7 +1739,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
 				FUNCTION("replace",3,0,0,replaceFunc),
 				FUNCTION("zeroblob",1,0,0,zeroblobFunc),
 				#if SQLITE_SOUNDEX
-																																												FUNCTION("soundex",            1, 0, 0, soundexFunc      ),
+																																																FUNCTION("soundex",            1, 0, 0, soundexFunc      ),
 #endif
 				#if !SQLITE_OMIT_LOAD_EXTENSION
 				FUNCTION("load_extension",1,0,0,loadExt),
@@ -1754,7 +1754,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
 				AGGREGATE("group_concat",2,0,0,groupConcatStep,groupConcatFinalize),
 				LIKEFUNC("glob",2,globInfo,SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
 				#if SQLITE_CASE_SENSITIVE_LIKE
-																																												LIKEFUNC("like", 2, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
+																																																LIKEFUNC("like", 2, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
 LIKEFUNC("like", 3, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
 #else
 				LIKEFUNC("like",2,likeInfoNorm,SQLITE_FUNC_LIKE),
@@ -1764,7 +1764,7 @@ LIKEFUNC("like", 3, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
 			};
 			int i;
 			#if SQLITE_OMIT_WSD
-																																	FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
+																																				FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
 FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
 #else
 			FuncDefHash pHash=sqlite3GlobalFunctions;

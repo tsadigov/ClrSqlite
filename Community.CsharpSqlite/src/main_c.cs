@@ -37,13 +37,13 @@ namespace Community.CsharpSqlite {
     *************************************************************************
     *///#include "sqliteInt.h"
 		#if SQLITE_ENABLE_FTS3
-																						// include "fts3.h"
+																								// include "fts3.h"
 #endif
 		#if SQLITE_ENABLE_RTREE
-																						// include "rtree.h"
+																								// include "rtree.h"
 #endif
 		#if SQLITE_ENABLE_ICU
-																						// include "sqliteicu.h"
+																								// include "sqliteicu.h"
 #endif
 		#if !SQLITE_AMALGAMATION
 		///<summary>
@@ -83,7 +83,7 @@ namespace Community.CsharpSqlite {
 			return SQLITE_THREADSAFE;
 		}
 		#if !SQLITE_OMIT_TRACE && SQLITE_ENABLE_IOTRACE
-																						/*
+																								/*
 ** If the following function pointer is not NULL and if
 ** SQLITE_ENABLE_IOTRACE is enabled, then messages describing
 ** I/O active are written using this function.  These messages
@@ -148,7 +148,7 @@ static void sqlite3IoTrace( string X, params object[] ap ) {  }
 			/* The main static mutex */int rc;
 			/* Result code */
 			#if SQLITE_OMIT_WSD
-																																	rc = sqlite3_wsd_init(4096, 24);
+																																				rc = sqlite3_wsd_init(4096, 24);
 if( rc!=SQLITE_OK ){
 return rc;
 }
@@ -217,7 +217,7 @@ return rc;
 				if(sqlite3GlobalConfig.isInit==0&&sqlite3GlobalConfig.inProgress==0) {
 					sqlite3GlobalConfig.inProgress=1;
 					#if SQLITE_OMIT_WSD
-																																																							FuncDefHash *pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
+																																																												FuncDefHash *pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
 memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 #else
 					sqlite3GlobalFunctions=new FuncDefHash();
@@ -257,8 +257,8 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
       ** reason.  So we run it once during initialization.
       */
 			#if !NDEBUG
-																																	#if !SQLITE_OMIT_FLOATING_POINT
-																																	      /* This section of code's only "output" is via Debug.Assert() statements. */
+																																				#if !SQLITE_OMIT_FLOATING_POINT
+																																				      /* This section of code's only "output" is via Debug.Assert() statements. */
       if ( rc == SQLITE_OK )
       {
         //u64 x = ( ( (u64)1 ) << 63 ) - 1;
@@ -269,7 +269,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
         //Debug.Assert( MathExtensions.sqlite3IsNaN( y ) );
       }
 #endif
-																																	#endif
+																																				#endif
 			return rc;
 		}
 		/*
@@ -363,7 +363,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 			return rc;
 		}
 		#if SQLITE_THREADSAFE
-																						    static int sqlite3_config( int op, sqlite3_mutex_methods ap )
+																								    static int sqlite3_config( int op, sqlite3_mutex_methods ap )
     {
       //  va_list ap;
       int rc = SQLITE_OK;
@@ -408,7 +408,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
           ** compile.
           */
 				#if SQLITE_THREADSAFE
-																																												          case SQLITE_CONFIG_SINGLETHREAD:
+																																																          case SQLITE_CONFIG_SINGLETHREAD:
             {
               /* Disable all mutexing */
               sqlite3GlobalConfig.bCoreMutex = false;
@@ -484,7 +484,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					break;
 				}
 				#if SQLITE_ENABLE_MEMSYS3 || SQLITE_ENABLE_MEMSYS5
-																																												case SQLITE_CONFIG_HEAP: {
+																																																case SQLITE_CONFIG_HEAP: {
 /* Designate a buffer for heap memory space */
 sqlite3GlobalConfig.pHeap = va_arg(ap, void);
 sqlite3GlobalConfig.nHeap = va_arg(ap, int);
@@ -510,12 +510,12 @@ memset(& sqlite3GlobalConfig.m, 0, sizeof( sqlite3GlobalConfig.m));
 ** ENABLE_MEMSYS5 is defined, return an error.
 */
 #if SQLITE_ENABLE_MEMSYS3
-																																												sqlite3GlobalConfig.m = *sqlite3MemGetMemsys3();
+																																																sqlite3GlobalConfig.m = *sqlite3MemGetMemsys3();
 #endif
-																																												#if SQLITE_ENABLE_MEMSYS5
-																																												sqlite3GlobalConfig.m = *sqlite3MemGetMemsys5();
+																																																#if SQLITE_ENABLE_MEMSYS5
+																																																sqlite3GlobalConfig.m = *sqlite3MemGetMemsys5();
 #endif
-																																												}
+																																																}
 break;
 }
 #endif
@@ -1039,7 +1039,7 @@ break;
 			sqlite3OsSleep(db.pVfs,delay*1000);
 			return 1;
 			#else
-																																	sqlite3 db = (sqlite3)ptr;
+																																				sqlite3 db = (sqlite3)ptr;
 int timeout = ( (sqlite3)ptr ).busyTimeout;
 if ( ( count + 1 ) * 1000 > timeout )
 {
@@ -1144,7 +1144,7 @@ return 1;
 				return SQLITE_MISUSE_BKPT();
 			}
 			#if !SQLITE_OMIT_UTF16
-																																	/* If SqliteEncoding.UTF16 is specified as the encoding type, transform this
+																																				/* If SqliteEncoding.UTF16 is specified as the encoding type, transform this
 ** to one of SqliteEncoding.UTF16LE or SqliteEncoding.UTF16BE using the
 ** SQLITE_UTF16NATIVE macro. SqliteEncoding.UTF16 is not used internally.
 **
@@ -1244,7 +1244,7 @@ enc = SqliteEncoding.UTF16BE;
 			return rc;
 		}
 		#if !SQLITE_OMIT_UTF16
-																						static int sqlite3_create_function16(
+																								static int sqlite3_create_function16(
 sqlite3 db,
 string zFunctionName,
 int nArg,
@@ -1376,7 +1376,7 @@ return rc;
 			return pRet;
 		}
 		#if !SQLITE_OMIT_WAL
-																						///<summary>
+																								///<summary>
 /// The sqlite3_wal_hook() callback registered by sqlite3_wal_autocheckpoint().
 /// Invoke sqlite3_wal_checkpoint if the number of frames in the log file
 /// is greater than sqlite3.pWalArg cast to an integer (the value configured by
@@ -1412,7 +1412,7 @@ return SQLITE_OK;
 			UNUSED_PARAMETER(db);
 			UNUSED_PARAMETER(nFrame);
 			#else
-																																	if( nFrame>0 ){
+																																				if( nFrame>0 ){
 sqlite3_wal_hook(db, sqlite3WalDefaultHook, SQLITE_INT_TO_PTR(nFrame));
 }else{
 sqlite3_wal_hook(db, 0, 0);
@@ -1428,7 +1428,7 @@ sqlite3_wal_hook(db, 0, 0);
 		static object sqlite3_wal_hook(sqlite3 db,/* Attach the hook to this db handle */dxWalCallback xCallback,//int(*xCallback)(void *, sqlite3*, const char*, int),
 		object pArg/* First argument passed to xCallback() */) {
 			#if !SQLITE_OMIT_WAL
-																																	void *pRet;
+																																				void *pRet;
 sqlite3_mutex_enter(db.mutex);
 pRet = db.pWalArg;
 db.xWalCallback = xCallback;
@@ -1449,7 +1449,7 @@ return pRet;
 			pnCkpt=0;
 			return SQLITE_OK;
 			#else
-																																	  int rc;                         /* Return code */
+																																				  int rc;                         /* Return code */
   int iDb = SQLITE_MAX_ATTACHED;  /* sqlite3.aDb[] index of db to checkpoint */
 
   /* Initialize the output variables to -1 in case an error occurs. */
@@ -1490,7 +1490,7 @@ return pRet;
 			return sqlite3_wal_checkpoint_v2(db,zDb,SQLITE_CHECKPOINT_PASSIVE,out dummy,out dummy);
 		}
 		#if !SQLITE_OMIT_WAL
-																						///<summary>
+																								///<summary>
 /// Run a checkpoint on database iDb. This is a no-op if database iDb is
 /// not currently open in WAL mode.
 ///
@@ -1601,7 +1601,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 			return z;
 		}
 		#if !SQLITE_OMIT_UTF16
-																						/*
+																								/*
 ** Return UTF-16 encoded English language explanation of the most recent
 ** error.
 */
@@ -2122,13 +2122,13 @@ return z;
 			if(SQLITE_DEFAULT_FILE_FORMAT<4)
 				db.flags|=SQLITE_LegacyFileFmt
 				#if SQLITE_ENABLE_LOAD_EXTENSION
-																																												| SQLITE_LoadExtension
+																																																| SQLITE_LoadExtension
 #endif
 				#if SQLITE_DEFAULT_RECURSIVE_TRIGGERS
-																																												   | SQLITE_RecTriggers
+																																																   | SQLITE_RecTriggers
 #endif
 				#if (SQLITE_DEFAULT_FOREIGN_KEYS)
-																																												   | SQLITE_ForeignKeys
+																																																   | SQLITE_ForeignKeys
 #endif
 				;
 			sqlite3HashInit(db.aCollSeq);
@@ -2192,30 +2192,30 @@ return z;
 				goto opendb_out;
 			}
 			#if SQLITE_ENABLE_FTS1
-																																	if( 0==db.mallocFailed ){
+																																				if( 0==db.mallocFailed ){
 extern int sqlite3Fts1Init(sqlite3);
 rc = sqlite3Fts1Init(db);
 }
 #endif
 			#if SQLITE_ENABLE_FTS2
-																																	if( 0==db.mallocFailed && rc==SQLITE_OK ){
+																																				if( 0==db.mallocFailed && rc==SQLITE_OK ){
 extern int sqlite3Fts2Init(sqlite3);
 rc = sqlite3Fts2Init(db);
 }
 #endif
 			#if SQLITE_ENABLE_FTS3
-																																	if( 0==db.mallocFailed && rc==SQLITE_OK ){
+																																				if( 0==db.mallocFailed && rc==SQLITE_OK ){
 rc = sqlite3Fts3Init(db);
 }
 #endif
 			#if SQLITE_ENABLE_ICU
-																																	if( 0==db.mallocFailed && rc==SQLITE_OK ){
+																																				if( 0==db.mallocFailed && rc==SQLITE_OK ){
 extern int sqlite3IcuInit(sqlite3);
 rc = sqlite3IcuInit(db);
 }
 #endif
 			#if SQLITE_ENABLE_RTREE
-																																	if( 0==db.mallocFailed && rc==SQLITE_OK){
+																																				if( 0==db.mallocFailed && rc==SQLITE_OK){
 rc = sqlite3RtreeInit(db);
 }
 #endif
@@ -2225,7 +2225,7 @@ rc = sqlite3RtreeInit(db);
       ** mode.  Doing nothing at all also makes NORMAL the default.
       */
 			#if SQLITE_DEFAULT_LOCKING_MODE
-																																	db.dfltLockMode = SQLITE_DEFAULT_LOCKING_MODE;
+																																				db.dfltLockMode = SQLITE_DEFAULT_LOCKING_MODE;
 sqlite3PagerLockingMode(sqlite3BtreePager(db.aDb[0].pBt),
 SQLITE_DEFAULT_LOCKING_MODE);
 #endif
@@ -2258,7 +2258,7 @@ SQLITE_DEFAULT_LOCKING_MODE);
 			return openDatabase(filename,out ppDb,flags,zVfs);
 		}
 		#if !SQLITE_OMIT_UTF16
-																						
+																								
 /*
 ** Open a new database handle.
 */
@@ -2274,10 +2274,10 @@ Debug.Assert(zFilename );
 Debug.Assert(ppDb );
 *ppDb = 0;
 #if !SQLITE_OMIT_AUTOINIT
-																						rc = sqlite3_initialize();
+																								rc = sqlite3_initialize();
 if( rc !=0) return rc;
 #endif
-																						pVal = sqlite3ValueNew(0);
+																								pVal = sqlite3ValueNew(0);
 sqlite3ValueSetStr(pVal, -1, zFilename, SqliteEncoding.UTF16NATIVE, SQLITE_STATIC);
 zFilename8 = sqlite3ValueText(pVal, SqliteEncoding.UTF8);
 if( zFilename8 ){
@@ -2320,7 +2320,7 @@ return sqlite3ApiExit(0, rc);
 			return rc;
 		}
 		#if !SQLITE_OMIT_UTF16
-																						/*
+																								/*
 ** Register a new collation sequence with the database handle db.
 */
 //int sqlite3_create_collation16(
@@ -2356,7 +2356,7 @@ return sqlite3ApiExit(0, rc);
 			return SQLITE_OK;
 		}
 		#if !SQLITE_OMIT_UTF16
-																						/*
+																								/*
 ** Register a collation sequence factory callback with the database handle
 ** db. Replace any previously installed collation sequence factory.
 */
@@ -2374,7 +2374,7 @@ return sqlite3ApiExit(0, rc);
 //}
 #endif
 		#if !SQLITE_OMIT_DEPRECATED
-																						/*
+																								/*
 ** This function is now an anachronism. It used to be used to recover from a
 ** malloc() failure, but SQLite now does this automatically.
 */
@@ -2419,7 +2419,7 @@ return SQLITE_OK;
 			return SQLITE_CANTOPEN;
 		}
 		#if !SQLITE_OMIT_DEPRECATED
-																						/*
+																								/*
 ** This is a convenience routine that makes sure that all thread-specific
 ** data for this thread has been deallocated.
 **
@@ -2435,7 +2435,7 @@ void sqlite3_thread_cleanup()
 ** See comment in sqlite3.h (sqlite.h.in) for details.
 */
 		#if SQLITE_ENABLE_COLUMN_METADATA
-																						
+																								
     static int sqlite3_table_column_metadata(
     sqlite3 db,            /* Connection handle */
     string zDbName,        /* Database name or NULL */
@@ -2611,7 +2611,7 @@ error_out:
 					Debug.Assert(fd!=null);
 					if(op==SQLITE_FCNTL_FILE_POINTER) {
 						#if (SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
-																																																																		              pArg = (long)-1; // not supported
+																																																																								              pArg = (long)-1; // not supported
 #else
 						pArg=(long)fd.fs.Handle;
 						#endif
@@ -2708,7 +2708,7 @@ error_out:
 							if(sqlite3PendingByte!=newVal)
 								sqlite3PendingByte=(int)newVal;
 							#if DEBUG && TCLSH
-																																																																													                  TCLsqlite3PendingByte.iValue = sqlite3PendingByte;
+																																																																																				                  TCLsqlite3PendingByte.iValue = sqlite3PendingByte;
 #endif
 							PENDING_BYTE=sqlite3PendingByte;
 						}
