@@ -689,7 +689,7 @@ namespace Community.CsharpSqlite {
 						aiCol[i]=-1;
 					}
 					#if !SQLITE_OMIT_AUTHORIZATION
-															      /* Request permission to read the parent key columns. If the 
+																				      /* Request permission to read the parent key columns. If the 
       ** authorization callback returns SQLITE_IGNORE, behave as if any
       ** values read from the parent table are NULL. */
       if( db.xAuth ){

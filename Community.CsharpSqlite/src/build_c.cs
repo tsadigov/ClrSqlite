@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 			pParse.nVar=0;
 		}
 		#if !SQLITE_OMIT_SHARED_CACHE
-						///<summary>
+								///<summary>
 /// The TableLock structure is only used by the sqlite3TableLock() and
 /// codeTableLocks() functions.
 ///</summary>
@@ -175,7 +175,7 @@ p.zName, P4_STATIC );
       */v=sqlite3GetVdbe(pParse);
 			Debug.Assert(0==pParse.isMultiWrite
 			#if SQLITE_DEBUG
-									        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
+												        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
 #endif
 			);
 			if(v!=null) {
@@ -221,7 +221,7 @@ p.zName, P4_STATIC );
 			/* Get the VDBE program ready for execution
       */if(v!=null&&ALWAYS(pParse.nErr==0)/* && 0 == db.mallocFailed */) {
 				#if SQLITE_DEBUG
-												        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
+																        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
         sqlite3VdbeTrace( v, trace );
 #endif
 				Debug.Assert(pParse.iCacheLevel==0);
@@ -549,7 +549,7 @@ p.zName, P4_STATIC );
 				string zName=pIndex.zName;
 				//
 				#if !NDEBUG || SQLITE_COVERAGE_TEST
-												        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
+																        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
         //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
         //  );
         Index pOld = sqlite3HashInsert(
@@ -790,7 +790,7 @@ p.zName, P4_STATIC );
 			if(db.init.iDb==1)
 				isTemp=1;
 			#if !SQLITE_OMIT_AUTHORIZATION
-									Debug.Assert( (isTemp & 1)==isTemp );
+												Debug.Assert( (isTemp & 1)==isTemp );
 {
 int code;
 string zDb = db.aDb[iDb].zName;
@@ -1715,7 +1715,7 @@ goto begin_table_error;
 			return;
 		}
 		#else
-						    static void sqlite3CreateView(
+								    static void sqlite3CreateView(
     Parse pParse,     /* The parsing context */
     Token pBegin,     /* The CREATE token that begins the statement */
     Token pName1,     /* The token that holds the name of the view */
@@ -1788,7 +1788,7 @@ goto begin_table_error;
 				pTable.nCol=-1;
 				db.lookaside.bEnabled=0;
 				#if !SQLITE_OMIT_AUTHORIZATION
-												xAuth = db.xAuth;
+																xAuth = db.xAuth;
 db.xAuth = 0;
 pSelTab = sqlite3ResultSetOfSelect(pParse, pSel);
 db.xAuth = xAuth;
@@ -1841,7 +1841,7 @@ db.xAuth = xAuth;
 			DbClearProperty(db,idx,DB_UnresetViews);
 		}
 		#else
-						    // define sqliteViewResetAll(A,B)
+								    // define sqliteViewResetAll(A,B)
     static void sqliteViewResetAll( sqlite3 A, int B )
     {
     }
@@ -1923,7 +1923,7 @@ db.xAuth = xAuth;
 		///</summary>
 		static void destroyTable(Parse pParse,Table pTab) {
 			#if SQLITE_OMIT_AUTOVACUUM
-									Index pIdx;
+												Index pIdx;
 int iDb = sqlite3SchemaToIndex( pParse.db, pTab.pSchema );
 destroyRootPage( pParse, pTab.tnum, iDb );
 for ( pIdx = pTab.pIndex ; pIdx != null ; pIdx = pIdx.pNext )
@@ -2004,7 +2004,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
 				goto exit_drop_table;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
-									{
+												{
 int code;
 string zTab = SCHEMA_TABLE(iDb);
 string zDb = db.aDb[iDb].zName;
@@ -2278,7 +2278,7 @@ goto exit_drop_table;
 			/* Register holding assemblied index record */sqlite3 db=pParse.db;
 			/* The database connection */int iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-									if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
+												if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
 db.aDb[iDb].zName ) ){
 return;
 }
@@ -2480,7 +2480,7 @@ return;
 			/* Check for authorization to create an index.
       */
 			#if !SQLITE_OMIT_AUTHORIZATION
-									{
+												{
 string zDb = pDb.zName;
 if( sqlite3AuthCheck(pParse, SQLITE_INSERT, SCHEMA_TABLE(iDb), 0, zDb) ){
 goto exit_create_index;
@@ -2845,7 +2845,7 @@ goto exit_create_index;
 			}
 			iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-									{
+												{
 int code = SQLITE_DROP_INDEX;
 Table pTab = pIndex.pTable;
 string zDb = db.aDb[iDb].zName;
@@ -3288,18 +3288,18 @@ goto exit_drop_index;
 		///
 		///</summary>
 		#if !SQLITE_OMIT_AUTHORIZATION
-						const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
+								const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
 #endif
 		static void sqlite3Savepoint(Parse pParse,int op,Token pName) {
 			string zName=sqlite3NameFromToken(pParse.db,pName);
 			if(zName!=null) {
 				Vdbe v=sqlite3GetVdbe(pParse);
 				#if !SQLITE_OMIT_AUTHORIZATION
-												Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
+																Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
 #endif
 				if(null==v
 				#if !SQLITE_OMIT_AUTHORIZATION
-												|| sqlite3AuthCheck(pParse, SQLITE_SAVEPOINT, az[op], zName, 0)
+																|| sqlite3AuthCheck(pParse, SQLITE_SAVEPOINT, az[op], zName, 0)
 #endif
 				) {
 					sqlite3DbFree(pParse.db,ref zName);

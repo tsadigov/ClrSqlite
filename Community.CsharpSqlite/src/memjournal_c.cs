@@ -89,8 +89,23 @@ namespace Community.CsharpSqlite {
 			public FileChunk pFirst;
 			/* Head of in-memory chunk-list */public FilePoint endpoint;
 			/* Pointer to the end of the file */public FilePoint readpoint;
-		/* Pointer to the end of the last xRead() */};
-
+			/* Pointer to the end of the last xRead() */public///<summary>
+			/// If pFile is currently larger than iSize bytes, then truncate it to
+			/// exactly iSize bytes. If pFile is not larger than iSize bytes, then
+			/// this function is a no-op.
+			///
+			/// Return SQLITE_OK if everything is successful, or an SQLite error
+			/// code if an error occurs.
+			///</summary>
+			int backupTruncateFile(int iSize) {
+				long iCurrent=0;
+				int rc=sqlite3OsFileSize(this,ref iCurrent);
+				if(rc==SQLITE_OK&&iCurrent>iSize) {
+					rc=sqlite3OsTruncate(this,iSize);
+				}
+				return rc;
+			}
+		}
 		///<summary>
 		/// Read data from the in-memory journal file.  This is the implementation
 		/// of the sqlite3_vfs.xRead method.

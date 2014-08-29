@@ -265,7 +265,7 @@ namespace Community.CsharpSqlite {
 		///#define TRANSLATE_TRACE 1
 		///</summary>
 		#if !SQLITE_OMIT_UTF16
-						
+								
 ///<summary>
 /// This routine transforms the internal text encoding used by pMem to
 /// desiredEnc. It is an error if the string is already of the desired
@@ -287,13 +287,13 @@ Debug.Assert( pMem.enc!=0 );
 Debug.Assert( pMem.n>=0 );
 
 #if TRANSLATE_TRACE && SQLITE_DEBUG
-						{
+								{
 char zBuf[100];
 sqlite3VdbeMemPrettyPrint(pMem, zBuf);
 fprintf(stderr, "INPUT:  %s\n", zBuf);
 }
 #endif
-						
+								
 /* If the translation is between UTF-16 little and big endian, then
 ** all that is required is to swap the byte order. This case is handled
 ** differently from the others.
@@ -400,13 +400,13 @@ Debugger.Break (); // TODO -
 
 translate_out:
 #if TRANSLATE_TRACE && SQLITE_DEBUG
-						{
+								{
 char zBuf[100];
 sqlite3VdbeMemPrettyPrint(pMem, zBuf);
 fprintf(stderr, "OUTPUT: %s\n", zBuf);
 }
 #endif
-						return SQLITE_OK;
+								return SQLITE_OK;
 }
 
 ///<summary>
@@ -481,7 +481,7 @@ return rc;
 	///
 	///</summary>
 	#if SQLITE_TEST && SQLITE_DEBUG
-			    /*
+				    /*
 ** Translate UTF-8 to UTF-8.
 **
 ** This has the effect of making sure that the string is well-formed
@@ -521,7 +521,7 @@ return rc;
     }
 #endif
 	#if !SQLITE_OMIT_UTF16
-			/*
+				/*
 ** Convert a UTF-16 string in the native encoding into a UTF-8 string.
 ** Memory to hold the UTF-8 string is obtained from sqlite3Malloc and must
 ** be freed by the calling function.
@@ -557,7 +557,7 @@ Mem m = Pool.Allocate_Mem();
 /// flag set.
 ///</summary>
 #if SQLITE_ENABLE_STAT2
-			char *sqlite3Utf8to16(sqlite3 db, SqliteEncoding enc, char *z, int n, int *pnOut){
+				char *sqlite3Utf8to16(sqlite3 db, SqliteEncoding enc, char *z, int n, int *pnOut){
   Mem m;
   memset(&m, 0, sizeof(m));
   m.db = db;
@@ -571,7 +571,7 @@ Mem m = Pool.Allocate_Mem();
   return m.z;
 }
 #endif
-			
+				
 /*
 ** zIn is a UTF-16 encoded unicode string at least nChar characters long.
 ** Return the number of bytes in the first nChar unicode characters
@@ -597,7 +597,7 @@ int sqlite3Utf16ByteLen(const void *zIn, int nChar){
 }
 
 #if SQLITE_TEST
-			/*
+				/*
 ** This routine is called from the TCL test function "translate_selftest".
 ** It checks that the primitives for serializing and deserializing
 ** characters in each encoding are inverses of each other.
@@ -654,6 +654,6 @@ assert( (z-zBuf)==n );
 }
 }
 #endif
-			#endif
+				#endif
 	}
 }

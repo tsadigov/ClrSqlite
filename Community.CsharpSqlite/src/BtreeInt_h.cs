@@ -416,12 +416,51 @@ namespace Community.CsharpSqlite {
 			/* Number of nested calls to sqlite3BtreeEnter() */public int nBackup;
 			/* Number of backup operations reading this btree */public Btree pNext;
 			/* List of other sharable Btrees from the same db */public Btree pPrev;
-		/* Back pointer of the same list */
-		#if !SQLITE_OMIT_SHARED_CACHE
-						BtLock lock;              /* Object used to lock page 1 */
+			/* Back pointer of the same list */
+			#if !SQLITE_OMIT_SHARED_CACHE
+									BtLock lock;              /* Object used to lock page 1 */
 #endif
-		};
-
+			/**
+///<summary>
+///Copy the complete content of pBtFrom into pBtTo.  A transaction
+///must be active for both files.
+///
+///The size of file pTo may be reduced by this operation. If anything
+///goes wrong, the transaction on pTo is rolled back. If successful, the
+///transaction is committed before returning.
+///</summary>
+*/public int sqlite3BtreeCopyFile(Btree pFrom) {
+				int rc;
+				sqlite3_backup b;
+				sqlite3BtreeEnter(this);
+				sqlite3BtreeEnter(pFrom);
+				/* Set up an sqlite3_backup object. sqlite3_backup.pDestDb must be set
+  ** to 0. This is used by the implementations of sqlite3_backup_step()
+  ** and sqlite3_backup_finish() to detect that they are being called
+  ** from this function, not directly by the user.
+  */b=new sqlite3_backup();
+				// memset( &b, 0, sizeof( b ) );
+				b.pSrcDb=pFrom.db;
+				b.pSrc=pFrom;
+				b.pDest=this;
+				b.iNext=1;
+				/* 0x7FFFFFFF is the hard limit for the number of pages in a database
+  ** file. By passing this as the number of pages to copy to
+  ** sqlite3_backup_step(), we can guarantee that the copy finishes
+  ** within a single call (unless an error occurs). The Debug.Assert() statement
+  ** checks this assumption - (p.rc) should be set to either SQLITE_DONE
+  ** or an error code.
+  */b.sqlite3_backup_step(0x7FFFFFFF);
+				Debug.Assert(b.rc!=SQLITE_OK);
+				rc=b.sqlite3_backup_finish();
+				if(rc==SQLITE_OK) {
+					this.pBt.pageSizeFixed=false;
+				}
+				sqlite3BtreeLeave(pFrom);
+				sqlite3BtreeLeave(this);
+				return rc;
+			}
+		}
 		///<summary>
 		/// Btree.inTrans may take one of the following values.
 		///
@@ -499,7 +538,7 @@ namespace Community.CsharpSqlite {
 			/* Non-recursive mutex required to access this object */public Bitvec pHasContent;
 			/* Set of pages moved to free-list this transaction */
 			#if !SQLITE_OMIT_SHARED_CACHE
-									public int nRef;                /* Number of references to this structure */
+												public int nRef;                /* Number of references to this structure */
 public BtShared pNext;          /* Next on a list of sharable BtShared structs */
 public BtLock pLock;            /* List of locks held on this shared-btree struct */
 public Btree pWriter;           /* Btree with currently open write transaction */
@@ -586,7 +625,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			/* True if info.nKey is valid */public int eState;
 			/* One of the CURSOR_XXX constants (see below) */
 			#if !SQLITE_OMIT_INCRBLOB
-									public Pgno[] aOverflow;         /* Cache of overflow page locations */
+												public Pgno[] aOverflow;         /* Cache of overflow page locations */
 public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 #endif
 			public i16 iPage;
@@ -613,7 +652,7 @@ public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 				nKey=0;
 				skipNext=0;
 				#if !SQLITE_OMIT_INCRBLOB
-												isIncrblobHandle=false;
+																isIncrblobHandle=false;
 aOverflow= null;
 #endif
 				iPage=0;
@@ -735,7 +774,7 @@ aOverflow= null;
 		///
 		///</summary>
 		#if DEBUG
-						    //define btreeIntegrity(p) \
+								    //define btreeIntegrity(p) \
     //  Debug.Assert( p.pBt.inTransaction!=TRANS_NONE || p.pBt.nTransaction==0 ); \
     //  Debug.Assert( p.pBt.inTransaction>=p.inTrans );
     static void btreeIntegrity( Btree p )
@@ -757,7 +796,7 @@ aOverflow= null;
 		#if !SQLITE_OMIT_AUTOVACUUM
 		//#define ISAUTOVACUUM (pBt.autoVacuum)
 		#else
-						//define ISAUTOVACUUM 0
+								//define ISAUTOVACUUM 0
 public static bool ISAUTOVACUUM =false;
 #endif
 		///<summary>

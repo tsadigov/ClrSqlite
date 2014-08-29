@@ -54,8 +54,385 @@ namespace Community.CsharpSqlite {
 			/* Number of pages left to copy */public Pgno nPagecount;
 			/* Total number of pages to copy */public int isAttached;
 			/* True once backup has been registered with pager */public sqlite3_backup pNext;
-		/* Next backup associated with source pager */};
-
+			/* Next backup associated with source pager */public///<summary>
+			/// This function is called after the contents of page iPage of the
+			/// source database have been modified. If page iPage has already been
+			/// copied into the destination database, then the data written to the
+			/// destination is now invalidated. The destination copy of iPage needs
+			/// to be updated with the new data before the backup operation is
+			/// complete.
+			///
+			/// It is assumed that the mutex associated with the BtShared object
+			/// corresponding to the source database is held when this function is
+			/// called.
+			///</summary>
+			void sqlite3BackupUpdate(Pgno iPage,byte[] aData) {
+				sqlite3_backup p;
+				/* Iterator variable */for(p=this;p!=null;p=p.pNext) {
+					Debug.Assert(sqlite3_mutex_held(p.pSrc.pBt.mutex));
+					if(!isFatalError(p.rc)&&iPage<p.iNext) {
+						/* The backup process p has already copied page iPage. But now it
+      ** has been modified by a transaction on the source pager. Copy
+      ** the new data into the backup.
+      */int rc;
+						Debug.Assert(p.pDestDb!=null);
+						sqlite3_mutex_enter(p.pDestDb.mutex);
+						rc=p.backupOnePage(iPage,aData);
+						sqlite3_mutex_leave(p.pDestDb.mutex);
+						Debug.Assert(rc!=SQLITE_BUSY&&rc!=SQLITE_LOCKED);
+						if(rc!=SQLITE_OK) {
+							p.rc=rc;
+						}
+					}
+				}
+			}
+			public///<summary>
+			/// Restart the backup process. This is called when the pager layer
+			/// detects that the database has been modified by an external database
+			/// connection. In this case there is no way of knowing which of the
+			/// pages that have been copied into the destination database are still
+			/// valid and which are not, so the entire process needs to be restarted.
+			///
+			/// It is assumed that the mutex associated with the BtShared object
+			/// corresponding to the source database is held when this function is
+			/// called.
+			///</summary>
+			void sqlite3BackupRestart() {
+				sqlite3_backup p;
+				/* Iterator variable */for(p=this;p!=null;p=p.pNext) {
+					Debug.Assert(sqlite3_mutex_held(p.pSrc.pBt.mutex));
+					p.iNext=1;
+				}
+			}
+			///<summary>
+			/// Copy nPage pages from the source b-tree to the destination.
+			///</summary>
+			public int sqlite3_backup_step(int nPage) {
+				int rc;
+				int destMode;
+				/* Destination journal mode */int pgszSrc=0;
+				/* Source page size */int pgszDest=0;
+				/* Destination page size */sqlite3_mutex_enter(this.pSrcDb.mutex);
+				sqlite3BtreeEnter(this.pSrc);
+				if(this.pDestDb!=null) {
+					sqlite3_mutex_enter(this.pDestDb.mutex);
+				}
+				rc=this.rc;
+				if(!isFatalError(rc)) {
+					Pager pSrcPager=sqlite3BtreePager(this.pSrc);
+					/* Source pager */Pager pDestPager=sqlite3BtreePager(this.pDest);
+					/* Dest pager */int ii;
+					/* Iterator variable */Pgno nSrcPage=0;
+					/* Size of source db in pages */int bCloseTrans=0;
+					/* True if src db requires unlocking *//* If the source pager is currently in a write-transaction, return
+    ** SQLITE_BUSY immediately.
+    */if(this.pDestDb!=null&&this.pSrc.pBt.inTransaction==TRANS_WRITE) {
+						rc=SQLITE_BUSY;
+					}
+					else {
+						rc=SQLITE_OK;
+					}
+					/* Lock the destination database, if it is not locked already. */if(SQLITE_OK==rc&&this.bDestLocked==0&&SQLITE_OK==(rc=sqlite3BtreeBeginTrans(this.pDest,2))) {
+						this.bDestLocked=1;
+						sqlite3BtreeGetMeta(this.pDest,BTREE_SCHEMA_VERSION,ref this.iDestSchema);
+					}
+					/* If there is no open read-transaction on the source database, open
+    ** one now. If a transaction is opened here, then it will be closed
+    ** before this function exits.
+    */if(rc==SQLITE_OK&&!sqlite3BtreeIsInReadTrans(this.pSrc)) {
+						rc=sqlite3BtreeBeginTrans(this.pSrc,0);
+						bCloseTrans=1;
+					}
+					/* Do not allow backup if the destination database is in WAL mode
+    ** and the page sizes are different between source and destination */pgszSrc=sqlite3BtreeGetPageSize(this.pSrc);
+					pgszDest=sqlite3BtreeGetPageSize(this.pDest);
+					destMode=sqlite3PagerGetJournalMode(sqlite3BtreePager(this.pDest));
+					if(SQLITE_OK==rc&&destMode==PAGER_JOURNALMODE_WAL&&pgszSrc!=pgszDest) {
+						rc=SQLITE_READONLY;
+					}
+					/* Now that there is a read-lock on the source database, query the
+    ** source pager for the number of pages in the database.
+    */nSrcPage=sqlite3BtreeLastPage(this.pSrc);
+					Debug.Assert(nSrcPage>=0);
+					for(ii=0;(nPage<0||ii<nPage)&&this.iNext<=nSrcPage&&0==rc;ii++) {
+						Pgno iSrcPg=this.iNext;
+						/* Source page number */if(iSrcPg!=PENDING_BYTE_PAGE(this.pSrc.pBt)) {
+							DbPage pSrcPg=null;
+							/* Source page object */rc=sqlite3PagerGet(pSrcPager,(u32)iSrcPg,ref pSrcPg);
+							if(rc==SQLITE_OK) {
+								rc=this.backupOnePage(iSrcPg,sqlite3PagerGetData(pSrcPg));
+								sqlite3PagerUnref(pSrcPg);
+							}
+						}
+						this.iNext++;
+					}
+					if(rc==SQLITE_OK) {
+						this.nPagecount=nSrcPage;
+						this.nRemaining=(nSrcPage+1-this.iNext);
+						if(this.iNext>nSrcPage) {
+							rc=SQLITE_DONE;
+						}
+						else
+							if(0==this.isAttached) {
+								this.attachBackupObject();
+							}
+					}
+					/* Update the schema version field in the destination database. This
+    ** is to make sure that the schema-version really does change in
+    ** the case where the source and destination databases have the
+    ** same schema version.
+    */if(rc==SQLITE_DONE&&(rc=sqlite3BtreeUpdateMeta(this.pDest,1,this.iDestSchema+1))==SQLITE_OK) {
+						Pgno nDestTruncate;
+						if(this.pDestDb!=null) {
+							sqlite3ResetInternalSchema(this.pDestDb,-1);
+						}
+						/* Set nDestTruncate to the final number of pages in the destination
+      ** database. The complication here is that the destination page
+      ** size may be different to the source page size.
+      **
+      ** If the source page size is smaller than the destination page size,
+      ** round up. In this case the call to sqlite3OsTruncate() below will
+      ** fix the size of the file. However it is important to call
+      ** sqlite3PagerTruncateImage() here so that any pages in the
+      ** destination file that lie beyond the nDestTruncate page mark are
+      ** journalled by PagerCommitPhaseOne() before they are destroyed
+      ** by the file truncation.
+      */Debug.Assert(pgszSrc==sqlite3BtreeGetPageSize(this.pSrc));
+						Debug.Assert(pgszDest==sqlite3BtreeGetPageSize(this.pDest));
+						if(pgszSrc<pgszDest) {
+							int ratio=pgszDest/pgszSrc;
+							nDestTruncate=(Pgno)((nSrcPage+ratio-1)/ratio);
+							if(nDestTruncate==(int)PENDING_BYTE_PAGE(this.pDest.pBt)) {
+								nDestTruncate--;
+							}
+						}
+						else {
+							nDestTruncate=(Pgno)(nSrcPage*(pgszSrc/pgszDest));
+						}
+						sqlite3PagerTruncateImage(pDestPager,nDestTruncate);
+						if(pgszSrc<pgszDest) {
+							/* If the source page-size is smaller than the destination page-size,
+        ** two extra things may need to happen:
+        **
+        **   * The destination may need to be truncated, and
+        **
+        **   * Data stored on the pages immediately following the
+        **     pending-byte page in the source database may need to be
+        **     copied into the destination database.
+        */int iSize=(int)(pgszSrc*nSrcPage);
+							sqlite3_file pFile=sqlite3PagerFile(pDestPager);
+							i64 iOff;
+							i64 iEnd;
+							Debug.Assert(pFile!=null);
+							Debug.Assert((i64)nDestTruncate*(i64)pgszDest>=iSize||(nDestTruncate==(int)(PENDING_BYTE_PAGE(this.pDest.pBt)-1)&&iSize>=PENDING_BYTE&&iSize<=PENDING_BYTE+pgszDest));
+							/* This call ensures that all data required to recreate the original
+        ** database has been stored in the journal for pDestPager and the
+        ** journal synced to disk. So at this point we may safely modify
+        ** the database file in any way, knowing that if a power failure
+        ** occurs, the original database will be reconstructed from the 
+        ** journal file.  */rc=sqlite3PagerCommitPhaseOne(pDestPager,null,true);
+							/* Write the extra pages and truncate the database file as required. */iEnd=MIN(PENDING_BYTE+pgszDest,iSize);
+							for(iOff=PENDING_BYTE+pgszSrc;rc==SQLITE_OK&&iOff<iEnd;iOff+=pgszSrc) {
+								PgHdr pSrcPg=null;
+								u32 iSrcPg=(u32)((iOff/pgszSrc)+1);
+								rc=sqlite3PagerGet(pSrcPager,iSrcPg,ref pSrcPg);
+								if(rc==SQLITE_OK) {
+									byte[] zData=sqlite3PagerGetData(pSrcPg);
+									rc=sqlite3OsWrite(pFile,zData,pgszSrc,iOff);
+								}
+								sqlite3PagerUnref(pSrcPg);
+							}
+							if(rc==SQLITE_OK) {
+								rc=pFile.backupTruncateFile((int)iSize);
+							}
+							/* Sync the database file to disk. */if(rc==SQLITE_OK) {
+								rc=sqlite3PagerSync(pDestPager);
+							}
+						}
+						else {
+							rc=sqlite3PagerCommitPhaseOne(pDestPager,null,false);
+						}
+						/* Finish committing the transaction to the destination database. */if(SQLITE_OK==rc&&SQLITE_OK==(rc=sqlite3BtreeCommitPhaseTwo(this.pDest,0))) {
+							rc=SQLITE_DONE;
+						}
+					}
+					/* If bCloseTrans is true, then this function opened a read transaction
+    ** on the source database. Close the read transaction here. There is
+    ** no need to check the return values of the btree methods here, as
+    ** "committing" a read-only transaction cannot fail.
+    */if(bCloseTrans!=0) {
+						#if !NDEBUG || SQLITE_COVERAGE_TEST
+																					      //TESTONLY( int rc2 );
+      //TESTONLY( rc2  = ) sqlite3BtreeCommitPhaseOne(p.pSrc, 0);
+      //TESTONLY( rc2 |= ) sqlite3BtreeCommitPhaseTwo(p.pSrc);
+      int rc2;
+      rc2 = sqlite3BtreeCommitPhaseOne( p.pSrc, "" );
+      rc2 |= sqlite3BtreeCommitPhaseTwo( p.pSrc, 0 );
+      Debug.Assert( rc2 == SQLITE_OK );
+#else
+						sqlite3BtreeCommitPhaseOne(this.pSrc,null);
+						sqlite3BtreeCommitPhaseTwo(this.pSrc,0);
+						#endif
+					}
+					if(rc==SQLITE_IOERR_NOMEM) {
+						rc=SQLITE_NOMEM;
+					}
+					this.rc=rc;
+				}
+				if(this.pDestDb!=null) {
+					sqlite3_mutex_leave(this.pDestDb.mutex);
+				}
+				sqlite3BtreeLeave(this.pSrc);
+				sqlite3_mutex_leave(this.pSrcDb.mutex);
+				return rc;
+			}
+			///<summary>
+			/// Release all resources associated with an sqlite3_backup* handle.
+			///</summary>
+			public int sqlite3_backup_finish() {
+				sqlite3_backup pp;
+				/* Ptr to head of pagers backup list */sqlite3_mutex mutex;
+				/* Mutex to protect source database */int rc;
+				/* Value to return *//* Enter the mutexes */if(this==null)
+					return SQLITE_OK;
+				sqlite3_mutex_enter(this.pSrcDb.mutex);
+				sqlite3BtreeEnter(this.pSrc);
+				mutex=this.pSrcDb.mutex;
+				if(this.pDestDb!=null) {
+					sqlite3_mutex_enter(this.pDestDb.mutex);
+				}
+				/* Detach this backup from the source pager. */if(this.pDestDb!=null) {
+					this.pSrc.nBackup--;
+				}
+				if(this.isAttached!=0) {
+					pp=sqlite3PagerBackupPtr(sqlite3BtreePager(this.pSrc));
+					while(pp!=this) {
+						pp=(pp).pNext;
+					}
+					sqlite3BtreePager(this.pSrc).pBackup=this.pNext;
+				}
+				/* If a transaction is still open on the Btree, roll it back. */sqlite3BtreeRollback(this.pDest);
+				/* Set the error code of the destination database handle. */rc=(this.rc==SQLITE_DONE)?SQLITE_OK:this.rc;
+				sqlite3Error(this.pDestDb,rc,0);
+				/* Exit the mutexes and free the backup context structure. */if(this.pDestDb!=null) {
+					sqlite3_mutex_leave(this.pDestDb.mutex);
+				}
+				sqlite3BtreeLeave(this.pSrc);
+				if(this.pDestDb!=null) {
+					/* EVIDENCE-OF: R-64852-21591 The sqlite3_backup object is created by a
+    ** call to sqlite3_backup_init() and is destroyed by a call to
+    ** sqlite3_backup_finish(). *///sqlite3_free( ref p );
+				}
+				sqlite3_mutex_leave(mutex);
+				return rc;
+			}
+			public///<summary>
+			/// Return the number of pages still to be backed up as of the most recent
+			/// call to sqlite3_backup_step().
+			///</summary>
+			int sqlite3_backup_remaining() {
+				return (int)this.nRemaining;
+			}
+			public///<summary>
+			/// Return the total number of pages in the source database as of the most
+			/// recent call to sqlite3_backup_step().
+			///</summary>
+			int sqlite3_backup_pagecount() {
+				return (int)this.nPagecount;
+			}
+			public///<summary>
+			/// Parameter zSrcData points to a buffer containing the data for
+			/// page iSrcPg from the source database. Copy this data into the
+			/// destination database.
+			///</summary>
+			int backupOnePage(Pgno iSrcPg,byte[] zSrcData) {
+				Pager pDestPager=sqlite3BtreePager(this.pDest);
+				int nSrcPgsz=sqlite3BtreeGetPageSize(this.pSrc);
+				int nDestPgsz=sqlite3BtreeGetPageSize(this.pDest);
+				int nCopy=MIN(nSrcPgsz,nDestPgsz);
+				i64 iEnd=(i64)iSrcPg*(i64)nSrcPgsz;
+				#if SQLITE_HAS_CODEC
+				int nSrcReserve=sqlite3BtreeGetReserve(this.pSrc);
+				int nDestReserve=sqlite3BtreeGetReserve(this.pDest);
+				#endif
+				int rc=SQLITE_OK;
+				i64 iOff;
+				Debug.Assert(this.bDestLocked!=0);
+				Debug.Assert(!isFatalError(this.rc));
+				Debug.Assert(iSrcPg!=PENDING_BYTE_PAGE(this.pSrc.pBt));
+				Debug.Assert(zSrcData!=null);
+				/* Catch the case where the destination is an in-memory database and the
+  ** page sizes of the source and destination differ.
+  */if(nSrcPgsz!=nDestPgsz&&sqlite3PagerIsMemdb(pDestPager)) {
+					rc=SQLITE_READONLY;
+				}
+				#if SQLITE_HAS_CODEC
+				/* Backup is not possible if the page size of the destination is changing
+  ** and a codec is in use.
+  */if(nSrcPgsz!=nDestPgsz&&sqlite3PagerGetCodec(pDestPager)!=null) {
+					rc=SQLITE_READONLY;
+				}
+				/* Backup is not possible if the number of bytes of reserve space differ
+  ** between source and destination.  If there is a difference, try to
+  ** fix the destination to agree with the source.  If that is not possible,
+  ** then the backup cannot proceed.
+  */if(nSrcReserve!=nDestReserve) {
+					u32 newPgsz=(u32)nSrcPgsz;
+					rc=sqlite3PagerSetPagesize(pDestPager,ref newPgsz,nSrcReserve);
+					if(rc==SQLITE_OK&&newPgsz!=nSrcPgsz)
+						rc=SQLITE_READONLY;
+				}
+				#endif
+				/* This loop runs once for each destination page spanned by the source
+  ** page. For each iteration, variable iOff is set to the byte offset
+  ** of the destination page.
+  */for(iOff=iEnd-(i64)nSrcPgsz;rc==SQLITE_OK&&iOff<iEnd;iOff+=nDestPgsz) {
+					DbPage pDestPg=null;
+					u32 iDest=(u32)(iOff/nDestPgsz)+1;
+					if(iDest==PENDING_BYTE_PAGE(this.pDest.pBt))
+						continue;
+					if(SQLITE_OK==(rc=sqlite3PagerGet(pDestPager,iDest,ref pDestPg))&&SQLITE_OK==(rc=sqlite3PagerWrite(pDestPg))) {
+						//string zIn = &zSrcData[iOff%nSrcPgsz];
+						byte[] zDestData=sqlite3PagerGetData(pDestPg);
+						//string zOut = &zDestData[iOff % nDestPgsz];
+						/* Copy the data from the source page into the destination page.
+      ** Then clear the Btree layer MemPage.isInit flag. Both this module
+      ** and the pager code use this trick (clearing the first byte
+      ** of the page 'extra' space to invalidate the Btree layers
+      ** cached parse of the page). MemPage.isInit is marked
+      ** "MUST BE FIRST" for this purpose.
+      */Buffer.BlockCopy(zSrcData,(int)(iOff%nSrcPgsz),zDestData,(int)(iOff%nDestPgsz),nCopy);
+						// memcpy( zOut, zIn, nCopy );
+						sqlite3PagerGetExtra(pDestPg).isInit=0;
+						// ( sqlite3PagerGetExtra( pDestPg ) )[0] = 0;
+					}
+					sqlite3PagerUnref(pDestPg);
+				}
+				return rc;
+			}
+			public///<summary>
+			/// Register this backup object with the associated source pager for
+			/// callbacks when pages are changed or the cache invalidated.
+			///</summary>
+			void attachBackupObject() {
+				sqlite3_backup pp;
+				Debug.Assert(sqlite3BtreeHoldsMutex(this.pSrc));
+				pp=sqlite3PagerBackupPtr(sqlite3BtreePager(this.pSrc));
+				this.pNext=pp;
+				sqlite3BtreePager(this.pSrc).pBackup=this;
+				//*pp = p;
+				this.isAttached=1;
+			}
+			public///<summary>
+			/// Attempt to set the page size of the destination to match the page size
+			/// of the source.
+			///</summary>
+			int setDestPgsz() {
+				int rc;
+				rc=sqlite3BtreeSetPageSize(this.pDest,sqlite3BtreeGetPageSize(this.pSrc),-1,0);
+				return rc;
+			}
+		}
 		///<summary>
 		/// THREAD SAFETY NOTES:
 		///
@@ -125,15 +502,6 @@ namespace Community.CsharpSqlite {
 			return pDb.aDb[i].pBt;
 		}
 		///<summary>
-		/// Attempt to set the page size of the destination to match the page size
-		/// of the source.
-		///</summary>
-		static int setDestPgsz(sqlite3_backup p) {
-			int rc;
-			rc=sqlite3BtreeSetPageSize(p.pDest,sqlite3BtreeGetPageSize(p.pSrc),-1,0);
-			return rc;
-		}
-		///<summary>
 		/// Create an sqlite3_backup process to copy the contents of zSrcDb from
 		/// connection handle pSrcDb to zDestDb in pDestDb. If successful, return
 		/// a pointer to the new sqlite3_backup object.
@@ -175,7 +543,7 @@ namespace Community.CsharpSqlite {
 				p.pSrcDb=pSrcDb;
 				p.iNext=1;
 				p.isAttached=0;
-				if(null==p.pSrc||null==p.pDest||setDestPgsz(p)==SQLITE_NOMEM) {
+				if(null==p.pSrc||null==p.pDest||p.setDestPgsz()==SQLITE_NOMEM) {
 					/* One (or both) of the named databases did not exist or an OOM
       ** error was hit.  The error has already been written into the
       ** pDestDb handle.  All that is left to do here is free the
@@ -199,430 +567,7 @@ namespace Community.CsharpSqlite {
 		static bool isFatalError(int rc) {
 			return (rc!=SQLITE_OK&&rc!=SQLITE_BUSY&&ALWAYS(rc!=SQLITE_LOCKED));
 		}
-		///<summary>
-		/// Parameter zSrcData points to a buffer containing the data for
-		/// page iSrcPg from the source database. Copy this data into the
-		/// destination database.
-		///</summary>
-		static int backupOnePage(sqlite3_backup p,Pgno iSrcPg,byte[] zSrcData) {
-			Pager pDestPager=sqlite3BtreePager(p.pDest);
-			int nSrcPgsz=sqlite3BtreeGetPageSize(p.pSrc);
-			int nDestPgsz=sqlite3BtreeGetPageSize(p.pDest);
-			int nCopy=MIN(nSrcPgsz,nDestPgsz);
-			i64 iEnd=(i64)iSrcPg*(i64)nSrcPgsz;
-			#if SQLITE_HAS_CODEC
-			int nSrcReserve=sqlite3BtreeGetReserve(p.pSrc);
-			int nDestReserve=sqlite3BtreeGetReserve(p.pDest);
-			#endif
-			int rc=SQLITE_OK;
-			i64 iOff;
-			Debug.Assert(p.bDestLocked!=0);
-			Debug.Assert(!isFatalError(p.rc));
-			Debug.Assert(iSrcPg!=PENDING_BYTE_PAGE(p.pSrc.pBt));
-			Debug.Assert(zSrcData!=null);
-			/* Catch the case where the destination is an in-memory database and the
-  ** page sizes of the source and destination differ.
-  */if(nSrcPgsz!=nDestPgsz&&sqlite3PagerIsMemdb(pDestPager)) {
-				rc=SQLITE_READONLY;
-			}
-			#if SQLITE_HAS_CODEC
-			/* Backup is not possible if the page size of the destination is changing
-  ** and a codec is in use.
-  */if(nSrcPgsz!=nDestPgsz&&sqlite3PagerGetCodec(pDestPager)!=null) {
-				rc=SQLITE_READONLY;
-			}
-			/* Backup is not possible if the number of bytes of reserve space differ
-  ** between source and destination.  If there is a difference, try to
-  ** fix the destination to agree with the source.  If that is not possible,
-  ** then the backup cannot proceed.
-  */if(nSrcReserve!=nDestReserve) {
-				u32 newPgsz=(u32)nSrcPgsz;
-				rc=sqlite3PagerSetPagesize(pDestPager,ref newPgsz,nSrcReserve);
-				if(rc==SQLITE_OK&&newPgsz!=nSrcPgsz)
-					rc=SQLITE_READONLY;
-			}
-			#endif
-			/* This loop runs once for each destination page spanned by the source
-  ** page. For each iteration, variable iOff is set to the byte offset
-  ** of the destination page.
-  */for(iOff=iEnd-(i64)nSrcPgsz;rc==SQLITE_OK&&iOff<iEnd;iOff+=nDestPgsz) {
-				DbPage pDestPg=null;
-				u32 iDest=(u32)(iOff/nDestPgsz)+1;
-				if(iDest==PENDING_BYTE_PAGE(p.pDest.pBt))
-					continue;
-				if(SQLITE_OK==(rc=sqlite3PagerGet(pDestPager,iDest,ref pDestPg))&&SQLITE_OK==(rc=sqlite3PagerWrite(pDestPg))) {
-					//string zIn = &zSrcData[iOff%nSrcPgsz];
-					byte[] zDestData=sqlite3PagerGetData(pDestPg);
-					//string zOut = &zDestData[iOff % nDestPgsz];
-					/* Copy the data from the source page into the destination page.
-      ** Then clear the Btree layer MemPage.isInit flag. Both this module
-      ** and the pager code use this trick (clearing the first byte
-      ** of the page 'extra' space to invalidate the Btree layers
-      ** cached parse of the page). MemPage.isInit is marked
-      ** "MUST BE FIRST" for this purpose.
-      */Buffer.BlockCopy(zSrcData,(int)(iOff%nSrcPgsz),zDestData,(int)(iOff%nDestPgsz),nCopy);
-					// memcpy( zOut, zIn, nCopy );
-					sqlite3PagerGetExtra(pDestPg).isInit=0;
-					// ( sqlite3PagerGetExtra( pDestPg ) )[0] = 0;
-				}
-				sqlite3PagerUnref(pDestPg);
-			}
-			return rc;
-		}
-		///<summary>
-		/// If pFile is currently larger than iSize bytes, then truncate it to
-		/// exactly iSize bytes. If pFile is not larger than iSize bytes, then
-		/// this function is a no-op.
-		///
-		/// Return SQLITE_OK if everything is successful, or an SQLite error
-		/// code if an error occurs.
-		///</summary>
-		static int backupTruncateFile(sqlite3_file pFile,int iSize) {
-			long iCurrent=0;
-			int rc=sqlite3OsFileSize(pFile,ref iCurrent);
-			if(rc==SQLITE_OK&&iCurrent>iSize) {
-				rc=sqlite3OsTruncate(pFile,iSize);
-			}
-			return rc;
-		}
-		///<summary>
-		/// Register this backup object with the associated source pager for
-		/// callbacks when pages are changed or the cache invalidated.
-		///</summary>
-		static void attachBackupObject(sqlite3_backup p) {
-			sqlite3_backup pp;
-			Debug.Assert(sqlite3BtreeHoldsMutex(p.pSrc));
-			pp=sqlite3PagerBackupPtr(sqlite3BtreePager(p.pSrc));
-			p.pNext=pp;
-			sqlite3BtreePager(p.pSrc).pBackup=p;
-			//*pp = p;
-			p.isAttached=1;
-		}
-		///<summary>
-		/// Copy nPage pages from the source b-tree to the destination.
-		///</summary>
-		static public int sqlite3_backup_step(sqlite3_backup p,int nPage) {
-			int rc;
-			int destMode;
-			/* Destination journal mode */int pgszSrc=0;
-			/* Source page size */int pgszDest=0;
-			/* Destination page size */sqlite3_mutex_enter(p.pSrcDb.mutex);
-			sqlite3BtreeEnter(p.pSrc);
-			if(p.pDestDb!=null) {
-				sqlite3_mutex_enter(p.pDestDb.mutex);
-			}
-			rc=p.rc;
-			if(!isFatalError(rc)) {
-				Pager pSrcPager=sqlite3BtreePager(p.pSrc);
-				/* Source pager */Pager pDestPager=sqlite3BtreePager(p.pDest);
-				/* Dest pager */int ii;
-				/* Iterator variable */Pgno nSrcPage=0;
-				/* Size of source db in pages */int bCloseTrans=0;
-				/* True if src db requires unlocking *//* If the source pager is currently in a write-transaction, return
-    ** SQLITE_BUSY immediately.
-    */if(p.pDestDb!=null&&p.pSrc.pBt.inTransaction==TRANS_WRITE) {
-					rc=SQLITE_BUSY;
-				}
-				else {
-					rc=SQLITE_OK;
-				}
-				/* Lock the destination database, if it is not locked already. */if(SQLITE_OK==rc&&p.bDestLocked==0&&SQLITE_OK==(rc=sqlite3BtreeBeginTrans(p.pDest,2))) {
-					p.bDestLocked=1;
-					sqlite3BtreeGetMeta(p.pDest,BTREE_SCHEMA_VERSION,ref p.iDestSchema);
-				}
-				/* If there is no open read-transaction on the source database, open
-    ** one now. If a transaction is opened here, then it will be closed
-    ** before this function exits.
-    */if(rc==SQLITE_OK&&!sqlite3BtreeIsInReadTrans(p.pSrc)) {
-					rc=sqlite3BtreeBeginTrans(p.pSrc,0);
-					bCloseTrans=1;
-				}
-				/* Do not allow backup if the destination database is in WAL mode
-    ** and the page sizes are different between source and destination */pgszSrc=sqlite3BtreeGetPageSize(p.pSrc);
-				pgszDest=sqlite3BtreeGetPageSize(p.pDest);
-				destMode=sqlite3PagerGetJournalMode(sqlite3BtreePager(p.pDest));
-				if(SQLITE_OK==rc&&destMode==PAGER_JOURNALMODE_WAL&&pgszSrc!=pgszDest) {
-					rc=SQLITE_READONLY;
-				}
-				/* Now that there is a read-lock on the source database, query the
-    ** source pager for the number of pages in the database.
-    */nSrcPage=sqlite3BtreeLastPage(p.pSrc);
-				Debug.Assert(nSrcPage>=0);
-				for(ii=0;(nPage<0||ii<nPage)&&p.iNext<=nSrcPage&&0==rc;ii++) {
-					Pgno iSrcPg=p.iNext;
-					/* Source page number */if(iSrcPg!=PENDING_BYTE_PAGE(p.pSrc.pBt)) {
-						DbPage pSrcPg=null;
-						/* Source page object */rc=sqlite3PagerGet(pSrcPager,(u32)iSrcPg,ref pSrcPg);
-						if(rc==SQLITE_OK) {
-							rc=backupOnePage(p,iSrcPg,sqlite3PagerGetData(pSrcPg));
-							sqlite3PagerUnref(pSrcPg);
-						}
-					}
-					p.iNext++;
-				}
-				if(rc==SQLITE_OK) {
-					p.nPagecount=nSrcPage;
-					p.nRemaining=(nSrcPage+1-p.iNext);
-					if(p.iNext>nSrcPage) {
-						rc=SQLITE_DONE;
-					}
-					else
-						if(0==p.isAttached) {
-							attachBackupObject(p);
-						}
-				}
-				/* Update the schema version field in the destination database. This
-    ** is to make sure that the schema-version really does change in
-    ** the case where the source and destination databases have the
-    ** same schema version.
-    */if(rc==SQLITE_DONE&&(rc=sqlite3BtreeUpdateMeta(p.pDest,1,p.iDestSchema+1))==SQLITE_OK) {
-					Pgno nDestTruncate;
-					if(p.pDestDb!=null) {
-						sqlite3ResetInternalSchema(p.pDestDb,-1);
-					}
-					/* Set nDestTruncate to the final number of pages in the destination
-      ** database. The complication here is that the destination page
-      ** size may be different to the source page size.
-      **
-      ** If the source page size is smaller than the destination page size,
-      ** round up. In this case the call to sqlite3OsTruncate() below will
-      ** fix the size of the file. However it is important to call
-      ** sqlite3PagerTruncateImage() here so that any pages in the
-      ** destination file that lie beyond the nDestTruncate page mark are
-      ** journalled by PagerCommitPhaseOne() before they are destroyed
-      ** by the file truncation.
-      */Debug.Assert(pgszSrc==sqlite3BtreeGetPageSize(p.pSrc));
-					Debug.Assert(pgszDest==sqlite3BtreeGetPageSize(p.pDest));
-					if(pgszSrc<pgszDest) {
-						int ratio=pgszDest/pgszSrc;
-						nDestTruncate=(Pgno)((nSrcPage+ratio-1)/ratio);
-						if(nDestTruncate==(int)PENDING_BYTE_PAGE(p.pDest.pBt)) {
-							nDestTruncate--;
-						}
-					}
-					else {
-						nDestTruncate=(Pgno)(nSrcPage*(pgszSrc/pgszDest));
-					}
-					sqlite3PagerTruncateImage(pDestPager,nDestTruncate);
-					if(pgszSrc<pgszDest) {
-						/* If the source page-size is smaller than the destination page-size,
-        ** two extra things may need to happen:
-        **
-        **   * The destination may need to be truncated, and
-        **
-        **   * Data stored on the pages immediately following the
-        **     pending-byte page in the source database may need to be
-        **     copied into the destination database.
-        */int iSize=(int)(pgszSrc*nSrcPage);
-						sqlite3_file pFile=sqlite3PagerFile(pDestPager);
-						i64 iOff;
-						i64 iEnd;
-						Debug.Assert(pFile!=null);
-						Debug.Assert((i64)nDestTruncate*(i64)pgszDest>=iSize||(nDestTruncate==(int)(PENDING_BYTE_PAGE(p.pDest.pBt)-1)&&iSize>=PENDING_BYTE&&iSize<=PENDING_BYTE+pgszDest));
-						/* This call ensures that all data required to recreate the original
-        ** database has been stored in the journal for pDestPager and the
-        ** journal synced to disk. So at this point we may safely modify
-        ** the database file in any way, knowing that if a power failure
-        ** occurs, the original database will be reconstructed from the 
-        ** journal file.  */rc=sqlite3PagerCommitPhaseOne(pDestPager,null,true);
-						/* Write the extra pages and truncate the database file as required. */iEnd=MIN(PENDING_BYTE+pgszDest,iSize);
-						for(iOff=PENDING_BYTE+pgszSrc;rc==SQLITE_OK&&iOff<iEnd;iOff+=pgszSrc) {
-							PgHdr pSrcPg=null;
-							u32 iSrcPg=(u32)((iOff/pgszSrc)+1);
-							rc=sqlite3PagerGet(pSrcPager,iSrcPg,ref pSrcPg);
-							if(rc==SQLITE_OK) {
-								byte[] zData=sqlite3PagerGetData(pSrcPg);
-								rc=sqlite3OsWrite(pFile,zData,pgszSrc,iOff);
-							}
-							sqlite3PagerUnref(pSrcPg);
-						}
-						if(rc==SQLITE_OK) {
-							rc=backupTruncateFile(pFile,(int)iSize);
-						}
-						/* Sync the database file to disk. */if(rc==SQLITE_OK) {
-							rc=sqlite3PagerSync(pDestPager);
-						}
-					}
-					else {
-						rc=sqlite3PagerCommitPhaseOne(pDestPager,null,false);
-					}
-					/* Finish committing the transaction to the destination database. */if(SQLITE_OK==rc&&SQLITE_OK==(rc=sqlite3BtreeCommitPhaseTwo(p.pDest,0))) {
-						rc=SQLITE_DONE;
-					}
-				}
-				/* If bCloseTrans is true, then this function opened a read transaction
-    ** on the source database. Close the read transaction here. There is
-    ** no need to check the return values of the btree methods here, as
-    ** "committing" a read-only transaction cannot fail.
-    */if(bCloseTrans!=0) {
-					#if !NDEBUG || SQLITE_COVERAGE_TEST
-															      //TESTONLY( int rc2 );
-      //TESTONLY( rc2  = ) sqlite3BtreeCommitPhaseOne(p.pSrc, 0);
-      //TESTONLY( rc2 |= ) sqlite3BtreeCommitPhaseTwo(p.pSrc);
-      int rc2;
-      rc2 = sqlite3BtreeCommitPhaseOne( p.pSrc, "" );
-      rc2 |= sqlite3BtreeCommitPhaseTwo( p.pSrc, 0 );
-      Debug.Assert( rc2 == SQLITE_OK );
-#else
-					sqlite3BtreeCommitPhaseOne(p.pSrc,null);
-					sqlite3BtreeCommitPhaseTwo(p.pSrc,0);
-					#endif
-				}
-				if(rc==SQLITE_IOERR_NOMEM) {
-					rc=SQLITE_NOMEM;
-				}
-				p.rc=rc;
-			}
-			if(p.pDestDb!=null) {
-				sqlite3_mutex_leave(p.pDestDb.mutex);
-			}
-			sqlite3BtreeLeave(p.pSrc);
-			sqlite3_mutex_leave(p.pSrcDb.mutex);
-			return rc;
-		}
-		///<summary>
-		/// Release all resources associated with an sqlite3_backup* handle.
-		///</summary>
-		static public int sqlite3_backup_finish(sqlite3_backup p) {
-			sqlite3_backup pp;
-			/* Ptr to head of pagers backup list */sqlite3_mutex mutex;
-			/* Mutex to protect source database */int rc;
-			/* Value to return *//* Enter the mutexes */if(p==null)
-				return SQLITE_OK;
-			sqlite3_mutex_enter(p.pSrcDb.mutex);
-			sqlite3BtreeEnter(p.pSrc);
-			mutex=p.pSrcDb.mutex;
-			if(p.pDestDb!=null) {
-				sqlite3_mutex_enter(p.pDestDb.mutex);
-			}
-			/* Detach this backup from the source pager. */if(p.pDestDb!=null) {
-				p.pSrc.nBackup--;
-			}
-			if(p.isAttached!=0) {
-				pp=sqlite3PagerBackupPtr(sqlite3BtreePager(p.pSrc));
-				while(pp!=p) {
-					pp=(pp).pNext;
-				}
-				sqlite3BtreePager(p.pSrc).pBackup=p.pNext;
-			}
-			/* If a transaction is still open on the Btree, roll it back. */sqlite3BtreeRollback(p.pDest);
-			/* Set the error code of the destination database handle. */rc=(p.rc==SQLITE_DONE)?SQLITE_OK:p.rc;
-			sqlite3Error(p.pDestDb,rc,0);
-			/* Exit the mutexes and free the backup context structure. */if(p.pDestDb!=null) {
-				sqlite3_mutex_leave(p.pDestDb.mutex);
-			}
-			sqlite3BtreeLeave(p.pSrc);
-			if(p.pDestDb!=null) {
-				/* EVIDENCE-OF: R-64852-21591 The sqlite3_backup object is created by a
-    ** call to sqlite3_backup_init() and is destroyed by a call to
-    ** sqlite3_backup_finish(). *///sqlite3_free( ref p );
-			}
-			sqlite3_mutex_leave(mutex);
-			return rc;
-		}
-		///<summary>
-		/// Return the number of pages still to be backed up as of the most recent
-		/// call to sqlite3_backup_step().
-		///</summary>
-		static int sqlite3_backup_remaining(sqlite3_backup p) {
-			return (int)p.nRemaining;
-		}
-		///<summary>
-		/// Return the total number of pages in the source database as of the most
-		/// recent call to sqlite3_backup_step().
-		///</summary>
-		static int sqlite3_backup_pagecount(sqlite3_backup p) {
-			return (int)p.nPagecount;
-		}
-		///<summary>
-		/// This function is called after the contents of page iPage of the
-		/// source database have been modified. If page iPage has already been
-		/// copied into the destination database, then the data written to the
-		/// destination is now invalidated. The destination copy of iPage needs
-		/// to be updated with the new data before the backup operation is
-		/// complete.
-		///
-		/// It is assumed that the mutex associated with the BtShared object
-		/// corresponding to the source database is held when this function is
-		/// called.
-		///</summary>
-		static void sqlite3BackupUpdate(sqlite3_backup pBackup,Pgno iPage,byte[] aData) {
-			sqlite3_backup p;
-			/* Iterator variable */for(p=pBackup;p!=null;p=p.pNext) {
-				Debug.Assert(sqlite3_mutex_held(p.pSrc.pBt.mutex));
-				if(!isFatalError(p.rc)&&iPage<p.iNext) {
-					/* The backup process p has already copied page iPage. But now it
-      ** has been modified by a transaction on the source pager. Copy
-      ** the new data into the backup.
-      */int rc;
-					Debug.Assert(p.pDestDb!=null);
-					sqlite3_mutex_enter(p.pDestDb.mutex);
-					rc=backupOnePage(p,iPage,aData);
-					sqlite3_mutex_leave(p.pDestDb.mutex);
-					Debug.Assert(rc!=SQLITE_BUSY&&rc!=SQLITE_LOCKED);
-					if(rc!=SQLITE_OK) {
-						p.rc=rc;
-					}
-				}
-			}
-		}
-		///<summary>
-		/// Restart the backup process. This is called when the pager layer
-		/// detects that the database has been modified by an external database
-		/// connection. In this case there is no way of knowing which of the
-		/// pages that have been copied into the destination database are still
-		/// valid and which are not, so the entire process needs to be restarted.
-		///
-		/// It is assumed that the mutex associated with the BtShared object
-		/// corresponding to the source database is held when this function is
-		/// called.
-		///</summary>
-		static void sqlite3BackupRestart(sqlite3_backup pBackup) {
-			sqlite3_backup p;
-			/* Iterator variable */for(p=pBackup;p!=null;p=p.pNext) {
-				Debug.Assert(sqlite3_mutex_held(p.pSrc.pBt.mutex));
-				p.iNext=1;
-			}
-		}
-		#if !SQLITE_OMIT_VACUUM
-		/*
-** Copy the complete content of pBtFrom into pBtTo.  A transaction
-** must be active for both files.
-**
-** The size of file pTo may be reduced by this operation. If anything
-** goes wrong, the transaction on pTo is rolled back. If successful, the
-** transaction is committed before returning.
-*/static int sqlite3BtreeCopyFile(Btree pTo,Btree pFrom) {
-			int rc;
-			sqlite3_backup b;
-			sqlite3BtreeEnter(pTo);
-			sqlite3BtreeEnter(pFrom);
-			/* Set up an sqlite3_backup object. sqlite3_backup.pDestDb must be set
-  ** to 0. This is used by the implementations of sqlite3_backup_step()
-  ** and sqlite3_backup_finish() to detect that they are being called
-  ** from this function, not directly by the user.
-  */b=new sqlite3_backup();
-			// memset( &b, 0, sizeof( b ) );
-			b.pSrcDb=pFrom.db;
-			b.pSrc=pFrom;
-			b.pDest=pTo;
-			b.iNext=1;
-			/* 0x7FFFFFFF is the hard limit for the number of pages in a database
-  ** file. By passing this as the number of pages to copy to
-  ** sqlite3_backup_step(), we can guarantee that the copy finishes
-  ** within a single call (unless an error occurs). The Debug.Assert() statement
-  ** checks this assumption - (p.rc) should be set to either SQLITE_DONE
-  ** or an error code.
-  */sqlite3_backup_step(b,0x7FFFFFFF);
-			Debug.Assert(b.rc!=SQLITE_OK);
-			rc=sqlite3_backup_finish(b);
-			if(rc==SQLITE_OK) {
-				pTo.pBt.pageSizeFixed=false;
-			}
-			sqlite3BtreeLeave(pFrom);
-			sqlite3BtreeLeave(pTo);
-			return rc;
-		}
+	#if !SQLITE_OMIT_VACUUM
 	#endif
 	}
 }

@@ -169,13 +169,13 @@ namespace Community.CsharpSqlite {
 			#if !SQLITE_OMIT_TRIGGER
 			'E',
 			#else
-									'\0',
+												'\0',
 #endif
 			'R',
 			#if !SQLITE_OMIT_FOREIGN_KEY
 			'E',
 			#else
-									'\0',
+												'\0',
 #endif
 			'F',
 			'E',
