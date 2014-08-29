@@ -46,7 +46,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if SQLITE_OMIT_WSD
-																										// define wsdStatInit  sqlite3StatType *x = &GLOBAL(sqlite3StatType,sqlite3Stat)
+																												// define wsdStatInit  sqlite3StatType *x = &GLOBAL(sqlite3StatType,sqlite3Stat)
 // define wsdStat x[0]
 #else
 		//# define wsdStatInit

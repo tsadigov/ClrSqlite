@@ -4911,13 +4911,13 @@ namespace Community.CsharpSqlite {
 			public int yyidx;
 			/* Index of top element in stack */
 			#if YYTRACKMAXSTACKDEPTH
-																																							int yyidxMax;                 /* Maximum value of yyidx */
+																																										int yyidxMax;                 /* Maximum value of yyidx */
 #endif
 			public int yyerrcnt;
 			/* Shifts left before out of the error */public Parse pParse;
 			// sqlite3ParserARG_SDECL                /* A place to hold %extra_argument */
 			#if YYSTACKDEPTH
-																																							public int yystksz;                  /* Current side of the stack */
+																																										public int yystksz;                  /* Current side of the stack */
 public yyStackEntry *yystack;        /* The parser's stack */
 #else
 			public yyStackEntry[] yystack=new yyStackEntry[YYSTACKDEPTH];
@@ -4927,12 +4927,12 @@ public yyStackEntry *yystack;        /* The parser's stack */
 
 		//typedef struct yyParser yyParser;
 		#if !NDEBUG
-																										    //include <stdio.h>
+																												    //include <stdio.h>
     static TextWriter yyTraceFILE = null;
     static string yyTracePrompt = "";
 #endif
 		#if !NDEBUG
-																										    /*
+																												    /*
 ** Turn parser tracing on by giving a stream to which to write the trace
 ** and a prompt to preface each trace message.  Tracing is turned off
 ** by making either argument NULL
@@ -4960,7 +4960,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
     }
 #endif
 		#if !NDEBUG
-																										    /* For tracing shifts, the names of all terminals and nonterminals
+																												    /* For tracing shifts, the names of all terminals and nonterminals
 ** are required.  The following table supplies these names */
     static string[] yyTokenName = {
 "$",             "SEMI",          "EXPLAIN",       "QUERY",       
@@ -5029,7 +5029,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 };
 #endif
 		#if !NDEBUG
-																										    ///<summary>
+																												    ///<summary>
 ///For tracing reduce actions, the names of all rules are required.
 ///</summary>
     static string[] yyRuleName = {
@@ -5365,7 +5365,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 };
 #endif
 		#if YYSTACKDEPTH
-																										/*
+																												/*
 ** Try to increase the size of the parser stack.
 */
 static void yyGrowStack(yyParser p){
@@ -5378,12 +5378,12 @@ newSize = p.yystksz*2 + 100;
 p.yystack = Array.Resize(p.yystack,newSize); //pNew;
 p.yystksz = newSize;
 #if !NDEBUG
-																										if( yyTraceFILE ){
+																												if( yyTraceFILE ){
 fprintf(yyTraceFILE,"%sStack grows to %d entries!\n",
 yyTracePrompt, p.yystksz);
 }
 #endif
-																										//}
+																												//}
 }
 #endif
 		///<summary>
@@ -5405,10 +5405,10 @@ yyTracePrompt, p.yystksz);
 			if(pParser!=null) {
 				pParser.yyidx=-1;
 				#if YYTRACKMAXSTACKDEPTH
-																																																				pParser.yyidxMax=0;
+																																																								pParser.yyidxMax=0;
 #endif
 				#if YYSTACKDEPTH
-																																																				pParser.yystack = NULL;
+																																																								pParser.yystack = NULL;
 pParser.yystksz = null;
 yyGrowStack(pParser);
 #endif
@@ -5537,7 +5537,7 @@ yyGrowStack(pParser);
       ** empty in SQLite.  */if(NEVER(pParser.yyidx<0))
 				return 0;
 			#if !NDEBUG
-																																							      if ( yyTraceFILE != null && pParser.yyidx >= 0 )
+																																										      if ( yyTraceFILE != null && pParser.yyidx >= 0 )
       {
         fprintf( yyTraceFILE, "%sPopping %s\n",
         yyTracePrompt,
@@ -5569,7 +5569,7 @@ yyGrowStack(pParser);
 			while(pParser.yyidx>=0)
 				yy_pop_parser_stack(pParser);
 			#if YYSTACKDEPTH
-																																							pParser.yystack = null;//free(pParser.yystack);
+																																										pParser.yystack = null;//free(pParser.yystack);
 #endif
 			pParser=null;
 			// freeProc(ref pParser);
@@ -5579,7 +5579,7 @@ yyGrowStack(pParser);
 		///
 		///</summary>
 		#if YYTRACKMAXSTACKDEPTH
-																										int sqlite3ParserStackPeak(void p){
+																												int sqlite3ParserStackPeak(void p){
 yyParser pParser = (yyParser*)p;
 return pParser.yyidxMax;
 }
@@ -5607,7 +5607,7 @@ return pParser.yyidxMax;
 					/* Fallback token */if(iLookAhead<yyFallback.Length//yyFallback.Length/sizeof(yyFallback[0])
 					&&(iFallback=yyFallback[iLookAhead])!=0) {
 						#if !NDEBUG
-																																																																														            if ( yyTraceFILE != null )
+																																																																																				            if ( yyTraceFILE != null )
             {
               fprintf( yyTraceFILE, "%sFALLBACK %s => %s\n",
               yyTracePrompt, yyTokenName[iLookAhead], yyTokenName[iFallback] );
@@ -5625,7 +5625,7 @@ return pParser.yyidxMax;
 						j<YY_ACTTAB_COUNT&&//#endif
 						yy_lookahead[j]==YYWILDCARD) {
 							#if !NDEBUG
-																																																																																											              if ( yyTraceFILE != null )
+																																																																																																		              if ( yyTraceFILE != null )
               {
                 Debugger.Break(); // TODO --
                 //fprintf(yyTraceFILE, "%sWILDCARD %s => %s\n",
@@ -5655,7 +5655,7 @@ return pParser.yyidxMax;
 		static int yy_find_reduce_action(int stateno,/* Current state number */YYCODETYPE iLookAhead/* The look-ahead token */) {
 			int i;
 			#if YYERRORSYMBOL
-																																							if( stateno>YY_REDUCE_COUNT ){
+																																										if( stateno>YY_REDUCE_COUNT ){
 return yy_default[stateno];
 }
 #else
@@ -5666,7 +5666,7 @@ return yy_default[stateno];
 			Debug.Assert(iLookAhead!=YYNOCODE);
 			i+=iLookAhead;
 			#if YYERRORSYMBOL
-																																							if( i<0 || i>=YY_ACTTAB_COUNT || yy_lookahead[i]!=iLookAhead ){
+																																										if( i<0 || i>=YY_ACTTAB_COUNT || yy_lookahead[i]!=iLookAhead ){
 return yy_default[stateno];
 }
 #else
@@ -5684,7 +5684,7 @@ return yy_default[stateno];
 			// sqlite3ParserARG_FETCH;
 			yypParser.yyidx--;
 			#if !NDEBUG
-																																							      if ( yyTraceFILE != null )
+																																										      if ( yyTraceFILE != null )
       {
         Debugger.Break(); // TODO --
         //fprintf(yyTraceFILE, "%sStack Overflow!\n", yyTracePrompt);
@@ -5709,7 +5709,7 @@ return yy_default[stateno];
 			yyStackEntry yytos=new yyStackEntry();
 			yypParser.yyidx++;
 			#if YYTRACKMAXSTACKDEPTH
-																																							if( yypParser.yyidx>yypParser.yyidxMax ){
+																																										if( yypParser.yyidx>yypParser.yyidxMax ){
 yypParser.yyidxMax = yypParser.yyidx;
 }
 #endif
@@ -5719,7 +5719,7 @@ yypParser.yyidxMax = yypParser.yyidx;
 				return;
 			}
 			#else
-																																							if( yypParser.yyidx>=yypParser.yystksz ){
+																																										if( yypParser.yyidx>=yypParser.yystksz ){
 yyGrowStack(yypParser);
 if( yypParser.yyidx>=yypParser.yystksz ){
 yyStackOverflow(yypParser, yypMinor);
@@ -5733,7 +5733,7 @@ return;
 			yytos.major=(YYCODETYPE)yyMajor;
 			yytos.minor=yypMinor;
 			#if !NDEBUG
-																																							      if ( yyTraceFILE != null && yypParser.yyidx > 0 )
+																																										      if ( yyTraceFILE != null && yypParser.yyidx > 0 )
       {
         int i;
         fprintf( yyTraceFILE, "%sShift %d\n", yyTracePrompt, yyNewState );
@@ -6104,7 +6104,7 @@ return;
 			yymsp=new yymsp(ref yypParser,yypParser.yyidx);
 			//      yymsp[0] = yypParser.yystack[yypParser.yyidx];
 			#if !NDEBUG
-																																							      if ( yyTraceFILE != null && yyruleno >= 0
+																																										      if ( yyTraceFILE != null && yyruleno >= 0
       && yyruleno < yyRuleName.Length )
       { //(int)(yyRuleName.Length/sizeof(yyRuleName[0])) ){
         fprintf( yyTraceFILE, "%sReduce [%s].\n", yyTracePrompt,
@@ -8051,7 +8051,7 @@ return;
 			Parse pParse=yypParser.pParse;
 			//       sqlite3ParserARG_FETCH;
 			#if !NDEBUG
-																																							      if ( yyTraceFILE != null )
+																																										      if ( yyTraceFILE != null )
       {
         Debugger.Break(); // TODO --        fprintf(yyTraceFILE, "%sFail!\n", yyTracePrompt);
       }
@@ -8089,7 +8089,7 @@ return;
 			Parse pParse=yypParser.pParse;
 			//       sqlite3ParserARG_FETCH;
 			#if !NDEBUG
-																																							      if ( yyTraceFILE != null )
+																																										      if ( yyTraceFILE != null )
       {
         fprintf( yyTraceFILE, "%sAccept!\n", yyTracePrompt );
       }
@@ -8128,13 +8128,13 @@ return;
 			/* The parser action. */bool yyendofinput;
 			/* True if we are at the end of input */
 			#if YYERRORSYMBOL
-																																							int yyerrorhit = null;   /* True if yymajor has invoked an error */
+																																										int yyerrorhit = null;   /* True if yymajor has invoked an error */
 #endif
 			yyParser yypParser;
 			/* The parser *//* (re)initialize the parser, if necessary */yypParser=yyp;
 			if(yypParser.yyidx<0) {
 				#if YYSTACKDEPTH
-																																																				if( yypParser.yystksz <=0 ){
+																																																								if( yypParser.yystksz <=0 ){
 memset(yyminorunion, 0, yyminorunion).Length;
 yyStackOverflow(yypParser, yyminorunion);
 return;
@@ -8151,7 +8151,7 @@ return;
 			yypParser.pParse=pParse;
 			//      sqlite3ParserARG_STORE;
 			#if !NDEBUG
-																																							      if ( yyTraceFILE != null )
+																																										      if ( yyTraceFILE != null )
       {
         fprintf( yyTraceFILE, "%sInput %s\n", yyTracePrompt, yyTokenName[yymajor] );
       }
@@ -8171,16 +8171,16 @@ return;
 					else {
 						Debug.Assert(yyact==YY_ERROR_ACTION);
 						#if YYERRORSYMBOL
-																																																																														int yymx;
+																																																																																				int yymx;
 #endif
 						#if !NDEBUG
-																																																																														          if ( yyTraceFILE != null )
+																																																																																				          if ( yyTraceFILE != null )
           {
             Debugger.Break(); // TODO --            fprintf(yyTraceFILE, "%sSyntax Error!\n", yyTracePrompt);
           }
 #endif
 						#if YYERRORSYMBOL
-																																																																														/* A syntax error has occurred.
+																																																																																				/* A syntax error has occurred.
 ** The response to an error depends upon whether or not the
 ** grammar defines an error token "ERROR".
 **
@@ -8205,12 +8205,12 @@ yy_syntax_error(yypParser,yymajor,yyminorunion);
 yymx = yypParser.yystack[yypParser.yyidx].major;
 if( yymx==YYERRORSYMBOL || yyerrorhit ){
 #if !NDEBUG
-																																																																														if( yyTraceFILE ){
+																																																																																				if( yyTraceFILE ){
 Debug.Assert(false); // TODO --                      fprintf(yyTraceFILE,"%sDiscard input token %s\n",
 yyTracePrompt,yyTokenName[yymajor]);
 }
 #endif
-																																																																														yy_destructor(yypParser,(YYCODETYPE)yymajor,yyminorunion);
+																																																																																				yy_destructor(yypParser,(YYCODETYPE)yymajor,yyminorunion);
 yymajor = YYNOCODE;
 }else{
 while(
@@ -8235,7 +8235,7 @@ yy_shift(yypParser,yyact,YYERRORSYMBOL,u2);
 yypParser.yyerrcnt = 3;
 yyerrorhit = 1;
 #elif (YYNOERRORRECOVERY)
-																																																																														/* If the YYNOERRORRECOVERY macro is defined, then do not attempt to
+																																																																																				/* If the YYNOERRORRECOVERY macro is defined, then do not attempt to
 ** do any kind of error recovery.  Instead, simply invoke the syntax
 ** error routine and continue going as if nothing had happened.
 **

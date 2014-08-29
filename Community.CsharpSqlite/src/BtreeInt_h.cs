@@ -502,7 +502,7 @@ namespace Community.CsharpSqlite {
 				//u8 pIter = &pCell[pPage.childPtrSize];
 				u32 nSize=0;
 				#if SQLITE_DEBUG || DEBUG
-																																																  /* The value returned by this function should always be the same as
+																																																				  /* The value returned by this function should always be the same as
 ** the (CellInfo.nSize) value found by doing a full parse of the
 ** cell. If SQLITE_DEBUG is defined, an Debug.Assert() at the bottom of
 ** this function verifies that this invariant is not violated. */
@@ -640,7 +640,7 @@ namespace Community.CsharpSqlite {
 					size=this.cellSizePtr(temp,pc);
 					cbrk-=size;
 					#if (SQLITE_ENABLE_OVERSIZE_CELL_CHECK)
-																																																													    if ( cbrk < iCellFirst || pc + size > usableSize )
+																																																																		    if ( cbrk < iCellFirst || pc + size > usableSize )
     {
       return SQLITE_CORRUPT_BKPT();
     }
@@ -946,7 +946,7 @@ namespace Community.CsharpSqlite {
     */iCellFirst=cellOffset+2*this.nCell;
 					iCellLast=usableSize-4;
 					#if (SQLITE_ENABLE_OVERSIZE_CELL_CHECK)
-																																																													    {
+																																																																		    {
       int i;            /* Index into the cell pointer array */
       int sz;           /* Size of a cell */
 
@@ -1313,7 +1313,7 @@ namespace Community.CsharpSqlite {
 					return;
 				Debug.Assert(idx>=0&&idx<this.nCell);
 				#if SQLITE_DEBUG
-																																																  Debug.Assert( sz == cellSize( pPage, idx ) );
+																																																				  Debug.Assert( sz == cellSize( pPage, idx ) );
 #endif
 				Debug.Assert(sqlite3PagerIswriteable(this.pDbPage));
 				Debug.Assert(sqlite3_mutex_held(this.pBt.mutex));
@@ -1599,7 +1599,7 @@ namespace Community.CsharpSqlite {
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																													if (false)
+																																																																		if (false)
 #endif
 					 {
 						ptrmapPut(pBt,pgnoNew,PTRMAP_BTREE,this.pgno,ref rc);
@@ -1691,7 +1691,7 @@ namespace Community.CsharpSqlite {
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																													if (false)
+																																																																		if (false)
 #endif
 					 {
 						pRC=pTo.setChildPtrmaps();
@@ -1732,7 +1732,7 @@ namespace Community.CsharpSqlite {
 				Debug.Assert(sqlite3_mutex_held(pBt.mutex));
 				Debug.Assert(sqlite3PagerIswriteable(this.pDbPage));
 				#if FALSE
-																																																TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
+																																																				TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
 #endif
 				/* At this point pParent may have at most one overflow cell. And if
 ** this overflow cell is present, it must be the cell with
@@ -2040,7 +2040,7 @@ namespace Community.CsharpSqlite {
 						#if !SQLITE_OMIT_AUTOVACUUM
 						if(pBt.autoVacuum)
 						#else
-																																																																										if (false)
+																																																																																if (false)
 #endif
 						 {
 							ptrmapPut(pBt,pNew.pgno,PTRMAP_BTREE,this.pgno,ref rc);
@@ -2195,7 +2195,7 @@ namespace Community.CsharpSqlite {
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																													if (false)
+																																																																		if (false)
 #endif
 					 {
 						/* Fix the pointer-map entries for all the cells that were shifted around.
@@ -2285,7 +2285,7 @@ namespace Community.CsharpSqlite {
 							}
 						}
 						#if FALSE
-																																																																										/* The ptrmapCheckPages() contains Debug.Assert() statements that verify that
+																																																																																/* The ptrmapCheckPages() contains Debug.Assert() statements that verify that
 ** all pointer map pages are set correctly. This is helpful while
 ** debugging. This is usually disabled because a corrupt database may
 ** cause an Debug.Assert() statement to fail.  */
@@ -2344,7 +2344,7 @@ ptrmapCheckPages(pParent, 1);
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																													if (false)
+																																																																		if (false)
 #endif
 					 {
 						ptrmapPut(pBt,pgnoChild,PTRMAP_BTREE,this.pgno,ref rc);
@@ -2428,7 +2428,7 @@ ptrmapCheckPages(pParent, 1);
 			/* List of other sharable Btrees from the same db */public Btree pPrev;
 			/* Back pointer of the same list */
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																				BtLock lock;              /* Object used to lock page 1 */
+																																							BtLock lock;              /* Object used to lock page 1 */
 #endif
 			/**
 ///<summary>
@@ -2558,7 +2558,7 @@ ptrmapCheckPages(pParent, 1);
 			/* Non-recursive mutex required to access this object */public Bitvec pHasContent;
 			/* Set of pages moved to free-list this transaction */
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																							public int nRef;                /* Number of references to this structure */
+																																										public int nRef;                /* Number of references to this structure */
 public BtShared pNext;          /* Next on a list of sharable BtShared structs */
 public BtLock pLock;            /* List of locks held on this shared-btree struct */
 public Btree pWriter;           /* Btree with currently open write transaction */
@@ -2566,8 +2566,76 @@ public u8 isExclusive;          /* True if pWriter has an EXCLUSIVE lock on the 
 public u8 isPending;            /* If waiting for read-locks to clear */
 #endif
 			public byte[] pTmpSpace;
-		/* BtShared.pageSize bytes of space for tmp use */};
-
+			/* BtShared.pageSize bytes of space for tmp use */public///<summary>
+			/// Set bit pgno of the BtShared.pHasContent bitvec. This is called
+			/// when a page that previously contained data becomes a free-list leaf
+			/// page.
+			///
+			/// The BtShared.pHasContent bitvec exists to work around an obscure
+			/// bug caused by the interaction of two useful IO optimizations surrounding
+			/// free-list leaf pages:
+			///
+			///   1) When all data is deleted from a page and the page becomes
+			///      a free-list leaf page, the page is not written to the database
+			///      (as free-list leaf pages contain no meaningful data). Sometimes
+			///      such a page is not even journalled (as it will not be modified,
+			///      why bother journalling it?).
+			///
+			///   2) When a free-list leaf page is reused, its content is not read
+			///      from the database or written to the journal file (why should it
+			///      be, if it is not at all meaningful?).
+			///
+			/// By themselves, these optimizations work fine and provide a handy
+			/// performance boost to bulk delete or insert operations. However, if
+			/// a page is moved to the free-list and then reused within the same
+			/// transaction, a problem comes up. If the page is not journalled when
+			/// it is moved to the free-list and it is also not journalled when it
+			/// is extracted from the free-list and reused, then the original data
+			/// may be lost. In the event of a rollback, it may not be possible
+			/// to restore the database to its original configuration.
+			///
+			/// The solution is the BtShared.pHasContent bitvec. Whenever a page is
+			/// moved to become a free-list leaf page, the corresponding bit is
+			/// set in the bitvec. Whenever a leaf page is extracted from the free-list,
+			/// optimization 2 above is omitted if the corresponding bit is already
+			/// set in BtShared.pHasContent. The contents of the bitvec are cleared
+			/// at the end of every transaction.
+			///</summary>
+			int btreeSetHasContent(Pgno pgno) {
+				int rc=SQLITE_OK;
+				if(null==this.pHasContent) {
+					Debug.Assert(pgno<=this.nPage);
+					this.pHasContent=sqlite3BitvecCreate(this.nPage);
+					//if ( null == pBt.pHasContent )
+					//{
+					//  rc = SQLITE_NOMEM;
+					//}
+				}
+				if(rc==SQLITE_OK&&pgno<=sqlite3BitvecSize(this.pHasContent)) {
+					rc=sqlite3BitvecSet(this.pHasContent,pgno);
+				}
+				return rc;
+			}
+			public///<summary>
+			/// Query the BtShared.pHasContent vector.
+			///
+			/// This function is called when a free-list leaf page is removed from the
+			/// free-list for reuse. It returns false if it is safe to retrieve the
+			/// page from the pager layer with the 'no-content' flag set. True otherwise.
+			///</summary>
+			bool btreeGetHasContent(Pgno pgno) {
+				Bitvec p=this.pHasContent;
+				return (p!=null&&(pgno>sqlite3BitvecSize(p)||sqlite3BitvecTest(p,pgno)!=0));
+			}
+			public///<summary>
+			/// Clear (destroy) the BtShared.pHasContent bitvec. This should be
+			/// invoked at the conclusion of each write-transaction.
+			///</summary>
+			void btreeClearHasContent() {
+				sqlite3BitvecDestroy(ref this.pHasContent);
+				this.pHasContent=null;
+			}
+		}
 		///<summary>
 		/// An instance of the following structure is used to hold information
 		/// about a cell.  The parseCellPtr() function fills in this structure
@@ -2645,7 +2713,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			/* True if info.nKey is valid */public int eState;
 			/* One of the CURSOR_XXX constants (see below) */
 			#if !SQLITE_OMIT_INCRBLOB
-																																							public Pgno[] aOverflow;         /* Cache of overflow page locations */
+																																										public Pgno[] aOverflow;         /* Cache of overflow page locations */
 public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 #endif
 			public i16 iPage;
@@ -2672,7 +2740,7 @@ public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 				nKey=0;
 				skipNext=0;
 				#if !SQLITE_OMIT_INCRBLOB
-																																																				isIncrblobHandle=false;
+																																																								isIncrblobHandle=false;
 aOverflow= null;
 #endif
 				iPage=0;
@@ -2794,7 +2862,7 @@ aOverflow= null;
 		///
 		///</summary>
 		#if DEBUG
-																										    //define btreeIntegrity(p) \
+																												    //define btreeIntegrity(p) \
     //  Debug.Assert( p.pBt.inTransaction!=TRANS_NONE || p.pBt.nTransaction==0 ); \
     //  Debug.Assert( p.pBt.inTransaction>=p.inTrans );
     static void btreeIntegrity( Btree p )
@@ -2816,7 +2884,7 @@ aOverflow= null;
 		#if !SQLITE_OMIT_AUTOVACUUM
 		//#define ISAUTOVACUUM (pBt.autoVacuum)
 		#else
-																										//define ISAUTOVACUUM 0
+																												//define ISAUTOVACUUM 0
 public static bool ISAUTOVACUUM =false;
 #endif
 		///<summary>

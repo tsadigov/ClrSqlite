@@ -143,7 +143,7 @@ namespace Community.CsharpSqlite {
 							else
 								if((pVar.flags&MEM_Str)!=0) {
 									#if !SQLITE_OMIT_UTF16
-																																																																																																																					SqliteEncoding enc = ENC(db);
+																																																																																																																														SqliteEncoding enc = ENC(db);
 if( enc!=SqliteEncoding.UTF8 ){
 Mem utf8;
 memset(&utf8, 0, sizeof(utf8));

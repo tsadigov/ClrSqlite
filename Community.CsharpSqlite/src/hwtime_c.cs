@@ -33,9 +33,9 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if ((__GNUC__) || (_MSC_VER)) &&       ((i386) || (__i386__) || (_M_IX86))
-																										
+																												
 #if (__GNUC__)
-																										
+																												
 __inline__ sqlite_u3264 sqlite3Hwtime(void){
 unsigned int lo, hi;
 __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
@@ -43,7 +43,7 @@ return (sqlite_u3264)hi << 32 | lo;
 }
 
 #elif (_MSC_VER)
-																										
+																												
 __declspec(naked) __inline sqlite_u3264 __cdecl sqlite3Hwtime(void){
 __asm {
 rdtsc
@@ -52,9 +52,9 @@ ret       ; return value at EDX:EAX
 }
 
 #endif
-																										
+																												
 #elif ((__GNUC__) && (__x86_64__))
-																										
+																												
 __inline__ sqlite_u3264 sqlite3Hwtime(void){
 unsigned long val;
 __asm__ __volatile__ ("rdtsc" : "=A" (val));
@@ -62,7 +62,7 @@ return val;
 }
 
 #elif ( (__GNUC__) &&  (__ppc__))
-																										
+																												
 __inline__ sqlite_u3264 sqlite3Hwtime(void){
 unsigned long long retval;
 unsigned long junk;

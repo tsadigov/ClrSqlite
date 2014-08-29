@@ -27,8 +27,8 @@ namespace Community.CsharpSqlite {
 	///</summary>
 	//#include "btreeInt.h"
 	#if !SQLITE_OMIT_SHARED_CACHE
-													#if SQLITE_THREADSAFE
-													
+														#if SQLITE_THREADSAFE
+														
 /*
 ** Obtain the BtShared mutex associated with B-Tree handle p. Also,
 ** set BtShared.db to the database handle associated with p and the
@@ -148,7 +148,7 @@ if( p->wantToLock==0 ){
 }
 
 #if NDEBUG
-													/*
+														/*
 ** Return true if the BtShared mutex is held on the btree, or if the
 ** B-Tree is not marked as sharable.
 **
@@ -163,10 +163,10 @@ int sqlite3BtreeHoldsMutex(Btree *p){
   return (p->sharable==0 || p->locked);
 }
 #endif
-													
+														
 
 #if SQLITE_OMIT_INCRBLOB
-													/*
+														/*
 ** Enter and leave a mutex on a Btree given a cursor owned by that
 ** Btree.  These entry points are used by incremental I/O and can be
 ** omitted if that module is not used.
@@ -178,7 +178,7 @@ void sqlite3BtreeLeaveCursor(BtCursor *pCur){
   sqlite3BtreeLeave(pCur->pBtree);
 }
 #endif
-													
+														
 
 /*
 ** Enter the mutex on every Btree associated with a database
@@ -222,7 +222,7 @@ int sqlite3BtreeSharable(Btree *p){
 }
 
 #if NDEBUG
-													/*
+														/*
 ** Return true if the current thread holds the database connection
 ** mutex and all required BtShared mutexes.
 **
@@ -244,9 +244,9 @@ if( p && p->sharable &&
   return 1;
 }
 #endif
-													
+														
 #if NDEBUG
-													/*
+														/*
 ** Return true if the correct mutexes are held for accessing the
 ** db->aDb[iDb].pSchema structure.  The mutexes required for schema
 ** access are:
@@ -269,9 +269,9 @@ int sqlite3SchemaMutexHeld(sqlite3 db, int iDb, Schema *pSchema){
   return p->sharable==0 || p->locked==1;
 }
 #endif
-													
+														
 #else
-													///<summary>
+														///<summary>
 /// The following are special cases for mutex enter routines for use
 /// in single threaded applications that use shared cache.  Except for
 /// these two routines, all mutex operations are no-ops in that case and
@@ -294,6 +294,6 @@ if( p ){
   }
 }
 #endif
-													#endif
+														#endif
 	}
 }

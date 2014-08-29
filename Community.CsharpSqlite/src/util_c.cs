@@ -184,13 +184,13 @@ namespace Community.CsharpSqlite {
 **      ...
 */
 			#if __FAST_MATH__
-																																							#error SQLite will not work correctly with the -ffast-math option of GCC.
-																																							#endif
+																																										#error SQLite will not work correctly with the -ffast-math option of GCC.
+																																										#endif
 			double y=x;
 			double z=y;
 			rc=(y!=z);
 			#else
-																																							rc = isnan(x);
+																																										rc = isnan(x);
 #endif
 			testcase(rc);
 			return rc;
@@ -224,13 +224,13 @@ namespace Community.CsharpSqlite {
     *///#include "sqliteInt.h"
 		//#include <stdarg.h>
 		#if SQLITE_HAVE_ISNAN
-																										// include <math.h>
+																												// include <math.h>
 #endif
 		/*
 ** Routine needed to support the testcase() macro.
 */
 		#if SQLITE_COVERAGE_TEST
-																										void sqlite3Coverage(int x){
+																												void sqlite3Coverage(int x){
 static uint dummy = 0;
 dummy += (uint)x;
 }
@@ -750,7 +750,7 @@ dummy += (uint)x;
 				}
 				return n;
 				#else
-																																																			/* For following code (kept for historical record only) shows an
+																																																							/* For following code (kept for historical record only) shows an
 ** unrolling for the 3- and 4-byte varint cases.  This code is
 ** slightly faster, but it is also larger and much harder to test.
 */
@@ -948,7 +948,7 @@ return n;
 			return -x;
 		}
 	#if SQLITE_ENABLE_8_3_NAMES
-													/*
+														/*
 ** If SQLITE_ENABLE_8_3_NAME is set at compile-time and if the database
 ** filename in zBaseFilename is a URI with the "8_3_names=1" parameter and
 ** if filename in z[] has a suffix (a.k.a. "extension") that is longer than
@@ -1259,7 +1259,7 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 			/* store the result */pResult=result;
 			/* return true if number and no extra non-whitespace chracters after */return zDx>=length&&nDigits>0&&eValid!=0;
 			#else
-																																							return !sqlite3Atoi64(z, pResult, length, enc);
+																																										return !sqlite3Atoi64(z, pResult, length, enc);
 #endif
 		}
 		///<summary>
