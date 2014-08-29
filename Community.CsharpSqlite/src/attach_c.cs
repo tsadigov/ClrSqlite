@@ -295,206 +295,22 @@ namespace Community.CsharpSqlite {
 			detach_error:
 			sqlite3_result_error(context,zErr.ToString(),-1);
 		}
-		/*
-** This procedure generates VDBE code for a single invocation of either the
-** sqlite_detach() or sqlite_attach() SQL user functions.
-*/static void codeAttach(Parse pParse,/* The parser context */int type,/* Either SQLITE_ATTACH or SQLITE_DETACH */FuncDef pFunc,/* FuncDef wrapper for detachFunc() or attachFunc() */Expr pAuthArg,/* Expression to pass to authorization callback */Expr pFilename,/* Name of database file */Expr pDbname,/* Name of the database to use internally */Expr pKey/* Database key for encryption extension */) {
-			int rc;
-			NameContext sName;
-			Vdbe v;
-			sqlite3 db=pParse.db;
-			int regArgs;
-			sName=new NameContext();
-			// memset( &sName, 0, sizeof(NameContext));
-			sName.pParse=pParse;
-			if(SQLITE_OK!=(rc=resolveAttachExpr(sName,pFilename))||SQLITE_OK!=(rc=resolveAttachExpr(sName,pDbname))||SQLITE_OK!=(rc=resolveAttachExpr(sName,pKey))) {
-				pParse.nErr++;
-				goto attach_end;
-			}
-			#if !SQLITE_OMIT_AUTHORIZATION
-						if( pAuthArg ){
-char *zAuthArg;
-if( pAuthArg->op==TK_STRING ){
-  zAuthArg = pAuthArg->u.zToken;
-}else{
-  zAuthArg = 0;
-}
-rc = sqlite3AuthCheck(pParse, type, zAuthArg, 0, 0);
-if(rc!=SQLITE_OK ){
-goto attach_end;
-}
-}
-#endif
-			v=sqlite3GetVdbe(pParse);
-			regArgs=sqlite3GetTempRange(pParse,4);
-			sqlite3ExprCode(pParse,pFilename,regArgs);
-			sqlite3ExprCode(pParse,pDbname,regArgs+1);
-			sqlite3ExprCode(pParse,pKey,regArgs+2);
-			Debug.Assert(v!=null/*|| db.mallocFailed != 0 */);
-			if(v!=null) {
-				sqlite3VdbeAddOp3(v,OP_Function,0,regArgs+3-pFunc.nArg,regArgs+3);
-				Debug.Assert(pFunc.nArg==-1||(pFunc.nArg&0xff)==pFunc.nArg);
-				sqlite3VdbeChangeP5(v,(u8)(pFunc.nArg));
-				sqlite3VdbeChangeP4(v,-1,pFunc,P4_FUNCDEF);
-				/* Code an OP_Expire. For an ATTACH statement, set P1 to true (expire this
-    ** statement only). For DETACH, set it to false (expire all existing
-    ** statements).
-    */sqlite3VdbeAddOp1(v,OP_Expire,(type==SQLITE_ATTACH)?1:0);
-			}
-			attach_end:
-			sqlite3ExprDelete(db,ref pFilename);
-			sqlite3ExprDelete(db,ref pDbname);
-			sqlite3ExprDelete(db,ref pKey);
-		}
 		///<summary>
 		/// Called by the parser to compile a DETACH statement.
 		///
 		///     DETACH pDbname
 		///</summary>
 		static FuncDef detach_func=new FuncDef(1,/* nArg */SqliteEncoding.UTF8,/* iPrefEnc */0,/* flags */null,/* pUserData */null,/* pNext */detachFunc,/* xFunc */null,/* xStep */null,/* xFinalize */"sqlite_detach",/* zName */null,/* pHash */null/* pDestructor */);
-		static void sqlite3Detach(Parse pParse,Expr pDbname) {
-			codeAttach(pParse,SQLITE_DETACH,detach_func,pDbname,null,null,pDbname);
-		}
 		///<summary>
 		/// Called by the parser to compile an ATTACH statement.
 		///
 		///     ATTACH p AS pDbname KEY pKey
 		///</summary>
 		static FuncDef attach_func=new FuncDef(3,/* nArg */SqliteEncoding.UTF8,/* iPrefEnc */0,/* flags */null,/* pUserData */null,/* pNext */attachFunc,/* xFunc */null,/* xStep */null,/* xFinalize */"sqlite_attach",/* zName */null,/* pHash */null/* pDestructor */);
-		static void sqlite3Attach(Parse pParse,Expr p,Expr pDbname,Expr pKey) {
-			codeAttach(pParse,SQLITE_ATTACH,attach_func,p,p,pDbname,pKey);
-		}
-		#endif
-		///<summary>
-		/// Initialize a DbFixer structure.  This routine must be called prior
-		/// to passing the structure to one of the sqliteFixAAAA() routines below.
-		///
-		/// The return value indicates whether or not fixation is required.  TRUE
-		/// means we do need to fix the database references, FALSE means we do not.
-		///</summary>
-		static int sqlite3FixInit(DbFixer pFix,/* The fixer to be initialized */Parse pParse,/* Error messages will be written here */int iDb,/* This is the database that must be used */string zType,/* "view", "trigger", or "index" */Token pName/* Name of the view, trigger, or index */) {
-			sqlite3 db;
-			if(NEVER(iDb<0)||iDb==1)
-				return 0;
-			db=pParse.db;
-			Debug.Assert(db.nDb>iDb);
-			pFix.pParse=pParse;
-			pFix.zDb=db.aDb[iDb].zName;
-			pFix.zType=zType;
-			pFix.pName=pName;
-			return 1;
-		}
-		///<summary>
-		/// The following set of routines walk through the parse tree and assign
-		/// a specific database to all table references where the database name
-		/// was left unspecified in the original SQL statement.  The pFix structure
-		/// must have been initialized by a prior call to sqlite3FixInit().
-		///
-		/// These routines are used to make sure that an index, trigger, or
-		/// view in one database does not refer to objects in a different database.
-		/// (Exception: indices, triggers, and views in the TEMP database are
-		/// allowed to refer to anything.)  If a reference is explicitly made
-		/// to an object in a different database, an error message is added to
-		/// pParse.zErrMsg and these routines return non-zero.  If everything
-		/// checks out, these routines return 0.
-		///</summary>
-		static int sqlite3FixSrcList(DbFixer pFix,/* Context of the fixation */SrcList pList/* The Source list to check and modify */) {
-			int i;
-			string zDb;
-			SrcList_item pItem;
-			if(NEVER(pList==null))
-				return 0;
-			zDb=pFix.zDb;
-			for(i=0;i<pList.nSrc;i++) {
-				//, pItem++){
-				pItem=pList.a[i];
-				if(pItem.zDatabase==null) {
-					pItem.zDatabase=zDb;
-					// sqlite3DbStrDup( pFix.pParse.db, zDb );
-				}
-				else
-					if(!pItem.zDatabase.Equals(zDb,StringComparison.InvariantCultureIgnoreCase)) {
-						sqlite3ErrorMsg(pFix.pParse,"%s %T cannot reference objects in database %s",pFix.zType,pFix.pName,pItem.zDatabase);
-						return 1;
-					}
-				#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_TRIGGER
-				if(sqlite3FixSelect(pFix,pItem.pSelect)!=0)
-					return 1;
-				if(sqlite3FixExpr(pFix,pItem.pOn)!=0)
-					return 1;
-				#endif
-			}
-			return 0;
-		}
-		#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_TRIGGER
-		static int sqlite3FixSelect(DbFixer pFix,/* Context of the fixation */Select pSelect/* The SELECT statement to be fixed to one database */) {
-			while(pSelect!=null) {
-				if(sqlite3FixExprList(pFix,pSelect.pEList)!=0) {
-					return 1;
-				}
-				if(sqlite3FixSrcList(pFix,pSelect.pSrc)!=0) {
-					return 1;
-				}
-				if(sqlite3FixExpr(pFix,pSelect.pWhere)!=0) {
-					return 1;
-				}
-				if(sqlite3FixExpr(pFix,pSelect.pHaving)!=0) {
-					return 1;
-				}
-				pSelect=pSelect.pPrior;
-			}
-			return 0;
-		}
-		static int sqlite3FixExpr(DbFixer pFix,/* Context of the fixation */Expr pExpr/* The expression to be fixed to one database */) {
-			while(pExpr!=null) {
-				if(ExprHasAnyProperty(pExpr,EP_TokenOnly))
-					break;
-				if(ExprHasProperty(pExpr,EP_xIsSelect)) {
-					if(sqlite3FixSelect(pFix,pExpr.x.pSelect)!=0)
-						return 1;
-				}
-				else {
-					if(sqlite3FixExprList(pFix,pExpr.x.pList)!=0)
-						return 1;
-				}
-				if(sqlite3FixExpr(pFix,pExpr.pRight)!=0) {
-					return 1;
-				}
-				pExpr=pExpr.pLeft;
-			}
-			return 0;
-		}
-		static int sqlite3FixExprList(DbFixer pFix,/* Context of the fixation */ExprList pList/* The expression to be fixed to one database */) {
-			int i;
-			ExprList_item pItem;
-			if(pList==null)
-				return 0;
-			for(i=0;i<pList.nExpr;i++)//, pItem++ )
-			 {
-				pItem=pList.a[i];
-				if(sqlite3FixExpr(pFix,pItem.pExpr)!=0) {
-					return 1;
-				}
-			}
-			return 0;
-		}
-		#endif
-		#if !SQLITE_OMIT_TRIGGER
-		static int sqlite3FixTriggerStep(DbFixer pFix,/* Context of the fixation */TriggerStep pStep/* The trigger step be fixed to one database */) {
-			while(pStep!=null) {
-				if(sqlite3FixSelect(pFix,pStep.pSelect)!=0) {
-					return 1;
-				}
-				if(sqlite3FixExpr(pFix,pStep.pWhere)!=0) {
-					return 1;
-				}
-				if(sqlite3FixExprList(pFix,pStep.pExprList)!=0) {
-					return 1;
-				}
-				pStep=pStep.pNext;
-			}
-			return 0;
-		}
+	#endif
+	#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_TRIGGER
+	#endif
+	#if !SQLITE_OMIT_TRIGGER
 	#endif
 	}
 }

@@ -99,7 +99,7 @@ namespace Community.CsharpSqlite {
 			return false;
 		}
 	#else
-		
+			
 //define WAL_SAVEPOINT_NDATA 4
 const int WAL_SAVEPOINT_NDATA = 4;
 
