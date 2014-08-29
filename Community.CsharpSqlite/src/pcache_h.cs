@@ -42,7 +42,7 @@ namespace Community.CsharpSqlite {
 			/* The page number for this page */public Pager pPager;
 			/* The pager to which this page belongs */
 			#if SQLITE_CHECK_PAGES || (SQLITE_DEBUG)
-																		      public int pageHash;          /* Hash of page content */
+																					      public int pageHash;          /* Hash of page content */
 #endif
 			public int flags;
 			/* PGHDR flags defined below *//**********************************************************************
@@ -68,7 +68,7 @@ namespace Community.CsharpSqlite {
 				this.pgno=0;
 				this.pPager=null;
 				#if SQLITE_CHECK_PAGES
-																								this.pageHash=0;
+																												this.pageHash=0;
 #endif
 				this.flags=0;
 				this.nRef=0;
@@ -78,8 +78,40 @@ namespace Community.CsharpSqlite {
 				this.pDirtyPrev=null;
 				this.pPgHdr1=null;
 			}
-		};
-
+			public///<summary>
+			/// Return true if it is necessary to write page *pPg into the sub-journal.
+			/// A page needs to be written into the sub-journal if there exists one
+			/// or more open savepoints for which:
+			///
+			///   * The page-number is less than or equal to PagerSavepoint.nOrig, and
+			///   * The bit corresponding to the page-number is not set in
+			///     PagerSavepoint.pInSavepoint.
+			///</summary>
+			bool subjRequiresPage() {
+				u32 pgno=this.pgno;
+				Pager pPager=this.pPager;
+				int i;
+				for(i=0;i<pPager.nSavepoint;i++) {
+					PagerSavepoint p=pPager.aSavepoint[i];
+					if(p.nOrig>=pgno&&0==sqlite3BitvecTest(p.pInSavepoint,pgno)) {
+						return true;
+					}
+				}
+				return false;
+			}
+			public///<summary>
+			/// Return true if the page is already in the journal file.
+			///
+			///</summary>
+			bool pageInJournal() {
+				return sqlite3BitvecTest(this.pPager.pInJournal,this.pgno)!=0;
+			}
+			public int pager_pagehash() {
+				return 0;
+			}
+			public void pager_set_pagehash() {
+			}
+		}
 		/* Bit values for PgHdr.flags *///#define PGHDR_DIRTY             0x002  /* Page has changed */
 		//#define PGHDR_NEED_SYNC         0x004  /* Fsync the rollback journal before
 		//                                       ** writing this page to the database */
@@ -131,7 +163,7 @@ namespace Community.CsharpSqlite {
 	//int sqlite3PcachePageRefcount(PgHdr*);
 	/* Return the total number of pages stored in the cache *///int sqlite3PcachePagecount(PCache*);
 	#if SQLITE_CHECK_PAGES
-						/* Iterate through all dirty pages currently stored in the cache. This
+							/* Iterate through all dirty pages currently stored in the cache. This
 ** interface is only available if SQLITE_CHECK_PAGES is defined when the
 ** library is built.
 */
@@ -145,14 +177,14 @@ namespace Community.CsharpSqlite {
 ** of the suggested cache-sizes.
 *///void sqlite3PcacheSetCachesize(PCache *, int);
 	#if SQLITE_TEST
-						    //int sqlite3PcacheGetCachesize(PCache *);
+							    //int sqlite3PcacheGetCachesize(PCache *);
 #endif
 	#if SQLITE_ENABLE_MEMORY_MANAGEMENT
-						/* Try to return memory used by the pcache module to the main memory heap */
+							/* Try to return memory used by the pcache module to the main memory heap */
 //int sqlite3PcacheReleaseMemory(int);
 #endif
 	#if SQLITE_TEST
-						    //void sqlite3PcacheStats(int*,int*,int*,int*);
+							    //void sqlite3PcacheStats(int*,int*,int*,int*);
 #endif
 	//void sqlite3PCacheSetDefault(void);
 	#endif

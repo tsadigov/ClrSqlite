@@ -167,7 +167,7 @@ namespace Community.CsharpSqlite {
 						rc=SQLITE_ERROR;
 					}
 					pPager=sqlite3BtreePager(aNew.pBt);
-					sqlite3PagerLockingMode(pPager,db.dfltLockMode);
+					pPager.sqlite3PagerLockingMode(db.dfltLockMode);
 					sqlite3BtreeSecureDelete(aNew.pBt,sqlite3BtreeSecureDelete(db.aDb[0].pBt,-1));
 				}
 			aNew.safety_level=3;

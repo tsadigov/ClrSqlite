@@ -46,7 +46,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if SQLITE_OMIT_WSD
-												// define wsdStatInit  sqlite3StatType *x = &GLOBAL(sqlite3StatType,sqlite3Stat)
+														// define wsdStatInit  sqlite3StatType *x = &GLOBAL(sqlite3StatType,sqlite3Stat)
 // define wsdStat x[0]
 #else
 		//# define wsdStatInit
@@ -149,7 +149,7 @@ namespace Community.CsharpSqlite {
 					Btree pBt=db.aDb[i].pBt;
 					if(pBt!=null) {
 						Pager pPager=sqlite3BtreePager(pBt);
-						totalUsed+=sqlite3PagerMemUsed(pPager);
+						totalUsed+=pPager.sqlite3PagerMemUsed();
 					}
 				}
 				sqlite3BtreeLeaveAll(db);

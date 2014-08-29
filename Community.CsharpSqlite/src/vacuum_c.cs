@@ -51,7 +51,7 @@ namespace Community.CsharpSqlite {
 		static int execSql(sqlite3 db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
 			#if !NDEBUG
-																		      int rc;
+																					      int rc;
       //VVA_ONLY( int rc; )
 #endif
 			if(zSql==null) {
@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 				return sqlite3_errcode(db);
 			}
 			#if !NDEBUG
-																		      rc = sqlite3_step( pStmt );
+																					      rc = sqlite3_step( pStmt );
       //VVA_ONLY( rc = ) sqlite3_step(pStmt);
       Debug.Assert( rc != SQLITE_ROW );
 #else
@@ -142,7 +142,7 @@ namespace Community.CsharpSqlite {
 			db.flags&=~(SQLITE_ForeignKeys|SQLITE_ReverseOrder);
 			db.xTrace=null;
 			pMain=db.aDb[0].pBt;
-			isMemDb=sqlite3PagerIsMemdb(sqlite3BtreePager(pMain));
+			isMemDb=sqlite3BtreePager(pMain).sqlite3PagerIsMemdb();
 			/* Attach the temporary database as 'vacuum_db'. The synchronous pragma
       ** can be set to 'off' for this file, as it is not recovered if a crash
       ** occurs anyway. The integrity of the database is maintained by a
@@ -190,7 +190,7 @@ namespace Community.CsharpSqlite {
 					db.nextPagesize=0;
 			}
 			#endif
-			/* Do not attempt to change the page size for a WAL database */if(sqlite3PagerGetJournalMode(sqlite3BtreePager(pMain))==PAGER_JOURNALMODE_WAL) {
+			/* Do not attempt to change the page size for a WAL database */if(sqlite3BtreePager(pMain).sqlite3PagerGetJournalMode()==PAGER_JOURNALMODE_WAL) {
 				db.nextPagesize=0;
 			}
 			if(sqlite3BtreeSetPageSize(pTemp,sqlite3BtreeGetPageSize(pMain),nRes,0)!=0||(!isMemDb&&sqlite3BtreeSetPageSize(pTemp,db.nextPagesize,nRes,0)!=0)//|| NEVER( db.mallocFailed != 0 )

@@ -57,7 +57,7 @@ namespace Community.CsharpSqlite {
 		//#include "btreeInt.h"
 		//#include "crypto.h"
 		#if CODEC_DEBUG || TRACE
-												//define CODEC_TRACE(X) {printf X;fflush(stdout);}
+														//define CODEC_TRACE(X) {printf X;fflush(stdout);}
 static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace )sqlite3DebugPrintf( T, ap ); }
 #else
 		//#define CODEC_TRACE(X)
@@ -141,7 +141,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 		const int CIPHER_ENCRYPT=1;
 		//#define CIPHER_ENCRYPT 1
 		#if NET_2_0
-												    static RijndaelManaged Aes = new RijndaelManaged();
+														    static RijndaelManaged Aes = new RijndaelManaged();
 #else
 		static AesManaged Aes=new AesManaged();
 		#endif
@@ -155,7 +155,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 			return (isOpen(pPager.fd))?pPager.fd:null;
 		}
 		static void sqlite3pager_sqlite3PagerSetCodec(Pager pPager,dxCodec xCodec,dxCodecSizeChng xCodecSizeChng,dxCodecFree xCodecFree,codec_ctx pCodec) {
-			sqlite3PagerSetCodec(pPager,xCodec,xCodecSizeChng,xCodecFree,pCodec);
+			pPager.sqlite3PagerSetCodec(xCodec,xCodecSizeChng,xCodecFree,pCodec);
 		}
 		/* END CRYPTO *///static void activate_openssl() {
 		//  if(EVP_get_cipherbyname(CIPHER) == null) {
@@ -294,7 +294,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 					c_ctx.key=k1.GetBytes(c_ctx.key_sz);
 				}
 				#if NET_2_0
-																								        Aes.BlockSize = 0x80;
+																												        Aes.BlockSize = 0x80;
         Aes.FeedbackSize = 8;
         Aes.KeySize = 0x100;
         Aes.Mode = CipherMode.CBC;
@@ -487,7 +487,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 				BtShared pBt=db.aDb[0].pBt.pBt;
 				byte[] zDbHeader=sqlite3MemMalloc((int)pBt.pageSize);
 				// pBt.pPager.pCodec.buffer;
-				sqlite3PagerReadFileheader(pBt.pPager,zDbHeader.Length,zDbHeader);
+				pBt.pPager.sqlite3PagerReadFileheader(zDbHeader.Length,zDbHeader);
 				if(Converter.sqlite3Get4byte(zDbHeader)>0)// Existing Database, need to reset some values
 				 {
 					CODEC2(pBt.pPager,zDbHeader,2,SQLITE_DECRYPT,ref zDbHeader);
@@ -500,7 +500,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 					pBt.autoVacuum=Converter.sqlite3Get4byte(zDbHeader,36+4*4)!=0;
 					pBt.incrVacuum=Converter.sqlite3Get4byte(zDbHeader,36+7*4)!=0;
 					#endif
-					sqlite3PagerSetPagesize(pBt.pPager,ref pBt.pageSize,nReserve);
+					pBt.pPager.sqlite3PagerSetPagesize(ref pBt.pageSize,nReserve);
 					pBt.usableSize=(u16)(pBt.pageSize-nReserve);
 				}
 				return SQLITE_OK;
@@ -558,10 +558,10 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
           ** 3. If that goes ok then commit and put ctx.rekey into ctx.key
           ** note: don't deallocate rekey since it may be used in a subsequent iteration
           */rc=sqlite3BtreeBeginTrans(pDb.pBt,1);
-					/* begin write transaction */sqlite3PagerPagecount(pPager,out page_count);
+					/* begin write transaction */pPager.sqlite3PagerPagecount(out page_count);
 					for(pgno=1;rc==SQLITE_OK&&pgno<=page_count;pgno++) {
 						/* pgno's start at 1 see pager.c:pagerAcquire */if(0==sqlite3pager_is_mj_pgno(pPager,pgno)) {
-							/* skip this page (see pager.c:pagerAcquire for reasoning) */rc=sqlite3PagerGet(pPager,pgno,ref page);
+							/* skip this page (see pager.c:pagerAcquire for reasoning) */rc=pPager.sqlite3PagerGet(pgno,ref page);
 							if(rc==SQLITE_OK) {
 								/* write page see pager_incr_changecounter for example */rc=sqlite3PagerWrite(page);
 								//printf("sqlite3PagerWrite(%d)\n", pgno);

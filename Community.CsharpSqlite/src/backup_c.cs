@@ -146,7 +146,7 @@ namespace Community.CsharpSqlite {
 					/* Do not allow backup if the destination database is in WAL mode
     ** and the page sizes are different between source and destination */pgszSrc=sqlite3BtreeGetPageSize(this.pSrc);
 					pgszDest=sqlite3BtreeGetPageSize(this.pDest);
-					destMode=sqlite3PagerGetJournalMode(sqlite3BtreePager(this.pDest));
+					destMode=sqlite3BtreePager(this.pDest).sqlite3PagerGetJournalMode();
 					if(SQLITE_OK==rc&&destMode==PAGER_JOURNALMODE_WAL&&pgszSrc!=pgszDest) {
 						rc=SQLITE_READONLY;
 					}
@@ -158,7 +158,7 @@ namespace Community.CsharpSqlite {
 						Pgno iSrcPg=this.iNext;
 						/* Source page number */if(iSrcPg!=PENDING_BYTE_PAGE(this.pSrc.pBt)) {
 							DbPage pSrcPg=null;
-							/* Source page object */rc=sqlite3PagerGet(pSrcPager,(u32)iSrcPg,ref pSrcPg);
+							/* Source page object */rc=pSrcPager.sqlite3PagerGet((u32)iSrcPg,ref pSrcPg);
 							if(rc==SQLITE_OK) {
 								rc=this.backupOnePage(iSrcPg,sqlite3PagerGetData(pSrcPg));
 								sqlite3PagerUnref(pSrcPg);
@@ -209,7 +209,7 @@ namespace Community.CsharpSqlite {
 						else {
 							nDestTruncate=(Pgno)(nSrcPage*(pgszSrc/pgszDest));
 						}
-						sqlite3PagerTruncateImage(pDestPager,nDestTruncate);
+						pDestPager.sqlite3PagerTruncateImage(nDestTruncate);
 						if(pgszSrc<pgszDest) {
 							/* If the source page-size is smaller than the destination page-size,
         ** two extra things may need to happen:
@@ -220,7 +220,7 @@ namespace Community.CsharpSqlite {
         **     pending-byte page in the source database may need to be
         **     copied into the destination database.
         */int iSize=(int)(pgszSrc*nSrcPage);
-							sqlite3_file pFile=sqlite3PagerFile(pDestPager);
+							sqlite3_file pFile=pDestPager.sqlite3PagerFile();
 							i64 iOff;
 							i64 iEnd;
 							Debug.Assert(pFile!=null);
@@ -230,12 +230,12 @@ namespace Community.CsharpSqlite {
         ** journal synced to disk. So at this point we may safely modify
         ** the database file in any way, knowing that if a power failure
         ** occurs, the original database will be reconstructed from the 
-        ** journal file.  */rc=sqlite3PagerCommitPhaseOne(pDestPager,null,true);
+        ** journal file.  */rc=pDestPager.sqlite3PagerCommitPhaseOne(null,true);
 							/* Write the extra pages and truncate the database file as required. */iEnd=MIN(PENDING_BYTE+pgszDest,iSize);
 							for(iOff=PENDING_BYTE+pgszSrc;rc==SQLITE_OK&&iOff<iEnd;iOff+=pgszSrc) {
 								PgHdr pSrcPg=null;
 								u32 iSrcPg=(u32)((iOff/pgszSrc)+1);
-								rc=sqlite3PagerGet(pSrcPager,iSrcPg,ref pSrcPg);
+								rc=pSrcPager.sqlite3PagerGet(iSrcPg,ref pSrcPg);
 								if(rc==SQLITE_OK) {
 									byte[] zData=sqlite3PagerGetData(pSrcPg);
 									rc=sqlite3OsWrite(pFile,zData,pgszSrc,iOff);
@@ -246,11 +246,11 @@ namespace Community.CsharpSqlite {
 								rc=pFile.backupTruncateFile((int)iSize);
 							}
 							/* Sync the database file to disk. */if(rc==SQLITE_OK) {
-								rc=sqlite3PagerSync(pDestPager);
+								rc=pDestPager.sqlite3PagerSync();
 							}
 						}
 						else {
-							rc=sqlite3PagerCommitPhaseOne(pDestPager,null,false);
+							rc=pDestPager.sqlite3PagerCommitPhaseOne(null,false);
 						}
 						/* Finish committing the transaction to the destination database. */if(SQLITE_OK==rc&&SQLITE_OK==(rc=sqlite3BtreeCommitPhaseTwo(this.pDest,0))) {
 							rc=SQLITE_DONE;
@@ -262,7 +262,7 @@ namespace Community.CsharpSqlite {
     ** "committing" a read-only transaction cannot fail.
     */if(bCloseTrans!=0) {
 						#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																	      //TESTONLY( int rc2 );
+																																							      //TESTONLY( int rc2 );
       //TESTONLY( rc2  = ) sqlite3BtreeCommitPhaseOne(p.pSrc, 0);
       //TESTONLY( rc2 |= ) sqlite3BtreeCommitPhaseTwo(p.pSrc);
       int rc2;
@@ -305,7 +305,7 @@ namespace Community.CsharpSqlite {
 					this.pSrc.nBackup--;
 				}
 				if(this.isAttached!=0) {
-					pp=sqlite3PagerBackupPtr(sqlite3BtreePager(this.pSrc));
+					pp=sqlite3BtreePager(this.pSrc).sqlite3PagerBackupPtr();
 					while(pp!=this) {
 						pp=(pp).pNext;
 					}
@@ -363,13 +363,13 @@ namespace Community.CsharpSqlite {
 				Debug.Assert(zSrcData!=null);
 				/* Catch the case where the destination is an in-memory database and the
   ** page sizes of the source and destination differ.
-  */if(nSrcPgsz!=nDestPgsz&&sqlite3PagerIsMemdb(pDestPager)) {
+  */if(nSrcPgsz!=nDestPgsz&&pDestPager.sqlite3PagerIsMemdb()) {
 					rc=SQLITE_READONLY;
 				}
 				#if SQLITE_HAS_CODEC
 				/* Backup is not possible if the page size of the destination is changing
   ** and a codec is in use.
-  */if(nSrcPgsz!=nDestPgsz&&sqlite3PagerGetCodec(pDestPager)!=null) {
+  */if(nSrcPgsz!=nDestPgsz&&pDestPager.sqlite3PagerGetCodec()!=null) {
 					rc=SQLITE_READONLY;
 				}
 				/* Backup is not possible if the number of bytes of reserve space differ
@@ -378,7 +378,7 @@ namespace Community.CsharpSqlite {
   ** then the backup cannot proceed.
   */if(nSrcReserve!=nDestReserve) {
 					u32 newPgsz=(u32)nSrcPgsz;
-					rc=sqlite3PagerSetPagesize(pDestPager,ref newPgsz,nSrcReserve);
+					rc=pDestPager.sqlite3PagerSetPagesize(ref newPgsz,nSrcReserve);
 					if(rc==SQLITE_OK&&newPgsz!=nSrcPgsz)
 						rc=SQLITE_READONLY;
 				}
@@ -391,7 +391,7 @@ namespace Community.CsharpSqlite {
 					u32 iDest=(u32)(iOff/nDestPgsz)+1;
 					if(iDest==PENDING_BYTE_PAGE(this.pDest.pBt))
 						continue;
-					if(SQLITE_OK==(rc=sqlite3PagerGet(pDestPager,iDest,ref pDestPg))&&SQLITE_OK==(rc=sqlite3PagerWrite(pDestPg))) {
+					if(SQLITE_OK==(rc=pDestPager.sqlite3PagerGet(iDest,ref pDestPg))&&SQLITE_OK==(rc=sqlite3PagerWrite(pDestPg))) {
 						//string zIn = &zSrcData[iOff%nSrcPgsz];
 						byte[] zDestData=sqlite3PagerGetData(pDestPg);
 						//string zOut = &zDestData[iOff % nDestPgsz];
@@ -417,7 +417,7 @@ namespace Community.CsharpSqlite {
 			void attachBackupObject() {
 				sqlite3_backup pp;
 				Debug.Assert(sqlite3BtreeHoldsMutex(this.pSrc));
-				pp=sqlite3PagerBackupPtr(sqlite3BtreePager(this.pSrc));
+				pp=sqlite3BtreePager(this.pSrc).sqlite3PagerBackupPtr();
 				this.pNext=pp;
 				sqlite3BtreePager(this.pSrc).pBackup=this;
 				//*pp = p;
