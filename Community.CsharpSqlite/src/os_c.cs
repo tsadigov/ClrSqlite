@@ -49,7 +49,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if (SQLITE_TEST)
-								    static int sqlite3_memdebug_vfs_oom_test = 1;
+										    static int sqlite3_memdebug_vfs_oom_test = 1;
 
     //define DO_OS_MALLOC_TEST(x)                                       \
     //if (sqlite3_memdebug_vfs_oom_test && (!x || !sqlite3IsMemJournal(x))) {  \
@@ -244,7 +244,7 @@ namespace Community.CsharpSqlite {
 		static sqlite3_vfs sqlite3_vfs_find(string zVfs) {
 			sqlite3_vfs pVfs=null;
 			#if SQLITE_THREADSAFE
-												      sqlite3_mutex mutex;
+															      sqlite3_mutex mutex;
 #endif
 			#if !SQLITE_OMIT_AUTOINIT
 			int rc=sqlite3_initialize();
@@ -252,7 +252,7 @@ namespace Community.CsharpSqlite {
 				return null;
 			#endif
 			#if SQLITE_THREADSAFE
-												      mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
+															      mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #endif
 			sqlite3_mutex_enter(mutex);
 			for(pVfs=vfsList;pVfs!=null;pVfs=pVfs.pNext) {
@@ -320,7 +320,7 @@ namespace Community.CsharpSqlite {
     ** Unregister a VFS so that it is no longer accessible.
     */static int sqlite3_vfs_unregister(sqlite3_vfs pVfs) {
 			#if SQLITE_THREADSAFE
-												      sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
+															      sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #endif
 			sqlite3_mutex_enter(mutex);
 			vfsUnlink(pVfs);

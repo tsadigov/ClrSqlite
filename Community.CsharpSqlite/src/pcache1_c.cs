@@ -324,7 +324,7 @@ namespace Community.CsharpSqlite {
 			}
 		}
 		#if SQLITE_ENABLE_MEMORY_MANAGEMENT
-								/*
+										/*
 ** Return the size of a pcache allocation
 */
 static int pcache1MemSize(object p){
@@ -556,7 +556,7 @@ static int pcache1MemSize(object p){
     ** The PCache mutex must be held when this function is called.
     */static void pcache1TruncateUnsafe(PCache1 pCache,/* The cache to truncate */uint iLimit/* Drop pages with this pgno or larger */) {
 			#if !NDEBUG || SQLITE_COVERAGE_TEST
-												      uint nPage = 0;
+															      uint nPage = 0;
 #endif
 			uint h;
 			Debug.Assert(sqlite3_mutex_held(pCache.pGroup.mutex));
@@ -578,14 +578,14 @@ static int pcache1MemSize(object p){
 					else {
 						pp=pPage.pNext;
 						#if !NDEBUG || SQLITE_COVERAGE_TEST
-																								            nPage++;
+																														            nPage++;
 #endif
 					}
 					pPrev=pPage;
 				}
 			}
 			#if !NDEBUG || SQLITE_COVERAGE_TEST
-												      Debug.Assert( pCache.nPage == nPage );
+															      Debug.Assert( pCache.nPage == nPage );
 #endif
 		}
 		/******************************************************************************////<summary>
@@ -645,7 +645,7 @@ static int pcache1MemSize(object p){
 			#if (SQLITE_ENABLE_MEMORY_MANAGEMENT) || !SQLITE_THREADSAF
 			const int separateCache=0;
 			#else
-												  int separateCache = sqlite3GlobalConfig.bCoreMutex>0;
+															  int separateCache = sqlite3GlobalConfig.bCoreMutex>0;
 #endif
 			//sz = sizeof( PCache1 ) + sizeof( PGroup ) * separateCache;
 			pCache=new PCache1();
@@ -954,7 +954,7 @@ static int pcache1MemSize(object p){
 			sqlite3_config(SQLITE_CONFIG_PCACHE,defaultMethods);
 		}
 	#if SQLITE_ENABLE_MEMORY_MANAGEMENT
-				/*
+					/*
 ** This function is called to free superfluous dynamically allocated memory
 ** held by the pager system. Memory in use by any SQLite pager allocated
 ** by the current thread may be sqlite3_free()ed.
@@ -982,7 +982,7 @@ int sqlite3PcacheReleaseMemory(int nReq){
 }
 #endif
 	#if SQLITE_TEST
-				    /*
+					    /*
 ** This function is used by test procedures to inspect the internal state
 ** of the global cache.
 */

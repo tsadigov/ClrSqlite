@@ -39,7 +39,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static int sqlite3_release_memory(int n) {
 			#if SQLITE_ENABLE_MEMORY_MANAGEMENT
-												int nRet = 0;
+															int nRet = 0;
 nRet += sqlite3PcacheReleaseMemory(n-nRet);
 return nRet;
 #else
@@ -147,7 +147,7 @@ return nRet;
 			sqlite3_release_memory(allocSize);
 		}
 		#if !SQLITE_OMIT_DEPRECATED
-								///<summary>
+										///<summary>
 /// Deprecated external interface.  Internal/core SQLite code
 /// should call sqlite3MemoryAlarm.
 ///</summary>
@@ -327,7 +327,7 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
 			}
 			p=sqlite3GlobalConfig.m.xMallocInt(nFull);
 			#if SQLITE_ENABLE_MEMORY_MANAGEMENT
-												if( p==null && mem0.alarmCallback!=null ){
+															if( p==null && mem0.alarmCallback!=null ){
 sqlite3MallocAlarm(nFull);
 p = sqlite3GlobalConfig.m.xMalloc(nFull);
 }
@@ -437,7 +437,7 @@ p = sqlite3GlobalConfig.m.xMalloc(nFull);
 		///
 		///</summary>
 		#if SQLITE_THREADSAFE && !(NDEBUG)
-								    static int scratchAllocOut = 0;
+										    static int scratchAllocOut = 0;
 #endif
 		///<summary>
 		/// Allocate memory that is to be used and released right away.
@@ -461,7 +461,7 @@ p = sqlite3GlobalConfig.m.xMalloc(nFull);
 			byte[] p=null;
 			Debug.Assert(n>0);
 			#if SQLITE_THREADSAFE && !(NDEBUG)
-												      /* Verify that no more than two scratch allocation per thread
+															      /* Verify that no more than two scratch allocation per thread
 ** is outstanding at one time.  (This is only checked in the
 ** single-threaded case since checking in the multi-threaded case
 ** would be much more complicated.) */
@@ -497,7 +497,7 @@ p = sqlite3GlobalConfig.m.xMalloc(nFull);
 				}
 			}
 			#if SQLITE_THREADSAFE && !(NDEBUG)
-												      scratchAllocOut = ( p != null ? 1 : 0 );
+															      scratchAllocOut = ( p != null ? 1 : 0 );
 #endif
 			return p;
 			scratch_overflow:
@@ -514,7 +514,7 @@ p = sqlite3GlobalConfig.m.xMalloc(nFull);
 			}
 			sqlite3MemdebugSetType(p,MemType.SCRATCH);
 			#if SQLITE_THREADSAFE && !(NDEBUG)
-												      scratchAllocOut = ( p != null ) ? 1 : 0;
+															      scratchAllocOut = ( p != null ) ? 1 : 0;
 #endif
 			return p;
 		}
@@ -551,7 +551,7 @@ p = sqlite3GlobalConfig.m.xMalloc(nFull);
 					//sqlite3StatusAdd(SQLITE_STATUS_SCRATCH_USED, -1);
 					//sqlite3_mutex_leave(mem0.mutex);
 					#if SQLITE_THREADSAFE && !(NDEBUG)
-																				          /* Verify that no more than two scratch allocation per thread
+																									          /* Verify that no more than two scratch allocation per thread
 ** is outstanding at one time.  (This is only checked in the
 ** single-threaded case since checking in the multi-threaded case
 ** would be much more complicated.) */
@@ -594,7 +594,7 @@ p = sqlite3GlobalConfig.m.xMalloc(nFull);
 		///
 		///</summary>
 		#if !SQLITE_OMIT_LOOKASIDE
-								static int isLookaside(sqlite3 db, object  *p){
+										static int isLookaside(sqlite3 db, object  *p){
 return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
 }
 #else
@@ -682,12 +682,12 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
 				#if SQLITE_OMIT_LOOKASIDE
 				//db.pnBytesFreed += 1;
 				#else
-																db.pnBytesFreed += sqlite3DbMallocSize( db, p );
+																				db.pnBytesFreed += sqlite3DbMallocSize( db, p );
 #endif
 				return;
 				//}
 				#if !SQLITE_OMIT_LOOKASIDE
-																if( isLookaside(db, p) ){
+																				if( isLookaside(db, p) ){
 LookasideSlot *pBuf = (LookasideSlot)p;
 pBuf.pNext = db.lookaside.pFree;
 db.lookaside.pFree = pBuf;
@@ -816,7 +816,7 @@ db.lookaside.nOut--;
 			Debug.Assert(db==null||sqlite3_mutex_held(db.mutex));
 			Debug.Assert(db==null||db.pnBytesFreed==0);
 			#if !SQLITE_OMIT_LOOKASIDE
-												if( db ){
+															if( db ){
 LookasideSlot *pBuf;
 if( db->mallocFailed ){
 return 0;
@@ -847,7 +847,7 @@ return (void)pBuf;
 			//  db->mallocFailed = 1;
 			//}
 			#if !SQLITE_OMIT_LOOKASIDE
-												sqlite3MemdebugSetType(p, MemType.DB |
+															sqlite3MemdebugSetType(p, MemType.DB |
 ((db !=null && db.lookaside.bEnabled) ? MemType.LOOKASIDE : MemType.HEAP));
 #endif
 			return p;
@@ -864,7 +864,7 @@ return (void)pBuf;
 				return sqlite3DbMallocRaw(db,n);
 			}
 			#if !SQLITE_OMIT_LOOKASIDE
-												if( isLookaside(db, p) ){
+															if( isLookaside(db, p) ){
 if( n<=db->lookaside.sz ){
 return p;
 }
@@ -887,7 +887,7 @@ sqlite3DbFree(db, ref p);
 					//  db->mallocFailed = 1;
 					//}
 					#if !SQLITE_OMIT_LOOKASIDE
-																				sqlite3MemdebugSetType(pNew, MemType.DB | 
+																									sqlite3MemdebugSetType(pNew, MemType.DB | 
 (db.lookaside.bEnabled ? MemType.LOOKASIDE : MemType.HEAP));
 #endif
 				}

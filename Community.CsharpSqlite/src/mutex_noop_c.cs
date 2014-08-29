@@ -72,7 +72,7 @@ namespace Community.CsharpSqlite {
 		sqlite3_mutex_methods sqlite3DefaultMutex() {
 			sqlite3_mutex_methods sMutex=new sqlite3_mutex_methods((dxMutexInit)noopMutexInit,(dxMutexEnd)noopMutexEnd,(dxMutexAlloc)noopMutexAlloc,(dxMutexFree)noopMutexFree,(dxMutexEnter)noopMutexEnter,(dxMutexTry)noopMutexTry,(dxMutexLeave)noopMutexLeave,
 			#if SQLITE_DEBUG
-												(dxMutexHeld)noopMutexHeld,
+															(dxMutexHeld)noopMutexHeld,
 (dxMutexNotheld)noopMutexNotheld
 #else
 			null,null
@@ -82,7 +82,7 @@ namespace Community.CsharpSqlite {
 		}
 	#endif
 	#if SQLITE_DEBUG && !SQLITE_MUTEX_OMIT
-				    /*
+					    /*
 ** In this implementation, error checking is provided for testing
 ** and debugging purposes.  The mutexes still do not provide any
 ** mutual exclusion.
@@ -232,7 +232,7 @@ namespace Community.CsharpSqlite {
 ** is used regardless of the run-time threadsafety setting.
 */
 	#if SQLITE_MUTEX_NOOP
-				sqlite3_mutex_methods const sqlite3DefaultMutex(void){
+					sqlite3_mutex_methods const sqlite3DefaultMutex(void){
 return sqlite3NoopMutex();
 }
 #endif

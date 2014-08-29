@@ -366,7 +366,7 @@ namespace Community.CsharpSqlite {
 			return nHeight;
 		}
 		#else
-								//define exprSetHeight(y)
+										//define exprSetHeight(y)
 #endif
 		///<summary>
 		/// This routine is the core allocator for Expr nodes.
@@ -420,7 +420,7 @@ namespace Community.CsharpSqlite {
 						//pNew.u.zToken[pToken.n] = 0;
 						if(dequote!=0&&nExtra>=3&&((c=pToken.z[0])=='\''||c=='"'||c=='['||c=='`')) {
 							#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																												StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
+																																			StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
 #else
 							StringExtensions.sqlite3Dequote(ref pNew.u.zToken);
 							#endif
@@ -649,7 +649,7 @@ namespace Community.CsharpSqlite {
 				sqlite3ExprDelete(db,ref p.pRight);
 				if(!ExprHasProperty(p,EP_Reduced)&&(p.flags2&EP2_MallocedToken)!=0) {
 					#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																				sqlite3DbFree( db, ref p.u._zToken );
+																									sqlite3DbFree( db, ref p.u._zToken );
 #else
 					sqlite3DbFree(db,ref p.u.zToken);
 					#endif
@@ -1025,7 +1025,7 @@ namespace Community.CsharpSqlite {
 			return pNew;
 		}
 		#else
-								Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
+										Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
 Debug.Assert( p==null );
 return null;
 }
@@ -1543,7 +1543,7 @@ return null;
 							sqlite3VdbeAddOp2(v,OP_Integer,1,iMem);
 							sqlite3VdbeAddOp4(v,OP_OpenRead,iTab,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 							#if SQLITE_DEBUG
-																												              VdbeComment( v, "%s", pIdx.zName );
+																																			              VdbeComment( v, "%s", pIdx.zName );
 #endif
 							eType=IN_INDEX_INDEX;
 							sqlite3VdbeJumpHere(v,iAddr);
@@ -1768,14 +1768,14 @@ return null;
 					dest.eDest=SelectResultType.Mem;
 					sqlite3VdbeAddOp2(v,OP_Null,0,dest.iParm);
 					#if SQLITE_DEBUG
-																				              VdbeComment( v, "Init subquery result" );
+																									              VdbeComment( v, "Init subquery result" );
 #endif
 				}
 				else {
 					dest.eDest=SelectResultType.Exists;
 					sqlite3VdbeAddOp2(v,OP_Integer,0,dest.iParm);
 					#if SQLITE_DEBUG
-																				              VdbeComment( v, "Init EXISTS result" );
+																									              VdbeComment( v, "Init EXISTS result" );
 #endif
 				}
 				sqlite3ExprDelete(pParse.db,ref pSel.pLimit);
@@ -1964,7 +1964,7 @@ return null;
 				}
 				else {
 					#if SQLITE_OMIT_FLOATING_POINT
-																				sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
+																									sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
 #else
 					codeReal(v,z,negFlag,iMem);
 					#endif
@@ -2006,10 +2006,10 @@ return null;
       ** that the object will never already be in cache.  Verify this guarantee.
       */
 			#if !NDEBUG
-												      for ( i = 0; i < SQLITE_N_COLCACHE; i++ )//p=pParse.aColCache... p++)
+															      for ( i = 0; i < SQLITE_N_COLCACHE; i++ )//p=pParse.aColCache... p++)
       {
 #if FALSE
-												p = pParse.aColCache[i];
+															p = pParse.aColCache[i];
 if ( p.iReg != 0 && p.iTable == iTab && p.iColumn == iCol )
 {
 cacheEntryClear( pParse, p );
@@ -2019,7 +2019,7 @@ p.lru = pParse.iCacheCnt++;
 return;
 }
 #endif
-												        Debug.Assert( p.iReg == 0 || p.iTable != iTab || p.iColumn != iCol );
+															        Debug.Assert( p.iReg == 0 || p.iTable != iTab || p.iColumn != iCol );
       }
 #endif
 			/* Find an empty slot and replace it */for(i=0;i<SQLITE_N_COLCACHE;i++)//p=pParse.aColCache... p++)
@@ -2225,7 +2225,7 @@ return;
 			}
 		}
 		#if (SQLITE_DEBUG) || (SQLITE_COVERAGE_TEST)
-								    /*
+										    /*
 ** Return true if any register in the range iFrom..iTo (inclusive)
 ** is used as part of the column cache.
 **
@@ -2754,7 +2754,7 @@ return;
 				/* The X expression */Expr pTest=null;
 				/* X==Ei (form A) or just Ei (form B) */
 				#if !NDEBUG
-																            int iCacheLevel = pParse.iCacheLevel;
+																				            int iCacheLevel = pParse.iCacheLevel;
             //VVA_ONLY( int iCacheLevel = pParse.iCacheLevel; )
 #endif
 				Debug.Assert(!ExprHasProperty(pExpr,EP_xIsSelect)&&pExpr.x.pList!=null);
@@ -2807,7 +2807,7 @@ return;
 					sqlite3VdbeAddOp2(v,OP_Null,0,target);
 				}
 				#if !NDEBUG
-																            Debug.Assert( /* db.mallocFailed != 0 || */ pParse.nErr > 0
+																				            Debug.Assert( /* db.mallocFailed != 0 || */ pParse.nErr > 0
             || pParse.iCacheLevel == iCacheLevel );
 #endif
 				sqlite3VdbeResolveLabel(v,endLabel);
@@ -3228,7 +3228,7 @@ return;
 				break;
 			}
 			#if SQLITE_OMIT_SUBQUERY
-												        case TK_IN:
+															        case TK_IN:
           {
             int destIfFalse = sqlite3VdbeMakeLabel( v );
             int destIfNull = jumpIfNull != 0 ? dest : destIfFalse;
@@ -3366,7 +3366,7 @@ return;
 				break;
 			}
 			#if SQLITE_OMIT_SUBQUERY
-												        case TK_IN:
+															        case TK_IN:
           {
             if ( jumpIfNull != 0 )
             {
