@@ -26,6 +26,8 @@ using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite {
 	using Op=Sqlite3.VdbeOp;
+    using System.Text;
+    using sqlite3_value = Sqlite3.Mem;
 	public partial class Sqlite3 {
 		/*
     ** 2003 September 6
@@ -184,7 +186,7 @@ namespace Community.CsharpSqlite {
 			public double r;
 			/* Real value */public struct union_ip {
 				#if DEBUG_CLASS_MEM || DEBUG_CLASS_ALL
-																												public i64 _i;              /* First operand */
+																																public i64 _i;              /* First operand */
 public i64 i
 {
 get { return _i; }
@@ -204,7 +206,7 @@ set { _i = value; }
 			/* BLOB value */public int n;
 			/* Number of characters in string value, excluding '\0' */
 			#if DEBUG_CLASS_MEM || DEBUG_CLASS_ALL
-																					public u16 _flags;              /* First operand */
+																								public u16 _flags;              /* First operand */
 public u16 flags
 {
 get { return _flags; }
@@ -218,7 +220,7 @@ set { _flags = value; }
 			/* One of SQLITE_NULL, SQLITE_TEXT, SQLITE_INTEGER, etc */public SqliteEncoding enc;
 			/* SqliteEncoding.UTF8, SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE */
 			#if SQLITE_DEBUG
-																					      public Mem pScopyFrom;        /* This Mem is a shallow copy of pScopyFrom */
+																								      public Mem pScopyFrom;        /* This Mem is a shallow copy of pScopyFrom */
       public object pFiller;        /* So that sizeof(Mem) is a multiple of 8 */
 #endif
 			public dxDel xDel;
@@ -236,7 +238,7 @@ set { _flags = value; }
 			}
 			public Mem(sqlite3 db,string z,double r,int i,int n,u16 flags,u8 type,SqliteEncoding enc
 			#if SQLITE_DEBUG
-																					         , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
+																								         , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
 #endif
 			) {
 				this.db=db;
@@ -246,7 +248,7 @@ set { _flags = value; }
 				this.n=n;
 				this.flags=flags;
 				#if SQLITE_DEBUG
-																												        this.pScopyFrom = pScopyFrom;
+																																        this.pScopyFrom = pScopyFrom;
         this.pFiller = pFiller;
 #endif
 				this.type=type;
@@ -322,7 +324,7 @@ set { _flags = value; }
 		const int MEM_Ephem=0x1000;
 		const int MEM_Agg=0x2000;
 		#if !SQLITE_OMIT_INCRBLOB
-														const int MEM_Zero = 0x4000;  
+																const int MEM_Zero = 0x4000;  
 #else
 		const int MEM_Zero=0x0000;
 		#endif
@@ -341,7 +343,7 @@ set { _flags = value; }
 		///
 		///</summary>
 		#if SQLITE_DEBUG
-														    //define memIsValid(M)  ((M)->flags & MEM_Invalid)==0
+																    //define memIsValid(M)  ((M)->flags & MEM_Invalid)==0
     static bool memIsValid( Mem M )
     {
       return ( ( M ).flags & MEM_Invalid ) == 0;
@@ -393,8 +395,99 @@ set { _flags = value; }
 			/* The return value is stored here */public Mem pMem;
 			/* Memory cell used to store aggregate context */public int isError;
 			/* Error code returned by the function. */public CollSeq pColl;
-		/* Collating sequence */};
-
+			/* Collating sequence */public///<summary>
+			/// sqlite3_result_  
+			/// The following routines are used by user-defined functions to specify
+			/// the function result.
+			///
+			/// The setStrOrError() funtion calls sqlite3VdbeMemSetStr() to store the
+			/// result as a string or blob but if the string or blob is too large, it
+			/// then sets the error code to SQLITE_TOOBIG
+			///
+			///</summary>
+			void setResultStrOrError(/* Function context */string z,/* String pointer */int o,/* offset into string */int n,/* Bytes in string, or negative */SqliteEncoding enc,/* Encoding of z.  0 for BLOBs */dxDel xDel//void (*xDel)(void)     /* Destructor function */
+			) {
+				if(sqlite3VdbeMemSetStr(this.s,z,o,n,enc,xDel)==SQLITE_TOOBIG) {
+					this.sqlite3_result_error_toobig();
+				}
+			}
+			public void setResultStrOrError(/* Function context */string z,/* String pointer */int n,/* Bytes in string, or negative */SqliteEncoding enc,/* Encoding of z.  0 for BLOBs */dxDel xDel//void (*xDel)(void)     /* Destructor function */
+			) {
+				if(sqlite3VdbeMemSetStr(this.s,z,n,enc,xDel)==SQLITE_TOOBIG) {
+					this.sqlite3_result_error_toobig();
+				}
+			}
+			public void sqlite3_result_blob(string z,int n,dxDel xDel) {
+				Debug.Assert(n>=0);
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				this.setResultStrOrError(z,n,0,xDel);
+			}
+			public void sqlite3_result_double(double rVal) {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				sqlite3VdbeMemSetDouble(this.s,rVal);
+			}
+			public void sqlite3_result_error(string z,int n) {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				this.setResultStrOrError(z,n,SqliteEncoding.UTF8,SQLITE_TRANSIENT);
+				this.isError=SQLITE_ERROR;
+			}
+			public void sqlite3_result_int(int iVal) {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				sqlite3VdbeMemSetInt64(this.s,(i64)iVal);
+			}
+			public void sqlite3_result_int64(i64 iVal) {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				sqlite3VdbeMemSetInt64(this.s,iVal);
+			}
+			public void sqlite3_result_null() {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				sqlite3VdbeMemSetNull(this.s);
+			}
+			public void sqlite3_result_text(string z,int o,//Offset
+			int n,dxDel xDel) {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				this.setResultStrOrError(z,o,n,SqliteEncoding.UTF8,xDel);
+			}
+			public void sqlite3_result_text(StringBuilder z,int n,dxDel xDel) {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				this.setResultStrOrError(z.ToString(),n,SqliteEncoding.UTF8,xDel);
+			}
+			public void sqlite3_result_text(string z,int n,dxDel xDel) {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				this.setResultStrOrError(z,n,SqliteEncoding.UTF8,xDel);
+			}
+			public void sqlite3_result_value(sqlite3_value pValue) {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				sqlite3VdbeMemCopy(this.s,pValue);
+			}
+			public void sqlite3_result_zeroblob(int n) {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				sqlite3VdbeMemSetZeroBlob(this.s,n);
+			}
+			public void sqlite3_result_error_code(int errCode) {
+				this.isError=errCode;
+				if((this.s.flags&MEM_Null)!=0) {
+					this.setResultStrOrError(sqlite3ErrStr(errCode),-1,SqliteEncoding.UTF8,SQLITE_STATIC);
+				}
+			}
+			///<summary>
+			///Force an SQLITE_TOOBIG error.
+			///</summary>
+			public void sqlite3_result_error_toobig() {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				this.isError=SQLITE_ERROR;
+				this.setResultStrOrError("string or blob too big",-1,SqliteEncoding.UTF8,SQLITE_STATIC);
+			}
+			///<summary>
+			///An SQLITE_NOMEM error.
+			///</summary>
+			public void sqlite3_result_error_nomem() {
+				Debug.Assert(sqlite3_mutex_held(this.s.db.mutex));
+				sqlite3VdbeMemSetNull(this.s);
+				this.isError=SQLITE_NOMEM;
+				//pCtx.s.db.mallocFailed = 1;
+			}
+		}
 		/*
     ** An instance of the virtual machine.  This structure contains the complete
     ** state of the virtual machine.
@@ -462,7 +555,7 @@ set { _flags = value; }
 			/* Text of the SQL statement that generated this */public object pFree;
 			/* Free this when deleting the vdbe */
 			#if SQLITE_DEBUG
-																					      public FILE trace;             /* Write an execution trace here, if not NULL */
+																								      public FILE trace;             /* Write an execution trace here, if not NULL */
 #endif
 			public VdbeFrame pFrame;
 			/* Parent frame */public VdbeFrame pDelFrame;
@@ -525,7 +618,7 @@ set { _flags = value; }
 				ct.zSql=zSql;
 				ct.pFree=pFree;
 				#if SQLITE_DEBUG
-																												        ct.trace = trace;
+																																        ct.trace = trace;
 #endif
 				ct.nFkConstraint=nFkConstraint;
 				ct.nStmtDefCons=nStmtDefCons;
@@ -535,11 +628,11 @@ set { _flags = value; }
 				ct.expmask=expmask;
 				ct.pProgram=pProgram;
 				#if SQLITE_SSE
-																												ct.fetchId=fetchId;
+																																ct.fetchId=fetchId;
 ct.lru=lru;
 #endif
 				#if SQLITE_ENABLE_MEMORY_MANAGEMENT
-																												ct.pLruPrev=pLruPrev;
+																																ct.pLruPrev=pLruPrev;
 ct.pLruNext=pLruNext;
 #endif
 			}
@@ -586,7 +679,7 @@ ct.pLruNext=pLruNext;
 		//int sqlite3VdbeMemSetStr(Mem*, const char*, int, u8, void()(void));
 		//void sqlite3VdbeMemSetInt64(Mem*, i64);
 		#if SQLITE_OMIT_FLOATING_POINT
-														// define sqlite3VdbeMemSetDouble sqlite3VdbeMemSetInt64
+																// define sqlite3VdbeMemSetDouble sqlite3VdbeMemSetInt64
 #else
 		//void sqlite3VdbeMemSetDouble(Mem*, double);
 		#endif
@@ -612,7 +705,7 @@ ct.pLruNext=pLruNext;
 		//int sqlite3VdbeFrameRestore(VdbeFrame );
 		//void sqlite3VdbeMemStoreType(Mem *pMem);  
 		#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
-														  //void sqlite3VdbeEnter(Vdbe);
+																  //void sqlite3VdbeEnter(Vdbe);
   //void sqlite3VdbeLeave(Vdbe);
 #else
 		//# define sqlite3VdbeEnter(X)
@@ -623,12 +716,12 @@ ct.pLruNext=pLruNext;
 		}
 		#endif
 		#if SQLITE_DEBUG
-														    //void sqlite3VdbeMemPrepareToChange(Vdbe*,Mem);
+																    //void sqlite3VdbeMemPrepareToChange(Vdbe*,Mem);
 #endif
 		#if !SQLITE_OMIT_FOREIGN_KEY
 		//int sqlite3VdbeCheckFk(Vdbe *, int);
 		#else
-														// define sqlite3VdbeCheckFk(p,i) 0
+																// define sqlite3VdbeCheckFk(p,i) 0
 static int sqlite3VdbeCheckFk( Vdbe p, int i ) { return 0; }
 #endif
 		//int sqlite3VdbeMemTranslate(Mem*, u8);
@@ -638,7 +731,7 @@ static int sqlite3VdbeCheckFk( Vdbe p, int i ) { return 0; }
 		//#endif
 		//int sqlite3VdbeMemHandleBom(Mem pMem);
 		#if !SQLITE_OMIT_INCRBLOB
-														//  int sqlite3VdbeMemExpandBlob(Mem );
+																//  int sqlite3VdbeMemExpandBlob(Mem );
 #else
 		//  #define sqlite3VdbeMemExpandBlob(x) SQLITE_OK
 		static int sqlite3VdbeMemExpandBlob(Mem x) {

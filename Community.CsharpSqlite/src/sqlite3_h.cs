@@ -7015,7 +7015,7 @@ namespace Community.CsharpSqlite {
 		ANY=5,
 		UTF16_ALIGNED=8
 		#if i386 || __i386__ || _M_IX86
-														
+																
 #else
 		//TODO: fix this
 		//SQLITE_UTF16NATIVE

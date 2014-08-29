@@ -78,7 +78,7 @@ namespace Community.CsharpSqlite {
 				SqliteEncoding enc=ENC(sqlite3VdbeDb(v));
 				Column pCol=pTab.aCol[i];
 				#if SQLITE_DEBUG
-																												        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
+																																        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
 #endif
 				Debug.Assert(i<pTab.nCol);
 				sqlite3ValueFromExpr(sqlite3VdbeDb(v),pCol.pDflt,enc,pCol.affinity,ref pValue);
@@ -154,11 +154,11 @@ namespace Community.CsharpSqlite {
 			isView=pTab.pSelect!=null;
 			Debug.Assert(pTrigger!=null||tmask==0);
 			#else
-																					      const Trigger pTrigger = null;// define pTrigger 0
+																								      const Trigger pTrigger = null;// define pTrigger 0
       const int tmask = 0;          // define tmask 0
 #endif
 			#if SQLITE_OMIT_TRIGGER || SQLITE_OMIT_VIEW
-																					//     undef isView
+																								//     undef isView
       const bool isView = false;    // define isView 0
 #endif
 			if(sqlite3ViewGetColumnNames(pParse,pTab)!=0) {
@@ -216,7 +216,7 @@ namespace Community.CsharpSqlite {
 					}
 				}
 				#if !SQLITE_OMIT_AUTHORIZATION
-																												{
+																																{
 int rc;
 rc = sqlite3AuthCheck(pParse, SQLITE_UPDATE, pTab.zName,
 pTab.aCol[j].zName, db.aDb[iDb].zName);
@@ -493,7 +493,7 @@ aXRef[j] = -1;
 			}
 			update_cleanup:
 			#if !SQLITE_OMIT_AUTHORIZATION
-																					sqlite3AuthContextPop(sContext);
+																								sqlite3AuthContextPop(sContext);
 #endif
 			sqlite3DbFree(db,ref aRegIdx);
 			sqlite3DbFree(db,ref aXRef);

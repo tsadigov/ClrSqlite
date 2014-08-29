@@ -72,7 +72,7 @@ namespace Community.CsharpSqlite {
 					iBest=i;
 				}
 			}
-			sqlite3_result_value(context,argv[iBest]);
+			context.sqlite3_result_value(argv[iBest]);
 		}
 		///<summary>
 		/// Return the type of the argument.
@@ -98,7 +98,7 @@ namespace Community.CsharpSqlite {
 			z="null";
 			break;
 			}
-			sqlite3_result_text(context,z,-1,SQLITE_STATIC);
+			context.sqlite3_result_text(z,-1,SQLITE_STATIC);
 		}
 		///<summary>
 		/// Implementation of the length() function
@@ -112,7 +112,7 @@ namespace Community.CsharpSqlite {
 			case SQLITE_BLOB:
 			case SQLITE_INTEGER:
 			case SQLITE_FLOAT: {
-				sqlite3_result_int(context,sqlite3_value_bytes(argv[0]));
+				context.sqlite3_result_int(sqlite3_value_bytes(argv[0]));
 				break;
 			}
 			case SQLITE_TEXT: {
@@ -125,11 +125,11 @@ namespace Community.CsharpSqlite {
 					len++;
 					SQLITE_SKIP_UTF8(z,ref iz);
 				}
-				sqlite3_result_int(context,len);
+				context.sqlite3_result_int(len);
 				break;
 			}
 			default: {
-				sqlite3_result_null(context);
+				context.sqlite3_result_null();
 				break;
 			}
 			}
@@ -151,16 +151,16 @@ namespace Community.CsharpSqlite {
 					if((iVal<<1)==0) {
 						/* IMP: R-35460-15084 If X is the integer -9223372036854775807 then
                 ** abs(X) throws an integer overflow error since there is no
-                ** equivalent positive 64-bit two complement value. */sqlite3_result_error(context,"integer overflow",-1);
+                ** equivalent positive 64-bit two complement value. */context.sqlite3_result_error("integer overflow",-1);
 						return;
 					}
 					iVal=-iVal;
 				}
-				sqlite3_result_int64(context,iVal);
+				context.sqlite3_result_int64(iVal);
 				break;
 			}
 			case SQLITE_NULL: {
-				/* IMP: R-37434-19929 Abs(X) returns NULL if X is NULL. */sqlite3_result_null(context);
+				/* IMP: R-37434-19929 Abs(X) returns NULL if X is NULL. */context.sqlite3_result_null();
 				break;
 			}
 			default: {
@@ -171,7 +171,7 @@ namespace Community.CsharpSqlite {
             */double rVal=sqlite3_value_double(argv[0]);
 				if(rVal<0)
 					rVal=-rVal;
-				sqlite3_result_double(context,rVal);
+				context.sqlite3_result_double(rVal);
 				break;
 			}
 			}
@@ -266,7 +266,7 @@ namespace Community.CsharpSqlite {
 				//{
 				//  SQLITE_SKIP_UTF8( ref z2 );
 				//}
-				sqlite3_result_text(context,z,p1,p2<=z.Length-p1?p2:z.Length-p1,SQLITE_TRANSIENT);
+				context.sqlite3_result_text(z,p1,p2<=z.Length-p1?p2:z.Length-p1,SQLITE_TRANSIENT);
 			}
 			else {
 				if(p1+p2>len) {
@@ -282,7 +282,7 @@ namespace Community.CsharpSqlite {
 						sb.Append((char)zBLOB[i]);
 					}
 				}
-				sqlite3_result_blob(context,sb.ToString(),(int)p2,SQLITE_TRANSIENT);
+				context.sqlite3_result_blob(sb.ToString(),(int)p2,SQLITE_TRANSIENT);
 			}
 		}
 		///<summary>
@@ -320,13 +320,13 @@ namespace Community.CsharpSqlite {
 				else {
 					zBuf=sqlite3_mprintf("%.*f",n,r);
 					if(zBuf==null) {
-						sqlite3_result_error_nomem(context);
+						context.sqlite3_result_error_nomem();
 						return;
 					}
 					Converter.sqlite3AtoF(zBuf,ref r,StringExtensions.sqlite3Strlen30(zBuf),SqliteEncoding.UTF8);
 					//sqlite3_free( ref zBuf );
 				}
-			sqlite3_result_double(context,r);
+			context.sqlite3_result_double(r);
 		}
 		#endif
 		///<summary>
@@ -379,7 +379,7 @@ namespace Community.CsharpSqlite {
 				//{
 				//(char)sqlite3Toupper( z1[i] );
 				//}
-				sqlite3_result_text(context,z2.Length==0?"":z2.Substring(0,n).ToUpper(),-1,null);
+				context.sqlite3_result_text(z2.Length==0?"":z2.Substring(0,n).ToUpper(),-1,null);
 				//sqlite3_free );
 				// }
 			}
@@ -401,13 +401,13 @@ namespace Community.CsharpSqlite {
 				//  {
 				//    z1[i] = (char)sqlite3Tolower( z1[i] );
 				//  }
-				sqlite3_result_text(context,z2.Length==0?"":z2.Substring(0,n).ToLower(),-1,null);
+				context.sqlite3_result_text(z2.Length==0?"":z2.Substring(0,n).ToLower(),-1,null);
 				//sqlite3_free );
 				//}
 			}
 		}
 		#if FALSE
-														/*
+																/*
 ** The COALESCE() and IFNULL() functions used to be implemented as shown
 ** here.  But now they are implemented as VDBE code so that unused arguments
 ** do not have to be computed.  This legacy implementation is retained as
@@ -454,7 +454,7 @@ break;
         ** therefore be no less than -9223372036854775807.
         */r=-(r^(((sqlite3_int64)1)<<63));
 			}
-			sqlite3_result_int64(context,r);
+			context.sqlite3_result_int64(r);
 		}
 		///<summary>
 		/// Implementation of randomblob(N).  Return a random blob
@@ -471,7 +471,7 @@ break;
 				n=1;
 			}
 			if(n>sqlite3_context_db_handle(context).aLimit[SQLITE_LIMIT_LENGTH]) {
-				sqlite3_result_error_toobig(context);
+				context.sqlite3_result_error_toobig();
 				p=null;
 			}
 			else {
@@ -484,7 +484,7 @@ break;
 					sqlite3_randomness(sizeof(u8),ref _p);
 					p[i]=(char)(_p&0x7F);
 				}
-				sqlite3_result_blob(context,new string(p),n,null);
+				context.sqlite3_result_blob(new string(p),n,null);
 				//sqlite3_free );
 			}
 		}
@@ -498,7 +498,7 @@ break;
 			UNUSED_PARAMETER2(NotUsed,NotUsed2);
 			/* IMP: R-51513-12026 The last_insert_rowid() SQL function is a
       ** wrapper around the sqlite3_last_insert_rowid() C/C++ interface
-      ** function. */sqlite3_result_int64(context,sqlite3_last_insert_rowid(db));
+      ** function. */context.sqlite3_result_int64(sqlite3_last_insert_rowid(db));
 		}
 		///<summary>
 		/// Implementation of the changes() SQL function.
@@ -511,7 +511,7 @@ break;
 		static void changes(sqlite3_context context,int NotUsed,sqlite3_value[] NotUsed2) {
 			sqlite3 db=sqlite3_context_db_handle(context);
 			UNUSED_PARAMETER2(NotUsed,NotUsed2);
-			sqlite3_result_int(context,sqlite3_changes(db));
+			context.sqlite3_result_int(sqlite3_changes(db));
 		}
 		///<summary>
 		/// Implementation of the total_changes() SQL function.  The return value is
@@ -522,7 +522,7 @@ break;
 			sqlite3 db=(sqlite3)sqlite3_context_db_handle(context);
 			UNUSED_PARAMETER2(NotUsed,NotUsed2);
 			/* IMP: R-52756-41993 This function is a wrapper around the
-      ** sqlite3_total_changes() C/C++ interface. */sqlite3_result_int(context,sqlite3_total_changes(db));
+      ** sqlite3_total_changes() C/C++ interface. */context.sqlite3_result_int(sqlite3_total_changes(db));
 		}
 		/*
     ** A structure defining how to do GLOB-style comparisons.
@@ -722,12 +722,12 @@ break;
 		///
 		///</summary>
 		#if SQLITE_TEST
-														#if !TCLSH
-														    static int sqlite3_like_count = 0;
+																#if !TCLSH
+																    static int sqlite3_like_count = 0;
 #else
-														    static tcl.lang.Var.SQLITE3_GETSET sqlite3_like_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_like_count" );
+																    static tcl.lang.Var.SQLITE3_GETSET sqlite3_like_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_like_count" );
 #endif
-														#endif
+																#endif
 		///<summary>
 		/// Implementation of the like() SQL function.  This function implements
 		/// the build-in LIKE operator.  The first argument to the function is the
@@ -753,7 +753,7 @@ break;
 			testcase(nPat==db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH]);
 			testcase(nPat==db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH]+1);
 			if(nPat>db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH]) {
-				sqlite3_result_error(context,"LIKE or GLOB pattern too complex",-1);
+				context.sqlite3_result_error("LIKE or GLOB pattern too complex",-1);
 				return;
 			}
 			//Debug.Assert( zB == sqlite3_value_text( argv[0] ) );  /* Encoding did not change */
@@ -764,7 +764,7 @@ break;
 				if(zEsc==null)
 					return;
 				if(sqlite3Utf8CharLen(zEsc,-1)!=1) {
-					sqlite3_result_error(context,"ESCAPE expression must be a single character",-1);
+					context.sqlite3_result_error("ESCAPE expression must be a single character",-1);
 					return;
 				}
 				escape=sqlite3Utf8Read(zEsc,ref zEsc);
@@ -772,13 +772,13 @@ break;
 			if(zA!=null&&zB!=null) {
 				compareInfo pInfo=(compareInfo)sqlite3_user_data(context);
 				#if SQLITE_TEST
-																												#if !TCLSH
-																												        sqlite3_like_count++;
+																																#if !TCLSH
+																																        sqlite3_like_count++;
 #else
-																												        sqlite3_like_count.iValue++;
+																																        sqlite3_like_count.iValue++;
 #endif
-																												#endif
-				sqlite3_result_int(context,patternCompare(zB,zA,pInfo,escape)?1:0);
+																																#endif
+				context.sqlite3_result_int(patternCompare(zB,zA,pInfo,escape)?1:0);
 			}
 		}
 		///<summary>
@@ -791,7 +791,7 @@ break;
 			CollSeq pColl=sqlite3GetFuncCollSeq(context);
 			UNUSED_PARAMETER(NotUsed);
 			if(sqlite3MemCompare(argv[0],argv[1],pColl)!=0) {
-				sqlite3_result_value(context,argv[0]);
+				context.sqlite3_result_value(argv[0]);
 			}
 		}
 		///<summary>
@@ -802,7 +802,7 @@ break;
 		static void versionFunc(sqlite3_context context,int NotUsed,sqlite3_value[] NotUsed2) {
 			UNUSED_PARAMETER2(NotUsed,NotUsed2);
 			/* IMP: R-48699-48617 This function is an SQL wrapper around the
-      ** sqlite3_libversion() C-interface. */sqlite3_result_text(context,sqlite3_libversion(),-1,SQLITE_STATIC);
+      ** sqlite3_libversion() C-interface. */context.sqlite3_result_text(sqlite3_libversion(),-1,SQLITE_STATIC);
 		}
 		///<summary>
 		/// Implementation of the sqlite_source_id() function. The result is a string
@@ -813,7 +813,7 @@ break;
 		static void sourceidFunc(sqlite3_context context,int NotUsed,sqlite3_value[] NotUsed2) {
 			UNUSED_PARAMETER2(NotUsed,NotUsed2);
 			/* IMP: R-24470-31136 This function is an SQL wrapper around the
-      ** sqlite3_sourceid() C interface. */sqlite3_result_text(context,sqlite3_sourceid(),-1,SQLITE_STATIC);
+      ** sqlite3_sourceid() C interface. */context.sqlite3_result_text(sqlite3_sourceid(),-1,SQLITE_STATIC);
 		}
 		/*
     ** Implementation of the sqlite_log() function.  This is a wrapper around
@@ -839,7 +839,7 @@ break;
       ** function is a wrapper around the sqlite3_compileoption_used() C/C++
       ** function.
       */if((zOptName=sqlite3_value_text(argv[0]))!=null) {
-				sqlite3_result_int(context,sqlite3_compileoption_used(zOptName));
+				context.sqlite3_result_int(sqlite3_compileoption_used(zOptName));
 			}
 		}
 		#endif
@@ -856,7 +856,7 @@ break;
 			/* IMP: R-04922-24076 The sqlite_compileoption_get() SQL function
       ** is a wrapper around the sqlite3_compileoption_get() C/C++ function.
       */n=sqlite3_value_int(argv[0]);
-			sqlite3_result_text(context,sqlite3_compileoption_get(n),-1,SQLITE_STATIC);
+			context.sqlite3_result_text(sqlite3_compileoption_get(n),-1,SQLITE_STATIC);
 		}
 		#endif
 		///<summary>
@@ -899,7 +899,7 @@ break;
 			switch(sqlite3_value_type(argv[0])) {
 			case SQLITE_INTEGER:
 			case SQLITE_FLOAT: {
-				sqlite3_result_value(context,argv[0]);
+				context.sqlite3_result_value(argv[0]);
 				break;
 			}
 			case SQLITE_BLOB: {
@@ -921,7 +921,7 @@ break;
 					//zText[( nBlob * 2 ) + 3] = '\0';
 					//zText[0] = 'X';
 					//zText[1] = '\'';
-					sqlite3_result_text(context,zText,-1,SQLITE_TRANSIENT);
+					context.sqlite3_result_text(zText,-1,SQLITE_TRANSIENT);
 					//sqlite3_free( zText );
 				}
 				break;
@@ -952,14 +952,14 @@ break;
 					z.Append('\'');
 					j++;
 					//z[j] = '\0'; ;
-					sqlite3_result_text(context,z,j,null);
+					context.sqlite3_result_text(z,j,null);
 					//sqlite3_free );
 				}
 				break;
 			}
 			default: {
 				Debug.Assert(sqlite3_value_type(argv[0])==SQLITE_NULL);
-				sqlite3_result_text(context,"NULL",4,SQLITE_STATIC);
+				context.sqlite3_result_text("NULL",4,SQLITE_STATIC);
 				break;
 			}
 			}
@@ -987,7 +987,7 @@ break;
 					zHex.Append(hexdigits[(c>>4)&0xf]);
 					zHex.Append(hexdigits[c&0xf]);
 				}
-				sqlite3_result_text(context,zHex,n*2,null);
+				context.sqlite3_result_text(zHex,n*2,null);
 				//sqlite3_free );
 			}
 		}
@@ -1004,10 +1004,10 @@ break;
 			testcase(n==db.aLimit[SQLITE_LIMIT_LENGTH]);
 			testcase(n==db.aLimit[SQLITE_LIMIT_LENGTH]+1);
 			if(n>db.aLimit[SQLITE_LIMIT_LENGTH]) {
-				sqlite3_result_error_toobig(context);
+				context.sqlite3_result_error_toobig();
 			}
 			else {
-				sqlite3_result_zeroblob(context,(int)n);
+				context.sqlite3_result_zeroblob((int)n);
 				/* IMP: R-00293-64994 */}
 		}
 		///<summary>
@@ -1043,7 +1043,7 @@ break;
 			}
 			if(zPattern=="") {
 				Debug.Assert(sqlite3_value_type(argv[1])!=SQLITE_NULL);
-				sqlite3_result_value(context,argv[0]);
+				context.sqlite3_result_value(argv[0]);
 				return;
 			}
 			nPattern=sqlite3_value_bytes(argv[1]);
@@ -1101,10 +1101,10 @@ break;
 				}
 			}
 			if(j==0||j>sqlite3_context_db_handle(context).aLimit[SQLITE_LIMIT_LENGTH]) {
-				sqlite3_result_error_toobig(context);
+				context.sqlite3_result_error_toobig();
 			}
 			else {
-				sqlite3_result_text(context,zOut,j,null);
+				context.sqlite3_result_text(zOut,j,null);
 				//sqlite3_free );
 			}
 		}
@@ -1212,7 +1212,7 @@ break;
 			StringBuilder sb=new StringBuilder(nIn);
 			for(i=0;i<nIn;i++)
 				sb.Append((char)zBlob[izIn+i]);
-			sqlite3_result_text(context,sb,nIn,SQLITE_TRANSIENT);
+			context.sqlite3_result_text(sb,nIn,SQLITE_TRANSIENT);
 		}
 		///<summary>
 		///IMP: R-25361-16150 This function is omitted from SQLite by default. It
@@ -1221,7 +1221,7 @@ break;
 		///
 		///</summary>
 		#if SQLITE_SOUNDEX
-														/*
+																/*
 ** Compute the soundex encoding of a word.
 **
 ** IMP: R-59782-00072 The soundex(X) function returns a string that is the
@@ -1293,7 +1293,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
 				zProc="";
 			}
 			if(zFile!=null&&sqlite3_load_extension(db,zFile,zProc,ref zErrMsg)!=0) {
-				sqlite3_result_error(context,zErrMsg,-1);
+				context.sqlite3_result_error(zErrMsg,-1);
 				sqlite3DbFree(db,ref zErrMsg);
 			}
 		}
@@ -1370,14 +1370,14 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
 				p=pMem._SumCtx;
 			if(p!=null&&p.cnt>0) {
 				if(p.overflow!=0) {
-					sqlite3_result_error(context,"integer overflow",-1);
+					context.sqlite3_result_error("integer overflow",-1);
 				}
 				else
 					if(p.approx) {
-						sqlite3_result_double(context,p.rSum);
+						context.sqlite3_result_double(p.rSum);
 					}
 					else {
-						sqlite3_result_int64(context,p.iSum);
+						context.sqlite3_result_int64(p.iSum);
 					}
 				p.cnt=0;
 				// Reset for C#
@@ -1389,7 +1389,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
 			if(pMem!=null)
 				p=pMem._SumCtx;
 			if(p!=null&&p.cnt>0) {
-				sqlite3_result_double(context,p.rSum/(double)p.cnt);
+				context.sqlite3_result_double(p.rSum/(double)p.cnt);
 			}
 		}
 		static void totalFinalize(sqlite3_context context) {
@@ -1397,7 +1397,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
 			Mem pMem=sqlite3_aggregate_context(context,0);
 			if(pMem!=null)
 				p=pMem._SumCtx;
-			/* (double)0 In case of SQLITE_OMIT_FLOATING_POINT... */sqlite3_result_double(context,p!=null?p.rSum:(double)0);
+			/* (double)0 In case of SQLITE_OMIT_FLOATING_POINT... */context.sqlite3_result_double(p!=null?p.rSum:(double)0);
 		}
 		///<summary>
 		/// The following structure keeps track of state information for the
@@ -1443,7 +1443,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
 				p.n++;
 			}
 			#if !SQLITE_OMIT_DEPRECATED
-																					/* The sqlite3_aggregate_count() function is deprecated.  But just to make
+																								/* The sqlite3_aggregate_count() function is deprecated.  But just to make
 ** sure it still operates correctly, verify that its count agrees with our
 ** internal count when using count(*) and when the total count can be
 ** expressed as a 32-bit integer. */
@@ -1454,7 +1454,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
 		static void countFinalize(sqlite3_context context) {
 			CountCtx p=new CountCtx();
 			p.Context=sqlite3_aggregate_context(context,0);
-			sqlite3_result_int64(context,p!=null?p.n:0);
+			context.sqlite3_result_int64(p!=null?p.n:0);
 		}
 		///<summary>
 		/// Routines to implement min() and max() aggregate functions.
@@ -1495,7 +1495,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
 			pRes=(sqlite3_value)sqlite3_aggregate_context(context,0);
 			if(pRes!=null) {
 				if(ALWAYS(pRes.flags!=0)) {
-					sqlite3_result_value(context,pRes);
+					context.sqlite3_result_value(pRes);
 				}
 				sqlite3VdbeMemRelease(pRes);
 			}
@@ -1553,14 +1553,14 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
 				//if ( pAccum != null )
 				//{
 				if(pAccum.tooBig) {
-					sqlite3_result_error_toobig(context);
+					context.sqlite3_result_error_toobig();
 				}
 				//else if ( pAccum.mallocFailed != 0 )
 				//{
 				//  sqlite3_result_error_nomem( context );
 				//}
 				else {
-					sqlite3_result_text(context,sqlite3StrAccumFinish(pAccum),-1,null);
+					context.sqlite3_result_text(sqlite3StrAccumFinish(pAccum),-1,null);
 					//sqlite3_free );
 				}
 			}
@@ -1739,7 +1739,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
 				FUNCTION("replace",3,0,0,replaceFunc),
 				FUNCTION("zeroblob",1,0,0,zeroblobFunc),
 				#if SQLITE_SOUNDEX
-																												FUNCTION("soundex",            1, 0, 0, soundexFunc      ),
+																																FUNCTION("soundex",            1, 0, 0, soundexFunc      ),
 #endif
 				#if !SQLITE_OMIT_LOAD_EXTENSION
 				FUNCTION("load_extension",1,0,0,loadExt),
@@ -1754,7 +1754,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
 				AGGREGATE("group_concat",2,0,0,groupConcatStep,groupConcatFinalize),
 				LIKEFUNC("glob",2,globInfo,SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
 				#if SQLITE_CASE_SENSITIVE_LIKE
-																												LIKEFUNC("like", 2, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
+																																LIKEFUNC("like", 2, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
 LIKEFUNC("like", 3, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
 #else
 				LIKEFUNC("like",2,likeInfoNorm,SQLITE_FUNC_LIKE),
@@ -1764,7 +1764,7 @@ LIKEFUNC("like", 3, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
 			};
 			int i;
 			#if SQLITE_OMIT_WSD
-																					FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
+																								FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
 FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
 #else
 			FuncDefHash pHash=sqlite3GlobalFunctions;

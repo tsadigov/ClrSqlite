@@ -28,7 +28,7 @@ namespace Community.CsharpSqlite {
 			}
 			int result=0;
 			#if WINDOWS_MOBILE
-																					  try { result = Int32.Parse(inStr.Substring(0, i)); }
+																								  try { result = Int32.Parse(inStr.Substring(0, i)); }
   catch { }
   return result;
 #else
@@ -128,13 +128,13 @@ namespace Community.CsharpSqlite {
 			zRegex=sqlite3_value_text(argv[0]);
 			zTest=sqlite3_value_text(argv[1]);
 			if(zTest==null||String.IsNullOrEmpty(zRegex)) {
-				sqlite3_result_int(context,0);
+				context.sqlite3_result_int(0);
 				return;
 			}
 			if(oRegex==null||oRegex.ToString()==zRegex) {
 				oRegex=new Regex(zRegex,RegexOptions.IgnoreCase);
 			}
-			sqlite3_result_int(context,oRegex.IsMatch(zTest)?1:0);
+			context.sqlite3_result_int(oRegex.IsMatch(zTest)?1:0);
 		}
 		// ----------------------------
 		// ** Convertion routines
@@ -343,7 +343,7 @@ namespace Community.CsharpSqlite {
 			}
 			return 4096;
 			#else
-																					    return 4096;
+																								    return 4096;
 #endif
 		}
 		static void SWAP<T>(ref T A,ref T B) {
@@ -373,7 +373,7 @@ namespace Community.CsharpSqlite {
 					if(type==SQLITE_INTEGER) {
 						i64 v=sqlite3_value_int64(argv[0]);
 						if(v==40||v==41) {
-							sqlite3_result_error(context,"value of "+v+" handed to x_count",-1);
+							context.sqlite3_result_error("value of "+v+" handed to x_count",-1);
 							return;
 						}
 						else {
@@ -401,23 +401,23 @@ namespace Community.CsharpSqlite {
 			p=pMem._SumCtx;
 			if(p!=null&&p.cnt>0) {
 				if(p.overflow!=0) {
-					sqlite3_result_error(context,"integer overflow",-1);
+					context.sqlite3_result_error("integer overflow",-1);
 				}
 				else
 					if(p.approx) {
-						sqlite3_result_double(context,p.rSum);
+						context.sqlite3_result_double(p.rSum);
 					}
 					else
 						if(p.iSum==42) {
-							sqlite3_result_error(context,"x_count totals to 42",-1);
+							context.sqlite3_result_error("x_count totals to 42",-1);
 						}
 						else {
-							sqlite3_result_int64(context,p.iSum);
+							context.sqlite3_result_int64(p.iSum);
 						}
 			}
 		}
 		#if SQLITE_MUTEX_W32
-														//---------------------WIN32 Definitions
+																//---------------------WIN32 Definitions
 static int GetCurrentThreadId()
 {
   return Thread.CurrentThread.ManagedThreadId;

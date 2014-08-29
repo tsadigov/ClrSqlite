@@ -122,7 +122,7 @@ namespace Community.CsharpSqlite {
 		}
 		#endif
 		#if (SQLITE_ENABLE_UPDATE_DELETE_LIMIT) && !(SQLITE_OMIT_SUBQUERY)
-														/*
+																/*
 ** Generate an expression tree to implement the WHERE, ORDER BY,
 ** and LIMIT/OFFSET portion of DELETE and UPDATE statements.
 **
@@ -264,11 +264,11 @@ return null;
 			pTrigger=sqlite3TriggersExist(pParse,pTab,TK_DELETE,null,out iDummy);
 			isView=pTab.pSelect!=null;
 			#else
-																					      const Trigger pTrigger = null;
+																								      const Trigger pTrigger = null;
       bool isView = false;
 #endif
 			#if SQLITE_OMIT_VIEW
-																					// undef isView
+																								// undef isView
 isView = false;
 #endif
 			/* If pTab is really a view, make sure it has been initialized.
@@ -282,7 +282,7 @@ isView = false;
 			Debug.Assert(iDb<db.nDb);
 			zDb=db.aDb[iDb].zName;
 			#if !SQLITE_OMIT_AUTHORIZATION
-																					rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
+																								rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
 #else
 			rcauth=SQLITE_OK;
 			#endif
@@ -298,7 +298,7 @@ isView = false;
 				pParse.nTab++;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
-																					/* Start the view context
+																								/* Start the view context
 */
 if( isView ){
 sqlite3AuthContextPush(pParse, sContext, pTab.zName);
@@ -416,7 +416,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			}
 			delete_from_cleanup:
 			#if !SQLITE_OMIT_AUTHORIZATION
-																					sqlite3AuthContextPop(sContext);
+																								sqlite3AuthContextPop(sContext);
 #endif
 			sqlite3SrcListDelete(db,ref pTabList);
 			sqlite3ExprDelete(db,ref pWhere);

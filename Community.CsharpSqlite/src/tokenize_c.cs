@@ -529,7 +529,7 @@ namespace Community.CsharpSqlite {
 				sqlite3Parser(pEngine,0,pParse.sLastToken,pParse);
 			}
 			#if YYTRACKMAXSTACKDEPTH
-																					sqlite3StatusSet(SQLITE_STATUS_PARSER_STACK,
+																								sqlite3StatusSet(SQLITE_STATUS_PARSER_STACK,
 sqlite3ParserStackPeak(pEngine)
 );
 #endif
@@ -555,7 +555,7 @@ sqlite3ParserStackPeak(pEngine)
 				pParse.pVdbe=null;
 			}
 			#if !SQLITE_OMIT_SHARED_CACHE
-																					if ( pParse.nested == 0 )
+																								if ( pParse.nested == 0 )
 {
 sqlite3DbFree( db, ref pParse.aTableLock );
 pParse.aTableLock = null;

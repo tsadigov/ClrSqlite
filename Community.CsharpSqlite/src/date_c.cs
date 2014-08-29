@@ -529,15 +529,15 @@ namespace Community.CsharpSqlite {
 			sqlite3_mutex_leave(mutex);
 			rc=pX==null?1:0;
 			#else
-																					#if !SQLITE_OMIT_BUILTIN_TEST
-																					  if( sqlite3GlobalConfig.bLocaltimeFault ) return 1;
+																								#if !SQLITE_OMIT_BUILTIN_TEST
+																								  if( sqlite3GlobalConfig.bLocaltimeFault ) return 1;
 #endif
-																					#if (HAVE_LOCALTIME_R) && HAVE_LOCALTIME_R
-																					  rc = localtime_r(t, pTm)==0;
+																								#if (HAVE_LOCALTIME_R) && HAVE_LOCALTIME_R
+																								  rc = localtime_r(t, pTm)==0;
 #else
-																					  rc = localtime_s(pTm, t);
+																								  rc = localtime_s(pTm, t);
 #endif
-																					#endif
+																								#endif
 			return rc;
 		}
 		#endif
@@ -576,7 +576,7 @@ namespace Community.CsharpSqlite {
 			t=(long)(x.iJD/1000-210866760000L);
 			// (time_t)(x.iJD/1000 - 21086676*(i64)10000);
 			if(osLocaltime(t,sLocal)!=0) {
-				sqlite3_result_error(pCtx,"local time unavailable",-1);
+				pCtx.sqlite3_result_error("local time unavailable",-1);
 				pRc=SQLITE_ERROR;
 				return 0;
 			}
@@ -897,7 +897,7 @@ namespace Community.CsharpSqlite {
 			DateTime x=null;
 			if(isDate(context,argc,argv,ref x)==0) {
 				computeJD(x);
-				sqlite3_result_double(context,x.iJD/86400000.0);
+				context.sqlite3_result_double(x.iJD/86400000.0);
 			}
 		}
 		///<summary>
@@ -912,7 +912,7 @@ namespace Community.CsharpSqlite {
 				zdtBuf.Length=0;
 				computeYMD_HMS(x);
 				sqlite3_snprintf(100,zdtBuf,"%04d-%02d-%02d %02d:%02d:%02d",x.Y,x.M,x.D,x.h,x.m,(int)(x.s));
-				sqlite3_result_text(context,zdtBuf,-1,SQLITE_TRANSIENT);
+				context.sqlite3_result_text(zdtBuf,-1,SQLITE_TRANSIENT);
 			}
 		}
 		///<summary>
@@ -927,7 +927,7 @@ namespace Community.CsharpSqlite {
 				zdtBuf.Length=0;
 				computeHMS(x);
 				sqlite3_snprintf(100,zdtBuf,"%02d:%02d:%02d",x.h,x.m,(int)x.s);
-				sqlite3_result_text(context,zdtBuf,-1,SQLITE_TRANSIENT);
+				context.sqlite3_result_text(zdtBuf,-1,SQLITE_TRANSIENT);
 			}
 		}
 		///<summary>
@@ -942,7 +942,7 @@ namespace Community.CsharpSqlite {
 				StringBuilder zdtBuf=new StringBuilder(100);
 				computeYMD(x);
 				sqlite3_snprintf(100,zdtBuf,"%04d-%02d-%02d",x.Y,x.M,x.D);
-				sqlite3_result_text(context,zdtBuf,-1,SQLITE_TRANSIENT);
+				context.sqlite3_result_text(zdtBuf,-1,SQLITE_TRANSIENT);
 			}
 		}
 		///<summary>
@@ -1023,7 +1023,7 @@ namespace Community.CsharpSqlite {
 				}
 				else
 					if(n>(u64)db.aLimit[SQLITE_LIMIT_LENGTH]) {
-						sqlite3_result_error_toobig(context);
+						context.sqlite3_result_error_toobig();
 						return;
 					}
 					else {
@@ -1132,7 +1132,7 @@ namespace Community.CsharpSqlite {
 					}
 				}
 				//z[j] = 0;
-				sqlite3_result_text(context,z,-1,z==zdtBuf?SQLITE_TRANSIENT:SQLITE_DYNAMIC);
+				context.sqlite3_result_text(z,-1,z==zdtBuf?SQLITE_TRANSIENT:SQLITE_DYNAMIC);
 			}
 		}
 		///<summary>
@@ -1167,7 +1167,7 @@ namespace Community.CsharpSqlite {
 		}
 		#endif
 		#if SQLITE_OMIT_DATETIME_FUNCS
-														/*
+																/*
 ** If the library is compiled to omit the full-scale date and time
 ** handling (to get a smaller binary), the following minimal version
 ** of the functions current_time(), current_date() and current_timestamp()
@@ -1194,13 +1194,13 @@ db = sqlite3_context_db_handle(context);
   sqlite3OsCurrentTimeInt64(db->pVfs, &iT);
   t = iT/1000 - 10000*(sqlite3_int64)21086676;
 #if HAVE_GMTIME_R
-														//  {
+																//  {
 //    struct tm sNow;
 //    gmtime_r(&t, sNow);
 //    strftime(zdtBuf, 20, zFormat, sNow);
 //  }
 #else
-														//  {
+																//  {
 //    struct tm pTm;
 //    sqlite3_mutex_enter(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER));
 //    pTm = gmtime(&t);
@@ -1208,7 +1208,7 @@ db = sqlite3_context_db_handle(context);
 //    sqlite3_mutex_leave(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER));
 //  }
 #endif
-														
+																
 //  sqlite3_result_text(context, zdtBuf, -1, SQLITE_TRANSIENT);
 //}
 #endif
@@ -1228,14 +1228,14 @@ db = sqlite3_context_db_handle(context);
 				FUNCTION("current_timestamp",0,0,0,(dxFunc)ctimestampFunc),
 				FUNCTION("current_date",0,0,0,(dxFunc)cdateFunc),
 			#else
-																					STR_FUNCTION("current_time",      0, "%H:%M:%S",          0, currentTimeFunc),
+																								STR_FUNCTION("current_time",      0, "%H:%M:%S",          0, currentTimeFunc),
 STR_FUNCTION("current_date",      0, "%Y-%m-%d",          0, currentTimeFunc),
 STR_FUNCTION("current_timestamp", 0, "%Y-%m-%d %H:%M:%S", 0, currentTimeFunc),
 #endif
 			};
 			int i;
 			#if SQLITE_OMIT_WSD
-																					FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
+																								FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
 FuncDef[] aFunc = (FuncDef)GLOBAL( FuncDef, aDateTimeFuncs );
 #else
 			FuncDefHash pHash=sqlite3GlobalFunctions;

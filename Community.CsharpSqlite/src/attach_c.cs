@@ -140,7 +140,7 @@ namespace Community.CsharpSqlite {
 			if(rc!=SQLITE_OK) {
 				//if ( rc == SQLITE_NOMEM )
 				//db.mallocFailed = 1;
-				sqlite3_result_error(context,zErr,-1);
+				context.sqlite3_result_error(zErr,-1);
 				//sqlite3_free( zErr );
 				return;
 			}
@@ -240,11 +240,11 @@ namespace Community.CsharpSqlite {
 			return;
 			attach_error:
 			/* Return an error if we get here */if(zErrDyn!="") {
-				sqlite3_result_error(context,zErrDyn,-1);
+				context.sqlite3_result_error(zErrDyn,-1);
 				sqlite3DbFree(db,ref zErrDyn);
 			}
 			if(rc!=0)
-				sqlite3_result_error_code(context,rc);
+				context.sqlite3_result_error_code(rc);
 		}
 		///<summary>
 		/// An SQL user-function registered to do the work of an DETACH statement. The
@@ -293,7 +293,7 @@ namespace Community.CsharpSqlite {
 			sqlite3ResetInternalSchema(db,-1);
 			return;
 			detach_error:
-			sqlite3_result_error(context,zErr.ToString(),-1);
+			context.sqlite3_result_error(zErr.ToString(),-1);
 		}
 		///<summary>
 		/// Called by the parser to compile a DETACH statement.

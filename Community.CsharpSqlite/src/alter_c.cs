@@ -77,7 +77,7 @@ namespace Community.CsharpSqlite {
 				}
 				while(token!=TK_LP&&token!=TK_USING);
 				zRet=sqlite3MPrintf(db,"%.*s\"%w\"%s",zLoc,zSql.Substring(0,zLoc),zTableName,zSql.Substring(zLoc+tname.n));
-				sqlite3_result_text(context,zRet,-1,SQLITE_DYNAMIC);
+				context.sqlite3_result_text(zRet,-1,SQLITE_DYNAMIC);
 			}
 		}
 		///<summary>
@@ -135,7 +135,7 @@ namespace Community.CsharpSqlite {
 				}
 			}
 			zResult=sqlite3MPrintf(db,"%s%s",zOutput,zInput.Substring(zLeft));
-			sqlite3_result_text(context,zResult,-1,SQLITE_DYNAMIC);
+			context.sqlite3_result_text(zResult,-1,SQLITE_DYNAMIC);
 			sqlite3DbFree(db,ref zOutput);
 		}
 		#endif
@@ -196,7 +196,7 @@ namespace Community.CsharpSqlite {
 				/* Variable tname now contains the token that is the old table-name
     ** in the CREATE TRIGGER statement.
     */zRet=sqlite3MPrintf(db,"%.*s\"%w\"%s",zLoc,zSql.Substring(0,zLoc),zTableName,zSql.Substring(zLoc+tname.n));
-				sqlite3_result_text(context,zRet,-1,SQLITE_DYNAMIC);
+				context.sqlite3_result_text(zRet,-1,SQLITE_DYNAMIC);
 			}
 		}
 		#endif
@@ -216,7 +216,7 @@ namespace Community.CsharpSqlite {
 			};
 			int i;
 			#if SQLITE_OMIT_WSD
-																					  FuncDefHash pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
+																								  FuncDefHash pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
   FuncDef[] aFunc = GLOBAL(FuncDef, aAlterTableFuncs);
 #else
 			FuncDefHash pHash=sqlite3GlobalFunctions;

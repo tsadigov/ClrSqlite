@@ -231,7 +231,7 @@ namespace Community.CsharpSqlite {
 				new sPragmaType("automatic_index",SQLITE_AutoIndex),
 				#endif
 				#if SQLITE_DEBUG
-																												new sPragmaType( "sql_trace",                SQLITE_SqlTrace      ),
+																																new sPragmaType( "sql_trace",                SQLITE_SqlTrace      ),
 new sPragmaType( "vdbe_listing",             SQLITE_VdbeListing   ),
 new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 #endif
@@ -327,7 +327,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 				"truncate",
 				"memory"
 			#if !SQLITE_OMIT_WAL
-																					, "wal"
+																								, "wal"
 #endif
 			};
 			Debug.Assert(PAGER_JOURNALMODE_DELETE==0);
@@ -416,7 +416,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			Debug.Assert(pId2!=null);
 			zDb=pId2.n>0?pDb.zName:null;
 			#if !SQLITE_OMIT_AUTHORIZATION
-																					if ( sqlite3AuthCheck( pParse, SQLITE_PRAGMA, zLeft, zRight, zDb ) )
+																								if ( sqlite3AuthCheck( pParse, SQLITE_PRAGMA, zLeft, zRight, zDb ) )
 {
 goto pragma_out;
 }
@@ -849,13 +849,13 @@ goto pragma_out;
 															else
 																#if !(SQLITE_ENABLE_LOCKING_STYLE)
 																#if (__APPLE__)
-																																																																																																																//    define SQLITE_ENABLE_LOCKING_STYLE 1
+																																																																																																																																//    define SQLITE_ENABLE_LOCKING_STYLE 1
 #else
 																//#    define SQLITE_ENABLE_LOCKING_STYLE 0
 																#endif
 																#endif
 																#if SQLITE_ENABLE_LOCKING_STYLE
-																																																																																																																/*
+																																																																																																																																/*
 **   PRAGMA [database.]lock_proxy_file
 **   PRAGMA [database.]lock_proxy_file = ":auto:"|"lock_file_path"
 **
@@ -1130,7 +1130,7 @@ else
 																							else
 																								#endif
 																								#if !NDEBUG
-																																																																																																																																																																								                                                if ( zLeft.Equals( "parser_trace" ,StringComparison.InvariantCultureIgnoreCase )  )
+																																																																																																																																																																																																                                                if ( zLeft.Equals( "parser_trace" ,StringComparison.InvariantCultureIgnoreCase )  )
                                                 {
                                                   if ( zRight != null )
                                                   {
@@ -1344,7 +1344,7 @@ else
 																												sqlite3VdbeAddOp2(v,OP_ResultRow,1,1);
 																											}
 																											#if !SQLITE_OMIT_UTF16
-																																																																																																																																																																																													else
+																																																																																																																																																																																																																								else
 {                        /* "PRAGMA encoding = XXX" */
 /* Only change the value of sqlite.enc if the database handle is not
 ** initialized. If the main database exists, the new sqlite.enc value
@@ -1473,7 +1473,7 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																														else
 																															#endif
 																															#if !SQLITE_OMIT_WAL
-																																																																																																																																																																																																																									  /*
+																																																																																																																																																																																																																																																								  /*
   **   PRAGMA [database.]wal_checkpoint = passive|full|restart
   **
   ** Checkpoint the database.
@@ -1517,7 +1517,7 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
   }else
 #endif
 																															#if SQLITE_DEBUG || SQLITE_TEST
-																																																																																																																																																																																																																									                                                            /*
+																																																																																																																																																																																																																																																								                                                            /*
 ** Report the current state of file logs for all databases
 */
                                                             if ( zLeft.Equals( "lock_status" ,StringComparison.InvariantCultureIgnoreCase )  )
@@ -1595,7 +1595,7 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																																			}
 																																			#endif
 																																			#if SQLITE_ENABLE_CEROD
-																																																																																																																																																																																																																																																					if( StringExtensions.sqlite3StrNICmp(zRight, "cerod-", 6)==0 ){
+																																																																																																																																																																																																																																																																																								if( StringExtensions.sqlite3StrNICmp(zRight, "cerod-", 6)==0 ){
 sqlite3_activate_cerod(&zRight[6]);
 }
 #endif
