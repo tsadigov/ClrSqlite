@@ -122,7 +122,7 @@ namespace Community.CsharpSqlite {
 		}
 		#endif
 		#if (SQLITE_ENABLE_UPDATE_DELETE_LIMIT) && !(SQLITE_OMIT_SUBQUERY)
-										/*
+												/*
 ** Generate an expression tree to implement the WHERE, ORDER BY,
 ** and LIMIT/OFFSET portion of DELETE and UPDATE statements.
 **
@@ -264,11 +264,11 @@ return null;
 			pTrigger=sqlite3TriggersExist(pParse,pTab,TK_DELETE,null,out iDummy);
 			isView=pTab.pSelect!=null;
 			#else
-															      const Trigger pTrigger = null;
+																		      const Trigger pTrigger = null;
       bool isView = false;
 #endif
 			#if SQLITE_OMIT_VIEW
-															// undef isView
+																		// undef isView
 isView = false;
 #endif
 			/* If pTab is really a view, make sure it has been initialized.
@@ -282,7 +282,7 @@ isView = false;
 			Debug.Assert(iDb<db.nDb);
 			zDb=db.aDb[iDb].zName;
 			#if !SQLITE_OMIT_AUTHORIZATION
-															rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
+																		rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
 #else
 			rcauth=SQLITE_OK;
 			#endif
@@ -298,7 +298,7 @@ isView = false;
 				pParse.nTab++;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
-															/* Start the view context
+																		/* Start the view context
 */
 if( isView ){
 sqlite3AuthContextPush(pParse, sContext, pTab.zName);
@@ -338,7 +338,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			/* Special case: A DELETE without a WHERE clause deletes everything.
   ** It is easier just to erase the whole table. Prior to version 3.6.5,
   ** this optimization caused the row change count (the value returned by 
-  ** API function sqlite3_count_changes) to be set incorrectly.  */if(rcauth==SQLITE_OK&&pWhere==null&&null==pTrigger&&!IsVirtual(pTab)&&0==sqlite3FkRequired(pParse,pTab,null,0)) {
+  ** API function sqlite3_count_changes) to be set incorrectly.  */if(rcauth==SQLITE_OK&&pWhere==null&&null==pTrigger&&!IsVirtual(pTab)&&0==pParse.sqlite3FkRequired(pTab,null,0)) {
 				Debug.Assert(!isView);
 				sqlite3VdbeAddOp4(v,OP_Clear,pTab.tnum,iDb,memCnt,pTab.zName,P4_STATIC);
 				for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
@@ -416,7 +416,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			}
 			delete_from_cleanup:
 			#if !SQLITE_OMIT_AUTHORIZATION
-															sqlite3AuthContextPop(sContext);
+																		sqlite3AuthContextPop(sContext);
 #endif
 			sqlite3SrcListDelete(db,ref pTabList);
 			sqlite3ExprDelete(db,ref pWhere);
@@ -463,12 +463,12 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
       ** not attempt to delete it or fire any DELETE triggers.  */iLabel=sqlite3VdbeMakeLabel(v);
 			sqlite3VdbeAddOp3(v,OP_NotExists,iCur,iLabel,iRowid);
 			/* If there are any triggers to fire, allocate a range of registers to
-      ** use for the old.* references in the triggers.  */if(sqlite3FkRequired(pParse,pTab,null,0)!=0||pTrigger!=null) {
+      ** use for the old.* references in the triggers.  */if(pParse.sqlite3FkRequired(pTab,null,0)!=0||pTrigger!=null) {
 				u32 mask;
 				/* Mask of OLD.* columns in use */int iCol;
 				/* Iterator used while populating OLD.* *//* TODO: Could use temporary registers here. Also could attempt to
         ** avoid copying the contents of the rowid register.  */mask=sqlite3TriggerColmask(pParse,pTrigger,null,0,TRIGGER_BEFORE|TRIGGER_AFTER,pTab,onconf);
-				mask|=sqlite3FkOldmask(pParse,pTab);
+				mask|=pParse.sqlite3FkOldmask(pTab);
 				iOld=pParse.nMem+1;
 				pParse.nMem+=(1+pTab.nCol);
 				/* Populate the OLD.* pseudo-table register array. These values will be 
@@ -485,7 +485,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
         ** do not fire AFTER triggers.  */sqlite3VdbeAddOp3(v,OP_NotExists,iCur,iLabel,iRowid);
 				/* Do FK processing. This call checks that any FK constraints that
         ** refer to this table (i.e. constraints attached to other tables) 
-        ** are not violated by deleting this row.  */sqlite3FkCheck(pParse,pTab,iOld,0);
+        ** are not violated by deleting this row.  */pParse.sqlite3FkCheck(pTab,iOld,0);
 			}
 			/* Delete the index and table entries. Skip this step if pTab is really
       ** a view (in which case the only effect of the DELETE statement is to
@@ -498,7 +498,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			}
 			/* Do any ON CASCADE, SET NULL or SET DEFAULT operations required to
       ** handle rows (possibly in other tables) that refer via a foreign key
-      ** to the row just deleted. */sqlite3FkActions(pParse,pTab,null,iOld);
+      ** to the row just deleted. */pParse.sqlite3FkActions(pTab,null,iOld);
 			/* Invoke AFTER DELETE trigger programs. */sqlite3CodeRowTrigger(pParse,pTrigger,TK_DELETE,null,TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
 			/* Jump here if the row had already been deleted before any BEFORE
       ** trigger programs were invoked. Or if a trigger program throws a 

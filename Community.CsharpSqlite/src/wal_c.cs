@@ -254,19 +254,19 @@ namespace Community.CsharpSqlite {
     *************************************************************************
     */
 	#if !SQLITE_OMIT_WAL
-					
+						
 //include "wal.h"
 
 /*
 ** Trace output macros
 */
 #if (SQLITE_TEST) && (SQLITE_DEBUG)
-					int sqlite3WalTrace = 0;
+						int sqlite3WalTrace = 0;
 // define WALTRACE(X)  if(sqlite3WalTrace) sqlite3DebugPrintf X
 #else
-					// define WALTRACE(X)
+						// define WALTRACE(X)
 #endif
-					
+						
 /*
 ** The maximum (and only) versions of the wal and wal-index formats
 ** that may be interpreted by this version of SQLite.
@@ -441,9 +441,9 @@ struct Wal {
   string zWalName;      /* Name of WAL file */
   u32 nCkpt;                 /* Checkpoint sequence counter in the wal-header */
 #if SQLITE_DEBUG
-					  u8 lockError;              /* True if a locking error has occurred */
+						  u8 lockError;              /* True if a locking error has occurred */
 #endif
-					};
+						};
 
 /*
 ** Candidate values for Wal.exclusiveMode.
@@ -754,7 +754,7 @@ static int walDecodeFrame(
 
 
 #if (SQLITE_TEST) && (SQLITE_DEBUG)
-					/*
+						/*
 ** Names of locks.  This routine is used to provide debugging output and is not
 ** a part of an ordinary build.
 */
@@ -773,7 +773,7 @@ static string walLockName(int lockIdx){
   }
 }
 #endif
-					    
+						    
 
 /*
 ** Set or release locks on the WAL.  Locks are either shared or exclusive.
@@ -957,7 +957,7 @@ static void walCleanupHash(Wal *pWal){
   memset((void )&aPgno[iLimit+1], 0, nByte);
 
 #if SQLITE_ENABLE_EXPENSIVE_ASSERT
-					  /* Verify that the every entry in the mapping region is still reachable
+						  /* Verify that the every entry in the mapping region is still reachable
   ** via the hash table even after the cleanup.
   */
   if( iLimit ){
@@ -971,7 +971,7 @@ static void walCleanupHash(Wal *pWal){
     }
   }
 #endif
-					}
+						}
 
 
 /*
@@ -1025,7 +1025,7 @@ static int walIndexAppend(Wal *pWal, u32 iFrame, u32 iPage){
     aHash[iKey] = (ht_slot)idx;
 
 #if SQLITE_ENABLE_EXPENSIVE_ASSERT
-					    /* Verify that the number of entries in the hash table exactly equals
+						    /* Verify that the number of entries in the hash table exactly equals
     ** the number of entries in the mapping region.
     */
     {
@@ -1050,7 +1050,7 @@ static int walIndexAppend(Wal *pWal, u32 iFrame, u32 iPage){
       }
     }
 #endif
-					  }
+						  }
 
 
   return rc;
@@ -1277,12 +1277,12 @@ int sqlite3WalOpen(
   ** in os_unix.c and os_win.c agree with the WALINDEX_LOCK_OFFSET value.
   */
 #if WIN_SHM_BASE
-					  Debug.Assert( WIN_SHM_BASE==WALINDEX_LOCK_OFFSET );
+						  Debug.Assert( WIN_SHM_BASE==WALINDEX_LOCK_OFFSET );
 #endif
-					#if UNIX_SHM_BASE
-					  Debug.Assert( UNIX_SHM_BASE==WALINDEX_LOCK_OFFSET );
+						#if UNIX_SHM_BASE
+						  Debug.Assert( UNIX_SHM_BASE==WALINDEX_LOCK_OFFSET );
 #endif
-					
+						
 
   /* Allocate an instance of struct Wal to return. */
   *ppWal = 0;
@@ -1491,14 +1491,14 @@ static void walMergesort(
   *pnList = nMerge;
 
 #if SQLITE_DEBUG
-					  {
+						  {
     int i;
     for(i=1; i<*pnList; i++){
       Debug.Assert( aContent[aList[i]] > aContent[aList[i-1]] );
     }
   }
 #endif
-					}
+						}
 
 /* 
 ** Free an iterator allocated by walIteratorInit().
@@ -2334,7 +2334,7 @@ int sqlite3WalRead(
   }
 
 #if SQLITE_ENABLE_EXPENSIVE_ASSERT
-					  /* If expensive Debug.Assert() statements are available, do a linear search
+						  /* If expensive Debug.Assert() statements are available, do a linear search
   ** of the wal-index file content. Make sure the results agree with the
   ** result obtained using the hash indexes above.  */
   {
@@ -2349,7 +2349,7 @@ int sqlite3WalRead(
     Debug.Assert( iRead==iRead2 );
   }
 #endif
-					
+						
   /* If iRead is non-zero, then it is the log frame number that contains the
   ** required page. Read and return data from the log file.
   */
@@ -2637,12 +2637,12 @@ int sqlite3WalFrames(
   Debug.Assert( pWal->writeLock );
 
 #if (SQLITE_TEST) && (SQLITE_DEBUG)
-					  { int cnt; for(cnt=0, p=pList; p; p=p->pDirty, cnt++){}
+						  { int cnt; for(cnt=0, p=pList; p; p=p->pDirty, cnt++){}
     WALTRACE(("WAL%p: frame write begin. %d frames. mxFrame=%d. %s\n",
               pWal, cnt, pWal->hdr.mxFrame, isCommit ? "Commit" : "Spill"));
   }
 #endif
-					
+						
   /* See if it is possible to write these frames into the start of the
   ** log file, instead of appending to it at pWal->hdr.mxFrame.
   */
@@ -2694,11 +2694,11 @@ int sqlite3WalFrames(
     /* Populate and write the frame header */
     nDbsize = (isCommit && p->pDirty==0) ? nTruncate : 0;
 #if (SQLITE_HAS_CODEC)
-					    if( (pData = sqlite3PagerCodec(p))==0 ) return SQLITE_NOMEM;
+						    if( (pData = sqlite3PagerCodec(p))==0 ) return SQLITE_NOMEM;
 #else
-					    pData = p->pData;
+						    pData = p->pData;
 #endif
-					    walEncodeFrame(pWal, p->pgno, nDbsize, pData, aFrame);
+						    walEncodeFrame(pWal, p->pgno, nDbsize, pData, aFrame);
     rc = sqlite3OsWrite(pWal->pWalFd, aFrame, sizeof(aFrame), iOffset);
     if( rc!=SQLITE_OK ){
       return rc;
@@ -2724,11 +2724,11 @@ int sqlite3WalFrames(
     while( iOffset<iSegment ){
       void *pData;
 #if (SQLITE_HAS_CODEC)
-					      if( (pData = sqlite3PagerCodec(pLast))==0 ) return SQLITE_NOMEM;
+						      if( (pData = sqlite3PagerCodec(pLast))==0 ) return SQLITE_NOMEM;
 #else
-					      pData = pLast->pData;
+						      pData = pLast->pData;
 #endif
-					      walEncodeFrame(pWal, pLast->pgno, nTruncate, pData, aFrame);
+						      walEncodeFrame(pWal, pLast->pgno, nTruncate, pData, aFrame);
       /* testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL */
       rc = sqlite3OsWrite(pWal->pWalFd, aFrame, sizeof(aFrame), iOffset);
       if( rc!=SQLITE_OK ){

@@ -24,8 +24,8 @@ namespace Community.CsharpSqlite {
     ** routines.
     */
 		#if SQLITE_POOL_MEM
-										#if TRUE
-										    static byte[] sqlite3MemMalloc( u32 nByte )
+												#if TRUE
+												    static byte[] sqlite3MemMalloc( u32 nByte )
     {
       return new byte[nByte];
     }
@@ -38,7 +38,7 @@ namespace Community.CsharpSqlite {
       return new int[nInt];
     }
 #else
-										    static byte[] sqlite3MemMalloc(int nByte)
+												    static byte[] sqlite3MemMalloc(int nByte)
     {
       byte[] pByte = null;
       int savej = -1;
@@ -110,7 +110,7 @@ namespace Community.CsharpSqlite {
       return pInt;
     }
 #endif
-										
+												
     static Mem sqlite3MemMallocMem( Mem dummy )
     {
       Mem pMem;
@@ -165,13 +165,13 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if SQLITE_POOL_MEM
-										#if TRUE
-										    static void sqlite3MemFreeInt( ref int[] pPrior )
+												#if TRUE
+												    static void sqlite3MemFreeInt( ref int[] pPrior )
     {
       pPrior = null;
     }
 #else
-										    static void sqlite3MemFree(ref byte[] pPrior)
+												    static void sqlite3MemFree(ref byte[] pPrior)
     {
       if (pPrior == null) return;
       if (pPrior.Length > mem0.aByteSize[0])
@@ -181,9 +181,9 @@ namespace Community.CsharpSqlite {
         int i;
         for (i = 0; i < mem0.aByteSize.Length - 1; i++) if (pPrior.Length <= mem0.aByteSize[i]) break;
 #if DEBUG
-										for (int j = 0; j < mem0.aByte[i].Length; j++) if (mem0.aByte[i][j] != null && mem0.aByte[i][j] == pPrior) Debugger.Break();
+												for (int j = 0; j < mem0.aByte[i].Length; j++) if (mem0.aByte[i][j] != null && mem0.aByte[i][j] == pPrior) Debugger.Break();
 #endif
-										        mem0.mf_Byte++;
+												        mem0.mf_Byte++;
         for (int j = 0; j <= mem0.aByte_used[i]; j++)
         {
           if (mem0.aByte[i][j] == null)
@@ -213,9 +213,9 @@ namespace Community.CsharpSqlite {
         int savei = -1;
         int Smallest = int.MaxValue;
 #if DEBUG
-										for (int i = 0; i < mem0.aInt.Length; i++) if (mem0.aInt[i] != null && mem0.aInt[i] == pPrior) Debugger.Break();
+												for (int i = 0; i < mem0.aInt.Length; i++) if (mem0.aInt[i] != null && mem0.aInt[i] == pPrior) Debugger.Break();
 #endif
-										        mem0.mf_Int++;
+												        mem0.mf_Int++;
         for (int i = 0; i < mem0.aInt.Length; i++)
         {
           if (mem0.aInt[i] == null)
@@ -236,14 +236,14 @@ namespace Community.CsharpSqlite {
       return;
     }
 #endif
-										    static void sqlite3MemFreeMem( ref Mem pPrior )
+												    static void sqlite3MemFreeMem( ref Mem pPrior )
     {
       if ( pPrior == null )
         return;
 #if FALSE && DEBUG
-										for (int i = mem0.msMem.next - 1; i >= 0; i--) if (mem0.aMem[i] != null && mem0.aMem[i] == pPrior) Debugger.Break();
+												for (int i = mem0.msMem.next - 1; i >= 0; i--) if (mem0.aMem[i] != null && mem0.aMem[i] == pPrior) Debugger.Break();
 #endif
-										      mem0.msMem.dealloc++;
+												      mem0.msMem.dealloc++;
       if ( mem0.msMem.next < mem0.aMem.Length - 1 )
       {
         pPrior.db = null;
@@ -272,9 +272,9 @@ namespace Community.CsharpSqlite {
       if ( pPrior == null )
         return;
 #if FALSE && DEBUG
-										      for ( int i = mem0.msBtCursor.next - 1; i >= 0; i-- ) if ( mem0.aBtCursor[i] != null && mem0.aBtCursor[i] == pPrior ) Debugger.Break();
+												      for ( int i = mem0.msBtCursor.next - 1; i >= 0; i-- ) if ( mem0.aBtCursor[i] != null && mem0.aBtCursor[i] == pPrior ) Debugger.Break();
 #endif
-										      mem0.msBtCursor.dealloc++;
+												      mem0.msBtCursor.dealloc++;
       if ( mem0.msBtCursor.next < mem0.aBtCursor.Length - 1 )
       {
         mem0.aBtCursor[++mem0.msBtCursor.next] = pPrior;

@@ -39,7 +39,7 @@ namespace Community.CsharpSqlite {
 		//#include "sqliteInt.h"
 		//#include "vdbeInt.h"
 		#if !SQLITE_OMIT_DEPRECATED
-										///<summary>
+												///<summary>
 /// Return TRUE (non-zero) of the statement supplied as an argument needs
 /// to be recompiled.  A statement needs to be recompiled whenever the
 /// execution environment changes in a way that would alter the program
@@ -96,12 +96,12 @@ return ( p == null || p.expired ) ? 1 : 0;
 				Vdbe v=pStmt;
 				sqlite3 db=v.db;
 				#if SQLITE_THREADSAFE
-																				        sqlite3_mutex mutex;
+																								        sqlite3_mutex mutex;
 #endif
 				if(vdbeSafety(v))
 					return SQLITE_MISUSE_BKPT();
 				#if SQLITE_THREADSAFE
-																				        mutex = v.db.mutex;
+																								        mutex = v.db.mutex;
 #endif
 				sqlite3_mutex_enter(mutex);
 				rc=sqlite3VdbeFinalize(ref v);
@@ -144,7 +144,7 @@ return ( p == null || p.expired ) ? 1 : 0;
 			int rc=SQLITE_OK;
 			Vdbe p=(Vdbe)pStmt;
 			#if SQLITE_THREADSAFE
-															      sqlite3_mutex mutex = ( (Vdbe)pStmt ).db.mutex;
+																		      sqlite3_mutex mutex = ( (Vdbe)pStmt ).db.mutex;
 #endif
 			sqlite3_mutex_enter(mutex);
 			for(i=0;i<p.nVar;i++) {
@@ -205,7 +205,7 @@ return ( p == null || p.expired ) ? 1 : 0;
 			return sqlite3ValueText(pVal,SqliteEncoding.UTF8);
 		}
 		#if !SQLITE_OMIT_UTF16
-										public static string sqlite3_value_text16(sqlite3_value pVal){
+												public static string sqlite3_value_text16(sqlite3_value pVal){
 return sqlite3ValueText(pVal, SqliteEncoding.UTF16NATIVE);
 }
 public static string  sqlite3_value_text16be(sqlite3_value pVal){
@@ -255,7 +255,7 @@ return sqlite3ValueText(pVal, SqliteEncoding.UTF16LE);
 			pCtx.isError=SQLITE_ERROR;
 		}
 		#if !SQLITE_OMIT_UTF16
-										//void sqlite3_result_error16(sqlite3_context pCtx, string z, int n){
+												//void sqlite3_result_error16(sqlite3_context pCtx, string z, int n){
 //  Debug.Assert( sqlite3_mutex_held(pCtx.s.db.mutex) );
 //  pCtx.isError = SQLITE_ERROR;
 //  sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16NATIVE, SQLITE_TRANSIENT);
@@ -287,7 +287,7 @@ return sqlite3ValueText(pVal, SqliteEncoding.UTF16LE);
 			setResultStrOrError(pCtx,z,n,SqliteEncoding.UTF8,xDel);
 		}
 		#if !SQLITE_OMIT_UTF16
-										void sqlite3_result_text16(
+												void sqlite3_result_text16(
 sqlite3_context pCtx,
 string z,
 int n,
@@ -354,7 +354,7 @@ sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16LE, xDel);
 		static int doWalCallbacks(sqlite3 db) {
 			int rc=SQLITE_OK;
 			#if !SQLITE_OMIT_WAL
-															int i;
+																		int i;
 for(i=0; i<db->nDb; i++){
 Btree *pBt = db->aDb[i].pBt;
 if( pBt ){
@@ -397,7 +397,7 @@ rc = db->xWalCallback(db->pWalArg, db, db->aDb[i].zName, nEntry);
         ** or SQLITE_BUSY error.
         */
 				#if SQLITE_OMIT_AUTORESET
-																				if( p.rc==SQLITE_BUSY || p.rc==SQLITE_LOCKED ){
+																								if( p.rc==SQLITE_BUSY || p.rc==SQLITE_LOCKED ){
 sqlite3_reset((sqlite3_stmt)p);
 }else{
 return SQLITE_MISUSE_BKPT();
@@ -668,7 +668,7 @@ return SQLITE_MISUSE_BKPT();
 			}
 		}
 		#if !SQLITE_OMIT_DEPRECATED
-										///<summary>
+												///<summary>
 /// Return the number of times the Step function of a aggregate has been
 /// called.
 ///
@@ -738,7 +738,7 @@ return p.pMem.n;
 				//         0, 0 };
 				Mem nullMem=new Mem(null,"",(double)0,0,0,MEM_Null,SQLITE_NULL,0
 				#if SQLITE_DEBUG
-																				         , null, null  /* pScopyFrom, pFiller */
+																								         , null, null  /* pScopyFrom, pFiller */
 #endif
 				);
 				if(pVm!=null&&ALWAYS(pVm.db!=null)) {
@@ -834,7 +834,7 @@ return p.pMem.n;
 			return (sqlite3_value)pOut;
 		}
 		#if !SQLITE_OMIT_UTF16
-										//const void *sqlite3_column_text16(sqlite3_stmt pStmt, int i){
+												//const void *sqlite3_column_text16(sqlite3_stmt pStmt, int i){
 //  const void *val = sqlite3_value_text16( columnMem(pStmt,i) );
 //  columnMallocFailure(pStmt);
 //  return val;
@@ -901,7 +901,7 @@ return p.pMem.n;
 			return columnName(pStmt,N,sqlite3_value_text,COLNAME_NAME);
 		}
 		#if !SQLITE_OMIT_UTF16
-										public static string sqlite3_column_name16(sqlite3_stmt pStmt, int N){
+												public static string sqlite3_column_name16(sqlite3_stmt pStmt, int N){
 return columnName(
 pStmt, N,  sqlite3_value_text16, COLNAME_NAME);
 }
@@ -911,8 +911,8 @@ pStmt, N,  sqlite3_value_text16, COLNAME_NAME);
 		/// not define OMIT_DECLTYPE.
 		///</summary>
 		#if SQLITE_OMIT_DECLTYPE && SQLITE_ENABLE_COLUMN_METADATA
-										#error "Must not define both SQLITE_OMIT_DECLTYPE and SQLITE_ENABLE_COLUMN_METADATA"
-										#endif
+												#error "Must not define both SQLITE_OMIT_DECLTYPE and SQLITE_ENABLE_COLUMN_METADATA"
+												#endif
 		#if !SQLITE_OMIT_DECLTYPE
 		/*
 ** Return the column declaration type (if applicable) of the 'i'th column
@@ -921,14 +921,14 @@ pStmt, N,  sqlite3_value_text16, COLNAME_NAME);
 			return columnName(pStmt,N,sqlite3_value_text,COLNAME_DECLTYPE);
 		}
 		#if !SQLITE_OMIT_UTF16
-										//const void *sqlite3_column_decltype16(sqlite3_stmt pStmt, int N){
+												//const void *sqlite3_column_decltype16(sqlite3_stmt pStmt, int N){
 //  return columnName(
 //      pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_DECLTYPE);
 //}
 #endif
 		#endif
 		#if SQLITE_ENABLE_COLUMN_METADATA
-										
+												
 /*
 ** Return the name of the database from which a result column derives.
 ** NULL is returned if the result column is an expression or constant or
@@ -940,12 +940,12 @@ pStmt, N,  sqlite3_value_text16, COLNAME_NAME);
       pStmt, N, sqlite3_value_text, COLNAME_DATABASE );
     }
 #if !SQLITE_OMIT_UTF16
-										const void *sqlite3_column_database_name16(sqlite3_stmt pStmt, int N){
+												const void *sqlite3_column_database_name16(sqlite3_stmt pStmt, int N){
 return columnName(
 pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_DATABASE);
 }
 #endif
-										
+												
 /*
 ** Return the name of the table from which a result column derives.
 ** NULL is returned if the result column is an expression or constant or
@@ -957,12 +957,12 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_DATABASE);
       pStmt, N, sqlite3_value_text, COLNAME_TABLE );
     }
 #if !SQLITE_OMIT_UTF16
-										const void *sqlite3_column_table_name16(sqlite3_stmt pStmt, int N){
+												const void *sqlite3_column_table_name16(sqlite3_stmt pStmt, int N){
 return columnName(
 pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_TABLE);
 }
 #endif
-										
+												
 /*
 ** Return the name of the table column from which a result column derives.
 ** NULL is returned if the result column is an expression or constant or
@@ -974,12 +974,12 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_TABLE);
       pStmt, N, sqlite3_value_text, COLNAME_COLUMN );
     }
 #if !SQLITE_OMIT_UTF16
-										const void *sqlite3_column_origin_name16(sqlite3_stmt pStmt, int N){
+												const void *sqlite3_column_origin_name16(sqlite3_stmt pStmt, int N){
 return columnName(
 pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
 }
 #endif
-										#endif
+												#endif
 		///<summary>
 		/// sqlite3_bind_  
 		///
@@ -1121,7 +1121,7 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
 			return bindBlob(pStmt,i,zData,nData>=0?nData:zData.Length,xDel,0);
 		}
 		#if !SQLITE_OMIT_UTF16
-										static int sqlite3_bind_text16(
+												static int sqlite3_bind_text16(
 sqlite3_stmt pStmt,
 int i,
 string zData,
@@ -1238,7 +1238,7 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
 			return SQLITE_OK;
 		}
 		#if !SQLITE_OMIT_DEPRECATED
-										///<summary>
+												///<summary>
 /// Deprecated external interface.  Internal/core SQLite code
 /// should call sqlite3TransferBindings.
 ///

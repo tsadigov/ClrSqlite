@@ -78,7 +78,7 @@ namespace Community.CsharpSqlite {
 				SqliteEncoding enc=ENC(sqlite3VdbeDb(v));
 				Column pCol=pTab.aCol[i];
 				#if SQLITE_DEBUG
-																				        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
+																								        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
 #endif
 				Debug.Assert(i<pTab.nCol);
 				sqlite3ValueFromExpr(sqlite3VdbeDb(v),pCol.pDflt,enc,pCol.affinity,ref pValue);
@@ -154,11 +154,11 @@ namespace Community.CsharpSqlite {
 			isView=pTab.pSelect!=null;
 			Debug.Assert(pTrigger!=null||tmask==0);
 			#else
-															      const Trigger pTrigger = null;// define pTrigger 0
+																		      const Trigger pTrigger = null;// define pTrigger 0
       const int tmask = 0;          // define tmask 0
 #endif
 			#if SQLITE_OMIT_TRIGGER || SQLITE_OMIT_VIEW
-															//     undef isView
+																		//     undef isView
       const bool isView = false;    // define isView 0
 #endif
 			if(sqlite3ViewGetColumnNames(pParse,pTab)!=0) {
@@ -216,7 +216,7 @@ namespace Community.CsharpSqlite {
 					}
 				}
 				#if !SQLITE_OMIT_AUTHORIZATION
-																				{
+																								{
 int rc;
 rc = sqlite3AuthCheck(pParse, SQLITE_UPDATE, pTab.zName,
 pTab.aCol[j].zName, db.aDb[iDb].zName);
@@ -228,7 +228,7 @@ aXRef[j] = -1;
 }
 #endif
 			}
-			hasFK=sqlite3FkRequired(pParse,pTab,aXRef,chngRowid?1:0)!=0;
+			hasFK=pParse.sqlite3FkRequired(pTab,aXRef,chngRowid?1:0)!=0;
 			/* Allocate memory for the array aRegIdx[].  There is one entry in the
       ** array for each index associated with table being updated.  Fill in
       ** the value with a register number for indices that are to be used
@@ -366,7 +366,7 @@ aXRef[j] = -1;
 			}
 			/* If there are triggers on this table, populate an array of registers 
       ** with the required old.* column data.  */if(hasFK||pTrigger!=null) {
-				u32 oldmask=(hasFK?sqlite3FkOldmask(pParse,pTab):0);
+				u32 oldmask=(hasFK?pParse.sqlite3FkOldmask(pTab):0);
 				oldmask|=sqlite3TriggerColmask(pParse,pTrigger,pChanges,0,TRIGGER_BEFORE|TRIGGER_AFTER,pTab,onError);
 				for(i=0;i<pTab.nCol;i++) {
 					if(aXRef[i]<0||oldmask==0xffffffff||(i<32&&0!=(oldmask&(1<<i)))) {
@@ -443,7 +443,7 @@ aXRef[j] = -1;
 				/* Address of jump instruction *//* Do constraint checks. */int iDummy;
 				sqlite3GenerateConstraintChecks(pParse,pTab,iCur,regNewRowid,aRegIdx,(chngRowid?regOldRowid:0),true,onError,addr,out iDummy);
 				/* Do FK constraint checks. */if(hasFK) {
-					sqlite3FkCheck(pParse,pTab,regOldRowid,0);
+					pParse.sqlite3FkCheck(pTab,regOldRowid,0);
 				}
 				/* Delete the index entries associated with the current record.  */j1=sqlite3VdbeAddOp3(v,OP_NotExists,iCur,0,regOldRowid);
 				sqlite3GenerateRowIndexDelete(pParse,pTab,iCur,aRegIdx);
@@ -452,13 +452,13 @@ aXRef[j] = -1;
 				}
 				sqlite3VdbeJumpHere(v,j1);
 				if(hasFK) {
-					sqlite3FkCheck(pParse,pTab,0,regNewRowid);
+					pParse.sqlite3FkCheck(pTab,0,regNewRowid);
 				}
 				/* Insert the new index entries and the new record. */sqlite3CompleteInsertion(pParse,pTab,iCur,regNewRowid,aRegIdx,true,false,false);
 				/* Do any ON CASCADE, SET NULL or SET DEFAULT operations required to
         ** handle rows (possibly in other tables) that refer via a foreign key
         ** to the row just updated. */if(hasFK) {
-					sqlite3FkActions(pParse,pTab,pChanges,regOldRowid);
+					pParse.sqlite3FkActions(pTab,pChanges,regOldRowid);
 				}
 			}
 			/* Increment the row counter 
@@ -493,7 +493,7 @@ aXRef[j] = -1;
 			}
 			update_cleanup:
 			#if !SQLITE_OMIT_AUTHORIZATION
-															sqlite3AuthContextPop(sContext);
+																		sqlite3AuthContextPop(sContext);
 #endif
 			sqlite3DbFree(db,ref aRegIdx);
 			sqlite3DbFree(db,ref aXRef);

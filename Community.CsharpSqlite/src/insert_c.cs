@@ -308,7 +308,7 @@ namespace Community.CsharpSqlite {
 			}
 		}
 		#else
-										/*
+												/*
 ** If SQLITE_OMIT_AUTOINCREMENT is defined, then the three routines
 ** above are all no-ops
 */
@@ -494,7 +494,7 @@ namespace Community.CsharpSqlite {
 			pDb=db.aDb[iDb];
 			zDb=pDb.zName;
 			#if !SQLITE_OMIT_AUTHORIZATION
-															if( sqlite3AuthCheck(pParse, SQLITE_INSERT, pTab.zName, 0, zDb) ){
+																		if( sqlite3AuthCheck(pParse, SQLITE_INSERT, pTab.zName, 0, zDb) ){
 goto insert_cleanup;
 }
 #endif
@@ -505,12 +505,12 @@ goto insert_cleanup;
 			pTrigger=sqlite3TriggersExist(pParse,pTab,TK_INSERT,null,out tmask);
 			isView=pTab.pSelect!=null;
 			#else
-															      Trigger pTrigger = null;  // define pTrigger 0
+																		      Trigger pTrigger = null;  // define pTrigger 0
       int tmask = 0;            // define tmask 0
       bool isView = false;
 #endif
 			#if SQLITE_OMIT_VIEW
-															// undef isView
+																		// undef isView
 isView = false;
 #endif
 			#if !SQLITE_OMIT_TRIGGER
@@ -586,14 +586,14 @@ isView = false;
 				sqlite3VdbeAddOp2(v,OP_Integer,0,regEof);
 				/* EOF <- 0 */
 				#if SQLITE_DEBUG
-																				        VdbeComment( v, "SELECT eof flag" );
+																								        VdbeComment( v, "SELECT eof flag" );
 #endif
 				sqlite3SelectDestInit(dest,SelectResultType.Coroutine,++pParse.nMem);
 				addrSelect=sqlite3VdbeCurrentAddr(v)+2;
 				sqlite3VdbeAddOp2(v,OP_Integer,addrSelect-1,dest.iParm);
 				j1=sqlite3VdbeAddOp2(v,OP_Goto,0,0);
 				#if SQLITE_DEBUG
-																				        VdbeComment( v, "Jump over SELECT coroutine" );
+																								        VdbeComment( v, "Jump over SELECT coroutine" );
 #endif
 				/* Resolve the expressions in the SELECT statement and execute it. */rc=sqlite3Select(pParse,pSelect,ref dest);
 				Debug.Assert(pParse.nErr==0||rc!=0);
@@ -604,7 +604,7 @@ isView = false;
 				/* EOF <- 1 */sqlite3VdbeAddOp1(v,OP_Yield,dest.iParm);
 				/* yield X */sqlite3VdbeAddOp2(v,OP_Halt,SQLITE_INTERNAL,OE_Abort);
 				#if SQLITE_DEBUG
-																				        VdbeComment( v, "End of SELECT coroutine" );
+																								        VdbeComment( v, "End of SELECT coroutine" );
 #endif
 				sqlite3VdbeJumpHere(v,j1);
 				/* label B: */regFromSelect=dest.iMem;
@@ -954,7 +954,7 @@ isView = false;
 				 {
 					int isReplace=0;
 					/* Set to true if constraints may cause a replace */sqlite3GenerateConstraintChecks(pParse,pTab,baseCur,regIns,aRegIdx,keyColumn>=0?1:0,false,onError,endOfLoop,out isReplace);
-					sqlite3FkCheck(pParse,pTab,0,regIns);
+					pParse.sqlite3FkCheck(pTab,0,regIns);
 					sqlite3CompleteInsertion(pParse,pTab,baseCur,regIns,aRegIdx,false,appendFlag,isReplace==0);
 				}
 			}
@@ -1235,7 +1235,7 @@ isView = false;
 						int iDummy;
 						pTrigger=sqlite3TriggersExist(pParse,pTab,TK_DELETE,null,out iDummy);
 					}
-					if(pTrigger!=null||sqlite3FkRequired(pParse,pTab,null,0)!=0) {
+					if(pTrigger!=null||pParse.sqlite3FkRequired(pTab,null,0)!=0) {
 						sqlite3MultiWrite(pParse);
 						sqlite3GenerateRowDelete(pParse,pTab,baseCur,regRowid,0,pTrigger,OE_Replace);
 					}
@@ -1433,7 +1433,7 @@ isView = false;
 				Debug.Assert(pIdx.pSchema==pTab.pSchema);
 				sqlite3VdbeAddOp4(v,op,i+baseCur,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
-																				        VdbeComment( v, "%s", pIdx.zName );
+																								        VdbeComment( v, "%s", pIdx.zName );
 #endif
 			}
 			if(pParse.nTab<baseCur+i) {
@@ -1442,18 +1442,18 @@ isView = false;
 			return i-1;
 		}
 		#if SQLITE_TEST
-										    /*
+												    /*
 ** The following global variable is incremented whenever the
 ** transfer optimization is used.  This is used for testing
 ** purposes only - to make sure the transfer optimization really
 ** is happening when it is suppose to.
 */
 #if !TCLSH
-										    static int sqlite3_xferopt_count = 0;
+												    static int sqlite3_xferopt_count = 0;
 #else
-										    static tcl.lang.Var.SQLITE3_GETSET sqlite3_xferopt_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_xferopt_count" );
+												    static tcl.lang.Var.SQLITE3_GETSET sqlite3_xferopt_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_xferopt_count" );
 #endif
-										#endif
+												#endif
 		#if !SQLITE_OMIT_XFER_OPT
 		///<summary>
 		/// Check to collation names to see if they are compatible.
@@ -1671,12 +1671,12 @@ isView = false;
       **        table is empty.
       */
 			#if SQLITE_TEST
-															#if !TCLSH
-															      sqlite3_xferopt_count++;
+																		#if !TCLSH
+																		      sqlite3_xferopt_count++;
 #else
-															      sqlite3_xferopt_count.iValue++;
+																		      sqlite3_xferopt_count.iValue++;
 #endif
-															#endif
+																		#endif
 			iDbSrc=sqlite3SchemaToIndex(pParse.db,pSrc.pSchema);
 			v=sqlite3GetVdbe(pParse);
 			sqlite3CodeVerifySchema(pParse,iDbSrc);
@@ -1736,12 +1736,12 @@ isView = false;
 				pKey=sqlite3IndexKeyinfo(pParse,pSrcIdx);
 				sqlite3VdbeAddOp4(v,OP_OpenRead,iSrc,pSrcIdx.tnum,iDbSrc,pKey,P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
-																				        VdbeComment( v, "%s", pSrcIdx.zName );
+																								        VdbeComment( v, "%s", pSrcIdx.zName );
 #endif
 				pKey=sqlite3IndexKeyinfo(pParse,pDestIdx);
 				sqlite3VdbeAddOp4(v,OP_OpenWrite,iDest,pDestIdx.tnum,iDbDest,pKey,P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
-																				        VdbeComment( v, "%s", pDestIdx.zName );
+																								        VdbeComment( v, "%s", pDestIdx.zName );
 #endif
 				addr1=sqlite3VdbeAddOp2(v,OP_Rewind,iSrc,0);
 				sqlite3VdbeAddOp2(v,OP_RowKey,iSrc,regData);
