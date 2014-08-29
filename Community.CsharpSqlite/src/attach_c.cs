@@ -283,7 +283,7 @@ namespace Community.CsharpSqlite {
 				sqlite3_snprintf(200,zErr,"cannot DETACH database within transaction");
 				goto detach_error;
 			}
-			if(sqlite3BtreeIsInReadTrans(pDb.pBt)||sqlite3BtreeIsInBackup(pDb.pBt)) {
+			if(pDb.pBt.sqlite3BtreeIsInReadTrans()||pDb.pBt.sqlite3BtreeIsInBackup()) {
 				sqlite3_snprintf(200,zErr,"database %s is locked",zName);
 				goto detach_error;
 			}

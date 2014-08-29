@@ -28,7 +28,7 @@ namespace Community.CsharpSqlite {
 			}
 			int result=0;
 			#if WINDOWS_MOBILE
-																																										  try { result = Int32.Parse(inStr.Substring(0, i)); }
+																																													  try { result = Int32.Parse(inStr.Substring(0, i)); }
   catch { }
   return result;
 #else
@@ -343,7 +343,7 @@ namespace Community.CsharpSqlite {
 			}
 			return 4096;
 			#else
-																																										    return 4096;
+																																													    return 4096;
 #endif
 		}
 		static void SWAP<T>(ref T A,ref T B) {
@@ -417,7 +417,7 @@ namespace Community.CsharpSqlite {
 			}
 		}
 		#if SQLITE_MUTEX_W32
-																												//---------------------WIN32 Definitions
+																														//---------------------WIN32 Definitions
 static int GetCurrentThreadId()
 {
   return Thread.CurrentThread.ManagedThreadId;

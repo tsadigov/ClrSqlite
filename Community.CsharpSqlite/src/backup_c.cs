@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite {
 					/* If there is no open read-transaction on the source database, open
     ** one now. If a transaction is opened here, then it will be closed
     ** before this function exits.
-    */if(rc==SQLITE_OK&&!sqlite3BtreeIsInReadTrans(this.pSrc)) {
+    */if(rc==SQLITE_OK&&!this.pSrc.sqlite3BtreeIsInReadTrans()) {
 						rc=sqlite3BtreeBeginTrans(this.pSrc,0);
 						bCloseTrans=1;
 					}
@@ -244,7 +244,7 @@ namespace Community.CsharpSqlite {
     ** "committing" a read-only transaction cannot fail.
     */if(bCloseTrans!=0) {
 						#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																	      //TESTONLY( int rc2 );
+																																																																																							      //TESTONLY( int rc2 );
       //TESTONLY( rc2  = ) sqlite3BtreeCommitPhaseOne(p.pSrc, 0);
       //TESTONLY( rc2 |= ) sqlite3BtreeCommitPhaseTwo(p.pSrc);
       int rc2;

@@ -86,7 +86,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if SQLITE_DEBUG
-																												    // define memAboutToChange(P,M) sqlite3VdbeMemPrepareToChange(P,M)
+																														    // define memAboutToChange(P,M) sqlite3VdbeMemPrepareToChange(P,M)
     static void memAboutToChange( Vdbe P, Mem M )
     {
       sqlite3VdbeMemPrepareToChange( P, M );
@@ -104,12 +104,12 @@ namespace Community.CsharpSqlite {
 ** help verify the correct operation of the library.
 */
 		#if SQLITE_TEST
-																												#if !TCLSH
-																												    static int sqlite3_search_count = 0;
+																														#if !TCLSH
+																														    static int sqlite3_search_count = 0;
 #else
-																												    static tcl.lang.Var.SQLITE3_GETSET sqlite3_search_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_search_count" );
+																														    static tcl.lang.Var.SQLITE3_GETSET sqlite3_search_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_search_count" );
 #endif
-																												#endif
+																														#endif
 		/*
 ** When this global variable is positive, it gets decremented once before
 ** each instruction in the VDBE.  When reaches zero, the u1.isInterrupted
@@ -119,12 +119,12 @@ namespace Community.CsharpSqlite {
 ** in an ordinary build.
 */
 		#if SQLITE_TEST
-																												#if !TCLSH
-																												    static int sqlite3_interrupt_count = 0;
+																														#if !TCLSH
+																														    static int sqlite3_interrupt_count = 0;
 #else
-																												    static tcl.lang.Var.SQLITE3_GETSET sqlite3_interrupt_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_interrupt_count" );
+																														    static tcl.lang.Var.SQLITE3_GETSET sqlite3_interrupt_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_interrupt_count" );
 #endif
-																												#endif
+																														#endif
 		/*
 ** The next global variable is incremented each type the OP_Sort opcode
 ** is executed.  The test procedures use this information to make sure that
@@ -133,12 +133,12 @@ namespace Community.CsharpSqlite {
 ** library.
 */
 		#if SQLITE_TEST
-																												#if !TCLSH
-																												    static int sqlite3_sort_count = 0;
+																														#if !TCLSH
+																														    static int sqlite3_sort_count = 0;
 #else
-																												    static tcl.lang.Var.SQLITE3_GETSET sqlite3_sort_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_sort_count" );
+																														    static tcl.lang.Var.SQLITE3_GETSET sqlite3_sort_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_sort_count" );
 #endif
-																												#endif
+																														#endif
 		/*
 ** The next global variable records the size of the largest MEM_Blob
 ** or MEM_Str that has been used by a VDBE opcode.  The test procedures
@@ -147,26 +147,26 @@ namespace Community.CsharpSqlite {
 ** help verify the correct operation of the library.
 */
 		#if SQLITE_TEST
-																												#if !TCLSH
-																												    static int sqlite3_max_blobsize = 0;
+																														#if !TCLSH
+																														    static int sqlite3_max_blobsize = 0;
 #else
-																												    static tcl.lang.Var.SQLITE3_GETSET sqlite3_max_blobsize = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_max_blobsize" );
+																														    static tcl.lang.Var.SQLITE3_GETSET sqlite3_max_blobsize = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_max_blobsize" );
 #endif
-																												
+																														
     static void updateMaxBlobsize( Mem p )
     {
 #if !TCLSH
-																												      if ( ( p.flags & ( MEM_Str | MEM_Blob ) ) != 0 && p.n > sqlite3_max_blobsize )
+																														      if ( ( p.flags & ( MEM_Str | MEM_Blob ) ) != 0 && p.n > sqlite3_max_blobsize )
       {
         sqlite3_max_blobsize = p.n;
       }
 #else
-																												      if ( ( p.flags & ( MEM_Str | MEM_Blob ) ) != 0 && p.n > sqlite3_max_blobsize.iValue )
+																														      if ( ( p.flags & ( MEM_Str | MEM_Blob ) ) != 0 && p.n > sqlite3_max_blobsize.iValue )
       {
         sqlite3_max_blobsize.iValue = p.n;
       }
 #endif
-																												    }
+																														    }
 #endif
 		/*
 ** The next global variable is incremented each type the OP_Found opcode
@@ -176,19 +176,19 @@ namespace Community.CsharpSqlite {
 ** library.
 */
 		#if SQLITE_TEST
-																												#if !TCLSH
-																												    static int sqlite3_found_count = 0;
+																														#if !TCLSH
+																														    static int sqlite3_found_count = 0;
 #else
-																												    static tcl.lang.Var.SQLITE3_GETSET sqlite3_found_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_found_count" );
+																														    static tcl.lang.Var.SQLITE3_GETSET sqlite3_found_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_found_count" );
 #endif
-																												#endif
+																														#endif
 		///<summary>
 		////
 		/// Test a register to see if it exceeds the current maximum blob size.
 		/// If it does, record the new maximum blob size.
 		///</summary>
 		#if SQLITE_TEST && !SQLITE_OMIT_BUILTIN_TEST
-																												    static void UPDATE_MAX_BLOBSIZE( Mem P )
+																														    static void UPDATE_MAX_BLOBSIZE( Mem P )
     {
       updateMaxBlobsize( P );
     }
@@ -408,7 +408,7 @@ namespace Community.CsharpSqlite {
 			applyAffinity((Mem)pVal,affinity,enc);
 		}
 		#if SQLITE_DEBUG
-																												    /*
+																														    /*
 ** Write a nice string representation of the contents of cell pMem
 ** into buffer zBuf, length nBuf.
 */
@@ -521,7 +521,7 @@ namespace Community.CsharpSqlite {
     }
 #endif
 		#if SQLITE_DEBUG
-																												    /*
+																														    /*
 ** Print the value of a register for tracing purposes:
 */
     static void memTracePrint( FILE _out, Mem p )
@@ -534,12 +534,12 @@ namespace Community.CsharpSqlite {
       {
         fprintf( _out, " si:%lld", p.u.i );
 #if !SQLITE_OMIT_FLOATING_POINT
-																												      }
+																														      }
       else if ( ( p.flags & MEM_Int ) != 0 )
       {
         fprintf( _out, " i:%lld", p.u.i );
 #endif
-																												      }
+																														      }
       else if ( ( p.flags & MEM_Real ) != 0 )
       {
         fprintf( _out, " r:%g", p.r );
@@ -564,7 +564,7 @@ namespace Community.CsharpSqlite {
     }
 #endif
 		#if SQLITE_DEBUG
-																												    //  define REGISTER_TRACE(R,M) if(p.trace)registerTrace(p.trace,R,M)
+																														    //  define REGISTER_TRACE(R,M) if(p.trace)registerTrace(p.trace,R,M)
     static void REGISTER_TRACE( Vdbe p, int R, Mem M )
     {
       if ( p.trace != null )
@@ -576,7 +576,7 @@ namespace Community.CsharpSqlite {
 		}
 		#endif
 		#if VDBE_PROFILE
-																												
+																														
 /*
 ** hwtime.h contains inline assembler code for implementing
 ** high-performance timing routines.
@@ -597,7 +597,7 @@ namespace Community.CsharpSqlite {
 		//#define CHECK_FOR_INTERRUPT \
 		//   if( db.u1.isInterrupted ) goto abort_due_to_interrupt;
 		#if !NDEBUG
-																												    ///<summary>
+																														    ///<summary>
 /// This function is only called from within an Debug.Assert() expression. It
 /// checks that the sqlite3.nTransaction variable is correctly set to
 /// the number of non-transaction savepoints currently in the
@@ -688,7 +688,7 @@ namespace Community.CsharpSqlite {
 			/* Permutation of columns for OP_Compare */i64 lastRowid=db.lastRowid;
 			/* Saved value of the last insert ROWID */
 			#if VDBE_PROFILE
-																																										u64 start;                   /* CPU clock count at start of opcode */
+																																													u64 start;                   /* CPU clock count at start of opcode */
 int origPc;                  /* Program counter at start of opcode */
 #endif
 			/*** INSERT STACK UNION HERE ***/Debug.Assert(p.magic==VDBE_MAGIC_RUN);
@@ -706,13 +706,13 @@ int origPc;                  /* Program counter at start of opcode */
 				goto abort_due_to_interrupt;
 			//CHECK_FOR_INTERRUPT;
 			#if TRACE
-																																										sqlite3VdbeIOTraceSql( p );
+																																													sqlite3VdbeIOTraceSql( p );
 #endif
 			#if !SQLITE_OMIT_PROGRESS_CALLBACK
 			checkProgress=db.xProgress!=null;
 			#endif
 			#if SQLITE_DEBUG
-																																										      sqlite3BeginBenignMalloc();
+																																													      sqlite3BeginBenignMalloc();
       if ( p.pc == 0
       && ( p.db.flags & SQLITE_VdbeListing ) != 0 )
       {
@@ -730,14 +730,14 @@ int origPc;                  /* Program counter at start of opcode */
 				Debug.Assert(pc>=0&&pc<p.nOp);
 				//      if ( db.mallocFailed != 0 ) goto no_mem;
 				#if VDBE_PROFILE
-																																																								origPc = pc;
+																																																												origPc = pc;
 start = sqlite3Hwtime();
 #endif
 				pOp=aOp[pc];
 				/* Only allow tracing if SQLITE_DEBUG is defined.
         */
 				#if SQLITE_DEBUG
-																																																								        if ( p.trace != null )
+																																																												        if ( p.trace != null )
         {
           if ( pc == 0 )
           {
@@ -751,18 +751,18 @@ start = sqlite3Hwtime();
 ** if we have a special test build.
 */
 				#if SQLITE_TEST
-																																																								#if !TCLSH
-																																																								        if ( sqlite3_interrupt_count > 0 )
+																																																												#if !TCLSH
+																																																												        if ( sqlite3_interrupt_count > 0 )
         {
           sqlite3_interrupt_count--;
           if ( sqlite3_interrupt_count == 0 )
 #else
-																																																								        if ( sqlite3_interrupt_count.iValue > 0 )
+																																																												        if ( sqlite3_interrupt_count.iValue > 0 )
         {
           sqlite3_interrupt_count.iValue--;
           if ( sqlite3_interrupt_count.iValue == 0 )
 #endif
-																																																								          {
+																																																												          {
             sqlite3_interrupt( db );
           }
         }
@@ -801,7 +801,7 @@ start = sqlite3Hwtime();
 				}
 				/* Sanity checking on other operands *//* Sanity checking on other operands */
 				#if SQLITE_DEBUG
-																																																								        if ( ( pOp.opflags & OPFLG_IN1 ) != 0 )
+																																																												        if ( ( pOp.opflags & OPFLG_IN1 ) != 0 )
         {
           Debug.Assert( pOp.p1 > 0 );
           Debug.Assert( pOp.p1 <= p.nMem );
@@ -1031,7 +1031,7 @@ start = sqlite3Hwtime();
 					pOp.opcode=OP_String;
 					pOp.p1=StringExtensions.sqlite3Strlen30(pOp.p4.z);
 					#if !SQLITE_OMIT_UTF16
-																																																																						if( encoding!=SqliteEncoding.UTF8 ){
+																																																																											if( encoding!=SqliteEncoding.UTF8 ){
 rc = sqlite3VdbeMemSetStr(pOut, pOp.p4.z, -1, SqliteEncoding.UTF8, SQLITE_STATIC);
 if( rc==SQLITE_TOOBIG ) goto too_big;
 if( SQLITE_OK!=sqlite3VdbeChangeEncoding(pOut, encoding) ) goto no_mem;
@@ -1065,10 +1065,10 @@ pOp.p1 = pOut.n;
 					#if SQLITE_OMIT_UTF16
 					pOut.enc=SqliteEncoding.UTF8;
 					#else
-																																																																						              pOut.enc = encoding;
+																																																																											              pOut.enc = encoding;
 #endif
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pOut );
+																																																																											              UPDATE_MAX_BLOBSIZE( pOut );
 #endif
 					break;
 				}
@@ -1088,7 +1088,7 @@ pOp.p1 = pOut.n;
 					sqlite3VdbeMemSetStr(pOut,pOp.p4.z,pOp.p1,0,null);
 					pOut.enc=encoding;
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pOut );
+																																																																											              UPDATE_MAX_BLOBSIZE( pOut );
 #endif
 					break;
 				}
@@ -1108,7 +1108,7 @@ pOp.p1 = pOut.n;
 					}
 					sqlite3VdbeMemShallowCopy(pOut,pVar,MEM_Static);
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pOut );
+																																																																											              UPDATE_MAX_BLOBSIZE( pOut );
 #endif
 					break;
 				}
@@ -1182,7 +1182,7 @@ pOp.p1 = pOut.n;
 					Debug.Assert(pOut!=pIn1);
 					sqlite3VdbeMemShallowCopy(pOut,pIn1,MEM_Ephem);
 					#if SQLITE_DEBUG
-																																																																						              if ( pOut.pScopyFrom == null )
+																																																																											              if ( pOut.pScopyFrom == null )
                 pOut.pScopyFrom = pIn1;
 #endif
 					REGISTER_TRACE(p,pOp.p2,pOut);
@@ -1325,7 +1325,7 @@ pOp.p1 = pOut.n;
 					pOut.n=(int)nByte;
 					pOut.enc=encoding;
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pOut );
+																																																																											              UPDATE_MAX_BLOBSIZE( pOut );
 #endif
 					break;
 				}
@@ -1455,7 +1455,7 @@ pOp.p1 = pOut.n;
 						}
 						}
 						#if SQLITE_OMIT_FLOATING_POINT
-																																																																																				pOut->u.i = rB;
+																																																																																										pOut->u.i = rB;
 MemSetTypeFlag(pOut, MEM_Int);
 #else
 						if(MathExtensions.sqlite3IsNaN(rB)) {
@@ -1586,7 +1586,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						goto too_big;
 					}
 					#if FALSE
-																																																																						  /* The app-defined function has done something that as caused this
+																																																																											  /* The app-defined function has done something that as caused this
   ** statement to expire.  (Perhaps the function called sqlite3_exec()
   ** with a CREATE TABLE statement.)
   */
@@ -1594,7 +1594,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 #endif
 					REGISTER_TRACE(p,pOp.p3,pOut);
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pOut );
+																																																																											              UPDATE_MAX_BLOBSIZE( pOut );
 #endif
 					break;
 				}
@@ -1747,7 +1747,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 					Debug.Assert((pIn1.flags&MEM_Str)!=0/*|| db.mallocFailed != 0 */);
 					pIn1.flags=(u16)(pIn1.flags&~(MEM_Int|MEM_Real|MEM_Blob|MEM_Zero));
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pIn1 );
+																																																																											              UPDATE_MAX_BLOBSIZE( pIn1 );
 #endif
 					break;
 				}
@@ -1772,7 +1772,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						pIn1.flags=(ushort)(pIn1.flags&~(MEM_TypeMask&~MEM_Blob));
 					}
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pIn1 );
+																																																																											              UPDATE_MAX_BLOBSIZE( pIn1 );
 #endif
 					break;
 				}
@@ -2018,7 +2018,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 					p1=pOp.p1;
 					p2=pOp.p2;
 					#if SQLITE_DEBUG
-																																																																						              if ( aPermute != null )
+																																																																											              if ( aPermute != null )
               {
                 int k, mx = 0;
                 for ( k = 0; k < n; k++ )
@@ -2193,7 +2193,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 					}
 					else {
 						#if SQLITE_OMIT_FLOATING_POINT
-																																																																																				c = sqlite3VdbeIntValue(pIn1)!=0;
+																																																																																										c = sqlite3VdbeIntValue(pIn1)!=0;
 #else
 						c=(sqlite3VdbeRealValue(pIn1)!=0.0)?1:0;
 						#endif
@@ -2522,7 +2522,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 					rc=sqlite3VdbeMemMakeWriteable(pDest);
 					op_column_out:
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pDest );
+																																																																											              UPDATE_MAX_BLOBSIZE( pDest );
 #endif
 					REGISTER_TRACE(p,pOp.p3,pDest);
 					if(zData!=null&&zData!=zRec)
@@ -2684,7 +2684,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 					pOut.enc=SqliteEncoding.UTF8;
 					/* In case the blob is ever converted to text */REGISTER_TRACE(p,pOp.p3,pOut);
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pOut );
+																																																																											              UPDATE_MAX_BLOBSIZE( pOut );
 #endif
 					break;
 				}
@@ -2962,7 +2962,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							goto abort_due_to_error;
 						}
 						if(pOp.p2!=0&&p.usesStmtJournal&&(db.autoCommit==0||db.activeVdbeCnt>1)) {
-							Debug.Assert(sqlite3BtreeIsInTrans(pBt));
+							Debug.Assert(pBt.sqlite3BtreeIsInTrans());
 							if(p.iStatement==0) {
 								Debug.Assert(db.nStatement>=0&&db.nSavepoint>=0);
 								db.nStatement++;
@@ -3476,7 +3476,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								r.aMem[rI]=aMem[pOp.p3+rI];
 							// r.aMem = aMem[pOp.p3];
 							#if SQLITE_DEBUG
-																																																																																																		                  {
+																																																																																																									                  {
                     int i;
                     for ( i = 0; i < r.nField; i++ )
                       Debug.Assert( memIsValid( r.aMem[i] ) );
@@ -3492,12 +3492,12 @@ MemSetTypeFlag(pOut, MEM_Int);
 						pC.deferredMoveto=false;
 						pC.cacheStatus=CACHE_STALE;
 						#if SQLITE_TEST
-																																																																																				#if !TCLSH
-																																																																																				                sqlite3_search_count++;
+																																																																																										#if !TCLSH
+																																																																																										                sqlite3_search_count++;
 #else
-																																																																																				                sqlite3_search_count.iValue++;
+																																																																																										                sqlite3_search_count.iValue++;
 #endif
-																																																																																				#endif
+																																																																																										#endif
 						if(oc>=OP_SeekGe) {
 							Debug.Assert(oc==OP_SeekGe||oc==OP_SeekGt);
 							if(res<0||(res==0&&oc==OP_SeekGt)) {
@@ -3592,12 +3592,12 @@ MemSetTypeFlag(pOut, MEM_Int);
 					UnpackedRecord aTempRec=new UnpackedRecord();
 					//char aTempRec[ROUND8(sizeof(UnpackedRecord)) + sizeof(Mem)*3 + 7];
 					#if SQLITE_TEST
-																																																																						#if !TCLSH
-																																																																						              sqlite3_found_count++;
+																																																																											#if !TCLSH
+																																																																											              sqlite3_found_count++;
 #else
-																																																																						              sqlite3_found_count.iValue++;
+																																																																											              sqlite3_found_count.iValue++;
 #endif
-																																																																						#endif
+																																																																											#endif
 					alreadyExists=0;
 					Debug.Assert(pOp.p1>=0&&pOp.p1<p.nCursor);
 					Debug.Assert(pOp.p4type==P4_INT32);
@@ -3613,7 +3613,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							for(int i=0;i<r.aMem.Length;i++) {
 								r.aMem[i]=aMem[pOp.p3+i];
 								#if SQLITE_DEBUG
-																																																																																																																                    Debug.Assert( memIsValid( r.aMem[i] ) );
+																																																																																																																								                    Debug.Assert( memIsValid( r.aMem[i] ) );
 #endif
 							}
 							r.flags=UNPACKED_PREFIX_MATCH;
@@ -3712,7 +3712,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						r.flags=UNPACKED_PREFIX_SEARCH;
 						r.aMem=aMx;
 						#if SQLITE_DEBUG
-																																																																																				                {
+																																																																																										                {
                   int i;
                   for ( i = 0; i < r.nField; i++ )
                     Debug.Assert( memIsValid( r.aMem[i] ) );
@@ -3836,7 +3836,7 @@ MemSetTypeFlag(pOut, MEM_Int);
                 ** and try again, up to 100 times.
                 */Debug.Assert(pC.isTable);
 						#if SQLITE_32BIT_ROWID
-																																																																																				const int MAX_ROWID = i32.MaxValue;//   define MAX_ROWID 0x7fffffff
+																																																																																										const int MAX_ROWID = i32.MaxValue;//   define MAX_ROWID 0x7fffffff
 #else
 						/* Some compilers complain about constants of the form 0x7fffffffffffffff.
 ** Others complain about 0x7ffffffffffffffffLL.  The following macro seems
@@ -4181,7 +4181,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 					pOut.enc=SqliteEncoding.UTF8;
 					/* In case the blob is ever cast to text */
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pOut );
+																																																																											              UPDATE_MAX_BLOBSIZE( pOut );
 #endif
 					break;
 				}
@@ -4298,14 +4298,14 @@ MemSetTypeFlag(pOut, MEM_Int);
           */case OP_Sort: {
 					/* jump */
 					#if SQLITE_TEST
-																																																																						#if !TCLSH
-																																																																						              sqlite3_sort_count++;
+																																																																											#if !TCLSH
+																																																																											              sqlite3_sort_count++;
               sqlite3_search_count--;
 #else
-																																																																						              sqlite3_sort_count.iValue++;
+																																																																											              sqlite3_sort_count.iValue++;
               sqlite3_search_count.iValue--;
 #endif
-																																																																						#endif
+																																																																											#endif
 					p.aCounter[SQLITE_STMTSTATUS_SORT-1]++;
 					/* Fall through into OP_Rewind */goto case OP_Rewind;
 				}
@@ -4389,12 +4389,12 @@ MemSetTypeFlag(pOut, MEM_Int);
 						if(pOp.p5!=0)
 							p.aCounter[pOp.p5-1]++;
 						#if SQLITE_TEST
-																																																																																				#if !TCLSH
-																																																																																				                sqlite3_search_count++;
+																																																																																										#if !TCLSH
+																																																																																										                sqlite3_search_count++;
 #else
-																																																																																				                sqlite3_search_count.iValue++;
+																																																																																										                sqlite3_search_count.iValue++;
 #endif
-																																																																																				#endif
+																																																																																										#endif
 					}
 					pC.rowidIsValid=false;
 					break;
@@ -4460,7 +4460,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						for(int ra=0;ra<r.nField;ra++) {
 							r.aMem[ra]=aMem[pOp.p2+ra];
 							#if SQLITE_DEBUG
-																																																																																																		                  Debug.Assert( memIsValid( r.aMem[ra] ) );
+																																																																																																									                  Debug.Assert( memIsValid( r.aMem[ra] ) );
 #endif
 						}
 						rc=sqlite3BtreeMovetoUnpacked(pCrsr,r,0,0,ref res);
@@ -4558,7 +4558,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							r.aMem[rI]=aMem[pOp.p3+rI];
 							// r.aMem = aMem[pOp.p3];
 							#if SQLITE_DEBUG
-																																																																																																		                  Debug.Assert( memIsValid( r.aMem[rI] ) );
+																																																																																																									                  Debug.Assert( memIsValid( r.aMem[rI] ) );
 #endif
 						}
 						rc=sqlite3VdbeIdxKeyCompare(pC,r,ref res);
@@ -4607,7 +4607,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						}
 					}
 					#else
-																																																																						              iCnt = db.activeVdbeCnt;
+																																																																											              iCnt = db.activeVdbeCnt;
 #endif
 					pOut.flags=MEM_Null;
 					if(iCnt>1) {
@@ -4724,7 +4724,7 @@ MemSetTypeFlag(pOut, MEM_Int);
               ** sqlite3InitCallback().
               */
 					#if SQLITE_DEBUG
-																																																																						              for ( iDb = 0; iDb < db.nDb; iDb++ )
+																																																																											              for ( iDb = 0; iDb < db.nDb; iDb++ )
               {
                 Debug.Assert( iDb == 1 || sqlite3BtreeHoldsMutex( db.aDb[iDb].pBt ) );
               }
@@ -4846,7 +4846,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 					aRoot[j]=0;
 					Debug.Assert(pOp.p5<db.nDb);
 					Debug.Assert((p.btreeMask&(((yDbMask)1)<<pOp.p5))!=0);
-					z=sqlite3BtreeIntegrityCheck(db.aDb[pOp.p5].pBt,aRoot,nRoot,(int)pnErr.u.i,ref nErr);
+					z=db.aDb[pOp.p5].pBt.sqlite3BtreeIntegrityCheck(aRoot,nRoot,(int)pnErr.u.i,ref nErr);
 					sqlite3DbFree(db,ref aRoot);
 					pnErr.u.i-=nErr;
 					sqlite3VdbeMemSetNull(pIn1);
@@ -4862,7 +4862,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							//sqlite3_free );
 						}
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pIn1 );
+																																																																											              UPDATE_MAX_BLOBSIZE( pIn1 );
 #endif
 					sqlite3VdbeChangeEncoding(pIn1,encoding);
 					break;
@@ -5289,7 +5289,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 					}
 					sqlite3VdbeChangeEncoding(pMem,encoding);
 					#if SQLITE_TEST
-																																																																						              UPDATE_MAX_BLOBSIZE( pMem );
+																																																																											              UPDATE_MAX_BLOBSIZE( pMem );
 #endif
 					if(sqlite3VdbeMemTooBig(pMem)) {
 						goto too_big;
@@ -5297,7 +5297,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 					break;
 				}
 				#if !SQLITE_OMIT_WAL
-																																																								/* Opcode: Checkpoint P1 P2 P3 * *
+																																																												/* Opcode: Checkpoint P1 P2 P3 * *
 **
 ** Checkpoint database P1. This is a no-op if P1 is not currently in
 ** WAL mode. Parameter P2 is one of SQLITE_CHECKPOINT_PASSIVE, FULL
@@ -5355,7 +5355,7 @@ cDebug.Ase OP_Checkpoint: {
 					if(0==pPager.sqlite3PagerOkToChangeJournalMode())
 						eNew=eOld;
 					#if !SQLITE_OMIT_WAL
-																																																																						zFilename = sqlite3PagerFilename(pPager);
+																																																																											zFilename = sqlite3PagerFilename(pPager);
 
 /* Do not allow a transition to journal_mode=WAL for a database
 ** in temporary storage or if the VFS does not support shared memory 
@@ -5467,7 +5467,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
 					break;
 				}
 				#if !SQLITE_OMIT_SHARED_CACHE
-																																																								/* Opcode: TableLock P1 P2 P3 P4 *
+																																																												/* Opcode: TableLock P1 P2 P3 P4 *
 **
 ** Obtain a lock on a particular table. This instruction is only used when
 ** the shared-cache feature is enabled.
@@ -5861,7 +5861,7 @@ break;
 						//sqlite3DbFree( db, ref z );
 					}
 					#if SQLITE_DEBUG
-																																																																						              if ( ( db.flags & SQLITE_SqlTrace ) != 0
+																																																																											              if ( ( db.flags & SQLITE_SqlTrace ) != 0
                 && ( zTrace = ( pOp.p4.z != null ? pOp.p4.z : p.zSql ) ) != "" )
               {
                 sqlite3DebugPrintf( "SQL-trace: %s\n", zTrace );
@@ -5890,15 +5890,15 @@ break;
           ** restored.
           *****************************************************************************/}
 				#if VDBE_PROFILE
-																																																								{
+																																																												{
 u64 elapsed = sqlite3Hwtime() - start;
 pOp.cycles += elapsed;
 pOp.cnt++;
 #if FALSE
-																																																								fprintf(stdout, "%10llu ", elapsed);
+																																																												fprintf(stdout, "%10llu ", elapsed);
 sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 #endif
-																																																								}
+																																																												}
 #endif
 				/* The following code adds nothing to the actual functionality
 ** of the program.  It is only here for testing and debugging.
@@ -5906,10 +5906,10 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 ** the evaluator loop.  So we can leave it out when NDEBUG is defined.
 */
 				#if !NDEBUG
-																																																								        Debug.Assert( pc >= -1 && pc < p.nOp );
+																																																												        Debug.Assert( pc >= -1 && pc < p.nOp );
 
 #if SQLITE_DEBUG
-																																																								        if ( p.trace != null )
+																																																												        if ( p.trace != null )
         {
           if ( rc != 0 )
             fprintf( p.trace, "rc=%d\n", rc );
@@ -5923,7 +5923,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
           }
         }
 #endif
-																																																								#endif
+																																																												#endif
 			}
 			/* The end of the for(;;) loop the loops through opcodes *//* If we reach this point, it means that execution is finished with
     ** an error of some kind.

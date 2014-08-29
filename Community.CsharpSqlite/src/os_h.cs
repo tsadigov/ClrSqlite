@@ -93,10 +93,10 @@ namespace Community.CsharpSqlite {
 		const int SQLITE_TEMPNAME_SIZE=(MAX_PATH+50);
 		//# define SQLITE_TEMPNAME_SIZE (MAX_PATH+50)
 		#elif SQLITE_OS_OS2
-																												#if FALSE
-																												//  include <os2safe.h> /* has to be included before os2.h for linking to work */
+																														#if FALSE
+																														//  include <os2safe.h> /* has to be included before os2.h for linking to work */
 #endif
-																												// define INCL_DOSDATETIME
+																														// define INCL_DOSDATETIME
 // define INCL_DOSFILEMGR
 // define INCL_DOSERRORS
 // define INCL_DOSMISC
@@ -223,7 +223,7 @@ namespace Community.CsharpSqlite {
     **
     */
 		#if SQLITE_OMIT_WSD
-																												// define PENDING_BYTE     (0x40000000)
+																														// define PENDING_BYTE     (0x40000000)
     static int PENDING_BYTE = 0x40000000; 
 #else
 		//# define PENDING_BYTE      sqlite3PendingByte

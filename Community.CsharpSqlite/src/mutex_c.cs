@@ -28,7 +28,7 @@ namespace Community.CsharpSqlite {
 	///</summary>
 	//#include "sqliteInt.h"
 	#if (SQLITE_DEBUG) && !(SQLITE_MUTEX_OMIT)
-														/*
+															/*
 ** For debugging purposes, record when the mutex subsystem is initialized
 ** and uninitialized so that we can assert() if there is an attempt to
 ** allocate a mutex while the system is uninitialized.
@@ -36,7 +36,7 @@ namespace Community.CsharpSqlite {
 static  int mutexIsInit = 0;
 #endif
 	#if !SQLITE_MUTEX_OMIT
-														///<summary>
+															///<summary>
 /// Initialize the mutex system.
 ///</summary>
 static int sqlite3MutexInit(){ 
@@ -63,9 +63,9 @@ static int sqlite3MutexInit(){
   rc = sqlite3GlobalConfig.mutex.xMutexInit();
 
 #if SQLITE_DEBUG
-														  mutexIsInit = 1; //GLOBAL(int, mutexIsInit) = 1;
+															  mutexIsInit = 1; //GLOBAL(int, mutexIsInit) = 1;
 #endif
-														
+															
   return rc;
 }
 
@@ -80,9 +80,9 @@ static int sqlite3MutexEnd(){
   }
 
 #if SQLITE_DEBUG
-														  mutexIsInit = 0;//GLOBAL(int, mutexIsInit) = 0;
+															  mutexIsInit = 0;//GLOBAL(int, mutexIsInit) = 0;
 #endif
-														
+															
   return rc;
 }
 
@@ -91,9 +91,9 @@ static int sqlite3MutexEnd(){
 ///</summary>
 static sqlite3_mutex sqlite3_mutex_alloc(int id){
 #if !SQLITE_OMIT_AUTOINIT
-														  if( sqlite3_initialize()!=0 ) return null;
+															  if( sqlite3_initialize()!=0 ) return null;
 #endif
-														  return sqlite3GlobalConfig.mutex.xMutexAlloc(id);
+															  return sqlite3GlobalConfig.mutex.xMutexAlloc(id);
 }
 
 static sqlite3_mutex sqlite3MutexAlloc(int id){
@@ -148,7 +148,7 @@ static void sqlite3_mutex_leave(sqlite3_mutex p){
 }
 
 #if !NDEBUG
-														///<summary>
+															///<summary>
 /// The sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
 /// intended for use inside assert() statements.
 ///</summary>
@@ -160,7 +160,7 @@ static bool sqlite3_mutex_held(sqlite3_mutex p){
   return p == null || sqlite3GlobalConfig.mutex.xMutexNotheld( p );
 }
 #endif
-														
+															
 #endif
 	}
 }

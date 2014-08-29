@@ -51,7 +51,7 @@ namespace Community.CsharpSqlite {
 		static int execSql(sqlite3 db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
 			#if !NDEBUG
-																																										      int rc;
+																																													      int rc;
       //VVA_ONLY( int rc; )
 #endif
 			if(zSql==null) {
@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 				return sqlite3_errcode(db);
 			}
 			#if !NDEBUG
-																																										      rc = sqlite3_step( pStmt );
+																																													      rc = sqlite3_step( pStmt );
       //VVA_ONLY( rc = ) sqlite3_step(pStmt);
       Debug.Assert( rc != SQLITE_ROW );
 #else
@@ -264,8 +264,8 @@ namespace Community.CsharpSqlite {
 					/* Preserve the text encoding */BTREE_USER_VERSION,
 					0,
 				/* Preserve the user version */};
-				Debug.Assert(sqlite3BtreeIsInTrans(pTemp));
-				Debug.Assert(sqlite3BtreeIsInTrans(pMain));
+				Debug.Assert(pTemp.sqlite3BtreeIsInTrans());
+				Debug.Assert(pMain.sqlite3BtreeIsInTrans());
 				/* Copy Btree meta values */for(i=0;i<ArraySize(aCopy);i+=2) {
 					/* GetMeta() and UpdateMeta() cannot fail in this context because
           ** we already have page 1 loaded into cache and marked dirty. */sqlite3BtreeGetMeta(pMain,aCopy[i],ref meta);

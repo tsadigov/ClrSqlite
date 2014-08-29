@@ -27,7 +27,7 @@ namespace Community.CsharpSqlite {
 	//#include "sqliteInt.h"
 	//#include "vdbeInt.h"
 	#if !SQLITE_OMIT_INCRBLOB
-														///<summary>
+															///<summary>
 /// Valid sqlite3_blob* handles point to Incrblob structures.
 ///</summary>
 typedef struct Incrblob Incrblob;
@@ -111,12 +111,12 @@ int sqlite3_blob_open(
       sqlite3ErrorMsg(pParse, "cannot open virtual table: %s", zTable);
     }
 #if !SQLITE_OMIT_VIEW
-														    if( pTab && pTab->pSelect ){
+															    if( pTab && pTab->pSelect ){
       pTab = 0;
       sqlite3ErrorMsg(pParse, "cannot open view: %s", zTable);
     }
 #endif
-														    if( null==pTab ){
+															    if( null==pTab ){
       if( pParse->zErrMsg ){
         sqlite3DbFree(db, zErr);
         zErr = pParse->zErrMsg;
@@ -149,7 +149,7 @@ int sqlite3_blob_open(
       string zFault = 0;
       Index *pIdx;
 #if !SQLITE_OMIT_FOREIGN_KEY
-														      if( db->flags&SQLITE_ForeignKeys ){
+															      if( db->flags&SQLITE_ForeignKeys ){
         /* Check that the column is not part of an FK child key definition. It
         ** is not necessary to check if it is part of a parent key, as parent
         ** key columns must be indexed. The check below will pick up this 
@@ -165,7 +165,7 @@ int sqlite3_blob_open(
         }
       }
 #endif
-														      for(pIdx=pTab->pIndex; pIdx; pIdx=pIdx->pNext){
+															      for(pIdx=pTab->pIndex; pIdx; pIdx=pIdx->pNext){
         int j;
         for(j=0; j<pIdx->nColumn; j++){
           if( pIdx->aiColumn[j]==iCol ){
@@ -202,14 +202,14 @@ int sqlite3_blob_open(
 
       /* Configure the OP_TableLock instruction */
 #if SQLITE_OMIT_SHARED_CACHE
-														      sqlite3VdbeChangeToNoop(v, 2, 1);
+															      sqlite3VdbeChangeToNoop(v, 2, 1);
 #else
-														      sqlite3VdbeChangeP1(v, 2, iDb);
+															      sqlite3VdbeChangeP1(v, 2, iDb);
       sqlite3VdbeChangeP2(v, 2, pTab->tnum);
       sqlite3VdbeChangeP3(v, 2, flags);
       sqlite3VdbeChangeP4(v, 2, pTab->zName, P4_TRANSIENT);
 #endif
-														
+															
       /* Remove either the OP_OpenWrite or OpenRead. Set the P2 
       ** parameter of the other to pTab->tnum.  */
       sqlite3VdbeChangeToNoop(v, 4 - flags, 1);

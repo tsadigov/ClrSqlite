@@ -47,7 +47,7 @@ namespace Community.CsharpSqlite {
 				sqlite3DbFree(db,ref zExternal);
 			}
 			#if !SQLITE_OMIT_UTF16
-																																										if( db.xCollNeeded16!=null ){
+																																													if( db.xCollNeeded16!=null ){
 string zExternal;
 sqlite3_value pTmp = sqlite3ValueNew(db);
 sqlite3ValueSetStr(pTmp, -1, zName, SqliteEncoding.UTF8, SQLITE_STATIC);
@@ -367,7 +367,7 @@ sqlite3ValueFree(ref pTmp);
       ** So we must not search for built-ins when creating a new function.
       */if(0==createFlag&&(pBest==null||(db.flags&SQLITE_PreferBuiltin)!=0)) {
 				#if SQLITE_OMIT_WSD
-																																																								FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
+																																																												FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
 #else
 				FuncDefHash pHash=sqlite3GlobalFunctions;
 				#endif
@@ -445,7 +445,7 @@ sqlite3ValueFree(ref pTmp);
     */static Schema sqlite3SchemaGet(sqlite3 db,Btree pBt) {
 			Schema p;
 			if(pBt!=null) {
-				p=sqlite3BtreeSchema(pBt,-1,(dxFreeSchema)sqlite3SchemaClear);
+				p=pBt.sqlite3BtreeSchema(-1,(dxFreeSchema)sqlite3SchemaClear);
 				//Schema.Length, sqlite3SchemaFree);
 			}
 			else {
