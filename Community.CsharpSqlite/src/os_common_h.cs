@@ -36,10 +36,10 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if MEMORY_DEBUG
-																		// error "The MEMORY_DEBUG macro is obsolete.  Use SQLITE_DEBUG instead."
+																				// error "The MEMORY_DEBUG macro is obsolete.  Use SQLITE_DEBUG instead."
 #endif
 		#if SQLITE_DEBUG || TRACE
-																		    static bool sqlite3OsTrace = false;
+																				    static bool sqlite3OsTrace = false;
     //define OSTRACE(X)          if( sqlite3OSTrace ) sqlite3DebugPrintf X
     static void OSTRACE( string X, params va_list[] ap )
     {
@@ -56,7 +56,7 @@ namespace Community.CsharpSqlite {
 ** on i486 hardware.
 */
 		#if SQLITE_PERFORMANCE_TRACE
-																		
+																				
 /*
 ** hwtime.h contains inline assembler code for implementing
 ** high-performance timing routines.
@@ -82,9 +82,9 @@ static sqlite_u3264 g_elapsed;
 		/// is used for testing the I/O recovery logic.
 		///</summary>
 		#if SQLITE_TEST
-																		
+																				
 #if !TCLSH
-																		    static int sqlite3_io_error_hit = 0;            /* Total number of I/O Errors */
+																				    static int sqlite3_io_error_hit = 0;            /* Total number of I/O Errors */
     static int sqlite3_io_error_hardhit = 0;        /* Number of non-benign errors */
     static int sqlite3_io_error_pending = 0;        /* Count down to first I/O error */
     static int sqlite3_io_error_persist = 0;        /* True if I/O errors persist */
@@ -92,7 +92,7 @@ static sqlite_u3264 g_elapsed;
     static int sqlite3_diskfull_pending = 0;
     static int sqlite3_diskfull = 0;
 #else
-																		    static tcl.lang.Var.SQLITE3_GETSET sqlite3_io_error_hit = new tcl.lang.Var.SQLITE3_GETSET( "sqlite_io_error_hit" );
+																				    static tcl.lang.Var.SQLITE3_GETSET sqlite3_io_error_hit = new tcl.lang.Var.SQLITE3_GETSET( "sqlite_io_error_hit" );
     static tcl.lang.Var.SQLITE3_GETSET sqlite3_io_error_hardhit = new tcl.lang.Var.SQLITE3_GETSET( "sqlite_io_error_hardhit" );
     static tcl.lang.Var.SQLITE3_GETSET sqlite3_io_error_pending = new tcl.lang.Var.SQLITE3_GETSET( "sqlite_io_error_pending" );
     static tcl.lang.Var.SQLITE3_GETSET sqlite3_io_error_persist = new tcl.lang.Var.SQLITE3_GETSET( "sqlite_io_error_persist" );
@@ -100,14 +100,14 @@ static sqlite_u3264 g_elapsed;
     static tcl.lang.Var.SQLITE3_GETSET sqlite3_diskfull_pending = new tcl.lang.Var.SQLITE3_GETSET( "sqlite_diskfull_pending" );
     static tcl.lang.Var.SQLITE3_GETSET sqlite3_diskfull = new tcl.lang.Var.SQLITE3_GETSET( "sqlite_diskfull" );
 #endif
-																		    static void SimulateIOErrorBenign( int X )
+																				    static void SimulateIOErrorBenign( int X )
     {
 #if !TCLSH
-																		      sqlite3_io_error_benign = ( X );
+																				      sqlite3_io_error_benign = ( X );
 #else
-																		      sqlite3_io_error_benign.iValue = ( X );
+																				      sqlite3_io_error_benign.iValue = ( X );
 #endif
-																		    }
+																				    }
     //define SimulateIOError(CODE)  \
     //  if( (sqlite3_io_error_persist && sqlite3_io_error_hit) \
     //       || sqlite3_io_error_pending-- == 1 )  \
@@ -115,13 +115,13 @@ static sqlite_u3264 g_elapsed;
     static bool SimulateIOError()
     {
 #if !TCLSH
-																		      if ( ( sqlite3_io_error_persist != 0 && sqlite3_io_error_hit != 0 )
+																				      if ( ( sqlite3_io_error_persist != 0 && sqlite3_io_error_hit != 0 )
       || sqlite3_io_error_pending-- == 1 )
 #else
-																		      if ( ( sqlite3_io_error_persist.iValue != 0 && sqlite3_io_error_hit.iValue != 0 )
+																				      if ( ( sqlite3_io_error_persist.iValue != 0 && sqlite3_io_error_hit.iValue != 0 )
       || sqlite3_io_error_pending.iValue-- == 1 )
 #endif
-																		      {
+																				      {
         local_ioerr();
         return true;
       }
@@ -131,18 +131,18 @@ static sqlite_u3264 g_elapsed;
     static void local_ioerr()
     {
 #if TRACE
-																		      IOTRACE( "IOERR\n" );
+																				      IOTRACE( "IOERR\n" );
 #endif
-																		#if !TCLSH
-																		      sqlite3_io_error_hit++;
+																				#if !TCLSH
+																				      sqlite3_io_error_hit++;
       if ( sqlite3_io_error_benign == 0 )
         sqlite3_io_error_hardhit++;
 #else
-																		      sqlite3_io_error_hit.iValue++;
+																				      sqlite3_io_error_hit.iValue++;
       if ( sqlite3_io_error_benign.iValue == 0 )
         sqlite3_io_error_hardhit.iValue++;
 #endif
-																		    }
+																				    }
     //define SimulateDiskfullError(CODE) \
     //   if( sqlite3_diskfull_pending ){ \
     //     if( sqlite3_diskfull_pending == 1 ){ \
@@ -157,34 +157,34 @@ static sqlite_u3264 g_elapsed;
     static bool SimulateDiskfullError()
     {
 #if !TCLSH
-																		      if ( sqlite3_diskfull_pending != 0 )
+																				      if ( sqlite3_diskfull_pending != 0 )
       {
         if ( sqlite3_diskfull_pending == 1 )
         {
 #else
-																		      if ( sqlite3_diskfull_pending.iValue != 0 )
+																				      if ( sqlite3_diskfull_pending.iValue != 0 )
       {
         if ( sqlite3_diskfull_pending.iValue == 1 )
         {
 #endif
-																		          local_ioerr();
+																				          local_ioerr();
 #if !TCLSH
-																		          sqlite3_diskfull = 1;
+																				          sqlite3_diskfull = 1;
           sqlite3_io_error_hit = 1;
 #else
-																		          sqlite3_diskfull.iValue = 1;
+																				          sqlite3_diskfull.iValue = 1;
           sqlite3_io_error_hit.iValue = 1;
 #endif
-																		          return true;
+																				          return true;
         }
         else
         {
 #if !TCLSH
-																		          sqlite3_diskfull_pending--;
+																				          sqlite3_diskfull_pending--;
 #else
-																		          sqlite3_diskfull_pending.iValue--;
+																				          sqlite3_diskfull_pending.iValue--;
 #endif
-																		        }
+																				        }
       }
       return false;
     }
@@ -202,20 +202,20 @@ static sqlite_u3264 g_elapsed;
 ** When testing, keep a count of the number of open files.
 */
 	#if SQLITE_TEST
-									#if !TCLSH
-									    static int sqlite3_open_file_count = 0;
+										#if !TCLSH
+										    static int sqlite3_open_file_count = 0;
 #else
-									    static tcl.lang.Var.SQLITE3_GETSET sqlite3_open_file_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_open_file_count" );
+										    static tcl.lang.Var.SQLITE3_GETSET sqlite3_open_file_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_open_file_count" );
 #endif
-									
+										
     static void OpenCounter( int X )
     {
 #if !TCLSH
-									      sqlite3_open_file_count += ( X );
+										      sqlite3_open_file_count += ( X );
 #else
-									      sqlite3_open_file_count.iValue += ( X );
+										      sqlite3_open_file_count.iValue += ( X );
 #endif
-									    }
+										    }
 #else
 	//#define OpenCounter(X)
 	#endif

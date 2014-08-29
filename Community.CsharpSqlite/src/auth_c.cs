@@ -32,7 +32,7 @@ namespace Community.CsharpSqlite {
 	/// macro.
 	///</summary>
 	#if !SQLITE_OMIT_AUTHORIZATION
-									
+										
 ///<summary>
 /// Set or clear the access authorization function.
 ///

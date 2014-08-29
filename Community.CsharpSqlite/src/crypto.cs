@@ -57,7 +57,7 @@ namespace Community.CsharpSqlite {
 		//#include "btreeInt.h"
 		//#include "crypto.h"
 		#if CODEC_DEBUG || TRACE
-																		//define CODEC_TRACE(X) {printf X;fflush(stdout);}
+																				//define CODEC_TRACE(X) {printf X;fflush(stdout);}
 static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace )sqlite3DebugPrintf( T, ap ); }
 #else
 		//#define CODEC_TRACE(X)
@@ -141,39 +141,15 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 		const int CIPHER_ENCRYPT=1;
 		//#define CIPHER_ENCRYPT 1
 		#if NET_2_0
-																		    static RijndaelManaged Aes = new RijndaelManaged();
+																				    static RijndaelManaged Aes = new RijndaelManaged();
 #else
 		static AesManaged Aes=new AesManaged();
 		#endif
-		/* BEGIN CRYPTO */static void sqlite3pager_get_codec(Pager pPager,ref codec_ctx ctx) {
-			ctx=pPager.pCodec;
-		}
-		static int sqlite3pager_is_mj_pgno(Pager pPager,Pgno pgno) {
-			return (PAGER_MJ_PGNO(pPager)==pgno)?1:0;
-		}
-		static sqlite3_file sqlite3Pager_get_fd(Pager pPager) {
-			return (isOpen(pPager.fd))?pPager.fd:null;
-		}
-		static void sqlite3pager_sqlite3PagerSetCodec(Pager pPager,dxCodec xCodec,dxCodecSizeChng xCodecSizeChng,dxCodecFree xCodecFree,codec_ctx pCodec) {
-			pPager.sqlite3PagerSetCodec(xCodec,xCodecSizeChng,xCodecFree,pCodec);
-		}
-		/* END CRYPTO *///static void activate_openssl() {
+		/* BEGIN CRYPTO *//* END CRYPTO *///static void activate_openssl() {
 		//  if(EVP_get_cipherbyname(CIPHER) == null) {
 		//    OpenSSL_add_all_algorithms();
 		//  }
 		//}
-		/**
-    * Free and wipe memory
-    * If ptr is not null memory will be freed.
-    * If sz is greater than zero, the memory will be overwritten with zero before it is freed
-    */static void codec_free(ref byte[] ptr,int sz) {
-			if(ptr!=null) {
-				if(sz>0)
-					Array.Clear(ptr,0,sz);
-				//memset( ptr, 0, sz ); 
-				sqlite3_free(ref ptr);
-			}
-		}
 		/**
     * Set the raw password / key data for a cipher context
     *
@@ -294,7 +270,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 					c_ctx.key=k1.GetBytes(c_ctx.key_sz);
 				}
 				#if NET_2_0
-																																				        Aes.BlockSize = 0x80;
+																																								        Aes.BlockSize = 0x80;
         Aes.FeedbackSize = 8;
         Aes.KeySize = 0x100;
         Aes.Mode = CipherMode.CBC;
@@ -350,7 +326,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 			if(pDb.pBt!=null) {
 				codec_ctx ctx=null;
 				cipher_ctx c_ctx;
-				sqlite3pager_get_codec(pDb.pBt.pBt.pPager,ref ctx);
+				pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
 				c_ctx=for_ctx!=0?ctx.write_ctx:ctx.read_ctx;
 				c_ctx.derive_key=true;
 				if(for_ctx==2)
@@ -365,7 +341,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 			if(pDb.pBt!=null) {
 				codec_ctx ctx=null;
 				cipher_ctx c_ctx;
-				sqlite3pager_get_codec(pDb.pBt.pBt.pPager,ref ctx);
+				pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
 				c_ctx=for_ctx!=0?ctx.write_ctx:ctx.read_ctx;
 				cipher_ctx_set_pass(c_ctx,zKey,nKey);
 				c_ctx.derive_key=true;
@@ -460,7 +436,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 				ctx.read_ctx.iv=new byte[ctx.read_ctx.iv_sz];
 				//sqlite3Malloc( ctx.iv_sz );
 				Buffer.BlockCopy(Encoding.UTF8.GetBytes(SQLITE_FILE_HEADER),0,ctx.read_ctx.iv,0,FILE_HEADER_SZ);
-				sqlite3pager_sqlite3PagerSetCodec(sqlite3BtreePager(pDb.pBt),sqlite3Codec,null,sqlite3FreeCodecArg,ctx);
+				sqlite3BtreePager(pDb.pBt).sqlite3pager_sqlite3PagerSetCodec(sqlite3Codec,null,sqlite3FreeCodecArg,ctx);
 				codec_set_cipher_name(db,nDb,CIPHER,0);
 				codec_set_pass_key(db,nDb,zKey,nKey,0);
 				cipher_ctx_copy(ctx.write_ctx,ctx.read_ctx);
@@ -533,11 +509,11 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 					Pgno pgno;
 					PgHdr page=null;
 					Pager pPager=pDb.pBt.pBt.pPager;
-					sqlite3pager_get_codec(pDb.pBt.pBt.pPager,ref ctx);
+					pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
 					if(ctx==null) {
 						CODEC_TRACE("sqlite3_rekey: no codec attached to db, attaching now\n");
 						/* there was no codec attached to this database,so attach one now with a null password */sqlite3CodecAttach(db,0,pKey,nKey);
-						sqlite3pager_get_codec(pDb.pBt.pBt.pPager,ref ctx);
+						pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
 						/* prepare this setup as if it had already been initialized */Buffer.BlockCopy(Encoding.UTF8.GetBytes(SQLITE_FILE_HEADER),0,ctx.read_ctx.iv,0,FILE_HEADER_SZ);
 						ctx.read_ctx.key_sz=ctx.read_ctx.iv_sz=ctx.read_ctx.pass_sz=0;
 					}
@@ -560,7 +536,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
           */rc=sqlite3BtreeBeginTrans(pDb.pBt,1);
 					/* begin write transaction */pPager.sqlite3PagerPagecount(out page_count);
 					for(pgno=1;rc==SQLITE_OK&&pgno<=page_count;pgno++) {
-						/* pgno's start at 1 see pager.c:pagerAcquire */if(0==sqlite3pager_is_mj_pgno(pPager,pgno)) {
+						/* pgno's start at 1 see pager.c:pagerAcquire */if(0==pPager.sqlite3pager_is_mj_pgno(pgno)) {
 							/* skip this page (see pager.c:pagerAcquire for reasoning) */rc=pPager.sqlite3PagerGet(pgno,ref page);
 							if(rc==SQLITE_OK) {
 								/* write page see pager_incr_changecounter for example */rc=sqlite3PagerWrite(page);
@@ -593,7 +569,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 			CODEC_TRACE("sqlite3CodecGetKey: entered db=%d, nDb=%d\n",db,nDb);
 			if(pDb.pBt!=null) {
 				codec_ctx ctx=null;
-				sqlite3pager_get_codec(pDb.pBt.pBt.pPager,ref ctx);
+				pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
 				if(ctx!=null) {
 					/* if the codec has an attached codec_context user the raw key data */zKey=ctx.read_ctx.pass;
 					nKey=ctx.read_ctx.pass_sz;
