@@ -1,11 +1,8 @@
 using System;
 using System.Diagnostics;
-
-namespace Community.CsharpSqlite
-{
-  public partial class Sqlite3
-  {
-    /*
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
+		/*
     ** 2008 Jan 22
     **
     ** The author disclaims copyright to this source code.  In place of
@@ -35,85 +32,72 @@ namespace Community.CsharpSqlite
     **  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
     **
     *************************************************************************
-    */
-    //#include "sqliteInt.h"
-
-#if !SQLITE_OMIT_BUILTIN_TEST
-    ///<summary>
-/// Global variables.
-///</summary>
-    //typedef struct BenignMallocHooks BenignMallocHooks;
-    public struct BenignMallocHooks//
-    {
-      public void_function xBenignBegin;//void (*xBenignBegin)(void);
-      public void_function xBenignEnd;    //void (*xBenignEnd)(void);
-      public BenignMallocHooks( void_function xBenignBegin, void_function xBenignEnd )
-      {
-        this.xBenignBegin = xBenignBegin;
-        this.xBenignEnd = xBenignEnd;
-      }
-    }
-    static BenignMallocHooks sqlite3Hooks = new BenignMallocHooks( null, null );
-
-    ///<summary>
-///The "wsdHooks" macro will resolve to the appropriate BenignMallocHooks
-/// structure.  If writable static data is unsupported on the target,
-/// we have to locate the state vector at run-time.  In the more common
-/// case where writable static data is supported, wsdHooks can refer directly
-/// to the "sqlite3Hooks" state vector declared above.
-///
-///</summary>
-#if SQLITE_OMIT_WSD
-//# define wsdHooksInit \
+    *///#include "sqliteInt.h"
+		#if !SQLITE_OMIT_BUILTIN_TEST
+		///<summary>
+		/// Global variables.
+		///</summary>
+		//typedef struct BenignMallocHooks BenignMallocHooks;
+		public struct BenignMallocHooks //
+		{
+			public void_function xBenignBegin;
+			//void (*xBenignBegin)(void);
+			public void_function xBenignEnd;
+			//void (*xBenignEnd)(void);
+			public BenignMallocHooks(void_function xBenignBegin,void_function xBenignEnd) {
+				this.xBenignBegin=xBenignBegin;
+				this.xBenignEnd=xBenignEnd;
+			}
+		}
+		static BenignMallocHooks sqlite3Hooks=new BenignMallocHooks(null,null);
+		///<summary>
+		///The "wsdHooks" macro will resolve to the appropriate BenignMallocHooks
+		/// structure.  If writable static data is unsupported on the target,
+		/// we have to locate the state vector at run-time.  In the more common
+		/// case where writable static data is supported, wsdHooks can refer directly
+		/// to the "sqlite3Hooks" state vector declared above.
+		///
+		///</summary>
+		#if SQLITE_OMIT_WSD
+		// define wsdHooksInit \
 BenignMallocHooks *x = &GLOBAL(BenignMallocHooks,sqlite3Hooks)
-//# define wsdHooks x[0]
+// define wsdHooks x[0]
 #else
-    //# define wsdHooksInit
-    static void wsdHooksInit()
-    {
-    }
-    //# define wsdHooks sqlite3Hooks
-    static BenignMallocHooks wsdHooks = sqlite3Hooks;
-#endif
-
-
-
-    ///<summary>
-/// Register hooks to call when sqlite3BeginBenignMalloc() and
-/// sqlite3EndBenignMalloc() are called, respectively.
-///</summary>
-    static void sqlite3BenignMallocHooks(
-    void_function xBenignBegin, //void (*xBenignBegin)(void),
-    void_function xBenignEnd //void (*xBenignEnd)(void)
-    )
-    {
-      wsdHooksInit();
-      wsdHooks.xBenignBegin = xBenignBegin;
-      wsdHooks.xBenignEnd = xBenignEnd;
-    }
-
-    ///<summary>
-/// This (sqlite3EndBenignMalloc()) is called by SQLite code to indicate that
-/// subsequent malloc failures are benign. A call to sqlite3EndBenignMalloc()
-/// indicates that subsequent malloc failures are non-benign.
-///
-///</summary>
-    static void sqlite3BeginBenignMalloc()
-    {
-      wsdHooksInit();
-      if ( wsdHooks.xBenignBegin != null )
-      {
-        wsdHooks.xBenignBegin();
-      }
-    }
-    static void sqlite3EndBenignMalloc()
-    {
-      wsdHooksInit();
-      if ( wsdHooks.xBenignEnd != null )
-      {
-        wsdHooks.xBenignEnd();
-      }
-    }
-#endif //* SQLITE_OMIT_BUILTIN_TEST */
-  }
+		//# define wsdHooksInit
+		static void wsdHooksInit() {
+		}
+		//# define wsdHooks sqlite3Hooks
+		static BenignMallocHooks wsdHooks=sqlite3Hooks;
+		#endif
+		///<summary>
+		/// Register hooks to call when sqlite3BeginBenignMalloc() and
+		/// sqlite3EndBenignMalloc() are called, respectively.
+		///</summary>
+		static void sqlite3BenignMallocHooks(void_function xBenignBegin,//void (*xBenignBegin)(void),
+		void_function xBenignEnd//void (*xBenignEnd)(void)
+		) {
+			wsdHooksInit();
+			wsdHooks.xBenignBegin=xBenignBegin;
+			wsdHooks.xBenignEnd=xBenignEnd;
+		}
+		///<summary>
+		/// This (sqlite3EndBenignMalloc()) is called by SQLite code to indicate that
+		/// subsequent malloc failures are benign. A call to sqlite3EndBenignMalloc()
+		/// indicates that subsequent malloc failures are non-benign.
+		///
+		///</summary>
+		static void sqlite3BeginBenignMalloc() {
+			wsdHooksInit();
+			if(wsdHooks.xBenignBegin!=null) {
+				wsdHooks.xBenignBegin();
+			}
+		}
+		static void sqlite3EndBenignMalloc() {
+			wsdHooksInit();
+			if(wsdHooks.xBenignEnd!=null) {
+				wsdHooks.xBenignEnd();
+			}
+		}
+	#endif
+	}
 }

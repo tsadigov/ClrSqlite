@@ -1,8 +1,6 @@
-namespace Community.CsharpSqlite
-{
-  public partial class Sqlite3
-  {
-    /*
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
+	/*
     ** 2007 August 22
     **
     ** The author disclaims copyright to this source code.  In place of
@@ -35,8 +33,8 @@ namespace Community.CsharpSqlite
     **
     *************************************************************************
     */
-#if SQLITE_ENABLE_ATOMIC_WRITE
-    //#include "sqliteInt.h"
+	#if SQLITE_ENABLE_ATOMIC_WRITE
+	    //include "sqliteInt.h"
 
 /*
 ** A JournalFile object is a subclass of sqlite3_file used by
@@ -246,5 +244,5 @@ int sqlite3JournalSize(sqlite3_vfs pVfs){
 return (pVfs->szOsFile+sizeof(JournalFile));
 }
 #endif
-  }
+	}
 }

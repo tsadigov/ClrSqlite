@@ -1,15 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-
-using Bitmask = System.UInt64;
-using u32 = System.UInt32;
-
-namespace Community.CsharpSqlite
-{
-  public partial class Sqlite3
-  {
-    /*
+using Bitmask=System.UInt64;
+using u32=System.UInt32;
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
+	/*
     ** 2010 February 1
     **
     ** The author disclaims copyright to this source code.  In place of
@@ -257,20 +253,20 @@ namespace Community.CsharpSqlite
     **
     *************************************************************************
     */
-#if !SQLITE_OMIT_WAL
-
-//#include "wal.h"
+	#if !SQLITE_OMIT_WAL
+	
+//include "wal.h"
 
 /*
 ** Trace output macros
 */
 #if (SQLITE_TEST) && (SQLITE_DEBUG)
-int sqlite3WalTrace = 0;
-//# define WALTRACE(X)  if(sqlite3WalTrace) sqlite3DebugPrintf X
+	int sqlite3WalTrace = 0;
+// define WALTRACE(X)  if(sqlite3WalTrace) sqlite3DebugPrintf X
 #else
-//# define WALTRACE(X)
+	// define WALTRACE(X)
 #endif
-
+	
 /*
 ** The maximum (and only) versions of the wal and wal-index formats
 ** that may be interpreted by this version of SQLite.
@@ -284,19 +280,19 @@ int sqlite3WalTrace = 0;
 ** WALINDEX_MAX_VERSION, then no read-transaction is opened and SQLite
 ** returns SQLITE_CANTOPEN.
 */
-////#define WAL_MAX_VERSION      3007000
-////#define WALINDEX_MAX_VERSION 3007000
+////define WAL_MAX_VERSION      3007000
+////define WALINDEX_MAX_VERSION 3007000
 
 /*
 ** Indices of various locking bytes.   WAL_NREADER is the number
 ** of available reader locks and should be at least 3.
 */
-////#define WAL_WRITE_LOCK         0
-////#define WAL_ALL_BUT_WRITE      1
-////#define WAL_CKPT_LOCK          1
-////#define WAL_RECOVER_LOCK       2
-////#define WAL_READ_LOCK(I)       (3+(I))
-////#define WAL_NREADER            (SQLITE_SHM_NLOCK-3)
+////define WAL_WRITE_LOCK         0
+////define WAL_ALL_BUT_WRITE      1
+////define WAL_CKPT_LOCK          1
+////define WAL_RECOVER_LOCK       2
+////define WAL_READ_LOCK(I)       (3+(I))
+////define WAL_NREADER            (SQLITE_SHM_NLOCK-3)
 
 
 ///<summary>
@@ -384,7 +380,7 @@ struct WalCkptInfo {
   u32 nBackfill;                  /* Number of WAL frames backfilled into DB */
   u32 aReadMark[WAL_NREADER];     /* Reader marks */
 };
-////#define READMARK_NOT_USED  0xffffffff
+////define READMARK_NOT_USED  0xffffffff
 
 
 /* A block of WALINDEX_LOCK_RESERVED bytes beginning at
@@ -392,16 +388,16 @@ struct WalCkptInfo {
 ** only support mandatory file-locks, we do not read or write data
 ** from the region of the file on which locks are applied.
 */
-////#define WALINDEX_LOCK_OFFSET   (sizeof(WalIndexHdr)*2 + sizeof(WalCkptInfo))
-////#define WALINDEX_LOCK_RESERVED 16
-////#define WALINDEX_HDR_SIZE      (WALINDEX_LOCK_OFFSET+WALINDEX_LOCK_RESERVED)
+////define WALINDEX_LOCK_OFFSET   (sizeof(WalIndexHdr)*2 + sizeof(WalCkptInfo))
+////define WALINDEX_LOCK_RESERVED 16
+////define WALINDEX_HDR_SIZE      (WALINDEX_LOCK_OFFSET+WALINDEX_LOCK_RESERVED)
 
 /* Size of header before each frame in wal */
-////#define WAL_FRAME_HDRSIZE 24
+////define WAL_FRAME_HDRSIZE 24
 
 /* Size of write ahead log header, including checksum. */
-/* ////#define WAL_HDRSIZE 24 */
-////#define WAL_HDRSIZE 32
+/* ////define WAL_HDRSIZE 24 */
+////define WAL_HDRSIZE 32
 
 /* WAL magic value. Either this value, or the same value with the least
 ** significant bit also set (WAL_MAGIC | 0x00000001) is stored in 32-bit
@@ -412,14 +408,14 @@ struct WalCkptInfo {
 ** big-endian words. Otherwise, they are calculated by interpreting 
 ** all data as 32-bit little-endian words.
 */
-////#define WAL_MAGIC 0x377f0682
+////define WAL_MAGIC 0x377f0682
 
 /*
 ** Return the offset of frame iFrame in the write-ahead log file, 
 ** assuming a database page size of szPage bytes. The offset returned
 ** is to the start of the write-ahead log frame-header.
 */
-////#define walFrameOffset(iFrame, szPage) (                               \
+////define walFrameOffset(iFrame, szPage) (                               \
   WAL_HDRSIZE + ((iFrame)-1)*(i64)((szPage)+WAL_FRAME_HDRSIZE)         \
 )
 
@@ -445,23 +441,23 @@ struct Wal {
   string zWalName;      /* Name of WAL file */
   u32 nCkpt;                 /* Checkpoint sequence counter in the wal-header */
 #if SQLITE_DEBUG
-  u8 lockError;              /* True if a locking error has occurred */
+	  u8 lockError;              /* True if a locking error has occurred */
 #endif
-};
+	};
 
 /*
 ** Candidate values for Wal.exclusiveMode.
 */
-//#define WAL_NORMAL_MODE     0
-//#define WAL_EXCLUSIVE_MODE  1     
-//#define WAL_HEAPMEMORY_MODE 2
+//define WAL_NORMAL_MODE     0
+//define WAL_EXCLUSIVE_MODE  1     
+//define WAL_HEAPMEMORY_MODE 2
 
 /*
 ** Possible values for WAL.readOnly
 */
-//#define WAL_RDWR        0    /* Normal read/write connection */
-//#define WAL_RDONLY      1    /* The WAL file is readonly */
-//#define WAL_SHM_RDONLY  2    /* The SHM file is readonly */
+//define WAL_RDWR        0    /* Normal read/write connection */
+//define WAL_RDONLY      1    /* The WAL file is readonly */
+//define WAL_SHM_RDONLY  2    /* The SHM file is readonly */
 
 /*
 ** Each page of the wal-index mapping contains a hash-table made up of
@@ -504,19 +500,19 @@ struct WalIterator {
 ** Changing any of these constants will alter the wal-index format and
 ** create incompatibilities.
 */
-//#define HASHTABLE_NPAGE      4096                 /* Must be power of 2 */
-//#define HASHTABLE_HASH_1     383                  /* Should be prime */
-//#define HASHTABLE_NSLOT      (HASHTABLE_NPAGE*2)  /* Must be a power of 2 */
+//define HASHTABLE_NPAGE      4096                 /* Must be power of 2 */
+//define HASHTABLE_HASH_1     383                  /* Should be prime */
+//define HASHTABLE_NSLOT      (HASHTABLE_NPAGE*2)  /* Must be a power of 2 */
 
 /* 
 ** The block of page numbers associated with the first hash-table in a
 ** wal-index is smaller than usual. This is so that there is a complete
 ** hash-table on each aligned 32KB page of the wal-index.
 */
-//#define HASHTABLE_NPAGE_ONE  (HASHTABLE_NPAGE - (WALINDEX_HDR_SIZE/sizeof(u32)))
+//define HASHTABLE_NPAGE_ONE  (HASHTABLE_NPAGE - (WALINDEX_HDR_SIZE/sizeof(u32)))
 
 /* The wal-index is divided into pages of WALINDEX_PGSZ bytes each. */
-//#define WALINDEX_PGSZ   (                                         \
+//define WALINDEX_PGSZ   (                                         \
     sizeof(ht_slot)*HASHTABLE_NSLOT + HASHTABLE_NPAGE*sizeof(u32) \
 )
 
@@ -591,7 +587,7 @@ static volatile WalIndexHdr *walIndexHdr(Wal *pWal){
 ** returns the value that would be produced by intepreting the 4 bytes
 ** of the input value as a little-endian integer.
 */
-//#define BYTESWAP32(x) ( \
+//define BYTESWAP32(x) ( \
     (((x)&0x000000FF)<<24) + (((x)&0x0000FF00)<<8)  \
   + (((x)&0x00FF0000)>>8)  + (((x)&0xFF000000)>>24) \
 )
@@ -758,7 +754,7 @@ static int walDecodeFrame(
 
 
 #if (SQLITE_TEST) && (SQLITE_DEBUG)
-/*
+	/*
 ** Names of locks.  This routine is used to provide debugging output and is not
 ** a part of an ordinary build.
 */
@@ -776,8 +772,8 @@ static string walLockName(int lockIdx){
     return zName;
   }
 }
-#endif //*defined(SQLITE_TEST) || defined(SQLITE_DEBUG) */
-    
+#endif
+	    
 
 /*
 ** Set or release locks on the WAL.  Locks are either shared or exclusive.
@@ -961,7 +957,7 @@ static void walCleanupHash(Wal *pWal){
   memset((void )&aPgno[iLimit+1], 0, nByte);
 
 #if SQLITE_ENABLE_EXPENSIVE_ASSERT
-  /* Verify that the every entry in the mapping region is still reachable
+	  /* Verify that the every entry in the mapping region is still reachable
   ** via the hash table even after the cleanup.
   */
   if( iLimit ){
@@ -974,8 +970,8 @@ static void walCleanupHash(Wal *pWal){
       Debug.Assert( aHash[iKey]==i );
     }
   }
-#endif //* SQLITE_ENABLE_EXPENSIVE_ASSERT */
-}
+#endif
+	}
 
 
 /*
@@ -1029,7 +1025,7 @@ static int walIndexAppend(Wal *pWal, u32 iFrame, u32 iPage){
     aHash[iKey] = (ht_slot)idx;
 
 #if SQLITE_ENABLE_EXPENSIVE_ASSERT
-    /* Verify that the number of entries in the hash table exactly equals
+	    /* Verify that the number of entries in the hash table exactly equals
     ** the number of entries in the mapping region.
     */
     {
@@ -1053,8 +1049,8 @@ static int walIndexAppend(Wal *pWal, u32 iFrame, u32 iPage){
         Debug.Assert( aHash[iKey]==i );
       }
     }
-#endif //* SQLITE_ENABLE_EXPENSIVE_ASSERT */
-  }
+#endif
+	  }
 
 
   return rc;
@@ -1277,16 +1273,16 @@ int sqlite3WalOpen(
   Debug.Assert( pDbFd );
 
   /* In the amalgamation, the os_unix.c and os_win.c source files come before
-  ** this source file.  Verify that the #defines of the locking byte offsets
+  ** this source file.  Verify that the defines of the locking byte offsets
   ** in os_unix.c and os_win.c agree with the WALINDEX_LOCK_OFFSET value.
   */
 #if WIN_SHM_BASE
-  Debug.Assert( WIN_SHM_BASE==WALINDEX_LOCK_OFFSET );
+	  Debug.Assert( WIN_SHM_BASE==WALINDEX_LOCK_OFFSET );
 #endif
-#if UNIX_SHM_BASE
-  Debug.Assert( UNIX_SHM_BASE==WALINDEX_LOCK_OFFSET );
+	#if UNIX_SHM_BASE
+	  Debug.Assert( UNIX_SHM_BASE==WALINDEX_LOCK_OFFSET );
 #endif
-
+	
 
   /* Allocate an instance of struct Wal to return. */
   *ppWal = 0;
@@ -1495,14 +1491,14 @@ static void walMergesort(
   *pnList = nMerge;
 
 #if SQLITE_DEBUG
-  {
+	  {
     int i;
     for(i=1; i<*pnList; i++){
       Debug.Assert( aContent[aList[i]] > aContent[aList[i-1]] );
     }
   }
 #endif
-}
+	}
 
 /* 
 ** Free an iterator allocated by walIteratorInit().
@@ -1987,7 +1983,7 @@ static int walIndexReadHdr(Wal *pWal, int *pChanged){
 ** This is the value that walTryBeginRead returns when it needs to
 ** be retried.
 */
-//#define WAL_RETRY  (-1)
+//define WAL_RETRY  (-1)
 
 /*
 ** Attempt to start a read transaction.  This might fail due to a race or
@@ -2338,7 +2334,7 @@ int sqlite3WalRead(
   }
 
 #if SQLITE_ENABLE_EXPENSIVE_ASSERT
-  /* If expensive Debug.Assert() statements are available, do a linear search
+	  /* If expensive Debug.Assert() statements are available, do a linear search
   ** of the wal-index file content. Make sure the results agree with the
   ** result obtained using the hash indexes above.  */
   {
@@ -2353,7 +2349,7 @@ int sqlite3WalRead(
     Debug.Assert( iRead==iRead2 );
   }
 #endif
-
+	
   /* If iRead is non-zero, then it is the log frame number that contains the
   ** required page. Read and return data from the log file.
   */
@@ -2641,12 +2637,12 @@ int sqlite3WalFrames(
   Debug.Assert( pWal->writeLock );
 
 #if (SQLITE_TEST) && (SQLITE_DEBUG)
-  { int cnt; for(cnt=0, p=pList; p; p=p->pDirty, cnt++){}
+	  { int cnt; for(cnt=0, p=pList; p; p=p->pDirty, cnt++){}
     WALTRACE(("WAL%p: frame write begin. %d frames. mxFrame=%d. %s\n",
               pWal, cnt, pWal->hdr.mxFrame, isCommit ? "Commit" : "Spill"));
   }
 #endif
-
+	
   /* See if it is possible to write these frames into the start of the
   ** log file, instead of appending to it at pWal->hdr.mxFrame.
   */
@@ -2698,11 +2694,11 @@ int sqlite3WalFrames(
     /* Populate and write the frame header */
     nDbsize = (isCommit && p->pDirty==0) ? nTruncate : 0;
 #if (SQLITE_HAS_CODEC)
-    if( (pData = sqlite3PagerCodec(p))==0 ) return SQLITE_NOMEM;
+	    if( (pData = sqlite3PagerCodec(p))==0 ) return SQLITE_NOMEM;
 #else
-    pData = p->pData;
+	    pData = p->pData;
 #endif
-    walEncodeFrame(pWal, p->pgno, nDbsize, pData, aFrame);
+	    walEncodeFrame(pWal, p->pgno, nDbsize, pData, aFrame);
     rc = sqlite3OsWrite(pWal->pWalFd, aFrame, sizeof(aFrame), iOffset);
     if( rc!=SQLITE_OK ){
       return rc;
@@ -2728,11 +2724,11 @@ int sqlite3WalFrames(
     while( iOffset<iSegment ){
       void *pData;
 #if (SQLITE_HAS_CODEC)
-      if( (pData = sqlite3PagerCodec(pLast))==0 ) return SQLITE_NOMEM;
+	      if( (pData = sqlite3PagerCodec(pLast))==0 ) return SQLITE_NOMEM;
 #else
-      pData = pLast->pData;
+	      pData = pLast->pData;
 #endif
-      walEncodeFrame(pWal, pLast->pgno, nTruncate, pData, aFrame);
+	      walEncodeFrame(pWal, pLast->pgno, nTruncate, pData, aFrame);
       /* testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL */
       rc = sqlite3OsWrite(pWal->pWalFd, aFrame, sizeof(aFrame), iOffset);
       if( rc!=SQLITE_OK ){
@@ -2967,6 +2963,6 @@ int sqlite3WalHeapMemory(Wal *pWal){
   return (pWal && pWal->exclusiveMode==WAL_HEAPMEMORY_MODE );
 }
 
-#endif //* #if !SQLITE_OMIT_WAL */
-  }
+#endif
+	}
 }

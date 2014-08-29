@@ -1,89 +1,88 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-
-namespace Community.CsharpSqlite
-{
-  public partial class Sqlite3
-  {
-    ///<summary>
-/// 2008 October 07
-///
-/// The author disclaims copyright to this source code.  In place of
-/// a legal notice, here is a blessing:
-///
-///    May you do good and not evil.
-///    May you find forgiveness for yourself and forgive others.
-///    May you share freely, never taking more than you give.
-///
-///
-/// This file contains the C functions that implement mutexes.
-///
-/// This implementation in this file does not provide any mutual
-/// exclusion and is thus suitable for use only in applications
-/// that use SQLite in a single thread.  The routines defined
-/// here are place-holders.  Applications can substitute working
-/// mutex routines at start-time using the
-///
-///     sqlite3_config(SQLITE_CONFIG_MUTEX,...)
-///
-/// interface.
-///
-/// If compiled with SQLITE_DEBUG, then additional logic is inserted
-/// that does error checking on mutexes to make sure they are being
-/// called correctly.
-///
-///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-///  C#-SQLite is an independent reimplementation of the SQLite software library
-///
-///  SQLITE_SOURCE_ID: 2009-12-07 16:39:13 1ed88e9d01e9eda5cbc622e7614277f29bcc551c
-///
-///
-///
-///</summary>
-    //#include "sqliteInt.h"
-
-
-#if !SQLITE_DEBUG
-///<summary>
-/// Stub routines for all mutex methods.
-///
-/// This routines provide no mutual exclusion or error checking.
-///</summary>
-static int noopMutexHeld(sqlite3_mutex p){ return 1; }
-static int noopMutexNotheld(sqlite3_mutex p){ return 1; }
-static int noopMutexInit(){ return SQLITE_OK; }
-static int noopMutexEnd(){ return SQLITE_OK; }
-static sqlite3_mutex noopMutexAlloc(int id){ return new sqlite3_mutex(); }
-static void noopMutexFree(sqlite3_mutex p){  }
-static void noopMutexEnter(sqlite3_mutex p){  }
-static int noopMutexTry(sqlite3_mutex p){ return SQLITE_OK; }
-static void noopMutexLeave(sqlite3_mutex p){  }
-
-sqlite3_mutex_methods sqlite3DefaultMutex(){
-sqlite3_mutex_methods sMutex = new sqlite3_mutex_methods(
-(dxMutexInit)noopMutexInit,
-(dxMutexEnd)noopMutexEnd,
-(dxMutexAlloc)noopMutexAlloc,
-(dxMutexFree)noopMutexFree,
-(dxMutexEnter)noopMutexEnter,
-(dxMutexTry)noopMutexTry,
-(dxMutexLeave)noopMutexLeave,
-#if SQLITE_DEBUG
-(dxMutexHeld)noopMutexHeld,
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
+		///<summary>
+		/// 2008 October 07
+		///
+		/// The author disclaims copyright to this source code.  In place of
+		/// a legal notice, here is a blessing:
+		///
+		///    May you do good and not evil.
+		///    May you find forgiveness for yourself and forgive others.
+		///    May you share freely, never taking more than you give.
+		///
+		///
+		/// This file contains the C functions that implement mutexes.
+		///
+		/// This implementation in this file does not provide any mutual
+		/// exclusion and is thus suitable for use only in applications
+		/// that use SQLite in a single thread.  The routines defined
+		/// here are place-holders.  Applications can substitute working
+		/// mutex routines at start-time using the
+		///
+		///     sqlite3_config(SQLITE_CONFIG_MUTEX,...)
+		///
+		/// interface.
+		///
+		/// If compiled with SQLITE_DEBUG, then additional logic is inserted
+		/// that does error checking on mutexes to make sure they are being
+		/// called correctly.
+		///
+		///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+		///  C#-SQLite is an independent reimplementation of the SQLite software library
+		///
+		///  SQLITE_SOURCE_ID: 2009-12-07 16:39:13 1ed88e9d01e9eda5cbc622e7614277f29bcc551c
+		///
+		///
+		///
+		///</summary>
+		//#include "sqliteInt.h"
+		#if !SQLITE_DEBUG
+		///<summary>
+		/// Stub routines for all mutex methods.
+		///
+		/// This routines provide no mutual exclusion or error checking.
+		///</summary>
+		static int noopMutexHeld(sqlite3_mutex p) {
+			return 1;
+		}
+		static int noopMutexNotheld(sqlite3_mutex p) {
+			return 1;
+		}
+		static int noopMutexInit() {
+			return SQLITE_OK;
+		}
+		static int noopMutexEnd() {
+			return SQLITE_OK;
+		}
+		static sqlite3_mutex noopMutexAlloc(int id) {
+			return new sqlite3_mutex();
+		}
+		static void noopMutexFree(sqlite3_mutex p) {
+		}
+		static void noopMutexEnter(sqlite3_mutex p) {
+		}
+		static int noopMutexTry(sqlite3_mutex p) {
+			return SQLITE_OK;
+		}
+		static void noopMutexLeave(sqlite3_mutex p) {
+		}
+		sqlite3_mutex_methods sqlite3DefaultMutex() {
+			sqlite3_mutex_methods sMutex=new sqlite3_mutex_methods((dxMutexInit)noopMutexInit,(dxMutexEnd)noopMutexEnd,(dxMutexAlloc)noopMutexAlloc,(dxMutexFree)noopMutexFree,(dxMutexEnter)noopMutexEnter,(dxMutexTry)noopMutexTry,(dxMutexLeave)noopMutexLeave,
+			#if SQLITE_DEBUG
+			(dxMutexHeld)noopMutexHeld,
 (dxMutexNotheld)noopMutexNotheld
 #else
-null,
-null
-#endif
-);
-
-return sMutex;
-}
-#endif //* !SQLITE_DEBUG */
-
-#if SQLITE_DEBUG && !SQLITE_MUTEX_OMIT
-    /*
+			null,null
+			#endif
+			);
+			return sMutex;
+		}
+	#endif
+	#if SQLITE_DEBUG && !SQLITE_MUTEX_OMIT
+	    /*
 ** In this implementation, error checking is provided for testing
 ** and debugging purposes.  The mutexes still do not provide any
 ** mutual exclusion.
@@ -227,17 +226,15 @@ return sMutex;
 
       return sMutex;
     }
-#endif //* SQLITE_DEBUG */
-
-    /*
+#endif
+	/*
 ** If compiled with SQLITE_MUTEX_NOOP, then the no-op mutex implementation
 ** is used regardless of the run-time threadsafety setting.
 */
-#if SQLITE_MUTEX_NOOP
-sqlite3_mutex_methods const sqlite3DefaultMutex(void){
+	#if SQLITE_MUTEX_NOOP
+	sqlite3_mutex_methods const sqlite3DefaultMutex(void){
 return sqlite3NoopMutex();
 }
-#endif //* SQLITE_MUTEX_NOOP */
-
-  }
+#endif
+	}
 }

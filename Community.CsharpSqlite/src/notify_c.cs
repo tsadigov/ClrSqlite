@@ -1,10 +1,7 @@
 using System.Diagnostics;
-
-namespace Community.CsharpSqlite
-{
-  public partial class Sqlite3
-  {
-    /*
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
+	/*
     ** 2009 March 3
     **
     ** The author disclaims copyright to this source code.  In place of
@@ -25,13 +22,11 @@ namespace Community.CsharpSqlite
     **  SQLITE_SOURCE_ID: 2009-12-07 16:39:13 1ed88e9d01e9eda5cbc622e7614277f29bcc551c
     **
     *************************************************************************
-    */
-    //#include "sqliteInt.h"
-    //#include "btreeInt.h"
-
-    /* Omit this entire file if SQLITE_ENABLE_UNLOCK_NOTIFY is not defined. */
-#if SQLITE_ENABLE_UNLOCK_NOTIFY
-
+    *///#include "sqliteInt.h"
+	//#include "btreeInt.h"
+	/* Omit this entire file if SQLITE_ENABLE_UNLOCK_NOTIFY is not defined. */
+	#if SQLITE_ENABLE_UNLOCK_NOTIFY
+	
 /*
 ** Public interfaces:
 **
@@ -41,7 +36,7 @@ namespace Community.CsharpSqlite
 **   sqlite3_unlock_notify()
 */
 
-//#define assertMutexHeld() \
+//define assertMutexHeld() \
 assert( sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)) )
 
 /*
@@ -53,7 +48,7 @@ assert( sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)) )
 static sqlite3 *SQLITE_WSD sqlite3BlockedList = 0;
 
 #if !NDEBUG
-/*
+	/*
 ** This function is a complex assert() that verifies the following
 ** properties of the blocked connections list:
 **
@@ -86,9 +81,9 @@ assert( db==0 || p->pBlockingConnection!=db );
 }
 }
 #else
-//# define checkListProperties(x)
+	// define checkListProperties(x)
 #endif
-
+	
 /*
 ** Remove connection db from the blocked connections list. If connection
 ** db is not currently a part of the list, this function is a no-op.
@@ -342,5 +337,5 @@ checkListProperties(db);
 leaveMutex();
 }
 #endif
-  }
+	}
 }

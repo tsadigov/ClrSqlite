@@ -1,48 +1,42 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-
-namespace Community.CsharpSqlite
-{
-  public partial class Sqlite3
-  {
-    ///<summary>
-/// 2007 August 14
-///
-/// The author disclaims copyright to this source code.  In place of
-/// a legal notice, here is a blessing:
-///
-///    May you do good and not evil.
-///    May you find forgiveness for yourself and forgive others.
-///    May you share freely, never taking more than you give.
-///
-///
-/// This file contains the C functions that implement mutexes.
-///
-/// This file contains code that is common across all mutex implementations.
-///
-///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-///  C#-SQLite is an independent reimplementation of the SQLite software library
-///
-///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
-///
-///
-///
-///</summary>
-    //#include "sqliteInt.h"
-
-#if (SQLITE_DEBUG) && !(SQLITE_MUTEX_OMIT)
-/*
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
+	///<summary>
+	/// 2007 August 14
+	///
+	/// The author disclaims copyright to this source code.  In place of
+	/// a legal notice, here is a blessing:
+	///
+	///    May you do good and not evil.
+	///    May you find forgiveness for yourself and forgive others.
+	///    May you share freely, never taking more than you give.
+	///
+	///
+	/// This file contains the C functions that implement mutexes.
+	///
+	/// This file contains code that is common across all mutex implementations.
+	///
+	///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+	///  C#-SQLite is an independent reimplementation of the SQLite software library
+	///
+	///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
+	///
+	///
+	///
+	///</summary>
+	//#include "sqliteInt.h"
+	#if (SQLITE_DEBUG) && !(SQLITE_MUTEX_OMIT)
+	/*
 ** For debugging purposes, record when the mutex subsystem is initialized
 ** and uninitialized so that we can assert() if there is an attempt to
 ** allocate a mutex while the system is uninitialized.
 */
 static  int mutexIsInit = 0;
-#endif //* SQLITE_DEBUG */
-
-
-#if !SQLITE_MUTEX_OMIT
-///<summary>
+#endif
+	#if !SQLITE_MUTEX_OMIT
+	///<summary>
 /// Initialize the mutex system.
 ///</summary>
 static int sqlite3MutexInit(){ 
@@ -69,9 +63,9 @@ static int sqlite3MutexInit(){
   rc = sqlite3GlobalConfig.mutex.xMutexInit();
 
 #if SQLITE_DEBUG
-  mutexIsInit = 1; //GLOBAL(int, mutexIsInit) = 1;
+	  mutexIsInit = 1; //GLOBAL(int, mutexIsInit) = 1;
 #endif
-
+	
   return rc;
 }
 
@@ -85,10 +79,10 @@ static int sqlite3MutexEnd(){
     rc = sqlite3GlobalConfig.mutex.xMutexEnd();
   }
 
-#if  SQLITE_DEBUG
-  mutexIsInit = 0;//GLOBAL(int, mutexIsInit) = 0;
+#if SQLITE_DEBUG
+	  mutexIsInit = 0;//GLOBAL(int, mutexIsInit) = 0;
 #endif
-
+	
   return rc;
 }
 
@@ -97,9 +91,9 @@ static int sqlite3MutexEnd(){
 ///</summary>
 static sqlite3_mutex sqlite3_mutex_alloc(int id){
 #if !SQLITE_OMIT_AUTOINIT
-  if( sqlite3_initialize()!=0 ) return null;
+	  if( sqlite3_initialize()!=0 ) return null;
 #endif
-  return sqlite3GlobalConfig.mutex.xMutexAlloc(id);
+	  return sqlite3GlobalConfig.mutex.xMutexAlloc(id);
 }
 
 static sqlite3_mutex sqlite3MutexAlloc(int id){
@@ -154,7 +148,7 @@ static void sqlite3_mutex_leave(sqlite3_mutex p){
 }
 
 #if !NDEBUG
-///<summary>
+	///<summary>
 /// The sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
 /// intended for use inside assert() statements.
 ///</summary>
@@ -166,7 +160,7 @@ static bool sqlite3_mutex_held(sqlite3_mutex p){
   return p == null || sqlite3GlobalConfig.mutex.xMutexNotheld( p );
 }
 #endif
-
-#endif //* SQLITE_MUTEX_OMIT */
-  }
+	
+#endif
+	}
 }

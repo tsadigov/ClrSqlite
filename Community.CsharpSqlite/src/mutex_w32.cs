@@ -1,13 +1,10 @@
 using System.Diagnostics;
-using DWORD = System.Int32;
+using DWORD=System.Int32;
 using System.Threading;
 using System;
-
-namespace Community.CsharpSqlite
-{
-  public partial class Sqlite3
-  {
-    /*
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
+	/*
     ** 2007 August 14
     **
     ** The author disclaims copyright to this source code.  In place of
@@ -26,15 +23,13 @@ namespace Community.CsharpSqlite
     **  SQLITE_SOURCE_ID: 2010-03-09 19:31:43 4ae453ea7be69018d8c16eb8dabe05617397dc4d
     **
     *************************************************************************
-    */
-    //#include "sqliteInt.h"
-
-    /*
+    *///#include "sqliteInt.h"
+	/*
     ** The code in this file is only used if we are compiling multithreaded
     ** on a win32 system.
     */
-#if SQLITE_MUTEX_W32
-
+	#if SQLITE_MUTEX_W32
+	
 
     /*
 ** Each recursive mutex is an instance of the following structure.
@@ -46,9 +41,9 @@ namespace Community.CsharpSqlite
       public int nRef;       /* Number of enterances */
       public DWORD owner;    /* Thread holding this mutex */
 #if SQLITE_DEBUG
-      public int trace;      /* True to trace changes */
+	      public int trace;      /* True to trace changes */
 #endif
-
+	
       public sqlite3_mutex()
       {
         mutex = new Object();
@@ -56,28 +51,28 @@ namespace Community.CsharpSqlite
 
       public sqlite3_mutex( Mutex mutex, int id, int nRef, DWORD owner
 #if SQLITE_DEBUG
-, int trace
+	, int trace
 #endif
- )
+	 )
       {
         this.mutex = mutex;
         this.id = id;
         this.nRef = nRef;
         this.owner = owner;
 #if SQLITE_DEBUG
-        this.trace = 0;
+	        this.trace = 0;
 #endif
-      }
+	      }
     };
 
-    //#define SQLITE_W32_MUTEX_INITIALIZER { 0 }
+    //define SQLITE_W32_MUTEX_INITIALIZER { 0 }
     static Mutex SQLITE_W32_MUTEX_INITIALIZER = null;
 #if SQLITE_DEBUG
-    //#define SQLITE3_MUTEX_INITIALIZER { SQLITE_W32_MUTEX_INITIALIZER, 0, 0L, (DWORD)0, 0 }
+	    //define SQLITE3_MUTEX_INITIALIZER { SQLITE_W32_MUTEX_INITIALIZER, 0, 0L, (DWORD)0, 0 }
 #else
-//#define SQLITE3_MUTEX_INITIALIZER { SQLITE_W32_MUTEX_INITIALIZER, 0, 0L, (DWORD)0 }
+	//define SQLITE3_MUTEX_INITIALIZER { SQLITE_W32_MUTEX_INITIALIZER, 0, 0L, (DWORD)0 }
 #endif
-
+	
     /*
 ** Return true (non-zero) if we are running under WinNT, Win2K, WinXP,
 ** or WinCE.  Return false (zero) for Win95, Win98, or WinME.
@@ -92,14 +87,14 @@ namespace Community.CsharpSqlite
 ** mutexIsNT() is only used for the TryEnterCriticalSection() API call,
 ** which is only available if your application was compiled with
 ** _WIN32_WINNT defined to a value >= 0x0400.  Currently, the only
-** call to TryEnterCriticalSection() is #ifdef'ed out, so #if
+** call to TryEnterCriticalSection() is ifdef'ed out, so if
 ** this out as well.
 */
 #if FALSE
-#if SQLITE_OS_WINCE
-//# define mutexIsNT()  (1)
+	#if SQLITE_OS_WINCE
+	// define mutexIsNT()  (1)
 #else
-static int mutexIsNT(void){
+	static int mutexIsNT(void){
 static int osType = 0;
 if( osType==0 ){
 OSVERSIONINFO sInfo;
@@ -109,11 +104,11 @@ osType = sInfo.dwPlatformId==VER_PLATFORM_WIN32_NT ? 2 : 1;
 }
 return osType==2;
 }
-#endif //* SQLITE_OS_WINCE */
 #endif
-
+	#endif
+	
 #if SQLITE_DEBUG
-    /*
+	    /*
 ** The sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
 ** intended for use only inside Debug.Assert() statements.
 */
@@ -131,43 +126,43 @@ return osType==2;
       return winMutexNotheld2( p, tid );
     }
 #endif
-
+	
 
     /*
 ** Initialize and deinitialize the mutex subsystem.
 */
-    //No MACROS under C#; Cannot use SQLITE3_MUTEX_INITIALIZER,
+    //No MACROS under C; Cannot use SQLITE3_MUTEX_INITIALIZER,
     static sqlite3_mutex[] winMutex_staticMutexes = new sqlite3_mutex[]{
 new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
 #if SQLITE_DEBUG
-  , 0 
+	  , 0 
 #endif
-  ),//  SQLITE3_MUTEX_INITIALIZER,
+	  ),//  SQLITE3_MUTEX_INITIALIZER,
 new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
 #if SQLITE_DEBUG
-  , 0 
+	  , 0 
 #endif
-  ),//  SQLITE3_MUTEX_INITIALIZER,
+	  ),//  SQLITE3_MUTEX_INITIALIZER,
 new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
 #if SQLITE_DEBUG
-  , 0 
+	  , 0 
 #endif
-  ),//  SQLITE3_MUTEX_INITIALIZER,
+	  ),//  SQLITE3_MUTEX_INITIALIZER,
 new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
 #if SQLITE_DEBUG
-  , 0 
+	  , 0 
 #endif
-  ),//  SQLITE3_MUTEX_INITIALIZER,
+	  ),//  SQLITE3_MUTEX_INITIALIZER,
 new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
 #if SQLITE_DEBUG
-  , 0 
+	  , 0 
 #endif
-  ),//  SQLITE3_MUTEX_INITIALIZER,
+	  ),//  SQLITE3_MUTEX_INITIALIZER,
 new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
 #if SQLITE_DEBUG
-  , 0 
+	  , 0 
 #endif
-  ),//  SQLITE3_MUTEX_INITIALIZER,
+	  ),//  SQLITE3_MUTEX_INITIALIZER,
 };
     static int winMutex_isInit = 0;
     /* As winMutexInit() and winMutexEnd() are called as part
@@ -330,19 +325,19 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
       p.owner = tid;
       p.nRef++;
 #if SQLITE_DEBUG
-      if ( p.trace != 0 )
+	      if ( p.trace != 0 )
       {
         printf( "enter mutex {0} ({1}) with nRef={2}\n", p.GetHashCode(), p.owner, p.nRef );
       }
 #endif
-    }
+	    }
 
     static int winMutexTry( sqlite3_mutex p )
     {
 #if !NDEBUG
-      DWORD tid = GetCurrentThreadId();
+	      DWORD tid = GetCurrentThreadId();
 #endif
-      int rc = SQLITE_BUSY;
+	      int rc = SQLITE_BUSY;
       Debug.Assert( p.id == SQLITE_MUTEX_RECURSIVE || winMutexNotheld2( p, tid ) );
       /*
       ** The sqlite3_mutex_try() routine is very rarely used, and when it
@@ -351,26 +346,26 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
       **
       ** The TryEnterCriticalSection() interface is only available on WinNT.
       ** And some windows compilers complain if you try to use it without
-      ** first doing some #defines that prevent SQLite from building on Win98.
+      ** first doing some defines that prevent SQLite from building on Win98.
       ** For that reason, we will omit this optimization for now.  See
-      ** ticket #2685.
+      ** ticket 2685.
       */
 #if FALSE
-if( mutexIsNT() && TryEnterCriticalSection(p.mutex) ){
+	if( mutexIsNT() && TryEnterCriticalSection(p.mutex) ){
 p.owner = tid;
 p.nRef++;
 rc = SQLITE_OK;
 }
 #else
-      UNUSED_PARAMETER( p );
+	      UNUSED_PARAMETER( p );
 #endif
-#if SQLITE_DEBUG
-      if ( rc == SQLITE_OK && p.trace != 0 )
+	#if SQLITE_DEBUG
+	      if ( rc == SQLITE_OK && p.trace != 0 )
       {
         printf( "try mutex {0} ({1}) with nRef={2}\n", p.GetHashCode(), p.owner, p.nRef );
       }
 #endif
-      return rc;
+	      return rc;
     }
 
     /*
@@ -382,20 +377,20 @@ rc = SQLITE_OK;
     static void winMutexLeave( sqlite3_mutex p )
     {
 #if !NDEBUG
-      DWORD tid = GetCurrentThreadId();
+	      DWORD tid = GetCurrentThreadId();
 #endif
-      Debug.Assert( p.nRef > 0 );
+	      Debug.Assert( p.nRef > 0 );
       Debug.Assert( p.owner == tid );
       p.nRef--;
       Debug.Assert( p.nRef == 0 || p.id == SQLITE_MUTEX_RECURSIVE );
       if (p.nRef == 0) LeaveCriticalSection( p.mutex );
 #if SQLITE_DEBUG
-      if ( p.trace != 0 )
+	      if ( p.trace != 0 )
       {
         printf( "leave mutex {0} ({1}) with nRef={2}\n", p.GetHashCode(), p.owner, p.nRef );
       }
 #endif
-    }
+	    }
 
     static sqlite3_mutex_methods sqlite3DefaultMutex()
     {
@@ -408,17 +403,16 @@ rc = SQLITE_OK;
 (dxMutexTry)winMutexTry,
 (dxMutexLeave)winMutexLeave,
 #if SQLITE_DEBUG
-(dxMutexHeld)winMutexHeld,
+	(dxMutexHeld)winMutexHeld,
 (dxMutexNotheld)winMutexNotheld
 #else
-null,
+	null,
 null
 #endif
-);
+	);
 
       return sMutex;
     }
-#endif // * SQLITE_MUTEX_W32 */
-  }
+#endif
+	}
 }
-

@@ -1,14 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-
-namespace Community.CsharpSqlite
-{
-  using sqlite3_value = Sqlite3.Mem;
-
-  public partial class Sqlite3
-  {
-/*
+namespace Community.CsharpSqlite {
+	using sqlite3_value=Sqlite3.Mem;
+	public partial class Sqlite3 {
+	/*
 ** 2003 January 11
 **
 ** The author disclaims copyright to this source code.  In place of
@@ -30,15 +26,13 @@ namespace Community.CsharpSqlite
 **  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
 **
 *************************************************************************
-*/
-//#include "sqliteInt.h"
-
-///<summary>
-/// All of the code in this file may be omitted by defining a single
-/// macro.
-///</summary>
-#if !SQLITE_OMIT_AUTHORIZATION
-
+*///#include "sqliteInt.h"
+	///<summary>
+	/// All of the code in this file may be omitted by defining a single
+	/// macro.
+	///</summary>
+	#if !SQLITE_OMIT_AUTHORIZATION
+	
 ///<summary>
 /// Set or clear the access authorization function.
 ///
@@ -262,6 +256,6 @@ pContext->pParse = 0;
 }
 }
 
-#endif //* SQLITE_OMIT_AUTHORIZATION */
-  }
+#endif
+	}
 }

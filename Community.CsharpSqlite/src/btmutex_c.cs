@@ -1,37 +1,34 @@
 using System.Diagnostics;
-
-namespace Community.CsharpSqlite
-{
-  public partial class Sqlite3
-  {
-///<summary>
-/// 2007 August 27
-///
-/// The author disclaims copyright to this source code.  In place of
-/// a legal notice, here is a blessing:
-///
-///    May you do good and not evil.
-///    May you find forgiveness for yourself and forgive others.
-///    May you share freely, never taking more than you give.
-///
-///
-///
-/// This file contains code used to implement mutexes on Btree objects.
-/// This code really belongs in btree.c.  But btree.c is getting too
-/// big and we want to break it down some.  This packaged seemed like
-/// a good breakout.
-///
-///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-///  C#-SQLite is an independent reimplementation of the SQLite software library
-///
-///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
-///
-///
-///</summary>
-//#include "btreeInt.h"
-#if !SQLITE_OMIT_SHARED_CACHE
-#if SQLITE_THREADSAFE
-
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
+	///<summary>
+	/// 2007 August 27
+	///
+	/// The author disclaims copyright to this source code.  In place of
+	/// a legal notice, here is a blessing:
+	///
+	///    May you do good and not evil.
+	///    May you find forgiveness for yourself and forgive others.
+	///    May you share freely, never taking more than you give.
+	///
+	///
+	///
+	/// This file contains code used to implement mutexes on Btree objects.
+	/// This code really belongs in btree.c.  But btree.c is getting too
+	/// big and we want to break it down some.  This packaged seemed like
+	/// a good breakout.
+	///
+	///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+	///  C#-SQLite is an independent reimplementation of the SQLite software library
+	///
+	///  SQLITE_SOURCE_ID: 2011-05-19 13:26:54 ed1da510a239ea767a01dc332b667119fa3c908e
+	///
+	///
+	///</summary>
+	//#include "btreeInt.h"
+	#if !SQLITE_OMIT_SHARED_CACHE
+	#if SQLITE_THREADSAFE
+	
 /*
 ** Obtain the BtShared mutex associated with B-Tree handle p. Also,
 ** set BtShared.db to the database handle associated with p and the
@@ -151,7 +148,7 @@ if( p->wantToLock==0 ){
 }
 
 #if NDEBUG
-/*
+	/*
 ** Return true if the BtShared mutex is held on the btree, or if the
 ** B-Tree is not marked as sharable.
 **
@@ -166,10 +163,10 @@ int sqlite3BtreeHoldsMutex(Btree *p){
   return (p->sharable==0 || p->locked);
 }
 #endif
-
+	
 
 #if SQLITE_OMIT_INCRBLOB
-/*
+	/*
 ** Enter and leave a mutex on a Btree given a cursor owned by that
 ** Btree.  These entry points are used by incremental I/O and can be
 ** omitted if that module is not used.
@@ -180,8 +177,8 @@ void sqlite3BtreeEnterCursor(BtCursor *pCur){
 void sqlite3BtreeLeaveCursor(BtCursor *pCur){
   sqlite3BtreeLeave(pCur->pBtree);
 }
-#endif //* SQLITE_OMIT_INCRBLOB */
-
+#endif
+	
 
 /*
 ** Enter the mutex on every Btree associated with a database
@@ -225,7 +222,7 @@ int sqlite3BtreeSharable(Btree *p){
 }
 
 #if NDEBUG
-/*
+	/*
 ** Return true if the current thread holds the database connection
 ** mutex and all required BtShared mutexes.
 **
@@ -246,10 +243,10 @@ if( p && p->sharable &&
   }
   return 1;
 }
-#endif //* NDEBUG */
-
+#endif
+	
 #if NDEBUG
-/*
+	/*
 ** Return true if the correct mutexes are held for accessing the
 ** db->aDb[iDb].pSchema structure.  The mutexes required for schema
 ** access are:
@@ -271,17 +268,17 @@ int sqlite3SchemaMutexHeld(sqlite3 db, int iDb, Schema *pSchema){
   assert( p!=0 );
   return p->sharable==0 || p->locked==1;
 }
-#endif //* NDEBUG */
-
-#else //* SQLITE_THREADSAFE>0 above.  SQLITE_THREADSAFE==0 below */
-///<summary>
+#endif
+	
+#else
+	///<summary>
 /// The following are special cases for mutex enter routines for use
 /// in single threaded applications that use shared cache.  Except for
 /// these two routines, all mutex operations are no-ops in that case and
-/// are null #defines in btree.h.
+/// are null defines in btree.h.
 ///
 /// If shared cache is disabled, then all btree mutex routines, including
-/// the ones below, are no-ops and are null #defines in btree.h.
+/// the ones below, are no-ops and are null defines in btree.h.
 ///</summary>
 
 void sqlite3BtreeEnter(Btree *p){
@@ -296,8 +293,7 @@ if( p ){
 }
   }
 }
-#endif //* if SQLITE_THREADSAFE */
-#endif //* ifndef SQLITE_OMIT_SHARED_CACHE */
-
-  }
+#endif
+	#endif
+	}
 }
