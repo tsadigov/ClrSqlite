@@ -191,7 +191,7 @@ namespace Community.CsharpSqlite {
 		//void sqlite3BtreeCursorList(Btree);
 		//#endif
 		#if !SQLITE_OMIT_WAL
-																								//int sqlite3BtreeCheckpoint(Btree*, int, int *, int );
+																										//int sqlite3BtreeCheckpoint(Btree*, int, int *, int );
 #endif
 		///<summary>
 		/// If we are not using shared cache, then there is no need to
@@ -199,7 +199,7 @@ namespace Community.CsharpSqlite {
 		/// Enter and Leave procedures no-ops.
 		///</summary>
 		#if !SQLITE_OMIT_SHARED_CACHE
-																								//void sqlite3BtreeEnter(Btree);
+																										//void sqlite3BtreeEnter(Btree);
 //void sqlite3BtreeEnterAll(sqlite3);
 #else
 		//# define sqlite3BtreeEnter(X)
@@ -210,18 +210,18 @@ namespace Community.CsharpSqlite {
 		}
 		#endif
 		#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
-																								//int sqlite3BtreeSharable(Btree);
+																										//int sqlite3BtreeSharable(Btree);
 //void sqlite3BtreeLeave(Btree);
 //void sqlite3BtreeEnterCursor(BtCursor);
 //void sqlite3BtreeLeaveCursor(BtCursor);
 //void sqlite3BtreeLeaveAll(sqlite3);
 #if !NDEBUG
-																								/* These routines are used inside Debug.Assert() statements only. */
+																										/* These routines are used inside Debug.Assert() statements only. */
 int sqlite3BtreeHoldsMutex(Btree);
 int sqlite3BtreeHoldsAllMutexes(sqlite3);
 int sqlite3SchemaMutexHeld(sqlite3*,int,Schema);
 #endif
-																								#else
+																										#else
 		//# define sqlite3BtreeSharable(X) 0
 		static bool sqlite3BtreeSharable(Btree X) {
 			return false;

@@ -80,19 +80,19 @@ namespace Community.CsharpSqlite {
 		//# define sqlite3_column_origin_name16   0
 		#endif
 		#if SQLITE_OMIT_COMPLETE
-																								// define sqlite3_complete 0
+																										// define sqlite3_complete 0
 // define sqlite3_complete16 0
 #endif
 		#if SQLITE_OMIT_DECLTYPE
-																								// define sqlite3_column_decltype16      0
+																										// define sqlite3_column_decltype16      0
 // define sqlite3_column_decltype        0
 #endif
 		#if SQLITE_OMIT_PROGRESS_CALLBACK
-																								// define sqlite3_progress_handler 0
+																										// define sqlite3_progress_handler 0
 static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xProgress, object pArg){}
 #endif
 		#if SQLITE_OMIT_VIRTUALTABLE
-																								    // define sqlite3_create_module 0
+																										    // define sqlite3_create_module 0
     // define sqlite3_create_module_v2 0
     // define sqlite3_declare_vtab 0
 #endif
@@ -100,7 +100,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//# define sqlite3_enable_shared_cache 0
 		#endif
 		#if SQLITE_OMIT_TRACE
-																								// define sqlite3_profile       0
+																										// define sqlite3_profile       0
 // define sqlite3_trace         0
 #endif
 		#if SQLITE_OMIT_GET_TABLE
@@ -141,7 +141,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//{
 		//  sqlite3_aggregate_context,
 		#if !SQLITE_OMIT_DEPRECATED
-																								    /  sqlite3_aggregate_count,
+																										    /  sqlite3_aggregate_count,
 #else
 		//  0,
 		#endif
@@ -200,7 +200,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  sqlite3_errmsg16,
 		//  sqlite3_exec,
 		#if !SQLITE_OMIT_DEPRECATED
-																								    //sqlite3_expired,
+																										    //sqlite3_expired,
 #else
 		//0,
 		#endif
@@ -244,14 +244,14 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  sqlite3_step,
 		//  sqlite3_table_column_metadata,
 		#if !SQLITE_OMIT_DEPRECATED
-																								    //sqlite3_thread_cleanup,
+																										    //sqlite3_thread_cleanup,
 #else
 		//  0,
 		#endif
 		//  sqlite3_total_changes,
 		//  sqlite3_trace,
 		#if !SQLITE_OMIT_DEPRECATED
-																								    //sqlite3_transfer_bindings,
+																										    //sqlite3_transfer_bindings,
 #else
 		//  0,
 		#endif
@@ -309,7 +309,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  0,
 		//  0,
 		#else
-																								//  sqlite3MutexAlloc,
+																										//  sqlite3MutexAlloc,
 //  sqlite3_mutex_enter,
 //  sqlite3_mutex_free,
 //  sqlite3_mutex_leave,
@@ -508,7 +508,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 ** dummy pointer.
 */
 		#if SQLITE_OMIT_LOAD_EXTENSION
-																								const sqlite3_api_routines sqlite3Apis = null;
+																										const sqlite3_api_routines sqlite3Apis = null;
 #endif
 		///<summary>
 		/// The following object holds the list of automatically loaded
@@ -536,7 +536,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		///
 		///</summary>
 		#if SQLITE_OMIT_WSD
-																								// define wsdAutoextInit \
+																										// define wsdAutoextInit \
 sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 // define wsdAutoext x[0]
 #else
@@ -562,7 +562,7 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 			 {
 				int i;
 				#if SQLITE_THREADSAFE
-																																																        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
+																																																				        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #else
 				sqlite3_mutex mutex=sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
 				#endif
@@ -599,14 +599,14 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 			#endif
 			 {
 				#if SQLITE_THREADSAFE
-																																																        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
+																																																				        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #else
 				sqlite3_mutex mutex=sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
 				#endif
 				wsdAutoextInit();
 				sqlite3_mutex_enter(mutex);
 				#if SQLITE_OMIT_WSD
-																																																//sqlite3_free( ref wsdAutoext.aExt );
+																																																				//sqlite3_free( ref wsdAutoext.aExt );
 wsdAutoext.aExt = null;
 wsdAutoext.nExt = 0;
 #else
@@ -628,7 +628,7 @@ wsdAutoext.nExt = 0;
 			//)(sqlite3*,char**,const sqlite3_api_routines);
 			wsdAutoextInit();
 			#if SQLITE_OMIT_WSD
-																																				if ( wsdAutoext.nExt == 0 )
+																																							if ( wsdAutoext.nExt == 0 )
 #else
 			if(sqlite3Autoext.nExt==0)
 			#endif
@@ -638,7 +638,7 @@ wsdAutoext.nExt = 0;
 			for(i=0;go;i++) {
 				string zErrmsg="";
 				#if SQLITE_THREADSAFE
-																																																        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
+																																																				        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #else
 				sqlite3_mutex mutex=sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
 				#endif

@@ -55,7 +55,7 @@ namespace Community.CsharpSqlite {
 		static _aTable[] aTable=new _aTable[] {
 			new _aTable("sqlite_stat1","tbl,idx,stat"),
 		#if SQLITE_ENABLE_STAT2
-																								new _aTable( "sqlite_stat2", "tbl,idx,sampleno,sample" ),
+																										new _aTable( "sqlite_stat2", "tbl,idx,sampleno,sample" ),
 #endif
 		};
 		///<summary>
@@ -131,7 +131,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static void sqlite3DeleteIndexSamples(sqlite3 db,Index pIdx) {
 			#if SQLITE_ENABLE_STAT2
-																																				  if ( pIdx.aSample != null )
+																																							  if ( pIdx.aSample != null )
   {
     int j;
     for ( j = 0; j < SQLITE_INDEX_SAMPLES; j++ )
@@ -201,7 +201,7 @@ namespace Community.CsharpSqlite {
 				sqlite3DbFree(db,ref zSql);
 				/* Load the statistics from the sqlite_stat2 table. */
 				#if SQLITE_ENABLE_STAT2
-																																															  if ( rc == SQLITE_OK && null == sqlite3FindTable( db, "sqlite_stat2", sInfo.zDatabase ) )
+																																																			  if ( rc == SQLITE_OK && null == sqlite3FindTable( db, "sqlite_stat2", sInfo.zDatabase ) )
   {
     rc = SQLITE_ERROR;
   }

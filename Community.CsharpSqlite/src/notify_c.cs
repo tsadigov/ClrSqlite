@@ -26,7 +26,7 @@ namespace Community.CsharpSqlite {
 	//#include "btreeInt.h"
 	/* Omit this entire file if SQLITE_ENABLE_UNLOCK_NOTIFY is not defined. */
 	#if SQLITE_ENABLE_UNLOCK_NOTIFY
-												
+													
 /*
 ** Public interfaces:
 **
@@ -48,7 +48,7 @@ assert( sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)) )
 static sqlite3 *SQLITE_WSD sqlite3BlockedList = 0;
 
 #if !NDEBUG
-												/*
+													/*
 ** This function is a complex assert() that verifies the following
 ** properties of the blocked connections list:
 **
@@ -81,9 +81,9 @@ assert( db==0 || p->pBlockingConnection!=db );
 }
 }
 #else
-												// define checkListProperties(x)
+													// define checkListProperties(x)
 #endif
-												
+													
 /*
 ** Remove connection db from the blocked connections list. If connection
 ** db is not currently a part of the list, this function is a no-op.
