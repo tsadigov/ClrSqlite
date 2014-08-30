@@ -504,45 +504,6 @@ p.eState = CURSOR_INVALID;
 		/// The caller must ensure that the cursor is valid (has eState==CURSOR_VALID)
 		/// prior to calling this routine.
 		///</summary>
-		static int saveCursorPosition(BtCursor pCur) {
-			int rc;
-			Debug.Assert(CURSOR_VALID==pCur.eState);
-			Debug.Assert(null==pCur.pKey);
-			Debug.Assert(pCur.cursorHoldsMutex());
-			rc=sqlite3BtreeKeySize(pCur,ref pCur.nKey);
-			Debug.Assert(rc==SQLITE_OK);
-			/* KeySize() cannot fail *//* If this is an intKey table, then the above call to BtreeKeySize()
-  ** stores the integer key in pCur.nKey. In this case this value is
-  ** all that is required. Otherwise, if pCur is not open on an intKey
-  ** table, then malloc space for and store the pCur.nKey bytes of key
-  ** data.
-  */if(0==pCur.apPage[0].intKey) {
-				byte[] pKey=sqlite3Malloc((int)pCur.nKey);
-				//if( pKey !=null){
-				rc=sqlite3BtreeKey(pCur,0,(u32)pCur.nKey,pKey);
-				if(rc==SQLITE_OK) {
-					pCur.pKey=pKey;
-				}
-				//else{
-				//  sqlite3_free(ref pKey);
-				//}
-				//}else{
-				//  rc = SQLITE_NOMEM;
-				//}
-			}
-			Debug.Assert(0==pCur.apPage[0].intKey||null==pCur.pKey);
-			if(rc==SQLITE_OK) {
-				int i;
-				for(i=0;i<=pCur.iPage;i++) {
-					releasePage(pCur.apPage[i]);
-					pCur.apPage[i]=null;
-				}
-				pCur.iPage=-1;
-				pCur.eState=CURSOR_REQUIRESEEK;
-			}
-			invalidateOverflowCache(pCur);
-			return rc;
-		}
 		///<summary>
 		/// Save the positions of all cursors (except pExcept) that are open on
 		/// the table  with root-page iRoot. Usually, this is called just before cursor
@@ -554,7 +515,7 @@ p.eState = CURSOR_INVALID;
 			Debug.Assert(pExcept==null||pExcept.pBt==pBt);
 			for(p=pBt.pCursor;p!=null;p=p.pNext) {
 				if(p!=pExcept&&(0==iRoot||p.pgnoRoot==iRoot)&&p.eState==CURSOR_VALID) {
-					int rc=saveCursorPosition(p);
+					int rc=p.saveCursorPosition();
 					if(SQLITE_OK!=rc) {
 						return rc;
 					}

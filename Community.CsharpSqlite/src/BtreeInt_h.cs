@@ -3043,6 +3043,45 @@ aOverflow= null;
 			public bool cursorHoldsMutex() {
 				return true;
 			}
+			public int saveCursorPosition() {
+				int rc;
+				Debug.Assert(CURSOR_VALID==this.eState);
+				Debug.Assert(null==this.pKey);
+				Debug.Assert(this.cursorHoldsMutex());
+				rc=sqlite3BtreeKeySize(this,ref this.nKey);
+				Debug.Assert(rc==SQLITE_OK);
+				/* KeySize() cannot fail *//* If this is an intKey table, then the above call to BtreeKeySize()
+  ** stores the integer key in pCur.nKey. In this case this value is
+  ** all that is required. Otherwise, if pCur is not open on an intKey
+  ** table, then malloc space for and store the pCur.nKey bytes of key
+  ** data.
+  */if(0==this.apPage[0].intKey) {
+					byte[] pKey=sqlite3Malloc((int)this.nKey);
+					//if( pKey !=null){
+					rc=sqlite3BtreeKey(this,0,(u32)this.nKey,pKey);
+					if(rc==SQLITE_OK) {
+						this.pKey=pKey;
+					}
+					//else{
+					//  sqlite3_free(ref pKey);
+					//}
+					//}else{
+					//  rc = SQLITE_NOMEM;
+					//}
+				}
+				Debug.Assert(0==this.apPage[0].intKey||null==this.pKey);
+				if(rc==SQLITE_OK) {
+					int i;
+					for(i=0;i<=this.iPage;i++) {
+						releasePage(this.apPage[i]);
+						this.apPage[i]=null;
+					}
+					this.iPage=-1;
+					this.eState=CURSOR_REQUIRESEEK;
+				}
+				invalidateOverflowCache(this);
+				return rc;
+			}
 		}
 		/*
     ** Potential values for BtCursor.eState.
