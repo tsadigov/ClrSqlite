@@ -298,7 +298,7 @@ namespace Community.CsharpSqlite {
 			pParse.sNameToken.n=pParse.sNameToken.z.Length;
 			//      (int)[pModuleName.n] - pName1.z );
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																						  /* Creating a virtual table invokes the authorization callback twice.
+																																																									  /* Creating a virtual table invokes the authorization callback twice.
   ** The first invocation, to obtain permission to INSERT a row into the
   ** sqlite_master table, has already been made by sqlite3StartTable().
   ** The second call, to obtain permission to create the table, is made now.
@@ -649,7 +649,7 @@ namespace Community.CsharpSqlite {
 				pParse.declareVtab=1;
 				pParse.db=db;
 				pParse.nQueryLoop=1;
-				if(SQLITE_OK==sqlite3RunParser(pParse,zCreateTable,ref zErr)&&pParse.pNewTable!=null//&& !db.mallocFailed
+				if(SQLITE_OK==pParse.sqlite3RunParser(zCreateTable,ref zErr)&&pParse.pNewTable!=null//&& !db.mallocFailed
 				&&null==pParse.pNewTable.pSelect&&(pParse.pNewTable.tabFlags&TF_Virtual)==0) {
 					if(null==pTab.aCol) {
 						pTab.aCol=pParse.pNewTable.aCol;

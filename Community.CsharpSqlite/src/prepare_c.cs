@@ -99,7 +99,7 @@ namespace Community.CsharpSqlite {
         */int rc;
 					sqlite3_stmt pStmt=null;
 					#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																										        //TESTONLY(int rcp);            /* Return code from sqlite3_prepare() */
+																																																																																															        //TESTONLY(int rcp);            /* Return code from sqlite3_prepare() */
         int rcp;
 #endif
 					Debug.Assert(db.init.busy!=0);
@@ -108,13 +108,13 @@ namespace Community.CsharpSqlite {
 					db.init.orphanTrigger=0;
 					//TESTONLY(rcp = ) sqlite3_prepare(db, argv[2], -1, &pStmt, 0);
 					#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																										        rcp = sqlite3_prepare( db, argv[2], -1, ref pStmt, 0 );
+																																																																																															        rcp = sqlite3_prepare( db, argv[2], -1, ref pStmt, 0 );
 #else
 					sqlite3_prepare(db,argv[2],-1,ref pStmt,0);
 					#endif
 					rc=db.errCode;
 					#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																										        Debug.Assert( ( rc & 0xFF ) == ( rcp & 0xFF ) );
+																																																																																															        Debug.Assert( ( rc & 0xFF ) == ( rcp & 0xFF ) );
 #endif
 					db.init.iDb=0;
 					if(SQLITE_OK!=rc) {
@@ -188,7 +188,7 @@ namespace Community.CsharpSqlite {
 			#if !SQLITE_OMIT_TEMPDB
 			string temp_master_schema="CREATE TEMP TABLE sqlite_temp_master(\n"+"  type text,\n"+"  name text,\n"+"  tbl_name text,\n"+"  rootpage integer,\n"+"  sql text\n"+")";
 			#else
-																																																						//define temp_master_schema 0
+																																																									//define temp_master_schema 0
 #endif
 			Debug.Assert(iDb>=0&&iDb<db.nDb);
 			Debug.Assert(db.aDb[iDb].pSchema!=null);
@@ -241,7 +241,7 @@ namespace Community.CsharpSqlite {
 					else
 						sqlite3SetString(ref pzErrMsg,db,"%s",sqlite3ErrStr(rc));
 					#else
-																																																																																										          sqlite3SetString( ref pzErrMsg, db, "%s", sqlite3ErrStr( rc ) );
+																																																																																															          sqlite3SetString( ref pzErrMsg, db, "%s", sqlite3ErrStr( rc ) );
 #endif
 					goto initone_error_out;
 				}
@@ -328,7 +328,7 @@ namespace Community.CsharpSqlite {
 				string zSql;
 				zSql=sqlite3MPrintf(db,"SELECT name, rootpage, sql FROM '%q'.%s ORDER BY rowid",db.aDb[iDb].zName,zMasterName);
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																								{
+																																																																												{
 int (*xAuth)(void*,int,const char*,const char*,const char*,const char*);
 xAuth = db.xAuth;
 db.xAuth = 0;
@@ -336,7 +336,7 @@ db.xAuth = 0;
 				rc=sqlite3_exec(db,zSql,(dxCallback)sqlite3InitCallback,initData,0);
 				pzErrMsg=initData.pzErrMsg;
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																								db.xAuth = xAuth;
+																																																																												db.xAuth = xAuth;
 }
 #endif
 				if(rc==SQLITE_OK)
@@ -586,7 +586,7 @@ db.xAuth = 0;
 				zSqlCopy=zSql.Substring(0,nBytes);
 				// sqlite3DbStrNDup(db, zSql, nBytes);
 				if(zSqlCopy!=null) {
-					sqlite3RunParser(pParse,zSqlCopy,ref zErrMsg);
+					pParse.sqlite3RunParser(zSqlCopy,ref zErrMsg);
 					sqlite3DbFree(db,ref zSqlCopy);
 					//pParse->zTail = &zSql[pParse->zTail-zSqlCopy];
 				}
@@ -595,7 +595,7 @@ db.xAuth = 0;
 				}
 			}
 			else {
-				sqlite3RunParser(pParse,zSql,ref zErrMsg);
+				pParse.sqlite3RunParser(zSql,ref zErrMsg);
 			}
 			Debug.Assert(1==(int)pParse.nQueryLoop);
 			//if ( db.mallocFailed != 0 )
@@ -772,7 +772,7 @@ db.xAuth = 0;
 			/* VERIFY: F13021 */return rc;
 		}
 	#if !SQLITE_OMIT_UTF16
-																		
+																			
 ///<summary>
 /// Compile the UTF-16 encoded SQL statement zSql into a statement handle.
 ///</summary>
