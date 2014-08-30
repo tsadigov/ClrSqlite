@@ -2922,6 +2922,8 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				sqlite3BitvecDestroy(ref this.pHasContent);
 				this.pHasContent=null;
 			}
+			public void invalidateAllOverflowCache() {
+			}
 		}
 		///<summary>
 		/// An instance of the following structure is used to hold information

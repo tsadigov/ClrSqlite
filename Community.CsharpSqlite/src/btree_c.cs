@@ -495,8 +495,6 @@ p.eState = CURSOR_INVALID;
 		static void invalidateOverflowCache(BtCursor pCur) {
 		}
 		//#define invalidateAllOverflowCache(x)
-		static void invalidateAllOverflowCache(BtShared pBt) {
-		}
 		//#define invalidateIncrblobCursors(x,y,z)
 		static void invalidateIncrblobCursors(Btree x,i64 y,int z) {
 		}
@@ -2021,7 +2019,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 				rc=SQLITE_DONE;
 			}
 			else {
-				invalidateAllOverflowCache(pBt);
+				pBt.invalidateAllOverflowCache();
 				rc=incrVacuumStep(pBt,0,btreePagecount(pBt));
 				if(rc==SQLITE_OK) {
 					rc=sqlite3PagerWrite(pBt.pPage1.pDbPage);
@@ -2050,7 +2048,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 			int nRef=0;
 			#endif
 			Debug.Assert(sqlite3_mutex_held(pBt.mutex));
-			invalidateAllOverflowCache(pBt);
+			pBt.invalidateAllOverflowCache();
 			Debug.Assert(pBt.autoVacuum);
 			if(!pBt.incrVacuum) {
 				Pgno nFin;
@@ -4623,7 +4621,7 @@ return rc;
     ** to make room for the new tables root page. In case this page turns
     ** out to be an overflow page, delete all overflow page-map caches
     ** held by open cursors.
-    */invalidateAllOverflowCache(pBt);
+    */pBt.invalidateAllOverflowCache();
 				/* Read the value of meta[3] from the database to determine where the
     ** root page of the new table should go. meta[3] is the largest root-page
     ** created so far, so the new root-page is (meta[3]+1).
