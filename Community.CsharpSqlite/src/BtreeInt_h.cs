@@ -2618,7 +2618,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 				/* Invalidate all incrblob cursors open on table iTable (assuming iTable
   ** is the root of a table b-tree - if it is not, the following call is
   ** a no-op).  */this.invalidateIncrblobCursors(0,1);
-				rc=saveAllCursors(pBt,(Pgno)iTable,null);
+				rc=pBt.saveAllCursors((Pgno)iTable,null);
 				if(SQLITE_OK==rc) {
 					rc=clearDatabasePage(pBt,(Pgno)iTable,0,ref pnChange);
 				}
@@ -2925,6 +2925,20 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				this.pHasContent=null;
 			}
 			public void invalidateAllOverflowCache() {
+			}
+			public int saveAllCursors(Pgno iRoot,BtCursor pExcept) {
+				BtCursor p;
+				Debug.Assert(sqlite3_mutex_held(this.mutex));
+				Debug.Assert(pExcept==null||pExcept.pBt==this);
+				for(p=this.pCursor;p!=null;p=p.pNext) {
+					if(p!=pExcept&&(0==iRoot||p.pgnoRoot==iRoot)&&p.eState==CURSOR_VALID) {
+						int rc=p.saveCursorPosition();
+						if(SQLITE_OK!=rc) {
+							return rc;
+						}
+					}
+				}
+				return SQLITE_OK;
 			}
 		}
 		///<summary>

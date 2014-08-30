@@ -509,20 +509,6 @@ p.eState = CURSOR_INVALID;
 		/// the table  with root-page iRoot. Usually, this is called just before cursor
 		/// pExcept is used to modify the table (BtreeDelete() or BtreeInsert()).
 		///</summary>
-		static int saveAllCursors(BtShared pBt,Pgno iRoot,BtCursor pExcept) {
-			BtCursor p;
-			Debug.Assert(sqlite3_mutex_held(pBt.mutex));
-			Debug.Assert(pExcept==null||pExcept.pBt==pBt);
-			for(p=pBt.pCursor;p!=null;p=p.pNext) {
-				if(p!=pExcept&&(0==iRoot||p.pgnoRoot==iRoot)&&p.eState==CURSOR_VALID) {
-					int rc=p.saveCursorPosition();
-					if(SQLITE_OK!=rc) {
-						return rc;
-					}
-				}
-			}
-			return SQLITE_OK;
-		}
 		///<summary>
 		/// Clear the current cursor position.
 		///</summary>
@@ -2261,7 +2247,7 @@ static int countWriteCursors( BtShared pBt )
 			BtShared pBt=p.pBt;
 			MemPage pPage1=new MemPage();
 			sqlite3BtreeEnter(p);
-			rc=saveAllCursors(pBt,0,null);
+			rc=pBt.saveAllCursors(0,null);
 			#if !SQLITE_OMIT_SHARED_CACHE
 																																																												if( rc!=SQLITE_OK ){
 /* This is a horrible situation. An IO or malloc() error occurred whilst
@@ -4358,7 +4344,7 @@ return 1;
   ** that the cursor is already where it needs to be and returns without
   ** doing any work. To avoid thwarting these optimizations, it is important
   ** not to clear the cursor here.
-  */rc=saveAllCursors(pBt,pCur.pgnoRoot,pCur);
+  */rc=pBt.saveAllCursors(pCur.pgnoRoot,pCur);
 			if(rc!=0)
 				return rc;
 			if(0==loc) {
@@ -4489,7 +4475,7 @@ return 1;
   ** making any modifications. Make the page containing the entry to be
   ** deleted writable. Then free any overflow pages associated with the
   ** entry and finally remove the cell itself from within the page.
-  */rc=saveAllCursors(pBt,pCur.pgnoRoot,pCur);
+  */rc=pBt.saveAllCursors(pCur.pgnoRoot,pCur);
 			if(rc!=0)
 				return rc;
 			rc=sqlite3PagerWrite(pPage.pDbPage);
