@@ -3101,6 +3101,27 @@ aOverflow= null;
 				sqlite3_free(ref this.pKey);
 				this.eState=CURSOR_INVALID;
 			}
+			public int btreeMoveto(/* Cursor open on the btree to be searched */byte[] pKey,/* Packed key if the btree is an index */i64 nKey,/* Integer key for tables.  Size of pKey for indices */int bias,/* Bias search to the high end */ref int pRes/* Write search results here */) {
+				int rc;
+				/* Status code */UnpackedRecord pIdxKey;
+				/* Unpacked index key */UnpackedRecord aSpace=new UnpackedRecord();
+				//char aSpace[150]; /* Temp space for pIdxKey - to avoid a malloc */
+				if(pKey!=null) {
+					Debug.Assert(nKey==(i64)(int)nKey);
+					pIdxKey=sqlite3VdbeRecordUnpack(this.pKeyInfo,(int)nKey,pKey,aSpace,16);
+					//sizeof( aSpace ) );
+					//if ( pIdxKey == null )
+					//  return SQLITE_NOMEM;
+				}
+				else {
+					pIdxKey=null;
+				}
+				rc=sqlite3BtreeMovetoUnpacked(this,pIdxKey,nKey,bias!=0?1:0,ref pRes);
+				if(pKey!=null) {
+					sqlite3VdbeDeleteUnpackedRecord(pIdxKey);
+				}
+				return rc;
+			}
 		}
 		/*
     ** Potential values for BtCursor.eState.
