@@ -184,7 +184,7 @@ namespace Community.CsharpSqlite {
 		public delegate void dxPC_Destroy(ref sqlite3_pcache pCache);
 		public delegate void dxIter(PgHdr p);
 	#if NET_35 || NET_40
-																    //API Simplifications -- Actions
+																	    //API Simplifications -- Actions
     public static Action<sqlite3_context, String, Int32, dxDel> ResultBlob = sqlite3_result_blob;
     public static Action<sqlite3_context, Double> ResultDouble = sqlite3_result_double;
     public static Action<sqlite3_context, String, Int32> ResultError = sqlite3_result_error;

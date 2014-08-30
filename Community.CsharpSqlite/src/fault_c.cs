@@ -59,7 +59,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if SQLITE_OMIT_WSD
-																																// define wsdHooksInit \
+																																		// define wsdHooksInit \
 BenignMallocHooks *x = &GLOBAL(BenignMallocHooks,sqlite3Hooks)
 // define wsdHooks x[0]
 #else

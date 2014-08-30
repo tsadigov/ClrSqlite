@@ -503,7 +503,7 @@ namespace Community.CsharpSqlite {
 				//u8 pIter = &pCell[pPage.childPtrSize];
 				u32 nSize=0;
 				#if SQLITE_DEBUG || DEBUG
-																																																												  /* The value returned by this function should always be the same as
+																																																																  /* The value returned by this function should always be the same as
 ** the (CellInfo.nSize) value found by doing a full parse of the
 ** cell. If SQLITE_DEBUG is defined, an Debug.Assert() at the bottom of
 ** this function verifies that this invariant is not violated. */
@@ -641,7 +641,7 @@ namespace Community.CsharpSqlite {
 					size=this.cellSizePtr(temp,pc);
 					cbrk-=size;
 					#if (SQLITE_ENABLE_OVERSIZE_CELL_CHECK)
-																																																																												    if ( cbrk < iCellFirst || pc + size > usableSize )
+																																																																																	    if ( cbrk < iCellFirst || pc + size > usableSize )
     {
       return SQLITE_CORRUPT_BKPT();
     }
@@ -947,7 +947,7 @@ namespace Community.CsharpSqlite {
     */iCellFirst=cellOffset+2*this.nCell;
 					iCellLast=usableSize-4;
 					#if (SQLITE_ENABLE_OVERSIZE_CELL_CHECK)
-																																																																												    {
+																																																																																	    {
       int i;            /* Index into the cell pointer array */
       int sz;           /* Size of a cell */
 
@@ -1314,7 +1314,7 @@ namespace Community.CsharpSqlite {
 					return;
 				Debug.Assert(idx>=0&&idx<this.nCell);
 				#if SQLITE_DEBUG
-																																																												  Debug.Assert( sz == cellSize( pPage, idx ) );
+																																																																  Debug.Assert( sz == cellSize( pPage, idx ) );
 #endif
 				Debug.Assert(sqlite3PagerIswriteable(this.pDbPage));
 				Debug.Assert(sqlite3_mutex_held(this.pBt.mutex));
@@ -1600,7 +1600,7 @@ namespace Community.CsharpSqlite {
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																																												if (false)
+																																																																																	if (false)
 #endif
 					 {
 						ptrmapPut(pBt,pgnoNew,PTRMAP_BTREE,this.pgno,ref rc);
@@ -1692,7 +1692,7 @@ namespace Community.CsharpSqlite {
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																																												if (false)
+																																																																																	if (false)
 #endif
 					 {
 						pRC=pTo.setChildPtrmaps();
@@ -1733,7 +1733,7 @@ namespace Community.CsharpSqlite {
 				Debug.Assert(sqlite3_mutex_held(pBt.mutex));
 				Debug.Assert(sqlite3PagerIswriteable(this.pDbPage));
 				#if FALSE
-																																																												TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
+																																																																TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
 #endif
 				/* At this point pParent may have at most one overflow cell. And if
 ** this overflow cell is present, it must be the cell with
@@ -2041,7 +2041,7 @@ namespace Community.CsharpSqlite {
 						#if !SQLITE_OMIT_AUTOVACUUM
 						if(pBt.autoVacuum)
 						#else
-																																																																																												if (false)
+																																																																																																		if (false)
 #endif
 						 {
 							ptrmapPut(pBt,pNew.pgno,PTRMAP_BTREE,this.pgno,ref rc);
@@ -2196,7 +2196,7 @@ namespace Community.CsharpSqlite {
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																																												if (false)
+																																																																																	if (false)
 #endif
 					 {
 						/* Fix the pointer-map entries for all the cells that were shifted around.
@@ -2286,7 +2286,7 @@ namespace Community.CsharpSqlite {
 							}
 						}
 						#if FALSE
-																																																																																												/* The ptrmapCheckPages() contains Debug.Assert() statements that verify that
+																																																																																																		/* The ptrmapCheckPages() contains Debug.Assert() statements that verify that
 ** all pointer map pages are set correctly. This is helpful while
 ** debugging. This is usually disabled because a corrupt database may
 ** cause an Debug.Assert() statement to fail.  */
@@ -2345,7 +2345,7 @@ ptrmapCheckPages(pParent, 1);
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																																												if (false)
+																																																																																	if (false)
 #endif
 					 {
 						ptrmapPut(pBt,pgnoChild,PTRMAP_BTREE,this.pgno,ref rc);
@@ -2429,7 +2429,7 @@ ptrmapCheckPages(pParent, 1);
 			/* List of other sharable Btrees from the same db */public Btree pPrev;
 			/* Back pointer of the same list */
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																													BtLock lock;              /* Object used to lock page 1 */
+																																																BtLock lock;              /* Object used to lock page 1 */
 #endif
 			/**
 ///<summary>
@@ -2516,32 +2516,32 @@ ptrmapCheckPages(pParent, 1);
 				sqlite3StrAccumInit(sCheck.errMsg,null,1000,20000);
 				//sCheck.errMsg.useMalloc = 2;
 				/* Check the integrity of the freelist
-  */checkList(sCheck,1,(int)Converter.sqlite3Get4byte(pBt.pPage1.aData,32),(int)Converter.sqlite3Get4byte(pBt.pPage1.aData,36),"Main freelist: ");
+  */sCheck.checkList(1,(int)Converter.sqlite3Get4byte(pBt.pPage1.aData,32),(int)Converter.sqlite3Get4byte(pBt.pPage1.aData,36),"Main freelist: ");
 				/* Check all the tables.
   */for(i=0;(int)i<nRoot&&sCheck.mxErr!=0;i++) {
 					if(aRoot[i]==0)
 						continue;
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum&&aRoot[i]>1) {
-						checkPtrmap(sCheck,(u32)aRoot[i],PTRMAP_ROOTPAGE,0,"");
+						sCheck.checkPtrmap((u32)aRoot[i],PTRMAP_ROOTPAGE,0,"");
 					}
 					#endif
-					checkTreePage(sCheck,aRoot[i],"List of tree roots: ",ref refNULL,ref refNULL,null,null);
+					sCheck.checkTreePage(aRoot[i],"List of tree roots: ",ref refNULL,ref refNULL,null,null);
 				}
 				/* Make sure every page in the file is referenced
   */for(i=1;i<=sCheck.nPage&&sCheck.mxErr!=0;i++) {
 					#if SQLITE_OMIT_AUTOVACUUM
-																																																																		if( sCheck.anRef[i]==null ){
+																																																																							if( sCheck.anRef[i]==null ){
 checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 }
 #else
 					/* If the database supports auto-vacuum, make sure no tables contain
 ** references to pointer-map pages.
 */if(sCheck.anRef[i]==0&&(PTRMAP_PAGENO(pBt,i)!=i||!pBt.autoVacuum)) {
-						checkAppendMsg(sCheck,"","Page %d is never used",i);
+						sCheck.checkAppendMsg("","Page %d is never used",i);
 					}
 					if(sCheck.anRef[i]!=0&&(PTRMAP_PAGENO(pBt,i)==i&&pBt.autoVacuum)) {
-						checkAppendMsg(sCheck,"","Pointer map page %d is referenced",i);
+						sCheck.checkAppendMsg("","Pointer map page %d is referenced",i);
 					}
 					#endif
 				}
@@ -2549,7 +2549,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
   ** This is an internal consistency check; an integrity check
   ** of the integrity check.
   */if(NEVER(nRef!=pBt.pPager.sqlite3PagerRefcount())) {
-					checkAppendMsg(sCheck,"","Outstanding page count goes from %d to %d during this analysis",nRef,pBt.pPager.sqlite3PagerRefcount());
+					sCheck.checkAppendMsg("","Outstanding page count goes from %d to %d during this analysis",nRef,pBt.pPager.sqlite3PagerRefcount());
 				}
 				/* Clean  up and report errors.
   */sqlite3BtreeLeave(this);
@@ -2565,28 +2565,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 					sqlite3StrAccumReset(sCheck.errMsg);
 				return sqlite3StrAccumFinish(sCheck.errMsg);
 			}
-			public string sqlite3BtreeGetFilename() {
-				Debug.Assert(this.pBt.pPager!=null);
-				return this.pBt.pPager.sqlite3PagerFilename();
-			}
-			public string sqlite3BtreeGetJournalname() {
-				Debug.Assert(this.pBt.pPager!=null);
-				return this.pBt.pPager.sqlite3PagerJournalname();
-			}
-			public bool sqlite3BtreeIsInTrans() {
-				Debug.Assert(this==null||sqlite3_mutex_held(this.db.mutex));
-				return (this!=null&&(this.inTrans==TRANS_WRITE));
-			}
-			public bool sqlite3BtreeIsInReadTrans() {
-				Debug.Assert(this!=null);
-				Debug.Assert(sqlite3_mutex_held(this.db.mutex));
-				return this.inTrans!=TRANS_NONE;
-			}
-			public bool sqlite3BtreeIsInBackup() {
-				Debug.Assert(this!=null);
-				Debug.Assert(sqlite3_mutex_held(this.db.mutex));
-				return this.nBackup!=0;
-			}
+			
 			public Schema sqlite3BtreeSchema(int nBytes,dxFreeSchema xFree) {
 				BtShared pBt=this.pBt;
 				sqlite3BtreeEnter(this);
@@ -2676,7 +2655,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 				piMoved=0;
 				if(iTable>1) {
 					#if SQLITE_OMIT_AUTOVACUUM
-																																																																	freePage(pPage, ref rc);
+																																																																						freePage(pPage, ref rc);
 releasePage(pPage);
 #else
 					if(pBt.autoVacuum) {
@@ -2759,7 +2738,7 @@ releasePage(pPage);
 				/* If auto-vacuum is disabled in this build and this is an auto-vacuum
   ** database, mark the database as read-only.  */
 				#if SQLITE_OMIT_AUTOVACUUM
-																																																	if( idx==BTREE_LARGEST_ROOT_PAGE && pMeta>0 ) pBt.readOnly = 1;
+																																																					if( idx==BTREE_LARGEST_ROOT_PAGE && pMeta>0 ) pBt.readOnly = 1;
 #endif
 				sqlite3BtreeLeave(this);
 			}
@@ -2795,9 +2774,9 @@ releasePage(pPage);
 		/// but any number may have active read transactions.
 		///
 		///</summary>
-		const byte TRANS_NONE=0;
-		const byte TRANS_READ=1;
-		const byte TRANS_WRITE=2;
+		public const byte TRANS_NONE=0;
+        public const byte TRANS_READ = 1;
+        public const byte TRANS_WRITE = 2;
 		/*
     ** An instance of this object represents a single database file.
     **
@@ -2864,7 +2843,7 @@ releasePage(pPage);
 			/* Non-recursive mutex required to access this object */public Bitvec pHasContent;
 			/* Set of pages moved to free-list this transaction */
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																																public int nRef;                /* Number of references to this structure */
+																																																			public int nRef;                /* Number of references to this structure */
 public BtShared pNext;          /* Next on a list of sharable BtShared structs */
 public BtLock pLock;            /* List of locks held on this shared-btree struct */
 public Btree pWriter;           /* Btree with currently open write transaction */
@@ -3019,7 +2998,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			/* True if info.nKey is valid */public int eState;
 			/* One of the CURSOR_XXX constants (see below) */
 			#if !SQLITE_OMIT_INCRBLOB
-																																																public Pgno[] aOverflow;         /* Cache of overflow page locations */
+																																																			public Pgno[] aOverflow;         /* Cache of overflow page locations */
 public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 #endif
 			public i16 iPage;
@@ -3046,7 +3025,7 @@ public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 				nKey=0;
 				skipNext=0;
 				#if !SQLITE_OMIT_INCRBLOB
-																																																																isIncrblobHandle=false;
+																																																																				isIncrblobHandle=false;
 aOverflow= null;
 #endif
 				iPage=0;
@@ -3168,7 +3147,7 @@ aOverflow= null;
 		///
 		///</summary>
 		#if DEBUG
-																																    //define btreeIntegrity(p) \
+																																		    //define btreeIntegrity(p) \
     //  Debug.Assert( p.pBt.inTransaction!=TRANS_NONE || p.pBt.nTransaction==0 ); \
     //  Debug.Assert( p.pBt.inTransaction>=p.inTrans );
     static void btreeIntegrity( Btree p )
@@ -3190,7 +3169,7 @@ aOverflow= null;
 		#if !SQLITE_OMIT_AUTOVACUUM
 		//#define ISAUTOVACUUM (pBt.autoVacuum)
 		#else
-																																//define ISAUTOVACUUM 0
+																																		//define ISAUTOVACUUM 0
 public static bool ISAUTOVACUUM =false;
 #endif
 		///<summary>
@@ -3207,8 +3186,322 @@ public static bool ISAUTOVACUUM =false;
 			/* Stop accumulating errors when this reaches zero */public int nErr;
 			/* Number of messages written to zErrMsg so far *///public int mallocFailed;  /* A memory allocation error has occurred */
 			public StrAccum errMsg=new StrAccum(100);
-		/* Accumulate the error message text here */};
-
+			/* Accumulate the error message text here */public void checkAppendMsg(StringBuilder zMsg1,string zFormat,params object[] ap) {
+				if(0==this.mxErr)
+					return;
+				//va_list ap;
+				lock(lock_va_list) {
+					this.mxErr--;
+					this.nErr++;
+					va_start(ap,zFormat);
+					if(this.errMsg.zText.Length!=0) {
+						sqlite3StrAccumAppend(this.errMsg,"\n",1);
+					}
+					if(zMsg1.Length>0) {
+						sqlite3StrAccumAppend(this.errMsg,zMsg1.ToString(),-1);
+					}
+					sqlite3VXPrintf(this.errMsg,1,zFormat,ap);
+					va_end(ref ap);
+				}
+				//if( pCheck.errMsg.mallocFailed ){
+				//  pCheck.mallocFailed = 1;
+				//}
+			}
+			public int checkRef(Pgno iPage,string zContext) {
+				if(iPage==0)
+					return 1;
+				if(iPage>this.nPage) {
+					this.checkAppendMsg(zContext,"invalid page number %d",iPage);
+					return 1;
+				}
+				if(this.anRef[iPage]==1) {
+					this.checkAppendMsg(zContext,"2nd reference to page %d",iPage);
+					return 1;
+				}
+				return ((this.anRef[iPage]++)>1)?1:0;
+			}
+			public int checkTreePage(/* Context for the sanity check */int iPage,/* Page number of the page to check */string zParentContext,/* Parent context */ref i64 pnParentMinKey,ref i64 pnParentMaxKey,object _pnParentMinKey,/* C# Needed to determine if content passed*/object _pnParentMaxKey/* C# Needed to determine if content passed*/) {
+				MemPage pPage=new MemPage();
+				int i,rc,depth,d2,pgno,cnt;
+				int hdr,cellStart;
+				int nCell;
+				u8[] data;
+				BtShared pBt;
+				int usableSize;
+				StringBuilder zContext=new StringBuilder(100);
+				byte[] hit=null;
+				i64 nMinKey=0;
+				i64 nMaxKey=0;
+				sqlite3_snprintf(200,zContext,"Page %d: ",iPage);
+				/* Check that the page exists
+  */pBt=this.pBt;
+				usableSize=(int)pBt.usableSize;
+				if(iPage==0)
+					return 0;
+				if(this.checkRef((u32)iPage,zParentContext)!=0)
+					return 0;
+				if((rc=btreeGetPage(pBt,(Pgno)iPage,ref pPage,0))!=0) {
+					this.checkAppendMsg(zContext.ToString(),"unable to get the page. error code=%d",rc);
+					return 0;
+				}
+				/* Clear MemPage.isInit to make sure the corruption detection code in
+  ** btreeInitPage() is executed.  */pPage.isInit=0;
+				if((rc=pPage.btreeInitPage())!=0) {
+					Debug.Assert(rc==SQLITE_CORRUPT);
+					/* The only possible error from InitPage */this.checkAppendMsg(zContext.ToString(),"btreeInitPage() returns error code %d",rc);
+					releasePage(pPage);
+					return 0;
+				}
+				/* Check out all the cells.
+  */depth=0;
+				for(i=0;i<pPage.nCell&&this.mxErr!=0;i++) {
+					u8[] pCell;
+					u32 sz;
+					CellInfo info=new CellInfo();
+					/* Check payload overflow pages
+    */sqlite3_snprintf(200,zContext,"On tree page %d cell %d: ",iPage,i);
+					int iCell=findCell(pPage,i);
+					//pCell = findCell( pPage, i );
+					pCell=pPage.aData;
+					pPage.btreeParseCellPtr(iCell,ref info);
+					//btreeParseCellPtr( pPage, pCell, info );
+					sz=info.nData;
+					if(0==pPage.intKey)
+						sz+=(u32)info.nKey;
+					/* For intKey pages, check that the keys are in order.
+    */else
+						if(i==0)
+							nMinKey=nMaxKey=info.nKey;
+						else {
+							if(info.nKey<=nMaxKey) {
+								this.checkAppendMsg(zContext.ToString(),"Rowid %lld out of order (previous was %lld)",info.nKey,nMaxKey);
+							}
+							nMaxKey=info.nKey;
+						}
+					Debug.Assert(sz==info.nPayload);
+					if((sz>info.nLocal)//&& (pCell[info.iOverflow]<=&pPage.aData[pBt.usableSize])
+					) {
+						int nPage=(int)(sz-info.nLocal+usableSize-5)/(usableSize-4);
+						Pgno pgnoOvfl=Converter.sqlite3Get4byte(pCell,iCell,info.iOverflow);
+						#if !SQLITE_OMIT_AUTOVACUUM
+						if(pBt.autoVacuum) {
+							this.checkPtrmap(pgnoOvfl,PTRMAP_OVERFLOW1,(u32)iPage,zContext.ToString());
+						}
+						#endif
+						this.checkList(0,(int)pgnoOvfl,nPage,zContext.ToString());
+					}
+					/* Check sanity of left child page.
+    */if(0==pPage.leaf) {
+						pgno=(int)Converter.sqlite3Get4byte(pCell,iCell);
+						//sqlite3Get4byte( pCell );
+						#if !SQLITE_OMIT_AUTOVACUUM
+						if(pBt.autoVacuum) {
+							this.checkPtrmap((u32)pgno,PTRMAP_BTREE,(u32)iPage,zContext.ToString());
+						}
+						#endif
+						if(i==0)
+							d2=this.checkTreePage(pgno,zContext.ToString(),ref nMinKey,ref refNULL,this,null);
+						else
+							d2=this.checkTreePage(pgno,zContext.ToString(),ref nMinKey,ref nMaxKey,this,this);
+						if(i>0&&d2!=depth) {
+							this.checkAppendMsg(zContext,"Child page depth differs");
+						}
+						depth=d2;
+					}
+				}
+				if(0==pPage.leaf) {
+					pgno=(int)Converter.sqlite3Get4byte(pPage.aData,pPage.hdrOffset+8);
+					sqlite3_snprintf(200,zContext,"On page %d at right child: ",iPage);
+					#if !SQLITE_OMIT_AUTOVACUUM
+					if(pBt.autoVacuum) {
+						this.checkPtrmap((u32)pgno,PTRMAP_BTREE,(u32)iPage,zContext.ToString());
+					}
+					#endif
+					//    checkTreePage(pCheck, pgno, zContext, NULL, !pPage->nCell ? NULL : &nMaxKey);
+					if(0==pPage.nCell)
+						this.checkTreePage(pgno,zContext.ToString(),ref refNULL,ref refNULL,null,null);
+					else
+						this.checkTreePage(pgno,zContext.ToString(),ref refNULL,ref nMaxKey,null,this);
+				}
+				/* For intKey leaf pages, check that the min/max keys are in order
+  ** with any left/parent/right pages.
+  */if(pPage.leaf!=0&&pPage.intKey!=0) {
+					/* if we are a left child page */if(_pnParentMinKey!=null) {
+						/* if we are the left most child page */if(_pnParentMaxKey==null) {
+							if(nMaxKey>pnParentMinKey) {
+								this.checkAppendMsg(zContext,"Rowid %lld out of order (max larger than parent min of %lld)",nMaxKey,pnParentMinKey);
+							}
+						}
+						else {
+							if(nMinKey<=pnParentMinKey) {
+								this.checkAppendMsg(zContext,"Rowid %lld out of order (min less than parent min of %lld)",nMinKey,pnParentMinKey);
+							}
+							if(nMaxKey>pnParentMaxKey) {
+								this.checkAppendMsg(zContext,"Rowid %lld out of order (max larger than parent max of %lld)",nMaxKey,pnParentMaxKey);
+							}
+							pnParentMinKey=nMaxKey;
+						}
+						/* else if we're a right child page */}
+					else
+						if(_pnParentMaxKey!=null) {
+							if(nMinKey<=pnParentMaxKey) {
+								this.checkAppendMsg(zContext,"Rowid %lld out of order (min less than parent max of %lld)",nMinKey,pnParentMaxKey);
+							}
+						}
+				}
+				/* Check for complete coverage of the page
+  */data=pPage.aData;
+				hdr=pPage.hdrOffset;
+				hit=sqlite3Malloc(pBt.pageSize);
+				//if( hit==null ){
+				//  pCheck.mallocFailed = 1;
+				//}else
+				{
+					int contentOffset=get2byteNotZero(data,hdr+5);
+					Debug.Assert(contentOffset<=usableSize);
+					/* Enforced by btreeInitPage() */Array.Clear(hit,contentOffset,usableSize-contentOffset);
+					//memset(hit+contentOffset, 0, usableSize-contentOffset);
+					for(int iLoop=contentOffset-1;iLoop>=0;iLoop--)
+						hit[iLoop]=1;
+					//memset(hit, 1, contentOffset);
+					nCell=get2byte(data,hdr+3);
+					cellStart=hdr+12-4*pPage.leaf;
+					for(i=0;i<nCell;i++) {
+						int pc=get2byte(data,cellStart+i*2);
+						u32 size=65536;
+						int j;
+						if(pc<=usableSize-4) {
+							size=pPage.cellSizePtr(data,pc);
+						}
+						if((int)(pc+size-1)>=usableSize) {
+							this.checkAppendMsg("","Corruption detected in cell %d on page %d",i,iPage);
+						}
+						else {
+							for(j=(int)(pc+size-1);j>=pc;j--)
+								hit[j]++;
+						}
+					}
+					i=get2byte(data,hdr+1);
+					while(i>0) {
+						int size,j;
+						Debug.Assert(i<=usableSize-4);
+						/* Enforced by btreeInitPage() */size=get2byte(data,i+2);
+						Debug.Assert(i+size<=usableSize);
+						/* Enforced by btreeInitPage() */for(j=i+size-1;j>=i;j--)
+							hit[j]++;
+						j=get2byte(data,i);
+						Debug.Assert(j==0||j>i+size);
+						/* Enforced by btreeInitPage() */Debug.Assert(j<=usableSize-4);
+						/* Enforced by btreeInitPage() */i=j;
+					}
+					for(i=cnt=0;i<usableSize;i++) {
+						if(hit[i]==0) {
+							cnt++;
+						}
+						else
+							if(hit[i]>1) {
+								this.checkAppendMsg("","Multiple uses for byte %d of page %d",i,iPage);
+								break;
+							}
+					}
+					if(cnt!=data[hdr+7]) {
+						this.checkAppendMsg("","Fragmentation of %d bytes reported as %d on page %d",cnt,data[hdr+7],iPage);
+					}
+				}
+				sqlite3PageFree(ref hit);
+				releasePage(pPage);
+				return depth+1;
+			}
+			public void checkList(/* Integrity checking context */int isFreeList,/* True for a freelist.  False for overflow page list */int iPage,/* Page number for first page in the list */int N,/* Expected number of pages in the list */string zContext/* Context for error messages */) {
+				int i;
+				int expected=N;
+				int iFirst=iPage;
+				while(N-->0&&this.mxErr!=0) {
+					PgHdr pOvflPage=new PgHdr();
+					byte[] pOvflData;
+					if(iPage<1) {
+						this.checkAppendMsg(zContext,"%d of %d pages missing from overflow list starting at %d",N+1,expected,iFirst);
+						break;
+					}
+					if(this.checkRef((u32)iPage,zContext)!=0)
+						break;
+					if(this.pPager.sqlite3PagerGet((Pgno)iPage,ref pOvflPage)!=0) {
+						this.checkAppendMsg(zContext,"failed to get page %d",iPage);
+						break;
+					}
+					pOvflData=sqlite3PagerGetData(pOvflPage);
+					if(isFreeList!=0) {
+						int n=(int)Converter.sqlite3Get4byte(pOvflData,4);
+						#if !SQLITE_OMIT_AUTOVACUUM
+						if(this.pBt.autoVacuum) {
+							this.checkPtrmap((u32)iPage,PTRMAP_FREEPAGE,0,zContext);
+						}
+						#endif
+						if(n>(int)this.pBt.usableSize/4-2) {
+							this.checkAppendMsg(zContext,"freelist leaf count too big on page %d",iPage);
+							N--;
+						}
+						else {
+							for(i=0;i<n;i++) {
+								Pgno iFreePage=Converter.sqlite3Get4byte(pOvflData,8+i*4);
+								#if !SQLITE_OMIT_AUTOVACUUM
+								if(this.pBt.autoVacuum) {
+									this.checkPtrmap(iFreePage,PTRMAP_FREEPAGE,0,zContext);
+								}
+								#endif
+								this.checkRef(iFreePage,zContext);
+							}
+							N-=n;
+						}
+					}
+					#if !SQLITE_OMIT_AUTOVACUUM
+					else {
+						/* If this database supports auto-vacuum and iPage is not the last
+      ** page in this overflow list, check that the pointer-map entry for
+      ** the following page matches iPage.
+      */if(this.pBt.autoVacuum&&N>0) {
+							i=(int)Converter.sqlite3Get4byte(pOvflData);
+							this.checkPtrmap((u32)i,PTRMAP_OVERFLOW2,(u32)iPage,zContext);
+						}
+					}
+					#endif
+					iPage=(int)Converter.sqlite3Get4byte(pOvflData);
+					sqlite3PagerUnref(pOvflPage);
+				}
+			}
+			public void checkPtrmap(/* Integrity check context */Pgno iChild,/* Child page number */u8 eType,/* Expected pointer map type */Pgno iParent,/* Expected pointer map parent page number */string zContext/* Context description (used for error msg) */) {
+				int rc;
+				u8 ePtrmapType=0;
+				Pgno iPtrmapParent=0;
+				rc=ptrmapGet(this.pBt,iChild,ref ePtrmapType,ref iPtrmapParent);
+				if(rc!=SQLITE_OK) {
+					//if( rc==SQLITE_NOMEM || rc==SQLITE_IOERR_NOMEM ) pCheck.mallocFailed = 1;
+					this.checkAppendMsg(zContext,"Failed to read ptrmap key=%d",iChild);
+					return;
+				}
+				if(ePtrmapType!=eType||iPtrmapParent!=iParent) {
+					this.checkAppendMsg(zContext,"Bad ptr map entry key=%d expected=(%d,%d) got=(%d,%d)",iChild,eType,iParent,ePtrmapType,iPtrmapParent);
+				}
+			}
+			public void checkAppendMsg(string zMsg1,string zFormat,params object[] ap) {
+				if(0==this.mxErr)
+					return;
+				//va_list ap;
+				lock(lock_va_list) {
+					this.mxErr--;
+					this.nErr++;
+					va_start(ap,zFormat);
+					if(this.errMsg.zText.Length!=0) {
+						sqlite3StrAccumAppend(this.errMsg,"\n",1);
+					}
+					if(zMsg1.Length>0) {
+						sqlite3StrAccumAppend(this.errMsg,zMsg1.ToString(),-1);
+					}
+					sqlite3VXPrintf(this.errMsg,1,zFormat,ap);
+					va_end(ref ap);
+				}
+			}
+		}
 		///<summary>
 		/// Read or write a two- and four-byte big-endian integer values.
 		///

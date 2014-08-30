@@ -12,4 +12,3 @@ C:\Github\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.1.exe
 C:\Github\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.1.pdb
 C:\Github\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.1.exe
 C:\Github\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.1.pdb
-C:\Github\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\Community.CsharpSqlite.shell.csprojResolveAssemblyReference.cache
