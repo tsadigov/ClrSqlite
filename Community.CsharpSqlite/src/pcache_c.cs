@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite {
     ** -DSQLITE_ENABLE_EXPENSIVE_ASSERT=1 compile-time option.
     */
 		#if SQLITE_ENABLE_EXPENSIVE_ASSERT
-																														// define expensive_assert(X)  Debug.Assert(X)
+																																// define expensive_assert(X)  Debug.Assert(X)
 static void expensive_assert( bool x ) { Debug.Assert( x ); }
 #else
 		//# define expensive_assert(X)
@@ -79,7 +79,7 @@ static void expensive_assert( bool x ) { Debug.Assert( x ); }
 		/// Linked List Management 
 		///</summary>
 		#if !NDEBUG &&  SQLITE_ENABLE_EXPENSIVE_ASSERT
-																														/*
+																																/*
 ** Check that the pCache.pSynced variable is set correctly. If it
 ** is not, either fail an Debug.Assert or return zero. Otherwise, return
 ** non-zero. This is only used in debugging builds, as follows:
@@ -125,7 +125,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 			pPage.pDirtyNext=null;
 			pPage.pDirtyPrev=null;
 			#if SQLITE_ENABLE_EXPENSIVE_ASSERT
-																																													expensive_assert( pcacheCheckSynced(p) );
+																																																expensive_assert( pcacheCheckSynced(p) );
 #endif
 		}
 		///<summary>
@@ -149,7 +149,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 				p.pSynced=pPage;
 			}
 			#if SQLITE_ENABLE_EXPENSIVE_ASSERT
-																																													expensive_assert( pcacheCheckSynced(p) );
+																																																expensive_assert( pcacheCheckSynced(p) );
 #endif
 		}
 		///<summary>
@@ -262,7 +262,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
         ** unreferenced dirty page.
         */
 				#if SQLITE_ENABLE_EXPENSIVE_ASSERT
-																																																												expensive_assert( pcacheCheckSynced(pCache) );
+																																																																expensive_assert( pcacheCheckSynced(pCache) );
 #endif
 				for(pPg=pCache.pSynced;pPg!=null&&(pPg.nRef!=0||(pPg.flags&PGHDR_NEED_SYNC)!=0);pPg=pPg.pDirtyPrev)
 					;
@@ -274,7 +274,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 				if(pPg!=null) {
 					int rc;
 					#if SQLITE_LOG_CACHE_SPILL
-																																																																											      sqlite3_log(SQLITE_FULL, 
+																																																																																      sqlite3_log(SQLITE_FULL, 
                   "spill page %d making room for %d - cache used: %d/%d",
                   pPg->pgno, pgno,
                   sqlite3GlobalConfig.pcache.xPagecount(pCache->pCache),
@@ -584,7 +584,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 			return nPage;
 		}
 		#if SQLITE_TEST
-																														    /*
+																																    /*
 ** Get the suggested cache-size value.
 */
     static int sqlite3PcacheGetCachesize( PCache pCache )
@@ -601,7 +601,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 			}
 		}
 	#if SQLITE_CHECK_PAGES  || (SQLITE_DEBUG)
-															    /*
+																    /*
 ** For all dirty pages currently in the cache, invoke the specified
 ** callback. This is only used if the SQLITE_CHECK_PAGES macro is
 ** defined.

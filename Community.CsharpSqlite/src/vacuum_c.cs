@@ -51,7 +51,7 @@ namespace Community.CsharpSqlite {
 		static int execSql(sqlite3 db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
 			#if !NDEBUG
-																																													      int rc;
+																																																      int rc;
       //VVA_ONLY( int rc; )
 #endif
 			if(zSql==null) {
@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 				return sqlite3_errcode(db);
 			}
 			#if !NDEBUG
-																																													      rc = sqlite3_step( pStmt );
+																																																      rc = sqlite3_step( pStmt );
       //VVA_ONLY( rc = ) sqlite3_step(pStmt);
       Debug.Assert( rc != SQLITE_ROW );
 #else
@@ -268,8 +268,8 @@ namespace Community.CsharpSqlite {
 				Debug.Assert(pMain.sqlite3BtreeIsInTrans());
 				/* Copy Btree meta values */for(i=0;i<ArraySize(aCopy);i+=2) {
 					/* GetMeta() and UpdateMeta() cannot fail in this context because
-          ** we already have page 1 loaded into cache and marked dirty. */sqlite3BtreeGetMeta(pMain,aCopy[i],ref meta);
-					rc=sqlite3BtreeUpdateMeta(pTemp,aCopy[i],(u32)(meta+aCopy[i+1]));
+          ** we already have page 1 loaded into cache and marked dirty. */pMain.sqlite3BtreeGetMeta(aCopy[i],ref meta);
+					rc=pTemp.sqlite3BtreeUpdateMeta(aCopy[i],(u32)(meta+aCopy[i+1]));
 					if(NEVER(rc!=SQLITE_OK))
 						goto end_of_vacuum;
 				}

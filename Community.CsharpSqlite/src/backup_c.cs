@@ -116,7 +116,7 @@ namespace Community.CsharpSqlite {
 					}
 					/* Lock the destination database, if it is not locked already. */if(SQLITE_OK==rc&&this.bDestLocked==0&&SQLITE_OK==(rc=sqlite3BtreeBeginTrans(this.pDest,2))) {
 						this.bDestLocked=1;
-						sqlite3BtreeGetMeta(this.pDest,BTREE_SCHEMA_VERSION,ref this.iDestSchema);
+						this.pDest.sqlite3BtreeGetMeta(BTREE_SCHEMA_VERSION,ref this.iDestSchema);
 					}
 					/* If there is no open read-transaction on the source database, open
     ** one now. If a transaction is opened here, then it will be closed
@@ -163,7 +163,7 @@ namespace Community.CsharpSqlite {
     ** is to make sure that the schema-version really does change in
     ** the case where the source and destination databases have the
     ** same schema version.
-    */if(rc==SQLITE_DONE&&(rc=sqlite3BtreeUpdateMeta(this.pDest,1,this.iDestSchema+1))==SQLITE_OK) {
+    */if(rc==SQLITE_DONE&&(rc=this.pDest.sqlite3BtreeUpdateMeta(1,this.iDestSchema+1))==SQLITE_OK) {
 						Pgno nDestTruncate;
 						if(this.pDestDb!=null) {
 							sqlite3ResetInternalSchema(this.pDestDb,-1);
@@ -244,7 +244,7 @@ namespace Community.CsharpSqlite {
     ** "committing" a read-only transaction cannot fail.
     */if(bCloseTrans!=0) {
 						#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																							      //TESTONLY( int rc2 );
+																																																																																													      //TESTONLY( int rc2 );
       //TESTONLY( rc2  = ) sqlite3BtreeCommitPhaseOne(p.pSrc, 0);
       //TESTONLY( rc2 |= ) sqlite3BtreeCommitPhaseTwo(p.pSrc);
       int rc2;

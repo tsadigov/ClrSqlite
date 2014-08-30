@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite {
 		/// macro.
 		///</summary>
 		#if TRACE
-																														static bool sqlite3BtreeTrace=false;  /* True to enable tracing */
+																																static bool sqlite3BtreeTrace=false;  /* True to enable tracing */
 // define TRACE(X)  if(sqlite3BtreeTrace){printf X;fflush(stdout);}
 static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf(X, ap); }
 #else
@@ -63,7 +63,7 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
 			return (((((int)get2byte(X,offset))-1)&0xffff)+1);
 		}
 		#if !SQLITE_OMIT_SHARED_CACHE
-																														///<summary>
+																																///<summary>
 /// A list of BtShared objects that are eligible for participation
 /// in shared cache.  This variable has file scope during normal builds,
 /// but the test harness needs to access it so we make it global for
@@ -72,13 +72,13 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
 /// Access to this variable is protected by SQLITE_MUTEX_STATIC_MASTER.
 ///</summary>
 #if SQLITE_TEST
-																														BtShared *SQLITE_WSD sqlite3SharedCacheList = 0;
+																																BtShared *SQLITE_WSD sqlite3SharedCacheList = 0;
 #else
-																														static BtShared *SQLITE_WSD sqlite3SharedCacheList = 0;
+																																static BtShared *SQLITE_WSD sqlite3SharedCacheList = 0;
 #endif
-																														#endif
+																																#endif
 		#if !SQLITE_OMIT_SHARED_CACHE
-																														///<summary>
+																																///<summary>
 /// Enable or disable the shared pager and schema features.
 ///
 /// This routine has no effect on existing database connections.
@@ -110,9 +110,9 @@ return SQLITE_OK;
 		//#define hasReadConflicts(a, b) 0
 		#endif
 		#if !SQLITE_OMIT_SHARED_CACHE
-																														
+																																
 #if SQLITE_DEBUG
-																														/*
+																																/*
 **** This function is only used as part of an assert() statement. ***
 **
 ** Check to see if pBtree holds the required locks to read or write to the 
@@ -196,9 +196,9 @@ return 0;
 }
 
 #endif
-																														
+																																
 #if SQLITE_DEBUG
-																														/*
+																																/*
 ** This function may be used as part of assert() statements only. ****
 **
 ** Return true if it would be illegal for pBtree to write into the
@@ -229,7 +229,7 @@ return 1;
 return 0;
 }
 #endif
-																														
+																																
 ///<summary>
 /// Query to see if Btree handle p may obtain a lock of type eLock
 /// (READ_LOCK or WRITE_LOCK) on the table with root-page iTab. Return
@@ -290,7 +290,7 @@ return SQLITE_OK;
 }
 #endif
 		#if !SQLITE_OMIT_SHARED_CACHE
-																														///<summary>
+																																///<summary>
 /// Add a lock on the table with root-page iTable to the shared-btree used
 /// by Btree handle p. Parameter eLock must be either READ_LOCK or
 /// WRITE_LOCK.
@@ -362,7 +362,7 @@ return SQLITE_OK;
 }
 #endif
 		#if !SQLITE_OMIT_SHARED_CACHE
-																														///<summary>
+																																///<summary>
 /// Release all the table locks (locks obtained via calls to
 /// the setSharedCacheTableLock() procedure) held by Btree object p.
 ///
@@ -437,7 +437,7 @@ pLock.eLock = READ_LOCK;
 		/// Verify that the cursor holds the mutex on its BtShared
 		///</summary>
 		#if SQLITE_DEBUG
-																														static bool cursorHoldsMutex( BtCursor p )
+																																static bool cursorHoldsMutex( BtCursor p )
 {
   return sqlite3_mutex_held( p.pBt.mutex );
 }
@@ -447,7 +447,7 @@ pLock.eLock = READ_LOCK;
 		}
 		#endif
 		#if !SQLITE_OMIT_INCRBLOB
-																														///<summary>
+																																///<summary>
 /// Invalidate the overflow page-list cache for cursor pCur, if any.
 ///</summary>
 static void invalidateOverflowCache(BtCursor pCur){
@@ -772,7 +772,7 @@ p.eState = CURSOR_INVALID;
 			return SQLITE_OK;
 		}
 		#else
-																														//define ptrmapPut(w,x,y,z,rc)
+																																//define ptrmapPut(w,x,y,z,rc)
 //define ptrmapGet(w,x,y,z) SQLITE_OK
 //define ptrmapPutOvflPtr(x, y, rc)
 #endif
@@ -795,7 +795,7 @@ p.eState = CURSOR_INVALID;
 		}
 		//#define parseCell(pPage, iCell, pInfo) \
 		#if SQLITE_DEBUG
-																														/* This variation on cellSizePtr() is used inside of assert() statements
+																																/* This variation on cellSizePtr() is used inside of assert() statements
 ** only. */
 static u16 cellSize( MemPage pPage, int iCell )
 {
@@ -977,7 +977,7 @@ static u16 cellSize( MemPage pPage, int iCell )
   ** false for a file-based database.
   */
 			#if SQLITE_OMIT_MEMORYDB
-																																													bool isMemdb = false;
+																																																bool isMemdb = false;
 #else
 			bool isMemdb=(zFilename==":memory:")||(isTempDb&&sqlite3TempInMemory(db));
 			#endif
@@ -1004,11 +1004,11 @@ static u16 cellSize( MemPage pPage, int iCell )
 			p.inTrans=TRANS_NONE;
 			p.db=db;
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																													p.lock.pBtree = p;
+																																																p.lock.pBtree = p;
 p.lock.iTable = 1;
 #endif
 			#if !(SQLITE_OMIT_SHARED_CACHE) && !(SQLITE_OMIT_DISKIO)
-																																													/*
+																																																/*
 ** If this Btree is a candidate for shared cache, try to find an
 ** existing BtShared object that we can share with
 */
@@ -1051,7 +1051,7 @@ sqlite3_mutex_leave(mutexShared);
 zFullPathname=null;//sqlite3_free(ref zFullPathname);
 }
 #if SQLITE_DEBUG
-																																													else{
+																																																else{
 /* In debug mode, we mark all persistent databases as sharable
 ** even when they are not.  This exercises the locking code and
 ** gives more opportunity for asserts(sqlite3_mutex_held())
@@ -1060,7 +1060,7 @@ zFullPathname=null;//sqlite3_free(ref zFullPathname);
 p.sharable = 1;
 }
 #endif
-																																													}
+																																																}
 #endif
 			if(pBt==null) {
 				/*
@@ -1093,7 +1093,7 @@ p.sharable = 1;
 				pBt.pPage1=null;
 				pBt.readOnly=pBt.pPager.sqlite3PagerIsreadonly();
 				#if SQLITE_SECURE_DELETE
-																																																												pBt.secureDelete = true;
+																																																																pBt.secureDelete = true;
 #endif
 				pBt.pageSize=(u32)((zDbHeader[16]<<8)|(zDbHeader[17]<<16));
 				if(pBt.pageSize<512||pBt.pageSize>SQLITE_MAX_PAGE_SIZE||((pBt.pageSize-1)&pBt.pageSize)!=0) {
@@ -1126,7 +1126,7 @@ p.sharable = 1;
 				Debug.Assert((pBt.pageSize&7)==0);
 				/* 8-byte alignment of pageSize */
 				#if !(SQLITE_OMIT_SHARED_CACHE) && !(SQLITE_OMIT_DISKIO)
-																																																												/* Add the new BtShared object to the linked list sharable BtShareds.
+																																																																/* Add the new BtShared object to the linked list sharable BtShareds.
 */
 if( p.sharable ){
 sqlite3_mutex *mutexShared;
@@ -1148,7 +1148,7 @@ sqlite3_mutex_leave(mutexShared);
 #endif
 			}
 			#if !(SQLITE_OMIT_SHARED_CACHE) && !(SQLITE_OMIT_DISKIO)
-																																													/* If the new Btree uses a sharable pBtShared, then link the new
+																																																/* If the new Btree uses a sharable pBtShared, then link the new
 ** Btree into the list of all sharable Btrees for the same connection.
 ** The list is kept in ascending order by pBt address.
 */
@@ -1211,7 +1211,7 @@ break;
 ** false if it is still positive.
 */static bool removeFromSharingList(BtShared pBt) {
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																													sqlite3_mutex pMaster;
+																																																sqlite3_mutex pMaster;
 BtShared pList;
 bool removed = false;
 
@@ -1296,7 +1296,7 @@ return removed;
 				//sqlite3_free(ref pBt);
 			}
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																													Debug.Assert( p.wantToLock==null );
+																																																Debug.Assert( p.wantToLock==null );
 Debug.Assert( p.locked==null );
 if( p.pPrev ) p.pPrev.pNext = p.pNext;
 if( p.pNext ) p.pNext.pPrev = p.pPrev;
@@ -1455,7 +1455,7 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
 ** determined by the SQLITE_DEFAULT_AUTOVACUUM macro.
 */static int sqlite3BtreeSetAutoVacuum(Btree p,int autoVacuum) {
 			#if SQLITE_OMIT_AUTOVACUUM
-																																													return SQLITE_READONLY;
+																																																return SQLITE_READONLY;
 #else
 			BtShared pBt=p.pBt;
 			int rc=SQLITE_OK;
@@ -1477,7 +1477,7 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
 ** enabled 1 is returned. Otherwise 0.
 */static int sqlite3BtreeGetAutoVacuum(Btree p) {
 			#if SQLITE_OMIT_AUTOVACUUM
-																																													return BTREE_AUTOVACUUM_NONE;
+																																																return BTREE_AUTOVACUUM_NONE;
 #else
 			int rc;
 			sqlite3BtreeEnter(p);
@@ -1534,7 +1534,7 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
 					goto page1_init_failed;
 				}
 				#else
-																																																												if( page1[18]>2 ){
+																																																																if( page1[18]>2 ){
 pBt.readOnly = true;
 }
 if( page1[19]>2 ){
@@ -1737,7 +1737,7 @@ rc = SQLITE_NOTADB;
 				goto trans_begun;
 			}
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																													/* If another database handle has already opened a write transaction
+																																																/* If another database handle has already opened a write transaction
 ** on this shared-btree structure and a second write transaction is
 ** requested, return SQLITE_LOCKED.
 */
@@ -1793,7 +1793,7 @@ goto trans_begun;
 				if(p.inTrans==TRANS_NONE) {
 					pBt.nTransaction++;
 					#if !SQLITE_OMIT_SHARED_CACHE
-																																																																											if( p.sharable ){
+																																																																																if( p.sharable ){
 Debug.Assert( p.lock.pBtree==p && p.lock.iTable==1 );
 p.lock.eLock = READ_LOCK;
 p.lock.pNext = pBt.pLock;
@@ -1808,7 +1808,7 @@ pBt.pLock = &p.lock;
 				if(wrflag!=0) {
 					MemPage pPage1=pBt.pPage1;
 					#if !SQLITE_OMIT_SHARED_CACHE
-																																																																											Debug.Assert( !pBt.pWriter );
+																																																																																Debug.Assert( !pBt.pWriter );
 pBt.pWriter = p;
 pBt.isExclusive = (u8)(wrflag>1);
 #endif
@@ -2051,7 +2051,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 			Pager pPager=pBt.pPager;
 			// VVA_ONLY( int nRef = sqlite3PagerRefcount(pPager) );
 			#if !NDEBUG || DEBUG
-																																													  int nRef = sqlite3PagerRefcount( pPager );
+																																																  int nRef = sqlite3PagerRefcount( pPager );
 #else
 			int nRef=0;
 			#endif
@@ -2103,7 +2103,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 			return rc;
 		}
 		#else
-																														// define setChildPtrmaps(x) SQLITE_OK
+																																// define setChildPtrmaps(x) SQLITE_OK
 #endif
 		/*
 ** This routine does the first phase of a two-phase commit.  This routine
@@ -2240,7 +2240,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 			return rc;
 		}
 		#if !NDEBUG || DEBUG
-																														/*
+																																/*
 ** Return the number of write-cursors open on this handle. This is for use
 ** in Debug.Assert() expressions, so it is only compiled if NDEBUG is not
 ** defined.
@@ -2312,7 +2312,7 @@ static int countWriteCursors( BtShared pBt )
 			sqlite3BtreeEnter(p);
 			rc=saveAllCursors(pBt,0,null);
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																													if( rc!=SQLITE_OK ){
+																																																if( rc!=SQLITE_OK ){
 /* This is a horrible situation. An IO or malloc() error occurred whilst
 ** trying to save cursor positions. If this is an automatic rollback (as
 ** the result of a constraint, malloc() failure or IO error) then
@@ -2580,7 +2580,7 @@ sqlite3BtreeTripAllCursors(p, rc);
 ** for MSVC and a macro for everything else.  Ticket #2457.
 */
 		#if !NDEBUG
-																														static void assertCellInfo( BtCursor pCur )
+																																static void assertCellInfo( BtCursor pCur )
 {
   CellInfo info;
   int iPage = pCur.iPage;
@@ -2605,7 +2605,7 @@ sqlite3BtreeTripAllCursors(p, rc);
 			}
 		}
 		#else
-																														/* Use a macro in all other compilers so that the function is inlined */
+																																/* Use a macro in all other compilers so that the function is inlined */
 //define getCellInfo(pCur)                                                      \
 //  if( pCur.info.nSize==null ){                                                   \
 //    int iPage = pCur.iPage;                                                   \
@@ -2616,7 +2616,7 @@ sqlite3BtreeTripAllCursors(p, rc);
 //  }
 #endif
 		#if !NDEBUG
-																														/*
+																																/*
 ** Return true if the given BtCursor is valid.  A valid cursor is one
 ** that is currently pointing to a row in a (non-empty) table.
 ** This is a verification routine is used only within Debug.Assert() statements.
@@ -2846,7 +2846,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
 				/* Bytes content per ovfl page */Pgno nextPage;
 				nextPage=Converter.sqlite3Get4byte(aPayload,pCur.info.nLocal+pCur.info.iCell+pCur.info.nHeader);
 				#if !SQLITE_OMIT_INCRBLOB
-																																																												/* If the isIncrblobHandle flag is set and the BtCursor.aOverflow[]
+																																																																/* If the isIncrblobHandle flag is set and the BtCursor.aOverflow[]
 ** has not been allocated, allocate it now. The array is sized at
 ** one entry for each overflow page in the overflow chain. The
 ** page number of the first overflow page is stored in aOverflow[0],
@@ -2875,7 +2875,7 @@ offset = (offset%ovflSize);
 #endif
 				for(;rc==SQLITE_OK&&amt>0&&nextPage!=0;iIdx++) {
 					#if !SQLITE_OMIT_INCRBLOB
-																																																																											/* If required, populate the overflow page-list cache. */
+																																																																																/* If required, populate the overflow page-list cache. */
 if( pCur.aOverflow ){
 Debug.Assert(!pCur.aOverflow[iIdx] || pCur.aOverflow[iIdx]==nextPage);
 pCur.aOverflow[iIdx] = nextPage;
@@ -2890,7 +2890,7 @@ pCur.aOverflow[iIdx] = nextPage;
         ** function.
         */
 						#if !SQLITE_OMIT_INCRBLOB
-																																																																																										if( pCur.aOverflow && pCur.aOverflow[iIdx+1] ){
+																																																																																																if( pCur.aOverflow && pCur.aOverflow[iIdx+1] ){
 nextPage = pCur.aOverflow[iIdx+1];
 } else
 #endif
@@ -2953,7 +2953,7 @@ nextPage = pCur.aOverflow[iIdx+1];
 */static int sqlite3BtreeData(BtCursor pCur,u32 offset,u32 amt,byte[] pBuf) {
 			int rc;
 			#if !SQLITE_OMIT_INCRBLOB
-																																													if ( pCur.eState==CURSOR_INVALID ){
+																																																if ( pCur.eState==CURSOR_INVALID ){
 return SQLITE_ABORT;
 }
 #endif
@@ -3087,7 +3087,7 @@ return SQLITE_ABORT;
 			return SQLITE_OK;
 		}
 		#if !NDEBUG
-																														/*
+																																/*
 ** Page pParent is an internal (non-leaf) tree page. This function
 ** asserts that page number iChild is the left-child if the iIdx'th
 ** cell in page pParent. Or, if iIdx is equal to the total number of
@@ -3285,7 +3285,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			Debug.Assert(sqlite3_mutex_held(pCur.pBtree.db.mutex));
 			/* If the cursor already points to the last entry, this is a no-op. */if(CURSOR_VALID==pCur.eState&&pCur.atLast!=0) {
 				#if SQLITE_DEBUG
-																																																												    /* This block serves to Debug.Assert() that the cursor really does point
+																																																																    /* This block serves to Debug.Assert() that the cursor really does point
 ** to the last entry in the b-tree. */
     int ii;
     for ( ii = 0; ii < pCur.iPage; ii++ )
@@ -3999,7 +3999,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			#if !SQLITE_OMIT_AUTOVACUUM
 			if(pBt.autoVacuum)
 			#else
-																																													if (false)
+																																																if (false)
 #endif
 			 {
 				ptrmapPut(pBt,iPage,PTRMAP_FREEPAGE,0,ref rc);
@@ -4154,7 +4154,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 		#if !SQLITE_OMIT_QUICKBALANCE
 		#endif
 		#if FALSE
-																														/*
+																																/*
 ** This function does not contribute anything to the operation of SQLite.
 ** it is sometimes activated temporarily while debugging code responsible
 ** for setting pointer-map entries.
@@ -4248,7 +4248,7 @@ return 1;
 			int nMin=(int)pCur.pBt.usableSize*2/3;
 			//u8[] pFree = null;
 			#if !NDEBUG || SQLITE_COVERAGE_TEST || DEBUG
-																																													  int balance_quick_called = 0;//TESTONLY( int balance_quick_called = 0 );
+																																																  int balance_quick_called = 0;//TESTONLY( int balance_quick_called = 0 );
   int balance_deeper_called = 0;//TESTONLY( int balance_deeper_called = 0 );
 #else
 			int balance_quick_called=0;
@@ -4617,7 +4617,7 @@ return 1;
 			Debug.Assert(pBt.inTransaction==TRANS_WRITE);
 			Debug.Assert(!pBt.readOnly);
 			#if SQLITE_OMIT_AUTOVACUUM
-																																													rc = allocateBtreePage(pBt, ref pRoot, ref pgnoRoot, 1, 0);
+																																																rc = allocateBtreePage(pBt, ref pRoot, ref pgnoRoot, 1, 0);
 if( rc !=0){
 return rc;
 }
@@ -4633,7 +4633,7 @@ return rc;
 				/* Read the value of meta[3] from the database to determine where the
     ** root page of the new table should go. meta[3] is the largest root-page
     ** created so far, so the new root-page is (meta[3]+1).
-    */sqlite3BtreeGetMeta(p,BTREE_LARGEST_ROOT_PAGE,ref pgnoRoot);
+    */p.sqlite3BtreeGetMeta(BTREE_LARGEST_ROOT_PAGE,ref pgnoRoot);
 				pgnoRoot++;
 				/* The new root-page may not be allocated on a pointer-map page, or the
     ** PENDING_BYTE page.
@@ -4698,7 +4698,7 @@ return rc;
     ** order either to increase the database filesize, or to decrement the
     ** freelist count.  Hence, the sqlite3BtreeUpdateMeta() call cannot fail.
     */Debug.Assert(sqlite3PagerIswriteable(pBt.pPage1.pDbPage));
-				rc=sqlite3BtreeUpdateMeta(p,4,pgnoRoot);
+				rc=p.sqlite3BtreeUpdateMeta(4,pgnoRoot);
 				if(NEVER(rc!=0)) {
 					releasePage(pRoot);
 					return rc;
@@ -4791,22 +4791,7 @@ return rc;
 ** If pnChange is not NULL, then table iTable must be an intkey table. The
 ** integer value pointed to by pnChange is incremented by the number of
 ** entries in the table.
-*/static int sqlite3BtreeClearTable(Btree p,int iTable,ref int pnChange) {
-			int rc;
-			BtShared pBt=p.pBt;
-			sqlite3BtreeEnter(p);
-			Debug.Assert(p.inTrans==TRANS_WRITE);
-			/* Invalidate all incrblob cursors open on table iTable (assuming iTable
-  ** is the root of a table b-tree - if it is not, the following call is
-  ** a no-op).  */invalidateIncrblobCursors(p,0,1);
-			rc=saveAllCursors(pBt,(Pgno)iTable,null);
-			if(SQLITE_OK==rc) {
-				rc=clearDatabasePage(pBt,(Pgno)iTable,0,ref pnChange);
-			}
-			sqlite3BtreeLeave(p);
-			return rc;
-		}
-		/*
+*//*
 ** Erase all information in a table and add the root of the table to
 ** the freelist.  Except, the root of the principle table (the one on
 ** page 1) is never added to the freelist.
@@ -4825,108 +4810,7 @@ return rc;
 ** the move.  If no page gets moved, piMoved is set to 0.
 ** The last root page is recorded in meta[3] and the value of
 ** meta[3] is updated by this procedure.
-*/static int btreeDropTable(Btree p,Pgno iTable,ref int piMoved) {
-			int rc;
-			MemPage pPage=null;
-			BtShared pBt=p.pBt;
-			Debug.Assert(sqlite3BtreeHoldsMutex(p));
-			Debug.Assert(p.inTrans==TRANS_WRITE);
-			/* It is illegal to drop a table if any cursors are open on the
-  ** database. This is because in auto-vacuum mode the backend may
-  ** need to move another root-page to fill a gap left by the deleted
-  ** root page. If an open cursor was using this page a problem would
-  ** occur.
-  **
-  ** This error is caught long before control reaches this point.
-  */if(NEVER(pBt.pCursor)) {
-				sqlite3ConnectionBlocked(p.db,pBt.pCursor.pBtree.db);
-				return SQLITE_LOCKED_SHAREDCACHE;
-			}
-			rc=btreeGetPage(pBt,(Pgno)iTable,ref pPage,0);
-			if(rc!=0)
-				return rc;
-			int Dummy0=0;
-			rc=sqlite3BtreeClearTable(p,(int)iTable,ref Dummy0);
-			if(rc!=0) {
-				releasePage(pPage);
-				return rc;
-			}
-			piMoved=0;
-			if(iTable>1) {
-				#if SQLITE_OMIT_AUTOVACUUM
-																																																												freePage(pPage, ref rc);
-releasePage(pPage);
-#else
-				if(pBt.autoVacuum) {
-					Pgno maxRootPgno=0;
-					sqlite3BtreeGetMeta(p,BTREE_LARGEST_ROOT_PAGE,ref maxRootPgno);
-					if(iTable==maxRootPgno) {
-						/* If the table being dropped is the table with the largest root-page
-        ** number in the database, put the root page on the free list.
-        */freePage(pPage,ref rc);
-						releasePage(pPage);
-						if(rc!=SQLITE_OK) {
-							return rc;
-						}
-					}
-					else {
-						/* The table being dropped does not have the largest root-page
-        ** number in the database. So move the page that does into the
-        ** gap left by the deleted root-page.
-        */MemPage pMove=new MemPage();
-						releasePage(pPage);
-						rc=btreeGetPage(pBt,maxRootPgno,ref pMove,0);
-						if(rc!=SQLITE_OK) {
-							return rc;
-						}
-						rc=relocatePage(pBt,pMove,PTRMAP_ROOTPAGE,0,iTable,0);
-						releasePage(pMove);
-						if(rc!=SQLITE_OK) {
-							return rc;
-						}
-						pMove=null;
-						rc=btreeGetPage(pBt,maxRootPgno,ref pMove,0);
-						freePage(pMove,ref rc);
-						releasePage(pMove);
-						if(rc!=SQLITE_OK) {
-							return rc;
-						}
-						piMoved=(int)maxRootPgno;
-					}
-					/* Set the new 'max-root-page' value in the database header. This
-      ** is the old value less one, less one more if that happens to
-      ** be a root-page number, less one again if that is the
-      ** PENDING_BYTE_PAGE.
-      */maxRootPgno--;
-					while(maxRootPgno==PENDING_BYTE_PAGE(pBt)||PTRMAP_ISPAGE(pBt,maxRootPgno)) {
-						maxRootPgno--;
-					}
-					Debug.Assert(maxRootPgno!=PENDING_BYTE_PAGE(pBt));
-					rc=sqlite3BtreeUpdateMeta(p,4,maxRootPgno);
-				}
-				else {
-					freePage(pPage,ref rc);
-					releasePage(pPage);
-				}
-				#endif
-			}
-			else {
-				/* If sqlite3BtreeDropTable was called on page 1.
-    ** This really never should happen except in a corrupt
-    ** database.
-    */pPage.zeroPage(PTF_INTKEY|PTF_LEAF);
-				releasePage(pPage);
-			}
-			return rc;
-		}
-		static int sqlite3BtreeDropTable(Btree p,int iTable,ref int piMoved) {
-			int rc;
-			sqlite3BtreeEnter(p);
-			rc=btreeDropTable(p,(u32)iTable,ref piMoved);
-			sqlite3BtreeLeave(p);
-			return rc;
-		}
-		/*
+*//*
 ** This function may only be called if the b-tree connection already
 ** has a read or write transaction open on the database.
 **
@@ -4938,47 +4822,10 @@ releasePage(pPage);
 ** The schema layer numbers meta values differently.  At the schema
 ** layer (and the SetCookie and ReadCookie opcodes) the number of
 ** free pages is not visible.  So Cookie[0] is the same as Meta[1].
-*/static void sqlite3BtreeGetMeta(Btree p,int idx,ref u32 pMeta) {
-			BtShared pBt=p.pBt;
-			sqlite3BtreeEnter(p);
-			Debug.Assert(p.inTrans>TRANS_NONE);
-			Debug.Assert(SQLITE_OK==querySharedCacheTableLock(p,MASTER_ROOT,READ_LOCK));
-			Debug.Assert(pBt.pPage1!=null);
-			Debug.Assert(idx>=0&&idx<=15);
-			pMeta=Converter.sqlite3Get4byte(pBt.pPage1.aData,36+idx*4);
-			/* If auto-vacuum is disabled in this build and this is an auto-vacuum
-  ** database, mark the database as read-only.  */
-			#if SQLITE_OMIT_AUTOVACUUM
-																																													if( idx==BTREE_LARGEST_ROOT_PAGE && pMeta>0 ) pBt.readOnly = 1;
-#endif
-			sqlite3BtreeLeave(p);
-		}
-		/*
+*//*
 ** Write meta-information back into the database.  Meta[0] is
 ** read-only and may not be written.
-*/static int sqlite3BtreeUpdateMeta(Btree p,int idx,u32 iMeta) {
-			BtShared pBt=p.pBt;
-			byte[] pP1;
-			int rc;
-			Debug.Assert(idx>=1&&idx<=15);
-			sqlite3BtreeEnter(p);
-			Debug.Assert(p.inTrans==TRANS_WRITE);
-			Debug.Assert(pBt.pPage1!=null);
-			pP1=pBt.pPage1.aData;
-			rc=sqlite3PagerWrite(pBt.pPage1.pDbPage);
-			if(rc==SQLITE_OK) {
-				Converter.sqlite3Put4byte(pP1,36+idx*4,iMeta);
-				#if !SQLITE_OMIT_AUTOVACUUM
-				if(idx==BTREE_INCR_VACUUM) {
-					Debug.Assert(pBt.autoVacuum||iMeta==0);
-					Debug.Assert(iMeta==0||iMeta==1);
-					pBt.incrVacuum=iMeta!=0;
-				}
-				#endif
-			}
-			sqlite3BtreeLeave(p);
-			return rc;
-		}
+*/
 		#if !SQLITE_OMIT_BTREECOUNT
 		/*
 ** The first argument, pCur, is a cursor opened on some b-tree. Count the
@@ -5432,7 +5279,7 @@ releasePage(pPage);
 ** Return non-zero if a transaction is active.
 */
 	#if !SQLITE_OMIT_WAL
-																													/*
+																														/*
 ** Run a checkpoint on the Btree passed as the first argument.
 **
 ** Return SQLITE_LOCKED if this or any other connection has an open 
@@ -5482,7 +5329,7 @@ return rc;
 ** sqlite_master table. Otherwise SQLITE_OK.
 */
 	#if !SQLITE_OMIT_SHARED_CACHE
-																													/*
+																														/*
 ** Obtain a lock on the table whose root page is iTab.  The
 ** lock is a write lock if isWritelock is true or a read lock
 ** if it is false.
@@ -5506,7 +5353,7 @@ return rc;
 }
 #endif
 	#if !SQLITE_OMIT_INCRBLOB
-																													/*
+																														/*
 ** Argument pCsr must be a cursor opened for writing on an
 ** INTKEY table currently pointing at a valid table entry.
 ** This function modifies the data stored as part of that entry.

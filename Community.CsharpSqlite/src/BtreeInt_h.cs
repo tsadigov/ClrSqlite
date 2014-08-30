@@ -10,7 +10,7 @@ using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
 	using DbPage=Sqlite3.PgHdr;
-    using System.Text;
+	using System.Text;
 	public partial class Sqlite3 {
 		/*
     ** 2004 April 6
@@ -503,7 +503,7 @@ namespace Community.CsharpSqlite {
 				//u8 pIter = &pCell[pPage.childPtrSize];
 				u32 nSize=0;
 				#if SQLITE_DEBUG || DEBUG
-																																																								  /* The value returned by this function should always be the same as
+																																																												  /* The value returned by this function should always be the same as
 ** the (CellInfo.nSize) value found by doing a full parse of the
 ** cell. If SQLITE_DEBUG is defined, an Debug.Assert() at the bottom of
 ** this function verifies that this invariant is not violated. */
@@ -641,7 +641,7 @@ namespace Community.CsharpSqlite {
 					size=this.cellSizePtr(temp,pc);
 					cbrk-=size;
 					#if (SQLITE_ENABLE_OVERSIZE_CELL_CHECK)
-																																																																							    if ( cbrk < iCellFirst || pc + size > usableSize )
+																																																																												    if ( cbrk < iCellFirst || pc + size > usableSize )
     {
       return SQLITE_CORRUPT_BKPT();
     }
@@ -947,7 +947,7 @@ namespace Community.CsharpSqlite {
     */iCellFirst=cellOffset+2*this.nCell;
 					iCellLast=usableSize-4;
 					#if (SQLITE_ENABLE_OVERSIZE_CELL_CHECK)
-																																																																							    {
+																																																																												    {
       int i;            /* Index into the cell pointer array */
       int sz;           /* Size of a cell */
 
@@ -1314,7 +1314,7 @@ namespace Community.CsharpSqlite {
 					return;
 				Debug.Assert(idx>=0&&idx<this.nCell);
 				#if SQLITE_DEBUG
-																																																								  Debug.Assert( sz == cellSize( pPage, idx ) );
+																																																												  Debug.Assert( sz == cellSize( pPage, idx ) );
 #endif
 				Debug.Assert(sqlite3PagerIswriteable(this.pDbPage));
 				Debug.Assert(sqlite3_mutex_held(this.pBt.mutex));
@@ -1600,7 +1600,7 @@ namespace Community.CsharpSqlite {
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																																							if (false)
+																																																																												if (false)
 #endif
 					 {
 						ptrmapPut(pBt,pgnoNew,PTRMAP_BTREE,this.pgno,ref rc);
@@ -1692,7 +1692,7 @@ namespace Community.CsharpSqlite {
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																																							if (false)
+																																																																												if (false)
 #endif
 					 {
 						pRC=pTo.setChildPtrmaps();
@@ -1733,7 +1733,7 @@ namespace Community.CsharpSqlite {
 				Debug.Assert(sqlite3_mutex_held(pBt.mutex));
 				Debug.Assert(sqlite3PagerIswriteable(this.pDbPage));
 				#if FALSE
-																																																								TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
+																																																												TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
 #endif
 				/* At this point pParent may have at most one overflow cell. And if
 ** this overflow cell is present, it must be the cell with
@@ -2041,7 +2041,7 @@ namespace Community.CsharpSqlite {
 						#if !SQLITE_OMIT_AUTOVACUUM
 						if(pBt.autoVacuum)
 						#else
-																																																																																						if (false)
+																																																																																												if (false)
 #endif
 						 {
 							ptrmapPut(pBt,pNew.pgno,PTRMAP_BTREE,this.pgno,ref rc);
@@ -2196,7 +2196,7 @@ namespace Community.CsharpSqlite {
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																																							if (false)
+																																																																												if (false)
 #endif
 					 {
 						/* Fix the pointer-map entries for all the cells that were shifted around.
@@ -2286,7 +2286,7 @@ namespace Community.CsharpSqlite {
 							}
 						}
 						#if FALSE
-																																																																																						/* The ptrmapCheckPages() contains Debug.Assert() statements that verify that
+																																																																																												/* The ptrmapCheckPages() contains Debug.Assert() statements that verify that
 ** all pointer map pages are set correctly. This is helpful while
 ** debugging. This is usually disabled because a corrupt database may
 ** cause an Debug.Assert() statement to fail.  */
@@ -2345,7 +2345,7 @@ ptrmapCheckPages(pParent, 1);
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if(pBt.autoVacuum)
 					#else
-																																																																							if (false)
+																																																																												if (false)
 #endif
 					 {
 						ptrmapPut(pBt,pgnoChild,PTRMAP_BTREE,this.pgno,ref rc);
@@ -2429,7 +2429,7 @@ ptrmapCheckPages(pParent, 1);
 			/* List of other sharable Btrees from the same db */public Btree pPrev;
 			/* Back pointer of the same list */
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																										BtLock lock;              /* Object used to lock page 1 */
+																																													BtLock lock;              /* Object used to lock page 1 */
 #endif
 			/**
 ///<summary>
@@ -2531,7 +2531,7 @@ ptrmapCheckPages(pParent, 1);
 				/* Make sure every page in the file is referenced
   */for(i=1;i<=sCheck.nPage&&sCheck.mxErr!=0;i++) {
 					#if SQLITE_OMIT_AUTOVACUUM
-																																																													if( sCheck.anRef[i]==null ){
+																																																																		if( sCheck.anRef[i]==null ){
 checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 }
 #else
@@ -2632,6 +2632,160 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 				pBt.doNotUseWAL=false;
 				return rc;
 			}
+			public int sqlite3BtreeClearTable(int iTable,ref int pnChange) {
+				int rc;
+				BtShared pBt=this.pBt;
+				sqlite3BtreeEnter(this);
+				Debug.Assert(this.inTrans==TRANS_WRITE);
+				/* Invalidate all incrblob cursors open on table iTable (assuming iTable
+  ** is the root of a table b-tree - if it is not, the following call is
+  ** a no-op).  */invalidateIncrblobCursors(this,0,1);
+				rc=saveAllCursors(pBt,(Pgno)iTable,null);
+				if(SQLITE_OK==rc) {
+					rc=clearDatabasePage(pBt,(Pgno)iTable,0,ref pnChange);
+				}
+				sqlite3BtreeLeave(this);
+				return rc;
+			}
+			public int btreeDropTable(Pgno iTable,ref int piMoved) {
+				int rc;
+				MemPage pPage=null;
+				BtShared pBt=this.pBt;
+				Debug.Assert(sqlite3BtreeHoldsMutex(this));
+				Debug.Assert(this.inTrans==TRANS_WRITE);
+				/* It is illegal to drop a table if any cursors are open on the
+  ** database. This is because in auto-vacuum mode the backend may
+  ** need to move another root-page to fill a gap left by the deleted
+  ** root page. If an open cursor was using this page a problem would
+  ** occur.
+  **
+  ** This error is caught long before control reaches this point.
+  */if(NEVER(pBt.pCursor)) {
+					sqlite3ConnectionBlocked(this.db,pBt.pCursor.pBtree.db);
+					return SQLITE_LOCKED_SHAREDCACHE;
+				}
+				rc=btreeGetPage(pBt,(Pgno)iTable,ref pPage,0);
+				if(rc!=0)
+					return rc;
+				int Dummy0=0;
+				rc=this.sqlite3BtreeClearTable((int)iTable,ref Dummy0);
+				if(rc!=0) {
+					releasePage(pPage);
+					return rc;
+				}
+				piMoved=0;
+				if(iTable>1) {
+					#if SQLITE_OMIT_AUTOVACUUM
+																																																																	freePage(pPage, ref rc);
+releasePage(pPage);
+#else
+					if(pBt.autoVacuum) {
+						Pgno maxRootPgno=0;
+						this.sqlite3BtreeGetMeta(BTREE_LARGEST_ROOT_PAGE,ref maxRootPgno);
+						if(iTable==maxRootPgno) {
+							/* If the table being dropped is the table with the largest root-page
+        ** number in the database, put the root page on the free list.
+        */freePage(pPage,ref rc);
+							releasePage(pPage);
+							if(rc!=SQLITE_OK) {
+								return rc;
+							}
+						}
+						else {
+							/* The table being dropped does not have the largest root-page
+        ** number in the database. So move the page that does into the
+        ** gap left by the deleted root-page.
+        */MemPage pMove=new MemPage();
+							releasePage(pPage);
+							rc=btreeGetPage(pBt,maxRootPgno,ref pMove,0);
+							if(rc!=SQLITE_OK) {
+								return rc;
+							}
+							rc=relocatePage(pBt,pMove,PTRMAP_ROOTPAGE,0,iTable,0);
+							releasePage(pMove);
+							if(rc!=SQLITE_OK) {
+								return rc;
+							}
+							pMove=null;
+							rc=btreeGetPage(pBt,maxRootPgno,ref pMove,0);
+							freePage(pMove,ref rc);
+							releasePage(pMove);
+							if(rc!=SQLITE_OK) {
+								return rc;
+							}
+							piMoved=(int)maxRootPgno;
+						}
+						/* Set the new 'max-root-page' value in the database header. This
+      ** is the old value less one, less one more if that happens to
+      ** be a root-page number, less one again if that is the
+      ** PENDING_BYTE_PAGE.
+      */maxRootPgno--;
+						while(maxRootPgno==PENDING_BYTE_PAGE(pBt)||PTRMAP_ISPAGE(pBt,maxRootPgno)) {
+							maxRootPgno--;
+						}
+						Debug.Assert(maxRootPgno!=PENDING_BYTE_PAGE(pBt));
+						rc=this.sqlite3BtreeUpdateMeta(4,maxRootPgno);
+					}
+					else {
+						freePage(pPage,ref rc);
+						releasePage(pPage);
+					}
+					#endif
+				}
+				else {
+					/* If sqlite3BtreeDropTable was called on page 1.
+    ** This really never should happen except in a corrupt
+    ** database.
+    */pPage.zeroPage(PTF_INTKEY|PTF_LEAF);
+					releasePage(pPage);
+				}
+				return rc;
+			}
+			public int sqlite3BtreeDropTable(int iTable,ref int piMoved) {
+				int rc;
+				sqlite3BtreeEnter(this);
+				rc=this.btreeDropTable((u32)iTable,ref piMoved);
+				sqlite3BtreeLeave(this);
+				return rc;
+			}
+			public void sqlite3BtreeGetMeta(int idx,ref u32 pMeta) {
+				BtShared pBt=this.pBt;
+				sqlite3BtreeEnter(this);
+				Debug.Assert(this.inTrans>TRANS_NONE);
+				Debug.Assert(SQLITE_OK==querySharedCacheTableLock(this,MASTER_ROOT,READ_LOCK));
+				Debug.Assert(pBt.pPage1!=null);
+				Debug.Assert(idx>=0&&idx<=15);
+				pMeta=Converter.sqlite3Get4byte(pBt.pPage1.aData,36+idx*4);
+				/* If auto-vacuum is disabled in this build and this is an auto-vacuum
+  ** database, mark the database as read-only.  */
+				#if SQLITE_OMIT_AUTOVACUUM
+																																																	if( idx==BTREE_LARGEST_ROOT_PAGE && pMeta>0 ) pBt.readOnly = 1;
+#endif
+				sqlite3BtreeLeave(this);
+			}
+			public int sqlite3BtreeUpdateMeta(int idx,u32 iMeta) {
+				BtShared pBt=this.pBt;
+				byte[] pP1;
+				int rc;
+				Debug.Assert(idx>=1&&idx<=15);
+				sqlite3BtreeEnter(this);
+				Debug.Assert(this.inTrans==TRANS_WRITE);
+				Debug.Assert(pBt.pPage1!=null);
+				pP1=pBt.pPage1.aData;
+				rc=sqlite3PagerWrite(pBt.pPage1.pDbPage);
+				if(rc==SQLITE_OK) {
+					Converter.sqlite3Put4byte(pP1,36+idx*4,iMeta);
+					#if !SQLITE_OMIT_AUTOVACUUM
+					if(idx==BTREE_INCR_VACUUM) {
+						Debug.Assert(pBt.autoVacuum||iMeta==0);
+						Debug.Assert(iMeta==0||iMeta==1);
+						pBt.incrVacuum=iMeta!=0;
+					}
+					#endif
+				}
+				sqlite3BtreeLeave(this);
+				return rc;
+			}
 		}
 		///<summary>
 		/// Btree.inTrans may take one of the following values.
@@ -2710,7 +2864,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 			/* Non-recursive mutex required to access this object */public Bitvec pHasContent;
 			/* Set of pages moved to free-list this transaction */
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																													public int nRef;                /* Number of references to this structure */
+																																																public int nRef;                /* Number of references to this structure */
 public BtShared pNext;          /* Next on a list of sharable BtShared structs */
 public BtLock pLock;            /* List of locks held on this shared-btree struct */
 public Btree pWriter;           /* Btree with currently open write transaction */
@@ -2865,7 +3019,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			/* True if info.nKey is valid */public int eState;
 			/* One of the CURSOR_XXX constants (see below) */
 			#if !SQLITE_OMIT_INCRBLOB
-																																													public Pgno[] aOverflow;         /* Cache of overflow page locations */
+																																																public Pgno[] aOverflow;         /* Cache of overflow page locations */
 public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 #endif
 			public i16 iPage;
@@ -2892,7 +3046,7 @@ public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 				nKey=0;
 				skipNext=0;
 				#if !SQLITE_OMIT_INCRBLOB
-																																																												isIncrblobHandle=false;
+																																																																isIncrblobHandle=false;
 aOverflow= null;
 #endif
 				iPage=0;
@@ -3014,7 +3168,7 @@ aOverflow= null;
 		///
 		///</summary>
 		#if DEBUG
-																														    //define btreeIntegrity(p) \
+																																    //define btreeIntegrity(p) \
     //  Debug.Assert( p.pBt.inTransaction!=TRANS_NONE || p.pBt.nTransaction==0 ); \
     //  Debug.Assert( p.pBt.inTransaction>=p.inTrans );
     static void btreeIntegrity( Btree p )
@@ -3036,7 +3190,7 @@ aOverflow= null;
 		#if !SQLITE_OMIT_AUTOVACUUM
 		//#define ISAUTOVACUUM (pBt.autoVacuum)
 		#else
-																														//define ISAUTOVACUUM 0
+																																//define ISAUTOVACUUM 0
 public static bool ISAUTOVACUUM =false;
 #endif
 		///<summary>

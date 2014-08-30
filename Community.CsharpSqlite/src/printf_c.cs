@@ -223,7 +223,7 @@ NULL pointers replaced by SQL NULL.  %Q */const int etTOKEN=12;
     */
 		#if !SQLITE_PRINT_BUF_SIZE
 		#if (SQLITE_SMALL_STACK)
-																														const int SQLITE_PRINT_BUF_SIZE = 50;
+																																const int SQLITE_PRINT_BUF_SIZE = 50;
 #else
 		const int SQLITE_PRINT_BUF_SIZE=350;
 		#endif
@@ -556,7 +556,7 @@ NULL pointers replaced by SQL NULL.  %Q */const int etTOKEN=12;
 				case etGENERIC:
 				realvalue=va_arg(ap,(Double)0);
 				#if SQLITE_OMIT_FLOATING_POINT
-																																																												length = 0;
+																																																																length = 0;
 #else
 				if(precision<0)
 					precision=6;
@@ -578,7 +578,7 @@ NULL pointers replaced by SQL NULL.  %Q */const int etTOKEN=12;
 				if(xtype==etGENERIC&&precision>0)
 					precision--;
 				#if FALSE
-																																																												/* Rounding works like BSD when the constant 0.4999 is used.  Wierd! */
+																																																																/* Rounding works like BSD when the constant 0.4999 is used.  Wierd! */
 for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 #else
 				/* It makes more sense to use 0.5 */for(idx=precision,rounder=0.5;idx>0;idx--,rounder*=0.1) {
@@ -589,7 +589,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 				/* Normalize realvalue to within 10.0 > realvalue >= 1.0 */exp=0;
 				double d=0;
 				#if WINDOWS_MOBILE
-																																																												            //alxwest: Tryparse doesn't exist on Windows Moble and what will Tryparsing a double do?
+																																																																            //alxwest: Tryparse doesn't exist on Windows Moble and what will Tryparsing a double do?
             if ( Double.IsNaN( realvalue ))
 #else
 				if(Double.IsNaN(realvalue)||!(Double.TryParse(Convert.ToString(realvalue),out d)))//if( MathExtensions.sqlite3IsNaN((double)realvalue) )
@@ -1235,7 +1235,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 			}
 		}
 		#if SQLITE_DEBUG || DEBUG || TRACE
-																														    /*
+																																    /*
 ** A version of printf() that understands %lld.  Used for debugging.
 ** The printf() built into some versions of windows does not understand %lld
 ** and segfaults if you give it a long long int.

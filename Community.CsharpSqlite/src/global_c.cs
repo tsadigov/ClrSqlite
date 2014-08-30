@@ -363,7 +363,7 @@ namespace Community.CsharpSqlite {
 		/* f8..ff    ........ */};
 		#endif
 		#if SQLITE_USE_URI
-																														    const bool SQLITE_USE_URI = true;
+																																    const bool SQLITE_USE_URI = true;
 #else
 		//# define  SQLITE_USE_URI 0
 		const bool SQLITE_USE_URI=false;
