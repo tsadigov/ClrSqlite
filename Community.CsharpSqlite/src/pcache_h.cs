@@ -5,6 +5,7 @@ using i16=System.Int16;
 using u32=System.UInt32;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
+    using u8 = Byte;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2008 August 05
@@ -42,7 +43,7 @@ namespace Community.CsharpSqlite {
 			/* The page number for this page */public Pager pPager;
 			/* The pager to which this page belongs */
 			#if SQLITE_CHECK_PAGES || (SQLITE_DEBUG)
-																																																						      public int pageHash;          /* Hash of page content */
+																																																									      public int pageHash;          /* Hash of page content */
 #endif
 			public int flags;
 			/* PGHDR flags defined below *//**********************************************************************
@@ -68,7 +69,7 @@ namespace Community.CsharpSqlite {
 				this.pgno=0;
 				this.pPager=null;
 				#if SQLITE_CHECK_PAGES
-																																																																								this.pageHash=0;
+																																																																												this.pageHash=0;
 #endif
 				this.flags=0;
 				this.nRef=0;
@@ -110,6 +111,15 @@ namespace Community.CsharpSqlite {
 				return 0;
 			}
 			public void pager_set_pagehash() {
+			}
+			public MemPage btreePageFromDbPage(Pgno pgno,BtShared pBt) {
+				MemPage pPage=(MemPage)sqlite3PagerGetExtra(this);
+				pPage.aData=sqlite3PagerGetData(this);
+				pPage.pDbPage=this;
+				pPage.pBt=pBt;
+				pPage.pgno=pgno;
+				pPage.hdrOffset=(u8)(pPage.pgno==1?100:0);
+				return pPage;
 			}
 		}
 		/* Bit values for PgHdr.flags *///#define PGHDR_DIRTY             0x002  /* Page has changed */
@@ -163,7 +173,7 @@ namespace Community.CsharpSqlite {
 	//int sqlite3PcachePageRefcount(PgHdr*);
 	/* Return the total number of pages stored in the cache *///int sqlite3PcachePagecount(PCache*);
 	#if SQLITE_CHECK_PAGES
-																		/* Iterate through all dirty pages currently stored in the cache. This
+																			/* Iterate through all dirty pages currently stored in the cache. This
 ** interface is only available if SQLITE_CHECK_PAGES is defined when the
 ** library is built.
 */
@@ -177,14 +187,14 @@ namespace Community.CsharpSqlite {
 ** of the suggested cache-sizes.
 *///void sqlite3PcacheSetCachesize(PCache *, int);
 	#if SQLITE_TEST
-																		    //int sqlite3PcacheGetCachesize(PCache *);
+																			    //int sqlite3PcacheGetCachesize(PCache *);
 #endif
 	#if SQLITE_ENABLE_MEMORY_MANAGEMENT
-																		/* Try to return memory used by the pcache module to the main memory heap */
+																			/* Try to return memory used by the pcache module to the main memory heap */
 //int sqlite3PcacheReleaseMemory(int);
 #endif
 	#if SQLITE_TEST
-																		    //void sqlite3PcacheStats(int*,int*,int*,int*);
+																			    //void sqlite3PcacheStats(int*,int*,int*,int*);
 #endif
 	//void sqlite3PCacheSetDefault(void);
 	#endif

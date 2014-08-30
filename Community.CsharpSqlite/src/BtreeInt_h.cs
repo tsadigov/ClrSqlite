@@ -379,7 +379,7 @@ namespace Community.CsharpSqlite {
 						iCell--;
 					}
 				}
-				return findCell(this,iCell);
+				return this.findCell(iCell);
 			}
 			public///<summary>
 			/// Parse a cell content block and fill in the CellInfo structure.  There
@@ -463,7 +463,7 @@ namespace Community.CsharpSqlite {
 			}
 			//  btreeParseCellPtr((pPage), findCell((pPage), (iCell)), (pInfo))
 			public void parseCell(int iCell,ref CellInfo pInfo) {
-				this.btreeParseCellPtr(findCell(this,iCell),ref pInfo);
+				this.btreeParseCellPtr(this.findCell(iCell),ref pInfo);
 			}
 			public///<summary>
 			/// Compute the total number of bytes that a Cell needs in the cell
@@ -1057,7 +1057,7 @@ namespace Community.CsharpSqlite {
 				}
 				nCell=this.nCell;
 				for(i=0;i<nCell;i++) {
-					int pCell=findCell(this,i);
+					int pCell=this.findCell(i);
 					this.ptrmapPutOvflPtr(pCell,ref rc);
 					if(0==this.leaf) {
 						Pgno childPgno=Converter.sqlite3Get4byte(this.aData,pCell);
@@ -1103,7 +1103,7 @@ namespace Community.CsharpSqlite {
 					this.btreeInitPage();
 					nCell=this.nCell;
 					for(i=0;i<nCell;i++) {
-						int pCell=findCell(this,i);
+						int pCell=this.findCell(i);
 						if(eType==PTRMAP_OVERFLOW1) {
 							CellInfo info=new CellInfo();
 							this.btreeParseCellPtr(pCell,ref info);
@@ -1620,7 +1620,7 @@ namespace Community.CsharpSqlite {
     ** The first of the while(...) loops below skips over the record-length
     ** field. The second while(...) loop copies the key value from the
     ** cell on pPage into the pSpace buffer.
-    */int iCell=findCell(pPage,pPage.nCell-1);
+    */int iCell=pPage.findCell(pPage.nCell-1);
 					//pCell = findCell( pPage, pPage.nCell - 1 );
 					pCell=pPage.aData;
 					int _pCell=iCell;
@@ -1778,7 +1778,7 @@ namespace Community.CsharpSqlite {
 					//&pParent.aData[pParent.hdrOffset + 8];
 				}
 				else {
-					pRight=findCell(this,i+nxDiv-this.nOverflow);
+					pRight=this.findCell(i+nxDiv-this.nOverflow);
 				}
 				pgno=Converter.sqlite3Get4byte(this.aData,pRight);
 				while(true) {
@@ -1798,7 +1798,7 @@ namespace Community.CsharpSqlite {
 						this.nOverflow=0;
 					}
 					else {
-						apDiv[i]=findCell(this,i+nxDiv-this.nOverflow);
+						apDiv[i]=this.findCell(i+nxDiv-this.nOverflow);
 						pgno=Converter.sqlite3Get4byte(this.aData,apDiv[i]);
 						szNew[i]=this.cellSizePtr(apDiv[i]);
 						/* Drop the cell from the parent page. apDiv[i] still points to
@@ -2368,6 +2368,9 @@ ptrmapCheckPages(pParent, 1);
 				ppChild=pChild;
 				return SQLITE_OK;
 			}
+			public int findCell(int iCell) {
+				return get2byte(this.aData,this.cellOffset+2*(iCell));
+			}
 		}
 		///<summary>
 		/// The in-memory image of a disk page has the auxiliary information appended
@@ -2493,7 +2496,7 @@ ptrmapCheckPages(pParent, 1);
 				nRef=pBt.pPager.sqlite3PagerRefcount();
 				sCheck.pBt=pBt;
 				sCheck.pPager=pBt.pPager;
-				sCheck.nPage=btreePagecount(sCheck.pBt);
+				sCheck.nPage=sCheck.pBt.btreePagecount();
 				sCheck.mxErr=mxErr;
 				sCheck.nErr=0;
 				//sCheck.mallocFailed = 0;
@@ -2642,7 +2645,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 					sqlite3ConnectionBlocked(this.db,pBt.pCursor.pBtree.db);
 					return SQLITE_LOCKED_SHAREDCACHE;
 				}
-				rc=btreeGetPage(pBt,(Pgno)iTable,ref pPage,0);
+				rc=pBt.btreeGetPage((Pgno)iTable,ref pPage,0);
 				if(rc!=0)
 					return rc;
 				int Dummy0=0;
@@ -2675,7 +2678,7 @@ releasePage(pPage);
         ** gap left by the deleted root-page.
         */MemPage pMove=new MemPage();
 							releasePage(pPage);
-							rc=btreeGetPage(pBt,maxRootPgno,ref pMove,0);
+							rc=pBt.btreeGetPage(maxRootPgno,ref pMove,0);
 							if(rc!=SQLITE_OK) {
 								return rc;
 							}
@@ -2685,7 +2688,7 @@ releasePage(pPage);
 								return rc;
 							}
 							pMove=null;
-							rc=btreeGetPage(pBt,maxRootPgno,ref pMove,0);
+							rc=pBt.btreeGetPage(maxRootPgno,ref pMove,0);
 							freePage(pMove,ref rc);
 							releasePage(pMove);
 							if(rc!=SQLITE_OK) {
@@ -3022,6 +3025,28 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				if(pEType<1||pEType>5)
 					return SQLITE_CORRUPT_BKPT();
 				return SQLITE_OK;
+			}
+			public int btreeGetPage(/* The btree */Pgno pgno,/* Number of the page to fetch */ref MemPage ppPage,/* Return the page in this parameter */int noContent/* Do not load page content if true */) {
+				int rc;
+				DbPage pDbPage=null;
+				Debug.Assert(sqlite3_mutex_held(this.mutex));
+				rc=this.pPager.sqlite3PagerAcquire(pgno,ref pDbPage,(u8)noContent);
+				if(rc!=0)
+					return rc;
+				ppPage=pDbPage.btreePageFromDbPage(pgno,this);
+				return SQLITE_OK;
+			}
+			public MemPage btreePageLookup(Pgno pgno) {
+				DbPage pDbPage;
+				Debug.Assert(sqlite3_mutex_held(this.mutex));
+				pDbPage=this.pPager.sqlite3PagerLookup(pgno);
+				if(pDbPage) {
+					return pDbPage.btreePageFromDbPage(pgno,this);
+				}
+				return null;
+			}
+			public Pgno btreePagecount() {
+				return this.nPage;
 			}
 		}
 		///<summary>
@@ -3447,7 +3472,7 @@ public static bool ISAUTOVACUUM =false;
 					return 0;
 				if(this.checkRef((u32)iPage,zParentContext)!=0)
 					return 0;
-				if((rc=btreeGetPage(pBt,(Pgno)iPage,ref pPage,0))!=0) {
+				if((rc=pBt.btreeGetPage((Pgno)iPage,ref pPage,0))!=0) {
 					this.checkAppendMsg(zContext.ToString(),"unable to get the page. error code=%d",rc);
 					return 0;
 				}
@@ -3467,7 +3492,7 @@ public static bool ISAUTOVACUUM =false;
 					CellInfo info=new CellInfo();
 					/* Check payload overflow pages
     */sqlite3_snprintf(200,zContext,"On tree page %d cell %d: ",iPage,i);
-					int iCell=findCell(pPage,i);
+					int iCell=pPage.findCell(i);
 					//pCell = findCell( pPage, i );
 					pCell=pPage.aData;
 					pPage.btreeParseCellPtr(iCell,ref info);
