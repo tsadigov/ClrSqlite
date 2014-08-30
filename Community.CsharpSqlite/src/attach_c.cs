@@ -6,62 +6,7 @@ using u32=System.UInt32;
 namespace Community.CsharpSqlite {
 	using sqlite3_value=Sqlite3.Mem;
 	public partial class Sqlite3 {
-		///<summary>
-		/// 2003 April 6
-		///
-		/// The author disclaims copyright to this source code.  In place of
-		/// a legal notice, here is a blessing:
-		///
-		///    May you do good and not evil.
-		///    May you find forgiveness for yourself and forgive others.
-		///    May you share freely, never taking more than you give.
-		///
-		///
-		/// This file contains code used to implement the ATTACH and DETACH commands.
-		///
-		///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-		///  C#-SQLite is an independent reimplementation of the SQLite software library
-		///
-		///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-		///
-		///
-		///</summary>
-		//#include "sqliteInt.h"
 		#if !SQLITE_OMIT_ATTACH
-		///<summary>
-		/// Resolve an expression that was part of an ATTACH or DETACH statement. This
-		/// is slightly different from resolving a normal SQL expression, because simple
-		/// identifiers are treated as strings, not possible column names or aliases.
-		///
-		/// i.e. if the parser sees:
-		///
-		///     ATTACH DATABASE abc AS def
-		///
-		/// it treats the two expressions as literal strings 'abc' and 'def' instead of
-		/// looking for columns of the same name.
-		///
-		/// This only applies to the root node of pExpr, so the statement:
-		///
-		///     ATTACH DATABASE abc||def AS 'db2'
-		///
-		/// will fail because neither abc or def can be resolved.
-		///</summary>
-		static int resolveAttachExpr(NameContext pName,Expr pExpr) {
-			int rc=SQLITE_OK;
-			if(pExpr!=null) {
-				if(pExpr.op!=TK_ID) {
-					rc=sqlite3ResolveExprNames(pName,ref pExpr);
-					if(rc==SQLITE_OK&&pExpr.sqlite3ExprIsConstant()==0) {
-						sqlite3ErrorMsg(pName.pParse,"invalid name: \"%s\"",pExpr.u.zToken);
-						return SQLITE_ERROR;
-					}
-				}
-				else {
-					pExpr.op=TK_STRING;
-				}
-			}
-			return rc;
-		}
 		///<summary>
 		/// An SQL user-function registered to do the work of an ATTACH statement. The
 		/// three arguments to the function come directly from an attach statement:
