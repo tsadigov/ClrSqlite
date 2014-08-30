@@ -3692,7 +3692,7 @@ return;
 					v.sqlite3VdbeAddOp2(OP_Integer,minFormat,r2);
 					j1=v.sqlite3VdbeAddOp3(OP_Ge,r2,0,r1);
 					v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_FILE_FORMAT,r2);
-					sqlite3VdbeJumpHere(v,j1);
+					v.sqlite3VdbeJumpHere(j1);
 					sqlite3ReleaseTempReg(this,r1);
 					sqlite3ReleaseTempReg(this,r2);
 				}
@@ -3989,8 +3989,8 @@ goto exit_rename_table;
 				}
 				/* Open the sqlite_stat[12] tables for writing. */for(i=0;i<ArraySize(aTable);i++) {
 					v.sqlite3VdbeAddOp3(OP_OpenWrite,iStatCur+i,aRoot[i],iDb);
-					sqlite3VdbeChangeP4(v,-1,3,P4_INT32);
-					sqlite3VdbeChangeP5(v,aCreateTbl[i]);
+					v.sqlite3VdbeChangeP4(-1,3,P4_INT32);
+					v.sqlite3VdbeChangeP5(aCreateTbl[i]);
 				}
 			}
 			public///<summary>
@@ -4108,9 +4108,9 @@ return;
 						v.sqlite3VdbeAddOp2(OP_Null,0,iMem+nCol+i+1);
 					}
 					/* Start the analysis loop. This loop runs through all the entries in
-    ** the index b-tree.  */endOfLoop=sqlite3VdbeMakeLabel(v);
+    ** the index b-tree.  */endOfLoop=v.sqlite3VdbeMakeLabel();
 					v.sqlite3VdbeAddOp2(OP_Rewind,iIdxCur,endOfLoop);
-					topOfLoop=sqlite3VdbeCurrentAddr(v);
+					topOfLoop=v.sqlite3VdbeCurrentAddr();
 					v.sqlite3VdbeAddOp2(OP_AddImm,iMem,1);
 					for(i=0;i<nCol;i++) {
 						v.sqlite3VdbeAddOp3(OP_Column,iIdxCur,i,regCol);
@@ -4152,7 +4152,7 @@ return;
 						Debug.Assert(pIdx.azColl[i]!=null);
 						pColl=sqlite3LocateCollSeq(this,pIdx.azColl[i]);
 						v.sqlite3VdbeAddOp4(OP_Ne,regCol,0,iMem+nCol+i+1,pColl,P4_COLLSEQ);
-						sqlite3VdbeChangeP5(v,SQLITE_NULLEQ);
+						v.sqlite3VdbeChangeP5(SQLITE_NULLEQ);
 					}
 					//if( db.mallocFailed ){
 					//  /* If a malloc failure has occurred, then the result of the expression 
@@ -4163,15 +4163,15 @@ return;
 					//}
 					v.sqlite3VdbeAddOp2(OP_Goto,0,endOfLoop);
 					for(i=0;i<nCol;i++) {
-						int addr2=sqlite3VdbeCurrentAddr(v)-(nCol*2);
+						int addr2=v.sqlite3VdbeCurrentAddr()-(nCol*2);
 						if(i==0) {
-							sqlite3VdbeJumpHere(v,addr2-1);
+							v.sqlite3VdbeJumpHere(addr2-1);
 							/* Set jump dest for the OP_IfNot */}
-						sqlite3VdbeJumpHere(v,addr2);
+						v.sqlite3VdbeJumpHere(addr2);
 						/* Set jump dest for the OP_Ne */v.sqlite3VdbeAddOp2(OP_AddImm,iMem+i+1,1);
 						v.sqlite3VdbeAddOp3(OP_Column,iIdxCur,i,iMem+nCol+i+1);
 					}
-					/* End of the analysis loop. */sqlite3VdbeResolveLabel(v,endOfLoop);
+					/* End of the analysis loop. */v.sqlite3VdbeResolveLabel(endOfLoop);
 					v.sqlite3VdbeAddOp2(OP_Next,iIdxCur,topOfLoop);
 					v.sqlite3VdbeAddOp1(OP_Close,iIdxCur);
 					/* Store the results in sqlite_stat1.
@@ -4207,7 +4207,7 @@ return;
 					v.sqlite3VdbeAddOp4(OP_MakeRecord,regTabname,3,regRec,"aaa",0);
 					v.sqlite3VdbeAddOp2(OP_NewRowid,iStatCur,regRowid);
 					v.sqlite3VdbeAddOp3(OP_Insert,iStatCur,regRec,regRowid);
-					sqlite3VdbeChangeP5(v,OPFLAG_APPEND);
+					v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
 				}
 				/* If the table has no indices, create a single sqlite_stat1 entry
   ** containing NULL as the index name and the row count as the content.
@@ -4219,17 +4219,17 @@ return;
 					jZeroRows=v.sqlite3VdbeAddOp1(OP_IfNot,regSampleno);
 				}
 				else {
-					sqlite3VdbeJumpHere(v,jZeroRows);
+					v.sqlite3VdbeJumpHere(jZeroRows);
 					jZeroRows=v.sqlite3VdbeAddOp0(OP_Goto);
 				}
 				v.sqlite3VdbeAddOp2(OP_Null,0,regIdxname);
 				v.sqlite3VdbeAddOp4(OP_MakeRecord,regTabname,3,regRec,"aaa",0);
 				v.sqlite3VdbeAddOp2(OP_NewRowid,iStatCur,regRowid);
 				v.sqlite3VdbeAddOp3(OP_Insert,iStatCur,regRec,regRowid);
-				sqlite3VdbeChangeP5(v,OPFLAG_APPEND);
+				v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
 				if(this.nMem<regRec)
 					this.nMem=regRec;
-				sqlite3VdbeJumpHere(v,jZeroRows);
+				v.sqlite3VdbeJumpHere(jZeroRows);
 			}
 			public///<summary>
 			/// Generate code that will cause the most recent index analysis to
@@ -4406,8 +4406,8 @@ goto attach_end;
 				if(v!=null) {
 					v.sqlite3VdbeAddOp3(OP_Function,0,regArgs+3-pFunc.nArg,regArgs+3);
 					Debug.Assert(pFunc.nArg==-1||(pFunc.nArg&0xff)==pFunc.nArg);
-					sqlite3VdbeChangeP5(v,(u8)(pFunc.nArg));
-					sqlite3VdbeChangeP4(v,-1,pFunc,P4_FUNCDEF);
+					v.sqlite3VdbeChangeP5((u8)(pFunc.nArg));
+					v.sqlite3VdbeChangeP4(-1,pFunc,P4_FUNCDEF);
 					/* Code an OP_Expire. For an ATTACH statement, set P1 to true (expire this
     ** statement only). For DETACH, set it to false (expire all existing
     ** statements).
@@ -4611,7 +4611,7 @@ goto attach_end;
 				int i;
 				/* Iterator variable */Vdbe v=sqlite3GetVdbe(this);
 				/* Vdbe to add code to */int iCur=this.nTab-1;
-				/* Cursor number to use */int iOk=sqlite3VdbeMakeLabel(v);
+				/* Cursor number to use */int iOk=v.sqlite3VdbeMakeLabel();
 				/* jump here if parent key found *//* If nIncr is less than zero, then check at runtime if there are any
       ** outstanding constraints to resolve. If there are not, there is no need
       ** to check if deleting this row resolves any outstanding violations.
@@ -4645,8 +4645,8 @@ goto attach_end;
 						sqlite3OpenTable(this,iCur,iDb,pTab,OP_OpenRead);
 						v.sqlite3VdbeAddOp3(OP_NotExists,iCur,0,regTemp);
 						v.sqlite3VdbeAddOp2(OP_Goto,0,iOk);
-						sqlite3VdbeJumpHere(v,sqlite3VdbeCurrentAddr(v)-2);
-						sqlite3VdbeJumpHere(v,iMustBeInt);
+						v.sqlite3VdbeJumpHere(v.sqlite3VdbeCurrentAddr()-2);
+						v.sqlite3VdbeJumpHere(iMustBeInt);
 						sqlite3ReleaseTempReg(this,regTemp);
 					}
 					else {
@@ -4655,7 +4655,7 @@ goto attach_end;
 						int regRec=sqlite3GetTempReg(this);
 						KeyInfo pKey=sqlite3IndexKeyinfo(this,pIdx);
 						v.sqlite3VdbeAddOp3(OP_OpenRead,iCur,pIdx.tnum,iDb);
-						sqlite3VdbeChangeP4(v,-1,pKey,P4_KEYINFO_HANDOFF);
+						v.sqlite3VdbeChangeP4(-1,pKey,P4_KEYINFO_HANDOFF);
 						for(i=0;i<nCol;i++) {
 							v.sqlite3VdbeAddOp2(OP_Copy,aiCol[i]+1+regData,regTemp+i);
 						}
@@ -4669,7 +4669,7 @@ goto attach_end;
           ** of the parent-key values are NULL (at this point it is known that
           ** none of the child key values are).
           */if(pTab==pFKey.pFrom&&nIncr==1) {
-							int iJump=sqlite3VdbeCurrentAddr(v)+nCol+1;
+							int iJump=v.sqlite3VdbeCurrentAddr()+nCol+1;
 							for(i=0;i<nCol;i++) {
 								int iChild=aiCol[i]+1+regData;
 								int iParent=pIdx.aiColumn[i]+1+regData;
@@ -4678,13 +4678,13 @@ goto attach_end;
 									/* The parent key is a composite key that includes the IPK column */iParent=regData;
 								}
 								v.sqlite3VdbeAddOp3(OP_Ne,iChild,iJump,iParent);
-								sqlite3VdbeChangeP5(v,SQLITE_JUMPIFNULL);
+								v.sqlite3VdbeChangeP5(SQLITE_JUMPIFNULL);
 							}
 							v.sqlite3VdbeAddOp2(OP_Goto,0,iOk);
 						}
 						v.sqlite3VdbeAddOp3(OP_MakeRecord,regTemp,nCol,regRec);
-						sqlite3VdbeChangeP4(v,-1,sqlite3IndexAffinityStr(v,pIdx),P4_TRANSIENT);
-						sqlite3VdbeAddOp4Int(v,OP_Found,iCur,iOk,regRec,0);
+						v.sqlite3VdbeChangeP4(-1,sqlite3IndexAffinityStr(v,pIdx),P4_TRANSIENT);
+						v.sqlite3VdbeAddOp4Int(OP_Found,iCur,iOk,regRec,0);
 						sqlite3ReleaseTempReg(this,regRec);
 						sqlite3ReleaseTempRange(this,regTemp,nCol);
 					}
@@ -4702,7 +4702,7 @@ goto attach_end;
 					}
 					v.sqlite3VdbeAddOp2(OP_FkCounter,pFKey.isDeferred,nIncr);
 				}
-				sqlite3VdbeResolveLabel(v,iOk);
+				v.sqlite3VdbeResolveLabel(iOk);
 				v.sqlite3VdbeAddOp1(OP_Close,iCur);
 			}
 			public///<summary>
@@ -4821,7 +4821,7 @@ goto attach_end;
 				}
 				/* Clean up the WHERE clause constructed above. */sqlite3ExprDelete(db,ref pWhere);
 				if(iFkIfZero!=0) {
-					sqlite3VdbeJumpHere(v,iFkIfZero);
+					v.sqlite3VdbeJumpHere(iFkIfZero);
 				}
 			}
 			public///<summary>
@@ -4860,7 +4860,7 @@ goto attach_end;
 						}
 						if(null==p)
 							return;
-						iSkip=sqlite3VdbeMakeLabel(v);
+						iSkip=v.sqlite3VdbeMakeLabel();
 						v.sqlite3VdbeAddOp2(OP_FkIfZero,1,iSkip);
 					}
 					this.disableTriggers=1;
@@ -4869,10 +4869,10 @@ goto attach_end;
 					/* If the DELETE has generated immediate foreign key constraint 
         ** violations, halt the VDBE and return an error at this point, before
         ** any modifications to the schema are made. This is because statement
-        ** transactions are not able to rollback schema changes.  */v.sqlite3VdbeAddOp2(OP_FkIfZero,0,sqlite3VdbeCurrentAddr(v)+2);
+        ** transactions are not able to rollback schema changes.  */v.sqlite3VdbeAddOp2(OP_FkIfZero,0,v.sqlite3VdbeCurrentAddr()+2);
 					sqlite3HaltConstraint(this,OE_Abort,"foreign key constraint failed",P4_STATIC);
 					if(iSkip!=0) {
-						sqlite3VdbeResolveLabel(v,iSkip);
+						v.sqlite3VdbeResolveLabel(iSkip);
 					}
 				}
 			}

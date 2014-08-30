@@ -6,10 +6,10 @@ using i64=System.Int64;
 using u8=System.Byte;
 using u16=System.UInt16;
 using u32=System.UInt32;
-using i32 = System.Int32;
 using u64=System.UInt64;
 using unsigned=System.UIntPtr;
 using Pgno=System.UInt32;
+using i32 = System.Int32;
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar=System.Int16;
 #else
@@ -753,14 +753,14 @@ pOp.cnt = 0;
 				union_p4 _p4=new union_p4();
 				_p4.i=pP4;
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,char pP4,int p4type) {
 				union_p4 _p4=new union_p4();
 				_p4.z=pP4.ToString();
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,StringBuilder pP4,int p4type) {
@@ -768,7 +768,7 @@ pOp.cnt = 0;
 				union_p4 _p4=new union_p4();
 				_p4.z=pP4.ToString();
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,string pP4,int p4type) {
@@ -776,7 +776,7 @@ pOp.cnt = 0;
 				union_p4 _p4=new union_p4();
 				_p4.z=pP4;
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,byte[] pP4,int p4type) {
@@ -784,7 +784,7 @@ pOp.cnt = 0;
 				union_p4 _p4=new union_p4();
 				_p4.z=Encoding.UTF8.GetString(pP4,0,pP4.Length);
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,int[] pP4,int p4type) {
@@ -792,42 +792,42 @@ pOp.cnt = 0;
 				union_p4 _p4=new union_p4();
 				_p4.ai=pP4;
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,i64 pP4,int p4type) {
 				union_p4 _p4=new union_p4();
 				_p4.pI64=pP4;
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,double pP4,int p4type) {
 				union_p4 _p4=new union_p4();
 				_p4.pReal=pP4;
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,FuncDef pP4,int p4type) {
 				union_p4 _p4=new union_p4();
 				_p4.pFunc=pP4;
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,CollSeq pP4,int p4type) {
 				union_p4 _p4=new union_p4();
 				_p4.pColl=pP4;
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,KeyInfo pP4,int p4type) {
 				union_p4 _p4=new union_p4();
 				_p4.pKeyInfo=pP4;
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,VTable pP4,int p4type) {
@@ -835,8 +835,367 @@ pOp.cnt = 0;
 				union_p4 _p4=new union_p4();
 				_p4.pVtab=pP4;
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				sqlite3VdbeChangeP4(this,addr,_p4,p4type);
+				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
+			}
+			public int sqlite3VdbeAddOp4Int(/* Add the opcode to this VM */int op,/* The new opcode */int p1,/* The P1 operand */int p2,/* The P2 operand */int p3,/* The P3 operand */int p4/* The P4 operand as an integer */) {
+				union_p4 _p4=new union_p4();
+				_p4.i=p4;
+				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
+				this.sqlite3VdbeChangeP4(addr,_p4,P4_INT32);
+				return addr;
+			}
+			public int sqlite3VdbeMakeLabel() {
+				int i;
+				i=this.nLabel++;
+				Debug.Assert(this.magic==VDBE_MAGIC_INIT);
+				if(i>=this.nLabelAlloc) {
+					int n=this.nLabelAlloc==0?15:this.nLabelAlloc*2+5;
+					if(this.aLabel==null)
+						this.aLabel=sqlite3Malloc(this.aLabel,n);
+					else
+						Array.Resize(ref this.aLabel,n);
+					//p.aLabel = sqlite3DbReallocOrFree(p.db, p.aLabel,
+					//                                       n*sizeof(p.aLabel[0]));
+					this.nLabelAlloc=this.aLabel.Length;
+					//sqlite3DbMallocSize(p.db, p.aLabel)/sizeof(p.aLabel[0]);
+				}
+				if(this.aLabel!=null) {
+					this.aLabel[i]=-1;
+				}
+				return -1-i;
+			}
+			public void sqlite3VdbeResolveLabel(int x) {
+				int j=-1-x;
+				Debug.Assert(this.magic==VDBE_MAGIC_INIT);
+				Debug.Assert(j>=0&&j<this.nLabel);
+				if(this.aLabel!=null) {
+					this.aLabel[j]=this.nOp;
+				}
+			}
+			public void sqlite3VdbeRunOnlyOnce() {
+				this.runOnlyOnce=1;
+			}
+			public void resolveP2Values(ref int pMaxFuncArgs) {
+				int i;
+				int nMaxArgs=pMaxFuncArgs;
+				Op pOp;
+				int[] aLabel=this.aLabel;
+				this.readOnly=true;
+				for(i=0;i<this.nOp;i++)//  for(pOp=p->aOp, i=p->nOp-1; i>=0; i--, pOp++)
+				 {
+					pOp=this.aOp[i];
+					u8 opcode=pOp.opcode;
+					pOp.opflags=(u8)sqlite3OpcodeProperty[opcode];
+					if(opcode==OP_Function||opcode==OP_AggStep) {
+						if(pOp.p5>nMaxArgs)
+							nMaxArgs=pOp.p5;
+					}
+					else
+						if((opcode==OP_Transaction&&pOp.p2!=0)||opcode==OP_Vacuum) {
+							this.readOnly=false;
+							#if !SQLITE_OMIT_VIRTUALTABLE
+						}
+						else
+							if(opcode==OP_VUpdate) {
+								if(pOp.p2>nMaxArgs)
+									nMaxArgs=pOp.p2;
+							}
+							else
+								if(opcode==OP_VFilter) {
+									int n;
+									Debug.Assert(this.nOp-i>=3);
+									Debug.Assert(this.aOp[i-1].opcode==OP_Integer);
+									//pOp[-1].opcode==OP_Integer );
+									n=this.aOp[i-1].p1;
+									//pOp[-1].p1;
+									if(n>nMaxArgs)
+										nMaxArgs=n;
+									#endif
+								}
+					if((pOp.opflags&OPFLG_JUMP)!=0&&pOp.p2<0) {
+						Debug.Assert(-1-pOp.p2<this.nLabel);
+						pOp.p2=aLabel[-1-pOp.p2];
+					}
+				}
+				sqlite3DbFree(this.db,ref this.aLabel);
+				pMaxFuncArgs=nMaxArgs;
+			}
+			public int sqlite3VdbeCurrentAddr() {
+				Debug.Assert(this.magic==VDBE_MAGIC_INIT);
+				return this.nOp;
+			}
+			public VdbeOp[] sqlite3VdbeTakeOpArray(ref int pnOp,ref int pnMaxArg) {
+				VdbeOp[] aOp=this.aOp;
+				Debug.Assert(aOp!=null);
+				// && 0==p.db.mallocFailed );
+				/* Check that sqlite3VdbeUsesBtree() was not called on this VM */Debug.Assert(this.btreeMask==0);
+				this.resolveP2Values(ref pnMaxArg);
+				pnOp=this.nOp;
+				this.aOp=null;
+				return aOp;
+			}
+			public int sqlite3VdbeAddOpList(int nOp,VdbeOpList[] aOp) {
+				int addr;
+				Debug.Assert(this.magic==VDBE_MAGIC_INIT);
+				if(this.nOp+nOp>this.nOpAlloc&&growOpArray(this)!=0) {
+					return 0;
+				}
+				addr=this.nOp;
+				if(ALWAYS(nOp>0)) {
+					int i;
+					VdbeOpList pIn;
+					for(i=0;i<nOp;i++) {
+						pIn=aOp[i];
+						int p2=pIn.p2;
+						if(this.aOp[i+addr]==null)
+							this.aOp[i+addr]=new VdbeOp();
+						VdbeOp pOut=this.aOp[i+addr];
+						pOut.opcode=pIn.opcode;
+						pOut.p1=pIn.p1;
+						if(p2<0&&(sqlite3OpcodeProperty[pOut.opcode]&OPFLG_JUMP)!=0) {
+							pOut.p2=addr+(-1-p2);
+							// ADDR(p2);
+						}
+						else {
+							pOut.p2=p2;
+						}
+						pOut.p3=pIn.p3;
+						pOut.p4type=P4_NOTUSED;
+						pOut.p4.p=null;
+						pOut.p5=0;
+						#if SQLITE_DEBUG
+																																																																																																					          pOut.zComment = null;
+          if ( sqlite3VdbeAddopTrace )
+          {
+            sqlite3VdbePrintOp( null, i + addr, p.aOp[i + addr] );
+          }
+#endif
+					}
+					this.nOp+=nOp;
+				}
+				return addr;
+			}
+			public void sqlite3VdbeChangeP1(int addr,int val) {
+				Debug.Assert(this!=null);
+				Debug.Assert(addr>=0);
+				if(this.nOp>addr) {
+					this.aOp[addr].p1=val;
+				}
+			}
+			public void sqlite3VdbeChangeP2(int addr,int val) {
+				Debug.Assert(this!=null);
+				Debug.Assert(addr>=0);
+				if(this.nOp>addr) {
+					this.aOp[addr].p2=val;
+				}
+			}
+			public void sqlite3VdbeChangeP3(int addr,int val) {
+				Debug.Assert(this!=null);
+				Debug.Assert(addr>=0);
+				if(this.nOp>addr) {
+					this.aOp[addr].p3=val;
+				}
+			}
+			public void sqlite3VdbeChangeP5(u8 val) {
+				Debug.Assert(this!=null);
+				if(this.aOp!=null) {
+					Debug.Assert(this.nOp>0);
+					this.aOp[this.nOp-1].p5=val;
+				}
+			}
+			public void sqlite3VdbeJumpHere(int addr) {
+				Debug.Assert(addr>=0);
+				this.sqlite3VdbeChangeP2(addr,this.nOp);
+			}
+			public void sqlite3VdbeChangeP4(int addr,CollSeq pColl,int n) {
+				union_p4 _p4=new union_p4();
+				_p4.pColl=pColl;
+				this.sqlite3VdbeChangeP4(addr,_p4,n);
+			}
+			public void sqlite3VdbeChangeP4(int addr,FuncDef pFunc,int n) {
+				union_p4 _p4=new union_p4();
+				_p4.pFunc=pFunc;
+				this.sqlite3VdbeChangeP4(addr,_p4,n);
+			}
+			public void sqlite3VdbeChangeP4(int addr,KeyInfo pKeyInfo,int n) {
+				union_p4 _p4=new union_p4();
+				_p4.pKeyInfo=pKeyInfo;
+				this.sqlite3VdbeChangeP4(addr,_p4,n);
+			}
+			public void sqlite3VdbeChangeP4(int addr,int i32n,int n) {
+				union_p4 _p4=new union_p4();
+				_p4.i=i32n;
+				this.sqlite3VdbeChangeP4(addr,_p4,n);
+			}
+			public void sqlite3VdbeChangeP4(int addr,char c,int n) {
+				union_p4 _p4=new union_p4();
+				_p4.z=c.ToString();
+				this.sqlite3VdbeChangeP4(addr,_p4,n);
+			}
+			public void sqlite3VdbeChangeP4(int addr,Mem m,int n) {
+				union_p4 _p4=new union_p4();
+				_p4.pMem=m;
+				this.sqlite3VdbeChangeP4(addr,_p4,n);
+			}
+			public void sqlite3VdbeChangeP4(int addr,string z,dxDel P4_Type) {
+				union_p4 _p4=new union_p4();
+				_p4.z=z;
+				this.sqlite3VdbeChangeP4(addr,_p4,P4_DYNAMIC);
+			}
+			public void sqlite3VdbeChangeP4(int addr,SubProgram pProgram,int n) {
+				union_p4 _p4=new union_p4();
+				_p4.pProgram=pProgram;
+				this.sqlite3VdbeChangeP4(addr,_p4,n);
+			}
+			public void sqlite3VdbeChangeP4(int addr,string z,int n) {
+				union_p4 _p4=new union_p4();
+				if(n>0&&n<=z.Length)
+					_p4.z=z.Substring(0,n);
+				else
+					_p4.z=z;
+				this.sqlite3VdbeChangeP4(addr,_p4,n);
+			}
+			public void sqlite3VdbeChangeP4(int addr,union_p4 _p4,int n) {
+				Op pOp;
+				sqlite3 db;
+				Debug.Assert(this!=null);
+				db=this.db;
+				Debug.Assert(this.magic==VDBE_MAGIC_INIT);
+				if(this.aOp==null/*|| db.mallocFailed != 0 */) {
+					if(n!=P4_KEYINFO&&n!=P4_VTAB) {
+						freeP4(db,n,_p4);
+					}
+					return;
+				}
+				Debug.Assert(this.nOp>0);
+				Debug.Assert(addr<this.nOp);
+				if(addr<0) {
+					addr=this.nOp-1;
+				}
+				pOp=this.aOp[addr];
+				freeP4(db,pOp.p4type,pOp.p4.p);
+				pOp.p4.p=null;
+				if(n==P4_INT32) {
+					/* Note: this cast is safe, because the origin data point was an int
+        ** that was cast to a (string ). */pOp.p4.i=_p4.i;
+					// SQLITE_PTR_TO_INT(zP4);
+					pOp.p4type=P4_INT32;
+				}
+				else
+					if(n==P4_INT64) {
+						pOp.p4.pI64=_p4.pI64;
+						pOp.p4type=n;
+					}
+					else
+						if(n==P4_REAL) {
+							pOp.p4.pReal=_p4.pReal;
+							pOp.p4type=n;
+						}
+						else
+							if(_p4==null) {
+								pOp.p4.p=null;
+								pOp.p4type=P4_NOTUSED;
+							}
+							else
+								if(n==P4_KEYINFO) {
+									KeyInfo pKeyInfo;
+									int nField,nByte;
+									nField=_p4.pKeyInfo.nField;
+									//nByte = sizeof(*pKeyInfo) + (nField-1)*sizeof(pKeyInfo.aColl[0]) + nField;
+									pKeyInfo=new KeyInfo();
+									//sqlite3DbMallocRaw(0, nByte);
+									pOp.p4.pKeyInfo=pKeyInfo;
+									if(pKeyInfo!=null) {
+										//u8 *aSortOrder;
+										// memcpy((char)pKeyInfo, zP4, nByte - nField);
+										//aSortOrder = pKeyInfo.aSortOrder;
+										//if( aSortOrder ){
+										//  pKeyInfo.aSortOrder = (unsigned char)&pKeyInfo.aColl[nField];
+										//  memcpy(pKeyInfo.aSortOrder, aSortOrder, nField);
+										//}
+										pKeyInfo=_p4.pKeyInfo.Copy();
+										pOp.p4type=P4_KEYINFO;
+									}
+									else {
+										//p.db.mallocFailed = 1;
+										pOp.p4type=P4_NOTUSED;
+									}
+									pOp.p4.pKeyInfo=_p4.pKeyInfo;
+									pOp.p4type=P4_KEYINFO;
+								}
+								else
+									if(n==P4_KEYINFO_HANDOFF||n==P4_KEYINFO_STATIC) {
+										pOp.p4.pKeyInfo=_p4.pKeyInfo;
+										pOp.p4type=P4_KEYINFO;
+									}
+									else
+										if(n==P4_FUNCDEF) {
+											pOp.p4.pFunc=_p4.pFunc;
+											pOp.p4type=P4_FUNCDEF;
+										}
+										else
+											if(n==P4_COLLSEQ) {
+												pOp.p4.pColl=_p4.pColl;
+												pOp.p4type=P4_COLLSEQ;
+											}
+											else
+												if(n==P4_DYNAMIC||n==P4_STATIC||n==P4_MPRINTF) {
+													pOp.p4.z=_p4.z;
+													pOp.p4type=P4_DYNAMIC;
+												}
+												else
+													if(n==P4_MEM) {
+														pOp.p4.pMem=_p4.pMem;
+														pOp.p4type=P4_MEM;
+													}
+													else
+														if(n==P4_INTARRAY) {
+															pOp.p4.ai=_p4.ai;
+															pOp.p4type=P4_INTARRAY;
+														}
+														else
+															if(n==P4_SUBPROGRAM) {
+																pOp.p4.pProgram=_p4.pProgram;
+																pOp.p4type=P4_SUBPROGRAM;
+															}
+															else
+																if(n==P4_VTAB) {
+																	pOp.p4.pVtab=_p4.pVtab;
+																	pOp.p4type=P4_VTAB;
+																	sqlite3VtabLock(_p4.pVtab);
+																	Debug.Assert((_p4.pVtab).db==this.db);
+																}
+																else
+																	if(n<0) {
+																		pOp.p4.p=_p4.p;
+																		pOp.p4type=n;
+																	}
+																	else {
+																		//if (n == 0) n =  n = StringExtensions.sqlite3Strlen30(zP4);
+																		pOp.p4.z=_p4.z;
+																		// sqlite3DbStrNDup(p.db, zP4, n);
+																		pOp.p4type=P4_DYNAMIC;
+																	}
+			}
+			public VdbeOp sqlite3VdbeGetOp(int addr) {
+				/* C89 specifies that the constant "dummy" will be initialized to all
+      ** zeros, which is correct.  MSVC generates a warning, nevertheless. */Debug.Assert(this.magic==VDBE_MAGIC_INIT);
+				if(addr<0) {
+					#if SQLITE_OMIT_TRACE
+																																																																																	if( p.nOp==0 ) return dummy;
+#endif
+					addr=this.nOp-1;
+				}
+				Debug.Assert((addr>=0&&addr<this.nOp)/* || p.db.mallocFailed != 0 */);
+				//if ( p.db.mallocFailed != 0 )
+				//{
+				//  return dummy;
+				//}
+				//else
+				{
+					return this.aOp[addr];
+				}
 			}
 		}
 		/*

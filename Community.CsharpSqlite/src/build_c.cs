@@ -188,7 +188,7 @@ p.zName, P4_STATIC );
         */if(pParse.cookieGoto>0) {
 					u32 mask;
 					int iDb;
-					sqlite3VdbeJumpHere(v,pParse.cookieGoto-1);
+					v.sqlite3VdbeJumpHere(pParse.cookieGoto-1);
 					for(iDb=0,mask=1;iDb<db.nDb;mask<<=1,iDb++) {
 						if((mask&pParse.cookieMask)==0)
 							continue;
@@ -634,7 +634,7 @@ p.zName, P4_STATIC );
 			Vdbe v=sqlite3GetVdbe(p);
 			sqlite3TableLock(p,iDb,MASTER_ROOT,1,SCHEMA_TABLE(iDb));
 			v.sqlite3VdbeAddOp3(OP_OpenWrite,0,MASTER_ROOT,iDb);
-			sqlite3VdbeChangeP4(v,-1,(int)5,P4_INT32);
+			v.sqlite3VdbeChangeP4(-1,(int)5,P4_INT32);
 			/* 5 column table */if(p.nTab==0) {
 				p.nTab=1;
 			}
@@ -896,7 +896,7 @@ goto begin_table_error;
 				v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_FILE_FORMAT,reg3);
 				v.sqlite3VdbeAddOp2(OP_Integer,(int)ENC(db),reg3);
 				v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_TEXT_ENCODING,reg3);
-				sqlite3VdbeJumpHere(v,j1);
+				v.sqlite3VdbeJumpHere(j1);
 				/* This just creates a place-holder record in the sqlite_master table.
         ** The record created does not contain anything yet.  It will be replaced
         ** by the real entry in code generated at sqlite3EndTable().
@@ -915,7 +915,7 @@ goto begin_table_error;
 				v.sqlite3VdbeAddOp2(OP_NewRowid,0,reg1);
 				v.sqlite3VdbeAddOp2(OP_Null,0,reg3);
 				v.sqlite3VdbeAddOp3(OP_Insert,0,reg3,reg1);
-				sqlite3VdbeChangeP5(v,OPFLAG_APPEND);
+				v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
 				v.sqlite3VdbeAddOp0(OP_Close);
 			}
 			/* Normal (non-error) return. */return;
@@ -1580,7 +1580,7 @@ goto begin_table_error;
 					Table pSelTab;
 					Debug.Assert(pParse.nTab==1);
 					v.sqlite3VdbeAddOp3(OP_OpenWrite,1,pParse.regRoot,iDb);
-					sqlite3VdbeChangeP5(v,1);
+					v.sqlite3VdbeChangeP5(1);
 					pParse.nTab=2;
 					sqlite3SelectDestInit(dest,SelectResultType.Table,1);
 					sqlite3Select(pParse,pSelect,ref dest);
@@ -2297,7 +2297,7 @@ return;
 			pKey=sqlite3IndexKeyinfo(pParse,pIndex);
 			v.sqlite3VdbeAddOp4(OP_OpenWrite,iIdx,tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 			if(memRootPage>=0) {
-				sqlite3VdbeChangeP5(v,1);
+				v.sqlite3VdbeChangeP5(1);
 			}
 			sqlite3OpenTable(pParse,iTab,iDb,pTab,OP_OpenRead);
 			addr1=v.sqlite3VdbeAddOp2(OP_Rewind,iTab,0);
@@ -2305,7 +2305,7 @@ return;
 			regIdxKey=sqlite3GenerateIndexKey(pParse,pIndex,iTab,regRecord,true);
 			if(pIndex.onError!=OE_None) {
 				int regRowid=regIdxKey+pIndex.nColumn;
-				int j2=sqlite3VdbeCurrentAddr(v)+2;
+				int j2=v.sqlite3VdbeCurrentAddr()+2;
 				int pRegKey=regIdxKey;
 				// SQLITE_INT_TO_PTR( regIdxKey );
 				/* The registers accessed by the OP_IsUnique opcode were allocated
@@ -2320,10 +2320,10 @@ return;
 				sqlite3HaltConstraint(pParse,OE_Abort,"indexed columns are not unique",P4_STATIC);
 			}
 			v.sqlite3VdbeAddOp2(OP_IdxInsert,iIdx,regRecord);
-			sqlite3VdbeChangeP5(v,OPFLAG_USESEEKRESULT);
+			v.sqlite3VdbeChangeP5(OPFLAG_USESEEKRESULT);
 			sqlite3ReleaseTempReg(pParse,regRecord);
 			v.sqlite3VdbeAddOp2(OP_Next,iTab,addr1+1);
-			sqlite3VdbeJumpHere(v,addr1);
+			v.sqlite3VdbeJumpHere(addr1);
 			v.sqlite3VdbeAddOp1(OP_Close,iTab);
 			v.sqlite3VdbeAddOp1(OP_Close,iIdx);
 		}

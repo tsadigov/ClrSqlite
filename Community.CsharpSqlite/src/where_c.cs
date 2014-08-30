@@ -786,7 +786,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
               ** API. To workaround them, add a dummy OP_Variable here.
               */int r1=sqlite3GetTempReg(pParse);
 							sqlite3ExprCodeTarget(pParse,pRight,r1);
-							sqlite3VdbeChangeP3(v,sqlite3VdbeCurrentAddr(v)-1,0);
+							v.sqlite3VdbeChangeP3(v.sqlite3VdbeCurrentAddr()-1,0);
 							sqlite3ReleaseTempReg(pParse,r1);
 						}
 					}
@@ -1947,12 +1947,12 @@ WhereCost pCost            /* Lowest cost query plan */
 			regRecord=sqlite3GetTempReg(pParse);
 			sqlite3GenerateIndexKey(pParse,pIdx,pLevel.iTabCur,regRecord,true);
 			v.sqlite3VdbeAddOp2(OP_IdxInsert,pLevel.iIdxCur,regRecord);
-			sqlite3VdbeChangeP5(v,OPFLAG_USESEEKRESULT);
+			v.sqlite3VdbeChangeP5(OPFLAG_USESEEKRESULT);
 			v.sqlite3VdbeAddOp2(OP_Next,pLevel.iTabCur,addrTop+1);
-			sqlite3VdbeChangeP5(v,SQLITE_STMTSTATUS_AUTOINDEX);
-			sqlite3VdbeJumpHere(v,addrTop);
+			v.sqlite3VdbeChangeP5(SQLITE_STMTSTATUS_AUTOINDEX);
+			v.sqlite3VdbeJumpHere(addrTop);
 			sqlite3ReleaseTempReg(pParse,regRecord);
-			/* Jump here when skipping the initialization */sqlite3VdbeJumpHere(v,addrInit);
+			/* Jump here when skipping the initialization */v.sqlite3VdbeJumpHere(addrInit);
 		}
 		#endif
 		#if !SQLITE_OMIT_VIRTUALTABLE
@@ -3257,7 +3257,7 @@ whereEqualScanEst_cancel:
 			}
 			/* Code the OP_Affinity opcode if there is anything left to do. */if(n>0) {
 				v.sqlite3VdbeAddOp2(OP_Affinity,_base,n);
-				sqlite3VdbeChangeP4(v,-1,zAff,n);
+				v.sqlite3VdbeChangeP4(-1,zAff,n);
 				sqlite3ExprCacheAffinityChange(pParse,_base,n);
 			}
 		}
@@ -3299,7 +3299,7 @@ whereEqualScanEst_cancel:
 					v.sqlite3VdbeAddOp2(OP_Rewind,iTab,0);
 					Debug.Assert((pLevel.plan.wsFlags&WHERE_IN_ABLE)!=0);
 					if(pLevel.u._in.nIn==0) {
-						pLevel.addrNxt=sqlite3VdbeMakeLabel(v);
+						pLevel.addrNxt=v.sqlite3VdbeMakeLabel();
 					}
 					pLevel.u._in.nIn++;
 					if(pLevel.u._in.aInLoop==null)
@@ -3608,8 +3608,8 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       ** means to continue with the next IN value combination.  When
       ** there are no IN operators in the constraints, the "addrNxt" label
       ** is the same as "addrBrk".
-      */addrBrk=pLevel.addrBrk=pLevel.addrNxt=sqlite3VdbeMakeLabel(v);
-			addrCont=pLevel.addrCont=sqlite3VdbeMakeLabel(v);
+      */addrBrk=pLevel.addrBrk=pLevel.addrNxt=v.sqlite3VdbeMakeLabel();
+			addrCont=pLevel.addrCont=v.sqlite3VdbeMakeLabel();
 			/* If this is the right table of a LEFT OUTER JOIN, allocate and
       ** initialize a memory cell that records if this table matches any
       ** row of the left table of the join.
@@ -3655,7 +3655,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				}
 				pLevel.op=OP_VNext;
 				pLevel.p1=iCur;
-				pLevel.p2=sqlite3VdbeCurrentAddr(v);
+				pLevel.p2=v.sqlite3VdbeCurrentAddr();
 				sqlite3ReleaseTempRange(pParse,iReg,nConstraint+2);
 				sqlite3ExprCachePop(pParse,1);
 			}
@@ -3744,7 +3744,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							}
 							disableTerm(pLevel,pEnd);
 						}
-						start=sqlite3VdbeCurrentAddr(v);
+						start=v.sqlite3VdbeCurrentAddr();
 						pLevel.op=(u8)(bRev!=0?OP_Prev:OP_Next);
 						pLevel.p1=iCur;
 						pLevel.p2=start;
@@ -3759,7 +3759,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							v.sqlite3VdbeAddOp2(OP_Rowid,iCur,iRowidReg);
 							sqlite3ExprCacheStore(pParse,iCur,-1,iRowidReg);
 							v.sqlite3VdbeAddOp3(testOp,memEndValue,addrBrk,iRowidReg);
-							sqlite3VdbeChangeP5(v,SQLITE_AFF_NUMERIC|SQLITE_JUMPIFNULL);
+							v.sqlite3VdbeChangeP5(SQLITE_AFF_NUMERIC|SQLITE_JUMPIFNULL);
 						}
 					}
 					else
@@ -3906,7 +3906,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							testcase(op==OP_SeekGe);
 							testcase(op==OP_SeekLe);
 							testcase(op==OP_SeekLt);
-							sqlite3VdbeAddOp4Int(v,op,iIdxCur,addrNxt,regBase,nConstraint);
+							v.sqlite3VdbeAddOp4Int(op,iIdxCur,addrNxt,regBase,nConstraint);
 							/* Load the value for the inequality constraint at the end of the
           ** range (if any).
           */nConstraint=nEq;
@@ -3933,14 +3933,14 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 								/* EV: R-30575-11662 */}
 							sqlite3DbFree(pParse.db,ref zStartAff);
 							sqlite3DbFree(pParse.db,ref zEndAff);
-							/* Top of the loop body */pLevel.p2=sqlite3VdbeCurrentAddr(v);
+							/* Top of the loop body */pLevel.p2=v.sqlite3VdbeCurrentAddr();
 							/* Check if the index cursor is past the end of the range. */op=aEndOp[((pRangeEnd!=null||nEq!=0)?1:0)*(1+bRev)];
 							testcase(op==OP_Noop);
 							testcase(op==OP_IdxGE);
 							testcase(op==OP_IdxLT);
 							if(op!=OP_Noop) {
-								sqlite3VdbeAddOp4Int(v,op,iIdxCur,addrNxt,regBase,nConstraint);
-								sqlite3VdbeChangeP5(v,(u8)(endEq!=bRev?1:0));
+								v.sqlite3VdbeAddOp4Int(op,iIdxCur,addrNxt,regBase,nConstraint);
+								v.sqlite3VdbeChangeP5((u8)(endEq!=bRev?1:0));
 							}
 							/* If there are inequality constraints, check that the value
           ** of the table column that the inequality contrains is not NULL.
@@ -4021,7 +4021,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 								/* Shortened table list or OR-clause generation */int regReturn=++pParse.nMem;
 								/* Register used with OP_Gosub */int regRowset=0;
 								/* Register for RowSet object */int regRowid=0;
-								/* Register holding rowid */int iLoopBody=sqlite3VdbeMakeLabel(v);
+								/* Register holding rowid */int iLoopBody=v.sqlite3VdbeMakeLabel();
 								/* Start of loop body */int iRetInit;
 								/* Address of regReturn init */int untestedTerms=0;
 								/* Some terms not completely tested */int ii;
@@ -4085,7 +4085,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 												int iSet=((ii==pOrWc.nTerm-1)?-1:ii);
 												int r;
 												r=sqlite3ExprCodeGetColumn(pParse,pTabItem.pTab,-1,iCur,regRowid);
-												sqlite3VdbeAddOp4Int(v,OP_RowSetTest,regRowset,sqlite3VdbeCurrentAddr(v)+2,r,iSet);
+												v.sqlite3VdbeAddOp4Int(OP_RowSetTest,regRowset,v.sqlite3VdbeCurrentAddr()+2,r,iSet);
 											}
 											v.sqlite3VdbeAddOp2(OP_Gosub,regReturn,iLoopBody);
 											/* The pSubWInfo.untestedTerms flag means that this OR term
@@ -4098,9 +4098,9 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 										}
 									}
 								}
-								sqlite3VdbeChangeP1(v,iRetInit,sqlite3VdbeCurrentAddr(v));
+								v.sqlite3VdbeChangeP1(iRetInit,v.sqlite3VdbeCurrentAddr());
 								v.sqlite3VdbeAddOp2(OP_Goto,0,pLevel.addrBrk);
-								sqlite3VdbeResolveLabel(v,iLoopBody);
+								v.sqlite3VdbeResolveLabel(iLoopBody);
 								if(pWInfo.nLevel>1)
 									sqlite3DbFree(pParse.db,ref pOrTab);
 								//sqlite3DbFree(pParse.db, pOrTab)
@@ -4159,7 +4159,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 			/* For a LEFT OUTER JOIN, generate code that will record the fact that
       ** at least one row of the right table has matched the left table.
       */if(pLevel.iLeftJoin!=0) {
-				pLevel.addrFirst=sqlite3VdbeCurrentAddr(v);
+				pLevel.addrFirst=v.sqlite3VdbeCurrentAddr();
 				v.sqlite3VdbeAddOp2(OP_Integer,1,pLevel.iLeftJoin);
 				#if SQLITE_DEBUG
 																																																																												        VdbeComment( v, "record LEFT JOIN hit" );
@@ -4368,7 +4368,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 			pWInfo.nLevel=nTabList;
 			pWInfo.pParse=pParse;
 			pWInfo.pTabList=pTabList;
-			pWInfo.iBreak=sqlite3VdbeMakeLabel(v);
+			pWInfo.iBreak=v.sqlite3VdbeMakeLabel();
 			pWInfo.pWC=pWC=new WhereClause();
 			// (WhereClause )((u8 )pWInfo)[nByteWInfo];
 			pWInfo.wctrlFlags=wctrlFlags;
@@ -4689,7 +4689,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 								int n=0;
 								for(;b!=0;b=b>>1,n++) {
 								}
-								sqlite3VdbeChangeP4(v,sqlite3VdbeCurrentAddr(v)-1,n,P4_INT32);
+								v.sqlite3VdbeChangeP4(v.sqlite3VdbeCurrentAddr()-1,n,P4_INT32);
 								//SQLITE_INT_TO_PTR(n)
 								Debug.Assert(n<=pTab.nCol);
 							}
@@ -4717,7 +4717,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				sqlite3CodeVerifySchema(pParse,iDb);
 				notReady&=~getMask(pWC.pMaskSet,pTabItem.iCursor);
 			}
-			pWInfo.iTop=sqlite3VdbeCurrentAddr(v);
+			pWInfo.iTop=v.sqlite3VdbeCurrentAddr();
 			//if( db.mallocFailed ) goto whereBeginError;
 			/* Generate the code to do the search.  Each iteration of the for
       ** loop below generates code for a single nested loop of the VM
@@ -4824,25 +4824,25 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       */sqlite3ExprCacheClear(pParse);
 			for(i=pWInfo.nLevel-1;i>=0;i--) {
 				pLevel=pWInfo.a[i];
-				sqlite3VdbeResolveLabel(v,pLevel.addrCont);
+				v.sqlite3VdbeResolveLabel(pLevel.addrCont);
 				if(pLevel.op!=OP_Noop) {
 					v.sqlite3VdbeAddOp2(pLevel.op,pLevel.p1,pLevel.p2);
-					sqlite3VdbeChangeP5(v,pLevel.p5);
+					v.sqlite3VdbeChangeP5(pLevel.p5);
 				}
 				if((pLevel.plan.wsFlags&WHERE_IN_ABLE)!=0&&pLevel.u._in.nIn>0) {
 					InLoop pIn;
 					int j;
-					sqlite3VdbeResolveLabel(v,pLevel.addrNxt);
+					v.sqlite3VdbeResolveLabel(pLevel.addrNxt);
 					for(j=pLevel.u._in.nIn;j>0;j--)//, pIn--)
 					 {
 						pIn=pLevel.u._in.aInLoop[j-1];
-						sqlite3VdbeJumpHere(v,pIn.addrInTop+1);
+						v.sqlite3VdbeJumpHere(pIn.addrInTop+1);
 						v.sqlite3VdbeAddOp2(OP_Next,pIn.iCur,pIn.addrInTop);
-						sqlite3VdbeJumpHere(v,pIn.addrInTop-1);
+						v.sqlite3VdbeJumpHere(pIn.addrInTop-1);
 					}
 					sqlite3DbFree(db,ref pLevel.u._in.aInLoop);
 				}
-				sqlite3VdbeResolveLabel(v,pLevel.addrBrk);
+				v.sqlite3VdbeResolveLabel(pLevel.addrBrk);
 				if(pLevel.iLeftJoin!=0) {
 					int addr;
 					addr=v.sqlite3VdbeAddOp1(OP_IfPos,pLevel.iLeftJoin);
@@ -4859,12 +4859,12 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 					else {
 						v.sqlite3VdbeAddOp2(OP_Goto,0,pLevel.addrFirst);
 					}
-					sqlite3VdbeJumpHere(v,addr);
+					v.sqlite3VdbeJumpHere(addr);
 				}
 			}
 			/* The "break" point is here, just past the end of the outer loop.
       ** Set it.
-      */sqlite3VdbeResolveLabel(v,pWInfo.iBreak);
+      */v.sqlite3VdbeResolveLabel(pWInfo.iBreak);
 			/* Close all of the cursors that were opened by sqlite3WhereBegin.
       */Debug.Assert(pWInfo.nLevel==1||pWInfo.nLevel==pTabList.nSrc);
 			for(i=0;i<pWInfo.nLevel;i++)//  for(i=0, pLevel=pWInfo.a; i<pWInfo.nLevel; i++, pLevel++){
@@ -4901,10 +4901,10 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 					Index pIdx=pLevel.plan.u.pIdx;
 					Debug.Assert(pIdx!=null);
 					//pOp = sqlite3VdbeGetOp( v, pWInfo.iTop );
-					last=sqlite3VdbeCurrentAddr(v);
+					last=v.sqlite3VdbeCurrentAddr();
 					for(k=pWInfo.iTop;k<last;k++)//, pOp++ )
 					 {
-						pOp=sqlite3VdbeGetOp(v,k);
+						pOp=v.sqlite3VdbeGetOp(k);
 						if(pOp.p1!=pLevel.iTabCur)
 							continue;
 						if(pOp.opcode==OP_Column) {

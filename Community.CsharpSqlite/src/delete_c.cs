@@ -368,7 +368,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				sqlite3WhereEnd(pWInfo);
 				/* Delete every item whose key was written to the list during the
         ** database scan.  We have to delete items after the scan is complete
-        ** because deleting an item can change the scan order. */end=sqlite3VdbeMakeLabel(v);
+        ** because deleting an item can change the scan order. */end=v.sqlite3VdbeMakeLabel();
 				/* Unless this is a view, open cursors for the table we are 
         ** deleting from and all its indices. If this is a view, then the
         ** only effect this statement has is to fire the INSTEAD OF 
@@ -382,7 +382,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 					VTable pVTab=sqlite3GetVTable(db,pTab);
 					sqlite3VtabMakeWritable(pParse,pTab);
 					v.sqlite3VdbeAddOp4(OP_VUpdate,0,1,iRowid,pVTab,P4_VTAB);
-					sqlite3VdbeChangeP5(v,OE_Abort);
+					v.sqlite3VdbeChangeP5(OE_Abort);
 					sqlite3MayAbort(pParse);
 				}
 				else
@@ -392,7 +392,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 					/* True to count changes */sqlite3GenerateRowDelete(pParse,pTab,iCur,iRowid,count,pTrigger,OE_Default);
 				}
 				/* End of the delete loop */v.sqlite3VdbeAddOp2(OP_Goto,0,addr);
-				sqlite3VdbeResolveLabel(v,end);
+				v.sqlite3VdbeResolveLabel(end);
 				/* Close the cursors open on the table and its indexes. */if(!isView&&!IsVirtual(pTab)) {
 					for(i=1,pIdx=pTab.pIndex;pIdx!=null;i++,pIdx=pIdx.pNext) {
 						v.sqlite3VdbeAddOp2(OP_Close,iCur+i,pIdx.tnum);
@@ -460,7 +460,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			/* Label resolved to end of generated code *//* Vdbe is guaranteed to have been allocated by this stage. */Debug.Assert(v!=null);
 			/* Seek cursor iCur to the row to delete. If this row no longer exists 
       ** (this can happen if a trigger program has already deleted it), do
-      ** not attempt to delete it or fire any DELETE triggers.  */iLabel=sqlite3VdbeMakeLabel(v);
+      ** not attempt to delete it or fire any DELETE triggers.  */iLabel=v.sqlite3VdbeMakeLabel();
 			v.sqlite3VdbeAddOp3(OP_NotExists,iCur,iLabel,iRowid);
 			/* If there are any triggers to fire, allocate a range of registers to
       ** use for the old.* references in the triggers.  */if(pParse.sqlite3FkRequired(pTab,null,0)!=0||pTrigger!=null) {
@@ -493,7 +493,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				sqlite3GenerateRowIndexDelete(pParse,pTab,iCur,0);
 				v.sqlite3VdbeAddOp2(OP_Delete,iCur,(count!=0?(int)OPFLAG_NCHANGE:0));
 				if(count!=0) {
-					sqlite3VdbeChangeP4(v,-1,pTab.zName,P4_TRANSIENT);
+					v.sqlite3VdbeChangeP4(-1,pTab.zName,P4_TRANSIENT);
 				}
 			}
 			/* Do any ON CASCADE, SET NULL or SET DEFAULT operations required to
@@ -502,7 +502,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			/* Invoke AFTER DELETE trigger programs. */sqlite3CodeRowTrigger(pParse,pTrigger,TK_DELETE,null,TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
 			/* Jump here if the row had already been deleted before any BEFORE
       ** trigger programs were invoked. Or if a trigger program throws a 
-      ** RAISE(IGNORE) exception.  */sqlite3VdbeResolveLabel(v,iLabel);
+      ** RAISE(IGNORE) exception.  */v.sqlite3VdbeResolveLabel(iLabel);
 		}
 		///<summary>
 		/// This routine generates VDBE code that causes the deletion of all
@@ -574,7 +574,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 					zAff=sqlite3IndexAffinityStr(v,pIdx);
 				}
 				v.sqlite3VdbeAddOp3(OP_MakeRecord,regBase,nCol+1,regOut);
-				sqlite3VdbeChangeP4(v,-1,zAff,P4_TRANSIENT);
+				v.sqlite3VdbeChangeP4(-1,zAff,P4_TRANSIENT);
 			}
 			sqlite3ReleaseTempRange(pParse,regBase,nCol+1);
 			return regBase;

@@ -224,7 +224,7 @@ namespace Community.CsharpSqlite {
 		static void sqlite3VdbeAddParseSchemaOp(Vdbe p,int iDb,string zWhere) {
 			int j;
 			int addr=p.sqlite3VdbeAddOp3(OP_ParseSchema,iDb,0,0);
-			sqlite3VdbeChangeP4(p,addr,zWhere,P4_DYNAMIC);
+			p.sqlite3VdbeChangeP4(addr,zWhere,P4_DYNAMIC);
 			for(j=0;j<p.db.nDb;j++)
 				sqlite3VdbeUsesBtree(p,j);
 		}
@@ -232,13 +232,6 @@ namespace Community.CsharpSqlite {
 		/// Add an opcode that includes the p4 value as an integer.
 		///
 		///</summary>
-		static int sqlite3VdbeAddOp4Int(Vdbe p,/* Add the opcode to this VM */int op,/* The new opcode */int p1,/* The P1 operand */int p2,/* The P2 operand */int p3,/* The P3 operand */int p4/* The P4 operand as an integer */) {
-			union_p4 _p4=new union_p4();
-			_p4.i=p4;
-			int addr=p.sqlite3VdbeAddOp3(op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,P4_INT32);
-			return addr;
-		}
 		///<summary>
 		/// Create a new symbolic label for an instruction that has yet to be
 		/// coded.  The symbolic label is really just a negative number.  The
@@ -254,47 +247,16 @@ namespace Community.CsharpSqlite {
 		/// Zero is returned if a malloc() fails.
 		///
 		///</summary>
-		static int sqlite3VdbeMakeLabel(Vdbe p) {
-			int i;
-			i=p.nLabel++;
-			Debug.Assert(p.magic==VDBE_MAGIC_INIT);
-			if(i>=p.nLabelAlloc) {
-				int n=p.nLabelAlloc==0?15:p.nLabelAlloc*2+5;
-				if(p.aLabel==null)
-					p.aLabel=sqlite3Malloc(p.aLabel,n);
-				else
-					Array.Resize(ref p.aLabel,n);
-				//p.aLabel = sqlite3DbReallocOrFree(p.db, p.aLabel,
-				//                                       n*sizeof(p.aLabel[0]));
-				p.nLabelAlloc=p.aLabel.Length;
-				//sqlite3DbMallocSize(p.db, p.aLabel)/sizeof(p.aLabel[0]);
-			}
-			if(p.aLabel!=null) {
-				p.aLabel[i]=-1;
-			}
-			return -1-i;
-		}
 		///<summary>
 		/// Resolve label "x" to be the address of the next instruction to
 		/// be inserted.  The parameter "x" must have been obtained from
 		/// a prior call to sqlite3VdbeMakeLabel().
 		///
 		///</summary>
-		static void sqlite3VdbeResolveLabel(Vdbe p,int x) {
-			int j=-1-x;
-			Debug.Assert(p.magic==VDBE_MAGIC_INIT);
-			Debug.Assert(j>=0&&j<p.nLabel);
-			if(p.aLabel!=null) {
-				p.aLabel[j]=p.nOp;
-			}
-		}
 		///<summary>
 		/// Mark the VDBE as one that can only be run one time.
 		///
 		///</summary>
-		static void sqlite3VdbeRunOnlyOnce(Vdbe p) {
-			p.runOnlyOnce=1;
-		}
 		#if SQLITE_DEBUG
 																																								
     /*
@@ -443,59 +405,10 @@ namespace Community.CsharpSqlite {
 		///
 		/// The Op.opflags field is set on all opcodes.
 		///</summary>
-		static void resolveP2Values(Vdbe p,ref int pMaxFuncArgs) {
-			int i;
-			int nMaxArgs=pMaxFuncArgs;
-			Op pOp;
-			int[] aLabel=p.aLabel;
-			p.readOnly=true;
-			for(i=0;i<p.nOp;i++)//  for(pOp=p->aOp, i=p->nOp-1; i>=0; i--, pOp++)
-			 {
-				pOp=p.aOp[i];
-				u8 opcode=pOp.opcode;
-				pOp.opflags=(u8)sqlite3OpcodeProperty[opcode];
-				if(opcode==OP_Function||opcode==OP_AggStep) {
-					if(pOp.p5>nMaxArgs)
-						nMaxArgs=pOp.p5;
-				}
-				else
-					if((opcode==OP_Transaction&&pOp.p2!=0)||opcode==OP_Vacuum) {
-						p.readOnly=false;
-						#if !SQLITE_OMIT_VIRTUALTABLE
-					}
-					else
-						if(opcode==OP_VUpdate) {
-							if(pOp.p2>nMaxArgs)
-								nMaxArgs=pOp.p2;
-						}
-						else
-							if(opcode==OP_VFilter) {
-								int n;
-								Debug.Assert(p.nOp-i>=3);
-								Debug.Assert(p.aOp[i-1].opcode==OP_Integer);
-								//pOp[-1].opcode==OP_Integer );
-								n=p.aOp[i-1].p1;
-								//pOp[-1].p1;
-								if(n>nMaxArgs)
-									nMaxArgs=n;
-								#endif
-							}
-				if((pOp.opflags&OPFLG_JUMP)!=0&&pOp.p2<0) {
-					Debug.Assert(-1-pOp.p2<p.nLabel);
-					pOp.p2=aLabel[-1-pOp.p2];
-				}
-			}
-			sqlite3DbFree(p.db,ref p.aLabel);
-			pMaxFuncArgs=nMaxArgs;
-		}
 		///<summary>
 		/// Return the address of the next instruction to be inserted.
 		///
 		///</summary>
-		static int sqlite3VdbeCurrentAddr(Vdbe p) {
-			Debug.Assert(p.magic==VDBE_MAGIC_INIT);
-			return p.nOp;
-		}
 		///<summary>
 		/// This function returns a pointer to the array of opcodes associated with
 		/// the Vdbe passed as the first argument. It is the callers responsibility
@@ -508,62 +421,11 @@ namespace Community.CsharpSqlite {
 		/// returned program.
 		///
 		///</summary>
-		static VdbeOp[] sqlite3VdbeTakeOpArray(Vdbe p,ref int pnOp,ref int pnMaxArg) {
-			VdbeOp[] aOp=p.aOp;
-			Debug.Assert(aOp!=null);
-			// && 0==p.db.mallocFailed );
-			/* Check that sqlite3VdbeUsesBtree() was not called on this VM */Debug.Assert(p.btreeMask==0);
-			resolveP2Values(p,ref pnMaxArg);
-			pnOp=p.nOp;
-			p.aOp=null;
-			return aOp;
-		}
 		///<summary>
 		/// Add a whole list of operations to the operation stack.  Return the
 		/// address of the first operation added.
 		///
 		///</summary>
-		static int sqlite3VdbeAddOpList(Vdbe p,int nOp,VdbeOpList[] aOp) {
-			int addr;
-			Debug.Assert(p.magic==VDBE_MAGIC_INIT);
-			if(p.nOp+nOp>p.nOpAlloc&&growOpArray(p)!=0) {
-				return 0;
-			}
-			addr=p.nOp;
-			if(ALWAYS(nOp>0)) {
-				int i;
-				VdbeOpList pIn;
-				for(i=0;i<nOp;i++) {
-					pIn=aOp[i];
-					int p2=pIn.p2;
-					if(p.aOp[i+addr]==null)
-						p.aOp[i+addr]=new VdbeOp();
-					VdbeOp pOut=p.aOp[i+addr];
-					pOut.opcode=pIn.opcode;
-					pOut.p1=pIn.p1;
-					if(p2<0&&(sqlite3OpcodeProperty[pOut.opcode]&OPFLG_JUMP)!=0) {
-						pOut.p2=addr+(-1-p2);
-						// ADDR(p2);
-					}
-					else {
-						pOut.p2=p2;
-					}
-					pOut.p3=pIn.p3;
-					pOut.p4type=P4_NOTUSED;
-					pOut.p4.p=null;
-					pOut.p5=0;
-					#if SQLITE_DEBUG
-																																																																																																				          pOut.zComment = null;
-          if ( sqlite3VdbeAddopTrace )
-          {
-            sqlite3VdbePrintOp( null, i + addr, p.aOp[i + addr] );
-          }
-#endif
-				}
-				p.nOp+=nOp;
-			}
-			return addr;
-		}
 		///<summary>
 		/// Change the value of the P1 operand for a specific instruction.
 		/// This routine is useful when a large program is loaded from a
@@ -571,57 +433,25 @@ namespace Community.CsharpSqlite {
 		/// few minor changes to the program.
 		///
 		///</summary>
-		static void sqlite3VdbeChangeP1(Vdbe p,int addr,int val) {
-			Debug.Assert(p!=null);
-			Debug.Assert(addr>=0);
-			if(p.nOp>addr) {
-				p.aOp[addr].p1=val;
-			}
-		}
 		///<summary>
 		/// Change the value of the P2 operand for a specific instruction.
 		/// This routine is useful for setting a jump destination.
 		///
 		///</summary>
-		static void sqlite3VdbeChangeP2(Vdbe p,int addr,int val) {
-			Debug.Assert(p!=null);
-			Debug.Assert(addr>=0);
-			if(p.nOp>addr) {
-				p.aOp[addr].p2=val;
-			}
-		}
 		///<summary>
 		/// Change the value of the P3 operand for a specific instruction.
 		///
 		///</summary>
-		static void sqlite3VdbeChangeP3(Vdbe p,int addr,int val) {
-			Debug.Assert(p!=null);
-			Debug.Assert(addr>=0);
-			if(p.nOp>addr) {
-				p.aOp[addr].p3=val;
-			}
-		}
 		///<summary>
 		/// Change the value of the P5 operand for the most recently
 		/// added operation.
 		///
 		///</summary>
-		static void sqlite3VdbeChangeP5(Vdbe p,u8 val) {
-			Debug.Assert(p!=null);
-			if(p.aOp!=null) {
-				Debug.Assert(p.nOp>0);
-				p.aOp[p.nOp-1].p5=val;
-			}
-		}
 		///<summary>
 		/// Change the P2 operand of instruction addr so that it points to
 		/// the address of the next instruction to be coded.
 		///
 		///</summary>
-		static void sqlite3VdbeJumpHere(Vdbe p,int addr) {
-			Debug.Assert(addr>=0);
-			sqlite3VdbeChangeP2(p,addr,p.nOp);
-		}
 		///<summary>
 		/// If the input FuncDef structure is ephemeral, then free it.  If
 		/// the FuncDef is not ephermal, then do nothing.
@@ -760,184 +590,14 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		//P4_COLLSEQ
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,CollSeq pColl,int n) {
-			union_p4 _p4=new union_p4();
-			_p4.pColl=pColl;
-			sqlite3VdbeChangeP4(p,addr,_p4,n);
-		}
 		//P4_FUNCDEF
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,FuncDef pFunc,int n) {
-			union_p4 _p4=new union_p4();
-			_p4.pFunc=pFunc;
-			sqlite3VdbeChangeP4(p,addr,_p4,n);
-		}
 		//P4_INT32
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,int i32n,int n) {
-			union_p4 _p4=new union_p4();
-			_p4.i=i32n;
-			sqlite3VdbeChangeP4(p,addr,_p4,n);
-		}
 		//P4_KEYINFO
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,KeyInfo pKeyInfo,int n) {
-			union_p4 _p4=new union_p4();
-			_p4.pKeyInfo=pKeyInfo;
-			sqlite3VdbeChangeP4(p,addr,_p4,n);
-		}
 		//CHAR
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,char c,int n) {
-			union_p4 _p4=new union_p4();
-			_p4.z=c.ToString();
-			sqlite3VdbeChangeP4(p,addr,_p4,n);
-		}
 		//MEM
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,Mem m,int n) {
-			union_p4 _p4=new union_p4();
-			_p4.pMem=m;
-			sqlite3VdbeChangeP4(p,addr,_p4,n);
-		}
 		//STRING
 		//STRING + Type
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,string z,dxDel P4_Type) {
-			union_p4 _p4=new union_p4();
-			_p4.z=z;
-			sqlite3VdbeChangeP4(p,addr,_p4,P4_DYNAMIC);
-		}
 		//SUBPROGRAM
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,SubProgram pProgram,int n) {
-			union_p4 _p4=new union_p4();
-			_p4.pProgram=pProgram;
-			sqlite3VdbeChangeP4(p,addr,_p4,n);
-		}
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,string z,int n) {
-			union_p4 _p4=new union_p4();
-			if(n>0&&n<=z.Length)
-				_p4.z=z.Substring(0,n);
-			else
-				_p4.z=z;
-			sqlite3VdbeChangeP4(p,addr,_p4,n);
-		}
-		static void sqlite3VdbeChangeP4(Vdbe p,int addr,union_p4 _p4,int n) {
-			Op pOp;
-			sqlite3 db;
-			Debug.Assert(p!=null);
-			db=p.db;
-			Debug.Assert(p.magic==VDBE_MAGIC_INIT);
-			if(p.aOp==null/*|| db.mallocFailed != 0 */) {
-				if(n!=P4_KEYINFO&&n!=P4_VTAB) {
-					freeP4(db,n,_p4);
-				}
-				return;
-			}
-			Debug.Assert(p.nOp>0);
-			Debug.Assert(addr<p.nOp);
-			if(addr<0) {
-				addr=p.nOp-1;
-			}
-			pOp=p.aOp[addr];
-			freeP4(db,pOp.p4type,pOp.p4.p);
-			pOp.p4.p=null;
-			if(n==P4_INT32) {
-				/* Note: this cast is safe, because the origin data point was an int
-        ** that was cast to a (string ). */pOp.p4.i=_p4.i;
-				// SQLITE_PTR_TO_INT(zP4);
-				pOp.p4type=P4_INT32;
-			}
-			else
-				if(n==P4_INT64) {
-					pOp.p4.pI64=_p4.pI64;
-					pOp.p4type=n;
-				}
-				else
-					if(n==P4_REAL) {
-						pOp.p4.pReal=_p4.pReal;
-						pOp.p4type=n;
-					}
-					else
-						if(_p4==null) {
-							pOp.p4.p=null;
-							pOp.p4type=P4_NOTUSED;
-						}
-						else
-							if(n==P4_KEYINFO) {
-								KeyInfo pKeyInfo;
-								int nField,nByte;
-								nField=_p4.pKeyInfo.nField;
-								//nByte = sizeof(*pKeyInfo) + (nField-1)*sizeof(pKeyInfo.aColl[0]) + nField;
-								pKeyInfo=new KeyInfo();
-								//sqlite3DbMallocRaw(0, nByte);
-								pOp.p4.pKeyInfo=pKeyInfo;
-								if(pKeyInfo!=null) {
-									//u8 *aSortOrder;
-									// memcpy((char)pKeyInfo, zP4, nByte - nField);
-									//aSortOrder = pKeyInfo.aSortOrder;
-									//if( aSortOrder ){
-									//  pKeyInfo.aSortOrder = (unsigned char)&pKeyInfo.aColl[nField];
-									//  memcpy(pKeyInfo.aSortOrder, aSortOrder, nField);
-									//}
-									pKeyInfo=_p4.pKeyInfo.Copy();
-									pOp.p4type=P4_KEYINFO;
-								}
-								else {
-									//p.db.mallocFailed = 1;
-									pOp.p4type=P4_NOTUSED;
-								}
-								pOp.p4.pKeyInfo=_p4.pKeyInfo;
-								pOp.p4type=P4_KEYINFO;
-							}
-							else
-								if(n==P4_KEYINFO_HANDOFF||n==P4_KEYINFO_STATIC) {
-									pOp.p4.pKeyInfo=_p4.pKeyInfo;
-									pOp.p4type=P4_KEYINFO;
-								}
-								else
-									if(n==P4_FUNCDEF) {
-										pOp.p4.pFunc=_p4.pFunc;
-										pOp.p4type=P4_FUNCDEF;
-									}
-									else
-										if(n==P4_COLLSEQ) {
-											pOp.p4.pColl=_p4.pColl;
-											pOp.p4type=P4_COLLSEQ;
-										}
-										else
-											if(n==P4_DYNAMIC||n==P4_STATIC||n==P4_MPRINTF) {
-												pOp.p4.z=_p4.z;
-												pOp.p4type=P4_DYNAMIC;
-											}
-											else
-												if(n==P4_MEM) {
-													pOp.p4.pMem=_p4.pMem;
-													pOp.p4type=P4_MEM;
-												}
-												else
-													if(n==P4_INTARRAY) {
-														pOp.p4.ai=_p4.ai;
-														pOp.p4type=P4_INTARRAY;
-													}
-													else
-														if(n==P4_SUBPROGRAM) {
-															pOp.p4.pProgram=_p4.pProgram;
-															pOp.p4type=P4_SUBPROGRAM;
-														}
-														else
-															if(n==P4_VTAB) {
-																pOp.p4.pVtab=_p4.pVtab;
-																pOp.p4type=P4_VTAB;
-																sqlite3VtabLock(_p4.pVtab);
-																Debug.Assert((_p4.pVtab).db==p.db);
-															}
-															else
-																if(n<0) {
-																	pOp.p4.p=_p4.p;
-																	pOp.p4type=n;
-																}
-																else {
-																	//if (n == 0) n =  n = StringExtensions.sqlite3Strlen30(zP4);
-																	pOp.p4.z=_p4.z;
-																	// sqlite3DbStrNDup(p.db, zP4, n);
-																	pOp.p4type=P4_DYNAMIC;
-																}
-		}
 		#if !NDEBUG
 																																								    ///<summary>
 /// Change the comment on the the most recently coded instruction.  Or
@@ -1010,25 +670,7 @@ namespace Community.CsharpSqlite {
 		/// check the value of p->nOp-1 before continuing.
 		///</summary>
 		const VdbeOp dummy=null;
-		/* Ignore the MSVC warning about no initializer */static VdbeOp sqlite3VdbeGetOp(Vdbe p,int addr) {
-			/* C89 specifies that the constant "dummy" will be initialized to all
-      ** zeros, which is correct.  MSVC generates a warning, nevertheless. */Debug.Assert(p.magic==VDBE_MAGIC_INIT);
-			if(addr<0) {
-				#if SQLITE_OMIT_TRACE
-																																																																																if( p.nOp==0 ) return dummy;
-#endif
-				addr=p.nOp-1;
-			}
-			Debug.Assert((addr>=0&&addr<p.nOp)/* || p.db.mallocFailed != 0 */);
-			//if ( p.db.mallocFailed != 0 )
-			//{
-			//  return dummy;
-			//}
-			//else
-			{
-				return p.aOp[addr];
-			}
-		}
+		/* Ignore the MSVC warning about no initializer */
 		#if !SQLITE_OMIT_EXPLAIN || !NDEBUG || VDBE_PROFILE || SQLITE_DEBUG
 		///<summary>
 		/// Compute a string that describes the P4 parameter for an opcode.
@@ -1732,7 +1374,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       ** an array to marshal SQL function arguments in.
       *///zCsr = (u8)&p->aOp[p->nOp];       /* Memory avaliable for allocation */
 			//zEnd = (u8)&p->aOp[p->nOpAlloc];  /* First byte past end of zCsr[] */
-			resolveP2Values(p,ref nArg);
+			p.resolveP2Values(ref nArg);
 			p.usesStmtJournal=(pParse.isMultiWrite!=0&&pParse.mayAbort!=0);
 			if(pParse.explain!=0&&nMem<10) {
 				nMem=10;

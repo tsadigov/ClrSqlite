@@ -537,9 +537,9 @@ return;
 				/* 8 */};
 				sqlite3BeginWriteOperation(pParse,0,iDb);
 				sqlite3OpenMasterTable(pParse,iDb);
-				_base=sqlite3VdbeAddOpList(v,dropTrigger.Length,dropTrigger);
-				sqlite3VdbeChangeP4(v,_base+1,pTrigger.zName,P4_TRANSIENT);
-				sqlite3VdbeChangeP4(v,_base+4,"trigger",P4_STATIC);
+				_base=v.sqlite3VdbeAddOpList(dropTrigger.Length,dropTrigger);
+				v.sqlite3VdbeChangeP4(_base+1,pTrigger.zName,P4_TRANSIENT);
+				v.sqlite3VdbeChangeP4(_base+4,"trigger",P4_STATIC);
 				sqlite3ChangeCookie(pParse,iDb);
 				v.sqlite3VdbeAddOp2(OP_Close,0,0);
 				v.sqlite3VdbeAddOp4(OP_DropTrigger,iDb,0,0,pTrigger.zName,0);
@@ -813,7 +813,7 @@ return;
         );
 #endif
 				#if !SQLITE_OMIT_TRACE
-				sqlite3VdbeChangeP4(v,-1,sqlite3MPrintf(db,"-- TRIGGER %s",pTrigger.zName),P4_DYNAMIC);
+				v.sqlite3VdbeChangeP4(-1,sqlite3MPrintf(db,"-- TRIGGER %s",pTrigger.zName),P4_DYNAMIC);
 				#endif
 				/* If one was specified, code the WHEN clause. If it evaluates to false
     ** (or NULL) the sub-vdbe is immediately halted by jumping to the 
@@ -821,14 +821,14 @@ return;
 					pWhen=sqlite3ExprDup(db,pTrigger.pWhen,0);
 					if(SQLITE_OK==sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
 					) {
-						iEndTrigger=sqlite3VdbeMakeLabel(v);
+						iEndTrigger=v.sqlite3VdbeMakeLabel();
 						sqlite3ExprIfFalse(pSubParse,pWhen,iEndTrigger,SQLITE_JUMPIFNULL);
 					}
 					sqlite3ExprDelete(db,ref pWhen);
 				}
 				/* Code the trigger program into the sub-vdbe. */codeTriggerProgram(pSubParse,pTrigger.step_list,orconf);
 				/* Insert an OP_Halt at the end of the sub-program. */if(iEndTrigger!=0) {
-					sqlite3VdbeResolveLabel(v,iEndTrigger);
+					v.sqlite3VdbeResolveLabel(iEndTrigger);
 				}
 				v.sqlite3VdbeAddOp0(OP_Halt);
 				#if SQLITE_DEBUG
@@ -836,7 +836,7 @@ return;
 #endif
 				transferParseError(pParse,pSubParse);
 				//if( db.mallocFailed==0 ){
-				pProgram.aOp=sqlite3VdbeTakeOpArray(v,ref pProgram.nOp,ref pTop.nMaxArg);
+				pProgram.aOp=v.sqlite3VdbeTakeOpArray(ref pProgram.nOp,ref pTop.nMaxArg);
 				//}
 				pProgram.nMem=pSubParse.nMem;
 				pProgram.nCsr=pSubParse.nTab;
@@ -888,7 +888,7 @@ return;
       ** is a pointer to the sub-vdbe containing the trigger program.  */if(pPrg!=null) {
 				bool bRecursive=(!String.IsNullOrEmpty(p.zName)&&0==(pParse.db.flags&SQLITE_RecTriggers));
 				v.sqlite3VdbeAddOp3(OP_Program,reg,ignoreJump,++pParse.nMem);
-				sqlite3VdbeChangeP4(v,-1,pPrg.pProgram,P4_SUBPROGRAM);
+				v.sqlite3VdbeChangeP4(-1,pPrg.pProgram,P4_SUBPROGRAM);
 				#if SQLITE_DEBUG
 																																																																												        VdbeComment
             ( v, "Call: %s.%s", ( !String.IsNullOrEmpty( p.zName ) ? p.zName : "fkey" ), onErrorText( orconf ) );
@@ -897,7 +897,7 @@ return;
     ** recursive invocation of this trigger program is disallowed. Recursive
     ** invocation is disallowed if (a) the sub-program is really a trigger,
     ** not a foreign key action, and (b) the flag to enable recursive triggers
-    ** is clear.  */sqlite3VdbeChangeP5(v,(u8)(bRecursive?1:0));
+    ** is clear.  */v.sqlite3VdbeChangeP5((u8)(bRecursive?1:0));
 			}
 		}
 		///<summary>

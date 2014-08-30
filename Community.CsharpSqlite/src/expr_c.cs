@@ -197,7 +197,7 @@ namespace Community.CsharpSqlite {
 			p4=sqlite3BinaryCompareCollSeq(pParse,pLeft,pRight);
 			p5=binaryCompareP5(pLeft,pRight,jumpIfNull);
 			addr=pParse.pVdbe.sqlite3VdbeAddOp4(opcode,in2,dest,in1,p4,P4_COLLSEQ);
-			sqlite3VdbeChangeP5(pParse.pVdbe,(u8)p5);
+			pParse.pVdbe.sqlite3VdbeChangeP5((u8)p5);
 			return addr;
 		}
 		#if SQLITE_MAX_EXPR_DEPTH
@@ -1222,7 +1222,7 @@ return null;
 					v.sqlite3VdbeAddOp2(OP_Integer,1,iMem);
 					sqlite3OpenTable(pParse,iTab,iDb,pTab,OP_OpenRead);
 					eType=IN_INDEX_ROWID;
-					sqlite3VdbeJumpHere(v,iAddr);
+					v.sqlite3VdbeJumpHere(iAddr);
 				}
 				else {
 					Index pIdx;
@@ -1247,7 +1247,7 @@ return null;
 																																																																																																																																					              VdbeComment( v, "%s", pIdx.zName );
 #endif
 							eType=IN_INDEX_INDEX;
-							sqlite3VdbeJumpHere(v,iAddr);
+							v.sqlite3VdbeJumpHere(iAddr);
 							if(//prNotFound != null &&         -- always exists under C#
 							pTab.aCol[iCol].notNull==0) {
 								prNotFound=++pParse.nMem;
@@ -1369,7 +1369,7 @@ return null;
             */pExpr.iTable=pParse.nTab++;
 				addr=v.sqlite3VdbeAddOp2(OP_OpenEphemeral,(int)pExpr.iTable,!isRowid);
 				if(rMayHaveNull==0)
-					sqlite3VdbeChangeP5(v,BTREE_UNORDERED);
+					v.sqlite3VdbeChangeP5(BTREE_UNORDERED);
 				keyInfo=new KeyInfo();
 				// memset( &keyInfo, 0, sizeof(keyInfo ));
 				keyInfo.nField=1;
@@ -1431,7 +1431,7 @@ return null;
 							else {
 								r3=sqlite3ExprCodeTarget(pParse,pE2,r1);
 								if(isRowid) {
-									v.sqlite3VdbeAddOp2(OP_MustBeInt,r3,sqlite3VdbeCurrentAddr(v)+2);
+									v.sqlite3VdbeAddOp2(OP_MustBeInt,r3,v.sqlite3VdbeCurrentAddr()+2);
 									v.sqlite3VdbeAddOp3(OP_Insert,pExpr.iTable,r2,r3);
 								}
 								else {
@@ -1445,7 +1445,7 @@ return null;
 						sqlite3ReleaseTempReg(pParse,r2);
 					}
 				if(!isRowid) {
-					sqlite3VdbeChangeP4(v,addr,keyInfo,P4_KEYINFO);
+					v.sqlite3VdbeChangeP4(addr,keyInfo,P4_KEYINFO);
 				}
 				break;
 			}
@@ -1491,7 +1491,7 @@ return null;
 			}
 			}
 			if(testAddr!=0) {
-				sqlite3VdbeJumpHere(v,testAddr-1);
+				v.sqlite3VdbeJumpHere(testAddr-1);
 			}
 			sqlite3ExprCachePop(pParse,1);
 			return rReg;
@@ -1544,7 +1544,7 @@ return null;
 				int addr1=v.sqlite3VdbeAddOp1(OP_NotNull,r1);
 				v.sqlite3VdbeAddOp2(OP_Rewind,pExpr.iTable,destIfFalse);
 				v.sqlite3VdbeAddOp2(OP_Goto,0,destIfNull);
-				sqlite3VdbeJumpHere(v,addr1);
+				v.sqlite3VdbeJumpHere(addr1);
 			}
 			if(eType==IN_INDEX_ROWID) {
 				/* In this case, the RHS is the ROWID of table b-tree
@@ -1566,7 +1566,7 @@ return null;
           **
           ** Also run this branch if NULL is equivalent to FALSE
           ** for this particular IN operator.
-          */sqlite3VdbeAddOp4Int(v,OP_NotFound,pExpr.iTable,destIfFalse,r1,1);
+          */v.sqlite3VdbeAddOp4Int(OP_NotFound,pExpr.iTable,destIfFalse,r1,1);
 				}
 				else {
 					/* In this branch, the RHS of the IN might contain a NULL and
@@ -1576,25 +1576,25 @@ return null;
 					/* First check to see if the LHS is contained in the RHS.  If so,
           ** then the presence of NULLs in the RHS does not matter, so jump
           ** over all of the code that follows.
-          */j1=sqlite3VdbeAddOp4Int(v,OP_Found,pExpr.iTable,0,r1,1);
+          */j1=v.sqlite3VdbeAddOp4Int(OP_Found,pExpr.iTable,0,r1,1);
 					/* Here we begin generating code that runs if the LHS is not
           ** contained within the RHS.  Generate additional code that
           ** tests the RHS for NULLs.  If the RHS contains a NULL then
           ** jump to destIfNull.  If there are no NULLs in the RHS then
           ** jump to destIfFalse.
           */j2=v.sqlite3VdbeAddOp1(OP_NotNull,rRhsHasNull);
-					j3=sqlite3VdbeAddOp4Int(v,OP_Found,pExpr.iTable,0,rRhsHasNull,1);
+					j3=v.sqlite3VdbeAddOp4Int(OP_Found,pExpr.iTable,0,rRhsHasNull,1);
 					v.sqlite3VdbeAddOp2(OP_Integer,-1,rRhsHasNull);
-					sqlite3VdbeJumpHere(v,j3);
+					v.sqlite3VdbeJumpHere(j3);
 					v.sqlite3VdbeAddOp2(OP_AddImm,rRhsHasNull,1);
-					sqlite3VdbeJumpHere(v,j2);
+					v.sqlite3VdbeJumpHere(j2);
 					/* Jump to the appropriate target depending on whether or not
           ** the RHS contains a NULL
           */v.sqlite3VdbeAddOp2(OP_If,rRhsHasNull,destIfNull);
 					v.sqlite3VdbeAddOp2(OP_Goto,0,destIfFalse);
 					/* The OP_Found at the top of this branch jumps here when true, 
           ** causing the overall IN expression evaluation to fall through.
-          */sqlite3VdbeJumpHere(v,j1);
+          */v.sqlite3VdbeJumpHere(j1);
 				}
 			}
 			sqlite3ReleaseTempReg(pParse,r1);
@@ -2052,7 +2052,7 @@ return;
 				v.sqlite3VdbeAddOp2(OP_Variable,pExpr.iColumn,target);
 				if(pExpr.u.zToken.Length>1) {
 					Debug.Assert(pExpr.u.zToken[0]=='?'||pExpr.u.zToken.CompareTo(pParse.azVar[pExpr.iColumn-1])==0);
-					sqlite3VdbeChangeP4(v,-1,pParse.azVar[pExpr.iColumn-1],P4_STATIC);
+					v.sqlite3VdbeChangeP4(-1,pParse.azVar[pExpr.iColumn-1],P4_STATIC);
 				}
 				break;
 			}
@@ -2216,7 +2216,7 @@ return;
 				testcase(regFree1==0);
 				addr=v.sqlite3VdbeAddOp1(op,r1);
 				v.sqlite3VdbeAddOp2(OP_AddImm,target,-1);
-				sqlite3VdbeJumpHere(v,addr);
+				v.sqlite3VdbeJumpHere(addr);
 				break;
 			}
 			case TK_AGG_FUNCTION: {
@@ -2263,7 +2263,7 @@ return;
             ** IFNULL() functions.  This avoids unnecessary evalation of
             ** arguments past the first non-NULL argument.
             */if((pDef.flags&SQLITE_FUNC_COALESCE)!=0) {
-					int endCoalesce=sqlite3VdbeMakeLabel(v);
+					int endCoalesce=v.sqlite3VdbeMakeLabel();
 					Debug.Assert(nFarg>=2);
 					sqlite3ExprCode(pParse,pFarg.a[0].pExpr,target);
 					for(i=1;i<nFarg;i++) {
@@ -2273,7 +2273,7 @@ return;
 						sqlite3ExprCode(pParse,pFarg.a[i].pExpr,target);
 						sqlite3ExprCachePop(pParse,1);
 					}
-					sqlite3VdbeResolveLabel(v,endCoalesce);
+					v.sqlite3VdbeResolveLabel(endCoalesce);
 					break;
 				}
 				if(pFarg!=null) {
@@ -2319,7 +2319,7 @@ return;
 					v.sqlite3VdbeAddOp4(OP_CollSeq,0,0,0,pColl,P4_COLLSEQ);
 				}
 				v.sqlite3VdbeAddOp4(OP_Function,constMask,r1,target,pDef,P4_FUNCDEF);
-				sqlite3VdbeChangeP5(v,(u8)nFarg);
+				v.sqlite3VdbeChangeP5((u8)nFarg);
 				if(nFarg!=0) {
 					sqlite3ReleaseTempRange(pParse,r1,nFarg);
 				}
@@ -2334,14 +2334,14 @@ return;
 				break;
 			}
 			case TK_IN: {
-				int destIfFalse=sqlite3VdbeMakeLabel(v);
-				int destIfNull=sqlite3VdbeMakeLabel(v);
+				int destIfFalse=v.sqlite3VdbeMakeLabel();
+				int destIfNull=v.sqlite3VdbeMakeLabel();
 				v.sqlite3VdbeAddOp2(OP_Null,0,target);
 				sqlite3ExprCodeIN(pParse,pExpr,destIfFalse,destIfNull);
 				v.sqlite3VdbeAddOp2(OP_Integer,1,target);
-				sqlite3VdbeResolveLabel(v,destIfFalse);
+				v.sqlite3VdbeResolveLabel(destIfFalse);
 				v.sqlite3VdbeAddOp2(OP_AddImm,target,0);
-				sqlite3VdbeResolveLabel(v,destIfNull);
+				v.sqlite3VdbeResolveLabel(destIfNull);
 				break;
 			}
 			#endif
@@ -2464,7 +2464,7 @@ return;
 				pEList=pExpr.x.pList;
 				aListelem=pEList.a;
 				nExpr=pEList.nExpr;
-				endLabel=sqlite3VdbeMakeLabel(v);
+				endLabel=v.sqlite3VdbeMakeLabel();
 				if((pX=pExpr.pLeft)!=null) {
 					cacheX=pX;
 					testcase(pX.op==TK_COLUMN);
@@ -2489,7 +2489,7 @@ return;
 					else {
 						pTest=aListelem[i].pExpr;
 					}
-					nextCase=sqlite3VdbeMakeLabel(v);
+					nextCase=v.sqlite3VdbeMakeLabel();
 					testcase(pTest.op==TK_COLUMN);
 					sqlite3ExprIfFalse(pParse,pTest,nextCase,SQLITE_JUMPIFNULL);
 					testcase(aListelem[i+1].pExpr.op==TK_COLUMN);
@@ -2497,7 +2497,7 @@ return;
 					sqlite3ExprCode(pParse,aListelem[i+1].pExpr,target);
 					v.sqlite3VdbeAddOp2(OP_Goto,0,endLabel);
 					sqlite3ExprCachePop(pParse,1);
-					sqlite3VdbeResolveLabel(v,nextCase);
+					v.sqlite3VdbeResolveLabel(nextCase);
 				}
 				if(pExpr.pRight!=null) {
 					sqlite3ExprCachePush(pParse);
@@ -2511,7 +2511,7 @@ return;
 																																																																												            Debug.Assert( /* db.mallocFailed != 0 || */ pParse.nErr > 0
             || pParse.iCacheLevel == iCacheLevel );
 #endif
-				sqlite3VdbeResolveLabel(v,endLabel);
+				v.sqlite3VdbeResolveLabel(endLabel);
 				break;
 			}
 			#if !SQLITE_OMIT_TRIGGER
@@ -2795,12 +2795,12 @@ return;
 			/* No way this can happen */op=pExpr.op;
 			switch(op) {
 			case TK_AND: {
-				int d2=sqlite3VdbeMakeLabel(v);
+				int d2=v.sqlite3VdbeMakeLabel();
 				testcase(jumpIfNull==0);
 				sqlite3ExprCachePush(pParse);
 				sqlite3ExprIfFalse(pParse,pExpr.pLeft,d2,jumpIfNull^SQLITE_JUMPIFNULL);
 				sqlite3ExprIfTrue(pParse,pExpr.pRight,dest,jumpIfNull);
-				sqlite3VdbeResolveLabel(v,d2);
+				v.sqlite3VdbeResolveLabel(d2);
 				sqlite3ExprCachePop(pParse,1);
 				break;
 			}
@@ -2947,12 +2947,12 @@ return;
 				break;
 			}
 			case TK_OR: {
-				int d2=sqlite3VdbeMakeLabel(v);
+				int d2=v.sqlite3VdbeMakeLabel();
 				testcase(jumpIfNull==0);
 				sqlite3ExprCachePush(pParse);
 				sqlite3ExprIfTrue(pParse,pExpr.pLeft,d2,jumpIfNull^SQLITE_JUMPIFNULL);
 				sqlite3ExprIfFalse(pParse,pExpr.pRight,dest,jumpIfNull);
-				sqlite3VdbeResolveLabel(v,d2);
+				v.sqlite3VdbeResolveLabel(d2);
 				sqlite3ExprCachePop(pParse,1);
 				break;
 			}

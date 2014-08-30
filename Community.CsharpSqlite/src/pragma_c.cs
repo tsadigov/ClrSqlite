@@ -392,7 +392,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			Vdbe v=pParse.pVdbe=sqlite3VdbeCreate(db);
 			if(v==null)
 				return;
-			sqlite3VdbeRunOnlyOnce(v);
+			v.sqlite3VdbeRunOnlyOnce();
 			pParse.nMem=2;
 			/* Interpret the [database.] part of the pragma statement. iDb is the
       ** index of the database this pragma is being applied to in db.aDb[]. */iDb=sqlite3TwoPartName(pParse,pId1,pId2,ref pId);
@@ -456,10 +456,10 @@ goto pragma_out;
 					sqlite3VdbeSetNumCols(v,1);
 					sqlite3VdbeSetColName(v,0,COLNAME_NAME,"cache_size",SQLITE_STATIC);
 					pParse.nMem+=2;
-					addr=sqlite3VdbeAddOpList(v,getCacheSize.Length,getCacheSize);
-					sqlite3VdbeChangeP1(v,addr,iDb);
-					sqlite3VdbeChangeP1(v,addr+1,iDb);
-					sqlite3VdbeChangeP1(v,addr+6,SQLITE_DEFAULT_CACHE_SIZE);
+					addr=v.sqlite3VdbeAddOpList(getCacheSize.Length,getCacheSize);
+					v.sqlite3VdbeChangeP1(addr,iDb);
+					v.sqlite3VdbeChangeP1(addr+1,iDb);
+					v.sqlite3VdbeChangeP1(addr+6,SQLITE_DEFAULT_CACHE_SIZE);
 				}
 				else {
 					int size=sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
@@ -719,12 +719,12 @@ goto pragma_out;
 																/* 4 */new VdbeOpList(OP_SetCookie,0,BTREE_INCR_VACUUM,1),
 															/* 5 */};
 															int iAddr;
-															iAddr=sqlite3VdbeAddOpList(v,ArraySize(setMeta6),setMeta6);
-															sqlite3VdbeChangeP1(v,iAddr,iDb);
-															sqlite3VdbeChangeP1(v,iAddr+1,iDb);
-															sqlite3VdbeChangeP2(v,iAddr+2,iAddr+4);
-															sqlite3VdbeChangeP1(v,iAddr+4,eAuto-1);
-															sqlite3VdbeChangeP1(v,iAddr+5,iDb);
+															iAddr=v.sqlite3VdbeAddOpList(ArraySize(setMeta6),setMeta6);
+															v.sqlite3VdbeChangeP1(iAddr,iDb);
+															v.sqlite3VdbeChangeP1(iAddr+1,iDb);
+															v.sqlite3VdbeChangeP2(iAddr+2,iAddr+4);
+															v.sqlite3VdbeChangeP1(iAddr+4,eAuto-1);
+															v.sqlite3VdbeChangeP1(iAddr+5,iDb);
 															sqlite3VdbeUsesBtree(v,iDb);
 														}
 													}
@@ -752,7 +752,7 @@ goto pragma_out;
 													v.sqlite3VdbeAddOp1(OP_ResultRow,1);
 													v.sqlite3VdbeAddOp2(OP_AddImm,1,-1);
 													v.sqlite3VdbeAddOp2(OP_IfPos,1,addr);
-													sqlite3VdbeJumpHere(v,addr);
+													v.sqlite3VdbeJumpHere(addr);
 												}
 												else
 													#endif
@@ -1196,7 +1196,7 @@ else
 																											sqlite3CodeVerifySchema(pParse,i);
 																											addr=v.sqlite3VdbeAddOp1(OP_IfPos,1);
 																											/* Halt if out of errors */v.sqlite3VdbeAddOp2(OP_Halt,0,0);
-																											sqlite3VdbeJumpHere(v,addr);
+																											v.sqlite3VdbeJumpHere(addr);
 																											/* Do an integrity check of the B-Tree
                                                         **
                                                         ** Begin by filling registers 2, 3, ... with the root pages numbers
@@ -1219,13 +1219,13 @@ else
 																												pParse.nMem=cnt+4;
 																											}
 																											/* Do the b-tree integrity checks */v.sqlite3VdbeAddOp3(OP_IntegrityCk,2,cnt,1);
-																											sqlite3VdbeChangeP5(v,(u8)i);
+																											v.sqlite3VdbeChangeP5((u8)i);
 																											addr=v.sqlite3VdbeAddOp1(OP_IsNull,2);
 																											v.sqlite3VdbeAddOp4(OP_String8,0,3,0,sqlite3MPrintf(db,"*** in database %s ***\n",db.aDb[i].zName),P4_DYNAMIC);
 																											v.sqlite3VdbeAddOp3(OP_Move,2,4,1);
 																											v.sqlite3VdbeAddOp3(OP_Concat,4,3,2);
 																											v.sqlite3VdbeAddOp2(OP_ResultRow,2,1);
-																											sqlite3VdbeJumpHere(v,addr);
+																											v.sqlite3VdbeJumpHere(addr);
 																											/* Make sure all the indices are constructed correctly.
                                                         */for(x=pTbls.first;x!=null&&!isQuick;x=x.next) {
 																												;
@@ -1238,7 +1238,7 @@ else
 																													continue;
 																												addr=v.sqlite3VdbeAddOp1(OP_IfPos,1);
 																												/* Stop if out of errors */v.sqlite3VdbeAddOp2(OP_Halt,0,0);
-																												sqlite3VdbeJumpHere(v,addr);
+																												v.sqlite3VdbeJumpHere(addr);
 																												sqlite3OpenTableAndIndices(pParse,pTab,1,OP_OpenRead);
 																												v.sqlite3VdbeAddOp2(OP_Integer,0,2);
 																												/* reg(2) will count entries */loopTop=v.sqlite3VdbeAddOp2(OP_Rewind,1,0);
@@ -1260,16 +1260,16 @@ else
 																														/* 9 */new VdbeOpList(OP_Halt,0,0,0),
 																													};
 																													r1=sqlite3GenerateIndexKey(pParse,pIdx,1,3,false);
-																													jmp2=sqlite3VdbeAddOp4Int(v,OP_Found,j+2,0,r1,pIdx.nColumn+1);
-																													addr=sqlite3VdbeAddOpList(v,ArraySize(idxErr),idxErr);
-																													sqlite3VdbeChangeP4(v,addr+1,"rowid ",SQLITE_STATIC);
-																													sqlite3VdbeChangeP4(v,addr+3," missing from index ",SQLITE_STATIC);
-																													sqlite3VdbeChangeP4(v,addr+4,pIdx.zName,P4_TRANSIENT);
-																													sqlite3VdbeJumpHere(v,addr+9);
-																													sqlite3VdbeJumpHere(v,jmp2);
+																													jmp2=v.sqlite3VdbeAddOp4Int(OP_Found,j+2,0,r1,pIdx.nColumn+1);
+																													addr=v.sqlite3VdbeAddOpList(ArraySize(idxErr),idxErr);
+																													v.sqlite3VdbeChangeP4(addr+1,"rowid ",SQLITE_STATIC);
+																													v.sqlite3VdbeChangeP4(addr+3," missing from index ",SQLITE_STATIC);
+																													v.sqlite3VdbeChangeP4(addr+4,pIdx.zName,P4_TRANSIENT);
+																													v.sqlite3VdbeJumpHere(addr+9);
+																													v.sqlite3VdbeJumpHere(jmp2);
 																												}
 																												v.sqlite3VdbeAddOp2(OP_Next,1,loopTop+1);
-																												sqlite3VdbeJumpHere(v,loopTop);
+																												v.sqlite3VdbeJumpHere(loopTop);
 																												for(j=0,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,j++) {
 																													VdbeOpList[] cntIdx=new VdbeOpList[] {
 																														new VdbeOpList(OP_Integer,0,3,0),
@@ -1285,22 +1285,22 @@ else
 																													};
 																													addr=v.sqlite3VdbeAddOp1(OP_IfPos,1);
 																													v.sqlite3VdbeAddOp2(OP_Halt,0,0);
-																													sqlite3VdbeJumpHere(v,addr);
-																													addr=sqlite3VdbeAddOpList(v,ArraySize(cntIdx),cntIdx);
-																													sqlite3VdbeChangeP1(v,addr+1,j+2);
-																													sqlite3VdbeChangeP2(v,addr+1,addr+4);
-																													sqlite3VdbeChangeP1(v,addr+3,j+2);
-																													sqlite3VdbeChangeP2(v,addr+3,addr+2);
-																													sqlite3VdbeJumpHere(v,addr+4);
-																													sqlite3VdbeChangeP4(v,addr+6,"wrong # of entries in index ",P4_STATIC);
-																													sqlite3VdbeChangeP4(v,addr+7,pIdx.zName,P4_TRANSIENT);
+																													v.sqlite3VdbeJumpHere(addr);
+																													addr=v.sqlite3VdbeAddOpList(ArraySize(cntIdx),cntIdx);
+																													v.sqlite3VdbeChangeP1(addr+1,j+2);
+																													v.sqlite3VdbeChangeP2(addr+1,addr+4);
+																													v.sqlite3VdbeChangeP1(addr+3,j+2);
+																													v.sqlite3VdbeChangeP2(addr+3,addr+2);
+																													v.sqlite3VdbeJumpHere(addr+4);
+																													v.sqlite3VdbeChangeP4(addr+6,"wrong # of entries in index ",P4_STATIC);
+																													v.sqlite3VdbeChangeP4(addr+7,pIdx.zName,P4_TRANSIENT);
 																												}
 																											}
 																										}
-																										addr=sqlite3VdbeAddOpList(v,ArraySize(endCode),endCode);
-																										sqlite3VdbeChangeP2(v,addr,-mxErr);
-																										sqlite3VdbeJumpHere(v,addr+1);
-																										sqlite3VdbeChangeP4(v,addr+2,"ok",P4_STATIC);
+																										addr=v.sqlite3VdbeAddOpList(ArraySize(endCode),endCode);
+																										v.sqlite3VdbeChangeP2(addr,-mxErr);
+																										v.sqlite3VdbeJumpHere(addr+1);
+																										v.sqlite3VdbeChangeP4(addr+2,"ok",P4_STATIC);
 																									}
 																									else
 																										#endif
@@ -1340,7 +1340,7 @@ else
 																												Debug.Assert(encnames[(int)SqliteEncoding.UTF8].enc==SqliteEncoding.UTF8);
 																												Debug.Assert(encnames[(int)SqliteEncoding.UTF16LE].enc==SqliteEncoding.UTF16LE);
 																												Debug.Assert(encnames[(int)SqliteEncoding.UTF16BE].enc==SqliteEncoding.UTF16BE);
-																												sqlite3VdbeChangeP4(v,-1,encnames[(int)ENC(pParse.db)].zName,P4_STATIC);
+																												v.sqlite3VdbeChangeP4(-1,encnames[(int)ENC(pParse.db)].zName,P4_STATIC);
 																												v.sqlite3VdbeAddOp2(OP_ResultRow,1,1);
 																											}
 																											#if !SQLITE_OMIT_UTF16
@@ -1421,11 +1421,11 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																														/* 0 */new VdbeOpList(OP_Integer,0,1,0),
 																														/* 1 */new VdbeOpList(OP_SetCookie,0,0,1),
 																													/* 2 */};
-																													int addr=sqlite3VdbeAddOpList(v,ArraySize(setCookie),setCookie);
-																													sqlite3VdbeChangeP1(v,addr,iDb);
-																													sqlite3VdbeChangeP1(v,addr+1,Converter.sqlite3Atoi(zRight));
-																													sqlite3VdbeChangeP1(v,addr+2,iDb);
-																													sqlite3VdbeChangeP2(v,addr+2,iCookie);
+																													int addr=v.sqlite3VdbeAddOpList(ArraySize(setCookie),setCookie);
+																													v.sqlite3VdbeChangeP1(addr,iDb);
+																													v.sqlite3VdbeChangeP1(addr+1,Converter.sqlite3Atoi(zRight));
+																													v.sqlite3VdbeChangeP1(addr+2,iDb);
+																													v.sqlite3VdbeChangeP2(addr+2,iCookie);
 																												}
 																												else {
 																													/* Read the specified cookie value */VdbeOpList[] readCookie=new VdbeOpList[] {
@@ -1433,11 +1433,11 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																														/* 0 */new VdbeOpList(OP_ReadCookie,0,1,0),
 																														/* 1 */new VdbeOpList(OP_ResultRow,1,1,0)
 																													};
-																													int addr=sqlite3VdbeAddOpList(v,readCookie.Length,readCookie);
+																													int addr=v.sqlite3VdbeAddOpList(readCookie.Length,readCookie);
 																													// ArraySize(readCookie), readCookie);
-																													sqlite3VdbeChangeP1(v,addr,iDb);
-																													sqlite3VdbeChangeP1(v,addr+1,iDb);
-																													sqlite3VdbeChangeP3(v,addr+1,iCookie);
+																													v.sqlite3VdbeChangeP1(addr,iDb);
+																													v.sqlite3VdbeChangeP1(addr+1,iDb);
+																													v.sqlite3VdbeChangeP3(addr+1,iCookie);
 																													sqlite3VdbeSetNumCols(v,1);
 																													sqlite3VdbeSetColName(v,0,COLNAME_NAME,zLeft,SQLITE_TRANSIENT);
 																												}

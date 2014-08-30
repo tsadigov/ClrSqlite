@@ -83,7 +83,7 @@ namespace Community.CsharpSqlite {
 				Debug.Assert(i<pTab.nCol);
 				sqlite3ValueFromExpr(sqlite3VdbeDb(v),pCol.pDflt,enc,pCol.affinity,ref pValue);
 				if(pValue!=null) {
-					sqlite3VdbeChangeP4(v,-1,pValue,P4_MEM);
+					v.sqlite3VdbeChangeP4(-1,pValue,P4_MEM);
 				}
 				#if !SQLITE_OMIT_FLOATING_POINT
 				if(iReg>=0&&pTab.aCol[i].affinity==SQLITE_AFF_REAL) {
@@ -348,7 +348,7 @@ aXRef[j] = -1;
 			/* Top of the update loop */if(okOnePass) {
 				int a1=v.sqlite3VdbeAddOp1(OP_NotNull,regOldRowid);
 				addr=v.sqlite3VdbeAddOp0(OP_Goto);
-				sqlite3VdbeJumpHere(v,a1);
+				v.sqlite3VdbeJumpHere(a1);
 			}
 			else {
 				addr=v.sqlite3VdbeAddOp3(OP_RowSetRead,regRowSet,0,regOldRowid);
@@ -450,7 +450,7 @@ aXRef[j] = -1;
 				/* If changing the record number, delete the old record.  */if(hasFK||chngRowid) {
 					v.sqlite3VdbeAddOp2(OP_Delete,iCur,0);
 				}
-				sqlite3VdbeJumpHere(v,j1);
+				v.sqlite3VdbeJumpHere(j1);
 				if(hasFK) {
 					pParse.sqlite3FkCheck(pTab,0,regNewRowid);
 				}
@@ -469,7 +469,7 @@ aXRef[j] = -1;
 			/* Repeat the above with the next record to be updated, until
       ** all record selected by the WHERE clause have been updated.
       */v.sqlite3VdbeAddOp2(OP_Goto,0,addr);
-			sqlite3VdbeJumpHere(v,addr);
+			v.sqlite3VdbeJumpHere(addr);
 			/* Close all tables */for(i=0,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,i++) {
 				if(openAll||aRegIdx[i]>0) {
 					v.sqlite3VdbeAddOp2(OP_Close,iCur+i+1,0);
@@ -566,7 +566,7 @@ aXRef[j] = -1;
       */Debug.Assert(v!=null);
 			ephemTab=pParse.nTab++;
 			v.sqlite3VdbeAddOp2(OP_OpenEphemeral,ephemTab,pTab.nCol+1+((pRowid!=null)?1:0));
-			sqlite3VdbeChangeP5(v,BTREE_UNORDERED);
+			v.sqlite3VdbeChangeP5(BTREE_UNORDERED);
 			/* fill the ephemeral table
       */sqlite3SelectDestInit(dest,SelectResultType.Table,ephemTab);
 			sqlite3Select(pParse,pSelect,ref dest);
@@ -580,10 +580,10 @@ aXRef[j] = -1;
 			}
 			sqlite3VtabMakeWritable(pParse,pTab);
 			v.sqlite3VdbeAddOp4(OP_VUpdate,0,pTab.nCol+2,iReg,pVTab,P4_VTAB);
-			sqlite3VdbeChangeP5(v,(byte)(onError==OE_Default?OE_Abort:onError));
+			v.sqlite3VdbeChangeP5((byte)(onError==OE_Default?OE_Abort:onError));
 			sqlite3MayAbort(pParse);
 			v.sqlite3VdbeAddOp2(OP_Next,ephemTab,addr+1);
-			sqlite3VdbeJumpHere(v,addr);
+			v.sqlite3VdbeJumpHere(addr);
 			v.sqlite3VdbeAddOp2(OP_Close,ephemTab,0);
 			/* Cleanup */sqlite3SelectDelete(db,ref pSelect);
 		}
