@@ -51,7 +51,7 @@ namespace Community.CsharpSqlite {
 		static int execSql(sqlite3 db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
 			#if !NDEBUG
-																																																						      int rc;
+																																																									      int rc;
       //VVA_ONLY( int rc; )
 #endif
 			if(zSql==null) {
@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 				return sqlite3_errcode(db);
 			}
 			#if !NDEBUG
-																																																						      rc = sqlite3_step( pStmt );
+																																																									      rc = sqlite3_step( pStmt );
       //VVA_ONLY( rc = ) sqlite3_step(pStmt);
       Debug.Assert( rc != SQLITE_ROW );
 #else
@@ -104,7 +104,7 @@ namespace Community.CsharpSqlite {
 		static void sqlite3Vacuum(Parse pParse) {
 			Vdbe v=sqlite3GetVdbe(pParse);
 			if(v!=null) {
-				sqlite3VdbeAddOp2(v,OP_Vacuum,0,0);
+				v.sqlite3VdbeAddOp2(OP_Vacuum,0,0);
 			}
 			return;
 		}

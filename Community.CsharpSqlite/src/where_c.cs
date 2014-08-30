@@ -40,10 +40,10 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if (SQLITE_TEST) || (SQLITE_DEBUG)
-																																				    static bool sqlite3WhereTrace = false;
+																																						    static bool sqlite3WhereTrace = false;
 #endif
 		#if (SQLITE_TEST) && (SQLITE_DEBUG) && TRACE
-																																				// define WHERETRACE(X)  if(sqlite3WhereTrace) sqlite3DebugPrintf X
+																																						// define WHERETRACE(X)  if(sqlite3WhereTrace) sqlite3DebugPrintf X
 static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace ) sqlite3DebugPrintf( X, ap ); }
 #else
 		//# define WHERETRACE(X)
@@ -140,7 +140,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		//#define TERM_ANDINFO    0x20   /* Need to free the WhereTerm.u.pAndInfo obj */
 		//#define TERM_OR_OK      0x40   /* Used during OR-clause processing */
 		#if SQLITE_ENABLE_STAT2
-																																				    //  define TERM_VNULL    0x80   /* Manufactured x>NULL or x<=NULL term */
+																																						    //  define TERM_VNULL    0x80   /* Manufactured x>NULL or x<=NULL term */
 #else
 		//#  define TERM_VNULL    0x00   /* Disabled if not using stat2 */
 		#endif
@@ -153,7 +153,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/* Need to free the WhereTerm.u.pAndInfo obj */const int TERM_OR_OK=0x40;
 		/* Used during OR-clause processing */
 		#if SQLITE_ENABLE_STAT2
-																																				    const int TERM_VNULL = 0x80;  /* Manufactured x>NULL or x<=NULL term */
+																																						    const int TERM_VNULL = 0x80;  /* Manufactured x>NULL or x<=NULL term */
 #else
 		const int TERM_VNULL=0x00;
 		///<summary>
@@ -175,7 +175,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			/* Number of entries in a[] */public WhereTerm[] a;
 			/* Each a[] describes a term of the WHERE cluase */
 			#if (SQLITE_SMALL_STACK)
-																																																						public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[] */
+																																																									public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[] */
 #else
 			public WhereTerm[] aStatic=new WhereTerm[8];
 			///<summary>
@@ -1388,7 +1388,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			}
 			#endif
 			#if SQLITE_ENABLE_STAT2
-																																																						      /* When sqlite_stat2 histogram data is available an operator of the
+																																																									      /* When sqlite_stat2 histogram data is available an operator of the
   ** form "x IS NOT NULL" can sometimes be evaluated more efficiently
   ** as "x>NULL" if x is not an INTEGER PRIMARY KEY.  So construct a
   ** virtual term of that form.
@@ -1594,7 +1594,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///
 		///</summary>
 		#if !(SQLITE_OMIT_VIRTUALTABLE) && (SQLITE_DEBUG)
-																																				static void TRACE_IDX_INPUTS( sqlite3_index_info p )
+																																						static void TRACE_IDX_INPUTS( sqlite3_index_info p )
 {
 int i;
 if ( !sqlite3WhereTrace ) return;
@@ -1679,7 +1679,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 						pOrTerm=pOrWC.a[_pOrWC];
 						WhereCost sTermCost=null;
 						#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																												            WHERETRACE( "... Multi-index OR testing for term %d of %d....\n",
+																																																																																																																		            WHERETRACE( "... Multi-index OR testing for term %d of %d....\n",
             _pOrWC, pOrWC.nTerm - _pOrWC//( pOrTerm - pOrWC.a ), ( pTerm - pWC.a )
             );
 #endif
@@ -1710,7 +1710,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 					/* If there is an ORDER BY clause, increase the scan cost to account
           ** for the cost of the sort. */if(pOrderBy!=null) {
 						#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																												            WHERETRACE( "... sorting increases OR cost %.9g to %.9g\n",
+																																																																																																																		            WHERETRACE( "... sorting increases OR cost %.9g to %.9g\n",
             rTotal, rTotal + nRow * estLog( nRow ) );
 #endif
 						rTotal+=nRow*estLog(nRow);
@@ -1719,7 +1719,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
           ** less than the current cost stored in pCost, replace the contents
           ** of pCost. */
 					#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																										          WHERETRACE( "... multi-index OR cost=%.9g nrow=%.9g\n", rTotal, nRow );
+																																																																																															          WHERETRACE( "... multi-index OR cost=%.9g nrow=%.9g\n", rTotal, nRow );
 #endif
 					if(rTotal<pCost.rCost) {
 						pCost.rCost=rTotal;
@@ -1795,7 +1795,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 				pTerm=pWC.a[ipTerm];
 				if(termCanDriveIndex(pTerm,pSrc,notReady)!=0) {
 					#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																										          WHERETRACE( "auto-index reduces cost from %.2f to %.2f\n",
+																																																																																															          WHERETRACE( "auto-index reduces cost from %.2f to %.2f\n",
           pCost.rCost, costTempIdx );
 #endif
 					pCost.rCost=costTempIdx;
@@ -1807,7 +1807,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 			}
 		}
 		#else
-																																				// define bestAutomaticIndex(A,B,C,D,E)  /* no-op */
+																																						// define bestAutomaticIndex(A,B,C,D,E)  /* no-op */
 static void bestAutomaticIndex(
 Parse pParse,              /* The parsing context */
 WhereClause pWC,           /* The WHERE clause */
@@ -1845,8 +1845,8 @@ WhereCost pCost            /* Lowest cost query plan */
       ** transient index on 2nd and subsequent iterations of the loop. */v=pParse.pVdbe;
 			Debug.Assert(v!=null);
 			regIsInit=++pParse.nMem;
-			addrInit=sqlite3VdbeAddOp1(v,OP_If,regIsInit);
-			sqlite3VdbeAddOp2(v,OP_Integer,1,regIsInit);
+			addrInit=v.sqlite3VdbeAddOp1(OP_If,regIsInit);
+			v.sqlite3VdbeAddOp2(OP_Integer,1,regIsInit);
 			/* Count the number of columns that will be added to the index
       ** and used to match WHERE clause constraints */nColumn=0;
 			pTable=pSrc.pTab;
@@ -1941,14 +1941,14 @@ WhereCost pCost            /* Lowest cost query plan */
 			Debug.Assert(n==nColumn);
 			/* Create the automatic index */pKeyinfo=sqlite3IndexKeyinfo(pParse,pIdx);
 			Debug.Assert(pLevel.iIdxCur>=0);
-			sqlite3VdbeAddOp4(v,OP_OpenAutoindex,pLevel.iIdxCur,nColumn+1,0,pKeyinfo,P4_KEYINFO_HANDOFF);
+			v.sqlite3VdbeAddOp4(OP_OpenAutoindex,pLevel.iIdxCur,nColumn+1,0,pKeyinfo,P4_KEYINFO_HANDOFF);
 			VdbeComment(v,"for %s",pTable.zName);
-			/* Fill the automatic index with content */addrTop=sqlite3VdbeAddOp1(v,OP_Rewind,pLevel.iTabCur);
+			/* Fill the automatic index with content */addrTop=v.sqlite3VdbeAddOp1(OP_Rewind,pLevel.iTabCur);
 			regRecord=sqlite3GetTempReg(pParse);
 			sqlite3GenerateIndexKey(pParse,pIdx,pLevel.iTabCur,regRecord,true);
-			sqlite3VdbeAddOp2(v,OP_IdxInsert,pLevel.iIdxCur,regRecord);
+			v.sqlite3VdbeAddOp2(OP_IdxInsert,pLevel.iIdxCur,regRecord);
 			sqlite3VdbeChangeP5(v,OPFLAG_USESEEKRESULT);
-			sqlite3VdbeAddOp2(v,OP_Next,pLevel.iTabCur,addrTop+1);
+			v.sqlite3VdbeAddOp2(OP_Next,pLevel.iTabCur,addrTop+1);
 			sqlite3VdbeChangeP5(v,SQLITE_STMTSTATUS_AUTOINDEX);
 			sqlite3VdbeJumpHere(v,addrTop);
 			sqlite3ReleaseTempReg(pParse,regRecord);
@@ -1971,7 +1971,7 @@ WhereCost pCost            /* Lowest cost query plan */
 			int nOrderBy;
 			sqlite3_index_info pIdxInfo;
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																						      WHERETRACE( "Recomputing index info for %s...\n", pSrc.pTab.zName );
+																																																									      WHERETRACE( "Recomputing index info for %s...\n", pSrc.pTab.zName );
 #endif
 			/* Count the number of possible WHERE clause constraints referring
 ** to this virtual table */for(i=nTerm=0;i<pWC.nTerm;i++)//, pTerm++ )
@@ -2081,7 +2081,7 @@ WhereCost pCost            /* Lowest cost query plan */
 			int i;
 			int rc;
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																						      WHERETRACE( "xBestIndex for %s\n", pTab.zName );
+																																																									      WHERETRACE( "xBestIndex for %s\n", pTab.zName );
 #endif
 			TRACE_IDX_INPUTS(p);
 			rc=pVtab.pModule.xBestIndex(pVtab,ref p);
@@ -2262,7 +2262,7 @@ WhereCost pCost            /* Lowest cost query plan */
 ** SQLITE_NOMEM is returned and *piRegion is undefined.
 */
 		#if SQLITE_ENABLE_STAT2
-																																				    static int whereRangeRegion(
+																																						    static int whereRangeRegion(
     Parse pParse,               /* Database connection */
     Index pIdx,                 /* Index to consider domain of */
     sqlite3_value pVal,         /* Value to consider */
@@ -2351,7 +2351,7 @@ WhereCost pCost            /* Lowest cost query plan */
             if ( ( eSampletype != eType ) )
               break;
 #if !SQLITE_OMIT_UTF16
-																																				if( pColl.enc!=SqliteEncoding.UTF8 ){
+																																						if( pColl.enc!=SqliteEncoding.UTF8 ){
 int nSample;
 string zSample;
 zSample = sqlite3Utf8to16(
@@ -2367,7 +2367,7 @@ c = pColl.xCmp(pColl.pUser, nSample, zSample, n, z);
 sqlite3DbFree(db, ref zSample);
 }else
 #endif
-																																				            {
+																																						            {
               c = pColl.xCmp( pColl.pUser, aSample[i].nByte, aSample[i].u.z, n, z );
             }
             if ( c - roundUp >= 0 )
@@ -2398,7 +2398,7 @@ sqlite3DbFree(db, ref zSample);
 		/// If an error occurs, return an error code. Otherwise, SQLITE_OK.
 		///</summary>
 		#if SQLITE_ENABLE_STAT2
-																																				    static int valueFromExpr(
+																																						    static int valueFromExpr(
     Parse pParse,
     Expr pExpr,
     char aff,
@@ -2461,7 +2461,7 @@ sqlite3DbFree(db, ref zSample);
 		static int whereRangeScanEst(Parse pParse,/* Parsing & code generating context */Index p,/* The index containing the range-compared column; "x" */int nEq,/* index into p.aCol[] of the range-compared column */WhereTerm pLower,/* Lower bound on the range. ex: "x>123" Might be NULL */WhereTerm pUpper,/* Upper bound on the range. ex: "x<455" Might be NULL */out int piEst/* OUT: Return value */) {
 			int rc=SQLITE_OK;
 			#if SQLITE_ENABLE_STAT2
-																																																						
+																																																									
       if ( nEq == 0 && p.aSample != null )
       {
         sqlite3_value pLowerVal = null;
@@ -2547,7 +2547,7 @@ range_est_fallback:
 			return rc;
 		}
 		#if SQLITE_ENABLE_STAT2
-																																				    /*
+																																						    /*
 ** Estimate the number of rows that will be returned based on
 ** an equality constraint x=VALUE and where that VALUE occurs in
 ** the histogram data.  This only works when x is the left-most
@@ -2617,7 +2617,7 @@ whereEqualScanEst_cancel:
     }
 #endif
 		#if SQLITE_ENABLE_STAT2
-																																				    /*
+																																						    /*
 ** Estimate the number of rows that will be returned based on
 ** an IN constraint where the right-hand side of the IN operator
 ** is a list of values.  Example:
@@ -2879,7 +2879,7 @@ whereEqualScanEst_cancel:
 				/* True if not a covering index */WhereTerm pTerm;
 				/* A single term of the WHERE clause */
 				#if SQLITE_ENABLE_STAT2
-																																																																								        WhereTerm pFirstTerm = null;  /* First term matching the index */
+																																																																												        WhereTerm pFirstTerm = null;  /* First term matching the index */
 #endif
 				/* Determine the values of nEq and nInMul */for(nEq=0;nEq<pProbe.nColumn;nEq++) {
 					int j=pProbe.aiColumn[nEq];
@@ -2904,7 +2904,7 @@ whereEqualScanEst_cancel:
 							wsFlags|=WHERE_COLUMN_NULL;
 						}
 					#if SQLITE_ENABLE_STAT2
-																																																																																										          if ( nEq == 0 && pProbe.aSample != null )
+																																																																																															          if ( nEq == 0 && pProbe.aSample != null )
             pFirstTerm = pTerm;
 #endif
 					used|=pTerm.prereqRight;
@@ -2977,7 +2977,7 @@ whereEqualScanEst_cancel:
 					nInMul=(int)(nRow/aiRowEst[nEq]);
 				}
 				#if SQLITE_ENABLE_STAT2
-																																																																								        /* If the constraint is of the form x=VALUE and histogram
+																																																																												        /* If the constraint is of the form x=VALUE and histogram
     ** data is available for column x, then it might be possible
     ** to get a better estimate on the number of rows based on
     ** VALUE and how common that value is according to the histogram.
@@ -3119,7 +3119,7 @@ whereEqualScanEst_cancel:
 						nRow=2;
 				}
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																								        WHERETRACE(
+																																																																												        WHERETRACE(
         "%s(%s): nEq=%d nInMul=%d estBound=%d bSort=%d bLookup=%d wsFlags=0x%x\n" +
       "         notReady=0x%llx log10N=%.1f nRow=%.1f cost=%.1f used=0x%llx\n",
         pSrc.pTab.zName, ( pIdx != null ? pIdx.zName : "ipk" ),
@@ -3154,7 +3154,7 @@ whereEqualScanEst_cancel:
 			Debug.Assert(pCost.plan.u.pIdx==null||(pCost.plan.wsFlags&WHERE_ROWID_EQ)==0);
 			Debug.Assert(pSrc.pIndex==null||pCost.plan.u.pIdx==null||pCost.plan.u.pIdx==pSrc.pIndex);
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																						      WHERETRACE( "best index is: %s\n",
+																																																									      WHERETRACE( "best index is: %s\n",
       ( ( pCost.plan.wsFlags & WHERE_NOT_FULLSCAN ) == 0 ? "none" :
       pCost.plan.u.pIdx != null ? pCost.plan.u.pIdx.zName : "ipk" )
       );
@@ -3256,7 +3256,7 @@ whereEqualScanEst_cancel:
 				n--;
 			}
 			/* Code the OP_Affinity opcode if there is anything left to do. */if(n>0) {
-				sqlite3VdbeAddOp2(v,OP_Affinity,_base,n);
+				v.sqlite3VdbeAddOp2(OP_Affinity,_base,n);
 				sqlite3VdbeChangeP4(v,-1,zAff,n);
 				sqlite3ExprCacheAffinityChange(pParse,_base,n);
 			}
@@ -3284,7 +3284,7 @@ whereEqualScanEst_cancel:
 			else
 				if(pX.op==TK_ISNULL) {
 					iReg=iTarget;
-					sqlite3VdbeAddOp2(v,OP_Null,0,iReg);
+					v.sqlite3VdbeAddOp2(OP_Null,0,iReg);
 					#if !SQLITE_OMIT_SUBQUERY
 				}
 				else {
@@ -3296,7 +3296,7 @@ whereEqualScanEst_cancel:
 					int iDummy=-1;
 					eType=sqlite3FindInIndex(pParse,pX,ref iDummy);
 					iTab=pX.iTable;
-					sqlite3VdbeAddOp2(v,OP_Rewind,iTab,0);
+					v.sqlite3VdbeAddOp2(OP_Rewind,iTab,0);
 					Debug.Assert((pLevel.plan.wsFlags&WHERE_IN_ABLE)!=0);
 					if(pLevel.u._in.nIn==0) {
 						pLevel.addrNxt=sqlite3VdbeMakeLabel(v);
@@ -3316,12 +3316,12 @@ whereEqualScanEst_cancel:
 						//pIn++
 						pIn.iCur=iTab;
 						if(eType==IN_INDEX_ROWID) {
-							pIn.addrInTop=sqlite3VdbeAddOp2(v,OP_Rowid,iTab,iReg);
+							pIn.addrInTop=v.sqlite3VdbeAddOp2(OP_Rowid,iTab,iReg);
 						}
 						else {
-							pIn.addrInTop=sqlite3VdbeAddOp3(v,OP_Column,iTab,0,iReg);
+							pIn.addrInTop=v.sqlite3VdbeAddOp3(OP_Column,iTab,0,iReg);
 						}
-						sqlite3VdbeAddOp1(v,OP_IsNull,iReg);
+						v.sqlite3VdbeAddOp1(OP_IsNull,iReg);
 					}
 					else {
 						pLevel.u._in.nIn=0;
@@ -3411,7 +3411,7 @@ whereEqualScanEst_cancel:
 						regBase=r1;
 					}
 					else {
-						sqlite3VdbeAddOp2(v,OP_SCopy,r1,regBase+j);
+						v.sqlite3VdbeAddOp2(OP_SCopy,r1,regBase+j);
 					}
 				}
 				testcase(pTerm.eOperator&WO_ISNULL);
@@ -3564,11 +3564,11 @@ whereEqualScanEst_cancel:
 					nRow=(sqlite3_int64)pLevel.plan.nRow;
 				}
 				zMsg.Append(sqlite3MAppendf(db,null," (~%lld rows)",nRow));
-				sqlite3VdbeAddOp4(v,OP_Explain,iId,iLevel,iFrom,zMsg,P4_DYNAMIC);
+				v.sqlite3VdbeAddOp4(OP_Explain,iId,iLevel,iFrom,zMsg,P4_DYNAMIC);
 			}
 		}
 		#else
-																																				// define explainOneScan(u,v,w,x,y,z)
+																																						// define explainOneScan(u,v,w,x,y,z)
 static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,  u16 z){}
 #endif
 		///<summary>
@@ -3616,9 +3616,9 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       */if(pLevel.iFrom>0&&(pTabItem.jointype&JT_LEFT)!=0)// Check value of pTabItem[0].jointype
 			 {
 				pLevel.iLeftJoin=++pParse.nMem;
-				sqlite3VdbeAddOp2(v,OP_Integer,0,pLevel.iLeftJoin);
+				v.sqlite3VdbeAddOp2(OP_Integer,0,pLevel.iLeftJoin);
 				#if SQLITE_DEBUG
-																																																																								        VdbeComment( v, "init LEFT JOIN no-match flag" );
+																																																																												        VdbeComment( v, "init LEFT JOIN no-match flag" );
 #endif
 			}
 			#if !SQLITE_OMIT_VIRTUALTABLE
@@ -3643,9 +3643,9 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 					if(k==nConstraint)
 						break;
 				}
-				sqlite3VdbeAddOp2(v,OP_Integer,pVtabIdx.idxNum,iReg);
-				sqlite3VdbeAddOp2(v,OP_Integer,j-1,iReg+1);
-				sqlite3VdbeAddOp4(v,OP_VFilter,iCur,addrBrk,iReg,pVtabIdx.idxStr,pVtabIdx.needToFreeIdxStr!=0?P4_MPRINTF:P4_STATIC);
+				v.sqlite3VdbeAddOp2(OP_Integer,pVtabIdx.idxNum,iReg);
+				v.sqlite3VdbeAddOp2(OP_Integer,j-1,iReg+1);
+				v.sqlite3VdbeAddOp4(OP_VFilter,iCur,addrBrk,iReg,pVtabIdx.idxStr,pVtabIdx.needToFreeIdxStr!=0?P4_MPRINTF:P4_STATIC);
 				pVtabIdx.needToFreeIdxStr=0;
 				for(j=0;j<nConstraint;j++) {
 					if(aUsage[j].omit!=false) {
@@ -3675,11 +3675,11 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 					testcase(pTerm.wtFlags&TERM_VIRTUAL);
 					/* EV: R-30575-11662 */iRowidReg=codeEqualityTerm(pParse,pTerm,pLevel,iReleaseReg);
 					addrNxt=pLevel.addrNxt;
-					sqlite3VdbeAddOp2(v,OP_MustBeInt,iRowidReg,addrNxt);
-					sqlite3VdbeAddOp3(v,OP_NotExists,iCur,addrNxt,iRowidReg);
+					v.sqlite3VdbeAddOp2(OP_MustBeInt,iRowidReg,addrNxt);
+					v.sqlite3VdbeAddOp3(OP_NotExists,iCur,addrNxt,iRowidReg);
 					sqlite3ExprCacheStore(pParse,iCur,-1,iRowidReg);
 					#if SQLITE_DEBUG
-																																																																																										          VdbeComment( v, "pk" );
+																																																																																															          VdbeComment( v, "pk" );
 #endif
 					pLevel.op=OP_Noop;
 				}
@@ -3717,16 +3717,16 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							Debug.Assert(pX!=null);
 							Debug.Assert(pStart.leftCursor==iCur);
 							r1=sqlite3ExprCodeTemp(pParse,pX.pRight,ref rTemp);
-							sqlite3VdbeAddOp3(v,aMoveOp[pX.op-TK_GT],iCur,addrBrk,r1);
+							v.sqlite3VdbeAddOp3(aMoveOp[pX.op-TK_GT],iCur,addrBrk,r1);
 							#if SQLITE_DEBUG
-																																																																																																																														            VdbeComment( v, "pk" );
+																																																																																																																																					            VdbeComment( v, "pk" );
 #endif
 							sqlite3ExprCacheAffinityChange(pParse,r1,1);
 							sqlite3ReleaseTempReg(pParse,rTemp);
 							disableTerm(pLevel,pStart);
 						}
 						else {
-							sqlite3VdbeAddOp2(v,bRev!=0?OP_Last:OP_Rewind,iCur,addrBrk);
+							v.sqlite3VdbeAddOp2(bRev!=0?OP_Last:OP_Rewind,iCur,addrBrk);
 						}
 						if(pEnd!=null) {
 							Expr pX;
@@ -3756,9 +3756,9 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 						}
 						if(testOp!=OP_Noop) {
 							iRowidReg=iReleaseReg=sqlite3GetTempReg(pParse);
-							sqlite3VdbeAddOp2(v,OP_Rowid,iCur,iRowidReg);
+							v.sqlite3VdbeAddOp2(OP_Rowid,iCur,iRowidReg);
 							sqlite3ExprCacheStore(pParse,iCur,-1,iRowidReg);
-							sqlite3VdbeAddOp3(v,testOp,memEndValue,addrBrk,iRowidReg);
+							v.sqlite3VdbeAddOp3(testOp,memEndValue,addrBrk,iRowidReg);
 							sqlite3VdbeChangeP5(v,SQLITE_AFF_NUMERIC|SQLITE_JUMPIFNULL);
 						}
 					}
@@ -3892,7 +3892,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 								/* EV: R-30575-11662 */}
 							else
 								if(isMinQuery!=0) {
-									sqlite3VdbeAddOp2(v,OP_Null,0,regBase+nEq);
+									v.sqlite3VdbeAddOp2(OP_Null,0,regBase+nEq);
 									nConstraint++;
 									startEq=0;
 									start_constraints=1;
@@ -3949,17 +3949,17 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							testcase(pLevel.plan.wsFlags&WHERE_BTM_LIMIT);
 							testcase(pLevel.plan.wsFlags&WHERE_TOP_LIMIT);
 							if((pLevel.plan.wsFlags&(WHERE_BTM_LIMIT|WHERE_TOP_LIMIT))!=0) {
-								sqlite3VdbeAddOp3(v,OP_Column,iIdxCur,nEq,r1);
-								sqlite3VdbeAddOp2(v,OP_IsNull,r1,addrCont);
+								v.sqlite3VdbeAddOp3(OP_Column,iIdxCur,nEq,r1);
+								v.sqlite3VdbeAddOp2(OP_IsNull,r1,addrCont);
 							}
 							sqlite3ReleaseTempReg(pParse,r1);
 							/* Seek the table cursor, if required */disableTerm(pLevel,pRangeStart);
 							disableTerm(pLevel,pRangeEnd);
 							if(0==omitTable) {
 								iRowidReg=iReleaseReg=sqlite3GetTempReg(pParse);
-								sqlite3VdbeAddOp2(v,OP_IdxRowid,iIdxCur,iRowidReg);
+								v.sqlite3VdbeAddOp2(OP_IdxRowid,iIdxCur,iRowidReg);
 								sqlite3ExprCacheStore(pParse,iCur,-1,iRowidReg);
-								sqlite3VdbeAddOp2(v,OP_Seek,iCur,iRowidReg);
+								v.sqlite3VdbeAddOp2(OP_Seek,iCur,iRowidReg);
 								/* Deferred seek */}
 							/* Record the instruction used to terminate the loop. Disable
           ** WHERE clause terms made redundant by the index range scan.
@@ -4070,9 +4070,9 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
             */if((wctrlFlags&WHERE_DUPLICATES_OK)==0) {
 									regRowset=++pParse.nMem;
 									regRowid=++pParse.nMem;
-									sqlite3VdbeAddOp2(v,OP_Null,0,regRowset);
+									v.sqlite3VdbeAddOp2(OP_Null,0,regRowset);
 								}
-								iRetInit=sqlite3VdbeAddOp2(v,OP_Integer,0,regReturn);
+								iRetInit=v.sqlite3VdbeAddOp2(OP_Integer,0,regReturn);
 								for(ii=0;ii<pOrWc.nTerm;ii++) {
 									WhereTerm pOrTerm=pOrWc.a[ii];
 									if(pOrTerm.leftCursor==iCur||pOrTerm.eOperator==WO_AND) {
@@ -4087,7 +4087,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 												r=sqlite3ExprCodeGetColumn(pParse,pTabItem.pTab,-1,iCur,regRowid);
 												sqlite3VdbeAddOp4Int(v,OP_RowSetTest,regRowset,sqlite3VdbeCurrentAddr(v)+2,r,iSet);
 											}
-											sqlite3VdbeAddOp2(v,OP_Gosub,regReturn,iLoopBody);
+											v.sqlite3VdbeAddOp2(OP_Gosub,regReturn,iLoopBody);
 											/* The pSubWInfo.untestedTerms flag means that this OR term
                   ** contained one or more AND term from a notReady table.  The
                   ** terms from the notReady table could not be tested and will
@@ -4099,7 +4099,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 									}
 								}
 								sqlite3VdbeChangeP1(v,iRetInit,sqlite3VdbeCurrentAddr(v));
-								sqlite3VdbeAddOp2(v,OP_Goto,0,pLevel.addrBrk);
+								v.sqlite3VdbeAddOp2(OP_Goto,0,pLevel.addrBrk);
 								sqlite3VdbeResolveLabel(v,iLoopBody);
 								if(pWInfo.nLevel>1)
 									sqlite3DbFree(pParse.db,ref pOrTab);
@@ -4124,7 +4124,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 								Debug.Assert(omitTable==0);
 								pLevel.op=aStep[bRev];
 								pLevel.p1=iCur;
-								pLevel.p2=1+sqlite3VdbeAddOp2(v,aStart[bRev],iCur,addrBrk);
+								pLevel.p2=1+v.sqlite3VdbeAddOp2(aStart[bRev],iCur,addrBrk);
 								pLevel.p5=SQLITE_STMTSTATUS_FULLSCAN_STEP;
 							}
 			notReady&=~getMask(pWC.pMaskSet,iCur);
@@ -4160,9 +4160,9 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       ** at least one row of the right table has matched the left table.
       */if(pLevel.iLeftJoin!=0) {
 				pLevel.addrFirst=sqlite3VdbeCurrentAddr(v);
-				sqlite3VdbeAddOp2(v,OP_Integer,1,pLevel.iLeftJoin);
+				v.sqlite3VdbeAddOp2(OP_Integer,1,pLevel.iLeftJoin);
 				#if SQLITE_DEBUG
-																																																																								        VdbeComment( v, "record LEFT JOIN hit" );
+																																																																												        VdbeComment( v, "record LEFT JOIN hit" );
 #endif
 				sqlite3ExprCacheClear(pParse);
 				for(j=0;j<pWC.nTerm;j++)//, pTerm++)
@@ -4185,19 +4185,19 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 			return notReady;
 		}
 		#if (SQLITE_TEST)
-																																				    /*
+																																						    /*
 ** The following variable holds a text description of query plan generated
 ** by the most recent call to sqlite3WhereBegin().  Each call to WhereBegin
 ** overwrites the previous.  This information is used for testing and
 ** analysis only.
 */
 #if !TCLSH
-																																				    //char sqlite3_query_plan[BMS*2*40];  /* Text of the join */
+																																						    //char sqlite3_query_plan[BMS*2*40];  /* Text of the join */
     static StringBuilder sqlite3_query_plan;
 #else
-																																				    static tcl.lang.Var.SQLITE3_GETSET sqlite3_query_plan = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_query_plan" );
+																																						    static tcl.lang.Var.SQLITE3_GETSET sqlite3_query_plan = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_query_plan" );
 #endif
-																																				    static int nQPlan = 0;              /* Next free slow in _query_plan[] */
+																																						    static int nQPlan = 0;              /* Next free slow in _query_plan[] */
 
 #endif
 		///<summary>
@@ -4417,7 +4417,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				#endif
 			}
 			#if !NDEBUG
-																																																						      {
+																																																									      {
         Bitmask toTheLeft = 0;
         for ( i = 0; i < pTabList.nSrc; i++ )
         {
@@ -4453,7 +4453,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       */notReady=~(Bitmask)0;
 			andFlags=~0;
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																						      WHERETRACE( "*** Optimizer Start ***\n" );
+																																																									      WHERETRACE( "*** Optimizer Start ***\n" );
 #endif
 			for(i=iFrom=0;i<nTabList;i++)//, pLevel++ )
 			 {
@@ -4470,7 +4470,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				// memset( &bestPlan, 0, sizeof( bestPlan ) );
 				bestPlan.rCost=SQLITE_BIG_DBL;
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																								        WHERETRACE( "*** Begin search for loop %d ***\n", i );
+																																																																												        WHERETRACE( "*** Begin search for loop %d ***\n", i );
 #endif
 				/* Loop through the remaining entries in the FROM clause to find the
 ** next nested loop. The loop tests all FROM clause entries
@@ -4538,7 +4538,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 						if(pTabItem.pIndex==null)
 							nUnconstrained++;
 						#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																												            WHERETRACE( "=== trying table %d with isOptimal=%d ===\n",
+																																																																																																																		            WHERETRACE( "=== trying table %d with isOptimal=%d ===\n",
             j, isOptimal );
 #endif
 						Debug.Assert(pTabItem.pTab!=null);
@@ -4579,7 +4579,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
             **       cost must be the same and the number of rows must be lower.
             */if((sCost.used&notReady)==0/* (1) */&&(bestJ<0||(notIndexed&m)!=0/* (2) */||(bestPlan.plan.wsFlags&WHERE_NOT_FULLSCAN)==0||(sCost.plan.wsFlags&WHERE_NOT_FULLSCAN)!=0)&&(nUnconstrained==0||pTabItem.pIndex==null/* (3) */||NEVER((sCost.plan.wsFlags&WHERE_NOT_FULLSCAN)!=0))&&(bestJ<0||sCost.rCost<bestPlan.rCost/* (4) */||(sCost.rCost<=bestPlan.rCost&&sCost.plan.nRow<bestPlan.plan.nRow))) {
 							#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																														              WHERETRACE( "=== table %d is best so far" +
+																																																																																																																																					              WHERETRACE( "=== table %d is best so far" +
               " with cost=%g and nRow=%g\n",
               j, sCost.rCost, sCost.plan.nRow );
 #endif
@@ -4593,7 +4593,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				Debug.Assert(bestJ>=0);
 				Debug.Assert((notReady&getMask(pMaskSet,pTabList.a[bestJ].iCursor))!=0);
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																								        WHERETRACE( "*** Optimizer selects table %d for loop %d" +
+																																																																												        WHERETRACE( "*** Optimizer selects table %d for loop %d" +
         " with cost=%g and nRow=%g\n",
         bestJ, i,//pLevel-pWInfo.a,
         bestPlan.rCost, bestPlan.plan.nRow );
@@ -4634,7 +4634,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				}
 			}
 			#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																						      WHERETRACE( "*** Optimizer Finished ***\n" );
+																																																									      WHERETRACE( "*** Optimizer Finished ***\n" );
 #endif
 			if(pParse.nErr!=0/*|| db.mallocFailed != 0 */) {
 				goto whereBeginError;
@@ -4675,7 +4675,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 					if((pLevel.plan.wsFlags&WHERE_VIRTUALTABLE)!=0) {
 						VTable pVTab=sqlite3GetVTable(db,pTab);
 						int iCur=pTabItem.iCursor;
-						sqlite3VdbeAddOp4(v,OP_VOpen,iCur,0,0,pVTab,P4_VTAB);
+						v.sqlite3VdbeAddOp4(OP_VOpen,iCur,0,0,pVTab,P4_VTAB);
 					}
 					else
 						#endif
@@ -4709,9 +4709,9 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 						int iIdxCur=pLevel.iIdxCur;
 						Debug.Assert(pIx.pSchema==pTab.pSchema);
 						Debug.Assert(iIdxCur>=0);
-						sqlite3VdbeAddOp4(v,OP_OpenRead,iIdxCur,pIx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
+						v.sqlite3VdbeAddOp4(OP_OpenRead,iIdxCur,pIx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 						#if SQLITE_DEBUG
-																																																																																																												            VdbeComment( v, "%s", pIx.zName );
+																																																																																																																		            VdbeComment( v, "%s", pIx.zName );
 #endif
 					}
 				sqlite3CodeVerifySchema(pParse,iDb);
@@ -4730,18 +4730,18 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				pWInfo.iContinue=pLevel.addrCont;
 			}
 			#if SQLITE_TEST
-																																																						      /* Record in the query plan information about the current table
+																																																									      /* Record in the query plan information about the current table
 ** and the index used to access it (if any).  If the table itself
 ** is not used, its name is just '{}'.  If no index is used
 ** the index is listed as "{}".  If the primary key is used the
 ** index name is '*'.
 */
 #if !TCLSH
-																																																						      sqlite3_query_plan.Length = 0;
+																																																									      sqlite3_query_plan.Length = 0;
 #else
-																																																						      sqlite3_query_plan.sValue = "";
+																																																									      sqlite3_query_plan.sValue = "";
 #endif
-																																																						      for ( i = 0; i < nTabList; i++ )
+																																																									      for ( i = 0; i < nTabList; i++ )
       {
         string z;
         int n;
@@ -4794,11 +4794,11 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       //}
       //sqlite3_query_plan[nQPlan] = 0;
 #if !TCLSH
-																																																						      sqlite3_query_plan = new StringBuilder( sqlite3_query_plan.ToString().Trim() );
+																																																									      sqlite3_query_plan = new StringBuilder( sqlite3_query_plan.ToString().Trim() );
 #else
-																																																						      sqlite3_query_plan.Trim();
+																																																									      sqlite3_query_plan.Trim();
 #endif
-																																																						      nQPlan = 0;
+																																																									      nQPlan = 0;
 #endif
 			/* Record the continuation address in the WhereInfo structure.  Then
 ** clean up and return.
@@ -4826,7 +4826,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				pLevel=pWInfo.a[i];
 				sqlite3VdbeResolveLabel(v,pLevel.addrCont);
 				if(pLevel.op!=OP_Noop) {
-					sqlite3VdbeAddOp2(v,pLevel.op,pLevel.p1,pLevel.p2);
+					v.sqlite3VdbeAddOp2(pLevel.op,pLevel.p1,pLevel.p2);
 					sqlite3VdbeChangeP5(v,pLevel.p5);
 				}
 				if((pLevel.plan.wsFlags&WHERE_IN_ABLE)!=0&&pLevel.u._in.nIn>0) {
@@ -4837,7 +4837,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 					 {
 						pIn=pLevel.u._in.aInLoop[j-1];
 						sqlite3VdbeJumpHere(v,pIn.addrInTop+1);
-						sqlite3VdbeAddOp2(v,OP_Next,pIn.iCur,pIn.addrInTop);
+						v.sqlite3VdbeAddOp2(OP_Next,pIn.iCur,pIn.addrInTop);
 						sqlite3VdbeJumpHere(v,pIn.addrInTop-1);
 					}
 					sqlite3DbFree(db,ref pLevel.u._in.aInLoop);
@@ -4845,19 +4845,19 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				sqlite3VdbeResolveLabel(v,pLevel.addrBrk);
 				if(pLevel.iLeftJoin!=0) {
 					int addr;
-					addr=sqlite3VdbeAddOp1(v,OP_IfPos,pLevel.iLeftJoin);
+					addr=v.sqlite3VdbeAddOp1(OP_IfPos,pLevel.iLeftJoin);
 					Debug.Assert((pLevel.plan.wsFlags&WHERE_IDX_ONLY)==0||(pLevel.plan.wsFlags&WHERE_INDEXED)!=0);
 					if((pLevel.plan.wsFlags&WHERE_IDX_ONLY)==0) {
-						sqlite3VdbeAddOp1(v,OP_NullRow,pTabList.a[i].iCursor);
+						v.sqlite3VdbeAddOp1(OP_NullRow,pTabList.a[i].iCursor);
 					}
 					if(pLevel.iIdxCur>=0) {
-						sqlite3VdbeAddOp1(v,OP_NullRow,pLevel.iIdxCur);
+						v.sqlite3VdbeAddOp1(OP_NullRow,pLevel.iIdxCur);
 					}
 					if(pLevel.op==OP_Return) {
-						sqlite3VdbeAddOp2(v,OP_Gosub,pLevel.p1,pLevel.addrFirst);
+						v.sqlite3VdbeAddOp2(OP_Gosub,pLevel.p1,pLevel.addrFirst);
 					}
 					else {
-						sqlite3VdbeAddOp2(v,OP_Goto,0,pLevel.addrFirst);
+						v.sqlite3VdbeAddOp2(OP_Goto,0,pLevel.addrFirst);
 					}
 					sqlite3VdbeJumpHere(v,addr);
 				}
@@ -4876,10 +4876,10 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				if((pTab.tabFlags&TF_Ephemeral)==0&&pTab.pSelect==null&&(pWInfo.wctrlFlags&WHERE_OMIT_CLOSE)==0) {
 					u32 ws=pLevel.plan.wsFlags;
 					if(0==pWInfo.okOnePass&&(ws&WHERE_IDX_ONLY)==0) {
-						sqlite3VdbeAddOp1(v,OP_Close,pTabItem.iCursor);
+						v.sqlite3VdbeAddOp1(OP_Close,pTabItem.iCursor);
 					}
 					if((ws&WHERE_INDEXED)!=0&&(ws&WHERE_TEMP_INDEX)==0) {
-						sqlite3VdbeAddOp1(v,OP_Close,pLevel.iIdxCur);
+						v.sqlite3VdbeAddOp1(OP_Close,pLevel.iIdxCur);
 					}
 				}
 				/* If this scan uses an index, make code substitutions to read data

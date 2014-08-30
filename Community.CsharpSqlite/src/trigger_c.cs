@@ -194,7 +194,7 @@ namespace Community.CsharpSqlite {
 			}
 			iTabDb=sqlite3SchemaToIndex(db,pTab.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																						{
+																																																									{
 int code = SQLITE_CREATE_TRIGGER;
 string zDb = db.aDb[iTabDb].zName;
 string zDbTrig = isTemp ? db.aDb[1].zName : zDb;
@@ -509,7 +509,7 @@ goto trigger_cleanup;
 			Debug.Assert(pTable!=null);
 			Debug.Assert(pTable.pSchema==pTrigger.pSchema||iDb==1);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																						{
+																																																									{
 int code = SQLITE_DROP_TRIGGER;
 string zDb = db.aDb[iDb].zName;
 string zTab = SCHEMA_TABLE(iDb);
@@ -541,8 +541,8 @@ return;
 				sqlite3VdbeChangeP4(v,_base+1,pTrigger.zName,P4_TRANSIENT);
 				sqlite3VdbeChangeP4(v,_base+4,"trigger",P4_STATIC);
 				sqlite3ChangeCookie(pParse,iDb);
-				sqlite3VdbeAddOp2(v,OP_Close,0,0);
-				sqlite3VdbeAddOp4(v,OP_DropTrigger,iDb,0,0,pTrigger.zName,0);
+				v.sqlite3VdbeAddOp2(OP_Close,0,0);
+				v.sqlite3VdbeAddOp4(OP_DropTrigger,iDb,0,0,pTrigger.zName,0);
 				if(pParse.nMem<3) {
 					pParse.nMem=3;
 				}
@@ -709,13 +709,13 @@ return;
 				}
 				}
 				if(pStep.op!=TK_SELECT) {
-					sqlite3VdbeAddOp0(v,OP_ResetCount);
+					v.sqlite3VdbeAddOp0(OP_ResetCount);
 				}
 			}
 			return 0;
 		}
 		#if SQLITE_DEBUG
-																																				    /*
+																																						    /*
 ** This function is used to add VdbeComment() annotations to a VDBE
 ** program. It is not used in production code, only for debugging.
 */
@@ -803,7 +803,7 @@ return;
 			v=sqlite3GetVdbe(pSubParse);
 			if(v!=null) {
 				#if SQLITE_DEBUG
-																																																																								        VdbeComment( v, "Start: %s.%s (%s %s%s%s ON %s)",
+																																																																												        VdbeComment( v, "Start: %s.%s (%s %s%s%s ON %s)",
           pTrigger.zName != null ? pTrigger.zName : "", onErrorText( orconf ),
           ( pTrigger.tr_tm == TRIGGER_BEFORE ? "BEFORE" : "AFTER" ),
             ( pTrigger.op == TK_UPDATE ? "UPDATE" : "" ),
@@ -830,9 +830,9 @@ return;
 				/* Insert an OP_Halt at the end of the sub-program. */if(iEndTrigger!=0) {
 					sqlite3VdbeResolveLabel(v,iEndTrigger);
 				}
-				sqlite3VdbeAddOp0(v,OP_Halt);
+				v.sqlite3VdbeAddOp0(OP_Halt);
 				#if SQLITE_DEBUG
-																																																																								        VdbeComment( v, "End: %s.%s", pTrigger.zName, onErrorText( orconf ) );
+																																																																												        VdbeComment( v, "End: %s.%s", pTrigger.zName, onErrorText( orconf ) );
 #endif
 				transferParseError(pParse,pSubParse);
 				//if( db.mallocFailed==0 ){
@@ -887,10 +887,10 @@ return;
 			/* Code the OP_Program opcode in the parent VDBE. P4 of the OP_Program 
       ** is a pointer to the sub-vdbe containing the trigger program.  */if(pPrg!=null) {
 				bool bRecursive=(!String.IsNullOrEmpty(p.zName)&&0==(pParse.db.flags&SQLITE_RecTriggers));
-				sqlite3VdbeAddOp3(v,OP_Program,reg,ignoreJump,++pParse.nMem);
+				v.sqlite3VdbeAddOp3(OP_Program,reg,ignoreJump,++pParse.nMem);
 				sqlite3VdbeChangeP4(v,-1,pPrg.pProgram,P4_SUBPROGRAM);
 				#if SQLITE_DEBUG
-																																																																								        VdbeComment
+																																																																												        VdbeComment
             ( v, "Call: %s.%s", ( !String.IsNullOrEmpty( p.zName ) ? p.zName : "fkey" ), onErrorText( orconf ) );
 #endif
 				/* Set the P5 operand of the OP_Program instruction to non-zero if

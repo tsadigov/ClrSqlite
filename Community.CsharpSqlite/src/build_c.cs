@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 			pParse.nVar=0;
 		}
 		#if !SQLITE_OMIT_SHARED_CACHE
-																																						///<summary>
+																																								///<summary>
 /// The TableLock structure is only used by the sqlite3TableLock() and
 /// codeTableLocks() functions.
 ///</summary>
@@ -175,11 +175,11 @@ p.zName, P4_STATIC );
       */v=sqlite3GetVdbe(pParse);
 			Debug.Assert(0==pParse.isMultiWrite
 			#if SQLITE_DEBUG
-																																																									        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
+																																																												        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
 #endif
 			);
 			if(v!=null) {
-				sqlite3VdbeAddOp0(v,OP_Halt);
+				v.sqlite3VdbeAddOp0(OP_Halt);
 				/* The cookie mask contains one bit for each database file open.
         ** (Bit 0 is for main, bit 1 is for temp, and so forth.)  Bits are
         ** set for each database that is used.  Generate code to start a
@@ -193,10 +193,10 @@ p.zName, P4_STATIC );
 						if((mask&pParse.cookieMask)==0)
 							continue;
 						sqlite3VdbeUsesBtree(v,iDb);
-						sqlite3VdbeAddOp2(v,OP_Transaction,iDb,(mask&pParse.writeMask)!=0);
+						v.sqlite3VdbeAddOp2(OP_Transaction,iDb,(mask&pParse.writeMask)!=0);
 						if(db.init.busy==0) {
 							Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-							sqlite3VdbeAddOp3(v,OP_VerifyCookie,iDb,pParse.cookieValue[iDb],(int)db.aDb[iDb].pSchema.iGeneration);
+							v.sqlite3VdbeAddOp3(OP_VerifyCookie,iDb,pParse.cookieValue[iDb],(int)db.aDb[iDb].pSchema.iGeneration);
 						}
 					}
 					#if !SQLITE_OMIT_VIRTUALTABLE
@@ -204,7 +204,7 @@ p.zName, P4_STATIC );
 						int i;
 						for(i=0;i<pParse.nVtabLock;i++) {
 							VTable vtab=sqlite3GetVTable(db,pParse.apVtabLock[i]);
-							sqlite3VdbeAddOp4(v,OP_VBegin,0,0,0,vtab,P4_VTAB);
+							v.sqlite3VdbeAddOp4(OP_VBegin,0,0,0,vtab,P4_VTAB);
 						}
 						pParse.nVtabLock=0;
 						#endif
@@ -215,13 +215,13 @@ p.zName, P4_STATIC );
           *//* Finally, jump back to the beginning of the executable code. */}
 					codeTableLocks(pParse);
 					sqlite3AutoincrementBegin(pParse);
-					sqlite3VdbeAddOp2(v,OP_Goto,0,pParse.cookieGoto);
+					v.sqlite3VdbeAddOp2(OP_Goto,0,pParse.cookieGoto);
 				}
 			}
 			/* Get the VDBE program ready for execution
       */if(v!=null&&ALWAYS(pParse.nErr==0)/* && 0 == db.mallocFailed */) {
 				#if SQLITE_DEBUG
-																																																																												        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
+																																																																																        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
         sqlite3VdbeTrace( v, trace );
 #endif
 				Debug.Assert(pParse.iCacheLevel==0);
@@ -549,7 +549,7 @@ p.zName, P4_STATIC );
 				string zName=pIndex.zName;
 				//
 				#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																												        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
+																																																																																        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
         //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
         //  );
         Index pOld = sqlite3HashInsert(
@@ -633,7 +633,7 @@ p.zName, P4_STATIC );
 		static void sqlite3OpenMasterTable(Parse p,int iDb) {
 			Vdbe v=sqlite3GetVdbe(p);
 			sqlite3TableLock(p,iDb,MASTER_ROOT,1,SCHEMA_TABLE(iDb));
-			sqlite3VdbeAddOp3(v,OP_OpenWrite,0,MASTER_ROOT,iDb);
+			v.sqlite3VdbeAddOp3(OP_OpenWrite,0,MASTER_ROOT,iDb);
 			sqlite3VdbeChangeP4(v,-1,(int)5,P4_INT32);
 			/* 5 column table */if(p.nTab==0) {
 				p.nTab=1;
@@ -790,7 +790,7 @@ p.zName, P4_STATIC );
 			if(db.init.iDb==1)
 				isTemp=1;
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																									Debug.Assert( (isTemp & 1)==isTemp );
+																																																												Debug.Assert( (isTemp & 1)==isTemp );
 {
 int code;
 string zDb = db.aDb[iDb].zName;
@@ -881,21 +881,21 @@ goto begin_table_error;
 				int reg1,reg2,reg3;
 				sqlite3BeginWriteOperation(pParse,0,iDb);
 				if(isVirtual!=0) {
-					sqlite3VdbeAddOp0(v,OP_VBegin);
+					v.sqlite3VdbeAddOp0(OP_VBegin);
 				}
 				/* If the file format and encoding in the database have not been set,
         ** set them now.
         */reg1=pParse.regRowid=++pParse.nMem;
 				reg2=pParse.regRoot=++pParse.nMem;
 				reg3=++pParse.nMem;
-				sqlite3VdbeAddOp3(v,OP_ReadCookie,iDb,reg3,BTREE_FILE_FORMAT);
+				v.sqlite3VdbeAddOp3(OP_ReadCookie,iDb,reg3,BTREE_FILE_FORMAT);
 				sqlite3VdbeUsesBtree(v,iDb);
-				j1=sqlite3VdbeAddOp1(v,OP_If,reg3);
+				j1=v.sqlite3VdbeAddOp1(OP_If,reg3);
 				fileFormat=(db.flags&SQLITE_LegacyFileFmt)!=0?1:SQLITE_MAX_FILE_FORMAT;
-				sqlite3VdbeAddOp2(v,OP_Integer,fileFormat,reg3);
-				sqlite3VdbeAddOp3(v,OP_SetCookie,iDb,BTREE_FILE_FORMAT,reg3);
-				sqlite3VdbeAddOp2(v,OP_Integer,(int)ENC(db),reg3);
-				sqlite3VdbeAddOp3(v,OP_SetCookie,iDb,BTREE_TEXT_ENCODING,reg3);
+				v.sqlite3VdbeAddOp2(OP_Integer,fileFormat,reg3);
+				v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_FILE_FORMAT,reg3);
+				v.sqlite3VdbeAddOp2(OP_Integer,(int)ENC(db),reg3);
+				v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_TEXT_ENCODING,reg3);
 				sqlite3VdbeJumpHere(v,j1);
 				/* This just creates a place-holder record in the sqlite_master table.
         ** The record created does not contain anything yet.  It will be replaced
@@ -906,17 +906,17 @@ goto begin_table_error;
         ** The rowid and root page number values are needed by the code that
         ** sqlite3EndTable will generate.
         */if(isView!=0||isVirtual!=0) {
-					sqlite3VdbeAddOp2(v,OP_Integer,0,reg2);
+					v.sqlite3VdbeAddOp2(OP_Integer,0,reg2);
 				}
 				else {
-					sqlite3VdbeAddOp2(v,OP_CreateTable,iDb,reg2);
+					v.sqlite3VdbeAddOp2(OP_CreateTable,iDb,reg2);
 				}
 				sqlite3OpenMasterTable(pParse,iDb);
-				sqlite3VdbeAddOp2(v,OP_NewRowid,0,reg1);
-				sqlite3VdbeAddOp2(v,OP_Null,0,reg3);
-				sqlite3VdbeAddOp3(v,OP_Insert,0,reg3,reg1);
+				v.sqlite3VdbeAddOp2(OP_NewRowid,0,reg1);
+				v.sqlite3VdbeAddOp2(OP_Null,0,reg3);
+				v.sqlite3VdbeAddOp3(OP_Insert,0,reg3,reg1);
 				sqlite3VdbeChangeP5(v,OPFLAG_APPEND);
-				sqlite3VdbeAddOp0(v,OP_Close);
+				v.sqlite3VdbeAddOp0(OP_Close);
 			}
 			/* Normal (non-error) return. */return;
 			/* If an error occurs, we jump here */begin_table_error:
@@ -1314,8 +1314,8 @@ goto begin_table_error;
 			sqlite3 db=pParse.db;
 			Vdbe v=pParse.pVdbe;
 			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-			sqlite3VdbeAddOp2(v,OP_Integer,db.aDb[iDb].pSchema.schema_cookie+1,r1);
-			sqlite3VdbeAddOp3(v,OP_SetCookie,iDb,BTREE_SCHEMA_VERSION,r1);
+			v.sqlite3VdbeAddOp2(OP_Integer,db.aDb[iDb].pSchema.schema_cookie+1,r1);
+			v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_SCHEMA_VERSION,r1);
 			sqlite3ReleaseTempReg(pParse,r1);
 		}
 		///<summary>
@@ -1550,7 +1550,7 @@ goto begin_table_error;
 				/* Text of the CREATE TABLE or CREATE VIEW statement */v=sqlite3GetVdbe(pParse);
 				if(NEVER(v==null))
 					return;
-				sqlite3VdbeAddOp1(v,OP_Close,0);
+				v.sqlite3VdbeAddOp1(OP_Close,0);
 				/*
         ** Initialize zType for the new view or table.
         */if(p.pSelect==null) {
@@ -1579,12 +1579,12 @@ goto begin_table_error;
 					SelectDest dest=new SelectDest();
 					Table pSelTab;
 					Debug.Assert(pParse.nTab==1);
-					sqlite3VdbeAddOp3(v,OP_OpenWrite,1,pParse.regRoot,iDb);
+					v.sqlite3VdbeAddOp3(OP_OpenWrite,1,pParse.regRoot,iDb);
 					sqlite3VdbeChangeP5(v,1);
 					pParse.nTab=2;
 					sqlite3SelectDestInit(dest,SelectResultType.Table,1);
 					sqlite3Select(pParse,pSelect,ref dest);
-					sqlite3VdbeAddOp1(v,OP_Close,1);
+					v.sqlite3VdbeAddOp1(OP_Close,1);
 					if(pParse.nErr==0) {
 						pSelTab=sqlite3ResultSetOfSelect(pParse,pSelect);
 						if(pSelTab==null)
@@ -1715,7 +1715,7 @@ goto begin_table_error;
 			return;
 		}
 		#else
-																																						    static void sqlite3CreateView(
+																																								    static void sqlite3CreateView(
     Parse pParse,     /* The parsing context */
     Token pBegin,     /* The CREATE token that begins the statement */
     Token pName1,     /* The token that holds the name of the view */
@@ -1788,7 +1788,7 @@ goto begin_table_error;
 				pTable.nCol=-1;
 				db.lookaside.bEnabled=0;
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																												xAuth = db.xAuth;
+																																																																																xAuth = db.xAuth;
 db.xAuth = 0;
 pSelTab = sqlite3ResultSetOfSelect(pParse, pSel);
 db.xAuth = xAuth;
@@ -1841,7 +1841,7 @@ db.xAuth = xAuth;
 			DbClearProperty(db,idx,DB_UnresetViews);
 		}
 		#else
-																																						    // define sqliteViewResetAll(A,B)
+																																								    // define sqliteViewResetAll(A,B)
     static void sqliteViewResetAll( sqlite3 A, int B )
     {
     }
@@ -1899,7 +1899,7 @@ db.xAuth = xAuth;
 		static void destroyRootPage(Parse pParse,int iTable,int iDb) {
 			Vdbe v=sqlite3GetVdbe(pParse);
 			int r1=sqlite3GetTempReg(pParse);
-			sqlite3VdbeAddOp3(v,OP_Destroy,iTable,r1,iDb);
+			v.sqlite3VdbeAddOp3(OP_Destroy,iTable,r1,iDb);
 			sqlite3MayAbort(pParse);
 			#if !SQLITE_OMIT_AUTOVACUUM
 			/* OP_Destroy stores an in integer r1. If this integer
@@ -1923,7 +1923,7 @@ db.xAuth = xAuth;
 		///</summary>
 		static void destroyTable(Parse pParse,Table pTab) {
 			#if SQLITE_OMIT_AUTOVACUUM
-																																																									Index pIdx;
+																																																												Index pIdx;
 int iDb = sqlite3SchemaToIndex( pParse.db, pTab.pSchema );
 destroyRootPage( pParse, pTab.tnum, iDb );
 for ( pIdx = pTab.pIndex ; pIdx != null ; pIdx = pIdx.pNext )
@@ -2004,7 +2004,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
 				goto exit_drop_table;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																									{
+																																																												{
 int code;
 string zTab = SCHEMA_TABLE(iDb);
 string zDb = db.aDb[iDb].zName;
@@ -2061,7 +2061,7 @@ goto exit_drop_table;
 				sqlite3BeginWriteOperation(pParse,1,iDb);
 				#if !SQLITE_OMIT_VIRTUALTABLE
 				if(IsVirtual(pTab)) {
-					sqlite3VdbeAddOp0(v,OP_VBegin);
+					v.sqlite3VdbeAddOp0(OP_VBegin);
 				}
 				#endif
 				pParse.sqlite3FkDropTable(pName,pTab);
@@ -2099,9 +2099,9 @@ goto exit_drop_table;
 				/* Remove the table entry from SQLite's internal schema and modify
         ** the schema cookie.
         */if(IsVirtual(pTab)) {
-					sqlite3VdbeAddOp4(v,OP_VDestroy,iDb,0,0,pTab.zName,0);
+					v.sqlite3VdbeAddOp4(OP_VDestroy,iDb,0,0,pTab.zName,0);
 				}
-				sqlite3VdbeAddOp4(v,OP_DropTable,iDb,0,0,pTab.zName,0);
+				v.sqlite3VdbeAddOp4(OP_DropTable,iDb,0,0,pTab.zName,0);
 				sqlite3ChangeCookie(pParse,iDb);
 			}
 			sqliteViewResetAll(db,iDb);
@@ -2278,7 +2278,7 @@ goto exit_drop_table;
 			/* Register holding assemblied index record */sqlite3 db=pParse.db;
 			/* The database connection */int iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																									if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
+																																																												if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
 db.aDb[iDb].zName ) ){
 return;
 }
@@ -2292,15 +2292,15 @@ return;
 			}
 			else {
 				tnum=pIndex.tnum;
-				sqlite3VdbeAddOp2(v,OP_Clear,tnum,iDb);
+				v.sqlite3VdbeAddOp2(OP_Clear,tnum,iDb);
 			}
 			pKey=sqlite3IndexKeyinfo(pParse,pIndex);
-			sqlite3VdbeAddOp4(v,OP_OpenWrite,iIdx,tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
+			v.sqlite3VdbeAddOp4(OP_OpenWrite,iIdx,tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 			if(memRootPage>=0) {
 				sqlite3VdbeChangeP5(v,1);
 			}
 			sqlite3OpenTable(pParse,iTab,iDb,pTab,OP_OpenRead);
-			addr1=sqlite3VdbeAddOp2(v,OP_Rewind,iTab,0);
+			addr1=v.sqlite3VdbeAddOp2(OP_Rewind,iTab,0);
 			regRecord=sqlite3GetTempReg(pParse);
 			regIdxKey=sqlite3GenerateIndexKey(pParse,pIndex,iTab,regRecord,true);
 			if(pIndex.onError!=OE_None) {
@@ -2316,16 +2316,16 @@ return;
         ** opcode use the values stored within seems dangerous. However, since
         ** we can be sure that no other temp registers have been allocated
         ** since sqlite3ReleaseTempRange() was called, it is safe to do so.
-        */sqlite3VdbeAddOp4(v,OP_IsUnique,iIdx,j2,regRowid,pRegKey,P4_INT32);
+        */v.sqlite3VdbeAddOp4(OP_IsUnique,iIdx,j2,regRowid,pRegKey,P4_INT32);
 				sqlite3HaltConstraint(pParse,OE_Abort,"indexed columns are not unique",P4_STATIC);
 			}
-			sqlite3VdbeAddOp2(v,OP_IdxInsert,iIdx,regRecord);
+			v.sqlite3VdbeAddOp2(OP_IdxInsert,iIdx,regRecord);
 			sqlite3VdbeChangeP5(v,OPFLAG_USESEEKRESULT);
 			sqlite3ReleaseTempReg(pParse,regRecord);
-			sqlite3VdbeAddOp2(v,OP_Next,iTab,addr1+1);
+			v.sqlite3VdbeAddOp2(OP_Next,iTab,addr1+1);
 			sqlite3VdbeJumpHere(v,addr1);
-			sqlite3VdbeAddOp1(v,OP_Close,iTab);
-			sqlite3VdbeAddOp1(v,OP_Close,iIdx);
+			v.sqlite3VdbeAddOp1(OP_Close,iTab);
+			v.sqlite3VdbeAddOp1(OP_Close,iIdx);
 		}
 		///<summary>
 		/// Create a new index for an SQL table.  pName1.pName2 is the name of the index
@@ -2480,7 +2480,7 @@ return;
 			/* Check for authorization to create an index.
       */
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																									{
+																																																												{
 string zDb = pDb.zName;
 if( sqlite3AuthCheck(pParse, SQLITE_INSERT, SCHEMA_TABLE(iDb), 0, zDb) ){
 goto exit_create_index;
@@ -2719,7 +2719,7 @@ goto exit_create_index;
 					goto exit_create_index;
 				/* Create the rootpage for the index
         */sqlite3BeginWriteOperation(pParse,1,iDb);
-				sqlite3VdbeAddOp2(v,OP_CreateIndex,iDb,iMem);
+				v.sqlite3VdbeAddOp2(OP_CreateIndex,iDb,iMem);
 				/* Gather the complete text of the CREATE INDEX statement into
         ** the zStmt variable
         */if(pStart!=null) {
@@ -2738,7 +2738,7 @@ goto exit_create_index;
 					sqlite3RefillIndex(pParse,pIndex,iMem);
 					sqlite3ChangeCookie(pParse,iDb);
 					sqlite3VdbeAddParseSchemaOp(v,iDb,sqlite3MPrintf(db,"name='%q' AND type='index'",pIndex.zName));
-					sqlite3VdbeAddOp1(v,OP_Expire,0);
+					v.sqlite3VdbeAddOp1(OP_Expire,0);
 				}
 			}
 			/* When adding an index to the list of indices for a table, make
@@ -2845,7 +2845,7 @@ goto exit_create_index;
 			}
 			iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																									{
+																																																												{
 int code = SQLITE_DROP_INDEX;
 Table pTab = pIndex.pTable;
 string zDb = db.aDb[iDb].zName;
@@ -2868,7 +2868,7 @@ goto exit_drop_index;
 				}
 				sqlite3ChangeCookie(pParse,iDb);
 				destroyRootPage(pParse,pIndex.tnum,iDb);
-				sqlite3VdbeAddOp4(v,OP_DropIndex,iDb,0,0,pIndex.zName,0);
+				v.sqlite3VdbeAddOp4(OP_DropIndex,iDb,0,0,pIndex.zName,0);
 			}
 			exit_drop_index:
 			sqlite3SrcListDelete(db,ref pName);
@@ -3242,11 +3242,11 @@ goto exit_drop_index;
 				return;
 			if(type!=TK_DEFERRED) {
 				for(i=0;i<db.nDb;i++) {
-					sqlite3VdbeAddOp2(v,OP_Transaction,i,(type==TK_EXCLUSIVE)?2:1);
+					v.sqlite3VdbeAddOp2(OP_Transaction,i,(type==TK_EXCLUSIVE)?2:1);
 					sqlite3VdbeUsesBtree(v,i);
 				}
 			}
-			sqlite3VdbeAddOp2(v,OP_AutoCommit,0,0);
+			v.sqlite3VdbeAddOp2(OP_AutoCommit,0,0);
 		}
 		///<summary>
 		/// Commit a transaction
@@ -3263,7 +3263,7 @@ goto exit_drop_index;
 			}
 			v=sqlite3GetVdbe(pParse);
 			if(v!=null) {
-				sqlite3VdbeAddOp2(v,OP_AutoCommit,1,0);
+				v.sqlite3VdbeAddOp2(OP_AutoCommit,1,0);
 			}
 		}
 		/*
@@ -3279,7 +3279,7 @@ goto exit_drop_index;
 			}
 			v=sqlite3GetVdbe(pParse);
 			if(v!=null) {
-				sqlite3VdbeAddOp2(v,OP_AutoCommit,1,1);
+				v.sqlite3VdbeAddOp2(OP_AutoCommit,1,1);
 			}
 		}
 		///<summary>
@@ -3288,24 +3288,24 @@ goto exit_drop_index;
 		///
 		///</summary>
 		#if !SQLITE_OMIT_AUTHORIZATION
-																																						const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
+																																								const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
 #endif
 		static void sqlite3Savepoint(Parse pParse,int op,Token pName) {
 			string zName=sqlite3NameFromToken(pParse.db,pName);
 			if(zName!=null) {
 				Vdbe v=sqlite3GetVdbe(pParse);
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																												Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
+																																																																																Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
 #endif
 				if(null==v
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																												|| sqlite3AuthCheck(pParse, SQLITE_SAVEPOINT, az[op], zName, 0)
+																																																																																|| sqlite3AuthCheck(pParse, SQLITE_SAVEPOINT, az[op], zName, 0)
 #endif
 				) {
 					sqlite3DbFree(pParse.db,ref zName);
 					return;
 				}
-				sqlite3VdbeAddOp4(v,OP_Savepoint,op,0,0,zName,P4_DYNAMIC);
+				v.sqlite3VdbeAddOp4(OP_Savepoint,op,0,0,zName,P4_DYNAMIC);
 			}
 		}
 		///<summary>
@@ -3362,7 +3362,7 @@ goto exit_drop_index;
 				Vdbe v=sqlite3GetVdbe(pToplevel);
 				if(v==null)
 					return;
-				/* This only happens if there was a prior error */pToplevel.cookieGoto=sqlite3VdbeAddOp2(v,OP_Goto,0,0)+1;
+				/* This only happens if there was a prior error */pToplevel.cookieGoto=v.sqlite3VdbeAddOp2(OP_Goto,0,0)+1;
 			}
 			if(iDb>=0) {
 				sqlite3 db=pToplevel.db;
@@ -3461,14 +3461,14 @@ goto exit_drop_index;
 			if(onError==OE_Abort) {
 				sqlite3MayAbort(pParse);
 			}
-			sqlite3VdbeAddOp4(v,OP_Halt,SQLITE_CONSTRAINT,onError,0,p4,p4type);
+			v.sqlite3VdbeAddOp4(OP_Halt,SQLITE_CONSTRAINT,onError,0,p4,p4type);
 		}
 		static void sqlite3HaltConstraint(Parse pParse,int onError,byte[] p4,int p4type) {
 			Vdbe v=sqlite3GetVdbe(pParse);
 			if(onError==OE_Abort) {
 				sqlite3MayAbort(pParse);
 			}
-			sqlite3VdbeAddOp4(v,OP_Halt,SQLITE_CONSTRAINT,onError,0,p4,p4type);
+			v.sqlite3VdbeAddOp4(OP_Halt,SQLITE_CONSTRAINT,onError,0,p4,p4type);
 		}
 		///<summary>
 		/// Check to see if pIndex uses the collating sequence pColl.  Return

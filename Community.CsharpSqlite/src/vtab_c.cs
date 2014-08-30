@@ -298,7 +298,7 @@ namespace Community.CsharpSqlite {
 			pParse.sNameToken.n=pParse.sNameToken.z.Length;
 			//      (int)[pModuleName.n] - pName1.z );
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																									  /* Creating a virtual table invokes the authorization callback twice.
+																																																												  /* Creating a virtual table invokes the authorization callback twice.
   ** The first invocation, to obtain permission to INSERT a row into the
   ** sqlite_master table, has already been made by sqlite3StartTable().
   ** The second call, to obtain permission to create the table, is made now.
@@ -365,10 +365,10 @@ namespace Community.CsharpSqlite {
 				sqlite3DbFree(db,ref zStmt);
 				v=sqlite3GetVdbe(pParse);
 				sqlite3ChangeCookie(pParse,iDb);
-				sqlite3VdbeAddOp2(v,OP_Expire,0,0);
+				v.sqlite3VdbeAddOp2(OP_Expire,0,0);
 				zWhere=sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);
 				sqlite3VdbeAddParseSchemaOp(v,iDb,zWhere);
-				sqlite3VdbeAddOp4(v,OP_VCreate,iDb,0,0,pTab.zName,StringExtensions.sqlite3Strlen30(pTab.zName)+1);
+				v.sqlite3VdbeAddOp4(OP_VCreate,iDb,0,0,pTab.zName,StringExtensions.sqlite3Strlen30(pTab.zName)+1);
 			}
 			/* If we are rereading the sqlite_master table create the in-memory
       ** record of the table. The xConnect() method is not called until

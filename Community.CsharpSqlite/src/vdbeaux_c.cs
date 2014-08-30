@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if SQLITE_DEBUG
-																																						    static bool sqlite3VdbeAddopTrace = false;
+																																								    static bool sqlite3VdbeAddopTrace = false;
 #endif
 		///<summary>
 		/// Create a new virtual database engine.
@@ -92,7 +92,7 @@ namespace Community.CsharpSqlite {
 			if(p==null)
 				return;
 			#if SQLITE_OMIT_TRACE
-																																																									if( 0==isPrepareV2 ) return;
+																																																												if( 0==isPrepareV2 ) return;
 #endif
 			Debug.Assert(p.zSql=="");
 			p.zSql=z.Substring(0,n);
@@ -130,7 +130,7 @@ namespace Community.CsharpSqlite {
 			pB.isPrepareV2=pA.isPrepareV2;
 		}
 		#if SQLITE_DEBUG
-																																						    /*
+																																								    /*
 ** Turn tracing on or off
 */
     static void sqlite3VdbeTrace( Vdbe p, FILE trace )
@@ -182,156 +182,22 @@ namespace Community.CsharpSqlite {
 		/// operand.
 		///
 		///</summary>
-		static int sqlite3VdbeAddOp3(Vdbe p,int op,int p1,int p2,int p3) {
-			int i;
-			VdbeOp pOp;
-			i=p.nOp;
-			Debug.Assert(p.magic==VDBE_MAGIC_INIT);
-			Debug.Assert(op>0&&op<0xff);
-			if(p.nOpAlloc<=i) {
-				if(growOpArray(p)!=0) {
-					return 1;
-				}
-			}
-			p.nOp++;
-			if(p.aOp[i]==null)
-				p.aOp[i]=new VdbeOp();
-			pOp=p.aOp[i];
-			pOp.opcode=(u8)op;
-			pOp.p5=0;
-			pOp.p1=p1;
-			pOp.p2=p2;
-			pOp.p3=p3;
-			pOp.p4.p=null;
-			pOp.p4type=P4_NOTUSED;
-			#if SQLITE_DEBUG
-																																																									      pOp.zComment = null;
-      if ( sqlite3VdbeAddopTrace )
-        sqlite3VdbePrintOp( null, i, p.aOp[i] );
-#endif
-			#if VDBE_PROFILE
-																																																									pOp.cycles = 0;
-pOp.cnt = 0;
-#endif
-			return i;
-		}
-		static int sqlite3VdbeAddOp0(Vdbe p,int op) {
-			return sqlite3VdbeAddOp3(p,op,0,0,0);
-		}
-		static int sqlite3VdbeAddOp1(Vdbe p,int op,int p1) {
-			return sqlite3VdbeAddOp3(p,op,p1,0,0);
-		}
-		static int sqlite3VdbeAddOp2(Vdbe p,int op,int p1,bool b2) {
-			return sqlite3VdbeAddOp2(p,op,p1,(int)(b2?1:0));
-		}
-		static int sqlite3VdbeAddOp2(Vdbe p,int op,int p1,int p2) {
-			return sqlite3VdbeAddOp3(p,op,p1,p2,0);
-		}
 		///<summary>
 		/// Add an opcode that includes the p4 value as a pointer.
 		///
 		///</summary>
 		//P4_INT32
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,i32 pP4,int p4type) {
-			union_p4 _p4=new union_p4();
-			_p4.i=pP4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		//char
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,char pP4,int p4type) {
-			union_p4 _p4=new union_p4();
-			_p4.z=pP4.ToString();
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		//StringBuilder
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,StringBuilder pP4,int p4type) {
-			//      Debug.Assert( pP4 != null );
-			union_p4 _p4=new union_p4();
-			_p4.z=pP4.ToString();
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		//String
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,string pP4,int p4type) {
-			//      Debug.Assert( pP4 != null );
-			union_p4 _p4=new union_p4();
-			_p4.z=pP4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,byte[] pP4,int p4type) {
-			Debug.Assert(op==OP_Null||pP4!=null);
-			union_p4 _p4=new union_p4();
-			_p4.z=Encoding.UTF8.GetString(pP4,0,pP4.Length);
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		//P4_INTARRAY
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,int[] pP4,int p4type) {
-			Debug.Assert(pP4!=null);
-			union_p4 _p4=new union_p4();
-			_p4.ai=pP4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		//P4_INT64
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,i64 pP4,int p4type) {
-			union_p4 _p4=new union_p4();
-			_p4.pI64=pP4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		//DOUBLE (REAL)
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,double pP4,int p4type) {
-			union_p4 _p4=new union_p4();
-			_p4.pReal=pP4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		//FUNCDEF
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,FuncDef pP4,int p4type) {
-			union_p4 _p4=new union_p4();
-			_p4.pFunc=pP4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		//CollSeq
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,CollSeq pP4,int p4type) {
-			union_p4 _p4=new union_p4();
-			_p4.pColl=pP4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		//KeyInfo
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,KeyInfo pP4,int p4type) {
-			union_p4 _p4=new union_p4();
-			_p4.pKeyInfo=pP4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		#if !SQLITE_OMIT_VIRTUALTABLE
 		//VTable
-		static int sqlite3VdbeAddOp4(Vdbe p,int op,int p1,int p2,int p3,VTable pP4,int p4type) {
-			Debug.Assert(pP4!=null);
-			union_p4 _p4=new union_p4();
-			_p4.pVtab=pP4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
-			sqlite3VdbeChangeP4(p,addr,_p4,p4type);
-			return addr;
-		}
 		#endif
 		//  static int sqlite3VdbeAddOp4(
 		//  Vdbe p,               /* Add the opcode to this VM */
@@ -357,7 +223,7 @@ pOp.cnt = 0;
 		///</summary>
 		static void sqlite3VdbeAddParseSchemaOp(Vdbe p,int iDb,string zWhere) {
 			int j;
-			int addr=sqlite3VdbeAddOp3(p,OP_ParseSchema,iDb,0,0);
+			int addr=p.sqlite3VdbeAddOp3(OP_ParseSchema,iDb,0,0);
 			sqlite3VdbeChangeP4(p,addr,zWhere,P4_DYNAMIC);
 			for(j=0;j<p.db.nDb;j++)
 				sqlite3VdbeUsesBtree(p,j);
@@ -369,7 +235,7 @@ pOp.cnt = 0;
 		static int sqlite3VdbeAddOp4Int(Vdbe p,/* Add the opcode to this VM */int op,/* The new opcode */int p1,/* The P1 operand */int p2,/* The P2 operand */int p3,/* The P3 operand */int p4/* The P4 operand as an integer */) {
 			union_p4 _p4=new union_p4();
 			_p4.i=p4;
-			int addr=sqlite3VdbeAddOp3(p,op,p1,p2,p3);
+			int addr=p.sqlite3VdbeAddOp3(op,p1,p2,p3);
 			sqlite3VdbeChangeP4(p,addr,_p4,P4_INT32);
 			return addr;
 		}
@@ -430,7 +296,7 @@ pOp.cnt = 0;
 			p.runOnlyOnce=1;
 		}
 		#if SQLITE_DEBUG
-																																						
+																																								
     /*
 ** The following type and function are used to iterate through all opcodes
 ** in a Vdbe main program and each of the sub-programs (triggers) it may 
@@ -544,9 +410,9 @@ pOp.cnt = 0;
         int opcode = pOp.opcode;
         if ( opcode == OP_Destroy || opcode == OP_VUpdate || opcode == OP_VRename
 #if !SQLITE_OMIT_FOREIGN_KEY
-																																						 || ( opcode == OP_FkCounter && pOp.p1 == 0 && pOp.p2 == 1 )
+																																								 || ( opcode == OP_FkCounter && pOp.p1 == 0 && pOp.p2 == 1 )
 #endif
-																																						 || ( ( opcode == OP_Halt || opcode == OP_HaltIfNull )
+																																								 || ( ( opcode == OP_Halt || opcode == OP_HaltIfNull )
         && ( pOp.p1 == SQLITE_CONSTRAINT && pOp.p2 == OE_Abort ) )
         )
         {
@@ -687,7 +553,7 @@ pOp.cnt = 0;
 					pOut.p4.p=null;
 					pOut.p5=0;
 					#if SQLITE_DEBUG
-																																																																																															          pOut.zComment = null;
+																																																																																																				          pOut.zComment = null;
           if ( sqlite3VdbeAddopTrace )
           {
             sqlite3VdbePrintOp( null, i + addr, p.aOp[i + addr] );
@@ -1073,7 +939,7 @@ pOp.cnt = 0;
 																}
 		}
 		#if !NDEBUG
-																																						    ///<summary>
+																																								    ///<summary>
 /// Change the comment on the the most recently coded instruction.  Or
 /// insert a No-op and add the comment to that new instruction.  This
 /// makes the code easier to read during debugging.  None of this happens
@@ -1149,7 +1015,7 @@ pOp.cnt = 0;
       ** zeros, which is correct.  MSVC generates a warning, nevertheless. */Debug.Assert(p.magic==VDBE_MAGIC_INIT);
 			if(addr<0) {
 				#if SQLITE_OMIT_TRACE
-																																																																												if( p.nOp==0 ) return dummy;
+																																																																																if( p.nOp==0 ) return dummy;
 #endif
 				addr=p.nOp-1;
 			}
@@ -1299,7 +1165,7 @@ pOp.cnt = 0;
 			}
 		}
 		#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
-																																						/*
+																																								/*
 ** If SQLite is compiled to support shared-cache mode and to be threadsafe,
 ** this routine obtains the mutex Debug.Associated with each BtShared structure
 ** that may be accessed by the VM pDebug.Assed as an argument. In doing so it also
@@ -1338,7 +1204,7 @@ void sqlite3VdbeEnter(Vdbe *p){
 }
 #endif
 		#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
-																																						/*
+																																								/*
 ** Unlock all of the btrees previously locked by a call to sqlite3VdbeEnter().
 */
 void sqlite3VdbeLeave(Vdbe *p){
@@ -1359,7 +1225,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 }
 #endif
 		#if VDBE_PROFILE || SQLITE_DEBUG
-																																						    /*
+																																								    /*
 ** Print a single opcode.  This routine is used for debugging only.
 */
     static void sqlite3VdbePrintOp( FILE pOut, int pc, Op pOp )
@@ -1374,11 +1240,11 @@ void sqlite3VdbeLeave(Vdbe *p){
       sqlite3_snprintf( 999, zOut, zFormat1, pc,
       sqlite3OpcodeName( pOp.opcode ), pOp.p1, pOp.p2, pOp.p3, zP4, pOp.p5,
 #if SQLITE_DEBUG
-																																						 pOp.zComment != null ? pOp.zComment : ""
+																																								 pOp.zComment != null ? pOp.zComment : ""
 #else
-																																						""
+																																								""
 #endif
-																																						 );
+																																								 );
       pOut.Write( zOut );
       //fflush(pOut);
     }
@@ -1664,7 +1530,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 						pMem=p.pResultSet[i_pMem++];
 						// pMem++;
 						#if SQLITE_DEBUG
-																																																																																																																		          if ( pOp.zComment != null )
+																																																																																																																								          if ( pOp.zComment != null )
           {
             pMem.flags = MEM_Str | MEM_Term;
             pMem.z = pOp.zComment;
@@ -1687,7 +1553,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 		}
 		#endif
 		#if SQLITE_DEBUG
-																																						    /*
+																																								    /*
 ** Print the SQL that was used to generate a VDBE program.
 */
     static void sqlite3VdbePrintSql( Vdbe p )
@@ -1706,7 +1572,7 @@ void sqlite3VdbeLeave(Vdbe *p){
     }
 #endif
 		#if !SQLITE_OMIT_TRACE && SQLITE_ENABLE_IOTRACE
-																																						/*
+																																								/*
 ** Print an IOTRACE message showing SQL content.
 */
 static void sqlite3VdbeIOTraceSql( Vdbe p )
@@ -1787,7 +1653,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		///</summary>
 		static void sqlite3VdbeRewind(Vdbe p) {
 			#if (SQLITE_DEBUG) || (VDBE_PROFILE)
-																																																									      int i;
+																																																												      int i;
     #endif
 			Debug.Assert(p!=null);
 			Debug.Assert(p.magic==VDBE_MAGIC_INIT);
@@ -1795,7 +1661,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       */Debug.Assert(p.nOp>0);
 			/* Set the magic to VDBE_MAGIC_RUN sooner rather than later. */p.magic=VDBE_MAGIC_RUN;
 			#if SQLITE_DEBUG
-																																																									      for(i=1; i<p.nMem; i++){
+																																																												      for(i=1; i<p.nMem; i++){
         Debug.Assert( p.aMem[i].db==p.db );
       }
     #endif
@@ -1809,7 +1675,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			p.iStatement=0;
 			p.nFkConstraint=0;
 			#if VDBE_PROFILE
-																																																									      for(i=0; i<p.nOp; i++){
+																																																												      for(i=0; i<p.nOp; i++){
         p.aOp[i].cnt = 0;
         p.aOp[i].cycles = 0;
       }
@@ -2061,7 +1927,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		static void Cleanup(Vdbe p) {
 			sqlite3 db=p.db;
 			#if SQLITE_DEBUG
-																																																									      /* Execute Debug.Assert() statements to ensure that the Vdbe.apCsr[] and 
+																																																												      /* Execute Debug.Assert() statements to ensure that the Vdbe.apCsr[] and 
 ** Vdbe.aMem[] arrays have already been cleaned up.  */
       int i;
       //TODO for(i=0; i<p.nCursor; i++) Debug.Assert( p.apCsr==null || p.apCsr[i]==null );
@@ -2134,7 +2000,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			/* Number of databases with an active write-transaction */int rc=SQLITE_OK;
 			bool needXcommit=false;
 			#if SQLITE_OMIT_VIRTUALTABLE
-																																																									      /* With this option, sqlite3VtabSync() is defined to be simply
+																																																												      /* With this option, sqlite3VtabSync() is defined to be simply
 ** SQLITE_OK so p is not used.
 */
       UNUSED_PARAMETER( p );
@@ -2302,7 +2168,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
         ** may be lying around. Returning an error code won't help matters.
         */
 				#if SQLITE_TEST
-																																																																												        disable_simulated_io_errors();
+																																																																																        disable_simulated_io_errors();
 #endif
 				sqlite3BeginBenignMalloc();
 				for(i=0;i<db.nDb;i++) {
@@ -2313,7 +2179,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				}
 				sqlite3EndBenignMalloc();
 				#if SQLITE_TEST
-																																																																												        enable_simulated_io_errors();
+																																																																																        enable_simulated_io_errors();
 #endif
 				sqlite3VtabCommit(db);
 			}
@@ -2331,7 +2197,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		///
 		///</summary>
 		#if !NDEBUG
-																																						    static void checkActiveVdbeCnt( sqlite3 db )
+																																								    static void checkActiveVdbeCnt( sqlite3 db )
     {
       Vdbe p;
       int cnt = 0;
@@ -2715,7 +2581,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			/* Save profiling information from this VDBE run.
       */
 			#if VDBE_PROFILE && TODO
-																																																									{
+																																																												{
 FILE *out = fopen("vdbe_profile.out", "a");
 if( out ){
 int i;
@@ -2841,7 +2707,7 @@ fclose(out);
 				int res=0;
 				int rc;
 				#if SQLITE_TEST
-																																																																												        //extern int sqlite3_search_count;
+																																																																																        //extern int sqlite3_search_count;
 #endif
 				Debug.Assert(p.isTable);
 				rc=sqlite3BtreeMovetoUnpacked(p.pCursor,null,p.movetoTarget,0,ref res);
@@ -2852,12 +2718,12 @@ fclose(out);
 					return SQLITE_CORRUPT_BKPT();
 				p.rowidIsValid=true;
 				#if SQLITE_TEST
-																																																																												#if !TCLSH
-																																																																												        sqlite3_search_count++;
+																																																																																#if !TCLSH
+																																																																																        sqlite3_search_count++;
 #else
-																																																																												        sqlite3_search_count.iValue++;
+																																																																																        sqlite3_search_count.iValue++;
 #endif
-																																																																												#endif
+																																																																																#endif
 				p.deferredMoveto=false;
 				p.cacheStatus=CACHE_STALE;
 			}
@@ -3035,7 +2901,7 @@ fclose(out);
 		///
 		///</summary>
 		#if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																						//static u64 floatSwap(u64 in){
+																																								//static u64 floatSwap(u64 in){
 //  union {
 //    u64 r;
 //    u32 i[2];
@@ -3079,13 +2945,13 @@ fclose(out);
 				if(serial_type==7) {
 					//Debug.Assert( sizeof( v) == sizeof(pMem.r));
 					#if WINDOWS_PHONE || WINDOWS_MOBILE
-																																																																																															v = (ulong)BitConverter.ToInt64(BitConverter.GetBytes(pMem.r),0);
+																																																																																																				v = (ulong)BitConverter.ToInt64(BitConverter.GetBytes(pMem.r),0);
 #else
 					v=(ulong)BitConverter.DoubleToInt64Bits(pMem.r);
 					// memcpy( &v, pMem.r, v ).Length;
 					#endif
 					#if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																																															swapMixedEndianFloat( v );
+																																																																																																				swapMixedEndianFloat( v );
 #endif
 				}
 				else {
@@ -3174,7 +3040,7 @@ fclose(out);
 				/* IEEE floating point */u64 x;
 				u32 y;
 				#if !NDEBUG && !SQLITE_OMIT_FLOATING_POINT
-																																																																												            /* Verify that integers and floating point values use the same
+																																																																																            /* Verify that integers and floating point values use the same
 ** byte order.  Or, that if SQLITE_MIXED_ENDIAN_64BIT_FLOAT is
 ** defined that 64-bit floating point values really are mixed
 ** endian.
@@ -3183,9 +3049,9 @@ fclose(out);
             const double r1 = 1.0;
             u64 t2 = t1;
 #if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																												swapMixedEndianFloat(t2);
+																																																																																swapMixedEndianFloat(t2);
 #endif
-																																																																												            Debug.Assert( sizeof( double ) == sizeof( u64 ) && memcmp( BitConverter.GetBytes( r1 ), BitConverter.GetBytes( t2 ), sizeof( double ) ) == 0 );//Debug.Assert( sizeof(r1)==sizeof(t2) && memcmp(&r1, t2, sizeof(r1))==0 );
+																																																																																            Debug.Assert( sizeof( double ) == sizeof( u64 ) && memcmp( BitConverter.GetBytes( r1 ), BitConverter.GetBytes( t2 ), sizeof( double ) ) == 0 );//Debug.Assert( sizeof(r1)==sizeof(t2) && memcmp(&r1, t2, sizeof(r1))==0 );
 #endif
 				x=(u64)((buf[offset+0]<<24)|(buf[offset+1]<<16)|(buf[offset+2]<<8)|buf[offset+3]);
 				y=(u32)((buf[offset+4]<<24)|(buf[offset+5]<<16)|(buf[offset+6]<<8)|buf[offset+7]);
@@ -3197,10 +3063,10 @@ fclose(out);
 				else {
 					Debug.Assert(sizeof(i64)==8&&sizeof(double)==8);
 					#if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																																															swapMixedEndianFloat(x);
+																																																																																																				swapMixedEndianFloat(x);
 #endif
 					#if WINDOWS_PHONE || WINDOWS_MOBILE
-																																																																																															              pMem.r = BitConverter.ToDouble(BitConverter.GetBytes((long)x), 0);
+																																																																																																				              pMem.r = BitConverter.ToDouble(BitConverter.GetBytes((long)x), 0);
 #else
 					pMem.r=BitConverter.Int64BitsToDouble((long)x);
 					// memcpy(pMem.r, x, sizeof(x))
@@ -3291,7 +3157,7 @@ fclose(out);
 				/* IEEE floating point */u64 x;
 				u32 y;
 				#if !NDEBUG && !SQLITE_OMIT_FLOATING_POINT
-																																																																												            /* Verify that integers and floating point values use the same
+																																																																																            /* Verify that integers and floating point values use the same
 ** byte order.  Or, that if SQLITE_MIXED_ENDIAN_64BIT_FLOAT is
 ** defined that 64-bit floating point values really are mixed
 ** endian.
@@ -3300,9 +3166,9 @@ fclose(out);
             const double r1 = 1.0;
             u64 t2 = t1;
 #if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																												swapMixedEndianFloat(t2);
+																																																																																swapMixedEndianFloat(t2);
 #endif
-																																																																												            Debug.Assert( sizeof( double ) == sizeof( u64 ) && memcmp( BitConverter.GetBytes( r1 ), BitConverter.GetBytes( t2 ), sizeof( double ) ) == 0 );//Debug.Assert( sizeof(r1)==sizeof(t2) && memcmp(&r1, t2, sizeof(r1))==0 );
+																																																																																            Debug.Assert( sizeof( double ) == sizeof( u64 ) && memcmp( BitConverter.GetBytes( r1 ), BitConverter.GetBytes( t2 ), sizeof( double ) ) == 0 );//Debug.Assert( sizeof(r1)==sizeof(t2) && memcmp(&r1, t2, sizeof(r1))==0 );
 #endif
 				x=(u64)((buf[0]<<24)|(buf[1]<<16)|(buf[2]<<8)|buf[3]);
 				y=(u32)((buf[4]<<24)|(buf[5]<<16)|(buf[6]<<8)|buf[7]);
@@ -3314,10 +3180,10 @@ fclose(out);
 				else {
 					Debug.Assert(sizeof(i64)==8&&sizeof(double)==8);
 					#if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																																															swapMixedEndianFloat(x);
+																																																																																																				swapMixedEndianFloat(x);
 #endif
 					#if WINDOWS_PHONE || WINDOWS_MOBILE
-																																																																																															              pMem.r = BitConverter.ToDouble(BitConverter.GetBytes((long)x), 0);
+																																																																																																				              pMem.r = BitConverter.ToDouble(BitConverter.GetBytes((long)x), 0);
 #else
 					pMem.r=BitConverter.Int64BitsToDouble((long)x);
 					// memcpy(pMem.r, x, sizeof(x))
@@ -3432,7 +3298,7 @@ fclose(out);
     ** This routine destroys a UnpackedRecord object.
     */static void sqlite3VdbeDeleteUnpackedRecord(UnpackedRecord p) {
 			#if SQLITE_DEBUG
-																																																									      int i;
+																																																												      int i;
       Mem pMem;
       Debug.Assert( p != null );
       Debug.Assert( ( p.flags & UNPACKED_NEED_DESTROY ) != 0 );
