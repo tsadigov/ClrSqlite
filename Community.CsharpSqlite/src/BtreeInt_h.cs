@@ -3122,6 +3122,22 @@ aOverflow= null;
 				}
 				return rc;
 			}
+			public int btreeRestoreCursorPosition() {
+				int rc;
+				Debug.Assert(this.cursorHoldsMutex());
+				Debug.Assert(this.eState>=CURSOR_REQUIRESEEK);
+				if(this.eState==CURSOR_FAULT) {
+					return this.skipNext;
+				}
+				this.eState=CURSOR_INVALID;
+				rc=this.btreeMoveto(this.pKey,this.nKey,0,ref this.skipNext);
+				if(rc==SQLITE_OK) {
+					//sqlite3_free(ref pCur.pKey);
+					this.pKey=null;
+					Debug.Assert(this.eState==CURSOR_VALID||this.eState==CURSOR_INVALID);
+				}
+				return rc;
+			}
 		}
 		/*
     ** Potential values for BtCursor.eState.

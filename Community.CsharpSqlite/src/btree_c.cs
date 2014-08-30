@@ -524,29 +524,13 @@ p.eState = CURSOR_INVALID;
 		/// at most one effective restoreCursorPosition() call after each
 		/// saveCursorPosition().
 		///</summary>
-		static int btreeRestoreCursorPosition(BtCursor pCur) {
-			int rc;
-			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pCur.eState>=CURSOR_REQUIRESEEK);
-			if(pCur.eState==CURSOR_FAULT) {
-				return pCur.skipNext;
-			}
-			pCur.eState=CURSOR_INVALID;
-			rc=pCur.btreeMoveto(pCur.pKey,pCur.nKey,0,ref pCur.skipNext);
-			if(rc==SQLITE_OK) {
-				//sqlite3_free(ref pCur.pKey);
-				pCur.pKey=null;
-				Debug.Assert(pCur.eState==CURSOR_VALID||pCur.eState==CURSOR_INVALID);
-			}
-			return rc;
-		}
 		//#define restoreCursorPosition(p) \
 		//  (p.eState>=CURSOR_REQUIRESEEK ? \
 		//         btreeRestoreCursorPosition(p) : \
 		//         SQLITE_OK)
 		static int restoreCursorPosition(BtCursor pCur) {
 			if(pCur.eState>=CURSOR_REQUIRESEEK)
-				return btreeRestoreCursorPosition(pCur);
+				return pCur.btreeRestoreCursorPosition();
 			else
 				return SQLITE_OK;
 		}
