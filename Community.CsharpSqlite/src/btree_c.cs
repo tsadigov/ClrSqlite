@@ -496,8 +496,6 @@ p.eState = CURSOR_INVALID;
 		}
 		//#define invalidateAllOverflowCache(x)
 		//#define invalidateIncrblobCursors(x,y,z)
-		static void invalidateIncrblobCursors(Btree x,i64 y,int z) {
-		}
 		#endif
 		///<summary>
 		/// Save the current cursor position in the variables BtCursor.nKey
@@ -4387,7 +4385,7 @@ return 1;
 			/* If this is an insert into a table b-tree, invalidate any incrblob
   ** cursors open on the row being replaced (assuming this is a replace
   ** operation - if it is not, the following is a no-op).  */if(pCur.pKeyInfo==null) {
-				invalidateIncrblobCursors(p,nKey,0);
+				p.invalidateIncrblobCursors(nKey,0);
 			}
 			/* Save the positions of any other cursors open on this table.
   **
@@ -4508,7 +4506,7 @@ return 1;
 				/* Something has gone awry. */}
 			/* If this is a delete operation to remove a row from a table b-tree,
   ** invalidate any incrblob cursors open on the row being deleted.  */if(pCur.pKeyInfo==null) {
-				invalidateIncrblobCursors(p,pCur.info.nKey,0);
+				p.invalidateIncrblobCursors(pCur.info.nKey,0);
 			}
 			iCellDepth=pCur.iPage;
 			iCellIdx=pCur.aiIdx[iCellDepth];

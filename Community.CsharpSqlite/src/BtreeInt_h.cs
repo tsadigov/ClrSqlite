@@ -2617,7 +2617,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 				Debug.Assert(this.inTrans==TRANS_WRITE);
 				/* Invalidate all incrblob cursors open on table iTable (assuming iTable
   ** is the root of a table b-tree - if it is not, the following call is
-  ** a no-op).  */invalidateIncrblobCursors(this,0,1);
+  ** a no-op).  */this.invalidateIncrblobCursors(0,1);
 				rc=saveAllCursors(pBt,(Pgno)iTable,null);
 				if(SQLITE_OK==rc) {
 					rc=clearDatabasePage(pBt,(Pgno)iTable,0,ref pnChange);
@@ -2766,6 +2766,8 @@ releasePage(pPage);
 			}
 			public int querySharedCacheTableLock(Pgno iTab,u8 eLock) {
 				return SQLITE_OK;
+			}
+			public void invalidateIncrblobCursors(i64 y,int z) {
 			}
 		}
 		///<summary>
