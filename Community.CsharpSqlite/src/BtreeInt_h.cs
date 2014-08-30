@@ -3096,6 +3096,11 @@ aOverflow= null;
 				invalidateOverflowCache(this);
 				return rc;
 			}
+			public void sqlite3BtreeClearCursor() {
+				Debug.Assert(this.cursorHoldsMutex());
+				sqlite3_free(ref this.pKey);
+				this.eState=CURSOR_INVALID;
+			}
 		}
 		/*
     ** Potential values for BtCursor.eState.
