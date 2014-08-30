@@ -528,12 +528,6 @@ p.eState = CURSOR_INVALID;
 		//  (p.eState>=CURSOR_REQUIRESEEK ? \
 		//         btreeRestoreCursorPosition(p) : \
 		//         SQLITE_OK)
-		static int restoreCursorPosition(BtCursor pCur) {
-			if(pCur.eState>=CURSOR_REQUIRESEEK)
-				return pCur.btreeRestoreCursorPosition();
-			else
-				return SQLITE_OK;
-		}
 		///<summary>
 		/// Determine whether or not a cursor has moved from the position it
 		/// was last placed at.  Cursors can move when the row they are pointing
@@ -542,21 +536,6 @@ p.eState = CURSOR_INVALID;
 		/// This routine returns an error code if something goes wrong.  The
 		/// integer pHasMoved is set to one if the cursor has moved and 0 if not.
 		///</summary>
-		static int sqlite3BtreeCursorHasMoved(BtCursor pCur,ref int pHasMoved) {
-			int rc;
-			rc=restoreCursorPosition(pCur);
-			if(rc!=0) {
-				pHasMoved=1;
-				return rc;
-			}
-			if(pCur.eState!=CURSOR_VALID||pCur.skipNext!=0) {
-				pHasMoved=1;
-			}
-			else {
-				pHasMoved=0;
-			}
-			return SQLITE_OK;
-		}
 		#if !SQLITE_OMIT_AUTOVACUUM
 		///<summary>
 		/// Given a page number of a regular database page, return the page
@@ -567,20 +546,6 @@ p.eState = CURSOR_INVALID;
 		/// no pointer map associated with page 1.  The integrity_check logic
 		/// requires that ptrmapPageno(*,1)!=1.
 		///</summary>
-		static Pgno ptrmapPageno(BtShared pBt,Pgno pgno) {
-			int nPagesPerMapPage;
-			Pgno iPtrMap,ret;
-			Debug.Assert(sqlite3_mutex_held(pBt.mutex));
-			if(pgno<2)
-				return 0;
-			nPagesPerMapPage=(int)(pBt.usableSize/5+1);
-			iPtrMap=(Pgno)((pgno-2)/nPagesPerMapPage);
-			ret=(Pgno)(iPtrMap*nPagesPerMapPage)+2;
-			if(ret==PENDING_BYTE_PAGE(pBt)) {
-				ret++;
-			}
-			return ret;
-		}
 		///<summary>
 		/// Write an entry into the pointer map.
 		///
@@ -591,81 +556,13 @@ p.eState = CURSOR_INVALID;
 		/// a no-op.  If an error occurs, the appropriate error code is written
 		/// into pRC.
 		///</summary>
-		static void ptrmapPut(BtShared pBt,Pgno key,u8 eType,Pgno parent,ref int pRC) {
-			PgHdr pDbPage=new PgHdr();
-			/* The pointer map page */u8[] pPtrmap;
-			/* The pointer map data */Pgno iPtrmap;
-			/* The pointer map page number */int offset;
-			/* Offset in pointer map page */int rc;
-			/* Return code from subfunctions */if(pRC!=0)
-				return;
-			Debug.Assert(sqlite3_mutex_held(pBt.mutex));
-			/* The master-journal page number must never be used as a pointer map page */Debug.Assert(false==PTRMAP_ISPAGE(pBt,PENDING_BYTE_PAGE(pBt)));
-			Debug.Assert(pBt.autoVacuum);
-			if(key==0) {
-				pRC=SQLITE_CORRUPT_BKPT();
-				return;
-			}
-			iPtrmap=PTRMAP_PAGENO(pBt,key);
-			rc=pBt.pPager.sqlite3PagerGet(iPtrmap,ref pDbPage);
-			if(rc!=SQLITE_OK) {
-				pRC=rc;
-				return;
-			}
-			offset=(int)PTRMAP_PTROFFSET(iPtrmap,key);
-			if(offset<0) {
-				pRC=SQLITE_CORRUPT_BKPT();
-				goto ptrmap_exit;
-			}
-			Debug.Assert(offset<=(int)pBt.usableSize-5);
-			pPtrmap=sqlite3PagerGetData(pDbPage);
-			if(eType!=pPtrmap[offset]||Converter.sqlite3Get4byte(pPtrmap,offset+1)!=parent) {
-				TRACE("PTRMAP_UPDATE: %d->(%d,%d)\n",key,eType,parent);
-				pRC=rc=sqlite3PagerWrite(pDbPage);
-				if(rc==SQLITE_OK) {
-					pPtrmap[offset]=eType;
-					Converter.sqlite3Put4byte(pPtrmap,offset+1,parent);
-				}
-			}
-			ptrmap_exit:
-			sqlite3PagerUnref(pDbPage);
-		}
 		/*
 ** Read an entry from the pointer map.
 **
 ** This routine retrieves the pointer map entry for page 'key', writing
 ** the type and parent page number to pEType and pPgno respectively.
 ** An error code is returned if something goes wrong, otherwise SQLITE_OK.
-*/static int ptrmapGet(BtShared pBt,Pgno key,ref u8 pEType,ref Pgno pPgno) {
-			PgHdr pDbPage=new PgHdr();
-			/* The pointer map page */int iPtrmap;
-			/* Pointer map page index */u8[] pPtrmap;
-			/* Pointer map page data */int offset;
-			/* Offset of entry in pointer map */int rc;
-			Debug.Assert(sqlite3_mutex_held(pBt.mutex));
-			iPtrmap=(int)PTRMAP_PAGENO(pBt,key);
-			rc=pBt.pPager.sqlite3PagerGet((u32)iPtrmap,ref pDbPage);
-			if(rc!=0) {
-				return rc;
-			}
-			pPtrmap=sqlite3PagerGetData(pDbPage);
-			offset=(int)PTRMAP_PTROFFSET((u32)iPtrmap,key);
-			if(offset<0) {
-				sqlite3PagerUnref(pDbPage);
-				return SQLITE_CORRUPT_BKPT();
-			}
-			Debug.Assert(offset<=(int)pBt.usableSize-5);
-			// Under C# pEType will always exist. No need to test; //
-			//Debug.Assert( pEType != 0 );
-			pEType=pPtrmap[offset];
-			// Under C# pPgno will always exist. No need to test; //
-			//if ( pPgno != 0 )
-			pPgno=Converter.sqlite3Get4byte(pPtrmap,offset+1);
-			sqlite3PagerUnref(pDbPage);
-			if(pEType<1||pEType>5)
-				return SQLITE_CORRUPT_BKPT();
-			return SQLITE_OK;
-		}
+*/
 		#else
 																																								//define ptrmapPut(w,x,y,z,rc)
 //define ptrmapGet(w,x,y,z) SQLITE_OK
@@ -1770,7 +1667,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 			else {
 				Pgno nextOvfl=Converter.sqlite3Get4byte(pDbPage.aData);
 				if(nextOvfl!=0) {
-					ptrmapPut(pBt,nextOvfl,PTRMAP_OVERFLOW2,iFreePage,ref rc);
+					pBt.ptrmapPut(nextOvfl,PTRMAP_OVERFLOW2,iFreePage,ref rc);
 					if(rc!=SQLITE_OK) {
 						return rc;
 					}
@@ -1792,7 +1689,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 				rc=pPtrPage.modifyPagePointer(iDbPage,iFreePage,eType);
 				releasePage(pPtrPage);
 				if(rc==SQLITE_OK) {
-					ptrmapPut(pBt,iFreePage,eType,iPtrPage,ref rc);
+					pBt.ptrmapPut(iFreePage,eType,iPtrPage,ref rc);
 				}
 			}
 			return rc;
@@ -1827,7 +1724,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 				if(nFreeList==0) {
 					return SQLITE_DONE;
 				}
-				rc=ptrmapGet(pBt,iLastPg,ref eType,ref iPtrPage);
+				rc=pBt.ptrmapGet(iLastPg,ref eType,ref iPtrPage);
 				if(rc!=SQLITE_OK) {
 					return rc;
 				}
@@ -2605,7 +2502,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
 					iGuess++;
 				}
 				if(iGuess<=btreePagecount(pBt)) {
-					rc=ptrmapGet(pBt,iGuess,ref eType,ref pgno);
+					rc=pBt.ptrmapGet(iGuess,ref eType,ref pgno);
 					if(rc==SQLITE_OK&&eType==PTRMAP_OVERFLOW2&&pgno==ovfl) {
 						next=iGuess;
 						rc=SQLITE_DONE;
@@ -2853,7 +2750,7 @@ return SQLITE_ABORT;
 }
 #endif
 			Debug.Assert(pCur.cursorHoldsMutex());
-			rc=restoreCursorPosition(pCur);
+			rc=pCur.restoreCursorPosition();
 			if(rc==SQLITE_OK) {
 				Debug.Assert(pCur.eState==CURSOR_VALID);
 				Debug.Assert(pCur.iPage>=0&&pCur.apPage[pCur.iPage]!=null);
@@ -3434,7 +3331,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			int idx;
 			MemPage pPage;
 			Debug.Assert(pCur.cursorHoldsMutex());
-			rc=restoreCursorPosition(pCur);
+			rc=pCur.restoreCursorPosition();
 			if(rc!=SQLITE_OK) {
 				return rc;
 			}
@@ -3499,7 +3396,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			int rc;
 			MemPage pPage;
 			Debug.Assert(pCur.cursorHoldsMutex());
-			rc=restoreCursorPosition(pCur);
+			rc=pCur.restoreCursorPosition();
 			if(rc!=SQLITE_OK) {
 				return rc;
 			}
@@ -3596,7 +3493,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 					Debug.Assert(nearby>0);
 					Debug.Assert(pBt.autoVacuum);
 					u32 Dummy0=0;
-					rc=ptrmapGet(pBt,nearby,ref eType,ref Dummy0);
+					rc=pBt.ptrmapGet(nearby,ref eType,ref Dummy0);
 					if(rc!=0)
 						return rc;
 					if(eType==PTRMAP_FREEPAGE) {
@@ -3897,7 +3794,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 																																																												if (false)
 #endif
 			 {
-				ptrmapPut(pBt,iPage,PTRMAP_FREEPAGE,0,ref rc);
+				pBt.ptrmapPut(iPage,PTRMAP_FREEPAGE,0,ref rc);
 				if(rc!=0)
 					goto freepage_out;
 			}
@@ -4556,7 +4453,7 @@ return rc;
 					if(rc!=SQLITE_OK) {
 						return rc;
 					}
-					rc=ptrmapGet(pBt,pgnoRoot,ref eType,ref iPtrPage);
+					rc=pBt.ptrmapGet(pgnoRoot,ref eType,ref iPtrPage);
 					if(eType==PTRMAP_ROOTPAGE||eType==PTRMAP_FREEPAGE) {
 						rc=SQLITE_CORRUPT_BKPT();
 					}
@@ -4584,7 +4481,7 @@ return rc;
 				else {
 					pRoot=pPageMove;
 				}
-				/* Update the pointer-map and meta-data with the new root-page number. */ptrmapPut(pBt,pgnoRoot,PTRMAP_ROOTPAGE,0,ref rc);
+				/* Update the pointer-map and meta-data with the new root-page number. */pBt.ptrmapPut(pgnoRoot,PTRMAP_ROOTPAGE,0,ref rc);
 				if(rc!=0) {
 					releasePage(pRoot);
 					return rc;

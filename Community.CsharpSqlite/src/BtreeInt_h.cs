@@ -570,7 +570,7 @@ namespace Community.CsharpSqlite {
 				Debug.Assert((info.nData+(this.intKey!=0?0:info.nKey))==info.nPayload);
 				if(info.iOverflow!=0) {
 					Pgno ovfl=Converter.sqlite3Get4byte(this.aData,pCell,info.iOverflow);
-					ptrmapPut(this.pBt,ovfl,PTRMAP_OVERFLOW1,this.pgno,ref pRC);
+					this.pBt.ptrmapPut(ovfl,PTRMAP_OVERFLOW1,this.pgno,ref pRC);
 				}
 			}
 			public void ptrmapPutOvflPtr(u8[] pCell,ref int pRC) {
@@ -582,7 +582,7 @@ namespace Community.CsharpSqlite {
 				Debug.Assert((info.nData+(this.intKey!=0?0:info.nKey))==info.nPayload);
 				if(info.iOverflow!=0) {
 					Pgno ovfl=Converter.sqlite3Get4byte(pCell,info.iOverflow);
-					ptrmapPut(this.pBt,ovfl,PTRMAP_OVERFLOW1,this.pgno,ref pRC);
+					this.pBt.ptrmapPut(ovfl,PTRMAP_OVERFLOW1,this.pgno,ref pRC);
 				}
 			}
 			public///<summary>
@@ -1061,12 +1061,12 @@ namespace Community.CsharpSqlite {
 					this.ptrmapPutOvflPtr(pCell,ref rc);
 					if(0==this.leaf) {
 						Pgno childPgno=Converter.sqlite3Get4byte(this.aData,pCell);
-						ptrmapPut(pBt,childPgno,PTRMAP_BTREE,pgno,ref rc);
+						pBt.ptrmapPut(childPgno,PTRMAP_BTREE,pgno,ref rc);
 					}
 				}
 				if(0==this.leaf) {
 					Pgno childPgno=Converter.sqlite3Get4byte(this.aData,this.hdrOffset+8);
-					ptrmapPut(pBt,childPgno,PTRMAP_BTREE,pgno,ref rc);
+					pBt.ptrmapPut(childPgno,PTRMAP_BTREE,pgno,ref rc);
 				}
 				set_child_ptrmaps_out:
 				this.isInit=isInitOrig;
@@ -1231,7 +1231,7 @@ namespace Community.CsharpSqlite {
 ** wrong pages from the database.
 */if(pBt.autoVacuum&&rc==SQLITE_OK) {
 							u8 eType=(u8)(pgnoPtrmap!=0?PTRMAP_OVERFLOW2:PTRMAP_OVERFLOW1);
-							ptrmapPut(pBt,pgnoOvfl,eType,pgnoPtrmap,ref rc);
+							pBt.ptrmapPut(pgnoOvfl,eType,pgnoPtrmap,ref rc);
 							if(rc!=0) {
 								releasePage(pOvfl);
 							}
@@ -1603,7 +1603,7 @@ namespace Community.CsharpSqlite {
 																																																																																																if (false)
 #endif
 					 {
-						ptrmapPut(pBt,pgnoNew,PTRMAP_BTREE,this.pgno,ref rc);
+						pBt.ptrmapPut(pgnoNew,PTRMAP_BTREE,this.pgno,ref rc);
 						if(szCell[0]>pNew.minLocal) {
 							pNew.ptrmapPutOvflPtr(pCell,ref rc);
 						}
@@ -2044,7 +2044,7 @@ namespace Community.CsharpSqlite {
 																																																																																																																				if (false)
 #endif
 						 {
-							ptrmapPut(pBt,pNew.pgno,PTRMAP_BTREE,this.pgno,ref rc);
+							pBt.ptrmapPut(pNew.pgno,PTRMAP_BTREE,this.pgno,ref rc);
 							if(rc!=SQLITE_OK) {
 								goto balance_cleanup;
 							}
@@ -2272,7 +2272,7 @@ namespace Community.CsharpSqlite {
         ** page before the balancing, then the pointer map entries associated
         ** with any child or overflow pages need to be updated.  */if(isDivider!=0||pOld.pgno!=pNew.pgno) {
 								if(0==leafCorrection) {
-									ptrmapPut(pBt,Converter.sqlite3Get4byte(apCell[i]),PTRMAP_BTREE,pNew.pgno,ref rc);
+									pBt.ptrmapPut(Converter.sqlite3Get4byte(apCell[i]),PTRMAP_BTREE,pNew.pgno,ref rc);
 								}
 								if(szCell[i]>pNew.minLocal) {
 									pNew.ptrmapPutOvflPtr(apCell[i],ref rc);
@@ -2282,7 +2282,7 @@ namespace Community.CsharpSqlite {
 						if(0==leafCorrection) {
 							for(i=0;i<nNew;i++) {
 								u32 key=Converter.sqlite3Get4byte(apNew[i].aData,8);
-								ptrmapPut(pBt,key,PTRMAP_BTREE,apNew[i].pgno,ref rc);
+								pBt.ptrmapPut(key,PTRMAP_BTREE,apNew[i].pgno,ref rc);
 							}
 						}
 						#if FALSE
@@ -2348,7 +2348,7 @@ ptrmapCheckPages(pParent, 1);
 																																																																																																if (false)
 #endif
 					 {
-						ptrmapPut(pBt,pgnoChild,PTRMAP_BTREE,this.pgno,ref rc);
+						pBt.ptrmapPut(pgnoChild,PTRMAP_BTREE,this.pgno,ref rc);
 					}
 				}
 				if(rc!=0) {
@@ -2940,6 +2940,89 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				}
 				return SQLITE_OK;
 			}
+			public Pgno ptrmapPageno(Pgno pgno) {
+				int nPagesPerMapPage;
+				Pgno iPtrMap,ret;
+				Debug.Assert(sqlite3_mutex_held(this.mutex));
+				if(pgno<2)
+					return 0;
+				nPagesPerMapPage=(int)(this.usableSize/5+1);
+				iPtrMap=(Pgno)((pgno-2)/nPagesPerMapPage);
+				ret=(Pgno)(iPtrMap*nPagesPerMapPage)+2;
+				if(ret==PENDING_BYTE_PAGE(this)) {
+					ret++;
+				}
+				return ret;
+			}
+			public void ptrmapPut(Pgno key,u8 eType,Pgno parent,ref int pRC) {
+				PgHdr pDbPage=new PgHdr();
+				/* The pointer map page */u8[] pPtrmap;
+				/* The pointer map data */Pgno iPtrmap;
+				/* The pointer map page number */int offset;
+				/* Offset in pointer map page */int rc;
+				/* Return code from subfunctions */if(pRC!=0)
+					return;
+				Debug.Assert(sqlite3_mutex_held(this.mutex));
+				/* The master-journal page number must never be used as a pointer map page */Debug.Assert(false==PTRMAP_ISPAGE(this,PENDING_BYTE_PAGE(this)));
+				Debug.Assert(this.autoVacuum);
+				if(key==0) {
+					pRC=SQLITE_CORRUPT_BKPT();
+					return;
+				}
+				iPtrmap=PTRMAP_PAGENO(this,key);
+				rc=this.pPager.sqlite3PagerGet(iPtrmap,ref pDbPage);
+				if(rc!=SQLITE_OK) {
+					pRC=rc;
+					return;
+				}
+				offset=(int)PTRMAP_PTROFFSET(iPtrmap,key);
+				if(offset<0) {
+					pRC=SQLITE_CORRUPT_BKPT();
+					goto ptrmap_exit;
+				}
+				Debug.Assert(offset<=(int)this.usableSize-5);
+				pPtrmap=sqlite3PagerGetData(pDbPage);
+				if(eType!=pPtrmap[offset]||Converter.sqlite3Get4byte(pPtrmap,offset+1)!=parent) {
+					TRACE("PTRMAP_UPDATE: %d->(%d,%d)\n",key,eType,parent);
+					pRC=rc=sqlite3PagerWrite(pDbPage);
+					if(rc==SQLITE_OK) {
+						pPtrmap[offset]=eType;
+						Converter.sqlite3Put4byte(pPtrmap,offset+1,parent);
+					}
+				}
+				ptrmap_exit:
+				sqlite3PagerUnref(pDbPage);
+			}
+			public int ptrmapGet(Pgno key,ref u8 pEType,ref Pgno pPgno) {
+				PgHdr pDbPage=new PgHdr();
+				/* The pointer map page */int iPtrmap;
+				/* Pointer map page index */u8[] pPtrmap;
+				/* Pointer map page data */int offset;
+				/* Offset of entry in pointer map */int rc;
+				Debug.Assert(sqlite3_mutex_held(this.mutex));
+				iPtrmap=(int)PTRMAP_PAGENO(this,key);
+				rc=this.pPager.sqlite3PagerGet((u32)iPtrmap,ref pDbPage);
+				if(rc!=0) {
+					return rc;
+				}
+				pPtrmap=sqlite3PagerGetData(pDbPage);
+				offset=(int)PTRMAP_PTROFFSET((u32)iPtrmap,key);
+				if(offset<0) {
+					sqlite3PagerUnref(pDbPage);
+					return SQLITE_CORRUPT_BKPT();
+				}
+				Debug.Assert(offset<=(int)this.usableSize-5);
+				// Under C# pEType will always exist. No need to test; //
+				//Debug.Assert( pEType != 0 );
+				pEType=pPtrmap[offset];
+				// Under C# pPgno will always exist. No need to test; //
+				//if ( pPgno != 0 )
+				pPgno=Converter.sqlite3Get4byte(pPtrmap,offset+1);
+				sqlite3PagerUnref(pDbPage);
+				if(pEType<1||pEType>5)
+					return SQLITE_CORRUPT_BKPT();
+				return SQLITE_OK;
+			}
 		}
 		///<summary>
 		/// An instance of the following structure is used to hold information
@@ -3138,6 +3221,27 @@ aOverflow= null;
 				}
 				return rc;
 			}
+			public int restoreCursorPosition() {
+				if(this.eState>=CURSOR_REQUIRESEEK)
+					return this.btreeRestoreCursorPosition();
+				else
+					return SQLITE_OK;
+			}
+			public int sqlite3BtreeCursorHasMoved(ref int pHasMoved) {
+				int rc;
+				rc=this.restoreCursorPosition();
+				if(rc!=0) {
+					pHasMoved=1;
+					return rc;
+				}
+				if(this.eState!=CURSOR_VALID||this.skipNext!=0) {
+					pHasMoved=1;
+				}
+				else {
+					pHasMoved=0;
+				}
+				return SQLITE_OK;
+			}
 		}
 		/*
     ** Potential values for BtCursor.eState.
@@ -3194,7 +3298,7 @@ aOverflow= null;
 		///</summary>
 		//#define PTRMAP_PAGENO(pBt, pgno) ptrmapPageno(pBt, pgno)
 		static Pgno PTRMAP_PAGENO(BtShared pBt,Pgno pgno) {
-			return ptrmapPageno(pBt,pgno);
+			return pBt.ptrmapPageno(pgno);
 		}
 		//#define PTRMAP_PTROFFSET(pgptrmap, pgno) (5*(pgno-pgptrmap-1))
 		static u32 PTRMAP_PTROFFSET(u32 pgptrmap,u32 pgno) {
@@ -3576,7 +3680,7 @@ public static bool ISAUTOVACUUM =false;
 				int rc;
 				u8 ePtrmapType=0;
 				Pgno iPtrmapParent=0;
-				rc=ptrmapGet(this.pBt,iChild,ref ePtrmapType,ref iPtrmapParent);
+				rc=this.pBt.ptrmapGet(iChild,ref ePtrmapType,ref iPtrmapParent);
 				if(rc!=SQLITE_OK) {
 					//if( rc==SQLITE_NOMEM || rc==SQLITE_IOERR_NOMEM ) pCheck.mallocFailed = 1;
 					this.checkAppendMsg(zContext,"Failed to read ptrmap key=%d",iChild);
