@@ -131,7 +131,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if TRACE
-																																		
+																																				
 static bool sqlite3PagerTrace = false;  /* True to enable tracing */
 //define sqlite3DebugPrintf printf
 //define PAGERTRACE(X)     if( sqlite3PagerTrace ){ sqlite3DebugPrintf X; }
@@ -466,7 +466,7 @@ static void PAGERTRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace 
 			}
 		}
 		#else
-																																		// define CODEC1(P,D,N,X,E)   /* NO-OP */
+																																				// define CODEC1(P,D,N,X,E)   /* NO-OP */
 static bool CODEC1 (Pager P, byte[] D, uint N /* page number */, int X /* E (moved to caller */)  { return false; }
 // define CODEC2(P,D,N,X,E,O) O=(char*)D
 static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; return false; }
@@ -501,7 +501,7 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
 			/* Original number of pages in file */public Pgno iSubRec;
 			/* Index of first record in sub-journal */
 			#if !SQLITE_OMIT_WAL
-																																																			public u32 aWalData[WAL_SAVEPOINT_NDATA];        /* WAL savepoint context */
+																																																						public u32 aWalData[WAL_SAVEPOINT_NDATA];        /* WAL savepoint context */
 #else
 			public object aWalData=null;
 			/* Used for C# convenience */
@@ -726,7 +726,7 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
 			/* Function to call when busy */public object pBusyHandlerArg;
 			/* Context argument for xBusyHandler */
 			#if SQLITE_TEST || DEBUG
-																																																			      public int nHit, nMiss;              /* Cache hits and missing */
+																																																						      public int nHit, nMiss;              /* Cache hits and missing */
       public int nRead, nWrite;            /* Database pages read/written */
 #else
 			public int nHit;
@@ -747,7 +747,7 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
 			/* Pager.pageSize bytes of space for tmp use */public PCache pPCache;
 			/* Pointer to page cache object */
 			#if !SQLITE_OMIT_WAL
-																																																			public Wal pWal;                       /* Write-ahead log used by "journal_mode=wal" */
+																																																						public Wal pWal;                       /* Write-ahead log used by "journal_mode=wal" */
 public string zWal;                    /* File name for write-ahead log */
 #else
 			public sqlite3_vfs pWal=null;
@@ -777,7 +777,7 @@ public string zWal;                    /* File name for write-ahead log */
 			///
 			///</summary>
 			#if !SQLITE_OMIT_WAL
-																																													static int pagerUseWal(Pager *pPager){
+																																																static int pagerUseWal(Pager *pPager){
 return (pPager->pWal!=0);
 }
 #else
@@ -818,7 +818,7 @@ return (pPager->pWal!=0);
       ** state.
       */if(
 				#if SQLITE_OMIT_MEMORYDB
-																																																														0!=MEMDB
+																																																																		0!=MEMDB
 #else
 				0!=pPager.memDb
 				#endif
@@ -836,7 +836,7 @@ return (pPager->pWal!=0);
 				case PAGER_OPEN:
 				Debug.Assert(
 				#if SQLITE_OMIT_MEMORYDB
-																																																														0==MEMDB
+																																																																		0==MEMDB
 #else
 				0==pPager.memDb
 				#endif
@@ -1405,7 +1405,7 @@ return (pPager->pWal!=0);
       */if(this.errCode!=0) {
 					Debug.Assert(
 					#if SQLITE_OMIT_MEMORYDB
-																																																																															0==MEMDB
+																																																																																				0==MEMDB
 #else
 					0==this.memDb
 					#endif
@@ -1443,7 +1443,7 @@ return (pPager->pWal!=0);
 				int rc2=rc&0xff;
 				Debug.Assert(rc==SQLITE_OK||
 				#if SQLITE_OMIT_MEMORYDB
-																																																														0==MEMDB
+																																																																		0==MEMDB
 #else
 				0==this.memDb
 				#endif
@@ -1565,7 +1565,7 @@ return (pPager->pWal!=0);
 							}
 				}
 				#if SQLITE_CHECK_PAGES
-																																																														sqlite3PcacheIterateDirty(pPager.pPCache, pager_set_pagehash);
+																																																																		sqlite3PcacheIterateDirty(pPager.pPCache, pager_set_pagehash);
 if( pPager.dbSize==0 && sqlite3PcacheRefCount(pPager.pPCache)>0 ){
 PgHdr p = pager_lookup(pPager, 1);
 if( p != null ){
@@ -1788,7 +1788,7 @@ sqlite3PagerUnref(p);
 				}
 				Debug.Assert(pPg!=null||
 				#if SQLITE_OMIT_MEMORYDB
-																																																														0==MEMDB
+																																																																		0==MEMDB
 #else
 				this.memDb==0
 				#endif
@@ -2580,12 +2580,12 @@ sqlite3PagerUnref(p);
 			/// testing and analysis only.
 			///</summary>
 			#if SQLITE_TEST
-																																													#if !TCLSH
-																																													    static int sqlite3_opentemp_count = 0;
+																																																#if !TCLSH
+																																																    static int sqlite3_opentemp_count = 0;
 #else
-																																													    static tcl.lang.Var.SQLITE3_GETSET sqlite3_opentemp_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_opentemp_count" );
+																																																    static tcl.lang.Var.SQLITE3_GETSET sqlite3_opentemp_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_opentemp_count" );
 #endif
-																																													#endif
+																																																#endif
 			///<summary>
 			/// Open a temporary file.
 			///
@@ -2605,12 +2605,12 @@ sqlite3PagerUnref(p);
 				int rc;
 				/* Return code */
 				#if SQLITE_TEST
-																																																														#if !TCLSH
-																																																														      sqlite3_opentemp_count++;  /* Used for testing and analysis only */
+																																																																		#if !TCLSH
+																																																																		      sqlite3_opentemp_count++;  /* Used for testing and analysis only */
 #else
-																																																														      sqlite3_opentemp_count.iValue++;  /* Used for testing and analysis only */
+																																																																		      sqlite3_opentemp_count.iValue++;  /* Used for testing and analysis only */
 #endif
-																																																														#endif
+																																																																		#endif
 				vfsFlags|=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_EXCLUSIVE|SQLITE_OPEN_DELETEONCLOSE;
 				int dummy=0;
 				rc=sqlite3OsOpen(this.pVfs,null,pFile,vfsFlags,ref dummy);
@@ -2748,28 +2748,28 @@ sqlite3PagerUnref(p);
 			///
 			///</summary>
 			#if SQLITE_TEST
-																																													    //extern int sqlite3_io_error_pending;
+																																																    //extern int sqlite3_io_error_pending;
     //extern int sqlite3_io_error_hit;
     static int saved_cnt;
     static void disable_simulated_io_errors()
     {
 #if !TCLSH
-																																													      saved_cnt = sqlite3_io_error_pending;
+																																																      saved_cnt = sqlite3_io_error_pending;
       sqlite3_io_error_pending = -1;
 #else
-																																													      saved_cnt = sqlite3_io_error_pending.iValue;
+																																																      saved_cnt = sqlite3_io_error_pending.iValue;
       sqlite3_io_error_pending.iValue = -1;
 #endif
-																																													    }
+																																																    }
 
     static void enable_simulated_io_errors()
     {
 #if !TCLSH
-																																													      sqlite3_io_error_pending = saved_cnt;
+																																																      sqlite3_io_error_pending = saved_cnt;
 #else
-																																													      sqlite3_io_error_pending.iValue = saved_cnt;
+																																																      sqlite3_io_error_pending.iValue = saved_cnt;
 #endif
-																																													    }
+																																																    }
 #else
 			//# define disable_simulated_io_errors()
 			//# define enable_simulated_io_errors()
@@ -2889,18 +2889,18 @@ sqlite3PagerUnref(p);
 			int sqlite3PagerClose() {
 				u8[] pTmp=this.pTmpSpace;
 				#if SQLITE_TEST
-																																																														      disable_simulated_io_errors();
+																																																																		      disable_simulated_io_errors();
 #endif
 				sqlite3BeginBenignMalloc();
 				/* pPager.errCode = 0; */this.exclusiveMode=false;
 				#if !SQLITE_OMIT_WAL
-																																																														sqlite3WalClose(pPager->pWal, pPager->ckptSyncFlags, pPager->pageSize, pTmp);
+																																																																		sqlite3WalClose(pPager->pWal, pPager->ckptSyncFlags, pPager->pageSize, pTmp);
 pPager.pWal = 0;
 #endif
 				this.pager_reset();
 				if(
 				#if SQLITE_OMIT_MEMORYDB
-																																																														1==MEMDB
+																																																																		1==MEMDB
 #else
 				1==this.memDb
 				#endif
@@ -2925,7 +2925,7 @@ pPager.pWal = 0;
 				}
 				sqlite3EndBenignMalloc();
 				#if SQLITE_TEST
-																																																														      enable_simulated_io_errors();
+																																																																		      enable_simulated_io_errors();
 #endif
 				PAGERTRACE("CLOSE %d\n",PAGERID(this));
 				IOTRACE("CLOSE %p\n",this);
@@ -3163,15 +3163,15 @@ pPager.pWal = 0;
 						PAGERTRACE("STORE %d page %d hash(%08x)\n",PAGERID(this),pgno,pList.pager_pagehash());
 						IOTRACE("PGOUT %p %d\n",this,pgno);
 						#if SQLITE_TEST
-																																																																																																#if !TCLSH
-																																																																																																          PAGER_INCR( ref sqlite3_pager_writedb_count );
+																																																																																																						#if !TCLSH
+																																																																																																						          PAGER_INCR( ref sqlite3_pager_writedb_count );
 #else
-																																																																																																          int iValue;
+																																																																																																						          int iValue;
           iValue = sqlite3_pager_writedb_count.iValue;
           PAGER_INCR( ref iValue );
           sqlite3_pager_writedb_count.iValue = iValue;
 #endif
-																																																																																																
+																																																																																																						
           PAGER_INCR( ref pPager.nWrite );
 #endif
 					}
@@ -3356,7 +3356,7 @@ pPager.pWal = 0;
 				Debug.Assert(this.eState==PAGER_OPEN||this.eState==PAGER_READER);
 				if(NEVER(
 				#if SQLITE_OMIT_MEMORYDB
-																																																														0!=MEMDB
+																																																																		0!=MEMDB
 #else
 				0!=this.memDb
 				#endif
@@ -3367,7 +3367,7 @@ pPager.pWal = 0;
 					int bHotJournal=1;
 					/* True if there exists a hot journal-file */Debug.Assert(
 					#if SQLITE_OMIT_MEMORYDB
-																																																																															0==MEMDB
+																																																																																				0==MEMDB
 #else
 					0==this.memDb
 					#endif
@@ -3516,7 +3516,7 @@ pPager.pWal = 0;
         ** mode. Otherwise, the following function call is a no-op.
         */rc=this.pagerOpenWalIfPresent();
 					#if !SQLITE_OMIT_WAL
-																																																																															Debug.Assert( pPager.pWal == null || rc == SQLITE_OK );
+																																																																																				Debug.Assert( pPager.pWal == null || rc == SQLITE_OK );
 #endif
 				}
 				if(this.pagerUseWal()) {
@@ -3530,7 +3530,7 @@ pPager.pWal = 0;
 				if(rc!=SQLITE_OK) {
 					Debug.Assert(
 					#if SQLITE_OMIT_MEMORYDB
-																																																																															0==MEMDB
+																																																																																				0==MEMDB
 #else
 					0==this.memDb
 					#endif
@@ -3637,7 +3637,7 @@ pPager.pWal = 0;
 					/* The pager cache has created a new page. Its content needs to 
         ** be initialized.  */
 					#if SQLITE_TEST
-																																																																															        PAGER_INCR( ref pPager.nMiss );
+																																																																																				        PAGER_INCR( ref pPager.nMiss );
 #endif
 					pPg=ppPage;
 					pPg.pPager=this;
@@ -3650,7 +3650,7 @@ pPager.pWal = 0;
 					}
 					if(
 					#if SQLITE_OMIT_MEMORYDB
-																																																																															1==MEMDB
+																																																																																				1==MEMDB
 #else
 					this.memDb!=0
 					#endif
@@ -3668,14 +3668,14 @@ pPager.pWal = 0;
             */sqlite3BeginBenignMalloc();
 							if(pgno<=this.dbOrigSize) {
 								#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																																																																		              rc = sqlite3BitvecSet( pPager.pInJournal, pgno );          //TESTONLY( rc = ) sqlite3BitvecSet(pPager.pInJournal, pgno);
+																																																																																																																																										              rc = sqlite3BitvecSet( pPager.pInJournal, pgno );          //TESTONLY( rc = ) sqlite3BitvecSet(pPager.pInJournal, pgno);
 #else
 								sqlite3BitvecSet(this.pInJournal,pgno);
 								#endif
 								testcase(rc==SQLITE_NOMEM);
 							}
 							#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																																																	            rc = addToSavepointBitvecs( pPager, pgno ); //TESTONLY( rc = ) addToSavepointBitvecs(pPager, pgno);
+																																																																																																																								            rc = addToSavepointBitvecs( pPager, pgno ); //TESTONLY( rc = ) addToSavepointBitvecs(pPager, pgno);
 #else
 							this.addToSavepointBitvecs(pgno);
 							#endif
@@ -3772,7 +3772,7 @@ pPager.pWal = 0;
 						else {
 							int flags=/* VFS flags to open journal file */SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|(this.tempFile?(SQLITE_OPEN_DELETEONCLOSE|SQLITE_OPEN_TEMP_JOURNAL):(SQLITE_OPEN_MAIN_JOURNAL));
 							#if SQLITE_ENABLE_ATOMIC_WRITE
-																																																																																																																	rc = sqlite3JournalOpen(
+																																																																																																																								rc = sqlite3JournalOpen(
 pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
 );
 #else
@@ -3919,7 +3919,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
 				Debug.Assert(isDirectMode==false);
 				UNUSED_PARAMETER(isDirectMode);
 				#else
-																																																														// define DIRECT_MODE isDirectMode
+																																																																		// define DIRECT_MODE isDirectMode
 int DIRECT_MODE = isDirectMode;
 #endif
 				if(!this.changeCountDone&&this.dbSize>0) {
@@ -3970,7 +3970,7 @@ int DIRECT_MODE = isDirectMode;
 				if(!this.noSync) {
 					Debug.Assert(
 					#if SQLITE_OMIT_MEMORYDB
-																																																																															0 == MEMDB
+																																																																																				0 == MEMDB
 #else
 					0==this.memDb
 					#endif
@@ -3981,7 +3981,7 @@ int DIRECT_MODE = isDirectMode;
 					if(isOpen(this.fd)) {
 						Debug.Assert(
 						#if SQLITE_OMIT_MEMORYDB
-																																																																																																0 == MEMDB
+																																																																																																						0 == MEMDB
 #else
 						0==this.memDb
 						#endif
@@ -4049,7 +4049,7 @@ int DIRECT_MODE = isDirectMode;
 					return SQLITE_OK;
 				if(
 				#if SQLITE_OMIT_MEMORYDB
-																																																														0 != MEMDB
+																																																																		0 != MEMDB
 #else
 				0!=this.memDb
 				#endif
@@ -4103,7 +4103,7 @@ int DIRECT_MODE = isDirectMode;
           ** created for this transaction.
           */
 						#if SQLITE_ENABLE_ATOMIC_WRITE
-																																																																																																PgHdr *pPg;
+																																																																																																						PgHdr *pPg;
 Debug.Assert( isOpen(pPager.jfd) 
 || pPager.journalMode==PAGER_JOURNALMODE_OFF 
 || pPager.journalMode==PAGER_JOURNALMODE_WAL 
@@ -4303,7 +4303,7 @@ rc = pager_incr_changecounter(pPager, 0);
 						rc=this.pager_end_transaction(0);
 						if(
 						#if SQLITE_OMIT_MEMORYDB
-																																																																																																0==MEMDB
+																																																																																																						0==MEMDB
 #else
 						0==this.memDb
 						#endif
@@ -4356,7 +4356,7 @@ rc = pager_incr_changecounter(pPager, 0);
 			///</summary>
 			bool sqlite3PagerIsMemdb() {
 				#if SQLITE_OMIT_MEMORYDB
-																																																														return MEMDB != 0;
+																																																																		return MEMDB != 0;
 #else
 				return this.memDb!=0;
 				#endif
@@ -4577,7 +4577,7 @@ rc = pager_incr_changecounter(pPager, 0);
       ** the page we are moving from.
       */if(
 				#if SQLITE_OMIT_MEMORYDB
-																																																														1==MEMDB
+																																																																		1==MEMDB
 #else
 				this.memDb!=0
 				#endif
@@ -4630,7 +4630,7 @@ rc = pager_incr_changecounter(pPager, 0);
 					pPg.flags|=(pPgOld.flags&PGHDR_NEED_SYNC);
 					if(
 					#if SQLITE_OMIT_MEMORYDB
-																																																																															1==MEMDB
+																																																																																				1==MEMDB
 #else
 					this.memDb!=0
 					#endif
@@ -4650,7 +4650,7 @@ rc = pager_incr_changecounter(pPager, 0);
       ** as the original page since it has already been allocated.
       */if(
 				#if SQLITE_OMIT_MEMORYDB
-																																																														0!=MEMDB
+																																																																		0!=MEMDB
 #else
 				0!=this.memDb
 				#endif
@@ -4736,7 +4736,7 @@ rc = pager_incr_changecounter(pPager, 0);
 				u8 eOld=this.journalMode;
 				/* Prior journalmode */
 				#if SQLITE_DEBUG
-																																																														      /* The print_pager_state() routine is intended to be used by the debugger
+																																																																		      /* The print_pager_state() routine is intended to be used by the debugger
 ** only.  We invoke it once here to suppress a compiler warning. */
       print_pager_state( pPager );
 #endif
@@ -4749,7 +4749,7 @@ rc = pager_incr_changecounter(pPager, 0);
       ** anything other than MEMORY or OFF
       */if(
 				#if SQLITE_OMIT_MEMORYDB
-																																																														1==MEMDB
+																																																																		1==MEMDB
 #else
 				1==this.memDb
 				#endif
@@ -4876,16 +4876,16 @@ rc = pager_incr_changecounter(pPager, 0);
 		///
 		///</summary>
 		#if SQLITE_TEST
-																																		#if !TCLSH
-																																		    static int sqlite3_pager_readdb_count = 0;    /* Number of full pages read from DB */
+																																				#if !TCLSH
+																																				    static int sqlite3_pager_readdb_count = 0;    /* Number of full pages read from DB */
     static int sqlite3_pager_writedb_count = 0;   /* Number of full pages written to DB */
     static int sqlite3_pager_writej_count = 0;    /* Number of pages written to journal */
 #else
-																																		    static tcl.lang.Var.SQLITE3_GETSET sqlite3_pager_readdb_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_pager_readdb_count" );
+																																				    static tcl.lang.Var.SQLITE3_GETSET sqlite3_pager_readdb_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_pager_readdb_count" );
     static tcl.lang.Var.SQLITE3_GETSET sqlite3_pager_writedb_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_pager_writedb_count" );
     static tcl.lang.Var.SQLITE3_GETSET sqlite3_pager_writej_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_pager_writej_count" );
 #endif
-																																		    static void PAGER_INCR( ref int v )
+																																				    static void PAGER_INCR( ref int v )
     {
       v++;
     }
@@ -4933,7 +4933,7 @@ rc = pager_incr_changecounter(pPager, 0);
     ** out code that would never execute.
     */
 		#if SQLITE_OMIT_MEMORYDB
-																																		// define MEMDB 0
+																																				// define MEMDB 0
 const int MEMDB = 0;
 #else
 		//# define MEMDB pPager.memDb
@@ -4974,13 +4974,13 @@ const int MEMDB = 0;
 ** the internal state of the Pager object.
 */
 		#else
-																																		    static bool assert_pager_state( Pager pPager )
+																																				    static bool assert_pager_state( Pager pPager )
     {
       return true;
     }
 #endif
 		#if SQLITE_DEBUG
-																																		    /*
+																																				    /*
 ** Return a pointer to a human readable string in a static buffer
 ** containing the state of the Pager object passed as an argument. This
 ** is intended to be used within debuggers. For example, as an alternative
@@ -5117,7 +5117,7 @@ const int MEMDB = 0;
     ** contains rollback data for exactly one page.
     */
 		#if SQLITE_ENABLE_ATOMIC_WRITE
-																																		static int jrnlBufferSize(Pager *pPager){
+																																				static int jrnlBufferSize(Pager *pPager){
 Debug.Assert( 0==MEMDB );
 if( !pPager.tempFile ){
 int dc;                           /* Device characteristics */
@@ -5145,7 +5145,7 @@ return JOURNAL_HDR_SZ(pPager) + JOURNAL_PG_SZ(pPager);
 		/// and debugging only.
 		///</summary>
 		#if SQLITE_CHECK_PAGES
-																																		/*
+																																				/*
 ** Return a 32-bit hash of the page data for pPage.
 */
 static u32 pager_datahash(int nByte, unsigned char pData){
@@ -5254,7 +5254,7 @@ assert( (pPg->flags&PGHDR_DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
     ** though fast and simple, catches the mostly likely kind of corruption.
     */
 		#else
-																																		// define pagerReportSize(X)     /* No-op if we do not support a codec */
+																																				// define pagerReportSize(X)     /* No-op if we do not support a codec */
 static void pagerReportSize(Pager X){}
 #endif
 		///<summary>
@@ -5277,7 +5277,7 @@ static void pagerReportSize(Pager X){}
 			/* True if page is in log file */int pgsz=pPager.pageSize;
 			/* Number of bytes to read */Debug.Assert(pPager.eState>=PAGER_READER&&
 			#if SQLITE_OMIT_MEMORYDB
-																																																			0 == MEMDB 
+																																																						0 == MEMDB 
 #else
 			0==pPager.memDb
 			#endif
@@ -5326,16 +5326,16 @@ static void pagerReportSize(Pager X){}
 				rc=SQLITE_NOMEM;
 			//CODEC1(pPager, pPg.pData, pgno, 3, rc = SQLITE_NOMEM);
 			#if SQLITE_TEST
-																																																			      //  PAGER_INCR(ref sqlite3_pager_readdb_count);
+																																																						      //  PAGER_INCR(ref sqlite3_pager_readdb_count);
 #if !TCLSH
-																																																			      PAGER_INCR( ref sqlite3_pager_readdb_count );
+																																																						      PAGER_INCR( ref sqlite3_pager_readdb_count );
 #else
-																																																			      int iValue;
+																																																						      int iValue;
       iValue = sqlite3_pager_readdb_count.iValue;
       PAGER_INCR( ref iValue );
       sqlite3_pager_readdb_count.iValue = iValue;
 #endif
-																																																			
+																																																						
       PAGER_INCR( ref pPager.nRead );
 #endif
 			IOTRACE("PGIN %p %d\n",pPager,pgno);
@@ -5361,7 +5361,7 @@ static void pagerReportSize(Pager X){}
 			put32bits(pPg.pData,96,SQLITE_VERSION_NUMBER);
 		}
 		#if !SQLITE_OMIT_WAL
-																																		///<summary>
+																																				///<summary>
 /// This function is invoked once for each page that has already been
 /// written into the log file when a WAL transaction is rolled back.
 /// Parameter iPg is the page number of said page. The pCtx argument
@@ -5449,17 +5449,17 @@ int syncFlags                   /* Flags to pass to OsSync() (or 0) */
 ){
 int rc;                         /* Return code */
 #if (SQLITE_DEBUG) || (SQLITE_CHECK_PAGES)
-																																		PgHdr *p;                       /* For looping over pages */
+																																				PgHdr *p;                       /* For looping over pages */
 #endif
-																																		
+																																				
 assert( pPager.pWal );
 #if SQLITE_DEBUG
-																																		/* Verify that the page list is in accending order */
+																																				/* Verify that the page list is in accending order */
 for(p=pList; p && p->pDirty; p=p->pDirty){
 assert( p->pgno < p->pDirty->pgno );
 }
 #endif
-																																		
+																																				
   if( isCommit ){
     /* If a WAL transaction is being committed, there is no point in writing
     ** any pages with page numbers greater than nTruncate into the WAL file.
@@ -5486,12 +5486,12 @@ sqlite3BackupUpdate(pPager.pBackup, p->pgno, (u8 *)p->pData);
 }
 
 #if SQLITE_CHECK_PAGES
-																																		pList = sqlite3PcacheDirtyList(pPager.pPCache);
+																																				pList = sqlite3PcacheDirtyList(pPager.pPCache);
 for(p=pList; p; p=p->pDirty){
 pager_set_pagehash(p);
 }
 #endif
-																																		
+																																				
 return rc;
 }
 
@@ -5526,7 +5526,7 @@ return rc;
 }
 #endif
 		#if !SQLITE_OMIT_WAL
-																																		///<summary>
+																																				///<summary>
 /// Check if the *-wal file that corresponds to the database opened by pPager
 /// exists if the database is not empy, or verify that the *-wal file does
 /// not exist (by deleting it) if the database file is empty.
@@ -5622,7 +5622,7 @@ return rc;
 		///
 		///</summary>
 		#if SQLITE_DEBUG
-																																		    static void assertTruncateConstraintCb( PgHdr pPg )
+																																				    static void assertTruncateConstraintCb( PgHdr pPg )
     {
       Debug.Assert( ( pPg.flags & PGHDR_DIRTY ) != 0 );
       Debug.Assert( !subjRequiresPage( pPg ) || pPg.pgno <= pPg.pPager.dbSize );
@@ -5637,7 +5637,7 @@ return rc;
 		}
 		#endif
 		#if !NDEBUG || SQLITE_TEST
-																																		    ///<summary>
+																																				    ///<summary>
 /// Return the page number for page pPg.
 ///</summary>
     static Pgno sqlite3PagerPagenumber( DbPage pPg )
@@ -5955,7 +5955,7 @@ return rc;
 				pPager.zJournal=pPager.zFilename+"-journal";
 				sqlite3FileSuffix3(pPager.zFilename,pPager.zJournal);
 				#if !SQLITE_OMIT_WAL
-																																																																				pPager.zWal = &pPager.zJournal[nPathname+8+1];
+																																																																								pPager.zWal = &pPager.zJournal[nPathname+8+1];
 memcpy(pPager.zWal, zPathname, nPathname);
 memcpy(&pPager.zWal[nPathname], "-wal", 4);
         sqlite3FileSuffix3(pPager.zFilename, pPager.zWal);
@@ -5992,7 +5992,7 @@ memcpy(&pPager.zWal[nPathname], "-wal", 4);
 						}
 					}
 					#if SQLITE_ENABLE_ATOMIC_WRITE
-																																																																																					{
+																																																																																										{
 int iDc = sqlite3OsDeviceCharacteristics(pPager.fd);
 int ii;
 Debug.Assert(SQLITE_IOCAP_ATOMIC512==(512>>8));
@@ -6045,7 +6045,7 @@ szPageDflt = ii;
 			/* pPager.stmtOpen = 0; *//* pPager.stmtInUse = 0; *//* pPager.nRef = 0; *//* pPager.stmtSize = 0; *//* pPager.stmtJSize = 0; *//* pPager.nPage = 0; */pPager.mxPgno=SQLITE_MAX_PAGE_COUNT;
 			/* pPager.state = PAGER_UNLOCK; */
 			#if FALSE
-																																																			Debug.Assert(pPager.state == (tempFile != 0 ? PAGER_EXCLUSIVE : PAGER_UNLOCK));
+																																																						Debug.Assert(pPager.state == (tempFile != 0 ? PAGER_EXCLUSIVE : PAGER_UNLOCK));
 #endif
 			/* pPager.errMask = 0; */pPager.tempFile=tempFile!=0;
 			Debug.Assert(tempFile==PAGER_LOCKINGMODE_NORMAL||tempFile==PAGER_LOCKINGMODE_EXCLUSIVE);
@@ -6121,7 +6121,7 @@ szPageDflt = ii;
       ** writable.  But check anyway, just for robustness. */if(NEVER(pPager.readOnly))
 				return SQLITE_PERM;
 			#if SQLITE_CHECK_PAGES
-																																																			CHECK_PAGE(pPg);
+																																																						CHECK_PAGE(pPg);
 #endif
 			/* The journal file needs to be opened. Higher level routines have already
 ** obtained the necessary locks to begin the write-transaction, but the
@@ -6181,14 +6181,14 @@ szPageDflt = ii;
 							return rc;
 						IOTRACE("JOUT %p %d %lld %d\n",pPager,pPg.pgno,pPager.journalOff,pPager.pageSize);
 						#if SQLITE_TEST
-																																																																																																						#if !TCLSH
-																																																																																																						            PAGER_INCR( ref sqlite3_pager_writej_count );
+																																																																																																												#if !TCLSH
+																																																																																																												            PAGER_INCR( ref sqlite3_pager_writej_count );
 #else
-																																																																																																						            int iValue = sqlite3_pager_writej_count.iValue;
+																																																																																																												            int iValue = sqlite3_pager_writej_count.iValue;
             PAGER_INCR( ref iValue );
             sqlite3_pager_writej_count.iValue = iValue;
 #endif
-																																																																																																						#endif
+																																																																																																												#endif
 						PAGERTRACE("JOURNAL %d page %d needSync=%d hash(%08x)\n",PAGERID(pPager),pPg.pgno,((pPg.flags&PGHDR_NEED_SYNC)!=0?1:0),pPg.pager_pagehash());
 						pPager.journalOff+=8+pPager.pageSize;
 						pPager.nRec++;
@@ -6255,7 +6255,7 @@ szPageDflt = ii;
         ** this function.
         */Debug.Assert(
 				#if SQLITE_OMIT_MEMORYDB
-																																																																				0==MEMDB
+																																																																								0==MEMDB
 #else
 				0==pPager.memDb
 				#endif
@@ -6312,7 +6312,7 @@ szPageDflt = ii;
         */if(rc==SQLITE_OK&&needSync) {
 					Debug.Assert(
 					#if SQLITE_OMIT_MEMORYDB
-																																																																																					0==MEMDB
+																																																																																										0==MEMDB
 #else
 					0==pPager.memDb
 					#endif
@@ -6340,7 +6340,7 @@ szPageDflt = ii;
 		///
 		///</summary>
 		#if !NDEBUG
-																																		    static bool sqlite3PagerIswriteable( DbPage pPg )
+																																				    static bool sqlite3PagerIswriteable( DbPage pPg )
     {
       return ( pPg.flags & PGHDR_DIRTY ) != 0;
     }
@@ -6380,7 +6380,7 @@ szPageDflt = ii;
 			return sqlite3PcachePageRefcount(pPage);
 		}
 		#if SQLITE_TEST
-																																		    /*
+																																				    /*
 ** This routine is used for testing and analysis only.
 */
     static int[] sqlite3PagerStats( Pager pPager )
@@ -6423,7 +6423,7 @@ szPageDflt = ii;
 			return pPg.pExtra;
 		}
 	#if !SQLITE_OMIT_WAL
-																	///<summary>
+																		///<summary>
 /// This function is called when the user invokes "PRAGMA wal_checkpoint",
 /// "PRAGMA wal_blocking_checkpoint" or calls the sqlite3_wal_checkpoint()
 /// or wal_blocking_checkpoint() API functions.
@@ -6599,7 +6599,7 @@ return rc;
 }
 
 #if SQLITE_HAS_CODEC
-																	/*
+																		/*
 ** This function is called by the wal module when writing page content
 ** into the log file.
 **
@@ -6612,7 +6612,7 @@ CODEC2(pPg->pPager, pPg->pData, pPg->pgno, 6, return 0, aData);
 return aData;
 }
 #endif
-																	
+																		
 #endif
 	#endif
 	}

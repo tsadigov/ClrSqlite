@@ -456,7 +456,7 @@ namespace Community.CsharpSqlite {
 				return WRC_Prune;
 			ExprSetProperty(pExpr,EP_Resolved);
 			#if !NDEBUG
-																																																			      if ( pNC.pSrcList != null && pNC.pSrcList.nAlloc > 0 )
+																																																						      if ( pNC.pSrcList != null && pNC.pSrcList.nAlloc > 0 )
       {
         SrcList pSrcList = pNC.pSrcList;
         int i;
@@ -468,7 +468,7 @@ namespace Community.CsharpSqlite {
 #endif
 			switch(pExpr.op) {
 			#if (SQLITE_ENABLE_UPDATE_DELETE_LIMIT) && !(SQLITE_OMIT_SUBQUERY)
-																																																			/* The special operator TK_ROW means use the rowid for the first
+																																																						/* The special operator TK_ROW means use the rowid for the first
 ** column in the FROM clause.  This is used by the LIMIT and ORDER BY
 ** clause processing on UPDATE and DELETE statements.
 */
@@ -542,7 +542,7 @@ break;
 					is_agg=pDef.xFunc==null;
 				}
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																				if( pDef ){
+																																																																								if( pDef ){
 auth = sqlite3AuthCheck(pParse, SQLITE_FUNCTION, 0, pDef.zName, 0);
 if( auth!=SQLITE_OK ){
 if( auth==SQLITE_DENY ){
@@ -576,7 +576,7 @@ return WRC_Prune;
 				}
 				if(is_agg)
 					pNC.allowAgg=0;
-				sqlite3WalkExprList(pWalker,pList);
+				pWalker.sqlite3WalkExprList(pList);
 				if(is_agg)
 					pNC.allowAgg=1;
 				/* FIX ME:  Compute pExpr.affinity based on the expected return
@@ -599,7 +599,7 @@ return WRC_Prune;
 						sqlite3ErrorMsg(pParse,"subqueries prohibited in CHECK constraints");
 					}
 					#endif
-					sqlite3WalkSelect(pWalker,pExpr.x.pSelect);
+					pWalker.sqlite3WalkSelect(pExpr.x.pSelect);
 					Debug.Assert(pNC.nRef>=nRef);
 					if(nRef!=pNC.nRef) {
 						ExprSetProperty(pExpr,EP_VarSelect);
@@ -1098,7 +1098,7 @@ return WRC_Prune;
 			if(pExpr==null)
 				return 0;
 			#if SQLITE_MAX_EXPR_DEPTH
-																																																			{
+																																																						{
 Parse pParse = pNC.pParse;
 if( sqlite3ExprCheckHeight(pParse, pExpr.nHeight+pNC.pParse.nHeight) ){
 return 1;
@@ -1112,9 +1112,9 @@ pParse.nHeight += pExpr.nHeight;
 			w.xSelectCallback=resolveSelectStep;
 			w.pParse=pNC.pParse;
 			w.u.pNC=pNC;
-			sqlite3WalkExpr(w,ref pExpr);
+			w.sqlite3WalkExpr(ref pExpr);
 			#if SQLITE_MAX_EXPR_DEPTH
-																																																			pNC.pParse.nHeight -= pExpr.nHeight;
+																																																						pNC.pParse.nHeight -= pExpr.nHeight;
 #endif
 			if(pNC.nErr>0||w.pParse.nErr>0) {
 				ExprSetProperty(pExpr,EP_Error);
@@ -1146,7 +1146,7 @@ pParse.nHeight += pExpr.nHeight;
 			w.xSelectCallback=resolveSelectStep;
 			w.pParse=pParse;
 			w.u.pNC=pOuterNC;
-			sqlite3WalkSelect(w,p);
+			w.sqlite3WalkSelect(p);
 		}
 	}
 }
