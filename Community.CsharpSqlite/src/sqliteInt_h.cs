@@ -1038,9 +1038,9 @@ public object pAuthArg;               /* 1st argument to the access auth functio
 			/* Number of nested statement-transactions  */public u8 isTransactionSavepoint;
 			/* True if the outermost savepoint is a TS */public i64 nDeferredCons;
 			/* Net deferred constraints this transaction. */public int pnBytesFreed;
-		/* If not NULL, increment this in DbFree() */
-		#if SQLITE_ENABLE_UNLOCK_NOTIFY
-																																														/* The following variables are all protected by the STATIC_MASTER
+			/* If not NULL, increment this in DbFree() */
+			#if SQLITE_ENABLE_UNLOCK_NOTIFY
+																																															/* The following variables are all protected by the STATIC_MASTER
 ** mutex, not by sqlite3.mutex. They are used by code in notify.c.
 **
 ** When X.pUnlockConnection==Y, that means that X is waiting for Y to
@@ -1056,8 +1056,65 @@ void *pUnlockArg;                     /* Argument to xUnlockNotify */
 void (*xUnlockNotify)(void **, int);  /* Unlock notify callback */
 sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
 #endif
-		};
-
+			public void whereOrInfoDelete(WhereOrInfo p) {
+				p.wc.whereClauseClear();
+				sqlite3DbFree(this,ref p);
+			}
+			public void whereAndInfoDelete(WhereAndInfo p) {
+				p.wc.whereClauseClear();
+				sqlite3DbFree(this,ref p);
+			}
+			public string explainIndexRange(WhereLevel pLevel,Table pTab) {
+				WherePlan pPlan=pLevel.plan;
+				Index pIndex=pPlan.u.pIdx;
+				uint nEq=pPlan.nEq;
+				int i,j;
+				Column[] aCol=pTab.aCol;
+				int[] aiColumn=pIndex.aiColumn;
+				StrAccum txt=new StrAccum(100);
+				if(nEq==0&&(pPlan.wsFlags&(WHERE_BTM_LIMIT|WHERE_TOP_LIMIT))==0) {
+					return null;
+				}
+				sqlite3StrAccumInit(txt,null,0,SQLITE_MAX_LENGTH);
+				txt.db=this;
+				sqlite3StrAccumAppend(txt," (",2);
+				for(i=0;i<nEq;i++) {
+					txt.explainAppendTerm(i,aCol[aiColumn[i]].zName,"=");
+				}
+				j=i;
+				if((pPlan.wsFlags&WHERE_BTM_LIMIT)!=0) {
+					txt.explainAppendTerm(i++,aCol[aiColumn[j]].zName,">");
+				}
+				if((pPlan.wsFlags&WHERE_TOP_LIMIT)!=0) {
+					txt.explainAppendTerm(i,aCol[aiColumn[j]].zName,"<");
+				}
+				sqlite3StrAccumAppend(txt,")",1);
+				return sqlite3StrAccumFinish(txt);
+			}
+			public void whereInfoFree(WhereInfo pWInfo) {
+				if(ALWAYS(pWInfo!=null)) {
+					int i;
+					for(i=0;i<pWInfo.nLevel;i++) {
+						sqlite3_index_info pInfo=pWInfo.a[i]!=null?pWInfo.a[i].pIdxInfo:null;
+						if(pInfo!=null) {
+							/* Debug.Assert( pInfo.needToFreeIdxStr==0 || db.mallocFailed ); */if(pInfo.needToFreeIdxStr!=0) {
+								//sqlite3_free( ref pInfo.idxStr );
+							}
+							sqlite3DbFree(this,ref pInfo);
+						}
+						if(pWInfo.a[i]!=null&&(pWInfo.a[i].plan.wsFlags&WHERE_TEMP_INDEX)!=0) {
+							Index pIdx=pWInfo.a[i].plan.u.pIdx;
+							if(pIdx!=null) {
+								sqlite3DbFree(this,ref pIdx.zColAff);
+								sqlite3DbFree(this,ref pIdx);
+							}
+						}
+					}
+					pWInfo.pWC.whereClauseClear();
+					sqlite3DbFree(this,ref pWInfo);
+				}
+			}
+		}
 		///<summary>
 		/// A macro to discover the encoding of a database.
 		///
@@ -3716,7 +3773,7 @@ set { _op = value; }
 				}
 				/* Final cleanup
       */pParse.nQueryLoop=this.savedNQueryLoop;
-				whereInfoFree(db,this);
+				db.whereInfoFree(this);
 				return;
 			}
 			public Bitmask codeOneLoopStart(/* Complete information about the WHERE clause */int iLevel,/* Which level of pWInfo.a[] should be coded */u16 wctrlFlags,/* One of the WHERE_* flags defined in sqliteInt.h */Bitmask notReady/* Which tables are currently available */) {
@@ -11340,7 +11397,7 @@ range_est_fallback:
 						zMsg.Append(sqlite3MAppendf(db,null," AS %s",pItem.zAlias));
 					}
 					if((flags&WHERE_INDEXED)!=0) {
-						string zWhere=explainIndexRange(db,pLevel,pItem.pTab);
+						string zWhere=db.explainIndexRange(pLevel,pItem.pTab);
 						zMsg.Append(sqlite3MAppendf(db,null," USING %s%sINDEX%s%s%s",((flags&WHERE_TEMP_INDEX)!=0?"AUTOMATIC ":""),((flags&WHERE_IDX_ONLY)!=0?"COVERING ":""),((flags&WHERE_TEMP_INDEX)!=0?"":" "),((flags&WHERE_TEMP_INDEX)!=0?"":pLevel.plan.u.pIdx.zName),zWhere!=null?zWhere:""));
 						sqlite3DbFree(db,ref zWhere);
 					}
@@ -11872,7 +11929,7 @@ range_est_fallback:
 				/* Jump here if malloc fails */whereBeginError:
 				if(pWInfo!=null) {
 					this.nQueryLoop=pWInfo.savedNQueryLoop;
-					whereInfoFree(db,pWInfo);
+					db.whereInfoFree(pWInfo);
 				}
 				return null;
 			}
