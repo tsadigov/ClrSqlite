@@ -1271,6 +1271,18 @@ pOp.cnt = 0;
 					#endif
 				}
 			}
+			public void sqlite3ExprCodeGetColumnOfTable(/* The VDBE under construction */Table pTab,/* The table containing the value */int iTabCur,/* The cursor for this table */int iCol,/* Index of the column to extract */int regOut/* Extract the value into this register */) {
+				if(iCol<0||iCol==pTab.iPKey) {
+					this.sqlite3VdbeAddOp2(OP_Rowid,iTabCur,regOut);
+				}
+				else {
+					int op=IsVirtual(pTab)?OP_VColumn:OP_Column;
+					this.sqlite3VdbeAddOp3(op,iTabCur,iCol,regOut);
+				}
+				if(iCol>=0) {
+					this.sqlite3ColumnDefault(pTab,iCol,regOut);
+				}
+			}
 		}
 		/*
     ** The following are allowed values for Vdbe.magic

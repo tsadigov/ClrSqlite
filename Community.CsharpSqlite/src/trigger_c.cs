@@ -822,7 +822,7 @@ return;
 					if(SQLITE_OK==sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
 					) {
 						iEndTrigger=v.sqlite3VdbeMakeLabel();
-						sqlite3ExprIfFalse(pSubParse,pWhen,iEndTrigger,SQLITE_JUMPIFNULL);
+						pSubParse.sqlite3ExprIfFalse(pWhen,iEndTrigger,SQLITE_JUMPIFNULL);
 					}
 					sqlite3ExprDelete(db,ref pWhen);
 				}

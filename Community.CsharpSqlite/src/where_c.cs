@@ -312,7 +312,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
             ** it to be useful for optimising expression pX. Store this
             ** value in variable pColl.
             */Debug.Assert(pX.pLeft!=null);
-							pColl=sqlite3BinaryCompareCollSeq(pParse,pX.pLeft,pX.pRight);
+							pColl=pParse.sqlite3BinaryCompareCollSeq(pX.pLeft,pX.pRight);
 							Debug.Assert(pColl!=null||pParse.nErr!=0);
 							for(j=0;pIdx.aiColumn[j]!=iColumn;j++) {
 								if(NEVER(j>=pIdx.nColumn))
@@ -649,8 +649,8 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			u16 expRight=(u16)(pExpr.pRight.flags&EP_ExpCollate);
 			u16 expLeft=(u16)(pExpr.pLeft.flags&EP_ExpCollate);
 			Debug.Assert(allowedOp(pExpr.op)&&pExpr.op!=TK_IN);
-			pExpr.pRight.pColl=sqlite3ExprCollSeq(pParse,pExpr.pRight);
-			pExpr.pLeft.pColl=sqlite3ExprCollSeq(pParse,pExpr.pLeft);
+			pExpr.pRight.pColl=pParse.sqlite3ExprCollSeq(pExpr.pRight);
+			pExpr.pLeft.pColl=pParse.sqlite3ExprCollSeq(pExpr.pLeft);
 			SWAP(ref pExpr.pRight.pColl,ref pExpr.pLeft.pColl);
 			pExpr.pRight.flags=(u16)((pExpr.pRight.flags&~EP_ExpCollate)|expLeft);
 			pExpr.pLeft.flags=(u16)((pExpr.pLeft.flags&~EP_ExpCollate)|expRight);
@@ -739,7 +739,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			//#endif
 			pList=pExpr.x.pList;
 			pLeft=pList.a[1].pExpr;
-			if(pLeft.op!=TK_COLUMN||sqlite3ExprAffinity(pLeft)!=SQLITE_AFF_TEXT) {
+			if(pLeft.op!=TK_COLUMN||pLeft.sqlite3ExprAffinity()!=SQLITE_AFF_TEXT) {
 				/* IMP: R-02065-49465 The left-hand side of the LIKE or GLOB operator must
         ** be the name of an indexed column with TEXT affinity. */return 0;
 			}
@@ -784,10 +784,10 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
               ** function, then no OP_Variable will be added to the program.
               ** This causes problems for the sqlite3_bind_parameter_name()
               ** API. To workaround them, add a dummy OP_Variable here.
-              */int r1=sqlite3GetTempReg(pParse);
-							sqlite3ExprCodeTarget(pParse,pRight,r1);
+              */int r1=pParse.sqlite3GetTempReg();
+							pParse.sqlite3ExprCodeTarget(pRight,r1);
 							v.sqlite3VdbeChangeP3(v.sqlite3VdbeCurrentAddr()-1,0);
-							sqlite3ReleaseTempReg(pParse,r1);
+							pParse.sqlite3ReleaseTempReg(r1);
 						}
 					}
 				}
@@ -1086,8 +1086,8 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 								/* If the right-hand side is also a column, then the affinities
               ** of both right and left sides must be such that no type
               ** conversions are required on the right.  (Ticket #2249)
-              */affRight=sqlite3ExprAffinity(pOrTerm.pExpr.pRight);
-								affLeft=sqlite3ExprAffinity(pOrTerm.pExpr.pLeft);
+              */affRight=pOrTerm.pExpr.pRight.sqlite3ExprAffinity();
+								affLeft=pOrTerm.pExpr.pLeft.sqlite3ExprAffinity();
 								if(affRight!=0&&affRight!=affLeft) {
 									okToChngToIN=0;
 								}
@@ -1116,12 +1116,12 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 						Debug.Assert(pOrTerm.leftCursor==iCursor);
 						Debug.Assert(pOrTerm.u.leftColumn==iColumn);
 						pDup=sqlite3ExprDup(db,pOrTerm.pExpr.pRight,0);
-						pList=sqlite3ExprListAppend(pWC.pParse,pList,pDup);
+						pList=pWC.pParse.sqlite3ExprListAppend(pList,pDup);
 						pLeft=pOrTerm.pExpr.pLeft;
 					}
 					Debug.Assert(pLeft!=null);
 					pDup=sqlite3ExprDup(db,pLeft,0);
-					pNew=sqlite3PExpr(pParse,TK_IN,pDup,null,null);
+					pNew=pParse.sqlite3PExpr(TK_IN,pDup,null,null);
 					if(pNew!=null) {
 						int idxNew;
 						transferJoinMarkings(pNew,pExpr);
@@ -1279,7 +1279,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 					for(i=0;i<2;i++) {
 						Expr pNewExpr;
 						int idxNew;
-						pNewExpr=sqlite3PExpr(pParse,ops[i],sqlite3ExprDup(db,pExpr.pLeft,0),sqlite3ExprDup(db,pList.a[i].pExpr,0),null);
+						pNewExpr=pParse.sqlite3PExpr(ops[i],sqlite3ExprDup(db,pExpr.pLeft,0),sqlite3ExprDup(db,pList.a[i].pExpr,0),null);
 						idxNew=pWC.whereClauseInsert(pNewExpr,TERM_VIRTUAL|TERM_DYNAMIC);
 						testcase(idxNew==0);
 						exprAnalyze(pSrc,pWC,idxNew);
@@ -1338,11 +1338,11 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 					// pC = c + 1;
 				}
 				pColl=sqlite3FindCollSeq(db,SqliteEncoding.UTF8,noCase?"NOCASE":"BINARY",0);
-				pNewExpr1=sqlite3PExpr(pParse,TK_GE,sqlite3ExprSetColl(sqlite3ExprDup(db,pLeft,0),pColl),pStr1,0);
+				pNewExpr1=pParse.sqlite3PExpr(TK_GE,sqlite3ExprDup(db,pLeft,0).sqlite3ExprSetColl(pColl),pStr1,0);
 				idxNew1=pWC.whereClauseInsert(pNewExpr1,TERM_VIRTUAL|TERM_DYNAMIC);
 				testcase(idxNew1==0);
 				exprAnalyze(pSrc,pWC,idxNew1);
-				pNewExpr2=sqlite3PExpr(pParse,TK_LT,sqlite3ExprSetColl(sqlite3ExprDup(db,pLeft,0),pColl),pStr2,null);
+				pNewExpr2=pParse.sqlite3PExpr(TK_LT,sqlite3ExprDup(db,pLeft,0).sqlite3ExprSetColl(pColl),pStr2,null);
 				idxNew2=pWC.whereClauseInsert(pNewExpr2,TERM_VIRTUAL|TERM_DYNAMIC);
 				testcase(idxNew2==0);
 				exprAnalyze(pSrc,pWC,idxNew2);
@@ -1371,7 +1371,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				prereqColumn=exprTableUsage(pMaskSet,pLeft);
 				if((prereqExpr&prereqColumn)==0) {
 					Expr pNewExpr;
-					pNewExpr=sqlite3PExpr(pParse,TK_MATCH,null,sqlite3ExprDup(db,pRight,0),null);
+					pNewExpr=pParse.sqlite3PExpr(TK_MATCH,null,sqlite3ExprDup(db,pRight,0),null);
 					idxNew=pWC.whereClauseInsert(pNewExpr,TERM_VIRTUAL|TERM_DYNAMIC);
 					testcase(idxNew==0);
 					pNewTerm=pWC.a[idxNew];
@@ -1499,7 +1499,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 					/* Can not use an index sort on anything that is not a column in the
           ** left-most table of the FROM clause */break;
 				}
-				pColl=sqlite3ExprCollSeq(pParse,pExpr);
+				pColl=pParse.sqlite3ExprCollSeq(pExpr);
 				if(null==pColl) {
 					pColl=db.pDfltColl;
 				}
@@ -1916,7 +1916,7 @@ WhereCost pCost            /* Lowest cost query plan */
 						Expr pX=pTerm.pExpr;
 						idxCols|=cMask;
 						pIdx.aiColumn[n]=pTerm.u.leftColumn;
-						pColl=sqlite3BinaryCompareCollSeq(pParse,pX.pLeft,pX.pRight);
+						pColl=pParse.sqlite3BinaryCompareCollSeq(pX.pLeft,pX.pRight);
 						pIdx.azColl[n]=ALWAYS(pColl!=null)?pColl.zName:"BINARY";
 						n++;
 					}
@@ -1944,14 +1944,14 @@ WhereCost pCost            /* Lowest cost query plan */
 			v.sqlite3VdbeAddOp4(OP_OpenAutoindex,pLevel.iIdxCur,nColumn+1,0,pKeyinfo,P4_KEYINFO_HANDOFF);
 			VdbeComment(v,"for %s",pTable.zName);
 			/* Fill the automatic index with content */addrTop=v.sqlite3VdbeAddOp1(OP_Rewind,pLevel.iTabCur);
-			regRecord=sqlite3GetTempReg(pParse);
+			regRecord=pParse.sqlite3GetTempReg();
 			pParse.sqlite3GenerateIndexKey(pIdx,pLevel.iTabCur,regRecord,true);
 			v.sqlite3VdbeAddOp2(OP_IdxInsert,pLevel.iIdxCur,regRecord);
 			v.sqlite3VdbeChangeP5(OPFLAG_USESEEKRESULT);
 			v.sqlite3VdbeAddOp2(OP_Next,pLevel.iTabCur,addrTop+1);
 			v.sqlite3VdbeChangeP5(SQLITE_STMTSTATUS_AUTOINDEX);
 			v.sqlite3VdbeJumpHere(addrTop);
-			sqlite3ReleaseTempReg(pParse,regRecord);
+			pParse.sqlite3ReleaseTempReg(regRecord);
 			/* Jump here when skipping the initialization */v.sqlite3VdbeJumpHere(addrInit);
 		}
 		#endif
@@ -3258,7 +3258,7 @@ whereEqualScanEst_cancel:
 			/* Code the OP_Affinity opcode if there is anything left to do. */if(n>0) {
 				v.sqlite3VdbeAddOp2(OP_Affinity,_base,n);
 				v.sqlite3VdbeChangeP4(-1,zAff,n);
-				sqlite3ExprCacheAffinityChange(pParse,_base,n);
+				pParse.sqlite3ExprCacheAffinityChange(_base,n);
 			}
 		}
 		///<summary>
@@ -3279,7 +3279,7 @@ whereEqualScanEst_cancel:
 			int iReg;
 			/* Register holding results */Debug.Assert(iTarget>0);
 			if(pX.op==TK_EQ) {
-				iReg=sqlite3ExprCodeTarget(pParse,pX.pRight,iTarget);
+				iReg=pParse.sqlite3ExprCodeTarget(pX.pRight,iTarget);
 			}
 			else
 				if(pX.op==TK_ISNULL) {
@@ -3407,7 +3407,7 @@ whereEqualScanEst_cancel:
 				/* EV: R-30575-11662 */r1=codeEqualityTerm(pParse,pTerm,pLevel,regBase+j);
 				if(r1!=regBase+j) {
 					if(nReg==1) {
-						sqlite3ReleaseTempReg(pParse,regBase);
+						pParse.sqlite3ReleaseTempReg(regBase);
 						regBase=r1;
 					}
 					else {
@@ -3630,13 +3630,13 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				int nConstraint=pVtabIdx.nConstraint;
 				sqlite3_index_constraint_usage[] aUsage=pVtabIdx.aConstraintUsage;
 				sqlite3_index_constraint[] aConstraint=pVtabIdx.aConstraint;
-				sqlite3ExprCachePush(pParse);
-				iReg=sqlite3GetTempRange(pParse,nConstraint+2);
+				pParse.sqlite3ExprCachePush();
+				iReg=pParse.sqlite3GetTempRange(nConstraint+2);
 				for(j=1;j<=nConstraint;j++) {
 					for(k=0;k<nConstraint;k++) {
 						if(aUsage[k].argvIndex==j) {
 							int iTerm=aConstraint[k].iTermOffset;
-							sqlite3ExprCode(pParse,pWC.a[iTerm].pExpr.pRight,iReg+j+1);
+							pParse.sqlite3ExprCode(pWC.a[iTerm].pExpr.pRight,iReg+j+1);
 							break;
 						}
 					}
@@ -3656,8 +3656,8 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				pLevel.op=OP_VNext;
 				pLevel.p1=iCur;
 				pLevel.p2=v.sqlite3VdbeCurrentAddr();
-				sqlite3ReleaseTempRange(pParse,iReg,nConstraint+2);
-				sqlite3ExprCachePop(pParse,1);
+				pParse.sqlite3ReleaseTempRange(iReg,nConstraint+2);
+				pParse.sqlite3ExprCachePop(1);
 			}
 			else
 				#endif
@@ -3666,7 +3666,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
           **          equality comparison against the ROWID field.  Or
           **          we reference multiple rows using a "rowid IN (...)"
           **          construct.
-          */iReleaseReg=sqlite3GetTempReg(pParse);
+          */iReleaseReg=pParse.sqlite3GetTempReg();
 					pTerm=pWC.findTerm(iCur,-1,notReady,WO_EQ|WO_IN,null);
 					Debug.Assert(pTerm!=null);
 					Debug.Assert(pTerm.pExpr!=null);
@@ -3677,7 +3677,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 					addrNxt=pLevel.addrNxt;
 					v.sqlite3VdbeAddOp2(OP_MustBeInt,iRowidReg,addrNxt);
 					v.sqlite3VdbeAddOp3(OP_NotExists,iCur,addrNxt,iRowidReg);
-					sqlite3ExprCacheStore(pParse,iCur,-1,iRowidReg);
+					pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
 					#if SQLITE_DEBUG
 																																																																																																				          VdbeComment( v, "pk" );
 #endif
@@ -3716,13 +3716,13 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							/* EV: R-30575-11662 */pX=pStart.pExpr;
 							Debug.Assert(pX!=null);
 							Debug.Assert(pStart.leftCursor==iCur);
-							r1=sqlite3ExprCodeTemp(pParse,pX.pRight,ref rTemp);
+							r1=pParse.sqlite3ExprCodeTemp(pX.pRight,ref rTemp);
 							v.sqlite3VdbeAddOp3(aMoveOp[pX.op-TK_GT],iCur,addrBrk,r1);
 							#if SQLITE_DEBUG
 																																																																																																																																												            VdbeComment( v, "pk" );
 #endif
-							sqlite3ExprCacheAffinityChange(pParse,r1,1);
-							sqlite3ReleaseTempReg(pParse,rTemp);
+							pParse.sqlite3ExprCacheAffinityChange(r1,1);
+							pParse.sqlite3ReleaseTempReg(rTemp);
 							disableTerm(pLevel,pStart);
 						}
 						else {
@@ -3735,7 +3735,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							Debug.Assert(pEnd.leftCursor==iCur);
 							testcase(pEnd.wtFlags&TERM_VIRTUAL);
 							/* EV: R-30575-11662 */memEndValue=++pParse.nMem;
-							sqlite3ExprCode(pParse,pX.pRight,memEndValue);
+							pParse.sqlite3ExprCode(pX.pRight,memEndValue);
 							if(pX.op==TK_LT||pX.op==TK_GT) {
 								testOp=bRev!=0?OP_Le:OP_Ge;
 							}
@@ -3755,9 +3755,9 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							Debug.Assert(pLevel.p5==0);
 						}
 						if(testOp!=OP_Noop) {
-							iRowidReg=iReleaseReg=sqlite3GetTempReg(pParse);
+							iRowidReg=iReleaseReg=pParse.sqlite3GetTempReg();
 							v.sqlite3VdbeAddOp2(OP_Rowid,iCur,iRowidReg);
-							sqlite3ExprCacheStore(pParse,iCur,-1,iRowidReg);
+							pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
 							v.sqlite3VdbeAddOp3(testOp,memEndValue,addrBrk,iRowidReg);
 							v.sqlite3VdbeChangeP5(SQLITE_AFF_NUMERIC|SQLITE_JUMPIFNULL);
 						}
@@ -3873,7 +3873,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							/* Seek the index cursor to the start of the range. */nConstraint=nEq;
 							if(pRangeStart!=null) {
 								Expr pRight=pRangeStart.pExpr.pRight;
-								sqlite3ExprCode(pParse,pRight,regBase+nEq);
+								pParse.sqlite3ExprCode(pRight,regBase+nEq);
 								if((pRangeStart.wtFlags&TERM_VNULL)==0) {
 									sqlite3ExprCodeIsNullJump(v,pRight,regBase+nEq,addrNxt);
 								}
@@ -3912,8 +3912,8 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
           */nConstraint=nEq;
 							if(pRangeEnd!=null) {
 								Expr pRight=pRangeEnd.pExpr.pRight;
-								sqlite3ExprCacheRemove(pParse,regBase+nEq,1);
-								sqlite3ExprCode(pParse,pRight,regBase+nEq);
+								pParse.sqlite3ExprCacheRemove(regBase+nEq,1);
+								pParse.sqlite3ExprCode(pRight,regBase+nEq);
 								if((pRangeEnd.wtFlags&TERM_VNULL)==0) {
 									sqlite3ExprCodeIsNullJump(v,pRight,regBase+nEq,addrNxt);
 								}
@@ -3945,20 +3945,20 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 							/* If there are inequality constraints, check that the value
           ** of the table column that the inequality contrains is not NULL.
           ** If it is, jump to the next iteration of the loop.
-          */r1=sqlite3GetTempReg(pParse);
+          */r1=pParse.sqlite3GetTempReg();
 							testcase(pLevel.plan.wsFlags&WHERE_BTM_LIMIT);
 							testcase(pLevel.plan.wsFlags&WHERE_TOP_LIMIT);
 							if((pLevel.plan.wsFlags&(WHERE_BTM_LIMIT|WHERE_TOP_LIMIT))!=0) {
 								v.sqlite3VdbeAddOp3(OP_Column,iIdxCur,nEq,r1);
 								v.sqlite3VdbeAddOp2(OP_IsNull,r1,addrCont);
 							}
-							sqlite3ReleaseTempReg(pParse,r1);
+							pParse.sqlite3ReleaseTempReg(r1);
 							/* Seek the table cursor, if required */disableTerm(pLevel,pRangeStart);
 							disableTerm(pLevel,pRangeEnd);
 							if(0==omitTable) {
-								iRowidReg=iReleaseReg=sqlite3GetTempReg(pParse);
+								iRowidReg=iReleaseReg=pParse.sqlite3GetTempReg();
 								v.sqlite3VdbeAddOp2(OP_IdxRowid,iIdxCur,iRowidReg);
-								sqlite3ExprCacheStore(pParse,iCur,-1,iRowidReg);
+								pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
 								v.sqlite3VdbeAddOp2(OP_Seek,iCur,iRowidReg);
 								/* Deferred seek */}
 							/* Record the instruction used to terminate the loop. Disable
@@ -4084,7 +4084,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 											if((wctrlFlags&WHERE_DUPLICATES_OK)==0) {
 												int iSet=((ii==pOrWc.nTerm-1)?-1:ii);
 												int r;
-												r=sqlite3ExprCodeGetColumn(pParse,pTabItem.pTab,-1,iCur,regRowid);
+												r=pParse.sqlite3ExprCodeGetColumn(pTabItem.pTab,-1,iCur,regRowid);
 												v.sqlite3VdbeAddOp4Int(OP_RowSetTest,regRowset,v.sqlite3VdbeCurrentAddr()+2,r,iSet);
 											}
 											v.sqlite3VdbeAddOp2(OP_Gosub,regReturn,iLoopBody);
@@ -4153,7 +4153,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				 {
 					continue;
 				}
-				sqlite3ExprIfFalse(pParse,pE,addrCont,SQLITE_JUMPIFNULL);
+				pParse.sqlite3ExprIfFalse(pE,addrCont,SQLITE_JUMPIFNULL);
 				pTerm.wtFlags|=TERM_CODED;
 			}
 			/* For a LEFT OUTER JOIN, generate code that will record the fact that
@@ -4164,7 +4164,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 				#if SQLITE_DEBUG
 																																																																																        VdbeComment( v, "record LEFT JOIN hit" );
 #endif
-				sqlite3ExprCacheClear(pParse);
+				pParse.sqlite3ExprCacheClear();
 				for(j=0;j<pWC.nTerm;j++)//, pTerm++)
 				 {
 					pTerm=pWC.a[j];
@@ -4177,11 +4177,11 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 						continue;
 					}
 					Debug.Assert(pTerm.pExpr!=null);
-					sqlite3ExprIfFalse(pParse,pTerm.pExpr,addrCont,SQLITE_JUMPIFNULL);
+					pParse.sqlite3ExprIfFalse(pTerm.pExpr,addrCont,SQLITE_JUMPIFNULL);
 					pTerm.wtFlags|=TERM_CODED;
 				}
 			}
-			sqlite3ReleaseTempReg(pParse,iReleaseReg);
+			pParse.sqlite3ReleaseTempReg(iReleaseReg);
 			return notReady;
 		}
 		#if (SQLITE_TEST)
@@ -4379,12 +4379,12 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
       */pMaskSet=new WhereMaskSet();
 			//initMaskSet(pMaskSet);
 			pWC.whereClauseInit(pParse,pMaskSet);
-			sqlite3ExprCodeConstants(pParse,pWhere);
+			pParse.sqlite3ExprCodeConstants(pWhere);
 			pWC.whereSplit(pWhere,TK_AND);
 			/* IMP: R-15842-53296 *//* Special case: a WHERE clause that is constant.  Evaluate the
       ** expression and either jump over all of the code or fall thru.
       */if(pWhere!=null&&(nTabList==0||pWhere.sqlite3ExprIsConstantNotJoin()!=0)) {
-				sqlite3ExprIfFalse(pParse,pWhere,pWInfo.iBreak,SQLITE_JUMPIFNULL);
+				pParse.sqlite3ExprIfFalse(pWhere,pWInfo.iBreak,SQLITE_JUMPIFNULL);
 				pWhere=null;
 			}
 			/* Assign a bit from the bitmask to every term in the FROM clause.
@@ -4821,7 +4821,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 			SrcList pTabList=pWInfo.pTabList;
 			sqlite3 db=pParse.db;
 			/* Generate loop termination code.
-      */sqlite3ExprCacheClear(pParse);
+      */pParse.sqlite3ExprCacheClear();
 			for(i=pWInfo.nLevel-1;i>=0;i--) {
 				pLevel=pWInfo.a[i];
 				v.sqlite3VdbeResolveLabel(pLevel.addrCont);

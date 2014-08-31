@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite {
 			//  memset(pNew, 0, sizeof(*pNew));
 			//}
 			if(pEList==null) {
-				pEList=sqlite3ExprListAppend(pParse,null,sqlite3Expr(db,TK_ALL,null));
+				pEList=pParse.sqlite3ExprListAppend(null,sqlite3Expr(db,TK_ALL,null));
 			}
 			pNew.pEList=pEList;
 			pNew.pSrc=pSrc;
@@ -259,7 +259,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(pSrc.a[iRight].pTab!=null);
 			pE1=sqlite3CreateColumnExpr(db,pSrc,iLeft,iColLeft);
 			pE2=sqlite3CreateColumnExpr(db,pSrc,iRight,iColRight);
-			pEq=sqlite3PExpr(pParse,TK_EQ,pE1,pE2,0);
+			pEq=pParse.sqlite3PExpr(TK_EQ,pE1,pE2,0);
 			if(pEq!=null&&isOuterJoin!=0) {
 				ExprSetProperty(pEq,EP_FromJoin);
 				Debug.Assert(!ExprHasAnyProperty(pEq,EP_TokenOnly|EP_Reduced));
@@ -404,16 +404,16 @@ namespace Community.CsharpSqlite {
 		static void pushOntoSorter(Parse pParse,/* Parser context */ExprList pOrderBy,/* The ORDER BY clause */Select pSelect,/* The whole SELECT statement */int regData/* Register holding data to be sorted */) {
 			Vdbe v=pParse.pVdbe;
 			int nExpr=pOrderBy.nExpr;
-			int regBase=sqlite3GetTempRange(pParse,nExpr+2);
-			int regRecord=sqlite3GetTempReg(pParse);
-			sqlite3ExprCacheClear(pParse);
-			sqlite3ExprCodeExprList(pParse,pOrderBy,regBase,false);
+			int regBase=pParse.sqlite3GetTempRange(nExpr+2);
+			int regRecord=pParse.sqlite3GetTempReg();
+			pParse.sqlite3ExprCacheClear();
+			pParse.sqlite3ExprCodeExprList(pOrderBy,regBase,false);
 			v.sqlite3VdbeAddOp2(OP_Sequence,pOrderBy.iECursor,regBase+nExpr);
-			sqlite3ExprCodeMove(pParse,regData,regBase+nExpr+1,1);
+			pParse.sqlite3ExprCodeMove(regData,regBase+nExpr+1,1);
 			v.sqlite3VdbeAddOp3(OP_MakeRecord,regBase,nExpr+2,regRecord);
 			v.sqlite3VdbeAddOp2(OP_IdxInsert,pOrderBy.iECursor,regRecord);
-			sqlite3ReleaseTempReg(pParse,regRecord);
-			sqlite3ReleaseTempRange(pParse,regBase,nExpr+2);
+			pParse.sqlite3ReleaseTempReg(regRecord);
+			pParse.sqlite3ReleaseTempRange(regBase,nExpr+2);
 			if(pSelect.iLimit!=0) {
 				int addr1,addr2;
 				int iLimit;
@@ -443,7 +443,7 @@ namespace Community.CsharpSqlite {
 				addr=v.sqlite3VdbeAddOp1(OP_IfNeg,p.iOffset);
 				v.sqlite3VdbeAddOp2(OP_Goto,0,iContinue);
 				#if SQLITE_DEBUG
-																																																																												        VdbeComment( v, "skip OFFSET records" );
+																																																																																        VdbeComment( v, "skip OFFSET records" );
 #endif
 				v.sqlite3VdbeJumpHere(addr);
 			}
@@ -462,11 +462,11 @@ namespace Community.CsharpSqlite {
 			Vdbe v;
 			int r1;
 			v=pParse.pVdbe;
-			r1=sqlite3GetTempReg(pParse);
+			r1=pParse.sqlite3GetTempReg();
 			v.sqlite3VdbeAddOp4Int(OP_Found,iTab,addrRepeat,iMem,N);
 			v.sqlite3VdbeAddOp3(OP_MakeRecord,iMem,N,r1);
 			v.sqlite3VdbeAddOp2(OP_IdxInsert,iTab,r1);
-			sqlite3ReleaseTempReg(pParse,r1);
+			pParse.sqlite3ReleaseTempReg(r1);
 		}
 		#if !SQLITE_OMIT_SUBQUERY
 		///<summary>
@@ -537,8 +537,8 @@ namespace Community.CsharpSqlite {
 				if(eDest!=SelectResultType.Exists) {
 					/* If the destination is an EXISTS(...) expression, the actual
         ** values returned by the SELECT are not required.
-        */sqlite3ExprCacheClear(pParse);
-					sqlite3ExprCodeExprList(pParse,pEList,regResult,eDest==SelectResultType.Output);
+        */pParse.sqlite3ExprCacheClear();
+					pParse.sqlite3ExprCodeExprList(pEList,regResult,eDest==SelectResultType.Output);
 				}
 			nColumn=nResultCol;
 			/* If the DISTINCT keyword was present on the SELECT statement
@@ -559,10 +559,10 @@ namespace Community.CsharpSqlite {
 			#if !SQLITE_OMIT_COMPOUND_SELECT
 			case SelectResultType.Union: {
 				int r1;
-				r1=sqlite3GetTempReg(pParse);
+				r1=pParse.sqlite3GetTempReg();
 				v.sqlite3VdbeAddOp3(OP_MakeRecord,regResult,nColumn,r1);
 				v.sqlite3VdbeAddOp2(OP_IdxInsert,iParm,r1);
-				sqlite3ReleaseTempReg(pParse,r1);
+				pParse.sqlite3ReleaseTempReg(r1);
 				break;
 			}
 			/* Construct a record from the query result, but instead of
@@ -576,7 +576,7 @@ namespace Community.CsharpSqlite {
 			/* Store the result as data using a unique key.
 */case SelectResultType.Table:
 			case SelectResultType.EphemTab: {
-				int r1=sqlite3GetTempReg(pParse);
+				int r1=pParse.sqlite3GetTempReg();
 				testcase(eDest==SelectResultType.Table);
 				testcase(eDest==SelectResultType.EphemTab);
 				v.sqlite3VdbeAddOp3(OP_MakeRecord,regResult,nColumn,r1);
@@ -584,13 +584,13 @@ namespace Community.CsharpSqlite {
 					pushOntoSorter(pParse,pOrderBy,p,r1);
 				}
 				else {
-					int r2=sqlite3GetTempReg(pParse);
+					int r2=pParse.sqlite3GetTempReg();
 					v.sqlite3VdbeAddOp2(OP_NewRowid,iParm,r2);
 					v.sqlite3VdbeAddOp3(OP_Insert,iParm,r1,r2);
 					v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
-					sqlite3ReleaseTempReg(pParse,r2);
+					pParse.sqlite3ReleaseTempReg(r2);
 				}
-				sqlite3ReleaseTempReg(pParse,r1);
+				pParse.sqlite3ReleaseTempReg(r1);
 				break;
 			}
 			#if !SQLITE_OMIT_SUBQUERY
@@ -607,11 +607,11 @@ namespace Community.CsharpSqlite {
               ** case the order does matter */pushOntoSorter(pParse,pOrderBy,p,regResult);
 				}
 				else {
-					int r1=sqlite3GetTempReg(pParse);
+					int r1=pParse.sqlite3GetTempReg();
 					v.sqlite3VdbeAddOp4(OP_MakeRecord,regResult,1,r1,p.affinity,1);
-					sqlite3ExprCacheAffinityChange(pParse,regResult,1);
+					pParse.sqlite3ExprCacheAffinityChange(regResult,1);
 					v.sqlite3VdbeAddOp2(OP_IdxInsert,iParm,r1);
-					sqlite3ReleaseTempReg(pParse,r1);
+					pParse.sqlite3ReleaseTempReg(r1);
 				}
 				break;
 			}
@@ -629,7 +629,7 @@ namespace Community.CsharpSqlite {
 					pushOntoSorter(pParse,pOrderBy,p,regResult);
 				}
 				else {
-					sqlite3ExprCodeMove(pParse,regResult,iParm,1);
+					pParse.sqlite3ExprCodeMove(regResult,iParm,1);
 					/* The LIMIT clause will jump out of the loop for us */}
 				break;
 			}
@@ -642,10 +642,10 @@ namespace Community.CsharpSqlite {
 				testcase(eDest==SelectResultType.Coroutine);
 				testcase(eDest==SelectResultType.Output);
 				if(pOrderBy!=null) {
-					int r1=sqlite3GetTempReg(pParse);
+					int r1=pParse.sqlite3GetTempReg();
 					v.sqlite3VdbeAddOp3(OP_MakeRecord,regResult,nColumn,r1);
 					pushOntoSorter(pParse,pOrderBy,p,r1);
-					sqlite3ReleaseTempReg(pParse,r1);
+					pParse.sqlite3ReleaseTempReg(r1);
 				}
 				else
 					if(eDest==SelectResultType.Coroutine) {
@@ -653,7 +653,7 @@ namespace Community.CsharpSqlite {
 					}
 					else {
 						v.sqlite3VdbeAddOp2(OP_ResultRow,regResult,nColumn);
-						sqlite3ExprCacheAffinityChange(pParse,regResult,nColumn);
+						pParse.sqlite3ExprCacheAffinityChange(regResult,nColumn);
 					}
 				break;
 			}
@@ -712,7 +712,7 @@ namespace Community.CsharpSqlite {
 					//, pItem++){
 					pItem=pList.a[i];
 					CollSeq pColl;
-					pColl=sqlite3ExprCollSeq(pParse,pItem.pExpr);
+					pColl=pParse.sqlite3ExprCollSeq(pItem.pExpr);
 					if(pColl==null) {
 						pColl=db.pDfltColl;
 					}
@@ -777,7 +777,7 @@ namespace Community.CsharpSqlite {
 			a=(byte)b;
 		}
 		#else
-																																						/* No-op versions of the explainXXX() functions and macros. */
+																																								/* No-op versions of the explainXXX() functions and macros. */
 // define explainTempTable(y,z)
 static void explainTempTable(ref int a, int b){ a = b;}
 
@@ -809,7 +809,7 @@ static void explainSetInteger(ref int a, int b){ a = b;}
 			}
 		}
 		#else
-																																						/* No-op versions of the explainXXX() functions and macros. */
+																																								/* No-op versions of the explainXXX() functions and macros. */
 // define explainComposite(v,w,x,y,z)
 static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 #endif
@@ -831,14 +831,14 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			int regRow;
 			int regRowid;
 			iTab=pOrderBy.iECursor;
-			regRow=sqlite3GetTempReg(pParse);
+			regRow=pParse.sqlite3GetTempReg();
 			if(eDest==SelectResultType.Output||eDest==SelectResultType.Coroutine) {
 				pseudoTab=pParse.nTab++;
 				v.sqlite3VdbeAddOp3(OP_OpenPseudo,pseudoTab,regRow,nColumn);
 				regRowid=0;
 			}
 			else {
-				regRowid=sqlite3GetTempReg(pParse);
+				regRowid=pParse.sqlite3GetTempReg();
 			}
 			addr=1+v.sqlite3VdbeAddOp2(OP_Sort,iTab,addrBreak);
 			codeOffset(v,p,addrContinue);
@@ -857,13 +857,13 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			case SelectResultType.Set: {
 				Debug.Assert(nColumn==1);
 				v.sqlite3VdbeAddOp4(OP_MakeRecord,regRow,1,regRowid,p.affinity,1);
-				sqlite3ExprCacheAffinityChange(pParse,regRow,1);
+				pParse.sqlite3ExprCacheAffinityChange(regRow,1);
 				v.sqlite3VdbeAddOp2(OP_IdxInsert,iParm,regRowid);
 				break;
 			}
 			case SelectResultType.Mem: {
 				Debug.Assert(nColumn==1);
-				sqlite3ExprCodeMove(pParse,regRow,iParm,1);
+				pParse.sqlite3ExprCodeMove(regRow,iParm,1);
 				/* The LIMIT clause will terminate the loop for us */break;
 			}
 			#endif
@@ -881,7 +881,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				}
 				if(eDest==SelectResultType.Output) {
 					v.sqlite3VdbeAddOp2(OP_ResultRow,pDest.iMem,nColumn);
-					sqlite3ExprCacheAffinityChange(pParse,pDest.iMem,nColumn);
+					pParse.sqlite3ExprCacheAffinityChange(pDest.iMem,nColumn);
 				}
 				else {
 					v.sqlite3VdbeAddOp1(OP_Yield,pDest.iParm);
@@ -889,8 +889,8 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				break;
 			}
 			}
-			sqlite3ReleaseTempReg(pParse,regRow);
-			sqlite3ReleaseTempReg(pParse,regRowid);
+			pParse.sqlite3ReleaseTempReg(regRow);
+			pParse.sqlite3ReleaseTempReg(regRowid);
 			/* The bottom of the loop
       */v.sqlite3VdbeResolveLabel(addrContinue);
 			v.sqlite3VdbeAddOp2(OP_Next,iTab,addr);
@@ -1049,7 +1049,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				Expr p=pEList.a[i].pExpr;
 				string zType;
 				#if SQLITE_ENABLE_COLUMN_METADATA
-																																																																												        string zOrigDb = null;
+																																																																																        string zOrigDb = null;
         string zOrigTab = null;
         string zOrigCol = null;
         zType = columnType( sNC, p, ref zOrigDb, ref zOrigTab, ref zOrigCol );
@@ -1273,10 +1273,10 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				string bDummy=null;
 				pCol.zType=columnType(sNC,p,ref bDummy,ref bDummy,ref bDummy);
 				// sqlite3DbStrDup( db, columnType( sNC, p, 0, 0, 0 ) );
-				pCol.affinity=sqlite3ExprAffinity(p);
+				pCol.affinity=p.sqlite3ExprAffinity();
 				if(pCol.affinity==0)
 					pCol.affinity=SQLITE_AFF_NONE;
-				pColl=sqlite3ExprCollSeq(pParse,p);
+				pColl=pParse.sqlite3ExprCollSeq(p);
 				if(pColl!=null) {
 					pCol.zColl=pColl.zName;
 					// sqlite3DbStrDup( db, pColl.zName );
@@ -1369,7 +1369,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
       ** contraversy about what the correct behavior should be.
       ** The current implementation interprets "LIMIT 0" to mean
       ** no rows.
-      */sqlite3ExprCacheClear(pParse);
+      */pParse.sqlite3ExprCacheClear();
 			Debug.Assert(p.pOffset==null||p.pLimit!=null);
 			if(p.pLimit!=null) {
 				p.iLimit=iLimit=++pParse.nMem;
@@ -1388,27 +1388,27 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 					}
 				}
 				else {
-					sqlite3ExprCode(pParse,p.pLimit,iLimit);
+					pParse.sqlite3ExprCode(p.pLimit,iLimit);
 					v.sqlite3VdbeAddOp1(OP_MustBeInt,iLimit);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "LIMIT counter" );
+																																																																																																				          VdbeComment( v, "LIMIT counter" );
 #endif
 					v.sqlite3VdbeAddOp2(OP_IfZero,iLimit,iBreak);
 				}
 				if(p.pOffset!=null) {
 					p.iOffset=iOffset=++pParse.nMem;
 					pParse.nMem++;
-					/* Allocate an extra register for limit+offset */sqlite3ExprCode(pParse,p.pOffset,iOffset);
+					/* Allocate an extra register for limit+offset */pParse.sqlite3ExprCode(p.pOffset,iOffset);
 					v.sqlite3VdbeAddOp1(OP_MustBeInt,iOffset);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "OFFSET counter" );
+																																																																																																				          VdbeComment( v, "OFFSET counter" );
 #endif
 					addr1=v.sqlite3VdbeAddOp1(OP_IfPos,iOffset);
 					v.sqlite3VdbeAddOp2(OP_Integer,0,iOffset);
 					v.sqlite3VdbeJumpHere(addr1);
 					v.sqlite3VdbeAddOp3(OP_Add,iLimit,iOffset,iOffset+1);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "LIMIT+OFFSET" );
+																																																																																																				          VdbeComment( v, "LIMIT+OFFSET" );
 #endif
 					addr1=v.sqlite3VdbeAddOp1(OP_IfPos,iLimit);
 					v.sqlite3VdbeAddOp2(OP_Integer,-1,iOffset+1);
@@ -1434,7 +1434,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			}
 			Debug.Assert(iCol>=0);
 			if(pRet==null&&iCol<p.pEList.nExpr) {
-				pRet=sqlite3ExprCollSeq(pParse,p.pEList.a[iCol].pExpr);
+				pRet=pParse.sqlite3ExprCollSeq(p.pEList.a[iCol].pExpr);
 			}
 			return pRet;
 		}
@@ -1552,7 +1552,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				if(p.iLimit!=0) {
 					addr=v.sqlite3VdbeAddOp1(OP_IfZero,p.iLimit);
 					#if SQLITE_DEBUG
-																																																																																															              VdbeComment( v, "Jump ahead if LIMIT reached" );
+																																																																																																				              VdbeComment( v, "Jump ahead if LIMIT reached" );
 #endif
 				}
 				explainSetInteger(ref iSub2,pParse.iNextSelectId);
@@ -1721,10 +1721,10 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				iCont=v.sqlite3VdbeMakeLabel();
 				computeLimitRegisters(pParse,p,iBreak);
 				v.sqlite3VdbeAddOp2(OP_Rewind,tab1,iBreak);
-				r1=sqlite3GetTempReg(pParse);
+				r1=pParse.sqlite3GetTempReg();
 				iStart=v.sqlite3VdbeAddOp2(OP_RowKey,tab1,r1);
 				v.sqlite3VdbeAddOp4Int(OP_NotFound,tab2,iCont,r1,0);
-				sqlite3ReleaseTempReg(pParse,r1);
+				pParse.sqlite3ReleaseTempReg(r1);
 				selectInnerLoop(pParse,p,p.pEList,tab1,p.pEList.nExpr,null,-1,dest,iCont,iBreak);
 				v.sqlite3VdbeResolveLabel(iCont);
 				v.sqlite3VdbeAddOp2(OP_Next,tab1,iStart);
@@ -1825,7 +1825,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				j2=v.sqlite3VdbeAddOp4(OP_Compare,pIn.iMem,regPrev+1,pIn.nMem,pKeyInfo,p4type);
 				v.sqlite3VdbeAddOp3(OP_Jump,j2+2,iContinue,j2+2);
 				v.sqlite3VdbeJumpHere(j1);
-				sqlite3ExprCodeCopy(pParse,pIn.iMem,regPrev+1,pIn.nMem);
+				pParse.sqlite3ExprCodeCopy(pIn.iMem,regPrev+1,pIn.nMem);
 				v.sqlite3VdbeAddOp2(OP_Integer,1,regPrev);
 			}
 			//if ( pParse.db.mallocFailed != 0 ) return 0;
@@ -1835,16 +1835,16 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			/* Store the result as data using a unique key.
         */case SelectResultType.Table:
 			case SelectResultType.EphemTab: {
-				int r1=sqlite3GetTempReg(pParse);
-				int r2=sqlite3GetTempReg(pParse);
+				int r1=pParse.sqlite3GetTempReg();
+				int r2=pParse.sqlite3GetTempReg();
 				testcase(pDest.eDest==SelectResultType.Table);
 				testcase(pDest.eDest==SelectResultType.EphemTab);
 				v.sqlite3VdbeAddOp3(OP_MakeRecord,pIn.iMem,pIn.nMem,r1);
 				v.sqlite3VdbeAddOp2(OP_NewRowid,pDest.iParm,r2);
 				v.sqlite3VdbeAddOp3(OP_Insert,pDest.iParm,r1,r2);
 				v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
-				sqlite3ReleaseTempReg(pParse,r2);
-				sqlite3ReleaseTempReg(pParse,r1);
+				pParse.sqlite3ReleaseTempReg(r2);
+				pParse.sqlite3ReleaseTempReg(r1);
 				break;
 			}
 			#if !SQLITE_OMIT_SUBQUERY
@@ -1855,15 +1855,15 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				int r1;
 				Debug.Assert(pIn.nMem==1);
 				p.affinity=p.pEList.a[0].pExpr.sqlite3CompareAffinity(pDest.affinity);
-				r1=sqlite3GetTempReg(pParse);
+				r1=pParse.sqlite3GetTempReg();
 				v.sqlite3VdbeAddOp4(OP_MakeRecord,pIn.iMem,1,r1,p.affinity,1);
-				sqlite3ExprCacheAffinityChange(pParse,pIn.iMem,1);
+				pParse.sqlite3ExprCacheAffinityChange(pIn.iMem,1);
 				v.sqlite3VdbeAddOp2(OP_IdxInsert,pDest.iParm,r1);
-				sqlite3ReleaseTempReg(pParse,r1);
+				pParse.sqlite3ReleaseTempReg(r1);
 				break;
 			}
 			#if FALSE
-																																																									/* If any row exist in the result set, record that fact and abort.
+																																																												/* If any row exist in the result set, record that fact and abort.
 */
 case SelectResultType.Exists: {
 sqlite3VdbeAddOp2(v, OP_Integer, 1, pDest.iParm);
@@ -1876,7 +1876,7 @@ break;
 ** of the scan loop.
 */case SelectResultType.Mem: {
 				Debug.Assert(pIn.nMem==1);
-				sqlite3ExprCodeMove(pParse,pIn.iMem,pDest.iParm,1);
+				pParse.sqlite3ExprCodeMove(pIn.iMem,pDest.iParm,1);
 				/* The LIMIT clause will jump out of the loop for us */break;
 			}
 			#endif
@@ -1884,10 +1884,10 @@ break;
 ** starting at pDest.iMem.  Then the co-routine yields.
 */case SelectResultType.Coroutine: {
 				if(pDest.iMem==0) {
-					pDest.iMem=sqlite3GetTempRange(pParse,pIn.nMem);
+					pDest.iMem=pParse.sqlite3GetTempRange(pIn.nMem);
 					pDest.nMem=pIn.nMem;
 				}
-				sqlite3ExprCodeMove(pParse,pIn.iMem,pDest.iMem,pDest.nMem);
+				pParse.sqlite3ExprCodeMove(pIn.iMem,pDest.iMem,pDest.nMem);
 				v.sqlite3VdbeAddOp1(OP_Yield,pDest.iParm);
 				break;
 			}
@@ -1901,7 +1901,7 @@ break;
         */default: {
 				Debug.Assert(pDest.eDest==SelectResultType.Output);
 				v.sqlite3VdbeAddOp2(OP_ResultRow,pIn.iMem,pIn.nMem);
-				sqlite3ExprCacheAffinityChange(pParse,pIn.iMem,pIn.nMem);
+				pParse.sqlite3ExprCacheAffinityChange(pIn.iMem,pIn.nMem);
 				break;
 			}
 			}
@@ -2076,7 +2076,7 @@ break;
 						//  return SQLITE_NOMEM;
 						pNew.flags|=EP_IntValue;
 						pNew.u.iValue=i;
-						pOrderBy=sqlite3ExprListAppend(pParse,pOrderBy,pNew);
+						pOrderBy=pParse.sqlite3ExprListAppend(pOrderBy,pNew);
 						pOrderBy.a[nOrderBy++].iCol=(u16)i;
 					}
 				}
@@ -2136,7 +2136,7 @@ break;
 			else {
 				int nExpr=p.pEList.nExpr;
 				Debug.Assert(nOrderBy>=nExpr/*|| db.mallocFailed != 0 */);
-				regPrev=sqlite3GetTempRange(pParse,nExpr+1);
+				regPrev=pParse.sqlite3GetTempRange(nExpr+1);
 				v.sqlite3VdbeAddOp2(OP_Integer,0,regPrev);
 				pKeyDup=new KeyInfo();
 				//sqlite3DbMallocZero(db,
@@ -2291,7 +2291,7 @@ break;
 			v.sqlite3VdbeAddOp3(OP_Jump,addrAltB,addrAeqB,addrAgtB);
 			/* Release temporary registers
       */if(regPrev!=0) {
-				sqlite3ReleaseTempRange(pParse,regPrev,nOrderBy+1);
+				pParse.sqlite3ReleaseTempRange(regPrev,nOrderBy+1);
 			}
 			/* Jump to the this point in order to terminate the query.
       */v.sqlite3VdbeResolveLabel(labelEnd);
@@ -3080,7 +3080,7 @@ break;
 					Debug.Assert(pE.op!=TK_DOT||pE.pRight!=null);
 					if(pE.op!=TK_ALL&&(pE.op!=TK_DOT||pE.pRight.op!=TK_ALL)) {
 						/* This particular expression does not need to be expanded.
-            */pNew=sqlite3ExprListAppend(pParse,pNew,a[k].pExpr);
+            */pNew=pParse.sqlite3ExprListAppend(pNew,a[k].pExpr);
 						if(pNew!=null) {
 							pNew.a[pNew.nExpr-1].zName=a[k].zName;
 							pNew.a[pNew.nExpr-1].zSpan=a[k].zSpan;
@@ -3144,7 +3144,7 @@ break;
 								if(longNames||pTabList.nSrc>1) {
 									Expr pLeft;
 									pLeft=sqlite3Expr(db,TK_ID,zTabName);
-									pExpr=sqlite3PExpr(pParse,TK_DOT,pLeft,pRight,0);
+									pExpr=pParse.sqlite3PExpr(TK_DOT,pLeft,pRight,0);
 									if(longNames) {
 										zColname=sqlite3MPrintf(db,"%s.%s",zTabName,zName);
 										zToFree=zColname;
@@ -3153,10 +3153,10 @@ break;
 								else {
 									pExpr=pRight;
 								}
-								pNew=sqlite3ExprListAppend(pParse,pNew,pExpr);
+								pNew=pParse.sqlite3ExprListAppend(pNew,pExpr);
 								sColname.z=zColname;
 								sColname.n=StringExtensions.sqlite3Strlen30(zColname);
-								sqlite3ExprListSetName(pParse,pNew,sColname,0);
+								pParse.sqlite3ExprListSetName(pNew,sColname,0);
 								sqlite3DbFree(db,ref zToFree);
 							}
 						}
@@ -3361,7 +3361,7 @@ break;
 			AggInfo_func pF;
 			AggInfo_col pC;
 			pAggInfo.directMode=1;
-			sqlite3ExprCacheClear(pParse);
+			pParse.sqlite3ExprCacheClear();
 			for(i=0;i<pAggInfo.nFunc;i++) {
 				//, pF++){
 				pF=pAggInfo.aFunc[i];
@@ -3372,8 +3372,8 @@ break;
 				ExprList pList=pF.pExpr.x.pList;
 				if(pList!=null) {
 					nArg=pList.nExpr;
-					regAgg=sqlite3GetTempRange(pParse,nArg);
-					sqlite3ExprCodeExprList(pParse,pList,regAgg,true);
+					regAgg=pParse.sqlite3GetTempRange(nArg);
+					pParse.sqlite3ExprCodeExprList(pList,regAgg,true);
 				}
 				else {
 					nArg=0;
@@ -3392,7 +3392,7 @@ break;
 					/* pList!=0 if pF->pFunc has NEEDCOLL */for(j=0;pColl==null&&j<nArg;j++) {
 						//, pItem++){
 						pItem=pList.a[j];
-						pColl=sqlite3ExprCollSeq(pParse,pItem.pExpr);
+						pColl=pParse.sqlite3ExprCollSeq(pItem.pExpr);
 					}
 					if(pColl==null) {
 						pColl=pParse.db.pDfltColl;
@@ -3401,11 +3401,11 @@ break;
 				}
 				v.sqlite3VdbeAddOp4(OP_AggStep,0,regAgg,pF.iMem,pF.pFunc,P4_FUNCDEF);
 				v.sqlite3VdbeChangeP5((u8)nArg);
-				sqlite3ExprCacheAffinityChange(pParse,regAgg,nArg);
-				sqlite3ReleaseTempRange(pParse,regAgg,nArg);
+				pParse.sqlite3ExprCacheAffinityChange(regAgg,nArg);
+				pParse.sqlite3ReleaseTempRange(regAgg,nArg);
 				if(addrNext!=0) {
 					v.sqlite3VdbeResolveLabel(addrNext);
-					sqlite3ExprCacheClear(pParse);
+					pParse.sqlite3ExprCacheClear();
 				}
 			}
 			/* Before populating the accumulator registers, clear the column cache.
@@ -3417,14 +3417,14 @@ break;
       **
       ** Another solution would be to change the OP_SCopy used to copy cached
       ** values to an OP_Copy.
-      */sqlite3ExprCacheClear(pParse);
+      */pParse.sqlite3ExprCacheClear();
 			for(i=0;i<pAggInfo.nAccumulator;i++)//, pC++)
 			 {
 				pC=pAggInfo.aCol[i];
-				sqlite3ExprCode(pParse,pC.pExpr,pC.iMem);
+				pParse.sqlite3ExprCode(pC.pExpr,pC.iMem);
 			}
 			pAggInfo.directMode=0;
-			sqlite3ExprCacheClear(pParse);
+			pParse.sqlite3ExprCacheClear();
 		}
 		///<summary>
 		/// Add a single OP_Explain instruction to the VDBE to explain a simple
@@ -3439,7 +3439,7 @@ break;
 			}
 		}
 		#else
-																																						// define explainSimpleCount(a,b,c)
+																																								// define explainSimpleCount(a,b,c)
     static void explainSimpleCount(Parse a, Table b, Index c){}
 #endif
 		///<summary>
@@ -3527,7 +3527,7 @@ break;
 				return 1;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																									if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
+																																																												if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
 #endif
 			sAggInfo=new AggInfo();
 			// memset(sAggInfo, 0, sAggInfo).Length;
@@ -3576,7 +3576,7 @@ break;
         ** (SQLITE_MAX_EXPR_DEPTH-Parse.nHeight) height. This is a bit
         ** more conservative than necessary, but much easier than enforcing
         ** an exact limit.
-        */pParse.nHeight+=sqlite3SelectExprHeight(p);
+        */pParse.nHeight+=p.sqlite3SelectExprHeight();
 				/* Check to see if the subquery can be absorbed into the parent. */isAggSub=(pSub.selFlags&SelectFlags.Aggregate)!=0;
 				if(flattenSubquery(pParse,p,i,isAgg,isAggSub)!=0) {
 					if(isAggSub) {
@@ -3597,7 +3597,7 @@ break;
 				//{
 				//  goto select_end;
 				//}
-				pParse.nHeight-=sqlite3SelectExprHeight(p);
+				pParse.nHeight-=p.sqlite3SelectExprHeight();
 				pTabList=p.pSrc;
 				if(!(pDest.eDest<=SelectResultType.Discard))//        if( null==IgnorableOrderby(pDest) )
 				 {
@@ -3791,11 +3791,11 @@ break;
 					pParse.nMem+=pGroupBy.nExpr;
 					v.sqlite3VdbeAddOp2(OP_Integer,0,iAbortFlag);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "clear abort flag" );
+																																																																																																				          VdbeComment( v, "clear abort flag" );
 #endif
 					v.sqlite3VdbeAddOp2(OP_Integer,0,iUseFlag);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "indicate accumulator empty" );
+																																																																																																				          VdbeComment( v, "indicate accumulator empty" );
 #endif
 					/* Begin a loop that will extract all source rows in GROUP BY order.
 ** This might involve two separate loops with an OP_Sort in between, or
@@ -3832,9 +3832,9 @@ break;
 								j++;
 							}
 						}
-						regBase=sqlite3GetTempRange(pParse,nCol);
-						sqlite3ExprCacheClear(pParse);
-						sqlite3ExprCodeExprList(pParse,pGroupBy,regBase,false);
+						regBase=pParse.sqlite3GetTempRange(nCol);
+						pParse.sqlite3ExprCacheClear();
+						pParse.sqlite3ExprCodeExprList(pGroupBy,regBase,false);
 						v.sqlite3VdbeAddOp2(OP_Sequence,sAggInfo.sortingIdx,regBase+nGroupBy);
 						j=nGroupBy+1;
 						for(i=0;i<sAggInfo.nColumn;i++) {
@@ -3842,39 +3842,39 @@ break;
 							if(pCol.iSorterColumn>=j) {
 								int r1=j+regBase;
 								int r2;
-								r2=sqlite3ExprCodeGetColumn(pParse,pCol.pTab,pCol.iColumn,pCol.iTable,r1);
+								r2=pParse.sqlite3ExprCodeGetColumn(pCol.pTab,pCol.iColumn,pCol.iTable,r1);
 								if(r1!=r2) {
 									v.sqlite3VdbeAddOp2(OP_SCopy,r2,r1);
 								}
 								j++;
 							}
 						}
-						regRecord=sqlite3GetTempReg(pParse);
+						regRecord=pParse.sqlite3GetTempReg();
 						v.sqlite3VdbeAddOp3(OP_MakeRecord,regBase,nCol,regRecord);
 						v.sqlite3VdbeAddOp2(OP_IdxInsert,sAggInfo.sortingIdx,regRecord);
-						sqlite3ReleaseTempReg(pParse,regRecord);
-						sqlite3ReleaseTempRange(pParse,regBase,nCol);
+						pParse.sqlite3ReleaseTempReg(regRecord);
+						pParse.sqlite3ReleaseTempRange(regBase,nCol);
 						sqlite3WhereEnd(pWInfo);
 						v.sqlite3VdbeAddOp2(OP_Sort,sAggInfo.sortingIdx,addrEnd);
 						#if SQLITE_DEBUG
-																																																																																																																		            VdbeComment( v, "GROUP BY sort" );
+																																																																																																																								            VdbeComment( v, "GROUP BY sort" );
 #endif
 						sAggInfo.useSortingIdx=1;
-						sqlite3ExprCacheClear(pParse);
+						pParse.sqlite3ExprCacheClear();
 					}
 					/* Evaluate the current GROUP BY terms and store in b0, b1, b2...
           ** (b0 is memory location iBMem+0, b1 is iBMem+1, and so forth)
           ** Then compare the current GROUP BY terms against the GROUP BY terms
           ** from the previous row currently stored in a0, a1, a2...
           */addrTopOfLoop=v.sqlite3VdbeCurrentAddr();
-					sqlite3ExprCacheClear(pParse);
+					pParse.sqlite3ExprCacheClear();
 					for(j=0;j<pGroupBy.nExpr;j++) {
 						if(groupBySort!=0) {
 							v.sqlite3VdbeAddOp3(OP_Column,sAggInfo.sortingIdx,j,iBMem+j);
 						}
 						else {
 							sAggInfo.directMode=1;
-							sqlite3ExprCode(pParse,pGroupBy.a[j].pExpr,iBMem+j);
+							pParse.sqlite3ExprCode(pGroupBy.a[j].pExpr,iBMem+j);
 						}
 					}
 					v.sqlite3VdbeAddOp4(OP_Compare,iAMem,iBMem,pGroupBy.nExpr,pKeyInfo,P4_KEYINFO);
@@ -3888,18 +3888,18 @@ break;
           ** over to a0,a1,a2.  It then calls the output subroutine
           ** and resets the aggregate accumulator registers in preparation
           ** for the next GROUP BY batch.
-          */sqlite3ExprCodeMove(pParse,iBMem,iAMem,pGroupBy.nExpr);
+          */pParse.sqlite3ExprCodeMove(iBMem,iAMem,pGroupBy.nExpr);
 					v.sqlite3VdbeAddOp2(OP_Gosub,regOutputRow,addrOutputRow);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "output one row" );
+																																																																																																				          VdbeComment( v, "output one row" );
 #endif
 					v.sqlite3VdbeAddOp2(OP_IfPos,iAbortFlag,addrEnd);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "check abort flag" );
+																																																																																																				          VdbeComment( v, "check abort flag" );
 #endif
 					v.sqlite3VdbeAddOp2(OP_Gosub,regReset,addrReset);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "reset accumulator" );
+																																																																																																				          VdbeComment( v, "reset accumulator" );
 #endif
 					/* Update the aggregate accumulators based on the content of
 ** the current row
@@ -3907,7 +3907,7 @@ break;
 					updateAccumulator(pParse,sAggInfo);
 					v.sqlite3VdbeAddOp2(OP_Integer,1,iUseFlag);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "indicate data in accumulator" );
+																																																																																																				          VdbeComment( v, "indicate data in accumulator" );
 #endif
 					/* End of the loop
 */if(groupBySort!=0) {
@@ -3920,7 +3920,7 @@ break;
 					/* Output the final row of result
           */v.sqlite3VdbeAddOp2(OP_Gosub,regOutputRow,addrOutputRow);
 					#if SQLITE_DEBUG
-																																																																																															          VdbeComment( v, "output final row" );
+																																																																																																				          VdbeComment( v, "output final row" );
 #endif
 					/* Jump over the subroutines
 */v.sqlite3VdbeAddOp2(OP_Goto,0,addrEnd);
@@ -3940,7 +3940,7 @@ break;
 					VdbeComment(v,"Groupby result generator entry point");
 					v.sqlite3VdbeAddOp1(OP_Return,regOutputRow);
 					finalizeAggFunctions(pParse,sAggInfo);
-					sqlite3ExprIfFalse(pParse,pHaving,addrOutputRow+1,SQLITE_JUMPIFNULL);
+					pParse.sqlite3ExprIfFalse(pHaving,addrOutputRow+1,SQLITE_JUMPIFNULL);
 					selectInnerLoop(pParse,p,p.pEList,0,0,pOrderBy,distinct,pDest,addrOutputRow+1,addrSetAbort);
 					v.sqlite3VdbeAddOp1(OP_Return,regOutputRow);
 					VdbeComment(v,"end groupby result generator");
@@ -4055,7 +4055,7 @@ break;
 						if(pMinMax==null&&flag!=0) {
 							v.sqlite3VdbeAddOp2(OP_Goto,0,pWInfo.iBreak);
 							#if SQLITE_DEBUG
-																																																																																																																																					              VdbeComment( v, "%s() by index",
+																																																																																																																																												              VdbeComment( v, "%s() by index",
               ( flag == WHERE_ORDERBY_MIN ? "min" : "max" ) );
 #endif
 						}
@@ -4063,7 +4063,7 @@ break;
 						finalizeAggFunctions(pParse,sAggInfo);
 					}
 					pOrderBy=null;
-					sqlite3ExprIfFalse(pParse,pHaving,addrEnd,SQLITE_JUMPIFNULL);
+					pParse.sqlite3ExprIfFalse(pHaving,addrEnd,SQLITE_JUMPIFNULL);
 					selectInnerLoop(pParse,p,p.pEList,0,0,null,-1,pDest,addrEnd,addrEnd);
 					sqlite3ExprListDelete(db,ref pDel);
 				}
@@ -4096,7 +4096,7 @@ break;
 			return rc;
 		}
 	#if SQLITE_DEBUG
-																			    /*
+																				    /*
 *******************************************************************************
 ** The following code is used for testing and debugging only.  The code
 ** that follows does not appear in normal builds.

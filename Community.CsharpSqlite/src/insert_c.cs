@@ -608,8 +608,8 @@ namespace Community.CsharpSqlite {
 			}
 			pParse.sqlite3OpenTable(iSrc,iDbSrc,pSrc,OP_OpenRead);
 			emptySrcTest=v.sqlite3VdbeAddOp2(OP_Rewind,iSrc,0);
-			regData=sqlite3GetTempReg(pParse);
-			regRowid=sqlite3GetTempReg(pParse);
+			regData=pParse.sqlite3GetTempReg();
+			regRowid=pParse.sqlite3GetTempReg();
 			if(pDest.iPKey>=0) {
 				addr1=v.sqlite3VdbeAddOp2(OP_Rowid,iSrc,regRowid);
 				addr2=v.sqlite3VdbeAddOp3(OP_NotExists,iDest,0,regRowid);
@@ -655,8 +655,8 @@ namespace Community.CsharpSqlite {
 				v.sqlite3VdbeJumpHere(addr1);
 			}
 			v.sqlite3VdbeJumpHere(emptySrcTest);
-			sqlite3ReleaseTempReg(pParse,regRowid);
-			sqlite3ReleaseTempReg(pParse,regData);
+			pParse.sqlite3ReleaseTempReg(regRowid);
+			pParse.sqlite3ReleaseTempReg(regData);
 			v.sqlite3VdbeAddOp2(OP_Close,iSrc,0);
 			v.sqlite3VdbeAddOp2(OP_Close,iDest,0);
 			if(emptyDestTest!=0) {

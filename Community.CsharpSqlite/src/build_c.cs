@@ -1310,13 +1310,13 @@ goto begin_table_error;
 		///
 		///</summary>
 		static void sqlite3ChangeCookie(Parse pParse,int iDb) {
-			int r1=sqlite3GetTempReg(pParse);
+			int r1=pParse.sqlite3GetTempReg();
 			sqlite3 db=pParse.db;
 			Vdbe v=pParse.pVdbe;
 			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 			v.sqlite3VdbeAddOp2(OP_Integer,db.aDb[iDb].pSchema.schema_cookie+1,r1);
 			v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_SCHEMA_VERSION,r1);
-			sqlite3ReleaseTempReg(pParse,r1);
+			pParse.sqlite3ReleaseTempReg(r1);
 		}
 		///<summary>
 		/// Measure the number of characters needed to output the given
@@ -1898,7 +1898,7 @@ db.xAuth = xAuth;
 		///</summary>
 		static void destroyRootPage(Parse pParse,int iTable,int iDb) {
 			Vdbe v=sqlite3GetVdbe(pParse);
-			int r1=sqlite3GetTempReg(pParse);
+			int r1=pParse.sqlite3GetTempReg();
 			v.sqlite3VdbeAddOp3(OP_Destroy,iTable,r1,iDb);
 			sqlite3MayAbort(pParse);
 			#if !SQLITE_OMIT_AUTOVACUUM
@@ -1912,7 +1912,7 @@ db.xAuth = xAuth;
 ** token for additional information.
 */sqlite3NestedParse(pParse,"UPDATE %Q.%s SET rootpage=%d WHERE #%d AND rootpage=#%d",pParse.db.aDb[iDb].zName,SCHEMA_TABLE(iDb),iTable,r1,r1);
 			#endif
-			sqlite3ReleaseTempReg(pParse,r1);
+			pParse.sqlite3ReleaseTempReg(r1);
 		}
 		///<summary>
 		/// Write VDBE code to erase table pTab and all associated indices on disk.
@@ -2301,7 +2301,7 @@ return;
 			}
 			pParse.sqlite3OpenTable(iTab,iDb,pTab,OP_OpenRead);
 			addr1=v.sqlite3VdbeAddOp2(OP_Rewind,iTab,0);
-			regRecord=sqlite3GetTempReg(pParse);
+			regRecord=pParse.sqlite3GetTempReg();
 			regIdxKey=pParse.sqlite3GenerateIndexKey(pIndex,iTab,regRecord,true);
 			if(pIndex.onError!=OE_None) {
 				int regRowid=regIdxKey+pIndex.nColumn;
@@ -2321,7 +2321,7 @@ return;
 			}
 			v.sqlite3VdbeAddOp2(OP_IdxInsert,iIdx,regRecord);
 			v.sqlite3VdbeChangeP5(OPFLAG_USESEEKRESULT);
-			sqlite3ReleaseTempReg(pParse,regRecord);
+			pParse.sqlite3ReleaseTempReg(regRecord);
 			v.sqlite3VdbeAddOp2(OP_Next,iTab,addr1+1);
 			v.sqlite3VdbeJumpHere(addr1);
 			v.sqlite3VdbeAddOp1(OP_Close,iTab);
@@ -2498,10 +2498,10 @@ goto exit_create_index;
 */if(pList==null) {
 				nullId.z=pTab.aCol[pTab.nCol-1].zName;
 				nullId.n=StringExtensions.sqlite3Strlen30(nullId.z);
-				pList=sqlite3ExprListAppend(pParse,null,null);
+				pList=pParse.sqlite3ExprListAppend(null,null);
 				if(pList==null)
 					goto exit_create_index;
-				sqlite3ExprListSetName(pParse,pList,nullId,0);
+				pParse.sqlite3ExprListSetName(pList,nullId,0);
 				pList.a[0].sortOrder=(u8)sortOrder;
 			}
 			/* Figure out how many bytes of space are required to store explicitly
