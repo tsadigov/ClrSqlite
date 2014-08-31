@@ -373,7 +373,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
         ** deleting from and all its indices. If this is a view, then the
         ** only effect this statement has is to fire the INSTEAD OF 
         ** triggers.  */if(!isView) {
-					sqlite3OpenTableAndIndices(pParse,pTab,iCur,OP_OpenWrite);
+					pParse.sqlite3OpenTableAndIndices(pTab,iCur,OP_OpenWrite);
 				}
 				addr=v.sqlite3VdbeAddOp3(OP_RowSetRead,iRowSet,end,iRowid);
 				/* Delete the row */
@@ -404,7 +404,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
       ** maximum rowid counter values recorded while inserting into
       ** autoincrement tables.
       */if(pParse.nested==0&&pParse.pTriggerTab==null) {
-				sqlite3AutoincrementEnd(pParse);
+				pParse.sqlite3AutoincrementEnd();
 			}
 			/* Return the number of rows that were deleted. If this routine is 
       ** generating code because of a call to sqlite3NestedParse(), do not

@@ -324,7 +324,7 @@ aXRef[j] = -1;
         ** action, then we need to open all indices because we might need
         ** to be deleting some records.
         */if(!okOnePass)
-					sqlite3OpenTable(pParse,iCur,iDb,pTab,OP_OpenWrite);
+					pParse.sqlite3OpenTable(iCur,iDb,pTab,OP_OpenWrite);
 				if(onError==OE_Replace) {
 					openAll=true;
 				}
@@ -441,7 +441,7 @@ aXRef[j] = -1;
 			if(!isView) {
 				int j1;
 				/* Address of jump instruction *//* Do constraint checks. */int iDummy;
-				sqlite3GenerateConstraintChecks(pParse,pTab,iCur,regNewRowid,aRegIdx,(chngRowid?regOldRowid:0),true,onError,addr,out iDummy);
+				pParse.sqlite3GenerateConstraintChecks(pTab,iCur,regNewRowid,aRegIdx,(chngRowid?regOldRowid:0),true,onError,addr,out iDummy);
 				/* Do FK constraint checks. */if(hasFK) {
 					pParse.sqlite3FkCheck(pTab,regOldRowid,0);
 				}
@@ -454,7 +454,7 @@ aXRef[j] = -1;
 				if(hasFK) {
 					pParse.sqlite3FkCheck(pTab,0,regNewRowid);
 				}
-				/* Insert the new index entries and the new record. */sqlite3CompleteInsertion(pParse,pTab,iCur,regNewRowid,aRegIdx,true,false,false);
+				/* Insert the new index entries and the new record. */pParse.sqlite3CompleteInsertion(pTab,iCur,regNewRowid,aRegIdx,true,false,false);
 				/* Do any ON CASCADE, SET NULL or SET DEFAULT operations required to
         ** handle rows (possibly in other tables) that refer via a foreign key
         ** to the row just updated. */if(hasFK) {
@@ -480,7 +480,7 @@ aXRef[j] = -1;
       ** maximum rowid counter values recorded while inserting into
       ** autoincrement tables.
       */if(pParse.nested==0&&pParse.pTriggerTab==null) {
-				sqlite3AutoincrementEnd(pParse);
+				pParse.sqlite3AutoincrementEnd();
 			}
 			/*
       ** Return the number of rows that were changed. If this routine is 

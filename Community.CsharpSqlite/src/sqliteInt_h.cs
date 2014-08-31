@@ -4642,7 +4642,7 @@ goto attach_end;
           ** increment the constraint-counter.  */if(pTab==pFKey.pFrom&&nIncr==1) {
 							v.sqlite3VdbeAddOp3(OP_Eq,regData,iOk,regTemp);
 						}
-						sqlite3OpenTable(this,iCur,iDb,pTab,OP_OpenRead);
+						this.sqlite3OpenTable(iCur,iDb,pTab,OP_OpenRead);
 						v.sqlite3VdbeAddOp3(OP_NotExists,iCur,0,regTemp);
 						v.sqlite3VdbeAddOp2(OP_Goto,0,iOk);
 						v.sqlite3VdbeJumpHere(v.sqlite3VdbeCurrentAddr()-2);
@@ -5555,7 +5555,7 @@ isView = false;
 				#endif
 				/* If this is an AUTOINCREMENT table, look up the sequence number in the
 ** sqlite_sequence table and store it in memory cell regAutoinc.
-*/regAutoinc=autoIncBegin(this,iDb,pTab);
+*/regAutoinc=this.autoIncBegin(iDb,pTab);
 				/* Figure out how many columns of data are supplied.  If the data
       ** is coming from a SELECT statement, then generate a co-routine that
       ** produces a single row of the SELECT on each invocation.  The
@@ -5620,7 +5620,7 @@ isView = false;
         ** A temp table must be used if the table being updated is also one
         ** of the tables being read by the SELECT statement.  Also use a
         ** temp table in the case of row triggers.
-        */if(pTrigger!=null||readsTable(this,addrSelect,iDb,pTab)) {
+        */if(pTrigger!=null||this.readsTable(addrSelect,iDb,pTab)) {
 						useTempTable=true;
 					}
 					if(useTempTable) {
@@ -5734,7 +5734,7 @@ isView = false;
 				/* If this is not a view, open the table and and all indices */if(!isView) {
 					int nIdx;
 					baseCur=this.nTab;
-					nIdx=sqlite3OpenTableAndIndices(this,pTab,baseCur,OP_OpenWrite);
+					nIdx=this.sqlite3OpenTableAndIndices(pTab,baseCur,OP_OpenWrite);
 					aRegIdx=new int[nIdx+1];
 					// sqlite3DbMallocRaw( db, sizeof( int ) * ( nIdx + 1 ) );
 					if(aRegIdx==null) {
@@ -5895,7 +5895,7 @@ isView = false;
 							v.sqlite3VdbeAddOp3(OP_NewRowid,baseCur,regRowid,regAutoinc);
 							appendFlag=true;
 						}
-					autoIncStep(this,regAutoinc,regRowid);
+					this.autoIncStep(regAutoinc,regRowid);
 					/* Push onto the stack, data for all columns of the new entry, beginning
         ** with the first column.
         */nHidden=0;
@@ -5954,9 +5954,9 @@ isView = false;
 					#endif
 					 {
 						int isReplace=0;
-						/* Set to true if constraints may cause a replace */sqlite3GenerateConstraintChecks(this,pTab,baseCur,regIns,aRegIdx,keyColumn>=0?1:0,false,onError,endOfLoop,out isReplace);
+						/* Set to true if constraints may cause a replace */this.sqlite3GenerateConstraintChecks(pTab,baseCur,regIns,aRegIdx,keyColumn>=0?1:0,false,onError,endOfLoop,out isReplace);
 						this.sqlite3FkCheck(pTab,0,regIns);
-						sqlite3CompleteInsertion(this,pTab,baseCur,regIns,aRegIdx,false,appendFlag,isReplace==0);
+						this.sqlite3CompleteInsertion(pTab,baseCur,regIns,aRegIdx,false,appendFlag,isReplace==0);
 					}
 				}
 				/* Update the count of rows that are inserted
@@ -5992,7 +5992,7 @@ isView = false;
       ** maximum rowid counter values recorded while inserting into
       ** autoincrement tables.
       */if(this.nested==0&&this.pTriggerTab==null) {
-					sqlite3AutoincrementEnd(this);
+					this.sqlite3AutoincrementEnd();
 				}
 				/*
       ** Return the number of rows inserted. If this routine is
@@ -6009,6 +6009,466 @@ isView = false;
 				sqlite3SelectDelete(db,ref pSelect);
 				sqlite3IdListDelete(db,ref pColumn);
 				sqlite3DbFree(db,ref aRegIdx);
+			}
+			public void sqlite3AutoincrementBegin() {
+				AutoincInfo p;
+				/* Information about an AUTOINCREMENT */sqlite3 db=this.db;
+				/* The database connection */Db pDb;
+				/* Database only autoinc table */int memId;
+				/* Register holding max rowid */int addr;
+				/* A VDBE address */Vdbe v=this.pVdbe;
+				/* VDBE under construction *//* This routine is never called during trigger-generation.  It is
+      ** only called from the top-level */Debug.Assert(this.pTriggerTab==null);
+				Debug.Assert(this==sqlite3ParseToplevel(this));
+				Debug.Assert(v!=null);
+				/* We failed long ago if this is not so */for(p=this.pAinc;p!=null;p=p.pNext) {
+					pDb=db.aDb[p.iDb];
+					memId=p.regCtr;
+					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pDb.pSchema));
+					this.sqlite3OpenTable(0,p.iDb,pDb.pSchema.pSeqTab,OP_OpenRead);
+					addr=v.sqlite3VdbeCurrentAddr();
+					v.sqlite3VdbeAddOp4(OP_String8,0,memId-1,0,p.pTab.zName,0);
+					v.sqlite3VdbeAddOp2(OP_Rewind,0,addr+9);
+					v.sqlite3VdbeAddOp3(OP_Column,0,0,memId);
+					v.sqlite3VdbeAddOp3(OP_Ne,memId-1,addr+7,memId);
+					v.sqlite3VdbeChangeP5(SQLITE_JUMPIFNULL);
+					v.sqlite3VdbeAddOp2(OP_Rowid,0,memId+1);
+					v.sqlite3VdbeAddOp3(OP_Column,0,1,memId);
+					v.sqlite3VdbeAddOp2(OP_Goto,0,addr+9);
+					v.sqlite3VdbeAddOp2(OP_Next,0,addr+2);
+					v.sqlite3VdbeAddOp2(OP_Integer,0,memId);
+					v.sqlite3VdbeAddOp0(OP_Close);
+				}
+			}
+			public void sqlite3AutoincrementEnd() {
+				AutoincInfo p;
+				Vdbe v=this.pVdbe;
+				sqlite3 db=this.db;
+				Debug.Assert(v!=null);
+				for(p=this.pAinc;p!=null;p=p.pNext) {
+					Db pDb=db.aDb[p.iDb];
+					int j1,j2,j3,j4,j5;
+					int iRec;
+					int memId=p.regCtr;
+					iRec=sqlite3GetTempReg(this);
+					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pDb.pSchema));
+					this.sqlite3OpenTable(0,p.iDb,pDb.pSchema.pSeqTab,OP_OpenWrite);
+					j1=v.sqlite3VdbeAddOp1(OP_NotNull,memId+1);
+					j2=v.sqlite3VdbeAddOp0(OP_Rewind);
+					j3=v.sqlite3VdbeAddOp3(OP_Column,0,0,iRec);
+					j4=v.sqlite3VdbeAddOp3(OP_Eq,memId-1,0,iRec);
+					v.sqlite3VdbeAddOp2(OP_Next,0,j3);
+					v.sqlite3VdbeJumpHere(j2);
+					v.sqlite3VdbeAddOp2(OP_NewRowid,0,memId+1);
+					j5=v.sqlite3VdbeAddOp0(OP_Goto);
+					v.sqlite3VdbeJumpHere(j4);
+					v.sqlite3VdbeAddOp2(OP_Rowid,0,memId+1);
+					v.sqlite3VdbeJumpHere(j1);
+					v.sqlite3VdbeJumpHere(j5);
+					v.sqlite3VdbeAddOp3(OP_MakeRecord,memId-1,2,iRec);
+					v.sqlite3VdbeAddOp3(OP_Insert,0,iRec,memId+1);
+					v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
+					v.sqlite3VdbeAddOp0(OP_Close);
+					sqlite3ReleaseTempReg(this,iRec);
+				}
+			}
+			public void autoIncStep(int memId,int regRowid) {
+				if(memId>0) {
+					this.pVdbe.sqlite3VdbeAddOp2(OP_MemMax,memId,regRowid);
+				}
+			}
+			public void sqlite3GenerateConstraintChecks(/* The parser context */Table pTab,/* the table into which we are inserting */int baseCur,/* Index of a read/write cursor pointing at pTab */int regRowid,/* Index of the range of input registers */int[] aRegIdx,/* Register used by each index.  0 for unused indices */int rowidChng,/* True if the rowid might collide with existing entry */bool isUpdate,/* True for UPDATE, False for INSERT */int overrideError,/* Override onError to this if not OE_Default */int ignoreDest,/* Jump to this label on an OE_Ignore resolution */out int pbMayReplace/* OUT: Set to true if constraint may cause a replace */) {
+				int i;
+				/* loop counter */Vdbe v;
+				/* VDBE under constrution */int nCol;
+				/* Number of columns */int onError;
+				/* Conflict resolution strategy */int j1;
+				/* Addresss of jump instruction */int j2=0,j3;
+				/* Addresses of jump instructions */int regData;
+				/* Register containing first data column */int iCur;
+				/* Table cursor number */Index pIdx;
+				/* Pointer to one of the indices */bool seenReplace=false;
+				/* True if REPLACE is used to resolve INT PK conflict */int regOldRowid=(rowidChng!=0&&isUpdate)?rowidChng:regRowid;
+				v=sqlite3GetVdbe(this);
+				Debug.Assert(v!=null);
+				Debug.Assert(pTab.pSelect==null);
+				/* This table is not a VIEW */nCol=pTab.nCol;
+				regData=regRowid+1;
+				/* Test all NOT NULL constraints.
+      */for(i=0;i<nCol;i++) {
+					if(i==pTab.iPKey) {
+						continue;
+					}
+					onError=pTab.aCol[i].notNull;
+					if(onError==OE_None)
+						continue;
+					if(overrideError!=OE_Default) {
+						onError=overrideError;
+					}
+					else
+						if(onError==OE_Default) {
+							onError=OE_Abort;
+						}
+					if(onError==OE_Replace&&pTab.aCol[i].pDflt==null) {
+						onError=OE_Abort;
+					}
+					Debug.Assert(onError==OE_Rollback||onError==OE_Abort||onError==OE_Fail||onError==OE_Ignore||onError==OE_Replace);
+					switch(onError) {
+					case OE_Abort: {
+						sqlite3MayAbort(this);
+						goto case OE_Fail;
+					}
+					case OE_Rollback:
+					case OE_Fail: {
+						string zMsg;
+						v.sqlite3VdbeAddOp3(OP_HaltIfNull,SQLITE_CONSTRAINT,onError,regData+i);
+						zMsg=sqlite3MPrintf(this.db,"%s.%s may not be NULL",pTab.zName,pTab.aCol[i].zName);
+						v.sqlite3VdbeChangeP4(-1,zMsg,P4_DYNAMIC);
+						break;
+					}
+					case OE_Ignore: {
+						v.sqlite3VdbeAddOp2(OP_IsNull,regData+i,ignoreDest);
+						break;
+					}
+					default: {
+						Debug.Assert(onError==OE_Replace);
+						j1=v.sqlite3VdbeAddOp1(OP_NotNull,regData+i);
+						sqlite3ExprCode(this,pTab.aCol[i].pDflt,regData+i);
+						v.sqlite3VdbeJumpHere(j1);
+						break;
+					}
+					}
+				}
+				/* Test all CHECK constraints
+      */
+				#if !SQLITE_OMIT_CHECK
+				if(pTab.pCheck!=null&&(this.db.flags&SQLITE_IgnoreChecks)==0) {
+					int allOk=v.sqlite3VdbeMakeLabel();
+					this.ckBase=regData;
+					sqlite3ExprIfTrue(this,pTab.pCheck,allOk,SQLITE_JUMPIFNULL);
+					onError=overrideError!=OE_Default?overrideError:OE_Abort;
+					if(onError==OE_Ignore) {
+						v.sqlite3VdbeAddOp2(OP_Goto,0,ignoreDest);
+					}
+					else {
+						if(onError==OE_Replace)
+							onError=OE_Abort;
+						/* IMP: R-15569-63625 */sqlite3HaltConstraint(this,onError,(string)null,0);
+					}
+					v.sqlite3VdbeResolveLabel(allOk);
+				}
+				#endif
+				/* If we have an INTEGER PRIMARY KEY, make sure the primary key
+** of the new record does not previously exist.  Except, if this
+** is an UPDATE and the primary key is not changing, that is OK.
+*/if(rowidChng!=0) {
+					onError=pTab.keyConf;
+					if(overrideError!=OE_Default) {
+						onError=overrideError;
+					}
+					else
+						if(onError==OE_Default) {
+							onError=OE_Abort;
+						}
+					if(isUpdate) {
+						j2=v.sqlite3VdbeAddOp3(OP_Eq,regRowid,0,rowidChng);
+					}
+					j3=v.sqlite3VdbeAddOp3(OP_NotExists,baseCur,0,regRowid);
+					switch(onError) {
+					default:
+					{
+						onError=OE_Abort;
+						/* Fall thru into the next case */}
+					goto case OE_Rollback;
+					case OE_Rollback:
+					case OE_Abort:
+					case OE_Fail: {
+						sqlite3HaltConstraint(this,onError,"PRIMARY KEY must be unique",P4_STATIC);
+						break;
+					}
+					case OE_Replace: {
+						/* If there are DELETE triggers on this table and the
+              ** recursive-triggers flag is set, call GenerateRowDelete() to
+              ** remove the conflicting row from the the table. This will fire
+              ** the triggers and remove both the table and index b-tree entries.
+              **
+              ** Otherwise, if there are no triggers or the recursive-triggers
+              ** flag is not set, but the table has one or more indexes, call 
+              ** GenerateRowIndexDelete(). This removes the index b-tree entries 
+              ** only. The table b-tree entry will be replaced by the new entry 
+              ** when it is inserted.  
+              **
+              ** If either GenerateRowDelete() or GenerateRowIndexDelete() is called,
+              ** also invoke MultiWrite() to indicate that this VDBE may require
+              ** statement rollback (if the statement is aborted after the delete
+              ** takes place). Earlier versions called sqlite3MultiWrite() regardless,
+              ** but being more selective here allows statements like:
+              **
+              **   REPLACE INTO t(rowid) VALUES($newrowid)
+              **
+              ** to run without a statement journal if there are no indexes on the
+              ** table.
+              */Trigger pTrigger=null;
+						if((this.db.flags&SQLITE_RecTriggers)!=0) {
+							int iDummy;
+							pTrigger=sqlite3TriggersExist(this,pTab,TK_DELETE,null,out iDummy);
+						}
+						if(pTrigger!=null||this.sqlite3FkRequired(pTab,null,0)!=0) {
+							sqlite3MultiWrite(this);
+							sqlite3GenerateRowDelete(this,pTab,baseCur,regRowid,0,pTrigger,OE_Replace);
+						}
+						else
+							if(pTab.pIndex!=null) {
+								sqlite3MultiWrite(this);
+								sqlite3GenerateRowIndexDelete(this,pTab,baseCur,0);
+							}
+						seenReplace=true;
+						break;
+					}
+					case OE_Ignore: {
+						Debug.Assert(!seenReplace);
+						v.sqlite3VdbeAddOp2(OP_Goto,0,ignoreDest);
+						break;
+					}
+					}
+					v.sqlite3VdbeJumpHere(j3);
+					if(isUpdate) {
+						v.sqlite3VdbeJumpHere(j2);
+					}
+				}
+				/* Test all UNIQUE constraints by creating entries for each UNIQUE
+      ** index and making sure that duplicate entries do not already exist.
+      ** Add the new records to the indices as we go.
+      */for(iCur=0,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,iCur++) {
+					int regIdx;
+					int regR;
+					if(aRegIdx[iCur]==0)
+						continue;
+					/* Skip unused indices *//* Create a key for accessing the index entry */regIdx=sqlite3GetTempRange(this,pIdx.nColumn+1);
+					for(i=0;i<pIdx.nColumn;i++) {
+						int idx=pIdx.aiColumn[i];
+						if(idx==pTab.iPKey) {
+							v.sqlite3VdbeAddOp2(OP_SCopy,regRowid,regIdx+i);
+						}
+						else {
+							v.sqlite3VdbeAddOp2(OP_SCopy,regData+idx,regIdx+i);
+						}
+					}
+					v.sqlite3VdbeAddOp2(OP_SCopy,regRowid,regIdx+i);
+					v.sqlite3VdbeAddOp3(OP_MakeRecord,regIdx,pIdx.nColumn+1,aRegIdx[iCur]);
+					v.sqlite3VdbeChangeP4(-1,v.sqlite3IndexAffinityStr(pIdx),P4_TRANSIENT);
+					sqlite3ExprCacheAffinityChange(this,regIdx,pIdx.nColumn+1);
+					/* Find out what action to take in case there is an indexing conflict */onError=pIdx.onError;
+					if(onError==OE_None) {
+						sqlite3ReleaseTempRange(this,regIdx,pIdx.nColumn+1);
+						continue;
+						/* pIdx is not a UNIQUE index */}
+					if(overrideError!=OE_Default) {
+						onError=overrideError;
+					}
+					else
+						if(onError==OE_Default) {
+							onError=OE_Abort;
+						}
+					if(seenReplace) {
+						if(onError==OE_Ignore)
+							onError=OE_Replace;
+						else
+							if(onError==OE_Fail)
+								onError=OE_Abort;
+					}
+					/* Check to see if the new index entry will be unique */regR=sqlite3GetTempReg(this);
+					v.sqlite3VdbeAddOp2(OP_SCopy,regOldRowid,regR);
+					j3=v.sqlite3VdbeAddOp4(OP_IsUnique,baseCur+iCur+1,0,regR,regIdx,//regR, SQLITE_INT_TO_PTR(regIdx),
+					P4_INT32);
+					sqlite3ReleaseTempRange(this,regIdx,pIdx.nColumn+1);
+					/* Generate code that executes if the new index entry is not unique */Debug.Assert(onError==OE_Rollback||onError==OE_Abort||onError==OE_Fail||onError==OE_Ignore||onError==OE_Replace);
+					switch(onError) {
+					case OE_Rollback:
+					case OE_Abort:
+					case OE_Fail: {
+						int j;
+						StrAccum errMsg=new StrAccum(200);
+						string zSep;
+						string zErr;
+						sqlite3StrAccumInit(errMsg,null,0,200);
+						errMsg.db=this.db;
+						zSep=pIdx.nColumn>1?"columns ":"column ";
+						for(j=0;j<pIdx.nColumn;j++) {
+							string zCol=pTab.aCol[pIdx.aiColumn[j]].zName;
+							sqlite3StrAccumAppend(errMsg,zSep,-1);
+							zSep=", ";
+							sqlite3StrAccumAppend(errMsg,zCol,-1);
+						}
+						sqlite3StrAccumAppend(errMsg,pIdx.nColumn>1?" are not unique":" is not unique",-1);
+						zErr=sqlite3StrAccumFinish(errMsg);
+						sqlite3HaltConstraint(this,onError,zErr,0);
+						sqlite3DbFree(errMsg.db,ref zErr);
+						break;
+					}
+					case OE_Ignore: {
+						Debug.Assert(!seenReplace);
+						v.sqlite3VdbeAddOp2(OP_Goto,0,ignoreDest);
+						break;
+					}
+					default: {
+						Trigger pTrigger=null;
+						Debug.Assert(onError==OE_Replace);
+						sqlite3MultiWrite(this);
+						if((this.db.flags&SQLITE_RecTriggers)!=0) {
+							int iDummy;
+							pTrigger=sqlite3TriggersExist(this,pTab,TK_DELETE,null,out iDummy);
+						}
+						sqlite3GenerateRowDelete(this,pTab,baseCur,regR,0,pTrigger,OE_Replace);
+						seenReplace=true;
+						break;
+					}
+					}
+					v.sqlite3VdbeJumpHere(j3);
+					sqlite3ReleaseTempReg(this,regR);
+				}
+				//if ( pbMayReplace )
+				{
+					pbMayReplace=seenReplace?1:0;
+				}
+			}
+			public void sqlite3CompleteInsertion(/* The parser context */Table pTab,/* the table into which we are inserting */int baseCur,/* Index of a read/write cursor pointing at pTab */int regRowid,/* Range of content */int[] aRegIdx,/* Register used by each index.  0 for unused indices */bool isUpdate,/* True for UPDATE, False for INSERT */bool appendBias,/* True if this is likely to be an append */bool useSeekResult/* True to set the USESEEKRESULT flag on OP_[Idx]Insert */) {
+				int i;
+				Vdbe v;
+				int nIdx;
+				Index pIdx;
+				u8 pik_flags;
+				int regData;
+				int regRec;
+				v=sqlite3GetVdbe(this);
+				Debug.Assert(v!=null);
+				Debug.Assert(pTab.pSelect==null);
+				/* This table is not a VIEW */for(nIdx=0,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,nIdx++) {
+				}
+				for(i=nIdx-1;i>=0;i--) {
+					if(aRegIdx[i]==0)
+						continue;
+					v.sqlite3VdbeAddOp2(OP_IdxInsert,baseCur+i+1,aRegIdx[i]);
+					if(useSeekResult) {
+						v.sqlite3VdbeChangeP5(OPFLAG_USESEEKRESULT);
+					}
+				}
+				regData=regRowid+1;
+				regRec=sqlite3GetTempReg(this);
+				v.sqlite3VdbeAddOp3(OP_MakeRecord,regData,pTab.nCol,regRec);
+				v.sqlite3TableAffinityStr(pTab);
+				sqlite3ExprCacheAffinityChange(this,regData,pTab.nCol);
+				if(this.nested!=0) {
+					pik_flags=0;
+				}
+				else {
+					pik_flags=OPFLAG_NCHANGE;
+					pik_flags|=(isUpdate?OPFLAG_ISUPDATE:OPFLAG_LASTROWID);
+				}
+				if(appendBias) {
+					pik_flags|=OPFLAG_APPEND;
+				}
+				if(useSeekResult) {
+					pik_flags|=OPFLAG_USESEEKRESULT;
+				}
+				v.sqlite3VdbeAddOp3(OP_Insert,baseCur,regRec,regRowid);
+				if(this.nested==0) {
+					v.sqlite3VdbeChangeP4(-1,pTab.zName,P4_TRANSIENT);
+				}
+				v.sqlite3VdbeChangeP5(pik_flags);
+			}
+			public int sqlite3OpenTableAndIndices(/* Parsing context */Table pTab,/* Table to be opened */int baseCur,/* VdbeCursor number assigned to the table */int op/* OP_OpenRead or OP_OpenWrite */) {
+				int i;
+				int iDb;
+				Index pIdx;
+				Vdbe v;
+				if(IsVirtual(pTab))
+					return 0;
+				iDb=sqlite3SchemaToIndex(this.db,pTab.pSchema);
+				v=sqlite3GetVdbe(this);
+				Debug.Assert(v!=null);
+				this.sqlite3OpenTable(baseCur,iDb,pTab,op);
+				for(i=1,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,i++) {
+					KeyInfo pKey=sqlite3IndexKeyinfo(this,pIdx);
+					Debug.Assert(pIdx.pSchema==pTab.pSchema);
+					v.sqlite3VdbeAddOp4(op,i+baseCur,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
+					#if SQLITE_DEBUG
+																																																																																	        VdbeComment( v, "%s", pIdx.zName );
+#endif
+				}
+				if(this.nTab<baseCur+i) {
+					this.nTab=baseCur+i;
+				}
+				return i-1;
+			}
+			public int autoIncBegin(/* Parsing context */int iDb,/* Index of the database holding pTab */Table pTab/* The table we are writing to */) {
+				int memId=0;
+				/* Register holding maximum rowid */if((pTab.tabFlags&TF_Autoincrement)!=0) {
+					Parse pToplevel=sqlite3ParseToplevel(this);
+					AutoincInfo pInfo;
+					pInfo=pToplevel.pAinc;
+					while(pInfo!=null&&pInfo.pTab!=pTab) {
+						pInfo=pInfo.pNext;
+					}
+					if(pInfo==null) {
+						pInfo=new AutoincInfo();
+						//sqlite3DbMallocRaw(pParse.db, sizeof(*pInfo));
+						//if( pInfo==0 ) return 0;
+						pInfo.pNext=pToplevel.pAinc;
+						pToplevel.pAinc=pInfo;
+						pInfo.pTab=pTab;
+						pInfo.iDb=iDb;
+						pToplevel.nMem++;
+						/* Register to hold name of table */pInfo.regCtr=++pToplevel.nMem;
+						/* Max rowid register */pToplevel.nMem++;
+						/* Rowid in sqlite_sequence */}
+					memId=pInfo.regCtr;
+				}
+				return memId;
+			}
+			public bool readsTable(int iStartAddr,int iDb,Table pTab) {
+				Vdbe v=sqlite3GetVdbe(this);
+				int i;
+				int iEnd=v.sqlite3VdbeCurrentAddr();
+				#if !SQLITE_OMIT_VIRTUALTABLE
+				VTable pVTab=IsVirtual(pTab)?sqlite3GetVTable(this.db,pTab):null;
+				#endif
+				for(i=iStartAddr;i<iEnd;i++) {
+					VdbeOp pOp=v.sqlite3VdbeGetOp(i);
+					Debug.Assert(pOp!=null);
+					if(pOp.opcode==OP_OpenRead&&pOp.p3==iDb) {
+						Index pIndex;
+						int tnum=pOp.p2;
+						if(tnum==pTab.tnum) {
+							return true;
+						}
+						for(pIndex=pTab.pIndex;pIndex!=null;pIndex=pIndex.pNext) {
+							if(tnum==pIndex.tnum) {
+								return true;
+							}
+						}
+					}
+					#if !SQLITE_OMIT_VIRTUALTABLE
+					if(pOp.opcode==OP_VOpen&&pOp.p4.pVtab==pVTab) {
+						Debug.Assert(pOp.p4.pVtab!=null);
+						Debug.Assert(pOp.p4type==P4_VTAB);
+						return true;
+					}
+					#endif
+				}
+				return false;
+			}
+			public void sqlite3OpenTable(/* Generate code into this VDBE */int iCur,/* The cursor number of the table */int iDb,/* The database index in sqlite3.aDb[] */Table pTab,/* The table to be opened */int opcode/* OP_OpenRead or OP_OpenWrite */) {
+				Vdbe v;
+				if(IsVirtual(pTab))
+					return;
+				v=sqlite3GetVdbe(this);
+				Debug.Assert(opcode==OP_OpenWrite||opcode==OP_OpenRead);
+				sqlite3TableLock(this,iDb,pTab.tnum,(opcode==OP_OpenWrite)?(byte)1:(byte)0,pTab.zName);
+				v.sqlite3VdbeAddOp3(opcode,iCur,pTab.tnum,iDb);
+				v.sqlite3VdbeChangeP4(-1,(pTab.nCol),P4_INT32);
+				//SQLITE_INT_TO_PTR( pTab.nCol ), P4_INT32 );
+				VdbeComment(v,"%s",pTab.zName);
 			}
 		}
 		#if SQLITE_OMIT_VIRTUALTABLE

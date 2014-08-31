@@ -4681,7 +4681,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 						#endif
 						if((pLevel.plan.wsFlags&WHERE_IDX_ONLY)==0&&(wctrlFlags&WHERE_OMIT_OPEN)==0) {
 							int op=pWInfo.okOnePass!=0?OP_OpenWrite:OP_OpenRead;
-							sqlite3OpenTable(pParse,pTabItem.iCursor,iDb,pTab,op);
+							pParse.sqlite3OpenTable(pTabItem.iCursor,iDb,pTab,op);
 							testcase(pTab.nCol==BMS-1);
 							testcase(pTab.nCol==BMS);
 							if(0==pWInfo.okOnePass&&pTab.nCol<BMS) {
