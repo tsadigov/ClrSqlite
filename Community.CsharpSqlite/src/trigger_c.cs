@@ -686,7 +686,7 @@ return;
         */pParse.eOrconf=(orconf==OE_Default)?pStep.orconf:(u8)orconf;
 				switch(pStep.op) {
 				case TK_UPDATE: {
-					sqlite3Update(pParse,targetSrcList(pParse,pStep),sqlite3ExprListDup(db,pStep.pExprList,0),sqlite3ExprDup(db,pStep.pWhere,0),pParse.eOrconf);
+					pParse.sqlite3Update(targetSrcList(pParse,pStep),sqlite3ExprListDup(db,pStep.pExprList,0),sqlite3ExprDup(db,pStep.pWhere,0),pParse.eOrconf);
 					break;
 				}
 				case TK_INSERT: {

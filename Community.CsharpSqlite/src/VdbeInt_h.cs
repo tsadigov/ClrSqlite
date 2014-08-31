@@ -1250,6 +1250,27 @@ pOp.cnt = 0;
 				}
 				this.sqlite3VdbeChangeP4(-1,pTab.zColAff,P4_TRANSIENT);
 			}
+			public void sqlite3ColumnDefault(Table pTab,int i,int iReg) {
+				Debug.Assert(pTab!=null);
+				if(null==pTab.pSelect) {
+					sqlite3_value pValue=new sqlite3_value();
+					SqliteEncoding enc=ENC(sqlite3VdbeDb(this));
+					Column pCol=pTab.aCol[i];
+					#if SQLITE_DEBUG
+																																																																																	        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
+#endif
+					Debug.Assert(i<pTab.nCol);
+					sqlite3ValueFromExpr(sqlite3VdbeDb(this),pCol.pDflt,enc,pCol.affinity,ref pValue);
+					if(pValue!=null) {
+						this.sqlite3VdbeChangeP4(-1,pValue,P4_MEM);
+					}
+					#if !SQLITE_OMIT_FLOATING_POINT
+					if(iReg>=0&&pTab.aCol[i].affinity==SQLITE_AFF_REAL) {
+						this.sqlite3VdbeAddOp1(OP_RealAffinity,iReg);
+					}
+					#endif
+				}
+			}
 		}
 		/*
     ** The following are allowed values for Vdbe.magic

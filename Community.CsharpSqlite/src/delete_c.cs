@@ -562,7 +562,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				}
 				else {
 					v.sqlite3VdbeAddOp3(OP_Column,iCur,idx,regBase+j);
-					sqlite3ColumnDefault(v,pTab,idx,-1);
+					v.sqlite3ColumnDefault(pTab,idx,-1);
 				}
 			}
 			if(doMakeRec) {

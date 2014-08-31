@@ -7042,7 +7042,7 @@ return;
 			{
 				sqlite3SrcListIndexedBy(pParse,yymsp[-4].minor.yy259,yymsp[-3].minor.yy0);
 				sqlite3ExprListCheckLength(pParse,yymsp[-1].minor.yy322,"set list");
-				sqlite3Update(pParse,yymsp[-4].minor.yy259,yymsp[-1].minor.yy322,yymsp[0].minor.yy314,yymsp[-5].minor.yy210);
+				pParse.sqlite3Update(yymsp[-4].minor.yy259,yymsp[-1].minor.yy322,yymsp[0].minor.yy314,yymsp[-5].minor.yy210);
 			}
 			//#line 2782 "parse.c"
 			break;

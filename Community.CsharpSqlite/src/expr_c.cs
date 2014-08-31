@@ -1837,7 +1837,7 @@ return;
 				v.sqlite3VdbeAddOp3(op,iTabCur,iCol,regOut);
 			}
 			if(iCol>=0) {
-				sqlite3ColumnDefault(v,pTab,iCol,regOut);
+				v.sqlite3ColumnDefault(pTab,iCol,regOut);
 			}
 		}
 		///<summary>
