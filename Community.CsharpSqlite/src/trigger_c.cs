@@ -134,7 +134,7 @@ namespace Community.CsharpSqlite {
       */if(pTableName==null/*|| db.mallocFailed != 0 */) {
 				goto trigger_cleanup;
 			}
-			pTab=sqlite3SrcListLookup(pParse,pTableName);
+			pTab=pParse.sqlite3SrcListLookup(pTableName);
 			if(db.init.busy==0&&pName2.n==0&&pTab!=null&&pTab.pSchema==db.aDb[1].pSchema) {
 				iDb=1;
 			}
@@ -143,7 +143,7 @@ namespace Community.CsharpSqlite {
 			if(sFix.sqlite3FixInit(pParse,iDb,"trigger",pName)!=0&&sFix.sqlite3FixSrcList(pTableName)!=0) {
 				goto trigger_cleanup;
 			}
-			pTab=sqlite3SrcListLookup(pParse,pTableName);
+			pTab=pParse.sqlite3SrcListLookup(pTableName);
 			if(pTab==null) {
 				/* The table does not exist. */if(db.init.iDb==1) {
 					/* Ticket #3810.
@@ -694,7 +694,7 @@ return;
 					break;
 				}
 				case TK_DELETE: {
-					sqlite3DeleteFrom(pParse,targetSrcList(pParse,pStep),sqlite3ExprDup(db,pStep.pWhere,0));
+					pParse.sqlite3DeleteFrom(targetSrcList(pParse,pStep),sqlite3ExprDup(db,pStep.pWhere,0));
 					break;
 				}
 				default:

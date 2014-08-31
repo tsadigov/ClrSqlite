@@ -4864,7 +4864,7 @@ goto attach_end;
 						v.sqlite3VdbeAddOp2(OP_FkIfZero,1,iSkip);
 					}
 					this.disableTriggers=1;
-					sqlite3DeleteFrom(this,sqlite3SrcListDup(db,pName,0),null);
+					this.sqlite3DeleteFrom(sqlite3SrcListDup(db,pName,0),null);
 					this.disableTriggers=0;
 					/* If the DELETE has generated immediate foreign key constraint 
         ** violations, halt the VDBE and return an error at this point, before
@@ -5486,7 +5486,7 @@ pParse.nTableLock = 0;
 				zTab=pTabList.a[0].zName;
 				if(NEVER(zTab==null))
 					goto insert_cleanup;
-				pTab=sqlite3SrcListLookup(this,pTabList);
+				pTab=this.sqlite3SrcListLookup(pTabList);
 				if(pTab==null) {
 					goto insert_cleanup;
 				}
@@ -5528,7 +5528,7 @@ isView = false;
 				/* Ensure that:
       *  (a) the table is not read-only, 
       *  (b) that if it is a view then ON INSERT triggers exist
-      */if(sqlite3IsReadOnly(this,pTab,tmask)) {
+      */if(this.sqlite3IsReadOnly(pTab,tmask)) {
 					goto insert_cleanup;
 				}
 				/* Allocate a VDBE
@@ -6215,12 +6215,12 @@ isView = false;
 						}
 						if(pTrigger!=null||this.sqlite3FkRequired(pTab,null,0)!=0) {
 							sqlite3MultiWrite(this);
-							sqlite3GenerateRowDelete(this,pTab,baseCur,regRowid,0,pTrigger,OE_Replace);
+							this.sqlite3GenerateRowDelete(pTab,baseCur,regRowid,0,pTrigger,OE_Replace);
 						}
 						else
 							if(pTab.pIndex!=null) {
 								sqlite3MultiWrite(this);
-								sqlite3GenerateRowIndexDelete(this,pTab,baseCur,0);
+								this.sqlite3GenerateRowIndexDelete(pTab,baseCur,0);
 							}
 						seenReplace=true;
 						break;
@@ -6319,7 +6319,7 @@ isView = false;
 							int iDummy;
 							pTrigger=sqlite3TriggersExist(this,pTab,TK_DELETE,null,out iDummy);
 						}
-						sqlite3GenerateRowDelete(this,pTab,baseCur,regR,0,pTrigger,OE_Replace);
+						this.sqlite3GenerateRowDelete(pTab,baseCur,regR,0,pTrigger,OE_Replace);
 						seenReplace=true;
 						break;
 					}
@@ -6514,7 +6514,7 @@ isView = false;
 				}
 				Debug.Assert(pTabList.nSrc==1);
 				/* Locate the table which we want to update.
-      */pTab=sqlite3SrcListLookup(this,pTabList);
+      */pTab=this.sqlite3SrcListLookup(pTabList);
 				if(pTab==null)
 					goto update_cleanup;
 				iDb=sqlite3SchemaToIndex(this.db,pTab.pSchema);
@@ -6536,7 +6536,7 @@ isView = false;
 				if(sqlite3ViewGetColumnNames(this,pTab)!=0) {
 					goto update_cleanup;
 				}
-				if(sqlite3IsReadOnly(this,pTab,tmask)) {
+				if(this.sqlite3IsReadOnly(pTab,tmask)) {
 					goto update_cleanup;
 				}
 				aXRef=new int[pTab.nCol];
@@ -6661,7 +6661,7 @@ aXRef[j] = -1;
       */
 				#if !(SQLITE_OMIT_VIEW) && !(SQLITE_OMIT_TRIGGER)
 				if(isView) {
-					sqlite3MaterializeView(this,pTab,pWhere,iCur);
+					this.sqlite3MaterializeView(pTab,pWhere,iCur);
 				}
 				#endif
 				/* Resolve the column names in all the expressions in the
@@ -6818,7 +6818,7 @@ aXRef[j] = -1;
 						this.sqlite3FkCheck(pTab,regOldRowid,0);
 					}
 					/* Delete the index entries associated with the current record.  */j1=v.sqlite3VdbeAddOp3(OP_NotExists,iCur,0,regOldRowid);
-					sqlite3GenerateRowIndexDelete(this,pTab,iCur,aRegIdx);
+					this.sqlite3GenerateRowIndexDelete(pTab,iCur,aRegIdx);
 					/* If changing the record number, delete the old record.  */if(hasFK||chngRowid) {
 						v.sqlite3VdbeAddOp2(OP_Delete,iCur,0);
 					}
@@ -6928,6 +6928,371 @@ aXRef[j] = -1;
 				v.sqlite3VdbeJumpHere(addr);
 				v.sqlite3VdbeAddOp2(OP_Close,ephemTab,0);
 				/* Cleanup */sqlite3SelectDelete(db,ref pSelect);
+			}
+			public Table sqlite3SrcListLookup(SrcList pSrc) {
+				SrcList_item pItem=pSrc.a[0];
+				Table pTab;
+				Debug.Assert(pItem!=null&&pSrc.nSrc==1);
+				pTab=sqlite3LocateTable(this,0,pItem.zName,pItem.zDatabase);
+				sqlite3DeleteTable(this.db,ref pItem.pTab);
+				pItem.pTab=pTab;
+				if(pTab!=null) {
+					pTab.nRef++;
+				}
+				if(sqlite3IndexedByLookup(this,pItem)!=0) {
+					pTab=null;
+				}
+				return pTab;
+			}
+			public bool sqlite3IsReadOnly(Table pTab,int viewOk) {
+				/* A table is not writable under the following circumstances:
+      **
+      **   1) It is a virtual table and no implementation of the xUpdate method
+      **      has been provided, or
+      **   2) It is a system table (i.e. sqlite_master), this call is not
+      **      part of a nested parse and writable_schema pragma has not
+      **      been specified.
+      **
+      ** In either case leave an error message in pParse and return non-zero.
+      */if((IsVirtual(pTab)&&sqlite3GetVTable(this.db,pTab).pMod.pModule.xUpdate==null)||((pTab.tabFlags&TF_Readonly)!=0&&(this.db.flags&SQLITE_WriteSchema)==0&&this.nested==0)) {
+					sqlite3ErrorMsg(this,"table %s may not be modified",pTab.zName);
+					return true;
+				}
+				#if !SQLITE_OMIT_VIEW
+				if(viewOk==0&&pTab.pSelect!=null) {
+					sqlite3ErrorMsg(this,"cannot modify %s because it is a view",pTab.zName);
+					return true;
+				}
+				#endif
+				return false;
+			}
+			public void sqlite3MaterializeView(/* Parsing context */Table pView,/* View definition */Expr pWhere,/* Optional WHERE clause to be added */int iCur/* VdbeCursor number for ephemerial table */) {
+				SelectDest dest=new SelectDest();
+				Select pDup;
+				sqlite3 db=this.db;
+				pDup=sqlite3SelectDup(db,pView.pSelect,0);
+				if(pWhere!=null) {
+					SrcList pFrom;
+					pWhere=sqlite3ExprDup(db,pWhere,0);
+					pFrom=sqlite3SrcListAppend(db,null,null,null);
+					//if ( pFrom != null )
+					//{
+					Debug.Assert(pFrom.nSrc==1);
+					pFrom.a[0].zAlias=pView.zName;
+					// sqlite3DbStrDup( db, pView.zName );
+					pFrom.a[0].pSelect=pDup;
+					Debug.Assert(pFrom.a[0].pOn==null);
+					Debug.Assert(pFrom.a[0].pUsing==null);
+					//}
+					//else
+					//{
+					//  sqlite3SelectDelete( db, ref pDup );
+					//}
+					pDup=sqlite3SelectNew(this,null,pFrom,pWhere,null,null,null,0,null,null);
+				}
+				sqlite3SelectDestInit(dest,SelectResultType.EphemTab,iCur);
+				sqlite3Select(this,pDup,ref dest);
+				sqlite3SelectDelete(db,ref pDup);
+			}
+			public void sqlite3DeleteFrom(/* The parser context */SrcList pTabList,/* The table from which we should delete things */Expr pWhere/* The WHERE clause.  May be null */) {
+				Vdbe v;
+				/* The virtual database engine */Table pTab;
+				/* The table from which records will be deleted */string zDb;
+				/* Name of database holding pTab */int end,addr=0;
+				/* A couple addresses of generated code */int i;
+				/* Loop counter */WhereInfo pWInfo;
+				/* Information about the WHERE clause */Index pIdx;
+				/* For looping over indices of the table */int iCur;
+				/* VDBE VdbeCursor number for pTab */sqlite3 db;
+				/* Main database structure */AuthContext sContext;
+				/* Authorization context */NameContext sNC;
+				/* Name context to resolve expressions in */int iDb;
+				/* Database number */int memCnt=-1;
+				/* Memory cell used for change counting */int rcauth;
+				/* Value returned by authorization callback */
+				#if !SQLITE_OMIT_TRIGGER
+				bool isView;
+				/* True if attempting to delete from a view */Trigger pTrigger;
+				/* List of table triggers, if required */
+				#endif
+				sContext=new AuthContext();
+				//memset(&sContext, 0, sizeof(sContext));
+				db=this.db;
+				if(this.nErr!=0/*|| db.mallocFailed != 0 */) {
+					goto delete_from_cleanup;
+				}
+				Debug.Assert(pTabList.nSrc==1);
+				/* Locate the table which we want to delete.  This table has to be
+      ** put in an SrcList structure because some of the subroutines we
+      ** will be calling are designed to work with multiple tables and expect
+      ** an SrcList* parameter instead of just a Table* parameter.
+      */pTab=this.sqlite3SrcListLookup(pTabList);
+				if(pTab==null)
+					goto delete_from_cleanup;
+				/* Figure out if we have any triggers and if the table being
+      ** deleted from is a view
+      */
+				#if !SQLITE_OMIT_TRIGGER
+				int iDummy;
+				pTrigger=sqlite3TriggersExist(this,pTab,TK_DELETE,null,out iDummy);
+				isView=pTab.pSelect!=null;
+				#else
+																																																													      const Trigger pTrigger = null;
+      bool isView = false;
+#endif
+				#if SQLITE_OMIT_VIEW
+																																																													// undef isView
+isView = false;
+#endif
+				/* If pTab is really a view, make sure it has been initialized.
+*/if(sqlite3ViewGetColumnNames(this,pTab)!=0) {
+					goto delete_from_cleanup;
+				}
+				if(this.sqlite3IsReadOnly(pTab,(pTrigger!=null?1:0))) {
+					goto delete_from_cleanup;
+				}
+				iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
+				Debug.Assert(iDb<db.nDb);
+				zDb=db.aDb[iDb].zName;
+				#if !SQLITE_OMIT_AUTHORIZATION
+																																																													rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
+#else
+				rcauth=SQLITE_OK;
+				#endif
+				Debug.Assert(rcauth==SQLITE_OK||rcauth==SQLITE_DENY||rcauth==SQLITE_IGNORE);
+				if(rcauth==SQLITE_DENY) {
+					goto delete_from_cleanup;
+				}
+				Debug.Assert(!isView||pTrigger!=null);
+				/* Assign  cursor number to the table and all its indices.
+      */Debug.Assert(pTabList.nSrc==1);
+				iCur=pTabList.a[0].iCursor=this.nTab++;
+				for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
+					this.nTab++;
+				}
+				#if !SQLITE_OMIT_AUTHORIZATION
+																																																													/* Start the view context
+*/
+if( isView ){
+sqlite3AuthContextPush(pParse, sContext, pTab.zName);
+}
+#endif
+				/* Begin generating code.
+*/v=sqlite3GetVdbe(this);
+				if(v==null) {
+					goto delete_from_cleanup;
+				}
+				if(this.nested==0)
+					sqlite3VdbeCountChanges(v);
+				sqlite3BeginWriteOperation(this,1,iDb);
+				/* If we are trying to delete from a view, realize that view into
+      ** a ephemeral table.
+      */
+				#if !(SQLITE_OMIT_VIEW) && !(SQLITE_OMIT_TRIGGER)
+				if(isView) {
+					this.sqlite3MaterializeView(pTab,pWhere,iCur);
+				}
+				#endif
+				/* Resolve the column names in the WHERE clause.
+      */sNC=new NameContext();
+				// memset( &sNC, 0, sizeof( sNC ) );
+				sNC.pParse=this;
+				sNC.pSrcList=pTabList;
+				if(sqlite3ResolveExprNames(sNC,ref pWhere)!=0) {
+					goto delete_from_cleanup;
+				}
+				/* Initialize the counter of the number of rows deleted, if
+** we are counting rows.
+*/if((db.flags&SQLITE_CountRows)!=0) {
+					memCnt=++this.nMem;
+					v.sqlite3VdbeAddOp2(OP_Integer,0,memCnt);
+				}
+				#if !SQLITE_OMIT_TRUNCATE_OPTIMIZATION
+				/* Special case: A DELETE without a WHERE clause deletes everything.
+  ** It is easier just to erase the whole table. Prior to version 3.6.5,
+  ** this optimization caused the row change count (the value returned by 
+  ** API function sqlite3_count_changes) to be set incorrectly.  */if(rcauth==SQLITE_OK&&pWhere==null&&null==pTrigger&&!IsVirtual(pTab)&&0==this.sqlite3FkRequired(pTab,null,0)) {
+					Debug.Assert(!isView);
+					v.sqlite3VdbeAddOp4(OP_Clear,pTab.tnum,iDb,memCnt,pTab.zName,P4_STATIC);
+					for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
+						Debug.Assert(pIdx.pSchema==pTab.pSchema);
+						v.sqlite3VdbeAddOp2(OP_Clear,pIdx.tnum,iDb);
+					}
+				}
+				else
+				#endif
+				/* The usual case: There is a WHERE clause so we have to scan through
+** the table and pick which records to delete.
+*/ {
+					int iRowSet=++this.nMem;
+					/* Register for rowset of rows to delete */int iRowid=++this.nMem;
+					/* Used for storing rowid values. */int regRowid;
+					/* Actual register containing rowids *//* Collect rowids of every row to be deleted.
+        */v.sqlite3VdbeAddOp2(OP_Null,0,iRowSet);
+					ExprList elDummy=null;
+					pWInfo=sqlite3WhereBegin(this,pTabList,pWhere,ref elDummy,WHERE_DUPLICATES_OK);
+					if(pWInfo==null)
+						goto delete_from_cleanup;
+					regRowid=sqlite3ExprCodeGetColumn(this,pTab,-1,iCur,iRowid);
+					v.sqlite3VdbeAddOp2(OP_RowSetAdd,iRowSet,regRowid);
+					if((db.flags&SQLITE_CountRows)!=0) {
+						v.sqlite3VdbeAddOp2(OP_AddImm,memCnt,1);
+					}
+					sqlite3WhereEnd(pWInfo);
+					/* Delete every item whose key was written to the list during the
+        ** database scan.  We have to delete items after the scan is complete
+        ** because deleting an item can change the scan order. */end=v.sqlite3VdbeMakeLabel();
+					/* Unless this is a view, open cursors for the table we are 
+        ** deleting from and all its indices. If this is a view, then the
+        ** only effect this statement has is to fire the INSTEAD OF 
+        ** triggers.  */if(!isView) {
+						this.sqlite3OpenTableAndIndices(pTab,iCur,OP_OpenWrite);
+					}
+					addr=v.sqlite3VdbeAddOp3(OP_RowSetRead,iRowSet,end,iRowid);
+					/* Delete the row */
+					#if !SQLITE_OMIT_VIRTUALTABLE
+					if(IsVirtual(pTab)) {
+						VTable pVTab=sqlite3GetVTable(db,pTab);
+						sqlite3VtabMakeWritable(this,pTab);
+						v.sqlite3VdbeAddOp4(OP_VUpdate,0,1,iRowid,pVTab,P4_VTAB);
+						v.sqlite3VdbeChangeP5(OE_Abort);
+						sqlite3MayAbort(this);
+					}
+					else
+					#endif
+					 {
+						int count=(this.nested==0)?1:0;
+						/* True to count changes */this.sqlite3GenerateRowDelete(pTab,iCur,iRowid,count,pTrigger,OE_Default);
+					}
+					/* End of the delete loop */v.sqlite3VdbeAddOp2(OP_Goto,0,addr);
+					v.sqlite3VdbeResolveLabel(end);
+					/* Close the cursors open on the table and its indexes. */if(!isView&&!IsVirtual(pTab)) {
+						for(i=1,pIdx=pTab.pIndex;pIdx!=null;i++,pIdx=pIdx.pNext) {
+							v.sqlite3VdbeAddOp2(OP_Close,iCur+i,pIdx.tnum);
+						}
+						v.sqlite3VdbeAddOp1(OP_Close,iCur);
+					}
+				}
+				/* Update the sqlite_sequence table by storing the content of the
+      ** maximum rowid counter values recorded while inserting into
+      ** autoincrement tables.
+      */if(this.nested==0&&this.pTriggerTab==null) {
+					this.sqlite3AutoincrementEnd();
+				}
+				/* Return the number of rows that were deleted. If this routine is 
+      ** generating code because of a call to sqlite3NestedParse(), do not
+      ** invoke the callback function.
+      */if((db.flags&SQLITE_CountRows)!=0&&0==this.nested&&null==this.pTriggerTab) {
+					v.sqlite3VdbeAddOp2(OP_ResultRow,memCnt,1);
+					sqlite3VdbeSetNumCols(v,1);
+					sqlite3VdbeSetColName(v,0,COLNAME_NAME,"rows deleted",SQLITE_STATIC);
+				}
+				delete_from_cleanup:
+				#if !SQLITE_OMIT_AUTHORIZATION
+																																																													sqlite3AuthContextPop(sContext);
+#endif
+				sqlite3SrcListDelete(db,ref pTabList);
+				sqlite3ExprDelete(db,ref pWhere);
+				return;
+			}
+			public void sqlite3GenerateRowDelete(/* Parsing context */Table pTab,/* Table containing the row to be deleted */int iCur,/* VdbeCursor number for the table */int iRowid,/* Memory cell that contains the rowid to delete */int count,/* If non-zero, increment the row change counter */Trigger pTrigger,/* List of triggers to (potentially) fire */int onconf/* Default ON CONFLICT policy for triggers */) {
+				Vdbe v=this.pVdbe;
+				/* Vdbe */int iOld=0;
+				/* First register in OLD.* array */int iLabel;
+				/* Label resolved to end of generated code *//* Vdbe is guaranteed to have been allocated by this stage. */Debug.Assert(v!=null);
+				/* Seek cursor iCur to the row to delete. If this row no longer exists 
+      ** (this can happen if a trigger program has already deleted it), do
+      ** not attempt to delete it or fire any DELETE triggers.  */iLabel=v.sqlite3VdbeMakeLabel();
+				v.sqlite3VdbeAddOp3(OP_NotExists,iCur,iLabel,iRowid);
+				/* If there are any triggers to fire, allocate a range of registers to
+      ** use for the old.* references in the triggers.  */if(this.sqlite3FkRequired(pTab,null,0)!=0||pTrigger!=null) {
+					u32 mask;
+					/* Mask of OLD.* columns in use */int iCol;
+					/* Iterator used while populating OLD.* *//* TODO: Could use temporary registers here. Also could attempt to
+        ** avoid copying the contents of the rowid register.  */mask=sqlite3TriggerColmask(this,pTrigger,null,0,TRIGGER_BEFORE|TRIGGER_AFTER,pTab,onconf);
+					mask|=this.sqlite3FkOldmask(pTab);
+					iOld=this.nMem+1;
+					this.nMem+=(1+pTab.nCol);
+					/* Populate the OLD.* pseudo-table register array. These values will be 
+        ** used by any BEFORE and AFTER triggers that exist.  */v.sqlite3VdbeAddOp2(OP_Copy,iRowid,iOld);
+					for(iCol=0;iCol<pTab.nCol;iCol++) {
+						if(mask==0xffffffff||(mask&(1<<iCol))!=0) {
+							sqlite3ExprCodeGetColumnOfTable(v,pTab,iCur,iCol,iOld+iCol+1);
+						}
+					}
+					/* Invoke BEFORE DELETE trigger programs. */sqlite3CodeRowTrigger(this,pTrigger,TK_DELETE,null,TRIGGER_BEFORE,pTab,iOld,onconf,iLabel);
+					/* Seek the cursor to the row to be deleted again. It may be that
+        ** the BEFORE triggers coded above have already removed the row
+        ** being deleted. Do not attempt to delete the row a second time, and 
+        ** do not fire AFTER triggers.  */v.sqlite3VdbeAddOp3(OP_NotExists,iCur,iLabel,iRowid);
+					/* Do FK processing. This call checks that any FK constraints that
+        ** refer to this table (i.e. constraints attached to other tables) 
+        ** are not violated by deleting this row.  */this.sqlite3FkCheck(pTab,iOld,0);
+				}
+				/* Delete the index and table entries. Skip this step if pTab is really
+      ** a view (in which case the only effect of the DELETE statement is to
+      ** fire the INSTEAD OF triggers).  */if(pTab.pSelect==null) {
+					this.sqlite3GenerateRowIndexDelete(pTab,iCur,0);
+					v.sqlite3VdbeAddOp2(OP_Delete,iCur,(count!=0?(int)OPFLAG_NCHANGE:0));
+					if(count!=0) {
+						v.sqlite3VdbeChangeP4(-1,pTab.zName,P4_TRANSIENT);
+					}
+				}
+				/* Do any ON CASCADE, SET NULL or SET DEFAULT operations required to
+      ** handle rows (possibly in other tables) that refer via a foreign key
+      ** to the row just deleted. */this.sqlite3FkActions(pTab,null,iOld);
+				/* Invoke AFTER DELETE trigger programs. */sqlite3CodeRowTrigger(this,pTrigger,TK_DELETE,null,TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
+				/* Jump here if the row had already been deleted before any BEFORE
+      ** trigger programs were invoked. Or if a trigger program throws a 
+      ** RAISE(IGNORE) exception.  */v.sqlite3VdbeResolveLabel(iLabel);
+			}
+			public void sqlite3GenerateRowIndexDelete(/* Parsing and code generating context */Table pTab,/* Table containing the row to be deleted */int iCur,/* VdbeCursor number for the table */int nothing/* Only delete if aRegIdx!=0 && aRegIdx[i]>0 */) {
+				int[] aRegIdx=null;
+				this.sqlite3GenerateRowIndexDelete(pTab,iCur,aRegIdx);
+			}
+			public void sqlite3GenerateRowIndexDelete(/* Parsing and code generating context */Table pTab,/* Table containing the row to be deleted */int iCur,/* VdbeCursor number for the table */int[] aRegIdx/* Only delete if aRegIdx!=0 && aRegIdx[i]>0 */) {
+				int i;
+				Index pIdx;
+				int r1;
+				for(i=1,pIdx=pTab.pIndex;pIdx!=null;i++,pIdx=pIdx.pNext) {
+					if(aRegIdx!=null&&aRegIdx[i-1]==0)
+						continue;
+					r1=this.sqlite3GenerateIndexKey(pIdx,iCur,0,false);
+					this.pVdbe.sqlite3VdbeAddOp3(OP_IdxDelete,iCur+i,r1,pIdx.nColumn+1);
+				}
+			}
+			public int sqlite3GenerateIndexKey(/* Parsing context */Index pIdx,/* The index for which to generate a key */int iCur,/* VdbeCursor number for the pIdx.pTable table */int regOut,/* Write the new index key to this register */bool doMakeRec/* Run the OP_MakeRecord instruction if true */) {
+				Vdbe v=this.pVdbe;
+				int j;
+				Table pTab=pIdx.pTable;
+				int regBase;
+				int nCol;
+				nCol=pIdx.nColumn;
+				regBase=sqlite3GetTempRange(this,nCol+1);
+				v.sqlite3VdbeAddOp2(OP_Rowid,iCur,regBase+nCol);
+				for(j=0;j<nCol;j++) {
+					int idx=pIdx.aiColumn[j];
+					if(idx==pTab.iPKey) {
+						v.sqlite3VdbeAddOp2(OP_SCopy,regBase+nCol,regBase+j);
+					}
+					else {
+						v.sqlite3VdbeAddOp3(OP_Column,iCur,idx,regBase+j);
+						v.sqlite3ColumnDefault(pTab,idx,-1);
+					}
+				}
+				if(doMakeRec) {
+					string zAff;
+					if(pTab.pSelect!=null||(this.db.flags&SQLITE_IdxRealAsInt)!=0) {
+						zAff="";
+					}
+					else {
+						zAff=v.sqlite3IndexAffinityStr(pIdx);
+					}
+					v.sqlite3VdbeAddOp3(OP_MakeRecord,regBase,nCol+1,regOut);
+					v.sqlite3VdbeChangeP4(-1,zAff,P4_TRANSIENT);
+				}
+				sqlite3ReleaseTempRange(this,regBase,nCol+1);
+				return regBase;
 			}
 		}
 		#if SQLITE_OMIT_VIRTUALTABLE

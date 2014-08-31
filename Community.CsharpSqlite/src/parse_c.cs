@@ -7033,7 +7033,7 @@ return;
 			/* cmd ::= DELETE FROM fullname indexed_opt where_opt *///#line 637 "parse.y"
 			{
 				sqlite3SrcListIndexedBy(pParse,yymsp[-2].minor.yy259,yymsp[-1].minor.yy0);
-				sqlite3DeleteFrom(pParse,yymsp[-2].minor.yy259,yymsp[0].minor.yy314);
+				pParse.sqlite3DeleteFrom(yymsp[-2].minor.yy259,yymsp[0].minor.yy314);
 			}
 			//#line 2773 "parse.c"
 			break;

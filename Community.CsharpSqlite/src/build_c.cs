@@ -2302,7 +2302,7 @@ return;
 			pParse.sqlite3OpenTable(iTab,iDb,pTab,OP_OpenRead);
 			addr1=v.sqlite3VdbeAddOp2(OP_Rewind,iTab,0);
 			regRecord=sqlite3GetTempReg(pParse);
-			regIdxKey=sqlite3GenerateIndexKey(pParse,pIndex,iTab,regRecord,true);
+			regIdxKey=pParse.sqlite3GenerateIndexKey(pIndex,iTab,regRecord,true);
 			if(pIndex.onError!=OE_None) {
 				int regRowid=regIdxKey+pIndex.nColumn;
 				int j2=v.sqlite3VdbeCurrentAddr()+2;
@@ -2392,7 +2392,7 @@ return;
 ** is a temp table. If so, set the database to 1. Do not do this
 ** if initialising a database schema.
 */if(0==db.init.busy) {
-					pTab=sqlite3SrcListLookup(pParse,pTblName);
+					pTab=pParse.sqlite3SrcListLookup(pTblName);
 					if(pName2.n==0&&pTab!=null&&pTab.pSchema==db.aDb[1].pSchema) {
 						iDb=1;
 					}

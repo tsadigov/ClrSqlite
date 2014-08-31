@@ -1945,7 +1945,7 @@ WhereCost pCost            /* Lowest cost query plan */
 			VdbeComment(v,"for %s",pTable.zName);
 			/* Fill the automatic index with content */addrTop=v.sqlite3VdbeAddOp1(OP_Rewind,pLevel.iTabCur);
 			regRecord=sqlite3GetTempReg(pParse);
-			sqlite3GenerateIndexKey(pParse,pIdx,pLevel.iTabCur,regRecord,true);
+			pParse.sqlite3GenerateIndexKey(pIdx,pLevel.iTabCur,regRecord,true);
 			v.sqlite3VdbeAddOp2(OP_IdxInsert,pLevel.iIdxCur,regRecord);
 			v.sqlite3VdbeChangeP5(OPFLAG_USESEEKRESULT);
 			v.sqlite3VdbeAddOp2(OP_Next,pLevel.iTabCur,addrTop+1);

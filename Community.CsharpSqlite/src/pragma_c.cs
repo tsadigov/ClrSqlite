@@ -1259,7 +1259,7 @@ else
 																														new VdbeOpList(OP_IfPos,1,0,0),
 																														/* 9 */new VdbeOpList(OP_Halt,0,0,0),
 																													};
-																													r1=sqlite3GenerateIndexKey(pParse,pIdx,1,3,false);
+																													r1=pParse.sqlite3GenerateIndexKey(pIdx,1,3,false);
 																													jmp2=v.sqlite3VdbeAddOp4Int(OP_Found,j+2,0,r1,pIdx.nColumn+1);
 																													addr=v.sqlite3VdbeAddOpList(ArraySize(idxErr),idxErr);
 																													v.sqlite3VdbeChangeP4(addr+1,"rowid ",SQLITE_STATIC);
