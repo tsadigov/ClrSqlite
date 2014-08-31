@@ -58,15 +58,6 @@ return ( p == null || p.expired ) ? 1 : 0;
 		/// an error and return true if it has been finalized (or is otherwise
 		/// invalid).  Return false if it is ok.
 		///</summary>
-		static bool vdbeSafetyNotNull(Vdbe p) {
-			if(p==null) {
-				sqlite3_log(SQLITE_MISUSE,"API called with NULL prepared statement");
-				return true;
-			}
-			else {
-				return p.vdbeSafety();
-			}
-		}
 		///<summary>
 		/// The following routine destroys a virtual machine that is created by
 		/// the sqlite3_compile() routine. The integer returned is an SQLITE_
@@ -401,7 +392,7 @@ return SQLITE_MISUSE_BKPT();
 			/* Result from sqlite3Reprepare() */Vdbe v=(Vdbe)pStmt;
 			/* the prepared statement */int cnt=0;
 			/* Counter to prevent infinite loop of reprepares */sqlite3 db;
-			/* The database connection */if(vdbeSafetyNotNull(v)) {
+			/* The database connection */if(v.vdbeSafetyNotNull()) {
 				return SQLITE_MISUSE_BKPT();
 			}
 			db=v.db;
@@ -898,7 +889,7 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
 		///</summary>
 		public static int vdbeUnbind(Vdbe p,int i) {
 			Mem pVar;
-			if(vdbeSafetyNotNull(p)) {
+			if(p.vdbeSafetyNotNull()) {
 				return SQLITE_MISUSE_BKPT();
 			}
 			sqlite3_mutex_enter(p.db.mutex);

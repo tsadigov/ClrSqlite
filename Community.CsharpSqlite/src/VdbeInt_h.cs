@@ -1292,6 +1292,15 @@ pOp.cnt = 0;
 					return false;
 				}
 			}
+			public bool vdbeSafetyNotNull() {
+				if(this==null) {
+					sqlite3_log(SQLITE_MISUSE,"API called with NULL prepared statement");
+					return true;
+				}
+				else {
+					return this.vdbeSafety();
+				}
+			}
 		}
 		/*
     ** The following are allowed values for Vdbe.magic
