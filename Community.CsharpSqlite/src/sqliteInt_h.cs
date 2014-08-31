@@ -8870,7 +8870,7 @@ return;
 			public void bestOrClauseIndex(/* The parsing context */WhereClause pWC,/* The WHERE clause */SrcList_item pSrc,/* The FROM clause term to search */Bitmask notReady,/* Mask of cursors not available for indexing */Bitmask notValid,/* Cursors not available for any purpose */ExprList pOrderBy,/* The ORDER BY clause */WhereCost pCost/* Lowest cost query plan */) {
 				#if !SQLITE_OMIT_OR_OPTIMIZATION
 				int iCur=pSrc.iCursor;
-				/* The cursor of the table to be accessed */Bitmask maskSrc=getMask(pWC.pMaskSet,iCur);
+				/* The cursor of the table to be accessed */Bitmask maskSrc=pWC.pMaskSet.getMask(iCur);
 				/* Bitmask for pSrc */WhereTerm pWCEnd=pWC.a[pWC.nTerm];
 				/* End of pWC.a[] */WhereTerm pTerm;
 				/* A single term of the WHERE clause *//* No OR-clause optimization allowed if the INDEXED BY or NOT INDEXED clauses
@@ -9797,7 +9797,7 @@ range_est_fallback:
 						int nSkipEq=nEq;
 						/* Number of == constraints to skip */int nSkipRange=nBound;
 						/* Number of < constraints to skip */Bitmask thisTab;
-						/* Bitmap for pSrc */thisTab=getMask(pWC.pMaskSet,iCur);
+						/* Bitmap for pSrc */thisTab=pWC.pMaskSet.getMask(iCur);
 						for(int ipTerm=0,k=pWC.nTerm;nRow>2&&k!=0;k--,ipTerm++)//pTerm++)
 						 {
 							pTerm=pWC.a[ipTerm];
@@ -10201,7 +10201,7 @@ range_est_fallback:
       ** WHERE_ONETABLE_ONLY flag is set.
       */Debug.Assert(pWC.vmask==0&&pMaskSet.n==0);
 				for(i=0;i<pTabList.nSrc;i++) {
-					createMask(pMaskSet,pTabList.a[i].iCursor);
+					pMaskSet.createMask(pTabList.a[i].iCursor);
 					#if !SQLITE_OMIT_VIRTUALTABLE
 					if(ALWAYS(pTabList.a[i].pTab)&&IsVirtual(pTabList.a[i].pTab)) {
 						pWC.vmask|=((Bitmask)1<<i);
@@ -10319,7 +10319,7 @@ range_est_fallback:
 							/* ORDER BY clause for index to optimize */doNotReorder=(pTabItem.jointype&(JT_LEFT|JT_CROSS))!=0?1:0;
 							if((j!=iFrom&&doNotReorder!=0))
 								break;
-							m=getMask(pMaskSet,pTabItem.iCursor);
+							m=pMaskSet.getMask(pTabItem.iCursor);
 							if((m&notReady)==0) {
 								if(j==iFrom)
 									iFrom++;
@@ -10383,7 +10383,7 @@ range_est_fallback:
 						}
 					}
 					Debug.Assert(bestJ>=0);
-					Debug.Assert((notReady&getMask(pMaskSet,pTabList.a[bestJ].iCursor))!=0);
+					Debug.Assert((notReady&pMaskSet.getMask(pTabList.a[bestJ].iCursor))!=0);
 					#if (SQLITE_TEST) && (SQLITE_DEBUG)
 																																																																																					        WHERETRACE( "*** Optimizer selects table %d for loop %d" +
         " with cost=%g and nRow=%g\n",
@@ -10403,7 +10403,7 @@ range_est_fallback:
 					else {
 						pLevel.iIdxCur=-1;
 					}
-					notReady&=~getMask(pMaskSet,pTabList.a[bestJ].iCursor);
+					notReady&=~pMaskSet.getMask(pTabList.a[bestJ].iCursor);
 					pLevel.iFrom=(u8)bestJ;
 					if(bestPlan.plan.nRow>=(double)1) {
 						this.nQueryLoop*=bestPlan.plan.nRow;
@@ -10507,7 +10507,7 @@ range_est_fallback:
 #endif
 						}
 					sqlite3CodeVerifySchema(this,iDb);
-					notReady&=~getMask(pWC.pMaskSet,pTabItem.iCursor);
+					notReady&=~pWC.pMaskSet.getMask(pTabItem.iCursor);
 				}
 				pWInfo.iTop=v.sqlite3VdbeCurrentAddr();
 				//if( db.mallocFailed ) goto whereBeginError;

@@ -383,6 +383,60 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				wms.n=this.n;
 				wms.ix=(int[])this.ix.Clone();
 			}
+			public Bitmask getMask(int iCursor) {
+				int i;
+				Debug.Assert(this.n<=(int)sizeof(Bitmask)*8);
+				for(i=0;i<this.n;i++) {
+					if(this.ix[i]==iCursor) {
+						return ((Bitmask)1)<<i;
+					}
+				}
+				return 0;
+			}
+			public void createMask(int iCursor) {
+				Debug.Assert(this.n<ArraySize(this.ix));
+				this.ix[this.n++]=iCursor;
+			}
+			public Bitmask exprTableUsage(Expr p) {
+				Bitmask mask=0;
+				if(p==null)
+					return 0;
+				if(p.op==TK_COLUMN) {
+					mask=this.getMask(p.iTable);
+					return mask;
+				}
+				mask=this.exprTableUsage(p.pRight);
+				mask|=this.exprTableUsage(p.pLeft);
+				if(ExprHasProperty(p,EP_xIsSelect)) {
+					mask|=this.exprSelectTableUsage(p.x.pSelect);
+				}
+				else {
+					mask|=this.exprListTableUsage(p.x.pList);
+				}
+				return mask;
+			}
+			public Bitmask exprListTableUsage(ExprList pList) {
+				int i;
+				Bitmask mask=0;
+				if(pList!=null) {
+					for(i=0;i<pList.nExpr;i++) {
+						mask|=this.exprTableUsage(pList.a[i].pExpr);
+					}
+				}
+				return mask;
+			}
+			public Bitmask exprSelectTableUsage(Select pS) {
+				Bitmask mask=0;
+				while(pS!=null) {
+					mask|=this.exprListTableUsage(pS.pEList);
+					mask|=this.exprListTableUsage(pS.pGroupBy);
+					mask|=this.exprListTableUsage(pS.pOrderBy);
+					mask|=this.exprTableUsage(pS.pWhere);
+					mask|=this.exprTableUsage(pS.pHaving);
+					pS=pS.pPrior;
+				}
+				return mask;
+			}
 		}
 		/*
     ** A WhereCost object records a lookup strategy and the estimated
@@ -531,16 +585,6 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/// iCursor is not in the set.
 		///
 		///</summary>
-		static Bitmask getMask(WhereMaskSet pMaskSet,int iCursor) {
-			int i;
-			Debug.Assert(pMaskSet.n<=(int)sizeof(Bitmask)*8);
-			for(i=0;i<pMaskSet.n;i++) {
-				if(pMaskSet.ix[i]==iCursor) {
-					return ((Bitmask)1)<<i;
-				}
-			}
-			return 0;
-		}
 		/*
     ** Create a new mask for cursor iCursor.
     **
@@ -548,11 +592,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
     ** tables in the FROM clause is limited by a test early in the
     ** sqlite3WhereBegin() routine.  So we know that the pMaskSet.ix[]
     ** array will never overflow.
-    */static void createMask(WhereMaskSet pMaskSet,int iCursor) {
-			Debug.Assert(pMaskSet.n<ArraySize(pMaskSet.ix));
-			pMaskSet.ix[pMaskSet.n++]=iCursor;
-		}
-		///<summary>
+    *////<summary>
 		/// This routine walks (recursively) an expression tree and generates
 		/// a bitmask indicating which tables are used in that expression
 		/// tree.
@@ -569,46 +609,6 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///</summary>
 		//static Bitmask exprListTableUsage(WhereMaskSet*, ExprList);
 		//static Bitmask exprSelectTableUsage(WhereMaskSet*, Select);
-		static Bitmask exprTableUsage(WhereMaskSet pMaskSet,Expr p) {
-			Bitmask mask=0;
-			if(p==null)
-				return 0;
-			if(p.op==TK_COLUMN) {
-				mask=getMask(pMaskSet,p.iTable);
-				return mask;
-			}
-			mask=exprTableUsage(pMaskSet,p.pRight);
-			mask|=exprTableUsage(pMaskSet,p.pLeft);
-			if(ExprHasProperty(p,EP_xIsSelect)) {
-				mask|=exprSelectTableUsage(pMaskSet,p.x.pSelect);
-			}
-			else {
-				mask|=exprListTableUsage(pMaskSet,p.x.pList);
-			}
-			return mask;
-		}
-		static Bitmask exprListTableUsage(WhereMaskSet pMaskSet,ExprList pList) {
-			int i;
-			Bitmask mask=0;
-			if(pList!=null) {
-				for(i=0;i<pList.nExpr;i++) {
-					mask|=exprTableUsage(pMaskSet,pList.a[i].pExpr);
-				}
-			}
-			return mask;
-		}
-		static Bitmask exprSelectTableUsage(WhereMaskSet pMaskSet,Select pS) {
-			Bitmask mask=0;
-			while(pS!=null) {
-				mask|=exprListTableUsage(pMaskSet,pS.pEList);
-				mask|=exprListTableUsage(pMaskSet,pS.pGroupBy);
-				mask|=exprListTableUsage(pMaskSet,pS.pOrderBy);
-				mask|=exprTableUsage(pMaskSet,pS.pWhere);
-				mask|=exprTableUsage(pMaskSet,pS.pHaving);
-				pS=pS.pPrior;
-			}
-			return mask;
-		}
 		/*
     ** Return TRUE if the given operator is one of the operators that is
     ** allowed for an indexable WHERE clause term.  The allowed operators are
@@ -877,7 +877,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 								pAndTerm=pAndWC.a[j];
 								Debug.Assert(pAndTerm.pExpr!=null);
 								if(allowedOp(pAndTerm.pExpr.op)) {
-									b|=getMask(pMaskSet,pAndTerm.leftCursor);
+									b|=pMaskSet.getMask(pAndTerm.leftCursor);
 								}
 							}
 						}
@@ -890,10 +890,10 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
           ** corresponding TERM_VIRTUAL term */}
 					else {
 						Bitmask b;
-						b=getMask(pMaskSet,pOrTerm.leftCursor);
+						b=pMaskSet.getMask(pOrTerm.leftCursor);
 						if((pOrTerm.wtFlags&TERM_VIRTUAL)!=0) {
 							WhereTerm pOther=pOrWc.a[pOrTerm.iParent];
-							b|=getMask(pMaskSet,pOther.leftCursor);
+							b|=pMaskSet.getMask(pOther.leftCursor);
 						}
 						indexable&=b;
 						if(pOrTerm.eOperator!=WO_EQ) {
@@ -951,7 +951,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
               ** current term is from the first iteration.  So skip this term. */Debug.Assert(j==1);
 							continue;
 						}
-						if((chngToIN&getMask(pMaskSet,pOrTerm.leftCursor))==0) {
+						if((chngToIN&pMaskSet.getMask(pOrTerm.leftCursor))==0) {
 							/* This term must be of the form t1.a==t2.b where t2 is in the
               ** chngToIN set but t1 is not.  This term will be either preceeded
               ** or follwed by an inverted copy (t2.b==t1.a).  Skip this term
@@ -968,7 +968,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 						/* No candidate table+column was found.  This can only occur
             ** on the second iteration */Debug.Assert(j==1);
 						Debug.Assert((chngToIN&(chngToIN-1))==0);
-						Debug.Assert(chngToIN==getMask(pMaskSet,iCursor));
+						Debug.Assert(chngToIN==pMaskSet.getMask(iCursor));
 						break;
 					}
 					testcase(j==1);
@@ -1084,15 +1084,15 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			pTerm=pWC.a[idxTerm];
 			pMaskSet=pWC.pMaskSet;
 			pExpr=pTerm.pExpr;
-			prereqLeft=exprTableUsage(pMaskSet,pExpr.pLeft);
+			prereqLeft=pMaskSet.exprTableUsage(pExpr.pLeft);
 			op=pExpr.op;
 			if(op==TK_IN) {
 				Debug.Assert(pExpr.pRight==null);
 				if(ExprHasProperty(pExpr,EP_xIsSelect)) {
-					pTerm.prereqRight=exprSelectTableUsage(pMaskSet,pExpr.x.pSelect);
+					pTerm.prereqRight=pMaskSet.exprSelectTableUsage(pExpr.x.pSelect);
 				}
 				else {
-					pTerm.prereqRight=exprListTableUsage(pMaskSet,pExpr.x.pList);
+					pTerm.prereqRight=pMaskSet.exprListTableUsage(pExpr.x.pList);
 				}
 			}
 			else
@@ -1100,11 +1100,11 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 					pTerm.prereqRight=0;
 				}
 				else {
-					pTerm.prereqRight=exprTableUsage(pMaskSet,pExpr.pRight);
+					pTerm.prereqRight=pMaskSet.exprTableUsage(pExpr.pRight);
 				}
-			prereqAll=exprTableUsage(pMaskSet,pExpr);
+			prereqAll=pMaskSet.exprTableUsage(pExpr);
 			if(ExprHasProperty(pExpr,EP_FromJoin)) {
-				Bitmask x=getMask(pMaskSet,pExpr.iRightJoinTable);
+				Bitmask x=pMaskSet.getMask(pExpr.iRightJoinTable);
 				prereqAll|=x;
 				extraRight=x-1;
 				/* ON clause terms may not be used with an index
@@ -1271,8 +1271,8 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				Bitmask prereqColumn,prereqExpr;
 				pRight=pExpr.x.pList.a[0].pExpr;
 				pLeft=pExpr.x.pList.a[1].pExpr;
-				prereqExpr=exprTableUsage(pMaskSet,pRight);
-				prereqColumn=exprTableUsage(pMaskSet,pLeft);
+				prereqExpr=pMaskSet.exprTableUsage(pRight);
+				prereqColumn=pMaskSet.exprTableUsage(pLeft);
 				if((prereqExpr&prereqColumn)==0) {
 					Expr pNewExpr;
 					pNewExpr=pParse.sqlite3PExpr(TK_MATCH,null,sqlite3ExprDup(db,pRight,0),null);
@@ -1343,9 +1343,9 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///
 		///</summary>
 		static bool referencesOtherTables(ExprList pList,/* Search expressions in ths list */WhereMaskSet pMaskSet,/* Mapping from tables to bitmaps */int iFirst,/* Be searching with the iFirst-th expression */int iBase/* Ignore references to this table */) {
-			Bitmask allowed=~getMask(pMaskSet,iBase);
+			Bitmask allowed=~pMaskSet.getMask(iBase);
 			while(iFirst<pList.nExpr) {
-				if((exprTableUsage(pMaskSet,pList.a[iFirst++].pExpr)&allowed)!=0) {
+				if((pMaskSet.exprTableUsage(pList.a[iFirst++].pExpr)&allowed)!=0) {
 					return true;
 				}
 			}
@@ -2792,7 +2792,7 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 								pLevel.p2=1+v.sqlite3VdbeAddOp2(aStart[bRev],iCur,addrBrk);
 								pLevel.p5=SQLITE_STMTSTATUS_FULLSCAN_STEP;
 							}
-			notReady&=~getMask(pWC.pMaskSet,iCur);
+			notReady&=~pWC.pMaskSet.getMask(iCur);
 			/* Insert code to test every subexpression that can be completely
       ** computed using the current set of tables.
       **
