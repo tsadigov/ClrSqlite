@@ -187,7 +187,7 @@ namespace Community.CsharpSqlite {
 			public double r;
 			/* Real value */public struct union_ip {
 				#if DEBUG_CLASS_MEM || DEBUG_CLASS_ALL
-																																																																																public i64 _i;              /* First operand */
+																																																																																				public i64 _i;              /* First operand */
 public i64 i
 {
 get { return _i; }
@@ -207,7 +207,7 @@ set { _i = value; }
 			/* BLOB value */public int n;
 			/* Number of characters in string value, excluding '\0' */
 			#if DEBUG_CLASS_MEM || DEBUG_CLASS_ALL
-																																																												public u16 _flags;              /* First operand */
+																																																															public u16 _flags;              /* First operand */
 public u16 flags
 {
 get { return _flags; }
@@ -221,7 +221,7 @@ set { _flags = value; }
 			/* One of SQLITE_NULL, SQLITE_TEXT, SQLITE_INTEGER, etc */public SqliteEncoding enc;
 			/* SqliteEncoding.UTF8, SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE */
 			#if SQLITE_DEBUG
-																																																												      public Mem pScopyFrom;        /* This Mem is a shallow copy of pScopyFrom */
+																																																															      public Mem pScopyFrom;        /* This Mem is a shallow copy of pScopyFrom */
       public object pFiller;        /* So that sizeof(Mem) is a multiple of 8 */
 #endif
 			public dxDel xDel;
@@ -239,7 +239,7 @@ set { _flags = value; }
 			}
 			public Mem(sqlite3 db,string z,double r,int i,int n,u16 flags,u8 type,SqliteEncoding enc
 			#if SQLITE_DEBUG
-																																																												         , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
+																																																															         , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
 #endif
 			) {
 				this.db=db;
@@ -249,7 +249,7 @@ set { _flags = value; }
 				this.n=n;
 				this.flags=flags;
 				#if SQLITE_DEBUG
-																																																																																        this.pScopyFrom = pScopyFrom;
+																																																																																				        this.pScopyFrom = pScopyFrom;
         this.pFiller = pFiller;
 #endif
 				this.type=type;
@@ -280,7 +280,7 @@ set { _flags = value; }
 			///
 			///</summary>
 			#if SQLITE_DEBUG
-																																																				    //define memIsValid(M)  ((M)->flags & MEM_Invalid)==0
+																																																							    //define memIsValid(M)  ((M)->flags & MEM_Invalid)==0
     static bool memIsValid( Mem M )
     {
       return ( ( M ).flags & MEM_Invalid ) == 0;
@@ -350,7 +350,7 @@ set { _flags = value; }
 		const int MEM_Ephem=0x1000;
 		const int MEM_Agg=0x2000;
 		#if !SQLITE_OMIT_INCRBLOB
-																																								const int MEM_Zero = 0x4000;  
+																																										const int MEM_Zero = 0x4000;  
 #else
 		const int MEM_Zero=0x0000;
 		#endif
@@ -558,7 +558,7 @@ set { _flags = value; }
 			/* Text of the SQL statement that generated this */public object pFree;
 			/* Free this when deleting the vdbe */
 			#if SQLITE_DEBUG
-																																																												      public FILE trace;             /* Write an execution trace here, if not NULL */
+																																																															      public FILE trace;             /* Write an execution trace here, if not NULL */
 #endif
 			public VdbeFrame pFrame;
 			/* Parent frame */public VdbeFrame pDelFrame;
@@ -621,7 +621,7 @@ set { _flags = value; }
 				ct.zSql=zSql;
 				ct.pFree=pFree;
 				#if SQLITE_DEBUG
-																																																																																        ct.trace = trace;
+																																																																																				        ct.trace = trace;
 #endif
 				ct.nFkConstraint=nFkConstraint;
 				ct.nStmtDefCons=nStmtDefCons;
@@ -631,11 +631,11 @@ set { _flags = value; }
 				ct.expmask=expmask;
 				ct.pProgram=pProgram;
 				#if SQLITE_SSE
-																																																																																ct.fetchId=fetchId;
+																																																																																				ct.fetchId=fetchId;
 ct.lru=lru;
 #endif
 				#if SQLITE_ENABLE_MEMORY_MANAGEMENT
-																																																																																ct.pLruPrev=pLruPrev;
+																																																																																				ct.pLruPrev=pLruPrev;
 ct.pLruNext=pLruNext;
 #endif
 			}
@@ -670,7 +670,7 @@ ct.pLruNext=pLruNext;
 			//int sqlite3VdbeMemSetStr(Mem*, const char*, int, u8, void()(void));
 			//void sqlite3VdbeMemSetInt64(Mem*, i64);
 			#if SQLITE_OMIT_FLOATING_POINT
-																																																				// define sqlite3VdbeMemSetDouble sqlite3VdbeMemSetInt64
+																																																							// define sqlite3VdbeMemSetDouble sqlite3VdbeMemSetInt64
 #else
 			//void sqlite3VdbeMemSetDouble(Mem*, double);
 			#endif
@@ -696,7 +696,7 @@ ct.pLruNext=pLruNext;
 			//int sqlite3VdbeFrameRestore(VdbeFrame );
 			//void sqlite3VdbeMemStoreType(Mem *pMem);  
 			#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
-																																																				  //void sqlite3VdbeEnter(Vdbe);
+																																																							  //void sqlite3VdbeEnter(Vdbe);
   //void sqlite3VdbeLeave(Vdbe);
 #else
 			//# define sqlite3VdbeEnter(X)
@@ -727,12 +727,12 @@ ct.pLruNext=pLruNext;
 				pOp.p4.p=null;
 				pOp.p4type=P4_NOTUSED;
 				#if SQLITE_DEBUG
-																																																																	      pOp.zComment = null;
+																																																																					      pOp.zComment = null;
       if ( sqlite3VdbeAddopTrace )
         sqlite3VdbePrintOp( null, i, p.aOp[i] );
 #endif
 				#if VDBE_PROFILE
-																																																																	pOp.cycles = 0;
+																																																																					pOp.cycles = 0;
 pOp.cnt = 0;
 #endif
 				return i;
@@ -965,7 +965,7 @@ pOp.cnt = 0;
 						pOut.p4.p=null;
 						pOut.p5=0;
 						#if SQLITE_DEBUG
-																																																																																																											          pOut.zComment = null;
+																																																																																																																	          pOut.zComment = null;
           if ( sqlite3VdbeAddopTrace )
           {
             sqlite3VdbePrintOp( null, i + addr, p.aOp[i + addr] );
@@ -1183,7 +1183,7 @@ pOp.cnt = 0;
       ** zeros, which is correct.  MSVC generates a warning, nevertheless. */Debug.Assert(this.magic==VDBE_MAGIC_INIT);
 				if(addr<0) {
 					#if SQLITE_OMIT_TRACE
-																																																																																						if( p.nOp==0 ) return dummy;
+																																																																																											if( p.nOp==0 ) return dummy;
 #endif
 					addr=this.nOp-1;
 				}
@@ -1257,7 +1257,7 @@ pOp.cnt = 0;
 					SqliteEncoding enc=ENC(sqlite3VdbeDb(this));
 					Column pCol=pTab.aCol[i];
 					#if SQLITE_DEBUG
-																																																																																	        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
+																																																																																						        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
 #endif
 					Debug.Assert(i<pTab.nCol);
 					sqlite3ValueFromExpr(sqlite3VdbeDb(this),pCol.pDflt,enc,pCol.affinity,ref pValue);
@@ -1283,6 +1283,15 @@ pOp.cnt = 0;
 					this.sqlite3ColumnDefault(pTab,iCol,regOut);
 				}
 			}
+			public bool vdbeSafety() {
+				if(this.db==null) {
+					sqlite3_log(SQLITE_MISUSE,"API called with finalized prepared statement");
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
 		}
 		/*
     ** The following are allowed values for Vdbe.magic
@@ -1297,12 +1306,12 @@ pOp.cnt = 0;
 	/* The VDBE has been deallocated *///# define sqlite3VdbeLeave(X)
 	#endif
 	#if SQLITE_DEBUG
-																												    //void sqlite3VdbeMemPrepareToChange(Vdbe*,Mem);
+																													    //void sqlite3VdbeMemPrepareToChange(Vdbe*,Mem);
 #endif
 	#if !SQLITE_OMIT_FOREIGN_KEY
 	//int sqlite3VdbeCheckFk(Vdbe *, int);
 	#else
-																												// define sqlite3VdbeCheckFk(p,i) 0
+																													// define sqlite3VdbeCheckFk(p,i) 0
 static int sqlite3VdbeCheckFk( Vdbe p, int i ) { return 0; }
 #endif
 	//int sqlite3VdbeMemTranslate(Mem*, u8);
@@ -1312,7 +1321,7 @@ static int sqlite3VdbeCheckFk( Vdbe p, int i ) { return 0; }
 	//#endif
 	//int sqlite3VdbeMemHandleBom(Mem pMem);
 	#if !SQLITE_OMIT_INCRBLOB
-																												//  int sqlite3VdbeMemExpandBlob(Mem );
+																													//  int sqlite3VdbeMemExpandBlob(Mem );
 #else
 	//  #define sqlite3VdbeMemExpandBlob(x) SQLITE_OK
 	#endif
