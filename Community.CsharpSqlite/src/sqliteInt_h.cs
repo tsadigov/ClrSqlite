@@ -2926,8 +2926,517 @@ set { _op = value; }
 					return cp;
 				}
 			}
-		};
+			public void exprAnalyzeAll(/* the FROM clause */WhereClause pWC/* the WHERE clause to be analyzed */) {
+				int i;
+				for(i=pWC.nTerm-1;i>=0;i--) {
+					this.exprAnalyze(pWC,i);
+				}
+			}
+			public void exprAnalyzeOrTerm(/* the FROM clause */WhereClause pWC,/* the complete WHERE clause */int idxTerm/* Index of the OR-term to be analyzed */) {
+				Parse pParse=pWC.pParse;
+				/* Parser context */sqlite3 db=pParse.db;
+				/* Data_base connection */WhereTerm pTerm=pWC.a[idxTerm];
+				/* The term to be analyzed */Expr pExpr=pTerm.pExpr;
+				/* The expression of the term */WhereMaskSet pMaskSet=pWC.pMaskSet;
+				/* Table use masks */int i;
+				/* Loop counters */WhereClause pOrWc;
+				/* Breakup of pTerm into subterms */WhereTerm pOrTerm;
+				/* A Sub-term within the pOrWc */WhereOrInfo pOrInfo;
+				/* Additional information Debug.Associated with pTerm */Bitmask chngToIN;
+				/* Tables that might satisfy case 1 */Bitmask indexable;
+				/* Tables that are indexable, satisfying case 2 *//*
+      ** Break the OR clause into its separate subterms.  The subterms are
+      ** stored in a WhereClause structure containing within the WhereOrInfo
+      ** object that is attached to the original OR clause term.
+      */Debug.Assert((pTerm.wtFlags&(TERM_DYNAMIC|TERM_ORINFO|TERM_ANDINFO))==0);
+				Debug.Assert(pExpr.op==TK_OR);
+				pTerm.u.pOrInfo=pOrInfo=new WhereOrInfo();
+				//sqlite3DbMallocZero(db, sizeof(*pOrInfo));
+				if(pOrInfo==null)
+					return;
+				pTerm.wtFlags|=TERM_ORINFO;
+				pOrWc=pOrInfo.wc;
+				pOrWc.whereClauseInit(pWC.pParse,pMaskSet);
+				pOrWc.whereSplit(pExpr,TK_OR);
+				this.exprAnalyzeAll(pOrWc);
+				//      if ( db.mallocFailed != 0 ) return;
+				Debug.Assert(pOrWc.nTerm>=2);
+				/*
+      ** Compute the set of tables that might satisfy cases 1 or 2.
+      */indexable=~(Bitmask)0;
+				chngToIN=~(pWC.vmask);
+				for(i=pOrWc.nTerm-1;i>=0&&indexable!=0;i--)//, pOrTerm++ )
+				 {
+					pOrTerm=pOrWc.a[i];
+					if((pOrTerm.eOperator&WO_SINGLE)==0) {
+						WhereAndInfo pAndInfo;
+						Debug.Assert(pOrTerm.eOperator==0);
+						Debug.Assert((pOrTerm.wtFlags&(TERM_ANDINFO|TERM_ORINFO))==0);
+						chngToIN=0;
+						pAndInfo=new WhereAndInfo();
+						//sqlite3DbMallocRaw(db, sizeof(*pAndInfo));
+						if(pAndInfo!=null) {
+							WhereClause pAndWC;
+							WhereTerm pAndTerm;
+							int j;
+							Bitmask b=0;
+							pOrTerm.u.pAndInfo=pAndInfo;
+							pOrTerm.wtFlags|=TERM_ANDINFO;
+							pOrTerm.eOperator=WO_AND;
+							pAndWC=pAndInfo.wc;
+							pAndWC.whereClauseInit(pWC.pParse,pMaskSet);
+							pAndWC.whereSplit(pOrTerm.pExpr,TK_AND);
+							this.exprAnalyzeAll(pAndWC);
+							//testcase( db.mallocFailed );
+							////if ( 0 == db.mallocFailed )
+							{
+								for(j=0;j<pAndWC.nTerm;j++)//, pAndTerm++ )
+								 {
+									pAndTerm=pAndWC.a[j];
+									Debug.Assert(pAndTerm.pExpr!=null);
+									if(allowedOp(pAndTerm.pExpr.op)) {
+										b|=pMaskSet.getMask(pAndTerm.leftCursor);
+									}
+								}
+							}
+							indexable&=b;
+						}
+					}
+					else
+						if((pOrTerm.wtFlags&TERM_COPIED)!=0) {
+							/* Skip this term for now.  We revisit it when we process the
+          ** corresponding TERM_VIRTUAL term */}
+						else {
+							Bitmask b;
+							b=pMaskSet.getMask(pOrTerm.leftCursor);
+							if((pOrTerm.wtFlags&TERM_VIRTUAL)!=0) {
+								WhereTerm pOther=pOrWc.a[pOrTerm.iParent];
+								b|=pMaskSet.getMask(pOther.leftCursor);
+							}
+							indexable&=b;
+							if(pOrTerm.eOperator!=WO_EQ) {
+								chngToIN=0;
+							}
+							else {
+								chngToIN&=b;
+							}
+						}
+				}
+				/*
+      ** Record the set of tables that satisfy case 2.  The set might be
+      ** empty.
+      */pOrInfo.indexable=indexable;
+				pTerm.eOperator=(u16)(indexable==0?0:WO_OR);
+				/*
+      ** chngToIN holds a set of tables that *might* satisfy case 1.  But
+      ** we have to do some additional checking to see if case 1 really
+      ** is satisfied.
+      **
+      ** chngToIN will hold either 0, 1, or 2 bits.  The 0-bit case means
+      ** that there is no possibility of transforming the OR clause into an
+      ** IN operator because one or more terms in the OR clause contain
+      ** something other than == on a column in the single table.  The 1-bit
+      ** case means that every term of the OR clause is of the form
+      ** "table.column=expr" for some single table.  The one bit that is set
+      ** will correspond to the common table.  We still need to check to make
+      ** sure the same column is used on all terms.  The 2-bit case is when
+      ** the all terms are of the form "table1.column=table2.column".  It
+      ** might be possible to form an IN operator with either table1.column
+      ** or table2.column as the LHS if either is common to every term of
+      ** the OR clause.
+      **
+      ** Note that terms of the form "table.column1=table.column2" (the
+      ** same table on both sizes of the ==) cannot be optimized.
+      */if(chngToIN!=0) {
+					int okToChngToIN=0;
+					/* True if the conversion to IN is valid */int iColumn=-1;
+					/* Column index on lhs of IN operator */int iCursor=-1;
+					/* Table cursor common to all terms */int j=0;
+					/* Loop counter *//* Search for a table and column that appears on one side or the
+        ** other of the == operator in every subterm.  That table and column
+        ** will be recorded in iCursor and iColumn.  There might not be any
+        ** such table and column.  Set okToChngToIN if an appropriate table
+        ** and column is found but leave okToChngToIN false if not found.
+        */for(j=0;j<2&&0==okToChngToIN;j++) {
+						//pOrTerm = pOrWc.a;
+						for(i=pOrWc.nTerm-1;i>=0;i--)//, pOrTerm++)
+						 {
+							pOrTerm=pOrWc.a[pOrWc.nTerm-1-i];
+							Debug.Assert(pOrTerm.eOperator==WO_EQ);
+							pOrTerm.wtFlags=(u8)(pOrTerm.wtFlags&~TERM_OR_OK);
+							if(pOrTerm.leftCursor==iCursor) {
+								/* This is the 2-bit case and we are on the second iteration and
+              ** current term is from the first iteration.  So skip this term. */Debug.Assert(j==1);
+								continue;
+							}
+							if((chngToIN&pMaskSet.getMask(pOrTerm.leftCursor))==0) {
+								/* This term must be of the form t1.a==t2.b where t2 is in the
+              ** chngToIN set but t1 is not.  This term will be either preceeded
+              ** or follwed by an inverted copy (t2.b==t1.a).  Skip this term
+              ** and use its inversion. */testcase(pOrTerm.wtFlags&TERM_COPIED);
+								testcase(pOrTerm.wtFlags&TERM_VIRTUAL);
+								Debug.Assert((pOrTerm.wtFlags&(TERM_COPIED|TERM_VIRTUAL))!=0);
+								continue;
+							}
+							iColumn=pOrTerm.u.leftColumn;
+							iCursor=pOrTerm.leftCursor;
+							break;
+						}
+						if(i<0) {
+							/* No candidate table+column was found.  This can only occur
+            ** on the second iteration */Debug.Assert(j==1);
+							Debug.Assert((chngToIN&(chngToIN-1))==0);
+							Debug.Assert(chngToIN==pMaskSet.getMask(iCursor));
+							break;
+						}
+						testcase(j==1);
+						/* We have found a candidate table and column.  Check to see if that
+          ** table and column is common to every term in the OR clause */okToChngToIN=1;
+						for(;i>=0&&okToChngToIN!=0;i--)//, pOrTerm++)
+						 {
+							pOrTerm=pOrWc.a[pOrWc.nTerm-1-i];
+							Debug.Assert(pOrTerm.eOperator==WO_EQ);
+							if(pOrTerm.leftCursor!=iCursor) {
+								pOrTerm.wtFlags=(u8)(pOrTerm.wtFlags&~TERM_OR_OK);
+							}
+							else
+								if(pOrTerm.u.leftColumn!=iColumn) {
+									okToChngToIN=0;
+								}
+								else {
+									int affLeft,affRight;
+									/* If the right-hand side is also a column, then the affinities
+              ** of both right and left sides must be such that no type
+              ** conversions are required on the right.  (Ticket #2249)
+              */affRight=pOrTerm.pExpr.pRight.sqlite3ExprAffinity();
+									affLeft=pOrTerm.pExpr.pLeft.sqlite3ExprAffinity();
+									if(affRight!=0&&affRight!=affLeft) {
+										okToChngToIN=0;
+									}
+									else {
+										pOrTerm.wtFlags|=TERM_OR_OK;
+									}
+								}
+						}
+					}
+					/* At this point, okToChngToIN is true if original pTerm satisfies
+        ** case 1.  In that case, construct a new virtual term that is
+        ** pTerm converted into an IN operator.
+        **
+        ** EV: R-00211-15100
+        */if(okToChngToIN!=0) {
+						Expr pDup;
+						/* A transient duplicate expression */ExprList pList=null;
+						/* The RHS of the IN operator */Expr pLeft=null;
+						/* The LHS of the IN operator */Expr pNew;
+						/* The complete IN operator */for(i=pOrWc.nTerm-1;i>=0;i--)//, pOrTerm++)
+						 {
+							pOrTerm=pOrWc.a[pOrWc.nTerm-1-i];
+							if((pOrTerm.wtFlags&TERM_OR_OK)==0)
+								continue;
+							Debug.Assert(pOrTerm.eOperator==WO_EQ);
+							Debug.Assert(pOrTerm.leftCursor==iCursor);
+							Debug.Assert(pOrTerm.u.leftColumn==iColumn);
+							pDup=sqlite3ExprDup(db,pOrTerm.pExpr.pRight,0);
+							pList=pWC.pParse.sqlite3ExprListAppend(pList,pDup);
+							pLeft=pOrTerm.pExpr.pLeft;
+						}
+						Debug.Assert(pLeft!=null);
+						pDup=sqlite3ExprDup(db,pLeft,0);
+						pNew=pParse.sqlite3PExpr(TK_IN,pDup,null,null);
+						if(pNew!=null) {
+							int idxNew;
+							pNew.transferJoinMarkings(pExpr);
+							Debug.Assert(!ExprHasProperty(pNew,EP_xIsSelect));
+							pNew.x.pList=pList;
+							idxNew=pWC.whereClauseInsert(pNew,TERM_VIRTUAL|TERM_DYNAMIC);
+							testcase(idxNew==0);
+							this.exprAnalyze(pWC,idxNew);
+							pTerm=pWC.a[idxTerm];
+							pWC.a[idxNew].iParent=idxTerm;
+							pTerm.nChild=1;
+						}
+						else {
+							sqlite3ExprListDelete(db,ref pList);
+						}
+						pTerm.eOperator=WO_NOOP;
+						/* case 1 trumps case 2 */}
+				}
+			}
+			public void exprAnalyze(/* the FROM clause */WhereClause pWC,/* the WHERE clause */int idxTerm/* Index of the term to be analyzed */) {
+				WhereTerm pTerm;
+				/* The term to be analyzed */WhereMaskSet pMaskSet;
+				/* Set of table index masks */Expr pExpr;
+				/* The expression to be analyzed */Bitmask prereqLeft;
+				/* Prerequesites of the pExpr.pLeft */Bitmask prereqAll;
+				/* Prerequesites of pExpr */Bitmask extraRight=0;
+				/* Extra dependencies on LEFT JOIN */Expr pStr1=null;
+				/* RHS of LIKE/GLOB operator */bool isComplete=false;
+				/* RHS of LIKE/GLOB ends with wildcard */bool noCase=false;
+				/* LIKE/GLOB distinguishes case */int op;
+				/* Top-level operator.  pExpr.op */Parse pParse=pWC.pParse;
+				/* Parsing context */sqlite3 db=pParse.db;
+				/* Data_base connection *///if ( db.mallocFailed != 0 )
+				//{
+				//  return;
+				//}
+				pTerm=pWC.a[idxTerm];
+				pMaskSet=pWC.pMaskSet;
+				pExpr=pTerm.pExpr;
+				prereqLeft=pMaskSet.exprTableUsage(pExpr.pLeft);
+				op=pExpr.op;
+				if(op==TK_IN) {
+					Debug.Assert(pExpr.pRight==null);
+					if(ExprHasProperty(pExpr,EP_xIsSelect)) {
+						pTerm.prereqRight=pMaskSet.exprSelectTableUsage(pExpr.x.pSelect);
+					}
+					else {
+						pTerm.prereqRight=pMaskSet.exprListTableUsage(pExpr.x.pList);
+					}
+				}
+				else
+					if(op==TK_ISNULL) {
+						pTerm.prereqRight=0;
+					}
+					else {
+						pTerm.prereqRight=pMaskSet.exprTableUsage(pExpr.pRight);
+					}
+				prereqAll=pMaskSet.exprTableUsage(pExpr);
+				if(ExprHasProperty(pExpr,EP_FromJoin)) {
+					Bitmask x=pMaskSet.getMask(pExpr.iRightJoinTable);
+					prereqAll|=x;
+					extraRight=x-1;
+					/* ON clause terms may not be used with an index
+** on left table of a LEFT JOIN.  Ticket #3015 */}
+				pTerm.prereqAll=prereqAll;
+				pTerm.leftCursor=-1;
+				pTerm.iParent=-1;
+				pTerm.eOperator=0;
+				if(allowedOp(op)&&(pTerm.prereqRight&prereqLeft)==0) {
+					Expr pLeft=pExpr.pLeft;
+					Expr pRight=pExpr.pRight;
+					if(pLeft.op==TK_COLUMN) {
+						pTerm.leftCursor=pLeft.iTable;
+						pTerm.u.leftColumn=pLeft.iColumn;
+						pTerm.eOperator=operatorMask(op);
+					}
+					if(pRight!=null&&pRight.op==TK_COLUMN) {
+						WhereTerm pNew;
+						Expr pDup;
+						if(pTerm.leftCursor>=0) {
+							int idxNew;
+							pDup=sqlite3ExprDup(db,pExpr,0);
+							//if ( db.mallocFailed != 0 )
+							//{
+							//  sqlite3ExprDelete( db, ref pDup );
+							//  return;
+							//}
+							idxNew=pWC.whereClauseInsert(pDup,TERM_VIRTUAL|TERM_DYNAMIC);
+							if(idxNew==0)
+								return;
+							pNew=pWC.a[idxNew];
+							pNew.iParent=idxTerm;
+							pTerm=pWC.a[idxTerm];
+							pTerm.nChild=1;
+							pTerm.wtFlags|=TERM_COPIED;
+						}
+						else {
+							pDup=pExpr;
+							pNew=pTerm;
+						}
+						pParse.exprCommute(pDup);
+						pLeft=pDup.pLeft;
+						pNew.leftCursor=pLeft.iTable;
+						pNew.u.leftColumn=pLeft.iColumn;
+						testcase((prereqLeft|extraRight)!=prereqLeft);
+						pNew.prereqRight=prereqLeft|extraRight;
+						pNew.prereqAll=prereqAll;
+						pNew.eOperator=operatorMask(pDup.op);
+					}
+				}
+				#if !SQLITE_OMIT_BETWEEN_OPTIMIZATION
+				/* If a term is the BETWEEN operator, create two new virtual terms
+** that define the range that the BETWEEN implements.  For example:
+**
+**      a BETWEEN b AND c
+**
+** is converted into:
+**
+**      (a BETWEEN b AND c) AND (a>=b) AND (a<=c)
+**
+** The two new terms are added onto the end of the WhereClause object.
+** The new terms are "dynamic" and are children of the original BETWEEN
+** term.  That means that if the BETWEEN term is coded, the children are
+** skipped.  Or, if the children are satisfied by an index, the original
+** BETWEEN term is skipped.
+*/else
+					if(pExpr.op==TK_BETWEEN&&pWC.op==TK_AND) {
+						ExprList pList=pExpr.x.pList;
+						int i;
+						u8[] ops=new u8[] {
+							TK_GE,
+							TK_LE
+						};
+						Debug.Assert(pList!=null);
+						Debug.Assert(pList.nExpr==2);
+						for(i=0;i<2;i++) {
+							Expr pNewExpr;
+							int idxNew;
+							pNewExpr=pParse.sqlite3PExpr(ops[i],sqlite3ExprDup(db,pExpr.pLeft,0),sqlite3ExprDup(db,pList.a[i].pExpr,0),null);
+							idxNew=pWC.whereClauseInsert(pNewExpr,TERM_VIRTUAL|TERM_DYNAMIC);
+							testcase(idxNew==0);
+							this.exprAnalyze(pWC,idxNew);
+							pTerm=pWC.a[idxTerm];
+							pWC.a[idxNew].iParent=idxTerm;
+						}
+						pTerm.nChild=2;
+					}
+					#endif
+					#if !(SQLITE_OMIT_OR_OPTIMIZATION) && !(SQLITE_OMIT_SUBQUERY)
+					/* Analyze a term that is composed of two or more subterms connected by
+** an OR operator.
+*/else
+						if(pExpr.op==TK_OR) {
+							Debug.Assert(pWC.op==TK_AND);
+							this.exprAnalyzeOrTerm(pWC,idxTerm);
+							pTerm=pWC.a[idxTerm];
+						}
+				#endif
+				#if !SQLITE_OMIT_LIKE_OPTIMIZATION
+				/* Add constraints to reduce the search space on a LIKE or GLOB
+** operator.
+**
+** A like pattern of the form "x LIKE 'abc%'" is changed into constraints
+**
+**          x>='abc' AND x<'abd' AND x LIKE 'abc%'
+**
+** The last character of the prefix "abc" is incremented to form the
+** termination condition "abd".
+*/if(pWC.op==TK_AND&&pParse.isLikeOrGlob(pExpr,ref pStr1,ref isComplete,ref noCase)!=0) {
+					Expr pLeft;
+					/* LHS of LIKE/GLOB operator */Expr pStr2;
+					/* Copy of pStr1 - RHS of LIKE/GLOB operator */Expr pNewExpr1;
+					Expr pNewExpr2;
+					int idxNew1;
+					int idxNew2;
+					CollSeq pColl;
+					/* Collating sequence to use */pLeft=pExpr.x.pList.a[1].pExpr;
+					pStr2=sqlite3ExprDup(db,pStr1,0);
+					////if ( 0 == db.mallocFailed )
+					{
+						int c,pC;
+						/* Last character before the first wildcard */pC=pStr2.u.zToken[StringExtensions.sqlite3Strlen30(pStr2.u.zToken)-1];
+						c=pC;
+						if(noCase) {
+							/* The point is to increment the last character before the first
+            ** wildcard.  But if we increment '@', that will push it into the
+            ** alphabetic range where case conversions will mess up the
+            ** inequality.  To avoid this, make sure to also run the full
+            ** LIKE on all candidate expressions by clearing the isComplete flag
+            */if(c=='A'-1)
+								isComplete=false;
+							/* EV: R-64339-08207 */c=sqlite3UpperToLower[c];
+						}
+						pStr2.u.zToken=pStr2.u.zToken.Substring(0,StringExtensions.sqlite3Strlen30(pStr2.u.zToken)-1)+(char)(c+1);
+						// pC = c + 1;
+					}
+					pColl=sqlite3FindCollSeq(db,SqliteEncoding.UTF8,noCase?"NOCASE":"BINARY",0);
+					pNewExpr1=pParse.sqlite3PExpr(TK_GE,sqlite3ExprDup(db,pLeft,0).sqlite3ExprSetColl(pColl),pStr1,0);
+					idxNew1=pWC.whereClauseInsert(pNewExpr1,TERM_VIRTUAL|TERM_DYNAMIC);
+					testcase(idxNew1==0);
+					this.exprAnalyze(pWC,idxNew1);
+					pNewExpr2=pParse.sqlite3PExpr(TK_LT,sqlite3ExprDup(db,pLeft,0).sqlite3ExprSetColl(pColl),pStr2,null);
+					idxNew2=pWC.whereClauseInsert(pNewExpr2,TERM_VIRTUAL|TERM_DYNAMIC);
+					testcase(idxNew2==0);
+					this.exprAnalyze(pWC,idxNew2);
+					pTerm=pWC.a[idxTerm];
+					if(isComplete) {
+						pWC.a[idxNew1].iParent=idxTerm;
+						pWC.a[idxNew2].iParent=idxTerm;
+						pTerm.nChild=2;
+					}
+				}
+				#endif
+				#if !SQLITE_OMIT_VIRTUALTABLE
+				/* Add a WO_MATCH auxiliary term to the constraint set if the
+** current expression is of the form:  column MATCH expr.
+** This information is used by the xBestIndex methods of
+** virtual tables.  The native query optimizer does not attempt
+** to do anything with MATCH functions.
+*/if(pExpr.isMatchOfColumn()!=0) {
+					int idxNew;
+					Expr pRight,pLeft;
+					WhereTerm pNewTerm;
+					Bitmask prereqColumn,prereqExpr;
+					pRight=pExpr.x.pList.a[0].pExpr;
+					pLeft=pExpr.x.pList.a[1].pExpr;
+					prereqExpr=pMaskSet.exprTableUsage(pRight);
+					prereqColumn=pMaskSet.exprTableUsage(pLeft);
+					if((prereqExpr&prereqColumn)==0) {
+						Expr pNewExpr;
+						pNewExpr=pParse.sqlite3PExpr(TK_MATCH,null,sqlite3ExprDup(db,pRight,0),null);
+						idxNew=pWC.whereClauseInsert(pNewExpr,TERM_VIRTUAL|TERM_DYNAMIC);
+						testcase(idxNew==0);
+						pNewTerm=pWC.a[idxNew];
+						pNewTerm.prereqRight=prereqExpr;
+						pNewTerm.leftCursor=pLeft.iTable;
+						pNewTerm.u.leftColumn=pLeft.iColumn;
+						pNewTerm.eOperator=WO_MATCH;
+						pNewTerm.iParent=idxTerm;
+						pTerm=pWC.a[idxTerm];
+						pTerm.nChild=1;
+						pTerm.wtFlags|=TERM_COPIED;
+						pNewTerm.prereqAll=pTerm.prereqAll;
+					}
+				}
+				#endif
+				#if SQLITE_ENABLE_STAT2
+																																																																      /* When sqlite_stat2 histogram data is available an operator of the
+  ** form "x IS NOT NULL" can sometimes be evaluated more efficiently
+  ** as "x>NULL" if x is not an INTEGER PRIMARY KEY.  So construct a
+  ** virtual term of that form.
+  **
+  ** Note that the virtual term must be tagged with TERM_VNULL.  This
+  ** TERM_VNULL tag will suppress the not-null check at the beginning
+  ** of the loop.  Without the TERM_VNULL flag, the not-null check at
+  ** the start of the loop will prevent any results from being returned.
+  */
+      if ( pExpr.op == TK_NOTNULL
+       && pExpr.pLeft.op == TK_COLUMN
+       && pExpr.pLeft.iColumn >= 0
+      )
+      {
+        Expr pNewExpr;
+        Expr pLeft = pExpr.pLeft;
+        int idxNew;
+        WhereTerm pNewTerm;
 
+        pNewExpr = sqlite3PExpr( pParse, TK_GT,
+                                sqlite3ExprDup( db, pLeft, 0 ),
+                                sqlite3PExpr( pParse, TK_NULL, 0, 0, 0 ), 0 );
+
+        idxNew = whereClauseInsert( pWC, pNewExpr,
+                                  TERM_VIRTUAL | TERM_DYNAMIC | TERM_VNULL );
+        if ( idxNew != 0 )
+        {
+          pNewTerm = pWC.a[idxNew];
+          pNewTerm.prereqRight = 0;
+          pNewTerm.leftCursor = pLeft.iTable;
+          pNewTerm.u.leftColumn = pLeft.iColumn;
+          pNewTerm.eOperator = WO_GT;
+          pNewTerm.iParent = idxTerm;
+          pTerm = pWC.a[idxTerm];
+          pTerm.nChild = 1;
+          pTerm.wtFlags |= TERM_COPIED;
+          pNewTerm.prereqAll = pTerm.prereqAll;
+        }
+      }
+#endif
+				/* Prevent ON clause terms of a LEFT JOIN from being used to drive
+** an index for tables to the left of the join.
+*/pTerm.prereqRight|=extraRight;
+			}
+		}
 		///<summary>
 		/// Permitted values of the SrcList.a.jointype field
 		///
@@ -3034,8 +3543,18 @@ set { _op = value; }
       ** a convenient place since there is one WhereLevel for each FROM clause
       ** element.
       */public sqlite3_index_info pIdxInfo;
-		/* Index info for n-th source table */};
-
+			/* Index info for n-th source table */public void disableTerm(WhereTerm pTerm) {
+				if(pTerm!=null&&(pTerm.wtFlags&TERM_CODED)==0&&(this.iLeftJoin==0||ExprHasProperty(pTerm.pExpr,EP_FromJoin))) {
+					pTerm.wtFlags|=TERM_CODED;
+					if(pTerm.iParent>=0) {
+						WhereTerm pOther=pTerm.pWC.a[pTerm.iParent];
+						if((--pOther.nChild)==0) {
+							this.disableTerm(pOther);
+						}
+					}
+				}
+			}
+		}
 		///<summary>
 		/// Flags appropriate for the wctrlFlags parameter of sqlite3WhereBegin()
 		/// and the WhereInfo.wctrlFlags member.
@@ -3275,7 +3794,7 @@ set { _op = value; }
 					for(j=0;j<nConstraint;j++) {
 						if(aUsage[j].omit!=false) {
 							int iTerm=aConstraint[j].iTermOffset;
-							disableTerm(pLevel,pWC.a[iTerm]);
+							pLevel.disableTerm(pWC.a[iTerm]);
 						}
 					}
 					pLevel.op=OP_VNext;
@@ -3348,7 +3867,7 @@ set { _op = value; }
 #endif
 								pParse.sqlite3ExprCacheAffinityChange(r1,1);
 								pParse.sqlite3ReleaseTempReg(rTemp);
-								disableTerm(pLevel,pStart);
+								pLevel.disableTerm(pStart);
 							}
 							else {
 								v.sqlite3VdbeAddOp2(bRev!=0?OP_Last:OP_Rewind,iCur,addrBrk);
@@ -3367,7 +3886,7 @@ set { _op = value; }
 								else {
 									testOp=bRev!=0?OP_Lt:OP_Gt;
 								}
-								disableTerm(pLevel,pEnd);
+								pLevel.disableTerm(pEnd);
 							}
 							start=v.sqlite3VdbeCurrentAddr();
 							pLevel.op=(u8)(bRev!=0?OP_Prev:OP_Next);
@@ -3578,8 +4097,8 @@ set { _op = value; }
 									v.sqlite3VdbeAddOp2(OP_IsNull,r1,addrCont);
 								}
 								pParse.sqlite3ReleaseTempReg(r1);
-								/* Seek the table cursor, if required */disableTerm(pLevel,pRangeStart);
-								disableTerm(pLevel,pRangeEnd);
+								/* Seek the table cursor, if required */pLevel.disableTerm(pRangeStart);
+								pLevel.disableTerm(pRangeEnd);
 								if(0==omitTable) {
 									iRowidReg=iReleaseReg=pParse.sqlite3GetTempReg();
 									v.sqlite3VdbeAddOp2(OP_IdxRowid,iIdxCur,iRowidReg);
@@ -3730,7 +4249,7 @@ set { _op = value; }
 										sqlite3DbFree(pParse.db,ref pOrTab);
 									//sqlite3DbFree(pParse.db, pOrTab)
 									if(0==untestedTerms)
-										disableTerm(pLevel,pTerm);
+										pLevel.disableTerm(pTerm);
 								}
 								else
 								#endif
@@ -9733,7 +10252,7 @@ return;
 				for(int ipTerm=0;ipTerm<pWC.nTerm;ipTerm++)//; pTerm<pWCEnd; pTerm++)
 				 {
 					pTerm=pWC.a[ipTerm];
-					if(termCanDriveIndex(pTerm,pSrc,notReady)!=0) {
+					if(pTerm.termCanDriveIndex(pSrc,notReady)!=0) {
 						#if (SQLITE_TEST) && (SQLITE_DEBUG)
 																																																																																																										          WHERETRACE( "auto-index reduces cost from %.2f to %.2f\n",
           pCost.rCost, costTempIdx );
@@ -9779,7 +10298,7 @@ return;
 				for(int ipTerm=0;ipTerm<pWC.nTerm;ipTerm++)//; pTerm<pWCEnd; pTerm++)
 				 {
 					pTerm=pWC.a[ipTerm];
-					if(termCanDriveIndex(pTerm,pSrc,notReady)!=0) {
+					if(pTerm.termCanDriveIndex(pSrc,notReady)!=0) {
 						int iCol=pTerm.u.leftColumn;
 						Bitmask cMask=iCol>=BMS?((Bitmask)1)<<(BMS-1):((Bitmask)1)<<iCol;
 						testcase(iCol==BMS);
@@ -9833,7 +10352,7 @@ return;
 				//for(pTerm=pWC.a; pTerm<pWCEnd; pTerm++){
 				for(int ipTerm=0;ipTerm<pWC.nTerm;ipTerm++) {
 					pTerm=pWC.a[ipTerm];
-					if(termCanDriveIndex(pTerm,pSrc,notReady)!=0) {
+					if(pTerm.termCanDriveIndex(pSrc,notReady)!=0) {
 						int iCol=pTerm.u.leftColumn;
 						Bitmask cMask=iCol>=BMS?((Bitmask)1)<<(BMS-1):((Bitmask)1)<<iCol;
 						if((idxCols&cMask)==0) {
@@ -10415,7 +10934,7 @@ range_est_fallback:
         ** naturally scan rows in the required order, set the appropriate flags
         ** in wsFlags. Otherwise, if there is an ORDER BY clause but the index
         ** will scan rows in a different order, set the bSort variable.  */if(pOrderBy!=null) {
-						if((wsFlags&WHERE_COLUMN_IN)==0&&pProbe.bUnordered==0&&isSortingIndex(this,pWC.pMaskSet,pProbe,iCur,pOrderBy,nEq,wsFlags,ref rev)) {
+						if((wsFlags&WHERE_COLUMN_IN)==0&&pProbe.bUnordered==0&&this.isSortingIndex(pWC.pMaskSet,pProbe,iCur,pOrderBy,nEq,wsFlags,ref rev)) {
 							wsFlags|=WHERE_ROWID_RANGE|WHERE_COLUMN_RANGE|WHERE_ORDERBY;
 							wsFlags|=(rev!=0?WHERE_REVERSE:0);
 						}
@@ -10734,7 +11253,7 @@ range_est_fallback:
 						}
 						#endif
 					}
-				disableTerm(pLevel,pTerm);
+				pLevel.disableTerm(pTerm);
 				return iReg;
 			}
 			public int codeAllEqualityTerms(/* Parsing context */WhereLevel pLevel,/* Which nested loop of the FROM we are coding */WhereClause pWC,/* The WHERE clause */Bitmask notReady,/* Which parts of FROM have not yet been coded */int nExtraReg,/* Number of extra registers to allocate */out StringBuilder pzAff/* OUT: Set to point to affinity string */) {
@@ -10978,7 +11497,7 @@ range_est_fallback:
 ** add new virtual terms onto the end of the WHERE clause.  We do not
 ** want to analyze these virtual terms, so start analyzing at the end
 ** and work forward so that the added virtual terms are never processed.
-*/exprAnalyzeAll(pTabList,pWC);
+*/pTabList.exprAnalyzeAll(pWC);
 				//if ( db.mallocFailed != 0 )
 				//{
 				//  goto whereBeginError;
@@ -11357,6 +11876,110 @@ range_est_fallback:
 				}
 				return null;
 			}
+			public bool isSortingIndex(/* Parsing context */WhereMaskSet pMaskSet,/* Mapping from table cursor numbers to bitmaps */Index pIdx,/* The index we are testing */int _base,/* Cursor number for the table to be sorted */ExprList pOrderBy,/* The ORDER BY clause */int nEqCol,/* Number of index columns with == constraints */int wsFlags,/* Index usages flags */ref int pbRev/* Set to 1 if ORDER BY is DESC */) {
+				int i,j;
+				/* Loop counters */int sortOrder=0;
+				/* XOR of index and ORDER BY sort direction */int nTerm;
+				/* Number of ORDER BY terms */ExprList_item pTerm;
+				/* A term of the ORDER BY clause */sqlite3 db=this.db;
+				Debug.Assert(pOrderBy!=null);
+				nTerm=pOrderBy.nExpr;
+				Debug.Assert(nTerm>0);
+				/* Argument pIdx must either point to a 'real' named index structure, 
+      ** or an index structure allocated on the stack by bestBtreeIndex() to
+      ** represent the rowid index that is part of every table.  */Debug.Assert(!String.IsNullOrEmpty(pIdx.zName)||(pIdx.nColumn==1&&pIdx.aiColumn[0]==-1));
+				/* Match terms of the ORDER BY clause against columns of
+      ** the index.
+      **
+      ** Note that indices have pIdx.nColumn regular columns plus
+      ** one additional column containing the rowid.  The rowid column
+      ** of the index is also allowed to match against the ORDER BY
+      ** clause.
+      */for(i=j=0;j<nTerm&&i<=pIdx.nColumn;i++) {
+					pTerm=pOrderBy.a[j];
+					Expr pExpr;
+					/* The expression of the ORDER BY pTerm */CollSeq pColl;
+					/* The collating sequence of pExpr */int termSortOrder;
+					/* Sort order for this term */int iColumn;
+					/* The i-th column of the index.  -1 for rowid */int iSortOrder;
+					/* 1 for DESC, 0 for ASC on the i-th index term */string zColl;
+					/* Name of the collating sequence for i-th index term */pExpr=pTerm.pExpr;
+					if(pExpr.op!=TK_COLUMN||pExpr.iTable!=_base) {
+						/* Can not use an index sort on anything that is not a column in the
+          ** left-most table of the FROM clause */break;
+					}
+					pColl=this.sqlite3ExprCollSeq(pExpr);
+					if(null==pColl) {
+						pColl=db.pDfltColl;
+					}
+					if(!String.IsNullOrEmpty(pIdx.zName)&&i<pIdx.nColumn) {
+						iColumn=pIdx.aiColumn[i];
+						if(iColumn==pIdx.pTable.iPKey) {
+							iColumn=-1;
+						}
+						iSortOrder=pIdx.aSortOrder[i];
+						zColl=pIdx.azColl[i];
+					}
+					else {
+						iColumn=-1;
+						iSortOrder=0;
+						zColl=pColl.zName;
+					}
+					if(pExpr.iColumn!=iColumn||!pColl.zName.Equals(zColl,StringComparison.InvariantCultureIgnoreCase)) {
+						/* Term j of the ORDER BY clause does not match column i of the index */if(i<nEqCol) {
+							/* If an index column that is constrained by == fails to match an
+            ** ORDER BY term, that is OK.  Just ignore that column of the index
+            */continue;
+						}
+						else
+							if(i==pIdx.nColumn) {
+								/* Index column i is the rowid.  All other terms match. */break;
+							}
+							else {
+								/* If an index column fails to match and is not constrained by ==
+            ** then the index cannot satisfy the ORDER BY constraint.
+            */return false;
+							}
+					}
+					Debug.Assert(pIdx.aSortOrder!=null||iColumn==-1);
+					Debug.Assert(pTerm.sortOrder==0||pTerm.sortOrder==1);
+					Debug.Assert(iSortOrder==0||iSortOrder==1);
+					termSortOrder=iSortOrder^pTerm.sortOrder;
+					if(i>nEqCol) {
+						if(termSortOrder!=sortOrder) {
+							/* Indices can only be used if all ORDER BY terms past the
+            ** equality constraints are all either DESC or ASC. */return false;
+						}
+					}
+					else {
+						sortOrder=termSortOrder;
+					}
+					j++;
+					//pTerm++;
+					if(iColumn<0&&!pOrderBy.referencesOtherTables(pMaskSet,j,_base)) {
+						/* If the indexed column is the primary key and everything matches
+          ** so far and none of the ORDER BY terms to the right reference other
+          ** tables in the join, then we are Debug.Assured that the index can be used
+          ** to sort because the primary key is unique and so none of the other
+          ** columns will make any difference
+          */j=nTerm;
+					}
+				}
+				pbRev=sortOrder!=0?1:0;
+				if(j>=nTerm) {
+					/* All terms of the ORDER BY clause are covered by this index so
+        ** this index can be used for sorting. */return true;
+				}
+				if(pIdx.onError!=OE_None&&i==pIdx.nColumn&&(wsFlags&WHERE_COLUMN_NULL)==0&&!pOrderBy.referencesOtherTables(pMaskSet,j,_base)) {
+					/* All terms of this index match some prefix of the ORDER BY clause
+        ** and the index is UNIQUE and no terms on the tail of the ORDER BY
+        ** clause reference other tables in a join.  If this is all true then
+        ** the order by clause is superfluous.  Not that if the matching
+        ** condition is IS NULL then the result is not necessarily unique
+        ** even on a UNIQUE index, so disallow those cases. */return true;
+				}
+				return false;
+			}
 		}
 		#if SQLITE_OMIT_VIRTUALTABLE
 																																														//define IN_DECLARE_VTAB 0
@@ -11699,8 +12322,14 @@ the <column-list> is stored here */public Schema pSchema;
 					return mxAlloc>0&&zText.Length>mxAlloc;
 				}
 			}
-		};
-
+			public void explainAppendTerm(/* The text expression being built */int iTerm,/* Index of this term.  First is zero */string zColumn,/* Name of the column */string zOp/* Name of the operator */) {
+				if(iTerm!=0)
+					sqlite3StrAccumAppend(this," AND ",5);
+				sqlite3StrAccumAppend(this,zColumn,-1);
+				sqlite3StrAccumAppend(this,zOp,1);
+				sqlite3StrAccumAppend(this,"?",1);
+			}
+		}
 		///<summary>
 		/// A pointer to this structure is used to communicate information
 		/// from sqlite3Init and OP_ParseSchema into the sqlite3InitCallback.
