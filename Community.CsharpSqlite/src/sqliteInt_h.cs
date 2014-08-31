@@ -2644,6 +2644,27 @@ set { _op = value; }
 				}
 				this.nHeight=nHeight+1;
 			}
+			public int isMatchOfColumn(/* Test this expression */) {
+				ExprList pList;
+				if(this.op!=TK_FUNCTION) {
+					return 0;
+				}
+				if(!this.u.zToken.Equals("match",StringComparison.InvariantCultureIgnoreCase)) {
+					return 0;
+				}
+				pList=this.x.pList;
+				if(pList.nExpr!=2) {
+					return 0;
+				}
+				if(pList.a[1].pExpr.op!=TK_COLUMN) {
+					return 0;
+				}
+				return 1;
+			}
+			public void transferJoinMarkings(Expr pBase) {
+				this.flags=(u16)(this.flags|pBase.flags&EP_FromJoin);
+				this.iRightJoinTable=pBase.iRightJoinTable;
+			}
 		}
 		/*
     ** The following are the meanings of bits in the Expr.flags field.
@@ -2773,6 +2794,15 @@ set { _op = value; }
 					a.CopyTo(cp.a,0);
 					return cp;
 				}
+			}
+			public bool referencesOtherTables(/* Search expressions in ths list */WhereMaskSet pMaskSet,/* Mapping from tables to bitmaps */int iFirst,/* Be searching with the iFirst-th expression */int iBase/* Ignore references to this table */) {
+				Bitmask allowed=~pMaskSet.getMask(iBase);
+				while(iFirst<this.nExpr) {
+					if((pMaskSet.exprTableUsage(this.a[iFirst++].pExpr)&allowed)!=0) {
+						return true;
+					}
+				}
+				return false;
 			}
 		}
 		///<summary>

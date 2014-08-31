@@ -711,32 +711,11 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///
 		/// If it is then return TRUE.  If not, return FALSE.
 		///</summary>
-		static int isMatchOfColumn(Expr pExpr/* Test this expression */) {
-			ExprList pList;
-			if(pExpr.op!=TK_FUNCTION) {
-				return 0;
-			}
-			if(!pExpr.u.zToken.Equals("match",StringComparison.InvariantCultureIgnoreCase)) {
-				return 0;
-			}
-			pList=pExpr.x.pList;
-			if(pList.nExpr!=2) {
-				return 0;
-			}
-			if(pList.a[1].pExpr.op!=TK_COLUMN) {
-				return 0;
-			}
-			return 1;
-		}
 		#endif
 		///<summary>
 		/// If the pBase expression originated in the ON or USING clause of
 		/// a join, then transfer the appropriate markings over to derived.
 		///</summary>
-		static void transferJoinMarkings(Expr pDerived,Expr pBase) {
-			pDerived.flags=(u16)(pDerived.flags|pBase.flags&EP_FromJoin);
-			pDerived.iRightJoinTable=pBase.iRightJoinTable;
-		}
 		#if !(SQLITE_OMIT_OR_OPTIMIZATION) && !(SQLITE_OMIT_SUBQUERY)
 		///<summary>
 		/// Analyze a term that consists of two or more OR-connected
@@ -1028,7 +1007,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 					pNew=pParse.sqlite3PExpr(TK_IN,pDup,null,null);
 					if(pNew!=null) {
 						int idxNew;
-						transferJoinMarkings(pNew,pExpr);
+						pNew.transferJoinMarkings(pExpr);
 						Debug.Assert(!ExprHasProperty(pNew,EP_xIsSelect));
 						pNew.x.pList=pList;
 						idxNew=pWC.whereClauseInsert(pNew,TERM_VIRTUAL|TERM_DYNAMIC);
@@ -1264,7 +1243,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 ** This information is used by the xBestIndex methods of
 ** virtual tables.  The native query optimizer does not attempt
 ** to do anything with MATCH functions.
-*/if(isMatchOfColumn(pExpr)!=0) {
+*/if(pExpr.isMatchOfColumn()!=0) {
 				int idxNew;
 				Expr pRight,pLeft;
 				WhereTerm pNewTerm;
@@ -1342,15 +1321,6 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/// a reference to any table other than the iBase table.
 		///
 		///</summary>
-		static bool referencesOtherTables(ExprList pList,/* Search expressions in ths list */WhereMaskSet pMaskSet,/* Mapping from tables to bitmaps */int iFirst,/* Be searching with the iFirst-th expression */int iBase/* Ignore references to this table */) {
-			Bitmask allowed=~pMaskSet.getMask(iBase);
-			while(iFirst<pList.nExpr) {
-				if((pMaskSet.exprTableUsage(pList.a[iFirst++].pExpr)&allowed)!=0) {
-					return true;
-				}
-			}
-			return false;
-		}
 		///<summary>
 		/// This routine decides if pIdx can be used to satisfy the ORDER BY
 		/// clause.  If it can, it returns 1.  If pIdx cannot satisfy the
@@ -1451,7 +1421,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				}
 				j++;
 				//pTerm++;
-				if(iColumn<0&&!referencesOtherTables(pOrderBy,pMaskSet,j,_base)) {
+				if(iColumn<0&&!pOrderBy.referencesOtherTables(pMaskSet,j,_base)) {
 					/* If the indexed column is the primary key and everything matches
           ** so far and none of the ORDER BY terms to the right reference other
           ** tables in the join, then we are Debug.Assured that the index can be used
@@ -1465,7 +1435,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				/* All terms of the ORDER BY clause are covered by this index so
         ** this index can be used for sorting. */return true;
 			}
-			if(pIdx.onError!=OE_None&&i==pIdx.nColumn&&(wsFlags&WHERE_COLUMN_NULL)==0&&!referencesOtherTables(pOrderBy,pMaskSet,j,_base)) {
+			if(pIdx.onError!=OE_None&&i==pIdx.nColumn&&(wsFlags&WHERE_COLUMN_NULL)==0&&!pOrderBy.referencesOtherTables(pMaskSet,j,_base)) {
 				/* All terms of this index match some prefix of the ORDER BY clause
         ** and the index is UNIQUE and no terms on the tail of the ORDER BY
         ** clause reference other tables in a join.  If this is all true then
