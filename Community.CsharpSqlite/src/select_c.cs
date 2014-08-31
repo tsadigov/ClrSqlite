@@ -3704,7 +3704,7 @@ break;
         */Debug.Assert(!isDistinct);
 				selectInnerLoop(pParse,p,pEList,0,0,pOrderBy,-1,pDest,pWInfo.iContinue,pWInfo.iBreak);
 				/* End the database scan loop.
-        */sqlite3WhereEnd(pWInfo);
+        */pWInfo.sqlite3WhereEnd();
 			}
 			else {
 				/* This is the processing for aggregate queries */NameContext sNC;
@@ -3854,7 +3854,7 @@ break;
 						v.sqlite3VdbeAddOp2(OP_IdxInsert,sAggInfo.sortingIdx,regRecord);
 						pParse.sqlite3ReleaseTempReg(regRecord);
 						pParse.sqlite3ReleaseTempRange(regBase,nCol);
-						sqlite3WhereEnd(pWInfo);
+						pWInfo.sqlite3WhereEnd();
 						v.sqlite3VdbeAddOp2(OP_Sort,sAggInfo.sortingIdx,addrEnd);
 						#if SQLITE_DEBUG
 																																																																																																																														            VdbeComment( v, "GROUP BY sort" );
@@ -3914,7 +3914,7 @@ break;
 						v.sqlite3VdbeAddOp2(OP_Next,sAggInfo.sortingIdx,addrTopOfLoop);
 					}
 					else {
-						sqlite3WhereEnd(pWInfo);
+						pWInfo.sqlite3WhereEnd();
 						sqlite3VdbeChangeToNoop(v,addrSortingIdx,1);
 					}
 					/* Output the final row of result
@@ -4059,7 +4059,7 @@ break;
               ( flag == WHERE_ORDERBY_MIN ? "min" : "max" ) );
 #endif
 						}
-						sqlite3WhereEnd(pWInfo);
+						pWInfo.sqlite3WhereEnd();
 						finalizeAggFunctions(pParse,sAggInfo);
 					}
 					pOrderBy=null;
