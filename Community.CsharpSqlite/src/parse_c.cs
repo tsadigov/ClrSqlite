@@ -7420,7 +7420,7 @@ return yy_default[stateno];
 				/* The CURRENT_TIME, CURRENT_DATE, and CURRENT_TIMESTAMP values are
             ** treated as functions that return constants */yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(0,yymsp[0].minor.yy0);
 				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.op=TK_CONST_FUNC;
+                    yygotominor.yy118.pExpr.Operator = Operator.TK_CONST_FUNC;
 				}
 				yygotominor.yy118.spanSet(yymsp[0].minor.yy0,yymsp[0].minor.yy0);
 			}

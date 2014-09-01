@@ -198,7 +198,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				wc.pParse=this.pParse;
 				wc.pMaskSet=new WhereMaskSet();
 				this.pMaskSet.CopyTo(wc.pMaskSet);
-				wc.op=this.op;
+				wc.Operator=this.Operator;
 				wc.nTerm=this.nTerm;
 				wc.nSlot=this.nSlot;
 				wc.a=(WhereTerm[])this.a.Clone();
@@ -290,11 +290,11 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				pTerm.iParent=-1;
 				return idx;
 			}
-			public void whereSplit(Expr pExpr,int op) {
-				this.op=(u8)op;
+			public void whereSplit(Expr pExpr,Operator op) {
+				this.Operator=op;
 				if(pExpr==null)
 					return;
-				if(pExpr.op!=op) {
+				if(pExpr.Operator!=op) {
 					this.whereClauseInsert(pExpr,0);
 				}
 				else {
@@ -338,7 +338,9 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				}
 				return null;
 			}
-		}
+
+            public Operator Operator { get { return (Operator)op; } set { op = (u8)value; } }
+        }
 		///<summary>
 		/// A WhereTerm with eOperator==WO_OR has its u.pOrInfo pointer set to
 		/// a dynamically allocated instance of the following structure.

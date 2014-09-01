@@ -144,11 +144,12 @@ namespace Community.CsharpSqlite {
 		/// is allocated to hold the integer text and the dequote flag is ignored.
 		///</summary>
 		static Expr sqlite3ExprAlloc(sqlite3 db,/* Handle for sqlite3DbMallocZero() (may be null) */int op,/* Expression opcode */Token pToken,/* Token argument.  Might be NULL */int dequote/* True to dequote */) {
-			Expr pNew;
+            Operator p_operator = (Operator)op;
+            Expr pNew;
 			int nExtra=0;
 			int iValue=0;
 			if(pToken!=null) {
-				if(op!=TK_INTEGER||pToken.zRestSql==null||pToken.zRestSql.Length==0||Converter.sqlite3GetInt32(pToken.zRestSql.ToString(),ref iValue)==false) {
+				if(p_operator!=Operator.TK_INTEGER||pToken.zRestSql==null||pToken.zRestSql.Length==0||Converter.sqlite3GetInt32(pToken.zRestSql.ToString(),ref iValue)==false) {
 					nExtra=pToken.Length+1;
 					Debug.Assert(iValue>=0);
 				}
@@ -156,7 +157,7 @@ namespace Community.CsharpSqlite {
 			pNew=new Expr();
 			//sqlite3DbMallocZero(db, sizeof(Expr)+nExtra);
 			if(pNew!=null) {
-				pNew.op=(u8)op;
+				pNew.Operator=p_operator;
 				pNew.iAgg=-1;
 				if(pToken!=null) {
 					if(nExtra==0) {
@@ -655,25 +656,28 @@ return null;
 				pWalker.u.i=0;
 				return WRC_Abort;
 			}
-			switch(pExpr.op) {
+			switch(pExpr.Operator) {
 			/* Consider functions to be constant if all their arguments are constant
-        ** and pWalker.u.i==2 */case TK_FUNCTION:
+        ** and pWalker.u.i==2 */
+                case Operator.TK_FUNCTION:
 			if((pWalker.u.i)==2)
 				return 0;
-			goto case TK_ID;
-			/* Fall through */case TK_ID:
-			case TK_COLUMN:
-			case TK_AGG_FUNCTION:
-			case TK_AGG_COLUMN:
-			testcase(pExpr.op==TK_ID);
-			testcase(pExpr.op==TK_COLUMN);
-			testcase(pExpr.op==TK_AGG_FUNCTION);
-			testcase(pExpr.op==TK_AGG_COLUMN);
+            goto case Operator.TK_ID;
+                /* Fall through */
+                case Operator.TK_ID:
+                case Operator.TK_COLUMN:
+                case Operator.TK_AGG_FUNCTION:
+                case Operator.TK_AGG_COLUMN:
+            testcase(pExpr.Operator == Operator.TK_ID);
+            testcase(pExpr.Operator == Operator.TK_COLUMN);
+            testcase(pExpr.Operator == Operator.TK_AGG_FUNCTION);
+            testcase(pExpr.Operator == Operator.TK_AGG_COLUMN);
 			pWalker.u.i=0;
 			return WRC_Abort;
 			default:
-			testcase(pExpr.op==TK_SELECT);
-			/* selectNodeIsConstant will disallow */testcase(pExpr.op==TK_EXISTS);
+            testcase(pExpr.Operator == Operator.TK_SELECT);
+            /* selectNodeIsConstant will disallow */
+            testcase(pExpr.Operator == Operator.TK_EXISTS);
 			/* selectNodeIsConstant will disallow */return WRC_Continue;
 			}
 		}
@@ -707,36 +711,46 @@ return null;
 		///
 		///</summary>
 		static int sqlite3ExprNeedsNoAffinityChange(Expr p,char aff) {
-			u8 op;
+			Operator op;
+
 			if(aff==SQLITE_AFF_NONE)
 				return 1;
-			while(p.op==TK_UPLUS||p.op==TK_UMINUS) {
+            while (p.Operator == Operator.TK_UPLUS || p.Operator == Operator.TK_UMINUS)
+            {
 				p=p.pLeft;
 			}
-			op=p.op;
-			if(op==TK_REGISTER)
-				op=p.op2;
-			switch(op) {
-			case TK_INTEGER: {
-				return (aff==SQLITE_AFF_INTEGER||aff==SQLITE_AFF_NUMERIC)?1:0;
-			}
-			case TK_FLOAT: {
-				return (aff==SQLITE_AFF_REAL||aff==SQLITE_AFF_NUMERIC)?1:0;
-			}
-			case TK_STRING: {
-				return (aff==SQLITE_AFF_TEXT)?1:0;
-			}
-			case TK_BLOB: {
-				return 1;
-			}
-			case TK_COLUMN: {
-				Debug.Assert(p.iTable>=0);
-				/* p cannot be part of a CHECK constraint */return (p.iColumn<0&&(aff==SQLITE_AFF_INTEGER||aff==SQLITE_AFF_NUMERIC))?1:0;
-			}
-			default: {
-				return 0;
-			}
-			}
+			op=p.Operator;
+            if (op == Operator.TK_REGISTER)
+				op=p.Operator2;
+            switch (op)
+            {
+                case Operator.TK_INTEGER:
+                    {
+                        return (aff == SQLITE_AFF_INTEGER || aff == SQLITE_AFF_NUMERIC) ? 1 : 0;
+                    }
+                case Operator.TK_FLOAT:
+                    {
+                        return (aff == SQLITE_AFF_REAL || aff == SQLITE_AFF_NUMERIC) ? 1 : 0;
+                    }
+                case Operator.TK_STRING:
+                    {
+                        return (aff == SQLITE_AFF_TEXT) ? 1 : 0;
+                    }
+                case Operator.TK_BLOB:
+                    {
+                        return 1;
+                    }
+                case Operator.TK_COLUMN:
+                    {
+                        Debug.Assert(p.iTable >= 0);
+                        /* p cannot be part of a CHECK constraint */
+                        return (p.iColumn < 0 && (aff == SQLITE_AFF_INTEGER || aff == SQLITE_AFF_NUMERIC)) ? 1 : 0;
+                    }
+                default:
+                    {
+                        return 0;
+                    }
+            }
 		}
 		/*
     ** Return TRUE if the given string is a row-id column name.
@@ -797,7 +811,8 @@ return null;
 			/* FROM clause not a virtual table */pEList=p.pEList;
 			if(pEList.nExpr!=1)
 				return 0;
-			/* One column in the result set */if(pEList.a[0].pExpr.op!=TK_COLUMN)
+            /* One column in the result set */
+            if (pEList.a[0].pExpr.Operator != Operator.TK_COLUMN)
 				return 0;
 			/* Result is a column */return 1;
 		}
@@ -1090,14 +1105,16 @@ return null;
 		///</summary>
 		static int evalConstExpr(Walker pWalker,ref Expr pExpr) {
 			Parse pParse=pWalker.pParse;
-			switch(pExpr.op) {
-			case TK_IN:
-			case TK_REGISTER: {
+			switch(pExpr.Operator) {
+                case Operator.TK_IN:
+                case Operator.TK_REGISTER:
+                    {
 				return WRC_Prune;
 			}
-			case TK_FUNCTION:
-			case TK_AGG_FUNCTION:
-			case TK_CONST_FUNC: {
+                case Operator.TK_FUNCTION:
+                case Operator.TK_AGG_FUNCTION:
+                case Operator.TK_CONST_FUNC:
+                    {
 				/* The arguments to a function have a fixed destination.
             ** Mark them this way to avoid generated unneeded OP_SCopy
             ** instructions.
@@ -1123,8 +1140,8 @@ return null;
 				r2=pParse.sqlite3ExprCodeTarget(pExpr,r1);
 				if(NEVER(r1!=r2))
 					pParse.sqlite3ReleaseTempReg(r1);
-				pExpr.op2=pExpr.op;
-				pExpr.op=TK_REGISTER;
+				pExpr.Operator2=pExpr.Operator;
+                pExpr.Operator = Operator.TK_REGISTER;
 				pExpr.iTable=r2;
 				return WRC_Prune;
 			}
@@ -1220,7 +1237,7 @@ return null;
 			}
 			if((pA.flags&EP_Distinct)!=(pB.flags&EP_Distinct))
 				return 2;
-			if(pA.op!=pB.op)
+			if(pA.Operator!=pB.Operator)
 				return 2;
 			if(sqlite3ExprCompare(pA.pLeft,pB.pLeft)!=0)
 				return 2;
@@ -1236,7 +1253,7 @@ return null;
 				}
 			}
 			else
-				if(pA.op!=TK_COLUMN&&pA.u.zToken!=null) {
+				if(pA.Operator!=Operator.TK_COLUMN&&pA.u.zToken!=null) {
 					if(ExprHasProperty(pB,EP_IntValue)||NEVER(pB.u.zToken==null))
 						return 2;
 					if(!pA.u.zToken.Equals(pB.u.zToken,StringComparison.InvariantCultureIgnoreCase)) {
@@ -1314,11 +1331,12 @@ return null;
 			Parse pParse=pNC.pParse;
 			SrcList pSrcList=pNC.pSrcList;
 			AggInfo pAggInfo=pNC.pAggInfo;
-			switch(pExpr.op) {
-			case TK_AGG_COLUMN:
-			case TK_COLUMN: {
-				testcase(pExpr.op==TK_AGG_COLUMN);
-				testcase(pExpr.op==TK_COLUMN);
+			switch(pExpr.Operator) {
+                case Operator.TK_AGG_COLUMN:
+                case Operator.TK_COLUMN:
+                    {
+                        testcase(pExpr.Operator == Operator.TK_AGG_COLUMN);
+                        testcase(pExpr.Operator == Operator.TK_COLUMN);
 				/* Check to see if the column is in one of the tables in the FROM
             ** clause of the aggregate query */if(ALWAYS(pSrcList!=null)) {
 					SrcList_item pItem;
@@ -1361,7 +1379,8 @@ return null;
 										//, pTerm++){
 										pTerm=pGB.a[j];
 										Expr pE=pTerm.pExpr;
-										if(pE.op==TK_COLUMN&&pE.iTable==pExpr.iTable&&pE.iColumn==pExpr.iColumn) {
+                                        if (pE.Operator == Operator.TK_COLUMN && pE.iTable == pExpr.iTable && pE.iColumn == pExpr.iColumn)
+                                        {
 											pCol.iSorterColumn=j;
 											break;
 										}
@@ -1377,7 +1396,7 @@ return null;
                   ** pAggInfo.aCol[] entry.
                   */ExprSetIrreducible(pExpr);
 							pExpr.pAggInfo=pAggInfo;
-							pExpr.op=TK_AGG_COLUMN;
+                            pExpr.Operator = Operator.TK_AGG_COLUMN;
 							pExpr.iAgg=(short)k;
 							break;
 						}
@@ -1385,7 +1404,8 @@ return null;
 					/* end loop over pSrcList */}
 				return WRC_Prune;
 			}
-			case TK_AGG_FUNCTION: {
+                case Operator.TK_AGG_FUNCTION:
+                    {
 				/* The pNC.nDepth==0 test causes aggregate functions in subqueries
             ** to be ignored */if(pNC.nDepth==0) {
 					/* Check to see if pExpr is a duplicate of another aggregate

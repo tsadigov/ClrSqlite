@@ -78,7 +78,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(pOrig!=null);
 			Debug.Assert((pOrig.flags&EP_Resolved)!=0);
 			db=pParse.db;
-			if(pOrig.op!=TK_COLUMN&&(zType.Length==0||zType[0]!='G')) {
+			if(pOrig.Operator!=Operator.TK_COLUMN&&(zType.Length==0||zType[0]!='G')) {
 				pDup=sqlite3ExprDup(db,pOrig,0);
 				pDup=pParse.sqlite3PExpr(TK_AS,pDup,null,null);
 				if(pDup==null)
@@ -348,7 +348,7 @@ namespace Community.CsharpSqlite {
       ** Because no reference was made to outer contexts, the pNC.nRef
       ** fields are not changed in any context.
       */if(cnt==0&&zTab==null&&ExprHasProperty(pExpr,EP_DblQuoted)) {
-				pExpr.op=TK_STRING;
+				pExpr.Operator=Operator.TK_STRING;
 				pExpr.pTab=null;
 				return WRC_Prune;
 			}
@@ -390,7 +390,7 @@ namespace Community.CsharpSqlite {
 			pExpr.pLeft=null;
 			sqlite3ExprDelete(db,ref pExpr.pRight);
 			pExpr.pRight=null;
-			pExpr.op=(u8)(isTrigger!=0?TK_TRIGGER:TK_COLUMN);
+            pExpr.Operator = (isTrigger != 0 ? Operator.TK_TRIGGER : Operator.TK_COLUMN);
 			lookupname_end:
 			if(cnt==1) {
 				Debug.Assert(pNC!=null);
@@ -466,7 +466,7 @@ namespace Community.CsharpSqlite {
         }
       }
 #endif
-			switch(pExpr.op) {
+			switch(pExpr.Operator) {
 			#if (SQLITE_ENABLE_UPDATE_DELETE_LIMIT) && !(SQLITE_OMIT_SUBQUERY)
 																																																												/* The special operator TK_ROW means use the rowid for the first
 ** column in the FROM clause.  This is used by the LIMIT and ORDER BY
@@ -486,24 +486,27 @@ break;
 }
 #endif
 			/* A lone identifier is the name of a column.
-*/case TK_ID: {
+*/case Operator.TK_ID: {
 				return lookupName(pParse,null,null,pExpr.u.zToken,pNC,pExpr);
 			}
 			/* A table name and column name:     ID.ID
         ** Or a database, table and column:  ID.ID.ID
-        */case TK_DOT: {
+        */
+  case Operator.TK_DOT:
+      {
 				string zColumn;
 				string zTable;
 				string zDb;
 				Expr pRight;
 				/* if( pSrcList==0 ) break; */pRight=pExpr.pRight;
-				if(pRight.op==TK_ID) {
+                if (pRight.Operator == Operator.TK_ID)
+                {
 					zDb=null;
 					zTable=pExpr.pLeft.u.zToken;
 					zColumn=pRight.u.zToken;
 				}
 				else {
-					Debug.Assert(pRight.op==TK_DOT);
+                    Debug.Assert(pRight.Operator == Operator.TK_DOT);
 					zDb=pExpr.pLeft.u.zToken;
 					zTable=pRight.pLeft.u.zToken;
 					zColumn=pRight.pRight.u.zToken;
@@ -511,8 +514,10 @@ break;
 				return lookupName(pParse,zDb,zTable,zColumn,pNC,pExpr);
 			}
 			/* Resolve function names
-        */case TK_CONST_FUNC:
-			case TK_FUNCTION: {
+        */
+  case Operator.TK_CONST_FUNC:
+  case Operator.TK_FUNCTION:
+      {
 				ExprList pList=pExpr.x.pList;
 				/* The argument list */int n=pList!=null?pList.nExpr:0;
 				/* Number of arguments */bool no_such_func=false;
@@ -524,7 +529,7 @@ break;
 				/* The function name. */FuncDef pDef;
 				/* Information about the function */SqliteEncoding enc=pParse.db.aDbStatic[0].pSchema.enc;
 				// ENC( pParse.db );   /* The database encoding */
-				testcase(pExpr.op==TK_CONST_FUNC);
+                testcase(pExpr.Operator == Operator.TK_CONST_FUNC);
 				Debug.Assert(!ExprHasProperty(pExpr,EP_xIsSelect));
 				zId=pExpr.u.zToken;
 				nId=StringExtensions.sqlite3Strlen30(zId);
@@ -571,7 +576,7 @@ return WRC_Prune;
 							pNC.nErr++;
 						}
 				if(is_agg) {
-					pExpr.op=TK_AGG_FUNCTION;
+                    pExpr.Operator = Operator.TK_AGG_FUNCTION;
 					pNC.hasAgg=1;
 				}
 				if(is_agg)
@@ -584,14 +589,16 @@ return WRC_Prune;
             */return WRC_Prune;
 			}
 			#if !SQLITE_OMIT_SUBQUERY
-			case TK_SELECT:
-			case TK_EXISTS: {
-				testcase(pExpr.op==TK_EXISTS);
-				goto case TK_IN;
+  case Operator.TK_SELECT:
+  case Operator.TK_EXISTS:
+      {
+          testcase(pExpr.Operator == Operator.TK_EXISTS);
+          goto case Operator.TK_IN;
 			}
 			#endif
-			case TK_IN: {
-				testcase(pExpr.op==TK_IN);
+  case Operator.TK_IN:
+      {
+          testcase(pExpr.Operator == Operator.TK_IN);
 				if(ExprHasProperty(pExpr,EP_xIsSelect)) {
 					int nRef=pNC.nRef;
 					#if !SQLITE_OMIT_CHECK
@@ -608,7 +615,8 @@ return WRC_Prune;
 				break;
 			}
 			#if !SQLITE_OMIT_CHECK
-			case TK_VARIABLE: {
+  case Operator.TK_VARIABLE:
+      {
 				if(pNC.isCheck!=0) {
 					sqlite3ErrorMsg(pParse,"parameters prohibited in CHECK constraints");
 				}
@@ -634,7 +642,7 @@ return WRC_Prune;
 		static int resolveAsName(Parse pParse,/* Parsing context for error messages */ExprList pEList,/* List of expressions to scan */Expr pE/* Expression we are trying to match */) {
 			int i;
 			/* Loop counter */UNUSED_PARAMETER(pParse);
-			if(pE.op==TK_ID) {
+			if(pE.Operator==Operator.TK_ID) {
 				string zCol=pE.u.zToken;
 				for(i=0;i<pEList.nExpr;i++) {
 					string zAs=pEList.a[i].zName;
