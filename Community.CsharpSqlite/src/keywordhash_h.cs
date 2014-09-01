@@ -1200,7 +1200,12 @@ namespace Community.CsharpSqlite {
 			TK_INITIALLY,
 			TK_ALL,
 		};
-		static int keywordCode(string z,int iOffset,int n) {
+
+        static Operator keywordCode(string z, int iOffset, int n)
+        {
+            return (Operator)innerKeywordCode(z,iOffset,n);
+        }
+		static int innerKeywordCode(string z,int iOffset,int n) {
 			int h,i;
 			if(n<2)
 				return TK_ID;
@@ -1336,7 +1341,7 @@ namespace Community.CsharpSqlite {
 			return TK_ID;
 		}
 		static int sqlite3KeywordCode(string z,int n) {
-			return keywordCode(z,0,n);
+			return innerKeywordCode(z,0,n);
 		}
 		public const int SQLITE_N_KEYWORD=121;
 	//#define SQLITE_N_KEYWORD 121

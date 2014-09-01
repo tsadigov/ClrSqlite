@@ -438,7 +438,7 @@ namespace Community.CsharpSqlite {
 		/// Return the length of the token that begins at z[iOffset + 0].
 		/// Store the token type in *tokenType before returning.
 		///</summary>
-		static int sqlite3GetToken(string z,int iOffset,ref int tokenType) {
+		static int sqlite3GetToken(string z,int iOffset,ref Operator tokenType) {
 			int i;
 			byte c=0;
 			switch(z[iOffset+0]) {
@@ -454,42 +454,42 @@ namespace Community.CsharpSqlite {
 				testcase(z[iOffset+0]=='\r');
 				for(i=1;z.Length>iOffset+i&&CharExtensions.sqlite3Isspace(z[iOffset+i]);i++) {
 				}
-				tokenType=TK_SPACE;
+                tokenType = Operator.TK_SPACE;
 				return i;
 			}
 			case '-': {
 				if(z.Length>iOffset+1&&z[iOffset+1]=='-') {
 					/* IMP: R-15891-05542 -- syntax diagram for comments */for(i=2;z.Length>iOffset+i&&(c=(byte)z[iOffset+i])!=0&&c!='\n';i++) {
 					}
-					tokenType=TK_SPACE;
+                    tokenType = Operator.TK_SPACE;
 					/* IMP: R-22934-25134 */return i;
 				}
-				tokenType=TK_MINUS;
+                tokenType = Operator.TK_MINUS;
 				return 1;
 			}
 			case '(': {
-				tokenType=TK_LP;
+                tokenType = Operator.TK_LP;
 				return 1;
 			}
 			case ')': {
-				tokenType=TK_RP;
+                tokenType = Operator.TK_RP;
 				return 1;
 			}
 			case ';': {
-				tokenType=TK_SEMI;
+                tokenType = Operator.TK_SEMI;
 				return 1;
 			}
 			case '+': {
-				tokenType=TK_PLUS;
+                tokenType = Operator.TK_PLUS;
 				return 1;
 			}
 			case '*': {
-				tokenType=TK_STAR;
+                tokenType = Operator.TK_STAR;
 				return 1;
 			}
 			case '/': {
 				if(iOffset+2>=z.Length||z[iOffset+1]!='*') {
-					tokenType=TK_SLASH;
+                    tokenType = Operator.TK_SLASH;
 					return 1;
 				}
 				/* IMP: R-15891-05542 -- syntax diagram for comments */for(i=3,c=(byte)z[iOffset+2];iOffset+i<z.Length&&(c!='*'||(z[iOffset+i]!='/')&&(c!=0));i++) {
@@ -499,82 +499,82 @@ namespace Community.CsharpSqlite {
 					c=0;
 				if(c!=0)
 					i++;
-				tokenType=TK_SPACE;
+                tokenType = Operator.TK_SPACE;
 				/* IMP: R-22934-25134 */return i;
 			}
 			case '%': {
-				tokenType=TK_REM;
+                tokenType = Operator.TK_REM;
 				return 1;
 			}
 			case '=': {
-				tokenType=TK_EQ;
+                tokenType = Operator.TK_EQ;
 				return 1+(z[iOffset+1]=='='?1:0);
 			}
 			case '<': {
 				if((c=(byte)z[iOffset+1])=='=') {
-					tokenType=TK_LE;
+                    tokenType = Operator.TK_LE;
 					return 2;
 				}
 				else
 					if(c=='>') {
-						tokenType=TK_NE;
+                        tokenType = Operator.TK_NE;
 						return 2;
 					}
 					else
 						if(c=='<') {
-							tokenType=TK_LSHIFT;
+                            tokenType = Operator.TK_LSHIFT;
 							return 2;
 						}
 						else {
-							tokenType=TK_LT;
+                            tokenType = Operator.TK_LT;
 							return 1;
 						}
 			}
 			case '>': {
 				if(z.Length>iOffset+1&&(c=(byte)z[iOffset+1])=='=') {
-					tokenType=TK_GE;
+                    tokenType = Operator.TK_GE;
 					return 2;
 				}
 				else
 					if(c=='>') {
-						tokenType=TK_RSHIFT;
+                        tokenType = Operator.TK_RSHIFT;
 						return 2;
 					}
 					else {
-						tokenType=TK_GT;
+                        tokenType = Operator.TK_GT;
 						return 1;
 					}
 			}
 			case '!': {
 				if(z[iOffset+1]!='=') {
-					tokenType=TK_ILLEGAL;
+                    tokenType = Operator.TK_ILLEGAL;
 					return 2;
 				}
 				else {
-					tokenType=TK_NE;
+                    tokenType = Operator.TK_NE;
 					return 2;
 				}
 			}
 			case '|': {
 				if(z[iOffset+1]!='|') {
-					tokenType=TK_BITOR;
+                    tokenType = Operator.TK_BITOR;
 					return 1;
 				}
 				else {
-					tokenType=TK_CONCAT;
+                    tokenType = Operator.TK_CONCAT;
 					return 2;
 				}
 			}
 			case ',': {
-				tokenType=TK_COMMA;
+                tokenType = Operator.TK_COMMA;
 				return 1;
 			}
 			case '&': {
-				tokenType=TK_BITAND;
+                tokenType = Operator.TK_BITAND;
 				return 1;
 			}
 			case '~': {
-				tokenType=TK_BITNOT;
+                tokenType = Operator.TK_BITNOT;
 				return 1;
 			}
 			case '`':
@@ -595,20 +595,20 @@ namespace Community.CsharpSqlite {
 					}
 				}
 				if((iOffset+i==z.Length&&c!=delim)||z[iOffset+i]!=delim) {
-					tokenType=TK_ILLEGAL;
+                    tokenType = Operator.TK_ILLEGAL;
 					return i+1;
 				}
 				if(c=='\'') {
-					tokenType=TK_STRING;
+                    tokenType = Operator.TK_STRING;
 					return i+1;
 				}
 				else
 					if(c!=0) {
-						tokenType=TK_ID;
+                        tokenType = Operator.TK_ID;
 						return i+1;
 					}
 					else {
-						tokenType=TK_ILLEGAL;
+                        tokenType = Operator.TK_ILLEGAL;
 						return i;
 					}
 			}
@@ -617,7 +617,7 @@ namespace Community.CsharpSqlite {
 				if(!CharExtensions.sqlite3Isdigit(z[iOffset+1]))
 				#endif
 				 {
-					tokenType=TK_DOT;
+                     tokenType = Operator.TK_DOT;
 					return 1;
 				}
 				/* If the next character is a digit, this is a floating point
@@ -643,7 +643,7 @@ namespace Community.CsharpSqlite {
 				testcase(z[iOffset]=='7');
 				testcase(z[iOffset]=='8');
 				testcase(z[iOffset]=='9');
-				tokenType=TK_INTEGER;
+                tokenType = Operator.TK_INTEGER;
 				for(i=0;z.Length>iOffset+i&&CharExtensions.sqlite3Isdigit(z[iOffset+i]);i++) {
 				}
 				#if !SQLITE_OMIT_FLOATING_POINT
@@ -652,18 +652,18 @@ namespace Community.CsharpSqlite {
 					while(z.Length>iOffset+i&&CharExtensions.sqlite3Isdigit(z[iOffset+i])) {
 						i++;
 					}
-					tokenType=TK_FLOAT;
+                    tokenType = Operator.TK_FLOAT;
 				}
 				if(z.Length>iOffset+i+1&&(z[iOffset+i]=='e'||z[iOffset+i]=='E')&&(CharExtensions.sqlite3Isdigit(z[iOffset+i+1])||z.Length>iOffset+i+2&&((z[iOffset+i+1]=='+'||z[iOffset+i+1]=='-')&&CharExtensions.sqlite3Isdigit(z[iOffset+i+2])))) {
 					i+=2;
 					while(z.Length>iOffset+i&&CharExtensions.sqlite3Isdigit(z[iOffset+i])) {
 						i++;
 					}
-					tokenType=TK_FLOAT;
+                    tokenType = Operator.TK_FLOAT;
 				}
 				#endif
 				while(iOffset+i<z.Length&&IdChar((byte)z[iOffset+i])) {
-					tokenType=TK_ILLEGAL;
+                    tokenType = Operator.TK_ILLEGAL;
 					i++;
 				}
 				return i;
@@ -671,11 +671,11 @@ namespace Community.CsharpSqlite {
 			case '[': {
 				for(i=1,c=(byte)z[iOffset+0];c!=']'&&(iOffset+i)<z.Length&&(c=(byte)z[iOffset+i])!=0;i++) {
 				}
-				tokenType=c==']'?TK_ID:TK_ILLEGAL;
+                tokenType = c == ']' ? Operator.TK_ID : Operator.TK_ILLEGAL;
 				return i;
 			}
 			case '?': {
-				tokenType=TK_VARIABLE;
+                tokenType = Operator.TK_VARIABLE;
 				for(i=1;z.Length>iOffset+i&&CharExtensions.sqlite3Isdigit(z[iOffset+i]);i++) {
 				}
 				return i;
@@ -685,7 +685,8 @@ namespace Community.CsharpSqlite {
 				}
 				if(i>1) {
 					/* Parameters of the form #NNN (where NNN is a number) are used
-              ** internally by sqlite3NestedParse.  */tokenType=TK_REGISTER;
+              ** internally by sqlite3NestedParse.  */
+                    tokenType = Operator.TK_REGISTER;
 					return i;
 				}
 				/* Fall through into the next case if the '#' is not followed by
@@ -700,7 +701,7 @@ namespace Community.CsharpSqlite {
 				testcase(z[iOffset+0]=='$');
 				testcase(z[iOffset+0]=='@');
 				testcase(z[iOffset+0]==':');
-				tokenType=TK_VARIABLE;
+                tokenType = Operator.TK_VARIABLE;
 				for(i=1;z.Length>iOffset+i&&(c=(byte)z[iOffset+i])!=0;i++) {
 					if(IdChar(c)) {
 						n++;
@@ -716,7 +717,7 @@ namespace Community.CsharpSqlite {
 								i++;
 							}
 							else {
-								tokenType=TK_ILLEGAL;
+                                tokenType = Operator.TK_ILLEGAL;
 							}
 							break;
 						}
@@ -730,7 +731,7 @@ namespace Community.CsharpSqlite {
 							}
 				}
 				if(n==0)
-					tokenType=TK_ILLEGAL;
+                    tokenType = Operator.TK_ILLEGAL;
 				return i;
 			}
 			#if !SQLITE_OMIT_BLOB_LITERAL
@@ -739,11 +740,11 @@ namespace Community.CsharpSqlite {
 				testcase(z[iOffset+0]=='x');
 				testcase(z[iOffset+0]=='X');
 				if(z.Length>iOffset+1&&z[iOffset+1]=='\'') {
-					tokenType=TK_BLOB;
+                    tokenType = Operator.TK_BLOB;
 					for(i=2;z.Length>iOffset+i&&CharExtensions.sqlite3Isxdigit(z[iOffset+i]);i++) {
 					}
 					if(iOffset+i==z.Length||z[iOffset+i]!='\''||i%2!=0) {
-						tokenType=TK_ILLEGAL;
+                        tokenType = Operator.TK_ILLEGAL;
 						while(z.Length>iOffset+i&&z[iOffset+i]!='\'') {
 							i++;
 						}
@@ -765,12 +766,12 @@ namespace Community.CsharpSqlite {
 				return i;
 			}
 			}
-			tokenType=TK_ILLEGAL;
+            tokenType = Operator.TK_ILLEGAL;
 			return 1;
 		}
 
         static Token GetToken(string z, int iOffset) {
-            int tokenType=0;
+            Operator tokenType = 0;
             int length = sqlite3GetToken(z, iOffset, ref tokenType);
             var token = new Token()
             {

@@ -2515,7 +2515,7 @@ goto attach_end;
                     }
                     switch (this.sLastToken.TokenType)
                     {
-                        case TK_SPACE:
+                        case Operator.TK_SPACE:
                             {
                                 if (db.u1.isInterrupted)
                                 {
@@ -2525,14 +2525,14 @@ goto attach_end;
                                 }
                                 break;
                             }
-                        case TK_ILLEGAL:
+                        case Operator.TK_ILLEGAL:
                             {
                                 db.sqlite3DbFree(ref pzErrMsg);
                                 pzErrMsg = sqlite3MPrintf(db, "unrecognized token: \"%T\"", (object)this.sLastToken);
                                 nErr++;
                                 goto abort_parse;
                             }
-                        case TK_SEMI:
+                        case Operator.TK_SEMI:
                             {
                                 //pParse.zTail = new StringBuilder(zSql.Substring( i,zSql.Length-i ));
                                 /* Fall thru into the default case */
@@ -2555,7 +2555,7 @@ goto attach_end;
                 {
                     if (lastTokenParsed != TK_SEMI)
                     {
-                        pEngine.sqlite3Parser(TK_SEMI, this.sLastToken, this);
+                        pEngine.sqlite3Parser(Operator.TK_SEMI, this.sLastToken, this);
                     }
                     pEngine.sqlite3Parser(0, this.sLastToken, this);
                 }

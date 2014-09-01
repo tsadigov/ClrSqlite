@@ -5181,8 +5181,9 @@ return;
       ** parser accepts */this.pParse=pParse;
 				//      sqlite3ParserARG_STORE; /* Suppress warning about unused %extra_argument variable */
 			}
-			public void sqlite3Parser(/* The parser */int yymajor,/* The major token code number */sqlite3ParserTOKENTYPE yyminor/* The value for the token */,Parse pParse//sqlite3ParserARG_PDECL           /* Optional %extra_argument parameter */
+			public void sqlite3Parser(/* The parser */Operator _yymajor,/* The major token code number */sqlite3ParserTOKENTYPE yyminor/* The value for the token */,Parse pParse//sqlite3ParserARG_PDECL           /* Optional %extra_argument parameter */
 			) {
+                int yymajor=(int)_yymajor;
 				YYMINORTYPE yyminorunion=new YYMINORTYPE();
 				int yyact;
 				/* The parser action. */bool yyendofinput;

@@ -46,7 +46,7 @@ namespace Community.CsharpSqlite {
 			string bResult=sqlite3_value_text(argv[0]);
 			string zSql=bResult==null?"":bResult;
 			string zTableName=sqlite3_value_text(argv[1]);
-			int token=0;
+            Operator token = 0;
 			Token tname=new Token();
 			int zCsr=0;
 			int zLoc=0;
@@ -72,10 +72,10 @@ namespace Community.CsharpSqlite {
 						zCsr+=len;
 						len=(zCsr==zSql.Length)?1:sqlite3GetToken(zSql,zCsr,ref token);
 					}
-					while(token==TK_SPACE);
+        while (token == Operator.TK_SPACE);
 					Debug.Assert(len>0);
 				}
-				while(token!=TK_LP&&token!=TK_USING);
+                while (token != Operator.TK_LP && token != Operator.TK_USING);
 				zRet=sqlite3MPrintf(db,"%.*s\"%w\"%s",zLoc,zSql.Substring(0,zLoc),zTableName,zSql.Substring(zLoc+tname.Length));
 				context.sqlite3_result_text(zRet,-1,SQLITE_DYNAMIC);
 			}
@@ -106,18 +106,20 @@ namespace Community.CsharpSqlite {
 			int zIdx;
 			/* Pointer to token */int zLeft=0;
 			/* Pointer to remainder of String */int n=0;
-			/* Length of token z */int token=0;
+            /* Length of token z */
+            Operator token = 0;
 			/* Type of token */UNUSED_PARAMETER(NotUsed);
 			for(zIdx=0;zIdx<zInput.Length;zIdx+=n)//z=zInput; *z; z=z+n)
 			 {
 				n=sqlite3GetToken(zInput,zIdx,ref token);
-				if(token==TK_REFERENCES) {
+                if (token == Operator.TK_REFERENCES)
+                {
 					string zParent;
 					do {
 						zIdx+=n;
 						n=sqlite3GetToken(zInput,zIdx,ref token);
 					}
-					while(token==TK_SPACE);
+                    while (token == Operator.TK_SPACE);
 					zParent=zIdx+n<zInput.Length?zInput.Substring(zIdx,n):"";
 					//sqlite3DbStrNDup(db, zIdx, n);
 					if(String.IsNullOrEmpty(zParent))
@@ -149,7 +151,7 @@ namespace Community.CsharpSqlite {
 */static void renameTriggerFunc(sqlite3_context context,int NotUsed,sqlite3_value[] argv) {
 			string zSql=sqlite3_value_text(argv[0]);
 			string zTableName=sqlite3_value_text(argv[1]);
-			int token=0;
+			Operator token=0;
 			Token tname=new Token();
 			int dist=3;
 			int zCsr=0;
@@ -177,7 +179,7 @@ namespace Community.CsharpSqlite {
 						zCsr+=len;
 						len=(zCsr==zSql.Length)?1:sqlite3GetToken(zSql,zCsr,ref token);
 					}
-					while(token==TK_SPACE);
+					while(token==Operator.TK_SPACE);
 					Debug.Assert(len>0);
 					/* Variable 'dist' stores the number of tokens read since the most
       ** recent TK_DOT or TK_ON. This means that when a WHEN, FOR or BEGIN
@@ -188,11 +190,12 @@ namespace Community.CsharpSqlite {
       ** there is no need to worry about syntax like
       ** "CREATE TRIGGER ... ON ON.ON BEGIN ..." etc.
       */dist++;
-					if(token==TK_DOT||token==TK_ON) {
+        if (token == Operator.TK_DOT || token == Operator.TK_ON)
+        {
 						dist=0;
 					}
 				}
-				while(dist!=2||(token!=TK_WHEN&&token!=TK_FOR&&token!=TK_BEGIN));
+                while (dist != 2 || (token != Operator.TK_WHEN && token != Operator.TK_FOR && token != Operator.TK_BEGIN));
 				/* Variable tname now contains the token that is the old table-name
     ** in the CREATE TRIGGER statement.
     */zRet=sqlite3MPrintf(db,"%.*s\"%w\"%s",zLoc,zSql.Substring(0,zLoc),zTableName,zSql.Substring(zLoc+tname.Length));
