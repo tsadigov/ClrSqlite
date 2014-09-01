@@ -869,13 +869,13 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 					Token pToken;
 					if(ap[vaNEXT] is String) {
 						pToken=new Token();
-						pToken.z=va_arg(ap,(String)null);
-						pToken.n=pToken.z.Length;
+						pToken.zRestSql=va_arg(ap,(String)null);
+						pToken.Length=pToken.zRestSql.Length;
 					}
 					else
 						pToken=va_arg(ap,(Token)null);
 					if(pToken!=null) {
-						sqlite3StrAccumAppend(pAccum,pToken.z.ToString(),(int)pToken.n);
+						sqlite3StrAccumAppend(pAccum,pToken.zRestSql.ToString(),(int)pToken.Length);
 					}
 					length=width=0;
 					break;

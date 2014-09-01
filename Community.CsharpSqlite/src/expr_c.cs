@@ -148,8 +148,8 @@ namespace Community.CsharpSqlite {
 			int nExtra=0;
 			int iValue=0;
 			if(pToken!=null) {
-				if(op!=TK_INTEGER||pToken.z==null||pToken.z.Length==0||Converter.sqlite3GetInt32(pToken.z.ToString(),ref iValue)==false) {
-					nExtra=pToken.n+1;
+				if(op!=TK_INTEGER||pToken.zRestSql==null||pToken.zRestSql.Length==0||Converter.sqlite3GetInt32(pToken.zRestSql.ToString(),ref iValue)==false) {
+					nExtra=pToken.Length+1;
 					Debug.Assert(iValue>=0);
 				}
 			}
@@ -166,14 +166,14 @@ namespace Community.CsharpSqlite {
 					else {
 						int c;
 						//pNew.u.zToken = (char)&pNew[1];
-						if(pToken.n>0)
-							pNew.u.zToken=pToken.z.Substring(0,pToken.n);
+						if(pToken.Length>0)
+							pNew.u.zToken=pToken.zRestSql.Substring(0,pToken.Length);
 						//memcpy(pNew.u.zToken, pToken.z, pToken.n);
 						else
-							if(pToken.n==0&&pToken.z=="")
+							if(pToken.Length==0&&pToken.zRestSql=="")
 								pNew.u.zToken="";
 						//pNew.u.zToken[pToken.n] = 0;
-						if(dequote!=0&&nExtra>=3&&((c=pToken.z[0])=='\''||c=='"'||c=='['||c=='`')) {
+						if(dequote!=0&&nExtra>=3&&((c=pToken.zRestSql[0])=='\''||c=='"'||c=='['||c=='`')) {
 							#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
 																																																																																																																																																										StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
 #else
@@ -197,8 +197,8 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static Expr sqlite3Expr(sqlite3 db,/* Handle for sqlite3DbMallocZero() (may be null) */int op,/* Expression opcode */string zToken/* Token argument.  Might be NULL */) {
 			Token x=new Token();
-			x.z=zToken;
-			x.n=!String.IsNullOrEmpty(zToken)?StringExtensions.sqlite3Strlen30(zToken):0;
+			x.zRestSql=zToken;
+			x.Length=!String.IsNullOrEmpty(zToken)?StringExtensions.sqlite3Strlen30(zToken):0;
 			return sqlite3ExprAlloc(db,op,x,0);
 		}
 		/*

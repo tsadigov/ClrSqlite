@@ -63,9 +63,9 @@ namespace Community.CsharpSqlite {
 						/* Ran out of input before finding an opening bracket. Return NULL. */return;
 					}
 					/* Store the token that zCsr points to in tname. */zLoc=zCsr;
-					tname.z=zSql.Substring(zCsr);
+					tname.zRestSql=zSql.Substring(zCsr);
 					//(char*)zCsr;
-					tname.n=len;
+					tname.Length=len;
 					/* Advance zCsr to the next token. Store that token type in 'token',
       ** and its length in 'len' (to be used next iteration of this loop).
       */do {
@@ -76,7 +76,7 @@ namespace Community.CsharpSqlite {
 					Debug.Assert(len>0);
 				}
 				while(token!=TK_LP&&token!=TK_USING);
-				zRet=sqlite3MPrintf(db,"%.*s\"%w\"%s",zLoc,zSql.Substring(0,zLoc),zTableName,zSql.Substring(zLoc+tname.n));
+				zRet=sqlite3MPrintf(db,"%.*s\"%w\"%s",zLoc,zSql.Substring(0,zLoc),zTableName,zSql.Substring(zLoc+tname.Length));
 				context.sqlite3_result_text(zRet,-1,SQLITE_DYNAMIC);
 			}
 		}
@@ -168,9 +168,9 @@ namespace Community.CsharpSqlite {
 						/* Ran out of input before finding the table name. Return NULL. */return;
 					}
 					/* Store the token that zCsr points to in tname. */zLoc=zCsr;
-					tname.z=zSql.Substring(zCsr,len);
+					tname.zRestSql=zSql.Substring(zCsr,len);
 					//(char*)zCsr;
-					tname.n=len;
+					tname.Length=len;
 					/* Advance zCsr to the next token. Store that token type in 'token',
       ** and its length in 'len' (to be used next iteration of this loop).
       */do {
@@ -195,7 +195,7 @@ namespace Community.CsharpSqlite {
 				while(dist!=2||(token!=TK_WHEN&&token!=TK_FOR&&token!=TK_BEGIN));
 				/* Variable tname now contains the token that is the old table-name
     ** in the CREATE TRIGGER statement.
-    */zRet=sqlite3MPrintf(db,"%.*s\"%w\"%s",zLoc,zSql.Substring(0,zLoc),zTableName,zSql.Substring(zLoc+tname.n));
+    */zRet=sqlite3MPrintf(db,"%.*s\"%w\"%s",zLoc,zSql.Substring(0,zLoc),zTableName,zSql.Substring(zLoc+tname.Length));
 				context.sqlite3_result_text(zRet,-1,SQLITE_DYNAMIC);
 			}
 		}

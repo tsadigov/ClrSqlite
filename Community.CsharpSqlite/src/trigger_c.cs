@@ -99,7 +99,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(op==TK_INSERT||op==TK_UPDATE||op==TK_DELETE);
 			Debug.Assert(op>0&&op<0xff);
 			if(isTemp!=0) {
-				/* If TEMP was specified, then the trigger name may not be qualified. */if(pName2.n>0) {
+				/* If TEMP was specified, then the trigger name may not be qualified. */if(pName2.Length>0) {
 					sqlite3ErrorMsg(pParse,"temporary trigger may not have qualified name");
 					goto trigger_cleanup;
 				}
@@ -135,7 +135,7 @@ namespace Community.CsharpSqlite {
 				goto trigger_cleanup;
 			}
 			pTab=pParse.sqlite3SrcListLookup(pTableName);
-			if(db.init.busy==0&&pName2.n==0&&pTab!=null&&pTab.pSchema==db.aDb[1].pSchema) {
+			if(db.init.busy==0&&pName2.Length==0&&pTab!=null&&pTab.pSchema==db.aDb[1].pSchema) {
 				iDb=1;
 			}
 			/* Ensure the table name matches database name and that the table exists *///      if ( db.mallocFailed != 0 ) goto trigger_cleanup;
@@ -263,8 +263,8 @@ goto trigger_cleanup;
 				pStepList.pTrig=pTrig;
 				pStepList=pStepList.pNext;
 			}
-			nameToken.z=pTrig.zName;
-			nameToken.n=StringExtensions.sqlite3Strlen30(nameToken.z);
+			nameToken.zRestSql=pTrig.zName;
+			nameToken.Length=StringExtensions.sqlite3Strlen30(nameToken.zRestSql);
 			if(sFix.sqlite3FixInit(pParse,iDb,"trigger",nameToken)!=0&&sFix.sqlite3FixTriggerStep(pTrig.step_list)!=0) {
 				goto triggerfinish_cleanup;
 			}
@@ -277,7 +277,7 @@ goto trigger_cleanup;
 				if(v==null)
 					goto triggerfinish_cleanup;
 				sqlite3BeginWriteOperation(pParse,0,iDb);
-				z=pAll.z.Substring(0,pAll.n);
+				z=pAll.zRestSql.Substring(0,pAll.Length);
 				//sqlite3DbStrNDup( db, (char*)pAll.z, pAll.n );
 				sqlite3NestedParse(pParse,"INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),zName,pTrig.table,z);
 				db.sqlite3DbFree(ref z);
@@ -340,10 +340,10 @@ goto trigger_cleanup;
 			//{
 			string z;
 			// = (char*)&pTriggerStep[1];
-			z=pName.z;
+			z=pName.zRestSql;
 			// memcpy( z, pName.z, pName.n );
-			pTriggerStep.target.z=z;
-			pTriggerStep.target.n=pName.n;
+			pTriggerStep.target.zRestSql=z;
+			pTriggerStep.target.Length=pName.Length;
 			pTriggerStep.op=op;
 			//}
 			return pTriggerStep;

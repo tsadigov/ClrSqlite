@@ -276,146 +276,27 @@ namespace Community.CsharpSqlite {
 		/// of parameters that follow the module name are still pending.
 		///
 		///</summary>
-		static void sqlite3VtabBeginParse(Parse pParse,/* Parsing context */Token pName1,/* Name of new table, or database name */Token pName2,/* Name of new table or NULL */Token pModuleName/* Name of the module for the virtual table */) {
-			int iDb;
-			/* The database the table is being created in */Table pTable;
-			/* The new virtual table */sqlite3 db;
-			/* Database connection */sqlite3StartTable(pParse,pName1,pName2,0,0,1,0);
-			pTable=pParse.pNewTable;
-			if(pTable==null)
-				return;
-			Debug.Assert(null==pTable.pIndex);
-			db=pParse.db;
-			iDb=sqlite3SchemaToIndex(db,pTable.pSchema);
-			Debug.Assert(iDb>=0);
-			pTable.tabFlags|=TF_Virtual;
-			pTable.nModuleArg=0;
-			addModuleArgument(db,pTable,sqlite3NameFromToken(db,pModuleName));
-			addModuleArgument(db,pTable,db.aDb[iDb].zName);
-			//sqlite3DbStrDup( db, db.aDb[iDb].zName ) );
-			addModuleArgument(db,pTable,pTable.zName);
-			//sqlite3DbStrDup( db, pTable.zName ) );
-			pParse.sNameToken.n=pParse.sNameToken.z.Length;
-			//      (int)[pModuleName.n] - pName1.z );
-			#if !SQLITE_OMIT_AUTHORIZATION
-																																																															  /* Creating a virtual table invokes the authorization callback twice.
-  ** The first invocation, to obtain permission to INSERT a row into the
-  ** sqlite_master table, has already been made by sqlite3StartTable().
-  ** The second call, to obtain permission to create the table, is made now.
-  */
-  if( pTable->azModuleArg ){
-    sqlite3AuthCheck(pParse, SQLITE_CREATE_VTABLE, pTable->zName, 
-            pTable->azModuleArg[0], pParse->db->aDb[iDb].zName);
-  }
-#endif
-		}
 		///<summary>
 		/// This routine takes the module argument that has been accumulating
 		/// in pParse.zArg[] and appends it to the list of arguments on the
 		/// virtual table currently under construction in pParse.pTable.
 		///
 		///</summary>
-		static void addArgumentToVtab(Parse pParse) {
-			if(pParse.sArg.z!=null&&ALWAYS(pParse.pNewTable)) {
-				string z=pParse.sArg.z.Substring(0,pParse.sArg.n);
-				int n=pParse.sArg.n;
-				sqlite3 db=pParse.db;
-				addModuleArgument(db,pParse.pNewTable,z);
-				///sqlite3DbStrNDup( db, z, n ) );
-			}
-		}
 		///<summary>
 		/// The parser calls this routine after the CREATE VIRTUAL TABLE statement
 		/// has been completely parsed.
 		///
 		///</summary>
-		static void sqlite3VtabFinishParse(Parse pParse,Token pEnd) {
-			Table pTab=pParse.pNewTable;
-			/* The table being constructed */sqlite3 db=pParse.db;
-			/* The database connection */if(pTab==null)
-				return;
-			addArgumentToVtab(pParse);
-			pParse.sArg.z="";
-			if(pTab.nModuleArg<1)
-				return;
-			/* If the CREATE VIRTUAL TABLE statement is being entered for the
-      ** first time (in other words if the virtual table is actually being
-      ** created now instead of just being read out of sqlite_master) then
-      ** do additional initialization work and store the statement text
-      ** in the sqlite_master table.
-      */if(0==db.init.busy) {
-				string zStmt;
-				string zWhere;
-				int iDb;
-				Vdbe v;
-				/* Compute the complete text of the CREATE VIRTUAL TABLE statement */if(pEnd!=null) {
-					pParse.sNameToken.n=pParse.sNameToken.z.Length;
-					//(int)( pEnd.z - pParse.sNameToken.z ) + pEnd.n;
-				}
-				zStmt=sqlite3MPrintf(db,"CREATE VIRTUAL TABLE %T",pParse.sNameToken.z.Substring(0,pParse.sNameToken.n));
-				/* A slot for the record has already been allocated in the 
-        ** SQLITE_MASTER table.  We just need to update that slot with all
-        ** the information we've collected.  
-        **
-        ** The VM register number pParse.regRowid holds the rowid of an
-        ** entry in the sqlite_master table tht was created for this vtab
-        ** by sqlite3StartTable().
-        */iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-				sqlite3NestedParse(pParse,"UPDATE %Q.%s "+"SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q "+"WHERE rowid=#%d",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),pTab.zName,pTab.zName,zStmt,pParse.regRowid);
-				db.sqlite3DbFree(ref zStmt);
-				v=sqlite3GetVdbe(pParse);
-				sqlite3ChangeCookie(pParse,iDb);
-				v.sqlite3VdbeAddOp2(OP_Expire,0,0);
-				zWhere=sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);
-				sqlite3VdbeAddParseSchemaOp(v,iDb,zWhere);
-				v.sqlite3VdbeAddOp4(OP_VCreate,iDb,0,0,pTab.zName,StringExtensions.sqlite3Strlen30(pTab.zName)+1);
-			}
-			/* If we are rereading the sqlite_master table create the in-memory
-      ** record of the table. The xConnect() method is not called until
-      ** the first time the virtual table is used in an SQL statement. This
-      ** allows a schema that contains virtual tables to be loaded before
-      ** the required virtual table implementations are registered.  */else {
-				Table pOld;
-				Schema pSchema=pTab.pSchema;
-				string zName=pTab.zName;
-				int nName=StringExtensions.sqlite3Strlen30(zName);
-				Debug.Assert(sqlite3SchemaMutexHeld(db,0,pSchema));
-				pOld=sqlite3HashInsert(ref pSchema.tblHash,zName,nName,pTab);
-				if(pOld!=null) {
-					//db.mallocFailed = 1;
-					Debug.Assert(pTab==pOld);
-					/* Malloc must have failed inside HashInsert() */return;
-				}
-				pParse.pNewTable=null;
-			}
-		}
 		///<summary>
 		/// The parser calls this routine when it sees the first token
 		/// of an argument to the module name in a CREATE VIRTUAL TABLE statement.
 		///
 		///</summary>
-		static void sqlite3VtabArgInit(Parse pParse) {
-			addArgumentToVtab(pParse);
-			pParse.sArg.z=null;
-			pParse.sArg.n=0;
-		}
 		///<summary>
 		/// The parser calls this routine for each token after the first token
 		/// in an argument to the module name in a CREATE VIRTUAL TABLE statement.
 		///
 		///</summary>
-		static void sqlite3VtabArgExtend(Parse pParse,Token p) {
-			Token pArg=pParse.sArg;
-			if(pArg.z==null) {
-				pArg.z=p.z;
-				pArg.n=p.n;
-			}
-			else {
-				//Debug.Assert( pArg.z< p.z );
-				pArg.n+=p.n+1;
-				//(int)( p.z[p.n] - pArg.z );
-			}
-		}
 		///<summary>
 		/// Invoke a virtual table constructor (either xCreate or xConnect). The
 		/// pointer to the function to invoke is passed as the fourth parameter
@@ -527,33 +408,6 @@ namespace Community.CsharpSqlite {
 		/// This call is a no-op if table pTab is not a virtual table.
 		///
 		///</summary>
-		static int sqlite3VtabCallConnect(Parse pParse,Table pTab) {
-			sqlite3 db=pParse.db;
-			string zMod;
-			Module pMod;
-			int rc;
-			Debug.Assert(pTab!=null);
-			if((pTab.tabFlags&TF_Virtual)==0||sqlite3GetVTable(db,pTab)!=null) {
-				return SQLITE_OK;
-			}
-			/* Locate the required virtual table module */zMod=pTab.azModuleArg[0];
-			pMod=(Module)sqlite3HashFind(db.aModule,zMod,StringExtensions.sqlite3Strlen30(zMod),(Module)null);
-			if(null==pMod) {
-				string zModule=pTab.azModuleArg[0];
-				sqlite3ErrorMsg(pParse,"no such module: %s",zModule);
-				rc=SQLITE_ERROR;
-			}
-			else {
-				string zErr=null;
-				rc=vtabCallConstructor(db,pTab,pMod,pMod.pModule.xConnect,ref zErr);
-				if(rc!=SQLITE_OK) {
-					sqlite3ErrorMsg(pParse,"%s",zErr);
-				}
-				zErr=null;
-				//sqlite3DbFree( db, zErr );
-			}
-			return rc;
-		}
 		///<summary>
 		/// Grow the db.aVTrans[] array so that there is room for at least one
 		/// more v-table. Return SQLITE_NOMEM if a malloc fails, or SQLITE_OK otherwise.
@@ -956,29 +810,6 @@ namespace Community.CsharpSqlite {
 		/// is a no-op.
 		///
 		///</summary>
-		static void sqlite3VtabMakeWritable(Parse pParse,Table pTab) {
-			Parse pToplevel=sqlite3ParseToplevel(pParse);
-			int i,n;
-			//Table[] apVtabLock = null;
-			Debug.Assert(IsVirtual(pTab));
-			for(i=0;i<pToplevel.nVtabLock;i++) {
-				if(pTab==pToplevel.apVtabLock[i])
-					return;
-			}
-			n=pToplevel.apVtabLock==null?1:pToplevel.apVtabLock.Length+1;
-			//(pToplevel.nVtabLock+1)*sizeof(pToplevel.apVtabLock[0]);
-			//sqlite3_realloc( pToplevel.apVtabLock, n );
-			//if ( apVtabLock != null )
-			{
-				Array.Resize(ref pToplevel.apVtabLock,n);
-				// pToplevel.apVtabLock= apVtabLock;
-				pToplevel.apVtabLock[pToplevel.nVtabLock++]=pTab;
-				//else
-				//{
-				//  pToplevel.db.mallocFailed = 1;
-				//}
-			}
-		}
 		static int[] aMap=new int[] {
 			SQLITE_ROLLBACK,
 			SQLITE_ABORT,

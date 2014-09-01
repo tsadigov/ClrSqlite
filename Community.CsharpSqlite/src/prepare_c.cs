@@ -531,7 +531,7 @@ db.xAuth = 0;
 			//  goto end_prepare;
 			//}
 			pParse.pReprepare=pReprepare;
-			pParse.sLastToken.z="";
+			pParse.sLastToken.zRestSql="";
 			//  assert( ppStmt && *ppStmt==0 );
 			//Debug.Assert( 0 == db.mallocFailed );
 			Debug.Assert(sqlite3_mutex_held(db.mutex));

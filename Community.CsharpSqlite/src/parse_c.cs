@@ -6,7 +6,7 @@ using u8=System.Byte;
 using YYCODETYPE=System.Int32;
 using YYACTIONTYPE=System.Int32;
 namespace Community.CsharpSqlite {
-	using sqlite3ParserTOKENTYPE=Sqlite3.Token;
+	using sqlite3ParserTOKENTYPE=Token;
 	public partial class Sqlite3 {
 		/*
     *************************************************************************
@@ -4868,7 +4868,8 @@ namespace Community.CsharpSqlite {
 			/* The major token value.  This is the code
 ** number for the token at this stack level */public YYMINORTYPE minor;
 		/* The user-supplied minor token value.  This
-** is the value of the token  */};
+** is the value of the token  */
+        };
 
 		//typedef struct yyStackEntry yyStackEntry;
 		///<summary>
@@ -4879,13 +4880,13 @@ namespace Community.CsharpSqlite {
 			public int yyidx;
 			/* Index of top element in stack */
 			#if YYTRACKMAXSTACKDEPTH
-																																																															int yyidxMax;                 /* Maximum value of yyidx */
+																																																																		int yyidxMax;                 /* Maximum value of yyidx */
 #endif
 			public int yyerrcnt;
 			/* Shifts left before out of the error */public Parse pParse;
 			// sqlite3ParserARG_SDECL                /* A place to hold %extra_argument */
 			#if YYSTACKDEPTH
-																																																															public int yystksz;                  /* Current side of the stack */
+																																																																		public int yystksz;                  /* Current side of the stack */
 public yyStackEntry *yystack;        /* The parser's stack */
 #else
 			public yyStackEntry[] yystack=new yyStackEntry[YYSTACKDEPTH];
@@ -4997,7 +4998,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
       ** empty in SQLite.  */if(NEVER(this.yyidx<0))
 					return 0;
 				#if !NDEBUG
-																																																																      if ( yyTraceFILE != null && pParser.yyidx >= 0 )
+																																																																				      if ( yyTraceFILE != null && pParser.yyidx >= 0 )
       {
         fprintf( yyTraceFILE, "%sPopping %s\n",
         yyTracePrompt,
@@ -5018,7 +5019,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 				while(pParser.yyidx>=0)
 					pParser.yy_pop_parser_stack();
 				#if YYSTACKDEPTH
-																																																																pParser.yystack = null;//free(pParser.yystack);
+																																																																				pParser.yystack = null;//free(pParser.yystack);
 #endif
 				pParser=null;
 				// freeProc(ref pParser);
@@ -5038,7 +5039,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 						/* Fallback token */if(iLookAhead<yyFallback.Length//yyFallback.Length/sizeof(yyFallback[0])
 						&&(iFallback=yyFallback[iLookAhead])!=0) {
 							#if !NDEBUG
-																																																																																																																															            if ( yyTraceFILE != null )
+																																																																																																																																						            if ( yyTraceFILE != null )
             {
               fprintf( yyTraceFILE, "%sFALLBACK %s => %s\n",
               yyTracePrompt, yyTokenName[iLookAhead], yyTokenName[iFallback] );
@@ -5056,7 +5057,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 							j<YY_ACTTAB_COUNT&&//#endif
 							yy_lookahead[j]==YYWILDCARD) {
 								#if !NDEBUG
-																																																																																																																																																				              if ( yyTraceFILE != null )
+																																																																																																																																																												              if ( yyTraceFILE != null )
               {
                 Debugger.Break(); // TODO --
                 //fprintf(yyTraceFILE, "%sWILDCARD %s => %s\n",
@@ -5078,7 +5079,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 				yyStackEntry yytos=new yyStackEntry();
 				this.yyidx++;
 				#if YYTRACKMAXSTACKDEPTH
-																																																																if( yypParser.yyidx>yypParser.yyidxMax ){
+																																																																				if( yypParser.yyidx>yypParser.yyidxMax ){
 yypParser.yyidxMax = yypParser.yyidx;
 }
 #endif
@@ -5088,7 +5089,7 @@ yypParser.yyidxMax = yypParser.yyidx;
 					return;
 				}
 				#else
-																																																																if( yypParser.yyidx>=yypParser.yystksz ){
+																																																																				if( yypParser.yyidx>=yypParser.yystksz ){
 yyGrowStack(yypParser);
 if( yypParser.yyidx>=yypParser.yystksz ){
 yyStackOverflow(yypParser, yypMinor);
@@ -5102,7 +5103,7 @@ return;
 				yytos.major=(YYCODETYPE)yyMajor;
 				yytos.minor=yypMinor;
 				#if !NDEBUG
-																																																																      if ( yyTraceFILE != null && yypParser.yyidx > 0 )
+																																																																				      if ( yyTraceFILE != null && yypParser.yyidx > 0 )
       {
         int i;
         fprintf( yyTraceFILE, "%sShift %d\n", yyTracePrompt, yyNewState );
@@ -5118,7 +5119,7 @@ return;
 				// sqlite3ParserARG_FETCH;
 				this.yyidx--;
 				#if !NDEBUG
-																																																																      if ( yyTraceFILE != null )
+																																																																				      if ( yyTraceFILE != null )
       {
         Debugger.Break(); // TODO --
         //fprintf(yyTraceFILE, "%sStack Overflow!\n", yyTracePrompt);
@@ -5139,7 +5140,7 @@ return;
 				Parse pParse=this.pParse;
 				//       sqlite3ParserARG_FETCH;
 				#if !NDEBUG
-																																																																      if ( yyTraceFILE != null )
+																																																																				      if ( yyTraceFILE != null )
       {
         Debugger.Break(); // TODO --        fprintf(yyTraceFILE, "%sFail!\n", yyTracePrompt);
       }
@@ -5156,7 +5157,7 @@ return;
 				//#define TOKEN (yyminor.yy0)
 				//#line 32 "parse.y"
 				UNUSED_PARAMETER(yymajor);
-				/* Silence some compiler warnings */Debug.Assert(yyminor.yy0.z.Length>0);
+				/* Silence some compiler warnings */Debug.Assert(yyminor.yy0.zRestSql.Length>0);
 				//TOKEN.z[0]);  /* The tokenizer always gives us a token */
 				sqlite3ErrorMsg(pParse,"near \"%T\": syntax error",yyminor.yy0);
 				//&TOKEN);
@@ -5169,7 +5170,7 @@ return;
 				Parse pParse=this.pParse;
 				//       sqlite3ParserARG_FETCH;
 				#if !NDEBUG
-																																																																      if ( yyTraceFILE != null )
+																																																																				      if ( yyTraceFILE != null )
       {
         fprintf( yyTraceFILE, "%sAccept!\n", yyTracePrompt );
       }
@@ -5187,13 +5188,13 @@ return;
 				/* The parser action. */bool yyendofinput;
 				/* True if we are at the end of input */
 				#if YYERRORSYMBOL
-																																																																int yyerrorhit = null;   /* True if yymajor has invoked an error */
+																																																																				int yyerrorhit = null;   /* True if yymajor has invoked an error */
 #endif
 				yyParser yypParser;
 				/* The parser *//* (re)initialize the parser, if necessary */yypParser=this;
 				if(yypParser.yyidx<0) {
 					#if YYSTACKDEPTH
-																																																																																					if( yypParser.yystksz <=0 ){
+																																																																																										if( yypParser.yystksz <=0 ){
 memset(yyminorunion, 0, yyminorunion).Length;
 yyStackOverflow(yypParser, yyminorunion);
 return;
@@ -5210,7 +5211,7 @@ return;
 				yypParser.pParse=pParse;
 				//      sqlite3ParserARG_STORE;
 				#if !NDEBUG
-																																																																      if ( yyTraceFILE != null )
+																																																																				      if ( yyTraceFILE != null )
       {
         fprintf( yyTraceFILE, "%sInput %s\n", yyTracePrompt, yyTokenName[yymajor] );
       }
@@ -5230,16 +5231,16 @@ return;
 						else {
 							Debug.Assert(yyact==YY_ERROR_ACTION);
 							#if YYERRORSYMBOL
-																																																																																																																															int yymx;
+																																																																																																																																						int yymx;
 #endif
 							#if !NDEBUG
-																																																																																																																															          if ( yyTraceFILE != null )
+																																																																																																																																						          if ( yyTraceFILE != null )
           {
             Debugger.Break(); // TODO --            fprintf(yyTraceFILE, "%sSyntax Error!\n", yyTracePrompt);
           }
 #endif
 							#if YYERRORSYMBOL
-																																																																																																																															/* A syntax error has occurred.
+																																																																																																																																						/* A syntax error has occurred.
 ** The response to an error depends upon whether or not the
 ** grammar defines an error token "ERROR".
 **
@@ -5264,12 +5265,12 @@ yy_syntax_error(yypParser,yymajor,yyminorunion);
 yymx = yypParser.yystack[yypParser.yyidx].major;
 if( yymx==YYERRORSYMBOL || yyerrorhit ){
 #if !NDEBUG
-																																																																																																																															if( yyTraceFILE ){
+																																																																																																																																						if( yyTraceFILE ){
 Debug.Assert(false); // TODO --                      fprintf(yyTraceFILE,"%sDiscard input token %s\n",
 yyTracePrompt,yyTokenName[yymajor]);
 }
 #endif
-																																																																																																																															yy_destructor(yypParser,(YYCODETYPE)yymajor,yyminorunion);
+																																																																																																																																						yy_destructor(yypParser,(YYCODETYPE)yymajor,yyminorunion);
 yymajor = YYNOCODE;
 }else{
 while(
@@ -5294,7 +5295,7 @@ yy_shift(yypParser,yyact,YYERRORSYMBOL,u2);
 yypParser.yyerrcnt = 3;
 yyerrorhit = 1;
 #elif (YYNOERRORRECOVERY)
-																																																																																																																															/* If the YYNOERRORRECOVERY macro is defined, then do not attempt to
+																																																																																																																																						/* If the YYNOERRORRECOVERY macro is defined, then do not attempt to
 ** do any kind of error recovery.  Instead, simply invoke the syntax
 ** error routine and continue going as if nothing had happened.
 **
@@ -5331,12 +5332,12 @@ yymajor = YYNOCODE;
 		}
 		//typedef struct yyParser yyParser;
 		#if !NDEBUG
-																																										    //include <stdio.h>
+																																												    //include <stdio.h>
     static TextWriter yyTraceFILE = null;
     static string yyTracePrompt = "";
 #endif
 		#if !NDEBUG
-																																										    /*
+																																												    /*
 ** Turn parser tracing on by giving a stream to which to write the trace
 ** and a prompt to preface each trace message.  Tracing is turned off
 ** by making either argument NULL
@@ -5364,7 +5365,7 @@ yymajor = YYNOCODE;
     }
 #endif
 		#if !NDEBUG
-																																										    /* For tracing shifts, the names of all terminals and nonterminals
+																																												    /* For tracing shifts, the names of all terminals and nonterminals
 ** are required.  The following table supplies these names */
     static string[] yyTokenName = {
 "$",             "SEMI",          "EXPLAIN",       "QUERY",       
@@ -5433,7 +5434,7 @@ yymajor = YYNOCODE;
 };
 #endif
 		#if !NDEBUG
-																																										    ///<summary>
+																																												    ///<summary>
 ///For tracing reduce actions, the names of all rules are required.
 ///</summary>
     static string[] yyRuleName = {
@@ -5769,7 +5770,7 @@ yymajor = YYNOCODE;
 };
 #endif
 		#if YYSTACKDEPTH
-																																										/*
+																																												/*
 ** Try to increase the size of the parser stack.
 */
 static void yyGrowStack(yyParser p){
@@ -5782,12 +5783,12 @@ newSize = p.yystksz*2 + 100;
 p.yystack = Array.Resize(p.yystack,newSize); //pNew;
 p.yystksz = newSize;
 #if !NDEBUG
-																																										if( yyTraceFILE ){
+																																												if( yyTraceFILE ){
 fprintf(yyTraceFILE,"%sStack grows to %d entries!\n",
 yyTracePrompt, p.yystksz);
 }
 #endif
-																																										//}
+																																												//}
 }
 #endif
 		///<summary>
@@ -5809,10 +5810,10 @@ yyTracePrompt, p.yystksz);
 			if(pParser!=null) {
 				pParser.yyidx=-1;
 				#if YYTRACKMAXSTACKDEPTH
-																																																																																				pParser.yyidxMax=0;
+																																																																																								pParser.yyidxMax=0;
 #endif
 				#if YYSTACKDEPTH
-																																																																																				pParser.yystack = NULL;
+																																																																																								pParser.yystack = NULL;
 pParser.yystksz = null;
 yyGrowStack(pParser);
 #endif
@@ -5851,7 +5852,7 @@ yyGrowStack(pParser);
 		///
 		///</summary>
 		#if YYTRACKMAXSTACKDEPTH
-																																										int sqlite3ParserStackPeak(void p){
+																																												int sqlite3ParserStackPeak(void p){
 yyParser pParser = (yyParser*)p;
 return pParser.yyidxMax;
 }
@@ -5876,7 +5877,7 @@ return pParser.yyidxMax;
 		static int yy_find_reduce_action(int stateno,/* Current state number */YYCODETYPE iLookAhead/* The look-ahead token */) {
 			int i;
 			#if YYERRORSYMBOL
-																																																															if( stateno>YY_REDUCE_COUNT ){
+																																																																		if( stateno>YY_REDUCE_COUNT ){
 return yy_default[stateno];
 }
 #else
@@ -5887,7 +5888,7 @@ return yy_default[stateno];
 			Debug.Assert(iLookAhead!=YYNOCODE);
 			i+=iLookAhead;
 			#if YYERRORSYMBOL
-																																																															if( i<0 || i>=YY_ACTTAB_COUNT || yy_lookahead[i]!=iLookAhead ){
+																																																																		if( i<0 || i>=YY_ACTTAB_COUNT || yy_lookahead[i]!=iLookAhead ){
 return yy_default[stateno];
 }
 #else
@@ -6264,7 +6265,7 @@ return yy_default[stateno];
 			yymsp=new yymsp(ref yypParser,yypParser.yyidx);
 			//      yymsp[0] = yypParser.yystack[yypParser.yyidx];
 			#if !NDEBUG
-																																																															      if ( yyTraceFILE != null && yyruleno >= 0
+																																																																		      if ( yyTraceFILE != null && yyruleno >= 0
       && yyruleno < yyRuleName.Length )
       { //(int)(yyRuleName.Length/sizeof(yyRuleName[0])) ){
         fprintf( yyTraceFILE, "%sReduce [%s].\n", yyTracePrompt,
@@ -6473,8 +6474,8 @@ return yy_default[stateno];
 			{
 				//yygotominor.yy0.z = yymsp[-2].minor.yy0.z;
 				//yygotominor.yy0.n = (int)( pParse.sLastToken.z - yymsp[-2].minor.yy0.z ) + pParse.sLastToken.n; 
-				yygotominor.yy0.n=(int)(yymsp[-2].minor.yy0.z.Length-pParse.sLastToken.z.Length)+pParse.sLastToken.n;
-				yygotominor.yy0.z=yymsp[-2].minor.yy0.z.Substring(0,yygotominor.yy0.n);
+				yygotominor.yy0.Length=(int)(yymsp[-2].minor.yy0.zRestSql.Length-pParse.sLastToken.zRestSql.Length)+pParse.sLastToken.Length;
+				yygotominor.yy0.zRestSql=yymsp[-2].minor.yy0.zRestSql.Substring(0,yygotominor.yy0.Length);
 			}
 			//#line 2239 "parse.c"
 			break;
@@ -6547,8 +6548,8 @@ return yy_default[stateno];
 			{
 				//yygotominor.yy0.z = yymsp[-3].minor.yy0.z;
 				//yygotominor.yy0.n = (int)( &yymsp[0].minor.yy0.z[yymsp[0].minor.yy0.n] - yymsp[-3].minor.yy0.z );
-				yygotominor.yy0.n=yymsp[-3].minor.yy0.z.Length-yymsp[0].minor.yy0.z.Length+yymsp[0].minor.yy0.n;
-				yygotominor.yy0.z=yymsp[-3].minor.yy0.z.Substring(0,yygotominor.yy0.n);
+				yygotominor.yy0.Length=yymsp[-3].minor.yy0.zRestSql.Length-yymsp[0].minor.yy0.zRestSql.Length+yymsp[0].minor.yy0.Length;
+				yygotominor.yy0.zRestSql=yymsp[-3].minor.yy0.zRestSql.Substring(0,yygotominor.yy0.Length);
 			}
 			//#line 2286 "parse.c"
 			break;
@@ -6557,8 +6558,8 @@ return yy_default[stateno];
 			{
 				//yygotominor.yy0.z = yymsp[-5].minor.yy0.z;
 				//yygotominor.yy0.n = (int)( &yymsp[0].minor.yy0.z[yymsp[0].minor.yy0.n] - yymsp[-5].minor.yy0.z );
-				yygotominor.yy0.n=yymsp[-5].minor.yy0.z.Length-yymsp[0].minor.yy0.z.Length+1;
-				yygotominor.yy0.z=yymsp[-5].minor.yy0.z.Substring(0,yygotominor.yy0.n);
+				yygotominor.yy0.Length=yymsp[-5].minor.yy0.zRestSql.Length-yymsp[0].minor.yy0.zRestSql.Length+1;
+				yygotominor.yy0.zRestSql=yymsp[-5].minor.yy0.zRestSql.Substring(0,yygotominor.yy0.Length);
 			}
 			//#line 2294 "parse.c"
 			break;
@@ -6566,8 +6567,8 @@ return yy_default[stateno];
 			/* typename ::= typename ids *///#line 263 "parse.y"
 			{
 				//yygotominor.yy0.z=yymsp[-1].minor.yy0.z; yygotominor.yy0.n=yymsp[0].minor.yy0.n+(int)(yymsp[0].minor.yy0.z-yymsp[-1].minor.yy0.z);
-				yygotominor.yy0.z=yymsp[-1].minor.yy0.z;
-				yygotominor.yy0.n=yymsp[0].minor.yy0.n+(int)(yymsp[-1].minor.yy0.z.Length-yymsp[0].minor.yy0.z.Length);
+				yygotominor.yy0.zRestSql=yymsp[-1].minor.yy0.zRestSql;
+				yygotominor.yy0.Length=yymsp[0].minor.yy0.Length+(int)(yymsp[-1].minor.yy0.zRestSql.Length-yymsp[0].minor.yy0.zRestSql.Length);
 			}
 			//#line 2299 "parse.c"
 			break;
@@ -6592,7 +6593,7 @@ return yy_default[stateno];
 			{
 				ExprSpan v=new ExprSpan();
 				v.pExpr=pParse.sqlite3PExpr(TK_UMINUS,yymsp[0].minor.yy118.pExpr,0,0);
-				v.zStart=yymsp[-1].minor.yy0.z;
+				v.zStart=yymsp[-1].minor.yy0.zRestSql;
 				v.zEnd=yymsp[0].minor.yy118.zEnd;
 				sqlite3AddDefaultValue(pParse,v);
 			}
@@ -6747,8 +6748,8 @@ return yy_default[stateno];
 			case 88:
 			/* conslist_opt ::= *///#line 339 "parse.y"
 			{
-				yygotominor.yy0.n=0;
-				yygotominor.yy0.z=null;
+				yygotominor.yy0.Length=0;
+				yygotominor.yy0.zRestSql=null;
 			}
 			//#line 2429 "parse.c"
 			break;
@@ -6916,7 +6917,7 @@ return yy_default[stateno];
 			/* selcollist ::= sclp expr as *///#line 447 "parse.y"
 			{
 				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-2].minor.yy322,yymsp[-1].minor.yy118.pExpr);
-				if(yymsp[0].minor.yy0.n>0)
+				if(yymsp[0].minor.yy0.Length>0)
 					pParse.sqlite3ExprListSetName(yygotominor.yy322,yymsp[0].minor.yy0,1);
 				pParse.sqlite3ExprListSetSpan(yygotominor.yy322,yymsp[-1].minor.yy118);
 			}
@@ -6943,7 +6944,7 @@ return yy_default[stateno];
 			case 129:
 			/* as ::= *///#line 469 "parse.y"
 			{
-				yygotominor.yy0.n=0;
+				yygotominor.yy0.Length=0;
 			}
 			//#line 2589 "parse.c"
 			break;
@@ -6997,7 +6998,7 @@ return yy_default[stateno];
 			case 136:
 			/* seltablist ::= stl_prefix LP seltablist RP as on_opt using_opt *///#line 505 "parse.y"
 			{
-				if(yymsp[-6].minor.yy259==null&&yymsp[-2].minor.yy0.n==0&&yymsp[-1].minor.yy314==null&&yymsp[0].minor.yy384==null) {
+				if(yymsp[-6].minor.yy259==null&&yymsp[-2].minor.yy0.Length==0&&yymsp[-1].minor.yy314==null&&yymsp[0].minor.yy384==null) {
 					yygotominor.yy259=yymsp[-4].minor.yy259;
 				}
 				else {
@@ -7014,8 +7015,8 @@ return yy_default[stateno];
 			/* indexed_opt ::= *///yytestcase(yyruleno==146);
 			//#line 530 "parse.y"
 			{
-				yygotominor.yy0.z=null;
-				yygotominor.yy0.n=0;
+				yygotominor.yy0.zRestSql=null;
+				yygotominor.yy0.Length=0;
 			}
 			//#line 2650 "parse.c"
 			break;
@@ -7089,8 +7090,8 @@ return yy_default[stateno];
 			case 148:
 			/* indexed_opt ::= NOT INDEXED *///#line 563 "parse.y"
 			{
-				yygotominor.yy0.z=null;
-				yygotominor.yy0.n=1;
+				yygotominor.yy0.zRestSql=null;
+				yygotominor.yy0.Length=1;
 			}
 			//#line 2699 "parse.c"
 			break;
@@ -7358,7 +7359,7 @@ return yy_default[stateno];
 				else {
 					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_REGISTER,0,0,yymsp[0].minor.yy0);
 					if(yygotominor.yy118.pExpr!=null)
-						Converter.sqlite3GetInt32(yymsp[0].minor.yy0.z,1,ref yygotominor.yy118.pExpr.iTable);
+						Converter.sqlite3GetInt32(yymsp[0].minor.yy0.zRestSql,1,ref yygotominor.yy118.pExpr.iTable);
 				}
 				yygotominor.yy118.spanSet(yymsp[0].minor.yy0,yymsp[0].minor.yy0);
 			}
@@ -7378,7 +7379,7 @@ return yy_default[stateno];
 			{
 				yygotominor.yy118.pExpr=pParse.sqlite3ExprSetCollByToken(yymsp[-2].minor.yy118.pExpr,yymsp[0].minor.yy0);
 				yygotominor.yy118.zStart=yymsp[-2].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.z.Substring(yymsp[0].minor.yy0.n);
+				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.zRestSql.Substring(yymsp[0].minor.yy0.Length);
 				//z[yymsp[0].minor.yy0.n];
 			}
 			//#line 2925 "parse.c"
@@ -7598,7 +7599,7 @@ return yy_default[stateno];
 						yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
 				}
 				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.z.Substring(yymsp[0].minor.yy0.n);
+				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.zRestSql.Substring(yymsp[0].minor.yy0.Length);
 				//[yymsp[0].minor.yy0.n];
 			}
 			//#line 3109 "parse.c"
@@ -7615,8 +7616,8 @@ return yy_default[stateno];
 				else {
 					sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
 				}
-				yygotominor.yy118.zStart=yymsp[-2].minor.yy0.z;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.z.Substring(yymsp[0].minor.yy0.n);
+				yygotominor.yy118.zStart=yymsp[-2].minor.yy0.zRestSql;
+				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.zRestSql.Substring(yymsp[0].minor.yy0.Length);
 				//z[yymsp[0].minor.yy0.n];
 			}
 			//#line 3125 "parse.c"
@@ -7636,7 +7637,7 @@ return yy_default[stateno];
 				if(yymsp[-3].minor.yy4!=0)
 					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
 				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.z.Substring(yymsp[0].minor.yy0.n);
+				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.zRestSql.Substring(yymsp[0].minor.yy0.Length);
 				//z[yymsp[0].minor.yy0.n];
 			}
 			//#line 3142 "parse.c"
@@ -7657,7 +7658,7 @@ return yy_default[stateno];
 				if(yymsp[-2].minor.yy4!=0)
 					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
 				yygotominor.yy118.zStart=yymsp[-3].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.z!=null?yymsp[0].minor.yy0.z.Substring(yymsp[0].minor.yy0.n):yymsp[-1].minor.yy0.z.Substring(yymsp[-1].minor.yy0.n);
+				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.zRestSql!=null?yymsp[0].minor.yy0.zRestSql.Substring(yymsp[0].minor.yy0.Length):yymsp[-1].minor.yy0.zRestSql.Substring(yymsp[-1].minor.yy0.Length);
 			}
 			//#line 3160 "parse.c"
 			break;
@@ -7673,8 +7674,8 @@ return yy_default[stateno];
 				else {
 					sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
 				}
-				yygotominor.yy118.zStart=yymsp[-3].minor.yy0.z;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.z.Substring(yymsp[0].minor.yy0.n);
+				yygotominor.yy118.zStart=yymsp[-3].minor.yy0.zRestSql;
+				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.zRestSql.Substring(yymsp[0].minor.yy0.Length);
 				//z[yymsp[0].minor.yy0.n];
 			}
 			//#line 3176 "parse.c"
@@ -7690,8 +7691,8 @@ return yy_default[stateno];
 				else {
 					sqlite3ExprListDelete(pParse.db,ref yymsp[-2].minor.yy322);
 				}
-				yygotominor.yy118.zStart=yymsp[-4].minor.yy0.z;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.z.Substring(yymsp[0].minor.yy0.n);
+				yygotominor.yy118.zStart=yymsp[-4].minor.yy0.zRestSql;
+				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.zRestSql.Substring(yymsp[0].minor.yy0.Length);
 				//z[yymsp[0].minor.yy0.n];
 			}
 			//#line 3191 "parse.c"
@@ -7739,7 +7740,7 @@ return yy_default[stateno];
 			/* idxlist ::= idxlist COMMA nm collate sortorder *///#line 1107 "parse.y"
 			{
 				Expr p=null;
-				if(yymsp[-1].minor.yy0.n>0) {
+				if(yymsp[-1].minor.yy0.Length>0) {
 					p=sqlite3Expr(pParse.db,TK_COLUMN,null);
 					pParse.sqlite3ExprSetCollByToken(p,yymsp[-1].minor.yy0);
 				}
@@ -7755,7 +7756,7 @@ return yy_default[stateno];
 			/* idxlist ::= nm collate sortorder *///#line 1118 "parse.y"
 			{
 				Expr p=null;
-				if(yymsp[-1].minor.yy0.n>0) {
+				if(yymsp[-1].minor.yy0.Length>0) {
 					p=pParse.sqlite3PExpr(TK_COLUMN,0,0,0);
 					pParse.sqlite3ExprSetCollByToken(p,yymsp[-1].minor.yy0);
 				}
@@ -7770,8 +7771,8 @@ return yy_default[stateno];
 			case 250:
 			/* collate ::= *///#line 1131 "parse.y"
 			{
-				yygotominor.yy0.z=null;
-				yygotominor.yy0.n=0;
+				yygotominor.yy0.zRestSql=null;
+				yygotominor.yy0.Length=0;
 			}
 			//#line 3262 "parse.c"
 			break;
@@ -7832,8 +7833,8 @@ return yy_default[stateno];
 				Token all=new Token();
 				//all.z = yymsp[-3].minor.yy0.z;
 				//all.n = (int)(yymsp[0].minor.yy0.z - yymsp[-3].minor.yy0.z) + yymsp[0].minor.yy0.n;
-				all.n=(int)(yymsp[-3].minor.yy0.z.Length-yymsp[0].minor.yy0.z.Length)+yymsp[0].minor.yy0.n;
-				all.z=yymsp[-3].minor.yy0.z.Substring(0,all.n);
+				all.Length=(int)(yymsp[-3].minor.yy0.zRestSql.Length-yymsp[0].minor.yy0.zRestSql.Length)+yymsp[0].minor.yy0.Length;
+				all.zRestSql=yymsp[-3].minor.yy0.zRestSql.Substring(0,all.Length);
 				sqlite3FinishTrigger(pParse,yymsp[-1].minor.yy203,all);
 			}
 			//#line 3308 "parse.c"
@@ -7842,7 +7843,7 @@ return yy_default[stateno];
 			/* trigger_decl ::= temp TRIGGER ifnotexists nm dbnm trigger_time trigger_event ON fullname foreach_clause when_clause *///#line 1184 "parse.y"
 			{
 				sqlite3BeginTrigger(pParse,yymsp[-7].minor.yy0,yymsp[-6].minor.yy0,yymsp[-5].minor.yy4,yymsp[-4].minor.yy90.a,yymsp[-4].minor.yy90.b,yymsp[-2].minor.yy259,yymsp[0].minor.yy314,yymsp[-10].minor.yy4,yymsp[-8].minor.yy4);
-				yygotominor.yy0=(yymsp[-6].minor.yy0.n==0?yymsp[-7].minor.yy0:yymsp[-6].minor.yy0);
+				yygotominor.yy0=(yymsp[-6].minor.yy0.Length==0?yymsp[-7].minor.yy0:yymsp[-6].minor.yy0);
 			}
 			//#line 3316 "parse.c"
 			break;
@@ -7988,8 +7989,8 @@ return yy_default[stateno];
 				if(yygotominor.yy118.pExpr!=null) {
 					yygotominor.yy118.pExpr.affinity=(char)OE_Ignore;
 				}
-				yygotominor.yy118.zStart=yymsp[-3].minor.yy0.z;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.z.Substring(yymsp[0].minor.yy0.n);
+				yygotominor.yy118.zStart=yymsp[-3].minor.yy0.zRestSql;
+				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.zRestSql.Substring(yymsp[0].minor.yy0.Length);
 				//z[yymsp[0].minor.yy0.n];
 			}
 			//#line 3439 "parse.c"
@@ -8001,8 +8002,8 @@ return yy_default[stateno];
 				if(yygotominor.yy118.pExpr!=null) {
 					yygotominor.yy118.pExpr.affinity=(char)yymsp[-3].minor.yy4;
 				}
-				yygotominor.yy118.zStart=yymsp[-5].minor.yy0.z;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.z.Substring(yymsp[0].minor.yy0.n);
+				yygotominor.yy118.zStart=yymsp[-5].minor.yy0.zRestSql;
+				yygotominor.yy118.zEnd=yymsp[0].minor.yy0.zRestSql.Substring(yymsp[0].minor.yy0.Length);
 				//z[yymsp[0].minor.yy0.n];
 			}
 			//#line 3451 "parse.c"
@@ -8095,28 +8096,28 @@ return yy_default[stateno];
 			case 316:
 			/* cmd ::= create_vtab *///#line 1356 "parse.y"
 			{
-				sqlite3VtabFinishParse(pParse,(Token)null);
+				pParse.sqlite3VtabFinishParse((Token)null);
 			}
 			//#line 3529 "parse.c"
 			break;
 			case 317:
 			/* cmd ::= create_vtab LP vtabarglist RP *///#line 1357 "parse.y"
 			{
-				sqlite3VtabFinishParse(pParse,yymsp[0].minor.yy0);
+				pParse.sqlite3VtabFinishParse(yymsp[0].minor.yy0);
 			}
 			//#line 3534 "parse.c"
 			break;
 			case 318:
 			/* create_vtab ::= createkw VIRTUAL TABLE nm dbnm USING nm *///#line 1358 "parse.y"
 			{
-				sqlite3VtabBeginParse(pParse,yymsp[-3].minor.yy0,yymsp[-2].minor.yy0,yymsp[0].minor.yy0);
+				pParse.sqlite3VtabBeginParse(yymsp[-3].minor.yy0,yymsp[-2].minor.yy0,yymsp[0].minor.yy0);
 			}
 			//#line 3541 "parse.c"
 			break;
 			case 321:
 			/* vtabarg ::= *///#line 1363 "parse.y"
 			{
-				sqlite3VtabArgInit(pParse);
+				pParse.sqlite3VtabArgInit();
 			}
 			//#line 3546 "parse.c"
 			break;
@@ -8127,7 +8128,7 @@ return yy_default[stateno];
 			/* lp ::= LP *///yytestcase(yyruleno==325);
 			//#line 1365 "parse.y"
 			{
-				sqlite3VtabArgExtend(pParse,yymsp[0].minor.yy0);
+				pParse.sqlite3VtabArgExtend(yymsp[0].minor.yy0);
 			}
 			//#line 3553 "parse.c"
 			break;

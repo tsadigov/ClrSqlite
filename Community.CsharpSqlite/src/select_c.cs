@@ -169,7 +169,7 @@ namespace Community.CsharpSqlite {
 			for(i=0;i<3&&apAll[i]!=null;i++) {
 				p=apAll[i];
 				for(j=0;j<ArraySize(aKeyword);j++) {
-					if(p.n==aKeyword[j].nChar&&p.z.StartsWith(zKeyText.Substring(aKeyword[j].i,aKeyword[j].nChar),StringComparison.InvariantCultureIgnoreCase)) {
+					if(p.Length==aKeyword[j].nChar&&p.zRestSql.StartsWith(zKeyText.Substring(aKeyword[j].i,aKeyword[j].nChar),StringComparison.InvariantCultureIgnoreCase)) {
 						jointype|=aKeyword[j].code;
 						break;
 					}
@@ -3154,8 +3154,8 @@ break;
 									pExpr=pRight;
 								}
 								pNew=pParse.sqlite3ExprListAppend(pNew,pExpr);
-								sColname.z=zColname;
-								sColname.n=StringExtensions.sqlite3Strlen30(zColname);
+								sColname.zRestSql=zColname;
+								sColname.Length=StringExtensions.sqlite3Strlen30(zColname);
 								pParse.sqlite3ExprListSetName(pNew,sColname,0);
 								db.sqlite3DbFree(ref zToFree);
 							}

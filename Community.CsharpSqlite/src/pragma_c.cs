@@ -414,7 +414,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 				zRight=sqlite3NameFromToken(db,pValue);
 			}
 			Debug.Assert(pId2!=null);
-			zDb=pId2.n>0?pDb.zName:null;
+			zDb=pId2.Length>0?pDb.zName:null;
 			#if !SQLITE_OMIT_AUTHORIZATION
 																																																															if ( sqlite3AuthCheck( pParse, SQLITE_PRAGMA, zLeft, zRight, zDb ) )
 {
@@ -511,7 +511,7 @@ goto pragma_out;
 						if(zRight!=null) {
 							b=sqlite3GetBoolean(zRight);
 						}
-						if(pId2.n==0&&b>=0) {
+						if(pId2.Length==0&&b>=0) {
 							int ii;
 							for(ii=0;ii<db.nDb;ii++) {
 								sqlite3BtreeSecureDelete(db.aDb[ii].pBt,b);
@@ -574,7 +574,7 @@ goto pragma_out;
                 */if(zLeft.Equals("locking_mode",StringComparison.InvariantCultureIgnoreCase)) {
 									string zRet="normal";
 									int eMode=getLockingMode(zRight);
-									if(pId2.n==0&&eMode==PAGER_LOCKINGMODE_QUERY) {
+									if(pId2.Length==0&&eMode==PAGER_LOCKINGMODE_QUERY) {
 										/* Simple "PRAGMA locking_mode;" statement. This is a query for
                     ** the current default locking mode (which may be different to
                     ** the locking-mode of the main database).
@@ -582,7 +582,7 @@ goto pragma_out;
 									}
 									else {
 										Pager pPager;
-										if(pId2.n==0) {
+										if(pId2.Length==0) {
 											/* This indicates that no database name was specified as part
                       ** of the PRAGMA command. In this case the locking-mode must be
                       ** set on all attached databases, as well as the main db file.
@@ -640,12 +640,12 @@ goto pragma_out;
                         ** then do a query */eMode=PAGER_JOURNALMODE_QUERY;
 											}
 										}
-										if(eMode==PAGER_JOURNALMODE_QUERY&&pId2.n==0) {
+										if(eMode==PAGER_JOURNALMODE_QUERY&&pId2.Length==0) {
 											/* Convert "PRAGMA journal_mode" into "PRAGMA main.journal_mode" */iDb=0;
-											pId2.n=1;
+											pId2.Length=1;
 										}
 										for(ii=db.nDb-1;ii>=0;ii--) {
-											if(db.aDb[ii].pBt!=null&&(ii==iDb||pId2.n==0)) {
+											if(db.aDb[ii].pBt!=null&&(ii==iDb||pId2.Length==0)) {
 												sqlite3VdbeUsesBtree(v,ii);
 												v.sqlite3VdbeAddOp3(OP_JournalMode,ii,1,eMode);
 											}

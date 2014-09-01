@@ -291,5 +291,13 @@ public u64 cycles;         /* Total time spend executing this instruction */
 		static void VdbeNoopComment(Vdbe v,string zFormat,params object[] ap) {
 		}
 	#endif
+
+
+
+
+
+
+
+
 	}
 }

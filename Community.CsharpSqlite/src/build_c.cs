@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 			pParse.nVar=0;
 		}
 		#if !SQLITE_OMIT_SHARED_CACHE
-																																												///<summary>
+																																														///<summary>
 /// The TableLock structure is only used by the sqlite3TableLock() and
 /// codeTableLocks() functions.
 ///</summary>
@@ -175,7 +175,7 @@ p.zName, P4_STATIC );
       */v=sqlite3GetVdbe(pParse);
 			Debug.Assert(0==pParse.isMultiWrite
 			#if SQLITE_DEBUG
-																																																																		        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
+																																																																					        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
 #endif
 			);
 			if(v!=null) {
@@ -221,7 +221,7 @@ p.zName, P4_STATIC );
 			/* Get the VDBE program ready for execution
       */if(v!=null&&ALWAYS(pParse.nErr==0)/* && 0 == db.mallocFailed */) {
 				#if SQLITE_DEBUG
-																																																																																								        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
+																																																																																												        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
         sqlite3VdbeTrace( v, trace );
 #endif
 				Debug.Assert(pParse.iCacheLevel==0);
@@ -549,7 +549,7 @@ p.zName, P4_STATIC );
 				string zName=pIndex.zName;
 				//
 				#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																								        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
+																																																																																												        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
         //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
         //  );
         Index pOld = sqlite3HashInsert(
@@ -615,8 +615,8 @@ p.zName, P4_STATIC );
 		///</summary>
 		static string sqlite3NameFromToken(sqlite3 db,Token pName) {
 			string zName;
-			if(pName!=null&&pName.z!=null) {
-				zName=pName.z.Substring(0,pName.n);
+			if(pName!=null&&pName.zRestSql!=null) {
+				zName=pName.zRestSql.Substring(0,pName.Length);
 				//sqlite3DbStrNDup(db, (char)pName.z, pName.n);
 				StringExtensions.sqlite3Dequote(ref zName);
 			}
@@ -696,7 +696,7 @@ p.zName, P4_STATIC );
 		static int sqlite3TwoPartName(Parse pParse,/* Parsing and code generating context */Token pName1,/* The "xxx" in the name "xxx.yyy" or "xxx" */Token pName2,/* The "yyy" in the name "xxx.yyy" */ref Token pUnqual/* Write the unqualified object name here */) {
 			int iDb;
 			/* Database holding the object */sqlite3 db=pParse.db;
-			if(ALWAYS(pName2!=null)&&pName2.n>0) {
+			if(ALWAYS(pName2!=null)&&pName2.Length>0) {
 				if(db.init.busy!=0) {
 					sqlite3ErrorMsg(pParse,"corrupt database");
 					pParse.nErr++;
@@ -773,7 +773,7 @@ p.zName, P4_STATIC );
       */iDb=sqlite3TwoPartName(pParse,pName1,pName2,ref pName);
 			if(iDb<0)
 				return;
-			if(0==OMIT_TEMPDB&&isTemp!=0&&pName2.n>0&&iDb!=1) {
+			if(0==OMIT_TEMPDB&&isTemp!=0&&pName2.Length>0&&iDb!=1) {
 				/* If creating a temp table, the name may not be qualified. Unless 
         ** the database name is "temp" anyway.  */sqlite3ErrorMsg(pParse,"temporary table name must be unqualified");
 				return;
@@ -790,7 +790,7 @@ p.zName, P4_STATIC );
 			if(db.init.iDb==1)
 				isTemp=1;
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																																		Debug.Assert( (isTemp & 1)==isTemp );
+																																																																					Debug.Assert( (isTemp & 1)==isTemp );
 {
 int code;
 string zDb = db.aDb[iDb].zName;
@@ -1601,8 +1601,8 @@ goto begin_table_error;
 					zStmt=createTableStmt(db,p);
 				}
 				else {
-					n=(int)(pParse.sNameToken.z.Length-pEnd.z.Length)+1;
-					zStmt=sqlite3MPrintf(db,"CREATE %s %.*s",zType2,n,pParse.sNameToken.z);
+					n=(int)(pParse.sNameToken.zRestSql.Length-pEnd.zRestSql.Length)+1;
+					zStmt=sqlite3MPrintf(db,"CREATE %s %.*s",zType2,n,pParse.sNameToken.zRestSql);
 				}
 				/* A slot for the record has already been allocated in the
         ** SQLITE_MASTER table.  We just need to update that slot with all
@@ -1639,13 +1639,13 @@ goto begin_table_error;
 				db.flags|=SQLITE_InternChanges;
 				#if !SQLITE_OMIT_ALTERTABLE
 				if(p.pSelect==null) {
-					string zName=pParse.sNameToken.z;
+					string zName=pParse.sNameToken.zRestSql;
 					int nName;
 					Debug.Assert(pSelect==null&&pCons!=null&&pEnd!=null);
-					if(pCons.z==null) {
+					if(pCons.zRestSql==null) {
 						pCons=pEnd;
 					}
-					nName=zName.Length-pCons.z.Length;
+					nName=zName.Length-pCons.zRestSql.Length;
 					p.addColOffset=13+nName;
 					// sqlite3Utf8CharLen(zName, nName);
 				}
@@ -1699,23 +1699,23 @@ goto begin_table_error;
 			/* Locate the end of the CREATE VIEW statement.  Make sEnd point to
       ** the end.
       */sEnd=pParse.sLastToken;
-			if(ALWAYS(sEnd.z[0]!=0)&&sEnd.z[0]!=';') {
-				sEnd.z=sEnd.z.Substring(sEnd.n);
+			if(ALWAYS(sEnd.zRestSql[0]!=0)&&sEnd.zRestSql[0]!=';') {
+				sEnd.zRestSql=sEnd.zRestSql.Substring(sEnd.Length);
 			}
-			sEnd.n=0;
-			n=(int)(pBegin.z.Length-sEnd.z.Length);
+			sEnd.Length=0;
+			n=(int)(pBegin.zRestSql.Length-sEnd.zRestSql.Length);
 			//sEnd.z - pBegin.z;
-			z=pBegin.z;
+			z=pBegin.zRestSql;
 			while(ALWAYS(n>0)&&CharExtensions.sqlite3Isspace(z[n-1])) {
 				n--;
 			}
-			sEnd.z=z.Substring(n-1);
-			sEnd.n=1;
+			sEnd.zRestSql=z.Substring(n-1);
+			sEnd.Length=1;
 			/* Use sqlite3EndTable() to add the view to the SQLITE_MASTER table */sqlite3EndTable(pParse,null,sEnd,null);
 			return;
 		}
 		#else
-																																												    static void sqlite3CreateView(
+																																														    static void sqlite3CreateView(
     Parse pParse,     /* The parsing context */
     Token pBegin,     /* The CREATE token that begins the statement */
     Token pName1,     /* The token that holds the name of the view */
@@ -1743,7 +1743,7 @@ goto begin_table_error;
 			//)(void*,int,const char*,const char*,const char*,const char);
 			Debug.Assert(pTable!=null);
 			#if !SQLITE_OMIT_VIRTUALTABLE
-			if(sqlite3VtabCallConnect(pParse,pTable)!=0) {
+			if(pParse.sqlite3VtabCallConnect(pTable)!=0) {
 				return SQLITE_ERROR;
 			}
 			#endif
@@ -1788,7 +1788,7 @@ goto begin_table_error;
 				pTable.nCol=-1;
 				db.lookaside.bEnabled=0;
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																								xAuth = db.xAuth;
+																																																																																												xAuth = db.xAuth;
 db.xAuth = 0;
 pSelTab = sqlite3ResultSetOfSelect(pParse, pSel);
 db.xAuth = xAuth;
@@ -1841,7 +1841,7 @@ db.xAuth = xAuth;
 			DbClearProperty(db,idx,DB_UnresetViews);
 		}
 		#else
-																																												    // define sqliteViewResetAll(A,B)
+																																														    // define sqliteViewResetAll(A,B)
     static void sqliteViewResetAll( sqlite3 A, int B )
     {
     }
@@ -1923,7 +1923,7 @@ db.xAuth = xAuth;
 		///</summary>
 		static void destroyTable(Parse pParse,Table pTab) {
 			#if SQLITE_OMIT_AUTOVACUUM
-																																																																		Index pIdx;
+																																																																					Index pIdx;
 int iDb = sqlite3SchemaToIndex( pParse.db, pTab.pSchema );
 destroyRootPage( pParse, pTab.tnum, iDb );
 for ( pIdx = pTab.pIndex ; pIdx != null ; pIdx = pIdx.pNext )
@@ -2004,7 +2004,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
 				goto exit_drop_table;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																																		{
+																																																																					{
 int code;
 string zTab = SCHEMA_TABLE(iDb);
 string zDb = db.aDb[iDb].zName;
@@ -2177,7 +2177,7 @@ goto exit_drop_table;
 			pFKey.aCol=new FKey.sColMap[nCol];
 			// z;
 			pFKey.aCol[0]=new FKey.sColMap();
-			pFKey.zTo=pTo.z.Substring(0,pTo.n);
+			pFKey.zTo=pTo.zRestSql.Substring(0,pTo.Length);
 			//memcpy( z, pTo.z, pTo.n );
 			//z[pTo.n] = 0;
 			StringExtensions.sqlite3Dequote(ref pFKey.zTo);
@@ -2278,7 +2278,7 @@ goto exit_drop_table;
 			/* Register holding assemblied index record */sqlite3 db=pParse.db;
 			/* The database connection */int iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																																		if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
+																																																																					if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
 db.aDb[iDb].zName ) ){
 return;
 }
@@ -2393,7 +2393,7 @@ return;
 ** if initialising a database schema.
 */if(0==db.init.busy) {
 					pTab=pParse.sqlite3SrcListLookup(pTblName);
-					if(pName2.n==0&&pTab!=null&&pTab.pSchema==db.aDb[1].pSchema) {
+					if(pName2.Length==0&&pTab!=null&&pTab.pSchema==db.aDb[1].pSchema) {
 						iDb=1;
 					}
 				}
@@ -2480,7 +2480,7 @@ return;
 			/* Check for authorization to create an index.
       */
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																																		{
+																																																																					{
 string zDb = pDb.zName;
 if( sqlite3AuthCheck(pParse, SQLITE_INSERT, SCHEMA_TABLE(iDb), 0, zDb) ){
 goto exit_create_index;
@@ -2496,8 +2496,8 @@ goto exit_create_index;
 ** key out of the last column added to the table under construction.
 ** So create a fake list to simulate this.
 */if(pList==null) {
-				nullId.z=pTab.aCol[pTab.nCol-1].zName;
-				nullId.n=StringExtensions.sqlite3Strlen30(nullId.z);
+				nullId.zRestSql=pTab.aCol[pTab.nCol-1].zName;
+				nullId.Length=StringExtensions.sqlite3Strlen30(nullId.zRestSql);
 				pList=pParse.sqlite3ExprListAppend(null,null);
 				if(pList==null)
 					goto exit_create_index;
@@ -2724,7 +2724,7 @@ goto exit_create_index;
         ** the zStmt variable
         */if(pStart!=null) {
 					Debug.Assert(pEnd!=null);
-					/* A named index with an explicit CREATE INDEX statement */zStmt=sqlite3MPrintf(db,"CREATE%s INDEX %.*s",onError==OE_None?"":" UNIQUE",(int)(pName.z.Length-pEnd.z.Length)+1,pName.z);
+					/* A named index with an explicit CREATE INDEX statement */zStmt=sqlite3MPrintf(db,"CREATE%s INDEX %.*s",onError==OE_None?"":" UNIQUE",(int)(pName.zRestSql.Length-pEnd.zRestSql.Length)+1,pName.zRestSql);
 				}
 				else {
 					/* An automatic index created by a PRIMARY KEY or UNIQUE constraint *//* zStmt = sqlite3MPrintf(""); */zStmt=null;
@@ -2845,7 +2845,7 @@ goto exit_create_index;
 			}
 			iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																																		{
+																																																																					{
 int code = SQLITE_DROP_INDEX;
 Table pTab = pIndex.pTable;
 string zDb = db.aDb[iDb].zName;
@@ -3074,7 +3074,7 @@ goto exit_drop_index;
 			//  return null;
 			//}
 			pItem=pList.a[pList.nSrc-1];
-			if(pDatabase!=null&&String.IsNullOrEmpty(pDatabase.z)) {
+			if(pDatabase!=null&&String.IsNullOrEmpty(pDatabase.zRestSql)) {
 				pDatabase=null;
 			}
 			if(pDatabase!=null) {
@@ -3165,7 +3165,7 @@ goto exit_drop_index;
 			//}
 			pItem=p.a[p.nSrc-1];
 			Debug.Assert(pAlias!=null);
-			if(pAlias.n!=0) {
+			if(pAlias.Length!=0) {
 				pItem.zAlias=sqlite3NameFromToken(db,pAlias);
 			}
 			pItem.pSelect=pSubquery;
@@ -3189,7 +3189,7 @@ goto exit_drop_index;
 			if(p!=null&&ALWAYS(p.nSrc>0)) {
 				SrcList_item pItem=p.a[p.nSrc-1];
 				Debug.Assert(0==pItem.notIndexed&&pItem.zIndex==null);
-				if(pIndexedBy.n==1&&null==pIndexedBy.z) {
+				if(pIndexedBy.Length==1&&null==pIndexedBy.zRestSql) {
 					/* A "NOT INDEXED" clause was supplied. See parse.y
           ** construct "indexed_opt" for details. */pItem.notIndexed=1;
 				}
@@ -3288,18 +3288,18 @@ goto exit_drop_index;
 		///
 		///</summary>
 		#if !SQLITE_OMIT_AUTHORIZATION
-																																												const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
+																																														const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
 #endif
 		static void sqlite3Savepoint(Parse pParse,int op,Token pName) {
 			string zName=sqlite3NameFromToken(pParse.db,pName);
 			if(zName!=null) {
 				Vdbe v=sqlite3GetVdbe(pParse);
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																								Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
+																																																																																												Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
 #endif
 				if(null==v
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																								|| sqlite3AuthCheck(pParse, SQLITE_SAVEPOINT, az[op], zName, 0)
+																																																																																												|| sqlite3AuthCheck(pParse, SQLITE_SAVEPOINT, az[op], zName, 0)
 #endif
 				) {
 					pParse.db.sqlite3DbFree(ref zName);
@@ -3567,9 +3567,9 @@ goto exit_drop_index;
 				return;
 			}
 			else
-				if(NEVER(pName2==null)||pName2.z==null||pName2.z.Length==0) {
+				if(NEVER(pName2==null)||pName2.zRestSql==null||pName2.zRestSql.Length==0) {
 					string zColl;
-					Debug.Assert(pName1.z!=null);
+					Debug.Assert(pName1.zRestSql!=null);
 					zColl=sqlite3NameFromToken(pParse.db,pName1);
 					if(zColl==null)
 						return;
