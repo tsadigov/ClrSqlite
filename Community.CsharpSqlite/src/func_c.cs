@@ -1656,7 +1656,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
 		///</summary>
 		static bool sqlite3IsLikeFunction(sqlite3 db,Expr pExpr,ref bool pIsNocase,char[] aWc) {
 			FuncDef pDef;
-            if (pExpr.Operator != Operator.TK_FUNCTION || null == pExpr.x.pList || pExpr.x.pList.nExpr != 2)
+            if (pExpr.Operator != TokenType.TK_FUNCTION || null == pExpr.x.pList || pExpr.x.pList.nExpr != 2)
             {
 				return false;
 			}

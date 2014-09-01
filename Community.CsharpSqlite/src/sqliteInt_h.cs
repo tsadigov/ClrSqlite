@@ -34,7 +34,7 @@ namespace Community.CsharpSqlite {
 
 
 
-    public enum Operator : byte
+    public enum TokenType : byte
     {
         TK_SEMI = 1,
         TK_EXPLAIN = 2,
@@ -2319,9 +2319,9 @@ get { return _op; }
 set { _op = value; }
 }
 #else
-          Operator _op;
+          TokenType _op;
 
-          public Operator Operator
+          public TokenType Operator
           {
               get { return _op; }
               set { _op = value; }
@@ -2329,7 +2329,7 @@ set { _op = value; }
           public u8 op
           {
               get { return(u8) _op; }
-              set { _op = (Operator)value; }
+              set { _op = (TokenType)value; }
           }
 			/* Operation performed by this node */
 			#endif
@@ -2868,7 +2868,7 @@ set { _op = value; }
 				this.iRightJoinTable=pBase.iRightJoinTable;
 			}
 
-            public Operator Operator2 { get { return (Operator)op2; } set { op2 = (u8)value; } }
+            public TokenType Operator2 { get { return (TokenType)op2; } set { op2 = (u8)value; } }
       }
 		/*
     ** The following are the meanings of bits in the Expr.flags field.
@@ -3189,7 +3189,7 @@ set { _op = value; }
 				pTerm.wtFlags|=TERM_ORINFO;
 				pOrWc=pOrInfo.wc;
 				pOrWc.whereClauseInit(pWC.pParse,pMaskSet);
-                pOrWc.whereSplit(pExpr, Operator.TK_OR);
+                pOrWc.whereSplit(pExpr, TokenType.TK_OR);
 				this.exprAnalyzeAll(pOrWc);
 				//      if ( db.mallocFailed != 0 ) return;
 				Debug.Assert(pOrWc.nTerm>=2);
@@ -3217,7 +3217,7 @@ set { _op = value; }
 							pOrTerm.eOperator=WO_AND;
 							pAndWC=pAndInfo.wc;
 							pAndWC.whereClauseInit(pWC.pParse,pMaskSet);
-                            pAndWC.whereSplit(pOrTerm.pExpr, Operator.TK_AND);
+                            pAndWC.whereSplit(pOrTerm.pExpr, TokenType.TK_AND);
 							this.exprAnalyzeAll(pAndWC);
 							//testcase( db.mallocFailed );
 							////if ( 0 == db.mallocFailed )
@@ -3502,7 +3502,7 @@ set { _op = value; }
 ** skipped.  Or, if the children are satisfied by an index, the original
 ** BETWEEN term is skipped.
 */else
-                    if (pExpr.Operator == Operator.TK_BETWEEN && pWC.Operator == Operator.TK_AND)
+                    if (pExpr.Operator == TokenType.TK_BETWEEN && pWC.Operator == TokenType.TK_AND)
                     {
 						ExprList pList=pExpr.x.pList;
 						int i;
@@ -3529,7 +3529,7 @@ set { _op = value; }
 					/* Analyze a term that is composed of two or more subterms connected by
 ** an OR operator.
 */else
-                        if (pExpr.Operator == Operator.TK_OR)
+                        if (pExpr.Operator == TokenType.TK_OR)
                         {
 							Debug.Assert(pWC.op==TK_AND);
 							this.exprAnalyzeOrTerm(pWC,idxTerm);
@@ -3547,7 +3547,7 @@ set { _op = value; }
 ** The last character of the prefix "abc" is incremented to form the
 ** termination condition "abd".
 */
-                if (pWC.Operator == Operator.TK_AND && pParse.isLikeOrGlob(pExpr, ref pStr1, ref isComplete, ref noCase) != 0)
+                if (pWC.Operator == TokenType.TK_AND && pParse.isLikeOrGlob(pExpr, ref pStr1, ref isComplete, ref noCase) != 0)
                 {
 					Expr pLeft;
 					/* LHS of LIKE/GLOB operator */Expr pStr2;

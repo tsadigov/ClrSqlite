@@ -290,7 +290,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				pTerm.iParent=-1;
 				return idx;
 			}
-			public void whereSplit(Expr pExpr,Operator op) {
+			public void whereSplit(Expr pExpr,TokenType op) {
 				this.Operator=op;
 				if(pExpr==null)
 					return;
@@ -339,7 +339,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				return null;
 			}
 
-            public Operator Operator { get { return (Operator)op; } set { op = (u8)value; } }
+            public TokenType Operator { get { return (TokenType)op; } set { op = (u8)value; } }
         }
 		///<summary>
 		/// A WhereTerm with eOperator==WO_OR has its u.pOrInfo pointer set to

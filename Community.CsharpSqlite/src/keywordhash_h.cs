@@ -1201,9 +1201,9 @@ namespace Community.CsharpSqlite {
 			TK_ALL,
 		};
 
-        static Operator keywordCode(string z, int iOffset, int n)
+        static TokenType keywordCode(string z, int iOffset, int n)
         {
-            return (Operator)innerKeywordCode(z,iOffset,n);
+            return (TokenType)innerKeywordCode(z,iOffset,n);
         }
 		static int innerKeywordCode(string z,int iOffset,int n) {
 			int h,i;

@@ -502,7 +502,7 @@ namespace Community.CsharpSqlite {
 				return 0;
 				/* The result set must have exactly one column */}
 			Debug.Assert(pEList.a[0].pExpr!=null);
-            if (pEList.a[0].pExpr.Operator != Operator.TK_ALL)
+            if (pEList.a[0].pExpr.Operator != TokenType.TK_ALL)
             {
 				return 0;
 				/* The result set must be the special operator "*" */}

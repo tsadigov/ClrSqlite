@@ -18,7 +18,7 @@ namespace Community.CsharpSqlite
         ///</summary>
         public class Token
         {
-            public Operator TokenType;
+            public TokenType TokenType;
             public int Start;
             public String Text;
 

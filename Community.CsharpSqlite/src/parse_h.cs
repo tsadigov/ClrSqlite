@@ -438,7 +438,7 @@ return;
 ** literal NULL, then set pDflt to 0. This simplifies checking
 ** for an SQL NULL default below.
 */
-                if (pDflt != null && pDflt.Operator == Operator.TK_NULL)
+                if (pDflt != null && pDflt.Operator == TokenType.TK_NULL)
                 {
                     pDflt = null;
                 }
@@ -2515,7 +2515,7 @@ goto attach_end;
                     }
                     switch (this.sLastToken.TokenType)
                     {
-                        case Operator.TK_SPACE:
+                        case TokenType.TK_SPACE:
                             {
                                 if (db.u1.isInterrupted)
                                 {
@@ -2525,14 +2525,14 @@ goto attach_end;
                                 }
                                 break;
                             }
-                        case Operator.TK_ILLEGAL:
+                        case TokenType.TK_ILLEGAL:
                             {
                                 db.sqlite3DbFree(ref pzErrMsg);
                                 pzErrMsg = sqlite3MPrintf(db, "unrecognized token: \"%T\"", (object)this.sLastToken);
                                 nErr++;
                                 goto abort_parse;
                             }
-                        case Operator.TK_SEMI:
+                        case TokenType.TK_SEMI:
                             {
                                 //pParse.zTail = new StringBuilder(zSql.Substring( i,zSql.Length-i ));
                                 /* Fall thru into the default case */
@@ -2555,7 +2555,7 @@ goto attach_end;
                 {
                     if (lastTokenParsed != TK_SEMI)
                     {
-                        pEngine.sqlite3Parser(Operator.TK_SEMI, this.sLastToken, this);
+                        pEngine.sqlite3Parser(TokenType.TK_SEMI, this.sLastToken, this);
                     }
                     pEngine.sqlite3Parser(0, this.sLastToken, this);
                 }
@@ -5023,12 +5023,12 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
                 Expr p = pExpr;
                 while (ALWAYS(p))
                 {
-                    Operator op;
+                    TokenType op;
                     pColl = pExpr.pColl;
                     if (pColl != null)
                         break;
                     op = p.Operator;
-                    if (p.pTab != null && (op == Operator.TK_AGG_COLUMN || op == Operator.TK_COLUMN || op == Operator.TK_REGISTER || op == Operator.TK_TRIGGER))
+                    if (p.pTab != null && (op == TokenType.TK_AGG_COLUMN || op == TokenType.TK_COLUMN || op == TokenType.TK_REGISTER || op == TokenType.TK_TRIGGER))
                     {
                         /* op==TK_REGISTER && p->pTab!=0 happens when pExpr was originally
           ** a TK_COLUMN but was previously evaluated and cached in a register */
@@ -5043,7 +5043,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
                         }
                         break;
                     }
-                    if (op != Operator.TK_CAST && op != Operator.TK_UPLUS)
+                    if (op != TokenType.TK_CAST && op != TokenType.TK_UPLUS)
                     {
                         break;
                     }
@@ -5587,13 +5587,13 @@ return;
                         {
                             Expr pLeft = pExpr.pLeft;
                             Debug.Assert(pLeft != null);
-                            if (pLeft.Operator == Operator.TK_INTEGER)
+                            if (pLeft.Operator == TokenType.TK_INTEGER)
                             {
                                 this.codeInteger(pLeft, true, target);
 #if !SQLITE_OMIT_FLOATING_POINT
                             }
                             else
-                                if (pLeft.Operator == Operator.TK_FLOAT)
+                                if (pLeft.Operator == TokenType.TK_FLOAT)
                                 {
                                     Debug.Assert(!ExprHasProperty(pExpr, EP_IntValue));
                                     codeReal(v, pLeft.u.zToken, true, target);
@@ -5939,12 +5939,12 @@ return;
                             if ((pX = pExpr.pLeft) != null)
                             {
                                 cacheX = pX;
-                                testcase(pX.Operator == Operator.TK_COLUMN);
-                                testcase(pX.Operator == Operator.TK_REGISTER);
+                                testcase(pX.Operator == TokenType.TK_COLUMN);
+                                testcase(pX.Operator == TokenType.TK_REGISTER);
                                 cacheX.iTable = this.sqlite3ExprCodeTemp(pX, ref regFree1);
                                 testcase(regFree1 == 0);
-                                cacheX.Operator = Operator.TK_REGISTER;
-                                opCompare.Operator = Operator.TK_EQ;
+                                cacheX.Operator = TokenType.TK_REGISTER;
+                                opCompare.Operator = TokenType.TK_EQ;
                                 opCompare.pLeft = cacheX;
                                 pTest = opCompare;
                                 /* Ticket b351d95f9cd5ef17e9d9dbae18f5ca8611190001:
@@ -8081,12 +8081,12 @@ range_est_fallback:
                 int iReg;
                 /* Register holding results */
                 Debug.Assert(iTarget > 0);
-                if (pX.Operator == Operator.TK_EQ)
+                if (pX.Operator == TokenType.TK_EQ)
                 {
                     iReg = this.sqlite3ExprCodeTarget(pX.pRight, iTarget);
                 }
                 else
-                    if (pX.Operator == Operator.TK_ISNULL)
+                    if (pX.Operator == TokenType.TK_ISNULL)
                     {
                         iReg = iTarget;
                         v.sqlite3VdbeAddOp2(OP_Null, 0, iReg);
@@ -8097,7 +8097,7 @@ range_est_fallback:
                         int eType;
                         int iTab;
                         InLoop pIn;
-                        Debug.Assert(pX.Operator == Operator.TK_IN);
+                        Debug.Assert(pX.Operator == TokenType.TK_IN);
                         iReg = iTarget;
                         int iDummy = -1;
                         eType = this.sqlite3FindInIndex(pX, ref iDummy);
@@ -8394,7 +8394,7 @@ range_est_fallback:
                 //initMaskSet(pMaskSet);
                 pWC.whereClauseInit(this, pMaskSet);
                 this.sqlite3ExprCodeConstants(pWhere);
-                pWC.whereSplit(pWhere, Operator.TK_AND);
+                pWC.whereSplit(pWhere, TokenType.TK_AND);
                 /* IMP: R-15842-53296 */
                 /* Special case: a WHERE clause that is constant.  Evaluate the
 ** expression and either jump over all of the code or fall thru.
@@ -8925,7 +8925,7 @@ range_est_fallback:
                     string zColl;
                     /* Name of the collating sequence for i-th index term */
                     pExpr = pTerm.pExpr;
-                    if (pExpr.Operator != Operator.TK_COLUMN || pExpr.iTable != _base)
+                    if (pExpr.Operator != TokenType.TK_COLUMN || pExpr.iTable != _base)
                     {
                         /* Can not use an index sort on anything that is not a column in the
           ** left-most table of the FROM clause */
@@ -9028,9 +9028,9 @@ range_est_fallback:
             public void binaryToUnaryIfNull(Expr pY, Expr pA, int op)
             {
                 sqlite3 db = this.db;
-                if (/*db.mallocFailed == null && */pY.Operator == Operator.TK_NULL)
+                if (/*db.mallocFailed == null && */pY.Operator == TokenType.TK_NULL)
                 {
-                    pA.Operator = (Operator)op;
+                    pA.Operator = (TokenType)op;
                     sqlite3ExprDelete(db, ref pA.pRight);
                     pA.pRight = null;
                 }
@@ -9045,7 +9045,7 @@ range_est_fallback:
                 /* Cursor of the RHS table */
                 bool mustBeUnique = (prNotFound != 0);
                 /* True if RHS must be unique */
-                Debug.Assert(pX.Operator == Operator.TK_IN);
+                Debug.Assert(pX.Operator == TokenType.TK_IN);
                 /* Check to see if an existing table or index can be used to
       ** satisfy the query.  This is preferable to generating a new
       ** ephemeral table.
@@ -9183,13 +9183,13 @@ range_est_fallback:
 #if !SQLITE_OMIT_EXPLAIN
                 if (this.explain == 2)
                 {
-                    string zMsg = sqlite3MPrintf(this.db, "EXECUTE %s%s SUBQUERY %d", testAddr != 0 ? "" : "CORRELATED ", pExpr.Operator == Operator.TK_IN ? "LIST" : "SCALAR", this.iNextSelectId);
+                    string zMsg = sqlite3MPrintf(this.db, "EXECUTE %s%s SUBQUERY %d", testAddr != 0 ? "" : "CORRELATED ", pExpr.Operator == TokenType.TK_IN ? "LIST" : "SCALAR", this.iNextSelectId);
                     v.sqlite3VdbeAddOp4(OP_Explain, this.iSelectId, 0, 0, zMsg, P4_DYNAMIC);
                 }
 #endif
                 switch (pExpr.Operator)
                 {
-                    case Operator.TK_IN:
+                    case TokenType.TK_IN:
                         {
                             char affinity;
                             /* Affinity of the LHS of the IN */
@@ -9317,8 +9317,8 @@ range_est_fallback:
                             }
                             break;
                         }
-                    case Operator.TK_EXISTS:
-                    case Operator.TK_SELECT:
+                    case TokenType.TK_EXISTS:
+                    case TokenType.TK_SELECT:
                     default:
                         {
                             /* If this has to be a scalar SELECT.  Generate code to put the
@@ -9331,13 +9331,13 @@ range_est_fallback:
                             /* SELECT statement to encode */
                             SelectDest dest = new SelectDest();
                             /* How to deal with SELECt result */
-                            testcase(pExpr.Operator == Operator.TK_EXISTS);
-                            testcase(pExpr.Operator == Operator.TK_SELECT);
-                            Debug.Assert(pExpr.Operator == Operator.TK_EXISTS || pExpr.Operator == Operator.TK_SELECT);
+                            testcase(pExpr.Operator == TokenType.TK_EXISTS);
+                            testcase(pExpr.Operator == TokenType.TK_SELECT);
+                            Debug.Assert(pExpr.Operator == TokenType.TK_EXISTS || pExpr.Operator == TokenType.TK_SELECT);
                             Debug.Assert(ExprHasProperty(pExpr, EP_xIsSelect));
                             pSel = pExpr.x.pSelect;
                             sqlite3SelectDestInit(dest, 0, ++this.nMem);
-                            if (pExpr.Operator == Operator.TK_SELECT)
+                            if (pExpr.Operator == TokenType.TK_SELECT)
                             {
                                 dest.eDest = SelectResultType.Mem;
                                 v.sqlite3VdbeAddOp2(OP_Null, 0, dest.iParm);

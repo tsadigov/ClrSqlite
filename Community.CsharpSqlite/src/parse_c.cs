@@ -5181,7 +5181,7 @@ return;
       ** parser accepts */this.pParse=pParse;
 				//      sqlite3ParserARG_STORE; /* Suppress warning about unused %extra_argument variable */
 			}
-			public void sqlite3Parser(/* The parser */Operator _yymajor,/* The major token code number */sqlite3ParserTOKENTYPE yyminor/* The value for the token */,Parse pParse//sqlite3ParserARG_PDECL           /* Optional %extra_argument parameter */
+			public void sqlite3Parser(/* The parser */TokenType _yymajor,/* The major token code number */sqlite3ParserTOKENTYPE yyminor/* The value for the token */,Parse pParse//sqlite3ParserARG_PDECL           /* Optional %extra_argument parameter */
 			) {
                 int yymajor=(int)_yymajor;
 				YYMINORTYPE yyminorunion=new YYMINORTYPE();
@@ -7421,7 +7421,7 @@ return yy_default[stateno];
 				/* The CURRENT_TIME, CURRENT_DATE, and CURRENT_TIMESTAMP values are
             ** treated as functions that return constants */yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(0,yymsp[0].minor.yy0);
 				if(yygotominor.yy118.pExpr!=null) {
-                    yygotominor.yy118.pExpr.Operator = Operator.TK_CONST_FUNC;
+                    yygotominor.yy118.pExpr.Operator = TokenType.TK_CONST_FUNC;
 				}
 				yygotominor.yy118.spanSet(yymsp[0].minor.yy0,yymsp[0].minor.yy0);
 			}

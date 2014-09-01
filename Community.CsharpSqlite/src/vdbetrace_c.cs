@@ -40,15 +40,15 @@ namespace Community.CsharpSqlite {
 		/// the total number of bytes in the text.
 		///</summary>
 		static int findNextHostParameter(string zSql,int iOffset,ref int pnToken) {
-			Operator tokenType=0;
+			TokenType tokenType=0;
 			int nTotal=0;
 			int n;
 			pnToken=0;
 			while(iOffset<zSql.Length) {
 				var token=GetToken(zSql,iOffset);
                 n = token.Length;
-				Debug.Assert(n>0&&token.TokenType!=Operator.TK_ILLEGAL);
-                if (tokenType == Operator.TK_VARIABLE)
+				Debug.Assert(n>0&&token.TokenType!=TokenType.TK_ILLEGAL);
+                if (tokenType == TokenType.TK_VARIABLE)
                 {
 					pnToken=n;
 					break;
