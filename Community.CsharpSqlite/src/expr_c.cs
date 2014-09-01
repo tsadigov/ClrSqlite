@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#else
-																																								//define exprSetHeight(y)
+																																										//define exprSetHeight(y)
 #endif
 		///<summary>
 		/// This routine is the core allocator for Expr nodes.
@@ -175,7 +175,7 @@ namespace Community.CsharpSqlite {
 						//pNew.u.zToken[pToken.n] = 0;
 						if(dequote!=0&&nExtra>=3&&((c=pToken.z[0])=='\''||c=='"'||c=='['||c=='`')) {
 							#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																																																																																												StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
+																																																																																																																																																			StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
 #else
 							StringExtensions.sqlite3Dequote(ref pNew.u.zToken);
 							#endif
@@ -292,7 +292,7 @@ namespace Community.CsharpSqlite {
 				sqlite3ExprDelete(db,ref p.pRight);
 				if(!ExprHasProperty(p,EP_Reduced)&&(p.flags2&EP2_MallocedToken)!=0) {
 					#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																																																				sqlite3DbFree( db, ref p.u._zToken );
+																																																																																																									sqlite3DbFree( db, ref p.u._zToken );
 #else
 					sqlite3DbFree(db,ref p.u.zToken);
 					#endif
@@ -576,7 +576,7 @@ namespace Community.CsharpSqlite {
 			return pNew;
 		}
 		#else
-																																								Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
+																																										Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
 Debug.Assert( p==null );
 return null;
 }
@@ -857,96 +857,6 @@ return null;
 		/// test more often than is necessary.
 		///</summary>
 		#if !SQLITE_OMIT_SUBQUERY
-		static int sqlite3FindInIndex(Parse pParse,Expr pX,ref int prNotFound) {
-			Select p;
-			/* SELECT to the right of IN operator */int eType=0;
-			/* Type of RHS table. IN_INDEX_* */int iTab=pParse.nTab++;
-			/* Cursor of the RHS table */bool mustBeUnique=(prNotFound!=0);
-			/* True if RHS must be unique */Debug.Assert(pX.op==TK_IN);
-			/* Check to see if an existing table or index can be used to
-      ** satisfy the query.  This is preferable to generating a new
-      ** ephemeral table.
-      */p=(ExprHasProperty(pX,EP_xIsSelect)?pX.x.pSelect:null);
-			if(ALWAYS(pParse.nErr==0)&&isCandidateForInOpt(p)!=0) {
-				sqlite3 db=pParse.db;
-				/* Database connection */Expr pExpr=p.pEList.a[0].pExpr;
-				/* Expression <column> */int iCol=pExpr.iColumn;
-				/* Index of column <column> */Vdbe v=sqlite3GetVdbe(pParse);
-				/* Virtual machine being coded */Table pTab=p.pSrc.a[0].pTab;
-				/* Table <table>. */int iDb;
-				/* Database idx for pTab *//* Code an OP_VerifyCookie and OP_TableLock for <table>. */iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-				sqlite3CodeVerifySchema(pParse,iDb);
-				sqlite3TableLock(pParse,iDb,pTab.tnum,0,pTab.zName);
-				/* This function is only called from two places. In both cases the vdbe
-        ** has already been allocated. So assume sqlite3GetVdbe() is always
-        ** successful here.
-        */Debug.Assert(v!=null);
-				if(iCol<0) {
-					int iMem=++pParse.nMem;
-					int iAddr;
-					iAddr=v.sqlite3VdbeAddOp1(OP_If,iMem);
-					v.sqlite3VdbeAddOp2(OP_Integer,1,iMem);
-					pParse.sqlite3OpenTable(iTab,iDb,pTab,OP_OpenRead);
-					eType=IN_INDEX_ROWID;
-					v.sqlite3VdbeJumpHere(iAddr);
-				}
-				else {
-					Index pIdx;
-					/* Iterator variable *//* The collation sequence used by the comparison. If an index is to
-          ** be used in place of a temp.table, it must be ordered according
-          ** to this collation sequence. */CollSeq pReq=pParse.sqlite3BinaryCompareCollSeq(pX.pLeft,pExpr);
-					/* Check that the affinity that will be used to perform the
-          ** comparison is the same as the affinity of the column. If
-          ** it is not, it is not possible to use any index.
-          */char aff=pX.comparisonAffinity();
-					bool affinity_ok=(pTab.aCol[iCol].affinity==aff||aff==SQLITE_AFF_NONE);
-					for(pIdx=pTab.pIndex;pIdx!=null&&eType==0&&affinity_ok;pIdx=pIdx.pNext) {
-						if((pIdx.aiColumn[0]==iCol)&&(sqlite3FindCollSeq(db,ENC(db),pIdx.azColl[0],0)==pReq)&&(mustBeUnique==false||(pIdx.nColumn==1&&pIdx.onError!=OE_None))) {
-							int iMem=++pParse.nMem;
-							int iAddr;
-							KeyInfo pKey;
-							pKey=sqlite3IndexKeyinfo(pParse,pIdx);
-							iAddr=v.sqlite3VdbeAddOp1(OP_If,iMem);
-							v.sqlite3VdbeAddOp2(OP_Integer,1,iMem);
-							v.sqlite3VdbeAddOp4(OP_OpenRead,iTab,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
-							#if SQLITE_DEBUG
-																																																																																																																																												              VdbeComment( v, "%s", pIdx.zName );
-#endif
-							eType=IN_INDEX_INDEX;
-							v.sqlite3VdbeJumpHere(iAddr);
-							if(//prNotFound != null &&         -- always exists under C#
-							pTab.aCol[iCol].notNull==0) {
-								prNotFound=++pParse.nMem;
-							}
-						}
-					}
-				}
-			}
-			if(eType==0) {
-				/* Could not found an existing table or index to use as the RHS b-tree.
-        ** We will have to generate an ephemeral table to do the job.
-        */double savedNQueryLoop=pParse.nQueryLoop;
-				int rMayHaveNull=0;
-				eType=IN_INDEX_EPH;
-				if(prNotFound!=-1)// Klude to show prNotFound not available
-				 {
-					prNotFound=rMayHaveNull=++pParse.nMem;
-				}
-				else {
-					testcase(pParse.nQueryLoop>(double)1);
-					pParse.nQueryLoop=(double)1;
-					if(pX.pLeft.iColumn<0&&!ExprHasAnyProperty(pX,EP_xIsSelect)) {
-						eType=IN_INDEX_ROWID;
-					}
-				}
-				sqlite3CodeSubselect(pParse,pX,rMayHaveNull,eType==IN_INDEX_ROWID);
-				pParse.nQueryLoop=savedNQueryLoop;
-			}
-			else {
-				pX.iTable=iTab;
-			}
-			return eType;
-		}
 		#endif
 		///<summary>
 		/// Generate code for scalar subqueries used as a subquery expression, EXISTS,
@@ -982,186 +892,6 @@ return null;
 		/// result.  For IN operators or if an error occurs, the return value is 0.
 		///</summary>
 		#if !SQLITE_OMIT_SUBQUERY
-		static int sqlite3CodeSubselect(Parse pParse,/* Parsing context */Expr pExpr,/* The IN, SELECT, or EXISTS operator */int rMayHaveNull,/* Register that records whether NULLs exist in RHS */bool isRowid/* If true, LHS of IN operator is a rowid */) {
-			int testAddr=0;
-			/* One-time test address */int rReg=0;
-			/* Register storing resulting */Vdbe v=sqlite3GetVdbe(pParse);
-			if(NEVER(v==null))
-				return 0;
-			pParse.sqlite3ExprCachePush();
-			/* This code must be run in its entirety every time it is encountered
-      ** if any of the following is true:
-      **
-      **    *  The right-hand side is a correlated subquery
-      **    *  The right-hand side is an expression list containing variables
-      **    *  We are inside a trigger
-      **
-      ** If all of the above are false, then we can run this code just once
-      ** save the results, and reuse the same result on subsequent invocations.
-      */if(!ExprHasAnyProperty(pExpr,EP_VarSelect)&&null==pParse.pTriggerTab) {
-				int mem=++pParse.nMem;
-				v.sqlite3VdbeAddOp1(OP_If,mem);
-				testAddr=v.sqlite3VdbeAddOp2(OP_Integer,1,mem);
-				Debug.Assert(testAddr>0/* || pParse.db.mallocFailed != 0 */);
-			}
-			#if !SQLITE_OMIT_EXPLAIN
-			if(pParse.explain==2) {
-				string zMsg=sqlite3MPrintf(pParse.db,"EXECUTE %s%s SUBQUERY %d",testAddr!=0?"":"CORRELATED ",pExpr.op==TK_IN?"LIST":"SCALAR",pParse.iNextSelectId);
-				v.sqlite3VdbeAddOp4(OP_Explain,pParse.iSelectId,0,0,zMsg,P4_DYNAMIC);
-			}
-			#endif
-			switch(pExpr.op) {
-			case TK_IN: {
-				char affinity;
-				/* Affinity of the LHS of the IN */KeyInfo keyInfo;
-				/* Keyinfo for the generated table */int addr;
-				/* Address of OP_OpenEphemeral instruction */Expr pLeft=pExpr.pLeft;
-				/* the LHS of the IN operator */if(rMayHaveNull!=0) {
-					v.sqlite3VdbeAddOp2(OP_Null,0,rMayHaveNull);
-				}
-				affinity=pLeft.sqlite3ExprAffinity();
-				/* Whether this is an 'x IN(SELECT...)' or an 'x IN(<exprlist>)'
-            ** expression it is handled the same way. An ephemeral table is
-            ** filled with single-field index keys representing the results
-            ** from the SELECT or the <exprlist>.
-            **
-            ** If the 'x' expression is a column value, or the SELECT...
-            ** statement returns a column value, then the affinity of that
-            ** column is used to build the index keys. If both 'x' and the
-            ** SELECT... statement are columns, then numeric affinity is used
-            ** if either column has NUMERIC or INTEGER affinity. If neither
-            ** 'x' nor the SELECT... statement are columns, then numeric affinity
-            ** is used.
-            */pExpr.iTable=pParse.nTab++;
-				addr=v.sqlite3VdbeAddOp2(OP_OpenEphemeral,(int)pExpr.iTable,!isRowid);
-				if(rMayHaveNull==0)
-					v.sqlite3VdbeChangeP5(BTREE_UNORDERED);
-				keyInfo=new KeyInfo();
-				// memset( &keyInfo, 0, sizeof(keyInfo ));
-				keyInfo.nField=1;
-				if(ExprHasProperty(pExpr,EP_xIsSelect)) {
-					/* Case 1:     expr IN (SELECT ...)
-              **
-              ** Generate code to write the results of the select into the temporary
-              ** table allocated and opened above.
-              */SelectDest dest=new SelectDest();
-					ExprList pEList;
-					Debug.Assert(!isRowid);
-					sqlite3SelectDestInit(dest,SelectResultType.Set,pExpr.iTable);
-					dest.affinity=(char)affinity;
-					Debug.Assert((pExpr.iTable&0x0000FFFF)==pExpr.iTable);
-					pExpr.x.pSelect.iLimit=0;
-					if(sqlite3Select(pParse,pExpr.x.pSelect,ref dest)!=0) {
-						return 0;
-					}
-					pEList=pExpr.x.pSelect.pEList;
-					if(ALWAYS(pEList!=null)&&pEList.nExpr>0) {
-						keyInfo.aColl[0]=pParse.sqlite3BinaryCompareCollSeq(pExpr.pLeft,pEList.a[0].pExpr);
-					}
-				}
-				else
-					if(ALWAYS(pExpr.x.pList!=null)) {
-						/* Case 2:     expr IN (exprlist)
-              **
-              ** For each expression, build an index key from the evaluation and
-              ** store it in the temporary table. If <expr> is a column, then use
-              ** that columns affinity when building index keys. If <expr> is not
-              ** a column, use numeric affinity.
-              */int i;
-						ExprList pList=pExpr.x.pList;
-						ExprList_item pItem;
-						int r1,r2,r3;
-						if(affinity=='\0') {
-							affinity=SQLITE_AFF_NONE;
-						}
-						keyInfo.aColl[0]=pParse.sqlite3ExprCollSeq(pExpr.pLeft);
-						/* Loop through each expression in <exprlist>. */r1=pParse.sqlite3GetTempReg();
-						r2=pParse.sqlite3GetTempReg();
-						v.sqlite3VdbeAddOp2(OP_Null,0,r2);
-						for(i=0;i<pList.nExpr;i++) {
-							//, pItem++){
-							pItem=pList.a[i];
-							Expr pE2=pItem.pExpr;
-							int iValToIns=0;
-							/* If the expression is not constant then we will need to
-                ** disable the test that was generated above that makes sure
-                ** this code only executes once.  Because for a non-constant
-                ** expression we need to rerun this code each time.
-                */if(testAddr!=0&&pE2.sqlite3ExprIsConstant()==0) {
-								sqlite3VdbeChangeToNoop(v,testAddr-1,2);
-								testAddr=0;
-							}
-							/* Evaluate the expression and insert it into the temp table */if(isRowid&&pE2.sqlite3ExprIsInteger(ref iValToIns)!=0) {
-								v.sqlite3VdbeAddOp3(OP_InsertInt,pExpr.iTable,r2,iValToIns);
-							}
-							else {
-								r3=pParse.sqlite3ExprCodeTarget(pE2,r1);
-								if(isRowid) {
-									v.sqlite3VdbeAddOp2(OP_MustBeInt,r3,v.sqlite3VdbeCurrentAddr()+2);
-									v.sqlite3VdbeAddOp3(OP_Insert,pExpr.iTable,r2,r3);
-								}
-								else {
-									v.sqlite3VdbeAddOp4(OP_MakeRecord,r3,1,r2,affinity,1);
-									pParse.sqlite3ExprCacheAffinityChange(r3,1);
-									v.sqlite3VdbeAddOp2(OP_IdxInsert,pExpr.iTable,r2);
-								}
-							}
-						}
-						pParse.sqlite3ReleaseTempReg(r1);
-						pParse.sqlite3ReleaseTempReg(r2);
-					}
-				if(!isRowid) {
-					v.sqlite3VdbeChangeP4(addr,keyInfo,P4_KEYINFO);
-				}
-				break;
-			}
-			case TK_EXISTS:
-			case TK_SELECT:
-			default: {
-				/* If this has to be a scalar SELECT.  Generate code to put the
-            ** value of this select in a memory cell and record the number
-            ** of the memory cell in iColumn.  If this is an EXISTS, write
-            ** an integer 0 (not exists) or 1 (exists) into a memory cell
-            ** and record that memory cell in iColumn.
-            */Select pSel;
-				/* SELECT statement to encode */SelectDest dest=new SelectDest();
-				/* How to deal with SELECt result */testcase(pExpr.op==TK_EXISTS);
-				testcase(pExpr.op==TK_SELECT);
-				Debug.Assert(pExpr.op==TK_EXISTS||pExpr.op==TK_SELECT);
-				Debug.Assert(ExprHasProperty(pExpr,EP_xIsSelect));
-				pSel=pExpr.x.pSelect;
-				sqlite3SelectDestInit(dest,0,++pParse.nMem);
-				if(pExpr.op==TK_SELECT) {
-					dest.eDest=SelectResultType.Mem;
-					v.sqlite3VdbeAddOp2(OP_Null,0,dest.iParm);
-					#if SQLITE_DEBUG
-																																																																																																				              VdbeComment( v, "Init subquery result" );
-#endif
-				}
-				else {
-					dest.eDest=SelectResultType.Exists;
-					v.sqlite3VdbeAddOp2(OP_Integer,0,dest.iParm);
-					#if SQLITE_DEBUG
-																																																																																																				              VdbeComment( v, "Init EXISTS result" );
-#endif
-				}
-				sqlite3ExprDelete(pParse.db,ref pSel.pLimit);
-				pSel.pLimit=pParse.sqlite3PExpr(TK_INTEGER,null,null,sqlite3IntTokens[1]);
-				pSel.iLimit=0;
-				if(sqlite3Select(pParse,pSel,ref dest)!=0) {
-					return 0;
-				}
-				rReg=dest.iParm;
-				ExprSetIrreducible(pExpr);
-				break;
-			}
-			}
-			if(testAddr!=0) {
-				v.sqlite3VdbeJumpHere(testAddr-1);
-			}
-			pParse.sqlite3ExprCachePop(1);
-			return rReg;
-		}
 		#endif
 		#if !SQLITE_OMIT_SUBQUERY
 		/*
@@ -1180,93 +910,7 @@ return null;
 ** contained within the RHS.  If due to NULLs we cannot determine if the LHS
 ** is contained in the RHS then jump to destIfNull.  If the LHS is contained
 ** within the RHS then fall through.
-*/static void sqlite3ExprCodeIN(Parse pParse,/* Parsing and code generating context */Expr pExpr,/* The IN expression */int destIfFalse,/* Jump here if LHS is not contained in the RHS */int destIfNull/* Jump here if the results are unknown due to NULLs */) {
-			int rRhsHasNull=0;
-			/* Register that is true if RHS contains NULL values */char affinity;
-			/* Comparison affinity to use */int eType;
-			/* Type of the RHS */int r1;
-			/* Temporary use register */Vdbe v;
-			/* Statement under construction *//* Compute the RHS.   After this step, the table with cursor
-      ** pExpr.iTable will contains the values that make up the RHS.
-      */v=pParse.pVdbe;
-			Debug.Assert(v!=null);
-			/* OOM detected prior to this routine */VdbeNoopComment(v,"begin IN expr");
-			eType=sqlite3FindInIndex(pParse,pExpr,ref rRhsHasNull);
-			/* Figure out the affinity to use to create a key from the results
-      ** of the expression. affinityStr stores a static string suitable for
-      ** P4 of OP_MakeRecord.
-      */affinity=pExpr.comparisonAffinity();
-			/* Code the LHS, the <expr> from "<expr> IN (...)".
-      */pParse.sqlite3ExprCachePush();
-			r1=pParse.sqlite3GetTempReg();
-			pParse.sqlite3ExprCode(pExpr.pLeft,r1);
-			/* If the LHS is NULL, then the result is either false or NULL depending
-      ** on whether the RHS is empty or not, respectively.
-      */if(destIfNull==destIfFalse) {
-				/* Shortcut for the common case where the false and NULL outcomes are
-        ** the same. */v.sqlite3VdbeAddOp2(OP_IsNull,r1,destIfNull);
-			}
-			else {
-				int addr1=v.sqlite3VdbeAddOp1(OP_NotNull,r1);
-				v.sqlite3VdbeAddOp2(OP_Rewind,pExpr.iTable,destIfFalse);
-				v.sqlite3VdbeAddOp2(OP_Goto,0,destIfNull);
-				v.sqlite3VdbeJumpHere(addr1);
-			}
-			if(eType==IN_INDEX_ROWID) {
-				/* In this case, the RHS is the ROWID of table b-tree
-        */v.sqlite3VdbeAddOp2(OP_MustBeInt,r1,destIfFalse);
-				v.sqlite3VdbeAddOp3(OP_NotExists,pExpr.iTable,destIfFalse,r1);
-			}
-			else {
-				/* In this case, the RHS is an index b-tree.
-        */v.sqlite3VdbeAddOp4(OP_Affinity,r1,1,0,affinity,1);
-				/* If the set membership test fails, then the result of the 
-        ** "x IN (...)" expression must be either 0 or NULL. If the set
-        ** contains no NULL values, then the result is 0. If the set 
-        ** contains one or more NULL values, then the result of the
-        ** expression is also NULL.
-        */if(rRhsHasNull==0||destIfFalse==destIfNull) {
-					/* This branch runs if it is known at compile time that the RHS
-          ** cannot contain NULL values. This happens as the result
-          ** of a "NOT NULL" constraint in the database schema.
-          **
-          ** Also run this branch if NULL is equivalent to FALSE
-          ** for this particular IN operator.
-          */v.sqlite3VdbeAddOp4Int(OP_NotFound,pExpr.iTable,destIfFalse,r1,1);
-				}
-				else {
-					/* In this branch, the RHS of the IN might contain a NULL and
-          ** the presence of a NULL on the RHS makes a difference in the
-          ** outcome.
-          */int j1,j2,j3;
-					/* First check to see if the LHS is contained in the RHS.  If so,
-          ** then the presence of NULLs in the RHS does not matter, so jump
-          ** over all of the code that follows.
-          */j1=v.sqlite3VdbeAddOp4Int(OP_Found,pExpr.iTable,0,r1,1);
-					/* Here we begin generating code that runs if the LHS is not
-          ** contained within the RHS.  Generate additional code that
-          ** tests the RHS for NULLs.  If the RHS contains a NULL then
-          ** jump to destIfNull.  If there are no NULLs in the RHS then
-          ** jump to destIfFalse.
-          */j2=v.sqlite3VdbeAddOp1(OP_NotNull,rRhsHasNull);
-					j3=v.sqlite3VdbeAddOp4Int(OP_Found,pExpr.iTable,0,rRhsHasNull,1);
-					v.sqlite3VdbeAddOp2(OP_Integer,-1,rRhsHasNull);
-					v.sqlite3VdbeJumpHere(j3);
-					v.sqlite3VdbeAddOp2(OP_AddImm,rRhsHasNull,1);
-					v.sqlite3VdbeJumpHere(j2);
-					/* Jump to the appropriate target depending on whether or not
-          ** the RHS contains a NULL
-          */v.sqlite3VdbeAddOp2(OP_If,rRhsHasNull,destIfNull);
-					v.sqlite3VdbeAddOp2(OP_Goto,0,destIfFalse);
-					/* The OP_Found at the top of this branch jumps here when true, 
-          ** causing the overall IN expression evaluation to fall through.
-          */v.sqlite3VdbeJumpHere(j1);
-				}
-			}
-			pParse.sqlite3ReleaseTempReg(r1);
-			pParse.sqlite3ExprCachePop(1);
-			VdbeComment(v,"end IN expr");
-		}
+*/
 		#endif
 		///<summary>
 		/// Duplicate an 8-byte value
@@ -1307,49 +951,10 @@ return null;
 		/// Expr.u.zToken is always UTF8 and zero-terminated.
 		///
 		///</summary>
-		static void codeInteger(Parse pParse,Expr pExpr,bool negFlag,int iMem) {
-			Vdbe v=pParse.pVdbe;
-			if((pExpr.flags&EP_IntValue)!=0) {
-				int i=pExpr.u.iValue;
-				Debug.Assert(i>=0);
-				if(negFlag)
-					i=-i;
-				v.sqlite3VdbeAddOp2(OP_Integer,i,iMem);
-			}
-			else {
-				int c;
-				i64 value=0;
-				string z=pExpr.u.zToken;
-				Debug.Assert(!String.IsNullOrEmpty(z));
-				c=Converter.sqlite3Atoi64(z,ref value,StringExtensions.sqlite3Strlen30(z),SqliteEncoding.UTF8);
-				if(c==0||(c==2&&negFlag)) {
-					//char* zV;
-					if(negFlag) {
-						value=c==2?IntegerExtensions.SMALLEST_INT64:-value;
-					}
-					v.sqlite3VdbeAddOp4(OP_Int64,0,iMem,0,value,P4_INT64);
-				}
-				else {
-					#if SQLITE_OMIT_FLOATING_POINT
-																																																																																																				sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
-#else
-					codeReal(v,z,negFlag,iMem);
-					#endif
-				}
-			}
-		}
 		///<summary>
 		/// Clear a cache entry.
 		///
 		///</summary>
-		static void cacheEntryClear(Parse pParse,yColCache p) {
-			if(p.tempReg!=0) {
-				if(pParse.nTempReg<ArraySize(pParse.aTempReg)) {
-					pParse.aTempReg[pParse.nTempReg++]=p.iReg;
-				}
-				p.tempReg=0;
-			}
-		}
 		///<summary>
 		/// Record in the column cache that a particular column from a
 		/// particular table is stored in a particular register.
@@ -1413,7 +1018,7 @@ return null;
 		///
 		///</summary>
 		#if (SQLITE_DEBUG) || (SQLITE_COVERAGE_TEST)
-																																								    /*
+																																										    /*
 ** Return true if any register in the range iFrom..iTo (inclusive)
 ** is used as part of the column cache.
 **
