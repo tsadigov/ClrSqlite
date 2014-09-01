@@ -3195,10 +3195,10 @@ isView = false;
                                 VdbeOp pOp;
                                 this.sqlite3ExprCode(pList.a[keyColumn].pExpr, regRowid);
                                 pOp = v.sqlite3VdbeGetOp(-1);
-                                if (ALWAYS(pOp != null) && pOp.opcode == OP_Null && !IsVirtual(pTab))
+                                if (ALWAYS(pOp != null) && pOp.OpCode == OpCode.OP_Null && !IsVirtual(pTab))
                                 {
                                     appendFlag = true;
-                                    pOp.opcode = OP_NewRowid;
+                                    pOp.OpCode = OpCode.OP_NewRowid;
                                     pOp.p1 = baseCur;
                                     pOp.p2 = regRowid;
                                     pOp.p3 = regAutoinc;
@@ -3904,7 +3904,7 @@ isView = false;
                 {
                     VdbeOp pOp = v.sqlite3VdbeGetOp(i);
                     Debug.Assert(pOp != null);
-                    if (pOp.opcode == OP_OpenRead && pOp.p3 == iDb)
+                    if (pOp.OpCode == OpCode.OP_OpenRead && pOp.p3 == iDb)
                     {
                         Index pIndex;
                         int tnum = pOp.p2;
@@ -3921,7 +3921,7 @@ isView = false;
                         }
                     }
 #if !SQLITE_OMIT_VIRTUALTABLE
-                    if (pOp.opcode == OP_VOpen && pOp.p4.pVtab == pVTab)
+                    if (pOp.OpCode == OpCode.OP_VOpen && pOp.p4.pVtab == pVTab)
                     {
                         Debug.Assert(pOp.p4.pVtab != null);
                         Debug.Assert(pOp.p4type == P4_VTAB);

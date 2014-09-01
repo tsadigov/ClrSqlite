@@ -75,6 +75,10 @@ namespace Community.CsharpSqlite {
     ** Every cursor that the virtual machine has open is represented by an
     ** instance of the following structure.
     */public class VdbeCursor {
+          public VdbeCursor()
+          {
+
+          }
 			public BtCursor pCursor;
 			/* The cursor structure of the backend */public Btree pBt;
 			/* Separate file holding temporary table */public KeyInfo pKeyInfo;
@@ -147,6 +151,10 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		//typedef struct VdbeFrame VdbeFrame;
 		public class VdbeFrame {
+            public VdbeFrame()
+            {
+
+            }
 			public Vdbe v;
 			/* VM this frame belongs to */public int pc;
 			/* Program Counter in parent (calling) frame */public Op[] aOp;
@@ -506,6 +514,10 @@ set { _flags = value; }
     ** malloc failure when SQLite is invoked recursively by a virtual table
     ** method function.
     */public class Vdbe {
+          public Vdbe()
+          {
+
+          }
 			public sqlite3 db;
 			/* The database connection that owns this statement */public Op[] aOp;
 			/* Space to hold the virtual machine's program */public Mem[] aMem;

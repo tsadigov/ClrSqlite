@@ -68,7 +68,12 @@ namespace Community.CsharpSqlite {
 		/* Used when p4type is P4_FUNCDEL */};
 
 		public class VdbeOp {
+            public VdbeOp()
+            {
+
+            }
 			public u8 opcode;
+            public OpCode OpCode { get { return (OpCode)opcode; } set { opcode = (byte)value; } }
 			/* What operation to perform */public int p4type;
 			/* One of the P4_xxx constants for p4 */public u8 opflags;
 			/* Mask of the OPFLG_* flags in opcodes.h */public u8 p5;

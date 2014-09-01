@@ -835,7 +835,7 @@ start = sqlite3Hwtime();
           memAboutToChange( p, aMem[pOp.p3] );
         }
 #endif
-				switch(pOp.opcode) {
+				switch(pOp.OpCode) {
 				/*****************************************************************************
           ** What follows is a massive switch statement where each case implements a
           ** separate instruction in the virtual machine.  If we follow the usual
@@ -875,7 +875,7 @@ start = sqlite3Hwtime();
           ** The next instruction executed will be
           ** the one at index P2 from the beginning of
           ** the program.
-          */case OP_Goto: {
+          */case OpCode.OP_Goto: {
 					/* jump */if(db.u1.isInterrupted)
 						goto abort_due_to_interrupt;
 					//CHECK_FOR_INTERRUPT;
@@ -886,7 +886,7 @@ start = sqlite3Hwtime();
           **
           ** Write the current address onto register P1
           ** and then jump to address P2.
-          */case OP_Gosub: {
+          */case OpCode.OP_Gosub: {
 					/* jump, in1 */pIn1=aMem[pOp.p1];
 					Debug.Assert((pIn1.flags&MEM_Dyn)==0);
 					memAboutToChange(p,pIn1);
@@ -899,7 +899,7 @@ start = sqlite3Hwtime();
 				/* Opcode:  Return P1 * * * *
           **
           ** Jump to the next instruction after the address in register P1.
-          */case OP_Return: {
+          */case OpCode.OP_Return: {
 					/* in1 */pIn1=aMem[pOp.p1];
 					Debug.Assert((pIn1.flags&MEM_Int)!=0);
 					pc=(int)pIn1.u.i;
@@ -908,7 +908,7 @@ start = sqlite3Hwtime();
 				/* Opcode:  Yield P1 * * * *
           **
           ** Swap the program counter with the value in register P1.
-          */case OP_Yield: {
+          */case OpCode.OP_Yield: {
 					/* in1 */int pcDest;
 					pIn1=aMem[pOp.p1];
 					Debug.Assert((pIn1.flags&MEM_Dyn)==0);
@@ -924,11 +924,11 @@ start = sqlite3Hwtime();
           ** Check the value in register P3.  If it is NULL then Halt using
           ** parameter P1, P2, and P4 as if this were a Halt instruction.  If the
           ** value in register P3 is not NULL, then this routine is a no-op.
-          */case OP_HaltIfNull: {
+          */case OpCode.OP_HaltIfNull: {
 					/* in3 */pIn3=aMem[pOp.p3];
 					if((pIn3.flags&MEM_Null)==0)
 						break;
-					/* Fall through into OP_Halt */goto case OP_Halt;
+					/* Fall through into OP_Halt */goto case OpCode.OP_Halt;
 				}
 				/* Opcode:  Halt P1 P2 * P4 *
           **
@@ -948,7 +948,7 @@ start = sqlite3Hwtime();
           ** There is an implied "Halt 0 0 0" instruction inserted at the very end of
           ** every program.  So a jump past the last instruction of the program
           ** is the same as executing Halt.
-          */case OP_Halt: {
+          */case OpCode.OP_Halt: {
 					pIn3=aMem[pOp.p3];
 					if(pOp.p1==SQLITE_OK&&p.pFrame!=null) {
 						/* Halt the sub-program. Return control to the parent frame. */VdbeFrame pFrame=p.pFrame;
@@ -997,7 +997,7 @@ start = sqlite3Hwtime();
 				/* Opcode: Integer P1 P2 * * *
           **
           ** The 32-bit integer value P1 is written into register P2.
-          */case OP_Integer: {
+          */case OpCode.OP_Integer: {
 					/* out2-prerelease */pOut.u.i=pOp.p1;
 					break;
 				}
@@ -1005,7 +1005,7 @@ start = sqlite3Hwtime();
           **
           ** P4 is a pointer to a 64-bit integer value.
           ** Write that value into register P2.
-          */case OP_Int64: {
+          */case OpCode.OP_Int64: {
 					/* out2-prerelease */// Integer pointer always exists Debug.Assert( pOp.p4.pI64 != 0 );
 					pOut.u.i=pOp.p4.pI64;
 					break;
@@ -1015,7 +1015,7 @@ start = sqlite3Hwtime();
 **
 ** P4 is a pointer to a 64-bit floating point value.
 ** Write that value into register P2.
-*/case OP_Real: {
+*/case OpCode.OP_Real: {
 					/* same as TK_FLOAT, ref2-prerelease */pOut.flags=MEM_Real;
 					Debug.Assert(!MathExtensions.sqlite3IsNaN(pOp.p4.pReal));
 					pOut.r=pOp.p4.pReal;
@@ -1026,9 +1026,9 @@ start = sqlite3Hwtime();
 **
 ** P4 points to a nul terminated UTF-8 string. This opcode is transformed
 ** into an OP_String before it is executed for the first time.
-*/case OP_String8: {
+*/case OpCode.OP_String8: {
 					/* same as TK_STRING, ref2-prerelease */Debug.Assert(pOp.p4.z!=null);
-					pOp.opcode=OP_String;
+                    pOp.OpCode = OpCode.OP_String;
 					pOp.p1=StringExtensions.sqlite3Strlen30(pOp.p4.z);
 					#if !SQLITE_OMIT_UTF16
 																																																																																																				if( encoding!=SqliteEncoding.UTF8 ){
@@ -1051,12 +1051,12 @@ pOp.p1 = pOut.n;
 					if(pOp.p1>db.aLimit[SQLITE_LIMIT_LENGTH]) {
 						goto too_big;
 					}
-					/* Fall through to the next case, OP_String */goto case OP_String;
+					/* Fall through to the next case, OP_String */goto case OpCode.OP_String;
 				}
 				/* Opcode: String P1 P2 * P4 *
           **
           ** The string value P4 of length P1 (bytes) is stored in register P2.
-          */case OP_String: {
+          */case OpCode.OP_String: {
 					/* out2-prerelease */Debug.Assert(pOp.p4.z!=null);
 					pOut.flags=MEM_Str|MEM_Static|MEM_Term;
 					sqlite3_free(ref pOut.zBLOB);
@@ -1075,7 +1075,7 @@ pOp.p1 = pOut.n;
 				/* Opcode: Null * P2 * * *
           **
           ** Write a NULL into register P2.
-          */case OP_Null: {
+          */case OpCode.OP_Null: {
 					/* out2-prerelease */pOut.flags=MEM_Null;
 					break;
 				}
@@ -1083,7 +1083,7 @@ pOp.p1 = pOut.n;
           **
           ** P4 points to a blob of data P1 bytes long.  Store this
           **  blob in register P2.
-          */case OP_Blob: {
+          */case OpCode.OP_Blob: {
 					/* out2-prerelease */Debug.Assert(pOp.p1<=db.aLimit[SQLITE_LIMIT_LENGTH]);
 					sqlite3VdbeMemSetStr(pOut,pOp.p4.z,pOp.p1,0,null);
 					pOut.enc=encoding;
@@ -1098,7 +1098,7 @@ pOp.p1 = pOut.n;
           **
           ** If the parameter is named, then its name appears in P4 and P3==1.
           ** The P4 value is used by sqlite3_bind_parameter_name().
-          */case OP_Variable: {
+          */case OpCode.OP_Variable: {
 					/* out2-prerelease */Mem pVar;
 					/* Value being transferred */Debug.Assert(pOp.p1>=0&&pOp.p1<=p.nVar);
 					Debug.Assert(pOp.p4.z==null||pOp.p4.z==p.azVar[pOp.p1-1]);
@@ -1118,7 +1118,7 @@ pOp.p1 = pOut.n;
           ** registers P2..P2+P3-1.  Registers P1..P1+P1-1 are
           ** left holding a NULL.  It is an error for register ranges
           ** P1..P1+P3-1 and P2..P2+P3-1 to overlap.
-          */case OP_Move: {
+          */case OpCode.OP_Move: {
 					//char* zMalloc;   /* Holding variable for allocated memory */
 					int n;
 					/* Number of registers left to copy */int p1;
@@ -1153,7 +1153,7 @@ pOp.p1 = pOut.n;
           **
           ** This instruction makes a deep copy of the value.  A duplicate
           ** is made of any string or blob constant.  See also OP_SCopy.
-          */case OP_Copy: {
+          */case OpCode.OP_Copy: {
 					/* in1, ref2 */pIn1=aMem[pOp.p1];
 					pOut=aMem[pOp.p2];
 					Debug.Assert(pOut!=pIn1);
@@ -1176,7 +1176,7 @@ pOp.p1 = pOut.n;
           ** Thus the program must guarantee that the original will not change
           ** during the lifetime of the copy.  Use OP_Copy to make a complete
           ** copy.
-          */case OP_SCopy: {
+          */case OpCode.OP_SCopy: {
 					/* in1, ref2 */pIn1=aMem[pOp.p1];
 					pOut=aMem[pOp.p2];
 					Debug.Assert(pOut!=pIn1);
@@ -1195,7 +1195,7 @@ pOp.p1 = pOut.n;
           ** with an SQLITE_ROW return code and it sets up the sqlite3_stmt
           ** structure to provide access to the top P1 values as the result
           ** row.
-          */case OP_ResultRow: {
+          */case OpCode.OP_ResultRow: {
 					//Mem[] pMem;
 					int i;
 					Debug.Assert(p.nResColumn==pOp.p2);
@@ -1261,7 +1261,7 @@ pOp.p1 = pOut.n;
           ** It is illegal for P1 and P3 to be the same register. Sometimes,
           ** if P3 is the same register as P2, the implementation is able
           ** to avoid a memcpy().
-          */case OP_Concat: {
+          */case OpCode.OP_Concat: {
 					/* same as TK_CONCAT, in1, in2, ref3 */i64 nByte;
 					pIn1=aMem[pOp.p1];
 					pIn2=aMem[pOp.p2];
@@ -1357,11 +1357,11 @@ pOp.p1 = pOut.n;
           ** register P1 by the value in register P2 and store the result in P3.
           ** If the value in register P2 is zero the result is NULL.
           ** If either operand is NULL, the result is NULL.
-          */case OP_Add:
-				/* same as TK_PLUS, in1, in2, ref3 */case OP_Subtract:
-				/* same as TK_MINUS, in1, in2, ref3 */case OP_Multiply:
-				/* same as TK_STAR, in1, in2, ref3 */case OP_Divide:
-				/* same as TK_SLASH, in1, in2, ref3 */case OP_Remainder: {
+          */case OpCode.OP_Add:
+				/* same as TK_PLUS, in1, in2, ref3 */case OpCode.OP_Subtract:
+				/* same as TK_MINUS, in1, in2, ref3 */case OpCode.OP_Multiply:
+				/* same as TK_STAR, in1, in2, ref3 */case OpCode.OP_Divide:
+				/* same as TK_SLASH, in1, in2, ref3 */case OpCode.OP_Remainder: {
 					/* same as TK_REM, in1, in2, ref3 */int flags;
 					/* Combined MEM_* flags from both inputs */i64 iA;
 					/* Integer value of left operand */i64 iB=0;
@@ -1379,26 +1379,30 @@ pOp.p1 = pOut.n;
 					if(!(fp_math=!((pIn1.flags&pIn2.flags&MEM_Int)==MEM_Int))) {
 						iA=pIn1.u.i;
 						iB=pIn2.u.i;
-						switch(pOp.opcode) {
-						case OP_Add: {
+						switch(pOp.OpCode) {
+                            case OpCode.OP_Add:
+                                {
 							if(sqlite3AddInt64(ref iB,iA)!=0)
 								fp_math=true;
 							// goto fp_math
 							break;
 						}
-						case OP_Subtract: {
+                            case OpCode.OP_Subtract:
+                                {
 							if(sqlite3SubInt64(ref iB,iA)!=0)
 								fp_math=true;
 							// goto fp_math
 							break;
 						}
-						case OP_Multiply: {
+                            case OpCode.OP_Multiply:
+                                {
 							if(sqlite3MulInt64(ref iB,iA)!=0)
 								fp_math=true;
 							// goto fp_math
 							break;
 						}
-						case OP_Divide: {
+                            case OpCode.OP_Divide:
+                                {
 							if(iA==0)
 								goto arithmetic_result_is_null;
 							if(iA==-1&&iB==IntegerExtensions.SMALLEST_INT64) {
@@ -1427,17 +1431,18 @@ pOp.p1 = pOut.n;
 						//fp_math:
 						rA=sqlite3VdbeRealValue(pIn1);
 						rB=sqlite3VdbeRealValue(pIn2);
-						switch(pOp.opcode) {
-						case OP_Add:
+						switch(pOp.OpCode) {
+                            case OpCode.OP_Add:
 						rB+=rA;
 						break;
-						case OP_Subtract:
+                            case OpCode.OP_Subtract:
 						rB-=rA;
 						break;
-						case OP_Multiply:
+                            case OpCode.OP_Multiply:
 						rB*=rA;
 						break;
-						case OP_Divide: {
+                            case OpCode.OP_Divide:
+                        {
 							/* (double)0 In case of SQLITE_OMIT_FLOATING_POINT... */if(rA==(double)0)
 								goto arithmetic_result_is_null;
 							rB/=rA;
@@ -1483,7 +1488,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** The interface used by the implementation of the aforementioned functions
           ** to retrieve the collation sequence set by this opcode is not available
           ** publicly, only to user functions defined in func.c.
-          */case OP_CollSeq: {
+          */
+                case OpCode.OP_CollSeq:
+                    {
 					Debug.Assert(pOp.p4type==P4_COLLSEQ);
 					break;
 				}
@@ -1502,7 +1509,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** invocation of this opcode.
           **
           ** See also: AggStep and AggFinal
-          */case OP_Function: {
+          */
+                case OpCode.OP_Function:
+                    {
 					int i;
 					Mem pArg;
 					sqlite3_context ctx=new sqlite3_context();
@@ -1620,10 +1629,15 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** number of bits specified by the integer in register P1.
           ** Store the result in register P3.
           ** If either input is NULL, the result is NULL.
-          */case OP_BitAnd:
-				/* same as TK_BITAND, in1, in2, ref3 */case OP_BitOr:
-				/* same as TK_BITOR, in1, in2, ref3 */case OP_ShiftLeft:
-				/* same as TK_LSHIFT, in1, in2, ref3 */case OP_ShiftRight: {
+          */
+                case OpCode.OP_BitAnd:
+                /* same as TK_BITAND, in1, in2, ref3 */
+                case OpCode.OP_BitOr:
+                /* same as TK_BITOR, in1, in2, ref3 */
+                case OpCode.OP_ShiftLeft:
+                /* same as TK_LSHIFT, in1, in2, ref3 */
+                case OpCode.OP_ShiftRight:
+                    {
 					/* same as TK_RSHIFT, in1, in2, ref3 */i64 iA;
 					u64 uA;
 					i64 iB;
@@ -1679,7 +1693,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** The result is always an integer.
           **
           ** To force any register to be an integer, just add 0.
-          */case OP_AddImm: {
+          */
+                case OpCode.OP_AddImm:
+                    {
 					/* in1 */pIn1=aMem[pOp.p1];
 					memAboutToChange(p,pIn1);
 					sqlite3VdbeMemIntegerify(pIn1);
@@ -1692,7 +1708,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** in P1 is not an integer and cannot be converted into an integer
           ** without data loss, then jump immediately to P2, or if P2==0
           ** raise an SQLITE_MISMATCH exception.
-          */case OP_MustBeInt: {
+          */
+                case OpCode.OP_MustBeInt:
+                    {
 					/* jump, in1 */pIn1=aMem[pOp.p1];
 					applyAffinity(pIn1,SQLITE_AFF_NUMERIC,encoding);
 					if((pIn1.flags&MEM_Int)==0) {
@@ -1718,7 +1736,9 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** has REAL affinity.  Such column values may still be stored as
 ** integers, for space efficiency, but after extraction we want them
 ** to have only a real value.
-*/case OP_RealAffinity: {
+*/
+                case OpCode.OP_RealAffinity:
+                    {
 					/* in1 */pIn1=aMem[pOp.p1];
 					if((pIn1.flags&MEM_Int)!=0) {
 						sqlite3VdbeMemRealify(pIn1);
@@ -1735,7 +1755,9 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** are afterwards simply interpreted as text.
 **
 ** A NULL value is not changed by this routine.  It remains NULL.
-*/case OP_ToText: {
+*/
+                case OpCode.OP_ToText:
+                    {
 					/* same as TK_TO_TEXT, in1 */pIn1=aMem[pOp.p1];
 					memAboutToChange(p,pIn1);
 					if((pIn1.flags&MEM_Null)!=0)
@@ -1759,7 +1781,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** to the underlying data.
           **
           ** A NULL value is not changed by this routine.  It remains NULL.
-          */case OP_ToBlob: {
+          */
+                case OpCode.OP_ToBlob:
+                    {
 					/* same as TK_TO_BLOB, in1 */pIn1=aMem[pOp.p1];
 					if((pIn1.flags&MEM_Null)!=0)
 						break;
@@ -1785,7 +1809,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** is possible.
           **
           ** A NULL value is not changed by this routine.  It remains NULL.
-          */case OP_ToNumeric: {
+          */case OpCode.OP_ToNumeric: {
 					/* same as TK_TO_NUMERIC, in1 */pIn1=aMem[pOp.p1];
 					sqlite3VdbeMemNumerify(pIn1);
 					break;
@@ -1799,7 +1823,9 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** equivalent of atoi() and store 0 if no such conversion is possible.
 **
 ** A NULL value is not changed by this routine.  It remains NULL.
-*/case OP_ToInt: {
+*/
+            case OpCode.OP_ToInt:
+                {
 					/* same as TK_TO_INT, in1 */pIn1=aMem[pOp.p1];
 					if((pIn1.flags&MEM_Null)==0) {
 						sqlite3VdbeMemIntegerify(pIn1);
@@ -1815,7 +1841,9 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** equivalent of atoi() and store 0.0 if no such conversion is possible.
 **
 ** A NULL value is not changed by this routine.  It remains NULL.
-*/case OP_ToReal: {
+*/
+            case OpCode.OP_ToReal:
+                {
 					/* same as TK_TO_REAL, in1 */pIn1=aMem[pOp.p1];
 					memAboutToChange(p,pIn1);
 					if((pIn1.flags&MEM_Null)==0) {
@@ -1890,12 +1918,19 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** This works just like the Lt opcode except that the jump is taken if
           ** the content of register P3 is greater than or equal to the content of
           ** register P1.  See the Lt opcode for additional information.
-          */case OP_Eq:
-				/* same as TK_EQ, jump, in1, in3 */case OP_Ne:
-				/* same as TK_NE, jump, in1, in3 */case OP_Lt:
-				/* same as TK_LT, jump, in1, in3 */case OP_Le:
-				/* same as TK_LE, jump, in1, in3 */case OP_Gt:
-				/* same as TK_GT, jump, in1, in3 */case OP_Ge: {
+          */
+            case OpCode.OP_Eq:
+            /* same as TK_EQ, jump, in1, in3 */
+            case OpCode.OP_Ne:
+            /* same as TK_NE, jump, in1, in3 */
+            case OpCode.OP_Lt:
+            /* same as TK_LT, jump, in1, in3 */
+            case OpCode.OP_Le:
+            /* same as TK_LE, jump, in1, in3 */
+            case OpCode.OP_Gt:
+            /* same as TK_GT, jump, in1, in3 */
+            case OpCode.OP_Ge:
+                {
 					/* same as TK_GE, jump, in1, in3 */int res=0;
 					/* Result of the comparison of pIn1 against pIn3 */char affinity;
 					/* Affinity to use for comparison */u16 flags1;
@@ -1940,26 +1975,27 @@ MemSetTypeFlag(pOut, MEM_Int);
 						ExpandBlob(pIn3);
 						res=sqlite3MemCompare(pIn3,pIn1,pOp.p4.pColl);
 					}
-					switch(pOp.opcode) {
-					case OP_Eq:
-					res=(res==0)?1:0;
-					break;
-					case OP_Ne:
-					res=(res!=0)?1:0;
-					break;
-					case OP_Lt:
-					res=(res<0)?1:0;
-					break;
-					case OP_Le:
-					res=(res<=0)?1:0;
-					break;
-					case OP_Gt:
-					res=(res>0)?1:0;
-					break;
-					default:
-					res=(res>=0)?1:0;
-					break;
-					}
+                    switch (pOp.OpCode)
+                    {
+                        case OpCode.OP_Eq:
+                            res = (res == 0) ? 1 : 0;
+                            break;
+                        case OpCode.OP_Ne:
+                            res = (res != 0) ? 1 : 0;
+                            break;
+                        case OpCode.OP_Lt:
+                            res = (res < 0) ? 1 : 0;
+                            break;
+                        case OpCode.OP_Le:
+                            res = (res <= 0) ? 1 : 0;
+                            break;
+                        case OpCode.OP_Gt:
+                            res = (res > 0) ? 1 : 0;
+                            break;
+                        default:
+                            res = (res >= 0) ? 1 : 0;
+                            break;
+                    }
 					if((pOp.p5&SQLITE_STOREP2)!=0) {
 						pOut=aMem[pOp.p2];
 						memAboutToChange(p,pOut);
@@ -1983,7 +2019,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** The permutation is only valid until the next OP_Permutation, OP_Compare,
           ** OP_Halt, or OP_ResultRow.  Typically the OP_Permutation should occur
           ** immediately prior to the OP_Compare.
-          */case OP_Permutation: {
+          */
+            case OpCode.OP_Permutation:
+                {
 					Debug.Assert(pOp.p4type==P4_INTARRAY);
 					Debug.Assert(pOp.p4.ai!=null);
 					aPermute=pOp.p4.ai;
@@ -2002,7 +2040,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** The comparison is a sort comparison, so NULLs compare equal,
           ** NULLs are less than numbers, numbers are less than strings,
           ** and strings are less than blobs.
-          */case OP_Compare: {
+          */
+            case OpCode.OP_Compare:
+                {
 					int n;
 					int i;
 					int p1;
@@ -2057,7 +2097,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** Jump to the instruction at address P1, P2, or P3 depending on whether
           ** in the most recent OP_Compare instruction the P1 vector was less than
           ** equal to, or greater than the P2 vector, respectively.
-          */case OP_Jump: {
+          */
+            case OpCode.OP_Jump:
+                {
 					/* jump */if(iCompare<0) {
 						pc=pOp.p1-1;
 					}
@@ -2086,8 +2128,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** If either P1 or P2 is nonzero (true) then the result is 1 (true)
           ** even if the other input is NULL.  A NULL and false or two NULLs
           ** give a NULL output.
-          */case OP_And:
-				/* same as TK_AND, in1, in2, ref3 */case OP_Or: {
+          */
+            case OpCode.OP_And:
+				/* same as TK_AND, in1, in2, ref3 */case OpCode.OP_Or: {
 					/* same as TK_OR, in1, in2, ref3 */int v1;
 					/* Left operand:  0==FALSE, 1==TRUE, 2==UNKNOWN or NULL */int v2;
 					/* Right operand: 0==FALSE, 1==TRUE, 2==UNKNOWN or NULL */pIn1=aMem[pOp.p1];
@@ -2147,7 +2190,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** Interpret the value in register P1 as a boolean value.  Store the
           ** boolean complement in register P2.  If the value in register P1 is
           ** NULL, then a NULL is stored in P2.
-          */case OP_Not: {
+          */
+                case OpCode.OP_Not:
+                    {
 					/* same as TK_NOT, in1 */pIn1=aMem[pOp.p1];
 					pOut=aMem[pOp.p2];
 					if((pIn1.flags&MEM_Null)!=0) {
@@ -2163,7 +2208,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** Interpret the content of register P1 as an integer.  Store the
           ** ones-complement of the P1 value into register P2.  If P1 holds
           ** a NULL then store a NULL in P2.
-          */case OP_BitNot: {
+          */
+                case OpCode.OP_BitNot:
+                    {
 					/* same as TK_BITNOT, in1 */pIn1=aMem[pOp.p1];
 					pOut=aMem[pOp.p2];
 					if((pIn1.flags&MEM_Null)!=0) {
@@ -2184,8 +2231,11 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** Jump to P2 if the value in register P1 is False.  The value
           ** is considered true if it has a numeric value of zero.  If the value
           ** in P1 is NULL then take the jump if P3 is true.
-          */case OP_If:
-				/* jump, in1 */case OP_IfNot: {
+          */
+                case OpCode.OP_If:
+                /* jump, in1 */
+                case OpCode.OP_IfNot:
+                    {
 					/* jump, in1 */int c;
 					pIn1=aMem[pOp.p1];
 					if((pIn1.flags&MEM_Null)!=0) {
@@ -2208,7 +2258,9 @@ MemSetTypeFlag(pOut, MEM_Int);
 				/* Opcode: IsNull P1 P2 * * *
           **
           ** Jump to P2 if the value in register P1 is NULL.
-          */case OP_IsNull: {
+          */
+                case OpCode.OP_IsNull:
+                    {
 					/* same as TK_ISNULL, jump, in1 */pIn1=aMem[pOp.p1];
 					if((pIn1.flags&MEM_Null)!=0) {
 						pc=pOp.p2-1;
@@ -2218,7 +2270,9 @@ MemSetTypeFlag(pOut, MEM_Int);
 				/* Opcode: NotNull P1 P2 * * *
           **
           ** Jump to P2 if the value in register P1 is not NULL.
-          */case OP_NotNull: {
+          */
+                case OpCode.OP_NotNull:
+                    {
 					/* same as TK_NOTNULL, jump, in1 */pIn1=aMem[pOp.p1];
 					if((pIn1.flags&MEM_Null)==0) {
 						pc=pOp.p2-1;
@@ -2243,7 +2297,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** then the cache of the cursor is reset prior to extracting the column.
           ** The first OP_Column against a pseudo-table after the value of the content
           ** register has changed should have this bit set.
-          */case OP_Column: {
+          */
+                case OpCode.OP_Column:
+                    {
 					u32 payloadSize;
 					/* Number of bytes in the record */i64 payloadSize64;
 					/* Number of bytes in the record */int p1;
@@ -2538,7 +2594,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** P4 is a string that is P2 characters long. The nth character of the
           ** string indicates the column affinity that should be used for the nth
           ** memory cell in the range.
-          */case OP_Affinity: {
+          */
+                case OpCode.OP_Affinity:
+                    {
 					string zAffinity;
 					/* The affinity to be applied */char cAff;
 					/* A single character of affinity */zAffinity=pOp.p4.z;
@@ -2572,7 +2630,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** macros defined in sqliteInt.h.
           **
           ** If P4 is NULL then all index fields have the affinity NONE.
-          */case OP_MakeRecord: {
+          */
+                case OpCode.OP_MakeRecord:
+                    {
 					byte[] zNewRecord;
 					/* A buffer to hold the data for the new record */Mem pRec;
 					/* The new record */u64 nData;
@@ -2694,7 +2754,8 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** opened by cursor P1 in register P2
           */
 				#if !SQLITE_OMIT_BTREECOUNT
-				case OP_Count: {
+                case OpCode.OP_Count:
+                    {
 					/* out2-prerelease */i64 nEntry=0;
 					BtCursor pCrsr;
 					pCrsr=p.apCsr[pOp.p1].pCursor;
@@ -2713,7 +2774,9 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** Open, release or rollback the savepoint named by parameter P4, depending
 ** on the value of P1. To open a new savepoint, P1==0. To release (commit) an
 ** existing savepoint, P1==1, or to rollback an existing savepoint P1==2.
-*/case OP_Savepoint: {
+*/
+                case OpCode.OP_Savepoint:
+                    {
 					int p1;
 					/* Value of P1 operand */string zName;
 					/* Name of savepoint */int nName;
@@ -2856,7 +2919,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** VMs (apart from this one), then the COMMIT or ROLLBACK statement fails.
           **
           ** This instruction causes the VM to halt.
-          */case OP_AutoCommit: {
+          */
+                case OpCode.OP_AutoCommit:
+                    {
 					int desiredAutoCommit;
 					int iRollback;
 					int turnOnAC;
@@ -2946,7 +3011,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** will automatically commit when the VDBE halts.
           **
           ** If P2 is zero, then a read-lock is obtained on the database file.
-          */case OP_Transaction: {
+          */
+                case OpCode.OP_Transaction:
+                    {
 					Btree pBt;
 					Debug.Assert(pOp.p1>=0&&pOp.p1<db.nDb);
 					Debug.Assert((p.btreeMask&(((yDbMask)1)<<pOp.p1))!=0);
@@ -2990,7 +3057,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** There must be a read-lock on the database (either a transaction
           ** must be started or there must be an open cursor) before
           ** executing this instruction.
-          */case OP_ReadCookie: {
+          */
+                case OpCode.OP_ReadCookie:
+                    {
 					/* out2-prerelease */u32 iMeta;
 					int iDb;
 					int iCookie;
@@ -3014,7 +3083,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** database file used to store temporary tables.
           **
           ** A transaction must be started before executing this opcode.
-          */case OP_SetCookie: {
+          */
+                case OpCode.OP_SetCookie:
+                    {
 					/* in3 */Db pDb;
 					Debug.Assert(pOp.p2<SQLITE_N_BTREE_META);
 					Debug.Assert(pOp.p1>=0&&pOp.p1<db.nDb);
@@ -3057,7 +3128,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** Either a transaction needs to have been started or an OP_Open needs
           ** to be executed (to establish a read lock) before this opcode is
           ** invoked.
-          */case OP_VerifyCookie: {
+          */
+                case OpCode.OP_VerifyCookie:
+                    {
 					u32 iMeta=0;
 					u32 iGen;
 					Btree pBt;
@@ -3143,8 +3216,10 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** cursors or a single read/write cursor but not both.
           **
           ** See also OpenRead.
-          */case OP_OpenRead:
-				case OP_OpenWrite: {
+          */
+                case OpCode.OP_OpenRead:
+                case OpCode.OP_OpenWrite:
+                    {
 					int nField;
 					KeyInfo pKeyInfo;
 					int p2;
@@ -3247,8 +3322,10 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** different name to distinguish its use.  Tables created using
           ** by this opcode will be used for automatically created transient
           ** indices in joins.
-          */case OP_OpenAutoindex:
-				case OP_OpenEphemeral: {
+          */
+                case OpCode.OP_OpenAutoindex:
+                case OpCode.OP_OpenEphemeral:
+                    {
 					VdbeCursor pCx;
 					const int vfsFlags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_EXCLUSIVE|SQLITE_OPEN_DELETEONCLOSE|SQLITE_OPEN_TRANSIENT_DB;
 					Debug.Assert(pOp.p1>=0);
@@ -3300,7 +3377,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** P3 is the number of fields in the records that will be stored by
           ** the pseudo-table.
-          */case OP_OpenPseudo: {
+          */
+                case OpCode.OP_OpenPseudo:
+                    {
 					VdbeCursor pCx;
 					Debug.Assert(pOp.p1>=0);
 					pCx=allocateCursor(p,pOp.p1,pOp.p3,-1,0);
@@ -3316,7 +3395,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** Close a cursor previously opened as P1.  If P1 is not
           ** currently open, this instruction is a no-op.
-          */case OP_Close: {
+          */
+                case OpCode.OP_Close:
+                    {
 					Debug.Assert(pOp.p1>=0&&pOp.p1<p.nCursor);
 					sqlite3VdbeFreeCursor(p,p.apCsr[pOp.p1]);
 					p.apCsr[pOp.p1]=null;
@@ -3370,10 +3451,15 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** less than or equal to the key and P2 is not zero, then jump to P2.
           **
           ** See also: Found, NotFound, Distinct, SeekGt, SeekGe, SeekLt
-          */case OP_SeekLt:
-				/* jump, in3 */case OP_SeekLe:
-				/* jump, in3 */case OP_SeekGe:
-				/* jump, in3 */case OP_SeekGt: {
+          */
+                case OpCode.OP_SeekLt:
+                /* jump, in3 */
+                case OpCode.OP_SeekLe:
+                /* jump, in3 */
+                case OpCode.OP_SeekGe:
+                /* jump, in3 */
+                case OpCode.OP_SeekGt:
+                    {
 					/* jump, in3 */int res;
 					int oc;
 					VdbeCursor pC;
@@ -3545,7 +3631,9 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** This is actually a deferred seek.  Nothing actually happens until
           ** the cursor is used to read a record.  That way, if no reads
           ** occur, no unnecessary I/O happens.
-          */case OP_Seek: {
+          */
+                case OpCode.OP_Seek:
+                    {
 					/* in2 */VdbeCursor pC;
 					Debug.Assert(pOp.p1>=0&&pOp.p1<p.nCursor);
 					pC=p.apCsr[pOp.p1];
@@ -3582,8 +3670,8 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** matching entry.
           **
           ** See also: Found, NotExists, IsUnique
-          */case OP_NotFound:
-				/* jump, in3 */case OP_Found: {
+          */case OpCode.OP_NotFound:
+				/* jump, in3 */case OpCode.OP_Found: {
 					/* jump, in3 */int alreadyExists;
 					VdbeCursor pC;
 					int res=0;
@@ -3675,7 +3763,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** instruction.
           **
           ** See also: NotFound, NotExists, Found
-          */case OP_IsUnique: {
+          */case OpCode.OP_IsUnique: {
 					/* jump, in3 */u16 ii;
 					VdbeCursor pCx=new VdbeCursor();
 					BtCursor pCrsr;
@@ -3745,7 +3833,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** P1 is an index.
           **
           ** See also: Found, NotFound, IsUnique
-          */case OP_NotExists: {
+          */case OpCode.OP_NotExists: {
 					/* jump, in3 */VdbeCursor pC;
 					BtCursor pCrsr;
 					int res;
@@ -3788,7 +3876,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** Write the sequence number into register P2.
           ** The sequence number on the cursor is incremented after this
           ** instruction.
-          */case OP_Sequence: {
+          */case OpCode.OP_Sequence: {
 					/* out2-prerelease */Debug.Assert(pOp.p1>=0&&pOp.p1<p.nCursor);
 					Debug.Assert(p.apCsr[pOp.p1]!=null);
 					pOut.u.i=(long)p.apCsr[pOp.p1].seqCount++;
@@ -3807,7 +3895,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** an SQLITE_FULL error is generated. The P3 register is updated with the '
           ** generated record number. This P3 mechanism is used to help implement the
           ** AUTOINCREMENT feature.
-          */case OP_NewRowid: {
+          */case OpCode.OP_NewRowid: {
 					/* out2-prerelease */i64 v;
 					/* The new rowid */VdbeCursor pC;
 					/* Cursor of table to get the new rowid */int res;
@@ -3971,8 +4059,8 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** This works exactly like OP_Insert except that the key is the
           ** integer value P3, not the value of the integer stored in register P3.
-          */case OP_Insert:
-				case OP_InsertInt: {
+          */case OpCode.OP_Insert:
+				case OpCode.OP_InsertInt: {
 					Mem pData;
 					/* MEM cell holding data for the record to be inserted */Mem pKey;
 					/* MEM cell holding key  for the record */i64 iKey;
@@ -4054,7 +4142,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** pointing to.  The update hook will be invoked, if it exists.
           ** If P4 is not NULL then the P1 cursor must have been positioned
           ** using OP_NotFound prior to invoking this opcode.
-          */case OP_Delete: {
+          */case OpCode.OP_Delete: {
 					i64 iKey;
 					VdbeCursor pC;
 					iKey=0;
@@ -4098,7 +4186,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** change counter (returned by subsequent calls to sqlite3_changes()).
           ** Then the VMs internal change counter resets to 0.
           ** This is used by trigger programs.
-          */case OP_ResetCount: {
+          */case OpCode.OP_ResetCount: {
 					sqlite3VdbeSetChanges(db,p.nChange);
 					p.nChange=0;
 					break;
@@ -4121,8 +4209,8 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** If the P1 cursor must be pointing to a valid row (not a NULL row)
           ** of a real table, not a pseudo-table.
-          */case OP_RowKey:
-				case OP_RowData: {
+          */case OpCode.OP_RowKey:
+				case OpCode.OP_RowData: {
 					VdbeCursor pC;
 					BtCursor pCrsr;
 					u32 n;
@@ -4193,7 +4281,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** P1 can be either an ordinary table or a virtual table.  There used to
           ** be a separate OP_VRowid opcode for use with virtual tables, but this
           ** one opcode now works for both table types.
-          */case OP_Rowid: {
+          */case OpCode.OP_Rowid: {
 					/* out2-prerelease */VdbeCursor pC;
 					i64 v;
 					sqlite3_vtab pVtab;
@@ -4242,7 +4330,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** Move the cursor P1 to a null row.  Any OP_Column operations
           ** that occur while the cursor is on the null row will always
           ** write a NULL.
-          */case OP_NullRow: {
+          */case OpCode.OP_NullRow: {
 					VdbeCursor pC;
 					Debug.Assert(pOp.p1>=0&&pOp.p1<p.nCursor);
 					pC=p.apCsr[pOp.p1];
@@ -4261,7 +4349,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** If the table or index is empty and P2>0, then jump immediately to P2.
           ** If P2 is 0 or if the table or index is not empty, fall through
           ** to the following instruction.
-          */case OP_Last: {
+          */case OpCode.OP_Last: {
 					/* jump */VdbeCursor pC;
 					BtCursor pCrsr;
 					int res=0;
@@ -4295,7 +4383,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** rewinding so that the global variable will be incremented and
           ** regression tests can determine whether or not the optimizer is
           ** correctly optimizing out sorts.
-          */case OP_Sort: {
+          */case OpCode.OP_Sort: {
 					/* jump */
 					#if SQLITE_TEST
 																																																																																																				#if !TCLSH
@@ -4307,7 +4395,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 #endif
 																																																																																																				#endif
 					p.aCounter[SQLITE_STMTSTATUS_SORT-1]++;
-					/* Fall through into OP_Rewind */goto case OP_Rewind;
+					/* Fall through into OP_Rewind */goto case OpCode.OP_Rewind;
 				}
 				/* Opcode: Rewind P1 P2 * * *
           **
@@ -4316,7 +4404,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** If the table or index is empty and P2>0, then jump immediately to P2.
           ** If P2 is 0 or if the table or index is not empty, fall through
           ** to the following instruction.
-          */case OP_Rewind: {
+          */case OpCode.OP_Rewind: {
 					/* jump */VdbeCursor pC;
 					BtCursor pCrsr;
 					int res=0;
@@ -4360,8 +4448,8 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** If P5 is positive and the jump is taken, then event counter
           ** number P5-1 in the prepared statement is incremented.
           **
-          */case OP_Prev:
-				/* jump */case OP_Next: {
+          */case OpCode.OP_Prev:
+				/* jump */case OpCode.OP_Next: {
 					/* jump */VdbeCursor pC;
 					BtCursor pCrsr;
 					int res;
@@ -4410,7 +4498,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** This instruction only works for indices.  The equivalent instruction
           ** for tables is OP_Insert.
-          */case OP_IdxInsert: {
+          */case OpCode.OP_IdxInsert: {
 					/* in2 */VdbeCursor pC;
 					BtCursor pCrsr;
 					int nKey;
@@ -4439,7 +4527,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** The content of P3 registers starting at register P2 form
           ** an unpacked index key. This opcode removes that entry from the
           ** index opened by cursor P1.
-          */case OP_IdxDelete: {
+          */case OpCode.OP_IdxDelete: {
 					VdbeCursor pC;
 					BtCursor pCrsr;
 					int res;
@@ -4479,7 +4567,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** the rowid of the table entry to which this index entry points.
           **
           ** See also: Rowid, MakeRecord.
-          */case OP_IdxRowid: {
+          */case OpCode.OP_IdxRowid: {
 					/* out2-prerelease */BtCursor pCrsr;
 					VdbeCursor pC;
 					i64 rowid;
@@ -4530,8 +4618,8 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** If P5 is non-zero then the key value is increased by an epsilon prior
           ** to the comparison.  This makes the opcode work like IdxLE.
-          */case OP_IdxLT:
-				/* jump */case OP_IdxGE: {
+          */case OpCode.OP_IdxLT:
+				/* jump */case OpCode.OP_IdxGE: {
 					/* jump */VdbeCursor pC;
 					int res;
 					UnpackedRecord r;
@@ -4594,7 +4682,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** If AUTOVACUUM is disabled then a zero is stored in register P2.
           **
           ** See also: Clear
-          */case OP_Destroy: {
+          */case OpCode.OP_Destroy: {
 					/* out2-prerelease */int iMoved=0;
 					int iCnt;
 					Vdbe pVdbe;
@@ -4648,7 +4736,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** also incremented by the number of rows in the table being cleared.
           **
           ** See also: Destroy
-          */case OP_Clear: {
+          */case OpCode.OP_Clear: {
 					int nChange;
 					nChange=0;
 					Debug.Assert((p.btreeMask&(((yDbMask)1)<<pOp.p2))!=0);
@@ -4687,8 +4775,8 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** register P2.
           **
           ** See documentation on OP_CreateTable for additional information.
-          */case OP_CreateIndex:
-				/* out2-prerelease */case OP_CreateTable: {
+          */case OpCode.OP_CreateIndex:
+				/* out2-prerelease */case OpCode.OP_CreateTable: {
 					/* out2-prerelease */int pgno;
 					int flags;
 					Db pDb;
@@ -4714,7 +4802,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** This opcode invokes the parser to create a new virtual machine,
           ** then runs the new virtual machine.  It is thus a re-entrant opcode.
-          */case OP_ParseSchema: {
+          */case OpCode.OP_ParseSchema: {
 					int iDb;
 					string zMaster;
 					string zSql;
@@ -4765,7 +4853,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** Read the sqlite_stat1 table for database P1 and load the content
 ** of that table into the internal index hash table.  This will cause
 ** the analysis to be used when preparing all subsequent queries.
-*/case OP_LoadAnalysis: {
+*/case OpCode.OP_LoadAnalysis: {
 					Debug.Assert(pOp.p1>=0&&pOp.p1<db.nDb);
 					rc=sqlite3AnalysisLoad(db,pOp.p1);
 					break;
@@ -4777,7 +4865,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** the table named P4 in database P1.  This is called after a table
 ** is dropped in order to keep the internal representation of the
 ** schema consistent with what is on disk.
-*/case OP_DropTable: {
+*/case OpCode.OP_DropTable: {
 					sqlite3UnlinkAndDeleteTable(db,pOp.p1,pOp.p4.z);
 					break;
 				}
@@ -4787,7 +4875,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** the index named P4 in database P1.  This is called after an index
           ** is dropped in order to keep the internal representation of the
           ** schema consistent with what is on disk.
-          */case OP_DropIndex: {
+          */case OpCode.OP_DropIndex: {
 					sqlite3UnlinkAndDeleteIndex(db,pOp.p1,pOp.p4.z);
 					break;
 				}
@@ -4797,7 +4885,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** the trigger named P4 in database P1.  This is called after a trigger
           ** is dropped in order to keep the internal representation of the
           ** schema consistent with what is on disk.
-          */case OP_DropTrigger: {
+          */case OpCode.OP_DropTrigger: {
 					sqlite3UnlinkAndDeleteTrigger(db,pOp.p1,pOp.p4.z);
 					break;
 				}
@@ -4821,7 +4909,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** file, not the main database file.
 **
 ** This opcode is used to implement the integrity_check pragma.
-*/case OP_IntegrityCk: {
+*/case OpCode.OP_IntegrityCk: {
 					int nRoot;
 					/* Number of tables to check.  (Number of root pages.) */int[] aRoot=null;
 					/* Array of rootpage numbers for tables to be checked */int j;
@@ -4874,7 +4962,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** held in register P1.
 **
 ** An assertion fails if P2 is not an integer.
-*/case OP_RowSetAdd: {
+*/case OpCode.OP_RowSetAdd: {
 					/* in1, in2 */pIn1=aMem[pOp.p1];
 					pIn2=aMem[pOp.p2];
 					Debug.Assert((pIn2.flags&MEM_Int)!=0);
@@ -4891,7 +4979,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** Extract the smallest value from boolean index P1 and put that value into
           ** register P3.  Or, if boolean index P1 is initially empty, leave P3
           ** unchanged and jump to instruction P2.
-          */case OP_RowSetRead: {
+          */case OpCode.OP_RowSetRead: {
 					/* jump, in1, ref3 */i64 val=0;
 					if(db.u1.isInterrupted)
 						goto abort_due_to_interrupt;
@@ -4928,7 +5016,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** inserted, there is no need to search to see if the same value was
           ** previously inserted as part of set X (only if it was previously
           ** inserted as part of some other set).
-          */case OP_RowSetTest: {
+          */case OpCode.OP_RowSetTest: {
 					/* jump, in1, in3 */int iSet;
 					int exists;
 					pIn1=aMem[pOp.p1];
@@ -4969,7 +5057,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** memory required by the sub-vdbe at runtime.
 **
 ** P4 is a pointer to the VM containing the trigger program.
-*/case OP_Program: {
+*/case OpCode.OP_Program: {
 					/* jump */int nMem;
 					/* Number of memory registers for sub-program */int nByte;
 					/* Bytes of runtime space required for sub-program */Mem pRt;
@@ -5085,7 +5173,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** The address of the cell in the parent frame is determined by adding
           ** the value of the P1 argument to the value of the P1 argument to the
           ** calling OP_Program instruction.
-          */case OP_Param: {
+          */case OpCode.OP_Param: {
 					/* out2-prerelease */VdbeFrame pFrame;
 					Mem pIn;
 					pFrame=p.pFrame;
@@ -5101,7 +5189,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** If P1 is non-zero, the database constraint counter is incremented 
 ** (deferred foreign key constraints). Otherwise, if P1 is zero, the 
 ** statement counter is incremented (immediate foreign key constraints).
-*/case OP_FkCounter: {
+*/case OpCode.OP_FkCounter: {
 					if(pOp.p1!=0) {
 						db.nDeferredCons+=pOp.p2;
 					}
@@ -5120,7 +5208,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** is zero (the one that counts deferred constraint violations). If P1 is
           ** zero, the jump is taken if the statement constraint-counter is zero
           ** (immediate foreign key constraint violations).
-          */case OP_FkIfZero: {
+          */case OpCode.OP_FkIfZero: {
 					/* jump */if(pOp.p1!=0) {
 						if(db.nDeferredCons==0)
 							pc=pOp.p2-1;
@@ -5142,7 +5230,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 **
 ** This instruction throws an error if the memory cell is not initially
 ** an integer.
-*/case OP_MemMax: {
+*/case OpCode.OP_MemMax: {
 					/* in2 */Mem _pIn1;
 					VdbeFrame pFrame;
 					if(p.pFrame!=null) {
@@ -5169,7 +5257,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 **
 ** It is illegal to use this instruction on a register that does
 ** not contain an integer.  An Debug.Assertion fault will result if you try.
-*/case OP_IfPos: {
+*/case OpCode.OP_IfPos: {
 					/* jump, in1 */pIn1=aMem[pOp.p1];
 					Debug.Assert((pIn1.flags&MEM_Int)!=0);
 					if(pIn1.u.i>0) {
@@ -5183,7 +5271,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** It is illegal to use this instruction on a register that does
           ** not contain an integer.  An Debug.Assertion fault will result if you try.
-          */case OP_IfNeg: {
+          */case OpCode.OP_IfNeg: {
 					/* jump, in1 */pIn1=aMem[pOp.p1];
 					Debug.Assert((pIn1.flags&MEM_Int)!=0);
 					if(pIn1.u.i<0) {
@@ -5198,7 +5286,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** It is illegal to use this instruction on a register that does
           ** not contain an integer.  An assertion fault will result if you try.
-          */case OP_IfZero: {
+          */case OpCode.OP_IfZero: {
 					/* jump, in1 */pIn1=aMem[pOp.p1];
 					Debug.Assert((pIn1.flags&MEM_Int)!=0);
 					pIn1.u.i+=pOp.p3;
@@ -5216,7 +5304,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           **
           ** The P5 arguments are taken from register P2 and its
           ** successors.
-          */case OP_AggStep: {
+          */case OpCode.OP_AggStep: {
 					int n;
 					int i;
 					Mem pMem;
@@ -5277,7 +5365,7 @@ MemSetTypeFlag(pOut, MEM_Int);
           ** functions that can take varying numbers of arguments.  The
           ** P4 argument is only needed for the degenerate case where
           ** the step function was not previously called.
-          */case OP_AggFinal: {
+          */case OpCode.OP_AggFinal: {
 					Mem pMem;
 					Debug.Assert(pOp.p1>0&&pOp.p1<=p.nMem);
 					pMem=aMem[pOp.p1];
@@ -5337,7 +5425,7 @@ cDebug.Ase OP_Checkpoint: {
 ** If changing into or out of WAL mode the procedure is more complicated.
 **
 ** Write a string containing the final journal-mode to register P2.
-*/case OP_JournalMode:
+*/case OpCode.OP_JournalMode:
 				{
 					/* out2-prerelease */Btree pBt;
 					/* Btree to change journal mode of */Pager pPager;
@@ -5425,7 +5513,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
 ** Vacuum the entire database.  This opcode will cause other virtual
 ** machines to be created and run.  It may not be called from within
 ** a transaction.
-*/case OP_Vacuum: {
+*/case OpCode.OP_Vacuum: {
 					rc=sqlite3RunVacuum(ref p.zErrMsg,db);
 					break;
 				}
@@ -5436,7 +5524,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
 ** Perform a single step of the incremental vacuum procedure on
 ** the P1 database. If the vacuum has finished, jump to instruction
 ** P2. Otherwise, fall through to the next instruction.
-*/case OP_IncrVacuum: {
+*/case OpCode.OP_IncrVacuum: {
 					/* jump */Btree pBt;
 					Debug.Assert(pOp.p1>=0&&pOp.p1<db.nDb);
 					Debug.Assert((p.btreeMask&(((yDbMask)1)<<pOp.p1))!=0);
@@ -5457,7 +5545,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
 **
 ** If P1 is 0, then all SQL statements become expired. If P1 is non-zero,
 ** then only the currently executing statement is affected.
-*/case OP_Expire: {
+*/case OpCode.OP_Expire: {
 					if(pOp.p1==0) {
 						sqlite3ExpirePreparedStatements(db);
 					}
@@ -5508,7 +5596,7 @@ break;
 ** Also, whether or not P4 is set, check that this is not being called from
 ** within a callback to a virtual table xSync() method. If it is, the error
 ** code will be set to SQLITE_LOCKED.
-*/case OP_VBegin: {
+*/case OpCode.OP_VBegin: {
 					VTable pVTab;
 					pVTab=pOp.p4.pVtab;
 					rc=sqlite3VtabBegin(db,pVTab);
@@ -5522,7 +5610,7 @@ break;
 **
 ** P4 is the name of a virtual table in database P1. Call the xCreate method
 ** for that table.
-*/case OP_VCreate: {
+*/case OpCode.OP_VCreate: {
 					rc=sqlite3VtabCallCreate(db,pOp.p1,pOp.p4.z,ref p.zErrMsg);
 					break;
 				}
@@ -5532,7 +5620,7 @@ break;
 **
 ** P4 is the name of a virtual table in database P1.  Call the xDestroy method
 ** of that table.
-*/case OP_VDestroy: {
+*/case OpCode.OP_VDestroy: {
 					p.inVtabMethod=2;
 					rc=sqlite3VtabCallDestroy(db,pOp.p1,pOp.p4.z);
 					p.inVtabMethod=0;
@@ -5545,7 +5633,7 @@ break;
 ** P4 is a pointer to a virtual table object, an sqlite3_vtab structure.
 ** P1 is a cursor number.  This opcode opens a cursor to the virtual
 ** table and stores that cursor in P1.
-*/case OP_VOpen: {
+*/case OpCode.OP_VOpen: {
 					VdbeCursor pCur;
 					sqlite3_vtab_cursor pVtabCursor;
 					sqlite3_vtab pVtab;
@@ -5589,7 +5677,7 @@ break;
 ** xFilter as argv. Register P3+2 becomes argv[0] when passed to xFilter.
 **
 ** A jump is made to P2 if the result set after filtering would be empty.
-*/case OP_VFilter: {
+*/case OpCode.OP_VFilter: {
 					/* jump */int nArg;
 					int iQuery;
 					sqlite3_module pModule;
@@ -5643,7 +5731,7 @@ break;
 ** Store the value of the P2-th column of
 ** the row of the virtual-table that the
 ** P1 cursor is pointing to into register P3.
-*/case OP_VColumn: {
+*/case OpCode.OP_VColumn: {
 					sqlite3_vtab pVtab;
 					sqlite3_module pModule;
 					Mem pDest;
@@ -5692,7 +5780,7 @@ break;
 ** Advance virtual table P1 to the next row in its result set and
 ** jump to instruction P2.  Or, if the virtual table has reached
 ** the end of its result set, then fall through to the next instruction.
-*/case OP_VNext: {
+*/case OpCode.OP_VNext: {
 					/* jump */sqlite3_vtab pVtab;
 					sqlite3_module pModule;
 					int res;
@@ -5730,7 +5818,7 @@ break;
 ** P4 is a pointer to a virtual table object, an sqlite3_vtab structure.
 ** This opcode invokes the corresponding xRename method. The value
 ** in register P1 is passed as the zName argument to the xRename method.
-*/case OP_VRename: {
+*/case OpCode.OP_VRename: {
 					sqlite3_vtab pVtab;
 					Mem pName;
 					pVtab=pOp.p4.pVtab.pVtab;
@@ -5768,7 +5856,7 @@ break;
 ** P1 is a boolean flag. If it is set to true and the xUpdate call
 ** is successful, then the value returned by sqlite3_last_insert_rowid()
 ** is set to the value of the rowid for the row just inserted.
-*/case OP_VUpdate: {
+*/case OpCode.OP_VUpdate: {
 					sqlite3_vtab pVtab;
 					sqlite3_module pModule;
 					int nArg;
@@ -5820,7 +5908,7 @@ break;
 				/* Opcode: Pagecount P1 P2 * * *
 **
 ** Write the current number of pages in database P1 to memory cell P2.
-*/case OP_Pagecount: {
+*/case OpCode.OP_Pagecount: {
 					/* out2-prerelease */pOut.u.i=sqlite3BtreeLastPage(db.aDb[pOp.p1].pBt);
 					break;
 				}
@@ -5833,7 +5921,7 @@ break;
 ** do not change the maximum page count value if P3==0.
 **
 ** Store the maximum page count after the change in register P2.
-*/case OP_MaxPgcnt: {
+*/case OpCode.OP_MaxPgcnt: {
 					/* out2-prerelease */i64 newMax;
 					Btree pBt;
 					pBt=db.aDb[pOp.p1].pBt;
@@ -5852,7 +5940,7 @@ break;
 **
 ** If tracing is enabled (by the sqlite3_trace()) interface, then
 ** the UTF-8 string contained in P4 is emitted on the trace callback.
-*/case OP_Trace: {
+*/case OpCode.OP_Trace: {
 					string zTrace;
 					string z;
 					if(db.xTrace!=null&&!String.IsNullOrEmpty(zTrace=(pOp.p4.z!=null?pOp.p4.z:p.zSql))) {

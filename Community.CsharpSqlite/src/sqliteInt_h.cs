@@ -3933,7 +3933,8 @@ set { _op = value; }
 							pOp=v.sqlite3VdbeGetOp(k);
 							if(pOp.p1!=pLevel.iTabCur)
 								continue;
-							if(pOp.opcode==OP_Column) {
+                            if (pOp.OpCode == OpCode.OP_Column)
+                            {
 								for(j=0;j<pIdx.nColumn;j++) {
 									if(pOp.p2==pIdx.aiColumn[j]) {
 										pOp.p2=j;
@@ -3944,9 +3945,10 @@ set { _op = value; }
 								Debug.Assert((pLevel.plan.wsFlags&WHERE_IDX_ONLY)==0||j<pIdx.nColumn);
 							}
 							else
-								if(pOp.opcode==OP_Rowid) {
+                                if (pOp.OpCode == OpCode.OP_Rowid)
+                                {
 									pOp.p1=pLevel.iIdxCur;
-									pOp.opcode=OP_IdxRowid;
+                                    pOp.OpCode = OpCode.OP_IdxRowid;
 								}
 						}
 					}
