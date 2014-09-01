@@ -40,10 +40,10 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if (SQLITE_TEST) || (SQLITE_DEBUG)
-																																										    static bool sqlite3WhereTrace = false;
+																																												    static bool sqlite3WhereTrace = false;
 #endif
 		#if (SQLITE_TEST) && (SQLITE_DEBUG) && TRACE
-																																										// define WHERETRACE(X)  if(sqlite3WhereTrace) sqlite3DebugPrintf X
+																																												// define WHERETRACE(X)  if(sqlite3WhereTrace) sqlite3DebugPrintf X
 static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace ) sqlite3DebugPrintf( X, ap ); }
 #else
 		//# define WHERETRACE(X)
@@ -152,7 +152,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		//#define TERM_ANDINFO    0x20   /* Need to free the WhereTerm.u.pAndInfo obj */
 		//#define TERM_OR_OK      0x40   /* Used during OR-clause processing */
 		#if SQLITE_ENABLE_STAT2
-																																										    //  define TERM_VNULL    0x80   /* Manufactured x>NULL or x<=NULL term */
+																																												    //  define TERM_VNULL    0x80   /* Manufactured x>NULL or x<=NULL term */
 #else
 		//#  define TERM_VNULL    0x00   /* Disabled if not using stat2 */
 		#endif
@@ -165,7 +165,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/* Need to free the WhereTerm.u.pAndInfo obj */const int TERM_OR_OK=0x40;
 		/* Used during OR-clause processing */
 		#if SQLITE_ENABLE_STAT2
-																																										    const int TERM_VNULL = 0x80;  /* Manufactured x>NULL or x<=NULL term */
+																																												    const int TERM_VNULL = 0x80;  /* Manufactured x>NULL or x<=NULL term */
 #else
 		const int TERM_VNULL=0x00;
 		///<summary>
@@ -187,7 +187,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			/* Number of entries in a[] */public WhereTerm[] a;
 			/* Each a[] describes a term of the WHERE cluase */
 			#if (SQLITE_SMALL_STACK)
-																																																															public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[] */
+																																																																		public WhereTerm[] aStatic = new WhereTerm[1];    /* Initial static space for a[] */
 #else
 			public WhereTerm[] aStatic=new WhereTerm[8];
 			///<summary>
@@ -228,7 +228,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 						}
 				}
 				if(this.a!=this.aStatic) {
-					sqlite3DbFree(db,ref this.a);
+					db.sqlite3DbFree(ref this.a);
 				}
 			}
 			public void whereClauseInit(/* The WhereClause to be initialized */Parse pParse,/* The parsing context */WhereMaskSet pMaskSet/* Mapping from table cursor numbers to bitmasks */) {
@@ -858,7 +858,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///
 		///</summary>
 		#if !(SQLITE_OMIT_VIRTUALTABLE) && (SQLITE_DEBUG)
-																																										static void TRACE_IDX_INPUTS( sqlite3_index_info p )
+																																												static void TRACE_IDX_INPUTS( sqlite3_index_info p )
 {
 int i;
 if ( !sqlite3WhereTrace ) return;
@@ -934,7 +934,7 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 	/// transient index.
 	///</summary>
 	#else
-																																									// define bestAutomaticIndex(A,B,C,D,E)  /* no-op */
+																																										// define bestAutomaticIndex(A,B,C,D,E)  /* no-op */
 static void bestAutomaticIndex(
 Parse pParse,              /* The parsing context */
 WhereClause pWC,           /* The WHERE clause */
@@ -1011,7 +1011,7 @@ WhereCost pCost            /* Lowest cost query plan */
 ** SQLITE_NOMEM is returned and *piRegion is undefined.
 */
 	#if SQLITE_ENABLE_STAT2
-																																									    static int whereRangeRegion(
+																																										    static int whereRangeRegion(
     Parse pParse,               /* Database connection */
     Index pIdx,                 /* Index to consider domain of */
     sqlite3_value pVal,         /* Value to consider */
@@ -1100,7 +1100,7 @@ WhereCost pCost            /* Lowest cost query plan */
             if ( ( eSampletype != eType ) )
               break;
 #if !SQLITE_OMIT_UTF16
-																																									if( pColl.enc!=SqliteEncoding.UTF8 ){
+																																										if( pColl.enc!=SqliteEncoding.UTF8 ){
 int nSample;
 string zSample;
 zSample = sqlite3Utf8to16(
@@ -1116,7 +1116,7 @@ c = pColl.xCmp(pColl.pUser, nSample, zSample, n, z);
 sqlite3DbFree(db, ref zSample);
 }else
 #endif
-																																									            {
+																																										            {
               c = pColl.xCmp( pColl.pUser, aSample[i].nByte, aSample[i].u.z, n, z );
             }
             if ( c - roundUp >= 0 )
@@ -1147,7 +1147,7 @@ sqlite3DbFree(db, ref zSample);
 	/// If an error occurs, return an error code. Otherwise, SQLITE_OK.
 	///</summary>
 	#if SQLITE_ENABLE_STAT2
-																																									    static int valueFromExpr(
+																																										    static int valueFromExpr(
     Parse pParse,
     Expr pExpr,
     char aff,
@@ -1208,7 +1208,7 @@ sqlite3DbFree(db, ref zSample);
 	/// in a return of 6.
 	///</summary>
 	#if SQLITE_ENABLE_STAT2
-																																									    /*
+																																										    /*
 ** Estimate the number of rows that will be returned based on
 ** an equality constraint x=VALUE and where that VALUE occurs in
 ** the histogram data.  This only works when x is the left-most
@@ -1278,7 +1278,7 @@ whereEqualScanEst_cancel:
     }
 #endif
 	#if SQLITE_ENABLE_STAT2
-																																									    /*
+																																										    /*
 ** Estimate the number of rows that will be returned based on
 ** an IN constraint where the right-hand side of the IN operator
 ** is a list of values.  Example:
@@ -1535,7 +1535,7 @@ whereEqualScanEst_cancel:
 	///
 	///</summary>
 	#else
-																																									// define explainOneScan(u,v,w,x,y,z)
+																																										// define explainOneScan(u,v,w,x,y,z)
 static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,  u16 z){}
 #endif
 	///<summary>
@@ -1543,19 +1543,19 @@ static void explainOneScan(  Parse u,  SrcList v,  WhereLevel w,  int x,  int y,
 	/// implementation described by pWInfo.
 	///</summary>
 	#if (SQLITE_TEST)
-																																									    /*
+																																										    /*
 ** The following variable holds a text description of query plan generated
 ** by the most recent call to sqlite3WhereBegin().  Each call to WhereBegin
 ** overwrites the previous.  This information is used for testing and
 ** analysis only.
 */
 #if !TCLSH
-																																									    //char sqlite3_query_plan[BMS*2*40];  /* Text of the join */
+																																										    //char sqlite3_query_plan[BMS*2*40];  /* Text of the join */
     static StringBuilder sqlite3_query_plan;
 #else
-																																									    static tcl.lang.Var.SQLITE3_GETSET sqlite3_query_plan = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_query_plan" );
+																																										    static tcl.lang.Var.SQLITE3_GETSET sqlite3_query_plan = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_query_plan" );
 #endif
-																																									    static int nQPlan = 0;              /* Next free slow in _query_plan[] */
+																																										    static int nQPlan = 0;              /* Next free slow in _query_plan[] */
 
 #endif
 	///<summary>

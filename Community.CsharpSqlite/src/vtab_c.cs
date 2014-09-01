@@ -68,7 +68,7 @@ namespace Community.CsharpSqlite {
 					sqlite3ResetInternalSchema(db,-1);
 					pDel.xDestroy(ref pDel.pAux);
 				}
-				sqlite3DbFree(db,ref pDel);
+				db.sqlite3DbFree(ref pDel);
 				//if( pDel==pMod ){
 				//  db.mallocFailed = 1;
 				//}
@@ -136,7 +136,7 @@ namespace Community.CsharpSqlite {
 				if(p!=null) {
 					((sqlite3_vtab)p).pModule.xDisconnect(ref p);
 				}
-				sqlite3DbFree(db,ref pVTab);
+				db.sqlite3DbFree(ref pVTab);
 			}
 		}
 		///<summary>
@@ -232,9 +232,9 @@ namespace Community.CsharpSqlite {
 			if(p.azModuleArg!=null) {
 				int i;
 				for(i=0;i<p.nModuleArg;i++) {
-					sqlite3DbFree(db,ref p.azModuleArg[i]);
+					db.sqlite3DbFree(ref p.azModuleArg[i]);
 				}
-				sqlite3DbFree(db,ref p.azModuleArg);
+				db.sqlite3DbFree(ref p.azModuleArg);
 			}
 		}
 		///<summary>
@@ -298,7 +298,7 @@ namespace Community.CsharpSqlite {
 			pParse.sNameToken.n=pParse.sNameToken.z.Length;
 			//      (int)[pModuleName.n] - pName1.z );
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																												  /* Creating a virtual table invokes the authorization callback twice.
+																																																															  /* Creating a virtual table invokes the authorization callback twice.
   ** The first invocation, to obtain permission to INSERT a row into the
   ** sqlite_master table, has already been made by sqlite3StartTable().
   ** The second call, to obtain permission to create the table, is made now.
@@ -362,7 +362,7 @@ namespace Community.CsharpSqlite {
         ** by sqlite3StartTable().
         */iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
 				sqlite3NestedParse(pParse,"UPDATE %Q.%s "+"SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q "+"WHERE rowid=#%d",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),pTab.zName,pTab.zName,zStmt,pParse.regRowid);
-				sqlite3DbFree(db,ref zStmt);
+				db.sqlite3DbFree(ref zStmt);
 				v=sqlite3GetVdbe(pParse);
 				sqlite3ChangeCookie(pParse,iDb);
 				v.sqlite3VdbeAddOp2(OP_Expire,0,0);
@@ -461,7 +461,7 @@ namespace Community.CsharpSqlite {
 					zErr=null;
 					//sqlite3_free( zErr );
 				}
-				sqlite3DbFree(db,ref pVTable);
+				db.sqlite3DbFree(ref pVTable);
 			}
 			else
 				if(ALWAYS(pVTable.pVtab)) {
@@ -516,7 +516,7 @@ namespace Community.CsharpSqlite {
 						}
 					}
 				}
-			sqlite3DbFree(db,ref zModuleName);
+			db.sqlite3DbFree(ref zModuleName);
 			return rc;
 		}
 		///<summary>
@@ -735,7 +735,7 @@ namespace Community.CsharpSqlite {
 					pVTab.iSavepoint=0;
 					sqlite3VtabUnlock(pVTab);
 				}
-				sqlite3DbFree(db,ref db.aVTrans);
+				db.sqlite3DbFree(ref db.aVTrans);
 				db.nVTrans=0;
 				db.aVTrans=null;
 			}
@@ -928,7 +928,7 @@ namespace Community.CsharpSqlite {
 				//  *z = sqlite3UpperToLower[*z];
 				//}
 				rc=pMod.xFindFunction(pVtab,nArg,zLowerName.ToLowerInvariant(),ref xFunc,ref pArg);
-				sqlite3DbFree(db,ref zLowerName);
+				db.sqlite3DbFree(ref zLowerName);
 			}
 			if(rc==0) {
 				return pDef;

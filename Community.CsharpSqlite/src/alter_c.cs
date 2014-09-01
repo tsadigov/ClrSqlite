@@ -125,18 +125,18 @@ namespace Community.CsharpSqlite {
 					StringExtensions.sqlite3Dequote(ref zParent);
 					if(zOld.Equals(zParent,StringComparison.InvariantCultureIgnoreCase)) {
 						string zOut=sqlite3MPrintf(db,"%s%.*s\"%w\"",zOutput,zIdx-zLeft,zInput.Substring(zLeft),zNew);
-						sqlite3DbFree(db,ref zOutput);
+						db.sqlite3DbFree(ref zOutput);
 						zOutput=zOut;
 						zIdx+=n;
 						// zInput = &z[n];
 						zLeft=zIdx;
 					}
-					sqlite3DbFree(db,ref zParent);
+					db.sqlite3DbFree(ref zParent);
 				}
 			}
 			zResult=sqlite3MPrintf(db,"%s%s",zOutput,zInput.Substring(zLeft));
 			context.sqlite3_result_text(zResult,-1,SQLITE_DYNAMIC);
-			sqlite3DbFree(db,ref zOutput);
+			db.sqlite3DbFree(ref zOutput);
 		}
 		#endif
 		#if !SQLITE_OMIT_TRIGGER
@@ -216,7 +216,7 @@ namespace Community.CsharpSqlite {
 			};
 			int i;
 			#if SQLITE_OMIT_WSD
-																																																						  FuncDefHash pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
+																																																									  FuncDefHash pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
   FuncDef[] aFunc = GLOBAL(FuncDef, aAlterTableFuncs);
 #else
 			FuncDefHash pHash=sqlite3GlobalFunctions;
@@ -249,7 +249,7 @@ namespace Community.CsharpSqlite {
 			}
 			else {
 				zNew=sqlite3MPrintf(db,"%s OR name=%Q",zWhere,zConstant);
-				sqlite3DbFree(db,ref zWhere);
+				db.sqlite3DbFree(ref zWhere);
 			}
 			return zNew;
 		}

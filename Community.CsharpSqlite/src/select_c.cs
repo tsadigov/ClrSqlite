@@ -110,7 +110,7 @@ namespace Community.CsharpSqlite {
 		static void sqlite3SelectDelete(sqlite3 db,ref Select p) {
 			if(p!=null) {
 				clearSelect(db,p);
-				sqlite3DbFree(db,ref p);
+				db.sqlite3DbFree(ref p);
 			}
 		}
 		///<summary>
@@ -443,7 +443,7 @@ namespace Community.CsharpSqlite {
 				addr=v.sqlite3VdbeAddOp1(OP_IfNeg,p.iOffset);
 				v.sqlite3VdbeAddOp2(OP_Goto,0,iContinue);
 				#if SQLITE_DEBUG
-																																																																																				        VdbeComment( v, "skip OFFSET records" );
+																																																																																								        VdbeComment( v, "skip OFFSET records" );
 #endif
 				v.sqlite3VdbeJumpHere(addr);
 			}
@@ -777,7 +777,7 @@ namespace Community.CsharpSqlite {
 			a=(byte)b;
 		}
 		#else
-																																										/* No-op versions of the explainXXX() functions and macros. */
+																																												/* No-op versions of the explainXXX() functions and macros. */
 // define explainTempTable(y,z)
 static void explainTempTable(ref int a, int b){ a = b;}
 
@@ -809,7 +809,7 @@ static void explainSetInteger(ref int a, int b){ a = b;}
 			}
 		}
 		#else
-																																										/* No-op versions of the explainXXX() functions and macros. */
+																																												/* No-op versions of the explainXXX() functions and macros. */
 // define explainComposite(v,w,x,y,z)
 static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 #endif
@@ -1049,7 +1049,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				Expr p=pEList.a[i].pExpr;
 				string zType;
 				#if SQLITE_ENABLE_COLUMN_METADATA
-																																																																																				        string zOrigDb = null;
+																																																																																								        string zOrigDb = null;
         string zOrigTab = null;
         string zOrigCol = null;
         zType = columnType( sNC, p, ref zOrigDb, ref zOrigTab, ref zOrigCol );
@@ -1216,7 +1216,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 						string zNewName;
 						//zName[nName] = 0;
 						zNewName=sqlite3MPrintf(db,"%s:%d",zName.Substring(0,nName),++cnt);
-						sqlite3DbFree(db,ref zName);
+						db.sqlite3DbFree(ref zName);
 						zName=zNewName;
 						j=-1;
 						if(zName=="")
@@ -1391,7 +1391,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 					pParse.sqlite3ExprCode(p.pLimit,iLimit);
 					v.sqlite3VdbeAddOp1(OP_MustBeInt,iLimit);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "LIMIT counter" );
+																																																																																																														          VdbeComment( v, "LIMIT counter" );
 #endif
 					v.sqlite3VdbeAddOp2(OP_IfZero,iLimit,iBreak);
 				}
@@ -1401,14 +1401,14 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 					/* Allocate an extra register for limit+offset */pParse.sqlite3ExprCode(p.pOffset,iOffset);
 					v.sqlite3VdbeAddOp1(OP_MustBeInt,iOffset);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "OFFSET counter" );
+																																																																																																														          VdbeComment( v, "OFFSET counter" );
 #endif
 					addr1=v.sqlite3VdbeAddOp1(OP_IfPos,iOffset);
 					v.sqlite3VdbeAddOp2(OP_Integer,0,iOffset);
 					v.sqlite3VdbeJumpHere(addr1);
 					v.sqlite3VdbeAddOp3(OP_Add,iLimit,iOffset,iOffset+1);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "LIMIT+OFFSET" );
+																																																																																																														          VdbeComment( v, "LIMIT+OFFSET" );
 #endif
 					addr1=v.sqlite3VdbeAddOp1(OP_IfPos,iLimit);
 					v.sqlite3VdbeAddOp2(OP_Integer,-1,iOffset+1);
@@ -1552,7 +1552,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				if(p.iLimit!=0) {
 					addr=v.sqlite3VdbeAddOp1(OP_IfZero,p.iLimit);
 					#if SQLITE_DEBUG
-																																																																																																									              VdbeComment( v, "Jump ahead if LIMIT reached" );
+																																																																																																														              VdbeComment( v, "Jump ahead if LIMIT reached" );
 #endif
 				}
 				explainSetInteger(ref iSub2,pParse.iNextSelectId);
@@ -1784,7 +1784,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 						pLoop.addrOpenEphm[i]=-1;
 					}
 				}
-				sqlite3DbFree(db,ref pKeyInfo);
+				db.sqlite3DbFree(ref pKeyInfo);
 			}
 			multi_select_end:
 			pDest.iMem=dest.iMem;
@@ -1863,7 +1863,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				break;
 			}
 			#if FALSE
-																																																															/* If any row exist in the result set, record that fact and abort.
+																																																																		/* If any row exist in the result set, record that fact and abort.
 */
 case SelectResultType.Exists: {
 sqlite3VdbeAddOp2(v, OP_Integer, 1, pDest.iParm);
@@ -2693,9 +2693,9 @@ break;
       */pSub=pSub1=pSubitem.pSelect;
 			/* Delete the transient table structure associated with the
       ** subquery
-      */sqlite3DbFree(db,ref pSubitem.zDatabase);
-			sqlite3DbFree(db,ref pSubitem.zName);
-			sqlite3DbFree(db,ref pSubitem.zAlias);
+      */db.sqlite3DbFree(ref pSubitem.zDatabase);
+			db.sqlite3DbFree(ref pSubitem.zName);
+			db.sqlite3DbFree(ref pSubitem.zAlias);
 			pSubitem.zDatabase=null;
 			pSubitem.zName=null;
 			pSubitem.zAlias=null;
@@ -3157,7 +3157,7 @@ break;
 								sColname.z=zColname;
 								sColname.n=StringExtensions.sqlite3Strlen30(zColname);
 								pParse.sqlite3ExprListSetName(pNew,sColname,0);
-								sqlite3DbFree(db,ref zToFree);
+								db.sqlite3DbFree(ref zToFree);
 							}
 						}
 						if(tableSeen==0) {
@@ -3439,7 +3439,7 @@ break;
 			}
 		}
 		#else
-																																										// define explainSimpleCount(a,b,c)
+																																												// define explainSimpleCount(a,b,c)
     static void explainSimpleCount(Parse a, Table b, Index c){}
 #endif
 		///<summary>
@@ -3527,7 +3527,7 @@ break;
 				return 1;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																															if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
+																																																																		if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
 #endif
 			sAggInfo=new AggInfo();
 			// memset(sAggInfo, 0, sAggInfo).Length;
@@ -3791,11 +3791,11 @@ break;
 					pParse.nMem+=pGroupBy.nExpr;
 					v.sqlite3VdbeAddOp2(OP_Integer,0,iAbortFlag);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "clear abort flag" );
+																																																																																																														          VdbeComment( v, "clear abort flag" );
 #endif
 					v.sqlite3VdbeAddOp2(OP_Integer,0,iUseFlag);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "indicate accumulator empty" );
+																																																																																																														          VdbeComment( v, "indicate accumulator empty" );
 #endif
 					/* Begin a loop that will extract all source rows in GROUP BY order.
 ** This might involve two separate loops with an OP_Sort in between, or
@@ -3857,7 +3857,7 @@ break;
 						pWInfo.sqlite3WhereEnd();
 						v.sqlite3VdbeAddOp2(OP_Sort,sAggInfo.sortingIdx,addrEnd);
 						#if SQLITE_DEBUG
-																																																																																																																														            VdbeComment( v, "GROUP BY sort" );
+																																																																																																																																				            VdbeComment( v, "GROUP BY sort" );
 #endif
 						sAggInfo.useSortingIdx=1;
 						pParse.sqlite3ExprCacheClear();
@@ -3891,15 +3891,15 @@ break;
           */pParse.sqlite3ExprCodeMove(iBMem,iAMem,pGroupBy.nExpr);
 					v.sqlite3VdbeAddOp2(OP_Gosub,regOutputRow,addrOutputRow);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "output one row" );
+																																																																																																														          VdbeComment( v, "output one row" );
 #endif
 					v.sqlite3VdbeAddOp2(OP_IfPos,iAbortFlag,addrEnd);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "check abort flag" );
+																																																																																																														          VdbeComment( v, "check abort flag" );
 #endif
 					v.sqlite3VdbeAddOp2(OP_Gosub,regReset,addrReset);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "reset accumulator" );
+																																																																																																														          VdbeComment( v, "reset accumulator" );
 #endif
 					/* Update the aggregate accumulators based on the content of
 ** the current row
@@ -3907,7 +3907,7 @@ break;
 					updateAccumulator(pParse,sAggInfo);
 					v.sqlite3VdbeAddOp2(OP_Integer,1,iUseFlag);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "indicate data in accumulator" );
+																																																																																																														          VdbeComment( v, "indicate data in accumulator" );
 #endif
 					/* End of the loop
 */if(groupBySort!=0) {
@@ -3920,7 +3920,7 @@ break;
 					/* Output the final row of result
           */v.sqlite3VdbeAddOp2(OP_Gosub,regOutputRow,addrOutputRow);
 					#if SQLITE_DEBUG
-																																																																																																									          VdbeComment( v, "output final row" );
+																																																																																																														          VdbeComment( v, "output final row" );
 #endif
 					/* Jump over the subroutines
 */v.sqlite3VdbeAddOp2(OP_Goto,0,addrEnd);
@@ -4055,7 +4055,7 @@ break;
 						if(pMinMax==null&&flag!=0) {
 							v.sqlite3VdbeAddOp2(OP_Goto,0,pWInfo.iBreak);
 							#if SQLITE_DEBUG
-																																																																																																																																																			              VdbeComment( v, "%s() by index",
+																																																																																																																																																										              VdbeComment( v, "%s() by index",
               ( flag == WHERE_ORDERBY_MIN ? "min" : "max" ) );
 #endif
 						}
@@ -4091,12 +4091,12 @@ break;
       */if(rc==SQLITE_OK&&pDest.eDest==SelectResultType.Output) {
 				generateColumnNames(pParse,pTabList,pEList);
 			}
-			sqlite3DbFree(db,ref sAggInfo.aCol);
-			sqlite3DbFree(db,ref sAggInfo.aFunc);
+			db.sqlite3DbFree(ref sAggInfo.aCol);
+			db.sqlite3DbFree(ref sAggInfo.aFunc);
 			return rc;
 		}
 	#if SQLITE_DEBUG
-																					    /*
+																						    /*
 *******************************************************************************
 ** The following code is used for testing and debugging only.  The code
 ** that follows does not appear in normal builds.

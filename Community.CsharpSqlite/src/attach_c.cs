@@ -173,7 +173,7 @@ namespace Community.CsharpSqlite {
 				db.nDb=iDb;
 				if(rc==SQLITE_NOMEM||rc==SQLITE_IOERR_NOMEM) {
 					////        db.mallocFailed = 1;
-					sqlite3DbFree(db,ref zErrDyn);
+					db.sqlite3DbFree(ref zErrDyn);
 					zErrDyn=sqlite3MPrintf(db,"out of memory");
 				}
 				else
@@ -186,7 +186,7 @@ namespace Community.CsharpSqlite {
 			attach_error:
 			/* Return an error if we get here */if(zErrDyn!="") {
 				context.sqlite3_result_error(zErrDyn,-1);
-				sqlite3DbFree(db,ref zErrDyn);
+				db.sqlite3DbFree(ref zErrDyn);
 			}
 			if(rc!=0)
 				context.sqlite3_result_error_code(rc);

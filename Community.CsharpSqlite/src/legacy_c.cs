@@ -141,13 +141,13 @@ namespace Community.CsharpSqlite {
 						break;
 					}
 				}
-				sqlite3DbFree(db,ref azCols);
+				db.sqlite3DbFree(ref azCols);
 				azCols=null;
 			}
 			exec_out:
 			if(pStmt!=null)
 				sqlite3VdbeFinalize(ref pStmt);
-			sqlite3DbFree(db,ref azCols);
+			db.sqlite3DbFree(ref azCols);
 			rc=sqlite3ApiExit(db,rc);
 			if(rc!=SQLITE_OK&&ALWAYS(rc==sqlite3_errcode(db))&&pzErrMsg!=null) {
 				//int nErrMsg = 1 + StringExtensions.sqlite3Strlen30(sqlite3_errmsg(db));

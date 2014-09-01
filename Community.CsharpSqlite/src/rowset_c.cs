@@ -177,7 +177,7 @@ namespace Community.CsharpSqlite {
 			RowSetChunk pChunk,pNextChunk;
 			for(pChunk=p.pChunk;pChunk!=null;pChunk=pNextChunk) {
 				pNextChunk=pChunk.pNextChunk;
-				sqlite3DbFree(p.db,ref pChunk);
+				p.db.sqlite3DbFree(ref pChunk);
 			}
 			p.pChunk=null;
 			p.nFresh=0;

@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 			pParse.nVar=0;
 		}
 		#if !SQLITE_OMIT_SHARED_CACHE
-																																										///<summary>
+																																												///<summary>
 /// The TableLock structure is only used by the sqlite3TableLock() and
 /// codeTableLocks() functions.
 ///</summary>
@@ -175,7 +175,7 @@ p.zName, P4_STATIC );
       */v=sqlite3GetVdbe(pParse);
 			Debug.Assert(0==pParse.isMultiWrite
 			#if SQLITE_DEBUG
-																																																															        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
+																																																																		        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
 #endif
 			);
 			if(v!=null) {
@@ -221,7 +221,7 @@ p.zName, P4_STATIC );
 			/* Get the VDBE program ready for execution
       */if(v!=null&&ALWAYS(pParse.nErr==0)/* && 0 == db.mallocFailed */) {
 				#if SQLITE_DEBUG
-																																																																																				        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
+																																																																																								        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
         sqlite3VdbeTrace( v, trace );
 #endif
 				Debug.Assert(pParse.iCacheLevel==0);
@@ -282,8 +282,8 @@ p.zName, P4_STATIC );
 				pParse.ResetMembers();
 				//  memset(pParse.nVar, 0, SAVE_SZ);
 				pParse.sqlite3RunParser(zSql,ref zErrMsg);
-				sqlite3DbFree(db,ref zErrMsg);
-				sqlite3DbFree(db,ref zSql);
+				db.sqlite3DbFree(ref zErrMsg);
+				db.sqlite3DbFree(ref zSql);
 				pParse.RestoreMembers();
 				//  memcpy(pParse.nVar, saveBuf, SAVE_SZ);
 				pParse.nested--;
@@ -390,8 +390,8 @@ p.zName, P4_STATIC );
 			#if !SQLITE_OMIT_ANALYZE
 			sqlite3DeleteIndexSamples(db,p);
 			#endif
-			sqlite3DbFree(db,ref p.zColAff);
-			sqlite3DbFree(db,ref p);
+			db.sqlite3DbFree(ref p.zColAff);
+			db.sqlite3DbFree(ref p);
 		}
 		///<summary>
 		/// For the index called zIdxName which is found in the database iDb,
@@ -477,7 +477,7 @@ p.zName, P4_STATIC );
       */for(i=j=2;i<db.nDb;i++) {
 				Db pDb=db.aDb[i];
 				if(pDb.pBt==null) {
-					sqlite3DbFree(db,ref pDb.zName);
+					db.sqlite3DbFree(ref pDb.zName);
 					continue;
 				}
 				if(j<i) {
@@ -515,11 +515,11 @@ p.zName, P4_STATIC );
 			for(i=0;i<pTable.nCol;i++) {
 				pCol=pTable.aCol[i];
 				if(pCol!=null) {
-					sqlite3DbFree(db,ref pCol.zName);
+					db.sqlite3DbFree(ref pCol.zName);
 					sqlite3ExprDelete(db,ref pCol.pDflt);
-					sqlite3DbFree(db,ref pCol.zDflt);
-					sqlite3DbFree(db,ref pCol.zType);
-					sqlite3DbFree(db,ref pCol.zColl);
+					db.sqlite3DbFree(ref pCol.zDflt);
+					db.sqlite3DbFree(ref pCol.zType);
+					db.sqlite3DbFree(ref pCol.zColl);
 				}
 			}
 		}
@@ -549,7 +549,7 @@ p.zName, P4_STATIC );
 				string zName=pIndex.zName;
 				//
 				#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																				        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
+																																																																																								        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
         //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
         //  );
         Index pOld = sqlite3HashInsert(
@@ -569,8 +569,8 @@ p.zName, P4_STATIC );
 			/* Delete any foreign keys attached to this table. */sqlite3FkDelete(db,pTable);
 			/* Delete the Table structure itself.
 */sqliteDeleteColumnNames(db,pTable);
-			sqlite3DbFree(db,ref pTable.zName);
-			sqlite3DbFree(db,ref pTable.zColAff);
+			db.sqlite3DbFree(ref pTable.zName);
+			db.sqlite3DbFree(ref pTable.zColAff);
 			sqlite3SelectDelete(db,ref pTable.pSelect);
 			#if !SQLITE_OMIT_CHECK
 			sqlite3ExprDelete(db,ref pTable.pCheck);
@@ -672,7 +672,7 @@ p.zName, P4_STATIC );
 			/* Database number */string zName;
 			/* Name we are searching for */zName=sqlite3NameFromToken(db,pName);
 			i=sqlite3FindDbName(db,zName);
-			sqlite3DbFree(db,ref zName);
+			db.sqlite3DbFree(ref zName);
 			return i;
 		}
 		///<summary>
@@ -790,7 +790,7 @@ p.zName, P4_STATIC );
 			if(db.init.iDb==1)
 				isTemp=1;
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																															Debug.Assert( (isTemp & 1)==isTemp );
+																																																																		Debug.Assert( (isTemp & 1)==isTemp );
 {
 int code;
 string zDb = db.aDb[iDb].zName;
@@ -920,7 +920,7 @@ goto begin_table_error;
 			}
 			/* Normal (non-error) return. */return;
 			/* If an error occurs, we jump here */begin_table_error:
-			sqlite3DbFree(db,ref zName);
+			db.sqlite3DbFree(ref zName);
 			return;
 		}
 		///<summary>
@@ -966,7 +966,7 @@ goto begin_table_error;
 				if(z.Equals(p.aCol[i].zName,StringComparison.InvariantCultureIgnoreCase)) {
 					//STRICMP(z, p.aCol[i].zName) ){
 					sqlite3ErrorMsg(pParse,"duplicate column name: %s",z);
-					sqlite3DbFree(db,ref z);
+					db.sqlite3DbFree(ref z);
 					return;
 				}
 			}
@@ -1118,7 +1118,7 @@ goto begin_table_error;
           ** is required by pragma table_info.
           */sqlite3ExprDelete(db,ref pCol.pDflt);
 					pCol.pDflt=sqlite3ExprDup(db,pSpan.pExpr,EXPRDUP_REDUCE);
-					sqlite3DbFree(db,ref pCol.zDflt);
+					db.sqlite3DbFree(ref pCol.zDflt);
 					pCol.zDflt=pSpan.zStart.Substring(0,pSpan.zStart.Length-pSpan.zEnd.Length);
 					//sqlite3DbStrNDup( db, pSpan.zStart,
 					//                               (int)( pSpan.zEnd.Length - pSpan.zStart.Length ) );
@@ -1253,7 +1253,7 @@ goto begin_table_error;
 				}
 			}
 			else {
-				sqlite3DbFree(db,ref zColl);
+				db.sqlite3DbFree(ref zColl);
 			}
 		}
 		///<summary>
@@ -1608,7 +1608,7 @@ goto begin_table_error;
         ** SQLITE_MASTER table.  We just need to update that slot with all
         ** the information we've collected.
         */sqlite3NestedParse(pParse,"UPDATE %Q.%s "+"SET type='%s', name=%Q, tbl_name=%Q, rootpage=#%d, sql=%Q "+"WHERE rowid=#%d",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),zType,p.zName,p.zName,pParse.regRoot,zStmt,pParse.regRowid);
-				sqlite3DbFree(db,ref zStmt);
+				db.sqlite3DbFree(ref zStmt);
 				sqlite3ChangeCookie(pParse,iDb);
 				#if !SQLITE_OMIT_AUTOINCREMENT
 				/* Check to see if we need to create an sqlite_sequence table for
@@ -1715,7 +1715,7 @@ goto begin_table_error;
 			return;
 		}
 		#else
-																																										    static void sqlite3CreateView(
+																																												    static void sqlite3CreateView(
     Parse pParse,     /* The parsing context */
     Token pBegin,     /* The CREATE token that begins the statement */
     Token pName1,     /* The token that holds the name of the view */
@@ -1788,7 +1788,7 @@ goto begin_table_error;
 				pTable.nCol=-1;
 				db.lookaside.bEnabled=0;
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																				xAuth = db.xAuth;
+																																																																																								xAuth = db.xAuth;
 db.xAuth = 0;
 pSelTab = sqlite3ResultSetOfSelect(pParse, pSel);
 db.xAuth = xAuth;
@@ -1841,7 +1841,7 @@ db.xAuth = xAuth;
 			DbClearProperty(db,idx,DB_UnresetViews);
 		}
 		#else
-																																										    // define sqliteViewResetAll(A,B)
+																																												    // define sqliteViewResetAll(A,B)
     static void sqliteViewResetAll( sqlite3 A, int B )
     {
     }
@@ -1923,7 +1923,7 @@ db.xAuth = xAuth;
 		///</summary>
 		static void destroyTable(Parse pParse,Table pTab) {
 			#if SQLITE_OMIT_AUTOVACUUM
-																																																															Index pIdx;
+																																																																		Index pIdx;
 int iDb = sqlite3SchemaToIndex( pParse.db, pTab.pSchema );
 destroyRootPage( pParse, pTab.tnum, iDb );
 for ( pIdx = pTab.pIndex ; pIdx != null ; pIdx = pIdx.pNext )
@@ -2004,7 +2004,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
 				goto exit_drop_table;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																															{
+																																																																		{
 int code;
 string zTab = SCHEMA_TABLE(iDb);
 string zDb = db.aDb[iDb].zName;
@@ -2232,7 +2232,7 @@ goto exit_drop_table;
       */p.pFKey=pFKey;
 			pFKey=null;
 			fk_end:
-			sqlite3DbFree(db,ref pFKey);
+			db.sqlite3DbFree(ref pFKey);
 			#endif
 			sqlite3ExprListDelete(db,ref pFromCol);
 			sqlite3ExprListDelete(db,ref pToCol);
@@ -2278,7 +2278,7 @@ goto exit_drop_table;
 			/* Register holding assemblied index record */sqlite3 db=pParse.db;
 			/* The database connection */int iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																															if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
+																																																																		if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
 db.aDb[iDb].zName ) ){
 return;
 }
@@ -2480,7 +2480,7 @@ return;
 			/* Check for authorization to create an index.
       */
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																															{
+																																																																		{
 string zDb = pDb.zName;
 if( sqlite3AuthCheck(pParse, SQLITE_INSERT, SCHEMA_TABLE(iDb), 0, zDb) ){
 goto exit_create_index;
@@ -2731,7 +2731,7 @@ goto exit_create_index;
 				}
 				/* Add an entry in sqlite_master for this index
         */sqlite3NestedParse(pParse,"INSERT INTO %Q.%s VALUES('index',%Q,%Q,#%d,%Q);",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),pIndex.zName,pTab.zName,iMem,zStmt);
-				sqlite3DbFree(db,ref zStmt);
+				db.sqlite3DbFree(ref zStmt);
 				/* Fill the index with data and reparse the schema. Code an OP_Expire
         ** to invalidate all pre-compiled statements.
         */if(pTblName!=null) {
@@ -2765,11 +2765,11 @@ goto exit_create_index;
 			/* Clean up before exiting */exit_create_index:
 			if(pIndex!=null) {
 				//sqlite3DbFree(db, ref pIndex.zColAff );
-				sqlite3DbFree(db,ref pIndex);
+				db.sqlite3DbFree(ref pIndex);
 			}
 			sqlite3ExprListDelete(db,ref pList);
 			sqlite3SrcListDelete(db,ref pTblName);
-			sqlite3DbFree(db,ref zName);
+			db.sqlite3DbFree(ref zName);
 			return pRet;
 		}
 		///<summary>
@@ -2845,7 +2845,7 @@ goto exit_create_index;
 			}
 			iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																															{
+																																																																		{
 int code = SQLITE_DROP_INDEX;
 Table pTab = pIndex.pTable;
 string zDb = db.aDb[iDb].zName;
@@ -2949,10 +2949,10 @@ goto exit_drop_index;
 			if(pList==null)
 				return;
 			for(i=0;i<pList.nId;i++) {
-				sqlite3DbFree(db,ref pList.a[i].zName);
+				db.sqlite3DbFree(ref pList.a[i].zName);
 			}
-			sqlite3DbFree(db,ref pList.a);
-			sqlite3DbFree(db,ref pList);
+			db.sqlite3DbFree(ref pList.a);
+			db.sqlite3DbFree(ref pList);
 		}
 		///<summary>
 		/// Return the index in pList of the identifier named zId.  Return -1
@@ -3116,16 +3116,16 @@ goto exit_drop_index;
 			for(i=0;i<pList.nSrc;i++) {
 				//, pItem++){
 				pItem=pList.a[i];
-				sqlite3DbFree(db,ref pItem.zDatabase);
-				sqlite3DbFree(db,ref pItem.zName);
-				sqlite3DbFree(db,ref pItem.zAlias);
-				sqlite3DbFree(db,ref pItem.zIndex);
+				db.sqlite3DbFree(ref pItem.zDatabase);
+				db.sqlite3DbFree(ref pItem.zName);
+				db.sqlite3DbFree(ref pItem.zAlias);
+				db.sqlite3DbFree(ref pItem.zIndex);
 				sqlite3DeleteTable(db,ref pItem.pTab);
 				sqlite3SelectDelete(db,ref pItem.pSelect);
 				sqlite3ExprDelete(db,ref pItem.pOn);
 				sqlite3IdListDelete(db,ref pItem.pUsing);
 			}
-			sqlite3DbFree(db,ref pList);
+			db.sqlite3DbFree(ref pList);
 		}
 		///<summary>
 		/// This routine is called by the parser to add a new term to the
@@ -3288,21 +3288,21 @@ goto exit_drop_index;
 		///
 		///</summary>
 		#if !SQLITE_OMIT_AUTHORIZATION
-																																										const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
+																																												const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
 #endif
 		static void sqlite3Savepoint(Parse pParse,int op,Token pName) {
 			string zName=sqlite3NameFromToken(pParse.db,pName);
 			if(zName!=null) {
 				Vdbe v=sqlite3GetVdbe(pParse);
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																				Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
+																																																																																								Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
 #endif
 				if(null==v
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																				|| sqlite3AuthCheck(pParse, SQLITE_SAVEPOINT, az[op], zName, 0)
+																																																																																								|| sqlite3AuthCheck(pParse, SQLITE_SAVEPOINT, az[op], zName, 0)
 #endif
 				) {
-					sqlite3DbFree(pParse.db,ref zName);
+					pParse.db.sqlite3DbFree(ref zName);
 					return;
 				}
 				v.sqlite3VdbeAddOp4(OP_Savepoint,op,0,0,zName,P4_DYNAMIC);
@@ -3576,10 +3576,10 @@ goto exit_drop_index;
 					pColl=sqlite3FindCollSeq(db,ENC(db),zColl,0);
 					if(pColl!=null) {
 						reindexDatabases(pParse,zColl);
-						sqlite3DbFree(db,ref zColl);
+						db.sqlite3DbFree(ref zColl);
 						return;
 					}
-					sqlite3DbFree(db,ref zColl);
+					db.sqlite3DbFree(ref zColl);
 				}
 			iDb=sqlite3TwoPartName(pParse,pName1,pName2,ref pObjName);
 			if(iDb<0)
@@ -3591,11 +3591,11 @@ goto exit_drop_index;
 			pTab=sqlite3FindTable(db,z,zDb);
 			if(pTab!=null) {
 				reindexTable(pParse,pTab,null);
-				sqlite3DbFree(db,ref z);
+				db.sqlite3DbFree(ref z);
 				return;
 			}
 			pIndex=sqlite3FindIndex(db,z,zDb);
-			sqlite3DbFree(db,ref z);
+			db.sqlite3DbFree(ref z);
 			if(pIndex!=null) {
 				sqlite3BeginWriteOperation(pParse,0,iDb);
 				sqlite3RefillIndex(pParse,pIndex,-1);
@@ -3636,7 +3636,7 @@ goto exit_drop_index;
 			}
 			if(pParse.nErr!=0) {
 				pKey=null;
-				sqlite3DbFree(db,ref pKey);
+				db.sqlite3DbFree(ref pKey);
 			}
 			return pKey;
 		}

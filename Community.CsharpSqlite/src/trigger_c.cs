@@ -39,7 +39,7 @@ namespace Community.CsharpSqlite {
 				sqlite3SelectDelete(db,ref pTmp.pSelect);
 				sqlite3IdListDelete(db,ref pTmp.pIdList);
 				pTriggerStep=null;
-				sqlite3DbFree(db,ref pTmp);
+				db.sqlite3DbFree(ref pTmp);
 			}
 		}
 		///<summary>
@@ -194,7 +194,7 @@ namespace Community.CsharpSqlite {
 			}
 			iTabDb=sqlite3SchemaToIndex(db,pTab.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																												{
+																																																															{
 int code = SQLITE_CREATE_TRIGGER;
 string zDb = db.aDb[iTabDb].zName;
 string zDbTrig = isTemp ? db.aDb[1].zName : zDb;
@@ -230,7 +230,7 @@ goto trigger_cleanup;
 			Debug.Assert(pParse.pNewTrigger==null);
 			pParse.pNewTrigger=pTrigger;
 			trigger_cleanup:
-			sqlite3DbFree(db,ref zName);
+			db.sqlite3DbFree(ref zName);
 			sqlite3SrcListDelete(db,ref pTableName);
 			sqlite3IdListDelete(db,ref pColumns);
 			sqlite3ExprDelete(db,ref pWhen);
@@ -280,7 +280,7 @@ goto trigger_cleanup;
 				z=pAll.z.Substring(0,pAll.n);
 				//sqlite3DbStrNDup( db, (char*)pAll.z, pAll.n );
 				sqlite3NestedParse(pParse,"INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),zName,pTrig.table,z);
-				sqlite3DbFree(db,ref z);
+				db.sqlite3DbFree(ref z);
 				sqlite3ChangeCookie(pParse,iDb);
 				sqlite3VdbeAddParseSchemaOp(v,iDb,sqlite3MPrintf(db,"type='trigger' AND name='%q'",zName));
 			}
@@ -430,12 +430,12 @@ goto trigger_cleanup;
 			if(pTrigger==null)
 				return;
 			sqlite3DeleteTriggerStep(db,ref pTrigger.step_list);
-			sqlite3DbFree(db,ref pTrigger.zName);
-			sqlite3DbFree(db,ref pTrigger.table);
+			db.sqlite3DbFree(ref pTrigger.zName);
+			db.sqlite3DbFree(ref pTrigger.table);
 			sqlite3ExprDelete(db,ref pTrigger.pWhen);
 			sqlite3IdListDelete(db,ref pTrigger.pColumns);
 			pTrigger=null;
-			sqlite3DbFree(db,ref pTrigger);
+			db.sqlite3DbFree(ref pTrigger);
 		}
 		///<summary>
 		/// This function is called to drop a trigger from the database schema.
@@ -509,7 +509,7 @@ goto trigger_cleanup;
 			Debug.Assert(pTable!=null);
 			Debug.Assert(pTable.pSchema==pTrigger.pSchema||iDb==1);
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																												{
+																																																															{
 int code = SQLITE_DROP_TRIGGER;
 string zDb = db.aDb[iDb].zName;
 string zTab = SCHEMA_TABLE(iDb);
@@ -715,7 +715,7 @@ return;
 			return 0;
 		}
 		#if SQLITE_DEBUG
-																																								    /*
+																																										    /*
 ** This function is used to add VdbeComment() annotations to a VDBE
 ** program. It is not used in production code, only for debugging.
 */
@@ -752,7 +752,7 @@ return;
 				pTo.nErr=pFrom.nErr;
 			}
 			else {
-				sqlite3DbFree(pFrom.db,ref pFrom.zErrMsg);
+				pFrom.db.sqlite3DbFree(ref pFrom.zErrMsg);
 			}
 		}
 		///<summary>
@@ -803,7 +803,7 @@ return;
 			v=sqlite3GetVdbe(pSubParse);
 			if(v!=null) {
 				#if SQLITE_DEBUG
-																																																																																        VdbeComment( v, "Start: %s.%s (%s %s%s%s ON %s)",
+																																																																																				        VdbeComment( v, "Start: %s.%s (%s %s%s%s ON %s)",
           pTrigger.zName != null ? pTrigger.zName : "", onErrorText( orconf ),
           ( pTrigger.tr_tm == TRIGGER_BEFORE ? "BEFORE" : "AFTER" ),
             ( pTrigger.op == TK_UPDATE ? "UPDATE" : "" ),
@@ -832,7 +832,7 @@ return;
 				}
 				v.sqlite3VdbeAddOp0(OP_Halt);
 				#if SQLITE_DEBUG
-																																																																																        VdbeComment( v, "End: %s.%s", pTrigger.zName, onErrorText( orconf ) );
+																																																																																				        VdbeComment( v, "End: %s.%s", pTrigger.zName, onErrorText( orconf ) );
 #endif
 				transferParseError(pParse,pSubParse);
 				//if( db.mallocFailed==0 ){
@@ -890,7 +890,7 @@ return;
 				v.sqlite3VdbeAddOp3(OP_Program,reg,ignoreJump,++pParse.nMem);
 				v.sqlite3VdbeChangeP4(-1,pPrg.pProgram,P4_SUBPROGRAM);
 				#if SQLITE_DEBUG
-																																																																																        VdbeComment
+																																																																																				        VdbeComment
             ( v, "Call: %s.%s", ( !String.IsNullOrEmpty( p.zName ) ? p.zName : "fkey" ), onErrorText( orconf ) );
 #endif
 				/* Set the P5 operand of the OP_Program instruction to non-zero if

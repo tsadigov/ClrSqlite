@@ -165,7 +165,7 @@ namespace Community.CsharpSqlite {
 				sqlite3ExprListDelete(dbMem,ref pStep.pExprList);
 				sqlite3SelectDelete(dbMem,ref pStep.pSelect);
 				sqlite3ExprDelete(dbMem,ref p.pWhen);
-				sqlite3DbFree(dbMem,ref p);
+				dbMem.sqlite3DbFree(ref p);
 			}
 		}
 		//#define COLUMN_MASK(x) (((x)>31) ? 0xffffffff : ((u32)1<<(x)))
@@ -205,7 +205,7 @@ namespace Community.CsharpSqlite {
 				fkTriggerDelete(db,pFKey.apTrigger[0]);
 				fkTriggerDelete(db,pFKey.apTrigger[1]);
 				pNext=pFKey.pNextFrom;
-				sqlite3DbFree(db,ref pFKey);
+				db.sqlite3DbFree(ref pFKey);
 			}
 		}
 	#endif

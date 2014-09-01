@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#else
-																																										//define exprSetHeight(y)
+																																												//define exprSetHeight(y)
 #endif
 		///<summary>
 		/// This routine is the core allocator for Expr nodes.
@@ -175,7 +175,7 @@ namespace Community.CsharpSqlite {
 						//pNew.u.zToken[pToken.n] = 0;
 						if(dequote!=0&&nExtra>=3&&((c=pToken.z[0])=='\''||c=='"'||c=='['||c=='`')) {
 							#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																																																																																																			StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
+																																																																																																																																																										StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
 #else
 							StringExtensions.sqlite3Dequote(ref pNew.u.zToken);
 							#endif
@@ -292,9 +292,9 @@ namespace Community.CsharpSqlite {
 				sqlite3ExprDelete(db,ref p.pRight);
 				if(!ExprHasProperty(p,EP_Reduced)&&(p.flags2&EP2_MallocedToken)!=0) {
 					#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																																																									sqlite3DbFree( db, ref p.u._zToken );
+																																																																																																														sqlite3DbFree( db, ref p.u._zToken );
 #else
-					sqlite3DbFree(db,ref p.u.zToken);
+					db.sqlite3DbFree(ref p.u.zToken);
 					#endif
 				}
 				if(ExprHasProperty(p,EP_xIsSelect)) {
@@ -305,7 +305,7 @@ namespace Community.CsharpSqlite {
 				}
 			}
 			if(!ExprHasProperty(p,EP_Static)) {
-				sqlite3DbFree(db,ref p);
+				db.sqlite3DbFree(ref p);
 			}
 		}
 		///<summary>
@@ -536,7 +536,7 @@ namespace Community.CsharpSqlite {
 			pNew.a=new IdList_item[p.nId];
 			//sqlite3DbMallocRaw(db, p.nId*sizeof(p.a[0]) );
 			if(pNew.a==null) {
-				sqlite3DbFree(db,ref pNew);
+				db.sqlite3DbFree(ref pNew);
 				return null;
 			}
 			for(i=0;i<p.nId;i++) {
@@ -576,7 +576,7 @@ namespace Community.CsharpSqlite {
 			return pNew;
 		}
 		#else
-																																										Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
+																																												Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
 Debug.Assert( p==null );
 return null;
 }
@@ -627,12 +627,12 @@ return null;
 			for(i=0;i<pList.nExpr;i++) {
 				if((pItem=pList.a[i])!=null) {
 					sqlite3ExprDelete(db,ref pItem.pExpr);
-					sqlite3DbFree(db,ref pItem.zName);
-					sqlite3DbFree(db,ref pItem.zSpan);
+					db.sqlite3DbFree(ref pItem.zName);
+					db.sqlite3DbFree(ref pItem.zSpan);
 				}
 			}
-			sqlite3DbFree(db,ref pList.a);
-			sqlite3DbFree(db,ref pList);
+			db.sqlite3DbFree(ref pList.a);
+			db.sqlite3DbFree(ref pList);
 		}
 		///<summary>
 		/// These routines are Walker callbacks.  Walker.u.pi is a pointer
@@ -1018,7 +1018,7 @@ return null;
 		///
 		///</summary>
 		#if (SQLITE_DEBUG) || (SQLITE_COVERAGE_TEST)
-																																										    /*
+																																												    /*
 ** Return true if any register in the range iFrom..iTo (inclusive)
 ** is used as part of the column cache.
 **

@@ -244,7 +244,7 @@ namespace Community.CsharpSqlite {
     ** "committing" a read-only transaction cannot fail.
     */if(bCloseTrans!=0) {
 						#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																																									      //TESTONLY( int rc2 );
+																																																																																																															      //TESTONLY( int rc2 );
       //TESTONLY( rc2  = ) sqlite3BtreeCommitPhaseOne(p.pSrc, 0);
       //TESTONLY( rc2 |= ) sqlite3BtreeCommitPhaseTwo(p.pSrc);
       int rc2;
@@ -470,7 +470,7 @@ namespace Community.CsharpSqlite {
 						sqlite3Error(pErrorDb,pParse.rc,"%s",pParse.zErrMsg);
 						rc=SQLITE_ERROR;
 					}
-					sqlite3DbFree(pErrorDb,ref pParse.zErrMsg);
+					pErrorDb.sqlite3DbFree(ref pParse.zErrMsg);
 					//sqlite3StackFree( pErrorDb, pParse );
 				}
 				if(rc!=0) {
