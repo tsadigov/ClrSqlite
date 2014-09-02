@@ -5038,13 +5038,13 @@ public yyStackEntry *yystack;        /* The parser's stack */
 				if(stateno>YY_SHIFT_COUNT||(i=yy_shift_ofst[stateno])==YY_SHIFT_USE_DFLT) {
 					return yy_default[stateno];
 				}
-                Log.WriteLine((TokenType)iLookAhead);
-                Log.WriteLine("current\t : "+i);
+                //Log.WriteLine((TokenType)iLookAhead);
+                //Log.WriteLine("current\t : "+i);
 
 
 				Debug.Assert(iLookAhead!=YYNOCODE);
 				i+=iLookAhead;
-                Log.WriteLine("new\t : " + i);
+                //Log.WriteLine("new\t : " + i);
 
 
 				if(i<0||i>=YY_ACTTAB_COUNT||yy_lookahead[i]!=iLookAhead) {

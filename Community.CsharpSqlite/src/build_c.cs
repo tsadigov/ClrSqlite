@@ -514,7 +514,8 @@ p.zName, P4_STATIC );
 			Debug.Assert(pTable!=null);
 			for(i=0;i<pTable.nCol;i++) {
 				pCol=pTable.aCol[i];
-				if(pCol!=null) {
+                if (pCol != null && db!=null)
+                {
 					db.sqlite3DbFree(ref pCol.zName);
 					sqlite3ExprDelete(db,ref pCol.pDflt);
 					db.sqlite3DbFree(ref pCol.zDflt);

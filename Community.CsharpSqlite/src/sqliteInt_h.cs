@@ -3032,14 +3032,14 @@ set { _op = value; }
 				this.zEnd=pEnd.zRestSql.Substring(pEnd.Length);
 			}
 			public void spanExpr(Parse pParse,int op,Token pValue) {
-                Log.WriteLine(String.Empty);
-                Log.WriteHeader("spanExpr");
-                Log.WriteLine(pValue.zRestSql);
-                Log.Indent();
+                //Log.WriteLine(String.Empty);
+                //Log.WriteHeader("spanExpr");
+                //Log.WriteLine(pValue.zRestSql);
+                //Log.Indent();
 				this.pExpr=pParse.sqlite3PExpr(op,0,0,pValue);
 				this.zStart=pValue.zRestSql;
 				this.zEnd=pValue.zRestSql.Substring(pValue.Length);
-                Log.Unindent();
+                //Log.Unindent();
 			}
 			public void spanBinaryExpr(/* Write the result here */Parse pParse,/* The parsing context.  Errors accumulate here */int op,/* The binary operation */ExprSpan pLeft,/* The left operand */ExprSpan pRight/* The right operand */) {
 				this.pExpr=pParse.sqlite3PExpr(op,pLeft.pExpr,pRight.pExpr,0);

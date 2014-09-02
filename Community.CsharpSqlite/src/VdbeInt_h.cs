@@ -26,9 +26,10 @@ using yDbMask = System.Int64;
 using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite {
-	using Op=Sqlite3.VdbeOp;
+	using Op=VdbeOp;
 	using System.Text;
 	using sqlite3_value=Sqlite3.Mem;
+    using System.Collections.Generic;
 	public partial class Sqlite3 {
 		/*
     ** 2003 September 6
@@ -544,7 +545,8 @@ set { _flags = value; }
 			public sqlite3 db;
 			/* The database connection that owns this statement */
             /** Space to hold the virtual machine's program */
-          public Op[] aOp;
+            public Op[] aOp;
+            public List<Op> lOp = new List<Op>();
           /* The memory locations */
           public Mem[] aMem;
 			public Mem[] apArg;
@@ -572,7 +574,7 @@ set { _flags = value; }
           /// <summary>
             /// The program counter 
           /// </summary>
-          public int pc;
+          public int currentOpCodeIndex;
        
           /// <summary>
           /// Value to return
@@ -627,7 +629,7 @@ set { _flags = value; }
 				ct.pNext=pNext;
 				ct.nOp=nOp;
 				ct.nOpAlloc=nOpAlloc;
-				ct.aOp=aOp;
+				ct.lOp=lOp;
 				ct.nLabel=nLabel;
 				ct.nLabelAlloc=nLabelAlloc;
 				ct.aLabel=aLabel;
@@ -643,7 +645,7 @@ set { _flags = value; }
 				ct.nMem=nMem;
 				ct.aMem=aMem;
 				ct.cacheCtr=cacheCtr;
-				ct.pc=pc;
+				ct.currentOpCodeIndex=currentOpCodeIndex;
 				ct.rc=rc;
 				ct.errorAction=errorAction;
 				ct.nResColumn=nResColumn;
@@ -765,9 +767,8 @@ ct.pLruNext=pLruNext;
 					}
 				}
 				this.nOp++;
-				if(this.aOp[i]==null)
-					this.aOp[i]=new VdbeOp();
-				pOp=this.aOp[i];
+				
+                pOp = new VdbeOp();
 				pOp.opcode=(u8)op;
 				pOp.p5=0;
 				pOp.p1=p1;
@@ -775,6 +776,7 @@ ct.pLruNext=pLruNext;
 				pOp.p3=p3;
 				pOp.p4.p=null;
 				pOp.p4type=P4_NOTUSED;
+                lOp.Add(pOp);
 				#if SQLITE_DEBUG
 																																																																									      pOp.zComment = null;
       if ( sqlite3VdbeAddopTrace )
@@ -933,7 +935,7 @@ pOp.cnt = 0;
 				this.readOnly=true;
 				for(i=0;i<this.nOp;i++)//  for(pOp=p->aOp, i=p->nOp-1; i>=0; i--, pOp++)
 				 {
-					pOp=this.aOp[i];
+					pOp=this.lOp[i];
 					u8 opcode=pOp.opcode;
 					pOp.opflags=(u8)sqlite3OpcodeProperty[opcode];
 					if(opcode==OP_Function||opcode==OP_AggStep) {
@@ -954,9 +956,9 @@ pOp.cnt = 0;
 								if(opcode==OP_VFilter) {
 									int n;
 									Debug.Assert(this.nOp-i>=3);
-									Debug.Assert(this.aOp[i-1].opcode==OP_Integer);
+									Debug.Assert(this.lOp[i-1].opcode==OP_Integer);
 									//pOp[-1].opcode==OP_Integer );
-									n=this.aOp[i-1].p1;
+									n=this.lOp[i-1].p1;
 									//pOp[-1].p1;
 									if(n>nMaxArgs)
 										nMaxArgs=n;
@@ -975,14 +977,14 @@ pOp.cnt = 0;
 				return this.nOp;
 			}
 			public VdbeOp[] sqlite3VdbeTakeOpArray(ref int pnOp,ref int pnMaxArg) {
-				VdbeOp[] aOp=this.aOp;
+				List<VdbeOp> lOp=this.lOp;
 				Debug.Assert(aOp!=null);
 				// && 0==p.db.mallocFailed );
 				/* Check that sqlite3VdbeUsesBtree() was not called on this VM */Debug.Assert(this.btreeMask==0);
 				this.resolveP2Values(ref pnMaxArg);
 				pnOp=this.nOp;
-				this.aOp=null;
-				return aOp;
+				this.lOp=null;
+				return lOp.ToArray();
 			}
 			public int sqlite3VdbeAddOpList(int nOp,VdbeOpList[] aOp) {
 				int addr;
@@ -997,9 +999,9 @@ pOp.cnt = 0;
 					for(i=0;i<nOp;i++) {
 						pIn=aOp[i];
 						int p2=pIn.p2;
-						if(this.aOp[i+addr]==null)
-							this.aOp[i+addr]=new VdbeOp();
-						VdbeOp pOut=this.aOp[i+addr];
+						if(this.lOp[i+addr]==null)
+							this.lOp[i+addr]=new VdbeOp();
+						VdbeOp pOut=this.lOp[i+addr];
 						pOut.opcode=pIn.opcode;
 						pOut.p1=pIn.p1;
 						if(p2<0&&(sqlite3OpcodeProperty[pOut.opcode]&OPFLG_JUMP)!=0) {
@@ -1029,28 +1031,28 @@ pOp.cnt = 0;
 				Debug.Assert(this!=null);
 				Debug.Assert(addr>=0);
 				if(this.nOp>addr) {
-					this.aOp[addr].p1=val;
+					this.lOp[addr].p1=val;
 				}
 			}
 			public void sqlite3VdbeChangeP2(int addr,int val) {
 				Debug.Assert(this!=null);
 				Debug.Assert(addr>=0);
 				if(this.nOp>addr) {
-					this.aOp[addr].p2=val;
+					this.lOp[addr].p2=val;
 				}
 			}
 			public void sqlite3VdbeChangeP3(int addr,int val) {
 				Debug.Assert(this!=null);
 				Debug.Assert(addr>=0);
 				if(this.nOp>addr) {
-					this.aOp[addr].p3=val;
+					this.lOp[addr].p3=val;
 				}
 			}
 			public void sqlite3VdbeChangeP5(u8 val) {
 				Debug.Assert(this!=null);
-				if(this.aOp!=null) {
+				if(this.lOp!=null) {
 					Debug.Assert(this.nOp>0);
-					this.aOp[this.nOp-1].p5=val;
+					this.lOp[this.nOp-1].p5=val;
 				}
 			}
 			public void sqlite3VdbeJumpHere(int addr) {
@@ -1111,7 +1113,7 @@ pOp.cnt = 0;
 				Debug.Assert(this!=null);
 				db=this.db;
 				Debug.Assert(this.magic==VDBE_MAGIC_INIT);
-				if(this.aOp==null/*|| db.mallocFailed != 0 */) {
+				if(this.lOp==null/*|| db.mallocFailed != 0 */) {
 					if(n!=P4_KEYINFO&&n!=P4_VTAB) {
 						freeP4(db,n,_p4);
 					}
@@ -1122,7 +1124,7 @@ pOp.cnt = 0;
 				if(addr<0) {
 					addr=this.nOp-1;
 				}
-				pOp=this.aOp[addr];
+				pOp=this.lOp[addr];
 				freeP4(db,pOp.p4type,pOp.p4.p);
 				pOp.p4.p=null;
 				if(n==P4_INT32) {
@@ -1243,7 +1245,7 @@ pOp.cnt = 0;
 				//}
 				//else
 				{
-					return this.aOp[addr];
+					return this.lOp[addr];
 				}
 			}
 			public string sqlite3IndexAffinityStr(Index pIdx) {

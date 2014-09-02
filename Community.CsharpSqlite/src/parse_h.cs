@@ -2470,7 +2470,7 @@ goto attach_end;
             public int sqlite3RunParser(string zSql, ref string pzErrMsg)
             {
                 Log.WriteHeader("sqlite3RunParser:"+zSql);
-                Log.Indent();
+                //Log.Indent();
                 int nErr = 0;
                 /* Number of errors encountered */
                 int i;
@@ -2639,7 +2639,7 @@ pParse.nTableLock = 0;
                 {
                     this.rc = SQLITE_ERROR;
                 }
-                Log.Unindent();
+                //Log.Unindent();
                 return nErr;
             }
             public void sqlite3Insert(SrcList pTabList, int null_3, int null_4, IdList pColumn, int onError)
@@ -5137,13 +5137,13 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
             }
             public Expr sqlite3PExpr(/* Parsing context */int op,/* Expression opcode */Expr pLeft,/* Left operand */Expr pRight,/* Right operand */Token pToken/* Argument Token */)
             {
-                Log.WriteHeader(@"sqlite3PExpr");
-                Log.Indent();
-                if (null != pToken)
-                {
-                    Log.WriteLine(pToken.Length);
-                    Log.WriteLine(pToken.zRestSql);
-                }
+                //Log.WriteHeader(@"sqlite3PExpr");
+                //Log.Indent();
+                //if (null != pToken)
+                //{
+                //    Log.WriteLine(pToken.Length);
+                //    Log.WriteLine(pToken.zRestSql);
+                //}
 
                 Expr p = sqlite3ExprAlloc(this.db, op, pToken, 1);
                 sqlite3ExprAttachSubtrees(this.db, p, pLeft, pRight);
@@ -5151,7 +5151,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
                 {
                     this.sqlite3ExprCheckHeight(p.nHeight);
                 }
-                Log.Unindent();
+                //Log.Unindent();
                 return p;
             }
             public void sqlite3ExprCacheStore(int iTab, int iCol, int iReg)

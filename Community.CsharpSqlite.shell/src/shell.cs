@@ -2355,7 +2355,7 @@ enableTimer = booleanValue(azArg[1]);
 
         Community.CsharpSqlite.Sqlite3.Parse pParse = new Community.CsharpSqlite.Sqlite3.Parse();
         String ErrMsg = null;
-        var sql="SELECT 5+6;";
+        var sql = "SELECT 5+6,'aaa';";
 
         callback_data dt = null;
         main_init(ref dt);
@@ -2363,7 +2363,22 @@ enableTimer = booleanValue(azArg[1]);
         //rc=process_input(data,null);
         open_db(dt);
         pParse.db = dt.db;
-        pParse.sqlite3RunParser( sql, ref ErrMsg);
+        pParse.sqlite3RunParser(sql, ref ErrMsg);
+
+        for (int idx = 0; idx < pParse.pVdbe.lOp.Count; idx++)
+        {
+            var item=pParse.pVdbe.lOp[idx];
+            if (item == null)
+                continue;
+
+            if (item.OpCode == OpCode.OP_Integer)
+            {
+                var mem=pParse.pVdbe.aMem[item.p2];
+                mem.u.i=item.p1;
+            }
+            Console.WriteLine(idx.ToString().PadLeft(3)+" : "+item.ToString(pParse));
+        }
+
 
 		string zErrMsg=null;
 		callback_data data=null;

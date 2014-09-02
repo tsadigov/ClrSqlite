@@ -311,6 +311,7 @@
     <Compile Include="src\shell.cs" />
     <Compile Include="src\Sqlite3_backup.cs" />
     <Compile Include="src\Token.cs" />
+    <Compile Include="src\VdbeOp.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

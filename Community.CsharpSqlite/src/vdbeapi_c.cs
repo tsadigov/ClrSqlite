@@ -8,7 +8,7 @@ using u64=System.UInt64;
 using u8=System.Byte;
 using sqlite3_int64=System.Int64;
 namespace Community.CsharpSqlite {
-	using Op=Sqlite3.VdbeOp;
+	using Op=VdbeOp;
 	using sqlite_int64=System.Int64;
 	using sqlite3_stmt=Sqlite3.Vdbe;
 	using sqlite3_value=Sqlite3.Mem;
@@ -268,24 +268,11 @@ rc = db->xWalCallback(db->pWalArg, db, db->aDb[i].zName, nEntry);
     */static int sqlite3Step(Vdbe p) {
 			sqlite3 db;
 			int rc;
-			Debug.Assert(p!=null);
+
+            #region error check
+            Debug.Assert(p!=null);
 			if(p.magic!=VDBE_MAGIC_RUN) {
-				/* We used to require that sqlite3_reset() be called before retrying
-        ** sqlite3_step() after any error or after SQLITE_DONE.  But beginning
-        ** with version 3.7.0, we changed this so that sqlite3_reset() would
-        ** be called automatically instead of throwing the SQLITE_MISUSE error.
-        ** This "automatic-reset" change is not technically an incompatibility, 
-        ** since any application that receives an SQLITE_MISUSE is broken by
-        ** definition.
-        **
-        ** Nevertheless, some published applications that were originally written
-        ** for version 3.6.23 or earlier do in fact depend on SQLITE_MISUSE 
-        ** returns, and the so were broken by the automatic-reset change.  As a
-        ** a work-around, the SQLITE_OMIT_AUTORESET compile-time restores the
-        ** legacy behavior of returning SQLITE_MISUSE for cases where the 
-        ** previous sqlite3_step() returned something other than a SQLITE_LOCKED
-        ** or SQLITE_BUSY error.
-        */
+
 				#if SQLITE_OMIT_AUTORESET
 																																																																																if( p.rc==SQLITE_BUSY || p.rc==SQLITE_LOCKED ){
 sqlite3_reset((sqlite3_stmt)p);
@@ -302,12 +289,12 @@ return SQLITE_MISUSE_BKPT();
 			//p->rc = SQLITE_NOMEM;
 			//  return SQLITE_NOMEM;
 			//}
-			if(p.pc<=0&&p.expired) {
+			if(p.currentOpCodeIndex<=0&&p.expired) {
 				p.rc=SQLITE_SCHEMA;
 				rc=SQLITE_ERROR;
 				goto end_of_step;
 			}
-			if(p.pc<0) {
+			if(p.currentOpCodeIndex<0) {
 				/* If there are no other statements currently running, then
         ** reset the interrupt flag.  This prevents a call to sqlite3_interrupt
         ** from interrupting a statement that has not yet started.
@@ -323,10 +310,12 @@ return SQLITE_MISUSE_BKPT();
 				db.activeVdbeCnt++;
 				if(p.readOnly==false)
 					db.writeVdbeCnt++;
-				p.pc=0;
-			}
-			#if !SQLITE_OMIT_EXPLAIN
-			if(p.explain!=0) {
+				p.currentOpCodeIndex=0;
+            }
+            #endregion
+
+#if !SQLITE_OMIT_EXPLAIN
+            if (p.explain!=0) {
 				rc=sqlite3VdbeList(p);
 			}
 			else
@@ -391,10 +380,14 @@ return SQLITE_MISUSE_BKPT();
             SqlResult rc = SqlResult.SQLITE_OK;
             /* Result from sqlite3Step() */
             SqlResult rc2 = SqlResult.SQLITE_OK;
-			/* Result from sqlite3Reprepare() */Vdbe v=(Vdbe)pStmt;
-			/* the prepared statement */int cnt=0;
-			/* Counter to prevent infinite loop of reprepares */sqlite3 db;
-			/* The database connection */if(v.vdbeSafetyNotNull()) {
+			/* Result from sqlite3Reprepare() */
+            Vdbe v=(Vdbe)pStmt;
+			/* the prepared statement */
+            int cnt=0;
+			/* Counter to prevent infinite loop of reprepares */
+            sqlite3 db;
+			/* The database connection */
+            if(v.vdbeSafetyNotNull()) {
                 return (SqlResult)SQLITE_MISUSE_BKPT();
 			}
 			db=v.db;
@@ -416,7 +409,8 @@ return SQLITE_MISUSE_BKPT();
         ** program counter to 0 to ensure that when the statement is
         ** finalized or reset the parser error message is available via
         ** sqlite3_errmsg() and sqlite3_errcode().
-        */string zErr=sqlite3_value_text(db.pErr);
+        */
+                string zErr=sqlite3_value_text(db.pErr);
 				db.sqlite3DbFree(ref v.zErrMsg);
 				//if ( 0 == db.mallocFailed )
 				{
@@ -900,7 +894,7 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
 				return SQLITE_MISUSE_BKPT();
 			}
 			sqlite3_mutex_enter(p.db.mutex);
-			if(p.magic!=VDBE_MAGIC_RUN||p.pc>=0) {
+			if(p.magic!=VDBE_MAGIC_RUN||p.currentOpCodeIndex>=0) {
 				sqlite3Error(p.db,SQLITE_MISUSE,0);
 				sqlite3_mutex_leave(p.db.mutex);
 				sqlite3_log(SQLITE_MISUSE,"bind on a busy prepared statement: [%s]",p.zSql);

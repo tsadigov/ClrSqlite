@@ -26,7 +26,7 @@ using yDbMask = System.Int64;
 using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite {
-	using Op=Sqlite3.VdbeOp;
+	using Op=VdbeOp;
 	using sqlite3_stmt=Sqlite3.Vdbe;
 	using sqlite3_value=Sqlite3.Mem;
 	using System;
@@ -551,12 +551,12 @@ namespace Community.CsharpSqlite {
 		/*
     ** Change N opcodes starting at addr to No-ops.
     */static void sqlite3VdbeChangeToNoop(Vdbe p,int addr,int N) {
-			if(p.aOp!=null) {
+			if(p.lOp!=null) {
 				sqlite3 db=p.db;
 				while(N-->0) {
-					VdbeOp pOp=p.aOp[addr+N];
+					VdbeOp pOp=p.lOp[addr+N];
 					freeP4(db,pOp.p4type,pOp.p4.p);
-					pOp=p.aOp[addr+N]=new VdbeOp();
+					pOp=p.lOp[addr+N]=new VdbeOp();
 					//memset(pOp, 0, sizeof(pOp[0]));
 					pOp.opcode=OP_Noop;
 					//pOp++;
@@ -1036,9 +1036,9 @@ void sqlite3VdbeLeave(Vdbe *p){
 			}
 			pMem=p.pResultSet[i_pMem++];
 			do {
-				i=p.pc++;
+				i=p.currentOpCodeIndex++;
 			}
-			while(i<nRow&&p.explain==2&&p.aOp[i].OpCode!=OpCode.OP_Explain);
+			while(i<nRow&&p.explain==2&&p.lOp[i].OpCode!=OpCode.OP_Explain);
 			if(i>=nRow) {
 				p.rc=SQLITE_OK;
 				rc=SQLITE_DONE;
@@ -1054,7 +1054,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 					Op pOp;
 					if(i<p.nOp) {
 						/* The output line number is small enough that we are still in the
-          ** main program. */pOp=p.aOp[i];
+          ** main program. */pOp=p.lOp[i];
 					}
 					else {
 						/* We are currently listing subprograms.  Figure out which one and
@@ -1307,7 +1307,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
         Debug.Assert( p.aMem[i].db==p.db );
       }
     #endif
-			p.pc=-1;
+			p.currentOpCodeIndex=-1;
 			p.rc=SQLITE_OK;
 			p.errorAction=OE_Abort;
 			p.magic=VDBE_MAGIC_RUN;
@@ -2005,7 +2005,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				return SQLITE_OK;
 			}
 			checkActiveVdbeCnt(db);
-			/* No commit or rollback needed if the program never started */if(p.pc>=0) {
+			/* No commit or rollback needed if the program never started */if(p.currentOpCodeIndex>=0) {
 				int mrc;
 				/* Primary error code from p.rc */int eStatementOp=0;
 				bool isSpecialError=false;
@@ -2134,7 +2134,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				}
 				/* Release the locks */p.sqlite3VdbeLeave();
 			}
-			/* We have successfully halted and closed the VM.  Record this fact. */if(p.pc>=0) {
+			/* We have successfully halted and closed the VM.  Record this fact. */if(p.currentOpCodeIndex>=0) {
 				db.activeVdbeCnt--;
 				if(!p.readOnly) {
 					db.writeVdbeCnt--;
@@ -2187,7 +2187,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       ** and error message from the VDBE into the main database structure.  But
       ** if the VDBE has just been set to run but has not actually executed any
       ** instructions yet, leave the main database error information unchanged.
-      */if(p.pc>=0) {
+      */if(p.currentOpCodeIndex>=0) {
 				//if ( p.zErrMsg != 0 ) // Always exists under C#
 				{
 					sqlite3BeginBenignMalloc();
