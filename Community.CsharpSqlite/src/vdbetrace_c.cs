@@ -91,7 +91,7 @@ namespace Community.CsharpSqlite {
 			db=p.db;
 			sqlite3StrAccumInit(_out,null,100,db.aLimit[SQLITE_LIMIT_LENGTH]);
 			_out.db=db;
-			if(db.vdbeExecCnt>1) {
+			if(db.callStackDepth>1) {
 				while(izRawSql<zRawSql.Length) {
 					//string zStart = zRawSql;
 					while(zRawSql[izRawSql++]!='\n'&&izRawSql<zRawSql.Length)

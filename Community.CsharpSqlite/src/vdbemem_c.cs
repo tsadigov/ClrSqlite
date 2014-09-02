@@ -8,7 +8,83 @@ using u32=System.UInt32;
 namespace Community.CsharpSqlite {
 	using sqlite3_value=Sqlite3.Mem;
 	using System.Globalization;
+
+    [Flags]
+    public enum MemFlags:short {
+        MEM_Null = 0x0001,
+        MEM_Str = 0x0002,
+        MEM_Int = 0x0004,
+        MEM_Real = 0x0008,
+        MEM_Blob = 0x0010,
+        MEM_RowSet = 0x0020,
+        MEM_Frame = 0x0040,
+        MEM_Invalid = 0x0080,
+        MEM_TypeMask = 0x00ff,
+
+        MEM_Term=0x0200,
+		MEM_Dyn=0x0400,
+		MEM_Static=0x0800,
+		MEM_Ephem=0x1000,
+		MEM_Agg=0x2000,
+		#if !SQLITE_OMIT_INCRBLOB
+																																												const int MEM_Zero = 0x4000;  
+#else
+		MEM_Zero=0x0000,
+		#endif
+		// TODO -- Convert back to inline for speed
+		
+    }
+
+    public enum ValType : byte{
+        SQLITE_INTEGER = 1,
+        SQLITE_FLOAT = 2,
+        SQLITE_BLOB = 4,
+        SQLITE_NULL = 5,
+        SQLITE_TEXT = 3,
+        SQLITE3_TEXT = 3
+    }
 	public partial class Sqlite3 {
+
+
+        /*
+    ** CAPI3REF: Fundamental Datatypes
+    ** KEYWORDS: SQLITE_TEXT
+    **
+    ** ^(Every value in SQLite has one of five fundamental datatypes:
+    **
+    ** <ul>
+    ** <li> 64-bit signed integer
+    ** <li> 64-bit IEEE floating point number
+    ** <li> string
+    ** <li> BLOB
+    ** <li> NULL
+    ** </ul>)^
+    **
+    ** These constants are codes for each of those types.
+    **
+    ** Note that the SQLITE_TEXT constant was also used in SQLite version 2
+    ** for a completely different meaning.  Software that links against both
+    ** SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not
+    ** SQLITE_TEXT.
+    */
+        //#define SQLITE_INTEGER  1
+        //#define SQLITE_FLOAT    2
+        //#define SQLITE_BLOB     4
+        //#define SQLITE_NULL     5
+        //#if SQLITE_TEXT
+        //# undef SQLITE_TEXT
+        //#else
+        //# define SQLITE_TEXT     3
+        //#endif
+        //#define SQLITE3_TEXT     3
+        public const u8 SQLITE_INTEGER = 1;
+        public const u8 SQLITE_FLOAT = 2;
+        public const u8 SQLITE_BLOB = 4;
+        public const u8 SQLITE_NULL = 5;
+        public const u8 SQLITE_TEXT = 3;
+        public const u8 SQLITE3_TEXT = 3;
+
+
 		/*
     ** 2004 May 26
     **

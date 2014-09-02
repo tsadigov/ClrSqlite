@@ -81,7 +81,8 @@ namespace Community.CsharpSqlite {
 			rc=sqlite3_prepare(db,zSql,-1,ref pStmt,0);
 			if(rc!=SQLITE_OK)
 				return rc;
-			while(SQLITE_ROW==sqlite3_step(pStmt)) {
+            while (SqlResult.SQLITE_ROW == sqlite3_step(pStmt))
+            {
 				rc=execSql(db,pzErrMsg,sqlite3_column_text(pStmt,0));
 				if(rc!=SQLITE_OK) {
 					vacuumFinalize(db,pStmt,pzErrMsg);

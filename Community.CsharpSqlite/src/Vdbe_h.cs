@@ -72,7 +72,7 @@ namespace Community.CsharpSqlite {
             {
 
             }
-			public u8 opcode;
+            public u8 opcode {get;set;}
             public OpCode OpCode { get { return (OpCode)opcode; } set { opcode = (byte)value; } }
 			/* What operation to perform */public int p4type;
 			/* One of the P4_xxx constants for p4 */public u8 opflags;
@@ -113,6 +113,11 @@ set { _p3 = value; }
 																																				public int cnt;             /* Number of times this instruction was executed */
 public u64 cycles;         /* Total time spend executing this instruction */
 #endif
+
+            public override string ToString()
+            {
+                return OpCode.ToString();
+            }
 		};
 
 		//typedef struct VdbeOp VdbeOp;

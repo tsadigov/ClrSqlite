@@ -1093,6 +1093,10 @@ void *sqlite3_wsd_find(void *K, int L);
     ** internal function sqlite3Error() is used to set these variables
     ** consistently.
     */public class sqlite3 {
+          public sqlite3()
+          {
+
+          }
 			public sqlite3_vfs pVfs;
 			/* OS Interface */public int nDb;
 			/* Number of backends currently in use */public Db[] aDb=new Db[SQLITE_MAX_ATTACHED];
@@ -1133,8 +1137,12 @@ void *sqlite3_wsd_find(void *K, int L);
 			/* Array of shared library handles */public Vdbe pVdbe;
 			/* List of active virtual machines */public int activeVdbeCnt;
 			/* Number of VDBEs currently executing */public int writeVdbeCnt;
-			/* Number of active VDBEs that are writing */public int vdbeExecCnt;
-			/* Number of nested calls to VdbeExec() */public dxTrace xTrace;
+			/* Number of active VDBEs that are writing */
+          /// <summary>
+            /// Number of nested calls to VdbeExec()
+          /// </summary>
+            public int callStackDepth;
+			public dxTrace xTrace;
 			//)(void*,const char);        /* Trace function */
 			public object pTraceArg;
 			/* Argument to the trace function */public dxProfile xProfile;

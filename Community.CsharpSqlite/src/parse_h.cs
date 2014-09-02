@@ -45,7 +45,15 @@ using yDbMask = System.Int64;
 
         public class Parse
         {
-            public sqlite3 db;
+            sqlite3 _db;
+            public sqlite3 db { 
+                get { 
+                    return _db; 
+                } 
+                set { 
+                    _db = value; 
+                } 
+            }
             /* The main database structure */
             public int rc;
             /* Return code from execution */

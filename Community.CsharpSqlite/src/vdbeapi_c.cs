@@ -332,9 +332,9 @@ return SQLITE_MISUSE_BKPT();
 			else
 			#endif
 			 {
-				db.vdbeExecCnt++;
+				db.callStackDepth++;
 				rc=sqlite3VdbeExec(p);
-				db.vdbeExecCnt--;
+				db.callStackDepth--;
 			}
 			#if !SQLITE_OMIT_TRACE
 			/* Invoke the profile callback if there is one
@@ -386,18 +386,25 @@ return SQLITE_MISUSE_BKPT();
 		/// call sqlite3Reprepare() and try again.
 		///
 		///</summary>
-		public static int sqlite3_step(sqlite3_stmt pStmt) {
-			int rc=SQLITE_OK;
-			/* Result from sqlite3Step() */int rc2=SQLITE_OK;
+        public static SqlResult sqlite3_step(sqlite3_stmt pStmt)
+        {
+            SqlResult rc = SqlResult.SQLITE_OK;
+            /* Result from sqlite3Step() */
+            SqlResult rc2 = SqlResult.SQLITE_OK;
 			/* Result from sqlite3Reprepare() */Vdbe v=(Vdbe)pStmt;
 			/* the prepared statement */int cnt=0;
 			/* Counter to prevent infinite loop of reprepares */sqlite3 db;
 			/* The database connection */if(v.vdbeSafetyNotNull()) {
-				return SQLITE_MISUSE_BKPT();
+                return (SqlResult)SQLITE_MISUSE_BKPT();
 			}
 			db=v.db;
 			sqlite3_mutex_enter(db.mutex);
-			while((rc=sqlite3Step(v))==SQLITE_SCHEMA&&cnt++<SQLITE_MAX_SCHEMA_RETRY&&(rc2=rc=sqlite3Reprepare(v))==SQLITE_OK) {
+            while ((rc = (SqlResult)sqlite3Step(v)) == SqlResult.SQLITE_SCHEMA
+                &&
+                cnt++<SQLITE_MAX_SCHEMA_RETRY
+                &&
+                (rc2 = rc = (SqlResult)sqlite3Reprepare(v)) == SqlResult.SQLITE_OK)
+            {
 				sqlite3_reset(pStmt);
 				v.expired=false;
 			}
@@ -415,7 +422,7 @@ return SQLITE_MISUSE_BKPT();
 				{
 					v.zErrMsg=zErr;
 					// sqlite3DbStrDup(db, zErr);
-					v.rc=rc2;
+					v.rc=(int)rc2;
 					//else
 					//{
 					//  v.zErrMsg = "";
@@ -423,7 +430,7 @@ return SQLITE_MISUSE_BKPT();
 					//}
 				}
 			}
-			rc=sqlite3ApiExit(db,rc);
+            rc = (SqlResult)sqlite3ApiExit(db,(int) rc);
 			sqlite3_mutex_leave(db.mutex);
 			return rc;
 		}

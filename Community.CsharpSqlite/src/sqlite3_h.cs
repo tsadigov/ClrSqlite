@@ -1,6 +1,38 @@
 using u8=System.Byte;
 using System.Diagnostics;
 namespace Community.CsharpSqlite {
+
+    public enum SqlResult {
+        SQLITE_OK = 0,
+        SQLITE_ERROR = 1,
+        SQLITE_INTERNAL = 2,
+        SQLITE_PERM = 3,
+        SQLITE_ABORT = 4,
+        SQLITE_BUSY = 5,
+        SQLITE_LOCKED = 6,
+        SQLITE_NOMEM = 7,
+        SQLITE_READONLY = 8,
+        SQLITE_INTERRUPT = 9,
+        SQLITE_IOERR = 10,
+        SQLITE_CORRUPT = 11,
+        SQLITE_NOTFOUND = 12,
+        SQLITE_FULL = 13,
+        SQLITE_CANTOPEN = 14,
+        SQLITE_PROTOCOL = 15,
+        SQLITE_EMPTY = 16,
+        SQLITE_SCHEMA = 17,
+        SQLITE_TOOBIG = 18,
+        SQLITE_CONSTRAINT = 19,
+        SQLITE_MISMATCH = 20,
+        SQLITE_MISUSE = 21,
+        SQLITE_NOLFS = 22,
+        SQLITE_AUTH = 23,
+        SQLITE_FORMAT = 24,
+        SQLITE_RANGE = 25,
+        SQLITE_NOTADB = 26,
+        SQLITE_ROW = 100,
+        SQLITE_DONE = 101
+    }
 	public partial class Sqlite3 {
 		/*
     ** 2001 September 15
@@ -3534,42 +3566,7 @@ namespace Community.CsharpSqlite {
     **
     ** See also: [sqlite3_column_count()]
     *///SQLITE_API int sqlite3_data_count(sqlite3_stmt *pStmt);
-		/*
-    ** CAPI3REF: Fundamental Datatypes
-    ** KEYWORDS: SQLITE_TEXT
-    **
-    ** ^(Every value in SQLite has one of five fundamental datatypes:
-    **
-    ** <ul>
-    ** <li> 64-bit signed integer
-    ** <li> 64-bit IEEE floating point number
-    ** <li> string
-    ** <li> BLOB
-    ** <li> NULL
-    ** </ul>)^
-    **
-    ** These constants are codes for each of those types.
-    **
-    ** Note that the SQLITE_TEXT constant was also used in SQLite version 2
-    ** for a completely different meaning.  Software that links against both
-    ** SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not
-    ** SQLITE_TEXT.
-    *///#define SQLITE_INTEGER  1
-		//#define SQLITE_FLOAT    2
-		//#define SQLITE_BLOB     4
-		//#define SQLITE_NULL     5
-		//#if SQLITE_TEXT
-		//# undef SQLITE_TEXT
-		//#else
-		//# define SQLITE_TEXT     3
-		//#endif
-		//#define SQLITE3_TEXT     3
-		public const u8 SQLITE_INTEGER=1;
-		public const u8 SQLITE_FLOAT=2;
-		public const u8 SQLITE_BLOB=4;
-		public const u8 SQLITE_NULL=5;
-		public const u8 SQLITE_TEXT=3;
-		public const u8 SQLITE3_TEXT=3;
+		
 		/*
     ** CAPI3REF: Result Values From A Query
     ** KEYWORDS: {column access functions}

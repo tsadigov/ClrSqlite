@@ -1137,10 +1137,10 @@ if( db ) sqlite3_interrupt(db);
 		if(rc!=Sqlite3.SQLITE_OK||null==pSelect) {
 			return rc;
 		}
-		rc=Sqlite3.sqlite3_step(pSelect);
+        rc = (int)Sqlite3.sqlite3_step(pSelect);
 		while(rc==Sqlite3.SQLITE_ROW) {
 			fprintf(_out,"%s;\n",Sqlite3.sqlite3_column_text(pSelect,0));
-			rc=Sqlite3.sqlite3_step(pSelect);
+            rc = (int)Sqlite3.sqlite3_step(pSelect);
 		}
 		return Sqlite3.sqlite3_finalize(pSelect);
 	}
@@ -1209,12 +1209,12 @@ if( db ) sqlite3_interrupt(db);
 				appendText(zSelect,zTmp.ToString(),'\'');
 			}
 			appendText(zSelect," || ' VALUES(' || ",'\0');
-			rc=Sqlite3.sqlite3_step(pTableInfo);
+			rc=(int)Sqlite3.sqlite3_step(pTableInfo);
 			while(rc==Sqlite3.SQLITE_ROW) {
 				string zText=(string)Sqlite3.sqlite3_column_text(pTableInfo,1);
 				appendText(zSelect,"quote(",'\0');
 				appendText(zSelect,zText,'"');
-				rc=Sqlite3.sqlite3_step(pTableInfo);
+				rc=(int)Sqlite3.sqlite3_step(pTableInfo);
 				if(rc==Sqlite3.SQLITE_ROW) {
 					appendText(zSelect,") || ',' || ",'\0');
 				}
@@ -2352,6 +2352,19 @@ enableTimer = booleanValue(azArg[1]);
 		snprintf(20,ref continuePrompt,"   ...> ");
 	}
 	static int main(int argc,string[] argv) {
+
+        Community.CsharpSqlite.Sqlite3.Parse pParse = new Community.CsharpSqlite.Sqlite3.Parse();
+        String ErrMsg = null;
+        var sql="SELECT 5+6;";
+
+        callback_data dt = null;
+        main_init(ref dt);
+
+        //rc=process_input(data,null);
+        open_db(dt);
+        pParse.db = dt.db;
+        pParse.sqlite3RunParser( sql, ref ErrMsg);
+
 		string zErrMsg=null;
 		callback_data data=null;
 		string zInitFile=null;

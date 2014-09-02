@@ -223,9 +223,32 @@ set { _flags = value; }
 }
 #else
 			public u16 flags;
+            public MemFlags Flags
+            {
+                get
+                {
+                    return (MemFlags)flags;
+                }
+                set
+                {
+                    flags = (u16)value;
+                }
+            }
+
 			/* Some combination of MEM_Null, MEM_Str, MEM_Dyn, etc. */
 			#endif
 			public u8 type;
+            public ValType ValType
+            {
+                get
+                {
+                    return (ValType)type;
+                }
+                set
+                {
+                    flags = (u8)value;
+                }
+            }
 			/* One of SQLITE_NULL, SQLITE_TEXT, SQLITE_INTEGER, etc */public SqliteEncoding enc;
 			/* SqliteEncoding.UTF8, SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE */
 			#if SQLITE_DEBUG
@@ -519,9 +542,12 @@ set { _flags = value; }
 
           }
 			public sqlite3 db;
-			/* The database connection that owns this statement */public Op[] aOp;
-			/* Space to hold the virtual machine's program */public Mem[] aMem;
-			/* The memory locations */public Mem[] apArg;
+			/* The database connection that owns this statement */
+            /** Space to hold the virtual machine's program */
+          public Op[] aOp;
+          /* The memory locations */
+          public Mem[] aMem;
+			public Mem[] apArg;
 			/* Arguments to currently executing user function */public Mem[] aColName;
 			/* Column names to return */public Mem[] pResultSet;
 			/* Pointer to an array of results */public int nMem;
@@ -542,9 +568,17 @@ set { _flags = value; }
 			/* Name of variables */public ynVar nVar;
 			/* Number of entries in aVar[] */public ynVar nzVar;
 			/* Number of entries in azVar[] */public u32 cacheCtr;
-			/* VdbeCursor row cache generation counter */public int pc;
-			/* The program counter */public int rc;
-			/* Value to return */public u8 errorAction;
+			/* VdbeCursor row cache generation counter */
+          /// <summary>
+            /// The program counter 
+          /// </summary>
+          public int pc;
+       
+          /// <summary>
+          /// Value to return
+          /// </summary>
+			public int rc;
+			public u8 errorAction;
 			/* Recovery action to do in case of an error */public int explain;
 			/* True if EXPLAIN present on SQL command */public bool changeCntOn;
 			/* True to update the change-counter */public bool expired;
@@ -716,12 +750,15 @@ ct.pLruNext=pLruNext;
 			}
 			public void sqlite3VdbeLeave() {
 			}
-			public int sqlite3VdbeAddOp3(int op,int p1,int p2,int p3) {
+            public int sqlite3VdbeAddOp3(int op, int p1, int p2, int p3) {
+                return sqlite3VdbeAddOp3((OpCode)op,p1,p2,p3);
+            }
+			public int sqlite3VdbeAddOp3(OpCode op,int p1,int p2,int p3) {
 				int i;
 				VdbeOp pOp;
 				i=this.nOp;
 				Debug.Assert(this.magic==VDBE_MAGIC_INIT);
-				Debug.Assert(op>0&&op<0xff);
+				//Debug.Assert(op>0&&op<0xff);
 				if(this.nOpAlloc<=i) {
 					if(growOpArray(this)!=0) {
 						return 1;

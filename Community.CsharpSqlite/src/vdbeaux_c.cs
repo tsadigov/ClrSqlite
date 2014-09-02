@@ -1038,7 +1038,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 			do {
 				i=p.pc++;
 			}
-			while(i<nRow&&p.explain==2&&p.aOp[i].opcode!=OP_Explain);
+			while(i<nRow&&p.explain==2&&p.aOp[i].OpCode!=OpCode.OP_Explain);
 			if(i>=nRow) {
 				p.rc=SQLITE_OK;
 				rc=SQLITE_DONE;
@@ -1067,7 +1067,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 					}
 					if(p.explain==1) {
 						pMem.flags=MEM_Int;
-						pMem.type=SQLITE_INTEGER;
+						pMem.ValType=ValType.SQLITE_INTEGER;
 						pMem.u.i=i;
 						/* Program counter */if(p.pResultSet[i_pMem]==null) {
 							p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
@@ -1079,10 +1079,10 @@ void sqlite3VdbeLeave(Vdbe *p){
           ** kept in p->aMem[9].z to hold the new program - assuming this subprogram
           ** has not already been seen.
           */pMem.flags=MEM_Static|MEM_Str|MEM_Term;
-						pMem.z=sqlite3OpcodeName(pOp.opcode);
+						pMem.z=sqlite3OpcodeName(pOp.OpCode);
 						/* Opcode */Debug.Assert(pMem.z!=null);
 						pMem.n=StringExtensions.sqlite3Strlen30(pMem.z);
-						pMem.type=SQLITE_TEXT;
+						pMem.ValType=ValType.SQLITE_TEXT;
 						pMem.enc=SqliteEncoding.UTF8;
 						if(p.pResultSet[i_pMem]==null) {
 							p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
@@ -1111,7 +1111,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 					}
 					pMem.flags=MEM_Int;
 					pMem.u.i=pOp.p1;
-					/* P1 */pMem.type=SQLITE_INTEGER;
+					/* P1 */pMem.ValType=ValType.SQLITE_INTEGER;
 					if(p.pResultSet[i_pMem]==null) {
 						p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
 					}
@@ -1119,7 +1119,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 					//pMem++;
 					pMem.flags=MEM_Int;
 					pMem.u.i=pOp.p2;
-					/* P2 */pMem.type=SQLITE_INTEGER;
+					/* P2 */pMem.ValType=ValType.SQLITE_INTEGER;
 					if(p.pResultSet[i_pMem]==null) {
 						p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
 					}
@@ -1127,7 +1127,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 					//pMem++;
 					pMem.flags=MEM_Int;
 					pMem.u.i=pOp.p3;
-					/* P3 */pMem.type=SQLITE_INTEGER;
+					/* P3 */pMem.ValType=ValType.SQLITE_INTEGER;
 					if(p.pResultSet[i_pMem]==null) {
 						p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
 					}
@@ -1138,7 +1138,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 					//  Debug.Assert( p.db.mallocFailed != 0 );
 					//  return SQLITE_ERROR;
 					//}
-					pMem.flags=MEM_Dyn|MEM_Str|MEM_Term;
+                    pMem.Flags = MemFlags.MEM_Dyn | MemFlags.MEM_Str | MemFlags.MEM_Term;
 					z=displayP4(pOp,pMem.z,32);
 					if(z!=pMem.z) {
 						sqlite3VdbeMemSetStr(pMem,z,-1,SqliteEncoding.UTF8,null);
