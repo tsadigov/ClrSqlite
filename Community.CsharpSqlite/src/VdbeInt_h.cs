@@ -786,7 +786,7 @@ pOp.cnt = 0;
 #endif
 				return i;
 			}
-			public int sqlite3VdbeAddOp0(OpCode op) {
+			public int sqlite3VdbeAddOp0(int op) {
 				return this.sqlite3VdbeAddOp3(op,0,0,0);
 			}
 			public int sqlite3VdbeAddOp1(int op,int p1) {

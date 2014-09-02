@@ -1173,7 +1173,7 @@ return;
                 else
                 {
                     v.sqlite3VdbeJumpHere(jZeroRows);
-                    jZeroRows = v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
+                    jZeroRows = v.sqlite3VdbeAddOp0(OP_Goto);
                 }
                 v.sqlite3VdbeAddOp2(OP_Null, 0, regIdxname);
                 v.sqlite3VdbeAddOp4(OP_MakeRecord, regTabname, 3, regRec, "aaa", 0);
@@ -3423,7 +3423,7 @@ isView = false;
                     v.sqlite3VdbeAddOp2(OP_Goto, 0, addr + 9);
                     v.sqlite3VdbeAddOp2(OP_Next, 0, addr + 2);
                     v.sqlite3VdbeAddOp2(OP_Integer, 0, memId);
-                    v.sqlite3VdbeAddOp0(OpCode.OP_Close);
+                    v.sqlite3VdbeAddOp0(OP_Close);
                 }
             }
             public void sqlite3AutoincrementEnd()
@@ -3442,13 +3442,13 @@ isView = false;
                     Debug.Assert(sqlite3SchemaMutexHeld(db, 0, pDb.pSchema));
                     this.sqlite3OpenTable(0, p.iDb, pDb.pSchema.pSeqTab, OP_OpenWrite);
                     j1 = v.sqlite3VdbeAddOp1(OP_NotNull, memId + 1);
-                    j2 = v.sqlite3VdbeAddOp0(OpCode.OP_Rewind);
+                    j2 = v.sqlite3VdbeAddOp0(OP_Rewind);
                     j3 = v.sqlite3VdbeAddOp3(OP_Column, 0, 0, iRec);
                     j4 = v.sqlite3VdbeAddOp3(OP_Eq, memId - 1, 0, iRec);
                     v.sqlite3VdbeAddOp2(OP_Next, 0, j3);
                     v.sqlite3VdbeJumpHere(j2);
                     v.sqlite3VdbeAddOp2(OP_NewRowid, 0, memId + 1);
-                    j5 = v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
+                    j5 = v.sqlite3VdbeAddOp0(OP_Goto);
                     v.sqlite3VdbeJumpHere(j4);
                     v.sqlite3VdbeAddOp2(OP_Rowid, 0, memId + 1);
                     v.sqlite3VdbeJumpHere(j1);
@@ -3456,7 +3456,7 @@ isView = false;
                     v.sqlite3VdbeAddOp3(OP_MakeRecord, memId - 1, 2, iRec);
                     v.sqlite3VdbeAddOp3(OP_Insert, 0, iRec, memId + 1);
                     v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
-                    v.sqlite3VdbeAddOp0(OpCode.OP_Close);
+                    v.sqlite3VdbeAddOp0(OP_Close);
                     this.sqlite3ReleaseTempReg(iRec);
                 }
             }
@@ -4279,7 +4279,7 @@ aXRef[j] = -1;
                 if (okOnePass)
                 {
                     int a1 = v.sqlite3VdbeAddOp1(OP_NotNull, regOldRowid);
-                    addr = v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
+                    addr = v.sqlite3VdbeAddOp0(OP_Goto);
                     v.sqlite3VdbeJumpHere(a1);
                 }
                 else

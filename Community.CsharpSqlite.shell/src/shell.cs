@@ -2364,11 +2364,7 @@ enableTimer = booleanValue(azArg[1]);
         open_db(dt);
         pParse.db = dt.db;
         pParse.sqlite3RunParser( sql, ref ErrMsg);
-        foreach (var item in pParse.pVdbe.aOp)
-        {
-            if(null!=item)
-            Console.WriteLine(item.ToString());
-        }
+
 		string zErrMsg=null;
 		callback_data data=null;
 		string zInitFile=null;

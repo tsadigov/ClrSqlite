@@ -709,7 +709,7 @@ return;
 				}
 				}
 				if(pStep.op!=TK_SELECT) {
-                    v.sqlite3VdbeAddOp0(OpCode.OP_ResetCount);
+					v.sqlite3VdbeAddOp0(OP_ResetCount);
 				}
 			}
 			return 0;
@@ -830,7 +830,7 @@ return;
 				/* Insert an OP_Halt at the end of the sub-program. */if(iEndTrigger!=0) {
 					v.sqlite3VdbeResolveLabel(iEndTrigger);
 				}
-				v.sqlite3VdbeAddOp0(OpCode.OP_Halt);
+				v.sqlite3VdbeAddOp0(OP_Halt);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "End: %s.%s", pTrigger.zName, onErrorText( orconf ) );
 #endif

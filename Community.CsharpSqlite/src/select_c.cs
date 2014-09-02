@@ -425,7 +425,7 @@ namespace Community.CsharpSqlite {
 				}
 				addr1=v.sqlite3VdbeAddOp1(OP_IfZero,iLimit);
 				v.sqlite3VdbeAddOp2(OP_AddImm,iLimit,-1);
-				addr2=v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
+				addr2=v.sqlite3VdbeAddOp0(OP_Goto);
 				v.sqlite3VdbeJumpHere(addr1);
 				v.sqlite3VdbeAddOp1(OP_Last,pOrderBy.iECursor);
 				v.sqlite3VdbeAddOp1(OP_Delete,pOrderBy.iECursor);
@@ -1332,7 +1332,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				v=pParse.pVdbe=sqlite3VdbeCreate(pParse.db);
 				#if !SQLITE_OMIT_TRACE
 				if(v!=null) {
-                    v.sqlite3VdbeAddOp0(OpCode.OP_Trace);
+					v.sqlite3VdbeAddOp0(OP_Trace);
 				}
 				#endif
 			}
@@ -2183,8 +2183,7 @@ break;
 			sqlite3SelectDestInit(destB,SelectResultType.Coroutine,regAddrB);
 			/* Jump past the various subroutines and coroutines to the main
       ** merge loop
-      */
-            j1 = v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
+      */j1=v.sqlite3VdbeAddOp0(OP_Goto);
 			addrSelectA=v.sqlite3VdbeCurrentAddr();
 			/* Generate a coroutine to evaluate the SELECT statement to the
       ** left of the compound operator - the "A" select.
