@@ -179,7 +179,7 @@ p.zName, P4_STATIC );
 #endif
 			);
 			if(v!=null) {
-				v.sqlite3VdbeAddOp0(OP_Halt);
+				v.sqlite3VdbeAddOp0(OpCode.OP_Halt);
 				/* The cookie mask contains one bit for each database file open.
         ** (Bit 0 is for main, bit 1 is for temp, and so forth.)  Bits are
         ** set for each database that is used.  Generate code to start a
@@ -881,7 +881,7 @@ goto begin_table_error;
 				int reg1,reg2,reg3;
 				sqlite3BeginWriteOperation(pParse,0,iDb);
 				if(isVirtual!=0) {
-					v.sqlite3VdbeAddOp0(OP_VBegin);
+                    v.sqlite3VdbeAddOp0(OpCode.OP_VBegin);
 				}
 				/* If the file format and encoding in the database have not been set,
         ** set them now.
@@ -916,7 +916,7 @@ goto begin_table_error;
 				v.sqlite3VdbeAddOp2(OP_Null,0,reg3);
 				v.sqlite3VdbeAddOp3(OP_Insert,0,reg3,reg1);
 				v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
-				v.sqlite3VdbeAddOp0(OP_Close);
+                v.sqlite3VdbeAddOp0(OpCode.OP_Close);
 			}
 			/* Normal (non-error) return. */return;
 			/* If an error occurs, we jump here */begin_table_error:
@@ -2061,7 +2061,7 @@ goto exit_drop_table;
 				sqlite3BeginWriteOperation(pParse,1,iDb);
 				#if !SQLITE_OMIT_VIRTUALTABLE
 				if(IsVirtual(pTab)) {
-					v.sqlite3VdbeAddOp0(OP_VBegin);
+                    v.sqlite3VdbeAddOp0(OpCode.OP_VBegin);
 				}
 				#endif
 				pParse.sqlite3FkDropTable(pName,pTab);
