@@ -305,10 +305,12 @@
     </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\Ast\IdentifierList.cs" />
     <Compile Include="src\BitvecExtensions.cs" />
     <Compile Include="src\BtCursor.cs" />
     <Compile Include="src\BTree.cs" />
     <Compile Include="src\BtreeExtensions.cs" />
+    <Compile Include="src\Schema\Schema.cs" />
     <Compile Include="src\Schema\Column.cs" />
     <Compile Include="src\Schema\Func.cs" />
     <Compile Include="src\Schema\Index.cs" />
@@ -322,7 +324,7 @@
     <Compile Include="src\Ast\select.cs" />
     <Compile Include="src\Ast\Where.cs" />
     <Compile Include="src\Ast\InLoop.cs" />
-    <Compile Include="src\Db - Copy.cs" />
+    <Compile Include="src\Config.cs" />
     <Compile Include="src\Db.cs" />
     <Compile Include="src\Ast\ExprExtensions.cs" />
     <Compile Include="src\Mem.cs" />
