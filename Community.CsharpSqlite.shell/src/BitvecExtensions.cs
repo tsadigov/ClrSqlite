@@ -59,7 +59,7 @@ namespace Community.CsharpSqlite
                 i = i % _this.iDivisor;
                 if (_this.u.apSub[bin] == null)
                 {
-                    _this.u.apSub[bin] = sqlite3BitvecCreate(_this.iDivisor);
+                    _this.u.apSub[bin] = Sqlite3.sqlite3BitvecCreate(_this.iDivisor);
                     //if ( p.u.apSub[bin] == null )
                     //  return SQLITE_NOMEM;
                 }
@@ -97,7 +97,7 @@ namespace Community.CsharpSqlite
             }
             while (_this.u.aHash[h] != 0);
         /* we didn't find it in the hash.  h points to the first *//* available free spot. check to see if _this is going to *//* make our hash too "full".  */bitvec_set_rehash:
-            if (_this.nSet >= BITVEC_MXHASH)
+            if (_this.nSet >= Sqlite3.BITVEC_MXHASH)
             {
                 u32 j;
                 int rc;

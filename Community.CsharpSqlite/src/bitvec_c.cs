@@ -60,19 +60,19 @@ namespace Community.CsharpSqlite {
 ** performance. *///#define BITVEC_TELEM     u8
 		//using BITVEC_TELEM     = System.Byte;
 		/* Size, in bits, of the bitmap element. *///#define BITVEC_SZELEM    8
-		const int BITVEC_SZELEM=8;
+		public const int BITVEC_SZELEM=8;
 		/* Number of elements in a bitmap array. *///#define BITVEC_NELEM     (BITVEC_USIZE/sizeof(BITVEC_TELEM))
 		static int BITVEC_NELEM=(int)(BITVEC_USIZE/sizeof(BITVEC_TELEM));
 		/* Number of bits in the bitmap array. *///#define BITVEC_NBIT      (BITVEC_NELEM*BITVEC_SZELEM)
-		static int BITVEC_NBIT=(BITVEC_NELEM*BITVEC_SZELEM);
+		public static int BITVEC_NBIT=(BITVEC_NELEM*BITVEC_SZELEM);
 		/* Number of u32 values in hash table. *///#define BITVEC_NINT      (BITVEC_USIZE/sizeof(u32))
-		static u32 BITVEC_NINT=(u32)(BITVEC_USIZE/sizeof(u32));
+		public static u32 BITVEC_NINT=(u32)(BITVEC_USIZE/sizeof(u32));
 		///<summary>
 		///Maximum number of entries in hash table before
 		/// sub-dividing and re-hashing.
 		///</summary>
 		//#define BITVEC_MXHASH    (BITVEC_NINT/2)
-		static int BITVEC_MXHASH=(int)(BITVEC_NINT/2);
+		public static int BITVEC_MXHASH=(int)(BITVEC_NINT/2);
 		///<summary>
 		///Hashing function for the aHash representation.
 		/// Empirical testing showed that the *37 multiplier
@@ -80,10 +80,10 @@ namespace Community.CsharpSqlite {
 		/// no fewer collisions than the no-op *1.
 		///</summary>
 		//#define BITVEC_HASH(X)   (((X)*1)%BITVEC_NINT)
-		static u32 BITVEC_HASH(u32 X) {
+		public static u32 BITVEC_HASH(u32 X) {
 			return (u32)(((X)*1)%BITVEC_NINT);
 		}
-		static int BITVEC_NPTR=(int)(BITVEC_USIZE/4);
+		public static int BITVEC_NPTR=(int)(BITVEC_USIZE/4);
 		//sizeof(Bitvec *));
 		///<summary>
 		/// A bitmap is an instance of the following structure.
@@ -128,7 +128,7 @@ namespace Community.CsharpSqlite {
 		/// inclusive.  Return a pointer to the new object.  Return NULL if
 		/// malloc fails.
 		///</summary>
-		static Bitvec sqlite3BitvecCreate(u32 iSize) {
+		public static Bitvec sqlite3BitvecCreate(u32 iSize) {
 			Bitvec p;
 			//Debug.Assert( sizeof(p)==BITVEC_SZ );
 			p=new Bitvec();

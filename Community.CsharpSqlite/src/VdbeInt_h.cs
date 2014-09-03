@@ -127,55 +127,7 @@ namespace Community.CsharpSqlite {
 			}
 		};
 
-		//typedef struct VdbeCursor VdbeCursor;
-		///<summary>
-		/// When a sub-program is executed (OP_Program), a structure of this type
-		/// is allocated to store the current value of the program counter, as
-		/// well as the current memory cell array and various other frame specific
-		/// values stored in the Vdbe struct. When the sub-program is finished,
-		/// these values are copied back to the Vdbe from the VdbeFrame structure,
-		/// restoring the state of the VM to as it was before the sub-program
-		/// began executing.
-		///
-		/// The memory for a VdbeFrame object is allocated and managed by a memory
-		/// cell in the parent (calling) frame. When the memory cell is deleted or
-		/// overwritten, the VdbeFrame object is not freed immediately. Instead, it
-		/// is linked into the Vdbe.pDelFrame list. The contents of the Vdbe.pDelFrame
-		/// list is deleted when the VM is reset in VdbeHalt(). The reason for doing
-		/// this instead of deleting the VdbeFrame immediately is to avoid recursive
-		/// calls to sqlite3VdbeMemRelease() when the memory cells belonging to the
-		/// child frame are released.
-		///
-		/// The currently executing frame is stored in Vdbe.pFrame. Vdbe.pFrame is
-		/// set to NULL if the currently executing frame is the main program.
-		///
-		///</summary>
-		//typedef struct VdbeFrame VdbeFrame;
-		public class VdbeFrame {
-            public VdbeFrame()
-            {
-
-            }
-			public Vdbe v;
-			/* VM this frame belongs to */public int pc;
-			/* Program Counter in parent (calling) frame */public Op[] aOp;
-			/* Program instructions for parent frame */public int nOp;
-			/* Size of aOp array */public Mem[] aMem;
-			/* Array of memory cells for parent frame */public int nMem;
-			/* Number of entries in aMem */public VdbeCursor[] apCsr;
-			/* Array of Vdbe cursors for parent frame */public u16 nCursor;
-			/* Number of entries in apCsr */public int token;
-			/* Copy of SubProgram.token */public int nChildMem;
-			/* Number of memory cells for child frame */public int nChildCsr;
-			/* Number of cursors for child frame */public i64 lastRowid;
-			/* Last insert rowid (sqlite3.lastRowid) */public int nChange;
-			/* Statement changes (Vdbe.nChanges)     */public VdbeFrame pParent;
-			/* Parent of this frame, or NULL if parent is main *///
-			// Needed for C# Implementation
-			//
-			public Mem[] aChildMem;
-			/* Array of memory cells for child frame */public VdbeCursor[] aChildCsr;
-		/* Array of cursors for child frame */};
+		
 
 		//#define VdbeFrameMem(p) ((Mem )&((u8 )p)[ROUND8(sizeof(VdbeFrame))])
 		///<summary>
