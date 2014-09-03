@@ -1,13 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using Bitmask = System.UInt64;
-using u32 = System.UInt32;
-
-namespace Community.CsharpSqlite
-{
-	public partial class Sqlite3
-	{
+using Bitmask=System.UInt64;
+using u32=System.UInt32;
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
 		///<summary>
 		/// 2008 August 16
 		///
@@ -53,51 +50,47 @@ namespace Community.CsharpSqlite
 		/// and WRC_Continue to continue.
 		///
 		///</summary>
-		static int sqlite3WalkExpr (Walker pWalker, ref Expr pExpr)
-		{
+		static int sqlite3WalkExpr(Walker pWalker,ref Expr pExpr) {
 			int rc;
-			if (pExpr == null)
+			if(pExpr==null)
 				return WRC_Continue;
-			testcase (ExprHasProperty (pExpr, EP_TokenOnly));
-			testcase (ExprHasProperty (pExpr, EP_Reduced));
-			rc = pWalker.xExprCallback (pWalker, ref pExpr);
-			if (rc == WRC_Continue && !ExprHasAnyProperty (pExpr, EP_TokenOnly)) {
-				if (sqlite3WalkExpr (pWalker, ref pExpr.pLeft) != 0)
+			testcase(pExpr.ExprHasProperty(EP_TokenOnly));
+			testcase(pExpr.ExprHasProperty(EP_Reduced));
+			rc=pWalker.xExprCallback(pWalker,ref pExpr);
+			if(rc==WRC_Continue&&!pExpr.ExprHasAnyProperty(EP_TokenOnly)) {
+				if(sqlite3WalkExpr(pWalker,ref pExpr.pLeft)!=0)
 					return WRC_Abort;
-				if (sqlite3WalkExpr (pWalker, ref pExpr.pRight) != 0)
+				if(sqlite3WalkExpr(pWalker,ref pExpr.pRight)!=0)
 					return WRC_Abort;
-				if (ExprHasProperty (pExpr, EP_xIsSelect)) {
-					if (sqlite3WalkSelect (pWalker, pExpr.x.pSelect) != 0)
+				if(pExpr.ExprHasProperty(EP_xIsSelect)) {
+					if(sqlite3WalkSelect(pWalker,pExpr.x.pSelect)!=0)
 						return WRC_Abort;
 				}
 				else {
-					if (sqlite3WalkExprList (pWalker, pExpr.x.pList) != 0)
+					if(sqlite3WalkExprList(pWalker,pExpr.x.pList)!=0)
 						return WRC_Abort;
 				}
 			}
-			return rc & WRC_Abort;
+			return rc&WRC_Abort;
 		}
-
 		///<summary>
 		/// Call sqlite3WalkExpr() for every expression in list p or until
 		/// an abort request is seen.
 		///
 		///</summary>
-		static int sqlite3WalkExprList (Walker pWalker, ExprList p)
-		{
+		static int sqlite3WalkExprList(Walker pWalker,ExprList p) {
 			int i;
 			ExprList_item pItem;
-			if (p != null) {
-				for (i = p.nExpr; i > 0; i--) {
+			if(p!=null) {
+				for(i=p.nExpr;i>0;i--) {
 					//, pItem++){
-					pItem = p.a [p.nExpr - i];
-					if (sqlite3WalkExpr (pWalker, ref pItem.pExpr) != 0)
+					pItem=p.a[p.nExpr-i];
+					if(sqlite3WalkExpr(pWalker,ref pItem.pExpr)!=0)
 						return WRC_Abort;
 				}
 			}
 			return WRC_Continue;
 		}
-
 		///<summary>
 		/// Walk all expressions associated with SELECT statement p.  Do
 		/// not invoke the SELECT callback on p, but do (of course) invoke
@@ -105,25 +98,23 @@ namespace Community.CsharpSqlite
 		/// Return WRC_Abort or WRC_Continue.
 		///
 		///</summary>
-		static int sqlite3WalkSelectExpr (Walker pWalker, Select p)
-		{
-			if (sqlite3WalkExprList (pWalker, p.pEList) != 0)
+		static int sqlite3WalkSelectExpr(Walker pWalker,Select p) {
+			if(sqlite3WalkExprList(pWalker,p.pEList)!=0)
 				return WRC_Abort;
-			if (sqlite3WalkExpr (pWalker, ref p.pWhere) != 0)
+			if(sqlite3WalkExpr(pWalker,ref p.pWhere)!=0)
 				return WRC_Abort;
-			if (sqlite3WalkExprList (pWalker, p.pGroupBy) != 0)
+			if(sqlite3WalkExprList(pWalker,p.pGroupBy)!=0)
 				return WRC_Abort;
-			if (sqlite3WalkExpr (pWalker, ref p.pHaving) != 0)
+			if(sqlite3WalkExpr(pWalker,ref p.pHaving)!=0)
 				return WRC_Abort;
-			if (sqlite3WalkExprList (pWalker, p.pOrderBy) != 0)
+			if(sqlite3WalkExprList(pWalker,p.pOrderBy)!=0)
 				return WRC_Abort;
-			if (sqlite3WalkExpr (pWalker, ref p.pLimit) != 0)
+			if(sqlite3WalkExpr(pWalker,ref p.pLimit)!=0)
 				return WRC_Abort;
-			if (sqlite3WalkExpr (pWalker, ref p.pOffset) != 0)
+			if(sqlite3WalkExpr(pWalker,ref p.pOffset)!=0)
 				return WRC_Abort;
 			return WRC_Continue;
 		}
-
 		///<summary>
 		/// Walk the parse trees associated with all subqueries in the
 		/// FROM clause of SELECT statement p.  Do not invoke the select
@@ -132,55 +123,51 @@ namespace Community.CsharpSqlite
 		/// WRC_Abort or WRC_Continue;
 		///
 		///</summary>
-		static int sqlite3WalkSelectFrom (Walker pWalker, Select p)
-		{
+		static int sqlite3WalkSelectFrom(Walker pWalker,Select p) {
 			SrcList pSrc;
 			int i;
 			SrcList_item pItem;
-			pSrc = p.pSrc;
-			if (ALWAYS (pSrc)) {
-				for (i = pSrc.nSrc; i > 0; i--)// pItem++ )
+			pSrc=p.pSrc;
+			if(ALWAYS(pSrc)) {
+				for(i=pSrc.nSrc;i>0;i--)// pItem++ )
 				 {
-					pItem = pSrc.a [pSrc.nSrc - i];
-					if (sqlite3WalkSelect (pWalker, pItem.pSelect) != 0) {
+					pItem=pSrc.a[pSrc.nSrc-i];
+					if(sqlite3WalkSelect(pWalker,pItem.pSelect)!=0) {
 						return WRC_Abort;
 					}
 				}
 			}
 			return WRC_Continue;
 		}
-
 		///
-///<summary>
-///Call sqlite3WalkExpr() for every expression in Select statement p.
-///Invoke sqlite3WalkSelect() for subqueries in the FROM clause and
-///on the compound select chain, p.pPrior.
-///
-///Return WRC_Continue under normal conditions.  Return WRC_Abort if
-///there is an abort request.
-///
-///If the Walker does not have an xSelectCallback() then this routine
-///</summary>
-///<param name="is a no">op returning WRC_Continue.</param>
-///<param name=""></param>
-
-		static int sqlite3WalkSelect (Walker pWalker, Select p)
-		{
+		///<summary>
+		///Call sqlite3WalkExpr() for every expression in Select statement p.
+		///Invoke sqlite3WalkSelect() for subqueries in the FROM clause and
+		///on the compound select chain, p.pPrior.
+		///
+		///Return WRC_Continue under normal conditions.  Return WRC_Abort if
+		///there is an abort request.
+		///
+		///If the Walker does not have an xSelectCallback() then this routine
+		///</summary>
+		///<param name="is a no">op returning WRC_Continue.</param>
+		///<param name=""></param>
+		static int sqlite3WalkSelect(Walker pWalker,Select p) {
 			int rc;
-			if (p == null || pWalker.xSelectCallback == null)
+			if(p==null||pWalker.xSelectCallback==null)
 				return WRC_Continue;
-			rc = WRC_Continue;
-			while (p != null) {
-				rc = pWalker.xSelectCallback (pWalker, p);
-				if (rc != 0)
+			rc=WRC_Continue;
+			while(p!=null) {
+				rc=pWalker.xSelectCallback(pWalker,p);
+				if(rc!=0)
 					break;
-				if (sqlite3WalkSelectExpr (pWalker, p) != 0)
+				if(sqlite3WalkSelectExpr(pWalker,p)!=0)
 					return WRC_Abort;
-				if (sqlite3WalkSelectFrom (pWalker, p) != 0)
+				if(sqlite3WalkSelectFrom(pWalker,p)!=0)
 					return WRC_Abort;
-				p = p.pPrior;
+				p=p.pPrior;
 			}
-			return rc & WRC_Abort;
+			return rc&WRC_Abort;
 		}
 	}
 }

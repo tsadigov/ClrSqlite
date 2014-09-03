@@ -2,23 +2,19 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using Bitmask = System.UInt64;
-using i64 = System.Int64;
-using u8 = System.Byte;
-using u32 = System.UInt32;
-using u16 = System.UInt16;
-using Pgno = System.UInt32;
-
+using Bitmask=System.UInt64;
+using i64=System.Int64;
+using u8=System.Byte;
+using u32=System.UInt32;
+using u16=System.UInt16;
+using Pgno=System.UInt32;
 #if !SQLITE_MAX_VARIABLE_NUMBER
-using ynVar = System.Int16;
-
+using ynVar=System.Int16;
 #else
 using ynVar = System.Int32; 
 #endif
-namespace Community.CsharpSqlite
-{
-	public partial class Sqlite3
-	{
+namespace Community.CsharpSqlite {
+	public partial class Sqlite3 {
 		///<summary>
 		/// 2001 September 15
 		///
@@ -125,7 +121,7 @@ namespace Community.CsharpSqlite
 		///
 		///</summary>
 		#else
-																																														//define exprSetHeight(y)
+																																																//define exprSetHeight(y)
 #endif
 		///<summary>
 		/// This routine is the core allocator for Expr nodes.
@@ -147,139 +143,125 @@ namespace Community.CsharpSqlite
 		/// into u.iValue and the EP_IntValue flag is set.  No extra storage
 		/// is allocated to hold the integer text and the dequote flag is ignored.
 		///</summary>
-		static Expr sqlite3ExprAlloc (sqlite3 db, ///
-///<summary>
-///Handle for sqlite3DbMallocZero() (may be null) 
-///</summary>
-
-		int op, ///
-///<summary>
-///Expression opcode 
-///</summary>
-
-		Token pToken, ///
-///<summary>
-///Token argument.  Might be NULL 
-///</summary>
-
+		static Expr sqlite3ExprAlloc(sqlite3 db,///
+		///<summary>
+		///Handle for sqlite3DbMallocZero() (may be null) 
+		///</summary>
+		int op,///
+		///<summary>
+		///Expression opcode 
+		///</summary>
+		Token pToken,///
+		///<summary>
+		///Token argument.  Might be NULL 
+		///</summary>
 		int dequote///
-///<summary>
-///True to dequote 
-///</summary>
-
-		)
-		{
-			TokenType p_operator = (TokenType)op;
+		///<summary>
+		///True to dequote 
+		///</summary>
+		) {
+			TokenType p_operator=(TokenType)op;
 			Expr pNew;
-			int nExtra = 0;
-			int iValue = 0;
-			if (pToken != null) {
-				if (p_operator != TokenType.TK_INTEGER || pToken.zRestSql == null || pToken.zRestSql.Length == 0 || Converter.sqlite3GetInt32 (pToken.zRestSql.ToString (), ref iValue) == false) {
-					nExtra = pToken.Length + 1;
-					Debug.Assert (iValue >= 0);
+			int nExtra=0;
+			int iValue=0;
+			if(pToken!=null) {
+				if(p_operator!=TokenType.TK_INTEGER||pToken.zRestSql==null||pToken.zRestSql.Length==0||Converter.sqlite3GetInt32(pToken.zRestSql.ToString(),ref iValue)==false) {
+					nExtra=pToken.Length+1;
+					Debug.Assert(iValue>=0);
 				}
 			}
-			pNew = new Expr ();
+			pNew=new Expr();
 			//sqlite3DbMallocZero(db, sizeof(Expr)+nExtra);
-			if (pNew != null) {
-				pNew.Operator = p_operator;
-				pNew.iAgg = -1;
-				if (pToken != null) {
-					if (nExtra == 0) {
-						pNew.flags |= EP_IntValue;
-						pNew.u.iValue = iValue;
+			if(pNew!=null) {
+				pNew.Operator=p_operator;
+				pNew.iAgg=-1;
+				if(pToken!=null) {
+					if(nExtra==0) {
+						pNew.flags|=EP_IntValue;
+						pNew.u.iValue=iValue;
 					}
 					else {
 						int c;
 						//pNew.u.zToken = (char)&pNew[1];
-						if (pToken.Length > 0)
-							pNew.u.zToken = pToken.zRestSql.Substring (0, pToken.Length);
+						if(pToken.Length>0)
+							pNew.u.zToken=pToken.zRestSql.Substring(0,pToken.Length);
 						//memcpy(pNew.u.zToken, pToken.z, pToken.n);
 						else
-							if (pToken.Length == 0 && pToken.zRestSql == "")
-								pNew.u.zToken = "";
+							if(pToken.Length==0&&pToken.zRestSql=="")
+								pNew.u.zToken="";
 						//pNew.u.zToken[pToken.n] = 0;
-						if (dequote != 0 && nExtra >= 3 && ((c = pToken.zRestSql [0]) == '\'' || c == '"' || c == '[' || c == '`')) {
+						if(dequote!=0&&nExtra>=3&&((c=pToken.zRestSql[0])=='\''||c=='"'||c=='['||c=='`')) {
 							#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																																																																																																																	StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
+																																																																																																																																																																								StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
 #else
-							StringExtensions.sqlite3Dequote (ref pNew.u.zToken);
+							StringExtensions.sqlite3Dequote(ref pNew.u.zToken);
 							#endif
-							if (c == '"')
-								pNew.flags |= EP_DblQuoted;
+							if(c=='"')
+								pNew.flags|=EP_DblQuoted;
 						}
 					}
 				}
 				#if SQLITE_MAX_EXPR_DEPTH
-				pNew.nHeight = 1;
+				pNew.nHeight=1;
 				#endif
 			}
 			return pNew;
 		}
-
 		///<summary>
 		/// Allocate a new expression node from a zero-terminated token that has
 		/// already been dequoted.
 		///
 		///</summary>
-		static Expr sqlite3Expr (sqlite3 db, ///
-///<summary>
-///Handle for sqlite3DbMallocZero() (may be null) 
-///</summary>
-
-		int op, ///
-///<summary>
-///Expression opcode 
-///</summary>
-
+		static Expr sqlite3Expr(sqlite3 db,///
+		///<summary>
+		///Handle for sqlite3DbMallocZero() (may be null) 
+		///</summary>
+		int op,///
+		///<summary>
+		///Expression opcode 
+		///</summary>
 		string zToken///
-///<summary>
-///Token argument.  Might be NULL 
-///</summary>
-
-		)
-		{
-			Token x = new Token ();
-			x.zRestSql = zToken;
-			x.Length = !String.IsNullOrEmpty (zToken) ? StringExtensions.sqlite3Strlen30 (zToken) : 0;
-			return sqlite3ExprAlloc (db, op, x, 0);
+		///<summary>
+		///Token argument.  Might be NULL 
+		///</summary>
+		) {
+			Token x=new Token();
+			x.zRestSql=zToken;
+			x.Length=!String.IsNullOrEmpty(zToken)?StringExtensions.sqlite3Strlen30(zToken):0;
+			return sqlite3ExprAlloc(db,op,x,0);
 		}
-
 		///
-///<summary>
-///Attach subtrees pLeft and pRight to the Expr node pRoot.
-///
-///If pRoot==NULL that means that a memory allocation error has occurred.
-///In that case, delete the subtrees pLeft and pRight.
-///
-///</summary>
-
-		static void sqlite3ExprAttachSubtrees (sqlite3 db, Expr pRoot, Expr pLeft, Expr pRight)
-		{
-			if (pRoot == null) {
+		///<summary>
+		///Attach subtrees pLeft and pRight to the Expr node pRoot.
+		///
+		///If pRoot==NULL that means that a memory allocation error has occurred.
+		///In that case, delete the subtrees pLeft and pRight.
+		///
+		///</summary>
+		static void sqlite3ExprAttachSubtrees(sqlite3 db,Expr pRoot,Expr pLeft,Expr pRight) {
+			if(pRoot==null) {
 				//Debug.Assert( db.mallocFailed != 0 );
-				sqlite3ExprDelete (db, ref pLeft);
-				sqlite3ExprDelete (db, ref pRight);
+				sqlite3ExprDelete(db,ref pLeft);
+				sqlite3ExprDelete(db,ref pRight);
 			}
 			else {
-				if (pRight != null) {
-					pRoot.pRight = pRight;
-					if ((pRight.flags & EP_ExpCollate) != 0) {
-						pRoot.flags |= EP_ExpCollate;
-						pRoot.pColl = pRight.pColl;
+				if(pRight!=null) {
+					pRoot.pRight=pRight;
+					if((pRight.flags&EP_ExpCollate)!=0) {
+						pRoot.flags|=EP_ExpCollate;
+						pRoot.pColl=pRight.pColl;
 					}
 				}
-				if (pLeft != null) {
-					pRoot.pLeft = pLeft;
-					if ((pLeft.flags & EP_ExpCollate) != 0) {
-						pRoot.flags |= EP_ExpCollate;
-						pRoot.pColl = pLeft.pColl;
+				if(pLeft!=null) {
+					pRoot.pLeft=pLeft;
+					if((pLeft.flags&EP_ExpCollate)!=0) {
+						pRoot.flags|=EP_ExpCollate;
+						pRoot.pColl=pLeft.pColl;
 					}
 				}
-				pRoot.exprSetHeight ();
+				pRoot.exprSetHeight();
 			}
 		}
-
 		///<summary>
 		/// Allocate a Expr node which joins as many as two subtrees.
 		///
@@ -290,28 +272,25 @@ namespace Community.CsharpSqlite
 		///</summary>
 		// OVERLOADS, so I don't need to rewrite parse.c
 		///
-///<summary>
-///Join two expressions using an AND operator.  If either expression is
-///NULL, then just return the other expression.
-///
-///</summary>
-
-		static Expr sqlite3ExprAnd (sqlite3 db, Expr pLeft, Expr pRight)
-		{
-			if (pLeft == null) {
+		///<summary>
+		///Join two expressions using an AND operator.  If either expression is
+		///NULL, then just return the other expression.
+		///
+		///</summary>
+		static Expr sqlite3ExprAnd(sqlite3 db,Expr pLeft,Expr pRight) {
+			if(pLeft==null) {
 				return pRight;
 			}
 			else
-				if (pRight == null) {
+				if(pRight==null) {
 					return pLeft;
 				}
 				else {
-					Expr pNew = sqlite3ExprAlloc (db, TK_AND, null, 0);
-					sqlite3ExprAttachSubtrees (db, pNew, pLeft, pRight);
+					Expr pNew=sqlite3ExprAlloc(db,TK_AND,null,0);
+					sqlite3ExprAttachSubtrees(db,pNew,pLeft,pRight);
 					return pNew;
 				}
 		}
-
 		///<summary>
 		/// Construct a new expression node for a function with multiple
 		/// arguments.
@@ -339,53 +318,48 @@ namespace Community.CsharpSqlite
 		/// Recursively delete an expression tree.
 		///
 		///</summary>
-		static void sqlite3ExprDelete (sqlite3 db, ref Expr p)
-		{
-			if (p == null)
+		static void sqlite3ExprDelete(sqlite3 db,ref Expr p) {
+			if(p==null)
 				return;
 			///
-///<summary>
-///</summary>
-///<param name="Sanity check: Assert that the IntValue is non">negative if it exists </param>
-
-			Debug.Assert (!ExprHasProperty (p, EP_IntValue) || p.u.iValue >= 0);
-			if (!ExprHasAnyProperty (p, EP_TokenOnly)) {
-				sqlite3ExprDelete (db, ref p.pLeft);
-				sqlite3ExprDelete (db, ref p.pRight);
-				if (!ExprHasProperty (p, EP_Reduced) && (p.flags2 & EP2_MallocedToken) != 0) {
+			///<summary>
+			///</summary>
+			///<param name="Sanity check: Assert that the IntValue is non">negative if it exists </param>
+			Debug.Assert(!p.ExprHasProperty(EP_IntValue)||p.u.iValue>=0);
+			if(!p.ExprHasAnyProperty(EP_TokenOnly)) {
+				sqlite3ExprDelete(db,ref p.pLeft);
+				sqlite3ExprDelete(db,ref p.pRight);
+				if(!p.ExprHasProperty(EP_Reduced)&&(p.flags2&EP2_MallocedToken)!=0) {
 					#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																																																																			sqlite3DbFree( db, ref p.u._zToken );
+																																																																																																																								sqlite3DbFree( db, ref p.u._zToken );
 #else
-					db.sqlite3DbFree (ref p.u.zToken);
+					db.sqlite3DbFree(ref p.u.zToken);
 					#endif
 				}
-				if (ExprHasProperty (p, EP_xIsSelect)) {
-					sqlite3SelectDelete (db, ref p.x.pSelect);
+				if(p.ExprHasProperty(EP_xIsSelect)) {
+					sqlite3SelectDelete(db,ref p.x.pSelect);
 				}
 				else {
-					sqlite3ExprListDelete (db, ref p.x.pList);
+					sqlite3ExprListDelete(db,ref p.x.pList);
 				}
 			}
-			if (!ExprHasProperty (p, EP_Static)) {
-				db.sqlite3DbFree (ref p);
+			if(!p.ExprHasProperty(EP_Static)) {
+				db.sqlite3DbFree(ref p);
 			}
 		}
-
 		///<summary>
 		/// Return the number of bytes allocated for the expression structure
 		/// passed as the first argument. This is always one of EXPR_FULLSIZE,
 		/// EXPR_REDUCEDSIZE or EXPR_TOKENONLYSIZE.
 		///
 		///</summary>
-		static int exprStructSize (Expr p)
-		{
-			if (ExprHasProperty (p, EP_TokenOnly))
+		static int exprStructSize(Expr p) {
+			if(p.ExprHasProperty(EP_TokenOnly))
 				return EXPR_TOKENONLYSIZE;
-			if (ExprHasProperty (p, EP_Reduced))
+			if(p.ExprHasProperty(EP_Reduced))
 				return EXPR_REDUCEDSIZE;
 			return EXPR_FULLSIZE;
 		}
-
 		///<summary>
 		/// This function is similar to sqlite3ExprDup(), except that if pzBuffer
 		/// is not NULL then *pzBuffer is assumed to point to a buffer large enough
@@ -395,24 +369,21 @@ namespace Community.CsharpSqlite
 		/// portion of the buffer copied into by this function.
 		///
 		///</summary>
-		static Expr exprDup (sqlite3 db, Expr p, int flags, ref Expr pzBuffer)
-		{
-			Expr pNew = null;
+		static Expr exprDup(sqlite3 db,Expr p,int flags,ref Expr pzBuffer) {
+			Expr pNew=null;
 			///
-///<summary>
-///Value to return 
-///</summary>
-
-			if (p != null) {
-				bool isReduced = (flags & EXPRDUP_REDUCE) != 0;
-				Expr zAlloc = new Expr ();
-				u32 staticFlag = 0;
-				Debug.Assert (pzBuffer == null || isReduced);
+			///<summary>
+			///Value to return 
+			///</summary>
+			if(p!=null) {
+				bool isReduced=(flags&EXPRDUP_REDUCE)!=0;
+				Expr zAlloc=new Expr();
+				u32 staticFlag=0;
+				Debug.Assert(pzBuffer==null||isReduced);
 				///
-///<summary>
-///Figure out where to write the new Expr structure. 
-///</summary>
-
+				///<summary>
+				///Figure out where to write the new Expr structure. 
+				///</summary>
 				//if ( pzBuffer !=null)
 				//{
 				//  zAlloc = pzBuffer;
@@ -426,78 +397,73 @@ namespace Community.CsharpSqlite
 				//if ( pNew != null )
 				{
 					///
-///<summary>
-///Set nNewSize to the size allocated for the structure pointed to
-///by pNew. This is either EXPR_FULLSIZE, EXPR_REDUCEDSIZE or
-///EXPR_TOKENONLYSIZE. nToken is set to the number of bytes consumed
-///</summary>
-///<param name="by the copy of the p">>u.zToken string (if any).</param>
-///<param name=""></param>
-
-					int nStructSize = p.dupedExprStructSize (flags);
-					int nNewSize = nStructSize & 0xfff;
+					///<summary>
+					///Set nNewSize to the size allocated for the structure pointed to
+					///by pNew. This is either EXPR_FULLSIZE, EXPR_REDUCEDSIZE or
+					///EXPR_TOKENONLYSIZE. nToken is set to the number of bytes consumed
+					///</summary>
+					///<param name="by the copy of the p">>u.zToken string (if any).</param>
+					///<param name=""></param>
+					int nStructSize=p.dupedExprStructSize(flags);
+					int nNewSize=nStructSize&0xfff;
 					int nToken;
-					if (!ExprHasProperty (p, EP_IntValue) && !String.IsNullOrEmpty (p.u.zToken)) {
-						nToken = StringExtensions.sqlite3Strlen30 (p.u.zToken);
+					if(!p.ExprHasProperty(EP_IntValue)&&!String.IsNullOrEmpty(p.u.zToken)) {
+						nToken=StringExtensions.sqlite3Strlen30(p.u.zToken);
 					}
 					else {
-						nToken = 0;
+						nToken=0;
 					}
-					if (isReduced) {
-						Debug.Assert (!ExprHasProperty (p, EP_Reduced));
-						pNew = p.Copy (EXPR_TOKENONLYSIZE);
+					if(isReduced) {
+						Debug.Assert(!p.ExprHasProperty(EP_Reduced));
+						pNew=p.Copy(EXPR_TOKENONLYSIZE);
 						//memcpy( zAlloc, p, nNewSize );
 					}
 					else {
-						int nSize = exprStructSize (p);
+						int nSize=exprStructSize(p);
 						//memcpy( zAlloc, p, nSize );
-						pNew = p.Copy ();
+						pNew=p.Copy();
 						//memset( &zAlloc[nSize], 0, EXPR_FULLSIZE - nSize );
 					}
 					///
-///<summary>
-///Set the EP_Reduced, EP_TokenOnly, and EP_Static flags appropriately. 
-///</summary>
-
+					///<summary>
+					///Set the EP_Reduced, EP_TokenOnly, and EP_Static flags appropriately. 
+					///</summary>
 					unchecked {
-						pNew.flags &= (ushort)(~(EP_Reduced | EP_TokenOnly | EP_Static));
+						pNew.flags&=(ushort)(~(EP_Reduced|EP_TokenOnly|EP_Static));
 					}
-					pNew.flags |= (ushort)(nStructSize & (EP_Reduced | EP_TokenOnly));
-					pNew.flags |= (ushort)staticFlag;
+					pNew.flags|=(ushort)(nStructSize&(EP_Reduced|EP_TokenOnly));
+					pNew.flags|=(ushort)staticFlag;
 					///
-///<summary>
-///</summary>
-///<param name="Copy the p">>u.zToken string, if any. </param>
-
-					if (nToken != 0) {
+					///<summary>
+					///</summary>
+					///<param name="Copy the p">>u.zToken string, if any. </param>
+					if(nToken!=0) {
 						string zToken;
 						// = pNew.u.zToken = (char)&zAlloc[nNewSize];
-						zToken = p.u.zToken.Substring (0, nToken);
+						zToken=p.u.zToken.Substring(0,nToken);
 						// memcpy( zToken, p.u.zToken, nToken );
 					}
-					if (0 == ((p.flags | pNew.flags) & EP_TokenOnly)) {
+					if(0==((p.flags|pNew.flags)&EP_TokenOnly)) {
 						///
-///<summary>
-///Fill in the pNew.x.pSelect or pNew.x.pList member. 
-///</summary>
-
-						if (ExprHasProperty (p, EP_xIsSelect)) {
-							pNew.x.pSelect = sqlite3SelectDup (db, p.x.pSelect, isReduced ? 1 : 0);
+						///<summary>
+						///Fill in the pNew.x.pSelect or pNew.x.pList member. 
+						///</summary>
+						if(p.ExprHasProperty(EP_xIsSelect)) {
+							pNew.x.pSelect=sqlite3SelectDup(db,p.x.pSelect,isReduced?1:0);
 						}
 						else {
-							pNew.x.pList = sqlite3ExprListDup (db, p.x.pList, isReduced ? 1 : 0);
+							pNew.x.pList=sqlite3ExprListDup(db,p.x.pList,isReduced?1:0);
 						}
 					}
 					///
-///<summary>
-///Fill in pNew.pLeft and pNew.pRight. 
-///</summary>
-
-					if (ExprHasAnyProperty (pNew, EP_Reduced | EP_TokenOnly)) {
+					///<summary>
+					///Fill in pNew.pLeft and pNew.pRight. 
+					///</summary>
+					if(pNew.ExprHasAnyProperty(EP_Reduced|EP_TokenOnly)) {
 						//zAlloc += dupedExprNodeSize( p, flags );
-						if (ExprHasProperty (pNew, EP_Reduced)) {
-							pNew.pLeft = exprDup (db, p.pLeft, EXPRDUP_REDUCE, ref pzBuffer);
-							pNew.pRight = exprDup (db, p.pRight, EXPRDUP_REDUCE, ref pzBuffer);
+						if(pNew.ExprHasProperty(EP_Reduced)) {
+							pNew.pLeft=exprDup(db,p.pLeft,EXPRDUP_REDUCE,ref pzBuffer);
+							pNew.pRight=exprDup(db,p.pRight,EXPRDUP_REDUCE,ref pzBuffer);
 						}
 						//if ( pzBuffer != null )
 						//{
@@ -505,17 +471,16 @@ namespace Community.CsharpSqlite
 						//}
 					}
 					else {
-						pNew.flags2 = 0;
-						if (!ExprHasAnyProperty (p, EP_TokenOnly)) {
-							pNew.pLeft = sqlite3ExprDup (db, p.pLeft, 0);
-							pNew.pRight = sqlite3ExprDup (db, p.pRight, 0);
+						pNew.flags2=0;
+						if(!p.ExprHasAnyProperty(EP_TokenOnly)) {
+							pNew.pLeft=sqlite3ExprDup(db,p.pLeft,0);
+							pNew.pRight=sqlite3ExprDup(db,p.pRight,0);
 						}
 					}
 				}
 			}
 			return pNew;
 		}
-
 		///<summary>
 		/// The following group of routines make deep copies of expressions,
 		/// expression lists, ID lists, and select statements.  The copies can
@@ -534,50 +499,46 @@ namespace Community.CsharpSqlite
 		/// part of the in-memory representation of the database schema.
 		///
 		///</summary>
-		static Expr sqlite3ExprDup (sqlite3 db, Expr p, int flags)
-		{
-			Expr ExprDummy = null;
-			return exprDup (db, p, flags, ref ExprDummy);
+		static Expr sqlite3ExprDup(sqlite3 db,Expr p,int flags) {
+			Expr ExprDummy=null;
+			return exprDup(db,p,flags,ref ExprDummy);
 		}
-
-		static ExprList sqlite3ExprListDup (sqlite3 db, ExprList p, int flags)
-		{
+		static ExprList sqlite3ExprListDup(sqlite3 db,ExprList p,int flags) {
 			ExprList pNew;
 			ExprList_item pItem;
 			ExprList_item pOldItem;
 			int i;
-			if (p == null)
+			if(p==null)
 				return null;
-			pNew = new ExprList ();
+			pNew=new ExprList();
 			//sqlite3DbMallocRaw(db, sizeof(*pNew) );
 			//if ( pNew == null ) return null;
-			pNew.iECursor = 0;
-			pNew.nExpr = pNew.nAlloc = p.nExpr;
-			pNew.a = new ExprList_item[p.nExpr];
+			pNew.iECursor=0;
+			pNew.nExpr=pNew.nAlloc=p.nExpr;
+			pNew.a=new ExprList_item[p.nExpr];
 			//sqlite3DbMallocRaw(db,  p.nExpr*sizeof(p.a[0]) );
 			//if( pItem==null ){
 			//  sqlite3DbFree(db,ref pNew);
 			//  return null;
 			//}
 			//pOldItem = p.a;
-			for (i = 0; i < p.nExpr; i++) {
+			for(i=0;i<p.nExpr;i++) {
 				//pItem++, pOldItem++){
-				pItem = pNew.a [i] = new ExprList_item ();
-				pOldItem = p.a [i];
-				Expr pOldExpr = pOldItem.pExpr;
-				pItem.pExpr = sqlite3ExprDup (db, pOldExpr, flags);
-				pItem.zName = pOldItem.zName;
+				pItem=pNew.a[i]=new ExprList_item();
+				pOldItem=p.a[i];
+				Expr pOldExpr=pOldItem.pExpr;
+				pItem.pExpr=sqlite3ExprDup(db,pOldExpr,flags);
+				pItem.zName=pOldItem.zName;
 				// sqlite3DbStrDup(db, pOldItem.zName);
-				pItem.zSpan = pOldItem.zSpan;
+				pItem.zSpan=pOldItem.zSpan;
 				// sqlite3DbStrDup( db, pOldItem.zSpan );
-				pItem.sortOrder = pOldItem.sortOrder;
-				pItem.done = 0;
-				pItem.iCol = pOldItem.iCol;
-				pItem.iAlias = pOldItem.iAlias;
+				pItem.sortOrder=pOldItem.sortOrder;
+				pItem.done=0;
+				pItem.iCol=pOldItem.iCol;
+				pItem.iAlias=pOldItem.iAlias;
 			}
 			return pNew;
 		}
-
 		///<summary>
 		/// If cursors, triggers, views and subqueries are all omitted from
 		/// the build, then none of the following routines, except for
@@ -586,109 +547,103 @@ namespace Community.CsharpSqlite
 		///
 		///</summary>
 		#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_TRIGGER  || !SQLITE_OMIT_SUBQUERY
-		static SrcList sqlite3SrcListDup (sqlite3 db, SrcList p, int flags)
-		{
+		static SrcList sqlite3SrcListDup(sqlite3 db,SrcList p,int flags) {
 			SrcList pNew;
 			int i;
 			int nByte;
-			if (p == null)
+			if(p==null)
 				return null;
 			//nByte = sizeof(*p) + (p.nSrc>0 ? sizeof(p.a[0]) * (p.nSrc-1) : 0);
-			pNew = new SrcList ();
+			pNew=new SrcList();
 			//sqlite3DbMallocRaw(db, nByte );
-			if (p.nSrc > 0)
-				pNew.a = new SrcList_item[p.nSrc];
-			if (pNew == null)
+			if(p.nSrc>0)
+				pNew.a=new SrcList_item[p.nSrc];
+			if(pNew==null)
 				return null;
-			pNew.nSrc = pNew.nAlloc = p.nSrc;
-			for (i = 0; i < p.nSrc; i++) {
-				pNew.a [i] = new SrcList_item ();
-				SrcList_item pNewItem = pNew.a [i];
-				SrcList_item pOldItem = p.a [i];
+			pNew.nSrc=pNew.nAlloc=p.nSrc;
+			for(i=0;i<p.nSrc;i++) {
+				pNew.a[i]=new SrcList_item();
+				SrcList_item pNewItem=pNew.a[i];
+				SrcList_item pOldItem=p.a[i];
 				Table pTab;
-				pNewItem.zDatabase = pOldItem.zDatabase;
+				pNewItem.zDatabase=pOldItem.zDatabase;
 				// sqlite3DbStrDup(db, pOldItem.zDatabase);
-				pNewItem.zName = pOldItem.zName;
+				pNewItem.zName=pOldItem.zName;
 				// sqlite3DbStrDup(db, pOldItem.zName);
-				pNewItem.zAlias = pOldItem.zAlias;
+				pNewItem.zAlias=pOldItem.zAlias;
 				// sqlite3DbStrDup(db, pOldItem.zAlias);
-				pNewItem.jointype = pOldItem.jointype;
-				pNewItem.iCursor = pOldItem.iCursor;
-				pNewItem.isPopulated = pOldItem.isPopulated;
-				pNewItem.zIndex = pOldItem.zIndex;
+				pNewItem.jointype=pOldItem.jointype;
+				pNewItem.iCursor=pOldItem.iCursor;
+				pNewItem.isPopulated=pOldItem.isPopulated;
+				pNewItem.zIndex=pOldItem.zIndex;
 				// sqlite3DbStrDup( db, pOldItem.zIndex );
-				pNewItem.notIndexed = pOldItem.notIndexed;
-				pNewItem.pIndex = pOldItem.pIndex;
-				pTab = pNewItem.pTab = pOldItem.pTab;
-				if (pTab != null) {
+				pNewItem.notIndexed=pOldItem.notIndexed;
+				pNewItem.pIndex=pOldItem.pIndex;
+				pTab=pNewItem.pTab=pOldItem.pTab;
+				if(pTab!=null) {
 					pTab.nRef++;
 				}
-				pNewItem.pSelect = sqlite3SelectDup (db, pOldItem.pSelect, flags);
-				pNewItem.pOn = sqlite3ExprDup (db, pOldItem.pOn, flags);
-				pNewItem.pUsing = sqlite3IdListDup (db, pOldItem.pUsing);
-				pNewItem.colUsed = pOldItem.colUsed;
+				pNewItem.pSelect=sqlite3SelectDup(db,pOldItem.pSelect,flags);
+				pNewItem.pOn=sqlite3ExprDup(db,pOldItem.pOn,flags);
+				pNewItem.pUsing=sqlite3IdListDup(db,pOldItem.pUsing);
+				pNewItem.colUsed=pOldItem.colUsed;
 			}
 			return pNew;
 		}
-
-		static IdList sqlite3IdListDup (sqlite3 db, IdList p)
-		{
+		static IdList sqlite3IdListDup(sqlite3 db,IdList p) {
 			IdList pNew;
 			int i;
-			if (p == null)
+			if(p==null)
 				return null;
-			pNew = new IdList ();
+			pNew=new IdList();
 			//sqlite3DbMallocRaw(db, sizeof(*pNew) );
-			if (pNew == null)
+			if(pNew==null)
 				return null;
-			pNew.nId = pNew.nAlloc = p.nId;
-			pNew.a = new IdList_item[p.nId];
+			pNew.nId=pNew.nAlloc=p.nId;
+			pNew.a=new IdList_item[p.nId];
 			//sqlite3DbMallocRaw(db, p.nId*sizeof(p.a[0]) );
-			if (pNew.a == null) {
-				db.sqlite3DbFree (ref pNew);
+			if(pNew.a==null) {
+				db.sqlite3DbFree(ref pNew);
 				return null;
 			}
-			for (i = 0; i < p.nId; i++) {
-				pNew.a [i] = new IdList_item ();
-				IdList_item pNewItem = pNew.a [i];
-				IdList_item pOldItem = p.a [i];
-				pNewItem.zName = pOldItem.zName;
+			for(i=0;i<p.nId;i++) {
+				pNew.a[i]=new IdList_item();
+				IdList_item pNewItem=pNew.a[i];
+				IdList_item pOldItem=p.a[i];
+				pNewItem.zName=pOldItem.zName;
 				// sqlite3DbStrDup(db, pOldItem.zName);
-				pNewItem.idx = pOldItem.idx;
+				pNewItem.idx=pOldItem.idx;
 			}
 			return pNew;
 		}
-
-		static Select sqlite3SelectDup (sqlite3 db, Select p, int flags)
-		{
+		static Select sqlite3SelectDup(sqlite3 db,Select p,int flags) {
 			Select pNew;
-			if (p == null)
+			if(p==null)
 				return null;
-			pNew = new Select ();
+			pNew=new Select();
 			//sqlite3DbMallocRaw(db, sizeof(*p) );
 			//if ( pNew == null ) return null;
-			pNew.pEList = sqlite3ExprListDup (db, p.pEList, flags);
-			pNew.pSrc = sqlite3SrcListDup (db, p.pSrc, flags);
-			pNew.pWhere = sqlite3ExprDup (db, p.pWhere, flags);
-			pNew.pGroupBy = sqlite3ExprListDup (db, p.pGroupBy, flags);
-			pNew.pHaving = sqlite3ExprDup (db, p.pHaving, flags);
-			pNew.pOrderBy = sqlite3ExprListDup (db, p.pOrderBy, flags);
-			pNew.tk_op = p.tk_op;
-			pNew.pPrior = sqlite3SelectDup (db, p.pPrior, flags);
-			pNew.pLimit = sqlite3ExprDup (db, p.pLimit, flags);
-			pNew.pOffset = sqlite3ExprDup (db, p.pOffset, flags);
-			pNew.iLimit = 0;
-			pNew.iOffset = 0;
-			pNew.selFlags = (p.selFlags & ~SelectFlags.UsesEphemeral);
-			pNew.pRightmost = null;
-			pNew.addrOpenEphm [0] = -1;
-			pNew.addrOpenEphm [1] = -1;
-			pNew.addrOpenEphm [2] = -1;
+			pNew.pEList=sqlite3ExprListDup(db,p.pEList,flags);
+			pNew.pSrc=sqlite3SrcListDup(db,p.pSrc,flags);
+			pNew.pWhere=sqlite3ExprDup(db,p.pWhere,flags);
+			pNew.pGroupBy=sqlite3ExprListDup(db,p.pGroupBy,flags);
+			pNew.pHaving=sqlite3ExprDup(db,p.pHaving,flags);
+			pNew.pOrderBy=sqlite3ExprListDup(db,p.pOrderBy,flags);
+			pNew.tk_op=p.tk_op;
+			pNew.pPrior=sqlite3SelectDup(db,p.pPrior,flags);
+			pNew.pLimit=sqlite3ExprDup(db,p.pLimit,flags);
+			pNew.pOffset=sqlite3ExprDup(db,p.pOffset,flags);
+			pNew.iLimit=0;
+			pNew.iOffset=0;
+			pNew.selFlags=(p.selFlags&~SelectFlags.UsesEphemeral);
+			pNew.pRightmost=null;
+			pNew.addrOpenEphm[0]=-1;
+			pNew.addrOpenEphm[1]=-1;
+			pNew.addrOpenEphm[2]=-1;
 			return pNew;
 		}
-
 		#else
-																																														Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
+																																																Select sqlite3SelectDup(sqlite3 db, Select p, int flags){
 Debug.Assert( p==null );
 return null;
 }
@@ -729,25 +684,23 @@ return null;
 		/// Delete an entire expression list.
 		///
 		///</summary>
-		static void sqlite3ExprListDelete (sqlite3 db, ref ExprList pList)
-		{
+		static void sqlite3ExprListDelete(sqlite3 db,ref ExprList pList) {
 			int i;
 			ExprList_item pItem;
-			if (pList == null)
+			if(pList==null)
 				return;
-			Debug.Assert (pList.a != null || (pList.nExpr == 0 && pList.nAlloc == 0));
-			Debug.Assert (pList.nExpr <= pList.nAlloc);
-			for (i = 0; i < pList.nExpr; i++) {
-				if ((pItem = pList.a [i]) != null) {
-					sqlite3ExprDelete (db, ref pItem.pExpr);
-					db.sqlite3DbFree (ref pItem.zName);
-					db.sqlite3DbFree (ref pItem.zSpan);
+			Debug.Assert(pList.a!=null||(pList.nExpr==0&&pList.nAlloc==0));
+			Debug.Assert(pList.nExpr<=pList.nAlloc);
+			for(i=0;i<pList.nExpr;i++) {
+				if((pItem=pList.a[i])!=null) {
+					sqlite3ExprDelete(db,ref pItem.pExpr);
+					db.sqlite3DbFree(ref pItem.zName);
+					db.sqlite3DbFree(ref pItem.zSpan);
 				}
 			}
-			db.sqlite3DbFree (ref pList.a);
-			db.sqlite3DbFree (ref pList);
+			db.sqlite3DbFree(ref pList.a);
+			db.sqlite3DbFree(ref pList);
 		}
-
 		///<summary>
 		/// These routines are Walker callbacks.  Walker.u.pi is a pointer
 		/// to an integer.  These routines are checking an expression to see
@@ -762,69 +715,60 @@ return null;
 		///
 		///
 		///</summary>
-		static int exprNodeIsConstant (Walker pWalker, ref Expr pExpr)
-		{
+		static int exprNodeIsConstant(Walker pWalker,ref Expr pExpr) {
 			///
-///<summary>
-///If pWalker.u.i is 3 then any term of the expression that comes from
-///the ON or USING clauses of a join disqualifies the expression
-///from being considered constant. 
-///</summary>
-
-			if (pWalker.u.i == 3 && ExprHasAnyProperty (pExpr, EP_FromJoin)) {
-				pWalker.u.i = 0;
+			///<summary>
+			///If pWalker.u.i is 3 then any term of the expression that comes from
+			///the ON or USING clauses of a join disqualifies the expression
+			///from being considered constant. 
+			///</summary>
+			if(pWalker.u.i==3&&pExpr.ExprHasAnyProperty(EP_FromJoin)) {
+				pWalker.u.i=0;
 				return WRC_Abort;
 			}
-			switch (pExpr.Operator) {
+			switch(pExpr.Operator) {
 			///
-///<summary>
-///Consider functions to be constant if all their arguments are constant
-///and pWalker.u.i==2 
-///</summary>
-
+			///<summary>
+			///Consider functions to be constant if all their arguments are constant
+			///and pWalker.u.i==2 
+			///</summary>
 			case TokenType.TK_FUNCTION:
-				if ((pWalker.u.i) == 2)
-					return 0;
-				goto case TokenType.TK_ID;
+			if((pWalker.u.i)==2)
+				return 0;
+			goto case TokenType.TK_ID;
 			///
-///<summary>
-///Fall through 
-///</summary>
-
+			///<summary>
+			///Fall through 
+			///</summary>
 			case TokenType.TK_ID:
 			case TokenType.TK_COLUMN:
 			case TokenType.TK_AGG_FUNCTION:
 			case TokenType.TK_AGG_COLUMN:
-				testcase (pExpr.Operator == TokenType.TK_ID);
-				testcase (pExpr.Operator == TokenType.TK_COLUMN);
-				testcase (pExpr.Operator == TokenType.TK_AGG_FUNCTION);
-				testcase (pExpr.Operator == TokenType.TK_AGG_COLUMN);
-				pWalker.u.i = 0;
-				return WRC_Abort;
+			testcase(pExpr.Operator==TokenType.TK_ID);
+			testcase(pExpr.Operator==TokenType.TK_COLUMN);
+			testcase(pExpr.Operator==TokenType.TK_AGG_FUNCTION);
+			testcase(pExpr.Operator==TokenType.TK_AGG_COLUMN);
+			pWalker.u.i=0;
+			return WRC_Abort;
 			default:
-				testcase (pExpr.Operator == TokenType.TK_SELECT);
-				///
-///<summary>
-///selectNodeIsConstant will disallow 
-///</summary>
-
-				testcase (pExpr.Operator == TokenType.TK_EXISTS);
-				///
-///<summary>
-///selectNodeIsConstant will disallow 
-///</summary>
-
-				return WRC_Continue;
+			testcase(pExpr.Operator==TokenType.TK_SELECT);
+			///
+			///<summary>
+			///selectNodeIsConstant will disallow 
+			///</summary>
+			testcase(pExpr.Operator==TokenType.TK_EXISTS);
+			///
+			///<summary>
+			///selectNodeIsConstant will disallow 
+			///</summary>
+			return WRC_Continue;
 			}
 		}
-
-		static int selectNodeIsConstant (Walker pWalker, Select NotUsed)
-		{
-			UNUSED_PARAMETER (NotUsed);
-			pWalker.u.i = 0;
+		static int selectNodeIsConstant(Walker pWalker,Select NotUsed) {
+			UNUSED_PARAMETER(NotUsed);
+			pWalker.u.i=0;
 			return WRC_Abort;
 		}
-
 		///<summary>
 		/// Generate an OP_IsNull instruction that tests register iReg and jumps
 		/// to location iDest if the value in iReg is NULL.  The value in iReg
@@ -833,33 +777,27 @@ return null;
 		/// can be omitted.
 		///
 		///</summary>
-		static void sqlite3ExprCodeIsNullJump (Vdbe v, ///
-///<summary>
-///The VDBE under construction 
-///</summary>
-
-		Expr pExpr, ///
-///<summary>
-///Only generate OP_IsNull if this expr can be NULL 
-///</summary>
-
-		int iReg, ///
-///<summary>
-///Test the value in this register for NULL 
-///</summary>
-
+		static void sqlite3ExprCodeIsNullJump(Vdbe v,///
+		///<summary>
+		///The VDBE under construction 
+		///</summary>
+		Expr pExpr,///
+		///<summary>
+		///Only generate OP_IsNull if this expr can be NULL 
+		///</summary>
+		int iReg,///
+		///<summary>
+		///Test the value in this register for NULL 
+		///</summary>
 		int iDest///
-///<summary>
-///Jump here if the value is null 
-///</summary>
-
-		)
-		{
-			if (pExpr.sqlite3ExprCanBeNull () != 0) {
-				v.sqlite3VdbeAddOp2 (OP_IsNull, iReg, iDest);
+		///<summary>
+		///Jump here if the value is null 
+		///</summary>
+		) {
+			if(pExpr.sqlite3ExprCanBeNull()!=0) {
+				v.sqlite3VdbeAddOp2(OP_IsNull,iReg,iDest);
 			}
 		}
-
 		///<summary>
 		/// Return TRUE if the given expression is a constant which would be
 		/// unchanged by OP_Affinity with the affinity given in the second
@@ -871,62 +809,56 @@ return null;
 		/// answer.
 		///
 		///</summary>
-		static int sqlite3ExprNeedsNoAffinityChange (Expr p, char aff)
-		{
+		static int sqlite3ExprNeedsNoAffinityChange(Expr p,char aff) {
 			TokenType op;
-			if (aff == SQLITE_AFF_NONE)
+			if(aff==SQLITE_AFF_NONE)
 				return 1;
-			while (p.Operator == TokenType.TK_UPLUS || p.Operator == TokenType.TK_UMINUS) {
-				p = p.pLeft;
+			while(p.Operator==TokenType.TK_UPLUS||p.Operator==TokenType.TK_UMINUS) {
+				p=p.pLeft;
 			}
-			op = p.Operator;
-			if (op == TokenType.TK_REGISTER)
-				op = p.Operator2;
-			switch (op) {
+			op=p.Operator;
+			if(op==TokenType.TK_REGISTER)
+				op=p.Operator2;
+			switch(op) {
 			case TokenType.TK_INTEGER: {
-				return (aff == SQLITE_AFF_INTEGER || aff == SQLITE_AFF_NUMERIC) ? 1 : 0;
+				return (aff==SQLITE_AFF_INTEGER||aff==SQLITE_AFF_NUMERIC)?1:0;
 			}
 			case TokenType.TK_FLOAT: {
-				return (aff == SQLITE_AFF_REAL || aff == SQLITE_AFF_NUMERIC) ? 1 : 0;
+				return (aff==SQLITE_AFF_REAL||aff==SQLITE_AFF_NUMERIC)?1:0;
 			}
 			case TokenType.TK_STRING: {
-				return (aff == SQLITE_AFF_TEXT) ? 1 : 0;
+				return (aff==SQLITE_AFF_TEXT)?1:0;
 			}
 			case TokenType.TK_BLOB: {
 				return 1;
 			}
 			case TokenType.TK_COLUMN: {
-				Debug.Assert (p.iTable >= 0);
+				Debug.Assert(p.iTable>=0);
 				///
-///<summary>
-///p cannot be part of a CHECK constraint 
-///</summary>
-
-				return (p.iColumn < 0 && (aff == SQLITE_AFF_INTEGER || aff == SQLITE_AFF_NUMERIC)) ? 1 : 0;
+				///<summary>
+				///p cannot be part of a CHECK constraint 
+				///</summary>
+				return (p.iColumn<0&&(aff==SQLITE_AFF_INTEGER||aff==SQLITE_AFF_NUMERIC))?1:0;
 			}
 			default: {
 				return 0;
 			}
 			}
 		}
-
 		///
-///<summary>
-///</summary>
-///<param name="Return TRUE if the given string is a row">id column name.</param>
-///<param name=""></param>
-
-		static bool sqlite3IsRowid (string z)
-		{
-			if (z.Equals ("_ROWID_", StringComparison.InvariantCultureIgnoreCase))
+		///<summary>
+		///</summary>
+		///<param name="Return TRUE if the given string is a row">id column name.</param>
+		///<param name=""></param>
+		static bool sqlite3IsRowid(string z) {
+			if(z.Equals("_ROWID_",StringComparison.InvariantCultureIgnoreCase))
 				return true;
-			if (z.Equals ("ROWID", StringComparison.InvariantCultureIgnoreCase))
+			if(z.Equals("ROWID",StringComparison.InvariantCultureIgnoreCase))
 				return true;
-			if (z.Equals ("OID", StringComparison.InvariantCultureIgnoreCase))
+			if(z.Equals("OID",StringComparison.InvariantCultureIgnoreCase))
 				return true;
 			return false;
 		}
-
 		///<summary>
 		/// Return true if we are able to the IN operator optimization on a
 		/// query of the form
@@ -941,111 +873,96 @@ return null;
 		///
 		///</summary>
 		#if !SQLITE_OMIT_SUBQUERY
-		static int isCandidateForInOpt (Select p)
-		{
+		static int isCandidateForInOpt(Select p) {
 			SrcList pSrc;
 			ExprList pEList;
 			Table pTab;
-			if (p == null)
+			if(p==null)
 				return 0;
 			///
-///<summary>
-///</summary>
-///<param name="right">hand side of IN is SELECT </param>
-
-			if (p.pPrior != null)
+			///<summary>
+			///</summary>
+			///<param name="right">hand side of IN is SELECT </param>
+			if(p.pPrior!=null)
 				return 0;
 			///
-///<summary>
-///Not a compound SELECT 
-///</summary>
-
-			if ((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0) {
-				testcase ((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct);
-				testcase ((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Aggregate);
+			///<summary>
+			///Not a compound SELECT 
+			///</summary>
+			if((p.selFlags&(SelectFlags.Distinct|SelectFlags.Aggregate))!=0) {
+				testcase((p.selFlags&(SelectFlags.Distinct|SelectFlags.Aggregate))==SelectFlags.Distinct);
+				testcase((p.selFlags&(SelectFlags.Distinct|SelectFlags.Aggregate))==SelectFlags.Aggregate);
 				return 0;
 				///
-///<summary>
-///No DISTINCT keyword and no aggregate functions 
-///</summary>
-
+				///<summary>
+				///No DISTINCT keyword and no aggregate functions 
+				///</summary>
 			}
-			Debug.Assert (p.pGroupBy == null);
+			Debug.Assert(p.pGroupBy==null);
 			///
-///<summary>
-///Has no GROUP BY clause 
-///</summary>
-
-			if (p.pLimit != null)
+			///<summary>
+			///Has no GROUP BY clause 
+			///</summary>
+			if(p.pLimit!=null)
 				return 0;
 			///
-///<summary>
-///Has no LIMIT clause 
-///</summary>
-
-			Debug.Assert (p.pOffset == null);
+			///<summary>
+			///Has no LIMIT clause 
+			///</summary>
+			Debug.Assert(p.pOffset==null);
 			///
-///<summary>
-///No LIMIT means no OFFSET 
-///</summary>
-
-			if (p.pWhere != null)
+			///<summary>
+			///No LIMIT means no OFFSET 
+			///</summary>
+			if(p.pWhere!=null)
 				return 0;
 			///
-///<summary>
-///Has no WHERE clause 
-///</summary>
-
-			pSrc = p.pSrc;
-			Debug.Assert (pSrc != null);
-			if (pSrc.nSrc != 1)
+			///<summary>
+			///Has no WHERE clause 
+			///</summary>
+			pSrc=p.pSrc;
+			Debug.Assert(pSrc!=null);
+			if(pSrc.nSrc!=1)
 				return 0;
 			///
-///<summary>
-///Single term in FROM clause 
-///</summary>
-
-			if (pSrc.a [0].pSelect != null)
+			///<summary>
+			///Single term in FROM clause 
+			///</summary>
+			if(pSrc.a[0].pSelect!=null)
 				return 0;
 			///
-///<summary>
-///FROM is not a subquery or view 
-///</summary>
-
-			pTab = pSrc.a [0].pTab;
-			if (NEVER (pTab == null))
+			///<summary>
+			///FROM is not a subquery or view 
+			///</summary>
+			pTab=pSrc.a[0].pTab;
+			if(NEVER(pTab==null))
 				return 0;
-			Debug.Assert (pTab.pSelect == null);
+			Debug.Assert(pTab.pSelect==null);
 			///
-///<summary>
-///FROM clause is not a view 
-///</summary>
-
-			if (IsVirtual (pTab))
+			///<summary>
+			///FROM clause is not a view 
+			///</summary>
+			if(IsVirtual(pTab))
 				return 0;
 			///
-///<summary>
-///FROM clause not a virtual table 
-///</summary>
-
-			pEList = p.pEList;
-			if (pEList.nExpr != 1)
+			///<summary>
+			///FROM clause not a virtual table 
+			///</summary>
+			pEList=p.pEList;
+			if(pEList.nExpr!=1)
 				return 0;
 			///
-///<summary>
-///One column in the result set 
-///</summary>
-
-			if (pEList.a [0].pExpr.Operator != TokenType.TK_COLUMN)
+			///<summary>
+			///One column in the result set 
+			///</summary>
+			if(pEList.a[0].pExpr.Operator!=TokenType.TK_COLUMN)
 				return 0;
 			///
-///<summary>
-///Result is a column 
-///</summary>
-
+			///<summary>
+			///Result is a column 
+			///</summary>
 			return 1;
 		}
-
 		#endif
 		///<summary>
 		/// This function is used by the implementation of the IN (...) operator.
@@ -1140,24 +1057,23 @@ return null;
 		#endif
 		#if !SQLITE_OMIT_SUBQUERY
 		///
-///<summary>
-///Generate code for an IN expression.
-///
-///x IN (SELECT ...)
-///x IN (value, value, ...)
-///
-///</summary>
-///<param name="The left">hand side (RHS)</param>
-///<param name="is an array of zero or more values.  The expression is true if the LHS is">is an array of zero or more values.  The expression is true if the LHS is</param>
-///<param name="contained within the RHS.  The value of the expression is unknown (NULL)">contained within the RHS.  The value of the expression is unknown (NULL)</param>
-///<param name="if the LHS is NULL or if the LHS is not contained within the RHS and the">if the LHS is NULL or if the LHS is not contained within the RHS and the</param>
-///<param name="RHS contains one or more NULL values.">RHS contains one or more NULL values.</param>
-///<param name=""></param>
-///<param name="This routine generates code will jump to destIfFalse if the LHS is not ">This routine generates code will jump to destIfFalse if the LHS is not </param>
-///<param name="contained within the RHS.  If due to NULLs we cannot determine if the LHS">contained within the RHS.  If due to NULLs we cannot determine if the LHS</param>
-///<param name="is contained in the RHS then jump to destIfNull.  If the LHS is contained">is contained in the RHS then jump to destIfNull.  If the LHS is contained</param>
-///<param name="within the RHS then fall through.">within the RHS then fall through.</param>
-
+		///<summary>
+		///Generate code for an IN expression.
+		///
+		///x IN (SELECT ...)
+		///x IN (value, value, ...)
+		///
+		///</summary>
+		///<param name="The left">hand side (RHS)</param>
+		///<param name="is an array of zero or more values.  The expression is true if the LHS is">is an array of zero or more values.  The expression is true if the LHS is</param>
+		///<param name="contained within the RHS.  The value of the expression is unknown (NULL)">contained within the RHS.  The value of the expression is unknown (NULL)</param>
+		///<param name="if the LHS is NULL or if the LHS is not contained within the RHS and the">if the LHS is NULL or if the LHS is not contained within the RHS and the</param>
+		///<param name="RHS contains one or more NULL values.">RHS contains one or more NULL values.</param>
+		///<param name=""></param>
+		///<param name="This routine generates code will jump to destIfFalse if the LHS is not ">This routine generates code will jump to destIfFalse if the LHS is not </param>
+		///<param name="contained within the RHS.  If due to NULLs we cannot determine if the LHS">contained within the RHS.  If due to NULLs we cannot determine if the LHS</param>
+		///<param name="is contained in the RHS then jump to destIfNull.  If the LHS is contained">is contained in the RHS then jump to destIfNull.  If the LHS is contained</param>
+		///<param name="within the RHS then fall through.">within the RHS then fall through.</param>
 		#endif
 		///<summary>
 		/// Duplicate an 8-byte value
@@ -1178,25 +1094,22 @@ return null;
 		/// z[n] character is guaranteed to be something that does not look
 		/// like the continuation of the number.
 		///</summary>
-		static void codeReal (Vdbe v, string z, bool negateFlag, int iMem)
-		{
-			if (ALWAYS (!String.IsNullOrEmpty (z))) {
-				double value = 0;
+		static void codeReal(Vdbe v,string z,bool negateFlag,int iMem) {
+			if(ALWAYS(!String.IsNullOrEmpty(z))) {
+				double value=0;
 				//string zV;
-				Converter.sqlite3AtoF (z, ref value, StringExtensions.sqlite3Strlen30 (z), SqliteEncoding.UTF8);
-				Debug.Assert (!MathExtensions.sqlite3IsNaN (value));
+				Converter.sqlite3AtoF(z,ref value,StringExtensions.sqlite3Strlen30(z),SqliteEncoding.UTF8);
+				Debug.Assert(!MathExtensions.sqlite3IsNaN(value));
 				///
-///<summary>
-///The new AtoF never returns NaN 
-///</summary>
-
-				if (negateFlag)
-					value = -value;
+				///<summary>
+				///The new AtoF never returns NaN 
+				///</summary>
+				if(negateFlag)
+					value=-value;
 				//zV = dup8bytes(v,  value);
-				v.sqlite3VdbeAddOp4 (OP_Real, 0, iMem, 0, value, P4_REAL);
+				v.sqlite3VdbeAddOp4(OP_Real,0,iMem,0,value,P4_REAL);
 			}
 		}
-
 		#endif
 		///<summary>
 		/// Generate an instruction that will put the integer describe by
@@ -1272,7 +1185,7 @@ return null;
 		///
 		///</summary>
 		#if (SQLITE_DEBUG) || (SQLITE_COVERAGE_TEST)
-																																														    /*
+																																																    /*
 ** Return true if any register in the range iFrom..iTo (inclusive)
 ** is used as part of the column cache.
 **
@@ -1342,10 +1255,9 @@ return null;
 		/// expression.
 		///
 		///</summary>
-		static int evalConstExpr (Walker pWalker, ref Expr pExpr)
-		{
-			Parse pParse = pWalker.pParse;
-			switch (pExpr.Operator) {
+		static int evalConstExpr(Walker pWalker,ref Expr pExpr) {
+			Parse pParse=pWalker.pParse;
+			switch(pExpr.Operator) {
 			case TokenType.TK_IN:
 			case TokenType.TK_REGISTER: {
 				return WRC_Prune;
@@ -1354,43 +1266,41 @@ return null;
 			case TokenType.TK_AGG_FUNCTION:
 			case TokenType.TK_CONST_FUNC: {
 				///
-///<summary>
-///The arguments to a function have a fixed destination.
-///Mark them this way to avoid generated unneeded OP_SCopy
-///instructions.
-///
-///</summary>
-
-				ExprList pList = pExpr.x.pList;
-				Debug.Assert (!ExprHasProperty (pExpr, EP_xIsSelect));
-				if (pList != null) {
-					int i = pList.nExpr;
+				///<summary>
+				///The arguments to a function have a fixed destination.
+				///Mark them this way to avoid generated unneeded OP_SCopy
+				///instructions.
+				///
+				///</summary>
+				ExprList pList=pExpr.x.pList;
+				Debug.Assert(!pExpr.ExprHasProperty(EP_xIsSelect));
+				if(pList!=null) {
+					int i=pList.nExpr;
 					ExprList_item pItem;
 					//= pList.a;
-					for (; i > 0; i--) {
+					for(;i>0;i--) {
 						//, pItem++){
-						pItem = pList.a [pList.nExpr - i];
-						if (ALWAYS (pItem.pExpr != null))
-							pItem.pExpr.flags |= EP_FixedDest;
+						pItem=pList.a[pList.nExpr-i];
+						if(ALWAYS(pItem.pExpr!=null))
+							pItem.pExpr.flags|=EP_FixedDest;
 					}
 				}
 				break;
 			}
 			}
-			if (pExpr.isAppropriateForFactoring () != 0) {
-				int r1 = ++pParse.nMem;
+			if(pExpr.isAppropriateForFactoring()!=0) {
+				int r1=++pParse.nMem;
 				int r2;
-				r2 = pParse.sqlite3ExprCodeTarget (pExpr, r1);
-				if (NEVER (r1 != r2))
-					pParse.sqlite3ReleaseTempReg (r1);
-				pExpr.Operator2 = pExpr.Operator;
-				pExpr.Operator = TokenType.TK_REGISTER;
-				pExpr.iTable = r2;
+				r2=pParse.sqlite3ExprCodeTarget(pExpr,r1);
+				if(NEVER(r1!=r2))
+					pParse.sqlite3ReleaseTempReg(r1);
+				pExpr.Operator2=pExpr.Operator;
+				pExpr.Operator=TokenType.TK_REGISTER;
+				pExpr.iTable=r2;
 				return WRC_Prune;
 			}
 			return WRC_Continue;
 		}
-
 		///<summary>
 		/// Preevaluate constant subexpressions within pExpr and store the
 		/// results in registers.  Modify pExpr so that the constant subexpresions
@@ -1470,48 +1380,46 @@ return null;
 		/// an incorrect 0 or 1 could lead to a malfunction.
 		///
 		///</summary>
-		static int sqlite3ExprCompare (Expr pA, Expr pB)
-		{
-			if (pA == null || pB == null) {
-				return pB == pA ? 0 : 2;
+		static int sqlite3ExprCompare(Expr pA,Expr pB) {
+			if(pA==null||pB==null) {
+				return pB==pA?0:2;
 			}
-			Debug.Assert (!ExprHasAnyProperty (pA, EP_TokenOnly | EP_Reduced));
-			Debug.Assert (!ExprHasAnyProperty (pB, EP_TokenOnly | EP_Reduced));
-			if (ExprHasProperty (pA, EP_xIsSelect) || ExprHasProperty (pB, EP_xIsSelect)) {
+			Debug.Assert(!pA.ExprHasAnyProperty(EP_TokenOnly|EP_Reduced));
+			Debug.Assert(!pB.ExprHasAnyProperty(EP_TokenOnly|EP_Reduced));
+			if(pA.ExprHasProperty(EP_xIsSelect)||pB.ExprHasProperty(EP_xIsSelect)) {
 				return 2;
 			}
-			if ((pA.flags & EP_Distinct) != (pB.flags & EP_Distinct))
+			if((pA.flags&EP_Distinct)!=(pB.flags&EP_Distinct))
 				return 2;
-			if (pA.Operator != pB.Operator)
+			if(pA.Operator!=pB.Operator)
 				return 2;
-			if (sqlite3ExprCompare (pA.pLeft, pB.pLeft) != 0)
+			if(sqlite3ExprCompare(pA.pLeft,pB.pLeft)!=0)
 				return 2;
-			if (sqlite3ExprCompare (pA.pRight, pB.pRight) != 0)
+			if(sqlite3ExprCompare(pA.pRight,pB.pRight)!=0)
 				return 2;
-			if (sqlite3ExprListCompare (pA.x.pList, pB.x.pList) != 0)
+			if(sqlite3ExprListCompare(pA.x.pList,pB.x.pList)!=0)
 				return 2;
-			if (pA.iTable != pB.iTable || pA.iColumn != pB.iColumn)
+			if(pA.iTable!=pB.iTable||pA.iColumn!=pB.iColumn)
 				return 2;
-			if (ExprHasProperty (pA, EP_IntValue)) {
-				if (!ExprHasProperty (pB, EP_IntValue) || pA.u.iValue != pB.u.iValue) {
+			if(pA.ExprHasProperty(EP_IntValue)) {
+				if(!pB.ExprHasProperty(EP_IntValue)||pA.u.iValue!=pB.u.iValue) {
 					return 2;
 				}
 			}
 			else
-				if (pA.Operator != TokenType.TK_COLUMN && pA.u.zToken != null) {
-					if (ExprHasProperty (pB, EP_IntValue) || NEVER (pB.u.zToken == null))
+				if(pA.Operator!=TokenType.TK_COLUMN&&pA.u.zToken!=null) {
+					if(pB.ExprHasProperty(EP_IntValue)||NEVER(pB.u.zToken==null))
 						return 2;
-					if (!pA.u.zToken.Equals (pB.u.zToken, StringComparison.InvariantCultureIgnoreCase)) {
+					if(!pA.u.zToken.Equals(pB.u.zToken,StringComparison.InvariantCultureIgnoreCase)) {
 						return 2;
 					}
 				}
-			if ((pA.flags & EP_ExpCollate) != (pB.flags & EP_ExpCollate))
+			if((pA.flags&EP_ExpCollate)!=(pB.flags&EP_ExpCollate))
 				return 1;
-			if ((pA.flags & EP_ExpCollate) != 0 && pA.pColl != pB.pColl)
+			if((pA.flags&EP_ExpCollate)!=0&&pA.pColl!=pB.pColl)
 				return 2;
 			return 0;
 		}
-
 		///<summary>
 		/// Compare two ExprList objects.  Return 0 if they are identical and
 		/// non-zero if they differ in any way.
@@ -1525,220 +1433,204 @@ return null;
 		/// always differs from a non-NULL pointer.
 		///
 		///</summary>
-		static int sqlite3ExprListCompare (ExprList pA, ExprList pB)
-		{
+		static int sqlite3ExprListCompare(ExprList pA,ExprList pB) {
 			int i;
-			if (pA == null && pB == null)
+			if(pA==null&&pB==null)
 				return 0;
-			if (pA == null || pB == null)
+			if(pA==null||pB==null)
 				return 1;
-			if (pA.nExpr != pB.nExpr)
+			if(pA.nExpr!=pB.nExpr)
 				return 1;
-			for (i = 0; i < pA.nExpr; i++) {
-				Expr pExprA = pA.a [i].pExpr;
-				Expr pExprB = pB.a [i].pExpr;
-				if (pA.a [i].sortOrder != pB.a [i].sortOrder)
+			for(i=0;i<pA.nExpr;i++) {
+				Expr pExprA=pA.a[i].pExpr;
+				Expr pExprB=pB.a[i].pExpr;
+				if(pA.a[i].sortOrder!=pB.a[i].sortOrder)
 					return 1;
-				if (sqlite3ExprCompare (pExprA, pExprB) != 0)
+				if(sqlite3ExprCompare(pExprA,pExprB)!=0)
 					return 1;
 			}
 			return 0;
 		}
-
 		///<summary>
 		/// Add a new element to the pAggInfo.aCol[] array.  Return the index of
 		/// the new element.  Return a negative number if malloc fails.
 		///
 		///</summary>
-		static int addAggInfoColumn (sqlite3 db, AggInfo pInfo)
-		{
-			int i = 0;
-			pInfo.aCol = sqlite3ArrayAllocate (db, pInfo.aCol, -1, //sizeof(pInfo.aCol[0]),
-			3, ref pInfo.nColumn, ref pInfo.nColumnAlloc, ref i);
+		static int addAggInfoColumn(sqlite3 db,AggInfo pInfo) {
+			int i=0;
+			pInfo.aCol=sqlite3ArrayAllocate(db,pInfo.aCol,-1,//sizeof(pInfo.aCol[0]),
+			3,ref pInfo.nColumn,ref pInfo.nColumnAlloc,ref i);
 			return i;
 		}
-
 		///<summary>
 		/// Add a new element to the pAggInfo.aFunc[] array.  Return the index of
 		/// the new element.  Return a negative number if malloc fails.
 		///
 		///</summary>
-		static int addAggInfoFunc (sqlite3 db, AggInfo pInfo)
-		{
-			int i = 0;
-			pInfo.aFunc = sqlite3ArrayAllocate (db, pInfo.aFunc, -1, //sizeof(pInfo.aFunc[0]),
-			3, ref pInfo.nFunc, ref pInfo.nFuncAlloc, ref i);
+		static int addAggInfoFunc(sqlite3 db,AggInfo pInfo) {
+			int i=0;
+			pInfo.aFunc=sqlite3ArrayAllocate(db,pInfo.aFunc,-1,//sizeof(pInfo.aFunc[0]),
+			3,ref pInfo.nFunc,ref pInfo.nFuncAlloc,ref i);
 			return i;
 		}
-
 		///<summary>
 		/// This is the xExprCallback for a tree walker.  It is used to
 		/// implement sqlite3ExprAnalyzeAggregates().  See sqlite3ExprAnalyzeAggregates
 		/// for additional information.
 		///
 		///</summary>
-		static int analyzeAggregate (Walker pWalker, ref Expr pExpr)
-		{
+		static int analyzeAggregate(Walker pWalker,ref Expr pExpr) {
 			int i;
-			NameContext pNC = pWalker.u.pNC;
-			Parse pParse = pNC.pParse;
-			SrcList pSrcList = pNC.pSrcList;
-			AggInfo pAggInfo = pNC.pAggInfo;
-			switch (pExpr.Operator) {
+			NameContext pNC=pWalker.u.pNC;
+			Parse pParse=pNC.pParse;
+			SrcList pSrcList=pNC.pSrcList;
+			AggInfo pAggInfo=pNC.pAggInfo;
+			switch(pExpr.Operator) {
 			case TokenType.TK_AGG_COLUMN:
 			case TokenType.TK_COLUMN: {
-				testcase (pExpr.Operator == TokenType.TK_AGG_COLUMN);
-				testcase (pExpr.Operator == TokenType.TK_COLUMN);
+				testcase(pExpr.Operator==TokenType.TK_AGG_COLUMN);
+				testcase(pExpr.Operator==TokenType.TK_COLUMN);
 				///
-///<summary>
-///Check to see if the column is in one of the tables in the FROM
-///clause of the aggregate query 
-///</summary>
-
-				if (ALWAYS (pSrcList != null)) {
+				///<summary>
+				///Check to see if the column is in one of the tables in the FROM
+				///clause of the aggregate query 
+				///</summary>
+				if(ALWAYS(pSrcList!=null)) {
 					SrcList_item pItem;
 					// = pSrcList.a;
-					for (i = 0; i < pSrcList.nSrc; i++) {
+					for(i=0;i<pSrcList.nSrc;i++) {
 						//, pItem++){
-						pItem = pSrcList.a [i];
+						pItem=pSrcList.a[i];
 						AggInfo_col pCol;
-						Debug.Assert (!ExprHasAnyProperty (pExpr, EP_TokenOnly | EP_Reduced));
-						if (pExpr.iTable == pItem.iCursor) {
+						Debug.Assert(!pExpr.ExprHasAnyProperty(EP_TokenOnly|EP_Reduced));
+						if(pExpr.iTable==pItem.iCursor) {
 							///
-///<summary>
-///If we reach this point, it means that pExpr refers to a table
-///that is in the FROM clause of the aggregate query.
-///
-///Make an entry for the column in pAggInfo.aCol[] if there
-///is not an entry there already.
-///
-///</summary>
-
+							///<summary>
+							///If we reach this point, it means that pExpr refers to a table
+							///that is in the FROM clause of the aggregate query.
+							///
+							///Make an entry for the column in pAggInfo.aCol[] if there
+							///is not an entry there already.
+							///
+							///</summary>
 							int k;
 							//pCol = pAggInfo.aCol;
-							for (k = 0; k < pAggInfo.nColumn; k++) {
+							for(k=0;k<pAggInfo.nColumn;k++) {
 								//, pCol++){
-								pCol = pAggInfo.aCol [k];
-								if (pCol.iTable == pExpr.iTable && pCol.iColumn == pExpr.iColumn) {
+								pCol=pAggInfo.aCol[k];
+								if(pCol.iTable==pExpr.iTable&&pCol.iColumn==pExpr.iColumn) {
 									break;
 								}
 							}
-							if ((k >= pAggInfo.nColumn) && (k = addAggInfoColumn (pParse.db, pAggInfo)) >= 0) {
-								pCol = pAggInfo.aCol [k];
-								pCol.pTab = pExpr.pTab;
-								pCol.iTable = pExpr.iTable;
-								pCol.iColumn = pExpr.iColumn;
-								pCol.iMem = ++pParse.nMem;
-								pCol.iSorterColumn = -1;
-								pCol.pExpr = pExpr;
-								if (pAggInfo.pGroupBy != null) {
-									int j, n;
-									ExprList pGB = pAggInfo.pGroupBy;
+							if((k>=pAggInfo.nColumn)&&(k=addAggInfoColumn(pParse.db,pAggInfo))>=0) {
+								pCol=pAggInfo.aCol[k];
+								pCol.pTab=pExpr.pTab;
+								pCol.iTable=pExpr.iTable;
+								pCol.iColumn=pExpr.iColumn;
+								pCol.iMem=++pParse.nMem;
+								pCol.iSorterColumn=-1;
+								pCol.pExpr=pExpr;
+								if(pAggInfo.pGroupBy!=null) {
+									int j,n;
+									ExprList pGB=pAggInfo.pGroupBy;
 									ExprList_item pTerm;
 									// = pGB.a;
-									n = pGB.nExpr;
-									for (j = 0; j < n; j++) {
+									n=pGB.nExpr;
+									for(j=0;j<n;j++) {
 										//, pTerm++){
-										pTerm = pGB.a [j];
-										Expr pE = pTerm.pExpr;
-										if (pE.Operator == TokenType.TK_COLUMN && pE.iTable == pExpr.iTable && pE.iColumn == pExpr.iColumn) {
-											pCol.iSorterColumn = j;
+										pTerm=pGB.a[j];
+										Expr pE=pTerm.pExpr;
+										if(pE.Operator==TokenType.TK_COLUMN&&pE.iTable==pExpr.iTable&&pE.iColumn==pExpr.iColumn) {
+											pCol.iSorterColumn=j;
 											break;
 										}
 									}
 								}
-								if (pCol.iSorterColumn < 0) {
-									pCol.iSorterColumn = pAggInfo.nSortingColumn++;
+								if(pCol.iSorterColumn<0) {
+									pCol.iSorterColumn=pAggInfo.nSortingColumn++;
 								}
 							}
 							///
-///<summary>
-///There is now an entry for pExpr in pAggInfo.aCol[] (either
-///because it was there before or because we just created it).
-///Convert the pExpr to be a TK_AGG_COLUMN referring to that
-///pAggInfo.aCol[] entry.
-///
-///</summary>
-
-							ExprSetIrreducible (pExpr);
-							pExpr.pAggInfo = pAggInfo;
-							pExpr.Operator = TokenType.TK_AGG_COLUMN;
-							pExpr.iAgg = (short)k;
+							///<summary>
+							///There is now an entry for pExpr in pAggInfo.aCol[] (either
+							///because it was there before or because we just created it).
+							///Convert the pExpr to be a TK_AGG_COLUMN referring to that
+							///pAggInfo.aCol[] entry.
+							///
+							///</summary>
+							pExpr.ExprSetIrreducible();
+							pExpr.pAggInfo=pAggInfo;
+							pExpr.Operator=TokenType.TK_AGG_COLUMN;
+							pExpr.iAgg=(short)k;
 							break;
 						}
 						///
-///<summary>
-///endif pExpr.iTable==pItem.iCursor 
-///</summary>
-
+						///<summary>
+						///endif pExpr.iTable==pItem.iCursor 
+						///</summary>
 					}
 					///
-///<summary>
-///end loop over pSrcList 
-///</summary>
-
+					///<summary>
+					///end loop over pSrcList 
+					///</summary>
 				}
 				return WRC_Prune;
 			}
 			case TokenType.TK_AGG_FUNCTION: {
 				///
-///<summary>
-///The pNC.nDepth==0 test causes aggregate functions in subqueries
-///to be ignored 
-///</summary>
-
-				if (pNC.nDepth == 0) {
+				///<summary>
+				///The pNC.nDepth==0 test causes aggregate functions in subqueries
+				///to be ignored 
+				///</summary>
+				if(pNC.nDepth==0) {
 					///
-///<summary>
-///Check to see if pExpr is a duplicate of another aggregate
-///function that is already in the pAggInfo structure
-///
-///</summary>
-
+					///<summary>
+					///Check to see if pExpr is a duplicate of another aggregate
+					///function that is already in the pAggInfo structure
+					///
+					///</summary>
 					AggInfo_func pItem;
 					// = pAggInfo.aFunc;
-					for (i = 0; i < pAggInfo.nFunc; i++) {
+					for(i=0;i<pAggInfo.nFunc;i++) {
 						//, pItem++){
-						pItem = pAggInfo.aFunc [i];
-						if (sqlite3ExprCompare (pItem.pExpr, pExpr) == 0) {
+						pItem=pAggInfo.aFunc[i];
+						if(sqlite3ExprCompare(pItem.pExpr,pExpr)==0) {
 							break;
 						}
 					}
-					if (i >= pAggInfo.nFunc) {
+					if(i>=pAggInfo.nFunc) {
 						///
-///<summary>
-///pExpr is original.  Make a new entry in pAggInfo.aFunc[]
-///
-///</summary>
-
-						SqliteEncoding enc = pParse.db.aDbStatic [0].pSchema.enc;
+						///<summary>
+						///pExpr is original.  Make a new entry in pAggInfo.aFunc[]
+						///
+						///</summary>
+						SqliteEncoding enc=pParse.db.aDbStatic[0].pSchema.enc;
 						// ENC(pParse.db);
-						i = addAggInfoFunc (pParse.db, pAggInfo);
-						if (i >= 0) {
-							Debug.Assert (!ExprHasProperty (pExpr, EP_xIsSelect));
-							pItem = pAggInfo.aFunc [i];
-							pItem.pExpr = pExpr;
-							pItem.iMem = ++pParse.nMem;
-							Debug.Assert (!ExprHasProperty (pExpr, EP_IntValue));
-							pItem.pFunc = sqlite3FindFunction (pParse.db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30 (pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0);
-							if ((pExpr.flags & EP_Distinct) != 0) {
-								pItem.iDistinct = pParse.nTab++;
+						i=addAggInfoFunc(pParse.db,pAggInfo);
+						if(i>=0) {
+							Debug.Assert(!pExpr.ExprHasProperty(EP_xIsSelect));
+							pItem=pAggInfo.aFunc[i];
+							pItem.pExpr=pExpr;
+							pItem.iMem=++pParse.nMem;
+							Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
+							pItem.pFunc=sqlite3FindFunction(pParse.db,pExpr.u.zToken,StringExtensions.sqlite3Strlen30(pExpr.u.zToken),pExpr.x.pList!=null?pExpr.x.pList.nExpr:0,enc,0);
+							if((pExpr.flags&EP_Distinct)!=0) {
+								pItem.iDistinct=pParse.nTab++;
 							}
 							else {
-								pItem.iDistinct = -1;
+								pItem.iDistinct=-1;
 							}
 						}
 					}
 					///
-///<summary>
-///Make pExpr point to the appropriate pAggInfo.aFunc[] entry
-///
-///</summary>
-
-					Debug.Assert (!ExprHasAnyProperty (pExpr, EP_TokenOnly | EP_Reduced));
-					ExprSetIrreducible (pExpr);
-					pExpr.iAgg = (short)i;
-					pExpr.pAggInfo = pAggInfo;
+					///<summary>
+					///Make pExpr point to the appropriate pAggInfo.aFunc[] entry
+					///
+					///</summary>
+					Debug.Assert(!pExpr.ExprHasAnyProperty(EP_TokenOnly|EP_Reduced));
+					pExpr.ExprSetIrreducible();
+					pExpr.iAgg=(short)i;
+					pExpr.pAggInfo=pAggInfo;
 					return WRC_Prune;
 				}
 				break;
@@ -1746,13 +1638,11 @@ return null;
 			}
 			return WRC_Continue;
 		}
-
-		static int analyzeAggregatesInSelect (Walker pWalker, Select pSelect)
-		{
-			NameContext pNC = pWalker.u.pNC;
-			if (pNC.nDepth == 0) {
+		static int analyzeAggregatesInSelect(Walker pWalker,Select pSelect) {
+			NameContext pNC=pWalker.u.pNC;
+			if(pNC.nDepth==0) {
 				pNC.nDepth++;
-				pWalker.sqlite3WalkSelect (pSelect);
+				pWalker.sqlite3WalkSelect(pSelect);
 				pNC.nDepth--;
 				return WRC_Prune;
 			}
@@ -1760,7 +1650,6 @@ return null;
 				return WRC_Continue;
 			}
 		}
-
 		///<summary>
 		/// Analyze the given expression looking for aggregate functions and
 		/// for variables that need to be added to the pParse.aAgg[] array.
@@ -1770,16 +1659,14 @@ return null;
 		/// analyzed by sqlite3ResolveExprNames().
 		///
 		///</summary>
-		static void sqlite3ExprAnalyzeAggregates (NameContext pNC, ref Expr pExpr)
-		{
-			Walker w = new Walker ();
-			w.xExprCallback = (dxExprCallback)analyzeAggregate;
-			w.xSelectCallback = (dxSelectCallback)analyzeAggregatesInSelect;
-			w.u.pNC = pNC;
-			Debug.Assert (pNC.pSrcList != null);
-			w.sqlite3WalkExpr (ref pExpr);
+		static void sqlite3ExprAnalyzeAggregates(NameContext pNC,ref Expr pExpr) {
+			Walker w=new Walker();
+			w.xExprCallback=(dxExprCallback)analyzeAggregate;
+			w.xSelectCallback=(dxSelectCallback)analyzeAggregatesInSelect;
+			w.u.pNC=pNC;
+			Debug.Assert(pNC.pSrcList!=null);
+			w.sqlite3WalkExpr(ref pExpr);
 		}
-
 		///<summary>
 		/// Call sqlite3ExprAnalyzeAggregates() for every expression in an
 		/// expression list.  Return the number of errors.
@@ -1787,15 +1674,14 @@ return null;
 		/// If an error is found, the analysis is cut short.
 		///
 		///</summary>
-		static void sqlite3ExprAnalyzeAggList (NameContext pNC, ExprList pList)
-		{
+		static void sqlite3ExprAnalyzeAggList(NameContext pNC,ExprList pList) {
 			ExprList_item pItem;
 			int i;
-			if (pList != null) {
-				for (i = 0; i < pList.nExpr; i++)//, pItem++)
+			if(pList!=null) {
+				for(i=0;i<pList.nExpr;i++)//, pItem++)
 				 {
-					pItem = pList.a [i];
-					sqlite3ExprAnalyzeAggregates (pNC, ref pItem.pExpr);
+					pItem=pList.a[i];
+					sqlite3ExprAnalyzeAggregates(pNC,ref pItem.pExpr);
 				}
 			}
 		}

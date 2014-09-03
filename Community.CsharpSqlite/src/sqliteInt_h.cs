@@ -4,20 +4,18 @@ using System.Diagnostics;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
-using Bitmask = System.UInt64;
-using i16 = System.Int16;
-using i64 = System.Int64;
-using sqlite3_int64 = System.Int64;
-using u8 = System.Byte;
-using u16 = System.UInt16;
-using u32 = System.UInt32;
-using u64 = System.UInt64;
-using unsigned = System.UInt64;
-using Pgno = System.UInt32;
-
+using Bitmask=System.UInt64;
+using i16=System.Int16;
+using i64=System.Int64;
+using sqlite3_int64=System.Int64;
+using u8=System.Byte;
+using u16=System.UInt16;
+using u32=System.UInt32;
+using u64=System.UInt64;
+using unsigned=System.UInt64;
+using Pgno=System.UInt32;
 #if !SQLITE_MAX_VARIABLE_NUMBER
-using ynVar = System.Int16;
-
+using ynVar=System.Int16;
 #else
 using ynVar = System.Int32; 
 #endif
@@ -25,70 +23,62 @@ using ynVar = System.Int32;
 ///<summary>
 ///The yDbMask datatype for the bitmask of all attached databases.
 ///</summary>
-
 #if SQLITE_MAX_ATTACHED
 //  typedef sqlite3_uint64 yDbMask;
 using yDbMask = System.Int64; 
 #else
 //  typedef unsigned int yDbMask;
-using yDbMask = System.Int32;
-
+using yDbMask=System.Int32;
 #endif
-namespace Community.CsharpSqlite
-{
-	using sqlite3_value = Sqlite3.Mem;
-
-	
-	public partial class Sqlite3
-	{
+namespace Community.CsharpSqlite {
+	using sqlite3_value=Sqlite3.Mem;
+	public partial class Sqlite3 {
 		///
-///<summary>
-///2001 September 15
-///
-///The author disclaims copyright to this source code.  In place of
-///a legal notice, here is a blessing:
-///
-///May you do good and not evil.
-///May you find forgiveness for yourself and forgive others.
-///May you share freely, never taking more than you give.
-///
-///
-///Internal interface definitions for SQLite.
-///
-///
-///</summary>
-///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
-///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
-///<param name=""></param>
-///<param name="SQLITE_SOURCE_ID: 2011">23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2</param>
-///<param name=""></param>
-///<param name=""></param>
-///<param name=""></param>
-
+		///<summary>
+		///2001 September 15
+		///
+		///The author disclaims copyright to this source code.  In place of
+		///a legal notice, here is a blessing:
+		///
+		///May you do good and not evil.
+		///May you find forgiveness for yourself and forgive others.
+		///May you share freely, never taking more than you give.
+		///
+		///
+		///Internal interface definitions for SQLite.
+		///
+		///
+		///</summary>
+		///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+		///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+		///<param name=""></param>
+		///<param name="SQLITE_SOURCE_ID: 2011">23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2</param>
+		///<param name=""></param>
+		///<param name=""></param>
+		///<param name=""></param>
 		//#if !_SQLITEINT_H_
 		//#define _SQLITEINT_H_
 		///
-///<summary>
-///These #defines should enable >2GB file support on POSIX if the
-///underlying operating system supports it.  If the OS lacks
-///</summary>
-///<param name="large file support, or if the OS is windows, these should be no">ops.</param>
-///<param name=""></param>
-///<param name="Ticket #2739:  The _LARGEFILE_SOURCE macro must appear before any">Ticket #2739:  The _LARGEFILE_SOURCE macro must appear before any</param>
-///<param name="system #includes.  Hence, this block of code must be the very first">system #includes.  Hence, this block of code must be the very first</param>
-///<param name="code in all source files.">code in all source files.</param>
-///<param name=""></param>
-///<param name="Large file support can be disabled using the ">DSQLITE_DISABLE_LFS switch</param>
-///<param name="on the compiler command line.  This is necessary if you are compiling">on the compiler command line.  This is necessary if you are compiling</param>
-///<param name="on a recent machine (ex: Red Hat 7.2) but you want your code to work">on a recent machine (ex: Red Hat 7.2) but you want your code to work</param>
-///<param name="on an older machine (ex: Red Hat 6.0).  If you compile on Red Hat 7.2">on an older machine (ex: Red Hat 6.0).  If you compile on Red Hat 7.2</param>
-///<param name="without this option, LFS is enable.  But LFS does not exist in the kernel">without this option, LFS is enable.  But LFS does not exist in the kernel</param>
-///<param name="in Red Hat 6.0, so the code won't work.  Hence, for maximum binary">in Red Hat 6.0, so the code won't work.  Hence, for maximum binary</param>
-///<param name="portability you should omit LFS.">portability you should omit LFS.</param>
-///<param name=""></param>
-///<param name="Similar is true for Mac OS X.  LFS is only supported on Mac OS X 9 and later.">Similar is true for Mac OS X.  LFS is only supported on Mac OS X 9 and later.</param>
-///<param name=""></param>
-
+		///<summary>
+		///These #defines should enable >2GB file support on POSIX if the
+		///underlying operating system supports it.  If the OS lacks
+		///</summary>
+		///<param name="large file support, or if the OS is windows, these should be no">ops.</param>
+		///<param name=""></param>
+		///<param name="Ticket #2739:  The _LARGEFILE_SOURCE macro must appear before any">Ticket #2739:  The _LARGEFILE_SOURCE macro must appear before any</param>
+		///<param name="system #includes.  Hence, this block of code must be the very first">system #includes.  Hence, this block of code must be the very first</param>
+		///<param name="code in all source files.">code in all source files.</param>
+		///<param name=""></param>
+		///<param name="Large file support can be disabled using the ">DSQLITE_DISABLE_LFS switch</param>
+		///<param name="on the compiler command line.  This is necessary if you are compiling">on the compiler command line.  This is necessary if you are compiling</param>
+		///<param name="on a recent machine (ex: Red Hat 7.2) but you want your code to work">on a recent machine (ex: Red Hat 7.2) but you want your code to work</param>
+		///<param name="on an older machine (ex: Red Hat 6.0).  If you compile on Red Hat 7.2">on an older machine (ex: Red Hat 6.0).  If you compile on Red Hat 7.2</param>
+		///<param name="without this option, LFS is enable.  But LFS does not exist in the kernel">without this option, LFS is enable.  But LFS does not exist in the kernel</param>
+		///<param name="in Red Hat 6.0, so the code won't work.  Hence, for maximum binary">in Red Hat 6.0, so the code won't work.  Hence, for maximum binary</param>
+		///<param name="portability you should omit LFS.">portability you should omit LFS.</param>
+		///<param name=""></param>
+		///<param name="Similar is true for Mac OS X.  LFS is only supported on Mac OS X 9 and later.">Similar is true for Mac OS X.  LFS is only supported on Mac OS X 9 and later.</param>
+		///<param name=""></param>
 		//#if !SQLITE_DISABLE_LFS
 		//# define _LARGE_FILE       1
 		//# ifndef _FILE_OFFSET_BITS
@@ -97,21 +87,19 @@ namespace Community.CsharpSqlite
 		//# define _LARGEFILE_SOURCE 1
 		//#endif
 		///
-///<summary>
-///Include the configuration header output by 'configure' if we're using the
-///</summary>
-///<param name="autoconf">based build</param>
-///<param name=""></param>
-
+		///<summary>
+		///Include the configuration header output by 'configure' if we're using the
+		///</summary>
+		///<param name="autoconf">based build</param>
+		///<param name=""></param>
 		#if _HAVE_SQLITE_CONFIG_H
-																																																										//include "config.h"
+																																																												//include "config.h"
 #endif
 		//#include "sqliteLimit.h"
 		///
-///<summary>
-///Disable nuisance warnings on Borland compilers 
-///</summary>
-
+		///<summary>
+		///Disable nuisance warnings on Borland compilers 
+		///</summary>
 		//#if (__BORLANDC__)
 		//#pragma warn -rch /* unreachable code */
 		//#pragma warn -ccc /* Condition is always true or false */
@@ -120,54 +108,49 @@ namespace Community.CsharpSqlite
 		//#pragma warn -spa /* Suspicious pointer arithmetic */
 		//#endif
 		///
-///<summary>
-///Needed for various definitions... 
-///</summary>
-
+		///<summary>
+		///Needed for various definitions... 
+		///</summary>
 		//#if !_GNU_SOURCE
 		//#define _GNU_SOURCE
 		//#endif
 		///
-///<summary>
-///Include standard header files as necessary
-///
-///</summary>
-
+		///<summary>
+		///Include standard header files as necessary
+		///
+		///</summary>
 		#if HAVE_STDINT_H
-																																																										//include <stdint.h>
+																																																												//include <stdint.h>
 #endif
 		#if HAVE_INTTYPES_H
-																																																										//include <inttypes.h>
+																																																												//include <inttypes.h>
 #endif
 		///
-///<summary>
-///The number of samples of an index that SQLite takes in order to 
-///construct a histogram of the table content when running ANALYZE
-///and with SQLITE_ENABLE_STAT2
-///</summary>
-
+		///<summary>
+		///The number of samples of an index that SQLite takes in order to 
+		///construct a histogram of the table content when running ANALYZE
+		///and with SQLITE_ENABLE_STAT2
+		///</summary>
 		//#define SQLITE_INDEX_SAMPLES 10
-		public const int SQLITE_INDEX_SAMPLES = 10;
-
+		public const int SQLITE_INDEX_SAMPLES=10;
 		///
-///<summary>
-///The following macros are used to cast pointers to integers and
-///integers to pointers.  The way you do this varies from one compiler
-///to the next, so we have developed the following set of #if statements
-///to generate appropriate macros for a wide range of compilers.
-///
-///The correct "ANSI" way to do this is to use the intptr_t type. 
-///Unfortunately, that typedef is not available on all compilers, or
-///if it is available, it requires an #include of specific headers
-///that vary from one machine to the next.
-///
-///</summary>
-///<param name="Ticket #3860:  The llvm">4.2 compiler from Apple chokes on</param>
-///<param name="the ((void)&((char)0)[X]) construct.  But MSVC chokes on ((void)(X)).">the ((void)&((char)0)[X]) construct.  But MSVC chokes on ((void)(X)).</param>
-///<param name="So we have to define the macros in different ways depending on the">So we have to define the macros in different ways depending on the</param>
-///<param name="compiler.">compiler.</param>
-///<param name=""></param>
-
+		///<summary>
+		///The following macros are used to cast pointers to integers and
+		///integers to pointers.  The way you do this varies from one compiler
+		///to the next, so we have developed the following set of #if statements
+		///to generate appropriate macros for a wide range of compilers.
+		///
+		///The correct "ANSI" way to do this is to use the intptr_t type. 
+		///Unfortunately, that typedef is not available on all compilers, or
+		///if it is available, it requires an #include of specific headers
+		///that vary from one machine to the next.
+		///
+		///</summary>
+		///<param name="Ticket #3860:  The llvm">4.2 compiler from Apple chokes on</param>
+		///<param name="the ((void)&((char)0)[X]) construct.  But MSVC chokes on ((void)(X)).">the ((void)&((char)0)[X]) construct.  But MSVC chokes on ((void)(X)).</param>
+		///<param name="So we have to define the macros in different ways depending on the">So we have to define the macros in different ways depending on the</param>
+		///<param name="compiler.">compiler.</param>
+		///<param name=""></param>
 		//#if (__PTRDIFF_TYPE__)  /* This case should work for GCC */
 		//# define SQLITE_INT_TO_PTR(X)  ((void)(__PTRDIFF_TYPE__)(X))
 		//# define SQLITE_PTR_TO_INT(X)  ((int)(__PTRDIFF_TYPE__)(X))
@@ -182,56 +165,51 @@ namespace Community.CsharpSqlite
 		//# define SQLITE_PTR_TO_INT(X)  ((int)(X))
 		//#endif
 		///
-///<summary>
-///The SQLITE_THREADSAFE macro must be defined as 0, 1, or 2.
-///0 means mutexes are permanently disable and the library is never
-///threadsafe.  1 means the library is serialized which is the highest
-///</summary>
-///<param name="level of threadsafety.  2 means the libary is multithreaded "> multiple</param>
-///<param name="threads can use SQLite as long as no two threads try to use the same">threads can use SQLite as long as no two threads try to use the same</param>
-///<param name="database connection at the same time.">database connection at the same time.</param>
-///<param name=""></param>
-///<param name="Older versions of SQLite used an optional THREADSAFE macro.">Older versions of SQLite used an optional THREADSAFE macro.</param>
-///<param name="We support that for legacy.">We support that for legacy.</param>
-///<param name=""></param>
-
+		///<summary>
+		///The SQLITE_THREADSAFE macro must be defined as 0, 1, or 2.
+		///0 means mutexes are permanently disable and the library is never
+		///threadsafe.  1 means the library is serialized which is the highest
+		///</summary>
+		///<param name="level of threadsafety.  2 means the libary is multithreaded "> multiple</param>
+		///<param name="threads can use SQLite as long as no two threads try to use the same">threads can use SQLite as long as no two threads try to use the same</param>
+		///<param name="database connection at the same time.">database connection at the same time.</param>
+		///<param name=""></param>
+		///<param name="Older versions of SQLite used an optional THREADSAFE macro.">Older versions of SQLite used an optional THREADSAFE macro.</param>
+		///<param name="We support that for legacy.">We support that for legacy.</param>
+		///<param name=""></param>
 		#if !SQLITE_THREADSAFE
 		//# define SQLITE_THREADSAFE 2
-		private const int SQLITE_THREADSAFE = 2;
-
+		private const int SQLITE_THREADSAFE=2;
 		#else
-																																																										    const int SQLITE_THREADSAFE = 2; /* IMP: R-07272-22309 */
+																																																												    const int SQLITE_THREADSAFE = 2; /* IMP: R-07272-22309 */
 #endif
 		///
-///<summary>
-///The SQLITE_DEFAULT_MEMSTATUS macro must be defined as either 0 or 1.
-///It determines whether or not the features related to
-///SQLITE_CONFIG_MEMSTATUS are available by default or not. This value can
-///be overridden at runtime using the sqlite3_config() API.
-///</summary>
-
+		///<summary>
+		///The SQLITE_DEFAULT_MEMSTATUS macro must be defined as either 0 or 1.
+		///It determines whether or not the features related to
+		///SQLITE_CONFIG_MEMSTATUS are available by default or not. This value can
+		///be overridden at runtime using the sqlite3_config() API.
+		///</summary>
 		#if !(SQLITE_DEFAULT_MEMSTATUS)
 		//# define SQLITE_DEFAULT_MEMSTATUS 1
-		private const int SQLITE_DEFAULT_MEMSTATUS = 0;
-
+		private const int SQLITE_DEFAULT_MEMSTATUS=0;
 		#else
-																																																										const int SQLITE_DEFAULT_MEMSTATUS = 1;
+																																																												const int SQLITE_DEFAULT_MEMSTATUS = 1;
 #endif
 		///
-///<summary>
-///Exactly one of the following macros must be defined in order to
-///specify which memory allocation subsystem to use.
-///
-///SQLITE_SYSTEM_MALLOC          // Use normal system malloc()
-///SQLITE_MEMDEBUG               // Debugging version of system malloc()
-///
-///(Historical note:  There used to be several other options, but we've
-///pared it down to just these two.)
-///
-///If none of the above are defined, then set SQLITE_SYSTEM_MALLOC as
-///the default.
-///</summary>
-
+		///<summary>
+		///Exactly one of the following macros must be defined in order to
+		///specify which memory allocation subsystem to use.
+		///
+		///SQLITE_SYSTEM_MALLOC          // Use normal system malloc()
+		///SQLITE_MEMDEBUG               // Debugging version of system malloc()
+		///
+		///(Historical note:  There used to be several other options, but we've
+		///pared it down to just these two.)
+		///
+		///If none of the above are defined, then set SQLITE_SYSTEM_MALLOC as
+		///the default.
+		///</summary>
 		//#if (SQLITE_SYSTEM_MALLOC)+defined(SQLITE_MEMDEBUG)+\
 		//# error "At most one of the following compile-time configuration options\
 		// is allows: SQLITE_SYSTEM_MALLOC, SQLITE_MEMDEBUG"
@@ -240,53 +218,48 @@ namespace Community.CsharpSqlite
 		//# define SQLITE_SYSTEM_MALLOC 1
 		//#endif
 		///
-///<summary>
-///If SQLITE_MALLOC_SOFT_LIMIT is not zero, then try to keep the
-///sizes of memory allocations below this value where possible.
-///
-///</summary>
-
+		///<summary>
+		///If SQLITE_MALLOC_SOFT_LIMIT is not zero, then try to keep the
+		///sizes of memory allocations below this value where possible.
+		///
+		///</summary>
 		#if !(SQLITE_MALLOC_SOFT_LIMIT)
-		private const int SQLITE_MALLOC_SOFT_LIMIT = 1024;
-
+		private const int SQLITE_MALLOC_SOFT_LIMIT=1024;
 		#endif
 		///
-///<summary>
-///We need to define _XOPEN_SOURCE as follows in order to enable
-///recursive mutexes on most Unix systems.  But Mac OS X is different.
-///The _XOPEN_SOURCE define causes problems for Mac OS X we are told,
-///so it is omitted there.  See ticket #2673.
-///
-///Later we learn that _XOPEN_SOURCE is poorly or incorrectly
-///implemented on some systems.  So we avoid defining it at all
-///if it is already defined or if it is unneeded because we are
-///not doing a threadsafe build.  Ticket #2681.
-///
-///See also ticket #2741.
-///</summary>
-
+		///<summary>
+		///We need to define _XOPEN_SOURCE as follows in order to enable
+		///recursive mutexes on most Unix systems.  But Mac OS X is different.
+		///The _XOPEN_SOURCE define causes problems for Mac OS X we are told,
+		///so it is omitted there.  See ticket #2673.
+		///
+		///Later we learn that _XOPEN_SOURCE is poorly or incorrectly
+		///implemented on some systems.  So we avoid defining it at all
+		///if it is already defined or if it is unneeded because we are
+		///not doing a threadsafe build.  Ticket #2681.
+		///
+		///See also ticket #2741.
+		///</summary>
 		#if !_XOPEN_SOURCE && !__DARWIN__ && !__APPLE__ && SQLITE_THREADSAFE
-																																																										    const int _XOPEN_SOURCE = 500;//define _XOPEN_SOURCE 500  /* Needed to enable pthread recursive mutexes */
+																																																												    const int _XOPEN_SOURCE = 500;//define _XOPEN_SOURCE 500  /* Needed to enable pthread recursive mutexes */
 #endif
 		///
-///<summary>
-///The TCL headers are only needed when compiling the TCL bindings.
-///</summary>
-
+		///<summary>
+		///The TCL headers are only needed when compiling the TCL bindings.
+		///</summary>
 		#if SQLITE_TCL || TCLSH
-																																																										    // include <tcl.h>
+																																																												    // include <tcl.h>
 #endif
 		///
-///<summary>
-///</summary>
-///<param name="Many people are failing to set ">DNDEBUG=1 when compiling SQLite.</param>
-///<param name="Setting NDEBUG makes the code smaller and run faster.  So the following">Setting NDEBUG makes the code smaller and run faster.  So the following</param>
-///<param name="lines are added to automatically set NDEBUG unless the ">DSQLITE_DEBUG=1</param>
-///<param name="option is set.  Thus NDEBUG becomes an opt">out</param>
-///<param name="feature.">feature.</param>
-
+		///<summary>
+		///</summary>
+		///<param name="Many people are failing to set ">DNDEBUG=1 when compiling SQLite.</param>
+		///<param name="Setting NDEBUG makes the code smaller and run faster.  So the following">Setting NDEBUG makes the code smaller and run faster.  So the following</param>
+		///<param name="lines are added to automatically set NDEBUG unless the ">DSQLITE_DEBUG=1</param>
+		///<param name="option is set.  Thus NDEBUG becomes an opt">out</param>
+		///<param name="feature.">feature.</param>
 		#if !NDEBUG && !SQLITE_DEBUG
-																																																										const int NDEBUG = 1;// define NDEBUG 1
+																																																												const int NDEBUG = 1;// define NDEBUG 1
 #endif
 		///<summary>
 		/// The testcase() macro is used to aid in coverage testing.  When
@@ -303,40 +276,36 @@ namespace Community.CsharpSqlite
 		///
 		///</summary>
 		#if SQLITE_COVERAGE_TEST
-																																																										void sqlite3Coverage(int);
+																																																												void sqlite3Coverage(int);
 // define testcase(X)  if( X ){ sqlite3Coverage(__LINE__); }
 #else
 		//# define testcase(X)
-		private static void testcase<T> (T X)
-		{
+		private static void testcase<T>(T X) {
 		}
-
 		#endif
 		///
-///<summary>
-///The TESTONLY macro is used to enclose variable declarations or
-///other bits of code that are needed to support the arguments
-///within testcase() and Debug.Assert() macros.
-///</summary>
-
+		///<summary>
+		///The TESTONLY macro is used to enclose variable declarations or
+		///other bits of code that are needed to support the arguments
+		///within testcase() and Debug.Assert() macros.
+		///</summary>
 		#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																										    // define TESTONLY(X)  X
+																																																												    // define TESTONLY(X)  X
     // -- Need workaround for C, since inline macros don't exist
 #else
 		//# define TESTONLY(X)
 		#endif
 		///
-///<summary>
-///Sometimes we need a small amount of code such as a variable initialization
-///to setup for a later Debug.Assert() statement.  We do not want this code to
-///appear when Debug.Assert() is disabled.  The following macro is therefore
-///used to contain that setup code.  The "VVA" acronym stands for
-///"Verification, Validation, and Accreditation".  In other words, the
-///code within VVA_ONLY() will only run during verification processes.
-///</summary>
-
+		///<summary>
+		///Sometimes we need a small amount of code such as a variable initialization
+		///to setup for a later Debug.Assert() statement.  We do not want this code to
+		///appear when Debug.Assert() is disabled.  The following macro is therefore
+		///used to contain that setup code.  The "VVA" acronym stands for
+		///"Verification, Validation, and Accreditation".  In other words, the
+		///code within VVA_ONLY() will only run during verification processes.
+		///</summary>
 		#if !NDEBUG
-																																																										    // define VVA_ONLY(X)  X
+																																																												    // define VVA_ONLY(X)  X
 #else
 		//# define VVA_ONLY(X)
 		#endif
@@ -356,10 +325,10 @@ namespace Community.CsharpSqlite
 		/// not be counted as untested code.
 		///</summary>
 		#if SQLITE_COVERAGE_TEST
-																																																										// define ALWAYS(X)      (1)
+																																																												// define ALWAYS(X)      (1)
 // define NEVER(X)       (0)
 #elif !NDEBUG
-																																																										    // define ALWAYS(X)      ((X)?1:(Debug.Assert(0),0))
+																																																												    // define ALWAYS(X)      ((X)?1:(Debug.Assert(0),0))
     static bool ALWAYS( bool X )
     {
       if ( X != true )
@@ -406,60 +375,41 @@ namespace Community.CsharpSqlite
     }
 #else
 		//# define ALWAYS(X)      (X)
-		private static bool ALWAYS (bool X)
-		{
+		private static bool ALWAYS(bool X) {
 			return X;
 		}
-
-		private static byte ALWAYS (byte X)
-		{
+		private static byte ALWAYS(byte X) {
 			return X;
 		}
-
-		private static int ALWAYS (int X)
-		{
+		private static int ALWAYS(int X) {
 			return X;
 		}
-
-		private static bool ALWAYS<T> (T X)
-		{
+		private static bool ALWAYS<T>(T X) {
 			return true;
 		}
-
 		//# define NEVER(X)       (X)
-		private static bool NEVER (bool X)
-		{
+		private static bool NEVER(bool X) {
 			return X;
 		}
-
-		private static byte NEVER (byte X)
-		{
+		private static byte NEVER(byte X) {
 			return X;
 		}
-
-		private static int NEVER (int X)
-		{
+		private static int NEVER(int X) {
 			return X;
 		}
-
-		private static bool NEVER<T> (T X)
-		{
+		private static bool NEVER<T>(T X) {
 			return false;
 		}
-
 		#endif
 		///
-///<summary>
-///</summary>
-///<param name="Return true (non">zero) if the input is a integer that is too large</param>
-///<param name="to fit in 32">bits.  This macro is used inside of various testcase()</param>
-///<param name="macros to verify that we have tested SQLite for large">file support.</param>
-
-		private static bool IS_BIG_INT (i64 X)
-		{
-			return (((X) & ~(i64)0xffffffff) != 0);
+		///<summary>
+		///</summary>
+		///<param name="Return true (non">zero) if the input is a integer that is too large</param>
+		///<param name="to fit in 32">bits.  This macro is used inside of various testcase()</param>
+		///<param name="macros to verify that we have tested SQLite for large">file support.</param>
+		private static bool IS_BIG_INT(i64 X) {
+			return (((X)&~(i64)0xffffffff)!=0);
 		}
-
 		//#define IS_BIG_INT(X)  (((X)&~(i64)0xffffffff)!=0)
 		///<summary>
 		/// The macro unlikely() is a hint that surrounds a boolean
@@ -469,21 +419,17 @@ namespace Community.CsharpSqlite
 		///
 		///</summary>
 		#if (__GNUC__) && FALSE
-																																																										// define likely(X)    __builtin_expect((X),1)
+																																																												// define likely(X)    __builtin_expect((X),1)
 // define unlikely(X)  __builtin_expect((X),0)
 #else
 		//# define likely(X)    !!(X)
-		private static bool likely (bool X)
-		{
+		private static bool likely(bool X) {
 			return !!X;
 		}
-
 		//# define unlikely(X)  !!(X)
-		private static bool unlikely (bool X)
-		{
+		private static bool unlikely(bool X) {
 			return !!X;
 		}
-
 		#endif
 		//#include "sqlite3.h"
 		//#include "hash.h"
@@ -494,14 +440,13 @@ namespace Community.CsharpSqlite
 		//#include <assert.h>
 		//#include <stddef.h>
 		///
-///<summary>
-///If compiling for a processor that lacks floating point support,
-///</summary>
-///<param name="substitute integer for floating">point</param>
-///<param name=""></param>
-
+		///<summary>
+		///If compiling for a processor that lacks floating point support,
+		///</summary>
+		///<param name="substitute integer for floating">point</param>
+		///<param name=""></param>
 		#if SQLITE_OMIT_FLOATING_POINT
-																																																										// define double sqlite_int64
+																																																												// define double sqlite_int64
 // define float sqlite_int64
 // define LONGDOUBLE_TYPE sqlite_int64
 //if !SQLITE_BIG_DBL
@@ -513,95 +458,81 @@ namespace Community.CsharpSqlite
 // undef SQLITE_HAVE_ISNAN
 #endif
 		#if !SQLITE_BIG_DBL
-		private const double SQLITE_BIG_DBL = (((sqlite3_int64)1) << 60);
-
+		private const double SQLITE_BIG_DBL=(((sqlite3_int64)1)<<60);
 		//# define SQLITE_BIG_DBL (1e99)
 		#endif
 		///
-///<summary>
-///OMIT_TEMPDB is set to 1 if SQLITE_OMIT_TEMPDB is defined, or 0
-///afterward. Having this macro allows us to cause the C compiler
-///to omit code used by TEMP tables without messy #if !statements.
-///</summary>
-
+		///<summary>
+		///OMIT_TEMPDB is set to 1 if SQLITE_OMIT_TEMPDB is defined, or 0
+		///afterward. Having this macro allows us to cause the C compiler
+		///to omit code used by TEMP tables without messy #if !statements.
+		///</summary>
 		#if SQLITE_OMIT_TEMPDB
-																																																										//define OMIT_TEMPDB 1
+																																																												//define OMIT_TEMPDB 1
 #else
-		private static int OMIT_TEMPDB = 0;
-
+		private static int OMIT_TEMPDB=0;
 		#endif
 		///
-///<summary>
-///The "file format" number is an integer that is incremented whenever
-///</summary>
-///<param name="the VDBE">level file format changes.  The following macros define the</param>
-///<param name="the default file format for new databases and the maximum file format">the default file format for new databases and the maximum file format</param>
-///<param name="that the library can read.">that the library can read.</param>
-
-		public static int SQLITE_MAX_FILE_FORMAT = 4;
-
+		///<summary>
+		///The "file format" number is an integer that is incremented whenever
+		///</summary>
+		///<param name="the VDBE">level file format changes.  The following macros define the</param>
+		///<param name="the default file format for new databases and the maximum file format">the default file format for new databases and the maximum file format</param>
+		///<param name="that the library can read.">that the library can read.</param>
+		public static int SQLITE_MAX_FILE_FORMAT=4;
 		//#define SQLITE_MAX_FILE_FORMAT 4
 		//#if !SQLITE_DEFAULT_FILE_FORMAT
-		private static int SQLITE_DEFAULT_FILE_FORMAT = 1;
-
+		private static int SQLITE_DEFAULT_FILE_FORMAT=1;
 		//# define SQLITE_DEFAULT_FILE_FORMAT 1
 		//#endif
 		///
-///<summary>
-///Determine whether triggers are recursive by default.  This can be
-///</summary>
-///<param name="changed at run">time using a pragma.</param>
-///<param name=""></param>
-
+		///<summary>
+		///Determine whether triggers are recursive by default.  This can be
+		///</summary>
+		///<param name="changed at run">time using a pragma.</param>
+		///<param name=""></param>
 		#if !SQLITE_DEFAULT_RECURSIVE_TRIGGERS
 		//# define SQLITE_DEFAULT_RECURSIVE_TRIGGERS 0
-		public static bool SQLITE_DEFAULT_RECURSIVE_TRIGGERS = false;
-
+		public static bool SQLITE_DEFAULT_RECURSIVE_TRIGGERS=false;
 		#else
-																																																										static public bool SQLITE_DEFAULT_RECURSIVE_TRIGGERS = true;
+																																																												static public bool SQLITE_DEFAULT_RECURSIVE_TRIGGERS = true;
 #endif
 		///
-///<summary>
-///Provide a default value for SQLITE_TEMP_STORE in case it is not specified
-///</summary>
-///<param name="on the command">line</param>
-
+		///<summary>
+		///Provide a default value for SQLITE_TEMP_STORE in case it is not specified
+		///</summary>
+		///<param name="on the command">line</param>
 		//#if !SQLITE_TEMP_STORE
-		private static int SQLITE_TEMP_STORE = 1;
-
+		private static int SQLITE_TEMP_STORE=1;
 		//#define SQLITE_TEMP_STORE 1
 		//#endif
 		///
-///<summary>
-///GCC does not define the offsetof() macro so we'll have to do it
-///ourselves.
-///</summary>
-
+		///<summary>
+		///GCC does not define the offsetof() macro so we'll have to do it
+		///ourselves.
+		///</summary>
 		#if !offsetof
 		//#define offsetof(STRUCTURE,FIELD) ((int)((char)&((STRUCTURE)0)->FIELD))
 		#endif
 		///
-///<summary>
-///Check to see if this machine uses EBCDIC.  (Yes, believe it or
-///not, there are still machines out there that use EBCDIC.)
-///</summary>
-
+		///<summary>
+		///Check to see if this machine uses EBCDIC.  (Yes, believe it or
+		///not, there are still machines out there that use EBCDIC.)
+		///</summary>
 		#if FALSE
-																																																										// define SQLITE_EBCDIC 1
+																																																												// define SQLITE_EBCDIC 1
 #else
-		private const int SQLITE_ASCII = 1;
-
+		private const int SQLITE_ASCII=1;
 		//#define SQLITE_ASCII 1
 		#endif
 		///
-///<summary>
-///Integers of known sizes.  These typedefs might change for architectures
-///where the sizes very.  Preprocessor macros are available so that the
-///</summary>
-///<param name="types can be conveniently redefined at compile">type.  Like this:</param>
-///<param name=""></param>
-///<param name="cc '">Du32PTR_TYPE=long long int' ...</param>
-
+		///<summary>
+		///Integers of known sizes.  These typedefs might change for architectures
+		///where the sizes very.  Preprocessor macros are available so that the
+		///</summary>
+		///<param name="types can be conveniently redefined at compile">type.  Like this:</param>
+		///<param name=""></param>
+		///<param name="cc '">Du32PTR_TYPE=long long int' ...</param>
 		//#if !u32_TYPE
 		//# ifdef HAVE_u32_T
 		//#  define u32_TYPE u32_t
@@ -648,40 +579,34 @@ namespace Community.CsharpSqlite
 		//typedef u328_TYPE u8;             /* 1-byte unsigned integer */
 		//typedef INT8_TYPE i8;              /* 1-byte signed integer */
 		///
-///<summary>
-///SQLITE_MAX_U32 is a u64 constant that is the maximum u64 value
-///that can be stored in a u32 without loss of data.  The value
-///is 0x00000000ffffffff.  But because of quirks of some compilers, we
-///have to specify the value in the less intuitive manner shown:
-///
-///</summary>
-
-		//#define SQLITE_MAX_U32  ((((u64)1)<<32)-1)
-		private const u32 SQLITE_MAX_U32 = (u32)((((u64)1) << 32) - 1);
-
+		///<summary>
+		///SQLITE_MAX_U32 is a u64 constant that is the maximum u64 value
+		///that can be stored in a u32 without loss of data.  The value
+		///is 0x00000000ffffffff.  But because of quirks of some compilers, we
+		///have to specify the value in the less intuitive manner shown:
 		///
-///<summary>
-///Macros to determine whether the machine is big or little endian,
-///evaluated at runtime.
-///
-///</summary>
-
+		///</summary>
+		//#define SQLITE_MAX_U32  ((((u64)1)<<32)-1)
+		private const u32 SQLITE_MAX_U32=(u32)((((u64)1)<<32)-1);
+		///
+		///<summary>
+		///Macros to determine whether the machine is big or little endian,
+		///evaluated at runtime.
+		///
+		///</summary>
 		#if SQLITE_AMALGAMATION
-																																																										//const int sqlite3one = 1;
+																																																												//const int sqlite3one = 1;
 #else
-		private const bool sqlite3one = true;
-
+		private const bool sqlite3one=true;
 		#endif
 		#if i386 || __i386__ || _M_IX86
-																																																										const int ;//define SQLITE_BIGENDIAN    0
+																																																												const int ;//define SQLITE_BIGENDIAN    0
 const int ;//define SQLITE_LITTLEENDIAN 1
 const int ;//define SQLITE_UTF16NATIVE  SqliteEncoding.UTF16LE
 #else
-		public static u8 SQLITE_BIGENDIAN = 0;
-
+		public static u8 SQLITE_BIGENDIAN=0;
 		//#define SQLITE_BIGENDIAN    (*(char )(&sqlite3one)==0)
-		public static u8 SQLITE_LITTLEENDIAN = 1;
-
+		public static u8 SQLITE_LITTLEENDIAN=1;
 		//#define SQLITE_LITTLEENDIAN (*(char )(&sqlite3one)==1)
 		//#define SQLITE_UTF16NATIVE (SQLITE_BIGENDIAN?SqliteEncoding.UTF16BE:SqliteEncoding.UTF16LE)
 		#endif
@@ -691,33 +616,28 @@ const int ;//define SQLITE_UTF16NATIVE  SqliteEncoding.UTF16LE
 		///
 		///</summary>
 		//#define ROUND8(x)     (((x)+7)&~7)
-		private static int ROUND8 (int x)
-		{
-			return (x + 7) & ~7;
+		private static int ROUND8(int x) {
+			return (x+7)&~7;
 		}
-
 		///<summary>
 		/// Round down to the nearest multiple of 8
 		///
 		///</summary>
 		//#define ROUNDDOWN8(x) ((x)&~7)
-		private static int ROUNDDOWN8 (int x)
-		{
-			return x & ~7;
+		private static int ROUNDDOWN8(int x) {
+			return x&~7;
 		}
-
 		///
-///<summary>
-///</summary>
-///<param name="Assert that the pointer X is aligned to an 8">byte boundary.  This</param>
-///<param name="macro is used only within Debug.Assert() to verify that the code gets">macro is used only within Debug.Assert() to verify that the code gets</param>
-///<param name="all alignment restrictions correct.">all alignment restrictions correct.</param>
-///<param name=""></param>
-///<param name="Except, if SQLITE_4_BYTE_ALIGNED_MALLOC is defined, then the">Except, if SQLITE_4_BYTE_ALIGNED_MALLOC is defined, then the</param>
-///<param name="underlying malloc() implemention might return us 4">byte aligned</param>
-///<param name="pointers.  In that case, only verify 4">byte alignment.</param>
-///<param name=""></param>
-
+		///<summary>
+		///</summary>
+		///<param name="Assert that the pointer X is aligned to an 8">byte boundary.  This</param>
+		///<param name="macro is used only within Debug.Assert() to verify that the code gets">macro is used only within Debug.Assert() to verify that the code gets</param>
+		///<param name="all alignment restrictions correct.">all alignment restrictions correct.</param>
+		///<param name=""></param>
+		///<param name="Except, if SQLITE_4_BYTE_ALIGNED_MALLOC is defined, then the">Except, if SQLITE_4_BYTE_ALIGNED_MALLOC is defined, then the</param>
+		///<param name="underlying malloc() implemention might return us 4">byte aligned</param>
+		///<param name="pointers.  In that case, only verify 4">byte alignment.</param>
+		///<param name=""></param>
 		//#if SQLITE_4_BYTE_ALIGNED_MALLOC
 		//# define EIGHT_BYTE_ALIGNMENT(X)   ((((char)(X) - (char)0)&3)==0)
 		//#else
@@ -734,100 +654,82 @@ const int ;//define SQLITE_UTF16NATIVE  SqliteEncoding.UTF16LE
 		///
 		///</summary>
 		//typedef struct BusyHandler BusyHandler;
-		public class BusyHandler
-		{
+		public class BusyHandler {
 			public dxBusy xFunc;
-
 			//)(void *,int);  /* The busy callback */
 			public object pArg;
-
 			///
-///<summary>
-///First arg to busy callback 
-///</summary>
-
+			///<summary>
+			///First arg to busy callback 
+			///</summary>
 			public int nBusy;
 		///
-///<summary>
-///Incremented with each busy call 
-///</summary>
-
+		///<summary>
+		///Incremented with each busy call 
+		///</summary>
 		};
 
-
 		///
-///<summary>
-///Name of the master database table.  The master database table
-///is a special table that holds the names and attributes of all
-///user tables and indices.
-///
-///</summary>
-
-		private const string MASTER_NAME = "sqlite_master";
-
+		///<summary>
+		///Name of the master database table.  The master database table
+		///is a special table that holds the names and attributes of all
+		///user tables and indices.
+		///
+		///</summary>
+		private const string MASTER_NAME="sqlite_master";
 		//#define MASTER_NAME       "sqlite_master"
-		private const string TEMP_MASTER_NAME = "sqlite_temp_master";
-
+		private const string TEMP_MASTER_NAME="sqlite_temp_master";
 		//#define TEMP_MASTER_NAME  "sqlite_temp_master"
 		///<summary>
 		/// The root-page of the master database table.
 		///
 		///</summary>
-		private const int MASTER_ROOT = 1;
-
+		private const int MASTER_ROOT=1;
 		//#define MASTER_ROOT       1
 		///
-///<summary>
-///The name of the schema table.
-///
-///</summary>
-
-		private static string SCHEMA_TABLE (int x)//#define SCHEMA_TABLE(x)  ((!OMIT_TEMPDB)&&(x==1)?TEMP_MASTER_NAME:MASTER_NAME)
-		
-		{
-			return ((OMIT_TEMPDB == 0) && (x == 1) ? TEMP_MASTER_NAME : MASTER_NAME);
+		///<summary>
+		///The name of the schema table.
+		///
+		///</summary>
+		private static string SCHEMA_TABLE(int x)//#define SCHEMA_TABLE(x)  ((!OMIT_TEMPDB)&&(x==1)?TEMP_MASTER_NAME:MASTER_NAME)
+		 {
+			return ((OMIT_TEMPDB==0)&&(x==1)?TEMP_MASTER_NAME:MASTER_NAME);
 		}
-
 		///<summary>
 		/// A convenience macro that returns the number of elements in
 		/// an array.
 		///
 		///</summary>
 		//#define ArraySize(X)    ((int)(sizeof(X)/sizeof(X[0])))
-		private static int ArraySize<T> (T[] x)
-		{
+		private static int ArraySize<T>(T[] x) {
 			return x.Length;
 		}
-
 		///
-///<summary>
-///The following value as a destructor means to use sqlite3DbFree().
-///This is an internal extension to SQLITE_STATIC and SQLITE_TRANSIENT.
-///
-///</summary>
-
+		///<summary>
+		///The following value as a destructor means to use sqlite3DbFree().
+		///This is an internal extension to SQLITE_STATIC and SQLITE_TRANSIENT.
+		///
+		///</summary>
 		//#define SQLITE_DYNAMIC   ((sqlite3_destructor_type)sqlite3DbFree)
 		private static dxDel SQLITE_DYNAMIC;
-
 		///
-///<summary>
-///When SQLITE_OMIT_WSD is defined, it means that the target platform does
-///not support Writable Static Data (WSD) such as global and static variables.
-///All variables must either be on the stack or dynamically allocated from
-///the heap.  When WSD is unsupported, the variable declarations scattered
-///throughout the SQLite code must become constants instead.  The SQLITE_WSD
-///macro is used for this purpose.  And instead of referencing the variable
-///</summary>
-///<param name="directly, we use its constant as a key to lookup the run">time allocated</param>
-///<param name="buffer that holds real variable.  The constant is also the initializer">buffer that holds real variable.  The constant is also the initializer</param>
-///<param name="for the run">time allocated buffer.</param>
-///<param name=""></param>
-///<param name="In the usual case where WSD is supported, the SQLITE_WSD and GLOBAL">In the usual case where WSD is supported, the SQLITE_WSD and GLOBAL</param>
-///<param name="macros become no">ops and have zero performance impact.</param>
-///<param name=""></param>
-
+		///<summary>
+		///When SQLITE_OMIT_WSD is defined, it means that the target platform does
+		///not support Writable Static Data (WSD) such as global and static variables.
+		///All variables must either be on the stack or dynamically allocated from
+		///the heap.  When WSD is unsupported, the variable declarations scattered
+		///throughout the SQLite code must become constants instead.  The SQLITE_WSD
+		///macro is used for this purpose.  And instead of referencing the variable
+		///</summary>
+		///<param name="directly, we use its constant as a key to lookup the run">time allocated</param>
+		///<param name="buffer that holds real variable.  The constant is also the initializer">buffer that holds real variable.  The constant is also the initializer</param>
+		///<param name="for the run">time allocated buffer.</param>
+		///<param name=""></param>
+		///<param name="In the usual case where WSD is supported, the SQLITE_WSD and GLOBAL">In the usual case where WSD is supported, the SQLITE_WSD and GLOBAL</param>
+		///<param name="macros become no">ops and have zero performance impact.</param>
+		///<param name=""></param>
 		#if SQLITE_OMIT_WSD
-																																																										//define SQLITE_WSD const
+																																																												//define SQLITE_WSD const
 //define GLOBAL(t,v) (*(t)sqlite3_wsd_find((void)&(v), sizeof(v)))
 //define sqlite3GlobalConfig GLOBAL(struct Sqlite3Config, sqlite3Config)
 int sqlite3_wsd_init(int N, int J);
@@ -837,7 +739,6 @@ void *sqlite3_wsd_find(void *K, int L);
 		//#define GLOBAL(t,v) v
 		//#define sqlite3GlobalConfig sqlite3Config
 		private static Sqlite3Config sqlite3GlobalConfig;
-
 		#endif
 		///<summary>
 		/// The following macros are used to suppress compiler warnings and to
@@ -856,143 +757,110 @@ void *sqlite3_wsd_find(void *K, int L);
 		/// cases the parameters are named as per the usual conventions.
 		///</summary>
 		//#define UNUSED_PARAMETER(x) (void)(x)
-		private static void UNUSED_PARAMETER<T> (T x)
-		{
+		private static void UNUSED_PARAMETER<T>(T x) {
 		}
-
 		//#define UNUSED_PARAMETER2(x,y) UNUSED_PARAMETER(x),UNUSED_PARAMETER(y)
-		private static void UNUSED_PARAMETER2<T1, T2> (T1 x, T2 y)
-		{
-			UNUSED_PARAMETER (x);
-			UNUSED_PARAMETER (y);
+		private static void UNUSED_PARAMETER2<T1,T2>(T1 x,T2 y) {
+			UNUSED_PARAMETER(x);
+			UNUSED_PARAMETER(y);
 		}
-
 		///
-///<summary>
-///Forward references to structures
-///
-///</summary>
-
-		
-
+		///<summary>
+		///Forward references to structures
 		///
-///<summary>
-///An instance of the following structure stores a database schema.
-///
-///Most Schema objects are associated with a Btree.  The exception is
-///</summary>
-///<param name="the Schema for the TEMP databaes (sqlite3.aDb[1]) which is free">standing.</param>
-///<param name="In shared cache mode, a single Schema object can be shared by multiple">In shared cache mode, a single Schema object can be shared by multiple</param>
-///<param name="Btrees that refer to the same underlying BtShared object.">Btrees that refer to the same underlying BtShared object.</param>
-///<param name=""></param>
-///<param name="Schema objects are automatically deallocated when the last Btree that">Schema objects are automatically deallocated when the last Btree that</param>
-///<param name="references them is destroyed.   The TEMP Schema is manually freed by">references them is destroyed.   The TEMP Schema is manually freed by</param>
-///<param name="sqlite3_close().">sqlite3_close().</param>
-///<param name=""></param>
-///<param name="A thread must be holding a mutex on the corresponding Btree in order">A thread must be holding a mutex on the corresponding Btree in order</param>
-///<param name="to access Schema content.  This implies that the thread must also be">to access Schema content.  This implies that the thread must also be</param>
-///<param name="holding a mutex on the sqlite3 connection pointer that owns the Btree.">holding a mutex on the sqlite3 connection pointer that owns the Btree.</param>
-///<param name="For a TEMP Schema, only the connection mutex is required.">For a TEMP Schema, only the connection mutex is required.</param>
-///<param name=""></param>
-
-		public class Schema
-		{
+		///</summary>
+		///
+		///<summary>
+		///An instance of the following structure stores a database schema.
+		///
+		///Most Schema objects are associated with a Btree.  The exception is
+		///</summary>
+		///<param name="the Schema for the TEMP databaes (sqlite3.aDb[1]) which is free">standing.</param>
+		///<param name="In shared cache mode, a single Schema object can be shared by multiple">In shared cache mode, a single Schema object can be shared by multiple</param>
+		///<param name="Btrees that refer to the same underlying BtShared object.">Btrees that refer to the same underlying BtShared object.</param>
+		///<param name=""></param>
+		///<param name="Schema objects are automatically deallocated when the last Btree that">Schema objects are automatically deallocated when the last Btree that</param>
+		///<param name="references them is destroyed.   The TEMP Schema is manually freed by">references them is destroyed.   The TEMP Schema is manually freed by</param>
+		///<param name="sqlite3_close().">sqlite3_close().</param>
+		///<param name=""></param>
+		///<param name="A thread must be holding a mutex on the corresponding Btree in order">A thread must be holding a mutex on the corresponding Btree in order</param>
+		///<param name="to access Schema content.  This implies that the thread must also be">to access Schema content.  This implies that the thread must also be</param>
+		///<param name="holding a mutex on the sqlite3 connection pointer that owns the Btree.">holding a mutex on the sqlite3 connection pointer that owns the Btree.</param>
+		///<param name="For a TEMP Schema, only the connection mutex is required.">For a TEMP Schema, only the connection mutex is required.</param>
+		///<param name=""></param>
+		public class Schema {
 			public int schema_cookie;
-
 			///
-///<summary>
-///Database schema version number for this file 
-///</summary>
-
+			///<summary>
+			///Database schema version number for this file 
+			///</summary>
 			public u32 iGeneration;
-
 			///
-///<summary>
-///Generation counter.  Incremented with each change 
-///</summary>
-
-			public Hash tblHash = new Hash ();
-
+			///<summary>
+			///Generation counter.  Incremented with each change 
+			///</summary>
+			public Hash tblHash=new Hash();
 			///
-///<summary>
-///All tables indexed by name 
-///</summary>
-
-			public Hash idxHash = new Hash ();
-
+			///<summary>
+			///All tables indexed by name 
+			///</summary>
+			public Hash idxHash=new Hash();
 			///
-///<summary>
-///All (named) indices indexed by name 
-///</summary>
-
-			public Hash trigHash = new Hash ();
-
+			///<summary>
+			///All (named) indices indexed by name 
+			///</summary>
+			public Hash trigHash=new Hash();
 			///
-///<summary>
-///All triggers indexed by name 
-///</summary>
-
-			public Hash fkeyHash = new Hash ();
-
+			///<summary>
+			///All triggers indexed by name 
+			///</summary>
+			public Hash fkeyHash=new Hash();
 			///
-///<summary>
-///All foreign keys by referenced table name 
-///</summary>
-
+			///<summary>
+			///All foreign keys by referenced table name 
+			///</summary>
 			public Table pSeqTab;
-
 			///
-///<summary>
-///The sqlite_sequence table used by AUTOINCREMENT 
-///</summary>
-
+			///<summary>
+			///The sqlite_sequence table used by AUTOINCREMENT 
+			///</summary>
 			public u8 file_format;
-
 			///
-///<summary>
-///Schema format version for this file 
-///</summary>
-
+			///<summary>
+			///Schema format version for this file 
+			///</summary>
 			public SqliteEncoding enc;
-
 			///
-///<summary>
-///Text encoding used by this database 
-///</summary>
-
+			///<summary>
+			///Text encoding used by this database 
+			///</summary>
 			public u16 flags;
-
 			///<summary>
 			///Flags associated with this schema
 			///</summary>
 			public int cache_size;
-
 			///<summary>
 			///Number of pages to use in the cache
 			///</summary>
-			public Schema Copy ()
-			{
-				if (this == null)
+			public Schema Copy() {
+				if(this==null)
 					return null;
 				else {
-					Schema cp = (Schema)MemberwiseClone ();
+					Schema cp=(Schema)MemberwiseClone();
 					return cp;
 				}
 			}
-
-			public void Clear ()
-			{
-				if (this != null) {
-					schema_cookie = 0;
-					tblHash = new Hash ();
-					idxHash = new Hash ();
-					trigHash = new Hash ();
-					fkeyHash = new Hash ();
-					pSeqTab = null;
+			public void Clear() {
+				if(this!=null) {
+					schema_cookie=0;
+					tblHash=new Hash();
+					idxHash=new Hash();
+					trigHash=new Hash();
+					fkeyHash=new Hash();
+					pSeqTab=null;
 				}
 			}
 		};
-
 
 		///<summary>
 		/// These macros can be used to test, set, or clear bits in the
@@ -1000,54 +868,43 @@ void *sqlite3_wsd_find(void *K, int L);
 		///
 		///</summary>
 		//#define DbHasProperty(D,I,P)     (((D)->aDb[I].pSchema->flags&(P))==(P))
-		private static bool DbHasProperty (sqlite3 D, int I, ushort P)
-		{
-			return (D.aDb [I].pSchema.flags & P) == P;
+		private static bool DbHasProperty(sqlite3 D,int I,ushort P) {
+			return (D.aDb[I].pSchema.flags&P)==P;
 		}
-
 		//#define DbHasAnyProperty(D,I,P)  (((D)->aDb[I].pSchema->flags&(P))!=0)
 		//#define DbSetProperty(D,I,P)     (D)->aDb[I].pSchema->flags|=(P)
-		private static void DbSetProperty (sqlite3 D, int I, ushort P)
-		{
-			D.aDb [I].pSchema.flags = (u16)(D.aDb [I].pSchema.flags | P);
+		private static void DbSetProperty(sqlite3 D,int I,ushort P) {
+			D.aDb[I].pSchema.flags=(u16)(D.aDb[I].pSchema.flags|P);
 		}
-
 		//#define DbClearProperty(D,I,P)   (D)->aDb[I].pSchema->flags&=~(P)
-		private static void DbClearProperty (sqlite3 D, int I, ushort P)
-		{
-			D.aDb [I].pSchema.flags = (u16)(D.aDb [I].pSchema.flags & ~P);
+		private static void DbClearProperty(sqlite3 D,int I,ushort P) {
+			D.aDb[I].pSchema.flags=(u16)(D.aDb[I].pSchema.flags&~P);
 		}
-
 		///
-///<summary>
-///</summary>
-///<param name="Allowed values for the DB.pSchema">>flags field.</param>
-///<param name=""></param>
-///<param name="The DB_SchemaLoaded flag is set after the database schema has been">The DB_SchemaLoaded flag is set after the database schema has been</param>
-///<param name="read into internal hash tables.">read into internal hash tables.</param>
-///<param name=""></param>
-///<param name="DB_UnresetViews means that one or more views have column names that">DB_UnresetViews means that one or more views have column names that</param>
-///<param name="have been filled out.  If the schema changes, these column names might">have been filled out.  If the schema changes, these column names might</param>
-///<param name="changes and so the view will need to be reset.">changes and so the view will need to be reset.</param>
-///<param name=""></param>
-
+		///<summary>
+		///</summary>
+		///<param name="Allowed values for the DB.pSchema">>flags field.</param>
+		///<param name=""></param>
+		///<param name="The DB_SchemaLoaded flag is set after the database schema has been">The DB_SchemaLoaded flag is set after the database schema has been</param>
+		///<param name="read into internal hash tables.">read into internal hash tables.</param>
+		///<param name=""></param>
+		///<param name="DB_UnresetViews means that one or more views have column names that">DB_UnresetViews means that one or more views have column names that</param>
+		///<param name="have been filled out.  If the schema changes, these column names might">have been filled out.  If the schema changes, these column names might</param>
+		///<param name="changes and so the view will need to be reset.">changes and so the view will need to be reset.</param>
+		///<param name=""></param>
 		//#define DB_SchemaLoaded    0x0001  /* The schema has been loaded */
 		//#define DB_UnresetViews    0x0002  /* Some views have defined column names */
 		//#define DB_Empty           0x0004  /* The file is empty (length 0 bytes) */
-		private const u16 DB_SchemaLoaded = 0x0001;
-
-		private const u16 DB_UnresetViews = 0x0002;
-
-		private const u16 DB_Empty = 0x0004;
-
+		private const u16 DB_SchemaLoaded=0x0001;
+		private const u16 DB_UnresetViews=0x0002;
+		private const u16 DB_Empty=0x0004;
 		///<summary>
 		/// The number of different kinds of things that can be limited
 		/// using the sqlite3_limit() interface.
 		///
 		///</summary>
 		//#define SQLITE_N_LIMIT (SQLITE_LIMIT_TRIGGER_DEPTH+1)
-		private const int SQLITE_N_LIMIT = SQLITE_LIMIT_TRIGGER_DEPTH + 1;
-
+		private const int SQLITE_N_LIMIT=SQLITE_LIMIT_TRIGGER_DEPTH+1;
 		///<summary>
 		/// Lookaside malloc is a set of fixed-size buffers that can be used
 		/// to satisfy small transient memory allocation requests for objects
@@ -1069,83 +926,61 @@ void *sqlite3_wsd_find(void *K, int L);
 		/// lookaside allocations are not used to construct the schema objects.
 		///
 		///</summary>
-		public class Lookaside
-		{
+		public class Lookaside {
 			public int sz;
-
 			///
-///<summary>
-///Size of each buffer in bytes 
-///</summary>
-
+			///<summary>
+			///Size of each buffer in bytes 
+			///</summary>
 			public u8 bEnabled;
-
 			///
-///<summary>
-///False to disable new lookaside allocations 
-///</summary>
-
+			///<summary>
+			///False to disable new lookaside allocations 
+			///</summary>
 			public bool bMalloced;
-
 			///
-///<summary>
-///True if pStart obtained from sqlite3_malloc() 
-///</summary>
-
+			///<summary>
+			///True if pStart obtained from sqlite3_malloc() 
+			///</summary>
 			public int nOut;
-
 			///
-///<summary>
-///Number of buffers currently checked out 
-///</summary>
-
+			///<summary>
+			///Number of buffers currently checked out 
+			///</summary>
 			public int mxOut;
-
 			///
-///<summary>
-///Highwater mark for nOut 
-///</summary>
-
-			public int[] anStat = new int[3];
-
+			///<summary>
+			///Highwater mark for nOut 
+			///</summary>
+			public int[] anStat=new int[3];
 			///
-///<summary>
-///0: hits.  1: size misses.  2: full misses 
-///</summary>
-
+			///<summary>
+			///0: hits.  1: size misses.  2: full misses 
+			///</summary>
 			public LookasideSlot pFree;
-
 			///
-///<summary>
-///List of available buffers 
-///</summary>
-
+			///<summary>
+			///List of available buffers 
+			///</summary>
 			public int pStart;
-
 			///
-///<summary>
-///First byte of available memory space 
-///</summary>
-
+			///<summary>
+			///First byte of available memory space 
+			///</summary>
 			public int pEnd;
 		///
-///<summary>
-///First byte past end of available space 
-///</summary>
-
+		///<summary>
+		///First byte past end of available space 
+		///</summary>
 		};
 
-
-		public class LookasideSlot
-		{
+		public class LookasideSlot {
 			public LookasideSlot pNext;
 		///
-///<summary>
-///Next buffer in the list of free buffers 
-///</summary>
-
+		///<summary>
+		///Next buffer in the list of free buffers 
+		///</summary>
 		};
-
 
 		///<summary>
 		/// A hash table for function definitions.
@@ -1154,35 +989,27 @@ void *sqlite3_wsd_find(void *K, int L);
 		/// Collisions are on the FuncDef.pHash chain.
 		///
 		///</summary>
-		public class FuncDefHash
-		{
-			public FuncDef[] a = new FuncDef[23];
+		public class FuncDefHash {
+			public FuncDef[] a=new FuncDef[23];
 		///
-///<summary>
-///Hash table for functions 
-///</summary>
-
+		///<summary>
+		///Hash table for functions 
+		///</summary>
 		};
-
-
-		
 
 		///<summary>
 		/// A macro to discover the encoding of a database.
 		///
 		///</summary>
 		//#define ENC(db) ((db)->aDb[0].pSchema->enc)
-		private static SqliteEncoding ENC (sqlite3 db)
-		{
-			return db.aDb [0].pSchema.enc;
+		private static SqliteEncoding ENC(sqlite3 db) {
+			return db.aDb[0].pSchema.enc;
 		}
-
 		///
-///<summary>
-///Possible values for the sqlite3.flags.
-///
-///</summary>
-
+		///<summary>
+		///Possible values for the sqlite3.flags.
+		///
+		///</summary>
 		//#define SQLITE_VdbeTrace      0x00000100  /* True to trace VDBE execution */
 		//#define SQLITE_InternChanges  0x00000200  /* Uncommitted Hash table changes */
 		//#define SQLITE_FullColNames   0x00000400  /* Show full column names on SELECT */
@@ -1210,60 +1037,36 @@ void *sqlite3_wsd_find(void *K, int L);
 		//#define SQLITE_PreferBuiltin  0x10000000  /* Preference to built-in funcs */
 		//#define SQLITE_LoadExtension  0x20000000  /* Enable load_extension */
 		//define SQLITE_EnableTrigger  0x40000000  /* True to enable triggers */
-		private const int SQLITE_VdbeTrace = 0x00000100;
-
-		private const int SQLITE_InternChanges = 0x00000200;
-
-		private const int SQLITE_FullColNames = 0x00000400;
-
-		private const int SQLITE_ShortColNames = 0x00000800;
-
-		private const int SQLITE_CountRows = 0x00001000;
-
-		private const int SQLITE_NullCallback = 0x00002000;
-
-		private const int SQLITE_SqlTrace = 0x00004000;
-
-		private const int SQLITE_VdbeListing = 0x00008000;
-
-		private const int SQLITE_WriteSchema = 0x00010000;
-
-		private const int SQLITE_NoReadlock = 0x00020000;
-
-		private const int SQLITE_IgnoreChecks = 0x00040000;
-
-		private const int SQLITE_ReadUncommitted = 0x0080000;
-
-		private const int SQLITE_LegacyFileFmt = 0x00100000;
-
-		private const int SQLITE_FullFSync = 0x00200000;
-
-		private const int SQLITE_CkptFullFSync = 0x00400000;
-
-		private const int SQLITE_RecoveryMode = 0x00800000;
-
-		private const int SQLITE_ReverseOrder = 0x01000000;
-
-		private const int SQLITE_RecTriggers = 0x02000000;
-
-		private const int SQLITE_ForeignKeys = 0x04000000;
-
-		private const int SQLITE_AutoIndex = 0x08000000;
-
-		private const int SQLITE_PreferBuiltin = 0x10000000;
-
-		private const int SQLITE_LoadExtension = 0x20000000;
-
-		private const int SQLITE_EnableTrigger = 0x40000000;
-
+		private const int SQLITE_VdbeTrace=0x00000100;
+		private const int SQLITE_InternChanges=0x00000200;
+		private const int SQLITE_FullColNames=0x00000400;
+		private const int SQLITE_ShortColNames=0x00000800;
+		private const int SQLITE_CountRows=0x00001000;
+		private const int SQLITE_NullCallback=0x00002000;
+		private const int SQLITE_SqlTrace=0x00004000;
+		private const int SQLITE_VdbeListing=0x00008000;
+		private const int SQLITE_WriteSchema=0x00010000;
+		private const int SQLITE_NoReadlock=0x00020000;
+		private const int SQLITE_IgnoreChecks=0x00040000;
+		private const int SQLITE_ReadUncommitted=0x0080000;
+		private const int SQLITE_LegacyFileFmt=0x00100000;
+		private const int SQLITE_FullFSync=0x00200000;
+		private const int SQLITE_CkptFullFSync=0x00400000;
+		private const int SQLITE_RecoveryMode=0x00800000;
+		private const int SQLITE_ReverseOrder=0x01000000;
+		private const int SQLITE_RecTriggers=0x02000000;
+		private const int SQLITE_ForeignKeys=0x04000000;
+		private const int SQLITE_AutoIndex=0x08000000;
+		private const int SQLITE_PreferBuiltin=0x10000000;
+		private const int SQLITE_LoadExtension=0x20000000;
+		private const int SQLITE_EnableTrigger=0x40000000;
 		///
-///<summary>
-///Bits of the sqlite3.flags field that are used by the
-///sqlite3_test_control(SQLITE_TESTCTRL_OPTIMIZATIONS,...) interface.
-///</summary>
-///<param name="These must be the low">order bits of the flags field.</param>
-///<param name=""></param>
-
+		///<summary>
+		///Bits of the sqlite3.flags field that are used by the
+		///sqlite3_test_control(SQLITE_TESTCTRL_OPTIMIZATIONS,...) interface.
+		///</summary>
+		///<param name="These must be the low">order bits of the flags field.</param>
+		///<param name=""></param>
 		//#define SQLITE_QueryFlattener 0x01        /* Disable query flattening */
 		//#define SQLITE_ColumnCache    0x02        /* Disable the column cache */
 		//#define SQLITE_IndexSort      0x04        /* Disable indexes for sorting */
@@ -1273,341 +1076,33 @@ void *sqlite3_wsd_find(void *K, int L);
 		//#define SQLITE_FactorOutConst 0x40        /* Disable factoring out constants */
 		//#define SQLITE_IdxRealAsInt   0x80        /* Store REAL as INT in indices */
 		//#define SQLITE_OptMask        0xff        /* Mask of all disablable opts */
-		private const int SQLITE_QueryFlattener = 0x01;
-
-		private const int SQLITE_ColumnCache = 0x02;
-
-		private const int SQLITE_IndexSort = 0x04;
-
-		private const int SQLITE_IndexSearch = 0x08;
-
-		private const int SQLITE_IndexCover = 0x10;
-
-		private const int SQLITE_GroupByOrder = 0x20;
-
-		private const int SQLITE_FactorOutConst = 0x40;
-
-		private const int SQLITE_IdxRealAsInt = 0x80;
-
-		private const int SQLITE_OptMask = 0xff;
-
+		private const int SQLITE_QueryFlattener=0x01;
+		private const int SQLITE_ColumnCache=0x02;
+		private const int SQLITE_IndexSort=0x04;
+		private const int SQLITE_IndexSearch=0x08;
+		private const int SQLITE_IndexCover=0x10;
+		private const int SQLITE_GroupByOrder=0x20;
+		private const int SQLITE_FactorOutConst=0x40;
+		private const int SQLITE_IdxRealAsInt=0x80;
+		private const int SQLITE_OptMask=0xff;
 		///<summary>
 		/// Possible values for the sqlite.magic field.
 		/// The numbers are obtained at random and have no special meaning, other
 		/// than being distinct from one another.
 		///
 		///</summary>
-		private const int SQLITE_MAGIC_OPEN = 0x1029a697;
-
+		private const int SQLITE_MAGIC_OPEN=0x1029a697;
 		//#define SQLITE_MAGIC_OPEN     0xa029a697  /* Database is open */
-		private const int SQLITE_MAGIC_CLOSED = 0x2f3c2d33;
-
+		private const int SQLITE_MAGIC_CLOSED=0x2f3c2d33;
 		//#define SQLITE_MAGIC_CLOSED   0x9f3c2d33  /* Database is closed */
-		private const int SQLITE_MAGIC_SICK = 0x3b771290;
-
+		private const int SQLITE_MAGIC_SICK=0x3b771290;
 		//#define SQLITE_MAGIC_SICK     0x4b771290  /* Error and awaiting close */
-		private const int SQLITE_MAGIC_BUSY = 0x403b7906;
-
+		private const int SQLITE_MAGIC_BUSY=0x403b7906;
 		//#define SQLITE_MAGIC_BUSY     0xf03b7906  /* Database currently in use */
-		private const int SQLITE_MAGIC_ERROR = 0x55357930;
-
+		private const int SQLITE_MAGIC_ERROR=0x55357930;
 		//#define SQLITE_MAGIC_ERROR    0xb5357930  /* An SQLITE_MISUSE error occurred */
 		///
-///<summary>
-///Each SQL function is defined by an instance of the following
-///structure.  A pointer to this structure is stored in the sqlite.aFunc
-///hash table.  When multiple functions have the same name, the hash table
-///points to a linked list of these structures.
-///
-///</summary>
-
-		public class FuncDef
-		{
-			public i16 nArg;
-
-			///
-///<summary>
-///</summary>
-///<param name="Number of arguments.  ">1 means unlimited </param>
-
-			public SqliteEncoding iPrefEnc;
-
-			///
-///<summary>
-///Preferred text encoding (SqliteEncoding.UTF8, 16LE, 16BE) 
-///</summary>
-
-			public u8 flags;
-
-			///
-///<summary>
-///Some combination of SQLITE_FUNC_* 
-///</summary>
-
-			public object pUserData;
-
-			///
-///<summary>
-///User data parameter 
-///</summary>
-
-			public FuncDef pNext;
-
-			///
-///<summary>
-///Next function with same name 
-///</summary>
-
-			public dxFunc xFunc;
-
-			//)(sqlite3_context*,int,sqlite3_value*); /* Regular function */
-			public dxStep xStep;
-
-			//)(sqlite3_context*,int,sqlite3_value*); /* Aggregate step */
-			public dxFinal xFinalize;
-
-			//)(sqlite3_context);                /* Aggregate finalizer */
-			public string zName;
-
-			///
-///<summary>
-///SQL name of the function. 
-///</summary>
-
-			public FuncDef pHash;
-
-			///
-///<summary>
-///Next with a different name but the same hash 
-///</summary>
-
-			public FuncDestructor pDestructor;
-
-			///<summary>
-			///Reference counted destructor function
-			///</summary>
-			public FuncDef ()
-			{
-			}
-
-			public FuncDef (i16 nArg, SqliteEncoding iPrefEnc, u8 iflags, object pUserData, FuncDef pNext, dxFunc xFunc, dxStep xStep, dxFinal xFinalize, string zName, FuncDef pHash, FuncDestructor pDestructor)
-			{
-				this.nArg = nArg;
-				this.iPrefEnc = iPrefEnc;
-				this.flags = iflags;
-				this.pUserData = pUserData;
-				this.pNext = pNext;
-				this.xFunc = xFunc;
-				this.xStep = xStep;
-				this.xFinalize = xFinalize;
-				this.zName = zName;
-				this.pHash = pHash;
-				this.pDestructor = pDestructor;
-			}
-
-			public FuncDef (string zName, SqliteEncoding iPrefEnc, i16 nArg, int iArg, u8 iflags, dxFunc xFunc)
-			{
-				this.nArg = nArg;
-				this.iPrefEnc = iPrefEnc;
-				this.flags = iflags;
-				this.pUserData = iArg;
-				this.pNext = null;
-				this.xFunc = xFunc;
-				this.xStep = null;
-				this.xFinalize = null;
-				this.zName = zName;
-			}
-
-			public FuncDef (string zName, SqliteEncoding iPrefEnc, i16 nArg, int iArg, u8 iflags, dxStep xStep, dxFinal xFinal)
-			{
-				this.nArg = nArg;
-				this.iPrefEnc = iPrefEnc;
-				this.flags = iflags;
-				this.pUserData = iArg;
-				this.pNext = null;
-				this.xFunc = null;
-				this.xStep = xStep;
-				this.xFinalize = xFinal;
-				this.zName = zName;
-			}
-
-			public FuncDef (string zName, SqliteEncoding iPrefEnc, i16 nArg, object arg, dxFunc xFunc, u8 flags)
-			{
-				this.nArg = nArg;
-				this.iPrefEnc = iPrefEnc;
-				this.flags = flags;
-				this.pUserData = arg;
-				this.pNext = null;
-				this.xFunc = xFunc;
-				this.xStep = null;
-				this.xFinalize = null;
-				this.zName = zName;
-			}
-
-			public FuncDef Copy ()
-			{
-				FuncDef c = new FuncDef ();
-				c.nArg = nArg;
-				c.iPrefEnc = iPrefEnc;
-				c.flags = flags;
-				c.pUserData = pUserData;
-				c.pNext = pNext;
-				c.xFunc = xFunc;
-				c.xStep = xStep;
-				c.xFinalize = xFinalize;
-				c.zName = zName;
-				c.pHash = pHash;
-				c.pDestructor = pDestructor;
-				return c;
-			}
-		};
-
-
-		///<summary>
-		/// This structure encapsulates a user-function destructor callback (as
-		/// configured using create_function_v2()) and a reference counter. When
-		/// create_function_v2() is called to create a function with a destructor,
-		/// a single object of this type is allocated. FuncDestructor.nRef is set to
-		/// the number of FuncDef objects created (either 1 or 3, depending on whether
-		/// or not the specified encoding is SqliteEncoding.ANY). The FuncDef.pDestructor
-		/// member of each of the new FuncDef objects is set to point to the allocated
-		/// FuncDestructor.
-		///
-		/// Thereafter, when one of the FuncDef objects is deleted, the reference
-		/// count on this object is decremented. When it reaches 0, the destructor
-		/// is invoked and the FuncDestructor structure freed.
-		///
-		///</summary>
-		//struct FuncDestructor {
-		//  int nRef;
-		//  void (*xDestroy)(void );
-		//  void *pUserData;
-		//};
-		public class FuncDestructor
-		{
-			public int nRef;
-
-			public dxFDestroy xDestroy;
-
-			// (*xDestroy)(void );
-			public object pUserData;
-		};
-
-
-		///
-///<summary>
-///Possible values for FuncDef.flags
-///
-///</summary>
-
-		//#define SQLITE_FUNC_LIKE     0x01  /* Candidate for the LIKE optimization */
-		//#define SQLITE_FUNC_CASE     0x02  /* Case-sensitive LIKE-type function */
-		//#define SQLITE_FUNC_EPHEM    0x04  /* Ephemeral.  Delete with VDBE */
-		//#define SQLITE_FUNC_NEEDCOLL 0x08 /* sqlite3GetFuncCollSeq() might be called */
-		//#define SQLITE_FUNC_PRIVATE  0x10 /* Allowed for internal use only */
-		//#define SQLITE_FUNC_COUNT    0x20 /* Built-in count() aggregate */
-		//#define SQLITE_FUNC_COALESCE 0x40 /* Built-in coalesce() or ifnull() function */
-		private const int SQLITE_FUNC_LIKE = 0x01;
-
-		///
-///<summary>
-///Candidate for the LIKE optimization 
-///</summary>
-
-		private const int SQLITE_FUNC_CASE = 0x02;
-
-		///
-///<summary>
-///</summary>
-///<param name="Case">type function </param>
-
-		private const int SQLITE_FUNC_EPHEM = 0x04;
-
-		///
-///<summary>
-///Ephermeral.  Delete with VDBE 
-///</summary>
-
-		private const int SQLITE_FUNC_NEEDCOLL = 0x08;
-
-		///
-///<summary>
-///sqlite3GetFuncCollSeq() might be called 
-///</summary>
-
-		private const int SQLITE_FUNC_PRIVATE = 0x10;
-
-		///
-///<summary>
-///Allowed for internal use only 
-///</summary>
-
-		private const int SQLITE_FUNC_COUNT = 0x20;
-
-		///
-///<summary>
-///</summary>
-///<param name="Built">in count() aggregate </param>
-
-		private const int SQLITE_FUNC_COALESCE = 0x40;
-
-		///
-///<summary>
-///</summary>
-///<param name="Built">in coalesce() or ifnull() function </param>
-
-		///<summary>
-		/// The following three macros, FUNCTION(), LIKEFUNC() and AGGREGATE() are
-		/// used to create the initializers for the FuncDef structures.
-		///
-		///   FUNCTION(zName, nArg, iArg, bNC, xFunc)
-		///     Used to create a scalar function definition of a function zName
-		///     implemented by C function xFunc that accepts nArg arguments. The
-		///     value passed as iArg is cast to a (void) and made available
-		///     as the user-data (sqlite3_user_data()) for the function. If
-		///     argument bNC is true, then the SQLITE_FUNC_NEEDCOLL flag is set.
-		///
-		///   AGGREGATE(zName, nArg, iArg, bNC, xStep, xFinal)
-		///     Used to create an aggregate function definition implemented by
-		///     the C functions xStep and xFinal. The first four parameters
-		///     are interpreted in the same way as the first 4 parameters to
-		///     FUNCTION().
-		///
-		///   LIKEFUNC(zName, nArg, pArg, flags)
-		///     Used to create a scalar function definition of a function zName
-		///     that accepts nArg arguments and is implemented by a call to C
-		///     function likeFunc. Argument pArg is cast to a (void ) and made
-		///     available as the function user-data (sqlite3_user_data()). The
-		///     FuncDef.flags variable is set to the value passed as the flags
-		///     parameter.
-		///
-		///</summary>
-		//#define FUNCTION(zName, nArg, iArg, bNC, xFunc) \
-		//  {nArg, SqliteEncoding.UTF8, bNC*SQLITE_FUNC_NEEDCOLL, \
-		//SQLITE_INT_TO_PTR(iArg), 0, xFunc, 0, 0, #zName, 0, 0}
-		private static FuncDef FUNCTION (string zName, i16 nArg, int iArg, u8 bNC, dxFunc xFunc)
-		{
-			return new FuncDef (zName, SqliteEncoding.UTF8, nArg, iArg, (u8)(bNC * SQLITE_FUNC_NEEDCOLL), xFunc);
-		}
-
-		//#define STR_FUNCTION(zName, nArg, pArg, bNC, xFunc) \
-		//  {nArg, SqliteEncoding.UTF8, bNC*SQLITE_FUNC_NEEDCOLL, \
-		//pArg, 0, xFunc, 0, 0, #zName, 0, 0}
-		//#define LIKEFUNC(zName, nArg, arg, flags) \
-		//  {nArg, SqliteEncoding.UTF8, flags, (void )arg, 0, likeFunc, 0, 0, #zName, 0, 0}
-		private static FuncDef LIKEFUNC (string zName, i16 nArg, object arg, u8 flags)
-		{
-			return new FuncDef (zName, SqliteEncoding.UTF8, nArg, arg, likeFunc, flags);
-		}
-
-		//#define AGGREGATE(zName, nArg, arg, nc, xStep, xFinal) \
-		//  {nArg, SqliteEncoding.UTF8, nc*SQLITE_FUNC_NEEDCOLL, \
-		//SQLITE_INT_TO_PTR(arg), 0, 0, xStep,xFinal,#zName,0,0}
-		private static FuncDef AGGREGATE (string zName, i16 nArg, int arg, u8 nc, dxStep xStep, dxFinal xFinal)
-		{
-			return new FuncDef (zName, SqliteEncoding.UTF8, nArg, arg, (u8)(nc * SQLITE_FUNC_NEEDCOLL), xStep, xFinal);
-		}
-
+		
 		///<summary>
 		/// All current savepoints are stored in a linked list starting at
 		/// sqlite3.pSavepoint. The first element in the list is the most recently
@@ -1620,44 +1115,34 @@ void *sqlite3_wsd_find(void *K, int L);
 		//  i64 nDeferredCons;                  /* Number of deferred fk violations */
 		//  Savepoint *pNext;                   /* Parent savepoint (if any) */
 		//};
-		public class Savepoint
-		{
+		public class Savepoint {
 			public string zName;
-
 			///
-///<summary>
-///</summary>
-///<param name="Savepoint name (nul">terminated) </param>
-
+			///<summary>
+			///</summary>
+			///<param name="Savepoint name (nul">terminated) </param>
 			public i64 nDeferredCons;
-
 			///
-///<summary>
-///Number of deferred fk violations 
-///</summary>
-
+			///<summary>
+			///Number of deferred fk violations 
+			///</summary>
 			public Savepoint pNext;
 		///
-///<summary>
-///Parent savepoint (if any) 
-///</summary>
-
+		///<summary>
+		///Parent savepoint (if any) 
+		///</summary>
 		};
-
 
 		///<summary>
 		/// The following are used as the second parameter to sqlite3Savepoint(),
 		/// and as the P1 argument to the OP_Savepoint instruction.
 		///
 		///</summary>
-		private const int SAVEPOINT_BEGIN = 0;
-
+		private const int SAVEPOINT_BEGIN=0;
 		//#define SAVEPOINT_BEGIN      0
-		private const int SAVEPOINT_RELEASE = 1;
-
+		private const int SAVEPOINT_RELEASE=1;
 		//#define SAVEPOINT_RELEASE    1
-		private const int SAVEPOINT_ROLLBACK = 2;
-
+		private const int SAVEPOINT_ROLLBACK=2;
 		//#define SAVEPOINT_ROLLBACK   2
 		///<summary>
 		/// Each SQLite module (virtual table definition) is defined by an
@@ -1665,268 +1150,95 @@ void *sqlite3_wsd_find(void *K, int L);
 		/// hash table.
 		///
 		///</summary>
-		public class Module
-		{
+		public class Module {
 			public sqlite3_module pModule;
-
 			///
-///<summary>
-///Callback pointers 
-///</summary>
-
+			///<summary>
+			///Callback pointers 
+			///</summary>
 			public string zName;
-
 			///
-///<summary>
-///Name passed to create_module() 
-///</summary>
-
+			///<summary>
+			///Name passed to create_module() 
+			///</summary>
 			public object pAux;
-
 			///
-///<summary>
-///pAux passed to create_module() 
-///</summary>
-
+			///<summary>
+			///pAux passed to create_module() 
+			///</summary>
 			public smdxDestroy xDestroy;
 		//)(void );/* Module destructor function */
 		};
 
-
+		///
 		///<summary>
-		/// information about each column of an SQL table is held in an instance
-		/// of this structure.
+		///Allowed values of CollSeq.type:
 		///
 		///</summary>
-		public class Column
-		{
-			public string zName;
-
-			///
-///<summary>
-///Name of this column 
-///</summary>
-
-			public Expr pDflt;
-
-			///
-///<summary>
-///Default value of this column 
-///</summary>
-
-			public string zDflt;
-
-			///
-///<summary>
-///Original text of the default value 
-///</summary>
-
-			public string zType;
-
-			///
-///<summary>
-///Data type for this column 
-///</summary>
-
-			public string zColl;
-
-			///
-///<summary>
-///Collating sequence.  If NULL, use the default 
-///</summary>
-
-			public u8 notNull;
-
-			///
-///<summary>
-///True if there is a NOT NULL constraint 
-///</summary>
-
-			public u8 isPrimKey;
-
-			///
-///<summary>
-///True if this column is part of the PRIMARY KEY 
-///</summary>
-
-			public char affinity;
-
-			///
-///<summary>
-///One of the SQLITE_AFF_... values 
-///</summary>
-
-			#if !SQLITE_OMIT_VIRTUALTABLE
-			public u8 isHidden;
-
-			///<summary>
-			///True if this column is 'hidden'
-			///</summary>
-			#endif
-			public Column Copy ()
-			{
-				Column cp = (Column)MemberwiseClone ();
-				if (cp.pDflt != null)
-					cp.pDflt = pDflt.Copy ();
-				return cp;
-			}
-		};
-
-
-		///<summary>
-		/// A "Collating Sequence" is defined by an instance of the following
-		/// structure. Conceptually, a collating sequence consists of a name and
-		/// a comparison routine that defines the order of that sequence.
-		///
-		/// There may two separate implementations of the collation function, one
-		/// that processes text in UTF-8 encoding (CollSeq.xCmp) and another that
-		/// processes text encoded in UTF-16 (CollSeq.xCmp16), using the machine
-		/// native byte order. When a collation sequence is invoked, SQLite selects
-		/// the version that will require the least expensive encoding
-		/// translations, if any.
-		///
-		/// The CollSeq.pUser member variable is an extra parameter that passed in
-		/// as the first argument to the UTF-8 comparison function, xCmp.
-		/// CollSeq.pUser16 is the equivalent for the UTF-16 comparison function,
-		/// xCmp16.
-		///
-		/// If both CollSeq.xCmp and CollSeq.xCmp16 are NULL, it means that the
-		/// collating sequence is undefined.  Indices built on an undefined
-		/// collating sequence may not be read or written.
-		///
-		///</summary>
-		public class CollSeq
-		{
-			public string zName;
-
-			///
-///<summary>
-///</summary>
-///<param name="Name of the collating sequence, UTF">8 encoded </param>
-
-			public SqliteEncoding enc;
-
-			///
-///<summary>
-///Text encoding handled by xCmp() 
-///</summary>
-
-			public CollationType type;
-
-			///
-///<summary>
-///One of the CollationType.... values below 
-///</summary>
-
-			public object pUser;
-
-			///<summary>
-			///First argument to xCmp()
-			///</summary>
-			public dxCompare xCmp;
-
-			//)(void*,int, const void*, int, const void);
-			public dxDelCollSeq xDel;
-
-			//)(void);  /* Destructor for pUser */
-			public CollSeq Copy ()
-			{
-				if (this == null)
-					return null;
-				else {
-					CollSeq cp = (CollSeq)MemberwiseClone ();
-					return cp;
-				}
-			}
-		};
-
-
-		///
-///<summary>
-///Allowed values of CollSeq.type:
-///
-///</summary>
-
-		public enum CollationType
-		{
-			BINARY = 1,
+		public enum CollationType {
+			BINARY=1,
 			//#define SQLITE_COLL_BINARY  1  /* The default memcmp() collating sequence */
-			NOCASE = 2,
+			NOCASE=2,
 			//#define SQLITE_COLL_NOCASE  2  /* The built-in NOCASE collating sequence */
-			REVERSE = 3,
+			REVERSE=3,
 			//#define SQLITE_COLL_REVERSE 3  /* The built-in REVERSE collating sequence */
-			USER = 0
+			USER=0
 		//#define SQLITE_COLL_USER    0  /* Any other user-defined collating sequence */
 		}
-
 		///
-///<summary>
-///A sort order can be either ASC or DESC.
-///
-///</summary>
-
-		private const int SQLITE_SO_ASC = 0;
-
+		///<summary>
+		///A sort order can be either ASC or DESC.
+		///
+		///</summary>
+		private const int SQLITE_SO_ASC=0;
 		//#define SQLITE_SO_ASC       0  /* Sort in ascending order */
-		private const int SQLITE_SO_DESC = 1;
-
+		private const int SQLITE_SO_DESC=1;
 		//#define SQLITE_SO_DESC     1  /* Sort in ascending order */
 		///
-///<summary>
-///Column affinity types.
-///
-///These used to have mnemonic name like 'i' for SQLITE_AFF_INTEGER and
-///'t' for SQLITE_AFF_TEXT.  But we can save a little space and improve
-///the speed a little by numbering the values consecutively.
-///
-///But rather than start with 0 or 1, we begin with 'a'.  That way,
-///when multiple affinity types are concatenated into a string and
-///used as the P4 operand, they will be more readable.
-///
-///Note also that the numeric types are grouped together so that testing
-///for a numeric type is a single comparison.
-///
-///</summary>
-
-		private const char SQLITE_AFF_TEXT = 'a';
-
+		///<summary>
+		///Column affinity types.
+		///
+		///These used to have mnemonic name like 'i' for SQLITE_AFF_INTEGER and
+		///'t' for SQLITE_AFF_TEXT.  But we can save a little space and improve
+		///the speed a little by numbering the values consecutively.
+		///
+		///But rather than start with 0 or 1, we begin with 'a'.  That way,
+		///when multiple affinity types are concatenated into a string and
+		///used as the P4 operand, they will be more readable.
+		///
+		///Note also that the numeric types are grouped together so that testing
+		///for a numeric type is a single comparison.
+		///
+		///</summary>
+		private const char SQLITE_AFF_TEXT='a';
 		//#define SQLITE_AFF_TEXT     'a'
-		private const char SQLITE_AFF_NONE = 'b';
-
+		private const char SQLITE_AFF_NONE='b';
 		//#define SQLITE_AFF_NONE     'b'
-		private const char SQLITE_AFF_NUMERIC = 'c';
-
+		private const char SQLITE_AFF_NUMERIC='c';
 		//#define SQLITE_AFF_NUMERIC  'c'
-		private const char SQLITE_AFF_INTEGER = 'd';
-
+		private const char SQLITE_AFF_INTEGER='d';
 		//#define SQLITE_AFF_INTEGER  'd'
-		private const char SQLITE_AFF_REAL = 'e';
-
+		private const char SQLITE_AFF_REAL='e';
 		//#define SQLITE_AFF_REAL     'e'
 		//#define sqlite3IsNumericAffinity(X)  ((X)>=SQLITE_AFF_NUMERIC)
 		///
-///<summary>
-///The SQLITE_AFF_MASK values masks off the significant bits of an
-///affinity value.
-///
-///</summary>
-
-		private const int SQLITE_AFF_MASK = 0x67;
-
+		///<summary>
+		///The SQLITE_AFF_MASK values masks off the significant bits of an
+		///affinity value.
+		///
+		///</summary>
+		private const int SQLITE_AFF_MASK=0x67;
 		//#define SQLITE_AFF_MASK     0x67
 		///<summary>
 		/// Additional bit values that can be ORed with an affinity without
 		/// changing the affinity.
 		///
 		///</summary>
-		private const int SQLITE_JUMPIFNULL = 0x08;
-
+		private const int SQLITE_JUMPIFNULL=0x08;
 		//#define SQLITE_JUMPIFNULL   0x08  /* jumps if either operand is NULL */
-		private const int SQLITE_STOREP2 = 0x10;
-
+		private const int SQLITE_STOREP2=0x10;
 		//#define SQLITE_STOREP2      0x10  /* Store result in reg[P2] rather than jump */
-		private const int SQLITE_NULLEQ = 0x80;
-
+		private const int SQLITE_NULLEQ=0x80;
 		//#define SQLITE_NULLEQ       0x80  /* NULL=NULL */
 		///<summary>
 		/// An object of this type is created for each virtual table present in
@@ -1971,58 +1283,43 @@ void *sqlite3_wsd_find(void *K, int L);
 		/// the first argument.
 		///
 		///</summary>
-		public class VTable
-		{
+		public class VTable {
 			public sqlite3 db;
-
 			///
-///<summary>
-///Database connection associated with this table 
-///</summary>
-
+			///<summary>
+			///Database connection associated with this table 
+			///</summary>
 			public Module pMod;
-
 			///
-///<summary>
-///Pointer to module implementation 
-///</summary>
-
+			///<summary>
+			///Pointer to module implementation 
+			///</summary>
 			public sqlite3_vtab pVtab;
-
 			///
-///<summary>
-///Pointer to vtab instance 
-///</summary>
-
+			///<summary>
+			///Pointer to vtab instance 
+			///</summary>
 			public int nRef;
-
 			///
-///<summary>
-///Number of pointers to this structure 
-///</summary>
-
+			///<summary>
+			///Number of pointers to this structure 
+			///</summary>
 			public u8 bConstraint;
-
 			///
-///<summary>
-///True if constraints are supported 
-///</summary>
-
+			///<summary>
+			///True if constraints are supported 
+			///</summary>
 			public int iSavepoint;
-
 			///
-///<summary>
-///Depth of the SAVEPOINT stack 
-///</summary>
-
+			///<summary>
+			///Depth of the SAVEPOINT stack 
+			///</summary>
 			public VTable pNext;
 		///
-///<summary>
-///Next in linked list (see above) 
-///</summary>
-
+		///<summary>
+		///Next in linked list (see above) 
+		///</summary>
 		};
-
 
 		///<summary>
 		///aCol[].zType and aCol[].pColl missing
@@ -2035,19 +1332,15 @@ void *sqlite3_wsd_find(void *K, int L);
 		///</summary>
 		#if !SQLITE_OMIT_VIRTUALTABLE
 		//#  define IsVirtual(X)      (((X)->tabFlags & TF_Virtual)!=0)
-		private static bool IsVirtual (Table X)
-		{
-			return (X.tabFlags & TF_Virtual) != 0;
+		private static bool IsVirtual(Table X) {
+			return (X.tabFlags&TF_Virtual)!=0;
 		}
-
 		//#  define IsHiddenColumn(X) ((X)->isHidden)
-		private static bool IsHiddenColumn (Column X)
-		{
-			return X.isHidden != 0;
+		private static bool IsHiddenColumn(Column X) {
+			return X.isHidden!=0;
 		}
-
 		#else
-																																																										    //  define IsVirtual(X)      0
+																																																												    //  define IsVirtual(X)      0
     static bool IsVirtual( Table T )
     {
       return false;
@@ -2058,134 +1351,7 @@ void *sqlite3_wsd_find(void *K, int L);
       return false;
     }
 #endif
-		///
-///<summary>
-///Each foreign key constraint is an instance of the following structure.
-///
-///A foreign key is associated with two tables.  The "from" table is
-///the table that contains the REFERENCES clause that creates the foreign
-///key.  The "to" table is the table that is named in the REFERENCES clause.
-///Consider this example:
-///
-///CREATE TABLE ex1(
-///a INTEGER PRIMARY KEY,
-///b INTEGER CONSTRAINT fk1 REFERENCES ex2(x)
-///);
-///
-///</summary>
-///<param name="For foreign key "fk1", the from">table is "ex2".</param>
-///<param name=""></param>
-///<param name="Each REFERENCES clause generates an instance of the following structure">Each REFERENCES clause generates an instance of the following structure</param>
-///<param name="which is attached to the from">table need not exist when</param>
-///<param name="the from">table is not checked.</param>
-
-		public class FKey
-		{
-			public Table pFrom;
-
-			///
-///<summary>
-///Table containing the REFERENCES clause (aka: Child) 
-///</summary>
-
-			public FKey pNextFrom;
-
-			///
-///<summary>
-///Next foreign key in pFrom 
-///</summary>
-
-			public string zTo;
-
-			///
-///<summary>
-///Name of table that the key points to (aka: Parent) 
-///</summary>
-
-			public FKey pNextTo;
-
-			///
-///<summary>
-///Next foreign key on table named zTo 
-///</summary>
-
-			public FKey pPrevTo;
-
-			///
-///<summary>
-///Previous foreign key on table named zTo 
-///</summary>
-
-			public int nCol;
-
-			///
-///<summary>
-///Number of columns in this key 
-///</summary>
-
-			///
-///<summary>
-///</summary>
-///<param name="EV: R">21917 </param>
-
-			public u8 isDeferred;
-
-			///
-///<summary>
-///True if constraint checking is deferred till COMMIT 
-///</summary>
-
-			public u8[] aAction = new u8[2];
-
-			///<summary>
-			///ON DELETE and ON UPDATE actions, respectively
-			///</summary>
-			public Trigger[] apTrigger = new Trigger[2];
-
-			///<summary>
-			///Triggers for aAction[] actions
-			///</summary>
-			public class sColMap
-			{
-				///
-///<summary>
-///Mapping of columns in pFrom to columns in zTo 
-///</summary>
-
-				public int iFrom;
-
-				///
-///<summary>
-///Index of column in pFrom 
-///</summary>
-
-				public string zCol;
-			///
-///<summary>
-///Name of column in zTo.  If 0 use PRIMARY KEY 
-///</summary>
-
-			};
-
-
-			public sColMap[] aCol;
-
-			///
-///<summary>
-///One entry for each of nCol column s 
-///</summary>
-
-			public FKey Copy ()
-			{
-				if (this == null)
-					return null;
-				else {
-					FKey cp = (FKey)MemberwiseClone ();
-					return cp;
-				}
-			}
-		};
-
+		
 
 		///<summary>
 		/// SQLite supports many different ways to resolve a constraint
@@ -2213,387 +1379,28 @@ void *sqlite3_wsd_find(void *K, int L);
 		/// of action to take.
 		///
 		///</summary>
-		private const int OE_None = 0;
-
+		private const int OE_None=0;
 		//#define OE_None     0   /* There is no constraint to check */
-		private const int OE_Rollback = 1;
-
+		private const int OE_Rollback=1;
 		//#define OE_Rollback 1   /* Fail the operation and rollback the transaction */
-		private const int OE_Abort = 2;
-
+		private const int OE_Abort=2;
 		//#define OE_Abort    2   /* Back out changes but do no rollback transaction */
-		private const int OE_Fail = 3;
-
+		private const int OE_Fail=3;
 		//#define OE_Fail     3   /* Stop the operation but leave all prior changes */
-		private const int OE_Ignore = 4;
-
+		private const int OE_Ignore=4;
 		//#define OE_Ignore   4   /* Ignore the error. Do not do the INSERT or UPDATE */
-		private const int OE_Replace = 5;
-
+		private const int OE_Replace=5;
 		//#define OE_Replace  5   /* Delete existing record, then do INSERT or UPDATE */
-		private const int OE_Restrict = 6;
-
+		private const int OE_Restrict=6;
 		//#define OE_Restrict 6   /* OE_Abort for IMMEDIATE, OE_Rollback for DEFERRED */
-		private const int OE_SetNull = 7;
-
+		private const int OE_SetNull=7;
 		//#define OE_SetNull  7   /* Set the foreign key value to NULL */
-		private const int OE_SetDflt = 8;
-
+		private const int OE_SetDflt=8;
 		//#define OE_SetDflt  8   /* Set the foreign key value to its default */
-		private const int OE_Cascade = 9;
-
+		private const int OE_Cascade=9;
 		//#define OE_Cascade  9   /* Cascade the changes */
-		private const int OE_Default = 99;
-
+		private const int OE_Default=99;
 		//#define OE_Default  99  /* Do whatever the default action is */
-		///<summary>
-		/// An instance of the following structure is passed as the first
-		/// argument to sqlite3VdbeKeyCompare and is used to control the
-		/// comparison of the two index keys.
-		///
-		///</summary>
-		public class KeyInfo
-		{
-			public sqlite3 db;
-
-			///
-///<summary>
-///The database connection 
-///</summary>
-
-			public SqliteEncoding enc;
-
-			///
-///<summary>
-///</summary>
-///<param name="Text encoding "> one of the SQLITE_UTF* values </param>
-
-			public u16 nField;
-
-			///
-///<summary>
-///Number of entries in aColl[] 
-///</summary>
-
-			public u8[] aSortOrder;
-
-			///<summary>
-			///Sort order for each column.  May be NULL
-			///</summary>
-			public CollSeq[] aColl = new CollSeq[1];
-
-			///
-///<summary>
-///Collating sequence for each term of the key 
-///</summary>
-
-			public KeyInfo Copy ()
-			{
-				return (KeyInfo)MemberwiseClone ();
-			}
-		};
-
-
-		///
-///<summary>
-///An instance of the following structure holds information about a
-///single index record that has already been parsed out into individual
-///values.
-///
-///A record is an object that contains one or more fields of data.
-///Records are used to store the content of a table row and to store
-///the key of an index.  A blob encoding of a record is created by
-///the OP_MakeRecord opcode of the VDBE and is disassembled by the
-///OP_Column opcode.
-///
-///This structure holds a record that has already been disassembled
-///into its constituent fields.
-///
-///</summary>
-
-		public class UnpackedRecord
-		{
-			public KeyInfo pKeyInfo;
-
-			///
-///<summary>
-///</summary>
-///<param name="Collation and sort">order information </param>
-
-			public u16 nField;
-
-			///
-///<summary>
-///Number of entries in apMem[] 
-///</summary>
-
-			public u16 flags;
-
-			///
-///<summary>
-///Boolean settings.  UNPACKED_... below 
-///</summary>
-
-			public i64 rowid;
-
-			///
-///<summary>
-///Used by UNPACKED_PREFIX_SEARCH 
-///</summary>
-
-			public Mem[] aMem;
-		///
-///<summary>
-///Values 
-///</summary>
-
-		};
-
-
-		///
-///<summary>
-///Allowed values of UnpackedRecord.flags
-///
-///</summary>
-
-		//#define UNPACKED_NEED_FREE     0x0001  /* Memory is from sqlite3Malloc() */
-		//#define UNPACKED_NEED_DESTROY  0x0002  /* apMem[]s should all be destroyed */
-		//#define UNPACKED_IGNORE_ROWID  0x0004  /* Ignore trailing rowid on key1 */
-		//#define UNPACKED_INCRKEY       0x0008  /* Make this key an epsilon larger */
-		//#define UNPACKED_PREFIX_MATCH  0x0010  /* A prefix match is considered OK */
-		//#define UNPACKED_PREFIX_SEARCH 0x0020  /* A prefix match is considered OK */
-		private const int UNPACKED_NEED_FREE = 0x0001;
-
-		///
-///<summary>
-///Memory is from sqlite3Malloc() 
-///</summary>
-
-		private const int UNPACKED_NEED_DESTROY = 0x0002;
-
-		///
-///<summary>
-///apMem[]s should all be destroyed 
-///</summary>
-
-		private const int UNPACKED_IGNORE_ROWID = 0x0004;
-
-		///
-///<summary>
-///Ignore trailing rowid on key1 
-///</summary>
-
-		private const int UNPACKED_INCRKEY = 0x0008;
-
-		///
-///<summary>
-///Make this key an epsilon larger 
-///</summary>
-
-		private const int UNPACKED_PREFIX_MATCH = 0x0010;
-
-		///
-///<summary>
-///A prefix match is considered OK 
-///</summary>
-
-		private const int UNPACKED_PREFIX_SEARCH = 0x0020;
-
-		///<summary>
-		///A prefix match is considered OK
-		///</summary>
-		///<summary>
-		/// Each SQL index is represented in memory by an
-		/// instance of the following structure.
-		///
-		/// The columns of the table that are to be indexed are described
-		/// by the aiColumn[] field of this structure.  For example, suppose
-		/// we have the following table and index:
-		///
-		///     CREATE TABLE Ex1(c1 int, c2 int, c3 text);
-		///     CREATE INDEX Ex2 ON Ex1(c3,c1);
-		///
-		/// In the Table structure describing Ex1, nCol==3 because there are
-		/// three columns in the table.  In the Index structure describing
-		/// Ex2, nColumn==2 since 2 of the 3 columns of Ex1 are indexed.
-		/// The value of aiColumn is {2, 0}.  aiColumn[0]==2 because the
-		/// first column to be indexed (c3) has an index of 2 in Ex1.aCol[].
-		/// The second column to be indexed (c1) has an index of 0 in
-		/// Ex1.aCol[], hence Ex2.aiColumn[1]==0.
-		///
-		/// The Index.onError field determines whether or not the indexed columns
-		/// must be unique and what to do if they are not.  When Index.onError=OE_None,
-		/// it means this is not a unique index.  Otherwise it is a unique index
-		/// and the value of Index.onError indicate the which conflict resolution
-		/// algorithm to employ whenever an attempt is made to insert a non-unique
-		/// element.
-		///
-		///</summary>
-		public class Index
-		{
-			public string zName;
-
-			///
-///<summary>
-///Name of this index 
-///</summary>
-
-			public int nColumn;
-
-			///
-///<summary>
-///Number of columns in the table used by this index 
-///</summary>
-
-			public int[] aiColumn;
-
-			///
-///<summary>
-///Which columns are used by this index.  1st is 0 
-///</summary>
-
-			public int[] aiRowEst;
-
-			///
-///<summary>
-///Result of ANALYZE: Est. rows selected by each column 
-///</summary>
-
-			public Table pTable;
-
-			///
-///<summary>
-///The SQL table being indexed 
-///</summary>
-
-			public int tnum;
-
-			///
-///<summary>
-///Page containing root of this index in database file 
-///</summary>
-
-			public u8 onError;
-
-			///
-///<summary>
-///OE_Abort, OE_Ignore, OE_Replace, or OE_None 
-///</summary>
-
-			public u8 autoIndex;
-
-			///
-///<summary>
-///True if is automatically created (ex: by UNIQUE) 
-///</summary>
-
-			public u8 bUnordered;
-
-			///
-///<summary>
-///Use this index for == or IN queries only 
-///</summary>
-
-			public string zColAff;
-
-			///
-///<summary>
-///String defining the affinity of each column 
-///</summary>
-
-			public Index pNext;
-
-			///
-///<summary>
-///The next index associated with the same table 
-///</summary>
-
-			public Schema pSchema;
-
-			///
-///<summary>
-///Schema containing this index 
-///</summary>
-
-			public u8[] aSortOrder;
-
-			///
-///<summary>
-///Array of size Index.nColumn. True==DESC, False==ASC 
-///</summary>
-
-			public string[] azColl;
-
-			///<summary>
-			///Array of collation sequence names for index
-			///</summary>
-			public IndexSample[] aSample;
-
-			///
-///<summary>
-///Array of SQLITE_INDEX_SAMPLES samples 
-///</summary>
-
-			public Index Copy ()
-			{
-				if (this == null)
-					return null;
-				else {
-					Index cp = (Index)MemberwiseClone ();
-					return cp;
-				}
-			}
-		};
-
-
-		///<summary>
-		/// Each sample stored in the sqlite_stat2 table is represented in memory
-		/// using a structure of this type.
-		///
-		///</summary>
-		public class IndexSample
-		{
-			public struct _u
-			{
-				//union {
-				public string z;
-
-				///
-///<summary>
-///Value if eType is SQLITE_TEXT 
-///</summary>
-
-				public byte[] zBLOB;
-
-				///
-///<summary>
-///Value if eType is SQLITE_BLOB 
-///</summary>
-
-				public double r;
-			///
-///<summary>
-///Value if eType is SQLITE_FLOAT or SQLITE_INTEGER 
-///</summary>
-
-			}
-
-			public _u u;
-
-			public u8 eType;
-
-			///
-///<summary>
-///SQLITE_NULL, SQLITE_INTEGER ... etc. 
-///</summary>
-
-			public u8 nByte;
-		///
-///<summary>
-///Size in byte of text or blob. 
-///</summary>
-
-		};
 
 
 		///<summary>
@@ -2610,184 +1417,136 @@ void *sqlite3_wsd_find(void *K, int L);
 		/// fields do not need to be freed when deallocating the AggInfo structure.
 		///
 		///</summary>
-		public class AggInfo_col
-		{
+		public class AggInfo_col {
 			///
-///<summary>
-///For each column used in source tables 
-///</summary>
-
+			///<summary>
+			///For each column used in source tables 
+			///</summary>
 			public Table pTab;
-
 			///
-///<summary>
-///Source table 
-///</summary>
-
+			///<summary>
+			///Source table 
+			///</summary>
 			public int iTable;
-
 			///
-///<summary>
-///VdbeCursor number of the source table 
-///</summary>
-
+			///<summary>
+			///VdbeCursor number of the source table 
+			///</summary>
 			public int iColumn;
-
 			///
-///<summary>
-///Column number within the source table 
-///</summary>
-
+			///<summary>
+			///Column number within the source table 
+			///</summary>
 			public int iSorterColumn;
-
 			///
-///<summary>
-///Column number in the sorting index 
-///</summary>
-
+			///<summary>
+			///Column number in the sorting index 
+			///</summary>
 			public int iMem;
-
 			///
-///<summary>
-///Memory location that acts as accumulator 
-///</summary>
-
+			///<summary>
+			///Memory location that acts as accumulator 
+			///</summary>
 			public Expr pExpr;
 		///
-///<summary>
-///The original expression 
-///</summary>
-
+		///<summary>
+		///The original expression 
+		///</summary>
 		};
 
-
-		public class AggInfo_func
-		{
+		public class AggInfo_func {
 			///
-///<summary>
-///For each aggregate function 
-///</summary>
-
+			///<summary>
+			///For each aggregate function 
+			///</summary>
 			public Expr pExpr;
-
 			///
-///<summary>
-///Expression encoding the function 
-///</summary>
-
+			///<summary>
+			///Expression encoding the function 
+			///</summary>
 			public FuncDef pFunc;
-
 			///
-///<summary>
-///The aggregate function implementation 
-///</summary>
-
+			///<summary>
+			///The aggregate function implementation 
+			///</summary>
 			public int iMem;
-
 			///
-///<summary>
-///Memory location that acts as accumulator 
-///</summary>
-
+			///<summary>
+			///Memory location that acts as accumulator 
+			///</summary>
 			public int iDistinct;
 		///
-///<summary>
-///Ephemeral table used to enforce DISTINCT 
-///</summary>
-
+		///<summary>
+		///Ephemeral table used to enforce DISTINCT 
+		///</summary>
 		}
-
-		public class AggInfo
-		{
+		public class AggInfo {
 			public u8 directMode;
-
 			///
-///<summary>
-///Direct rendering mode means take data directly
-///from source tables rather than from accumulators 
-///</summary>
-
+			///<summary>
+			///Direct rendering mode means take data directly
+			///from source tables rather than from accumulators 
+			///</summary>
 			public u8 useSortingIdx;
-
 			///
-///<summary>
-///In direct mode, reference the sorting index rather
-///than the source table 
-///</summary>
-
+			///<summary>
+			///In direct mode, reference the sorting index rather
+			///than the source table 
+			///</summary>
 			public int sortingIdx;
-
 			///
-///<summary>
-///VdbeCursor number of the sorting index 
-///</summary>
-
+			///<summary>
+			///VdbeCursor number of the sorting index 
+			///</summary>
 			public ExprList pGroupBy;
-
 			///
-///<summary>
-///The group by clause 
-///</summary>
-
+			///<summary>
+			///The group by clause 
+			///</summary>
 			public int nSortingColumn;
-
 			///
-///<summary>
-///Number of columns in the sorting index 
-///</summary>
-
+			///<summary>
+			///Number of columns in the sorting index 
+			///</summary>
 			public AggInfo_col[] aCol;
-
 			public int nColumn;
-
 			///
-///<summary>
-///Number of used entries in aCol[] 
-///</summary>
-
+			///<summary>
+			///Number of used entries in aCol[] 
+			///</summary>
 			public int nColumnAlloc;
-
 			///
-///<summary>
-///Number of slots allocated for aCol[] 
-///</summary>
-
+			///<summary>
+			///Number of slots allocated for aCol[] 
+			///</summary>
 			public int nAccumulator;
-
 			///
-///<summary>
-///Number of columns that show through to the output.
-///Additional columns are used only as parameters to
-///aggregate functions 
-///</summary>
-
+			///<summary>
+			///Number of columns that show through to the output.
+			///Additional columns are used only as parameters to
+			///aggregate functions 
+			///</summary>
 			public AggInfo_func[] aFunc;
-
 			public int nFunc;
-
 			///<summary>
 			///Number of entries in aFunc[]
 			///</summary>
 			public int nFuncAlloc;
-
 			///
-///<summary>
-///Number of slots allocated for aFunc[] 
-///</summary>
-
-			public AggInfo Copy ()
-			{
-				if (this == null)
+			///<summary>
+			///Number of slots allocated for aFunc[] 
+			///</summary>
+			public AggInfo Copy() {
+				if(this==null)
 					return null;
 				else {
-					AggInfo cp = (AggInfo)MemberwiseClone ();
-					if (pGroupBy != null)
-						cp.pGroupBy = pGroupBy.Copy ();
+					AggInfo cp=(AggInfo)MemberwiseClone();
+					if(pGroupBy!=null)
+						cp.pGroupBy=pGroupBy.Copy();
 					return cp;
 				}
 			}
 		};
-
 
 		///<summary>
 		/// The datatype ynVar is a signed integer, either 16-bit or 32-bit.
@@ -2868,14 +1627,12 @@ void *sqlite3_wsd_find(void *K, int L);
     ** the subtrees in Expr.x.pList or Expr.x.pSelect are always separately
     ** allocated, regardless of whether or not EP_Reduced is set.
     */
-        public class Expr
-		{
-			public Expr ()
-			{
+        
+        public class Expr {
+			public Expr() {
 			}
-
 			#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																																							public u8 _op;                      /* Operation performed by this node */
+																																																																																										public u8 _op;                      /* Operation performed by this node */
 public u8 op
 {
 get { return _op; }
@@ -2883,38 +1640,33 @@ set { _op = value; }
 }
 #else
 			TokenType _op;
-
 			public TokenType Operator {
 				get {
 					return _op;
 				}
 				set {
-					_op = value;
+					_op=value;
 				}
 			}
-
 			public u8 op {
 				get {
 					return (u8)_op;
 				}
 				set {
-					_op = (TokenType)value;
+					_op=(TokenType)value;
 				}
 			}
-
 			///
-///<summary>
-///Operation performed by this node 
-///</summary>
-
+			///<summary>
+			///Operation performed by this node 
+			///</summary>
 			#endif
 			public char affinity;
-
 			///<summary>
 			///The affinity of the column or 0 if not a column
 			///</summary>
 			#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																																							public u16 _flags;                            /* Various flags.  EP_* See below */
+																																																																																										public u16 _flags;                            /* Various flags.  EP_* See below */
 public u16 flags
 {
 get { return _flags; }
@@ -2932,249 +1684,201 @@ public int iValue;            /* Non-negative integer value if EP_IntValue */
 }
 
 #else
-			public struct _u
-			{
+			public struct _u {
 				public string zToken;
-
 				///
-///<summary>
-///Token value. Zero terminated and dequoted 
-///</summary>
-
+				///<summary>
+				///Token value. Zero terminated and dequoted 
+				///</summary>
 				public int iValue;
 			///
-///<summary>
-///</summary>
-///<param name="Non">negative integer value if EP_IntValue </param>
-
+			///<summary>
+			///</summary>
+			///<param name="Non">negative integer value if EP_IntValue </param>
 			}
-
 			public u16 flags;
-
 			///
-///<summary>
-///Various flags.  EP_* See below 
-///</summary>
-
+			///<summary>
+			///Various flags.  EP_* See below 
+			///</summary>
 			#endif
 			public _u u;
-
 			///
-///<summary>
-///If the EP_TokenOnly flag is set in the Expr.flags mask, then no
-///space is allocated for the fields below this point. An attempt to
-///access them will result in a segfault or malfunction.
-///
-///</summary>
-
+			///<summary>
+			///If the EP_TokenOnly flag is set in the Expr.flags mask, then no
+			///space is allocated for the fields below this point. An attempt to
+			///access them will result in a segfault or malfunction.
+			///
+			///</summary>
 			public Expr pLeft;
-
 			///<summary>
 			///Left subnode
 			///</summary>
 			public Expr pRight;
-
 			///
-///<summary>
-///Right subnode 
-///</summary>
-
-			public struct _x
-			{
+			///<summary>
+			///Right subnode 
+			///</summary>
+			public struct _x {
 				public ExprList pList;
-
 				///
-///<summary>
-///</summary>
-///<param name="Function arguments or in "<expr> IN (<expr">list)" </param>
-
+				///<summary>
+				///</summary>
+				///<param name="Function arguments or in "<expr> IN (<expr">list)" </param>
 				public Select pSelect;
 			///
-///<summary>
-///</summary>
-///<param name="Used for sub">selects and "<expr> IN (<select>)" </param>
-
+			///<summary>
+			///</summary>
+			///<param name="Used for sub">selects and "<expr> IN (<select>)" </param>
 			}
-
 			public _x x;
-
 			public CollSeq pColl;
-
 			///
-///<summary>
-///The collation type of the column or 0 
-///</summary>
-
+			///<summary>
+			///The collation type of the column or 0 
+			///</summary>
 			///
-///<summary>
-///If the EP_Reduced flag is set in the Expr.flags mask, then no
-///space is allocated for the fields below this point. An attempt to
-///access them will result in a segfault or malfunction.
-///
-///</summary>
-
+			///<summary>
+			///If the EP_Reduced flag is set in the Expr.flags mask, then no
+			///space is allocated for the fields below this point. An attempt to
+			///access them will result in a segfault or malfunction.
+			///
+			///</summary>
 			public int iTable;
-
 			///
-///<summary>
-///TK_COLUMN: cursor number of table holding column
-///TK_REGISTER: register number
-///</summary>
-///<param name="TK_TRIGGER: 1 ">> old </param>
-
+			///<summary>
+			///TK_COLUMN: cursor number of table holding column
+			///TK_REGISTER: register number
+			///</summary>
+			///<param name="TK_TRIGGER: 1 ">> old </param>
 			public ynVar iColumn;
-
 			///
-///<summary>
-///</summary>
-///<param name="TK_COLUMN: column index.  ">1 for rowid.</param>
-///<param name="TK_VARIABLE: variable number (always >= 1). ">TK_VARIABLE: variable number (always >= 1). </param>
-
+			///<summary>
+			///</summary>
+			///<param name="TK_COLUMN: column index.  ">1 for rowid.</param>
+			///<param name="TK_VARIABLE: variable number (always >= 1). ">TK_VARIABLE: variable number (always >= 1). </param>
 			public i16 iAgg;
-
 			///
-///<summary>
-///</summary>
-///<param name="Which entry in pAggInfo">>aFunc[] </param>
-
+			///<summary>
+			///</summary>
+			///<param name="Which entry in pAggInfo">>aFunc[] </param>
 			public i16 iRightJoinTable;
-
 			///
-///<summary>
-///If EP_FromJoin, the right table of the join 
-///</summary>
-
+			///<summary>
+			///If EP_FromJoin, the right table of the join 
+			///</summary>
 			public u8 flags2;
-
 			///
-///<summary>
-///Second set of flags.  EP2_... 
-///</summary>
-
+			///<summary>
+			///Second set of flags.  EP2_... 
+			///</summary>
 			public u8 op2;
-
 			///
-///<summary>
-///If a TK_REGISTER, the original value of Expr.op 
-///</summary>
-
+			///<summary>
+			///If a TK_REGISTER, the original value of Expr.op 
+			///</summary>
 			public AggInfo pAggInfo;
-
 			///
-///<summary>
-///Used by TK_AGG_COLUMN and TK_AGG_FUNCTION 
-///</summary>
-
+			///<summary>
+			///Used by TK_AGG_COLUMN and TK_AGG_FUNCTION 
+			///</summary>
 			public Table pTab;
-
 			///
-///<summary>
-///Table for TK_COLUMN expressions. 
-///</summary>
-
+			///<summary>
+			///Table for TK_COLUMN expressions. 
+			///</summary>
 			#if SQLITE_MAX_EXPR_DEPTH
 			public int nHeight;
-
 			///
-///<summary>
-///Height of the tree headed by this node 
-///</summary>
-
+			///<summary>
+			///Height of the tree headed by this node 
+			///</summary>
 			public Table pZombieTab;
-
 			///<summary>
 			///List of Table objects to delete after code gen
 			///</summary>
 			#endif
 			#if DEBUG_CLASS
-																																																																																							public int op
+																																																																																										public int op
 {
 get { return _op; }
 set { _op = value; }
 }
 #endif
-			public void CopyFrom (Expr cf)
-			{
-				op = cf.op;
-				affinity = cf.affinity;
-				flags = cf.flags;
-				u = cf.u;
-				pColl = cf.pColl == null ? null : cf.pColl.Copy ();
-				iTable = cf.iTable;
-				iColumn = cf.iColumn;
-				pAggInfo = cf.pAggInfo == null ? null : cf.pAggInfo.Copy ();
-				iAgg = cf.iAgg;
-				iRightJoinTable = cf.iRightJoinTable;
-				flags2 = cf.flags2;
-				pTab = cf.pTab == null ? null : cf.pTab;
+			public void CopyFrom(Expr cf) {
+				op=cf.op;
+				affinity=cf.affinity;
+				flags=cf.flags;
+				u=cf.u;
+				pColl=cf.pColl==null?null:cf.pColl.Copy();
+				iTable=cf.iTable;
+				iColumn=cf.iColumn;
+				pAggInfo=cf.pAggInfo==null?null:cf.pAggInfo.Copy();
+				iAgg=cf.iAgg;
+				iRightJoinTable=cf.iRightJoinTable;
+				flags2=cf.flags2;
+				pTab=cf.pTab==null?null:cf.pTab;
 				#if SQLITE_TEST || SQLITE_MAX_EXPR_DEPTH
-				nHeight = cf.nHeight;
-				pZombieTab = cf.pZombieTab;
+				nHeight=cf.nHeight;
+				pZombieTab=cf.pZombieTab;
 				#endif
-				pLeft = cf.pLeft == null ? null : cf.pLeft.Copy ();
-				pRight = cf.pRight == null ? null : cf.pRight.Copy ();
-				x.pList = cf.x.pList == null ? null : cf.x.pList.Copy ();
-				x.pSelect = cf.x.pSelect == null ? null : cf.x.pSelect.Copy ();
+				pLeft=cf.pLeft==null?null:cf.pLeft.Copy();
+				pRight=cf.pRight==null?null:cf.pRight.Copy();
+				x.pList=cf.x.pList==null?null:cf.x.pList.Copy();
+				x.pSelect=cf.x.pSelect==null?null:cf.x.pSelect.Copy();
 			}
-
-			public Expr Copy ()
-			{
-				if (this == null)
+			public Expr Copy() {
+				if(this==null)
 					return null;
 				else
-					return Copy (flags);
+					return Copy(flags);
 			}
-
-			public Expr Copy (int flag)
-			{
-				Expr cp = new Expr ();
-				cp.op = op;
-				cp.affinity = affinity;
-				cp.flags = flags;
-				cp.u = u;
-				if ((flag & EP_TokenOnly) != 0)
+			public Expr Copy(int flag) {
+				Expr cp=new Expr();
+				cp.op=op;
+				cp.affinity=affinity;
+				cp.flags=flags;
+				cp.u=u;
+				if((flag&EP_TokenOnly)!=0)
 					return cp;
-				if (pLeft != null)
-					cp.pLeft = pLeft.Copy ();
-				if (pRight != null)
-					cp.pRight = pRight.Copy ();
-				cp.x = x;
-				cp.pColl = pColl;
-				if ((flag & EP_Reduced) != 0)
+				if(pLeft!=null)
+					cp.pLeft=pLeft.Copy();
+				if(pRight!=null)
+					cp.pRight=pRight.Copy();
+				cp.x=x;
+				cp.pColl=pColl;
+				if((flag&EP_Reduced)!=0)
 					return cp;
-				cp.iTable = iTable;
-				cp.iColumn = iColumn;
-				cp.iAgg = iAgg;
-				cp.iRightJoinTable = iRightJoinTable;
-				cp.flags2 = flags2;
-				cp.op2 = op2;
-				cp.pAggInfo = pAggInfo;
-				cp.pTab = pTab;
+				cp.iTable=iTable;
+				cp.iColumn=iColumn;
+				cp.iAgg=iAgg;
+				cp.iRightJoinTable=iRightJoinTable;
+				cp.flags2=flags2;
+				cp.op2=op2;
+				cp.pAggInfo=pAggInfo;
+				cp.pTab=pTab;
 				#if SQLITE_MAX_EXPR_DEPTH
-				cp.nHeight = nHeight;
-				cp.pZombieTab = pZombieTab;
+				cp.nHeight=nHeight;
+				cp.pZombieTab=pZombieTab;
 				#endif
 				return cp;
 			}
-
 			public///<summary>
 			/// pExpr is an operand of a comparison operator.  aff2 is the
 			/// type affinity of the other operand.  This routine returns the
 			/// type affinity that should be used for the comparison operator.
 			///
 			///</summary>
-			char sqlite3CompareAffinity (char aff2)
-			{
-				char aff1 = this.sqlite3ExprAffinity ();
-				if (aff1 != '\0' && aff2 != '\0') {
+			char sqlite3CompareAffinity(char aff2) {
+				char aff1=this.sqlite3ExprAffinity();
+				if(aff1!='\0'&&aff2!='\0') {
 					///
-///<summary>
-///Both sides of the comparison are columns. If one has numeric
-///affinity, use that. Otherwise use no affinity.
-///
-///</summary>
-
-					if (aff1 >= SQLITE_AFF_NUMERIC || aff2 >= SQLITE_AFF_NUMERIC)//        if (sqlite3IsNumericAffinity(aff1) || sqlite3IsNumericAffinity(aff2))
+					///<summary>
+					///Both sides of the comparison are columns. If one has numeric
+					///affinity, use that. Otherwise use no affinity.
+					///
+					///</summary>
+					if(aff1>=SQLITE_AFF_NUMERIC||aff2>=SQLITE_AFF_NUMERIC)//        if (sqlite3IsNumericAffinity(aff1) || sqlite3IsNumericAffinity(aff2))
 					 {
 						return SQLITE_AFF_NUMERIC;
 					}
@@ -3183,52 +1887,47 @@ set { _op = value; }
 					}
 				}
 				else
-					if (aff1 == '\0' && aff2 == '\0') {
+					if(aff1=='\0'&&aff2=='\0') {
 						///
-///<summary>
-///Neither side of the comparison is a column.  Compare the
-///results directly.
-///
-///</summary>
-
+						///<summary>
+						///Neither side of the comparison is a column.  Compare the
+						///results directly.
+						///
+						///</summary>
 						return SQLITE_AFF_NONE;
 					}
 					else {
 						///
-///<summary>
-///One side is a column, the other is not. Use the columns affinity. 
-///</summary>
-
-						Debug.Assert (aff1 == 0 || aff2 == 0);
-						return (aff1 != '\0' ? aff1 : aff2);
+						///<summary>
+						///One side is a column, the other is not. Use the columns affinity. 
+						///</summary>
+						Debug.Assert(aff1==0||aff2==0);
+						return (aff1!='\0'?aff1:aff2);
 					}
 			}
-
 			public///<summary>
 			/// pExpr is a comparison operator.  Return the type affinity that should
 			/// be applied to both operands prior to doing the comparison.
 			///
 			///</summary>
-			char comparisonAffinity ()
-			{
+			char comparisonAffinity() {
 				char aff;
-				Debug.Assert (this.op == TK_EQ || this.op == TK_IN || this.op == TK_LT || this.op == TK_GT || this.op == TK_GE || this.op == TK_LE || this.op == TK_NE || this.op == TK_IS || this.op == TK_ISNOT);
-				Debug.Assert (this.pLeft != null);
-				aff = this.pLeft.sqlite3ExprAffinity ();
-				if (this.pRight != null) {
-					aff = this.pRight.sqlite3CompareAffinity (aff);
+				Debug.Assert(this.op==TK_EQ||this.op==TK_IN||this.op==TK_LT||this.op==TK_GT||this.op==TK_GE||this.op==TK_LE||this.op==TK_NE||this.op==TK_IS||this.op==TK_ISNOT);
+				Debug.Assert(this.pLeft!=null);
+				aff=this.pLeft.sqlite3ExprAffinity();
+				if(this.pRight!=null) {
+					aff=this.pRight.sqlite3CompareAffinity(aff);
 				}
 				else
-					if (ExprHasProperty (this, EP_xIsSelect)) {
-						aff = this.x.pSelect.pEList.a [0].pExpr.sqlite3CompareAffinity (aff);
+					if(this.ExprHasProperty(EP_xIsSelect)) {
+						aff=this.x.pSelect.pEList.a[0].pExpr.sqlite3CompareAffinity(aff);
 					}
 					else
-						if (aff == '\0') {
-							aff = SQLITE_AFF_NONE;
+						if(aff=='\0') {
+							aff=SQLITE_AFF_NONE;
 						}
 				return aff;
 			}
-
 			public///<summary>
 			/// pExpr is a comparison expression, eg. '=', '<', IN(...) etc.
 			/// idx_affinity is the affinity of an indexed column. Return true
@@ -3236,20 +1935,18 @@ set { _op = value; }
 			/// the comparison in pExpr.
 			///
 			///</summary>
-			bool sqlite3IndexAffinityOk (char idx_affinity)
-			{
-				char aff = this.comparisonAffinity ();
-				switch (aff) {
+			bool sqlite3IndexAffinityOk(char idx_affinity) {
+				char aff=this.comparisonAffinity();
+				switch(aff) {
 				case SQLITE_AFF_NONE:
-					return true;
+				return true;
 				case SQLITE_AFF_TEXT:
-					return idx_affinity == SQLITE_AFF_TEXT;
+				return idx_affinity==SQLITE_AFF_TEXT;
 				default:
-					return idx_affinity >= SQLITE_AFF_NUMERIC;
+				return idx_affinity>=SQLITE_AFF_NUMERIC;
 				// sqlite3IsNumericAffinity(idx_affinity);
 				}
 			}
-
 			public///<summary>
 			/// The dupedExpr*Size() routines each return the number of bytes required
 			/// to store a copy of an expression or expression tree.  They differ in
@@ -3285,33 +1982,30 @@ set { _op = value; }
 			/// to enforce this constraint.
 			///
 			///</summary>
-			int dupedExprStructSize (int flags)
-			{
+			int dupedExprStructSize(int flags) {
 				int nSize;
-				Debug.Assert (flags == EXPRDUP_REDUCE || flags == 0);
+				Debug.Assert(flags==EXPRDUP_REDUCE||flags==0);
 				///
-///<summary>
-///Only one flag value allowed 
-///</summary>
-
-				if (0 == (flags & EXPRDUP_REDUCE)) {
-					nSize = EXPR_FULLSIZE;
+				///<summary>
+				///Only one flag value allowed 
+				///</summary>
+				if(0==(flags&EXPRDUP_REDUCE)) {
+					nSize=EXPR_FULLSIZE;
 				}
 				else {
-					Debug.Assert (!ExprHasAnyProperty (this, EP_TokenOnly | EP_Reduced));
-					Debug.Assert (!ExprHasProperty (this, EP_FromJoin));
-					Debug.Assert ((this.flags2 & EP2_MallocedToken) == 0);
-					Debug.Assert ((this.flags2 & EP2_Irreducible) == 0);
-					if (this.pLeft != null || this.pRight != null || this.pColl != null || this.x.pList != null || this.x.pSelect != null) {
-						nSize = EXPR_REDUCEDSIZE | EP_Reduced;
+					Debug.Assert(!this.ExprHasAnyProperty(EP_TokenOnly|EP_Reduced));
+					Debug.Assert(!this.ExprHasProperty(EP_FromJoin));
+					Debug.Assert((this.flags2&EP2_MallocedToken)==0);
+					Debug.Assert((this.flags2&EP2_Irreducible)==0);
+					if(this.pLeft!=null||this.pRight!=null||this.pColl!=null||this.x.pList!=null||this.x.pSelect!=null) {
+						nSize=EXPR_REDUCEDSIZE|EP_Reduced;
 					}
 					else {
-						nSize = EXPR_TOKENONLYSIZE | EP_TokenOnly;
+						nSize=EXPR_TOKENONLYSIZE|EP_TokenOnly;
 					}
 				}
 				return nSize;
 			}
-
 			public///<summary>
 			/// Return the number of bytes required to create a duplicate of the
 			/// expression passed as the first argument. The second argument is a
@@ -3326,44 +2020,38 @@ set { _op = value; }
 			/// descended from the Expr.x.pList or Expr.x.pSelect variables).
 			///
 			///</summary>
-			int dupedExprSize (int flags)
-			{
-				int nByte = 0;
-				if (this != null) {
-					nByte = this.dupedExprNodeSize (flags);
-					if ((flags & EXPRDUP_REDUCE) != 0) {
-						nByte += this.pLeft.dupedExprSize (flags) + this.pRight.dupedExprSize (flags);
+			int dupedExprSize(int flags) {
+				int nByte=0;
+				if(this!=null) {
+					nByte=this.dupedExprNodeSize(flags);
+					if((flags&EXPRDUP_REDUCE)!=0) {
+						nByte+=this.pLeft.dupedExprSize(flags)+this.pRight.dupedExprSize(flags);
 					}
 				}
 				return nByte;
 			}
-
 			public///<summary>
 			/// This function returns the space in bytes required to store the copy
 			/// of the Expr structure and a copy of the Expr.u.zToken string (if that
 			/// string is defined.)
 			///
 			///</summary>
-			int dupedExprNodeSize (int flags)
-			{
-				int nByte = this.dupedExprStructSize (flags) & 0xfff;
-				if (!ExprHasProperty (this, EP_IntValue) && this.u.zToken != null) {
-					nByte += StringExtensions.sqlite3Strlen30 (this.u.zToken) + 1;
+			int dupedExprNodeSize(int flags) {
+				int nByte=this.dupedExprStructSize(flags)&0xfff;
+				if(!this.ExprHasProperty(EP_IntValue)&&this.u.zToken!=null) {
+					nByte+=StringExtensions.sqlite3Strlen30(this.u.zToken)+1;
 				}
-				return ROUND8 (nByte);
+				return ROUND8(nByte);
 			}
-
-			public int exprIsConst (int initFlag)
-			{
-				Walker w = new Walker ();
-				w.u.i = initFlag;
-				w.xExprCallback = exprNodeIsConstant;
-				w.xSelectCallback = selectNodeIsConstant;
-				Expr _this = this;
-				w.sqlite3WalkExpr (ref _this);
+			public int exprIsConst(int initFlag) {
+				Walker w=new Walker();
+				w.u.i=initFlag;
+				w.xExprCallback=exprNodeIsConstant;
+				w.xSelectCallback=selectNodeIsConstant;
+				Expr _this=this;
+				w.sqlite3WalkExpr(ref _this);
 				return w.u.i;
 			}
-
 			public///<summary>
 			/// Walk an expression tree.  Return 1 if the expression is constant
 			/// and 0 if it involves variables or function calls.
@@ -3373,11 +2061,9 @@ set { _op = value; }
 			/// a constant.
 			///
 			///</summary>
-			int sqlite3ExprIsConstant ()
-			{
-				return this.exprIsConst (1);
+			int sqlite3ExprIsConstant() {
+				return this.exprIsConst(1);
 			}
-
 			public///<summary>
 			/// Walk an expression tree.  Return 1 if the expression is constant
 			/// that does no originate from the ON or USING clauses of a join.
@@ -3385,11 +2071,9 @@ set { _op = value; }
 			/// an ON or USING clause.
 			///
 			///</summary>
-			int sqlite3ExprIsConstantNotJoin ()
-			{
-				return this.exprIsConst (3);
+			int sqlite3ExprIsConstantNotJoin() {
+				return this.exprIsConst(3);
 			}
-
 			public///<summary>
 			/// Walk an expression tree.  Return 1 if the expression is constant
 			/// or a function call with constant arguments.  Return and 0 if there
@@ -3400,11 +2084,9 @@ set { _op = value; }
 			/// a constant.
 			///
 			///</summary>
-			int sqlite3ExprIsConstantOrFunction ()
-			{
-				return this.exprIsConst (2);
+			int sqlite3ExprIsConstantOrFunction() {
+				return this.exprIsConst(2);
 			}
-
 			public///<summary>
 			/// If the expression p codes a constant integer that is small enough
 			/// to fit in a 32-bit integer, return 1 and put the value of the integer
@@ -3412,39 +2094,36 @@ set { _op = value; }
 			/// to fit in a signed 32-bit integer, return 0 and leave pValue unchanged.
 			///
 			///</summary>
-			int sqlite3ExprIsInteger (ref int pValue)
-			{
-				int rc = 0;
+			int sqlite3ExprIsInteger(ref int pValue) {
+				int rc=0;
 				///
-///<summary>
-///</summary>
-///<param name="If an expression is an integer literal that fits in a signed 32">bit</param>
-///<param name="integer, then the EP_IntValue flag will have already been set ">integer, then the EP_IntValue flag will have already been set </param>
-
-				Debug.Assert (this.op != TK_INTEGER || (this.flags & EP_IntValue) != 0 || !Converter.sqlite3GetInt32 (this.u.zToken, ref rc));
-				if ((this.flags & EP_IntValue) != 0) {
-					pValue = (int)this.u.iValue;
+				///<summary>
+				///</summary>
+				///<param name="If an expression is an integer literal that fits in a signed 32">bit</param>
+				///<param name="integer, then the EP_IntValue flag will have already been set ">integer, then the EP_IntValue flag will have already been set </param>
+				Debug.Assert(this.op!=TK_INTEGER||(this.flags&EP_IntValue)!=0||!Converter.sqlite3GetInt32(this.u.zToken,ref rc));
+				if((this.flags&EP_IntValue)!=0) {
+					pValue=(int)this.u.iValue;
 					return 1;
 				}
-				switch (this.op) {
+				switch(this.op) {
 				case TK_UPLUS: {
-					rc = this.pLeft.sqlite3ExprIsInteger (ref pValue);
+					rc=this.pLeft.sqlite3ExprIsInteger(ref pValue);
 					break;
 				}
 				case TK_UMINUS: {
-					int v = 0;
-					if (this.pLeft.sqlite3ExprIsInteger (ref v) != 0) {
-						pValue = -v;
-						rc = 1;
+					int v=0;
+					if(this.pLeft.sqlite3ExprIsInteger(ref v)!=0) {
+						pValue=-v;
+						rc=1;
 					}
 					break;
 				}
 				default:
-					break;
+				break;
 				}
 				return rc;
 			}
-
 			public///<summary>
 			/// Return FALSE if there is no chance that the expression can be NULL.
 			///
@@ -3460,27 +2139,25 @@ set { _op = value; }
 			/// TRUE.
 			///
 			///</summary>
-			int sqlite3ExprCanBeNull ()
-			{
+			int sqlite3ExprCanBeNull() {
 				u8 op;
-				Expr expr = this;
-				while (expr.op == TK_UPLUS || expr.op == TK_UMINUS) {
-					expr = expr.pLeft;
+				Expr expr=this;
+				while(expr.op==TK_UPLUS||expr.op==TK_UMINUS) {
+					expr=expr.pLeft;
 				}
-				op = expr.op;
-				if (op == TK_REGISTER)
-					op = expr.op2;
-				switch (op) {
+				op=expr.op;
+				if(op==TK_REGISTER)
+					op=expr.op2;
+				switch(op) {
 				case TK_INTEGER:
 				case TK_STRING:
 				case TK_FLOAT:
 				case TK_BLOB:
-					return 0;
+				return 0;
 				default:
-					return 1;
+				return 1;
 				}
 			}
-
 			public///<summary>
 			/// Return TRUE if pExpr is an constant expression that is appropriate
 			/// for factoring out of a loop.  Appropriate expressions are:
@@ -3499,28 +2176,25 @@ set { _op = value; }
 			/// avoid the OP_SCopy.
 			///
 			///</summary>
-			int isAppropriateForFactoring ()
-			{
-				Expr expr = this;
-				if (expr.sqlite3ExprIsConstantNotJoin () == 0) {
+			int isAppropriateForFactoring() {
+				Expr expr=this;
+				if(expr.sqlite3ExprIsConstantNotJoin()==0) {
 					return 0;
 					///
-///<summary>
-///Only constant expressions are appropriate for factoring 
-///</summary>
-
+					///<summary>
+					///Only constant expressions are appropriate for factoring 
+					///</summary>
 				}
-				if ((expr.flags & EP_FixedDest) == 0) {
+				if((expr.flags&EP_FixedDest)==0) {
 					return 1;
 					///
-///<summary>
-///Any constant without a fixed destination is appropriate 
-///</summary>
-
+					///<summary>
+					///Any constant without a fixed destination is appropriate 
+					///</summary>
 				}
-				while (expr.op == TK_UPLUS)
-					expr = expr.pLeft;
-				switch (expr.op) {
+				while(expr.op==TK_UPLUS)
+					expr=expr.pLeft;
+				switch(expr.op) {
 				#if !SQLITE_OMIT_BLOB_LITERAL
 				case TK_BLOB:
 				#endif
@@ -3529,24 +2203,23 @@ set { _op = value; }
 				case TK_FLOAT:
 				case TK_NULL:
 				case TK_STRING: {
-					testcase (expr.op == TK_BLOB);
-					testcase (expr.op == TK_VARIABLE);
-					testcase (expr.op == TK_INTEGER);
-					testcase (expr.op == TK_FLOAT);
-					testcase (expr.op == TK_NULL);
-					testcase (expr.op == TK_STRING);
+					testcase(expr.op==TK_BLOB);
+					testcase(expr.op==TK_VARIABLE);
+					testcase(expr.op==TK_INTEGER);
+					testcase(expr.op==TK_FLOAT);
+					testcase(expr.op==TK_NULL);
+					testcase(expr.op==TK_STRING);
 					///
-///<summary>
-///</summary>
-///<param name="Single">instruction constants with a fixed destination are</param>
-///<param name="better done in">line.  If we factor them, they will just end</param>
-///<param name="up generating an OP_SCopy to move the value to the destination">up generating an OP_SCopy to move the value to the destination</param>
-///<param name="register. ">register. </param>
-
+					///<summary>
+					///</summary>
+					///<param name="Single">instruction constants with a fixed destination are</param>
+					///<param name="better done in">line.  If we factor them, they will just end</param>
+					///<param name="up generating an OP_SCopy to move the value to the destination">up generating an OP_SCopy to move the value to the destination</param>
+					///<param name="register. ">register. </param>
 					return 0;
 				}
 				case TK_UMINUS: {
-					if (expr.pLeft.op == TK_FLOAT || expr.pLeft.op == TK_INTEGER) {
+					if(expr.pLeft.op==TK_FLOAT||expr.pLeft.op==TK_INTEGER) {
 						return 0;
 					}
 					break;
@@ -3557,107 +2230,104 @@ set { _op = value; }
 				}
 				return 1;
 			}
-
-			public char sqlite3ExprAffinity ()
-			{
-				int op = this.op;
-				if (op == TK_SELECT) {
-					Debug.Assert ((this.flags & EP_xIsSelect) != 0);
-					return this.x.pSelect.pEList.a [0].pExpr.sqlite3ExprAffinity ();
+			public char sqlite3ExprAffinity() {
+				int op=this.op;
+				if(op==TK_SELECT) {
+					Debug.Assert((this.flags&EP_xIsSelect)!=0);
+					return this.x.pSelect.pEList.a[0].pExpr.sqlite3ExprAffinity();
 				}
 				#if !SQLITE_OMIT_CAST
-				if (op == TK_CAST) {
-					Debug.Assert (!ExprHasProperty (this, EP_IntValue));
-					return sqlite3AffinityType (this.u.zToken);
+				if(op==TK_CAST) {
+					Debug.Assert(!this.ExprHasProperty(EP_IntValue));
+					return sqlite3AffinityType(this.u.zToken);
 				}
 				#endif
-				if ((op == TK_AGG_COLUMN || op == TK_COLUMN || op == TK_REGISTER) && this.pTab != null) {
+				if((op==TK_AGG_COLUMN||op==TK_COLUMN||op==TK_REGISTER)&&this.pTab!=null) {
 					///
-///<summary>
-///op==TK_REGISTER && pExpr.pTab!=0 happens when pExpr was originally
-///a TK_COLUMN but was previously evaluated and cached in a register 
-///</summary>
-
-					int j = this.iColumn;
-					if (j < 0)
+					///<summary>
+					///op==TK_REGISTER && pExpr.pTab!=0 happens when pExpr was originally
+					///a TK_COLUMN but was previously evaluated and cached in a register 
+					///</summary>
+					int j=this.iColumn;
+					if(j<0)
 						return SQLITE_AFF_INTEGER;
-					Debug.Assert (this.pTab != null && j < this.pTab.nCol);
-					return this.pTab.aCol [j].affinity;
+					Debug.Assert(this.pTab!=null&&j<this.pTab.nCol);
+					return this.pTab.aCol[j].affinity;
 				}
 				return this.affinity;
 			}
-
-			public Expr sqlite3ExprSetColl (CollSeq pColl)
-			{
-				if (this != null && pColl != null) {
-					this.pColl = pColl;
-					this.flags |= EP_ExpCollate;
+			public Expr sqlite3ExprSetColl(CollSeq pColl) {
+				if(this!=null&&pColl!=null) {
+					this.pColl=pColl;
+					this.flags|=EP_ExpCollate;
 				}
 				return this;
 			}
-
-			public u8 binaryCompareP5 (Expr pExpr2, int jumpIfNull)
-			{
-				u8 aff = (u8)pExpr2.sqlite3ExprAffinity ();
-				aff = (u8)((u8)this.sqlite3CompareAffinity ((char)aff) | (u8)jumpIfNull);
+			public u8 binaryCompareP5(Expr pExpr2,int jumpIfNull) {
+				u8 aff=(u8)pExpr2.sqlite3ExprAffinity();
+				aff=(u8)((u8)this.sqlite3CompareAffinity((char)aff)|(u8)jumpIfNull);
 				return aff;
 			}
-
-			public void exprSetHeight ()
-			{
-				int nHeight = 0;
-				this.pLeft.heightOfExpr (ref nHeight);
-				this.pRight.heightOfExpr (ref nHeight);
-				if (ExprHasProperty (this, EP_xIsSelect)) {
-					this.x.pSelect.heightOfSelect (ref nHeight);
+			public void exprSetHeight() {
+				int nHeight=0;
+				this.pLeft.heightOfExpr(ref nHeight);
+				this.pRight.heightOfExpr(ref nHeight);
+				if(this.ExprHasProperty(EP_xIsSelect)) {
+					this.x.pSelect.heightOfSelect(ref nHeight);
 				}
 				else {
-					this.x.pList.heightOfExprList (ref nHeight);
+					this.x.pList.heightOfExprList(ref nHeight);
 				}
-				this.nHeight = nHeight + 1;
+				this.nHeight=nHeight+1;
 			}
-
-			public int isMatchOfColumn (///
-///<summary>
-///Test this expression 
-///</summary>
-
-			)
-			{
+			public int isMatchOfColumn(///
+			///<summary>
+			///Test this expression 
+			///</summary>
+			) {
 				ExprList pList;
-				if (this.op != TK_FUNCTION) {
+				if(this.op!=TK_FUNCTION) {
 					return 0;
 				}
-				if (!this.u.zToken.Equals ("match", StringComparison.InvariantCultureIgnoreCase)) {
+				if(!this.u.zToken.Equals("match",StringComparison.InvariantCultureIgnoreCase)) {
 					return 0;
 				}
-				pList = this.x.pList;
-				if (pList.nExpr != 2) {
+				pList=this.x.pList;
+				if(pList.nExpr!=2) {
 					return 0;
 				}
-				if (pList.a [1].pExpr.op != TK_COLUMN) {
+				if(pList.a[1].pExpr.op!=TK_COLUMN) {
 					return 0;
 				}
 				return 1;
 			}
-
-			public void transferJoinMarkings (Expr pBase)
-			{
-				this.flags = (u16)(this.flags | pBase.flags & EP_FromJoin);
-				this.iRightJoinTable = pBase.iRightJoinTable;
+			public void transferJoinMarkings(Expr pBase) {
+				this.flags=(u16)(this.flags|pBase.flags&EP_FromJoin);
+				this.iRightJoinTable=pBase.iRightJoinTable;
 			}
-
 			public TokenType Operator2 {
 				get {
 					return (TokenType)op2;
 				}
 				set {
-					op2 = (u8)value;
+					op2=(u8)value;
 				}
 			}
+			public void ExprSetIrreducible() {
+			}
+			public bool ExprHasProperty(int P) {
+				return (this.flags&P)==P;
+			}
+			public bool ExprHasAnyProperty(int P) {
+				return (this.flags&P)!=0;
+			}
+			public void ExprSetProperty(int P) {
+				this.flags=(ushort)(this.flags|P);
+			}
+			public void ExprClearProperty(int P) {
+				this.flags=(ushort)(this.flags&~P);
+			}
 		}
-
-		
 		///<summary>
 		/// The pseudo-routine sqlite3ExprSetIrreducible sets the EP2_Irreducible
 		/// flag on an expression structure.  This flag is used for VV&A only.  The
@@ -3666,73 +2336,43 @@ set { _op = value; }
 		///
 		///</summary>
 		#if SQLITE_DEBUG
-																																																										    // define ExprSetIrreducible(X)  (X)->flags2 |= EP2_Irreducible
+																																																												    // define ExprSetIrreducible(X)  (X)->flags2 |= EP2_Irreducible
     static void ExprSetIrreducible( Expr X )
     {
       X.flags2 |= EP2_Irreducible;
     }
 #else
 		//# define ExprSetIrreducible(X)
-		private static void ExprSetIrreducible (Expr X)
-		{
-		}
-
 		#endif
 		///<summary>
 		/// These macros can be used to test, set, or clear bits in the
 		/// Expr.flags field.
 		///</summary>
 		//#define ExprHasProperty(E,P)     (((E)->flags&(P))==(P))
-		private static bool ExprHasProperty (Expr E, int P)
-		{
-			return (E.flags & P) == P;
-		}
-
 		//#define ExprHasAnyProperty(E,P)  (((E)->flags&(P))!=0)
-		private static bool ExprHasAnyProperty (Expr E, int P)
-		{
-			return (E.flags & P) != 0;
-		}
-
 		//#define ExprSetProperty(E,P)     (E)->flags|=(P)
-		private static void ExprSetProperty (Expr E, int P)
-		{
-			E.flags = (ushort)(E.flags | P);
-		}
-
 		//#define ExprClearProperty(E,P)   (E)->flags&=~(P)
-		private static void ExprClearProperty (Expr E, int P)
-		{
-			E.flags = (ushort)(E.flags & ~P);
-		}
-
 		///
-///<summary>
-///Macros to determine the number of bytes required by a normal Expr
-///struct, an Expr struct with the EP_Reduced flag set in Expr.flags
-///and an Expr struct with the EP_TokenOnly flag set.
-///
-///</summary>
-
+		///<summary>
+		///Macros to determine the number of bytes required by a normal Expr
+		///struct, an Expr struct with the EP_Reduced flag set in Expr.flags
+		///and an Expr struct with the EP_TokenOnly flag set.
+		///
+		///</summary>
 		//#define EXPR_FULLSIZE           sizeof(Expr)           /* Full size */
 		//#define EXPR_REDUCEDSIZE        offsetof(Expr,iTable)  /* Common features */
 		//#define EXPR_TOKENONLYSIZE      offsetof(Expr,pLeft)   /* Fewer features */
 		// We don't use these in C#, but define them anyway,
-		private const int EXPR_FULLSIZE = 48;
-
-		private const int EXPR_REDUCEDSIZE = 24;
-
-		private const int EXPR_TOKENONLYSIZE = 8;
-
+		private const int EXPR_FULLSIZE=48;
+		private const int EXPR_REDUCEDSIZE=24;
+		private const int EXPR_TOKENONLYSIZE=8;
 		///<summary>
 		/// Flags passed to the sqlite3ExprDup() function. See the header comment
 		/// above sqlite3ExprDup() for details.
 		///
 		///</summary>
 		//#define EXPRDUP_REDUCE         0x0001  /* Used reduced-size Expr nodes */
-		private const int EXPRDUP_REDUCE = 0x0001;
-
-		
+		private const int EXPRDUP_REDUCE=0x0001;
 		///<summary>
 		/// An instance of this structure can hold a simple list of identifiers,
 		/// such as the list "a,b,c" in the following statements:
@@ -3749,1086 +2389,56 @@ set { _op = value; }
 		/// If "a" is the k-th column of table "t", then IdList.a[0].idx==k.
 		///
 		///</summary>
-		public class IdList_item
-		{
+		public class IdList_item {
 			public string zName;
-
 			///
-///<summary>
-///Name of the identifier 
-///</summary>
-
+			///<summary>
+			///Name of the identifier 
+			///</summary>
 			public int idx;
 		///
-///<summary>
-///Index in some Table.aCol[] of a column named zName 
-///</summary>
-
+		///<summary>
+		///Index in some Table.aCol[] of a column named zName 
+		///</summary>
 		}
-
-		public class IdList
-		{
+		public class IdList {
 			public IdList_item[] a;
-
 			public int nId;
-
 			///<summary>
 			///Number of identifiers on the list
 			///</summary>
 			public int nAlloc;
-
 			///
-///<summary>
-///Number of entries allocated for a[] below 
-///</summary>
-
-			public IdList Copy ()
-			{
-				if (this == null)
+			///<summary>
+			///Number of entries allocated for a[] below 
+			///</summary>
+			public IdList Copy() {
+				if(this==null)
 					return null;
 				else {
-					IdList cp = (IdList)MemberwiseClone ();
-					a.CopyTo (cp.a, 0);
+					IdList cp=(IdList)MemberwiseClone();
+					a.CopyTo(cp.a,0);
 					return cp;
 				}
 			}
 		};
 
-
 		///
-///<summary>
-///The bitmask datatype defined below is used for various optimizations.
-///
-///</summary>
-///<param name="Changing this from a 64">bit type limits the number of</param>
-///<param name="tables in a join to 32 instead of 64.  But it also reduces the size">tables in a join to 32 instead of 64.  But it also reduces the size</param>
-///<param name="of the library by 738 bytes on ix86.">of the library by 738 bytes on ix86.</param>
-///<param name=""></param>
-
+		///<summary>
+		///The bitmask datatype defined below is used for various optimizations.
+		///
+		///</summary>
+		///<param name="Changing this from a 64">bit type limits the number of</param>
+		///<param name="tables in a join to 32 instead of 64.  But it also reduces the size">tables in a join to 32 instead of 64.  But it also reduces the size</param>
+		///<param name="of the library by 738 bytes on ix86.">of the library by 738 bytes on ix86.</param>
+		///<param name=""></param>
 		//typedef u64 Bitmask;
 		///<summary>
 		/// The number of bits in a Bitmask.  "BMS" means "BitMask Size".
 		///
 		///</summary>
 		//#define BMS  ((int)(sizeof(Bitmask)*8))
-		private const int BMS = ((int)(sizeof(Bitmask) * 8));
-
-		///<summary>
-		/// The following structure describes the FROM clause of a SELECT statement.
-		/// Each table or subquery in the FROM clause is a separate element of
-		/// the SrcList.a[] array.
-		///
-		/// With the addition of multiple database support, the following structure
-		/// can also be used to describe a particular table such as the table that
-		/// is modified by an INSERT, DELETE, or UPDATE statement.  In standard SQL,
-		/// such a table must be a simple name: ID.  But in SQLite, the table can
-		/// now be identified by a database name, a dot, then the table name: ID.ID.
-		///
-		/// The jointype starts out showing the join type between the current table
-		/// and the next table on the list.  The parser builds the list this way.
-		/// But sqlite3SrcListShiftJoinType() later shifts the jointypes so that each
-		/// jointype expresses the join between the table and the previous table.
-		///
-		/// In the colUsed field, the high-order bit (bit 63) is set if the table
-		/// contains more than 63 columns and the 64-th or later column is used.
-		///
-		///</summary>
-		public class SrcList_item
-		{
-			public string zDatabase;
-
-			///
-///<summary>
-///Name of database holding this table 
-///</summary>
-
-			public string zName;
-
-			///
-///<summary>
-///Name of the table 
-///</summary>
-
-			public string zAlias;
-
-			///
-///<summary>
-///The "B" part of a "A AS B" phrase.  zName is the "A" 
-///</summary>
-
-			public Table pTab;
-
-			///
-///<summary>
-///An SQL table corresponding to zName 
-///</summary>
-
-			public Select pSelect;
-
-			///
-///<summary>
-///A SELECT statement used in place of a table name 
-///</summary>
-
-			public u8 isPopulated;
-
-			///
-///<summary>
-///Temporary table associated with SELECT is populated 
-///</summary>
-
-			public u8 jointype;
-
-			///
-///<summary>
-///Type of join between this able and the previous 
-///</summary>
-
-			public u8 notIndexed;
-
-			///
-///<summary>
-///True if there is a NOT INDEXED clause 
-///</summary>
-
-			#if !SQLITE_OMIT_EXPLAIN
-			public u8 iSelectId;
-
-			///
-///<summary>
-///</summary>
-///<param name="If pSelect!=0, the id of the sub">select in EQP </param>
-
-			#endif
-			public int iCursor;
-
-			///
-///<summary>
-///The VDBE cursor number used to access this table 
-///</summary>
-
-			public Expr pOn;
-
-			///
-///<summary>
-///The ON clause of a join 
-///</summary>
-
-			public IdList pUsing;
-
-			///
-///<summary>
-///The USING clause of a join 
-///</summary>
-
-			public Bitmask colUsed;
-
-			///
-///<summary>
-///Bit N (1<<N) set if column N of pTab is used 
-///</summary>
-
-			public string zIndex;
-
-			///
-///<summary>
-///Identifier from "INDEXED BY <zIndex>" clause 
-///</summary>
-
-			public Index pIndex;
-		///
-///<summary>
-///Index structure corresponding to zIndex, if any 
-///</summary>
-
-		}
-
-		public class SrcList
-		{
-			public i16 nSrc;
-
-			///
-///<summary>
-///Number of tables or subqueries in the FROM clause 
-///</summary>
-
-			public i16 nAlloc;
-
-			///<summary>
-			///Number of entries allocated in a[] below
-			///</summary>
-			public SrcList_item[] a;
-
-			///
-///<summary>
-///One entry for each identifier on the list 
-///</summary>
-
-			public SrcList Copy ()
-			{
-				if (this == null)
-					return null;
-				else {
-					SrcList cp = (SrcList)MemberwiseClone ();
-					if (a != null)
-						a.CopyTo (cp.a, 0);
-					return cp;
-				}
-			}
-
-			public void exprAnalyzeAll (///
-///<summary>
-///the FROM clause 
-///</summary>
-
-			WhereClause pWC///
-///<summary>
-///the WHERE clause to be analyzed 
-///</summary>
-
-			)
-			{
-				int i;
-				for (i = pWC.nTerm - 1; i >= 0; i--) {
-					this.exprAnalyze (pWC, i);
-				}
-			}
-
-			public void exprAnalyzeOrTerm (///
-///<summary>
-///the FROM clause 
-///</summary>
-
-			WhereClause pWC, ///
-///<summary>
-///the complete WHERE clause 
-///</summary>
-
-			int idxTerm///
-///<summary>
-///</summary>
-///<param name="Index of the OR">term to be analyzed </param>
-
-			)
-			{
-				Parse pParse = pWC.pParse;
-				///
-///<summary>
-///Parser context 
-///</summary>
-
-				sqlite3 db = pParse.db;
-				///
-///<summary>
-///Data_base connection 
-///</summary>
-
-				WhereTerm pTerm = pWC.a [idxTerm];
-				///
-///<summary>
-///The term to be analyzed 
-///</summary>
-
-				Expr pExpr = pTerm.pExpr;
-				///
-///<summary>
-///The expression of the term 
-///</summary>
-
-				WhereMaskSet pMaskSet = pWC.pMaskSet;
-				///
-///<summary>
-///Table use masks 
-///</summary>
-
-				int i;
-				///
-///<summary>
-///Loop counters 
-///</summary>
-
-				WhereClause pOrWc;
-				///
-///<summary>
-///Breakup of pTerm into subterms 
-///</summary>
-
-				WhereTerm pOrTerm;
-				///
-///<summary>
-///</summary>
-///<param name="A Sub">term within the pOrWc </param>
-
-				WhereOrInfo pOrInfo;
-				///
-///<summary>
-///Additional information Debug.Associated with pTerm 
-///</summary>
-
-				Bitmask chngToIN;
-				///
-///<summary>
-///Tables that might satisfy case 1 
-///</summary>
-
-				Bitmask indexable;
-				///
-///<summary>
-///Tables that are indexable, satisfying case 2 
-///</summary>
-
-				///
-///<summary>
-///Break the OR clause into its separate subterms.  The subterms are
-///stored in a WhereClause structure containing within the WhereOrInfo
-///object that is attached to the original OR clause term.
-///
-///</summary>
-
-				Debug.Assert ((pTerm.wtFlags & (TERM_DYNAMIC | TERM_ORINFO | TERM_ANDINFO)) == 0);
-				Debug.Assert (pExpr.op == TK_OR);
-				pTerm.u.pOrInfo = pOrInfo = new WhereOrInfo ();
-				//sqlite3DbMallocZero(db, sizeof(*pOrInfo));
-				if (pOrInfo == null)
-					return;
-				pTerm.wtFlags |= TERM_ORINFO;
-				pOrWc = pOrInfo.wc;
-				pOrWc.whereClauseInit (pWC.pParse, pMaskSet);
-				pOrWc.whereSplit (pExpr, TokenType.TK_OR);
-				this.exprAnalyzeAll (pOrWc);
-				//      if ( db.mallocFailed != 0 ) return;
-				Debug.Assert (pOrWc.nTerm >= 2);
-				///
-///<summary>
-///Compute the set of tables that might satisfy cases 1 or 2.
-///
-///</summary>
-
-				indexable = ~(Bitmask)0;
-				chngToIN = ~(pWC.vmask);
-				for (i = pOrWc.nTerm - 1; i >= 0 && indexable != 0; i--)//, pOrTerm++ )
-				 {
-					pOrTerm = pOrWc.a [i];
-					if ((pOrTerm.eOperator & WO_SINGLE) == 0) {
-						WhereAndInfo pAndInfo;
-						Debug.Assert (pOrTerm.eOperator == 0);
-						Debug.Assert ((pOrTerm.wtFlags & (TERM_ANDINFO | TERM_ORINFO)) == 0);
-						chngToIN = 0;
-						pAndInfo = new WhereAndInfo ();
-						//sqlite3DbMallocRaw(db, sizeof(*pAndInfo));
-						if (pAndInfo != null) {
-							WhereClause pAndWC;
-							WhereTerm pAndTerm;
-							int j;
-							Bitmask b = 0;
-							pOrTerm.u.pAndInfo = pAndInfo;
-							pOrTerm.wtFlags |= TERM_ANDINFO;
-							pOrTerm.eOperator = WO_AND;
-							pAndWC = pAndInfo.wc;
-							pAndWC.whereClauseInit (pWC.pParse, pMaskSet);
-							pAndWC.whereSplit (pOrTerm.pExpr, TokenType.TK_AND);
-							this.exprAnalyzeAll (pAndWC);
-							//testcase( db.mallocFailed );
-							////if ( 0 == db.mallocFailed )
-							{
-								for (j = 0; j < pAndWC.nTerm; j++)//, pAndTerm++ )
-								 {
-									pAndTerm = pAndWC.a [j];
-									Debug.Assert (pAndTerm.pExpr != null);
-									if (allowedOp (pAndTerm.pExpr.op)) {
-										b |= pMaskSet.getMask (pAndTerm.leftCursor);
-									}
-								}
-							}
-							indexable &= b;
-						}
-					}
-					else
-						if ((pOrTerm.wtFlags & TERM_COPIED) != 0) {
-							///
-///<summary>
-///Skip this term for now.  We revisit it when we process the
-///corresponding TERM_VIRTUAL term 
-///</summary>
-
-						}
-						else {
-							Bitmask b;
-							b = pMaskSet.getMask (pOrTerm.leftCursor);
-							if ((pOrTerm.wtFlags & TERM_VIRTUAL) != 0) {
-								WhereTerm pOther = pOrWc.a [pOrTerm.iParent];
-								b |= pMaskSet.getMask (pOther.leftCursor);
-							}
-							indexable &= b;
-							if (pOrTerm.eOperator != WO_EQ) {
-								chngToIN = 0;
-							}
-							else {
-								chngToIN &= b;
-							}
-						}
-				}
-				///
-///<summary>
-///Record the set of tables that satisfy case 2.  The set might be
-///empty.
-///
-///</summary>
-
-				pOrInfo.indexable = indexable;
-				pTerm.eOperator = (u16)(indexable == 0 ? 0 : WO_OR);
-				///
-///<summary>
-///chngToIN holds a set of tables that *might* satisfy case 1.  But
-///we have to do some additional checking to see if case 1 really
-///is satisfied.
-///
-///</summary>
-///<param name="chngToIN will hold either 0, 1, or 2 bits.  The 0">bit case means</param>
-///<param name="that there is no possibility of transforming the OR clause into an">that there is no possibility of transforming the OR clause into an</param>
-///<param name="IN operator because one or more terms in the OR clause contain">IN operator because one or more terms in the OR clause contain</param>
-///<param name="something other than == on a column in the single table.  The 1">bit</param>
-///<param name="case means that every term of the OR clause is of the form">case means that every term of the OR clause is of the form</param>
-///<param name=""table.column=expr" for some single table.  The one bit that is set">"table.column=expr" for some single table.  The one bit that is set</param>
-///<param name="will correspond to the common table.  We still need to check to make">will correspond to the common table.  We still need to check to make</param>
-///<param name="sure the same column is used on all terms.  The 2">bit case is when</param>
-///<param name="the all terms are of the form "table1.column=table2.column".  It">the all terms are of the form "table1.column=table2.column".  It</param>
-///<param name="might be possible to form an IN operator with either table1.column">might be possible to form an IN operator with either table1.column</param>
-///<param name="or table2.column as the LHS if either is common to every term of">or table2.column as the LHS if either is common to every term of</param>
-///<param name="the OR clause.">the OR clause.</param>
-///<param name=""></param>
-///<param name="Note that terms of the form "table.column1=table.column2" (the">Note that terms of the form "table.column1=table.column2" (the</param>
-///<param name="same table on both sizes of the ==) cannot be optimized.">same table on both sizes of the ==) cannot be optimized.</param>
-///<param name=""></param>
-
-				if (chngToIN != 0) {
-					int okToChngToIN = 0;
-					///
-///<summary>
-///True if the conversion to IN is valid 
-///</summary>
-
-					int iColumn = -1;
-					///
-///<summary>
-///Column index on lhs of IN operator 
-///</summary>
-
-					int iCursor = -1;
-					///
-///<summary>
-///Table cursor common to all terms 
-///</summary>
-
-					int j = 0;
-					///
-///<summary>
-///Loop counter 
-///</summary>
-
-					///
-///<summary>
-///Search for a table and column that appears on one side or the
-///other of the == operator in every subterm.  That table and column
-///will be recorded in iCursor and iColumn.  There might not be any
-///such table and column.  Set okToChngToIN if an appropriate table
-///and column is found but leave okToChngToIN false if not found.
-///
-///</summary>
-
-					for (j = 0; j < 2 && 0 == okToChngToIN; j++) {
-						//pOrTerm = pOrWc.a;
-						for (i = pOrWc.nTerm - 1; i >= 0; i--)//, pOrTerm++)
-						 {
-							pOrTerm = pOrWc.a [pOrWc.nTerm - 1 - i];
-							Debug.Assert (pOrTerm.eOperator == WO_EQ);
-							pOrTerm.wtFlags = (u8)(pOrTerm.wtFlags & ~TERM_OR_OK);
-							if (pOrTerm.leftCursor == iCursor) {
-								///
-///<summary>
-///</summary>
-///<param name="This is the 2">bit case and we are on the second iteration and</param>
-///<param name="current term is from the first iteration.  So skip this term. ">current term is from the first iteration.  So skip this term. </param>
-
-								Debug.Assert (j == 1);
-								continue;
-							}
-							if ((chngToIN & pMaskSet.getMask (pOrTerm.leftCursor)) == 0) {
-								///
-///<summary>
-///This term must be of the form t1.a==t2.b where t2 is in the
-///chngToIN set but t1 is not.  This term will be either preceeded
-///or follwed by an inverted copy (t2.b==t1.a).  Skip this term
-///and use its inversion. 
-///</summary>
-
-								testcase (pOrTerm.wtFlags & TERM_COPIED);
-								testcase (pOrTerm.wtFlags & TERM_VIRTUAL);
-								Debug.Assert ((pOrTerm.wtFlags & (TERM_COPIED | TERM_VIRTUAL)) != 0);
-								continue;
-							}
-							iColumn = pOrTerm.u.leftColumn;
-							iCursor = pOrTerm.leftCursor;
-							break;
-						}
-						if (i < 0) {
-							///
-///<summary>
-///No candidate table+column was found.  This can only occur
-///on the second iteration 
-///</summary>
-
-							Debug.Assert (j == 1);
-							Debug.Assert ((chngToIN & (chngToIN - 1)) == 0);
-							Debug.Assert (chngToIN == pMaskSet.getMask (iCursor));
-							break;
-						}
-						testcase (j == 1);
-						///
-///<summary>
-///We have found a candidate table and column.  Check to see if that
-///table and column is common to every term in the OR clause 
-///</summary>
-
-						okToChngToIN = 1;
-						for (; i >= 0 && okToChngToIN != 0; i--)//, pOrTerm++)
-						 {
-							pOrTerm = pOrWc.a [pOrWc.nTerm - 1 - i];
-							Debug.Assert (pOrTerm.eOperator == WO_EQ);
-							if (pOrTerm.leftCursor != iCursor) {
-								pOrTerm.wtFlags = (u8)(pOrTerm.wtFlags & ~TERM_OR_OK);
-							}
-							else
-								if (pOrTerm.u.leftColumn != iColumn) {
-									okToChngToIN = 0;
-								}
-								else {
-									int affLeft, affRight;
-									///
-///<summary>
-///</summary>
-///<param name="If the right">hand side is also a column, then the affinities</param>
-///<param name="of both right and left sides must be such that no type">of both right and left sides must be such that no type</param>
-///<param name="conversions are required on the right.  (Ticket #2249)">conversions are required on the right.  (Ticket #2249)</param>
-///<param name=""></param>
-
-									affRight = pOrTerm.pExpr.pRight.sqlite3ExprAffinity ();
-									affLeft = pOrTerm.pExpr.pLeft.sqlite3ExprAffinity ();
-									if (affRight != 0 && affRight != affLeft) {
-										okToChngToIN = 0;
-									}
-									else {
-										pOrTerm.wtFlags |= TERM_OR_OK;
-									}
-								}
-						}
-					}
-					///
-///<summary>
-///At this point, okToChngToIN is true if original pTerm satisfies
-///case 1.  In that case, construct a new virtual term that is
-///pTerm converted into an IN operator.
-///
-///</summary>
-///<param name="EV: R">15100</param>
-///<param name=""></param>
-
-					if (okToChngToIN != 0) {
-						Expr pDup;
-						///
-///<summary>
-///A transient duplicate expression 
-///</summary>
-
-						ExprList pList = null;
-						///
-///<summary>
-///The RHS of the IN operator 
-///</summary>
-
-						Expr pLeft = null;
-						///
-///<summary>
-///The LHS of the IN operator 
-///</summary>
-
-						Expr pNew;
-						///
-///<summary>
-///The complete IN operator 
-///</summary>
-
-						for (i = pOrWc.nTerm - 1; i >= 0; i--)//, pOrTerm++)
-						 {
-							pOrTerm = pOrWc.a [pOrWc.nTerm - 1 - i];
-							if ((pOrTerm.wtFlags & TERM_OR_OK) == 0)
-								continue;
-							Debug.Assert (pOrTerm.eOperator == WO_EQ);
-							Debug.Assert (pOrTerm.leftCursor == iCursor);
-							Debug.Assert (pOrTerm.u.leftColumn == iColumn);
-							pDup = sqlite3ExprDup (db, pOrTerm.pExpr.pRight, 0);
-							pList = pWC.pParse.sqlite3ExprListAppend (pList, pDup);
-							pLeft = pOrTerm.pExpr.pLeft;
-						}
-						Debug.Assert (pLeft != null);
-						pDup = sqlite3ExprDup (db, pLeft, 0);
-						pNew = pParse.sqlite3PExpr (TK_IN, pDup, null, null);
-						if (pNew != null) {
-							int idxNew;
-							pNew.transferJoinMarkings (pExpr);
-							Debug.Assert (!ExprHasProperty (pNew, EP_xIsSelect));
-							pNew.x.pList = pList;
-							idxNew = pWC.whereClauseInsert (pNew, TERM_VIRTUAL | TERM_DYNAMIC);
-							testcase (idxNew == 0);
-							this.exprAnalyze (pWC, idxNew);
-							pTerm = pWC.a [idxTerm];
-							pWC.a [idxNew].iParent = idxTerm;
-							pTerm.nChild = 1;
-						}
-						else {
-							sqlite3ExprListDelete (db, ref pList);
-						}
-						pTerm.eOperator = WO_NOOP;
-						///
-///<summary>
-///case 1 trumps case 2 
-///</summary>
-
-					}
-				}
-			}
-
-			public void exprAnalyze (///
-///<summary>
-///the FROM clause 
-///</summary>
-
-			WhereClause pWC, ///
-///<summary>
-///the WHERE clause 
-///</summary>
-
-			int idxTerm///
-///<summary>
-///Index of the term to be analyzed 
-///</summary>
-
-			)
-			{
-				WhereTerm pTerm;
-				///
-///<summary>
-///The term to be analyzed 
-///</summary>
-
-				WhereMaskSet pMaskSet;
-				///
-///<summary>
-///Set of table index masks 
-///</summary>
-
-				Expr pExpr;
-				///
-///<summary>
-///The expression to be analyzed 
-///</summary>
-
-				Bitmask prereqLeft;
-				///
-///<summary>
-///Prerequesites of the pExpr.pLeft 
-///</summary>
-
-				Bitmask prereqAll;
-				///
-///<summary>
-///Prerequesites of pExpr 
-///</summary>
-
-				Bitmask extraRight = 0;
-				///
-///<summary>
-///Extra dependencies on LEFT JOIN 
-///</summary>
-
-				Expr pStr1 = null;
-				///
-///<summary>
-///RHS of LIKE/GLOB operator 
-///</summary>
-
-				bool isComplete = false;
-				///
-///<summary>
-///RHS of LIKE/GLOB ends with wildcard 
-///</summary>
-
-				bool noCase = false;
-				///
-///<summary>
-///LIKE/GLOB distinguishes case 
-///</summary>
-
-				int op;
-				///
-///<summary>
-///</summary>
-///<param name="Top">level operator.  pExpr.op </param>
-
-				Parse pParse = pWC.pParse;
-				///
-///<summary>
-///Parsing context 
-///</summary>
-
-				sqlite3 db = pParse.db;
-				///
-///<summary>
-///Data_base connection 
-///</summary>
-
-				//if ( db.mallocFailed != 0 )
-				//{
-				//  return;
-				//}
-				pTerm = pWC.a [idxTerm];
-				pMaskSet = pWC.pMaskSet;
-				pExpr = pTerm.pExpr;
-				prereqLeft = pMaskSet.exprTableUsage (pExpr.pLeft);
-				op = pExpr.op;
-				if (op == TK_IN) {
-					Debug.Assert (pExpr.pRight == null);
-					if (ExprHasProperty (pExpr, EP_xIsSelect)) {
-						pTerm.prereqRight = pMaskSet.exprSelectTableUsage (pExpr.x.pSelect);
-					}
-					else {
-						pTerm.prereqRight = pMaskSet.exprListTableUsage (pExpr.x.pList);
-					}
-				}
-				else
-					if (op == TK_ISNULL) {
-						pTerm.prereqRight = 0;
-					}
-					else {
-						pTerm.prereqRight = pMaskSet.exprTableUsage (pExpr.pRight);
-					}
-				prereqAll = pMaskSet.exprTableUsage (pExpr);
-				if (ExprHasProperty (pExpr, EP_FromJoin)) {
-					Bitmask x = pMaskSet.getMask (pExpr.iRightJoinTable);
-					prereqAll |= x;
-					extraRight = x - 1;
-					///
-///<summary>
-///ON clause terms may not be used with an index
-///on left table of a LEFT JOIN.  Ticket #3015 
-///</summary>
-
-				}
-				pTerm.prereqAll = prereqAll;
-				pTerm.leftCursor = -1;
-				pTerm.iParent = -1;
-				pTerm.eOperator = 0;
-				if (allowedOp (op) && (pTerm.prereqRight & prereqLeft) == 0) {
-					Expr pLeft = pExpr.pLeft;
-					Expr pRight = pExpr.pRight;
-					if (pLeft.op == TK_COLUMN) {
-						pTerm.leftCursor = pLeft.iTable;
-						pTerm.u.leftColumn = pLeft.iColumn;
-						pTerm.eOperator = operatorMask (op);
-					}
-					if (pRight != null && pRight.op == TK_COLUMN) {
-						WhereTerm pNew;
-						Expr pDup;
-						if (pTerm.leftCursor >= 0) {
-							int idxNew;
-							pDup = sqlite3ExprDup (db, pExpr, 0);
-							//if ( db.mallocFailed != 0 )
-							//{
-							//  sqlite3ExprDelete( db, ref pDup );
-							//  return;
-							//}
-							idxNew = pWC.whereClauseInsert (pDup, TERM_VIRTUAL | TERM_DYNAMIC);
-							if (idxNew == 0)
-								return;
-							pNew = pWC.a [idxNew];
-							pNew.iParent = idxTerm;
-							pTerm = pWC.a [idxTerm];
-							pTerm.nChild = 1;
-							pTerm.wtFlags |= TERM_COPIED;
-						}
-						else {
-							pDup = pExpr;
-							pNew = pTerm;
-						}
-						pParse.exprCommute (pDup);
-						pLeft = pDup.pLeft;
-						pNew.leftCursor = pLeft.iTable;
-						pNew.u.leftColumn = pLeft.iColumn;
-						testcase ((prereqLeft | extraRight) != prereqLeft);
-						pNew.prereqRight = prereqLeft | extraRight;
-						pNew.prereqAll = prereqAll;
-						pNew.eOperator = operatorMask (pDup.op);
-					}
-				}
-				#if !SQLITE_OMIT_BETWEEN_OPTIMIZATION
-				///
-///<summary>
-///If a term is the BETWEEN operator, create two new virtual terms
-///that define the range that the BETWEEN implements.  For example:
-///
-///a BETWEEN b AND c
-///
-///is converted into:
-///
-///(a BETWEEN b AND c) AND (a>=b) AND (a<=c)
-///
-///The two new terms are added onto the end of the WhereClause object.
-///The new terms are "dynamic" and are children of the original BETWEEN
-///term.  That means that if the BETWEEN term is coded, the children are
-///skipped.  Or, if the children are satisfied by an index, the original
-///BETWEEN term is skipped.
-///</summary>
-
-				else
-					if (pExpr.Operator == TokenType.TK_BETWEEN && pWC.Operator == TokenType.TK_AND) {
-						ExprList pList = pExpr.x.pList;
-						int i;
-						u8[] ops = new u8[] {
-							TK_GE,
-							TK_LE
-						};
-						Debug.Assert (pList != null);
-						Debug.Assert (pList.nExpr == 2);
-						for (i = 0; i < 2; i++) {
-							Expr pNewExpr;
-							int idxNew;
-							pNewExpr = pParse.sqlite3PExpr (ops [i], sqlite3ExprDup (db, pExpr.pLeft, 0), sqlite3ExprDup (db, pList.a [i].pExpr, 0), null);
-							idxNew = pWC.whereClauseInsert (pNewExpr, TERM_VIRTUAL | TERM_DYNAMIC);
-							testcase (idxNew == 0);
-							this.exprAnalyze (pWC, idxNew);
-							pTerm = pWC.a [idxTerm];
-							pWC.a [idxNew].iParent = idxTerm;
-						}
-						pTerm.nChild = 2;
-					}
-					#endif
-					#if !(SQLITE_OMIT_OR_OPTIMIZATION) && !(SQLITE_OMIT_SUBQUERY)
-					///
-///<summary>
-///Analyze a term that is composed of two or more subterms connected by
-///an OR operator.
-///</summary>
-
-					else
-						if (pExpr.Operator == TokenType.TK_OR) {
-							Debug.Assert (pWC.op == TK_AND);
-							this.exprAnalyzeOrTerm (pWC, idxTerm);
-							pTerm = pWC.a [idxTerm];
-						}
-				#endif
-				#if !SQLITE_OMIT_LIKE_OPTIMIZATION
-				///
-///<summary>
-///Add constraints to reduce the search space on a LIKE or GLOB
-///operator.
-///
-///A like pattern of the form "x LIKE 'abc%'" is changed into constraints
-///
-///x>='abc' AND x<'abd' AND x LIKE 'abc%'
-///
-///The last character of the prefix "abc" is incremented to form the
-///termination condition "abd".
-///</summary>
-
-				if (pWC.Operator == TokenType.TK_AND && pParse.isLikeOrGlob (pExpr, ref pStr1, ref isComplete, ref noCase) != 0) {
-					Expr pLeft;
-					///
-///<summary>
-///LHS of LIKE/GLOB operator 
-///</summary>
-
-					Expr pStr2;
-					///
-///<summary>
-///</summary>
-///<param name="Copy of pStr1 "> RHS of LIKE/GLOB operator </param>
-
-					Expr pNewExpr1;
-					Expr pNewExpr2;
-					int idxNew1;
-					int idxNew2;
-					CollSeq pColl;
-					///
-///<summary>
-///Collating sequence to use 
-///</summary>
-
-					pLeft = pExpr.x.pList.a [1].pExpr;
-					pStr2 = sqlite3ExprDup (db, pStr1, 0);
-					////if ( 0 == db.mallocFailed )
-					{
-						int c, pC;
-						///
-///<summary>
-///Last character before the first wildcard 
-///</summary>
-
-						pC = pStr2.u.zToken [StringExtensions.sqlite3Strlen30 (pStr2.u.zToken) - 1];
-						c = pC;
-						if (noCase) {
-							///
-///<summary>
-///The point is to increment the last character before the first
-///wildcard.  But if we increment '@', that will push it into the
-///alphabetic range where case conversions will mess up the
-///inequality.  To avoid this, make sure to also run the full
-///LIKE on all candidate expressions by clearing the isComplete flag
-///
-///</summary>
-
-							if (c == 'A' - 1)
-								isComplete = false;
-							///
-///<summary>
-///</summary>
-///<param name="EV: R">08207 </param>
-
-							c = sqlite3UpperToLower [c];
-						}
-						pStr2.u.zToken = pStr2.u.zToken.Substring (0, StringExtensions.sqlite3Strlen30 (pStr2.u.zToken) - 1) + (char)(c + 1);
-						// pC = c + 1;
-					}
-					pColl = sqlite3FindCollSeq (db, SqliteEncoding.UTF8, noCase ? "NOCASE" : "BINARY", 0);
-					pNewExpr1 = pParse.sqlite3PExpr (TK_GE, sqlite3ExprDup (db, pLeft, 0).sqlite3ExprSetColl (pColl), pStr1, 0);
-					idxNew1 = pWC.whereClauseInsert (pNewExpr1, TERM_VIRTUAL | TERM_DYNAMIC);
-					testcase (idxNew1 == 0);
-					this.exprAnalyze (pWC, idxNew1);
-					pNewExpr2 = pParse.sqlite3PExpr (TK_LT, sqlite3ExprDup (db, pLeft, 0).sqlite3ExprSetColl (pColl), pStr2, null);
-					idxNew2 = pWC.whereClauseInsert (pNewExpr2, TERM_VIRTUAL | TERM_DYNAMIC);
-					testcase (idxNew2 == 0);
-					this.exprAnalyze (pWC, idxNew2);
-					pTerm = pWC.a [idxTerm];
-					if (isComplete) {
-						pWC.a [idxNew1].iParent = idxTerm;
-						pWC.a [idxNew2].iParent = idxTerm;
-						pTerm.nChild = 2;
-					}
-				}
-				#endif
-				#if !SQLITE_OMIT_VIRTUALTABLE
-				///
-///<summary>
-///Add a WO_MATCH auxiliary term to the constraint set if the
-///current expression is of the form:  column MATCH expr.
-///This information is used by the xBestIndex methods of
-///virtual tables.  The native query optimizer does not attempt
-///to do anything with MATCH functions.
-///</summary>
-
-				if (pExpr.isMatchOfColumn () != 0) {
-					int idxNew;
-					Expr pRight, pLeft;
-					WhereTerm pNewTerm;
-					Bitmask prereqColumn, prereqExpr;
-					pRight = pExpr.x.pList.a [0].pExpr;
-					pLeft = pExpr.x.pList.a [1].pExpr;
-					prereqExpr = pMaskSet.exprTableUsage (pRight);
-					prereqColumn = pMaskSet.exprTableUsage (pLeft);
-					if ((prereqExpr & prereqColumn) == 0) {
-						Expr pNewExpr;
-						pNewExpr = pParse.sqlite3PExpr (TK_MATCH, null, sqlite3ExprDup (db, pRight, 0), null);
-						idxNew = pWC.whereClauseInsert (pNewExpr, TERM_VIRTUAL | TERM_DYNAMIC);
-						testcase (idxNew == 0);
-						pNewTerm = pWC.a [idxNew];
-						pNewTerm.prereqRight = prereqExpr;
-						pNewTerm.leftCursor = pLeft.iTable;
-						pNewTerm.u.leftColumn = pLeft.iColumn;
-						pNewTerm.eOperator = WO_MATCH;
-						pNewTerm.iParent = idxTerm;
-						pTerm = pWC.a [idxTerm];
-						pTerm.nChild = 1;
-						pTerm.wtFlags |= TERM_COPIED;
-						pNewTerm.prereqAll = pTerm.prereqAll;
-					}
-				}
-				#endif
-				#if SQLITE_ENABLE_STAT2
-																																																																																								      /* When sqlite_stat2 histogram data is available an operator of the
-  ** form "x IS NOT NULL" can sometimes be evaluated more efficiently
-  ** as "x>NULL" if x is not an INTEGER PRIMARY KEY.  So construct a
-  ** virtual term of that form.
-  **
-  ** Note that the virtual term must be tagged with TERM_VNULL.  This
-  ** TERM_VNULL tag will suppress the not-null check at the beginning
-  ** of the loop.  Without the TERM_VNULL flag, the not-null check at
-  ** the start of the loop will prevent any results from being returned.
-  */
-      if ( pExpr.op == TK_NOTNULL
-       && pExpr.pLeft.op == TK_COLUMN
-       && pExpr.pLeft.iColumn >= 0
-      )
-      {
-        Expr pNewExpr;
-        Expr pLeft = pExpr.pLeft;
-        int idxNew;
-        WhereTerm pNewTerm;
-
-        pNewExpr = sqlite3PExpr( pParse, TK_GT,
-                                sqlite3ExprDup( db, pLeft, 0 ),
-                                sqlite3PExpr( pParse, TK_NULL, 0, 0, 0 ), 0 );
-
-        idxNew = whereClauseInsert( pWC, pNewExpr,
-                                  TERM_VIRTUAL | TERM_DYNAMIC | TERM_VNULL );
-        if ( idxNew != 0 )
-        {
-          pNewTerm = pWC.a[idxNew];
-          pNewTerm.prereqRight = 0;
-          pNewTerm.leftCursor = pLeft.iTable;
-          pNewTerm.u.leftColumn = pLeft.iColumn;
-          pNewTerm.eOperator = WO_GT;
-          pNewTerm.iParent = idxTerm;
-          pTerm = pWC.a[idxTerm];
-          pTerm.nChild = 1;
-          pTerm.wtFlags |= TERM_COPIED;
-          pNewTerm.prereqAll = pTerm.prereqAll;
-        }
-      }
-#endif
-				///
-///<summary>
-///Prevent ON clause terms of a LEFT JOIN from being used to drive
-///an index for tables to the left of the join.
-///</summary>
-
-				pTerm.prereqRight |= extraRight;
-			}
-		}
-
-		///<summary>
-		/// Permitted values of the SrcList.a.jointype field
-		///
-		///</summary>
-		private const int JT_INNER = 0x0001;
-
-		//#define JT_INNER     0x0001    /* Any kind of inner or cross join */
-		private const int JT_CROSS = 0x0002;
-
-		//#define JT_CROSS     0x0002    /* Explicit use of the CROSS keyword */
-		private const int JT_NATURAL = 0x0004;
-
-		//#define JT_NATURAL   0x0004    /* True for a "natural" join */
-		private const int JT_LEFT = 0x0008;
-
-		//#define JT_LEFT      0x0008    /* Left outer join */
-		private const int JT_RIGHT = 0x0010;
-
-		//#define JT_RIGHT     0x0010    /* Right outer join */
-		private const int JT_OUTER = 0x0020;
-
-		//#define JT_OUTER     0x0020    /* The "OUTER" keyword is present */
-		private const int JT_ERROR = 0x0040;
-
-		//#define JT_ERROR     0x0040    /* unknown or unsupported join type */
+		private const int BMS=((int)(sizeof(Bitmask)*8));
 		
 		///<summary>
 		/// A NameContext defines a context in which to resolve table and column
@@ -4852,85 +2462,62 @@ set { _op = value; }
 		/// subqueries looking for a match.
 		///
 		///</summary>
-		public class NameContext
-		{
+		public class NameContext {
 			public Parse pParse;
-
 			///
-///<summary>
-///The parser 
-///</summary>
-
+			///<summary>
+			///The parser 
+			///</summary>
 			public SrcList pSrcList;
-
 			///
-///<summary>
-///One or more tables used to resolve names 
-///</summary>
-
+			///<summary>
+			///One or more tables used to resolve names 
+			///</summary>
 			public ExprList pEList;
-
 			///
-///<summary>
-///Optional list of named expressions 
-///</summary>
-
+			///<summary>
+			///Optional list of named expressions 
+			///</summary>
 			public int nRef;
-
 			///
-///<summary>
-///Number of names resolved by this context 
-///</summary>
-
+			///<summary>
+			///Number of names resolved by this context 
+			///</summary>
 			public int nErr;
-
 			///
-///<summary>
-///Number of errors encountered while resolving names 
-///</summary>
-
+			///<summary>
+			///Number of errors encountered while resolving names 
+			///</summary>
 			public u8 allowAgg;
-
 			///
-///<summary>
-///Aggregate functions allowed here 
-///</summary>
-
+			///<summary>
+			///Aggregate functions allowed here 
+			///</summary>
 			public u8 hasAgg;
-
 			///
-///<summary>
-///True if aggregates are seen 
-///</summary>
-
+			///<summary>
+			///True if aggregates are seen 
+			///</summary>
 			public u8 isCheck;
-
 			///
-///<summary>
-///True if resolving names in a CHECK constraint 
-///</summary>
-
+			///<summary>
+			///True if resolving names in a CHECK constraint 
+			///</summary>
 			public int nDepth;
-
 			///
-///<summary>
-///Depth of subquery recursion. 1 for no recursion 
-///</summary>
-
+			///<summary>
+			///Depth of subquery recursion. 1 for no recursion 
+			///</summary>
 			public AggInfo pAggInfo;
-
 			///
-///<summary>
-///Information about aggregates at this level 
-///</summary>
-
+			///<summary>
+			///Information about aggregates at this level 
+			///</summary>
 			public NameContext pNext;
-
 			///
-///<summary>
-///Next outer name context.  NULL for outermost 
-///</summary>
-
+			///<summary>
+			///Next outer name context.  NULL for outermost 
+			///</summary>
 			public///<summary>
 			/// Resolve an expression that was part of an ATTACH or DETACH statement. This
 			/// is slightly different from resolving a normal SQL expression, because simple
@@ -4949,68 +2536,56 @@ set { _op = value; }
 			///
 			/// will fail because neither abc or def can be resolved.
 			///</summary>
-			int resolveAttachExpr (Expr pExpr)
-			{
-				int rc = SQLITE_OK;
-				if (pExpr != null) {
-					if (pExpr.op != TK_ID) {
-						rc = sqlite3ResolveExprNames (this, ref pExpr);
-						if (rc == SQLITE_OK && pExpr.sqlite3ExprIsConstant () == 0) {
-							sqlite3ErrorMsg (this.pParse, "invalid name: \"%s\"", pExpr.u.zToken);
+			int resolveAttachExpr(Expr pExpr) {
+				int rc=SQLITE_OK;
+				if(pExpr!=null) {
+					if(pExpr.op!=TK_ID) {
+						rc=sqlite3ResolveExprNames(this,ref pExpr);
+						if(rc==SQLITE_OK&&pExpr.sqlite3ExprIsConstant()==0) {
+							sqlite3ErrorMsg(this.pParse,"invalid name: \"%s\"",pExpr.u.zToken);
 							return SQLITE_ERROR;
 						}
 					}
 					else {
-						pExpr.op = TK_STRING;
+						pExpr.op=TK_STRING;
 					}
 				}
 				return rc;
 			}
 		}
-
 		///
-///<summary>
-///During code generation of statements that do inserts into AUTOINCREMENT
-///tables, the following information is attached to the Table.u.autoInc.p
-///pointer of each autoincrement table to record some side information that
-///</summary>
-///<param name="the code generator needs.  We have to keep per">table autoincrement</param>
-///<param name="information in case inserts are down within triggers.  Triggers do not">information in case inserts are down within triggers.  Triggers do not</param>
-///<param name="normally coordinate their activities, but we do need to coordinate the">normally coordinate their activities, but we do need to coordinate the</param>
-///<param name="loading and saving of autoincrement information.">loading and saving of autoincrement information.</param>
-///<param name=""></param>
-
-		public class AutoincInfo
-		{
+		///<summary>
+		///During code generation of statements that do inserts into AUTOINCREMENT
+		///tables, the following information is attached to the Table.u.autoInc.p
+		///pointer of each autoincrement table to record some side information that
+		///</summary>
+		///<param name="the code generator needs.  We have to keep per">table autoincrement</param>
+		///<param name="information in case inserts are down within triggers.  Triggers do not">information in case inserts are down within triggers.  Triggers do not</param>
+		///<param name="normally coordinate their activities, but we do need to coordinate the">normally coordinate their activities, but we do need to coordinate the</param>
+		///<param name="loading and saving of autoincrement information.">loading and saving of autoincrement information.</param>
+		///<param name=""></param>
+		public class AutoincInfo {
 			public AutoincInfo pNext;
-
 			///
-///<summary>
-///Next info block in a list of them all 
-///</summary>
-
+			///<summary>
+			///Next info block in a list of them all 
+			///</summary>
 			public Table pTab;
-
 			///
-///<summary>
-///Table this info block refers to 
-///</summary>
-
+			///<summary>
+			///Table this info block refers to 
+			///</summary>
 			public int iDb;
-
 			///
-///<summary>
-///Index in sqlite3.aDb[] of database holding pTab 
-///</summary>
-
+			///<summary>
+			///Index in sqlite3.aDb[] of database holding pTab 
+			///</summary>
 			public int regCtr;
 		///
-///<summary>
-///Memory register holding the rowid counter 
-///</summary>
-
+		///<summary>
+		///Memory register holding the rowid counter 
+		///</summary>
 		};
-
 
 		///<summary>
 		/// Size of the column cache
@@ -5018,11 +2593,8 @@ set { _op = value; }
 		///</summary>
 		#if !SQLITE_N_COLCACHE
 		//# define SQLITE_N_COLCACHE 10
-		private const int SQLITE_N_COLCACHE = 10;
-
+		private const int SQLITE_N_COLCACHE=10;
 		#endif
-		
-
 		///<summary>
 		/// The yDbMask datatype for the bitmask of all attached databases.
 		///
@@ -5049,88 +2621,67 @@ set { _op = value; }
 		/// list.
 		///
 		///</summary>
-		public class yColCache
-		{
+		public class yColCache {
 			public int iTable;
-
 			///
-///<summary>
-///Table cursor number 
-///</summary>
-
+			///<summary>
+			///Table cursor number 
+			///</summary>
 			public int iColumn;
-
 			///
-///<summary>
-///Table column number 
-///</summary>
-
+			///<summary>
+			///Table column number 
+			///</summary>
 			public u8 tempReg;
-
 			///
-///<summary>
-///iReg is a temp register that needs to be freed 
-///</summary>
-
+			///<summary>
+			///iReg is a temp register that needs to be freed 
+			///</summary>
 			public int iLevel;
-
 			///
-///<summary>
-///Nesting level 
-///</summary>
-
+			///<summary>
+			///Nesting level 
+			///</summary>
 			public int iReg;
-
 			///
-///<summary>
-///Reg with value of this column. 0 means none. 
-///</summary>
-
+			///<summary>
+			///Reg with value of this column. 0 means none. 
+			///</summary>
 			public int lru;
 		///
-///<summary>
-///Least recently used entry has the smallest value 
-///</summary>
-
+		///<summary>
+		///Least recently used entry has the smallest value 
+		///</summary>
 		}
-
 		#if SQLITE_OMIT_VIRTUALTABLE
-																																																										//define IN_DECLARE_VTAB 0
+																																																												//define IN_DECLARE_VTAB 0
     static bool IN_DECLARE_VTAB( Parse pParse )
     {
       return false;
     }
 #else
 		//#define IN_DECLARE_VTAB (pParse.declareVtab)
-		private static bool IN_DECLARE_VTAB (Parse pParse)
-		{
-			return pParse.declareVtab != 0;
+		private static bool IN_DECLARE_VTAB(Parse pParse) {
+			return pParse.declareVtab!=0;
 		}
-
 		#endif
 		///
-///<summary>
-///An instance of the following structure can be declared on a stack and used
-///to save the Parse.zAuthContext value so that it can be restored later.
-///</summary>
-
-		public class AuthContext
-		{
+		///<summary>
+		///An instance of the following structure can be declared on a stack and used
+		///to save the Parse.zAuthContext value so that it can be restored later.
+		///</summary>
+		public class AuthContext {
 			public string zAuthContext;
-
 			///
-///<summary>
-///Put saved Parse.zAuthContext here 
-///</summary>
-
+			///<summary>
+			///Put saved Parse.zAuthContext here 
+			///</summary>
 			public Parse pParse;
 		///
-///<summary>
-///The Parse structure 
-///</summary>
-
+		///<summary>
+		///The Parse structure 
+		///</summary>
 		};
-
 
 		///<summary>
 		/// Bitfield flags for P5 value in OP_Insert and OP_Delete
@@ -5142,20 +2693,12 @@ set { _op = value; }
 		//#define OPFLAG_APPEND        0x08    /* This is likely to be an append */
 		//#define OPFLAG_USESEEKRESULT 0x10    /* Try to avoid a seek in BtreeInsert() */
 		//#define OPFLAG_CLEARCACHE    0x20    /* Clear pseudo-table cache in OP_Column */
-		private const byte OPFLAG_NCHANGE = 0x01;
-
-		private const byte OPFLAG_LASTROWID = 0x02;
-
-		private const byte OPFLAG_ISUPDATE = 0x04;
-
-		private const byte OPFLAG_APPEND = 0x08;
-
-		private const byte OPFLAG_USESEEKRESULT = 0x10;
-
-		private const byte OPFLAG_CLEARCACHE = 0x20;
-
-	
-		
+		private const byte OPFLAG_NCHANGE=0x01;
+		private const byte OPFLAG_LASTROWID=0x02;
+		private const byte OPFLAG_ISUPDATE=0x04;
+		private const byte OPFLAG_APPEND=0x08;
+		private const byte OPFLAG_USESEEKRESULT=0x10;
+		private const byte OPFLAG_CLEARCACHE=0x20;
 		///<summary>
 		/// The following structure contains information used by the sqliteFix...
 		/// routines as they walk the parse tree to make database references
@@ -5163,36 +2706,27 @@ set { _op = value; }
 		///
 		///</summary>
 		//typedef struct DbFixer DbFixer;
-		public class DbFixer
-		{
+		public class DbFixer {
 			public Parse pParse;
-
 			///
-///<summary>
-///The parsing context.  Error messages written here 
-///</summary>
-
+			///<summary>
+			///The parsing context.  Error messages written here 
+			///</summary>
 			public string zDb;
-
 			///
-///<summary>
-///Make sure all objects are contained in this database 
-///</summary>
-
+			///<summary>
+			///Make sure all objects are contained in this database 
+			///</summary>
 			public string zType;
-
 			///
-///<summary>
-///</summary>
-///<param name="Type of the container "> used for error messages </param>
-
+			///<summary>
+			///</summary>
+			///<param name="Type of the container "> used for error messages </param>
 			public Token pName;
-
 			///
-///<summary>
-///</summary>
-///<param name="Name of the container "> used for error messages </param>
-
+			///<summary>
+			///</summary>
+			///<param name="Name of the container "> used for error messages </param>
 			public///<summary>
 			/// Initialize a DbFixer structure.  This routine must be called prior
 			/// to passing the structure to one of the sqliteFixAAAA() routines below.
@@ -5200,45 +2734,38 @@ set { _op = value; }
 			/// The return value indicates whether or not fixation is required.  TRUE
 			/// means we do need to fix the database references, FALSE means we do not.
 			///</summary>
-			int sqlite3FixInit (///
-///<summary>
-///The fixer to be initialized 
-///</summary>
-
-			Parse pParse, ///
-///<summary>
-///Error messages will be written here 
-///</summary>
-
-			int iDb, ///
-///<summary>
-///This is the database that must be used 
-///</summary>
-
-			string zType, ///
-///<summary>
-///"view", "trigger", or "index" 
-///</summary>
-
+			int sqlite3FixInit(///
+			///<summary>
+			///The fixer to be initialized 
+			///</summary>
+			Parse pParse,///
+			///<summary>
+			///Error messages will be written here 
+			///</summary>
+			int iDb,///
+			///<summary>
+			///This is the database that must be used 
+			///</summary>
+			string zType,///
+			///<summary>
+			///"view", "trigger", or "index" 
+			///</summary>
 			Token pName///
-///<summary>
-///Name of the view, trigger, or index 
-///</summary>
-
-			)
-			{
+			///<summary>
+			///Name of the view, trigger, or index 
+			///</summary>
+			) {
 				sqlite3 db;
-				if (NEVER (iDb < 0) || iDb == 1)
+				if(NEVER(iDb<0)||iDb==1)
 					return 0;
-				db = pParse.db;
-				Debug.Assert (db.nDb > iDb);
-				this.pParse = pParse;
-				this.zDb = db.aDb [iDb].zName;
-				this.zType = zType;
-				this.pName = pName;
+				db=pParse.db;
+				Debug.Assert(db.nDb>iDb);
+				this.pParse=pParse;
+				this.zDb=db.aDb[iDb].zName;
+				this.zType=zType;
+				this.pName=pName;
 				return 1;
 			}
-
 			public///<summary>
 			/// The following set of routines walk through the parse tree and assign
 			/// a specific database to all table references where the database name
@@ -5253,557 +2780,444 @@ set { _op = value; }
 			/// pParse.zErrMsg and these routines return non-zero.  If everything
 			/// checks out, these routines return 0.
 			///</summary>
-			int sqlite3FixSrcList (///
-///<summary>
-///Context of the fixation 
-///</summary>
-
+			int sqlite3FixSrcList(///
+			///<summary>
+			///Context of the fixation 
+			///</summary>
 			SrcList pList///
-///<summary>
-///The Source list to check and modify 
-///</summary>
-
-			)
-			{
+			///<summary>
+			///The Source list to check and modify 
+			///</summary>
+			) {
 				int i;
 				string zDb;
 				SrcList_item pItem;
-				if (NEVER (pList == null))
+				if(NEVER(pList==null))
 					return 0;
-				zDb = this.zDb;
-				for (i = 0; i < pList.nSrc; i++) {
+				zDb=this.zDb;
+				for(i=0;i<pList.nSrc;i++) {
 					//, pItem++){
-					pItem = pList.a [i];
-					if (pItem.zDatabase == null) {
-						pItem.zDatabase = zDb;
+					pItem=pList.a[i];
+					if(pItem.zDatabase==null) {
+						pItem.zDatabase=zDb;
 						// sqlite3DbStrDup( pFix.pParse.db, zDb );
 					}
 					else
-						if (!pItem.zDatabase.Equals (zDb, StringComparison.InvariantCultureIgnoreCase)) {
-							sqlite3ErrorMsg (this.pParse, "%s %T cannot reference objects in database %s", this.zType, this.pName, pItem.zDatabase);
+						if(!pItem.zDatabase.Equals(zDb,StringComparison.InvariantCultureIgnoreCase)) {
+							sqlite3ErrorMsg(this.pParse,"%s %T cannot reference objects in database %s",this.zType,this.pName,pItem.zDatabase);
 							return 1;
 						}
 					#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_TRIGGER
-					if (this.sqlite3FixSelect (pItem.pSelect) != 0)
+					if(this.sqlite3FixSelect(pItem.pSelect)!=0)
 						return 1;
-					if (this.sqlite3FixExpr (pItem.pOn) != 0)
+					if(this.sqlite3FixExpr(pItem.pOn)!=0)
 						return 1;
 					#endif
 				}
 				return 0;
 			}
-
-			public int sqlite3FixSelect (///
-///<summary>
-///Context of the fixation 
-///</summary>
-
+			public int sqlite3FixSelect(///
+			///<summary>
+			///Context of the fixation 
+			///</summary>
 			Select pSelect///
-///<summary>
-///The SELECT statement to be fixed to one database 
-///</summary>
-
-			)
-			{
-				while (pSelect != null) {
-					if (this.sqlite3FixExprList (pSelect.pEList) != 0) {
+			///<summary>
+			///The SELECT statement to be fixed to one database 
+			///</summary>
+			) {
+				while(pSelect!=null) {
+					if(this.sqlite3FixExprList(pSelect.pEList)!=0) {
 						return 1;
 					}
-					if (this.sqlite3FixSrcList (pSelect.pSrc) != 0) {
+					if(this.sqlite3FixSrcList(pSelect.pSrc)!=0) {
 						return 1;
 					}
-					if (this.sqlite3FixExpr (pSelect.pWhere) != 0) {
+					if(this.sqlite3FixExpr(pSelect.pWhere)!=0) {
 						return 1;
 					}
-					if (this.sqlite3FixExpr (pSelect.pHaving) != 0) {
+					if(this.sqlite3FixExpr(pSelect.pHaving)!=0) {
 						return 1;
 					}
-					pSelect = pSelect.pPrior;
+					pSelect=pSelect.pPrior;
 				}
 				return 0;
 			}
-
-			public int sqlite3FixExpr (///
-///<summary>
-///Context of the fixation 
-///</summary>
-
+			public int sqlite3FixExpr(///
+			///<summary>
+			///Context of the fixation 
+			///</summary>
 			Expr pExpr///
-///<summary>
-///The expression to be fixed to one database 
-///</summary>
-
-			)
-			{
-				while (pExpr != null) {
-					if (ExprHasAnyProperty (pExpr, EP_TokenOnly))
+			///<summary>
+			///The expression to be fixed to one database 
+			///</summary>
+			) {
+				while(pExpr!=null) {
+					if(pExpr.ExprHasAnyProperty(EP_TokenOnly))
 						break;
-					if (ExprHasProperty (pExpr, EP_xIsSelect)) {
-						if (this.sqlite3FixSelect (pExpr.x.pSelect) != 0)
+					if(pExpr.ExprHasProperty(EP_xIsSelect)) {
+						if(this.sqlite3FixSelect(pExpr.x.pSelect)!=0)
 							return 1;
 					}
 					else {
-						if (this.sqlite3FixExprList (pExpr.x.pList) != 0)
+						if(this.sqlite3FixExprList(pExpr.x.pList)!=0)
 							return 1;
 					}
-					if (this.sqlite3FixExpr (pExpr.pRight) != 0) {
+					if(this.sqlite3FixExpr(pExpr.pRight)!=0) {
 						return 1;
 					}
-					pExpr = pExpr.pLeft;
+					pExpr=pExpr.pLeft;
 				}
 				return 0;
 			}
-
-			public int sqlite3FixExprList (///
-///<summary>
-///Context of the fixation 
-///</summary>
-
+			public int sqlite3FixExprList(///
+			///<summary>
+			///Context of the fixation 
+			///</summary>
 			ExprList pList///
-///<summary>
-///The expression to be fixed to one database 
-///</summary>
-
-			)
-			{
+			///<summary>
+			///The expression to be fixed to one database 
+			///</summary>
+			) {
 				int i;
 				ExprList_item pItem;
-				if (pList == null)
+				if(pList==null)
 					return 0;
-				for (i = 0; i < pList.nExpr; i++)//, pItem++ )
+				for(i=0;i<pList.nExpr;i++)//, pItem++ )
 				 {
-					pItem = pList.a [i];
-					if (this.sqlite3FixExpr (pItem.pExpr) != 0) {
+					pItem=pList.a[i];
+					if(this.sqlite3FixExpr(pItem.pExpr)!=0) {
 						return 1;
 					}
 				}
 				return 0;
 			}
-
-			public int sqlite3FixTriggerStep (///
-///<summary>
-///Context of the fixation 
-///</summary>
-
+			public int sqlite3FixTriggerStep(///
+			///<summary>
+			///Context of the fixation 
+			///</summary>
 			TriggerStep pStep///
-///<summary>
-///The trigger step be fixed to one database 
-///</summary>
-
-			)
-			{
-				while (pStep != null) {
-					if (this.sqlite3FixSelect (pStep.pSelect) != 0) {
+			///<summary>
+			///The trigger step be fixed to one database 
+			///</summary>
+			) {
+				while(pStep!=null) {
+					if(this.sqlite3FixSelect(pStep.pSelect)!=0) {
 						return 1;
 					}
-					if (this.sqlite3FixExpr (pStep.pWhere) != 0) {
+					if(this.sqlite3FixExpr(pStep.pWhere)!=0) {
 						return 1;
 					}
-					if (this.sqlite3FixExprList (pStep.pExprList) != 0) {
+					if(this.sqlite3FixExprList(pStep.pExprList)!=0) {
 						return 1;
 					}
-					pStep = pStep.pNext;
+					pStep=pStep.pNext;
 				}
 				return 0;
 			}
 		}
-
 		///<summary>
 		/// An objected used to accumulate the text of a string where we
 		/// do not necessarily know how big the string will be in the end.
 		///
 		///</summary>
-		public class StrAccum
-		{
+		public class StrAccum {
 			public sqlite3 db;
-
 			///
-///<summary>
-///Optional database for lookaside.  Can be NULL 
-///</summary>
-
+			///<summary>
+			///Optional database for lookaside.  Can be NULL 
+			///</summary>
 			//public StringBuilder zBase; /* A base allocation.  Not from malloc. */
 			public StringBuilder zText;
-
 			///
-///<summary>
-///The string collected so far 
-///</summary>
-
+			///<summary>
+			///The string collected so far 
+			///</summary>
 			//public int nChar;           /* Length of the string so far */
 			//public int nAlloc;          /* Amount of space allocated in zText */
 			public int mxAlloc;
-
 			///
-///<summary>
-///Maximum allowed string length 
-///</summary>
-
+			///<summary>
+			///Maximum allowed string length 
+			///</summary>
 			// Cannot happen under C#
 			//public u8 mallocFailed;   /* Becomes true if any memory allocation fails */
 			//public u8 useMalloc;        /* 0: none,  1: sqlite3DbMalloc,  2: sqlite3_malloc */
 			//public u8 tooBig;           /* Becomes true if string size exceeds limits */
 			public Mem Context;
-
-			public StrAccum (int n)
-			{
-				db = null;
+			public StrAccum(int n) {
+				db=null;
 				//zBase = new StringBuilder( n );
-				zText = new StringBuilder (n);
+				zText=new StringBuilder(n);
 				//nChar = 0;
 				//nAlloc = n;
-				mxAlloc = 0;
+				mxAlloc=0;
 				//useMalloc = 0;
 				//tooBig = 0;
-				Context = null;
+				Context=null;
 			}
-
 			public i64 nChar {
 				get {
 					return zText.Length;
 				}
 			}
-
 			public bool tooBig {
 				get {
-					return mxAlloc > 0 && zText.Length > mxAlloc;
+					return mxAlloc>0&&zText.Length>mxAlloc;
 				}
 			}
-
-			public void explainAppendTerm (///
-///<summary>
-///The text expression being built 
-///</summary>
-
-			int iTerm, ///
-///<summary>
-///Index of this term.  First is zero 
-///</summary>
-
-			string zColumn, ///
-///<summary>
-///Name of the column 
-///</summary>
-
+			public void explainAppendTerm(///
+			///<summary>
+			///The text expression being built 
+			///</summary>
+			int iTerm,///
+			///<summary>
+			///Index of this term.  First is zero 
+			///</summary>
+			string zColumn,///
+			///<summary>
+			///Name of the column 
+			///</summary>
 			string zOp///
-///<summary>
-///Name of the operator 
-///</summary>
-
-			)
-			{
-				if (iTerm != 0)
-					sqlite3StrAccumAppend (this, " AND ", 5);
-				sqlite3StrAccumAppend (this, zColumn, -1);
-				sqlite3StrAccumAppend (this, zOp, 1);
-				sqlite3StrAccumAppend (this, "?", 1);
+			///<summary>
+			///Name of the operator 
+			///</summary>
+			) {
+				if(iTerm!=0)
+					sqlite3StrAccumAppend(this," AND ",5);
+				sqlite3StrAccumAppend(this,zColumn,-1);
+				sqlite3StrAccumAppend(this,zOp,1);
+				sqlite3StrAccumAppend(this,"?",1);
 			}
 		}
-
 		///<summary>
 		/// A pointer to this structure is used to communicate information
 		/// from sqlite3Init and OP_ParseSchema into the sqlite3InitCallback.
 		///
 		///</summary>
-		public class InitData
-		{
+		public class InitData {
 			public sqlite3 db;
-
 			///
-///<summary>
-///The database being initialized 
-///</summary>
-
+			///<summary>
+			///The database being initialized 
+			///</summary>
 			public int iDb;
-
 			///
-///<summary>
-///0 for main database.  1 for TEMP, 2.. for ATTACHed 
-///</summary>
-
+			///<summary>
+			///0 for main database.  1 for TEMP, 2.. for ATTACHed 
+			///</summary>
 			public string pzErrMsg;
-
 			///
-///<summary>
-///Error message stored here 
-///</summary>
-
+			///<summary>
+			///Error message stored here 
+			///</summary>
 			public int rc;
 		///
-///<summary>
-///Result code stored here 
-///</summary>
-
+		///<summary>
+		///Result code stored here 
+		///</summary>
 		}
-
 		///<summary>
 		/// Structure containing global configuration data for the SQLite library.
 		///
 		/// This structure also contains some state information.
 		///
 		///</summary>
-		public class Sqlite3Config
-		{
+		public class Sqlite3Config {
 			public bool bMemstat;
-
 			///
-///<summary>
-///True to enable memory status 
-///</summary>
-
+			///<summary>
+			///True to enable memory status 
+			///</summary>
 			public bool bCoreMutex;
-
 			///
-///<summary>
-///True to enable core mutexing 
-///</summary>
-
+			///<summary>
+			///True to enable core mutexing 
+			///</summary>
 			public bool bFullMutex;
-
 			///
-///<summary>
-///True to enable full mutexing 
-///</summary>
-
+			///<summary>
+			///True to enable full mutexing 
+			///</summary>
 			public bool bOpenUri;
-
 			///
-///<summary>
-///True to interpret filenames as URIs 
-///</summary>
-
+			///<summary>
+			///True to interpret filenames as URIs 
+			///</summary>
 			public int mxStrlen;
-
 			///
-///<summary>
-///Maximum string length 
-///</summary>
-
+			///<summary>
+			///Maximum string length 
+			///</summary>
 			public int szLookaside;
-
 			///
-///<summary>
-///Default lookaside buffer size 
-///</summary>
-
+			///<summary>
+			///Default lookaside buffer size 
+			///</summary>
 			public int nLookaside;
-
 			///
-///<summary>
-///Default lookaside buffer count 
-///</summary>
-
+			///<summary>
+			///Default lookaside buffer count 
+			///</summary>
 			public sqlite3_mem_methods m;
-
 			///
-///<summary>
-///</summary>
-///<param name="Low">level memory allocation interface </param>
-
+			///<summary>
+			///</summary>
+			///<param name="Low">level memory allocation interface </param>
 			public sqlite3_mutex_methods mutex;
-
 			///
-///<summary>
-///</summary>
-///<param name="Low">level mutex interface </param>
-
+			///<summary>
+			///</summary>
+			///<param name="Low">level mutex interface </param>
 			public sqlite3_pcache_methods pcache;
-
 			///
-///<summary>
-///</summary>
-///<param name="Low">cache interface </param>
-
+			///<summary>
+			///</summary>
+			///<param name="Low">cache interface </param>
 			public byte[] pHeap;
-
 			///
-///<summary>
-///Heap storage space 
-///</summary>
-
+			///<summary>
+			///Heap storage space 
+			///</summary>
 			public int nHeap;
-
 			///
-///<summary>
-///Size of pHeap[] 
-///</summary>
-
-			public int mnReq, mxReq;
-
+			///<summary>
+			///Size of pHeap[] 
+			///</summary>
+			public int mnReq,mxReq;
 			///
-///<summary>
-///Min and max heap requests sizes 
-///</summary>
-
+			///<summary>
+			///Min and max heap requests sizes 
+			///</summary>
 			public byte[][] pScratch2;
-
 			///
-///<summary>
-///Scratch memory 
-///</summary>
-
+			///<summary>
+			///Scratch memory 
+			///</summary>
 			public byte[][] pScratch;
-
 			///
-///<summary>
-///Scratch memory 
-///</summary>
-
+			///<summary>
+			///Scratch memory 
+			///</summary>
 			public int szScratch;
-
 			///
-///<summary>
-///Size of each scratch buffer 
-///</summary>
-
+			///<summary>
+			///Size of each scratch buffer 
+			///</summary>
 			public int nScratch;
-
 			///
-///<summary>
-///Number of scratch buffers 
-///</summary>
-
+			///<summary>
+			///Number of scratch buffers 
+			///</summary>
 			public MemPage pPage;
-
 			///
-///<summary>
-///Page cache memory 
-///</summary>
-
+			///<summary>
+			///Page cache memory 
+			///</summary>
 			public int szPage;
-
 			///
-///<summary>
-///Size of each page in pPage[] 
-///</summary>
-
+			///<summary>
+			///Size of each page in pPage[] 
+			///</summary>
 			public int nPage;
-
 			///
-///<summary>
-///Number of pages in pPage[] 
-///</summary>
-
+			///<summary>
+			///Number of pages in pPage[] 
+			///</summary>
 			public int mxParserStack;
-
 			///
-///<summary>
-///maximum depth of the parser stack 
-///</summary>
-
+			///<summary>
+			///maximum depth of the parser stack 
+			///</summary>
 			public bool sharedCacheEnabled;
-
 			///
-///<summary>
-///</summary>
-///<param name="true if shared">cache mode enabled </param>
-
+			///<summary>
+			///</summary>
+			///<param name="true if shared">cache mode enabled </param>
 			///
-///<summary>
-///</summary>
-///<param name="The above might be initialized to non">zero.  The following need to always</param>
-///<param name="initially be zero, however. ">initially be zero, however. </param>
-
+			///<summary>
+			///</summary>
+			///<param name="The above might be initialized to non">zero.  The following need to always</param>
+			///<param name="initially be zero, however. ">initially be zero, however. </param>
 			public int isInit;
-
 			///
-///<summary>
-///True after initialization has finished 
-///</summary>
-
+			///<summary>
+			///True after initialization has finished 
+			///</summary>
 			public int inProgress;
-
 			///
-///<summary>
-///True while initialization in progress 
-///</summary>
-
+			///<summary>
+			///True while initialization in progress 
+			///</summary>
 			public int isMutexInit;
-
 			///
-///<summary>
-///True after mutexes are initialized 
-///</summary>
-
+			///<summary>
+			///True after mutexes are initialized 
+			///</summary>
 			public int isMallocInit;
-
 			///
-///<summary>
-///True after malloc is initialized 
-///</summary>
-
+			///<summary>
+			///True after malloc is initialized 
+			///</summary>
 			public int isPCacheInit;
-
 			///
-///<summary>
-///True after malloc is initialized 
-///</summary>
-
+			///<summary>
+			///True after malloc is initialized 
+			///</summary>
 			public sqlite3_mutex pInitMutex;
-
 			///
-///<summary>
-///Mutex used by sqlite3_initialize() 
-///</summary>
-
+			///<summary>
+			///Mutex used by sqlite3_initialize() 
+			///</summary>
 			public int nRefInitMutex;
-
 			///
-///<summary>
-///Number of users of pInitMutex 
-///</summary>
-
+			///<summary>
+			///Number of users of pInitMutex 
+			///</summary>
 			public dxLog xLog;
-
 			//void (*xLog)(void*,int,const char); /* Function for logging */
 			public object pLogArg;
-
 			///
-///<summary>
-///First argument to xLog() 
-///</summary>
-
+			///<summary>
+			///First argument to xLog() 
+			///</summary>
 			public bool bLocaltimeFault;
-
 			///
-///<summary>
-///True to fail localtime() calls 
-///</summary>
-
-			public Sqlite3Config (int bMemstat, int bCoreMutex, bool bFullMutex, bool bOpenUri, int mxStrlen, int szLookaside, int nLookaside, sqlite3_mem_methods m, sqlite3_mutex_methods mutex, sqlite3_pcache_methods pcache, byte[] pHeap, int nHeap, int mnReq, int mxReq, byte[][] pScratch, int szScratch, int nScratch, MemPage pPage, int szPage, int nPage, int mxParserStack, bool sharedCacheEnabled, int isInit, int inProgress, int isMutexInit, int isMallocInit, int isPCacheInit, sqlite3_mutex pInitMutex, int nRefInitMutex, dxLog xLog, object pLogArg, bool bLocaltimeFault)
-			{
-				this.bMemstat = bMemstat != 0;
-				this.bCoreMutex = bCoreMutex != 0;
-				this.bOpenUri = bOpenUri;
-				this.bFullMutex = bFullMutex;
-				this.mxStrlen = mxStrlen;
-				this.szLookaside = szLookaside;
-				this.nLookaside = nLookaside;
-				this.m = m;
-				this.mutex = mutex;
-				this.pcache = pcache;
-				this.pHeap = pHeap;
-				this.nHeap = nHeap;
-				this.mnReq = mnReq;
-				this.mxReq = mxReq;
-				this.pScratch = pScratch;
-				this.szScratch = szScratch;
-				this.nScratch = nScratch;
-				this.pPage = pPage;
-				this.szPage = szPage;
-				this.nPage = nPage;
-				this.mxParserStack = mxParserStack;
-				this.sharedCacheEnabled = sharedCacheEnabled;
-				this.isInit = isInit;
-				this.inProgress = inProgress;
-				this.isMutexInit = isMutexInit;
-				this.isMallocInit = isMallocInit;
-				this.isPCacheInit = isPCacheInit;
-				this.pInitMutex = pInitMutex;
-				this.nRefInitMutex = nRefInitMutex;
-				this.xLog = xLog;
-				this.pLogArg = pLogArg;
-				this.bLocaltimeFault = bLocaltimeFault;
+			///<summary>
+			///True to fail localtime() calls 
+			///</summary>
+			public Sqlite3Config(int bMemstat,int bCoreMutex,bool bFullMutex,bool bOpenUri,int mxStrlen,int szLookaside,int nLookaside,sqlite3_mem_methods m,sqlite3_mutex_methods mutex,sqlite3_pcache_methods pcache,byte[] pHeap,int nHeap,int mnReq,int mxReq,byte[][] pScratch,int szScratch,int nScratch,MemPage pPage,int szPage,int nPage,int mxParserStack,bool sharedCacheEnabled,int isInit,int inProgress,int isMutexInit,int isMallocInit,int isPCacheInit,sqlite3_mutex pInitMutex,int nRefInitMutex,dxLog xLog,object pLogArg,bool bLocaltimeFault) {
+				this.bMemstat=bMemstat!=0;
+				this.bCoreMutex=bCoreMutex!=0;
+				this.bOpenUri=bOpenUri;
+				this.bFullMutex=bFullMutex;
+				this.mxStrlen=mxStrlen;
+				this.szLookaside=szLookaside;
+				this.nLookaside=nLookaside;
+				this.m=m;
+				this.mutex=mutex;
+				this.pcache=pcache;
+				this.pHeap=pHeap;
+				this.nHeap=nHeap;
+				this.mnReq=mnReq;
+				this.mxReq=mxReq;
+				this.pScratch=pScratch;
+				this.szScratch=szScratch;
+				this.nScratch=nScratch;
+				this.pPage=pPage;
+				this.szPage=szPage;
+				this.nPage=nPage;
+				this.mxParserStack=mxParserStack;
+				this.sharedCacheEnabled=sharedCacheEnabled;
+				this.isInit=isInit;
+				this.inProgress=inProgress;
+				this.isMutexInit=isMutexInit;
+				this.isMallocInit=isMallocInit;
+				this.isPCacheInit=isPCacheInit;
+				this.pInitMutex=pInitMutex;
+				this.nRefInitMutex=nRefInitMutex;
+				this.xLog=xLog;
+				this.pLogArg=pLogArg;
+				this.bLocaltimeFault=bLocaltimeFault;
 			}
 		};
 
@@ -5817,26 +3231,22 @@ set { _op = value; }
 		//    while( (*zIn & 0xc0)==0x80 ){ zIn++; }             \
 		//  }                                                    \
 		//}
-		private static void SQLITE_SKIP_UTF8 (string zIn, ref int iz)
-		{
+		private static void SQLITE_SKIP_UTF8(string zIn,ref int iz) {
 			iz++;
-			if (iz < zIn.Length && zIn [iz - 1] >= 0xC0) {
-				while (iz < zIn.Length && (zIn [iz] & 0xC0) == 0x80) {
+			if(iz<zIn.Length&&zIn[iz-1]>=0xC0) {
+				while(iz<zIn.Length&&(zIn[iz]&0xC0)==0x80) {
 					iz++;
 				}
 			}
 		}
-
-		private static void SQLITE_SKIP_UTF8 (byte[] zIn, ref int iz)
-		{
+		private static void SQLITE_SKIP_UTF8(byte[] zIn,ref int iz) {
 			iz++;
-			if (iz < zIn.Length && zIn [iz - 1] >= 0xC0) {
-				while (iz < zIn.Length && (zIn [iz] & 0xC0) == 0x80) {
+			if(iz<zIn.Length&&zIn[iz-1]>=0xC0) {
+				while(iz<zIn.Length&&(zIn[iz]&0xC0)==0x80) {
 					iz++;
 				}
 			}
 		}
-
 		///<summary>
 		/// The SQLITE_*_BKPT macros are substitutes for the error codes with
 		/// the same name but without the _BKPT suffix.  These macros invoke
@@ -5849,7 +3259,7 @@ set { _op = value; }
 		//int sqlite3MisuseError(int);
 		//int sqlite3CantopenError(int);
 		#if DEBUG
-																																																										  
+																																																												  
     //define SQLITE_CORRUPT_BKPT sqlite3CorruptError(__LINE__)
     static int SQLITE_CORRUPT_BKPT()
     {
@@ -5868,27 +3278,20 @@ set { _op = value; }
       return sqlite3CantopenError( 0 );
     }
 #else
-		private static int SQLITE_CORRUPT_BKPT ()
-		{
+		private static int SQLITE_CORRUPT_BKPT() {
 			return SQLITE_CORRUPT;
 		}
-
-		private static int SQLITE_MISUSE_BKPT ()
-		{
+		private static int SQLITE_MISUSE_BKPT() {
 			return SQLITE_MISUSE;
 		}
-
-		private static int SQLITE_CANTOPEN_BKPT ()
-		{
+		private static int SQLITE_CANTOPEN_BKPT() {
 			return SQLITE_CANTOPEN;
 		}
-
 		#endif
 		///
-///<summary>
-///Internal function prototypes
-///</summary>
-
+		///<summary>
+		///Internal function prototypes
+		///</summary>
 		//int sqlite3StrICmp(string , string );
 		//int StringExtensions.sqlite3Strlen30(const char);
 		//#define StringExtensions.sqlite3StrNICmp sqlite3_strnicmp
@@ -5923,12 +3326,12 @@ set { _op = value; }
 		///
 		///</summary>
 		#if SQLITE_USE_ALLOCA
-																																																										// define sqlite3StackAllocRaw(D,N)   alloca(N)
+																																																												// define sqlite3StackAllocRaw(D,N)   alloca(N)
 // define sqlite3StackAllocZero(D,N)  memset(alloca(N), 0, N)
 // define sqlite3StackFree(D,P)
 #else
 		#if FALSE
-																																																										// define sqlite3StackAllocRaw(D,N)   sqlite3DbMallocRaw(D,N)
+																																																												// define sqlite3StackAllocRaw(D,N)   sqlite3DbMallocRaw(D,N)
 static void sqlite3StackAllocRaw( sqlite3 D, int N ) { sqlite3DbMallocRaw( D, N ); }
 // define sqlite3StackAllocZero(D,N)  sqlite3DbMallocZero(D,N)
 static void sqlite3StackAllocZero( sqlite3 D, int N ) { sqlite3DbMallocZero( D, N ); }
@@ -5937,13 +3340,13 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 #endif
 		#endif
 		#if SQLITE_ENABLE_MEMSYS3
-																																																										const sqlite3_mem_methods *sqlite3MemGetMemsys3(void);
+																																																												const sqlite3_mem_methods *sqlite3MemGetMemsys3(void);
 #endif
 		#if SQLITE_ENABLE_MEMSYS5
-																																																										const sqlite3_mem_methods *sqlite3MemGetMemsys5(void);
+																																																												const sqlite3_mem_methods *sqlite3MemGetMemsys5(void);
 #endif
 		#if !SQLITE_MUTEX_OMIT
-																																																										    //  sqlite3_mutex_methods const *sqlite3DefaultMutex(void);
+																																																												    //  sqlite3_mutex_methods const *sqlite3DefaultMutex(void);
     //  sqlite3_mutex_methods const *sqlite3NoopMutex(void);
     //  sqlite3_mutex *sqlite3MutexAlloc(int);
     //  int sqlite3MutexInit(void);
@@ -5965,10 +3368,10 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//char *sqlite3VMPrintf(sqlite3*,const char*, va_list);
 		//char *sqlite3MAppendf(sqlite3*,char*,const char*,...);
 		#if SQLITE_TEST || SQLITE_DEBUG
-																																																										    //  void sqlite3DebugPrintf(const char*, ...);
+																																																												    //  void sqlite3DebugPrintf(const char*, ...);
 #endif
 		#if SQLITE_TEST
-																																																										    //  void *sqlite3TestTextToPtr(const char);
+																																																												    //  void *sqlite3TestTextToPtr(const char);
 #endif
 		//void sqlite3SetString(char **, sqlite3*, const char*, ...);
 		//void sqlite3ErrorMsg(Parse*, const char*, ...);
@@ -6027,7 +3430,7 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_VIRTUALTABLE
 		//int sqlite3ViewGetColumnNames(Parse*,Table);
 		#else
-																																																										    // define sqlite3ViewGetColumnNames(A,B) 0
+																																																												    // define sqlite3ViewGetColumnNames(A,B) 0
     static int sqlite3ViewGetColumnNames( Parse A, Table B )
     {
       return 0;
@@ -6067,7 +3470,7 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//int sqlite3IsReadOnly(Parse*, Table*, int);
 		//void sqlite3OpenTable(Parse*, int iCur, int iDb, Table*, int);
 		#if (SQLITE_ENABLE_UPDATE_DELETE_LIMIT) && !(SQLITE_OMIT_SUBQUERY)
-																																																										//Expr *sqlite3LimitWhere(Parse *, SrcList *, Expr *, ExprList *, Expr *, Expr *, char );
+																																																												//Expr *sqlite3LimitWhere(Parse *, SrcList *, Expr *, ExprList *, Expr *, Expr *, char );
 #endif
 		//void sqlite3DeleteFrom(Parse*, SrcList*, Expr);
 		//void sqlite3Update(Parse*, SrcList*, ExprList*, Expr*, int);
@@ -6170,13 +3573,11 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void sqlite3UnlinkAndDeleteTrigger(sqlite3*,int,const char);
 		//  u32  sqlite3TriggerColmask(Parse*,Trigger*,ExprList*,int,int,Table*,int);
 		//# define sqlite3ParseToplevel(p) ((p)->pToplevel ? (p)->pToplevel : (p))
-		private static Parse sqlite3ParseToplevel (Parse p)
-		{
-			return p.pToplevel != null ? p.pToplevel : p;
+		private static Parse sqlite3ParseToplevel(Parse p) {
+			return p.pToplevel!=null?p.pToplevel:p;
 		}
-
 		#else
-																																																										    static void sqlite3BeginTrigger( Parse A, Token B, Token C, int D, int E, IdList F, SrcList G, Expr H, int I, int J )
+																																																												    static void sqlite3BeginTrigger( Parse A, Token B, Token C, int D, int E, IdList F, SrcList G, Expr H, int I, int J )
     {
     }
     static void sqlite3FinishTrigger( Parse P, TriggerStep TS, Token T )
@@ -6265,34 +3666,26 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void sqlite3CreateForeignKey(Parse*, ExprList*, Token*, ExprList*, int);
 		//void sqlite3DeferForeignKey(Parse*, int);
 		#if !SQLITE_OMIT_AUTHORIZATION
-																																																										void sqlite3AuthRead(Parse*,Expr*,Schema*,SrcList);
+																																																												void sqlite3AuthRead(Parse*,Expr*,Schema*,SrcList);
 int sqlite3AuthCheck(Parse*,int, const char*, const char*, const char);
 void sqlite3AuthContextPush(Parse*, AuthContext*, const char);
 void sqlite3AuthContextPop(AuthContext);
 int sqlite3AuthReadCol(Parse*, string , string , int);
 #else
 		//# define sqlite3AuthRead(a,b,c,d)
-		private static void sqlite3AuthRead (Parse a, Expr b, Schema c, SrcList d)
-		{
+		private static void sqlite3AuthRead(Parse a,Expr b,Schema c,SrcList d) {
 		}
-
 		//# define sqlite3AuthCheck(a,b,c,d,e)    SQLITE_OK
-		private static int sqlite3AuthCheck (Parse a, int b, string c, byte[] d, byte[] e)
-		{
+		private static int sqlite3AuthCheck(Parse a,int b,string c,byte[] d,byte[] e) {
 			return SQLITE_OK;
 		}
-
 		//# define sqlite3AuthContextPush(a,b,c)
-		private static void sqlite3AuthContextPush (Parse a, AuthContext b, string c)
-		{
+		private static void sqlite3AuthContextPush(Parse a,AuthContext b,string c) {
 		}
-
 		//# define sqlite3AuthContextPop(a)  ((void)(a))
-		private static Parse sqlite3AuthContextPop (Parse a)
-		{
+		private static Parse sqlite3AuthContextPop(Parse a) {
 			return a;
 		}
-
 		#endif
 		//void sqlite3Attach(Parse*, Expr*, Expr*, Expr);
 		//void sqlite3Detach(Parse*, Expr);
@@ -6309,15 +3702,14 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//int sqlite3Utf8CharLen(const char pData, int nByte);
 		//u32 sqlite3Utf8Read(const u8*, const u8*);
 		///
-///<summary>
-///</summary>
-///<param name="Routines to read and write variable">length integers.  These used to</param>
-///<param name="be defined locally, but now we use the varint routines in the util.c">be defined locally, but now we use the varint routines in the util.c</param>
-///<param name="file.  Code should use the MACRO forms below, as the Varint32 versions">file.  Code should use the MACRO forms below, as the Varint32 versions</param>
-///<param name="are coded to assume the single byte case is already handled (which">are coded to assume the single byte case is already handled (which</param>
-///<param name="the MACRO form does).">the MACRO form does).</param>
-///<param name=""></param>
-
+		///<summary>
+		///</summary>
+		///<param name="Routines to read and write variable">length integers.  These used to</param>
+		///<param name="be defined locally, but now we use the varint routines in the util.c">be defined locally, but now we use the varint routines in the util.c</param>
+		///<param name="file.  Code should use the MACRO forms below, as the Varint32 versions">file.  Code should use the MACRO forms below, as the Varint32 versions</param>
+		///<param name="are coded to assume the single byte case is already handled (which">are coded to assume the single byte case is already handled (which</param>
+		///<param name="the MACRO form does).">the MACRO form does).</param>
+		///<param name=""></param>
 		//int sqlite3PutVarint(unsigned char*, u64);
 		//int putVarint32(unsigned char*, u32);
 		//u8 sqlite3GetVarint(const unsigned char *, u64 );
@@ -6370,13 +3762,11 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//int sqlite3MulInt64(i64*,i64);
 		//int sqlite3AbsInt32(int);
 		#if SQLITE_ENABLE_8_3_NAMES
-																																																										    //void sqlite3FileSuffix3(const char*, char);
+																																																												    //void sqlite3FileSuffix3(const char*, char);
     #else
 		//# define sqlite3FileSuffix3(X,Y)
-		private static void sqlite3FileSuffix3 (string X, string Y)
-		{
+		private static void sqlite3FileSuffix3(string X,string Y) {
 		}
-
 		#endif
 		//u8 sqlite3GetBoolean(string z);
 		//const void *sqlite3ValueText(sqlite3_value*, u8);
@@ -6455,32 +3845,28 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//void sqlite3ParserFree(void*, void()(void));
 		//void sqlite3Parser(void*, int, Token, Parse);
 		#if YYTRACKMAXSTACKDEPTH
-																																																										int sqlite3ParserStackPeak(void);
+																																																												int sqlite3ParserStackPeak(void);
 #endif
 		//void sqlite3AutoLoadExtensions(sqlite3);
 		#if !SQLITE_OMIT_LOAD_EXTENSION
 		//void sqlite3CloseExtensions(sqlite3);
 		#else
-																																																										// define sqlite3CloseExtensions(X)
+																																																												// define sqlite3CloseExtensions(X)
 #endif
 		#if !SQLITE_OMIT_SHARED_CACHE
-																																																										//void sqlite3TableLock(Parse *, int, int, u8, string );
+																																																												//void sqlite3TableLock(Parse *, int, int, u8, string );
 #else
 		//#define sqlite3TableLock(v,w,x,y,z)
-		private static void sqlite3TableLock (Parse p, int p1, int p2, u8 p3, byte[] p4)
-		{
+		private static void sqlite3TableLock(Parse p,int p1,int p2,u8 p3,byte[] p4) {
 		}
-
-		private static void sqlite3TableLock (Parse p, int p1, int p2, u8 p3, string p4)
-		{
+		private static void sqlite3TableLock(Parse p,int p1,int p2,u8 p3,string p4) {
 		}
-
 		#endif
 		#if SQLITE_TEST
-																																																										    ///int sqlite3Utf8To8(unsigned char);
+																																																												    ///int sqlite3Utf8To8(unsigned char);
 #endif
 		#if SQLITE_OMIT_VIRTUALTABLE
-																																																										    //  define sqlite3VtabClear(D, Y)
+																																																												    //  define sqlite3VtabClear(D, Y)
     static void sqlite3VtabClear( sqlite3 db, Table Y )
     {
     }
@@ -6560,11 +3946,9 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//void sqlite3VtabUnlockList(sqlite3);
 		//int sqlite3VtabSavepoint(sqlite3 *, int, int);
 		//#  define sqlite3VtabInSync(db) ((db)->nVTrans>0 && (db)->aVTrans==0)
-		private static bool sqlite3VtabInSync (sqlite3 db)
-		{
-			return (db.nVTrans > 0 && db.aVTrans == null);
+		private static bool sqlite3VtabInSync(sqlite3 db) {
+			return (db.nVTrans>0&&db.aVTrans==null);
 		}
-
 		#endif
 		//void sqlite3VtabMakeWritable(Parse*,Table);
 		//void sqlite3VtabBeginParse(Parse*, Token*, Token*, Token);
@@ -6588,16 +3972,15 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//int sqlite3Checkpoint(sqlite3*, int, int, int*, int);
 		//int sqlite3WalDefaultHook(void*,sqlite3*,const char*,int);
 		///
-///<summary>
-///Declarations for functions in fkey.c. All of these are replaced by
-///</summary>
-///<param name="no">op macros if OMIT_FOREIGN_KEY is defined. In this case no foreign</param>
-///<param name="key functionality is available. If OMIT_TRIGGER is defined but">key functionality is available. If OMIT_TRIGGER is defined but</param>
-///<param name="OMIT_FOREIGN_KEY is not, only some of the functions are no">oped. In</param>
-///<param name="this case foreign keys are parsed, but no other functionality is ">this case foreign keys are parsed, but no other functionality is </param>
-///<param name="provided (enforcement of FK constraints requires the triggers sub">system).</param>
-///<param name=""></param>
-
+		///<summary>
+		///Declarations for functions in fkey.c. All of these are replaced by
+		///</summary>
+		///<param name="no">op macros if OMIT_FOREIGN_KEY is defined. In this case no foreign</param>
+		///<param name="key functionality is available. If OMIT_TRIGGER is defined but">key functionality is available. If OMIT_TRIGGER is defined but</param>
+		///<param name="OMIT_FOREIGN_KEY is not, only some of the functions are no">oped. In</param>
+		///<param name="this case foreign keys are parsed, but no other functionality is ">this case foreign keys are parsed, but no other functionality is </param>
+		///<param name="provided (enforcement of FK constraints requires the triggers sub">system).</param>
+		///<param name=""></param>
 		#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
 		//void sqlite3FkCheck(Parse*, Table*, int, int);
 		//void sqlite3FkDropTable(Parse*, SrcList *, Table);
@@ -6606,7 +3989,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//u32 sqlite3FkOldmask(Parse*, Table);
 		//FKey *sqlite3FkReferences(vtable );
 		#else
-																																																										//define sqlite3FkActions(a,b,c,d)
+																																																												//define sqlite3FkActions(a,b,c,d)
 static void sqlite3FkActions( Parse a, Table b, ExprList c, int d ) { }
 
 //define sqlite3FkCheck(a,b,c,d)
@@ -6624,19 +4007,16 @@ static int sqlite3FkRequired( Parse a, Table b, int[] c, int d ) { return 0; }
 		#if !SQLITE_OMIT_FOREIGN_KEY
 		//void sqlite3FkDelete(sqlite3 *, Table);
 		#else
-																																																										//define sqlite3FkDelete(a, b)
+																																																												//define sqlite3FkDelete(a, b)
 static void sqlite3FkDelete(sqlite3 a, Table b) {}                 
 #endif
 		///
-///<summary>
-///Available fault injectors.  Should be numbered beginning with 0.
-///</summary>
-
-		private const int SQLITE_FAULTINJECTOR_MALLOC = 0;
-
+		///<summary>
+		///Available fault injectors.  Should be numbered beginning with 0.
+		///</summary>
+		private const int SQLITE_FAULTINJECTOR_MALLOC=0;
 		//#define SQLITE_FAULTINJECTOR_MALLOC     0
-		private const int SQLITE_FAULTINJECTOR_COUNT = 1;
-
+		private const int SQLITE_FAULTINJECTOR_COUNT=1;
 		//#define SQLITE_FAULTINJECTOR_COUNT      1
 		///<summary>
 		/// The interface to the code in fault.c used for identifying "benign"
@@ -6648,30 +4028,25 @@ static void sqlite3FkDelete(sqlite3 a, Table b) {}
 		//void sqlite3BeginBenignMalloc(void);
 		//void sqlite3EndBenignMalloc(void);
 		#else
-																																																										//define sqlite3BeginBenignMalloc()
+																																																												//define sqlite3BeginBenignMalloc()
 //define sqlite3EndBenignMalloc()
 #endif
-		private const int IN_INDEX_ROWID = 1;
-
+		private const int IN_INDEX_ROWID=1;
 		//#define IN_INDEX_ROWID           1
-		private const int IN_INDEX_EPH = 2;
-
+		private const int IN_INDEX_EPH=2;
 		//#define IN_INDEX_EPH             2
-		private const int IN_INDEX_INDEX = 3;
-
+		private const int IN_INDEX_INDEX=3;
 		//#define IN_INDEX_INDEX           3
 		//int sqlite3FindInIndex(Parse *, Expr *, int);
 		#if SQLITE_ENABLE_ATOMIC_WRITE
-																																																										//  int sqlite3JournalOpen(sqlite3_vfs *, string , sqlite3_file *, int, int);
+																																																												//  int sqlite3JournalOpen(sqlite3_vfs *, string , sqlite3_file *, int, int);
 //  int sqlite3JournalSize(sqlite3_vfs );
 //  int sqlite3JournalCreate(sqlite3_file );
 #else
 		//#define sqlite3JournalSize(pVfs) ((pVfs)->szOsFile)
-		private static int sqlite3JournalSize (sqlite3_vfs pVfs)
-		{
+		private static int sqlite3JournalSize(sqlite3_vfs pVfs) {
 			return pVfs.szOsFile;
 		}
-
 		#endif
 		//void sqlite3MemJournalOpen(sqlite3_file );
 		//int sqlite3MemJournalSize(void);
@@ -6681,35 +4056,29 @@ static void sqlite3FkDelete(sqlite3 a, Table b) {}
 		//  int sqlite3SelectExprHeight(Select );
 		//int sqlite3ExprCheckHeight(Parse*, int);
 		#else
-																																																										//define sqlite3ExprSetHeight(x,y)
+																																																												//define sqlite3ExprSetHeight(x,y)
 //define sqlite3SelectExprHeight(x) 0
 //define sqlite3ExprCheckHeight(x,y)
 #endif
 		//u32 sqlite3Get4byte(const u8);
 		//void sqlite3sqlite3Put4byte(u8*, u32);
 		#if SQLITE_ENABLE_UNLOCK_NOTIFY
-																																																										void sqlite3ConnectionBlocked(sqlite3 *, sqlite3 );
+																																																												void sqlite3ConnectionBlocked(sqlite3 *, sqlite3 );
 void sqlite3ConnectionUnlocked(sqlite3 db);
 void sqlite3ConnectionClosed(sqlite3 db);
 #else
-		private static void sqlite3ConnectionBlocked (sqlite3 x, sqlite3 y)
-		{
+		private static void sqlite3ConnectionBlocked(sqlite3 x,sqlite3 y) {
 		}
-
 		//#define sqlite3ConnectionBlocked(x,y)
-		private static void sqlite3ConnectionUnlocked (sqlite3 x)
-		{
+		private static void sqlite3ConnectionUnlocked(sqlite3 x) {
 		}
-
 		//#define sqlite3ConnectionUnlocked(x)
-		private static void sqlite3ConnectionClosed (sqlite3 x)
-		{
+		private static void sqlite3ConnectionClosed(sqlite3 x) {
 		}
-
 		//#define sqlite3ConnectionClosed(x)
 		#endif
 		#if SQLITE_DEBUG
-																																																										    //  void sqlite3ParserTrace(FILE*, char );
+																																																												    //  void sqlite3ParserTrace(FILE*, char );
 #endif
 		///<summary>
 		/// If the SQLITE_ENABLE IOTRACE exists then the global variable
@@ -6717,7 +4086,7 @@ void sqlite3ConnectionClosed(sqlite3 db);
 		/// print I/O tracing messages.
 		///</summary>
 		#if SQLITE_ENABLE_IOTRACE
-																																																										static bool SQLite3IoTrace = false;
+																																																												static bool SQLite3IoTrace = false;
 //define IOTRACE(A)  if( sqlite3IoTrace ){ sqlite3IoTrace A; }
 static void IOTRACE( string X, params object[] ap ) { if ( SQLite3IoTrace ) { printf( X, ap ); } }
 
@@ -6725,15 +4094,11 @@ static void IOTRACE( string X, params object[] ap ) { if ( SQLite3IoTrace ) { pr
 //SQLITE_EXTERN void (*sqlite3IoTrace)(const char*,...);
 #else
 		//#define IOTRACE(A)
-		private static void IOTRACE (string F, params object[] ap)
-		{
+		private static void IOTRACE(string F,params object[] ap) {
 		}
-
 		//#define sqlite3VdbeIOTraceSql(X)
-		private static void sqlite3VdbeIOTraceSql (Vdbe X)
-		{
+		private static void sqlite3VdbeIOTraceSql(Vdbe X) {
 		}
-
 		#endif
 		///<summary>
 		/// These routines are available for the mem2.c debugging memory allocator
@@ -6764,153 +4129,35 @@ static void IOTRACE( string X, params object[] ap ) { if ( SQLite3IoTrace ) { pr
 		/// play when the SQLITE_MEMDEBUG compile-time option is used.
 		///</summary>
 		#if SQLITE_MEMDEBUG
-																																																										//  void sqlite3MemdebugSetType(void*,u8);
+																																																												//  void sqlite3MemdebugSetType(void*,u8);
 //  int sqlite3MemdebugHasType(void*,u8);
 //  int sqlite3MemdebugNoType(void*,u8);
 #else
 		//# define sqlite3MemdebugSetType(X,Y)  /* no-op */
-		private static void sqlite3MemdebugSetType<T> (T X, MemType Y)
-		{
+		private static void sqlite3MemdebugSetType<T>(T X,MemType Y) {
 		}
-
 		//# define sqlite3MemdebugHasType(X,Y)  1
-		private static bool sqlite3MemdebugHasType<T> (T X, MemType Y)
-		{
+		private static bool sqlite3MemdebugHasType<T>(T X,MemType Y) {
 			return true;
 		}
-
 		//# define sqlite3MemdebugNoType(X,Y)   1
-		private static bool sqlite3MemdebugNoType<T> (T X, MemType Y)
-		{
+		private static bool sqlite3MemdebugNoType<T>(T X,MemType Y) {
 			return true;
 		}
 	#endif
 	//#endif //* _SQLITEINT_H_ */
 	}
-	public enum MemType
-	{
+	public enum MemType {
 		//#define MEMTYPE_HEAP       0x01  /* General heap allocations */
 		//#define MEMTYPE_LOOKASIDE  0x02  /* Might have been lookaside memory */
 		//#define MEMTYPE_SCRATCH    0x04  /* Scratch allocations */
 		//#define MEMTYPE_PCACHE     0x08  /* Page cache allocations */
 		//#define MEMTYPE_DB         0x10  /* Uses sqlite3DbMalloc, not sqlite_malloc */
-		HEAP = 0x01,
-		LOOKASIDE = 0x02,
-		SCRATCH = 0x04,
-		PCACHE = 0x08,
-		DB = 0x10
+		HEAP=0x01,
+		LOOKASIDE=0x02,
+		SCRATCH=0x04,
+		PCACHE=0x08,
+		DB=0x10
 	}
-	public partial class CharExtensions
-	{
-		static byte[] sqlite3CtypeMap {
-			get {
-				return Sqlite3.sqlite3CtypeMap;
-			}
-		}
-
-		///
-///<summary>
-///FTS4 is really an extension for FTS3.  It is enabled using the
-///SQLITE_ENABLE_FTS3 macro.  But to avoid confusion we also all
-///the SQLITE_ENABLE_FTS4 macro to serve as an alisse for SQLITE_ENABLE_FTS3.
-///</summary>
-
-		//#if (SQLITE_ENABLE_FTS4) && !defined(SQLITE_ENABLE_FTS3)
-		//# define SQLITE_ENABLE_FTS3
-		//#endif
-		///
-///<summary>
-///</summary>
-///<param name="The ctype.h header is needed for non">ASCII systems.  It is also</param>
-///<param name="needed by FTS3 when FTS3 is included in the amalgamation.">needed by FTS3 when FTS3 is included in the amalgamation.</param>
-///<param name=""></param>
-
-		//#if !defined(SQLITE_ASCII) || \
-		//    (defined(SQLITE_ENABLE_FTS3) && defined(SQLITE_AMALGAMATION))
-		//# include <ctype.h>
-		//#endif
-		///
-///<summary>
-///The following macros mimic the standard library functions toupper(),
-///isspace(), isalnum(), isdigit() and isxdigit(), respectively. The
-///sqlite versions only work for ASCII characters, regardless of locale.
-///
-///</summary>
-
-		#if SQLITE_ASCII
-		//# define sqlite3Toupper(x)  ((x)&~(sqlite3CtypeMap[(unsigned char)(x)]&0x20))
-		//# define CharExtensions.sqlite3Isspace(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x01)
-		//private 
-		public static bool sqlite3Isspace (byte x)
-		{
-			return (Sqlite3.sqlite3CtypeMap [(byte)(x)] & 0x01) != 0;
-		}
-
-		//private
-		public static bool sqlite3Isspace (char x)
-		{
-			return x < 256 && (sqlite3CtypeMap [(byte)(x)] & 0x01) != 0;
-		}
-
-		//# define sqlite3Isalnum(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x06)
-		public static bool sqlite3Isalnum (byte x)
-		{
-			return (sqlite3CtypeMap [(byte)(x)] & 0x06) != 0;
-		}
-
-		public static bool sqlite3Isalnum (char x)
-		{
-			return x < 256 && (sqlite3CtypeMap [(byte)(x)] & 0x06) != 0;
-		}
-
-		//# define sqlite3Isalpha(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x02)
-		//# define sqlite3Isdigit(x)   (sqlite3CtypeMap[(unsigned char)(x)]&0x04)
-		public static bool sqlite3Isdigit (byte x)
-		{
-			return (sqlite3CtypeMap [((byte)x)] & 0x04) != 0;
-		}
-
-		public static bool sqlite3Isdigit (char x)
-		{
-			return x < 256 && (sqlite3CtypeMap [((byte)x)] & 0x04) != 0;
-		}
-
-		//# define sqlite3Isxdigit(x)  (sqlite3CtypeMap[(unsigned char)(x)]&0x08)
-		public static bool sqlite3Isxdigit (byte x)
-		{
-			return (sqlite3CtypeMap [((byte)x)] & 0x08) != 0;
-		}
-
-		public static bool sqlite3Isxdigit (char x)
-		{
-			return x < 256 && (sqlite3CtypeMap [((byte)x)] & 0x08) != 0;
-		}
-	//# define sqlite3Tolower(x)   (sqlite3UpperToLower[(unsigned char)(x)])
-	#else
-																													// define sqlite3Toupper(x)   toupper((unsigned char)(x))
-// define CharExtensions.sqlite3Isspace(x)   isspace((unsigned char)(x))
-// define sqlite3Isalnum(x)   isalnum((unsigned char)(x))
-// define sqlite3Isalpha(x)   isalpha((unsigned char)(x))
-// define sqlite3Isdigit(x)   isdigit((unsigned char)(x))
-// define sqlite3Isxdigit(x)  isxdigit((unsigned char)(x))
-// define sqlite3Tolower(x)   tolower((unsigned char)(x))
-#endif
-	}
-	public class IntegerExtensions
-	{
-		///
-///<summary>
-///</summary>
-///<param name="Constants for the largest and smallest possible 64">bit signed integers.</param>
-///<param name="These macros are designed to work correctly on both 32">bit</param>
-///<param name="compilers.">compilers.</param>
-
-		//#define LARGEST_INT64  (0xffffffff|(((i64)0x7fffffff)<<32))
-		//#define SMALLEST_INT64 (((i64)-1) - LARGEST_INT64)
-		public const i64 LARGEST_INT64 = i64.MaxValue;
-
-		//( 0xffffffff | ( ( (i64)0x7fffffff ) << 32 ) );
-		public const i64 SMALLEST_INT64 = i64.MinValue;
-	//( ( ( i64 ) - 1 ) - LARGEST_INT64 );
-	}
+	
 }
