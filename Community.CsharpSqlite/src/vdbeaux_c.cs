@@ -30,6 +30,7 @@ namespace Community.CsharpSqlite {
 	using sqlite3_stmt=Sqlite3.Vdbe;
 	using sqlite3_value=Sqlite3.Mem;
 	using System;
+    using System.Collections.Generic;
 	public partial class Sqlite3 {
 		/*
     ** 2003 September 6
@@ -513,6 +514,13 @@ namespace Community.CsharpSqlite {
 				aOp=null;
 			}
 		}
+        static void vdbeFreeOpArray(sqlite3 db, List<Op> lOp)
+        {
+            if (lOp != null)
+            {
+                lOp.Clear();
+            }
+        }
 		///<summary>
 		/// Link the SubProgram object passed as the second argument into the linked
 		/// list at Vdbe.pSubProgram. This list is used to delete all sub-program
@@ -648,7 +656,7 @@ namespace Community.CsharpSqlite {
 		/// Use zTemp for any required temporary buffer space.
 		///</summary>
 		static StringBuilder zTemp=new StringBuilder(100);
-		static string displayP4(Op pOp,string zBuffer,int nTemp) {
+		public static string displayP4(Op pOp,string notUsedParam,int nTemp) {
 			zTemp.Length=0;
 			Debug.Assert(nTemp>=20);
 			switch(pOp.p4type) {
@@ -1074,6 +1082,8 @@ void sqlite3VdbeLeave(Vdbe *p){
 					if(p.pResultSet[i_pMem]==null) {
 						p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
 					}
+
+                    //--------------------------
 					pMem=p.pResultSet[i_pMem++];
 					//pMem++;
 					pMem.flags=MEM_Int;
@@ -1082,6 +1092,8 @@ void sqlite3VdbeLeave(Vdbe *p){
 					if(p.pResultSet[i_pMem]==null) {
 						p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
 					}
+
+                    //----------------------------
 					pMem=p.pResultSet[i_pMem++];
 					//pMem++;
 					pMem.flags=MEM_Int;
@@ -1090,6 +1102,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 					if(p.pResultSet[i_pMem]==null) {
 						p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
 					}
+                    //-----------------------
 					pMem=p.pResultSet[i_pMem++];
 					//pMem++;
 					//if ( sqlite3VdbeMemGrow( pMem, 32, 0 ) != 0 )
@@ -1111,6 +1124,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 					if(p.pResultSet[i_pMem]==null) {
 						p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
 					}
+                    //--------------------------------
 					pMem=p.pResultSet[i_pMem++];
 					//pMem++;
 					if(p.explain==1) {
@@ -1128,6 +1142,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 						if(p.pResultSet[i_pMem]==null) {
 							p.pResultSet[i_pMem]=sqlite3Malloc(p.pResultSet[i_pMem]);
 						}
+                        //----------------------------------
 						pMem=p.pResultSet[i_pMem++];
 						// pMem++;
 						#if SQLITE_DEBUG
@@ -2497,6 +2512,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			u=0;
 			while(idx<(int)szHdr&&u<p.nField&&d<=nKey) {
 				p.aMem[u]=sqlite3Malloc(p.aMem[u]);
+                //---------------------------------
 				pMem=p.aMem[u];
 				u32 serial_type=0;
 				idx+=(u32)getVarint32(aKey,idx,out serial_type);

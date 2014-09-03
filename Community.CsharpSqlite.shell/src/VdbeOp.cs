@@ -139,6 +139,9 @@ public u64 cycles;         /* Total time spend executing this instruction */
                     var pDb = vdbe.db.aDb[iDb];
                     str = pDb.zName;
                     break;
+                case OpCode.OP_ParseSchema:
+                    str=Sqlite3.displayP4(this, "", 30);
+                    break;
             }
             return OpCode.ToString() + " \t\t:\t " + str;
         }

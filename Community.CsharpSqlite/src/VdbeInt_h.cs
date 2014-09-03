@@ -236,7 +236,7 @@ set { _flags = value; }
                 }
                 set
                 {
-                    flags = (u8)value;
+                    type = (u8)value;
                 }
             }
             /* One of SQLITE_NULL, SQLITE_TEXT, SQLITE_INTEGER, etc */

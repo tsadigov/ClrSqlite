@@ -104,7 +104,17 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 			/* Number of aliased result set columns */public int nAliasAlloc;
 			/* Number of allocated slots for aAlias[] */public int[] aAlias;
 			/* Register used to hold aliased result */public u8 explain;
-			/* True if the EXPLAIN flag is found on the query */public Token sNameToken;
+			/* True if the EXPLAIN flag is found on the query */
+            Token _sNameToken;
+
+            public Token sNameToken
+            {
+                get { return _sNameToken; }
+                set { 
+                    _sNameToken = value;
+                    Log.WriteHeader("Parse name : "+_sNameToken.Text);
+                }
+            }
 			/* Token with unqualified schema object name */public Token sLastToken;
 			/* The last token parsed */public StringBuilder zTail {
 				get;
