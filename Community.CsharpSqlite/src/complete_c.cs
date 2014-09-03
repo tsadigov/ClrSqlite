@@ -1,42 +1,54 @@
 using System.Diagnostics;
-namespace Community.CsharpSqlite {
-	using u8=System.Byte;
-	public partial class Sqlite3 {
-		/*
-    ** 2001 September 15
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** An tokenizer for SQL
-    **
-    ** This file contains C code that implements the sqlite3_complete() API.
-    ** This code used to be part of the tokenizer.c source file.  But by
-    ** separating it out, the code will be automatically omitted from
-    ** static links that do not use it.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
-    **
-    *************************************************************************
-    *///#include "sqliteInt.h"
+
+namespace Community.CsharpSqlite
+{
+	using u8 = System.Byte;
+
+	public partial class Sqlite3
+	{
+		///
+///<summary>
+///2001 September 15
+///
+///The author disclaims copyright to this source code.  In place of
+///a legal notice, here is a blessing:
+///
+///May you do good and not evil.
+///May you find forgiveness for yourself and forgive others.
+///May you share freely, never taking more than you give.
+///
+///
+///An tokenizer for SQL
+///
+///This file contains C code that implements the sqlite3_complete() API.
+///This code used to be part of the tokenizer.c source file.  But by
+///separating it out, the code will be automatically omitted from
+///static links that do not use it.
+///
+///</summary>
+///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+///<param name=""></param>
+///<param name="SQLITE_SOURCE_ID: 2010">23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name=""></param>
+
+		//#include "sqliteInt.h"
 		#if !SQLITE_OMIT_COMPLETE
-		/*
-** This is defined in tokenize.c.  We just have to import the definition.
-*/
+		///
+///<summary>
+///This is defined in tokenize.c.  We just have to import the definition.
+///</summary>
+
 		#if !SQLITE_AMALGAMATION
 		#if SQLITE_ASCII
 		//#define IdChar(C)  ((sqlite3CtypeMap[(unsigned char)C]&0x46)!=0)
-		static bool IdChar(u8 C) {
-			return (sqlite3CtypeMap[(char)C]&0x46)!=0;
+		static bool IdChar (u8 C)
+		{
+			return (sqlite3CtypeMap [(char)C] & 0x46) != 0;
 		}
+
 		#endif
 		//#if  SQLITE_EBCDIC
 		//extern const char sqlite3IsEbcdicIdChar[];
@@ -47,15 +59,23 @@ namespace Community.CsharpSqlite {
 		/// Token types used by the sqlite3_complete() routine.  See the header
 		/// comments on that procedure for additional information.
 		///</summary>
-		const int tkSEMI=0;
-		const int tkWS=1;
-		const int tkOTHER=2;
+		const int tkSEMI = 0;
+
+		const int tkWS = 1;
+
+		const int tkOTHER = 2;
+
 		#if !SQLITE_OMIT_TRIGGER
-		const int tkEXPLAIN=3;
-		const int tkCREATE=4;
-		const int tkTEMP=5;
-		const int tkTRIGGER=6;
-		const int tkEND=7;
+		const int tkEXPLAIN = 3;
+
+		const int tkCREATE = 4;
+
+		const int tkTEMP = 5;
+
+		const int tkTRIGGER = 6;
+
+		const int tkEND = 7;
+
 		#endif
 		///<summary>
 		/// Return TRUE if the given SQL string ends in a semicolon.
@@ -110,15 +130,44 @@ namespace Community.CsharpSqlite {
 		/// to recognize the end of a trigger can be omitted.  All we have to do
 		/// is look for a semicolon that is not part of an string or comment.
 		///</summary>
-		static public int sqlite3_complete(string zSql) {
-			int state=0;
-			/* Current state, using numbers defined in header comment */int token;
-			/* Value of the next token */
+		static public int sqlite3_complete (string zSql)
+		{
+			int state = 0;
+			///
+///<summary>
+///Current state, using numbers defined in header comment 
+///</summary>
+
+			int token;
+			///
+///<summary>
+///Value of the next token 
+///</summary>
+
 			#if !SQLITE_OMIT_TRIGGER
-			/* A complex statement machine used to detect the end of a CREATE TRIGGER
-** statement.  This is the normal case.
-*/u8[][] trans=new u8[][] {
-				/* Token:                                                *//* State:       **  SEMI  WS  OTHER  EXPLAIN  CREATE  TEMP  TRIGGER  END *//* 0 INVALID: */new u8[] {
+			///
+///<summary>
+///A complex statement machine used to detect the end of a CREATE TRIGGER
+///statement.  This is the normal case.
+///</summary>
+
+			u8[][] trans = new u8[][] {
+				///
+///<summary>
+///Token:                                                
+///</summary>
+
+				///
+///<summary>
+///State:       **  SEMI  WS  OTHER  EXPLAIN  CREATE  TEMP  TRIGGER  END 
+///</summary>
+
+				///
+///<summary>
+///0 INVALID: 
+///</summary>
+
+				new u8[] {
 					1,
 					0,
 					2,
@@ -128,7 +177,12 @@ namespace Community.CsharpSqlite {
 					2,
 					2,
 				},
-				/* 1   START: */new u8[] {
+				///
+///<summary>
+///1   START: 
+///</summary>
+
+				new u8[] {
 					1,
 					1,
 					2,
@@ -138,7 +192,12 @@ namespace Community.CsharpSqlite {
 					2,
 					2,
 				},
-				/* 2  NORMAL: */new u8[] {
+				///
+///<summary>
+///2  NORMAL: 
+///</summary>
+
+				new u8[] {
 					1,
 					2,
 					2,
@@ -148,7 +207,12 @@ namespace Community.CsharpSqlite {
 					2,
 					2,
 				},
-				/* 3 EXPLAIN: */new u8[] {
+				///
+///<summary>
+///3 EXPLAIN: 
+///</summary>
+
+				new u8[] {
 					1,
 					3,
 					3,
@@ -158,7 +222,12 @@ namespace Community.CsharpSqlite {
 					2,
 					2,
 				},
-				/* 4  CREATE: */new u8[] {
+				///
+///<summary>
+///4  CREATE: 
+///</summary>
+
+				new u8[] {
 					1,
 					4,
 					2,
@@ -168,7 +237,12 @@ namespace Community.CsharpSqlite {
 					5,
 					2,
 				},
-				/* 5 TRIGGER: */new u8[] {
+				///
+///<summary>
+///5 TRIGGER: 
+///</summary>
+
+				new u8[] {
 					6,
 					5,
 					5,
@@ -178,7 +252,12 @@ namespace Community.CsharpSqlite {
 					5,
 					5,
 				},
-				/* 6    SEMI: */new u8[] {
+				///
+///<summary>
+///6    SEMI: 
+///</summary>
+
+				new u8[] {
 					6,
 					6,
 					5,
@@ -188,7 +267,12 @@ namespace Community.CsharpSqlite {
 					5,
 					7,
 				},
-				/* 7     END: */new u8[] {
+				///
+///<summary>
+///7     END: 
+///</summary>
+
+				new u8[] {
 					1,
 					7,
 					5,
@@ -200,7 +284,7 @@ namespace Community.CsharpSqlite {
 				},
 			};
 			#else
-																																																						      /* If triggers are not supported by this compile then the statement machine
+																																																									      /* If triggers are not supported by this compile then the statement machine
   ** used to detect the end of a statement is much simplier
   */
       u8[][] trans = new u8[][]   {
@@ -211,11 +295,16 @@ namespace Community.CsharpSqlite {
      /* 2  NORMAL: */new u8[] {    1,  2,     2, },
 };
 #endif
-			int zIdx=0;
-			while(zIdx<zSql.Length) {
-				switch(zSql[zIdx]) {
+			int zIdx = 0;
+			while (zIdx < zSql.Length) {
+				switch (zSql [zIdx]) {
 				case ';': {
-					/* A semicolon */token=tkSEMI;
+					///
+///<summary>
+///A semicolon 
+///</summary>
+
+					token = tkSEMI;
 					break;
 				}
 				case ' ':
@@ -223,140 +312,180 @@ namespace Community.CsharpSqlite {
 				case '\t':
 				case '\n':
 				case '\f': {
-					/* White space is ignored */token=tkWS;
+					///
+///<summary>
+///White space is ignored 
+///</summary>
+
+					token = tkWS;
 					break;
 				}
 				case '/': {
-					/* C-style comments */if(zSql[zIdx+1]!='*') {
-						token=tkOTHER;
+					///
+///<summary>
+///</summary>
+///<param name="C">style comments </param>
+
+					if (zSql [zIdx + 1] != '*') {
+						token = tkOTHER;
 						break;
 					}
-					zIdx+=2;
-					while(zIdx<zSql.Length&&zSql[zIdx]!='*'||zIdx<zSql.Length-1&&zSql[zIdx+1]!='/') {
+					zIdx += 2;
+					while (zIdx < zSql.Length && zSql [zIdx] != '*' || zIdx < zSql.Length - 1 && zSql [zIdx + 1] != '/') {
 						zIdx++;
 					}
-					if(zIdx==zSql.Length)
+					if (zIdx == zSql.Length)
 						return 0;
 					zIdx++;
-					token=tkWS;
+					token = tkWS;
 					break;
 				}
 				case '-': {
-					/* SQL-style comments from "--" to end of line */if(zSql[zIdx+1]!='-') {
-						token=tkOTHER;
+					///
+///<summary>
+///</summary>
+///<param name="SQL">" to end of line </param>
+
+					if (zSql [zIdx + 1] != '-') {
+						token = tkOTHER;
 						break;
 					}
-					while(zIdx<zSql.Length&&zSql[zIdx]!='\n') {
+					while (zIdx < zSql.Length && zSql [zIdx] != '\n') {
 						zIdx++;
 					}
-					if(zIdx==zSql.Length)
-						return state==1?1:0;
+					if (zIdx == zSql.Length)
+						return state == 1 ? 1 : 0;
 					//if( *zSql==0 ) return state==1;
-					token=tkWS;
+					token = tkWS;
 					break;
 				}
 				case '[': {
-					/* Microsoft-style identifiers in [...] */zIdx++;
-					while(zIdx<zSql.Length&&zSql[zIdx]!=']') {
+					///
+///<summary>
+///</summary>
+///<param name="Microsoft">style identifiers in [...] </param>
+
+					zIdx++;
+					while (zIdx < zSql.Length && zSql [zIdx] != ']') {
 						zIdx++;
 					}
-					if(zIdx==zSql.Length)
+					if (zIdx == zSql.Length)
 						return 0;
-					token=tkOTHER;
+					token = tkOTHER;
 					break;
 				}
 				case '`':
-				/* Grave-accent quoted symbols used by MySQL */case '"':
-				/* single- and double-quoted strings */case '\'': {
-					int c=zSql[zIdx];
+				///
+///<summary>
+///</summary>
+///<param name="Grave">accent quoted symbols used by MySQL </param>
+
+				case '"':
+				///
+///<summary>
+///</summary>
+///<param name="single">quoted strings </param>
+
+				case '\'': {
+					int c = zSql [zIdx];
 					zIdx++;
-					while(zIdx<zSql.Length&&zSql[zIdx]!=c) {
+					while (zIdx < zSql.Length && zSql [zIdx] != c) {
 						zIdx++;
 					}
-					if(zIdx==zSql.Length)
+					if (zIdx == zSql.Length)
 						return 0;
-					token=tkOTHER;
+					token = tkOTHER;
 					break;
 				}
 				default: {
 					//#if SQLITE_EBCDIC
 					//        unsigned char c;
 					//#endif
-					if(IdChar((u8)zSql[zIdx])) {
-						/* Keywords and unquoted identifiers */int nId;
-						for(nId=1;(zIdx+nId)<zSql.Length&&IdChar((u8)zSql[zIdx+nId]);nId++) {
+					if (IdChar ((u8)zSql [zIdx])) {
+						///
+///<summary>
+///Keywords and unquoted identifiers 
+///</summary>
+
+						int nId;
+						for (nId = 1; (zIdx + nId) < zSql.Length && IdChar ((u8)zSql [zIdx + nId]); nId++) {
 						}
 						#if SQLITE_OMIT_TRIGGER
-																																																																																																												                token = tkOTHER;
+																																																																																																																		                token = tkOTHER;
 #else
-						switch(zSql[zIdx]) {
+						switch (zSql [zIdx]) {
 						case 'c':
 						case 'C': {
-							if(nId==6&&StringExtensions.sqlite3StrNICmp(zSql,zIdx,"create",6)==0) {
-								token=tkCREATE;
+							if (nId == 6 && StringExtensions.sqlite3StrNICmp (zSql, zIdx, "create", 6) == 0) {
+								token = tkCREATE;
 							}
 							else {
-								token=tkOTHER;
+								token = tkOTHER;
 							}
 							break;
 						}
 						case 't':
 						case 'T': {
-							if(nId==7&&StringExtensions.sqlite3StrNICmp(zSql,zIdx,"trigger",7)==0) {
-								token=tkTRIGGER;
+							if (nId == 7 && StringExtensions.sqlite3StrNICmp (zSql, zIdx, "trigger", 7) == 0) {
+								token = tkTRIGGER;
 							}
 							else
-								if(nId==4&&StringExtensions.sqlite3StrNICmp(zSql,zIdx,"temp",4)==0) {
-									token=tkTEMP;
+								if (nId == 4 && StringExtensions.sqlite3StrNICmp (zSql, zIdx, "temp", 4) == 0) {
+									token = tkTEMP;
 								}
 								else
-									if(nId==9&&StringExtensions.sqlite3StrNICmp(zSql,zIdx,"temporary",9)==0) {
-										token=tkTEMP;
+									if (nId == 9 && StringExtensions.sqlite3StrNICmp (zSql, zIdx, "temporary", 9) == 0) {
+										token = tkTEMP;
 									}
 									else {
-										token=tkOTHER;
+										token = tkOTHER;
 									}
 							break;
 						}
 						case 'e':
 						case 'E': {
-							if(nId==3&&StringExtensions.sqlite3StrNICmp(zSql,zIdx,"end",3)==0) {
-								token=tkEND;
+							if (nId == 3 && StringExtensions.sqlite3StrNICmp (zSql, zIdx, "end", 3) == 0) {
+								token = tkEND;
 							}
 							else
 								#if !SQLITE_OMIT_EXPLAIN
-								if(nId==7&&StringExtensions.sqlite3StrNICmp(zSql,zIdx,"explain",7)==0) {
-									token=tkEXPLAIN;
+								if (nId == 7 && StringExtensions.sqlite3StrNICmp (zSql, zIdx, "explain", 7) == 0) {
+									token = tkEXPLAIN;
 								}
 								else
 								#endif
 								 {
-									token=tkOTHER;
+									token = tkOTHER;
 								}
 							break;
 						}
 						default: {
-							token=tkOTHER;
+							token = tkOTHER;
 							break;
 						}
 						}
 						#endif
-						zIdx+=nId-1;
+						zIdx += nId - 1;
 					}
 					else {
-						/* Operators and special symbols */token=tkOTHER;
+						///
+///<summary>
+///Operators and special symbols 
+///</summary>
+
+						token = tkOTHER;
 					}
 					break;
 				}
 				}
-				state=trans[state][token];
+				state = trans [state] [token];
 				zIdx++;
 			}
-			return (state==1)?1:0;
+			return (state == 1) ? 1 : 0;
 			//return state==1;
 		}
 	#if !SQLITE_OMIT_UTF16
-																		/*
+																			/*
 ** This routine is the same as the sqlite3_complete() routine described
 ** above, except that the parameter is required to be UTF-16 encoded, not
 ** UTF-8.
@@ -367,10 +496,10 @@ char const *zSql8;
 int rc = SQLITE_NOMEM;
 
 #if !SQLITE_OMIT_AUTOINIT
-																		rc = sqlite3_initialize();
+																			rc = sqlite3_initialize();
 if( rc !=0) return rc;
 #endif
-																		pVal = sqlite3ValueNew(0);
+																			pVal = sqlite3ValueNew(0);
 sqlite3ValueSetStr(pVal, -1, zSql, SqliteEncoding.UTF16NATIVE, SQLITE_STATIC);
 zSql8 = sqlite3ValueText(pVal, SqliteEncoding.UTF8);
 if( zSql8 ){

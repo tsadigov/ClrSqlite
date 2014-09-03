@@ -1,11 +1,14 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using Pgno=System.UInt32;
-using u8=System.Byte;
-using u32=System.UInt32;
-namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+using Pgno = System.UInt32;
+using u8 = System.Byte;
+using u32 = System.UInt32;
+
+namespace Community.CsharpSqlite
+{
+	public partial class Sqlite3
+	{
 		///<summary>
 		/// 2001 September 15
 		///
@@ -112,22 +115,30 @@ namespace Community.CsharpSqlite {
 		/// memory cell is updated.  The stack is unchanged.
 		///
 		///</summary>
-		/*
-    ** This routine generates the code needed to write autoincrement
-    ** maximum rowid values back into the sqlite_sequence register.
-    ** Every statement that might do an INSERT into an autoincrement
-    ** table (either directly or through triggers) needs to call this
-    ** routine just before the "exit" code.
-    */
+		///
+///<summary>
+///This routine generates the code needed to write autoincrement
+///maximum rowid values back into the sqlite_sequence register.
+///Every statement that might do an INSERT into an autoincrement
+///table (either directly or through triggers) needs to call this
+///routine just before the "exit" code.
+///
+///</summary>
+
 		#else
-																																								/*
+																																										/*
 ** If SQLITE_OMIT_AUTOINCREMENT is defined, then the three routines
 ** above are all no-ops
 */
 // define autoIncBegin(A,B,C) (0)
 // define autoIncStep(A,B,C)
 #endif
-		/* Forward declaration *///static int xferOptimization(
+		///
+///<summary>
+///Forward declaration 
+///</summary>
+
+		//static int xferOptimization(
 		//  Parse pParse,        /* Parser context */
 		//  Table pDest,         /* The table we are inserting into */
 		//  Select pSelect,      /* A SELECT statement to use as the data source */
@@ -347,31 +358,33 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if SQLITE_TEST
-																																								    /*
+																																										    /*
 ** The following global variable is incremented whenever the
 ** transfer optimization is used.  This is used for testing
 ** purposes only - to make sure the transfer optimization really
 ** is happening when it is suppose to.
 */
 #if !TCLSH
-																																								    static int sqlite3_xferopt_count = 0;
+																																										    static int sqlite3_xferopt_count = 0;
 #else
-																																								    static tcl.lang.Var.SQLITE3_GETSET sqlite3_xferopt_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_xferopt_count" );
+																																										    static tcl.lang.Var.SQLITE3_GETSET sqlite3_xferopt_count = new tcl.lang.Var.SQLITE3_GETSET( "sqlite3_xferopt_count" );
 #endif
-																																								#endif
+																																										#endif
 		#if !SQLITE_OMIT_XFER_OPT
 		///<summary>
 		/// Check to collation names to see if they are compatible.
 		///</summary>
-		static bool xferCompatibleCollation(string z1,string z2) {
-			if(z1==null) {
-				return z2==null;
+		static bool xferCompatibleCollation (string z1, string z2)
+		{
+			if (z1 == null) {
+				return z2 == null;
 			}
-			if(z2==null) {
+			if (z2 == null) {
 				return false;
 			}
-			return z1.Equals(z2,StringComparison.InvariantCultureIgnoreCase);
+			return z1.Equals (z2, StringComparison.InvariantCultureIgnoreCase);
 		}
+
 		///<summary>
 		/// Check to see if index pSrc is compatible as a source of data
 		/// for index pDest in an insert transfer optimization.  The rules
@@ -383,287 +396,582 @@ namespace Community.CsharpSqlite {
 		///    *   The same collating sequence on each column
 		///
 		///</summary>
-		static bool xferCompatibleIndex(Index pDest,Index pSrc) {
+		static bool xferCompatibleIndex (Index pDest, Index pSrc)
+		{
 			int i;
-			Debug.Assert(pDest!=null&&pSrc!=null);
-			Debug.Assert(pDest.pTable!=pSrc.pTable);
-			if(pDest.nColumn!=pSrc.nColumn) {
+			Debug.Assert (pDest != null && pSrc != null);
+			Debug.Assert (pDest.pTable != pSrc.pTable);
+			if (pDest.nColumn != pSrc.nColumn) {
 				return false;
-				/* Different number of columns */}
-			if(pDest.onError!=pSrc.onError) {
+				///
+///<summary>
+///Different number of columns 
+///</summary>
+
+			}
+			if (pDest.onError != pSrc.onError) {
 				return false;
-				/* Different conflict resolution strategies */}
-			for(i=0;i<pSrc.nColumn;i++) {
-				if(pSrc.aiColumn[i]!=pDest.aiColumn[i]) {
-					return false;
-					/* Different columns indexed */}
-				if(pSrc.aSortOrder[i]!=pDest.aSortOrder[i]) {
-					return false;
-					/* Different sort orders */}
-				if(!xferCompatibleCollation(pSrc.azColl[i],pDest.azColl[i])) {
-					return false;
-					/* Different collating sequences */}
+				///
+///<summary>
+///Different conflict resolution strategies 
+///</summary>
+
 			}
-			/* If no test above fails then the indices must be compatible */return true;
-		}
-		/*
-    ** Attempt the transfer optimization on INSERTs of the form
-    **
-    **     INSERT INTO tab1 SELECT * FROM tab2;
-    **
-    ** This optimization is only attempted if
-    **
-    **    (1)  tab1 and tab2 have identical schemas including all the
-    **         same indices and constraints
-    **
-    **    (2)  tab1 and tab2 are different tables
-    **
-    **    (3)  There must be no triggers on tab1
-    **
-    **    (4)  The result set of the SELECT statement is "*"
-    **
-    **    (5)  The SELECT statement has no WHERE, HAVING, ORDER BY, GROUP BY,
-    **         or LIMIT clause.
-    **
-    **    (6)  The SELECT statement is a simple (not a compound) select that
-    **         contains only tab2 in its FROM clause
-    **
-    ** This method for implementing the INSERT transfers raw records from
-    ** tab2 over to tab1.  The columns are not decoded.  Raw records from
-    ** the indices of tab2 are transfered to tab1 as well.  In so doing,
-    ** the resulting tab1 has much less fragmentation.
-    **
-    ** This routine returns TRUE if the optimization is attempted.  If any
-    ** of the conditions above fail so that the optimization should not
-    ** be attempted, then this routine returns FALSE.
-    */static int xferOptimization(Parse pParse,/* Parser context */Table pDest,/* The table we are inserting into */Select pSelect,/* A SELECT statement to use as the data source */int onError,/* How to handle constraint errors */int iDbDest/* The database of pDest */) {
-			ExprList pEList;
-			/* The result set of the SELECT */Table pSrc;
-			/* The table in the FROM clause of SELECT */Index pSrcIdx,pDestIdx;
-			/* Source and destination indices */SrcList_item pItem;
-			/* An element of pSelect.pSrc */int i;
-			/* Loop counter */int iDbSrc;
-			/* The database of pSrc */int iSrc,iDest;
-			/* Cursors from source and destination */int addr1,addr2;
-			/* Loop addresses */int emptyDestTest;
-			/* Address of test for empty pDest */int emptySrcTest;
-			/* Address of test for empty pSrc */Vdbe v;
-			/* The VDBE we are building */KeyInfo pKey;
-			/* Key information for an index */int regAutoinc;
-			/* Memory register used by AUTOINC */bool destHasUniqueIdx=false;
-			/* True if pDest has a UNIQUE index */int regData,regRowid;
-			/* Registers holding data and rowid */if(pSelect==null) {
-				return 0;
-				/* Must be of the form  INSERT INTO ... SELECT ... */}
-			#if !SQLITE_OMIT_TRIGGER
-			if(sqlite3TriggerList(pParse,pDest)!=null) {
-				return 0;
-				/* tab1 must not have triggers */}
-			#endif
-			if((pDest.tabFlags&TF_Virtual)!=0) {
-				return 0;
-				/* tab1 must not be a virtual table */}
-			if(onError==OE_Default) {
-				onError=OE_Abort;
-			}
-			if(onError!=OE_Abort&&onError!=OE_Rollback) {
-				return 0;
-				/* Cannot do OR REPLACE or OR IGNORE or OR FAIL */}
-			Debug.Assert(pSelect.pSrc!=null);
-			/* allocated even if there is no FROM clause */if(pSelect.pSrc.nSrc!=1) {
-				return 0;
-				/* FROM clause must have exactly one term */}
-			if(pSelect.pSrc.a[0].pSelect!=null) {
-				return 0;
-				/* FROM clause cannot contain a subquery */}
-			if(pSelect.pWhere!=null) {
-				return 0;
-				/* SELECT may not have a WHERE clause */}
-			if(pSelect.pOrderBy!=null) {
-				return 0;
-				/* SELECT may not have an ORDER BY clause */}
-			/* Do not need to test for a HAVING clause.  If HAVING is present but
-      ** there is no ORDER BY, we will get an error. */if(pSelect.pGroupBy!=null) {
-				return 0;
-				/* SELECT may not have a GROUP BY clause */}
-			if(pSelect.pLimit!=null) {
-				return 0;
-				/* SELECT may not have a LIMIT clause */}
-			Debug.Assert(pSelect.pOffset==null);
-			/* Must be so if pLimit==0 */if(pSelect.pPrior!=null) {
-				return 0;
-				/* SELECT may not be a compound query */}
-			if((pSelect.selFlags&SelectFlags.Distinct)!=0) {
-				return 0;
-				/* SELECT may not be DISTINCT */}
-			pEList=pSelect.pEList;
-			Debug.Assert(pEList!=null);
-			if(pEList.nExpr!=1) {
-				return 0;
-				/* The result set must have exactly one column */}
-			Debug.Assert(pEList.a[0].pExpr!=null);
-            if (pEList.a[0].pExpr.Operator != TokenType.TK_ALL)
-            {
-				return 0;
-				/* The result set must be the special operator "*" */}
-			/* At this point we have established that the statement is of the
-      ** correct syntactic form to participate in this optimization.  Now
-      ** we have to check the semantics.
-      */pItem=pSelect.pSrc.a[0];
-			pSrc=sqlite3LocateTable(pParse,0,pItem.zName,pItem.zDatabase);
-			if(pSrc==null) {
-				return 0;
-				/* FROM clause does not contain a real table */}
-			if(pSrc==pDest) {
-				return 0;
-				/* tab1 and tab2 may not be the same table */}
-			if((pSrc.tabFlags&TF_Virtual)!=0) {
-				return 0;
-				/* tab2 must not be a virtual table */}
-			if(pSrc.pSelect!=null) {
-				return 0;
-				/* tab2 may not be a view */}
-			if(pDest.nCol!=pSrc.nCol) {
-				return 0;
-				/* Number of columns must be the same in tab1 and tab2 */}
-			if(pDest.iPKey!=pSrc.iPKey) {
-				return 0;
-				/* Both tables must have the same INTEGER PRIMARY KEY */}
-			for(i=0;i<pDest.nCol;i++) {
-				if(pDest.aCol[i].affinity!=pSrc.aCol[i].affinity) {
-					return 0;
-					/* Affinity must be the same on all columns */}
-				if(!xferCompatibleCollation(pDest.aCol[i].zColl,pSrc.aCol[i].zColl)) {
-					return 0;
-					/* Collating sequence must be the same on all columns */}
-				if(pDest.aCol[i].notNull!=0&&pSrc.aCol[i].notNull==0) {
-					return 0;
-					/* tab2 must be NOT NULL if tab1 is */}
-			}
-			for(pDestIdx=pDest.pIndex;pDestIdx!=null;pDestIdx=pDestIdx.pNext) {
-				if(pDestIdx.onError!=OE_None) {
-					destHasUniqueIdx=true;
+			for (i = 0; i < pSrc.nColumn; i++) {
+				if (pSrc.aiColumn [i] != pDest.aiColumn [i]) {
+					return false;
+					///
+///<summary>
+///Different columns indexed 
+///</summary>
+
 				}
-				for(pSrcIdx=pSrc.pIndex;pSrcIdx!=null;pSrcIdx=pSrcIdx.pNext) {
-					if(xferCompatibleIndex(pDestIdx,pSrcIdx))
+				if (pSrc.aSortOrder [i] != pDest.aSortOrder [i]) {
+					return false;
+					///
+///<summary>
+///Different sort orders 
+///</summary>
+
+				}
+				if (!xferCompatibleCollation (pSrc.azColl [i], pDest.azColl [i])) {
+					return false;
+					///
+///<summary>
+///Different collating sequences 
+///</summary>
+
+				}
+			}
+			///
+///<summary>
+///If no test above fails then the indices must be compatible 
+///</summary>
+
+			return true;
+		}
+
+		///
+///<summary>
+///Attempt the transfer optimization on INSERTs of the form
+///
+///INSERT INTO tab1 SELECT * FROM tab2;
+///
+///This optimization is only attempted if
+///
+///(1)  tab1 and tab2 have identical schemas including all the
+///same indices and constraints
+///
+///(2)  tab1 and tab2 are different tables
+///
+///(3)  There must be no triggers on tab1
+///
+///(4)  The result set of the SELECT statement is "*"
+///
+///(5)  The SELECT statement has no WHERE, HAVING, ORDER BY, GROUP BY,
+///or LIMIT clause.
+///
+///(6)  The SELECT statement is a simple (not a compound) select that
+///contains only tab2 in its FROM clause
+///
+///This method for implementing the INSERT transfers raw records from
+///tab2 over to tab1.  The columns are not decoded.  Raw records from
+///the indices of tab2 are transfered to tab1 as well.  In so doing,
+///the resulting tab1 has much less fragmentation.
+///
+///This routine returns TRUE if the optimization is attempted.  If any
+///of the conditions above fail so that the optimization should not
+///be attempted, then this routine returns FALSE.
+///
+///</summary>
+
+		static int xferOptimization (Parse pParse, ///
+///<summary>
+///Parser context 
+///</summary>
+
+		Table pDest, ///
+///<summary>
+///The table we are inserting into 
+///</summary>
+
+		Select pSelect, ///
+///<summary>
+///A SELECT statement to use as the data source 
+///</summary>
+
+		int onError, ///
+///<summary>
+///How to handle constraint errors 
+///</summary>
+
+		int iDbDest///
+///<summary>
+///The database of pDest 
+///</summary>
+
+		)
+		{
+			ExprList pEList;
+			///
+///<summary>
+///The result set of the SELECT 
+///</summary>
+
+			Table pSrc;
+			///
+///<summary>
+///The table in the FROM clause of SELECT 
+///</summary>
+
+			Index pSrcIdx, pDestIdx;
+			///
+///<summary>
+///Source and destination indices 
+///</summary>
+
+			SrcList_item pItem;
+			///
+///<summary>
+///An element of pSelect.pSrc 
+///</summary>
+
+			int i;
+			///
+///<summary>
+///Loop counter 
+///</summary>
+
+			int iDbSrc;
+			///
+///<summary>
+///The database of pSrc 
+///</summary>
+
+			int iSrc, iDest;
+			///
+///<summary>
+///Cursors from source and destination 
+///</summary>
+
+			int addr1, addr2;
+			///
+///<summary>
+///Loop addresses 
+///</summary>
+
+			int emptyDestTest;
+			///
+///<summary>
+///Address of test for empty pDest 
+///</summary>
+
+			int emptySrcTest;
+			///
+///<summary>
+///Address of test for empty pSrc 
+///</summary>
+
+			Vdbe v;
+			///
+///<summary>
+///The VDBE we are building 
+///</summary>
+
+			KeyInfo pKey;
+			///
+///<summary>
+///Key information for an index 
+///</summary>
+
+			int regAutoinc;
+			///
+///<summary>
+///Memory register used by AUTOINC 
+///</summary>
+
+			bool destHasUniqueIdx = false;
+			///
+///<summary>
+///True if pDest has a UNIQUE index 
+///</summary>
+
+			int regData, regRowid;
+			///
+///<summary>
+///Registers holding data and rowid 
+///</summary>
+
+			if (pSelect == null) {
+				return 0;
+				///
+///<summary>
+///Must be of the form  INSERT INTO ... SELECT ... 
+///</summary>
+
+			}
+			#if !SQLITE_OMIT_TRIGGER
+			if (sqlite3TriggerList (pParse, pDest) != null) {
+				return 0;
+				///
+///<summary>
+///tab1 must not have triggers 
+///</summary>
+
+			}
+			#endif
+			if ((pDest.tabFlags & TF_Virtual) != 0) {
+				return 0;
+				///
+///<summary>
+///tab1 must not be a virtual table 
+///</summary>
+
+			}
+			if (onError == OE_Default) {
+				onError = OE_Abort;
+			}
+			if (onError != OE_Abort && onError != OE_Rollback) {
+				return 0;
+				///
+///<summary>
+///Cannot do OR REPLACE or OR IGNORE or OR FAIL 
+///</summary>
+
+			}
+			Debug.Assert (pSelect.pSrc != null);
+			///
+///<summary>
+///allocated even if there is no FROM clause 
+///</summary>
+
+			if (pSelect.pSrc.nSrc != 1) {
+				return 0;
+				///
+///<summary>
+///FROM clause must have exactly one term 
+///</summary>
+
+			}
+			if (pSelect.pSrc.a [0].pSelect != null) {
+				return 0;
+				///
+///<summary>
+///FROM clause cannot contain a subquery 
+///</summary>
+
+			}
+			if (pSelect.pWhere != null) {
+				return 0;
+				///
+///<summary>
+///SELECT may not have a WHERE clause 
+///</summary>
+
+			}
+			if (pSelect.pOrderBy != null) {
+				return 0;
+				///
+///<summary>
+///SELECT may not have an ORDER BY clause 
+///</summary>
+
+			}
+			///
+///<summary>
+///Do not need to test for a HAVING clause.  If HAVING is present but
+///there is no ORDER BY, we will get an error. 
+///</summary>
+
+			if (pSelect.pGroupBy != null) {
+				return 0;
+				///
+///<summary>
+///SELECT may not have a GROUP BY clause 
+///</summary>
+
+			}
+			if (pSelect.pLimit != null) {
+				return 0;
+				///
+///<summary>
+///SELECT may not have a LIMIT clause 
+///</summary>
+
+			}
+			Debug.Assert (pSelect.pOffset == null);
+			///
+///<summary>
+///Must be so if pLimit==0 
+///</summary>
+
+			if (pSelect.pPrior != null) {
+				return 0;
+				///
+///<summary>
+///SELECT may not be a compound query 
+///</summary>
+
+			}
+			if ((pSelect.selFlags & SelectFlags.Distinct) != 0) {
+				return 0;
+				///
+///<summary>
+///SELECT may not be DISTINCT 
+///</summary>
+
+			}
+			pEList = pSelect.pEList;
+			Debug.Assert (pEList != null);
+			if (pEList.nExpr != 1) {
+				return 0;
+				///
+///<summary>
+///The result set must have exactly one column 
+///</summary>
+
+			}
+			Debug.Assert (pEList.a [0].pExpr != null);
+			if (pEList.a [0].pExpr.Operator != TokenType.TK_ALL) {
+				return 0;
+				///
+///<summary>
+///The result set must be the special operator "*" 
+///</summary>
+
+			}
+			///
+///<summary>
+///At this point we have established that the statement is of the
+///correct syntactic form to participate in this optimization.  Now
+///we have to check the semantics.
+///
+///</summary>
+
+			pItem = pSelect.pSrc.a [0];
+			pSrc = sqlite3LocateTable (pParse, 0, pItem.zName, pItem.zDatabase);
+			if (pSrc == null) {
+				return 0;
+				///
+///<summary>
+///FROM clause does not contain a real table 
+///</summary>
+
+			}
+			if (pSrc == pDest) {
+				return 0;
+				///
+///<summary>
+///tab1 and tab2 may not be the same table 
+///</summary>
+
+			}
+			if ((pSrc.tabFlags & TF_Virtual) != 0) {
+				return 0;
+				///
+///<summary>
+///tab2 must not be a virtual table 
+///</summary>
+
+			}
+			if (pSrc.pSelect != null) {
+				return 0;
+				///
+///<summary>
+///tab2 may not be a view 
+///</summary>
+
+			}
+			if (pDest.nCol != pSrc.nCol) {
+				return 0;
+				///
+///<summary>
+///Number of columns must be the same in tab1 and tab2 
+///</summary>
+
+			}
+			if (pDest.iPKey != pSrc.iPKey) {
+				return 0;
+				///
+///<summary>
+///Both tables must have the same INTEGER PRIMARY KEY 
+///</summary>
+
+			}
+			for (i = 0; i < pDest.nCol; i++) {
+				if (pDest.aCol [i].affinity != pSrc.aCol [i].affinity) {
+					return 0;
+					///
+///<summary>
+///Affinity must be the same on all columns 
+///</summary>
+
+				}
+				if (!xferCompatibleCollation (pDest.aCol [i].zColl, pSrc.aCol [i].zColl)) {
+					return 0;
+					///
+///<summary>
+///Collating sequence must be the same on all columns 
+///</summary>
+
+				}
+				if (pDest.aCol [i].notNull != 0 && pSrc.aCol [i].notNull == 0) {
+					return 0;
+					///
+///<summary>
+///tab2 must be NOT NULL if tab1 is 
+///</summary>
+
+				}
+			}
+			for (pDestIdx = pDest.pIndex; pDestIdx != null; pDestIdx = pDestIdx.pNext) {
+				if (pDestIdx.onError != OE_None) {
+					destHasUniqueIdx = true;
+				}
+				for (pSrcIdx = pSrc.pIndex; pSrcIdx != null; pSrcIdx = pSrcIdx.pNext) {
+					if (xferCompatibleIndex (pDestIdx, pSrcIdx))
 						break;
 				}
-				if(pSrcIdx==null) {
+				if (pSrcIdx == null) {
 					return 0;
-					/* pDestIdx has no corresponding index in pSrc */}
+					///
+///<summary>
+///pDestIdx has no corresponding index in pSrc 
+///</summary>
+
+				}
 			}
 			#if !SQLITE_OMIT_CHECK
-			if(pDest.pCheck!=null&&0!=sqlite3ExprCompare(pSrc.pCheck,pDest.pCheck)) {
+			if (pDest.pCheck != null && 0 != sqlite3ExprCompare (pSrc.pCheck, pDest.pCheck)) {
 				return 0;
-				/* Tables have different CHECK constraints.  Ticket #2252 */}
+				///
+///<summary>
+///Tables have different CHECK constraints.  Ticket #2252 
+///</summary>
+
+			}
 			#endif
 			#if !SQLITE_OMIT_FOREIGN_KEY
-			/* Disallow the transfer optimization if the destination table constains
-  ** any foreign key constraints.  This is more restrictive than necessary.
-  ** But the main beneficiary of the transfer optimization is the VACUUM 
-  ** command, and the VACUUM command disables foreign key constraints.  So
-  ** the extra complication to make this rule less restrictive is probably
-  ** not worth the effort.  Ticket [6284df89debdfa61db8073e062908af0c9b6118e]
-  */if((pParse.db.flags&SQLITE_ForeignKeys)!=0&&pDest.pFKey!=null) {
+			///
+///<summary>
+///Disallow the transfer optimization if the destination table constains
+///any foreign key constraints.  This is more restrictive than necessary.
+///But the main beneficiary of the transfer optimization is the VACUUM 
+///command, and the VACUUM command disables foreign key constraints.  So
+///the extra complication to make this rule less restrictive is probably
+///not worth the effort.  Ticket [6284df89debdfa61db8073e062908af0c9b6118e]
+///
+///</summary>
+
+			if ((pParse.db.flags & SQLITE_ForeignKeys) != 0 && pDest.pFKey != null) {
 				return 0;
 			}
 			#endif
-			/* If we get this far, it means either:
-      **
-      **    *   We can always do the transfer if the table contains an
-      **        an integer primary key
-      **
-      **    *   We can conditionally do the transfer if the destination
-      **        table is empty.
-      */
+			///
+///<summary>
+///If we get this far, it means either:
+///
+///We can always do the transfer if the table contains an
+///an integer primary key
+///
+///We can conditionally do the transfer if the destination
+///table is empty.
+///
+///</summary>
+
 			#if SQLITE_TEST
-																																																												#if !TCLSH
-																																																												      sqlite3_xferopt_count++;
+																																																															#if !TCLSH
+																																																															      sqlite3_xferopt_count++;
 #else
-																																																												      sqlite3_xferopt_count.iValue++;
+																																																															      sqlite3_xferopt_count.iValue++;
 #endif
-																																																												#endif
-			iDbSrc=sqlite3SchemaToIndex(pParse.db,pSrc.pSchema);
-			v=sqlite3GetVdbe(pParse);
-			sqlite3CodeVerifySchema(pParse,iDbSrc);
-			iSrc=pParse.nTab++;
-			iDest=pParse.nTab++;
-			regAutoinc=pParse.autoIncBegin(iDbDest,pDest);
-			pParse.sqlite3OpenTable(iDest,iDbDest,pDest,OP_OpenWrite);
-			if((pDest.iPKey<0&&pDest.pIndex!=null)||destHasUniqueIdx) {
-				/* If tables do not have an INTEGER PRIMARY KEY and there
-        ** are indices to be copied and the destination is not empty,
-        ** we have to disallow the transfer optimization because the
-        ** the rowids might change which will mess up indexing.
-        **
-        ** Or if the destination has a UNIQUE index and is not empty,
-        ** we also disallow the transfer optimization because we cannot
-        ** insure that all entries in the union of DEST and SRC will be
-        ** unique.
-        */addr1=v.sqlite3VdbeAddOp2(OP_Rewind,iDest,0);
-				emptyDestTest=v.sqlite3VdbeAddOp2(OP_Goto,0,0);
-				v.sqlite3VdbeJumpHere(addr1);
+																																																															#endif
+			iDbSrc = sqlite3SchemaToIndex (pParse.db, pSrc.pSchema);
+			v = sqlite3GetVdbe (pParse);
+			sqlite3CodeVerifySchema (pParse, iDbSrc);
+			iSrc = pParse.nTab++;
+			iDest = pParse.nTab++;
+			regAutoinc = pParse.autoIncBegin (iDbDest, pDest);
+			pParse.sqlite3OpenTable (iDest, iDbDest, pDest, OP_OpenWrite);
+			if ((pDest.iPKey < 0 && pDest.pIndex != null) || destHasUniqueIdx) {
+				///
+///<summary>
+///If tables do not have an INTEGER PRIMARY KEY and there
+///are indices to be copied and the destination is not empty,
+///we have to disallow the transfer optimization because the
+///the rowids might change which will mess up indexing.
+///
+///Or if the destination has a UNIQUE index and is not empty,
+///we also disallow the transfer optimization because we cannot
+///insure that all entries in the union of DEST and SRC will be
+///unique.
+///
+///</summary>
+
+				addr1 = v.sqlite3VdbeAddOp2 (OP_Rewind, iDest, 0);
+				emptyDestTest = v.sqlite3VdbeAddOp2 (OP_Goto, 0, 0);
+				v.sqlite3VdbeJumpHere (addr1);
 			}
 			else {
-				emptyDestTest=0;
+				emptyDestTest = 0;
 			}
-			pParse.sqlite3OpenTable(iSrc,iDbSrc,pSrc,OP_OpenRead);
-			emptySrcTest=v.sqlite3VdbeAddOp2(OP_Rewind,iSrc,0);
-			regData=pParse.sqlite3GetTempReg();
-			regRowid=pParse.sqlite3GetTempReg();
-			if(pDest.iPKey>=0) {
-				addr1=v.sqlite3VdbeAddOp2(OP_Rowid,iSrc,regRowid);
-				addr2=v.sqlite3VdbeAddOp3(OP_NotExists,iDest,0,regRowid);
-				sqlite3HaltConstraint(pParse,onError,"PRIMARY KEY must be unique",P4_STATIC);
-				v.sqlite3VdbeJumpHere(addr2);
-				pParse.autoIncStep(regAutoinc,regRowid);
+			pParse.sqlite3OpenTable (iSrc, iDbSrc, pSrc, OP_OpenRead);
+			emptySrcTest = v.sqlite3VdbeAddOp2 (OP_Rewind, iSrc, 0);
+			regData = pParse.sqlite3GetTempReg ();
+			regRowid = pParse.sqlite3GetTempReg ();
+			if (pDest.iPKey >= 0) {
+				addr1 = v.sqlite3VdbeAddOp2 (OP_Rowid, iSrc, regRowid);
+				addr2 = v.sqlite3VdbeAddOp3 (OP_NotExists, iDest, 0, regRowid);
+				sqlite3HaltConstraint (pParse, onError, "PRIMARY KEY must be unique", P4_STATIC);
+				v.sqlite3VdbeJumpHere (addr2);
+				pParse.autoIncStep (regAutoinc, regRowid);
 			}
 			else
-				if(pDest.pIndex==null) {
-					addr1=v.sqlite3VdbeAddOp2(OP_NewRowid,iDest,regRowid);
+				if (pDest.pIndex == null) {
+					addr1 = v.sqlite3VdbeAddOp2 (OP_NewRowid, iDest, regRowid);
 				}
 				else {
-					addr1=v.sqlite3VdbeAddOp2(OP_Rowid,iSrc,regRowid);
-					Debug.Assert((pDest.tabFlags&TF_Autoincrement)==0);
+					addr1 = v.sqlite3VdbeAddOp2 (OP_Rowid, iSrc, regRowid);
+					Debug.Assert ((pDest.tabFlags & TF_Autoincrement) == 0);
 				}
-			v.sqlite3VdbeAddOp2(OP_RowData,iSrc,regData);
-			v.sqlite3VdbeAddOp3(OP_Insert,iDest,regData,regRowid);
-			v.sqlite3VdbeChangeP5(OPFLAG_NCHANGE|OPFLAG_LASTROWID|OPFLAG_APPEND);
-			v.sqlite3VdbeChangeP4(-1,pDest.zName,0);
-			v.sqlite3VdbeAddOp2(OP_Next,iSrc,addr1);
-			for(pDestIdx=pDest.pIndex;pDestIdx!=null;pDestIdx=pDestIdx.pNext) {
-				for(pSrcIdx=pSrc.pIndex;pSrcIdx!=null;pSrcIdx=pSrcIdx.pNext) {
-					if(xferCompatibleIndex(pDestIdx,pSrcIdx))
+			v.sqlite3VdbeAddOp2 (OP_RowData, iSrc, regData);
+			v.sqlite3VdbeAddOp3 (OP_Insert, iDest, regData, regRowid);
+			v.sqlite3VdbeChangeP5 (OPFLAG_NCHANGE | OPFLAG_LASTROWID | OPFLAG_APPEND);
+			v.sqlite3VdbeChangeP4 (-1, pDest.zName, 0);
+			v.sqlite3VdbeAddOp2 (OP_Next, iSrc, addr1);
+			for (pDestIdx = pDest.pIndex; pDestIdx != null; pDestIdx = pDestIdx.pNext) {
+				for (pSrcIdx = pSrc.pIndex; pSrcIdx != null; pSrcIdx = pSrcIdx.pNext) {
+					if (xferCompatibleIndex (pDestIdx, pSrcIdx))
 						break;
 				}
-				Debug.Assert(pSrcIdx!=null);
-				v.sqlite3VdbeAddOp2(OP_Close,iSrc,0);
-				v.sqlite3VdbeAddOp2(OP_Close,iDest,0);
-				pKey=sqlite3IndexKeyinfo(pParse,pSrcIdx);
-				v.sqlite3VdbeAddOp4(OP_OpenRead,iSrc,pSrcIdx.tnum,iDbSrc,pKey,P4_KEYINFO_HANDOFF);
+				Debug.Assert (pSrcIdx != null);
+				v.sqlite3VdbeAddOp2 (OP_Close, iSrc, 0);
+				v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
+				pKey = sqlite3IndexKeyinfo (pParse, pSrcIdx);
+				v.sqlite3VdbeAddOp4 (OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey, P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
-																																																																																        VdbeComment( v, "%s", pSrcIdx.zName );
+																																																																																				        VdbeComment( v, "%s", pSrcIdx.zName );
 #endif
-				pKey=sqlite3IndexKeyinfo(pParse,pDestIdx);
-				v.sqlite3VdbeAddOp4(OP_OpenWrite,iDest,pDestIdx.tnum,iDbDest,pKey,P4_KEYINFO_HANDOFF);
+				pKey = sqlite3IndexKeyinfo (pParse, pDestIdx);
+				v.sqlite3VdbeAddOp4 (OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey, P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
-																																																																																        VdbeComment( v, "%s", pDestIdx.zName );
+																																																																																				        VdbeComment( v, "%s", pDestIdx.zName );
 #endif
-				addr1=v.sqlite3VdbeAddOp2(OP_Rewind,iSrc,0);
-				v.sqlite3VdbeAddOp2(OP_RowKey,iSrc,regData);
-				v.sqlite3VdbeAddOp3(OP_IdxInsert,iDest,regData,1);
-				v.sqlite3VdbeAddOp2(OP_Next,iSrc,addr1+1);
-				v.sqlite3VdbeJumpHere(addr1);
+				addr1 = v.sqlite3VdbeAddOp2 (OP_Rewind, iSrc, 0);
+				v.sqlite3VdbeAddOp2 (OP_RowKey, iSrc, regData);
+				v.sqlite3VdbeAddOp3 (OP_IdxInsert, iDest, regData, 1);
+				v.sqlite3VdbeAddOp2 (OP_Next, iSrc, addr1 + 1);
+				v.sqlite3VdbeJumpHere (addr1);
 			}
-			v.sqlite3VdbeJumpHere(emptySrcTest);
-			pParse.sqlite3ReleaseTempReg(regRowid);
-			pParse.sqlite3ReleaseTempReg(regData);
-			v.sqlite3VdbeAddOp2(OP_Close,iSrc,0);
-			v.sqlite3VdbeAddOp2(OP_Close,iDest,0);
-			if(emptyDestTest!=0) {
-				v.sqlite3VdbeAddOp2(OP_Halt,SQLITE_OK,0);
-				v.sqlite3VdbeJumpHere(emptyDestTest);
-				v.sqlite3VdbeAddOp2(OP_Close,iDest,0);
+			v.sqlite3VdbeJumpHere (emptySrcTest);
+			pParse.sqlite3ReleaseTempReg (regRowid);
+			pParse.sqlite3ReleaseTempReg (regData);
+			v.sqlite3VdbeAddOp2 (OP_Close, iSrc, 0);
+			v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
+			if (emptyDestTest != 0) {
+				v.sqlite3VdbeAddOp2 (OP_Halt, SQLITE_OK, 0);
+				v.sqlite3VdbeJumpHere (emptyDestTest);
+				v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
 				return 0;
 			}
 			else {

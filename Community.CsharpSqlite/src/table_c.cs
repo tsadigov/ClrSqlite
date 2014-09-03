@@ -1,8 +1,11 @@
 using System;
 using System.Diagnostics;
-using i64=System.Int64;
-namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+using i64 = System.Int64;
+
+namespace Community.CsharpSqlite
+{
+	public partial class Sqlite3
+	{
 	///<summary>
 	/// 2001 September 15
 	///
@@ -33,7 +36,7 @@ namespace Community.CsharpSqlite {
 	//#include <stdlib.h>
 	//#include <string.h>
 	#if !SQLITE_OMIT_GET_TABLE
-																		
+																			
 ///<summary>
 /// This structure is used to pass data from sqlite3_get_table() through
 /// to the callback function is uses to build the result.

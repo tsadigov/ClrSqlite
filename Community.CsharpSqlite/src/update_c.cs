@@ -1,31 +1,39 @@
 using System;
 using System.Diagnostics;
-using u8=System.Byte;
-using u32=System.UInt32;
-namespace Community.CsharpSqlite {
-	using sqlite3_value=Sqlite3.Mem;
-	public partial class Sqlite3 {
-	/*
-    ** 2001 September 15
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains C code routines that are called by the parser
-    ** to handle UPDATE statements.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    *///#include "sqliteInt.h"
+using u8 = System.Byte;
+using u32 = System.UInt32;
+
+namespace Community.CsharpSqlite
+{
+	using sqlite3_value = Sqlite3.Mem;
+
+	public partial class Sqlite3
+	{
+	///
+///<summary>
+///2001 September 15
+///
+///The author disclaims copyright to this source code.  In place of
+///a legal notice, here is a blessing:
+///
+///May you do good and not evil.
+///May you find forgiveness for yourself and forgive others.
+///May you share freely, never taking more than you give.
+///
+///
+///This file contains C code routines that are called by the parser
+///to handle UPDATE statements.
+///
+///</summary>
+///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+///<param name=""></param>
+///<param name="SQLITE_SOURCE_ID: 2011">23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name=""></param>
+
+	//#include "sqliteInt.h"
 	#if !SQLITE_OMIT_VIRTUALTABLE
 	///<summary>
 	///Forward declaration
@@ -71,13 +79,17 @@ namespace Community.CsharpSqlite {
 	/// stored in place of an 8-byte floating point value in order to save
 	/// space.
 	///</summary>
-	/*
-    ** Process an UPDATE statement.
-    **
-    **   UPDATE OR IGNORE table_wxyz SET a=b, c=d WHERE e<5 AND f NOT NULL;
-    **          \_______/ \________/     \______/       \________________/
-    *            onError   pTabList      pChanges             pWhere
-    *////<summary>
+	///
+///<summary>
+///Process an UPDATE statement.
+///
+///UPDATE OR IGNORE table_wxyz SET a=b, c=d WHERE e<5 AND f NOT NULL;
+///\_______/ \________/     \______/       \________________/
+///onError   pTabList      pChanges             pWhere
+///
+///</summary>
+
+	///<summary>
 	///Make sure "isView" and other macros defined above are undefined. Otherwise
 	/// thely may interfere with compilation of other functions in this file
 	/// (or in another file, if this file becomes part of the amalgamation).
@@ -89,25 +101,27 @@ namespace Community.CsharpSqlite {
 	// #undef pTrigger
 	//#endif
 	#if !SQLITE_OMIT_VIRTUALTABLE
-	/*
-** Generate code for an UPDATE of a virtual table.
-**
-** The strategy is that we create an ephemerial table that contains
-** for each row to be changed:
-**
-**   (A)  The original rowid of that row.
-**   (B)  The revised rowid for the row. (note1)
-**   (C)  The content of every column in the row.
-**
-** Then we loop over this ephemeral table and for each row in
-** the ephermeral table call VUpdate.
-**
-** When finished, drop the ephemeral table.
-**
-** (note1) Actually, if we know in advance that (A) is always the same
-** as (B) we only store (A), then duplicate (A) when pulling
-** it out of the ephemeral table before calling VUpdate.
-*/
+	///
+///<summary>
+///Generate code for an UPDATE of a virtual table.
+///
+///The strategy is that we create an ephemerial table that contains
+///for each row to be changed:
+///
+///(A)  The original rowid of that row.
+///(B)  The revised rowid for the row. (note1)
+///(C)  The content of every column in the row.
+///
+///Then we loop over this ephemeral table and for each row in
+///the ephermeral table call VUpdate.
+///
+///When finished, drop the ephemeral table.
+///
+///(note1) Actually, if we know in advance that (A) is always the same
+///as (B) we only store (A), then duplicate (A) when pulling
+///it out of the ephemeral table before calling VUpdate.
+///</summary>
+
 	#endif
 	}
 }

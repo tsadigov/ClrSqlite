@@ -1,105 +1,146 @@
-using u8=System.Byte;
-using Pgno=System.UInt32;
+using u8 = System.Byte;
+using Pgno = System.UInt32;
+
 #if SQLITE_OMIT_WAL
-using Wal=System.Object;
+using Wal = System.Object;
+
 #endif
-namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
-		/*
-    ** 2010 February 1
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This header file defines the interface to the write-ahead logging 
-    ** system. Refer to the comments below and the header comment attached to 
-    ** the implementation of each function in log.c for further details.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    *///#if !_WAL_H_
+namespace Community.CsharpSqlite
+{
+	public partial class Sqlite3
+	{
+		///
+///<summary>
+///2010 February 1
+///
+///The author disclaims copyright to this source code.  In place of
+///a legal notice, here is a blessing:
+///
+///May you do good and not evil.
+///May you find forgiveness for yourself and forgive others.
+///May you share freely, never taking more than you give.
+///
+///
+///</summary>
+///<param name="This header file defines the interface to the write">ahead logging </param>
+///<param name="system. Refer to the comments below and the header comment attached to ">system. Refer to the comments below and the header comment attached to </param>
+///<param name="the implementation of each function in log.c for further details.">the implementation of each function in log.c for further details.</param>
+///<param name=""></param>
+///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+///<param name=""></param>
+///<param name="SQLITE_SOURCE_ID: 2011">23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name=""></param>
+
+		//#if !_WAL_H_
 		//#define _WAL_H_
 		//#include "sqliteInt.h"
 		#if SQLITE_OMIT_WAL
 		//# define sqlite3WalOpen(x,y,z)                 0
-		static int sqlite3WalOpen(sqlite3_vfs x,sqlite3_file y,string z) {
+		static int sqlite3WalOpen (sqlite3_vfs x, sqlite3_file y, string z)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalLimit(x,y)
-		static void sqlite3WalLimit(sqlite3_vfs x,long y) {
+		static void sqlite3WalLimit (sqlite3_vfs x, long y)
+		{
 		}
+
 		//# define sqlite3WalClose(w,x,y,z)              0
-		static int sqlite3WalClose(Wal w,int x,int y,u8 z) {
+		static int sqlite3WalClose (Wal w, int x, int y, u8 z)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalBeginReadTransaction(y,z)   0
-		static int sqlite3WalBeginReadTransaction(Wal y,int z) {
+		static int sqlite3WalBeginReadTransaction (Wal y, int z)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalEndReadTransaction(z)
-		static void sqlite3WalEndReadTransaction(Wal z) {
+		static void sqlite3WalEndReadTransaction (Wal z)
+		{
 		}
+
 		//# define sqlite3WalRead(v,w,x,y,z)             0
-		static int sqlite3WalRead(Wal v,Pgno w,ref int x,int y,u8[] z) {
+		static int sqlite3WalRead (Wal v, Pgno w, ref int x, int y, u8[] z)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalDbsize(y) 0
-		static Pgno sqlite3WalDbsize(Wal y) {
+		static Pgno sqlite3WalDbsize (Wal y)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalBeginWriteTransaction(y)    0
-		static int sqlite3WalBeginWriteTransaction(Wal y) {
+		static int sqlite3WalBeginWriteTransaction (Wal y)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalEndWriteTransaction(x)      0
-		static int sqlite3WalEndWriteTransaction(Wal x) {
+		static int sqlite3WalEndWriteTransaction (Wal x)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalUndo(x,y,z)                 0
-		static int sqlite3WalUndo(Wal x,int y,object z) {
+		static int sqlite3WalUndo (Wal x, int y, object z)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalSavepoint(y,z)
-		static void sqlite3WalSavepoint(Wal y,object z) {
+		static void sqlite3WalSavepoint (Wal y, object z)
+		{
 		}
+
 		//# define sqlite3WalSavepointUndo(y,z)          0
-		static int sqlite3WalSavepointUndo(Wal y,object z) {
+		static int sqlite3WalSavepointUndo (Wal y, object z)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalFrames(u,v,w,x,y,z)         0
-		static int sqlite3WalFrames(Wal u,int v,PgHdr w,Pgno x,int y,int z) {
+		static int sqlite3WalFrames (Wal u, int v, PgHdr w, Pgno x, int y, int z)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalCheckpoint(r,s,t,u,v,w,x,y,z)         0
-		static int sqlite3WalCheckpoint(Wal r,int s,int t,u8[] u,int v,int w,u8[] x,ref int y,ref int z)//r,s,t,u,v,w,x,y,z
-		 {
-			y=0;
-			z=0;
+		static int sqlite3WalCheckpoint (Wal r, int s, int t, u8[] u, int v, int w, u8[] x, ref int y, ref int z)//r,s,t,u,v,w,x,y,z
+		
+		{
+			y = 0;
+			z = 0;
 			return 0;
 		}
+
 		//# define sqlite3WalCallback(z)                 0
-		static int sqlite3WalCallback(Wal z) {
+		static int sqlite3WalCallback (Wal z)
+		{
 			return 0;
 		}
+
 		//# define sqlite3WalExclusiveMode(y,z)          0
-		static bool sqlite3WalExclusiveMode(Wal y,int z) {
+		static bool sqlite3WalExclusiveMode (Wal y, int z)
+		{
 			return false;
 		}
+
 		//# define sqlite3WalHeapMemory(z)               0
-		static bool sqlite3WalHeapMemory(Wal z) {
+		static bool sqlite3WalHeapMemory (Wal z)
+		{
 			return false;
 		}
 	#else
-																		
+																			
 //define WAL_SAVEPOINT_NDATA 4
 const int WAL_SAVEPOINT_NDATA = 4;
 

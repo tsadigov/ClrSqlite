@@ -2,18 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FILE=System.IO.TextWriter;
-using i64=System.Int64;
-using u8=System.Byte;
-using u16=System.UInt16;
-using u32=System.UInt32;
-using u64=System.UInt64;
-using unsigned=System.UIntPtr;
-using Pgno=System.UInt32;
-using i32=System.Int32;
-namespace Community.CsharpSqlite {
-	using Op=VdbeOp;
-	public partial class Sqlite3 {
+using FILE = System.IO.TextWriter;
+using i64 = System.Int64;
+using u8 = System.Byte;
+using u16 = System.UInt16;
+using u32 = System.UInt32;
+using u64 = System.UInt64;
+using unsigned = System.UIntPtr;
+using Pgno = System.UInt32;
+using i32 = System.Int32;
+
+namespace Community.CsharpSqlite
+{
+	using Op = VdbeOp;
+
+	public partial class Sqlite3
+	{
 		//typedef struct VdbeCursor VdbeCursor;
 		///<summary>
 		/// When a sub-program is executed (OP_Program), a structure of this type
@@ -38,65 +42,161 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		//typedef struct VdbeFrame VdbeFrame;
-		public class VdbeFrame {
-			public VdbeFrame() {
+		public class VdbeFrame
+		{
+			public VdbeFrame ()
+			{
 			}
 
-            /* VM this frame belongs to */
+			///
+///<summary>
+///VM this frame belongs to 
+///</summary>
 
 			public Vdbe v;
-            /* Program Counter in parent (calling) frame */
 
-            int _currentOpCodeIndex;
+			///
+///<summary>
+///Program Counter in parent (calling) frame 
+///</summary>
 
-            public int currentOpCodeIndex
-            {
-                get { return _currentOpCodeIndex; }
-                set { _currentOpCodeIndex = value; }
-            }
-            
-            public Op[] aOp;
-			/* Program instructions for parent frame */public int nOp;
-			/* Size of aOp array */public Mem[] aMem;
-			/* Array of memory cells for parent frame */public int nMem;
-			/* Number of entries in aMem */public VdbeCursor[] apCsr;
-			/* Array of Vdbe cursors for parent frame */public u16 nCursor;
-			/* Number of entries in apCsr */public int token;
-			/* Copy of SubProgram.token */public int nChildMem;
-			/* Number of memory cells for child frame */public int nChildCsr;
-			/* Number of cursors for child frame */public i64 lastRowid;
-			/* Last insert rowid (sqlite3.lastRowid) */public int nChange;
-			/* Statement changes (Vdbe.nChanges)     */public VdbeFrame pParent;
-			/* Parent of this frame, or NULL if parent is main *///
+			int _currentOpCodeIndex;
+
+			public int currentOpCodeIndex {
+				get {
+					return _currentOpCodeIndex;
+				}
+				set {
+					_currentOpCodeIndex = value;
+				}
+			}
+
+			public Op[] aOp;
+
+			///
+///<summary>
+///Program instructions for parent frame 
+///</summary>
+
+			public int nOp;
+
+			///
+///<summary>
+///Size of aOp array 
+///</summary>
+
+			public Mem[] aMem;
+
+			///
+///<summary>
+///Array of memory cells for parent frame 
+///</summary>
+
+			public int nMem;
+
+			///
+///<summary>
+///Number of entries in aMem 
+///</summary>
+
+			public VdbeCursor[] apCsr;
+
+			///
+///<summary>
+///Array of Vdbe cursors for parent frame 
+///</summary>
+
+			public u16 nCursor;
+
+			///
+///<summary>
+///Number of entries in apCsr 
+///</summary>
+
+			public int token;
+
+			///
+///<summary>
+///Copy of SubProgram.token 
+///</summary>
+
+			public int nChildMem;
+
+			///
+///<summary>
+///Number of memory cells for child frame 
+///</summary>
+
+			public int nChildCsr;
+
+			///
+///<summary>
+///Number of cursors for child frame 
+///</summary>
+
+			public i64 lastRowid;
+
+			///
+///<summary>
+///Last insert rowid (sqlite3.lastRowid) 
+///</summary>
+
+			public int nChange;
+
+			///
+///<summary>
+///Statement changes (Vdbe.nChanges)     
+///</summary>
+
+			public VdbeFrame pParent;
+
+			///
+///<summary>
+///Parent of this frame, or NULL if parent is main 
+///</summary>
+
+			//
 			// Needed for C# Implementation
 			//
-            /* Array of memory cells for child frame */
+			///
+///<summary>
+///Array of memory cells for child frame 
+///</summary>
 
 			public Mem[] aChildMem;
-			/* Array of cursors for child frame */
-            public VdbeCursor[] aChildCsr;
-            public void sqlite3VdbeFrameDelete() {
+
+			///
+///<summary>
+///Array of cursors for child frame 
+///</summary>
+
+			public VdbeCursor[] aChildCsr;
+
+			public void sqlite3VdbeFrameDelete ()
+			{
 				int i;
 				//Mem[] aMem = VdbeFrameMem(p);
-				VdbeCursor[] apCsr=this.aChildCsr;
+				VdbeCursor[] apCsr = this.aChildCsr;
 				// (VdbeCursor)aMem[p.nChildMem];
-				for(i=0;i<this.nChildCsr;i++) {
-					sqlite3VdbeFreeCursor(this.v,apCsr[i]);
+				for (i = 0; i < this.nChildCsr; i++) {
+					sqlite3VdbeFreeCursor (this.v, apCsr [i]);
 				}
-				releaseMemArray(this.aChildMem,this.nChildMem);
+				releaseMemArray (this.aChildMem, this.nChildMem);
 				//this=null;
 				// sqlite3DbFree( p.v.db, p );
 			}
-			public int sqlite3VdbeFrameRestore() {
-				Vdbe v=this.v;
-				v.aOp=this.aOp;
-				v.nOp=this.nOp;
-				v.aMem=this.aMem;
-				v.nMem=this.nMem;
-				v.apCsr=this.apCsr;
-				v.nCursor=this.nCursor;
-				v.db.lastRowid=this.lastRowid;
-				v.nChange=this.nChange;
+
+			public int sqlite3VdbeFrameRestore ()
+			{
+				Vdbe v = this.v;
+				v.aOp = this.aOp;
+				v.nOp = this.nOp;
+				v.aMem = this.aMem;
+				v.nMem = this.nMem;
+				v.apCsr = this.apCsr;
+				v.nCursor = this.nCursor;
+				v.db.lastRowid = this.lastRowid;
+				v.nChange = this.nChange;
 				return this.currentOpCodeIndex;
 			}
 		}

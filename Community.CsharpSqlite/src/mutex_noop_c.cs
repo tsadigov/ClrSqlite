@@ -1,8 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+
+namespace Community.CsharpSqlite
+{
+	public partial class Sqlite3
+	{
 		///<summary>
 		/// 2008 October 07
 		///
@@ -45,44 +48,63 @@ namespace Community.CsharpSqlite {
 		///
 		/// This routines provide no mutual exclusion or error checking.
 		///</summary>
-		static int noopMutexHeld(sqlite3_mutex p) {
+		static int noopMutexHeld (sqlite3_mutex p)
+		{
 			return 1;
 		}
-		static int noopMutexNotheld(sqlite3_mutex p) {
+
+		static int noopMutexNotheld (sqlite3_mutex p)
+		{
 			return 1;
 		}
-		static int noopMutexInit() {
+
+		static int noopMutexInit ()
+		{
 			return SQLITE_OK;
 		}
-		static int noopMutexEnd() {
+
+		static int noopMutexEnd ()
+		{
 			return SQLITE_OK;
 		}
-		static sqlite3_mutex noopMutexAlloc(int id) {
-			return new sqlite3_mutex();
+
+		static sqlite3_mutex noopMutexAlloc (int id)
+		{
+			return new sqlite3_mutex ();
 		}
-		static void noopMutexFree(sqlite3_mutex p) {
+
+		static void noopMutexFree (sqlite3_mutex p)
+		{
 		}
-		static void noopMutexEnter(sqlite3_mutex p) {
+
+		static void noopMutexEnter (sqlite3_mutex p)
+		{
 		}
-		static int noopMutexTry(sqlite3_mutex p) {
+
+		static int noopMutexTry (sqlite3_mutex p)
+		{
 			return SQLITE_OK;
 		}
-		static void noopMutexLeave(sqlite3_mutex p) {
+
+		static void noopMutexLeave (sqlite3_mutex p)
+		{
 		}
-		sqlite3_mutex_methods sqlite3DefaultMutex() {
-			sqlite3_mutex_methods sMutex=new sqlite3_mutex_methods((dxMutexInit)noopMutexInit,(dxMutexEnd)noopMutexEnd,(dxMutexAlloc)noopMutexAlloc,(dxMutexFree)noopMutexFree,(dxMutexEnter)noopMutexEnter,(dxMutexTry)noopMutexTry,(dxMutexLeave)noopMutexLeave,
+
+		sqlite3_mutex_methods sqlite3DefaultMutex ()
+		{
+			sqlite3_mutex_methods sMutex = new sqlite3_mutex_methods ((dxMutexInit)noopMutexInit, (dxMutexEnd)noopMutexEnd, (dxMutexAlloc)noopMutexAlloc, (dxMutexFree)noopMutexFree, (dxMutexEnter)noopMutexEnter, (dxMutexTry)noopMutexTry, (dxMutexLeave)noopMutexLeave, 
 			#if SQLITE_DEBUG
-																																																						(dxMutexHeld)noopMutexHeld,
+																																																									(dxMutexHeld)noopMutexHeld,
 (dxMutexNotheld)noopMutexNotheld
 #else
-			null,null
+			null, null
 			#endif
 			);
 			return sMutex;
 		}
 	#endif
 	#if SQLITE_DEBUG && !SQLITE_MUTEX_OMIT
-																		    /*
+																			    /*
 ** In this implementation, error checking is provided for testing
 ** and debugging purposes.  The mutexes still do not provide any
 ** mutual exclusion.
@@ -227,12 +249,14 @@ namespace Community.CsharpSqlite {
       return sMutex;
     }
 #endif
-	/*
-** If compiled with SQLITE_MUTEX_NOOP, then the no-op mutex implementation
-** is used regardless of the run-time threadsafety setting.
-*/
+	///
+///<summary>
+///</summary>
+///<param name="If compiled with SQLITE_MUTEX_NOOP, then the no">op mutex implementation</param>
+///<param name="is used regardless of the run">time threadsafety setting.</param>
+
 	#if SQLITE_MUTEX_NOOP
-																		sqlite3_mutex_methods const sqlite3DefaultMutex(void){
+																			sqlite3_mutex_methods const sqlite3DefaultMutex(void){
 return sqlite3NoopMutex();
 }
 #endif

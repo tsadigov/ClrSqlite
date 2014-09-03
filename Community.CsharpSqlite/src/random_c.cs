@@ -1,11 +1,14 @@
 using System;
 using System.Diagnostics;
-using i64=System.Int64;
-using u8=System.Byte;
-using u32=System.UInt32;
-using u64=System.UInt64;
-namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+using i64 = System.Int64;
+using u8 = System.Byte;
+using u32 = System.UInt32;
+using u64 = System.UInt64;
+
+namespace Community.CsharpSqlite
+{
+	public partial class Sqlite3
+	{
 		///<summary>
 		/// 2001 September 15
 		///
@@ -37,22 +40,40 @@ namespace Community.CsharpSqlite {
 		/// This structure is the current state of the generator.
 		///
 		///</summary>
-		public class sqlite3PrngType {
+		public class sqlite3PrngType
+		{
 			public bool isInit;
-			/* True if initialized */public int i;
+
+			///
+///<summary>
+///True if initialized 
+///</summary>
+
+			public int i;
+
 			public int j;
+
 			///<summary>
 			///State variables
 			///</summary>
-			public u8[] s=new u8[256];
-			/* State variables */public sqlite3PrngType Copy() {
-				sqlite3PrngType cp=(sqlite3PrngType)MemberwiseClone();
-				cp.s=new u8[s.Length];
-				Array.Copy(s,cp.s,s.Length);
+			public u8[] s = new u8[256];
+
+			///
+///<summary>
+///State variables 
+///</summary>
+
+			public sqlite3PrngType Copy ()
+			{
+				sqlite3PrngType cp = (sqlite3PrngType)MemberwiseClone ();
+				cp.s = new u8[s.Length];
+				Array.Copy (s, cp.s, s.Length);
 				return cp;
 			}
 		}
-		public static sqlite3PrngType sqlite3Prng=new sqlite3PrngType();
+
+		public static sqlite3PrngType sqlite3Prng = new sqlite3PrngType ();
+
 		///<summary>
 		/// Get a single 8-bit random value from the RC4 PRNG.  The Mutex
 		/// must be held while executing this routine.
@@ -70,85 +91,104 @@ namespace Community.CsharpSqlite {
 		/// randomness any more.  But we will leave this code in all the same.
 		///
 		///</summary>
-		static u8 randomu8() {
+		static u8 randomu8 ()
+		{
 			u8 t;
-			/* The "wsdPrng" macro will resolve to the pseudo-random number generator
-      ** state vector.  If writable static data is unsupported on the target,
-      ** we have to locate the state vector at run-time.  In the more common
-      ** case where writable static data is supported, wsdPrng can refer directly
-      ** to the "sqlite3Prng" state vector declared above.
-      */
+			///
+///<summary>
+///</summary>
+///<param name="The "wsdPrng" macro will resolve to the pseudo">random number generator</param>
+///<param name="state vector.  If writable static data is unsupported on the target,">state vector.  If writable static data is unsupported on the target,</param>
+///<param name="we have to locate the state vector at run">time.  In the more common</param>
+///<param name="case where writable static data is supported, wsdPrng can refer directly">case where writable static data is supported, wsdPrng can refer directly</param>
+///<param name="to the "sqlite3Prng" state vector declared above.">to the "sqlite3Prng" state vector declared above.</param>
+///<param name=""></param>
+
 			#if SQLITE_OMIT_WSD
-																																																						struct sqlite3PrngType *p = &GLOBAL(struct sqlite3PrngType, sqlite3Prng);
+																																																									struct sqlite3PrngType *p = &GLOBAL(struct sqlite3PrngType, sqlite3Prng);
 // define wsdPrng p[0]
 #else
 			//# define wsdPrng sqlite3Prng
-			sqlite3PrngType wsdPrng=sqlite3Prng;
+			sqlite3PrngType wsdPrng = sqlite3Prng;
 			#endif
-			/* Initialize the state of the random number generator once,
-** the first time this routine is called.  The seed value does
-** not need to contain a lot of randomness since we are not
-** trying to do secure encryption or anything like that...
-**
-** Nothing in this file or anywhere else in SQLite does any kind of
-** encryption.  The RC4 algorithm is being used as a PRNG (pseudo-random
-** number generator) not as an encryption device.
-*/if(!wsdPrng.isInit) {
+			///
+///<summary>
+///Initialize the state of the random number generator once,
+///the first time this routine is called.  The seed value does
+///not need to contain a lot of randomness since we are not
+///trying to do secure encryption or anything like that...
+///
+///Nothing in this file or anywhere else in SQLite does any kind of
+///</summary>
+///<param name="encryption.  The RC4 algorithm is being used as a PRNG (pseudo">random</param>
+///<param name="number generator) not as an encryption device.">number generator) not as an encryption device.</param>
+
+			if (!wsdPrng.isInit) {
 				int i;
-				u8[] k=new u8[256];
-				wsdPrng.j=0;
-				wsdPrng.i=0;
-				sqlite3OsRandomness(sqlite3_vfs_find(""),256,k);
-				for(i=0;i<255;i++) {
-					wsdPrng.s[i]=(u8)i;
+				u8[] k = new u8[256];
+				wsdPrng.j = 0;
+				wsdPrng.i = 0;
+				sqlite3OsRandomness (sqlite3_vfs_find (""), 256, k);
+				for (i = 0; i < 255; i++) {
+					wsdPrng.s [i] = (u8)i;
 				}
-				for(i=0;i<255;i++) {
-					wsdPrng.j=(u8)(wsdPrng.j+wsdPrng.s[i]+k[i]);
-					t=wsdPrng.s[wsdPrng.j];
-					wsdPrng.s[wsdPrng.j]=wsdPrng.s[i];
-					wsdPrng.s[i]=t;
+				for (i = 0; i < 255; i++) {
+					wsdPrng.j = (u8)(wsdPrng.j + wsdPrng.s [i] + k [i]);
+					t = wsdPrng.s [wsdPrng.j];
+					wsdPrng.s [wsdPrng.j] = wsdPrng.s [i];
+					wsdPrng.s [i] = t;
 				}
-				wsdPrng.isInit=true;
+				wsdPrng.isInit = true;
 			}
-			/* Generate and return single random u8
-      */wsdPrng.i++;
-			t=wsdPrng.s[(u8)wsdPrng.i];
-			wsdPrng.j=(u8)(wsdPrng.j+t);
-			wsdPrng.s[(u8)wsdPrng.i]=wsdPrng.s[wsdPrng.j];
-			wsdPrng.s[wsdPrng.j]=t;
-			t+=wsdPrng.s[(u8)wsdPrng.i];
-			return wsdPrng.s[t];
+			///
+///<summary>
+///Generate and return single random u8
+///
+///</summary>
+
+			wsdPrng.i++;
+			t = wsdPrng.s [(u8)wsdPrng.i];
+			wsdPrng.j = (u8)(wsdPrng.j + t);
+			wsdPrng.s [(u8)wsdPrng.i] = wsdPrng.s [wsdPrng.j];
+			wsdPrng.s [wsdPrng.j] = t;
+			t += wsdPrng.s [(u8)wsdPrng.i];
+			return wsdPrng.s [t];
 		}
+
 		///<summary>
 		/// Return N random u8s.
 		///
 		///</summary>
-		static void sqlite3_randomness(int N,ref i64 pBuf) {
-			u8[] zBuf=new u8[N];
-			pBuf=0;
+		static void sqlite3_randomness (int N, ref i64 pBuf)
+		{
+			u8[] zBuf = new u8[N];
+			pBuf = 0;
 			#if SQLITE_THREADSAFE
-																																																						      sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_PRNG );
+																																																									      sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_PRNG );
 #endif
-			sqlite3_mutex_enter(mutex);
-			while(N-->0) {
-				pBuf=(u32)((pBuf<<8)+randomu8());
+			sqlite3_mutex_enter (mutex);
+			while (N-- > 0) {
+				pBuf = (u32)((pBuf << 8) + randomu8 ());
 				//  zBuf[N] = randomu8();
 			}
-			sqlite3_mutex_leave(mutex);
+			sqlite3_mutex_leave (mutex);
 		}
-		static void sqlite3_randomness(byte[] pBuf,int Offset,int N) {
-			i64 iBuf=System.DateTime.Now.Ticks;
+
+		static void sqlite3_randomness (byte[] pBuf, int Offset, int N)
+		{
+			i64 iBuf = System.DateTime.Now.Ticks;
 			#if SQLITE_THREADSAFE
-																																																						  sqlite3_mutex mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_PRNG);
+																																																									  sqlite3_mutex mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_PRNG);
 #endif
-			sqlite3_mutex_enter(mutex);
-			while(N-->0) {
-				iBuf=(u32)((iBuf<<8)+randomu8());
+			sqlite3_mutex_enter (mutex);
+			while (N-- > 0) {
+				iBuf = (u32)((iBuf << 8) + randomu8 ());
 				//  zBuf[N] = randomu8();
-				pBuf[Offset++]=(byte)iBuf;
+				pBuf [Offset++] = (byte)iBuf;
 			}
-			sqlite3_mutex_leave(mutex);
+			sqlite3_mutex_leave (mutex);
 		}
+
 		#if !SQLITE_OMIT_BUILTIN_TEST
 		///<summary>
 		/// For testing purposes, we sometimes want to preserve the state of
@@ -159,25 +199,31 @@ namespace Community.CsharpSqlite {
 		/// The sqlite3_test_control() interface calls these routines to
 		/// control the PRNG.
 		///</summary>
-		static sqlite3PrngType sqlite3SavedPrng=null;
-		static void sqlite3PrngSaveState() {
-			sqlite3SavedPrng=sqlite3Prng.Copy();
+		static sqlite3PrngType sqlite3SavedPrng = null;
+
+		static void sqlite3PrngSaveState ()
+		{
+			sqlite3SavedPrng = sqlite3Prng.Copy ();
 			//      memcpy(
 			//  &GLOBAL(struct sqlite3PrngType, sqlite3SavedPrng),
 			//  &GLOBAL(struct sqlite3PrngType, sqlite3Prng),
 			//  sizeof(sqlite3Prng)
 			//);
 		}
-		static void sqlite3PrngRestoreState() {
-			sqlite3Prng=sqlite3SavedPrng.Copy();
+
+		static void sqlite3PrngRestoreState ()
+		{
+			sqlite3Prng = sqlite3SavedPrng.Copy ();
 			//memcpy(
 			//  &GLOBAL(struct sqlite3PrngType, sqlite3Prng),
 			//  &GLOBAL(struct sqlite3PrngType, sqlite3SavedPrng),
 			//  sizeof(sqlite3Prng)
 			//);
 		}
-		static void sqlite3PrngResetState() {
-			sqlite3Prng.isInit=false;
+
+		static void sqlite3PrngResetState ()
+		{
+			sqlite3Prng.isInit = false;
 			//  GLOBAL(struct sqlite3PrngType, sqlite3Prng).isInit = 0;
 		}
 	#endif

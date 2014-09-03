@@ -1,63 +1,76 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using u32=System.UInt32;
-namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
-		/*
-    ** 2004 April 13
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This file contains routines used to translate between UTF-8,
-    ** UTF-16, UTF-16BE, and UTF-16LE.
-    **
-    ** Notes on UTF-8:
-    **
-    **   Byte-0    Byte-1    Byte-2    Byte-3    Value
-    **  0xxxxxxx                                 00000000 00000000 0xxxxxxx
-    **  110yyyyy  10xxxxxx                       00000000 00000yyy yyxxxxxx
-    **  1110zzzz  10yyyyyy  10xxxxxx             00000000 zzzzyyyy yyxxxxxx
-    **  11110uuu  10uuzzzz  10yyyyyy  10xxxxxx   000uuuuu zzzzyyyy yyxxxxxx
-    **
-    **
-    ** Notes on UTF-16:  (with wwww+1==uuuuu)
-    **
-    **      Word-0               Word-1          Value
-    **  110110ww wwzzzzyy   110111yy yyxxxxxx    000uuuuu zzzzyyyy yyxxxxxx
-    **  zzzzyyyy yyxxxxxx                        00000000 zzzzyyyy yyxxxxxx
-    **
-    **
-    ** BOM or Byte Order Mark:
-    **     0xff 0xfe   little-endian utf-16 follows
-    **     0xfe 0xff   big-endian utf-16 follows
-    **
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    *///#include "sqliteInt.h"
+using u32 = System.UInt32;
+
+namespace Community.CsharpSqlite
+{
+	public partial class Sqlite3
+	{
+		///
+///<summary>
+///2004 April 13
+///
+///The author disclaims copyright to this source code.  In place of
+///a legal notice, here is a blessing:
+///
+///May you do good and not evil.
+///May you find forgiveness for yourself and forgive others.
+///May you share freely, never taking more than you give.
+///
+///
+///</summary>
+///<param name="This file contains routines used to translate between UTF">8,</param>
+///<param name="UTF">16LE.</param>
+///<param name=""></param>
+///<param name="Notes on UTF">8:</param>
+///<param name=""></param>
+///<param name="Byte">3    Value</param>
+///<param name="0xxxxxxx                                 00000000 00000000 0xxxxxxx">0xxxxxxx                                 00000000 00000000 0xxxxxxx</param>
+///<param name="110yyyyy  10xxxxxx                       00000000 00000yyy yyxxxxxx">110yyyyy  10xxxxxx                       00000000 00000yyy yyxxxxxx</param>
+///<param name="1110zzzz  10yyyyyy  10xxxxxx             00000000 zzzzyyyy yyxxxxxx">1110zzzz  10yyyyyy  10xxxxxx             00000000 zzzzyyyy yyxxxxxx</param>
+///<param name="11110uuu  10uuzzzz  10yyyyyy  10xxxxxx   000uuuuu zzzzyyyy yyxxxxxx">11110uuu  10uuzzzz  10yyyyyy  10xxxxxx   000uuuuu zzzzyyyy yyxxxxxx</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name="Notes on UTF">16:  (with wwww+1==uuuuu)</param>
+///<param name=""></param>
+///<param name="Word">1          Value</param>
+///<param name="110110ww wwzzzzyy   110111yy yyxxxxxx    000uuuuu zzzzyyyy yyxxxxxx">110110ww wwzzzzyy   110111yy yyxxxxxx    000uuuuu zzzzyyyy yyxxxxxx</param>
+///<param name="zzzzyyyy yyxxxxxx                        00000000 zzzzyyyy yyxxxxxx">zzzzyyyy yyxxxxxx                        00000000 zzzzyyyy yyxxxxxx</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name="BOM or Byte Order Mark:">BOM or Byte Order Mark:</param>
+///<param name="0xff 0xfe   little">16 follows</param>
+///<param name="0xfe 0xff   big">16 follows</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+///<param name=""></param>
+///<param name="SQLITE_SOURCE_ID: 2011">23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name=""></param>
+
+		//#include "sqliteInt.h"
 		//#include <assert.h>
 		//#include "vdbeInt.h"
 		#if !SQLITE_AMALGAMATION
-		/*
-** The following constant value is used by the SQLITE_BIGENDIAN and
-** SQLITE_LITTLEENDIAN macros.
-*///const int sqlite3one = 1;
+		///
+///<summary>
+///The following constant value is used by the SQLITE_BIGENDIAN and
+///SQLITE_LITTLEENDIAN macros.
+///</summary>
+
+		//const int sqlite3one = 1;
 		#endif
-		/*
-** This lookup table is used to help decode the first byte of
-** a multi-byte UTF8 character.
-*/static byte[] sqlite3Utf8Trans1=new byte[] {
+		///
+///<summary>
+///This lookup table is used to help decode the first byte of
+///</summary>
+///<param name="a multi">byte UTF8 character.</param>
+
+		static byte[] sqlite3Utf8Trans1 = new byte[] {
 			0x00,
 			0x01,
 			0x02,
@@ -123,6 +136,7 @@ namespace Community.CsharpSqlite {
 			0x00,
 			0x00,
 		};
+
 		//#define WRITE_UTF8(zOut, c) {                          \
 		//  if( c<0x00080 ){                                     \
 		//    *zOut++ = (u8)(c&0xFF);                            \
@@ -221,11 +235,27 @@ namespace Community.CsharpSqlite {
 		//        || (c&0xFFFFF800)==0xD800                          \
 		//        || (c&0xFFFFFFFE)==0xFFFE ){  c = 0xFFFD; }        \
 		//  }
-		static u32 sqlite3Utf8Read(string zIn,/* First byte of UTF-8 character */ref string pzNext/* Write first byte past UTF-8 char here */) {
+		static u32 sqlite3Utf8Read (string zIn, ///
+///<summary>
+///</summary>
+///<param name="First byte of UTF">8 character </param>
+
+		ref string pzNext///
+///<summary>
+///</summary>
+///<param name="Write first byte past UTF">8 char here </param>
+
+		)
+		{
 			//unsigned int c;
-			/* Same as READ_UTF8() above but without the zTerm parameter.
-      ** For this routine, we assume the UTF8 string is always zero-terminated.
-      */if(String.IsNullOrEmpty(zIn))
+			///
+///<summary>
+///Same as READ_UTF8() above but without the zTerm parameter.
+///</summary>
+///<param name="For this routine, we assume the UTF8 string is always zero">terminated.</param>
+///<param name=""></param>
+
+			if (String.IsNullOrEmpty (zIn))
 				return 0;
 			//c = *( zIn++ );
 			//if ( c >= 0xc0 )
@@ -240,32 +270,37 @@ namespace Community.CsharpSqlite {
 			//      || ( c & 0xFFFFFFFE ) == 0xFFFE ) { c = 0xFFFD; }
 			//}
 			//*pzNext = zIn;
-			int zIndex=0;
-			u32 c=zIn[zIndex++];
-			if(c>=0xc0) {
+			int zIndex = 0;
+			u32 c = zIn [zIndex++];
+			if (c >= 0xc0) {
 				//if ( c > 0xff ) c = 0;
 				//else
 				{
 					//c = sqlite3Utf8Trans1[c - 0xc0];
-					while(zIndex!=zIn.Length&&(zIn[zIndex]&0xc0)==0x80) {
-						c=(u32)((c<<6)+(0x3f&zIn[zIndex++]));
+					while (zIndex != zIn.Length && (zIn [zIndex] & 0xc0) == 0x80) {
+						c = (u32)((c << 6) + (0x3f & zIn [zIndex++]));
 					}
-					if(c<0x80||(c&0xFFFFF800)==0xD800||(c&0xFFFFFFFE)==0xFFFE) {
-						c=0xFFFD;
+					if (c < 0x80 || (c & 0xFFFFF800) == 0xD800 || (c & 0xFFFFFFFE) == 0xFFFE) {
+						c = 0xFFFD;
 					}
 				}
 			}
-			pzNext=zIn.Substring(zIndex);
+			pzNext = zIn.Substring (zIndex);
 			return c;
 		}
-		/*
-    ** If the TRANSLATE_TRACE macro is defined, the value of each Mem is
-    ** printed on stderr on the way into and out of sqlite3VdbeMemTranslate().
-    *////<summary>
+
+		///
+///<summary>
+///If the TRANSLATE_TRACE macro is defined, the value of each Mem is
+///printed on stderr on the way into and out of sqlite3VdbeMemTranslate().
+///
+///</summary>
+
+		///<summary>
 		///#define TRANSLATE_TRACE 1
 		///</summary>
 		#if !SQLITE_OMIT_UTF16
-																																				
+																																						
 ///<summary>
 /// This routine transforms the internal text encoding used by pMem to
 /// desiredEnc. It is an error if the string is already of the desired
@@ -287,13 +322,13 @@ Debug.Assert( pMem.enc!=0 );
 Debug.Assert( pMem.n>=0 );
 
 #if TRANSLATE_TRACE && SQLITE_DEBUG
-																																				{
+																																						{
 char zBuf[100];
 sqlite3VdbeMemPrettyPrint(pMem, zBuf);
 fprintf(stderr, "INPUT:  %s\n", zBuf);
 }
 #endif
-																																				
+																																						
 /* If the translation is between UTF-16 little and big endian, then
 ** all that is required is to swap the byte order. This case is handled
 ** differently from the others.
@@ -400,13 +435,13 @@ Debugger.Break (); // TODO -
 
 translate_out:
 #if TRANSLATE_TRACE && SQLITE_DEBUG
-																																				{
+																																						{
 char zBuf[100];
 sqlite3VdbeMemPrettyPrint(pMem, zBuf);
 fprintf(stderr, "OUTPUT: %s\n", zBuf);
 }
 #endif
-																																				return SQLITE_OK;
+																																						return SQLITE_OK;
 }
 
 ///<summary>
@@ -450,19 +485,23 @@ pMem.enc = bom;
 return rc;
 }
 #endif
-		/*
-** pZ is a UTF-8 encoded unicode string. If nByte is less than zero,
-** return the number of unicode characters in pZ up to (but not including)
-** the first 0x00 byte. If nByte is not less than zero, return the
-** number of unicode characters in the first nByte of pZ (or up to
-** the first 0x00, whichever comes first).
-*/static int sqlite3Utf8CharLen(string zIn,int nByte) {
+		///
+///<summary>
+///</summary>
+///<param name="pZ is a UTF">8 encoded unicode string. If nByte is less than zero,</param>
+///<param name="return the number of unicode characters in pZ up to (but not including)">return the number of unicode characters in pZ up to (but not including)</param>
+///<param name="the first 0x00 byte. If nByte is not less than zero, return the">the first 0x00 byte. If nByte is not less than zero, return the</param>
+///<param name="number of unicode characters in the first nByte of pZ (or up to">number of unicode characters in the first nByte of pZ (or up to</param>
+///<param name="the first 0x00, whichever comes first).">the first 0x00, whichever comes first).</param>
+
+		static int sqlite3Utf8CharLen (string zIn, int nByte)
+		{
 			//int r = 0;
 			//string z = zIn;
-			if(zIn.Length==0)
+			if (zIn.Length == 0)
 				return 0;
-			int zInLength=zIn.Length;
-			int zTerm=(nByte>=0&&nByte<=zInLength)?nByte:zInLength;
+			int zInLength = zIn.Length;
+			int zTerm = (nByte >= 0 && nByte <= zInLength) ? nByte : zInLength;
 			//Debug.Assert( z<=zTerm );
 			//for ( int i = 0 ; i < zTerm ; i++ )      //while( *z!=0 && z<zTerm ){
 			//{
@@ -470,8 +509,8 @@ return rc;
 			//  r++;
 			//}
 			//return r;
-			if(zTerm==zInLength)
-				return zInLength-(zIn[zTerm-1]==0?1:0);
+			if (zTerm == zInLength)
+				return zInLength - (zIn [zTerm - 1] == 0 ? 1 : 0);
 			else
 				return nByte;
 		}
@@ -481,7 +520,7 @@ return rc;
 	///
 	///</summary>
 	#if SQLITE_TEST && SQLITE_DEBUG
-																		    /*
+																			    /*
 ** Translate UTF-8 to UTF-8.
 **
 ** This has the effect of making sure that the string is well-formed
@@ -521,7 +560,7 @@ return rc;
     }
 #endif
 	#if !SQLITE_OMIT_UTF16
-																		/*
+																			/*
 ** Convert a UTF-16 string in the native encoding into a UTF-8 string.
 ** Memory to hold the UTF-8 string is obtained from sqlite3Malloc and must
 ** be freed by the calling function.
@@ -557,7 +596,7 @@ Mem m = Pool.Allocate_Mem();
 /// flag set.
 ///</summary>
 #if SQLITE_ENABLE_STAT2
-																		char *sqlite3Utf8to16(sqlite3 db, SqliteEncoding enc, char *z, int n, int *pnOut){
+																			char *sqlite3Utf8to16(sqlite3 db, SqliteEncoding enc, char *z, int n, int *pnOut){
   Mem m;
   memset(&m, 0, sizeof(m));
   m.db = db;
@@ -571,7 +610,7 @@ Mem m = Pool.Allocate_Mem();
   return m.z;
 }
 #endif
-																		
+																			
 /*
 ** zIn is a UTF-16 encoded unicode string at least nChar characters long.
 ** Return the number of bytes in the first nChar unicode characters
@@ -597,7 +636,7 @@ int sqlite3Utf16ByteLen(const void *zIn, int nChar){
 }
 
 #if SQLITE_TEST
-																		/*
+																			/*
 ** This routine is called from the TCL test function "translate_selftest".
 ** It checks that the primitives for serializing and deserializing
 ** characters in each encoding are inverses of each other.
@@ -654,6 +693,6 @@ assert( (z-zBuf)==n );
 }
 }
 #endif
-																		#endif
+																			#endif
 	}
 }

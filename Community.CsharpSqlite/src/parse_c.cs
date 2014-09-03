@@ -2,30 +2,48 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using u8=System.Byte;
-using YYCODETYPE=System.Int32;
-using YYACTIONTYPE=System.Int32;
-namespace Community.CsharpSqlite {
-	using sqlite3ParserTOKENTYPE=Token;
-	public partial class Sqlite3 {
-		/*
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
-    **
-    *************************************************************************
-    *//* Driver template for the LEMON parser generator.
-    ** The author disclaims copyright to this source code.
-    **
-    ** This version of "lempar.c" is modified, slightly, for use by SQLite.
-    ** The only modifications are the addition of a couple of NEVER()
-    ** macros to disable tests that are needed in the case of a general
-    ** LALR(1) grammar but which are always false in the
-    ** specific grammar used by SQLite.
-    *//* First off, code is included that follows the "include" declaration
-    ** in the input grammar file. *///#include <stdio.h>
+using u8 = System.Byte;
+using YYCODETYPE = System.Int32;
+using YYACTIONTYPE = System.Int32;
+
+namespace Community.CsharpSqlite
+{
+	using sqlite3ParserTOKENTYPE = Token;
+
+	public partial class Sqlite3
+	{
+		///
+///<summary>
+///
+///</summary>
+///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+///<param name=""></param>
+///<param name="SQLITE_SOURCE_ID: 2010">23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name=""></param>
+
+		///
+///<summary>
+///Driver template for the LEMON parser generator.
+///The author disclaims copyright to this source code.
+///
+///This version of "lempar.c" is modified, slightly, for use by SQLite.
+///The only modifications are the addition of a couple of NEVER()
+///macros to disable tests that are needed in the case of a general
+///LALR(1) grammar but which are always false in the
+///specific grammar used by SQLite.
+///
+///</summary>
+
+		///
+///<summary>
+///First off, code is included that follows the "include" declaration
+///in the input grammar file. 
+///</summary>
+
+		//#include <stdio.h>
 		//#line 51 "parse.y"
 		//#include "sqliteInt.h"
 		///<summary>
@@ -34,33 +52,62 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		//#define YYNOERRORRECOVERY 1
-		const int YYNOERRORRECOVERY=1;
+		const int YYNOERRORRECOVERY = 1;
+
 		///<summary>
 		/// Make yytestcase() the same as testcase()
 		///
 		///</summary>
 		//#define yytestcase(X) testcase(X)
-		static void yytestcase<T>(T X) {
-			testcase(X);
+		static void yytestcase<T> (T X)
+		{
+			testcase (X);
 		}
+
 		///<summary>
 		/// An instance of this structure holds information about the
 		/// LIMIT clause of a SELECT statement.
 		///
 		///</summary>
-		public struct LimitVal {
+		public struct LimitVal
+		{
 			public Expr pLimit;
-			/* The LIMIT expression.  NULL if there is no limit */public Expr pOffset;
-		/* The OFFSET expression.  NULL if there is none */}
+
+			///
+///<summary>
+///The LIMIT expression.  NULL if there is no limit 
+///</summary>
+
+			public Expr pOffset;
+		///
+///<summary>
+///The OFFSET expression.  NULL if there is none 
+///</summary>
+
+		}
+
 		///<summary>
 		/// An instance of this structure is used to store the LIKE,
 		/// GLOB, NOT LIKE, and NOT GLOB operators.
 		///
 		///</summary>
-		public struct LikeOp {
+		public struct LikeOp
+		{
 			public Token eOperator;
-			/* "like" or "glob" or "regexp" */public bool not;
-		/* True if the NOT keyword is present */}
+
+			///
+///<summary>
+///"like" or "glob" or "regexp" 
+///</summary>
+
+			public bool not;
+		///
+///<summary>
+///True if the NOT keyword is present 
+///</summary>
+
+		}
+
 		///<summary>
 		/// An instance of the following structure describes the event of a
 		/// TRIGGER.  "a" is the event type, one of TK_UPDATE, TK_INSERT,
@@ -71,18 +118,24 @@ namespace Community.CsharpSqlite {
 		/// Then the "b" IdList records the list "a,b,c".
 		///
 		///</summary>
-		public struct TrigEvent {
+		public struct TrigEvent
+		{
 			public int a;
+
 			public IdList b;
 		}
+
 		///<summary>
 		/// An instance of this structure holds the ATTACH key and the key type.
 		///
 		///</summary>
-		public struct AttachKey {
+		public struct AttachKey
+		{
 			public int type;
+
 			public Token key;
 		}
+
 		//#line 722 "parse.y"
 		///<summary>
 		///This is a utility routine used to set the ExprSpan.zStart and
@@ -113,18 +166,36 @@ namespace Community.CsharpSqlite {
 		/// unary TK_ISNULL or TK_NOTNULL expression.
 		///</summary>
 		//#line 920 "parse.y"
-		/* Construct an expression node for a unary prefix operator
-    *///#line 141 "parse.c"
-		/* Next is all token values, in a form suitable for use by makeheaders.
-    ** This section will be null unless lemon is run with the -m switch.
-    *//*
-    ** These constants (all generated automatically by the parser generator)
-    ** specify the various kinds of tokens (terminals) that the parser
-    ** understands.
-    **
-    ** Each symbol here is a terminal symbol in the grammar.
-    *//* Make sure the INTERFACE macro is defined.
-    */
+		///
+///<summary>
+///Construct an expression node for a unary prefix operator
+///
+///</summary>
+
+		//#line 141 "parse.c"
+		///
+///<summary>
+///Next is all token values, in a form suitable for use by makeheaders.
+///</summary>
+///<param name="This section will be null unless lemon is run with the ">m switch.</param>
+///<param name=""></param>
+
+		///
+///<summary>
+///These constants (all generated automatically by the parser generator)
+///specify the various kinds of tokens (terminals) that the parser
+///understands.
+///
+///Each symbol here is a terminal symbol in the grammar.
+///
+///</summary>
+
+		///
+///<summary>
+///Make sure the INTERFACE macro is defined.
+///
+///</summary>
+
 		#if !INTERFACE
 		//# define INTERFACE 1
 		#endif
@@ -164,113 +235,159 @@ namespace Community.CsharpSqlite {
 		///                       defined, then do no error processing.
 		///</summary>
 		//#define YYCODETYPE unsigned short char
-		const int YYNOCODE=253;
+		const int YYNOCODE = 253;
+
 		//#define YYACTIONTYPE unsigned short int
-		const int YYWILDCARD=67;
+		const int YYWILDCARD = 67;
+
 		//#define sqlite3ParserTOKENTYPE Token
-		public class YYMINORTYPE {
+		public class YYMINORTYPE
+		{
 			public int yyinit;
-			public sqlite3ParserTOKENTYPE yy0Token=new sqlite3ParserTOKENTYPE();
+
+			public sqlite3ParserTOKENTYPE yy0Token = new sqlite3ParserTOKENTYPE ();
+
 			public int yy4;
+
 			public TrigEvent yy90;
-			public ExprSpan yy118=new ExprSpan();
+
+			public ExprSpan yy118 = new ExprSpan ();
+
 			public TriggerStep yy203;
+
 			public u8 yy210;
-			public struct _yy215 {
+
+			public struct _yy215
+			{
 				public int value;
+
 				public int mask;
 			}
+
 			public _yy215 yy215;
+
 			public SrcList yy259;
+
 			public LimitVal yy292;
+
 			public Expr yy314;
+
 			public ExprList yy322;
+
 			public LikeOp yy342;
+
 			public IdList yy384;
+
 			public Select yy387;
 		}
+
 		#if !YYSTACKDEPTH
-		const int YYSTACKDEPTH=100;
+		const int YYSTACKDEPTH = 100;
+
 		#endif
 		//#define sqlite3ParserARG_SDECL Parse pParse;
 		//#define sqlite3ParserARG_PDECL ,Parse pParse
 		//#define sqlite3ParserARG_FETCH Parse pParse = yypParser.pParse
 		//#define sqlite3ParserARG_STORE yypParser.pParse = pParse
-		const int YYNSTATE=630;
-		const int YYNRULE=329;
+		const int YYNSTATE = 630;
+
+		const int YYNRULE = 329;
+
 		//#define YYFALLBACK 1
-		const int YYFALLBACK=1;
-		const int YY_NO_ACTION=(YYNSTATE+YYNRULE+2);
-		const int YY_ACCEPT_ACTION=(YYNSTATE+YYNRULE+1);
-		const int YY_ERROR_ACTION=(YYNSTATE+YYNRULE);
-		/* The yyzerominor constant is used to initialize instances of
-    ** YYMINORTYPE objects to zero. */
-        YYMINORTYPE yyzerominor=new YYMINORTYPE();
+		const int YYFALLBACK = 1;
+
+		const int YY_NO_ACTION = (YYNSTATE + YYNRULE + 2);
+
+		const int YY_ACCEPT_ACTION = (YYNSTATE + YYNRULE + 1);
+
+		const int YY_ERROR_ACTION = (YYNSTATE + YYNRULE);
+
+		///
+///<summary>
+///The yyzerominor constant is used to initialize instances of
+///YYMINORTYPE objects to zero. 
+///</summary>
+
+		YYMINORTYPE yyzerominor = new YYMINORTYPE ();
+
 		//static const YYMINORTYPE yyzerominor = { 0 };
-		/* Define the yytestcase() macro to be a no-op if is not already defined
-    ** otherwise.
-    **
-    ** Applications can choose to define yytestcase() in the %include section
-    ** to a macro that can assist in verifying code coverage.  For production
-    ** code the yytestcase() macro should be turned off.  But it is useful
-    ** for testing.
-    */
-        //#if !yytestcase
+		///
+///<summary>
+///</summary>
+///<param name="Define the yytestcase() macro to be a no">op if is not already defined</param>
+///<param name="otherwise.">otherwise.</param>
+///<param name=""></param>
+///<param name="Applications can choose to define yytestcase() in the %include section">Applications can choose to define yytestcase() in the %include section</param>
+///<param name="to a macro that can assist in verifying code coverage.  For production">to a macro that can assist in verifying code coverage.  For production</param>
+///<param name="code the yytestcase() macro should be turned off.  But it is useful">code the yytestcase() macro should be turned off.  But it is useful</param>
+///<param name="for testing.">for testing.</param>
+///<param name=""></param>
+
+		//#if !yytestcase
 		//# define yytestcase(X)
 		//#endif
+		///
+///<summary>
+///Next are the tables used to determine what action to take based on the
+///current state and lookahead token.  These tables are used to implement
+///functions that take a state number and lookahead value and return an
+///action integer.
+///
+///Suppose the action integer is N.  Then the action is determined as
+///follows
+///
+///0 <= N < YYNSTATE                  Shift N.  That is, push the lookahead
+///token onto the stack and goto state N.
+///
+///</summary>
+///<param name="YYNSTATE <= N < YYNSTATE+YYNRULE   Reduce by rule N">YYNSTATE.</param>
+///<param name=""></param>
+///<param name="N == YYNSTATE+YYNRULE              A syntax error has occurred.">N == YYNSTATE+YYNRULE              A syntax error has occurred.</param>
+///<param name=""></param>
+///<param name="N == YYNSTATE+YYNRULE+1            The parser accepts its input.">N == YYNSTATE+YYNRULE+1            The parser accepts its input.</param>
+///<param name=""></param>
+///<param name="N == YYNSTATE+YYNRULE+2            No such action.  Denotes unused">N == YYNSTATE+YYNRULE+2            No such action.  Denotes unused</param>
+///<param name="slots in the yy_action[] table.">slots in the yy_action[] table.</param>
+///<param name=""></param>
+///<param name="The action table is constructed as a single large table named yy_action[].">The action table is constructed as a single large table named yy_action[].</param>
+///<param name="Given state S and lookahead X, the action is computed as">Given state S and lookahead X, the action is computed as</param>
+///<param name=""></param>
+///<param name="yy_action[ yy_shift_ofst[S] + X ]">yy_action[ yy_shift_ofst[S] + X ]</param>
+///<param name=""></param>
+///<param name="If the index value yy_shift_ofst[S]+X is out of range or if the value">If the index value yy_shift_ofst[S]+X is out of range or if the value</param>
+///<param name="yy_lookahead[yy_shift_ofst[S]+X] is not equal to X or if yy_shift_ofst[S]">yy_lookahead[yy_shift_ofst[S]+X] is not equal to X or if yy_shift_ofst[S]</param>
+///<param name="is equal to YY_SHIFT_USE_DFLT, it means that the action is not in the table">is equal to YY_SHIFT_USE_DFLT, it means that the action is not in the table</param>
+///<param name="and that yy_default[S] should be used instead.">and that yy_default[S] should be used instead.</param>
+///<param name=""></param>
+///<param name="The formula above is for computing the action when the lookahead is">The formula above is for computing the action when the lookahead is</param>
+///<param name="a terminal symbol.  If the lookahead is a non">terminal (as occurs after</param>
+///<param name="a reduce action) then the yy_reduce_ofst[] array is used in place of">a reduce action) then the yy_reduce_ofst[] array is used in place of</param>
+///<param name="the yy_shift_ofst[] array and YY_REDUCE_USE_DFLT is used in place of">the yy_shift_ofst[] array and YY_REDUCE_USE_DFLT is used in place of</param>
+///<param name="YY_SHIFT_USE_DFLT.">YY_SHIFT_USE_DFLT.</param>
+///<param name=""></param>
+///<param name="The following are the tables generated in this section:">The following are the tables generated in this section:</param>
+///<param name=""></param>
+///<param name="yy_action[]        A single table containing all actions.">yy_action[]        A single table containing all actions.</param>
+///<param name="yy_lookahead[]     A table containing the lookahead for each entry in">yy_lookahead[]     A table containing the lookahead for each entry in</param>
+///<param name="yy_action.  Used to detect hash collisions.">yy_action.  Used to detect hash collisions.</param>
+///<param name="yy_shift_ofst[]    For each state, the offset into yy_action for">yy_shift_ofst[]    For each state, the offset into yy_action for</param>
+///<param name="shifting terminals.">shifting terminals.</param>
+///<param name="yy_reduce_ofst[]   For each state, the offset into yy_action for">yy_reduce_ofst[]   For each state, the offset into yy_action for</param>
+///<param name="shifting non">terminals after a reduce.</param>
+///<param name="yy_default[]       Default action for each state.">yy_default[]       Default action for each state.</param>
+///<param name=""></param>
 
-		/* Next are the tables used to determine what action to take based on the
-    ** current state and lookahead token.  These tables are used to implement
-    ** functions that take a state number and lookahead value and return an
-    ** action integer.
-    **
-    ** Suppose the action integer is N.  Then the action is determined as
-    ** follows
-    **
-    **   0 <= N < YYNSTATE                  Shift N.  That is, push the lookahead
-    **                                      token onto the stack and goto state N.
-    **
-    **   YYNSTATE <= N < YYNSTATE+YYNRULE   Reduce by rule N-YYNSTATE.
-    **
-    **   N == YYNSTATE+YYNRULE              A syntax error has occurred.
-    **
-    **   N == YYNSTATE+YYNRULE+1            The parser accepts its input.
-    **
-    **   N == YYNSTATE+YYNRULE+2            No such action.  Denotes unused
-    **                                      slots in the yy_action[] table.
-    **
-    ** The action table is constructed as a single large table named yy_action[].
-    ** Given state S and lookahead X, the action is computed as
-    **
-    **      yy_action[ yy_shift_ofst[S] + X ]
-    **
-    ** If the index value yy_shift_ofst[S]+X is out of range or if the value
-    ** yy_lookahead[yy_shift_ofst[S]+X] is not equal to X or if yy_shift_ofst[S]
-    ** is equal to YY_SHIFT_USE_DFLT, it means that the action is not in the table
-    ** and that yy_default[S] should be used instead.
-    **
-    ** The formula above is for computing the action when the lookahead is
-    ** a terminal symbol.  If the lookahead is a non-terminal (as occurs after
-    ** a reduce action) then the yy_reduce_ofst[] array is used in place of
-    ** the yy_shift_ofst[] array and YY_REDUCE_USE_DFLT is used in place of
-    ** YY_SHIFT_USE_DFLT.
-    **
-    ** The following are the tables generated in this section:
-    **
-    **  yy_action[]        A single table containing all actions.
-    **  yy_lookahead[]     A table containing the lookahead for each entry in
-    **                     yy_action.  Used to detect hash collisions.
-    **  yy_shift_ofst[]    For each state, the offset into yy_action for
-    **                     shifting terminals.
-    **  yy_reduce_ofst[]   For each state, the offset into yy_action for
-    **                     shifting non-terminals after a reduce.
-    **  yy_default[]       Default action for each state.
-    *///#define YY_ACTTAB_COUNT (1557)
-		const int YY_ACTTAB_COUNT=1557;
+		//#define YY_ACTTAB_COUNT (1557)
+		const int YY_ACTTAB_COUNT = 1557;
 
-        #region tables
-        static  YYACTIONTYPE[] yy_action=new YYACTIONTYPE[] {
-			/*     0 */313,
+		#region tables
+		static YYACTIONTYPE[] yy_action = new YYACTIONTYPE[] {
+			///
+///<summary>
+///0 
+///</summary>
+
+			313,
 			960,
 			186,
 			419,
@@ -280,7 +397,12 @@ namespace Community.CsharpSqlite {
 			597,
 			55,
 			55,
-			/*    10 */55,
+			///
+///<summary>
+///10 
+///</summary>
+
+			55,
 			55,
 			48,
 			53,
@@ -290,7 +412,12 @@ namespace Community.CsharpSqlite {
 			52,
 			52,
 			51,
-			/*    20 */51,
+			///
+///<summary>
+///20 
+///</summary>
+
+			51,
 			51,
 			50,
 			238,
@@ -300,7 +427,12 @@ namespace Community.CsharpSqlite {
 			622,
 			516,
 			515,
-			/*    30 */590,
+			///
+///<summary>
+///30 
+///</summary>
+
+			590,
 			584,
 			55,
 			55,
@@ -310,7 +442,12 @@ namespace Community.CsharpSqlite {
 			53,
 			53,
 			53,
-			/*    40 */53,
+			///
+///<summary>
+///40 
+///</summary>
+
+			53,
 			52,
 			52,
 			51,
@@ -320,7 +457,12 @@ namespace Community.CsharpSqlite {
 			238,
 			6,
 			56,
-			/*    50 */57,
+			///
+///<summary>
+///50 
+///</summary>
+
+			57,
 			47,
 			582,
 			581,
@@ -330,7 +472,12 @@ namespace Community.CsharpSqlite {
 			54,
 			55,
 			55,
-			/*    60 */55,
+			///
+///<summary>
+///60 
+///</summary>
+
+			55,
 			55,
 			608,
 			53,
@@ -340,7 +487,12 @@ namespace Community.CsharpSqlite {
 			52,
 			52,
 			51,
-			/*    70 */51,
+			///
+///<summary>
+///70 
+///</summary>
+
+			51,
 			51,
 			50,
 			238,
@@ -350,7 +502,12 @@ namespace Community.CsharpSqlite {
 			330,
 			579,
 			579,
-			/*    80 */32,
+			///
+///<summary>
+///80 
+///</summary>
+
+			32,
 			53,
 			53,
 			53,
@@ -360,7 +517,12 @@ namespace Community.CsharpSqlite {
 			51,
 			51,
 			51,
-			/*    90 */50,
+			///
+///<summary>
+///90 
+///</summary>
+
+			50,
 			238,
 			330,
 			217,
@@ -370,7 +532,12 @@ namespace Community.CsharpSqlite {
 			411,
 			624,
 			382,
-			/*   100 */379,
+			///
+///<summary>
+///100 
+///</summary>
+
+			379,
 			378,
 			7,
 			491,
@@ -380,7 +547,12 @@ namespace Community.CsharpSqlite {
 			199,
 			198,
 			58,
-			/*   110 */377,
+			///
+///<summary>
+///110 
+///</summary>
+
+			377,
 			300,
 			414,
 			621,
@@ -390,7 +562,12 @@ namespace Community.CsharpSqlite {
 			622,
 			621,
 			580,
-			/*   120 */254,
+			///
+///<summary>
+///120 
+///</summary>
+
+			254,
 			601,
 			94,
 			56,
@@ -400,7 +577,12 @@ namespace Community.CsharpSqlite {
 			581,
 			583,
 			583,
-			/*   130 */54,
+			///
+///<summary>
+///130 
+///</summary>
+
+			54,
 			54,
 			55,
 			55,
@@ -410,7 +592,12 @@ namespace Community.CsharpSqlite {
 			53,
 			53,
 			53,
-			/*   140 */53,
+			///
+///<summary>
+///140 
+///</summary>
+
+			53,
 			52,
 			52,
 			51,
@@ -420,7 +607,12 @@ namespace Community.CsharpSqlite {
 			238,
 			313,
 			532,
-			/*   150 */226,
+			///
+///<summary>
+///150 
+///</summary>
+
+			226,
 			506,
 			507,
 			133,
@@ -430,7 +622,12 @@ namespace Community.CsharpSqlite {
 			385,
 			279,
 			384,
-			/*   160 */169,
+			///
+///<summary>
+///160 
+///</summary>
+
+			169,
 			197,
 			342,
 			398,
@@ -440,7 +637,12 @@ namespace Community.CsharpSqlite {
 			275,
 			388,
 			167,
-			/*   170 */139,
+			///
+///<summary>
+///170 
+///</summary>
+
+			139,
 			284,
 			385,
 			279,
@@ -450,7 +652,12 @@ namespace Community.CsharpSqlite {
 			236,
 			590,
 			584,
-			/*   180 */672,
+			///
+///<summary>
+///180 
+///</summary>
+
+			672,
 			240,
 			275,
 			157,
@@ -460,7 +667,12 @@ namespace Community.CsharpSqlite {
 			437,
 			51,
 			51,
-			/*   190 */51,
+			///
+///<summary>
+///190 
+///</summary>
+
+			51,
 			50,
 			238,
 			343,
@@ -470,7 +682,12 @@ namespace Community.CsharpSqlite {
 			56,
 			57,
 			47,
-			/*   200 */582,
+			///
+///<summary>
+///200 
+///</summary>
+
+			582,
 			581,
 			583,
 			583,
@@ -480,7 +697,12 @@ namespace Community.CsharpSqlite {
 			55,
 			55,
 			55,
-			/*   210 */465,
+			///
+///<summary>
+///210 
+///</summary>
+
+			465,
 			53,
 			53,
 			53,
@@ -490,7 +712,12 @@ namespace Community.CsharpSqlite {
 			51,
 			51,
 			51,
-			/*   220 */50,
+			///
+///<summary>
+///220 
+///</summary>
+
+			50,
 			238,
 			313,
 			390,
@@ -500,7 +727,12 @@ namespace Community.CsharpSqlite {
 			51,
 			51,
 			50,
-			/*   230 */238,
+			///
+///<summary>
+///230 
+///</summary>
+
+			238,
 			391,
 			166,
 			491,
@@ -510,7 +742,12 @@ namespace Community.CsharpSqlite {
 			378,
 			409,
 			440,
-			/*   240 */579,
+			///
+///<summary>
+///240 
+///</summary>
+
+			579,
 			579,
 			252,
 			440,
@@ -520,7 +757,12 @@ namespace Community.CsharpSqlite {
 			513,
 			621,
 			49,
-			/*   250 */46,
+			///
+///<summary>
+///250 
+///</summary>
+
+			46,
 			147,
 			590,
 			584,
@@ -530,7 +772,12 @@ namespace Community.CsharpSqlite {
 			189,
 			621,
 			441,
-			/*   260 */442,
+			///
+///<summary>
+///260 
+///</summary>
+
+			442,
 			673,
 			526,
 			441,
@@ -540,7 +787,12 @@ namespace Community.CsharpSqlite {
 			64,
 			194,
 			482,
-			/*   270 */434,
+			///
+///<summary>
+///270 
+///</summary>
+
+			434,
 			56,
 			57,
 			47,
@@ -550,7 +802,12 @@ namespace Community.CsharpSqlite {
 			583,
 			54,
 			54,
-			/*   280 */55,
+			///
+///<summary>
+///280 
+///</summary>
+
+			55,
 			55,
 			55,
 			55,
@@ -560,7 +817,12 @@ namespace Community.CsharpSqlite {
 			53,
 			53,
 			52,
-			/*   290 */52,
+			///
+///<summary>
+///290 
+///</summary>
+
+			52,
 			51,
 			51,
 			51,
@@ -570,7 +832,12 @@ namespace Community.CsharpSqlite {
 			593,
 			593,
 			593,
-			/*   300 */387,
+			///
+///<summary>
+///300 
+///</summary>
+
+			387,
 			578,
 			606,
 			493,
@@ -580,7 +847,12 @@ namespace Community.CsharpSqlite {
 			411,
 			1,
 			623,
-			/*   310 */622,
+			///
+///<summary>
+///310 
+///</summary>
+
+			622,
 			496,
 			623,
 			622,
@@ -590,7 +862,12 @@ namespace Community.CsharpSqlite {
 			622,
 			597,
 			443,
-			/*   320 */237,
+			///
+///<summary>
+///320 
+///</summary>
+
+			237,
 			239,
 			414,
 			341,
@@ -600,7 +877,12 @@ namespace Community.CsharpSqlite {
 			584,
 			18,
 			603,
-			/*   330 */166,
+			///
+///<summary>
+///330 
+///</summary>
+
+			166,
 			601,
 			87,
 			382,
@@ -610,7 +892,12 @@ namespace Community.CsharpSqlite {
 			623,
 			622,
 			38,
-			/*   340 */623,
+			///
+///<summary>
+///340 
+///</summary>
+
+			623,
 			622,
 			176,
 			270,
@@ -620,7 +907,12 @@ namespace Community.CsharpSqlite {
 			47,
 			582,
 			581,
-			/*   350 */583,
+			///
+///<summary>
+///350 
+///</summary>
+
+			583,
 			583,
 			54,
 			54,
@@ -630,7 +922,12 @@ namespace Community.CsharpSqlite {
 			55,
 			175,
 			53,
-			/*   360 */53,
+			///
+///<summary>
+///360 
+///</summary>
+
+			53,
 			53,
 			53,
 			52,
@@ -640,7 +937,12 @@ namespace Community.CsharpSqlite {
 			51,
 			50,
 			238,
-			/*   370 */313,
+			///
+///<summary>
+///370 
+///</summary>
+
+			313,
 			396,
 			233,
 			411,
@@ -650,7 +952,12 @@ namespace Community.CsharpSqlite {
 			620,
 			619,
 			44,
-			/*   380 */620,
+			///
+///<summary>
+///380 
+///</summary>
+
+			620,
 			619,
 			240,
 			206,
@@ -660,7 +967,12 @@ namespace Community.CsharpSqlite {
 			266,
 			414,
 			268,
-			/*   390 */409,
+			///
+///<summary>
+///390 
+///</summary>
+
+			409,
 			597,
 			579,
 			579,
@@ -670,7 +982,12 @@ namespace Community.CsharpSqlite {
 			601,
 			73,
 			533,
-			/*   400 */590,
+			///
+///<summary>
+///400 
+///</summary>
+
+			590,
 			584,
 			466,
 			548,
@@ -680,7 +997,12 @@ namespace Community.CsharpSqlite {
 			576,
 			620,
 			619,
-			/*   410 */547,
+			///
+///<summary>
+///410 
+///</summary>
+
+			547,
 			383,
 			551,
 			35,
@@ -690,7 +1012,12 @@ namespace Community.CsharpSqlite {
 			600,
 			504,
 			56,
-			/*   420 */57,
+			///
+///<summary>
+///420 
+///</summary>
+
+			57,
 			47,
 			582,
 			581,
@@ -700,7 +1027,12 @@ namespace Community.CsharpSqlite {
 			54,
 			55,
 			55,
-			/*   430 */55,
+			///
+///<summary>
+///430 
+///</summary>
+
+			55,
 			55,
 			567,
 			53,
@@ -710,7 +1042,12 @@ namespace Community.CsharpSqlite {
 			52,
 			52,
 			51,
-			/*   440 */51,
+			///
+///<summary>
+///440 
+///</summary>
+
+			51,
 			51,
 			50,
 			238,
@@ -720,7 +1057,12 @@ namespace Community.CsharpSqlite {
 			561,
 			528,
 			364,
-			/*   450 */259,
+			///
+///<summary>
+///450 
+///</summary>
+
+			259,
 			351,
 			258,
 			183,
@@ -730,7 +1072,12 @@ namespace Community.CsharpSqlite {
 			374,
 			411,
 			597,
-			/*   460 */414,
+			///
+///<summary>
+///460 
+///</summary>
+
+			414,
 			240,
 			560,
 			560,
@@ -740,7 +1087,12 @@ namespace Community.CsharpSqlite {
 			579,
 			328,
 			601,
-			/*   470 */93,
+			///
+///<summary>
+///470 
+///</summary>
+
+			93,
 			623,
 			622,
 			414,
@@ -750,7 +1102,12 @@ namespace Community.CsharpSqlite {
 			564,
 			559,
 			559,
-			/*   480 */520,
+			///
+///<summary>
+///480 
+///</summary>
+
+			520,
 			402,
 			601,
 			87,
@@ -760,7 +1117,12 @@ namespace Community.CsharpSqlite {
 			579,
 			168,
 			421,
-			/*   490 */950,
+			///
+///<summary>
+///490 
+///</summary>
+
+			950,
 			519,
 			950,
 			56,
@@ -770,7 +1132,12 @@ namespace Community.CsharpSqlite {
 			581,
 			583,
 			583,
-			/*   500 */54,
+			///
+///<summary>
+///500 
+///</summary>
+
+			54,
 			54,
 			55,
 			55,
@@ -780,7 +1147,12 @@ namespace Community.CsharpSqlite {
 			53,
 			53,
 			53,
-			/*   510 */53,
+			///
+///<summary>
+///510 
+///</summary>
+
+			53,
 			52,
 			52,
 			51,
@@ -790,7 +1162,12 @@ namespace Community.CsharpSqlite {
 			238,
 			313,
 			600,
-			/*   520 */293,
+			///
+///<summary>
+///520 
+///</summary>
+
+			293,
 			563,
 			511,
 			234,
@@ -800,7 +1177,12 @@ namespace Community.CsharpSqlite {
 			475,
 			367,
 			411,
-			/*   530 */562,
+			///
+///<summary>
+///530 
+///</summary>
+
+			562,
 			411,
 			358,
 			542,
@@ -810,7 +1192,12 @@ namespace Community.CsharpSqlite {
 			215,
 			144,
 			620,
-			/*   540 */619,
+			///
+///<summary>
+///540 
+///</summary>
+
+			619,
 			544,
 			318,
 			353,
@@ -820,7 +1207,12 @@ namespace Community.CsharpSqlite {
 			275,
 			590,
 			584,
-			/*   550 */549,
+			///
+///<summary>
+///550 
+///</summary>
+
+			549,
 			414,
 			174,
 			601,
@@ -830,7 +1222,12 @@ namespace Community.CsharpSqlite {
 			558,
 			471,
 			61,
-			/*   560 */601,
+			///
+///<summary>
+///560 
+///</summary>
+
+			601,
 			79,
 			421,
 			949,
@@ -840,7 +1237,12 @@ namespace Community.CsharpSqlite {
 			56,
 			57,
 			47,
-			/*   570 */582,
+			///
+///<summary>
+///570 
+///</summary>
+
+			582,
 			581,
 			583,
 			583,
@@ -850,7 +1252,12 @@ namespace Community.CsharpSqlite {
 			55,
 			55,
 			55,
-			/*   580 */535,
+			///
+///<summary>
+///580 
+///</summary>
+
+			535,
 			53,
 			53,
 			53,
@@ -860,7 +1267,12 @@ namespace Community.CsharpSqlite {
 			51,
 			51,
 			51,
-			/*   590 */50,
+			///
+///<summary>
+///590 
+///</summary>
+
+			50,
 			238,
 			313,
 			307,
@@ -870,7 +1282,12 @@ namespace Community.CsharpSqlite {
 			49,
 			46,
 			147,
-			/*   600 */349,
+			///
+///<summary>
+///600 
+///</summary>
+
+			349,
 			322,
 			4,
 			411,
@@ -880,7 +1297,12 @@ namespace Community.CsharpSqlite {
 			425,
 			568,
 			492,
-			/*   610 */216,
+			///
+///<summary>
+///610 
+///</summary>
+
+			216,
 			264,
 			407,
 			575,
@@ -890,7 +1312,12 @@ namespace Community.CsharpSqlite {
 			549,
 			414,
 			621,
-			/*   620 */540,
+			///
+///<summary>
+///620 
+///</summary>
+
+			540,
 			602,
 			590,
 			584,
@@ -900,7 +1327,12 @@ namespace Community.CsharpSqlite {
 			601,
 			72,
 			12,
-			/*   630 */618,
+			///
+///<summary>
+///630 
+///</summary>
+
+			618,
 			617,
 			616,
 			202,
@@ -910,7 +1342,12 @@ namespace Community.CsharpSqlite {
 			469,
 			422,
 			319,
-			/*   640 */148,
+			///
+///<summary>
+///640 
+///</summary>
+
+			148,
 			56,
 			57,
 			47,
@@ -920,7 +1357,12 @@ namespace Community.CsharpSqlite {
 			583,
 			54,
 			54,
-			/*   650 */55,
+			///
+///<summary>
+///650 
+///</summary>
+
+			55,
 			55,
 			55,
 			55,
@@ -930,7 +1372,12 @@ namespace Community.CsharpSqlite {
 			53,
 			53,
 			52,
-			/*   660 */52,
+			///
+///<summary>
+///660 
+///</summary>
+
+			52,
 			51,
 			51,
 			51,
@@ -940,7 +1387,12 @@ namespace Community.CsharpSqlite {
 			600,
 			600,
 			411,
-			/*   670 */39,
+			///
+///<summary>
+///670 
+///</summary>
+
+			39,
 			21,
 			37,
 			170,
@@ -950,7 +1402,12 @@ namespace Community.CsharpSqlite {
 			572,
 			572,
 			201,
-			/*   680 */144,
+			///
+///<summary>
+///680 
+///</summary>
+
+			144,
 			473,
 			538,
 			331,
@@ -960,7 +1417,12 @@ namespace Community.CsharpSqlite {
 			146,
 			630,
 			628,
-			/*   690 */334,
+			///
+///<summary>
+///690 
+///</summary>
+
+			334,
 			414,
 			353,
 			601,
@@ -970,7 +1432,12 @@ namespace Community.CsharpSqlite {
 			584,
 			132,
 			365,
-			/*   700 */601,
+			///
+///<summary>
+///700 
+///</summary>
+
+			601,
 			96,
 			307,
 			423,
@@ -980,7 +1447,12 @@ namespace Community.CsharpSqlite {
 			46,
 			147,
 			568,
-			/*   710 */406,
+			///
+///<summary>
+///710 
+///</summary>
+
+			406,
 			216,
 			549,
 			360,
@@ -990,7 +1462,12 @@ namespace Community.CsharpSqlite {
 			47,
 			582,
 			581,
-			/*   720 */583,
+			///
+///<summary>
+///720 
+///</summary>
+
+			583,
 			583,
 			54,
 			54,
@@ -1000,7 +1477,12 @@ namespace Community.CsharpSqlite {
 			55,
 			411,
 			53,
-			/*   730 */53,
+			///
+///<summary>
+///730 
+///</summary>
+
+			53,
 			53,
 			53,
 			52,
@@ -1010,7 +1492,12 @@ namespace Community.CsharpSqlite {
 			51,
 			50,
 			238,
-			/*   740 */313,
+			///
+///<summary>
+///740 
+///</summary>
+
+			313,
 			411,
 			605,
 			414,
@@ -1020,7 +1507,12 @@ namespace Community.CsharpSqlite {
 			422,
 			597,
 			318,
-			/*   750 */496,
+			///
+///<summary>
+///750 
+///</summary>
+
+			496,
 			485,
 			601,
 			99,
@@ -1030,7 +1522,12 @@ namespace Community.CsharpSqlite {
 			411,
 			231,
 			411,
-			/*   760 */540,
+			///
+///<summary>
+///760 
+///</summary>
+
+			540,
 			411,
 			359,
 			629,
@@ -1040,7 +1537,12 @@ namespace Community.CsharpSqlite {
 			426,
 			308,
 			414,
-			/*   770 */590,
+			///
+///<summary>
+///770 
+///</summary>
+
+			590,
 			584,
 			414,
 			20,
@@ -1050,7 +1552,12 @@ namespace Community.CsharpSqlite {
 			621,
 			601,
 			106,
-			/*   780 */503,
+			///
+///<summary>
+///780 
+///</summary>
+
+			503,
 			601,
 			105,
 			601,
@@ -1060,7 +1567,12 @@ namespace Community.CsharpSqlite {
 			204,
 			28,
 			56,
-			/*   790 */57,
+			///
+///<summary>
+///790 
+///</summary>
+
+			57,
 			47,
 			582,
 			581,
@@ -1070,7 +1582,12 @@ namespace Community.CsharpSqlite {
 			54,
 			55,
 			55,
-			/*   800 */55,
+			///
+///<summary>
+///800 
+///</summary>
+
+			55,
 			55,
 			411,
 			53,
@@ -1080,7 +1597,12 @@ namespace Community.CsharpSqlite {
 			52,
 			52,
 			51,
-			/*   810 */51,
+			///
+///<summary>
+///810 
+///</summary>
+
+			51,
 			51,
 			50,
 			238,
@@ -1090,7 +1612,12 @@ namespace Community.CsharpSqlite {
 			414,
 			411,
 			276,
-			/*   820 */214,
+			///
+///<summary>
+///820 
+///</summary>
+
+			214,
 			600,
 			411,
 			366,
@@ -1100,7 +1627,12 @@ namespace Community.CsharpSqlite {
 			134,
 			274,
 			500,
-			/*   830 */414,
+			///
+///<summary>
+///830 
+///</summary>
+
+			414,
 			167,
 			130,
 			414,
@@ -1110,7 +1642,12 @@ namespace Community.CsharpSqlite {
 			414,
 			376,
 			601,
-			/*   840 */135,
+			///
+///<summary>
+///840 
+///</summary>
+
+			135,
 			129,
 			601,
 			100,
@@ -1120,7 +1657,12 @@ namespace Community.CsharpSqlite {
 			104,
 			522,
 			521,
-			/*   850 */414,
+			///
+///<summary>
+///850 
+///</summary>
+
+			414,
 			621,
 			224,
 			273,
@@ -1130,7 +1672,12 @@ namespace Community.CsharpSqlite {
 			282,
 			600,
 			601,
-			/*   860 */103,
+			///
+///<summary>
+///860 
+///</summary>
+
+			103,
 			468,
 			521,
 			56,
@@ -1140,7 +1687,12 @@ namespace Community.CsharpSqlite {
 			581,
 			583,
 			583,
-			/*   870 */54,
+			///
+///<summary>
+///870 
+///</summary>
+
+			54,
 			54,
 			55,
 			55,
@@ -1150,7 +1702,12 @@ namespace Community.CsharpSqlite {
 			53,
 			53,
 			53,
-			/*   880 */53,
+			///
+///<summary>
+///880 
+///</summary>
+
+			53,
 			52,
 			52,
 			51,
@@ -1160,7 +1717,12 @@ namespace Community.CsharpSqlite {
 			238,
 			313,
 			411,
-			/*   890 */27,
+			///
+///<summary>
+///890 
+///</summary>
+
+			27,
 			414,
 			411,
 			375,
@@ -1170,7 +1732,12 @@ namespace Community.CsharpSqlite {
 			544,
 			50,
 			238,
-			/*   900 */601,
+			///
+///<summary>
+///900 
+///</summary>
+
+			601,
 			95,
 			128,
 			223,
@@ -1180,7 +1747,12 @@ namespace Community.CsharpSqlite {
 			414,
 			411,
 			621,
-			/*   910 */411,
+			///
+///<summary>
+///910 
+///</summary>
+
+			411,
 			621,
 			612,
 			601,
@@ -1190,7 +1762,12 @@ namespace Community.CsharpSqlite {
 			76,
 			590,
 			584,
-			/*   920 */414,
+			///
+///<summary>
+///920 
+///</summary>
+
+			414,
 			570,
 			236,
 			414,
@@ -1200,7 +1777,12 @@ namespace Community.CsharpSqlite {
 			621,
 			188,
 			601,
-			/*   930 */98,
+			///
+///<summary>
+///930 
+///</summary>
+
+			98,
 			225,
 			601,
 			138,
@@ -1210,7 +1792,12 @@ namespace Community.CsharpSqlite {
 			56,
 			45,
 			47,
-			/*   940 */582,
+			///
+///<summary>
+///940 
+///</summary>
+
+			582,
 			581,
 			583,
 			583,
@@ -1220,7 +1807,12 @@ namespace Community.CsharpSqlite {
 			55,
 			55,
 			55,
-			/*   950 */411,
+			///
+///<summary>
+///950 
+///</summary>
+
+			411,
 			53,
 			53,
 			53,
@@ -1230,7 +1822,12 @@ namespace Community.CsharpSqlite {
 			51,
 			51,
 			51,
-			/*   960 */50,
+			///
+///<summary>
+///960 
+///</summary>
+
+			50,
 			238,
 			313,
 			276,
@@ -1240,7 +1837,12 @@ namespace Community.CsharpSqlite {
 			276,
 			544,
 			459,
-			/*   970 */359,
+			///
+///<summary>
+///970 
+///</summary>
+
+			359,
 			171,
 			209,
 			479,
@@ -1250,7 +1852,12 @@ namespace Community.CsharpSqlite {
 			334,
 			621,
 			621,
-			/*   980 */125,
+			///
+///<summary>
+///980 
+///</summary>
+
+			125,
 			414,
 			621,
 			368,
@@ -1260,7 +1867,12 @@ namespace Community.CsharpSqlite {
 			540,
 			589,
 			588,
-			/*   990 */601,
+			///
+///<summary>
+///990 
+///</summary>
+
+			601,
 			75,
 			590,
 			584,
@@ -1270,7 +1882,12 @@ namespace Community.CsharpSqlite {
 			23,
 			124,
 			414,
-			/*  1000 */326,
+			///
+///<summary>
+///1000 
+///</summary>
+
+			326,
 			325,
 			621,
 			427,
@@ -1280,7 +1897,12 @@ namespace Community.CsharpSqlite {
 			288,
 			601,
 			92,
-			/*  1010 */586,
+			///
+///<summary>
+///1010 
+///</summary>
+
+			586,
 			585,
 			57,
 			47,
@@ -1290,7 +1912,12 @@ namespace Community.CsharpSqlite {
 			583,
 			54,
 			54,
-			/*  1020 */55,
+			///
+///<summary>
+///1020 
+///</summary>
+
+			55,
 			55,
 			55,
 			55,
@@ -1300,7 +1927,12 @@ namespace Community.CsharpSqlite {
 			53,
 			53,
 			52,
-			/*  1030 */52,
+			///
+///<summary>
+///1030 
+///</summary>
+
+			52,
 			51,
 			51,
 			51,
@@ -1310,7 +1942,12 @@ namespace Community.CsharpSqlite {
 			587,
 			411,
 			414,
-			/*  1040 */411,
+			///
+///<summary>
+///1040 
+///</summary>
+
+			411,
 			207,
 			611,
 			476,
@@ -1320,7 +1957,12 @@ namespace Community.CsharpSqlite {
 			123,
 			601,
 			91,
-			/*  1050 */323,
+			///
+///<summary>
+///1050 
+///</summary>
+
+			323,
 			261,
 			15,
 			414,
@@ -1330,7 +1972,12 @@ namespace Community.CsharpSqlite {
 			621,
 			411,
 			354,
-			/*  1060 */222,
+			///
+///<summary>
+///1060 
+///</summary>
+
+			222,
 			411,
 			601,
 			74,
@@ -1340,7 +1987,12 @@ namespace Community.CsharpSqlite {
 			584,
 			159,
 			264,
-			/*  1070 */158,
+			///
+///<summary>
+///1070 
+///</summary>
+
+			158,
 			414,
 			461,
 			414,
@@ -1350,7 +2002,12 @@ namespace Community.CsharpSqlite {
 			121,
 			120,
 			25,
-			/*  1080 */601,
+			///
+///<summary>
+///1080 
+///</summary>
+
+			601,
 			89,
 			601,
 			101,
@@ -1360,7 +2017,12 @@ namespace Community.CsharpSqlite {
 			47,
 			582,
 			581,
-			/*  1090 */583,
+			///
+///<summary>
+///1090 
+///</summary>
+
+			583,
 			583,
 			54,
 			54,
@@ -1370,7 +2032,12 @@ namespace Community.CsharpSqlite {
 			55,
 			544,
 			53,
-			/*  1100 */53,
+			///
+///<summary>
+///1100 
+///</summary>
+
+			53,
 			53,
 			53,
 			52,
@@ -1380,7 +2047,12 @@ namespace Community.CsharpSqlite {
 			51,
 			50,
 			238,
-			/*  1110 */43,
+			///
+///<summary>
+///1110 
+///</summary>
+
+			43,
 			405,
 			263,
 			3,
@@ -1390,7 +2062,12 @@ namespace Community.CsharpSqlite {
 			415,
 			622,
 			24,
-			/*  1120 */410,
+			///
+///<summary>
+///1120 
+///</summary>
+
+			410,
 			11,
 			456,
 			594,
@@ -1400,7 +2077,12 @@ namespace Community.CsharpSqlite {
 			452,
 			408,
 			621,
-			/*  1130 */621,
+			///
+///<summary>
+///1130 
+///</summary>
+
+			621,
 			621,
 			156,
 			43,
@@ -1410,7 +2092,12 @@ namespace Community.CsharpSqlite {
 			286,
 			621,
 			113,
-			/*  1140 */415,
+			///
+///<summary>
+///1140 
+///</summary>
+
+			415,
 			622,
 			111,
 			445,
@@ -1420,7 +2107,12 @@ namespace Community.CsharpSqlite {
 			403,
 			545,
 			10,
-			/*  1150 */411,
+			///
+///<summary>
+///1150 
+///</summary>
+
+			411,
 			408,
 			264,
 			110,
@@ -1430,7 +2122,12 @@ namespace Community.CsharpSqlite {
 			566,
 			453,
 			414,
-			/*  1160 */621,
+			///
+///<summary>
+///1160 
+///</summary>
+
+			621,
 			621,
 			63,
 			621,
@@ -1440,7 +2137,12 @@ namespace Community.CsharpSqlite {
 			621,
 			601,
 			94,
-			/*  1170 */403,
+			///
+///<summary>
+///1170 
+///</summary>
+
+			403,
 			621,
 			411,
 			337,
@@ -1450,7 +2152,12 @@ namespace Community.CsharpSqlite {
 			40,
 			41,
 			534,
-			/*  1180 */566,
+			///
+///<summary>
+///1180 
+///</summary>
+
+			566,
 			414,
 			242,
 			264,
@@ -1460,7 +2167,12 @@ namespace Community.CsharpSqlite {
 			414,
 			600,
 			595,
-			/*  1190 */601,
+			///
+///<summary>
+///1190 
+///</summary>
+
+			601,
 			85,
 			191,
 			333,
@@ -1470,7 +2182,12 @@ namespace Community.CsharpSqlite {
 			84,
 			621,
 			539,
-			/*  1200 */40,
+			///
+///<summary>
+///1200 
+///</summary>
+
+			40,
 			41,
 			420,
 			230,
@@ -1480,7 +2197,12 @@ namespace Community.CsharpSqlite {
 			42,
 			413,
 			412,
-			/*  1210 */398,
+			///
+///<summary>
+///1210 
+///</summary>
+
+			398,
 			127,
 			595,
 			315,
@@ -1490,7 +2212,12 @@ namespace Community.CsharpSqlite {
 			625,
 			181,
 			414,
-			/*  1220 */593,
+			///
+///<summary>
+///1220 
+///</summary>
+
+			593,
 			593,
 			593,
 			592,
@@ -1500,7 +2227,12 @@ namespace Community.CsharpSqlite {
 			411,
 			601,
 			71,
-			/*  1230 */240,
+			///
+///<summary>
+///1230 
+///</summary>
+
+			240,
 			621,
 			43,
 			405,
@@ -1510,7 +2242,12 @@ namespace Community.CsharpSqlite {
 			180,
 			264,
 			415,
-			/*  1240 */622,
+			///
+///<summary>
+///1240 
+///</summary>
+
+			622,
 			614,
 			414,
 			593,
@@ -1520,7 +2257,12 @@ namespace Community.CsharpSqlite {
 			591,
 			14,
 			621,
-			/*  1250 */408,
+			///
+///<summary>
+///1250 
+///</summary>
+
+			408,
 			601,
 			70,
 			621,
@@ -1530,7 +2272,12 @@ namespace Community.CsharpSqlite {
 			613,
 			3,
 			411,
-			/*  1260 */264,
+			///
+///<summary>
+///1260 
+///</summary>
+
+			264,
 			411,
 			415,
 			622,
@@ -1540,7 +2287,12 @@ namespace Community.CsharpSqlite {
 			509,
 			8,
 			403,
-			/*  1270 */241,
+			///
+///<summary>
+///1270 
+///</summary>
+
+			241,
 			416,
 			126,
 			408,
@@ -1550,7 +2302,12 @@ namespace Community.CsharpSqlite {
 			449,
 			208,
 			566,
-			/*  1280 */240,
+			///
+///<summary>
+///1280 
+///</summary>
+
+			240,
 			221,
 			621,
 			601,
@@ -1560,7 +2317,12 @@ namespace Community.CsharpSqlite {
 			599,
 			297,
 			277,
-			/*  1290 */296,
+			///
+///<summary>
+///1290 
+///</summary>
+
+			296,
 			30,
 			403,
 			31,
@@ -1570,7 +2332,12 @@ namespace Community.CsharpSqlite {
 			397,
 			489,
 			40,
-			/*  1300 */41,
+			///
+///<summary>
+///1300 
+///</summary>
+
+			41,
 			411,
 			566,
 			220,
@@ -1580,7 +2347,12 @@ namespace Community.CsharpSqlite {
 			413,
 			412,
 			271,
-			/*  1310 */621,
+			///
+///<summary>
+///1310 
+///</summary>
+
+			621,
 			595,
 			600,
 			621,
@@ -1590,7 +2362,12 @@ namespace Community.CsharpSqlite {
 			269,
 			267,
 			623,
-			/*  1320 */622,
+			///
+///<summary>
+///1320 
+///</summary>
+
+			622,
 			36,
 			40,
 			41,
@@ -1600,7 +2377,12 @@ namespace Community.CsharpSqlite {
 			598,
 			235,
 			42,
-			/*  1330 */413,
+			///
+///<summary>
+///1330 
+///</summary>
+
+			413,
 			412,
 			621,
 			621,
@@ -1610,7 +2392,12 @@ namespace Community.CsharpSqlite {
 			411,
 			248,
 			556,
-			/*  1340 */173,
+			///
+///<summary>
+///1340 
+///</summary>
+
+			173,
 			185,
 			593,
 			593,
@@ -1620,7 +2407,12 @@ namespace Community.CsharpSqlite {
 			14,
 			218,
 			29,
-			/*  1350 */621,
+			///
+///<summary>
+///1350 
+///</summary>
+
+			621,
 			543,
 			414,
 			305,
@@ -1630,7 +2422,12 @@ namespace Community.CsharpSqlite {
 			301,
 			411,
 			566,
-			/*  1360 */454,
+			///
+///<summary>
+///1360 
+///</summary>
+
+			454,
 			601,
 			80,
 			289,
@@ -1640,7 +2437,12 @@ namespace Community.CsharpSqlite {
 			593,
 			592,
 			591,
-			/*  1370 */14,
+			///
+///<summary>
+///1370 
+///</summary>
+
+			14,
 			411,
 			287,
 			414,
@@ -1650,7 +2452,12 @@ namespace Community.CsharpSqlite {
 			260,
 			411,
 			196,
-			/*  1380 */195,
+			///
+///<summary>
+///1380 
+///</summary>
+
+			195,
 			523,
 			601,
 			69,
@@ -1660,7 +2467,12 @@ namespace Community.CsharpSqlite {
 			526,
 			537,
 			285,
-			/*  1390 */389,
+			///
+///<summary>
+///1390 
+///</summary>
+
+			389,
 			595,
 			621,
 			414,
@@ -1670,7 +2482,12 @@ namespace Community.CsharpSqlite {
 			362,
 			153,
 			414,
-			/*  1400 */466,
+			///
+///<summary>
+///1400 
+///</summary>
+
+			466,
 			463,
 			601,
 			78,
@@ -1680,7 +2497,12 @@ namespace Community.CsharpSqlite {
 			152,
 			601,
 			77,
-			/*  1410 */355,
+			///
+///<summary>
+///1410 
+///</summary>
+
+			355,
 			255,
 			621,
 			455,
@@ -1690,7 +2512,12 @@ namespace Community.CsharpSqlite {
 			386,
 			444,
 			517,
-			/*  1420 */247,
+			///
+///<summary>
+///1420 
+///</summary>
+
+			247,
 			621,
 			593,
 			593,
@@ -1700,7 +2527,12 @@ namespace Community.CsharpSqlite {
 			244,
 			621,
 			243,
-			/*  1430 */430,
+			///
+///<summary>
+///1430 
+///</summary>
+
+			430,
 			518,
 			292,
 			621,
@@ -1710,7 +2542,12 @@ namespace Community.CsharpSqlite {
 			393,
 			280,
 			513,
-			/*  1440 */291,
+			///
+///<summary>
+///1440 
+///</summary>
+
+			291,
 			131,
 			621,
 			514,
@@ -1720,7 +2557,12 @@ namespace Community.CsharpSqlite {
 			621,
 			259,
 			346,
-			/*  1450 */249,
+			///
+///<summary>
+///1450 
+///</summary>
+
+			249,
 			621,
 			621,
 			229,
@@ -1730,7 +2572,12 @@ namespace Community.CsharpSqlite {
 			512,
 			227,
 			240,
-			/*  1460 */494,
+			///
+///<summary>
+///1460 
+///</summary>
+
+			494,
 			488,
 			310,
 			164,
@@ -1740,7 +2587,12 @@ namespace Community.CsharpSqlite {
 			480,
 			163,
 			262,
-			/*  1470 */369,
+			///
+///<summary>
+///1470 
+///</summary>
+
+			369,
 			371,
 			162,
 			26,
@@ -1750,7 +2602,12 @@ namespace Community.CsharpSqlite {
 			161,
 			141,
 			363,
-			/*  1480 */467,
+			///
+///<summary>
+///1480 
+///</summary>
+
+			467,
 			122,
 			339,
 			187,
@@ -1760,7 +2617,12 @@ namespace Community.CsharpSqlite {
 			117,
 			116,
 			115,
-			/*  1490 */114,
+			///
+///<summary>
+///1490 
+///</summary>
+
+			114,
 			112,
 			182,
 			457,
@@ -1770,7 +2632,12 @@ namespace Community.CsharpSqlite {
 			432,
 			448,
 			19,
-			/*  1500 */609,
+			///
+///<summary>
+///1500 
+///</summary>
+
+			609,
 			431,
 			428,
 			62,
@@ -1780,7 +2647,12 @@ namespace Community.CsharpSqlite {
 			298,
 			555,
 			552,
-			/*  1510 */571,
+			///
+///<summary>
+///1510 
+///</summary>
+
+			571,
 			404,
 			290,
 			380,
@@ -1790,7 +2662,12 @@ namespace Community.CsharpSqlite {
 			306,
 			281,
 			499,
-			/*  1520 */250,
+			///
+///<summary>
+///1520 
+///</summary>
+
+			250,
 			5,
 			497,
 			460,
@@ -1800,7 +2677,12 @@ namespace Community.CsharpSqlite {
 			550,
 			238,
 			299,
-			/*  1530 */527,
+			///
+///<summary>
+///1530 
+///</summary>
+
+			527,
 			525,
 			508,
 			961,
@@ -1810,7 +2692,12 @@ namespace Community.CsharpSqlite {
 			401,
 			961,
 			211,
-			/*  1540 */490,
+			///
+///<summary>
+///1540 
+///</summary>
+
+			490,
 			356,
 			256,
 			961,
@@ -1820,7 +2707,12 @@ namespace Community.CsharpSqlite {
 			961,
 			961,
 			961,
-			/*  1550 */961,
+			///
+///<summary>
+///1550 
+///</summary>
+
+			961,
 			961,
 			961,
 			961,
@@ -1828,8 +2720,14 @@ namespace Community.CsharpSqlite {
 			961,
 			370,
 		};
-		static YYCODETYPE[] yy_lookahead=new YYCODETYPE[] {
-			/*     0 */19,
+
+		static YYCODETYPE[] yy_lookahead = new YYCODETYPE[] {
+			///
+///<summary>
+///0 
+///</summary>
+
+			19,
 			142,
 			143,
 			144,
@@ -1839,7 +2737,12 @@ namespace Community.CsharpSqlite {
 			26,
 			77,
 			78,
-			/*    10 */79,
+			///
+///<summary>
+///10 
+///</summary>
+
+			79,
 			80,
 			81,
 			82,
@@ -1849,7 +2752,12 @@ namespace Community.CsharpSqlite {
 			86,
 			87,
 			88,
-			/*    20 */89,
+			///
+///<summary>
+///20 
+///</summary>
+
+			89,
 			90,
 			91,
 			92,
@@ -1859,7 +2767,12 @@ namespace Community.CsharpSqlite {
 			27,
 			7,
 			8,
-			/*    30 */49,
+			///
+///<summary>
+///30 
+///</summary>
+
+			49,
 			50,
 			77,
 			78,
@@ -1869,7 +2782,12 @@ namespace Community.CsharpSqlite {
 			82,
 			83,
 			84,
-			/*    40 */85,
+			///
+///<summary>
+///40 
+///</summary>
+
+			85,
 			86,
 			87,
 			88,
@@ -1879,7 +2797,12 @@ namespace Community.CsharpSqlite {
 			92,
 			22,
 			68,
-			/*    50 */69,
+			///
+///<summary>
+///50 
+///</summary>
+
+			69,
 			70,
 			71,
 			72,
@@ -1889,7 +2812,12 @@ namespace Community.CsharpSqlite {
 			76,
 			77,
 			78,
-			/*    60 */79,
+			///
+///<summary>
+///60 
+///</summary>
+
+			79,
 			80,
 			23,
 			82,
@@ -1899,7 +2827,12 @@ namespace Community.CsharpSqlite {
 			86,
 			87,
 			88,
-			/*    70 */89,
+			///
+///<summary>
+///70 
+///</summary>
+
+			89,
 			90,
 			91,
 			92,
@@ -1909,7 +2842,12 @@ namespace Community.CsharpSqlite {
 			19,
 			114,
 			115,
-			/*    80 */25,
+			///
+///<summary>
+///80 
+///</summary>
+
+			25,
 			82,
 			83,
 			84,
@@ -1919,7 +2857,12 @@ namespace Community.CsharpSqlite {
 			88,
 			89,
 			90,
-			/*    90 */91,
+			///
+///<summary>
+///90 
+///</summary>
+
+			91,
 			92,
 			19,
 			22,
@@ -1929,7 +2872,12 @@ namespace Community.CsharpSqlite {
 			150,
 			150,
 			99,
-			/*   100 */100,
+			///
+///<summary>
+///100 
+///</summary>
+
+			100,
 			101,
 			76,
 			150,
@@ -1939,7 +2887,12 @@ namespace Community.CsharpSqlite {
 			106,
 			107,
 			54,
-			/*   110 */110,
+			///
+///<summary>
+///110 
+///</summary>
+
+			110,
 			158,
 			165,
 			165,
@@ -1949,7 +2902,12 @@ namespace Community.CsharpSqlite {
 			27,
 			165,
 			113,
-			/*   120 */16,
+			///
+///<summary>
+///120 
+///</summary>
+
+			16,
 			174,
 			175,
 			68,
@@ -1959,7 +2917,12 @@ namespace Community.CsharpSqlite {
 			72,
 			73,
 			74,
-			/*   130 */75,
+			///
+///<summary>
+///130 
+///</summary>
+
+			75,
 			76,
 			77,
 			78,
@@ -1969,7 +2932,12 @@ namespace Community.CsharpSqlite {
 			82,
 			83,
 			84,
-			/*   140 */85,
+			///
+///<summary>
+///140 
+///</summary>
+
+			85,
 			86,
 			87,
 			88,
@@ -1979,7 +2947,12 @@ namespace Community.CsharpSqlite {
 			92,
 			19,
 			23,
-			/*   150 */92,
+			///
+///<summary>
+///150 
+///</summary>
+
+			92,
 			97,
 			98,
 			24,
@@ -1989,7 +2962,12 @@ namespace Community.CsharpSqlite {
 			99,
 			100,
 			101,
-			/*   160 */102,
+			///
+///<summary>
+///160 
+///</summary>
+
+			102,
 			25,
 			97,
 			216,
@@ -1999,7 +2977,12 @@ namespace Community.CsharpSqlite {
 			109,
 			221,
 			25,
-			/*   170 */97,
+			///
+///<summary>
+///170 
+///</summary>
+
+			97,
 			98,
 			99,
 			100,
@@ -2009,7 +2992,12 @@ namespace Community.CsharpSqlite {
 			87,
 			49,
 			50,
-			/*   180 */118,
+			///
+///<summary>
+///180 
+///</summary>
+
+			118,
 			116,
 			109,
 			25,
@@ -2019,7 +3007,12 @@ namespace Community.CsharpSqlite {
 			97,
 			88,
 			89,
-			/*   190 */90,
+			///
+///<summary>
+///190 
+///</summary>
+
+			90,
 			91,
 			92,
 			128,
@@ -2029,7 +3022,12 @@ namespace Community.CsharpSqlite {
 			68,
 			69,
 			70,
-			/*   200 */71,
+			///
+///<summary>
+///200 
+///</summary>
+
+			71,
 			72,
 			73,
 			74,
@@ -2039,7 +3037,12 @@ namespace Community.CsharpSqlite {
 			78,
 			79,
 			80,
-			/*   210 */11,
+			///
+///<summary>
+///210 
+///</summary>
+
+			11,
 			82,
 			83,
 			84,
@@ -2049,7 +3052,12 @@ namespace Community.CsharpSqlite {
 			88,
 			89,
 			90,
-			/*   220 */91,
+			///
+///<summary>
+///220 
+///</summary>
+
+			91,
 			92,
 			19,
 			19,
@@ -2059,7 +3067,12 @@ namespace Community.CsharpSqlite {
 			89,
 			90,
 			91,
-			/*   230 */92,
+			///
+///<summary>
+///230 
+///</summary>
+
+			92,
 			27,
 			96,
 			150,
@@ -2069,7 +3082,12 @@ namespace Community.CsharpSqlite {
 			101,
 			112,
 			150,
-			/*   240 */114,
+			///
+///<summary>
+///240 
+///</summary>
+
+			114,
 			115,
 			138,
 			150,
@@ -2079,7 +3097,12 @@ namespace Community.CsharpSqlite {
 			103,
 			165,
 			222,
-			/*   250 */223,
+			///
+///<summary>
+///250 
+///</summary>
+
+			223,
 			224,
 			49,
 			50,
@@ -2089,7 +3112,12 @@ namespace Community.CsharpSqlite {
 			24,
 			165,
 			170,
-			/*   260 */171,
+			///
+///<summary>
+///260 
+///</summary>
+
+			171,
 			118,
 			94,
 			170,
@@ -2099,7 +3127,12 @@ namespace Community.CsharpSqlite {
 			25,
 			185,
 			186,
-			/*   270 */243,
+			///
+///<summary>
+///270 
+///</summary>
+
+			243,
 			68,
 			69,
 			70,
@@ -2109,7 +3142,12 @@ namespace Community.CsharpSqlite {
 			74,
 			75,
 			76,
-			/*   280 */77,
+			///
+///<summary>
+///280 
+///</summary>
+
+			77,
 			78,
 			79,
 			80,
@@ -2119,7 +3157,12 @@ namespace Community.CsharpSqlite {
 			84,
 			85,
 			86,
-			/*   290 */87,
+			///
+///<summary>
+///290 
+///</summary>
+
+			87,
 			88,
 			89,
 			90,
@@ -2129,7 +3172,12 @@ namespace Community.CsharpSqlite {
 			129,
 			130,
 			131,
-			/*   300 */88,
+			///
+///<summary>
+///300 
+///</summary>
+
+			88,
 			23,
 			172,
 			173,
@@ -2139,7 +3187,12 @@ namespace Community.CsharpSqlite {
 			150,
 			22,
 			26,
-			/*   310 */27,
+			///
+///<summary>
+///310 
+///</summary>
+
+			27,
 			181,
 			26,
 			27,
@@ -2149,7 +3202,12 @@ namespace Community.CsharpSqlite {
 			27,
 			26,
 			230,
-			/*   320 */231,
+			///
+///<summary>
+///320 
+///</summary>
+
+			231,
 			197,
 			165,
 			230,
@@ -2159,7 +3217,12 @@ namespace Community.CsharpSqlite {
 			50,
 			204,
 			117,
-			/*   330 */96,
+			///
+///<summary>
+///330 
+///</summary>
+
+			96,
 			174,
 			175,
 			99,
@@ -2169,7 +3232,12 @@ namespace Community.CsharpSqlite {
 			26,
 			27,
 			136,
-			/*   340 */26,
+			///
+///<summary>
+///340 
+///</summary>
+
+			26,
 			27,
 			118,
 			16,
@@ -2179,7 +3247,12 @@ namespace Community.CsharpSqlite {
 			70,
 			71,
 			72,
-			/*   350 */73,
+			///
+///<summary>
+///350 
+///</summary>
+
+			73,
 			74,
 			75,
 			76,
@@ -2189,7 +3262,12 @@ namespace Community.CsharpSqlite {
 			80,
 			118,
 			82,
-			/*   360 */83,
+			///
+///<summary>
+///360 
+///</summary>
+
+			83,
 			84,
 			85,
 			86,
@@ -2199,7 +3277,12 @@ namespace Community.CsharpSqlite {
 			90,
 			91,
 			92,
-			/*   370 */19,
+			///
+///<summary>
+///370 
+///</summary>
+
+			19,
 			214,
 			215,
 			150,
@@ -2209,7 +3292,12 @@ namespace Community.CsharpSqlite {
 			94,
 			95,
 			22,
-			/*   380 */94,
+			///
+///<summary>
+///380 
+///</summary>
+
+			94,
 			95,
 			116,
 			160,
@@ -2219,7 +3307,12 @@ namespace Community.CsharpSqlite {
 			60,
 			165,
 			62,
-			/*   390 */112,
+			///
+///<summary>
+///390 
+///</summary>
+
+			112,
 			26,
 			114,
 			115,
@@ -2229,7 +3322,12 @@ namespace Community.CsharpSqlite {
 			174,
 			175,
 			88,
-			/*   400 */49,
+			///
+///<summary>
+///400 
+///</summary>
+
+			49,
 			50,
 			57,
 			120,
@@ -2239,7 +3337,12 @@ namespace Community.CsharpSqlite {
 			23,
 			94,
 			95,
-			/*   410 */120,
+			///
+///<summary>
+///410 
+///</summary>
+
+			120,
 			51,
 			25,
 			136,
@@ -2249,7 +3352,12 @@ namespace Community.CsharpSqlite {
 			194,
 			58,
 			68,
-			/*   420 */69,
+			///
+///<summary>
+///420 
+///</summary>
+
+			69,
 			70,
 			71,
 			72,
@@ -2259,7 +3367,12 @@ namespace Community.CsharpSqlite {
 			76,
 			77,
 			78,
-			/*   430 */79,
+			///
+///<summary>
+///430 
+///</summary>
+
+			79,
 			80,
 			23,
 			82,
@@ -2269,7 +3382,12 @@ namespace Community.CsharpSqlite {
 			86,
 			87,
 			88,
-			/*   440 */89,
+			///
+///<summary>
+///440 
+///</summary>
+
+			89,
 			90,
 			91,
 			92,
@@ -2279,7 +3397,12 @@ namespace Community.CsharpSqlite {
 			12,
 			23,
 			228,
-			/*   450 */105,
+			///
+///<summary>
+///450 
+///</summary>
+
+			105,
 			106,
 			107,
 			23,
@@ -2289,7 +3412,12 @@ namespace Community.CsharpSqlite {
 			19,
 			150,
 			94,
-			/*   460 */165,
+			///
+///<summary>
+///460 
+///</summary>
+
+			165,
 			116,
 			28,
 			28,
@@ -2299,7 +3427,12 @@ namespace Community.CsharpSqlite {
 			115,
 			108,
 			174,
-			/*   470 */175,
+			///
+///<summary>
+///470 
+///</summary>
+
+			175,
 			26,
 			27,
 			165,
@@ -2309,7 +3442,12 @@ namespace Community.CsharpSqlite {
 			11,
 			44,
 			44,
-			/*   480 */46,
+			///
+///<summary>
+///480 
+///</summary>
+
+			46,
 			46,
 			174,
 			175,
@@ -2319,7 +3457,12 @@ namespace Community.CsharpSqlite {
 			115,
 			50,
 			22,
-			/*   490 */23,
+			///
+///<summary>
+///490 
+///</summary>
+
+			23,
 			57,
 			25,
 			68,
@@ -2329,7 +3472,12 @@ namespace Community.CsharpSqlite {
 			72,
 			73,
 			74,
-			/*   500 */75,
+			///
+///<summary>
+///500 
+///</summary>
+
+			75,
 			76,
 			77,
 			78,
@@ -2339,7 +3487,12 @@ namespace Community.CsharpSqlite {
 			82,
 			83,
 			84,
-			/*   510 */85,
+			///
+///<summary>
+///510 
+///</summary>
+
+			85,
 			86,
 			87,
 			88,
@@ -2349,7 +3502,12 @@ namespace Community.CsharpSqlite {
 			92,
 			19,
 			194,
-			/*   520 */225,
+			///
+///<summary>
+///520 
+///</summary>
+
+			225,
 			23,
 			23,
 			215,
@@ -2359,7 +3517,12 @@ namespace Community.CsharpSqlite {
 			106,
 			107,
 			150,
-			/*   530 */23,
+			///
+///<summary>
+///530 
+///</summary>
+
+			23,
 			150,
 			27,
 			23,
@@ -2369,7 +3532,12 @@ namespace Community.CsharpSqlite {
 			206,
 			207,
 			94,
-			/*   540 */95,
+			///
+///<summary>
+///540 
+///</summary>
+
+			95,
 			166,
 			104,
 			218,
@@ -2379,7 +3547,12 @@ namespace Community.CsharpSqlite {
 			109,
 			49,
 			50,
-			/*   550 */120,
+			///
+///<summary>
+///550 
+///</summary>
+
+			120,
 			165,
 			25,
 			174,
@@ -2389,7 +3562,12 @@ namespace Community.CsharpSqlite {
 			23,
 			21,
 			234,
-			/*   560 */174,
+			///
+///<summary>
+///560 
+///</summary>
+
+			174,
 			175,
 			22,
 			23,
@@ -2399,7 +3577,12 @@ namespace Community.CsharpSqlite {
 			68,
 			69,
 			70,
-			/*   570 */71,
+			///
+///<summary>
+///570 
+///</summary>
+
+			71,
 			72,
 			73,
 			74,
@@ -2409,7 +3592,12 @@ namespace Community.CsharpSqlite {
 			78,
 			79,
 			80,
-			/*   580 */205,
+			///
+///<summary>
+///580 
+///</summary>
+
+			205,
 			82,
 			83,
 			84,
@@ -2419,7 +3607,12 @@ namespace Community.CsharpSqlite {
 			88,
 			89,
 			90,
-			/*   590 */91,
+			///
+///<summary>
+///590 
+///</summary>
+
+			91,
 			92,
 			19,
 			22,
@@ -2429,7 +3622,12 @@ namespace Community.CsharpSqlite {
 			222,
 			223,
 			224,
-			/*   600 */63,
+			///
+///<summary>
+///600 
+///</summary>
+
+			63,
 			220,
 			35,
 			150,
@@ -2439,7 +3637,12 @@ namespace Community.CsharpSqlite {
 			67,
 			166,
 			167,
-			/*   610 */168,
+			///
+///<summary>
+///610 
+///</summary>
+
+			168,
 			150,
 			169,
 			170,
@@ -2449,7 +3652,12 @@ namespace Community.CsharpSqlite {
 			25,
 			165,
 			165,
-			/*   620 */150,
+			///
+///<summary>
+///620 
+///</summary>
+
+			150,
 			113,
 			49,
 			50,
@@ -2459,7 +3667,12 @@ namespace Community.CsharpSqlite {
 			174,
 			175,
 			35,
-			/*   630 */7,
+			///
+///<summary>
+///630 
+///</summary>
+
+			7,
 			8,
 			9,
 			160,
@@ -2469,7 +3682,12 @@ namespace Community.CsharpSqlite {
 			100,
 			67,
 			247,
-			/*   640 */248,
+			///
+///<summary>
+///640 
+///</summary>
+
+			248,
 			68,
 			69,
 			70,
@@ -2479,7 +3697,12 @@ namespace Community.CsharpSqlite {
 			74,
 			75,
 			76,
-			/*   650 */77,
+			///
+///<summary>
+///650 
+///</summary>
+
+			77,
 			78,
 			79,
 			80,
@@ -2489,7 +3712,12 @@ namespace Community.CsharpSqlite {
 			84,
 			85,
 			86,
-			/*   660 */87,
+			///
+///<summary>
+///660 
+///</summary>
+
+			87,
 			88,
 			89,
 			90,
@@ -2499,7 +3727,12 @@ namespace Community.CsharpSqlite {
 			194,
 			194,
 			150,
-			/*   670 */135,
+			///
+///<summary>
+///670 
+///</summary>
+
+			135,
 			24,
 			137,
 			35,
@@ -2509,7 +3742,12 @@ namespace Community.CsharpSqlite {
 			129,
 			130,
 			206,
-			/*   680 */207,
+			///
+///<summary>
+///680 
+///</summary>
+
+			207,
 			30,
 			27,
 			213,
@@ -2519,7 +3757,12 @@ namespace Community.CsharpSqlite {
 			95,
 			0,
 			1,
-			/*   690 */2,
+			///
+///<summary>
+///690 
+///</summary>
+
+			2,
 			165,
 			218,
 			174,
@@ -2529,7 +3772,12 @@ namespace Community.CsharpSqlite {
 			50,
 			22,
 			48,
-			/*   700 */174,
+			///
+///<summary>
+///700 
+///</summary>
+
+			174,
 			175,
 			22,
 			23,
@@ -2539,7 +3787,12 @@ namespace Community.CsharpSqlite {
 			223,
 			224,
 			166,
-			/*   710 */167,
+			///
+///<summary>
+///710 
+///</summary>
+
+			167,
 			168,
 			120,
 			239,
@@ -2549,7 +3802,12 @@ namespace Community.CsharpSqlite {
 			70,
 			71,
 			72,
-			/*   720 */73,
+			///
+///<summary>
+///720 
+///</summary>
+
+			73,
 			74,
 			75,
 			76,
@@ -2559,7 +3817,12 @@ namespace Community.CsharpSqlite {
 			80,
 			150,
 			82,
-			/*   730 */83,
+			///
+///<summary>
+///730 
+///</summary>
+
+			83,
 			84,
 			85,
 			86,
@@ -2569,7 +3832,12 @@ namespace Community.CsharpSqlite {
 			90,
 			91,
 			92,
-			/*   740 */19,
+			///
+///<summary>
+///740 
+///</summary>
+
+			19,
 			150,
 			173,
 			165,
@@ -2579,7 +3847,12 @@ namespace Community.CsharpSqlite {
 			67,
 			26,
 			104,
-			/*   750 */181,
+			///
+///<summary>
+///750 
+///</summary>
+
+			181,
 			188,
 			174,
 			175,
@@ -2589,7 +3862,12 @@ namespace Community.CsharpSqlite {
 			150,
 			52,
 			150,
-			/*   760 */150,
+			///
+///<summary>
+///760 
+///</summary>
+
+			150,
 			150,
 			150,
 			144,
@@ -2599,7 +3877,12 @@ namespace Community.CsharpSqlite {
 			249,
 			250,
 			165,
-			/*   770 */49,
+			///
+///<summary>
+///770 
+///</summary>
+
+			49,
 			50,
 			165,
 			52,
@@ -2609,7 +3892,12 @@ namespace Community.CsharpSqlite {
 			165,
 			174,
 			175,
-			/*   780 */29,
+			///
+///<summary>
+///780 
+///</summary>
+
+			29,
 			174,
 			175,
 			174,
@@ -2619,7 +3907,12 @@ namespace Community.CsharpSqlite {
 			160,
 			22,
 			68,
-			/*   790 */69,
+			///
+///<summary>
+///790 
+///</summary>
+
+			69,
 			70,
 			71,
 			72,
@@ -2629,7 +3922,12 @@ namespace Community.CsharpSqlite {
 			76,
 			77,
 			78,
-			/*   800 */79,
+			///
+///<summary>
+///800 
+///</summary>
+
+			79,
 			80,
 			150,
 			82,
@@ -2639,7 +3937,12 @@ namespace Community.CsharpSqlite {
 			86,
 			87,
 			88,
-			/*   810 */89,
+			///
+///<summary>
+///810 
+///</summary>
+
+			89,
 			90,
 			91,
 			92,
@@ -2649,7 +3952,12 @@ namespace Community.CsharpSqlite {
 			165,
 			150,
 			150,
-			/*   820 */160,
+			///
+///<summary>
+///820 
+///</summary>
+
+			160,
 			194,
 			150,
 			213,
@@ -2659,7 +3967,12 @@ namespace Community.CsharpSqlite {
 			175,
 			23,
 			23,
-			/*   830 */165,
+			///
+///<summary>
+///830 
+///</summary>
+
+			165,
 			25,
 			22,
 			165,
@@ -2669,7 +3982,12 @@ namespace Community.CsharpSqlite {
 			165,
 			52,
 			174,
-			/*   840 */175,
+			///
+///<summary>
+///840 
+///</summary>
+
+			175,
 			22,
 			174,
 			175,
@@ -2679,7 +3997,12 @@ namespace Community.CsharpSqlite {
 			175,
 			190,
 			191,
-			/*   850 */165,
+			///
+///<summary>
+///850 
+///</summary>
+
+			165,
 			165,
 			240,
 			23,
@@ -2689,7 +4012,12 @@ namespace Community.CsharpSqlite {
 			109,
 			194,
 			174,
-			/*   860 */175,
+			///
+///<summary>
+///860 
+///</summary>
+
+			175,
 			190,
 			191,
 			68,
@@ -2699,7 +4027,12 @@ namespace Community.CsharpSqlite {
 			72,
 			73,
 			74,
-			/*   870 */75,
+			///
+///<summary>
+///870 
+///</summary>
+
+			75,
 			76,
 			77,
 			78,
@@ -2709,7 +4042,12 @@ namespace Community.CsharpSqlite {
 			82,
 			83,
 			84,
-			/*   880 */85,
+			///
+///<summary>
+///880 
+///</summary>
+
+			85,
 			86,
 			87,
 			88,
@@ -2719,7 +4057,12 @@ namespace Community.CsharpSqlite {
 			92,
 			19,
 			150,
-			/*   890 */22,
+			///
+///<summary>
+///890 
+///</summary>
+
+			22,
 			165,
 			150,
 			23,
@@ -2729,7 +4072,12 @@ namespace Community.CsharpSqlite {
 			166,
 			91,
 			92,
-			/*   900 */174,
+			///
+///<summary>
+///900 
+///</summary>
+
+			174,
 			175,
 			22,
 			217,
@@ -2739,7 +4087,12 @@ namespace Community.CsharpSqlite {
 			165,
 			150,
 			165,
-			/*   910 */150,
+			///
+///<summary>
+///910 
+///</summary>
+
+			150,
 			165,
 			150,
 			174,
@@ -2749,7 +4102,12 @@ namespace Community.CsharpSqlite {
 			175,
 			49,
 			50,
-			/*   920 */165,
+			///
+///<summary>
+///920 
+///</summary>
+
+			165,
 			86,
 			87,
 			165,
@@ -2759,7 +4117,12 @@ namespace Community.CsharpSqlite {
 			165,
 			24,
 			174,
-			/*   930 */175,
+			///
+///<summary>
+///930 
+///</summary>
+
+			175,
 			187,
 			174,
 			175,
@@ -2769,7 +4132,12 @@ namespace Community.CsharpSqlite {
 			68,
 			69,
 			70,
-			/*   940 */71,
+			///
+///<summary>
+///940 
+///</summary>
+
+			71,
 			72,
 			73,
 			74,
@@ -2779,7 +4147,12 @@ namespace Community.CsharpSqlite {
 			78,
 			79,
 			80,
-			/*   950 */150,
+			///
+///<summary>
+///950 
+///</summary>
+
+			150,
 			82,
 			83,
 			84,
@@ -2789,7 +4162,12 @@ namespace Community.CsharpSqlite {
 			88,
 			89,
 			90,
-			/*   960 */91,
+			///
+///<summary>
+///960 
+///</summary>
+
+			91,
 			92,
 			19,
 			150,
@@ -2799,7 +4177,12 @@ namespace Community.CsharpSqlite {
 			150,
 			166,
 			23,
-			/*   970 */150,
+			///
+///<summary>
+///970 
+///</summary>
+
+			150,
 			25,
 			160,
 			20,
@@ -2809,7 +4192,12 @@ namespace Community.CsharpSqlite {
 			2,
 			165,
 			165,
-			/*   980 */104,
+			///
+///<summary>
+///980 
+///</summary>
+
+			104,
 			165,
 			165,
 			43,
@@ -2819,7 +4207,12 @@ namespace Community.CsharpSqlite {
 			150,
 			49,
 			50,
-			/*   990 */174,
+			///
+///<summary>
+///990 
+///</summary>
+
+			174,
 			175,
 			49,
 			50,
@@ -2829,7 +4222,12 @@ namespace Community.CsharpSqlite {
 			25,
 			53,
 			165,
-			/*  1000 */187,
+			///
+///<summary>
+///1000 
+///</summary>
+
+			187,
 			187,
 			165,
 			23,
@@ -2839,7 +4237,12 @@ namespace Community.CsharpSqlite {
 			205,
 			174,
 			175,
-			/*  1010 */71,
+			///
+///<summary>
+///1010 
+///</summary>
+
+			71,
 			72,
 			69,
 			70,
@@ -2849,7 +4252,12 @@ namespace Community.CsharpSqlite {
 			74,
 			75,
 			76,
-			/*  1020 */77,
+			///
+///<summary>
+///1020 
+///</summary>
+
+			77,
 			78,
 			79,
 			80,
@@ -2859,7 +4267,12 @@ namespace Community.CsharpSqlite {
 			84,
 			85,
 			86,
-			/*  1030 */87,
+			///
+///<summary>
+///1030 
+///</summary>
+
+			87,
 			88,
 			89,
 			90,
@@ -2869,7 +4282,12 @@ namespace Community.CsharpSqlite {
 			98,
 			150,
 			165,
-			/*  1040 */150,
+			///
+///<summary>
+///1040 
+///</summary>
+
+			150,
 			160,
 			150,
 			59,
@@ -2879,7 +4297,12 @@ namespace Community.CsharpSqlite {
 			22,
 			174,
 			175,
-			/*  1050 */213,
+			///
+///<summary>
+///1050 
+///</summary>
+
+			213,
 			138,
 			5,
 			165,
@@ -2889,7 +4312,12 @@ namespace Community.CsharpSqlite {
 			165,
 			150,
 			150,
-			/*  1060 */240,
+			///
+///<summary>
+///1060 
+///</summary>
+
+			240,
 			150,
 			174,
 			175,
@@ -2899,7 +4327,12 @@ namespace Community.CsharpSqlite {
 			50,
 			118,
 			150,
-			/*  1070 */35,
+			///
+///<summary>
+///1070 
+///</summary>
+
+			35,
 			165,
 			27,
 			165,
@@ -2909,7 +4342,12 @@ namespace Community.CsharpSqlite {
 			108,
 			127,
 			76,
-			/*  1080 */174,
+			///
+///<summary>
+///1080 
+///</summary>
+
+			174,
 			175,
 			174,
 			175,
@@ -2919,7 +4357,12 @@ namespace Community.CsharpSqlite {
 			70,
 			71,
 			72,
-			/*  1090 */73,
+			///
+///<summary>
+///1090 
+///</summary>
+
+			73,
 			74,
 			75,
 			76,
@@ -2929,7 +4372,12 @@ namespace Community.CsharpSqlite {
 			80,
 			166,
 			82,
-			/*  1100 */83,
+			///
+///<summary>
+///1100 
+///</summary>
+
+			83,
 			84,
 			85,
 			86,
@@ -2939,7 +4387,12 @@ namespace Community.CsharpSqlite {
 			90,
 			91,
 			92,
-			/*  1110 */19,
+			///
+///<summary>
+///1110 
+///</summary>
+
+			19,
 			20,
 			193,
 			22,
@@ -2949,7 +4402,12 @@ namespace Community.CsharpSqlite {
 			26,
 			27,
 			76,
-			/*  1120 */150,
+			///
+///<summary>
+///1120 
+///</summary>
+
+			150,
 			22,
 			1,
 			150,
@@ -2959,7 +4417,12 @@ namespace Community.CsharpSqlite {
 			20,
 			37,
 			165,
-			/*  1130 */165,
+			///
+///<summary>
+///1130 
+///</summary>
+
+			165,
 			165,
 			16,
 			19,
@@ -2969,7 +4432,12 @@ namespace Community.CsharpSqlite {
 			205,
 			165,
 			119,
-			/*  1140 */26,
+			///
+///<summary>
+///1140 
+///</summary>
+
+			26,
 			27,
 			108,
 			128,
@@ -2979,7 +4447,12 @@ namespace Community.CsharpSqlite {
 			56,
 			150,
 			22,
-			/*  1150 */150,
+			///
+///<summary>
+///1150 
+///</summary>
+
+			150,
 			37,
 			150,
 			127,
@@ -2989,7 +4462,12 @@ namespace Community.CsharpSqlite {
 			66,
 			193,
 			165,
-			/*  1160 */165,
+			///
+///<summary>
+///1160 
+///</summary>
+
+			165,
 			165,
 			16,
 			165,
@@ -2999,7 +4477,12 @@ namespace Community.CsharpSqlite {
 			165,
 			174,
 			175,
-			/*  1170 */56,
+			///
+///<summary>
+///1170 
+///</summary>
+
+			56,
 			165,
 			150,
 			65,
@@ -3009,7 +4492,12 @@ namespace Community.CsharpSqlite {
 			86,
 			87,
 			88,
-			/*  1180 */66,
+			///
+///<summary>
+///1180 
+///</summary>
+
+			66,
 			165,
 			140,
 			150,
@@ -3019,7 +4507,12 @@ namespace Community.CsharpSqlite {
 			165,
 			194,
 			98,
-			/*  1190 */174,
+			///
+///<summary>
+///1190 
+///</summary>
+
+			174,
 			175,
 			22,
 			3,
@@ -3029,7 +4522,12 @@ namespace Community.CsharpSqlite {
 			175,
 			165,
 			150,
-			/*  1200 */86,
+			///
+///<summary>
+///1200 
+///</summary>
+
+			86,
 			87,
 			4,
 			180,
@@ -3039,7 +4537,12 @@ namespace Community.CsharpSqlite {
 			93,
 			94,
 			95,
-			/*  1210 */216,
+			///
+///<summary>
+///1210 
+///</summary>
+
+			216,
 			180,
 			98,
 			251,
@@ -3049,7 +4552,12 @@ namespace Community.CsharpSqlite {
 			149,
 			6,
 			165,
-			/*  1220 */129,
+			///
+///<summary>
+///1220 
+///</summary>
+
+			129,
 			130,
 			131,
 			132,
@@ -3059,7 +4567,12 @@ namespace Community.CsharpSqlite {
 			150,
 			174,
 			175,
-			/*  1230 */116,
+			///
+///<summary>
+///1230 
+///</summary>
+
+			116,
 			165,
 			19,
 			20,
@@ -3069,7 +4582,12 @@ namespace Community.CsharpSqlite {
 			151,
 			150,
 			26,
-			/*  1240 */27,
+			///
+///<summary>
+///1240 
+///</summary>
+
+			27,
 			149,
 			165,
 			129,
@@ -3079,7 +4597,12 @@ namespace Community.CsharpSqlite {
 			133,
 			134,
 			165,
-			/*  1250 */37,
+			///
+///<summary>
+///1250 
+///</summary>
+
+			37,
 			174,
 			175,
 			165,
@@ -3089,7 +4612,12 @@ namespace Community.CsharpSqlite {
 			13,
 			22,
 			150,
-			/*  1260 */150,
+			///
+///<summary>
+///1260 
+///</summary>
+
+			150,
 			150,
 			26,
 			27,
@@ -3099,7 +4627,12 @@ namespace Community.CsharpSqlite {
 			150,
 			25,
 			56,
-			/*  1270 */152,
+			///
+///<summary>
+///1270 
+///</summary>
+
+			152,
 			159,
 			154,
 			37,
@@ -3109,7 +4642,12 @@ namespace Community.CsharpSqlite {
 			193,
 			160,
 			66,
-			/*  1280 */116,
+			///
+///<summary>
+///1280 
+///</summary>
+
+			116,
 			193,
 			165,
 			174,
@@ -3119,7 +4657,12 @@ namespace Community.CsharpSqlite {
 			194,
 			199,
 			150,
-			/*  1290 */200,
+			///
+///<summary>
+///1290 
+///</summary>
+
+			200,
 			126,
 			56,
 			124,
@@ -3129,7 +4672,12 @@ namespace Community.CsharpSqlite {
 			122,
 			150,
 			86,
-			/*  1300 */87,
+			///
+///<summary>
+///1300 
+///</summary>
+
+			87,
 			150,
 			66,
 			193,
@@ -3139,7 +4687,12 @@ namespace Community.CsharpSqlite {
 			94,
 			95,
 			150,
-			/*  1310 */165,
+			///
+///<summary>
+///1310 
+///</summary>
+
+			165,
 			98,
 			194,
 			165,
@@ -3149,7 +4702,12 @@ namespace Community.CsharpSqlite {
 			150,
 			150,
 			26,
-			/*  1320 */27,
+			///
+///<summary>
+///1320 
+///</summary>
+
+			27,
 			135,
 			86,
 			87,
@@ -3159,7 +4717,12 @@ namespace Community.CsharpSqlite {
 			203,
 			226,
 			93,
-			/*  1330 */94,
+			///
+///<summary>
+///1330 
+///</summary>
+
+			94,
 			95,
 			165,
 			165,
@@ -3169,7 +4732,12 @@ namespace Community.CsharpSqlite {
 			150,
 			193,
 			157,
-			/*  1340 */118,
+			///
+///<summary>
+///1340 
+///</summary>
+
+			118,
 			157,
 			129,
 			130,
@@ -3179,7 +4747,12 @@ namespace Community.CsharpSqlite {
 			134,
 			5,
 			104,
-			/*  1350 */165,
+			///
+///<summary>
+///1350 
+///</summary>
+
+			165,
 			211,
 			165,
 			10,
@@ -3189,7 +4762,12 @@ namespace Community.CsharpSqlite {
 			14,
 			150,
 			66,
-			/*  1360 */17,
+			///
+///<summary>
+///1360 
+///</summary>
+
+			17,
 			174,
 			175,
 			210,
@@ -3199,7 +4777,12 @@ namespace Community.CsharpSqlite {
 			131,
 			132,
 			133,
-			/*  1370 */134,
+			///
+///<summary>
+///1370 
+///</summary>
+
+			134,
 			150,
 			210,
 			165,
@@ -3209,7 +4792,12 @@ namespace Community.CsharpSqlite {
 			150,
 			150,
 			86,
-			/*  1380 */87,
+			///
+///<summary>
+///1380 
+///</summary>
+
+			87,
 			176,
 			174,
 			175,
@@ -3219,7 +4807,12 @@ namespace Community.CsharpSqlite {
 			94,
 			211,
 			210,
-			/*  1390 */150,
+			///
+///<summary>
+///1390 
+///</summary>
+
+			150,
 			98,
 			165,
 			165,
@@ -3229,7 +4822,12 @@ namespace Community.CsharpSqlite {
 			150,
 			55,
 			165,
-			/*  1400 */57,
+			///
+///<summary>
+///1400 
+///</summary>
+
+			57,
 			150,
 			174,
 			175,
@@ -3239,7 +4837,12 @@ namespace Community.CsharpSqlite {
 			64,
 			174,
 			175,
-			/*  1410 */150,
+			///
+///<summary>
+///1410 
+///</summary>
+
+			150,
 			150,
 			165,
 			150,
@@ -3249,7 +4852,12 @@ namespace Community.CsharpSqlite {
 			104,
 			150,
 			184,
-			/*  1420 */150,
+			///
+///<summary>
+///1420 
+///</summary>
+
+			150,
 			165,
 			129,
 			130,
@@ -3259,7 +4867,12 @@ namespace Community.CsharpSqlite {
 			150,
 			165,
 			150,
-			/*  1430 */150,
+			///
+///<summary>
+///1430 
+///</summary>
+
+			150,
 			176,
 			150,
 			165,
@@ -3269,7 +4882,12 @@ namespace Community.CsharpSqlite {
 			150,
 			176,
 			103,
-			/*  1440 */150,
+			///
+///<summary>
+///1440 
+///</summary>
+
+			150,
 			22,
 			165,
 			178,
@@ -3279,7 +4897,12 @@ namespace Community.CsharpSqlite {
 			165,
 			105,
 			106,
-			/*  1450 */107,
+			///
+///<summary>
+///1450 
+///</summary>
+
+			107,
 			165,
 			165,
 			229,
@@ -3289,7 +4912,12 @@ namespace Community.CsharpSqlite {
 			176,
 			229,
 			116,
-			/*  1460 */184,
+			///
+///<summary>
+///1460 
+///</summary>
+
+			184,
 			176,
 			179,
 			156,
@@ -3299,7 +4927,12 @@ namespace Community.CsharpSqlite {
 			157,
 			156,
 			237,
-			/*  1470 */45,
+			///
+///<summary>
+///1470 
+///</summary>
+
+			45,
 			157,
 			156,
 			135,
@@ -3309,7 +4942,12 @@ namespace Community.CsharpSqlite {
 			156,
 			68,
 			157,
-			/*  1480 */189,
+			///
+///<summary>
+///1480 
+///</summary>
+
+			189,
 			189,
 			139,
 			219,
@@ -3319,7 +4957,12 @@ namespace Community.CsharpSqlite {
 			192,
 			192,
 			192,
-			/*  1490 */192,
+			///
+///<summary>
+///1490 
+///</summary>
+
+			192,
 			189,
 			219,
 			199,
@@ -3329,7 +4972,12 @@ namespace Community.CsharpSqlite {
 			157,
 			199,
 			242,
-			/*  1500 */153,
+			///
+///<summary>
+///1500 
+///</summary>
+
+			153,
 			157,
 			38,
 			245,
@@ -3339,7 +4987,12 @@ namespace Community.CsharpSqlite {
 			198,
 			177,
 			177,
-			/*  1510 */232,
+			///
+///<summary>
+///1510 
+///</summary>
+
+			232,
 			227,
 			209,
 			178,
@@ -3349,7 +5002,12 @@ namespace Community.CsharpSqlite {
 			148,
 			177,
 			177,
-			/*  1520 */209,
+			///
+///<summary>
+///1520 
+///</summary>
+
+			209,
 			196,
 			177,
 			199,
@@ -3359,7 +5017,12 @@ namespace Community.CsharpSqlite {
 			208,
 			92,
 			195,
-			/*  1530 */174,
+			///
+///<summary>
+///1530 
+///</summary>
+
+			174,
 			174,
 			183,
 			252,
@@ -3369,7 +5032,12 @@ namespace Community.CsharpSqlite {
 			191,
 			252,
 			235,
-			/*  1540 */186,
+			///
+///<summary>
+///1540 
+///</summary>
+
+			186,
 			241,
 			241,
 			252,
@@ -3379,7 +5047,12 @@ namespace Community.CsharpSqlite {
 			252,
 			252,
 			252,
-			/*  1550 */252,
+			///
+///<summary>
+///1550 
+///</summary>
+
+			252,
 			252,
 			252,
 			252,
@@ -3387,16 +5060,26 @@ namespace Community.CsharpSqlite {
 			252,
 			236,
 		};
-		const int YY_SHIFT_USE_DFLT=-74;
+
+		const int YY_SHIFT_USE_DFLT = -74;
+
 		//#define YY_SHIFT_USE_DFLT (-74)
-		const int YY_SHIFT_COUNT=418;
+		const int YY_SHIFT_COUNT = 418;
+
 		//#define YY_SHIFT_COUNT (418)
-		const int YY_SHIFT_MIN=-73;
+		const int YY_SHIFT_MIN = -73;
+
 		//#define YY_SHIFT_MIN   (-73)
-		const int YY_SHIFT_MAX=1468;
+		const int YY_SHIFT_MAX = 1468;
+
 		//#define YY_SHIFT_MAX   (1468)
-		static short[] yy_shift_ofst=new short[] {
-			/*     0 */975,
+		static short[] yy_shift_ofst = new short[] {
+			///
+///<summary>
+///0 
+///</summary>
+
+			975,
 			1114,
 			1343,
 			1114,
@@ -3406,7 +5089,12 @@ namespace Community.CsharpSqlite {
 			90,
 			0,
 			-19,
-			/*    10 */1213,
+			///
+///<summary>
+///10 
+///</summary>
+
+			1213,
 			1213,
 			1213,
 			1213,
@@ -3416,7 +5104,11 @@ namespace Community.CsharpSqlite {
 			721,
 			1091,
 			1213,
-			/*    20 */1213,
+			///
+///<summary>
+///20 
+///</summary>
+
 			1213,
 			1213,
 			1213,
@@ -3426,7 +5118,12 @@ namespace Community.CsharpSqlite {
 			1213,
 			1213,
 			1213,
-			/*    30 */1213,
+			1213,
+			///
+///<summary>
+///30 
+///</summary>
+
 			1213,
 			1213,
 			1213,
@@ -3436,7 +5133,13 @@ namespace Community.CsharpSqlite {
 			1213,
 			1213,
 			1213,
-			/*    40 */1213,
+			1213,
+			///
+///<summary>
+///40 
+///</summary>
+
+			1213,
 			1213,
 			1213,
 			1213,
@@ -3446,7 +5149,11 @@ namespace Community.CsharpSqlite {
 			1236,
 			1213,
 			1213,
-			/*    50 */1213,
+			///
+///<summary>
+///50 
+///</summary>
+
 			1213,
 			1213,
 			1213,
@@ -3456,7 +5163,13 @@ namespace Community.CsharpSqlite {
 			1213,
 			1213,
 			1213,
-			/*    60 */1213,
+			1213,
+			///
+///<summary>
+///60 
+///</summary>
+
+			1213,
 			199,
 			445,
 			445,
@@ -3466,7 +5179,12 @@ namespace Community.CsharpSqlite {
 			1164,
 			55,
 			647,
-			/*    70 */573,
+			///
+///<summary>
+///70 
+///</summary>
+
+			573,
 			499,
 			425,
 			351,
@@ -3476,7 +5194,11 @@ namespace Community.CsharpSqlite {
 			795,
 			795,
 			795,
-			/*    80 */795,
+			///
+///<summary>
+///80 
+///</summary>
+
 			795,
 			795,
 			795,
@@ -3486,7 +5208,13 @@ namespace Community.CsharpSqlite {
 			795,
 			795,
 			795,
-			/*    90 */795,
+			795,
+			///
+///<summary>
+///90 
+///</summary>
+
+			795,
 			795,
 			795,
 			795,
@@ -3496,7 +5224,12 @@ namespace Community.CsharpSqlite {
 			943,
 			1017,
 			1017,
-			/*   100 */-69,
+			///
+///<summary>
+///100 
+///</summary>
+
+			-69,
 			-45,
 			-45,
 			-45,
@@ -3506,7 +5239,11 @@ namespace Community.CsharpSqlite {
 			58,
 			138,
 			100,
-			/*   110 */445,
+			///
+///<summary>
+///110 
+///</summary>
+
 			445,
 			445,
 			445,
@@ -3516,7 +5253,13 @@ namespace Community.CsharpSqlite {
 			445,
 			445,
 			445,
-			/*   120 */445,
+			445,
+			///
+///<summary>
+///120 
+///</summary>
+
+			445,
 			445,
 			445,
 			445,
@@ -3526,7 +5269,12 @@ namespace Community.CsharpSqlite {
 			438,
 			445,
 			445,
-			/*   130 */445,
+			///
+///<summary>
+///130 
+///</summary>
+
+			445,
 			445,
 			445,
 			365,
@@ -3536,7 +5284,12 @@ namespace Community.CsharpSqlite {
 			-74,
 			-74,
 			1293,
-			/*   140 */73,
+			///
+///<summary>
+///140 
+///</summary>
+
+			73,
 			434,
 			434,
 			311,
@@ -3546,7 +5299,11 @@ namespace Community.CsharpSqlite {
 			286,
 			540,
 			467,
-			/*   150 */445,
+			///
+///<summary>
+///150 
+///</summary>
+
 			445,
 			445,
 			445,
@@ -3556,7 +5313,12 @@ namespace Community.CsharpSqlite {
 			445,
 			445,
 			445,
-			/*   160 */445,
+			445,
+			///
+///<summary>
+///160 
+///</summary>
+
 			445,
 			445,
 			445,
@@ -3566,7 +5328,12 @@ namespace Community.CsharpSqlite {
 			445,
 			445,
 			445,
-			/*   170 */445,
+			445,
+			///
+///<summary>
+///170 
+///</summary>
+
 			445,
 			445,
 			445,
@@ -3576,7 +5343,13 @@ namespace Community.CsharpSqlite {
 			445,
 			445,
 			445,
-			/*   180 */445,
+			445,
+			///
+///<summary>
+///180 
+///</summary>
+
+			445,
 			445,
 			65,
 			722,
@@ -3586,7 +5359,12 @@ namespace Community.CsharpSqlite {
 			266,
 			1164,
 			1164,
-			/*   190 */1164,
+			///
+///<summary>
+///190 
+///</summary>
+
+			1164,
 			-74,
 			-74,
 			-74,
@@ -3596,7 +5374,12 @@ namespace Community.CsharpSqlite {
 			234,
 			360,
 			360,
-			/*   200 */360,
+			///
+///<summary>
+///200 
+///</summary>
+
+			360,
 			430,
 			372,
 			435,
@@ -3606,7 +5389,12 @@ namespace Community.CsharpSqlite {
 			-36,
 			-36,
 			-36,
-			/*   210 */-36,
+			///
+///<summary>
+///210 
+///</summary>
+
+			-36,
 			421,
 			651,
 			-36,
@@ -3616,7 +5404,12 @@ namespace Community.CsharpSqlite {
 			212,
 			623,
 			158,
-			/*   220 */204,
+			///
+///<summary>
+///220 
+///</summary>
+
+			204,
 			204,
 			505,
 			158,
@@ -3626,7 +5419,12 @@ namespace Community.CsharpSqlite {
 			154,
 			365,
 			154,
-			/*   230 */645,
+			///
+///<summary>
+///230 
+///</summary>
+
+			645,
 			154,
 			204,
 			154,
@@ -3636,7 +5434,12 @@ namespace Community.CsharpSqlite {
 			548,
 			365,
 			387,
-			/*   240 */508,
+			///
+///<summary>
+///240 
+///</summary>
+
+			508,
 			233,
 			1464,
 			1222,
@@ -3646,7 +5449,12 @@ namespace Community.CsharpSqlite {
 			1222,
 			1462,
 			1410,
-			/*   250 */1165,
+			///
+///<summary>
+///250 
+///</summary>
+
+			1165,
 			1468,
 			1468,
 			1468,
@@ -3656,7 +5464,12 @@ namespace Community.CsharpSqlite {
 			1462,
 			1410,
 			1410,
-			/*   260 */1222,
+			///
+///<summary>
+///260 
+///</summary>
+
+			1222,
 			1448,
 			1338,
 			1425,
@@ -3666,7 +5479,12 @@ namespace Community.CsharpSqlite {
 			1222,
 			1448,
 			1222,
-			/*   270 */1448,
+			///
+///<summary>
+///270 
+///</summary>
+
+			1448,
 			1419,
 			1313,
 			1313,
@@ -3676,7 +5494,12 @@ namespace Community.CsharpSqlite {
 			1364,
 			1419,
 			1313,
-			/*   280 */1336,
+			///
+///<summary>
+///280 
+///</summary>
+
+			1336,
 			1313,
 			1387,
 			1313,
@@ -3686,7 +5509,12 @@ namespace Community.CsharpSqlite {
 			1254,
 			1245,
 			1254,
-			/*   290 */1245,
+			///
+///<summary>
+///290 
+///</summary>
+
+			1245,
 			1222,
 			1222,
 			1186,
@@ -3696,7 +5524,12 @@ namespace Community.CsharpSqlite {
 			1171,
 			1165,
 			1164,
-			/*   300 */1243,
+			///
+///<summary>
+///300 
+///</summary>
+
+			1243,
 			1244,
 			1244,
 			1212,
@@ -3706,7 +5539,12 @@ namespace Community.CsharpSqlite {
 			-74,
 			-74,
 			-74,
-			/*   310 */-74,
+			///
+///<summary>
+///310 
+///</summary>
+
+			-74,
 			-74,
 			-74,
 			939,
@@ -3716,7 +5554,12 @@ namespace Community.CsharpSqlite {
 			327,
 			1,
 			980,
-			/*   320 */26,
+			///
+///<summary>
+///320 
+///</summary>
+
+			26,
 			972,
 			971,
 			946,
@@ -3726,7 +5569,12 @@ namespace Community.CsharpSqlite {
 			806,
 			54,
 			21,
-			/*   330 */-73,
+			///
+///<summary>
+///330 
+///</summary>
+
+			-73,
 			510,
 			242,
 			1198,
@@ -3736,7 +5584,12 @@ namespace Community.CsharpSqlite {
 			1161,
 			1108,
 			1146,
-			/*   340 */1141,
+			///
+///<summary>
+///340 
+///</summary>
+
+			1141,
 			1132,
 			1015,
 			1127,
@@ -3746,7 +5599,12 @@ namespace Community.CsharpSqlite {
 			1107,
 			1004,
 			1116,
-			/*   350 */1121,
+			///
+///<summary>
+///350 
+///</summary>
+
+			1121,
 			1005,
 			1099,
 			951,
@@ -3756,7 +5614,12 @@ namespace Community.CsharpSqlite {
 			1045,
 			1035,
 			950,
-			/*   360 */1053,
+			///
+///<summary>
+///360 
+///</summary>
+
+			1053,
 			1047,
 			1025,
 			942,
@@ -3766,7 +5629,12 @@ namespace Community.CsharpSqlite {
 			945,
 			984,
 			940,
-			/*   370 */876,
+			///
+///<summary>
+///370 
+///</summary>
+
+			876,
 			904,
 			953,
 			896,
@@ -3776,7 +5644,12 @@ namespace Community.CsharpSqlite {
 			786,
 			868,
 			819,
-			/*   380 */805,
+			///
+///<summary>
+///380 
+///</summary>
+
+			805,
 			810,
 			773,
 			751,
@@ -3786,7 +5659,12 @@ namespace Community.CsharpSqlite {
 			691,
 			681,
 			568,
-			/*   390 */655,
+			///
+///<summary>
+///390 
+///</summary>
+
+			655,
 			638,
 			676,
 			516,
@@ -3796,7 +5674,12 @@ namespace Community.CsharpSqlite {
 			567,
 			541,
 			534,
-			/*   400 */507,
+			///
+///<summary>
+///400 
+///</summary>
+
+			507,
 			527,
 			498,
 			523,
@@ -3806,7 +5689,12 @@ namespace Community.CsharpSqlite {
 			384,
 			357,
 			6,
-			/*   410 */240,
+			///
+///<summary>
+///410 
+///</summary>
+
+			240,
 			224,
 			143,
 			62,
@@ -3816,16 +5704,26 @@ namespace Community.CsharpSqlite {
 			9,
 			5,
 		};
-		const int YY_REDUCE_USE_DFLT=-142;
+
+		const int YY_REDUCE_USE_DFLT = -142;
+
 		//#define YY_REDUCE_USE_DFLT (-142)
-		const int YY_REDUCE_COUNT=312;
+		const int YY_REDUCE_COUNT = 312;
+
 		//#define YY_REDUCE_COUNT (312)
-		const int YY_REDUCE_MIN=-141;
+		const int YY_REDUCE_MIN = -141;
+
 		//#define YY_REDUCE_MIN   (-141)
-		const int YY_REDUCE_MAX=1369;
+		const int YY_REDUCE_MAX = 1369;
+
 		//#define YY_REDUCE_MAX   (1369)
-		static short[] yy_reduce_ofst=new short[] {
-			/*     0 */-141,
+		static short[] yy_reduce_ofst = new short[] {
+			///
+///<summary>
+///0 
+///</summary>
+
+			-141,
 			994,
 			1118,
 			223,
@@ -3835,7 +5733,12 @@ namespace Community.CsharpSqlite {
 			89,
 			83,
 			375,
-			/*    10 */386,
+			///
+///<summary>
+///10 
+///</summary>
+
+			386,
 			381,
 			379,
 			308,
@@ -3845,7 +5748,12 @@ namespace Community.CsharpSqlite {
 			27,
 			1240,
 			1234,
-			/*    20 */1228,
+			///
+///<summary>
+///20 
+///</summary>
+
+			1228,
 			1221,
 			1208,
 			1187,
@@ -3855,7 +5763,12 @@ namespace Community.CsharpSqlite {
 			1077,
 			1054,
 			1022,
-			/*    30 */1016,
+			///
+///<summary>
+///30 
+///</summary>
+
+			1016,
 			1000,
 			911,
 			908,
@@ -3865,7 +5778,12 @@ namespace Community.CsharpSqlite {
 			874,
 			834,
 			816,
-			/*    40 */800,
+			///
+///<summary>
+///40 
+///</summary>
+
+			800,
 			760,
 			758,
 			755,
@@ -3875,7 +5793,12 @@ namespace Community.CsharpSqlite {
 			685,
 			672,
 			668,
-			/*    50 */665,
+			///
+///<summary>
+///50 
+///</summary>
+
+			665,
 			652,
 			611,
 			609,
@@ -3885,7 +5808,12 @@ namespace Community.CsharpSqlite {
 			578,
 			526,
 			519,
-			/*    60 */453,
+			///
+///<summary>
+///60 
+///</summary>
+
+			453,
 			474,
 			454,
 			461,
@@ -3895,7 +5823,11 @@ namespace Community.CsharpSqlite {
 			473,
 			484,
 			484,
-			/*    70 */484,
+			///
+///<summary>
+///70 
+///</summary>
+
 			484,
 			484,
 			484,
@@ -3905,7 +5837,12 @@ namespace Community.CsharpSqlite {
 			484,
 			484,
 			484,
-			/*    80 */484,
+			484,
+			///
+///<summary>
+///80 
+///</summary>
+
 			484,
 			484,
 			484,
@@ -3915,7 +5852,12 @@ namespace Community.CsharpSqlite {
 			484,
 			484,
 			484,
-			/*    90 */484,
+			484,
+			///
+///<summary>
+///90 
+///</summary>
+
 			484,
 			484,
 			484,
@@ -3925,7 +5867,13 @@ namespace Community.CsharpSqlite {
 			484,
 			484,
 			484,
-			/*   100 */484,
+			484,
+			///
+///<summary>
+///100 
+///</summary>
+
+			484,
 			484,
 			484,
 			484,
@@ -3935,7 +5883,12 @@ namespace Community.CsharpSqlite {
 			130,
 			484,
 			484,
-			/*   110 */1145,
+			///
+///<summary>
+///110 
+///</summary>
+
+			1145,
 			909,
 			1110,
 			1088,
@@ -3945,7 +5898,12 @@ namespace Community.CsharpSqlite {
 			965,
 			820,
 			837,
-			/*   120 */746,
+			///
+///<summary>
+///120 
+///</summary>
+
+			746,
 			686,
 			612,
 			817,
@@ -3955,7 +5913,12 @@ namespace Community.CsharpSqlite {
 			563,
 			814,
 			813,
-			/*   130 */744,
+			///
+///<summary>
+///130 
+///</summary>
+
+			744,
 			669,
 			470,
 			543,
@@ -3965,7 +5928,12 @@ namespace Community.CsharpSqlite {
 			484,
 			484,
 			291,
-			/*   140 */569,
+			///
+///<summary>
+///140 
+///</summary>
+
+			569,
 			671,
 			658,
 			970,
@@ -3975,7 +5943,12 @@ namespace Community.CsharpSqlite {
 			1282,
 			518,
 			518,
-			/*   150 */1280,
+			///
+///<summary>
+///150 
+///</summary>
+
+			1280,
 			1279,
 			1277,
 			1270,
@@ -3985,7 +5958,12 @@ namespace Community.CsharpSqlite {
 			1260,
 			1256,
 			1251,
-			/*   160 */1247,
+			///
+///<summary>
+///160 
+///</summary>
+
+			1247,
 			1227,
 			1185,
 			1168,
@@ -3995,7 +5973,12 @@ namespace Community.CsharpSqlite {
 			1139,
 			1117,
 			1066,
-			/*   170 */1049,
+			///
+///<summary>
+///170 
+///</summary>
+
+			1049,
 			1006,
 			998,
 			996,
@@ -4005,7 +5988,12 @@ namespace Community.CsharpSqlite {
 			966,
 			964,
 			892,
-			/*   180 */762,
+			///
+///<summary>
+///180 
+///</summary>
+
+			762,
 			-52,
 			881,
 			932,
@@ -4015,7 +6003,12 @@ namespace Community.CsharpSqlite {
 			812,
 			664,
 			660,
-			/*   190 */627,
+			///
+///<summary>
+///190 
+///</summary>
+
+			627,
 			392,
 			331,
 			124,
@@ -4025,7 +6018,12 @@ namespace Community.CsharpSqlite {
 			1354,
 			1352,
 			1351,
-			/*   200 */1349,
+			///
+///<summary>
+///200 
+///</summary>
+
+			1349,
 			1319,
 			1334,
 			1346,
@@ -4035,7 +6033,12 @@ namespace Community.CsharpSqlite {
 			1334,
 			1334,
 			1334,
-			/*   210 */1334,
+			///
+///<summary>
+///210 
+///</summary>
+
+			1334,
 			1320,
 			1304,
 			1334,
@@ -4045,7 +6048,12 @@ namespace Community.CsharpSqlite {
 			1325,
 			1369,
 			1326,
-			/*   220 */1315,
+			///
+///<summary>
+///220 
+///</summary>
+
+			1315,
 			1311,
 			1301,
 			1324,
@@ -4055,7 +6063,12 @@ namespace Community.CsharpSqlite {
 			1345,
 			1348,
 			1342,
-			/*   230 */1333,
+			///
+///<summary>
+///230 
+///</summary>
+
+			1333,
 			1341,
 			1303,
 			1332,
@@ -4065,7 +6078,12 @@ namespace Community.CsharpSqlite {
 			1274,
 			1339,
 			1309,
-			/*   240 */1308,
+			///
+///<summary>
+///240 
+///</summary>
+
+			1308,
 			1347,
 			1258,
 			1344,
@@ -4075,7 +6093,12 @@ namespace Community.CsharpSqlite {
 			1337,
 			1273,
 			1302,
-			/*   250 */1299,
+			///
+///<summary>
+///250 
+///</summary>
+
+			1299,
 			1298,
 			1297,
 			1296,
@@ -4085,7 +6108,12 @@ namespace Community.CsharpSqlite {
 			1264,
 			1292,
 			1291,
-			/*   260 */1322,
+			///
+///<summary>
+///260 
+///</summary>
+
+			1322,
 			1321,
 			1238,
 			1232,
@@ -4095,7 +6123,12 @@ namespace Community.CsharpSqlite {
 			1314,
 			1312,
 			1310,
-			/*   270 */1307,
+			///
+///<summary>
+///270 
+///</summary>
+
+			1307,
 			1283,
 			1289,
 			1288,
@@ -4105,7 +6138,12 @@ namespace Community.CsharpSqlite {
 			1224,
 			1267,
 			1281,
-			/*   280 */1265,
+			///
+///<summary>
+///280 
+///</summary>
+
+			1265,
 			1262,
 			1235,
 			1255,
@@ -4115,7 +6153,12 @@ namespace Community.CsharpSqlite {
 			1177,
 			1162,
 			1140,
-			/*   290 */1153,
+			///
+///<summary>
+///290 
+///</summary>
+
+			1153,
 			1184,
 			1182,
 			1102,
@@ -4125,7 +6168,12 @@ namespace Community.CsharpSqlite {
 			1090,
 			1089,
 			1093,
-			/*   300 */1112,
+			///
+///<summary>
+///300 
+///</summary>
+
+			1112,
 			1115,
 			1086,
 			1105,
@@ -4135,12 +6183,23 @@ namespace Community.CsharpSqlite {
 			962,
 			955,
 			957,
-			/*   310 */1031,
+			///
+///<summary>
+///310 
+///</summary>
+
+			1031,
 			1023,
 			1030,
 		};
-		static YYACTIONTYPE[] yy_default=new YYACTIONTYPE[] {
-			/*     0 */635,
+
+		static YYACTIONTYPE[] yy_default = new YYACTIONTYPE[] {
+			///
+///<summary>
+///0 
+///</summary>
+
+			635,
 			870,
 			959,
 			959,
@@ -4150,7 +6209,12 @@ namespace Community.CsharpSqlite {
 			899,
 			959,
 			759,
-			/*    10 */959,
+			///
+///<summary>
+///10 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4160,7 +6224,11 @@ namespace Community.CsharpSqlite {
 			933,
 			959,
 			959,
-			/*    20 */959,
+			///
+///<summary>
+///20 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4170,7 +6238,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*    30 */959,
+			959,
+			///
+///<summary>
+///30 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4180,7 +6253,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*    40 */959,
+			959,
+			///
+///<summary>
+///40 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4190,7 +6268,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*    50 */959,
+			959,
+			///
+///<summary>
+///50 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4200,7 +6283,13 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*    60 */959,
+			959,
+			///
+///<summary>
+///60 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4210,7 +6299,12 @@ namespace Community.CsharpSqlite {
 			763,
 			794,
 			959,
-			/*    70 */959,
+			///
+///<summary>
+///70 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4220,7 +6314,12 @@ namespace Community.CsharpSqlite {
 			932,
 			934,
 			809,
-			/*    80 */808,
+			///
+///<summary>
+///80 
+///</summary>
+
+			808,
 			802,
 			801,
 			912,
@@ -4230,7 +6329,12 @@ namespace Community.CsharpSqlite {
 			785,
 			796,
 			871,
-			/*    90 */864,
+			///
+///<summary>
+///90 
+///</summary>
+
+			864,
 			865,
 			863,
 			867,
@@ -4240,7 +6344,12 @@ namespace Community.CsharpSqlite {
 			831,
 			848,
 			830,
-			/*   100 */842,
+			///
+///<summary>
+///100 
+///</summary>
+
+			842,
 			847,
 			854,
 			846,
@@ -4250,7 +6359,11 @@ namespace Community.CsharpSqlite {
 			666,
 			834,
 			835,
-			/*   110 */959,
+			///
+///<summary>
+///110 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4260,7 +6373,13 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   120 */959,
+			959,
+			///
+///<summary>
+///120 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4270,7 +6389,12 @@ namespace Community.CsharpSqlite {
 			728,
 			959,
 			959,
-			/*   130 */959,
+			///
+///<summary>
+///130 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4280,7 +6404,11 @@ namespace Community.CsharpSqlite {
 			850,
 			849,
 			959,
-			/*   140 */959,
+			///
+///<summary>
+///140 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4290,7 +6418,13 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   150 */959,
+			959,
+			///
+///<summary>
+///150 
+///</summary>
+
+			959,
 			939,
 			937,
 			959,
@@ -4300,7 +6434,11 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   160 */959,
+			///
+///<summary>
+///160 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4310,7 +6448,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   170 */959,
+			959,
+			///
+///<summary>
+///170 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4320,7 +6463,13 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   180 */959,
+			959,
+			///
+///<summary>
+///180 
+///</summary>
+
+			959,
 			641,
 			959,
 			759,
@@ -4330,7 +6479,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   190 */959,
+			///
+///<summary>
+///190 
+///</summary>
+
+			959,
 			951,
 			763,
 			753,
@@ -4340,7 +6494,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   200 */959,
+			///
+///<summary>
+///200 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4350,7 +6509,12 @@ namespace Community.CsharpSqlite {
 			804,
 			742,
 			922,
-			/*   210 */924,
+			///
+///<summary>
+///210 
+///</summary>
+
+			924,
 			959,
 			905,
 			740,
@@ -4360,7 +6524,12 @@ namespace Community.CsharpSqlite {
 			751,
 			643,
 			798,
-			/*   220 */776,
+			///
+///<summary>
+///220 
+///</summary>
+
+			776,
 			776,
 			917,
 			798,
@@ -4370,7 +6539,12 @@ namespace Community.CsharpSqlite {
 			788,
 			959,
 			788,
-			/*   230 */697,
+			///
+///<summary>
+///230 
+///</summary>
+
+			697,
 			788,
 			776,
 			788,
@@ -4380,7 +6554,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			760,
-			/*   240 */751,
+			///
+///<summary>
+///240 
+///</summary>
+
+			751,
 			959,
 			944,
 			767,
@@ -4390,7 +6569,12 @@ namespace Community.CsharpSqlite {
 			767,
 			810,
 			732,
-			/*   250 */798,
+			///
+///<summary>
+///250 
+///</summary>
+
+			798,
 			739,
 			739,
 			739,
@@ -4400,7 +6584,12 @@ namespace Community.CsharpSqlite {
 			810,
 			732,
 			732,
-			/*   260 */767,
+			///
+///<summary>
+///260 
+///</summary>
+
+			767,
 			658,
 			911,
 			909,
@@ -4410,7 +6599,12 @@ namespace Community.CsharpSqlite {
 			767,
 			658,
 			767,
-			/*   270 */658,
+			///
+///<summary>
+///270 
+///</summary>
+
+			658,
 			876,
 			730,
 			730,
@@ -4420,7 +6614,12 @@ namespace Community.CsharpSqlite {
 			880,
 			876,
 			730,
-			/*   280 */700,
+			///
+///<summary>
+///280 
+///</summary>
+
+			700,
 			730,
 			715,
 			730,
@@ -4430,7 +6629,12 @@ namespace Community.CsharpSqlite {
 			780,
 			775,
 			780,
-			/*   290 */775,
+			///
+///<summary>
+///290 
+///</summary>
+
+			775,
 			767,
 			767,
 			959,
@@ -4440,7 +6644,12 @@ namespace Community.CsharpSqlite {
 			789,
 			798,
 			959,
-			/*   300 */718,
+			///
+///<summary>
+///300 
+///</summary>
+
+			718,
 			651,
 			651,
 			640,
@@ -4450,7 +6659,12 @@ namespace Community.CsharpSqlite {
 			956,
 			956,
 			951,
-			/*   310 */702,
+			///
+///<summary>
+///310 
+///</summary>
+
+			702,
 			702,
 			684,
 			959,
@@ -4460,7 +6674,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   320 */885,
+			///
+///<summary>
+///320 
+///</summary>
+
+			885,
 			959,
 			959,
 			959,
@@ -4470,7 +6689,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   330 */959,
+			///
+///<summary>
+///330 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4480,7 +6704,11 @@ namespace Community.CsharpSqlite {
 			959,
 			943,
 			959,
-			/*   340 */959,
+			///
+///<summary>
+///340 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4490,7 +6718,13 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   350 */959,
+			959,
+			///
+///<summary>
+///350 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4500,7 +6734,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			915,
-			/*   360 */959,
+			///
+///<summary>
+///360 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4510,7 +6749,11 @@ namespace Community.CsharpSqlite {
 			907,
 			959,
 			959,
-			/*   370 */959,
+			///
+///<summary>
+///370 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4520,7 +6763,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   380 */959,
+			959,
+			///
+///<summary>
+///380 
+///</summary>
+
 			959,
 			959,
 			959,
@@ -4530,7 +6778,13 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			959,
-			/*   390 */959,
+			959,
+			///
+///<summary>
+///390 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4540,7 +6794,12 @@ namespace Community.CsharpSqlite {
 			959,
 			869,
 			959,
-			/*   400 */959,
+			///
+///<summary>
+///400 
+///</summary>
+
+			959,
 			959,
 			959,
 			959,
@@ -4550,7 +6809,12 @@ namespace Community.CsharpSqlite {
 			959,
 			959,
 			745,
-			/*   410 */819,
+			///
+///<summary>
+///410 
+///</summary>
+
+			819,
 			959,
 			818,
 			822,
@@ -4560,7 +6824,12 @@ namespace Community.CsharpSqlite {
 			649,
 			959,
 			632,
-			/*   420 */637,
+			///
+///<summary>
+///420 
+///</summary>
+
+			637,
 			955,
 			958,
 			957,
@@ -4570,7 +6839,12 @@ namespace Community.CsharpSqlite {
 			947,
 			945,
 			942,
-			/*   430 */941,
+			///
+///<summary>
+///430 
+///</summary>
+
+			941,
 			940,
 			938,
 			935,
@@ -4580,7 +6854,12 @@ namespace Community.CsharpSqlite {
 			894,
 			893,
 			892,
-			/*   440 */891,
+			///
+///<summary>
+///440 
+///</summary>
+
+			891,
 			890,
 			888,
 			886,
@@ -4590,7 +6869,12 @@ namespace Community.CsharpSqlite {
 			800,
 			797,
 			930,
-			/*   450 */882,
+			///
+///<summary>
+///450 
+///</summary>
+
+			882,
 			741,
 			738,
 			737,
@@ -4600,7 +6884,12 @@ namespace Community.CsharpSqlite {
 			923,
 			921,
 			811,
-			/*   460 */920,
+			///
+///<summary>
+///460 
+///</summary>
+
+			920,
 			919,
 			918,
 			916,
@@ -4610,7 +6899,12 @@ namespace Community.CsharpSqlite {
 			806,
 			733,
 			874,
-			/*   470 */873,
+			///
+///<summary>
+///470 
+///</summary>
+
+			873,
 			660,
 			904,
 			903,
@@ -4620,7 +6914,12 @@ namespace Community.CsharpSqlite {
 			901,
 			769,
 			659,
-			/*   480 */656,
+			///
+///<summary>
+///480 
+///</summary>
+
+			656,
 			665,
 			722,
 			721,
@@ -4630,7 +6929,12 @@ namespace Community.CsharpSqlite {
 			725,
 			724,
 			723,
-			/*   490 */720,
+			///
+///<summary>
+///490 
+///</summary>
+
+			720,
 			667,
 			675,
 			686,
@@ -4640,7 +6944,12 @@ namespace Community.CsharpSqlite {
 			879,
 			881,
 			878,
-			/*   500 */877,
+			///
+///<summary>
+///500 
+///</summary>
+
+			877,
 			707,
 			706,
 			712,
@@ -4650,7 +6959,12 @@ namespace Community.CsharpSqlite {
 			708,
 			705,
 			704,
-			/*   510 */703,
+			///
+///<summary>
+///510 
+///</summary>
+
+			703,
 			696,
 			695,
 			701,
@@ -4660,7 +6974,12 @@ namespace Community.CsharpSqlite {
 			713,
 			693,
 			736,
-			/*   520 */735,
+			///
+///<summary>
+///520 
+///</summary>
+
+			735,
 			734,
 			731,
 			692,
@@ -4670,7 +6989,12 @@ namespace Community.CsharpSqlite {
 			689,
 			688,
 			828,
-			/*   530 */827,
+			///
+///<summary>
+///530 
+///</summary>
+
+			827,
 			815,
 			858,
 			756,
@@ -4680,7 +7004,12 @@ namespace Community.CsharpSqlite {
 			765,
 			778,
 			777,
-			/*   540 */813,
+			///
+///<summary>
+///540 
+///</summary>
+
+			813,
 			812,
 			779,
 			764,
@@ -4690,7 +7019,12 @@ namespace Community.CsharpSqlite {
 			772,
 			771,
 			770,
-			/*   550 */762,
+			///
+///<summary>
+///550 
+///</summary>
+
+			762,
 			752,
 			784,
 			787,
@@ -4700,7 +7034,12 @@ namespace Community.CsharpSqlite {
 			768,
 			857,
 			929,
-			/*   560 */928,
+			///
+///<summary>
+///560 
+///</summary>
+
+			928,
 			927,
 			926,
 			925,
@@ -4710,7 +7049,12 @@ namespace Community.CsharpSqlite {
 			826,
 			679,
 			680,
-			/*   570 */898,
+			///
+///<summary>
+///570 
+///</summary>
+
+			898,
 			896,
 			897,
 			895,
@@ -4720,7 +7064,12 @@ namespace Community.CsharpSqlite {
 			677,
 			859,
 			747,
-			/*   580 */746,
+			///
+///<summary>
+///580 
+///</summary>
+
+			746,
 			855,
 			852,
 			844,
@@ -4730,7 +7079,12 @@ namespace Community.CsharpSqlite {
 			845,
 			841,
 			839,
-			/*   590 */838,
+			///
+///<summary>
+///590 
+///</summary>
+
+			838,
 			824,
 			823,
 			821,
@@ -4740,7 +7094,12 @@ namespace Community.CsharpSqlite {
 			670,
 			748,
 			744,
-			/*   600 */743,
+			///
+///<summary>
+///600 
+///</summary>
+
+			743,
 			814,
 			750,
 			749,
@@ -4750,7 +7109,12 @@ namespace Community.CsharpSqlite {
 			664,
 			662,
 			655,
-			/*   610 */653,
+			///
+///<summary>
+///610 
+///</summary>
+
+			653,
 			652,
 			654,
 			650,
@@ -4760,7 +7124,12 @@ namespace Community.CsharpSqlite {
 			645,
 			644,
 			673,
-			/*   620 */672,
+			///
+///<summary>
+///620 
+///</summary>
+
+			672,
 			671,
 			669,
 			668,
@@ -4771,9 +7140,9 @@ namespace Community.CsharpSqlite {
 			633,
 			631,
 		};
-        #endregion
 
-        ///<summary>
+		#endregion
+		///<summary>
 		///The next table maps tokens into fallback tokens.  If a construct
 		/// like the following:
 		///
@@ -4786,75 +7155,411 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if YYFALLBACK || TRUE
-		static YYCODETYPE[] yyFallback=new YYCODETYPE[] {
+		static YYCODETYPE[] yyFallback = new YYCODETYPE[] {
 			0,
-			/*          $ => nothing */0,
-			/*       SEMI => nothing */26,
-			/*    EXPLAIN => ID */26,
-			/*      QUERY => ID */26,
-			/*       PLAN => ID */26,
-			/*      BEGIN => ID */0,
-			/* TRANSACTION => nothing */26,
-			/*   DEFERRED => ID */26,
-			/*  IMMEDIATE => ID */26,
-			/*  EXCLUSIVE => ID */0,
-			/*     COMMIT => nothing */26,
-			/*        END => ID */26,
-			/*   ROLLBACK => ID */26,
-			/*  SAVEPOINT => ID */26,
-			/*    RELEASE => ID */0,
-			/*         TO => nothing */0,
-			/*      TABLE => nothing */0,
-			/*     CREATE => nothing */26,
-			/*         IF => ID */0,
-			/*        NOT => nothing */0,
-			/*     EXISTS => nothing */26,
-			/*       TEMP => ID */0,
-			/*         LP => nothing */0,
-			/*         RP => nothing */0,
-			/*         AS => nothing */0,
-			/*      COMMA => nothing */0,
-			/*         ID => nothing */0,
-			/*    INDEXED => nothing */26,
-			/*      ABORT => ID */26,
-			/*     ACTION => ID */26,
-			/*      AFTER => ID */26,
-			/*    ANALYZE => ID */26,
-			/*        ASC => ID */26,
-			/*     ATTACH => ID */26,
-			/*     BEFORE => ID */26,
-			/*         BY => ID */26,
-			/*    CASCADE => ID */26,
-			/*       CAST => ID */26,
-			/*   COLUMNKW => ID */26,
-			/*   CONFLICT => ID */26,
-			/*   DATABASE => ID */26,
-			/*       DESC => ID */26,
-			/*     DETACH => ID */26,
-			/*       EACH => ID */26,
-			/*       FAIL => ID */26,
-			/*        FOR => ID */26,
-			/*     IGNORE => ID */26,
-			/*  INITIALLY => ID */26,
-			/*    INSTEAD => ID */26,
-			/*    LIKE_KW => ID */26,
-			/*      MATCH => ID */26,
-			/*         NO => ID */26,
-			/*        KEY => ID */26,
-			/*         OF => ID */26,
-			/*     OFFSET => ID */26,
-			/*     PRAGMA => ID */26,
-			/*      RAISE => ID */26,
-			/*    REPLACE => ID */26,
-			/*   RESTRICT => ID */26,
-			/*        ROW => ID */26,
-			/*    TRIGGER => ID */26,
-			/*     VACUUM => ID */26,
-			/*       VIEW => ID */26,
-			/*    VIRTUAL => ID */26,
-			/*    REINDEX => ID */26,
-			/*     RENAME => ID */26,
-		/*   CTIME_KW => ID */};
+			///
+///<summary>
+///$ => nothing 
+///</summary>
+
+			0,
+			///
+///<summary>
+///SEMI => nothing 
+///</summary>
+
+			26,
+			///
+///<summary>
+///EXPLAIN => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///QUERY => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///PLAN => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///BEGIN => ID 
+///</summary>
+
+			0,
+			///
+///<summary>
+///TRANSACTION => nothing 
+///</summary>
+
+			26,
+			///
+///<summary>
+///DEFERRED => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///IMMEDIATE => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///EXCLUSIVE => ID 
+///</summary>
+
+			0,
+			///
+///<summary>
+///COMMIT => nothing 
+///</summary>
+
+			26,
+			///
+///<summary>
+///END => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///ROLLBACK => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///SAVEPOINT => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///RELEASE => ID 
+///</summary>
+
+			0,
+			///
+///<summary>
+///TO => nothing 
+///</summary>
+
+			0,
+			///
+///<summary>
+///TABLE => nothing 
+///</summary>
+
+			0,
+			///
+///<summary>
+///CREATE => nothing 
+///</summary>
+
+			26,
+			///
+///<summary>
+///IF => ID 
+///</summary>
+
+			0,
+			///
+///<summary>
+///NOT => nothing 
+///</summary>
+
+			0,
+			///
+///<summary>
+///EXISTS => nothing 
+///</summary>
+
+			26,
+			///
+///<summary>
+///TEMP => ID 
+///</summary>
+
+			0,
+			///
+///<summary>
+///LP => nothing 
+///</summary>
+
+			0,
+			///
+///<summary>
+///RP => nothing 
+///</summary>
+
+			0,
+			///
+///<summary>
+///AS => nothing 
+///</summary>
+
+			0,
+			///
+///<summary>
+///COMMA => nothing 
+///</summary>
+
+			0,
+			///
+///<summary>
+///ID => nothing 
+///</summary>
+
+			0,
+			///
+///<summary>
+///INDEXED => nothing 
+///</summary>
+
+			26,
+			///
+///<summary>
+///ABORT => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///ACTION => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///AFTER => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///ANALYZE => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///ASC => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///ATTACH => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///BEFORE => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///BY => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///CASCADE => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///CAST => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///COLUMNKW => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///CONFLICT => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///DATABASE => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///DESC => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///DETACH => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///EACH => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///FAIL => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///FOR => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///IGNORE => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///INITIALLY => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///INSTEAD => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///LIKE_KW => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///MATCH => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///NO => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///KEY => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///OF => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///OFFSET => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///PRAGMA => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///RAISE => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///REPLACE => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///RESTRICT => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///ROW => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///TRIGGER => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///VACUUM => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///VIEW => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///VIRTUAL => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///REINDEX => ID 
+///</summary>
+
+			26,
+			///
+///<summary>
+///RENAME => ID 
+///</summary>
+
+			26,
+		///
+///<summary>
+///CTIME_KW => ID 
+///</summary>
+
+		};
+
 		#endif
 		///<summary>
 		///The following structure represents a single element of the
@@ -4869,243 +7574,527 @@ namespace Community.CsharpSqlite {
 		///      the information used by the action routines in the grammar.
 		///      It is sometimes called the "minor" token.
 		///</summary>
-		public class yyStackEntry {
+		public class yyStackEntry
+		{
 			public YYACTIONTYPE stateno;
-			/* The state-number */public YYCODETYPE major;
-			/* The major token value.  This is the code
-** number for the token at this stack level */public YYMINORTYPE minor;
-		/* The user-supplied minor token value.  This
-** is the value of the token  */
-        };
+
+			///
+///<summary>
+///</summary>
+///<param name="The state">number </param>
+
+			public YYCODETYPE major;
+
+			///
+///<summary>
+///The major token value.  This is the code
+///number for the token at this stack level 
+///</summary>
+
+			public YYMINORTYPE minor;
+		///
+///<summary>
+///</summary>
+///<param name="The user">supplied minor token value.  This</param>
+///<param name="is the value of the token  ">is the value of the token  </param>
+
+		};
+
 
 		//typedef struct yyStackEntry yyStackEntry;
 		///<summary>
 		///The state of the parser is completely contained in an instance of
 		/// the following structure
 		///</summary>
-		public class yyParser {
+		public class yyParser
+		{
 			public int yyidx;
-			/* Index of top element in stack */
+
+			///
+///<summary>
+///Index of top element in stack 
+///</summary>
+
 			#if YYTRACKMAXSTACKDEPTH
-																																																																		int yyidxMax;                 /* Maximum value of yyidx */
+																																																																					int yyidxMax;                 /* Maximum value of yyidx */
 #endif
 			public int yyerrcnt;
-			/* Shifts left before out of the error */public Parse pParse;
+
+			///
+///<summary>
+///Shifts left before out of the error 
+///</summary>
+
+			public Parse pParse;
+
 			// sqlite3ParserARG_SDECL                /* A place to hold %extra_argument */
 			#if YYSTACKDEPTH
-																																																																		public int yystksz;                  /* Current side of the stack */
+																																																																					public int yystksz;                  /* Current side of the stack */
 public yyStackEntry *yystack;        /* The parser's stack */
 #else
-			public yyStackEntry[] yystack=new yyStackEntry[YYSTACKDEPTH];
-			/* The parser's stack */
+			public yyStackEntry[] yystack = new yyStackEntry[YYSTACKDEPTH];
+
+			///
+///<summary>
+///The parser's stack 
+///</summary>
+
 			#endif
-			public void yy_destructor(/* The parser */YYCODETYPE yymajor,/* Type code for object to destroy */YYMINORTYPE yypminor/* The object to be destroyed */) {
-				Parse pParse=this.pParse;
+			public void yy_destructor (///
+///<summary>
+///The parser 
+///</summary>
+
+			YYCODETYPE yymajor, ///
+///<summary>
+///Type code for object to destroy 
+///</summary>
+
+			YYMINORTYPE yypminor///
+///<summary>
+///The object to be destroyed 
+///</summary>
+
+			)
+			{
+				Parse pParse = this.pParse;
 				// sqlite3ParserARG_FETCH;
-				switch(yymajor) {
-				/* Here is inserted the actions which take place when a
-        ** terminal or non-terminal is destroyed.  This can happen
-        ** when the symbol is popped from the stack during a
-        ** reduce or during error processing or when a parser is
-        ** being destroyed before it is finished parsing.
-        **
-        ** Note: during a reduce, the only symbols destroyed are those
-        ** which appear on the RHS of the rule, but which are not used
-        ** inside the C code.
-        */case 160:
-				/* select */case 194:
-				/* oneselect */{
-					//#line 403 "parse.y"
-					sqlite3SelectDelete(pParse.db,ref (yypminor.yy387));
-					//#line 1399 "parse.c"
-				}
-				break;
+				switch (yymajor) {
+				///
+///<summary>
+///Here is inserted the actions which take place when a
+///</summary>
+///<param name="terminal or non">terminal is destroyed.  This can happen</param>
+///<param name="when the symbol is popped from the stack during a">when the symbol is popped from the stack during a</param>
+///<param name="reduce or during error processing or when a parser is">reduce or during error processing or when a parser is</param>
+///<param name="being destroyed before it is finished parsing.">being destroyed before it is finished parsing.</param>
+///<param name=""></param>
+///<param name="Note: during a reduce, the only symbols destroyed are those">Note: during a reduce, the only symbols destroyed are those</param>
+///<param name="which appear on the RHS of the rule, but which are not used">which appear on the RHS of the rule, but which are not used</param>
+///<param name="inside the C code.">inside the C code.</param>
+///<param name=""></param>
+
+				case 160:
+				///
+///<summary>
+///select 
+///</summary>
+
+				case 194:
+					///
+///<summary>
+///oneselect 
+///</summary>
+
+					{
+						//#line 403 "parse.y"
+						sqlite3SelectDelete (pParse.db, ref (yypminor.yy387));
+						//#line 1399 "parse.c"
+					}
+					break;
 				case 174:
-				/* term */case 175:
-				/* Expr */{
-					//#line 720 "parse.y"
-					sqlite3ExprDelete(pParse.db,ref (yypminor.yy118).pExpr);
-					//#line 1407 "parse.c"
-				}
-				break;
+				///
+///<summary>
+///term 
+///</summary>
+
+				case 175:
+					///
+///<summary>
+///Expr 
+///</summary>
+
+					{
+						//#line 720 "parse.y"
+						sqlite3ExprDelete (pParse.db, ref (yypminor.yy118).pExpr);
+						//#line 1407 "parse.c"
+					}
+					break;
 				case 179:
-				/* idxlist_opt */case 187:
-				/* idxlist */case 197:
-				/* selcollist */case 200:
-				/* groupby_opt */case 202:
-				/* orderby_opt */case 204:
-				/* sclp */case 214:
-				/* sortlist */case 216:
-				/* nexprlist */case 217:
-				/* setlist */case 220:
-				/* itemlist */case 221:
-				/* exprlist */case 226:
-				/* case_exprlist */{
-					//#line 1103 "parse.y"
-					sqlite3ExprListDelete(pParse.db,ref (yypminor.yy322));
-					//#line 1425 "parse.c"
-				}
-				break;
+				///
+///<summary>
+///idxlist_opt 
+///</summary>
+
+				case 187:
+				///
+///<summary>
+///idxlist 
+///</summary>
+
+				case 197:
+				///
+///<summary>
+///selcollist 
+///</summary>
+
+				case 200:
+				///
+///<summary>
+///groupby_opt 
+///</summary>
+
+				case 202:
+				///
+///<summary>
+///orderby_opt 
+///</summary>
+
+				case 204:
+				///
+///<summary>
+///sclp 
+///</summary>
+
+				case 214:
+				///
+///<summary>
+///sortlist 
+///</summary>
+
+				case 216:
+				///
+///<summary>
+///nexprlist 
+///</summary>
+
+				case 217:
+				///
+///<summary>
+///setlist 
+///</summary>
+
+				case 220:
+				///
+///<summary>
+///itemlist 
+///</summary>
+
+				case 221:
+				///
+///<summary>
+///exprlist 
+///</summary>
+
+				case 226:
+					///
+///<summary>
+///case_exprlist 
+///</summary>
+
+					{
+						//#line 1103 "parse.y"
+						sqlite3ExprListDelete (pParse.db, ref (yypminor.yy322));
+						//#line 1425 "parse.c"
+					}
+					break;
 				case 193:
-				/* fullname */case 198:
-				/* from */case 206:
-				/* seltablist */case 207:
-				/* stl_prefix */{
-					//#line 534 "parse.y"
-					sqlite3SrcListDelete(pParse.db,ref (yypminor.yy259));
-					//#line 1435 "parse.c"
-				}
-				break;
+				///
+///<summary>
+///fullname 
+///</summary>
+
+				case 198:
+				///
+///<summary>
+///from 
+///</summary>
+
+				case 206:
+				///
+///<summary>
+///seltablist 
+///</summary>
+
+				case 207:
+					///
+///<summary>
+///stl_prefix 
+///</summary>
+
+					{
+						//#line 534 "parse.y"
+						sqlite3SrcListDelete (pParse.db, ref (yypminor.yy259));
+						//#line 1435 "parse.c"
+					}
+					break;
 				case 199:
-				/* where_opt */case 201:
-				/* having_opt */case 210:
-				/* on_opt */case 215:
-				/* sortitem */case 225:
-				/* case_operand */case 227:
-				/* case_else */case 238:
-				/* when_clause */case 243:
-				/* key_opt */{
-					//#line 644 "parse.y"
-					sqlite3ExprDelete(pParse.db,ref (yypminor.yy314));
-					//#line 1449 "parse.c"
-				}
-				break;
+				///
+///<summary>
+///where_opt 
+///</summary>
+
+				case 201:
+				///
+///<summary>
+///having_opt 
+///</summary>
+
+				case 210:
+				///
+///<summary>
+///on_opt 
+///</summary>
+
+				case 215:
+				///
+///<summary>
+///sortitem 
+///</summary>
+
+				case 225:
+				///
+///<summary>
+///case_operand 
+///</summary>
+
+				case 227:
+				///
+///<summary>
+///case_else 
+///</summary>
+
+				case 238:
+				///
+///<summary>
+///when_clause 
+///</summary>
+
+				case 243:
+					///
+///<summary>
+///key_opt 
+///</summary>
+
+					{
+						//#line 644 "parse.y"
+						sqlite3ExprDelete (pParse.db, ref (yypminor.yy314));
+						//#line 1449 "parse.c"
+					}
+					break;
 				case 211:
-				/* using_opt */case 213:
-				/* inscollist */case 219:
-				/* inscollist_opt */{
-					//#line 566 "parse.y"
-					sqlite3IdListDelete(pParse.db,ref (yypminor.yy384));
-					//#line 1458 "parse.c"
-				}
-				break;
+				///
+///<summary>
+///using_opt 
+///</summary>
+
+				case 213:
+				///
+///<summary>
+///inscollist 
+///</summary>
+
+				case 219:
+					///
+///<summary>
+///inscollist_opt 
+///</summary>
+
+					{
+						//#line 566 "parse.y"
+						sqlite3IdListDelete (pParse.db, ref (yypminor.yy384));
+						//#line 1458 "parse.c"
+					}
+					break;
 				case 234:
-				/* trigger_cmd_list */case 239:
-				/* trigger_cmd */{
-					//#line 1210"parse.y"
-					sqlite3DeleteTriggerStep(pParse.db,ref (yypminor.yy203));
-					//#line 1466 "parse.c"
-				}
-				break;
+				///
+///<summary>
+///trigger_cmd_list 
+///</summary>
+
+				case 239:
+					///
+///<summary>
+///trigger_cmd 
+///</summary>
+
+					{
+						//#line 1210"parse.y"
+						sqlite3DeleteTriggerStep (pParse.db, ref (yypminor.yy203));
+						//#line 1466 "parse.c"
+					}
+					break;
 				case 236:
-				/* trigger_event */{
-					//#line 1196 "parse.y"
-					sqlite3IdListDelete(pParse.db,ref (yypminor.yy90).b);
-					//#line 1473 "parse.c"
-				}
-				break;
+					///
+///<summary>
+///trigger_event 
+///</summary>
+
+					{
+						//#line 1196 "parse.y"
+						sqlite3IdListDelete (pParse.db, ref (yypminor.yy90).b);
+						//#line 1473 "parse.c"
+					}
+					break;
 				default:
-				break;
-				/* If no destructor action specified: do nothing */}
+					break;
+				///
+///<summary>
+///If no destructor action specified: do nothing 
+///</summary>
+
+				}
 			}
-			public int yy_pop_parser_stack() {
+
+			public int yy_pop_parser_stack ()
+			{
 				YYCODETYPE yymajor;
-				yyStackEntry yytos=this.yystack[this.yyidx];
-				/* There is no mechanism by which the parser stack can be popped below
-      ** empty in SQLite.  */if(NEVER(this.yyidx<0))
+				yyStackEntry yytos = this.yystack [this.yyidx];
+				///
+///<summary>
+///There is no mechanism by which the parser stack can be popped below
+///empty in SQLite.  
+///</summary>
+
+				if (NEVER (this.yyidx < 0))
 					return 0;
 				#if !NDEBUG
-																																																																				      if ( yyTraceFILE != null && pParser.yyidx >= 0 )
+																																																																								      if ( yyTraceFILE != null && pParser.yyidx >= 0 )
       {
         fprintf( yyTraceFILE, "%sPopping %s\n",
         yyTracePrompt,
         yyTokenName[yytos.major] );
       }
 #endif
-				yymajor=yytos.major;
-				this.yy_destructor(yymajor,yytos.minor);
+				yymajor = yytos.major;
+				this.yy_destructor (yymajor, yytos.minor);
 				this.yyidx--;
 				return yymajor;
 			}
-			public void sqlite3ParserFree(/* The parser to be deleted */dxDel freeProc//)(void*)     /* Function used to reclaim memory */
-			) {
-				yyParser pParser=this;
-				/* In SQLite, we never try to destroy a parser that was not successfully
-      ** created in the first place. */if(NEVER(pParser==null))
+
+			public void sqlite3ParserFree (///
+///<summary>
+///The parser to be deleted 
+///</summary>
+
+			dxDel freeProc//)(void*)     /* Function used to reclaim memory */
+			)
+			{
+				yyParser pParser = this;
+				///
+///<summary>
+///In SQLite, we never try to destroy a parser that was not successfully
+///created in the first place. 
+///</summary>
+
+				if (NEVER (pParser == null))
 					return;
-				while(pParser.yyidx>=0)
-					pParser.yy_pop_parser_stack();
+				while (pParser.yyidx >= 0)
+					pParser.yy_pop_parser_stack ();
 				#if YYSTACKDEPTH
-																																																																				pParser.yystack = null;//free(pParser.yystack);
+																																																																								pParser.yystack = null;//free(pParser.yystack);
 #endif
-				pParser=null;
+				pParser = null;
 				// freeProc(ref pParser);
 			}
-			
-            public int yy_find_shift_action(/* The parser */YYCODETYPE iLookAhead/* The look-ahead token */) {
+
+			public int yy_find_shift_action (///
+///<summary>
+///The parser 
+///</summary>
+
+			YYCODETYPE iLookAhead///
+///<summary>
+///</summary>
+///<param name="The look">ahead token </param>
+
+			)
+			{
 				int i;
-				int stateno=this.yystack[this.yyidx].stateno;
-				if(stateno>YY_SHIFT_COUNT||(i=yy_shift_ofst[stateno])==YY_SHIFT_USE_DFLT) {
-					return yy_default[stateno];
+				int stateno = this.yystack [this.yyidx].stateno;
+				if (stateno > YY_SHIFT_COUNT || (i = yy_shift_ofst [stateno]) == YY_SHIFT_USE_DFLT) {
+					return yy_default [stateno];
 				}
-                //Log.WriteLine((TokenType)iLookAhead);
-                //Log.WriteLine("current\t : "+i);
-
-
-				Debug.Assert(iLookAhead!=YYNOCODE);
-				i+=iLookAhead;
-                //Log.WriteLine("new\t : " + i);
-
-
-				if(i<0||i>=YY_ACTTAB_COUNT||yy_lookahead[i]!=iLookAhead) {
-					if(iLookAhead>0) {
+				//Log.WriteLine((TokenType)iLookAhead);
+				//Log.WriteLine("current\t : "+i);
+				Debug.Assert (iLookAhead != YYNOCODE);
+				i += iLookAhead;
+				//Log.WriteLine("new\t : " + i);
+				if (i < 0 || i >= YY_ACTTAB_COUNT || yy_lookahead [i] != iLookAhead) {
+					if (iLookAhead > 0) {
 						//#if YYFALLBACK
 						YYCODETYPE iFallback;
-						/* Fallback token */if(iLookAhead<yyFallback.Length//yyFallback.Length/sizeof(yyFallback[0])
-						&&(iFallback=yyFallback[iLookAhead])!=0) {
+						///
+///<summary>
+///Fallback token 
+///</summary>
+
+						if (iLookAhead < yyFallback.Length //yyFallback.Length/sizeof(yyFallback[0])
+						&& (iFallback = yyFallback [iLookAhead]) != 0) {
 							#if !NDEBUG
-																																																																																																																																						            if ( yyTraceFILE != null )
+																																																																																																																																													            if ( yyTraceFILE != null )
             {
               fprintf( yyTraceFILE, "%sFALLBACK %s => %s\n",
               yyTracePrompt, yyTokenName[iLookAhead], yyTokenName[iFallback] );
             }
 #endif
-							return this.yy_find_shift_action(iFallback);
+							return this.yy_find_shift_action (iFallback);
 						}
 						//#endif
 						//#if YYWILDCARD
 						{
-							int j=i-iLookAhead+YYWILDCARD;
-							if(//#if YY_SHIFT_MIN+YYWILDCARD<0
-							j>=0&&//#endif
+							int j = i - iLookAhead + YYWILDCARD;
+							if (//#if YY_SHIFT_MIN+YYWILDCARD<0
+							j >= 0 && //#endif
 							//#if YY_SHIFT_MAX+YYWILDCARD>=YY_ACTTAB_COUNT
-							j<YY_ACTTAB_COUNT&&//#endif
-							yy_lookahead[j]==YYWILDCARD) {
+							j < YY_ACTTAB_COUNT && //#endif
+							yy_lookahead [j] == YYWILDCARD) {
 								#if !NDEBUG
-																																																																																																																																																												              if ( yyTraceFILE != null )
+																																																																																																																																																																				              if ( yyTraceFILE != null )
               {
                 Debugger.Break(); // TODO --
                 //fprintf(yyTraceFILE, "%sWILDCARD %s => %s\n",
                 //   yyTracePrompt, yyTokenName[iLookAhead], yyTokenName[YYWILDCARD]);
               }
 #endif
-								return yy_action[j];
+								return yy_action [j];
 							}
 							//#endif // * YYWILDCARD */
 						}
 					}
-					return yy_default[stateno];
+					return yy_default [stateno];
 				}
 				else {
-					return yy_action[i];
+					return yy_action [i];
 				}
 			}
 
-			public void yy_shift(/* The parser to be shifted */int yyNewState,/* The new state to shift in */int yyMajor,/* The major token to shift in */YYMINORTYPE yypMinor/* Pointer to the minor token to shift in */) {
-				yyStackEntry yytos=new yyStackEntry();
+			public void yy_shift (///
+///<summary>
+///The parser to be shifted 
+///</summary>
+
+			int yyNewState, ///
+///<summary>
+///The new state to shift in 
+///</summary>
+
+			int yyMajor, ///
+///<summary>
+///The major token to shift in 
+///</summary>
+
+			YYMINORTYPE yypMinor///
+///<summary>
+///Pointer to the minor token to shift in 
+///</summary>
+
+			)
+			{
+				yyStackEntry yytos = new yyStackEntry ();
 				this.yyidx++;
 				#if YYTRACKMAXSTACKDEPTH
-																																																																				if( yypParser.yyidx>yypParser.yyidxMax ){
+																																																																								if( yypParser.yyidx>yypParser.yyidxMax ){
 yypParser.yyidxMax = yypParser.yyidx;
 }
 #endif
 				#if !YYSTACKDEPTH
-				if(this.yyidx>=YYSTACKDEPTH) {
-					this.yyStackOverflow(yypMinor);
+				if (this.yyidx >= YYSTACKDEPTH) {
+					this.yyStackOverflow (yypMinor);
 					return;
 				}
 				#else
-																																																																				if( yypParser.yyidx>=yypParser.yystksz ){
+																																																																								if( yypParser.yyidx>=yypParser.yystksz ){
 yyGrowStack(yypParser);
 if( yypParser.yyidx>=yypParser.yystksz ){
 yyStackOverflow(yypParser, yypMinor);
@@ -5113,13 +8102,13 @@ return;
 }
 }
 #endif
-				this.yystack[this.yyidx]=yytos;
+				this.yystack [this.yyidx] = yytos;
 				//yytos = yypParser.yystack[yypParser.yyidx];
-				yytos.stateno=(YYACTIONTYPE)yyNewState;
-				yytos.major=(YYCODETYPE)yyMajor;
-				yytos.minor=yypMinor;
+				yytos.stateno = (YYACTIONTYPE)yyNewState;
+				yytos.major = (YYCODETYPE)yyMajor;
+				yytos.minor = yypMinor;
 				#if !NDEBUG
-																																																																				      if ( yyTraceFILE != null && yypParser.yyidx > 0 )
+																																																																								      if ( yyTraceFILE != null && yypParser.yyidx > 0 )
       {
         int i;
         fprintf( yyTraceFILE, "%sShift %d\n", yyTracePrompt, yyNewState );
@@ -5130,139 +8119,233 @@ return;
       }
 #endif
 			}
-			public void yyStackOverflow(YYMINORTYPE yypMinor) {
-				Parse pParse=this.pParse;
+
+			public void yyStackOverflow (YYMINORTYPE yypMinor)
+			{
+				Parse pParse = this.pParse;
 				// sqlite3ParserARG_FETCH;
 				this.yyidx--;
 				#if !NDEBUG
-																																																																				      if ( yyTraceFILE != null )
+																																																																								      if ( yyTraceFILE != null )
       {
         Debugger.Break(); // TODO --
         //fprintf(yyTraceFILE, "%sStack Overflow!\n", yyTracePrompt);
       }
 #endif
-				while(this.yyidx>=0)
-					this.yy_pop_parser_stack();
-				/* Here code is inserted which will execute if the parser
-      ** stack every overflows *///#line 38 "parse.y"
-				UNUSED_PARAMETER(yypMinor);
-				/* Silence some compiler warnings */sqlite3ErrorMsg(pParse,"parser stack overflow");
-				pParse.parseError=1;
+				while (this.yyidx >= 0)
+					this.yy_pop_parser_stack ();
+				///
+///<summary>
+///Here code is inserted which will execute if the parser
+///stack every overflows 
+///</summary>
+
+				//#line 38 "parse.y"
+				UNUSED_PARAMETER (yypMinor);
+				///
+///<summary>
+///Silence some compiler warnings 
+///</summary>
+
+				sqlite3ErrorMsg (pParse, "parser stack overflow");
+				pParse.parseError = 1;
 				//#line 1664  "parse.c"
-				this.pParse=pParse;
+				this.pParse = pParse;
 				//      sqlite3ParserARG_STORE; /* Suppress warning about unused %extra_argument var */
 			}
-			public void yy_parse_failed(/* The parser */) {
-				Parse pParse=this.pParse;
+
+			public void yy_parse_failed (///
+///<summary>
+///The parser 
+///</summary>
+
+			)
+			{
+				Parse pParse = this.pParse;
 				//       sqlite3ParserARG_FETCH;
 				#if !NDEBUG
-																																																																				      if ( yyTraceFILE != null )
+																																																																								      if ( yyTraceFILE != null )
       {
         Debugger.Break(); // TODO --        fprintf(yyTraceFILE, "%sFail!\n", yyTracePrompt);
       }
 #endif
-				while(this.yyidx>=0)
-					this.yy_pop_parser_stack();
-				/* Here code is inserted which will be executed whenever the
-      ** parser fails */this.pParse=pParse;
+				while (this.yyidx >= 0)
+					this.yy_pop_parser_stack ();
+				///
+///<summary>
+///Here code is inserted which will be executed whenever the
+///parser fails 
+///</summary>
+
+				this.pParse = pParse;
 				//      sqlite3ParserARG_STORE; /* Suppress warning about unused %extra_argument variable */
 			}
-			public void yy_syntax_error(/* The parser */int yymajor,/* The major type of the error token */YYMINORTYPE yyminor/* The minor type of the error token */) {
-				Parse pParse=this.pParse;
+
+			public void yy_syntax_error (///
+///<summary>
+///The parser 
+///</summary>
+
+			int yymajor, ///
+///<summary>
+///The major type of the error token 
+///</summary>
+
+			YYMINORTYPE yyminor///
+///<summary>
+///The minor type of the error token 
+///</summary>
+
+			)
+			{
+				Parse pParse = this.pParse;
 				//       sqlite3ParserARG_FETCH;
 				//#define TOKEN (yyminor.yy0)
 				//#line 32 "parse.y"
-				UNUSED_PARAMETER(yymajor);
-				/* Silence some compiler warnings */Debug.Assert(yyminor.yy0Token.zRestSql.Length>0);
+				UNUSED_PARAMETER (yymajor);
+				///
+///<summary>
+///Silence some compiler warnings 
+///</summary>
+
+				Debug.Assert (yyminor.yy0Token.zRestSql.Length > 0);
 				//TOKEN.z[0]);  /* The tokenizer always gives us a token */
-				sqlite3ErrorMsg(pParse,"near \"%T\": syntax error",yyminor.yy0Token);
+				sqlite3ErrorMsg (pParse, "near \"%T\": syntax error", yyminor.yy0Token);
 				//&TOKEN);
-				pParse.parseError=1;
+				pParse.parseError = 1;
 				//#line 3661 "parse.c"
-				this.pParse=pParse;
+				this.pParse = pParse;
 				// sqlite3ParserARG_STORE; /* Suppress warning about unused %extra_argument variable */
 			}
-			public void yy_accept(/* The parser */) {
-				Parse pParse=this.pParse;
+
+			public void yy_accept (///
+///<summary>
+///The parser 
+///</summary>
+
+			)
+			{
+				Parse pParse = this.pParse;
 				//       sqlite3ParserARG_FETCH;
 				#if !NDEBUG
-																																																																				      if ( yyTraceFILE != null )
+																																																																								      if ( yyTraceFILE != null )
       {
         fprintf( yyTraceFILE, "%sAccept!\n", yyTracePrompt );
       }
 #endif
-				while(this.yyidx>=0)
-					this.yy_pop_parser_stack();
-				/* Here code is inserted which will be executed whenever the
-      ** parser accepts */this.pParse=pParse;
+				while (this.yyidx >= 0)
+					this.yy_pop_parser_stack ();
+				///
+///<summary>
+///Here code is inserted which will be executed whenever the
+///parser accepts 
+///</summary>
+
+				this.pParse = pParse;
 				//      sqlite3ParserARG_STORE; /* Suppress warning about unused %extra_argument variable */
 			}
-			public void sqlite3Parser(/* The parser */
-                TokenType _yymajor,/* The major token code number */
-                sqlite3ParserTOKENTYPE yyminor/* The value for the token */,
-                Parse pParse//sqlite3ParserARG_PDECL           /* Optional %extra_argument parameter */
-			) {
-                int yymajor=(int)_yymajor;
-				YYMINORTYPE yyminorunion=new YYMINORTYPE();
+
+			public void sqlite3Parser (///
+///<summary>
+///The parser 
+///</summary>
+
+			TokenType _yymajor, ///
+///<summary>
+///The major token code number 
+///</summary>
+
+			sqlite3ParserTOKENTYPE yyminor///
+///<summary>
+///The value for the token 
+///</summary>
+
+			, Parse pParse//sqlite3ParserARG_PDECL           /* Optional %extra_argument parameter */
+			)
+			{
+				int yymajor = (int)_yymajor;
+				YYMINORTYPE yyminorunion = new YYMINORTYPE ();
 				int yyact;
-				/* The parser action. */
-                bool yyendofinput;
-				/* True if we are at the end of input */
+				///
+///<summary>
+///The parser action. 
+///</summary>
+
+				bool yyendofinput;
+				///
+///<summary>
+///True if we are at the end of input 
+///</summary>
+
 				#if YYERRORSYMBOL
-																																																																				int yyerrorhit = null;   /* True if yymajor has invoked an error */
+																																																																								int yyerrorhit = null;   /* True if yymajor has invoked an error */
 #endif
 				yyParser yypParser;
-				/* The parser *//* (re)initialize the parser, if necessary */
-                yypParser=this;
-				if(yypParser.yyidx<0) {
+				///
+///<summary>
+///The parser 
+///</summary>
+
+				///
+///<summary>
+///(re)initialize the parser, if necessary 
+///</summary>
+
+				yypParser = this;
+				if (yypParser.yyidx < 0) {
 					#if YYSTACKDEPTH
-																																																																																										if( yypParser.yystksz <=0 ){
+																																																																																															if( yypParser.yystksz <=0 ){
 memset(yyminorunion, 0, yyminorunion).Length;
 yyStackOverflow(yypParser, yyminorunion);
 return;
 }
 #endif
-					yypParser.yyidx=0;
-					yypParser.yyerrcnt=-1;
-					yypParser.yystack[0]=new yyStackEntry();
-					yypParser.yystack[0].stateno=0;
-					yypParser.yystack[0].major=0;
+					yypParser.yyidx = 0;
+					yypParser.yyerrcnt = -1;
+					yypParser.yystack [0] = new yyStackEntry ();
+					yypParser.yystack [0].stateno = 0;
+					yypParser.yystack [0].major = 0;
 				}
-				yyminorunion.yy0Token=yyminor.Copy();
-				yyendofinput=(yymajor==0);
-				yypParser.pParse=pParse;
+				yyminorunion.yy0Token = yyminor.Copy ();
+				yyendofinput = (yymajor == 0);
+				yypParser.pParse = pParse;
 				//      sqlite3ParserARG_STORE;
 				#if !NDEBUG
-																																																																				      if ( yyTraceFILE != null )
+																																																																								      if ( yyTraceFILE != null )
       {
         fprintf( yyTraceFILE, "%sInput %s\n", yyTracePrompt, yyTokenName[yymajor] );
       }
 #endif
 				do {
-					yyact=yypParser.yy_find_shift_action((YYCODETYPE)_yymajor);
-					if(yyact<YYNSTATE) {
-						Debug.Assert(!yyendofinput);
-						/* Impossible to shift the $ token */yypParser.yy_shift(yyact,yymajor,yyminorunion);
+					yyact = yypParser.yy_find_shift_action ((YYCODETYPE)_yymajor);
+					if (yyact < YYNSTATE) {
+						Debug.Assert (!yyendofinput);
+						///
+///<summary>
+///Impossible to shift the $ token 
+///</summary>
+
+						yypParser.yy_shift (yyact, yymajor, yyminorunion);
 						yypParser.yyerrcnt--;
-						yymajor=YYNOCODE;
+						yymajor = YYNOCODE;
 					}
 					else
-						if(yyact<YYNSTATE+YYNRULE) {
-							yy_reduce(yypParser,yyact-YYNSTATE);
+						if (yyact < YYNSTATE + YYNRULE) {
+							yy_reduce (yypParser, yyact - YYNSTATE);
 						}
 						else {
-							Debug.Assert(yyact==YY_ERROR_ACTION);
+							Debug.Assert (yyact == YY_ERROR_ACTION);
 							#if YYERRORSYMBOL
-																																																																																																																																						int yymx;
+																																																																																																																																													int yymx;
 #endif
 							#if !NDEBUG
-																																																																																																																																						          if ( yyTraceFILE != null )
+																																																																																																																																													          if ( yyTraceFILE != null )
           {
             Debugger.Break(); // TODO --            fprintf(yyTraceFILE, "%sSyntax Error!\n", yyTracePrompt);
           }
 #endif
 							#if YYERRORSYMBOL
-																																																																																																																																						/* A syntax error has occurred.
+																																																																																																																																													/* A syntax error has occurred.
 ** The response to an error depends upon whether or not the
 ** grammar defines an error token "ERROR".
 **
@@ -5287,12 +8370,12 @@ yy_syntax_error(yypParser,yymajor,yyminorunion);
 yymx = yypParser.yystack[yypParser.yyidx].major;
 if( yymx==YYERRORSYMBOL || yyerrorhit ){
 #if !NDEBUG
-																																																																																																																																						if( yyTraceFILE ){
+																																																																																																																																													if( yyTraceFILE ){
 Debug.Assert(false); // TODO --                      fprintf(yyTraceFILE,"%sDiscard input token %s\n",
 yyTracePrompt,yyTokenName[yymajor]);
 }
 #endif
-																																																																																																																																						yy_destructor(yypParser,(YYCODETYPE)yymajor,yyminorunion);
+																																																																																																																																													yy_destructor(yypParser,(YYCODETYPE)yymajor,yyminorunion);
 yymajor = YYNOCODE;
 }else{
 while(
@@ -5317,7 +8400,7 @@ yy_shift(yypParser,yyact,YYERRORSYMBOL,u2);
 yypParser.yyerrcnt = 3;
 yyerrorhit = 1;
 #elif (YYNOERRORRECOVERY)
-																																																																																																																																						/* If the YYNOERRORRECOVERY macro is defined, then do not attempt to
+																																																																																																																																													/* If the YYNOERRORRECOVERY macro is defined, then do not attempt to
 ** do any kind of error recovery.  Instead, simply invoke the syntax
 ** error routine and continue going as if nothing had happened.
 **
@@ -5328,39 +8411,43 @@ yy_syntax_error(yypParser,yymajor,yyminorunion);
 yy_destructor(yypParser,(YYCODETYPE)yymajor,yyminorunion);
 yymajor = YYNOCODE;
 #else
-							/* This is what we do if the grammar does not define ERROR:
-**
-**  * Report an error message, and throw away the input token.
-**
-**  * If the input token is $, then fail the parse.
-**
-** As before, subsequent error messages are suppressed until
-** three input tokens have been successfully shifted.
-*/
-                            if(yypParser.yyerrcnt<=0) {
-								yypParser.yy_syntax_error(yymajor,yyminorunion);
+							///
+///<summary>
+///This is what we do if the grammar does not define ERROR:
+///
+///Report an error message, and throw away the input token.
+///
+///If the input token is $, then fail the parse.
+///
+///As before, subsequent error messages are suppressed until
+///three input tokens have been successfully shifted.
+///</summary>
+
+							if (yypParser.yyerrcnt <= 0) {
+								yypParser.yy_syntax_error (yymajor, yyminorunion);
 							}
-							yypParser.yyerrcnt=3;
-							yypParser.yy_destructor((YYCODETYPE)yymajor,yyminorunion);
-							if(yyendofinput) {
-								yypParser.yy_parse_failed();
+							yypParser.yyerrcnt = 3;
+							yypParser.yy_destructor ((YYCODETYPE)yymajor, yyminorunion);
+							if (yyendofinput) {
+								yypParser.yy_parse_failed ();
 							}
-							yymajor=YYNOCODE;
+							yymajor = YYNOCODE;
 							#endif
 						}
 				}
-				while(yymajor!=YYNOCODE&&yypParser.yyidx>=0);
+				while (yymajor != YYNOCODE && yypParser.yyidx >= 0);
 				return;
 			}
 		}
+
 		//typedef struct yyParser yyParser;
 		#if !NDEBUG
-																																												    //include <stdio.h>
+																																														    //include <stdio.h>
     static TextWriter yyTraceFILE = null;
     static string yyTracePrompt = "";
 #endif
 		#if !NDEBUG
-																																												    /*
+																																														    /*
 ** Turn parser tracing on by giving a stream to which to write the trace
 ** and a prompt to preface each trace message.  Tracing is turned off
 ** by making either argument NULL
@@ -5388,7 +8475,7 @@ yymajor = YYNOCODE;
     }
 #endif
 		#if !NDEBUG
-																																												    /* For tracing shifts, the names of all terminals and nonterminals
+																																														    /* For tracing shifts, the names of all terminals and nonterminals
 ** are required.  The following table supplies these names */
     static string[] yyTokenName = {
 "$",             "SEMI",          "EXPLAIN",       "QUERY",       
@@ -5457,7 +8544,7 @@ yymajor = YYNOCODE;
 };
 #endif
 		#if !NDEBUG
-																																												    ///<summary>
+																																														    ///<summary>
 ///For tracing reduce actions, the names of all rules are required.
 ///</summary>
     static string[] yyRuleName = {
@@ -5793,7 +8880,7 @@ yymajor = YYNOCODE;
 };
 #endif
 		#if YYSTACKDEPTH
-																																												/*
+																																														/*
 ** Try to increase the size of the parser stack.
 */
 static void yyGrowStack(yyParser p){
@@ -5806,12 +8893,12 @@ newSize = p.yystksz*2 + 100;
 p.yystack = Array.Resize(p.yystack,newSize); //pNew;
 p.yystksz = newSize;
 #if !NDEBUG
-																																												if( yyTraceFILE ){
+																																														if( yyTraceFILE ){
 fprintf(yyTraceFILE,"%sStack grows to %d entries!\n",
 yyTracePrompt, p.yystksz);
 }
 #endif
-																																												//}
+																																														//}
 }
 #endif
 		///<summary>
@@ -5826,25 +8913,25 @@ yyTracePrompt, p.yystksz);
 		/// A pointer to a parser.  This pointer is used in subsequent calls
 		/// to sqlite3Parser and sqlite3ParserFree.
 		///</summary>
-        static yyParser sqlite3ParserAlloc()
-        {
-            //void *(*mallocProc)(size_t)){
-            yyParser pParser = new yyParser();
-            //pParser = (yyParser*)(*mallocProc)( (size_t)yyParser.Length );
-            if (pParser != null)
-            {
-                pParser.yyidx = -1;
-#if YYTRACKMAXSTACKDEPTH
-																																																																																								pParser.yyidxMax=0;
+		static yyParser sqlite3ParserAlloc ()
+		{
+			//void *(*mallocProc)(size_t)){
+			yyParser pParser = new yyParser ();
+			//pParser = (yyParser*)(*mallocProc)( (size_t)yyParser.Length );
+			if (pParser != null) {
+				pParser.yyidx = -1;
+				#if YYTRACKMAXSTACKDEPTH
+																																																																																												pParser.yyidxMax=0;
 #endif
-#if YYSTACKDEPTH
-																																																																																								pParser.yystack = NULL;
+				#if YYSTACKDEPTH
+																																																																																												pParser.yystack = NULL;
 pParser.yystksz = null;
 yyGrowStack(pParser);
 #endif
-            }
-            return pParser;
-        }
+			}
+			return pParser;
+		}
+
 		///<summary>
 		///The following function deletes the value associated with a
 		/// symbol.  The symbol can be either a terminal or nonterminal.
@@ -5861,23 +8948,27 @@ yyGrowStack(pParser);
 		/// Return the major token number for the symbol popped.
 		///
 		///</summary>
-		/*
-    ** Deallocate and destroy a parser.  Destructors are all called for
-    ** all stack elements before shutting the parser down.
-    **
-    ** Inputs:
-    ** <ul>
-    ** <li>  A pointer to the parser.  This should be a pointer
-    **       obtained from sqlite3ParserAlloc.
-    ** <li>  A pointer to a function used to reclaim memory obtained
-    **       from malloc.
-    ** </ul>
-    *////<summary>
+		///
+///<summary>
+///Deallocate and destroy a parser.  Destructors are all called for
+///all stack elements before shutting the parser down.
+///
+///Inputs:
+///<ul>
+///<li>  A pointer to the parser.  This should be a pointer
+///obtained from sqlite3ParserAlloc.
+///<li>  A pointer to a function used to reclaim memory obtained
+///from malloc.
+///</ul>
+///
+///</summary>
+
+		///<summary>
 		/// Return the peak depth of the stack for a parser.
 		///
 		///</summary>
 		#if YYTRACKMAXSTACKDEPTH
-																																												int sqlite3ParserStackPeak(void p){
+																																														int sqlite3ParserStackPeak(void p){
 yyParser pParser = (yyParser*)p;
 return pParser.yyidxMax;
 }
@@ -5899,29 +8990,41 @@ return pParser.yyidxMax;
 		/// return YY_NO_ACTION.
 		///
 		///</summary>
-		static int yy_find_reduce_action(int stateno,/* Current state number */YYCODETYPE iLookAhead/* The look-ahead token */) {
+		static int yy_find_reduce_action (int stateno, ///
+///<summary>
+///Current state number 
+///</summary>
+
+		YYCODETYPE iLookAhead///
+///<summary>
+///</summary>
+///<param name="The look">ahead token </param>
+
+		)
+		{
 			int i;
 			#if YYERRORSYMBOL
-																																																																		if( stateno>YY_REDUCE_COUNT ){
+																																																																					if( stateno>YY_REDUCE_COUNT ){
 return yy_default[stateno];
 }
 #else
-			Debug.Assert(stateno<=YY_REDUCE_COUNT);
+			Debug.Assert (stateno <= YY_REDUCE_COUNT);
 			#endif
-			i=yy_reduce_ofst[stateno];
-			Debug.Assert(i!=YY_REDUCE_USE_DFLT);
-			Debug.Assert(iLookAhead!=YYNOCODE);
-			i+=iLookAhead;
+			i = yy_reduce_ofst [stateno];
+			Debug.Assert (i != YY_REDUCE_USE_DFLT);
+			Debug.Assert (iLookAhead != YYNOCODE);
+			i += iLookAhead;
 			#if YYERRORSYMBOL
-																																																																		if( i<0 || i>=YY_ACTTAB_COUNT || yy_lookahead[i]!=iLookAhead ){
+																																																																					if( i<0 || i>=YY_ACTTAB_COUNT || yy_lookahead[i]!=iLookAhead ){
 return yy_default[stateno];
 }
 #else
-			Debug.Assert(i>=0&&i<YY_ACTTAB_COUNT);
-			Debug.Assert(yy_lookahead[i]==iLookAhead);
+			Debug.Assert (i >= 0 && i < YY_ACTTAB_COUNT);
+			Debug.Assert (yy_lookahead [i] == iLookAhead);
 			#endif
-			return yy_action[i];
+			return yy_action [i];
 		}
+
 		///<summary>
 		/// The following routine is called if the stack overflows.
 		///
@@ -5935,2302 +9038,4057 @@ return yy_default[stateno];
 		/// is used during the reduce.
 		///
 		///</summary>
-		public struct _yyRuleInfo {
+		public struct _yyRuleInfo
+		{
 			public YYCODETYPE lhs;
-			/* Symbol on the left-hand side of the rule */public byte nrhs;
-			/* Number of right-hand side symbols in the rule */public _yyRuleInfo(YYCODETYPE lhs,byte nrhs) {
-				this.lhs=lhs;
-				this.nrhs=nrhs;
+
+			///
+///<summary>
+///</summary>
+///<param name="Symbol on the left">hand side of the rule </param>
+
+			public byte nrhs;
+
+			///
+///<summary>
+///</summary>
+///<param name="Number of right">hand side symbols in the rule </param>
+
+			public _yyRuleInfo (YYCODETYPE lhs, byte nrhs)
+			{
+				this.lhs = lhs;
+				this.nrhs = nrhs;
 			}
 		}
-        #region rule info
-        static _yyRuleInfo[] yyRuleInfo=new _yyRuleInfo[] {
-			new _yyRuleInfo(142,1),
-			new _yyRuleInfo(143,2),
-			new _yyRuleInfo(143,1),
-			new _yyRuleInfo(144,1),
-			new _yyRuleInfo(144,3),
-			new _yyRuleInfo(145,0),
-			new _yyRuleInfo(145,1),
-			new _yyRuleInfo(145,3),
-			new _yyRuleInfo(146,1),
-			new _yyRuleInfo(147,3),
-			new _yyRuleInfo(149,0),
-			new _yyRuleInfo(149,1),
-			new _yyRuleInfo(149,2),
-			new _yyRuleInfo(148,0),
-			new _yyRuleInfo(148,1),
-			new _yyRuleInfo(148,1),
-			new _yyRuleInfo(148,1),
-			new _yyRuleInfo(147,2),
-			new _yyRuleInfo(147,2),
-			new _yyRuleInfo(147,2),
-			new _yyRuleInfo(151,1),
-			new _yyRuleInfo(151,0),
-			new _yyRuleInfo(147,2),
-			new _yyRuleInfo(147,3),
-			new _yyRuleInfo(147,5),
-			new _yyRuleInfo(147,2),
-			new _yyRuleInfo(152,6),
-			new _yyRuleInfo(154,1),
-			new _yyRuleInfo(156,0),
-			new _yyRuleInfo(156,3),
-			new _yyRuleInfo(155,1),
-			new _yyRuleInfo(155,0),
-			new _yyRuleInfo(153,4),
-			new _yyRuleInfo(153,2),
-			new _yyRuleInfo(158,3),
-			new _yyRuleInfo(158,1),
-			new _yyRuleInfo(161,3),
-			new _yyRuleInfo(162,1),
-			new _yyRuleInfo(165,1),
-			new _yyRuleInfo(165,1),
-			new _yyRuleInfo(166,1),
-			new _yyRuleInfo(150,1),
-			new _yyRuleInfo(150,1),
-			new _yyRuleInfo(150,1),
-			new _yyRuleInfo(163,0),
-			new _yyRuleInfo(163,1),
-			new _yyRuleInfo(167,1),
-			new _yyRuleInfo(167,4),
-			new _yyRuleInfo(167,6),
-			new _yyRuleInfo(168,1),
-			new _yyRuleInfo(168,2),
-			new _yyRuleInfo(169,1),
-			new _yyRuleInfo(169,1),
-			new _yyRuleInfo(164,2),
-			new _yyRuleInfo(164,0),
-			new _yyRuleInfo(172,3),
-			new _yyRuleInfo(172,1),
-			new _yyRuleInfo(173,2),
-			new _yyRuleInfo(173,4),
-			new _yyRuleInfo(173,3),
-			new _yyRuleInfo(173,3),
-			new _yyRuleInfo(173,2),
-			new _yyRuleInfo(173,2),
-			new _yyRuleInfo(173,3),
-			new _yyRuleInfo(173,5),
-			new _yyRuleInfo(173,2),
-			new _yyRuleInfo(173,4),
-			new _yyRuleInfo(173,4),
-			new _yyRuleInfo(173,1),
-			new _yyRuleInfo(173,2),
-			new _yyRuleInfo(178,0),
-			new _yyRuleInfo(178,1),
-			new _yyRuleInfo(180,0),
-			new _yyRuleInfo(180,2),
-			new _yyRuleInfo(182,2),
-			new _yyRuleInfo(182,3),
-			new _yyRuleInfo(182,3),
-			new _yyRuleInfo(182,3),
-			new _yyRuleInfo(183,2),
-			new _yyRuleInfo(183,2),
-			new _yyRuleInfo(183,1),
-			new _yyRuleInfo(183,1),
-			new _yyRuleInfo(183,2),
-			new _yyRuleInfo(181,3),
-			new _yyRuleInfo(181,2),
-			new _yyRuleInfo(184,0),
-			new _yyRuleInfo(184,2),
-			new _yyRuleInfo(184,2),
-			new _yyRuleInfo(159,0),
-			new _yyRuleInfo(159,2),
-			new _yyRuleInfo(185,3),
-			new _yyRuleInfo(185,2),
-			new _yyRuleInfo(185,1),
-			new _yyRuleInfo(186,2),
-			new _yyRuleInfo(186,7),
-			new _yyRuleInfo(186,5),
-			new _yyRuleInfo(186,5),
-			new _yyRuleInfo(186,10),
-			new _yyRuleInfo(188,0),
-			new _yyRuleInfo(188,1),
-			new _yyRuleInfo(176,0),
-			new _yyRuleInfo(176,3),
-			new _yyRuleInfo(189,0),
-			new _yyRuleInfo(189,2),
-			new _yyRuleInfo(190,1),
-			new _yyRuleInfo(190,1),
-			new _yyRuleInfo(190,1),
-			new _yyRuleInfo(147,4),
-			new _yyRuleInfo(192,2),
-			new _yyRuleInfo(192,0),
-			new _yyRuleInfo(147,8),
-			new _yyRuleInfo(147,4),
-			new _yyRuleInfo(147,1),
-			new _yyRuleInfo(160,1),
-			new _yyRuleInfo(160,3),
-			new _yyRuleInfo(195,1),
-			new _yyRuleInfo(195,2),
-			new _yyRuleInfo(195,1),
-			new _yyRuleInfo(194,9),
-			new _yyRuleInfo(196,1),
-			new _yyRuleInfo(196,1),
-			new _yyRuleInfo(196,0),
-			new _yyRuleInfo(204,2),
-			new _yyRuleInfo(204,0),
-			new _yyRuleInfo(197,3),
-			new _yyRuleInfo(197,2),
-			new _yyRuleInfo(197,4),
-			new _yyRuleInfo(205,2),
-			new _yyRuleInfo(205,1),
-			new _yyRuleInfo(205,0),
-			new _yyRuleInfo(198,0),
-			new _yyRuleInfo(198,2),
-			new _yyRuleInfo(207,2),
-			new _yyRuleInfo(207,0),
-			new _yyRuleInfo(206,7),
-			new _yyRuleInfo(206,7),
-			new _yyRuleInfo(206,7),
-			new _yyRuleInfo(157,0),
-			new _yyRuleInfo(157,2),
-			new _yyRuleInfo(193,2),
-			new _yyRuleInfo(208,1),
-			new _yyRuleInfo(208,2),
-			new _yyRuleInfo(208,3),
-			new _yyRuleInfo(208,4),
-			new _yyRuleInfo(210,2),
-			new _yyRuleInfo(210,0),
-			new _yyRuleInfo(209,0),
-			new _yyRuleInfo(209,3),
-			new _yyRuleInfo(209,2),
-			new _yyRuleInfo(211,4),
-			new _yyRuleInfo(211,0),
-			new _yyRuleInfo(202,0),
-			new _yyRuleInfo(202,3),
-			new _yyRuleInfo(214,4),
-			new _yyRuleInfo(214,2),
-			new _yyRuleInfo(215,1),
-			new _yyRuleInfo(177,1),
-			new _yyRuleInfo(177,1),
-			new _yyRuleInfo(177,0),
-			new _yyRuleInfo(200,0),
-			new _yyRuleInfo(200,3),
-			new _yyRuleInfo(201,0),
-			new _yyRuleInfo(201,2),
-			new _yyRuleInfo(203,0),
-			new _yyRuleInfo(203,2),
-			new _yyRuleInfo(203,4),
-			new _yyRuleInfo(203,4),
-			new _yyRuleInfo(147,5),
-			new _yyRuleInfo(199,0),
-			new _yyRuleInfo(199,2),
-			new _yyRuleInfo(147,7),
-			new _yyRuleInfo(217,5),
-			new _yyRuleInfo(217,3),
-			new _yyRuleInfo(147,8),
-			new _yyRuleInfo(147,5),
-			new _yyRuleInfo(147,6),
-			new _yyRuleInfo(218,2),
-			new _yyRuleInfo(218,1),
-			new _yyRuleInfo(220,3),
-			new _yyRuleInfo(220,1),
-			new _yyRuleInfo(219,0),
-			new _yyRuleInfo(219,3),
-			new _yyRuleInfo(213,3),
-			new _yyRuleInfo(213,1),
-			new _yyRuleInfo(175,1),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(174,1),
-			new _yyRuleInfo(175,1),
-			new _yyRuleInfo(175,1),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,5),
-			new _yyRuleInfo(174,1),
-			new _yyRuleInfo(174,1),
-			new _yyRuleInfo(175,1),
-			new _yyRuleInfo(175,1),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,6),
-			new _yyRuleInfo(175,5),
-			new _yyRuleInfo(175,4),
-			new _yyRuleInfo(174,1),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(222,1),
-			new _yyRuleInfo(222,2),
-			new _yyRuleInfo(222,1),
-			new _yyRuleInfo(222,2),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,5),
-			new _yyRuleInfo(175,2),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,4),
-			new _yyRuleInfo(175,2),
-			new _yyRuleInfo(175,2),
-			new _yyRuleInfo(175,2),
-			new _yyRuleInfo(175,2),
-			new _yyRuleInfo(223,1),
-			new _yyRuleInfo(223,2),
-			new _yyRuleInfo(175,5),
-			new _yyRuleInfo(224,1),
-			new _yyRuleInfo(224,2),
-			new _yyRuleInfo(175,5),
-			new _yyRuleInfo(175,3),
-			new _yyRuleInfo(175,5),
-			new _yyRuleInfo(175,4),
-			new _yyRuleInfo(175,4),
-			new _yyRuleInfo(175,5),
-			new _yyRuleInfo(226,5),
-			new _yyRuleInfo(226,4),
-			new _yyRuleInfo(227,2),
-			new _yyRuleInfo(227,0),
-			new _yyRuleInfo(225,1),
-			new _yyRuleInfo(225,0),
-			new _yyRuleInfo(221,1),
-			new _yyRuleInfo(221,0),
-			new _yyRuleInfo(216,3),
-			new _yyRuleInfo(216,1),
-			new _yyRuleInfo(147,11),
-			new _yyRuleInfo(228,1),
-			new _yyRuleInfo(228,0),
-			new _yyRuleInfo(179,0),
-			new _yyRuleInfo(179,3),
-			new _yyRuleInfo(187,5),
-			new _yyRuleInfo(187,3),
-			new _yyRuleInfo(229,0),
-			new _yyRuleInfo(229,2),
-			new _yyRuleInfo(147,4),
-			new _yyRuleInfo(147,1),
-			new _yyRuleInfo(147,2),
-			new _yyRuleInfo(147,3),
-			new _yyRuleInfo(147,5),
-			new _yyRuleInfo(147,6),
-			new _yyRuleInfo(147,5),
-			new _yyRuleInfo(147,6),
-			new _yyRuleInfo(230,1),
-			new _yyRuleInfo(230,1),
-			new _yyRuleInfo(230,1),
-			new _yyRuleInfo(230,1),
-			new _yyRuleInfo(230,1),
-			new _yyRuleInfo(170,2),
-			new _yyRuleInfo(171,2),
-			new _yyRuleInfo(232,1),
-			new _yyRuleInfo(231,1),
-			new _yyRuleInfo(231,0),
-			new _yyRuleInfo(147,5),
-			new _yyRuleInfo(233,11),
-			new _yyRuleInfo(235,1),
-			new _yyRuleInfo(235,1),
-			new _yyRuleInfo(235,2),
-			new _yyRuleInfo(235,0),
-			new _yyRuleInfo(236,1),
-			new _yyRuleInfo(236,1),
-			new _yyRuleInfo(236,3),
-			new _yyRuleInfo(237,0),
-			new _yyRuleInfo(237,3),
-			new _yyRuleInfo(238,0),
-			new _yyRuleInfo(238,2),
-			new _yyRuleInfo(234,3),
-			new _yyRuleInfo(234,2),
-			new _yyRuleInfo(240,1),
-			new _yyRuleInfo(240,3),
-			new _yyRuleInfo(241,0),
-			new _yyRuleInfo(241,3),
-			new _yyRuleInfo(241,2),
-			new _yyRuleInfo(239,7),
-			new _yyRuleInfo(239,8),
-			new _yyRuleInfo(239,5),
-			new _yyRuleInfo(239,5),
-			new _yyRuleInfo(239,1),
-			new _yyRuleInfo(175,4),
-			new _yyRuleInfo(175,6),
-			new _yyRuleInfo(191,1),
-			new _yyRuleInfo(191,1),
-			new _yyRuleInfo(191,1),
-			new _yyRuleInfo(147,4),
-			new _yyRuleInfo(147,6),
-			new _yyRuleInfo(147,3),
-			new _yyRuleInfo(243,0),
-			new _yyRuleInfo(243,2),
-			new _yyRuleInfo(242,1),
-			new _yyRuleInfo(242,0),
-			new _yyRuleInfo(147,1),
-			new _yyRuleInfo(147,3),
-			new _yyRuleInfo(147,1),
-			new _yyRuleInfo(147,3),
-			new _yyRuleInfo(147,6),
-			new _yyRuleInfo(147,6),
-			new _yyRuleInfo(244,1),
-			new _yyRuleInfo(245,0),
-			new _yyRuleInfo(245,1),
-			new _yyRuleInfo(147,1),
-			new _yyRuleInfo(147,4),
-			new _yyRuleInfo(246,7),
-			new _yyRuleInfo(247,1),
-			new _yyRuleInfo(247,3),
-			new _yyRuleInfo(248,0),
-			new _yyRuleInfo(248,2),
-			new _yyRuleInfo(249,1),
-			new _yyRuleInfo(249,3),
-			new _yyRuleInfo(250,1),
-			new _yyRuleInfo(251,0),
-			new _yyRuleInfo(251,4),
-			new _yyRuleInfo(251,2),
+
+		#region rule info
+		static _yyRuleInfo[] yyRuleInfo = new _yyRuleInfo[] {
+			new _yyRuleInfo (142, 1),
+			new _yyRuleInfo (143, 2),
+			new _yyRuleInfo (143, 1),
+			new _yyRuleInfo (144, 1),
+			new _yyRuleInfo (144, 3),
+			new _yyRuleInfo (145, 0),
+			new _yyRuleInfo (145, 1),
+			new _yyRuleInfo (145, 3),
+			new _yyRuleInfo (146, 1),
+			new _yyRuleInfo (147, 3),
+			new _yyRuleInfo (149, 0),
+			new _yyRuleInfo (149, 1),
+			new _yyRuleInfo (149, 2),
+			new _yyRuleInfo (148, 0),
+			new _yyRuleInfo (148, 1),
+			new _yyRuleInfo (148, 1),
+			new _yyRuleInfo (148, 1),
+			new _yyRuleInfo (147, 2),
+			new _yyRuleInfo (147, 2),
+			new _yyRuleInfo (147, 2),
+			new _yyRuleInfo (151, 1),
+			new _yyRuleInfo (151, 0),
+			new _yyRuleInfo (147, 2),
+			new _yyRuleInfo (147, 3),
+			new _yyRuleInfo (147, 5),
+			new _yyRuleInfo (147, 2),
+			new _yyRuleInfo (152, 6),
+			new _yyRuleInfo (154, 1),
+			new _yyRuleInfo (156, 0),
+			new _yyRuleInfo (156, 3),
+			new _yyRuleInfo (155, 1),
+			new _yyRuleInfo (155, 0),
+			new _yyRuleInfo (153, 4),
+			new _yyRuleInfo (153, 2),
+			new _yyRuleInfo (158, 3),
+			new _yyRuleInfo (158, 1),
+			new _yyRuleInfo (161, 3),
+			new _yyRuleInfo (162, 1),
+			new _yyRuleInfo (165, 1),
+			new _yyRuleInfo (165, 1),
+			new _yyRuleInfo (166, 1),
+			new _yyRuleInfo (150, 1),
+			new _yyRuleInfo (150, 1),
+			new _yyRuleInfo (150, 1),
+			new _yyRuleInfo (163, 0),
+			new _yyRuleInfo (163, 1),
+			new _yyRuleInfo (167, 1),
+			new _yyRuleInfo (167, 4),
+			new _yyRuleInfo (167, 6),
+			new _yyRuleInfo (168, 1),
+			new _yyRuleInfo (168, 2),
+			new _yyRuleInfo (169, 1),
+			new _yyRuleInfo (169, 1),
+			new _yyRuleInfo (164, 2),
+			new _yyRuleInfo (164, 0),
+			new _yyRuleInfo (172, 3),
+			new _yyRuleInfo (172, 1),
+			new _yyRuleInfo (173, 2),
+			new _yyRuleInfo (173, 4),
+			new _yyRuleInfo (173, 3),
+			new _yyRuleInfo (173, 3),
+			new _yyRuleInfo (173, 2),
+			new _yyRuleInfo (173, 2),
+			new _yyRuleInfo (173, 3),
+			new _yyRuleInfo (173, 5),
+			new _yyRuleInfo (173, 2),
+			new _yyRuleInfo (173, 4),
+			new _yyRuleInfo (173, 4),
+			new _yyRuleInfo (173, 1),
+			new _yyRuleInfo (173, 2),
+			new _yyRuleInfo (178, 0),
+			new _yyRuleInfo (178, 1),
+			new _yyRuleInfo (180, 0),
+			new _yyRuleInfo (180, 2),
+			new _yyRuleInfo (182, 2),
+			new _yyRuleInfo (182, 3),
+			new _yyRuleInfo (182, 3),
+			new _yyRuleInfo (182, 3),
+			new _yyRuleInfo (183, 2),
+			new _yyRuleInfo (183, 2),
+			new _yyRuleInfo (183, 1),
+			new _yyRuleInfo (183, 1),
+			new _yyRuleInfo (183, 2),
+			new _yyRuleInfo (181, 3),
+			new _yyRuleInfo (181, 2),
+			new _yyRuleInfo (184, 0),
+			new _yyRuleInfo (184, 2),
+			new _yyRuleInfo (184, 2),
+			new _yyRuleInfo (159, 0),
+			new _yyRuleInfo (159, 2),
+			new _yyRuleInfo (185, 3),
+			new _yyRuleInfo (185, 2),
+			new _yyRuleInfo (185, 1),
+			new _yyRuleInfo (186, 2),
+			new _yyRuleInfo (186, 7),
+			new _yyRuleInfo (186, 5),
+			new _yyRuleInfo (186, 5),
+			new _yyRuleInfo (186, 10),
+			new _yyRuleInfo (188, 0),
+			new _yyRuleInfo (188, 1),
+			new _yyRuleInfo (176, 0),
+			new _yyRuleInfo (176, 3),
+			new _yyRuleInfo (189, 0),
+			new _yyRuleInfo (189, 2),
+			new _yyRuleInfo (190, 1),
+			new _yyRuleInfo (190, 1),
+			new _yyRuleInfo (190, 1),
+			new _yyRuleInfo (147, 4),
+			new _yyRuleInfo (192, 2),
+			new _yyRuleInfo (192, 0),
+			new _yyRuleInfo (147, 8),
+			new _yyRuleInfo (147, 4),
+			new _yyRuleInfo (147, 1),
+			new _yyRuleInfo (160, 1),
+			new _yyRuleInfo (160, 3),
+			new _yyRuleInfo (195, 1),
+			new _yyRuleInfo (195, 2),
+			new _yyRuleInfo (195, 1),
+			new _yyRuleInfo (194, 9),
+			new _yyRuleInfo (196, 1),
+			new _yyRuleInfo (196, 1),
+			new _yyRuleInfo (196, 0),
+			new _yyRuleInfo (204, 2),
+			new _yyRuleInfo (204, 0),
+			new _yyRuleInfo (197, 3),
+			new _yyRuleInfo (197, 2),
+			new _yyRuleInfo (197, 4),
+			new _yyRuleInfo (205, 2),
+			new _yyRuleInfo (205, 1),
+			new _yyRuleInfo (205, 0),
+			new _yyRuleInfo (198, 0),
+			new _yyRuleInfo (198, 2),
+			new _yyRuleInfo (207, 2),
+			new _yyRuleInfo (207, 0),
+			new _yyRuleInfo (206, 7),
+			new _yyRuleInfo (206, 7),
+			new _yyRuleInfo (206, 7),
+			new _yyRuleInfo (157, 0),
+			new _yyRuleInfo (157, 2),
+			new _yyRuleInfo (193, 2),
+			new _yyRuleInfo (208, 1),
+			new _yyRuleInfo (208, 2),
+			new _yyRuleInfo (208, 3),
+			new _yyRuleInfo (208, 4),
+			new _yyRuleInfo (210, 2),
+			new _yyRuleInfo (210, 0),
+			new _yyRuleInfo (209, 0),
+			new _yyRuleInfo (209, 3),
+			new _yyRuleInfo (209, 2),
+			new _yyRuleInfo (211, 4),
+			new _yyRuleInfo (211, 0),
+			new _yyRuleInfo (202, 0),
+			new _yyRuleInfo (202, 3),
+			new _yyRuleInfo (214, 4),
+			new _yyRuleInfo (214, 2),
+			new _yyRuleInfo (215, 1),
+			new _yyRuleInfo (177, 1),
+			new _yyRuleInfo (177, 1),
+			new _yyRuleInfo (177, 0),
+			new _yyRuleInfo (200, 0),
+			new _yyRuleInfo (200, 3),
+			new _yyRuleInfo (201, 0),
+			new _yyRuleInfo (201, 2),
+			new _yyRuleInfo (203, 0),
+			new _yyRuleInfo (203, 2),
+			new _yyRuleInfo (203, 4),
+			new _yyRuleInfo (203, 4),
+			new _yyRuleInfo (147, 5),
+			new _yyRuleInfo (199, 0),
+			new _yyRuleInfo (199, 2),
+			new _yyRuleInfo (147, 7),
+			new _yyRuleInfo (217, 5),
+			new _yyRuleInfo (217, 3),
+			new _yyRuleInfo (147, 8),
+			new _yyRuleInfo (147, 5),
+			new _yyRuleInfo (147, 6),
+			new _yyRuleInfo (218, 2),
+			new _yyRuleInfo (218, 1),
+			new _yyRuleInfo (220, 3),
+			new _yyRuleInfo (220, 1),
+			new _yyRuleInfo (219, 0),
+			new _yyRuleInfo (219, 3),
+			new _yyRuleInfo (213, 3),
+			new _yyRuleInfo (213, 1),
+			new _yyRuleInfo (175, 1),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (174, 1),
+			new _yyRuleInfo (175, 1),
+			new _yyRuleInfo (175, 1),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 5),
+			new _yyRuleInfo (174, 1),
+			new _yyRuleInfo (174, 1),
+			new _yyRuleInfo (175, 1),
+			new _yyRuleInfo (175, 1),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 6),
+			new _yyRuleInfo (175, 5),
+			new _yyRuleInfo (175, 4),
+			new _yyRuleInfo (174, 1),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (222, 1),
+			new _yyRuleInfo (222, 2),
+			new _yyRuleInfo (222, 1),
+			new _yyRuleInfo (222, 2),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 5),
+			new _yyRuleInfo (175, 2),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 4),
+			new _yyRuleInfo (175, 2),
+			new _yyRuleInfo (175, 2),
+			new _yyRuleInfo (175, 2),
+			new _yyRuleInfo (175, 2),
+			new _yyRuleInfo (223, 1),
+			new _yyRuleInfo (223, 2),
+			new _yyRuleInfo (175, 5),
+			new _yyRuleInfo (224, 1),
+			new _yyRuleInfo (224, 2),
+			new _yyRuleInfo (175, 5),
+			new _yyRuleInfo (175, 3),
+			new _yyRuleInfo (175, 5),
+			new _yyRuleInfo (175, 4),
+			new _yyRuleInfo (175, 4),
+			new _yyRuleInfo (175, 5),
+			new _yyRuleInfo (226, 5),
+			new _yyRuleInfo (226, 4),
+			new _yyRuleInfo (227, 2),
+			new _yyRuleInfo (227, 0),
+			new _yyRuleInfo (225, 1),
+			new _yyRuleInfo (225, 0),
+			new _yyRuleInfo (221, 1),
+			new _yyRuleInfo (221, 0),
+			new _yyRuleInfo (216, 3),
+			new _yyRuleInfo (216, 1),
+			new _yyRuleInfo (147, 11),
+			new _yyRuleInfo (228, 1),
+			new _yyRuleInfo (228, 0),
+			new _yyRuleInfo (179, 0),
+			new _yyRuleInfo (179, 3),
+			new _yyRuleInfo (187, 5),
+			new _yyRuleInfo (187, 3),
+			new _yyRuleInfo (229, 0),
+			new _yyRuleInfo (229, 2),
+			new _yyRuleInfo (147, 4),
+			new _yyRuleInfo (147, 1),
+			new _yyRuleInfo (147, 2),
+			new _yyRuleInfo (147, 3),
+			new _yyRuleInfo (147, 5),
+			new _yyRuleInfo (147, 6),
+			new _yyRuleInfo (147, 5),
+			new _yyRuleInfo (147, 6),
+			new _yyRuleInfo (230, 1),
+			new _yyRuleInfo (230, 1),
+			new _yyRuleInfo (230, 1),
+			new _yyRuleInfo (230, 1),
+			new _yyRuleInfo (230, 1),
+			new _yyRuleInfo (170, 2),
+			new _yyRuleInfo (171, 2),
+			new _yyRuleInfo (232, 1),
+			new _yyRuleInfo (231, 1),
+			new _yyRuleInfo (231, 0),
+			new _yyRuleInfo (147, 5),
+			new _yyRuleInfo (233, 11),
+			new _yyRuleInfo (235, 1),
+			new _yyRuleInfo (235, 1),
+			new _yyRuleInfo (235, 2),
+			new _yyRuleInfo (235, 0),
+			new _yyRuleInfo (236, 1),
+			new _yyRuleInfo (236, 1),
+			new _yyRuleInfo (236, 3),
+			new _yyRuleInfo (237, 0),
+			new _yyRuleInfo (237, 3),
+			new _yyRuleInfo (238, 0),
+			new _yyRuleInfo (238, 2),
+			new _yyRuleInfo (234, 3),
+			new _yyRuleInfo (234, 2),
+			new _yyRuleInfo (240, 1),
+			new _yyRuleInfo (240, 3),
+			new _yyRuleInfo (241, 0),
+			new _yyRuleInfo (241, 3),
+			new _yyRuleInfo (241, 2),
+			new _yyRuleInfo (239, 7),
+			new _yyRuleInfo (239, 8),
+			new _yyRuleInfo (239, 5),
+			new _yyRuleInfo (239, 5),
+			new _yyRuleInfo (239, 1),
+			new _yyRuleInfo (175, 4),
+			new _yyRuleInfo (175, 6),
+			new _yyRuleInfo (191, 1),
+			new _yyRuleInfo (191, 1),
+			new _yyRuleInfo (191, 1),
+			new _yyRuleInfo (147, 4),
+			new _yyRuleInfo (147, 6),
+			new _yyRuleInfo (147, 3),
+			new _yyRuleInfo (243, 0),
+			new _yyRuleInfo (243, 2),
+			new _yyRuleInfo (242, 1),
+			new _yyRuleInfo (242, 0),
+			new _yyRuleInfo (147, 1),
+			new _yyRuleInfo (147, 3),
+			new _yyRuleInfo (147, 1),
+			new _yyRuleInfo (147, 3),
+			new _yyRuleInfo (147, 6),
+			new _yyRuleInfo (147, 6),
+			new _yyRuleInfo (244, 1),
+			new _yyRuleInfo (245, 0),
+			new _yyRuleInfo (245, 1),
+			new _yyRuleInfo (147, 1),
+			new _yyRuleInfo (147, 4),
+			new _yyRuleInfo (246, 7),
+			new _yyRuleInfo (247, 1),
+			new _yyRuleInfo (247, 3),
+			new _yyRuleInfo (248, 0),
+			new _yyRuleInfo (248, 2),
+			new _yyRuleInfo (249, 1),
+			new _yyRuleInfo (249, 3),
+			new _yyRuleInfo (250, 1),
+			new _yyRuleInfo (251, 0),
+			new _yyRuleInfo (251, 4),
+			new _yyRuleInfo (251, 2),
 		};
 
-        #endregion
-        //static void yy_accept(yyParser*);  /* Forward Declaration */
-		/*
-    ** Perform a reduce action and the shift that must immediately
-    ** follow the reduce.
-    */static void yy_reduce(yyParser yypParser,/* The parser */int yyruleno/* Number of the rule by which to reduce */) {
+		#endregion
+		//static void yy_accept(yyParser*);  /* Forward Declaration */
+		///
+///<summary>
+///Perform a reduce action and the shift that must immediately
+///follow the reduce.
+///
+///</summary>
+
+		static void yy_reduce (yyParser yypParser, ///
+///<summary>
+///The parser 
+///</summary>
+
+		int yyruleno///
+///<summary>
+///Number of the rule by which to reduce 
+///</summary>
+
+		)
+		{
 			int yygoto;
-			/* The next state */int yyact;
-			/* The next action */YYMINORTYPE yygotominor;
-			/* The LHS of the rule reduced */yymsp yymsp;
+			///
+///<summary>
+///The next state 
+///</summary>
+
+			int yyact;
+			///
+///<summary>
+///The next action 
+///</summary>
+
+			YYMINORTYPE yygotominor;
+			///
+///<summary>
+///The LHS of the rule reduced 
+///</summary>
+
+			yymsp yymsp;
 			// yyStackEntry[] yymsp = new yyStackEntry[0];            /* The top of the parser's stack */
 			int yysize;
-			/* Amount to pop the stack */Parse pParse=yypParser.pParse;
+			///
+///<summary>
+///Amount to pop the stack 
+///</summary>
+
+			Parse pParse = yypParser.pParse;
 			//sqlite3ParserARG_FETCH;
-			yymsp=new yymsp(ref yypParser,yypParser.yyidx);
+			yymsp = new yymsp (ref yypParser, yypParser.yyidx);
 			//      yymsp[0] = yypParser.yystack[yypParser.yyidx];
 			#if !NDEBUG
-																																																																		      if ( yyTraceFILE != null && yyruleno >= 0
+																																																																					      if ( yyTraceFILE != null && yyruleno >= 0
       && yyruleno < yyRuleName.Length )
       { //(int)(yyRuleName.Length/sizeof(yyRuleName[0])) ){
         fprintf( yyTraceFILE, "%sReduce [%s].\n", yyTracePrompt,
         yyRuleName[yyruleno] );
       }
 #endif
-			/* Silence complaints from purify about yygotominor being uninitialized
-** in some cases when it is copied into the stack after the following
-** switch.  yygotominor is uninitialized when a rule reduces that does
-** not set the value of its left-hand side nonterminal.  Leaving the
-** value of the nonterminal uninitialized is utterly harmless as long
-** as the value is never used.  So really the only thing this code
-** accomplishes is to quieten purify.
-**
-** 2007-01-16:  The wireshark project (www.wireshark.org) reports that
-** without this code, their parser segfaults.  I'm not sure what there
-** parser is doing to make this happen.  This is the second bug report
-** from wireshark this week.  Clearly they are stressing Lemon in ways
-** that it has not been previously stressed...  (SQLite ticket #2172)
-*/yygotominor=new YYMINORTYPE();
+			///
+///<summary>
+///Silence complaints from purify about yygotominor being uninitialized
+///in some cases when it is copied into the stack after the following
+///switch.  yygotominor is uninitialized when a rule reduces that does
+///</summary>
+///<param name="not set the value of its left">hand side nonterminal.  Leaving the</param>
+///<param name="value of the nonterminal uninitialized is utterly harmless as long">value of the nonterminal uninitialized is utterly harmless as long</param>
+///<param name="as the value is never used.  So really the only thing this code">as the value is never used.  So really the only thing this code</param>
+///<param name="accomplishes is to quieten purify.">accomplishes is to quieten purify.</param>
+///<param name=""></param>
+///<param name="2007">16:  The wireshark project (www.wireshark.org) reports that</param>
+///<param name="without this code, their parser segfaults.  I'm not sure what there">without this code, their parser segfaults.  I'm not sure what there</param>
+///<param name="parser is doing to make this happen.  This is the second bug report">parser is doing to make this happen.  This is the second bug report</param>
+///<param name="from wireshark this week.  Clearly they are stressing Lemon in ways">from wireshark this week.  Clearly they are stressing Lemon in ways</param>
+///<param name="that it has not been previously stressed...  (SQLite ticket #2172)">that it has not been previously stressed...  (SQLite ticket #2172)</param>
+
+			yygotominor = new YYMINORTYPE ();
 			//memset(yygotominor, 0, yygotominor).Length;
-			switch(yyruleno) {
-			/* Beginning here are the reduction cases.  A typical example
-        ** follows:
-        **   case 0:
-        **  //#line <lineno> <grammarfile>
-        **     { ... }           // User supplied code
-        **  //#line <lineno> <thisfile>
-        **     break;
-        */case 5:
-			/* explain ::= *///#line 107 "parse.y"
-			{
-				sqlite3BeginParse(pParse,0);
-			}
-			//#line 2107 "parse.c"
-			break;
+			switch (yyruleno) {
+			///
+///<summary>
+///Beginning here are the reduction cases.  A typical example
+///follows:
+///case 0:
+/////#line <lineno> <grammarfile>
+///{ ... }           // User supplied code
+/////#line <lineno> <thisfile>
+///break;
+///
+///</summary>
+
+			case 5:
+				///
+///<summary>
+///explain ::= 
+///</summary>
+
+				//#line 107 "parse.y"
+				{
+					sqlite3BeginParse (pParse, 0);
+				}
+				//#line 2107 "parse.c"
+				break;
 			case 6:
-			/* explain ::= EXPLAIN *///#line 109 "parse.y"
-			{
-				sqlite3BeginParse(pParse,1);
-			}
-			//#line 2112 "parse.c"
-			break;
+				///
+///<summary>
+///explain ::= EXPLAIN 
+///</summary>
+
+				//#line 109 "parse.y"
+				{
+					sqlite3BeginParse (pParse, 1);
+				}
+				//#line 2112 "parse.c"
+				break;
 			case 7:
-			/* explain ::= EXPLAIN QUERY PLAN *///#line 110 "parse.y"
-			{
-				sqlite3BeginParse(pParse,2);
-			}
-			//#line 2117 "parse.c"
-			break;
+				///
+///<summary>
+///explain ::= EXPLAIN QUERY PLAN 
+///</summary>
+
+				//#line 110 "parse.y"
+				{
+					sqlite3BeginParse (pParse, 2);
+				}
+				//#line 2117 "parse.c"
+				break;
 			case 8:
-			/* cmdx ::= cmd *///#line 112 "parse.y"
-			{
-				sqlite3FinishCoding(pParse);
-			}
-			//#line 2122 "parse.c"
-			break;
+				///
+///<summary>
+///cmdx ::= cmd 
+///</summary>
+
+				//#line 112 "parse.y"
+				{
+					sqlite3FinishCoding (pParse);
+				}
+				//#line 2122 "parse.c"
+				break;
 			case 9:
-			/* cmd ::= BEGIN transtype trans_opt *///#line 117 "parse.y"
-			{
-				sqlite3BeginTransaction(pParse,yymsp[-1].minor.yy4);
-			}
-			//#line 2127 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= BEGIN transtype trans_opt 
+///</summary>
+
+				//#line 117 "parse.y"
+				{
+					sqlite3BeginTransaction (pParse, yymsp [-1].minor.yy4);
+				}
+				//#line 2127 "parse.c"
+				break;
 			case 13:
-			/* transtype ::= *///#line 122 "parse.y"
-			{
-				yygotominor.yy4=TK_DEFERRED;
-			}
-			//#line 2132 "parse.c"
-			break;
+				///
+///<summary>
+///transtype ::= 
+///</summary>
+
+				//#line 122 "parse.y"
+				{
+					yygotominor.yy4 = TK_DEFERRED;
+				}
+				//#line 2132 "parse.c"
+				break;
 			case 14:
-			/* transtype ::= DEFERRED */case 15:
-			/* transtype ::= IMMEDIATE *///yytestcase(yyruleno==15);
+			///
+///<summary>
+///transtype ::= DEFERRED 
+///</summary>
+
+			case 15:
+			///
+///<summary>
+///transtype ::= IMMEDIATE 
+///</summary>
+
+			//yytestcase(yyruleno==15);
 			case 16:
-			/* transtype ::= EXCLUSIVE *///yytestcase(yyruleno==16);
+			///
+///<summary>
+///transtype ::= EXCLUSIVE 
+///</summary>
+
+			//yytestcase(yyruleno==16);
 			case 115:
-			/* multiselect_op ::= UNION *///yytestcase(yyruleno==114);
+			///
+///<summary>
+///multiselect_op ::= UNION 
+///</summary>
+
+			//yytestcase(yyruleno==114);
 			case 117:
-			/* multiselect_op ::= EXCEPT|INTERSECT *///yytestcase(yyruleno==116);
-			//#line 123 "parse.y"
-			{
-				yygotominor.yy4=yymsp[0].major;
-			}
-			//#line 2141 "parse.c"
-			break;
+				///
+///<summary>
+///multiselect_op ::= EXCEPT|INTERSECT 
+///</summary>
+
+				//yytestcase(yyruleno==116);
+				//#line 123 "parse.y"
+				{
+					yygotominor.yy4 = yymsp [0].major;
+				}
+				//#line 2141 "parse.c"
+				break;
 			case 17:
-			/* cmd ::= COMMIT trans_opt */case 18:
-			/* cmd ::= END trans_opt *///yytestcase(yyruleno==18);
-			//#line 126 "parse.y"
-			{
-				sqlite3CommitTransaction(pParse);
-			}
-			//#line 2147 "parse.c"
-			break;
+			///
+///<summary>
+///cmd ::= COMMIT trans_opt 
+///</summary>
+
+			case 18:
+				///
+///<summary>
+///cmd ::= END trans_opt 
+///</summary>
+
+				//yytestcase(yyruleno==18);
+				//#line 126 "parse.y"
+				{
+					sqlite3CommitTransaction (pParse);
+				}
+				//#line 2147 "parse.c"
+				break;
 			case 19:
-			/* cmd ::= ROLLBACK trans_opt *///#line 128 "parse.y"
-			{
-				sqlite3RollbackTransaction(pParse);
-			}
-			//#line 2152 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= ROLLBACK trans_opt 
+///</summary>
+
+				//#line 128 "parse.y"
+				{
+					sqlite3RollbackTransaction (pParse);
+				}
+				//#line 2152 "parse.c"
+				break;
 			case 22:
-			/* cmd ::= SAVEPOINT nm *///#line 132 "parse.y"
-			{
-				sqlite3Savepoint(pParse,SAVEPOINT_BEGIN,yymsp[0].minor.yy0Token);
-			}
-			//#line 2159 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= SAVEPOINT nm 
+///</summary>
+
+				//#line 132 "parse.y"
+				{
+					sqlite3Savepoint (pParse, SAVEPOINT_BEGIN, yymsp [0].minor.yy0Token);
+				}
+				//#line 2159 "parse.c"
+				break;
 			case 23:
-			/* cmd ::= RELEASE savepoint_opt nm *///#line 135 "parse.y"
-			{
-				sqlite3Savepoint(pParse,SAVEPOINT_RELEASE,yymsp[0].minor.yy0Token);
-			}
-			//#line 2166 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= RELEASE savepoint_opt nm 
+///</summary>
+
+				//#line 135 "parse.y"
+				{
+					sqlite3Savepoint (pParse, SAVEPOINT_RELEASE, yymsp [0].minor.yy0Token);
+				}
+				//#line 2166 "parse.c"
+				break;
 			case 24:
-			/* cmd ::= ROLLBACK trans_opt TO savepoint_opt nm *///#line 138 "parse.y"
-			{
-				sqlite3Savepoint(pParse,SAVEPOINT_ROLLBACK,yymsp[0].minor.yy0Token);
-			}
-			//#line 2173 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= ROLLBACK trans_opt TO savepoint_opt nm 
+///</summary>
+
+				//#line 138 "parse.y"
+				{
+					sqlite3Savepoint (pParse, SAVEPOINT_ROLLBACK, yymsp [0].minor.yy0Token);
+				}
+				//#line 2173 "parse.c"
+				break;
 			case 26:
-			/* create_table ::= createkw temp TABLE ifnotexists nm dbnm *///#line 145 "parse.y"
-			{
-				sqlite3StartTable(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token,yymsp[-4].minor.yy4,0,0,yymsp[-2].minor.yy4);
-			}
-			//#line 2180 "parse.c"
-			break;
+				///
+///<summary>
+///create_table ::= createkw temp TABLE ifnotexists nm dbnm 
+///</summary>
+
+				//#line 145 "parse.y"
+				{
+					sqlite3StartTable (pParse, yymsp [-1].minor.yy0Token, yymsp [0].minor.yy0Token, yymsp [-4].minor.yy4, 0, 0, yymsp [-2].minor.yy4);
+				}
+				//#line 2180 "parse.c"
+				break;
 			case 27:
-			/* createkw ::= CREATE *///#line 148 "parse.y"
-			{
-				pParse.db.lookaside.bEnabled=0;
-				yygotominor.yy0Token=yymsp[0].minor.yy0Token;
-			}
-			//#line 2188 "parse.c"
-			break;
+				///
+///<summary>
+///createkw ::= CREATE 
+///</summary>
+
+				//#line 148 "parse.y"
+				{
+					pParse.db.lookaside.bEnabled = 0;
+					yygotominor.yy0Token = yymsp [0].minor.yy0Token;
+				}
+				//#line 2188 "parse.c"
+				break;
 			case 28:
-			/* ifnotexists ::= */case 31:
-			/* temp ::= *///yytestcase(yyruleno == 31);
+			///
+///<summary>
+///ifnotexists ::= 
+///</summary>
+
+			case 31:
+			///
+///<summary>
+///temp ::= 
+///</summary>
+
+			//yytestcase(yyruleno == 31);
 			case 70:
-			/* autoinc ::= *///yytestcase(yyruleno == 70);
+			///
+///<summary>
+///autoinc ::= 
+///</summary>
+
+			//yytestcase(yyruleno == 70);
 			case 83:
-			/* defer_subclause ::= NOT DEFERRABLE init_deferred_pred_opt *///yytestcase(yyruleno == 83);
+			///
+///<summary>
+///defer_subclause ::= NOT DEFERRABLE init_deferred_pred_opt 
+///</summary>
+
+			//yytestcase(yyruleno == 83);
 			case 85:
-			/* init_deferred_pred_opt ::= *///yytestcase(yyruleno == 85);
+			///
+///<summary>
+///init_deferred_pred_opt ::= 
+///</summary>
+
+			//yytestcase(yyruleno == 85);
 			case 87:
-			/* init_deferred_pred_opt ::= INITIALLY IMMEDIATE *///yytestcase(yyruleno == 87);
+			///
+///<summary>
+///init_deferred_pred_opt ::= INITIALLY IMMEDIATE 
+///</summary>
+
+			//yytestcase(yyruleno == 87);
 			case 98:
-			/* defer_subclause_opt ::= *///yytestcase(yyruleno == 98);
+			///
+///<summary>
+///defer_subclause_opt ::= 
+///</summary>
+
+			//yytestcase(yyruleno == 98);
 			case 109:
-			/* ifexists ::= *///yytestcase(yyruleno == 109);
+			///
+///<summary>
+///ifexists ::= 
+///</summary>
+
+			//yytestcase(yyruleno == 109);
 			case 120:
-			/* distinct ::= ALL *///yytestcase(yyruleno == 120);
+			///
+///<summary>
+///distinct ::= ALL 
+///</summary>
+
+			//yytestcase(yyruleno == 120);
 			case 121:
-			/* distinct ::= *///yytestcase(yyruleno == 121);
+			///
+///<summary>
+///distinct ::= 
+///</summary>
+
+			//yytestcase(yyruleno == 121);
 			case 222:
-			/* between_op ::= BETWEEN *///yytestcase(yyruleno == 223);
+			///
+///<summary>
+///between_op ::= BETWEEN 
+///</summary>
+
+			//yytestcase(yyruleno == 223);
 			case 225:
-			/* in_op ::= IN *///yytestcase(yyruleno == 226);
-			//#line 153 "parse.y"
-			{
-				yygotominor.yy4=0;
-			}
-			//#line 2204 "parse.c"
-			break;
+				///
+///<summary>
+///in_op ::= IN 
+///</summary>
+
+				//yytestcase(yyruleno == 226);
+				//#line 153 "parse.y"
+				{
+					yygotominor.yy4 = 0;
+				}
+				//#line 2204 "parse.c"
+				break;
 			case 29:
-			/* ifnotexists ::= IF NOT EXISTS */case 30:
-			/* temp ::= TEMP *///yytestcase(yyruleno == 30);
+			///
+///<summary>
+///ifnotexists ::= IF NOT EXISTS 
+///</summary>
+
+			case 30:
+			///
+///<summary>
+///temp ::= TEMP 
+///</summary>
+
+			//yytestcase(yyruleno == 30);
 			case 71:
-			/* autoinc ::= AUTOINCR *///yytestcase(yyruleno == 71);
+			///
+///<summary>
+///autoinc ::= AUTOINCR 
+///</summary>
+
+			//yytestcase(yyruleno == 71);
 			case 86:
-			/* init_deferred_pred_opt ::= INITIALLY DEFERRED *///yytestcase(yyruleno == 86);
+			///
+///<summary>
+///init_deferred_pred_opt ::= INITIALLY DEFERRED 
+///</summary>
+
+			//yytestcase(yyruleno == 86);
 			case 108:
-			/* ifexists ::= IF EXISTS *///yytestcase(yyruleno == 108);
+			///
+///<summary>
+///ifexists ::= IF EXISTS 
+///</summary>
+
+			//yytestcase(yyruleno == 108);
 			case 119:
-			/* distinct ::= DISTINCT *///yytestcase(yyruleno == 119);
+			///
+///<summary>
+///distinct ::= DISTINCT 
+///</summary>
+
+			//yytestcase(yyruleno == 119);
 			case 223:
-			/* between_op ::= NOT BETWEEN *///yytestcase(yyruleno == 224);
+			///
+///<summary>
+///between_op ::= NOT BETWEEN 
+///</summary>
+
+			//yytestcase(yyruleno == 224);
 			case 226:
-			/* in_op ::= NOT IN *///yytestcase(yyruleno == 227);
-			//#line 154 "parse.y"
-			{
-				yygotominor.yy4=1;
-			}
-			//#line 2216 "parse.c"
-			break;
+				///
+///<summary>
+///in_op ::= NOT IN 
+///</summary>
+
+				//yytestcase(yyruleno == 227);
+				//#line 154 "parse.y"
+				{
+					yygotominor.yy4 = 1;
+				}
+				//#line 2216 "parse.c"
+				break;
 			case 32:
-			/* create_table_args ::= LP columnlist conslist_opt RP *///#line 160 "parse.y"
-			{
-				sqlite3EndTable(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token,0);
-			}
-			//#line 2223 "parse.c"
-			break;
+				///
+///<summary>
+///create_table_args ::= LP columnlist conslist_opt RP 
+///</summary>
+
+				//#line 160 "parse.y"
+				{
+					sqlite3EndTable (pParse, yymsp [-1].minor.yy0Token, yymsp [0].minor.yy0Token, 0);
+				}
+				//#line 2223 "parse.c"
+				break;
 			case 33:
-			/* create_table_args ::= AS select *///#line 163 "parse.y"
-			{
-				sqlite3EndTable(pParse,0,0,yymsp[0].minor.yy387);
-				sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387);
-			}
-			//#line 2231 "parse.c"
-			break;
+				///
+///<summary>
+///create_table_args ::= AS select 
+///</summary>
+
+				//#line 163 "parse.y"
+				{
+					sqlite3EndTable (pParse, 0, 0, yymsp [0].minor.yy387);
+					sqlite3SelectDelete (pParse.db, ref yymsp [0].minor.yy387);
+				}
+				//#line 2231 "parse.c"
+				break;
 			case 36:
-			/* column ::= columnid type carglist *///#line 175 "parse.y"
-			{
-				//yygotominor.yy0.z = yymsp[-2].minor.yy0.z;
-				//yygotominor.yy0.n = (int)( pParse.sLastToken.z - yymsp[-2].minor.yy0.z ) + pParse.sLastToken.n; 
-				yygotominor.yy0Token.Length=(int)(yymsp[-2].minor.yy0Token.zRestSql.Length-pParse.sLastToken.zRestSql.Length)+pParse.sLastToken.Length;
-				yygotominor.yy0Token.zRestSql=yymsp[-2].minor.yy0Token.zRestSql.Substring(0,yygotominor.yy0Token.Length);
-			}
-			//#line 2239 "parse.c"
-			break;
+				///
+///<summary>
+///column ::= columnid type carglist 
+///</summary>
+
+				//#line 175 "parse.y"
+				{
+					//yygotominor.yy0.z = yymsp[-2].minor.yy0.z;
+					//yygotominor.yy0.n = (int)( pParse.sLastToken.z - yymsp[-2].minor.yy0.z ) + pParse.sLastToken.n; 
+					yygotominor.yy0Token.Length = (int)(yymsp [-2].minor.yy0Token.zRestSql.Length - pParse.sLastToken.zRestSql.Length) + pParse.sLastToken.Length;
+					yygotominor.yy0Token.zRestSql = yymsp [-2].minor.yy0Token.zRestSql.Substring (0, yygotominor.yy0Token.Length);
+				}
+				//#line 2239 "parse.c"
+				break;
 			case 37:
-			/* columnid ::= nm *///#line 179 "parse.y"
-			{
-				sqlite3AddColumn(pParse,yymsp[0].minor.yy0Token);
-				yygotominor.yy0Token=yymsp[0].minor.yy0Token;
-			}
-			//#line 2247 "parse.c"
-			break;
+				///
+///<summary>
+///columnid ::= nm 
+///</summary>
+
+				//#line 179 "parse.y"
+				{
+					sqlite3AddColumn (pParse, yymsp [0].minor.yy0Token);
+					yygotominor.yy0Token = yymsp [0].minor.yy0Token;
+				}
+				//#line 2247 "parse.c"
+				break;
 			case 38:
-			/* id ::= ID */case 39:
-			/* id ::= INDEXED *///yytestcase(yyruleno==39);
+			///
+///<summary>
+///id ::= ID 
+///</summary>
+
+			case 39:
+			///
+///<summary>
+///id ::= INDEXED 
+///</summary>
+
+			//yytestcase(yyruleno==39);
 			case 40:
-			/* ids ::= ID|STRING *///yytestcase(yyruleno==40);
+			///
+///<summary>
+///ids ::= ID|STRING 
+///</summary>
+
+			//yytestcase(yyruleno==40);
 			case 41:
-			/* nm ::= id *///yytestcase(yyruleno==41);
+			///
+///<summary>
+///nm ::= id 
+///</summary>
+
+			//yytestcase(yyruleno==41);
 			case 42:
-			/* nm ::= STRING *///yytestcase(yyruleno==42);
+			///
+///<summary>
+///nm ::= STRING 
+///</summary>
+
+			//yytestcase(yyruleno==42);
 			case 43:
-			/* nm ::= JOIN_KW *///yytestcase(yyruleno==43);
+			///
+///<summary>
+///nm ::= JOIN_KW 
+///</summary>
+
+			//yytestcase(yyruleno==43);
 			case 46:
-			/* typetoken ::= typename *///yytestcase(yyruleno==46);
+			///
+///<summary>
+///typetoken ::= typename 
+///</summary>
+
+			//yytestcase(yyruleno==46);
 			case 49:
-			/* typename ::= ids *///yytestcase(yyruleno==49);
+			///
+///<summary>
+///typename ::= ids 
+///</summary>
+
+			//yytestcase(yyruleno==49);
 			case 127:
-			/* as ::= AS nm */////yytestcase(yyruleno == 127);
+			///
+///<summary>
+///as ::= AS nm 
+///</summary>
+
+			////yytestcase(yyruleno == 127);
 			case 128:
-			/* as ::= ids */////yytestcase(yyruleno == 128);
+			///
+///<summary>
+///as ::= ids 
+///</summary>
+
+			////yytestcase(yyruleno == 128);
 			case 138:
-			/* dbnm ::= DOT nm */////yytestcase(yyruleno == 138);
+			///
+///<summary>
+///dbnm ::= DOT nm 
+///</summary>
+
+			////yytestcase(yyruleno == 138);
 			case 147:
-			/* indexed_opt ::= INDEXED BY nm */////yytestcase(yyruleno == 147);
+			///
+///<summary>
+///indexed_opt ::= INDEXED BY nm 
+///</summary>
+
+			////yytestcase(yyruleno == 147);
 			case 251:
-			/* collate ::= COLLATE ids *///testcase(yyruleno == 251);
+			///
+///<summary>
+///collate ::= COLLATE ids 
+///</summary>
+
+			//testcase(yyruleno == 251);
 			case 260:
-			/* nmnum ::= plus_num *///testcase(yyruleno == 260);
+			///
+///<summary>
+///nmnum ::= plus_num 
+///</summary>
+
+			//testcase(yyruleno == 260);
 			case 261:
-			/* nmnum ::= nm *///testcase(yyruleno == 261);
+			///
+///<summary>
+///nmnum ::= nm 
+///</summary>
+
+			//testcase(yyruleno == 261);
 			case 262:
-			/* nmnum ::= ON *///testcase(yyruleno == 262);
+			///
+///<summary>
+///nmnum ::= ON 
+///</summary>
+
+			//testcase(yyruleno == 262);
 			case 263:
-			/* nmnum ::= DELETE *///testcase(yyruleno == 263);
+			///
+///<summary>
+///nmnum ::= DELETE 
+///</summary>
+
+			//testcase(yyruleno == 263);
 			case 264:
-			/* nmnum ::= DEFAULT *///testcase(yyruleno == 264);
+			///
+///<summary>
+///nmnum ::= DEFAULT 
+///</summary>
+
+			//testcase(yyruleno == 264);
 			case 265:
-			/* plus_num ::= plus_opt number *///testcase(yyruleno == 265);
+			///
+///<summary>
+///plus_num ::= plus_opt number 
+///</summary>
+
+			//testcase(yyruleno == 265);
 			case 266:
-			/* minus_num ::= MINUS number *///testcase(yyruleno == 266);
+			///
+///<summary>
+///minus_num ::= MINUS number 
+///</summary>
+
+			//testcase(yyruleno == 266);
 			case 267:
-			/* number ::= INTEGER|FLOAT *///testcase(yyruleno == 267);
+			///
+///<summary>
+///number ::= INTEGER|FLOAT 
+///</summary>
+
+			//testcase(yyruleno == 267);
 			case 285:
-			/* trnm ::= nm *///testcase(yyruleno == 285);
-			//#line 189 "parse.y"
-			{
-				yygotominor.yy0Token=yymsp[0].minor.yy0Token;
-			}
-			//#line 2273 "parse.c"
-			break;
+				///
+///<summary>
+///trnm ::= nm 
+///</summary>
+
+				//testcase(yyruleno == 285);
+				//#line 189 "parse.y"
+				{
+					yygotominor.yy0Token = yymsp [0].minor.yy0Token;
+				}
+				//#line 2273 "parse.c"
+				break;
 			case 45:
-			/* type ::= typetoken *///#line 251 "parse.y"
-			{
-				sqlite3AddColumnType(pParse,yymsp[0].minor.yy0Token);
-			}
-			//#line 2278 "parse.c"
-			break;
+				///
+///<summary>
+///type ::= typetoken 
+///</summary>
+
+				//#line 251 "parse.y"
+				{
+					sqlite3AddColumnType (pParse, yymsp [0].minor.yy0Token);
+				}
+				//#line 2278 "parse.c"
+				break;
 			case 47:
-			/* typetoken ::= typename LP signed RP *///#line 253 "parse.y"
-			{
-				//yygotominor.yy0.z = yymsp[-3].minor.yy0.z;
-				//yygotominor.yy0.n = (int)( &yymsp[0].minor.yy0.z[yymsp[0].minor.yy0.n] - yymsp[-3].minor.yy0.z );
-				yygotominor.yy0Token.Length=yymsp[-3].minor.yy0Token.zRestSql.Length-yymsp[0].minor.yy0Token.zRestSql.Length+yymsp[0].minor.yy0Token.Length;
-				yygotominor.yy0Token.zRestSql=yymsp[-3].minor.yy0Token.zRestSql.Substring(0,yygotominor.yy0Token.Length);
-			}
-			//#line 2286 "parse.c"
-			break;
+				///
+///<summary>
+///typetoken ::= typename LP signed RP 
+///</summary>
+
+				//#line 253 "parse.y"
+				{
+					//yygotominor.yy0.z = yymsp[-3].minor.yy0.z;
+					//yygotominor.yy0.n = (int)( &yymsp[0].minor.yy0.z[yymsp[0].minor.yy0.n] - yymsp[-3].minor.yy0.z );
+					yygotominor.yy0Token.Length = yymsp [-3].minor.yy0Token.zRestSql.Length - yymsp [0].minor.yy0Token.zRestSql.Length + yymsp [0].minor.yy0Token.Length;
+					yygotominor.yy0Token.zRestSql = yymsp [-3].minor.yy0Token.zRestSql.Substring (0, yygotominor.yy0Token.Length);
+				}
+				//#line 2286 "parse.c"
+				break;
 			case 48:
-			/* typetoken ::= typename LP signed COMMA signed RP *///#line 257 "parse.y"
-			{
-				//yygotominor.yy0.z = yymsp[-5].minor.yy0.z;
-				//yygotominor.yy0.n = (int)( &yymsp[0].minor.yy0.z[yymsp[0].minor.yy0.n] - yymsp[-5].minor.yy0.z );
-				yygotominor.yy0Token.Length=yymsp[-5].minor.yy0Token.zRestSql.Length-yymsp[0].minor.yy0Token.zRestSql.Length+1;
-				yygotominor.yy0Token.zRestSql=yymsp[-5].minor.yy0Token.zRestSql.Substring(0,yygotominor.yy0Token.Length);
-			}
-			//#line 2294 "parse.c"
-			break;
+				///
+///<summary>
+///typetoken ::= typename LP signed COMMA signed RP 
+///</summary>
+
+				//#line 257 "parse.y"
+				{
+					//yygotominor.yy0.z = yymsp[-5].minor.yy0.z;
+					//yygotominor.yy0.n = (int)( &yymsp[0].minor.yy0.z[yymsp[0].minor.yy0.n] - yymsp[-5].minor.yy0.z );
+					yygotominor.yy0Token.Length = yymsp [-5].minor.yy0Token.zRestSql.Length - yymsp [0].minor.yy0Token.zRestSql.Length + 1;
+					yygotominor.yy0Token.zRestSql = yymsp [-5].minor.yy0Token.zRestSql.Substring (0, yygotominor.yy0Token.Length);
+				}
+				//#line 2294 "parse.c"
+				break;
 			case 50:
-			/* typename ::= typename ids *///#line 263 "parse.y"
-			{
-				//yygotominor.yy0.z=yymsp[-1].minor.yy0.z; yygotominor.yy0.n=yymsp[0].minor.yy0.n+(int)(yymsp[0].minor.yy0.z-yymsp[-1].minor.yy0.z);
-				yygotominor.yy0Token.zRestSql=yymsp[-1].minor.yy0Token.zRestSql;
-				yygotominor.yy0Token.Length=yymsp[0].minor.yy0Token.Length+(int)(yymsp[-1].minor.yy0Token.zRestSql.Length-yymsp[0].minor.yy0Token.zRestSql.Length);
-			}
-			//#line 2299 "parse.c"
-			break;
+				///
+///<summary>
+///typename ::= typename ids 
+///</summary>
+
+				//#line 263 "parse.y"
+				{
+					//yygotominor.yy0.z=yymsp[-1].minor.yy0.z; yygotominor.yy0.n=yymsp[0].minor.yy0.n+(int)(yymsp[0].minor.yy0.z-yymsp[-1].minor.yy0.z);
+					yygotominor.yy0Token.zRestSql = yymsp [-1].minor.yy0Token.zRestSql;
+					yygotominor.yy0Token.Length = yymsp [0].minor.yy0Token.Length + (int)(yymsp [-1].minor.yy0Token.zRestSql.Length - yymsp [0].minor.yy0Token.zRestSql.Length);
+				}
+				//#line 2299 "parse.c"
+				break;
 			case 57:
-			/* ccons ::= DEFAULT term */case 59:
-			/* ccons ::= DEFAULT PLUS term *///yytestcase(yyruleno==59);
-			//#line 274 "parse.y"
-			{
-				sqlite3AddDefaultValue(pParse,yymsp[0].minor.yy118);
-			}
-			//#line 2308 "parse.c"
-			break;
+			///
+///<summary>
+///ccons ::= DEFAULT term 
+///</summary>
+
+			case 59:
+				///
+///<summary>
+///ccons ::= DEFAULT PLUS term 
+///</summary>
+
+				//yytestcase(yyruleno==59);
+				//#line 274 "parse.y"
+				{
+					sqlite3AddDefaultValue (pParse, yymsp [0].minor.yy118);
+				}
+				//#line 2308 "parse.c"
+				break;
 			case 58:
-			/* ccons ::= DEFAULT LP expr RP *///#line 275 "parse.y"
-			{
-				sqlite3AddDefaultValue(pParse,yymsp[-1].minor.yy118);
-			}
-			//#line 2310 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= DEFAULT LP expr RP 
+///</summary>
+
+				//#line 275 "parse.y"
+				{
+					sqlite3AddDefaultValue (pParse, yymsp [-1].minor.yy118);
+				}
+				//#line 2310 "parse.c"
+				break;
 			case 60:
-			/* ccons ::= DEFAULT MINUS term *///#line 277 "parse.y"
-			{
-				ExprSpan v=new ExprSpan();
-				v.pExpr=pParse.sqlite3PExpr(TK_UMINUS,yymsp[0].minor.yy118.pExpr,0,0);
-				v.zStart=yymsp[-1].minor.yy0Token.zRestSql;
-				v.zEnd=yymsp[0].minor.yy118.zEnd;
-				sqlite3AddDefaultValue(pParse,v);
-			}
-			//#line 2321 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= DEFAULT MINUS term 
+///</summary>
+
+				//#line 277 "parse.y"
+				{
+					ExprSpan v = new ExprSpan ();
+					v.pExpr = pParse.sqlite3PExpr (TK_UMINUS, yymsp [0].minor.yy118.pExpr, 0, 0);
+					v.zStart = yymsp [-1].minor.yy0Token.zRestSql;
+					v.zEnd = yymsp [0].minor.yy118.zEnd;
+					sqlite3AddDefaultValue (pParse, v);
+				}
+				//#line 2321 "parse.c"
+				break;
 			case 61:
-			/* ccons ::= DEFAULT id *///#line 284 "parse.y"
-			{
-				ExprSpan v=new ExprSpan();
-				v.spanExpr(pParse,TK_STRING,yymsp[0].minor.yy0Token);
-				sqlite3AddDefaultValue(pParse,v);
-			}
-			//#line 2330 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= DEFAULT id 
+///</summary>
+
+				//#line 284 "parse.y"
+				{
+					ExprSpan v = new ExprSpan ();
+					v.spanExpr (pParse, TK_STRING, yymsp [0].minor.yy0Token);
+					sqlite3AddDefaultValue (pParse, v);
+				}
+				//#line 2330 "parse.c"
+				break;
 			case 63:
-			/* ccons ::= NOT NULL onconf *///#line 294 "parse.y"
-			{
-				sqlite3AddNotNull(pParse,yymsp[0].minor.yy4);
-			}
-			//#line 2335 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= NOT NULL onconf 
+///</summary>
+
+				//#line 294 "parse.y"
+				{
+					sqlite3AddNotNull (pParse, yymsp [0].minor.yy4);
+				}
+				//#line 2335 "parse.c"
+				break;
 			case 64:
-			/* ccons ::= PRIMARY KEY sortorder onconf autoinc *///#line 296 "parse.y"
-			{
-				sqlite3AddPrimaryKey(pParse,0,yymsp[-1].minor.yy4,yymsp[0].minor.yy4,yymsp[-2].minor.yy4);
-			}
-			//#line 2340 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= PRIMARY KEY sortorder onconf autoinc 
+///</summary>
+
+				//#line 296 "parse.y"
+				{
+					sqlite3AddPrimaryKey (pParse, 0, yymsp [-1].minor.yy4, yymsp [0].minor.yy4, yymsp [-2].minor.yy4);
+				}
+				//#line 2340 "parse.c"
+				break;
 			case 65:
-			/* ccons ::= UNIQUE onconf *///#line 297 "parse.y"
-			{
-				sqlite3CreateIndex(pParse,0,0,0,0,yymsp[0].minor.yy4,0,0,0,0);
-			}
-			//#line 2345 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= UNIQUE onconf 
+///</summary>
+
+				//#line 297 "parse.y"
+				{
+					sqlite3CreateIndex (pParse, 0, 0, 0, 0, yymsp [0].minor.yy4, 0, 0, 0, 0);
+				}
+				//#line 2345 "parse.c"
+				break;
 			case 66:
-			/* ccons ::= CHECK LP expr RP *///#line 298 "parse.y"
-			{
-				sqlite3AddCheckConstraint(pParse,yymsp[-1].minor.yy118.pExpr);
-			}
-			//#line 2350 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= CHECK LP expr RP 
+///</summary>
+
+				//#line 298 "parse.y"
+				{
+					sqlite3AddCheckConstraint (pParse, yymsp [-1].minor.yy118.pExpr);
+				}
+				//#line 2350 "parse.c"
+				break;
 			case 67:
-			/* ccons ::= REFERENCES nm idxlist_opt refargs *///#line 300 "parse.y"
-			{
-				sqlite3CreateForeignKey(pParse,0,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy322,yymsp[0].minor.yy4);
-			}
-			//#line 2355 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= REFERENCES nm idxlist_opt refargs 
+///</summary>
+
+				//#line 300 "parse.y"
+				{
+					sqlite3CreateForeignKey (pParse, 0, yymsp [-2].minor.yy0Token, yymsp [-1].minor.yy322, yymsp [0].minor.yy4);
+				}
+				//#line 2355 "parse.c"
+				break;
 			case 68:
-			/* ccons ::= defer_subclause *///#line 301 "parse.y"
-			{
-				sqlite3DeferForeignKey(pParse,yymsp[0].minor.yy4);
-			}
-			//#line 2360 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= defer_subclause 
+///</summary>
+
+				//#line 301 "parse.y"
+				{
+					sqlite3DeferForeignKey (pParse, yymsp [0].minor.yy4);
+				}
+				//#line 2360 "parse.c"
+				break;
 			case 69:
-			/* ccons ::= COLLATE ids *///#line 302 "parse.y"
-			{
-				sqlite3AddCollateType(pParse,yymsp[0].minor.yy0Token);
-			}
-			//#line 2365 "parse.c"
-			break;
+				///
+///<summary>
+///ccons ::= COLLATE ids 
+///</summary>
+
+				//#line 302 "parse.y"
+				{
+					sqlite3AddCollateType (pParse, yymsp [0].minor.yy0Token);
+				}
+				//#line 2365 "parse.c"
+				break;
 			case 72:
-			/* refargs ::= *///#line 315 "parse.y"
-			{
-				yygotominor.yy4=OE_None*0x0101;
-				/* EV: R-19803-45884 */}
-			//#line 2370 "parse.c"
-			break;
+				///
+///<summary>
+///refargs ::= 
+///</summary>
+
+				//#line 315 "parse.y"
+				{
+					yygotominor.yy4 = OE_None * 0x0101;
+					///
+///<summary>
+///</summary>
+///<param name="EV: R">45884 </param>
+
+				}
+				//#line 2370 "parse.c"
+				break;
 			case 73:
-			/* refargs ::= refargs refarg *///#line 316 "parse.y"
-			{
-				yygotominor.yy4=(yymsp[-1].minor.yy4&~yymsp[0].minor.yy215.mask)|yymsp[0].minor.yy215.value;
-			}
-			//#line 2375 "parse.c"
-			break;
+				///
+///<summary>
+///refargs ::= refargs refarg 
+///</summary>
+
+				//#line 316 "parse.y"
+				{
+					yygotominor.yy4 = (yymsp [-1].minor.yy4 & ~yymsp [0].minor.yy215.mask) | yymsp [0].minor.yy215.value;
+				}
+				//#line 2375 "parse.c"
+				break;
 			case 74:
-			/* refarg ::= MATCH nm */case 75:
-			/* refarg ::= ON INSERT refact *///yytestcase(yyruleno==75);
-			//#line 318 "parse.y"
-			{
-				yygotominor.yy215.value=0;
-				yygotominor.yy215.mask=0x000000;
-			}
-			//#line 2381 "parse.c"
-			break;
+			///
+///<summary>
+///refarg ::= MATCH nm 
+///</summary>
+
+			case 75:
+				///
+///<summary>
+///refarg ::= ON INSERT refact 
+///</summary>
+
+				//yytestcase(yyruleno==75);
+				//#line 318 "parse.y"
+				{
+					yygotominor.yy215.value = 0;
+					yygotominor.yy215.mask = 0x000000;
+				}
+				//#line 2381 "parse.c"
+				break;
 			case 76:
-			/* refarg ::= ON DELETE refact *///#line 320 "parse.y"
-			{
-				yygotominor.yy215.value=yymsp[0].minor.yy4;
-				yygotominor.yy215.mask=0x0000ff;
-			}
-			//#line 2386 "parse.c"
-			break;
+				///
+///<summary>
+///refarg ::= ON DELETE refact 
+///</summary>
+
+				//#line 320 "parse.y"
+				{
+					yygotominor.yy215.value = yymsp [0].minor.yy4;
+					yygotominor.yy215.mask = 0x0000ff;
+				}
+				//#line 2386 "parse.c"
+				break;
 			case 77:
-			/* refarg ::= ON UPDATE refact *///#line 321 "parse.y"
-			{
-				yygotominor.yy215.value=yymsp[0].minor.yy4<<8;
-				yygotominor.yy215.mask=0x00ff00;
-			}
-			//#line 2391 "parse.c"
-			break;
+				///
+///<summary>
+///refarg ::= ON UPDATE refact 
+///</summary>
+
+				//#line 321 "parse.y"
+				{
+					yygotominor.yy215.value = yymsp [0].minor.yy4 << 8;
+					yygotominor.yy215.mask = 0x00ff00;
+				}
+				//#line 2391 "parse.c"
+				break;
 			case 78:
-			/* refact ::= SET NULL *///#line 323 "parse.y"
-			{
-				yygotominor.yy4=OE_SetNull;
-				/* EV: R-33326-45252 */}
-			//#line 2396 "parse.c"
-			break;
+				///
+///<summary>
+///refact ::= SET NULL 
+///</summary>
+
+				//#line 323 "parse.y"
+				{
+					yygotominor.yy4 = OE_SetNull;
+					///
+///<summary>
+///</summary>
+///<param name="EV: R">45252 </param>
+
+				}
+				//#line 2396 "parse.c"
+				break;
 			case 79:
-			/* refact ::= SET DEFAULT *///#line 324 "parse.y"
-			{
-				yygotominor.yy4=OE_SetDflt;
-				/* EV: R-33326-45252 */}
-			//#line 2401 "parse.c"
-			break;
+				///
+///<summary>
+///refact ::= SET DEFAULT 
+///</summary>
+
+				//#line 324 "parse.y"
+				{
+					yygotominor.yy4 = OE_SetDflt;
+					///
+///<summary>
+///</summary>
+///<param name="EV: R">45252 </param>
+
+				}
+				//#line 2401 "parse.c"
+				break;
 			case 80:
-			/* refact ::= CASCADE *///#line 325 "parse.y"
-			{
-				yygotominor.yy4=OE_Cascade;
-				/* EV: R-33326-45252 */}
-			//#line 2406 "parse.c"
-			break;
+				///
+///<summary>
+///refact ::= CASCADE 
+///</summary>
+
+				//#line 325 "parse.y"
+				{
+					yygotominor.yy4 = OE_Cascade;
+					///
+///<summary>
+///</summary>
+///<param name="EV: R">45252 </param>
+
+				}
+				//#line 2406 "parse.c"
+				break;
 			case 81:
-			/* refact ::= RESTRICT *///#line 326 "parse.y"
-			{
-				yygotominor.yy4=OE_Restrict;
-				/* EV: R-33326-45252 */}
-			//#line 2411 "parse.c"
-			break;
+				///
+///<summary>
+///refact ::= RESTRICT 
+///</summary>
+
+				//#line 326 "parse.y"
+				{
+					yygotominor.yy4 = OE_Restrict;
+					///
+///<summary>
+///</summary>
+///<param name="EV: R">45252 </param>
+
+				}
+				//#line 2411 "parse.c"
+				break;
 			case 82:
-			/* refact ::= NO ACTION *///#line 327 "parse.y"
-			{
-				yygotominor.yy4=OE_None;
-				/* EV: R-33326-45252 */}
-			//#line 2416 "parse.c"
-			break;
+				///
+///<summary>
+///refact ::= NO ACTION 
+///</summary>
+
+				//#line 327 "parse.y"
+				{
+					yygotominor.yy4 = OE_None;
+					///
+///<summary>
+///</summary>
+///<param name="EV: R">45252 </param>
+
+				}
+				//#line 2416 "parse.c"
+				break;
 			case 84:
-			/* defer_subclause ::= DEFERRABLE init_deferred_pred_opt */case 99:
-			/* defer_subclause_opt ::= defer_subclause *///yytestcase(yyruleno==99);
+			///
+///<summary>
+///defer_subclause ::= DEFERRABLE init_deferred_pred_opt 
+///</summary>
+
+			case 99:
+			///
+///<summary>
+///defer_subclause_opt ::= defer_subclause 
+///</summary>
+
+			//yytestcase(yyruleno==99);
 			case 101:
-			/* onconf ::= ON CONFLICT resolvetype *///yytestcase(yyruleno==101);
+			///
+///<summary>
+///onconf ::= ON CONFLICT resolvetype 
+///</summary>
+
+			//yytestcase(yyruleno==101);
 			case 104:
-			/* resolvetype ::= raisetype *///yytestcase(yyruleno==104);
-			//#line 330 "parse.y"
-			{
-				yygotominor.yy4=yymsp[0].minor.yy4;
-			}
-			//#line 2424 "parse.c"
-			break;
+				///
+///<summary>
+///resolvetype ::= raisetype 
+///</summary>
+
+				//yytestcase(yyruleno==104);
+				//#line 330 "parse.y"
+				{
+					yygotominor.yy4 = yymsp [0].minor.yy4;
+				}
+				//#line 2424 "parse.c"
+				break;
 			case 88:
-			/* conslist_opt ::= *///#line 339 "parse.y"
-			{
-				yygotominor.yy0Token.Length=0;
-				yygotominor.yy0Token.zRestSql=null;
-			}
-			//#line 2429 "parse.c"
-			break;
+				///
+///<summary>
+///conslist_opt ::= 
+///</summary>
+
+				//#line 339 "parse.y"
+				{
+					yygotominor.yy0Token.Length = 0;
+					yygotominor.yy0Token.zRestSql = null;
+				}
+				//#line 2429 "parse.c"
+				break;
 			case 89:
-			/* conslist_opt ::= COMMA conslist *///#line 340 "parse.y"
-			{
-				yygotominor.yy0Token=yymsp[-1].minor.yy0Token;
-			}
-			//#line 2434 "parse.c"
-			break;
+				///
+///<summary>
+///conslist_opt ::= COMMA conslist 
+///</summary>
+
+				//#line 340 "parse.y"
+				{
+					yygotominor.yy0Token = yymsp [-1].minor.yy0Token;
+				}
+				//#line 2434 "parse.c"
+				break;
 			case 94:
-			/* tcons ::= PRIMARY KEY LP idxlist autoinc RP onconf *///#line 346 "parse.y"
-			{
-				sqlite3AddPrimaryKey(pParse,yymsp[-3].minor.yy322,yymsp[0].minor.yy4,yymsp[-2].minor.yy4,0);
-			}
-			//#line 2439 "parse.c"
-			break;
+				///
+///<summary>
+///tcons ::= PRIMARY KEY LP idxlist autoinc RP onconf 
+///</summary>
+
+				//#line 346 "parse.y"
+				{
+					sqlite3AddPrimaryKey (pParse, yymsp [-3].minor.yy322, yymsp [0].minor.yy4, yymsp [-2].minor.yy4, 0);
+				}
+				//#line 2439 "parse.c"
+				break;
 			case 95:
-			/* tcons ::= UNIQUE LP idxlist RP onconf *///#line 348 "parse.y"
-			{
-				sqlite3CreateIndex(pParse,0,0,0,yymsp[-2].minor.yy322,yymsp[0].minor.yy4,0,0,0,0);
-			}
-			//#line 2444 "parse.c"
-			break;
+				///
+///<summary>
+///tcons ::= UNIQUE LP idxlist RP onconf 
+///</summary>
+
+				//#line 348 "parse.y"
+				{
+					sqlite3CreateIndex (pParse, 0, 0, 0, yymsp [-2].minor.yy322, yymsp [0].minor.yy4, 0, 0, 0, 0);
+				}
+				//#line 2444 "parse.c"
+				break;
 			case 96:
-			/* tcons ::= CHECK LP expr RP onconf *///#line 350 "parse.y"
-			{
-				sqlite3AddCheckConstraint(pParse,yymsp[-2].minor.yy118.pExpr);
-			}
-			//#line 2449 "parse.c"
-			break;
+				///
+///<summary>
+///tcons ::= CHECK LP expr RP onconf 
+///</summary>
+
+				//#line 350 "parse.y"
+				{
+					sqlite3AddCheckConstraint (pParse, yymsp [-2].minor.yy118.pExpr);
+				}
+				//#line 2449 "parse.c"
+				break;
 			case 97:
-			/* tcons ::= FOREIGN KEY LP idxlist RP REFERENCES nm idxlist_opt refargs defer_subclause_opt *///#line 352 "parse.y"
-			{
-				sqlite3CreateForeignKey(pParse,yymsp[-6].minor.yy322,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy322,yymsp[-1].minor.yy4);
-				sqlite3DeferForeignKey(pParse,yymsp[0].minor.yy4);
-			}
-			//#line 2457 "parse.c"
-			break;
+				///
+///<summary>
+///tcons ::= FOREIGN KEY LP idxlist RP REFERENCES nm idxlist_opt refargs defer_subclause_opt 
+///</summary>
+
+				//#line 352 "parse.y"
+				{
+					sqlite3CreateForeignKey (pParse, yymsp [-6].minor.yy322, yymsp [-3].minor.yy0Token, yymsp [-2].minor.yy322, yymsp [-1].minor.yy4);
+					sqlite3DeferForeignKey (pParse, yymsp [0].minor.yy4);
+				}
+				//#line 2457 "parse.c"
+				break;
 			case 100:
-			/* onconf ::= *///#line 366 "parse.y"
-			{
-				yygotominor.yy4=OE_Default;
-			}
-			//#line 2462 "parse.c"
-			break;
+				///
+///<summary>
+///onconf ::= 
+///</summary>
+
+				//#line 366 "parse.y"
+				{
+					yygotominor.yy4 = OE_Default;
+				}
+				//#line 2462 "parse.c"
+				break;
 			case 102:
-			/* orconf ::= *///#line 368 "parse.y"
-			{
-				yygotominor.yy210=OE_Default;
-			}
-			//#line 2467 "parse.c"
-			break;
+				///
+///<summary>
+///orconf ::= 
+///</summary>
+
+				//#line 368 "parse.y"
+				{
+					yygotominor.yy210 = OE_Default;
+				}
+				//#line 2467 "parse.c"
+				break;
 			case 103:
-			/* orconf ::= OR resolvetype *///#line 369 "parse.y"
-			{
-				yygotominor.yy210=(u8)yymsp[0].minor.yy4;
-			}
-			//#line 2472 "parse.c"
-			break;
+				///
+///<summary>
+///orconf ::= OR resolvetype 
+///</summary>
+
+				//#line 369 "parse.y"
+				{
+					yygotominor.yy210 = (u8)yymsp [0].minor.yy4;
+				}
+				//#line 2472 "parse.c"
+				break;
 			case 105:
-			/* resolvetype ::= IGNORE *///#line 371 "parse.y"
-			{
-				yygotominor.yy4=OE_Ignore;
-			}
-			//#line 2477 "parse.c"
-			break;
+				///
+///<summary>
+///resolvetype ::= IGNORE 
+///</summary>
+
+				//#line 371 "parse.y"
+				{
+					yygotominor.yy4 = OE_Ignore;
+				}
+				//#line 2477 "parse.c"
+				break;
 			case 106:
-			/* resolvetype ::= REPLACE *///#line 372 "parse.y"
-			{
-				yygotominor.yy4=OE_Replace;
-			}
-			//#line 2482 "parse.c"
-			break;
+				///
+///<summary>
+///resolvetype ::= REPLACE 
+///</summary>
+
+				//#line 372 "parse.y"
+				{
+					yygotominor.yy4 = OE_Replace;
+				}
+				//#line 2482 "parse.c"
+				break;
 			case 107:
-			/* cmd ::= DROP TABLE ifexists fullname *///#line 376 "parse.y"
-			{
-				sqlite3DropTable(pParse,yymsp[0].minor.yy259,0,yymsp[-1].minor.yy4);
-			}
-			//#line 2489 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= DROP TABLE ifexists fullname 
+///</summary>
+
+				//#line 376 "parse.y"
+				{
+					sqlite3DropTable (pParse, yymsp [0].minor.yy259, 0, yymsp [-1].minor.yy4);
+				}
+				//#line 2489 "parse.c"
+				break;
 			case 110:
-			/* cmd ::= createkw temp VIEW ifnotexists nm dbnm AS select *///#line 386 "parse.y"
-			{
-				sqlite3CreateView(pParse,yymsp[-7].minor.yy0Token,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy387,yymsp[-6].minor.yy4,yymsp[-4].minor.yy4);
-			}
-			//#line 2496 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= createkw temp VIEW ifnotexists nm dbnm AS select 
+///</summary>
+
+				//#line 386 "parse.y"
+				{
+					sqlite3CreateView (pParse, yymsp [-7].minor.yy0Token, yymsp [-3].minor.yy0Token, yymsp [-2].minor.yy0Token, yymsp [0].minor.yy387, yymsp [-6].minor.yy4, yymsp [-4].minor.yy4);
+				}
+				//#line 2496 "parse.c"
+				break;
 			case 111:
-			/* cmd ::= DROP VIEW ifexists fullname *///#line 389 "parse.y"
-			{
-				sqlite3DropTable(pParse,yymsp[0].minor.yy259,1,yymsp[-1].minor.yy4);
-			}
-			//#line 2503 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= DROP VIEW ifexists fullname 
+///</summary>
+
+				//#line 389 "parse.y"
+				{
+					sqlite3DropTable (pParse, yymsp [0].minor.yy259, 1, yymsp [-1].minor.yy4);
+				}
+				//#line 2503 "parse.c"
+				break;
 			case 112:
-			/* cmd ::= select *///#line 396 "parse.y"
-			{
-				SelectDest dest=new SelectDest(SelectResultType.Output,'\0',0,0,0);
-				sqlite3Select(pParse,yymsp[0].minor.yy387,ref dest);
-				sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387);
-			}
-			//#line 2512 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= select 
+///</summary>
+
+				//#line 396 "parse.y"
+				{
+					SelectDest dest = new SelectDest (SelectResultType.Output, '\0', 0, 0, 0);
+					sqlite3Select (pParse, yymsp [0].minor.yy387, ref dest);
+					sqlite3SelectDelete (pParse.db, ref yymsp [0].minor.yy387);
+				}
+				//#line 2512 "parse.c"
+				break;
 			case 113:
-			/* select ::= oneselect *///#line 407 "parse.y"
-			{
-				yygotominor.yy387=yymsp[0].minor.yy387;
-			}
-			//#line 2517 "parse.c"
-			break;
+				///
+///<summary>
+///select ::= oneselect 
+///</summary>
+
+				//#line 407 "parse.y"
+				{
+					yygotominor.yy387 = yymsp [0].minor.yy387;
+				}
+				//#line 2517 "parse.c"
+				break;
 			case 114:
-			/* select ::= select multiselect_op oneselect *///#line 409 "parse.y"
-			{
-				if(yymsp[0].minor.yy387!=null) {
-					yymsp[0].minor.yy387.tk_op=(u8)yymsp[-1].minor.yy4;
-					yymsp[0].minor.yy387.pPrior=yymsp[-2].minor.yy387;
-				}
-				else {
-					sqlite3SelectDelete(pParse.db,ref yymsp[-2].minor.yy387);
-				}
-				yygotominor.yy387=yymsp[0].minor.yy387;
-			}
-			//#line 2530 "parse.c"
-			break;
-			case 116:
-			/* multiselect_op ::= UNION ALL *///#line 420 "parse.y"
-			{
-				yygotominor.yy4=TK_ALL;
-			}
-			//#line 2535 "parse.c"
-			break;
-			case 118:
-			/* oneselect ::= SELECT distinct selcollist from where_opt groupby_opt having_opt orderby_opt limit_opt *///#line 424 "parse.y"
-			{
-				yygotominor.yy387=sqlite3SelectNew(pParse,yymsp[-6].minor.yy322,yymsp[-5].minor.yy259,yymsp[-4].minor.yy314,yymsp[-3].minor.yy322,yymsp[-2].minor.yy314,yymsp[-1].minor.yy322,yymsp[-7].minor.yy4,yymsp[0].minor.yy292.pLimit,yymsp[0].minor.yy292.pOffset);
-			}
-			//#line 2542 "parse.c"
-			break;
-			case 122:
-			/* sclp ::= selcollist COMMA */case 247:
-			/* idxlist_opt ::= LP idxlist RP *///yytestcase(yyruleno==247);
-			//#line 445 "parse.y"
-			{
-				yygotominor.yy322=yymsp[-1].minor.yy322;
-			}
-			//#line 2548 "parse.c"
-			break;
-			case 123:
-			/* sclp ::= */case 151:
-			/* orderby_opt ::= *///yytestcase(yyruleno==151);
-			case 159:
-			/* groupby_opt ::= *///yytestcase(yyruleno==159);
-			case 240:
-			/* exprlist ::= *///yytestcase(yyruleno==240);
-			case 246:
-			/* idxlist_opt ::= *///yytestcase(yyruleno==246);
-			//#line 446 "parse.y"
-			{
-				yygotominor.yy322=null;
-			}
-			//#line 2557 "parse.c"
-			break;
-			case 124:
-			/* selcollist ::= sclp expr as *///#line 447 "parse.y"
-			{
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-2].minor.yy322,yymsp[-1].minor.yy118.pExpr);
-				if(yymsp[0].minor.yy0Token.Length>0)
-					pParse.sqlite3ExprListSetName(yygotominor.yy322,yymsp[0].minor.yy0Token,1);
-				pParse.sqlite3ExprListSetSpan(yygotominor.yy322,yymsp[-1].minor.yy118);
-			}
-			//#line 2566 "parse.c"
-			break;
-			case 125:
-			/* selcollist ::= sclp STAR *///#line 452 "parse.y"
-			{
-				Expr p=sqlite3Expr(pParse.db,TK_ALL,null);
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-1].minor.yy322,p);
-			}
-			//#line 2574 "parse.c"
-			break;
-			case 126:
-			/* selcollist ::= sclp nm DOT STAR *///#line 456 "parse.y"
-			{
-				Expr pRight=pParse.sqlite3PExpr(TK_ALL,0,0,yymsp[0].minor.yy0Token);
-				Expr pLeft=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[-2].minor.yy0Token);
-				Expr pDot=pParse.sqlite3PExpr(TK_DOT,pLeft,pRight,0);
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-3].minor.yy322,pDot);
-			}
-			//#line 2584 "parse.c"
-			break;
-			case 129:
-			/* as ::= *///#line 469 "parse.y"
-			{
-				yygotominor.yy0Token.Length=0;
-			}
-			//#line 2589 "parse.c"
-			break;
-			case 130:
-			/* from ::= *///#line 481 "parse.y"
-			{
-				yygotominor.yy259=new SrcList();
-			}
-			//sqlite3DbMallocZero(pParse.db, sizeof(*yygotominor.yy259));}
-			//#line 2594 "parse.c"
-			break;
-			case 131:
-			/* from ::= FROM seltablist *///#line 482 "parse.y"
-			{
-				yygotominor.yy259=yymsp[0].minor.yy259;
-				sqlite3SrcListShiftJoinType(yygotominor.yy259);
-			}
-			//#line 2602 "parse.c"
-			break;
-			case 132:
-			/* stl_prefix ::= seltablist joinop *///#line 490 "parse.y"
-			{
-				yygotominor.yy259=yymsp[-1].minor.yy259;
-				if(ALWAYS(yygotominor.yy259!=null&&yygotominor.yy259.nSrc>0))
-					yygotominor.yy259.a[yygotominor.yy259.nSrc-1].jointype=(u8)yymsp[0].minor.yy4;
-			}
-			//#line 2610 "parse.c"
-			break;
-			case 133:
-			/* stl_prefix ::= *///#line 494 "parse.y"
-			{
-				yygotominor.yy259=null;
-			}
-			//#line 2615 "parse.c"
-			break;
-			case 134:
-			/* seltablist ::= stl_prefix nm dbnm as indexed_opt on_opt using_opt *///#line 495 "parse.y"
-			{
-				yygotominor.yy259=sqlite3SrcListAppendFromTerm(pParse,yymsp[-6].minor.yy259,yymsp[-5].minor.yy0Token,yymsp[-4].minor.yy0Token,yymsp[-3].minor.yy0Token,0,yymsp[-1].minor.yy314,yymsp[0].minor.yy384);
-				sqlite3SrcListIndexedBy(pParse,yygotominor.yy259,yymsp[-2].minor.yy0Token);
-			}
-			//#line 2623 "parse.c"
-			break;
-			case 135:
-			/* seltablist ::= stl_prefix LP select RP as on_opt using_opt *///#line 501 "parse.y"
-			{
-				yygotominor.yy259=sqlite3SrcListAppendFromTerm(pParse,yymsp[-6].minor.yy259,0,0,yymsp[-2].minor.yy0Token,yymsp[-4].minor.yy387,yymsp[-1].minor.yy314,yymsp[0].minor.yy384);
-			}
-			//#line 2630 "parse.c"
-			break;
-			case 136:
-			/* seltablist ::= stl_prefix LP seltablist RP as on_opt using_opt *///#line 505 "parse.y"
-			{
-				if(yymsp[-6].minor.yy259==null&&yymsp[-2].minor.yy0Token.Length==0&&yymsp[-1].minor.yy314==null&&yymsp[0].minor.yy384==null) {
-					yygotominor.yy259=yymsp[-4].minor.yy259;
-				}
-				else {
-					Select pSubquery;
-					sqlite3SrcListShiftJoinType(yymsp[-4].minor.yy259);
-					pSubquery=sqlite3SelectNew(pParse,0,yymsp[-4].minor.yy259,0,0,0,0,0,0,0);
-					yygotominor.yy259=sqlite3SrcListAppendFromTerm(pParse,yymsp[-6].minor.yy259,0,0,yymsp[-2].minor.yy0Token,pSubquery,yymsp[-1].minor.yy314,yymsp[0].minor.yy384);
-				}
-			}
-			//#line 2644 "parse.c"
-			break;
-			case 137:
-			/* dbnm ::= */case 146:
-			/* indexed_opt ::= *///yytestcase(yyruleno==146);
-			//#line 530 "parse.y"
-			{
-				yygotominor.yy0Token.zRestSql=null;
-				yygotominor.yy0Token.Length=0;
-			}
-			//#line 2650 "parse.c"
-			break;
-			case 139:
-			/* fullname ::= nm dbnm *///#line 535 "parse.y"
-			{
-				yygotominor.yy259=sqlite3SrcListAppend(pParse.db,0,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 2655 "parse.c"
-			break;
-			case 140:
-			/* joinop ::= COMMA|JOIN *///#line 539 "parse.y"
-			{
-				yygotominor.yy4=JT_INNER;
-			}
-			//#line 2660 "parse.c"
-			break;
-			case 141:
-			/* joinop ::= JOIN_KW JOIN *///#line 540 "parse.y"
-			{
-				yygotominor.yy4=sqlite3JoinType(pParse,yymsp[-1].minor.yy0Token,0,0);
-			}
-			//#line 2665 "parse.c"
-			break;
-			case 142:
-			/* joinop ::= JOIN_KW nm JOIN *///#line 541 "parse.y"
-			{
-				yygotominor.yy4=sqlite3JoinType(pParse,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy0Token,0);
-			}
-			//#line 2670 "parse.c"
-			break;
-			case 143:
-			/* joinop ::= JOIN_KW nm nm JOIN *///#line 543 "parse.y"
-			{
-				yygotominor.yy4=sqlite3JoinType(pParse,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy0Token);
-			}
-			//#line 2675 "parse.c"
-			break;
-			case 144:
-			/* on_opt ::= ON expr */case 155:
-			/* sortitem ::= expr *///yytestcase(yyruleno==155);
-			case 162:
-			/* having_opt ::= HAVING expr *///yytestcase(yyruleno==162);
-			case 169:
-			/* where_opt ::= WHERE expr *///yytestcase(yyruleno==169);
-			case 235:
-			/* case_else ::= ELSE expr *///yytestcase(yyruleno==235);
-			case 237:
-			/* case_operand ::= expr *///yytestcase(yyruleno==237);
-			//#line 547 "parse.y"
-			{
-				yygotominor.yy314=yymsp[0].minor.yy118.pExpr;
-			}
-			//#line 2685 "parse.c"
-			break;
-			case 145:
-			/* on_opt ::= */case 161:
-			/* having_opt ::= *///yytestcase(yyruleno==161);
-			case 168:
-			/* where_opt ::= *///yytestcase(yyruleno==168);
-			case 236:
-			/* case_else ::= *///yytestcase(yyruleno==236);
-			case 238:
-			/* case_operand ::= *///yytestcase(yyruleno==238);
-			//#line 548 "parse.y"
-			{
-				yygotominor.yy314=null;
-			}
-			//#line 2694 "parse.c"
-			break;
-			case 148:
-			/* indexed_opt ::= NOT INDEXED *///#line 563 "parse.y"
-			{
-				yygotominor.yy0Token.zRestSql=null;
-				yygotominor.yy0Token.Length=1;
-			}
-			//#line 2699 "parse.c"
-			break;
-			case 149:
-			/* using_opt ::= USING LP inscollist RP */case 181:
-			/* inscollist_opt ::= LP inscollist RP *///yytestcase(yyruleno==181);
-			//#line 567 "parse.y"
-			{
-				yygotominor.yy384=yymsp[-1].minor.yy384;
-			}
-			//#line 2705 "parse.c"
-			break;
-			case 150:
-			/* using_opt ::= */case 180:
-			/* inscollist_opt ::= *///yytestcase(yyruleno==180);
-			//#line 568 "parse.y"
-			{
-				yygotominor.yy384=null;
-			}
-			//#line 2711 "parse.c"
-			break;
-			case 152:
-			/* orderby_opt ::= ORDER BY sortlist */case 160:
-			/* groupby_opt ::= GROUP BY nexprlist *///yytestcase(yyruleno==160);
-			case 239:
-			/* exprlist ::= nexprlist *///yytestcase(yyruleno==239);
-			//#line 579 "parse.y"
-			{
-				yygotominor.yy322=yymsp[0].minor.yy322;
-			}
-			//#line 2718 "parse.c"
-			break;
-			case 153:
-			/* sortlist ::= sortlist COMMA sortitem sortorder *///#line 580 "parse.y"
-			{
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-3].minor.yy322,yymsp[-1].minor.yy314);
-				if(yygotominor.yy322!=null)
-					yygotominor.yy322.a[yygotominor.yy322.nExpr-1].sortOrder=(u8)yymsp[0].minor.yy4;
-			}
-			//#line 2726 "parse.c"
-			break;
-			case 154:
-			/* sortlist ::= sortitem sortorder *///#line 584 "parse.y"
-			{
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(0,yymsp[-1].minor.yy314);
-				if(yygotominor.yy322!=null&&ALWAYS(yygotominor.yy322.a!=null))
-					yygotominor.yy322.a[0].sortOrder=(u8)yymsp[0].minor.yy4;
-			}
-			//#line 2734 "parse.c"
-			break;
-			case 156:
-			/* sortorder ::= ASC */case 158:
-			/* sortorder ::= *///yytestcase(yyruleno==158);
-			//#line 592 "parse.y"
-			{
-				yygotominor.yy4=SQLITE_SO_ASC;
-			}
-			//#line 2740 "parse.c"
-			break;
-			case 157:
-			/* sortorder ::= DESC *///#line 593 "parse.y"
-			{
-				yygotominor.yy4=SQLITE_SO_DESC;
-			}
-			//#line 2745 "parse.c"
-			break;
-			case 163:
-			/* limit_opt ::= *///#line 619 "parse.y"
-			{
-				yygotominor.yy292.pLimit=null;
-				yygotominor.yy292.pOffset=null;
-			}
-			//#line 2750 "parse.c"
-			break;
-			case 164:
-			/* limit_opt ::= LIMIT expr *///#line 620 "parse.y"
-			{
-				yygotominor.yy292.pLimit=yymsp[0].minor.yy118.pExpr;
-				yygotominor.yy292.pOffset=null;
-			}
-			//#line 2755 "parse.c"
-			break;
-			case 165:
-			/* limit_opt ::= LIMIT expr OFFSET expr *///#line 622 "parse.y"
-			{
-				yygotominor.yy292.pLimit=yymsp[-2].minor.yy118.pExpr;
-				yygotominor.yy292.pOffset=yymsp[0].minor.yy118.pExpr;
-			}
-			//#line 2760 "parse.c"
-			break;
-			case 166:
-			/* limit_opt ::= LIMIT expr COMMA expr *///#line 624 "parse.y"
-			{
-				yygotominor.yy292.pOffset=yymsp[-2].minor.yy118.pExpr;
-				yygotominor.yy292.pLimit=yymsp[0].minor.yy118.pExpr;
-			}
-			//#line 2765 "parse.c"
-			break;
-			case 167:
-			/* cmd ::= DELETE FROM fullname indexed_opt where_opt *///#line 637 "parse.y"
-			{
-				sqlite3SrcListIndexedBy(pParse,yymsp[-2].minor.yy259,yymsp[-1].minor.yy0Token);
-				pParse.sqlite3DeleteFrom(yymsp[-2].minor.yy259,yymsp[0].minor.yy314);
-			}
-			//#line 2773 "parse.c"
-			break;
-			case 170:
-			/* cmd ::= UPDATE orconf fullname indexed_opt SET setlist where_opt *///#line 660 "parse.y"
-			{
-				sqlite3SrcListIndexedBy(pParse,yymsp[-4].minor.yy259,yymsp[-3].minor.yy0Token);
-				pParse.sqlite3ExprListCheckLength(yymsp[-1].minor.yy322,"set list");
-				pParse.sqlite3Update(yymsp[-4].minor.yy259,yymsp[-1].minor.yy322,yymsp[0].minor.yy314,yymsp[-5].minor.yy210);
-			}
-			//#line 2782 "parse.c"
-			break;
-			case 171:
-			/* setlist ::= setlist COMMA nm EQ expr *///#line 670 "parse.y"
-			{
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-4].minor.yy322,yymsp[0].minor.yy118.pExpr);
-				pParse.sqlite3ExprListSetName(yygotominor.yy322,yymsp[-2].minor.yy0Token,1);
-			}
-			//#line 2790 "parse.c"
-			break;
-			case 172:
-			/* setlist ::= nm EQ expr *///#line 674 "parse.y"
-			{
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(0,yymsp[0].minor.yy118.pExpr);
-				pParse.sqlite3ExprListSetName(yygotominor.yy322,yymsp[-2].minor.yy0Token,1);
-			}
-			//#line 2798 "parse.c"
-			break;
-			case 173:
-			/* cmd ::= insert_cmd INTO fullname inscollist_opt VALUES LP itemlist RP *///#line 683 "parse.y"
-			{
-				pParse.sqlite3Insert(yymsp[-5].minor.yy259,yymsp[-1].minor.yy322,0,yymsp[-4].minor.yy384,yymsp[-7].minor.yy210);
-			}
-			//#line 2803 "parse.c"
-			break;
-			case 174:
-			/* cmd ::= insert_cmd INTO fullname inscollist_opt select *///#line 685 "parse.y"
-			{
-				pParse.sqlite3Insert(yymsp[-2].minor.yy259,0,yymsp[0].minor.yy387,yymsp[-1].minor.yy384,yymsp[-4].minor.yy210);
-			}
-			//#line 2808 "parse.c"
-			break;
-			case 175:
-			/* cmd ::= insert_cmd INTO fullname inscollist_opt DEFAULT VALUES *///#line 687 "parse.y"
-			{
-				pParse.sqlite3Insert(yymsp[-3].minor.yy259,0,0,yymsp[-2].minor.yy384,yymsp[-5].minor.yy210);
-			}
-			//#line 2813 "parse.c"
-			break;
-			case 176:
-			/* insert_cmd ::= INSERT orconf *///#line 690 "parse.y"
-			{
-				yygotominor.yy210=yymsp[0].minor.yy210;
-			}
-			//#line 2818 "parse.c"
-			break;
-			case 177:
-			/* insert_cmd ::= REPLACE *///#line 691 "parse.y"
-			{
-				yygotominor.yy210=OE_Replace;
-			}
-			//#line 2823 "parse.c"
-			break;
-			case 178:
-			/* itemlist ::= itemlist COMMA expr */case 241:
-			/* nexprlist ::= nexprlist COMMA expr *///yytestcase(yyruleno==241);
-			//#line 698 "parse.y"
-			{
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-2].minor.yy322,yymsp[0].minor.yy118.pExpr);
-			}
-			//#line 2829 "parse.c"
-			break;
-			case 179:
-			/* itemlist ::= expr */case 242:
-			/* nexprlist ::= expr *///yytestcase(yyruleno==242);
-			//#line 700 "parse.y"
-			{
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(0,yymsp[0].minor.yy118.pExpr);
-			}
-			//#line 2835 "parse.c"
-			break;
-			case 182:
-			/* inscollist ::= inscollist COMMA nm *///#line 710 "parse.y"
-			{
-				yygotominor.yy384=sqlite3IdListAppend(pParse.db,yymsp[-2].minor.yy384,yymsp[0].minor.yy0Token);
-			}
-			//#line 2840 "parse.c"
-			break;
-			case 183:
-			/* inscollist ::= nm *///#line 712 "parse.y"
-			{
-				yygotominor.yy384=sqlite3IdListAppend(pParse.db,0,yymsp[0].minor.yy0Token);
-			}
-			//#line 2845 "parse.c"
-			break;
-			case 184:
-			/* expr ::= term *///#line 743 "parse.y"
-			{
-				yygotominor.yy118=yymsp[0].minor.yy118;
-			}
-			//#line 2850 "parse.c"
-			break;
-			case 185:
-			/* expr ::= LP expr RP *///#line 744 "parse.y"
-			{
-				yygotominor.yy118.pExpr=yymsp[-1].minor.yy118.pExpr;
-				yygotominor.yy118.spanSet(yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 2855 "parse.c"
-			break;
-			case 186:
-			/* term ::= NULL */case 191:
-			/* term ::= INTEGER|FLOAT|BLOB *///yytestcase(yyruleno==191);
-			case 192:
-			/* term ::= STRING *///yytestcase(yyruleno==192);
-			//#line 745 "parse.y"
-			{
-				yygotominor.yy118.spanExpr(pParse,yymsp[0].major,yymsp[0].minor.yy0Token);
-			}
-			//#line 2862 "parse.c"
-			break;
-			case 187:
-			/* expr ::= id */case 188:
-			/* expr ::= JOIN_KW *///yytestcase(yyruleno==188);
-			//#line 746 "parse.y"
-			{
-				yygotominor.yy118.spanExpr(pParse,TK_ID,yymsp[0].minor.yy0Token);
-			}
-			//#line 2868 "parse.c"
-			break;
-			case 189:
-			/* expr ::= nm DOT nm *///#line 748 "parse.y"
-			{
-				Expr temp1=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[-2].minor.yy0Token);
-				Expr temp2=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[0].minor.yy0Token);
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_DOT,temp1,temp2,0);
-				yygotominor.yy118.spanSet(yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 2878 "parse.c"
-			break;
-			case 190:
-			/* expr ::= nm DOT nm DOT nm *///#line 754 "parse.y"
-			{
-				Expr temp1=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[-4].minor.yy0Token);
-				Expr temp2=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[-2].minor.yy0Token);
-				Expr temp3=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[0].minor.yy0Token);
-				Expr temp4=pParse.sqlite3PExpr(TK_DOT,temp2,temp3,0);
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_DOT,temp1,temp4,0);
-				yygotominor.yy118.spanSet(yymsp[-4].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 2890 "parse.c"
-			break;
-			case 193:
-			/* expr ::= REGISTER *///#line 764 "parse.y"
-			{
-				/* When doing a nested parse, one can include terms in an expression
-            ** that look like this:   #1 #2 ...  These terms refer to registers
-            ** in the virtual machine.  #N is the N-th register. */if(pParse.nested==0) {
-					sqlite3ErrorMsg(pParse,"near \"%T\": syntax error",yymsp[0].minor.yy0Token);
-					yygotominor.yy118.pExpr=null;
-				}
-				else {
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_REGISTER,0,0,yymsp[0].minor.yy0Token);
-					if(yygotominor.yy118.pExpr!=null)
-						Converter.sqlite3GetInt32(yymsp[0].minor.yy0Token.zRestSql,1,ref yygotominor.yy118.pExpr.iTable);
-				}
-				yygotominor.yy118.spanSet(yymsp[0].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 2907 "parse.c"
-			break;
-			case 194:
-			/* expr ::= VARIABLE *///#line 777 "parse.y"
-			{
-				yygotominor.yy118.spanExpr(pParse,TK_VARIABLE,yymsp[0].minor.yy0Token);
-				pParse.sqlite3ExprAssignVarNumber(yygotominor.yy118.pExpr);
-				yygotominor.yy118.spanSet(yymsp[0].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 2916 "parse.c"
-			break;
-			case 195:
-			/* expr ::= expr COLLATE ids *///#line 782 "parse.y"
-			{
-				yygotominor.yy118.pExpr=pParse.sqlite3ExprSetCollByToken(yymsp[-2].minor.yy118.pExpr,yymsp[0].minor.yy0Token);
-				yygotominor.yy118.zStart=yymsp[-2].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
-				//z[yymsp[0].minor.yy0.n];
-			}
-			//#line 2925 "parse.c"
-			break;
-			case 196:
-			/* expr ::= CAST LP expr AS typetoken RP *///#line 788 "parse.y"
-			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_CAST,yymsp[-3].minor.yy118.pExpr,0,yymsp[-1].minor.yy0Token);
-				yygotominor.yy118.spanSet(yymsp[-5].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 2933 "parse.c"
-			break;
-			case 197:
-			/* expr ::= ID LP distinct exprlist RP *///#line 793 "parse.y"
-			{
-				if(yymsp[-1].minor.yy322!=null&&yymsp[-1].minor.yy322.nExpr>pParse.db.aLimit[SQLITE_LIMIT_FUNCTION_ARG]) {
-					sqlite3ErrorMsg(pParse,"too many arguments on function %T",yymsp[-4].minor.yy0Token);
-				}
-				yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(yymsp[-1].minor.yy322,yymsp[-4].minor.yy0Token);
-				yygotominor.yy118.spanSet(yymsp[-4].minor.yy0Token,yymsp[0].minor.yy0Token);
-				if(yymsp[-2].minor.yy4!=0&&yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.flags|=EP_Distinct;
-				}
-			}
-			//#line 2947 "parse.c"
-			break;
-			case 198:
-			/* expr ::= ID LP STAR RP *///#line 803 "parse.y"
-			{
-				yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(0,yymsp[-3].minor.yy0Token);
-				yygotominor.yy118.spanSet(yymsp[-3].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 2955 "parse.c"
-			break;
-			case 199:
-			/* term ::= CTIME_KW *///#line 807 "parse.y"
-			{
-				/* The CURRENT_TIME, CURRENT_DATE, and CURRENT_TIMESTAMP values are
-            ** treated as functions that return constants */yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(0,yymsp[0].minor.yy0Token);
-				if(yygotominor.yy118.pExpr!=null) {
-                    yygotominor.yy118.pExpr.Operator = TokenType.TK_CONST_FUNC;
-				}
-				yygotominor.yy118.spanSet(yymsp[0].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 2968 "parse.c"
-			break;
-			case 200:
-			/* expr ::= expr AND expr */case 201:
-			/* expr ::= expr OR expr *///yytestcase(yyruleno==201);
-			case 202:
-			/* expr ::= expr LT|GT|GE|LE expr *///yytestcase(yyruleno==202);
-			case 203:
-			/* expr ::= expr EQ|NE expr *///yytestcase(yyruleno==203);
-			case 204:
-			/* expr ::= expr BITAND|BITOR|LSHIFT|RSHIFT expr *///yytestcase(yyruleno==204);
-			case 205:
-			/* expr ::= expr PLUS|MINUS expr *///yytestcase(yyruleno==205);
-			case 206:
-			/* expr ::= expr STAR|SLASH|REM expr *///yytestcase(yyruleno==206);
-			case 207:
-			/* expr ::= expr CONCAT expr *///yytestcase(yyruleno==207);
-			//#line 834 "parse.y"
-			{
-				yygotominor.yy118.spanBinaryExpr(pParse,yymsp[-1].major,yymsp[-2].minor.yy118,yymsp[0].minor.yy118);
-			}
-			//#line 2980 "parse.c"
-			break;
-			case 208:
-			/* likeop ::= LIKE_KW */case 210:
-			/* likeop ::= MATCH *///yytestcase(yyruleno==210);
-			//#line 847 "parse.y"
-			{
-				yygotominor.yy342.eOperator=yymsp[0].minor.yy0Token;
-				yygotominor.yy342.not=false;
-			}
-			//#line 2986 "parse.c"
-			break;
-			case 209:
-			/* likeop ::= NOT LIKE_KW */case 211:
-			/* likeop ::= NOT MATCH *///yytestcase(yyruleno==211);
-			//#line 848 "parse.y"
-			{
-				yygotominor.yy342.eOperator=yymsp[0].minor.yy0Token;
-				yygotominor.yy342.not=true;
-			}
-			//#line 2992 "parse.c"
-			break;
-			case 212:
-			/* expr ::= expr likeop expr *///#line 851 "parse.y"
-			{
-				ExprList pList;
-				pList=pParse.sqlite3ExprListAppend(0,yymsp[0].minor.yy118.pExpr);
-				pList=pParse.sqlite3ExprListAppend(pList,yymsp[-2].minor.yy118.pExpr);
-				yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(pList,yymsp[-1].minor.yy342.eOperator);
-				if(yymsp[-1].minor.yy342.not)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
-				yygotominor.yy118.zStart=yymsp[-2].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy118.zEnd;
-				if(yygotominor.yy118.pExpr!=null)
-					yygotominor.yy118.pExpr.flags|=EP_InfixFunc;
-			}
-			//#line 3006 "parse.c"
-			break;
-			case 213:
-			/* expr ::= expr likeop expr ESCAPE expr *///#line 861 "parse.y"
-			{
-				ExprList pList;
-				pList=pParse.sqlite3ExprListAppend(0,yymsp[-2].minor.yy118.pExpr);
-				pList=pParse.sqlite3ExprListAppend(pList,yymsp[-4].minor.yy118.pExpr);
-				pList=pParse.sqlite3ExprListAppend(pList,yymsp[0].minor.yy118.pExpr);
-				yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(pList,yymsp[-3].minor.yy342.eOperator);
-				if(yymsp[-3].minor.yy342.not)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
-				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy118.zEnd;
-				if(yygotominor.yy118.pExpr!=null)
-					yygotominor.yy118.pExpr.flags|=EP_InfixFunc;
-			}
-			//#line 3021 "parse.c"
-			break;
-			case 214:
-			/* expr ::= expr ISNULL|NOTNULL *///#line 889 "parse.y"
-			{
-				yygotominor.yy118.spanUnaryPostfix(pParse,yymsp[0].major,yymsp[-1].minor.yy118,yymsp[0].minor.yy0Token);
-			}
-			//#line 3026 "parse.c"
-			break;
-			case 215:
-			/* expr ::= expr NOT NULL *///#line 890 "parse.y"
-			{
-				yygotominor.yy118.spanUnaryPostfix(pParse,TK_NOTNULL,yymsp[-2].minor.yy118,yymsp[0].minor.yy0Token);
-			}
-			//#line 3031 "parse.c"
-			break;
-			case 216:
-			/* expr ::= expr IS expr *///#line 911 "parse.y"
-			{
-				yygotominor.yy118.spanBinaryExpr(pParse,TK_IS,yymsp[-2].minor.yy118,yymsp[0].minor.yy118);
-				pParse.binaryToUnaryIfNull(yymsp[0].minor.yy118.pExpr,yygotominor.yy118.pExpr,TK_ISNULL);
-			}
-			//#line 3039 "parse.c"
-			break;
-			case 217:
-			/* expr ::= expr IS NOT expr *///#line 915 "parse.y"
-			{
-				yygotominor.yy118.spanBinaryExpr(pParse,TK_ISNOT,yymsp[-3].minor.yy118,yymsp[0].minor.yy118);
-				pParse.binaryToUnaryIfNull(yymsp[0].minor.yy118.pExpr,yygotominor.yy118.pExpr,TK_NOTNULL);
-			}
-			//#line 3047 "parse.c"
-			break;
-			case 218:
-			/* expr ::= NOT expr */case 219:
-			/* expr ::= BITNOT expr *///yytestcase(yyruleno==219);
-			//#line 938 "parse.y"
-			{
-				yygotominor.yy118.spanUnaryPrefix(pParse,yymsp[-1].major,yymsp[0].minor.yy118,yymsp[-1].minor.yy0Token);
-			}
-			//#line 3053 "parse.c"
-			break;
-			case 220:
-			/* expr ::= MINUS expr *///#line 941 "parse.y"
-			{
-				yygotominor.yy118.spanUnaryPrefix(pParse,TK_UMINUS,yymsp[0].minor.yy118,yymsp[-1].minor.yy0Token);
-			}
-			//#line 3058 "parse.c"
-			break;
-			case 221:
-			/* expr ::= PLUS expr *///#line 943 "parse.y"
-			{
-				yygotominor.yy118.spanUnaryPrefix(pParse,TK_UPLUS,yymsp[0].minor.yy118,yymsp[-1].minor.yy0Token);
-			}
-			//#line 3063 "parse.c"
-			break;
-			case 224:
-			/* expr ::= expr between_op expr AND expr *///#line 948 "parse.y"
-			{
-				ExprList pList=pParse.sqlite3ExprListAppend(0,yymsp[-2].minor.yy118.pExpr);
-				pList=pParse.sqlite3ExprListAppend(pList,yymsp[0].minor.yy118.pExpr);
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_BETWEEN,yymsp[-4].minor.yy118.pExpr,0,0);
-				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.x.pList=pList;
-				}
-				else {
-					sqlite3ExprListDelete(pParse.db,ref pList);
-				}
-				if(yymsp[-3].minor.yy4!=0)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
-				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy118.zEnd;
-			}
-			//#line 3080 "parse.c"
-			break;
-			case 227:
-			/* expr ::= expr in_op LP exprlist RP *///#line 965 "parse.y"
-			{
-				if(yymsp[-1].minor.yy322==null) {
-					/* Expressions of the form
-              **
-              **      expr1 IN ()
-              **      expr1 NOT IN ()
-              **
-              ** simplify to constants 0 (false) and 1 (true), respectively,
-              ** regardless of the value of expr1.
-              */yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_INTEGER,0,0,sqlite3IntTokens[yymsp[-3].minor.yy4]);
-					sqlite3ExprDelete(pParse.db,ref yymsp[-4].minor.yy118.pExpr);
-				}
-				else {
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_IN,yymsp[-4].minor.yy118.pExpr,0,0);
-					if(yygotominor.yy118.pExpr!=null) {
-						yygotominor.yy118.pExpr.x.pList=yymsp[-1].minor.yy322;
-						pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
+				///
+///<summary>
+///select ::= select multiselect_op oneselect 
+///</summary>
+
+				//#line 409 "parse.y"
+				{
+					if (yymsp [0].minor.yy387 != null) {
+						yymsp [0].minor.yy387.tk_op = (u8)yymsp [-1].minor.yy4;
+						yymsp [0].minor.yy387.pPrior = yymsp [-2].minor.yy387;
 					}
 					else {
-						sqlite3ExprListDelete(pParse.db,ref yymsp[-1].minor.yy322);
+						sqlite3SelectDelete (pParse.db, ref yymsp [-2].minor.yy387);
 					}
-					if(yymsp[-3].minor.yy4!=0)
-						yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
+					yygotominor.yy387 = yymsp [0].minor.yy387;
 				}
-				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
-				//[yymsp[0].minor.yy0.n];
-			}
-			//#line 3109 "parse.c"
-			break;
+				//#line 2530 "parse.c"
+				break;
+			case 116:
+				///
+///<summary>
+///multiselect_op ::= UNION ALL 
+///</summary>
+
+				//#line 420 "parse.y"
+				{
+					yygotominor.yy4 = TK_ALL;
+				}
+				//#line 2535 "parse.c"
+				break;
+			case 118:
+				///
+///<summary>
+///oneselect ::= SELECT distinct selcollist from where_opt groupby_opt having_opt orderby_opt limit_opt 
+///</summary>
+
+				//#line 424 "parse.y"
+				{
+					yygotominor.yy387 = sqlite3SelectNew (pParse, yymsp [-6].minor.yy322, yymsp [-5].minor.yy259, yymsp [-4].minor.yy314, yymsp [-3].minor.yy322, yymsp [-2].minor.yy314, yymsp [-1].minor.yy322, yymsp [-7].minor.yy4, yymsp [0].minor.yy292.pLimit, yymsp [0].minor.yy292.pOffset);
+				}
+				//#line 2542 "parse.c"
+				break;
+			case 122:
+			///
+///<summary>
+///sclp ::= selcollist COMMA 
+///</summary>
+
+			case 247:
+				///
+///<summary>
+///idxlist_opt ::= LP idxlist RP 
+///</summary>
+
+				//yytestcase(yyruleno==247);
+				//#line 445 "parse.y"
+				{
+					yygotominor.yy322 = yymsp [-1].minor.yy322;
+				}
+				//#line 2548 "parse.c"
+				break;
+			case 123:
+			///
+///<summary>
+///sclp ::= 
+///</summary>
+
+			case 151:
+			///
+///<summary>
+///orderby_opt ::= 
+///</summary>
+
+			//yytestcase(yyruleno==151);
+			case 159:
+			///
+///<summary>
+///groupby_opt ::= 
+///</summary>
+
+			//yytestcase(yyruleno==159);
+			case 240:
+			///
+///<summary>
+///exprlist ::= 
+///</summary>
+
+			//yytestcase(yyruleno==240);
+			case 246:
+				///
+///<summary>
+///idxlist_opt ::= 
+///</summary>
+
+				//yytestcase(yyruleno==246);
+				//#line 446 "parse.y"
+				{
+					yygotominor.yy322 = null;
+				}
+				//#line 2557 "parse.c"
+				break;
+			case 124:
+				///
+///<summary>
+///selcollist ::= sclp expr as 
+///</summary>
+
+				//#line 447 "parse.y"
+				{
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yymsp [-2].minor.yy322, yymsp [-1].minor.yy118.pExpr);
+					if (yymsp [0].minor.yy0Token.Length > 0)
+						pParse.sqlite3ExprListSetName (yygotominor.yy322, yymsp [0].minor.yy0Token, 1);
+					pParse.sqlite3ExprListSetSpan (yygotominor.yy322, yymsp [-1].minor.yy118);
+				}
+				//#line 2566 "parse.c"
+				break;
+			case 125:
+				///
+///<summary>
+///selcollist ::= sclp STAR 
+///</summary>
+
+				//#line 452 "parse.y"
+				{
+					Expr p = sqlite3Expr (pParse.db, TK_ALL, null);
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yymsp [-1].minor.yy322, p);
+				}
+				//#line 2574 "parse.c"
+				break;
+			case 126:
+				///
+///<summary>
+///selcollist ::= sclp nm DOT STAR 
+///</summary>
+
+				//#line 456 "parse.y"
+				{
+					Expr pRight = pParse.sqlite3PExpr (TK_ALL, 0, 0, yymsp [0].minor.yy0Token);
+					Expr pLeft = pParse.sqlite3PExpr (TK_ID, 0, 0, yymsp [-2].minor.yy0Token);
+					Expr pDot = pParse.sqlite3PExpr (TK_DOT, pLeft, pRight, 0);
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yymsp [-3].minor.yy322, pDot);
+				}
+				//#line 2584 "parse.c"
+				break;
+			case 129:
+				///
+///<summary>
+///as ::= 
+///</summary>
+
+				//#line 469 "parse.y"
+				{
+					yygotominor.yy0Token.Length = 0;
+				}
+				//#line 2589 "parse.c"
+				break;
+			case 130:
+				///
+///<summary>
+///from ::= 
+///</summary>
+
+				//#line 481 "parse.y"
+				{
+					yygotominor.yy259 = new SrcList ();
+				}
+				//sqlite3DbMallocZero(pParse.db, sizeof(*yygotominor.yy259));}
+				//#line 2594 "parse.c"
+				break;
+			case 131:
+				///
+///<summary>
+///from ::= FROM seltablist 
+///</summary>
+
+				//#line 482 "parse.y"
+				{
+					yygotominor.yy259 = yymsp [0].minor.yy259;
+					sqlite3SrcListShiftJoinType (yygotominor.yy259);
+				}
+				//#line 2602 "parse.c"
+				break;
+			case 132:
+				///
+///<summary>
+///stl_prefix ::= seltablist joinop 
+///</summary>
+
+				//#line 490 "parse.y"
+				{
+					yygotominor.yy259 = yymsp [-1].minor.yy259;
+					if (ALWAYS (yygotominor.yy259 != null && yygotominor.yy259.nSrc > 0))
+						yygotominor.yy259.a [yygotominor.yy259.nSrc - 1].jointype = (u8)yymsp [0].minor.yy4;
+				}
+				//#line 2610 "parse.c"
+				break;
+			case 133:
+				///
+///<summary>
+///stl_prefix ::= 
+///</summary>
+
+				//#line 494 "parse.y"
+				{
+					yygotominor.yy259 = null;
+				}
+				//#line 2615 "parse.c"
+				break;
+			case 134:
+				///
+///<summary>
+///seltablist ::= stl_prefix nm dbnm as indexed_opt on_opt using_opt 
+///</summary>
+
+				//#line 495 "parse.y"
+				{
+					yygotominor.yy259 = sqlite3SrcListAppendFromTerm (pParse, yymsp [-6].minor.yy259, yymsp [-5].minor.yy0Token, yymsp [-4].minor.yy0Token, yymsp [-3].minor.yy0Token, 0, yymsp [-1].minor.yy314, yymsp [0].minor.yy384);
+					sqlite3SrcListIndexedBy (pParse, yygotominor.yy259, yymsp [-2].minor.yy0Token);
+				}
+				//#line 2623 "parse.c"
+				break;
+			case 135:
+				///
+///<summary>
+///seltablist ::= stl_prefix LP select RP as on_opt using_opt 
+///</summary>
+
+				//#line 501 "parse.y"
+				{
+					yygotominor.yy259 = sqlite3SrcListAppendFromTerm (pParse, yymsp [-6].minor.yy259, 0, 0, yymsp [-2].minor.yy0Token, yymsp [-4].minor.yy387, yymsp [-1].minor.yy314, yymsp [0].minor.yy384);
+				}
+				//#line 2630 "parse.c"
+				break;
+			case 136:
+				///
+///<summary>
+///seltablist ::= stl_prefix LP seltablist RP as on_opt using_opt 
+///</summary>
+
+				//#line 505 "parse.y"
+				{
+					if (yymsp [-6].minor.yy259 == null && yymsp [-2].minor.yy0Token.Length == 0 && yymsp [-1].minor.yy314 == null && yymsp [0].minor.yy384 == null) {
+						yygotominor.yy259 = yymsp [-4].minor.yy259;
+					}
+					else {
+						Select pSubquery;
+						sqlite3SrcListShiftJoinType (yymsp [-4].minor.yy259);
+						pSubquery = sqlite3SelectNew (pParse, 0, yymsp [-4].minor.yy259, 0, 0, 0, 0, 0, 0, 0);
+						yygotominor.yy259 = sqlite3SrcListAppendFromTerm (pParse, yymsp [-6].minor.yy259, 0, 0, yymsp [-2].minor.yy0Token, pSubquery, yymsp [-1].minor.yy314, yymsp [0].minor.yy384);
+					}
+				}
+				//#line 2644 "parse.c"
+				break;
+			case 137:
+			///
+///<summary>
+///dbnm ::= 
+///</summary>
+
+			case 146:
+				///
+///<summary>
+///indexed_opt ::= 
+///</summary>
+
+				//yytestcase(yyruleno==146);
+				//#line 530 "parse.y"
+				{
+					yygotominor.yy0Token.zRestSql = null;
+					yygotominor.yy0Token.Length = 0;
+				}
+				//#line 2650 "parse.c"
+				break;
+			case 139:
+				///
+///<summary>
+///fullname ::= nm dbnm 
+///</summary>
+
+				//#line 535 "parse.y"
+				{
+					yygotominor.yy259 = sqlite3SrcListAppend (pParse.db, 0, yymsp [-1].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 2655 "parse.c"
+				break;
+			case 140:
+				///
+///<summary>
+///joinop ::= COMMA|JOIN 
+///</summary>
+
+				//#line 539 "parse.y"
+				{
+					yygotominor.yy4 = JT_INNER;
+				}
+				//#line 2660 "parse.c"
+				break;
+			case 141:
+				///
+///<summary>
+///joinop ::= JOIN_KW JOIN 
+///</summary>
+
+				//#line 540 "parse.y"
+				{
+					yygotominor.yy4 = sqlite3JoinType (pParse, yymsp [-1].minor.yy0Token, 0, 0);
+				}
+				//#line 2665 "parse.c"
+				break;
+			case 142:
+				///
+///<summary>
+///joinop ::= JOIN_KW nm JOIN 
+///</summary>
+
+				//#line 541 "parse.y"
+				{
+					yygotominor.yy4 = sqlite3JoinType (pParse, yymsp [-2].minor.yy0Token, yymsp [-1].minor.yy0Token, 0);
+				}
+				//#line 2670 "parse.c"
+				break;
+			case 143:
+				///
+///<summary>
+///joinop ::= JOIN_KW nm nm JOIN 
+///</summary>
+
+				//#line 543 "parse.y"
+				{
+					yygotominor.yy4 = sqlite3JoinType (pParse, yymsp [-3].minor.yy0Token, yymsp [-2].minor.yy0Token, yymsp [-1].minor.yy0Token);
+				}
+				//#line 2675 "parse.c"
+				break;
+			case 144:
+			///
+///<summary>
+///on_opt ::= ON expr 
+///</summary>
+
+			case 155:
+			///
+///<summary>
+///sortitem ::= expr 
+///</summary>
+
+			//yytestcase(yyruleno==155);
+			case 162:
+			///
+///<summary>
+///having_opt ::= HAVING expr 
+///</summary>
+
+			//yytestcase(yyruleno==162);
+			case 169:
+			///
+///<summary>
+///where_opt ::= WHERE expr 
+///</summary>
+
+			//yytestcase(yyruleno==169);
+			case 235:
+			///
+///<summary>
+///case_else ::= ELSE expr 
+///</summary>
+
+			//yytestcase(yyruleno==235);
+			case 237:
+				///
+///<summary>
+///case_operand ::= expr 
+///</summary>
+
+				//yytestcase(yyruleno==237);
+				//#line 547 "parse.y"
+				{
+					yygotominor.yy314 = yymsp [0].minor.yy118.pExpr;
+				}
+				//#line 2685 "parse.c"
+				break;
+			case 145:
+			///
+///<summary>
+///on_opt ::= 
+///</summary>
+
+			case 161:
+			///
+///<summary>
+///having_opt ::= 
+///</summary>
+
+			//yytestcase(yyruleno==161);
+			case 168:
+			///
+///<summary>
+///where_opt ::= 
+///</summary>
+
+			//yytestcase(yyruleno==168);
+			case 236:
+			///
+///<summary>
+///case_else ::= 
+///</summary>
+
+			//yytestcase(yyruleno==236);
+			case 238:
+				///
+///<summary>
+///case_operand ::= 
+///</summary>
+
+				//yytestcase(yyruleno==238);
+				//#line 548 "parse.y"
+				{
+					yygotominor.yy314 = null;
+				}
+				//#line 2694 "parse.c"
+				break;
+			case 148:
+				///
+///<summary>
+///indexed_opt ::= NOT INDEXED 
+///</summary>
+
+				//#line 563 "parse.y"
+				{
+					yygotominor.yy0Token.zRestSql = null;
+					yygotominor.yy0Token.Length = 1;
+				}
+				//#line 2699 "parse.c"
+				break;
+			case 149:
+			///
+///<summary>
+///using_opt ::= USING LP inscollist RP 
+///</summary>
+
+			case 181:
+				///
+///<summary>
+///inscollist_opt ::= LP inscollist RP 
+///</summary>
+
+				//yytestcase(yyruleno==181);
+				//#line 567 "parse.y"
+				{
+					yygotominor.yy384 = yymsp [-1].minor.yy384;
+				}
+				//#line 2705 "parse.c"
+				break;
+			case 150:
+			///
+///<summary>
+///using_opt ::= 
+///</summary>
+
+			case 180:
+				///
+///<summary>
+///inscollist_opt ::= 
+///</summary>
+
+				//yytestcase(yyruleno==180);
+				//#line 568 "parse.y"
+				{
+					yygotominor.yy384 = null;
+				}
+				//#line 2711 "parse.c"
+				break;
+			case 152:
+			///
+///<summary>
+///orderby_opt ::= ORDER BY sortlist 
+///</summary>
+
+			case 160:
+			///
+///<summary>
+///groupby_opt ::= GROUP BY nexprlist 
+///</summary>
+
+			//yytestcase(yyruleno==160);
+			case 239:
+				///
+///<summary>
+///exprlist ::= nexprlist 
+///</summary>
+
+				//yytestcase(yyruleno==239);
+				//#line 579 "parse.y"
+				{
+					yygotominor.yy322 = yymsp [0].minor.yy322;
+				}
+				//#line 2718 "parse.c"
+				break;
+			case 153:
+				///
+///<summary>
+///sortlist ::= sortlist COMMA sortitem sortorder 
+///</summary>
+
+				//#line 580 "parse.y"
+				{
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yymsp [-3].minor.yy322, yymsp [-1].minor.yy314);
+					if (yygotominor.yy322 != null)
+						yygotominor.yy322.a [yygotominor.yy322.nExpr - 1].sortOrder = (u8)yymsp [0].minor.yy4;
+				}
+				//#line 2726 "parse.c"
+				break;
+			case 154:
+				///
+///<summary>
+///sortlist ::= sortitem sortorder 
+///</summary>
+
+				//#line 584 "parse.y"
+				{
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (0, yymsp [-1].minor.yy314);
+					if (yygotominor.yy322 != null && ALWAYS (yygotominor.yy322.a != null))
+						yygotominor.yy322.a [0].sortOrder = (u8)yymsp [0].minor.yy4;
+				}
+				//#line 2734 "parse.c"
+				break;
+			case 156:
+			///
+///<summary>
+///sortorder ::= ASC 
+///</summary>
+
+			case 158:
+				///
+///<summary>
+///sortorder ::= 
+///</summary>
+
+				//yytestcase(yyruleno==158);
+				//#line 592 "parse.y"
+				{
+					yygotominor.yy4 = SQLITE_SO_ASC;
+				}
+				//#line 2740 "parse.c"
+				break;
+			case 157:
+				///
+///<summary>
+///sortorder ::= DESC 
+///</summary>
+
+				//#line 593 "parse.y"
+				{
+					yygotominor.yy4 = SQLITE_SO_DESC;
+				}
+				//#line 2745 "parse.c"
+				break;
+			case 163:
+				///
+///<summary>
+///limit_opt ::= 
+///</summary>
+
+				//#line 619 "parse.y"
+				{
+					yygotominor.yy292.pLimit = null;
+					yygotominor.yy292.pOffset = null;
+				}
+				//#line 2750 "parse.c"
+				break;
+			case 164:
+				///
+///<summary>
+///limit_opt ::= LIMIT expr 
+///</summary>
+
+				//#line 620 "parse.y"
+				{
+					yygotominor.yy292.pLimit = yymsp [0].minor.yy118.pExpr;
+					yygotominor.yy292.pOffset = null;
+				}
+				//#line 2755 "parse.c"
+				break;
+			case 165:
+				///
+///<summary>
+///limit_opt ::= LIMIT expr OFFSET expr 
+///</summary>
+
+				//#line 622 "parse.y"
+				{
+					yygotominor.yy292.pLimit = yymsp [-2].minor.yy118.pExpr;
+					yygotominor.yy292.pOffset = yymsp [0].minor.yy118.pExpr;
+				}
+				//#line 2760 "parse.c"
+				break;
+			case 166:
+				///
+///<summary>
+///limit_opt ::= LIMIT expr COMMA expr 
+///</summary>
+
+				//#line 624 "parse.y"
+				{
+					yygotominor.yy292.pOffset = yymsp [-2].minor.yy118.pExpr;
+					yygotominor.yy292.pLimit = yymsp [0].minor.yy118.pExpr;
+				}
+				//#line 2765 "parse.c"
+				break;
+			case 167:
+				///
+///<summary>
+///cmd ::= DELETE FROM fullname indexed_opt where_opt 
+///</summary>
+
+				//#line 637 "parse.y"
+				{
+					sqlite3SrcListIndexedBy (pParse, yymsp [-2].minor.yy259, yymsp [-1].minor.yy0Token);
+					pParse.sqlite3DeleteFrom (yymsp [-2].minor.yy259, yymsp [0].minor.yy314);
+				}
+				//#line 2773 "parse.c"
+				break;
+			case 170:
+				///
+///<summary>
+///cmd ::= UPDATE orconf fullname indexed_opt SET setlist where_opt 
+///</summary>
+
+				//#line 660 "parse.y"
+				{
+					sqlite3SrcListIndexedBy (pParse, yymsp [-4].minor.yy259, yymsp [-3].minor.yy0Token);
+					pParse.sqlite3ExprListCheckLength (yymsp [-1].minor.yy322, "set list");
+					pParse.sqlite3Update (yymsp [-4].minor.yy259, yymsp [-1].minor.yy322, yymsp [0].minor.yy314, yymsp [-5].minor.yy210);
+				}
+				//#line 2782 "parse.c"
+				break;
+			case 171:
+				///
+///<summary>
+///setlist ::= setlist COMMA nm EQ expr 
+///</summary>
+
+				//#line 670 "parse.y"
+				{
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yymsp [-4].minor.yy322, yymsp [0].minor.yy118.pExpr);
+					pParse.sqlite3ExprListSetName (yygotominor.yy322, yymsp [-2].minor.yy0Token, 1);
+				}
+				//#line 2790 "parse.c"
+				break;
+			case 172:
+				///
+///<summary>
+///setlist ::= nm EQ expr 
+///</summary>
+
+				//#line 674 "parse.y"
+				{
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (0, yymsp [0].minor.yy118.pExpr);
+					pParse.sqlite3ExprListSetName (yygotominor.yy322, yymsp [-2].minor.yy0Token, 1);
+				}
+				//#line 2798 "parse.c"
+				break;
+			case 173:
+				///
+///<summary>
+///cmd ::= insert_cmd INTO fullname inscollist_opt VALUES LP itemlist RP 
+///</summary>
+
+				//#line 683 "parse.y"
+				{
+					pParse.sqlite3Insert (yymsp [-5].minor.yy259, yymsp [-1].minor.yy322, 0, yymsp [-4].minor.yy384, yymsp [-7].minor.yy210);
+				}
+				//#line 2803 "parse.c"
+				break;
+			case 174:
+				///
+///<summary>
+///cmd ::= insert_cmd INTO fullname inscollist_opt select 
+///</summary>
+
+				//#line 685 "parse.y"
+				{
+					pParse.sqlite3Insert (yymsp [-2].minor.yy259, 0, yymsp [0].minor.yy387, yymsp [-1].minor.yy384, yymsp [-4].minor.yy210);
+				}
+				//#line 2808 "parse.c"
+				break;
+			case 175:
+				///
+///<summary>
+///cmd ::= insert_cmd INTO fullname inscollist_opt DEFAULT VALUES 
+///</summary>
+
+				//#line 687 "parse.y"
+				{
+					pParse.sqlite3Insert (yymsp [-3].minor.yy259, 0, 0, yymsp [-2].minor.yy384, yymsp [-5].minor.yy210);
+				}
+				//#line 2813 "parse.c"
+				break;
+			case 176:
+				///
+///<summary>
+///insert_cmd ::= INSERT orconf 
+///</summary>
+
+				//#line 690 "parse.y"
+				{
+					yygotominor.yy210 = yymsp [0].minor.yy210;
+				}
+				//#line 2818 "parse.c"
+				break;
+			case 177:
+				///
+///<summary>
+///insert_cmd ::= REPLACE 
+///</summary>
+
+				//#line 691 "parse.y"
+				{
+					yygotominor.yy210 = OE_Replace;
+				}
+				//#line 2823 "parse.c"
+				break;
+			case 178:
+			///
+///<summary>
+///itemlist ::= itemlist COMMA expr 
+///</summary>
+
+			case 241:
+				///
+///<summary>
+///nexprlist ::= nexprlist COMMA expr 
+///</summary>
+
+				//yytestcase(yyruleno==241);
+				//#line 698 "parse.y"
+				{
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yymsp [-2].minor.yy322, yymsp [0].minor.yy118.pExpr);
+				}
+				//#line 2829 "parse.c"
+				break;
+			case 179:
+			///
+///<summary>
+///itemlist ::= expr 
+///</summary>
+
+			case 242:
+				///
+///<summary>
+///nexprlist ::= expr 
+///</summary>
+
+				//yytestcase(yyruleno==242);
+				//#line 700 "parse.y"
+				{
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (0, yymsp [0].minor.yy118.pExpr);
+				}
+				//#line 2835 "parse.c"
+				break;
+			case 182:
+				///
+///<summary>
+///inscollist ::= inscollist COMMA nm 
+///</summary>
+
+				//#line 710 "parse.y"
+				{
+					yygotominor.yy384 = sqlite3IdListAppend (pParse.db, yymsp [-2].minor.yy384, yymsp [0].minor.yy0Token);
+				}
+				//#line 2840 "parse.c"
+				break;
+			case 183:
+				///
+///<summary>
+///inscollist ::= nm 
+///</summary>
+
+				//#line 712 "parse.y"
+				{
+					yygotominor.yy384 = sqlite3IdListAppend (pParse.db, 0, yymsp [0].minor.yy0Token);
+				}
+				//#line 2845 "parse.c"
+				break;
+			case 184:
+				///
+///<summary>
+///expr ::= term 
+///</summary>
+
+				//#line 743 "parse.y"
+				{
+					yygotominor.yy118 = yymsp [0].minor.yy118;
+				}
+				//#line 2850 "parse.c"
+				break;
+			case 185:
+				///
+///<summary>
+///expr ::= LP expr RP 
+///</summary>
+
+				//#line 744 "parse.y"
+				{
+					yygotominor.yy118.pExpr = yymsp [-1].minor.yy118.pExpr;
+					yygotominor.yy118.spanSet (yymsp [-2].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 2855 "parse.c"
+				break;
+			case 186:
+			///
+///<summary>
+///term ::= NULL 
+///</summary>
+
+			case 191:
+			///
+///<summary>
+///term ::= INTEGER|FLOAT|BLOB 
+///</summary>
+
+			//yytestcase(yyruleno==191);
+			case 192:
+				///
+///<summary>
+///term ::= STRING 
+///</summary>
+
+				//yytestcase(yyruleno==192);
+				//#line 745 "parse.y"
+				{
+					yygotominor.yy118.spanExpr (pParse, yymsp [0].major, yymsp [0].minor.yy0Token);
+				}
+				//#line 2862 "parse.c"
+				break;
+			case 187:
+			///
+///<summary>
+///expr ::= id 
+///</summary>
+
+			case 188:
+				///
+///<summary>
+///expr ::= JOIN_KW 
+///</summary>
+
+				//yytestcase(yyruleno==188);
+				//#line 746 "parse.y"
+				{
+					yygotominor.yy118.spanExpr (pParse, TK_ID, yymsp [0].minor.yy0Token);
+				}
+				//#line 2868 "parse.c"
+				break;
+			case 189:
+				///
+///<summary>
+///expr ::= nm DOT nm 
+///</summary>
+
+				//#line 748 "parse.y"
+				{
+					Expr temp1 = pParse.sqlite3PExpr (TK_ID, 0, 0, yymsp [-2].minor.yy0Token);
+					Expr temp2 = pParse.sqlite3PExpr (TK_ID, 0, 0, yymsp [0].minor.yy0Token);
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_DOT, temp1, temp2, 0);
+					yygotominor.yy118.spanSet (yymsp [-2].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 2878 "parse.c"
+				break;
+			case 190:
+				///
+///<summary>
+///expr ::= nm DOT nm DOT nm 
+///</summary>
+
+				//#line 754 "parse.y"
+				{
+					Expr temp1 = pParse.sqlite3PExpr (TK_ID, 0, 0, yymsp [-4].minor.yy0Token);
+					Expr temp2 = pParse.sqlite3PExpr (TK_ID, 0, 0, yymsp [-2].minor.yy0Token);
+					Expr temp3 = pParse.sqlite3PExpr (TK_ID, 0, 0, yymsp [0].minor.yy0Token);
+					Expr temp4 = pParse.sqlite3PExpr (TK_DOT, temp2, temp3, 0);
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_DOT, temp1, temp4, 0);
+					yygotominor.yy118.spanSet (yymsp [-4].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 2890 "parse.c"
+				break;
+			case 193:
+				///
+///<summary>
+///expr ::= REGISTER 
+///</summary>
+
+				//#line 764 "parse.y"
+				{
+					///
+///<summary>
+///When doing a nested parse, one can include terms in an expression
+///that look like this:   #1 #2 ...  These terms refer to registers
+///</summary>
+///<param name="in the virtual machine.  #N is the N">th register. </param>
+
+					if (pParse.nested == 0) {
+						sqlite3ErrorMsg (pParse, "near \"%T\": syntax error", yymsp [0].minor.yy0Token);
+						yygotominor.yy118.pExpr = null;
+					}
+					else {
+						yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_REGISTER, 0, 0, yymsp [0].minor.yy0Token);
+						if (yygotominor.yy118.pExpr != null)
+							Converter.sqlite3GetInt32 (yymsp [0].minor.yy0Token.zRestSql, 1, ref yygotominor.yy118.pExpr.iTable);
+					}
+					yygotominor.yy118.spanSet (yymsp [0].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 2907 "parse.c"
+				break;
+			case 194:
+				///
+///<summary>
+///expr ::= VARIABLE 
+///</summary>
+
+				//#line 777 "parse.y"
+				{
+					yygotominor.yy118.spanExpr (pParse, TK_VARIABLE, yymsp [0].minor.yy0Token);
+					pParse.sqlite3ExprAssignVarNumber (yygotominor.yy118.pExpr);
+					yygotominor.yy118.spanSet (yymsp [0].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 2916 "parse.c"
+				break;
+			case 195:
+				///
+///<summary>
+///expr ::= expr COLLATE ids 
+///</summary>
+
+				//#line 782 "parse.y"
+				{
+					yygotominor.yy118.pExpr = pParse.sqlite3ExprSetCollByToken (yymsp [-2].minor.yy118.pExpr, yymsp [0].minor.yy0Token);
+					yygotominor.yy118.zStart = yymsp [-2].minor.yy118.zStart;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy0Token.zRestSql.Substring (yymsp [0].minor.yy0Token.Length);
+					//z[yymsp[0].minor.yy0.n];
+				}
+				//#line 2925 "parse.c"
+				break;
+			case 196:
+				///
+///<summary>
+///expr ::= CAST LP expr AS typetoken RP 
+///</summary>
+
+				//#line 788 "parse.y"
+				{
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_CAST, yymsp [-3].minor.yy118.pExpr, 0, yymsp [-1].minor.yy0Token);
+					yygotominor.yy118.spanSet (yymsp [-5].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 2933 "parse.c"
+				break;
+			case 197:
+				///
+///<summary>
+///expr ::= ID LP distinct exprlist RP 
+///</summary>
+
+				//#line 793 "parse.y"
+				{
+					if (yymsp [-1].minor.yy322 != null && yymsp [-1].minor.yy322.nExpr > pParse.db.aLimit [SQLITE_LIMIT_FUNCTION_ARG]) {
+						sqlite3ErrorMsg (pParse, "too many arguments on function %T", yymsp [-4].minor.yy0Token);
+					}
+					yygotominor.yy118.pExpr = pParse.sqlite3ExprFunction (yymsp [-1].minor.yy322, yymsp [-4].minor.yy0Token);
+					yygotominor.yy118.spanSet (yymsp [-4].minor.yy0Token, yymsp [0].minor.yy0Token);
+					if (yymsp [-2].minor.yy4 != 0 && yygotominor.yy118.pExpr != null) {
+						yygotominor.yy118.pExpr.flags |= EP_Distinct;
+					}
+				}
+				//#line 2947 "parse.c"
+				break;
+			case 198:
+				///
+///<summary>
+///expr ::= ID LP STAR RP 
+///</summary>
+
+				//#line 803 "parse.y"
+				{
+					yygotominor.yy118.pExpr = pParse.sqlite3ExprFunction (0, yymsp [-3].minor.yy0Token);
+					yygotominor.yy118.spanSet (yymsp [-3].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 2955 "parse.c"
+				break;
+			case 199:
+				///
+///<summary>
+///term ::= CTIME_KW 
+///</summary>
+
+				//#line 807 "parse.y"
+				{
+					///
+///<summary>
+///The CURRENT_TIME, CURRENT_DATE, and CURRENT_TIMESTAMP values are
+///treated as functions that return constants 
+///</summary>
+
+					yygotominor.yy118.pExpr = pParse.sqlite3ExprFunction (0, yymsp [0].minor.yy0Token);
+					if (yygotominor.yy118.pExpr != null) {
+						yygotominor.yy118.pExpr.Operator = TokenType.TK_CONST_FUNC;
+					}
+					yygotominor.yy118.spanSet (yymsp [0].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 2968 "parse.c"
+				break;
+			case 200:
+			///
+///<summary>
+///expr ::= expr AND expr 
+///</summary>
+
+			case 201:
+			///
+///<summary>
+///expr ::= expr OR expr 
+///</summary>
+
+			//yytestcase(yyruleno==201);
+			case 202:
+			///
+///<summary>
+///expr ::= expr LT|GT|GE|LE expr 
+///</summary>
+
+			//yytestcase(yyruleno==202);
+			case 203:
+			///
+///<summary>
+///expr ::= expr EQ|NE expr 
+///</summary>
+
+			//yytestcase(yyruleno==203);
+			case 204:
+			///
+///<summary>
+///expr ::= expr BITAND|BITOR|LSHIFT|RSHIFT expr 
+///</summary>
+
+			//yytestcase(yyruleno==204);
+			case 205:
+			///
+///<summary>
+///expr ::= expr PLUS|MINUS expr 
+///</summary>
+
+			//yytestcase(yyruleno==205);
+			case 206:
+			///
+///<summary>
+///expr ::= expr STAR|SLASH|REM expr 
+///</summary>
+
+			//yytestcase(yyruleno==206);
+			case 207:
+				///
+///<summary>
+///expr ::= expr CONCAT expr 
+///</summary>
+
+				//yytestcase(yyruleno==207);
+				//#line 834 "parse.y"
+				{
+					yygotominor.yy118.spanBinaryExpr (pParse, yymsp [-1].major, yymsp [-2].minor.yy118, yymsp [0].minor.yy118);
+				}
+				//#line 2980 "parse.c"
+				break;
+			case 208:
+			///
+///<summary>
+///likeop ::= LIKE_KW 
+///</summary>
+
+			case 210:
+				///
+///<summary>
+///likeop ::= MATCH 
+///</summary>
+
+				//yytestcase(yyruleno==210);
+				//#line 847 "parse.y"
+				{
+					yygotominor.yy342.eOperator = yymsp [0].minor.yy0Token;
+					yygotominor.yy342.not = false;
+				}
+				//#line 2986 "parse.c"
+				break;
+			case 209:
+			///
+///<summary>
+///likeop ::= NOT LIKE_KW 
+///</summary>
+
+			case 211:
+				///
+///<summary>
+///likeop ::= NOT MATCH 
+///</summary>
+
+				//yytestcase(yyruleno==211);
+				//#line 848 "parse.y"
+				{
+					yygotominor.yy342.eOperator = yymsp [0].minor.yy0Token;
+					yygotominor.yy342.not = true;
+				}
+				//#line 2992 "parse.c"
+				break;
+			case 212:
+				///
+///<summary>
+///expr ::= expr likeop expr 
+///</summary>
+
+				//#line 851 "parse.y"
+				{
+					ExprList pList;
+					pList = pParse.sqlite3ExprListAppend (0, yymsp [0].minor.yy118.pExpr);
+					pList = pParse.sqlite3ExprListAppend (pList, yymsp [-2].minor.yy118.pExpr);
+					yygotominor.yy118.pExpr = pParse.sqlite3ExprFunction (pList, yymsp [-1].minor.yy342.eOperator);
+					if (yymsp [-1].minor.yy342.not)
+						yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_NOT, yygotominor.yy118.pExpr, 0, 0);
+					yygotominor.yy118.zStart = yymsp [-2].minor.yy118.zStart;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy118.zEnd;
+					if (yygotominor.yy118.pExpr != null)
+						yygotominor.yy118.pExpr.flags |= EP_InfixFunc;
+				}
+				//#line 3006 "parse.c"
+				break;
+			case 213:
+				///
+///<summary>
+///expr ::= expr likeop expr ESCAPE expr 
+///</summary>
+
+				//#line 861 "parse.y"
+				{
+					ExprList pList;
+					pList = pParse.sqlite3ExprListAppend (0, yymsp [-2].minor.yy118.pExpr);
+					pList = pParse.sqlite3ExprListAppend (pList, yymsp [-4].minor.yy118.pExpr);
+					pList = pParse.sqlite3ExprListAppend (pList, yymsp [0].minor.yy118.pExpr);
+					yygotominor.yy118.pExpr = pParse.sqlite3ExprFunction (pList, yymsp [-3].minor.yy342.eOperator);
+					if (yymsp [-3].minor.yy342.not)
+						yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_NOT, yygotominor.yy118.pExpr, 0, 0);
+					yygotominor.yy118.zStart = yymsp [-4].minor.yy118.zStart;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy118.zEnd;
+					if (yygotominor.yy118.pExpr != null)
+						yygotominor.yy118.pExpr.flags |= EP_InfixFunc;
+				}
+				//#line 3021 "parse.c"
+				break;
+			case 214:
+				///
+///<summary>
+///expr ::= expr ISNULL|NOTNULL 
+///</summary>
+
+				//#line 889 "parse.y"
+				{
+					yygotominor.yy118.spanUnaryPostfix (pParse, yymsp [0].major, yymsp [-1].minor.yy118, yymsp [0].minor.yy0Token);
+				}
+				//#line 3026 "parse.c"
+				break;
+			case 215:
+				///
+///<summary>
+///expr ::= expr NOT NULL 
+///</summary>
+
+				//#line 890 "parse.y"
+				{
+					yygotominor.yy118.spanUnaryPostfix (pParse, TK_NOTNULL, yymsp [-2].minor.yy118, yymsp [0].minor.yy0Token);
+				}
+				//#line 3031 "parse.c"
+				break;
+			case 216:
+				///
+///<summary>
+///expr ::= expr IS expr 
+///</summary>
+
+				//#line 911 "parse.y"
+				{
+					yygotominor.yy118.spanBinaryExpr (pParse, TK_IS, yymsp [-2].minor.yy118, yymsp [0].minor.yy118);
+					pParse.binaryToUnaryIfNull (yymsp [0].minor.yy118.pExpr, yygotominor.yy118.pExpr, TK_ISNULL);
+				}
+				//#line 3039 "parse.c"
+				break;
+			case 217:
+				///
+///<summary>
+///expr ::= expr IS NOT expr 
+///</summary>
+
+				//#line 915 "parse.y"
+				{
+					yygotominor.yy118.spanBinaryExpr (pParse, TK_ISNOT, yymsp [-3].minor.yy118, yymsp [0].minor.yy118);
+					pParse.binaryToUnaryIfNull (yymsp [0].minor.yy118.pExpr, yygotominor.yy118.pExpr, TK_NOTNULL);
+				}
+				//#line 3047 "parse.c"
+				break;
+			case 218:
+			///
+///<summary>
+///expr ::= NOT expr 
+///</summary>
+
+			case 219:
+				///
+///<summary>
+///expr ::= BITNOT expr 
+///</summary>
+
+				//yytestcase(yyruleno==219);
+				//#line 938 "parse.y"
+				{
+					yygotominor.yy118.spanUnaryPrefix (pParse, yymsp [-1].major, yymsp [0].minor.yy118, yymsp [-1].minor.yy0Token);
+				}
+				//#line 3053 "parse.c"
+				break;
+			case 220:
+				///
+///<summary>
+///expr ::= MINUS expr 
+///</summary>
+
+				//#line 941 "parse.y"
+				{
+					yygotominor.yy118.spanUnaryPrefix (pParse, TK_UMINUS, yymsp [0].minor.yy118, yymsp [-1].minor.yy0Token);
+				}
+				//#line 3058 "parse.c"
+				break;
+			case 221:
+				///
+///<summary>
+///expr ::= PLUS expr 
+///</summary>
+
+				//#line 943 "parse.y"
+				{
+					yygotominor.yy118.spanUnaryPrefix (pParse, TK_UPLUS, yymsp [0].minor.yy118, yymsp [-1].minor.yy0Token);
+				}
+				//#line 3063 "parse.c"
+				break;
+			case 224:
+				///
+///<summary>
+///expr ::= expr between_op expr AND expr 
+///</summary>
+
+				//#line 948 "parse.y"
+				{
+					ExprList pList = pParse.sqlite3ExprListAppend (0, yymsp [-2].minor.yy118.pExpr);
+					pList = pParse.sqlite3ExprListAppend (pList, yymsp [0].minor.yy118.pExpr);
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_BETWEEN, yymsp [-4].minor.yy118.pExpr, 0, 0);
+					if (yygotominor.yy118.pExpr != null) {
+						yygotominor.yy118.pExpr.x.pList = pList;
+					}
+					else {
+						sqlite3ExprListDelete (pParse.db, ref pList);
+					}
+					if (yymsp [-3].minor.yy4 != 0)
+						yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_NOT, yygotominor.yy118.pExpr, 0, 0);
+					yygotominor.yy118.zStart = yymsp [-4].minor.yy118.zStart;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy118.zEnd;
+				}
+				//#line 3080 "parse.c"
+				break;
+			case 227:
+				///
+///<summary>
+///expr ::= expr in_op LP exprlist RP 
+///</summary>
+
+				//#line 965 "parse.y"
+				{
+					if (yymsp [-1].minor.yy322 == null) {
+						///
+///<summary>
+///Expressions of the form
+///
+///expr1 IN ()
+///expr1 NOT IN ()
+///
+///simplify to constants 0 (false) and 1 (true), respectively,
+///regardless of the value of expr1.
+///
+///</summary>
+
+						yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_INTEGER, 0, 0, sqlite3IntTokens [yymsp [-3].minor.yy4]);
+						sqlite3ExprDelete (pParse.db, ref yymsp [-4].minor.yy118.pExpr);
+					}
+					else {
+						yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_IN, yymsp [-4].minor.yy118.pExpr, 0, 0);
+						if (yygotominor.yy118.pExpr != null) {
+							yygotominor.yy118.pExpr.x.pList = yymsp [-1].minor.yy322;
+							pParse.sqlite3ExprSetHeight (yygotominor.yy118.pExpr);
+						}
+						else {
+							sqlite3ExprListDelete (pParse.db, ref yymsp [-1].minor.yy322);
+						}
+						if (yymsp [-3].minor.yy4 != 0)
+							yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_NOT, yygotominor.yy118.pExpr, 0, 0);
+					}
+					yygotominor.yy118.zStart = yymsp [-4].minor.yy118.zStart;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy0Token.zRestSql.Substring (yymsp [0].minor.yy0Token.Length);
+					//[yymsp[0].minor.yy0.n];
+				}
+				//#line 3109 "parse.c"
+				break;
 			case 228:
-			/* expr ::= LP select RP *///#line 990 "parse.y"
-			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_SELECT,0,0,0);
-				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.x.pSelect=yymsp[-1].minor.yy387;
-					ExprSetProperty(yygotominor.yy118.pExpr,EP_xIsSelect);
-					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
+				///
+///<summary>
+///expr ::= LP select RP 
+///</summary>
+
+				//#line 990 "parse.y"
+				{
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_SELECT, 0, 0, 0);
+					if (yygotominor.yy118.pExpr != null) {
+						yygotominor.yy118.pExpr.x.pSelect = yymsp [-1].minor.yy387;
+						ExprSetProperty (yygotominor.yy118.pExpr, EP_xIsSelect);
+						pParse.sqlite3ExprSetHeight (yygotominor.yy118.pExpr);
+					}
+					else {
+						sqlite3SelectDelete (pParse.db, ref yymsp [-1].minor.yy387);
+					}
+					yygotominor.yy118.zStart = yymsp [-2].minor.yy0Token.zRestSql;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy0Token.zRestSql.Substring (yymsp [0].minor.yy0Token.Length);
+					//z[yymsp[0].minor.yy0.n];
 				}
-				else {
-					sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
-				}
-				yygotominor.yy118.zStart=yymsp[-2].minor.yy0Token.zRestSql;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
-				//z[yymsp[0].minor.yy0.n];
-			}
-			//#line 3125 "parse.c"
-			break;
+				//#line 3125 "parse.c"
+				break;
 			case 229:
-			/* expr ::= expr in_op LP select RP *///#line 1002 "parse.y"
-			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_IN,yymsp[-4].minor.yy118.pExpr,0,0);
-				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.x.pSelect=yymsp[-1].minor.yy387;
-					ExprSetProperty(yygotominor.yy118.pExpr,EP_xIsSelect);
-					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
+				///
+///<summary>
+///expr ::= expr in_op LP select RP 
+///</summary>
+
+				//#line 1002 "parse.y"
+				{
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_IN, yymsp [-4].minor.yy118.pExpr, 0, 0);
+					if (yygotominor.yy118.pExpr != null) {
+						yygotominor.yy118.pExpr.x.pSelect = yymsp [-1].minor.yy387;
+						ExprSetProperty (yygotominor.yy118.pExpr, EP_xIsSelect);
+						pParse.sqlite3ExprSetHeight (yygotominor.yy118.pExpr);
+					}
+					else {
+						sqlite3SelectDelete (pParse.db, ref yymsp [-1].minor.yy387);
+					}
+					if (yymsp [-3].minor.yy4 != 0)
+						yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_NOT, yygotominor.yy118.pExpr, 0, 0);
+					yygotominor.yy118.zStart = yymsp [-4].minor.yy118.zStart;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy0Token.zRestSql.Substring (yymsp [0].minor.yy0Token.Length);
+					//z[yymsp[0].minor.yy0.n];
 				}
-				else {
-					sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
-				}
-				if(yymsp[-3].minor.yy4!=0)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
-				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
-				//z[yymsp[0].minor.yy0.n];
-			}
-			//#line 3142 "parse.c"
-			break;
+				//#line 3142 "parse.c"
+				break;
 			case 230:
-			/* expr ::= expr in_op nm dbnm *///#line 1015 "parse.y"
-			{
-				SrcList pSrc=sqlite3SrcListAppend(pParse.db,0,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token);
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_IN,yymsp[-3].minor.yy118.pExpr,0,0);
-				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.x.pSelect=sqlite3SelectNew(pParse,0,pSrc,0,0,0,0,0,0,0);
-					ExprSetProperty(yygotominor.yy118.pExpr,EP_xIsSelect);
-					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
+				///
+///<summary>
+///expr ::= expr in_op nm dbnm 
+///</summary>
+
+				//#line 1015 "parse.y"
+				{
+					SrcList pSrc = sqlite3SrcListAppend (pParse.db, 0, yymsp [-1].minor.yy0Token, yymsp [0].minor.yy0Token);
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_IN, yymsp [-3].minor.yy118.pExpr, 0, 0);
+					if (yygotominor.yy118.pExpr != null) {
+						yygotominor.yy118.pExpr.x.pSelect = sqlite3SelectNew (pParse, 0, pSrc, 0, 0, 0, 0, 0, 0, 0);
+						ExprSetProperty (yygotominor.yy118.pExpr, EP_xIsSelect);
+						pParse.sqlite3ExprSetHeight (yygotominor.yy118.pExpr);
+					}
+					else {
+						sqlite3SrcListDelete (pParse.db, ref pSrc);
+					}
+					if (yymsp [-2].minor.yy4 != 0)
+						yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_NOT, yygotominor.yy118.pExpr, 0, 0);
+					yygotominor.yy118.zStart = yymsp [-3].minor.yy118.zStart;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy0Token.zRestSql != null ? yymsp [0].minor.yy0Token.zRestSql.Substring (yymsp [0].minor.yy0Token.Length) : yymsp [-1].minor.yy0Token.zRestSql.Substring (yymsp [-1].minor.yy0Token.Length);
 				}
-				else {
-					sqlite3SrcListDelete(pParse.db,ref pSrc);
-				}
-				if(yymsp[-2].minor.yy4!=0)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
-				yygotominor.yy118.zStart=yymsp[-3].minor.yy118.zStart;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql!=null?yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length):yymsp[-1].minor.yy0Token.zRestSql.Substring(yymsp[-1].minor.yy0Token.Length);
-			}
-			//#line 3160 "parse.c"
-			break;
+				//#line 3160 "parse.c"
+				break;
 			case 231:
-			/* expr ::= EXISTS LP select RP *///#line 1029 "parse.y"
-			{
-				Expr p=yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_EXISTS,0,0,0);
-				if(p!=null) {
-					p.x.pSelect=yymsp[-1].minor.yy387;
-					ExprSetProperty(p,EP_xIsSelect);
-					pParse.sqlite3ExprSetHeight(p);
+				///
+///<summary>
+///expr ::= EXISTS LP select RP 
+///</summary>
+
+				//#line 1029 "parse.y"
+				{
+					Expr p = yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_EXISTS, 0, 0, 0);
+					if (p != null) {
+						p.x.pSelect = yymsp [-1].minor.yy387;
+						ExprSetProperty (p, EP_xIsSelect);
+						pParse.sqlite3ExprSetHeight (p);
+					}
+					else {
+						sqlite3SelectDelete (pParse.db, ref yymsp [-1].minor.yy387);
+					}
+					yygotominor.yy118.zStart = yymsp [-3].minor.yy0Token.zRestSql;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy0Token.zRestSql.Substring (yymsp [0].minor.yy0Token.Length);
+					//z[yymsp[0].minor.yy0.n];
 				}
-				else {
-					sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
-				}
-				yygotominor.yy118.zStart=yymsp[-3].minor.yy0Token.zRestSql;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
-				//z[yymsp[0].minor.yy0.n];
-			}
-			//#line 3176 "parse.c"
-			break;
+				//#line 3176 "parse.c"
+				break;
 			case 232:
-			/* expr ::= CASE case_operand case_exprlist case_else END *///#line 1044 "parse.y"
-			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_CASE,yymsp[-3].minor.yy314,yymsp[-1].minor.yy314,0);
-				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.x.pList=yymsp[-2].minor.yy322;
-					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
+				///
+///<summary>
+///expr ::= CASE case_operand case_exprlist case_else END 
+///</summary>
+
+				//#line 1044 "parse.y"
+				{
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_CASE, yymsp [-3].minor.yy314, yymsp [-1].minor.yy314, 0);
+					if (yygotominor.yy118.pExpr != null) {
+						yygotominor.yy118.pExpr.x.pList = yymsp [-2].minor.yy322;
+						pParse.sqlite3ExprSetHeight (yygotominor.yy118.pExpr);
+					}
+					else {
+						sqlite3ExprListDelete (pParse.db, ref yymsp [-2].minor.yy322);
+					}
+					yygotominor.yy118.zStart = yymsp [-4].minor.yy0Token.zRestSql;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy0Token.zRestSql.Substring (yymsp [0].minor.yy0Token.Length);
+					//z[yymsp[0].minor.yy0.n];
 				}
-				else {
-					sqlite3ExprListDelete(pParse.db,ref yymsp[-2].minor.yy322);
-				}
-				yygotominor.yy118.zStart=yymsp[-4].minor.yy0Token.zRestSql;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
-				//z[yymsp[0].minor.yy0.n];
-			}
-			//#line 3191 "parse.c"
-			break;
+				//#line 3191 "parse.c"
+				break;
 			case 233:
-			/* case_exprlist ::= case_exprlist WHEN expr THEN expr *///#line 1057 "parse.y"
-			{
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-4].minor.yy322,yymsp[-2].minor.yy118.pExpr);
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yygotominor.yy322,yymsp[0].minor.yy118.pExpr);
-			}
-			//#line 3199 "parse.c"
-			break;
+				///
+///<summary>
+///case_exprlist ::= case_exprlist WHEN expr THEN expr 
+///</summary>
+
+				//#line 1057 "parse.y"
+				{
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yymsp [-4].minor.yy322, yymsp [-2].minor.yy118.pExpr);
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yygotominor.yy322, yymsp [0].minor.yy118.pExpr);
+				}
+				//#line 3199 "parse.c"
+				break;
 			case 234:
-			/* case_exprlist ::= WHEN expr THEN expr *///#line 1061 "parse.y"
-			{
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(0,yymsp[-2].minor.yy118.pExpr);
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yygotominor.yy322,yymsp[0].minor.yy118.pExpr);
-			}
-			//#line 3207 "parse.c"
-			break;
+				///
+///<summary>
+///case_exprlist ::= WHEN expr THEN expr 
+///</summary>
+
+				//#line 1061 "parse.y"
+				{
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (0, yymsp [-2].minor.yy118.pExpr);
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yygotominor.yy322, yymsp [0].minor.yy118.pExpr);
+				}
+				//#line 3207 "parse.c"
+				break;
 			case 243:
-			/* cmd ::= createkw uniqueflag INDEX ifnotexists nm dbnm ON nm LP idxlist RP *///#line 1090 "parse.y"
-			{
-				sqlite3CreateIndex(pParse,yymsp[-6].minor.yy0Token,yymsp[-5].minor.yy0Token,sqlite3SrcListAppend(pParse.db,0,yymsp[-3].minor.yy0Token,0),yymsp[-1].minor.yy322,yymsp[-9].minor.yy4,yymsp[-10].minor.yy0Token,yymsp[0].minor.yy0Token,SQLITE_SO_ASC,yymsp[-7].minor.yy4);
-			}
-			//#line 3216 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= createkw uniqueflag INDEX ifnotexists nm dbnm ON nm LP idxlist RP 
+///</summary>
+
+				//#line 1090 "parse.y"
+				{
+					sqlite3CreateIndex (pParse, yymsp [-6].minor.yy0Token, yymsp [-5].minor.yy0Token, sqlite3SrcListAppend (pParse.db, 0, yymsp [-3].minor.yy0Token, 0), yymsp [-1].minor.yy322, yymsp [-9].minor.yy4, yymsp [-10].minor.yy0Token, yymsp [0].minor.yy0Token, SQLITE_SO_ASC, yymsp [-7].minor.yy4);
+				}
+				//#line 3216 "parse.c"
+				break;
 			case 244:
-			/* uniqueflag ::= UNIQUE */case 298:
-			/* raisetype ::= ABORT *///yytestcase(yyruleno==298);
-			//#line 1097 "parse.y"
-			{
-				yygotominor.yy4=OE_Abort;
-			}
-			//#line 3222 "parse.c"
-			break;
+			///
+///<summary>
+///uniqueflag ::= UNIQUE 
+///</summary>
+
+			case 298:
+				///
+///<summary>
+///raisetype ::= ABORT 
+///</summary>
+
+				//yytestcase(yyruleno==298);
+				//#line 1097 "parse.y"
+				{
+					yygotominor.yy4 = OE_Abort;
+				}
+				//#line 3222 "parse.c"
+				break;
 			case 245:
-			/* uniqueflag ::= *///#line 1098 "parse.y"
-			{
-				yygotominor.yy4=OE_None;
-			}
-			//#line 3227 "parse.c"
-			break;
+				///
+///<summary>
+///uniqueflag ::= 
+///</summary>
+
+				//#line 1098 "parse.y"
+				{
+					yygotominor.yy4 = OE_None;
+				}
+				//#line 3227 "parse.c"
+				break;
 			case 248:
-			/* idxlist ::= idxlist COMMA nm collate sortorder *///#line 1107 "parse.y"
-			{
-				Expr p=null;
-				if(yymsp[-1].minor.yy0Token.Length>0) {
-					p=sqlite3Expr(pParse.db,TK_COLUMN,null);
-					pParse.sqlite3ExprSetCollByToken(p,yymsp[-1].minor.yy0Token);
+				///
+///<summary>
+///idxlist ::= idxlist COMMA nm collate sortorder 
+///</summary>
+
+				//#line 1107 "parse.y"
+				{
+					Expr p = null;
+					if (yymsp [-1].minor.yy0Token.Length > 0) {
+						p = sqlite3Expr (pParse.db, TK_COLUMN, null);
+						pParse.sqlite3ExprSetCollByToken (p, yymsp [-1].minor.yy0Token);
+					}
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (yymsp [-4].minor.yy322, p);
+					pParse.sqlite3ExprListSetName (yygotominor.yy322, yymsp [-2].minor.yy0Token, 1);
+					pParse.sqlite3ExprListCheckLength (yygotominor.yy322, "index");
+					if (yygotominor.yy322 != null)
+						yygotominor.yy322.a [yygotominor.yy322.nExpr - 1].sortOrder = (u8)yymsp [0].minor.yy4;
 				}
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-4].minor.yy322,p);
-				pParse.sqlite3ExprListSetName(yygotominor.yy322,yymsp[-2].minor.yy0Token,1);
-				pParse.sqlite3ExprListCheckLength(yygotominor.yy322,"index");
-				if(yygotominor.yy322!=null)
-					yygotominor.yy322.a[yygotominor.yy322.nExpr-1].sortOrder=(u8)yymsp[0].minor.yy4;
-			}
-			//#line 3242 "parse.c"
-			break;
+				//#line 3242 "parse.c"
+				break;
 			case 249:
-			/* idxlist ::= nm collate sortorder *///#line 1118 "parse.y"
-			{
-				Expr p=null;
-				if(yymsp[-1].minor.yy0Token.Length>0) {
-					p=pParse.sqlite3PExpr(TK_COLUMN,0,0,0);
-					pParse.sqlite3ExprSetCollByToken(p,yymsp[-1].minor.yy0Token);
+				///
+///<summary>
+///idxlist ::= nm collate sortorder 
+///</summary>
+
+				//#line 1118 "parse.y"
+				{
+					Expr p = null;
+					if (yymsp [-1].minor.yy0Token.Length > 0) {
+						p = pParse.sqlite3PExpr (TK_COLUMN, 0, 0, 0);
+						pParse.sqlite3ExprSetCollByToken (p, yymsp [-1].minor.yy0Token);
+					}
+					yygotominor.yy322 = pParse.sqlite3ExprListAppend (0, p);
+					pParse.sqlite3ExprListSetName (yygotominor.yy322, yymsp [-2].minor.yy0Token, 1);
+					pParse.sqlite3ExprListCheckLength (yygotominor.yy322, "index");
+					if (yygotominor.yy322 != null)
+						yygotominor.yy322.a [yygotominor.yy322.nExpr - 1].sortOrder = (u8)yymsp [0].minor.yy4;
 				}
-				yygotominor.yy322=pParse.sqlite3ExprListAppend(0,p);
-				pParse.sqlite3ExprListSetName(yygotominor.yy322,yymsp[-2].minor.yy0Token,1);
-				pParse.sqlite3ExprListCheckLength(yygotominor.yy322,"index");
-				if(yygotominor.yy322!=null)
-					yygotominor.yy322.a[yygotominor.yy322.nExpr-1].sortOrder=(u8)yymsp[0].minor.yy4;
-			}
-			//#line 3257 "parse.c"
-			break;
+				//#line 3257 "parse.c"
+				break;
 			case 250:
-			/* collate ::= *///#line 1131 "parse.y"
-			{
-				yygotominor.yy0Token.zRestSql=null;
-				yygotominor.yy0Token.Length=0;
-			}
-			//#line 3262 "parse.c"
-			break;
+				///
+///<summary>
+///collate ::= 
+///</summary>
+
+				//#line 1131 "parse.y"
+				{
+					yygotominor.yy0Token.zRestSql = null;
+					yygotominor.yy0Token.Length = 0;
+				}
+				//#line 3262 "parse.c"
+				break;
 			case 252:
-			/* cmd ::= DROP INDEX ifexists fullname *///#line 1137 "parse.y"
-			{
-				sqlite3DropIndex(pParse,yymsp[0].minor.yy259,yymsp[-1].minor.yy4);
-			}
-			//#line 3267 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= DROP INDEX ifexists fullname 
+///</summary>
+
+				//#line 1137 "parse.y"
+				{
+					sqlite3DropIndex (pParse, yymsp [0].minor.yy259, yymsp [-1].minor.yy4);
+				}
+				//#line 3267 "parse.c"
+				break;
 			case 253:
-			/* cmd ::= VACUUM */case 254:
-			/* cmd ::= VACUUM nm *///yytestcase(yyruleno==254);
-			//#line 1143 "parse.y"
-			{
-				sqlite3Vacuum(pParse);
-			}
-			//#line 3273 "parse.c"
-			break;
+			///
+///<summary>
+///cmd ::= VACUUM 
+///</summary>
+
+			case 254:
+				///
+///<summary>
+///cmd ::= VACUUM nm 
+///</summary>
+
+				//yytestcase(yyruleno==254);
+				//#line 1143 "parse.y"
+				{
+					sqlite3Vacuum (pParse);
+				}
+				//#line 3273 "parse.c"
+				break;
 			case 255:
-			/* cmd ::= PRAGMA nm dbnm *///#line 1151 "parse.y"
-			{
-				sqlite3Pragma(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token,0,0);
-			}
-			//#line 3278 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= PRAGMA nm dbnm 
+///</summary>
+
+				//#line 1151 "parse.y"
+				{
+					sqlite3Pragma (pParse, yymsp [-1].minor.yy0Token, yymsp [0].minor.yy0Token, 0, 0);
+				}
+				//#line 3278 "parse.c"
+				break;
 			case 256:
-			/* cmd ::= PRAGMA nm dbnm EQ nmnum *///#line 1152 "parse.y"
-			{
-				sqlite3Pragma(pParse,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token,0);
-			}
-			//#line 3283 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= PRAGMA nm dbnm EQ nmnum 
+///</summary>
+
+				//#line 1152 "parse.y"
+				{
+					sqlite3Pragma (pParse, yymsp [-3].minor.yy0Token, yymsp [-2].minor.yy0Token, yymsp [0].minor.yy0Token, 0);
+				}
+				//#line 3283 "parse.c"
+				break;
 			case 257:
-			/* cmd ::= PRAGMA nm dbnm LP nmnum RP *///#line 1153 "parse.y"
-			{
-				sqlite3Pragma(pParse,yymsp[-4].minor.yy0Token,yymsp[-3].minor.yy0Token,yymsp[-1].minor.yy0Token,0);
-			}
-			//#line 3288 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= PRAGMA nm dbnm LP nmnum RP 
+///</summary>
+
+				//#line 1153 "parse.y"
+				{
+					sqlite3Pragma (pParse, yymsp [-4].minor.yy0Token, yymsp [-3].minor.yy0Token, yymsp [-1].minor.yy0Token, 0);
+				}
+				//#line 3288 "parse.c"
+				break;
 			case 258:
-			/* cmd ::= PRAGMA nm dbnm EQ minus_num *///#line 1155 "parse.y"
-			{
-				sqlite3Pragma(pParse,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token,1);
-			}
-			//#line 3293 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= PRAGMA nm dbnm EQ minus_num 
+///</summary>
+
+				//#line 1155 "parse.y"
+				{
+					sqlite3Pragma (pParse, yymsp [-3].minor.yy0Token, yymsp [-2].minor.yy0Token, yymsp [0].minor.yy0Token, 1);
+				}
+				//#line 3293 "parse.c"
+				break;
 			case 259:
-			/* cmd ::= PRAGMA nm dbnm LP minus_num RP *///#line 1157 "parse.y"
-			{
-				sqlite3Pragma(pParse,yymsp[-4].minor.yy0Token,yymsp[-3].minor.yy0Token,yymsp[-1].minor.yy0Token,1);
-			}
-			//#line 3298 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= PRAGMA nm dbnm LP minus_num RP 
+///</summary>
+
+				//#line 1157 "parse.y"
+				{
+					sqlite3Pragma (pParse, yymsp [-4].minor.yy0Token, yymsp [-3].minor.yy0Token, yymsp [-1].minor.yy0Token, 1);
+				}
+				//#line 3298 "parse.c"
+				break;
 			case 270:
-			/* cmd ::= createkw trigger_decl BEGIN trigger_cmd_list END *///#line 1175 "parse.y"
-			{
-				Token all=new Token();
-				//all.z = yymsp[-3].minor.yy0.z;
-				//all.n = (int)(yymsp[0].minor.yy0.z - yymsp[-3].minor.yy0.z) + yymsp[0].minor.yy0.n;
-				all.Length=(int)(yymsp[-3].minor.yy0Token.zRestSql.Length-yymsp[0].minor.yy0Token.zRestSql.Length)+yymsp[0].minor.yy0Token.Length;
-				all.zRestSql=yymsp[-3].minor.yy0Token.zRestSql.Substring(0,all.Length);
-				sqlite3FinishTrigger(pParse,yymsp[-1].minor.yy203,all);
-			}
-			//#line 3308 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= createkw trigger_decl BEGIN trigger_cmd_list END 
+///</summary>
+
+				//#line 1175 "parse.y"
+				{
+					Token all = new Token ();
+					//all.z = yymsp[-3].minor.yy0.z;
+					//all.n = (int)(yymsp[0].minor.yy0.z - yymsp[-3].minor.yy0.z) + yymsp[0].minor.yy0.n;
+					all.Length = (int)(yymsp [-3].minor.yy0Token.zRestSql.Length - yymsp [0].minor.yy0Token.zRestSql.Length) + yymsp [0].minor.yy0Token.Length;
+					all.zRestSql = yymsp [-3].minor.yy0Token.zRestSql.Substring (0, all.Length);
+					sqlite3FinishTrigger (pParse, yymsp [-1].minor.yy203, all);
+				}
+				//#line 3308 "parse.c"
+				break;
 			case 271:
-			/* trigger_decl ::= temp TRIGGER ifnotexists nm dbnm trigger_time trigger_event ON fullname foreach_clause when_clause *///#line 1184 "parse.y"
-			{
-				sqlite3BeginTrigger(pParse,yymsp[-7].minor.yy0Token,yymsp[-6].minor.yy0Token,yymsp[-5].minor.yy4,yymsp[-4].minor.yy90.a,yymsp[-4].minor.yy90.b,yymsp[-2].minor.yy259,yymsp[0].minor.yy314,yymsp[-10].minor.yy4,yymsp[-8].minor.yy4);
-				yygotominor.yy0Token=(yymsp[-6].minor.yy0Token.Length==0?yymsp[-7].minor.yy0Token:yymsp[-6].minor.yy0Token);
-			}
-			//#line 3316 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_decl ::= temp TRIGGER ifnotexists nm dbnm trigger_time trigger_event ON fullname foreach_clause when_clause 
+///</summary>
+
+				//#line 1184 "parse.y"
+				{
+					sqlite3BeginTrigger (pParse, yymsp [-7].minor.yy0Token, yymsp [-6].minor.yy0Token, yymsp [-5].minor.yy4, yymsp [-4].minor.yy90.a, yymsp [-4].minor.yy90.b, yymsp [-2].minor.yy259, yymsp [0].minor.yy314, yymsp [-10].minor.yy4, yymsp [-8].minor.yy4);
+					yygotominor.yy0Token = (yymsp [-6].minor.yy0Token.Length == 0 ? yymsp [-7].minor.yy0Token : yymsp [-6].minor.yy0Token);
+				}
+				//#line 3316 "parse.c"
+				break;
 			case 272:
-			/* trigger_time ::= BEFORE */case 275:
-			/* trigger_time ::= *///yytestcase(yyruleno==275);
-			//#line 1190 "parse.y"
-			{
-				yygotominor.yy4=TK_BEFORE;
-			}
-			//#line 3322 "parse.c"
-			break;
+			///
+///<summary>
+///trigger_time ::= BEFORE 
+///</summary>
+
+			case 275:
+				///
+///<summary>
+///trigger_time ::= 
+///</summary>
+
+				//yytestcase(yyruleno==275);
+				//#line 1190 "parse.y"
+				{
+					yygotominor.yy4 = TK_BEFORE;
+				}
+				//#line 3322 "parse.c"
+				break;
 			case 273:
-			/* trigger_time ::= AFTER *///#line 1191 "parse.y"
-			{
-				yygotominor.yy4=TK_AFTER;
-			}
-			//#line 3327 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_time ::= AFTER 
+///</summary>
+
+				//#line 1191 "parse.y"
+				{
+					yygotominor.yy4 = TK_AFTER;
+				}
+				//#line 3327 "parse.c"
+				break;
 			case 274:
-			/* trigger_time ::= INSTEAD OF *///#line 1192 "parse.y"
-			{
-				yygotominor.yy4=TK_INSTEAD;
-			}
-			//#line 3332 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_time ::= INSTEAD OF 
+///</summary>
+
+				//#line 1192 "parse.y"
+				{
+					yygotominor.yy4 = TK_INSTEAD;
+				}
+				//#line 3332 "parse.c"
+				break;
 			case 276:
-			/* trigger_event ::= DELETE|INSERT */case 277:
-			/* trigger_event ::= UPDATE *///yytestcase(yyruleno==277);
-			//#line 1197 "parse.y"
-			{
-				yygotominor.yy90.a=yymsp[0].major;
-				yygotominor.yy90.b=null;
-			}
-			//#line 3338 "parse.c"
-			break;
+			///
+///<summary>
+///trigger_event ::= DELETE|INSERT 
+///</summary>
+
+			case 277:
+				///
+///<summary>
+///trigger_event ::= UPDATE 
+///</summary>
+
+				//yytestcase(yyruleno==277);
+				//#line 1197 "parse.y"
+				{
+					yygotominor.yy90.a = yymsp [0].major;
+					yygotominor.yy90.b = null;
+				}
+				//#line 3338 "parse.c"
+				break;
 			case 278:
-			/* trigger_event ::= UPDATE OF inscollist *///#line 1199 "parse.y"
-			{
-				yygotominor.yy90.a=TK_UPDATE;
-				yygotominor.yy90.b=yymsp[0].minor.yy384;
-			}
-			//#line 3343 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_event ::= UPDATE OF inscollist 
+///</summary>
+
+				//#line 1199 "parse.y"
+				{
+					yygotominor.yy90.a = TK_UPDATE;
+					yygotominor.yy90.b = yymsp [0].minor.yy384;
+				}
+				//#line 3343 "parse.c"
+				break;
 			case 281:
-			/* when_clause ::= */case 303:
-			/* key_opt ::= *///yytestcase(yyruleno==303);
-			//#line 1206 "parse.y"
-			{
-				yygotominor.yy314=null;
-			}
-			//#line 3349 "parse.c"
-			break;
+			///
+///<summary>
+///when_clause ::= 
+///</summary>
+
+			case 303:
+				///
+///<summary>
+///key_opt ::= 
+///</summary>
+
+				//yytestcase(yyruleno==303);
+				//#line 1206 "parse.y"
+				{
+					yygotominor.yy314 = null;
+				}
+				//#line 3349 "parse.c"
+				break;
 			case 282:
-			/* when_clause ::= WHEN expr */case 304:
-			/* key_opt ::= KEY expr *///yytestcase(yyruleno==304);
-			//#line 1207 "parse.y"
-			{
-				yygotominor.yy314=yymsp[0].minor.yy118.pExpr;
-			}
-			//#line 3355 "parse.c"
-			break;
+			///
+///<summary>
+///when_clause ::= WHEN expr 
+///</summary>
+
+			case 304:
+				///
+///<summary>
+///key_opt ::= KEY expr 
+///</summary>
+
+				//yytestcase(yyruleno==304);
+				//#line 1207 "parse.y"
+				{
+					yygotominor.yy314 = yymsp [0].minor.yy118.pExpr;
+				}
+				//#line 3355 "parse.c"
+				break;
 			case 283:
-			/* trigger_cmd_list ::= trigger_cmd_list trigger_cmd SEMI *///#line 1211 "parse.y"
-			{
-				Debug.Assert(yymsp[-2].minor.yy203!=null);
-				yymsp[-2].minor.yy203.pLast.pNext=yymsp[-1].minor.yy203;
-				yymsp[-2].minor.yy203.pLast=yymsp[-1].minor.yy203;
-				yygotominor.yy203=yymsp[-2].minor.yy203;
-			}
-			//#line 3365 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_cmd_list ::= trigger_cmd_list trigger_cmd SEMI 
+///</summary>
+
+				//#line 1211 "parse.y"
+				{
+					Debug.Assert (yymsp [-2].minor.yy203 != null);
+					yymsp [-2].minor.yy203.pLast.pNext = yymsp [-1].minor.yy203;
+					yymsp [-2].minor.yy203.pLast = yymsp [-1].minor.yy203;
+					yygotominor.yy203 = yymsp [-2].minor.yy203;
+				}
+				//#line 3365 "parse.c"
+				break;
 			case 284:
-			/* trigger_cmd_list ::= trigger_cmd SEMI *///#line 1217 "parse.y"
-			{
-				Debug.Assert(yymsp[-1].minor.yy203!=null);
-				yymsp[-1].minor.yy203.pLast=yymsp[-1].minor.yy203;
-				yygotominor.yy203=yymsp[-1].minor.yy203;
-			}
-			//#line 3374 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_cmd_list ::= trigger_cmd SEMI 
+///</summary>
+
+				//#line 1217 "parse.y"
+				{
+					Debug.Assert (yymsp [-1].minor.yy203 != null);
+					yymsp [-1].minor.yy203.pLast = yymsp [-1].minor.yy203;
+					yygotominor.yy203 = yymsp [-1].minor.yy203;
+				}
+				//#line 3374 "parse.c"
+				break;
 			case 286:
-			/* trnm ::= nm DOT nm *///#line 1229 "parse.y"
-			{
-				yygotominor.yy0Token=yymsp[0].minor.yy0Token;
-				sqlite3ErrorMsg(pParse,"qualified table names are not allowed on INSERT, UPDATE, and DELETE "+"statements within triggers");
-			}
-			//#line 3384 "parse.c"
-			break;
+				///
+///<summary>
+///trnm ::= nm DOT nm 
+///</summary>
+
+				//#line 1229 "parse.y"
+				{
+					yygotominor.yy0Token = yymsp [0].minor.yy0Token;
+					sqlite3ErrorMsg (pParse, "qualified table names are not allowed on INSERT, UPDATE, and DELETE " + "statements within triggers");
+				}
+				//#line 3384 "parse.c"
+				break;
 			case 288:
-			/* tridxby ::= INDEXED BY nm *///#line 1241 "parse.y"
-			{
-				sqlite3ErrorMsg(pParse,"the INDEXED BY clause is not allowed on UPDATE or DELETE statements "+"within triggers");
-			}
-			//#line 3393 "parse.c"
-			break;
+				///
+///<summary>
+///tridxby ::= INDEXED BY nm 
+///</summary>
+
+				//#line 1241 "parse.y"
+				{
+					sqlite3ErrorMsg (pParse, "the INDEXED BY clause is not allowed on UPDATE or DELETE statements " + "within triggers");
+				}
+				//#line 3393 "parse.c"
+				break;
 			case 289:
-			/* tridxby ::= NOT INDEXED *///#line 1246 "parse.y"
-			{
-				sqlite3ErrorMsg(pParse,"the NOT INDEXED clause is not allowed on UPDATE or DELETE statements "+"within triggers");
-			}
-			//#line 3402 "parse.c"
-			break;
+				///
+///<summary>
+///tridxby ::= NOT INDEXED 
+///</summary>
+
+				//#line 1246 "parse.y"
+				{
+					sqlite3ErrorMsg (pParse, "the NOT INDEXED clause is not allowed on UPDATE or DELETE statements " + "within triggers");
+				}
+				//#line 3402 "parse.c"
+				break;
 			case 290:
-			/* trigger_cmd ::= UPDATE orconf trnm tridxby SET setlist where_opt *///#line 1259 "parse.y"
-			{
-				yygotominor.yy203=sqlite3TriggerUpdateStep(pParse.db,yymsp[-4].minor.yy0Token,yymsp[-1].minor.yy322,yymsp[0].minor.yy314,yymsp[-5].minor.yy210);
-			}
-			//#line 3407 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_cmd ::= UPDATE orconf trnm tridxby SET setlist where_opt 
+///</summary>
+
+				//#line 1259 "parse.y"
+				{
+					yygotominor.yy203 = sqlite3TriggerUpdateStep (pParse.db, yymsp [-4].minor.yy0Token, yymsp [-1].minor.yy322, yymsp [0].minor.yy314, yymsp [-5].minor.yy210);
+				}
+				//#line 3407 "parse.c"
+				break;
 			case 291:
-			/* trigger_cmd ::= insert_cmd INTO trnm inscollist_opt VALUES LP itemlist RP *///#line 1264 "parse.y"
-			{
-				yygotominor.yy203=sqlite3TriggerInsertStep(pParse.db,yymsp[-5].minor.yy0Token,yymsp[-4].minor.yy384,yymsp[-1].minor.yy322,0,yymsp[-7].minor.yy210);
-			}
-			//#line 3412 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_cmd ::= insert_cmd INTO trnm inscollist_opt VALUES LP itemlist RP 
+///</summary>
+
+				//#line 1264 "parse.y"
+				{
+					yygotominor.yy203 = sqlite3TriggerInsertStep (pParse.db, yymsp [-5].minor.yy0Token, yymsp [-4].minor.yy384, yymsp [-1].minor.yy322, 0, yymsp [-7].minor.yy210);
+				}
+				//#line 3412 "parse.c"
+				break;
 			case 292:
-			/* trigger_cmd ::= insert_cmd INTO trnm inscollist_opt select *///#line 1267 "parse.y"
-			{
-				yygotominor.yy203=sqlite3TriggerInsertStep(pParse.db,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy384,0,yymsp[0].minor.yy387,yymsp[-4].minor.yy210);
-			}
-			//#line 3417 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_cmd ::= insert_cmd INTO trnm inscollist_opt select 
+///</summary>
+
+				//#line 1267 "parse.y"
+				{
+					yygotominor.yy203 = sqlite3TriggerInsertStep (pParse.db, yymsp [-2].minor.yy0Token, yymsp [-1].minor.yy384, 0, yymsp [0].minor.yy387, yymsp [-4].minor.yy210);
+				}
+				//#line 3417 "parse.c"
+				break;
 			case 293:
-			/* trigger_cmd ::= DELETE FROM trnm tridxby where_opt *///#line 1271 "parse.y"
-			{
-				yygotominor.yy203=sqlite3TriggerDeleteStep(pParse.db,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy314);
-			}
-			//#line 3422 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_cmd ::= DELETE FROM trnm tridxby where_opt 
+///</summary>
+
+				//#line 1271 "parse.y"
+				{
+					yygotominor.yy203 = sqlite3TriggerDeleteStep (pParse.db, yymsp [-2].minor.yy0Token, yymsp [0].minor.yy314);
+				}
+				//#line 3422 "parse.c"
+				break;
 			case 294:
-			/* trigger_cmd ::= select *///#line 1274 "parse.y"
-			{
-				yygotominor.yy203=sqlite3TriggerSelectStep(pParse.db,yymsp[0].minor.yy387);
-			}
-			//#line 3427 "parse.c"
-			break;
+				///
+///<summary>
+///trigger_cmd ::= select 
+///</summary>
+
+				//#line 1274 "parse.y"
+				{
+					yygotominor.yy203 = sqlite3TriggerSelectStep (pParse.db, yymsp [0].minor.yy387);
+				}
+				//#line 3427 "parse.c"
+				break;
 			case 295:
-			/* expr ::= RAISE LP IGNORE RP *///#line 1277 "parse.y"
-			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_RAISE,0,0,0);
-				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.affinity=(char)OE_Ignore;
+				///
+///<summary>
+///expr ::= RAISE LP IGNORE RP 
+///</summary>
+
+				//#line 1277 "parse.y"
+				{
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_RAISE, 0, 0, 0);
+					if (yygotominor.yy118.pExpr != null) {
+						yygotominor.yy118.pExpr.affinity = (char)OE_Ignore;
+					}
+					yygotominor.yy118.zStart = yymsp [-3].minor.yy0Token.zRestSql;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy0Token.zRestSql.Substring (yymsp [0].minor.yy0Token.Length);
+					//z[yymsp[0].minor.yy0.n];
 				}
-				yygotominor.yy118.zStart=yymsp[-3].minor.yy0Token.zRestSql;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
-				//z[yymsp[0].minor.yy0.n];
-			}
-			//#line 3439 "parse.c"
-			break;
+				//#line 3439 "parse.c"
+				break;
 			case 296:
-			/* expr ::= RAISE LP raisetype COMMA nm RP *///#line 1285 "parse.y"
-			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_RAISE,0,0,yymsp[-1].minor.yy0Token);
-				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.affinity=(char)yymsp[-3].minor.yy4;
+				///
+///<summary>
+///expr ::= RAISE LP raisetype COMMA nm RP 
+///</summary>
+
+				//#line 1285 "parse.y"
+				{
+					yygotominor.yy118.pExpr = pParse.sqlite3PExpr (TK_RAISE, 0, 0, yymsp [-1].minor.yy0Token);
+					if (yygotominor.yy118.pExpr != null) {
+						yygotominor.yy118.pExpr.affinity = (char)yymsp [-3].minor.yy4;
+					}
+					yygotominor.yy118.zStart = yymsp [-5].minor.yy0Token.zRestSql;
+					yygotominor.yy118.zEnd = yymsp [0].minor.yy0Token.zRestSql.Substring (yymsp [0].minor.yy0Token.Length);
+					//z[yymsp[0].minor.yy0.n];
 				}
-				yygotominor.yy118.zStart=yymsp[-5].minor.yy0Token.zRestSql;
-				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
-				//z[yymsp[0].minor.yy0.n];
-			}
-			//#line 3451 "parse.c"
-			break;
+				//#line 3451 "parse.c"
+				break;
 			case 297:
-			/* raisetype ::= ROLLBACK *///#line 1296 "parse.y"
-			{
-				yygotominor.yy4=OE_Rollback;
-			}
-			//#line 3456 "parse.c"
-			break;
+				///
+///<summary>
+///raisetype ::= ROLLBACK 
+///</summary>
+
+				//#line 1296 "parse.y"
+				{
+					yygotominor.yy4 = OE_Rollback;
+				}
+				//#line 3456 "parse.c"
+				break;
 			case 299:
-			/* raisetype ::= FAIL *///#line 1298 "parse.y"
-			{
-				yygotominor.yy4=OE_Fail;
-			}
-			//#line 3461 "parse.c"
-			break;
+				///
+///<summary>
+///raisetype ::= FAIL 
+///</summary>
+
+				//#line 1298 "parse.y"
+				{
+					yygotominor.yy4 = OE_Fail;
+				}
+				//#line 3461 "parse.c"
+				break;
 			case 300:
-			/* cmd ::= DROP TRIGGER ifexists fullname *///#line 1303 "parse.y"
-			{
-				sqlite3DropTrigger(pParse,yymsp[0].minor.yy259,yymsp[-1].minor.yy4);
-			}
-			//#line 3468 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= DROP TRIGGER ifexists fullname 
+///</summary>
+
+				//#line 1303 "parse.y"
+				{
+					sqlite3DropTrigger (pParse, yymsp [0].minor.yy259, yymsp [-1].minor.yy4);
+				}
+				//#line 3468 "parse.c"
+				break;
 			case 301:
-			/* cmd ::= ATTACH database_kw_opt expr AS expr key_opt *///#line 1310 "parse.y"
-			{
-				pParse.sqlite3Attach(yymsp[-3].minor.yy118.pExpr,yymsp[-1].minor.yy118.pExpr,yymsp[0].minor.yy314);
-			}
-			//#line 3475 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= ATTACH database_kw_opt expr AS expr key_opt 
+///</summary>
+
+				//#line 1310 "parse.y"
+				{
+					pParse.sqlite3Attach (yymsp [-3].minor.yy118.pExpr, yymsp [-1].minor.yy118.pExpr, yymsp [0].minor.yy314);
+				}
+				//#line 3475 "parse.c"
+				break;
 			case 302:
-			/* cmd ::= DETACH database_kw_opt expr *///#line 1313 "parse.y"
-			{
-				pParse.sqlite3Detach(yymsp[0].minor.yy118.pExpr);
-			}
-			//#line 3482 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= DETACH database_kw_opt expr 
+///</summary>
+
+				//#line 1313 "parse.y"
+				{
+					pParse.sqlite3Detach (yymsp [0].minor.yy118.pExpr);
+				}
+				//#line 3482 "parse.c"
+				break;
 			case 307:
-			/* cmd ::= REINDEX *///#line 1328 "parse.y"
-			{
-				sqlite3Reindex(pParse,0,0);
-			}
-			//#line 3487 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= REINDEX 
+///</summary>
+
+				//#line 1328 "parse.y"
+				{
+					sqlite3Reindex (pParse, 0, 0);
+				}
+				//#line 3487 "parse.c"
+				break;
 			case 308:
-			/* cmd ::= REINDEX nm dbnm *///#line 1329 "parse.y"
-			{
-				sqlite3Reindex(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 3492 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= REINDEX nm dbnm 
+///</summary>
+
+				//#line 1329 "parse.y"
+				{
+					sqlite3Reindex (pParse, yymsp [-1].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 3492 "parse.c"
+				break;
 			case 309:
-			/* cmd ::= ANALYZE *///#line 1334 "parse.y"
-			{
-				pParse.sqlite3Analyze(0,0);
-			}
-			//#line 3497 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= ANALYZE 
+///</summary>
+
+				//#line 1334 "parse.y"
+				{
+					pParse.sqlite3Analyze (0, 0);
+				}
+				//#line 3497 "parse.c"
+				break;
 			case 310:
-			/* cmd ::= ANALYZE nm dbnm *///#line 1335 "parse.y"
-			{
-				pParse.sqlite3Analyze(yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 3502 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= ANALYZE nm dbnm 
+///</summary>
+
+				//#line 1335 "parse.y"
+				{
+					pParse.sqlite3Analyze (yymsp [-1].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 3502 "parse.c"
+				break;
 			case 311:
-			/* cmd ::= ALTER TABLE fullname RENAME TO nm *///#line 1340 "parse.y"
-			{
-				pParse.sqlite3AlterRenameTable(yymsp[-3].minor.yy259,yymsp[0].minor.yy0Token);
-			}
-			//#line 3509 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= ALTER TABLE fullname RENAME TO nm 
+///</summary>
+
+				//#line 1340 "parse.y"
+				{
+					pParse.sqlite3AlterRenameTable (yymsp [-3].minor.yy259, yymsp [0].minor.yy0Token);
+				}
+				//#line 3509 "parse.c"
+				break;
 			case 312:
-			/* cmd ::= ALTER TABLE add_column_fullname ADD kwcolumn_opt column *///#line 1343 "parse.y"
-			{
-				pParse.sqlite3AlterFinishAddColumn(yymsp[0].minor.yy0Token);
-			}
-			//#line 3516 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= ALTER TABLE add_column_fullname ADD kwcolumn_opt column 
+///</summary>
+
+				//#line 1343 "parse.y"
+				{
+					pParse.sqlite3AlterFinishAddColumn (yymsp [0].minor.yy0Token);
+				}
+				//#line 3516 "parse.c"
+				break;
 			case 313:
-			/* add_column_fullname ::= fullname *///#line 1346 "parse.y"
-			{
-				pParse.db.lookaside.bEnabled=0;
-				pParse.sqlite3AlterBeginAddColumn(yymsp[0].minor.yy259);
-			}
-			//#line 3524 "parse.c"
-			break;
+				///
+///<summary>
+///add_column_fullname ::= fullname 
+///</summary>
+
+				//#line 1346 "parse.y"
+				{
+					pParse.db.lookaside.bEnabled = 0;
+					pParse.sqlite3AlterBeginAddColumn (yymsp [0].minor.yy259);
+				}
+				//#line 3524 "parse.c"
+				break;
 			case 316:
-			/* cmd ::= create_vtab *///#line 1356 "parse.y"
-			{
-				pParse.sqlite3VtabFinishParse((Token)null);
-			}
-			//#line 3529 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= create_vtab 
+///</summary>
+
+				//#line 1356 "parse.y"
+				{
+					pParse.sqlite3VtabFinishParse ((Token)null);
+				}
+				//#line 3529 "parse.c"
+				break;
 			case 317:
-			/* cmd ::= create_vtab LP vtabarglist RP *///#line 1357 "parse.y"
-			{
-				pParse.sqlite3VtabFinishParse(yymsp[0].minor.yy0Token);
-			}
-			//#line 3534 "parse.c"
-			break;
+				///
+///<summary>
+///cmd ::= create_vtab LP vtabarglist RP 
+///</summary>
+
+				//#line 1357 "parse.y"
+				{
+					pParse.sqlite3VtabFinishParse (yymsp [0].minor.yy0Token);
+				}
+				//#line 3534 "parse.c"
+				break;
 			case 318:
-			/* create_vtab ::= createkw VIRTUAL TABLE nm dbnm USING nm *///#line 1358 "parse.y"
-			{
-				pParse.sqlite3VtabBeginParse(yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token);
-			}
-			//#line 3541 "parse.c"
-			break;
+				///
+///<summary>
+///create_vtab ::= createkw VIRTUAL TABLE nm dbnm USING nm 
+///</summary>
+
+				//#line 1358 "parse.y"
+				{
+					pParse.sqlite3VtabBeginParse (yymsp [-3].minor.yy0Token, yymsp [-2].minor.yy0Token, yymsp [0].minor.yy0Token);
+				}
+				//#line 3541 "parse.c"
+				break;
 			case 321:
-			/* vtabarg ::= *///#line 1363 "parse.y"
-			{
-				pParse.sqlite3VtabArgInit();
-			}
-			//#line 3546 "parse.c"
-			break;
+				///
+///<summary>
+///vtabarg ::= 
+///</summary>
+
+				//#line 1363 "parse.y"
+				{
+					pParse.sqlite3VtabArgInit ();
+				}
+				//#line 3546 "parse.c"
+				break;
 			case 323:
-			/* vtabargtoken ::= ANY */case 324:
-			/* vtabargtoken ::= lp anylist RP *///yytestcase(yyruleno==324);
+			///
+///<summary>
+///vtabargtoken ::= ANY 
+///</summary>
+
+			case 324:
+			///
+///<summary>
+///vtabargtoken ::= lp anylist RP 
+///</summary>
+
+			//yytestcase(yyruleno==324);
 			case 325:
-			/* lp ::= LP *///yytestcase(yyruleno==325);
-			//#line 1365 "parse.y"
-			{
-				pParse.sqlite3VtabArgExtend(yymsp[0].minor.yy0Token);
-			}
-			//#line 3553 "parse.c"
-			break;
+				///
+///<summary>
+///lp ::= LP 
+///</summary>
+
+				//yytestcase(yyruleno==325);
+				//#line 1365 "parse.y"
+				{
+					pParse.sqlite3VtabArgExtend (yymsp [0].minor.yy0Token);
+				}
+				//#line 3553 "parse.c"
+				break;
 			default:
-			/* (0) input ::= cmdlist *///yytestcase(yyruleno==0);
-			/* (1) cmdlist ::= cmdlist ecmd *///yytestcase(yyruleno==1);
-			/* (2) cmdlist ::= ecmd *///yytestcase(yyruleno==2);
-			/* (3) ecmd ::= SEMI *///yytestcase(yyruleno==3);
-			/* (4) ecmd ::= explain cmdx SEMI *///yytestcase(yyruleno==4);
-			/* (10) trans_opt ::= *///yytestcase(yyruleno==10);
-			/* (11) trans_opt ::= TRANSACTION *///yytestcase(yyruleno==11);
-			/* (12) trans_opt ::= TRANSACTION nm *///yytestcase(yyruleno==12);
-			/* (20) savepoint_opt ::= SAVEPOINT *///yytestcase(yyruleno==20);
-			/* (21) savepoint_opt ::= *///yytestcase(yyruleno==21);
-			/* (25) cmd ::= create_table create_table_args *///yytestcase(yyruleno==25);
-			/* (34) columnlist ::= columnlist COMMA column *///yytestcase(yyruleno==34);
-			/* (35) columnlist ::= column *///yytestcase(yyruleno==35);
-			/* (44) type ::= *///yytestcase(yyruleno==44);
-			/* (51) signed ::= plus_num *///yytestcase(yyruleno==51);
-			/* (52) signed ::= minus_num *///yytestcase(yyruleno==52);
-			/* (53) carglist ::= carglist carg *///yytestcase(yyruleno==53);
-			/* (54) carglist ::= *///yytestcase(yyruleno==54);
-			/* (55) carg ::= CONSTRAINT nm ccons *///yytestcase(yyruleno==55);
-			/* (56) carg ::= ccons *///yytestcase(yyruleno==56);
-			/* (62) ccons ::= NULL onconf *///yytestcase(yyruleno==62);
-			/* (90) conslist ::= conslist COMMA tcons *///yytestcase(yyruleno==90);
-			/* (91) conslist ::= conslist tcons *///yytestcase(yyruleno==91);
-			/* (92) conslist ::= tcons *///yytestcase(yyruleno==92);
-			/* (93) tcons ::= CONSTRAINT nm *///yytestcase(yyruleno==93);
-			/* (268) plus_opt ::= PLUS *///yytestcase(yyruleno==268);
-			/* (269) plus_opt ::= *///yytestcase(yyruleno==269);
-			/* (279) foreach_clause ::= *///yytestcase(yyruleno==279);
-			/* (280) foreach_clause ::= FOR EACH ROW *///yytestcase(yyruleno==280);
-			/* (287) tridxby ::= *///yytestcase(yyruleno==287);
-			/* (305) database_kw_opt ::= DATABASE *///yytestcase(yyruleno==305);
-			/* (306) database_kw_opt ::= *///yytestcase(yyruleno==306);
-			/* (314) kwcolumn_opt ::= *///yytestcase(yyruleno==314);
-			/* (315) kwcolumn_opt ::= COLUMNKW *///yytestcase(yyruleno==315);
-			/* (319) vtabarglist ::= vtabarg *///yytestcase(yyruleno==319);
-			/* (320) vtabarglist ::= vtabarglist COMMA vtabarg *///yytestcase(yyruleno==320);
-			/* (322) vtabarg ::= vtabarg vtabargtoken *///yytestcase(yyruleno==322);
-			/* (326) anylist ::= *///yytestcase(yyruleno==326);
-			/* (327) anylist ::= anylist LP anylist RP *///yytestcase(yyruleno==327);
-			/* (328) anylist ::= anylist ANY *///yytestcase(yyruleno==328);
-			break;
+				///
+///<summary>
+///(0) input ::= cmdlist 
+///</summary>
+
+				//yytestcase(yyruleno==0);
+				///
+///<summary>
+///(1) cmdlist ::= cmdlist ecmd 
+///</summary>
+
+				//yytestcase(yyruleno==1);
+				///
+///<summary>
+///(2) cmdlist ::= ecmd 
+///</summary>
+
+				//yytestcase(yyruleno==2);
+				///
+///<summary>
+///(3) ecmd ::= SEMI 
+///</summary>
+
+				//yytestcase(yyruleno==3);
+				///
+///<summary>
+///(4) ecmd ::= explain cmdx SEMI 
+///</summary>
+
+				//yytestcase(yyruleno==4);
+				///
+///<summary>
+///(10) trans_opt ::= 
+///</summary>
+
+				//yytestcase(yyruleno==10);
+				///
+///<summary>
+///(11) trans_opt ::= TRANSACTION 
+///</summary>
+
+				//yytestcase(yyruleno==11);
+				///
+///<summary>
+///(12) trans_opt ::= TRANSACTION nm 
+///</summary>
+
+				//yytestcase(yyruleno==12);
+				///
+///<summary>
+///(20) savepoint_opt ::= SAVEPOINT 
+///</summary>
+
+				//yytestcase(yyruleno==20);
+				///
+///<summary>
+///(21) savepoint_opt ::= 
+///</summary>
+
+				//yytestcase(yyruleno==21);
+				///
+///<summary>
+///(25) cmd ::= create_table create_table_args 
+///</summary>
+
+				//yytestcase(yyruleno==25);
+				///
+///<summary>
+///(34) columnlist ::= columnlist COMMA column 
+///</summary>
+
+				//yytestcase(yyruleno==34);
+				///
+///<summary>
+///(35) columnlist ::= column 
+///</summary>
+
+				//yytestcase(yyruleno==35);
+				///
+///<summary>
+///(44) type ::= 
+///</summary>
+
+				//yytestcase(yyruleno==44);
+				///
+///<summary>
+///(51) signed ::= plus_num 
+///</summary>
+
+				//yytestcase(yyruleno==51);
+				///
+///<summary>
+///(52) signed ::= minus_num 
+///</summary>
+
+				//yytestcase(yyruleno==52);
+				///
+///<summary>
+///(53) carglist ::= carglist carg 
+///</summary>
+
+				//yytestcase(yyruleno==53);
+				///
+///<summary>
+///(54) carglist ::= 
+///</summary>
+
+				//yytestcase(yyruleno==54);
+				///
+///<summary>
+///(55) carg ::= CONSTRAINT nm ccons 
+///</summary>
+
+				//yytestcase(yyruleno==55);
+				///
+///<summary>
+///(56) carg ::= ccons 
+///</summary>
+
+				//yytestcase(yyruleno==56);
+				///
+///<summary>
+///(62) ccons ::= NULL onconf 
+///</summary>
+
+				//yytestcase(yyruleno==62);
+				///
+///<summary>
+///(90) conslist ::= conslist COMMA tcons 
+///</summary>
+
+				//yytestcase(yyruleno==90);
+				///
+///<summary>
+///(91) conslist ::= conslist tcons 
+///</summary>
+
+				//yytestcase(yyruleno==91);
+				///
+///<summary>
+///(92) conslist ::= tcons 
+///</summary>
+
+				//yytestcase(yyruleno==92);
+				///
+///<summary>
+///(93) tcons ::= CONSTRAINT nm 
+///</summary>
+
+				//yytestcase(yyruleno==93);
+				///
+///<summary>
+///(268) plus_opt ::= PLUS 
+///</summary>
+
+				//yytestcase(yyruleno==268);
+				///
+///<summary>
+///(269) plus_opt ::= 
+///</summary>
+
+				//yytestcase(yyruleno==269);
+				///
+///<summary>
+///(279) foreach_clause ::= 
+///</summary>
+
+				//yytestcase(yyruleno==279);
+				///
+///<summary>
+///(280) foreach_clause ::= FOR EACH ROW 
+///</summary>
+
+				//yytestcase(yyruleno==280);
+				///
+///<summary>
+///(287) tridxby ::= 
+///</summary>
+
+				//yytestcase(yyruleno==287);
+				///
+///<summary>
+///(305) database_kw_opt ::= DATABASE 
+///</summary>
+
+				//yytestcase(yyruleno==305);
+				///
+///<summary>
+///(306) database_kw_opt ::= 
+///</summary>
+
+				//yytestcase(yyruleno==306);
+				///
+///<summary>
+///(314) kwcolumn_opt ::= 
+///</summary>
+
+				//yytestcase(yyruleno==314);
+				///
+///<summary>
+///(315) kwcolumn_opt ::= COLUMNKW 
+///</summary>
+
+				//yytestcase(yyruleno==315);
+				///
+///<summary>
+///(319) vtabarglist ::= vtabarg 
+///</summary>
+
+				//yytestcase(yyruleno==319);
+				///
+///<summary>
+///(320) vtabarglist ::= vtabarglist COMMA vtabarg 
+///</summary>
+
+				//yytestcase(yyruleno==320);
+				///
+///<summary>
+///(322) vtabarg ::= vtabarg vtabargtoken 
+///</summary>
+
+				//yytestcase(yyruleno==322);
+				///
+///<summary>
+///(326) anylist ::= 
+///</summary>
+
+				//yytestcase(yyruleno==326);
+				///
+///<summary>
+///(327) anylist ::= anylist LP anylist RP 
+///</summary>
+
+				//yytestcase(yyruleno==327);
+				///
+///<summary>
+///(328) anylist ::= anylist ANY 
+///</summary>
+
+				//yytestcase(yyruleno==328);
+				break;
 			}
 			;
-			yygoto=yyRuleInfo[yyruleno].lhs;
-			yysize=yyRuleInfo[yyruleno].nrhs;
-			yypParser.yyidx-=yysize;
-			yyact=yy_find_reduce_action(yymsp[-yysize].stateno,(YYCODETYPE)yygoto);
-			if(yyact<YYNSTATE) {
+			yygoto = yyRuleInfo [yyruleno].lhs;
+			yysize = yyRuleInfo [yyruleno].nrhs;
+			yypParser.yyidx -= yysize;
+			yyact = yy_find_reduce_action (yymsp [-yysize].stateno, (YYCODETYPE)yygoto);
+			if (yyact < YYNSTATE) {
 				#if NDEBUG
-				/* If we are not debugging and the reduce action popped at least
-** one element off the stack, then we can push the new element back
-** onto the stack here, and skip the stack overflow test in yy_shift().
-** That gives a significant speed improvement. */if(yysize!=0) {
+				///
+///<summary>
+///If we are not debugging and the reduce action popped at least
+///one element off the stack, then we can push the new element back
+///onto the stack here, and skip the stack overflow test in yy_shift().
+///That gives a significant speed improvement. 
+///</summary>
+
+				if (yysize != 0) {
 					yypParser.yyidx++;
-					yymsp._yyidx-=yysize-1;
-					yymsp[0].stateno=(YYACTIONTYPE)yyact;
-					yymsp[0].major=(YYCODETYPE)yygoto;
-					yymsp[0].minor=yygotominor;
+					yymsp._yyidx -= yysize - 1;
+					yymsp [0].stateno = (YYACTIONTYPE)yyact;
+					yymsp [0].major = (YYCODETYPE)yygoto;
+					yymsp [0].minor = yygotominor;
 				}
 				else
 				#endif
 				 {
-					yypParser.yy_shift(yyact,yygoto,yygotominor);
+					yypParser.yy_shift (yyact, yygoto, yygotominor);
 				}
 			}
 			else {
-				Debug.Assert(yyact==YYNSTATE+YYNRULE+1);
-				yypParser.yy_accept();
+				Debug.Assert (yyact == YYNSTATE + YYNRULE + 1);
+				yypParser.yy_accept ();
 			}
 		}
+
 		///<summary>
 		/// The following code executes when the parse fails
 		///
@@ -8265,19 +13123,24 @@ return yy_default[stateno];
 		/// None.
 		///
 		///</summary>
-		public class yymsp {
+		public class yymsp
+		{
 			public yyParser _yyParser;
+
 			public int _yyidx;
+
 			// CONSTRUCTOR
-			public yymsp(ref yyParser pointer_to_yyParser,int yyidx)//' Parser and Stack Index
-			 {
-				this._yyParser=pointer_to_yyParser;
-				this._yyidx=yyidx;
+			public yymsp (ref yyParser pointer_to_yyParser, int yyidx)//' Parser and Stack Index
+			
+			{
+				this._yyParser = pointer_to_yyParser;
+				this._yyidx = yyidx;
 			}
+
 			// Default Value
-			public yyStackEntry this[int offset] {
+			public yyStackEntry this [int offset] {
 				get {
-					return _yyParser.yystack[_yyidx+offset];
+					return _yyParser.yystack [_yyidx + offset];
 				}
 			}
 		}

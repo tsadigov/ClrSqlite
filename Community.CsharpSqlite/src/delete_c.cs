@@ -1,10 +1,13 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using u8=System.Byte;
-using u32=System.UInt32;
-namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+using u8 = System.Byte;
+using u32 = System.UInt32;
+
+namespace Community.CsharpSqlite
+{
+	public partial class Sqlite3
+	{
 	///<summary>
 	/// 2001 September 15
 	///
@@ -57,7 +60,7 @@ namespace Community.CsharpSqlite {
 	///</summary>
 	#endif
 	#if (SQLITE_ENABLE_UPDATE_DELETE_LIMIT) && !(SQLITE_OMIT_SUBQUERY)
-																																							/*
+																																								/*
 ** Generate an expression tree to implement the WHERE, ORDER BY,
 ** and LIMIT/OFFSET portion of DELETE and UPDATE statements.
 **
@@ -150,13 +153,16 @@ sqlite3ExprDelete(pParse.db, ref pOffset);
 return null;
 }
 #endif
-	/*
-** Generate code for a DELETE FROM statement.
-**
-**     DELETE FROM table_wxyz WHERE a<5 AND b NOT NULL;
-**                 \________/       \________________/
-**                  pTabList              pWhere
-*////<summary>
+	///
+///<summary>
+///Generate code for a DELETE FROM statement.
+///
+///DELETE FROM table_wxyz WHERE a<5 AND b NOT NULL;
+///\________/       \________________/
+///pTabList              pWhere
+///</summary>
+
+	///<summary>
 	///Make sure "isView" and other macros defined above are undefined. Otherwise
 	/// thely may interfere with compilation of other functions in this file
 	/// (or in another file, if this file becomes part of the amalgamation).
@@ -204,15 +210,19 @@ return null;
 	///       deleted.
 	///
 	///</summary>
-	/*
-    ** Generate code that will assemble an index key and put it in register
-    ** regOut.  The key with be for index pIdx which is an index on pTab.
-    ** iCur is the index of a cursor open on the pTab table and pointing to
-    ** the entry that needs indexing.
-    **
-    ** Return a register number which is the first in a block of
-    ** registers that holds the elements of the index key.  The
-    ** block of registers has already been deallocated by the time
-    ** this routine returns.
-    */}
+	///
+///<summary>
+///Generate code that will assemble an index key and put it in register
+///regOut.  The key with be for index pIdx which is an index on pTab.
+///iCur is the index of a cursor open on the pTab table and pointing to
+///the entry that needs indexing.
+///
+///Return a register number which is the first in a block of
+///registers that holds the elements of the index key.  The
+///block of registers has already been deallocated by the time
+///this routine returns.
+///
+///</summary>
+
+	}
 }

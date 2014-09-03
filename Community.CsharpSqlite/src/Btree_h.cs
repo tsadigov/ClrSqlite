@@ -1,44 +1,82 @@
-namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
-		/*
-    ** 2001 September 15
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    ** This header file defines the interface that the sqlite B-Tree file
-    ** subsystem.  See comments in the source code for a detailed description
-    ** of what each interface routine does.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-    **
-    *************************************************************************
-    *///#if !_BTREE_H_
+namespace Community.CsharpSqlite
+{
+	public partial class Sqlite3
+	{
+		///
+///<summary>
+///2001 September 15
+///
+///The author disclaims copyright to this source code.  In place of
+///a legal notice, here is a blessing:
+///
+///May you do good and not evil.
+///May you find forgiveness for yourself and forgive others.
+///May you share freely, never taking more than you give.
+///
+///
+///</summary>
+///<param name="This header file defines the interface that the sqlite B">Tree file</param>
+///<param name="subsystem.  See comments in the source code for a detailed description">subsystem.  See comments in the source code for a detailed description</param>
+///<param name="of what each interface routine does.">of what each interface routine does.</param>
+///<param name=""></param>
+///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+///<param name=""></param>
+///<param name="SQLITE_SOURCE_ID: 2011">23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name=""></param>
+
+		//#if !_BTREE_H_
 		//#define _BTREE_H_
-		/* TODO: This definition is just included so other modules compile. It
-    ** needs to be revisited.
-    */const int SQLITE_N_BTREE_META=10;
-		/*
-    ** If defined as non-zero, auto-vacuum is enabled by default. Otherwise
-    ** it must be turned on for each database using "PRAGMA auto_vacuum = 1".
-    */
+		///
+///<summary>
+///TODO: This definition is just included so other modules compile. It
+///needs to be revisited.
+///
+///</summary>
+
+		const int SQLITE_N_BTREE_META = 10;
+
+		///
+///<summary>
+///</summary>
+///<param name="If defined as non">vacuum is enabled by default. Otherwise</param>
+///<param name="it must be turned on for each database using "PRAGMA auto_vacuum = 1".">it must be turned on for each database using "PRAGMA auto_vacuum = 1".</param>
+///<param name=""></param>
+
 		#if !SQLITE_DEFAULT_AUTOVACUUM
-		const int SQLITE_DEFAULT_AUTOVACUUM=0;
+		const int SQLITE_DEFAULT_AUTOVACUUM = 0;
+
 		#endif
-		const int BTREE_AUTOVACUUM_NONE=0;
-		/* Do not do auto-vacuum */const int BTREE_AUTOVACUUM_FULL=1;
-		/* Do full auto-vacuum */const int BTREE_AUTOVACUUM_INCR=2;
-		/* Incremental vacuum *//*
-    ** Forward declarations of structure
-    *///typedef struct Btree Btree;
+		const int BTREE_AUTOVACUUM_NONE = 0;
+
+		///
+///<summary>
+///</summary>
+///<param name="Do not do auto">vacuum </param>
+
+		const int BTREE_AUTOVACUUM_FULL = 1;
+
+		///
+///<summary>
+///</summary>
+///<param name="Do full auto">vacuum </param>
+
+		const int BTREE_AUTOVACUUM_INCR = 2;
+
+		///
+///<summary>
+///Incremental vacuum 
+///</summary>
+
+		///
+///<summary>
+///Forward declarations of structure
+///
+///</summary>
+
+		//typedef struct Btree Btree;
 		//typedef struct BtCursor BtCursor;
 		//typedef struct BtShared BtShared;
 		//int sqlite3BtreeOpen(
@@ -49,22 +87,57 @@ namespace Community.CsharpSqlite {
 		//  int flags,              /* Flags */
 		//  int vfsFlags            /* Flags passed through to VFS open */
 		//);
-		/* The flags parameter to sqlite3BtreeOpen can be the bitwise or of the
-    ** following values.
-    **
-    ** NOTE:  These values must match the corresponding PAGER_ values in
-    ** pager.h.
-    *///#define BTREE_OMIT_JOURNAL  1  /* Do not create or use a rollback journal */
+		///
+///<summary>
+///The flags parameter to sqlite3BtreeOpen can be the bitwise or of the
+///following values.
+///
+///NOTE:  These values must match the corresponding PAGER_ values in
+///pager.h.
+///
+///</summary>
+
+		//#define BTREE_OMIT_JOURNAL  1  /* Do not create or use a rollback journal */
 		//#define BTREE_NO_READLOCK   2  /* Omit readlocks on readonly files */
 		//#define BTREE_MEMORY        4  /* This is an in-memory DB */
 		//#define BTREE_SINGLE        8  /* The file contains at most 1 b-tree */
 		//#define BTREE_UNORDERED    16  /* Use of a hash implementation is OK */
-		const int BTREE_OMIT_JOURNAL=1;
-		/* Do not create or use a rollback journal */const int BTREE_NO_READLOCK=2;
-		/* Omit readlocks on readonly files */const int BTREE_MEMORY=4;
-		/* This is an in-memory DB */const int BTREE_SINGLE=8;
-		/* The file contains at most 1 b-tree */const int BTREE_UNORDERED=16;
-		/* Use of a hash implementation is OK *///int sqlite3BtreeClose(Btree);
+		const int BTREE_OMIT_JOURNAL = 1;
+
+		///
+///<summary>
+///Do not create or use a rollback journal 
+///</summary>
+
+		const int BTREE_NO_READLOCK = 2;
+
+		///
+///<summary>
+///Omit readlocks on readonly files 
+///</summary>
+
+		const int BTREE_MEMORY = 4;
+
+		///
+///<summary>
+///</summary>
+///<param name="This is an in">memory DB </param>
+
+		const int BTREE_SINGLE = 8;
+
+		///
+///<summary>
+///</summary>
+///<param name="The file contains at most 1 b">tree </param>
+
+		const int BTREE_UNORDERED = 16;
+
+		///
+///<summary>
+///Use of a hash implementation is OK 
+///</summary>
+
+		//int sqlite3BtreeClose(Btree);
 		//int sqlite3BtreeSetCacheSize(Btree*,int);
 		//int sqlite3BtreeSetSafetyLevel(Btree*,int,int,int);
 		//int sqlite3BtreeSyncDisabled(Btree);
@@ -94,25 +167,31 @@ namespace Community.CsharpSqlite {
 		//string sqlite3BtreeGetJournalname(Btree );
 		//int sqlite3BtreeCopyFile(Btree *, Btree );
 		//int sqlite3BtreeIncrVacuum(Btree );
-		/* The flags parameter to sqlite3BtreeCreateTable can be the bitwise OR
-    ** of the flags shown below.
-    **
-    ** Every SQLite table must have either BTREE_INTKEY or BTREE_BLOBKEY set.
-    ** With BTREE_INTKEY, the table key is a 64-bit integer and arbitrary data
-    ** is stored in the leaves.  (BTREE_INTKEY is used for SQL tables.)  With
-    ** BTREE_BLOBKEY, the key is an arbitrary BLOB and no content is stored
-    ** anywhere - the key is the content.  (BTREE_BLOBKEY is used for SQL
-    ** indices.)
-    *///#define BTREE_INTKEY     1    /* Table has only 64-bit signed integer keys */
+		///
+///<summary>
+///The flags parameter to sqlite3BtreeCreateTable can be the bitwise OR
+///of the flags shown below.
+///
+///Every SQLite table must have either BTREE_INTKEY or BTREE_BLOBKEY set.
+///</summary>
+///<param name="With BTREE_INTKEY, the table key is a 64">bit integer and arbitrary data</param>
+///<param name="is stored in the leaves.  (BTREE_INTKEY is used for SQL tables.)  With">is stored in the leaves.  (BTREE_INTKEY is used for SQL tables.)  With</param>
+///<param name="BTREE_BLOBKEY, the key is an arbitrary BLOB and no content is stored">BTREE_BLOBKEY, the key is an arbitrary BLOB and no content is stored</param>
+///<param name="anywhere "> the key is the content.  (BTREE_BLOBKEY is used for SQL</param>
+///<param name="indices.)">indices.)</param>
+///<param name=""></param>
+
+		//#define BTREE_INTKEY     1    /* Table has only 64-bit signed integer keys */
 		//#define BTREE_BLOBKEY    2    /* Table has keys only - no data */
-		const int BTREE_INTKEY=1;
-		const int BTREE_BLOBKEY=2;
+		const int BTREE_INTKEY = 1;
+
+		const int BTREE_BLOBKEY = 2;
+
 		//int sqlite3BtreeDropTable(Btree*, int, int);
 		//int sqlite3BtreeClearTable(Btree*, int, int);
 		//void sqlite3BtreeTripAllCursors(Btree*, int);
 		//void sqlite3BtreeGetMeta(Btree *pBtree, int idx, u32 *pValue);
 		//int sqlite3BtreeUpdateMeta(Btree*, int idx, u32 value);
-		
 		//int sqlite3BtreeCursor(
 		//  Btree*,                              /* BTree containing table to open */
 		//  int iTable,                          /* Index of root page */
@@ -165,7 +244,7 @@ namespace Community.CsharpSqlite {
 		//void sqlite3BtreeCursorList(Btree);
 		//#endif
 		#if !SQLITE_OMIT_WAL
-																																				//int sqlite3BtreeCheckpoint(Btree*, int, int *, int );
+																																						//int sqlite3BtreeCheckpoint(Btree*, int, int *, int );
 #endif
 		///<summary>
 		/// If we are not using shared cache, then there is no need to
@@ -173,55 +252,74 @@ namespace Community.CsharpSqlite {
 		/// Enter and Leave procedures no-ops.
 		///</summary>
 		#if !SQLITE_OMIT_SHARED_CACHE
-																																				//void sqlite3BtreeEnter(Btree);
+																																						//void sqlite3BtreeEnter(Btree);
 //void sqlite3BtreeEnterAll(sqlite3);
 #else
 		//# define sqlite3BtreeEnter(X)
-		static void sqlite3BtreeEnter(Btree bt) {
+		static void sqlite3BtreeEnter (Btree bt)
+		{
 		}
+
 		//# define sqlite3BtreeEnterAll(X)
-		static void sqlite3BtreeEnterAll(sqlite3 p) {
+		static void sqlite3BtreeEnterAll (sqlite3 p)
+		{
 		}
+
 		#endif
 		#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
-																																				//int sqlite3BtreeSharable(Btree);
+																																						//int sqlite3BtreeSharable(Btree);
 //void sqlite3BtreeLeave(Btree);
 //void sqlite3BtreeEnterCursor(BtCursor);
 //void sqlite3BtreeLeaveCursor(BtCursor);
 //void sqlite3BtreeLeaveAll(sqlite3);
 #if !NDEBUG
-																																				/* These routines are used inside Debug.Assert() statements only. */
+																																						/* These routines are used inside Debug.Assert() statements only. */
 int sqlite3BtreeHoldsMutex(Btree);
 int sqlite3BtreeHoldsAllMutexes(sqlite3);
 int sqlite3SchemaMutexHeld(sqlite3*,int,Schema);
 #endif
-																																				#else
+																																						#else
 		//# define sqlite3BtreeSharable(X) 0
-		static bool sqlite3BtreeSharable(Btree X) {
+		static bool sqlite3BtreeSharable (Btree X)
+		{
 			return false;
 		}
+
 		//# define sqlite3BtreeLeave(X)
-		static void sqlite3BtreeLeave(Btree X) {
+		static void sqlite3BtreeLeave (Btree X)
+		{
 		}
+
 		//# define sqlite3BtreeEnterCursor(X)
-		static void sqlite3BtreeEnterCursor(BtCursor X) {
+		static void sqlite3BtreeEnterCursor (BtCursor X)
+		{
 		}
+
 		//# define sqlite3BtreeLeaveCursor(X)
-		static void sqlite3BtreeLeaveCursor(BtCursor X) {
+		static void sqlite3BtreeLeaveCursor (BtCursor X)
+		{
 		}
+
 		//# define sqlite3BtreeLeaveAll(X)
-		static void sqlite3BtreeLeaveAll(sqlite3 X) {
+		static void sqlite3BtreeLeaveAll (sqlite3 X)
+		{
 		}
+
 		//# define sqlite3BtreeHoldsMutex(X) 1
-		static bool sqlite3BtreeHoldsMutex(Btree X) {
+		static bool sqlite3BtreeHoldsMutex (Btree X)
+		{
 			return true;
 		}
+
 		//# define sqlite3BtreeHoldsAllMutexes(X) 1
-		static bool sqlite3BtreeHoldsAllMutexes(sqlite3 X) {
+		static bool sqlite3BtreeHoldsAllMutexes (sqlite3 X)
+		{
 			return true;
 		}
+
 		//# define sqlite3SchemaMutexHeld(X,Y,Z) 1
-		static bool sqlite3SchemaMutexHeld(sqlite3 X,int y,Schema z) {
+		static bool sqlite3SchemaMutexHeld (sqlite3 X, int y, Schema z)
+		{
 			return true;
 		}
 	#endif
