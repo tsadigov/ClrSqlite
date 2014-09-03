@@ -600,7 +600,7 @@ pOp.cnt = 0;
 				return this.sqlite3VdbeAddOp3 (op, 0, 0, 0);
 			}
 
-			public int sqlite3VdbeAddOp1 (int op, int p1)
+			public int sqlite3VdbeAddOp1 (OpCode op, int p1)
 			{
 				return this.sqlite3VdbeAddOp3 (op, p1, 0, 0);
 			}
@@ -1274,7 +1274,7 @@ pOp.cnt = 0;
 					}
 					#if !SQLITE_OMIT_FLOATING_POINT
 					if (iReg >= 0 && pTab.aCol [i].affinity == SQLITE_AFF_REAL) {
-						this.sqlite3VdbeAddOp1 (OP_RealAffinity, iReg);
+						this.sqlite3VdbeAddOp1 (OpCode.OP_RealAffinity, iReg);
 					}
 					#endif
 				}

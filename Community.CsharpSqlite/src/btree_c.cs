@@ -855,7 +855,7 @@ static u16 cellSize( MemPage pPage, int iCell )
 			//if( !p ){
 			//  return SQLITE_NOMEM;
 			//}
-			p.inTrans=TRANS_NONE;
+            p.inTrans = TransType.TRANS_NONE;
 			p.db=db;
 			#if !SQLITE_OMIT_SHARED_CACHE
 																																																																								p.lock.pBtree = p;
@@ -1539,8 +1539,9 @@ rc = SQLITE_NOTADB;
 		///<param name="If there is a transaction in progress, this routine is a no">op.</param>
 		static void unlockBtreeIfUnused(BtShared pBt) {
 			Debug.Assert(sqlite3_mutex_held(pBt.mutex));
-			Debug.Assert(pBt.pCursor==null||pBt.inTransaction>TRANS_NONE);
-			if(pBt.inTransaction==TRANS_NONE&&pBt.pPage1!=null) {
+            Debug.Assert(pBt.pCursor == null || pBt.inTransaction > TransType.TRANS_NONE);
+            if (pBt.inTransaction == TransType.TRANS_NONE && pBt.pPage1 != null)
+            {
 				Debug.Assert(pBt.pPage1.aData!=null);
 				//Debug.Assert( sqlite3PagerRefcount( pBt.pPager ) == 1 );
 				releasePage(pBt.pPage1);
@@ -1640,7 +1641,7 @@ rc = SQLITE_NOTADB;
 			///<param name="is already in a read">transaction</param>
 			///<param name="is requested, this is a no">op.</param>
 			///<param name=""></param>
-			if(p.inTrans==TRANS_WRITE||(p.inTrans==TRANS_READ&&0==wrflag)) {
+			if(p.inTrans==TransType.TRANS_WRITE||(p.inTrans==TransType.TRANS_READ&&0==wrflag)) {
 				goto trans_begun;
 			}
 			///
@@ -1711,9 +1712,10 @@ goto trans_begun;
 					unlockBtreeIfUnused(pBt);
 				}
 			}
-			while((rc&0xFF)==SQLITE_BUSY&&pBt.inTransaction==TRANS_NONE&&btreeInvokeBusyHandler(pBt)!=0);
+            while ((rc & 0xFF) == SQLITE_BUSY && pBt.inTransaction == TransType.TRANS_NONE && btreeInvokeBusyHandler(pBt) != 0);
 			if(rc==SQLITE_OK) {
-				if(p.inTrans==TRANS_NONE) {
+                if (p.inTrans == TransType.TRANS_NONE)
+                {
 					pBt.nTransaction++;
 					#if !SQLITE_OMIT_SHARED_CACHE
 																																																																																																																								if( p.sharable ){
@@ -1724,7 +1726,7 @@ pBt.pLock = &p.lock;
 }
 #endif
 				}
-				p.inTrans=(wrflag!=0?TRANS_WRITE:TRANS_READ);
+                p.inTrans = (wrflag != 0 ? TransType.TRANS_WRITE : TransType.TRANS_READ);
 				if(p.inTrans>pBt.inTransaction) {
 					pBt.inTransaction=p.inTrans;
 				}
@@ -2018,7 +2020,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 			int rc;
 			BtShared pBt=p.pBt;
 			sqlite3BtreeEnter(p);
-			Debug.Assert(pBt.inTransaction==TRANS_WRITE&&p.inTrans==TRANS_WRITE);
+            Debug.Assert(pBt.inTransaction == TransType.TRANS_WRITE && p.inTrans == TransType.TRANS_WRITE);
 			if(!pBt.autoVacuum) {
 				rc=SQLITE_DONE;
 			}
@@ -2160,7 +2162,8 @@ pBt.isExclusive = (u8)(wrflag>1);
 		///<param name="the write">transaction for this database file is to delete the journal.</param>
 		static int sqlite3BtreeCommitPhaseOne(Btree p,string zMaster) {
 			int rc=SQLITE_OK;
-			if(p.inTrans==TRANS_WRITE) {
+            if (p.inTrans == TransType.TRANS_WRITE)
+            {
 				BtShared pBt=p.pBt;
 				sqlite3BtreeEnter(p);
 				#if !SQLITE_OMIT_AUTOVACUUM
@@ -2186,7 +2189,8 @@ pBt.isExclusive = (u8)(wrflag>1);
 			BtShared pBt=p.pBt;
 			Debug.Assert(sqlite3BtreeHoldsMutex(p));
 			pBt.btreeClearHasContent();
-			if(p.inTrans>TRANS_NONE&&p.db.activeVdbeCnt>1) {
+            if (p.inTrans > TransType.TRANS_NONE && p.db.activeVdbeCnt > 1)
+            {
 				///
 				///<summary>
 				///If there are other active statements that belong to this database
@@ -2194,7 +2198,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 				///<param name="handle, downgrade to a read">only transaction. The other statements</param>
 				///<param name="may still be reading from the database.  ">may still be reading from the database.  </param>
 				p.downgradeAllSharedCacheTableLocks();
-				p.inTrans=TRANS_READ;
+                p.inTrans = TransType.TRANS_READ;
 			}
 			else {
 				///
@@ -2204,11 +2208,12 @@ pBt.isExclusive = (u8)(wrflag>1);
 				///reaches 0, set the shared state to TRANS_NONE. The unlockBtreeIfUnused()
 				///call below will unlock the pager.  
 				///</summary>
-				if(p.inTrans!=TRANS_NONE) {
+                if (p.inTrans != TransType.TRANS_NONE)
+                {
 					p.clearAllSharedCacheTableLocks();
 					pBt.nTransaction--;
 					if(0==pBt.nTransaction) {
-						pBt.inTransaction=TRANS_NONE;
+                        pBt.inTransaction = TransType.TRANS_NONE;
 					}
 				}
 				///
@@ -2216,7 +2221,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 				///Set the current transaction state to TRANS_NONE and unlock the
 				///pager if this call closed the only read or write transaction.  
 				///</summary>
-				p.inTrans=TRANS_NONE;
+                p.inTrans = TransType.TRANS_NONE;
 				unlockBtreeIfUnused(pBt);
 			}
 			btreeIntegrity(p);
@@ -2249,7 +2254,7 @@ pBt.isExclusive = (u8)(wrflag>1);
 		///<param name="This will release the write lock on the database file.  If there">This will release the write lock on the database file.  If there</param>
 		///<param name="are no active cursors, it also releases the read lock.">are no active cursors, it also releases the read lock.</param>
 		static int sqlite3BtreeCommitPhaseTwo(Btree p,int bCleanup) {
-			if(p.inTrans==TRANS_NONE)
+            if (p.inTrans == TransType.TRANS_NONE)
 				return SQLITE_OK;
 			sqlite3BtreeEnter(p);
 			btreeIntegrity(p);
@@ -2259,17 +2264,18 @@ pBt.isExclusive = (u8)(wrflag>1);
 			///<param name="If the handle has a write">btrees</param>
 			///<param name="transaction and set the shared state to TRANS_READ.">transaction and set the shared state to TRANS_READ.</param>
 			///<param name=""></param>
-			if(p.inTrans==TRANS_WRITE) {
+            if (p.inTrans == TransType.TRANS_WRITE)
+            {
 				int rc;
 				BtShared pBt=p.pBt;
-				Debug.Assert(pBt.inTransaction==TRANS_WRITE);
+                Debug.Assert(pBt.inTransaction == TransType.TRANS_WRITE);
 				Debug.Assert(pBt.nTransaction>0);
 				rc=pBt.pPager.sqlite3PagerCommitPhaseTwo();
 				if(rc!=SQLITE_OK&&bCleanup==0) {
 					sqlite3BtreeLeave(p);
 					return rc;
 				}
-				pBt.inTransaction=TRANS_READ;
+                pBt.inTransaction = TransType.TRANS_READ;
 			}
 			btreeEndTransaction(p);
 			sqlite3BtreeLeave(p);
@@ -2378,9 +2384,10 @@ sqlite3BtreeTripAllCursors(p, rc);
 }
 #endif
 			btreeIntegrity(p);
-			if(p.inTrans==TRANS_WRITE) {
+            if (p.inTrans == TransType.TRANS_WRITE)
+            {
 				int rc2;
-				Debug.Assert(TRANS_WRITE==pBt.inTransaction);
+                Debug.Assert(TransType.TRANS_WRITE == pBt.inTransaction);
 				rc2=pBt.pPager.sqlite3PagerRollback();
 				if(rc2!=SQLITE_OK) {
 					rc=rc2;
@@ -2401,7 +2408,7 @@ sqlite3BtreeTripAllCursors(p, rc);
 					releasePage(pPage1);
 				}
 				Debug.Assert(countWriteCursors(pBt)==0);
-				pBt.inTransaction=TRANS_READ;
+                pBt.inTransaction = TransType.TRANS_READ;
 			}
 			btreeEndTransaction(p);
 			sqlite3BtreeLeave(p);
@@ -2430,11 +2437,11 @@ sqlite3BtreeTripAllCursors(p, rc);
 			int rc;
 			BtShared pBt=p.pBt;
 			sqlite3BtreeEnter(p);
-			Debug.Assert(p.inTrans==TRANS_WRITE);
+            Debug.Assert(p.inTrans == TransType.TRANS_WRITE);
 			Debug.Assert(!pBt.readOnly);
 			Debug.Assert(iStatement>0);
 			Debug.Assert(iStatement>p.db.nSavepoint);
-			Debug.Assert(pBt.inTransaction==TRANS_WRITE);
+            Debug.Assert(pBt.inTransaction == TransType.TRANS_WRITE);
 			///
 			///<summary>
 			///At the pager level, a statement transaction is a savepoint with
@@ -2462,7 +2469,8 @@ sqlite3BtreeTripAllCursors(p, rc);
 		///<param name="transaction remains open.">transaction remains open.</param>
 		static int sqlite3BtreeSavepoint(Btree p,int op,int iSavepoint) {
 			int rc=SQLITE_OK;
-			if(p!=null&&p.inTrans==TRANS_WRITE) {
+            if (p != null && p.inTrans == TransType.TRANS_WRITE)
+            {
 				BtShared pBt=p.pBt;
 				Debug.Assert(op==SAVEPOINT_RELEASE||op==SAVEPOINT_ROLLBACK);
 				Debug.Assert(iSavepoint>=0||(iSavepoint==-1&&op==SAVEPOINT_ROLLBACK));
@@ -2559,8 +2567,8 @@ sqlite3BtreeTripAllCursors(p, rc);
 			///<summary>
 			///Assert that the caller has opened the required transaction. 
 			///</summary>
-			Debug.Assert(p.inTrans>TRANS_NONE);
-			Debug.Assert(wrFlag==0||p.inTrans==TRANS_WRITE);
+            Debug.Assert(p.inTrans > TransType.TRANS_NONE);
+            Debug.Assert(wrFlag == 0 || p.inTrans == TransType.TRANS_WRITE);
 			Debug.Assert(pBt.pPage1!=null&&pBt.pPage1.aData!=null);
 			if(NEVER(wrFlag!=0&&pBt.readOnly)) {
 				return SQLITE_READONLY;
@@ -4920,7 +4928,7 @@ return 1;
 				return pCur.skipNext;
 			}
 			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pCur.wrFlag!=0&&pBt.inTransaction==TRANS_WRITE&&!pBt.readOnly);
+            Debug.Assert(pCur.wrFlag != 0 && pBt.inTransaction == TransType.TRANS_WRITE && !pBt.readOnly);
 			Debug.Assert(p.hasSharedCacheTableLock(pCur.pgnoRoot,pCur.pKeyInfo!=null?1:0,2));
 			///
 			///<summary>
@@ -5083,7 +5091,7 @@ return 1;
 			///Depth of node containing pCell 
 			///</summary>
 			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pBt.inTransaction==TRANS_WRITE);
+            Debug.Assert(pBt.inTransaction == TransType.TRANS_WRITE);
 			Debug.Assert(!pBt.readOnly);
 			Debug.Assert(pCur.wrFlag!=0);
 			Debug.Assert(p.hasSharedCacheTableLock(pCur.pgnoRoot,pCur.pKeyInfo!=null?1:0,2));
@@ -5221,7 +5229,7 @@ return 1;
 			///</summary>
 			///<param name="Page">type flage for the root page of new table </param>
 			Debug.Assert(sqlite3BtreeHoldsMutex(p));
-			Debug.Assert(pBt.inTransaction==TRANS_WRITE);
+            Debug.Assert(pBt.inTransaction == TransType.TRANS_WRITE);
 			Debug.Assert(!pBt.readOnly);
 			#if SQLITE_OMIT_AUTOVACUUM
 																																																																								rc = allocateBtreePage(pBt, ref pRoot, ref pgnoRoot, 1, 0);

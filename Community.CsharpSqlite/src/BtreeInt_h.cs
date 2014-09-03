@@ -417,11 +417,13 @@ namespace Community.CsharpSqlite
 		/// but any number may have active read transactions.
 		///
 		///</summary>
-		public const byte TRANS_NONE = 0;
+        public enum TransType:byte { 
+		 TRANS_NONE = 0,
 
-		public const byte TRANS_READ = 1;
+		 TRANS_READ = 1,
 
-		public const byte TRANS_WRITE = 2;
+		 TRANS_WRITE = 2
+    }
 
 		///
 ///<summary>
@@ -542,7 +544,7 @@ namespace Community.CsharpSqlite
 ///<param name="True if incr">vacuum is enabled </param>
 
 			#endif
-			public u8 inTransaction;
+			public TransType inTransaction;
 
 			///
 ///<summary>

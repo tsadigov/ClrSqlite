@@ -797,7 +797,7 @@ goto trigger_cleanup;
 			int nName;
 			sqlite3 db = pParse.db;
 			//      if ( db.mallocFailed != 0 ) goto drop_trigger_cleanup;
-			if (SQLITE_OK != sqlite3ReadSchema (pParse)) {
+			if (SqlResult.SQLITE_OK != sqlite3ReadSchema (pParse)) {
 				goto drop_trigger_cleanup;
 			}
 			Debug.Assert (pName.nSrc == 1);

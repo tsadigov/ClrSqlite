@@ -208,7 +208,7 @@ namespace Community.CsharpSqlite {
 					///<param name="If the source pager is currently in a write">transaction, return</param>
 					///<param name="SQLITE_BUSY immediately.">SQLITE_BUSY immediately.</param>
 					///<param name=""></param>
-					if(this.pDestDb!=null&&this.pSrc.pBt.inTransaction==TRANS_WRITE) {
+					if(this.pDestDb!=null&&this.pSrc.pBt.inTransaction==TransType.TRANS_WRITE) {
 						rc=SQLITE_BUSY;
 					}
 					else {

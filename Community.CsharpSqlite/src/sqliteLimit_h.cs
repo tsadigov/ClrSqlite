@@ -198,7 +198,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 		#if !SQLITE_DEFAULT_PAGE_SIZE
-		const int SQLITE_DEFAULT_PAGE_SIZE = 1024;
+        const int SQLITE_DEFAULT_PAGE_SIZE = 1024;
 
 		#endif
 		#if SQLITE_DEFAULT_PAGE_SIZE

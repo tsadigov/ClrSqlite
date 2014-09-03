@@ -1258,6 +1258,9 @@ break;
 				return "unknown error";
 			}
 		}
+        static string sqlite3ErrStr(SqlResult rc) {
+            return sqlite3ErrStr((int)rc);
+        }
 		///<summary>
 		/// This routine implements a busy callback that sleeps and tries
 		/// again until a timeout value is reached.  The timeout value is

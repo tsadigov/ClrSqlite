@@ -559,15 +559,16 @@ db.xAuth = 0;
 		/// Otherwise, the schema is loaded. An error code is returned.
 		///
 		///</summary>
-		static int sqlite3ReadSchema (Parse pParse)
+		static SqlResult sqlite3ReadSchema (Parse pParse)
 		{
-			int rc = SQLITE_OK;
+            SqlResult rc = SqlResult.SQLITE_OK;
 			sqlite3 db = pParse.db;
 			Debug.Assert (sqlite3_mutex_held (db.mutex));
 			if (0 == db.init.busy) {
-				rc = sqlite3Init (db, ref pParse.zErrMsg);
+                rc = (SqlResult)sqlite3Init(db, ref pParse.zErrMsg);
 			}
-			if (rc != SQLITE_OK) {
+            if (rc != SqlResult.SQLITE_OK)
+            {
 				pParse.rc = rc;
 				pParse.nErr++;
 			}
@@ -631,7 +632,7 @@ db.xAuth = 0;
 				Debug.Assert (sqlite3SchemaMutexHeld (db, iDb, null));
 				if (cookie != db.aDb [iDb].pSchema.schema_cookie) {
 					sqlite3ResetInternalSchema (db, iDb);
-					pParse.rc = SQLITE_SCHEMA;
+                    pParse.rc = SqlResult.SQLITE_SCHEMA;
 				}
 				///
 ///<summary>
@@ -837,8 +838,8 @@ db.xAuth = 0;
 			//{
 			//  pParse.rc = SQLITE_NOMEM;
 			//}
-			if (pParse.rc == SQLITE_DONE)
-				pParse.rc = SQLITE_OK;
+			if (pParse.rc == SqlResult.SQLITE_DONE)
+                pParse.rc = SqlResult.SQLITE_OK;
 			if (pParse.checkSchema != 0) {
 				schemaIsValid (pParse);
 			}
@@ -858,7 +859,7 @@ db.xAuth = 0;
 
 				//sqlite3StackFree( db, pParse );
 			}
-			rc = pParse.rc;
+			rc =(int) pParse.rc;
 			if (rc == SQLITE_OK && pParse.pVdbe != null && pParse.explain != 0) {
 				string[] azColName = new string[] {
 					"addr",

@@ -6690,13 +6690,13 @@ set { _op = value; }
 					v.sqlite3VdbeResolveLabel (pLevel.addrBrk);
 					if (pLevel.iLeftJoin != 0) {
 						int addr;
-						addr = v.sqlite3VdbeAddOp1 (OP_IfPos, pLevel.iLeftJoin);
+						addr = v.sqlite3VdbeAddOp1 (OpCode.OP_IfPos, pLevel.iLeftJoin);
 						Debug.Assert ((pLevel.plan.wsFlags & WHERE_IDX_ONLY) == 0 || (pLevel.plan.wsFlags & WHERE_INDEXED) != 0);
 						if ((pLevel.plan.wsFlags & WHERE_IDX_ONLY) == 0) {
-							v.sqlite3VdbeAddOp1 (OP_NullRow, pTabList.a [i].iCursor);
+							v.sqlite3VdbeAddOp1 (OpCode.OP_NullRow, pTabList.a [i].iCursor);
 						}
 						if (pLevel.iIdxCur >= 0) {
-							v.sqlite3VdbeAddOp1 (OP_NullRow, pLevel.iIdxCur);
+							v.sqlite3VdbeAddOp1 (OpCode.OP_NullRow, pLevel.iIdxCur);
 						}
 						if (pLevel.op == OP_Return) {
 							v.sqlite3VdbeAddOp2 (OP_Gosub, pLevel.p1, pLevel.addrFirst);
@@ -6731,10 +6731,10 @@ set { _op = value; }
 					if ((pTab.tabFlags & TF_Ephemeral) == 0 && pTab.pSelect == null && (this.wctrlFlags & WHERE_OMIT_CLOSE) == 0) {
 						u32 ws = pLevel.plan.wsFlags;
 						if (0 == this.okOnePass && (ws & WHERE_IDX_ONLY) == 0) {
-							v.sqlite3VdbeAddOp1 (OP_Close, pTabItem.iCursor);
+							v.sqlite3VdbeAddOp1 (OpCode.OP_Close, pTabItem.iCursor);
 						}
 						if ((ws & WHERE_INDEXED) != 0 && (ws & WHERE_TEMP_INDEX) == 0) {
-							v.sqlite3VdbeAddOp1 (OP_Close, pLevel.iIdxCur);
+							v.sqlite3VdbeAddOp1 (OpCode.OP_Close, pLevel.iIdxCur);
 						}
 					}
 					///

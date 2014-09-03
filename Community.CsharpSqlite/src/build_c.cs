@@ -265,11 +265,11 @@ p.zName, P4_STATIC );
 				if(pParse.pAinc!=null&&pParse.nTab==0)
 					pParse.nTab=1;
 				sqlite3VdbeMakeReady(v,pParse);
-				pParse.rc=SQLITE_DONE;
+				pParse.rc=SqlResult.SQLITE_DONE;
 				pParse.colNamesSet=0;
 			}
 			else {
-				pParse.rc=SQLITE_ERROR;
+				pParse.rc=SqlResult.SQLITE_ERROR;
 			}
 			pParse.nTab=0;
 			pParse.nMem=0;
@@ -403,7 +403,7 @@ p.zName, P4_STATIC );
 			///Read the database schema. If an error occurs, leave an error message
 			///and code in pParse and return NULL. 
 			///</summary>
-			if(SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+			if( SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
 				return null;
 			}
 			p=sqlite3FindTable(pParse.db,zName,zDbase);
@@ -1028,7 +1028,7 @@ goto begin_table_error;
 			///</summary>
 			if(!IN_DECLARE_VTAB(pParse)) {
 				String zDb=db.aDb[iDb].zName;
-				if(SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+				if( SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
 					goto begin_table_error;
 				}
 				pTable=sqlite3FindTable(db,zName,zDb);
@@ -1105,7 +1105,7 @@ goto begin_table_error;
 				reg3=++pParse.nMem;
 				v.sqlite3VdbeAddOp3(OP_ReadCookie,iDb,reg3,BTREE_FILE_FORMAT);
 				sqlite3VdbeUsesBtree(v,iDb);
-				j1=v.sqlite3VdbeAddOp1(OP_If,reg3);
+				j1=v.sqlite3VdbeAddOp1(OpCode.OP_If,reg3);
 				fileFormat=(db.flags&SQLITE_LegacyFileFmt)!=0?1:SQLITE_MAX_FILE_FORMAT;
 				v.sqlite3VdbeAddOp2(OP_Integer,fileFormat,reg3);
 				v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_FILE_FORMAT,reg3);
@@ -1897,7 +1897,7 @@ goto begin_table_error;
 				v=sqlite3GetVdbe(pParse);
 				if(NEVER(v==null))
 					return;
-				v.sqlite3VdbeAddOp1(OP_Close,0);
+				v.sqlite3VdbeAddOp1 (OpCode.OP_Close,0);
 				///
 				///<summary>
 				///Initialize zType for the new view or table.
@@ -1946,7 +1946,7 @@ goto begin_table_error;
 					pParse.nTab=2;
 					sqlite3SelectDestInit(dest,SelectResultType.Table,1);
 					sqlite3Select(pParse,pSelect,ref dest);
-					v.sqlite3VdbeAddOp1(OP_Close,1);
+					v.sqlite3VdbeAddOp1(OpCode.OP_Close,1);
 					if(pParse.nErr==0) {
 						pSelTab=sqlite3ResultSetOfSelect(pParse,pSelect);
 						if(pSelTab==null)
@@ -2906,8 +2906,8 @@ return;
 			pParse.sqlite3ReleaseTempReg(regRecord);
 			v.sqlite3VdbeAddOp2(OP_Next,iTab,addr1+1);
 			v.sqlite3VdbeJumpHere(addr1);
-			v.sqlite3VdbeAddOp1(OP_Close,iTab);
-			v.sqlite3VdbeAddOp1(OP_Close,iIdx);
+			v.sqlite3VdbeAddOp1 (OpCode.OP_Close,iTab);
+			v.sqlite3VdbeAddOp1 (OpCode.OP_Close,iIdx);
 		}
 		///<summary>
 		/// Create a new index for an SQL table.  pName1.pName2 is the name of the index
@@ -3056,7 +3056,7 @@ return;
 			IN_DECLARE_VTAB(pParse)) {
 				goto exit_create_index;
 			}
-			if(SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+			if( SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
 				goto exit_create_index;
 			}
 			///
@@ -3530,7 +3530,7 @@ goto exit_create_index;
 					sqlite3RefillIndex(pParse,pIndex,iMem);
 					sqlite3ChangeCookie(pParse,iDb);
 					v.sqlite3VdbeAddParseSchemaOp(iDb,sqlite3MPrintf(db,"name='%q' AND type='index'",pIndex.zName));
-					v.sqlite3VdbeAddOp1(OP_Expire,0);
+					v.sqlite3VdbeAddOp1 (OpCode.OP_Expire,0);
 				}
 			}
 			///
@@ -3629,7 +3629,7 @@ goto exit_create_index;
 			//  goto exit_drop_index;
 			//}
 			Debug.Assert(pName.nSrc==1);
-			if(SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+			if( SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
 				goto exit_drop_index;
 			}
 			pIndex=sqlite3FindIndex(db,pName.a[0].zName,pName.a[0].zDatabase);
@@ -4272,11 +4272,11 @@ goto exit_drop_index;
 		static int sqlite3OpenTempDatabase(Parse pParse) {
 			sqlite3 db=pParse.db;
 			if(db.aDb[1].pBt==null&&pParse.explain==0) {
-				int rc;
+				SqlResult rc;
 				Btree pBt=null;
 				const int flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_EXCLUSIVE|SQLITE_OPEN_DELETEONCLOSE|SQLITE_OPEN_TEMP_DB;
-				rc=sqlite3BtreeOpen(db.pVfs,null,db,ref pBt,0,flags);
-				if(rc!=SQLITE_OK) {
+				rc=(SqlResult)sqlite3BtreeOpen(db.pVfs,null,db,ref pBt,0,flags);
+				if(rc!=SqlResult.SQLITE_OK) {
 					sqlite3ErrorMsg(pParse,"unable to open a temporary database "+"file for storing temporary tables");
 					pParse.rc=rc;
 					return 1;
@@ -4583,7 +4583,7 @@ goto exit_drop_index;
 			///Read the database schema. If an error occurs, leave an error message
 			///and code in pParse and return NULL. 
 			///</summary>
-			if(SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+			if( SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
 				return;
 			}
 			if(pName1==null) {

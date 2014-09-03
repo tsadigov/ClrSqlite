@@ -308,6 +308,460 @@ namespace Community.CsharpSqlite
 	}
 	public partial class Sqlite3
 	{
+
+
+
+        //#define OP_Goto                                 1
+        public const int OP_Goto = 1;
+
+        public const int OP_Gosub = 2;
+
+        public const int OP_Return = 3;
+
+        public const int OP_Yield = 4;
+
+        public const int OP_HaltIfNull = 5;
+
+        public const int OP_Halt = 6;
+
+        public const int OP_Integer = 7;
+
+        public const int OP_Int64 = 8;
+
+        public const int OP_Real = 130///
+            ///<summary>
+            ///same as TK_FLOAT    
+            ///</summary>
+
+        ;
+
+        public const int OP_String8 = 94///
+            ///<summary>
+            ///same as TK_STRING   
+            ///</summary>
+
+        ;
+
+        public const int OP_String = 9;
+
+        public const int OP_Null = 10;
+
+        public const int OP_Blob = 11;
+
+        public const int OP_Variable = 12;
+
+        public const int OP_Move = 13;
+
+        public const int OP_Copy = 14;
+
+        public const int OP_SCopy = 15;
+
+        public const int OP_ResultRow = 16;
+
+        public const int OP_Concat = 91///
+            ///<summary>
+            ///same as TK_CONCAT   
+            ///</summary>
+
+        ;
+
+        public const int OP_Add = 86///
+            ///<summary>
+            ///same as TK_PLUS     
+            ///</summary>
+
+        ;
+
+        public const int OP_Subtract = 87///
+            ///<summary>
+            ///same as TK_MINUS    
+            ///</summary>
+
+        ;
+
+        public const int OP_Multiply = 88///
+            ///<summary>
+            ///same as TK_STAR     
+            ///</summary>
+
+        ;
+
+        public const int OP_Divide = 89///
+            ///<summary>
+            ///same as TK_SLASH    
+            ///</summary>
+
+        ;
+
+        public const int OP_Remainder = 90///
+            ///<summary>
+            ///same as TK_REM      
+            ///</summary>
+
+        ;
+
+        public const int OP_CollSeq = 17;
+
+        public const int OP_Function = 18;
+
+        public const int OP_BitAnd = 82///
+            ///<summary>
+            ///same as TK_BITAND   
+            ///</summary>
+
+        ;
+
+        public const int OP_BitOr = 83///
+            ///<summary>
+            ///same as TK_BITOR    
+            ///</summary>
+
+        ;
+
+        public const int OP_ShiftLeft = 84///
+            ///<summary>
+            ///same as TK_LSHIFT   
+            ///</summary>
+
+        ;
+
+        public const int OP_ShiftRight = 85///
+            ///<summary>
+            ///same as TK_RSHIFT   
+            ///</summary>
+
+        ;
+
+        public const int OP_AddImm = 20;
+
+        public const int OP_MustBeInt = 21;
+
+        public const int OP_RealAffinity = 22;
+
+        public const int OP_ToText = 141///
+            ///<summary>
+            ///same as TK_TO_TEXT  
+            ///</summary>
+
+        ;
+
+        public const int OP_ToBlob = 142///
+            ///<summary>
+            ///same as TK_TO_BLOB  
+            ///</summary>
+
+        ;
+
+        public const int OP_ToNumeric = 143///
+            ///<summary>
+            ///same as TK_TO_NUMERIC
+            ///</summary>
+
+        ;
+
+        public const int OP_ToInt = 144///
+            ///<summary>
+            ///same as TK_TO_INT   
+            ///</summary>
+
+        ;
+
+        public const int OP_ToReal = 145///
+            ///<summary>
+            ///same as TK_TO_REAL  
+            ///</summary>
+
+        ;
+
+        public const int OP_Eq = 76///
+            ///<summary>
+            ///same as TK_EQ       
+            ///</summary>
+
+        ;
+
+        public const int OP_Ne = 75///
+            ///<summary>
+            ///same as TK_NE       
+            ///</summary>
+
+        ;
+
+        public const int OP_Lt = 79///
+            ///<summary>
+            ///same as TK_LT       
+            ///</summary>
+
+        ;
+
+        public const int OP_Le = 78///
+            ///<summary>
+            ///same as TK_LE       
+            ///</summary>
+
+        ;
+
+        public const int OP_Gt = 77///
+            ///<summary>
+            ///same as TK_GT       
+            ///</summary>
+
+        ;
+
+        public const int OP_Ge = 80///
+            ///<summary>
+            ///same as TK_GE       
+            ///</summary>
+
+        ;
+
+        public const int OP_Permutation = 23;
+
+        public const int OP_Compare = 24;
+
+        public const int OP_Jump = 25;
+
+        public const int OP_And = 69///
+            ///<summary>
+            ///same as TK_AND      
+            ///</summary>
+
+        ;
+
+        public const int OP_Or = 68///
+            ///<summary>
+            ///same as TK_OR       
+            ///</summary>
+
+        ;
+
+        public const int OP_Not = 19///
+            ///<summary>
+            ///same as TK_NOT      
+            ///</summary>
+
+        ;
+
+        public const int OP_BitNot = 93///
+            ///<summary>
+            ///same as TK_BITNOT   
+            ///</summary>
+
+        ;
+
+        public const int OP_If = 26;
+
+        public const int OP_IfNot = 27;
+
+        public const int OP_IsNull = 73///
+            ///<summary>
+            ///same as TK_ISNULL   
+            ///</summary>
+
+        ;
+
+        public const int OP_NotNull = 74///
+            ///<summary>
+            ///same as TK_NOTNULL  
+            ///</summary>
+
+        ;
+
+        public const int OP_Column = 28;
+
+        public const int OP_Affinity = 29;
+
+        public const int OP_MakeRecord = 30;
+
+        public const int OP_Count = 31;
+
+        public const int OP_Savepoint = 32;
+
+        public const int OP_AutoCommit = 33;
+
+        public const int OP_Transaction = 34;
+
+        public const int OP_ReadCookie = 35;
+
+        public const int OP_SetCookie = 36;
+
+        public const int OP_VerifyCookie = 37;
+
+        public const int OP_OpenRead = 38;
+
+        public const int OP_OpenWrite = 39;
+
+        public const int OP_OpenAutoindex = 40;
+
+        public const int OP_OpenEphemeral = 41;
+
+        public const int OP_OpenPseudo = 42;
+
+        public const int OP_Close = 43;
+
+        public const int OP_SeekLt = 44;
+
+        public const int OP_SeekLe = 45;
+
+        public const int OP_SeekGe = 46;
+
+        public const int OP_SeekGt = 47;
+
+        public const int OP_Seek = 48;
+
+        public const int OP_NotFound = 49;
+
+        public const int OP_Found = 50;
+
+        public const int OP_IsUnique = 51;
+
+        public const int OP_NotExists = 52;
+
+        public const int OP_Sequence = 53;
+
+        public const int OP_NewRowid = 54;
+
+        public const int OP_Insert = 55;
+
+        public const int OP_InsertInt = 56;
+
+        public const int OP_Delete = 57;
+
+        public const int OP_ResetCount = 58;
+
+        public const int OP_RowKey = 59;
+
+        public const int OP_RowData = 60;
+
+        public const int OP_Rowid = 61;
+
+        public const int OP_NullRow = 62;
+
+        public const int OP_Last = 63;
+
+        public const int OP_Sort = 64;
+
+        public const int OP_Rewind = 65;
+
+        public const int OP_Prev = 66;
+
+        public const int OP_Next = 67;
+
+        public const int OP_IdxInsert = 70;
+
+        public const int OP_IdxDelete = 71;
+
+        public const int OP_IdxRowid = 72;
+
+        public const int OP_IdxLT = 81;
+
+        public const int OP_IdxGE = 92;
+
+        public const int OP_Destroy = 95;
+
+        public const int OP_Clear = 96;
+
+        public const int OP_CreateIndex = 97;
+
+        public const int OP_CreateTable = 98;
+
+        public const int OP_ParseSchema = 99;
+
+        public const int OP_LoadAnalysis = 100;
+
+        public const int OP_DropTable = 101;
+
+        public const int OP_DropIndex = 102;
+
+        public const int OP_DropTrigger = 103;
+
+        public const int OP_IntegrityCk = 104;
+
+        public const int OP_RowSetAdd = 105;
+
+        public const int OP_RowSetRead = 106;
+
+        public const int OP_RowSetTest = 107;
+
+        public const int OP_Program = 108;
+
+        public const int OP_Param = 109;
+
+        public const int OP_FkCounter = 110;
+
+        public const int OP_FkIfZero = 111;
+
+        public const int OP_MemMax = 112;
+
+        public const int OP_IfPos = 113;
+
+        public const int OP_IfNeg = 114;
+
+        public const int OP_IfZero = 115;
+
+        public const int OP_AggStep = 116;
+
+        public const int OP_AggFinal = 117;
+
+        public const int OP_Checkpoint = 118;
+
+        public const int OP_JournalMode = 119;
+
+        public const int OP_Vacuum = 120;
+
+        public const int OP_IncrVacuum = 121;
+
+        public const int OP_Expire = 122;
+
+        public const int OP_TableLock = 123;
+
+        public const int OP_VBegin = 124;
+
+        public const int OP_VCreate = 125;
+
+        public const int OP_VDestroy = 126;
+
+        public const int OP_VOpen = 127;
+
+        public const int OP_VFilter = 128;
+
+        public const int OP_VColumn = 129;
+
+        public const int OP_VNext = 131;
+
+        public const int OP_VRename = 132;
+
+        public const int OP_VUpdate = 133;
+
+        public const int OP_Pagecount = 134;
+
+        public const int OP_MaxPgcnt = 135;
+
+        public const int OP_Trace = 136;
+
+        public const int OP_Noop = 137;
+
+        public const int OP_Explain = 138;
+
+        ///
+        ///<summary>
+        ///The following opcode values are never used 
+        ///</summary>
+
+        //#define OP_NotUsed_139                        139
+        //#define OP_NotUsed_140                        140
+        ///
+        ///<summary>
+        ///The following opcode values are never used 
+        ///</summary>
+
+        public const int OP_NotUsed_138 = 138;
+
+        public const int OP_NotUsed_139 = 139;
+
+        public const int OP_NotUsed_140 = 140;
+
+
 		///
 ///<summary>
 ///Automatically generated.  Do not edit 
@@ -327,456 +781,6 @@ namespace Community.CsharpSqlite
 ///<summary>
 ///See the mkopcodeh.awk script for details 
 ///</summary>
-
-		//#define OP_Goto                                 1
-		public const int OP_Goto = 1;
-
-		public const int OP_Gosub = 2;
-
-		public const int OP_Return = 3;
-
-		public const int OP_Yield = 4;
-
-		public const int OP_HaltIfNull = 5;
-
-		public const int OP_Halt = 6;
-
-		public const int OP_Integer = 7;
-
-		public const int OP_Int64 = 8;
-
-		public const int OP_Real = 130///
-///<summary>
-///same as TK_FLOAT    
-///</summary>
-
-		;
-
-		public const int OP_String8 = 94///
-///<summary>
-///same as TK_STRING   
-///</summary>
-
-		;
-
-		public const int OP_String = 9;
-
-		public const int OP_Null = 10;
-
-		public const int OP_Blob = 11;
-
-		public const int OP_Variable = 12;
-
-		public const int OP_Move = 13;
-
-		public const int OP_Copy = 14;
-
-		public const int OP_SCopy = 15;
-
-		public const int OP_ResultRow = 16;
-
-		public const int OP_Concat = 91///
-///<summary>
-///same as TK_CONCAT   
-///</summary>
-
-		;
-
-		public const int OP_Add = 86///
-///<summary>
-///same as TK_PLUS     
-///</summary>
-
-		;
-
-		public const int OP_Subtract = 87///
-///<summary>
-///same as TK_MINUS    
-///</summary>
-
-		;
-
-		public const int OP_Multiply = 88///
-///<summary>
-///same as TK_STAR     
-///</summary>
-
-		;
-
-		public const int OP_Divide = 89///
-///<summary>
-///same as TK_SLASH    
-///</summary>
-
-		;
-
-		public const int OP_Remainder = 90///
-///<summary>
-///same as TK_REM      
-///</summary>
-
-		;
-
-		public const int OP_CollSeq = 17;
-
-		public const int OP_Function = 18;
-
-		public const int OP_BitAnd = 82///
-///<summary>
-///same as TK_BITAND   
-///</summary>
-
-		;
-
-		public const int OP_BitOr = 83///
-///<summary>
-///same as TK_BITOR    
-///</summary>
-
-		;
-
-		public const int OP_ShiftLeft = 84///
-///<summary>
-///same as TK_LSHIFT   
-///</summary>
-
-		;
-
-		public const int OP_ShiftRight = 85///
-///<summary>
-///same as TK_RSHIFT   
-///</summary>
-
-		;
-
-		public const int OP_AddImm = 20;
-
-		public const int OP_MustBeInt = 21;
-
-		public const int OP_RealAffinity = 22;
-
-		public const int OP_ToText = 141///
-///<summary>
-///same as TK_TO_TEXT  
-///</summary>
-
-		;
-
-		public const int OP_ToBlob = 142///
-///<summary>
-///same as TK_TO_BLOB  
-///</summary>
-
-		;
-
-		public const int OP_ToNumeric = 143///
-///<summary>
-///same as TK_TO_NUMERIC
-///</summary>
-
-		;
-
-		public const int OP_ToInt = 144///
-///<summary>
-///same as TK_TO_INT   
-///</summary>
-
-		;
-
-		public const int OP_ToReal = 145///
-///<summary>
-///same as TK_TO_REAL  
-///</summary>
-
-		;
-
-		public const int OP_Eq = 76///
-///<summary>
-///same as TK_EQ       
-///</summary>
-
-		;
-
-		public const int OP_Ne = 75///
-///<summary>
-///same as TK_NE       
-///</summary>
-
-		;
-
-		public const int OP_Lt = 79///
-///<summary>
-///same as TK_LT       
-///</summary>
-
-		;
-
-		public const int OP_Le = 78///
-///<summary>
-///same as TK_LE       
-///</summary>
-
-		;
-
-		public const int OP_Gt = 77///
-///<summary>
-///same as TK_GT       
-///</summary>
-
-		;
-
-		public const int OP_Ge = 80///
-///<summary>
-///same as TK_GE       
-///</summary>
-
-		;
-
-		public const int OP_Permutation = 23;
-
-		public const int OP_Compare = 24;
-
-		public const int OP_Jump = 25;
-
-		public const int OP_And = 69///
-///<summary>
-///same as TK_AND      
-///</summary>
-
-		;
-
-		public const int OP_Or = 68///
-///<summary>
-///same as TK_OR       
-///</summary>
-
-		;
-
-		public const int OP_Not = 19///
-///<summary>
-///same as TK_NOT      
-///</summary>
-
-		;
-
-		public const int OP_BitNot = 93///
-///<summary>
-///same as TK_BITNOT   
-///</summary>
-
-		;
-
-		public const int OP_If = 26;
-
-		public const int OP_IfNot = 27;
-
-		public const int OP_IsNull = 73///
-///<summary>
-///same as TK_ISNULL   
-///</summary>
-
-		;
-
-		public const int OP_NotNull = 74///
-///<summary>
-///same as TK_NOTNULL  
-///</summary>
-
-		;
-
-		public const int OP_Column = 28;
-
-		public const int OP_Affinity = 29;
-
-		public const int OP_MakeRecord = 30;
-
-		public const int OP_Count = 31;
-
-		public const int OP_Savepoint = 32;
-
-		public const int OP_AutoCommit = 33;
-
-		public const int OP_Transaction = 34;
-
-		public const int OP_ReadCookie = 35;
-
-		public const int OP_SetCookie = 36;
-
-		public const int OP_VerifyCookie = 37;
-
-		public const int OP_OpenRead = 38;
-
-		public const int OP_OpenWrite = 39;
-
-		public const int OP_OpenAutoindex = 40;
-
-		public const int OP_OpenEphemeral = 41;
-
-		public const int OP_OpenPseudo = 42;
-
-		public const int OP_Close = 43;
-
-		public const int OP_SeekLt = 44;
-
-		public const int OP_SeekLe = 45;
-
-		public const int OP_SeekGe = 46;
-
-		public const int OP_SeekGt = 47;
-
-		public const int OP_Seek = 48;
-
-		public const int OP_NotFound = 49;
-
-		public const int OP_Found = 50;
-
-		public const int OP_IsUnique = 51;
-
-		public const int OP_NotExists = 52;
-
-		public const int OP_Sequence = 53;
-
-		public const int OP_NewRowid = 54;
-
-		public const int OP_Insert = 55;
-
-		public const int OP_InsertInt = 56;
-
-		public const int OP_Delete = 57;
-
-		public const int OP_ResetCount = 58;
-
-		public const int OP_RowKey = 59;
-
-		public const int OP_RowData = 60;
-
-		public const int OP_Rowid = 61;
-
-		public const int OP_NullRow = 62;
-
-		public const int OP_Last = 63;
-
-		public const int OP_Sort = 64;
-
-		public const int OP_Rewind = 65;
-
-		public const int OP_Prev = 66;
-
-		public const int OP_Next = 67;
-
-		public const int OP_IdxInsert = 70;
-
-		public const int OP_IdxDelete = 71;
-
-		public const int OP_IdxRowid = 72;
-
-		public const int OP_IdxLT = 81;
-
-		public const int OP_IdxGE = 92;
-
-		public const int OP_Destroy = 95;
-
-		public const int OP_Clear = 96;
-
-		public const int OP_CreateIndex = 97;
-
-		public const int OP_CreateTable = 98;
-
-		public const int OP_ParseSchema = 99;
-
-		public const int OP_LoadAnalysis = 100;
-
-		public const int OP_DropTable = 101;
-
-		public const int OP_DropIndex = 102;
-
-		public const int OP_DropTrigger = 103;
-
-		public const int OP_IntegrityCk = 104;
-
-		public const int OP_RowSetAdd = 105;
-
-		public const int OP_RowSetRead = 106;
-
-		public const int OP_RowSetTest = 107;
-
-		public const int OP_Program = 108;
-
-		public const int OP_Param = 109;
-
-		public const int OP_FkCounter = 110;
-
-		public const int OP_FkIfZero = 111;
-
-		public const int OP_MemMax = 112;
-
-		public const int OP_IfPos = 113;
-
-		public const int OP_IfNeg = 114;
-
-		public const int OP_IfZero = 115;
-
-		public const int OP_AggStep = 116;
-
-		public const int OP_AggFinal = 117;
-
-		public const int OP_Checkpoint = 118;
-
-		public const int OP_JournalMode = 119;
-
-		public const int OP_Vacuum = 120;
-
-		public const int OP_IncrVacuum = 121;
-
-		public const int OP_Expire = 122;
-
-		public const int OP_TableLock = 123;
-
-		public const int OP_VBegin = 124;
-
-		public const int OP_VCreate = 125;
-
-		public const int OP_VDestroy = 126;
-
-		public const int OP_VOpen = 127;
-
-		public const int OP_VFilter = 128;
-
-		public const int OP_VColumn = 129;
-
-		public const int OP_VNext = 131;
-
-		public const int OP_VRename = 132;
-
-		public const int OP_VUpdate = 133;
-
-		public const int OP_Pagecount = 134;
-
-		public const int OP_MaxPgcnt = 135;
-
-		public const int OP_Trace = 136;
-
-		public const int OP_Noop = 137;
-
-		public const int OP_Explain = 138;
-
-		///
-///<summary>
-///The following opcode values are never used 
-///</summary>
-
-		//#define OP_NotUsed_139                        139
-		//#define OP_NotUsed_140                        140
-		///
-///<summary>
-///The following opcode values are never used 
-///</summary>
-
-		public const int OP_NotUsed_138 = 138;
-
-		public const int OP_NotUsed_139 = 139;
-
-		public const int OP_NotUsed_140 = 140;
 
 		///
 ///<summary>

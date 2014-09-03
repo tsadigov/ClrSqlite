@@ -47,7 +47,7 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///Sharable content of this Btree 
 			///</summary>
-			public u8 inTrans;
+			public TransType inTrans;
 			///
 			///<summary>
 			///TRANS_NONE, TRANS_READ or TRANS_WRITE 
@@ -171,7 +171,7 @@ namespace Community.CsharpSqlite {
 				StringBuilder zErr=new StringBuilder(100);
 				//char zErr[100];
 				sqlite3BtreeEnter(this);
-				Debug.Assert(this.inTrans>TRANS_NONE&&pBt.inTransaction>TRANS_NONE);
+                Debug.Assert(this.inTrans > (byte)TransType.TRANS_NONE && pBt.inTransaction > (byte)TransType.TRANS_NONE);
 				nRef=pBt.pPager.sqlite3PagerRefcount();
 				sCheck.pBt=pBt;
 				sCheck.pPager=pBt.pPager;
@@ -297,7 +297,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 				///<summary>
 				///Return code 
 				///</summary>
-				Debug.Assert(this.inTrans==TRANS_NONE);
+                Debug.Assert(this.inTrans == TransType.TRANS_NONE);
 				Debug.Assert(iVersion==1||iVersion==2);
 				///
 				///<summary>
@@ -327,7 +327,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 				int rc;
 				BtShared pBt=this.pBt;
 				sqlite3BtreeEnter(this);
-				Debug.Assert(this.inTrans==TRANS_WRITE);
+				Debug.Assert(this.inTrans==TransType.TRANS_WRITE);
 				///
 				///<summary>
 				///Invalidate all incrblob cursors open on table iTable (assuming iTable
@@ -347,7 +347,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
 				MemPage pPage=null;
 				BtShared pBt=this.pBt;
 				Debug.Assert(sqlite3BtreeHoldsMutex(this));
-				Debug.Assert(this.inTrans==TRANS_WRITE);
+                Debug.Assert(this.inTrans == TransType.TRANS_WRITE);
 				///
 				///<summary>
 				///It is illegal to drop a table if any cursors are open on the
@@ -467,7 +467,7 @@ releasePage(pPage);
 				u32 pMeta;
 				BtShared pBt=this.pBt;
 				sqlite3BtreeEnter(this);
-				Debug.Assert(this.inTrans>TRANS_NONE);
+                Debug.Assert(this.inTrans > (byte)TransType.TRANS_NONE);
 				Debug.Assert(SQLITE_OK==this.querySharedCacheTableLock(MASTER_ROOT,READ_LOCK));
 				Debug.Assert(pBt.pPage1!=null);
 				Debug.Assert(idx>=0&&idx<=15);
@@ -489,7 +489,7 @@ releasePage(pPage);
 				int rc;
 				Debug.Assert(idx>=1&&idx<=15);
 				sqlite3BtreeEnter(this);
-				Debug.Assert(this.inTrans==TRANS_WRITE);
+                Debug.Assert(this.inTrans == TransType.TRANS_WRITE);
 				Debug.Assert(pBt.pPage1!=null);
 				pP1=pBt.pPage1.aData;
 				rc=sqlite3PagerWrite(pBt.pPage1.pDbPage);

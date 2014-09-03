@@ -308,7 +308,14 @@ dummy += (uint)x;
 		{
 			sqlite3Error (db, err_code, err_code == 0 ? null : "");
 		}
+        static void sqlite3Error(sqlite3 db, SqlResult err, int noString) {
+            sqlite3Error(db,(int) err,noString);
+        }
 
+        static void sqlite3Error(sqlite3 db, SqlResult err, string zFormat, params object[] ap)
+        {
+            sqlite3Error(db,(int)err,zFormat,ap);
+        }
 		static void sqlite3Error (sqlite3 db, int err_code, string zFormat, params object[] ap)
 		{
 			if (db != null && (db.pErr != null || (db.pErr = sqlite3ValueNew (db)) != null)) {
@@ -363,7 +370,7 @@ dummy += (uint)x;
 				pParse.nErr++;
 				db.sqlite3DbFree (ref pParse.zErrMsg);
 				pParse.zErrMsg = zMsg;
-				pParse.rc = SQLITE_ERROR;
+				pParse.rc = SqlResult.SQLITE_ERROR;
 			}
 		}
 

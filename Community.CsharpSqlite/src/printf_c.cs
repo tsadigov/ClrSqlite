@@ -1800,6 +1800,9 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 				}
 			}
 		}
+        static void sqlite3_log(SqlResult err, string zFormat, params va_list[] ap) {
+            sqlite3_log((int)err, zFormat, ap);
+        }
 
 		#if SQLITE_DEBUG || DEBUG || TRACE
 																																								    /*
