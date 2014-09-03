@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if SQLITE_DEBUG
-																																										    static bool sqlite3VdbeAddopTrace = false;
+																																												    static bool sqlite3VdbeAddopTrace = false;
 #endif
 		///<summary>
 		/// Create a new virtual database engine.
@@ -92,7 +92,7 @@ namespace Community.CsharpSqlite {
 			if(p==null)
 				return;
 			#if SQLITE_OMIT_TRACE
-																																																															if( 0==isPrepareV2 ) return;
+																																																																		if( 0==isPrepareV2 ) return;
 #endif
 			Debug.Assert(p.zSql=="");
 			p.zSql=z.Substring(0,n);
@@ -130,7 +130,7 @@ namespace Community.CsharpSqlite {
 			pB.isPrepareV2=pA.isPrepareV2;
 		}
 		#if SQLITE_DEBUG
-																																										    /*
+																																												    /*
 ** Turn tracing on or off
 */
     static void sqlite3VdbeTrace( Vdbe p, FILE trace )
@@ -147,24 +147,6 @@ namespace Community.CsharpSqlite {
 		/// unchanged (this is so that any opcodes already allocated can be
 		/// correctly deallocated along with the rest of the Vdbe).
 		///</summary>
-		static int growOpArray(Vdbe p) {
-			//VdbeOp pNew;
-			int nNew=(p.nOpAlloc!=0?p.nOpAlloc*2:1024/4);
-			//(int)(1024/sizeof(Op)));
-			// pNew = sqlite3DbRealloc( p.db, p.aOp, nNew * sizeof( Op ) );
-			//if (pNew != null)
-			//{
-			//      p.nOpAlloc = sqlite3DbMallocSize(p.db, pNew)/sizeof(Op);
-			//  p.aOp = pNew;
-			//}
-			p.nOpAlloc=nNew;
-			if(p.aOp==null)
-				p.aOp=new VdbeOp[nNew];
-			else
-				Array.Resize(ref p.aOp,nNew);
-			return (p.aOp!=null?SQLITE_OK:SQLITE_NOMEM);
-			//  return (pNew ? SQLITE_OK : SQLITE_NOMEM);
-		}
 		///<summary>
 		/// Add a new instruction to the list of instructions current in the
 		/// VDBE.  Return the address of the new instruction.
@@ -221,13 +203,6 @@ namespace Community.CsharpSqlite {
 		/// This routine will take ownership of the allocated memory.
 		///
 		///</summary>
-		static void sqlite3VdbeAddParseSchemaOp(Vdbe p,int iDb,string zWhere) {
-			int j;
-			int addr=p.sqlite3VdbeAddOp3(OP_ParseSchema,iDb,0,0);
-			p.sqlite3VdbeChangeP4(addr,zWhere,P4_DYNAMIC);
-			for(j=0;j<p.db.nDb;j++)
-				sqlite3VdbeUsesBtree(p,j);
-		}
 		///<summary>
 		/// Add an opcode that includes the p4 value as an integer.
 		///
@@ -258,7 +233,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		#if SQLITE_DEBUG
-																																										
+																																												
     /*
 ** The following type and function are used to iterate through all opcodes
 ** in a Vdbe main program and each of the sub-programs (triggers) it may 
@@ -372,9 +347,9 @@ namespace Community.CsharpSqlite {
         int opcode = pOp.opcode;
         if ( opcode == OP_Destroy || opcode == OP_VUpdate || opcode == OP_VRename
 #if !SQLITE_OMIT_FOREIGN_KEY
-																																										 || ( opcode == OP_FkCounter && pOp.p1 == 0 && pOp.p2 == 1 )
+																																												 || ( opcode == OP_FkCounter && pOp.p1 == 0 && pOp.p2 == 1 )
 #endif
-																																										 || ( ( opcode == OP_Halt || opcode == OP_HaltIfNull )
+																																												 || ( ( opcode == OP_Halt || opcode == OP_HaltIfNull )
         && ( pOp.p1 == SQLITE_CONSTRAINT && pOp.p2 == OE_Abort ) )
         )
         {
@@ -544,10 +519,6 @@ namespace Community.CsharpSqlite {
 		/// objects when the VM is no longer required.
 		///
 		///</summary>
-		static void sqlite3VdbeLinkSubProgram(Vdbe pVdbe,SubProgram p) {
-			p.pNext=pVdbe.pProgram;
-			pVdbe.pProgram=p;
-		}
 		/*
     ** Change N opcodes starting at addr to No-ops.
     */static void sqlite3VdbeChangeToNoop(Vdbe p,int addr,int N) {
@@ -599,7 +570,7 @@ namespace Community.CsharpSqlite {
 		//STRING + Type
 		//SUBPROGRAM
 		#if !NDEBUG
-																																										    ///<summary>
+																																												    ///<summary>
 /// Change the comment on the the most recently coded instruction.  Or
 /// insert a No-op and add the comment to that new instruction.  This
 /// makes the code easier to read during debugging.  None of this happens
@@ -807,7 +778,7 @@ namespace Community.CsharpSqlite {
 			}
 		}
 		#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
-																																										/*
+																																												/*
 ** If SQLite is compiled to support shared-cache mode and to be threadsafe,
 ** this routine obtains the mutex Debug.Associated with each BtShared structure
 ** that may be accessed by the VM pDebug.Assed as an argument. In doing so it also
@@ -846,7 +817,7 @@ void sqlite3VdbeEnter(Vdbe *p){
 }
 #endif
 		#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
-																																										/*
+																																												/*
 ** Unlock all of the btrees previously locked by a call to sqlite3VdbeEnter().
 */
 void sqlite3VdbeLeave(Vdbe *p){
@@ -867,7 +838,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 }
 #endif
 		#if VDBE_PROFILE || SQLITE_DEBUG
-																																										    /*
+																																												    /*
 ** Print a single opcode.  This routine is used for debugging only.
 */
     static void sqlite3VdbePrintOp( FILE pOut, int pc, Op pOp )
@@ -882,11 +853,11 @@ void sqlite3VdbeLeave(Vdbe *p){
       sqlite3_snprintf( 999, zOut, zFormat1, pc,
       sqlite3OpcodeName( pOp.opcode ), pOp.p1, pOp.p2, pOp.p3, zP4, pOp.p5,
 #if SQLITE_DEBUG
-																																										 pOp.zComment != null ? pOp.zComment : ""
+																																												 pOp.zComment != null ? pOp.zComment : ""
 #else
-																																										""
+																																												""
 #endif
-																																										 );
+																																												 );
       pOut.Write( zOut );
       //fflush(pOut);
     }
@@ -950,18 +921,6 @@ void sqlite3VdbeLeave(Vdbe *p){
 		/// allocated by the OP_Program opcode in sqlite3VdbeExec().
 		///
 		///</summary>
-		static void sqlite3VdbeFrameDelete(VdbeFrame p) {
-			int i;
-			//Mem[] aMem = VdbeFrameMem(p);
-			VdbeCursor[] apCsr=p.aChildCsr;
-			// (VdbeCursor)aMem[p.nChildMem];
-			for(i=0;i<p.nChildCsr;i++) {
-				sqlite3VdbeFreeCursor(p.v,apCsr[i]);
-			}
-			releaseMemArray(p.aChildMem,p.nChildMem);
-			p=null;
-			// sqlite3DbFree( p.v.db, p );
-		}
 		#if !SQLITE_OMIT_EXPLAIN
 		/*
 ** Give a listing of the program in the virtual machine.
@@ -1138,7 +1097,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 					//  Debug.Assert( p.db.mallocFailed != 0 );
 					//  return SQLITE_ERROR;
 					//}
-                    pMem.Flags = MemFlags.MEM_Dyn | MemFlags.MEM_Str | MemFlags.MEM_Term;
+					pMem.Flags=MemFlags.MEM_Dyn|MemFlags.MEM_Str|MemFlags.MEM_Term;
 					z=displayP4(pOp,pMem.z,32);
 					if(z!=pMem.z) {
 						sqlite3VdbeMemSetStr(pMem,z,-1,SqliteEncoding.UTF8,null);
@@ -1172,7 +1131,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 						pMem=p.pResultSet[i_pMem++];
 						// pMem++;
 						#if SQLITE_DEBUG
-																																																																																																																														          if ( pOp.zComment != null )
+																																																																																																																																				          if ( pOp.zComment != null )
           {
             pMem.flags = MEM_Str | MEM_Term;
             pMem.z = pOp.zComment;
@@ -1195,7 +1154,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 		}
 		#endif
 		#if SQLITE_DEBUG
-																																										    /*
+																																												    /*
 ** Print the SQL that was used to generate a VDBE program.
 */
     static void sqlite3VdbePrintSql( Vdbe p )
@@ -1214,7 +1173,7 @@ void sqlite3VdbeLeave(Vdbe *p){
     }
 #endif
 		#if !SQLITE_OMIT_TRACE && SQLITE_ENABLE_IOTRACE
-																																										/*
+																																												/*
 ** Print an IOTRACE message showing SQL content.
 */
 static void sqlite3VdbeIOTraceSql( Vdbe p )
@@ -1293,36 +1252,6 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		/// running it.
 		///
 		///</summary>
-		static void sqlite3VdbeRewind(Vdbe p) {
-			#if (SQLITE_DEBUG) || (VDBE_PROFILE)
-																																																															      int i;
-    #endif
-			Debug.Assert(p!=null);
-			Debug.Assert(p.magic==VDBE_MAGIC_INIT);
-			/* There should be at least one opcode.
-      */Debug.Assert(p.nOp>0);
-			/* Set the magic to VDBE_MAGIC_RUN sooner rather than later. */p.magic=VDBE_MAGIC_RUN;
-			#if SQLITE_DEBUG
-																																																															      for(i=1; i<p.nMem; i++){
-        Debug.Assert( p.aMem[i].db==p.db );
-      }
-    #endif
-			p.currentOpCodeIndex=-1;
-			p.rc=SQLITE_OK;
-			p.errorAction=OE_Abort;
-			p.magic=VDBE_MAGIC_RUN;
-			p.nChange=0;
-			p.cacheCtr=1;
-			p.minWriteFileFormat=255;
-			p.iStatement=0;
-			p.nFkConstraint=0;
-			#if VDBE_PROFILE
-																																																															      for(i=0; i<p.nOp; i++){
-        p.aOp[i].cnt = 0;
-        p.aOp[i].cycles = 0;
-      }
-    #endif
-		}
 		///<summary>
 		/// Prepare a virtual machine for execution for the first time after
 		/// creating the virtual machine.  This involves things such
@@ -1474,7 +1403,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				}
 			}
 			p.explain=pParse.explain;
-			sqlite3VdbeRewind(p);
+			p.sqlite3VdbeRewind();
 		}
 		///<summary>
 		/// Close a VDBE cursor and release all the resources that cursor
@@ -1509,18 +1438,6 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		/// control to the main program.
 		///
 		///</summary>
-		static int sqlite3VdbeFrameRestore(VdbeFrame pFrame) {
-			Vdbe v=pFrame.v;
-			v.aOp=pFrame.aOp;
-			v.nOp=pFrame.nOp;
-			v.aMem=pFrame.aMem;
-			v.nMem=pFrame.nMem;
-			v.apCsr=pFrame.apCsr;
-			v.nCursor=pFrame.nCursor;
-			v.db.lastRowid=pFrame.lastRowid;
-			v.nChange=pFrame.nChange;
-			return pFrame.pc;
-		}
 		///<summary>
 		/// Close all cursors.
 		///
@@ -1535,7 +1452,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				VdbeFrame pFrame;
 				for(pFrame=p.pFrame;pFrame.pParent!=null;pFrame=pFrame.pParent)
 					;
-				sqlite3VdbeFrameRestore(pFrame);
+				pFrame.sqlite3VdbeFrameRestore();
 			}
 			p.pFrame=null;
 			p.nFrame=0;
@@ -1555,7 +1472,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			while(p.pDelFrame!=null) {
 				VdbeFrame pDel=p.pDelFrame;
 				p.pDelFrame=pDel.pParent;
-				sqlite3VdbeFrameDelete(pDel);
+				pDel.sqlite3VdbeFrameDelete();
 			}
 		}
 		///<summary>
@@ -1569,7 +1486,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		static void Cleanup(Vdbe p) {
 			sqlite3 db=p.db;
 			#if SQLITE_DEBUG
-																																																															      /* Execute Debug.Assert() statements to ensure that the Vdbe.apCsr[] and 
+																																																																		      /* Execute Debug.Assert() statements to ensure that the Vdbe.apCsr[] and 
 ** Vdbe.aMem[] arrays have already been cleaned up.  */
       int i;
       //TODO for(i=0; i<p.nCursor; i++) Debug.Assert( p.apCsr==null || p.apCsr[i]==null );
@@ -1586,24 +1503,6 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		/// be called on an SQL statement before sqlite3_step().
 		///
 		///</summary>
-		static void sqlite3VdbeSetNumCols(Vdbe p,int nResColumn) {
-			Mem pColName;
-			int n;
-			sqlite3 db=p.db;
-			releaseMemArray(p.aColName,p.nResColumn*COLNAME_N);
-			db.sqlite3DbFree(ref p.aColName);
-			n=nResColumn*COLNAME_N;
-			p.nResColumn=(u16)nResColumn;
-			p.aColName=new Mem[n];
-			// (Mem)sqlite3DbMallocZero(db, Mem.Length * n);
-			//if (p.aColName == 0) return;
-			while(n-->0) {
-				p.aColName[n]=sqlite3Malloc(p.aColName[n]);
-				pColName=p.aColName[n];
-				pColName.flags=MEM_Null;
-				pColName.db=p.db;
-			}
-		}
 		///<summary>
 		/// Set the name of the idx'th column to be returned by the SQL statement.
 		/// zName must be a pointer to a nul terminated string.
@@ -1615,22 +1514,6 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		/// to by zName will be freed by sqlite3DbFree() when the vdbe is destroyed.
 		///
 		///</summary>
-		static int sqlite3VdbeSetColName(Vdbe p,/* Vdbe being configured */int idx,/* Index of column zName applies to */int var,/* One of the COLNAME_* constants */string zName,/* Pointer to buffer containing name */dxDel xDel/* Memory management strategy for zName */) {
-			int rc;
-			Mem pColName;
-			Debug.Assert(idx<p.nResColumn);
-			Debug.Assert(var<COLNAME_N);
-			//if ( p.db.mallocFailed != 0 )
-			//{
-			//  Debug.Assert( null == zName || xDel != SQLITE_DYNAMIC );
-			//  return SQLITE_NOMEM;
-			//}
-			Debug.Assert(p.aColName!=null);
-			pColName=p.aColName[idx+var*p.nResColumn];
-			rc=sqlite3VdbeMemSetStr(pColName,zName,-1,SqliteEncoding.UTF8,xDel);
-			Debug.Assert(rc!=0||null==zName||(pColName.flags&MEM_Term)!=0);
-			return rc;
-		}
 		/*
     ** A read or write transaction may or may not be active on database handle
     ** db. If a transaction is active, commit it. If there is a
@@ -1642,7 +1525,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			/* Number of databases with an active write-transaction */int rc=SQLITE_OK;
 			bool needXcommit=false;
 			#if SQLITE_OMIT_VIRTUALTABLE
-																																																															      /* With this option, sqlite3VtabSync() is defined to be simply
+																																																																		      /* With this option, sqlite3VtabSync() is defined to be simply
 ** SQLITE_OK so p is not used.
 */
       UNUSED_PARAMETER( p );
@@ -1810,7 +1693,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
         ** may be lying around. Returning an error code won't help matters.
         */
 				#if SQLITE_TEST
-																																																																																				        disable_simulated_io_errors();
+																																																																																								        disable_simulated_io_errors();
 #endif
 				sqlite3BeginBenignMalloc();
 				for(i=0;i<db.nDb;i++) {
@@ -1821,7 +1704,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				}
 				sqlite3EndBenignMalloc();
 				#if SQLITE_TEST
-																																																																																				        enable_simulated_io_errors();
+																																																																																								        enable_simulated_io_errors();
 #endif
 				sqlite3VtabCommit(db);
 			}
@@ -1839,7 +1722,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		///
 		///</summary>
 		#if !NDEBUG
-																																										    static void checkActiveVdbeCnt( sqlite3 db )
+																																												    static void checkActiveVdbeCnt( sqlite3 db )
     {
       Vdbe p;
       int cnt = 0;
@@ -1897,53 +1780,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
     **
     ** If an IO error occurs, an SQLITE_IOERR_XXX error code is returned.
     ** Otherwise SQLITE_OK.
-    */static int sqlite3VdbeCloseStatement(Vdbe p,int eOp) {
-			sqlite3 db=p.db;
-			int rc=SQLITE_OK;
-			/* If p->iStatement is greater than zero, then this Vdbe opened a 
-      ** statement transaction that should be closed here. The only exception
-      ** is that an IO error may have occured, causing an emergency rollback.
-      ** In this case (db->nStatement==0), and there is nothing to do.
-      */if(db.nStatement!=0&&p.iStatement!=0) {
-				int i;
-				int iSavepoint=p.iStatement-1;
-				Debug.Assert(eOp==SAVEPOINT_ROLLBACK||eOp==SAVEPOINT_RELEASE);
-				Debug.Assert(db.nStatement>0);
-				Debug.Assert(p.iStatement==(db.nStatement+db.nSavepoint));
-				for(i=0;i<db.nDb;i++) {
-					int rc2=SQLITE_OK;
-					Btree pBt=db.aDb[i].pBt;
-					if(pBt!=null) {
-						if(eOp==SAVEPOINT_ROLLBACK) {
-							rc2=sqlite3BtreeSavepoint(pBt,SAVEPOINT_ROLLBACK,iSavepoint);
-						}
-						if(rc2==SQLITE_OK) {
-							rc2=sqlite3BtreeSavepoint(pBt,SAVEPOINT_RELEASE,iSavepoint);
-						}
-						if(rc==SQLITE_OK) {
-							rc=rc2;
-						}
-					}
-				}
-				db.nStatement--;
-				p.iStatement=0;
-				if(rc==SQLITE_OK) {
-					if(eOp==SAVEPOINT_ROLLBACK) {
-						rc=sqlite3VtabSavepoint(db,SAVEPOINT_ROLLBACK,iSavepoint);
-					}
-					if(rc==SQLITE_OK) {
-						rc=sqlite3VtabSavepoint(db,SAVEPOINT_RELEASE,iSavepoint);
-					}
-				}
-				/* If the statement transaction is being rolled back, also restore the 
-        ** database handles deferred constraint counter to the value it had when 
-        ** the statement transaction was opened.  */if(eOp==SAVEPOINT_ROLLBACK) {
-					db.nDeferredCons=p.nStmtDefCons;
-				}
-			}
-			return rc;
-		}
-		///<summary>
+    *////<summary>
 		/// This function is called when a transaction opened by the database
 		/// handle associated with the VM passed as an argument is about to be
 		/// committed. If there are outstanding deferred foreign key constraint
@@ -1955,16 +1792,6 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		///
 		///</summary>
 		#if !SQLITE_OMIT_FOREIGN_KEY
-		static int sqlite3VdbeCheckFk(Vdbe p,int deferred) {
-			sqlite3 db=p.db;
-			if((deferred!=0&&db.nDeferredCons>0)||(0==deferred&&p.nFkConstraint>0)) {
-				p.rc=SQLITE_CONSTRAINT;
-				p.errorAction=OE_Abort;
-				sqlite3SetString(ref p.zErrMsg,db,"foreign key constraint failed");
-				return SQLITE_ERROR;
-			}
-			return SQLITE_OK;
-		}
 		#endif
 		///<summary>
 		/// This routine is called the when a VDBE tries to halt.  If the VDBE
@@ -1979,191 +1806,11 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		/// lock contention, return SQLITE_BUSY.  If SQLITE_BUSY is returned, it
 		/// means the close did not happen and needs to be repeated.
 		///</summary>
-		static int sqlite3VdbeHalt(Vdbe p) {
-			int rc;
-			/* Used to store transient return codes */sqlite3 db=p.db;
-			/* This function contains the logic that determines if a statement or
-      ** transaction will be committed or rolled back as a result of the
-      ** execution of this virtual machine.
-      **
-      ** If any of the following errors occur:
-      **
-      **     SQLITE_NOMEM
-      **     SQLITE_IOERR
-      **     SQLITE_FULL
-      **     SQLITE_INTERRUPT
-      **
-      ** Then the internal cache might have been left in an inconsistent
-      ** state.  We need to rollback the statement transaction, if there is
-      ** one, or the complete transaction if there is no statement transaction.
-      *///if ( p.db.mallocFailed != 0 )
-			//{
-			//  p.rc = SQLITE_NOMEM;
-			//}
-			closeAllCursors(p);
-			if(p.magic!=VDBE_MAGIC_RUN) {
-				return SQLITE_OK;
-			}
-			checkActiveVdbeCnt(db);
-			/* No commit or rollback needed if the program never started */if(p.currentOpCodeIndex>=0) {
-				int mrc;
-				/* Primary error code from p.rc */int eStatementOp=0;
-				bool isSpecialError=false;
-				/* Set to true if a 'special' error *//* Lock all btrees used by the statement */p.sqlite3VdbeEnter();
-				/* Check for one of the special errors */mrc=p.rc&0xff;
-				Debug.Assert(p.rc!=SQLITE_IOERR_BLOCKED);
-				/* This error no longer exists */isSpecialError=mrc==SQLITE_NOMEM||mrc==SQLITE_IOERR||mrc==SQLITE_INTERRUPT||mrc==SQLITE_FULL;
-				if(isSpecialError) {
-					/* If the query was read-only and the error code is SQLITE_INTERRUPT, 
-          ** no rollback is necessary. Otherwise, at least a savepoint 
-          ** transaction must be rolled back to restore the database to a 
-          ** consistent state.
-          **
-          ** Even if the statement is read-only, it is important to perform
-          ** a statement or transaction rollback operation. If the error 
-          ** occured while writing to the journal, sub-journal or database
-          ** file as part of an effort to free up cache space (see function
-          ** pagerStress() in pager.c), the rollback is required to restore 
-          ** the pager to a consistent state.
-          */if(!p.readOnly||mrc!=SQLITE_INTERRUPT) {
-						if((mrc==SQLITE_NOMEM||mrc==SQLITE_FULL)&&p.usesStmtJournal) {
-							eStatementOp=SAVEPOINT_ROLLBACK;
-						}
-						else {
-							/* We are forced to roll back the active transaction. Before doing
-              ** so, abort any other statements this handle currently has active.
-              */invalidateCursorsOnModifiedBtrees(db);
-							sqlite3RollbackAll(db);
-							sqlite3CloseSavepoints(db);
-							db.autoCommit=1;
-						}
-					}
-				}
-				/* Check for immediate foreign key violations. */if(p.rc==SQLITE_OK) {
-					sqlite3VdbeCheckFk(p,0);
-				}
-				/* If the auto-commit flag is set and this is the only active writer
-        ** VM, then we do either a commit or rollback of the current transaction.
-        **
-        ** Note: This block also runs if one of the special errors handled
-        ** above has occurred.
-        */if(!sqlite3VtabInSync(db)&&db.autoCommit!=0&&db.writeVdbeCnt==((p.readOnly==false)?1:0)) {
-					if(p.rc==SQLITE_OK||(p.errorAction==OE_Fail&&!isSpecialError)) {
-						rc=sqlite3VdbeCheckFk(p,1);
-						if(rc!=SQLITE_OK) {
-							if(NEVER(p.readOnly)) {
-								p.sqlite3VdbeLeave();
-								return SQLITE_ERROR;
-							}
-							rc=SQLITE_CONSTRAINT;
-						}
-						else {
-							/* The auto-commit flag is true, the vdbe program was successful 
-              ** or hit an 'OR FAIL' constraint and there are no deferred foreign
-              ** key constraints to hold up the transaction. This means a commit 
-              ** is required. */rc=vdbeCommit(db,p);
-						}
-						if(rc==SQLITE_BUSY&&p.readOnly) {
-							p.sqlite3VdbeLeave();
-							return SQLITE_BUSY;
-						}
-						else
-							if(rc!=SQLITE_OK) {
-								p.rc=rc;
-								sqlite3RollbackAll(db);
-							}
-							else {
-								db.nDeferredCons=0;
-								sqlite3CommitInternalChanges(db);
-							}
-					}
-					else {
-						sqlite3RollbackAll(db);
-					}
-					db.nStatement=0;
-				}
-				else
-					if(eStatementOp==0) {
-						if(p.rc==SQLITE_OK||p.errorAction==OE_Fail) {
-							eStatementOp=SAVEPOINT_RELEASE;
-						}
-						else
-							if(p.errorAction==OE_Abort) {
-								eStatementOp=SAVEPOINT_ROLLBACK;
-							}
-							else {
-								invalidateCursorsOnModifiedBtrees(db);
-								sqlite3RollbackAll(db);
-								sqlite3CloseSavepoints(db);
-								db.autoCommit=1;
-							}
-					}
-				/* If eStatementOp is non-zero, then a statement transaction needs to
-        ** be committed or rolled back. Call sqlite3VdbeCloseStatement() to
-        ** do so. If this operation returns an error, and the current statement
-        ** error code is SQLITE_OK or SQLITE_CONSTRAINT, then promote the
-        ** current statement error code.
-        */if(eStatementOp!=0) {
-					rc=sqlite3VdbeCloseStatement(p,eStatementOp);
-					if(rc!=0) {
-						if(p.rc==SQLITE_OK||p.rc==SQLITE_CONSTRAINT) {
-							p.rc=rc;
-							db.sqlite3DbFree(ref p.zErrMsg);
-							p.zErrMsg=null;
-						}
-						invalidateCursorsOnModifiedBtrees(db);
-						sqlite3RollbackAll(db);
-						sqlite3CloseSavepoints(db);
-						db.autoCommit=1;
-					}
-				}
-				/* If this was an INSERT, UPDATE or DELETE and no statement transaction
-        ** has been rolled back, update the database connection change-counter.
-        */if(p.changeCntOn) {
-					if(eStatementOp!=SAVEPOINT_ROLLBACK) {
-						sqlite3VdbeSetChanges(db,p.nChange);
-					}
-					else {
-						sqlite3VdbeSetChanges(db,0);
-					}
-					p.nChange=0;
-				}
-				/* Rollback or commit any schema changes that occurred. */if(p.rc!=SQLITE_OK&&(db.flags&SQLITE_InternChanges)!=0) {
-					sqlite3ResetInternalSchema(db,-1);
-					db.flags=(db.flags|SQLITE_InternChanges);
-				}
-				/* Release the locks */p.sqlite3VdbeLeave();
-			}
-			/* We have successfully halted and closed the VM.  Record this fact. */if(p.currentOpCodeIndex>=0) {
-				db.activeVdbeCnt--;
-				if(!p.readOnly) {
-					db.writeVdbeCnt--;
-				}
-				Debug.Assert(db.activeVdbeCnt>=db.writeVdbeCnt);
-			}
-			p.magic=VDBE_MAGIC_HALT;
-			checkActiveVdbeCnt(db);
-			//if ( p.db.mallocFailed != 0 )
-			//{
-			//  p.rc = SQLITE_NOMEM;
-			//}
-			/* If the auto-commit flag is set to true, then any locks that were held
-      ** by connection db have now been released. Call sqlite3ConnectionUnlocked()
-      ** to invoke any required unlock-notify callbacks.
-      */if(db.autoCommit!=0) {
-				sqlite3ConnectionUnlocked(db);
-			}
-			Debug.Assert(db.activeVdbeCnt>0||db.autoCommit==0||db.nStatement==0);
-			return (p.rc==SQLITE_BUSY?SQLITE_BUSY:SQLITE_OK);
-		}
 		///<summary>
 		/// Each VDBE holds the result of the most recent sqlite3_step() call
 		/// in p.rc.  This routine sets that result back to SQLITE_OK.
 		///
 		///</summary>
-		static void sqlite3VdbeResetStepResult(Vdbe p) {
-			p.rc=SQLITE_OK;
-		}
 		///<summary>
 		/// Clean up a VDBE after execution but do not delete the VDBE just yet.
 		/// Write any error messages into pzErrMsg.  Return the result code.
@@ -2176,77 +1823,6 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		/// VDBE_MAGIC_INIT.
 		///
 		///</summary>
-		static int sqlite3VdbeReset(Vdbe p) {
-			sqlite3 db;
-			db=p.db;
-			/* If the VM did not run to completion or if it encountered an
-      ** error, then it might not have been halted properly.  So halt
-      ** it now.
-      */sqlite3VdbeHalt(p);
-			/* If the VDBE has be run even partially, then transfer the error code
-      ** and error message from the VDBE into the main database structure.  But
-      ** if the VDBE has just been set to run but has not actually executed any
-      ** instructions yet, leave the main database error information unchanged.
-      */if(p.currentOpCodeIndex>=0) {
-				//if ( p.zErrMsg != 0 ) // Always exists under C#
-				{
-					sqlite3BeginBenignMalloc();
-					sqlite3ValueSetStr(db.pErr,-1,p.zErrMsg==null?"":p.zErrMsg,SqliteEncoding.UTF8,SQLITE_TRANSIENT);
-					sqlite3EndBenignMalloc();
-					db.errCode=p.rc;
-					db.sqlite3DbFree(ref p.zErrMsg);
-					p.zErrMsg="";
-					//else if ( p.rc != 0 )
-					//{
-					//  sqlite3Error( db, p.rc, 0 );
-					//}
-					//else
-					//{
-					//  sqlite3Error( db, SQLITE_OK, 0 );
-					//}
-				}
-				if(p.runOnlyOnce!=0)
-					p.expired=true;
-			}
-			else
-				if(p.rc!=0&&p.expired) {
-					/* The expired flag was set on the VDBE before the first call
-        ** to sqlite3_step(). For consistency (since sqlite3_step() was
-        ** called), set the database error in this case as well.
-        */sqlite3Error(db,p.rc,0);
-					sqlite3ValueSetStr(db.pErr,-1,p.zErrMsg,SqliteEncoding.UTF8,SQLITE_TRANSIENT);
-					db.sqlite3DbFree(ref p.zErrMsg);
-					p.zErrMsg="";
-				}
-			/* Reclaim all memory used by the VDBE
-      */Cleanup(p);
-			/* Save profiling information from this VDBE run.
-      */
-			#if VDBE_PROFILE && TODO
-																																																															{
-FILE *out = fopen("vdbe_profile.out", "a");
-if( out ){
-int i;
-fprintf(out, "---- ");
-for(i=0; i<p.nOp; i++){
-fprintf(out, "%02x", p.aOp[i].opcode);
-}
-fprintf(out, "\n");
-for(i=0; i<p.nOp; i++){
-fprintf(out, "%6d %10lld %8lld ",
-p.aOp[i].cnt,
-p.aOp[i].cycles,
-p.aOp[i].cnt>0 ? p.aOp[i].cycles/p.aOp[i].cnt : 0
-);
-sqlite3VdbePrintOp(out, i, p.aOp[i]);
-}
-fclose(out);
-}
-}
-#endif
-			p.magic=VDBE_MAGIC_INIT;
-			return p.rc&db.errMask;
-		}
 		///<summary>
 		/// Clean up and delete a VDBE after execution.  Return an integer which is
 		/// the result code.  Write any error message text into pzErrMsg.
@@ -2255,7 +1831,7 @@ fclose(out);
 		static int sqlite3VdbeFinalize(ref Vdbe p) {
 			int rc=SQLITE_OK;
 			if(p.magic==VDBE_MAGIC_RUN||p.magic==VDBE_MAGIC_HALT) {
-				rc=sqlite3VdbeReset(p);
+				rc=p.sqlite3VdbeReset();
 				Debug.Assert((rc&p.db.errMask)==rc);
 			}
 			sqlite3VdbeDelete(ref p);
@@ -2349,7 +1925,7 @@ fclose(out);
 				int res=0;
 				int rc;
 				#if SQLITE_TEST
-																																																																																				        //extern int sqlite3_search_count;
+																																																																																								        //extern int sqlite3_search_count;
 #endif
 				Debug.Assert(p.isTable);
 				rc=sqlite3BtreeMovetoUnpacked(p.pCursor,null,p.movetoTarget,0,ref res);
@@ -2360,12 +1936,12 @@ fclose(out);
 					return SQLITE_CORRUPT_BKPT();
 				p.rowidIsValid=true;
 				#if SQLITE_TEST
-																																																																																				#if !TCLSH
-																																																																																				        sqlite3_search_count++;
+																																																																																								#if !TCLSH
+																																																																																								        sqlite3_search_count++;
 #else
-																																																																																				        sqlite3_search_count.iValue++;
+																																																																																								        sqlite3_search_count.iValue++;
 #endif
-																																																																																				#endif
+																																																																																								#endif
 				p.deferredMoveto=false;
 				p.cacheStatus=CACHE_STALE;
 			}
@@ -2543,7 +2119,7 @@ fclose(out);
 		///
 		///</summary>
 		#if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																										//static u64 floatSwap(u64 in){
+																																												//static u64 floatSwap(u64 in){
 //  union {
 //    u64 r;
 //    u32 i[2];
@@ -2587,13 +2163,13 @@ fclose(out);
 				if(serial_type==7) {
 					//Debug.Assert( sizeof( v) == sizeof(pMem.r));
 					#if WINDOWS_PHONE || WINDOWS_MOBILE
-																																																																																																									v = (ulong)BitConverter.ToInt64(BitConverter.GetBytes(pMem.r),0);
+																																																																																																														v = (ulong)BitConverter.ToInt64(BitConverter.GetBytes(pMem.r),0);
 #else
 					v=(ulong)BitConverter.DoubleToInt64Bits(pMem.r);
 					// memcpy( &v, pMem.r, v ).Length;
 					#endif
 					#if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																																																									swapMixedEndianFloat( v );
+																																																																																																														swapMixedEndianFloat( v );
 #endif
 				}
 				else {
@@ -2682,7 +2258,7 @@ fclose(out);
 				/* IEEE floating point */u64 x;
 				u32 y;
 				#if !NDEBUG && !SQLITE_OMIT_FLOATING_POINT
-																																																																																				            /* Verify that integers and floating point values use the same
+																																																																																								            /* Verify that integers and floating point values use the same
 ** byte order.  Or, that if SQLITE_MIXED_ENDIAN_64BIT_FLOAT is
 ** defined that 64-bit floating point values really are mixed
 ** endian.
@@ -2691,9 +2267,9 @@ fclose(out);
             const double r1 = 1.0;
             u64 t2 = t1;
 #if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																																				swapMixedEndianFloat(t2);
+																																																																																								swapMixedEndianFloat(t2);
 #endif
-																																																																																				            Debug.Assert( sizeof( double ) == sizeof( u64 ) && memcmp( BitConverter.GetBytes( r1 ), BitConverter.GetBytes( t2 ), sizeof( double ) ) == 0 );//Debug.Assert( sizeof(r1)==sizeof(t2) && memcmp(&r1, t2, sizeof(r1))==0 );
+																																																																																								            Debug.Assert( sizeof( double ) == sizeof( u64 ) && memcmp( BitConverter.GetBytes( r1 ), BitConverter.GetBytes( t2 ), sizeof( double ) ) == 0 );//Debug.Assert( sizeof(r1)==sizeof(t2) && memcmp(&r1, t2, sizeof(r1))==0 );
 #endif
 				x=(u64)((buf[offset+0]<<24)|(buf[offset+1]<<16)|(buf[offset+2]<<8)|buf[offset+3]);
 				y=(u32)((buf[offset+4]<<24)|(buf[offset+5]<<16)|(buf[offset+6]<<8)|buf[offset+7]);
@@ -2705,10 +2281,10 @@ fclose(out);
 				else {
 					Debug.Assert(sizeof(i64)==8&&sizeof(double)==8);
 					#if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																																																									swapMixedEndianFloat(x);
+																																																																																																														swapMixedEndianFloat(x);
 #endif
 					#if WINDOWS_PHONE || WINDOWS_MOBILE
-																																																																																																									              pMem.r = BitConverter.ToDouble(BitConverter.GetBytes((long)x), 0);
+																																																																																																														              pMem.r = BitConverter.ToDouble(BitConverter.GetBytes((long)x), 0);
 #else
 					pMem.r=BitConverter.Int64BitsToDouble((long)x);
 					// memcpy(pMem.r, x, sizeof(x))
@@ -2799,7 +2375,7 @@ fclose(out);
 				/* IEEE floating point */u64 x;
 				u32 y;
 				#if !NDEBUG && !SQLITE_OMIT_FLOATING_POINT
-																																																																																				            /* Verify that integers and floating point values use the same
+																																																																																								            /* Verify that integers and floating point values use the same
 ** byte order.  Or, that if SQLITE_MIXED_ENDIAN_64BIT_FLOAT is
 ** defined that 64-bit floating point values really are mixed
 ** endian.
@@ -2808,9 +2384,9 @@ fclose(out);
             const double r1 = 1.0;
             u64 t2 = t1;
 #if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																																				swapMixedEndianFloat(t2);
+																																																																																								swapMixedEndianFloat(t2);
 #endif
-																																																																																				            Debug.Assert( sizeof( double ) == sizeof( u64 ) && memcmp( BitConverter.GetBytes( r1 ), BitConverter.GetBytes( t2 ), sizeof( double ) ) == 0 );//Debug.Assert( sizeof(r1)==sizeof(t2) && memcmp(&r1, t2, sizeof(r1))==0 );
+																																																																																								            Debug.Assert( sizeof( double ) == sizeof( u64 ) && memcmp( BitConverter.GetBytes( r1 ), BitConverter.GetBytes( t2 ), sizeof( double ) ) == 0 );//Debug.Assert( sizeof(r1)==sizeof(t2) && memcmp(&r1, t2, sizeof(r1))==0 );
 #endif
 				x=(u64)((buf[0]<<24)|(buf[1]<<16)|(buf[2]<<8)|buf[3]);
 				y=(u32)((buf[4]<<24)|(buf[5]<<16)|(buf[6]<<8)|buf[7]);
@@ -2822,10 +2398,10 @@ fclose(out);
 				else {
 					Debug.Assert(sizeof(i64)==8&&sizeof(double)==8);
 					#if SQLITE_MIXED_ENDIAN_64BIT_FLOAT
-																																																																																																									swapMixedEndianFloat(x);
+																																																																																																														swapMixedEndianFloat(x);
 #endif
 					#if WINDOWS_PHONE || WINDOWS_MOBILE
-																																																																																																									              pMem.r = BitConverter.ToDouble(BitConverter.GetBytes((long)x), 0);
+																																																																																																														              pMem.r = BitConverter.ToDouble(BitConverter.GetBytes((long)x), 0);
 #else
 					pMem.r=BitConverter.Int64BitsToDouble((long)x);
 					// memcpy(pMem.r, x, sizeof(x))
@@ -2940,7 +2516,7 @@ fclose(out);
     ** This routine destroys a UnpackedRecord object.
     */static void sqlite3VdbeDeleteUnpackedRecord(UnpackedRecord p) {
 			#if SQLITE_DEBUG
-																																																															      int i;
+																																																																		      int i;
       Mem pMem;
       Debug.Assert( p != null );
       Debug.Assert( ( p.flags & UNPACKED_NEED_DESTROY ) != 0 );
@@ -3190,9 +2766,6 @@ fclose(out);
 		/// or reset.
 		///
 		///</summary>
-		static void sqlite3VdbeCountChanges(Vdbe v) {
-			v.changeCntOn=true;
-		}
 		///<summary>
 		/// Mark every prepared statement associated with a database connection
 		/// as expired.
@@ -3210,50 +2783,22 @@ fclose(out);
 				p.expired=true;
 			}
 		}
-		///<summary>
-		/// Return the database associated with the Vdbe.
-		///
-		///</summary>
-		static sqlite3 sqlite3VdbeDb(Vdbe v) {
-			return v.db;
-		}
-		///<summary>
-		/// Return a pointer to an sqlite3_value structure containing the value bound
-		/// parameter iVar of VM v. Except, if the value is an SQL NULL, return
-		/// 0 instead. Unless it is NULL, apply affinity aff (one of the SQLITE_AFF_
-		/// constants) to the value before returning it.
-		///
-		/// The returned value must be freed by the caller using sqlite3ValueFree().
-		///
-		///</summary>
-		static sqlite3_value sqlite3VdbeGetValue(Vdbe v,int iVar,u8 aff) {
-			Debug.Assert(iVar>0);
-			if(v!=null) {
-				Mem pMem=v.aVar[iVar-1];
-				if(0==(pMem.flags&MEM_Null)) {
-					sqlite3_value pRet=sqlite3ValueNew(v.db);
-					if(pRet!=null) {
-						sqlite3VdbeMemCopy((Mem)pRet,pMem);
-						sqlite3ValueApplyAffinity(pRet,(char)aff,SqliteEncoding.UTF8);
-						sqlite3VdbeMemStoreType((Mem)pRet);
-					}
-					return pRet;
-				}
-			}
-			return null;
-		}
-		/*
+	///<summary>
+	/// Return the database associated with the Vdbe.
+	///
+	///</summary>
+	///<summary>
+	/// Return a pointer to an sqlite3_value structure containing the value bound
+	/// parameter iVar of VM v. Except, if the value is an SQL NULL, return
+	/// 0 instead. Unless it is NULL, apply affinity aff (one of the SQLITE_AFF_
+	/// constants) to the value before returning it.
+	///
+	/// The returned value must be freed by the caller using sqlite3ValueFree().
+	///
+	///</summary>
+	/*
     ** Configure SQL variable iVar so that binding a new value to it signals
     ** to sqlite3_reoptimize() that re-preparing the statement may result
     ** in a better query plan.
-    */static void sqlite3VdbeSetVarmask(Vdbe v,int iVar) {
-			Debug.Assert(iVar>0);
-			if(iVar>32) {
-				v.expmask=0xffffffff;
-			}
-			else {
-				v.expmask|=((u32)1<<(iVar-1));
-			}
-		}
-	}
+    */}
 }

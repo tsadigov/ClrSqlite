@@ -313,6 +313,7 @@
     <Compile Include="src\shell.cs" />
     <Compile Include="src\Sqlite3_backup.cs" />
     <Compile Include="src\Token.cs" />
+    <Compile Include="src\Vdbe.cs" />
     <Compile Include="src\VdbeFrame.cs" />
     <Compile Include="src\VdbeOp.cs" />
   </ItemGroup>

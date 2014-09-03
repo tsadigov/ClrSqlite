@@ -2662,7 +2662,7 @@ releasePage(pPage);
 #else
 					if(pBt.autoVacuum) {
 						Pgno maxRootPgno=0;
-						this.sqlite3BtreeGetMeta(BTREE_LARGEST_ROOT_PAGE,ref maxRootPgno);
+                        maxRootPgno=this.sqlite3BtreeGetMeta(BTREE_LARGEST_ROOT_PAGE);
 						if(iTable==maxRootPgno) {
 							/* If the table being dropped is the table with the largest root-page
         ** number in the database, put the root page on the free list.
@@ -2729,7 +2729,10 @@ releasePage(pPage);
 				sqlite3BtreeLeave(this);
 				return rc;
 			}
-			public void sqlite3BtreeGetMeta(int idx,ref u32 pMeta) {
+            public u32 sqlite3BtreeGetMeta(int idx)
+            {
+                u32 pMeta;
+
 				BtShared pBt=this.pBt;
 				sqlite3BtreeEnter(this);
 				Debug.Assert(this.inTrans>TRANS_NONE);
@@ -2739,6 +2742,7 @@ releasePage(pPage);
 				pMeta=Converter.sqlite3Get4byte(pBt.pPage1.aData,36+idx*4);
 				/* If auto-vacuum is disabled in this build and this is an auto-vacuum
   ** database, mark the database as read-only.  */
+                return pMeta;
 				#if SQLITE_OMIT_AUTOVACUUM
 																																																																									if( idx==BTREE_LARGEST_ROOT_PAGE && pMeta>0 ) pBt.readOnly = 1;
 #endif

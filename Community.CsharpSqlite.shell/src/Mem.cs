@@ -16,7 +16,8 @@ namespace Community.CsharpSqlite
     public partial class Sqlite3
     {
 
-        /* One or more of the following flags are set to indicate the validOK
+
+         /* One or more of the following flags are set to indicate the validOK
     ** representations of the value stored in the Mem struct.
     **
     ** If the MEM_Null flag is set, then the value is an SQL NULL value.
@@ -46,7 +47,31 @@ namespace Community.CsharpSqlite
         const int MEM_Frame = 0x0040;
         const int MEM_Invalid = 0x0080;
         const int MEM_TypeMask = 0x00ff;
-
+        /* Whenever Mem contains a valid string or blob representation, one of
+    ** the following flags must be set to determine the memory management
+    ** policy for Mem.z.  The MEM_Term flag tells us whether or not the
+    ** string is \000 or \u0000 terminated
+    //    */
+        //#define MEM_Term      0x0200   /* String rep is nul terminated */
+        //#define MEM_Dyn       0x0400   /* Need to call sqliteFree() on Mem.z */
+        //#define MEM_Static    0x0800   /* Mem.z points to a static string */
+        //#define MEM_Ephem     0x1000   /* Mem.z points to an ephemeral string */
+        //#define MEM_Agg       0x2000   /* Mem.z points to an agg function context */
+        //#define MEM_Zero      0x4000   /* Mem.i contains count of 0s appended to blob */
+        //#if SQLITE_OMIT_INCRBLOB
+        //  #undef MEM_Zero
+        //  #define MEM_Zero 0x0000
+        //#endif
+        const int MEM_Term = 0x0200;
+        const int MEM_Dyn = 0x0400;
+        const int MEM_Static = 0x0800;
+        const int MEM_Ephem = 0x1000;
+        const int MEM_Agg = 0x2000;
+#if !SQLITE_OMIT_INCRBLOB
+																																														const int MEM_Zero = 0x4000;  
+#else
+        const int MEM_Zero = 0x0000;
+#endif
 
 
 

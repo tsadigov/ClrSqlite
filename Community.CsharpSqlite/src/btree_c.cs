@@ -4347,7 +4347,8 @@ return rc;
 				/* Read the value of meta[3] from the database to determine where the
     ** root page of the new table should go. meta[3] is the largest root-page
     ** created so far, so the new root-page is (meta[3]+1).
-    */p.sqlite3BtreeGetMeta(BTREE_LARGEST_ROOT_PAGE,ref pgnoRoot);
+    */
+      pgnoRoot=p.sqlite3BtreeGetMeta(BTREE_LARGEST_ROOT_PAGE);
 				pgnoRoot++;
 				/* The new root-page may not be allocated on a pointer-map page, or the
     ** PENDING_BYTE page.

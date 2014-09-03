@@ -199,8 +199,8 @@ namespace Community.CsharpSqlite {
 			//}
 			//sqlite3VdbeAddOp4( v, OP_Int64, 0, mem, 0, (char*)pI64, P4_INT64 );
 			v.sqlite3VdbeAddOp4(OP_Int64,0,mem,0,value,P4_INT64);
-			sqlite3VdbeSetNumCols(v,1);
-			sqlite3VdbeSetColName(v,0,COLNAME_NAME,zLabel,SQLITE_STATIC);
+			v.sqlite3VdbeSetNumCols(1);
+			v.sqlite3VdbeSetColName(0,COLNAME_NAME,zLabel,SQLITE_STATIC);
 			v.sqlite3VdbeAddOp2(OP_ResultRow,mem,1);
 		}
 		#if !SQLITE_OMIT_FLAG_PRAGMAS
@@ -231,7 +231,7 @@ namespace Community.CsharpSqlite {
 				new sPragmaType("automatic_index",SQLITE_AutoIndex),
 				#endif
 				#if SQLITE_DEBUG
-																																																																																								new sPragmaType( "sql_trace",                SQLITE_SqlTrace      ),
+																																																																																												new sPragmaType( "sql_trace",                SQLITE_SqlTrace      ),
 new sPragmaType( "vdbe_listing",             SQLITE_VdbeListing   ),
 new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 #endif
@@ -327,7 +327,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 				"truncate",
 				"memory"
 			#if !SQLITE_OMIT_WAL
-																																																																		, "wal"
+																																																																					, "wal"
 #endif
 			};
 			Debug.Assert(PAGER_JOURNALMODE_DELETE==0);
@@ -416,7 +416,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			Debug.Assert(pId2!=null);
 			zDb=pId2.Length>0?pDb.zName:null;
 			#if !SQLITE_OMIT_AUTHORIZATION
-																																																																		if ( sqlite3AuthCheck( pParse, SQLITE_PRAGMA, zLeft, zRight, zDb ) )
+																																																																					if ( sqlite3AuthCheck( pParse, SQLITE_PRAGMA, zLeft, zRight, zDb ) )
 {
 goto pragma_out;
 }
@@ -453,8 +453,8 @@ goto pragma_out;
 					goto pragma_out;
 				sqlite3VdbeUsesBtree(v,iDb);
 				if(null==zRight) {
-					sqlite3VdbeSetNumCols(v,1);
-					sqlite3VdbeSetColName(v,0,COLNAME_NAME,"cache_size",SQLITE_STATIC);
+					v.sqlite3VdbeSetNumCols(1);
+					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"cache_size",SQLITE_STATIC);
 					pParse.nMem+=2;
 					addr=v.sqlite3VdbeAddOpList(getCacheSize.Length,getCacheSize);
 					v.sqlite3VdbeChangeP1(addr,iDb);
@@ -546,8 +546,8 @@ goto pragma_out;
 								v.sqlite3VdbeAddOp3(OP_MaxPgcnt,iDb,iReg,Converter.sqlite3Atoi(zRight));
 							}
 							v.sqlite3VdbeAddOp2(OP_ResultRow,iReg,1);
-							sqlite3VdbeSetNumCols(v,1);
-							sqlite3VdbeSetColName(v,0,COLNAME_NAME,zLeft,SQLITE_TRANSIENT);
+							v.sqlite3VdbeSetNumCols(1);
+							v.sqlite3VdbeSetColName(0,COLNAME_NAME,zLeft,SQLITE_TRANSIENT);
 						}
 						else
 							/*
@@ -564,8 +564,8 @@ goto pragma_out;
 								iReg=++pParse.nMem;
 								_v.sqlite3VdbeAddOp2(OP_Pagecount,iDb,iReg);
 								_v.sqlite3VdbeAddOp2(OP_ResultRow,iReg,1);
-								sqlite3VdbeSetNumCols(_v,1);
-								sqlite3VdbeSetColName(_v,0,COLNAME_NAME,"page_count",SQLITE_STATIC);
+								_v.sqlite3VdbeSetNumCols(1);
+								_v.sqlite3VdbeSetColName(0,COLNAME_NAME,"page_count",SQLITE_STATIC);
 							}
 							else
 								/*
@@ -605,8 +605,8 @@ goto pragma_out;
 									if(eMode==PAGER_LOCKINGMODE_EXCLUSIVE) {
 										zRet="exclusive";
 									}
-									sqlite3VdbeSetNumCols(v,1);
-									sqlite3VdbeSetColName(v,0,COLNAME_NAME,"locking_mode",SQLITE_STATIC);
+									v.sqlite3VdbeSetNumCols(1);
+									v.sqlite3VdbeSetColName(0,COLNAME_NAME,"locking_mode",SQLITE_STATIC);
 									v.sqlite3VdbeAddOp4(OP_String8,0,1,0,zRet,0);
 									v.sqlite3VdbeAddOp2(OP_ResultRow,1,1);
 								}
@@ -622,8 +622,8 @@ goto pragma_out;
                     ** database files to be opened and the journal_modes set. */if(sqlite3ReadSchema(pParse)!=0) {
 											goto pragma_out;
 										}
-										sqlite3VdbeSetNumCols(v,1);
-										sqlite3VdbeSetColName(v,0,COLNAME_NAME,"journal_mode",SQLITE_STATIC);
+										v.sqlite3VdbeSetNumCols(1);
+										v.sqlite3VdbeSetColName(0,COLNAME_NAME,"journal_mode",SQLITE_STATIC);
 										if(null==zRight) {
 											/* If there is no "=MODE" part of the pragma, do a query for the
                       ** current mode */eMode=PAGER_JOURNALMODE_QUERY;
@@ -815,8 +815,8 @@ goto pragma_out;
                               */if(zLeft.Equals("temp_store_directory",StringComparison.InvariantCultureIgnoreCase)) {
 																if(null==zRight) {
 																	if(sqlite3_temp_directory!="") {
-																		sqlite3VdbeSetNumCols(v,1);
-																		sqlite3VdbeSetColName(v,0,COLNAME_NAME,"temp_store_directory",SQLITE_STATIC);
+																		v.sqlite3VdbeSetNumCols(1);
+																		v.sqlite3VdbeSetColName(0,COLNAME_NAME,"temp_store_directory",SQLITE_STATIC);
 																		v.sqlite3VdbeAddOp4(OP_String8,0,1,0,sqlite3_temp_directory,0);
 																		v.sqlite3VdbeAddOp2(OP_ResultRow,1,1);
 																	}
@@ -849,13 +849,13 @@ goto pragma_out;
 															else
 																#if !(SQLITE_ENABLE_LOCKING_STYLE)
 																#if (__APPLE__)
-																																																																																																																																																																																																																																																																																																																																																																//    define SQLITE_ENABLE_LOCKING_STYLE 1
+																																																																																																																																																																																																																																																																																																																																																																																//    define SQLITE_ENABLE_LOCKING_STYLE 1
 #else
 																//#    define SQLITE_ENABLE_LOCKING_STYLE 0
 																#endif
 																#endif
 																#if SQLITE_ENABLE_LOCKING_STYLE
-																																																																																																																																																																																																																																																																																																																																																																/*
+																																																																																																																																																																																																																																																																																																																																																																																/*
 **   PRAGMA [database.]lock_proxy_file
 **   PRAGMA [database.]lock_proxy_file = ":auto:"|"lock_file_path"
 **
@@ -960,14 +960,14 @@ else
 																				int i;
 																				int nHidden=0;
 																				Column pCol;
-																				sqlite3VdbeSetNumCols(v,6);
+																				v.sqlite3VdbeSetNumCols(6);
 																				pParse.nMem=6;
-																				sqlite3VdbeSetColName(v,0,COLNAME_NAME,"cid",SQLITE_STATIC);
-																				sqlite3VdbeSetColName(v,1,COLNAME_NAME,"name",SQLITE_STATIC);
-																				sqlite3VdbeSetColName(v,2,COLNAME_NAME,"type",SQLITE_STATIC);
-																				sqlite3VdbeSetColName(v,3,COLNAME_NAME,"notnull",SQLITE_STATIC);
-																				sqlite3VdbeSetColName(v,4,COLNAME_NAME,"dflt_value",SQLITE_STATIC);
-																				sqlite3VdbeSetColName(v,5,COLNAME_NAME,"pk",SQLITE_STATIC);
+																				v.sqlite3VdbeSetColName(0,COLNAME_NAME,"cid",SQLITE_STATIC);
+																				v.sqlite3VdbeSetColName(1,COLNAME_NAME,"name",SQLITE_STATIC);
+																				v.sqlite3VdbeSetColName(2,COLNAME_NAME,"type",SQLITE_STATIC);
+																				v.sqlite3VdbeSetColName(3,COLNAME_NAME,"notnull",SQLITE_STATIC);
+																				v.sqlite3VdbeSetColName(4,COLNAME_NAME,"dflt_value",SQLITE_STATIC);
+																				v.sqlite3VdbeSetColName(5,COLNAME_NAME,"pk",SQLITE_STATIC);
 																				sqlite3ViewGetColumnNames(pParse,pTab);
 																				for(i=0;i<pTab.nCol;i++)//, pCol++)
 																				 {
@@ -1001,11 +1001,11 @@ else
 																				if(pIdx!=null) {
 																					int i;
 																					pTab=pIdx.pTable;
-																					sqlite3VdbeSetNumCols(v,3);
+																					v.sqlite3VdbeSetNumCols(3);
 																					pParse.nMem=3;
-																					sqlite3VdbeSetColName(v,0,COLNAME_NAME,"seqno",SQLITE_STATIC);
-																					sqlite3VdbeSetColName(v,1,COLNAME_NAME,"cid",SQLITE_STATIC);
-																					sqlite3VdbeSetColName(v,2,COLNAME_NAME,"name",SQLITE_STATIC);
+																					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"seqno",SQLITE_STATIC);
+																					v.sqlite3VdbeSetColName(1,COLNAME_NAME,"cid",SQLITE_STATIC);
+																					v.sqlite3VdbeSetColName(2,COLNAME_NAME,"name",SQLITE_STATIC);
 																					for(i=0;i<pIdx.nColumn;i++) {
 																						int cnum=pIdx.aiColumn[i];
 																						v.sqlite3VdbeAddOp2(OP_Integer,i,1);
@@ -1028,11 +1028,11 @@ else
 																						pIdx=pTab.pIndex;
 																						if(pIdx!=null) {
 																							int i=0;
-																							sqlite3VdbeSetNumCols(v,3);
+																							v.sqlite3VdbeSetNumCols(3);
 																							pParse.nMem=3;
-																							sqlite3VdbeSetColName(v,0,COLNAME_NAME,"seq",SQLITE_STATIC);
-																							sqlite3VdbeSetColName(v,1,COLNAME_NAME,"name",SQLITE_STATIC);
-																							sqlite3VdbeSetColName(v,2,COLNAME_NAME,"unique",SQLITE_STATIC);
+																							v.sqlite3VdbeSetColName(0,COLNAME_NAME,"seq",SQLITE_STATIC);
+																							v.sqlite3VdbeSetColName(1,COLNAME_NAME,"name",SQLITE_STATIC);
+																							v.sqlite3VdbeSetColName(2,COLNAME_NAME,"unique",SQLITE_STATIC);
 																							while(pIdx!=null) {
 																								v.sqlite3VdbeAddOp2(OP_Integer,i,1);
 																								v.sqlite3VdbeAddOp4(OP_String8,0,2,0,pIdx.zName,0);
@@ -1049,11 +1049,11 @@ else
 																						int i;
 																						if(sqlite3ReadSchema(pParse)!=0)
 																							goto pragma_out;
-																						sqlite3VdbeSetNumCols(v,3);
+																						v.sqlite3VdbeSetNumCols(3);
 																						pParse.nMem=3;
-																						sqlite3VdbeSetColName(v,0,COLNAME_NAME,"seq",SQLITE_STATIC);
-																						sqlite3VdbeSetColName(v,1,COLNAME_NAME,"name",SQLITE_STATIC);
-																						sqlite3VdbeSetColName(v,2,COLNAME_NAME,"file",SQLITE_STATIC);
+																						v.sqlite3VdbeSetColName(0,COLNAME_NAME,"seq",SQLITE_STATIC);
+																						v.sqlite3VdbeSetColName(1,COLNAME_NAME,"name",SQLITE_STATIC);
+																						v.sqlite3VdbeSetColName(2,COLNAME_NAME,"file",SQLITE_STATIC);
 																						for(i=0;i<db.nDb;i++) {
 																							if(db.aDb[i].pBt==null)
 																								continue;
@@ -1068,10 +1068,10 @@ else
 																						if(zLeft.Equals("collation_list",StringComparison.InvariantCultureIgnoreCase)) {
 																							int i=0;
 																							HashElem p;
-																							sqlite3VdbeSetNumCols(v,2);
+																							v.sqlite3VdbeSetNumCols(2);
 																							pParse.nMem=2;
-																							sqlite3VdbeSetColName(v,0,COLNAME_NAME,"seq",SQLITE_STATIC);
-																							sqlite3VdbeSetColName(v,1,COLNAME_NAME,"name",SQLITE_STATIC);
+																							v.sqlite3VdbeSetColName(0,COLNAME_NAME,"seq",SQLITE_STATIC);
+																							v.sqlite3VdbeSetColName(1,COLNAME_NAME,"name",SQLITE_STATIC);
 																							for(p=db.aCollSeq.first;p!=null;p=p.next)//( p = sqliteHashFirst( db.aCollSeq ) ; p; p = sqliteHashNext( p ) )
 																							 {
 																								CollSeq pColl=((CollSeq[])p.data)[0];
@@ -1095,16 +1095,16 @@ else
 																									pFK=pTab.pFKey;
 																									if(pFK!=null) {
 																										int i=0;
-																										sqlite3VdbeSetNumCols(v,8);
+																										v.sqlite3VdbeSetNumCols(8);
 																										pParse.nMem=8;
-																										sqlite3VdbeSetColName(v,0,COLNAME_NAME,"id",SQLITE_STATIC);
-																										sqlite3VdbeSetColName(v,1,COLNAME_NAME,"seq",SQLITE_STATIC);
-																										sqlite3VdbeSetColName(v,2,COLNAME_NAME,"table",SQLITE_STATIC);
-																										sqlite3VdbeSetColName(v,3,COLNAME_NAME,"from",SQLITE_STATIC);
-																										sqlite3VdbeSetColName(v,4,COLNAME_NAME,"to",SQLITE_STATIC);
-																										sqlite3VdbeSetColName(v,5,COLNAME_NAME,"on_update",SQLITE_STATIC);
-																										sqlite3VdbeSetColName(v,6,COLNAME_NAME,"on_delete",SQLITE_STATIC);
-																										sqlite3VdbeSetColName(v,7,COLNAME_NAME,"match",SQLITE_STATIC);
+																										v.sqlite3VdbeSetColName(0,COLNAME_NAME,"id",SQLITE_STATIC);
+																										v.sqlite3VdbeSetColName(1,COLNAME_NAME,"seq",SQLITE_STATIC);
+																										v.sqlite3VdbeSetColName(2,COLNAME_NAME,"table",SQLITE_STATIC);
+																										v.sqlite3VdbeSetColName(3,COLNAME_NAME,"from",SQLITE_STATIC);
+																										v.sqlite3VdbeSetColName(4,COLNAME_NAME,"to",SQLITE_STATIC);
+																										v.sqlite3VdbeSetColName(5,COLNAME_NAME,"on_update",SQLITE_STATIC);
+																										v.sqlite3VdbeSetColName(6,COLNAME_NAME,"on_delete",SQLITE_STATIC);
+																										v.sqlite3VdbeSetColName(7,COLNAME_NAME,"match",SQLITE_STATIC);
 																										while(pFK!=null) {
 																											int j;
 																											for(j=0;j<pFK.nCol;j++) {
@@ -1130,7 +1130,7 @@ else
 																							else
 																								#endif
 																								#if !NDEBUG
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																                                                if ( zLeft.Equals( "parser_trace" ,StringComparison.InvariantCultureIgnoreCase )  )
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																								                                                if ( zLeft.Equals( "parser_trace" ,StringComparison.InvariantCultureIgnoreCase )  )
                                                 {
                                                   if ( zRight != null )
                                                   {
@@ -1177,8 +1177,8 @@ else
 																										/* Initialize the VDBE program */if(sqlite3ReadSchema(pParse)!=0)
 																											goto pragma_out;
 																										pParse.nMem=6;
-																										sqlite3VdbeSetNumCols(v,1);
-																										sqlite3VdbeSetColName(v,0,COLNAME_NAME,"integrity_check",SQLITE_STATIC);
+																										v.sqlite3VdbeSetNumCols(1);
+																										v.sqlite3VdbeSetColName(0,COLNAME_NAME,"integrity_check",SQLITE_STATIC);
 																										/* Set the maximum error count */mxErr=SQLITE_INTEGRITY_CHECK_ERROR_MAX;
 																										if(zRight!=null) {
 																											Converter.sqlite3GetInt32(zRight,ref mxErr);
@@ -1334,8 +1334,8 @@ else
 																													pParse.rc=0;
 																													//  reset errors goto pragma_out;
 																												}
-																												sqlite3VdbeSetNumCols(v,1);
-																												sqlite3VdbeSetColName(v,0,COLNAME_NAME,"encoding",SQLITE_STATIC);
+																												v.sqlite3VdbeSetNumCols(1);
+																												v.sqlite3VdbeSetColName(0,COLNAME_NAME,"encoding",SQLITE_STATIC);
 																												v.sqlite3VdbeAddOp2(OP_String8,0,1);
 																												Debug.Assert(encnames[(int)SqliteEncoding.UTF8].enc==SqliteEncoding.UTF8);
 																												Debug.Assert(encnames[(int)SqliteEncoding.UTF16LE].enc==SqliteEncoding.UTF16LE);
@@ -1344,7 +1344,7 @@ else
 																												v.sqlite3VdbeAddOp2(OP_ResultRow,1,1);
 																											}
 																											#if !SQLITE_OMIT_UTF16
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		else
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																													else
 {                        /* "PRAGMA encoding = XXX" */
 /* Only change the value of sqlite.enc if the database handle is not
 ** initialized. If the main database exists, the new sqlite.enc value
@@ -1438,8 +1438,8 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																													v.sqlite3VdbeChangeP1(addr,iDb);
 																													v.sqlite3VdbeChangeP1(addr+1,iDb);
 																													v.sqlite3VdbeChangeP3(addr+1,iCookie);
-																													sqlite3VdbeSetNumCols(v,1);
-																													sqlite3VdbeSetColName(v,0,COLNAME_NAME,zLeft,SQLITE_TRANSIENT);
+																													v.sqlite3VdbeSetNumCols(1);
+																													v.sqlite3VdbeSetColName(0,COLNAME_NAME,zLeft,SQLITE_TRANSIENT);
 																												}
 																											}
 																											else
@@ -1462,9 +1462,9 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 */if(zLeft.Equals("compile_options",StringComparison.InvariantCultureIgnoreCase)) {
 																															int i=0;
 																															string zOpt;
-																															sqlite3VdbeSetNumCols(v,1);
+																															v.sqlite3VdbeSetNumCols(1);
 																															pParse.nMem=1;
-																															sqlite3VdbeSetColName(v,0,COLNAME_NAME,"compile_option",SQLITE_STATIC);
+																															v.sqlite3VdbeSetColName(0,COLNAME_NAME,"compile_option",SQLITE_STATIC);
 																															while((zOpt=sqlite3_compileoption_get(i++))!=null) {
 																																v.sqlite3VdbeAddOp4(OP_String8,0,1,0,zOpt,0);
 																																v.sqlite3VdbeAddOp2(OP_ResultRow,1,1);
@@ -1473,7 +1473,7 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																														else
 																															#endif
 																															#if !SQLITE_OMIT_WAL
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										  /*
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									  /*
   **   PRAGMA [database.]wal_checkpoint = passive|full|restart
   **
   ** Checkpoint the database.
@@ -1517,7 +1517,7 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
   }else
 #endif
 																															#if SQLITE_DEBUG || SQLITE_TEST
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										                                                            /*
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									                                                            /*
 ** Report the current state of file logs for all databases
 */
                                                             if ( zLeft.Equals( "lock_status" ,StringComparison.InvariantCultureIgnoreCase )  )
@@ -1595,7 +1595,7 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																																			}
 																																			#endif
 																																			#if SQLITE_ENABLE_CEROD
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		if( StringExtensions.sqlite3StrNICmp(zRight, "cerod-", 6)==0 ){
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																					if( StringExtensions.sqlite3StrNICmp(zRight, "cerod-", 6)==0 ){
 sqlite3_activate_cerod(&zRight[6]);
 }
 #endif

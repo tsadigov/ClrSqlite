@@ -269,7 +269,8 @@ namespace Community.CsharpSqlite {
 				Debug.Assert(pMain.sqlite3BtreeIsInTrans());
 				/* Copy Btree meta values */for(i=0;i<ArraySize(aCopy);i+=2) {
 					/* GetMeta() and UpdateMeta() cannot fail in this context because
-          ** we already have page 1 loaded into cache and marked dirty. */pMain.sqlite3BtreeGetMeta(aCopy[i],ref meta);
+          ** we already have page 1 loaded into cache and marked dirty. */
+                    meta=pMain.sqlite3BtreeGetMeta(aCopy[i]);
 					rc=pTemp.sqlite3BtreeUpdateMeta(aCopy[i],(u32)(meta+aCopy[i+1]));
 					if(NEVER(rc!=SQLITE_OK))
 						goto end_of_vacuum;

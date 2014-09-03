@@ -116,7 +116,7 @@ namespace Community.CsharpSqlite {
 					}
 					/* Lock the destination database, if it is not locked already. */if(SQLITE_OK==rc&&this.bDestLocked==0&&SQLITE_OK==(rc=sqlite3BtreeBeginTrans(this.pDest,2))) {
 						this.bDestLocked=1;
-						this.pDest.sqlite3BtreeGetMeta(BTREE_SCHEMA_VERSION,ref this.iDestSchema);
+						this.iDestSchema=this.pDest.sqlite3BtreeGetMeta(BTREE_SCHEMA_VERSION);
 					}
 					/* If there is no open read-transaction on the source database, open
     ** one now. If a transaction is opened here, then it will be closed
