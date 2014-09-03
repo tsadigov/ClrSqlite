@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define SQLITE_MAX_EXPR_DEPTH
+
+using System;
 using System.Diagnostics;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
@@ -25,6 +27,883 @@ namespace Community.CsharpSqlite
 {
     public partial class Sqlite3
     {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /**
+    ** Each node of an expression in the parse tree is an instance
+    ** of this structure.
+    **
+    ** Expr.op is the opcode.  The integer parser token codes are reused
+    ** as opcodes here.  For example, the parser defines TK_GE to be an integer
+    ** code representing the ">=" operator.  This same integer code is reused
+    ** to represent the greater-than-or-equal-to operator in the expression
+    ** tree.
+    **
+    ** If the expression is an SQL literal (TK_INTEGER, TK_FLOAT, TK_BLOB,
+    ** or TK_STRING), then Expr.token contains the text of the SQL literal. If
+    ** the expression is a variable (TK_VARIABLE), then Expr.token contains the
+    ** variable name. Finally, if the expression is an SQL function (TK_FUNCTION),
+    ** then Expr.token contains the name of the function.
+    **
+    ** Expr.pRight and Expr.pLeft are the left and right subexpressions of a
+    ** binary operator. Either or both may be NULL.
+    **
+    ** Expr.x.pList is a list of arguments if the expression is an SQL function,
+    ** a CASE expression or an IN expression of the form "<lhs> IN (<y>, <z>...)".
+    ** Expr.x.pSelect is used if the expression is a sub-select or an expression of
+    ** the form "<lhs> IN (SELECT ...)". If the EP_xIsSelect bit is set in the
+    ** Expr.flags mask, then Expr.x.pSelect is valid. Otherwise, Expr.x.pList is
+    ** valid.
+    **
+    ** An expression of the form ID or ID.ID refers to a column in a table.
+    ** For such expressions, Expr.op is set to TK_COLUMN and Expr.iTable is
+    ** the integer cursor number of a VDBE cursor pointing to that table and
+    ** Expr.iColumn is the column number for the specific column.  If the
+    ** expression is used as a result in an aggregate SELECT, then the
+    ** value is also stored in the Expr.iAgg column in the aggregate so that
+    ** it can be accessed after all aggregates are computed.
+    **
+    ** If the expression is an unbound variable marker (a question mark
+    ** character '?' in the original SQL) then the Expr.iTable holds the index
+    ** number for that variable.
+    **
+    ** If the expression is a subquery then Expr.iColumn holds an integer
+    ** register number containing the result of the subquery.  If the
+    ** subquery gives a constant result, then iTable is -1.  If the subquery
+    ** gives a different answer at different times during statement processing
+    ** then iTable is the address of a subroutine that computes the subquery.
+    **
+    ** If the Expr is of type OP_Column, and the table it is selecting from
+    ** is a disk table or the "old.*" pseudo-table, then pTab points to the
+    ** corresponding table definition.
+    **
+    ** ALLOCATION NOTES:
+    **
+    ** Expr objects can use a lot of memory space in database schema.  To
+    ** help reduce memory requirements, sometimes an Expr object will be
+    ** truncated.  And to reduce the number of memory allocations, sometimes
+    ** two or more Expr objects will be stored in a single memory allocation,
+    ** together with Expr.zToken strings.
+    **
+    ** If the EP_Reduced and EP_TokenOnly flags are set when
+    ** an Expr object is truncated.  When EP_Reduced is set, then all
+    ** the child Expr objects in the Expr.pLeft and Expr.pRight subtrees
+    ** are contained within the same memory allocation.  Note, however, that
+    ** the subtrees in Expr.x.pList or Expr.x.pSelect are always separately
+    ** allocated, regardless of whether or not EP_Reduced is set.
+    */
+
+        public class Expr
+        {
+            public Expr()
+            {
+            }
+#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
+																																																																																										public u8 _op;                      /* Operation performed by this node */
+public u8 op
+{
+get { return _op; }
+set { _op = value; }
+}
+#else
+            TokenType _op;
+            public TokenType Operator
+            {
+                get
+                {
+                    return _op;
+                }
+                set
+                {
+                    _op = value;
+                }
+            }
+            public u8 op
+            {
+                get
+                {
+                    return (u8)_op;
+                }
+                set
+                {
+                    _op = (TokenType)value;
+                }
+            }
+            ///
+            ///<summary>
+            ///Operation performed by this node 
+            ///</summary>
+#endif
+            public char affinity;
+            ///<summary>
+            ///The affinity of the column or 0 if not a column
+            ///</summary>
+#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
+																																																																																										public u16 _flags;                            /* Various flags.  EP_* See below */
+public u16 flags
+{
+get { return _flags; }
+set { _flags = value; }
+}
+public struct _u
+{
+public string _zToken;         /* Token value. Zero terminated and dequoted */
+public string zToken
+{
+get { return _zToken; }
+set { _zToken = value; }
+}
+public int iValue;            /* Non-negative integer value if EP_IntValue */
+}
+
+#else
+            public struct _u
+            {
+                public string zToken;
+                ///
+                ///<summary>
+                ///Token value. Zero terminated and dequoted 
+                ///</summary>
+                public int iValue;
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Non">negative integer value if EP_IntValue </param>
+            }
+            public u16 flags;
+            ///
+            ///<summary>
+            ///Various flags.  EP_* See below 
+            ///</summary>
+#endif
+            public _u u;
+            ///
+            ///<summary>
+            ///If the EP_TokenOnly flag is set in the Expr.flags mask, then no
+            ///space is allocated for the fields below this point. An attempt to
+            ///access them will result in a segfault or malfunction.
+            ///
+            ///</summary>
+            public Expr pLeft;
+            ///<summary>
+            ///Left subnode
+            ///</summary>
+            public Expr pRight;
+            ///
+            ///<summary>
+            ///Right subnode 
+            ///</summary>
+            public struct _x
+            {
+                public ExprList pList;
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Function arguments or in "<expr> IN (<expr">list)" </param>
+                public Select pSelect;
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Used for sub">selects and "<expr> IN (<select>)" </param>
+            }
+            public _x x;
+            public CollSeq pColl;
+            ///
+            ///<summary>
+            ///The collation type of the column or 0 
+            ///</summary>
+            ///
+            ///<summary>
+            ///If the EP_Reduced flag is set in the Expr.flags mask, then no
+            ///space is allocated for the fields below this point. An attempt to
+            ///access them will result in a segfault or malfunction.
+            ///
+            ///</summary>
+            public int iTable;
+            ///
+            ///<summary>
+            ///TK_COLUMN: cursor number of table holding column
+            ///TK_REGISTER: register number
+            ///</summary>
+            ///<param name="TK_TRIGGER: 1 ">> old </param>
+            public ynVar iColumn;
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="TK_COLUMN: column index.  ">1 for rowid.</param>
+            ///<param name="TK_VARIABLE: variable number (always >= 1). ">TK_VARIABLE: variable number (always >= 1). </param>
+            public i16 iAgg;
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Which entry in pAggInfo">>aFunc[] </param>
+            public i16 iRightJoinTable;
+            ///
+            ///<summary>
+            ///If EP_FromJoin, the right table of the join 
+            ///</summary>
+            public u8 flags2;
+            ///
+            ///<summary>
+            ///Second set of flags.  EP2_... 
+            ///</summary>
+            public u8 op2;
+            ///
+            ///<summary>
+            ///If a TK_REGISTER, the original value of Expr.op 
+            ///</summary>
+            public AggInfo pAggInfo;
+            ///
+            ///<summary>
+            ///Used by TK_AGG_COLUMN and TK_AGG_FUNCTION 
+            ///</summary>
+            public Table pTab;
+            ///
+            ///<summary>
+            ///Table for TK_COLUMN expressions. 
+            ///</summary>
+#if SQLITE_MAX_EXPR_DEPTH
+			public int nHeight;
+			///
+			///<summary>
+			///Height of the tree headed by this node 
+			///</summary>
+			public Table pZombieTab;
+			///<summary>
+			///List of Table objects to delete after code gen
+			///</summary>
+#endif
+#if DEBUG_CLASS
+																																																																																										public int op
+{
+get { return _op; }
+set { _op = value; }
+}
+#endif
+            public void CopyFrom(Expr cf)
+            {
+                op = cf.op;
+                affinity = cf.affinity;
+                flags = cf.flags;
+                u = cf.u;
+                pColl = cf.pColl == null ? null : cf.pColl.Copy();
+                iTable = cf.iTable;
+                iColumn = cf.iColumn;
+                pAggInfo = cf.pAggInfo == null ? null : cf.pAggInfo.Copy();
+                iAgg = cf.iAgg;
+                iRightJoinTable = cf.iRightJoinTable;
+                flags2 = cf.flags2;
+                pTab = cf.pTab == null ? null : cf.pTab;
+#if SQLITE_TEST || SQLITE_MAX_EXPR_DEPTH
+				nHeight=cf.nHeight;
+				pZombieTab=cf.pZombieTab;
+#endif
+                pLeft = cf.pLeft == null ? null : cf.pLeft.Copy();
+                pRight = cf.pRight == null ? null : cf.pRight.Copy();
+                x.pList = cf.x.pList == null ? null : cf.x.pList.Copy();
+                x.pSelect = cf.x.pSelect == null ? null : cf.x.pSelect.Copy();
+            }
+            public Expr Copy()
+            {
+                if (this == null)
+                    return null;
+                else
+                    return Copy(flags);
+            }
+            public Expr Copy(int flag)
+            {
+                Expr cp = new Expr();
+                cp.op = op;
+                cp.affinity = affinity;
+                cp.flags = flags;
+                cp.u = u;
+                if ((flag & EP_TokenOnly) != 0)
+                    return cp;
+                if (pLeft != null)
+                    cp.pLeft = pLeft.Copy();
+                if (pRight != null)
+                    cp.pRight = pRight.Copy();
+                cp.x = x;
+                cp.pColl = pColl;
+                if ((flag & EP_Reduced) != 0)
+                    return cp;
+                cp.iTable = iTable;
+                cp.iColumn = iColumn;
+                cp.iAgg = iAgg;
+                cp.iRightJoinTable = iRightJoinTable;
+                cp.flags2 = flags2;
+                cp.op2 = op2;
+                cp.pAggInfo = pAggInfo;
+                cp.pTab = pTab;
+#if SQLITE_MAX_EXPR_DEPTH
+				cp.nHeight=nHeight;
+				cp.pZombieTab=pZombieTab;
+#endif
+                return cp;
+            }
+            public///<summary>
+                /// pExpr is an operand of a comparison operator.  aff2 is the
+                /// type affinity of the other operand.  This routine returns the
+                /// type affinity that should be used for the comparison operator.
+                ///
+                ///</summary>
+            char sqlite3CompareAffinity(char aff2)
+            {
+                char aff1 = this.sqlite3ExprAffinity();
+                if (aff1 != '\0' && aff2 != '\0')
+                {
+                    ///
+                    ///<summary>
+                    ///Both sides of the comparison are columns. If one has numeric
+                    ///affinity, use that. Otherwise use no affinity.
+                    ///
+                    ///</summary>
+                    if (aff1 >= SQLITE_AFF_NUMERIC || aff2 >= SQLITE_AFF_NUMERIC)//        if (sqlite3IsNumericAffinity(aff1) || sqlite3IsNumericAffinity(aff2))
+                    {
+                        return SQLITE_AFF_NUMERIC;
+                    }
+                    else
+                    {
+                        return SQLITE_AFF_NONE;
+                    }
+                }
+                else
+                    if (aff1 == '\0' && aff2 == '\0')
+                    {
+                        ///
+                        ///<summary>
+                        ///Neither side of the comparison is a column.  Compare the
+                        ///results directly.
+                        ///
+                        ///</summary>
+                        return SQLITE_AFF_NONE;
+                    }
+                    else
+                    {
+                        ///
+                        ///<summary>
+                        ///One side is a column, the other is not. Use the columns affinity. 
+                        ///</summary>
+                        Debug.Assert(aff1 == 0 || aff2 == 0);
+                        return (aff1 != '\0' ? aff1 : aff2);
+                    }
+            }
+            public///<summary>
+                /// pExpr is a comparison operator.  Return the type affinity that should
+                /// be applied to both operands prior to doing the comparison.
+                ///
+                ///</summary>
+            char comparisonAffinity()
+            {
+                char aff;
+                Debug.Assert(this.op == TK_EQ || this.op == TK_IN || this.op == TK_LT || this.op == TK_GT || this.op == TK_GE || this.op == TK_LE || this.op == TK_NE || this.op == TK_IS || this.op == TK_ISNOT);
+                Debug.Assert(this.pLeft != null);
+                aff = this.pLeft.sqlite3ExprAffinity();
+                if (this.pRight != null)
+                {
+                    aff = this.pRight.sqlite3CompareAffinity(aff);
+                }
+                else
+                    if (this.ExprHasProperty(EP_xIsSelect))
+                    {
+                        aff = this.x.pSelect.pEList.a[0].pExpr.sqlite3CompareAffinity(aff);
+                    }
+                    else
+                        if (aff == '\0')
+                        {
+                            aff = SQLITE_AFF_NONE;
+                        }
+                return aff;
+            }
+            public///<summary>
+                /// pExpr is a comparison expression, eg. '=', '<', IN(...) etc.
+                /// idx_affinity is the affinity of an indexed column. Return true
+                /// if the index with affinity idx_affinity may be used to implement
+                /// the comparison in pExpr.
+                ///
+                ///</summary>
+            bool sqlite3IndexAffinityOk(char idx_affinity)
+            {
+                char aff = this.comparisonAffinity();
+                switch (aff)
+                {
+                    case SQLITE_AFF_NONE:
+                        return true;
+                    case SQLITE_AFF_TEXT:
+                        return idx_affinity == SQLITE_AFF_TEXT;
+                    default:
+                        return idx_affinity >= SQLITE_AFF_NUMERIC;
+                    // sqlite3IsNumericAffinity(idx_affinity);
+                }
+            }
+            public///<summary>
+                /// The dupedExpr*Size() routines each return the number of bytes required
+                /// to store a copy of an expression or expression tree.  They differ in
+                /// how much of the tree is measured.
+                ///
+                ///     dupedExprStructSize()     Size of only the Expr structure
+                ///     dupedExprNodeSize()       Size of Expr + space for token
+                ///     dupedExprSize()           Expr + token + subtree components
+                ///
+                ///
+                ///
+                /// The dupedExprStructSize() function returns two values OR-ed together:
+                /// (1) the space required for a copy of the Expr structure only and
+                /// (2) the EP_xxx flags that indicate what the structure size should be.
+                /// The return values is always one of:
+                ///
+                ///      EXPR_FULLSIZE
+                ///      EXPR_REDUCEDSIZE   | EP_Reduced
+                ///      EXPR_TOKENONLYSIZE | EP_TokenOnly
+                ///
+                /// The size of the structure can be found by masking the return value
+                /// of this routine with 0xfff.  The flags can be found by masking the
+                /// return value with EP_Reduced|EP_TokenOnly.
+                ///
+                /// Note that with flags==EXPRDUP_REDUCE, this routines works on full-size
+                /// (unreduced) Expr objects as they or originally constructed by the parser.
+                /// During expression analysis, extra information is computed and moved into
+                /// later parts of teh Expr object and that extra information might get chopped
+                /// off if the expression is reduced.  Note also that it does not work to
+                /// make a EXPRDUP_REDUCE copy of a reduced expression.  It is only legal
+                /// to reduce a pristine expression tree from the parser.  The implementation
+                /// of dupedExprStructSize() contain multiple Debug.Assert() statements that attempt
+                /// to enforce this constraint.
+                ///
+                ///</summary>
+            int dupedExprStructSize(int flags)
+            {
+                int nSize;
+                Debug.Assert(flags == EXPRDUP_REDUCE || flags == 0);
+                ///
+                ///<summary>
+                ///Only one flag value allowed 
+                ///</summary>
+                if (0 == (flags & EXPRDUP_REDUCE))
+                {
+                    nSize = EXPR_FULLSIZE;
+                }
+                else
+                {
+                    Debug.Assert(!this.ExprHasAnyProperty(EP_TokenOnly | EP_Reduced));
+                    Debug.Assert(!this.ExprHasProperty(EP_FromJoin));
+                    Debug.Assert((this.flags2 & EP2_MallocedToken) == 0);
+                    Debug.Assert((this.flags2 & EP2_Irreducible) == 0);
+                    if (this.pLeft != null || this.pRight != null || this.pColl != null || this.x.pList != null || this.x.pSelect != null)
+                    {
+                        nSize = EXPR_REDUCEDSIZE | EP_Reduced;
+                    }
+                    else
+                    {
+                        nSize = EXPR_TOKENONLYSIZE | EP_TokenOnly;
+                    }
+                }
+                return nSize;
+            }
+            public///<summary>
+                /// Return the number of bytes required to create a duplicate of the
+                /// expression passed as the first argument. The second argument is a
+                /// mask containing EXPRDUP_XXX flags.
+                ///
+                /// The value returned includes space to create a copy of the Expr struct
+                /// itself and the buffer referred to by Expr.u.zToken, if any.
+                ///
+                /// If the EXPRDUP_REDUCE flag is set, then the return value includes
+                /// space to duplicate all Expr nodes in the tree formed by Expr.pLeft
+                /// and Expr.pRight variables (but not for any structures pointed to or
+                /// descended from the Expr.x.pList or Expr.x.pSelect variables).
+                ///
+                ///</summary>
+            int dupedExprSize(int flags)
+            {
+                int nByte = 0;
+                if (this != null)
+                {
+                    nByte = this.dupedExprNodeSize(flags);
+                    if ((flags & EXPRDUP_REDUCE) != 0)
+                    {
+                        nByte += this.pLeft.dupedExprSize(flags) + this.pRight.dupedExprSize(flags);
+                    }
+                }
+                return nByte;
+            }
+            public///<summary>
+                /// This function returns the space in bytes required to store the copy
+                /// of the Expr structure and a copy of the Expr.u.zToken string (if that
+                /// string is defined.)
+                ///
+                ///</summary>
+            int dupedExprNodeSize(int flags)
+            {
+                int nByte = this.dupedExprStructSize(flags) & 0xfff;
+                if (!this.ExprHasProperty(EP_IntValue) && this.u.zToken != null)
+                {
+                    nByte += StringExtensions.sqlite3Strlen30(this.u.zToken) + 1;
+                }
+                return ROUND8(nByte);
+            }
+            public int exprIsConst(int initFlag)
+            {
+                Walker w = new Walker();
+                w.u.i = initFlag;
+                w.xExprCallback = exprNodeIsConstant;
+                w.xSelectCallback = selectNodeIsConstant;
+                Expr _this = this;
+                w.sqlite3WalkExpr(ref _this);
+                return w.u.i;
+            }
+            public///<summary>
+                /// Walk an expression tree.  Return 1 if the expression is constant
+                /// and 0 if it involves variables or function calls.
+                ///
+                /// For the purposes of this function, a double-quoted string (ex: "abc")
+                /// is considered a variable but a single-quoted string (ex: 'abc') is
+                /// a constant.
+                ///
+                ///</summary>
+            int sqlite3ExprIsConstant()
+            {
+                return this.exprIsConst(1);
+            }
+            public///<summary>
+                /// Walk an expression tree.  Return 1 if the expression is constant
+                /// that does no originate from the ON or USING clauses of a join.
+                /// Return 0 if it involves variables or function calls or terms from
+                /// an ON or USING clause.
+                ///
+                ///</summary>
+            int sqlite3ExprIsConstantNotJoin()
+            {
+                return this.exprIsConst(3);
+            }
+            public///<summary>
+                /// Walk an expression tree.  Return 1 if the expression is constant
+                /// or a function call with constant arguments.  Return and 0 if there
+                /// are any variables.
+                ///
+                /// For the purposes of this function, a double-quoted string (ex: "abc")
+                /// is considered a variable but a single-quoted string (ex: 'abc') is
+                /// a constant.
+                ///
+                ///</summary>
+            int sqlite3ExprIsConstantOrFunction()
+            {
+                return this.exprIsConst(2);
+            }
+            public///<summary>
+                /// If the expression p codes a constant integer that is small enough
+                /// to fit in a 32-bit integer, return 1 and put the value of the integer
+                /// in pValue.  If the expression is not an integer or if it is too big
+                /// to fit in a signed 32-bit integer, return 0 and leave pValue unchanged.
+                ///
+                ///</summary>
+            int sqlite3ExprIsInteger(ref int pValue)
+            {
+                int rc = 0;
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="If an expression is an integer literal that fits in a signed 32">bit</param>
+                ///<param name="integer, then the EP_IntValue flag will have already been set ">integer, then the EP_IntValue flag will have already been set </param>
+                Debug.Assert(this.op != TK_INTEGER || (this.flags & EP_IntValue) != 0 || !Converter.sqlite3GetInt32(this.u.zToken, ref rc));
+                if ((this.flags & EP_IntValue) != 0)
+                {
+                    pValue = (int)this.u.iValue;
+                    return 1;
+                }
+                switch (this.op)
+                {
+                    case TK_UPLUS:
+                        {
+                            rc = this.pLeft.sqlite3ExprIsInteger(ref pValue);
+                            break;
+                        }
+                    case TK_UMINUS:
+                        {
+                            int v = 0;
+                            if (this.pLeft.sqlite3ExprIsInteger(ref v) != 0)
+                            {
+                                pValue = -v;
+                                rc = 1;
+                            }
+                            break;
+                        }
+                    default:
+                        break;
+                }
+                return rc;
+            }
+            public///<summary>
+                /// Return FALSE if there is no chance that the expression can be NULL.
+                ///
+                /// If the expression might be NULL or if the expression is too complex
+                /// to tell return TRUE.
+                ///
+                /// This routine is used as an optimization, to skip OP_IsNull opcodes
+                /// when we know that a value cannot be NULL.  Hence, a false positive
+                /// (returning TRUE when in fact the expression can never be NULL) might
+                /// be a small performance hit but is otherwise harmless.  On the other
+                /// hand, a false negative (returning FALSE when the result could be NULL)
+                /// will likely result in an incorrect answer.  So when in doubt, return
+                /// TRUE.
+                ///
+                ///</summary>
+            int sqlite3ExprCanBeNull()
+            {
+                u8 op;
+                Expr expr = this;
+                while (expr.op == TK_UPLUS || expr.op == TK_UMINUS)
+                {
+                    expr = expr.pLeft;
+                }
+                op = expr.op;
+                if (op == TK_REGISTER)
+                    op = expr.op2;
+                switch (op)
+                {
+                    case TK_INTEGER:
+                    case TK_STRING:
+                    case TK_FLOAT:
+                    case TK_BLOB:
+                        return 0;
+                    default:
+                        return 1;
+                }
+            }
+            public///<summary>
+                /// Return TRUE if pExpr is an constant expression that is appropriate
+                /// for factoring out of a loop.  Appropriate expressions are:
+                ///
+                ///    *  Any expression that evaluates to two or more opcodes.
+                ///
+                ///    *  Any OP_Integer, OP_Real, OP_String, OP_Blob, OP_Null,
+                ///       or OP_Variable that does not need to be placed in a
+                ///       specific register.
+                ///
+                /// There is no point in factoring out single-instruction constant
+                /// expressions that need to be placed in a particular register.
+                /// We could factor them out, but then we would end up adding an
+                /// OP_SCopy instruction to move the value into the correct register
+                /// later.  We might as well just use the original instruction and
+                /// avoid the OP_SCopy.
+                ///
+                ///</summary>
+            int isAppropriateForFactoring()
+            {
+                Expr expr = this;
+                if (expr.sqlite3ExprIsConstantNotJoin() == 0)
+                {
+                    return 0;
+                    ///
+                    ///<summary>
+                    ///Only constant expressions are appropriate for factoring 
+                    ///</summary>
+                }
+                if ((expr.flags & EP_FixedDest) == 0)
+                {
+                    return 1;
+                    ///
+                    ///<summary>
+                    ///Any constant without a fixed destination is appropriate 
+                    ///</summary>
+                }
+                while (expr.op == TK_UPLUS)
+                    expr = expr.pLeft;
+                switch (expr.op)
+                {
+#if !SQLITE_OMIT_BLOB_LITERAL
+                    case TK_BLOB:
+#endif
+                    case TK_VARIABLE:
+                    case TK_INTEGER:
+                    case TK_FLOAT:
+                    case TK_NULL:
+                    case TK_STRING:
+                        {
+                            testcase(expr.op == TK_BLOB);
+                            testcase(expr.op == TK_VARIABLE);
+                            testcase(expr.op == TK_INTEGER);
+                            testcase(expr.op == TK_FLOAT);
+                            testcase(expr.op == TK_NULL);
+                            testcase(expr.op == TK_STRING);
+                            ///
+                            ///<summary>
+                            ///</summary>
+                            ///<param name="Single">instruction constants with a fixed destination are</param>
+                            ///<param name="better done in">line.  If we factor them, they will just end</param>
+                            ///<param name="up generating an OP_SCopy to move the value to the destination">up generating an OP_SCopy to move the value to the destination</param>
+                            ///<param name="register. ">register. </param>
+                            return 0;
+                        }
+                    case TK_UMINUS:
+                        {
+                            if (expr.pLeft.op == TK_FLOAT || expr.pLeft.op == TK_INTEGER)
+                            {
+                                return 0;
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+                }
+                return 1;
+            }
+            public char sqlite3ExprAffinity()
+            {
+                int op = this.op;
+                if (op == TK_SELECT)
+                {
+                    Debug.Assert((this.flags & EP_xIsSelect) != 0);
+                    return this.x.pSelect.pEList.a[0].pExpr.sqlite3ExprAffinity();
+                }
+#if !SQLITE_OMIT_CAST
+                if (op == TK_CAST)
+                {
+                    Debug.Assert(!this.ExprHasProperty(EP_IntValue));
+                    return sqlite3AffinityType(this.u.zToken);
+                }
+#endif
+                if ((op == TK_AGG_COLUMN || op == TK_COLUMN || op == TK_REGISTER) && this.pTab != null)
+                {
+                    ///
+                    ///<summary>
+                    ///op==TK_REGISTER && pExpr.pTab!=0 happens when pExpr was originally
+                    ///a TK_COLUMN but was previously evaluated and cached in a register 
+                    ///</summary>
+                    int j = this.iColumn;
+                    if (j < 0)
+                        return SQLITE_AFF_INTEGER;
+                    Debug.Assert(this.pTab != null && j < this.pTab.nCol);
+                    return this.pTab.aCol[j].affinity;
+                }
+                return this.affinity;
+            }
+            public Expr sqlite3ExprSetColl(CollSeq pColl)
+            {
+                if (this != null && pColl != null)
+                {
+                    this.pColl = pColl;
+                    this.flags |= EP_ExpCollate;
+                }
+                return this;
+            }
+            public u8 binaryCompareP5(Expr pExpr2, int jumpIfNull)
+            {
+                u8 aff = (u8)pExpr2.sqlite3ExprAffinity();
+                aff = (u8)((u8)this.sqlite3CompareAffinity((char)aff) | (u8)jumpIfNull);
+                return aff;
+            }
+            public void exprSetHeight()
+            {
+                int nHeight = 0;
+                this.pLeft.heightOfExpr(ref nHeight);
+                this.pRight.heightOfExpr(ref nHeight);
+                if (this.ExprHasProperty(EP_xIsSelect))
+                {
+                    this.x.pSelect.heightOfSelect(ref nHeight);
+                }
+                else
+                {
+                    this.x.pList.heightOfExprList(ref nHeight);
+                }
+                this.nHeight = nHeight + 1;
+            }
+            public int isMatchOfColumn(///
+                ///<summary>
+                ///Test this expression 
+                ///</summary>
+            )
+            {
+                ExprList pList;
+                if (this.op != TK_FUNCTION)
+                {
+                    return 0;
+                }
+                if (!this.u.zToken.Equals("match", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return 0;
+                }
+                pList = this.x.pList;
+                if (pList.nExpr != 2)
+                {
+                    return 0;
+                }
+                if (pList.a[1].pExpr.op != TK_COLUMN)
+                {
+                    return 0;
+                }
+                return 1;
+            }
+            public void transferJoinMarkings(Expr pBase)
+            {
+                this.flags = (u16)(this.flags | pBase.flags & EP_FromJoin);
+                this.iRightJoinTable = pBase.iRightJoinTable;
+            }
+            public TokenType Operator2
+            {
+                get
+                {
+                    return (TokenType)op2;
+                }
+                set
+                {
+                    op2 = (u8)value;
+                }
+            }
+            public void ExprSetIrreducible()
+            {
+            }
+            public bool ExprHasProperty(int P)
+            {
+                return (this.flags & P) == P;
+            }
+            public bool ExprHasAnyProperty(int P)
+            {
+                return (this.flags & P) != 0;
+            }
+            public void ExprSetProperty(int P)
+            {
+                this.flags = (ushort)(this.flags | P);
+            }
+            public void ExprClearProperty(int P)
+            {
+                this.flags = (ushort)(this.flags & ~P);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
