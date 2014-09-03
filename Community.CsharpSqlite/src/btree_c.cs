@@ -2993,7 +2993,8 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 		/* Move the cursor to the last entry in the table.  Return SQLITE_OK
 ** on success.  Set pRes to 0 if the cursor actually points to something
 ** or set pRes to 1 if the table is empty.
-*/static int sqlite3BtreeLast(BtCursor pCur,ref int pRes) {
+*/
+        public static int sqlite3BtreeLast(BtCursor pCur,ref int pRes) {
 			int rc;
 			Debug.Assert(pCur.cursorHoldsMutex());
 			Debug.Assert(sqlite3_mutex_held(pCur.pBtree.db.mutex));

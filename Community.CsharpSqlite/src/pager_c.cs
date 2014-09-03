@@ -707,8 +707,17 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
 			/* File descriptor for main journal */public sqlite3_file sjfd;
 			/* File descriptor for sub-journal */public i64 journalOff;
 			/* Current write offset in the journal file */public i64 journalHdr;
-			/* Byte offset to previous journal header */public sqlite3_backup pBackup;
-			/* Pointer to list of ongoing backup processes */public PagerSavepoint[] aSavepoint;
+            /* Byte offset to previous journal header */
+            sqlite3_backup _pBackup;
+			/* Pointer to list of ongoing backup processes */
+
+public sqlite3_backup pBackup
+{
+  get { return _pBackup; }
+  set { _pBackup = value; }
+}
+          
+          public PagerSavepoint[] aSavepoint;
 			/* Array of active savepoints */public int nSavepoint;
 			/* Number of elements in aSavepoint[] */public u8[] dbFileVers=new u8[16];
 			/* Changes whenever database file changes *//*

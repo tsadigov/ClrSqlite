@@ -131,7 +131,17 @@ namespace Community.CsharpSqlite {
 		//#define BTREE_TEXT_ENCODING       5
 		//#define BTREE_USER_VERSION        6
 		//#define BTREE_INCR_VACUUM         7
-		const int BTREE_FREE_PAGE_COUNT=0;
+        public enum BTreeProp{ 
+             FREE_PAGE_COUNT=0,
+		 SCHEMA_VERSION=1,
+		 FILE_FORMAT=2,
+		 DEFAULT_CACHE_SIZE=3,
+		 LARGEST_ROOT_PAGE=4,
+		 TEXT_ENCODING=5,
+		 USER_VERSION=6,
+		 INCR_VACUUM=7
+        }
+        const int BTREE_FREE_PAGE_COUNT = 0;
 		const int BTREE_SCHEMA_VERSION=1;
 		const int BTREE_FILE_FORMAT=2;
 		const int BTREE_DEFAULT_CACHE_SIZE=3;

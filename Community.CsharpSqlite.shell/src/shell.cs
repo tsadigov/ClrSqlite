@@ -2378,7 +2378,13 @@ enableTimer = booleanValue(azArg[1]);
             }
             Console.WriteLine(idx.ToString().PadLeft(3)+" : "+item.ToString(pParse));
         }
-
+        Log.WriteHeader("executing");
+        int sDummy=0;
+        var vdbe = new sqlite3_stmt(); 
+        //var rcc = Sqlite3.sqlite3_prepare(db, sql, -1, ref vdbe,  sDummy);
+		
+        //Sqlite3.sqlite3_step(vdbe);
+        //pParse.pVdbe.sqlite3VdbeExec();
 
 		string zErrMsg=null;
 		callback_data data=null;

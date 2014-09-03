@@ -142,6 +142,23 @@ public u64 cycles;         /* Total time spend executing this instruction */
                 case OpCode.OP_ParseSchema:
                     str=Sqlite3.displayP4(this, "", 30);
                     break;
+
+                case OpCode.OP_ReadCookie:
+                case OpCode.OP_SetCookie:
+                    str=((Sqlite3.BTreeProp)p3).ToString();
+                    break;
+                case OpCode.OP_NewRowid:
+                    var pC = vdbe.apCsr[p1];
+
+                    if (null != pC && null != pC.pCursor)
+                    {
+                        int id = 0;
+                        id=(int)pC.pCursor.sqlite3BtreeGetCachedRowid();
+                        if(0==id)
+                            Sqlite3.sqlite3BtreeLast(pC.pCursor, ref id);
+                        str = "cached " + id; 
+                    }
+                    break;
             }
             return OpCode.ToString() + " \t\t:\t " + str;
         }
