@@ -112,43 +112,7 @@ namespace Community.CsharpSqlite {
 		//void sqlite3BtreeTripAllCursors(Btree*, int);
 		//void sqlite3BtreeGetMeta(Btree *pBtree, int idx, u32 *pValue);
 		//int sqlite3BtreeUpdateMeta(Btree*, int idx, u32 value);
-		/*
-    ** The second parameter to sqlite3BtreeGetMeta or sqlite3BtreeUpdateMeta
-    ** should be one of the following values. The integer values are assigned
-    ** to constants so that the offset of the corresponding field in an
-    ** SQLite database header may be found using the following formula:
-    **
-    **   offset = 36 + (idx * 4)
-    **
-    ** For example, the free-page-count field is located at byte offset 36 of
-    ** the database file header. The incr-vacuum-flag field is located at
-    ** byte offset 64 (== 36+4*7).
-    *///#define BTREE_FREE_PAGE_COUNT     0
-		//#define BTREE_SCHEMA_VERSION      1
-		//#define BTREE_FILE_FORMAT         2
-		//#define BTREE_DEFAULT_CACHE_SIZE  3
-		//#define BTREE_LARGEST_ROOT_PAGE   4
-		//#define BTREE_TEXT_ENCODING       5
-		//#define BTREE_USER_VERSION        6
-		//#define BTREE_INCR_VACUUM         7
-        public enum BTreeProp{ 
-             FREE_PAGE_COUNT=0,
-		 SCHEMA_VERSION=1,
-		 FILE_FORMAT=2,
-		 DEFAULT_CACHE_SIZE=3,
-		 LARGEST_ROOT_PAGE=4,
-		 TEXT_ENCODING=5,
-		 USER_VERSION=6,
-		 INCR_VACUUM=7
-        }
-        const int BTREE_FREE_PAGE_COUNT = 0;
-		const int BTREE_SCHEMA_VERSION=1;
-		const int BTREE_FILE_FORMAT=2;
-		const int BTREE_DEFAULT_CACHE_SIZE=3;
-		const int BTREE_LARGEST_ROOT_PAGE=4;
-		const int BTREE_TEXT_ENCODING=5;
-		const int BTREE_USER_VERSION=6;
-		const int BTREE_INCR_VACUUM=7;
+		
 		//int sqlite3BtreeCursor(
 		//  Btree*,                              /* BTree containing table to open */
 		//  int iTable,                          /* Index of root page */
