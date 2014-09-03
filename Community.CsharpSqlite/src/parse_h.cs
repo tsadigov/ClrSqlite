@@ -321,6 +321,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				}
 				set {
 					_sNameToken=value;
+                    if (null != _sNameToken)
 					Log.WriteHeader("Parse name : "+_sNameToken.Text);
 				}
 			}

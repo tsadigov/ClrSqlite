@@ -27,7 +27,21 @@ namespace Community.CsharpSqlite
     {
 
 
-
+        ///<summary>
+        /// A hash table for function definitions.
+        ///
+        /// Hash each FuncDef structure into one of the FuncDefHash.a[] slots.
+        /// Collisions are on the FuncDef.pHash chain.
+        ///
+        ///</summary>
+        public class FuncDefHash
+        {
+            public FuncDef[] a = new FuncDef[23];
+            ///
+            ///<summary>
+            ///Hash table for functions 
+            ///</summary>
+        };
 
         ///<summary>
         ///Each SQL function is defined by an instance of the following

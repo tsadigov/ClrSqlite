@@ -4779,13 +4779,10 @@ MemSetTypeFlag(pOut, MEM_Int);
 								zIdx = szHdr;
 								// zData[szHdr];
 								///
-///<summary>
 ///Scan the header and use it to fill in the aType[] and aOffset[]
-///</summary>
-///<param name="arrays.  aType[i] will contain the type integer for the i">th</param>
-///<param name="column and aOffset[i] will contain the offset from the beginning">column and aOffset[i] will contain the offset from the beginning</param>
-///<param name="of the record to the start of the data for the i">th column</param>
-///<param name=""></param>
+///arrays.  aType[i] will contain the type integer for the i'th
+///column and aOffset[i] will contain the offset from the beginning
+///of the record to the start of the data for the i"th column
 
 								for (i = 0; i < nField; i++) {
 									if (zIdx < zEndHdr) {
@@ -4971,11 +4968,9 @@ MemSetTypeFlag(pOut, MEM_Int);
 ///</summary>
 
 						case OpCode.OP_MakeRecord: {
-							byte[] zNewRecord;
-							///
-///<summary>
-///A buffer to hold the data for the new record 
-///</summary>
+                            ///A buffer to hold the data for the new record 
+
+                            byte[] zNewRecord;
 
 							Mem pRec;
 							///

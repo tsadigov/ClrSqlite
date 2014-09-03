@@ -142,6 +142,10 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			public int eState;
+            public BtCursorState State {
+                get { return (BtCursorState)eState; }
+                set { eState = (int)value; }
+            }
 
 			///
 ///<summary>
@@ -398,5 +402,53 @@ aOverflow= null;
 				return this.cachedRowid;
 			}
 		}
-	}
+
+
+        ///
+        ///<summary>
+        ///Potential values for BtCursor.eState.
+        ///
+        ///CURSOR_VALID:
+        ///VdbeCursor points to a valid entry. getPayload() etc. may be called.
+        ///
+        ///CURSOR_INVALID:
+        ///VdbeCursor does not point to a valid entry. This can happen (for example)
+        ///because the table is empty or because BtreeCursorFirst() has not been
+        ///called.
+        ///
+        ///CURSOR_REQUIRESEEK:
+        ///The table that this cursor was opened on still exists, but has been
+        ///modified since the cursor was last used. The cursor position is saved
+        ///in variables BtCursor.pKey and BtCursor.nKey. When a cursor is in
+        ///this state, restoreCursorPosition() can be called to attempt to
+        ///seek the cursor to the saved position.
+        ///
+        ///CURSOR_FAULT:
+        ///A unrecoverable error (an I/O error or a malloc failure) has occurred
+        ///on a different connection that shares the BtShared cache with this
+        ///cursor.  The error has left the cache in an inconsistent state.
+        ///Do nothing else with this cursor.  Any attempt to use the cursor
+        ///should return the error code stored in BtCursor.skip
+        ///
+        ///</summary>
+
+        public enum BtCursorState { 
+            CURSOR_INVALID = 0,
+
+            CURSOR_VALID = 1,
+
+            CURSOR_REQUIRESEEK = 2,
+
+            CURSOR_FAULT = 3
+
+        }
+        const int CURSOR_INVALID = 0;
+
+        const int CURSOR_VALID = 1;
+
+        const int CURSOR_REQUIRESEEK = 2;
+
+        const int CURSOR_FAULT = 3;
+
+    }
 }

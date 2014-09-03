@@ -223,7 +223,17 @@ public u64 cycles;         /* Total time spend executing this instruction */
 		{
 			String str = null;
 			switch (OpCode) {
-			case OpCode.OP_Goto:
+                case OpCode.OP_MakeRecord:
+            
+                    break;
+			
+                case OpCode.OP_Column:
+                    break;
+
+                case OpCode.OP_Insert:
+                    break;
+
+                case OpCode.OP_Goto:
 				str = p2.ToString ();
 				break;
 			case OpCode.OP_Integer:

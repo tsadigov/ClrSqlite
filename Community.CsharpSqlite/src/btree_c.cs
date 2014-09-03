@@ -2346,7 +2346,7 @@ static int countWriteCursors( BtShared pBt )
 			for(p=pBtree.pBt.pCursor;p!=null;p=p.pNext) {
 				int i;
 				p.sqlite3BtreeClearCursor();
-				p.eState=CURSOR_FAULT;
+				p.State=BtCursorState.CURSOR_FAULT;
 				p.skipNext=errCode;
 				for(i=0;i<=p.iPage;i++) {
 					releasePage(p.apPage[i]);
@@ -2592,7 +2592,7 @@ sqlite3BtreeTripAllCursors(p, rc);
 				pCur.pNext.pPrev=pCur;
 			}
 			pBt.pCursor=pCur;
-			pCur.eState=CURSOR_INVALID;
+            pCur.State = BtCursorState.CURSOR_INVALID;
 			pCur.cachedRowid=0;
 			return SQLITE_OK;
 		}
@@ -2769,8 +2769,9 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
 		///</summary>
 		static int sqlite3BtreeKeySize(BtCursor pCur,ref i64 pSize) {
 			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pCur.eState==CURSOR_INVALID||pCur.eState==CURSOR_VALID);
-			if(pCur.eState!=CURSOR_VALID) {
+            Debug.Assert(pCur.State == BtCursorState.CURSOR_INVALID || pCur.State == BtCursorState.CURSOR_VALID);
+            if (pCur.State != BtCursorState.CURSOR_VALID)
+            {
 				pSize=0;
 			}
 			else {
@@ -2794,7 +2795,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
 		///<param name="to return an integer result code for historical reasons.">to return an integer result code for historical reasons.</param>
 		static int sqlite3BtreeDataSize(BtCursor pCur,ref u32 pSize) {
 			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pCur.eState==CURSOR_VALID);
+            Debug.Assert(pCur.State == BtCursorState.CURSOR_VALID);
 			getCellInfo(pCur);
 			pSize=pCur.info.nData;
 			return SQLITE_OK;
@@ -3033,7 +3034,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
 			///Btree this cursor belongs to 
 			///</summary>
 			Debug.Assert(pPage!=null);
-			Debug.Assert(pCur.eState==CURSOR_VALID);
+            Debug.Assert(pCur.State == BtCursorState.CURSOR_VALID);
 			Debug.Assert(pCur.aiIdx[pCur.iPage]<pPage.nCell);
 			Debug.Assert(pCur.cursorHoldsMutex());
 			getCellInfo(pCur);
@@ -3175,7 +3176,7 @@ nextPage = pCur.aOverflow[iIdx+1];
 		///</summary>
 		static int sqlite3BtreeKey(BtCursor pCur,u32 offset,u32 amt,byte[] pBuf) {
 			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pCur.eState==CURSOR_VALID);
+            Debug.Assert(pCur.State == BtCursorState.CURSOR_VALID);
 			Debug.Assert(pCur.iPage>=0&&pCur.apPage[pCur.iPage]!=null);
 			Debug.Assert(pCur.aiIdx[pCur.iPage]<pCur.apPage[pCur.iPage].nCell);
 			return accessPayload(pCur,offset,amt,pBuf,0);
@@ -3193,14 +3194,14 @@ nextPage = pCur.aOverflow[iIdx+1];
 		static int sqlite3BtreeData(BtCursor pCur,u32 offset,u32 amt,byte[] pBuf) {
 			int rc;
 			#if !SQLITE_OMIT_INCRBLOB
-																																																																								if ( pCur.eState==CURSOR_INVALID ){
+																																																																								if ( pCur.State==BtCursorState.CURSOR_INVALID ){
 return SQLITE_ABORT;
 }
 #endif
 			Debug.Assert(pCur.cursorHoldsMutex());
 			rc=pCur.restoreCursorPosition();
 			if(rc==SQLITE_OK) {
-				Debug.Assert(pCur.eState==CURSOR_VALID);
+                Debug.Assert(pCur.State == BtCursorState.CURSOR_VALID);
 				Debug.Assert(pCur.iPage>=0&&pCur.apPage[pCur.iPage]!=null);
 				Debug.Assert(pCur.aiIdx[pCur.iPage]<pCur.apPage[pCur.iPage].nCell);
 				rc=accessPayload(pCur,offset,amt,pBuf,0);
@@ -3249,7 +3250,7 @@ return SQLITE_ABORT;
 			u32 nKey;
 			u32 nLocal;
 			Debug.Assert(pCur!=null&&pCur.iPage>=0&&pCur.apPage[pCur.iPage]!=null);
-			Debug.Assert(pCur.eState==CURSOR_VALID);
+            Debug.Assert(pCur.State == BtCursorState.CURSOR_VALID);
 			Debug.Assert(pCur.cursorHoldsMutex());
 			outOffset=-1;
 			pPage=pCur.apPage[pCur.iPage];
@@ -3300,7 +3301,7 @@ return SQLITE_ABORT;
 			byte[] p=null;
 			Debug.Assert(sqlite3_mutex_held(pCur.pBtree.db.mutex));
 			Debug.Assert(pCur.cursorHoldsMutex());
-			if(ALWAYS(pCur.eState==CURSOR_VALID)) {
+			if(ALWAYS(pCur.State==BtCursorState.CURSOR_VALID)) {
 				p=fetchPayload(pCur,ref pAmt,ref outOffset,false);
 			}
 			return p;
@@ -3309,7 +3310,8 @@ return SQLITE_ABORT;
 			byte[] p=null;
 			Debug.Assert(sqlite3_mutex_held(pCur.pBtree.db.mutex));
 			Debug.Assert(pCur.cursorHoldsMutex());
-			if(ALWAYS(pCur.eState==CURSOR_VALID)) {
+            if (ALWAYS(pCur.State == BtCursorState.CURSOR_VALID))
+            {
 				p=fetchPayload(pCur,ref pAmt,ref outOffset,true);
 			}
 			return p;
@@ -3330,7 +3332,7 @@ return SQLITE_ABORT;
 			MemPage pNewPage=new MemPage();
 			BtShared pBt=pCur.pBt;
 			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pCur.eState==CURSOR_VALID);
+            Debug.Assert(pCur.State == BtCursorState.CURSOR_VALID);
 			Debug.Assert(pCur.iPage<BTCURSOR_MAX_DEPTH);
 			if(pCur.iPage>=(BTCURSOR_MAX_DEPTH-1)) {
 				return SQLITE_CORRUPT_BKPT();
@@ -3381,7 +3383,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 		///<param name="the largest cell index.">the largest cell index.</param>
 		static void moveToParent(BtCursor pCur) {
 			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pCur.eState==CURSOR_VALID);
+			Debug.Assert(pCur.State==BtCursorState.CURSOR_VALID);
 			Debug.Assert(pCur.iPage>0);
 			Debug.Assert(pCur.apPage[pCur.iPage]!=null);
 			pCur.apPage[pCur.iPage-1].assertParentIndex(pCur.aiIdx[pCur.iPage-1],pCur.apPage[pCur.iPage].pgno);
@@ -3422,7 +3424,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			Debug.Assert(CURSOR_VALID<CURSOR_REQUIRESEEK);
 			Debug.Assert(CURSOR_FAULT>CURSOR_REQUIRESEEK);
 			if(pCur.eState>=CURSOR_REQUIRESEEK) {
-				if(pCur.eState==CURSOR_FAULT) {
+				if(pCur.State==BtCursorState.CURSOR_FAULT) {
 					Debug.Assert(pCur.skipNext!=SQLITE_OK);
 					return pCur.skipNext;
 				}
@@ -3438,7 +3440,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			else {
 				rc=getAndInitPage(pBt,pCur.pgnoRoot,ref pCur.apPage[0]);
 				if(rc!=SQLITE_OK) {
-					pCur.eState=CURSOR_INVALID;
+					pCur.State=BtCursorState.CURSOR_INVALID;
 					return rc;
 				}
 				pCur.iPage=0;
@@ -3475,11 +3477,11 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 				if(pRoot.pgno!=1)
 					return SQLITE_CORRUPT_BKPT();
 				subpage=Converter.sqlite3Get4byte(pRoot.aData,pRoot.hdrOffset+8);
-				pCur.eState=CURSOR_VALID;
+				pCur.State=BtCursorState.CURSOR_VALID;
 				rc=moveToChild(pCur,subpage);
 			}
 			else {
-				pCur.eState=((pRoot.nCell>0)?CURSOR_VALID:CURSOR_INVALID);
+				pCur.State=((pRoot.nCell>0)?BtCursorState.CURSOR_VALID:BtCursorState.CURSOR_INVALID);
 			}
 			return rc;
 		}
@@ -3496,7 +3498,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			int rc=SQLITE_OK;
 			MemPage pPage;
 			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pCur.eState==CURSOR_VALID);
+			Debug.Assert(pCur.State==BtCursorState.CURSOR_VALID);
 			while(rc==SQLITE_OK&&0==(pPage=pCur.apPage[pCur.iPage]).leaf) {
 				Debug.Assert(pCur.aiIdx[pCur.iPage]<pPage.nCell);
 				pgno=Converter.sqlite3Get4byte(pPage.aData,pPage.findCell(pCur.aiIdx[pCur.iPage]));
@@ -3520,7 +3522,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			int rc=SQLITE_OK;
 			MemPage pPage=null;
 			Debug.Assert(pCur.cursorHoldsMutex());
-			Debug.Assert(pCur.eState==CURSOR_VALID);
+			Debug.Assert(pCur.State==BtCursorState.CURSOR_VALID);
 			while(rc==SQLITE_OK&&0==(pPage=pCur.apPage[pCur.iPage]).leaf) {
 				pgno=Converter.sqlite3Get4byte(pPage.aData,pPage.hdrOffset+8);
 				pCur.aiIdx[pCur.iPage]=pPage.nCell;
@@ -3545,7 +3547,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			Debug.Assert(sqlite3_mutex_held(pCur.pBtree.db.mutex));
 			rc=moveToRoot(pCur);
 			if(rc==SQLITE_OK) {
-				if(pCur.eState==CURSOR_INVALID) {
+				if(pCur.State==BtCursorState.CURSOR_INVALID) {
 					Debug.Assert(pCur.apPage[pCur.iPage].nCell==0);
 					pRes=1;
 				}
@@ -3571,7 +3573,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			///<summary>
 			///</summary>
 			///<param name="If the cursor already points to the last entry, this is a no">op. </param>
-			if(CURSOR_VALID==pCur.eState&&pCur.atLast!=0) {
+			if(BtCursorState.CURSOR_VALID==pCur.State&&pCur.atLast!=0) {
 				#if SQLITE_DEBUG
 																																																																																																    /* This block serves to Debug.Assert() that the cursor really does point
 ** to the last entry in the b-tree. */
@@ -3587,12 +3589,12 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			}
 			rc=moveToRoot(pCur);
 			if(rc==SQLITE_OK) {
-				if(CURSOR_INVALID==pCur.eState) {
+				if(BtCursorState.CURSOR_INVALID==pCur.State) {
 					Debug.Assert(pCur.apPage[pCur.iPage].nCell==0);
 					pRes=1;
 				}
 				else {
-					Debug.Assert(pCur.eState==CURSOR_VALID);
+					Debug.Assert(pCur.State==BtCursorState.CURSOR_VALID);
 					pRes=0;
 					rc=moveToRightmost(pCur);
 					pCur.atLast=(u8)(rc==SQLITE_OK?1:0);
@@ -3661,7 +3663,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			///If the cursor is already positioned at the point we are trying
 			///to move to, then just return without doing any work 
 			///</summary>
-			if(pCur.eState==CURSOR_VALID&&pCur.validNKey&&pCur.apPage[0].intKey!=0) {
+			if(pCur.State==BtCursorState.CURSOR_VALID&&pCur.validNKey&&pCur.apPage[0].intKey!=0) {
 				if(pCur.info.nKey==intKey) {
 					pRes=0;
 					return SQLITE_OK;
@@ -3677,8 +3679,8 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			}
 			Debug.Assert(pCur.apPage[pCur.iPage]!=null);
 			Debug.Assert(pCur.apPage[pCur.iPage].isInit!=0);
-			Debug.Assert(pCur.apPage[pCur.iPage].nCell>0||pCur.eState==CURSOR_INVALID);
-			if(pCur.eState==CURSOR_INVALID) {
+			Debug.Assert(pCur.apPage[pCur.iPage].nCell>0||pCur.State==BtCursorState.CURSOR_INVALID);
+			if(pCur.State==BtCursorState.CURSOR_INVALID) {
 				pRes=-1;
 				Debug.Assert(pCur.apPage[pCur.iPage].nCell==0);
 				return SQLITE_OK;
@@ -3872,7 +3874,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			///as well as the boolean result value.
 			///
 			///</summary>
-			return (CURSOR_VALID!=pCur.eState);
+            return (BtCursorState.CURSOR_VALID != pCur.State);
 		}
 		///
 		///<summary>
@@ -3919,7 +3921,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 				do {
 					if(pCur.iPage==0) {
 						pRes=1;
-						pCur.eState=CURSOR_INVALID;
+						pCur.State=BtCursorState.CURSOR_INVALID;
 						return SQLITE_OK;
 					}
 					moveToParent(pCur);
@@ -3981,7 +3983,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
 			else {
 				while(pCur.aiIdx[pCur.iPage]==0) {
 					if(pCur.iPage==0) {
-						pCur.eState=CURSOR_INVALID;
+						pCur.State=BtCursorState.CURSOR_INVALID;
 						pRes=1;
 						return SQLITE_OK;
 					}
@@ -4923,7 +4925,7 @@ return 1;
 			BtShared pBt=p.pBt;
 			int oldCell;
 			byte[] newCell=null;
-			if(pCur.eState==CURSOR_FAULT) {
+			if(pCur.State==BtCursorState.CURSOR_FAULT) {
 				Debug.Assert(pCur.skipNext!=SQLITE_OK);
 				return pCur.skipNext;
 			}
@@ -4970,7 +4972,7 @@ return 1;
 				if(rc!=0)
 					return rc;
 			}
-			Debug.Assert(pCur.eState==CURSOR_VALID||(pCur.eState==CURSOR_INVALID&&loc!=0));
+			Debug.Assert(pCur.State==BtCursorState.CURSOR_VALID||(pCur.State==BtCursorState.CURSOR_INVALID&&loc!=0));
 			pPage=pCur.apPage[pCur.iPage];
 			Debug.Assert(pPage.intKey!=0||nKey>=0);
 			Debug.Assert(pPage.leaf!=0||0==pPage.intKey);
@@ -5051,7 +5053,7 @@ return 1;
 				///from trying to save the current position of the cursor.  
 				///</summary>
 				pCur.apPage[pCur.iPage].nOverflow=0;
-				pCur.eState=CURSOR_INVALID;
+				pCur.State=BtCursorState.CURSOR_INVALID;
 			}
 			Debug.Assert(pCur.apPage[pCur.iPage].nOverflow==0);
 			end_insert:

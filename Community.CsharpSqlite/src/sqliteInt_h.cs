@@ -890,20 +890,7 @@ void *sqlite3_wsd_find(void *K, int L);
 		///</summary>
 		};
 
-		///<summary>
-		/// A hash table for function definitions.
-		///
-		/// Hash each FuncDef structure into one of the FuncDefHash.a[] slots.
-		/// Collisions are on the FuncDef.pHash chain.
-		///
-		///</summary>
-		public class FuncDefHash {
-			public FuncDef[] a=new FuncDef[23];
-		///
-		///<summary>
-		///Hash table for functions 
-		///</summary>
-		};
+		
 
 		///<summary>
 		/// A macro to discover the encoding of a database.
@@ -1498,26 +1485,7 @@ void *sqlite3_wsd_find(void *K, int L);
 		//#define ExprSetProperty(E,P)     (E)->flags|=(P)
 		//#define ExprClearProperty(E,P)   (E)->flags&=~(P)
 		///
-		///<summary>
-		///Macros to determine the number of bytes required by a normal Expr
-		///struct, an Expr struct with the EP_Reduced flag set in Expr.flags
-		///and an Expr struct with the EP_TokenOnly flag set.
-		///
-		///</summary>
-		//#define EXPR_FULLSIZE           sizeof(Expr)           /* Full size */
-		//#define EXPR_REDUCEDSIZE        offsetof(Expr,iTable)  /* Common features */
-		//#define EXPR_TOKENONLYSIZE      offsetof(Expr,pLeft)   /* Fewer features */
-		// We don't use these in C#, but define them anyway,
-		private const int EXPR_FULLSIZE=48;
-		private const int EXPR_REDUCEDSIZE=24;
-		private const int EXPR_TOKENONLYSIZE=8;
-		///<summary>
-		/// Flags passed to the sqlite3ExprDup() function. See the header comment
-		/// above sqlite3ExprDup() for details.
-		///
-		///</summary>
-		//#define EXPRDUP_REDUCE         0x0001  /* Used reduced-size Expr nodes */
-		private const int EXPRDUP_REDUCE=0x0001;
+		
 		
 		///
 		///<summary>
