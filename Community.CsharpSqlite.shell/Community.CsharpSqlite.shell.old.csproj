@@ -308,6 +308,7 @@
     <Compile Include="src\BitvecExtensions.cs" />
     <Compile Include="src\BtreeExtensions.cs" />
     <Compile Include="src\ExprExtensions.cs" />
+    <Compile Include="src\Mem.cs" />
     <Compile Include="src\MyHelpers.cs" />
     <Compile Include="src\shell.cs" />
     <Compile Include="src\Sqlite3_backup.cs" />
