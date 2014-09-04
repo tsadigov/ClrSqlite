@@ -4402,41 +4402,24 @@ MemSetTypeFlag(pOut, MEM_Int);
 ///<param name=""></param>
 
 						case OpCode.OP_Column: {
-							u32 payloadSize;
-							///
-///<summary>
-///Number of bytes in the record 
-///</summary>
 
-							i64 payloadSize64;
-							///
-///<summary>
-///Number of bytes in the record 
-///</summary>
+                            ///Number of bytes in the record 
+                            u32 payloadSize;
 
-							int p1;
-							///
-///<summary>
-///P1 value of the opcode 
-///</summary>
+                            ///Number of bytes in the record 
+                            i64 payloadSize64;
 
-							int p2;
-							///
-///<summary>
-///column number to retrieve 
-///</summary>
+                            ///P1 value of the opcode 
+                            int p1;
 
-							VdbeCursor pC;
-							///
-///<summary>
-///The VDBE cursor 
-///</summary>
+                            ///column number to retrieve 
+                            int p2;
 
-							byte[] zRec;
-							///
-///<summary>
-///</summary>
-///<param name="Pointer to complete record">data </param>
+                            ///The VDBE cursor 
+                            VdbeCursor pC;
+
+                            ///Pointer to complete record
+                            byte[] zRec;
 
 							BtCursor pCrsr;
 							///
@@ -4689,7 +4672,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 										zData = sqlite3BtreeKeyFetch (pCrsr, ref avail, ref pC.aRow);
 									}
 									else {
-										zData = sqlite3BtreeDataFetch (pCrsr, ref avail, ref pC.aRow);
+										zData = DataFetch (pCrsr, ref avail, ref pC.aRow);
 									}
 									///
 ///<summary>

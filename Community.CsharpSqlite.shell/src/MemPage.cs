@@ -3405,6 +3405,14 @@ ptrmapCheckPages(pParent, 1);
 				return SQLITE_OK;
 			}
 
+  /*
+** Given a btree page and a cell index (0 means the first cell on
+** the page, 1 means the second cell, and so forth) return a pointer
+** to the cell content.
+**
+** This routine works only for pages that do not contain overflow cells.
+*/
+
 			public int findCell (int iCell)
 			{
 				return get2byte (this.aData, this.cellOffset + 2 * (iCell));

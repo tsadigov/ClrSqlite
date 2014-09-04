@@ -123,7 +123,7 @@ namespace Community.CsharpSqlite {
 		#else
 																																																//define exprSetHeight(y)
 #endif
-		///<summary>
+        ///<summary>sqlite3ExprAlloc
 		/// This routine is the core allocator for Expr nodes.
 		///
 		/// Construct a new expression node and return a pointer to it.  Memory
@@ -143,7 +143,7 @@ namespace Community.CsharpSqlite {
 		/// into u.iValue and the EP_IntValue flag is set.  No extra storage
 		/// is allocated to hold the integer text and the dequote flag is ignored.
 		///</summary>
-		static Expr sqlite3ExprAlloc(sqlite3 db,///
+		static Expr CreateExpr(sqlite3 db,///
 		///<summary>
 		///Handle for sqlite3DbMallocZero() (may be null) 
 		///</summary>
@@ -155,7 +155,7 @@ namespace Community.CsharpSqlite {
 		///<summary>
 		///Token argument.  Might be NULL 
 		///</summary>
-		int dequote///
+		bool dequote///
 		///<summary>
 		///True to dequote 
 		///</summary>
@@ -171,13 +171,14 @@ namespace Community.CsharpSqlite {
 				}
 			}
 			pNew=new Expr();
+            pNew.token = pToken;
 			//sqlite3DbMallocZero(db, sizeof(Expr)+nExtra);
 			if(pNew!=null) {
 				pNew.Operator=p_operator;
 				pNew.iAgg=-1;
 				if(pToken!=null) {
 					if(nExtra==0) {
-						pNew.flags|=EP_IntValue;
+                        pNew.Flags |= ExprFlags.EP_IntValue;
 						pNew.u.iValue=iValue;
 					}
 					else {
@@ -190,14 +191,14 @@ namespace Community.CsharpSqlite {
 							if(pToken.Length==0&&pToken.zRestSql=="")
 								pNew.u.zToken="";
 						//pNew.u.zToken[pToken.n] = 0;
-						if(dequote!=0&&nExtra>=3&&((c=pToken.zRestSql[0])=='\''||c=='"'||c=='['||c=='`')) {
+						if(dequote&&nExtra>=3&&((c=pToken.zRestSql[0])=='\''||c=='"'||c=='['||c=='`')) {
 							#if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
 																																																																																																																																																																								StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
 #else
 							StringExtensions.sqlite3Dequote(ref pNew.u.zToken);
 							#endif
 							if(c=='"')
-								pNew.flags|=EP_DblQuoted;
+                                pNew.Flags |= ExprFlags.EP_DblQuoted;
 						}
 					}
 				}
@@ -228,7 +229,7 @@ namespace Community.CsharpSqlite {
 			Token x=new Token();
 			x.zRestSql=zToken;
 			x.Length=!String.IsNullOrEmpty(zToken)?StringExtensions.sqlite3Strlen30(zToken):0;
-			return sqlite3ExprAlloc(db,op,x,0);
+			return CreateExpr(db,op,x,false);
 		}
 		///
 		///<summary>
@@ -247,15 +248,17 @@ namespace Community.CsharpSqlite {
 			else {
 				if(pRight!=null) {
 					pRoot.pRight=pRight;
-					if((pRight.flags&EP_ExpCollate)!=0) {
-						pRoot.flags|=EP_ExpCollate;
+                    if ((pRight.Flags & ExprFlags.EP_ExpCollate) != 0)
+                    {
+                        pRoot.Flags |= ExprFlags.EP_ExpCollate;
 						pRoot.pColl=pRight.pColl;
 					}
 				}
 				if(pLeft!=null) {
 					pRoot.pLeft=pLeft;
-					if((pLeft.flags&EP_ExpCollate)!=0) {
-						pRoot.flags|=EP_ExpCollate;
+                    if ((pLeft.Flags & ExprFlags.EP_ExpCollate) != 0)
+                    {
+                        pRoot.Flags |= ExprFlags.EP_ExpCollate;
 						pRoot.pColl=pLeft.pColl;
 					}
 				}
@@ -286,7 +289,7 @@ namespace Community.CsharpSqlite {
 					return pLeft;
 				}
 				else {
-					Expr pNew=sqlite3ExprAlloc(db,TK_AND,null,0);
+					Expr pNew=CreateExpr(db,TK_AND,null,false);
 					sqlite3ExprAttachSubtrees(db,pNew,pLeft,pRight);
 					return pNew;
 				}
@@ -378,7 +381,7 @@ namespace Community.CsharpSqlite {
 			if(p!=null) {
 				bool isReduced=(flags&EXPRDUP_REDUCE)!=0;
 				Expr zAlloc=new Expr();
-				u32 staticFlag=0;
+                ExprFlags staticFlag = 0;
 				Debug.Assert(pzBuffer==null||isReduced);
 				///
 				///<summary>
@@ -429,10 +432,10 @@ namespace Community.CsharpSqlite {
 					///Set the EP_Reduced, EP_TokenOnly, and EP_Static flags appropriately. 
 					///</summary>
 					unchecked {
-						pNew.flags&=(ushort)(~(EP_Reduced|EP_TokenOnly|EP_Static));
+                        pNew.Flags &= (~(ExprFlags.EP_Reduced | ExprFlags.EP_TokenOnly | ExprFlags.EP_Static));
 					}
-					pNew.flags|=(ushort)(nStructSize&(EP_Reduced|EP_TokenOnly));
-					pNew.flags|=(ushort)staticFlag;
+                    pNew.Flags |= ((ExprFlags)nStructSize & (ExprFlags.EP_Reduced | ExprFlags.EP_TokenOnly));
+					pNew.Flags|=staticFlag;
 					///
 					///<summary>
 					///</summary>
@@ -443,7 +446,8 @@ namespace Community.CsharpSqlite {
 						zToken=p.u.zToken.Substring(0,nToken);
 						// memcpy( zToken, p.u.zToken, nToken );
 					}
-					if(0==((p.flags|pNew.flags)&EP_TokenOnly)) {
+                    if (0 == ((p.Flags | pNew.Flags) & ExprFlags.EP_TokenOnly))
+                    {
 						///
 						///<summary>
 						///Fill in the pNew.x.pSelect or pNew.x.pList member. 
@@ -1282,7 +1286,7 @@ return null;
 						//, pItem++){
 						pItem=pList.a[pList.nExpr-i];
 						if(ALWAYS(pItem.pExpr!=null))
-							pItem.pExpr.flags|=EP_FixedDest;
+                            pItem.pExpr.Flags |= ExprFlags.EP_FixedDest;
 					}
 				}
 				break;
@@ -1389,7 +1393,7 @@ return null;
 			if(pA.ExprHasProperty(EP_xIsSelect)||pB.ExprHasProperty(EP_xIsSelect)) {
 				return 2;
 			}
-			if((pA.flags&EP_Distinct)!=(pB.flags&EP_Distinct))
+            if ((pA.Flags & ExprFlags.EP_Distinct) != (pB.Flags & ExprFlags.EP_Distinct))
 				return 2;
 			if(pA.Operator!=pB.Operator)
 				return 2;
@@ -1414,9 +1418,9 @@ return null;
 						return 2;
 					}
 				}
-			if((pA.flags&EP_ExpCollate)!=(pB.flags&EP_ExpCollate))
+            if ((pA.Flags & ExprFlags.EP_ExpCollate) != (pB.Flags & ExprFlags.EP_ExpCollate))
 				return 1;
-			if((pA.flags&EP_ExpCollate)!=0&&pA.pColl!=pB.pColl)
+            if ((pA.Flags & ExprFlags.EP_ExpCollate) != 0 && pA.pColl != pB.pColl)
 				return 2;
 			return 0;
 		}
@@ -1614,7 +1618,8 @@ return null;
 							pItem.iMem=++pParse.nMem;
 							Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
 							pItem.pFunc=sqlite3FindFunction(pParse.db,pExpr.u.zToken,StringExtensions.sqlite3Strlen30(pExpr.u.zToken),pExpr.x.pList!=null?pExpr.x.pList.nExpr:0,enc,0);
-							if((pExpr.flags&EP_Distinct)!=0) {
+                            if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)
+                            {
 								pItem.iDistinct=pParse.nTab++;
 							}
 							else {

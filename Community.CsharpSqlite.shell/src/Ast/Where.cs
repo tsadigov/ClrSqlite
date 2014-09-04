@@ -1368,7 +1368,7 @@ namespace Community.CsharpSqlite {
 					}
 					pE=pTerm.pExpr;
 					Debug.Assert(pE!=null);
-					if(pLevel.iLeftJoin!=0&&!((pE.flags&EP_FromJoin)==EP_FromJoin))// !ExprHasProperty(pE, EP_FromJoin) ){
+                    if (pLevel.iLeftJoin != 0 && !((pE.Flags & ExprFlags.EP_FromJoin) == ExprFlags.EP_FromJoin))// !ExprHasProperty(pE, EP_FromJoin) ){
 					 {
 						continue;
 					}

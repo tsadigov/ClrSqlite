@@ -106,7 +106,7 @@ using yDbMask = System.Int64;
 			///<summary>
 			///Number of aTempReg[] currently checked out 
 			///</summary>
-			public int[] aTempReg;
+            public int[] aTempReg { get;set; }
 			///
 			///<summary>
 			///Holding area for temporary registers 
@@ -6710,12 +6710,14 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			public CollSeq sqlite3BinaryCompareCollSeq(Expr pLeft,Expr pRight) {
 				CollSeq pColl;
 				Debug.Assert(pLeft!=null);
-				if((pLeft.flags&EP_ExpCollate)!=0) {
+                if ((pLeft.Flags & ExprFlags.EP_ExpCollate) != 0)
+                {
 					Debug.Assert(pLeft.pColl!=null);
 					pColl=pLeft.pColl;
 				}
 				else
-					if(pRight!=null&&((pRight.flags&EP_ExpCollate)!=0)) {
+                    if (pRight != null && ((pRight.Flags & ExprFlags.EP_ExpCollate) != 0))
+                    {
 						Debug.Assert(pRight.pColl!=null);
 						pColl=pRight.pColl;
 					}
@@ -6821,7 +6823,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				//    Log.WriteLine(pToken.Length);
 				//    Log.WriteLine(pToken.zRestSql);
 				//}
-				Expr p=sqlite3ExprAlloc(this.db,op,pToken,1);
+				Expr p=CreateExpr(this.db,op,pToken,true);
 				sqlite3ExprAttachSubtrees(this.db,p,pLeft,pRight);
 				if(p!=null) {
 					this.sqlite3ExprCheckHeight(p.nHeight);
@@ -7466,7 +7468,8 @@ return;
 					///"glob(B,A).  We want to use the A in "A glob B" to test
 					///for function overloading.  But we use the B term in "glob(B,A)".
 					///</summary>
-					if(nFarg>=2&&(pExpr.flags&EP_InfixFunc)!=0) {
+                    if (nFarg >= 2 && (pExpr.Flags & ExprFlags.EP_InfixFunc) != 0)
+                    {
 						pDef=sqlite3VtabOverloadFunction(db,pDef,nFarg,pFarg.a[1].pExpr);
 					}
 					else
@@ -8391,7 +8394,7 @@ return;
 				Expr pNew;
 				sqlite3 db=this.db;
 				Debug.Assert(pToken!=null);
-				pNew=sqlite3ExprAlloc(db,TK_FUNCTION,pToken,1);
+				pNew=CreateExpr(db,TK_FUNCTION,pToken,true);
 				if(pNew==null) {
 					sqlite3ExprListDelete(db,ref pList);
 					///
@@ -8487,14 +8490,14 @@ return;
 				}
 			}
 			public void exprCommute(Expr pExpr) {
-				u16 expRight=(u16)(pExpr.pRight.flags&EP_ExpCollate);
-				u16 expLeft=(u16)(pExpr.pLeft.flags&EP_ExpCollate);
+                ExprFlags expRight = (pExpr.pRight.Flags & ExprFlags.EP_ExpCollate);
+                ExprFlags expLeft = (pExpr.pLeft.Flags & ExprFlags.EP_ExpCollate);
 				Debug.Assert(allowedOp(pExpr.op)&&pExpr.op!=TK_IN);
 				pExpr.pRight.pColl=this.sqlite3ExprCollSeq(pExpr.pRight);
 				pExpr.pLeft.pColl=this.sqlite3ExprCollSeq(pExpr.pLeft);
 				SWAP(ref pExpr.pRight.pColl,ref pExpr.pLeft.pColl);
-				pExpr.pRight.flags=(u16)((pExpr.pRight.flags&~EP_ExpCollate)|expLeft);
-				pExpr.pLeft.flags=(u16)((pExpr.pLeft.flags&~EP_ExpCollate)|expRight);
+                pExpr.pRight.Flags = ((pExpr.pRight.Flags & ~ExprFlags.EP_ExpCollate) | expLeft);
+                pExpr.pLeft.Flags = ((pExpr.pLeft.Flags & ~ExprFlags.EP_ExpCollate) | expRight);
 				SWAP(ref pExpr.pRight,ref pExpr.pLeft);
 				if(pExpr.op>=TK_GT) {
 					Debug.Assert(TK_LT==TK_GT+2);
@@ -12257,7 +12260,8 @@ range_est_fallback:
 			}
 			public void codeInteger(Expr pExpr,bool negFlag,int iMem) {
 				Vdbe v=this.pVdbe;
-				if((pExpr.flags&EP_IntValue)!=0) {
+                if ((pExpr.Flags & ExprFlags.EP_IntValue) != 0)
+                {
 					int i=pExpr.u.iValue;
 					Debug.Assert(i>=0);
 					if(negFlag)

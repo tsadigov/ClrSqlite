@@ -108,7 +108,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(iCol>=0&&iCol<pEList.nExpr);
 			pOrig=pEList.a[iCol].pExpr;
 			Debug.Assert(pOrig!=null);
-			Debug.Assert((pOrig.flags&EP_Resolved)!=0);
+			Debug.Assert((pOrig.Flags&ExprFlags.EP_Resolved)!=0);
 			db=pParse.db;
 			if(pOrig.Operator!=TokenType.TK_COLUMN&&(zType.Length==0||zType[0]!='G')) {
 				pDup=sqlite3ExprDup(db,pOrig,0);
@@ -134,14 +134,15 @@ namespace Community.CsharpSqlite {
 					pOrig.u.zToken=zToken;
 					if(pDup==null)
 						return;
-					Debug.Assert((pDup.flags&(EP_Reduced|EP_TokenOnly))==0);
+                    Debug.Assert((pDup.Flags & (ExprFlags.EP_Reduced | ExprFlags.EP_TokenOnly)) == 0);
 					pDup.flags2|=EP2_MallocedToken;
 					pDup.u.zToken=zToken;
 					// sqlite3DbStrDup( db, zToken );
 				}
-			if((pExpr.flags&EP_ExpCollate)!=0) {
+            if ((pExpr.Flags & ExprFlags.EP_ExpCollate) != 0)
+            {
 				pDup.pColl=pExpr.pColl;
-				pDup.flags|=EP_ExpCollate;
+                pDup.Flags |= ExprFlags.EP_ExpCollate;
 			}
 			///
 			///<summary>
@@ -575,7 +576,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static Expr sqlite3CreateColumnExpr(sqlite3 db,SrcList pSrc,int iSrc,int iCol) {
-			Expr p=sqlite3ExprAlloc(db,TK_COLUMN,null,0);
+			Expr p=CreateExpr(db,TK_COLUMN,null,false);
 			if(p!=null) {
 				SrcList_item pItem=pSrc.a[iSrc];
 				p.pTab=pItem.pTab;
@@ -1085,13 +1086,13 @@ return WRC_Prune;
 					}
 					if(iCol>0) {
 						CollSeq pColl=pE.pColl;
-						int flags=pE.flags&EP_ExpCollate;
+                        ExprFlags flags = pE.Flags & ExprFlags.EP_ExpCollate;
 						sqlite3ExprDelete(db,ref pE);
 						pItem.pExpr=pE=sqlite3Expr(db,TK_INTEGER,null);
 						if(pE==null)
 							return 1;
 						pE.pColl=pColl;
-						pE.flags=(u16)(pE.flags|EP_IntValue|flags);
+                        pE.Flags = (pE.Flags | ExprFlags.EP_IntValue | flags);
 						pE.u.iValue=iCol;
 						pItem.iCol=(u16)iCol;
 						pItem.done=1;
@@ -1500,7 +1501,7 @@ return WRC_Prune;
 					for(i=0;i<pGroupBy.nExpr;i++)//, pItem++)
 					 {
 						pItem=pGroupBy.a[i];
-						if((pItem.pExpr.flags&EP_Agg)!=0)//HasProperty(pItem.pExpr, EP_Agg) )
+                        if ((pItem.pExpr.Flags & ExprFlags.EP_Agg) != 0)//HasProperty(pItem.pExpr, EP_Agg) )
 						 {
 							sqlite3ErrorMsg(pParse,"aggregate functions are not allowed in "+"the GROUP BY clause");
 							return WRC_Abort;

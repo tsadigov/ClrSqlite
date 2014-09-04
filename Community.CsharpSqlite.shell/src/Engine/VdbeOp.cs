@@ -231,6 +231,16 @@ public u64 cycles;         /* Total time spend executing this instruction */
                     break;
 
                 case OpCode.OP_Insert:
+                    var pData = vdbe.aMem [p2];
+                    var pKey = vdbe.aMem [p3];
+                    str = pKey.u.i+"<<";
+                    if (null != pData.zBLOB)
+                    str+=String.Join(",",pData.zBLOB.Select(x=>"x"+x.ToString()).ToArray());// Converter.ToH(pData.zBLOB);
+                    break;
+
+                case OpCode.OP_Yield:
+                    var pIn1 = vdbe.aMem[p1];
+                    str = pIn1.u.i.ToString();
                     break;
 
                 case OpCode.OP_Goto:
@@ -280,7 +290,7 @@ public u64 cycles;         /* Total time spend executing this instruction */
 				}
 				break;
 			}
-			return OpCode.ToString () + " \t\t:\t " + str;
+			return OpCode.ToString () + " \t\t:\t " + str+Environment.NewLine;
 		}
 	}
 }

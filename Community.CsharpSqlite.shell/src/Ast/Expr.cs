@@ -152,6 +152,7 @@ set { _op = value; }
                 set
                 {
                     _op = value;
+                    //Console.WriteLine(":::"+value);
                 }
             }
             public u8 op
@@ -206,7 +207,15 @@ public int iValue;            /* Non-negative integer value if EP_IntValue */
                 ///</summary>
                 ///<param name="Non">negative integer value if EP_IntValue </param>
             }
-            public u16 flags;
+            public ExprFlags Flags{
+                get{
+                    return (ExprFlags)flags;
+                }
+                set {
+                    flags =(u16)value;
+                }
+            }
+            protected u16 flags;
             ///
             ///<summary>
             ///Various flags.  EP_* See below 
@@ -788,20 +797,20 @@ set { _op = value; }
             }
             public char sqlite3ExprAffinity()
             {
-                int op = this.op;
-                if (op == TK_SELECT)
+                var op = this.Operator;
+                if (op == TokenType.TK_SELECT)
                 {
                     Debug.Assert((this.flags & EP_xIsSelect) != 0);
                     return this.x.pSelect.pEList.a[0].pExpr.sqlite3ExprAffinity();
                 }
 #if !SQLITE_OMIT_CAST
-                if (op == TK_CAST)
+                if (op == TokenType.TK_CAST)
                 {
                     Debug.Assert(!this.ExprHasProperty(EP_IntValue));
                     return sqlite3AffinityType(this.u.zToken);
                 }
 #endif
-                if ((op == TK_AGG_COLUMN || op == TK_COLUMN || op == TK_REGISTER) && this.pTab != null)
+                if ((op == TokenType.TK_AGG_COLUMN || op == TokenType.TK_COLUMN || op == TokenType.TK_REGISTER) && this.pTab != null)
                 {
                     ///
                     ///<summary>
@@ -907,6 +916,8 @@ set { _op = value; }
             {
                 this.flags = (ushort)(this.flags & ~P);
             }
+
+            public Token token { get; set; }
         }
 
 
@@ -963,6 +974,39 @@ set { _op = value; }
         //#define EP_Reduced    0x1000  /* Expr struct is EXPR_REDUCEDSIZE bytes only */
         //#define EP_TokenOnly  0x2000  /* Expr struct is EXPR_TOKENONLYSIZE bytes only */
         //#define EP_Static     0x4000  /* Held in memory not obtained from malloc() */
+
+        public enum ExprFlags :ushort{
+            EP_FromJoin = 0x0001,
+
+            EP_Agg = 0x0002,
+
+            EP_Resolved = 0x0004,
+
+            EP_Error = 0x0008,
+
+            EP_Distinct = 0x0010,
+
+            EP_VarSelect = 0x0020,
+
+            EP_DblQuoted = 0x0040,
+
+            EP_InfixFunc = 0x0080,
+
+            EP_ExpCollate = 0x0100,
+
+            EP_FixedDest = 0x0200,
+
+            EP_IntValue = 0x0400,
+
+            EP_xIsSelect = 0x0800,
+
+            EP_Reduced = 0x1000,
+
+            EP_TokenOnly = 0x2000,
+
+            EP_Static = 0x4000
+
+        }
         private const ushort EP_FromJoin = 0x0001;
 
         private const ushort EP_Agg = 0x0002;
@@ -1227,6 +1271,34 @@ set { _op = value; }
                 this.zEnd = pRight.zEnd;
             }
 
+            public void spanUnaryPostfix(///
+                ///<summary>
+                ///Write the new expression node here 
+                ///</summary>
+
+            Parse pParse, ///
+                ///<summary>
+                ///Parsing context to record errors 
+                ///</summary>
+
+            OpCode op, ///
+                ///<summary>
+                ///The operator 
+                ///</summary>
+
+            ExprSpan pOperand, ///
+                ///<summary>
+                ///The operand 
+                ///</summary>
+
+            Token pPostOp///
+                ///<summary>
+                ///The operand token for setting the span 
+                ///</summary>
+
+            ) {
+                spanUnaryPostfix(pParse,(int)op,pOperand,pPostOp);
+            }
             public void spanUnaryPostfix(///
                 ///<summary>
                 ///Write the new expression node here 

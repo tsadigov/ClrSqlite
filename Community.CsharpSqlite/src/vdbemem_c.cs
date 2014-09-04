@@ -1384,7 +1384,7 @@ return SQLITE_NOMEM;
 				zData=sqlite3BtreeKeyFetch(pCur,ref available,ref outOffset);
 			}
 			else {
-				zData=sqlite3BtreeDataFetch(pCur,ref available,ref outOffset);
+				zData=DataFetch(pCur,ref available,ref outOffset);
 			}
 			Debug.Assert(zData!=null);
 			if(offset+amt<=available&&(pMem.flags&MEM_Dyn)==0) {

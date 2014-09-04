@@ -3306,7 +3306,7 @@ return SQLITE_ABORT;
 			}
 			return p;
 		}
-		static byte[] sqlite3BtreeDataFetch(BtCursor pCur,ref int pAmt,ref int outOffset) {
+		static byte[] DataFetch(BtCursor pCur,ref int pAmt,ref int outOffset) {
 			byte[] p=null;
 			Debug.Assert(sqlite3_mutex_held(pCur.pBtree.db.mutex));
 			Debug.Assert(pCur.cursorHoldsMutex());

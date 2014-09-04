@@ -3121,7 +3121,7 @@ break;
 						Expr pNew=sqlite3Expr(db,TK_INTEGER,null);
 						//if ( pNew == null )
 						//  return SQLITE_NOMEM;
-						pNew.flags|=EP_IntValue;
+                        pNew.Flags |= ExprFlags.EP_IntValue;
 						pNew.u.iValue=i;
 						pOrderBy=pParse.sqlite3ExprListAppend(pOrderBy,pNew);
 						pOrderBy.a[nOrderBy++].iCol=(u16)i;
@@ -3159,12 +3159,13 @@ break;
 					for(i=0;i<nOrderBy;i++) {
 						CollSeq pColl;
 						Expr pTerm=pOrderBy.a[i].pExpr;
-						if((pTerm.flags&EP_ExpCollate)!=0) {
+                        if ((pTerm.Flags & ExprFlags.EP_ExpCollate) != 0)
+                        {
 							pColl=pTerm.pColl;
 						}
 						else {
 							pColl=multiSelectCollSeq(pParse,p,aPermute[i]);
-							pTerm.flags|=EP_ExpCollate;
+                            pTerm.Flags |= ExprFlags.EP_ExpCollate;
 							pTerm.pColl=pColl;
 						}
 						pKeyMerge.aColl[i]=pColl;
@@ -4316,7 +4317,7 @@ break;
 				return null;
 			if((pAggInfo.aFunc[0].pFunc.flags&SQLITE_FUNC_COUNT)==0)
 				return null;
-			if((pExpr.flags&EP_Distinct)!=0)
+            if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)
 				return null;
 			return pTab;
 		}
