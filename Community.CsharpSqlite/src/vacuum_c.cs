@@ -51,7 +51,7 @@ namespace Community.CsharpSqlite {
 		static int execSql(sqlite3 db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
 			#if !NDEBUG
-																																																															      int rc;
+																																																																		      int rc;
       //VVA_ONLY( int rc; )
 #endif
 			if(zSql==null) {
@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 				return sqlite3_errcode(db);
 			}
 			#if !NDEBUG
-																																																															      rc = sqlite3_step( pStmt );
+																																																																		      rc = sqlite3_step( pStmt );
       //VVA_ONLY( rc = ) sqlite3_step(pStmt);
       Debug.Assert( rc != SQLITE_ROW );
 #else
@@ -236,7 +236,7 @@ namespace Community.CsharpSqlite {
 			///cause problems for the call to BtreeSetPageSize() below.  
 			///</summary>
 			sqlite3BtreeCommit(pTemp);
-			nRes=sqlite3BtreeGetReserve(pMain);
+			nRes=pMain.sqlite3BtreeGetReserve();
 			///
 			///<summary>
 			///A VACUUM cannot change the pagesize of an encrypted database. 
@@ -269,7 +269,7 @@ namespace Community.CsharpSqlite {
 				goto end_of_vacuum;
 			}
 			#if !SQLITE_OMIT_AUTOVACUUM
-			sqlite3BtreeSetAutoVacuum(pTemp,db.nextAutovac>=0?db.nextAutovac:sqlite3BtreeGetAutoVacuum(pMain));
+			pTemp.sqlite3BtreeSetAutoVacuum(db.nextAutovac>=0?db.nextAutovac:pMain.sqlite3BtreeGetAutoVacuum());
 			#endif
 			///
 			///<summary>
@@ -398,7 +398,7 @@ namespace Community.CsharpSqlite {
 				if(rc!=SQLITE_OK)
 					goto end_of_vacuum;
 				#if !SQLITE_OMIT_AUTOVACUUM
-				sqlite3BtreeSetAutoVacuum(pMain,sqlite3BtreeGetAutoVacuum(pTemp));
+				pMain.sqlite3BtreeSetAutoVacuum(pTemp.sqlite3BtreeGetAutoVacuum());
 				#endif
 				///
 				///<summary>

@@ -588,6 +588,62 @@ releasePage(pPage);
 				sqlite3BtreeLeave(this);
 				return rc;
 			}
+			public int sqlite3BtreeGetReserve() {
+				int n;
+				sqlite3BtreeEnter(this);
+				n=(int)(this.pBt.pageSize-this.pBt.usableSize);
+				sqlite3BtreeLeave(this);
+				return n;
+			}
+			public Pgno sqlite3BtreeMaxPageCount(int mxPage) {
+				Pgno n;
+				sqlite3BtreeEnter(this);
+				n=this.pBt.pPager.sqlite3PagerMaxPageCount(mxPage);
+				sqlite3BtreeLeave(this);
+				return n;
+			}
+			public int sqlite3BtreeSecureDelete(int newFlag) {
+				int b;
+				if(this==null)
+					return 0;
+				sqlite3BtreeEnter(this);
+				if(newFlag>=0) {
+					this.pBt.secureDelete=(newFlag!=0);
+				}
+				b=this.pBt.secureDelete?1:0;
+				sqlite3BtreeLeave(this);
+				return b;
+			}
+			public int sqlite3BtreeSetAutoVacuum(int autoVacuum) {
+				#if SQLITE_OMIT_AUTOVACUUM
+																																																																												return SQLITE_READONLY;
+#else
+				BtShared pBt=this.pBt;
+				int rc=SQLITE_OK;
+				u8 av=(u8)autoVacuum;
+				sqlite3BtreeEnter(this);
+				if(pBt.pageSizeFixed&&(av!=0)!=pBt.autoVacuum) {
+					rc=SQLITE_READONLY;
+				}
+				else {
+					pBt.autoVacuum=av!=0;
+					pBt.incrVacuum=av==2;
+				}
+				sqlite3BtreeLeave(this);
+				return rc;
+				#endif
+			}
+			public int sqlite3BtreeGetAutoVacuum() {
+				#if SQLITE_OMIT_AUTOVACUUM
+																																																																												return BTREE_AUTOVACUUM_NONE;
+#else
+				int rc;
+				sqlite3BtreeEnter(this);
+				rc=((!this.pBt.autoVacuum)?BTREE_AUTOVACUUM_NONE:(!this.pBt.incrVacuum)?BTREE_AUTOVACUUM_FULL:BTREE_AUTOVACUUM_INCR);
+				sqlite3BtreeLeave(this);
+				return rc;
+				#endif
+			}
 		}
 		///
 		///<summary>

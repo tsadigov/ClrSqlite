@@ -526,8 +526,8 @@ namespace Community.CsharpSqlite {
 				int nCopy=MIN(nSrcPgsz,nDestPgsz);
 				i64 iEnd=(i64)iSrcPg*(i64)nSrcPgsz;
 				#if SQLITE_HAS_CODEC
-				int nSrcReserve=sqlite3BtreeGetReserve(this.pSrc);
-				int nDestReserve=sqlite3BtreeGetReserve(this.pDest);
+				int nSrcReserve=this.pSrc.sqlite3BtreeGetReserve();
+				int nDestReserve=this.pDest.sqlite3BtreeGetReserve();
 				#endif
 				int rc=SQLITE_OK;
 				i64 iOff;

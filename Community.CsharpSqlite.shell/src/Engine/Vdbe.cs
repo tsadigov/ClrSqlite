@@ -8820,7 +8820,7 @@ break;
 								if(newMax<pOp.p3)
 									newMax=pOp.p3;
 							}
-							pOut.u.i=(i64)sqlite3BtreeMaxPageCount(pBt,(int)newMax);
+							pOut.u.i=(i64)pBt.sqlite3BtreeMaxPageCount((int)newMax);
 							break;
 						}
 						#endif

@@ -1254,44 +1254,18 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
 		///are intentually left unused.  This is the "reserved" space that is
 		///sometimes used by extensions.
 		///</summary>
-		static int sqlite3BtreeGetReserve(Btree p) {
-			int n;
-			sqlite3BtreeEnter(p);
-			n=(int)(p.pBt.pageSize-p.pBt.usableSize);
-			sqlite3BtreeLeave(p);
-			return n;
-		}
 		///
 		///<summary>
 		///Set the maximum page count for a database if mxPage is positive.
 		///No changes are made if mxPage is 0 or negative.
 		///Regardless of the value of mxPage, return the maximum page count.
 		///</summary>
-		static Pgno sqlite3BtreeMaxPageCount(Btree p,int mxPage) {
-			Pgno n;
-			sqlite3BtreeEnter(p);
-			n=p.pBt.pPager.sqlite3PagerMaxPageCount(mxPage);
-			sqlite3BtreeLeave(p);
-			return n;
-		}
 		///
 		///<summary>
 		///</summary>
 		///<param name="Set the secureDelete flag if newFlag is 0 or 1.  If newFlag is ">1,</param>
 		///<param name="then make no changes.  Always return the value of the secureDelete">then make no changes.  Always return the value of the secureDelete</param>
 		///<param name="setting after the change.">setting after the change.</param>
-		static int sqlite3BtreeSecureDelete(Btree p,int newFlag) {
-			int b;
-			if(p==null)
-				return 0;
-			sqlite3BtreeEnter(p);
-			if(newFlag>=0) {
-				p.pBt.secureDelete=(newFlag!=0);
-			}
-			b=p.pBt.secureDelete?1:0;
-			sqlite3BtreeLeave(p);
-			return b;
-		}
 		#endif
 		///
 		///<summary>
@@ -1300,41 +1274,11 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
 		///<param name="parameter is non">vacuum mode is enabled. If zero, it</param>
 		///<param name="is disabled. The default value for the auto">vacuum property is</param>
 		///<param name="determined by the SQLITE_DEFAULT_AUTOVACUUM macro.">determined by the SQLITE_DEFAULT_AUTOVACUUM macro.</param>
-		static int sqlite3BtreeSetAutoVacuum(Btree p,int autoVacuum) {
-			#if SQLITE_OMIT_AUTOVACUUM
-																																																																											return SQLITE_READONLY;
-#else
-			BtShared pBt=p.pBt;
-			int rc=SQLITE_OK;
-			u8 av=(u8)autoVacuum;
-			sqlite3BtreeEnter(p);
-			if(pBt.pageSizeFixed&&(av!=0)!=pBt.autoVacuum) {
-				rc=SQLITE_READONLY;
-			}
-			else {
-				pBt.autoVacuum=av!=0;
-				pBt.incrVacuum=av==2;
-			}
-			sqlite3BtreeLeave(p);
-			return rc;
-			#endif
-		}
 		///
 		///<summary>
 		///</summary>
 		///<param name="Return the value of the 'auto">vacuum is</param>
 		///<param name="enabled 1 is returned. Otherwise 0.">enabled 1 is returned. Otherwise 0.</param>
-		static int sqlite3BtreeGetAutoVacuum(Btree p) {
-			#if SQLITE_OMIT_AUTOVACUUM
-																																																																											return BTREE_AUTOVACUUM_NONE;
-#else
-			int rc;
-			sqlite3BtreeEnter(p);
-			rc=((!p.pBt.autoVacuum)?BTREE_AUTOVACUUM_NONE:(!p.pBt.incrVacuum)?BTREE_AUTOVACUUM_FULL:BTREE_AUTOVACUUM_INCR);
-			sqlite3BtreeLeave(p);
-			return rc;
-			#endif
-		}
 		///
 		///<summary>
 		///Get a reference to pPage1 of the database file.  This will
