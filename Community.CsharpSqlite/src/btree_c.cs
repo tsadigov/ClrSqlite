@@ -1222,16 +1222,6 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
 		///Return TRUE if the given btree is set to safety level 1.  In other
 		///words, return TRUE if no sync() occurs on the disk files.
 		///</summary>
-		static int sqlite3BtreeSyncDisabled(Btree p) {
-			BtShared pBt=p.pBt;
-			int rc;
-			Debug.Assert(sqlite3_mutex_held(p.db.mutex));
-			sqlite3BtreeEnter(p);
-			Debug.Assert(pBt!=null&&pBt.pPager!=null);
-			rc=pBt.pPager.sqlite3PagerNosync()?1:0;
-			sqlite3BtreeLeave(p);
-			return rc;
-		}
 		///
 		///<summary>
 		///Change the default pages size and the number of reserved bytes per page.

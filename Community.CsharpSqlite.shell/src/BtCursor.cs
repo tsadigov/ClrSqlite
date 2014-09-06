@@ -578,6 +578,16 @@ releasePage(pPage);
 				Debug.Assert(((this.pBt.nPage)&0x8000000)==0);
 				return (Pgno)this.pBt.btreePagecount();
 			}
+			public int sqlite3BtreeSyncDisabled() {
+				BtShared pBt=this.pBt;
+				int rc;
+				Debug.Assert(sqlite3_mutex_held(this.db.mutex));
+				sqlite3BtreeEnter(this);
+				Debug.Assert(pBt!=null&&pBt.pPager!=null);
+				rc=pBt.pPager.sqlite3PagerNosync()?1:0;
+				sqlite3BtreeLeave(this);
+				return rc;
+			}
 		}
 		///
 		///<summary>
