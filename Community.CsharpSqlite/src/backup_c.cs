@@ -177,12 +177,12 @@ namespace Community.CsharpSqlite {
 				}
 				rc=this.rc;
 				if(!isFatalError(rc)) {
-					Pager pSrcPager=sqlite3BtreePager(this.pSrc);
+					Pager pSrcPager=this.pSrc.sqlite3BtreePager();
 					///
 					///<summary>
 					///Source pager 
 					///</summary>
-					Pager pDestPager=sqlite3BtreePager(this.pDest);
+					Pager pDestPager=this.pDest.sqlite3BtreePager();
 					///
 					///<summary>
 					///Dest pager 
@@ -218,7 +218,7 @@ namespace Community.CsharpSqlite {
 					///<summary>
 					///Lock the destination database, if it is not locked already. 
 					///</summary>
-					if(SQLITE_OK==rc&&this.bDestLocked==0&&SQLITE_OK==(rc=sqlite3BtreeBeginTrans(this.pDest,2))) {
+					if(SQLITE_OK==rc&&this.bDestLocked==0&&SQLITE_OK==(rc=this.pDest.sqlite3BtreeBeginTrans(2))) {
 						this.bDestLocked=1;
 						this.iDestSchema=this.pDest.sqlite3BtreeGetMeta(BTREE_SCHEMA_VERSION);
 					}
@@ -230,7 +230,7 @@ namespace Community.CsharpSqlite {
 					///<param name="before this function exits.">before this function exits.</param>
 					///<param name=""></param>
 					if(rc==SQLITE_OK&&!this.pSrc.sqlite3BtreeIsInReadTrans()) {
-						rc=sqlite3BtreeBeginTrans(this.pSrc,0);
+						rc=this.pSrc.sqlite3BtreeBeginTrans(0);
 						bCloseTrans=1;
 					}
 					///
@@ -240,7 +240,7 @@ namespace Community.CsharpSqlite {
 					///</summary>
 					pgszSrc=this.pSrc.sqlite3BtreeGetPageSize();
 					pgszDest=this.pDest.sqlite3BtreeGetPageSize();
-					destMode=sqlite3BtreePager(this.pDest).sqlite3PagerGetJournalMode();
+					destMode=this.pDest.sqlite3BtreePager().sqlite3PagerGetJournalMode();
 					if(SQLITE_OK==rc&&destMode==PAGER_JOURNALMODE_WAL&&pgszSrc!=pgszDest) {
 						rc=SQLITE_READONLY;
 					}
@@ -386,7 +386,7 @@ namespace Community.CsharpSqlite {
 						///<summary>
 						///Finish committing the transaction to the destination database. 
 						///</summary>
-						if(SQLITE_OK==rc&&SQLITE_OK==(rc=sqlite3BtreeCommitPhaseTwo(this.pDest,0))) {
+						if(SQLITE_OK==rc&&SQLITE_OK==(rc=this.pDest.sqlite3BtreeCommitPhaseTwo(0))) {
 							rc=SQLITE_DONE;
 						}
 					}
@@ -408,8 +408,8 @@ namespace Community.CsharpSqlite {
       rc2 |= sqlite3BtreeCommitPhaseTwo( p.pSrc, 0 );
       Debug.Assert( rc2 == SQLITE_OK );
 #else
-						sqlite3BtreeCommitPhaseOne(this.pSrc,null);
-						sqlite3BtreeCommitPhaseTwo(this.pSrc,0);
+						this.pSrc.sqlite3BtreeCommitPhaseOne(null);
+						this.pSrc.sqlite3BtreeCommitPhaseTwo(0);
 						#endif
 					}
 					if(rc==SQLITE_IOERR_NOMEM) {
@@ -463,17 +463,17 @@ namespace Community.CsharpSqlite {
 					this.pSrc.nBackup--;
 				}
 				if(this.isAttached!=0) {
-					pp=sqlite3BtreePager(this.pSrc).sqlite3PagerBackupPtr();
+					pp=this.pSrc.sqlite3BtreePager().sqlite3PagerBackupPtr();
 					while(pp!=this) {
 						pp=(pp).pNext;
 					}
-					sqlite3BtreePager(this.pSrc).pBackup=this.pNext;
+					this.pSrc.sqlite3BtreePager().pBackup=this.pNext;
 				}
 				///
 				///<summary>
 				///If a transaction is still open on the Btree, roll it back. 
 				///</summary>
-				sqlite3BtreeRollback(this.pDest);
+				this.pDest.sqlite3BtreeRollback();
 				///
 				///<summary>
 				///Set the error code of the destination database handle. 
@@ -520,7 +520,7 @@ namespace Community.CsharpSqlite {
 			/// destination database.
 			///</summary>
 			int backupOnePage(Pgno iSrcPg,byte[] zSrcData) {
-				Pager pDestPager=sqlite3BtreePager(this.pDest);
+				Pager pDestPager=this.pDest.sqlite3BtreePager();
 				int nSrcPgsz=this.pSrc.sqlite3BtreeGetPageSize();
 				int nDestPgsz=this.pDest.sqlite3BtreeGetPageSize();
 				int nCopy=MIN(nSrcPgsz,nDestPgsz);
@@ -611,9 +611,9 @@ namespace Community.CsharpSqlite {
 			void attachBackupObject() {
 				sqlite3_backup pp;
 				Debug.Assert(sqlite3BtreeHoldsMutex(this.pSrc));
-				pp=sqlite3BtreePager(this.pSrc).sqlite3PagerBackupPtr();
+				pp=this.pSrc.sqlite3BtreePager().sqlite3PagerBackupPtr();
 				this.pNext=pp;
-				sqlite3BtreePager(this.pSrc).pBackup=this;
+				this.pSrc.sqlite3BtreePager().pBackup=this;
 				//*pp = p;
 				this.isAttached=1;
 			}

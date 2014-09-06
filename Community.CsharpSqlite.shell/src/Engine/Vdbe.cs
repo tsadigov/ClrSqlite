@@ -1264,10 +1264,10 @@ pOp.cnt = 0;
 						Btree pBt=db.aDb[i].pBt;
 						if(pBt!=null) {
 							if(eOp==SAVEPOINT_ROLLBACK) {
-								rc2=sqlite3BtreeSavepoint(pBt,SAVEPOINT_ROLLBACK,iSavepoint);
+								rc2=pBt.sqlite3BtreeSavepoint(SAVEPOINT_ROLLBACK,iSavepoint);
 							}
 							if(rc2==SQLITE_OK) {
-								rc2=sqlite3BtreeSavepoint(pBt,SAVEPOINT_RELEASE,iSavepoint);
+								rc2=pBt.sqlite3BtreeSavepoint(SAVEPOINT_RELEASE,iSavepoint);
 							}
 							if(rc==SQLITE_OK) {
 								rc=rc2;
@@ -4835,7 +4835,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 										else {
 											iSavepoint=db.nSavepoint-iSavepoint-1;
 											for(ii=0;ii<db.nDb;ii++) {
-												rc=sqlite3BtreeSavepoint(db.aDb[ii].pBt,p1,iSavepoint);
+												rc=db.aDb[ii].pBt.sqlite3BtreeSavepoint(p1,iSavepoint);
 												if(rc!=SQLITE_OK) {
 													goto abort_due_to_error;
 												}
@@ -5007,7 +5007,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							Debug.Assert((this.btreeMask&(((yDbMask)1)<<pOp.p1))!=0);
 							pBt=db.aDb[pOp.p1].pBt;
 							if(pBt!=null) {
-								rc=sqlite3BtreeBeginTrans(pBt,pOp.p2);
+								rc=pBt.sqlite3BtreeBeginTrans(pOp.p2);
 								if(rc==SQLITE_BUSY) {
 									this.currentOpCodeIndex=opcodeIndex;
 									this.rc=rc=SQLITE_BUSY;
@@ -5025,7 +5025,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									}
 									rc=sqlite3VtabSavepoint(db,SAVEPOINT_BEGIN,this.iStatement-1);
 									if(rc==SQLITE_OK) {
-										rc=sqlite3BtreeBeginStmt(pBt,this.iStatement);
+										rc=pBt.sqlite3BtreeBeginStmt(this.iStatement);
 									}
 									///
 									///<summary>
@@ -5318,7 +5318,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								goto no_mem;
 							pCur.nullRow=true;
 							pCur.isOrdered=true;
-							rc=sqlite3BtreeCursor(pX,p2,wrFlag,pKeyInfo,pCur.pCursor);
+							rc=pX.sqlite3BtreeCursor(p2,wrFlag,pKeyInfo,pCur.pCursor);
 							pCur.pKeyInfo=pKeyInfo;
 							///
 							///<summary>
@@ -5385,7 +5385,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							pCx.nullRow=true;
 							rc=sqlite3BtreeOpen(db.pVfs,null,db,ref pCx.pBt,BTREE_OMIT_JOURNAL|BTREE_SINGLE|pOp.p5,vfsFlags);
 							if(rc==SQLITE_OK) {
-								rc=sqlite3BtreeBeginTrans(pCx.pBt,1);
+								rc=pCx.pBt.sqlite3BtreeBeginTrans(1);
 							}
 							if(rc==SQLITE_OK) {
 								///
@@ -5402,14 +5402,14 @@ MemSetTypeFlag(pOut, MEM_Int);
 									rc=sqlite3BtreeCreateTable(pCx.pBt,ref pgno,BTREE_BLOBKEY);
 									if(rc==SQLITE_OK) {
 										Debug.Assert(pgno==MASTER_ROOT+1);
-										rc=sqlite3BtreeCursor(pCx.pBt,pgno,1,pOp.p4.pKeyInfo,pCx.pCursor);
+										rc=pCx.pBt.sqlite3BtreeCursor(pgno,1,pOp.p4.pKeyInfo,pCx.pCursor);
 										pCx.pKeyInfo=pOp.p4.pKeyInfo;
 										pCx.pKeyInfo.enc=ENC(this.db);
 									}
 									pCx.isTable=false;
 								}
 								else {
-									rc=sqlite3BtreeCursor(pCx.pBt,MASTER_ROOT,1,null,pCx.pCursor);
+									rc=pCx.pBt.sqlite3BtreeCursor(MASTER_ROOT,1,null,pCx.pCursor);
 									pCx.isTable=true;
 								}
 							}
@@ -8231,7 +8231,7 @@ cDebug.Ase OP_Checkpoint: {
 							Debug.Assert(eNew==PAGER_JOURNALMODE_DELETE||eNew==PAGER_JOURNALMODE_TRUNCATE||eNew==PAGER_JOURNALMODE_PERSIST||eNew==PAGER_JOURNALMODE_OFF||eNew==PAGER_JOURNALMODE_MEMORY||eNew==PAGER_JOURNALMODE_WAL||eNew==PAGER_JOURNALMODE_QUERY);
 							Debug.Assert(pOp.p1>=0&&pOp.p1<db.nDb);
 							pBt=db.aDb[pOp.p1].pBt;
-							pPager=sqlite3BtreePager(pBt);
+							pPager=pBt.sqlite3BtreePager();
 							eOld=pPager.sqlite3PagerGetJournalMode();
 							if(eNew==PAGER_JOURNALMODE_QUERY)
 								eNew=eOld;
@@ -8334,7 +8334,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
 							Debug.Assert(pOp.p1>=0&&pOp.p1<db.nDb);
 							Debug.Assert((this.btreeMask&(((yDbMask)1)<<pOp.p1))!=0);
 							pBt=db.aDb[pOp.p1].pBt;
-							rc=sqlite3BtreeIncrVacuum(pBt);
+							rc=pBt.sqlite3BtreeIncrVacuum();
 							if(rc==SQLITE_DONE) {
 								opcodeIndex=pOp.p2-1;
 								rc=SQLITE_OK;

@@ -1732,7 +1732,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 					needXcommit=true;
 					if(i!=1)
 						nTrans++;
-					rc=sqlite3BtreePager(pBt).sqlite3PagerExclusiveLock();
+					rc=pBt.sqlite3BtreePager().sqlite3PagerExclusiveLock();
 				}
 			}
 			if(rc!=SQLITE_OK) {
@@ -1764,7 +1764,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				for(i=0;rc==SQLITE_OK&&i<db.nDb;i++) {
 					Btree pBt=db.aDb[i].pBt;
 					if(pBt!=null) {
-						rc=sqlite3BtreeCommitPhaseOne(pBt,null);
+						rc=pBt.sqlite3BtreeCommitPhaseOne(null);
 					}
 				}
 				///
@@ -1778,7 +1778,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				for(i=0;rc==SQLITE_OK&&i<db.nDb;i++) {
 					Btree pBt=db.aDb[i].pBt;
 					if(pBt!=null) {
-						rc=sqlite3BtreeCommitPhaseTwo(pBt,0);
+						rc=pBt.sqlite3BtreeCommitPhaseTwo(0);
 					}
 				}
 				if(rc==SQLITE_OK) {
@@ -1896,7 +1896,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				for(i=0;rc==SQLITE_OK&&i<db.nDb;i++) {
 					Btree pBt=db.aDb[i].pBt;
 					if(pBt!=null) {
-						rc=sqlite3BtreeCommitPhaseOne(pBt,zMaster);
+						rc=pBt.sqlite3BtreeCommitPhaseOne(zMaster);
 					}
 				}
 				sqlite3OsCloseFree(pMaster);
@@ -1934,7 +1934,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				for(i=0;i<db.nDb;i++) {
 					Btree pBt=db.aDb[i].pBt;
 					if(pBt!=null) {
-						sqlite3BtreeCommitPhaseTwo(pBt,0);
+						pBt.sqlite3BtreeCommitPhaseTwo(0);
 					}
 				}
 				sqlite3EndBenignMalloc();
@@ -2002,7 +2002,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			for(i=0;i<db.nDb;i++) {
 				Btree p=db.aDb[i].pBt;
 				if(p!=null&&p.sqlite3BtreeIsInTrans()) {
-					sqlite3BtreeTripAllCursors(p,SQLITE_ABORT);
+					p.sqlite3BtreeTripAllCursors(SQLITE_ABORT);
 				}
 			}
 		}

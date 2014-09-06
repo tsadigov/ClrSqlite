@@ -66,7 +66,7 @@ namespace Community.CsharpSqlite {
 		//#include "btreeInt.h"
 		//#include "crypto.h"
 		#if CODEC_DEBUG || TRACE
-																																								//define CODEC_TRACE(X) {printf X;fflush(stdout);}
+																																										//define CODEC_TRACE(X) {printf X;fflush(stdout);}
 static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace )sqlite3DebugPrintf( T, ap ); }
 #else
 		//#define CODEC_TRACE(X)
@@ -150,7 +150,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 		const int CIPHER_ENCRYPT=1;
 		//#define CIPHER_ENCRYPT 1
 		#if NET_2_0
-																																								    static RijndaelManaged Aes = new RijndaelManaged();
+																																										    static RijndaelManaged Aes = new RijndaelManaged();
 #else
 		static AesManaged Aes=new AesManaged();
 		#endif
@@ -291,7 +291,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 					c_ctx.key=k1.GetBytes(c_ctx.key_sz);
 				}
 				#if NET_2_0
-																																																																																        Aes.BlockSize = 0x80;
+																																																																																				        Aes.BlockSize = 0x80;
         Aes.FeedbackSize = 8;
         Aes.KeySize = 0x100;
         Aes.Mode = CipherMode.CBC;
@@ -495,7 +495,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 				ctx.read_ctx.iv=new byte[ctx.read_ctx.iv_sz];
 				//sqlite3Malloc( ctx.iv_sz );
 				Buffer.BlockCopy(Encoding.UTF8.GetBytes(SQLITE_FILE_HEADER),0,ctx.read_ctx.iv,0,FILE_HEADER_SZ);
-				sqlite3BtreePager(pDb.pBt).sqlite3pager_sqlite3PagerSetCodec(sqlite3Codec,null,sqlite3FreeCodecArg,ctx);
+				pDb.pBt.sqlite3BtreePager().sqlite3pager_sqlite3PagerSetCodec(sqlite3Codec,null,sqlite3FreeCodecArg,ctx);
 				codec_set_cipher_name(db,nDb,CIPHER,0);
 				codec_set_pass_key(db,nDb,zKey,nKey,0);
 				cipher_ctx_copy(ctx.write_ctx,ctx.read_ctx);
@@ -616,7 +616,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 					///note: don't deallocate rekey since it may be used in a subsequent iteration
 					///
 					///</summary>
-					rc=sqlite3BtreeBeginTrans(pDb.pBt,1);
+					rc=pDb.pBt.sqlite3BtreeBeginTrans(1);
 					///
 					///<summary>
 					///begin write transaction 
@@ -653,13 +653,13 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 					if(rc==SQLITE_OK) {
 						CODEC_TRACE("sqlite3_rekey: committing\n");
 						db.nextPagesize=pDb.pBt.sqlite3BtreeGetPageSize();
-						rc=sqlite3BtreeCommit(pDb.pBt);
+						rc=pDb.pBt.sqlite3BtreeCommit();
 						if(ctx!=null)
 							cipher_ctx_copy(ctx.read_ctx,ctx.write_ctx);
 					}
 					else {
 						CODEC_TRACE("sqlite3_rekey: rollback\n");
-						sqlite3BtreeRollback(pDb.pBt);
+						pDb.pBt.sqlite3BtreeRollback();
 					}
 					ctx.mode_rekey=0;
 				}

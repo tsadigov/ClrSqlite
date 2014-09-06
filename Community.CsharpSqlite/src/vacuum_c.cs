@@ -193,7 +193,7 @@ namespace Community.CsharpSqlite {
 			db.flags&=~(SQLITE_ForeignKeys|SQLITE_ReverseOrder);
 			db.xTrace=null;
 			pMain=db.aDb[0].pBt;
-			isMemDb=sqlite3BtreePager(pMain).sqlite3PagerIsMemdb();
+			isMemDb=pMain.sqlite3BtreePager().sqlite3PagerIsMemdb();
 			///
 			///<summary>
 			///Attach the temporary database as 'vacuum_db'. The synchronous pragma
@@ -235,7 +235,7 @@ namespace Community.CsharpSqlite {
 			///to read the schema was concluded. Unlock it here so that this doesn't
 			///cause problems for the call to BtreeSetPageSize() below.  
 			///</summary>
-			sqlite3BtreeCommit(pTemp);
+			pTemp.sqlite3BtreeCommit();
 			nRes=pMain.sqlite3BtreeGetReserve();
 			///
 			///<summary>
@@ -256,7 +256,7 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///Do not attempt to change the page size for a WAL database 
 			///</summary>
-			if(sqlite3BtreePager(pMain).sqlite3PagerGetJournalMode()==PAGER_JOURNALMODE_WAL) {
+			if(pMain.sqlite3BtreePager().sqlite3PagerGetJournalMode()==PAGER_JOURNALMODE_WAL) {
 				db.nextPagesize=0;
 			}
 			if(pTemp.sqlite3BtreeSetPageSize(pMain.sqlite3BtreeGetPageSize(),nRes,0)!=0||(!isMemDb&&pTemp.sqlite3BtreeSetPageSize(db.nextPagesize,nRes,0)!=0)//|| NEVER( db.mallocFailed != 0 )
@@ -394,7 +394,7 @@ namespace Community.CsharpSqlite {
 				rc=pMain.sqlite3BtreeCopyFile(pTemp);
 				if(rc!=SQLITE_OK)
 					goto end_of_vacuum;
-				rc=sqlite3BtreeCommit(pTemp);
+				rc=pTemp.sqlite3BtreeCommit();
 				if(rc!=SQLITE_OK)
 					goto end_of_vacuum;
 				#if !SQLITE_OMIT_AUTOVACUUM

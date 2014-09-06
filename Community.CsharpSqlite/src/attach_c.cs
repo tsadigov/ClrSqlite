@@ -127,7 +127,7 @@ namespace Community.CsharpSqlite {
 						zErrDyn=sqlite3MPrintf(db,"attached databases must use the same text encoding as main database");
 						rc=SQLITE_ERROR;
 					}
-					pPager=sqlite3BtreePager(aNew.pBt);
+					pPager=aNew.pBt.sqlite3BtreePager();
 					pPager.sqlite3PagerLockingMode(db.dfltLockMode);
 					aNew.pBt.sqlite3BtreeSecureDelete(db.aDb[0].pBt.sqlite3BtreeSecureDelete(-1));
 				}
