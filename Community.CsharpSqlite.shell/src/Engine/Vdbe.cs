@@ -238,6 +238,10 @@ namespace Community.CsharpSqlite
 			/// Value to return
 			/// </summary>
 			public int rc;
+            public SqlResult result {
+                get { return (SqlResult)rc; }
+                set { rc=(int)value;}
+            }
 
 			public u8 errorAction;
 
@@ -575,7 +579,7 @@ ct.pLruNext=pLruNext;
 				}
 				this.nOp++;
 				pOp = new VdbeOp ();
-				pOp.opcode = (u8)op;
+				pOp.OpCode = op;
 				pOp.p5 = 0;
 				pOp.p1 = p1;
 				pOp.p2 = p2;
@@ -614,6 +618,9 @@ pOp.cnt = 0;
 			{
 				return this.sqlite3VdbeAddOp3 (op, p1, p2, 0);
 			}
+            public int sqlite3VdbeAddOp2(OpCode op, int p1, int p2) {
+                return this.sqlite3VdbeAddOp3(op, p1, p2, 0);
+            }
 
 			public int sqlite3VdbeAddOp4 (int op, int p1, int p2, int p3, i32 pP4, int p4type)
 			{

@@ -305,7 +305,7 @@ rc = db->xWalCallback(db->pWalArg, db, db->aDb[i].zName, nEntry);
 		static int sqlite3Step (Vdbe p)
 		{
 			sqlite3 db;
-			int rc;
+			SqlResult rc;
 			#region error check
 			Debug.Assert (p != null);
 			if (p.magic != VDBE_MAGIC_RUN) {
@@ -331,8 +331,8 @@ return SQLITE_MISUSE_BKPT();
 			//  return SQLITE_NOMEM;
 			//}
 			if (p.currentOpCodeIndex <= 0 && p.expired) {
-				p.rc = SQLITE_SCHEMA;
-				rc = SQLITE_ERROR;
+                p.result = SqlResult.SQLITE_SCHEMA;
+				rc = SqlResult.SQLITE_ERROR;
 				goto end_of_step;
 			}
 			if (p.currentOpCodeIndex < 0) {
@@ -361,13 +361,13 @@ return SQLITE_MISUSE_BKPT();
 			#endregion
 			#if !SQLITE_OMIT_EXPLAIN
 			if (p.explain != 0) {
-				rc = sqlite3VdbeList (p);
+                rc = (SqlResult)sqlite3VdbeList(p);
 			}
 			else
 			#endif
 			 {
 				db.callStackDepth++;
-				rc = p.sqlite3VdbeExec ();
+				rc =(SqlResult) p.sqlite3VdbeExec ();
 				db.callStackDepth--;
 			}
 			#if !SQLITE_OMIT_TRACE
@@ -376,20 +376,22 @@ return SQLITE_MISUSE_BKPT();
 ///Invoke the profile callback if there is one
 ///</summary>
 
-			if (rc != SQLITE_ROW && db.xProfile != null && 0 == db.init.busy && p.zSql != null) {
+            if (rc != SqlResult.SQLITE_ROW && db.xProfile != null && 0 == db.init.busy && p.zSql != null)
+            {
 				sqlite3_int64 iNow = 0;
 				sqlite3OsCurrentTimeInt64 (db.pVfs, ref iNow);
 				db.xProfile (db.pProfileArg, p.zSql, (iNow - p.startTime) * 1000000);
 			}
 			#endif
-			if (rc == SQLITE_DONE) {
+            if (rc == SqlResult.SQLITE_DONE)
+            {
 				Debug.Assert (p.rc == SQLITE_OK);
 				p.rc = doWalCallbacks (db);
 				if (p.rc != SQLITE_OK) {
-					rc = SQLITE_ERROR;
+                    rc = SqlResult.SQLITE_ERROR;
 				}
 			}
-			db.errCode = rc;
+			db.errCode =(int) rc;
 			if (SQLITE_NOMEM == sqlite3ApiExit (p.db, p.rc)) {
 				p.rc = SQLITE_NOMEM;
 			}
@@ -405,9 +407,10 @@ return SQLITE_MISUSE_BKPT();
 ///
 ///</summary>
 
-			Debug.Assert (rc == SQLITE_ROW || rc == SQLITE_DONE || rc == SQLITE_ERROR || rc == SQLITE_BUSY || rc == SQLITE_MISUSE);
-			Debug.Assert (p.rc != SQLITE_ROW && p.rc != SQLITE_DONE);
-			if (p.isPrepareV2 && rc != SQLITE_ROW && rc != SQLITE_DONE) {
+            Debug.Assert(rc == SqlResult.SQLITE_ROW || rc == SqlResult.SQLITE_DONE || rc == SqlResult.SQLITE_ERROR || rc == SqlResult.SQLITE_BUSY || rc == SqlResult.SQLITE_MISUSE);
+            Debug.Assert(p.result != SqlResult.SQLITE_ROW && p.result != SqlResult.SQLITE_DONE);
+            if (p.isPrepareV2 && rc != SqlResult.SQLITE_ROW && rc != SqlResult.SQLITE_DONE)
+            {
 				///
 ///<summary>
 ///If this statement was prepared using sqlite3_prepare_v2(), and an
@@ -416,9 +419,9 @@ return SQLITE_MISUSE_BKPT();
 ///
 ///</summary>
 
-				rc = db.errCode = p.rc;
+				rc = db.ErrCode = p.result;
 			}
-			return (rc & db.errMask);
+            return ((int)rc & db.errMask);
 		}
 
 		///<summary>

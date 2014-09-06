@@ -1107,23 +1107,21 @@ goto begin_table_error;
 				sqlite3VdbeUsesBtree(v,iDb);
 				j1=v.sqlite3VdbeAddOp1(OpCode.OP_If,reg3);
 				fileFormat=(db.flags&SQLITE_LegacyFileFmt)!=0?1:SQLITE_MAX_FILE_FORMAT;
-				v.sqlite3VdbeAddOp2(OP_Integer,fileFormat,reg3);
-				v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_FILE_FORMAT,reg3);
-				v.sqlite3VdbeAddOp2(OP_Integer,(int)ENC(db),reg3);
-				v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_TEXT_ENCODING,reg3);
+				v.sqlite3VdbeAddOp2(OpCode.OP_Integer,fileFormat,reg3);
+                v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTREE_FILE_FORMAT, reg3);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Integer, (int)ENC(db), reg3);
+                v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTREE_TEXT_ENCODING, reg3);
 				v.sqlite3VdbeJumpHere(j1);
 				///
 				///<summary>
 				///</summary>
-				///<param name="This just creates a place">holder record in the sqlite_master table.</param>
-				///<param name="The record created does not contain anything yet.  It will be replaced">The record created does not contain anything yet.  It will be replaced</param>
-				///<param name="by the real entry in code generated at sqlite3EndTable().">by the real entry in code generated at sqlite3EndTable().</param>
-				///<param name=""></param>
-				///<param name="The rowid for the new entry is left in register pParse">>regRowid.</param>
-				///<param name="The root page number of the new table is left in reg pParse">>regRoot.</param>
-				///<param name="The rowid and root page number values are needed by the code that">The rowid and root page number values are needed by the code that</param>
-				///<param name="sqlite3EndTable will generate.">sqlite3EndTable will generate.</param>
-				///<param name=""></param>
+				///This just creates a place holder record in the sqlite_master table.
+				///The record created does not contain anything yet.  It will be replaced
+				///by the real entry in code generated at sqlite3EndTable().by the real entry in code generated at sqlite3EndTable().
+				///The rowid for the new entry is left in register pParse>regRowid.
+				///The root page number of the new table is left in reg pParse>regRoot.
+				///The rowid and root page number values are needed by the code that
+				///sqlite3EndTable will generate.
 				if(isView!=0||isVirtual!=0) {
 					v.sqlite3VdbeAddOp2(OP_Integer,0,reg2);
 				}

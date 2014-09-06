@@ -101,7 +101,13 @@ using yDbMask = System.Int64;
 			///<summary>
 			///Number of temporary registers in aTempReg[] 
 			///</summary>
-			public u8 nTempInUse;
+            u8 _nTempInUse;
+
+            public u8 nTempInUse
+            {
+                get { return _nTempInUse; }
+                set { _nTempInUse = value; }
+            }
 			///
 			///<summary>
 			///Number of aTempReg[] currently checked out 
@@ -111,7 +117,13 @@ using yDbMask = System.Int64;
 			///<summary>
 			///Holding area for temporary registers 
 			///</summary>
-			public int nRangeReg;
+            int _nRangeReg;
+
+            public int nRangeReg
+            {
+                get { return _nRangeReg; }
+                set { _nRangeReg = value; }
+            }
 			///
 			///<summary>
 			///Size of the temporary register block 
@@ -131,7 +143,13 @@ using yDbMask = System.Int64;
 			///<summary>
 			///Number of previously allocated VDBE cursors 
 			///</summary>
-			public int nMem;
+            int _nMem;
+
+            public int nMem
+            {
+                get { return _nMem; }
+                set { _nMem = value; }
+            }
 			///
 			///<summary>
 			///Number of memory cells used so far 

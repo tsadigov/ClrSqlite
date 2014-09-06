@@ -345,14 +345,26 @@ namespace Community.CsharpSqlite
             ///A parameter used by the eDest disposal method 
             ///</summary>
 
-            public int iMem;
+            int _iMem;
+
+            public int iMem
+            {
+                get { return _iMem; }
+                set { _iMem = value; }
+            }
 
             ///
             ///<summary>
             ///Base register where results are written 
             ///</summary>
 
-            public int nMem;
+            int _nMem;
+
+            public int nMem
+            {
+                get { return _nMem; }
+                set { _nMem = value; }
+            }
 
             ///
             ///<summary>

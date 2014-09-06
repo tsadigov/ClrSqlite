@@ -95,6 +95,10 @@ namespace Community.CsharpSqlite
             ///</summary>
 
             public int errCode;
+            public SqlResult ErrCode {
+                get { return (SqlResult)errCode; }
+                set { errCode = (int)value; }
+            }
 
             ///
             ///<summary>
