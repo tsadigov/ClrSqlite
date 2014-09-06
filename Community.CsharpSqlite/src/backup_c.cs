@@ -250,7 +250,7 @@ namespace Community.CsharpSqlite {
 					///<param name="Now that there is a read">lock on the source database, query the</param>
 					///<param name="source pager for the number of pages in the database.">source pager for the number of pages in the database.</param>
 					///<param name=""></param>
-					nSrcPage=sqlite3BtreeLastPage(this.pSrc);
+					nSrcPage=this.pSrc.sqlite3BtreeLastPage();
 					Debug.Assert(nSrcPage>=0);
 					for(ii=0;(nPage<0||ii<nPage)&&this.iNext<=nSrcPage&&0==rc;ii++) {
 						Pgno iSrcPg=this.iNext;
@@ -400,7 +400,7 @@ namespace Community.CsharpSqlite {
 					///<param name=""></param>
 					if(bCloseTrans!=0) {
 						#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																																																											      //TESTONLY( int rc2 );
+																																																																																																																																	      //TESTONLY( int rc2 );
       //TESTONLY( rc2  = ) sqlite3BtreeCommitPhaseOne(p.pSrc, 0);
       //TESTONLY( rc2 |= ) sqlite3BtreeCommitPhaseTwo(p.pSrc);
       int rc2;
