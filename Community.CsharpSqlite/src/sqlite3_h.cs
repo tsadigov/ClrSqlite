@@ -1343,6 +1343,8 @@ namespace Community.CsharpSqlite
 		//};
 		public class sqlite3_vfs
 		{
+
+           
 			public int iVersion;
 
 			///

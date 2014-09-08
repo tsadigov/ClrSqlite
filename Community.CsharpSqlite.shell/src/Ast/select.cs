@@ -61,6 +61,10 @@ namespace Community.CsharpSqlite
             ///</summary>
 
             public u8 tk_op;
+            public TokenType TokenOp {
+                get { return (TokenType)tk_op; }
+                set { tk_op = (u8)value; }
+            }
 
             ///
             ///<summary>
@@ -202,21 +206,6 @@ namespace Community.CsharpSqlite
                     if (pOffset != null)
                         cp.pOffset = pOffset.Copy();
                     return cp;
-                }
-            }
-
-            public void heightOfSelect(ref int pnHeight)
-            {
-                if (this != null)
-                {
-                    this.pWhere.heightOfExpr(ref pnHeight);
-                    this.pHaving.heightOfExpr(ref pnHeight);
-                    this.pLimit.heightOfExpr(ref pnHeight);
-                    this.pOffset.heightOfExpr(ref pnHeight);
-                    this.pEList.heightOfExprList(ref pnHeight);
-                    this.pGroupBy.heightOfExprList(ref pnHeight);
-                    this.pOrderBy.heightOfExprList(ref pnHeight);
-                    this.pPrior.heightOfSelect(ref pnHeight);
                 }
             }
 

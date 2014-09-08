@@ -4273,7 +4273,7 @@ goto exit_drop_index;
 				SqlResult rc;
 				Btree pBt=null;
 				const int flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_EXCLUSIVE|SQLITE_OPEN_DELETEONCLOSE|SQLITE_OPEN_TEMP_DB;
-				rc=(SqlResult)sqlite3BtreeOpen(db.pVfs,null,db,ref pBt,0,flags);
+				rc=(SqlResult)Btree.Open(db.pVfs,null,db,ref pBt,0,flags);
 				if(rc!=SqlResult.SQLITE_OK) {
 					sqlite3ErrorMsg(pParse,"unable to open a temporary database "+"file for storing temporary tables");
 					pParse.rc=rc;

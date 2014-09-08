@@ -1591,7 +1591,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			}
 			else
 				if(pCx.pCursor!=null) {
-					sqlite3BtreeCloseCursor(pCx.pCursor);
+					pCx.pCursor.sqlite3BtreeCloseCursor();
 				}
 			#if !SQLITE_OMIT_VIRTUALTABLE
 			if(pCx.pVtabCursor!=null) {
@@ -1760,7 +1760,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			///<param name="that case we do not support atomic multi">file commits, so use the</param>
 			///<param name="simple case then too.">simple case then too.</param>
 			///<param name=""></param>
-			if(0==StringExtensions.sqlite3Strlen30(db.aDb[0].pBt.sqlite3BtreeGetFilename())||nTrans<=1) {
+			if(0==StringExtensions.sqlite3Strlen30(db.aDb[0].pBt.GetFilename())||nTrans<=1) {
 				for(i=0;rc==SQLITE_OK&&i<db.nDb;i++) {
 					Btree pBt=db.aDb[i].pBt;
 					if(pBt!=null) {
@@ -1801,7 +1801,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				///<summary>
 				///</summary>
 				///<param name="File">name for the master journal </param>
-				string zMainFile=db.aDb[0].pBt.sqlite3BtreeGetFilename();
+				string zMainFile=db.aDb[0].pBt.GetFilename();
 				sqlite3_file pMaster=null;
 				i64 offset=0;
 				int res=0;
@@ -1846,7 +1846,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				for(i=0;i<db.nDb;i++) {
 					Btree pBt=db.aDb[i].pBt;
 					if(pBt.sqlite3BtreeIsInTrans()) {
-						string zFile=pBt.sqlite3BtreeGetJournalname();
+						string zFile=pBt.GetJournalname();
 						if(zFile==null) {
 							continue;
 							///
@@ -2169,7 +2169,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 																																																																																																        //extern int sqlite3_search_count;
 #endif
 				Debug.Assert(p.isTable);
-				rc=sqlite3BtreeMovetoUnpacked(p.pCursor,null,p.movetoTarget,0,ref res);
+				rc=p.pCursor.sqlite3BtreeMovetoUnpacked(null,p.movetoTarget,0,ref res);
 				if(rc!=0)
 					return rc;
 				p.lastRowid=p.movetoTarget;
@@ -2494,7 +2494,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		///<summary>
 		///Serial type to deserialize 
 		///</summary>
-		Mem pMem///
+		Mem result///
 		///<summary>
 		///Memory cell to write value into 
 		///</summary>
@@ -2515,64 +2515,46 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				///<summary>
 				///NULL 
 				///</summary>
-				pMem.flags=MEM_Null;
-				pMem.n=0;
-				pMem.z=null;
-				pMem.zBLOB=null;
+				result.flags=MEM_Null;
+				result.n=0;
+				result.z=null;
+				result.zBLOB=null;
 				break;
 			}
 			case 1: {
-				///
-				///<summary>
-				///</summary>
 				///<param name="1">byte signed integer </param>
-				pMem.u.i=(sbyte)buf[offset+0];
-				pMem.flags=MEM_Int;
+				result.u.i=(sbyte)buf[offset+0];
+				result.flags=MEM_Int;
 				return 1;
 			}
 			case 2: {
-				///
-				///<summary>
-				///</summary>
 				///<param name="2">byte signed integer </param>
-				pMem.u.i=(int)((((sbyte)buf[offset+0])<<8)|buf[offset+1]);
-				pMem.flags=MEM_Int;
+				result.u.i=(int)((((sbyte)buf[offset+0])<<8)|buf[offset+1]);
+				result.flags=MEM_Int;
 				return 2;
 			}
 			case 3: {
-				///
-				///<summary>
-				///</summary>
 				///<param name="3">byte signed integer </param>
-				pMem.u.i=(int)((((sbyte)buf[offset+0])<<16)|(buf[offset+1]<<8)|buf[offset+2]);
-				pMem.flags=MEM_Int;
+				result.u.i=(int)((((sbyte)buf[offset+0])<<16)|(buf[offset+1]<<8)|buf[offset+2]);
+				result.flags=MEM_Int;
 				return 3;
 			}
 			case 4: {
-				///
-				///<summary>
-				///</summary>
 				///<param name="4">byte signed integer </param>
-				pMem.u.i=(int)(((sbyte)buf[offset+0]<<24)|(buf[offset+1]<<16)|(buf[offset+2]<<8)|buf[offset+3]);
-				pMem.flags=MEM_Int;
+				result.u.i=(int)(((sbyte)buf[offset+0]<<24)|(buf[offset+1]<<16)|(buf[offset+2]<<8)|buf[offset+3]);
+				result.flags=MEM_Int;
 				return 4;
 			}
 			case 5: {
-				///
-				///<summary>
-				///</summary>
 				///<param name="6">byte signed integer </param>
 				u64 x=(ulong)((((sbyte)buf[offset+0])<<8)|buf[offset+1]);
 				u32 y=(u32)((buf[offset+2]<<24)|(buf[offset+3]<<16)|(buf[offset+4]<<8)|buf[offset+5]);
 				x=(x<<32)|y;
-				pMem.u.i=(i64)x;
-				pMem.flags=MEM_Int;
+				result.u.i=(i64)x;
+				result.flags=MEM_Int;
 				return 6;
 			}
 			case 6:
-			///
-			///<summary>
-			///</summary>
 			///<param name="8">byte signed integer </param>
 			case 7: {
 				///
@@ -2599,8 +2581,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				y=(u32)((buf[offset+4]<<24)|(buf[offset+5]<<16)|(buf[offset+6]<<8)|buf[offset+7]);
 				x=(x<<32)|y;
 				if(serial_type==6) {
-					pMem.u.i=(i64)x;
-					pMem.flags=MEM_Int;
+					result.u.i=(i64)x;
+					result.flags=MEM_Int;
 				}
 				else {
 					Debug.Assert(sizeof(i64)==8&&sizeof(double)==8);
@@ -2610,55 +2592,49 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 					#if WINDOWS_PHONE || WINDOWS_MOBILE
 																																																																																																																								              pMem.r = BitConverter.ToDouble(BitConverter.GetBytes((long)x), 0);
 #else
-					pMem.r=BitConverter.Int64BitsToDouble((long)x);
+					result.r=BitConverter.Int64BitsToDouble((long)x);
 					// memcpy(pMem.r, x, sizeof(x))
 					#endif
-					pMem.flags=(u16)(MathExtensions.sqlite3IsNaN(pMem.r)?MEM_Null:MEM_Real);
+					result.flags=(u16)(MathExtensions.sqlite3IsNaN(result.r)?MEM_Null:MEM_Real);
 				}
 				return 8;
 			}
 			case 8:
-			///
-			///<summary>
 			///Integer 0 
-			///</summary>
 			case 9: {
-				///
-				///<summary>
 				///Integer 1 
-				///</summary>
-				pMem.u.i=serial_type-8;
-				pMem.flags=MEM_Int;
+				result.u.i=serial_type-8;
+				result.flags=MEM_Int;
 				return 0;
 			}
 			default: {
 				u32 len=(serial_type-12)/2;
-				pMem.n=(int)len;
-				pMem.xDel=null;
+				result.n=(int)len;
+				result.xDel=null;
 				if((serial_type&0x01)!=0) {
-					pMem.flags=MEM_Str|MEM_Ephem;
+					result.flags=MEM_Str|MEM_Ephem;
 					if(len<=buf.Length-offset) {
-						pMem.z=Encoding.UTF8.GetString(buf,offset,(int)len);
+						result.z=Encoding.UTF8.GetString(buf,offset,(int)len);
 						//memcpy( buf, pMem.z, len );
-						pMem.n=pMem.z.Length;
+						result.n=result.z.Length;
 					}
 					else {
-						pMem.z="";
+						result.z="";
 						// Corrupted Data
-						pMem.n=0;
+						result.n=0;
 					}
-					pMem.zBLOB=null;
+					result.zBLOB=null;
 				}
 				else {
-					pMem.z=null;
-					pMem.zBLOB=sqlite3Malloc((int)len);
-					pMem.flags=MEM_Blob|MEM_Ephem;
+					result.z=null;
+					result.zBLOB=sqlite3Malloc((int)len);
+					result.flags=MEM_Blob|MEM_Ephem;
 					if(len<=buf.Length-offset) {
-						Buffer.BlockCopy(buf,offset,pMem.zBLOB,0,(int)len);
+						Buffer.BlockCopy(buf,offset,result.zBLOB,0,(int)len);
 						//memcpy( buf, pMem.z, len );
 					}
 					else {
-						Buffer.BlockCopy(buf,offset,pMem.zBLOB,0,buf.Length-offset-1);
+						Buffer.BlockCopy(buf,offset,result.zBLOB,0,buf.Length-offset-1);
 					}
 				}
 				return len;
@@ -3194,8 +3170,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			///<param name="Any corruption is detected in sqlite3BtreeParseCellPtr(), though, so">Any corruption is detected in sqlite3BtreeParseCellPtr(), though, so</param>
 			///<param name="this code can safely assume that nCellKey is 32">bits  </param>
 			///<param name=""></param>
-			Debug.Assert(sqlite3BtreeCursorIsValid(pCur));
-			rc=sqlite3BtreeKeySize(pCur,ref nCellKey);
+			Debug.Assert(pCur.sqlite3BtreeCursorIsValid());
+			rc=pCur.sqlite3BtreeKeySize(ref nCellKey);
 			Debug.Assert(rc==SQLITE_OK);
 			///
 			///<summary>
@@ -3291,8 +3267,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 			int rc;
 			BtCursor pCur=pC.pCursor;
 			Mem m=null;
-			Debug.Assert(sqlite3BtreeCursorIsValid(pCur));
-			rc=sqlite3BtreeKeySize(pCur,ref nCellKey);
+			Debug.Assert(pCur.sqlite3BtreeCursorIsValid());
+			rc=pCur.sqlite3BtreeKeySize(ref nCellKey);
 			Debug.Assert(rc==SQLITE_OK);
 			///
 			///<summary>

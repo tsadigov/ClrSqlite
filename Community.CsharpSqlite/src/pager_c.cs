@@ -6432,7 +6432,7 @@ rc = pager_incr_changecounter(pPager, 0);
 			/// Return the full pathname of the database file.
 			///
 			///</summary>
-			string sqlite3PagerFilename ()
+			string Filename ()
 			{
 				return this.zFilename;
 			}

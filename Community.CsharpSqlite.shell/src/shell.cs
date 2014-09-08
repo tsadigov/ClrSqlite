@@ -2775,7 +2775,13 @@ enableTimer = booleanValue(azArg[1]);
 
 	static int main (int argc, string[] argv)
 	{
-		Community.CsharpSqlite.Sqlite3.Parse pParse = new Community.CsharpSqlite.Sqlite3.Parse ();
+        sqlite3 pSrc = null;
+        var zSrcFile = "hehehe";
+        var r=Sqlite3.sqlite3_open(zSrcFile, out pSrc);
+        Sqlite3.Btree btree = null;
+        r = Sqlite3.Btree.Open(pSrc.pVfs, "hehehe", pSrc, ref btree, 0, 262);
+		/*
+        Community.CsharpSqlite.Sqlite3.Parse pParse = new Community.CsharpSqlite.Sqlite3.Parse ();
 		String ErrMsg = null;
 		var sql = "CREATE TABLE aaaa(bbb int);";
 		callback_data dt = null;
@@ -2797,6 +2803,12 @@ enableTimer = booleanValue(azArg[1]);
 		Log.WriteHeader ("executing");
 		int sDummy = 0;
 		var vdbe = new sqlite3_stmt ();
+
+
+
+       
+         */
+         
 		//var rcc = Sqlite3.sqlite3_prepare(db, sql, -1, ref vdbe,  sDummy);
 		//Sqlite3.sqlite3_step(vdbe);
 		//pParse.pVdbe.sqlite3VdbeExec();

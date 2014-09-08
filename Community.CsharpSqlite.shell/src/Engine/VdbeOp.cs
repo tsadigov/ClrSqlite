@@ -221,75 +221,83 @@ public u64 cycles;         /* Total time spend executing this instruction */
 
 		internal string ToString (Sqlite3.Vdbe vdbe)
 		{
+            var p1 = this.p1;
+
 			String str = null;
-			switch (OpCode) {
+            switch (OpCode)
+            {
                 case OpCode.OP_MakeRecord:
-            
+
                     break;
-			
+
                 case OpCode.OP_Column:
+
+                    var vdbeCursor = vdbe.apCsr[p1];
+                    str = "nField:" + vdbeCursor.nField + "\tpayloadSize" + vdbeCursor.payloadSize + "\taRow:" + vdbeCursor.aRow + "\taOffset:" + (vdbeCursor.aOffset==null?"":String.Join(",", vdbeCursor.aOffset.Select(x => "x" + x.ToString()).ToArray()));
+
                     break;
 
                 case OpCode.OP_Insert:
-                    var pData = vdbe.aMem [p2];
-                    var pKey = vdbe.aMem [p3];
-                    str = pKey.u.i+"<<";
+                    var pData = vdbe.aMem[p2];
+                    var pKey = vdbe.aMem[p3];
+                    str = pKey.u.i + "<<";
                     if (null != pData.zBLOB)
-                    str+=String.Join(",",pData.zBLOB.Select(x=>"x"+x.ToString()).ToArray());// Converter.ToH(pData.zBLOB);
+                        str += String.Join(",", pData.zBLOB.Select(x => "x" + x.ToString()).ToArray());// Converter.ToH(pData.zBLOB);
                     break;
 
                 case OpCode.OP_Yield:
-                    var pIn1 = vdbe.aMem[p1];
+                    var pIn1 = vdbe.aMem[this.p1];
                     str = pIn1.u.i.ToString();
                     break;
 
                 case OpCode.OP_Goto:
-				str = p2.ToString ();
-				break;
-			case OpCode.OP_Integer:
-				str = p1.ToString ();
-				break;
-			case OpCode.OP_String8:
-				str = this.p4.z;
-				break;
-			case OpCode.OP_Add:
-				{
-					var mem1 = vdbe.aMem [p1];
-					var mem2 = vdbe.aMem [p2];
-					str = mem2.u.i + "+" + mem1.u.i;
-				}
-				break;
-			case OpCode.OP_Divide:
-				{
-					var mem1 = vdbe.aMem [p1];
-					var mem2 = vdbe.aMem [p2];
-					str = mem2.u.i + "/" + mem1.u.i;
-				}
-				break;
-			case OpCode.OP_OpenRead:
-			case OpCode.OP_OpenWrite:
-				var iDb = this.p3;
-				var pDb = vdbe.db.aDb [iDb];
-				str = pDb.zName;
-				break;
-			case OpCode.OP_ParseSchema:
-				str = Sqlite3.displayP4 (this, "", 30);
-				break;
-			case OpCode.OP_ReadCookie:
-			case OpCode.OP_SetCookie:
-				str = ((Sqlite3.BTreeProp)p3).ToString ();
-				break;
-			case OpCode.OP_NewRowid:
-				var pC = vdbe.apCsr [p1];
-				if (null != pC && null != pC.pCursor) {
-					int id = 0;
-					id = (int)pC.pCursor.sqlite3BtreeGetCachedRowid ();
-					if (0 == id)
-						Sqlite3.sqlite3BtreeLast (pC.pCursor, ref id);
-					str = "cached " + id;
-				}
-				break;
-			}
+                    str = p2.ToString();
+                    break;
+                case OpCode.OP_Integer:
+                    str = p1.ToString();
+                    break;
+                case OpCode.OP_String8:
+                    str = this.p4.z;
+                    break;
+                case OpCode.OP_Add:
+                    {
+                        var mem1 = vdbe.aMem[p1];
+                        var mem2 = vdbe.aMem[p2];
+                        str = mem2.u.i + "+" + mem1.u.i;
+                    }
+                    break;
+                case OpCode.OP_Divide:
+                    {
+                        var mem1 = vdbe.aMem[p1];
+                        var mem2 = vdbe.aMem[p2];
+                        str = mem2.u.i + "/" + mem1.u.i;
+                    }
+                    break;
+                case OpCode.OP_OpenRead:
+                case OpCode.OP_OpenWrite:
+                    var iDb = this.p3;
+                    var pDb = vdbe.db.aDb[iDb];
+                    str = pDb.zName;
+                    break;
+                case OpCode.OP_ParseSchema:
+                    str = Sqlite3.displayP4(this, "", 30);
+                    break;
+                case OpCode.OP_ReadCookie:
+                case OpCode.OP_SetCookie:
+                    str = ((Sqlite3.BTreeProp)p3).ToString();
+                    break;
+                case OpCode.OP_NewRowid:
+                    var pC = vdbe.apCsr[p1];
+                    if (null != pC && null != pC.pCursor)
+                    {
+                        int id = 0;
+                        id = (int)pC.pCursor.sqlite3BtreeGetCachedRowid();
+                        if (0 == id)
+                            pC.pCursor.sqlite3BtreeLast(ref id);
+                        str = "cached " + id;
+                    }
+                    break;
+            }
 			return OpCode.ToString () + " \t\t:\t " + str+Environment.NewLine;
 		}
 	}

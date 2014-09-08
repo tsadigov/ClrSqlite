@@ -390,7 +390,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 		///<param name=""></param>
 		static byte[] sqlite3Codec(codec_ctx iCtx,byte[] data,Pgno pgno,int mode) {
 			codec_ctx ctx=(codec_ctx)iCtx;
-			int pg_sz=ctx.pBt.sqlite3BtreeGetPageSize();
+			int pg_sz=ctx.pBt.GetPageSize();
 			int offset=0;
 			byte[] pData=data;
 			CODEC_TRACE("sqlite3Codec: entered pgno=%d, mode=%d, ctx.mode_rekey=%d, pg_sz=%d\n",pgno,mode,ctx.mode_rekey,pg_sz);
@@ -484,7 +484,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 				///<param name="pre">allocate a page buffer of PageSize bytes. This will</param>
 				///<param name="be used as a persistent buffer for encryption and decryption">be used as a persistent buffer for encryption and decryption</param>
 				///<param name="operations to avoid overhead of multiple memory allocations">operations to avoid overhead of multiple memory allocations</param>
-				ctx.buffer=sqlite3MemMalloc(ctx.pBt.sqlite3BtreeGetPageSize());
+				ctx.buffer=sqlite3MemMalloc(ctx.pBt.GetPageSize());
 				//sqlite3Malloc(sqlite3BtreeGetPageSize(ctx.pBt);
 				//if(ctx.buffer == null) return SQLITE_NOMEM;
 				///
@@ -652,7 +652,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 					///</summary>
 					if(rc==SQLITE_OK) {
 						CODEC_TRACE("sqlite3_rekey: committing\n");
-						db.nextPagesize=pDb.pBt.sqlite3BtreeGetPageSize();
+						db.nextPagesize=pDb.pBt.GetPageSize();
 						rc=pDb.pBt.sqlite3BtreeCommit();
 						if(ctx!=null)
 							cipher_ctx_copy(ctx.read_ctx,ctx.write_ctx);

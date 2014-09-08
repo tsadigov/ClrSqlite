@@ -584,7 +584,7 @@ goto pragma_out;
 					v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_DEFAULT_CACHE_SIZE,1);
 					Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 					pDb.pSchema.cache_size=size;
-					pDb.pBt.sqlite3BtreeSetCacheSize(pDb.pSchema.cache_size);
+					pDb.pBt.SetCacheSize(pDb.pSchema.cache_size);
 				}
 			}
 			else
@@ -603,7 +603,7 @@ goto pragma_out;
 					Btree pBt=pDb.pBt;
 					Debug.Assert(pBt!=null);
 					if(null==zRight) {
-						int size=ALWAYS(pBt)?pBt.sqlite3BtreeGetPageSize():0;
+						int size=ALWAYS(pBt)?pBt.GetPageSize():0;
 						returnSingleInt(pParse,"page_size",size);
 					}
 					else {
@@ -862,7 +862,7 @@ goto pragma_out;
 												if(null==zRight) {
 													int auto_vacuum;
 													if(ALWAYS(pBt)) {
-														auto_vacuum=pBt.sqlite3BtreeGetAutoVacuum();
+														auto_vacuum=pBt.GetAutoVacuum();
 													}
 													else {
 														auto_vacuum=SQLITE_DEFAULT_AUTOVACUUM;
@@ -989,7 +989,7 @@ goto pragma_out;
 														else {
 															int size=sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
 															pDb.pSchema.cache_size=size;
-															pDb.pBt.sqlite3BtreeSetCacheSize(pDb.pSchema.cache_size);
+															pDb.pBt.SetCacheSize(pDb.pSchema.cache_size);
 														}
 													}
 													else
@@ -1283,7 +1283,7 @@ else
 																							Debug.Assert(db.aDb[i].zName!=null);
 																							v.sqlite3VdbeAddOp2(OP_Integer,i,1);
 																							v.sqlite3VdbeAddOp4(OP_String8,0,2,0,db.aDb[i].zName,0);
-																							v.sqlite3VdbeAddOp4(OP_String8,0,3,0,db.aDb[i].pBt.sqlite3BtreeGetFilename(),0);
+																							v.sqlite3VdbeAddOp4(OP_String8,0,3,0,db.aDb[i].pBt.GetFilename(),0);
 																							v.sqlite3VdbeAddOp2(OP_ResultRow,1,3);
 																						}
 																					}

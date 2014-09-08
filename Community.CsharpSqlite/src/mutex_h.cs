@@ -120,7 +120,7 @@ namespace Community.CsharpSqlite
 		}
 
 		//#define sqlite3_mutex_free(X)
-		static void sqlite3_mutex_enter (sqlite3_mutex m)
+		public static void sqlite3_mutex_enter (sqlite3_mutex m)
 		{
 		}
 
@@ -131,7 +131,7 @@ namespace Community.CsharpSqlite
 		}
 
 		//#define sqlite3_mutex_try(X)      SQLITE_OK
-		static void sqlite3_mutex_leave (sqlite3_mutex m)
+		public static void sqlite3_mutex_leave (sqlite3_mutex m)
 		{
 		}
 

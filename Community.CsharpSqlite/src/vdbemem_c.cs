@@ -25,7 +25,7 @@ namespace Community.CsharpSqlite {
 		MEM_Ephem=0x1000,
 		MEM_Agg=0x2000,
 		#if !SQLITE_OMIT_INCRBLOB
-																																																const int MEM_Zero = 0x4000;  
+																																																		const int MEM_Zero = 0x4000;  
 #else
 		MEM_Zero=0x0000,
 	#endif
@@ -145,7 +145,7 @@ namespace Community.CsharpSqlite {
 			#if SQLITE_OMIT_UTF16
 			return SQLITE_ERROR;
 			#else
-																																																															
+																																																																		
 /* MemTranslate() may return SQLITE_OK or SQLITE_NOMEM. If NOMEM is returned,
 ** then the encoding of the value may not have changed.
 */
@@ -239,7 +239,7 @@ return rc;
 					//pMem.z[pMem->n + 1] = 0;
 					pMem.flags|=MEM_Term;
 				#if SQLITE_DEBUG
-																																																																																				        pMem.pScopyFrom = null;
+																																																																																								        pMem.pScopyFrom = null;
 #endif
 			}
 			return SQLITE_OK;
@@ -250,7 +250,7 @@ return rc;
 		///
 		///</summary>
 		#if !SQLITE_OMIT_INCRBLOB
-																																										static int sqlite3VdbeMemExpandBlob( Mem pMem )
+																																												static int sqlite3VdbeMemExpandBlob( Mem pMem )
 {
 if ( ( pMem.flags & MEM_Zero ) != 0 )
 {
@@ -474,7 +474,7 @@ return SQLITE_OK;
 		///</summary>
 		static i64 doubleToInt64(double r) {
 			#if SQLITE_OMIT_FLOATING_POINT
-																																																															/* When floating-point is omitted, double and int64 are the same thing */
+																																																																		/* When floating-point is omitted, double and int64 are the same thing */
 return r;
 #else
 			///
@@ -798,7 +798,7 @@ return r;
 			return false;
 		}
 		#if SQLITE_DEBUG
-																																										    /*
+																																												    /*
 ** This routine prepares a memory cell for modication by breaking
 ** its link to a shallow copy and by marking any current shallow
 ** copies of this cell as invalid.
@@ -1167,7 +1167,7 @@ return r;
 			pMem.enc=((byte)enc==0?SqliteEncoding.UTF8:enc);
 			pMem.type=(enc==0?SQLITE_BLOB:SQLITE_TEXT);
 			#if !SQLITE_OMIT_UTF16
-																																																															if( pMem.enc!=SqliteEncoding.UTF8 && sqlite3VdbeMemHandleBom(pMem)!=0 ){
+																																																																		if( pMem.enc!=SqliteEncoding.UTF8 && sqlite3VdbeMemHandleBom(pMem)!=0 ){
 return SQLITE_NOMEM;
 }
 #endif
@@ -1372,7 +1372,7 @@ return SQLITE_NOMEM;
 			///<summary>
 			///Return code 
 			///</summary>
-			Debug.Assert(sqlite3BtreeCursorIsValid(pCur));
+			Debug.Assert(pCur.sqlite3BtreeCursorIsValid());
 			///
 			///<summary>
 			///Note: the calls to BtreeKeyFetch() and DataFetch() below assert()
@@ -1381,10 +1381,10 @@ return SQLITE_NOMEM;
 			Debug.Assert((pMem.flags&MEM_RowSet)==0);
 			int outOffset=-1;
 			if(key) {
-				zData=sqlite3BtreeKeyFetch(pCur,ref available,ref outOffset);
+				zData=pCur.KeyFetch(ref available,ref outOffset);
 			}
 			else {
-				zData=DataFetch(pCur,ref available,ref outOffset);
+				zData=pCur.DataFetch(ref available,ref outOffset);
 			}
 			Debug.Assert(zData!=null);
 			if(offset+amt<=available&&(pMem.flags&MEM_Dyn)==0) {
@@ -1402,10 +1402,10 @@ return SQLITE_NOMEM;
 					pMem.zBLOB=sqlite3Malloc(amt);
 					pMem.flags=MEM_Blob|MEM_Dyn|MEM_Term;
 					if(key) {
-						rc=sqlite3BtreeKey(pCur,(u32)offset,(u32)amt,pMem.zBLOB);
+						rc=pCur.sqlite3BtreeKey((u32)offset,(u32)amt,pMem.zBLOB);
 					}
 					else {
-						rc=sqlite3BtreeData(pCur,(u32)offset,(u32)amt,pMem.zBLOB);
+						rc=pCur.sqlite3BtreeData((u32)offset,(u32)amt,pMem.zBLOB);
 						//pMem.z =  pMem_z ;
 					}
 					//pMem.z[amt] = 0;
@@ -1541,7 +1541,7 @@ return SQLITE_NOMEM;
 			///
 			///</summary>
 			#if SQLITE_ENABLE_STAT2
-																																																															      if ( op == TK_REGISTER )
+																																																																		      if ( op == TK_REGISTER )
         op = pExpr.op2;
 #else
 			if(NEVER(op==TK_REGISTER))

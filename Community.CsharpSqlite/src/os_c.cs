@@ -335,7 +335,13 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-		static sqlite3_vfs vfsList;
+        static sqlite3_vfs s_vfsList;
+
+        public static sqlite3_vfs vfsList
+        {
+            get { return Sqlite3.s_vfsList; }
+            set { Sqlite3.s_vfsList = value; }
+        }
 
 		//#define vfsList GLOBAL(sqlite3_vfs *, vfsList)
 		///<summary>

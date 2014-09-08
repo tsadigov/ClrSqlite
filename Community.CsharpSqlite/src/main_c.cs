@@ -2703,7 +2703,7 @@ return z;
 			///<summary>
 			///Open the backend database driver 
 			///</summary>
-			rc=sqlite3BtreeOpen(db.pVfs,zOpen,db,ref db.aDb[0].pBt,0,flags|SQLITE_OPEN_MAIN_DB);
+			rc=Btree.Open(db.pVfs,zOpen,db,ref db.aDb[0].pBt,0,flags|SQLITE_OPEN_MAIN_DB);
 			if(rc!=SQLITE_OK) {
 				if(rc==SQLITE_IOERR_NOMEM) {
 					rc=SQLITE_NOMEM;

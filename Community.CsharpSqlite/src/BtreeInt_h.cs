@@ -949,7 +949,15 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 		//typedef struct CellInfo CellInfo;
 		public struct CellInfo
 		{
-			public int iCell;
+			int _iCell;
+            public int iCell { 
+                get { 
+                    return _iCell; 
+                } 
+                set { 
+                    _iCell = value; 
+                } 
+            }
 
 			///
 ///<summary>

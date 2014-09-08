@@ -12,1140 +12,1941 @@ namespace Community.CsharpSqlite {
 	using DbPage=Sqlite3.PgHdr;
 	using System.Text;
 	public partial class Sqlite3 {
-		///
-		///<summary>
-		///A Btree handle
-		///
-		///A database connection contains a pointer to an instance of
-		///this object for every database file that it has open.  This structure
-		///is opaque to the database connection.  The database connection cannot
-		///see the internals of this structure and only deals with pointers to
-		///this structure.
-		///
-		///For some database files, the same underlying database cache might be
-		///shared between multiple connections.  In that case, each connection
-		///has it own instance of this object.  But each instance of this object
-		///points to the same BtShared object.  The database cache and the
-		///schema associated with the database file are all contained within
-		///the BtShared object.
-		///
-		///All fields in this structure are accessed under sqlite3.mutex.
-		///The pBt pointer itself may not be changed while there exists cursors
-		///in the referenced BtShared that point back to this Btree since those
-		///cursors have to go through this Btree to find their BtShared and
-		///they often do so without holding sqlite3.mutex.
-		///
-		///</summary>
-		public class Btree {
-			public sqlite3 db;
-			///
-			///<summary>
-			///The database connection holding this Btree 
-			///</summary>
-			public BtShared pBt;
-			///
-			///<summary>
-			///Sharable content of this Btree 
-			///</summary>
-			public TransType inTrans;
-			///
-			///<summary>
-			///TRANS_NONE, TRANS_READ or TRANS_WRITE 
-			///</summary>
-			public bool sharable;
-			///
-			///<summary>
-			///True if we can share pBt with another db 
-			///</summary>
-			public bool locked;
-			///
-			///<summary>
-			///True if db currently has pBt locked 
-			///</summary>
-			public int wantToLock;
-			///
-			///<summary>
-			///Number of nested calls to sqlite3BtreeEnter() 
-			///</summary>
-			public int nBackup;
-			///
-			///<summary>
-			///Number of backup operations reading this btree 
-			///</summary>
-			public Btree pNext;
-			///
-			///<summary>
-			///List of other sharable Btrees from the same db 
-			///</summary>
-			public Btree pPrev;
-			///
-			///<summary>
-			///Back pointer of the same list 
-			///</summary>
-			#if !SQLITE_OMIT_SHARED_CACHE
-																																																																								BtLock lock;              /* Object used to lock page 1 */
+
+
+
+        ///
+        ///<summary>
+        ///A cursor is a pointer to a particular entry within a particular
+        ///</summary>
+        ///<param name="b">tree within a database file.</param>
+        ///<param name=""></param>
+        ///<param name="The entry is identified by its MemPage and the index in">The entry is identified by its MemPage and the index in</param>
+        ///<param name="MemPage.aCell[] of the entry.">MemPage.aCell[] of the entry.</param>
+        ///<param name=""></param>
+        ///<param name="A single database file can shared by two more database connections,">A single database file can shared by two more database connections,</param>
+        ///<param name="but cursors cannot be shared.  Each cursor is associated with a">but cursors cannot be shared.  Each cursor is associated with a</param>
+        ///<param name="particular database connection identified BtCursor.pBtree.db.">particular database connection identified BtCursor.pBtree.db.</param>
+        ///<param name=""></param>
+        ///<param name="Fields in this structure are accessed under the BtShared.mutex">Fields in this structure are accessed under the BtShared.mutex</param>
+        ///<param name="found at self.pBt.mutex.">found at self.pBt.mutex.</param>
+        ///<param name=""></param>
+        public class BtCursor
+        {
+            public Btree pBtree;
+            ///
+            ///<summary>
+            ///The Btree to which this cursor belongs 
+            ///</summary>
+            public BtShared pBt;
+            ///
+            ///<summary>
+            ///The BtShared this cursor points to 
+            ///</summary>
+            public BtCursor pNext;
+            public BtCursor pPrev;
+            ///
+            ///<summary>
+            ///Forms a linked list of all cursors 
+            ///</summary>
+            public KeyInfo pKeyInfo;
+            ///
+            ///<summary>
+            ///Argument passed to comparison function 
+            ///</summary>
+            public Pgno pgnoRoot;
+            ///
+            ///<summary>
+            ///The root page of this tree 
+            ///</summary>
+            public sqlite3_int64 cachedRowid;
+            ///
+            ///<summary>
+            ///Next rowid cache.  0 means not valid 
+            ///</summary>
+            public CellInfo info = new CellInfo();
+            ///
+            ///<summary>
+            ///A parse of the cell we are pointing at 
+            ///</summary>
+            public byte[] pKey;
+            ///
+            ///<summary>
+            ///Saved key that was cursor's last known position 
+            ///</summary>
+            public i64 nKey;
+            ///
+            ///<summary>
+            ///Size of pKey, or last integer key 
+            ///</summary>
+            public int skipNext;
+            ///
+            ///<summary>
+            ///Prev() is noop if negative. Next() is noop if positive 
+            ///</summary>
+            public u8 wrFlag;
+            ///
+            ///<summary>
+            ///True if writable 
+            ///</summary>
+            public u8 atLast;
+            ///
+            ///<summary>
+            ///VdbeCursor pointing to the last entry 
+            ///</summary>
+            public bool validNKey;
+            ///
+            ///<summary>
+            ///True if info.nKey is valid 
+            ///</summary>
+            public int eState;
+            public BtCursorState State
+            {
+                get
+                {
+                    return (BtCursorState)eState;
+                }
+                set
+                {
+                    eState = (int)value;
+                }
+            }
+            ///
+            ///<summary>
+            ///One of the CURSOR_XXX constants (see below) 
+            ///</summary>
+#if !SQLITE_OMIT_INCRBLOB
+																																																																								public Pgno[] aOverflow;         /* Cache of overflow page locations */
+public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 #endif
-			/**
-///<summary>
-///Copy the complete content of pBtFrom into pBtTo.  A transaction
-///must be active for both files.
-///
-///The size of file pTo may be reduced by this operation. If anything
-///goes wrong, the transaction on pTo is rolled back. If successful, the
-///transaction is committed before returning.
-///</summary>
-*/public int sqlite3BtreeCopyFile(Btree pFrom) {
-				int rc;
-				sqlite3_backup b;
-				sqlite3BtreeEnter(this);
-				sqlite3BtreeEnter(pFrom);
-				///
-				///<summary>
-				///Set up an sqlite3_backup object. sqlite3_backup.pDestDb must be set
-				///to 0. This is used by the implementations of sqlite3_backup_step()
-				///and sqlite3_backup_finish() to detect that they are being called
-				///from this function, not directly by the user.
-				///
-				///</summary>
-				b=new sqlite3_backup();
-				// memset( &b, 0, sizeof( b ) );
-				b.pSrcDb=pFrom.db;
-				b.pSrc=pFrom;
-				b.pDest=this;
-				b.iNext=1;
-				///
-				///<summary>
-				///0x7FFFFFFF is the hard limit for the number of pages in a database
-				///file. By passing this as the number of pages to copy to
-				///sqlite3_backup_step(), we can guarantee that the copy finishes
-				///within a single call (unless an error occurs). The Debug.Assert() statement
-				///</summary>
-				///<param name="checks this assumption "> (p.rc) should be set to either SQLITE_DONE</param>
-				///<param name="or an error code.">or an error code.</param>
-				///<param name=""></param>
-				b.sqlite3_backup_step(0x7FFFFFFF);
-				Debug.Assert(b.rc!=SQLITE_OK);
-				rc=b.sqlite3_backup_finish();
-				if(rc==SQLITE_OK) {
-					this.pBt.pageSizeFixed=false;
-				}
-				sqlite3BtreeLeave(pFrom);
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public void clearAllSharedCacheTableLocks() {
-			}
-			public void downgradeAllSharedCacheTableLocks() {
-			}
-			public bool hasSharedCacheTableLock(Pgno b,int c,int d) {
-				return true;
-			}
-			public bool hasReadConflicts(Pgno b) {
-				return false;
-			}
-			public string sqlite3BtreeIntegrityCheck(///
-			///<summary>
-			///The btree to be checked 
-			///</summary>
-			int[] aRoot,///
-			///<summary>
-			///An array of root pages numbers for individual trees 
-			///</summary>
-			int nRoot,///
-			///<summary>
-			///Number of entries in aRoot[] 
-			///</summary>
-			int mxErr,///
-			///<summary>
-			///Stop reporting errors after this many 
-			///</summary>
-			ref int pnErr///
-			///<summary>
-			///Write number of errors seen to this variable 
-			///</summary>
-			) {
-				Pgno i;
-				int nRef;
-				IntegrityCk sCheck=new IntegrityCk();
-				BtShared pBt=this.pBt;
-				StringBuilder zErr=new StringBuilder(100);
-				//char zErr[100];
-				sqlite3BtreeEnter(this);
-				Debug.Assert(this.inTrans>(byte)TransType.TRANS_NONE&&pBt.inTransaction>(byte)TransType.TRANS_NONE);
-				nRef=pBt.pPager.sqlite3PagerRefcount();
-				sCheck.pBt=pBt;
-				sCheck.pPager=pBt.pPager;
-				sCheck.nPage=sCheck.pBt.btreePagecount();
-				sCheck.mxErr=mxErr;
-				sCheck.nErr=0;
-				//sCheck.mallocFailed = 0;
-				pnErr=0;
-				if(sCheck.nPage==0) {
-					sqlite3BtreeLeave(this);
-					return "";
-				}
-				sCheck.anRef=sqlite3Malloc(sCheck.anRef,(int)sCheck.nPage+1);
-				//if( !sCheck.anRef ){
-				//  pnErr = 1;
-				//  sqlite3BtreeLeave(p);
-				//  return 0;
-				//}
-				// for (i = 0; i <= sCheck.nPage; i++) { sCheck.anRef[i] = 0; }
-				i=PENDING_BYTE_PAGE(pBt);
-				if(i<=sCheck.nPage) {
-					sCheck.anRef[i]=1;
-				}
-				sqlite3StrAccumInit(sCheck.errMsg,null,1000,20000);
-				//sCheck.errMsg.useMalloc = 2;
-				///
-				///<summary>
-				///Check the integrity of the freelist
-				///
-				///</summary>
-				sCheck.checkList(1,(int)Converter.sqlite3Get4byte(pBt.pPage1.aData,32),(int)Converter.sqlite3Get4byte(pBt.pPage1.aData,36),"Main freelist: ");
-				///
-				///<summary>
-				///Check all the tables.
-				///
-				///</summary>
-				for(i=0;(int)i<nRoot&&sCheck.mxErr!=0;i++) {
-					if(aRoot[i]==0)
-						continue;
-					#if !SQLITE_OMIT_AUTOVACUUM
-					if(pBt.autoVacuum&&aRoot[i]>1) {
-						sCheck.checkPtrmap((u32)aRoot[i],PTRMAP_ROOTPAGE,0,"");
-					}
-					#endif
-					sCheck.checkTreePage(aRoot[i],"List of tree roots: ",ref refNULL,ref refNULL,null,null);
-				}
-				///
-				///<summary>
-				///Make sure every page in the file is referenced
-				///
-				///</summary>
-				for(i=1;i<=sCheck.nPage&&sCheck.mxErr!=0;i++) {
-					#if SQLITE_OMIT_AUTOVACUUM
-																																																																																																															if( sCheck.anRef[i]==null ){
-checkAppendMsg(sCheck, 0, "Page %d is never used", i);
+            public i16 iPage;
+            ///
+            ///<summary>
+            ///Index of current page in apPage 
+            ///</summary>
+            public u16[] aiIdx = new u16[BTCURSOR_MAX_DEPTH];
+            ///<summary>
+            ///Current index in apPage[i]
+            ///</summary>
+            public MemPage[] apPage = new MemPage[BTCURSOR_MAX_DEPTH];
+            ///<summary>
+            ///Pages from root to current page
+            ///</summary>
+            public void Clear()
+            {
+                pNext = null;
+                pPrev = null;
+                pKeyInfo = null;
+                pgnoRoot = 0;
+                cachedRowid = 0;
+                info = new CellInfo();
+                wrFlag = 0;
+                atLast = 0;
+                validNKey = false;
+                eState = 0;
+                pKey = null;
+                nKey = 0;
+                skipNext = 0;
+#if !SQLITE_OMIT_INCRBLOB
+																																																																																																isIncrblobHandle=false;
+aOverflow= null;
+#endif
+                iPage = 0;
+            }
+            public BtCursor Copy()
+            {
+                BtCursor cp = (BtCursor)MemberwiseClone();
+                return cp;
+            }
+            public bool cursorHoldsMutex()
+            {
+                return true;
+            }
+            public int saveCursorPosition()
+            {
+                int rc;
+                Debug.Assert(CURSOR_VALID == this.eState);
+                Debug.Assert(null == this.pKey);
+                Debug.Assert(this.cursorHoldsMutex());
+                rc = this.sqlite3BtreeKeySize(ref this.nKey);
+                Debug.Assert(rc == SQLITE_OK);
+                ///
+                ///<summary>
+                ///KeySize() cannot fail 
+                ///</summary>
+                ///
+                ///<summary>
+                ///If this is an intKey table, then the above call to BtreeKeySize()
+                ///stores the integer key in pCur.nKey. In this case this value is
+                ///all that is required. Otherwise, if pCur is not open on an intKey
+                ///table, then malloc space for and store the pCur.nKey bytes of key
+                ///data.
+                ///</summary>
+                if (0 == this.apPage[0].intKey)
+                {
+                    byte[] pKey = sqlite3Malloc((int)this.nKey);
+                    //if( pKey !=null){
+                    rc = this.sqlite3BtreeKey(0, (u32)this.nKey, pKey);
+                    if (rc == SQLITE_OK)
+                    {
+                        this.pKey = pKey;
+                    }
+                    //else{
+                    //  sqlite3_free(ref pKey);
+                    //}
+                    //}else{
+                    //  rc = SQLITE_NOMEM;
+                    //}
+                }
+                Debug.Assert(0 == this.apPage[0].intKey || null == this.pKey);
+                if (rc == SQLITE_OK)
+                {
+                    int i;
+                    for (i = 0; i <= this.iPage; i++)
+                    {
+                        releasePage(this.apPage[i]);
+                        this.apPage[i] = null;
+                    }
+                    this.iPage = -1;
+                    this.eState = CURSOR_REQUIRESEEK;
+                }
+                invalidateOverflowCache(this);
+                return rc;
+            }
+            public void sqlite3BtreeClearCursor()
+            {
+                Debug.Assert(this.cursorHoldsMutex());
+                sqlite3_free(ref this.pKey);
+                this.eState = CURSOR_INVALID;
+            }
+            public int btreeMoveto(///
+                ///<summary>
+                ///Cursor open on the btree to be searched 
+                ///</summary>
+            byte[] pKey,///
+                ///<summary>
+                ///Packed key if the btree is an index 
+                ///</summary>
+            i64 nKey,///
+                ///<summary>
+                ///Integer key for tables.  Size of pKey for indices 
+                ///</summary>
+            int bias,///
+                ///<summary>
+                ///Bias search to the high end 
+                ///</summary>
+            ref int pRes///
+                ///<summary>
+                ///Write search results here 
+                ///</summary>
+            )
+            {
+                int rc;
+                ///
+                ///<summary>
+                ///Status code 
+                ///</summary>
+                UnpackedRecord pIdxKey;
+                ///
+                ///<summary>
+                ///Unpacked index key 
+                ///</summary>
+                UnpackedRecord aSpace = new UnpackedRecord();
+                //char aSpace[150]; /* Temp space for pIdxKey - to avoid a malloc */
+                if (pKey != null)
+                {
+                    Debug.Assert(nKey == (i64)(int)nKey);
+                    pIdxKey = sqlite3VdbeRecordUnpack(this.pKeyInfo, (int)nKey, pKey, aSpace, 16);
+                    //sizeof( aSpace ) );
+                    //if ( pIdxKey == null )
+                    //  return SQLITE_NOMEM;
+                }
+                else
+                {
+                    pIdxKey = null;
+                }
+                rc = this.sqlite3BtreeMovetoUnpacked(pIdxKey, nKey, bias != 0 ? 1 : 0, ref pRes);
+                if (pKey != null)
+                {
+                    sqlite3VdbeDeleteUnpackedRecord(pIdxKey);
+                }
+                return rc;
+            }
+            public int btreeRestoreCursorPosition()
+            {
+                int rc;
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(this.eState >= CURSOR_REQUIRESEEK);
+                if (this.eState == CURSOR_FAULT)
+                {
+                    return this.skipNext;
+                }
+                this.eState = CURSOR_INVALID;
+                rc = this.btreeMoveto(this.pKey, this.nKey, 0, ref this.skipNext);
+                if (rc == SQLITE_OK)
+                {
+                    //sqlite3_free(ref pCur.pKey);
+                    this.pKey = null;
+                    Debug.Assert(this.eState == CURSOR_VALID || this.eState == CURSOR_INVALID);
+                }
+                return rc;
+            }
+            public int restoreCursorPosition()
+            {
+                if (this.eState >= CURSOR_REQUIRESEEK)
+                    return this.btreeRestoreCursorPosition();
+                else
+                    return SQLITE_OK;
+            }
+            public int sqlite3BtreeCursorHasMoved(ref int pHasMoved)
+            {
+                int rc;
+                rc = this.restoreCursorPosition();
+                if (rc != 0)
+                {
+                    pHasMoved = 1;
+                    return rc;
+                }
+                if (this.eState != CURSOR_VALID || this.skipNext != 0)
+                {
+                    pHasMoved = 1;
+                }
+                else
+                {
+                    pHasMoved = 0;
+                }
+                return SQLITE_OK;
+            }
+            ///
+            ///<summary>
+            ///Set the cached rowid value of every cursor in the same database file
+            ///as pCur and having the same root page number as pCur.  The value is
+            ///set to iRowid.
+            ///
+            ///Only positive rowid values are considered valid for this cache.
+            ///The cache is initialized to zero, indicating an invalid cache.
+            ///A btree will work fine with zero or negative rowids.  We just cannot
+            ///cache zero or negative rowids, which means tables that use zero or
+            ///negative rowids might run a little slower.  But in practice, zero
+            ///or negative rowids are very uncommon so this should not be a problem.
+            ///</summary>
+            public void sqlite3BtreeSetCachedRowid(sqlite3_int64 iRowid)
+            {
+                BtCursor p;
+                for (p = this.pBt.pCursor; p != null; p = p.pNext)
+                {
+                    if (p.pgnoRoot == this.pgnoRoot)
+                        p.cachedRowid = iRowid;
+                }
+                Debug.Assert(this.cachedRowid == iRowid);
+            }
+            ///
+            ///<summary>
+            ///Return the cached rowid for the given cursor.  A negative or zero
+            ///return value indicates that the rowid cache is invalid and should be
+            ///ignored.  If the rowid cache has never before been set, then a
+            ///zero is returned.
+            ///
+            ///</summary>
+            public sqlite3_int64 sqlite3BtreeGetCachedRowid()
+            {
+                return this.cachedRowid;
+            }
+            public int sqlite3BtreeCount(ref i64 pnEntry)
+            {
+                i64 nEntry = 0;
+                ///
+                ///<summary>
+                ///Value to return in pnEntry 
+                ///</summary>
+                int rc;
+                ///
+                ///<summary>
+                ///Return code 
+                ///</summary>
+                rc = this.moveToRoot();
+                ///
+                ///<summary>
+                ///Unless an error occurs, the following loop runs one iteration for each
+                ///</summary>
+                ///<param name="page in the B">Tree structure (not including overflow pages).</param>
+                ///<param name=""></param>
+                while (rc == SQLITE_OK)
+                {
+                    int iIdx;
+                    ///
+                    ///<summary>
+                    ///Index of child node in parent 
+                    ///</summary>
+                    MemPage pPage;
+                    ///
+                    ///<summary>
+                    ///</summary>
+                    ///<param name="Current page of the b">tree </param>
+                    ///
+                    ///<summary>
+                    ///</summary>
+                    ///<param name="If this is a leaf page or the tree is not an int">key tree, then</param>
+                    ///<param name="this page contains countable entries. Increment the entry counter">this page contains countable entries. Increment the entry counter</param>
+                    ///<param name="accordingly.">accordingly.</param>
+                    ///<param name=""></param>
+                    pPage = this.apPage[this.iPage];
+                    if (pPage.leaf != 0 || 0 == pPage.intKey)
+                    {
+                        nEntry += pPage.nCell;
+                    }
+                    ///
+                    ///<summary>
+                    ///pPage is a leaf node. This loop navigates the cursor so that it
+                    ///points to the first interior cell that it points to the parent of
+                    ///the next page in the tree that has not yet been visited. The
+                    ///pCur.aiIdx[pCur.iPage] value is set to the index of the parent cell
+                    ///of the page, or to the number of cells in the page if the next page
+                    ///</summary>
+                    ///<param name="to visit is the right">child of its parent.</param>
+                    ///<param name=""></param>
+                    ///<param name="If all pages in the tree have been visited, return SQLITE_OK to the">If all pages in the tree have been visited, return SQLITE_OK to the</param>
+                    ///<param name="caller.">caller.</param>
+                    ///<param name=""></param>
+                    if (pPage.leaf != 0)
+                    {
+                        do
+                        {
+                            if (this.iPage == 0)
+                            {
+                                ///
+                                ///<summary>
+                                ///</summary>
+                                ///<param name="All pages of the b">tree have been visited. Return successfully. </param>
+                                pnEntry = nEntry;
+                                return SQLITE_OK;
+                            }
+                            this.moveToParent();
+                        }
+                        while (this.aiIdx[this.iPage] >= this.apPage[this.iPage].nCell);
+                        this.aiIdx[this.iPage]++;
+                        pPage = this.apPage[this.iPage];
+                    }
+                    ///
+                    ///<summary>
+                    ///Descend to the child node of the cell that the cursor currently
+                    ///</summary>
+                    ///<param name="points at. This is the right">child if (iIdx==pPage.nCell).</param>
+                    ///<param name=""></param>
+                    iIdx = this.aiIdx[this.iPage];
+                    if (iIdx == pPage.nCell)
+                    {
+                        rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8));
+                    }
+                    else
+                    {
+                        rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(iIdx)));
+                    }
+                }
+                ///
+                ///<summary>
+                ///An error has occurred. Return an error code. 
+                ///</summary>
+                return rc;
+            }
+            public int sqlite3BtreeDelete()
+            {
+                Btree p = this.pBtree;
+                BtShared pBt = p.pBt;
+                int rc;
+                ///
+                ///<summary>
+                ///Return code 
+                ///</summary>
+                MemPage pPage;
+                ///
+                ///<summary>
+                ///Page to delete cell from 
+                ///</summary>
+                int pCell;
+                ///
+                ///<summary>
+                ///Pointer to cell to delete 
+                ///</summary>
+                int iCellIdx;
+                ///
+                ///<summary>
+                ///Index of cell to delete 
+                ///</summary>
+                int iCellDepth;
+                ///
+                ///<summary>
+                ///Depth of node containing pCell 
+                ///</summary>
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(pBt.inTransaction == TransType.TRANS_WRITE);
+                Debug.Assert(!pBt.readOnly);
+                Debug.Assert(this.wrFlag != 0);
+                Debug.Assert(p.hasSharedCacheTableLock(this.pgnoRoot, this.pKeyInfo != null ? 1 : 0, 2));
+                Debug.Assert(!p.hasReadConflicts(this.pgnoRoot));
+                if (NEVER(this.aiIdx[this.iPage] >= this.apPage[this.iPage].nCell) || NEVER(this.eState != CURSOR_VALID))
+                {
+                    return SQLITE_ERROR;
+                    ///
+                    ///<summary>
+                    ///Something has gone awry. 
+                    ///</summary>
+                }
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="If this is a delete operation to remove a row from a table b">tree,</param>
+                ///<param name="invalidate any incrblob cursors open on the row being deleted.  ">invalidate any incrblob cursors open on the row being deleted.  </param>
+                if (this.pKeyInfo == null)
+                {
+                    p.invalidateIncrblobCursors(this.info.nKey, 0);
+                }
+                iCellDepth = this.iPage;
+                iCellIdx = this.aiIdx[iCellDepth];
+                pPage = this.apPage[iCellDepth];
+                pCell = pPage.findCell(iCellIdx);
+                ///
+                ///<summary>
+                ///If the page containing the entry to delete is not a leaf page, move
+                ///the cursor to the largest entry in the tree that is smaller than
+                ///the entry being deleted. This cell will replace the cell being deleted
+                ///from the internal node. The 'previous' entry is used for this instead
+                ///of the 'next' entry, as the previous entry is always a part of the
+                ///</summary>
+                ///<param name="sub">tree headed by the child page of the cell being deleted. This makes</param>
+                ///<param name="balancing the tree following the delete operation easier.  ">balancing the tree following the delete operation easier.  </param>
+                if (0 == pPage.leaf)
+                {
+                    int notUsed = 0;
+                    rc = this.sqlite3BtreePrevious(ref notUsed);
+                    if (rc != 0)
+                        return rc;
+                }
+                ///
+                ///<summary>
+                ///Save the positions of any other cursors open on this table before
+                ///making any modifications. Make the page containing the entry to be
+                ///deleted writable. Then free any overflow pages associated with the
+                ///entry and finally remove the cell itself from within the page.
+                ///
+                ///</summary>
+                rc = pBt.saveAllCursors(this.pgnoRoot, this);
+                if (rc != 0)
+                    return rc;
+                rc = sqlite3PagerWrite(pPage.pDbPage);
+                if (rc != 0)
+                    return rc;
+                rc = clearCell(pPage, pCell);
+                pPage.dropCell(iCellIdx, pPage.cellSizePtr(pCell), ref rc);
+                if (rc != 0)
+                    return rc;
+                ///
+                ///<summary>
+                ///If the cell deleted was not located on a leaf page, then the cursor
+                ///</summary>
+                ///<param name="is currently pointing to the largest entry in the sub">tree headed</param>
+                ///<param name="by the child">page of the cell that was just deleted from an internal</param>
+                ///<param name="node. The cell from the leaf node needs to be moved to the internal">node. The cell from the leaf node needs to be moved to the internal</param>
+                ///<param name="node to replace the deleted cell.  ">node to replace the deleted cell.  </param>
+                if (0 == pPage.leaf)
+                {
+                    MemPage pLeaf = this.apPage[this.iPage];
+                    int nCell;
+                    Pgno n = this.apPage[iCellDepth + 1].pgno;
+                    //byte[] pTmp;
+                    pCell = pLeaf.findCell(pLeaf.nCell - 1);
+                    nCell = pLeaf.cellSizePtr(pCell);
+                    Debug.Assert(MX_CELL_SIZE(pBt) >= nCell);
+                    //allocateTempSpace(pBt);
+                    //pTmp = pBt.pTmpSpace;
+                    rc = sqlite3PagerWrite(pLeaf.pDbPage);
+                    byte[] pNext_4 = sqlite3Malloc(nCell + 4);
+                    Buffer.BlockCopy(pLeaf.aData, pCell - 4, pNext_4, 0, nCell + 4);
+                    pPage.insertCell(iCellIdx, pNext_4, nCell + 4, null, n, ref rc);
+                    //insertCell( pPage, iCellIdx, pCell - 4, nCell + 4, pTmp, n, ref rc );
+                    pLeaf.dropCell(pLeaf.nCell - 1, nCell, ref rc);
+                    if (rc != 0)
+                        return rc;
+                }
+                ///
+                ///<summary>
+                ///Balance the tree. If the entry deleted was located on a leaf page,
+                ///then the cursor still points to that page. In this case the first
+                ///call to balance() repairs the tree, and the if(...) condition is
+                ///never true.
+                ///
+                ///Otherwise, if the entry deleted was on an internal node page, then
+                ///pCur is pointing to the leaf page from which a cell was removed to
+                ///replace the cell deleted from the internal node. This is slightly
+                ///tricky as the leaf node may be underfull, and the internal node may
+                ///be either under or overfull. In this case run the balancing algorithm
+                ///on the leaf node first. If the balance proceeds far enough up the
+                ///tree that we can be sure that any problem in the internal node has
+                ///been corrected, so be it. Otherwise, after balancing the leaf node,
+                ///walk the cursor up the tree to the internal node and balance it as
+                ///well.  
+                ///</summary>
+                rc = this.balance();
+                if (rc == SQLITE_OK && this.iPage > iCellDepth)
+                {
+                    while (this.iPage > iCellDepth)
+                    {
+                        releasePage(this.apPage[this.iPage--]);
+                    }
+                    rc = this.balance();
+                }
+                if (rc == SQLITE_OK)
+                {
+                    this.moveToRoot();
+                }
+                return rc;
+            }
+            public int sqlite3BtreeInsert(///
+                ///<summary>
+                ///Insert data into the table of this cursor 
+                ///</summary>
+            byte[] pKey, i64 nKey,///
+                ///<summary>
+                ///The key of the new record 
+                ///</summary>
+            byte[] pData, int nData,///
+                ///<summary>
+                ///The data of the new record 
+                ///</summary>
+            int nZero,///
+                ///<summary>
+                ///Number of extra 0 bytes to append to data 
+                ///</summary>
+            int appendBias,///
+                ///<summary>
+                ///True if this is likely an append 
+                ///</summary>
+            int seekResult///
+                ///<summary>
+                ///Result of prior MovetoUnpacked() call 
+                ///</summary>
+            )
+            {
+                int rc;
+                int loc = seekResult;
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="">1: before desired location  +1: after </param>
+                int szNew = 0;
+                int idx;
+                MemPage pPage;
+                Btree p = this.pBtree;
+                BtShared pBt = p.pBt;
+                int oldCell;
+                byte[] newCell = null;
+                if (this.State == BtCursorState.CURSOR_FAULT)
+                {
+                    Debug.Assert(this.skipNext != SQLITE_OK);
+                    return this.skipNext;
+                }
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(this.wrFlag != 0 && pBt.inTransaction == TransType.TRANS_WRITE && !pBt.readOnly);
+                Debug.Assert(p.hasSharedCacheTableLock(this.pgnoRoot, this.pKeyInfo != null ? 1 : 0, 2));
+                ///
+                ///<summary>
+                ///Assert that the caller has been consistent. If this cursor was opened
+                ///</summary>
+                ///<param name="expecting an index b">tree, then the caller should be inserting blob</param>
+                ///<param name="keys with no associated data. If the cursor was opened expecting an">keys with no associated data. If the cursor was opened expecting an</param>
+                ///<param name="intkey table, the caller should be inserting integer keys with a">intkey table, the caller should be inserting integer keys with a</param>
+                ///<param name="blob of associated data.  ">blob of associated data.  </param>
+                Debug.Assert((pKey == null) == (this.pKeyInfo == null));
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="If this is an insert into a table b">tree, invalidate any incrblob</param>
+                ///<param name="cursors open on the row being replaced (assuming this is a replace">cursors open on the row being replaced (assuming this is a replace</param>
+                ///<param name="operation ">op).  </param>
+                if (this.pKeyInfo == null)
+                {
+                    p.invalidateIncrblobCursors(nKey, 0);
+                }
+                ///
+                ///<summary>
+                ///Save the positions of any other cursors open on this table.
+                ///
+                ///</summary>
+                ///<param name="In some cases, the call to btreeMoveto() below is a no">op. For</param>
+                ///<param name="example, when inserting data into a table with auto">generated integer</param>
+                ///<param name="keys, the VDBE layer invokes sqlite3BtreeLast() to figure out the">keys, the VDBE layer invokes sqlite3BtreeLast() to figure out the</param>
+                ///<param name="integer key to use. It then calls this function to actually insert the">integer key to use. It then calls this function to actually insert the</param>
+                ///<param name="data into the intkey B">Tree. In this case btreeMoveto() recognizes</param>
+                ///<param name="that the cursor is already where it needs to be and returns without">that the cursor is already where it needs to be and returns without</param>
+                ///<param name="doing any work. To avoid thwarting these optimizations, it is important">doing any work. To avoid thwarting these optimizations, it is important</param>
+                ///<param name="not to clear the cursor here.">not to clear the cursor here.</param>
+                ///<param name=""></param>
+                rc = pBt.saveAllCursors(this.pgnoRoot, this);
+                if (rc != 0)
+                    return rc;
+                if (0 == loc)
+                {
+                    rc = this.btreeMoveto(pKey, nKey, appendBias, ref loc);
+                    if (rc != 0)
+                        return rc;
+                }
+                Debug.Assert(this.State == BtCursorState.CURSOR_VALID || (this.State == BtCursorState.CURSOR_INVALID && loc != 0));
+                pPage = this.apPage[this.iPage];
+                Debug.Assert(pPage.intKey != 0 || nKey >= 0);
+                Debug.Assert(pPage.leaf != 0 || 0 == pPage.intKey);
+                TRACE("INSERT: table=%d nkey=%lld ndata=%d page=%d %s\n", this.pgnoRoot, nKey, nData, pPage.pgno, loc == 0 ? "overwrite" : "new entry");
+                Debug.Assert(pPage.isInit != 0);
+                allocateTempSpace(pBt);
+                newCell = pBt.pTmpSpace;
+                //if (newCell == null) return SQLITE_NOMEM;
+                rc = pPage.fillInCell(newCell, pKey, nKey, pData, nData, nZero, ref szNew);
+                if (rc != 0)
+                    goto end_insert;
+                Debug.Assert(szNew == pPage.cellSizePtr(newCell));
+                Debug.Assert(szNew <= MX_CELL_SIZE(pBt));
+                idx = this.aiIdx[this.iPage];
+                if (loc == 0)
+                {
+                    u16 szOld;
+                    Debug.Assert(idx < pPage.nCell);
+                    rc = sqlite3PagerWrite(pPage.pDbPage);
+                    if (rc != 0)
+                    {
+                        goto end_insert;
+                    }
+                    oldCell = pPage.findCell(idx);
+                    if (0 == pPage.leaf)
+                    {
+                        //memcpy(newCell, oldCell, 4);
+                        newCell[0] = pPage.aData[oldCell + 0];
+                        newCell[1] = pPage.aData[oldCell + 1];
+                        newCell[2] = pPage.aData[oldCell + 2];
+                        newCell[3] = pPage.aData[oldCell + 3];
+                    }
+                    szOld = pPage.cellSizePtr(oldCell);
+                    rc = clearCell(pPage, oldCell);
+                    pPage.dropCell(idx, szOld, ref rc);
+                    if (rc != 0)
+                        goto end_insert;
+                }
+                else
+                    if (loc < 0 && pPage.nCell > 0)
+                    {
+                        Debug.Assert(pPage.leaf != 0);
+                        idx = ++this.aiIdx[this.iPage];
+                    }
+                    else
+                    {
+                        Debug.Assert(pPage.leaf != 0);
+                    }
+                pPage.insertCell(idx, newCell, szNew, null, 0, ref rc);
+                Debug.Assert(rc != SQLITE_OK || pPage.nCell > 0 || pPage.nOverflow > 0);
+                ///
+                ///<summary>
+                ///If no error has occured and pPage has an overflow cell, call balance()
+                ///to redistribute the cells within the tree. Since balance() may move
+                ///the cursor, zero the BtCursor.info.nSize and BtCursor.validNKey
+                ///variables.
+                ///
+                ///Previous versions of SQLite called moveToRoot() to move the cursor
+                ///back to the root page as balance() used to invalidate the contents
+                ///of BtCursor.apPage[] and BtCursor.aiIdx[]. Instead of doing that,
+                ///set the cursor state to "invalid". This makes common insert operations
+                ///slightly faster.
+                ///
+                ///There is a subtle but important optimization here too. When inserting
+                ///</summary>
+                ///<param name="multiple records into an intkey b">tree using a single cursor (as can</param>
+                ///<param name="happen while processing an "INSERT INTO ... SELECT" statement), it">happen while processing an "INSERT INTO ... SELECT" statement), it</param>
+                ///<param name="is advantageous to leave the cursor pointing to the last entry in">is advantageous to leave the cursor pointing to the last entry in</param>
+                ///<param name="the b">tree if possible. If the cursor is left pointing to the last</param>
+                ///<param name="entry in the table, and the next row inserted has an integer key">entry in the table, and the next row inserted has an integer key</param>
+                ///<param name="larger than the largest existing key, it is possible to insert the">larger than the largest existing key, it is possible to insert the</param>
+                ///<param name="row without seeking the cursor. This can be a big performance boost.">row without seeking the cursor. This can be a big performance boost.</param>
+                ///<param name=""></param>
+                this.info.nSize = 0;
+                this.validNKey = false;
+                if (rc == SQLITE_OK && pPage.nOverflow != 0)
+                {
+                    rc = this.balance();
+                    ///
+                    ///<summary>
+                    ///Must make sure nOverflow is reset to zero even if the balance()
+                    ///fails. Internal data structure corruption will result otherwise.
+                    ///Also, set the cursor state to invalid. This stops saveCursorPosition()
+                    ///from trying to save the current position of the cursor.  
+                    ///</summary>
+                    this.apPage[this.iPage].nOverflow = 0;
+                    this.State = BtCursorState.CURSOR_INVALID;
+                }
+                Debug.Assert(this.apPage[this.iPage].nOverflow == 0);
+            end_insert:
+                return rc;
+            }
+            public int balance()
+            {
+                int rc = SQLITE_OK;
+                int nMin = (int)this.pBt.usableSize * 2 / 3;
+                //u8[] pFree = null;
+#if !NDEBUG || SQLITE_COVERAGE_TEST || DEBUG
+																																																																												  int balance_quick_called = 0;//TESTONLY( int balance_quick_called = 0 );
+  int balance_deeper_called = 0;//TESTONLY( int balance_deeper_called = 0 );
+#else
+                int balance_quick_called = 0;
+                int balance_deeper_called = 0;
+#endif
+                do
+                {
+                    int iPage = this.iPage;
+                    MemPage pPage = this.apPage[iPage];
+                    if (iPage == 0)
+                    {
+                        if (pPage.nOverflow != 0)
+                        {
+                            ///
+                            ///<summary>
+                            ///</summary>
+                            ///<param name="The root page of the b">tree is overfull. In this case call the</param>
+                            ///<param name="balance_deeper() function to create a new child for the root">page</param>
+                            ///<param name="and copy the current contents of the root">page to it. The</param>
+                            ///<param name="next iteration of the do">loop will balance the child page.</param>
+                            ///<param name=""></param>
+                            Debug.Assert((balance_deeper_called++) == 0);
+                            rc = pPage.balance_deeper(ref this.apPage[1]);
+                            if (rc == SQLITE_OK)
+                            {
+                                this.iPage = 1;
+                                this.aiIdx[0] = 0;
+                                this.aiIdx[1] = 0;
+                                Debug.Assert(this.apPage[1].nOverflow != 0);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                        if (pPage.nOverflow == 0 && pPage.nFree <= nMin)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            MemPage pParent = this.apPage[iPage - 1];
+                            int iIdx = this.aiIdx[iPage - 1];
+                            rc = sqlite3PagerWrite(pParent.pDbPage);
+                            if (rc == SQLITE_OK)
+                            {
+#if !SQLITE_OMIT_QUICKBALANCE
+                                if (pPage.hasData != 0 && pPage.nOverflow == 1 && pPage.aOvfl[0].idx == pPage.nCell && pParent.pgno != 1 && pParent.nCell == iIdx)
+                                {
+                                    ///
+                                    ///<summary>
+                                    ///Call balance_quick() to create a new sibling of pPage on which
+                                    ///to store the overflow cell. balance_quick() inserts a new cell
+                                    ///into pParent, which may cause pParent overflow. If this
+                                    ///</summary>
+                                    ///<param name="happens, the next interation of the do">loop will balance pParent</param>
+                                    ///<param name="use either balance_nonroot() or balance_deeper(). Until this">use either balance_nonroot() or balance_deeper(). Until this</param>
+                                    ///<param name="happens, the overflow cell is stored in the aBalanceQuickSpace[]">happens, the overflow cell is stored in the aBalanceQuickSpace[]</param>
+                                    ///<param name="buffer.">buffer.</param>
+                                    ///<param name=""></param>
+                                    ///<param name="The purpose of the following Debug.Assert() is to check that only a">The purpose of the following Debug.Assert() is to check that only a</param>
+                                    ///<param name="single call to balance_quick() is made for each call to this">single call to balance_quick() is made for each call to this</param>
+                                    ///<param name="function. If this were not verified, a subtle bug involving reuse">function. If this were not verified, a subtle bug involving reuse</param>
+                                    ///<param name="of the aBalanceQuickSpace[] might sneak in.">of the aBalanceQuickSpace[] might sneak in.</param>
+                                    ///<param name=""></param>
+                                    Debug.Assert((balance_quick_called++) == 0);
+                                    rc = pParent.balance_quick(pPage, aBalanceQuickSpace);
+                                }
+                                else
+#endif
+                                {
+                                    ///
+                                    ///<summary>
+                                    ///In this case, call balance_nonroot() to redistribute cells
+                                    ///between pPage and up to 2 of its sibling pages. This involves
+                                    ///modifying the contents of pParent, which may cause pParent to
+                                    ///</summary>
+                                    ///<param name="become overfull or underfull. The next iteration of the do">loop</param>
+                                    ///<param name="will balance the parent page to correct this.">will balance the parent page to correct this.</param>
+                                    ///<param name=""></param>
+                                    ///<param name="If the parent page becomes overfull, the overflow cell or cells">If the parent page becomes overfull, the overflow cell or cells</param>
+                                    ///<param name="are stored in the pSpace buffer allocated immediately below.">are stored in the pSpace buffer allocated immediately below.</param>
+                                    ///<param name="A subsequent iteration of the do">loop will deal with this by</param>
+                                    ///<param name="calling balance_nonroot() (balance_deeper() may be called first,">calling balance_nonroot() (balance_deeper() may be called first,</param>
+                                    ///<param name="but it doesn't deal with overflow cells "> just moves them to a</param>
+                                    ///<param name="different page). Once this subsequent call to balance_nonroot()">different page). Once this subsequent call to balance_nonroot()</param>
+                                    ///<param name="has completed, it is safe to release the pSpace buffer used by">has completed, it is safe to release the pSpace buffer used by</param>
+                                    ///<param name="the previous call, as the overflow cell data will have been">the previous call, as the overflow cell data will have been</param>
+                                    ///<param name="copied either into the body of a database page or into the new">copied either into the body of a database page or into the new</param>
+                                    ///<param name="pSpace buffer passed to the latter call to balance_nonroot().">pSpace buffer passed to the latter call to balance_nonroot().</param>
+                                    ///<param name=""></param>
+                                    u8[] pSpace = new u8[this.pBt.pageSize];
+                                    // u8 pSpace = sqlite3PageMalloc( pCur.pBt.pageSize );
+                                    rc = pParent.balance_nonroot(iIdx, null, iPage == 1 ? 1 : 0);
+                                    //if (pFree != null)
+                                    //{
+                                    //  /* If pFree is not NULL, it points to the pSpace buffer used
+                                    //  ** by a previous call to balance_nonroot(). Its contents are
+                                    //  ** now stored either on real database pages or within the
+                                    //  ** new pSpace buffer, so it may be safely freed here. */
+                                    //  sqlite3PageFree(ref pFree);
+                                    //}
+                                    ///
+                                    ///<summary>
+                                    ///The pSpace buffer will be freed after the next call to
+                                    ///balance_nonroot(), or just before this function returns, whichever
+                                    ///comes first. 
+                                    ///</summary>
+                                    //pFree = pSpace;
+                                }
+                            }
+                            pPage.nOverflow = 0;
+                            ///
+                            ///<summary>
+                            ///</summary>
+                            ///<param name="The next iteration of the do">loop balances the parent page. </param>
+                            releasePage(pPage);
+                            this.iPage--;
+                        }
+                }
+                while (rc == SQLITE_OK);
+                //if (pFree != null)
+                //{
+                //  sqlite3PageFree(ref pFree);
+                //}
+                return rc;
+            }
+            public int sqlite3BtreePrevious(ref int pRes)
+            {
+                int rc;
+                MemPage pPage;
+                Debug.Assert(this.cursorHoldsMutex());
+                rc = this.restoreCursorPosition();
+                if (rc != SQLITE_OK)
+                {
+                    return rc;
+                }
+                this.atLast = 0;
+                if (CURSOR_INVALID == this.eState)
+                {
+                    pRes = 1;
+                    return SQLITE_OK;
+                }
+                if (this.skipNext < 0)
+                {
+                    this.skipNext = 0;
+                    pRes = 0;
+                    return SQLITE_OK;
+                }
+                this.skipNext = 0;
+                pPage = this.apPage[this.iPage];
+                Debug.Assert(pPage.isInit != 0);
+                if (0 == pPage.leaf)
+                {
+                    int idx = this.aiIdx[this.iPage];
+                    rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(idx)));
+                    if (rc != 0)
+                    {
+                        return rc;
+                    }
+                    rc = this.moveToRightmost();
+                }
+                else
+                {
+                    while (this.aiIdx[this.iPage] == 0)
+                    {
+                        if (this.iPage == 0)
+                        {
+                            this.State = BtCursorState.CURSOR_INVALID;
+                            pRes = 1;
+                            return SQLITE_OK;
+                        }
+                        this.moveToParent();
+                    }
+                    this.info.nSize = 0;
+                    this.validNKey = false;
+                    this.aiIdx[this.iPage]--;
+                    pPage = this.apPage[this.iPage];
+                    if (pPage.intKey != 0 && 0 == pPage.leaf)
+                    {
+                        rc = this.sqlite3BtreePrevious(ref pRes);
+                    }
+                    else
+                    {
+                        rc = SQLITE_OK;
+                    }
+                }
+                pRes = 0;
+                return rc;
+            }
+            public int sqlite3BtreeNext(ref int pRes)
+            {
+                int rc;
+                int idx;
+                MemPage pPage;
+                Debug.Assert(this.cursorHoldsMutex());
+                rc = this.restoreCursorPosition();
+                if (rc != SQLITE_OK)
+                {
+                    return rc;
+                }
+                // Not needed in C# // Debug.Assert( pRes != 0 );
+                if (CURSOR_INVALID == this.eState)
+                {
+                    pRes = 1;
+                    return SQLITE_OK;
+                }
+                if (this.skipNext > 0)
+                {
+                    this.skipNext = 0;
+                    pRes = 0;
+                    return SQLITE_OK;
+                }
+                this.skipNext = 0;
+                pPage = this.apPage[this.iPage];
+                idx = ++this.aiIdx[this.iPage];
+                Debug.Assert(pPage.isInit != 0);
+                Debug.Assert(idx <= pPage.nCell);
+                this.info.nSize = 0;
+                this.validNKey = false;
+                if (idx >= pPage.nCell)
+                {
+                    if (0 == pPage.leaf)
+                    {
+                        rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8));
+                        if (rc != 0)
+                            return rc;
+                        rc = this.moveToLeftmost();
+                        pRes = 0;
+                        return rc;
+                    }
+                    do
+                    {
+                        if (this.iPage == 0)
+                        {
+                            pRes = 1;
+                            this.State = BtCursorState.CURSOR_INVALID;
+                            return SQLITE_OK;
+                        }
+                        this.moveToParent();
+                        pPage = this.apPage[this.iPage];
+                    }
+                    while (this.aiIdx[this.iPage] >= pPage.nCell);
+                    pRes = 0;
+                    if (pPage.intKey != 0)
+                    {
+                        rc = this.sqlite3BtreeNext(ref pRes);
+                    }
+                    else
+                    {
+                        rc = SQLITE_OK;
+                    }
+                    return rc;
+                }
+                pRes = 0;
+                if (pPage.leaf != 0)
+                {
+                    return SQLITE_OK;
+                }
+                rc = this.moveToLeftmost();
+                return rc;
+            }
+            public bool sqlite3BtreeEof()
+            {
+                ///
+                ///<summary>
+                ///TODO: What if the cursor is in CURSOR_REQUIRESEEK but all table entries
+                ///have been deleted? This API will need to change to return an error code
+                ///as well as the boolean result value.
+                ///
+                ///</summary>
+                return (BtCursorState.CURSOR_VALID != this.State);
+            }
+            public int sqlite3BtreeMovetoUnpacked(///
+                ///<summary>
+                ///The cursor to be moved 
+                ///</summary>
+            UnpackedRecord pIdxKey,///
+                ///<summary>
+                ///Unpacked index key 
+                ///</summary>
+            i64 intKey,///
+                ///<summary>
+                ///The table key 
+                ///</summary>
+            int biasRight,///
+                ///<summary>
+                ///If true, bias the search to the high end 
+                ///</summary>
+            ref int pRes///
+                ///<summary>
+                ///Write search results here 
+                ///</summary>
+            )
+            {
+                int rc;
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                // Not needed in C# // Debug.Assert( pRes != 0 );
+                Debug.Assert((pIdxKey == null) == (this.pKeyInfo == null));
+                ///
+                ///<summary>
+                ///If the cursor is already positioned at the point we are trying
+                ///to move to, then just return without doing any work 
+                ///</summary>
+                if (this.State == BtCursorState.CURSOR_VALID && this.validNKey && this.apPage[0].intKey != 0)
+                {
+                    if (this.info.nKey == intKey)
+                    {
+                        pRes = 0;
+                        return SQLITE_OK;
+                    }
+                    if (this.atLast != 0 && this.info.nKey < intKey)
+                    {
+                        pRes = -1;
+                        return SQLITE_OK;
+                    }
+                }
+                rc = this.moveToRoot();
+                if (rc != 0)
+                {
+                    return rc;
+                }
+                Debug.Assert(this.apPage[this.iPage] != null);
+                Debug.Assert(this.apPage[this.iPage].isInit != 0);
+                Debug.Assert(this.apPage[this.iPage].nCell > 0 || this.State == BtCursorState.CURSOR_INVALID);
+                if (this.State == BtCursorState.CURSOR_INVALID)
+                {
+                    pRes = -1;
+                    Debug.Assert(this.apPage[this.iPage].nCell == 0);
+                    return SQLITE_OK;
+                }
+                Debug.Assert(this.apPage[0].intKey != 0 || pIdxKey != null);
+                for (; ; )
+                {
+                    int lwr, upr, idx;
+                    Pgno chldPg;
+                    MemPage pPage = this.apPage[this.iPage];
+                    int c;
+                    ///
+                    ///<summary>
+                    ///</summary>
+                    ///<param name="pPage.nCell must be greater than zero. If this is the root">page</param>
+                    ///<param name="the cursor would have been INVALID above and this for(;;) loop">the cursor would have been INVALID above and this for(;;) loop</param>
+                    ///<param name="not run. If this is not the root">page, then the moveToChild() routine</param>
+                    ///<param name="would have already detected db corruption. Similarly, pPage must">would have already detected db corruption. Similarly, pPage must</param>
+                    ///<param name="be the right kind (index or table) of b">tree page. Otherwise</param>
+                    ///<param name="a moveToChild() or moveToRoot() call would have detected corruption.  ">a moveToChild() or moveToRoot() call would have detected corruption.  </param>
+                    Debug.Assert(pPage.nCell > 0);
+                    Debug.Assert(pPage.intKey == ((pIdxKey == null) ? 1 : 0));
+                    lwr = 0;
+                    upr = pPage.nCell - 1;
+                    if (biasRight != 0)
+                    {
+                        this.aiIdx[this.iPage] = (u16)(idx = upr);
+                    }
+                    else
+                    {
+                        this.aiIdx[this.iPage] = (u16)(idx = (upr + lwr) / 2);
+                    }
+                    for (; ; )
+                    {
+                        int pCell;
+                        ///
+                        ///<summary>
+                        ///Pointer to current cell in pPage 
+                        ///</summary>
+                        Debug.Assert(idx == this.aiIdx[this.iPage]);
+                        this.info.nSize = 0;
+                        pCell = pPage.findCell(idx) + pPage.childPtrSize;
+                        if (pPage.intKey != 0)
+                        {
+                            i64 nCellKey = 0;
+                            if (pPage.hasData != 0)
+                            {
+                                u32 Dummy0 = 0;
+                                pCell += getVarint32(pPage.aData, pCell, out Dummy0);
+                            }
+                            getVarint(pPage.aData, pCell, out nCellKey);
+                            if (nCellKey == intKey)
+                            {
+                                c = 0;
+                            }
+                            else
+                                if (nCellKey < intKey)
+                                {
+                                    c = -1;
+                                }
+                                else
+                                {
+                                    Debug.Assert(nCellKey > intKey);
+                                    c = +1;
+                                }
+                            this.validNKey = true;
+                            this.info.nKey = nCellKey;
+                        }
+                        else
+                        {
+                            ///
+                            ///<summary>
+                            ///</summary>
+                            ///<param name="The maximum supported page">size is 65536 bytes. This means that</param>
+                            ///<param name="the maximum number of record bytes stored on an index B">Tree</param>
+                            ///<param name="page is less than 16384 bytes and may be stored as a 2">byte</param>
+                            ///<param name="varint. This information is used to attempt to avoid parsing">varint. This information is used to attempt to avoid parsing</param>
+                            ///<param name="the entire cell by checking for the cases where the record is">the entire cell by checking for the cases where the record is</param>
+                            ///<param name="stored entirely within the b">tree page by inspecting the first</param>
+                            ///<param name="2 bytes of the cell.">2 bytes of the cell.</param>
+                            ///<param name=""></param>
+                            int nCell = pPage.aData[pCell + 0];
+                            //pCell[0];
+                            if (0 == (nCell & 0x80) && nCell <= pPage.maxLocal)
+                            {
+                                ///
+                                ///<summary>
+                                ///</summary>
+                                ///<param name="This branch runs if the record">size field of the cell is a</param>
+                                ///<param name="single byte varint and the record fits entirely on the main">single byte varint and the record fits entirely on the main</param>
+                                ///<param name="b">tree page.  </param>
+                                c = sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 1, pIdxKey);
+                                //c = sqlite3VdbeRecordCompare( nCell, (void*)&pCell[1], pIdxKey );
+                            }
+                            else
+                                if (0 == (pPage.aData[pCell + 1] & 0x80)//!(pCell[1] & 0x80)
+                                && (nCell = ((nCell & 0x7f) << 7) + pPage.aData[pCell + 1]) <= pPage.maxLocal//pCell[1])<=pPage.maxLocal
+                                )
+                                {
+                                    ///
+                                    ///<summary>
+                                    ///</summary>
+                                    ///<param name="The record">size field is a 2 byte varint and the record</param>
+                                    ///<param name="fits entirely on the main b">tree page.  </param>
+                                    c = sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 2, pIdxKey);
+                                    //c = sqlite3VdbeRecordCompare( nCell, (void*)&pCell[2], pIdxKey );
+                                }
+                                else
+                                {
+                                    ///
+                                    ///<summary>
+                                    ///The record flows over onto one or more overflow pages. In
+                                    ///this case the whole cell needs to be parsed, a buffer allocated
+                                    ///and accessPayload() used to retrieve the record into the
+                                    ///buffer before VdbeRecordCompare() can be called. 
+                                    ///</summary>
+                                    u8[] pCellKey;
+                                    u8[] pCellBody = new u8[pPage.aData.Length - pCell + pPage.childPtrSize];
+                                    Buffer.BlockCopy(pPage.aData, pCell - pPage.childPtrSize, pCellBody, 0, pCellBody.Length);
+                                    //          u8 * const pCellBody = pCell - pPage->childPtrSize;
+                                    pPage.btreeParseCellPtr(pCellBody, ref this.info);
+                                    nCell = (int)this.info.nKey;
+                                    pCellKey = sqlite3Malloc(nCell);
+                                    //if ( pCellKey == null )
+                                    //{
+                                    //  rc = SQLITE_NOMEM;
+                                    //  goto moveto_finish;
+                                    //}
+                                    rc = this.accessPayload(0, (u32)nCell, pCellKey, 0);
+                                    if (rc != 0)
+                                    {
+                                        pCellKey = null;
+                                        // sqlite3_free(ref pCellKey );
+                                        goto moveto_finish;
+                                    }
+                                    c = sqlite3VdbeRecordCompare(nCell, pCellKey, pIdxKey);
+                                    pCellKey = null;
+                                    // sqlite3_free(ref pCellKey );
+                                }
+                        }
+                        if (c == 0)
+                        {
+                            if (pPage.intKey != 0 && 0 == pPage.leaf)
+                            {
+                                lwr = idx;
+                                upr = lwr - 1;
+                                break;
+                            }
+                            else
+                            {
+                                pRes = 0;
+                                rc = SQLITE_OK;
+                                goto moveto_finish;
+                            }
+                        }
+                        if (c < 0)
+                        {
+                            lwr = idx + 1;
+                        }
+                        else
+                        {
+                            upr = idx - 1;
+                        }
+                        if (lwr > upr)
+                        {
+                            break;
+                        }
+                        this.aiIdx[this.iPage] = (u16)(idx = (lwr + upr) / 2);
+                    }
+                    Debug.Assert(lwr == upr + 1);
+                    Debug.Assert(pPage.isInit != 0);
+                    if (pPage.leaf != 0)
+                    {
+                        chldPg = 0;
+                    }
+                    else
+                        if (lwr >= pPage.nCell)
+                        {
+                            chldPg = Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8);
+                        }
+                        else
+                        {
+                            chldPg = Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(lwr));
+                        }
+                    if (chldPg == 0)
+                    {
+                        Debug.Assert(this.aiIdx[this.iPage] < this.apPage[this.iPage].nCell);
+                        pRes = c;
+                        rc = SQLITE_OK;
+                        goto moveto_finish;
+                    }
+                    this.aiIdx[this.iPage] = (u16)lwr;
+                    this.info.nSize = 0;
+                    this.validNKey = false;
+                    rc = this.moveToChild(chldPg);
+                    if (rc != 0)
+                        goto moveto_finish;
+                }
+            moveto_finish:
+                return rc;
+            }
+            public int sqlite3BtreeLast(ref int pRes)
+            {
+                int rc;
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="If the cursor already points to the last entry, this is a no">op. </param>
+                if (BtCursorState.CURSOR_VALID == this.State && this.atLast != 0)
+                {
+#if SQLITE_DEBUG
+																																																																																																					    /* This block serves to Debug.Assert() that the cursor really does point
+** to the last entry in the b-tree. */
+    int ii;
+    for ( ii = 0; ii < pCur.iPage; ii++ )
+    {
+      Debug.Assert( pCur.aiIdx[ii] == pCur.apPage[ii].nCell );
+    }
+    Debug.Assert( pCur.aiIdx[pCur.iPage] == pCur.apPage[pCur.iPage].nCell - 1 );
+    Debug.Assert( pCur.apPage[pCur.iPage].leaf != 0 );
+#endif
+                    return SQLITE_OK;
+                }
+                rc = this.moveToRoot();
+                if (rc == SQLITE_OK)
+                {
+                    if (BtCursorState.CURSOR_INVALID == this.State)
+                    {
+                        Debug.Assert(this.apPage[this.iPage].nCell == 0);
+                        pRes = 1;
+                    }
+                    else
+                    {
+                        Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                        pRes = 0;
+                        rc = this.moveToRightmost();
+                        this.atLast = (u8)(rc == SQLITE_OK ? 1 : 0);
+                    }
+                }
+                return rc;
+            }
+            public int sqlite3BtreeFirst(ref int pRes)
+            {
+                int rc;
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                rc = this.moveToRoot();
+                if (rc == SQLITE_OK)
+                {
+                    if (this.State == BtCursorState.CURSOR_INVALID)
+                    {
+                        Debug.Assert(this.apPage[this.iPage].nCell == 0);
+                        pRes = 1;
+                    }
+                    else
+                    {
+                        Debug.Assert(this.apPage[this.iPage].nCell > 0);
+                        pRes = 0;
+                        rc = this.moveToLeftmost();
+                    }
+                }
+                return rc;
+            }
+            public int moveToRightmost()
+            {
+                Pgno pgno;
+                int rc = SQLITE_OK;
+                MemPage pPage = null;
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                while (rc == SQLITE_OK && 0 == (pPage = this.apPage[this.iPage]).leaf)
+                {
+                    pgno = Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8);
+                    this.aiIdx[this.iPage] = pPage.nCell;
+                    rc = this.moveToChild(pgno);
+                }
+                if (rc == SQLITE_OK)
+                {
+                    this.aiIdx[this.iPage] = (u16)(pPage.nCell - 1);
+                    this.info.nSize = 0;
+                    this.validNKey = false;
+                }
+                return rc;
+            }
+            public int moveToLeftmost()
+            {
+                Pgno pgno;
+                int rc = SQLITE_OK;
+                MemPage pPage;
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                while (rc == SQLITE_OK && 0 == (pPage = this.apPage[this.iPage]).leaf)
+                {
+                    Debug.Assert(this.aiIdx[this.iPage] < pPage.nCell);
+                    pgno = Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(this.aiIdx[this.iPage]));
+                    rc = this.moveToChild(pgno);
+                }
+                return rc;
+            }
+            public int moveToRoot()
+            {
+                MemPage pRoot;
+                int rc = SQLITE_OK;
+                Btree p = this.pBtree;
+                BtShared pBt = p.pBt;
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(CURSOR_INVALID < CURSOR_REQUIRESEEK);
+                Debug.Assert(CURSOR_VALID < CURSOR_REQUIRESEEK);
+                Debug.Assert(CURSOR_FAULT > CURSOR_REQUIRESEEK);
+                if (this.eState >= CURSOR_REQUIRESEEK)
+                {
+                    if (this.State == BtCursorState.CURSOR_FAULT)
+                    {
+                        Debug.Assert(this.skipNext != SQLITE_OK);
+                        return this.skipNext;
+                    }
+                    this.sqlite3BtreeClearCursor();
+                }
+                if (this.iPage >= 0)
+                {
+                    int i;
+                    for (i = 1; i <= this.iPage; i++)
+                    {
+                        releasePage(this.apPage[i]);
+                    }
+                    this.iPage = 0;
+                }
+                else
+                {
+                    rc = getAndInitPage(pBt, this.pgnoRoot, ref this.apPage[0]);
+                    if (rc != SQLITE_OK)
+                    {
+                        this.State = BtCursorState.CURSOR_INVALID;
+                        return rc;
+                    }
+                    this.iPage = 0;
+                    ///
+                    ///<summary>
+                    ///If pCur.pKeyInfo is not NULL, then the caller that opened this cursor
+                    ///</summary>
+                    ///<param name="expected to open it on an index b">tree. Otherwise, if pKeyInfo is</param>
+                    ///<param name="NULL, the caller expects a table b">tree. If this is not the case,</param>
+                    ///<param name="return an SQLITE_CORRUPT error.  ">return an SQLITE_CORRUPT error.  </param>
+                    Debug.Assert(this.apPage[0].intKey == 1 || this.apPage[0].intKey == 0);
+                    if ((this.pKeyInfo == null) != (this.apPage[0].intKey != 0))
+                    {
+                        return SQLITE_CORRUPT_BKPT();
+                    }
+                }
+                ///
+                ///<summary>
+                ///Assert that the root page is of the correct type. This must be the
+                ///</summary>
+                ///<param name="case as the call to this function that loaded the root">page (either</param>
+                ///<param name="this call or a previous invocation) would have detected corruption">this call or a previous invocation) would have detected corruption</param>
+                ///<param name="if the assumption were not true, and it is not possible for the flags">if the assumption were not true, and it is not possible for the flags</param>
+                ///<param name="byte to have been modified while this cursor is holding a reference">byte to have been modified while this cursor is holding a reference</param>
+                ///<param name="to the page.  ">to the page.  </param>
+                pRoot = this.apPage[0];
+                Debug.Assert(pRoot.pgno == this.pgnoRoot);
+                Debug.Assert(pRoot.isInit != 0 && (this.pKeyInfo == null) == (pRoot.intKey != 0));
+                this.aiIdx[0] = 0;
+                this.info.nSize = 0;
+                this.atLast = 0;
+                this.validNKey = false;
+                if (pRoot.nCell == 0 && 0 == pRoot.leaf)
+                {
+                    Pgno subpage;
+                    if (pRoot.pgno != 1)
+                        return SQLITE_CORRUPT_BKPT();
+                    subpage = Converter.sqlite3Get4byte(pRoot.aData, pRoot.hdrOffset + 8);
+                    this.State = BtCursorState.CURSOR_VALID;
+                    rc = this.moveToChild(subpage);
+                }
+                else
+                {
+                    this.State = ((pRoot.nCell > 0) ? BtCursorState.CURSOR_VALID : BtCursorState.CURSOR_INVALID);
+                }
+                return rc;
+            }
+            public void moveToParent()
+            {
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                Debug.Assert(this.iPage > 0);
+                Debug.Assert(this.apPage[this.iPage] != null);
+                this.apPage[this.iPage - 1].assertParentIndex(this.aiIdx[this.iPage - 1], this.apPage[this.iPage].pgno);
+                releasePage(this.apPage[this.iPage]);
+                this.iPage--;
+                this.info.nSize = 0;
+                this.validNKey = false;
+            }
+            public int moveToChild(u32 newPgno)
+            {
+                int rc;
+                int i = this.iPage;
+                MemPage pNewPage = new MemPage();
+                BtShared pBt = this.pBt;
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                Debug.Assert(this.iPage < BTCURSOR_MAX_DEPTH);
+                if (this.iPage >= (BTCURSOR_MAX_DEPTH - 1))
+                {
+                    return SQLITE_CORRUPT_BKPT();
+                }
+                rc = getAndInitPage(pBt, newPgno, ref pNewPage);
+                if (rc != 0)
+                    return rc;
+                this.apPage[i + 1] = pNewPage;
+                this.aiIdx[i + 1] = 0;
+                this.iPage++;
+                this.info.nSize = 0;
+                this.validNKey = false;
+                if (pNewPage.nCell < 1 || pNewPage.intKey != this.apPage[i].intKey)
+                {
+                    return SQLITE_CORRUPT_BKPT();
+                }
+                return SQLITE_OK;
+            }
+            public byte[] DataFetch(ref int pAmt, ref int outOffset)
+            {
+                byte[] p = null;
+                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                Debug.Assert(this.cursorHoldsMutex());
+                if (ALWAYS(this.State == BtCursorState.CURSOR_VALID))
+                {
+                    p = this.fetchPayload(ref pAmt, ref outOffset, true);
+                }
+                return p;
+            }
+            public byte[] KeyFetch(ref int pAmt, ref int outOffset)
+            {
+                byte[] p = null;
+                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                Debug.Assert(this.cursorHoldsMutex());
+                if (ALWAYS(this.State == BtCursorState.CURSOR_VALID))
+                {
+                    p = this.fetchPayload(ref pAmt, ref outOffset, false);
+                }
+                return p;
+            }
+            public byte[] fetchPayload(///
+                ///<summary>
+                ///Cursor pointing to entry to read from 
+                ///</summary>
+            ref int pAmt,///
+                ///<summary>
+                ///Write the number of available bytes here 
+                ///</summary>
+            ref int outOffset,///
+                ///<summary>
+                ///Offset into Buffer 
+                ///</summary>
+            bool skipKey///
+                ///<summary>
+                ///read beginning at data if this is true 
+                ///</summary>
+            )
+            {
+                byte[] aPayload;
+                MemPage pPage;
+                u32 nKey;
+                u32 nLocal;
+                Debug.Assert(this != null && this.iPage >= 0 && this.apPage[this.iPage] != null);
+                Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                Debug.Assert(this.cursorHoldsMutex());
+                outOffset = -1;
+                pPage = this.apPage[this.iPage];
+                Debug.Assert(this.aiIdx[this.iPage] < pPage.nCell);
+                if (NEVER(this.info.nSize == 0))
+                {
+                    this.apPage[this.iPage].btreeParseCell(this.aiIdx[this.iPage], ref this.info);
+                }
+                //aPayload = pCur.info.pCell;
+                //aPayload += pCur.info.nHeader;
+                aPayload = sqlite3Malloc(this.info.nSize - this.info.nHeader);
+                if (pPage.intKey != 0)
+                {
+                    nKey = 0;
+                }
+                else
+                {
+                    nKey = (u32)this.info.nKey;
+                }
+                if (skipKey)
+                {
+                    //aPayload += nKey;
+                    outOffset = (int)(this.info.iCell + this.info.nHeader + nKey);
+                    Buffer.BlockCopy(this.info.pCell, outOffset, aPayload, 0, (int)(this.info.nSize - this.info.nHeader - nKey));
+                    nLocal = this.info.nLocal - nKey;
+                }
+                else
+                {
+                    outOffset = (int)(this.info.iCell + this.info.nHeader);
+                    Buffer.BlockCopy(this.info.pCell, outOffset, aPayload, 0, this.info.nSize - this.info.nHeader);
+                    nLocal = this.info.nLocal;
+                    Debug.Assert(nLocal <= nKey);
+                }
+                pAmt = (int)nLocal;
+                return aPayload;
+            }
+            public int sqlite3BtreeData(u32 offset, u32 amt, byte[] pBuf)
+            {
+                int rc;
+#if !SQLITE_OMIT_INCRBLOB
+																																																																												if ( pCur.State==BtCursorState.CURSOR_INVALID ){
+return SQLITE_ABORT;
 }
-#else
-					///
-					///<summary>
-					///</summary>
-					///<param name="If the database supports auto">vacuum, make sure no tables contain</param>
-					///<param name="references to pointer">map pages.</param>
-					if(sCheck.anRef[i]==0&&(PTRMAP_PAGENO(pBt,i)!=i||!pBt.autoVacuum)) {
-						sCheck.checkAppendMsg("","Page %d is never used",i);
-					}
-					if(sCheck.anRef[i]!=0&&(PTRMAP_PAGENO(pBt,i)==i&&pBt.autoVacuum)) {
-						sCheck.checkAppendMsg("","Pointer map page %d is referenced",i);
-					}
-					#endif
-				}
-				///
-				///<summary>
-				///Make sure this analysis did not leave any unref() pages.
-				///This is an internal consistency check; an integrity check
-				///of the integrity check.
-				///
-				///</summary>
-				if(NEVER(nRef!=pBt.pPager.sqlite3PagerRefcount())) {
-					sCheck.checkAppendMsg("","Outstanding page count goes from %d to %d during this analysis",nRef,pBt.pPager.sqlite3PagerRefcount());
-				}
-				///
-				///<summary>
-				///Clean  up and report errors.
-				///
-				///</summary>
-				sqlite3BtreeLeave(this);
-				sCheck.anRef=null;
-				// sqlite3_free( ref sCheck.anRef );
-				//if( sCheck.mallocFailed ){
-				//  sqlite3StrAccumReset(sCheck.errMsg);
-				//  pnErr = sCheck.nErr+1;
-				//  return 0;
-				//}
-				pnErr=sCheck.nErr;
-				if(sCheck.nErr==0)
-					sqlite3StrAccumReset(sCheck.errMsg);
-				return sqlite3StrAccumFinish(sCheck.errMsg);
-			}
-			public Schema sqlite3BtreeSchema(int nBytes,dxFreeSchema xFree) {
-				BtShared pBt=this.pBt;
-				sqlite3BtreeEnter(this);
-				if(null==pBt.pSchema&&nBytes!=0) {
-					pBt.pSchema=new Schema();
-					//sqlite3DbMallocZero(0, nBytes);
-					pBt.xFreeSchema=xFree;
-				}
-				sqlite3BtreeLeave(this);
-				return pBt.pSchema;
-			}
-			public int sqlite3BtreeSchemaLocked() {
-				int rc;
-				Debug.Assert(sqlite3_mutex_held(this.db.mutex));
-				sqlite3BtreeEnter(this);
-				rc=this.querySharedCacheTableLock(MASTER_ROOT,READ_LOCK);
-				Debug.Assert(rc==SQLITE_OK||rc==SQLITE_LOCKED_SHAREDCACHE);
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public int sqlite3BtreeSetVersion(int iVersion) {
-				BtShared pBt=this.pBt;
-				int rc;
-				///
-				///<summary>
-				///Return code 
-				///</summary>
-				Debug.Assert(this.inTrans==TransType.TRANS_NONE);
-				Debug.Assert(iVersion==1||iVersion==2);
-				///
-				///<summary>
-				///If setting the version fields to 1, do not automatically open the
-				///WAL connection, even if the version fields are currently set to 2.
-				///
-				///</summary>
-				pBt.doNotUseWAL=iVersion==1;
-				rc=this.sqlite3BtreeBeginTrans(0);
-				if(rc==SQLITE_OK) {
-					u8[] aData=pBt.pPage1.aData;
-					if(aData[18]!=(u8)iVersion||aData[19]!=(u8)iVersion) {
-						rc=this.sqlite3BtreeBeginTrans(2);
-						if(rc==SQLITE_OK) {
-							rc=sqlite3PagerWrite(pBt.pPage1.pDbPage);
-							if(rc==SQLITE_OK) {
-								aData[18]=(u8)iVersion;
-								aData[19]=(u8)iVersion;
-							}
-						}
-					}
-				}
-				pBt.doNotUseWAL=false;
-				return rc;
-			}
-			public int sqlite3BtreeClearTable(int iTable,ref int pnChange) {
-				int rc;
-				BtShared pBt=this.pBt;
-				sqlite3BtreeEnter(this);
-				Debug.Assert(this.inTrans==TransType.TRANS_WRITE);
-				///
-				///<summary>
-				///Invalidate all incrblob cursors open on table iTable (assuming iTable
-				///</summary>
-				///<param name="is the root of a table b"> if it is not, the following call is</param>
-				///<param name="a no">op).  </param>
-				this.invalidateIncrblobCursors(0,1);
-				rc=pBt.saveAllCursors((Pgno)iTable,null);
-				if(SQLITE_OK==rc) {
-					rc=clearDatabasePage(pBt,(Pgno)iTable,0,ref pnChange);
-				}
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public int btreeDropTable(Pgno iTable,ref int piMoved) {
-				int rc;
-				MemPage pPage=null;
-				BtShared pBt=this.pBt;
-				Debug.Assert(sqlite3BtreeHoldsMutex(this));
-				Debug.Assert(this.inTrans==TransType.TRANS_WRITE);
-				///
-				///<summary>
-				///It is illegal to drop a table if any cursors are open on the
-				///</summary>
-				///<param name="database. This is because in auto">vacuum mode the backend may</param>
-				///<param name="need to move another root">page to fill a gap left by the deleted</param>
-				///<param name="root page. If an open cursor was using this page a problem would">root page. If an open cursor was using this page a problem would</param>
-				///<param name="occur.">occur.</param>
-				///<param name=""></param>
-				///<param name="This error is caught long before control reaches this point.">This error is caught long before control reaches this point.</param>
-				///<param name=""></param>
-				if(NEVER(pBt.pCursor)) {
-					sqlite3ConnectionBlocked(this.db,pBt.pCursor.pBtree.db);
-					return SQLITE_LOCKED_SHAREDCACHE;
-				}
-				rc=pBt.btreeGetPage((Pgno)iTable,ref pPage,0);
-				if(rc!=0)
-					return rc;
-				int Dummy0=0;
-				rc=this.sqlite3BtreeClearTable((int)iTable,ref Dummy0);
-				if(rc!=0) {
-					releasePage(pPage);
-					return rc;
-				}
-				piMoved=0;
-				if(iTable>1) {
-					#if SQLITE_OMIT_AUTOVACUUM
-																																																																																																														freePage(pPage, ref rc);
-releasePage(pPage);
-#else
-					if(pBt.autoVacuum) {
-						Pgno maxRootPgno=0;
-						maxRootPgno=this.sqlite3BtreeGetMeta(BTREE_LARGEST_ROOT_PAGE);
-						if(iTable==maxRootPgno) {
-							///
-							///<summary>
-							///</summary>
-							///<param name="If the table being dropped is the table with the largest root">page</param>
-							///<param name="number in the database, put the root page on the free list.">number in the database, put the root page on the free list.</param>
-							///<param name=""></param>
-							freePage(pPage,ref rc);
-							releasePage(pPage);
-							if(rc!=SQLITE_OK) {
-								return rc;
-							}
-						}
-						else {
-							///
-							///<summary>
-							///</summary>
-							///<param name="The table being dropped does not have the largest root">page</param>
-							///<param name="number in the database. So move the page that does into the">number in the database. So move the page that does into the</param>
-							///<param name="gap left by the deleted root">page.</param>
-							///<param name=""></param>
-							MemPage pMove=new MemPage();
-							releasePage(pPage);
-							rc=pBt.btreeGetPage(maxRootPgno,ref pMove,0);
-							if(rc!=SQLITE_OK) {
-								return rc;
-							}
-							rc=relocatePage(pBt,pMove,PTRMAP_ROOTPAGE,0,iTable,0);
-							releasePage(pMove);
-							if(rc!=SQLITE_OK) {
-								return rc;
-							}
-							pMove=null;
-							rc=pBt.btreeGetPage(maxRootPgno,ref pMove,0);
-							freePage(pMove,ref rc);
-							releasePage(pMove);
-							if(rc!=SQLITE_OK) {
-								return rc;
-							}
-							piMoved=(int)maxRootPgno;
-						}
-						///
-						///<summary>
-						///</summary>
-						///<param name="Set the new 'max">page' value in the database header. This</param>
-						///<param name="is the old value less one, less one more if that happens to">is the old value less one, less one more if that happens to</param>
-						///<param name="be a root">page number, less one again if that is the</param>
-						///<param name="PENDING_BYTE_PAGE.">PENDING_BYTE_PAGE.</param>
-						///<param name=""></param>
-						maxRootPgno--;
-						while(maxRootPgno==PENDING_BYTE_PAGE(pBt)||PTRMAP_ISPAGE(pBt,maxRootPgno)) {
-							maxRootPgno--;
-						}
-						Debug.Assert(maxRootPgno!=PENDING_BYTE_PAGE(pBt));
-						rc=this.sqlite3BtreeUpdateMeta(4,maxRootPgno);
-					}
-					else {
-						freePage(pPage,ref rc);
-						releasePage(pPage);
-					}
-					#endif
-				}
-				else {
-					///
-					///<summary>
-					///If sqlite3BtreeDropTable was called on page 1.
-					///This really never should happen except in a corrupt
-					///database.
-					///
-					///</summary>
-					pPage.zeroPage(PTF_INTKEY|PTF_LEAF);
-					releasePage(pPage);
-				}
-				return rc;
-			}
-			public int sqlite3BtreeDropTable(int iTable,ref int piMoved) {
-				int rc;
-				sqlite3BtreeEnter(this);
-				rc=this.btreeDropTable((u32)iTable,ref piMoved);
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public u32 sqlite3BtreeGetMeta(int idx) {
-				u32 pMeta;
-				BtShared pBt=this.pBt;
-				sqlite3BtreeEnter(this);
-				Debug.Assert(this.inTrans>(byte)TransType.TRANS_NONE);
-				Debug.Assert(SQLITE_OK==this.querySharedCacheTableLock(MASTER_ROOT,READ_LOCK));
-				Debug.Assert(pBt.pPage1!=null);
-				Debug.Assert(idx>=0&&idx<=15);
-				pMeta=Converter.sqlite3Get4byte(pBt.pPage1.aData,36+idx*4);
-				///
-				///<summary>
-				///</summary>
-				///<param name="If auto">vacuum</param>
-				///<param name="database, mark the database as read">only.  </param>
-				return pMeta;
-				#if SQLITE_OMIT_AUTOVACUUM
-																																																																																					if( idx==BTREE_LARGEST_ROOT_PAGE && pMeta>0 ) pBt.readOnly = 1;
 #endif
-				sqlite3BtreeLeave(this);
-			}
-			public int sqlite3BtreeUpdateMeta(int idx,u32 iMeta) {
-				BtShared pBt=this.pBt;
-				byte[] pP1;
-				int rc;
-				Debug.Assert(idx>=1&&idx<=15);
-				sqlite3BtreeEnter(this);
-				Debug.Assert(this.inTrans==TransType.TRANS_WRITE);
-				Debug.Assert(pBt.pPage1!=null);
-				pP1=pBt.pPage1.aData;
-				rc=sqlite3PagerWrite(pBt.pPage1.pDbPage);
-				if(rc==SQLITE_OK) {
-					Converter.sqlite3Put4byte(pP1,36+idx*4,iMeta);
-					#if !SQLITE_OMIT_AUTOVACUUM
-					if(idx==BTREE_INCR_VACUUM) {
-						Debug.Assert(pBt.autoVacuum||iMeta==0);
-						Debug.Assert(iMeta==0||iMeta==1);
-						pBt.incrVacuum=iMeta!=0;
-					}
-					#endif
-				}
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public int querySharedCacheTableLock(Pgno iTab,u8 eLock) {
-				return SQLITE_OK;
-			}
-			public void invalidateIncrblobCursors(i64 y,int z) {
-			}
-			public int sqlite3BtreeSetCacheSize(int mxPage) {
-				BtShared pBt=this.pBt;
-				Debug.Assert(sqlite3_mutex_held(this.db.mutex));
-				sqlite3BtreeEnter(this);
-				pBt.pPager.sqlite3PagerSetCachesize(mxPage);
-				sqlite3BtreeLeave(this);
-				return SQLITE_OK;
-			}
-			public int sqlite3BtreeSetSafetyLevel(///
-			///<summary>
-			///The btree to set the safety level on 
-			///</summary>
-			int level,///
-			///<summary>
-			///PRAGMA synchronous.  1=OFF, 2=NORMAL, 3=FULL 
-			///</summary>
-			int fullSync,///
-			///<summary>
-			///PRAGMA fullfsync. 
-			///</summary>
-			int ckptFullSync///
-			///<summary>
-			///PRAGMA checkpoint_fullfync 
-			///</summary>
-			) {
-				BtShared pBt=this.pBt;
-				Debug.Assert(sqlite3_mutex_held(this.db.mutex));
-				Debug.Assert(level>=1&&level<=3);
-				sqlite3BtreeEnter(this);
-				pBt.pPager.sqlite3PagerSetSafetyLevel(level,fullSync,ckptFullSync);
-				sqlite3BtreeLeave(this);
-				return SQLITE_OK;
-			}
-			public int sqlite3BtreeGetPageSize() {
-				return (int)this.pBt.pageSize;
-			}
-			public int sqlite3BtreeSetPageSize(int pageSize,int nReserve,int iFix) {
-				int rc=SQLITE_OK;
-				BtShared pBt=this.pBt;
-				Debug.Assert(nReserve>=-1&&nReserve<=255);
-				sqlite3BtreeEnter(this);
-				if(pBt.pageSizeFixed) {
-					sqlite3BtreeLeave(this);
-					return SQLITE_READONLY;
-				}
-				if(nReserve<0) {
-					nReserve=(int)(pBt.pageSize-pBt.usableSize);
-				}
-				Debug.Assert(nReserve>=0&&nReserve<=255);
-				if(pageSize>=512&&pageSize<=SQLITE_MAX_PAGE_SIZE&&((pageSize-1)&pageSize)==0) {
-					Debug.Assert((pageSize&7)==0);
-					Debug.Assert(null==pBt.pPage1&&null==pBt.pCursor);
-					pBt.pageSize=(u32)pageSize;
-					//        freeTempSpace(pBt);
-				}
-				rc=pBt.pPager.sqlite3PagerSetPagesize(ref pBt.pageSize,nReserve);
-				pBt.usableSize=(u16)(pBt.pageSize-nReserve);
-				if(iFix!=0)
-					pBt.pageSizeFixed=true;
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public Pgno sqlite3BtreeLastPage() {
-				Debug.Assert(sqlite3BtreeHoldsMutex(this));
-				Debug.Assert(((this.pBt.nPage)&0x8000000)==0);
-				return (Pgno)this.pBt.btreePagecount();
-			}
-			public int sqlite3BtreeSyncDisabled() {
-				BtShared pBt=this.pBt;
-				int rc;
-				Debug.Assert(sqlite3_mutex_held(this.db.mutex));
-				sqlite3BtreeEnter(this);
-				Debug.Assert(pBt!=null&&pBt.pPager!=null);
-				rc=pBt.pPager.sqlite3PagerNosync()?1:0;
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public int sqlite3BtreeGetReserve() {
-				int n;
-				sqlite3BtreeEnter(this);
-				n=(int)(this.pBt.pageSize-this.pBt.usableSize);
-				sqlite3BtreeLeave(this);
-				return n;
-			}
-			public Pgno sqlite3BtreeMaxPageCount(int mxPage) {
-				Pgno n;
-				sqlite3BtreeEnter(this);
-				n=this.pBt.pPager.sqlite3PagerMaxPageCount(mxPage);
-				sqlite3BtreeLeave(this);
-				return n;
-			}
-			public int sqlite3BtreeSecureDelete(int newFlag) {
-				int b;
-				if(this==null)
-					return 0;
-				sqlite3BtreeEnter(this);
-				if(newFlag>=0) {
-					this.pBt.secureDelete=(newFlag!=0);
-				}
-				b=this.pBt.secureDelete?1:0;
-				sqlite3BtreeLeave(this);
-				return b;
-			}
-			public int sqlite3BtreeSetAutoVacuum(int autoVacuum) {
-				#if SQLITE_OMIT_AUTOVACUUM
-																																																																												return SQLITE_READONLY;
-#else
-				BtShared pBt=this.pBt;
-				int rc=SQLITE_OK;
-				u8 av=(u8)autoVacuum;
-				sqlite3BtreeEnter(this);
-				if(pBt.pageSizeFixed&&(av!=0)!=pBt.autoVacuum) {
-					rc=SQLITE_READONLY;
-				}
-				else {
-					pBt.autoVacuum=av!=0;
-					pBt.incrVacuum=av==2;
-				}
-				sqlite3BtreeLeave(this);
-				return rc;
-				#endif
-			}
-			public int sqlite3BtreeGetAutoVacuum() {
-				#if SQLITE_OMIT_AUTOVACUUM
-																																																																												return BTREE_AUTOVACUUM_NONE;
-#else
-				int rc;
-				sqlite3BtreeEnter(this);
-				rc=((!this.pBt.autoVacuum)?BTREE_AUTOVACUUM_NONE:(!this.pBt.incrVacuum)?BTREE_AUTOVACUUM_FULL:BTREE_AUTOVACUUM_INCR);
-				sqlite3BtreeLeave(this);
-				return rc;
-				#endif
-			}
-			public int sqlite3BtreeBeginTrans(int wrflag) {
-				BtShared pBt=this.pBt;
-				int rc=SQLITE_OK;
-				sqlite3BtreeEnter(this);
-				btreeIntegrity(this);
-				///
-				///<summary>
-				///</summary>
-				///<param name="If the btree is already in a write">transaction, or it</param>
-				///<param name="is already in a read">transaction</param>
-				///<param name="is requested, this is a no">op.</param>
-				///<param name=""></param>
-				if(this.inTrans==TransType.TRANS_WRITE||(this.inTrans==TransType.TRANS_READ&&0==wrflag)) {
-					goto trans_begun;
-				}
-				///
-				///<summary>
-				///</summary>
-				///<param name="Write transactions are not possible on a read">only database </param>
-				if(pBt.readOnly&&wrflag!=0) {
-					rc=SQLITE_READONLY;
-					goto trans_begun;
-				}
-				#if !SQLITE_OMIT_SHARED_CACHE
-																																																																												/* If another database handle has already opened a write transaction
-** on this shared-btree structure and a second write transaction is
-** requested, return SQLITE_LOCKED.
+                Debug.Assert(this.cursorHoldsMutex());
+                rc = this.restoreCursorPosition();
+                if (rc == SQLITE_OK)
+                {
+                    Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                    Debug.Assert(this.iPage >= 0 && this.apPage[this.iPage] != null);
+                    Debug.Assert(this.aiIdx[this.iPage] < this.apPage[this.iPage].nCell);
+                    rc = this.accessPayload(offset, amt, pBuf, 0);
+                }
+                return rc;
+            }
+            public int sqlite3BtreeKey(u32 offset, u32 amt, byte[] pBuf)
+            {
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                Debug.Assert(this.iPage >= 0 && this.apPage[this.iPage] != null);
+                Debug.Assert(this.aiIdx[this.iPage] < this.apPage[this.iPage].nCell);
+                return this.accessPayload(offset, amt, pBuf, 0);
+            }
+            public int accessPayload(///
+                ///<summary>
+                ///Cursor pointing to entry to read from 
+                ///</summary>
+            u32 offset,///
+                ///<summary>
+                ///Begin reading this far into payload 
+                ///</summary>
+            u32 amt,///
+                ///<summary>
+                ///Read this many bytes 
+                ///</summary>
+            byte[] pBuf,///
+                ///<summary>
+                ///Write the bytes into this buffer 
+                ///</summary>
+            int eOp///
+                ///<summary>
+                ///</summary>
+                ///<param name="zero to read. non">zero to write. </param>
+            )
+            {
+                u32 pBufOffset = 0;
+                byte[] aPayload;
+                int rc = SQLITE_OK;
+                u32 nKey;
+                int iIdx = 0;
+                MemPage pPage = this.apPage[this.iPage];
+                ///
+                ///<summary>
+                ///Btree page of current entry 
+                ///</summary>
+                BtShared pBt = this.pBt;
+                ///
+                ///<summary>
+                ///Btree this cursor belongs to 
+                ///</summary>
+                Debug.Assert(pPage != null);
+                Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                Debug.Assert(this.aiIdx[this.iPage] < pPage.nCell);
+                Debug.Assert(this.cursorHoldsMutex());
+                this.getCellInfo();
+                aPayload = this.info.pCell;
+                //pCur.info.pCell + pCur.info.nHeader;
+                nKey = (u32)(pPage.intKey != 0 ? 0 : (int)this.info.nKey);
+                if (NEVER(offset + amt > nKey + this.info.nData) || this.info.nLocal > pBt.usableSize//&aPayload[pCur.info.nLocal] > &pPage.aData[pBt.usableSize]
+                )
+                {
+                    ///
+                    ///<summary>
+                    ///Trying to read or write past the end of the data is an error 
+                    ///</summary>
+                    return SQLITE_CORRUPT_BKPT();
+                }
+                ///
+                ///<summary>
+                ///Check if data must be read/written to/from the btree page itself. 
+                ///</summary>
+                if (offset < this.info.nLocal)
+                {
+                    int a = (int)amt;
+                    if (a + offset > this.info.nLocal)
+                    {
+                        a = (int)(this.info.nLocal - offset);
+                    }
+                    rc = copyPayload(aPayload, (u32)(offset + this.info.iCell + this.info.nHeader), pBuf, pBufOffset, (u32)a, eOp, pPage.pDbPage);
+                    offset = 0;
+                    pBufOffset += (u32)a;
+                    //pBuf += a;
+                    amt -= (u32)a;
+                }
+                else
+                {
+                    offset -= this.info.nLocal;
+                }
+                if (rc == SQLITE_OK && amt > 0)
+                {
+                    u32 ovflSize = (u32)(pBt.usableSize - 4);
+                    ///
+                    ///<summary>
+                    ///Bytes content per ovfl page 
+                    ///</summary>
+                    Pgno nextPage;
+                    nextPage = Converter.sqlite3Get4byte(aPayload, this.info.nLocal + this.info.iCell + this.info.nHeader);
+#if !SQLITE_OMIT_INCRBLOB
+																																																																																																					/* If the isIncrblobHandle flag is set and the BtCursor.aOverflow[]
+** has not been allocated, allocate it now. The array is sized at
+** one entry for each overflow page in the overflow chain. The
+** page number of the first overflow page is stored in aOverflow[0],
+** etc. A value of 0 in the aOverflow[] array means "not yet known"
+** (the cache is lazily populated).
 */
-if( (wrflag && pBt.inTransaction==TRANS_WRITE) || pBt.isPending ){
-sqlite3 pBlock = pBt.pWriter.db;
-}else if( wrflag>1 ){
-BtLock pIter;
-for(pIter=pBt.pLock; pIter; pIter=pIter.pNext){
-if( pIter.pBtree!=p ){
-pBlock = pIter.pBtree.db;
-break;
+if( pCur.isIncrblobHandle && !pCur.aOverflow ){
+int nOvfl = (pCur.info.nPayload-pCur.info.nLocal+ovflSize-1)/ovflSize;
+pCur.aOverflow = (Pgno *)sqlite3MallocZero(sizeof(Pgno)*nOvfl);
+/* nOvfl is always positive.  If it were zero, fetchPayload would have
+** been used instead of this routine. */
+if( ALWAYS(nOvfl) && !pCur.aOverflow ){
+rc = SQLITE_NOMEM;
 }
 }
-}
-if( pBlock ){
-sqlite3ConnectionBlocked(p.db, pBlock);
-rc = SQLITE_LOCKED_SHAREDCACHE;
-goto trans_begun;
-}
-#endif
-				///
-				///<summary>
-				///</summary>
-				///<param name="Any read">lock on</param>
-				///<param name="page 1. So if some other shared">lock</param>
-				///<param name="on page 1, the transaction cannot be opened. ">on page 1, the transaction cannot be opened. </param>
-				rc=this.querySharedCacheTableLock(MASTER_ROOT,READ_LOCK);
-				if(SQLITE_OK!=rc)
-					goto trans_begun;
-				pBt.initiallyEmpty=pBt.nPage==0;
-				do {
-					///
-					///<summary>
-					///Call lockBtree() until either pBt.pPage1 is populated or
-					///lockBtree() returns something other than SQLITE_OK. lockBtree()
-					///may return SQLITE_OK but leave pBt.pPage1 set to 0 if after
-					///</summary>
-					///<param name="reading page 1 it discovers that the page">size of the database</param>
-					///<param name="file is not pBt.pageSize. In this case lockBtree() will update">file is not pBt.pageSize. In this case lockBtree() will update</param>
-					///<param name="pBt.pageSize to the page">size of the file on disk.</param>
-					///<param name=""></param>
-					while(pBt.pPage1==null&&SQLITE_OK==(rc=lockBtree(pBt)))
-						;
-					if(rc==SQLITE_OK&&wrflag!=0) {
-						if(pBt.readOnly) {
-							rc=SQLITE_READONLY;
-						}
-						else {
-							rc=pBt.pPager.sqlite3PagerBegin(wrflag>1,sqlite3TempInMemory(this.db)?1:0);
-							if(rc==SQLITE_OK) {
-								rc=newDatabase(pBt);
-							}
-						}
-					}
-					if(rc!=SQLITE_OK) {
-						unlockBtreeIfUnused(pBt);
-					}
-				}
-				while((rc&0xFF)==SQLITE_BUSY&&pBt.inTransaction==TransType.TRANS_NONE&&btreeInvokeBusyHandler(pBt)!=0);
-				if(rc==SQLITE_OK) {
-					if(this.inTrans==TransType.TRANS_NONE) {
-						pBt.nTransaction++;
-						#if !SQLITE_OMIT_SHARED_CACHE
-																																																																																																																														if( p.sharable ){
-Debug.Assert( p.lock.pBtree==p && p.lock.iTable==1 );
-p.lock.eLock = READ_LOCK;
-p.lock.pNext = pBt.pLock;
-pBt.pLock = &p.lock;
-}
-#endif
-					}
-					this.inTrans=(wrflag!=0?TransType.TRANS_WRITE:TransType.TRANS_READ);
-					if(this.inTrans>pBt.inTransaction) {
-						pBt.inTransaction=this.inTrans;
-					}
-					if(wrflag!=0) {
-						MemPage pPage1=pBt.pPage1;
-						#if !SQLITE_OMIT_SHARED_CACHE
-																																																																																																																														Debug.Assert( !pBt.pWriter );
-pBt.pWriter = p;
-pBt.isExclusive = (u8)(wrflag>1);
-#endif
-						///
-						///<summary>
-						///</summary>
-						///<param name="If the db">size header field is incorrect (as it may be if an old</param>
-						///<param name="client has been writing the database file), update it now. Doing">client has been writing the database file), update it now. Doing</param>
-						///<param name="this sooner rather than later means the database size can safely ">this sooner rather than later means the database size can safely </param>
-						///<param name="re">read the database size from page 1 if a savepoint or transaction</param>
-						///<param name="rollback occurs within the transaction.">rollback occurs within the transaction.</param>
-						if(pBt.nPage!=Converter.sqlite3Get4byte(pPage1.aData,28)) {
-							rc=sqlite3PagerWrite(pPage1.pDbPage);
-							if(rc==SQLITE_OK) {
-								Converter.sqlite3Put4byte(pPage1.aData,(u32)28,pBt.nPage);
-							}
-						}
-					}
-				}
-				trans_begun:
-				if(rc==SQLITE_OK&&wrflag!=0) {
-					///
-					///<summary>
-					///This call makes sure that the pager has the correct number of
-					///open savepoints. If the second parameter is greater than 0 and
-					///</summary>
-					///<param name="the sub">journal is not already open, then it will be opened here.</param>
-					///<param name=""></param>
-					rc=pBt.pPager.sqlite3PagerOpenSavepoint(this.db.nSavepoint);
-				}
-				btreeIntegrity(this);
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public int sqlite3BtreeIncrVacuum() {
-				int rc;
-				BtShared pBt=this.pBt;
-				sqlite3BtreeEnter(this);
-				Debug.Assert(pBt.inTransaction==TransType.TRANS_WRITE&&this.inTrans==TransType.TRANS_WRITE);
-				if(!pBt.autoVacuum) {
-					rc=SQLITE_DONE;
-				}
-				else {
-					pBt.invalidateAllOverflowCache();
-					rc=incrVacuumStep(pBt,0,pBt.btreePagecount());
-					if(rc==SQLITE_OK) {
-						rc=sqlite3PagerWrite(pBt.pPage1.pDbPage);
-						Converter.sqlite3Put4byte(pBt.pPage1.aData,(u32)28,pBt.nPage);
-						//put4byte(&pBt->pPage1->aData[28], pBt->nPage);
-					}
-				}
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public int sqlite3BtreeCommitPhaseOne(string zMaster) {
-				int rc=SQLITE_OK;
-				if(this.inTrans==TransType.TRANS_WRITE) {
-					BtShared pBt=this.pBt;
-					sqlite3BtreeEnter(this);
-					#if !SQLITE_OMIT_AUTOVACUUM
-					if(pBt.autoVacuum) {
-						rc=autoVacuumCommit(pBt);
-						if(rc!=SQLITE_OK) {
-							sqlite3BtreeLeave(this);
-							return rc;
-						}
-					}
-					#endif
-					rc=pBt.pPager.sqlite3PagerCommitPhaseOne(zMaster,false);
-					sqlite3BtreeLeave(this);
-				}
-				return rc;
-			}
-			public void btreeEndTransaction() {
-				BtShared pBt=this.pBt;
-				Debug.Assert(sqlite3BtreeHoldsMutex(this));
-				pBt.btreeClearHasContent();
-				if(this.inTrans>TransType.TRANS_NONE&&this.db.activeVdbeCnt>1) {
-					///
-					///<summary>
-					///If there are other active statements that belong to this database
-					///</summary>
-					///<param name="handle, downgrade to a read">only transaction. The other statements</param>
-					///<param name="may still be reading from the database.  ">may still be reading from the database.  </param>
-					this.downgradeAllSharedCacheTableLocks();
-					this.inTrans=TransType.TRANS_READ;
-				}
-				else {
-					///
-					///<summary>
-					///If the handle had any kind of transaction open, decrement the
-					///transaction count of the shared btree. If the transaction count
-					///reaches 0, set the shared state to TRANS_NONE. The unlockBtreeIfUnused()
-					///call below will unlock the pager.  
-					///</summary>
-					if(this.inTrans!=TransType.TRANS_NONE) {
-						this.clearAllSharedCacheTableLocks();
-						pBt.nTransaction--;
-						if(0==pBt.nTransaction) {
-							pBt.inTransaction=TransType.TRANS_NONE;
-						}
-					}
-					///
-					///<summary>
-					///Set the current transaction state to TRANS_NONE and unlock the
-					///pager if this call closed the only read or write transaction.  
-					///</summary>
-					this.inTrans=TransType.TRANS_NONE;
-					unlockBtreeIfUnused(pBt);
-				}
-				btreeIntegrity(this);
-			}
-			public int sqlite3BtreeCommitPhaseTwo(int bCleanup) {
-				if(this.inTrans==TransType.TRANS_NONE)
-					return SQLITE_OK;
-				sqlite3BtreeEnter(this);
-				btreeIntegrity(this);
-				///
-				///<summary>
-				///</summary>
-				///<param name="If the handle has a write">btrees</param>
-				///<param name="transaction and set the shared state to TRANS_READ.">transaction and set the shared state to TRANS_READ.</param>
-				///<param name=""></param>
-				if(this.inTrans==TransType.TRANS_WRITE) {
-					int rc;
-					BtShared pBt=this.pBt;
-					Debug.Assert(pBt.inTransaction==TransType.TRANS_WRITE);
-					Debug.Assert(pBt.nTransaction>0);
-					rc=pBt.pPager.sqlite3PagerCommitPhaseTwo();
-					if(rc!=SQLITE_OK&&bCleanup==0) {
-						sqlite3BtreeLeave(this);
-						return rc;
-					}
-					pBt.inTransaction=TransType.TRANS_READ;
-				}
-				this.btreeEndTransaction();
-				sqlite3BtreeLeave(this);
-				return SQLITE_OK;
-			}
-			public int sqlite3BtreeCommit() {
-				int rc;
-				sqlite3BtreeEnter(this);
-				rc=this.sqlite3BtreeCommitPhaseOne(null);
-				if(rc==SQLITE_OK) {
-					rc=this.sqlite3BtreeCommitPhaseTwo(0);
-				}
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public void sqlite3BtreeTripAllCursors(int errCode) {
-				BtCursor p;
-				sqlite3BtreeEnter(this);
-				for(p=this.pBt.pCursor;p!=null;p=p.pNext) {
-					int i;
-					p.sqlite3BtreeClearCursor();
-					p.State=BtCursorState.CURSOR_FAULT;
-					p.skipNext=errCode;
-					for(i=0;i<=p.iPage;i++) {
-						releasePage(p.apPage[i]);
-						p.apPage[i]=null;
-					}
-				}
-				sqlite3BtreeLeave(this);
-			}
-			public int sqlite3BtreeRollback() {
-				int rc;
-				BtShared pBt=this.pBt;
-				MemPage pPage1=new MemPage();
-				sqlite3BtreeEnter(this);
-				rc=pBt.saveAllCursors(0,null);
-				#if !SQLITE_OMIT_SHARED_CACHE
-																																																																												if( rc!=SQLITE_OK ){
-/* This is a horrible situation. An IO or malloc() error occurred whilst
-** trying to save cursor positions. If this is an automatic rollback (as
-** the result of a constraint, malloc() failure or IO error) then
-** the cache may be internally inconsistent (not contain valid trees) so
-** we cannot simply return the error to the caller. Instead, abort
-** all queries that may be using any of the cursors that failed to save.
+
+/* If the overflow page-list cache has been allocated and the
+** entry for the first required overflow page is valid, skip
+** directly to it.
 */
-sqlite3BtreeTripAllCursors(p, rc);
+if( pCur.aOverflow && pCur.aOverflow[offset/ovflSize] ){
+iIdx = (offset/ovflSize);
+nextPage = pCur.aOverflow[iIdx];
+offset = (offset%ovflSize);
 }
 #endif
-				btreeIntegrity(this);
-				if(this.inTrans==TransType.TRANS_WRITE) {
-					int rc2;
-					Debug.Assert(TransType.TRANS_WRITE==pBt.inTransaction);
-					rc2=pBt.pPager.sqlite3PagerRollback();
-					if(rc2!=SQLITE_OK) {
-						rc=rc2;
-					}
-					///
-					///<summary>
-					///The rollback may have destroyed the pPage1.aData value.  So
-					///call btreeGetPage() on page 1 again to make
-					///sure pPage1.aData is set correctly. 
-					///</summary>
-					if(pBt.btreeGetPage(1,ref pPage1,0)==SQLITE_OK) {
-						Pgno nPage=Converter.sqlite3Get4byte(pPage1.aData,28);
-						testcase(nPage==0);
-						if(nPage==0)
-							pBt.pPager.sqlite3PagerPagecount(out nPage);
-						testcase(pBt.nPage!=nPage);
-						pBt.nPage=nPage;
-						releasePage(pPage1);
-					}
-					Debug.Assert(countWriteCursors(pBt)==0);
-					pBt.inTransaction=TransType.TRANS_READ;
-				}
-				this.btreeEndTransaction();
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public int sqlite3BtreeBeginStmt(int iStatement) {
-				int rc;
-				BtShared pBt=this.pBt;
-				sqlite3BtreeEnter(this);
-				Debug.Assert(this.inTrans==TransType.TRANS_WRITE);
-				Debug.Assert(!pBt.readOnly);
-				Debug.Assert(iStatement>0);
-				Debug.Assert(iStatement>this.db.nSavepoint);
-				Debug.Assert(pBt.inTransaction==TransType.TRANS_WRITE);
-				///
-				///<summary>
-				///At the pager level, a statement transaction is a savepoint with
-				///an index greater than all savepoints created explicitly using
-				///SQL statements. It is illegal to open, release or rollback any
-				///such savepoints while the statement transaction savepoint is active.
-				///
-				///</summary>
-				rc=pBt.pPager.sqlite3PagerOpenSavepoint(iStatement);
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public int sqlite3BtreeSavepoint(int op,int iSavepoint) {
-				int rc=SQLITE_OK;
-				if(this!=null&&this.inTrans==TransType.TRANS_WRITE) {
-					BtShared pBt=this.pBt;
-					Debug.Assert(op==SAVEPOINT_RELEASE||op==SAVEPOINT_ROLLBACK);
-					Debug.Assert(iSavepoint>=0||(iSavepoint==-1&&op==SAVEPOINT_ROLLBACK));
-					sqlite3BtreeEnter(this);
-					rc=pBt.pPager.sqlite3PagerSavepoint(op,iSavepoint);
-					if(rc==SQLITE_OK) {
-						if(iSavepoint<0&&pBt.initiallyEmpty)
-							pBt.nPage=0;
-						rc=newDatabase(pBt);
-						pBt.nPage=Converter.sqlite3Get4byte(pBt.pPage1.aData,28);
-						///
-						///<summary>
-						///The database size was written into the offset 28 of the header
-						///when the transaction started, so we know that the value at offset
-						///28 is nonzero. 
-						///</summary>
-						Debug.Assert(pBt.nPage>0);
-					}
-					sqlite3BtreeLeave(this);
-				}
-				return rc;
-			}
-			public int btreeCursor(///
-			///<summary>
-			///The btree 
-			///</summary>
-			int iTable,///
-			///<summary>
-			///Root page of table to open 
-			///</summary>
-			int wrFlag,///
-			///<summary>
-			///</summary>
-			///<param name="1 to write. 0 read">only </param>
-			KeyInfo pKeyInfo,///
-			///<summary>
-			///First arg to comparison function 
-			///</summary>
-			BtCursor pCur///
-			///<summary>
-			///Space for new cursor 
-			///</summary>
-			) {
-				BtShared pBt=this.pBt;
-				///
-				///<summary>
-				///</summary>
-				///<param name="Shared b">tree handle </param>
-				Debug.Assert(sqlite3BtreeHoldsMutex(this));
-				Debug.Assert(wrFlag==0||wrFlag==1);
-				///
-				///<summary>
-				///The following Debug.Assert statements verify that if this is a sharable
-				///</summary>
-				///<param name="b">tree database, the connection is holding the required table locks,</param>
-				///<param name="and that no other connection has any open cursor that conflicts with">and that no other connection has any open cursor that conflicts with</param>
-				///<param name="this lock.  ">this lock.  </param>
-				Debug.Assert(this.hasSharedCacheTableLock((u32)iTable,pKeyInfo!=null?1:0,wrFlag+1));
-				Debug.Assert(wrFlag==0||!this.hasReadConflicts((u32)iTable));
-				///
-				///<summary>
-				///Assert that the caller has opened the required transaction. 
-				///</summary>
-				Debug.Assert(this.inTrans>TransType.TRANS_NONE);
-				Debug.Assert(wrFlag==0||this.inTrans==TransType.TRANS_WRITE);
-				Debug.Assert(pBt.pPage1!=null&&pBt.pPage1.aData!=null);
-				if(NEVER(wrFlag!=0&&pBt.readOnly)) {
-					return SQLITE_READONLY;
-				}
-				if(iTable==1&&pBt.btreePagecount()==0) {
-					return SQLITE_EMPTY;
-				}
-				///
-				///<summary>
-				///Now that no other errors can occur, finish filling in the BtCursor
-				///variables and link the cursor into the BtShared list.  
-				///</summary>
-				pCur.pgnoRoot=(Pgno)iTable;
-				pCur.iPage=-1;
-				pCur.pKeyInfo=pKeyInfo;
-				pCur.pBtree=this;
-				pCur.pBt=pBt;
-				pCur.wrFlag=(u8)wrFlag;
-				pCur.pNext=pBt.pCursor;
-				if(pCur.pNext!=null) {
-					pCur.pNext.pPrev=pCur;
-				}
-				pBt.pCursor=pCur;
-				pCur.State=BtCursorState.CURSOR_INVALID;
-				pCur.cachedRowid=0;
-				return SQLITE_OK;
-			}
-			public int sqlite3BtreeCursor(///
-			///<summary>
-			///The btree 
-			///</summary>
-			int iTable,///
-			///<summary>
-			///Root page of table to open 
-			///</summary>
-			int wrFlag,///
-			///<summary>
-			///</summary>
-			///<param name="1 to write. 0 read">only </param>
-			KeyInfo pKeyInfo,///
-			///<summary>
-			///First arg to xCompare() 
-			///</summary>
-			BtCursor pCur///
-			///<summary>
-			///Write new cursor here 
-			///</summary>
-			) {
-				int rc;
-				sqlite3BtreeEnter(this);
-				rc=this.btreeCursor(iTable,wrFlag,pKeyInfo,pCur);
-				sqlite3BtreeLeave(this);
-				return rc;
-			}
-			public Pager sqlite3BtreePager() {
-				return this.pBt.pPager;
-			}
-		}
-		///
-		///<summary>
-		///The second parameter to sqlite3BtreeGetMeta or sqlite3BtreeUpdateMeta
-		///should be one of the following values. The integer values are assigned
-		///to constants so that the offset of the corresponding field in an
-		///SQLite database header may be found using the following formula:
-		///
-		///offset = 36 + (idx * 4)
-		///
-		///</summary>
-		///<param name="For example, the free">count field is located at byte offset 36 of</param>
-		///<param name="the database file header. The incr">flag field is located at</param>
-		///<param name="byte offset 64 (== 36+4*7).">byte offset 64 (== 36+4*7).</param>
-		///<param name=""></param>
-		//#define BTREE_FREE_PAGE_COUNT     0
-		//#define BTREE_SCHEMA_VERSION      1
-		//#define BTREE_FILE_FORMAT         2
-		//#define BTREE_DEFAULT_CACHE_SIZE  3
-		//#define BTREE_LARGEST_ROOT_PAGE   4
-		//#define BTREE_TEXT_ENCODING       5
-		//#define BTREE_USER_VERSION        6
-		//#define BTREE_INCR_VACUUM         7
-		public enum BTreeProp {
-			FREE_PAGE_COUNT=0,
-			SCHEMA_VERSION=1,
-			FILE_FORMAT=2,
-			DEFAULT_CACHE_SIZE=3,
-			LARGEST_ROOT_PAGE=4,
-			TEXT_ENCODING=5,
-			USER_VERSION=6,
-			INCR_VACUUM=7
-		}
-		const int BTREE_FREE_PAGE_COUNT=0;
-		const int BTREE_SCHEMA_VERSION=1;
-		const int BTREE_FILE_FORMAT=2;
-		const int BTREE_DEFAULT_CACHE_SIZE=3;
-		const int BTREE_LARGEST_ROOT_PAGE=4;
-		const int BTREE_TEXT_ENCODING=5;
-		const int BTREE_USER_VERSION=6;
-		const int BTREE_INCR_VACUUM=7;
+                    for (; rc == SQLITE_OK && amt > 0 && nextPage != 0; iIdx++)
+                    {
+#if !SQLITE_OMIT_INCRBLOB
+																																																																																																																														/* If required, populate the overflow page-list cache. */
+if( pCur.aOverflow ){
+Debug.Assert(!pCur.aOverflow[iIdx] || pCur.aOverflow[iIdx]==nextPage);
+pCur.aOverflow[iIdx] = nextPage;
+}
+#endif
+                        MemPage MemPageDummy = null;
+                        if (offset >= ovflSize)
+                        {
+                            ///
+                            ///<summary>
+                            ///The only reason to read this page is to obtain the page
+                            ///number for the next page in the overflow chain. The page
+                            ///data is not required. So first try to lookup the overflow
+                            ///</summary>
+                            ///<param name="page">list cache, if any, then fall back to the getOverflowPage()</param>
+                            ///<param name="function.">function.</param>
+                            ///<param name=""></param>
+#if !SQLITE_OMIT_INCRBLOB
+																																																																																																																																																							if( pCur.aOverflow && pCur.aOverflow[iIdx+1] ){
+nextPage = pCur.aOverflow[iIdx+1];
+} else
+#endif
+                            rc = getOverflowPage(pBt, nextPage, out MemPageDummy, out nextPage);
+                            offset -= ovflSize;
+                        }
+                        else
+                        {
+                            ///
+                            ///<summary>
+                            ///Need to read this page properly. It contains some of the
+                            ///range of data that is being read (eOp==null) or written (eOp!=null).
+                            ///
+                            ///</summary>
+                            PgHdr pDbPage = new PgHdr();
+                            int a = (int)amt;
+                            rc = pBt.pPager.sqlite3PagerGet(nextPage, ref pDbPage);
+                            if (rc == SQLITE_OK)
+                            {
+                                aPayload = sqlite3PagerGetData(pDbPage);
+                                nextPage = Converter.sqlite3Get4byte(aPayload);
+                                if (a + offset > ovflSize)
+                                {
+                                    a = (int)(ovflSize - offset);
+                                }
+                                rc = copyPayload(aPayload, offset + 4, pBuf, pBufOffset, (u32)a, eOp, pDbPage);
+                                sqlite3PagerUnref(pDbPage);
+                                offset = 0;
+                                amt -= (u32)a;
+                                pBufOffset += (u32)a;
+                                //pBuf += a;
+                            }
+                        }
+                    }
+                }
+                if (rc == SQLITE_OK && amt > 0)
+                {
+                    return SQLITE_CORRUPT_BKPT();
+                }
+                return rc;
+            }
+            public int sqlite3BtreeDataSize(ref u32 pSize)
+            {
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
+                this.getCellInfo();
+                pSize = this.info.nData;
+                return SQLITE_OK;
+            }
+            public int sqlite3BtreeKeySize(ref i64 pSize)
+            {
+                Debug.Assert(this.cursorHoldsMutex());
+                Debug.Assert(this.State == BtCursorState.CURSOR_INVALID || this.State == BtCursorState.CURSOR_VALID);
+                if (this.State != BtCursorState.CURSOR_VALID)
+                {
+                    pSize = 0;
+                }
+                else
+                {
+                    this.getCellInfo();
+                    pSize = this.info.nKey;
+                }
+                return SQLITE_OK;
+            }
+            public bool sqlite3BtreeCursorIsValid()
+            {
+                return true;
+            }
+            public void getCellInfo()
+            {
+                if (this.info.nSize == 0)
+                {
+                    int iPage = this.iPage;
+                    this.apPage[iPage].btreeParseCell(this.aiIdx[iPage], ref this.info);
+                    this.validNKey = true;
+                }
+                else
+                {
+                    this.assertCellInfo();
+                }
+            }
+            public int sqlite3BtreeCloseCursor()
+            {
+                Btree pBtree = this.pBtree;
+                if (pBtree != null)
+                {
+                    int i;
+                    BtShared pBt = this.pBt;
+                    sqlite3BtreeEnter(pBtree);
+                    this.sqlite3BtreeClearCursor();
+                    if (this.pPrev != null)
+                    {
+                        this.pPrev.pNext = this.pNext;
+                    }
+                    else
+                    {
+                        pBt.pCursor = this.pNext;
+                    }
+                    if (this.pNext != null)
+                    {
+                        this.pNext.pPrev = this.pPrev;
+                    }
+                    for (i = 0; i <= this.iPage; i++)
+                    {
+                        releasePage(this.apPage[i]);
+                    }
+                    unlockBtreeIfUnused(pBt);
+                    invalidateOverflowCache(this);
+                    ///
+                    ///<summary>
+                    ///sqlite3_free(ref pCur); 
+                    ///</summary>
+                    sqlite3BtreeLeave(pBtree);
+                }
+                return SQLITE_OK;
+            }
+            public void assertCellInfo()
+            {
+            }
+            public void sqlite3BtreeCursorZero()
+            {
+                this.Clear();
+                // memset( p, 0, offsetof( BtCursor, iPage ) );
+            }
+        }
+        ///
+        ///<summary>
+        ///Potential values for BtCursor.eState.
+        ///
+        ///CURSOR_VALID:
+        ///VdbeCursor points to a valid entry. getPayload() etc. may be called.
+        ///
+        ///CURSOR_INVALID:
+        ///VdbeCursor does not point to a valid entry. This can happen (for example)
+        ///because the table is empty or because BtreeCursorFirst() has not been
+        ///called.
+        ///
+        ///CURSOR_REQUIRESEEK:
+        ///The table that this cursor was opened on still exists, but has been
+        ///modified since the cursor was last used. The cursor position is saved
+        ///in variables BtCursor.pKey and BtCursor.nKey. When a cursor is in
+        ///this state, restoreCursorPosition() can be called to attempt to
+        ///seek the cursor to the saved position.
+        ///
+        ///CURSOR_FAULT:
+        ///A unrecoverable error (an I/O error or a malloc failure) has occurred
+        ///on a different connection that shares the BtShared cache with this
+        ///cursor.  The error has left the cache in an inconsistent state.
+        ///Do nothing else with this cursor.  Any attempt to use the cursor
+        ///should return the error code stored in BtCursor.skip
+        ///
+        ///</summary>
+        public enum BtCursorState
+        {
+            CURSOR_INVALID = 0,
+            CURSOR_VALID = 1,
+            CURSOR_REQUIRESEEK = 2,
+            CURSOR_FAULT = 3
+        }
+        const int CURSOR_INVALID = 0;
+        const int CURSOR_VALID = 1;
+        const int CURSOR_REQUIRESEEK = 2;
+        const int CURSOR_FAULT = 3;
 	}
 }

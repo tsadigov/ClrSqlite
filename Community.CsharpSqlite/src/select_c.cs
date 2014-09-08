@@ -1116,16 +1116,16 @@ namespace Community.CsharpSqlite {
 		///<summary>
 		/// Name of the connection operator, used for error messages.
 		///</summary>
-		static string selectOpName(int id) {
+		static string selectOpName(TokenType id) {
 			string z;
 			switch(id) {
-			case TK_ALL:
+			case TokenType.TK_ALL:
 			z="UNION ALL";
 			break;
-			case TK_INTERSECT:
+            case TokenType.TK_INTERSECT:
 			z="INTERSECT";
 			break;
-			case TK_EXCEPT:
+            case TokenType.TK_EXCEPT:
 			z="EXCEPT";
 			break;
 			default:
@@ -1216,7 +1216,7 @@ static void explainSetInteger(ref int a, int b){ a = b;}
 			Debug.Assert(op==TK_UNION||op==TK_EXCEPT||op==TK_INTERSECT||op==TK_ALL);
 			if(pParse.explain==2) {
 				Vdbe v=pParse.pVdbe;
-				string zMsg=sqlite3MPrintf(pParse.db,"COMPOUND SUBQUERIES %d AND %d %s(%s)",iSub1,iSub2,bUseTmp?"USING TEMP B-TREE ":"",selectOpName(op));
+				string zMsg=sqlite3MPrintf(pParse.db,"COMPOUND SUBQUERIES %d AND %d %s(%s)",iSub1,iSub2,bUseTmp?"USING TEMP B-TREE ":"",selectOpName((TokenType)op));
 				v.sqlite3VdbeAddOp4(OP_Explain,pParse.iSelectId,0,0,zMsg,P4_DYNAMIC);
 			}
 		}
@@ -2179,12 +2179,12 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			Debug.Assert(pPrior.pRightmost==p.pRightmost);
 			dest=pDest;
 			if(pPrior.pOrderBy!=null) {
-				sqlite3ErrorMsg(pParse,"ORDER BY clause should come after %s not before",selectOpName(p.tk_op));
+				sqlite3ErrorMsg(pParse,"ORDER BY clause should come after %s not before",selectOpName(p.TokenOp));
 				rc=1;
 				goto multi_select_end;
 			}
 			if(pPrior.pLimit!=null) {
-				sqlite3ErrorMsg(pParse,"LIMIT clause should come after %s not before",selectOpName(p.tk_op));
+				sqlite3ErrorMsg(pParse,"LIMIT clause should come after %s not before",selectOpName(p.TokenOp));
 				rc=1;
 				goto multi_select_end;
 			}
@@ -2213,7 +2213,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			///</summary>
 			Debug.Assert(p.pEList!=null&&pPrior.pEList!=null);
 			if(p.pEList.nExpr!=pPrior.pEList.nExpr) {
-				sqlite3ErrorMsg(pParse,"SELECTs to the left and right of %s"+" do not have the same number of result columns",selectOpName(p.tk_op));
+				sqlite3ErrorMsg(pParse,"SELECTs to the left and right of %s"+" do not have the same number of result columns",selectOpName(p.TokenOp));
 				rc=1;
 				goto multi_select_end;
 			}

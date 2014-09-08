@@ -306,6 +306,8 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Ast\IdentifierList.cs" />
+    <Compile Include="src\Ast\SelectExtensions.cs" />
+    <Compile Include="src\BackupExtensions.cs" />
     <Compile Include="src\BitvecExtensions.cs" />
     <Compile Include="src\BtCursor.cs" />
     <Compile Include="src\BTree.cs" />

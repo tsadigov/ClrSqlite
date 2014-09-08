@@ -92,7 +92,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 		//#define ROWSET_ALLOCATION_SIZE 1024
-		const int ROWSET_ALLOCATION_SIZE = 1024;
+        const int ROWSET_ALLOCATION_SIZE = 256;
 
 		///<summary>
 		/// The number of rowset entries per allocation chunk.

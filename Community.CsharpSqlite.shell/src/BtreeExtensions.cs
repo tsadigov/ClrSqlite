@@ -8,13 +8,13 @@ namespace Community.CsharpSqlite
 {
 	public static class BtreeExtensions
 	{
-		public static string sqlite3BtreeGetFilename (this Community.CsharpSqlite.Sqlite3.Btree _this)
+		public static string GetFilename (this Community.CsharpSqlite.Sqlite3.Btree _this)
 		{
 			Debug.Assert (_this.pBt.pPager != null);
-			return _this.pBt.pPager.sqlite3PagerFilename ();
+			return _this.pBt.pPager.Filename ();
 		}
 
-		public static string sqlite3BtreeGetJournalname (this Community.CsharpSqlite.Sqlite3.Btree _this)
+		public static string GetJournalname (this Community.CsharpSqlite.Sqlite3.Btree _this)
 		{
 			Debug.Assert (_this.pBt.pPager != null);
 			return _this.pBt.pPager.sqlite3PagerJournalname ();

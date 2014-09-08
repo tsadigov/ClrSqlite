@@ -55,7 +55,13 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Sort order for each column.  May be NULL
             ///</summary>
-            public CollSeq[] aColl = new CollSeq[1];
+            private CollSeq[] _aColl = new CollSeq[1];
+
+            public CollSeq[] aColl
+            {
+                get { return _aColl; }
+                set { _aColl = value; }
+            }
             ///
             ///<summary>
             ///Collating sequence for each term of the key 

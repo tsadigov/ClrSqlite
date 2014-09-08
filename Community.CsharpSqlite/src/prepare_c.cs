@@ -374,7 +374,7 @@ namespace Community.CsharpSqlite {
 					size=SQLITE_DEFAULT_CACHE_SIZE;
 				}
 				pDb.pSchema.cache_size=size;
-				pDb.pBt.sqlite3BtreeSetCacheSize(pDb.pSchema.cache_size);
+				pDb.pBt.SetCacheSize(pDb.pSchema.cache_size);
 			}
 			///
 			///<summary>

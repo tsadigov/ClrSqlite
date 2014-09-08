@@ -110,46 +110,7 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///Next backup associated with source pager 
 			///</summary>
-			public///<summary>
-			/// This function is called after the contents of page iPage of the
-			/// source database have been modified. If page iPage has already been
-			/// copied into the destination database, then the data written to the
-			/// destination is now invalidated. The destination copy of iPage needs
-			/// to be updated with the new data before the backup operation is
-			/// complete.
-			///
-			/// It is assumed that the mutex associated with the BtShared object
-			/// corresponding to the source database is held when this function is
-			/// called.
-			///</summary>
-			void sqlite3BackupUpdate(Pgno iPage,byte[] aData) {
-				sqlite3_backup p;
-				///
-				///<summary>
-				///Iterator variable 
-				///</summary>
-				for(p=this;p!=null;p=p.pNext) {
-					Debug.Assert(sqlite3_mutex_held(p.pSrc.pBt.mutex));
-					if(!isFatalError(p.rc)&&iPage<p.iNext) {
-						///
-						///<summary>
-						///The backup process p has already copied page iPage. But now it
-						///has been modified by a transaction on the source pager. Copy
-						///the new data into the backup.
-						///
-						///</summary>
-						int rc;
-						Debug.Assert(p.pDestDb!=null);
-						sqlite3_mutex_enter(p.pDestDb.mutex);
-						rc=p.backupOnePage(iPage,aData);
-						sqlite3_mutex_leave(p.pDestDb.mutex);
-						Debug.Assert(rc!=SQLITE_BUSY&&rc!=SQLITE_LOCKED);
-						if(rc!=SQLITE_OK) {
-							p.rc=rc;
-						}
-					}
-				}
-			}
+			
 			///<summary>
 			/// Copy nPage pages from the source b-tree to the destination.
 			///</summary>
@@ -238,8 +199,8 @@ namespace Community.CsharpSqlite {
 					///Do not allow backup if the destination database is in WAL mode
 					///and the page sizes are different between source and destination 
 					///</summary>
-					pgszSrc=this.pSrc.sqlite3BtreeGetPageSize();
-					pgszDest=this.pDest.sqlite3BtreeGetPageSize();
+					pgszSrc=this.pSrc.GetPageSize();
+					pgszDest=this.pDest.GetPageSize();
 					destMode=this.pDest.sqlite3BtreePager().sqlite3PagerGetJournalMode();
 					if(SQLITE_OK==rc&&destMode==PAGER_JOURNALMODE_WAL&&pgszSrc!=pgszDest) {
 						rc=SQLITE_READONLY;
@@ -311,8 +272,8 @@ namespace Community.CsharpSqlite {
 						///by the file truncation.
 						///
 						///</summary>
-						Debug.Assert(pgszSrc==this.pSrc.sqlite3BtreeGetPageSize());
-						Debug.Assert(pgszDest==this.pDest.sqlite3BtreeGetPageSize());
+						Debug.Assert(pgszSrc==this.pSrc.GetPageSize());
+						Debug.Assert(pgszDest==this.pDest.GetPageSize());
 						if(pgszSrc<pgszDest) {
 							int ratio=pgszDest/pgszSrc;
 							nDestTruncate=(Pgno)((nSrcPage+ratio-1)/ratio);
@@ -521,13 +482,13 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			int backupOnePage(Pgno iSrcPg,byte[] zSrcData) {
 				Pager pDestPager=this.pDest.sqlite3BtreePager();
-				int nSrcPgsz=this.pSrc.sqlite3BtreeGetPageSize();
-				int nDestPgsz=this.pDest.sqlite3BtreeGetPageSize();
+				int nSrcPgsz=this.pSrc.GetPageSize();
+				int nDestPgsz=this.pDest.GetPageSize();
 				int nCopy=MIN(nSrcPgsz,nDestPgsz);
 				i64 iEnd=(i64)iSrcPg*(i64)nSrcPgsz;
 				#if SQLITE_HAS_CODEC
-				int nSrcReserve=this.pSrc.sqlite3BtreeGetReserve();
-				int nDestReserve=this.pDest.sqlite3BtreeGetReserve();
+				int nSrcReserve=this.pSrc.GetReserve();
+				int nDestReserve=this.pDest.GetReserve();
 				#endif
 				int rc=SQLITE_OK;
 				i64 iOff;
@@ -623,7 +584,7 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			int setDestPgsz() {
 				int rc;
-				rc=this.pDest.sqlite3BtreeSetPageSize(this.pSrc.sqlite3BtreeGetPageSize(),-1,0);
+				rc=this.pDest.sqlite3BtreeSetPageSize(this.pSrc.GetPageSize(),-1,0);
 				return rc;
 			}
 		}
@@ -794,7 +755,7 @@ namespace Community.CsharpSqlite {
 		/// considered fatal if encountered during a backup operation. All errors
 		/// are considered fatal except for SQLITE_BUSY and SQLITE_LOCKED.
 		///</summary>
-		static bool isFatalError(int rc) {
+		public static bool isFatalError(int rc) {
 			return (rc!=SQLITE_OK&&rc!=SQLITE_BUSY&&ALWAYS(rc!=SQLITE_LOCKED));
 		}
 	#if !SQLITE_OMIT_VACUUM

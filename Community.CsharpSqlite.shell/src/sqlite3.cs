@@ -198,24 +198,24 @@ namespace Community.CsharpSqlite
             ///Value returned by sqlite3_changes() 
             ///</summary>
 
-            public int nTotalChange;
-
-            ///
             ///<summary>
             ///Value returned by sqlite3_total_changes() 
             ///</summary>
 
-            public sqlite3_mutex mutex;
+
+            public int nTotalChange;
+
 
             ///<summary>
             ///Connection mutex
             ///</summary>
-            public int[] aLimit = new int[SQLITE_N_LIMIT];
+            public sqlite3_mutex mutex;
 
-            ///
             ///<summary>
             ///Limits 
             ///</summary>
+            public int[] aLimit = new int[SQLITE_N_LIMIT];
+
 
             public class sqlite3InitInfo
             {

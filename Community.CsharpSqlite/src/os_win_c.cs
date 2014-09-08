@@ -3955,37 +3955,23 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 			return getLastErrorMsg (nBuf, ref zBuf);
 		}
 
-		static sqlite3_vfs winVfs = new sqlite3_vfs (3, ///
-///<summary>
+		static sqlite3_vfs s_winVfs = new sqlite3_vfs (3, 
 ///iVersion 
-///</summary>
 
 		-1, //sqlite3_file.Length,      /* szOsFile */
-		MAX_PATH, ///
-///<summary>
+		MAX_PATH, 
 ///mxPathname 
-///</summary>
 
-		null, ///
-///<summary>
+		null, 
 ///pNext 
-///</summary>
-
-		"win32", ///
-///<summary>
+		"win32", 
 ///zName 
-///</summary>
 
-		0, ///
-///<summary>
+		0, 
 ///pAppData 
-///</summary>
 
-		(dxOpen)winOpen, ///
-///<summary>
+		(dxOpen)winOpen, 
 ///xOpen 
-///</summary>
-
 		(dxDelete)winDelete, ///
 ///<summary>
 ///xDelete 
@@ -4061,7 +4047,13 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 ///xNextSystemCall 
 ///</summary>
 
-		);
+        );
+
+        public static sqlite3_vfs winVfs
+        {
+            get { return Sqlite3.s_winVfs; }
+            set { Sqlite3.s_winVfs = value; }
+        }
 
 		///
 ///<summary>
