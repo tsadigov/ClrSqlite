@@ -16,6 +16,7 @@ using Pgno = System.UInt32;
 
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar = System.Int16;
+using System.Collections.Generic;
 
 #else
 using ynVar = System.Int32; 
@@ -46,59 +47,67 @@ namespace Community.CsharpSqlite
         ///<param name=""></param>
         public class Schema
         {
-            public int schema_cookie;
+
+            static List<Schema> s_instances = new List<Schema>();
+            public Schema()
+            {
+                s_instances.Add(this);
+            }
+
             ///
             ///<summary>
             ///Database schema version number for this file 
             ///</summary>
-            public u32 iGeneration;
+            public int schema_cookie;
             ///
             ///<summary>
             ///Generation counter.  Incremented with each change 
             ///</summary>
-            public Hash tblHash = new Hash();
+            public u32 iGeneration;
             ///
             ///<summary>
             ///All tables indexed by name 
             ///</summary>
-            public Hash idxHash = new Hash();
+            public Hash tblHash = new Hash();
             ///
             ///<summary>
             ///All (named) indices indexed by name 
             ///</summary>
-            public Hash trigHash = new Hash();
+            public Hash idxHash = new Hash();
             ///
             ///<summary>
             ///All triggers indexed by name 
             ///</summary>
-            public Hash fkeyHash = new Hash();
+            public Hash trigHash = new Hash();
             ///
             ///<summary>
             ///All foreign keys by referenced table name 
             ///</summary>
-            public Table pSeqTab;
+            public Hash fkeyHash = new Hash();
             ///
             ///<summary>
             ///The sqlite_sequence table used by AUTOINCREMENT 
             ///</summary>
-            public u8 file_format;
+            public Table pSeqTab;
             ///
             ///<summary>
             ///Schema format version for this file 
             ///</summary>
-            public SqliteEncoding enc;
+            public u8 file_format;
             ///
             ///<summary>
             ///Text encoding used by this database 
             ///</summary>
-            public u16 flags;
+            public SqliteEncoding enc;
             ///<summary>
             ///Flags associated with this schema
             ///</summary>
-            public int cache_size;
+            public u16 flags;
             ///<summary>
             ///Number of pages to use in the cache
             ///</summary>
+            public int cache_size;
+            
             public Schema Copy()
             {
                 if (this == null)

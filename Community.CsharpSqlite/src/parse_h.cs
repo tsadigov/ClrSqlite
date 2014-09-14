@@ -28,14 +28,14 @@ namespace Community.CsharpSqlite {
 	#if !SQLITE_MAX_VARIABLE_NUMBER
 	using ynVar=System.Int16;
 	#else
-			using ynVar = System.Int32; 
+				using ynVar = System.Int32; 
 #endif
 	///
 	///<summary>
 	///The yDbMask datatype for the bitmask of all attached databases.
 	///</summary>
 	#if SQLITE_MAX_ATTACHED
-			//  typedef sqlite3_uint64 yDbMask;
+				//  typedef sqlite3_uint64 yDbMask;
 using yDbMask = System.Int64; 
 #else
 	//  typedef unsigned int yDbMask;
@@ -101,29 +101,36 @@ using yDbMask = System.Int64;
 			///<summary>
 			///Number of temporary registers in aTempReg[] 
 			///</summary>
-            u8 _nTempInUse;
-
-            public u8 nTempInUse
-            {
-                get { return _nTempInUse; }
-                set { _nTempInUse = value; }
-            }
+			u8 _nTempInUse;
+			public u8 nTempInUse {
+				get {
+					return _nTempInUse;
+				}
+				set {
+					_nTempInUse=value;
+				}
+			}
 			///
 			///<summary>
 			///Number of aTempReg[] currently checked out 
 			///</summary>
-            public int[] aTempReg { get;set; }
+			public int[] aTempReg {
+				get;
+				set;
+			}
 			///
 			///<summary>
 			///Holding area for temporary registers 
 			///</summary>
-            int _nRangeReg;
-
-            public int nRangeReg
-            {
-                get { return _nRangeReg; }
-                set { _nRangeReg = value; }
-            }
+			int _nRangeReg;
+			public int nRangeReg {
+				get {
+					return _nRangeReg;
+				}
+				set {
+					_nRangeReg=value;
+				}
+			}
 			///
 			///<summary>
 			///Size of the temporary register block 
@@ -143,13 +150,15 @@ using yDbMask = System.Int64;
 			///<summary>
 			///Number of previously allocated VDBE cursors 
 			///</summary>
-            int _nMem;
-
-            public int nMem
-            {
-                get { return _nMem; }
-                set { _nMem = value; }
-            }
+			int _nMem;
+			public int nMem {
+				get {
+					return _nMem;
+				}
+				set {
+					_nMem=value;
+				}
+			}
 			///
 			///<summary>
 			///Number of memory cells used so far 
@@ -220,7 +229,7 @@ using yDbMask = System.Int64;
 			///Values of cookies to verify 
 			///</summary>
 			#if !SQLITE_OMIT_SHARED_CACHE
-																																																																																													public int nTableLock;         /* Number of locks in aTableLock */
+																																																																																																public int nTableLock;         /* Number of locks in aTableLock */
 public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 #endif
 			public int regRowid;
@@ -339,8 +348,8 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				}
 				set {
 					_sNameToken=value;
-                    if (null != _sNameToken)
-					Log.WriteHeader("Parse name : "+_sNameToken.Text);
+					if(null!=_sNameToken)
+						Log.WriteHeader("Parse name : "+_sNameToken.Text);
 				}
 			}
 			///
@@ -702,7 +711,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				pTab=sqlite3FindTable(db,zTab,zDb);
 				Debug.Assert(pTab!=null);
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																																												/* Invoke the authorization callback. */
+																																																																																																																																/* Invoke the authorization callback. */
 if( sqlite3AuthCheck(pParse, SQLITE_ALTER_TABLE, zDb, pTab.zName, 0) ){
 return;
 }
@@ -946,7 +955,7 @@ return;
 				}
 				#endif
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																																												/* Invoke the authorization callback. */
+																																																																																																																																/* Invoke the authorization callback. */
 if( sqlite3AuthCheck(pParse, SQLITE_ALTER_TABLE, zDb, pTab.zName, 0) ){
 goto exit_rename_table;
 }
@@ -1017,7 +1026,7 @@ goto exit_rename_table;
 				///</summary>
 				sqlite3NestedParse(this,"UPDATE %Q.%s SET "+
 				#if SQLITE_OMIT_TRIGGER
-																																																																																																																												 "sql = sqlite_rename_table(sql, %Q), " +
+																																																																																																																																 "sql = sqlite_rename_table(sql, %Q), " +
 #else
 				"sql = CASE "+"WHEN type = 'trigger' THEN sqlite_rename_trigger(sql, %Q)"+"ELSE sqlite_rename_table(sql, %Q) END, "+
 				#endif
@@ -1369,7 +1378,7 @@ goto exit_rename_table;
 				///Rowid for the inserted record 
 				///</summary>
 				#if SQLITE_ENABLE_STAT2
-																																																																																																																											  int addr = 0;                /* Instruction address */
+																																																																																																																															  int addr = 0;                /* Instruction address */
   int regTemp2 = iMem++;       /* Temporary use register */
   int regSamplerecno = iMem++; /* Index of next sample to record */
   int regRecno = iMem++;       /* Current sample index */
@@ -1399,7 +1408,7 @@ goto exit_rename_table;
 				Debug.Assert(iDb>=0);
 				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																																											if( sqlite3AuthCheck(pParse, SQLITE_ANALYZE, pTab.zName, 0,
+																																																																																																																															if( sqlite3AuthCheck(pParse, SQLITE_ANALYZE, pTab.zName, 0,
 db.aDb[iDb].zName ) ){
 return;
 }
@@ -1434,7 +1443,7 @@ return;
 					///</summary>
 					v.sqlite3VdbeAddOp4(OP_String8,0,regIdxname,0,pIdx.zName,0);
 					#if SQLITE_ENABLE_STAT2
-																																																																																																																																																										
+																																																																																																																																																															
     /* If this iteration of the loop is generating code to analyze the
 ** first index in the pTab.pIndex list, then register regLast has
 ** not been populated. In this case populate it now.  */
@@ -1497,7 +1506,7 @@ return;
 						CollSeq pColl;
 						if(i==0) {
 							#if SQLITE_ENABLE_STAT2
-																																																																																																																																																																																																																								        /* Check if the record that cursor iIdxCur points to contains a
+																																																																																																																																																																																																																															        /* Check if the record that cursor iIdxCur points to contains a
 ** value that should be stored in the sqlite_stat2 table. If so,
 ** store it.  */
         int ne = sqlite3VdbeAddOp3( v, OP_Ne, regRecno, 0, regSamplerecno );
@@ -1840,7 +1849,7 @@ return;
 					goto attach_end;
 				}
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																																										if( pAuthArg ){
+																																																																																																																														if( pAuthArg ){
 char *zAuthArg;
 if( pAuthArg->op==TK_STRING ){
   zAuthArg = pAuthArg->u.zToken;
@@ -2753,7 +2762,7 @@ goto attach_end;
 							aiCol[i]=-1;
 						}
 						#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																																																																																																					      /* Request permission to read the parent key columns. If the 
+																																																																																																																																																																																											      /* Request permission to read the parent key columns. If the 
       ** authorization callback returns SQLITE_IGNORE, behave as if any
       ** values read from the parent table are NULL. */
       if( db.xAuth ){
@@ -3421,7 +3430,7 @@ goto attach_end;
 					pEngine.sqlite3Parser(0,this.sLastToken,this);
 				}
 				#if YYTRACKMAXSTACKDEPTH
-																																																																																																						sqlite3StatusSet(SQLITE_STATUS_PARSER_STACK,
+																																																																																																										sqlite3StatusSet(SQLITE_STATUS_PARSER_STACK,
 sqlite3ParserStackPeak(pEngine)
 );
 #endif
@@ -3447,7 +3456,7 @@ sqlite3ParserStackPeak(pEngine)
 					this.pVdbe=null;
 				}
 				#if !SQLITE_OMIT_SHARED_CACHE
-																																																																																																						if ( pParse.nested == 0 )
+																																																																																																										if ( pParse.nested == 0 )
 {
 sqlite3DbFree( db, ref pParse.aTableLock );
 pParse.aTableLock = null;
@@ -3721,7 +3730,7 @@ pParse.nTableLock = 0;
 				pDb=db.aDb[iDb];
 				zDb=pDb.zName;
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																	if( sqlite3AuthCheck(pParse, SQLITE_INSERT, pTab.zName, 0, zDb) ){
+																																																																																																					if( sqlite3AuthCheck(pParse, SQLITE_INSERT, pTab.zName, 0, zDb) ){
 goto insert_cleanup;
 }
 #endif
@@ -3734,12 +3743,12 @@ goto insert_cleanup;
 				pTrigger=sqlite3TriggersExist(this,pTab,TK_INSERT,null,out tmask);
 				isView=pTab.pSelect!=null;
 				#else
-																																																																																																	      Trigger pTrigger = null;  // define pTrigger 0
+																																																																																																					      Trigger pTrigger = null;  // define pTrigger 0
       int tmask = 0;            // define tmask 0
       bool isView = false;
 #endif
 				#if SQLITE_OMIT_VIEW
-																																																																																																	// undef isView
+																																																																																																					// undef isView
 isView = false;
 #endif
 				#if !SQLITE_OMIT_TRIGGER
@@ -3844,14 +3853,14 @@ isView = false;
 					///</summary>
 					///<param name="EOF <"> 0 </param>
 					#if SQLITE_DEBUG
-																																																																																																																														        VdbeComment( v, "SELECT eof flag" );
+																																																																																																																																			        VdbeComment( v, "SELECT eof flag" );
 #endif
 					sqlite3SelectDestInit(dest,SelectResultType.Coroutine,++this.nMem);
 					addrSelect=v.sqlite3VdbeCurrentAddr()+2;
 					v.sqlite3VdbeAddOp2(OP_Integer,addrSelect-1,dest.iParm);
 					j1=v.sqlite3VdbeAddOp2(OP_Goto,0,0);
 					#if SQLITE_DEBUG
-																																																																																																																														        VdbeComment( v, "Jump over SELECT coroutine" );
+																																																																																																																																			        VdbeComment( v, "Jump over SELECT coroutine" );
 #endif
 					///
 					///<summary>
@@ -3878,7 +3887,7 @@ isView = false;
 					///</summary>
 					v.sqlite3VdbeAddOp2(OP_Halt,SQLITE_INTERNAL,OE_Abort);
 					#if SQLITE_DEBUG
-																																																																																																																														        VdbeComment( v, "End of SELECT coroutine" );
+																																																																																																																																			        VdbeComment( v, "End of SELECT coroutine" );
 #endif
 					v.sqlite3VdbeJumpHere(j1);
 					///
@@ -5032,7 +5041,7 @@ isView = false;
 					Debug.Assert(pIdx.pSchema==pTab.pSchema);
 					v.sqlite3VdbeAddOp4(op,i+baseCur,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 					#if SQLITE_DEBUG
-																																																																																																																														        VdbeComment( v, "%s", pIdx.zName );
+																																																																																																																																			        VdbeComment( v, "%s", pIdx.zName );
 #endif
 				}
 				if(this.nTab<baseCur+i) {
@@ -5354,11 +5363,11 @@ isView = false;
 				isView=pTab.pSelect!=null;
 				Debug.Assert(pTrigger!=null||tmask==0);
 				#else
-																																																																																																	      const Trigger pTrigger = null;// define pTrigger 0
+																																																																																																					      const Trigger pTrigger = null;// define pTrigger 0
       const int tmask = 0;          // define tmask 0
 #endif
 				#if SQLITE_OMIT_TRIGGER || SQLITE_OMIT_VIEW
-																																																																																																	//     undef isView
+																																																																																																					//     undef isView
       const bool isView = false;    // define isView 0
 #endif
 				if(sqlite3ViewGetColumnNames(this,pTab)!=0) {
@@ -5428,7 +5437,7 @@ isView = false;
 						}
 					}
 					#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																																														{
+																																																																																																																																			{
 int rc;
 rc = sqlite3AuthCheck(pParse, SQLITE_UPDATE, pTab.zName,
 pTab.aCol[j].zName, db.aDb[iDb].zName);
@@ -5833,7 +5842,7 @@ aXRef[j] = -1;
 				}
 				update_cleanup:
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																	sqlite3AuthContextPop(sContext);
+																																																																																																					sqlite3AuthContextPop(sContext);
 #endif
 				db.sqlite3DbFree(ref aRegIdx);
 				db.sqlite3DbFree(ref aXRef);
@@ -6198,11 +6207,11 @@ aXRef[j] = -1;
 				pTrigger=sqlite3TriggersExist(this,pTab,TK_DELETE,null,out iDummy);
 				isView=pTab.pSelect!=null;
 				#else
-																																																																																																	      const Trigger pTrigger = null;
+																																																																																																					      const Trigger pTrigger = null;
       bool isView = false;
 #endif
 				#if SQLITE_OMIT_VIEW
-																																																																																																	// undef isView
+																																																																																																					// undef isView
 isView = false;
 #endif
 				///
@@ -6219,7 +6228,7 @@ isView = false;
 				Debug.Assert(iDb<db.nDb);
 				zDb=db.aDb[iDb].zName;
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																	rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
+																																																																																																					rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
 #else
 				rcauth=SQLITE_OK;
 				#endif
@@ -6239,7 +6248,7 @@ isView = false;
 					this.nTab++;
 				}
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																	/* Start the view context
+																																																																																																					/* Start the view context
 */
 if( isView ){
 sqlite3AuthContextPush(pParse, sContext, pTab.zName);
@@ -6423,7 +6432,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				}
 				delete_from_cleanup:
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																																																	sqlite3AuthContextPop(sContext);
+																																																																																																					sqlite3AuthContextPop(sContext);
 #endif
 				sqlite3SrcListDelete(db,ref pTabList);
 				sqlite3ExprDelete(db,ref pWhere);
@@ -6728,14 +6737,12 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			public CollSeq sqlite3BinaryCompareCollSeq(Expr pLeft,Expr pRight) {
 				CollSeq pColl;
 				Debug.Assert(pLeft!=null);
-                if ((pLeft.Flags & ExprFlags.EP_ExpCollate) != 0)
-                {
+				if((pLeft.Flags&ExprFlags.EP_ExpCollate)!=0) {
 					Debug.Assert(pLeft.pColl!=null);
 					pColl=pLeft.pColl;
 				}
 				else
-                    if (pRight != null && ((pRight.Flags & ExprFlags.EP_ExpCollate) != 0))
-                    {
+					if(pRight!=null&&((pRight.Flags&ExprFlags.EP_ExpCollate)!=0)) {
 						Debug.Assert(pRight.pColl!=null);
 						pColl=pRight.pColl;
 					}
@@ -6881,10 +6888,10 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///
 				///</summary>
 				#if !NDEBUG
-																																																																																																	      for ( i = 0; i < SQLITE_N_COLCACHE; i++ )//p=pParse.aColCache... p++)
+																																																																																																					      for ( i = 0; i < SQLITE_N_COLCACHE; i++ )//p=pParse.aColCache... p++)
       {
 #if FALSE
-																																																																																																	p = pParse.aColCache[i];
+																																																																																																					p = pParse.aColCache[i];
 if ( p.iReg != 0 && p.iTable == iTab && p.iColumn == iCol )
 {
 cacheEntryClear( pParse, p );
@@ -6894,7 +6901,7 @@ p.lru = pParse.iCacheCnt++;
 return;
 }
 #endif
-																																																																																																	        Debug.Assert( p.iReg == 0 || p.iTable != iTab || p.iColumn != iCol );
+																																																																																																					        Debug.Assert( p.iReg == 0 || p.iTable != iTab || p.iColumn != iCol );
       }
 #endif
 				///
@@ -7486,8 +7493,7 @@ return;
 					///"glob(B,A).  We want to use the A in "A glob B" to test
 					///for function overloading.  But we use the B term in "glob(B,A)".
 					///</summary>
-                    if (nFarg >= 2 && (pExpr.Flags & ExprFlags.EP_InfixFunc) != 0)
-                    {
+					if(nFarg>=2&&(pExpr.Flags&ExprFlags.EP_InfixFunc)!=0) {
 						pDef=sqlite3VtabOverloadFunction(db,pDef,nFarg,pFarg.a[1].pExpr);
 					}
 					else
@@ -7697,7 +7703,7 @@ return;
 					///X==Ei (form A) or just Ei (form B) 
 					///</summary>
 					#if !NDEBUG
-																																																																																																																														            int iCacheLevel = pParse.iCacheLevel;
+																																																																																																																																			            int iCacheLevel = pParse.iCacheLevel;
             //VVA_ONLY( int iCacheLevel = pParse.iCacheLevel; )
 #endif
 					Debug.Assert(!pExpr.ExprHasProperty(EP_xIsSelect)&&pExpr.x.pList!=null);
@@ -7754,7 +7760,7 @@ return;
 						v.sqlite3VdbeAddOp2(OP_Null,0,target);
 					}
 					#if !NDEBUG
-																																																																																																																														            Debug.Assert( /* db.mallocFailed != 0 || */ pParse.nErr > 0
+																																																																																																																																			            Debug.Assert( /* db.mallocFailed != 0 || */ pParse.nErr > 0
             || pParse.iCacheLevel == iCacheLevel );
 #endif
 					v.sqlite3VdbeResolveLabel(endLabel);
@@ -8066,7 +8072,7 @@ return;
 					break;
 				}
 				#if SQLITE_OMIT_SUBQUERY
-																																																																																																	        case TK_IN:
+																																																																																																					        case TK_IN:
           {
             int destIfFalse = sqlite3VdbeMakeLabel( v );
             int destIfNull = jumpIfNull != 0 ? dest : destIfFalse;
@@ -8206,7 +8212,7 @@ return;
 					break;
 				}
 				#if SQLITE_OMIT_SUBQUERY
-																																																																																																	        case TK_IN:
+																																																																																																					        case TK_IN:
           {
             if ( jumpIfNull != 0 )
             {
@@ -8508,14 +8514,14 @@ return;
 				}
 			}
 			public void exprCommute(Expr pExpr) {
-                ExprFlags expRight = (pExpr.pRight.Flags & ExprFlags.EP_ExpCollate);
-                ExprFlags expLeft = (pExpr.pLeft.Flags & ExprFlags.EP_ExpCollate);
+				ExprFlags expRight=(pExpr.pRight.Flags&ExprFlags.EP_ExpCollate);
+				ExprFlags expLeft=(pExpr.pLeft.Flags&ExprFlags.EP_ExpCollate);
 				Debug.Assert(allowedOp(pExpr.op)&&pExpr.op!=TK_IN);
 				pExpr.pRight.pColl=this.sqlite3ExprCollSeq(pExpr.pRight);
 				pExpr.pLeft.pColl=this.sqlite3ExprCollSeq(pExpr.pLeft);
 				SWAP(ref pExpr.pRight.pColl,ref pExpr.pLeft.pColl);
-                pExpr.pRight.Flags = ((pExpr.pRight.Flags & ~ExprFlags.EP_ExpCollate) | expLeft);
-                pExpr.pLeft.Flags = ((pExpr.pLeft.Flags & ~ExprFlags.EP_ExpCollate) | expRight);
+				pExpr.pRight.Flags=((pExpr.pRight.Flags&~ExprFlags.EP_ExpCollate)|expLeft);
+				pExpr.pLeft.Flags=((pExpr.pLeft.Flags&~ExprFlags.EP_ExpCollate)|expRight);
 				SWAP(ref pExpr.pRight,ref pExpr.pLeft);
 				if(pExpr.op>=TK_GT) {
 					Debug.Assert(TK_LT==TK_GT+2);
@@ -8753,7 +8759,7 @@ return;
 							pOrTerm=pOrWC.a[_pOrWC];
 							WhereCost sTermCost=null;
 							#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																																																																																							            WHERETRACE( "... Multi-index OR testing for term %d of %d....\n",
+																																																																																																																																																																																														            WHERETRACE( "... Multi-index OR testing for term %d of %d....\n",
             _pOrWC, pOrWC.nTerm - _pOrWC//( pOrTerm - pOrWC.a ), ( pTerm - pWC.a )
             );
 #endif
@@ -8788,7 +8794,7 @@ return;
 						///</summary>
 						if(pOrderBy!=null) {
 							#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																																																																																							            WHERETRACE( "... sorting increases OR cost %.9g to %.9g\n",
+																																																																																																																																																																																														            WHERETRACE( "... sorting increases OR cost %.9g to %.9g\n",
             rTotal, rTotal + nRow * estLog( nRow ) );
 #endif
 							rTotal+=nRow*estLog(nRow);
@@ -8800,7 +8806,7 @@ return;
 						///of pCost. 
 						///</summary>
 						#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																																																										          WHERETRACE( "... multi-index OR cost=%.9g nrow=%.9g\n", rTotal, nRow );
+																																																																																																																																																																          WHERETRACE( "... multi-index OR cost=%.9g nrow=%.9g\n", rTotal, nRow );
 #endif
 						if(rTotal<pCost.rCost) {
 							pCost.rCost=rTotal;
@@ -8915,7 +8921,7 @@ return;
 					pTerm=pWC.a[ipTerm];
 					if(pTerm.termCanDriveIndex(pSrc,notReady)!=0) {
 						#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																																																										          WHERETRACE( "auto-index reduces cost from %.2f to %.2f\n",
+																																																																																																																																																																          WHERETRACE( "auto-index reduces cost from %.2f to %.2f\n",
           pCost.rCost, costTempIdx );
 #endif
 						pCost.rCost=costTempIdx;
@@ -9192,7 +9198,7 @@ return;
 				int nOrderBy;
 				sqlite3_index_info pIdxInfo;
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																      WHERETRACE( "Recomputing index info for %s...\n", pSrc.pTab.zName );
+																																																																																																				      WHERETRACE( "Recomputing index info for %s...\n", pSrc.pTab.zName );
 #endif
 				///
 				///<summary>
@@ -9307,7 +9313,7 @@ return;
 				int i;
 				int rc;
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																      WHERETRACE( "xBestIndex for %s\n", pTab.zName );
+																																																																																																				      WHERETRACE( "xBestIndex for %s\n", pTab.zName );
 #endif
 				TRACE_IDX_INPUTS(p);
 				rc=pVtab.pModule.xBestIndex(pVtab,ref p);
@@ -9361,7 +9367,7 @@ return;
 			) {
 				int rc=SQLITE_OK;
 				#if SQLITE_ENABLE_STAT2
-																																																																																																
+																																																																																																				
       if ( nEq == 0 && p.aSample != null )
       {
         sqlite3_value pLowerVal = null;
@@ -9913,7 +9919,7 @@ range_est_fallback:
 					///A single term of the WHERE clause 
 					///</summary>
 					#if SQLITE_ENABLE_STAT2
-																																																																																																																													        WhereTerm pFirstTerm = null;  /* First term matching the index */
+																																																																																																																																		        WhereTerm pFirstTerm = null;  /* First term matching the index */
 #endif
 					///
 					///<summary>
@@ -9950,7 +9956,7 @@ range_est_fallback:
 								wsFlags|=WHERE_COLUMN_NULL;
 							}
 						#if SQLITE_ENABLE_STAT2
-																																																																																																																																																										          if ( nEq == 0 && pProbe.aSample != null )
+																																																																																																																																																																          if ( nEq == 0 && pProbe.aSample != null )
             pFirstTerm = pTerm;
 #endif
 						used|=pTerm.prereqRight;
@@ -10038,7 +10044,7 @@ range_est_fallback:
 						nInMul=(int)(nRow/aiRowEst[nEq]);
 					}
 					#if SQLITE_ENABLE_STAT2
-																																																																																																																													        /* If the constraint is of the form x=VALUE and histogram
+																																																																																																																																		        /* If the constraint is of the form x=VALUE and histogram
     ** data is available for column x, then it might be possible
     ** to get a better estimate on the number of rows based on
     ** VALUE and how common that value is according to the histogram.
@@ -10247,7 +10253,7 @@ range_est_fallback:
 							nRow=2;
 					}
 					#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																													        WHERETRACE(
+																																																																																																																																		        WHERETRACE(
         "%s(%s): nEq=%d nInMul=%d estBound=%d bSort=%d bLookup=%d wsFlags=0x%x\n" +
       "         notReady=0x%llx log10N=%.1f nRow=%.1f cost=%.1f used=0x%llx\n",
         pSrc.pTab.zName, ( pIdx != null ? pIdx.zName : "ipk" ),
@@ -10297,7 +10303,7 @@ range_est_fallback:
 				Debug.Assert(pCost.plan.u.pIdx==null||(pCost.plan.wsFlags&WHERE_ROWID_EQ)==0);
 				Debug.Assert(pSrc.pIndex==null||pCost.plan.u.pIdx==null||pCost.plan.u.pIdx==pSrc.pIndex);
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																      WHERETRACE( "best index is: %s\n",
+																																																																																																				      WHERETRACE( "best index is: %s\n",
       ( ( pCost.plan.wsFlags & WHERE_NOT_FULLSCAN ) == 0 ? "none" :
       pCost.plan.u.pIdx != null ? pCost.plan.u.pIdx.zName : "ipk" )
       );
@@ -10914,7 +10920,7 @@ range_est_fallback:
 					#endif
 				}
 				#if !NDEBUG
-																																																																																																      {
+																																																																																																				      {
         Bitmask toTheLeft = 0;
         for ( i = 0; i < pTabList.nSrc; i++ )
         {
@@ -10957,7 +10963,7 @@ range_est_fallback:
 				notReady=~(Bitmask)0;
 				andFlags=~0;
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																      WHERETRACE( "*** Optimizer Start ***\n" );
+																																																																																																				      WHERETRACE( "*** Optimizer Start ***\n" );
 #endif
 				for(i=iFrom=0;i<nTabList;i++)//, pLevel++ )
 				 {
@@ -11006,7 +11012,7 @@ range_est_fallback:
 					// memset( &bestPlan, 0, sizeof( bestPlan ) );
 					bestPlan.rCost=SQLITE_BIG_DBL;
 					#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																													        WHERETRACE( "*** Begin search for loop %d ***\n", i );
+																																																																																																																																		        WHERETRACE( "*** Begin search for loop %d ***\n", i );
 #endif
 					///
 					///<summary>
@@ -11093,7 +11099,7 @@ range_est_fallback:
 							if(pTabItem.pIndex==null)
 								nUnconstrained++;
 							#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																																																																																							            WHERETRACE( "=== trying table %d with isOptimal=%d ===\n",
+																																																																																																																																																																																														            WHERETRACE( "=== trying table %d with isOptimal=%d ===\n",
             j, isOptimal );
 #endif
 							Debug.Assert(pTabItem.pTab!=null);
@@ -11158,7 +11164,7 @@ range_est_fallback:
 							///</summary>
 							||(sCost.rCost<=bestPlan.rCost&&sCost.plan.nRow<bestPlan.plan.nRow))) {
 								#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																																																																																																																				              WHERETRACE( "=== table %d is best so far" +
+																																																																																																																																																																																																																												              WHERETRACE( "=== table %d is best so far" +
               " with cost=%g and nRow=%g\n",
               j, sCost.rCost, sCost.plan.nRow );
 #endif
@@ -11172,7 +11178,7 @@ range_est_fallback:
 					Debug.Assert(bestJ>=0);
 					Debug.Assert((notReady&pMaskSet.getMask(pTabList.a[bestJ].iCursor))!=0);
 					#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																																													        WHERETRACE( "*** Optimizer selects table %d for loop %d" +
+																																																																																																																																		        WHERETRACE( "*** Optimizer selects table %d for loop %d" +
         " with cost=%g and nRow=%g\n",
         bestJ, i,//pLevel-pWInfo.a,
         bestPlan.rCost, bestPlan.plan.nRow );
@@ -11221,7 +11227,7 @@ range_est_fallback:
 					}
 				}
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
-																																																																																																      WHERETRACE( "*** Optimizer Finished ***\n" );
+																																																																																																				      WHERETRACE( "*** Optimizer Finished ***\n" );
 #endif
 				if(this.nErr!=0///
 				///<summary>
@@ -11330,7 +11336,7 @@ range_est_fallback:
 							Debug.Assert(iIdxCur>=0);
 							v.sqlite3VdbeAddOp4(OP_OpenRead,iIdxCur,pIx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 							#if SQLITE_DEBUG
-																																																																																																																																																																																							            VdbeComment( v, "%s", pIx.zName );
+																																																																																																																																																																																														            VdbeComment( v, "%s", pIx.zName );
 #endif
 						}
 					sqlite3CodeVerifySchema(this,iDb);
@@ -11353,18 +11359,18 @@ range_est_fallback:
 					pWInfo.iContinue=pLevel.addrCont;
 				}
 				#if SQLITE_TEST
-																																																																																																      /* Record in the query plan information about the current table
+																																																																																																				      /* Record in the query plan information about the current table
 ** and the index used to access it (if any).  If the table itself
 ** is not used, its name is just '{}'.  If no index is used
 ** the index is listed as "{}".  If the primary key is used the
 ** index name is '*'.
 */
 #if !TCLSH
-																																																																																																      sqlite3_query_plan.Length = 0;
+																																																																																																				      sqlite3_query_plan.Length = 0;
 #else
-																																																																																																      sqlite3_query_plan.sValue = "";
+																																																																																																				      sqlite3_query_plan.sValue = "";
 #endif
-																																																																																																      for ( i = 0; i < nTabList; i++ )
+																																																																																																				      for ( i = 0; i < nTabList; i++ )
       {
         string z;
         int n;
@@ -11417,11 +11423,11 @@ range_est_fallback:
       //}
       //sqlite3_query_plan[nQPlan] = 0;
 #if !TCLSH
-																																																																																																      sqlite3_query_plan = new StringBuilder( sqlite3_query_plan.ToString().Trim() );
+																																																																																																				      sqlite3_query_plan = new StringBuilder( sqlite3_query_plan.ToString().Trim() );
 #else
-																																																																																																      sqlite3_query_plan.Trim();
+																																																																																																				      sqlite3_query_plan.Trim();
 #endif
-																																																																																																      nQPlan = 0;
+																																																																																																				      nQPlan = 0;
 #endif
 				///
 				///<summary>
@@ -11789,7 +11795,7 @@ range_est_fallback:
 								v.sqlite3VdbeAddOp2(OP_Integer,1,iMem);
 								v.sqlite3VdbeAddOp4(OP_OpenRead,iTab,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 								#if SQLITE_DEBUG
-																																																																																																																																																																																												              VdbeComment( v, "%s", pIdx.zName );
+																																																																																																																																																																																																				              VdbeComment( v, "%s", pIdx.zName );
 #endif
 								eType=IN_INDEX_INDEX;
 								v.sqlite3VdbeJumpHere(iAddr);
@@ -12067,14 +12073,14 @@ range_est_fallback:
 						dest.eDest=SelectResultType.Mem;
 						v.sqlite3VdbeAddOp2(OP_Null,0,dest.iParm);
 						#if SQLITE_DEBUG
-																																																																																																																																								              VdbeComment( v, "Init subquery result" );
+																																																																																																																																														              VdbeComment( v, "Init subquery result" );
 #endif
 					}
 					else {
 						dest.eDest=SelectResultType.Exists;
 						v.sqlite3VdbeAddOp2(OP_Integer,0,dest.iParm);
 						#if SQLITE_DEBUG
-																																																																																																																																								              VdbeComment( v, "Init EXISTS result" );
+																																																																																																																																														              VdbeComment( v, "Init EXISTS result" );
 #endif
 					}
 					sqlite3ExprDelete(this.db,ref pSel.pLimit);
@@ -12278,8 +12284,7 @@ range_est_fallback:
 			}
 			public void codeInteger(Expr pExpr,bool negFlag,int iMem) {
 				Vdbe v=this.pVdbe;
-                if ((pExpr.Flags & ExprFlags.EP_IntValue) != 0)
-                {
+				if((pExpr.Flags&ExprFlags.EP_IntValue)!=0) {
 					int i=pExpr.u.iValue;
 					Debug.Assert(i>=0);
 					if(negFlag)
@@ -12301,7 +12306,7 @@ range_est_fallback:
 					}
 					else {
 						#if SQLITE_OMIT_FLOATING_POINT
-																																																																																																																																								sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
+																																																																																																																																														sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
 #else
 						codeReal(v,z,negFlag,iMem);
 						#endif
@@ -12366,7 +12371,7 @@ range_est_fallback:
 				this.sNameToken.Length=this.sNameToken.zRestSql.Length;
 				//      (int)[pModuleName.n] - pName1.z );
 				#if !SQLITE_OMIT_AUTHORIZATION
-																																																																															  /* Creating a virtual table invokes the authorization callback twice.
+																																																																																			  /* Creating a virtual table invokes the authorization callback twice.
   ** The first invocation, to obtain permission to INSERT a row into the
   ** sqlite_master table, has already been made by sqlite3StartTable().
   ** The second call, to obtain permission to create the table, is made now.
@@ -12505,7 +12510,7 @@ range_est_fallback:
 				///Locate the required virtual table module 
 				///</summary>
 				zMod=pTab.azModuleArg[0];
-				pMod=(Module)sqlite3HashFind(db.aModule,zMod,StringExtensions.sqlite3Strlen30(zMod),(Module)null);
+				pMod=(Module)db.aModule.sqlite3HashFind(zMod,StringExtensions.sqlite3Strlen30(zMod),(Module)null);
 				if(null==pMod) {
 					string zModule=pTab.azModuleArg[0];
 					sqlite3ErrorMsg(this,"no such module: %s",zModule);
