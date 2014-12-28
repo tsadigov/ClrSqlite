@@ -177,7 +177,7 @@ p.zName, P4_STATIC );
 			///vdbe program
 			///
 			///</summary>
-			v=sqlite3GetVdbe(pParse);
+			v=pParse.sqlite3GetVdbe();
 			Debug.Assert(0==pParse.isMultiWrite
 			#if SQLITE_DEBUG
 																																																																																	        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
@@ -746,7 +746,7 @@ p.zName, P4_STATIC );
 		///
 		///</summary>
 		static void sqlite3OpenMasterTable(Parse p,int iDb) {
-			Vdbe v=sqlite3GetVdbe(p);
+			Vdbe v=p.sqlite3GetVdbe();
 			sqlite3TableLock(p,iDb,MASTER_ROOT,1,SCHEMA_TABLE(iDb));
 			v.sqlite3VdbeAddOp3(OP_OpenWrite,0,MASTER_ROOT,iDb);
 			v.sqlite3VdbeChangeP4(-1,(int)5,P4_INT32);
@@ -1086,7 +1086,7 @@ goto begin_table_error;
 			///indices.  Hence, the record number for the table must be allocated
 			///now.
 			///</summary>
-			if(0==db.init.busy&&(v=sqlite3GetVdbe(pParse))!=null) {
+			if(0==db.init.busy&&(v=pParse.sqlite3GetVdbe())!=null) {
 				int j1;
 				int fileFormat;
 				int reg1,reg2,reg3;
@@ -1892,7 +1892,7 @@ goto begin_table_error;
 				///<summary>
 				///Text of the CREATE TABLE or CREATE VIEW statement 
 				///</summary>
-				v=sqlite3GetVdbe(pParse);
+				v=pParse.sqlite3GetVdbe();
 				if(NEVER(v==null))
 					return;
 				v.sqlite3VdbeAddOp1(OpCode.OP_Close,0);
@@ -2353,7 +2353,7 @@ db.xAuth = xAuth;
 		/// erasing iTable (this can happen with an auto-vacuum database).
 		///</summary>
 		static void destroyRootPage(Parse pParse,int iTable,int iDb) {
-			Vdbe v=sqlite3GetVdbe(pParse);
+			Vdbe v=pParse.sqlite3GetVdbe();
 			int r1=pParse.sqlite3GetTempReg();
 			v.sqlite3VdbeAddOp3(OP_Destroy,iTable,r1,iDb);
 			sqlite3MayAbort(pParse);
@@ -2529,7 +2529,7 @@ goto exit_drop_table;
 			///Generate code to remove the table from the master table
 			///on disk.
 			///</summary>
-			v=sqlite3GetVdbe(pParse);
+			v=pParse.sqlite3GetVdbe();
 			if(v!=null) {
 				Trigger pTrigger;
 				Db pDb=db.aDb[iDb];
@@ -2860,7 +2860,7 @@ return;
 			///</summary>
 			///<param name="Require a write">lock on the table to perform this operation </param>
 			sqlite3TableLock(pParse,iDb,pTab.tnum,1,pTab.zName);
-			v=sqlite3GetVdbe(pParse);
+			v=pParse.sqlite3GetVdbe();
 			if(v==null)
 				return;
 			if(memRootPage>=0) {
@@ -3476,7 +3476,7 @@ goto exit_create_index;
 				Vdbe v;
 				string zStmt;
 				int iMem=++pParse.nMem;
-				v=sqlite3GetVdbe(pParse);
+				v=pParse.sqlite3GetVdbe();
 				if(v==null)
 					goto exit_create_index;
 				///
@@ -3665,7 +3665,7 @@ goto exit_drop_index;
 			///<summary>
 			///Generate code to remove the index and from the master table 
 			///</summary>
-			v=sqlite3GetVdbe(pParse);
+			v=pParse.sqlite3GetVdbe();
 			if(v!=null) {
 				sqlite3BeginWriteOperation(pParse,1,iDb);
 				sqlite3NestedParse(pParse,"DELETE FROM %Q.%s WHERE name=%Q AND type='index'",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),pIndex.zName);
@@ -4180,7 +4180,7 @@ goto exit_drop_index;
 			if(sqlite3AuthCheck(pParse,SQLITE_TRANSACTION,"BEGIN",null,null)!=0) {
 				return;
 			}
-			v=sqlite3GetVdbe(pParse);
+			v=pParse.sqlite3GetVdbe();
 			if(v==null)
 				return;
 			if(type!=TK_DEFERRED) {
@@ -4208,7 +4208,7 @@ goto exit_drop_index;
 			if(sqlite3AuthCheck(pParse,SQLITE_TRANSACTION,"COMMIT",null,null)!=0) {
 				return;
 			}
-			v=sqlite3GetVdbe(pParse);
+			v=pParse.sqlite3GetVdbe();
 			if(v!=null) {
 				v.sqlite3VdbeAddOp2(OP_AutoCommit,1,0);
 			}
@@ -4231,7 +4231,7 @@ goto exit_drop_index;
 			if(sqlite3AuthCheck(pParse,SQLITE_TRANSACTION,"ROLLBACK",null,null)!=0) {
 				return;
 			}
-			v=sqlite3GetVdbe(pParse);
+			v=pParse.sqlite3GetVdbe();
 			if(v!=null) {
 				v.sqlite3VdbeAddOp2(OP_AutoCommit,1,1);
 			}
@@ -4247,7 +4247,7 @@ goto exit_drop_index;
 		static void sqlite3Savepoint(Parse pParse,int op,Token pName) {
 			string zName=sqlite3NameFromToken(pParse.db,pName);
 			if(zName!=null) {
-				Vdbe v=sqlite3GetVdbe(pParse);
+				Vdbe v=pParse.sqlite3GetVdbe();
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																												Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
 #endif
@@ -4313,7 +4313,7 @@ goto exit_drop_index;
 		static void sqlite3CodeVerifySchema(Parse pParse,int iDb) {
 			Parse pToplevel=sqlite3ParseToplevel(pParse);
 			if(pToplevel.cookieGoto==0) {
-				Vdbe v=sqlite3GetVdbe(pToplevel);
+                Vdbe v = pToplevel.sqlite3GetVdbe();
 				if(v==null)
 					return;
 				///
@@ -4415,14 +4415,14 @@ goto exit_drop_index;
 		///
 		///</summary>
 		static void sqlite3HaltConstraint(Parse pParse,int onError,string p4,int p4type) {
-			Vdbe v=sqlite3GetVdbe(pParse);
+			Vdbe v=pParse.sqlite3GetVdbe();
 			if(onError==OE_Abort) {
 				sqlite3MayAbort(pParse);
 			}
 			v.sqlite3VdbeAddOp4(OP_Halt,SQLITE_CONSTRAINT,onError,0,p4,p4type);
 		}
 		static void sqlite3HaltConstraint(Parse pParse,int onError,byte[] p4,int p4type) {
-			Vdbe v=sqlite3GetVdbe(pParse);
+			Vdbe v=pParse.sqlite3GetVdbe();
 			if(onError==OE_Abort) {
 				sqlite3MayAbort(pParse);
 			}

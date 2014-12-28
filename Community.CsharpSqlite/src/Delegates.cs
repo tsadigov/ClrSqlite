@@ -88,81 +88,7 @@ namespace Community.CsharpSqlite
 
 		public delegate int dxExprTreeFunction_OBJ (object pArg, Expr pExpr);
 
-		///
-///<summary>
-///VFS Delegates
-///
-///</summary>
-
-		public delegate int dxClose (sqlite3_file File_ID);
-
-		public delegate int dxCheckReservedLock (sqlite3_file File_ID, ref int pRes);
-
-		public delegate int dxDeviceCharacteristics (sqlite3_file File_ID);
-
-		public delegate int dxFileControl (sqlite3_file File_ID, int op, ref sqlite3_int64 pArgs);
-
-		public delegate int dxFileSize (sqlite3_file File_ID, ref long size);
-
-		public delegate int dxLock (sqlite3_file File_ID, int locktype);
-
-		public delegate int dxRead (sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
-
-		public delegate int dxSectorSize (sqlite3_file File_ID);
-
-		public delegate int dxSync (sqlite3_file File_ID, int flags);
-
-		public delegate int dxTruncate (sqlite3_file File_ID, sqlite3_int64 size);
-
-		public delegate int dxUnlock (sqlite3_file File_ID, int locktype);
-
-		public delegate int dxWrite (sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
-
-		public delegate int dxShmMap (sqlite3_file File_ID, int iPg, int pgsz, int pInt, out object pvolatile);
-
-		public delegate int dxShmLock (sqlite3_file File_ID, int offset, int n, int flags);
-
-		public delegate void dxShmBarrier (sqlite3_file File_ID);
-
-		public delegate int dxShmUnmap (sqlite3_file File_ID, int deleteFlag);
-
-		///
-///<summary>
-///sqlite_vfs Delegates
-///
-///</summary>
-
-		public delegate int dxOpen (sqlite3_vfs vfs, string zName, sqlite3_file db, int flags, out int pOutFlags);
-
-		public delegate int dxDelete (sqlite3_vfs vfs, string zName, int syncDir);
-
-		public delegate int dxAccess (sqlite3_vfs vfs, string zName, int flags, out int pResOut);
-
-		public delegate int dxFullPathname (sqlite3_vfs vfs, string zName, int nOut, StringBuilder zOut);
-
-		public delegate HANDLE dxDlOpen (sqlite3_vfs vfs, string zFilename);
-
-		public delegate int dxDlError (sqlite3_vfs vfs, int nByte, string zErrMsg);
-
-		public delegate HANDLE dxDlSym (sqlite3_vfs vfs, HANDLE data, string zSymbol);
-
-		public delegate int dxDlClose (sqlite3_vfs vfs, HANDLE data);
-
-		public delegate int dxRandomness (sqlite3_vfs vfs, int nByte, byte[] buffer);
-
-		public delegate int dxSleep (sqlite3_vfs vfs, int microseconds);
-
-		public delegate int dxCurrentTime (sqlite3_vfs vfs, ref double currenttime);
-
-		public delegate int dxGetLastError (sqlite3_vfs pVfs, int nBuf, ref string zBuf);
-
-		public delegate int dxCurrentTimeInt64 (sqlite3_vfs pVfs, ref sqlite3_int64 pTime);
-
-		public delegate int dxSetSystemCall (sqlite3_vfs pVfs, string zName, sqlite3_int64 sqlite3_syscall_ptr);
-
-		public delegate int dxGetSystemCall (sqlite3_vfs pVfs, string zName, sqlite3_int64 sqlite3_syscall_ptr);
-
-		public delegate int dxNextSystemCall (sqlite3_vfs pVfs, string zName, sqlite3_int64 sqlite3_syscall_ptr);
+		
 
 		///
 ///<summary>
@@ -306,24 +232,12 @@ namespace Community.CsharpSqlite
 
 		public delegate int dxRoundup (int nSize);
 
-		//Mutex Methods
-		public delegate int dxMutexInit ();
+		
 
-		public delegate int dxMutexEnd ();
 
-		public delegate sqlite3_mutex dxMutexAlloc (int iNumber);
+        //MUTEX delegates where here
 
-		public delegate void dxMutexFree (sqlite3_mutex sm);
 
-		public delegate void dxMutexEnter (sqlite3_mutex sm);
-
-		public delegate int dxMutexTry (sqlite3_mutex sm);
-
-		public delegate void dxMutexLeave (sqlite3_mutex sm);
-
-		public delegate bool dxMutexHeld (sqlite3_mutex sm);
-
-		public delegate bool dxMutexNotheld (sqlite3_mutex sm);
 
 		public delegate object dxColumn (sqlite3_stmt pStmt, int i);
 

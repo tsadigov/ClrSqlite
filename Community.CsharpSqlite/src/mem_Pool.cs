@@ -451,7 +451,7 @@ namespace Community.CsharpSqlite
 		static void sqlite3MemSetDefault ()
 		{
 			sqlite3_mem_methods defaultMethods = new sqlite3_mem_methods (sqlite3MemMalloc, sqlite3MemMallocInt, sqlite3MemMallocMem, sqlite3MemFree, sqlite3MemFreeInt, sqlite3MemFreeMem, sqlite3MemRealloc, sqlite3MemSize, sqlite3MemRoundup, (dxMemInit)sqlite3MemInit, (dxMemShutdown)sqlite3MemShutdown, 0);
-			sqlite3_config (SQLITE_CONFIG_MALLOC, defaultMethods);
+            sqlite3_config(SqliteConfig.MALLOC, defaultMethods);
 		}
 	}
 }

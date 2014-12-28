@@ -102,7 +102,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static void sqlite3Vacuum(Parse pParse) {
-			Vdbe v=sqlite3GetVdbe(pParse);
+            Vdbe v = pParse.sqlite3GetVdbe();
 			if(v!=null) {
 				v.sqlite3VdbeAddOp2(OP_Vacuum,0,0);
 			}

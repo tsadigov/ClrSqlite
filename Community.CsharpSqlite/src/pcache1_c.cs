@@ -1414,7 +1414,7 @@ static int pcache1MemSize(object p){
 ///</summary>
 
 			);
-			sqlite3_config (SQLITE_CONFIG_PCACHE, defaultMethods);
+            sqlite3_config(SqliteConfig.PCACHE, defaultMethods);
 		}
 	#if SQLITE_ENABLE_MEMORY_MANAGEMENT
 																			/*

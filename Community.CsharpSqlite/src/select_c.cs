@@ -69,46 +69,9 @@ namespace Community.CsharpSqlite {
 		static Select sqlite3SelectNew(Parse pParse,int null_2,SrcList pSrc,int null_4,int null_5,int null_6,int null_7,int isDistinct,int null_9,int null_10) {
 			return sqlite3SelectNew(pParse,null,pSrc,null,null,null,null,isDistinct,null,null);
 		}
-		static Select sqlite3SelectNew(Parse pParse,///
-		///<summary>
-		///Parsing context 
-		///</summary>
-		ExprList pEList,///
-		///<summary>
-		///which columns to include in the result 
-		///</summary>
-		SrcList pSrc,///
-		///<summary>
-		///</summary>
-		///<param name="the FROM clause "> which tables to scan </param>
-		Expr pWhere,///
-		///<summary>
-		///the WHERE clause 
-		///</summary>
-		ExprList pGroupBy,///
-		///<summary>
-		///the GROUP BY clause 
-		///</summary>
-		Expr pHaving,///
-		///<summary>
-		///the HAVING clause 
-		///</summary>
-		ExprList pOrderBy,///
-		///<summary>
-		///the ORDER BY clause 
-		///</summary>
-		int isDistinct,///
-		///<summary>
-		///true if the DISTINCT keyword is present 
-		///</summary>
-		Expr pLimit,///
-		///<summary>
-		///LIMIT value.  NULL means not used 
-		///</summary>
-		Expr pOffset///
-		///<summary>
-		///OFFSET value.  NULL means no offset 
-		///</summary>
+		static Select sqlite3SelectNew(Parse pParse,/*which columns to include in the result */ExprList pEList, /*the FROM clause "> which tables to scan */SrcList pSrc, /*the WHERE clause */Expr pWhere,  
+            /*the GROUP BY clause */ExprList pGroupBy,/*the HAVING clause */Expr pHaving, /*the ORDER BY clause*/ExprList pOrderBy,/*true if the DISTINCT keyword is present */int isDistinct,
+            /*LIMIT value.  NULL means not used */Expr pLimit,/*OFFSET value.  NULL means no offset */Expr pOffset
 		) {
 			Select pNew;
 			//           Select standin;
@@ -160,46 +123,7 @@ namespace Community.CsharpSqlite {
 				db.sqlite3DbFree(ref p);
 			}
 		}
-		///<summary>
-		/// Given 1 to 3 identifiers preceeding the JOIN keyword, determine the
-		/// type of join.  Return an integer constant that expresses that type
-		/// in terms of the following bit values:
-		///
-		///     JT_INNER
-		///     JT_CROSS
-		///     JT_OUTER
-		///     JT_NATURAL
-		///     JT_LEFT
-		///     JT_RIGHT
-		///
-		/// A full outer join is the combination of JT_LEFT and JT_RIGHT.
-		///
-		/// If an illegal or unsupported join type is seen, then still return
-		/// a join type, but put an error in the pParse structure.
-		///
-		///</summary>
-		class Keyword {
-			public u8 i;
-			///
-			///<summary>
-			///Beginning of keyword text in zKeyText[] 
-			///</summary>
-			public u8 nChar;
-			///
-			///<summary>
-			///Length of the keyword in characters 
-			///</summary>
-			public u8 code;
-			///
-			///<summary>
-			///Join type mask 
-			///</summary>
-			public Keyword(u8 i,u8 nChar,u8 code) {
-				this.i=i;
-				this.nChar=nChar;
-				this.code=code;
-			}
-		}
+		
 		// OVERLOADS, so I don't need to rewrite parse.c
 		static int sqlite3JoinType(Parse pParse,Token pA,int null_3,int null_4) {
 			return sqlite3JoinType(pParse,pA,null,null);
@@ -1907,7 +1831,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			savedFlags=db.flags;
 			db.flags&=~SQLITE_FullColNames;
 			db.flags|=SQLITE_ShortColNames;
-			sqlite3SelectPrep(pParse,pSelect,null);
+			Select.sqlite3SelectPrep(pParse,pSelect,null);
 			if(pParse.nErr!=0)
 				return null;
 			while(pSelect.pPrior!=null)
@@ -1937,23 +1861,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			//}
 			return pTab;
 		}
-		///<summary>
-		/// Get a VDBE for the given parser context.  Create a new one if necessary.
-		/// If an error occurs, return NULL and leave a message in pParse.
-		///
-		///</summary>
-		static Vdbe sqlite3GetVdbe(Parse pParse) {
-			Vdbe v=pParse.pVdbe;
-			if(v==null) {
-				v=pParse.pVdbe=sqlite3VdbeCreate(pParse.db);
-				#if !SQLITE_OMIT_TRACE
-				if(v!=null) {
-					v.sqlite3VdbeAddOp0(OP_Trace);
-				}
-				#endif
-			}
-			return v;
-		}
+		
 		///<summary>
 		/// Compute the iLimit and iOffset fields of the SELECT based on the
 		/// pLimit and pOffset expressions.  pLimit and pOffset hold the expressions
@@ -1992,7 +1900,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			Debug.Assert(p.pOffset==null||p.pLimit!=null);
 			if(p.pLimit!=null) {
 				p.iLimit=iLimit=++pParse.nMem;
-				v=sqlite3GetVdbe(pParse);
+				v=pParse.sqlite3GetVdbe();
 				if(NEVER(v==null))
 					return;
 				///
@@ -2188,7 +2096,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				rc=1;
 				goto multi_select_end;
 			}
-			v=sqlite3GetVdbe(pParse);
+			v=pParse.sqlite3GetVdbe();
 			Debug.Assert(v!=null);
 			///
 			///<summary>
@@ -4346,322 +4254,6 @@ break;
 			return SQLITE_OK;
 		}
 		///<summary>
-		/// This routine is a Walker callback for "expanding" a SELECT statement.
-		/// "Expanding" means to do the following:
-		///
-		///    (1)  Make sure VDBE cursor numbers have been assigned to every
-		///         element of the FROM clause.
-		///
-		///    (2)  Fill in the pTabList.a[].pTab fields in the SrcList that
-		///         defines FROM clause.  When views appear in the FROM clause,
-		///         fill pTabList.a[].x.pSelect with a copy of the SELECT statement
-		///         that implements the view.  A copy is made of the view's SELECT
-		///         statement so that we can freely modify or delete that statement
-		///         without worrying about messing up the presistent representation
-		///         of the view.
-		///
-		///    (3)  Add terms to the WHERE clause to accomodate the NATURAL keyword
-		///         on joins and the ON and USING clause of joins.
-		///
-		///    (4)  Scan the list of columns in the result set (pEList) looking
-		///         for instances of the "*" operator or the TABLE.* operator.
-		///         If found, expand each "*" to be every column in every table
-		///         and TABLE.* to be every column in TABLE.
-		///
-		///
-		///</summary>
-		static int selectExpander(Walker pWalker,Select p) {
-			Parse pParse=pWalker.pParse;
-			int i,j,k;
-			SrcList pTabList;
-			ExprList pEList;
-			SrcList_item pFrom;
-			sqlite3 db=pParse.db;
-			//if ( db.mallocFailed != 0 )
-			//{
-			//  return WRC_Abort;
-			//}
-			if(NEVER(p.pSrc==null)||(p.selFlags&SelectFlags.Expanded)!=0) {
-				return WRC_Prune;
-			}
-			p.selFlags|=SelectFlags.Expanded;
-			pTabList=p.pSrc;
-			pEList=p.pEList;
-			///
-			///<summary>
-			///Make sure cursor numbers have been assigned to all entries in
-			///the FROM clause of the SELECT statement.
-			///
-			///</summary>
-			sqlite3SrcListAssignCursors(pParse,pTabList);
-			///
-			///<summary>
-			///Look up every table named in the FROM clause of the select.  If
-			///an entry of the FROM clause is a subquery instead of a table or view,
-			///then create a transient table ure to describe the subquery.
-			///
-			///</summary>
-			for(i=0;i<pTabList.nSrc;i++)// pFrom++ )
-			 {
-				pFrom=pTabList.a[i];
-				Table pTab;
-				if(pFrom.pTab!=null) {
-					///
-					///<summary>
-					///This statement has already been prepared.  There is no need
-					///to go further. 
-					///</summary>
-					Debug.Assert(i==0);
-					return WRC_Prune;
-				}
-				if(pFrom.zName==null) {
-					#if !SQLITE_OMIT_SUBQUERY
-					Select pSel=pFrom.pSelect;
-					///
-					///<summary>
-					///</summary>
-					///<param name="A sub">query in the FROM clause of a SELECT </param>
-					Debug.Assert(pSel!=null);
-					Debug.Assert(pFrom.pTab==null);
-					pWalker.sqlite3WalkSelect(pSel);
-					pFrom.pTab=pTab=new Table();
-					// sqlite3DbMallocZero( db, sizeof( Table ) );
-					if(pTab==null)
-						return WRC_Abort;
-					pTab.nRef=1;
-					pTab.zName=sqlite3MPrintf(db,"sqlite_subquery_%p_",pTab);
-					while(pSel.pPrior!=null) {
-						pSel=pSel.pPrior;
-					}
-					selectColumnsFromExprList(pParse,pSel.pEList,ref pTab.nCol,ref pTab.aCol);
-					pTab.iPKey=-1;
-					pTab.nRowEst=1000000;
-					pTab.tabFlags|=TF_Ephemeral;
-					#endif
-				}
-				else {
-					///
-					///<summary>
-					///An ordinary table or view name in the FROM clause 
-					///</summary>
-					Debug.Assert(pFrom.pTab==null);
-					pFrom.pTab=pTab=sqlite3LocateTable(pParse,0,pFrom.zName,pFrom.zDatabase);
-					if(pTab==null)
-						return WRC_Abort;
-					pTab.nRef++;
-					#if !(SQLITE_OMIT_VIEW) || !(SQLITE_OMIT_VIRTUALTABLE)
-					if(pTab.pSelect!=null||IsVirtual(pTab)) {
-						///
-						///<summary>
-						///We reach here if the named table is a really a view 
-						///</summary>
-						if(sqlite3ViewGetColumnNames(pParse,pTab)!=0)
-							return WRC_Abort;
-						pFrom.pSelect=sqlite3SelectDup(db,pTab.pSelect,0);
-						pWalker.sqlite3WalkSelect(pFrom.pSelect);
-					}
-					#endif
-				}
-				///
-				///<summary>
-				///Locate the index named by the INDEXED BY clause, if any. 
-				///</summary>
-				if(sqlite3IndexedByLookup(pParse,pFrom)!=0) {
-					return WRC_Abort;
-				}
-			}
-			///
-			///<summary>
-			///Process NATURAL keywords, and ON and USING clauses of joins.
-			///
-			///</summary>
-			if(///
-			///<summary>
-			///db.mallocFailed != 0 || 
-			///</summary>
-			sqliteProcessJoin(pParse,p)!=0) {
-				return WRC_Abort;
-			}
-			///
-			///<summary>
-			///For every "*" that occurs in the column list, insert the names of
-			///all columns in all tables.  And for every TABLE.* insert the names
-			///of all columns in TABLE.  The parser inserted a special expression
-			///with the TK_ALL operator for each "*" that it found in the column list.
-			///The following code just has to locate the TK_ALL expressions and expand
-			///each one to the list of all columns in all tables.
-			///
-			///The first loop just checks to see if there are any "*" operators
-			///that need expanding.
-			///
-			///</summary>
-			for(k=0;k<pEList.nExpr;k++) {
-				Expr pE=pEList.a[k].pExpr;
-				if(pE.op==TK_ALL)
-					break;
-				Debug.Assert(pE.op!=TK_DOT||pE.pRight!=null);
-				Debug.Assert(pE.op!=TK_DOT||(pE.pLeft!=null&&pE.pLeft.op==TK_ID));
-				if(pE.op==TK_DOT&&pE.pRight.op==TK_ALL)
-					break;
-			}
-			if(k<pEList.nExpr) {
-				///
-				///<summary>
-				///If we get here it means the result set contains one or more "*"
-				///operators that need to be expanded.  Loop through each expression
-				///in the result set and expand them one by one.
-				///
-				///</summary>
-				ExprList_item[] a=pEList.a;
-				ExprList pNew=null;
-				int flags=pParse.db.flags;
-				bool longNames=(flags&SQLITE_FullColNames)!=0&&(flags&SQLITE_ShortColNames)==0;
-				for(k=0;k<pEList.nExpr;k++) {
-					Expr pE=a[k].pExpr;
-					Debug.Assert(pE.op!=TK_DOT||pE.pRight!=null);
-					if(pE.op!=TK_ALL&&(pE.op!=TK_DOT||pE.pRight.op!=TK_ALL)) {
-						///
-						///<summary>
-						///This particular expression does not need to be expanded.
-						///
-						///</summary>
-						pNew=pParse.sqlite3ExprListAppend(pNew,a[k].pExpr);
-						if(pNew!=null) {
-							pNew.a[pNew.nExpr-1].zName=a[k].zName;
-							pNew.a[pNew.nExpr-1].zSpan=a[k].zSpan;
-							a[k].zName=null;
-							a[k].zSpan=null;
-						}
-						a[k].pExpr=null;
-					}
-					else {
-						///
-						///<summary>
-						///This expression is a "*" or a "TABLE.*" and needs to be
-						///expanded. 
-						///</summary>
-						int tableSeen=0;
-						///
-						///<summary>
-						///Set to 1 when TABLE matches 
-						///</summary>
-						string zTName;
-						///
-						///<summary>
-						///text of name of TABLE 
-						///</summary>
-						if(pE.op==TK_DOT) {
-							Debug.Assert(pE.pLeft!=null);
-							Debug.Assert(!pE.pLeft.ExprHasProperty(EP_IntValue));
-							zTName=pE.pLeft.u.zToken;
-						}
-						else {
-							zTName=null;
-						}
-						for(i=0;i<pTabList.nSrc;i++)//, pFrom++ )
-						 {
-							pFrom=pTabList.a[i];
-							Table pTab=pFrom.pTab;
-							string zTabName=pFrom.zAlias;
-							if(zTabName==null) {
-								zTabName=pTab.zName;
-							}
-							///if ( db.mallocFailed != 0 ) break;
-							if(zTName!=null&&!zTName.Equals(zTabName,StringComparison.InvariantCultureIgnoreCase)) {
-								continue;
-							}
-							tableSeen=1;
-							for(j=0;j<pTab.nCol;j++) {
-								Expr pExpr,pRight;
-								string zName=pTab.aCol[j].zName;
-								string zColname;
-								///
-								///<summary>
-								///The computed column name 
-								///</summary>
-								string zToFree;
-								///
-								///<summary>
-								///Malloced string that needs to be freed 
-								///</summary>
-								Token sColname=new Token();
-								///
-								///<summary>
-								///Computed column name as a token 
-								///</summary>
-								///
-								///<summary>
-								///If a column is marked as 'hidden' (currently only possible
-								///for virtual tables), do not include it in the expanded
-								///</summary>
-								///<param name="result">set list.</param>
-								///<param name=""></param>
-								if(IsHiddenColumn(pTab.aCol[j])) {
-									Debug.Assert(IsVirtual(pTab));
-									continue;
-								}
-								if(i>0&&(zTName==null||zTName.Length==0)) {
-									int iDummy=0;
-									if((pFrom.jointype&JT_NATURAL)!=0&&tableAndColumnIndex(pTabList,i,zName,ref iDummy,ref iDummy)!=0) {
-										///
-										///<summary>
-										///In a NATURAL join, omit the join columns from the
-										///table to the right of the join 
-										///</summary>
-										continue;
-									}
-									if(sqlite3IdListIndex(pFrom.pUsing,zName)>=0) {
-										///
-										///<summary>
-										///In a join with a USING clause, omit columns in the
-										///using clause from the table on the right. 
-										///</summary>
-										continue;
-									}
-								}
-								pRight=sqlite3Expr(db,TK_ID,zName);
-								zColname=zName;
-								zToFree="";
-								if(longNames||pTabList.nSrc>1) {
-									Expr pLeft;
-									pLeft=sqlite3Expr(db,TK_ID,zTabName);
-									pExpr=pParse.sqlite3PExpr(TK_DOT,pLeft,pRight,0);
-									if(longNames) {
-										zColname=sqlite3MPrintf(db,"%s.%s",zTabName,zName);
-										zToFree=zColname;
-									}
-								}
-								else {
-									pExpr=pRight;
-								}
-								pNew=pParse.sqlite3ExprListAppend(pNew,pExpr);
-								sColname.zRestSql=zColname;
-								sColname.Length=StringExtensions.sqlite3Strlen30(zColname);
-								pParse.sqlite3ExprListSetName(pNew,sColname,0);
-								db.sqlite3DbFree(ref zToFree);
-							}
-						}
-						if(tableSeen==0) {
-							if(zTName!=null) {
-								sqlite3ErrorMsg(pParse,"no such table: %s",zTName);
-							}
-							else {
-								sqlite3ErrorMsg(pParse,"no tables specified");
-							}
-						}
-					}
-				}
-				sqlite3ExprListDelete(db,ref pEList);
-				p.pEList=pNew;
-			}
-			//#if SQLITE_MAX_COLUMN
-			if(p.pEList!=null&&p.pEList.nExpr>db.aLimit[SQLITE_LIMIT_COLUMN]) {
-				sqlite3ErrorMsg(pParse,"too many columns in result set");
-			}
-			//#endif
-			return WRC_Continue;
-		}
-		///<summary>
 		/// No-op routine for the parse-tree walker.
 		///
 		/// When this routine is the Walker.xExprCallback then expression trees
@@ -4675,27 +4267,7 @@ break;
 			UNUSED_PARAMETER2(NotUsed,NotUsed2);
 			return WRC_Continue;
 		}
-		///<summary>
-		/// This routine "expands" a SELECT statement and all of its subqueries.
-		/// For additional information on what it means to "expand" a SELECT
-		/// statement, see the comment on the selectExpand worker callback above.
-		///
-		/// Expanding a SELECT statement is the first step in processing a
-		/// SELECT statement.  The SELECT statement must be expanded before
-		/// name resolution is performed.
-		///
-		/// If anything goes wrong, an error message is written into pParse.
-		/// The calling function can detect the problem by looking at pParse.nErr
-		/// and/or pParse.db.mallocFailed.
-		///
-		///</summary>
-		static void sqlite3SelectExpand(Parse pParse,Select pSelect) {
-			Walker w=new Walker();
-			w.xSelectCallback=selectExpander;
-			w.xExprCallback=exprWalkNoop;
-			w.pParse=pParse;
-			w.sqlite3WalkSelect(pSelect);
-		}
+		
 		#if !SQLITE_OMIT_SUBQUERY
 		///<summary>
 		/// This is a Walker.xSelectCallback callback for the sqlite3SelectTypeInfo()
@@ -4769,41 +4341,7 @@ break;
 		/// This routine acts recursively on all subqueries within the SELECT.
 		///
 		///</summary>
-		static void sqlite3SelectPrep(Parse pParse,///
-		///<summary>
-		///The parser context 
-		///</summary>
-		Select p,///
-		///<summary>
-		///The SELECT statement being coded. 
-		///</summary>
-		NameContext pOuterNC///
-		///<summary>
-		///Name context for container 
-		///</summary>
-		) {
-			sqlite3 db;
-			if(NEVER(p==null))
-				return;
-			db=pParse.db;
-			if((p.selFlags&SelectFlags.HasTypeInfo)!=0)
-				return;
-			sqlite3SelectExpand(pParse,p);
-			if(pParse.nErr!=0///
-			///<summary>
-			///|| db.mallocFailed != 0 
-			///</summary>
-			)
-				return;
-			sqlite3ResolveSelectNames(pParse,p,pOuterNC);
-			if(pParse.nErr!=0///
-			///<summary>
-			///|| db.mallocFailed != 0 
-			///</summary>
-			)
-				return;
-			sqlite3SelectAddTypeInfo(pParse,p);
-		}
+		
 		///<summary>
 		/// Reset the aggregate accumulator.
 		///
@@ -4942,34 +4480,7 @@ break;
 			pAggInfo.directMode=0;
 			pParse.sqlite3ExprCacheClear();
 		}
-		///<summary>
-		/// Add a single OP_Explain instruction to the VDBE to explain a simple
-		/// count() query ("SELECT count() FROM pTab").
-		///
-		///</summary>
-		#if !SQLITE_OMIT_EXPLAIN
-		static void explainSimpleCount(Parse pParse,///
-		///<summary>
-		///Parse context 
-		///</summary>
-		Table pTab,///
-		///<summary>
-		///Table being queried 
-		///</summary>
-		Index pIdx///
-		///<summary>
-		///Index used to optimize scan, or NULL 
-		///</summary>
-		) {
-			if(pParse.explain==2) {
-				string zEqp=sqlite3MPrintf(pParse.db,"SCAN TABLE %s %s%s(~%d rows)",pTab.zName,pIdx!=null?"USING COVERING INDEX ":"",pIdx!=null?pIdx.zName:"",pTab.nRowEst);
-				pParse.pVdbe.sqlite3VdbeAddOp4(OP_Explain,pParse.iSelectId,0,0,zEqp,P4_DYNAMIC);
-			}
-		}
-		#else
-																																																		// define explainSimpleCount(a,b,c)
-    static void explainSimpleCount(Parse a, Table b, Index c){}
-#endif
+		
 		///<summary>
 		/// Generate code for the SELECT statement given in the p argument.
 		///
@@ -5027,114 +4538,64 @@ break;
 		///</summary>
 		static SelectDest sdDummy=null;
 		static bool bDummy=false;
-		static int sqlite3Select(Parse pParse,///
-		///<summary>
-		///The parser context 
-		///</summary>
-		Select p,///
-		///<summary>
-		///The SELECT statement being coded. 
-		///</summary>
-		ref SelectDest pDest///
-		///<summary>
-		///What to do with the query results 
-		///</summary>
-		) {
+		static int sqlite3Select(Parse pParse,/*The SELECT statement being coded.*/ Select p,/*What to do with the query results */ref SelectDest pDest) {
+            ///Loop counters 
 			int i,j;
-			///
-			///<summary>
-			///Loop counters 
-			///</summary>
-			WhereInfo pWInfo;
-			///
-			///<summary>
-			///Return from sqlite3WhereBegin() 
-			///</summary>
-			Vdbe v;
-			///
-			///<summary>
-			///The virtual machine under construction 
-			///</summary>
-			bool isAgg;
-			///
-			///<summary>
-			///True for select lists like "count()" 
-			///</summary>
-			ExprList pEList=new ExprList();
-			///
-			///<summary>
-			///List of columns to extract. 
-			///</summary>
-			SrcList pTabList=new SrcList();
-			///
-			///<summary>
-			///List of tables to select from 
-			///</summary>
-			Expr pWhere;
-			///
-			///<summary>
-			///The WHERE clause.  May be NULL 
-			///</summary>
-			ExprList pOrderBy;
-			///
-			///<summary>
-			///The ORDER BY clause.  May be NULL 
-			///</summary>
-			ExprList pGroupBy;
-			///
-			///<summary>
-			///The GROUP BY clause.  May be NULL 
-			///</summary>
-			Expr pHaving;
-			///
-			///<summary>
-			///The HAVING clause.  May be NULL 
-			///</summary>
-			bool isDistinct;
-			///
-			///<summary>
-			///True if the DISTINCT keyword is present 
-			///</summary>
-			int distinct;
-			///
-			///<summary>
-			///Table to use for the distinct set 
-			///</summary>
-			int rc=1;
-			///
-			///<summary>
-			///Value to return from this function 
-			///</summary>
-			int addrSortIndex;
-			///
-			///<summary>
-			///Address of an OP_OpenEphemeral instruction 
-			///</summary>
-			AggInfo sAggInfo;
-			///
-			///<summary>
-			///Information used by aggregate queries 
-			///</summary>
-			int iEnd;
-			///
-			///<summary>
-			///Address of the end of the query 
-			///</summary>
-			sqlite3 db;
-			///
-			///<summary>
-			///The database connection 
-			///</summary>
-			#if !SQLITE_OMIT_EXPLAIN
+
+            ///Return from sqlite3WhereBegin() 
+            WhereInfo pWInfo;
+
+            ///The virtual machine under construction 
+            Vdbe v;
+
+            ///True for select lists like "count()" 
+            bool isAgg;
+
+            ///List of columns to extract. 
+            ExprList pEList = new ExprList();
+
+            ///List of tables to select from 
+            SrcList pTabList = new SrcList();
+
+            ///The WHERE clause.  May be NULL 
+            Expr pWhere;
+
+            ///The ORDER BY clause.  May be NULL 
+            ExprList pOrderBy;
+
+            ///The GROUP BY clause.  May be NULL 
+            ExprList pGroupBy;
+
+            ///The HAVING clause.  May be NULL 
+            Expr pHaving;
+
+            ///True if the DISTINCT keyword is present 
+            bool isDistinct;
+
+            ///Table to use for the distinct set 
+            int distinct;
+
+            ///Value to return from this function 
+            int rc = 1;
+
+            ///Address of an OP_OpenEphemeral instruction 
+            int addrSortIndex;
+
+            ///Information used by aggregate queries 
+            AggInfo sAggInfo;
+
+            ///Address of the end of the query 
+            int iEnd;
+
+            ///The database connection 
+            sqlite3 db;
+
+            #if !SQLITE_OMIT_EXPLAIN
 			int iRestoreSelectId=pParse.iSelectId;
 			pParse.iSelectId=pParse.iNextSelectId++;
 			#endif
 			db=pParse.db;
-			if(p==null///
-			///<summary>
-			///|| db.mallocFailed != 0 
-			///</summary>
-			||pParse.nErr!=0) {
+			if(p==null/*|| db.mallocFailed != 0 */||pParse.nErr!=0) {
 				return 1;
 			}
 			#if !SQLITE_OMIT_AUTHORIZATION
@@ -5154,15 +4615,11 @@ break;
 				p.pOrderBy=null;
 				p.selFlags=(p.selFlags&~SelectFlags.Distinct);
 			}
-			sqlite3SelectPrep(pParse,p,null);
+			Select.sqlite3SelectPrep(pParse,p,null);
 			pOrderBy=p.pOrderBy;
 			pTabList=p.pSrc;
 			pEList=p.pEList;
-			if(pParse.nErr!=0///
-			///<summary>
-			///|| db.mallocFailed != 0 
-			///</summary>
-			) {
+			if(pParse.nErr!=0/*|| db.mallocFailed != 0*/) {
 				goto select_end;
 			}
 			isAgg=(p.selFlags&SelectFlags.Aggregate)!=0;
@@ -5172,7 +4629,7 @@ break;
 			///Begin generating code.
 			///
 			///</summary>
-			v=sqlite3GetVdbe(pParse);
+			v=pParse.sqlite3GetVdbe();
 			if(v==null)
 				goto select_end;
 			///
@@ -5186,10 +4643,8 @@ break;
 				goto select_end;
 			}
 			#endif
-			///
-			///<summary>
-			///</summary>
-			///<param name="Generate code for all sub">queries in the FROM clause</param>
+	
+			///Generate code for all subqueries in the FROM clause
 			#if !SQLITE_OMIT_SUBQUERY || !SQLITE_OMIT_VIEW
 			for(i=0;p.pPrior==null&&i<pTabList.nSrc;i++) {
 				SrcList_item pItem=pTabList.a[i];
@@ -5389,48 +4844,25 @@ break;
 				pWInfo.sqlite3WhereEnd();
 			}
 			else {
-				///
-				///<summary>
 				///This is the processing for aggregate queries 
-				///</summary>
-				NameContext sNC;
-				///
-				///<summary>
-				///Name context for processing aggregate information 
-				///</summary>
-				int iAMem;
-				///
-				///<summary>
-				///First Mem address for storing current GROUP BY 
-				///</summary>
-				int iBMem;
-				///
-				///<summary>
-				///First Mem address for previous GROUP BY 
-				///</summary>
-				int iUseFlag;
-				///
-				///<summary>
-				///Mem address holding flag indicating that at least
-				///one row of the input to the aggregator has been
-				///processed 
-				///</summary>
-				int iAbortFlag;
-				///
-				///<summary>
-				///Mem address which causes query abort if positive 
-				///</summary>
-				int groupBySort;
-				///
-				///<summary>
-				///Rows come from source in GR BY' clause thanROUP BY order 
-				///</summary>
-				int addrEnd;
-				///
-				///<summary>
-				///End of processing for this SELECT 
-				///</summary>
-				///
+                
+                
+                ///Name context for processing aggregate information 
+                NameContext sNC;
+                ///First Mem address for storing current GROUP BY 
+                int iAMem;
+                ///First Mem address for previous GROUP BY 
+                int iBMem;
+                ///Mem address holding flag indicating that at least
+                ///one row of the input to the aggregator has been
+                ///processed 
+                int iUseFlag;
+                ///Mem address which causes query abort if positive 
+                int iAbortFlag;
+                ///Rows come from source in GR BY' clause thanROUP BY order 
+                int groupBySort;
+                ///End of processing for this SELECT 
+                int addrEnd;
 				///<summary>
 				///Remove any and all aliases between the result set and the
 				///GROUP BY clause.
@@ -5859,7 +5291,7 @@ break;
 						}
 						v.sqlite3VdbeAddOp2(OP_Count,iCsr,sAggInfo.aFunc[0].iMem);
 						v.sqlite3VdbeAddOp1(OpCode.OP_Close,iCsr);
-						explainSimpleCount(pParse,pTab,pBest);
+                        pParse.explainSimpleCount(pTab, pBest);
 					}
 					else
 					#endif
@@ -5985,7 +5417,9 @@ break;
 			db.sqlite3DbFree(ref sAggInfo.aFunc);
 			return rc;
 		}
-	#if SQLITE_DEBUG
+	
+
+#if SQLITE_DEBUG
 																									    /*
 *******************************************************************************
 ** The following code is used for testing and debugging only.  The code

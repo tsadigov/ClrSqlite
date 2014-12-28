@@ -630,7 +630,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				///Begin a transaction and increment the schema cookie.  
 				///</summary>
 				sqlite3BeginWriteOperation(this,0,iDb);
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				if(v==null)
 					goto exit_begin_add_column;
 				sqlite3ChangeCookie(this,iDb);
@@ -803,7 +803,7 @@ return;
 			///</summary>
 			void sqlite3MinimumFileFormat(int iDb,int minFormat) {
 				Vdbe v;
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				///
 				///<summary>
 				///The VDBE should have been allocated before this routine is called.
@@ -978,7 +978,7 @@ goto exit_rename_table;
 				///schema). Open a statement transaction if the table is a virtual
 				///table.
 				///</summary>
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				if(v==null) {
 					goto exit_rename_table;
 				}
@@ -1097,7 +1097,7 @@ goto exit_rename_table;
 				#if !SQLITE_OMIT_TRIGGER
 				Trigger pTrig;
 				#endif
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				if(NEVER(v==null))
 					return;
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
@@ -1220,7 +1220,7 @@ goto exit_rename_table;
 				int i;
 				sqlite3 db=this.db;
 				Db pDb;
-				Vdbe v=sqlite3GetVdbe(this);
+				Vdbe v=this.sqlite3GetVdbe();
 				if(v==null)
 					return;
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
@@ -1385,7 +1385,7 @@ goto exit_rename_table;
   int regLast = iMem++;        /* Index of last sample to record */
   int regFirst = iMem++;       /* Index of first sample to record */
 #endif
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				if(v==null||NEVER(pTab==null)) {
 					return;
 				}
@@ -1649,7 +1649,7 @@ return;
 			/// be loaded into internal hash tables where is can be used.
 			///</summary>
 			void loadAnalysis(int iDb) {
-				Vdbe v=sqlite3GetVdbe(this);
+				Vdbe v=this.sqlite3GetVdbe();
 				if(v!=null) {
 					v.sqlite3VdbeAddOp1(OpCode.OP_LoadAnalysis,iDb);
 				}
@@ -1862,7 +1862,7 @@ goto attach_end;
 }
 }
 #endif
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				regArgs=this.sqlite3GetTempRange(4);
 				this.sqlite3ExprCode(pFilename,regArgs);
 				this.sqlite3ExprCode(pDbname,regArgs+1);
@@ -2202,7 +2202,7 @@ goto attach_end;
 				///<summary>
 				///Iterator variable 
 				///</summary>
-				Vdbe v=sqlite3GetVdbe(this);
+				Vdbe v=this.sqlite3GetVdbe();
 				///
 				///<summary>
 				///Vdbe to add code to 
@@ -2430,7 +2430,7 @@ goto attach_end;
 				///<summary>
 				///Address of OP_FkIfZero 
 				///</summary>
-				Vdbe v=sqlite3GetVdbe(this);
+				Vdbe v=this.sqlite3GetVdbe();
 				Debug.Assert(null==pIdx||pIdx.pTable==pTab);
 				if(nIncr<0) {
 					iFkIfZero=v.sqlite3VdbeAddOp2(OP_FkIfZero,pFKey.isDeferred,0);
@@ -2591,7 +2591,7 @@ goto attach_end;
 				sqlite3 db=this.db;
 				if((db.flags&SQLITE_ForeignKeys)!=0&&!IsVirtual(pTab)&&null==pTab.pSelect) {
 					int iSkip=0;
-					Vdbe v=sqlite3GetVdbe(this);
+					Vdbe v=this.sqlite3GetVdbe();
 					Debug.Assert(v!=null);
 					///
 					///<summary>
@@ -3781,7 +3781,7 @@ isView = false;
 				///Allocate a VDBE
 				///
 				///</summary>
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				if(v==null)
 					goto insert_cleanup;
 				if(this.nested==0)
@@ -4631,7 +4631,7 @@ isView = false;
 				///True if REPLACE is used to resolve INT PK conflict 
 				///</summary>
 				int regOldRowid=(rowidChng!=0&&isUpdate)?rowidChng:regRowid;
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				Debug.Assert(v!=null);
 				Debug.Assert(pTab.pSelect==null);
 				///
@@ -4968,7 +4968,7 @@ isView = false;
 				u8 pik_flags;
 				int regData;
 				int regRec;
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				Debug.Assert(v!=null);
 				Debug.Assert(pTab.pSelect==null);
 				///
@@ -5033,7 +5033,7 @@ isView = false;
 				if(IsVirtual(pTab))
 					return 0;
 				iDb=sqlite3SchemaToIndex(this.db,pTab.pSchema);
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				Debug.Assert(v!=null);
 				this.sqlite3OpenTable(baseCur,iDb,pTab,op);
 				for(i=1,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,i++) {
@@ -5103,7 +5103,7 @@ isView = false;
 				return memId;
 			}
 			public bool readsTable(int iStartAddr,int iDb,Table pTab) {
-				Vdbe v=sqlite3GetVdbe(this);
+				Vdbe v=this.sqlite3GetVdbe();
 				int i;
 				int iEnd=v.sqlite3VdbeCurrentAddr();
 				#if !SQLITE_OMIT_VIRTUALTABLE
@@ -5158,7 +5158,7 @@ isView = false;
 				Vdbe v;
 				if(IsVirtual(pTab))
 					return;
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				Debug.Assert(opcode==OP_OpenWrite||opcode==OP_OpenRead);
 				sqlite3TableLock(this,iDb,pTab.tnum,(opcode==OP_OpenWrite)?(byte)1:(byte)0,pTab.zName);
 				v.sqlite3VdbeAddOp3(opcode,iCur,pTab.tnum,iDb);
@@ -5486,7 +5486,7 @@ aXRef[j] = -1;
 				///<summary>
 				///Begin generating code. 
 				///</summary>
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				if(v==null)
 					goto update_cleanup;
 				if(this.nested==0)
@@ -6258,7 +6258,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///<summary>
 				///Begin generating code.
 				///</summary>
-				v=sqlite3GetVdbe(this);
+				v=this.sqlite3GetVdbe();
 				if(v==null) {
 					goto delete_from_cleanup;
 				}
@@ -11724,7 +11724,7 @@ range_est_fallback:
 					///<summary>
 					///Index of column <column> 
 					///</summary>
-					Vdbe v=sqlite3GetVdbe(this);
+					Vdbe v=this.sqlite3GetVdbe();
 					///
 					///<summary>
 					///Virtual machine being coded 
@@ -11863,7 +11863,7 @@ range_est_fallback:
 				///<summary>
 				///Register storing resulting 
 				///</summary>
-				Vdbe v=sqlite3GetVdbe(this);
+				Vdbe v=this.sqlite3GetVdbe();
 				if(NEVER(v==null))
 					return 0;
 				this.sqlite3ExprCachePush();
@@ -12445,7 +12445,7 @@ range_est_fallback:
 					iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
 					sqlite3NestedParse(this,"UPDATE %Q.%s "+"SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q "+"WHERE rowid=#%d",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),pTab.zName,pTab.zName,zStmt,this.regRowid);
 					db.sqlite3DbFree(ref zStmt);
-					v=sqlite3GetVdbe(this);
+					v=this.sqlite3GetVdbe();
 					sqlite3ChangeCookie(this,iDb);
 					v.sqlite3VdbeAddOp2(OP_Expire,0,0);
 					zWhere=sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);

@@ -69,25 +69,7 @@ namespace Community.CsharpSqlite {
 		#if SQLITE_DEBUG
 																																																    static bool sqlite3VdbeAddopTrace = false;
 #endif
-		///<summary>
-		/// Create a new virtual database engine.
-		///</summary>
-		static Vdbe sqlite3VdbeCreate(sqlite3 db) {
-			Vdbe p;
-			p=new Vdbe();
-			// sqlite3DbMallocZero(db, Vdbe).Length;
-			if(p==null)
-				return null;
-			p.db=db;
-			if(db.pVdbe!=null) {
-				db.pVdbe.pPrev=p;
-			}
-			p.pNext=db.pVdbe;
-			p.pPrev=null;
-			db.pVdbe=p;
-			p.magic=VDBE_MAGIC_INIT;
-			return p;
-		}
+		
 		///<summary>
 		/// Remember the SQL string for a prepared statement.
 		///

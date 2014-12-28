@@ -164,7 +164,7 @@ namespace Community.CsharpSqlite
 ///The P4 parameter is not used 
 ///</summary>
 
-		const int P4_DYNAMIC = (-1);
+		public const int P4_DYNAMIC = (-1);
 
 		///
 ///<summary>

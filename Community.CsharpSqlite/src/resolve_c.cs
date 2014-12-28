@@ -1354,7 +1354,7 @@ return WRC_Prune;
 			///
 			///</summary>
 			if((p.selFlags&SelectFlags.Expanded)==0) {
-				sqlite3SelectPrep(pParse,p,pOuterNC);
+				Select.sqlite3SelectPrep(pParse,p,pOuterNC);
 				return (pParse.nErr!=0///
 				///<summary>
 				///|| db.mallocFailed != 0 

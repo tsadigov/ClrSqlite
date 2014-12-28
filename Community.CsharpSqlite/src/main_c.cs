@@ -342,81 +342,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 			}
 			return SQLITE_OK;
 		}
-		///<summary>
-		/// This API allows applications to modify the global configuration of
-		/// the SQLite library at run-time.
-		///
-		/// This routine should only be called when there are no outstanding
-		/// database connections or memory allocations.  This routine is not
-		/// threadsafe.  Failure to heed these warnings can lead to unpredictable
-		/// behavior.
-		///
-		///</summary>
-		// Overloads for ap assignments
-		static int sqlite3_config(int op,sqlite3_pcache_methods ap) {
-			//  va_list ap;
-			int rc=SQLITE_OK;
-			switch(op) {
-			case SQLITE_CONFIG_PCACHE: {
-				///
-				///<summary>
-				///Specify an alternative malloc implementation 
-				///</summary>
-				sqlite3GlobalConfig.pcache=ap;
-				//sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)va_arg(ap, "sqlite3_pcache_methods");
-				break;
-			}
-			}
-			return rc;
-		}
-		static int sqlite3_config(int op,ref sqlite3_pcache_methods ap) {
-			//  va_list ap;
-			int rc=SQLITE_OK;
-			switch(op) {
-			case SQLITE_CONFIG_GETPCACHE: {
-				if(sqlite3GlobalConfig.pcache.xInit==null) {
-					sqlite3PCacheSetDefault();
-				}
-				ap=sqlite3GlobalConfig.pcache;
-				//va_arg(ap, sqlite3_pcache_methods) = sqlite3GlobalConfig.pcache;
-				break;
-			}
-			}
-			return rc;
-		}
-		static int sqlite3_config(int op,sqlite3_mem_methods ap) {
-			//  va_list ap;
-			int rc=SQLITE_OK;
-			switch(op) {
-			case SQLITE_CONFIG_MALLOC: {
-				///
-				///<summary>
-				///Specify an alternative malloc implementation 
-				///</summary>
-				sqlite3GlobalConfig.m=ap;
-				// (sqlite3_mem_methods)va_arg( ap, "sqlite3_mem_methods" );
-				break;
-			}
-			}
-			return rc;
-		}
-		static int sqlite3_config(int op,ref sqlite3_mem_methods ap) {
-			//  va_list ap;
-			int rc=SQLITE_OK;
-			switch(op) {
-			case SQLITE_CONFIG_GETMALLOC: {
-				///
-				///<summary>
-				///Retrieve the current malloc() implementation 
-				///</summary>
-				//if ( sqlite3GlobalConfig.m.xMalloc == null ) sqlite3MemSetDefault();
-				ap=sqlite3GlobalConfig.m;
-				//va_arg(ap, sqlite3_mem_methods) =  sqlite3GlobalConfig.m;
-				break;
-			}
-			}
-			return rc;
-		}
+		
 		#if SQLITE_THREADSAFE
 																																														    static int sqlite3_config( int op, sqlite3_mutex_methods ap )
     {
@@ -450,7 +376,8 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
       return rc;
     }
 #endif
-		static int sqlite3_config(int op,params object[] ap) {
+        static int sqlite3_config(SqliteConfig op, params object[] ap)
+        {
 			//  va_list ap;
 			int rc=SQLITE_OK;
 			///
@@ -462,7 +389,9 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 				return SQLITE_MISUSE_BKPT();
 			lock(lock_va_list) {
 				va_start(ap,null);
-				switch(op) {
+
+                switch (op)
+                {
 				///
 				///<summary>
 				///Mutex configuration options are only available in a threadsafe
@@ -505,7 +434,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
               break;
             }
 #endif
-				case SQLITE_CONFIG_MALLOC: {
+				case SqliteConfig.MALLOC: {
 					Debugger.Break();
 					// TODO --
 					///
@@ -515,7 +444,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					sqlite3GlobalConfig.m=va_arg(ap,(sqlite3_mem_methods)null);
 					break;
 				}
-				case SQLITE_CONFIG_GETMALLOC: {
+				case SqliteConfig.GETMALLOC: {
 					///
 					///<summary>
 					///Retrieve the current malloc() implementation 
@@ -524,7 +453,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					//Debugger.Break(); // TODO --//va_arg(ap, sqlite3_mem_methods) =  sqlite3GlobalConfig.m;
 					break;
 				}
-				case SQLITE_CONFIG_MEMSTATUS: {
+				case SqliteConfig.MEMSTATUS: {
 					///
 					///<summary>
 					///Enable or disable the malloc status collection 
@@ -532,7 +461,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					sqlite3GlobalConfig.bMemstat=va_arg(ap,(Int32)0)!=0;
 					break;
 				}
-				case SQLITE_CONFIG_SCRATCH: {
+				case SqliteConfig.SCRATCH: {
 					///
 					///<summary>
 					///Designate a buffer for scratch memory space 
@@ -542,7 +471,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					sqlite3GlobalConfig.nScratch=va_arg(ap,(Int32)0);
 					break;
 				}
-				case SQLITE_CONFIG_PAGECACHE: {
+				case SqliteConfig.PAGECACHE: {
 					///
 					///<summary>
 					///Designate a buffer for page cache memory space 
@@ -552,7 +481,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					sqlite3GlobalConfig.nPage=va_arg(ap,(Int32)0);
 					break;
 				}
-				case SQLITE_CONFIG_PCACHE: {
+				case SqliteConfig.PCACHE: {
 					///
 					///<summary>
 					///Specify an alternative page cache implementation 
@@ -561,7 +490,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					// TODO --sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)va_arg(ap, "sqlite3_pcache_methods");
 					break;
 				}
-				case SQLITE_CONFIG_GETPCACHE: {
+				case SqliteConfig.GETPCACHE: {
 					if(sqlite3GlobalConfig.pcache.xInit==null) {
 						sqlite3PCacheSetDefault();
 					}
@@ -605,7 +534,7 @@ memset(& sqlite3GlobalConfig.m, 0, sizeof( sqlite3GlobalConfig.m));
 break;
 }
 #endif
-				case SQLITE_CONFIG_LOOKASIDE: {
+				case SqliteConfig.LOOKASIDE: {
 					sqlite3GlobalConfig.szLookaside=va_arg(ap,(Int32)0);
 					sqlite3GlobalConfig.nLookaside=va_arg(ap,(Int32)0);
 					break;
@@ -617,7 +546,7 @@ break;
 				///NULL.
 				///
 				///</summary>
-				case SQLITE_CONFIG_LOG: {
+				case SqliteConfig.LOG: {
 					///
 					///<summary>
 					///MSVC is picky about pulling func ptrs from va lists.
@@ -631,7 +560,7 @@ break;
 					sqlite3GlobalConfig.pLogArg=va_arg(ap,(Object)null);
 					break;
 				}
-				case SQLITE_CONFIG_URI: {
+				case SqliteConfig.URI: {
 					sqlite3GlobalConfig.bOpenUri=va_arg(ap,(Boolean)true);
 					break;
 				}

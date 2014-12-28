@@ -887,7 +887,7 @@ namespace Community.CsharpSqlite
 #endif
 																																																															#endif
 			iDbSrc = sqlite3SchemaToIndex (pParse.db, pSrc.pSchema);
-			v = sqlite3GetVdbe (pParse);
+			v = pParse.sqlite3GetVdbe ();
 			sqlite3CodeVerifySchema (pParse, iDbSrc);
 			iSrc = pParse.nTab++;
 			iDest = pParse.nTab++;

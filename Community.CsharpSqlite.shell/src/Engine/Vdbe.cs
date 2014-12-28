@@ -9012,6 +9012,29 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 Debug.Assert((pIn1.flags & MEM_Int) != 0);
                 opcodeIndex = (int)pIn1.u.i;
             }
+
+
+            ///<summary>
+            /// Create a new virtual database engine.
+            ///</summary>
+            public static Vdbe Create(sqlite3 db)
+            {
+                Vdbe p;
+                p = new Vdbe();
+                // sqlite3DbMallocZero(db, Vdbe).Length;
+                if (p == null)
+                    return null;
+                p.db = db;
+                if (db.pVdbe != null)
+                {
+                    db.pVdbe.pPrev = p;
+                }
+                p.pNext = db.pVdbe;
+                p.pPrev = null;
+                db.pVdbe = p;
+                p.magic = VDBE_MAGIC_INIT;
+                return p;
+            }
 		}
 	#endif
 	}

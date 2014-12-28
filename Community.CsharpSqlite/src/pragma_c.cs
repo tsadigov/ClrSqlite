@@ -193,7 +193,7 @@ namespace Community.CsharpSqlite {
 		/// Generate code to return a single integer value.
 		///</summary>
 		static void returnSingleInt(Parse pParse,string zLabel,i64 value) {
-			Vdbe v=sqlite3GetVdbe(pParse);
+			Vdbe v=pParse.sqlite3GetVdbe();
 			int mem=++pParse.nMem;
 			//i64* pI64 = sqlite3DbMallocRaw( pParse->db, sizeof( value ) );
 			//if ( pI64 )
@@ -279,7 +279,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 				if(zLeft.Equals(p.zName,StringComparison.InvariantCultureIgnoreCase)) {
 					sqlite3 db=pParse.db;
 					Vdbe v;
-					v=sqlite3GetVdbe(pParse);
+					v=pParse.sqlite3GetVdbe();
 					Debug.Assert(v!=null);
 					///
 					///<summary>
@@ -483,7 +483,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			///</summary>
 			sqlite3 db=pParse.db;
 			Db pDb;
-			Vdbe v=pParse.pVdbe=sqlite3VdbeCreate(db);
+			Vdbe v=pParse.pVdbe=Vdbe.Create(db);
 			if(v==null)
 				return;
 			v.sqlite3VdbeRunOnlyOnce();
@@ -689,7 +689,7 @@ goto pragma_out;
 							if(zLeft=="page_count") {
 								Vdbe _v;
 								int iReg;
-								_v=sqlite3GetVdbe(pParse);
+								_v=pParse.sqlite3GetVdbe();
 								if(_v==null||SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 									goto pragma_out;
 								sqlite3CodeVerifySchema(pParse,iDb);
@@ -1247,7 +1247,7 @@ else
 																						goto pragma_out;
 																					pTab=sqlite3FindTable(db,zRight,zDb);
 																					if(pTab!=null) {
-																						v=sqlite3GetVdbe(pParse);
+																						v=pParse.sqlite3GetVdbe();
 																						pIdx=pTab.pIndex;
 																						if(pIdx!=null) {
 																							int i=0;
@@ -1314,7 +1314,7 @@ else
 																									goto pragma_out;
 																								pTab=sqlite3FindTable(db,zRight,zDb);
 																								if(pTab!=null) {
-																									v=sqlite3GetVdbe(pParse);
+																									v=pParse.sqlite3GetVdbe();
 																									pFK=pTab.pFKey;
 																									if(pFK!=null) {
 																										int i=0;

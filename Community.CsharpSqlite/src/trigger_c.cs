@@ -448,7 +448,7 @@ goto trigger_cleanup;
 				///<summary>
 				///Make an entry in the sqlite_master table 
 				///</summary>
-				v=sqlite3GetVdbe(pParse);
+				v=pParse.sqlite3GetVdbe();
 				if(v==null)
 					goto triggerfinish_cleanup;
 				sqlite3BeginWriteOperation(pParse,0,iDb);
@@ -779,7 +779,7 @@ return;
 			///Generate code to destroy the database record of the trigger.
 			///</summary>
 			Debug.Assert(pTable!=null);
-			if((v=sqlite3GetVdbe(pParse))!=null) {
+			if((v=pParse.sqlite3GetVdbe())!=null) {
 				int _base;
 				VdbeOpList[] dropTrigger=new VdbeOpList[] {
 					new VdbeOpList(OP_Rewind,0,ADDR(9),0),
@@ -1177,7 +1177,7 @@ return;
 			pSubParse.zAuthContext=pTrigger.zName;
 			pSubParse.eTriggerOp=pTrigger.op;
 			pSubParse.nQueryLoop=pParse.nQueryLoop;
-			v=sqlite3GetVdbe(pSubParse);
+            v = pSubParse.sqlite3GetVdbe();
 			if(v!=null) {
 				#if SQLITE_DEBUG
 																																																																																																        VdbeComment( v, "Start: %s.%s (%s %s%s%s ON %s)",
@@ -1316,7 +1316,7 @@ return;
 		///Instruction to jump to for RAISE(IGNORE) 
 		///</summary>
 		) {
-			Vdbe v=sqlite3GetVdbe(pParse);
+			Vdbe v=pParse.sqlite3GetVdbe();
 			///
 			///<summary>
 			///Main VM 

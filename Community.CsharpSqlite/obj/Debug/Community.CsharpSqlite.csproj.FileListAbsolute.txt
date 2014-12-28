@@ -1,0 +1,1 @@
+C:\Github\ClrSqlite\Community.CsharpSqlite\obj\Debug\Community.CsharpSqlite.csprojResolveAssemblyReference.cache

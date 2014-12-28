@@ -1630,7 +1630,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 		/// %-conversion extensions.
 		///
 		///</summary>
-		static string sqlite3MPrintf (sqlite3 db, string zFormat, params va_list[] ap)
+		public static string sqlite3MPrintf (sqlite3 db, string zFormat, params va_list[] ap)
 		{
 			string z;
 			//va_list ap;
