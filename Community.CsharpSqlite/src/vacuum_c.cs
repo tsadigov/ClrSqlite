@@ -430,7 +430,7 @@ namespace Community.CsharpSqlite {
 			pMain.sqlite3BtreeSetPageSize(-1,-1,1);
 			db.autoCommit=1;
 			if(pDb!=null) {
-				sqlite3BtreeClose(ref pDb.pBt);
+                BTreeMethods.sqlite3BtreeClose(ref pDb.pBt);
 				pDb.pBt=null;
 				pDb.pSchema=null;
 			}

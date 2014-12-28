@@ -767,7 +767,7 @@ namespace Community.CsharpSqlite
 				nFrag = data [hdr + 7];
 				Debug.Assert (this.cellOffset == hdr + 12 - 4 * this.leaf);
 				gap = this.cellOffset + 2 * this.nCell;
-				top = get2byteNotZero (data, hdr + 5);
+                top = BTreeMethods.get2byteNotZero(data, hdr + 5);
 				if (gap > top)
 					return SQLITE_CORRUPT_BKPT ();
 				testcase (gap + 2 == top);
@@ -782,7 +782,7 @@ namespace Community.CsharpSqlite
 					rc = this.defragmentPage ();
 					if (rc != 0)
 						return rc;
-					top = get2byteNotZero (data, hdr + 5);
+                    top = BTreeMethods.get2byteNotZero(data, hdr + 5);
 				}
 				else
 					if (gap + 2 <= top) {
@@ -852,7 +852,7 @@ namespace Community.CsharpSqlite
 					rc = this.defragmentPage ();
 					if (rc != 0)
 						return rc;
-					top = get2byteNotZero (data, hdr + 5);
+                    top = BTreeMethods.get2byteNotZero(data, hdr + 5);
 					Debug.Assert (gap + nByte <= top);
 				}
 				///
@@ -1124,7 +1124,7 @@ namespace Community.CsharpSqlite
 					this.nOverflow = 0;
 					usableSize = (int)pBt.usableSize;
 					this.cellOffset = (cellOffset = (u16)(hdr + 12 - 4 * this.leaf));
-					top = get2byteNotZero (data, hdr + 5);
+                    top = BTreeMethods.get2byteNotZero(data, hdr + 5);
 					this.nCell = (u16)(get2byte (data, hdr + 3));
 					if (this.nCell > MX_CELL (pBt)) {
 						///
@@ -1520,7 +1520,7 @@ namespace Community.CsharpSqlite
 							while (PTRMAP_ISPAGE (pBt, pgnoOvfl) || pgnoOvfl == PENDING_BYTE_PAGE (pBt));
 						}
 						#endif
-						rc = allocateBtreePage (pBt, ref pOvfl, ref pgnoOvfl, pgnoOvfl, 0);
+                        rc = BTreeMethods.allocateBtreePage(pBt, ref pOvfl, ref pgnoOvfl, pgnoOvfl, 0);
 						#if !SQLITE_OMIT_AUTOVACUUM
 						///
 ///<summary>
@@ -1539,12 +1539,12 @@ namespace Community.CsharpSqlite
 							u8 eType = (u8)(pgnoPtrmap != 0 ? PTRMAP_OVERFLOW2 : PTRMAP_OVERFLOW1);
 							pBt.ptrmapPut (pgnoOvfl, eType, pgnoPtrmap, ref rc);
 							if (rc != 0) {
-								releasePage (pOvfl);
+                                BTreeMethods.releasePage(pOvfl);
 							}
 						}
 						#endif
 						if (rc != 0) {
-							releasePage (pToRelease);
+                            BTreeMethods.releasePage(pToRelease);
 							return rc;
 						}
 						///
@@ -1564,7 +1564,7 @@ namespace Community.CsharpSqlite
 						//Debug.Assert( pPrior < pPage.aData || pPrior >= &pPage.aData[pBt.pageSize]
 						//      || sqlite3PagerIswriteable(pPage.pDbPage) );
 						Converter.sqlite3Put4byte (pPrior, pPriorIndex, pgnoOvfl);
-						releasePage (pToRelease);
+                        BTreeMethods.releasePage(pToRelease);
 						pToRelease = pOvfl;
 						pPrior = pOvfl.aData;
 						pPriorIndex = 0;
@@ -1617,7 +1617,7 @@ namespace Community.CsharpSqlite
 						pSrc = pData;
 					}
 				}
-				releasePage (pToRelease);
+                BTreeMethods.releasePage(pToRelease);
 				return SQLITE_OK;
 			}
 
@@ -1973,7 +1973,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				Debug.Assert (this.nCell == 0);
-				Debug.Assert (get2byteNotZero (data, hdr + 5) == nUsable);
+				Debug.Assert (BTreeMethods.get2byteNotZero (data, hdr + 5) == nUsable);
 				pCellptr = this.cellOffset + nCell * 2;
 				//data[pPage.cellOffset + nCell * 2];
 				cellbody = nUsable;
@@ -2234,7 +2234,7 @@ namespace Community.CsharpSqlite
 ///<param name="may be inserted. If both these operations are successful, proceed.">may be inserted. If both these operations are successful, proceed.</param>
 ///<param name=""></param>
 
-				rc = allocateBtreePage (pBt, ref pNew, ref pgnoNew, 0, 0);
+                rc = BTreeMethods.allocateBtreePage(pBt, ref pNew, ref pgnoNew, 0, 0);
 				if (rc == SQLITE_OK) {
 					int pOut = 4;
 					//u8 pOut = &pSpace[4];
@@ -2319,7 +2319,7 @@ namespace Community.CsharpSqlite
 ///Release the reference to the new page. 
 ///</summary>
 
-					releasePage (pNew);
+					BTreeMethods.releasePage(pNew);
 				}
 				return rc;
 			}
@@ -2399,59 +2399,50 @@ namespace Community.CsharpSqlite
 			}
 
 			// under C#; Try to reuse Memory
-			public int balance_nonroot (///
-///<summary>
-///Parent page of siblings being balanced 
-///</summary>
+			public int balance_nonroot (
+                ///Parent page of siblings being balanced 
+                int iParentIdx, 
+                ///Index of "the page" in pParent 
 
-			int iParentIdx, ///
-///<summary>
-///Index of "the page" in pParent 
-///</summary>
+                u8[] aOvflSpace, 
+                ///page-size bytes of space for parent ovfl </param>
 
-			u8[] aOvflSpace, ///
-///<summary>
-///</summary>
-///<param name="page">size bytes of space for parent ovfl </param>
-
-			int isRoot///
-///<summary>
-///</summary>
-///<param name="True if pParent is a root">page </param>
+                int isRoot
+                ///True if pParent is a root-page 
 
 			)
 			{
-				MemPage[] apOld = new MemPage[NB];
+                MemPage[] apOld = new MemPage[BTreeMethods.NB];
 				///
 ///<summary>
 ///pPage and up to two siblings 
 ///</summary>
 
-				MemPage[] apCopy = new MemPage[NB];
+                MemPage[] apCopy = new MemPage[BTreeMethods.NB];
 				///
 ///<summary>
 ///Private copies of apOld[] pages 
 ///</summary>
 
-				MemPage[] apNew = new MemPage[NB + 2];
+                MemPage[] apNew = new MemPage[BTreeMethods.NB + 2];
 				///
 ///<summary>
 ///pPage and up to NB siblings after balancing 
 ///</summary>
 
-				int[] apDiv = new int[NB - 1];
+                int[] apDiv = new int[BTreeMethods.NB - 1];
 				///
 ///<summary>
 ///Divider cells in pParent 
 ///</summary>
 
-				int[] cntNew = new int[NB + 2];
+                int[] cntNew = new int[BTreeMethods.NB + 2];
 				///
 ///<summary>
 ///</summary>
 ///<param name="Index in aCell[] of cell after i">th page </param>
 
-				int[] szNew = new int[NB + 2];
+                int[] szNew = new int[BTreeMethods.NB + 2];
 				///
 ///<summary>
 ///</summary>
@@ -2636,7 +2627,7 @@ namespace Community.CsharpSqlite
 				}
 				pgno = Converter.sqlite3Get4byte (this.aData, pRight);
 				while (true) {
-					rc = getAndInitPage (pBt, pgno, ref apOld [i]);
+					rc = BTreeMethods.getAndInitPage (pBt, pgno, ref apOld [i]);
 					if (rc != 0) {
 						//memset(apOld, 0, (i+1)*sizeof(MemPage*));
 						goto balance_cleanup;
@@ -2783,7 +2774,7 @@ namespace Community.CsharpSqlite
 						for (j = 0; j < limit; j++) {
 							Debugger.Break ();
 							Debug.Assert (nCell < nMaxCells);
-							apCell [nCell] = findCellv2 (aData, maskPage, cellOffset, j);
+							apCell [nCell] = BTreeMethods.findCellv2 (aData, maskPage, cellOffset, j);
 							szCell [nCell] = pOld.cellSizePtr (apCell [nCell]);
 							nCell++;
 						}
@@ -2862,7 +2853,8 @@ namespace Community.CsharpSqlite
 						}
 						subtotal = 0;
 						k++;
-						if (k > NB + 1) {
+                        if (k > BTreeMethods.NB + 1)
+                        {
 							rc = SQLITE_CORRUPT_BKPT ();
 							goto balance_cleanup;
 						}
@@ -2956,7 +2948,7 @@ namespace Community.CsharpSqlite
 					}
 					else {
 						Debug.Assert (i > 0);
-						rc = allocateBtreePage (pBt, ref pNew, ref pgno, pgno, 0);
+						rc = BTreeMethods.allocateBtreePage (pBt, ref pNew, ref pgno, pgno, 0);
 						if (rc != 0)
 							goto balance_cleanup;
 						apNew [i] = pNew;
@@ -2986,10 +2978,10 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				while (i < nOld) {
-					freePage (apOld [i], ref rc);
+                    BTreeMethods.freePage(apOld[i], ref rc);
 					if (rc != 0)
 						goto balance_cleanup;
-					releasePage (apOld [i]);
+					BTreeMethods.releasePage(apOld [i]);
 					apOld [i] = null;
 					i++;
 				}
@@ -3156,7 +3148,7 @@ namespace Community.CsharpSqlite
 					Debug.Assert (nNew == 1);
 					Debug.Assert (apNew [0].nFree == (get2byte (apNew [0].aData, 5) - apNew [0].cellOffset - apNew [0].nCell * 2));
 					apNew [0].copyNodeContent (this, ref rc);
-					freePage (apNew [0], ref rc);
+                    BTreeMethods.freePage(apNew[0], ref rc);
 				}
 				else
 					#if !SQLITE_OMIT_AUTOVACUUM
@@ -3300,10 +3292,10 @@ ptrmapCheckPages(pParent, 1);
 				balance_cleanup:
 				sqlite3ScratchFree (apCell);
 				for (i = 0; i < nOld; i++) {
-					releasePage (apOld [i]);
+					BTreeMethods.releasePage(apOld [i]);
 				}
 				for (i = 0; i < nNew; i++) {
-					releasePage (apNew [i]);
+					BTreeMethods.releasePage(apNew [i]);
 				}
 				return rc;
 			}
@@ -3366,7 +3358,7 @@ ptrmapCheckPages(pParent, 1);
 
 				rc = sqlite3PagerWrite (this.pDbPage);
 				if (rc == SQLITE_OK) {
-					rc = allocateBtreePage (pBt, ref pChild, ref pgnoChild, this.pgno, 0);
+					rc = BTreeMethods.allocateBtreePage (pBt, ref pChild, ref pgnoChild, this.pgno, 0);
 					this.copyNodeContent (pChild, ref rc);
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if (pBt.autoVacuum)
@@ -3379,7 +3371,7 @@ ptrmapCheckPages(pParent, 1);
 				}
 				if (rc != 0) {
 					ppChild = null;
-					releasePage (pChild);
+					BTreeMethods.releasePage(pChild);
 					return rc;
 				}
 				Debug.Assert (sqlite3PagerIswriteable (pChild.pDbPage));

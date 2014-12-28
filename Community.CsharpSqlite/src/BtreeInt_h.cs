@@ -1329,7 +1329,7 @@ public static bool ISAUTOVACUUM =false;
 ///</summary>
 
 					this.checkAppendMsg (zContext.ToString (), "btreeInitPage() returns error code %d", rc);
-					releasePage (pPage);
+					BTreeMethods.releasePage(pPage);
 					return 0;
 				}
 				///
@@ -1400,7 +1400,7 @@ public static bool ISAUTOVACUUM =false;
 						}
 						#endif
 						if (i == 0)
-							d2 = this.checkTreePage (pgno, zContext.ToString (), ref nMinKey, ref refNULL, this, null);
+                            d2 = this.checkTreePage(pgno, zContext.ToString(), ref nMinKey, ref BTreeMethods.refNULL, this, null);
 						else
 							d2 = this.checkTreePage (pgno, zContext.ToString (), ref nMinKey, ref nMaxKey, this, this);
 						if (i > 0 && d2 != depth) {
@@ -1419,9 +1419,9 @@ public static bool ISAUTOVACUUM =false;
 					#endif
 					//    checkTreePage(pCheck, pgno, zContext, NULL, !pPage->nCell ? NULL : &nMaxKey);
 					if (0 == pPage.nCell)
-						this.checkTreePage (pgno, zContext.ToString (), ref refNULL, ref refNULL, null, null);
+                        this.checkTreePage(pgno, zContext.ToString(), ref BTreeMethods.refNULL, ref BTreeMethods.refNULL, null, null);
 					else
-						this.checkTreePage (pgno, zContext.ToString (), ref refNULL, ref nMaxKey, null, this);
+						this.checkTreePage (pgno, zContext.ToString (), ref BTreeMethods.refNULL, ref nMaxKey, null, this);
 				}
 				///
 ///<summary>
@@ -1482,7 +1482,7 @@ public static bool ISAUTOVACUUM =false;
 				//  pCheck.mallocFailed = 1;
 				//}else
 				{
-					int contentOffset = get2byteNotZero (data, hdr + 5);
+					int contentOffset = BTreeMethods.get2byteNotZero (data, hdr + 5);
 					Debug.Assert (contentOffset <= usableSize);
 					///
 ///<summary>
@@ -1559,7 +1559,7 @@ public static bool ISAUTOVACUUM =false;
 					}
 				}
 				sqlite3PageFree (ref hit);
-				releasePage (pPage);
+				BTreeMethods.releasePage(pPage);
 				return depth + 1;
 			}
 

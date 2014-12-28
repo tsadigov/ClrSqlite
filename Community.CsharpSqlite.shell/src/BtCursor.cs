@@ -204,13 +204,13 @@ aOverflow= null;
                     int i;
                     for (i = 0; i <= this.iPage; i++)
                     {
-                        releasePage(this.apPage[i]);
+                        BTreeMethods.releasePage(this.apPage[i]);
                         this.apPage[i] = null;
                     }
                     this.iPage = -1;
                     this.eState = CURSOR_REQUIRESEEK;
                 }
-                invalidateOverflowCache(this);
+                BTreeMethods.invalidateOverflowCache(this);
                 return rc;
             }
             public void sqlite3BtreeClearCursor()
@@ -536,7 +536,7 @@ aOverflow= null;
                 rc = sqlite3PagerWrite(pPage.pDbPage);
                 if (rc != 0)
                     return rc;
-                rc = clearCell(pPage, pCell);
+                rc = BTreeMethods.clearCell(pPage, pCell);
                 pPage.dropCell(iCellIdx, pPage.cellSizePtr(pCell), ref rc);
                 if (rc != 0)
                     return rc;
@@ -591,7 +591,7 @@ aOverflow= null;
                 {
                     while (this.iPage > iCellDepth)
                     {
-                        releasePage(this.apPage[this.iPage--]);
+                        BTreeMethods.releasePage(this.apPage[this.iPage--]);
                     }
                     rc = this.balance();
                 }
@@ -696,7 +696,7 @@ aOverflow= null;
                 Debug.Assert(pPage.leaf != 0 || 0 == pPage.intKey);
                 TRACE("INSERT: table=%d nkey=%lld ndata=%d page=%d %s\n", this.pgnoRoot, nKey, nData, pPage.pgno, loc == 0 ? "overwrite" : "new entry");
                 Debug.Assert(pPage.isInit != 0);
-                allocateTempSpace(pBt);
+                BTreeMethods.allocateTempSpace(pBt);
                 newCell = pBt.pTmpSpace;
                 //if (newCell == null) return SQLITE_NOMEM;
                 rc = pPage.fillInCell(newCell, pKey, nKey, pData, nData, nZero, ref szNew);
@@ -724,7 +724,7 @@ aOverflow= null;
                         newCell[3] = pPage.aData[oldCell + 3];
                     }
                     szOld = pPage.cellSizePtr(oldCell);
-                    rc = clearCell(pPage, oldCell);
+                    rc = BTreeMethods.clearCell(pPage, oldCell);
                     pPage.dropCell(idx, szOld, ref rc);
                     if (rc != 0)
                         goto end_insert;
@@ -858,7 +858,7 @@ aOverflow= null;
                                     ///<param name="of the aBalanceQuickSpace[] might sneak in.">of the aBalanceQuickSpace[] might sneak in.</param>
                                     ///<param name=""></param>
                                     Debug.Assert((balance_quick_called++) == 0);
-                                    rc = pParent.balance_quick(pPage, aBalanceQuickSpace);
+                                    rc = pParent.balance_quick(pPage, BTreeMethods.aBalanceQuickSpace);
                                 }
                                 else
 #endif
@@ -908,7 +908,7 @@ aOverflow= null;
                             ///<summary>
                             ///</summary>
                             ///<param name="The next iteration of the do">loop balances the parent page. </param>
-                            releasePage(pPage);
+                            BTreeMethods.releasePage(pPage);
                             this.iPage--;
                         }
                 }
@@ -1445,13 +1445,13 @@ aOverflow= null;
                     int i;
                     for (i = 1; i <= this.iPage; i++)
                     {
-                        releasePage(this.apPage[i]);
+                        BTreeMethods.releasePage(this.apPage[i]);
                     }
                     this.iPage = 0;
                 }
                 else
                 {
-                    rc = getAndInitPage(pBt, this.pgnoRoot, ref this.apPage[0]);
+                    rc = BTreeMethods.getAndInitPage(pBt, this.pgnoRoot, ref this.apPage[0]);
                     if (rc != SQLITE_OK)
                     {
                         this.State = BtCursorState.CURSOR_INVALID;
@@ -1509,7 +1509,7 @@ aOverflow= null;
                 Debug.Assert(this.iPage > 0);
                 Debug.Assert(this.apPage[this.iPage] != null);
                 this.apPage[this.iPage - 1].assertParentIndex(this.aiIdx[this.iPage - 1], this.apPage[this.iPage].pgno);
-                releasePage(this.apPage[this.iPage]);
+                BTreeMethods.releasePage(this.apPage[this.iPage]);
                 this.iPage--;
                 this.info.nSize = 0;
                 this.validNKey = false;
@@ -1527,7 +1527,7 @@ aOverflow= null;
                 {
                     return SQLITE_CORRUPT_BKPT();
                 }
-                rc = getAndInitPage(pBt, newPgno, ref pNewPage);
+                rc = BTreeMethods.getAndInitPage(pBt, newPgno, ref pNewPage);
                 if (rc != 0)
                     return rc;
                 this.apPage[i + 1] = pNewPage;
@@ -1715,7 +1715,7 @@ return SQLITE_ABORT;
                     {
                         a = (int)(this.info.nLocal - offset);
                     }
-                    rc = copyPayload(aPayload, (u32)(offset + this.info.iCell + this.info.nHeader), pBuf, pBufOffset, (u32)a, eOp, pPage.pDbPage);
+                    rc = BTreeMethods.copyPayload(aPayload, (u32)(offset + this.info.iCell + this.info.nHeader), pBuf, pBufOffset, (u32)a, eOp, pPage.pDbPage);
                     offset = 0;
                     pBufOffset += (u32)a;
                     //pBuf += a;
@@ -1788,7 +1788,7 @@ pCur.aOverflow[iIdx] = nextPage;
 nextPage = pCur.aOverflow[iIdx+1];
 } else
 #endif
-                            rc = getOverflowPage(pBt, nextPage, out MemPageDummy, out nextPage);
+                            rc = BTreeMethods.getOverflowPage(pBt, nextPage, out MemPageDummy, out nextPage);
                             offset -= ovflSize;
                         }
                         else
@@ -1810,7 +1810,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                                 {
                                     a = (int)(ovflSize - offset);
                                 }
-                                rc = copyPayload(aPayload, offset + 4, pBuf, pBufOffset, (u32)a, eOp, pDbPage);
+                                rc = BTreeMethods.copyPayload(aPayload, offset + 4, pBuf, pBufOffset, (u32)a, eOp, pDbPage);
                                 sqlite3PagerUnref(pDbPage);
                                 offset = 0;
                                 amt -= (u32)a;
@@ -1889,10 +1889,10 @@ nextPage = pCur.aOverflow[iIdx+1];
                     }
                     for (i = 0; i <= this.iPage; i++)
                     {
-                        releasePage(this.apPage[i]);
+                        BTreeMethods.releasePage(this.apPage[i]);
                     }
-                    unlockBtreeIfUnused(pBt);
-                    invalidateOverflowCache(this);
+                    BTreeMethods.unlockBtreeIfUnused(pBt);
+                    BTreeMethods.invalidateOverflowCache(this);
                     ///
                     ///<summary>
                     ///sqlite3_free(ref pCur); 

@@ -164,7 +164,7 @@ namespace Community.CsharpSqlite {
 					sqlite3ErrorMsg(pParse,"temporary storage cannot be changed "+"from within a transaction");
 					return SQLITE_ERROR;
 				}
-				sqlite3BtreeClose(ref db.aDb[1].pBt);
+				BTreeMethods.sqlite3BtreeClose(ref db.aDb[1].pBt);
 				db.aDb[1].pBt=null;
 				sqlite3ResetInternalSchema(db,-1);
 			}

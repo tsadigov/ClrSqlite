@@ -1564,7 +1564,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 				return;
 			}
 			if(pCx.pBt!=null) {
-				sqlite3BtreeClose(ref pCx.pBt);
+                BTreeMethods.sqlite3BtreeClose(ref pCx.pBt);
 				///
 				///<summary>
 				///The pCx.pCursor will be close automatically, if it exists, by

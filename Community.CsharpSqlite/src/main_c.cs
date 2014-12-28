@@ -906,7 +906,7 @@ break;
 			for(j=0;j<db.nDb;j++) {
 				Db pDb=db.aDb[j];
 				if(pDb.pBt!=null) {
-					sqlite3BtreeClose(ref pDb.pBt);
+                    BTreeMethods.sqlite3BtreeClose(ref pDb.pBt);
 					pDb.pBt=null;
 					if(j!=1) {
 						pDb.pSchema=null;

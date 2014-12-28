@@ -188,7 +188,7 @@ namespace Community.CsharpSqlite {
 				int iDb=db.nDb-1;
 				Debug.Assert(iDb>=2);
 				if(db.aDb[iDb].pBt!=null) {
-					sqlite3BtreeClose(ref db.aDb[iDb].pBt);
+					BTreeMethods.sqlite3BtreeClose(ref db.aDb[iDb].pBt);
 					db.aDb[iDb].pBt=null;
 					db.aDb[iDb].pSchema=null;
 				}
@@ -259,7 +259,7 @@ namespace Community.CsharpSqlite {
 				sqlite3_snprintf(200,zErr,"database %s is locked",zName);
 				goto detach_error;
 			}
-			sqlite3BtreeClose(ref pDb.pBt);
+			BTreeMethods.sqlite3BtreeClose(ref pDb.pBt);
 			pDb.pBt=null;
 			pDb.pSchema=null;
 			sqlite3ResetInternalSchema(db,-1);
