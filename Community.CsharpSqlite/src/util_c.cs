@@ -1963,5 +1963,42 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 		{
 			return b;
 		}
+
+
+
+        //from pager
+        ///<summary>
+        /// Write a 32-bit integer into a string buffer in big-endian byte order.
+        ///
+        ///</summary>
+        //#define Converter.put32bits(A,B)  sqlite3sqlite3Put4byte((u8*)A,B)
+        public static void put32bits(string ac, int offset, int val)
+        {
+            byte[] A = new byte[4];
+            A[0] = (byte)ac[offset + 0];
+            A[1] = (byte)ac[offset + 1];
+            A[2] = (byte)ac[offset + 2];
+            A[3] = (byte)ac[offset + 3];
+            Converter.sqlite3Put4byte(A, 0, val);
+        }
+
+        public static void put32bits(byte[] ac, int offset, int val)
+        {
+            Converter.sqlite3Put4byte(ac, offset, (u32)val);
+        }
+
+        public static void put32bits(byte[] ac, u32 val)
+        {
+            Converter.sqlite3Put4byte(ac, 0U, val);
+        }
+
+        public static void put32bits(byte[] ac, int offset, u32 val)
+        {
+            Converter.sqlite3Put4byte(ac, offset, val);
+        }
+
+
+
+
 	}
 }

@@ -187,18 +187,18 @@ namespace Community.CsharpSqlite
 	//#define sqlite3PagerGet(A,B,C) sqlite3PagerAcquire(A,B,C,0)
 	//DbPage *sqlite3PagerLookup(Pager *pPager, Pgno pgno);
 	//void sqlite3PagerRef(DbPage);
-	//void sqlite3PagerUnref(DbPage);
+	//void PagerMethods.sqlite3PagerUnref(DbPage);
 	///
 ///<summary>
 ///Operations on page references. 
 ///</summary>
 
-	//int sqlite3PagerWrite(DbPage);
+	//int PagerMethods.sqlite3PagerWrite(DbPage);
 	//void sqlite3PagerDontWrite(DbPage);
 	//int sqlite3PagerMovepage(Pager*,DbPage*,Pgno,int);
-	//int sqlite3PagerPageRefcount(DbPage);
+	//int PagerMethods.sqlite3PagerPageRefcount(DbPage);
 	//void *sqlite3PagerGetData(DbPage );
-	//void *sqlite3PagerGetExtra(DbPage );
+	//void * PagerMethods.sqlite3PagerGetExtra (DbPage );
 	///
 ///<summary>
 ///Functions used to manage pager transactions and savepoints. 

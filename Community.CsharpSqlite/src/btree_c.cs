@@ -629,7 +629,7 @@ static u16 cellSize( MemPage pPage, int iCell )
             /// If the noContent flag is set, it means that we do not care about
             /// the content of the page at this time.  So do not go to the disk
             /// to fetch the content.  Just fill in the content with zeros for now.
-            /// If in the future we call sqlite3PagerWrite() on this page, that
+            /// If in the future we call PagerMethods.sqlite3PagerWrite() on this page, that
             /// means we have started to be concerned about content and the disk
             /// read should occur at that point.
             ///</summary>
@@ -697,10 +697,10 @@ static u16 cellSize( MemPage pPage, int iCell )
                     Debug.Assert(pPage.aData != null);
                     Debug.Assert(pPage.pBt != null);
                     //TODO -- find out why corrupt9 & diskfull fail on this tests 
-                    //Debug.Assert( sqlite3PagerGetExtra( pPage.pDbPage ) == pPage );
+                    //Debug.Assert(  PagerMethods.sqlite3PagerGetExtra ( pPage.pDbPage ) == pPage );
                     //Debug.Assert( sqlite3PagerGetData( pPage.pDbPage ) == pPage.aData );
                     Debug.Assert(sqlite3_mutex_held(pPage.pBt.mutex));
-                    sqlite3PagerUnref(pPage.pDbPage);
+                    PagerMethods.sqlite3PagerUnref(pPage.pDbPage);
                 }
             }
             ///<summary>
@@ -714,13 +714,13 @@ static u16 cellSize( MemPage pPage, int iCell )
             public static void pageReinit(DbPage pData)
             {
                 MemPage pPage;
-                pPage = sqlite3PagerGetExtra(pData);
-                Debug.Assert(sqlite3PagerPageRefcount(pData) > 0);
+                pPage =  PagerMethods.sqlite3PagerGetExtra (pData);
+                Debug.Assert(pData.sqlite3PagerPageRefcount() > 0);
                 if (pPage.isInit != 0)
                 {
                     Debug.Assert(sqlite3_mutex_held(pPage.pBt.mutex));
                     pPage.isInit = 0;
-                    if (sqlite3PagerPageRefcount(pData) > 1)
+                    if (pData.sqlite3PagerPageRefcount() > 1)
                     {
                         ///
                         ///<summary>
@@ -1196,7 +1196,7 @@ rc = SQLITE_NOTADB;
                 pP1 = pBt.pPage1;
                 Debug.Assert(pP1 != null);
                 data = pP1.aData;
-                rc = sqlite3PagerWrite(pP1.pDbPage);
+                rc = PagerMethods.sqlite3PagerWrite(pP1.pDbPage);
                 if (rc != 0)
                     return rc;
                 Buffer.BlockCopy(zMagicHeader, 0, data, 0, 16);
@@ -1364,7 +1364,7 @@ rc = SQLITE_NOTADB;
                     {
                         return rc;
                     }
-                    rc = sqlite3PagerWrite(pPtrPage.pDbPage);
+                    rc = PagerMethods.sqlite3PagerWrite(pPtrPage.pDbPage);
                     if (rc != SQLITE_OK)
                     {
                         BTreeMethods.releasePage(pPtrPage);
@@ -1490,7 +1490,7 @@ rc = SQLITE_NOTADB;
                         }
                         while (nFin != 0 && iFreePg > nFin);
                         Debug.Assert(iFreePg < iLastPg);
-                        rc = sqlite3PagerWrite(pLastPg.pDbPage);
+                        rc = PagerMethods.sqlite3PagerWrite(pLastPg.pDbPage);
                         if (rc == SQLITE_OK)
                         {
                             rc = BTreeMethods.relocatePage(pBt, pLastPg, eType, iPtrPage, iFreePg, (nFin != 0) ? 1 : 0);
@@ -1515,7 +1515,7 @@ rc = SQLITE_NOTADB;
                             {
                                 return rc;
                             }
-                            rc = sqlite3PagerWrite(pPg.pDbPage);
+                            rc = PagerMethods.sqlite3PagerWrite(pPg.pDbPage);
                             BTreeMethods.releasePage(pPg);
                             if (rc != SQLITE_OK)
                             {
@@ -1625,7 +1625,7 @@ rc = SQLITE_NOTADB;
                     }
                     if ((rc == SQLITE_DONE || rc == SQLITE_OK) && nFree > 0)
                     {
-                        rc = sqlite3PagerWrite(pBt.pPage1.pDbPage);
+                        rc = PagerMethods.sqlite3PagerWrite(pBt.pPage1.pDbPage);
                         Converter.sqlite3Put4byte(pBt.pPage1.aData, 32, 0);
                         Converter.sqlite3Put4byte(pBt.pPage1.aData, 36, 0);
                         Converter.sqlite3Put4byte(pBt.pPage1.aData, (u32)28, nFin);
@@ -2038,7 +2038,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             ///pPayload is a pointer to data stored on database page pDbPage.
             ///If argument eOp is false, then nByte bytes of data are copied
             ///from pPayload to the buffer pointed at by pBuf. If eOp is true,
-            ///then sqlite3PagerWrite() is called on pDbPage and nByte bytes
+            ///then PagerMethods.sqlite3PagerWrite() is called on pDbPage and nByte bytes
             ///of data are copied from the buffer pBuf to pPayload.
             ///
             ///SQLITE_OK is returned on success, otherwise an error code.
@@ -2079,7 +2079,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
                     ///<summary>
                     ///Copy data from buffer to page (a write operation) 
                     ///</summary>
-                    int rc = sqlite3PagerWrite(pDbPage);
+                    int rc = PagerMethods.sqlite3PagerWrite(pDbPage);
                     if (rc != SQLITE_OK)
                     {
                         return rc;
@@ -2107,7 +2107,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             //){
             //  if( eOp!=0 ){
             //    /* Copy data from buffer to page (a write operation) */
-            //    int rc = sqlite3PagerWrite(pDbPage);
+            //    int rc = PagerMethods.sqlite3PagerWrite(pDbPage);
             //    if( rc!=SQLITE_OK ){
             //      return rc;
             //    }
@@ -2355,14 +2355,14 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
             ///<summary>
             ///Allocate a new page from the database file.
             ///
-            ///The new page is marked as dirty.  (In other words, sqlite3PagerWrite()
+            ///The new page is marked as dirty.  (In other words, PagerMethods.sqlite3PagerWrite()
             ///has already been called on the new page.)  The new page has also
             ///been referenced and the calling routine is responsible for calling
-            ///sqlite3PagerUnref() on the new page when it is done.
+            ///PagerMethods.sqlite3PagerUnref() on the new page when it is done.
             ///
             ///SQLITE_OK is returned on success.  Any other return value indicates
             ///an error.  ppPage and pPgno are undefined in the event of an error.
-            ///Do not invoke sqlite3PagerUnref() on ppPage if an error is returned.
+            ///Do not invoke PagerMethods.sqlite3PagerUnref() on ppPage if an error is returned.
             ///
             ///If the "nearby" parameter is not 0, then a (feeble) effort is made to
             ///locate a page close to the page number "nearby".  This can be used in an
@@ -2444,7 +2444,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                     ///</summary>
                     ///<param name="Decrement the free">list count by 1. Set iTrunk to the index of the</param>
                     ///<param name="first free">list trunk page. iPrevTrunk is initially 1.</param>
-                    rc = sqlite3PagerWrite(pPage1.pDbPage);
+                    rc = PagerMethods.sqlite3PagerWrite(pPage1.pDbPage);
                     if (rc != 0)
                         return rc;
                     Converter.sqlite3Put4byte(pPage1.aData, (u32)36, n - 1);
@@ -2494,7 +2494,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                             ///allocated page 
                             ///</summary>
                             Debug.Assert(pPrevTrunk == null);
-                            rc = sqlite3PagerWrite(pTrunk.pDbPage);
+                            rc = PagerMethods.sqlite3PagerWrite(pTrunk.pDbPage);
                             if (rc != 0)
                             {
                                 goto end_allocate_page;
@@ -2529,7 +2529,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                     Debug.Assert(pPgno == iTrunk);
                                     ppPage = pTrunk;
                                     searchList = 0;
-                                    rc = sqlite3PagerWrite(pTrunk.pDbPage);
+                                    rc = PagerMethods.sqlite3PagerWrite(pTrunk.pDbPage);
                                     if (rc != 0)
                                     {
                                         goto end_allocate_page;
@@ -2546,7 +2546,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                         }
                                         else
                                         {
-                                            rc = sqlite3PagerWrite(pPrevTrunk.pDbPage);
+                                            rc = PagerMethods.sqlite3PagerWrite(pPrevTrunk.pDbPage);
                                             if (rc != SQLITE_OK)
                                             {
                                                 goto end_allocate_page;
@@ -2580,7 +2580,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                         {
                                             goto end_allocate_page;
                                         }
-                                        rc = sqlite3PagerWrite(pNewTrunk.pDbPage);
+                                        rc = PagerMethods.sqlite3PagerWrite(pNewTrunk.pDbPage);
                                         if (rc != SQLITE_OK)
                                         {
                                             BTreeMethods.releasePage(pNewTrunk);
@@ -2602,7 +2602,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                         }
                                         else
                                         {
-                                            rc = sqlite3PagerWrite(pPrevTrunk.pDbPage);
+                                            rc = PagerMethods.sqlite3PagerWrite(pPrevTrunk.pDbPage);
                                             if (rc != 0)
                                             {
                                                 goto end_allocate_page;
@@ -2657,7 +2657,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                             int noContent;
                                             pPgno = iPage;
                                             TRACE("ALLOCATE: %d was leaf %d of %d on trunk %d" + ": %d more free pages\n", pPgno, closest + 1, k, pTrunk.pgno, n - 1);
-                                            rc = sqlite3PagerWrite(pTrunk.pDbPage);
+                                            rc = PagerMethods.sqlite3PagerWrite(pTrunk.pDbPage);
                                             if (rc != 0)
                                                 goto end_allocate_page;
                                             if (closest < k - 1)
@@ -2671,7 +2671,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                             rc = pBt.btreeGetPage(pPgno, ref ppPage, noContent);
                                             if (rc == SQLITE_OK)
                                             {
-                                                rc = sqlite3PagerWrite((ppPage).pDbPage);
+                                                rc = PagerMethods.sqlite3PagerWrite((ppPage).pDbPage);
                                                 if (rc != SQLITE_OK)
                                                 {
                                                     BTreeMethods.releasePage(ppPage);
@@ -2692,7 +2692,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                     ///There are no pages on the freelist, so create a new page at the
                     ///end of the file 
                     ///</summary>
-                    rc = sqlite3PagerWrite(pBt.pPage1.pDbPage);
+                    rc = PagerMethods.sqlite3PagerWrite(pBt.pPage1.pDbPage);
                     if (rc != 0)
                         return rc;
                     pBt.nPage++;
@@ -2714,7 +2714,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         rc = pBt.btreeGetPage(pBt.nPage, ref pPg, 1);
                         if (rc == SQLITE_OK)
                         {
-                            rc = sqlite3PagerWrite(pPg.pDbPage);
+                            rc = PagerMethods.sqlite3PagerWrite(pPg.pDbPage);
                             BTreeMethods.releasePage(pPg);
                         }
                         if (rc != 0)
@@ -2732,7 +2732,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                     rc = pBt.btreeGetPage(pPgno, ref ppPage, 1);
                     if (rc != 0)
                         return rc;
-                    rc = sqlite3PagerWrite((ppPage).pDbPage);
+                    rc = PagerMethods.sqlite3PagerWrite((ppPage).pDbPage);
                     if (rc != SQLITE_OK)
                     {
                         BTreeMethods.releasePage(ppPage);
@@ -2745,7 +2745,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 BTreeMethods.releasePage(pPrevTrunk);
                 if (rc == SQLITE_OK)
                 {
-                    if (sqlite3PagerPageRefcount((ppPage).pDbPage) > 1)
+                    if ((ppPage).pDbPage.sqlite3PagerPageRefcount() > 1)
                     {
                         BTreeMethods.releasePage(ppPage);
                         return SQLITE_CORRUPT_BKPT();
@@ -2810,7 +2810,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 if (pMemPage != null)
                 {
                     pPage = pMemPage;
-                    sqlite3PagerRef(pPage.pDbPage);
+                    PagerMethods.sqlite3PagerRef(pPage.pDbPage);
                 }
                 else
                 {
@@ -2820,7 +2820,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 ///<summary>
                 ///Increment the free page count on pPage1 
                 ///</summary>
-                rc = sqlite3PagerWrite(pPage1.pDbPage);
+                rc = PagerMethods.sqlite3PagerWrite(pPage1.pDbPage);
                 if (rc != 0)
                     goto freepage_out;
                 nFree = (int)Converter.sqlite3Get4byte(pPage1.aData, 36);
@@ -2833,7 +2833,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                     ///always fully overwrite deleted information with zeros.
                     ///
                     ///</summary>
-                    if ((null == pPage && ((rc = pBt.btreeGetPage(iPage, ref pPage, 0)) != 0)) || ((rc = sqlite3PagerWrite(pPage.pDbPage)) != 0))
+                    if ((null == pPage && ((rc = pBt.btreeGetPage(iPage, ref pPage, 0)) != 0)) || ((rc = PagerMethods.sqlite3PagerWrite(pPage.pDbPage)) != 0))
                     {
                         goto freepage_out;
                     }
@@ -2905,14 +2905,14 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         ///<param name="to 3.6.0 or later) we should consider fixing the conditional above">to 3.6.0 or later) we should consider fixing the conditional above</param>
                         ///<param name="to read "usableSize/4">8".</param>
                         ///<param name=""></param>
-                        rc = sqlite3PagerWrite(pTrunk.pDbPage);
+                        rc = PagerMethods.sqlite3PagerWrite(pTrunk.pDbPage);
                         if (rc == SQLITE_OK)
                         {
                             Converter.sqlite3Put4byte(pTrunk.aData, (u32)4, nLeaf + 1);
                             Converter.sqlite3Put4byte(pTrunk.aData, (u32)8 + nLeaf * 4, iPage);
                             if (pPage != null && !pBt.secureDelete)
                             {
-                                sqlite3PagerDontWrite(pPage.pDbPage);
+                                PagerMethods.sqlite3PagerDontWrite(pPage.pDbPage);
                             }
                             rc = pBt.btreeSetHasContent(iPage);
                         }
@@ -2933,7 +2933,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 {
                     goto freepage_out;
                 }
-                rc = sqlite3PagerWrite(pPage.pDbPage);
+                rc = PagerMethods.sqlite3PagerWrite(pPage.pDbPage);
                 if (rc != SQLITE_OK)
                 {
                     goto freepage_out;
@@ -3005,7 +3005,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         if (rc != 0)
                             return rc;
                     }
-                    if ((pOvfl != null || ((pOvfl = pBt.btreePageLookup(ovflPgno)) != null)) && sqlite3PagerPageRefcount(pOvfl.pDbPage) != 1)
+                    if ((pOvfl != null || ((pOvfl = pBt.btreePageLookup(ovflPgno)) != null)) && pOvfl.pDbPage.sqlite3PagerPageRefcount() != 1)
                     {
                         ///
                         ///<summary>
@@ -3028,7 +3028,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                     }
                     if (pOvfl != null)
                     {
-                        sqlite3PagerUnref(pOvfl.pDbPage);
+                        PagerMethods.sqlite3PagerUnref(pOvfl.pDbPage);
                     }
                     if (rc != 0)
                         return rc;
@@ -3318,7 +3318,7 @@ return rc;
                         {
                             return rc;
                         }
-                        rc = sqlite3PagerWrite(pRoot.pDbPage);
+                        rc = PagerMethods.sqlite3PagerWrite(pRoot.pDbPage);
                         if (rc != SQLITE_OK)
                         {
                             BTreeMethods.releasePage(pRoot);
@@ -3371,7 +3371,7 @@ return rc;
                     ptfFlags = PTF_ZERODATA | PTF_LEAF;
                 }
                 pRoot.zeroPage(ptfFlags);
-                sqlite3PagerUnref(pRoot.pDbPage);
+                PagerMethods.sqlite3PagerUnref(pRoot.pDbPage);
                 Debug.Assert((pBt.openFlags & BTREE_SINGLE) == 0 || pgnoRoot == 2);
                 piTable = (int)pgnoRoot;
                 return SQLITE_OK;
@@ -3443,7 +3443,7 @@ return rc;
                     freePage(pPage, ref rc);
                 }
                 else
-                    if ((rc = sqlite3PagerWrite(pPage.pDbPage)) == 0)
+                    if ((rc = PagerMethods.sqlite3PagerWrite(pPage.pDbPage)) == 0)
                     {
                         pPage.zeroPage(pPage.aData[0] | PTF_LEAF);
                     }

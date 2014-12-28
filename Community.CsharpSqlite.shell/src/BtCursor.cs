@@ -533,7 +533,7 @@ aOverflow= null;
                 rc = pBt.saveAllCursors(this.pgnoRoot, this);
                 if (rc != 0)
                     return rc;
-                rc = sqlite3PagerWrite(pPage.pDbPage);
+                rc = PagerMethods.sqlite3PagerWrite(pPage.pDbPage);
                 if (rc != 0)
                     return rc;
                 rc = BTreeMethods.clearCell(pPage, pCell);
@@ -559,7 +559,7 @@ aOverflow= null;
                     Debug.Assert(MX_CELL_SIZE(pBt) >= nCell);
                     //allocateTempSpace(pBt);
                     //pTmp = pBt.pTmpSpace;
-                    rc = sqlite3PagerWrite(pLeaf.pDbPage);
+                    rc = PagerMethods.sqlite3PagerWrite(pLeaf.pDbPage);
                     byte[] pNext_4 = sqlite3Malloc(nCell + 4);
                     Buffer.BlockCopy(pLeaf.aData, pCell - 4, pNext_4, 0, nCell + 4);
                     pPage.insertCell(iCellIdx, pNext_4, nCell + 4, null, n, ref rc);
@@ -709,7 +709,7 @@ aOverflow= null;
                 {
                     u16 szOld;
                     Debug.Assert(idx < pPage.nCell);
-                    rc = sqlite3PagerWrite(pPage.pDbPage);
+                    rc = PagerMethods.sqlite3PagerWrite(pPage.pDbPage);
                     if (rc != 0)
                     {
                         goto end_insert;
@@ -835,7 +835,7 @@ aOverflow= null;
                         {
                             MemPage pParent = this.apPage[iPage - 1];
                             int iIdx = this.aiIdx[iPage - 1];
-                            rc = sqlite3PagerWrite(pParent.pDbPage);
+                            rc = PagerMethods.sqlite3PagerWrite(pParent.pDbPage);
                             if (rc == SQLITE_OK)
                             {
 #if !SQLITE_OMIT_QUICKBALANCE
@@ -1804,14 +1804,14 @@ nextPage = pCur.aOverflow[iIdx+1];
                             rc = pBt.pPager.sqlite3PagerGet(nextPage, ref pDbPage);
                             if (rc == SQLITE_OK)
                             {
-                                aPayload = sqlite3PagerGetData(pDbPage);
+                                aPayload = (pDbPage.sqlite3PagerGetData());
                                 nextPage = Converter.sqlite3Get4byte(aPayload);
                                 if (a + offset > ovflSize)
                                 {
                                     a = (int)(ovflSize - offset);
                                 }
                                 rc = BTreeMethods.copyPayload(aPayload, offset + 4, pBuf, pBufOffset, (u32)a, eOp, pDbPage);
-                                sqlite3PagerUnref(pDbPage);
+                                PagerMethods.sqlite3PagerUnref(pDbPage);
                                 offset = 0;
                                 amt -= (u32)a;
                                 pBufOffset += (u32)a;

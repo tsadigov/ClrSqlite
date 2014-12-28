@@ -205,14 +205,78 @@ namespace Community.CsharpSqlite
 
 			public MemPage btreePageFromDbPage (Pgno pgno, BtShared pBt)
 			{
-				MemPage pPage = (MemPage)sqlite3PagerGetExtra (this);
-				pPage.aData = sqlite3PagerGetData (this);
+				MemPage pPage = (MemPage) PagerMethods.sqlite3PagerGetExtra  (this);
+                pPage.aData = this.sqlite3PagerGetData();
 				pPage.pDbPage = this;
 				pPage.pBt = pBt;
 				pPage.pgno = pgno;
 				pPage.hdrOffset = (u8)(pPage.pgno == 1 ? 100 : 0);
 				return pPage;
 			}
+
+            ///<summary>
+            /// Return a pointer to the data for the specified page.
+            ///</summary>
+            public byte[] sqlite3PagerGetData()
+            {
+                PgHdr pPg = this;
+                Debug.Assert(pPg.nRef > 0 || pPg.pPager.memDb != 0);
+                return pPg.pData;
+            }
+
+
+            ///<summary>
+            /// Increase the reference count of a supplied page by 1.
+            ///
+            ///</summary>
+            public void sqlite3PcacheRef()
+            {
+                Debug.Assert(this.nRef > 0);
+                this.nRef++;
+            }
+
+            ///<summary>
+            /// Update the value of the change-counter at offsets 24 and 92 in
+            /// the header and the sqlite version number at offset 96.
+            ///
+            /// This is an unconditional update.  See also the pager_incr_changecounter()
+            /// routine which only updates the change-counter if the update is actually
+            /// needed, as determined by the pPager.changeCountDone state variable.
+            ///
+            ///</summary>
+            public void pager_write_changecounter()
+            {
+                PgHdr pPg = this;
+                u32 change_counter;
+                ///Increment the value just read and write it back to byte 24. 
+
+                change_counter = Converter.sqlite3Get4byte(pPg.pPager.dbFileVers, 0) + 1;
+                Converter.put32bits(pPg.pData, 24, change_counter);
+
+                ///Also store the SQLite version number in bytes 96..99 and in
+                ///bytes 92..95 store the change counter for which the version number
+                Converter.put32bits(pPg.pData, 92, change_counter);
+                Converter.put32bits(pPg.pData, 96, SQLITE_VERSION_NUMBER);
+            }
+
+            ///<summary>
+            /// Return the number of references to the page supplied as an argument.
+            ///
+            ///</summary>
+            public int sqlite3PcachePageRefcount()
+            {
+                return this.nRef;
+            }
+
+            ///<summary>
+            /// Return the number of references to the specified page.
+            ///
+            ///</summary>
+            public int sqlite3PagerPageRefcount()
+            {
+                return this.sqlite3PcachePageRefcount();
+            }
+
 		}
 
 		///

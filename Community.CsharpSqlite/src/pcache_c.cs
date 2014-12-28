@@ -502,15 +502,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 			}
 		}
 
-		///<summary>
-		/// Increase the reference count of a supplied page by 1.
-		///
-		///</summary>
-		static void sqlite3PcacheRef (PgHdr p)
-		{
-			Debug.Assert (p.nRef > 0);
-			p.nRef++;
-		}
+		
 
 		///<summary>
 		/// Drop a page from the cache. There must be exactly one reference to the
@@ -778,14 +770,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 			return pCache.nRef;
 		}
 
-		///<summary>
-		/// Return the number of references to the page supplied as an argument.
-		///
-		///</summary>
-		static int sqlite3PcachePageRefcount (PgHdr p)
-		{
-			return p.nRef;
-		}
+		
 
 		///<summary>
 		/// Return the total number of pages in the cache.

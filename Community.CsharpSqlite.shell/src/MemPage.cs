@@ -1050,9 +1050,9 @@ namespace Community.CsharpSqlite
 			{
 				Debug.Assert (this.pBt != null);
 				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
-				Debug.Assert (this.pgno == sqlite3PagerPagenumber (this.pDbPage));
-				Debug.Assert (this == sqlite3PagerGetExtra (this.pDbPage));
-				Debug.Assert (this.aData == sqlite3PagerGetData (this.pDbPage));
+				Debug.Assert (this.pgno == PagerMethods.sqlite3PagerPagenumber (this.pDbPage));
+				Debug.Assert (this ==  PagerMethods.sqlite3PagerGetExtra  (this.pDbPage));
+                Debug.Assert(this.aData == this.pDbPage.sqlite3PagerGetData());
 				if (0 == this.isInit) {
 					u16 pc;
 					///
@@ -1236,9 +1236,9 @@ namespace Community.CsharpSqlite
 				BtShared pBt = this.pBt;
 				u8 hdr = this.hdrOffset;
 				u16 first;
-				Debug.Assert (sqlite3PagerPagenumber (this.pDbPage) == this.pgno);
-				Debug.Assert (sqlite3PagerGetExtra (this.pDbPage) == this);
-				Debug.Assert (sqlite3PagerGetData (this.pDbPage) == data);
+				Debug.Assert (PagerMethods.sqlite3PagerPagenumber (this.pDbPage) == this.pgno);
+				Debug.Assert ( PagerMethods.sqlite3PagerGetExtra  (this.pDbPage) == this);
+                Debug.Assert(this.pDbPage.sqlite3PagerGetData() == data);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (sqlite3_mutex_held (pBt.mutex));
 				if (pBt.secureDelete) {
@@ -1841,7 +1841,7 @@ namespace Community.CsharpSqlite
 					this.aOvfl [j].idx = (u16)i;
 				}
 				else {
-					int rc = sqlite3PagerWrite (this.pDbPage);
+					int rc = PagerMethods.sqlite3PagerWrite (this.pDbPage);
 					if (rc != SQLITE_OK) {
 						pRC = rc;
 						return;
@@ -2941,7 +2941,7 @@ namespace Community.CsharpSqlite
 					if (i < nOld) {
 						pNew = apNew [i] = apOld [i];
 						apOld [i] = null;
-						rc = sqlite3PagerWrite (pNew.pDbPage);
+						rc = PagerMethods.sqlite3PagerWrite (pNew.pDbPage);
 						nNew++;
 						if (rc != 0)
 							goto balance_cleanup;
@@ -3356,7 +3356,7 @@ ptrmapCheckPages(pParent, 1);
 ///<param name="of the node stored on pRoot into the new child page.">of the node stored on pRoot into the new child page.</param>
 ///<param name=""></param>
 
-				rc = sqlite3PagerWrite (this.pDbPage);
+				rc = PagerMethods.sqlite3PagerWrite (this.pDbPage);
 				if (rc == SQLITE_OK) {
 					rc = BTreeMethods.allocateBtreePage (pBt, ref pChild, ref pgnoChild, this.pgno, 0);
 					this.copyNodeContent (pChild, ref rc);

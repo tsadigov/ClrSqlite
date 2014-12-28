@@ -3782,7 +3782,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 				#else
 																																																																												processId = 28376023;
 #endif
-				put32bits (zBuf, n, processId);
+				Converter.put32bits (zBuf, n, processId);
 				//(memcpy(&zBuf[n], pid, sizeof(pid));
 				n += 4;
 				// sizeof(pid);
@@ -3790,7 +3790,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 			if (sizeof(DWORD) <= nBuf - n) {
 				//DWORD cnt = GetTickCount();
 				System.DateTime dt = new System.DateTime ();
-				put32bits (zBuf, n, (u32)dt.Ticks);
+				Converter.put32bits (zBuf, n, (u32)dt.Ticks);
 				// memcpy(&zBuf[n], cnt, sizeof(cnt));
 				n += 4;
 				// cnt.Length;
@@ -3799,9 +3799,9 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 				long i;
 				i = System.DateTime.UtcNow.Millisecond;
 				// QueryPerformanceCounter(out i);
-				put32bits (zBuf, n, (u32)(i & 0xFFFFFFFF));
+				Converter.put32bits (zBuf, n, (u32)(i & 0xFFFFFFFF));
 				//memcpy(&zBuf[n], i, sizeof(i));
-				put32bits (zBuf, n, (u32)(i >> 32));
+				Converter.put32bits (zBuf, n, (u32)(i >> 32));
 				n += sizeof(long);
 			}
 			#endif

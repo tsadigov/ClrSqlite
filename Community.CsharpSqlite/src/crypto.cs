@@ -533,7 +533,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 				pBt.pPager.sqlite3PagerReadFileheader(zDbHeader.Length,zDbHeader);
 				if(Converter.sqlite3Get4byte(zDbHeader)>0)// Existing Database, need to reset some values
 				 {
-					CODEC2(pBt.pPager,zDbHeader,2,SQLITE_DECRYPT,ref zDbHeader);
+					PagerMethods.CODEC2(pBt.pPager,zDbHeader,2,SQLITE_DECRYPT,ref zDbHeader);
 					byte nReserve=zDbHeader[20];
 					pBt.pageSize=(uint)((zDbHeader[16]<<8)|(zDbHeader[17]<<16));
 					if(pBt.pageSize<512||pBt.pageSize>SQLITE_MAX_PAGE_SIZE||((pBt.pageSize-1)&pBt.pageSize)!=0)
@@ -638,10 +638,10 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 								///<summary>
 								///write page see pager_incr_changecounter for example 
 								///</summary>
-								rc=sqlite3PagerWrite(page);
+                                rc = PagerMethods.sqlite3PagerWrite(page);
 								//printf("sqlite3PagerWrite(%d)\n", pgno);
 								if(rc==SQLITE_OK) {
-									sqlite3PagerUnref(page);
+									PagerMethods.sqlite3PagerUnref(page);
 								}
 							}
 						}

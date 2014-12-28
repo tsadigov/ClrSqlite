@@ -38,6 +38,26 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Must be first 
             ///</summary>
+            ///
+
+            ///<summary>
+            /// The argument to this macro is a file descriptor (type sqlite3_file*).
+            /// Return 0 if it is not open, or non-zero (but not 1) if it is.
+            ///
+            /// This is so that expressions can be written as:
+            ///
+            ///   if( isOpen(pPager.jfd) ){ ...
+            ///
+            /// instead of
+            ///
+            ///   if( pPager.jfd->pMethods ){ ...
+            ///
+            ///</summary>
+            //#define isOpen(pFd) ((pFd)->pMethods)
+            public bool isOpen
+            {
+                get { return this.pMethods != null; }
+            }
 
         }
 

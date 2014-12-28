@@ -826,17 +826,17 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 					goto ptrmap_exit;
 				}
 				Debug.Assert (offset <= (int)this.usableSize - 5);
-				pPtrmap = sqlite3PagerGetData (pDbPage);
+				pPtrmap =pDbPage. sqlite3PagerGetData ();
 				if (eType != pPtrmap [offset] || Converter.sqlite3Get4byte (pPtrmap, offset + 1) != parent) {
 					TRACE ("PTRMAP_UPDATE: %d->(%d,%d)\n", key, eType, parent);
-					pRC = rc = sqlite3PagerWrite (pDbPage);
+					pRC = rc = PagerMethods.sqlite3PagerWrite (pDbPage);
 					if (rc == SQLITE_OK) {
 						pPtrmap [offset] = eType;
 						Converter.sqlite3Put4byte (pPtrmap, offset + 1, parent);
 					}
 				}
 				ptrmap_exit:
-				sqlite3PagerUnref (pDbPage);
+				PagerMethods.sqlite3PagerUnref (pDbPage);
 			}
 
 			public int ptrmapGet (Pgno key, ref u8 pEType, ref Pgno pPgno)
@@ -872,10 +872,10 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				if (rc != 0) {
 					return rc;
 				}
-				pPtrmap = sqlite3PagerGetData (pDbPage);
+                pPtrmap = pDbPage.sqlite3PagerGetData();
 				offset = (int)PTRMAP_PTROFFSET ((u32)iPtrmap, key);
 				if (offset < 0) {
-					sqlite3PagerUnref (pDbPage);
+					PagerMethods.sqlite3PagerUnref (pDbPage);
 					return SQLITE_CORRUPT_BKPT ();
 				}
 				Debug.Assert (offset <= (int)this.usableSize - 5);
@@ -885,7 +885,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				// Under C# pPgno will always exist. No need to test; //
 				//if ( pPgno != 0 )
 				pPgno = Converter.sqlite3Get4byte (pPtrmap, offset + 1);
-				sqlite3PagerUnref (pDbPage);
+				PagerMethods.sqlite3PagerUnref (pDbPage);
 				if (pEType < 1 || pEType > 5)
 					return SQLITE_CORRUPT_BKPT ();
 				return SQLITE_OK;
@@ -1606,7 +1606,7 @@ public static bool ISAUTOVACUUM =false;
 						this.checkAppendMsg (zContext, "failed to get page %d", iPage);
 						break;
 					}
-					pOvflData = sqlite3PagerGetData (pOvflPage);
+                    pOvflData = pOvflPage.sqlite3PagerGetData();
 					if (isFreeList != 0) {
 						int n = (int)Converter.sqlite3Get4byte (pOvflData, 4);
 						#if !SQLITE_OMIT_AUTOVACUUM
@@ -1648,7 +1648,7 @@ public static bool ISAUTOVACUUM =false;
 					}
 					#endif
 					iPage = (int)Converter.sqlite3Get4byte (pOvflData);
-					sqlite3PagerUnref (pOvflPage);
+					PagerMethods.sqlite3PagerUnref (pOvflPage);
 				}
 			}
 

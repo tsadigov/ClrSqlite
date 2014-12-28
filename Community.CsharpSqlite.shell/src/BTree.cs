@@ -252,7 +252,7 @@ p.sharable = 1;
                     //  rc = SQLITE_NOMEM;
                     //  goto btree_open_out;
                     //}
-                    rc = sqlite3PagerOpen(pVfs, out pBt.pPager, zFilename, EXTRA_SIZE, flags, vfsFlags, BTreeMethods.pageReinit);
+                    rc = PagerMethods.sqlite3PagerOpen(pVfs, out pBt.pPager, zFilename, EXTRA_SIZE, flags, vfsFlags, BTreeMethods.pageReinit);
                     if (rc == SQLITE_OK)
                     {
                         rc = pBt.pPager.sqlite3PagerReadFileheader(zDbHeader.Length, zDbHeader);
@@ -698,7 +698,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
                         rc = this.sqlite3BtreeBeginTrans(2);
                         if (rc == SQLITE_OK)
                         {
-                            rc = sqlite3PagerWrite(pBt.pPage1.pDbPage);
+                            rc = PagerMethods.sqlite3PagerWrite(pBt.pPage1.pDbPage);
                             if (rc == SQLITE_OK)
                             {
                                 aData[18] = (u8)iVersion;
@@ -898,7 +898,7 @@ releasePage(pPage);
                 Debug.Assert(this.inTrans == TransType.TRANS_WRITE);
                 Debug.Assert(pBt.pPage1 != null);
                 pP1 = pBt.pPage1.aData;
-                rc = sqlite3PagerWrite(pBt.pPage1.pDbPage);
+                rc = PagerMethods.sqlite3PagerWrite(pBt.pPage1.pDbPage);
                 if (rc == SQLITE_OK)
                 {
                     Converter.sqlite3Put4byte(pP1, 36 + idx * 4, iMeta);
@@ -1213,7 +1213,7 @@ pBt.isExclusive = (u8)(wrflag>1);
                         ///<param name="rollback occurs within the transaction.">rollback occurs within the transaction.</param>
                         if (pBt.nPage != Converter.sqlite3Get4byte(pPage1.aData, 28))
                         {
-                            rc = sqlite3PagerWrite(pPage1.pDbPage);
+                            rc = PagerMethods.sqlite3PagerWrite(pPage1.pDbPage);
                             if (rc == SQLITE_OK)
                             {
                                 Converter.sqlite3Put4byte(pPage1.aData, (u32)28, pBt.nPage);
@@ -1253,7 +1253,7 @@ pBt.isExclusive = (u8)(wrflag>1);
                     rc = BTreeMethods.incrVacuumStep(pBt, 0, pBt.btreePagecount());
                     if (rc == SQLITE_OK)
                     {
-                        rc = sqlite3PagerWrite(pBt.pPage1.pDbPage);
+                        rc = PagerMethods.sqlite3PagerWrite(pBt.pPage1.pDbPage);
                         Converter.sqlite3Put4byte(pBt.pPage1.aData, (u32)28, pBt.nPage);
                         //put4byte(&pBt->pPage1->aData[28], pBt->nPage);
                     }
