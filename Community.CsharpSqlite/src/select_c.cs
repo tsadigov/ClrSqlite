@@ -48,72 +48,10 @@ namespace Community.CsharpSqlite {
 			sqlite3ExprDelete(db,ref p.pLimit);
 			sqlite3ExprDelete(db,ref p.pOffset);
 		}
-		///
-		///<summary>
-		///Initialize a SelectDest structure.
-		///
-		///</summary>
-		static void sqlite3SelectDestInit(SelectDest pDest,SelectResultType eDest,int iParm) {
-			pDest.eDest=eDest;
-			pDest.iParm=iParm;
-			pDest.affinity='\0';
-			pDest.iMem=0;
-			pDest.nMem=0;
-		}
-		///<summary>
-		/// Allocate a new Select structure and return a pointer to that
-		/// structure.
-		///
-		///</summary>
-		// OVERLOADS, so I don't need to rewrite parse.c
-		static Select sqlite3SelectNew(Parse pParse,int null_2,SrcList pSrc,int null_4,int null_5,int null_6,int null_7,int isDistinct,int null_9,int null_10) {
-			return sqlite3SelectNew(pParse,null,pSrc,null,null,null,null,isDistinct,null,null);
-		}
-		static Select sqlite3SelectNew(Parse pParse,/*which columns to include in the result */ExprList pEList, /*the FROM clause "> which tables to scan */SrcList pSrc, /*the WHERE clause */Expr pWhere,  
-            /*the GROUP BY clause */ExprList pGroupBy,/*the HAVING clause */Expr pHaving, /*the ORDER BY clause*/ExprList pOrderBy,/*true if the DISTINCT keyword is present */int isDistinct,
-            /*LIMIT value.  NULL means not used */Expr pLimit,/*OFFSET value.  NULL means no offset */Expr pOffset
-		) {
-			Select pNew;
-			//           Select standin;
-			sqlite3 db=pParse.db;
-			pNew=new Select();
-			//sqlite3DbMallocZero(db, sizeof(*pNew) );
-			Debug.Assert(//db.mallocFailed != 0 ||
-			null==pOffset||pLimit!=null);
-			///
-			///<summary>
-			///OFFSET implies LIMIT 
-			///</summary>
-			//if( pNew==null   ){
-			//  pNew = standin;
-			//  memset(pNew, 0, sizeof(*pNew));
-			//}
-			if(pEList==null) {
-				pEList=pParse.sqlite3ExprListAppend(null,sqlite3Expr(db,TK_ALL,null));
-			}
-			pNew.pEList=pEList;
-			pNew.pSrc=pSrc;
-			pNew.pWhere=pWhere;
-			pNew.pGroupBy=pGroupBy;
-			pNew.pHaving=pHaving;
-			pNew.pOrderBy=pOrderBy;
-			pNew.selFlags=(isDistinct!=0?SelectFlags.Distinct:0);
-			pNew.tk_op=TK_SELECT;
-			pNew.pLimit=pLimit;
-			pNew.pOffset=pOffset;
-			Debug.Assert(pOffset==null||pLimit!=null);
-			pNew.addrOpenEphm[0]=-1;
-			pNew.addrOpenEphm[1]=-1;
-			pNew.addrOpenEphm[2]=-1;
-			//if ( db.mallocFailed != 0 )
-			//{
-			//  clearSelect( db, pNew );
-			//  //if ( pNew != standin ) sqlite3DbFree( db, ref pNew );
-			//  pNew = null;
-			//}
-			return pNew;
-		}
-		///<summary>
+
+		
+        
+        ///<summary>
 		/// Delete the given Select structure and all of its substructures.
 		///
 		///</summary>
@@ -211,19 +149,7 @@ namespace Community.CsharpSqlite {
 				}
 			return jointype;
 		}
-		///<summary>
-		/// Return the index of a column in a table.  Return -1 if the column
-		/// is not contained in the table.
-		///
-		///</summary>
-		static int columnIndex(Table pTab,string zCol) {
-			int i;
-			for(i=0;i<pTab.nCol;i++) {
-				if(pTab.aCol[i].zName.Equals(zCol,StringComparison.InvariantCultureIgnoreCase))
-					return i;
-			}
-			return -1;
-		}
+		
 		///<summary>
 		/// Search the first N tables in pSrc, from left to right, looking for a
 		/// table that has a column named zCol.
@@ -235,25 +161,15 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static int tableAndColumnIndex(SrcList pSrc,///
-		///<summary>
 		///Array of tables to search 
-		///</summary>
 		int N,///
-		///<summary>
 		///Number of tables in pSrc.a[] to search 
-		///</summary>
 		string zCol,///
-		///<summary>
 		///Name of the column we are looking for 
-		///</summary>
 		ref int piTab,///
-		///<summary>
 		///Write index of pSrc.a[] here 
-		///</summary>
 		ref int piCol///
-		///<summary>
 		///Write index of pSrc.a[*piTab].pTab.aCol[] here 
-		///</summary>
 		) {
 			int i;
 			///
@@ -271,7 +187,7 @@ namespace Community.CsharpSqlite {
 			///Both or neither are NULL 
 			///</summary>
 			for(i=0;i<N;i++) {
-				iCol=columnIndex(pSrc.a[i].pTab,zCol);
+                iCol = pSrc.a[i].pTab.columnIndex(zCol);
 				if(iCol>=0) {
 					//if( piTab )
 					{
@@ -296,37 +212,21 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static void addWhereTerm(Parse pParse,///
-		///<summary>
 		///Parsing context 
-		///</summary>
 		SrcList pSrc,///
-		///<summary>
 		///List of tables in FROM clause 
-		///</summary>
 		int iLeft,///
-		///<summary>
 		///Index of first table to join in pSrc 
-		///</summary>
 		int iColLeft,///
-		///<summary>
 		///Index of column in first table 
-		///</summary>
 		int iRight,///
-		///<summary>
 		///Index of second table in pSrc 
-		///</summary>
 		int iColRight,///
-		///<summary>
 		///Index of column in second table 
-		///</summary>
 		int isOuterJoin,///
-		///<summary>
 		///True if this is an OUTER join 
-		///</summary>
 		ref Expr ppWhere///
-		///<summary>
 		///IN/OUT: The WHERE clause to add to 
-		///</summary>
 		) {
 			sqlite3 db=pParse.db;
 			Expr pE1;
@@ -336,8 +236,8 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(pSrc.nSrc>iRight);
 			Debug.Assert(pSrc.a[iLeft].pTab!=null);
 			Debug.Assert(pSrc.a[iRight].pTab!=null);
-			pE1=sqlite3CreateColumnExpr(db,pSrc,iLeft,iColLeft);
-			pE2=sqlite3CreateColumnExpr(db,pSrc,iRight,iColRight);
+			pE1=ResolveExtensions.sqlite3CreateColumnExpr(db,pSrc,iLeft,iColLeft);
+            pE2 = ResolveExtensions.sqlite3CreateColumnExpr(db, pSrc, iRight, iColRight);
 			pEq=pParse.sqlite3PExpr(TK_EQ,pE1,pE2,0);
 			if(pEq!=null&&isOuterJoin!=0) {
 				pEq.ExprSetProperty(EP_FromJoin);
@@ -463,7 +363,7 @@ namespace Community.CsharpSqlite {
 						///Matching column in the left table 
 						///</summary>
 						zName=pRightTab.aCol[j].zName;
-						int iRightCol=columnIndex(pRightTab,zName);
+                        int iRightCol = pRightTab.columnIndex(zName);
 						if(tableAndColumnIndex(pSrc,i+1,zName,ref iLeft,ref iLeftCol)!=0) {
 							addWhereTerm(pParse,pSrc,iLeft,iLeftCol,i+1,j,isOuter?1:0,ref p.pWhere);
 						}
@@ -524,7 +424,7 @@ namespace Community.CsharpSqlite {
 						///Column number of matching column on the right 
 						///</summary>
 						zName=pList.a[j].zName;
-						iRightCol=columnIndex(pRightTab,zName);
+                        iRightCol = pRightTab.columnIndex(zName);
 						if(iRightCol<0||0==tableAndColumnIndex(pSrc,i+1,zName,ref iLeft,ref iLeftCol)) {
 							sqlite3ErrorMsg(pParse,"cannot join using column %s - column "+"not present in both tables",zName);
 							return 1;
@@ -541,21 +441,13 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static void pushOntoSorter(Parse pParse,///
-		///<summary>
 		///Parser context 
-		///</summary>
 		ExprList pOrderBy,///
-		///<summary>
 		///The ORDER BY clause 
-		///</summary>
 		Select pSelect,///
-		///<summary>
 		///The whole SELECT statement 
-		///</summary>
 		int regData///
-		///<summary>
 		///Register holding data to be sorted 
-		///</summary>
 		) {
 			Vdbe v=pParse.pVdbe;
 			int nExpr=pOrderBy.nExpr;
@@ -592,17 +484,11 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static void codeOffset(Vdbe v,///
-		///<summary>
 		///Generate code into this VM 
-		///</summary>
 		Select p,///
-		///<summary>
 		///The SELECT statement being coded 
-		///</summary>
 		int iContinue///
-		///<summary>
 		///Jump here to skip the current record 
-		///</summary>
 		) {
 			if(p.iOffset!=0&&iContinue!=0) {
 				int addr;
@@ -1081,7 +967,7 @@ namespace Community.CsharpSqlite {
 		///<summary>
 		/// Assign expression b to lvalue a. A second, no-op, version of this macro
 		/// is provided when SQLITE_OMIT_EXPLAIN is defined. This allows the code
-		/// in sqlite3Select() to assign values to structure member variables that
+		/// in Select.sqlite3Select() to assign values to structure member variables that
 		/// only exist if SQLITE_OMIT_EXPLAIN is not defined without polluting the
 		/// code with #if !directives.
 		///</summary>
@@ -1271,177 +1157,14 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 				v.sqlite3VdbeAddOp2(OP_Close,pseudoTab,0);
 			}
 		}
-		///<summary>
-		/// Return a pointer to a string containing the 'declaration type' of the
-		/// expression pExpr. The string may be treated as static by the caller.
-		///
-		/// The declaration type is the exact datatype definition extracted from the
-		/// original CREATE TABLE statement if the expression is a column. The
-		/// declaration type for a ROWID field is INTEGER. Exactly when an expression
-		/// is considered a column can be complex in the presence of subqueries. The
-		/// result-set expression in all of the following SELECT statements is
-		/// considered a column by this function.
-		///
-		///   SELECT col FROM tbl;
-		///   SELECT (SELECT col FROM tbl;
-		///   SELECT (SELECT col FROM tbl);
-		///   SELECT abc FROM (SELECT col AS abc FROM tbl);
-		///
-		/// The declaration type for any expression other than a column is NULL.
-		///
-		///</summary>
-		static string columnType(NameContext pNC,Expr pExpr,ref string pzOriginDb,ref string pzOriginTab,ref string pzOriginCol) {
-			string zType=null;
-			string zOriginDb=null;
-			string zOriginTab=null;
-			string zOriginCol=null;
-			int j;
-			if(NEVER(pExpr==null)||pNC.pSrcList==null)
-				return null;
-			switch(pExpr.op) {
-			case TK_AGG_COLUMN:
-			case TK_COLUMN: {
-				///
-				///<summary>
-				///The expression is a column. Locate the table the column is being
-				///extracted from in NameContext.pSrcList. This table may be real
-				///database table or a subquery.
-				///
-				///</summary>
-				Table pTab=null;
-				///
-				///<summary>
-				///Table structure column is extracted from 
-				///</summary>
-				Select pS=null;
-				///
-				///<summary>
-				///Select the column is extracted from 
-				///</summary>
-				int iCol=pExpr.iColumn;
-				///
-				///<summary>
-				///Index of column in pTab 
-				///</summary>
-				testcase(pExpr.op==TK_AGG_COLUMN);
-				testcase(pExpr.op==TK_COLUMN);
-				while(pNC!=null&&pTab==null) {
-					SrcList pTabList=pNC.pSrcList;
-					for(j=0;j<pTabList.nSrc&&pTabList.a[j].iCursor!=pExpr.iTable;j++)
-						;
-					if(j<pTabList.nSrc) {
-						pTab=pTabList.a[j].pTab;
-						pS=pTabList.a[j].pSelect;
-					}
-					else {
-						pNC=pNC.pNext;
-					}
-				}
-				if(pTab==null) {
-					///
-					///<summary>
-					///At one time, code such as "SELECT new.x" within a trigger would
-					///cause this condition to run.  Since then, we have restructured how
-					///trigger code is generated and so this condition is no longer 
-					///possible. However, it can still be true for statements like
-					///the following:
-					///
-					///CREATE TABLE t1(col INTEGER);
-					///SELECT (SELECT t1.col) FROM FROM t1;
-					///
-					///when columnType() is called on the expression "t1.col" in the 
-					///</summary>
-					///<param name="sub">select. In this case, set the column type to NULL, even</param>
-					///<param name="though it should really be "INTEGER".">though it should really be "INTEGER".</param>
-					///<param name=""></param>
-					///<param name="This is not a problem, as the column type of "t1.col" is never">This is not a problem, as the column type of "t1.col" is never</param>
-					///<param name="used. When columnType() is called on the expression ">used. When columnType() is called on the expression </param>
-					///<param name=""(SELECT t1.col)", the correct type is returned (see the TK_SELECT">"(SELECT t1.col)", the correct type is returned (see the TK_SELECT</param>
-					///<param name="branch below.  ">branch below.  </param>
-					break;
-				}
-				//Debug.Assert( pTab != null && pExpr.pTab == pTab );
-				if(pS!=null) {
-					///
-					///<summary>
-					///</summary>
-					///<param name="The "table" is actually a sub">select or a view in the FROM clause</param>
-					///<param name="of the SELECT statement. Return the declaration type and origin">of the SELECT statement. Return the declaration type and origin</param>
-					///<param name="data for the result">select.</param>
-					///<param name=""></param>
-					if(iCol>=0&&ALWAYS(iCol<pS.pEList.nExpr)) {
-						///
-						///<summary>
-						///If iCol is less than zero, then the expression requests the
-						///</summary>
-						///<param name="rowid of the sub">select or view. This expression is legal (see</param>
-						///<param name="test case misc2.2.2) "> it always evaluates to NULL.</param>
-						///<param name=""></param>
-						NameContext sNC=new NameContext();
-						Expr p=pS.pEList.a[iCol].pExpr;
-						sNC.pSrcList=pS.pSrc;
-						sNC.pNext=pNC;
-						sNC.pParse=pNC.pParse;
-						zType=columnType(sNC,p,ref zOriginDb,ref zOriginTab,ref zOriginCol);
-					}
-				}
-				else
-					if(ALWAYS(pTab.pSchema)) {
-						///
-						///<summary>
-						///A real table 
-						///</summary>
-						Debug.Assert(pS==null);
-						if(iCol<0)
-							iCol=pTab.iPKey;
-						Debug.Assert(iCol==-1||(iCol>=0&&iCol<pTab.nCol));
-						if(iCol<0) {
-							zType="INTEGER";
-							zOriginCol="rowid";
-						}
-						else {
-							zType=pTab.aCol[iCol].zType;
-							zOriginCol=pTab.aCol[iCol].zName;
-						}
-						zOriginTab=pTab.zName;
-						if(pNC.pParse!=null) {
-							int iDb=sqlite3SchemaToIndex(pNC.pParse.db,pTab.pSchema);
-							zOriginDb=pNC.pParse.db.aDb[iDb].zName;
-						}
-					}
-				break;
-			}
-			#if !SQLITE_OMIT_SUBQUERY
-			case TK_SELECT: {
-				///
-				///<summary>
-				///</summary>
-				///<param name="The expression is a sub">select. Return the declaration type and</param>
-				///<param name="origin info for the single column in the result set of the SELECT">origin info for the single column in the result set of the SELECT</param>
-				///<param name="statement.">statement.</param>
-				///<param name=""></param>
-				NameContext sNC=new NameContext();
-				Select pS=pExpr.x.pSelect;
-				Expr p=pS.pEList.a[0].pExpr;
-				Debug.Assert(pExpr.ExprHasProperty(EP_xIsSelect));
-				sNC.pSrcList=pS.pSrc;
-				sNC.pNext=pNC;
-				sNC.pParse=pNC.pParse;
-				zType=columnType(sNC,p,ref zOriginDb,ref zOriginTab,ref zOriginCol);
-				break;
-			}
-			#endif
-			}
-			//if ( pzOriginDb != null )
-			{
-				//Debug.Assert( pzOriginTab != null && pzOriginCol != null );
-				pzOriginDb=zOriginDb;
-				pzOriginTab=zOriginTab;
-				pzOriginCol=zOriginCol;
-			}
-			return zType;
-		}
-		///<summary>
+		
+        
+        
+        
+        
+        
+        
+        ///<summary>
 		/// Generate code that will tell the VDBE the declaration types of columns
 		/// in the result set.
 		///
@@ -1466,7 +1189,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			sNC.pSrcList=pTabList;
 			sNC.pParse=pParse;
 			for(i=0;i<pEList.nExpr;i++) {
-				Expr p=pEList.a[i].pExpr;
+				Expr expr=pEList.a[i].pExpr;
 				string zType;
 				#if SQLITE_ENABLE_COLUMN_METADATA
 																																																																																																				        string zOrigDb = null;
@@ -1483,7 +1206,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
         sqlite3VdbeSetColName( v, i, COLNAME_COLUMN, zOrigCol, SQLITE_TRANSIENT );
 #else
 				string sDummy=null;
-				zType=columnType(sNC,p,ref sDummy,ref sDummy,ref sDummy);
+                zType = expr.columnType(sNC, ref sDummy, ref sDummy, ref sDummy);
 				#endif
 				v.sqlite3VdbeSetColName(i,COLNAME_DECLTYPE,zType,SQLITE_TRANSIENT);
 			}
@@ -1754,71 +1477,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			//}
 			return SQLITE_OK;
 		}
-		///<summary>
-		/// Add type and collation information to a column list based on
-		/// a SELECT statement.
-		///
-		/// The column list presumably came from selectColumnNamesFromExprList().
-		/// The column list has only names, not types or collations.  This
-		/// routine goes through and adds the types and collations.
-		///
-		/// This routine requires that all identifiers in the SELECT
-		/// statement be resolved.
-		///
-		///</summary>
-		static void selectAddColumnTypeAndCollation(Parse pParse,///
-		///<summary>
-		///Parsing contexts 
-		///</summary>
-		int nCol,///
-		///<summary>
-		///Number of columns 
-		///</summary>
-		Column[] aCol,///
-		///<summary>
-		///List of columns 
-		///</summary>
-		Select pSelect///
-		///<summary>
-		///SELECT used to determine types and collations 
-		///</summary>
-		) {
-			sqlite3 db=pParse.db;
-			NameContext sNC;
-			Column pCol;
-			CollSeq pColl;
-			int i;
-			Expr p;
-			ExprList_item[] a;
-			Debug.Assert(pSelect!=null);
-			Debug.Assert((pSelect.selFlags&SelectFlags.Resolved)!=0);
-			Debug.Assert(nCol==pSelect.pEList.nExpr///
-			///<summary>
-			///|| db.mallocFailed != 0 
-			///</summary>
-			);
-			//      if ( db.mallocFailed != 0 ) return;
-			sNC=new NameContext();
-			// memset( &sNC, 0, sizeof( sNC ) );
-			sNC.pSrcList=pSelect.pSrc;
-			a=pSelect.pEList.a;
-			for(i=0;i<nCol;i++)//, pCol++ )
-			 {
-				pCol=aCol[i];
-				p=a[i].pExpr;
-				string bDummy=null;
-				pCol.zType=columnType(sNC,p,ref bDummy,ref bDummy,ref bDummy);
-				// sqlite3DbStrDup( db, columnType( sNC, p, 0, 0, 0 ) );
-				pCol.affinity=p.sqlite3ExprAffinity();
-				if(pCol.affinity==0)
-					pCol.affinity=SQLITE_AFF_NONE;
-				pColl=pParse.sqlite3ExprCollSeq(p);
-				if(pColl!=null) {
-					pCol.zColl=pColl.zName;
-					// sqlite3DbStrDup( db, pColl.zName );
-				}
-			}
-		}
+		
 		///<summary>
 		/// Given a SELECT statement, generate a Table structure that describes
 		/// the result set of that SELECT.
@@ -1852,7 +1511,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			pTab.zName=null;
 			pTab.nRowEst=1000000;
 			selectColumnsFromExprList(pParse,pSelect.pEList,ref pTab.nCol,ref pTab.aCol);
-			selectAddColumnTypeAndCollation(pParse,pTab.nCol,pTab.aCol,pSelect);
+			Select.selectAddColumnTypeAndCollation(pParse,pTab.nCol,pTab.aCol,pSelect);
 			pTab.iPKey=-1;
 			//if ( db.mallocFailed != 0 )
 			//{
@@ -1984,517 +1643,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 		//  Select* p,            /* The right-most of SELECTs to be coded */
 		//  SelectDest* pDest     /* What to do with query results */
 		//);
-		#if !SQLITE_OMIT_COMPOUND_SELECT
-		///<summary>
-		/// This routine is called to process a compound query form from
-		/// two or more separate queries using UNION, UNION ALL, EXCEPT, or
-		/// INTERSECT
-		///
-		/// "p" points to the right-most of the two queries.  the query on the
-		/// left is p.pPrior.  The left query could also be a compound query
-		/// in which case this routine will be called recursively.
-		///
-		/// The results of the total query are to be written into a destination
-		/// of type eDest with parameter iParm.
-		///
-		/// Example 1:  Consider a three-way compound SQL statement.
-		///
-		///     SELECT a FROM t1 UNION SELECT b FROM t2 UNION SELECT c FROM t3
-		///
-		/// This statement is parsed up as follows:
-		///
-		///     SELECT c FROM t3
-		///      |
-		///      `----.  SELECT b FROM t2
-		///                |
-		///                `-----.  SELECT a FROM t1
-		///
-		/// The arrows in the diagram above represent the Select.pPrior pointer.
-		/// So if this routine is called with p equal to the t3 query, then
-		/// pPrior will be the t2 query.  p.op will be TK_UNION in this case.
-		///
-		/// Notice that because of the way SQLite parses compound SELECTs, the
-		/// individual selects always group from left to right.
-		///</summary>
-		static int multiSelect(Parse pParse,///
-		///<summary>
-		///Parsing context 
-		///</summary>
-		Select p,///
-		///<summary>
-		///</summary>
-		///<param name="The right">most of SELECTs to be coded </param>
-		SelectDest pDest///
-		///<summary>
-		///What to do with query results 
-		///</summary>
-		) {
-			int rc=SQLITE_OK;
-			///
-			///<summary>
-			///Success code from a subroutine 
-			///</summary>
-			Select pPrior;
-			///
-			///<summary>
-			///Another SELECT immediately to our left 
-			///</summary>
-			Vdbe v;
-			///
-			///<summary>
-			///Generate code to this VDBE 
-			///</summary>
-			SelectDest dest=new SelectDest();
-			///
-			///<summary>
-			///Alternative data destination 
-			///</summary>
-			Select pDelete=null;
-			///
-			///<summary>
-			///Chain of simple selects to delete 
-			///</summary>
-			sqlite3 db;
-			///
-			///<summary>
-			///Database connection 
-			///</summary>
-			#if !SQLITE_OMIT_EXPLAIN
-			int iSub1=0;
-			///
-			///<summary>
-			///</summary>
-			///<param name="EQP id of left">hand query </param>
-			int iSub2=0;
-			///
-			///<summary>
-			///</summary>
-			///<param name="EQP id of right">hand query </param>
-			#endif
-			///
-			///<summary>
-			///Make sure there is no ORDER BY or LIMIT clause on prior SELECTs.  Only
-			///</summary>
-			///<param name="the last (right">most) SELECT in the series may have an ORDER BY or LIMIT.</param>
-			Debug.Assert(p!=null&&p.pPrior!=null);
-			///
-			///<summary>
-			///Calling function guarantees this much 
-			///</summary>
-			db=pParse.db;
-			pPrior=p.pPrior;
-			Debug.Assert(pPrior.pRightmost!=pPrior);
-			Debug.Assert(pPrior.pRightmost==p.pRightmost);
-			dest=pDest;
-			if(pPrior.pOrderBy!=null) {
-				sqlite3ErrorMsg(pParse,"ORDER BY clause should come after %s not before",selectOpName(p.TokenOp));
-				rc=1;
-				goto multi_select_end;
-			}
-			if(pPrior.pLimit!=null) {
-				sqlite3ErrorMsg(pParse,"LIMIT clause should come after %s not before",selectOpName(p.TokenOp));
-				rc=1;
-				goto multi_select_end;
-			}
-			v=pParse.sqlite3GetVdbe();
-			Debug.Assert(v!=null);
-			///
-			///<summary>
-			///The VDBE already created by calling function 
-			///</summary>
-			///
-			///<summary>
-			///Create the destination temporary table if necessary
-			///
-			///</summary>
-			if(dest.eDest==SelectResultType.EphemTab) {
-				Debug.Assert(p.pEList!=null);
-				v.sqlite3VdbeAddOp2(OP_OpenEphemeral,dest.iParm,p.pEList.nExpr);
-				v.sqlite3VdbeChangeP5(BTREE_UNORDERED);
-				dest.eDest=SelectResultType.Table;
-			}
-			///
-			///<summary>
-			///Make sure all SELECTs in the statement have the same number of elements
-			///in their result sets.
-			///
-			///</summary>
-			Debug.Assert(p.pEList!=null&&pPrior.pEList!=null);
-			if(p.pEList.nExpr!=pPrior.pEList.nExpr) {
-				sqlite3ErrorMsg(pParse,"SELECTs to the left and right of %s"+" do not have the same number of result columns",selectOpName(p.TokenOp));
-				rc=1;
-				goto multi_select_end;
-			}
-			///
-			///<summary>
-			///Compound SELECTs that have an ORDER BY clause are handled separately.
-			///
-			///</summary>
-			if(p.pOrderBy!=null) {
-				return multiSelectOrderBy(pParse,p,pDest);
-			}
-			///
-			///<summary>
-			///Generate code for the left and right SELECT statements.
-			///
-			///</summary>
-			switch(p.tk_op) {
-			case TK_ALL: {
-				int addr=0;
-				int nLimit=0;
-				Debug.Assert(pPrior.pLimit==null);
-				pPrior.pLimit=p.pLimit;
-				pPrior.pOffset=p.pOffset;
-				explainSetInteger(ref iSub1,pParse.iNextSelectId);
-				rc=sqlite3Select(pParse,pPrior,ref dest);
-				p.pLimit=null;
-				p.pOffset=null;
-				if(rc!=0) {
-					goto multi_select_end;
-				}
-				p.pPrior=null;
-				p.iLimit=pPrior.iLimit;
-				p.iOffset=pPrior.iOffset;
-				if(p.iLimit!=0) {
-					addr=v.sqlite3VdbeAddOp1(OpCode.OP_IfZero,p.iLimit);
-					#if SQLITE_DEBUG
-																																																																																																																													              VdbeComment( v, "Jump ahead if LIMIT reached" );
-#endif
-				}
-				explainSetInteger(ref iSub2,pParse.iNextSelectId);
-				rc=sqlite3Select(pParse,p,ref dest);
-				testcase(rc!=SQLITE_OK);
-				pDelete=p.pPrior;
-				p.pPrior=pPrior;
-				p.nSelectRow+=pPrior.nSelectRow;
-				if(pPrior.pLimit!=null&&pPrior.pLimit.sqlite3ExprIsInteger(ref nLimit)!=0&&p.nSelectRow>(double)nLimit) {
-					p.nSelectRow=(double)nLimit;
-				}
-				if(addr!=0) {
-					v.sqlite3VdbeJumpHere(addr);
-				}
-				break;
-			}
-			case TK_EXCEPT:
-			case TK_UNION: {
-				int unionTab;
-				///
-				///<summary>
-				///VdbeCursor number of the temporary table holding result 
-				///</summary>
-				SelectResultType op=0;
-				///
-				///<summary>
-				///One of the SelectResultType. operations to apply to self 
-				///</summary>
-				SelectResultType priorOp;
-				///
-				///<summary>
-				///The SelectResultType. operation to apply to prior selects 
-				///</summary>
-				Expr pLimit,pOffset;
-				///
-				///<summary>
-				///Saved values of p.nLimit and p.nOffset 
-				///</summary>
-				int addr;
-				SelectDest uniondest=new SelectDest();
-				testcase(p.tk_op==TK_EXCEPT);
-				testcase(p.tk_op==TK_UNION);
-				priorOp=SelectResultType.Union;
-				if(dest.eDest==priorOp&&ALWAYS(null==p.pLimit&&null==p.pOffset)) {
-					///
-					///<summary>
-					///We can reuse a temporary table generated by a SELECT to our
-					///right.
-					///
-					///</summary>
-					Debug.Assert(p.pRightmost!=p);
-					///
-					///<summary>
-					///Can only happen for leftward elements
-					///</summary>
-					///<param name="of a 3">way or more compound </param>
-					Debug.Assert(p.pLimit==null);
-					///
-					///<summary>
-					///Not allowed on leftward elements 
-					///</summary>
-					Debug.Assert(p.pOffset==null);
-					///
-					///<summary>
-					///Not allowed on leftward elements 
-					///</summary>
-					unionTab=dest.iParm;
-				}
-				else {
-					///
-					///<summary>
-					///We will need to create our own temporary table to hold the
-					///intermediate results.
-					///
-					///</summary>
-					unionTab=pParse.nTab++;
-					Debug.Assert(p.pOrderBy==null);
-					addr=v.sqlite3VdbeAddOp2(OP_OpenEphemeral,unionTab,0);
-					Debug.Assert(p.addrOpenEphm[0]==-1);
-					p.addrOpenEphm[0]=addr;
-					p.pRightmost.selFlags|=SelectFlags.UsesEphemeral;
-					Debug.Assert(p.pEList!=null);
-				}
-				///
-				///<summary>
-				///Code the SELECT statements to our left
-				///
-				///</summary>
-				Debug.Assert(pPrior.pOrderBy==null);
-				sqlite3SelectDestInit(uniondest,priorOp,unionTab);
-				explainSetInteger(ref iSub1,pParse.iNextSelectId);
-				rc=sqlite3Select(pParse,pPrior,ref uniondest);
-				if(rc!=0) {
-					goto multi_select_end;
-				}
-				///
-				///<summary>
-				///Code the current SELECT statement
-				///
-				///</summary>
-				if(p.tk_op==TK_EXCEPT) {
-					op=SelectResultType.Except;
-				}
-				else {
-					Debug.Assert(p.tk_op==TK_UNION);
-					op=SelectResultType.Union;
-				}
-				p.pPrior=null;
-				pLimit=p.pLimit;
-				p.pLimit=null;
-				pOffset=p.pOffset;
-				p.pOffset=null;
-				uniondest.eDest=op;
-				explainSetInteger(ref iSub2,pParse.iNextSelectId);
-				rc=sqlite3Select(pParse,p,ref uniondest);
-				testcase(rc!=SQLITE_OK);
-				///
-				///<summary>
-				///Query flattening in sqlite3Select() might refill p.pOrderBy.
-				///Be sure to delete p.pOrderBy, therefore, to avoid a memory leak. 
-				///</summary>
-				sqlite3ExprListDelete(db,ref p.pOrderBy);
-				pDelete=p.pPrior;
-				p.pPrior=pPrior;
-				p.pOrderBy=null;
-				if(p.tk_op==TK_UNION)
-					p.nSelectRow+=pPrior.nSelectRow;
-				sqlite3ExprDelete(db,ref p.pLimit);
-				p.pLimit=pLimit;
-				p.pOffset=pOffset;
-				p.iLimit=0;
-				p.iOffset=0;
-				///
-				///<summary>
-				///Convert the data in the temporary table into whatever form
-				///it is that we currently need.
-				///
-				///</summary>
-				Debug.Assert(unionTab==dest.iParm||dest.eDest!=priorOp);
-				if(dest.eDest!=priorOp) {
-					int iCont,iBreak,iStart;
-					Debug.Assert(p.pEList!=null);
-					if(dest.eDest==SelectResultType.Output) {
-						Select pFirst=p;
-						while(pFirst.pPrior!=null)
-							pFirst=pFirst.pPrior;
-						generateColumnNames(pParse,null,pFirst.pEList);
-					}
-					iBreak=v.sqlite3VdbeMakeLabel();
-					iCont=v.sqlite3VdbeMakeLabel();
-					computeLimitRegisters(pParse,p,iBreak);
-					v.sqlite3VdbeAddOp2(OP_Rewind,unionTab,iBreak);
-					iStart=v.sqlite3VdbeCurrentAddr();
-					selectInnerLoop(pParse,p,p.pEList,unionTab,p.pEList.nExpr,null,-1,dest,iCont,iBreak);
-					v.sqlite3VdbeResolveLabel(iCont);
-					v.sqlite3VdbeAddOp2(OP_Next,unionTab,iStart);
-					v.sqlite3VdbeResolveLabel(iBreak);
-					v.sqlite3VdbeAddOp2(OP_Close,unionTab,0);
-				}
-				break;
-			}
-			default:
-			Debug.Assert(p.tk_op==TK_INTERSECT);
-			{
-				int tab1,tab2;
-				int iCont,iBreak,iStart;
-				Expr pLimit,pOffset;
-				int addr;
-				SelectDest intersectdest=new SelectDest();
-				int r1;
-				///
-				///<summary>
-				///INTERSECT is different from the others since it requires
-				///two temporary tables.  Hence it has its own case.  Begin
-				///by allocating the tables we will need.
-				///
-				///</summary>
-				tab1=pParse.nTab++;
-				tab2=pParse.nTab++;
-				Debug.Assert(p.pOrderBy==null);
-				addr=v.sqlite3VdbeAddOp2(OP_OpenEphemeral,tab1,0);
-				Debug.Assert(p.addrOpenEphm[0]==-1);
-				p.addrOpenEphm[0]=addr;
-				p.pRightmost.selFlags|=SelectFlags.UsesEphemeral;
-				Debug.Assert(p.pEList!=null);
-				///
-				///<summary>
-				///Code the SELECTs to our left into temporary table "tab1".
-				///
-				///</summary>
-				sqlite3SelectDestInit(intersectdest,SelectResultType.Union,tab1);
-				explainSetInteger(ref iSub1,pParse.iNextSelectId);
-				rc=sqlite3Select(pParse,pPrior,ref intersectdest);
-				if(rc!=0) {
-					goto multi_select_end;
-				}
-				///
-				///<summary>
-				///Code the current SELECT into temporary table "tab2"
-				///
-				///</summary>
-				addr=v.sqlite3VdbeAddOp2(OP_OpenEphemeral,tab2,0);
-				Debug.Assert(p.addrOpenEphm[1]==-1);
-				p.addrOpenEphm[1]=addr;
-				p.pPrior=null;
-				pLimit=p.pLimit;
-				p.pLimit=null;
-				pOffset=p.pOffset;
-				p.pOffset=null;
-				intersectdest.iParm=tab2;
-				explainSetInteger(ref iSub2,pParse.iNextSelectId);
-				rc=sqlite3Select(pParse,p,ref intersectdest);
-				testcase(rc!=SQLITE_OK);
-				p.pPrior=pPrior;
-				if(p.nSelectRow>pPrior.nSelectRow)
-					p.nSelectRow=pPrior.nSelectRow;
-				sqlite3ExprDelete(db,ref p.pLimit);
-				p.pLimit=pLimit;
-				p.pOffset=pOffset;
-				///
-				///<summary>
-				///Generate code to take the intersection of the two temporary
-				///tables.
-				///
-				///</summary>
-				Debug.Assert(p.pEList!=null);
-				if(dest.eDest==SelectResultType.Output) {
-					Select pFirst=p;
-					while(pFirst.pPrior!=null)
-						pFirst=pFirst.pPrior;
-					generateColumnNames(pParse,null,pFirst.pEList);
-				}
-				iBreak=v.sqlite3VdbeMakeLabel();
-				iCont=v.sqlite3VdbeMakeLabel();
-				computeLimitRegisters(pParse,p,iBreak);
-				v.sqlite3VdbeAddOp2(OP_Rewind,tab1,iBreak);
-				r1=pParse.sqlite3GetTempReg();
-				iStart=v.sqlite3VdbeAddOp2(OP_RowKey,tab1,r1);
-				v.sqlite3VdbeAddOp4Int(OP_NotFound,tab2,iCont,r1,0);
-				pParse.sqlite3ReleaseTempReg(r1);
-				selectInnerLoop(pParse,p,p.pEList,tab1,p.pEList.nExpr,null,-1,dest,iCont,iBreak);
-				v.sqlite3VdbeResolveLabel(iCont);
-				v.sqlite3VdbeAddOp2(OP_Next,tab1,iStart);
-				v.sqlite3VdbeResolveLabel(iBreak);
-				v.sqlite3VdbeAddOp2(OP_Close,tab2,0);
-				v.sqlite3VdbeAddOp2(OP_Close,tab1,0);
-				break;
-			}
-			}
-			explainComposite(pParse,p.tk_op,iSub1,iSub2,p.tk_op!=TK_ALL);
-			///
-			///<summary>
-			///Compute collating sequences used by
-			///temporary tables needed to implement the compound select.
-			///Attach the KeyInfo structure to all temporary tables.
-			///
-			///</summary>
-			///<param name="This section is run by the right">most SELECT statement only.</param>
-			///<param name="SELECT statements to the left always skip this part.  The right">most</param>
-			///<param name="SELECT might also skip this part if it has no ORDER BY clause and">SELECT might also skip this part if it has no ORDER BY clause and</param>
-			///<param name="no temp tables are required.">no temp tables are required.</param>
-			///<param name=""></param>
-			if((p.selFlags&SelectFlags.UsesEphemeral)!=0) {
-				int i;
-				///
-				///<summary>
-				///Loop counter 
-				///</summary>
-				KeyInfo pKeyInfo;
-				///
-				///<summary>
-				///Collating sequence for the result set 
-				///</summary>
-				Select pLoop;
-				///
-				///<summary>
-				///For looping through SELECT statements 
-				///</summary>
-				CollSeq apColl;
-				///
-				///<summary>
-				///For looping through pKeyInfo.aColl[] 
-				///</summary>
-				int nCol;
-				///
-				///<summary>
-				///Number of columns in result set 
-				///</summary>
-				Debug.Assert(p.pRightmost==p);
-				nCol=p.pEList.nExpr;
-				pKeyInfo=new KeyInfo();
-				//sqlite3DbMallocZero(db,
-				pKeyInfo.aColl=new CollSeq[nCol];
-				//sizeof(*pKeyInfo)+nCol*(CollSeq*.Length + 1));
-				//if ( pKeyInfo == null )
-				//{
-				//  rc = SQLITE_NOMEM;
-				//  goto multi_select_end;
-				//}
-				pKeyInfo.enc=db.aDbStatic[0].pSchema.enc;
-				// ENC( pParse.db );
-				pKeyInfo.nField=(u16)nCol;
-				for(i=0;i<nCol;i++) {
-					//, apColl++){
-					apColl=multiSelectCollSeq(pParse,p,i);
-					if(null==apColl) {
-						apColl=db.pDfltColl;
-					}
-					pKeyInfo.aColl[i]=apColl;
-				}
-				for(pLoop=p;pLoop!=null;pLoop=pLoop.pPrior) {
-					for(i=0;i<2;i++) {
-						int addr=pLoop.addrOpenEphm[i];
-						if(addr<0) {
-							///
-							///<summary>
-							///If [0] is unused then [1] is also unused.  So we can
-							///always safely abort as soon as the first unused slot is found 
-							///</summary>
-							Debug.Assert(pLoop.addrOpenEphm[1]<0);
-							break;
-						}
-						v.sqlite3VdbeChangeP2(addr,nCol);
-						v.sqlite3VdbeChangeP4(addr,pKeyInfo,P4_KEYINFO);
-						pLoop.addrOpenEphm[i]=-1;
-					}
-				}
-				db.sqlite3DbFree(ref pKeyInfo);
-			}
-			multi_select_end:
-			pDest.iMem=dest.iMem;
-			pDest.nMem=dest.nMem;
-			sqlite3SelectDelete(db,ref pDelete);
-			return rc;
-		}
-		#endif
+		
 		///
 		///<summary>
 		///Code an output subroutine for a coroutine implementation of a
@@ -3131,9 +2280,9 @@ break;
 			///
 			///</summary>
 			p.pPrior=null;
-			sqlite3ResolveOrderGroupBy(pParse,p,p.pOrderBy,"ORDER");
+			ResolveExtensions.sqlite3ResolveOrderGroupBy(pParse,p,p.pOrderBy,"ORDER");
 			if(pPrior.pPrior==null) {
-				sqlite3ResolveOrderGroupBy(pParse,pPrior,pPrior.pOrderBy,"ORDER");
+				ResolveExtensions.sqlite3ResolveOrderGroupBy(pParse,pPrior,pPrior.pOrderBy,"ORDER");
 			}
 			///
 			///<summary>
@@ -3159,8 +2308,8 @@ break;
 			regEofB=++pParse.nMem;
 			regOutA=++pParse.nMem;
 			regOutB=++pParse.nMem;
-			sqlite3SelectDestInit(destA,SelectResultType.Coroutine,regAddrA);
-			sqlite3SelectDestInit(destB,SelectResultType.Coroutine,regAddrB);
+            destA.Init(SelectResultType.Coroutine, regAddrA);
+            destB.Init(SelectResultType.Coroutine, regAddrB);
 			///
 			///<summary>
 			///Jump past the various subroutines and coroutines to the main
@@ -3178,7 +2327,7 @@ break;
 			VdbeNoopComment(v,"Begin coroutine for left SELECT");
 			pPrior.iLimit=regLimitA;
 			explainSetInteger(ref iSub1,pParse.iNextSelectId);
-			sqlite3Select(pParse,pPrior,ref destA);
+			Select.sqlite3Select(pParse,pPrior,ref destA);
 			v.sqlite3VdbeAddOp2(OP_Integer,1,regEofA);
 			v.sqlite3VdbeAddOp1(OpCode.OP_Yield,regAddrA);
 			VdbeNoopComment(v,"End coroutine for left SELECT");
@@ -3195,7 +2344,7 @@ break;
 			p.iLimit=regLimitB;
 			p.iOffset=0;
 			explainSetInteger(ref iSub2,pParse.iNextSelectId);
-			sqlite3Select(pParse,p,ref destB);
+			Select.sqlite3Select(pParse,p,ref destB);
 			p.iLimit=savedLimit;
 			p.iOffset=savedOffset;
 			v.sqlite3VdbeAddOp2(OP_Integer,1,regEofB);
@@ -4305,7 +3454,7 @@ break;
 						Debug.Assert(pSel!=null);
 						while(pSel.pPrior!=null)
 							pSel=pSel.pPrior;
-						selectAddColumnTypeAndCollation(pParse,pTab.nCol,pTab.aCol,pSel);
+						Select.selectAddColumnTypeAndCollation(pParse,pTab.nCol,pTab.aCol,pSel);
 					}
 				}
 			}
@@ -4481,943 +3630,7 @@ break;
 			pParse.sqlite3ExprCacheClear();
 		}
 		
-		///<summary>
-		/// Generate code for the SELECT statement given in the p argument.
-		///
-		/// The results are distributed in various ways depending on the
-		/// contents of the SelectDest structure pointed to by argument pDest
-		/// as follows:
-		///
-		///     pDest.eDest    Result
-		///     ------------    -------------------------------------------
-		///     SelectResultType.Output      Generate a row of output (using the OP_ResultRow
-		///                     opcode) for each row in the result set.
-		///
-		///     SelectResultType.Mem         Only valid if the result is a single column.
-		///                     Store the first column of the first result row
-		///                     in register pDest.iParm then abandon the rest
-		///                     of the query.  This destination implies "LIMIT 1".
-		///
-		///     SelectResultType.Set         The result must be a single column.  Store each
-		///                     row of result as the key in table pDest.iParm.
-		///                     Apply the affinity pDest.affinity before storing
-		///                     results.  Used to implement "IN (SELECT ...)".
-		///
-		///     SelectResultType.Union       Store results as a key in a temporary table pDest.iParm.
-		///
-		///     SelectResultType.Except      Remove results from the temporary table pDest.iParm.
-		///
-		///     SelectResultType.Table       Store results in temporary table pDest.iParm.
-		///                     This is like SelectResultType.EphemTab except that the table
-		///                     is assumed to already be open.
-		///
-		///     SelectResultType.EphemTab    Create an temporary table pDest.iParm and store
-		///                     the result there. The cursor is left open after
-		///                     returning.  This is like SelectResultType.Table except that
-		///                     this destination uses OP_OpenEphemeral to create
-		///                     the table first.
-		///
-		///     SelectResultType.Coroutine   Generate a co-routine that returns a new row of
-		///                     results each time it is invoked.  The entry point
-		///                     of the co-routine is stored in register pDest.iParm.
-		///
-		///     SelectResultType.Exists      Store a 1 in memory cell pDest.iParm if the result
-		///                     set is not empty.
-		///
-		///     SelectResultType.Discard     Throw the results away.  This is used by SELECT
-		///                     statements within triggers whose only purpose is
-		///                     the side-effects of functions.
-		///
-		/// This routine returns the number of errors.  If any errors are
-		/// encountered, then an appropriate error message is left in
-		/// pParse.zErrMsg.
-		///
-		/// This routine does NOT free the Select structure passed in.  The
-		/// calling function needs to do that.
-		///
-		///</summary>
-		static SelectDest sdDummy=null;
-		static bool bDummy=false;
-		static int sqlite3Select(Parse pParse,/*The SELECT statement being coded.*/ Select p,/*What to do with the query results */ref SelectDest pDest) {
-            ///Loop counters 
-			int i,j;
-
-            ///Return from sqlite3WhereBegin() 
-            WhereInfo pWInfo;
-
-            ///The virtual machine under construction 
-            Vdbe v;
-
-            ///True for select lists like "count()" 
-            bool isAgg;
-
-            ///List of columns to extract. 
-            ExprList pEList = new ExprList();
-
-            ///List of tables to select from 
-            SrcList pTabList = new SrcList();
-
-            ///The WHERE clause.  May be NULL 
-            Expr pWhere;
-
-            ///The ORDER BY clause.  May be NULL 
-            ExprList pOrderBy;
-
-            ///The GROUP BY clause.  May be NULL 
-            ExprList pGroupBy;
-
-            ///The HAVING clause.  May be NULL 
-            Expr pHaving;
-
-            ///True if the DISTINCT keyword is present 
-            bool isDistinct;
-
-            ///Table to use for the distinct set 
-            int distinct;
-
-            ///Value to return from this function 
-            int rc = 1;
-
-            ///Address of an OP_OpenEphemeral instruction 
-            int addrSortIndex;
-
-            ///Information used by aggregate queries 
-            AggInfo sAggInfo;
-
-            ///Address of the end of the query 
-            int iEnd;
-
-            ///The database connection 
-            sqlite3 db;
-
-            #if !SQLITE_OMIT_EXPLAIN
-			int iRestoreSelectId=pParse.iSelectId;
-			pParse.iSelectId=pParse.iNextSelectId++;
-			#endif
-			db=pParse.db;
-			if(p==null/*|| db.mallocFailed != 0 */||pParse.nErr!=0) {
-				return 1;
-			}
-			#if !SQLITE_OMIT_AUTHORIZATION
-																																																																											if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
-#endif
-			sAggInfo=new AggInfo();
-			// memset(sAggInfo, 0, sAggInfo).Length;
-			if(pDest.eDest<=SelectResultType.Discard)//IgnorableOrderby(pDest))
-			 {
-				Debug.Assert(pDest.eDest==SelectResultType.Exists||pDest.eDest==SelectResultType.Union||pDest.eDest==SelectResultType.Except||pDest.eDest==SelectResultType.Discard);
-				///
-				///<summary>
-				///If ORDER BY makes no difference in the output then neither does
-				///DISTINCT so it can be removed too. 
-				///</summary>
-				sqlite3ExprListDelete(db,ref p.pOrderBy);
-				p.pOrderBy=null;
-				p.selFlags=(p.selFlags&~SelectFlags.Distinct);
-			}
-			Select.sqlite3SelectPrep(pParse,p,null);
-			pOrderBy=p.pOrderBy;
-			pTabList=p.pSrc;
-			pEList=p.pEList;
-			if(pParse.nErr!=0/*|| db.mallocFailed != 0*/) {
-				goto select_end;
-			}
-			isAgg=(p.selFlags&SelectFlags.Aggregate)!=0;
-			Debug.Assert(pEList!=null);
-			///
-			///<summary>
-			///Begin generating code.
-			///
-			///</summary>
-			v=pParse.sqlite3GetVdbe();
-			if(v==null)
-				goto select_end;
-			///
-			///<summary>
-			///If writing to memory or generating a set
-			///only a single column may be output.
-			///
-			///</summary>
-			#if !SQLITE_OMIT_SUBQUERY
-			if(checkForMultiColumnSelectError(pParse,pDest,pEList.nExpr)) {
-				goto select_end;
-			}
-			#endif
-	
-			///Generate code for all subqueries in the FROM clause
-			#if !SQLITE_OMIT_SUBQUERY || !SQLITE_OMIT_VIEW
-			for(i=0;p.pPrior==null&&i<pTabList.nSrc;i++) {
-				SrcList_item pItem=pTabList.a[i];
-				SelectDest dest=new SelectDest();
-				Select pSub=pItem.pSelect;
-				bool isAggSub;
-				if(pSub==null||pItem.isPopulated!=0)
-					continue;
-				///
-				///<summary>
-				///Increment Parse.nHeight by the height of the largest expression
-				///tree refered to by this, the parent select. The child select
-				///may contain expression trees of at most
-				///</summary>
-				///<param name="(SQLITE_MAX_EXPR_DEPTH">Parse.nHeight) height. This is a bit</param>
-				///<param name="more conservative than necessary, but much easier than enforcing">more conservative than necessary, but much easier than enforcing</param>
-				///<param name="an exact limit.">an exact limit.</param>
-				///<param name=""></param>
-				pParse.nHeight+=p.sqlite3SelectExprHeight();
-				///
-				///<summary>
-				///Check to see if the subquery can be absorbed into the parent. 
-				///</summary>
-				isAggSub=(pSub.selFlags&SelectFlags.Aggregate)!=0;
-				if(flattenSubquery(pParse,p,i,isAgg,isAggSub)!=0) {
-					if(isAggSub) {
-						isAgg=true;
-						p.selFlags|=SelectFlags.Aggregate;
-					}
-					i=-1;
-				}
-				else {
-					sqlite3SelectDestInit(dest,SelectResultType.EphemTab,pItem.iCursor);
-					Debug.Assert(0==pItem.isPopulated);
-					explainSetInteger(ref pItem.iSelectId,(int)pParse.iNextSelectId);
-					sqlite3Select(pParse,pSub,ref dest);
-					pItem.isPopulated=1;
-					pItem.pTab.nRowEst=(uint)pSub.nSelectRow;
-				}
-				//if ( /* pParse.nErr != 0 || */ db.mallocFailed != 0 )
-				//{
-				//  goto select_end;
-				//}
-				pParse.nHeight-=p.sqlite3SelectExprHeight();
-				pTabList=p.pSrc;
-				if(!(pDest.eDest<=SelectResultType.Discard))//        if( null==IgnorableOrderby(pDest) )
-				 {
-					pOrderBy=p.pOrderBy;
-				}
-			}
-			pEList=p.pEList;
-			#endif
-			pWhere=p.pWhere;
-			pGroupBy=p.pGroupBy;
-			pHaving=p.pHaving;
-			isDistinct=(p.selFlags&SelectFlags.Distinct)!=0;
-			#if !SQLITE_OMIT_COMPOUND_SELECT
-			///
-			///<summary>
-			///If there is are a sequence of queries, do the earlier ones first.
-			///</summary>
-			if(p.pPrior!=null) {
-				if(p.pRightmost==null) {
-					Select pLoop,pRight=null;
-					int cnt=0;
-					int mxSelect;
-					for(pLoop=p;pLoop!=null;pLoop=pLoop.pPrior,cnt++) {
-						pLoop.pRightmost=p;
-						pLoop.pNext=pRight;
-						pRight=pLoop;
-					}
-					mxSelect=db.aLimit[SQLITE_LIMIT_COMPOUND_SELECT];
-					if(mxSelect!=0&&cnt>mxSelect) {
-						sqlite3ErrorMsg(pParse,"too many terms in compound SELECT");
-						goto select_end;
-					}
-				}
-				rc=multiSelect(pParse,p,pDest);
-				explainSetInteger(ref pParse.iSelectId,iRestoreSelectId);
-				return rc;
-			}
-			#endif
-			///
-			///<summary>
-			///If possible, rewrite the query to use GROUP BY instead of DISTINCT.
-			///GROUP BY might use an index, DISTINCT never does.
-			///</summary>
-			Debug.Assert(p.pGroupBy==null||(p.selFlags&SelectFlags.Aggregate)!=0);
-			if((p.selFlags&(SelectFlags.Distinct|SelectFlags.Aggregate))==SelectFlags.Distinct) {
-				p.pGroupBy=sqlite3ExprListDup(db,p.pEList,0);
-				pGroupBy=p.pGroupBy;
-				p.selFlags=(p.selFlags&~SelectFlags.Distinct);
-			}
-			///
-			///<summary>
-			///If there is both a GROUP BY and an ORDER BY clause and they are
-			///identical, then disable the ORDER BY clause since the GROUP BY
-			///will cause elements to come out in the correct order.  This is
-			///</summary>
-			///<param name="an optimization "> the correct answer should result regardless.</param>
-			///<param name="Use the SQLITE_GroupByOrder flag with SQLITE_TESTCTRL_OPTIMIZER">Use the SQLITE_GroupByOrder flag with SQLITE_TESTCTRL_OPTIMIZER</param>
-			///<param name="to disable this optimization for testing purposes.">to disable this optimization for testing purposes.</param>
-			///<param name=""></param>
-			if(sqlite3ExprListCompare(p.pGroupBy,pOrderBy)==0&&(db.flags&SQLITE_GroupByOrder)==0) {
-				pOrderBy=null;
-			}
-			///
-			///<summary>
-			///If there is an ORDER BY clause, then this sorting
-			///index might end up being unused if the data can be
-			///</summary>
-			///<param name="extracted in pre">sorted order.  If that is the case, then the</param>
-			///<param name="OP_OpenEphemeral instruction will be changed to an OP_Noop once">OP_OpenEphemeral instruction will be changed to an OP_Noop once</param>
-			///<param name="we figure out that the sorting index is not needed.  The addrSortIndex">we figure out that the sorting index is not needed.  The addrSortIndex</param>
-			///<param name="variable is used to facilitate that change.">variable is used to facilitate that change.</param>
-			///<param name=""></param>
-			if(pOrderBy!=null) {
-				KeyInfo pKeyInfo;
-				pKeyInfo=keyInfoFromExprList(pParse,pOrderBy);
-				pOrderBy.iECursor=pParse.nTab++;
-				p.addrOpenEphm[2]=addrSortIndex=v.sqlite3VdbeAddOp4(OP_OpenEphemeral,pOrderBy.iECursor,pOrderBy.nExpr+2,0,pKeyInfo,P4_KEYINFO_HANDOFF);
-			}
-			else {
-				addrSortIndex=-1;
-			}
-			///
-			///<summary>
-			///If the output is destined for a temporary table, open that table.
-			///
-			///</summary>
-			if(pDest.eDest==SelectResultType.EphemTab) {
-				v.sqlite3VdbeAddOp2(OP_OpenEphemeral,pDest.iParm,pEList.nExpr);
-			}
-			///
-			///<summary>
-			///Set the limiter.
-			///
-			///</summary>
-			iEnd=v.sqlite3VdbeMakeLabel();
-			p.nSelectRow=(double)IntegerExtensions.LARGEST_INT64;
-			computeLimitRegisters(pParse,p,iEnd);
-			///
-			///<summary>
-			///Open a virtual index to use for the distinct set.
-			///
-			///</summary>
-			if((p.selFlags&SelectFlags.Distinct)!=0) {
-				KeyInfo pKeyInfo;
-				Debug.Assert(isAgg||pGroupBy!=null);
-				distinct=pParse.nTab++;
-				pKeyInfo=keyInfoFromExprList(pParse,p.pEList);
-				v.sqlite3VdbeAddOp4(OP_OpenEphemeral,distinct,0,0,pKeyInfo,P4_KEYINFO_HANDOFF);
-				v.sqlite3VdbeChangeP5(BTREE_UNORDERED);
-			}
-			else {
-				distinct=-1;
-			}
-			///
-			///<summary>
-			///</summary>
-			///<param name="Aggregate and non">aggregate queries are handled differently </param>
-			if(!isAgg&&pGroupBy==null) {
-				///
-				///<summary>
-				///</summary>
-				///<param name="This case is for non">aggregate queries</param>
-				///<param name="Begin the database scan">Begin the database scan</param>
-				///<param name=""></param>
-				pWInfo=pParse.sqlite3WhereBegin(pTabList,pWhere,ref pOrderBy,0);
-				if(pWInfo==null)
-					goto select_end;
-				if(pWInfo.nRowOut<p.nSelectRow)
-					p.nSelectRow=pWInfo.nRowOut;
-				///
-				///<summary>
-				///If sorting index that was created by a prior OP_OpenEphemeral
-				///instruction ended up not being needed, then change the OP_OpenEphemeral
-				///into an OP_Noop.
-				///
-				///</summary>
-				if(addrSortIndex>=0&&pOrderBy==null) {
-					sqlite3VdbeChangeToNoop(v,addrSortIndex,1);
-					p.addrOpenEphm[2]=-1;
-				}
-				///
-				///<summary>
-				///Use the standard inner loop
-				///
-				///</summary>
-				Debug.Assert(!isDistinct);
-				selectInnerLoop(pParse,p,pEList,0,0,pOrderBy,-1,pDest,pWInfo.iContinue,pWInfo.iBreak);
-				///
-				///<summary>
-				///End the database scan loop.
-				///
-				///</summary>
-				pWInfo.sqlite3WhereEnd();
-			}
-			else {
-				///This is the processing for aggregate queries 
-                
-                
-                ///Name context for processing aggregate information 
-                NameContext sNC;
-                ///First Mem address for storing current GROUP BY 
-                int iAMem;
-                ///First Mem address for previous GROUP BY 
-                int iBMem;
-                ///Mem address holding flag indicating that at least
-                ///one row of the input to the aggregator has been
-                ///processed 
-                int iUseFlag;
-                ///Mem address which causes query abort if positive 
-                int iAbortFlag;
-                ///Rows come from source in GR BY' clause thanROUP BY order 
-                int groupBySort;
-                ///End of processing for this SELECT 
-                int addrEnd;
-				///<summary>
-				///Remove any and all aliases between the result set and the
-				///GROUP BY clause.
-				///
-				///</summary>
-				if(pGroupBy!=null) {
-					int k;
-					///
-					///<summary>
-					///Loop counter 
-					///</summary>
-					ExprList_item pItem;
-					///
-					///<summary>
-					///For looping over expression in a list 
-					///</summary>
-					for(k=p.pEList.nExpr;k>0;k--)//, pItem++)
-					 {
-						pItem=p.pEList.a[p.pEList.nExpr-k];
-						pItem.iAlias=0;
-					}
-					for(k=pGroupBy.nExpr;k>0;k--)//, pItem++ )
-					 {
-						pItem=pGroupBy.a[pGroupBy.nExpr-k];
-						pItem.iAlias=0;
-					}
-					if(p.nSelectRow>(double)100)
-						p.nSelectRow=(double)100;
-				}
-				else {
-					p.nSelectRow=(double)1;
-				}
-				///
-				///<summary>
-				///Create a label to jump to when we want to abort the query 
-				///</summary>
-				addrEnd=v.sqlite3VdbeMakeLabel();
-				///
-				///<summary>
-				///Convert TK_COLUMN nodes into TK_AGG_COLUMN and make entries in
-				///sAggInfo for all TK_AGG_FUNCTION nodes in expressions of the
-				///SELECT statement.
-				///
-				///</summary>
-				sNC=new NameContext();
-				// memset(sNC, 0, sNC).Length;
-				sNC.pParse=pParse;
-				sNC.pSrcList=pTabList;
-				sNC.pAggInfo=sAggInfo;
-				sAggInfo.nSortingColumn=pGroupBy!=null?pGroupBy.nExpr+1:0;
-				sAggInfo.pGroupBy=pGroupBy;
-				sqlite3ExprAnalyzeAggList(sNC,pEList);
-				sqlite3ExprAnalyzeAggList(sNC,pOrderBy);
-				if(pHaving!=null) {
-					sqlite3ExprAnalyzeAggregates(sNC,ref pHaving);
-				}
-				sAggInfo.nAccumulator=sAggInfo.nColumn;
-				for(i=0;i<sAggInfo.nFunc;i++) {
-					Debug.Assert(!sAggInfo.aFunc[i].pExpr.ExprHasProperty(EP_xIsSelect));
-					sqlite3ExprAnalyzeAggList(sNC,sAggInfo.aFunc[i].pExpr.x.pList);
-				}
-				//      if ( db.mallocFailed != 0 ) goto select_end;
-				///
-				///<summary>
-				///Processing for aggregates with GROUP BY is very different and
-				///much more complex than aggregates without a GROUP BY.
-				///
-				///</summary>
-				if(pGroupBy!=null) {
-					KeyInfo pKeyInfo;
-					///
-					///<summary>
-					///Keying information for the group by clause 
-					///</summary>
-					int j1;
-					///
-					///<summary>
-					///</summary>
-					///<param name="A">B comparision jump </param>
-					int addrOutputRow;
-					///
-					///<summary>
-					///Start of subroutine that outputs a result row 
-					///</summary>
-					int regOutputRow;
-					///
-					///<summary>
-					///Return address register for output subroutine 
-					///</summary>
-					int addrSetAbort;
-					///
-					///<summary>
-					///Set the abort flag and return 
-					///</summary>
-					int addrTopOfLoop;
-					///
-					///<summary>
-					///Top of the input loop 
-					///</summary>
-					int addrSortingIdx;
-					///
-					///<summary>
-					///The OP_OpenEphemeral for the sorting index 
-					///</summary>
-					int addrReset;
-					///
-					///<summary>
-					///Subroutine for resetting the accumulator 
-					///</summary>
-					int regReset;
-					///
-					///<summary>
-					///Return address register for reset subroutine 
-					///</summary>
-					///
-					///<summary>
-					///If there is a GROUP BY clause we might need a sorting index to
-					///implement it.  Allocate that sorting index now.  If it turns out
-					///that we do not need it after all, the OpenEphemeral instruction
-					///will be converted into a Noop.
-					///
-					///</summary>
-					sAggInfo.sortingIdx=pParse.nTab++;
-					pKeyInfo=keyInfoFromExprList(pParse,pGroupBy);
-					addrSortingIdx=v.sqlite3VdbeAddOp4(OP_OpenEphemeral,sAggInfo.sortingIdx,sAggInfo.nSortingColumn,0,pKeyInfo,P4_KEYINFO_HANDOFF);
-					///
-					///<summary>
-					///Initialize memory locations used by GROUP BY aggregate processing
-					///
-					///</summary>
-					iUseFlag=++pParse.nMem;
-					iAbortFlag=++pParse.nMem;
-					regOutputRow=++pParse.nMem;
-					addrOutputRow=v.sqlite3VdbeMakeLabel();
-					regReset=++pParse.nMem;
-					addrReset=v.sqlite3VdbeMakeLabel();
-					iAMem=pParse.nMem+1;
-					pParse.nMem+=pGroupBy.nExpr;
-					iBMem=pParse.nMem+1;
-					pParse.nMem+=pGroupBy.nExpr;
-					v.sqlite3VdbeAddOp2(OP_Integer,0,iAbortFlag);
-					#if SQLITE_DEBUG
-																																																																																																																													          VdbeComment( v, "clear abort flag" );
-#endif
-					v.sqlite3VdbeAddOp2(OP_Integer,0,iUseFlag);
-					#if SQLITE_DEBUG
-																																																																																																																													          VdbeComment( v, "indicate accumulator empty" );
-#endif
-					///
-					///<summary>
-					///Begin a loop that will extract all source rows in GROUP BY order.
-					///This might involve two separate loops with an OP_Sort in between, or
-					///it might be a single loop that uses an index to extract information
-					///in the right order to begin with.
-					///</summary>
-					v.sqlite3VdbeAddOp2(OP_Gosub,regReset,addrReset);
-					pWInfo=pParse.sqlite3WhereBegin(pTabList,pWhere,ref pGroupBy,0);
-					if(pWInfo==null)
-						goto select_end;
-					if(pGroupBy==null) {
-						///
-						///<summary>
-						///The optimizer is able to deliver rows in group by order so
-						///we do not have to sort.  The OP_OpenEphemeral table will be
-						///cancelled later because we still need to use the pKeyInfo
-						///
-						///</summary>
-						pGroupBy=p.pGroupBy;
-						groupBySort=0;
-					}
-					else {
-						///
-						///<summary>
-						///Rows are coming out in undetermined order.  We have to push
-						///each row into a sorting index, terminate the first loop,
-						///then loop over the sorting index in order to get the output
-						///in sorted order
-						///
-						///</summary>
-						int regBase;
-						int regRecord;
-						int nCol;
-						int nGroupBy;
-						explainTempTable(pParse,isDistinct&&0==(p.selFlags&SelectFlags.Distinct)?"DISTINCT":"GROUP BY");
-						groupBySort=1;
-						nGroupBy=pGroupBy.nExpr;
-						nCol=nGroupBy+1;
-						j=nGroupBy+1;
-						for(i=0;i<sAggInfo.nColumn;i++) {
-							if(sAggInfo.aCol[i].iSorterColumn>=j) {
-								nCol++;
-								j++;
-							}
-						}
-						regBase=pParse.sqlite3GetTempRange(nCol);
-						pParse.sqlite3ExprCacheClear();
-						pParse.sqlite3ExprCodeExprList(pGroupBy,regBase,false);
-						v.sqlite3VdbeAddOp2(OP_Sequence,sAggInfo.sortingIdx,regBase+nGroupBy);
-						j=nGroupBy+1;
-						for(i=0;i<sAggInfo.nColumn;i++) {
-							AggInfo_col pCol=sAggInfo.aCol[i];
-							if(pCol.iSorterColumn>=j) {
-								int r1=j+regBase;
-								int r2;
-								r2=pParse.sqlite3ExprCodeGetColumn(pCol.pTab,pCol.iColumn,pCol.iTable,r1);
-								if(r1!=r2) {
-									v.sqlite3VdbeAddOp2(OP_SCopy,r2,r1);
-								}
-								j++;
-							}
-						}
-						regRecord=pParse.sqlite3GetTempReg();
-						v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord,regBase,nCol,regRecord);
-						v.sqlite3VdbeAddOp2(OP_IdxInsert,sAggInfo.sortingIdx,regRecord);
-						pParse.sqlite3ReleaseTempReg(regRecord);
-						pParse.sqlite3ReleaseTempRange(regBase,nCol);
-						pWInfo.sqlite3WhereEnd();
-						v.sqlite3VdbeAddOp2(OP_Sort,sAggInfo.sortingIdx,addrEnd);
-						#if SQLITE_DEBUG
-																																																																																																																																																						            VdbeComment( v, "GROUP BY sort" );
-#endif
-						sAggInfo.useSortingIdx=1;
-						pParse.sqlite3ExprCacheClear();
-					}
-					///
-					///<summary>
-					///Evaluate the current GROUP BY terms and store in b0, b1, b2...
-					///(b0 is memory location iBMem+0, b1 is iBMem+1, and so forth)
-					///Then compare the current GROUP BY terms against the GROUP BY terms
-					///from the previous row currently stored in a0, a1, a2...
-					///
-					///</summary>
-					addrTopOfLoop=v.sqlite3VdbeCurrentAddr();
-					pParse.sqlite3ExprCacheClear();
-					for(j=0;j<pGroupBy.nExpr;j++) {
-						if(groupBySort!=0) {
-							v.sqlite3VdbeAddOp3(OpCode.OP_Column,sAggInfo.sortingIdx,j,iBMem+j);
-						}
-						else {
-							sAggInfo.directMode=1;
-							pParse.sqlite3ExprCode(pGroupBy.a[j].pExpr,iBMem+j);
-						}
-					}
-					v.sqlite3VdbeAddOp4(OP_Compare,iAMem,iBMem,pGroupBy.nExpr,pKeyInfo,P4_KEYINFO);
-					j1=v.sqlite3VdbeCurrentAddr();
-					v.sqlite3VdbeAddOp3(OpCode.OP_Jump,j1+1,0,j1+1);
-					///
-					///<summary>
-					///Generate code that runs whenever the GROUP BY changes.
-					///Changes in the GROUP BY are detected by the previous code
-					///block.  If there were no changes, this block is skipped.
-					///
-					///This code copies current group by terms in b0,b1,b2,...
-					///over to a0,a1,a2.  It then calls the output subroutine
-					///and resets the aggregate accumulator registers in preparation
-					///for the next GROUP BY batch.
-					///
-					///</summary>
-					pParse.sqlite3ExprCodeMove(iBMem,iAMem,pGroupBy.nExpr);
-					v.sqlite3VdbeAddOp2(OP_Gosub,regOutputRow,addrOutputRow);
-					#if SQLITE_DEBUG
-																																																																																																																													          VdbeComment( v, "output one row" );
-#endif
-					v.sqlite3VdbeAddOp2(OP_IfPos,iAbortFlag,addrEnd);
-					#if SQLITE_DEBUG
-																																																																																																																													          VdbeComment( v, "check abort flag" );
-#endif
-					v.sqlite3VdbeAddOp2(OP_Gosub,regReset,addrReset);
-					#if SQLITE_DEBUG
-																																																																																																																													          VdbeComment( v, "reset accumulator" );
-#endif
-					///
-					///<summary>
-					///Update the aggregate accumulators based on the content of
-					///the current row
-					///</summary>
-					v.sqlite3VdbeJumpHere(j1);
-					updateAccumulator(pParse,sAggInfo);
-					v.sqlite3VdbeAddOp2(OP_Integer,1,iUseFlag);
-					#if SQLITE_DEBUG
-																																																																																																																													          VdbeComment( v, "indicate data in accumulator" );
-#endif
-					///
-					///<summary>
-					///End of the loop
-					///</summary>
-					if(groupBySort!=0) {
-						v.sqlite3VdbeAddOp2(OP_Next,sAggInfo.sortingIdx,addrTopOfLoop);
-					}
-					else {
-						pWInfo.sqlite3WhereEnd();
-						sqlite3VdbeChangeToNoop(v,addrSortingIdx,1);
-					}
-					///
-					///<summary>
-					///Output the final row of result
-					///
-					///</summary>
-					v.sqlite3VdbeAddOp2(OP_Gosub,regOutputRow,addrOutputRow);
-					#if SQLITE_DEBUG
-																																																																																																																													          VdbeComment( v, "output final row" );
-#endif
-					///
-					///<summary>
-					///Jump over the subroutines
-					///</summary>
-					v.sqlite3VdbeAddOp2(OP_Goto,0,addrEnd);
-					///
-					///<summary>
-					///Generate a subroutine that outputs a single row of the result
-					///set.  This subroutine first looks at the iUseFlag.  If iUseFlag
-					///</summary>
-					///<param name="is less than or equal to zero, the subroutine is a no">op.  If</param>
-					///<param name="the processing calls for the query to abort, this subroutine">the processing calls for the query to abort, this subroutine</param>
-					///<param name="increments the iAbortFlag memory location before returning in">increments the iAbortFlag memory location before returning in</param>
-					///<param name="order to signal the caller to abort.">order to signal the caller to abort.</param>
-					///<param name=""></param>
-					addrSetAbort=v.sqlite3VdbeCurrentAddr();
-					v.sqlite3VdbeAddOp2(OP_Integer,1,iAbortFlag);
-					VdbeComment(v,"set abort flag");
-					v.sqlite3VdbeAddOp1(OpCode.OP_Return,regOutputRow);
-					v.sqlite3VdbeResolveLabel(addrOutputRow);
-					addrOutputRow=v.sqlite3VdbeCurrentAddr();
-					v.sqlite3VdbeAddOp2(OP_IfPos,iUseFlag,addrOutputRow+2);
-					VdbeComment(v,"Groupby result generator entry point");
-					v.sqlite3VdbeAddOp1(OpCode.OP_Return,regOutputRow);
-					finalizeAggFunctions(pParse,sAggInfo);
-					pParse.sqlite3ExprIfFalse(pHaving,addrOutputRow+1,SQLITE_JUMPIFNULL);
-					selectInnerLoop(pParse,p,p.pEList,0,0,pOrderBy,distinct,pDest,addrOutputRow+1,addrSetAbort);
-					v.sqlite3VdbeAddOp1(OpCode.OP_Return,regOutputRow);
-					VdbeComment(v,"end groupby result generator");
-					///
-					///<summary>
-					///</summary>
-					///<param name="Generate a subroutine that will reset the group">by accumulator</param>
-					///<param name=""></param>
-					v.sqlite3VdbeResolveLabel(addrReset);
-					resetAccumulator(pParse,sAggInfo);
-					v.sqlite3VdbeAddOp1(OpCode.OP_Return,regReset);
-				}
-				///
-				///<summary>
-				///endif pGroupBy.  Begin aggregate queries without GROUP BY: 
-				///</summary>
-				else {
-					ExprList pDel=null;
-					#if !SQLITE_OMIT_BTREECOUNT
-					Table pTab;
-					if((pTab=isSimpleCount(p,sAggInfo))!=null) {
-						///
-						///<summary>
-						///If isSimpleCount() returns a pointer to a Table structure, then
-						///the SQL statement is of the form:
-						///
-						///SELECT count() FROM <tbl>
-						///
-						///where the Table structure returned represents table <tbl>.
-						///
-						///This statement is so common that it is optimized specially. The
-						///OP_Count instruction is executed either on the intkey table that
-						///contains the data for table <tbl> or on one of its indexes. It
-						///is better to execute the op on an index, as indexes are almost
-						///always spread across less pages than their corresponding tables.
-						///
-						///</summary>
-						int iDb=sqlite3SchemaToIndex(pParse.db,pTab.pSchema);
-						int iCsr=pParse.nTab++;
-						///
-						///<summary>
-						///</summary>
-						///<param name="Cursor to scan b">tree </param>
-						Index pIdx;
-						///
-						///<summary>
-						///Iterator variable 
-						///</summary>
-						KeyInfo pKeyInfo=null;
-						///
-						///<summary>
-						///Keyinfo for scanned index 
-						///</summary>
-						Index pBest=null;
-						///
-						///<summary>
-						///Best index found so far 
-						///</summary>
-						int iRoot=pTab.tnum;
-						///
-						///<summary>
-						///</summary>
-						///<param name="Root page of scanned b">tree </param>
-						sqlite3CodeVerifySchema(pParse,iDb);
-						sqlite3TableLock(pParse,iDb,pTab.tnum,0,pTab.zName);
-						///
-						///<summary>
-						///Search for the index that has the least amount of columns. If
-						///there is such an index, and it has less columns than the table
-						///does, then we can assume that it consumes less space on disk and
-						///will therefore be cheaper to scan to determine the query result.
-						///</summary>
-						///<param name="In this case set iRoot to the root page number of the index b">tree</param>
-						///<param name="and pKeyInfo to the KeyInfo structure required to navigate the">and pKeyInfo to the KeyInfo structure required to navigate the</param>
-						///<param name="index.">index.</param>
-						///<param name=""></param>
-						///<param name="(2011">15) Do not do a full scan of an unordered index.</param>
-						///<param name=""></param>
-						///<param name="In practice the KeyInfo structure will not be used. It is only">In practice the KeyInfo structure will not be used. It is only</param>
-						///<param name="passed to keep OP_OpenRead happy.">passed to keep OP_OpenRead happy.</param>
-						///<param name=""></param>
-						for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-							if(pIdx.bUnordered==0&&(null==pBest||pIdx.nColumn<pBest.nColumn)) {
-								pBest=pIdx;
-							}
-						}
-						if(pBest!=null&&pBest.nColumn<pTab.nCol) {
-							iRoot=pBest.tnum;
-							pKeyInfo=sqlite3IndexKeyinfo(pParse,pBest);
-						}
-						///
-						///<summary>
-						///</summary>
-						///<param name="Open a read">only cursor, execute the OP_Count, close the cursor. </param>
-						v.sqlite3VdbeAddOp3(OpCode.OP_OpenRead,iCsr,iRoot,iDb);
-						if(pKeyInfo!=null) {
-							v.sqlite3VdbeChangeP4(-1,pKeyInfo,P4_KEYINFO_HANDOFF);
-						}
-						v.sqlite3VdbeAddOp2(OP_Count,iCsr,sAggInfo.aFunc[0].iMem);
-						v.sqlite3VdbeAddOp1(OpCode.OP_Close,iCsr);
-                        pParse.explainSimpleCount(pTab, pBest);
-					}
-					else
-					#endif
-					 {
-						///
-						///<summary>
-						///Check if the query is of one of the following forms:
-						///
-						///SELECT min(x) FROM ...
-						///SELECT max(x) FROM ...
-						///
-						///If it is, then ask the code in where.c to attempt to sort results
-						///as if there was an "ORDER ON x" or "ORDER ON x DESC" clause.
-						///If where.c is able to produce results sorted in this order, then
-						///add vdbe code to break out of the processing loop after the
-						///first iteration (since the first iteration of the loop is
-						///guaranteed to operate on the row with the minimum or maximum
-						///value of x, the only row required).
-						///
-						///A special flag must be passed to sqlite3WhereBegin() to slightly
-						///modify behavior as follows:
-						///
-						///+ If the query is a "SELECT min(x)", then the loop coded by
-						///where.c should not iterate over any values with a NULL value
-						///for x.
-						///
-						///+ The optimizer code in where.c (the thing that decides which
-						///index or indices to use) should place a different priority on
-						///satisfying the 'ORDER BY' clause than it does in other cases.
-						///Refer to code and comments in where.c for details.
-						///
-						///</summary>
-						ExprList pMinMax=null;
-						int flag=minMaxQuery(p);
-						if(flag!=0) {
-							Debug.Assert(!p.pEList.a[0].pExpr.ExprHasProperty(EP_xIsSelect));
-							pMinMax=sqlite3ExprListDup(db,p.pEList.a[0].pExpr.x.pList,0);
-							pDel=pMinMax;
-							if(pMinMax!=null)///* && 0 == db.mallocFailed */ )
-							 {
-								pMinMax.a[0].sortOrder=(u8)(flag!=WHERE_ORDERBY_MIN?1:0);
-								pMinMax.a[0].pExpr.op=TK_COLUMN;
-							}
-						}
-						///
-						///<summary>
-						///This case runs if the aggregate has no GROUP BY clause.  The
-						///processing is much simpler since there is only a single row
-						///of output.
-						///
-						///</summary>
-						resetAccumulator(pParse,sAggInfo);
-						pWInfo=pParse.sqlite3WhereBegin(pTabList,pWhere,ref pMinMax,(byte)flag);
-						if(pWInfo==null) {
-							sqlite3ExprListDelete(db,ref pDel);
-							goto select_end;
-						}
-						updateAccumulator(pParse,sAggInfo);
-						if(pMinMax==null&&flag!=0) {
-							v.sqlite3VdbeAddOp2(OP_Goto,0,pWInfo.iBreak);
-							#if SQLITE_DEBUG
-																																																																																																																																																																															              VdbeComment( v, "%s() by index",
-              ( flag == WHERE_ORDERBY_MIN ? "min" : "max" ) );
-#endif
-						}
-						pWInfo.sqlite3WhereEnd();
-						finalizeAggFunctions(pParse,sAggInfo);
-					}
-					pOrderBy=null;
-					pParse.sqlite3ExprIfFalse(pHaving,addrEnd,SQLITE_JUMPIFNULL);
-					selectInnerLoop(pParse,p,p.pEList,0,0,null,-1,pDest,addrEnd,addrEnd);
-					sqlite3ExprListDelete(db,ref pDel);
-				}
-				v.sqlite3VdbeResolveLabel(addrEnd);
-			}
-			///
-			///<summary>
-			///endif aggregate query 
-			///</summary>
-			if(distinct>=0) {
-				explainTempTable(pParse,"DISTINCT");
-			}
-			///
-			///<summary>
-			///If there is an ORDER BY clause, then we need to sort the results
-			///and send them to the callback one by one.
-			///
-			///</summary>
-			if(pOrderBy!=null) {
-				explainTempTable(pParse,"ORDER BY");
-				generateSortTail(pParse,p,v,pEList.nExpr,pDest);
-			}
-			///
-			///<summary>
-			///Jump here to skip this query
-			///
-			///</summary>
-			v.sqlite3VdbeResolveLabel(iEnd);
-			///
-			///<summary>
-			///The SELECT was successfully coded.   Set the return code to 0
-			///to indicate no errors.
-			///
-			///</summary>
-			rc=0;
-			///
-			///<summary>
-			///Control jumps to here if an error is encountered above, or upon
-			///successful coding of the SELECT.
-			///
-			///</summary>
-			select_end:
-			explainSetInteger(ref pParse.iSelectId,iRestoreSelectId);
-			///
-			///<summary>
-			///Identify column names if results of the SELECT are to be output.
-			///
-			///</summary>
-			if(rc==SQLITE_OK&&pDest.eDest==SelectResultType.Output) {
-				generateColumnNames(pParse,pTabList,pEList);
-			}
-			db.sqlite3DbFree(ref sAggInfo.aCol);
-			db.sqlite3DbFree(ref sAggInfo.aFunc);
-			return rc;
-		}
-	
+		
 
 #if SQLITE_DEBUG
 																									    /*

@@ -1023,8 +1023,8 @@ return;
 				{
 					SelectDest sDest=new SelectDest();
 					Select pSelect=sqlite3SelectDup(db,pStep.pSelect,0);
-					sqlite3SelectDestInit(sDest,SelectResultType.Discard,0);
-					sqlite3Select(pParse,pSelect,ref sDest);
+                    sDest.Init(SelectResultType.Discard, 0);
+					Select.sqlite3Select(pParse,pSelect,ref sDest);
 					sqlite3SelectDelete(db,ref pSelect);
 					break;
 				}
@@ -1200,7 +1200,7 @@ return;
 				///<param name="OP_Halt inserted at the end of the program.  ">OP_Halt inserted at the end of the program.  </param>
 				if(pTrigger.pWhen!=null) {
 					pWhen=sqlite3ExprDup(db,pTrigger.pWhen,0);
-					if(SQLITE_OK==sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
+					if(SQLITE_OK==ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
 					) {
 						iEndTrigger=v.sqlite3VdbeMakeLabel();
 						pSubParse.sqlite3ExprIfFalse(pWhen,iEndTrigger,SQLITE_JUMPIFNULL);

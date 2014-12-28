@@ -1849,7 +1849,8 @@ goto begin_table_error;
 				sNC.pParse=pParse;
 				sNC.pSrcList=sSrc;
 				sNC.isCheck=1;
-				if(sqlite3ResolveExprNames(sNC,ref p.pCheck)!=0) {
+                if (ResolveExtensions.sqlite3ResolveExprNames(sNC, ref p.pCheck) != 0)
+                {
 					return;
 				}
 			}
@@ -1942,8 +1943,8 @@ goto begin_table_error;
 					v.sqlite3VdbeAddOp3(OP_OpenWrite,1,pParse.regRoot,iDb);
 					v.sqlite3VdbeChangeP5(1);
 					pParse.nTab=2;
-					sqlite3SelectDestInit(dest,SelectResultType.Table,1);
-					sqlite3Select(pParse,pSelect,ref dest);
+                    dest.Init(SelectResultType.Table, 1);
+					Select.sqlite3Select(pParse,pSelect,ref dest);
 					v.sqlite3VdbeAddOp1(OpCode.OP_Close,1);
 					if(pParse.nErr==0) {
 						pSelTab=sqlite3ResultSetOfSelect(pParse,pSelect);

@@ -310,7 +310,10 @@
     <Compile Include="src\Ast\IdentifierList.cs" />
     <Compile Include="src\Ast\InLoop.cs" />
     <Compile Include="src\Ast\select.cs" />
+    <Compile Include="src\Ast\SelectDest.cs" />
     <Compile Include="src\Ast\SelectExtensions.cs" />
+    <Compile Include="src\Ast\SelectResultType.cs" />
+    <Compile Include="src\Ast\SqcList.cs" />
     <Compile Include="src\Ast\Token.cs" />
     <Compile Include="src\Ast\Where.cs" />
     <Compile Include="src\BackupExtensions.cs" />
@@ -324,10 +327,13 @@
     <Compile Include="src\Engine\VdbeOp.cs" />
     <Compile Include="src\Index.cs" />
     <Compile Include="src\Mem.cs" />
+    <Compile Include="src\MemType.cs" />
     <Compile Include="src\MemPage.cs" />
     <Compile Include="src\MyHelpers.cs" />
     <Compile Include="src\Os\sqlite3_file.cs" />
     <Compile Include="src\ParseExtensions.cs" />
+    <Compile Include="src\Parse\NameContext.cs" />
+    <Compile Include="src\Parse\ResolveExtensions.cs" />
     <Compile Include="src\Schema\Column.cs" />
     <Compile Include="src\Schema\FKey.cs" />
     <Compile Include="src\Schema\Func.cs" />
@@ -343,7 +349,11 @@
     <Compile Include="src\Sqlite3_backup.cs" />
     <Compile Include="src\SqlResult.cs" />
     <Compile Include="src\TextEncodings.cs" />
+    <Compile Include="src\Utils\StreAccum.cs" />
     <Compile Include="src\Walker.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\Framework\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

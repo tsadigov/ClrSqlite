@@ -2543,7 +2543,7 @@ goto attach_end;
 				// memset( &sNameContext, 0, sizeof( NameContext ) );
 				sNameContext.pSrcList=pSrc;
 				sNameContext.pParse=this;
-				sqlite3ResolveExprNames(sNameContext,ref pWhere);
+				ResolveExtensions.sqlite3ResolveExprNames(sNameContext,ref pWhere);
 				///
 				///<summary>
 				///Create VDBE to loop through the entries in pSrc that match the WHERE
@@ -3205,7 +3205,7 @@ goto attach_end;
 						if(pRaise!=null) {
 							pRaise.affinity=(char)OE_Abort;
 						}
-						pSelect=sqlite3SelectNew(this,this.sqlite3ExprListAppend(0,pRaise),sqlite3SrcListAppend(db,0,tFrom,null),pWhere,null,null,null,0,null,null);
+						pSelect=Select.sqlite3SelectNew(this,this.sqlite3ExprListAppend(0,pRaise),sqlite3SrcListAppend(db,0,tFrom,null),pWhere,null,null,null,0,null,null);
 						pWhere=null;
 					}
 					///
@@ -3855,7 +3855,7 @@ isView = false;
 					#if SQLITE_DEBUG
 																																																																																																																																			        VdbeComment( v, "SELECT eof flag" );
 #endif
-					sqlite3SelectDestInit(dest,SelectResultType.Coroutine,++this.nMem);
+                    dest.Init(SelectResultType.Coroutine, ++this.nMem);
 					addrSelect=v.sqlite3VdbeCurrentAddr()+2;
 					v.sqlite3VdbeAddOp2(OP_Integer,addrSelect-1,dest.iParm);
 					j1=v.sqlite3VdbeAddOp2(OP_Goto,0,0);
@@ -3866,7 +3866,7 @@ isView = false;
 					///<summary>
 					///Resolve the expressions in the SELECT statement and execute it. 
 					///</summary>
-					rc=sqlite3Select(this,pSelect,ref dest);
+					rc=Select.sqlite3Select(this,pSelect,ref dest);
 					Debug.Assert(this.nErr==0||rc!=0);
 					if(rc!=0||NEVER(this.nErr!=0)///
 					///<summary>
@@ -3978,7 +3978,7 @@ isView = false;
 					Debug.Assert(!useTempTable);
 					nColumn=pList!=null?pList.nExpr:0;
 					for(i=0;i<nColumn;i++) {
-						if(sqlite3ResolveExprNames(sNC,ref pList.a[i].pExpr)!=0) {
+						if(ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pList.a[i].pExpr)!=0) {
 							goto insert_cleanup;
 						}
 					}
@@ -4892,11 +4892,11 @@ isView = false;
 						zSep=pIdx.nColumn>1?"columns ":"column ";
 						for(j=0;j<pIdx.nColumn;j++) {
 							string zCol=pTab.aCol[pIdx.aiColumn[j]].zName;
-							sqlite3StrAccumAppend(errMsg,zSep,-1);
+                            errMsg.sqlite3StrAccumAppend(zSep, -1);
 							zSep=", ";
-							sqlite3StrAccumAppend(errMsg,zCol,-1);
+                            errMsg.sqlite3StrAccumAppend(zCol, -1);
 						}
-						sqlite3StrAccumAppend(errMsg,pIdx.nColumn>1?" are not unique":" is not unique",-1);
+                        errMsg.sqlite3StrAccumAppend(pIdx.nColumn > 1 ? " are not unique" : " is not unique", -1);
 						zErr=sqlite3StrAccumFinish(errMsg);
 						sqlite3HaltConstraint(this,onError,zErr,0);
 						errMsg.db.sqlite3DbFree(ref zErr);
@@ -5412,7 +5412,7 @@ isView = false;
 				///</summary>
 				chngRowid=false;
 				for(i=0;i<pChanges.nExpr;i++) {
-					if(sqlite3ResolveExprNames(sNC,ref pChanges.a[i].pExpr)!=0) {
+					if(ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pChanges.a[i].pExpr)!=0) {
 						goto update_cleanup;
 					}
 					for(j=0;j<pTab.nCol;j++) {
@@ -5541,7 +5541,7 @@ aXRef[j] = -1;
 				///Resolve the column names in all the expressions in the
 				///WHERE clause.
 				///</summary>
-				if(sqlite3ResolveExprNames(sNC,ref pWhere)!=0) {
+				if(ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pWhere)!=0) {
 					goto update_cleanup;
 				}
 				///
@@ -5951,7 +5951,7 @@ aXRef[j] = -1;
 					}
 					pEList=this.sqlite3ExprListAppend(pEList,pExpr);
 				}
-				pSelect=sqlite3SelectNew(this,pEList,pSrc,pWhere,null,null,null,0,null,null);
+				pSelect=Select.sqlite3SelectNew(this,pEList,pSrc,pWhere,null,null,null,0,null,null);
 				///
 				///<summary>
 				///Create the ephemeral table into which the update results will
@@ -5967,8 +5967,8 @@ aXRef[j] = -1;
 				///fill the ephemeral table
 				///
 				///</summary>
-				sqlite3SelectDestInit(dest,SelectResultType.Table,ephemTab);
-				sqlite3Select(this,pSelect,ref dest);
+                dest.Init(SelectResultType.Table, ephemTab);
+				Select.sqlite3Select(this,pSelect,ref dest);
 				///
 				///<summary>
 				///Generate code to scan the ephemeral table and call VUpdate. 
@@ -6073,10 +6073,10 @@ aXRef[j] = -1;
 					//{
 					//  sqlite3SelectDelete( db, ref pDup );
 					//}
-					pDup=sqlite3SelectNew(this,null,pFrom,pWhere,null,null,null,0,null,null);
+					pDup=Select.sqlite3SelectNew(this,null,pFrom,pWhere,null,null,null,0,null,null);
 				}
-				sqlite3SelectDestInit(dest,SelectResultType.EphemTab,iCur);
-				sqlite3Select(this,pDup,ref dest);
+                dest.Init( SelectResultType.EphemTab, iCur);
+				Select.sqlite3Select(this,pDup,ref dest);
 				sqlite3SelectDelete(db,ref pDup);
 			}
 			public void sqlite3DeleteFrom(///
@@ -6285,7 +6285,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				// memset( &sNC, 0, sizeof( sNC ) );
 				sNC.pParse=this;
 				sNC.pSrcList=pTabList;
-				if(sqlite3ResolveExprNames(sNC,ref pWhere)!=0) {
+				if(ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pWhere)!=0) {
 					goto delete_from_cleanup;
 				}
 				///
@@ -8594,7 +8594,7 @@ return;
 				///<summary>
 				///Opcode of pRight 
 				///</summary>
-				if(!sqlite3IsLikeFunction(db,pExpr,ref pnoCase,wc)) {
+				if(!func.sqlite3IsLikeFunction(db,pExpr,ref pnoCase,wc)) {
 					return 0;
 				}
 				//#if SQLITE_EBCDIC
@@ -11957,11 +11957,11 @@ range_est_fallback:
 						SelectDest dest=new SelectDest();
 						ExprList pEList;
 						Debug.Assert(!isRowid);
-						sqlite3SelectDestInit(dest,SelectResultType.Set,pExpr.iTable);
+						dest.Init(SelectResultType.Set,pExpr.iTable);
 						dest.affinity=(char)affinity;
 						Debug.Assert((pExpr.iTable&0x0000FFFF)==pExpr.iTable);
 						pExpr.x.pSelect.iLimit=0;
-						if(sqlite3Select(this,pExpr.x.pSelect,ref dest)!=0) {
+						if(Select.sqlite3Select(this,pExpr.x.pSelect,ref dest)!=0) {
 							return 0;
 						}
 						pEList=pExpr.x.pSelect.pEList;
@@ -12068,7 +12068,7 @@ range_est_fallback:
 					Debug.Assert(pExpr.Operator==TokenType.TK_EXISTS||pExpr.Operator==TokenType.TK_SELECT);
 					Debug.Assert(pExpr.ExprHasProperty(EP_xIsSelect));
 					pSel=pExpr.x.pSelect;
-					sqlite3SelectDestInit(dest,0,++this.nMem);
+					dest.Init(0,++this.nMem);
 					if(pExpr.Operator==TokenType.TK_SELECT) {
 						dest.eDest=SelectResultType.Mem;
 						v.sqlite3VdbeAddOp2(OP_Null,0,dest.iParm);
@@ -12086,7 +12086,7 @@ range_est_fallback:
 					sqlite3ExprDelete(this.db,ref pSel.pLimit);
 					pSel.pLimit=this.sqlite3PExpr(TK_INTEGER,null,null,sqlite3IntTokens[1]);
 					pSel.iLimit=0;
-					if(sqlite3Select(this,pSel,ref dest)!=0) {
+					if(Select.sqlite3Select(this,pSel,ref dest)!=0) {
 						return 0;
 					}
 					rReg=dest.iParm;

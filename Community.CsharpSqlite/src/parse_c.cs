@@ -9786,7 +9786,7 @@ return yy_default[stateno];
 			//#line 396 "parse.y"
 			{
 				SelectDest dest=new SelectDest(SelectResultType.Output,'\0',0,0,0);
-				sqlite3Select(pParse,yymsp[0].minor.yy387,ref dest);
+				Select.sqlite3Select(pParse,yymsp[0].minor.yy387,ref dest);
 				sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387);
 			}
 			//#line 2512 "parse.c"
@@ -9838,7 +9838,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 424 "parse.y"
 			{
-				yygotominor.yy387=sqlite3SelectNew(pParse,yymsp[-6].minor.yy322,yymsp[-5].minor.yy259,yymsp[-4].minor.yy314,yymsp[-3].minor.yy322,yymsp[-2].minor.yy314,yymsp[-1].minor.yy322,yymsp[-7].minor.yy4,yymsp[0].minor.yy292.pLimit,yymsp[0].minor.yy292.pOffset);
+				yygotominor.yy387=Select.sqlite3SelectNew(pParse,yymsp[-6].minor.yy322,yymsp[-5].minor.yy259,yymsp[-4].minor.yy314,yymsp[-3].minor.yy322,yymsp[-2].minor.yy314,yymsp[-1].minor.yy322,yymsp[-7].minor.yy4,yymsp[0].minor.yy292.pLimit,yymsp[0].minor.yy292.pOffset);
 			}
 			//#line 2542 "parse.c"
 			break;
@@ -10029,7 +10029,7 @@ return yy_default[stateno];
 				else {
 					Select pSubquery;
 					sqlite3SrcListShiftJoinType(yymsp[-4].minor.yy259);
-					pSubquery=sqlite3SelectNew(pParse,0,yymsp[-4].minor.yy259,0,0,0,0,0,0,0);
+					pSubquery=Select.sqlite3SelectNew(pParse,0,yymsp[-4].minor.yy259,0,0,0,0,0,0,0);
 					yygotominor.yy259=sqlite3SrcListAppendFromTerm(pParse,yymsp[-6].minor.yy259,0,0,yymsp[-2].minor.yy0Token,pSubquery,yymsp[-1].minor.yy314,yymsp[0].minor.yy384);
 				}
 			}
@@ -11057,7 +11057,7 @@ return yy_default[stateno];
 				SrcList pSrc=sqlite3SrcListAppend(pParse.db,0,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token);
 				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_IN,yymsp[-3].minor.yy118.pExpr,0,0);
 				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.x.pSelect=sqlite3SelectNew(pParse,0,pSrc,0,0,0,0,0,0,0);
+					yygotominor.yy118.pExpr.x.pSelect=Select.sqlite3SelectNew(pParse,0,pSrc,0,0,0,0,0,0,0);
 					yygotominor.yy118.pExpr.ExprSetProperty(EP_xIsSelect);
 					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
 				}

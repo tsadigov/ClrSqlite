@@ -283,7 +283,7 @@ namespace Community.CsharpSqlite
         //  {nArg, SqliteEncoding.UTF8, flags, (void )arg, 0, likeFunc, 0, 0, #zName, 0, 0}
         private static FuncDef LIKEFUNC(string zName, i16 nArg, object arg, u8 flags)
         {
-            return new FuncDef(zName, SqliteEncoding.UTF8, nArg, arg, likeFunc, flags);
+            return new FuncDef(zName, SqliteEncoding.UTF8, nArg, arg, func.likeFunc, flags);
         }
         //#define AGGREGATE(zName, nArg, arg, nc, xStep, xFinal) \
         //  {nArg, SqliteEncoding.UTF8, nc*SQLITE_FUNC_NEEDCOLL, \

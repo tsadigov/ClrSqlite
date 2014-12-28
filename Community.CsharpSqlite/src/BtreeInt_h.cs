@@ -1231,10 +1231,10 @@ public static bool ISAUTOVACUUM =false;
 					this.nErr++;
 					va_start (ap, zFormat);
 					if (this.errMsg.zText.Length != 0) {
-						sqlite3StrAccumAppend (this.errMsg, "\n", 1);
+                        this.errMsg.sqlite3StrAccumAppend("\n", 1);
 					}
 					if (zMsg1.Length > 0) {
-						sqlite3StrAccumAppend (this.errMsg, zMsg1.ToString (), -1);
+                        this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
 					}
 					sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
 					va_end (ref ap);
@@ -1703,10 +1703,10 @@ public static bool ISAUTOVACUUM =false;
 					this.nErr++;
 					va_start (ap, zFormat);
 					if (this.errMsg.zText.Length != 0) {
-						sqlite3StrAccumAppend (this.errMsg, "\n", 1);
+                        this.errMsg.sqlite3StrAccumAppend("\n", 1);
 					}
 					if (zMsg1.Length > 0) {
-						sqlite3StrAccumAppend (this.errMsg, zMsg1.ToString (), -1);
+                        this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
 					}
 					sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
 					va_end (ref ap);

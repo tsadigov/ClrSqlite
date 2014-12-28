@@ -15,6 +15,7 @@ using ynVar = System.Int32;
 #endif
 namespace Community.CsharpSqlite {
 	public partial class Sqlite3 {
+
 		///<summary>
 		/// 2001 September 15
 		///

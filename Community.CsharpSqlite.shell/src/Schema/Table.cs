@@ -240,6 +240,25 @@ namespace Community.CsharpSqlite
                     return cp;
                 }
             }
+
+
+
+            ///<summary>
+            /// Return the index of a column in a table.  Return -1 if the column
+            /// is not contained in the table.
+            ///
+            ///</summary>
+            public int columnIndex( string zCol)
+            {
+                Table pTab = this;
+                int i;
+                for (i = 0; i < pTab.nCol; i++)
+                {
+                    if (pTab.aCol[i].zName.Equals(zCol, StringComparison.InvariantCultureIgnoreCase))
+                        return i;
+                }
+                return -1;
+            }
         };
 
 

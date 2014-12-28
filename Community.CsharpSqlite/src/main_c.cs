@@ -256,7 +256,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					sqlite3GlobalFunctions=new FuncDefHash();
 					FuncDefHash pHash=sqlite3GlobalFunctions;
 					#endif
-					sqlite3RegisterGlobalFunctions();
+					func.sqlite3RegisterGlobalFunctions();
 					if(sqlite3GlobalConfig.isPCacheInit==0) {
 						rc=sqlite3PcacheInitialize();
 					}
@@ -2665,7 +2665,7 @@ return z;
 			///<param name="is accessed.">is accessed.</param>
 			///<param name=""></param>
 			sqlite3Error(db,SQLITE_OK,0);
-			sqlite3RegisterBuiltinFunctions(db);
+			func.sqlite3RegisterBuiltinFunctions(db);
 			///
 			///<summary>
 			///</summary>

@@ -583,7 +583,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 }
                 sqlite3StrAccumInit(txt, null, 0, SQLITE_MAX_LENGTH);
                 txt.db = this;
-                sqlite3StrAccumAppend(txt, " (", 2);
+                txt.sqlite3StrAccumAppend(" (", 2);
                 for (i = 0; i < nEq; i++)
                 {
                     txt.explainAppendTerm(i, aCol[aiColumn[i]].zName, "=");
@@ -597,7 +597,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 {
                     txt.explainAppendTerm(i, aCol[aiColumn[j]].zName, "<");
                 }
-                sqlite3StrAccumAppend(txt, ")", 1);
+                txt.sqlite3StrAccumAppend(")", 1);
                 return sqlite3StrAccumFinish(txt);
             }
 

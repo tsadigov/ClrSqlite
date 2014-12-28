@@ -680,12 +680,12 @@ namespace Community.CsharpSqlite
 					amt = 1;
 					while (_fmt < fmt.Length && (c = (fmt [++_fmt])) != '%' && c != 0)
 						amt++;
-					sqlite3StrAccumAppend (pAccum, fmt.Substring (bufpt, amt), amt);
+                    pAccum.sqlite3StrAccumAppend(fmt.Substring(bufpt, amt), amt);
 					if (c == 0)
 						break;
 				}
 				if (_fmt < fmt.Length && (c = (fmt [++_fmt])) == 0) {
-					sqlite3StrAccumAppend (pAccum, "%", 1);
+                    pAccum.sqlite3StrAccumAppend("%", 1);
 					break;
 				}
 				///
@@ -1396,7 +1396,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 					else
 						pToken = va_arg (ap, (Token)null);
 					if (pToken != null) {
-						sqlite3StrAccumAppend (pAccum, pToken.zRestSql.ToString (), (int)pToken.Length);
+                        pAccum.sqlite3StrAccumAppend(pToken.zRestSql.ToString(), (int)pToken.Length);
 					}
 					length = width = 0;
 					break;
@@ -1407,10 +1407,10 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 					SrcList_item pItem = pSrc.a [k];
 					Debug.Assert (k >= 0 && k < pSrc.nSrc);
 					if (pItem.zDatabase != null) {
-						sqlite3StrAccumAppend (pAccum, pItem.zDatabase, -1);
-						sqlite3StrAccumAppend (pAccum, ".", 1);
+                        pAccum.sqlite3StrAccumAppend(pItem.zDatabase, -1);
+                        pAccum.sqlite3StrAccumAppend(".", 1);
 					}
-					sqlite3StrAccumAppend (pAccum, pItem.zName, -1);
+                    pAccum.sqlite3StrAccumAppend(pItem.zName, -1);
 					length = width = 0;
 					break;
 				}
@@ -1441,7 +1441,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 					}
 				}
 				if (length > 0) {
-					sqlite3StrAccumAppend (pAccum, new string (buf, bufpt, length), length);
+                    pAccum.sqlite3StrAccumAppend(new string(buf, bufpt, length), length);
 				}
 				if (flag_leftjustify) {
 					int nspace;
@@ -1461,67 +1461,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
 
 		}
 
-		///<summary>
-		///End of function
-		///</summary>
-		///<summary>
-		/// Append N bytes of text from z to the StrAccum object.
-		///
-		///</summary>
-		static void sqlite3StrAccumAppend (StrAccum p, string z, int N)
-		{
-			Debug.Assert (z != null || N == 0);
-			if (p.tooBig)//|| p.mallocFailed != 0 )
-			 {
-				testcase (p.tooBig);
-				//testcase( p.mallocFailed );
-				return;
-			}
-			if (N < 0) {
-				N = StringExtensions.sqlite3Strlen30 (z);
-			}
-			if (N == 0 || NEVER (z == null)) {
-				return;
-			}
-			//if( p->nChar+N >= p->nAlloc ){
-			//  string zNew;
-			//  if( null==p->useMalloc ){
-			//    p->tooBig = 1;
-			//    N = p->nAlloc - p->nChar - 1;
-			//    if( N<=0 ){
-			//      return;
-			//    }
-			//  }else{
-			//    string zOld = (p->zText==p->zBase ? 0 : p->zText);
-			//    i64 szNew = p->nChar;
-			//    szNew += N + 1;
-			//    if( szNew > p->mxAlloc ){
-			//      sqlite3StrAccumReset(p);
-			//      p->tooBig = 1;
-			//      return;
-			//    }else{
-			//      p->nAlloc = (int)szNew;
-			//    }
-			//    if( p->useMalloc==1 ){
-			//      zNew = sqlite3DbRealloc(p->db, zOld, p->nAlloc);
-			//    }else{
-			//      zNew = sqlite3_realloc(zOld, p->nAlloc);
-			//    }
-			//    if( zNew ){
-			//      if( zOld==0 ) memcpy(zNew, p->zText, p->nChar);
-			//      p->zText = zNew;
-			//    }else{
-			//      p->mallocFailed = 1;
-			//      sqlite3StrAccumReset(p);
-			//      return;
-			//    }
-			//  }
-			//}
-			//memcpy(&p->zText[p->nChar], z, N);
-			p.zText.Append (z.Substring (0, N <= z.Length ? N : z.Length));
-			//p.nChar += N;
-		}
-
+		
 		///<summary>
 		/// Finish off a string by making sure it is zero-terminated.
 		/// Return a pointer to the resulting string.  Return a NULL

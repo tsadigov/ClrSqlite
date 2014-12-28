@@ -1376,7 +1376,7 @@ else
 																								///</summary>
 																								if(zLeft.Equals("case_sensitive_like",StringComparison.InvariantCultureIgnoreCase)) {
 																									if(zRight!=null) {
-																										sqlite3RegisterLikeFunctions(db,sqlite3GetBoolean(zRight));
+																										func.sqlite3RegisterLikeFunctions(db,sqlite3GetBoolean(zRight));
 																									}
 																								}
 																								else

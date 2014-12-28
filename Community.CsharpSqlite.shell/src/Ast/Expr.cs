@@ -918,6 +918,205 @@ set { _op = value; }
             }
 
             public Token token { get; set; }
+
+
+
+
+
+
+
+
+
+
+            ///<summary>
+            /// Return a pointer to a string containing the 'declaration type' of the
+            /// expression pExpr. The string may be treated as static by the caller.
+            ///
+            /// The declaration type is the exact datatype definition extracted from the
+            /// original CREATE TABLE statement if the expression is a column. The
+            /// declaration type for a ROWID field is INTEGER. Exactly when an expression
+            /// is considered a column can be complex in the presence of subqueries. The
+            /// result-set expression in all of the following SELECT statements is
+            /// considered a column by this function.
+            ///
+            ///   SELECT col FROM tbl;
+            ///   SELECT (SELECT col FROM tbl;
+            ///   SELECT (SELECT col FROM tbl);
+            ///   SELECT abc FROM (SELECT col AS abc FROM tbl);
+            ///
+            /// The declaration type for any expression other than a column is NULL.
+            ///
+            ///</summary>
+            public string columnType( NameContext pNC, ref string pzOriginDb, ref string pzOriginTab, ref string pzOriginCol)
+            {
+
+                Expr pExpr = this;
+
+                string zType = null;
+                string zOriginDb = null;
+                string zOriginTab = null;
+                string zOriginCol = null;
+                int j;
+                if (NEVER(pExpr == null) || pNC.pSrcList == null)
+                    return null;
+                switch (pExpr.op)
+                {
+                    case TK_AGG_COLUMN:
+                    case TK_COLUMN:
+                        {
+                            ///
+                            ///<summary>
+                            ///The expression is a column. Locate the table the column is being
+                            ///extracted from in NameContext.pSrcList. This table may be real
+                            ///database table or a subquery.
+                            ///
+                            ///</summary>
+                            Table pTab = null;
+                            ///
+                            ///<summary>
+                            ///Table structure column is extracted from 
+                            ///</summary>
+                            Select pS = null;
+                            ///
+                            ///<summary>
+                            ///Select the column is extracted from 
+                            ///</summary>
+                            int iCol = pExpr.iColumn;
+                            ///
+                            ///<summary>
+                            ///Index of column in pTab 
+                            ///</summary>
+                            testcase(pExpr.op == TK_AGG_COLUMN);
+                            testcase(pExpr.op == TK_COLUMN);
+                            while (pNC != null && pTab == null)
+                            {
+                                SrcList pTabList = pNC.pSrcList;
+                                for (j = 0; j < pTabList.nSrc && pTabList.a[j].iCursor != pExpr.iTable; j++)
+                                    ;
+                                if (j < pTabList.nSrc)
+                                {
+                                    pTab = pTabList.a[j].pTab;
+                                    pS = pTabList.a[j].pSelect;
+                                }
+                                else
+                                {
+                                    pNC = pNC.pNext;
+                                }
+                            }
+                            if (pTab == null)
+                            {
+                                ///
+                                ///<summary>
+                                ///At one time, code such as "SELECT new.x" within a trigger would
+                                ///cause this condition to run.  Since then, we have restructured how
+                                ///trigger code is generated and so this condition is no longer 
+                                ///possible. However, it can still be true for statements like
+                                ///the following:
+                                ///
+                                ///CREATE TABLE t1(col INTEGER);
+                                ///SELECT (SELECT t1.col) FROM FROM t1;
+                                ///
+                                ///when columnType() is called on the expression "t1.col" in the 
+                                ///</summary>
+                                ///<param name="sub">select. In this case, set the column type to NULL, even</param>
+                                ///<param name="though it should really be "INTEGER".">though it should really be "INTEGER".</param>
+                                ///<param name=""></param>
+                                ///<param name="This is not a problem, as the column type of "t1.col" is never">This is not a problem, as the column type of "t1.col" is never</param>
+                                ///<param name="used. When columnType() is called on the expression ">used. When columnType() is called on the expression </param>
+                                ///<param name=""(SELECT t1.col)", the correct type is returned (see the TK_SELECT">"(SELECT t1.col)", the correct type is returned (see the TK_SELECT</param>
+                                ///<param name="branch below.  ">branch below.  </param>
+                                break;
+                            }
+                            //Debug.Assert( pTab != null && pExpr.pTab == pTab );
+                            if (pS != null)
+                            {
+                                ///
+                                ///<summary>
+                                ///</summary>
+                                ///<param name="The "table" is actually a sub">select or a view in the FROM clause</param>
+                                ///<param name="of the SELECT statement. Return the declaration type and origin">of the SELECT statement. Return the declaration type and origin</param>
+                                ///<param name="data for the result">select.</param>
+                                ///<param name=""></param>
+                                if (iCol >= 0 && ALWAYS(iCol < pS.pEList.nExpr))
+                                {
+                                    ///
+                                    ///<summary>
+                                    ///If iCol is less than zero, then the expression requests the
+                                    ///</summary>
+                                    ///<param name="rowid of the sub">select or view. This expression is legal (see</param>
+                                    ///<param name="test case misc2.2.2) "> it always evaluates to NULL.</param>
+                                    ///<param name=""></param>
+                                    NameContext sNC = new NameContext();
+                                    Expr expr = pS.pEList.a[iCol].pExpr;
+                                    sNC.pSrcList = pS.pSrc;
+                                    sNC.pNext = pNC;
+                                    sNC.pParse = pNC.pParse;
+                                    zType = expr.columnType( sNC, ref zOriginDb, ref zOriginTab, ref zOriginCol);
+                                }
+                            }
+                            else
+                                if (ALWAYS(pTab.pSchema))
+                                {
+                                    ///
+                                    ///<summary>
+                                    ///A real table 
+                                    ///</summary>
+                                    Debug.Assert(pS == null);
+                                    if (iCol < 0)
+                                        iCol = pTab.iPKey;
+                                    Debug.Assert(iCol == -1 || (iCol >= 0 && iCol < pTab.nCol));
+                                    if (iCol < 0)
+                                    {
+                                        zType = "INTEGER";
+                                        zOriginCol = "rowid";
+                                    }
+                                    else
+                                    {
+                                        zType = pTab.aCol[iCol].zType;
+                                        zOriginCol = pTab.aCol[iCol].zName;
+                                    }
+                                    zOriginTab = pTab.zName;
+                                    if (pNC.pParse != null)
+                                    {
+                                        int iDb = sqlite3SchemaToIndex(pNC.pParse.db, pTab.pSchema);
+                                        zOriginDb = pNC.pParse.db.aDb[iDb].zName;
+                                    }
+                                }
+                            break;
+                        }
+#if !SQLITE_OMIT_SUBQUERY
+                    case TK_SELECT:
+                        {
+                            ///
+                            ///<summary>
+                            ///</summary>
+                            ///<param name="The expression is a sub">select. Return the declaration type and</param>
+                            ///<param name="origin info for the single column in the result set of the SELECT">origin info for the single column in the result set of the SELECT</param>
+                            ///<param name="statement.">statement.</param>
+                            ///<param name=""></param>
+                            NameContext sNC = new NameContext();
+                            Select pS = pExpr.x.pSelect;
+                            Expr expr = pS.pEList.a[0].pExpr;
+                            Debug.Assert(pExpr.ExprHasProperty(EP_xIsSelect));
+                            sNC.pSrcList = pS.pSrc;
+                            sNC.pNext = pNC;
+                            sNC.pParse = pNC.pParse;
+                            zType = expr.columnType( sNC, ref zOriginDb, ref zOriginTab, ref zOriginCol);
+                            break;
+                        }
+#endif
+                }
+                //if ( pzOriginDb != null )
+                {
+                    //Debug.Assert( pzOriginTab != null && pzOriginCol != null );
+                    pzOriginDb = zOriginDb;
+                    pzOriginTab = zOriginTab;
+                    pzOriginCol = zOriginCol;
+                }
+                return zType;
+            }
+		
+
         }
 
 
@@ -1364,5 +1563,8 @@ set { _op = value; }
             }
         }
 
+
+
+        
     }
 }

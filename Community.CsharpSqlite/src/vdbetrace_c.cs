@@ -160,8 +160,8 @@ namespace Community.CsharpSqlite
 					//string zStart = zRawSql;
 					while (zRawSql [izRawSql++] != '\n' && izRawSql < zRawSql.Length)
 						;
-					sqlite3StrAccumAppend (_out, "-- ", 3);
-					sqlite3StrAccumAppend (_out, zRawSql, (int)izRawSql);
+                    _out.sqlite3StrAccumAppend("-- ", 3);
+                    _out.sqlite3StrAccumAppend(zRawSql, (int)izRawSql);
 					//zRawSql - zStart );
 				}
 			}
@@ -169,7 +169,7 @@ namespace Community.CsharpSqlite
 				while (izRawSql < zRawSql.Length) {
 					n = findNextHostParameter (zRawSql, izRawSql, ref nToken);
 					Debug.Assert (n > 0);
-					sqlite3StrAccumAppend (_out, zRawSql.Substring (izRawSql, n), n);
+                    _out.sqlite3StrAccumAppend(zRawSql.Substring(izRawSql, n), n);
 					izRawSql += n;
 					Debug.Assert (izRawSql < zRawSql.Length || nToken == 0);
 					if (nToken == 0)
@@ -196,7 +196,7 @@ namespace Community.CsharpSqlite
 					Debug.Assert (idx > 0 && idx <= p.nVar);
 					pVar = p.aVar [idx - 1];
 					if ((pVar.flags & MEM_Null) != 0) {
-						sqlite3StrAccumAppend (_out, "NULL", 4);
+                        _out.sqlite3StrAccumAppend("NULL", 4);
 					}
 					else
 						if ((pVar.flags & MEM_Int) != 0) {
@@ -230,11 +230,11 @@ sqlite3VdbeMemRelease(&utf8);
 									}
 									else {
 										Debug.Assert ((pVar.flags & MEM_Blob) != 0);
-										sqlite3StrAccumAppend (_out, "x'", 2);
+                                        _out.sqlite3StrAccumAppend("x'", 2);
 										for (i = 0; i < pVar.n; i++) {
 											sqlite3XPrintf (_out, "%02x", pVar.zBLOB [i] & 0xff);
 										}
-										sqlite3StrAccumAppend (_out, "'", 1);
+                                        _out.sqlite3StrAccumAppend( "'", 1);
 									}
 				}
 			}
