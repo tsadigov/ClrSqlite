@@ -1561,13 +1561,13 @@ return rc;
                 ///<param name="source file journal.c).">source file journal.c).</param>
                 ///<param name=""></param>
 
-                if (sqlite3JournalSize(pVfs) > sqlite3MemJournalSize())
+                if (sqlite3JournalSize(pVfs) > memjrnl.sqlite3MemJournalSize())
                 {
                     journalFileSize = ROUND8(sqlite3JournalSize(pVfs));
                 }
                 else
                 {
-                    journalFileSize = ROUND8(sqlite3MemJournalSize());
+                    journalFileSize = ROUND8(memjrnl.sqlite3MemJournalSize());
                 }
                 ///
                 ///<summary>

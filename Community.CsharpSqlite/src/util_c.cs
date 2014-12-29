@@ -176,6 +176,24 @@ namespace Community.CsharpSqlite
 	}
 	public partial class MathExtensions
 	{
+        ///<summary>
+        ///Macro to find the minimum of two numeric values.
+        ///
+        ///</summary>
+        //#if !MIN
+        //# define MIN(x,y) ((x)<(y)?(x):(y))
+        //#endif
+        public static int MIN(int x, int y)
+        {
+            return (x < y) ? x : y;
+        }
+
+        public static int MIN(int x, u32 y)
+        {
+            return (x < y) ? x : (int)y;
+        }
+
+
 		public static void testcase (object o)
 		{
 		}

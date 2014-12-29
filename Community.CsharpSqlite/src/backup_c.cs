@@ -318,7 +318,7 @@ namespace Community.CsharpSqlite {
 							///<summary>
 							///Write the extra pages and truncate the database file as required. 
 							///</summary>
-							iEnd=MIN(PENDING_BYTE+pgszDest,iSize);
+                            iEnd = MathExtensions.MIN(PENDING_BYTE + pgszDest, iSize);
 							for(iOff=PENDING_BYTE+pgszSrc;rc==SQLITE_OK&&iOff<iEnd;iOff+=pgszSrc) {
 								PgHdr pSrcPg=null;
 								u32 iSrcPg=(u32)((iOff/pgszSrc)+1);
@@ -484,7 +484,7 @@ namespace Community.CsharpSqlite {
 				Pager pDestPager=this.pDest.sqlite3BtreePager();
 				int nSrcPgsz=this.pSrc.GetPageSize();
 				int nDestPgsz=this.pDest.GetPageSize();
-				int nCopy=MIN(nSrcPgsz,nDestPgsz);
+                int nCopy = MathExtensions.MIN(nSrcPgsz, nDestPgsz);
 				i64 iEnd=(i64)iSrcPg*(i64)nSrcPgsz;
 				#if SQLITE_HAS_CODEC
 				int nSrcReserve=this.pSrc.GetReserve();

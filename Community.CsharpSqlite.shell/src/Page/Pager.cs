@@ -1844,7 +1844,7 @@ return (pPager->pWal!=0);
                     {
                         sqlite3BitvecDestroy(ref this.aSavepoint[ii].pInSavepoint);
                     }
-                    if (!this.exclusiveMode || sqlite3IsMemJournal(this.sjfd))
+                    if (!this.exclusiveMode || memjrnl.sqlite3IsMemJournal(this.sjfd))
                     {
                         sqlite3OsClose(this.sjfd);
                     }
@@ -2107,7 +2107,7 @@ return (pPager->pWal!=0);
                         ///Finalize the journal file. 
                         ///</summary>
 
-                        if (sqlite3IsMemJournal(this.jfd))
+                        if (memjrnl.sqlite3IsMemJournal(this.jfd))
                         {
                             Debug.Assert(this.journalMode == PAGER_JOURNALMODE_MEMORY);
                             sqlite3OsClose(this.jfd);
@@ -4519,7 +4519,7 @@ pPager.pWal = 0;
                     {
                         if (this.journalMode == PAGER_JOURNALMODE_MEMORY || this.subjInMemory != 0)
                         {
-                            sqlite3MemJournalOpen(this.sjfd);
+                            memjrnl.sqlite3MemJournalOpen(this.sjfd);
                         }
                         else
                         {
@@ -5338,7 +5338,7 @@ this.memDb != 0
                         {
                             if (this.journalMode == PAGER_JOURNALMODE_MEMORY)
                             {
-                                sqlite3MemJournalOpen(this.jfd);
+                                memjrnl.sqlite3MemJournalOpen(this.jfd);
                             }
                             else
                             {
@@ -6364,7 +6364,7 @@ rc = pager_incr_changecounter(pPager, 0);
                                 ///</summary>
                                 ///<param name="Only truncate if it is an in">journal. </param>
 
-                                if (sqlite3IsMemJournal(this.sjfd))
+                                if (memjrnl.sqlite3IsMemJournal(this.sjfd))
                                 {
                                     rc = sqlite3OsTruncate(this.sjfd, 0);
                                     Debug.Assert(rc == SQLITE_OK);

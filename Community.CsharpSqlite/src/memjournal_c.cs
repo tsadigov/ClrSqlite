@@ -61,22 +61,6 @@ namespace Community.CsharpSqlite
 		//#define JOURNAL_CHUNKSIZE ((int)(1024-sizeof(FileChunk*)))
 		const int JOURNAL_CHUNKSIZE = 4096;
 
-		///<summary>
-		///Macro to find the minimum of two numeric values.
-		///
-		///</summary>
-		//#if !MIN
-		//# define MIN(x,y) ((x)<(y)?(x):(y))
-		//#endif
-		static int MIN (int x, int y)
-		{
-			return (x < y) ? x : y;
-		}
-
-		static int MIN (int x, u32 y)
-		{
-			return (x < y) ? x : (int)y;
-		}
 
 		///<summary>
 		/// The rollback journal is composed of a linked list of these structures.
@@ -171,330 +155,266 @@ namespace Community.CsharpSqlite
 			}
 		}
 
-		///<summary>
-		/// Read data from the in-memory journal file.  This is the implementation
-		/// of the sqlite3_vfs.xRead method.
-		///
-		///</summary>
-		static int memjrnlRead (sqlite3_file pJfd, ///
-///<summary>
-///The journal file from which to read 
-///</summary>
 
-		byte[] zBuf, ///
-///<summary>
-///Put the results here 
-///</summary>
+        public class memjrnl {
 
-		int iAmt, ///
-///<summary>
-///Number of bytes to read 
-///</summary>
+            ///<summary>
+            /// Read data from the in-memory journal file.  This is the implementation
+            /// of the sqlite3_vfs.xRead method.
+            ///</summary>
+            public static int memjrnlRead(/*The journal file from which to read */sqlite3_file pJfd, /*Put the results here */byte[] zBuf,
+                /*Number of bytes to read */int iAmt, /*Begin reading at this offset */sqlite3_int64 iOfst)
+            {
+                MemJournal p = (MemJournal)pJfd;
+                byte[] zOut = zBuf;
+                int nRead = iAmt;
+                int iChunkOffset;
+                FileChunk pChunk;
+                ///SQLite never tries to read past the end of a rollback journal file 
 
-		sqlite3_int64 iOfst///
-///<summary>
-///Begin reading at this offset 
-///</summary>
+                Debug.Assert(iOfst + iAmt <= p.endpoint.iOffset);
+                if (p.readpoint.iOffset != iOfst || iOfst == 0)
+                {
+                    int iOff = 0;
+                    for (pChunk = p.pFirst; ALWAYS(pChunk != null) && (iOff + JOURNAL_CHUNKSIZE) <= iOfst; pChunk = pChunk.pNext)
+                    {
+                        iOff += JOURNAL_CHUNKSIZE;
+                    }
+                }
+                else
+                {
+                    pChunk = p.readpoint.pChunk;
+                }
+                iChunkOffset = (int)(iOfst % JOURNAL_CHUNKSIZE);
+                int izOut = 0;
+                do
+                {
+                    int iSpace = JOURNAL_CHUNKSIZE - iChunkOffset;
+                    int nCopy = MathExtensions.MIN(nRead, (JOURNAL_CHUNKSIZE - iChunkOffset));
+                    Buffer.BlockCopy(pChunk.zChunk, iChunkOffset, zOut, izOut, nCopy);
+                    //memcpy( zOut, pChunk.zChunk[iChunkOffset], nCopy );
+                    izOut += nCopy;
+                    // zOut += nCopy;
+                    nRead -= iSpace;
+                    iChunkOffset = 0;
+                }
+                while (nRead >= 0 && (pChunk = pChunk.pNext) != null && nRead > 0);
+                p.readpoint.iOffset = (int)(iOfst + iAmt);
+                p.readpoint.pChunk = pChunk;
+                return SQLITE_OK;
+            }
 
-		)
-		{
-			MemJournal p = (MemJournal)pJfd;
-			byte[] zOut = zBuf;
-			int nRead = iAmt;
-			int iChunkOffset;
-			FileChunk pChunk;
-			///
-///<summary>
-///SQLite never tries to read past the end of a rollback journal file 
-///</summary>
+            ///<summary>
+            /// Write data to the file.
+            ///
+            ///</summary>
+            public static int memjrnlWrite(sqlite3_file pJfd, ///
+                ///The journal file into which to write 
 
-			Debug.Assert (iOfst + iAmt <= p.endpoint.iOffset);
-			if (p.readpoint.iOffset != iOfst || iOfst == 0) {
-				int iOff = 0;
-				for (pChunk = p.pFirst; ALWAYS (pChunk != null) && (iOff + JOURNAL_CHUNKSIZE) <= iOfst; pChunk = pChunk.pNext) {
-					iOff += JOURNAL_CHUNKSIZE;
-				}
-			}
-			else {
-				pChunk = p.readpoint.pChunk;
-			}
-			iChunkOffset = (int)(iOfst % JOURNAL_CHUNKSIZE);
-			int izOut = 0;
-			do {
-				int iSpace = JOURNAL_CHUNKSIZE - iChunkOffset;
-				int nCopy = MIN (nRead, (JOURNAL_CHUNKSIZE - iChunkOffset));
-				Buffer.BlockCopy (pChunk.zChunk, iChunkOffset, zOut, izOut, nCopy);
-				//memcpy( zOut, pChunk.zChunk[iChunkOffset], nCopy );
-				izOut += nCopy;
-				// zOut += nCopy;
-				nRead -= iSpace;
-				iChunkOffset = 0;
-			}
-			while (nRead >= 0 && (pChunk = pChunk.pNext) != null && nRead > 0);
-			p.readpoint.iOffset = (int)(iOfst + iAmt);
-			p.readpoint.pChunk = pChunk;
-			return SQLITE_OK;
-		}
+            byte[] zBuf, ///
+                ///Take data to be written from here 
 
-		///<summary>
-		/// Write data to the file.
-		///
-		///</summary>
-		static int memjrnlWrite (sqlite3_file pJfd, ///
-///<summary>
-///The journal file into which to write 
-///</summary>
+            int iAmt, ///
+                ///Number of bytes to write 
 
-		byte[] zBuf, ///
-///<summary>
-///Take data to be written from here 
-///</summary>
+            sqlite3_int64 iOfst///
+                ///Begin writing at this offset into the file 
 
-		int iAmt, ///
-///<summary>
-///Number of bytes to write 
-///</summary>
+            )
+            {
+                MemJournal p = (MemJournal)pJfd;
+                int nWrite = iAmt;
+                byte[] zWrite = zBuf;
+                int izWrite = 0;
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="An in">memory journal file should only ever be appended to. Random</param>
+                ///<param name="access writes are not required by sqlite.">access writes are not required by sqlite.</param>
+                ///<param name=""></param>
 
-		sqlite3_int64 iOfst///
-///<summary>
-///Begin writing at this offset into the file 
-///</summary>
+                Debug.Assert(iOfst == p.endpoint.iOffset);
+                UNUSED_PARAMETER(iOfst);
+                while (nWrite > 0)
+                {
+                    FileChunk pChunk = p.endpoint.pChunk;
+                    int iChunkOffset = (int)(p.endpoint.iOffset % JOURNAL_CHUNKSIZE);
+                    int iSpace = MathExtensions.MIN(nWrite, JOURNAL_CHUNKSIZE - iChunkOffset);
+                    if (iChunkOffset == 0)
+                    {
+                        ///
+                        ///<summary>
+                        ///New chunk is required to extend the file. 
+                        ///</summary>
 
-		)
-		{
-			MemJournal p = (MemJournal)pJfd;
-			int nWrite = iAmt;
-			byte[] zWrite = zBuf;
-			int izWrite = 0;
-			///
-///<summary>
-///</summary>
-///<param name="An in">memory journal file should only ever be appended to. Random</param>
-///<param name="access writes are not required by sqlite.">access writes are not required by sqlite.</param>
-///<param name=""></param>
+                        FileChunk pNew = new FileChunk();
+                        // sqlite3_malloc( sizeof( FileChunk ) );
+                        if (null == pNew)
+                        {
+                            return SQLITE_IOERR_NOMEM;
+                        }
+                        pNew.pNext = null;
+                        if (pChunk != null)
+                        {
+                            Debug.Assert(p.pFirst != null);
+                            pChunk.pNext = pNew;
+                        }
+                        else
+                        {
+                            Debug.Assert(null == p.pFirst);
+                            p.pFirst = pNew;
+                        }
+                        p.endpoint.pChunk = pNew;
+                    }
+                    Buffer.BlockCopy(zWrite, izWrite, p.endpoint.pChunk.zChunk, iChunkOffset, iSpace);
+                    //memcpy( &p.endpoint.pChunk.zChunk[iChunkOffset], zWrite, iSpace );
+                    izWrite += iSpace;
+                    //zWrite += iSpace;
+                    nWrite -= iSpace;
+                    p.endpoint.iOffset += iSpace;
+                }
+                return SQLITE_OK;
+            }
 
-			Debug.Assert (iOfst == p.endpoint.iOffset);
-			UNUSED_PARAMETER (iOfst);
-			while (nWrite > 0) {
-				FileChunk pChunk = p.endpoint.pChunk;
-				int iChunkOffset = (int)(p.endpoint.iOffset % JOURNAL_CHUNKSIZE);
-				int iSpace = MIN (nWrite, JOURNAL_CHUNKSIZE - iChunkOffset);
-				if (iChunkOffset == 0) {
-					///
-///<summary>
-///New chunk is required to extend the file. 
-///</summary>
+            ///<summary>
+            /// Truncate the file.
+            ///
+            ///</summary>
+            public static int memjrnlTruncate(sqlite3_file pJfd, sqlite3_int64 size)
+            {
+                MemJournal p = (MemJournal)pJfd;
+                FileChunk pChunk;
+                Debug.Assert(size == 0);
+                UNUSED_PARAMETER(size);
+                pChunk = p.pFirst;
+                while (pChunk != null)
+                {
+                    FileChunk pTmp = pChunk;
+                    pChunk = pChunk.pNext;
+                    //sqlite3_free( ref pTmp );
+                }
+                sqlite3MemJournalOpen(pJfd);
+                return SQLITE_OK;
+            }
 
-					FileChunk pNew = new FileChunk ();
-					// sqlite3_malloc( sizeof( FileChunk ) );
-					if (null == pNew) {
-						return SQLITE_IOERR_NOMEM;
-					}
-					pNew.pNext = null;
-					if (pChunk != null) {
-						Debug.Assert (p.pFirst != null);
-						pChunk.pNext = pNew;
-					}
-					else {
-						Debug.Assert (null == p.pFirst);
-						p.pFirst = pNew;
-					}
-					p.endpoint.pChunk = pNew;
-				}
-				Buffer.BlockCopy (zWrite, izWrite, p.endpoint.pChunk.zChunk, iChunkOffset, iSpace);
-				//memcpy( &p.endpoint.pChunk.zChunk[iChunkOffset], zWrite, iSpace );
-				izWrite += iSpace;
-				//zWrite += iSpace;
-				nWrite -= iSpace;
-				p.endpoint.iOffset += iSpace;
-			}
-			return SQLITE_OK;
-		}
+            ///<summary>
+            /// Close the file.
+            ///
+            ///</summary>
+            public static int memjrnlClose(MemJournal pJfd)
+            {
+                memjrnlTruncate(pJfd, 0);
+                return SQLITE_OK;
+            }
 
-		///<summary>
-		/// Truncate the file.
-		///
-		///</summary>
-		static int memjrnlTruncate (sqlite3_file pJfd, sqlite3_int64 size)
-		{
-			MemJournal p = (MemJournal)pJfd;
-			FileChunk pChunk;
-			Debug.Assert (size == 0);
-			UNUSED_PARAMETER (size);
-			pChunk = p.pFirst;
-			while (pChunk != null) {
-				FileChunk pTmp = pChunk;
-				pChunk = pChunk.pNext;
-				//sqlite3_free( ref pTmp );
-			}
-			sqlite3MemJournalOpen (pJfd);
-			return SQLITE_OK;
-		}
+            ///<summary>
+            /// Sync the file.
+            ///
+            /// Syncing an in-memory journal is a no-op.  And, in fact, this routine
+            /// is never called in a working implementation.  This implementation
+            /// exists purely as a contingency, in case some malfunction in some other
+            /// part of SQLite causes Sync to be called by mistake.
+            ///
+            ///</summary>
+            public static int memjrnlSync(sqlite3_file NotUsed, int NotUsed2)
+            {
+                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                return SQLITE_OK;
+            }
 
-		///<summary>
-		/// Close the file.
-		///
-		///</summary>
-		static int memjrnlClose (MemJournal pJfd)
-		{
-			memjrnlTruncate (pJfd, 0);
-			return SQLITE_OK;
-		}
+            ///
+            ///<summary>
+            ///Query the size of the file in bytes.
+            ///
+            ///</summary>
 
-		///<summary>
-		/// Sync the file.
-		///
-		/// Syncing an in-memory journal is a no-op.  And, in fact, this routine
-		/// is never called in a working implementation.  This implementation
-		/// exists purely as a contingency, in case some malfunction in some other
-		/// part of SQLite causes Sync to be called by mistake.
-		///
-		///</summary>
-		static int memjrnlSync (sqlite3_file NotUsed, int NotUsed2)
-		{
-			UNUSED_PARAMETER2 (NotUsed, NotUsed2);
-			return SQLITE_OK;
-		}
+            public static int memjrnlFileSize(sqlite3_file pJfd, ref long pSize)
+            {
+                MemJournal p = (MemJournal)pJfd;
+                pSize = p.endpoint.iOffset;
+                return SQLITE_OK;
+            }
 
-		///
-///<summary>
-///Query the size of the file in bytes.
-///
-///</summary>
+            ///<summary>
+            /// Open a journal file.
+            ///
+            ///</summary>
+            public static void sqlite3MemJournalOpen(sqlite3_file pJfd)
+            {
+                MemJournal p = (MemJournal)pJfd;
+                //memset( p, 0, sqlite3MemJournalSize() );
+                p.pFirst = null;
+                p.endpoint = new FilePoint();
+                p.readpoint = new FilePoint();
+                p.pMethods = MemJournalMethods;
+                //(sqlite3_io_methods*)&MemJournalMethods;
+            }
 
-		static int memjrnlFileSize (sqlite3_file pJfd, ref long pSize)
-		{
-			MemJournal p = (MemJournal)pJfd;
-			pSize = p.endpoint.iOffset;
-			return SQLITE_OK;
-		}
+            ///<summary>
+            /// Return true if the file-handle passed as an argument is
+            /// an in-memory journal
+            ///
+            ///</summary>
+            public static bool sqlite3IsMemJournal(sqlite3_file pJfd)
+            {
+                return pJfd.pMethods == MemJournalMethods;
+            }
+
+            ///
+            ///<summary>
+            ///Return the number of bytes required to store a MemJournal file descriptor.
+            ///
+            ///</summary>
+
+            public static int sqlite3MemJournalSize()
+            {
+                return 3096;
+                // sizeof( MemJournal );
+            }
+        }
+
 
 		///<summary>
 		/// Table of methods for MemJournal sqlite3_file object.
 		///
 		///</summary>
-		static sqlite3_io_methods MemJournalMethods = new sqlite3_io_methods (1, ///
-///<summary>
-///iVersion 
-///</summary>
+		static sqlite3_io_methods MemJournalMethods = new sqlite3_io_methods (
+                1, ///iVersion 
 
-		(dxClose)memjrnlClose, ///
-///<summary>
-///xClose 
-///</summary>
+                (dxClose)memjrnl.memjrnlClose, ///xClose 
 
-		(dxRead)memjrnlRead, ///
-///<summary>
-///xRead 
-///</summary>
+                (dxRead)memjrnl.memjrnlRead, ///xRead 
 
-		(dxWrite)memjrnlWrite, ///
-///<summary>
-///xWrite 
-///</summary>
+                (dxWrite)memjrnl.memjrnlWrite, ///xWrite 
 
-		(dxTruncate)memjrnlTruncate, ///
-///<summary>
-///xTruncate 
-///</summary>
+                (dxTruncate)memjrnl.memjrnlTruncate, ///xTruncate 
 
-		(dxSync)memjrnlSync, ///
-///<summary>
-///xSync 
-///</summary>
+                (dxSync)memjrnl.memjrnlSync, ///xSync 
 
-		(dxFileSize)memjrnlFileSize, ///
-///<summary>
-///xFileSize 
-///</summary>
+                (dxFileSize)memjrnl.memjrnlFileSize, ///xFileSize 
 
-		null, ///
-///<summary>
-///xLock 
-///</summary>
+		        null, ///xLock 
 
-		null, ///
-///<summary>
-///xUnlock 
-///</summary>
+		        null, ///xUnlock 
 
-		null, ///
-///<summary>
-///xCheckReservedLock 
-///</summary>
+		        null, ///xCheckReservedLock 
 
-		null, ///
-///<summary>
-///xFileControl 
-///</summary>
+		        null, ///xFileControl 
 
-		null, ///
-///<summary>
-///xSectorSize 
-///</summary>
+		        null, ///xSectorSize 
 
-		null, ///
-///<summary>
-///xDeviceCharacteristics 
-///</summary>
+		        null,///xDeviceCharacteristics 
 
-		null, ///
-///<summary>
-///xShmMap 
-///</summary>
+		        null,///xShmMap 
 
-		null, ///
-///<summary>
-///xShmLock 
-///</summary>
+		        null,///xShmLock 
 
-		null, ///
-///<summary>
-///xShmBarrier 
-///</summary>
+		        null,///xShmBarrier 
 
-		null///
-///<summary>
-///xShmUnlock 
-///</summary>
+		        null///xShmUnlock 
 
 		);
 
-		///<summary>
-		/// Open a journal file.
-		///
-		///</summary>
-		static void sqlite3MemJournalOpen (sqlite3_file pJfd)
-		{
-			MemJournal p = (MemJournal)pJfd;
-			//memset( p, 0, sqlite3MemJournalSize() );
-			p.pFirst = null;
-			p.endpoint = new FilePoint ();
-			p.readpoint = new FilePoint ();
-			p.pMethods = MemJournalMethods;
-			//(sqlite3_io_methods*)&MemJournalMethods;
-		}
-
-		///<summary>
-		/// Return true if the file-handle passed as an argument is
-		/// an in-memory journal
-		///
-		///</summary>
-		static bool sqlite3IsMemJournal (sqlite3_file pJfd)
-		{
-			return pJfd.pMethods == MemJournalMethods;
-		}
-
-		///
-///<summary>
-///Return the number of bytes required to store a MemJournal file descriptor.
-///
-///</summary>
-
-		static int sqlite3MemJournalSize ()
-		{
-			return 3096;
-			// sizeof( MemJournal );
-		}
+		
 	}
 }
