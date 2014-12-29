@@ -166,10 +166,10 @@ namespace Community.CsharpSqlite {
 		static void fkTriggerDelete(sqlite3 dbMem,Trigger p) {
 			if(p!=null) {
 				TriggerStep pStep=p.step_list;
-				sqlite3ExprDelete(dbMem,ref pStep.pWhere);
-				sqlite3ExprListDelete(dbMem,ref pStep.pExprList);
+				exprc.sqlite3ExprDelete(dbMem,ref pStep.pWhere);
+				exprc.sqlite3ExprListDelete(dbMem,ref pStep.pExprList);
 				sqlite3SelectDelete(dbMem,ref pStep.pSelect);
-				sqlite3ExprDelete(dbMem,ref p.pWhen);
+				exprc.sqlite3ExprDelete(dbMem,ref p.pWhen);
 				dbMem.sqlite3DbFree(ref p);
 			}
 		}

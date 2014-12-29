@@ -1461,7 +1461,7 @@ void *sqlite3_wsd_find(void *K, int L);
 		//#endif
 		
 		///<summary>
-		/// The pseudo-routine sqlite3ExprSetIrreducible sets the EP2_Irreducible
+		/// The pseudo-routine exprc.sqlite3ExprSetIrreducible sets the EP2_Irreducible
 		/// flag on an expression structure.  This flag is used for VV&A only.  The
 		/// routine is implemented as a macro that only works when in debugging mode,
 		/// so as not to burden production code.
@@ -2060,18 +2060,18 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void sqlite3ReleaseTempReg(Parse*,int);
 		//int sqlite3GetTempRange(Parse*,int);
 		//void sqlite3ReleaseTempRange(Parse*,int,int);
-		//Expr *sqlite3ExprAlloc(sqlite3*,int,const Token*,int);
-		//Expr *sqlite3Expr(sqlite3*,int,const char);
-		//void sqlite3ExprAttachSubtrees(sqlite3*,Expr*,Expr*,Expr);
+		//Expr *exprc.sqlite3ExprAlloc(sqlite3*,int,const Token*,int);
+		//Expr *exprc.sqlite3Expr(sqlite3*,int,const char);
+		//void exprc.sqlite3ExprAttachSubtrees(sqlite3*,Expr*,Expr*,Expr);
 		//Expr *sqlite3PExpr(Parse*, int, Expr*, Expr*, const Token);
-		//Expr *sqlite3ExprAnd(sqlite3*,Expr*, Expr);
-		//Expr *sqlite3ExprFunction(Parse*,ExprList*, Token);
-		//void sqlite3ExprAssignVarNumber(Parse*, Expr);
-		//void sqlite3ExprDelete(sqlite3*, Expr);
-		//ExprList *sqlite3ExprListAppend(Parse*,ExprList*,Expr);
-		//void sqlite3ExprListSetName(Parse*,ExprList*,Token*,int);
-		//void sqlite3ExprListSetSpan(Parse*,ExprList*,ExprSpan);
-		//void sqlite3ExprListDelete(sqlite3*, ExprList);
+		//Expr *exprc.sqlite3ExprAnd(sqlite3*,Expr*, Expr);
+		//Expr *exprc.sqlite3ExprFunction(Parse*,ExprList*, Token);
+		//void exprc.sqlite3ExprAssignVarNumber(Parse*, Expr);
+		//void exprc.sqlite3ExprDelete(sqlite3*, Expr);
+		//ExprList *exprc.sqlite3ExprListAppend(Parse*,ExprList*,Expr);
+		//void exprc.sqlite3ExprListSetName(Parse*,ExprList*,Token*,int);
+		//void exprc.sqlite3ExprListSetSpan(Parse*,ExprList*,ExprSpan);
+		//void exprc.sqlite3ExprListDelete(sqlite3*, ExprList);
 		//int sqlite3Init(sqlite3*, char*);
 		//int sqlite3InitCallback(void*, int, char**, char*);
 		//void sqlite3Pragma(Parse*,Token*,Token*,Token*,int);
@@ -2153,24 +2153,24 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void sqlite3Update(Parse*, SrcList*, ExprList*, Expr*, int);
 		//WhereInfo *sqlite3WhereBegin(Parse*, SrcList*, Expr*, ExprList**, u16);
 		//void sqlite3WhereEnd(WhereInfo);
-		//int sqlite3ExprCodeGetColumn(Parse*, Table*, int, int, int);
-		//void sqlite3ExprCodeGetColumnOfTable(Vdbe*, Table*, int, int, int);
-		//void sqlite3ExprCodeMove(Parse*, int, int, int);
-		//void sqlite3ExprCodeCopy(Parse*, int, int, int);
-		//void sqlite3ExprCacheStore(Parse*, int, int, int);
-		//void sqlite3ExprCachePush(Parse);
-		//void sqlite3ExprCachePop(Parse*, int);
-		//void sqlite3ExprCacheRemove(Parse*, int, int);
-		//void sqlite3ExprCacheClear(Parse);
-		//void sqlite3ExprCacheAffinityChange(Parse*, int, int);
-		//int sqlite3ExprCode(Parse*, Expr*, int);
-		//int sqlite3ExprCodeTemp(Parse*, Expr*, int);
-		//int sqlite3ExprCodeTarget(Parse*, Expr*, int);
-		//int sqlite3ExprCodeAndCache(Parse*, Expr*, int);
-		//void sqlite3ExprCodeConstants(Parse*, Expr);
-		//int sqlite3ExprCodeExprList(Parse*, ExprList*, int, int);
-		//void sqlite3ExprIfTrue(Parse*, Expr*, int, int);
-		//void sqlite3ExprIfFalse(Parse*, Expr*, int, int);
+		//int exprc.sqlite3ExprCodeGetColumn(Parse*, Table*, int, int, int);
+		//void exprc.sqlite3ExprCodeGetColumnOfTable(Vdbe*, Table*, int, int, int);
+		//void exprc.sqlite3ExprCodeMove(Parse*, int, int, int);
+		//void exprc.sqlite3ExprCodeCopy(Parse*, int, int, int);
+		//void exprc.sqlite3ExprCacheStore(Parse*, int, int, int);
+		//void exprc.sqlite3ExprCachePush(Parse);
+		//void exprc.sqlite3ExprCachePop(Parse*, int);
+		//void exprc.sqlite3ExprCacheRemove(Parse*, int, int);
+		//void exprc.sqlite3ExprCacheClear(Parse);
+		//void exprc.sqlite3ExprCacheAffinityChange(Parse*, int, int);
+		//int exprc.sqlite3ExprCode(Parse*, Expr*, int);
+		//int exprc.sqlite3ExprCodeTemp(Parse*, Expr*, int);
+		//int exprc.sqlite3ExprCodeTarget(Parse*, Expr*, int);
+		//int exprc.sqlite3ExprCodeAndCache(Parse*, Expr*, int);
+		//void exprc.sqlite3ExprCodeConstants(Parse*, Expr);
+		//int exprc.sqlite3ExprCodeExprList(Parse*, ExprList*, int, int);
+		//void exprc.sqlite3ExprIfTrue(Parse*, Expr*, int, int);
+		//void exprc.sqlite3ExprIfFalse(Parse*, Expr*, int, int);
 		//Table *sqlite3FindTable(sqlite3*,const char*, const char);
 		//Table *sqlite3LocateTable(Parse*,int isView,const char*, const char);
 		//Index *sqlite3FindIndex(sqlite3*,const char*, const char);
@@ -2179,10 +2179,10 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void sqlite3Vacuum(Parse);
 		//int sqlite3RunVacuum(char**, sqlite3);
 		//char *sqlite3NameFromToken(sqlite3*, Token);
-		//int sqlite3ExprCompare(Expr*, Expr);
-		//int sqlite3ExprListCompare(ExprList*, ExprList);
-		//void sqlite3ExprAnalyzeAggregates(NameContext*, Expr);
-		//void sqlite3ExprAnalyzeAggList(NameContext*,ExprList);
+		//int exprc.sqlite3ExprCompare(Expr*, Expr);
+		//int exprc.sqlite3ExprListCompare(ExprList*, ExprList);
+		//void exprc.sqlite3ExprAnalyzeAggregates(NameContext*, Expr);
+		//void exprc.sqlite3ExprAnalyzeAggList(NameContext*,ExprList);
 		//Vdbe *sqlite3GetVdbe(Parse);
 		//void sqlite3PrngSaveState(void);
 		//void sqlite3PrngRestoreState(void);
@@ -2199,10 +2199,10 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//int sqlite3ExprIsConstantNotJoin(Expr);
 		//int sqlite3ExprIsConstantOrFunction(Expr);
 		//int sqlite3ExprIsInteger(Expr*, int);
-		//int sqlite3ExprCanBeNull(const Expr);
-		//void sqlite3ExprCodeIsNullJump(Vdbe*, const Expr*, int, int);
-		//int sqlite3ExprNeedsNoAffinityChange(const Expr*, char);
-		//int sqlite3IsRowid(const char);
+		//int exprc.sqlite3ExprCanBeNull(const Expr);
+		//void exprc.sqlite3ExprCodeIsNullJump(Vdbe*, const Expr*, int, int);
+		//int exprc.sqlite3ExprNeedsNoAffinityChange(const Expr*, char);
+		//int exprc.sqlite3IsRowid(const char);
 		//void sqlite3GenerateRowDelete(Parse*, Table*, int, int, int, Trigger *, int);
 		//void sqlite3GenerateRowIndexDelete(Parse*, Table*, int, int);
 		//int sqlite3GenerateIndexKey(Parse*, Index*, int, int, int);
@@ -2214,11 +2214,11 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void sqlite3MultiWrite(Parse);
 		//void sqlite3MayAbort(Parse );
 		//void sqlite3HaltConstraint(Parse*, int, char*, int);
-		//Expr *sqlite3ExprDup(sqlite3*,Expr*,int);
-		//ExprList *sqlite3ExprListDup(sqlite3*,ExprList*,int);
-		//SrcList *sqlite3SrcListDup(sqlite3*,SrcList*,int);
-		//IdList *sqlite3IdListDup(sqlite3*,IdList);
-		//Select *sqlite3SelectDup(sqlite3*,Select*,int);
+		//Expr *exprc.sqlite3ExprDup(sqlite3*,Expr*,int);
+		//ExprList *exprc.sqlite3ExprListDup(sqlite3*,ExprList*,int);
+		//SrcList *exprc.sqlite3SrcListDup(sqlite3*,SrcList*,int);
+		//IdList *exprc.sqlite3IdListDup(sqlite3*,IdList);
+		//Select *exprc.sqlite3SelectDup(sqlite3*,Select*,int);
 		//void sqlite3FuncDefInsert(FuncDefHash*, FuncDef);
 		//FuncDef *sqlite3FindFunction(sqlite3*,const char*,int,int,u8,int);
 		//void sqlite3RegisterBuiltinFunctions(sqlite3);
@@ -2418,7 +2418,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//void sqlite3TableAffinityStr(Vdbe *, Table );
 		//char sqlite3CompareAffinity(Expr pExpr, char aff2);
 		//int sqlite3IndexAffinityOk(Expr pExpr, char idx_affinity);
-		//char sqlite3ExprAffinity(Expr pExpr);
+		//char exprc.sqlite3ExprAffinity(Expr pExpr);
 		//int Converter.sqlite3Atoi64(const char*, i64*, int, u8);
 		//void utilc.sqlite3Error(sqlite3*, int, const char*,...);
 		//void *Converter.sqlite3HexToBlob(sqlite3*, string z, int n);
@@ -2428,9 +2428,9 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//int sqlite3ReadSchema(Parse pParse);
 		//CollSeq *sqlite3FindCollSeq(sqlite3*,u8 enc, const char*,int);
 		//CollSeq *sqlite3LocateCollSeq(Parse *pParse, const char*zName);
-		//CollSeq *sqlite3ExprCollSeq(Parse pParse, Expr pExpr);
-		//Expr *sqlite3ExprSetColl(Expr*, CollSeq);
-		//Expr *sqlite3ExprSetCollByToken(Parse *pParse, Expr*, Token);
+		//CollSeq *exprc.sqlite3ExprCollSeq(Parse pParse, Expr pExpr);
+		//Expr *exprc.sqlite3ExprSetColl(Expr*, CollSeq);
+		//Expr *exprc.sqlite3ExprSetCollByToken(Parse *pParse, Expr*, Token);
 		//int sqlite3CheckCollSeq(Parse *, CollSeq );
 		//int sqlite3CheckObjectName(Parse *, string );
 		//void sqlite3VdbeSetChanges(sqlite3 *, int);
@@ -2641,7 +2641,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//int vdbeapi.sqlite3VdbeParameterIndex(Vdbe*, const char*, int);
 		//int sqlite3TransferBindings(sqlite3_stmt *, sqlite3_stmt );
 		//int sqlite3Reprepare(Vdbe);
-		//void sqlite3ExprListCheckLength(Parse*, ExprList*, const char);
+		//void exprc.sqlite3ExprListCheckLength(Parse*, ExprList*, const char);
 		//CollSeq *sqlite3BinaryCompareCollSeq(Parse *, Expr *, Expr );
 		//int sqlite3TempInMemory(const sqlite3);
 		//VTable *sqlite3GetVTable(sqlite3*, Table);
@@ -2729,13 +2729,13 @@ static void sqlite3FkDelete(sqlite3 a, Table b) {}
 		//int sqlite3MemJournalSize(void);
 		//int sqlite3IsMemJournal(sqlite3_file );
 		#if SQLITE_MAX_EXPR_DEPTH
-		//  void sqlite3ExprSetHeight(Parse pParse, Expr p);
+		//  void exprc.sqlite3ExprSetHeight(Parse pParse, Expr p);
 		//  int sqlite3SelectExprHeight(Select );
-		//int sqlite3ExprCheckHeight(Parse*, int);
+		//int exprc.sqlite3ExprCheckHeight(Parse*, int);
 		#else
-																																																												//define sqlite3ExprSetHeight(x,y)
+																																																												//define exprc.sqlite3ExprSetHeight(x,y)
 //define sqlite3SelectExprHeight(x) 0
-//define sqlite3ExprCheckHeight(x,y)
+//define exprc.sqlite3ExprCheckHeight(x,y)
 #endif
 		//u32 sqlite3Get4byte(const u8);
 		//void sqlite3sqlite3Put4byte(u8*, u32);

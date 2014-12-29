@@ -120,7 +120,7 @@ namespace Community.CsharpSqlite
                 db = pParse.db;
                 if (pOrig.Operator != TokenType.TK_COLUMN && (zType.Length == 0 || zType[0] != 'G'))
                 {
-                    pDup = sqlite3ExprDup(db, pOrig, 0);
+                    pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
                     pDup = pParse.sqlite3PExpr(TK_AS, pDup, null, null);
                     if (pDup == null)
                         return;
@@ -133,7 +133,7 @@ namespace Community.CsharpSqlite
                 else
                     if (pOrig.ExprHasProperty(EP_IntValue) || pOrig.u.zToken == null)
                     {
-                        pDup = sqlite3ExprDup(db, pOrig, 0);
+                        pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
                         if (pDup == null)
                             return;
                     }
@@ -142,7 +142,7 @@ namespace Community.CsharpSqlite
                         string zToken = pOrig.u.zToken;
                         Debug.Assert(zToken != null);
                         pOrig.u.zToken = null;
-                        pDup = sqlite3ExprDup(db, pOrig, 0);
+                        pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
                         pOrig.u.zToken = zToken;
                         if (pDup == null)
                             return;
@@ -158,13 +158,13 @@ namespace Community.CsharpSqlite
                 }
                 ///
                 ///<summary>
-                ///Before calling sqlite3ExprDelete(), set the EP_Static flag. This 
+                ///Before calling exprc.sqlite3ExprDelete(), set the EP_Static flag. This 
                 ///prevents ExprDelete() from deleting the Expr structure itself,
                 ///allowing it to be repopulated by the memcpy() on the following line.
                 ///
                 ///</summary>
                 pExpr.ExprSetProperty(EP_Static);
-                sqlite3ExprDelete(db, ref pExpr);
+                exprc.sqlite3ExprDelete(db, ref pExpr);
                 pExpr.CopyFrom(pDup);
                 //memcpy(pExpr, pDup, sizeof(*pExpr));
                 db.sqlite3DbFree(ref pDup);
@@ -316,7 +316,7 @@ namespace Community.CsharpSqlite
                 ///<param name=""></param>
                 for (i = 0; i < pEList.nExpr; i++)
                 {
-                    if (sqlite3ExprCompare(pEList.a[i].pExpr, pE) < 2)
+                    if (exprc.sqlite3ExprCompare(pEList.a[i].pExpr, pE) < 2)
                     {
                         return i + 1;
                     }
@@ -342,7 +342,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static Expr sqlite3CreateColumnExpr(sqlite3 db, SrcList pSrc, int iSrc, int iCol)
             {
-                Expr p = CreateExpr(db, TK_COLUMN, null, false);
+                Expr p = exprc.CreateExpr(db, TK_COLUMN, null, false);
                 if (p != null)
                 {
                     SrcList_item pItem = pSrc.a[iSrc];
@@ -608,7 +608,7 @@ namespace Community.CsharpSqlite
                                     break;
                                 }
                             }
-                            if (iCol >= pTab.nCol && sqlite3IsRowid(zCol))
+                            if (iCol >= pTab.nCol && exprc.sqlite3IsRowid(zCol))
                             {
                                 iCol = -1;
                                 ///
@@ -648,7 +648,7 @@ namespace Community.CsharpSqlite
                     ///Perhaps the name is a reference to the ROWID
                     ///
                     ///</summary>
-                    if (cnt == 0 && cntTab == 1 && sqlite3IsRowid(zCol))
+                    if (cnt == 0 && cntTab == 1 && exprc.sqlite3IsRowid(zCol))
                     {
                         cnt = 1;
                         pExpr.iColumn = -1;
@@ -777,9 +777,9 @@ namespace Community.CsharpSqlite
                 ///Clean up and return
                 ///
                 ///</summary>
-                sqlite3ExprDelete(db, ref pExpr.pLeft);
+                exprc.sqlite3ExprDelete(db, ref pExpr.pLeft);
                 pExpr.pLeft = null;
-                sqlite3ExprDelete(db, ref pExpr.pRight);
+                exprc.sqlite3ExprDelete(db, ref pExpr.pRight);
                 pExpr.pRight = null;
                 pExpr.Operator = (isTrigger != 0 ? TokenType.TK_TRIGGER : TokenType.TK_COLUMN);
             lookupname_end:
@@ -1184,21 +1184,21 @@ return WRC_Prune;
                             iCol = ResolveExtensions.resolveAsName(pParse, pEList, pE);
                             if (iCol == 0)
                             {
-                                pDup = sqlite3ExprDup(db, pE, 0);
+                                pDup = exprc.sqlite3ExprDup(db, pE, 0);
                                 ////if ( 0 == db.mallocFailed )
                                 {
                                     Debug.Assert(pDup != null);
                                     iCol = ResolveExtensions.resolveOrderByTermToExprList(pParse, pSelect, pDup);
                                 }
-                                sqlite3ExprDelete(db, ref pDup);
+                                exprc.sqlite3ExprDelete(db, ref pDup);
                             }
                         }
                         if (iCol > 0)
                         {
                             CollSeq pColl = pE.pColl;
                             ExprFlags flags = pE.Flags & ExprFlags.EP_ExpCollate;
-                            sqlite3ExprDelete(db, ref pE);
-                            pItem.pExpr = pE = sqlite3Expr(db, TK_INTEGER, null);
+                            exprc.sqlite3ExprDelete(db, ref pE);
+                            pItem.pExpr = pE = exprc.sqlite3Expr(db, TK_INTEGER, null);
                             if (pE == null)
                                 return 1;
                             pE.pColl = pColl;
@@ -1702,7 +1702,7 @@ return WRC_Prune;
 #if SQLITE_MAX_EXPR_DEPTH
 																																																																		{
 Parse pParse = pNC.pParse;
-if( sqlite3ExprCheckHeight(pParse, pExpr.nHeight+pNC.pParse.nHeight) ){
+if( exprc.sqlite3ExprCheckHeight(pParse, pExpr.nHeight+pNC.pParse.nHeight) ){
 return 1;
 }
 pParse.nHeight += pExpr.nHeight;

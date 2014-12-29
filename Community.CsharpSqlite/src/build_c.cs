@@ -612,7 +612,7 @@ p.zName, P4_STATIC );
 				pCol=pTable.aCol[i];
 				if(pCol!=null&&db!=null) {
 					db.sqlite3DbFree(ref pCol.zName);
-					sqlite3ExprDelete(db,ref pCol.pDflt);
+					exprc.sqlite3ExprDelete(db,ref pCol.pDflt);
 					db.sqlite3DbFree(ref pCol.zDflt);
 					db.sqlite3DbFree(ref pCol.zType);
 					db.sqlite3DbFree(ref pCol.zColl);
@@ -684,7 +684,7 @@ p.zName, P4_STATIC );
 			db.sqlite3DbFree(ref pTable.zColAff);
 			sqlite3SelectDelete(db,ref pTable.pSelect);
 			#if !SQLITE_OMIT_CHECK
-			sqlite3ExprDelete(db,ref pTable.pCheck);
+			exprc.sqlite3ExprDelete(db,ref pTable.pCheck);
 			#endif
 			#if !SQLITE_OMIT_VIRTUALTABLE
 			sqlite3VtabClear(db,pTable);
@@ -1352,15 +1352,15 @@ goto begin_table_error;
 					///is required by pragma table_info.
 					///
 					///</summary>
-					sqlite3ExprDelete(db,ref pCol.pDflt);
-					pCol.pDflt=sqlite3ExprDup(db,pSpan.pExpr,EXPRDUP_REDUCE);
+					exprc.sqlite3ExprDelete(db,ref pCol.pDflt);
+					pCol.pDflt=exprc.sqlite3ExprDup(db,pSpan.pExpr,EXPRDUP_REDUCE);
 					db.sqlite3DbFree(ref pCol.zDflt);
 					pCol.zDflt=pSpan.zStart.Substring(0,pSpan.zStart.Length-pSpan.zEnd.Length);
 					//sqlite3DbStrNDup( db, pSpan.zStart,
 					//                               (int)( pSpan.zEnd.Length - pSpan.zStart.Length ) );
 				}
 			}
-			sqlite3ExprDelete(db,ref pSpan.pExpr);
+			exprc.sqlite3ExprDelete(db,ref pSpan.pExpr);
 		}
 		///<summary>
 		/// Designate the PRIMARY KEY for the table.  pList is a list of names
@@ -1458,7 +1458,7 @@ goto begin_table_error;
 					pList=null;
 				}
 			primary_key_exit:
-			sqlite3ExprListDelete(pParse.db,ref pList);
+			exprc.sqlite3ExprListDelete(pParse.db,ref pList);
 			return;
 		}
 		///<summary>
@@ -1478,12 +1478,12 @@ goto begin_table_error;
 			#if !SQLITE_OMIT_CHECK
 			Table pTab=pParse.pNewTable;
 			if(pTab!=null&&!IN_DECLARE_VTAB(pParse)) {
-				pTab.pCheck=sqlite3ExprAnd(db,pTab.pCheck,pCheckExpr);
+				pTab.pCheck=exprc.sqlite3ExprAnd(db,pTab.pCheck,pCheckExpr);
 			}
 			else
 			#endif
 			 {
-				sqlite3ExprDelete(db,ref pCheckExpr);
+				exprc.sqlite3ExprDelete(db,ref pCheckExpr);
 			}
 		}
 		///<summary>
@@ -2103,7 +2103,7 @@ goto begin_table_error;
 			///<param name="allocated rather than point to the input string "> which means that</param>
 			///<param name="they will persist after the current sqlite3_exec() call returns.">they will persist after the current sqlite3_exec() call returns.</param>
 			///<param name=""></param>
-			p.pSelect=sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
+			p.pSelect=exprc.sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
 			sqlite3SelectDelete(db,ref pSelect);
 			//if ( db.mallocFailed != 0 )
 			//{
@@ -2235,7 +2235,7 @@ goto begin_table_error;
 			///
 			///</summary>
 			Debug.Assert(pTable.pSelect!=null);
-			pSel=sqlite3SelectDup(db,pTable.pSelect,0);
+			pSel=exprc.sqlite3SelectDup(db,pTable.pSelect,0);
 			if(pSel!=null) {
 				u8 enableLookaside=db.lookaside.bEnabled;
 				n=pParse.nTab;
@@ -2760,8 +2760,8 @@ goto exit_drop_table;
 			fk_end:
 			db.sqlite3DbFree(ref pFKey);
 			#endif
-			sqlite3ExprListDelete(db,ref pFromCol);
-			sqlite3ExprListDelete(db,ref pToCol);
+			exprc.sqlite3ExprListDelete(db,ref pFromCol);
+			exprc.sqlite3ExprListDelete(db,ref pToCol);
 		}
 		///<summary>
 		/// This routine is called when an INITIALLY IMMEDIATE or INITIALLY DEFERRED
@@ -3566,7 +3566,7 @@ goto exit_create_index;
 				//sqlite3DbFree(db, ref pIndex.zColAff );
 				db.sqlite3DbFree(ref pIndex);
 			}
-			sqlite3ExprListDelete(db,ref pList);
+			exprc.sqlite3ExprListDelete(db,ref pList);
 			sqlite3SrcListDelete(db,ref pTblName);
 			db.sqlite3DbFree(ref zName);
 			return pRet;
@@ -4026,7 +4026,7 @@ goto exit_drop_index;
 				db.sqlite3DbFree(ref pItem.zIndex);
 				sqlite3DeleteTable(db,ref pItem.pTab);
 				sqlite3SelectDelete(db,ref pItem.pSelect);
-				sqlite3ExprDelete(db,ref pItem.pOn);
+				exprc.sqlite3ExprDelete(db,ref pItem.pOn);
 				sqlite3IdListDelete(db,ref pItem.pUsing);
 			}
 			db.sqlite3DbFree(ref pList);
@@ -4110,7 +4110,7 @@ goto exit_drop_index;
 			return p;
 			append_from_error:
 			Debug.Assert(p==null);
-			sqlite3ExprDelete(db,ref pOn);
+			exprc.sqlite3ExprDelete(db,ref pOn);
 			sqlite3IdListDelete(db,ref pUsing);
 			sqlite3SelectDelete(db,ref pSubquery);
 			return null;

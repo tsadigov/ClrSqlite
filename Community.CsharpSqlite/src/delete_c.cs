@@ -113,14 +113,14 @@ return pWhere;
 
 pSelectRowid = sqlite3PExpr( pParse, TK_ROW, null, null, null );
 if( pSelectRowid == null ) goto limit_where_cleanup_2;
-pEList = sqlite3ExprListAppend( pParse, null, pSelectRowid);
+pEList = exprc.sqlite3ExprListAppend( pParse, null, pSelectRowid);
 if( pEList == null ) goto limit_where_cleanup_2;
 
 /* duplicate the FROM clause as it is needed by both the DELETE/UPDATE tree
 ** and the SELECT subtree. */
-pSelectSrc = sqlite3SrcListDup(pParse.db, pSrc,0);
+pSelectSrc = exprc.sqlite3SrcListDup(pParse.db, pSrc,0);
 if( pSelectSrc == null ) {
-sqlite3ExprListDelete(pParse.db, pEList);
+exprc.sqlite3ExprListDelete(pParse.db, pEList);
 goto limit_where_cleanup_2;
 }
 
@@ -137,7 +137,7 @@ if( pInClause == null ) goto limit_where_cleanup_1;
 
 pInClause->x.pSelect = pSelect;
 pInClause->flags |= EP_xIsSelect;
-sqlite3ExprSetHeight(pParse, pInClause);
+exprc.sqlite3ExprSetHeight(pParse, pInClause);
 return pInClause;
 
 /* something went wrong. clean up anything allocated. */
@@ -146,10 +146,10 @@ sqlite3SelectDelete(pParse.db, pSelect);
 return null;
 
 limit_where_cleanup_2:
-sqlite3ExprDelete(pParse.db, ref pWhere);
-sqlite3ExprListDelete(pParse.db, pOrderBy);
-sqlite3ExprDelete(pParse.db, ref pLimit);
-sqlite3ExprDelete(pParse.db, ref pOffset);
+exprc.sqlite3ExprDelete(pParse.db, ref pWhere);
+exprc.sqlite3ExprListDelete(pParse.db, pOrderBy);
+exprc.sqlite3ExprDelete(pParse.db, ref pLimit);
+exprc.sqlite3ExprDelete(pParse.db, ref pOffset);
 return null;
 }
 #endif

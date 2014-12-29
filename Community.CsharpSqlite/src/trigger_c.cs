@@ -34,8 +34,8 @@ namespace Community.CsharpSqlite {
 			while(pTriggerStep!=null) {
 				TriggerStep pTmp=pTriggerStep;
 				pTriggerStep=pTriggerStep.pNext;
-				sqlite3ExprDelete(db,ref pTmp.pWhere);
-				sqlite3ExprListDelete(db,ref pTmp.pExprList);
+				exprc.sqlite3ExprDelete(db,ref pTmp.pWhere);
+				exprc.sqlite3ExprListDelete(db,ref pTmp.pExprList);
 				sqlite3SelectDelete(db,ref pTmp.pSelect);
 				sqlite3IdListDelete(db,ref pTmp.pIdList);
 				pTriggerStep=null;
@@ -356,15 +356,15 @@ goto trigger_cleanup;
 			pTrigger.pTabSchema=pTab.pSchema;
 			pTrigger.op=(u8)op;
 			pTrigger.tr_tm=tr_tm==TK_BEFORE?TRIGGER_BEFORE:TRIGGER_AFTER;
-			pTrigger.pWhen=sqlite3ExprDup(db,pWhen,EXPRDUP_REDUCE);
-			pTrigger.pColumns=sqlite3IdListDup(db,pColumns);
+			pTrigger.pWhen=exprc.sqlite3ExprDup(db,pWhen,EXPRDUP_REDUCE);
+			pTrigger.pColumns=exprc.sqlite3IdListDup(db,pColumns);
 			Debug.Assert(pParse.pNewTrigger==null);
 			pParse.pNewTrigger=pTrigger;
 			trigger_cleanup:
 			db.sqlite3DbFree(ref zName);
 			sqlite3SrcListDelete(db,ref pTableName);
 			sqlite3IdListDelete(db,ref pColumns);
-			sqlite3ExprDelete(db,ref pWhen);
+			exprc.sqlite3ExprDelete(db,ref pWhen);
 			if(pParse.pNewTrigger==null) {
 				sqlite3DeleteTrigger(db,ref pTrigger);
 			}
@@ -591,16 +591,16 @@ goto trigger_cleanup;
 			pTriggerStep=triggerStepAllocate(db,TK_INSERT,pTableName);
 			//if ( pTriggerStep != null )
 			//{
-			pTriggerStep.pSelect=sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
+			pTriggerStep.pSelect=exprc.sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
 			pTriggerStep.pIdList=pColumn;
-			pTriggerStep.pExprList=sqlite3ExprListDup(db,pEList,EXPRDUP_REDUCE);
+			pTriggerStep.pExprList=exprc.sqlite3ExprListDup(db,pEList,EXPRDUP_REDUCE);
 			pTriggerStep.orconf=orconf;
 			//}
 			//else
 			//{
 			//  sqlite3IdListDelete( db, ref pColumn );
 			//}
-			sqlite3ExprListDelete(db,ref pEList);
+			exprc.sqlite3ExprListDelete(db,ref pEList);
 			sqlite3SelectDelete(db,ref pSelect);
 			return pTriggerStep;
 		}
@@ -635,12 +635,12 @@ goto trigger_cleanup;
 			pTriggerStep=triggerStepAllocate(db,TK_UPDATE,pTableName);
 			//if ( pTriggerStep != null )
 			//{
-			pTriggerStep.pExprList=sqlite3ExprListDup(db,pEList,EXPRDUP_REDUCE);
-			pTriggerStep.pWhere=sqlite3ExprDup(db,pWhere,EXPRDUP_REDUCE);
+			pTriggerStep.pExprList=exprc.sqlite3ExprListDup(db,pEList,EXPRDUP_REDUCE);
+			pTriggerStep.pWhere=exprc.sqlite3ExprDup(db,pWhere,EXPRDUP_REDUCE);
 			pTriggerStep.orconf=orconf;
 			//}
-			sqlite3ExprListDelete(db,ref pEList);
-			sqlite3ExprDelete(db,ref pWhere);
+			exprc.sqlite3ExprListDelete(db,ref pEList);
+			exprc.sqlite3ExprDelete(db,ref pWhere);
 			return pTriggerStep;
 		}
 		///<summary>
@@ -666,10 +666,10 @@ goto trigger_cleanup;
 			pTriggerStep=triggerStepAllocate(db,TK_DELETE,pTableName);
 			//if ( pTriggerStep != null )
 			//{
-			pTriggerStep.pWhere=sqlite3ExprDup(db,pWhere,EXPRDUP_REDUCE);
+			pTriggerStep.pWhere=exprc.sqlite3ExprDup(db,pWhere,EXPRDUP_REDUCE);
 			pTriggerStep.orconf=OE_Default;
 			//}
-			sqlite3ExprDelete(db,ref pWhere);
+			exprc.sqlite3ExprDelete(db,ref pWhere);
 			return pTriggerStep;
 		}
 		///<summary>
@@ -682,7 +682,7 @@ goto trigger_cleanup;
 			sqlite3DeleteTriggerStep(db,ref pTrigger.step_list);
 			db.sqlite3DbFree(ref pTrigger.zName);
 			db.sqlite3DbFree(ref pTrigger.table);
-			sqlite3ExprDelete(db,ref pTrigger.pWhen);
+			exprc.sqlite3ExprDelete(db,ref pTrigger.pWhen);
 			sqlite3IdListDelete(db,ref pTrigger.pColumns);
 			pTrigger=null;
 			db.sqlite3DbFree(ref pTrigger);
@@ -1007,22 +1007,22 @@ return;
 				pParse.eOrconf=(orconf==OE_Default)?pStep.orconf:(u8)orconf;
 				switch(pStep.op) {
 				case TK_UPDATE: {
-					pParse.sqlite3Update(targetSrcList(pParse,pStep),sqlite3ExprListDup(db,pStep.pExprList,0),sqlite3ExprDup(db,pStep.pWhere,0),pParse.eOrconf);
+					pParse.sqlite3Update(targetSrcList(pParse,pStep),exprc.sqlite3ExprListDup(db,pStep.pExprList,0),exprc.sqlite3ExprDup(db,pStep.pWhere,0),pParse.eOrconf);
 					break;
 				}
 				case TK_INSERT: {
-					pParse.sqlite3Insert(targetSrcList(pParse,pStep),sqlite3ExprListDup(db,pStep.pExprList,0),sqlite3SelectDup(db,pStep.pSelect,0),sqlite3IdListDup(db,pStep.pIdList),pParse.eOrconf);
+					pParse.sqlite3Insert(targetSrcList(pParse,pStep),exprc.sqlite3ExprListDup(db,pStep.pExprList,0),exprc.sqlite3SelectDup(db,pStep.pSelect,0),exprc.sqlite3IdListDup(db,pStep.pIdList),pParse.eOrconf);
 					break;
 				}
 				case TK_DELETE: {
-					pParse.sqlite3DeleteFrom(targetSrcList(pParse,pStep),sqlite3ExprDup(db,pStep.pWhere,0));
+					pParse.sqlite3DeleteFrom(targetSrcList(pParse,pStep),exprc.sqlite3ExprDup(db,pStep.pWhere,0));
 					break;
 				}
 				default:
 				Debug.Assert(pStep.op==TK_SELECT);
 				{
 					SelectDest sDest=new SelectDest();
-					Select pSelect=sqlite3SelectDup(db,pStep.pSelect,0);
+					Select pSelect=exprc.sqlite3SelectDup(db,pStep.pSelect,0);
                     sDest.Init(SelectResultType.Discard, 0);
 					Select.sqlite3Select(pParse,pSelect,ref sDest);
 					sqlite3SelectDelete(db,ref pSelect);
@@ -1199,13 +1199,13 @@ return;
 				///<param name="(or NULL) the sub">vdbe is immediately halted by jumping to the </param>
 				///<param name="OP_Halt inserted at the end of the program.  ">OP_Halt inserted at the end of the program.  </param>
 				if(pTrigger.pWhen!=null) {
-					pWhen=sqlite3ExprDup(db,pTrigger.pWhen,0);
+					pWhen=exprc.sqlite3ExprDup(db,pTrigger.pWhen,0);
 					if(SQLITE_OK==ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
 					) {
 						iEndTrigger=v.sqlite3VdbeMakeLabel();
 						pSubParse.sqlite3ExprIfFalse(pWhen,iEndTrigger,SQLITE_JUMPIFNULL);
 					}
-					sqlite3ExprDelete(db,ref pWhen);
+					exprc.sqlite3ExprDelete(db,ref pWhen);
 				}
 				///
 				///<summary>

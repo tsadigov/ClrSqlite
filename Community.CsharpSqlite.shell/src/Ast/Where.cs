@@ -970,7 +970,7 @@ namespace Community.CsharpSqlite {
 									Expr pRight=pRangeStart.pExpr.pRight;
 									pParse.sqlite3ExprCode(pRight,regBase+nEq);
 									if((pRangeStart.wtFlags&TERM_VNULL)==0) {
-										sqlite3ExprCodeIsNullJump(v,pRight,regBase+nEq,addrNxt);
+										exprc.sqlite3ExprCodeIsNullJump(v,pRight,regBase+nEq,addrNxt);
 									}
 									if(zStartAff.Length!=0) {
 										if(pRight.sqlite3CompareAffinity(zStartAff[nEq])==SQLITE_AFF_NONE) {
@@ -982,7 +982,7 @@ namespace Community.CsharpSqlite {
 											///</summary>
 											zStartAff[nEq]=SQLITE_AFF_NONE;
 										}
-										if((sqlite3ExprNeedsNoAffinityChange(pRight,zStartAff[nEq]))!=0) {
+										if((exprc.sqlite3ExprNeedsNoAffinityChange(pRight,zStartAff[nEq]))!=0) {
 											zStartAff[nEq]=SQLITE_AFF_NONE;
 										}
 									}
@@ -1022,7 +1022,7 @@ namespace Community.CsharpSqlite {
 									pParse.sqlite3ExprCacheRemove(regBase+nEq,1);
 									pParse.sqlite3ExprCode(pRight,regBase+nEq);
 									if((pRangeEnd.wtFlags&TERM_VNULL)==0) {
-										sqlite3ExprCodeIsNullJump(v,pRight,regBase+nEq,addrNxt);
+										exprc.sqlite3ExprCodeIsNullJump(v,pRight,regBase+nEq,addrNxt);
 									}
 									if(zEndAff.Length>0) {
 										if(pRight.sqlite3CompareAffinity(zEndAff[nEq])==SQLITE_AFF_NONE) {
@@ -1034,7 +1034,7 @@ namespace Community.CsharpSqlite {
 											///</summary>
 											zEndAff[nEq]=SQLITE_AFF_NONE;
 										}
-										if((sqlite3ExprNeedsNoAffinityChange(pRight,zEndAff[nEq]))!=0) {
+										if((exprc.sqlite3ExprNeedsNoAffinityChange(pRight,zEndAff[nEq]))!=0) {
 											zEndAff[nEq]=SQLITE_AFF_NONE;
 										}
 									}

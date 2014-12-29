@@ -38,15 +38,15 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static void clearSelect(sqlite3 db,Select p) {
-			sqlite3ExprListDelete(db,ref p.pEList);
+			exprc.sqlite3ExprListDelete(db,ref p.pEList);
 			sqlite3SrcListDelete(db,ref p.pSrc);
-			sqlite3ExprDelete(db,ref p.pWhere);
-			sqlite3ExprListDelete(db,ref p.pGroupBy);
-			sqlite3ExprDelete(db,ref p.pHaving);
-			sqlite3ExprListDelete(db,ref p.pOrderBy);
+			exprc.sqlite3ExprDelete(db,ref p.pWhere);
+			exprc.sqlite3ExprListDelete(db,ref p.pGroupBy);
+			exprc.sqlite3ExprDelete(db,ref p.pHaving);
+			exprc.sqlite3ExprListDelete(db,ref p.pOrderBy);
 			sqlite3SelectDelete(db,ref p.pPrior);
-			sqlite3ExprDelete(db,ref p.pLimit);
-			sqlite3ExprDelete(db,ref p.pOffset);
+			exprc.sqlite3ExprDelete(db,ref p.pLimit);
+			exprc.sqlite3ExprDelete(db,ref p.pOffset);
 		}
 
 		
@@ -245,7 +245,7 @@ namespace Community.CsharpSqlite {
 				pEq.ExprSetIrreducible();
 				pEq.iRightJoinTable=(i16)pE2.iTable;
 			}
-			ppWhere=sqlite3ExprAnd(db,ppWhere,pEq);
+			ppWhere=exprc.sqlite3ExprAnd(db,ppWhere,pEq);
 		}
 		///<summary>
 		/// Set the EP_FromJoin property on all terms of the given expression.
@@ -387,7 +387,7 @@ namespace Community.CsharpSqlite {
 				if(pRight.pOn!=null) {
 					if(isOuter)
 						setJoinExpr(pRight.pOn,pRight.iCursor);
-					p.pWhere=sqlite3ExprAnd(pParse.db,p.pWhere,pRight.pOn);
+					p.pWhere=exprc.sqlite3ExprAnd(pParse.db,p.pWhere,pRight.pOn);
 					pRight.pOn=null;
 				}
 				///
@@ -2175,7 +2175,7 @@ break;
 							break;
 					}
 					if(j==nOrderBy) {
-						Expr pNew=sqlite3Expr(db,TK_INTEGER,null);
+						Expr pNew=exprc.sqlite3Expr(db,TK_INTEGER,null);
 						//if ( pNew == null )
 						//  return SQLITE_NOMEM;
                         pNew.Flags |= ExprFlags.EP_IntValue;
@@ -2239,7 +2239,7 @@ break;
 			///
 			///</summary>
 			p.pOrderBy=pOrderBy;
-			pPrior.pOrderBy=sqlite3ExprListDup(pParse.db,pOrderBy,0);
+			pPrior.pOrderBy=exprc.sqlite3ExprListDup(pParse.db,pOrderBy,0);
 			///
 			///<summary>
 			///Allocate a range of temporary registers and the KeyInfo needed
@@ -2298,9 +2298,9 @@ break;
 			else {
 				regLimitA=regLimitB=0;
 			}
-			sqlite3ExprDelete(db,ref p.pLimit);
+			exprc.sqlite3ExprDelete(db,ref p.pLimit);
 			p.pLimit=null;
-			sqlite3ExprDelete(db,ref p.pOffset);
+			exprc.sqlite3ExprDelete(db,ref p.pOffset);
 			p.pOffset=null;
 			regAddrA=++pParse.nMem;
 			regEofA=++pParse.nMem;
@@ -2556,11 +2556,11 @@ break;
 					Expr pNew;
 					Debug.Assert(pEList!=null&&pExpr.iColumn<pEList.nExpr);
 					Debug.Assert(pExpr.pLeft==null&&pExpr.pRight==null);
-					pNew=sqlite3ExprDup(db,pEList.a[pExpr.iColumn].pExpr,0);
+					pNew=exprc.sqlite3ExprDup(db,pEList.a[pExpr.iColumn].pExpr,0);
 					if(pExpr.pColl!=null) {
 						pNew.pColl=pExpr.pColl;
 					}
-					sqlite3ExprDelete(db,ref pExpr);
+					exprc.sqlite3ExprDelete(db,ref pExpr);
 					pExpr=pNew;
 				}
 			}
@@ -3068,7 +3068,7 @@ break;
 				p.pSrc=null;
 				p.pPrior=null;
 				p.pLimit=null;
-				pNew=sqlite3SelectDup(db,p,0);
+				pNew=exprc.sqlite3SelectDup(db,p,0);
 				p.pLimit=pLimit;
 				p.pOrderBy=pOrderBy;
 				p.pSrc=pSrc;
@@ -3261,7 +3261,7 @@ break;
 						substExprList(db,pParent.pOrderBy,iParent,pSub.pEList);
 					}
 				if(pSub.pWhere!=null) {
-					pWhere=sqlite3ExprDup(db,pSub.pWhere,0);
+					pWhere=exprc.sqlite3ExprDup(db,pSub.pWhere,0);
 				}
 				else {
 					pWhere=null;
@@ -3271,13 +3271,13 @@ break;
 					pParent.pHaving=pParent.pWhere;
 					pParent.pWhere=pWhere;
 					pParent.pHaving=substExpr(db,pParent.pHaving,iParent,pSub.pEList);
-					pParent.pHaving=sqlite3ExprAnd(db,pParent.pHaving,sqlite3ExprDup(db,pSub.pHaving,0));
+					pParent.pHaving=exprc.sqlite3ExprAnd(db,pParent.pHaving,exprc.sqlite3ExprDup(db,pSub.pHaving,0));
 					Debug.Assert(pParent.pGroupBy==null);
-					pParent.pGroupBy=sqlite3ExprListDup(db,pSub.pGroupBy,0);
+					pParent.pGroupBy=exprc.sqlite3ExprListDup(db,pSub.pGroupBy,0);
 				}
 				else {
 					pParent.pWhere=substExpr(db,pParent.pWhere,iParent,pSub.pEList);
-					pParent.pWhere=sqlite3ExprAnd(db,pParent.pWhere,pWhere);
+					pParent.pWhere=exprc.sqlite3ExprAnd(db,pParent.pWhere,pWhere);
 				}
 				///
 				///<summary>
@@ -3611,7 +3611,7 @@ break;
 			///<summary>
 			///Before populating the accumulator registers, clear the column cache.
 			///Otherwise, if any of the required column values are already present 
-			///in registers, sqlite3ExprCode() may use OP_SCopy to copy the value
+			///in registers, exprc.sqlite3ExprCode() may use OP_SCopy to copy the value
 			///</summary>
 			///<param name="to pC">>iMem. But by the time the value is used, the original register</param>
 			///<param name="may have been used, invalidating the underlying buffer holding the">may have been used, invalidating the underlying buffer holding the</param>

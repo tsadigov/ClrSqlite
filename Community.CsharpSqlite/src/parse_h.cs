@@ -1887,9 +1887,9 @@ goto attach_end;
 					v.sqlite3VdbeAddOp1(OpCode.OP_Expire,(type==SQLITE_ATTACH)?1:0);
 				}
 				attach_end:
-				sqlite3ExprDelete(db,ref pFilename);
-				sqlite3ExprDelete(db,ref pDbname);
-				sqlite3ExprDelete(db,ref pKey);
+				exprc.sqlite3ExprDelete(db,ref pFilename);
+				exprc.sqlite3ExprDelete(db,ref pDbname);
+				exprc.sqlite3ExprDelete(db,ref pKey);
 			}
 			public void sqlite3Detach(Expr pDbname) {
 				this.codeAttach(SQLITE_DETACH,detach_func,pDbname,null,null,pDbname);
@@ -2472,7 +2472,7 @@ goto attach_end;
 					///<summary>
 					///Name of column in child table 
 					///</summary>
-					pLeft=sqlite3Expr(db,TK_REGISTER,null);
+					pLeft=exprc.sqlite3Expr(db,TK_REGISTER,null);
 					if(pLeft!=null) {
 						///
 						///<summary>
@@ -2497,9 +2497,9 @@ goto attach_end;
 					iCol=aiCol!=null?aiCol[i]:pFKey.aCol[0].iFrom;
 					Debug.Assert(iCol>=0);
 					zCol=pFKey.pFrom.aCol[iCol].zName;
-					pRight=sqlite3Expr(db,TK_ID,zCol);
+					pRight=exprc.sqlite3Expr(db,TK_ID,zCol);
 					pEq=this.sqlite3PExpr(TK_EQ,pLeft,pRight,0);
-					pWhere=sqlite3ExprAnd(db,pWhere,pEq);
+					pWhere=exprc.sqlite3ExprAnd(db,pWhere,pEq);
 				}
 				///
 				///<summary>
@@ -2524,8 +2524,8 @@ goto attach_end;
 					///<summary>
 					///Column ref to child table 
 					///</summary>
-					pLeft=sqlite3Expr(db,TK_REGISTER,null);
-					pRight=sqlite3Expr(db,TK_COLUMN,null);
+					pLeft=exprc.sqlite3Expr(db,TK_REGISTER,null);
+					pRight=exprc.sqlite3Expr(db,TK_COLUMN,null);
 					if(pLeft!=null&&pRight!=null) {
 						pLeft.iTable=regData;
 						pLeft.affinity=SQLITE_AFF_INTEGER;
@@ -2533,7 +2533,7 @@ goto attach_end;
 						pRight.iColumn=-1;
 					}
 					pEq=this.sqlite3PExpr(TK_NE,pLeft,pRight,0);
-					pWhere=sqlite3ExprAnd(db,pWhere,pEq);
+					pWhere=exprc.sqlite3ExprAnd(db,pWhere,pEq);
 				}
 				///
 				///<summary>
@@ -2564,7 +2564,7 @@ goto attach_end;
 				///<summary>
 				///Clean up the WHERE clause constructed above. 
 				///</summary>
-				sqlite3ExprDelete(db,ref pWhere);
+				exprc.sqlite3ExprDelete(db,ref pWhere);
 				if(iFkIfZero!=0) {
 					v.sqlite3VdbeJumpHere(iFkIfZero);
 				}
@@ -2617,7 +2617,7 @@ goto attach_end;
 						v.sqlite3VdbeAddOp2(OP_FkIfZero,1,iSkip);
 					}
 					this.disableTriggers=1;
-					this.sqlite3DeleteFrom(sqlite3SrcListDup(db,pName,0),null);
+					this.sqlite3DeleteFrom(exprc.sqlite3SrcListDup(db,pName,0),null);
 					this.disableTriggers=0;
 					///
 					///<summary>
@@ -3158,7 +3158,7 @@ goto attach_end;
 						///parent table are used for the comparison. 
 						///</summary>
 						pEq=this.sqlite3PExpr(TK_EQ,this.sqlite3PExpr(TK_DOT,this.sqlite3PExpr(TK_ID,null,null,tOld),this.sqlite3PExpr(TK_ID,null,null,tToCol),0),this.sqlite3PExpr(TK_ID,null,null,tFromCol),0);
-						pWhere=sqlite3ExprAnd(db,pWhere,pEq);
+						pWhere=exprc.sqlite3ExprAnd(db,pWhere,pEq);
 						///
 						///<summary>
 						///For ON UPDATE, construct the next term of the WHEN clause.
@@ -3169,7 +3169,7 @@ goto attach_end;
 						///</summary>
 						if(pChanges!=null) {
 							pEq=this.sqlite3PExpr(TK_IS,this.sqlite3PExpr(TK_DOT,this.sqlite3PExpr(TK_ID,null,null,tOld),this.sqlite3PExpr(TK_ID,null,null,tToCol),0),this.sqlite3PExpr(TK_DOT,this.sqlite3PExpr(TK_ID,null,null,tNew),this.sqlite3PExpr(TK_ID,null,null,tToCol),0),0);
-							pWhen=sqlite3ExprAnd(db,pWhen,pEq);
+							pWhen=exprc.sqlite3ExprAnd(db,pWhen,pEq);
 						}
 						if(action!=OE_Restrict&&(action!=OE_Cascade||pChanges!=null)) {
 							Expr pNew;
@@ -3180,7 +3180,7 @@ goto attach_end;
 								if(action==OE_SetDflt) {
 									Expr pDflt=pFKey.pFrom.aCol[iFromCol].pDflt;
 									if(pDflt!=null) {
-										pNew=sqlite3ExprDup(db,pDflt,0);
+										pNew=exprc.sqlite3ExprDup(db,pDflt,0);
 									}
 									else {
 										pNew=this.sqlite3PExpr(TK_NULL,0,0,0);
@@ -3201,7 +3201,7 @@ goto attach_end;
 						Expr pRaise;
 						tFrom.zRestSql=zFrom;
 						tFrom.Length=nFrom;
-						pRaise=sqlite3Expr(db,TK_RAISE,"foreign key constraint failed");
+						pRaise=exprc.sqlite3Expr(db,TK_RAISE,"foreign key constraint failed");
 						if(pRaise!=null) {
 							pRaise.affinity=(char)OE_Abort;
 						}
@@ -3228,12 +3228,12 @@ goto attach_end;
 						pStep.target.Length=nFrom;
 						pStep.target.zRestSql=zFrom;
 						// memcpy( (char*)pStep.target.z, zFrom, nFrom );
-						pStep.pWhere=sqlite3ExprDup(db,pWhere,EXPRDUP_REDUCE);
-						pStep.pExprList=sqlite3ExprListDup(db,pList,EXPRDUP_REDUCE);
-						pStep.pSelect=sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
+						pStep.pWhere=exprc.sqlite3ExprDup(db,pWhere,EXPRDUP_REDUCE);
+						pStep.pExprList=exprc.sqlite3ExprListDup(db,pList,EXPRDUP_REDUCE);
+						pStep.pSelect=exprc.sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
 						if(pWhen!=null) {
 							pWhen=this.sqlite3PExpr(TK_NOT,pWhen,0,0);
-							pTrigger.pWhen=sqlite3ExprDup(db,pWhen,EXPRDUP_REDUCE);
+							pTrigger.pWhen=exprc.sqlite3ExprDup(db,pWhen,EXPRDUP_REDUCE);
 						}
 						///
 						///<summary>
@@ -3246,9 +3246,9 @@ goto attach_end;
 						//}
 					}
 					db.lookaside.bEnabled=enableLookaside;
-					sqlite3ExprDelete(db,ref pWhere);
-					sqlite3ExprDelete(db,ref pWhen);
-					sqlite3ExprListDelete(db,ref pList);
+					exprc.sqlite3ExprDelete(db,ref pWhere);
+					exprc.sqlite3ExprDelete(db,ref pWhen);
+					exprc.sqlite3ExprListDelete(db,ref pList);
 					sqlite3SelectDelete(db,ref pSelect);
 					switch(action) {
 					case OE_Restrict:
@@ -4031,7 +4031,7 @@ isView = false;
 							}
 						}
 						if(j>=pTab.nCol) {
-							if(sqlite3IsRowid(pColumn.a[i].zName)) {
+							if(exprc.sqlite3IsRowid(pColumn.a[i].zName)) {
 								keyColumn=i;
 							}
 							else {
@@ -4435,7 +4435,7 @@ isView = false;
 				}
 				insert_cleanup:
 				sqlite3SrcListDelete(db,ref pTabList);
-				sqlite3ExprListDelete(db,ref pList);
+				exprc.sqlite3ExprListDelete(db,ref pList);
 				sqlite3SelectDelete(db,ref pSelect);
 				sqlite3IdListDelete(db,ref pColumn);
 				db.sqlite3DbFree(ref aRegIdx);
@@ -5426,7 +5426,7 @@ isView = false;
 						}
 					}
 					if(j>=pTab.nCol) {
-						if(sqlite3IsRowid(pChanges.a[i].zName)) {
+						if(exprc.sqlite3IsRowid(pChanges.a[i].zName)) {
 							chngRowid=true;
 							pRowidExpr=pChanges.a[i].pExpr;
 						}
@@ -5847,8 +5847,8 @@ aXRef[j] = -1;
 				db.sqlite3DbFree(ref aRegIdx);
 				db.sqlite3DbFree(ref aXRef);
 				sqlite3SrcListDelete(db,ref pTabList);
-				sqlite3ExprListDelete(db,ref pChanges);
-				sqlite3ExprDelete(db,ref pWhere);
+				exprc.sqlite3ExprListDelete(db,ref pChanges);
+				exprc.sqlite3ExprDelete(db,ref pWhere);
 				return;
 			}
 			public void updateVirtualTable(///
@@ -5937,17 +5937,17 @@ aXRef[j] = -1;
 				///all updated rows.
 				///
 				///</summary>
-				pEList=this.sqlite3ExprListAppend(0,sqlite3Expr(db,TK_ID,"_rowid_"));
+				pEList=this.sqlite3ExprListAppend(0,exprc.sqlite3Expr(db,TK_ID,"_rowid_"));
 				if(pRowid!=null) {
-					pEList=this.sqlite3ExprListAppend(pEList,sqlite3ExprDup(db,pRowid,0));
+					pEList=this.sqlite3ExprListAppend(pEList,exprc.sqlite3ExprDup(db,pRowid,0));
 				}
 				Debug.Assert(pTab.iPKey<0);
 				for(i=0;i<pTab.nCol;i++) {
 					if(aXRef[i]>=0) {
-						pExpr=sqlite3ExprDup(db,pChanges.a[aXRef[i]].pExpr,0);
+						pExpr=exprc.sqlite3ExprDup(db,pChanges.a[aXRef[i]].pExpr,0);
 					}
 					else {
-						pExpr=sqlite3Expr(db,TK_ID,pTab.aCol[i].zName);
+						pExpr=exprc.sqlite3Expr(db,TK_ID,pTab.aCol[i].zName);
 					}
 					pEList=this.sqlite3ExprListAppend(pEList,pExpr);
 				}
@@ -6055,10 +6055,10 @@ aXRef[j] = -1;
 				SelectDest dest=new SelectDest();
 				Select pDup;
 				sqlite3 db=this.db;
-				pDup=sqlite3SelectDup(db,pView.pSelect,0);
+				pDup=exprc.sqlite3SelectDup(db,pView.pSelect,0);
 				if(pWhere!=null) {
 					SrcList pFrom;
-					pWhere=sqlite3ExprDup(db,pWhere,0);
+					pWhere=exprc.sqlite3ExprDup(db,pWhere,0);
 					pFrom=sqlite3SrcListAppend(db,null,null,null);
 					//if ( pFrom != null )
 					//{
@@ -6435,7 +6435,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 																																																																																																					sqlite3AuthContextPop(sContext);
 #endif
 				sqlite3SrcListDelete(db,ref pTabList);
-				sqlite3ExprDelete(db,ref pWhere);
+				exprc.sqlite3ExprDelete(db,ref pWhere);
 				return;
 			}
 			public void sqlite3GenerateRowDelete(///
@@ -6848,8 +6848,8 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				//    Log.WriteLine(pToken.Length);
 				//    Log.WriteLine(pToken.zRestSql);
 				//}
-				Expr p=CreateExpr(this.db,op,pToken,true);
-				sqlite3ExprAttachSubtrees(this.db,p,pLeft,pRight);
+				Expr p=exprc.CreateExpr(this.db,op,pToken,true);
+				exprc.sqlite3ExprAttachSubtrees(this.db,p,pLeft,pRight);
 				if(p!=null) {
 					this.sqlite3ExprCheckHeight(p.nHeight);
 				}
@@ -7157,7 +7157,7 @@ return;
 				#if !SQLITE_OMIT_FLOATING_POINT
 				case TK_FLOAT: {
 					Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
-					codeReal(v,pExpr.u.zToken,false,target);
+					exprc.codeReal(v,pExpr.u.zToken,false,target);
 					break;
 				}
 				#endif
@@ -7324,7 +7324,7 @@ return;
 					else
 						if(pLeft.Operator==TokenType.TK_FLOAT) {
 							Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
-							codeReal(v,pLeft.u.zToken,true,target);
+							exprc.codeReal(v,pLeft.u.zToken,true,target);
 							#endif
 						}
 						else {
@@ -7853,7 +7853,7 @@ return;
 				if((this.db.flags&SQLITE_FactorOutConst)!=0)
 					return;
 				w=new Walker();
-				w.xExprCallback=(dxExprCallback)evalConstExpr;
+				w.xExprCallback=(dxExprCallback)exprc.evalConstExpr;
 				w.xSelectCallback=null;
 				w.pParse=this;
 				w.sqlite3WalkExpr(ref pExpr);
@@ -8076,7 +8076,7 @@ return;
           {
             int destIfFalse = sqlite3VdbeMakeLabel( v );
             int destIfNull = jumpIfNull != 0 ? dest : destIfFalse;
-            sqlite3ExprCodeIN( pParse, pExpr, destIfFalse, destIfNull );
+            exprc.sqlite3ExprCodeIN( pParse, pExpr, destIfFalse, destIfNull );
             sqlite3VdbeAddOp2( v, OP_Goto, 0, dest );
             sqlite3VdbeResolveLabel( v, destIfFalse );
             break;
@@ -8216,12 +8216,12 @@ return;
           {
             if ( jumpIfNull != 0 )
             {
-              sqlite3ExprCodeIN( pParse, pExpr, dest, dest );
+              exprc.sqlite3ExprCodeIN( pParse, pExpr, dest, dest );
             }
             else
             {
               int destIfNull = sqlite3VdbeMakeLabel( v );
-              sqlite3ExprCodeIN( pParse, pExpr, dest, destIfNull );
+              exprc.sqlite3ExprCodeIN( pParse, pExpr, dest, destIfNull );
               sqlite3VdbeResolveLabel( v, destIfNull );
             }
           break;
@@ -8330,8 +8330,8 @@ return;
 				return pList;
 				//no_mem:
 				//  /* Avoid leaking memory if malloc has failed. */
-				//  sqlite3ExprDelete( db, ref pExpr );
-				//  sqlite3ExprListDelete( db, ref pList );
+				//  exprc.sqlite3ExprDelete( db, ref pExpr );
+				//  exprc.sqlite3ExprListDelete( db, ref pList );
 				//  return null;
 			}
 			public void sqlite3ExprListSetSpan(///
@@ -8418,9 +8418,9 @@ return;
 				Expr pNew;
 				sqlite3 db=this.db;
 				Debug.Assert(pToken!=null);
-				pNew=CreateExpr(db,TK_FUNCTION,pToken,true);
+				pNew=exprc.CreateExpr(db,TK_FUNCTION,pToken,true);
 				if(pNew==null) {
-					sqlite3ExprListDelete(db,ref pList);
+					exprc.sqlite3ExprListDelete(db,ref pList);
 					///
 					///<summary>
 					///Avoid memory leak when malloc fails 
@@ -8646,7 +8646,7 @@ return;
 					if(cnt!=0&&255!=(u8)z[cnt-1]) {
 						Expr pPrefix;
 						pisComplete=c==wc[0]&&cnt==z.Length-1;
-						pPrefix=sqlite3Expr(db,TK_STRING,z);
+						pPrefix=exprc.sqlite3Expr(db,TK_STRING,z);
 						if(pPrefix!=null)
 							pPrefix.u.zToken=pPrefix.u.zToken.Substring(0,cnt);
 						ppPrefix=pPrefix;
@@ -10593,12 +10593,12 @@ range_est_fallback:
 					testcase(pTerm.eOperator&WO_IN);
 					if((pTerm.eOperator&(WO_ISNULL|WO_IN))==0) {
 						Expr pRight=pTerm.pExpr.pRight;
-						sqlite3ExprCodeIsNullJump(v,pRight,regBase+j,pLevel.addrBrk);
+						exprc.sqlite3ExprCodeIsNullJump(v,pRight,regBase+j,pLevel.addrBrk);
 						if(zAff.Length>0) {
 							if(pRight.sqlite3CompareAffinity(zAff[j])==SQLITE_AFF_NONE) {
 								zAff[j]=SQLITE_AFF_NONE;
 							}
-							if((sqlite3ExprNeedsNoAffinityChange(pRight,zAff[j]))!=0) {
+							if((exprc.sqlite3ExprNeedsNoAffinityChange(pRight,zAff[j]))!=0) {
 								zAff[j]=SQLITE_AFF_NONE;
 							}
 						}
@@ -11674,7 +11674,7 @@ range_est_fallback:
 				///</summary>
 				pY.Operator==TokenType.TK_NULL) {
 					pA.Operator=(TokenType)op;
-					sqlite3ExprDelete(db,ref pA.pRight);
+					exprc.sqlite3ExprDelete(db,ref pA.pRight);
 					pA.pRight=null;
 				}
 			}
@@ -11708,7 +11708,7 @@ range_est_fallback:
 				///
 				///</summary>
 				p=(pX.ExprHasProperty(EP_xIsSelect)?pX.x.pSelect:null);
-				if(ALWAYS(this.nErr==0)&&isCandidateForInOpt(p)!=0) {
+				if(ALWAYS(this.nErr==0)&&exprc.isCandidateForInOpt(p)!=0) {
 					sqlite3 db=this.db;
 					///
 					///<summary>
@@ -12083,7 +12083,7 @@ range_est_fallback:
 																																																																																																																																														              VdbeComment( v, "Init EXISTS result" );
 #endif
 					}
-					sqlite3ExprDelete(this.db,ref pSel.pLimit);
+					exprc.sqlite3ExprDelete(this.db,ref pSel.pLimit);
 					pSel.pLimit=this.sqlite3PExpr(TK_INTEGER,null,null,sqlite3IntTokens[1]);
 					pSel.iLimit=0;
 					if(Select.sqlite3Select(this,pSel,ref dest)!=0) {
@@ -12308,7 +12308,7 @@ range_est_fallback:
 						#if SQLITE_OMIT_FLOATING_POINT
 																																																																																																																																														utilc.sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
 #else
-						codeReal(v,z,negFlag,iMem);
+						exprc.codeReal(v,z,negFlag,iMem);
 						#endif
 					}
 				}

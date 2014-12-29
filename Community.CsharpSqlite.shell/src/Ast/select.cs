@@ -359,7 +359,7 @@ namespace Community.CsharpSqlite
                             ///</summary>
                             if (sqlite3ViewGetColumnNames(pParse, pTab) != 0)
                                 return WRC_Abort;
-                            pFrom.pSelect = sqlite3SelectDup(db, pTab.pSelect, 0);
+                            pFrom.pSelect = exprc.sqlite3SelectDup(db, pTab.pSelect, 0);
                             pWalker.sqlite3WalkSelect(pFrom.pSelect);
                         }
 #endif
@@ -538,13 +538,13 @@ namespace Community.CsharpSqlite
                                             continue;
                                         }
                                     }
-                                    pRight = sqlite3Expr(db, TK_ID, zName);
+                                    pRight = exprc.sqlite3Expr(db, TK_ID, zName);
                                     zColname = zName;
                                     zToFree = "";
                                     if (longNames || pTabList.nSrc > 1)
                                     {
                                         Expr pLeft;
-                                        pLeft = sqlite3Expr(db, TK_ID, zTabName);
+                                        pLeft = exprc.sqlite3Expr(db, TK_ID, zTabName);
                                         pExpr = pParse.sqlite3PExpr(TK_DOT, pLeft, pRight, 0);
                                         if (longNames)
                                         {
@@ -576,7 +576,7 @@ namespace Community.CsharpSqlite
                             }
                         }
                     }
-                    sqlite3ExprListDelete(db, ref pEList);
+                    exprc.sqlite3ExprListDelete(db, ref pEList);
                     p.pEList = pNew;
                 }
                 //#if SQLITE_MAX_COLUMN
@@ -766,7 +766,7 @@ namespace Community.CsharpSqlite
                     ///If ORDER BY makes no difference in the output then neither does
                     ///DISTINCT so it can be removed too. 
                     ///</summary>
-                    sqlite3ExprListDelete(db, ref p.pOrderBy);
+                    exprc.sqlite3ExprListDelete(db, ref p.pOrderBy);
                     p.pOrderBy = null;
                     p.selFlags = (p.selFlags & ~SelectFlags.Distinct);
                 }
@@ -900,7 +900,7 @@ namespace Community.CsharpSqlite
                 Debug.Assert(p.pGroupBy == null || (p.selFlags & SelectFlags.Aggregate) != 0);
                 if ((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct)
                 {
-                    p.pGroupBy = sqlite3ExprListDup(db, p.pEList, 0);
+                    p.pGroupBy = exprc.sqlite3ExprListDup(db, p.pEList, 0);
                     pGroupBy = p.pGroupBy;
                     p.selFlags = (p.selFlags & ~SelectFlags.Distinct);
                 }
@@ -914,7 +914,7 @@ namespace Community.CsharpSqlite
                 ///<param name="Use the SQLITE_GroupByOrder flag with SQLITE_TESTCTRL_OPTIMIZER">Use the SQLITE_GroupByOrder flag with SQLITE_TESTCTRL_OPTIMIZER</param>
                 ///<param name="to disable this optimization for testing purposes.">to disable this optimization for testing purposes.</param>
                 ///<param name=""></param>
-                if (sqlite3ExprListCompare(p.pGroupBy, pOrderBy) == 0 && (db.flags & SQLITE_GroupByOrder) == 0)
+                if (exprc.sqlite3ExprListCompare(p.pGroupBy, pOrderBy) == 0 && (db.flags & SQLITE_GroupByOrder) == 0)
                 {
                     pOrderBy = null;
                 }
@@ -1091,17 +1091,17 @@ namespace Community.CsharpSqlite
                     sNC.pAggInfo = sAggInfo;
                     sAggInfo.nSortingColumn = pGroupBy != null ? pGroupBy.nExpr + 1 : 0;
                     sAggInfo.pGroupBy = pGroupBy;
-                    sqlite3ExprAnalyzeAggList(sNC, pEList);
-                    sqlite3ExprAnalyzeAggList(sNC, pOrderBy);
+                    exprc.sqlite3ExprAnalyzeAggList(sNC, pEList);
+                    exprc.sqlite3ExprAnalyzeAggList(sNC, pOrderBy);
                     if (pHaving != null)
                     {
-                        sqlite3ExprAnalyzeAggregates(sNC, ref pHaving);
+                        exprc.sqlite3ExprAnalyzeAggregates(sNC, ref pHaving);
                     }
                     sAggInfo.nAccumulator = sAggInfo.nColumn;
                     for (i = 0; i < sAggInfo.nFunc; i++)
                     {
                         Debug.Assert(!sAggInfo.aFunc[i].pExpr.ExprHasProperty(EP_xIsSelect));
-                        sqlite3ExprAnalyzeAggList(sNC, sAggInfo.aFunc[i].pExpr.x.pList);
+                        exprc.sqlite3ExprAnalyzeAggList(sNC, sAggInfo.aFunc[i].pExpr.x.pList);
                     }
                     //      if ( db.mallocFailed != 0 ) goto select_end;
                     ///
@@ -1527,7 +1527,7 @@ namespace Community.CsharpSqlite
                             if (flag != 0)
                             {
                                 Debug.Assert(!p.pEList.a[0].pExpr.ExprHasProperty(EP_xIsSelect));
-                                pMinMax = sqlite3ExprListDup(db, p.pEList.a[0].pExpr.x.pList, 0);
+                                pMinMax = exprc.sqlite3ExprListDup(db, p.pEList.a[0].pExpr.x.pList, 0);
                                 pDel = pMinMax;
                                 if (pMinMax != null)///* && 0 == db.mallocFailed */ )
                                 {
@@ -1546,7 +1546,7 @@ namespace Community.CsharpSqlite
                             pWInfo = pParse.sqlite3WhereBegin(pTabList, pWhere, ref pMinMax, (byte)flag);
                             if (pWInfo == null)
                             {
-                                sqlite3ExprListDelete(db, ref pDel);
+                                exprc.sqlite3ExprListDelete(db, ref pDel);
                                 goto select_end;
                             }
                             updateAccumulator(pParse, sAggInfo);
@@ -1564,7 +1564,7 @@ namespace Community.CsharpSqlite
                         pOrderBy = null;
                         pParse.sqlite3ExprIfFalse(pHaving, addrEnd, SQLITE_JUMPIFNULL);
                         selectInnerLoop(pParse, p, p.pEList, 0, 0, null, -1, pDest, addrEnd, addrEnd);
-                        sqlite3ExprListDelete(db, ref pDel);
+                        exprc.sqlite3ExprListDelete(db, ref pDel);
                     }
                     v.sqlite3VdbeResolveLabel(addrEnd);
                 }
@@ -1936,13 +1936,13 @@ namespace Community.CsharpSqlite
                             ///Query flattening in Select.sqlite3Select() might refill p.pOrderBy.
                             ///Be sure to delete p.pOrderBy, therefore, to avoid a memory leak. 
                             ///</summary>
-                            sqlite3ExprListDelete(db, ref p.pOrderBy);
+                            exprc.sqlite3ExprListDelete(db, ref p.pOrderBy);
                             pDelete = p.pPrior;
                             p.pPrior = pPrior;
                             p.pOrderBy = null;
                             if (p.tk_op == TK_UNION)
                                 p.nSelectRow += pPrior.nSelectRow;
-                            sqlite3ExprDelete(db, ref p.pLimit);
+                            exprc.sqlite3ExprDelete(db, ref p.pLimit);
                             p.pLimit = pLimit;
                             p.pOffset = pOffset;
                             p.iLimit = 0;
@@ -2034,7 +2034,7 @@ namespace Community.CsharpSqlite
                             p.pPrior = pPrior;
                             if (p.nSelectRow > pPrior.nSelectRow)
                                 p.nSelectRow = pPrior.nSelectRow;
-                            sqlite3ExprDelete(db, ref p.pLimit);
+                            exprc.sqlite3ExprDelete(db, ref p.pLimit);
                             p.pLimit = pLimit;
                             p.pOffset = pOffset;
                             ///
@@ -2264,7 +2264,7 @@ namespace Community.CsharpSqlite
                 //}
                 if (pEList == null)
                 {
-                    pEList = pParse.sqlite3ExprListAppend(null, sqlite3Expr(db, TK_ALL, null));
+                    pEList = pParse.sqlite3ExprListAppend(null, exprc.sqlite3Expr(db, TK_ALL, null));
                 }
                 pNew.pEList = pEList;
                 pNew.pSrc = pSrc;

@@ -209,7 +209,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///Allowed values of WhereTerm.wtFlags
 		///
 		///</summary>
-		//#define TERM_DYNAMIC    0x01   /* Need to call sqlite3ExprDelete(db, ref pExpr) */
+		//#define TERM_DYNAMIC    0x01   /* Need to call exprc.sqlite3ExprDelete(db, ref pExpr) */
 		//#define TERM_VIRTUAL    0x02   /* Added by the optimizer.  Do not code */
 		//#define TERM_CODED      0x04   /* This term is already coded */
 		//#define TERM_COPIED     0x08   /* Has a child */
@@ -224,7 +224,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		const int TERM_DYNAMIC=0x01;
 		///
 		///<summary>
-		///Need to call sqlite3ExprDelete(db, ref pExpr) 
+		///Need to call exprc.sqlite3ExprDelete(db, ref pExpr) 
 		///</summary>
 		const int TERM_VIRTUAL=0x02;
 		///
@@ -336,7 +336,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				 {
 					a=this.a[i];
 					if((a.wtFlags&TERM_DYNAMIC)!=0) {
-						sqlite3ExprDelete(db,ref a.pExpr);
+						exprc.sqlite3ExprDelete(db,ref a.pExpr);
 					}
 					if((a.wtFlags&TERM_ORINFO)!=0) {
 						db.whereOrInfoDelete(a.u.pOrInfo);
@@ -405,7 +405,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 					//pWC.a = sqlite3DbMallocRaw(db, sizeof(pWC.a[0])*pWC.nSlot*2 );
 					//if( pWC.a==null ){
 					//  if( wtFlags & TERM_DYNAMIC ){
-					//    sqlite3ExprDelete(db, ref p);
+					//    exprc.sqlite3ExprDelete(db, ref p);
 					//  }
 					//  pWC.a = pOld;
 					//  return 0;

@@ -3003,7 +3003,7 @@ void sqlite3_thread_cleanup()
       }
 
       /* Find the column for which info is requested */
-      if ( sqlite3IsRowid( zColumnName ) )
+      if ( exprc.sqlite3IsRowid( zColumnName ) )
       {
         iCol = pTab.iPKey;
         if ( iCol >= 0 )

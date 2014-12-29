@@ -420,12 +420,12 @@ namespace Community.CsharpSqlite
                             Debug.Assert(pOrTerm.eOperator == WO_EQ);
                             Debug.Assert(pOrTerm.leftCursor == iCursor);
                             Debug.Assert(pOrTerm.u.leftColumn == iColumn);
-                            pDup = sqlite3ExprDup(db, pOrTerm.pExpr.pRight, 0);
+                            pDup = exprc.sqlite3ExprDup(db, pOrTerm.pExpr.pRight, 0);
                             pList = pWC.pParse.sqlite3ExprListAppend(pList, pDup);
                             pLeft = pOrTerm.pExpr.pLeft;
                         }
                         Debug.Assert(pLeft != null);
-                        pDup = sqlite3ExprDup(db, pLeft, 0);
+                        pDup = exprc.sqlite3ExprDup(db, pLeft, 0);
                         pNew = pParse.sqlite3PExpr(TK_IN, pDup, null, null);
                         if (pNew != null)
                         {
@@ -442,7 +442,7 @@ namespace Community.CsharpSqlite
                         }
                         else
                         {
-                            sqlite3ExprListDelete(db, ref pList);
+                            exprc.sqlite3ExprListDelete(db, ref pList);
                         }
                         pTerm.eOperator = WO_NOOP;
                         ///
@@ -589,10 +589,10 @@ namespace Community.CsharpSqlite
                         if (pTerm.leftCursor >= 0)
                         {
                             int idxNew;
-                            pDup = sqlite3ExprDup(db, pExpr, 0);
+                            pDup = exprc.sqlite3ExprDup(db, pExpr, 0);
                             //if ( db.mallocFailed != 0 )
                             //{
-                            //  sqlite3ExprDelete( db, ref pDup );
+                            //  exprc.sqlite3ExprDelete( db, ref pDup );
                             //  return;
                             //}
                             idxNew = pWC.whereClauseInsert(pDup, TERM_VIRTUAL | TERM_DYNAMIC);
@@ -652,7 +652,7 @@ namespace Community.CsharpSqlite
                         {
                             Expr pNewExpr;
                             int idxNew;
-                            pNewExpr = pParse.sqlite3PExpr(ops[i], sqlite3ExprDup(db, pExpr.pLeft, 0), sqlite3ExprDup(db, pList.a[i].pExpr, 0), null);
+                            pNewExpr = pParse.sqlite3PExpr(ops[i], exprc.sqlite3ExprDup(db, pExpr.pLeft, 0), exprc.sqlite3ExprDup(db, pList.a[i].pExpr, 0), null);
                             idxNew = pWC.whereClauseInsert(pNewExpr, TERM_VIRTUAL | TERM_DYNAMIC);
                             testcase(idxNew == 0);
                             this.exprAnalyze(pWC, idxNew);
@@ -711,7 +711,7 @@ namespace Community.CsharpSqlite
                     ///Collating sequence to use 
                     ///</summary>
                     pLeft = pExpr.x.pList.a[1].pExpr;
-                    pStr2 = sqlite3ExprDup(db, pStr1, 0);
+                    pStr2 = exprc.sqlite3ExprDup(db, pStr1, 0);
                     ////if ( 0 == db.mallocFailed )
                     {
                         int c, pC;
@@ -744,11 +744,11 @@ namespace Community.CsharpSqlite
                         // pC = c + 1;
                     }
                     pColl = sqlite3FindCollSeq(db, SqliteEncoding.UTF8, noCase ? "NOCASE" : "BINARY", 0);
-                    pNewExpr1 = pParse.sqlite3PExpr(TK_GE, sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr1, 0);
+                    pNewExpr1 = pParse.sqlite3PExpr(TK_GE, exprc.sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr1, 0);
                     idxNew1 = pWC.whereClauseInsert(pNewExpr1, TERM_VIRTUAL | TERM_DYNAMIC);
                     testcase(idxNew1 == 0);
                     this.exprAnalyze(pWC, idxNew1);
-                    pNewExpr2 = pParse.sqlite3PExpr(TK_LT, sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr2, null);
+                    pNewExpr2 = pParse.sqlite3PExpr(TK_LT, exprc.sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr2, null);
                     idxNew2 = pWC.whereClauseInsert(pNewExpr2, TERM_VIRTUAL | TERM_DYNAMIC);
                     testcase(idxNew2 == 0);
                     this.exprAnalyze(pWC, idxNew2);
@@ -783,7 +783,7 @@ namespace Community.CsharpSqlite
                     if ((prereqExpr & prereqColumn) == 0)
                     {
                         Expr pNewExpr;
-                        pNewExpr = pParse.sqlite3PExpr(TK_MATCH, null, sqlite3ExprDup(db, pRight, 0), null);
+                        pNewExpr = pParse.sqlite3PExpr(TK_MATCH, null, exprc.sqlite3ExprDup(db, pRight, 0), null);
                         idxNew = pWC.whereClauseInsert(pNewExpr, TERM_VIRTUAL | TERM_DYNAMIC);
                         testcase(idxNew == 0);
                         pNewTerm = pWC.a[idxNew];
@@ -821,7 +821,7 @@ namespace Community.CsharpSqlite
         WhereTerm pNewTerm;
 
         pNewExpr = sqlite3PExpr( pParse, TK_GT,
-                                sqlite3ExprDup( db, pLeft, 0 ),
+                                exprc.sqlite3ExprDup( db, pLeft, 0 ),
                                 sqlite3PExpr( pParse, TK_NULL, 0, 0, 0 ), 0 );
 
         idxNew = whereClauseInsert( pWC, pNewExpr,

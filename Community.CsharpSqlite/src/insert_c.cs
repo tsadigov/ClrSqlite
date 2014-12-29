@@ -842,7 +842,7 @@ namespace Community.CsharpSqlite
 				}
 			}
 			#if !SQLITE_OMIT_CHECK
-			if (pDest.pCheck != null && 0 != sqlite3ExprCompare (pSrc.pCheck, pDest.pCheck)) {
+			if (pDest.pCheck != null && 0 != exprc.sqlite3ExprCompare (pSrc.pCheck, pDest.pCheck)) {
 				return 0;
 				///
 ///<summary>

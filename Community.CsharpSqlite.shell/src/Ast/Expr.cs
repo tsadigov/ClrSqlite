@@ -44,8 +44,8 @@ namespace Community.CsharpSqlite
         private const int EXPR_REDUCEDSIZE = 24;
         private const int EXPR_TOKENONLYSIZE = 8;
         ///<summary>
-        /// Flags passed to the sqlite3ExprDup() function. See the header comment
-        /// above sqlite3ExprDup() for details.
+        /// Flags passed to the exprc.sqlite3ExprDup() function. See the header comment
+        /// above exprc.sqlite3ExprDup() for details.
         ///
         ///</summary>
         //#define EXPRDUP_REDUCE         0x0001  /* Used reduced-size Expr nodes */
@@ -588,8 +588,8 @@ set { _op = value; }
             {
                 Walker w = new Walker();
                 w.u.i = initFlag;
-                w.xExprCallback = exprNodeIsConstant;
-                w.xSelectCallback = selectNodeIsConstant;
+                w.xExprCallback = exprc.exprNodeIsConstant;
+                w.xSelectCallback = exprc.selectNodeIsConstant;
                 Expr _this = this;
                 w.sqlite3WalkExpr(ref _this);
                 return w.u.i;
