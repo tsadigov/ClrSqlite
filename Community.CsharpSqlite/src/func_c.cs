@@ -2209,7 +2209,7 @@ FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
                 {
                     sqlite3FuncDefInsert(pHash, aFunc[i]);
                 }
-                sqlite3RegisterDateTimeFunctions();
+                DateUtils.sqlite3RegisterDateTimeFunctions();
 #if !SQLITE_OMIT_ALTERTABLE
                 sqlite3AlterFunctions();
 #endif
