@@ -903,7 +903,7 @@ PgHdr *pPg;
 
 pPg = sqlite3PagerLookup(pPager, iPg);
 if( pPg ){
-if( sqlite3PcachePageRefcount(pPg)==1 ){
+if( PCacheMethods.sqlite3PcachePageRefcount(pPg)==1 ){
 sqlite3PcacheDrop(pPg);
 }else{
 rc = readDbPage(pPg);
@@ -943,7 +943,7 @@ PgHdr *pList;                   /* List of dirty pages to revert */
 */
 pPager.dbSize = pPager.dbOrigSize;
 rc = sqlite3WalUndo(pPager.pWal, pagerUndoCallback, (void *)pPager);
-pList = sqlite3PcacheDirtyList(pPager.pPCache);
+pList = PCacheMethods.sqlite3PcacheDirtyList(pPager.pPCache);
 while( pList && rc==SQLITE_OK ){
 PgHdr *pNext = pList->pDirty;
 rc = pagerUndoCallback((void *)pPager, pList->pgno);
@@ -1009,7 +1009,7 @@ sqlite3BackupUpdate(pPager.pBackup, p->pgno, (u8 *)p->pData);
 }
 
 #if SQLITE_CHECK_PAGES
-																																						pList = sqlite3PcacheDirtyList(pPager.pPCache);
+																																						pList = PCacheMethods.sqlite3PcacheDirtyList(pPager.pPCache);
 for(p=pList; p; p=p->pDirty){
 pager_set_pagehash(p);
 }
@@ -1088,7 +1088,7 @@ pPager.pVfs, pPager.zWal, SQLITE_ACCESS_EXISTS, &isWal
 }
 if( rc==SQLITE_OK ){
 if( isWal ){
-testcase( sqlite3PcachePagecount(pPager.pPCache)==0 );
+testcase( PCacheMethods.sqlite3PcachePagecount(pPager.pPCache)==0 );
 rc = sqlite3PagerOpenWal(pPager, 0);
 }else if( pPager.journalMode==PAGER_JOURNALMODE_WAL ){
 pPager.journalMode = PAGER_JOURNALMODE_DELETE;
@@ -1162,7 +1162,7 @@ return rc;
     }
     static void assertTruncateConstraint( Pager pPager )
     {
-      sqlite3PcacheIterateDirty( pPager.pPCache, assertTruncateConstraintCb );
+      PCacheMethods.sqlite3PcacheIterateDirty( pPager.pPCache, assertTruncateConstraintCb );
     }
 #else
             //# define assertTruncateConstraint(pPager)
@@ -1268,11 +1268,11 @@ return rc;
             /// out to the database file, if possible. This may involve syncing the
             /// journal file.
             ///
-            /// If successful, sqlite3PcacheMakeClean() is called on the page and
+            /// If successful, PCacheMethods.sqlite3PcacheMakeClean() is called on the page and
             /// SQLITE_OK returned. If an IO error occurs while trying to make the
             /// page clean, the IO error code is returned. If the page cannot be
             /// made clean for some other reason, but no error occurs, then SQLITE_OK
-            /// is returned by sqlite3PcacheMakeClean() is not called.
+            /// is returned by PCacheMethods.sqlite3PcacheMakeClean() is not called.
             ///
             ///</summary>
             static int pagerStress(object p, PgHdr pPg)
@@ -1293,7 +1293,7 @@ return rc;
                 ///
                 ///Spilling is also prohibited when in an error state since that could
                 ///lead to database corruption.   In the current implementaton it 
-                ///is impossible for sqlite3PCacheFetch() to be called with createFlag==1
+                ///is impossible for PCacheMethods.sqlite3PcacheFetch() to be called with createFlag==1
                 ///while in the error state, hence it is impossible for this routine to
                 ///be called in the error state.  Nevertheless, we include a NEVER()
                 ///test for the error state as a safeguard against future changes.
@@ -1390,7 +1390,7 @@ return rc;
                 if (rc == SQLITE_OK)
                 {
                     PAGERTRACE("STRESS %d page %d\n", PagerMethods.PAGERID(pPager), pPg.pgno);
-                    sqlite3PcacheMakeClean(pPg);
+                    PCacheMethods.sqlite3PcacheMakeClean(pPg);
                 }
                 return pPager.pager_error(rc);
             }
@@ -1525,7 +1525,7 @@ return rc;
                 ///</summary>
                 ///<param name="True to omit read">lock </param>
 
-                int pcacheSize = sqlite3PcacheSize();
+                int pcacheSize = PCacheMethods.sqlite3PcacheSize();
                 ///
                 ///<summary>
                 ///Bytes to allocate for PCache 
@@ -1820,7 +1820,7 @@ szPageDflt = ii;
 
                 Debug.Assert(nExtra < 1000);
                 nExtra = ROUND8(nExtra);
-                sqlite3PcacheOpen((int)szPageDflt, nExtra, 0 == memDb, 0 == memDb ? (dxStress)pagerStress : null, pPager, pPager.pPCache);
+                PCacheMethods.sqlite3PcacheOpen((int)szPageDflt, nExtra, 0 == memDb, 0 == memDb ? (dxStress)pagerStress : null, pPager, pPager.pPCache);
                 PAGERTRACE("OPEN %d %s\n", FILEHANDLEID(pPager.fd), pPager.zFilename);
                 IOTRACE("OPEN %p %s\n", pPager, pPager.zFilename);
                 pPager.useJournal = (u8)(useJournal ? 1 : 0);
@@ -1954,7 +1954,7 @@ szPageDflt = ii;
                 if (pPg != null)
                 {
                     Pager pPager = pPg.pPager;
-                    sqlite3PcacheRelease(pPg);
+                    PCacheMethods.sqlite3PcacheRelease(pPg);
                     pPager.pagerUnlockIfUnused();
                 }
             }
@@ -2008,8 +2008,8 @@ szPageDflt = ii;
                 ///<param name="obtained the necessary locks to begin the write">transaction, but the</param>
                 ///<param name="rollback journal might not yet be open. Open it now if this is the case.">rollback journal might not yet be open. Open it now if this is the case.</param>
                 ///<param name=""></param>
-                ///<param name="This is done before calling sqlite3PcacheMakeDirty() on the page. ">This is done before calling sqlite3PcacheMakeDirty() on the page. </param>
-                ///<param name="Otherwise, if it were done after calling sqlite3PcacheMakeDirty(), then">Otherwise, if it were done after calling sqlite3PcacheMakeDirty(), then</param>
+                ///<param name="This is done before calling PCacheMethods.sqlite3PcacheMakeDirty() on the page. ">This is done before calling PCacheMethods.sqlite3PcacheMakeDirty() on the page. </param>
+                ///<param name="Otherwise, if it were done after calling PCacheMethods.sqlite3PcacheMakeDirty(), then">Otherwise, if it were done after calling PCacheMethods.sqlite3PcacheMakeDirty(), then</param>
                 ///<param name="an error might occur and the pager would end up in WRITER_LOCKED state">an error might occur and the pager would end up in WRITER_LOCKED state</param>
                 ///<param name="with pages marked as dirty in the cache.">with pages marked as dirty in the cache.</param>
 
@@ -2028,7 +2028,7 @@ szPageDflt = ii;
                 ///
                 ///</summary>
 
-                sqlite3PcacheMakeDirty(pPg);
+                PCacheMethods.sqlite3PcacheMakeDirty(pPg);
                 if (pPg.pageInJournal() && !pPg.subjRequiresPage())
                 {
                     Debug.Assert(!pPager.pagerUseWal());
@@ -2354,7 +2354,7 @@ szPageDflt = ii;
       int[] a = new int[11];
       a[0] = sqlite3PcacheRefCount( pPager.pPCache );
       a[1] = sqlite3PcachePagecount( pPager.pPCache );
-      a[2] = sqlite3PcacheGetCachesize( pPager.pPCache );
+      a[2] = PCacheMethods.sqlite3PcacheGetCachesize( pPager.pPCache );
       a[3] = pPager.eState == PAGER_OPEN ? -1 : (int)pPager.dbSize;
       a[4] = pPager.eState;
       a[5] = pPager.errCode;

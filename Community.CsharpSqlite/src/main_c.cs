@@ -243,7 +243,7 @@ return rc;
 			///<param name=""></param>
 			///<param name="The following mutex is what serializes access to the appdef pcache xInit">The following mutex is what serializes access to the appdef pcache xInit</param>
 			///<param name="methods.  The sqlite3_pcache_methods.xInit() all is embedded in the">methods.  The sqlite3_pcache_methods.xInit() all is embedded in the</param>
-			///<param name="call to sqlite3PcacheInitialize().">call to sqlite3PcacheInitialize().</param>
+			///<param name="call to PCacheMethods.sqlite3PcacheInitialize().">call to PCacheMethods.sqlite3PcacheInitialize().</param>
 			///<param name=""></param>
 			//sqlite3_mutex_enter( sqlite3GlobalConfig.pInitMutex );
 			lock(sqlite3GlobalConfig.pInitMutex) {
@@ -258,7 +258,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					#endif
 					func.sqlite3RegisterGlobalFunctions();
 					if(sqlite3GlobalConfig.isPCacheInit==0) {
-						rc=sqlite3PcacheInitialize();
+						rc=PCacheMethods.sqlite3PcacheInitialize();
 					}
 					if(rc==SQLITE_OK) {
 						sqlite3GlobalConfig.isPCacheInit=1;
@@ -329,7 +329,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 				sqlite3GlobalConfig.isInit=0;
 			}
 			if(sqlite3GlobalConfig.isPCacheInit!=0) {
-				sqlite3PcacheShutdown();
+				PCacheMethods.sqlite3PcacheShutdown();
 				sqlite3GlobalConfig.isPCacheInit=0;
 			}
 			if(sqlite3GlobalConfig.isMallocInit!=0) {

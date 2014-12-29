@@ -1029,7 +1029,7 @@ return (pPager->pWal!=0);
 #endif
 );
                             Debug.Assert(pPager.errCode == SQLITE_OK);
-                            Debug.Assert(sqlite3PcacheRefCount(pPager.pPCache) == 0 || pPager.tempFile);
+                            Debug.Assert(PCacheMethods.sqlite3PcacheRefCount(pPager.pPCache) == 0 || pPager.tempFile);
                             break;
                         case PAGER_READER:
                             Debug.Assert(pPager.errCode == SQLITE_OK);
@@ -1092,7 +1092,7 @@ return (pPager->pWal!=0);
                             ///</summary>
 
                             Debug.Assert(pPager.errCode != SQLITE_OK);
-                            Debug.Assert(sqlite3PcacheRefCount(pPager.pPCache) > 0);
+                            Debug.Assert(PCacheMethods.sqlite3PcacheRefCount(pPager.pPCache) > 0);
                             break;
                     }
                     return true;
@@ -1778,7 +1778,7 @@ return (pPager->pWal!=0);
                     ///
                     ///</summary>
 
-                    sqlite3PcacheFetch(this.pPCache, pgno, 0, ref p);
+                    PCacheMethods.sqlite3PcacheFetch(this.pPCache, pgno, 0, ref p);
                     return p;
                 }
 
@@ -1790,7 +1790,7 @@ return (pPager->pWal!=0);
                 {
                     if (null != this.pBackup)
                         this.pBackup.sqlite3BackupRestart();
-                    sqlite3PcacheClear(this.pPCache);
+                    PCacheMethods.sqlite3PcacheClear(this.pPCache);
                 }
 
                 public///<summary>
@@ -2163,8 +2163,8 @@ PagerMethods.sqlite3PagerUnref(p);
                     sqlite3BitvecDestroy(ref this.pInJournal);
                     this.pInJournal = null;
                     this.nRec = 0;
-                    sqlite3PcacheCleanAll(this.pPCache);
-                    sqlite3PcacheTruncate(this.pPCache, this.dbSize);
+                    PCacheMethods.sqlite3PcacheCleanAll(this.pPCache);
+                    PCacheMethods.sqlite3PcacheTruncate(this.pPCache, this.dbSize);
                     if (this.pagerUseWal())
                     {
                         ///
@@ -2590,7 +2590,7 @@ PagerMethods.sqlite3PagerUnref(p);
                             if (rc != SQLITE_OK)
                                 return rc;
                             pPg.flags &= ~PGHDR_NEED_READ;
-                            sqlite3PcacheMakeDirty(pPg);
+                            PCacheMethods.sqlite3PcacheMakeDirty(pPg);
                         }
                     if (pPg != null)
                     {
@@ -2634,7 +2634,7 @@ PagerMethods.sqlite3PagerUnref(p);
                             ///</summary>
 
                             Debug.Assert(!this.pagerUseWal());
-                            sqlite3PcacheMakeClean(pPg);
+                            PCacheMethods.sqlite3PcacheMakeClean(pPg);
                         }
                         pPg.pager_set_pagehash();
                         ///
@@ -2656,7 +2656,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         if (PagerMethods.CODEC1(this, pData, pPg.pgno, SQLITE_DECRYPT))
                             rc = SQLITE_NOMEM;
                         //PagerMethods.CODEC1(pPager, pData, pPg.pgno, 3, rc=SQLITE_NOMEM);
-                        sqlite3PcacheRelease(pPg);
+                        PCacheMethods.sqlite3PcacheRelease(pPg);
                     }
                     return rc;
                 }
@@ -3596,7 +3596,7 @@ PagerMethods.sqlite3PagerUnref(p);
 
                 public void sqlite3PagerSetCachesize(int mxPage)
                 {
-                    sqlite3PcacheSetCachesize(this.pPCache, mxPage);
+                    PCacheMethods.sqlite3PcacheSetCachesize(this.pPCache, mxPage);
                 }
 
                 public///<summary>
@@ -3850,7 +3850,7 @@ PagerMethods.sqlite3PagerUnref(p);
 
                     u32 pageSize = pPageSize;
                     Debug.Assert(pageSize == 0 || (pageSize >= 512 && pageSize <= SQLITE_MAX_PAGE_SIZE));
-                    if ((this.memDb == 0 || this.dbSize == 0) && sqlite3PcacheRefCount(this.pPCache) == 0 && pageSize != 0 && pageSize != (u32)this.pageSize)
+                    if ((this.memDb == 0 || this.dbSize == 0) && PCacheMethods.sqlite3PcacheRefCount(this.pPCache) == 0 && pageSize != 0 && pageSize != (u32)this.pageSize)
                     {
                         //char *pNew = NULL;             /* New temp space */
                         i64 nByte = 0;
@@ -3871,7 +3871,7 @@ PagerMethods.sqlite3PagerUnref(p);
                             sqlite3PageFree(ref this.pTmpSpace);
                             this.pTmpSpace = sqlite3Malloc(pageSize);
                             // pNew;
-                            sqlite3PcacheSetPageSize(this.pPCache, (int)pageSize);
+                            PCacheMethods.sqlite3PcacheSetPageSize(this.pPCache, (int)pageSize);
                         }
                     }
                     pPageSize = (u32)this.pageSize;
@@ -4161,7 +4161,7 @@ pPager.pWal = 0;
                     sqlite3OsClose(this.jfd);
                     sqlite3OsClose(this.fd);
                     //sqlite3_free( ref pTmp );
-                    sqlite3PcacheClose(this.pPCache);
+                    PCacheMethods.sqlite3PcacheClose(this.pPCache);
 #if SQLITE_HAS_CODEC
                     if (this.xCodecFree != null)
                         this.xCodecFree(ref this.pCodec);
@@ -4327,7 +4327,7 @@ pPager.pWal = 0;
                     ///
                     ///</summary>
 
-                    sqlite3PcacheClearSyncFlags(this.pPCache);
+                    PCacheMethods.sqlite3PcacheClearSyncFlags(this.pPCache);
                     this.eState = PAGER_WRITER_DBMOD;
                     Debug.Assert(this.assert_pager_state());
                     return SQLITE_OK;
@@ -4741,7 +4741,7 @@ pPager.pWal = 0;
                     ///<param name="exclusive access mode.">exclusive access mode.</param>
                     ///<param name=""></param>
 
-                    Debug.Assert(sqlite3PcacheRefCount(this.pPCache) == 0);
+                    Debug.Assert(PCacheMethods.sqlite3PcacheRefCount(this.pPCache) == 0);
                     Debug.Assert(this.assert_pager_state());
                     Debug.Assert(this.eState == PAGER_OPEN || this.eState == PAGER_READER);
                     if (NEVER(
@@ -4916,7 +4916,7 @@ pPager.pWal = 0;
                             Debug.Assert(this.eState == PAGER_OPEN);
                             Debug.Assert((this.eLock == SHARED_LOCK) || (this.exclusiveMode && this.eLock > SHARED_LOCK));
                         }
-                        if (!this.tempFile && (this.pBackup != null || sqlite3PcachePagecount(this.pPCache) > 0))
+                        if (!this.tempFile && (this.pBackup != null || PCacheMethods.sqlite3PcachePagecount(this.pPCache) > 0))
                         {
                             ///
                             ///<summary>
@@ -5005,7 +5005,7 @@ pPager.pWal = 0;
 
                 public void pagerUnlockIfUnused()
                 {
-                    if (sqlite3PcacheRefCount(this.pPCache) == 0)
+                    if (PCacheMethods.sqlite3PcacheRefCount(this.pPCache) == 0)
                     {
                         this.pagerUnlockAndRollback();
                     }
@@ -5126,7 +5126,7 @@ pPager.pWal = 0;
                     }
                     else
                     {
-                        rc = sqlite3PcacheFetch(this.pPCache, pgno, 1, ref ppPage);
+                        rc = PCacheMethods.sqlite3PcacheFetch(this.pPCache, pgno, 1, ref ppPage);
                     }
                     if (rc != SQLITE_OK)
                     {
@@ -5243,7 +5243,7 @@ this.memDb != 0
                     Debug.Assert(rc != SQLITE_OK);
                     if (pPg != null)
                     {
-                        sqlite3PcacheDrop(pPg);
+                        PCacheMethods.sqlite3PcacheDrop(pPg);
                     }
                     this.pagerUnlockIfUnused();
                     ppPage = null;
@@ -5269,7 +5269,7 @@ this.memDb != 0
                     Debug.Assert(pgno != 0);
                     Debug.Assert(this.pPCache != null);
                     Debug.Assert(this.eState >= PAGER_READER && this.eState != PAGER_ERROR);
-                    sqlite3PcacheFetch(this.pPCache, pgno, 0, ref pPg);
+                    PCacheMethods.sqlite3PcacheFetch(this.pPCache, pgno, 0, ref pPg);
                     return pPg;
                 }
 
@@ -5770,7 +5770,7 @@ int DIRECT_MODE = isDirectMode;
                     {
                         if (this.pagerUseWal())
                         {
-                            PgHdr pList = sqlite3PcacheDirtyList(this.pPCache);
+                            PgHdr pList = PCacheMethods.sqlite3PcacheDirtyList(this.pPCache);
                             PgHdr pPageOne = null;
                             if (pList == null)
                             {
@@ -5792,7 +5792,7 @@ int DIRECT_MODE = isDirectMode;
                             PagerMethods.sqlite3PagerUnref(pPageOne);
                             if (rc == SQLITE_OK)
                             {
-                                sqlite3PcacheCleanAll(this.pPCache);
+                                PCacheMethods.sqlite3PcacheCleanAll(this.pPCache);
                             }
                         }
                         else
@@ -5939,13 +5939,13 @@ rc = pager_incr_changecounter(pPager, 0);
                             rc = this.syncJournal(0);
                             if (rc != SQLITE_OK)
                                 goto commit_phase_one_exit;
-                            rc = this.pager_write_pagelist(sqlite3PcacheDirtyList(this.pPCache));
+                            rc = this.pager_write_pagelist(PCacheMethods.sqlite3PcacheDirtyList(this.pPCache));
                             if (rc != SQLITE_OK)
                             {
                                 Debug.Assert(rc != SQLITE_IOERR_BLOCKED);
                                 goto commit_phase_one_exit;
                             }
-                            sqlite3PcacheCleanAll(this.pPCache);
+                            PCacheMethods.sqlite3PcacheCleanAll(this.pPCache);
                             ///
                             ///<summary>
                             ///If the file on disk is not the same size as the database image,
@@ -6158,7 +6158,7 @@ rc = pager_incr_changecounter(pPager, 0);
                     ///</summary>
                 int sqlite3PagerRefcount()
                 {
-                    return sqlite3PcacheRefCount(this.pPCache);
+                    return PCacheMethods.sqlite3PcacheRefCount(this.pPCache);
                 }
 
                 public///<summary>
@@ -6170,7 +6170,7 @@ rc = pager_incr_changecounter(pPager, 0);
                 {
                     int perPageSize = this.pageSize + this.nExtra + 20;
                     //+ sizeof(PgHdr) + 5*sizeof(void*);
-                    return perPageSize * sqlite3PcachePagecount(this.pPCache) + 0 // Not readily available under C#// sqlite3MallocSize(pPager);
+                    return perPageSize * PCacheMethods.sqlite3PcachePagecount(this.pPCache) + 0 // Not readily available under C#// sqlite3MallocSize(pPager);
                     + this.pageSize;
                 }
 
@@ -6606,16 +6606,16 @@ this.memDb != 0
                             ///<param name="Do not discard pages from an in">memory database since we might</param>
                             ///<param name="need to rollback later.  Just move the page out of the way. ">need to rollback later.  Just move the page out of the way. </param>
 
-                            sqlite3PcacheMove(pPgOld, this.dbSize + 1);
+                            PCacheMethods.sqlite3PcacheMove(pPgOld, this.dbSize + 1);
                         }
                         else
                         {
-                            sqlite3PcacheDrop(pPgOld);
+                            PCacheMethods.sqlite3PcacheDrop(pPgOld);
                         }
                     }
                     origPgno = pPg.pgno;
-                    sqlite3PcacheMove(pPg, pgno);
-                    sqlite3PcacheMakeDirty(pPg);
+                    PCacheMethods.sqlite3PcacheMove(pPg, pgno);
+                    PCacheMethods.sqlite3PcacheMakeDirty(pPg);
                     ///
                     ///<summary>
                     ///</summary>
@@ -6633,7 +6633,7 @@ this.memDb != 0
 )
                     {
                         Debug.Assert(pPgOld);
-                        sqlite3PcacheMove(pPgOld, origPgno);
+                        PCacheMethods.sqlite3PcacheMove(pPgOld, origPgno);
                         PagerMethods.sqlite3PagerUnref(pPgOld);
                     }
                     if (needSyncPgno != 0)
@@ -6670,7 +6670,7 @@ this.memDb != 0
                             return rc;
                         }
                         pPgHdr.flags |= PGHDR_NEED_SYNC;
-                        sqlite3PcacheMakeDirty(pPgHdr);
+                        PCacheMethods.sqlite3PcacheMakeDirty(pPgHdr);
                         PagerMethods.sqlite3PagerUnref(pPgHdr);
                     }
                     return SQLITE_OK;
