@@ -192,7 +192,7 @@ namespace Community.CsharpSqlite {
 					db.aDb[iDb].pBt=null;
 					db.aDb[iDb].pSchema=null;
 				}
-				sqlite3ResetInternalSchema(db,-1);
+				build.sqlite3ResetInternalSchema(db,-1);
 				db.nDb=iDb;
 				if(rc==SQLITE_NOMEM||rc==SQLITE_IOERR_NOMEM) {
 					////        db.mallocFailed = 1;
@@ -262,7 +262,7 @@ namespace Community.CsharpSqlite {
 			BTreeMethods.sqlite3BtreeClose(ref pDb.pBt);
 			pDb.pBt=null;
 			pDb.pSchema=null;
-			sqlite3ResetInternalSchema(db,-1);
+			build.sqlite3ResetInternalSchema(db,-1);
 			return;
 			detach_error:
 			context.sqlite3_result_error(zErr.ToString(),-1);

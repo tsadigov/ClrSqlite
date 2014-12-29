@@ -105,12 +105,12 @@ namespace Community.CsharpSqlite
 			if (argv == null || argv [0] == null || argv [2] == null) {
 				return 0;
 			}
-			pTable = sqlite3FindTable (pInfo.db, argv [0], pInfo.zDatabase);
+			pTable = build.sqlite3FindTable (pInfo.db, argv [0], pInfo.zDatabase);
 			if (pTable == null) {
 				return 0;
 			}
 			if (!String.IsNullOrEmpty (argv [1])) {
-				pIndex = sqlite3FindIndex (pInfo.db, argv [1], pInfo.zDatabase);
+				pIndex = build.sqlite3FindIndex (pInfo.db, argv [1], pInfo.zDatabase);
 			}
 			else {
 				pIndex = null;
@@ -207,7 +207,7 @@ namespace Community.CsharpSqlite
 			for (i = db.aDb [iDb].pSchema.idxHash.first; i != null; i = i.next) {
 				Index pIdx = (Index)i.data;
 				// sqliteHashData( i );
-				sqlite3DefaultRowEst (pIdx);
+				build.sqlite3DefaultRowEst (pIdx);
 				sqlite3DeleteIndexSamples (db, pIdx);
 				pIdx.aSample = null;
 			}
@@ -218,7 +218,7 @@ namespace Community.CsharpSqlite
 
 			sInfo.db = db;
 			sInfo.zDatabase = db.aDb [iDb].zName;
-			if (sqlite3FindTable (db, "sqlite_stat1", sInfo.zDatabase) == null) {
+			if (build.sqlite3FindTable (db, "sqlite_stat1", sInfo.zDatabase) == null) {
 				return SQLITE_ERROR;
 			}
 			///
@@ -241,7 +241,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				#if SQLITE_ENABLE_STAT2
-																																																																															  if ( rc == SQLITE_OK && null == sqlite3FindTable( db, "sqlite_stat2", sInfo.zDatabase ) )
+																																																																															  if ( rc == SQLITE_OK && null == build.sqlite3FindTable( db, "sqlite_stat2", sInfo.zDatabase ) )
   {
     rc = SQLITE_ERROR;
   }
@@ -265,7 +265,7 @@ namespace Community.CsharpSqlite
         string zIndex;   /* Index name */
         Index pIdx;    /* Pointer to the index object */
         zIndex = sqlite3_column_text( pStmt, 0 );
-        pIdx = !String.IsNullOrEmpty( zIndex ) ? sqlite3FindIndex( db, zIndex, sInfo.zDatabase ) : null;
+        pIdx = !String.IsNullOrEmpty( zIndex ) ? build.sqlite3FindIndex( db, zIndex, sInfo.zDatabase ) : null;
         if ( pIdx != null )
         {
           int iSample = sqlite3_column_int( pStmt, 1 );

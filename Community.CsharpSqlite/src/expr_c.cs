@@ -1555,7 +1555,7 @@ return null;
             static int addAggInfoColumn(sqlite3 db, AggInfo pInfo)
             {
                 int i = 0;
-                pInfo.aCol = sqlite3ArrayAllocate(db, pInfo.aCol, -1,//sizeof(pInfo.aCol[0]),
+                pInfo.aCol = build.sqlite3ArrayAllocate(db, pInfo.aCol, -1,//sizeof(pInfo.aCol[0]),
                 3, ref pInfo.nColumn, ref pInfo.nColumnAlloc, ref i);
                 return i;
             }
@@ -1567,7 +1567,7 @@ return null;
             static int addAggInfoFunc(sqlite3 db, AggInfo pInfo)
             {
                 int i = 0;
-                pInfo.aFunc = sqlite3ArrayAllocate(db, pInfo.aFunc, -1,//sizeof(pInfo.aFunc[0]),
+                pInfo.aFunc = build.sqlite3ArrayAllocate(db, pInfo.aFunc, -1,//sizeof(pInfo.aFunc[0]),
                 3, ref pInfo.nFunc, ref pInfo.nFuncAlloc, ref i);
                 return i;
             }

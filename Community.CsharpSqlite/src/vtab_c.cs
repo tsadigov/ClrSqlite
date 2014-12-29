@@ -85,7 +85,7 @@ namespace Community.CsharpSqlite {
 				pMod.xDestroy=xDestroy;
 				pDel=(Module)sqlite3HashInsert(ref db.aModule,zCopy,nName,pMod);
 				if(pDel!=null&&pDel.xDestroy!=null) {
-					sqlite3ResetInternalSchema(db,-1);
+					build.sqlite3ResetInternalSchema(db,-1);
 					pDel.xDestroy(ref pDel.pAux);
 				}
 				db.sqlite3DbFree(ref pDel);
@@ -531,7 +531,7 @@ namespace Community.CsharpSqlite {
 			Table pTab;
 			Module pMod;
 			string zMod;
-			pTab=sqlite3FindTable(db,zTab,db.aDb[iDb].zName);
+			pTab=build.sqlite3FindTable(db,zTab,db.aDb[iDb].zName);
 			Debug.Assert(pTab!=null&&(pTab.tabFlags&TF_Virtual)!=0&&null==pTab.pVTable);
 			///
 			///<summary>
@@ -615,7 +615,7 @@ namespace Community.CsharpSqlite {
 				if(pParse.pVdbe!=null) {
                     vdbeaux.sqlite3VdbeFinalize(ref pParse.pVdbe);
 				}
-				sqlite3DeleteTable(db,ref pParse.pNewTable);
+				build.sqlite3DeleteTable(db,ref pParse.pNewTable);
 				//sqlite3StackFree( db, pParse );
 			}
 			Debug.Assert((rc&0xff)==rc);
@@ -634,7 +634,7 @@ namespace Community.CsharpSqlite {
 		static int sqlite3VtabCallDestroy(sqlite3 db,int iDb,string zTab) {
 			int rc=SQLITE_OK;
 			Table pTab;
-			pTab=sqlite3FindTable(db,zTab,db.aDb[iDb].zName);
+			pTab=build.sqlite3FindTable(db,zTab,db.aDb[iDb].zName);
 			if(ALWAYS(pTab!=null&&pTab.pVTable!=null)) {
 				VTable p=vtabDisconnectAll(db,pTab);
 				Debug.Assert(rc==SQLITE_OK);

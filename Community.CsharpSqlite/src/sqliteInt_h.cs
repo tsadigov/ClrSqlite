@@ -1029,7 +1029,7 @@ void *sqlite3_wsd_find(void *K, int L);
 		};
 
 		///<summary>
-		/// The following are used as the second parameter to sqlite3Savepoint(),
+		/// The following are used as the second parameter to build.sqlite3Savepoint(),
 		/// and as the P1 argument to the OP_Savepoint instruction.
 		///
 		///</summary>
@@ -2075,19 +2075,19 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//int sqlite3Init(sqlite3*, char*);
 		//int sqlite3InitCallback(void*, int, char**, char*);
 		//void sqlite3Pragma(Parse*,Token*,Token*,Token*,int);
-		//void sqlite3ResetInternalSchema(sqlite3*, int);
+		//void build.sqlite3ResetInternalSchema(sqlite3*, int);
 		//void sqlite3BeginParse(Parse*,int);
 		//void sqlite3CommitInternalChanges(sqlite3);
 		//Table *sqlite3ResultSetOfSelect(Parse*,Select);
 		//void sqlite3OpenMasterTable(Parse *, int);
-		//void sqlite3StartTable(Parse*,Token*,Token*,int,int,int,int);
-		//void sqlite3AddColumn(Parse*,Token);
-		//void sqlite3AddNotNull(Parse*, int);
-		//void sqlite3AddPrimaryKey(Parse*, ExprList*, int, int, int);
-		//void sqlite3AddCheckConstraint(Parse*, Expr);
-		//void sqlite3AddColumnType(Parse*,Token);
-		//void sqlite3AddDefaultValue(Parse*,ExprSpan);
-		//void sqlite3AddCollateType(Parse*, Token);
+		//void build.sqlite3StartTable(Parse*,Token*,Token*,int,int,int,int);
+		//void build.sqlite3AddColumn(Parse*,Token);
+		//void build.sqlite3AddNotNull(Parse*, int);
+		//void build.sqlite3AddPrimaryKey(Parse*, ExprList*, int, int, int);
+		//void build.sqlite3AddCheckConstraint(Parse*, Expr);
+		//void build.sqlite3AddColumnType(Parse*,Token);
+		//void build.sqlite3AddDefaultValue(Parse*,ExprSpan);
+		//void build.sqlite3AddCollateType(Parse*, Token);
 		//void sqlite3EndTable(Parse*,Token*,Token*,Select);
 		//int sqlite3ParseUri(const char*,const char*,unsigned int*,
 		//                sqlite3_vfs**,char**,char *);
@@ -2105,16 +2105,16 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//int sqlite3RowSetNext(RowSet*, i64);
 		//void sqlite3CreateView(Parse*,Token*,Token*,Token*,Select*,int,int);
 		#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_VIRTUALTABLE
-		//int sqlite3ViewGetColumnNames(Parse*,Table);
+		//int build.sqlite3ViewGetColumnNames(Parse*,Table);
 		#else
-																																																												    // define sqlite3ViewGetColumnNames(A,B) 0
-    static int sqlite3ViewGetColumnNames( Parse A, Table B )
+																																																												    // define build.sqlite3ViewGetColumnNames(A,B) 0
+    static int build.sqlite3ViewGetColumnNames( Parse A, Table B )
     {
       return 0;
     }
 #endif
 		//void sqlite3DropTable(Parse*, SrcList*, int, int);
-		//void sqlite3DeleteTable(sqlite3*, Table);
+		//void build.sqlite3DeleteTable(sqlite3*, Table);
 		//#if !SQLITE_OMIT_AUTOINCREMENT
 		//  void sqlite3AutoincrementBegin(Parse *pParse);
 		//  void sqlite3AutoincrementEnd(Parse *pParse);
@@ -2124,19 +2124,19 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//#endif
 		//void sqlite3Insert(Parse*, SrcList*, ExprList*, Select*, IdList*, int);
 		//void *sqlite3ArrayAllocate(sqlite3*,void*,int,int,int*,int*,int);
-		//IdList *sqlite3IdListAppend(sqlite3*, IdList*, Token);
+		//IdList *build.sqlite3IdListAppend(sqlite3*, IdList*, Token);
 		//int sqlite3IdListIndex(IdList*,const char);
-		//SrcList *sqlite3SrcListEnlarge(sqlite3*, SrcList*, int, int);
-		//SrcList *sqlite3SrcListAppend(sqlite3*, SrcList*, Token*, Token);
-		//SrcList *sqlite3SrcListAppendFromTerm(Parse*, SrcList*, Token*, Token*,
+		//SrcList *build.sqlite3SrcListEnlarge(sqlite3*, SrcList*, int, int);
+		//SrcList *build.sqlite3SrcListAppend(sqlite3*, SrcList*, Token*, Token);
+		//SrcList *build.sqlite3SrcListAppendFromTerm(Parse*, SrcList*, Token*, Token*,
 		//                                      Token*, Select*, Expr*, IdList);
-		//void sqlite3SrcListIndexedBy(Parse *, SrcList *, Token );
+		//void build.sqlite3SrcListIndexedBy(Parse *, SrcList *, Token );
 		//int sqlite3IndexedByLookup(Parse *, struct SrcList_item );
-		//void sqlite3SrcListShiftJoinType(SrcList);
+		//void build.sqlite3SrcListShiftJoinType(SrcList);
 		//void sqlite3SrcListAssignCursors(Parse*, SrcList);
-		//void sqlite3IdListDelete(sqlite3*, IdList);
-		//void sqlite3SrcListDelete(sqlite3*, SrcList);
-		//Index *sqlite3CreateIndex(Parse*,Token*,Token*,SrcList*,ExprList*,int,Token*,
+		//void build.sqlite3IdListDelete(sqlite3*, IdList);
+		//void build.sqlite3SrcListDelete(sqlite3*, SrcList);
+		//Index *build.sqlite3CreateIndex(Parse*,Token*,Token*,SrcList*,ExprList*,int,Token*,
 		//                        Token*, int, int);
 		//void sqlite3DropIndex(Parse*, SrcList*, int);
 		//int sqlite3Select(Parse*, Select*, SelectDest);
@@ -2171,14 +2171,14 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//int exprc.sqlite3ExprCodeExprList(Parse*, ExprList*, int, int);
 		//void exprc.sqlite3ExprIfTrue(Parse*, Expr*, int, int);
 		//void exprc.sqlite3ExprIfFalse(Parse*, Expr*, int, int);
-		//Table *sqlite3FindTable(sqlite3*,const char*, const char);
-		//Table *sqlite3LocateTable(Parse*,int isView,const char*, const char);
-		//Index *sqlite3FindIndex(sqlite3*,const char*, const char);
-		//void sqlite3UnlinkAndDeleteTable(sqlite3*,int,const char);
-		//void sqlite3UnlinkAndDeleteIndex(sqlite3*,int,const char);
+		//Table *build.sqlite3FindTable(sqlite3*,const char*, const char);
+		//Table *build.sqlite3LocateTable(Parse*,int isView,const char*, const char);
+		//Index *build.sqlite3FindIndex(sqlite3*,const char*, const char);
+		//void build.sqlite3UnlinkAndDeleteTable(sqlite3*,int,const char);
+		//void build.sqlite3UnlinkAndDeleteIndex(sqlite3*,int,const char);
 		//void sqlite3Vacuum(Parse);
 		//int sqlite3RunVacuum(char**, sqlite3);
-		//char *sqlite3NameFromToken(sqlite3*, Token);
+		//char *build.sqlite3NameFromToken(sqlite3*, Token);
 		//int exprc.sqlite3ExprCompare(Expr*, Expr);
 		//int exprc.sqlite3ExprListCompare(ExprList*, ExprList);
 		//void exprc.sqlite3ExprAnalyzeAggregates(NameContext*, Expr);
@@ -2191,9 +2191,9 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void sqlite3CodeVerifySchema(Parse*, int);
 		//void sqlite3CodeVerifyNamedSchema(Parse*, string zDb);
 		//void sqlite3BeginTransaction(Parse*, int);
-		//void sqlite3CommitTransaction(Parse);
+		//void build.sqlite3CommitTransaction(Parse);
 		//void sqlite3RollbackTransaction(Parse);
-		//void sqlite3Savepoint(Parse*, int, Token);
+		//void build.sqlite3Savepoint(Parse*, int, Token);
 		//void sqlite3CloseSavepoints(sqlite3 );
 		//int sqlite3ExprIsConstant(Expr);
 		//int sqlite3ExprIsConstantNotJoin(Expr);
@@ -2211,9 +2211,9 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void sqlite3CompleteInsertion(Parse*, Table*, int, int, int*, int, int, int);
 		//int sqlite3OpenTableAndIndices(Parse*, Table*, int, int);
 		//void sqlite3BeginWriteOperation(Parse*, int, int);
-		//void sqlite3MultiWrite(Parse);
-		//void sqlite3MayAbort(Parse );
-		//void sqlite3HaltConstraint(Parse*, int, char*, int);
+		//void build.sqlite3MultiWrite(Parse);
+		//void build.sqlite3MayAbort(Parse );
+		//void build.sqlite3HaltConstraint(Parse*, int, char*, int);
 		//Expr *exprc.sqlite3ExprDup(sqlite3*,Expr*,int);
 		//ExprList *exprc.sqlite3ExprListDup(sqlite3*,ExprList*,int);
 		//SrcList *exprc.sqlite3SrcListDup(sqlite3*,SrcList*,int);
@@ -2340,7 +2340,7 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
     }
 #endif
 		//int sqlite3JoinType(Parse*, Token*, Token*, Token);
-		//void sqlite3CreateForeignKey(Parse*, ExprList*, Token*, ExprList*, int);
+		//void build.sqlite3CreateForeignKey(Parse*, ExprList*, Token*, ExprList*, int);
 		//void sqlite3DeferForeignKey(Parse*, int);
 		#if !SQLITE_OMIT_AUTHORIZATION
 																																																												void sqlite3AuthRead(Parse*,Expr*,Schema*,SrcList);
@@ -2423,11 +2423,11 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//void utilc.sqlite3Error(sqlite3*, int, const char*,...);
 		//void *Converter.sqlite3HexToBlob(sqlite3*, string z, int n);
 		//u8 Converter.sqlite3HexToInt(int h);
-		//int sqlite3TwoPartName(Parse *, Token *, Token *, Token *);
+		//int build.sqlite3TwoPartName(Parse *, Token *, Token *, Token *);
 		//string sqlite3ErrStr(int);
 		//int sqlite3ReadSchema(Parse pParse);
 		//CollSeq *sqlite3FindCollSeq(sqlite3*,u8 enc, const char*,int);
-		//CollSeq *sqlite3LocateCollSeq(Parse *pParse, const char*zName);
+		//CollSeq *build.sqlite3LocateCollSeq(Parse *pParse, const char*zName);
 		//CollSeq *exprc.sqlite3ExprCollSeq(Parse pParse, Expr pExpr);
 		//Expr *exprc.sqlite3ExprSetColl(Expr*, CollSeq);
 		//Expr *exprc.sqlite3ExprSetCollByToken(Parse *pParse, Expr*, Token);
@@ -2470,11 +2470,11 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//#endif
 		//#endif
 		//void sqlite3RootPageMoved(sqlite3*, int, int, int);
-		//void sqlite3Reindex(Parse*, Token*, Token);
+		//void build.sqlite3Reindex(Parse*, Token*, Token);
 		//void sqlite3AlterFunctions(void);
 		//void sqlite3AlterRenameTable(Parse*, SrcList*, Token);
 		//int sqlite3GetToken(const unsigned char *, int );
-		//void sqlite3NestedParse(Parse*, const char*, ...);
+		//void build.sqlite3NestedParse(Parse*, const char*, ...);
 		//void sqlite3ExpirePreparedStatements(sqlite3);
 		//int sqlite3CodeSubselect(Parse *, Expr *, int, int);
 		//void sqlite3SelectPrep(Parse*, Select*, NameContext);
@@ -2488,8 +2488,8 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//char sqlite3AffinityType(const char);
 		//void sqlite3Analyze(Parse*, Token*, Token);
 		//int sqlite3InvokeBusyHandler(BusyHandler);
-		//int sqlite3FindDb(sqlite3*, Token);
-		//int sqlite3FindDbName(sqlite3 *, string );
+		//int build.sqlite3FindDb(sqlite3*, Token);
+		//int build.sqlite3FindDbName(sqlite3 *, string );
 		//int sqlite3AnalysisLoad(sqlite3*,int iDB);
 		//void sqlite3DeleteIndexSamples(sqlite3*,Index);
 		//void sqlite3DefaultRowEst(Index);
@@ -2499,7 +2499,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//void sqlite3SchemaClear(void );
 		//Schema *sqlite3SchemaGet(sqlite3 *, Btree );
 		//int sqlite3SchemaToIndex(sqlite3 db, Schema );
-		//KeyInfo *sqlite3IndexKeyinfo(Parse *, Index );
+		//KeyInfo *build.sqlite3IndexKeyinfo(Parse *, Index );
 		//int sqlite3CreateFunc(sqlite3 *, string , int, int, object  *, 
 		//  void ()(sqlite3_context*,int,sqlite3_value *),
 		//  void ()(sqlite3_context*,int,sqlite3_value *), object  ()(sqlite3_context),

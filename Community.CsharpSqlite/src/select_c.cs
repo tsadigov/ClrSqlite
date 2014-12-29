@@ -39,7 +39,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static void clearSelect(sqlite3 db,Select p) {
 			exprc.sqlite3ExprListDelete(db,ref p.pEList);
-			sqlite3SrcListDelete(db,ref p.pSrc);
+			build.sqlite3SrcListDelete(db,ref p.pSrc);
 			exprc.sqlite3ExprDelete(db,ref p.pWhere);
 			exprc.sqlite3ExprListDelete(db,ref p.pGroupBy);
 			exprc.sqlite3ExprDelete(db,ref p.pHaving);
@@ -1515,7 +1515,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 			pTab.iPKey=-1;
 			//if ( db.mallocFailed != 0 )
 			//{
-			//  sqlite3DeleteTable(db, ref pTab );
+			//  build.sqlite3DeleteTable(db, ref pTab );
 			//  return null;
 			//}
 			return pTab;
@@ -3174,7 +3174,7 @@ break;
 					///<summary>
 					///2nd and subsequent times through the loop 
 					///</summary>
-					pSrc=pParent.pSrc=sqlite3SrcListAppend(db,null,null,null);
+					pSrc=pParent.pSrc=build.sqlite3SrcListAppend(db,null,null,null);
 					//if ( pSrc == null )
 					//{
 					//  //Debug.Assert( db.mallocFailed != 0 );
@@ -3200,7 +3200,7 @@ break;
 				///
 				///</summary>
 				if(nSubSrc>1) {
-					pParent.pSrc=pSrc=sqlite3SrcListEnlarge(db,pSrc,nSubSrc-1,iFrom+1);
+					pParent.pSrc=pSrc=build.sqlite3SrcListEnlarge(db,pSrc,nSubSrc-1,iFrom+1);
 					//if ( db.mallocFailed != 0 )
 					//{
 					//  break;
@@ -3213,7 +3213,7 @@ break;
 				///
 				///</summary>
 				for(i=0;i<nSubSrc;i++) {
-					sqlite3IdListDelete(db,ref pSrc.a[i+iFrom].pUsing);
+					build.sqlite3IdListDelete(db,ref pSrc.a[i+iFrom].pUsing);
 					pSrc.a[i+iFrom]=pSubSrc.a[i];
 					pSubSrc.a[i]=new SrcList_item();
 					//memset(pSubSrc.a[i], 0, sizeof(pSubSrc.a[i]));

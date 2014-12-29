@@ -103,7 +103,7 @@ sqlite3ValueFree(ref pTmp);
 		/// db for collation type name zName, length nName, or NULL, if no collation
 		/// sequence can be found.
 		///
-		/// See also: sqlite3LocateCollSeq(), sqlite3FindCollSeq()
+		/// See also: build.sqlite3LocateCollSeq(), sqlite3FindCollSeq()
 		///
 		///</summary>
 		static CollSeq sqlite3GetCollSeq(sqlite3 db,///
@@ -254,12 +254,12 @@ sqlite3ValueFree(ref pTmp);
 		/// If the entry specified is not found and 'create' is true, then create a
 		/// new entry.  Otherwise return NULL.
 		///
-		/// A separate function sqlite3LocateCollSeq() is a wrapper around
-		/// this routine.  sqlite3LocateCollSeq() invokes the collation factory
+		/// A separate function build.sqlite3LocateCollSeq() is a wrapper around
+		/// this routine.  build.sqlite3LocateCollSeq() invokes the collation factory
 		/// if necessary and generates an error message if the collating sequence
 		/// cannot be found.
 		///
-		/// See also: sqlite3LocateCollSeq(), sqlite3GetCollSeq()
+		/// See also: build.sqlite3LocateCollSeq(), sqlite3GetCollSeq()
 		///
 		///</summary>
 		static CollSeq sqlite3FindCollSeq(sqlite3 db,SqliteEncoding enc,string zName,u8 create) {
@@ -540,7 +540,7 @@ sqlite3ValueFree(ref pTmp);
 			 {
 				Table pTab=(Table)pElem.data;
 				//sqliteHashData(pElem);
-				sqlite3DeleteTable(null,ref pTab);
+				build.sqlite3DeleteTable(null,ref pTab);
 			}
 			sqlite3HashClear(temp1);
 			sqlite3HashClear(pSchema.fkeyHash);

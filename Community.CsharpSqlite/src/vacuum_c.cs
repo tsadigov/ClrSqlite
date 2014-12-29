@@ -435,7 +435,7 @@ namespace Community.CsharpSqlite {
 				pDb.pBt=null;
 				pDb.pSchema=null;
 			}
-			sqlite3ResetInternalSchema(db,-1);
+			build.sqlite3ResetInternalSchema(db,-1);
 			return rc;
 		}
 	#endif

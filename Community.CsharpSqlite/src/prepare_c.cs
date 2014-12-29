@@ -174,7 +174,7 @@ namespace Community.CsharpSqlite {
 						///
 						///</summary>
 						Index pIndex;
-						pIndex=sqlite3FindIndex(db,argv[0],db.aDb[iDb].zName);
+						pIndex=build.sqlite3FindIndex(db,argv[0],db.aDb[iDb].zName);
 						if(pIndex==null) {
 							///
 							///<summary>
@@ -264,7 +264,7 @@ namespace Community.CsharpSqlite {
 				rc=initData.rc;
 				goto error_out;
 			}
-			pTab=sqlite3FindTable(db,zMasterName,db.aDb[iDb].zName);
+			pTab=build.sqlite3FindTable(db,zMasterName,db.aDb[iDb].zName);
 			if(ALWAYS(pTab)) {
 				pTab.tabFlags|=TF_Readonly;
 			}
@@ -436,7 +436,7 @@ db.xAuth = 0;
 				//if ( db.mallocFailed != 0 )
 				//{
 				//  rc = SQLITE_NOMEM;
-				//  sqlite3ResetInternalSchema( db, -1 );
+				//  build.sqlite3ResetInternalSchema( db, -1 );
 				//}
 				///
 				///<summary>
@@ -493,7 +493,7 @@ db.xAuth = 0;
 					continue;
 				rc=sqlite3InitOne(db,i,ref pzErrMsg);
 				if(rc!=0) {
-					sqlite3ResetInternalSchema(db,i);
+					build.sqlite3ResetInternalSchema(db,i);
 				}
 			}
 			///
@@ -507,13 +507,13 @@ db.xAuth = 0;
 			if(rc==SQLITE_OK&&ALWAYS(db.nDb>1)&&!DbHasProperty(db,1,DB_SchemaLoaded)) {
 				rc=sqlite3InitOne(db,1,ref pzErrMsg);
 				if(rc!=0) {
-					sqlite3ResetInternalSchema(db,1);
+					build.sqlite3ResetInternalSchema(db,1);
 				}
 			}
 			#endif
 			db.init.busy=0;
 			if(rc==SQLITE_OK&&commit_internal) {
-				sqlite3CommitInternalChanges(db);
+				build.sqlite3CommitInternalChanges(db);
 			}
 			return rc;
 		}
@@ -586,7 +586,7 @@ db.xAuth = 0;
 				cookie=pBt.sqlite3BtreeGetMeta(BTREE_SCHEMA_VERSION);
 				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 				if(cookie!=db.aDb[iDb].pSchema.schema_cookie) {
-					sqlite3ResetInternalSchema(db,iDb);
+					build.sqlite3ResetInternalSchema(db,iDb);
 					pParse.rc=SqlResult.SQLITE_SCHEMA;
 				}
 				///

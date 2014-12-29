@@ -255,7 +255,7 @@ namespace Community.CsharpSqlite {
 					if(rc==SQLITE_DONE&&(rc=this.pDest.sqlite3BtreeUpdateMeta(1,this.iDestSchema+1))==SQLITE_OK) {
 						Pgno nDestTruncate;
 						if(this.pDestDb!=null) {
-							sqlite3ResetInternalSchema(this.pDestDb,-1);
+							build.sqlite3ResetInternalSchema(this.pDestDb,-1);
 						}
 						///
 						///<summary>
@@ -627,7 +627,7 @@ namespace Community.CsharpSqlite {
 		/// error message to pErrorDb.
 		///</summary>
 		static Btree findBtree(sqlite3 pErrorDb,sqlite3 pDb,string zDb) {
-			int i=sqlite3FindDbName(pDb,zDb);
+			int i=build.sqlite3FindDbName(pDb,zDb);
 			if(i==1) {
 				Parse pParse;
 				int rc=0;
@@ -639,7 +639,7 @@ namespace Community.CsharpSqlite {
 				}
 				else {
 					pParse.db=pDb;
-					if(sqlite3OpenTempDatabase(pParse)!=0) {
+					if(build.sqlite3OpenTempDatabase(pParse)!=0) {
 						utilc.sqlite3Error(pErrorDb,pParse.rc,"%s",pParse.zErrMsg);
 						rc=SQLITE_ERROR;
 					}

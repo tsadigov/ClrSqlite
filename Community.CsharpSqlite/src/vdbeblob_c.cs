@@ -109,7 +109,7 @@ int sqlite3_blob_open(
     pParse->db = db;
 
     sqlite3BtreeEnterAll(db);
-    pTab = sqlite3LocateTable(pParse, 0, zTable, zDb);
+    pTab = build.sqlite3LocateTable(pParse, 0, zTable, zDb);
     if( pTab && IsVirtual(pTab) ){
       pTab = 0;
       utilc.sqlite3ErrorMsg(pParse, "cannot open virtual table: %s", zTable);

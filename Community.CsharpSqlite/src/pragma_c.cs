@@ -166,7 +166,7 @@ namespace Community.CsharpSqlite {
 				}
 				BTreeMethods.sqlite3BtreeClose(ref db.aDb[1].pBt);
 				db.aDb[1].pBt=null;
-				sqlite3ResetInternalSchema(db,-1);
+				build.sqlite3ResetInternalSchema(db,-1);
 			}
 			return SQLITE_OK;
 		}
@@ -493,7 +493,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			///Interpret the [database.] part of the pragma statement. iDb is the
 			///index of the database this pragma is being applied to in db.aDb[]. 
 			///</summary>
-			iDb=sqlite3TwoPartName(pParse,pId1,pId2,ref pId);
+			iDb=build.sqlite3TwoPartName(pParse,pId1,pId2,ref pId);
 			if(iDb<0)
 				return;
 			pDb=db.aDb[iDb];
@@ -503,17 +503,17 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			///pragma, make sure it is open.
 			///
 			///</summary>
-			if(iDb==1&&sqlite3OpenTempDatabase(pParse)!=0) {
+			if(iDb==1&&build.sqlite3OpenTempDatabase(pParse)!=0) {
 				return;
 			}
-			zLeft=sqlite3NameFromToken(db,pId);
+			zLeft=build.sqlite3NameFromToken(db,pId);
 			if(zLeft=="")
 				return;
 			if(minusFlag!=0) {
 				zRight=(pValue==null)?"":io.sqlite3MPrintf(db,"-%T",pValue);
 			}
 			else {
-				zRight=sqlite3NameFromToken(db,pValue);
+				zRight=build.sqlite3NameFromToken(db,pValue);
 			}
 			Debug.Assert(pId2!=null);
 			zDb=pId2.Length>0?pDb.zName:null;
@@ -579,7 +579,7 @@ goto pragma_out;
 				}
 				else {
                     int size = utilc.sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
-					sqlite3BeginWriteOperation(pParse,0,iDb);
+					build.sqlite3BeginWriteOperation(pParse,0,iDb);
 					v.sqlite3VdbeAddOp2(OP_Integer,size,1);
 					v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_DEFAULT_CACHE_SIZE,1);
 					Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
@@ -666,7 +666,7 @@ goto pragma_out;
 							int iReg;
 							if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 								goto pragma_out;
-							sqlite3CodeVerifySchema(pParse,iDb);
+							build.sqlite3CodeVerifySchema(pParse,iDb);
 							iReg=++pParse.nMem;
 							if(zLeft[0]=='p') {
 								v.sqlite3VdbeAddOp2(OP_Pagecount,iDb,iReg);
@@ -692,7 +692,7 @@ goto pragma_out;
 								_v=pParse.sqlite3GetVdbe();
 								if(_v==null||SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 									goto pragma_out;
-								sqlite3CodeVerifySchema(pParse,iDb);
+								build.sqlite3CodeVerifySchema(pParse,iDb);
 								iReg=++pParse.nMem;
 								_v.sqlite3VdbeAddOp2(OP_Pagecount,iDb,iReg);
 								_v.sqlite3VdbeAddOp2(OP_ResultRow,iReg,1);
@@ -953,7 +953,7 @@ goto pragma_out;
 													if(zRight==null||!Converter.sqlite3GetInt32(zRight,ref iLimit)||iLimit<=0) {
 														iLimit=0x7fffffff;
 													}
-													sqlite3BeginWriteOperation(pParse,0,iDb);
+													build.sqlite3BeginWriteOperation(pParse,0,iDb);
 													v.sqlite3VdbeAddOp2(OP_Integer,iLimit,1);
 													addr=v.sqlite3VdbeAddOp1(OpCode.OP_IncrVacuum,iDb);
 													v.sqlite3VdbeAddOp1(OpCode.OP_ResultRow,1);
@@ -1178,7 +1178,7 @@ else
 																			Table pTab;
 																			if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																				goto pragma_out;
-																			pTab=sqlite3FindTable(db,zRight,zDb);
+																			pTab=build.sqlite3FindTable(db,zRight,zDb);
 																			if(pTab!=null) {
 																				int i;
 																				int nHidden=0;
@@ -1191,7 +1191,7 @@ else
 																				v.sqlite3VdbeSetColName(3,COLNAME_NAME,"notnull",SQLITE_STATIC);
 																				v.sqlite3VdbeSetColName(4,COLNAME_NAME,"dflt_value",SQLITE_STATIC);
 																				v.sqlite3VdbeSetColName(5,COLNAME_NAME,"pk",SQLITE_STATIC);
-																				sqlite3ViewGetColumnNames(pParse,pTab);
+																				build.sqlite3ViewGetColumnNames(pParse,pTab);
 																				for(i=0;i<pTab.nCol;i++)//, pCol++)
 																				 {
 																					pCol=pTab.aCol[i];
@@ -1220,7 +1220,7 @@ else
 																				Table pTab;
 																				if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																					goto pragma_out;
-																				pIdx=sqlite3FindIndex(db,zRight,zDb);
+																				pIdx=build.sqlite3FindIndex(db,zRight,zDb);
 																				if(pIdx!=null) {
 																					int i;
 																					pTab=pIdx.pTable;
@@ -1245,7 +1245,7 @@ else
 																					Table pTab;
 																					if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																						goto pragma_out;
-																					pTab=sqlite3FindTable(db,zRight,zDb);
+																					pTab=build.sqlite3FindTable(db,zRight,zDb);
 																					if(pTab!=null) {
 																						v=pParse.sqlite3GetVdbe();
 																						pIdx=pTab.pIndex;
@@ -1312,7 +1312,7 @@ else
 																								Table pTab;
 																								if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																									goto pragma_out;
-																								pTab=sqlite3FindTable(db,zRight,zDb);
+																								pTab=build.sqlite3FindTable(db,zRight,zDb);
 																								if(pTab!=null) {
 																									v=pParse.sqlite3GetVdbe();
 																									pFK=pTab.pFKey;
@@ -1454,7 +1454,7 @@ else
 																											int cnt=0;
 																											if(OMIT_TEMPDB!=0&&i==1)
 																												continue;
-																											sqlite3CodeVerifySchema(pParse,i);
+																											build.sqlite3CodeVerifySchema(pParse,i);
 																											addr=v.sqlite3VdbeAddOp1(OpCode.OP_IfPos,1);
 																											///
 																											///<summary>
@@ -1817,12 +1817,12 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																													///<summary>
 																													///force schema reloading
 																													///</summary>
-																													sqlite3ResetInternalSchema(db,-1);
+																													build.sqlite3ResetInternalSchema(db,-1);
 																												}
 																												else
 																													if(zLeft.Equals("file_format",StringComparison.InvariantCultureIgnoreCase)) {
 																														pDb.pSchema.file_format=(u8)atoi(zRight);
-																														sqlite3ResetInternalSchema(db,-1);
+																														build.sqlite3ResetInternalSchema(db,-1);
 																													}
 																													else
 																														#endif

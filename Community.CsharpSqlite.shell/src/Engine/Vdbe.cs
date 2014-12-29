@@ -1029,7 +1029,7 @@ pOp.cnt = 0;
 				///stored as a member of the Table structure for subsequent use.
 				///
 				///The column affinity string will eventually be deleted by
-				///sqlite3DeleteTable() when the Table structure itself is cleaned up.
+				///build.sqlite3DeleteTable() when the Table structure itself is cleaned up.
 				///
 				///</summary>
 				if(pTab.zColAff==null) {
@@ -1453,7 +1453,7 @@ pOp.cnt = 0;
 								}
 								else {
 									db.nDeferredCons=0;
-									sqlite3CommitInternalChanges(db);
+									build.sqlite3CommitInternalChanges(db);
 								}
 						}
 						else {
@@ -1520,7 +1520,7 @@ pOp.cnt = 0;
 					///Rollback or commit any schema changes that occurred. 
 					///</summary>
 					if(this.rc!=SQLITE_OK&&(db.flags&SQLITE_InternChanges)!=0) {
-						sqlite3ResetInternalSchema(db,-1);
+						build.sqlite3ResetInternalSchema(db,-1);
 						db.flags=(db.flags|SQLITE_InternChanges);
 					}
 					///
@@ -4150,7 +4150,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 											}
 											if(p1==SAVEPOINT_ROLLBACK&&(db.flags&SQLITE_InternChanges)!=0) {
                                                 vdbeaux.sqlite3ExpirePreparedStatements(db);
-												sqlite3ResetInternalSchema(db,-1);
+												build.sqlite3ResetInternalSchema(db,-1);
 												db.flags=(db.flags|SQLITE_InternChanges);
 											}
 										}
@@ -4496,7 +4496,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								///<param name="a v">table method.</param>
 								///<param name=""></param>
 								if(db.aDb[pOp.p1].pSchema.schema_cookie!=iMeta) {
-									sqlite3ResetInternalSchema(db,pOp.p1);
+									build.sqlite3ResetInternalSchema(db,pOp.p1);
 								}
 								this.expired=true;
 								rc=SQLITE_SCHEMA;
@@ -6562,7 +6562,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								pOut.u.i=iMoved;
 								#if !SQLITE_OMIT_AUTOVACUUM
 								if(rc==SQLITE_OK&&iMoved!=0) {
-									sqlite3RootPageMoved(db,iDb,iMoved,pOp.p1);
+									build.sqlite3RootPageMoved(db,iDb,iMoved,pOp.p1);
 									///
 									///<summary>
 									///All OP_Destroy operations occur on the same btree 
@@ -6762,7 +6762,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<param name="is dropped in order to keep the internal representation of the">is dropped in order to keep the internal representation of the</param>
 						///<param name="schema consistent with what is on disk.">schema consistent with what is on disk.</param>
 						case OpCode.OP_DropTable: {
-							sqlite3UnlinkAndDeleteTable(db,pOp.p1,pOp.p4.z);
+							build.sqlite3UnlinkAndDeleteTable(db,pOp.p1,pOp.p4.z);
 							break;
 						}
 						///
@@ -6776,7 +6776,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<param name="schema consistent with what is on disk.">schema consistent with what is on disk.</param>
 						///<param name=""></param>
 						case OpCode.OP_DropIndex: {
-							sqlite3UnlinkAndDeleteIndex(db,pOp.p1,pOp.p4.z);
+							build.sqlite3UnlinkAndDeleteIndex(db,pOp.p1,pOp.p4.z);
 							break;
 						}
 						///
@@ -8248,7 +8248,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					//if ( rc == SQLITE_IOERR_NOMEM ) db.mallocFailed = 1;
 					rc=SQLITE_ERROR;
 					if(resetSchemaOnFault>0) {
-						sqlite3ResetInternalSchema(db,resetSchemaOnFault-1);
+						build.sqlite3ResetInternalSchema(db,resetSchemaOnFault-1);
 					}
 					///
 					///<summary>

@@ -804,7 +804,7 @@ set { _op = value; }
                 if (op == TokenType.TK_CAST)
                 {
                     Debug.Assert(!this.ExprHasProperty(EP_IntValue));
-                    return sqlite3AffinityType(this.u.zToken);
+                    return build.sqlite3AffinityType(this.u.zToken);
                 }
 #endif
                 if ((op == TokenType.TK_AGG_COLUMN || op == TokenType.TK_COLUMN || op == TokenType.TK_REGISTER) && this.pTab != null)

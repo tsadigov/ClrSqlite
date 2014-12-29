@@ -868,7 +868,7 @@ break;
 			///<summary>
 			///Force xDestroy calls on all virtual tables 
 			///</summary>
-			sqlite3ResetInternalSchema(db,-1);
+			build.sqlite3ResetInternalSchema(db,-1);
 			///
 			///<summary>
 			///If a transaction is open, the ResetInternalSchema() call above
@@ -913,7 +913,7 @@ break;
 					}
 				}
 			}
-			sqlite3ResetInternalSchema(db,-1);
+			build.sqlite3ResetInternalSchema(db,-1);
 			///
 			///<summary>
 			///Tell the code in notify.c that the connection no longer holds any
@@ -1020,7 +1020,7 @@ break;
 			sqlite3EndBenignMalloc();
 			if((db.flags&SQLITE_InternChanges)!=0) {
                 vdbeaux.sqlite3ExpirePreparedStatements(db);
-				sqlite3ResetInternalSchema(db,-1);
+				build.sqlite3ResetInternalSchema(db,-1);
 			}
 			///
 			///<summary>
@@ -1746,7 +1746,7 @@ return pRet;
 
   sqlite3_mutex_enter(db->mutex);
   if( zDb && zDb[0] ){
-    iDb = sqlite3FindDbName(db, zDb);
+    iDb = build.sqlite3FindDbName(db, zDb);
   }
   if( iDb<0 ){
     rc = SQLITE_ERROR;
@@ -2995,7 +2995,7 @@ void sqlite3_thread_cleanup()
       }
 
       /* Locate the table in question */
-      pTab = sqlite3FindTable( db, zTableName, zDbName );
+      pTab = build.sqlite3FindTable( db, zTableName, zDbName );
       if ( null == pTab || pTab.pSelect != null )
       {
         pTab = null;

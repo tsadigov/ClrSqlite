@@ -544,7 +544,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 ///<param name="This routine makes a (partial) copy of the Table structure">This routine makes a (partial) copy of the Table structure</param>
 ///<param name="for the table being altered and sets Parse.pNewTable to point">for the table being altered and sets Parse.pNewTable to point</param>
 ///<param name="to it. Routines called by the parser as the column definition">to it. Routines called by the parser as the column definition</param>
-///<param name="is parsed (i.e. sqlite3AddColumn()) add the new Column data to">is parsed (i.e. sqlite3AddColumn()) add the new Column data to</param>
+///<param name="is parsed (i.e. build.sqlite3AddColumn()) add the new Column data to">is parsed (i.e. build.sqlite3AddColumn()) add the new Column data to</param>
 ///<param name="the copy. The copy of the Table structure is deleted by tokenize.c">the copy. The copy of the Table structure is deleted by tokenize.c</param>
 ///<param name="after parsing is finished.">after parsing is finished.</param>
 ///<param name=""></param>
@@ -565,7 +565,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				Debug.Assert(this.pNewTable==null);
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
 				//      if ( db.mallocFailed != 0 ) goto exit_begin_add_column;
-				pTab=sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
+				pTab=build.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
 				if(pTab==null)
 					goto exit_begin_add_column;
 				if(IsVirtual(pTab)) {
@@ -588,7 +588,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				///
 				///<summary>
 				///Put a copy of the Table struct in Parse.pNewTable for the
-				///sqlite3AddColumn() function and friends to modify.  But modify
+				///build.sqlite3AddColumn() function and friends to modify.  But modify
 				///the name by adding an "sqlite_altertab_" prefix.  By adding this
 				///prefix, we insure that the name will not collide with an existing
 				///table because user table are not allowed to have the "sqlite_"
@@ -629,13 +629,13 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				///<summary>
 				///Begin a transaction and increment the schema cookie.  
 				///</summary>
-				sqlite3BeginWriteOperation(this,0,iDb);
+				build.sqlite3BeginWriteOperation(this,0,iDb);
 				v=this.sqlite3GetVdbe();
 				if(v==null)
 					goto exit_begin_add_column;
-				sqlite3ChangeCookie(this,iDb);
+				build.sqlite3ChangeCookie(this,iDb);
 				exit_begin_add_column:
-				sqlite3SrcListDelete(db,ref pSrc);
+				build.sqlite3SrcListDelete(db,ref pSrc);
 				return;
 			}
 			public///<summary>
@@ -708,7 +708,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				// zTab = &pNew->zName[16]; /* Skip the "sqlite_altertab_" prefix on the name */
 				pCol=pNew.aCol[pNew.nCol-1];
 				pDflt=pCol.pDflt;
-				pTab=sqlite3FindTable(db,zTab,zDb);
+				pTab=build.sqlite3FindTable(db,zTab,zDb);
 				Debug.Assert(pTab!=null);
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																																																/* Invoke the authorization callback. */
@@ -779,7 +779,7 @@ return;
 					//    zEnd-- = '\0';
 					//  }
 					db.flags|=SQLITE_PreferBuiltin;
-					sqlite3NestedParse(this,"UPDATE \"%w\".%s SET "+"sql = substr(sql,1,%d) || ', ' || %Q || substr(sql,%d) "+"WHERE type = 'table' AND name = %Q",zDb,SCHEMA_TABLE(iDb),pNew.addColOffset,zCol,pNew.addColOffset+1,zTab);
+					build.sqlite3NestedParse(this,"UPDATE \"%w\".%s SET "+"sql = substr(sql,1,%d) || ', ' || %Q || substr(sql,%d) "+"WHERE type = 'table' AND name = %Q",zDb,SCHEMA_TABLE(iDb),pNew.addColOffset,zCol,pNew.addColOffset+1,zTab);
 					db.sqlite3DbFree(ref zCol);
 					db.flags=savedDbFlags;
 				}
@@ -913,7 +913,7 @@ return;
 				//if ( NEVER( db.mallocFailed != 0 ) ) goto exit_rename_table;
 				Debug.Assert(pSrc.nSrc==1);
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				pTab=sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
+				pTab=build.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
 				if(pTab==null)
 					goto exit_rename_table;
 				iDb=sqlite3SchemaToIndex(this.db,pTab.pSchema);
@@ -923,7 +923,7 @@ return;
 				///<summary>
 				///Get a NULL terminated version of the new table name. 
 				///</summary>
-				zName=sqlite3NameFromToken(db,pName);
+				zName=build.sqlite3NameFromToken(db,pName);
 				if(zName==null)
 					goto exit_rename_table;
 				///
@@ -932,7 +932,7 @@ return;
 				///in database iDb. If so, this is an error.
 				///
 				///</summary>
-				if(sqlite3FindTable(db,zName,zDb)!=null||sqlite3FindIndex(db,zName,zDb)!=null) {
+				if(build.sqlite3FindTable(db,zName,zDb)!=null||build.sqlite3FindIndex(db,zName,zDb)!=null) {
 					utilc.sqlite3ErrorMsg(this,"there is already another table or index with this name: %s",zName);
 					goto exit_rename_table;
 				}
@@ -945,7 +945,7 @@ return;
 				if(SQLITE_OK!=this.isSystemTable(pTab.zName)) {
 					goto exit_rename_table;
 				}
-				if(SQLITE_OK!=sqlite3CheckObjectName(this,zName)) {
+				if(SQLITE_OK!=build.sqlite3CheckObjectName(this,zName)) {
 					goto exit_rename_table;
 				}
 				#if !SQLITE_OMIT_VIEW
@@ -960,7 +960,7 @@ if( sqlite3AuthCheck(pParse, SQLITE_ALTER_TABLE, zDb, pTab.zName, 0) ){
 goto exit_rename_table;
 }
 #endif
-				if(sqlite3ViewGetColumnNames(this,pTab)!=0) {
+				if(build.sqlite3ViewGetColumnNames(this,pTab)!=0) {
 					goto exit_rename_table;
 				}
 				#if !SQLITE_OMIT_VIRTUALTABLE
@@ -982,8 +982,8 @@ goto exit_rename_table;
 				if(v==null) {
 					goto exit_rename_table;
 				}
-				sqlite3BeginWriteOperation(this,pVTab!=null?1:0,iDb);
-				sqlite3ChangeCookie(this,iDb);
+				build.sqlite3BeginWriteOperation(this,pVTab!=null?1:0,iDb);
+				build.sqlite3ChangeCookie(this,iDb);
 				///
 				///<summary>
 				///If this is a virtual table, invoke the xRename() function if
@@ -997,7 +997,7 @@ goto exit_rename_table;
 					int i=++this.nMem;
 					v.sqlite3VdbeAddOp4(OP_String8,0,i,0,zName,0);
 					v.sqlite3VdbeAddOp4(OP_VRename,i,0,0,pVTab,P4_VTAB);
-					sqlite3MayAbort(this);
+					build.sqlite3MayAbort(this);
 				}
 				#endif
 				///
@@ -1015,7 +1015,7 @@ goto exit_rename_table;
 					///<param name="statements corresponding to all child tables of foreign key constraints">statements corresponding to all child tables of foreign key constraints</param>
 					///<param name="for which the renamed table is the parent table.  ">for which the renamed table is the parent table.  </param>
 					if((zWhere=this.whereForeignKeys(pTab))!=null) {
-						sqlite3NestedParse(this,"UPDATE \"%w\".%s SET "+"sql = sqlite_rename_parent(sql, %Q, %Q) "+"WHERE %s;",zDb,SCHEMA_TABLE(iDb),zTabName,zName,zWhere);
+						build.sqlite3NestedParse(this,"UPDATE \"%w\".%s SET "+"sql = sqlite_rename_parent(sql, %Q, %Q) "+"WHERE %s;",zDb,SCHEMA_TABLE(iDb),zTabName,zName,zWhere);
 						db.sqlite3DbFree(ref zWhere);
 					}
 				}
@@ -1024,7 +1024,7 @@ goto exit_rename_table;
 				///<summary>
 				///Modify the sqlite_master table to use the new table name. 
 				///</summary>
-				sqlite3NestedParse(this,"UPDATE %Q.%s SET "+
+				build.sqlite3NestedParse(this,"UPDATE %Q.%s SET "+
 				#if SQLITE_OMIT_TRIGGER
 																																																																																																																																 "sql = sqlite_rename_table(sql, %Q), " +
 #else
@@ -1041,8 +1041,8 @@ goto exit_rename_table;
 				///If the sqlite_sequence table exists in this database, then update
 				///it with the new table name.
 				///</summary>
-				if(sqlite3FindTable(db,"sqlite_sequence",zDb)!=null) {
-					sqlite3NestedParse(this,"UPDATE \"%w\".sqlite_sequence set name = %Q WHERE name = %Q",zDb,zName,pTab.zName);
+				if(build.sqlite3FindTable(db,"sqlite_sequence",zDb)!=null) {
+					build.sqlite3NestedParse(this,"UPDATE \"%w\".sqlite_sequence set name = %Q WHERE name = %Q",zDb,zName,pTab.zName);
 				}
 				#endif
 				#if !SQLITE_OMIT_TRIGGER
@@ -1053,7 +1053,7 @@ goto exit_rename_table;
 				///the temp database.
 				///</summary>
 				if((zWhere=this.whereTempTriggers(pTab))!="") {
-					sqlite3NestedParse(this,"UPDATE sqlite_temp_master SET "+"sql = sqlite_rename_trigger(sql, %Q), "+"tbl_name = %Q "+"WHERE %s;",zName,zName,zWhere);
+					build.sqlite3NestedParse(this,"UPDATE sqlite_temp_master SET "+"sql = sqlite_rename_trigger(sql, %Q), "+"tbl_name = %Q "+"WHERE %s;",zName,zName,zWhere);
 					db.sqlite3DbFree(ref zWhere);
 				}
 				#endif
@@ -1074,7 +1074,7 @@ goto exit_rename_table;
 				///</summary>
 				this.reloadTableSchema(pTab,zName);
 				exit_rename_table:
-				sqlite3SrcListDelete(db,ref pSrc);
+				build.sqlite3SrcListDelete(db,ref pSrc);
 				db.sqlite3DbFree(ref zName);
 				db.flags=savedDbFlags;
 			}
@@ -1229,7 +1229,7 @@ goto exit_rename_table;
 				for(i=0;i<ArraySize(aTable);i++) {
 					string zTab=aTable[i].zName;
 					Table pStat;
-					if((pStat=sqlite3FindTable(db,zTab,pDb.zName))==null) {
+					if((pStat=build.sqlite3FindTable(db,zTab,pDb.zName))==null) {
 						///
 						///<summary>
 						///The sqlite_stat[12] table does not exist. Create it. Note that a 
@@ -1237,7 +1237,7 @@ goto exit_rename_table;
 						///<param name="side">effect of the CREATE TABLE statement is to leave the rootpage </param>
 						///<param name="of the new table in register pParse.regRoot. This is important ">of the new table in register pParse.regRoot. This is important </param>
 						///<param name="because the OpenWrite opcode below will be needing it. ">because the OpenWrite opcode below will be needing it. </param>
-						sqlite3NestedParse(this,"CREATE TABLE %Q.%s(%s)",pDb.zName,zTab,aTable[i].zCols);
+						build.sqlite3NestedParse(this,"CREATE TABLE %Q.%s(%s)",pDb.zName,zTab,aTable[i].zCols);
 						aRoot[i]=this.regRoot;
 						aCreateTbl[i]=1;
 					}
@@ -1251,7 +1251,7 @@ goto exit_rename_table;
 						aRoot[i]=pStat.tnum;
 						sqlite3TableLock(this,iDb,aRoot[i],1,zTab);
 						if(!String.IsNullOrEmpty(zWhere)) {
-							sqlite3NestedParse(this,"DELETE FROM %Q.%s WHERE %s=%Q",pDb.zName,zTab,zWhereType,zWhere);
+							build.sqlite3NestedParse(this,"DELETE FROM %Q.%s WHERE %s=%Q",pDb.zName,zTab,zWhereType,zWhere);
 						}
 						else {
 							///
@@ -1426,7 +1426,7 @@ return;
 					if(pOnlyIdx!=null&&pOnlyIdx!=pIdx)
 						continue;
 					nCol=pIdx.nColumn;
-					pKey=sqlite3IndexKeyinfo(this,pIdx);
+					pKey=build.sqlite3IndexKeyinfo(this,pIdx);
 					if(iMem+1+(nCol*2)>this.nMem) {
 						this.nMem=iMem+1+(nCol*2);
 					}
@@ -1543,7 +1543,7 @@ return;
 						}
 						Debug.Assert(pIdx.azColl!=null);
 						Debug.Assert(pIdx.azColl[i]!=null);
-						pColl=sqlite3LocateCollSeq(this,pIdx.azColl[i]);
+						pColl=build.sqlite3LocateCollSeq(this,pIdx.azColl[i]);
 						v.sqlite3VdbeAddOp4(OP_Ne,regCol,0,iMem+nCol+i+1,pColl,P4_COLLSEQ);
 						v.sqlite3VdbeChangeP5(SQLITE_NULLEQ);
 					}
@@ -1667,7 +1667,7 @@ return;
 				HashElem k;
 				int iStatCur;
 				int iMem;
-				sqlite3BeginWriteOperation(this,0,iDb);
+				build.sqlite3BeginWriteOperation(this,0,iDb);
 				iStatCur=this.nTab;
 				this.nTab+=2;
 				this.openStatTable(iDb,iStatCur,null,null);
@@ -1693,7 +1693,7 @@ return;
 				Debug.Assert(pTab!=null);
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
 				iDb=sqlite3SchemaToIndex(this.db,pTab.pSchema);
-				sqlite3BeginWriteOperation(this,0,iDb);
+				build.sqlite3BeginWriteOperation(this,0,iDb);
 				iStatCur=this.nTab;
 				this.nTab+=2;
 				if(pOnlyIdx!=null) {
@@ -1760,18 +1760,18 @@ return;
 						///<summary>
 						///Form 2:  Analyze the database or table named 
 						///</summary>
-						iDb=sqlite3FindDb(db,pName1);
+						iDb=build.sqlite3FindDb(db,pName1);
 						if(iDb>=0) {
 							this.analyzeDatabase(iDb);
 						}
 						else {
-							z=sqlite3NameFromToken(db,pName1);
+							z=build.sqlite3NameFromToken(db,pName1);
 							if(z!=null) {
-								if((pIdx=sqlite3FindIndex(db,z,null))!=null) {
+								if((pIdx=build.sqlite3FindIndex(db,z,null))!=null) {
 									this.analyzeTable(pIdx.pTable,pIdx);
 								}
 								else
-									if((pTab=sqlite3LocateTable(this,0,z,null))!=null) {
+									if((pTab=build.sqlite3LocateTable(this,0,z,null))!=null) {
 										this.analyzeTable(pTab,null);
 									}
 								z=null;
@@ -1784,16 +1784,16 @@ return;
 						///<summary>
 						///Form 3: Analyze the fully qualified table name 
 						///</summary>
-						iDb=sqlite3TwoPartName(this,pName1,pName2,ref pTableName);
+						iDb=build.sqlite3TwoPartName(this,pName1,pName2,ref pTableName);
 						if(iDb>=0) {
 							zDb=db.aDb[iDb].zName;
-							z=sqlite3NameFromToken(db,pTableName);
+							z=build.sqlite3NameFromToken(db,pTableName);
 							if(z!=null) {
-								if((pIdx=sqlite3FindIndex(db,z,zDb))!=null) {
+								if((pIdx=build.sqlite3FindIndex(db,z,zDb))!=null) {
 									this.analyzeTable(pIdx.pTable,pIdx);
 								}
 								else
-									if((pTab=sqlite3LocateTable(this,0,z,zDb))!=null) {
+									if((pTab=build.sqlite3LocateTable(this,0,z,zDb))!=null) {
 										this.analyzeTable(pTab,null);
 									}
 								z=null;
@@ -2278,7 +2278,7 @@ goto attach_end;
 						int nCol=pFKey.nCol;
 						int regTemp=this.sqlite3GetTempRange(nCol);
 						int regRec=this.sqlite3GetTempReg();
-						KeyInfo pKey=sqlite3IndexKeyinfo(this,pIdx);
+						KeyInfo pKey=build.sqlite3IndexKeyinfo(this,pIdx);
 						v.sqlite3VdbeAddOp3(OP_OpenRead,iCur,pIdx.tnum,iDb);
 						v.sqlite3VdbeChangeP4(-1,pKey,P4_KEYINFO_HANDOFF);
 						for(i=0;i<nCol;i++) {
@@ -2331,7 +2331,7 @@ goto attach_end;
 					///generated for will not open a statement transaction.  
 					///</summary>
 					Debug.Assert(nIncr==1);
-					sqlite3HaltConstraint(this,OE_Abort,"foreign key constraint failed",P4_STATIC);
+					build.sqlite3HaltConstraint(this,OE_Abort,"foreign key constraint failed",P4_STATIC);
 				}
 				else {
 					if(nIncr>0&&pFKey.isDeferred==0) {
@@ -2487,7 +2487,7 @@ goto attach_end;
 								iCol=-1;
 							pLeft.iTable=regData+iCol+1;
 							pLeft.affinity=pCol.affinity;
-							pLeft.pColl=sqlite3LocateCollSeq(this,pCol.zColl);
+							pLeft.pColl=build.sqlite3LocateCollSeq(this,pCol.zColl);
 						}
 						else {
 							pLeft.iTable=regData;
@@ -2627,7 +2627,7 @@ goto attach_end;
 					///transactions are not able to rollback schema changes.  
 					///</summary>
 					v.sqlite3VdbeAddOp2(OP_FkIfZero,0,v.sqlite3VdbeCurrentAddr()+2);
-					sqlite3HaltConstraint(this,OE_Abort,"foreign key constraint failed",P4_STATIC);
+					build.sqlite3HaltConstraint(this,OE_Abort,"foreign key constraint failed",P4_STATIC);
 					if(iSkip!=0) {
 						v.sqlite3VdbeResolveLabel(iSkip);
 					}
@@ -2734,10 +2734,10 @@ goto attach_end;
 					///early.  
 					///</summary>
 					if(this.disableTriggers!=0) {
-						pTo=sqlite3FindTable(db,pFKey.zTo,zDb);
+						pTo=build.sqlite3FindTable(db,pFKey.zTo,zDb);
 					}
 					else {
-						pTo=sqlite3LocateTable(this,0,pFKey.zTo,zDb);
+						pTo=build.sqlite3LocateTable(this,0,pFKey.zTo,zDb);
 					}
 					if(null==pTo||this.locateFkeyIndex(pTo,pFKey,out pIdx,out aiFree)!=0) {
 						if(0==isIgnoreErrors///
@@ -2837,7 +2837,7 @@ goto attach_end;
 					///the foreign key that refers to this table is attached to). This
 					///is required for the sqlite3WhereXXX() interface.  
 					///</summary>
-					pSrc=sqlite3SrcListAppend(db,0,null,null);
+					pSrc=build.sqlite3SrcListAppend(db,0,null,null);
 					if(pSrc!=null) {
 						SrcList_item pItem=pSrc.a[0];
 						pItem.pTab=pFKey.pFrom;
@@ -2860,7 +2860,7 @@ goto attach_end;
 							this.fkScanChildren(pSrc,pTab,pIdx,pFKey,aiCol,regOld,1);
 						}
 						pItem.zName=null;
-						sqlite3SrcListDelete(db,ref pSrc);
+						build.sqlite3SrcListDelete(db,ref pSrc);
 					}
 					db.sqlite3DbFree(ref aiCol);
 				}
@@ -3205,7 +3205,7 @@ goto attach_end;
 						if(pRaise!=null) {
 							pRaise.affinity=(char)OE_Abort;
 						}
-						pSelect=Select.sqlite3SelectNew(this,this.sqlite3ExprListAppend(0,pRaise),sqlite3SrcListAppend(db,0,tFrom,null),pWhere,null,null,null,0,null,null);
+						pSelect=Select.sqlite3SelectNew(this,this.sqlite3ExprListAppend(0,pRaise),build.sqlite3SrcListAppend(db,0,tFrom,null),pWhere,null,null,null,0,null,null);
 						pWhere=null;
 					}
 					///
@@ -3475,7 +3475,7 @@ pParse.nTableLock = 0;
 					///will take responsibility for freeing the Table structure.
 					///
 					///</summary>
-					sqlite3DeleteTable(db,ref this.pNewTable);
+					build.sqlite3DeleteTable(db,ref this.pNewTable);
 				}
 				#if !SQLITE_OMIT_TRIGGER
 				sqlite3DeleteTrigger(db,ref this.pNewTrigger);
@@ -3492,7 +3492,7 @@ pParse.nTableLock = 0;
 				while(this.pZombieTab!=null) {
 					Table p=this.pZombieTab;
 					this.pZombieTab=p.pNextZombie;
-					sqlite3DeleteTable(db,ref p);
+					build.sqlite3DeleteTable(db,ref p);
 				}
 				if(nErr>0&&this.rc==SQLITE_OK) {
 					this.rc=SqlResult.SQLITE_ERROR;
@@ -3762,7 +3762,7 @@ isView = false;
 				///<param name="ViewGetColumnNames() is a no">op if pTab is not a view (or virtual</param>
 				///<param name="module table).">module table).</param>
 				///<param name=""></param>
-				if(sqlite3ViewGetColumnNames(this,pTab)!=-0) {
+				if(build.sqlite3ViewGetColumnNames(this,pTab)!=-0) {
 					goto insert_cleanup;
 				}
 				#endif
@@ -3786,7 +3786,7 @@ isView = false;
 					goto insert_cleanup;
 				if(this.nested==0)
 					v.sqlite3VdbeCountChanges();
-				sqlite3BeginWriteOperation(this,(pSelect!=null||pTrigger!=null)?1:0,iDb);
+				build.sqlite3BeginWriteOperation(this,(pSelect!=null||pTrigger!=null)?1:0,iDb);
 				#if !SQLITE_OMIT_XFER_OPT
 				///
 				///<summary>
@@ -4352,7 +4352,7 @@ isView = false;
 						this.sqlite3VtabMakeWritable(pTab);
 						v.sqlite3VdbeAddOp4(OP_VUpdate,1,pTab.nCol+2,regIns,pVTab,P4_VTAB);
 						v.sqlite3VdbeChangeP5((byte)(onError==OE_Default?OE_Abort:onError));
-						sqlite3MayAbort(this);
+						build.sqlite3MayAbort(this);
 					}
 					else
 					#endif
@@ -4424,7 +4424,7 @@ isView = false;
 				///
 				///<summary>
 				///Return the number of rows inserted. If this routine is
-				///generating code because of a call to sqlite3NestedParse(), do not
+				///generating code because of a call to build.sqlite3NestedParse(), do not
 				///invoke the callback function.
 				///
 				///</summary>
@@ -4434,10 +4434,10 @@ isView = false;
 					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows inserted",SQLITE_STATIC);
 				}
 				insert_cleanup:
-				sqlite3SrcListDelete(db,ref pTabList);
+				build.sqlite3SrcListDelete(db,ref pTabList);
 				exprc.sqlite3ExprListDelete(db,ref pList);
 				sqlite3SelectDelete(db,ref pSelect);
-				sqlite3IdListDelete(db,ref pColumn);
+				build.sqlite3IdListDelete(db,ref pColumn);
 				db.sqlite3DbFree(ref aRegIdx);
 			}
 			public void sqlite3AutoincrementBegin() {
@@ -4665,7 +4665,7 @@ isView = false;
 					Debug.Assert(onError==OE_Rollback||onError==OE_Abort||onError==OE_Fail||onError==OE_Ignore||onError==OE_Replace);
 					switch(onError) {
 					case OE_Abort: {
-						sqlite3MayAbort(this);
+						build.sqlite3MayAbort(this);
 						goto case OE_Fail;
 					}
 					case OE_Rollback:
@@ -4710,7 +4710,7 @@ isView = false;
 						///<summary>
 						///</summary>
 						///<param name="IMP: R">63625 </param>
-						sqlite3HaltConstraint(this,onError,(string)null,0);
+						build.sqlite3HaltConstraint(this,onError,(string)null,0);
 					}
 					v.sqlite3VdbeResolveLabel(allOk);
 				}
@@ -4747,7 +4747,7 @@ isView = false;
 					case OE_Rollback:
 					case OE_Abort:
 					case OE_Fail: {
-						sqlite3HaltConstraint(this,onError,"PRIMARY KEY must be unique",P4_STATIC);
+						build.sqlite3HaltConstraint(this,onError,"PRIMARY KEY must be unique",P4_STATIC);
 						break;
 					}
 					case OE_Replace: {
@@ -4768,7 +4768,7 @@ isView = false;
 						///<param name="If either GenerateRowDelete() or GenerateRowIndexDelete() is called,">If either GenerateRowDelete() or GenerateRowIndexDelete() is called,</param>
 						///<param name="also invoke MultiWrite() to indicate that this VDBE may require">also invoke MultiWrite() to indicate that this VDBE may require</param>
 						///<param name="statement rollback (if the statement is aborted after the delete">statement rollback (if the statement is aborted after the delete</param>
-						///<param name="takes place). Earlier versions called sqlite3MultiWrite() regardless,">takes place). Earlier versions called sqlite3MultiWrite() regardless,</param>
+						///<param name="takes place). Earlier versions called build.sqlite3MultiWrite() regardless,">takes place). Earlier versions called build.sqlite3MultiWrite() regardless,</param>
 						///<param name="but being more selective here allows statements like:">but being more selective here allows statements like:</param>
 						///<param name=""></param>
 						///<param name="REPLACE INTO t(rowid) VALUES($newrowid)">REPLACE INTO t(rowid) VALUES($newrowid)</param>
@@ -4782,12 +4782,12 @@ isView = false;
 							pTrigger=sqlite3TriggersExist(this,pTab,TK_DELETE,null,out iDummy);
 						}
 						if(pTrigger!=null||this.sqlite3FkRequired(pTab,null,0)!=0) {
-							sqlite3MultiWrite(this);
+							build.sqlite3MultiWrite(this);
 							this.sqlite3GenerateRowDelete(pTab,baseCur,regRowid,0,pTrigger,OE_Replace);
 						}
 						else
 							if(pTab.pIndex!=null) {
-								sqlite3MultiWrite(this);
+								build.sqlite3MultiWrite(this);
 								this.sqlite3GenerateRowIndexDelete(pTab,baseCur,0);
 							}
 						seenReplace=true;
@@ -4898,7 +4898,7 @@ isView = false;
 						}
                         errMsg.sqlite3StrAccumAppend(pIdx.nColumn > 1 ? " are not unique" : " is not unique", -1);
 						zErr=io.sqlite3StrAccumFinish(errMsg);
-						sqlite3HaltConstraint(this,onError,zErr,0);
+						build.sqlite3HaltConstraint(this,onError,zErr,0);
 						errMsg.db.sqlite3DbFree(ref zErr);
 						break;
 					}
@@ -4910,7 +4910,7 @@ isView = false;
 					default: {
 						Trigger pTrigger=null;
 						Debug.Assert(onError==OE_Replace);
-						sqlite3MultiWrite(this);
+						build.sqlite3MultiWrite(this);
 						if((this.db.flags&SQLITE_RecTriggers)!=0) {
 							int iDummy;
 							pTrigger=sqlite3TriggersExist(this,pTab,TK_DELETE,null,out iDummy);
@@ -5037,7 +5037,7 @@ isView = false;
 				Debug.Assert(v!=null);
 				this.sqlite3OpenTable(baseCur,iDb,pTab,op);
 				for(i=1,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,i++) {
-					KeyInfo pKey=sqlite3IndexKeyinfo(this,pIdx);
+					KeyInfo pKey=build.sqlite3IndexKeyinfo(this,pIdx);
 					Debug.Assert(pIdx.pSchema==pTab.pSchema);
 					v.sqlite3VdbeAddOp4(op,i+baseCur,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 					#if SQLITE_DEBUG
@@ -5370,7 +5370,7 @@ isView = false;
 																																																																																																					//     undef isView
       const bool isView = false;    // define isView 0
 #endif
-				if(sqlite3ViewGetColumnNames(this,pTab)!=0) {
+				if(build.sqlite3ViewGetColumnNames(this,pTab)!=0) {
 					goto update_cleanup;
 				}
 				if(this.sqlite3IsReadOnly(pTab,tmask)) {
@@ -5491,7 +5491,7 @@ aXRef[j] = -1;
 					goto update_cleanup;
 				if(this.nested==0)
 					v.sqlite3VdbeCountChanges();
-				sqlite3BeginWriteOperation(this,1,iDb);
+				build.sqlite3BeginWriteOperation(this,1,iDb);
 				#if !SQLITE_OMIT_VIRTUALTABLE
 				///
 				///<summary>
@@ -5605,7 +5605,7 @@ aXRef[j] = -1;
 					}
 					for(i=0,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,i++) {
 						if(openAll||aRegIdx[i]>0) {
-							KeyInfo pKey=sqlite3IndexKeyinfo(this,pIdx);
+							KeyInfo pKey=build.sqlite3IndexKeyinfo(this,pIdx);
 							v.sqlite3VdbeAddOp4(OP_OpenWrite,iCur+i+1,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 							Debug.Assert(this.nTab>iCur+i+1);
 						}
@@ -5831,7 +5831,7 @@ aXRef[j] = -1;
 				///
 				///<summary>
 				///Return the number of rows that were changed. If this routine is 
-				///generating code because of a call to sqlite3NestedParse(), do not
+				///generating code because of a call to build.sqlite3NestedParse(), do not
 				///invoke the callback function.
 				///
 				///</summary>
@@ -5846,7 +5846,7 @@ aXRef[j] = -1;
 #endif
 				db.sqlite3DbFree(ref aRegIdx);
 				db.sqlite3DbFree(ref aXRef);
-				sqlite3SrcListDelete(db,ref pTabList);
+				build.sqlite3SrcListDelete(db,ref pTabList);
 				exprc.sqlite3ExprListDelete(db,ref pChanges);
 				exprc.sqlite3ExprDelete(db,ref pWhere);
 				return;
@@ -5984,7 +5984,7 @@ aXRef[j] = -1;
 				this.sqlite3VtabMakeWritable(pTab);
 				v.sqlite3VdbeAddOp4(OP_VUpdate,0,pTab.nCol+2,iReg,pVTab,P4_VTAB);
 				v.sqlite3VdbeChangeP5((byte)(onError==OE_Default?OE_Abort:onError));
-				sqlite3MayAbort(this);
+				build.sqlite3MayAbort(this);
 				v.sqlite3VdbeAddOp2(OP_Next,ephemTab,addr+1);
 				v.sqlite3VdbeJumpHere(addr);
 				v.sqlite3VdbeAddOp2(OP_Close,ephemTab,0);
@@ -5998,8 +5998,8 @@ aXRef[j] = -1;
 				SrcList_item pItem=pSrc.a[0];
 				Table pTab;
 				Debug.Assert(pItem!=null&&pSrc.nSrc==1);
-				pTab=sqlite3LocateTable(this,0,pItem.zName,pItem.zDatabase);
-				sqlite3DeleteTable(this.db,ref pItem.pTab);
+				pTab=build.sqlite3LocateTable(this,0,pItem.zName,pItem.zDatabase);
+				build.sqlite3DeleteTable(this.db,ref pItem.pTab);
 				pItem.pTab=pTab;
 				if(pTab!=null) {
 					pTab.nRef++;
@@ -6059,7 +6059,7 @@ aXRef[j] = -1;
 				if(pWhere!=null) {
 					SrcList pFrom;
 					pWhere=exprc.sqlite3ExprDup(db,pWhere,0);
-					pFrom=sqlite3SrcListAppend(db,null,null,null);
+					pFrom=build.sqlite3SrcListAppend(db,null,null,null);
 					//if ( pFrom != null )
 					//{
 					Debug.Assert(pFrom.nSrc==1);
@@ -6218,7 +6218,7 @@ isView = false;
 				///<summary>
 				///If pTab is really a view, make sure it has been initialized.
 				///</summary>
-				if(sqlite3ViewGetColumnNames(this,pTab)!=0) {
+				if(build.sqlite3ViewGetColumnNames(this,pTab)!=0) {
 					goto delete_from_cleanup;
 				}
 				if(this.sqlite3IsReadOnly(pTab,(pTrigger!=null?1:0))) {
@@ -6264,7 +6264,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				}
 				if(this.nested==0)
 					v.sqlite3VdbeCountChanges();
-				sqlite3BeginWriteOperation(this,1,iDb);
+				build.sqlite3BeginWriteOperation(this,1,iDb);
 				///
 				///<summary>
 				///If we are trying to delete from a view, realize that view into
@@ -6379,7 +6379,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 						this.sqlite3VtabMakeWritable(pTab);
 						v.sqlite3VdbeAddOp4(OP_VUpdate,0,1,iRowid,pVTab,P4_VTAB);
 						v.sqlite3VdbeChangeP5(OE_Abort);
-						sqlite3MayAbort(this);
+						build.sqlite3MayAbort(this);
 					}
 					else
 					#endif
@@ -6421,7 +6421,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///
 				///<summary>
 				///Return the number of rows that were deleted. If this routine is 
-				///generating code because of a call to sqlite3NestedParse(), do not
+				///generating code because of a call to build.sqlite3NestedParse(), do not
 				///invoke the callback function.
 				///
 				///</summary>
@@ -6434,7 +6434,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																					sqlite3AuthContextPop(sContext);
 #endif
-				sqlite3SrcListDelete(db,ref pTabList);
+				build.sqlite3SrcListDelete(db,ref pTabList);
 				exprc.sqlite3ExprDelete(db,ref pWhere);
 				return;
 			}
@@ -6693,8 +6693,8 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///</summary>
 				CollSeq pColl;
 				sqlite3 db=this.db;
-				zColl=sqlite3NameFromToken(db,pCollName);
-				pColl=sqlite3LocateCollSeq(this,zColl);
+				zColl=build.sqlite3NameFromToken(db,pCollName);
+				pColl=build.sqlite3LocateCollSeq(this,zColl);
 				pExpr.sqlite3ExprSetColl(pColl);
 				db.sqlite3DbFree(ref zColl);
 				return pExpr;
@@ -7214,7 +7214,7 @@ return;
 					int aff,to_op;
 					inReg=this.sqlite3ExprCodeTarget(pExpr.pLeft,target);
 					Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
-					aff=sqlite3AffinityType(pExpr.u.zToken);
+					aff=build.sqlite3AffinityType(pExpr.u.zToken);
 					to_op=aff-SQLITE_AFF_TEXT+OP_ToText;
 					Debug.Assert(to_op==OP_ToText||aff!=SQLITE_AFF_TEXT);
 					Debug.Assert(to_op==OP_ToBlob||aff!=SQLITE_AFF_NONE);
@@ -7774,14 +7774,14 @@ return;
 						return 0;
 					}
 					if(pExpr.affinity==OE_Abort) {
-						sqlite3MayAbort(this);
+						build.sqlite3MayAbort(this);
 					}
 					Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
 					if(pExpr.affinity==OE_Ignore) {
 						v.sqlite3VdbeAddOp4(OP_Halt,SQLITE_OK,OE_Ignore,0,pExpr.u.zToken,0);
 					}
 					else {
-						sqlite3HaltConstraint(this,pExpr.affinity,pExpr.u.zToken,0);
+						build.sqlite3HaltConstraint(this,pExpr.affinity,pExpr.u.zToken,0);
 					}
 					break;
 				}
@@ -9165,7 +9165,7 @@ return;
 				///<summary>
 				///Create the automatic index 
 				///</summary>
-				pKeyinfo=sqlite3IndexKeyinfo(this,pIdx);
+				pKeyinfo=build.sqlite3IndexKeyinfo(this,pIdx);
 				Debug.Assert(pLevel.iIdxCur>=0);
 				v.sqlite3VdbeAddOp4(OP_OpenAutoindex,pLevel.iIdxCur,nColumn+1,0,pKeyinfo,P4_KEYINFO_HANDOFF);
 				VdbeComment(v,"for %s",pTable.zName);
@@ -9529,7 +9529,7 @@ range_est_fallback:
 				///<summary>
 				///The module name must be defined. Also, by this point there must
 				///be a pointer to an sqlite3_vtab structure. Otherwise
-				///sqlite3ViewGetColumnNames() would have picked up the error.
+				///build.sqlite3ViewGetColumnNames() would have picked up the error.
 				///
 				///</summary>
 				Debug.Assert(pTab.azModuleArg!=null&&pTab.azModuleArg[0]!=null);
@@ -11264,7 +11264,7 @@ range_est_fallback:
 				///searching those tables.
 				///
 				///</summary>
-				sqlite3CodeVerifySchema(this,-1);
+				build.sqlite3CodeVerifySchema(this,-1);
 				///
 				///<summary>
 				///Insert the cookie verifier Goto 
@@ -11330,7 +11330,7 @@ range_est_fallback:
 						#endif
 						if((pLevel.plan.wsFlags&WHERE_INDEXED)!=0) {
 							Index pIx=pLevel.plan.u.pIdx;
-							KeyInfo pKey=sqlite3IndexKeyinfo(this,pIx);
+							KeyInfo pKey=build.sqlite3IndexKeyinfo(this,pIx);
 							int iIdxCur=pLevel.iIdxCur;
 							Debug.Assert(pIx.pSchema==pTab.pSchema);
 							Debug.Assert(iIdxCur>=0);
@@ -11339,7 +11339,7 @@ range_est_fallback:
 																																																																																																																																																																																														            VdbeComment( v, "%s", pIx.zName );
 #endif
 						}
-					sqlite3CodeVerifySchema(this,iDb);
+					build.sqlite3CodeVerifySchema(this,iDb);
 					notReady&=~pWC.pMaskSet.getMask(pTabItem.iCursor);
 				}
 				pWInfo.iTop=v.sqlite3VdbeCurrentAddr();
@@ -11744,7 +11744,7 @@ range_est_fallback:
 					///Code an OP_VerifyCookie and OP_TableLock for <table>. 
 					///</summary>
 					iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-					sqlite3CodeVerifySchema(this,iDb);
+					build.sqlite3CodeVerifySchema(this,iDb);
 					sqlite3TableLock(this,iDb,pTab.tnum,0,pTab.zName);
 					///
 					///<summary>
@@ -11790,7 +11790,7 @@ range_est_fallback:
 								int iMem=++this.nMem;
 								int iAddr;
 								KeyInfo pKey;
-								pKey=sqlite3IndexKeyinfo(this,pIdx);
+								pKey=build.sqlite3IndexKeyinfo(this,pIdx);
 								iAddr=v.sqlite3VdbeAddOp1(OpCode.OP_If,iMem);
 								v.sqlite3VdbeAddOp2(OP_Integer,1,iMem);
 								v.sqlite3VdbeAddOp4(OP_OpenRead,iTab,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
@@ -12353,7 +12353,7 @@ range_est_fallback:
 				///<summary>
 				///Database connection 
 				///</summary>
-				sqlite3StartTable(this,pName1,pName2,0,0,1,0);
+				build.sqlite3StartTable(this,pName1,pName2,0,0,1,0);
 				pTable=this.pNewTable;
 				if(pTable==null)
 					return;
@@ -12363,7 +12363,7 @@ range_est_fallback:
 				Debug.Assert(iDb>=0);
 				pTable.tabFlags|=TF_Virtual;
 				pTable.nModuleArg=0;
-				addModuleArgument(db,pTable,sqlite3NameFromToken(db,pModuleName));
+				addModuleArgument(db,pTable,build.sqlite3NameFromToken(db,pModuleName));
 				addModuleArgument(db,pTable,db.aDb[iDb].zName);
 				//sqlite3DbStrDup( db, db.aDb[iDb].zName ) );
 				addModuleArgument(db,pTable,pTable.zName);
@@ -12373,7 +12373,7 @@ range_est_fallback:
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																			  /* Creating a virtual table invokes the authorization callback twice.
   ** The first invocation, to obtain permission to INSERT a row into the
-  ** sqlite_master table, has already been made by sqlite3StartTable().
+  ** sqlite_master table, has already been made by build.sqlite3StartTable().
   ** The second call, to obtain permission to create the table, is made now.
   */
   if( pTable->azModuleArg ){
@@ -12439,14 +12439,14 @@ range_est_fallback:
 					///
 					///The VM register number pParse.regRowid holds the rowid of an
 					///entry in the sqlite_master table tht was created for this vtab
-					///by sqlite3StartTable().
+					///by build.sqlite3StartTable().
 					///
 					///</summary>
 					iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-					sqlite3NestedParse(this,"UPDATE %Q.%s "+"SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q "+"WHERE rowid=#%d",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),pTab.zName,pTab.zName,zStmt,this.regRowid);
+					build.sqlite3NestedParse(this,"UPDATE %Q.%s "+"SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q "+"WHERE rowid=#%d",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),pTab.zName,pTab.zName,zStmt,this.regRowid);
 					db.sqlite3DbFree(ref zStmt);
 					v=this.sqlite3GetVdbe();
-					sqlite3ChangeCookie(this,iDb);
+					build.sqlite3ChangeCookie(this,iDb);
 					v.sqlite3VdbeAddOp2(OP_Expire,0,0);
 					zWhere=io.sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);
 					v.sqlite3VdbeAddParseSchemaOp(iDb,zWhere);

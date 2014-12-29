@@ -290,7 +290,7 @@ namespace Community.CsharpSqlite
                 ///the FROM clause of the SELECT statement.
                 ///
                 ///</summary>
-                sqlite3SrcListAssignCursors(pParse, pTabList);
+                build.sqlite3SrcListAssignCursors(pParse, pTabList);
                 ///
                 ///<summary>
                 ///Look up every table named in the FROM clause of the select.  If
@@ -346,7 +346,7 @@ namespace Community.CsharpSqlite
                         ///An ordinary table or view name in the FROM clause 
                         ///</summary>
                         Debug.Assert(pFrom.pTab == null);
-                        pFrom.pTab = pTab = sqlite3LocateTable(pParse, 0, pFrom.zName, pFrom.zDatabase);
+                        pFrom.pTab = pTab = build.sqlite3LocateTable(pParse, 0, pFrom.zName, pFrom.zDatabase);
                         if (pTab == null)
                             return WRC_Abort;
                         pTab.nRef++;
@@ -357,7 +357,7 @@ namespace Community.CsharpSqlite
                             ///<summary>
                             ///We reach here if the named table is a really a view 
                             ///</summary>
-                            if (sqlite3ViewGetColumnNames(pParse, pTab) != 0)
+                            if (build.sqlite3ViewGetColumnNames(pParse, pTab) != 0)
                                 return WRC_Abort;
                             pFrom.pSelect = exprc.sqlite3SelectDup(db, pTab.pSelect, 0);
                             pWalker.sqlite3WalkSelect(pFrom.pSelect);
@@ -528,7 +528,7 @@ namespace Community.CsharpSqlite
                                             ///</summary>
                                             continue;
                                         }
-                                        if (sqlite3IdListIndex(pFrom.pUsing, zName) >= 0)
+                                        if (build.sqlite3IdListIndex(pFrom.pUsing, zName) >= 0)
                                         {
                                             ///
                                             ///<summary>
@@ -1448,7 +1448,7 @@ namespace Community.CsharpSqlite
                             ///<summary>
                             ///</summary>
                             ///<param name="Root page of scanned b">tree </param>
-                            sqlite3CodeVerifySchema(pParse, iDb);
+                            build.sqlite3CodeVerifySchema(pParse, iDb);
                             sqlite3TableLock(pParse, iDb, pTab.tnum, 0, pTab.zName);
                             ///
                             ///<summary>
@@ -1476,7 +1476,7 @@ namespace Community.CsharpSqlite
                             if (pBest != null && pBest.nColumn < pTab.nCol)
                             {
                                 iRoot = pBest.tnum;
-                                pKeyInfo = sqlite3IndexKeyinfo(pParse, pBest);
+                                pKeyInfo = build.sqlite3IndexKeyinfo(pParse, pBest);
                             }
                             ///
                             ///<summary>
@@ -2356,7 +2356,7 @@ namespace Community.CsharpSqlite
         ///
         /// The jointype starts out showing the join type between the current table
         /// and the next table on the list.  The parser builds the list this way.
-        /// But sqlite3SrcListShiftJoinType() later shifts the jointypes so that each
+        /// But build.sqlite3SrcListShiftJoinType() later shifts the jointypes so that each
         /// jointype expresses the join between the table and the previous table.
         ///
         /// In the colUsed field, the high-order bit (bit 63) is set if the table

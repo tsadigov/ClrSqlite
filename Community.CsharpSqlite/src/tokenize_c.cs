@@ -933,7 +933,7 @@ namespace Community.CsharpSqlite
                                 ///
                                 ///<summary>
                                 ///Parameters of the form #NNN (where NNN is a number) are used
-                                ///internally by sqlite3NestedParse.  
+                                ///internally by build.sqlite3NestedParse.  
                                 ///</summary>
 
                                 tokenType = TokenType.TK_REGISTER;

@@ -18,51 +18,56 @@ using yDbMask = System.Int64;
 //  typedef unsigned int yDbMask;
 using yDbMask=System.Int32;
 #endif
-namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
-		///<summary>
-		/// 2001 September 15
-		///
-		/// The author disclaims copyright to this source code.  In place of
-		/// a legal notice, here is a blessing:
-		///
-		///    May you do good and not evil.
-		///    May you find forgiveness for yourself and forgive others.
-		///    May you share freely, never taking more than you give.
-		///
-		///
-		/// This file contains C code routines that are called by the SQLite parser
-		/// when syntax rules are reduced.  The routines in this file handle the
-		/// following kinds of SQL syntax:
-		///
-		///     CREATE TABLE
-		///     DROP TABLE
-		///     CREATE INDEX
-		///     DROP INDEX
-		///     creating ID lists
-		///     BEGIN TRANSACTION
-		///     COMMIT
-		///     ROLLBACK
-		///
-		///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-		///  C#-SQLite is an independent reimplementation of the SQLite software library
-		///
-		///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-		///
-		///
-		///
-		///</summary>
-		//#include "sqliteInt.h"
-		///<summary>
-		/// This routine is called when a new SQL statement is beginning to
-		/// be parsed.  Initialize the pParse structure as needed.
-		///
-		///</summary>
-		static void sqlite3BeginParse(Parse pParse,int explainFlag) {
-			pParse.explain=(byte)explainFlag;
-			pParse.nVar=0;
-		}
-		#if !SQLITE_OMIT_SHARED_CACHE
+namespace Community.CsharpSqlite
+{
+    public partial class Sqlite3
+    {
+        public class build
+        {
+            ///<summary>
+            /// 2001 September 15
+            ///
+            /// The author disclaims copyright to this source code.  In place of
+            /// a legal notice, here is a blessing:
+            ///
+            ///    May you do good and not evil.
+            ///    May you find forgiveness for yourself and forgive others.
+            ///    May you share freely, never taking more than you give.
+            ///
+            ///
+            /// This file contains C code routines that are called by the SQLite parser
+            /// when syntax rules are reduced.  The routines in this file handle the
+            /// following kinds of SQL syntax:
+            ///
+            ///     CREATE TABLE
+            ///     DROP TABLE
+            ///     CREATE INDEX
+            ///     DROP INDEX
+            ///     creating ID lists
+            ///     BEGIN TRANSACTION
+            ///     COMMIT
+            ///     ROLLBACK
+            ///
+            ///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+            ///  C#-SQLite is an independent reimplementation of the SQLite software library
+            ///
+            ///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+            ///
+            ///
+            ///
+            ///</summary>
+            //#include "sqliteInt.h"
+            ///<summary>
+            /// This routine is called when a new SQL statement is beginning to
+            /// be parsed.  Initialize the pParse structure as needed.
+            ///
+            ///</summary>
+            public static void sqlite3BeginParse(Parse pParse, int explainFlag)
+            {
+                pParse.explain = (byte)explainFlag;
+                pParse.nVar = 0;
+            }
+#if !SQLITE_OMIT_SHARED_CACHE
 																																																						///<summary>
 /// The TableLock structure is only used by the sqlite3TableLock() and
 /// codeTableLocks() functions.
@@ -148,511 +153,554 @@ p.zName, P4_STATIC );
 }
 }
 #else
-		//  #define codeTableLocks(x)
-		static void codeTableLocks(Parse pParse) {
-		}
-		#endif
-		///<summary>
-		/// This routine is called after a single SQL statement has been
-		/// parsed and a VDBE program to execute that statement has been
-		/// prepared.  This routine puts the finishing touches on the
-		/// VDBE program and resets the pParse structure for the next
-		/// parse.
-		///
-		/// Note that if an error occurred, it might be the case that
-		/// no VDBE code was generated.
-		///</summary>
-		static void sqlite3FinishCoding(Parse pParse) {
-			sqlite3 db;
-			Vdbe v;
-			db=pParse.db;
-			//      if ( db.mallocFailed != 0 ) return;
-			if(pParse.nested!=0)
-				return;
-			if(pParse.nErr!=0)
-				return;
-			///
-			///<summary>
-			///Begin by generating some termination code at the end of the
-			///vdbe program
-			///
-			///</summary>
-			v=pParse.sqlite3GetVdbe();
-			Debug.Assert(0==pParse.isMultiWrite
-			#if SQLITE_DEBUG
+            //  #define codeTableLocks(x)
+            static void codeTableLocks(Parse pParse)
+            {
+            }
+#endif
+            ///<summary>
+            /// This routine is called after a single SQL statement has been
+            /// parsed and a VDBE program to execute that statement has been
+            /// prepared.  This routine puts the finishing touches on the
+            /// VDBE program and resets the pParse structure for the next
+            /// parse.
+            ///
+            /// Note that if an error occurred, it might be the case that
+            /// no VDBE code was generated.
+            ///</summary>
+            public static void sqlite3FinishCoding(Parse pParse)
+            {
+                sqlite3 db;
+                Vdbe v;
+                db = pParse.db;
+                //      if ( db.mallocFailed != 0 ) return;
+                if (pParse.nested != 0)
+                    return;
+                if (pParse.nErr != 0)
+                    return;
+                ///
+                ///<summary>
+                ///Begin by generating some termination code at the end of the
+                ///vdbe program
+                ///
+                ///</summary>
+                v = pParse.sqlite3GetVdbe();
+                Debug.Assert(0 == pParse.isMultiWrite
+#if SQLITE_DEBUG
 																																																																																	        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
 #endif
-			);
-			if(v!=null) {
-				v.sqlite3VdbeAddOp0(OP_Halt);
-				///
-				///<summary>
-				///The cookie mask contains one bit for each database file open.
-				///(Bit 0 is for main, bit 1 is for temp, and so forth.)  Bits are
-				///set for each database that is used.  Generate code to start a
-				///transaction on each used database and to verify the schema cookie
-				///on each used database.
-				///
-				///</summary>
-				if(pParse.cookieGoto>0) {
-					u32 mask;
-					int iDb;
-					v.sqlite3VdbeJumpHere(pParse.cookieGoto-1);
-					for(iDb=0,mask=1;iDb<db.nDb;mask<<=1,iDb++) {
-						if((mask&pParse.cookieMask)==0)
-							continue;
-						vdbeaux.sqlite3VdbeUsesBtree(v,iDb);
-						v.sqlite3VdbeAddOp2(OP_Transaction,iDb,(mask&pParse.writeMask)!=0);
-						if(db.init.busy==0) {
-							Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-							v.sqlite3VdbeAddOp3(OP_VerifyCookie,iDb,pParse.cookieValue[iDb],(int)db.aDb[iDb].pSchema.iGeneration);
-						}
-					}
-					#if !SQLITE_OMIT_VIRTUALTABLE
-					{
-						int i;
-						for(i=0;i<pParse.nVtabLock;i++) {
-							VTable vtab=sqlite3GetVTable(db,pParse.apVtabLock[i]);
-							v.sqlite3VdbeAddOp4(OP_VBegin,0,0,0,vtab,P4_VTAB);
-						}
-						pParse.nVtabLock=0;
-						#endif
-						///
-						///<summary>
-						///Once all the cookies have been verified and transactions opened,
-						///</summary>
-						///<param name="obtain the required table">op unless the</param>
-						///<param name="shared">cache feature is enabled.</param>
-						///
-						///<summary>
-						///Initialize any AUTOINCREMENT data structures required.
-						///
-						///</summary>
-						///
-						///<summary>
-						///Finally, jump back to the beginning of the executable code. 
-						///</summary>
-					}
-					codeTableLocks(pParse);
-					pParse.sqlite3AutoincrementBegin();
-					v.sqlite3VdbeAddOp2(OP_Goto,0,pParse.cookieGoto);
-				}
-			}
-			///
-			///<summary>
-			///Get the VDBE program ready for execution
-			///
-			///</summary>
-			if(v!=null&&ALWAYS(pParse.nErr==0)///
-			///<summary>
-			///&& 0 == db.mallocFailed 
-			///</summary>
-			) {
-				#if SQLITE_DEBUG
+);
+                if (v != null)
+                {
+                    v.sqlite3VdbeAddOp0(OP_Halt);
+                    ///
+                    ///<summary>
+                    ///The cookie mask contains one bit for each database file open.
+                    ///(Bit 0 is for main, bit 1 is for temp, and so forth.)  Bits are
+                    ///set for each database that is used.  Generate code to start a
+                    ///transaction on each used database and to verify the schema cookie
+                    ///on each used database.
+                    ///
+                    ///</summary>
+                    if (pParse.cookieGoto > 0)
+                    {
+                        u32 mask;
+                        int iDb;
+                        v.sqlite3VdbeJumpHere(pParse.cookieGoto - 1);
+                        for (iDb = 0, mask = 1; iDb < db.nDb; mask <<= 1, iDb++)
+                        {
+                            if ((mask & pParse.cookieMask) == 0)
+                                continue;
+                            vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                            v.sqlite3VdbeAddOp2(OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
+                            if (db.init.busy == 0)
+                            {
+                                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                                v.sqlite3VdbeAddOp3(OP_VerifyCookie, iDb, pParse.cookieValue[iDb], (int)db.aDb[iDb].pSchema.iGeneration);
+                            }
+                        }
+#if !SQLITE_OMIT_VIRTUALTABLE
+                        {
+                            int i;
+                            for (i = 0; i < pParse.nVtabLock; i++)
+                            {
+                                VTable vtab = sqlite3GetVTable(db, pParse.apVtabLock[i]);
+                                v.sqlite3VdbeAddOp4(OP_VBegin, 0, 0, 0, vtab, P4_VTAB);
+                            }
+                            pParse.nVtabLock = 0;
+#endif
+                            ///
+                            ///<summary>
+                            ///Once all the cookies have been verified and transactions opened,
+                            ///</summary>
+                            ///<param name="obtain the required table">op unless the</param>
+                            ///<param name="shared">cache feature is enabled.</param>
+                            ///
+                            ///<summary>
+                            ///Initialize any AUTOINCREMENT data structures required.
+                            ///
+                            ///</summary>
+                            ///
+                            ///<summary>
+                            ///Finally, jump back to the beginning of the executable code. 
+                            ///</summary>
+                        }
+                        codeTableLocks(pParse);
+                        pParse.sqlite3AutoincrementBegin();
+                        v.sqlite3VdbeAddOp2(OP_Goto, 0, pParse.cookieGoto);
+                    }
+                }
+                ///
+                ///<summary>
+                ///Get the VDBE program ready for execution
+                ///
+                ///</summary>
+                if (v != null && ALWAYS(pParse.nErr == 0)///
+                    ///<summary>
+                    ///&& 0 == db.mallocFailed 
+                    ///</summary>
+                )
+                {
+#if SQLITE_DEBUG
 																																																																																																												        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
         sqlite3VdbeTrace( v, trace );
 #endif
-				Debug.Assert(pParse.iCacheLevel==0);
-				///
-				///<summary>
-				///</summary>
-				///<param name="Disables and re">enables match </param>
-				///
-				///<summary>
-				///A minimum of one cursor is required if autoincrement is used
-				///See ticket [a696379c1f08866] 
-				///</summary>
-				if(pParse.pAinc!=null&&pParse.nTab==0)
-					pParse.nTab=1;
-                vdbeaux.sqlite3VdbeMakeReady(v, pParse);
-				pParse.rc=SqlResult.SQLITE_DONE;
-				pParse.colNamesSet=0;
-			}
-			else {
-				pParse.rc=SqlResult.SQLITE_ERROR;
-			}
-			pParse.nTab=0;
-			pParse.nMem=0;
-			pParse.nSet=0;
-			pParse.nVar=0;
-			pParse.cookieMask=0;
-			pParse.cookieGoto=0;
-		}
-		///<summary>
-		/// Run the parser and code generator recursively in order to generate
-		/// code for the SQL statement given onto the end of the pParse context
-		/// currently under construction.  When the parser is run recursively
-		/// this way, the final OP_Halt is not appended and other initialization
-		/// and finalization steps are omitted because those are handling by the
-		/// outermost parser.
-		///
-		/// Not everything is nestable.  This facility is designed to permit
-		/// INSERT, UPDATE, and DELETE operations against SQLITE_MASTER.  Use
-		/// care if you decide to try to use this routine for some other purposes.
-		///
-		///</summary>
-		static void sqlite3NestedParse(Parse pParse,string zFormat,params object[] ap) {
-			string zSql;
-			//  string zSql;
-			string zErrMsg="";
-			//  char* zErrMsg = 0;
-			sqlite3 db=pParse.db;
-			//# define SAVE_SZ  (Parse.Length - offsetof(Parse,nVar))
-			//  char saveBuf[SAVE_SZ];
-			if(pParse.nErr!=0)
-				return;
-			Debug.Assert(pParse.nested<10);
-			///
-			///<summary>
-			///Nesting should only be of limited depth 
-			///</summary>
-			//  va_list ap;
-			lock(lock_va_list) {
-				va_start(ap,zFormat);
-				zSql=io.sqlite3VMPrintf(db,zFormat,ap);
-				va_end(ref ap);
-			}
-			//if( zSql=="" ){
-			//  return;   /* A malloc must have failed */
-			//}
-			lock(nestingLock) {
-				pParse.nested++;
-				pParse.SaveMembers();
-				//  memcpy(saveBuf, pParse.nVar, SAVE_SZ);
-				pParse.ResetMembers();
-				//  memset(pParse.nVar, 0, SAVE_SZ);
-				pParse.sqlite3RunParser(zSql,ref zErrMsg);
-				db.sqlite3DbFree(ref zErrMsg);
-				db.sqlite3DbFree(ref zSql);
-				pParse.RestoreMembers();
-				//  memcpy(pParse.nVar, saveBuf, SAVE_SZ);
-				pParse.nested--;
-			}
-		}
-		static Object nestingLock=new Object();
-		///<summary>
-		/// Locate the in-memory structure that describes a particular database
-		/// table given the name of that table and (optionally) the name of the
-		/// database containing the table.  Return NULL if not found.
-		///
-		/// If zDatabase is 0, all databases are searched for the table and the
-		/// first matching table is returned.  (No checking for duplicate table
-		/// names is done.)  The search order is TEMP first, then MAIN, then any
-		/// auxiliary databases added using the ATTACH command.
-		///
-		/// See also sqlite3LocateTable().
-		///
-		///</summary>
-		static Table sqlite3FindTable(sqlite3 db,string zName,string zDatabase) {
-			Table p=null;
-			int i;
-			int nName;
-			Debug.Assert(zName!=null);
-			nName=StringExtensions.sqlite3Strlen30(zName);
-			///
-			///<summary>
-			///All mutexes are required for schema access.  Make sure we hold them. 
-			///</summary>
-			Debug.Assert(zDatabase!=null||sqlite3BtreeHoldsAllMutexes(db));
-			for(i=OMIT_TEMPDB;i<db.nDb;i++) {
-				int j=(i<2)?i^1:i;
-				///
-				///<summary>
-				///Search TEMP before MAIN 
-				///</summary>
-				if(zDatabase!=null&&!zDatabase.Equals(db.aDb[j].zName,StringComparison.InvariantCultureIgnoreCase))
-					continue;
-				Debug.Assert(sqlite3SchemaMutexHeld(db,j,null));
-				p=db.aDb[j].pSchema.tblHash.sqlite3HashFind(zName,nName,(Table)null);
-				if(p!=null)
-					break;
-			}
-			return p;
-		}
-		///<summary>
-		/// Locate the in-memory structure that describes a particular database
-		/// table given the name of that table and (optionally) the name of the
-		/// database containing the table.  Return NULL if not found.  Also leave an
-		/// error message in pParse.zErrMsg.
-		///
-		/// The difference between this routine and sqlite3FindTable() is that this
-		/// routine leaves an error message in pParse.zErrMsg where
-		/// sqlite3FindTable() does not.
-		///
-		///</summary>
-		static Table sqlite3LocateTable(Parse pParse,///
-		///<summary>
-		///context in which to report errors 
-		///</summary>
-		int isView,///
-		///<summary>
-		///True if looking for a VIEW rather than a TABLE 
-		///</summary>
-		string zName,///
-		///<summary>
-		///Name of the table we are looking for 
-		///</summary>
-		string zDbase///
-		///<summary>
-		///Name of the database.  Might be NULL 
-		///</summary>
-		) {
-			Table p;
-			///
-			///<summary>
-			///Read the database schema. If an error occurs, leave an error message
-			///and code in pParse and return NULL. 
-			///</summary>
-			if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
-				return null;
-			}
-			p=sqlite3FindTable(pParse.db,zName,zDbase);
-			if(p==null) {
-				string zMsg=isView!=0?"no such view":"no such table";
-				if(zDbase!=null) {
-					utilc.sqlite3ErrorMsg(pParse,"%s: %s.%s",zMsg,zDbase,zName);
-				}
-				else {
-					utilc.sqlite3ErrorMsg(pParse,"%s: %s",zMsg,zName);
-				}
-				pParse.checkSchema=1;
-			}
-			return p;
-		}
-		///<summary>
-		/// Locate the in-memory structure that describes
-		/// a particular index given the name of that index
-		/// and the name of the database that contains the index.
-		/// Return NULL if not found.
-		///
-		/// If zDatabase is 0, all databases are searched for the
-		/// table and the first matching index is returned.  (No checking
-		/// for duplicate index names is done.)  The search order is
-		/// TEMP first, then MAIN, then any auxiliary databases added
-		/// using the ATTACH command.
-		///
-		///</summary>
-		static Index sqlite3FindIndex(sqlite3 db,string zName,string zDb) {
-			Index p=null;
-			int i;
-			int nName=StringExtensions.sqlite3Strlen30(zName);
-			///
-			///<summary>
-			///All mutexes are required for schema access.  Make sure we hold them. 
-			///</summary>
-			Debug.Assert(zDb!=null||sqlite3BtreeHoldsAllMutexes(db));
-			for(i=OMIT_TEMPDB;i<db.nDb;i++) {
-				int j=(i<2)?i^1:i;
-				///
-				///<summary>
-				///Search TEMP before MAIN 
-				///</summary>
-				Schema pSchema=db.aDb[j].pSchema;
-				Debug.Assert(pSchema!=null);
-				if(zDb!=null&&!zDb.Equals(db.aDb[j].zName,StringComparison.InvariantCultureIgnoreCase))
-					continue;
-				Debug.Assert(sqlite3SchemaMutexHeld(db,j,null));
-				p=pSchema.idxHash.sqlite3HashFind(zName,nName,(Index)null);
-				if(p!=null)
-					break;
-			}
-			return p;
-		}
-		///<summary>
-		/// Reclaim the memory used by an index
-		///
-		///</summary>
-		static void freeIndex(sqlite3 db,ref Index p) {
-			#if !SQLITE_OMIT_ANALYZE
-			sqlite3DeleteIndexSamples(db,p);
-			#endif
-			db.sqlite3DbFree(ref p.zColAff);
-			db.sqlite3DbFree(ref p);
-		}
-		///<summary>
-		/// For the index called zIdxName which is found in the database iDb,
-		/// unlike that index from its Table then remove the index from
-		/// the index hash table and free all memory structures associated
-		/// with the index.
-		///
-		///</summary>
-		static void sqlite3UnlinkAndDeleteIndex(sqlite3 db,int iDb,string zIdxName) {
-			Index pIndex;
-			int len;
-			Hash pHash;
-			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-			pHash=db.aDb[iDb].pSchema.idxHash;
-			len=StringExtensions.sqlite3Strlen30(zIdxName);
-			pIndex=sqlite3HashInsert(ref pHash,zIdxName,len,(Index)null);
-			if(ALWAYS(pIndex)) {
-				if(pIndex.pTable.pIndex==pIndex) {
-					pIndex.pTable.pIndex=pIndex.pNext;
-				}
-				else {
-					Index p;
-					///
-					///<summary>
-					///Justification of ALWAYS();  The index must be on the list of
-					///indices. 
-					///</summary>
-					p=pIndex.pTable.pIndex;
-					while(ALWAYS(p!=null)&&p.pNext!=pIndex) {
-						p=p.pNext;
-					}
-					if(ALWAYS(p!=null&&p.pNext==pIndex)) {
-						p.pNext=pIndex.pNext;
-					}
-				}
-				freeIndex(db,ref pIndex);
-			}
-			db.flags|=SQLITE_InternChanges;
-		}
-		///<summary>
-		/// Erase all schema information from the in-memory hash tables of
-		/// a single database.  This routine is called to reclaim memory
-		/// before the database closes.  It is also called during a rollback
-		/// if there were schema changes during the transaction or if a
-		/// schema-cookie mismatch occurs.
-		///
-		/// If iDb<0 then reset the internal schema tables for all database
-		/// files.  If iDb>=0 then reset the internal schema for only the
-		/// single file indicated.
-		///
-		///</summary>
-		static void sqlite3ResetInternalSchema(sqlite3 db,int iDb) {
-			int i,j;
-			Debug.Assert(iDb<db.nDb);
-			if(iDb>=0) {
-				///
-				///<summary>
-				///Case 1:  Reset the single schema identified by iDb 
-				///</summary>
-				Db pDb=db.aDb[iDb];
-				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-				Debug.Assert(pDb.pSchema!=null);
-				sqlite3SchemaClear(pDb.pSchema);
-				///
-				///<summary>
-				///If any database other than TEMP is reset, then also reset TEMP
-				///since TEMP might be holding triggers that reference tables in the
-				///other database.
-				///
-				///</summary>
-				if(iDb!=1) {
-					pDb=db.aDb[1];
-					Debug.Assert(pDb.pSchema!=null);
-					sqlite3SchemaClear(pDb.pSchema);
-				}
-				return;
-			}
-			///
-			///<summary>
-			///Case 2 (from here to the end): Reset all schemas for all attached
-			///databases. 
-			///</summary>
-			Debug.Assert(iDb<0);
-			sqlite3BtreeEnterAll(db);
-			for(i=0;i<db.nDb;i++) {
-				Db pDb=db.aDb[i];
-				if(pDb.pSchema!=null) {
-					sqlite3SchemaClear(pDb.pSchema);
-				}
-			}
-			db.flags&=~SQLITE_InternChanges;
-			sqlite3VtabUnlockList(db);
-			sqlite3BtreeLeaveAll(db);
-			///
-			///<summary>
-			///If one or more of the auxiliary database files has been closed,
-			///then remove them from the auxiliary database list.  We take the
-			///opportunity to do this here since we have just deleted all of the
-			///schema hash tables and therefore do not have to make any changes
-			///to any of those tables.
-			///
-			///</summary>
-			for(i=j=2;i<db.nDb;i++) {
-				Db pDb=db.aDb[i];
-				if(pDb.pBt==null) {
-					db.sqlite3DbFree(ref pDb.zName);
-					continue;
-				}
-				if(j<i) {
-					db.aDb[j]=db.aDb[i];
-				}
-				j++;
-			}
-			if(db.nDb!=j)
-				db.aDb[j]=new Db();
-			//memset(db.aDb[j], 0, (db.nDb-j)*sizeof(db.aDb[j]));
-			db.nDb=j;
-			if(db.nDb<=2&&db.aDb!=db.aDbStatic) {
-				Array.Copy(db.aDb,db.aDbStatic,2);
-				// memcpy(db.aDbStatic, db.aDb, 2*sizeof(db.aDb[0]));
-				//sqlite3DbFree( db, ref db.aDb );
-				//db.aDb = db.aDbStatic;
-			}
-		}
-		///<summary>
-		/// This routine is called when a commit occurs.
-		///
-		///</summary>
-		static void sqlite3CommitInternalChanges(sqlite3 db) {
-			db.flags&=~SQLITE_InternChanges;
-		}
-		///<summary>
-		/// Delete memory allocated for the column names of a table or view (the
-		/// Table.aCol[] array).
-		///
-		///</summary>
-		static void sqliteDeleteColumnNames(sqlite3 db,Table pTable) {
-			int i;
-			Column pCol;
-			Debug.Assert(pTable!=null);
-			for(i=0;i<pTable.nCol;i++) {
-				pCol=pTable.aCol[i];
-				if(pCol!=null&&db!=null) {
-					db.sqlite3DbFree(ref pCol.zName);
-					exprc.sqlite3ExprDelete(db,ref pCol.pDflt);
-					db.sqlite3DbFree(ref pCol.zDflt);
-					db.sqlite3DbFree(ref pCol.zType);
-					db.sqlite3DbFree(ref pCol.zColl);
-				}
-			}
-		}
-		///<summary>
-		/// Remove the memory data structures associated with the given
-		/// Table.  No changes are made to disk by this routine.
-		///
-		/// This routine just deletes the data structure.  It does not unlink
-		/// the table data structure from the hash table.  But it does destroy
-		/// memory structures of the indices and foreign keys associated with
-		/// the table.
-		///
-		///</summary>
-		static void sqlite3DeleteTable(sqlite3 db,ref Table pTable) {
-			Index pIndex;
-			Index pNext;
-			Debug.Assert(null==pTable||pTable.nRef>0);
-			///
-			///<summary>
-			///Do not delete the table until the reference count reaches zero. 
-			///</summary>
-			if(null==pTable)
-				return;
-			if((// ( !db || db->pnBytesFreed == 0 ) && 
-			(--pTable.nRef)>0))
-				return;
-			///
-			///<summary>
-			///Delete all indices associated with this table. 
-			///</summary>
-			for(pIndex=pTable.pIndex;pIndex!=null;pIndex=pNext) {
-				pNext=pIndex.pNext;
-				Debug.Assert(pIndex.pSchema==pTable.pSchema);
-				//if( null==db || db.pnBytesFreed==0 ){
-				string zName=pIndex.zName;
-				//
-				#if !NDEBUG || SQLITE_COVERAGE_TEST
+                    Debug.Assert(pParse.iCacheLevel == 0);
+                    ///
+                    ///<summary>
+                    ///</summary>
+                    ///<param name="Disables and re">enables match </param>
+                    ///
+                    ///<summary>
+                    ///A minimum of one cursor is required if autoincrement is used
+                    ///See ticket [a696379c1f08866] 
+                    ///</summary>
+                    if (pParse.pAinc != null && pParse.nTab == 0)
+                        pParse.nTab = 1;
+                    vdbeaux.sqlite3VdbeMakeReady(v, pParse);
+                    pParse.rc = SqlResult.SQLITE_DONE;
+                    pParse.colNamesSet = 0;
+                }
+                else
+                {
+                    pParse.rc = SqlResult.SQLITE_ERROR;
+                }
+                pParse.nTab = 0;
+                pParse.nMem = 0;
+                pParse.nSet = 0;
+                pParse.nVar = 0;
+                pParse.cookieMask = 0;
+                pParse.cookieGoto = 0;
+            }
+            ///<summary>
+            /// Run the parser and code generator recursively in order to generate
+            /// code for the SQL statement given onto the end of the pParse context
+            /// currently under construction.  When the parser is run recursively
+            /// this way, the final OP_Halt is not appended and other initialization
+            /// and finalization steps are omitted because those are handling by the
+            /// outermost parser.
+            ///
+            /// Not everything is nestable.  This facility is designed to permit
+            /// INSERT, UPDATE, and DELETE operations against SQLITE_MASTER.  Use
+            /// care if you decide to try to use this routine for some other purposes.
+            ///
+            ///</summary>
+            public static void sqlite3NestedParse(Parse pParse, string zFormat, params object[] ap)
+            {
+                string zSql;
+                //  string zSql;
+                string zErrMsg = "";
+                //  char* zErrMsg = 0;
+                sqlite3 db = pParse.db;
+                //# define SAVE_SZ  (Parse.Length - offsetof(Parse,nVar))
+                //  char saveBuf[SAVE_SZ];
+                if (pParse.nErr != 0)
+                    return;
+                Debug.Assert(pParse.nested < 10);
+                ///
+                ///<summary>
+                ///Nesting should only be of limited depth 
+                ///</summary>
+                //  va_list ap;
+                lock (lock_va_list)
+                {
+                    va_start(ap, zFormat);
+                    zSql = io.sqlite3VMPrintf(db, zFormat, ap);
+                    va_end(ref ap);
+                }
+                //if( zSql=="" ){
+                //  return;   /* A malloc must have failed */
+                //}
+                lock (nestingLock)
+                {
+                    pParse.nested++;
+                    pParse.SaveMembers();
+                    //  memcpy(saveBuf, pParse.nVar, SAVE_SZ);
+                    pParse.ResetMembers();
+                    //  memset(pParse.nVar, 0, SAVE_SZ);
+                    pParse.sqlite3RunParser(zSql, ref zErrMsg);
+                    db.sqlite3DbFree(ref zErrMsg);
+                    db.sqlite3DbFree(ref zSql);
+                    pParse.RestoreMembers();
+                    //  memcpy(pParse.nVar, saveBuf, SAVE_SZ);
+                    pParse.nested--;
+                }
+            }
+            static Object nestingLock = new Object();
+            ///<summary>
+            /// Locate the in-memory structure that describes a particular database
+            /// table given the name of that table and (optionally) the name of the
+            /// database containing the table.  Return NULL if not found.
+            ///
+            /// If zDatabase is 0, all databases are searched for the table and the
+            /// first matching table is returned.  (No checking for duplicate table
+            /// names is done.)  The search order is TEMP first, then MAIN, then any
+            /// auxiliary databases added using the ATTACH command.
+            ///
+            /// See also build.sqlite3LocateTable().
+            ///
+            ///</summary>
+            public static Table sqlite3FindTable(sqlite3 db, string zName, string zDatabase)
+            {
+                Table p = null;
+                int i;
+                int nName;
+                Debug.Assert(zName != null);
+                nName = StringExtensions.sqlite3Strlen30(zName);
+                ///
+                ///<summary>
+                ///All mutexes are required for schema access.  Make sure we hold them. 
+                ///</summary>
+                Debug.Assert(zDatabase != null || sqlite3BtreeHoldsAllMutexes(db));
+                for (i = OMIT_TEMPDB; i < db.nDb; i++)
+                {
+                    int j = (i < 2) ? i ^ 1 : i;
+                    ///
+                    ///<summary>
+                    ///Search TEMP before MAIN 
+                    ///</summary>
+                    if (zDatabase != null && !zDatabase.Equals(db.aDb[j].zName, StringComparison.InvariantCultureIgnoreCase))
+                        continue;
+                    Debug.Assert(sqlite3SchemaMutexHeld(db, j, null));
+                    p = db.aDb[j].pSchema.tblHash.sqlite3HashFind(zName, nName, (Table)null);
+                    if (p != null)
+                        break;
+                }
+                return p;
+            }
+            ///<summary>
+            /// Locate the in-memory structure that describes a particular database
+            /// table given the name of that table and (optionally) the name of the
+            /// database containing the table.  Return NULL if not found.  Also leave an
+            /// error message in pParse.zErrMsg.
+            ///
+            /// The difference between this routine and build.sqlite3FindTable() is that this
+            /// routine leaves an error message in pParse.zErrMsg where
+            /// build.sqlite3FindTable() does not.
+            ///
+            ///</summary>
+            public static Table sqlite3LocateTable(Parse pParse,///
+                ///<summary>
+                ///context in which to report errors 
+                ///</summary>
+            int isView,///
+                ///<summary>
+                ///True if looking for a VIEW rather than a TABLE 
+                ///</summary>
+            string zName,///
+                ///<summary>
+                ///Name of the table we are looking for 
+                ///</summary>
+            string zDbase///
+                ///<summary>
+                ///Name of the database.  Might be NULL 
+                ///</summary>
+            )
+            {
+                Table p;
+                ///
+                ///<summary>
+                ///Read the database schema. If an error occurs, leave an error message
+                ///and code in pParse and return NULL. 
+                ///</summary>
+                if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                {
+                    return null;
+                }
+                p = build.sqlite3FindTable(pParse.db, zName, zDbase);
+                if (p == null)
+                {
+                    string zMsg = isView != 0 ? "no such view" : "no such table";
+                    if (zDbase != null)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "%s: %s.%s", zMsg, zDbase, zName);
+                    }
+                    else
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "%s: %s", zMsg, zName);
+                    }
+                    pParse.checkSchema = 1;
+                }
+                return p;
+            }
+            ///<summary>
+            /// Locate the in-memory structure that describes
+            /// a particular index given the name of that index
+            /// and the name of the database that contains the index.
+            /// Return NULL if not found.
+            ///
+            /// If zDatabase is 0, all databases are searched for the
+            /// table and the first matching index is returned.  (No checking
+            /// for duplicate index names is done.)  The search order is
+            /// TEMP first, then MAIN, then any auxiliary databases added
+            /// using the ATTACH command.
+            ///
+            ///</summary>
+            public static Index sqlite3FindIndex(sqlite3 db, string zName, string zDb)
+            {
+                Index p = null;
+                int i;
+                int nName = StringExtensions.sqlite3Strlen30(zName);
+                ///
+                ///<summary>
+                ///All mutexes are required for schema access.  Make sure we hold them. 
+                ///</summary>
+                Debug.Assert(zDb != null || sqlite3BtreeHoldsAllMutexes(db));
+                for (i = OMIT_TEMPDB; i < db.nDb; i++)
+                {
+                    int j = (i < 2) ? i ^ 1 : i;
+                    ///
+                    ///<summary>
+                    ///Search TEMP before MAIN 
+                    ///</summary>
+                    Schema pSchema = db.aDb[j].pSchema;
+                    Debug.Assert(pSchema != null);
+                    if (zDb != null && !zDb.Equals(db.aDb[j].zName, StringComparison.InvariantCultureIgnoreCase))
+                        continue;
+                    Debug.Assert(sqlite3SchemaMutexHeld(db, j, null));
+                    p = pSchema.idxHash.sqlite3HashFind(zName, nName, (Index)null);
+                    if (p != null)
+                        break;
+                }
+                return p;
+            }
+            ///<summary>
+            /// Reclaim the memory used by an index
+            ///
+            ///</summary>
+            static void freeIndex(sqlite3 db, ref Index p)
+            {
+#if !SQLITE_OMIT_ANALYZE
+                sqlite3DeleteIndexSamples(db, p);
+#endif
+                db.sqlite3DbFree(ref p.zColAff);
+                db.sqlite3DbFree(ref p);
+            }
+            ///<summary>
+            /// For the index called zIdxName which is found in the database iDb,
+            /// unlike that index from its Table then remove the index from
+            /// the index hash table and free all memory structures associated
+            /// with the index.
+            ///
+            ///</summary>
+            public static void sqlite3UnlinkAndDeleteIndex(sqlite3 db, int iDb, string zIdxName)
+            {
+                Index pIndex;
+                int len;
+                Hash pHash;
+                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                pHash = db.aDb[iDb].pSchema.idxHash;
+                len = StringExtensions.sqlite3Strlen30(zIdxName);
+                pIndex = sqlite3HashInsert(ref pHash, zIdxName, len, (Index)null);
+                if (ALWAYS(pIndex))
+                {
+                    if (pIndex.pTable.pIndex == pIndex)
+                    {
+                        pIndex.pTable.pIndex = pIndex.pNext;
+                    }
+                    else
+                    {
+                        Index p;
+                        ///
+                        ///<summary>
+                        ///Justification of ALWAYS();  The index must be on the list of
+                        ///indices. 
+                        ///</summary>
+                        p = pIndex.pTable.pIndex;
+                        while (ALWAYS(p != null) && p.pNext != pIndex)
+                        {
+                            p = p.pNext;
+                        }
+                        if (ALWAYS(p != null && p.pNext == pIndex))
+                        {
+                            p.pNext = pIndex.pNext;
+                        }
+                    }
+                    freeIndex(db, ref pIndex);
+                }
+                db.flags |= SQLITE_InternChanges;
+            }
+            ///<summary>
+            /// Erase all schema information from the in-memory hash tables of
+            /// a single database.  This routine is called to reclaim memory
+            /// before the database closes.  It is also called during a rollback
+            /// if there were schema changes during the transaction or if a
+            /// schema-cookie mismatch occurs.
+            ///
+            /// If iDb<0 then reset the internal schema tables for all database
+            /// files.  If iDb>=0 then reset the internal schema for only the
+            /// single file indicated.
+            ///
+            ///</summary>
+            public static void sqlite3ResetInternalSchema(sqlite3 db, int iDb)
+            {
+                int i, j;
+                Debug.Assert(iDb < db.nDb);
+                if (iDb >= 0)
+                {
+                    ///
+                    ///<summary>
+                    ///Case 1:  Reset the single schema identified by iDb 
+                    ///</summary>
+                    Db pDb = db.aDb[iDb];
+                    Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                    Debug.Assert(pDb.pSchema != null);
+                    sqlite3SchemaClear(pDb.pSchema);
+                    ///
+                    ///<summary>
+                    ///If any database other than TEMP is reset, then also reset TEMP
+                    ///since TEMP might be holding triggers that reference tables in the
+                    ///other database.
+                    ///
+                    ///</summary>
+                    if (iDb != 1)
+                    {
+                        pDb = db.aDb[1];
+                        Debug.Assert(pDb.pSchema != null);
+                        sqlite3SchemaClear(pDb.pSchema);
+                    }
+                    return;
+                }
+                ///
+                ///<summary>
+                ///Case 2 (from here to the end): Reset all schemas for all attached
+                ///databases. 
+                ///</summary>
+                Debug.Assert(iDb < 0);
+                sqlite3BtreeEnterAll(db);
+                for (i = 0; i < db.nDb; i++)
+                {
+                    Db pDb = db.aDb[i];
+                    if (pDb.pSchema != null)
+                    {
+                        sqlite3SchemaClear(pDb.pSchema);
+                    }
+                }
+                db.flags &= ~SQLITE_InternChanges;
+                sqlite3VtabUnlockList(db);
+                sqlite3BtreeLeaveAll(db);
+                ///
+                ///<summary>
+                ///If one or more of the auxiliary database files has been closed,
+                ///then remove them from the auxiliary database list.  We take the
+                ///opportunity to do this here since we have just deleted all of the
+                ///schema hash tables and therefore do not have to make any changes
+                ///to any of those tables.
+                ///
+                ///</summary>
+                for (i = j = 2; i < db.nDb; i++)
+                {
+                    Db pDb = db.aDb[i];
+                    if (pDb.pBt == null)
+                    {
+                        db.sqlite3DbFree(ref pDb.zName);
+                        continue;
+                    }
+                    if (j < i)
+                    {
+                        db.aDb[j] = db.aDb[i];
+                    }
+                    j++;
+                }
+                if (db.nDb != j)
+                    db.aDb[j] = new Db();
+                //memset(db.aDb[j], 0, (db.nDb-j)*sizeof(db.aDb[j]));
+                db.nDb = j;
+                if (db.nDb <= 2 && db.aDb != db.aDbStatic)
+                {
+                    Array.Copy(db.aDb, db.aDbStatic, 2);
+                    // memcpy(db.aDbStatic, db.aDb, 2*sizeof(db.aDb[0]));
+                    //sqlite3DbFree( db, ref db.aDb );
+                    //db.aDb = db.aDbStatic;
+                }
+            }
+            ///<summary>
+            /// This routine is called when a commit occurs.
+            ///
+            ///</summary>
+            public static void sqlite3CommitInternalChanges(sqlite3 db)
+            {
+                db.flags &= ~SQLITE_InternChanges;
+            }
+            ///<summary>
+            /// Delete memory allocated for the column names of a table or view (the
+            /// Table.aCol[] array).
+            ///
+            ///</summary>
+            static void sqliteDeleteColumnNames(sqlite3 db, Table pTable)
+            {
+                int i;
+                Column pCol;
+                Debug.Assert(pTable != null);
+                for (i = 0; i < pTable.nCol; i++)
+                {
+                    pCol = pTable.aCol[i];
+                    if (pCol != null && db != null)
+                    {
+                        db.sqlite3DbFree(ref pCol.zName);
+                        exprc.sqlite3ExprDelete(db, ref pCol.pDflt);
+                        db.sqlite3DbFree(ref pCol.zDflt);
+                        db.sqlite3DbFree(ref pCol.zType);
+                        db.sqlite3DbFree(ref pCol.zColl);
+                    }
+                }
+            }
+            ///<summary>
+            /// Remove the memory data structures associated with the given
+            /// Table.  No changes are made to disk by this routine.
+            ///
+            /// This routine just deletes the data structure.  It does not unlink
+            /// the table data structure from the hash table.  But it does destroy
+            /// memory structures of the indices and foreign keys associated with
+            /// the table.
+            ///
+            ///</summary>
+            public static void sqlite3DeleteTable(sqlite3 db, ref Table pTable)
+            {
+                Index pIndex;
+                Index pNext;
+                Debug.Assert(null == pTable || pTable.nRef > 0);
+                ///
+                ///<summary>
+                ///Do not delete the table until the reference count reaches zero. 
+                ///</summary>
+                if (null == pTable)
+                    return;
+                if ((// ( !db || db->pnBytesFreed == 0 ) && 
+                (--pTable.nRef) > 0))
+                    return;
+                ///
+                ///<summary>
+                ///Delete all indices associated with this table. 
+                ///</summary>
+                for (pIndex = pTable.pIndex; pIndex != null; pIndex = pNext)
+                {
+                    pNext = pIndex.pNext;
+                    Debug.Assert(pIndex.pSchema == pTable.pSchema);
+                    //if( null==db || db.pnBytesFreed==0 ){
+                    string zName = pIndex.zName;
+                    //
+#if !NDEBUG || SQLITE_COVERAGE_TEST
 																																																																																																												        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
         //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
         //  );
@@ -662,336 +710,357 @@ p.zName, P4_STATIC );
         Debug.Assert( db == null || sqlite3SchemaMutexHeld( db, 0, pIndex.pSchema ) );
         Debug.Assert( pOld == pIndex || pOld == null );
 #else
-				//  TESTONLY ( Index pOld = ) sqlite3HashInsert(
-				//ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
-				//  );
-				sqlite3HashInsert(ref pIndex.pSchema.idxHash,zName,StringExtensions.sqlite3Strlen30(zName),(Index)null);
-				#endif
-				//}
-				freeIndex(db,ref pIndex);
-			}
-			///
-			///<summary>
-			///Delete any foreign keys attached to this table. 
-			///</summary>
-			sqlite3FkDelete(db,pTable);
-			///
-			///<summary>
-			///Delete the Table structure itself.
-			///</summary>
-			sqliteDeleteColumnNames(db,pTable);
-			db.sqlite3DbFree(ref pTable.zName);
-			db.sqlite3DbFree(ref pTable.zColAff);
-			sqlite3SelectDelete(db,ref pTable.pSelect);
-			#if !SQLITE_OMIT_CHECK
-			exprc.sqlite3ExprDelete(db,ref pTable.pCheck);
-			#endif
-			#if !SQLITE_OMIT_VIRTUALTABLE
-			sqlite3VtabClear(db,pTable);
-			#endif
-			pTable=null;
-			//      sqlite3DbFree( db, ref pTable );
-		}
-		///<summary>
-		/// Unlink the given table from the hash tables and the delete the
-		/// table structure with all its indices and foreign keys.
-		///
-		///</summary>
-		static void sqlite3UnlinkAndDeleteTable(sqlite3 db,int iDb,string zTabName) {
-			Table p;
-			Db pDb;
-			Debug.Assert(db!=null);
-			Debug.Assert(iDb>=0&&iDb<db.nDb);
-			Debug.Assert(zTabName!=null);
-			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-			testcase(zTabName.Length==0);
-			///
-			///<summary>
-			///</summary>
-			///<param name="Zero">length table names are allowed </param>
-			pDb=db.aDb[iDb];
-			p=sqlite3HashInsert(ref pDb.pSchema.tblHash,zTabName,StringExtensions.sqlite3Strlen30(zTabName),(Table)null);
-			sqlite3DeleteTable(db,ref p);
-			db.flags|=SQLITE_InternChanges;
-		}
-		///<summary>
-		/// Given a token, return a string that consists of the text of that
-		/// token.  Space to hold the returned string
-		/// is obtained from sqliteMalloc() and must be freed by the calling
-		/// function.
-		///
-		/// Any quotation marks (ex:  "name", 'name', [name], or `name`) that
-		/// surround the body of the token are removed.
-		///
-		/// Tokens are often just pointers into the original SQL text and so
-		/// are not \000 terminated and are not persistent.  The returned string
-		/// is \000 terminated and is persistent.
-		///
-		///</summary>
-		static string sqlite3NameFromToken(sqlite3 db,Token pName) {
-			string zName;
-			if(pName!=null&&pName.zRestSql!=null) {
-				zName=pName.zRestSql.Substring(0,pName.Length);
-				//sqlite3DbStrNDup(db, (char)pName.z, pName.n);
-				StringExtensions.sqlite3Dequote(ref zName);
-			}
-			else {
-				return null;
-			}
-			return zName;
-		}
-		///<summary>
-		/// Open the sqlite_master table stored in database number iDb for
-		/// writing. The table is opened using cursor 0.
-		///
-		///</summary>
-		static void sqlite3OpenMasterTable(Parse p,int iDb) {
-			Vdbe v=p.sqlite3GetVdbe();
-			sqlite3TableLock(p,iDb,MASTER_ROOT,1,SCHEMA_TABLE(iDb));
-			v.sqlite3VdbeAddOp3(OP_OpenWrite,0,MASTER_ROOT,iDb);
-			v.sqlite3VdbeChangeP4(-1,(int)5,P4_INT32);
-			///
-			///<summary>
-			///5 column table 
-			///</summary>
-			if(p.nTab==0) {
-				p.nTab=1;
-			}
-		}
-		///<summary>
-		/// Parameter zName points to a nul-terminated buffer containing the name
-		/// of a database ("main", "temp" or the name of an attached db). This
-		/// function returns the index of the named database in db->aDb[], or
-		/// -1 if the named db cannot be found.
-		///
-		///</summary>
-		static int sqlite3FindDbName(sqlite3 db,string zName) {
-			int i=-1;
-			///
-			///<summary>
-			///Database number 
-			///</summary>
-			if(zName!=null) {
-				Db pDb;
-				int n=StringExtensions.sqlite3Strlen30(zName);
-				for(i=(db.nDb-1);i>=0;i--) {
-					pDb=db.aDb[i];
-					if((OMIT_TEMPDB==0||i!=1)&&n==StringExtensions.sqlite3Strlen30(pDb.zName)&&pDb.zName.Equals(zName,StringComparison.InvariantCultureIgnoreCase)) {
-						break;
-					}
-				}
-			}
-			return i;
-		}
-		///<summary>
-		/// The token *pName contains the name of a database (either "main" or
-		/// "temp" or the name of an attached db). This routine returns the
-		/// index of the named database in db->aDb[], or -1 if the named db
-		/// does not exist.
-		///
-		///</summary>
-		static int sqlite3FindDb(sqlite3 db,Token pName) {
-			int i;
-			///
-			///<summary>
-			///Database number 
-			///</summary>
-			string zName;
-			///
-			///<summary>
-			///Name we are searching for 
-			///</summary>
-			zName=sqlite3NameFromToken(db,pName);
-			i=sqlite3FindDbName(db,zName);
-			db.sqlite3DbFree(ref zName);
-			return i;
-		}
-		///<summary>
-		///The table or view or trigger name is passed to this routine via tokens
-		/// pName1 and pName2. If the table name was fully qualified, for example:
-		///
-		/// CREATE TABLE xxx.yyy (...);
-		///
-		/// Then pName1 is set to "xxx" and pName2 "yyy". On the other hand if
-		/// the table name is not fully qualified, i.e.:
-		///
-		/// CREATE TABLE yyy(...);
-		///
-		/// Then pName1 is set to "yyy" and pName2 is "".
-		///
-		/// This routine sets the ppUnqual pointer to point at the token (pName1 or
-		/// pName2) that stores the unqualified table name.  The index of the
-		/// database "xxx" is returned.
-		///
-		///</summary>
-		static int sqlite3TwoPartName(Parse pParse,///
-		///<summary>
-		///Parsing and code generating context 
-		///</summary>
-		Token pName1,///
-		///<summary>
-		///The "xxx" in the name "xxx.yyy" or "xxx" 
-		///</summary>
-		Token pName2,///
-		///<summary>
-		///The "yyy" in the name "xxx.yyy" 
-		///</summary>
-		ref Token pUnqual///
-		///<summary>
-		///Write the unqualified object name here 
-		///</summary>
-		) {
-			int iDb;
-			///
-			///<summary>
-			///Database holding the object 
-			///</summary>
-			sqlite3 db=pParse.db;
-			if(ALWAYS(pName2!=null)&&pName2.Length>0) {
-				if(db.init.busy!=0) {
-					utilc.sqlite3ErrorMsg(pParse,"corrupt database");
-					pParse.nErr++;
-					return -1;
-				}
-				pUnqual=pName2;
-				iDb=sqlite3FindDb(db,pName1);
-				if(iDb<0) {
-					utilc.sqlite3ErrorMsg(pParse,"unknown database %T",pName1);
-					pParse.nErr++;
-					return -1;
-				}
-			}
-			else {
-				Debug.Assert(db.init.iDb==0||db.init.busy!=0);
-				iDb=db.init.iDb;
-				pUnqual=pName1;
-			}
-			return iDb;
-		}
-		///<summary>
-		/// This routine is used to check if the UTF-8 string zName is a legal
-		/// unqualified name for a new schema object (vtable, index, view or
-		/// trigger). All names are legal except those that begin with the string
-		/// "sqlite_" (in upper, lower or mixed case). This portion of the namespace
-		/// is reserved for internal use.
-		///
-		///</summary>
-		static int sqlite3CheckObjectName(Parse pParse,string zName) {
-			if(0==pParse.db.init.busy&&pParse.nested==0&&(pParse.db.flags&SQLITE_WriteSchema)==0&&zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)) {
-				utilc.sqlite3ErrorMsg(pParse,"object name reserved for internal use: %s",zName);
-				return SQLITE_ERROR;
-			}
-			return SQLITE_OK;
-		}
-		///
-		///<summary>
-		///Begin constructing a new table representation in memory.  This is
-		///the first of several action routines that get called in response
-		///to a CREATE TABLE statement.  In particular, this routine is called
-		///after seeing tokens "CREATE" and "TABLE" and the table name. The isTemp
-		///flag is true if the table should be stored in the auxiliary database
-		///file instead of in the main database file.  This is normally the case
-		///when the "TEMP" or "TEMPORARY" keyword occurs in between
-		///CREATE and TABLE.
-		///
-		///The new table record is initialized and put in pParse.pNewTable.
-		///As more of the CREATE TABLE statement is parsed, additional action
-		///routines will be called to add more information to this record.
-		///At the end of the CREATE TABLE statement, the sqlite3EndTable() routine
-		///is called to complete the construction of the new table record.
-		///
-		///</summary>
-		static void sqlite3StartTable(Parse pParse,///
-		///<summary>
-		///Parser context 
-		///</summary>
-		Token pName1,///
-		///<summary>
-		///First part of the name of the table or view 
-		///</summary>
-		Token pName2,///
-		///<summary>
-		///Second part of the name of the table or view 
-		///</summary>
-		int isTemp,///
-		///<summary>
-		///True if this is a TEMP table 
-		///</summary>
-		int isView,///
-		///<summary>
-		///True if this is a VIEW 
-		///</summary>
-		int isVirtual,///
-		///<summary>
-		///True if this is a VIRTUAL table 
-		///</summary>
-		int noErr///
-		///<summary>
-		///Do nothing if table already exists 
-		///</summary>
-		) {
-			Table pTable;
-			string zName=null;
-			///
-			///<summary>
-			///The name of the new table 
-			///</summary>
-			sqlite3 db=pParse.db;
-			Vdbe v;
-			int iDb;
-			///
-			///<summary>
-			///Database number to create the table in 
-			///</summary>
-			Token pName=new Token();
-			///
-			///<summary>
-			///Unqualified name of the table to create 
-			///</summary>
-			///
-			///<summary>
-			///The table or view name to create is passed to this routine via tokens
-			///pName1 and pName2. If the table name was fully qualified, for example:
-			///
-			///CREATE TABLE xxx.yyy (...);
-			///
-			///Then pName1 is set to "xxx" and pName2 "yyy". On the other hand if
-			///the table name is not fully qualified, i.e.:
-			///
-			///CREATE TABLE yyy(...);
-			///
-			///Then pName1 is set to "yyy" and pName2 is "".
-			///
-			///The call below sets the pName pointer to point at the token (pName1 or
-			///pName2) that stores the unqualified table name. The variable iDb is
-			///set to the index of the database that the table or view is to be
-			///created in.
-			///
-			///</summary>
-			iDb=sqlite3TwoPartName(pParse,pName1,pName2,ref pName);
-			if(iDb<0)
-				return;
-			if(0==OMIT_TEMPDB&&isTemp!=0&&pName2.Length>0&&iDb!=1) {
-				///
-				///<summary>
-				///If creating a temp table, the name may not be qualified. Unless 
-				///the database name is "temp" anyway.  
-				///</summary>
-				utilc.sqlite3ErrorMsg(pParse,"temporary table name must be unqualified");
-				return;
-			}
-			if(OMIT_TEMPDB==0&&isTemp!=0)
-				iDb=1;
-			pParse.sNameToken=pName;
-			zName=sqlite3NameFromToken(db,pName);
-			if(zName==null)
-				return;
-			if(SQLITE_OK!=sqlite3CheckObjectName(pParse,zName)) {
-				goto begin_table_error;
-			}
-			if(db.init.iDb==1)
-				isTemp=1;
-			#if !SQLITE_OMIT_AUTHORIZATION
+                    //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
+                    //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
+                    //  );
+                    sqlite3HashInsert(ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), (Index)null);
+#endif
+                    //}
+                    freeIndex(db, ref pIndex);
+                }
+                ///
+                ///<summary>
+                ///Delete any foreign keys attached to this table. 
+                ///</summary>
+                sqlite3FkDelete(db, pTable);
+                ///
+                ///<summary>
+                ///Delete the Table structure itself.
+                ///</summary>
+                sqliteDeleteColumnNames(db, pTable);
+                db.sqlite3DbFree(ref pTable.zName);
+                db.sqlite3DbFree(ref pTable.zColAff);
+                sqlite3SelectDelete(db, ref pTable.pSelect);
+#if !SQLITE_OMIT_CHECK
+                exprc.sqlite3ExprDelete(db, ref pTable.pCheck);
+#endif
+#if !SQLITE_OMIT_VIRTUALTABLE
+                sqlite3VtabClear(db, pTable);
+#endif
+                pTable = null;
+                //      sqlite3DbFree( db, ref pTable );
+            }
+            ///<summary>
+            /// Unlink the given table from the hash tables and the delete the
+            /// table structure with all its indices and foreign keys.
+            ///
+            ///</summary>
+            public static void sqlite3UnlinkAndDeleteTable(sqlite3 db, int iDb, string zTabName)
+            {
+                Table p;
+                Db pDb;
+                Debug.Assert(db != null);
+                Debug.Assert(iDb >= 0 && iDb < db.nDb);
+                Debug.Assert(zTabName != null);
+                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                testcase(zTabName.Length == 0);
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Zero">length table names are allowed </param>
+                pDb = db.aDb[iDb];
+                p = sqlite3HashInsert(ref pDb.pSchema.tblHash, zTabName, StringExtensions.sqlite3Strlen30(zTabName), (Table)null);
+                build.sqlite3DeleteTable(db, ref p);
+                db.flags |= SQLITE_InternChanges;
+            }
+            ///<summary>
+            /// Given a token, return a string that consists of the text of that
+            /// token.  Space to hold the returned string
+            /// is obtained from sqliteMalloc() and must be freed by the calling
+            /// function.
+            ///
+            /// Any quotation marks (ex:  "name", 'name', [name], or `name`) that
+            /// surround the body of the token are removed.
+            ///
+            /// Tokens are often just pointers into the original SQL text and so
+            /// are not \000 terminated and are not persistent.  The returned string
+            /// is \000 terminated and is persistent.
+            ///
+            ///</summary>
+            public static string sqlite3NameFromToken(sqlite3 db, Token pName)
+            {
+                string zName;
+                if (pName != null && pName.zRestSql != null)
+                {
+                    zName = pName.zRestSql.Substring(0, pName.Length);
+                    //sqlite3DbStrNDup(db, (char)pName.z, pName.n);
+                    StringExtensions.sqlite3Dequote(ref zName);
+                }
+                else
+                {
+                    return null;
+                }
+                return zName;
+            }
+            ///<summary>
+            /// Open the sqlite_master table stored in database number iDb for
+            /// writing. The table is opened using cursor 0.
+            ///
+            ///</summary>
+            public static void sqlite3OpenMasterTable(Parse p, int iDb)
+            {
+                Vdbe v = p.sqlite3GetVdbe();
+                sqlite3TableLock(p, iDb, MASTER_ROOT, 1, SCHEMA_TABLE(iDb));
+                v.sqlite3VdbeAddOp3(OP_OpenWrite, 0, MASTER_ROOT, iDb);
+                v.sqlite3VdbeChangeP4(-1, (int)5, P4_INT32);
+                ///
+                ///<summary>
+                ///5 column table 
+                ///</summary>
+                if (p.nTab == 0)
+                {
+                    p.nTab = 1;
+                }
+            }
+            ///<summary>
+            /// Parameter zName points to a nul-terminated buffer containing the name
+            /// of a database ("main", "temp" or the name of an attached db). This
+            /// function returns the index of the named database in db->aDb[], or
+            /// -1 if the named db cannot be found.
+            ///
+            ///</summary>
+            public static int sqlite3FindDbName(sqlite3 db, string zName)
+            {
+                int i = -1;
+                ///
+                ///<summary>
+                ///Database number 
+                ///</summary>
+                if (zName != null)
+                {
+                    Db pDb;
+                    int n = StringExtensions.sqlite3Strlen30(zName);
+                    for (i = (db.nDb - 1); i >= 0; i--)
+                    {
+                        pDb = db.aDb[i];
+                        if ((OMIT_TEMPDB == 0 || i != 1) && n == StringExtensions.sqlite3Strlen30(pDb.zName) && pDb.zName.Equals(zName, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            break;
+                        }
+                    }
+                }
+                return i;
+            }
+            ///<summary>
+            /// The token *pName contains the name of a database (either "main" or
+            /// "temp" or the name of an attached db). This routine returns the
+            /// index of the named database in db->aDb[], or -1 if the named db
+            /// does not exist.
+            ///
+            ///</summary>
+            public static int sqlite3FindDb(sqlite3 db, Token pName)
+            {
+                int i;
+                ///
+                ///<summary>
+                ///Database number 
+                ///</summary>
+                string zName;
+                ///
+                ///<summary>
+                ///Name we are searching for 
+                ///</summary>
+                zName = build.sqlite3NameFromToken(db, pName);
+                i = build.sqlite3FindDbName(db, zName);
+                db.sqlite3DbFree(ref zName);
+                return i;
+            }
+            ///<summary>
+            ///The table or view or trigger name is passed to this routine via tokens
+            /// pName1 and pName2. If the table name was fully qualified, for example:
+            ///
+            /// CREATE TABLE xxx.yyy (...);
+            ///
+            /// Then pName1 is set to "xxx" and pName2 "yyy". On the other hand if
+            /// the table name is not fully qualified, i.e.:
+            ///
+            /// CREATE TABLE yyy(...);
+            ///
+            /// Then pName1 is set to "yyy" and pName2 is "".
+            ///
+            /// This routine sets the ppUnqual pointer to point at the token (pName1 or
+            /// pName2) that stores the unqualified table name.  The index of the
+            /// database "xxx" is returned.
+            ///
+            ///</summary>
+            public static int sqlite3TwoPartName(Parse pParse,///
+                ///<summary>
+                ///Parsing and code generating context 
+                ///</summary>
+            Token pName1,///
+                ///<summary>
+                ///The "xxx" in the name "xxx.yyy" or "xxx" 
+                ///</summary>
+            Token pName2,///
+                ///<summary>
+                ///The "yyy" in the name "xxx.yyy" 
+                ///</summary>
+            ref Token pUnqual///
+                ///<summary>
+                ///Write the unqualified object name here 
+                ///</summary>
+            )
+            {
+                int iDb;
+                ///
+                ///<summary>
+                ///Database holding the object 
+                ///</summary>
+                sqlite3 db = pParse.db;
+                if (ALWAYS(pName2 != null) && pName2.Length > 0)
+                {
+                    if (db.init.busy != 0)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "corrupt database");
+                        pParse.nErr++;
+                        return -1;
+                    }
+                    pUnqual = pName2;
+                    iDb = build.sqlite3FindDb(db, pName1);
+                    if (iDb < 0)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "unknown database %T", pName1);
+                        pParse.nErr++;
+                        return -1;
+                    }
+                }
+                else
+                {
+                    Debug.Assert(db.init.iDb == 0 || db.init.busy != 0);
+                    iDb = db.init.iDb;
+                    pUnqual = pName1;
+                }
+                return iDb;
+            }
+            ///<summary>
+            /// This routine is used to check if the UTF-8 string zName is a legal
+            /// unqualified name for a new schema object (vtable, index, view or
+            /// trigger). All names are legal except those that begin with the string
+            /// "sqlite_" (in upper, lower or mixed case). This portion of the namespace
+            /// is reserved for internal use.
+            ///
+            ///</summary>
+            public static int sqlite3CheckObjectName(Parse pParse, string zName)
+            {
+                if (0 == pParse.db.init.busy && pParse.nested == 0 && (pParse.db.flags & SQLITE_WriteSchema) == 0 && zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "object name reserved for internal use: %s", zName);
+                    return SQLITE_ERROR;
+                }
+                return SQLITE_OK;
+            }
+            ///
+            ///<summary>
+            ///Begin constructing a new table representation in memory.  This is
+            ///the first of several action routines that get called in response
+            ///to a CREATE TABLE statement.  In particular, this routine is called
+            ///after seeing tokens "CREATE" and "TABLE" and the table name. The isTemp
+            ///flag is true if the table should be stored in the auxiliary database
+            ///file instead of in the main database file.  This is normally the case
+            ///when the "TEMP" or "TEMPORARY" keyword occurs in between
+            ///CREATE and TABLE.
+            ///
+            ///The new table record is initialized and put in pParse.pNewTable.
+            ///As more of the CREATE TABLE statement is parsed, additional action
+            ///routines will be called to add more information to this record.
+            ///At the end of the CREATE TABLE statement, the sqlite3EndTable() routine
+            ///is called to complete the construction of the new table record.
+            ///
+            ///</summary>
+            public static void sqlite3StartTable(Parse pParse,///
+                ///<summary>
+                ///Parser context 
+                ///</summary>
+            Token pName1,///
+                ///<summary>
+                ///First part of the name of the table or view 
+                ///</summary>
+            Token pName2,///
+                ///<summary>
+                ///Second part of the name of the table or view 
+                ///</summary>
+            int isTemp,///
+                ///<summary>
+                ///True if this is a TEMP table 
+                ///</summary>
+            int isView,///
+                ///<summary>
+                ///True if this is a VIEW 
+                ///</summary>
+            int isVirtual,///
+                ///<summary>
+                ///True if this is a VIRTUAL table 
+                ///</summary>
+            int noErr///
+                ///<summary>
+                ///Do nothing if table already exists 
+                ///</summary>
+            )
+            {
+                Table pTable;
+                string zName = null;
+                ///
+                ///<summary>
+                ///The name of the new table 
+                ///</summary>
+                sqlite3 db = pParse.db;
+                Vdbe v;
+                int iDb;
+                ///
+                ///<summary>
+                ///Database number to create the table in 
+                ///</summary>
+                Token pName = new Token();
+                ///
+                ///<summary>
+                ///Unqualified name of the table to create 
+                ///</summary>
+                ///
+                ///<summary>
+                ///The table or view name to create is passed to this routine via tokens
+                ///pName1 and pName2. If the table name was fully qualified, for example:
+                ///
+                ///CREATE TABLE xxx.yyy (...);
+                ///
+                ///Then pName1 is set to "xxx" and pName2 "yyy". On the other hand if
+                ///the table name is not fully qualified, i.e.:
+                ///
+                ///CREATE TABLE yyy(...);
+                ///
+                ///Then pName1 is set to "yyy" and pName2 is "".
+                ///
+                ///The call below sets the pName pointer to point at the token (pName1 or
+                ///pName2) that stores the unqualified table name. The variable iDb is
+                ///set to the index of the database that the table or view is to be
+                ///created in.
+                ///
+                ///</summary>
+                iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
+                if (iDb < 0)
+                    return;
+                if (0 == OMIT_TEMPDB && isTemp != 0 && pName2.Length > 0 && iDb != 1)
+                {
+                    ///
+                    ///<summary>
+                    ///If creating a temp table, the name may not be qualified. Unless 
+                    ///the database name is "temp" anyway.  
+                    ///</summary>
+                    utilc.sqlite3ErrorMsg(pParse, "temporary table name must be unqualified");
+                    return;
+                }
+                if (OMIT_TEMPDB == 0 && isTemp != 0)
+                    iDb = 1;
+                pParse.sNameToken = pName;
+                zName = build.sqlite3NameFromToken(db, pName);
+                if (zName == null)
+                    return;
+                if (SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
+                {
+                    goto begin_table_error;
+                }
+                if (db.init.iDb == 1)
+                    isTemp = 1;
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	Debug.Assert( (isTemp & 1)==isTemp );
 {
 int code;
@@ -1017,696 +1086,759 @@ goto begin_table_error;
 }
 }
 #endif
-			///
-			///<summary>
-			///Make sure the new table name does not collide with an existing
-			///index or table name in the same database.  Issue an error message if
-			///it does. The exception is if the statement being parsed was passed
-			///to an sqlite3_declare_vtab() call. In that case only the column names
-			///and types will be used, so there is no need to test for namespace
-			///collisions.
-			///</summary>
-			if(!IN_DECLARE_VTAB(pParse)) {
-				String zDb=db.aDb[iDb].zName;
-				if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
-					goto begin_table_error;
-				}
-				pTable=sqlite3FindTable(db,zName,zDb);
-				if(pTable!=null) {
-					if(noErr==0) {
-						utilc.sqlite3ErrorMsg(pParse,"table %T already exists",pName);
-					}
-					else {
-						Debug.Assert(0==db.init.busy);
-						sqlite3CodeVerifySchema(pParse,iDb);
-					}
-					goto begin_table_error;
-				}
-				if(sqlite3FindIndex(db,zName,zDb)!=null) {
-					utilc.sqlite3ErrorMsg(pParse,"there is already an index named %s",zName);
-					goto begin_table_error;
-				}
-			}
-			pTable=new Table();
-			// sqlite3DbMallocZero(db, Table).Length;
-			//if ( pTable == null )
-			//{
-			//  db.mallocFailed = 1;
-			//  pParse.rc = SQLITE_NOMEM;
-			//  pParse.nErr++;
-			//  goto begin_table_error;
-			//}
-			pTable.zName=zName;
-			pTable.iPKey=-1;
-			pTable.pSchema=db.aDb[iDb].pSchema;
-			pTable.nRef=1;
-			pTable.nRowEst=1000000;
-			Debug.Assert(pParse.pNewTable==null);
-			pParse.pNewTable=pTable;
-			///
-			///<summary>
-			///If this is the magic sqlite_sequence table used by autoincrement,
-			///then record a pointer to this table in the main database structure
-			///so that INSERT can find the table easily.
-			///
-			///</summary>
-			#if !SQLITE_OMIT_AUTOINCREMENT
-			if(pParse.nested==0&&zName=="sqlite_sequence") {
-				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-				pTable.pSchema.pSeqTab=pTable;
-			}
-			#endif
-			///
-			///<summary>
-			///Begin generating the code that will insert the table record into
-			///the SQLITE_MASTER table.  Note in particular that we must go ahead
-			///and allocate the record number for the table entry now.  Before any
-			///PRIMARY KEY or UNIQUE keywords are parsed.  Those keywords will cause
-			///indices to be created and the table record must come before the
-			///indices.  Hence, the record number for the table must be allocated
-			///now.
-			///</summary>
-			if(0==db.init.busy&&(v=pParse.sqlite3GetVdbe())!=null) {
-				int j1;
-				int fileFormat;
-				int reg1,reg2,reg3;
-				sqlite3BeginWriteOperation(pParse,0,iDb);
-				if(isVirtual!=0) {
-					v.sqlite3VdbeAddOp0(OP_VBegin);
-				}
-				///
-				///<summary>
-				///If the file format and encoding in the database have not been set,
-				///set them now.
-				///
-				///</summary>
-				reg1=pParse.regRowid=++pParse.nMem;
-				reg2=pParse.regRoot=++pParse.nMem;
-				reg3=++pParse.nMem;
-				v.sqlite3VdbeAddOp3(OP_ReadCookie,iDb,reg3,BTREE_FILE_FORMAT);
-                vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
-				j1=v.sqlite3VdbeAddOp1(OpCode.OP_If,reg3);
-				fileFormat=(db.flags&SQLITE_LegacyFileFmt)!=0?1:SQLITE_MAX_FILE_FORMAT;
-				v.sqlite3VdbeAddOp2(OpCode.OP_Integer,fileFormat,reg3);
-				v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie,iDb,BTREE_FILE_FORMAT,reg3);
-				v.sqlite3VdbeAddOp2(OpCode.OP_Integer,(int)ENC(db),reg3);
-				v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie,iDb,BTREE_TEXT_ENCODING,reg3);
-				v.sqlite3VdbeJumpHere(j1);
-				///
-				///<summary>
-				///</summary>
-				///This just creates a place holder record in the sqlite_master table.
-				///The record created does not contain anything yet.  It will be replaced
-				///by the real entry in code generated at sqlite3EndTable().by the real entry in code generated at sqlite3EndTable().
-				///The rowid for the new entry is left in register pParse>regRowid.
-				///The root page number of the new table is left in reg pParse>regRoot.
-				///The rowid and root page number values are needed by the code that
-				///sqlite3EndTable will generate.
-				if(isView!=0||isVirtual!=0) {
-					v.sqlite3VdbeAddOp2(OP_Integer,0,reg2);
-				}
-				else {
-					v.sqlite3VdbeAddOp2(OP_CreateTable,iDb,reg2);
-				}
-				sqlite3OpenMasterTable(pParse,iDb);
-				v.sqlite3VdbeAddOp2(OP_NewRowid,0,reg1);
-				v.sqlite3VdbeAddOp2(OP_Null,0,reg3);
-				v.sqlite3VdbeAddOp3(OP_Insert,0,reg3,reg1);
-				v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
-				v.sqlite3VdbeAddOp0(OP_Close);
-			}
-			///
-			///<summary>
-			///</summary>
-			///<param name="Normal (non">error) return. </param>
-			return;
-			///
-			///<summary>
-			///If an error occurs, we jump here 
-			///</summary>
-			begin_table_error:
-			db.sqlite3DbFree(ref zName);
-			return;
-		}
-		///<summary>
-		/// This macro is used to compare two strings in a case-insensitive manner.
-		/// It is slightly faster than calling sqlite3StrICmp() directly, but
-		/// produces larger code.
-		///
-		/// WARNING: This macro is not compatible with the strcmp() family. It
-		/// returns true if the two strings are equal, otherwise false.
-		///
-		///</summary>
-		//#define STRICMP(x, y) (\
-		//sqlite3UpperToLower[*(unsigned char )(x)]==   \
-		//sqlite3UpperToLower[*(unsigned char )(y)]     \
-		//&& sqlite3StrICmp((x)+1,(y)+1)==0 )
-		///<summary>
-		/// Add a new column to the table currently being constructed.
-		///
-		/// The parser calls this routine once for each column declaration
-		/// in a CREATE TABLE statement.  sqlite3StartTable() gets called
-		/// first to get things going.  Then this routine is called for each
-		/// column.
-		///
-		///</summary>
-		static void sqlite3AddColumn(Parse pParse,Token pName) {
-			Table p;
-			int i;
-			string z;
-			Column pCol;
-			sqlite3 db=pParse.db;
-			if((p=pParse.pNewTable)==null)
-				return;
-			#if SQLITE_MAX_COLUMN || !SQLITE_MAX_COLUMN
-			if(p.nCol+1>db.aLimit[SQLITE_LIMIT_COLUMN]) {
-				utilc.sqlite3ErrorMsg(pParse,"too many columns on %s",p.zName);
-				return;
-			}
-			#endif
-			z=sqlite3NameFromToken(db,pName);
-			if(z==null)
-				return;
-			for(i=0;i<p.nCol;i++) {
-				if(z.Equals(p.aCol[i].zName,StringComparison.InvariantCultureIgnoreCase)) {
-					//STRICMP(z, p.aCol[i].zName) ){
-					utilc.sqlite3ErrorMsg(pParse,"duplicate column name: %s",z);
-					db.sqlite3DbFree(ref z);
-					return;
-				}
-			}
-			if((p.nCol&0x7)==0) {
-				//aNew = sqlite3DbRealloc(db,p.aCol,(p.nCol+8)*sizeof(p.aCol[0]));
-				//if( aNew==0 ){
-				//  sqlite3DbFree(db,ref z);
-				//  return;
-				//}
-				Array.Resize(ref p.aCol,p.nCol+8);
-			}
-			p.aCol[p.nCol]=new Column();
-			pCol=p.aCol[p.nCol];
-			//memset(pCol, 0, sizeof(p.aCol[0]));
-			pCol.zName=z;
-			///
-			///<summary>
-			///If there is no type specified, columns have the default affinity
-			///'NONE'. If there is a type specified, then sqlite3AddColumnType() will
-			///be called next to set pCol.affinity correctly.
-			///
-			///</summary>
-			pCol.affinity=SQLITE_AFF_NONE;
-			p.nCol++;
-		}
-		///<summary>
-		/// This routine is called by the parser while in the middle of
-		/// parsing a CREATE TABLE statement.  A "NOT NULL" constraint has
-		/// been seen on a column.  This routine sets the notNull flag on
-		/// the column currently under construction.
-		///
-		///</summary>
-		static void sqlite3AddNotNull(Parse pParse,int onError) {
-			Table p;
-			p=pParse.pNewTable;
-			if(p==null||NEVER(p.nCol<1))
-				return;
-			p.aCol[p.nCol-1].notNull=(u8)onError;
-		}
-		///<summary>
-		/// Scan the column type name zType (length nType) and return the
-		/// associated affinity type.
-		///
-		/// This routine does a case-independent search of zType for the
-		/// substrings in the following table. If one of the substrings is
-		/// found, the corresponding affinity is returned. If zType contains
-		/// more than one of the substrings, entries toward the top of
-		/// the table take priority. For example, if zType is 'BLOBINT',
-		/// SQLITE_AFF_INTEGER is returned.
-		///
-		/// Substring     | Affinity
-		/// --------------------------------
-		/// 'INT'         | SQLITE_AFF_INTEGER
-		/// 'CHAR'        | SQLITE_AFF_TEXT
-		/// 'CLOB'        | SQLITE_AFF_TEXT
-		/// 'TEXT'        | SQLITE_AFF_TEXT
-		/// 'BLOB'        | SQLITE_AFF_NONE
-		/// 'REAL'        | SQLITE_AFF_REAL
-		/// 'FLOA'        | SQLITE_AFF_REAL
-		/// 'DOUB'        | SQLITE_AFF_REAL
-		///
-		/// If none of the substrings in the above table are found,
-		/// SQLITE_AFF_NUMERIC is returned.
-		///
-		///</summary>
-		static char sqlite3AffinityType(string zIn) {
-			//u32 h = 0;
-			//char aff = SQLITE_AFF_NUMERIC;
-			zIn=zIn.ToLower();
-			if(zIn.Contains("char")||zIn.Contains("clob")||zIn.Contains("text"))
-				return SQLITE_AFF_TEXT;
-			if(zIn.Contains("blob"))
-				return SQLITE_AFF_NONE;
-			if(zIn.Contains("doub")||zIn.Contains("floa")||zIn.Contains("real"))
-				return SQLITE_AFF_REAL;
-			if(zIn.Contains("int"))
-				return SQLITE_AFF_INTEGER;
-			return SQLITE_AFF_NUMERIC;
-			//      string zEnd = pType.z.Substring(pType.n);
-			//      while( zIn!=zEnd ){
-			//        h = (h<<8) + sqlite3UpperToLower[*zIn];
-			//        zIn++;
-			//        if( h==(('c'<<24)+('h'<<16)+('a'<<8)+'r') ){             /* CHAR */
-			//          aff = SQLITE_AFF_TEXT;
-			//        }else if( h==(('c'<<24)+('l'<<16)+('o'<<8)+'b') ){       /* CLOB */
-			//          aff = SQLITE_AFF_TEXT;
-			//        }else if( h==(('t'<<24)+('e'<<16)+('x'<<8)+'t') ){       /* TEXT */
-			//          aff = SQLITE_AFF_TEXT;
-			//        }else if( h==(('b'<<24)+('l'<<16)+('o'<<8)+'b')          /* BLOB */
-			//            && (aff==SQLITE_AFF_NUMERIC || aff==SQLITE_AFF_REAL) ){
-			//          aff = SQLITE_AFF_NONE;
-			//#if !SQLITE_OMIT_FLOATING_POINT
-			//        }else if( h==(('r'<<24)+('e'<<16)+('a'<<8)+'l')          /* REAL */
-			//            && aff==SQLITE_AFF_NUMERIC ){
-			//          aff = SQLITE_AFF_REAL;
-			//        }else if( h==(('f'<<24)+('l'<<16)+('o'<<8)+'a')          /* FLOA */
-			//            && aff==SQLITE_AFF_NUMERIC ){
-			//          aff = SQLITE_AFF_REAL;
-			//        }else if( h==(('d'<<24)+('o'<<16)+('u'<<8)+'b')          /* DOUB */
-			//            && aff==SQLITE_AFF_NUMERIC ){
-			//          aff = SQLITE_AFF_REAL;
-			//#endif
-			//        }else if( (h&0x00FFFFFF)==(('i'<<16)+('n'<<8)+'t') ){    /* INT */
-			//          aff = SQLITE_AFF_INTEGER;
-			//          break;
-			//        }
-			//      }
-			//      return aff;
-		}
-		///<summary>
-		/// This routine is called by the parser while in the middle of
-		/// parsing a CREATE TABLE statement.  The pFirst token is the first
-		/// token in the sequence of tokens that describe the type of the
-		/// column currently under construction.   pLast is the last token
-		/// in the sequence.  Use this information to construct a string
-		/// that contains the typename of the column and store that string
-		/// in zType.
-		///
-		///</summary>
-		static void sqlite3AddColumnType(Parse pParse,Token pType) {
-			Table p;
-			Column pCol;
-			p=pParse.pNewTable;
-			if(p==null||NEVER(p.nCol<1))
-				return;
-			pCol=p.aCol[p.nCol-1];
-			Debug.Assert(pCol.zType==null);
-			pCol.zType=sqlite3NameFromToken(pParse.db,pType);
-			pCol.affinity=sqlite3AffinityType(pCol.zType);
-		}
-		///
-		///<summary>
-		///The expression is the default value for the most recently added column
-		///of the table currently under construction.
-		///
-		///Default value expressions must be constant.  Raise an exception if this
-		///is not the case.
-		///
-		///This routine is called by the parser while in the middle of
-		///parsing a CREATE TABLE statement.
-		///
-		///</summary>
-		static void sqlite3AddDefaultValue(Parse pParse,ExprSpan pSpan) {
-			Table p;
-			Column pCol;
-			sqlite3 db=pParse.db;
-			p=pParse.pNewTable;
-			if(p!=null) {
-				pCol=(p.aCol[p.nCol-1]);
-				if(pSpan.pExpr.sqlite3ExprIsConstantOrFunction()==0) {
-					utilc.sqlite3ErrorMsg(pParse,"default value of column [%s] is not constant",pCol.zName);
-				}
-				else {
-					///
-					///<summary>
-					///A copy of pExpr is used instead of the original, as pExpr contains
-					///tokens that point to volatile memory. The 'span' of the expression
-					///is required by pragma table_info.
-					///
-					///</summary>
-					exprc.sqlite3ExprDelete(db,ref pCol.pDflt);
-					pCol.pDflt=exprc.sqlite3ExprDup(db,pSpan.pExpr,EXPRDUP_REDUCE);
-					db.sqlite3DbFree(ref pCol.zDflt);
-					pCol.zDflt=pSpan.zStart.Substring(0,pSpan.zStart.Length-pSpan.zEnd.Length);
-					//sqlite3DbStrNDup( db, pSpan.zStart,
-					//                               (int)( pSpan.zEnd.Length - pSpan.zStart.Length ) );
-				}
-			}
-			exprc.sqlite3ExprDelete(db,ref pSpan.pExpr);
-		}
-		///<summary>
-		/// Designate the PRIMARY KEY for the table.  pList is a list of names
-		/// of columns that form the primary key.  If pList is NULL, then the
-		/// most recently added column of the table is the primary key.
-		///
-		/// A table can have at most one primary key.  If the table already has
-		/// a primary key (and this is the second primary key) then create an
-		/// error.
-		///
-		/// If the PRIMARY KEY is on a single column whose datatype is INTEGER,
-		/// then we will try to use that column as the rowid.  Set the Table.iPKey
-		/// field of the table under construction to be the index of the
-		/// INTEGER PRIMARY KEY column.  Table.iPKey is set to -1 if there is
-		/// no INTEGER PRIMARY KEY.
-		///
-		/// If the key is not an INTEGER PRIMARY KEY, then create a unique
-		/// index for the key.  No index is created for INTEGER PRIMARY KEYs.
-		///
-		///</summary>
-		// OVERLOADS, so I don't need to rewrite parse.c
-		static void sqlite3AddPrimaryKey(Parse pParse,int null_2,int onError,int autoInc,int sortOrder) {
-			sqlite3AddPrimaryKey(pParse,null,onError,autoInc,sortOrder);
-		}
-		static void sqlite3AddPrimaryKey(Parse pParse,///
-		///<summary>
-		///Parsing context 
-		///</summary>
-		ExprList pList,///
-		///<summary>
-		///List of field names to be indexed 
-		///</summary>
-		int onError,///
-		///<summary>
-		///What to do with a uniqueness conflict 
-		///</summary>
-		int autoInc,///
-		///<summary>
-		///True if the AUTOINCREMENT keyword is present 
-		///</summary>
-		int sortOrder///
-		///<summary>
-		///SQLITE_SO_ASC or SQLITE_SO_DESC 
-		///</summary>
-		) {
-			Table pTab=pParse.pNewTable;
-			string zType=null;
-			int iCol=-1,i;
-			if(pTab==null||IN_DECLARE_VTAB(pParse))
-				goto primary_key_exit;
-			if((pTab.tabFlags&TF_HasPrimaryKey)!=0) {
-				utilc.sqlite3ErrorMsg(pParse,"table \"%s\" has more than one primary key",pTab.zName);
-				goto primary_key_exit;
-			}
-			pTab.tabFlags|=TF_HasPrimaryKey;
-			if(pList==null) {
-				iCol=pTab.nCol-1;
-				pTab.aCol[iCol].isPrimKey=1;
-			}
-			else {
-				for(i=0;i<pList.nExpr;i++) {
-					for(iCol=0;iCol<pTab.nCol;iCol++) {
-						if(pList.a[i].zName.Equals(pTab.aCol[iCol].zName,StringComparison.InvariantCultureIgnoreCase)) {
-							break;
-						}
-					}
-					if(iCol<pTab.nCol) {
-						pTab.aCol[iCol].isPrimKey=1;
-					}
-				}
-				if(pList.nExpr>1)
-					iCol=-1;
-			}
-			if(iCol>=0&&iCol<pTab.nCol) {
-				zType=pTab.aCol[iCol].zType;
-			}
-			if(zType!=null&&zType.Equals("INTEGER",StringComparison.InvariantCultureIgnoreCase)&&sortOrder==SQLITE_SO_ASC) {
-				pTab.iPKey=iCol;
-				pTab.keyConf=(byte)onError;
-				Debug.Assert(autoInc==0||autoInc==1);
-				pTab.tabFlags|=(u8)(autoInc*TF_Autoincrement);
-			}
-			else
-				if(autoInc!=0) {
-					#if !SQLITE_OMIT_AUTOINCREMENT
-					utilc.sqlite3ErrorMsg(pParse,"AUTOINCREMENT is only allowed on an "+"INTEGER PRIMARY KEY");
-					#endif
-				}
-				else {
-					Index p;
-					p=sqlite3CreateIndex(pParse,0,0,0,pList,onError,0,0,sortOrder,0);
-					if(p!=null) {
-						p.autoIndex=2;
-					}
-					pList=null;
-				}
-			primary_key_exit:
-			exprc.sqlite3ExprListDelete(pParse.db,ref pList);
-			return;
-		}
-		///<summary>
-		/// Add a new CHECK constraint to the table currently under construction.
-		///
-		///</summary>
-		static void sqlite3AddCheckConstraint(Parse pParse,///
-		///<summary>
-		///Parsing context 
-		///</summary>
-		Expr pCheckExpr///
-		///<summary>
-		///The check expression 
-		///</summary>
-		) {
-			sqlite3 db=pParse.db;
-			#if !SQLITE_OMIT_CHECK
-			Table pTab=pParse.pNewTable;
-			if(pTab!=null&&!IN_DECLARE_VTAB(pParse)) {
-				pTab.pCheck=exprc.sqlite3ExprAnd(db,pTab.pCheck,pCheckExpr);
-			}
-			else
-			#endif
-			 {
-				exprc.sqlite3ExprDelete(db,ref pCheckExpr);
-			}
-		}
-		///<summary>
-		/// Set the collation function of the most recently parsed table column
-		/// to the CollSeq given.
-		///
-		///</summary>
-		static void sqlite3AddCollateType(Parse pParse,Token pToken) {
-			Table p;
-			int i;
-			string zColl;
-			///
-			///<summary>
-			///Dequoted name of collation sequence 
-			///</summary>
-			sqlite3 db;
-			if((p=pParse.pNewTable)==null)
-				return;
-			i=p.nCol-1;
-			db=pParse.db;
-			zColl=sqlite3NameFromToken(db,pToken);
-			if(zColl==null)
-				return;
-			if(sqlite3LocateCollSeq(pParse,zColl)!=null) {
-				Index pIdx;
-				p.aCol[i].zColl=zColl;
-				///
-				///<summary>
-				///If the column is declared as "<name> PRIMARY KEY COLLATE <type>",
-				///then an index may have been created on this column before the
-				///collation type was added. Correct this if it is the case.
-				///
-				///</summary>
-				for(pIdx=p.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-					Debug.Assert(pIdx.nColumn==1);
-					if(pIdx.aiColumn[0]==i) {
-						pIdx.azColl[0]=p.aCol[i].zColl;
-					}
-				}
-			}
-			else {
-				db.sqlite3DbFree(ref zColl);
-			}
-		}
-		///<summary>
-		/// This function returns the collation sequence for database native text
-		/// encoding identified by the string zName, length nName.
-		///
-		/// If the requested collation sequence is not available, or not available
-		/// in the database native encoding, the collation factory is invoked to
-		/// request it. If the collation factory does not supply such a sequence,
-		/// and the sequence is available in another text encoding, then that is
-		/// returned instead.
-		///
-		/// If no versions of the requested collations sequence are available, or
-		/// another error occurs, NULL is returned and an error message written into
-		/// pParse.
-		///
-		/// This routine is a wrapper around sqlite3FindCollSeq().  This routine
-		/// invokes the collation factory if the named collation cannot be found
-		/// and generates an error message.
-		///
-		/// See also: sqlite3FindCollSeq(), sqlite3GetCollSeq()
-		///
-		///</summary>
-		static CollSeq sqlite3LocateCollSeq(Parse pParse,string zName) {
-			sqlite3 db=pParse.db;
-			SqliteEncoding enc=db.aDb[0].pSchema.enc;
-			// ENC(db);
-			u8 initbusy=db.init.busy;
-			CollSeq pColl;
-			pColl=sqlite3FindCollSeq(db,enc,zName,initbusy);
-			if(0==initbusy&&(pColl==null||pColl.xCmp==null)) {
-				pColl=sqlite3GetCollSeq(db,enc,pColl,zName);
-				if(pColl==null) {
-					utilc.sqlite3ErrorMsg(pParse,"no such collation sequence: %s",zName);
-				}
-			}
-			return pColl;
-		}
-		///<summary>
-		/// Generate code that will increment the schema cookie.
-		///
-		/// The schema cookie is used to determine when the schema for the
-		/// database changes.  After each schema change, the cookie value
-		/// changes.  When a process first reads the schema it records the
-		/// cookie.  Thereafter, whenever it goes to access the database,
-		/// it checks the cookie to make sure the schema has not changed
-		/// since it was last read.
-		///
-		/// This plan is not completely bullet-proof.  It is possible for
-		/// the schema to change multiple times and for the cookie to be
-		/// set back to prior value.  But schema changes are infrequent
-		/// and the probability of hitting the same cookie value is only
-		/// 1 chance in 2^32.  So we're safe enough.
-		///
-		///</summary>
-		static void sqlite3ChangeCookie(Parse pParse,int iDb) {
-			int r1=pParse.sqlite3GetTempReg();
-			sqlite3 db=pParse.db;
-			Vdbe v=pParse.pVdbe;
-			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-			v.sqlite3VdbeAddOp2(OP_Integer,db.aDb[iDb].pSchema.schema_cookie+1,r1);
-			v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_SCHEMA_VERSION,r1);
-			pParse.sqlite3ReleaseTempReg(r1);
-		}
-		///<summary>
-		/// Measure the number of characters needed to output the given
-		/// identifier.  The number returned includes any quotes used
-		/// but does not include the null terminator.
-		///
-		/// The estimate is conservative.  It might be larger that what is
-		/// really needed.
-		///
-		///</summary>
-		static int identLength(string z) {
-			int n;
-			for(n=0;n<z.Length;n++) {
-				if(z[n]==(byte)'"') {
-					n++;
-				}
-			}
-			return n+2;
-		}
-		///<summary>
-		/// The first parameter is a pointer to an output buffer. The second
-		/// parameter is a pointer to an integer that contains the offset at
-		/// which to write into the output buffer. This function copies the
-		/// nul-terminated string pointed to by the third parameter, zSignedIdent,
-		/// to the specified offset in the buffer and updates *pIdx to refer
-		/// to the first byte after the last byte written before returning.
-		///
-		/// If the string zSignedIdent consists entirely of alpha-numeric
-		/// characters, does not begin with a digit and is not an SQL keyword,
-		/// then it is copied to the output buffer exactly as it is. Otherwise,
-		/// it is quoted using double-quotes.
-		///
-		///</summary>
-		static void identPut(StringBuilder z,ref int pIdx,string zSignedIdent) {
-			string zIdent=zSignedIdent;
-			int i;
-			int j;
-			bool needQuote;
-			i=pIdx;
-			for(j=0;j<zIdent.Length;j++) {
-				if(!CharExtensions.sqlite3Isalnum(zIdent[j])&&zIdent[j]!='_')
-					break;
-			}
-			needQuote=CharExtensions.sqlite3Isdigit(zIdent[0])||sqlite3KeywordCode(zIdent,j)!=TK_ID;
-			if(!needQuote) {
-				needQuote=(j<zIdent.Length&&zIdent[j]!=0);
-			}
-			if(needQuote) {
-				if(i==z.Length)
-					z.Append('\0');
-				z[i++]='"';
-			}
-			for(j=0;j<zIdent.Length;j++) {
-				if(i==z.Length)
-					z.Append('\0');
-				z[i++]=zIdent[j];
-				if(zIdent[j]=='"') {
-					if(i==z.Length)
-						z.Append('\0');
-					z[i++]='"';
-				}
-			}
-			if(needQuote) {
-				if(i==z.Length)
-					z.Append('\0');
-				z[i++]='"';
-			}
-			//z[i] = 0;
-			pIdx=i;
-		}
-		///
-		///<summary>
-		///Generate a CREATE TABLE statement appropriate for the given
-		///table.  Memory to hold the text of the statement is obtained
-		///from sqliteMalloc() and must be freed by the calling function.
-		///
-		///</summary>
-		static string createTableStmt(sqlite3 db,Table p) {
-			int i,k,n;
-			StringBuilder zStmt;
-			string zSep;
-			string zSep2;
-			string zEnd;
-			Column pCol;
-			n=0;
-			for(i=0;i<p.nCol;i++) {
-				//, pCol++){
-				pCol=p.aCol[i];
-				n+=identLength(pCol.zName)+5;
-			}
-			n+=identLength(p.zName);
-			if(n<50) {
-				zSep="";
-				zSep2=",";
-				zEnd=")";
-			}
-			else {
-				zSep="\n  ";
-				zSep2=",\n  ";
-				zEnd="\n)";
-			}
-			n+=35+6*p.nCol;
-			zStmt=new StringBuilder(n);
-			//zStmt = sqlite3DbMallocRaw(0, n);
-			//if( zStmt==0 ){
-			//  db.mallocFailed = 1;
-			//  return 0;
-			//}
-			//io.sqlite3_snprintf(n, zStmt,"CREATE TABLE ");
-			zStmt.Append("CREATE TABLE ");
-			k=StringExtensions.sqlite3Strlen30(zStmt);
-			identPut(zStmt,ref k,p.zName);
-			zStmt.Append('(');
-			//zStmt[k++] = '(';
-			for(i=0;i<p.nCol;i++) {
-				//, pCol++){
-				pCol=p.aCol[i];
-				string[] azType=new string[] {
+                ///
+                ///<summary>
+                ///Make sure the new table name does not collide with an existing
+                ///index or table name in the same database.  Issue an error message if
+                ///it does. The exception is if the statement being parsed was passed
+                ///to an sqlite3_declare_vtab() call. In that case only the column names
+                ///and types will be used, so there is no need to test for namespace
+                ///collisions.
+                ///</summary>
+                if (!IN_DECLARE_VTAB(pParse))
+                {
+                    String zDb = db.aDb[iDb].zName;
+                    if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                    {
+                        goto begin_table_error;
+                    }
+                    pTable = build.sqlite3FindTable(db, zName, zDb);
+                    if (pTable != null)
+                    {
+                        if (noErr == 0)
+                        {
+                            utilc.sqlite3ErrorMsg(pParse, "table %T already exists", pName);
+                        }
+                        else
+                        {
+                            Debug.Assert(0 == db.init.busy);
+                            sqlite3CodeVerifySchema(pParse, iDb);
+                        }
+                        goto begin_table_error;
+                    }
+                    if (build.sqlite3FindIndex(db, zName, zDb) != null)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "there is already an index named %s", zName);
+                        goto begin_table_error;
+                    }
+                }
+                pTable = new Table();
+                // sqlite3DbMallocZero(db, Table).Length;
+                //if ( pTable == null )
+                //{
+                //  db.mallocFailed = 1;
+                //  pParse.rc = SQLITE_NOMEM;
+                //  pParse.nErr++;
+                //  goto begin_table_error;
+                //}
+                pTable.zName = zName;
+                pTable.iPKey = -1;
+                pTable.pSchema = db.aDb[iDb].pSchema;
+                pTable.nRef = 1;
+                pTable.nRowEst = 1000000;
+                Debug.Assert(pParse.pNewTable == null);
+                pParse.pNewTable = pTable;
+                ///
+                ///<summary>
+                ///If this is the magic sqlite_sequence table used by autoincrement,
+                ///then record a pointer to this table in the main database structure
+                ///so that INSERT can find the table easily.
+                ///
+                ///</summary>
+#if !SQLITE_OMIT_AUTOINCREMENT
+                if (pParse.nested == 0 && zName == "sqlite_sequence")
+                {
+                    Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                    pTable.pSchema.pSeqTab = pTable;
+                }
+#endif
+                ///
+                ///<summary>
+                ///Begin generating the code that will insert the table record into
+                ///the SQLITE_MASTER table.  Note in particular that we must go ahead
+                ///and allocate the record number for the table entry now.  Before any
+                ///PRIMARY KEY or UNIQUE keywords are parsed.  Those keywords will cause
+                ///indices to be created and the table record must come before the
+                ///indices.  Hence, the record number for the table must be allocated
+                ///now.
+                ///</summary>
+                if (0 == db.init.busy && (v = pParse.sqlite3GetVdbe()) != null)
+                {
+                    int j1;
+                    int fileFormat;
+                    int reg1, reg2, reg3;
+                    sqlite3BeginWriteOperation(pParse, 0, iDb);
+                    if (isVirtual != 0)
+                    {
+                        v.sqlite3VdbeAddOp0(OP_VBegin);
+                    }
+                    ///
+                    ///<summary>
+                    ///If the file format and encoding in the database have not been set,
+                    ///set them now.
+                    ///
+                    ///</summary>
+                    reg1 = pParse.regRowid = ++pParse.nMem;
+                    reg2 = pParse.regRoot = ++pParse.nMem;
+                    reg3 = ++pParse.nMem;
+                    v.sqlite3VdbeAddOp3(OP_ReadCookie, iDb, reg3, BTREE_FILE_FORMAT);
+                    vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                    j1 = v.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
+                    fileFormat = (db.flags & SQLITE_LegacyFileFmt) != 0 ? 1 : SQLITE_MAX_FILE_FORMAT;
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Integer, fileFormat, reg3);
+                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTREE_FILE_FORMAT, reg3);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Integer, (int)ENC(db), reg3);
+                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTREE_TEXT_ENCODING, reg3);
+                    v.sqlite3VdbeJumpHere(j1);
+                    ///
+                    ///<summary>
+                    ///</summary>
+                    ///This just creates a place holder record in the sqlite_master table.
+                    ///The record created does not contain anything yet.  It will be replaced
+                    ///by the real entry in code generated at sqlite3EndTable().by the real entry in code generated at sqlite3EndTable().
+                    ///The rowid for the new entry is left in register pParse>regRowid.
+                    ///The root page number of the new table is left in reg pParse>regRoot.
+                    ///The rowid and root page number values are needed by the code that
+                    ///sqlite3EndTable will generate.
+                    if (isView != 0 || isVirtual != 0)
+                    {
+                        v.sqlite3VdbeAddOp2(OP_Integer, 0, reg2);
+                    }
+                    else
+                    {
+                        v.sqlite3VdbeAddOp2(OP_CreateTable, iDb, reg2);
+                    }
+                    sqlite3OpenMasterTable(pParse, iDb);
+                    v.sqlite3VdbeAddOp2(OP_NewRowid, 0, reg1);
+                    v.sqlite3VdbeAddOp2(OP_Null, 0, reg3);
+                    v.sqlite3VdbeAddOp3(OP_Insert, 0, reg3, reg1);
+                    v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
+                    v.sqlite3VdbeAddOp0(OP_Close);
+                }
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Normal (non">error) return. </param>
+                return;
+            ///
+            ///<summary>
+            ///If an error occurs, we jump here 
+            ///</summary>
+            begin_table_error:
+                db.sqlite3DbFree(ref zName);
+                return;
+            }
+            ///<summary>
+            /// This macro is used to compare two strings in a case-insensitive manner.
+            /// It is slightly faster than calling sqlite3StrICmp() directly, but
+            /// produces larger code.
+            ///
+            /// WARNING: This macro is not compatible with the strcmp() family. It
+            /// returns true if the two strings are equal, otherwise false.
+            ///
+            ///</summary>
+            //#define STRICMP(x, y) (\
+            //sqlite3UpperToLower[*(unsigned char )(x)]==   \
+            //sqlite3UpperToLower[*(unsigned char )(y)]     \
+            //&& sqlite3StrICmp((x)+1,(y)+1)==0 )
+            ///<summary>
+            /// Add a new column to the table currently being constructed.
+            ///
+            /// The parser calls this routine once for each column declaration
+            /// in a CREATE TABLE statement.  build.sqlite3StartTable() gets called
+            /// first to get things going.  Then this routine is called for each
+            /// column.
+            ///
+            ///</summary>
+            public static void sqlite3AddColumn(Parse pParse, Token pName)
+            {
+                Table p;
+                int i;
+                string z;
+                Column pCol;
+                sqlite3 db = pParse.db;
+                if ((p = pParse.pNewTable) == null)
+                    return;
+#if SQLITE_MAX_COLUMN || !SQLITE_MAX_COLUMN
+                if (p.nCol + 1 > db.aLimit[SQLITE_LIMIT_COLUMN])
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "too many columns on %s", p.zName);
+                    return;
+                }
+#endif
+                z = build.sqlite3NameFromToken(db, pName);
+                if (z == null)
+                    return;
+                for (i = 0; i < p.nCol; i++)
+                {
+                    if (z.Equals(p.aCol[i].zName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        //STRICMP(z, p.aCol[i].zName) ){
+                        utilc.sqlite3ErrorMsg(pParse, "duplicate column name: %s", z);
+                        db.sqlite3DbFree(ref z);
+                        return;
+                    }
+                }
+                if ((p.nCol & 0x7) == 0)
+                {
+                    //aNew = sqlite3DbRealloc(db,p.aCol,(p.nCol+8)*sizeof(p.aCol[0]));
+                    //if( aNew==0 ){
+                    //  sqlite3DbFree(db,ref z);
+                    //  return;
+                    //}
+                    Array.Resize(ref p.aCol, p.nCol + 8);
+                }
+                p.aCol[p.nCol] = new Column();
+                pCol = p.aCol[p.nCol];
+                //memset(pCol, 0, sizeof(p.aCol[0]));
+                pCol.zName = z;
+                ///
+                ///<summary>
+                ///If there is no type specified, columns have the default affinity
+                ///'NONE'. If there is a type specified, then build.sqlite3AddColumnType() will
+                ///be called next to set pCol.affinity correctly.
+                ///
+                ///</summary>
+                pCol.affinity = SQLITE_AFF_NONE;
+                p.nCol++;
+            }
+            ///<summary>
+            /// This routine is called by the parser while in the middle of
+            /// parsing a CREATE TABLE statement.  A "NOT NULL" constraint has
+            /// been seen on a column.  This routine sets the notNull flag on
+            /// the column currently under construction.
+            ///
+            ///</summary>
+            public static void sqlite3AddNotNull(Parse pParse, int onError)
+            {
+                Table p;
+                p = pParse.pNewTable;
+                if (p == null || NEVER(p.nCol < 1))
+                    return;
+                p.aCol[p.nCol - 1].notNull = (u8)onError;
+            }
+            ///<summary>
+            /// Scan the column type name zType (length nType) and return the
+            /// associated affinity type.
+            ///
+            /// This routine does a case-independent search of zType for the
+            /// substrings in the following table. If one of the substrings is
+            /// found, the corresponding affinity is returned. If zType contains
+            /// more than one of the substrings, entries toward the top of
+            /// the table take priority. For example, if zType is 'BLOBINT',
+            /// SQLITE_AFF_INTEGER is returned.
+            ///
+            /// Substring     | Affinity
+            /// --------------------------------
+            /// 'INT'         | SQLITE_AFF_INTEGER
+            /// 'CHAR'        | SQLITE_AFF_TEXT
+            /// 'CLOB'        | SQLITE_AFF_TEXT
+            /// 'TEXT'        | SQLITE_AFF_TEXT
+            /// 'BLOB'        | SQLITE_AFF_NONE
+            /// 'REAL'        | SQLITE_AFF_REAL
+            /// 'FLOA'        | SQLITE_AFF_REAL
+            /// 'DOUB'        | SQLITE_AFF_REAL
+            ///
+            /// If none of the substrings in the above table are found,
+            /// SQLITE_AFF_NUMERIC is returned.
+            ///
+            ///</summary>
+            public static char sqlite3AffinityType(string zIn)
+            {
+                //u32 h = 0;
+                //char aff = SQLITE_AFF_NUMERIC;
+                zIn = zIn.ToLower();
+                if (zIn.Contains("char") || zIn.Contains("clob") || zIn.Contains("text"))
+                    return SQLITE_AFF_TEXT;
+                if (zIn.Contains("blob"))
+                    return SQLITE_AFF_NONE;
+                if (zIn.Contains("doub") || zIn.Contains("floa") || zIn.Contains("real"))
+                    return SQLITE_AFF_REAL;
+                if (zIn.Contains("int"))
+                    return SQLITE_AFF_INTEGER;
+                return SQLITE_AFF_NUMERIC;
+                //      string zEnd = pType.z.Substring(pType.n);
+                //      while( zIn!=zEnd ){
+                //        h = (h<<8) + sqlite3UpperToLower[*zIn];
+                //        zIn++;
+                //        if( h==(('c'<<24)+('h'<<16)+('a'<<8)+'r') ){             /* CHAR */
+                //          aff = SQLITE_AFF_TEXT;
+                //        }else if( h==(('c'<<24)+('l'<<16)+('o'<<8)+'b') ){       /* CLOB */
+                //          aff = SQLITE_AFF_TEXT;
+                //        }else if( h==(('t'<<24)+('e'<<16)+('x'<<8)+'t') ){       /* TEXT */
+                //          aff = SQLITE_AFF_TEXT;
+                //        }else if( h==(('b'<<24)+('l'<<16)+('o'<<8)+'b')          /* BLOB */
+                //            && (aff==SQLITE_AFF_NUMERIC || aff==SQLITE_AFF_REAL) ){
+                //          aff = SQLITE_AFF_NONE;
+                //#if !SQLITE_OMIT_FLOATING_POINT
+                //        }else if( h==(('r'<<24)+('e'<<16)+('a'<<8)+'l')          /* REAL */
+                //            && aff==SQLITE_AFF_NUMERIC ){
+                //          aff = SQLITE_AFF_REAL;
+                //        }else if( h==(('f'<<24)+('l'<<16)+('o'<<8)+'a')          /* FLOA */
+                //            && aff==SQLITE_AFF_NUMERIC ){
+                //          aff = SQLITE_AFF_REAL;
+                //        }else if( h==(('d'<<24)+('o'<<16)+('u'<<8)+'b')          /* DOUB */
+                //            && aff==SQLITE_AFF_NUMERIC ){
+                //          aff = SQLITE_AFF_REAL;
+                //#endif
+                //        }else if( (h&0x00FFFFFF)==(('i'<<16)+('n'<<8)+'t') ){    /* INT */
+                //          aff = SQLITE_AFF_INTEGER;
+                //          break;
+                //        }
+                //      }
+                //      return aff;
+            }
+            ///<summary>
+            /// This routine is called by the parser while in the middle of
+            /// parsing a CREATE TABLE statement.  The pFirst token is the first
+            /// token in the sequence of tokens that describe the type of the
+            /// column currently under construction.   pLast is the last token
+            /// in the sequence.  Use this information to construct a string
+            /// that contains the typename of the column and store that string
+            /// in zType.
+            ///
+            ///</summary>
+            public static void sqlite3AddColumnType(Parse pParse, Token pType)
+            {
+                Table p;
+                Column pCol;
+                p = pParse.pNewTable;
+                if (p == null || NEVER(p.nCol < 1))
+                    return;
+                pCol = p.aCol[p.nCol - 1];
+                Debug.Assert(pCol.zType == null);
+                pCol.zType = build.sqlite3NameFromToken(pParse.db, pType);
+                pCol.affinity = sqlite3AffinityType(pCol.zType);
+            }
+            ///
+            ///<summary>
+            ///The expression is the default value for the most recently added column
+            ///of the table currently under construction.
+            ///
+            ///Default value expressions must be constant.  Raise an exception if this
+            ///is not the case.
+            ///
+            ///This routine is called by the parser while in the middle of
+            ///parsing a CREATE TABLE statement.
+            ///
+            ///</summary>
+            public static void sqlite3AddDefaultValue(Parse pParse, ExprSpan pSpan)
+            {
+                Table p;
+                Column pCol;
+                sqlite3 db = pParse.db;
+                p = pParse.pNewTable;
+                if (p != null)
+                {
+                    pCol = (p.aCol[p.nCol - 1]);
+                    if (pSpan.pExpr.sqlite3ExprIsConstantOrFunction() == 0)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "default value of column [%s] is not constant", pCol.zName);
+                    }
+                    else
+                    {
+                        ///
+                        ///<summary>
+                        ///A copy of pExpr is used instead of the original, as pExpr contains
+                        ///tokens that point to volatile memory. The 'span' of the expression
+                        ///is required by pragma table_info.
+                        ///
+                        ///</summary>
+                        exprc.sqlite3ExprDelete(db, ref pCol.pDflt);
+                        pCol.pDflt = exprc.sqlite3ExprDup(db, pSpan.pExpr, EXPRDUP_REDUCE);
+                        db.sqlite3DbFree(ref pCol.zDflt);
+                        pCol.zDflt = pSpan.zStart.Substring(0, pSpan.zStart.Length - pSpan.zEnd.Length);
+                        //sqlite3DbStrNDup( db, pSpan.zStart,
+                        //                               (int)( pSpan.zEnd.Length - pSpan.zStart.Length ) );
+                    }
+                }
+                exprc.sqlite3ExprDelete(db, ref pSpan.pExpr);
+            }
+            ///<summary>
+            /// Designate the PRIMARY KEY for the table.  pList is a list of names
+            /// of columns that form the primary key.  If pList is NULL, then the
+            /// most recently added column of the table is the primary key.
+            ///
+            /// A table can have at most one primary key.  If the table already has
+            /// a primary key (and this is the second primary key) then create an
+            /// error.
+            ///
+            /// If the PRIMARY KEY is on a single column whose datatype is INTEGER,
+            /// then we will try to use that column as the rowid.  Set the Table.iPKey
+            /// field of the table under construction to be the index of the
+            /// INTEGER PRIMARY KEY column.  Table.iPKey is set to -1 if there is
+            /// no INTEGER PRIMARY KEY.
+            ///
+            /// If the key is not an INTEGER PRIMARY KEY, then create a unique
+            /// index for the key.  No index is created for INTEGER PRIMARY KEYs.
+            ///
+            ///</summary>
+            // OVERLOADS, so I don't need to rewrite parse.c
+            public static void sqlite3AddPrimaryKey(Parse pParse, int null_2, int onError, int autoInc, int sortOrder)
+            {
+                build.sqlite3AddPrimaryKey(pParse, null, onError, autoInc, sortOrder);
+            }
+            public static void sqlite3AddPrimaryKey(Parse pParse,///
+                ///<summary>
+                ///Parsing context 
+                ///</summary>
+            ExprList pList,///
+                ///<summary>
+                ///List of field names to be indexed 
+                ///</summary>
+            int onError,///
+                ///<summary>
+                ///What to do with a uniqueness conflict 
+                ///</summary>
+            int autoInc,///
+                ///<summary>
+                ///True if the AUTOINCREMENT keyword is present 
+                ///</summary>
+            int sortOrder///
+                ///<summary>
+                ///SQLITE_SO_ASC or SQLITE_SO_DESC 
+                ///</summary>
+            )
+            {
+                Table pTab = pParse.pNewTable;
+                string zType = null;
+                int iCol = -1, i;
+                if (pTab == null || IN_DECLARE_VTAB(pParse))
+                    goto primary_key_exit;
+                if ((pTab.tabFlags & TF_HasPrimaryKey) != 0)
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "table \"%s\" has more than one primary key", pTab.zName);
+                    goto primary_key_exit;
+                }
+                pTab.tabFlags |= TF_HasPrimaryKey;
+                if (pList == null)
+                {
+                    iCol = pTab.nCol - 1;
+                    pTab.aCol[iCol].isPrimKey = 1;
+                }
+                else
+                {
+                    for (i = 0; i < pList.nExpr; i++)
+                    {
+                        for (iCol = 0; iCol < pTab.nCol; iCol++)
+                        {
+                            if (pList.a[i].zName.Equals(pTab.aCol[iCol].zName, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                break;
+                            }
+                        }
+                        if (iCol < pTab.nCol)
+                        {
+                            pTab.aCol[iCol].isPrimKey = 1;
+                        }
+                    }
+                    if (pList.nExpr > 1)
+                        iCol = -1;
+                }
+                if (iCol >= 0 && iCol < pTab.nCol)
+                {
+                    zType = pTab.aCol[iCol].zType;
+                }
+                if (zType != null && zType.Equals("INTEGER", StringComparison.InvariantCultureIgnoreCase) && sortOrder == SQLITE_SO_ASC)
+                {
+                    pTab.iPKey = iCol;
+                    pTab.keyConf = (byte)onError;
+                    Debug.Assert(autoInc == 0 || autoInc == 1);
+                    pTab.tabFlags |= (u8)(autoInc * TF_Autoincrement);
+                }
+                else
+                    if (autoInc != 0)
+                    {
+#if !SQLITE_OMIT_AUTOINCREMENT
+                        utilc.sqlite3ErrorMsg(pParse, "AUTOINCREMENT is only allowed on an " + "INTEGER PRIMARY KEY");
+#endif
+                    }
+                    else
+                    {
+                        Index p;
+                        p = build.sqlite3CreateIndex(pParse, 0, 0, 0, pList, onError, 0, 0, sortOrder, 0);
+                        if (p != null)
+                        {
+                            p.autoIndex = 2;
+                        }
+                        pList = null;
+                    }
+            primary_key_exit:
+                exprc.sqlite3ExprListDelete(pParse.db, ref pList);
+                return;
+            }
+            ///<summary>
+            /// Add a new CHECK constraint to the table currently under construction.
+            ///
+            ///</summary>
+            public static void sqlite3AddCheckConstraint(Parse pParse,///
+                ///<summary>
+                ///Parsing context 
+                ///</summary>
+            Expr pCheckExpr///
+                ///<summary>
+                ///The check expression 
+                ///</summary>
+            )
+            {
+                sqlite3 db = pParse.db;
+#if !SQLITE_OMIT_CHECK
+                Table pTab = pParse.pNewTable;
+                if (pTab != null && !IN_DECLARE_VTAB(pParse))
+                {
+                    pTab.pCheck = exprc.sqlite3ExprAnd(db, pTab.pCheck, pCheckExpr);
+                }
+                else
+#endif
+                {
+                    exprc.sqlite3ExprDelete(db, ref pCheckExpr);
+                }
+            }
+            ///<summary>
+            /// Set the collation function of the most recently parsed table column
+            /// to the CollSeq given.
+            ///
+            ///</summary>
+            public static void sqlite3AddCollateType(Parse pParse, Token pToken)
+            {
+                Table p;
+                int i;
+                string zColl;
+                ///
+                ///<summary>
+                ///Dequoted name of collation sequence 
+                ///</summary>
+                sqlite3 db;
+                if ((p = pParse.pNewTable) == null)
+                    return;
+                i = p.nCol - 1;
+                db = pParse.db;
+                zColl = build.sqlite3NameFromToken(db, pToken);
+                if (zColl == null)
+                    return;
+                if (build.sqlite3LocateCollSeq(pParse, zColl) != null)
+                {
+                    Index pIdx;
+                    p.aCol[i].zColl = zColl;
+                    ///
+                    ///<summary>
+                    ///If the column is declared as "<name> PRIMARY KEY COLLATE <type>",
+                    ///then an index may have been created on this column before the
+                    ///collation type was added. Correct this if it is the case.
+                    ///
+                    ///</summary>
+                    for (pIdx = p.pIndex; pIdx != null; pIdx = pIdx.pNext)
+                    {
+                        Debug.Assert(pIdx.nColumn == 1);
+                        if (pIdx.aiColumn[0] == i)
+                        {
+                            pIdx.azColl[0] = p.aCol[i].zColl;
+                        }
+                    }
+                }
+                else
+                {
+                    db.sqlite3DbFree(ref zColl);
+                }
+            }
+            ///<summary>
+            /// This function returns the collation sequence for database native text
+            /// encoding identified by the string zName, length nName.
+            ///
+            /// If the requested collation sequence is not available, or not available
+            /// in the database native encoding, the collation factory is invoked to
+            /// request it. If the collation factory does not supply such a sequence,
+            /// and the sequence is available in another text encoding, then that is
+            /// returned instead.
+            ///
+            /// If no versions of the requested collations sequence are available, or
+            /// another error occurs, NULL is returned and an error message written into
+            /// pParse.
+            ///
+            /// This routine is a wrapper around sqlite3FindCollSeq().  This routine
+            /// invokes the collation factory if the named collation cannot be found
+            /// and generates an error message.
+            ///
+            /// See also: sqlite3FindCollSeq(), sqlite3GetCollSeq()
+            ///
+            ///</summary>
+            public static CollSeq sqlite3LocateCollSeq(Parse pParse, string zName)
+            {
+                sqlite3 db = pParse.db;
+                SqliteEncoding enc = db.aDb[0].pSchema.enc;
+                // ENC(db);
+                u8 initbusy = db.init.busy;
+                CollSeq pColl;
+                pColl = sqlite3FindCollSeq(db, enc, zName, initbusy);
+                if (0 == initbusy && (pColl == null || pColl.xCmp == null))
+                {
+                    pColl = sqlite3GetCollSeq(db, enc, pColl, zName);
+                    if (pColl == null)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "no such collation sequence: %s", zName);
+                    }
+                }
+                return pColl;
+            }
+            ///<summary>
+            /// Generate code that will increment the schema cookie.
+            ///
+            /// The schema cookie is used to determine when the schema for the
+            /// database changes.  After each schema change, the cookie value
+            /// changes.  When a process first reads the schema it records the
+            /// cookie.  Thereafter, whenever it goes to access the database,
+            /// it checks the cookie to make sure the schema has not changed
+            /// since it was last read.
+            ///
+            /// This plan is not completely bullet-proof.  It is possible for
+            /// the schema to change multiple times and for the cookie to be
+            /// set back to prior value.  But schema changes are infrequent
+            /// and the probability of hitting the same cookie value is only
+            /// 1 chance in 2^32.  So we're safe enough.
+            ///
+            ///</summary>
+            public static void sqlite3ChangeCookie(Parse pParse, int iDb)
+            {
+                int r1 = pParse.sqlite3GetTempReg();
+                sqlite3 db = pParse.db;
+                Vdbe v = pParse.pVdbe;
+                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                v.sqlite3VdbeAddOp2(OP_Integer, db.aDb[iDb].pSchema.schema_cookie + 1, r1);
+                v.sqlite3VdbeAddOp3(OP_SetCookie, iDb, BTREE_SCHEMA_VERSION, r1);
+                pParse.sqlite3ReleaseTempReg(r1);
+            }
+            ///<summary>
+            /// Measure the number of characters needed to output the given
+            /// identifier.  The number returned includes any quotes used
+            /// but does not include the null terminator.
+            ///
+            /// The estimate is conservative.  It might be larger that what is
+            /// really needed.
+            ///
+            ///</summary>
+            static int identLength(string z)
+            {
+                int n;
+                for (n = 0; n < z.Length; n++)
+                {
+                    if (z[n] == (byte)'"')
+                    {
+                        n++;
+                    }
+                }
+                return n + 2;
+            }
+            ///<summary>
+            /// The first parameter is a pointer to an output buffer. The second
+            /// parameter is a pointer to an integer that contains the offset at
+            /// which to write into the output buffer. This function copies the
+            /// nul-terminated string pointed to by the third parameter, zSignedIdent,
+            /// to the specified offset in the buffer and updates *pIdx to refer
+            /// to the first byte after the last byte written before returning.
+            ///
+            /// If the string zSignedIdent consists entirely of alpha-numeric
+            /// characters, does not begin with a digit and is not an SQL keyword,
+            /// then it is copied to the output buffer exactly as it is. Otherwise,
+            /// it is quoted using double-quotes.
+            ///
+            ///</summary>
+            static void identPut(StringBuilder z, ref int pIdx, string zSignedIdent)
+            {
+                string zIdent = zSignedIdent;
+                int i;
+                int j;
+                bool needQuote;
+                i = pIdx;
+                for (j = 0; j < zIdent.Length; j++)
+                {
+                    if (!CharExtensions.sqlite3Isalnum(zIdent[j]) && zIdent[j] != '_')
+                        break;
+                }
+                needQuote = CharExtensions.sqlite3Isdigit(zIdent[0]) || sqlite3KeywordCode(zIdent, j) != TK_ID;
+                if (!needQuote)
+                {
+                    needQuote = (j < zIdent.Length && zIdent[j] != 0);
+                }
+                if (needQuote)
+                {
+                    if (i == z.Length)
+                        z.Append('\0');
+                    z[i++] = '"';
+                }
+                for (j = 0; j < zIdent.Length; j++)
+                {
+                    if (i == z.Length)
+                        z.Append('\0');
+                    z[i++] = zIdent[j];
+                    if (zIdent[j] == '"')
+                    {
+                        if (i == z.Length)
+                            z.Append('\0');
+                        z[i++] = '"';
+                    }
+                }
+                if (needQuote)
+                {
+                    if (i == z.Length)
+                        z.Append('\0');
+                    z[i++] = '"';
+                }
+                //z[i] = 0;
+                pIdx = i;
+            }
+            ///
+            ///<summary>
+            ///Generate a CREATE TABLE statement appropriate for the given
+            ///table.  Memory to hold the text of the statement is obtained
+            ///from sqliteMalloc() and must be freed by the calling function.
+            ///
+            ///</summary>
+            static string createTableStmt(sqlite3 db, Table p)
+            {
+                int i, k, n;
+                StringBuilder zStmt;
+                string zSep;
+                string zSep2;
+                string zEnd;
+                Column pCol;
+                n = 0;
+                for (i = 0; i < p.nCol; i++)
+                {
+                    //, pCol++){
+                    pCol = p.aCol[i];
+                    n += identLength(pCol.zName) + 5;
+                }
+                n += identLength(p.zName);
+                if (n < 50)
+                {
+                    zSep = "";
+                    zSep2 = ",";
+                    zEnd = ")";
+                }
+                else
+                {
+                    zSep = "\n  ";
+                    zSep2 = ",\n  ";
+                    zEnd = "\n)";
+                }
+                n += 35 + 6 * p.nCol;
+                zStmt = new StringBuilder(n);
+                //zStmt = sqlite3DbMallocRaw(0, n);
+                //if( zStmt==0 ){
+                //  db.mallocFailed = 1;
+                //  return 0;
+                //}
+                //io.sqlite3_snprintf(n, zStmt,"CREATE TABLE ");
+                zStmt.Append("CREATE TABLE ");
+                k = StringExtensions.sqlite3Strlen30(zStmt);
+                identPut(zStmt, ref k, p.zName);
+                zStmt.Append('(');
+                //zStmt[k++] = '(';
+                for (i = 0; i < p.nCol; i++)
+                {
+                    //, pCol++){
+                    pCol = p.aCol[i];
+                    string[] azType = new string[] {
 					///
 					///<summary>
 					///SQLITE_AFF_TEXT    
@@ -1733,412 +1865,438 @@ goto begin_table_error;
 					///</summary>
 					" REAL"
 				};
-				int len;
-				string zType;
-				zStmt.Append(zSep);
-				//  io.sqlite3_snprintf(n-k, zStmt[k], zSep);
-				k=StringExtensions.sqlite3Strlen30(zStmt);
-				//  k += strlen(zStmt[k]);
-				zSep=zSep2;
-				identPut(zStmt,ref k,pCol.zName);
-				Debug.Assert(pCol.affinity-SQLITE_AFF_TEXT>=0);
-				Debug.Assert(pCol.affinity-SQLITE_AFF_TEXT<ArraySize(azType));
-				testcase(pCol.affinity==SQLITE_AFF_TEXT);
-				testcase(pCol.affinity==SQLITE_AFF_NONE);
-				testcase(pCol.affinity==SQLITE_AFF_NUMERIC);
-				testcase(pCol.affinity==SQLITE_AFF_INTEGER);
-				testcase(pCol.affinity==SQLITE_AFF_REAL);
-				zType=azType[pCol.affinity-SQLITE_AFF_TEXT];
-				len=StringExtensions.sqlite3Strlen30(zType);
-				Debug.Assert(pCol.affinity==SQLITE_AFF_NONE||pCol.affinity==sqlite3AffinityType(zType));
-				zStmt.Append(zType);
-				// memcpy( &zStmt[k], zType, len );
-				k+=len;
-				Debug.Assert(k<=n);
-			}
-			zStmt.Append(zEnd);
-			//sqlite3_snprintf(n-k, zStmt[k], "%s", zEnd);
-			return zStmt.ToString();
-		}
-		///<summary>
-		/// This routine is called to report the final ")" that terminates
-		/// a CREATE TABLE statement.
-		///
-		/// The table structure that other action routines have been building
-		/// is added to the internal hash tables, assuming no errors have
-		/// occurred.
-		///
-		/// An entry for the table is made in the master table on disk, unless
-		/// this is a temporary table or db.init.busy==1.  When db.init.busy==1
-		/// it means we are reading the sqlite_master table because we just
-		/// connected to the database or because the sqlite_master table has
-		/// recently changed, so the entry for this table already exists in
-		/// the sqlite_master table.  We do not want to create it again.
-		///
-		/// If the pSelect argument is not NULL, it means that this routine
-		/// was called to create a table generated from a
-		/// "CREATE TABLE ... AS SELECT ..." statement.  The column names of
-		/// the new table will match the result set of the SELECT.
-		///
-		///</summary>
-		// OVERLOADS, so I don't need to rewrite parse.c
-		static void sqlite3EndTable(Parse pParse,Token pCons,Token pEnd,int null_4) {
-			sqlite3EndTable(pParse,pCons,pEnd,null);
-		}
-		static void sqlite3EndTable(Parse pParse,int null_2,int null_3,Select pSelect) {
-			sqlite3EndTable(pParse,null,null,pSelect);
-		}
-		static void sqlite3EndTable(Parse pParse,///
-		///<summary>
-		///Parse context 
-		///</summary>
-		Token pCons,///
-		///<summary>
-		///The ',' token after the last column defn. 
-		///</summary>
-		Token pEnd,///
-		///<summary>
-		///The final ')' token in the CREATE TABLE 
-		///</summary>
-		Select pSelect///
-		///<summary>
-		///Select from a "CREATE ... AS SELECT" 
-		///</summary>
-		) {
-			Table p;
-			sqlite3 db=pParse.db;
-			int iDb;
-			if((pEnd==null&&pSelect==null)///
-			///<summary>
-			///|| db.mallocFailed != 0 
-			///</summary>
-			) {
-				return;
-			}
-			p=pParse.pNewTable;
-			if(p==null)
-				return;
-			Debug.Assert(0==db.init.busy||pSelect==null);
-			iDb=sqlite3SchemaToIndex(db,p.pSchema);
-			#if !SQLITE_OMIT_CHECK
-			///
-			///<summary>
-			///Resolve names in all CHECK constraint expressions.
-			///</summary>
-			if(p.pCheck!=null) {
-				SrcList sSrc;
-				///
-				///<summary>
-				///Fake SrcList for pParse.pNewTable 
-				///</summary>
-				NameContext sNC;
-				///
-				///<summary>
-				///Name context for pParse.pNewTable 
-				///</summary>
-				sNC=new NameContext();
-				// memset(sNC, 0, sizeof(sNC));
-				sSrc=new SrcList();
-				// memset(sSrc, 0, sizeof(sSrc));
-				sSrc.nSrc=1;
-				sSrc.a=new SrcList_item[1];
-				sSrc.a[0]=new SrcList_item();
-				sSrc.a[0].zName=p.zName;
-				sSrc.a[0].pTab=p;
-				sSrc.a[0].iCursor=-1;
-				sNC.pParse=pParse;
-				sNC.pSrcList=sSrc;
-				sNC.isCheck=1;
-                if (ResolveExtensions.sqlite3ResolveExprNames(sNC, ref p.pCheck) != 0)
+                    int len;
+                    string zType;
+                    zStmt.Append(zSep);
+                    //  io.sqlite3_snprintf(n-k, zStmt[k], zSep);
+                    k = StringExtensions.sqlite3Strlen30(zStmt);
+                    //  k += strlen(zStmt[k]);
+                    zSep = zSep2;
+                    identPut(zStmt, ref k, pCol.zName);
+                    Debug.Assert(pCol.affinity - SQLITE_AFF_TEXT >= 0);
+                    Debug.Assert(pCol.affinity - SQLITE_AFF_TEXT < ArraySize(azType));
+                    testcase(pCol.affinity == SQLITE_AFF_TEXT);
+                    testcase(pCol.affinity == SQLITE_AFF_NONE);
+                    testcase(pCol.affinity == SQLITE_AFF_NUMERIC);
+                    testcase(pCol.affinity == SQLITE_AFF_INTEGER);
+                    testcase(pCol.affinity == SQLITE_AFF_REAL);
+                    zType = azType[pCol.affinity - SQLITE_AFF_TEXT];
+                    len = StringExtensions.sqlite3Strlen30(zType);
+                    Debug.Assert(pCol.affinity == SQLITE_AFF_NONE || pCol.affinity == sqlite3AffinityType(zType));
+                    zStmt.Append(zType);
+                    // memcpy( &zStmt[k], zType, len );
+                    k += len;
+                    Debug.Assert(k <= n);
+                }
+                zStmt.Append(zEnd);
+                //sqlite3_snprintf(n-k, zStmt[k], "%s", zEnd);
+                return zStmt.ToString();
+            }
+            ///<summary>
+            /// This routine is called to report the final ")" that terminates
+            /// a CREATE TABLE statement.
+            ///
+            /// The table structure that other action routines have been building
+            /// is added to the internal hash tables, assuming no errors have
+            /// occurred.
+            ///
+            /// An entry for the table is made in the master table on disk, unless
+            /// this is a temporary table or db.init.busy==1.  When db.init.busy==1
+            /// it means we are reading the sqlite_master table because we just
+            /// connected to the database or because the sqlite_master table has
+            /// recently changed, so the entry for this table already exists in
+            /// the sqlite_master table.  We do not want to create it again.
+            ///
+            /// If the pSelect argument is not NULL, it means that this routine
+            /// was called to create a table generated from a
+            /// "CREATE TABLE ... AS SELECT ..." statement.  The column names of
+            /// the new table will match the result set of the SELECT.
+            ///
+            ///</summary>
+            // OVERLOADS, so I don't need to rewrite parse.c
+            public static void sqlite3EndTable(Parse pParse, Token pCons, Token pEnd, int null_4)
+            {
+                sqlite3EndTable(pParse, pCons, pEnd, null);
+            }
+            public static void sqlite3EndTable(Parse pParse, int null_2, int null_3, Select pSelect)
+            {
+                sqlite3EndTable(pParse, null, null, pSelect);
+            }
+            public static void sqlite3EndTable(Parse pParse,///
+                ///<summary>
+                ///Parse context 
+                ///</summary>
+            Token pCons,///
+                ///<summary>
+                ///The ',' token after the last column defn. 
+                ///</summary>
+            Token pEnd,///
+                ///<summary>
+                ///The final ')' token in the CREATE TABLE 
+                ///</summary>
+            Select pSelect///
+                ///<summary>
+                ///Select from a "CREATE ... AS SELECT" 
+                ///</summary>
+            )
+            {
+                Table p;
+                sqlite3 db = pParse.db;
+                int iDb;
+                if ((pEnd == null && pSelect == null)///
+                    ///<summary>
+                    ///|| db.mallocFailed != 0 
+                    ///</summary>
+                )
                 {
-					return;
-				}
-			}
-			#endif
-			///
-			///<summary>
-			///If the db.init.busy is 1 it means we are reading the SQL off the
-			///"sqlite_master" or "sqlite_temp_master" table on the disk.
-			///So do not write to the disk again.  Extract the root page number
-			///for the table from the db.init.newTnum field.  (The page number
-			///should have been put there by the sqliteOpenCb routine.)
-			///</summary>
-			if(db.init.busy!=0) {
-				p.tnum=db.init.newTnum;
-			}
-			///
-			///<summary>
-			///If not initializing, then create a record for the new table
-			///in the SQLITE_MASTER table of the database.
-			///
-			///If this is a TEMPORARY table, write the entry into the auxiliary
-			///file instead of into the main database file.
-			///
-			///</summary>
-			if(0==db.init.busy) {
-				int n;
-				Vdbe v;
-				String zType="";
-				///
-				///<summary>
-				///"view" or "table" 
-				///</summary>
-				String zType2="";
-				///
-				///<summary>
-				///"VIEW" or "TABLE" 
-				///</summary>
-				String zStmt="";
-				///
-				///<summary>
-				///Text of the CREATE TABLE or CREATE VIEW statement 
-				///</summary>
-				v=pParse.sqlite3GetVdbe();
-				if(NEVER(v==null))
-					return;
-				v.sqlite3VdbeAddOp1(OpCode.OP_Close,0);
-				///
-				///<summary>
-				///Initialize zType for the new view or table.
-				///
-				///</summary>
-				if(p.pSelect==null) {
-					///
-					///<summary>
-					///A regular table 
-					///</summary>
-					zType="table";
-					zType2="TABLE";
-					#if !SQLITE_OMIT_VIEW
-				}
-				else {
-					///
-					///<summary>
-					///A view 
-					///</summary>
-					zType="view";
-					zType2="VIEW";
-					#endif
-				}
-				///
-				///<summary>
-				///If this is a CREATE TABLE xx AS SELECT ..., execute the SELECT
-				///</summary>
-				///<param name="statement to populate the new table. The root">page number for the</param>
-				///<param name="new table is in register pParse">>regRoot.</param>
-				///<param name=""></param>
-				///<param name="Once the SELECT has been coded by sqlite3Select(), it is in a">Once the SELECT has been coded by sqlite3Select(), it is in a</param>
-				///<param name="suitable state to query for the column names and types to be used">suitable state to query for the column names and types to be used</param>
-				///<param name="by the new table.">by the new table.</param>
-				///<param name=""></param>
-				///<param name="A shared">lock is not required to write to the new table,</param>
-				///<param name="as a schema">lock must have already been obtained to create it. Since</param>
-				///<param name="a schema">lock would</param>
-				///<param name="be redundant.">be redundant.</param>
-				///<param name=""></param>
-				if(pSelect!=null) {
-					SelectDest dest=new SelectDest();
-					Table pSelTab;
-					Debug.Assert(pParse.nTab==1);
-					v.sqlite3VdbeAddOp3(OP_OpenWrite,1,pParse.regRoot,iDb);
-					v.sqlite3VdbeChangeP5(1);
-					pParse.nTab=2;
-                    dest.Init(SelectResultType.Table, 1);
-					Select.sqlite3Select(pParse,pSelect,ref dest);
-					v.sqlite3VdbeAddOp1(OpCode.OP_Close,1);
-					if(pParse.nErr==0) {
-						pSelTab=sqlite3ResultSetOfSelect(pParse,pSelect);
-						if(pSelTab==null)
-							return;
-						Debug.Assert(p.aCol==null);
-						p.nCol=pSelTab.nCol;
-						p.aCol=pSelTab.aCol;
-						pSelTab.nCol=0;
-						pSelTab.aCol=null;
-						sqlite3DeleteTable(db,ref pSelTab);
-					}
-				}
-				///
-				///<summary>
-				///Compute the complete text of the CREATE statement 
-				///</summary>
-				if(pSelect!=null) {
-					zStmt=createTableStmt(db,p);
-				}
-				else {
-					n=(int)(pParse.sNameToken.zRestSql.Length-pEnd.zRestSql.Length)+1;
-					zStmt=io.sqlite3MPrintf(db,"CREATE %s %.*s",zType2,n,pParse.sNameToken.zRestSql);
-				}
-				///
-				///<summary>
-				///A slot for the record has already been allocated in the
-				///SQLITE_MASTER table.  We just need to update that slot with all
-				///the information we've collected.
-				///
-				///</summary>
-				sqlite3NestedParse(pParse,"UPDATE %Q.%s "+"SET type='%s', name=%Q, tbl_name=%Q, rootpage=#%d, sql=%Q "+"WHERE rowid=#%d",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),zType,p.zName,p.zName,pParse.regRoot,zStmt,pParse.regRowid);
-				db.sqlite3DbFree(ref zStmt);
-				sqlite3ChangeCookie(pParse,iDb);
-				#if !SQLITE_OMIT_AUTOINCREMENT
-				///
-				///<summary>
-				///Check to see if we need to create an sqlite_sequence table for
-				///keeping track of autoincrement keys.
-				///</summary>
-				if((p.tabFlags&TF_Autoincrement)!=0) {
-					Db pDb=db.aDb[iDb];
-					Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-					if(pDb.pSchema.pSeqTab==null) {
-						sqlite3NestedParse(pParse,"CREATE TABLE %Q.sqlite_sequence(name,seq)",pDb.zName);
-					}
-				}
-				#endif
-				///
-				///<summary>
-				///Reparse everything to update our internal data structures 
-				///</summary>
-				v.sqlite3VdbeAddParseSchemaOp(iDb,io.sqlite3MPrintf(db,"tbl_name='%q'",p.zName));
-			}
-			///
-			///<summary>
-			///</summary>
-			///<param name="Add the table to the in">memory representation of the database.</param>
-			///<param name=""></param>
-			if(db.init.busy!=0) {
-				Table pOld;
-				Schema pSchema=p.pSchema;
-				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-				pOld=sqlite3HashInsert(ref pSchema.tblHash,p.zName,StringExtensions.sqlite3Strlen30(p.zName),p);
-				if(pOld!=null) {
-					Debug.Assert(p==pOld);
-					///
-					///<summary>
-					///Malloc must have failed inside HashInsert() 
-					///</summary>
-					//        db.mallocFailed = 1;
-					return;
-				}
-				pParse.pNewTable=null;
-				db.nTable++;
-				db.flags|=SQLITE_InternChanges;
-				#if !SQLITE_OMIT_ALTERTABLE
-				if(p.pSelect==null) {
-					string zName=pParse.sNameToken.zRestSql;
-					int nName;
-					Debug.Assert(pSelect==null&&pCons!=null&&pEnd!=null);
-					if(pCons.zRestSql==null) {
-						pCons=pEnd;
-					}
-					nName=zName.Length-pCons.zRestSql.Length;
-					p.addColOffset=13+nName;
-					// sqlite3Utf8CharLen(zName, nName);
-				}
-				#endif
-			}
-		}
-		#if !SQLITE_OMIT_VIEW
-		///<summary>
-		/// The parser calls this routine in order to create a new VIEW
-		///</summary>
-		static void sqlite3CreateView(Parse pParse,///
-		///<summary>
-		///The parsing context 
-		///</summary>
-		Token pBegin,///
-		///<summary>
-		///The CREATE token that begins the statement 
-		///</summary>
-		Token pName1,///
-		///<summary>
-		///The token that holds the name of the view 
-		///</summary>
-		Token pName2,///
-		///<summary>
-		///The token that holds the name of the view 
-		///</summary>
-		Select pSelect,///
-		///<summary>
-		///A SELECT statement that will become the new view 
-		///</summary>
-		int isTemp,///
-		///<summary>
-		///TRUE for a TEMPORARY view 
-		///</summary>
-		int noErr///
-		///<summary>
-		///Suppress error messages if VIEW already exists 
-		///</summary>
-		) {
-			Table p;
-			int n;
-			string z;
-			//string z;
-			Token sEnd;
-			DbFixer sFix=new DbFixer();
-			Token pName=null;
-			int iDb;
-			sqlite3 db=pParse.db;
-			if(pParse.nVar>0) {
-				utilc.sqlite3ErrorMsg(pParse,"parameters are not allowed in views");
-				sqlite3SelectDelete(db,ref pSelect);
-				return;
-			}
-			sqlite3StartTable(pParse,pName1,pName2,isTemp,1,0,noErr);
-			p=pParse.pNewTable;
-			if(p==null||pParse.nErr!=0) {
-				sqlite3SelectDelete(db,ref pSelect);
-				return;
-			}
-			sqlite3TwoPartName(pParse,pName1,pName2,ref pName);
-			iDb=sqlite3SchemaToIndex(db,p.pSchema);
-			if(sFix.sqlite3FixInit(pParse,iDb,"view",pName)!=0&&sFix.sqlite3FixSelect(pSelect)!=0) {
-				sqlite3SelectDelete(db,ref pSelect);
-				return;
-			}
-			///
-			///<summary>
-			///Make a copy of the entire SELECT statement that defines the view.
-			///This will force all the Expr.token.z values to be dynamically
-			///</summary>
-			///<param name="allocated rather than point to the input string "> which means that</param>
-			///<param name="they will persist after the current sqlite3_exec() call returns.">they will persist after the current sqlite3_exec() call returns.</param>
-			///<param name=""></param>
-			p.pSelect=exprc.sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
-			sqlite3SelectDelete(db,ref pSelect);
-			//if ( db.mallocFailed != 0 )
-			//{
-			//  return;
-			//}
-			if(0==db.init.busy) {
-				sqlite3ViewGetColumnNames(pParse,p);
-			}
-			///
-			///<summary>
-			///Locate the end of the CREATE VIEW statement.  Make sEnd point to
-			///the end.
-			///
-			///</summary>
-			sEnd=pParse.sLastToken;
-			if(ALWAYS(sEnd.zRestSql[0]!=0)&&sEnd.zRestSql[0]!=';') {
-				sEnd.zRestSql=sEnd.zRestSql.Substring(sEnd.Length);
-			}
-			sEnd.Length=0;
-			n=(int)(pBegin.zRestSql.Length-sEnd.zRestSql.Length);
-			//sEnd.z - pBegin.z;
-			z=pBegin.zRestSql;
-			while(ALWAYS(n>0)&&CharExtensions.sqlite3Isspace(z[n-1])) {
-				n--;
-			}
-			sEnd.zRestSql=z.Substring(n-1);
-			sEnd.Length=1;
-			///
-			///<summary>
-			///Use sqlite3EndTable() to add the view to the SQLITE_MASTER table 
-			///</summary>
-			sqlite3EndTable(pParse,null,sEnd,null);
-			return;
-		}
-		#else
+                    return;
+                }
+                p = pParse.pNewTable;
+                if (p == null)
+                    return;
+                Debug.Assert(0 == db.init.busy || pSelect == null);
+                iDb = sqlite3SchemaToIndex(db, p.pSchema);
+#if !SQLITE_OMIT_CHECK
+                ///
+                ///<summary>
+                ///Resolve names in all CHECK constraint expressions.
+                ///</summary>
+                if (p.pCheck != null)
+                {
+                    SrcList sSrc;
+                    ///
+                    ///<summary>
+                    ///Fake SrcList for pParse.pNewTable 
+                    ///</summary>
+                    NameContext sNC;
+                    ///
+                    ///<summary>
+                    ///Name context for pParse.pNewTable 
+                    ///</summary>
+                    sNC = new NameContext();
+                    // memset(sNC, 0, sizeof(sNC));
+                    sSrc = new SrcList();
+                    // memset(sSrc, 0, sizeof(sSrc));
+                    sSrc.nSrc = 1;
+                    sSrc.a = new SrcList_item[1];
+                    sSrc.a[0] = new SrcList_item();
+                    sSrc.a[0].zName = p.zName;
+                    sSrc.a[0].pTab = p;
+                    sSrc.a[0].iCursor = -1;
+                    sNC.pParse = pParse;
+                    sNC.pSrcList = sSrc;
+                    sNC.isCheck = 1;
+                    if (ResolveExtensions.sqlite3ResolveExprNames(sNC, ref p.pCheck) != 0)
+                    {
+                        return;
+                    }
+                }
+#endif
+                ///
+                ///<summary>
+                ///If the db.init.busy is 1 it means we are reading the SQL off the
+                ///"sqlite_master" or "sqlite_temp_master" table on the disk.
+                ///So do not write to the disk again.  Extract the root page number
+                ///for the table from the db.init.newTnum field.  (The page number
+                ///should have been put there by the sqliteOpenCb routine.)
+                ///</summary>
+                if (db.init.busy != 0)
+                {
+                    p.tnum = db.init.newTnum;
+                }
+                ///
+                ///<summary>
+                ///If not initializing, then create a record for the new table
+                ///in the SQLITE_MASTER table of the database.
+                ///
+                ///If this is a TEMPORARY table, write the entry into the auxiliary
+                ///file instead of into the main database file.
+                ///
+                ///</summary>
+                if (0 == db.init.busy)
+                {
+                    int n;
+                    Vdbe v;
+                    String zType = "";
+                    ///
+                    ///<summary>
+                    ///"view" or "table" 
+                    ///</summary>
+                    String zType2 = "";
+                    ///
+                    ///<summary>
+                    ///"VIEW" or "TABLE" 
+                    ///</summary>
+                    String zStmt = "";
+                    ///
+                    ///<summary>
+                    ///Text of the CREATE TABLE or CREATE VIEW statement 
+                    ///</summary>
+                    v = pParse.sqlite3GetVdbe();
+                    if (NEVER(v == null))
+                        return;
+                    v.sqlite3VdbeAddOp1(OpCode.OP_Close, 0);
+                    ///
+                    ///<summary>
+                    ///Initialize zType for the new view or table.
+                    ///
+                    ///</summary>
+                    if (p.pSelect == null)
+                    {
+                        ///
+                        ///<summary>
+                        ///A regular table 
+                        ///</summary>
+                        zType = "table";
+                        zType2 = "TABLE";
+#if !SQLITE_OMIT_VIEW
+                    }
+                    else
+                    {
+                        ///
+                        ///<summary>
+                        ///A view 
+                        ///</summary>
+                        zType = "view";
+                        zType2 = "VIEW";
+#endif
+                    }
+                    ///
+                    ///<summary>
+                    ///If this is a CREATE TABLE xx AS SELECT ..., execute the SELECT
+                    ///</summary>
+                    ///<param name="statement to populate the new table. The root">page number for the</param>
+                    ///<param name="new table is in register pParse">>regRoot.</param>
+                    ///<param name=""></param>
+                    ///<param name="Once the SELECT has been coded by sqlite3Select(), it is in a">Once the SELECT has been coded by sqlite3Select(), it is in a</param>
+                    ///<param name="suitable state to query for the column names and types to be used">suitable state to query for the column names and types to be used</param>
+                    ///<param name="by the new table.">by the new table.</param>
+                    ///<param name=""></param>
+                    ///<param name="A shared">lock is not required to write to the new table,</param>
+                    ///<param name="as a schema">lock must have already been obtained to create it. Since</param>
+                    ///<param name="a schema">lock would</param>
+                    ///<param name="be redundant.">be redundant.</param>
+                    ///<param name=""></param>
+                    if (pSelect != null)
+                    {
+                        SelectDest dest = new SelectDest();
+                        Table pSelTab;
+                        Debug.Assert(pParse.nTab == 1);
+                        v.sqlite3VdbeAddOp3(OP_OpenWrite, 1, pParse.regRoot, iDb);
+                        v.sqlite3VdbeChangeP5(1);
+                        pParse.nTab = 2;
+                        dest.Init(SelectResultType.Table, 1);
+                        Select.sqlite3Select(pParse, pSelect, ref dest);
+                        v.sqlite3VdbeAddOp1(OpCode.OP_Close, 1);
+                        if (pParse.nErr == 0)
+                        {
+                            pSelTab = sqlite3ResultSetOfSelect(pParse, pSelect);
+                            if (pSelTab == null)
+                                return;
+                            Debug.Assert(p.aCol == null);
+                            p.nCol = pSelTab.nCol;
+                            p.aCol = pSelTab.aCol;
+                            pSelTab.nCol = 0;
+                            pSelTab.aCol = null;
+                            build.sqlite3DeleteTable(db, ref pSelTab);
+                        }
+                    }
+                    ///
+                    ///<summary>
+                    ///Compute the complete text of the CREATE statement 
+                    ///</summary>
+                    if (pSelect != null)
+                    {
+                        zStmt = createTableStmt(db, p);
+                    }
+                    else
+                    {
+                        n = (int)(pParse.sNameToken.zRestSql.Length - pEnd.zRestSql.Length) + 1;
+                        zStmt = io.sqlite3MPrintf(db, "CREATE %s %.*s", zType2, n, pParse.sNameToken.zRestSql);
+                    }
+                    ///
+                    ///<summary>
+                    ///A slot for the record has already been allocated in the
+                    ///SQLITE_MASTER table.  We just need to update that slot with all
+                    ///the information we've collected.
+                    ///
+                    ///</summary>
+                    build.sqlite3NestedParse(pParse, "UPDATE %Q.%s " + "SET type='%s', name=%Q, tbl_name=%Q, rootpage=#%d, sql=%Q " + "WHERE rowid=#%d", db.aDb[iDb].zName, SCHEMA_TABLE(iDb), zType, p.zName, p.zName, pParse.regRoot, zStmt, pParse.regRowid);
+                    db.sqlite3DbFree(ref zStmt);
+                    sqlite3ChangeCookie(pParse, iDb);
+#if !SQLITE_OMIT_AUTOINCREMENT
+                    ///
+                    ///<summary>
+                    ///Check to see if we need to create an sqlite_sequence table for
+                    ///keeping track of autoincrement keys.
+                    ///</summary>
+                    if ((p.tabFlags & TF_Autoincrement) != 0)
+                    {
+                        Db pDb = db.aDb[iDb];
+                        Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                        if (pDb.pSchema.pSeqTab == null)
+                        {
+                            build.sqlite3NestedParse(pParse, "CREATE TABLE %Q.sqlite_sequence(name,seq)", pDb.zName);
+                        }
+                    }
+#endif
+                    ///
+                    ///<summary>
+                    ///Reparse everything to update our internal data structures 
+                    ///</summary>
+                    v.sqlite3VdbeAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "tbl_name='%q'", p.zName));
+                }
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Add the table to the in">memory representation of the database.</param>
+                ///<param name=""></param>
+                if (db.init.busy != 0)
+                {
+                    Table pOld;
+                    Schema pSchema = p.pSchema;
+                    Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                    pOld = sqlite3HashInsert(ref pSchema.tblHash, p.zName, StringExtensions.sqlite3Strlen30(p.zName), p);
+                    if (pOld != null)
+                    {
+                        Debug.Assert(p == pOld);
+                        ///
+                        ///<summary>
+                        ///Malloc must have failed inside HashInsert() 
+                        ///</summary>
+                        //        db.mallocFailed = 1;
+                        return;
+                    }
+                    pParse.pNewTable = null;
+                    db.nTable++;
+                    db.flags |= SQLITE_InternChanges;
+#if !SQLITE_OMIT_ALTERTABLE
+                    if (p.pSelect == null)
+                    {
+                        string zName = pParse.sNameToken.zRestSql;
+                        int nName;
+                        Debug.Assert(pSelect == null && pCons != null && pEnd != null);
+                        if (pCons.zRestSql == null)
+                        {
+                            pCons = pEnd;
+                        }
+                        nName = zName.Length - pCons.zRestSql.Length;
+                        p.addColOffset = 13 + nName;
+                        // sqlite3Utf8CharLen(zName, nName);
+                    }
+#endif
+                }
+            }
+#if !SQLITE_OMIT_VIEW
+            ///<summary>
+            /// The parser calls this routine in order to create a new VIEW
+            ///</summary>
+            public static void sqlite3CreateView(Parse pParse,///
+                ///<summary>
+                ///The parsing context 
+                ///</summary>
+            Token pBegin,///
+                ///<summary>
+                ///The CREATE token that begins the statement 
+                ///</summary>
+            Token pName1,///
+                ///<summary>
+                ///The token that holds the name of the view 
+                ///</summary>
+            Token pName2,///
+                ///<summary>
+                ///The token that holds the name of the view 
+                ///</summary>
+            Select pSelect,///
+                ///<summary>
+                ///A SELECT statement that will become the new view 
+                ///</summary>
+            int isTemp,///
+                ///<summary>
+                ///TRUE for a TEMPORARY view 
+                ///</summary>
+            int noErr///
+                ///<summary>
+                ///Suppress error messages if VIEW already exists 
+                ///</summary>
+            )
+            {
+                Table p;
+                int n;
+                string z;
+                //string z;
+                Token sEnd;
+                DbFixer sFix = new DbFixer();
+                Token pName = null;
+                int iDb;
+                sqlite3 db = pParse.db;
+                if (pParse.nVar > 0)
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "parameters are not allowed in views");
+                    sqlite3SelectDelete(db, ref pSelect);
+                    return;
+                }
+                build.sqlite3StartTable(pParse, pName1, pName2, isTemp, 1, 0, noErr);
+                p = pParse.pNewTable;
+                if (p == null || pParse.nErr != 0)
+                {
+                    sqlite3SelectDelete(db, ref pSelect);
+                    return;
+                }
+                build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
+                iDb = sqlite3SchemaToIndex(db, p.pSchema);
+                if (sFix.sqlite3FixInit(pParse, iDb, "view", pName) != 0 && sFix.sqlite3FixSelect(pSelect) != 0)
+                {
+                    sqlite3SelectDelete(db, ref pSelect);
+                    return;
+                }
+                ///
+                ///<summary>
+                ///Make a copy of the entire SELECT statement that defines the view.
+                ///This will force all the Expr.token.z values to be dynamically
+                ///</summary>
+                ///<param name="allocated rather than point to the input string "> which means that</param>
+                ///<param name="they will persist after the current sqlite3_exec() call returns.">they will persist after the current sqlite3_exec() call returns.</param>
+                ///<param name=""></param>
+                p.pSelect = exprc.sqlite3SelectDup(db, pSelect, EXPRDUP_REDUCE);
+                sqlite3SelectDelete(db, ref pSelect);
+                //if ( db.mallocFailed != 0 )
+                //{
+                //  return;
+                //}
+                if (0 == db.init.busy)
+                {
+                    build.sqlite3ViewGetColumnNames(pParse, p);
+                }
+                ///
+                ///<summary>
+                ///Locate the end of the CREATE VIEW statement.  Make sEnd point to
+                ///the end.
+                ///
+                ///</summary>
+                sEnd = pParse.sLastToken;
+                if (ALWAYS(sEnd.zRestSql[0] != 0) && sEnd.zRestSql[0] != ';')
+                {
+                    sEnd.zRestSql = sEnd.zRestSql.Substring(sEnd.Length);
+                }
+                sEnd.Length = 0;
+                n = (int)(pBegin.zRestSql.Length - sEnd.zRestSql.Length);
+                //sEnd.z - pBegin.z;
+                z = pBegin.zRestSql;
+                while (ALWAYS(n > 0) && CharExtensions.sqlite3Isspace(z[n - 1]))
+                {
+                    n--;
+                }
+                sEnd.zRestSql = z.Substring(n - 1);
+                sEnd.Length = 1;
+                ///
+                ///<summary>
+                ///Use sqlite3EndTable() to add the view to the SQLITE_MASTER table 
+                ///</summary>
+                sqlite3EndTable(pParse, null, sEnd, null);
+                return;
+            }
+#else
 																																																						    static void sqlite3CreateView(
     Parse pParse,     /* The parsing context */
     Token pBegin,     /* The CREATE token that begins the statement */
@@ -2151,238 +2309,253 @@ goto begin_table_error;
     {
     }
 #endif
-		#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_VIRTUALTABLE
-		///<summary>
-		/// The Table structure pTable is really a VIEW.  Fill in the names of
-		/// the columns of the view in the pTable structure.  Return the number
-		/// of errors.  If an error is seen leave an error message in pParse.zErrMsg.
-		///</summary>
-		static int sqlite3ViewGetColumnNames(Parse pParse,Table pTable) {
-			Table pSelTab;
-			///
-			///<summary>
-			///A fake table from which we get the result set 
-			///</summary>
-			Select pSel;
-			///
-			///<summary>
-			///Copy of the SELECT that implements the view 
-			///</summary>
-			int nErr=0;
-			///
-			///<summary>
-			///Number of errors encountered 
-			///</summary>
-			int n;
-			///
-			///<summary>
-			///Temporarily holds the number of cursors assigned 
-			///</summary>
-			sqlite3 db=pParse.db;
-			///
-			///<summary>
-			///Database connection for malloc errors 
-			///</summary>
-			dxAuth xAuth;
-			//)(void*,int,const char*,const char*,const char*,const char);
-			Debug.Assert(pTable!=null);
-			#if !SQLITE_OMIT_VIRTUALTABLE
-			if(pParse.sqlite3VtabCallConnect(pTable)!=0) {
-				return SQLITE_ERROR;
-			}
-			#endif
-			if(IsVirtual(pTable))
-				return 0;
-			#if !SQLITE_OMIT_VIEW
-			///
-			///<summary>
-			///A positive nCol means the columns names for this view are
-			///already known.
-			///</summary>
-			if(pTable.nCol>0)
-				return 0;
-			///
-			///<summary>
-			///A negative nCol is a special marker meaning that we are currently
-			///trying to compute the column names.  If we enter this routine with
-			///a negative nCol, it means two or more views form a loop, like this:
-			///
-			///CREATE VIEW one AS SELECT * FROM two;
-			///CREATE VIEW two AS SELECT * FROM one;
-			///
-			///Actually, the error above is now caught prior to reaching this point.
-			///But the following test is still important as it does come up
-			///in the following:
-			///
-			///CREATE TABLE main.ex1(a);
-			///CREATE TEMP VIEW ex1 AS SELECT a FROM ex1;
-			///SELECT * FROM temp.ex1;
-			///
-			///</summary>
-			if(pTable.nCol<0) {
-				utilc.sqlite3ErrorMsg(pParse,"view %s is circularly defined",pTable.zName);
-				return 1;
-			}
-			Debug.Assert(pTable.nCol>=0);
-			///
-			///<summary>
-			///If we get this far, it means we need to compute the table names.
-			///Note that the call to sqlite3ResultSetOfSelect() will expand any
-			///"*" elements in the results set of the view and will assign cursors
-			///to the elements of the FROM clause.  But we do not want these changes
-			///to be permanent.  So the computation is done on a copy of the SELECT
-			///statement that defines the view.
-			///
-			///</summary>
-			Debug.Assert(pTable.pSelect!=null);
-			pSel=exprc.sqlite3SelectDup(db,pTable.pSelect,0);
-			if(pSel!=null) {
-				u8 enableLookaside=db.lookaside.bEnabled;
-				n=pParse.nTab;
-				sqlite3SrcListAssignCursors(pParse,pSel.pSrc);
-				pTable.nCol=-1;
-				db.lookaside.bEnabled=0;
-				#if !SQLITE_OMIT_AUTHORIZATION
+#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_VIRTUALTABLE
+            ///<summary>
+            /// The Table structure pTable is really a VIEW.  Fill in the names of
+            /// the columns of the view in the pTable structure.  Return the number
+            /// of errors.  If an error is seen leave an error message in pParse.zErrMsg.
+            ///</summary>
+            public static int sqlite3ViewGetColumnNames(Parse pParse, Table pTable)
+            {
+                Table pSelTab;
+                ///
+                ///<summary>
+                ///A fake table from which we get the result set 
+                ///</summary>
+                Select pSel;
+                ///
+                ///<summary>
+                ///Copy of the SELECT that implements the view 
+                ///</summary>
+                int nErr = 0;
+                ///
+                ///<summary>
+                ///Number of errors encountered 
+                ///</summary>
+                int n;
+                ///
+                ///<summary>
+                ///Temporarily holds the number of cursors assigned 
+                ///</summary>
+                sqlite3 db = pParse.db;
+                ///
+                ///<summary>
+                ///Database connection for malloc errors 
+                ///</summary>
+                dxAuth xAuth;
+                //)(void*,int,const char*,const char*,const char*,const char);
+                Debug.Assert(pTable != null);
+#if !SQLITE_OMIT_VIRTUALTABLE
+                if (pParse.sqlite3VtabCallConnect(pTable) != 0)
+                {
+                    return SQLITE_ERROR;
+                }
+#endif
+                if (IsVirtual(pTable))
+                    return 0;
+#if !SQLITE_OMIT_VIEW
+                ///
+                ///<summary>
+                ///A positive nCol means the columns names for this view are
+                ///already known.
+                ///</summary>
+                if (pTable.nCol > 0)
+                    return 0;
+                ///
+                ///<summary>
+                ///A negative nCol is a special marker meaning that we are currently
+                ///trying to compute the column names.  If we enter this routine with
+                ///a negative nCol, it means two or more views form a loop, like this:
+                ///
+                ///CREATE VIEW one AS SELECT * FROM two;
+                ///CREATE VIEW two AS SELECT * FROM one;
+                ///
+                ///Actually, the error above is now caught prior to reaching this point.
+                ///But the following test is still important as it does come up
+                ///in the following:
+                ///
+                ///CREATE TABLE main.ex1(a);
+                ///CREATE TEMP VIEW ex1 AS SELECT a FROM ex1;
+                ///SELECT * FROM temp.ex1;
+                ///
+                ///</summary>
+                if (pTable.nCol < 0)
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "view %s is circularly defined", pTable.zName);
+                    return 1;
+                }
+                Debug.Assert(pTable.nCol >= 0);
+                ///
+                ///<summary>
+                ///If we get this far, it means we need to compute the table names.
+                ///Note that the call to sqlite3ResultSetOfSelect() will expand any
+                ///"*" elements in the results set of the view and will assign cursors
+                ///to the elements of the FROM clause.  But we do not want these changes
+                ///to be permanent.  So the computation is done on a copy of the SELECT
+                ///statement that defines the view.
+                ///
+                ///</summary>
+                Debug.Assert(pTable.pSelect != null);
+                pSel = exprc.sqlite3SelectDup(db, pTable.pSelect, 0);
+                if (pSel != null)
+                {
+                    u8 enableLookaside = db.lookaside.bEnabled;
+                    n = pParse.nTab;
+                    sqlite3SrcListAssignCursors(pParse, pSel.pSrc);
+                    pTable.nCol = -1;
+                    db.lookaside.bEnabled = 0;
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																												xAuth = db.xAuth;
 db.xAuth = 0;
 pSelTab = sqlite3ResultSetOfSelect(pParse, pSel);
 db.xAuth = xAuth;
 #else
-				pSelTab=sqlite3ResultSetOfSelect(pParse,pSel);
-				#endif
-				db.lookaside.bEnabled=enableLookaside;
-				pParse.nTab=n;
-				if(pSelTab!=null) {
-					Debug.Assert(pTable.aCol==null);
-					pTable.nCol=pSelTab.nCol;
-					pTable.aCol=pSelTab.aCol;
-					pSelTab.nCol=0;
-					pSelTab.aCol=null;
-					sqlite3DeleteTable(db,ref pSelTab);
-					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pTable.pSchema));
-					pTable.pSchema.flags|=DB_UnresetViews;
-				}
-				else {
-					pTable.nCol=0;
-					nErr++;
-				}
-				sqlite3SelectDelete(db,ref pSel);
-			}
-			else {
-				nErr++;
-			}
-			#endif
-			return nErr;
-		}
-		#endif
-		#if !SQLITE_OMIT_VIEW
-		///
-		///<summary>
-		///Clear the column names from every VIEW in database idx.
-		///</summary>
-		static void sqliteViewResetAll(sqlite3 db,int idx) {
-			HashElem i;
-			Debug.Assert(sqlite3SchemaMutexHeld(db,idx,null));
-			if(!DbHasProperty(db,idx,DB_UnresetViews))
-				return;
-			//for(i=sqliteHashFirst(&db.aDb[idx].pSchema.tblHash); i;i=sqliteHashNext(i)){
-			for(i=db.aDb[idx].pSchema.tblHash.first;i!=null;i=i.next) {
-				Table pTab=(Table)i.data;
-				// sqliteHashData( i );
-				if(pTab.pSelect!=null) {
-					sqliteDeleteColumnNames(db,pTab);
-					pTab.aCol=null;
-					pTab.nCol=0;
-				}
-			}
-			DbClearProperty(db,idx,DB_UnresetViews);
-		}
-		#else
+                    pSelTab = sqlite3ResultSetOfSelect(pParse, pSel);
+#endif
+                    db.lookaside.bEnabled = enableLookaside;
+                    pParse.nTab = n;
+                    if (pSelTab != null)
+                    {
+                        Debug.Assert(pTable.aCol == null);
+                        pTable.nCol = pSelTab.nCol;
+                        pTable.aCol = pSelTab.aCol;
+                        pSelTab.nCol = 0;
+                        pSelTab.aCol = null;
+                        build.sqlite3DeleteTable(db, ref pSelTab);
+                        Debug.Assert(sqlite3SchemaMutexHeld(db, 0, pTable.pSchema));
+                        pTable.pSchema.flags |= DB_UnresetViews;
+                    }
+                    else
+                    {
+                        pTable.nCol = 0;
+                        nErr++;
+                    }
+                    sqlite3SelectDelete(db, ref pSel);
+                }
+                else
+                {
+                    nErr++;
+                }
+#endif
+                return nErr;
+            }
+#endif
+#if !SQLITE_OMIT_VIEW
+            ///
+            ///<summary>
+            ///Clear the column names from every VIEW in database idx.
+            ///</summary>
+            static void sqliteViewResetAll(sqlite3 db, int idx)
+            {
+                HashElem i;
+                Debug.Assert(sqlite3SchemaMutexHeld(db, idx, null));
+                if (!DbHasProperty(db, idx, DB_UnresetViews))
+                    return;
+                //for(i=sqliteHashFirst(&db.aDb[idx].pSchema.tblHash); i;i=sqliteHashNext(i)){
+                for (i = db.aDb[idx].pSchema.tblHash.first; i != null; i = i.next)
+                {
+                    Table pTab = (Table)i.data;
+                    // sqliteHashData( i );
+                    if (pTab.pSelect != null)
+                    {
+                        sqliteDeleteColumnNames(db, pTab);
+                        pTab.aCol = null;
+                        pTab.nCol = 0;
+                    }
+                }
+                DbClearProperty(db, idx, DB_UnresetViews);
+            }
+#else
 																																																						    // define sqliteViewResetAll(A,B)
     static void sqliteViewResetAll( sqlite3 A, int B )
     {
     }
 #endif
-		///<summary>
-		/// This function is called by the VDBE to adjust the internal schema
-		/// used by SQLite when the btree layer moves a table root page. The
-		/// root-page of a table or index in database iDb has changed from iFrom
-		/// to iTo.
-		///
-		/// Ticket #1728:  The symbol table might still contain information
-		/// on tables and/or indices that are the process of being deleted.
-		/// If you are unlucky, one of those deleted indices or tables might
-		/// have the same rootpage number as the real table or index that is
-		/// being moved.  So we cannot stop searching after the first match
-		/// because the first match might be for one of the deleted indices
-		/// or tables and not the table/index that is actually being moved.
-		/// We must continue looping until all tables and indices with
-		/// rootpage==iFrom have been converted to have a rootpage of iTo
-		/// in order to be certain that we got the right one.
-		///</summary>
-		#if !SQLITE_OMIT_AUTOVACUUM
-		static void sqlite3RootPageMoved(sqlite3 db,int iDb,int iFrom,int iTo) {
-			HashElem pElem;
-			Hash pHash;
-			Db pDb;
-			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-			pDb=db.aDb[iDb];
-			pHash=pDb.pSchema.tblHash;
-			for(pElem=pHash.first;pElem!=null;pElem=pElem.next)// ( pElem = sqliteHashFirst( pHash ) ; pElem ; pElem = sqliteHashNext( pElem ) )
-			 {
-				Table pTab=(Table)pElem.data;
-				// sqliteHashData( pElem );
-				if(pTab.tnum==iFrom) {
-					pTab.tnum=iTo;
-				}
-			}
-			pHash=pDb.pSchema.idxHash;
-			for(pElem=pHash.first;pElem!=null;pElem=pElem.next)// ( pElem = sqliteHashFirst( pHash ) ; pElem ; pElem = sqliteHashNext( pElem ) )
-			 {
-				Index pIdx=(Index)pElem.data;
-				// sqliteHashData( pElem );
-				if(pIdx.tnum==iFrom) {
-					pIdx.tnum=iTo;
-				}
-			}
-		}
-		#endif
-		///<summary>
-		/// Write code to erase the table with root-page iTable from database iDb.
-		/// Also write code to modify the sqlite_master table and internal schema
-		/// if a root-page of another table is moved by the btree-layer whilst
-		/// erasing iTable (this can happen with an auto-vacuum database).
-		///</summary>
-		static void destroyRootPage(Parse pParse,int iTable,int iDb) {
-			Vdbe v=pParse.sqlite3GetVdbe();
-			int r1=pParse.sqlite3GetTempReg();
-			v.sqlite3VdbeAddOp3(OP_Destroy,iTable,r1,iDb);
-			sqlite3MayAbort(pParse);
-			#if !SQLITE_OMIT_AUTOVACUUM
-			///
-			///<summary>
-			///OP_Destroy stores an in integer r1. If this integer
-			///</summary>
-			///<param name="is non">zero, then it is the root page number of a table moved to</param>
-			///<param name="location iTable. The following code modifies the sqlite_master table to">location iTable. The following code modifies the sqlite_master table to</param>
-			///<param name="reflect this.">reflect this.</param>
-			///<param name=""></param>
-			///<param name="The "#NNN" in the SQL is a special constant that means whatever value">The "#NNN" in the SQL is a special constant that means whatever value</param>
-			///<param name="is in register NNN.  See grammar rules associated with the TK_REGISTER">is in register NNN.  See grammar rules associated with the TK_REGISTER</param>
-			///<param name="token for additional information.">token for additional information.</param>
-			sqlite3NestedParse(pParse,"UPDATE %Q.%s SET rootpage=%d WHERE #%d AND rootpage=#%d",pParse.db.aDb[iDb].zName,SCHEMA_TABLE(iDb),iTable,r1,r1);
-			#endif
-			pParse.sqlite3ReleaseTempReg(r1);
-		}
-		///<summary>
-		/// Write VDBE code to erase table pTab and all associated indices on disk.
-		/// Code to update the sqlite_master tables and internal schema definitions
-		/// in case a root-page belonging to another table is moved by the btree layer
-		/// is also added (this can happen with an auto-vacuum database).
-		///
-		///</summary>
-		static void destroyTable(Parse pParse,Table pTab) {
-			#if SQLITE_OMIT_AUTOVACUUM
+            ///<summary>
+            /// This function is called by the VDBE to adjust the internal schema
+            /// used by SQLite when the btree layer moves a table root page. The
+            /// root-page of a table or index in database iDb has changed from iFrom
+            /// to iTo.
+            ///
+            /// Ticket #1728:  The symbol table might still contain information
+            /// on tables and/or indices that are the process of being deleted.
+            /// If you are unlucky, one of those deleted indices or tables might
+            /// have the same rootpage number as the real table or index that is
+            /// being moved.  So we cannot stop searching after the first match
+            /// because the first match might be for one of the deleted indices
+            /// or tables and not the table/index that is actually being moved.
+            /// We must continue looping until all tables and indices with
+            /// rootpage==iFrom have been converted to have a rootpage of iTo
+            /// in order to be certain that we got the right one.
+            ///</summary>
+#if !SQLITE_OMIT_AUTOVACUUM
+            public static void sqlite3RootPageMoved(sqlite3 db, int iDb, int iFrom, int iTo)
+            {
+                HashElem pElem;
+                Hash pHash;
+                Db pDb;
+                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                pDb = db.aDb[iDb];
+                pHash = pDb.pSchema.tblHash;
+                for (pElem = pHash.first; pElem != null; pElem = pElem.next)// ( pElem = sqliteHashFirst( pHash ) ; pElem ; pElem = sqliteHashNext( pElem ) )
+                {
+                    Table pTab = (Table)pElem.data;
+                    // sqliteHashData( pElem );
+                    if (pTab.tnum == iFrom)
+                    {
+                        pTab.tnum = iTo;
+                    }
+                }
+                pHash = pDb.pSchema.idxHash;
+                for (pElem = pHash.first; pElem != null; pElem = pElem.next)// ( pElem = sqliteHashFirst( pHash ) ; pElem ; pElem = sqliteHashNext( pElem ) )
+                {
+                    Index pIdx = (Index)pElem.data;
+                    // sqliteHashData( pElem );
+                    if (pIdx.tnum == iFrom)
+                    {
+                        pIdx.tnum = iTo;
+                    }
+                }
+            }
+#endif
+            ///<summary>
+            /// Write code to erase the table with root-page iTable from database iDb.
+            /// Also write code to modify the sqlite_master table and internal schema
+            /// if a root-page of another table is moved by the btree-layer whilst
+            /// erasing iTable (this can happen with an auto-vacuum database).
+            ///</summary>
+            static void destroyRootPage(Parse pParse, int iTable, int iDb)
+            {
+                Vdbe v = pParse.sqlite3GetVdbe();
+                int r1 = pParse.sqlite3GetTempReg();
+                v.sqlite3VdbeAddOp3(OP_Destroy, iTable, r1, iDb);
+                build.sqlite3MayAbort(pParse);
+#if !SQLITE_OMIT_AUTOVACUUM
+                ///
+                ///<summary>
+                ///OP_Destroy stores an in integer r1. If this integer
+                ///</summary>
+                ///<param name="is non">zero, then it is the root page number of a table moved to</param>
+                ///<param name="location iTable. The following code modifies the sqlite_master table to">location iTable. The following code modifies the sqlite_master table to</param>
+                ///<param name="reflect this.">reflect this.</param>
+                ///<param name=""></param>
+                ///<param name="The "#NNN" in the SQL is a special constant that means whatever value">The "#NNN" in the SQL is a special constant that means whatever value</param>
+                ///<param name="is in register NNN.  See grammar rules associated with the TK_REGISTER">is in register NNN.  See grammar rules associated with the TK_REGISTER</param>
+                ///<param name="token for additional information.">token for additional information.</param>
+                build.sqlite3NestedParse(pParse, "UPDATE %Q.%s SET rootpage=%d WHERE #%d AND rootpage=#%d", pParse.db.aDb[iDb].zName, SCHEMA_TABLE(iDb), iTable, r1, r1);
+#endif
+                pParse.sqlite3ReleaseTempReg(r1);
+            }
+            ///<summary>
+            /// Write VDBE code to erase table pTab and all associated indices on disk.
+            /// Code to update the sqlite_master tables and internal schema definitions
+            /// in case a root-page belonging to another table is moved by the btree layer
+            /// is also added (this can happen with an auto-vacuum database).
+            ///
+            ///</summary>
+            static void destroyTable(Parse pParse, Table pTab)
+            {
+#if SQLITE_OMIT_AUTOVACUUM
 																																																																																	Index pIdx;
 int iDb = sqlite3SchemaToIndex( pParse.db, pTab.pSchema );
 destroyRootPage( pParse, pTab.tnum, iDb );
@@ -2391,89 +2564,98 @@ for ( pIdx = pTab.pIndex ; pIdx != null ; pIdx = pIdx.pNext )
 destroyRootPage( pParse, pIdx.tnum, iDb );
 }
 #else
-			///
-			///<summary>
-			///</summary>
-			///<param name="If the database may be auto">vacuum capable (if SQLITE_OMIT_AUTOVACUUM</param>
-			///<param name="is not defined), then it is important to call OP_Destroy on the">is not defined), then it is important to call OP_Destroy on the</param>
-			///<param name="table and index root">pages in order, starting with the numerically</param>
-			///<param name="largest root">pages</param>
-			///<param name="to be destroyed is relocated by an earlier OP_Destroy. i.e. if the">to be destroyed is relocated by an earlier OP_Destroy. i.e. if the</param>
-			///<param name="following were coded:">following were coded:</param>
-			///<param name=""></param>
-			///<param name="OP_Destroy 4 0">OP_Destroy 4 0</param>
-			///<param name="...">...</param>
-			///<param name="OP_Destroy 5 0">OP_Destroy 5 0</param>
-			///<param name=""></param>
-			///<param name="and root page 5 happened to be the largest root">page number in the</param>
-			///<param name="database, then root page 5 would be moved to page 4 by the">database, then root page 5 would be moved to page 4 by the</param>
-			///<param name=""OP_Destroy 4 0" opcode. The subsequent "OP_Destroy 5 0" would hit">"OP_Destroy 4 0" opcode. The subsequent "OP_Destroy 5 0" would hit</param>
-			///<param name="a free">list page.</param>
-			int iTab=pTab.tnum;
-			int iDestroyed=0;
-			while(true) {
-				Index pIdx;
-				int iLargest=0;
-				if(iDestroyed==0||iTab<iDestroyed) {
-					iLargest=iTab;
-				}
-				for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-					int iIdx=pIdx.tnum;
-					Debug.Assert(pIdx.pSchema==pTab.pSchema);
-					if((iDestroyed==0||(iIdx<iDestroyed))&&iIdx>iLargest) {
-						iLargest=iIdx;
-					}
-				}
-				if(iLargest==0) {
-					return;
-				}
-				else {
-					int iDb=sqlite3SchemaToIndex(pParse.db,pTab.pSchema);
-					destroyRootPage(pParse,iLargest,iDb);
-					iDestroyed=iLargest;
-				}
-			}
-			#endif
-		}
-		///
-		///<summary>
-		///This routine is called to do the work of a DROP TABLE statement.
-		///pName is the name of the table to be dropped.
-		///
-		///</summary>
-		static void sqlite3DropTable(Parse pParse,SrcList pName,int isView,int noErr) {
-			Table pTab;
-			Vdbe v;
-			sqlite3 db=pParse.db;
-			int iDb;
-			//if ( db.mallocFailed != 0 )
-			//{
-			//  goto exit_drop_table;
-			//}
-			Debug.Assert(pParse.nErr==0);
-			Debug.Assert(pName.nSrc==1);
-			if(noErr!=0)
-				db.suppressErr++;
-			pTab=sqlite3LocateTable(pParse,isView,pName.a[0].zName,pName.a[0].zDatabase);
-			if(noErr!=0)
-				db.suppressErr--;
-			if(pTab==null) {
-				if(noErr!=0)
-					sqlite3CodeVerifyNamedSchema(pParse,pName.a[0].zDatabase);
-				goto exit_drop_table;
-			}
-			iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-			Debug.Assert(iDb>=0&&iDb<db.nDb);
-			///
-			///<summary>
-			///If pTab is a virtual table, call ViewGetColumnNames() to ensure
-			///it is initialized.
-			///
-			///</summary>
-			if(IsVirtual(pTab)&&sqlite3ViewGetColumnNames(pParse,pTab)!=0) {
-				goto exit_drop_table;
-			}
-			#if !SQLITE_OMIT_AUTHORIZATION
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="If the database may be auto">vacuum capable (if SQLITE_OMIT_AUTOVACUUM</param>
+                ///<param name="is not defined), then it is important to call OP_Destroy on the">is not defined), then it is important to call OP_Destroy on the</param>
+                ///<param name="table and index root">pages in order, starting with the numerically</param>
+                ///<param name="largest root">pages</param>
+                ///<param name="to be destroyed is relocated by an earlier OP_Destroy. i.e. if the">to be destroyed is relocated by an earlier OP_Destroy. i.e. if the</param>
+                ///<param name="following were coded:">following were coded:</param>
+                ///<param name=""></param>
+                ///<param name="OP_Destroy 4 0">OP_Destroy 4 0</param>
+                ///<param name="...">...</param>
+                ///<param name="OP_Destroy 5 0">OP_Destroy 5 0</param>
+                ///<param name=""></param>
+                ///<param name="and root page 5 happened to be the largest root">page number in the</param>
+                ///<param name="database, then root page 5 would be moved to page 4 by the">database, then root page 5 would be moved to page 4 by the</param>
+                ///<param name=""OP_Destroy 4 0" opcode. The subsequent "OP_Destroy 5 0" would hit">"OP_Destroy 4 0" opcode. The subsequent "OP_Destroy 5 0" would hit</param>
+                ///<param name="a free">list page.</param>
+                int iTab = pTab.tnum;
+                int iDestroyed = 0;
+                while (true)
+                {
+                    Index pIdx;
+                    int iLargest = 0;
+                    if (iDestroyed == 0 || iTab < iDestroyed)
+                    {
+                        iLargest = iTab;
+                    }
+                    for (pIdx = pTab.pIndex; pIdx != null; pIdx = pIdx.pNext)
+                    {
+                        int iIdx = pIdx.tnum;
+                        Debug.Assert(pIdx.pSchema == pTab.pSchema);
+                        if ((iDestroyed == 0 || (iIdx < iDestroyed)) && iIdx > iLargest)
+                        {
+                            iLargest = iIdx;
+                        }
+                    }
+                    if (iLargest == 0)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        int iDb = sqlite3SchemaToIndex(pParse.db, pTab.pSchema);
+                        destroyRootPage(pParse, iLargest, iDb);
+                        iDestroyed = iLargest;
+                    }
+                }
+#endif
+            }
+            ///
+            ///<summary>
+            ///This routine is called to do the work of a DROP TABLE statement.
+            ///pName is the name of the table to be dropped.
+            ///
+            ///</summary>
+            public static void sqlite3DropTable(Parse pParse, SrcList pName, int isView, int noErr)
+            {
+                Table pTab;
+                Vdbe v;
+                sqlite3 db = pParse.db;
+                int iDb;
+                //if ( db.mallocFailed != 0 )
+                //{
+                //  goto exit_drop_table;
+                //}
+                Debug.Assert(pParse.nErr == 0);
+                Debug.Assert(pName.nSrc == 1);
+                if (noErr != 0)
+                    db.suppressErr++;
+                pTab = build.sqlite3LocateTable(pParse, isView, pName.a[0].zName, pName.a[0].zDatabase);
+                if (noErr != 0)
+                    db.suppressErr--;
+                if (pTab == null)
+                {
+                    if (noErr != 0)
+                        sqlite3CodeVerifyNamedSchema(pParse, pName.a[0].zDatabase);
+                    goto exit_drop_table;
+                }
+                iDb = sqlite3SchemaToIndex(db, pTab.pSchema);
+                Debug.Assert(iDb >= 0 && iDb < db.nDb);
+                ///
+                ///<summary>
+                ///If pTab is a virtual table, call ViewGetColumnNames() to ensure
+                ///it is initialized.
+                ///
+                ///</summary>
+                if (IsVirtual(pTab) && build.sqlite3ViewGetColumnNames(pParse, pTab) != 0)
+                {
+                    goto exit_drop_table;
+                }
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	{
 int code;
 string zTab = SCHEMA_TABLE(iDb);
@@ -2506,685 +2688,740 @@ goto exit_drop_table;
 }
 }
 #endif
-			if(pTab.zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)) {
-				utilc.sqlite3ErrorMsg(pParse,"table %s may not be dropped",pTab.zName);
-				goto exit_drop_table;
-			}
-			#if !SQLITE_OMIT_VIEW
-			///
-			///<summary>
-			///Ensure DROP TABLE is not used on a view, and DROP VIEW is not used
-			///on a table.
-			///</summary>
-			if(isView!=0&&pTab.pSelect==null) {
-				utilc.sqlite3ErrorMsg(pParse,"use DROP TABLE to delete table %s",pTab.zName);
-				goto exit_drop_table;
-			}
-			if(0==isView&&pTab.pSelect!=null) {
-				utilc.sqlite3ErrorMsg(pParse,"use DROP VIEW to delete view %s",pTab.zName);
-				goto exit_drop_table;
-			}
-			#endif
-			///
-			///<summary>
-			///Generate code to remove the table from the master table
-			///on disk.
-			///</summary>
-			v=pParse.sqlite3GetVdbe();
-			if(v!=null) {
-				Trigger pTrigger;
-				Db pDb=db.aDb[iDb];
-				sqlite3BeginWriteOperation(pParse,1,iDb);
-				#if !SQLITE_OMIT_VIRTUALTABLE
-				if(IsVirtual(pTab)) {
-					v.sqlite3VdbeAddOp0(OP_VBegin);
-				}
-				#endif
-				pParse.sqlite3FkDropTable(pName,pTab);
-				///
-				///<summary>
-				///Drop all triggers associated with the table being dropped. Code
-				///is generated to remove entries from sqlite_master and/or
-				///sqlite_temp_master if required.
-				///
-				///</summary>
-				pTrigger=sqlite3TriggerList(pParse,pTab);
-				while(pTrigger!=null) {
-					Debug.Assert(pTrigger.pSchema==pTab.pSchema||pTrigger.pSchema==db.aDb[1].pSchema);
-					sqlite3DropTriggerPtr(pParse,pTrigger);
-					pTrigger=pTrigger.pNext;
-				}
-				#if !SQLITE_OMIT_AUTOINCREMENT
-				///
-				///<summary>
-				///Remove any entries of the sqlite_sequence table associated with
-				///the table being dropped. This is done before the table is dropped
-				///at the btree level, in case the sqlite_sequence table needs to
-				///</summary>
-				///<param name="move as a result of the drop (can happen in auto">vacuum mode).</param>
-				if((pTab.tabFlags&TF_Autoincrement)!=0) {
-					sqlite3NestedParse(pParse,"DELETE FROM %s.sqlite_sequence WHERE name=%Q",pDb.zName,pTab.zName);
-				}
-				#endif
-				///
-				///<summary>
-				///Drop all SQLITE_MASTER table and index entries that refer to the
-				///table. The program name loops through the master table and deletes
-				///every row that refers to a table of the same name as the one being
-				///dropped. Triggers are handled seperately because a trigger can be
-				///created in the temp database that refers to a table in another
-				///database.
-				///</summary>
-				sqlite3NestedParse(pParse,"DELETE FROM %Q.%s WHERE tbl_name=%Q and type!='trigger'",pDb.zName,SCHEMA_TABLE(iDb),pTab.zName);
-				///
-				///<summary>
-				///Drop any statistics from the sqlite_stat1 table, if it exists 
-				///</summary>
-				if(sqlite3FindTable(db,"sqlite_stat1",db.aDb[iDb].zName)!=null) {
-					sqlite3NestedParse(pParse,"DELETE FROM %Q.sqlite_stat1 WHERE tbl=%Q",pDb.zName,pTab.zName);
-				}
-				if(0==isView&&!IsVirtual(pTab)) {
-					destroyTable(pParse,pTab);
-				}
-				///
-				///<summary>
-				///Remove the table entry from SQLite's internal schema and modify
-				///the schema cookie.
-				///
-				///</summary>
-				if(IsVirtual(pTab)) {
-					v.sqlite3VdbeAddOp4(OP_VDestroy,iDb,0,0,pTab.zName,0);
-				}
-				v.sqlite3VdbeAddOp4(OP_DropTable,iDb,0,0,pTab.zName,0);
-				sqlite3ChangeCookie(pParse,iDb);
-			}
-			sqliteViewResetAll(db,iDb);
-			exit_drop_table:
-			sqlite3SrcListDelete(db,ref pName);
-		}
-		///<summary>
-		/// This routine is called to create a new foreign key on the table
-		/// currently under construction.  pFromCol determines which columns
-		/// in the current table point to the foreign key.  If pFromCol==0 then
-		/// connect the key to the last column inserted.  pTo is the name of
-		/// the table referred to.  pToCol is a list of tables in the other
-		/// pTo table that the foreign key points to.  flags contains all
-		/// information about the conflict resolution algorithms specified
-		/// in the ON DELETE, ON UPDATE and ON INSERT clauses.
-		///
-		/// An FKey structure is created and added to the table currently
-		/// under construction in the pParse.pNewTable field.
-		///
-		/// The foreign key is set for IMMEDIATE processing.  A subsequent call
-		/// to sqlite3DeferForeignKey() might change this to DEFERRED.
-		///
-		///</summary>
-		// OVERLOADS, so I don't need to rewrite parse.c
-		static void sqlite3CreateForeignKey(Parse pParse,int null_2,Token pTo,ExprList pToCol,int flags) {
-			sqlite3CreateForeignKey(pParse,null,pTo,pToCol,flags);
-		}
-		static void sqlite3CreateForeignKey(Parse pParse,///
-		///<summary>
-		///Parsing context 
-		///</summary>
-		ExprList pFromCol,///
-		///<summary>
-		///Columns in this table that point to other table 
-		///</summary>
-		Token pTo,///
-		///<summary>
-		///Name of the other table 
-		///</summary>
-		ExprList pToCol,///
-		///<summary>
-		///Columns in the other table 
-		///</summary>
-		int flags///
-		///<summary>
-		///Conflict resolution algorithms. 
-		///</summary>
-		) {
-			sqlite3 db=pParse.db;
-			#if !SQLITE_OMIT_FOREIGN_KEY
-			FKey pFKey=null;
-			FKey pNextTo;
-			Table p=pParse.pNewTable;
-			int nByte;
-			int i;
-			int nCol;
-			//string z;
-			Debug.Assert(pTo!=null);
-			if(p==null||IN_DECLARE_VTAB(pParse))
-				goto fk_end;
-			if(pFromCol==null) {
-				int iCol=p.nCol-1;
-				if(NEVER(iCol<0))
-					goto fk_end;
-				if(pToCol!=null&&pToCol.nExpr!=1) {
-					utilc.sqlite3ErrorMsg(pParse,"foreign key on %s"+" should reference only one column of table %T",p.aCol[iCol].zName,pTo);
-					goto fk_end;
-				}
-				nCol=1;
-			}
-			else
-				if(pToCol!=null&&pToCol.nExpr!=pFromCol.nExpr) {
-					utilc.sqlite3ErrorMsg(pParse,"number of columns in foreign key does not match the number of "+"columns in the referenced table");
-					goto fk_end;
-				}
-				else {
-					nCol=pFromCol.nExpr;
-				}
-			//nByte = sizeof(*pFKey) + (nCol-1)*sizeof(pFKey.aCol[0]) + pTo.n + 1;
-			//if( pToCol ){
-			//  for(i=0; i<pToCol.nExpr; i++){
-			//    nByte += StringExtensions.sqlite3Strlen30(pToCol->a[i].zName) + 1;
-			//  }
-			//}
-			pFKey=new FKey();
-			//sqlite3DbMallocZero(db, nByte );
-			if(pFKey==null) {
-				goto fk_end;
-			}
-			pFKey.pFrom=p;
-			pFKey.pNextFrom=p.pFKey;
-			//z = pFKey.aCol[nCol].zCol;
-			pFKey.aCol=new FKey.sColMap[nCol];
-			// z;
-			pFKey.aCol[0]=new FKey.sColMap();
-			pFKey.zTo=pTo.zRestSql.Substring(0,pTo.Length);
-			//memcpy( z, pTo.z, pTo.n );
-			//z[pTo.n] = 0;
-			StringExtensions.sqlite3Dequote(ref pFKey.zTo);
-			//z += pTo.n + 1;
-			pFKey.nCol=nCol;
-			if(pFromCol==null) {
-				pFKey.aCol[0].iFrom=p.nCol-1;
-			}
-			else {
-				for(i=0;i<nCol;i++) {
-					if(pFKey.aCol[i]==null)
-						pFKey.aCol[i]=new FKey.sColMap();
-					int j;
-					for(j=0;j<p.nCol;j++) {
-						if(p.aCol[j].zName.Equals(pFromCol.a[i].zName,StringComparison.InvariantCultureIgnoreCase)) {
-							pFKey.aCol[i].iFrom=j;
-							break;
-						}
-					}
-					if(j>=p.nCol) {
-						utilc.sqlite3ErrorMsg(pParse,"unknown column \"%s\" in foreign key definition",pFromCol.a[i].zName);
-						goto fk_end;
-					}
-				}
-			}
-			if(pToCol!=null) {
-				for(i=0;i<nCol;i++) {
-					int n=StringExtensions.sqlite3Strlen30(pToCol.a[i].zName);
-					if(pFKey.aCol[i]==null)
-						pFKey.aCol[i]=new FKey.sColMap();
-					pFKey.aCol[i].zCol=pToCol.a[i].zName;
-					//memcpy( z, pToCol.a[i].zName, n );
-					//z[n] = 0;
-					//z += n + 1;
-				}
-			}
-			pFKey.isDeferred=0;
-			pFKey.aAction[0]=(u8)(flags&0xff);
-			///
-			///<summary>
-			///ON DELETE action 
-			///</summary>
-			pFKey.aAction[1]=(u8)((flags>>8)&0xff);
-			///
-			///<summary>
-			///ON UPDATE action 
-			///</summary>
-			Debug.Assert(sqlite3SchemaMutexHeld(db,0,p.pSchema));
-			pNextTo=sqlite3HashInsert(ref p.pSchema.fkeyHash,pFKey.zTo,StringExtensions.sqlite3Strlen30(pFKey.zTo),pFKey);
-			//if( pNextTo==pFKey ){
-			//  db.mallocFailed = 1;
-			//  goto fk_end;
-			//}
-			if(pNextTo!=null) {
-				Debug.Assert(pNextTo.pPrevTo==null);
-				pFKey.pNextTo=pNextTo;
-				pNextTo.pPrevTo=pFKey;
-			}
-			///
-			///<summary>
-			///Link the foreign key to the table as the last step.
-			///
-			///</summary>
-			p.pFKey=pFKey;
-			pFKey=null;
-			fk_end:
-			db.sqlite3DbFree(ref pFKey);
-			#endif
-			exprc.sqlite3ExprListDelete(db,ref pFromCol);
-			exprc.sqlite3ExprListDelete(db,ref pToCol);
-		}
-		///<summary>
-		/// This routine is called when an INITIALLY IMMEDIATE or INITIALLY DEFERRED
-		/// clause is seen as part of a foreign key definition.  The isDeferred
-		/// parameter is 1 for INITIALLY DEFERRED and 0 for INITIALLY IMMEDIATE.
-		/// The behavior of the most recently created foreign key is adjusted
-		/// accordingly.
-		///
-		///</summary>
-		static void sqlite3DeferForeignKey(Parse pParse,int isDeferred) {
-			#if !SQLITE_OMIT_FOREIGN_KEY
-			Table pTab;
-			FKey pFKey;
-			if((pTab=pParse.pNewTable)==null||(pFKey=pTab.pFKey)==null)
-				return;
-			Debug.Assert(isDeferred==0||isDeferred==1);
-			///
-			///<summary>
-			///</summary>
-			///<param name="EV: R">21917 </param>
-			pFKey.isDeferred=(u8)isDeferred;
-			#endif
-		}
-		///
-		///<summary>
-		///Generate code that will erase and refill index pIdx.  This is
-		///used to initialize a newly created index or to recompute the
-		///content of an index in response to a REINDEX command.
-		///
-		///if memRootPage is not negative, it means that the index is newly
-		///created.  The register specified by memRootPage contains the
-		///root page number of the index.  If memRootPage is negative, then
-		///the index already exists and must be cleared before being refilled and
-		///the root page number of the index is taken from pIndex.tnum.
-		///
-		///</summary>
-		static void sqlite3RefillIndex(Parse pParse,Index pIndex,int memRootPage) {
-			Table pTab=pIndex.pTable;
-			///
-			///<summary>
-			///The table that is indexed 
-			///</summary>
-			int iTab=pParse.nTab++;
-			///
-			///<summary>
-			///Btree cursor used for pTab 
-			///</summary>
-			int iIdx=pParse.nTab++;
-			///
-			///<summary>
-			///Btree cursor used for pIndex 
-			///</summary>
-			int addr1;
-			///
-			///<summary>
-			///Address of top of loop 
-			///</summary>
-			int tnum;
-			///
-			///<summary>
-			///Root page of index 
-			///</summary>
-			Vdbe v;
-			///
-			///<summary>
-			///Generate code into this virtual machine 
-			///</summary>
-			KeyInfo pKey;
-			///
-			///<summary>
-			///KeyInfo for index 
-			///</summary>
-			int regIdxKey;
-			///
-			///<summary>
-			///Registers containing the index key 
-			///</summary>
-			int regRecord;
-			///
-			///<summary>
-			///Register holding assemblied index record 
-			///</summary>
-			sqlite3 db=pParse.db;
-			///
-			///<summary>
-			///The database connection 
-			///</summary>
-			int iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
-			#if !SQLITE_OMIT_AUTHORIZATION
+                if (pTab.zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "table %s may not be dropped", pTab.zName);
+                    goto exit_drop_table;
+                }
+#if !SQLITE_OMIT_VIEW
+                ///
+                ///<summary>
+                ///Ensure DROP TABLE is not used on a view, and DROP VIEW is not used
+                ///on a table.
+                ///</summary>
+                if (isView != 0 && pTab.pSelect == null)
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "use DROP TABLE to delete table %s", pTab.zName);
+                    goto exit_drop_table;
+                }
+                if (0 == isView && pTab.pSelect != null)
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "use DROP VIEW to delete view %s", pTab.zName);
+                    goto exit_drop_table;
+                }
+#endif
+                ///
+                ///<summary>
+                ///Generate code to remove the table from the master table
+                ///on disk.
+                ///</summary>
+                v = pParse.sqlite3GetVdbe();
+                if (v != null)
+                {
+                    Trigger pTrigger;
+                    Db pDb = db.aDb[iDb];
+                    sqlite3BeginWriteOperation(pParse, 1, iDb);
+#if !SQLITE_OMIT_VIRTUALTABLE
+                    if (IsVirtual(pTab))
+                    {
+                        v.sqlite3VdbeAddOp0(OP_VBegin);
+                    }
+#endif
+                    pParse.sqlite3FkDropTable(pName, pTab);
+                    ///
+                    ///<summary>
+                    ///Drop all triggers associated with the table being dropped. Code
+                    ///is generated to remove entries from sqlite_master and/or
+                    ///sqlite_temp_master if required.
+                    ///
+                    ///</summary>
+                    pTrigger = sqlite3TriggerList(pParse, pTab);
+                    while (pTrigger != null)
+                    {
+                        Debug.Assert(pTrigger.pSchema == pTab.pSchema || pTrigger.pSchema == db.aDb[1].pSchema);
+                        sqlite3DropTriggerPtr(pParse, pTrigger);
+                        pTrigger = pTrigger.pNext;
+                    }
+#if !SQLITE_OMIT_AUTOINCREMENT
+                    ///
+                    ///<summary>
+                    ///Remove any entries of the sqlite_sequence table associated with
+                    ///the table being dropped. This is done before the table is dropped
+                    ///at the btree level, in case the sqlite_sequence table needs to
+                    ///</summary>
+                    ///<param name="move as a result of the drop (can happen in auto">vacuum mode).</param>
+                    if ((pTab.tabFlags & TF_Autoincrement) != 0)
+                    {
+                        build.sqlite3NestedParse(pParse, "DELETE FROM %s.sqlite_sequence WHERE name=%Q", pDb.zName, pTab.zName);
+                    }
+#endif
+                    ///
+                    ///<summary>
+                    ///Drop all SQLITE_MASTER table and index entries that refer to the
+                    ///table. The program name loops through the master table and deletes
+                    ///every row that refers to a table of the same name as the one being
+                    ///dropped. Triggers are handled seperately because a trigger can be
+                    ///created in the temp database that refers to a table in another
+                    ///database.
+                    ///</summary>
+                    build.sqlite3NestedParse(pParse, "DELETE FROM %Q.%s WHERE tbl_name=%Q and type!='trigger'", pDb.zName, SCHEMA_TABLE(iDb), pTab.zName);
+                    ///
+                    ///<summary>
+                    ///Drop any statistics from the sqlite_stat1 table, if it exists 
+                    ///</summary>
+                    if (build.sqlite3FindTable(db, "sqlite_stat1", db.aDb[iDb].zName) != null)
+                    {
+                        build.sqlite3NestedParse(pParse, "DELETE FROM %Q.sqlite_stat1 WHERE tbl=%Q", pDb.zName, pTab.zName);
+                    }
+                    if (0 == isView && !IsVirtual(pTab))
+                    {
+                        destroyTable(pParse, pTab);
+                    }
+                    ///
+                    ///<summary>
+                    ///Remove the table entry from SQLite's internal schema and modify
+                    ///the schema cookie.
+                    ///
+                    ///</summary>
+                    if (IsVirtual(pTab))
+                    {
+                        v.sqlite3VdbeAddOp4(OP_VDestroy, iDb, 0, 0, pTab.zName, 0);
+                    }
+                    v.sqlite3VdbeAddOp4(OP_DropTable, iDb, 0, 0, pTab.zName, 0);
+                    sqlite3ChangeCookie(pParse, iDb);
+                }
+                sqliteViewResetAll(db, iDb);
+            exit_drop_table:
+                build.sqlite3SrcListDelete(db, ref pName);
+            }
+            ///<summary>
+            /// This routine is called to create a new foreign key on the table
+            /// currently under construction.  pFromCol determines which columns
+            /// in the current table point to the foreign key.  If pFromCol==0 then
+            /// connect the key to the last column inserted.  pTo is the name of
+            /// the table referred to.  pToCol is a list of tables in the other
+            /// pTo table that the foreign key points to.  flags contains all
+            /// information about the conflict resolution algorithms specified
+            /// in the ON DELETE, ON UPDATE and ON INSERT clauses.
+            ///
+            /// An FKey structure is created and added to the table currently
+            /// under construction in the pParse.pNewTable field.
+            ///
+            /// The foreign key is set for IMMEDIATE processing.  A subsequent call
+            /// to sqlite3DeferForeignKey() might change this to DEFERRED.
+            ///
+            ///</summary>
+            // OVERLOADS, so I don't need to rewrite parse.c
+            public static void sqlite3CreateForeignKey(Parse pParse, int null_2, Token pTo, ExprList pToCol, int flags)
+            {
+                build.sqlite3CreateForeignKey(pParse, null, pTo, pToCol, flags);
+            }
+            public static void sqlite3CreateForeignKey(Parse pParse,///
+                ///<summary>
+                ///Parsing context 
+                ///</summary>
+            ExprList pFromCol,///
+                ///<summary>
+                ///Columns in this table that point to other table 
+                ///</summary>
+            Token pTo,///
+                ///<summary>
+                ///Name of the other table 
+                ///</summary>
+            ExprList pToCol,///
+                ///<summary>
+                ///Columns in the other table 
+                ///</summary>
+            int flags///
+                ///<summary>
+                ///Conflict resolution algorithms. 
+                ///</summary>
+            )
+            {
+                sqlite3 db = pParse.db;
+#if !SQLITE_OMIT_FOREIGN_KEY
+                FKey pFKey = null;
+                FKey pNextTo;
+                Table p = pParse.pNewTable;
+                int nByte;
+                int i;
+                int nCol;
+                //string z;
+                Debug.Assert(pTo != null);
+                if (p == null || IN_DECLARE_VTAB(pParse))
+                    goto fk_end;
+                if (pFromCol == null)
+                {
+                    int iCol = p.nCol - 1;
+                    if (NEVER(iCol < 0))
+                        goto fk_end;
+                    if (pToCol != null && pToCol.nExpr != 1)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "foreign key on %s" + " should reference only one column of table %T", p.aCol[iCol].zName, pTo);
+                        goto fk_end;
+                    }
+                    nCol = 1;
+                }
+                else
+                    if (pToCol != null && pToCol.nExpr != pFromCol.nExpr)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "number of columns in foreign key does not match the number of " + "columns in the referenced table");
+                        goto fk_end;
+                    }
+                    else
+                    {
+                        nCol = pFromCol.nExpr;
+                    }
+                //nByte = sizeof(*pFKey) + (nCol-1)*sizeof(pFKey.aCol[0]) + pTo.n + 1;
+                //if( pToCol ){
+                //  for(i=0; i<pToCol.nExpr; i++){
+                //    nByte += StringExtensions.sqlite3Strlen30(pToCol->a[i].zName) + 1;
+                //  }
+                //}
+                pFKey = new FKey();
+                //sqlite3DbMallocZero(db, nByte );
+                if (pFKey == null)
+                {
+                    goto fk_end;
+                }
+                pFKey.pFrom = p;
+                pFKey.pNextFrom = p.pFKey;
+                //z = pFKey.aCol[nCol].zCol;
+                pFKey.aCol = new FKey.sColMap[nCol];
+                // z;
+                pFKey.aCol[0] = new FKey.sColMap();
+                pFKey.zTo = pTo.zRestSql.Substring(0, pTo.Length);
+                //memcpy( z, pTo.z, pTo.n );
+                //z[pTo.n] = 0;
+                StringExtensions.sqlite3Dequote(ref pFKey.zTo);
+                //z += pTo.n + 1;
+                pFKey.nCol = nCol;
+                if (pFromCol == null)
+                {
+                    pFKey.aCol[0].iFrom = p.nCol - 1;
+                }
+                else
+                {
+                    for (i = 0; i < nCol; i++)
+                    {
+                        if (pFKey.aCol[i] == null)
+                            pFKey.aCol[i] = new FKey.sColMap();
+                        int j;
+                        for (j = 0; j < p.nCol; j++)
+                        {
+                            if (p.aCol[j].zName.Equals(pFromCol.a[i].zName, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                pFKey.aCol[i].iFrom = j;
+                                break;
+                            }
+                        }
+                        if (j >= p.nCol)
+                        {
+                            utilc.sqlite3ErrorMsg(pParse, "unknown column \"%s\" in foreign key definition", pFromCol.a[i].zName);
+                            goto fk_end;
+                        }
+                    }
+                }
+                if (pToCol != null)
+                {
+                    for (i = 0; i < nCol; i++)
+                    {
+                        int n = StringExtensions.sqlite3Strlen30(pToCol.a[i].zName);
+                        if (pFKey.aCol[i] == null)
+                            pFKey.aCol[i] = new FKey.sColMap();
+                        pFKey.aCol[i].zCol = pToCol.a[i].zName;
+                        //memcpy( z, pToCol.a[i].zName, n );
+                        //z[n] = 0;
+                        //z += n + 1;
+                    }
+                }
+                pFKey.isDeferred = 0;
+                pFKey.aAction[0] = (u8)(flags & 0xff);
+                ///
+                ///<summary>
+                ///ON DELETE action 
+                ///</summary>
+                pFKey.aAction[1] = (u8)((flags >> 8) & 0xff);
+                ///
+                ///<summary>
+                ///ON UPDATE action 
+                ///</summary>
+                Debug.Assert(sqlite3SchemaMutexHeld(db, 0, p.pSchema));
+                pNextTo = sqlite3HashInsert(ref p.pSchema.fkeyHash, pFKey.zTo, StringExtensions.sqlite3Strlen30(pFKey.zTo), pFKey);
+                //if( pNextTo==pFKey ){
+                //  db.mallocFailed = 1;
+                //  goto fk_end;
+                //}
+                if (pNextTo != null)
+                {
+                    Debug.Assert(pNextTo.pPrevTo == null);
+                    pFKey.pNextTo = pNextTo;
+                    pNextTo.pPrevTo = pFKey;
+                }
+                ///
+                ///<summary>
+                ///Link the foreign key to the table as the last step.
+                ///
+                ///</summary>
+                p.pFKey = pFKey;
+                pFKey = null;
+            fk_end:
+                db.sqlite3DbFree(ref pFKey);
+#endif
+                exprc.sqlite3ExprListDelete(db, ref pFromCol);
+                exprc.sqlite3ExprListDelete(db, ref pToCol);
+            }
+            ///<summary>
+            /// This routine is called when an INITIALLY IMMEDIATE or INITIALLY DEFERRED
+            /// clause is seen as part of a foreign key definition.  The isDeferred
+            /// parameter is 1 for INITIALLY DEFERRED and 0 for INITIALLY IMMEDIATE.
+            /// The behavior of the most recently created foreign key is adjusted
+            /// accordingly.
+            ///
+            ///</summary>
+            public static void sqlite3DeferForeignKey(Parse pParse, int isDeferred)
+            {
+#if !SQLITE_OMIT_FOREIGN_KEY
+                Table pTab;
+                FKey pFKey;
+                if ((pTab = pParse.pNewTable) == null || (pFKey = pTab.pFKey) == null)
+                    return;
+                Debug.Assert(isDeferred == 0 || isDeferred == 1);
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="EV: R">21917 </param>
+                pFKey.isDeferred = (u8)isDeferred;
+#endif
+            }
+            ///
+            ///<summary>
+            ///Generate code that will erase and refill index pIdx.  This is
+            ///used to initialize a newly created index or to recompute the
+            ///content of an index in response to a REINDEX command.
+            ///
+            ///if memRootPage is not negative, it means that the index is newly
+            ///created.  The register specified by memRootPage contains the
+            ///root page number of the index.  If memRootPage is negative, then
+            ///the index already exists and must be cleared before being refilled and
+            ///the root page number of the index is taken from pIndex.tnum.
+            ///
+            ///</summary>
+            static void sqlite3RefillIndex(Parse pParse, Index pIndex, int memRootPage)
+            {
+                Table pTab = pIndex.pTable;
+                ///
+                ///<summary>
+                ///The table that is indexed 
+                ///</summary>
+                int iTab = pParse.nTab++;
+                ///
+                ///<summary>
+                ///Btree cursor used for pTab 
+                ///</summary>
+                int iIdx = pParse.nTab++;
+                ///
+                ///<summary>
+                ///Btree cursor used for pIndex 
+                ///</summary>
+                int addr1;
+                ///
+                ///<summary>
+                ///Address of top of loop 
+                ///</summary>
+                int tnum;
+                ///
+                ///<summary>
+                ///Root page of index 
+                ///</summary>
+                Vdbe v;
+                ///
+                ///<summary>
+                ///Generate code into this virtual machine 
+                ///</summary>
+                KeyInfo pKey;
+                ///
+                ///<summary>
+                ///KeyInfo for index 
+                ///</summary>
+                int regIdxKey;
+                ///
+                ///<summary>
+                ///Registers containing the index key 
+                ///</summary>
+                int regRecord;
+                ///
+                ///<summary>
+                ///Register holding assemblied index record 
+                ///</summary>
+                sqlite3 db = pParse.db;
+                ///
+                ///<summary>
+                ///The database connection 
+                ///</summary>
+                int iDb = sqlite3SchemaToIndex(db, pIndex.pSchema);
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
 db.aDb[iDb].zName ) ){
 return;
 }
 #endif
-			///
-			///<summary>
-			///</summary>
-			///<param name="Require a write">lock on the table to perform this operation </param>
-			sqlite3TableLock(pParse,iDb,pTab.tnum,1,pTab.zName);
-			v=pParse.sqlite3GetVdbe();
-			if(v==null)
-				return;
-			if(memRootPage>=0) {
-				tnum=memRootPage;
-			}
-			else {
-				tnum=pIndex.tnum;
-				v.sqlite3VdbeAddOp2(OP_Clear,tnum,iDb);
-			}
-			pKey=sqlite3IndexKeyinfo(pParse,pIndex);
-			v.sqlite3VdbeAddOp4(OP_OpenWrite,iIdx,tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
-			if(memRootPage>=0) {
-				v.sqlite3VdbeChangeP5(1);
-			}
-			pParse.sqlite3OpenTable(iTab,iDb,pTab,OP_OpenRead);
-			addr1=v.sqlite3VdbeAddOp2(OP_Rewind,iTab,0);
-			regRecord=pParse.sqlite3GetTempReg();
-			regIdxKey=pParse.sqlite3GenerateIndexKey(pIndex,iTab,regRecord,true);
-			if(pIndex.onError!=OE_None) {
-				int regRowid=regIdxKey+pIndex.nColumn;
-				int j2=v.sqlite3VdbeCurrentAddr()+2;
-				int pRegKey=regIdxKey;
-				// SQLITE_INT_TO_PTR( regIdxKey );
-				///
-				///<summary>
-				///The registers accessed by the OP_IsUnique opcode were allocated
-				///using sqlite3GetTempRange() inside of the sqlite3GenerateIndexKey()
-				///call above. Just before that function was freed they were released
-				///(made available to the compiler for reuse) using
-				///sqlite3ReleaseTempRange(). So in some ways having the OP_IsUnique
-				///opcode use the values stored within seems dangerous. However, since
-				///we can be sure that no other temp registers have been allocated
-				///since sqlite3ReleaseTempRange() was called, it is safe to do so.
-				///
-				///</summary>
-				v.sqlite3VdbeAddOp4(OP_IsUnique,iIdx,j2,regRowid,pRegKey,P4_INT32);
-				sqlite3HaltConstraint(pParse,OE_Abort,"indexed columns are not unique",P4_STATIC);
-			}
-			v.sqlite3VdbeAddOp2(OP_IdxInsert,iIdx,regRecord);
-			v.sqlite3VdbeChangeP5(OPFLAG_USESEEKRESULT);
-			pParse.sqlite3ReleaseTempReg(regRecord);
-			v.sqlite3VdbeAddOp2(OP_Next,iTab,addr1+1);
-			v.sqlite3VdbeJumpHere(addr1);
-			v.sqlite3VdbeAddOp1(OpCode.OP_Close,iTab);
-			v.sqlite3VdbeAddOp1(OpCode.OP_Close,iIdx);
-		}
-		///<summary>
-		/// Create a new index for an SQL table.  pName1.pName2 is the name of the index
-		/// and pTblList is the name of the table that is to be indexed.  Both will
-		/// be NULL for a primary key or an index that is created to satisfy a
-		/// UNIQUE constraint.  If pTable and pIndex are NULL, use pParse.pNewTable
-		/// as the table to be indexed.  pParse.pNewTable is a table that is
-		/// currently being constructed by a CREATE TABLE statement.
-		///
-		/// pList is a list of columns to be indexed.  pList will be NULL if this
-		/// is a primary key or unique-constraint on the most recent column added
-		/// to the table currently under construction.
-		///
-		/// If the index is created successfully, return a pointer to the new Index
-		/// structure. This is used by sqlite3AddPrimaryKey() to mark the index
-		/// as the tables primary key (Index.autoIndex==2).
-		///
-		///</summary>
-		// OVERLOADS, so I don't need to rewrite parse.c
-		static Index sqlite3CreateIndex(Parse pParse,int null_2,int null_3,int null_4,int null_5,int onError,int null_7,int null_8,int sortOrder,int ifNotExist) {
-			return sqlite3CreateIndex(pParse,null,null,null,null,onError,null,null,sortOrder,ifNotExist);
-		}
-		static Index sqlite3CreateIndex(Parse pParse,int null_2,int null_3,int null_4,ExprList pList,int onError,int null_7,int null_8,int sortOrder,int ifNotExist) {
-			return sqlite3CreateIndex(pParse,null,null,null,pList,onError,null,null,sortOrder,ifNotExist);
-		}
-		static Index sqlite3CreateIndex(Parse pParse,///
-		///<summary>
-		///All information about this Parse 
-		///</summary>
-		Token pName1,///
-		///<summary>
-		///First part of index name. May be NULL 
-		///</summary>
-		Token pName2,///
-		///<summary>
-		///Second part of index name. May be NULL 
-		///</summary>
-		SrcList pTblName,///
-		///<summary>
-		///Table to index. Use pParse.pNewTable if 0 
-		///</summary>
-		ExprList pList,///
-		///<summary>
-		///A list of columns to be indexed 
-		///</summary>
-		int onError,///
-		///<summary>
-		///OE_Abort, OE_Ignore, OE_Replace, or OE_None 
-		///</summary>
-		Token pStart,///
-		///<summary>
-		///The CREATE token that begins this statement 
-		///</summary>
-		Token pEnd,///
-		///<summary>
-		///The ")" that closes the CREATE INDEX statement 
-		///</summary>
-		int sortOrder,///
-		///<summary>
-		///Sort order of primary key when pList==NULL 
-		///</summary>
-		int ifNotExist///
-		///<summary>
-		///Omit error if index already exists 
-		///</summary>
-		) {
-			Index pRet=null;
-			///
-			///<summary>
-			///Pointer to return 
-			///</summary>
-			Table pTab=null;
-			///
-			///<summary>
-			///Table to be indexed 
-			///</summary>
-			Index pIndex=null;
-			///
-			///<summary>
-			///The index to be created 
-			///</summary>
-			string zName=null;
-			///
-			///<summary>
-			///Name of the index 
-			///</summary>
-			int nName;
-			///
-			///<summary>
-			///Number of characters in zName 
-			///</summary>
-			int i,j;
-			Token nullId=new Token();
-			///
-			///<summary>
-			///Fake token for an empty ID list 
-			///</summary>
-			DbFixer sFix=new DbFixer();
-			///
-			///<summary>
-			///For assigning database names to pTable 
-			///</summary>
-			int sortOrderMask;
-			///
-			///<summary>
-			///1 to honor DESC in index.  0 to ignore. 
-			///</summary>
-			sqlite3 db=pParse.db;
-			Db pDb;
-			///
-			///<summary>
-			///The specific table containing the indexed database 
-			///</summary>
-			int iDb;
-			///
-			///<summary>
-			///Index of the database that is being written 
-			///</summary>
-			Token pName=null;
-			///
-			///<summary>
-			///Unqualified name of the index to create 
-			///</summary>
-			ExprList_item pListItem;
-			///
-			///<summary>
-			///For looping over pList 
-			///</summary>
-			int nCol;
-			int nExtra=0;
-			StringBuilder zExtra=new StringBuilder();
-			Debug.Assert(pStart==null||pEnd!=null);
-			///
-			///<summary>
-			///</summary>
-			///<param name="pEnd must be non">NULL if pStart is </param>
-			Debug.Assert(pParse.nErr==0);
-			///
-			///<summary>
-			///Never called with prior errors 
-			///</summary>
-			if(///
-			///<summary>
-			///db.mallocFailed != 0  || 
-			///</summary>
-			IN_DECLARE_VTAB(pParse)) {
-				goto exit_create_index;
-			}
-			if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
-				goto exit_create_index;
-			}
-			///
-			///<summary>
-			///Find the table that is to be indexed.  Return early if not found.
-			///
-			///</summary>
-			if(pTblName!=null) {
-				///
-				///<summary>
-				///</summary>
-				///<param name="Use the two">part index name to determine the database</param>
-				///<param name="to search for the table. 'Fix' the table name to this db">to search for the table. 'Fix' the table name to this db</param>
-				///<param name="before looking up the table.">before looking up the table.</param>
-				///<param name=""></param>
-				Debug.Assert(pName1!=null&&pName2!=null);
-				iDb=sqlite3TwoPartName(pParse,pName1,pName2,ref pName);
-				if(iDb<0)
-					goto exit_create_index;
-				#if !SQLITE_OMIT_TEMPDB
-				///
-				///<summary>
-				///If the index name was unqualified, check if the the table
-				///is a temp table. If so, set the database to 1. Do not do this
-				///if initialising a database schema.
-				///</summary>
-				if(0==db.init.busy) {
-					pTab=pParse.sqlite3SrcListLookup(pTblName);
-					if(pName2.Length==0&&pTab!=null&&pTab.pSchema==db.aDb[1].pSchema) {
-						iDb=1;
-					}
-				}
-				#endif
-				if(sFix.sqlite3FixInit(pParse,iDb,"index",pName)!=0&&sFix.sqlite3FixSrcList(pTblName)!=0) {
-					///
-					///<summary>
-					///Because the parser constructs pTblName from a single identifier,
-					///sqlite3FixSrcList can never fail. 
-					///</summary>
-					Debugger.Break();
-				}
-				pTab=sqlite3LocateTable(pParse,0,pTblName.a[0].zName,pTblName.a[0].zDatabase);
-				if(pTab==null///
-				///<summary>
-				///|| db.mallocFailed != 0 
-				///</summary>
-				)
-					goto exit_create_index;
-				Debug.Assert(db.aDb[iDb].pSchema==pTab.pSchema);
-			}
-			else {
-				Debug.Assert(pName==null);
-				pTab=pParse.pNewTable;
-				if(pTab==null)
-					goto exit_create_index;
-				iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-			}
-			pDb=db.aDb[iDb];
-			Debug.Assert(pTab!=null);
-			Debug.Assert(pParse.nErr==0);
-			if(pTab.zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)&&!pTab.zName.StartsWith("sqlite_altertab_",System.StringComparison.InvariantCultureIgnoreCase)) {
-				utilc.sqlite3ErrorMsg(pParse,"table %s may not be indexed",pTab.zName);
-				goto exit_create_index;
-			}
-			#if !SQLITE_OMIT_VIEW
-			if(pTab.pSelect!=null) {
-				utilc.sqlite3ErrorMsg(pParse,"views may not be indexed");
-				goto exit_create_index;
-			}
-			#endif
-			if(IsVirtual(pTab)) {
-				utilc.sqlite3ErrorMsg(pParse,"virtual tables may not be indexed");
-				goto exit_create_index;
-			}
-			///
-			///<summary>
-			///Find the name of the index.  Make sure there is not already another
-			///index or table with the same name.
-			///
-			///Exception:  If we are reading the names of permanent indices from the
-			///sqlite_master table (because some other process changed the schema) and
-			///one of the index names collides with the name of a temporary table or
-			///index, then we will continue to process this index.
-			///
-			///If pName==0 it means that we are
-			///dealing with a primary key or UNIQUE constraint.  We have to invent our
-			///own name.
-			///
-			///</summary>
-			if(pName!=null) {
-				zName=sqlite3NameFromToken(db,pName);
-				if(zName==null)
-					goto exit_create_index;
-				if(SQLITE_OK!=sqlite3CheckObjectName(pParse,zName)) {
-					goto exit_create_index;
-				}
-				if(0==db.init.busy) {
-					if(sqlite3FindTable(db,zName,null)!=null) {
-						utilc.sqlite3ErrorMsg(pParse,"there is already a table named %s",zName);
-						goto exit_create_index;
-					}
-				}
-				if(sqlite3FindIndex(db,zName,pDb.zName)!=null) {
-					if(ifNotExist==0) {
-						utilc.sqlite3ErrorMsg(pParse,"index %s already exists",zName);
-					}
-					else {
-						Debug.Assert(0==db.init.busy);
-						sqlite3CodeVerifySchema(pParse,iDb);
-					}
-					goto exit_create_index;
-				}
-			}
-			else {
-				int n=0;
-				Index pLoop;
-				for(pLoop=pTab.pIndex,n=1;pLoop!=null;pLoop=pLoop.pNext,n++) {
-				}
-				zName=io.sqlite3MPrintf(db,"sqlite_autoindex_%s_%d",pTab.zName,n);
-				if(zName==null) {
-					goto exit_create_index;
-				}
-			}
-			///
-			///<summary>
-			///Check for authorization to create an index.
-			///
-			///</summary>
-			#if !SQLITE_OMIT_AUTHORIZATION
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Require a write">lock on the table to perform this operation </param>
+                sqlite3TableLock(pParse, iDb, pTab.tnum, 1, pTab.zName);
+                v = pParse.sqlite3GetVdbe();
+                if (v == null)
+                    return;
+                if (memRootPage >= 0)
+                {
+                    tnum = memRootPage;
+                }
+                else
+                {
+                    tnum = pIndex.tnum;
+                    v.sqlite3VdbeAddOp2(OP_Clear, tnum, iDb);
+                }
+                pKey = build.sqlite3IndexKeyinfo(pParse, pIndex);
+                v.sqlite3VdbeAddOp4(OP_OpenWrite, iIdx, tnum, iDb, pKey, P4_KEYINFO_HANDOFF);
+                if (memRootPage >= 0)
+                {
+                    v.sqlite3VdbeChangeP5(1);
+                }
+                pParse.sqlite3OpenTable(iTab, iDb, pTab, OP_OpenRead);
+                addr1 = v.sqlite3VdbeAddOp2(OP_Rewind, iTab, 0);
+                regRecord = pParse.sqlite3GetTempReg();
+                regIdxKey = pParse.sqlite3GenerateIndexKey(pIndex, iTab, regRecord, true);
+                if (pIndex.onError != OE_None)
+                {
+                    int regRowid = regIdxKey + pIndex.nColumn;
+                    int j2 = v.sqlite3VdbeCurrentAddr() + 2;
+                    int pRegKey = regIdxKey;
+                    // SQLITE_INT_TO_PTR( regIdxKey );
+                    ///
+                    ///<summary>
+                    ///The registers accessed by the OP_IsUnique opcode were allocated
+                    ///using sqlite3GetTempRange() inside of the sqlite3GenerateIndexKey()
+                    ///call above. Just before that function was freed they were released
+                    ///(made available to the compiler for reuse) using
+                    ///sqlite3ReleaseTempRange(). So in some ways having the OP_IsUnique
+                    ///opcode use the values stored within seems dangerous. However, since
+                    ///we can be sure that no other temp registers have been allocated
+                    ///since sqlite3ReleaseTempRange() was called, it is safe to do so.
+                    ///
+                    ///</summary>
+                    v.sqlite3VdbeAddOp4(OP_IsUnique, iIdx, j2, regRowid, pRegKey, P4_INT32);
+                    build.sqlite3HaltConstraint(pParse, OE_Abort, "indexed columns are not unique", P4_STATIC);
+                }
+                v.sqlite3VdbeAddOp2(OP_IdxInsert, iIdx, regRecord);
+                v.sqlite3VdbeChangeP5(OPFLAG_USESEEKRESULT);
+                pParse.sqlite3ReleaseTempReg(regRecord);
+                v.sqlite3VdbeAddOp2(OP_Next, iTab, addr1 + 1);
+                v.sqlite3VdbeJumpHere(addr1);
+                v.sqlite3VdbeAddOp1(OpCode.OP_Close, iTab);
+                v.sqlite3VdbeAddOp1(OpCode.OP_Close, iIdx);
+            }
+            ///<summary>
+            /// Create a new index for an SQL table.  pName1.pName2 is the name of the index
+            /// and pTblList is the name of the table that is to be indexed.  Both will
+            /// be NULL for a primary key or an index that is created to satisfy a
+            /// UNIQUE constraint.  If pTable and pIndex are NULL, use pParse.pNewTable
+            /// as the table to be indexed.  pParse.pNewTable is a table that is
+            /// currently being constructed by a CREATE TABLE statement.
+            ///
+            /// pList is a list of columns to be indexed.  pList will be NULL if this
+            /// is a primary key or unique-constraint on the most recent column added
+            /// to the table currently under construction.
+            ///
+            /// If the index is created successfully, return a pointer to the new Index
+            /// structure. This is used by build.sqlite3AddPrimaryKey() to mark the index
+            /// as the tables primary key (Index.autoIndex==2).
+            ///
+            ///</summary>
+            // OVERLOADS, so I don't need to rewrite parse.c
+            public static Index sqlite3CreateIndex(Parse pParse, int null_2, int null_3, int null_4, int null_5, int onError, int null_7, int null_8, int sortOrder, int ifNotExist)
+            {
+                return build.sqlite3CreateIndex(pParse, null, null, null, null, onError, null, null, sortOrder, ifNotExist);
+            }
+            public static Index sqlite3CreateIndex(Parse pParse, int null_2, int null_3, int null_4, ExprList pList, int onError, int null_7, int null_8, int sortOrder, int ifNotExist)
+            {
+                return sqlite3CreateIndex(pParse, null, null, null, pList, onError, null, null, sortOrder, ifNotExist);
+            }
+            public static Index sqlite3CreateIndex(Parse pParse,///
+                ///<summary>
+                ///All information about this Parse 
+                ///</summary>
+            Token pName1,///
+                ///<summary>
+                ///First part of index name. May be NULL 
+                ///</summary>
+            Token pName2,///
+                ///<summary>
+                ///Second part of index name. May be NULL 
+                ///</summary>
+            SrcList pTblName,///
+                ///<summary>
+                ///Table to index. Use pParse.pNewTable if 0 
+                ///</summary>
+            ExprList pList,///
+                ///<summary>
+                ///A list of columns to be indexed 
+                ///</summary>
+            int onError,///
+                ///<summary>
+                ///OE_Abort, OE_Ignore, OE_Replace, or OE_None 
+                ///</summary>
+            Token pStart,///
+                ///<summary>
+                ///The CREATE token that begins this statement 
+                ///</summary>
+            Token pEnd,///
+                ///<summary>
+                ///The ")" that closes the CREATE INDEX statement 
+                ///</summary>
+            int sortOrder,///
+                ///<summary>
+                ///Sort order of primary key when pList==NULL 
+                ///</summary>
+            int ifNotExist///
+                ///<summary>
+                ///Omit error if index already exists 
+                ///</summary>
+            )
+            {
+                Index pRet = null;
+                ///
+                ///<summary>
+                ///Pointer to return 
+                ///</summary>
+                Table pTab = null;
+                ///
+                ///<summary>
+                ///Table to be indexed 
+                ///</summary>
+                Index pIndex = null;
+                ///
+                ///<summary>
+                ///The index to be created 
+                ///</summary>
+                string zName = null;
+                ///
+                ///<summary>
+                ///Name of the index 
+                ///</summary>
+                int nName;
+                ///
+                ///<summary>
+                ///Number of characters in zName 
+                ///</summary>
+                int i, j;
+                Token nullId = new Token();
+                ///
+                ///<summary>
+                ///Fake token for an empty ID list 
+                ///</summary>
+                DbFixer sFix = new DbFixer();
+                ///
+                ///<summary>
+                ///For assigning database names to pTable 
+                ///</summary>
+                int sortOrderMask;
+                ///
+                ///<summary>
+                ///1 to honor DESC in index.  0 to ignore. 
+                ///</summary>
+                sqlite3 db = pParse.db;
+                Db pDb;
+                ///
+                ///<summary>
+                ///The specific table containing the indexed database 
+                ///</summary>
+                int iDb;
+                ///
+                ///<summary>
+                ///Index of the database that is being written 
+                ///</summary>
+                Token pName = null;
+                ///
+                ///<summary>
+                ///Unqualified name of the index to create 
+                ///</summary>
+                ExprList_item pListItem;
+                ///
+                ///<summary>
+                ///For looping over pList 
+                ///</summary>
+                int nCol;
+                int nExtra = 0;
+                StringBuilder zExtra = new StringBuilder();
+                Debug.Assert(pStart == null || pEnd != null);
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="pEnd must be non">NULL if pStart is </param>
+                Debug.Assert(pParse.nErr == 0);
+                ///
+                ///<summary>
+                ///Never called with prior errors 
+                ///</summary>
+                if (///
+                    ///<summary>
+                    ///db.mallocFailed != 0  || 
+                    ///</summary>
+                IN_DECLARE_VTAB(pParse))
+                {
+                    goto exit_create_index;
+                }
+                if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                {
+                    goto exit_create_index;
+                }
+                ///
+                ///<summary>
+                ///Find the table that is to be indexed.  Return early if not found.
+                ///
+                ///</summary>
+                if (pTblName != null)
+                {
+                    ///
+                    ///<summary>
+                    ///</summary>
+                    ///<param name="Use the two">part index name to determine the database</param>
+                    ///<param name="to search for the table. 'Fix' the table name to this db">to search for the table. 'Fix' the table name to this db</param>
+                    ///<param name="before looking up the table.">before looking up the table.</param>
+                    ///<param name=""></param>
+                    Debug.Assert(pName1 != null && pName2 != null);
+                    iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
+                    if (iDb < 0)
+                        goto exit_create_index;
+#if !SQLITE_OMIT_TEMPDB
+                    ///
+                    ///<summary>
+                    ///If the index name was unqualified, check if the the table
+                    ///is a temp table. If so, set the database to 1. Do not do this
+                    ///if initialising a database schema.
+                    ///</summary>
+                    if (0 == db.init.busy)
+                    {
+                        pTab = pParse.sqlite3SrcListLookup(pTblName);
+                        if (pName2.Length == 0 && pTab != null && pTab.pSchema == db.aDb[1].pSchema)
+                        {
+                            iDb = 1;
+                        }
+                    }
+#endif
+                    if (sFix.sqlite3FixInit(pParse, iDb, "index", pName) != 0 && sFix.sqlite3FixSrcList(pTblName) != 0)
+                    {
+                        ///
+                        ///<summary>
+                        ///Because the parser constructs pTblName from a single identifier,
+                        ///sqlite3FixSrcList can never fail. 
+                        ///</summary>
+                        Debugger.Break();
+                    }
+                    pTab = build.sqlite3LocateTable(pParse, 0, pTblName.a[0].zName, pTblName.a[0].zDatabase);
+                    if (pTab == null///
+                        ///<summary>
+                        ///|| db.mallocFailed != 0 
+                        ///</summary>
+                    )
+                        goto exit_create_index;
+                    Debug.Assert(db.aDb[iDb].pSchema == pTab.pSchema);
+                }
+                else
+                {
+                    Debug.Assert(pName == null);
+                    pTab = pParse.pNewTable;
+                    if (pTab == null)
+                        goto exit_create_index;
+                    iDb = sqlite3SchemaToIndex(db, pTab.pSchema);
+                }
+                pDb = db.aDb[iDb];
+                Debug.Assert(pTab != null);
+                Debug.Assert(pParse.nErr == 0);
+                if (pTab.zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase) && !pTab.zName.StartsWith("sqlite_altertab_", System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "table %s may not be indexed", pTab.zName);
+                    goto exit_create_index;
+                }
+#if !SQLITE_OMIT_VIEW
+                if (pTab.pSelect != null)
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "views may not be indexed");
+                    goto exit_create_index;
+                }
+#endif
+                if (IsVirtual(pTab))
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "virtual tables may not be indexed");
+                    goto exit_create_index;
+                }
+                ///
+                ///<summary>
+                ///Find the name of the index.  Make sure there is not already another
+                ///index or table with the same name.
+                ///
+                ///Exception:  If we are reading the names of permanent indices from the
+                ///sqlite_master table (because some other process changed the schema) and
+                ///one of the index names collides with the name of a temporary table or
+                ///index, then we will continue to process this index.
+                ///
+                ///If pName==0 it means that we are
+                ///dealing with a primary key or UNIQUE constraint.  We have to invent our
+                ///own name.
+                ///
+                ///</summary>
+                if (pName != null)
+                {
+                    zName = build.sqlite3NameFromToken(db, pName);
+                    if (zName == null)
+                        goto exit_create_index;
+                    if (SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
+                    {
+                        goto exit_create_index;
+                    }
+                    if (0 == db.init.busy)
+                    {
+                        if (build.sqlite3FindTable(db, zName, null) != null)
+                        {
+                            utilc.sqlite3ErrorMsg(pParse, "there is already a table named %s", zName);
+                            goto exit_create_index;
+                        }
+                    }
+                    if (build.sqlite3FindIndex(db, zName, pDb.zName) != null)
+                    {
+                        if (ifNotExist == 0)
+                        {
+                            utilc.sqlite3ErrorMsg(pParse, "index %s already exists", zName);
+                        }
+                        else
+                        {
+                            Debug.Assert(0 == db.init.busy);
+                            sqlite3CodeVerifySchema(pParse, iDb);
+                        }
+                        goto exit_create_index;
+                    }
+                }
+                else
+                {
+                    int n = 0;
+                    Index pLoop;
+                    for (pLoop = pTab.pIndex, n = 1; pLoop != null; pLoop = pLoop.pNext, n++)
+                    {
+                    }
+                    zName = io.sqlite3MPrintf(db, "sqlite_autoindex_%s_%d", pTab.zName, n);
+                    if (zName == null)
+                    {
+                        goto exit_create_index;
+                    }
+                }
+                ///
+                ///<summary>
+                ///Check for authorization to create an index.
+                ///
+                ///</summary>
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	{
 string zDb = pDb.zName;
 if( sqlite3AuthCheck(pParse, SQLITE_INSERT, SCHEMA_TABLE(iDb), 0, zDb) ){
@@ -3197,457 +3434,498 @@ goto exit_create_index;
 }
 }
 #endif
-			///
-			///<summary>
-			///If pList==0, it means this routine was called to make a primary
-			///key out of the last column added to the table under construction.
-			///So create a fake list to simulate this.
-			///</summary>
-			if(pList==null) {
-				nullId.zRestSql=pTab.aCol[pTab.nCol-1].zName;
-				nullId.Length=StringExtensions.sqlite3Strlen30(nullId.zRestSql);
-				pList=pParse.sqlite3ExprListAppend(null,null);
-				if(pList==null)
-					goto exit_create_index;
-				pParse.sqlite3ExprListSetName(pList,nullId,0);
-				pList.a[0].sortOrder=(u8)sortOrder;
-			}
-			///
-			///<summary>
-			///Figure out how many bytes of space are required to store explicitly
-			///specified collation sequence names.
-			///
-			///</summary>
-			for(i=0;i<pList.nExpr;i++) {
-				Expr pExpr=pList.a[i].pExpr;
-				if(pExpr!=null) {
-					CollSeq pColl=pExpr.pColl;
-					///
-					///<summary>
-					///Either pColl!=0 or there was an OOM failure.  But if an OOM
-					///failure we have quit before reaching this point. 
-					///</summary>
-					if(ALWAYS(pColl!=null)) {
-						nExtra+=(1+StringExtensions.sqlite3Strlen30(pColl.zName));
-					}
-				}
-			}
-			///
-			///<summary>
-			///Allocate the index structure.
-			///
-			///</summary>
-			nName=StringExtensions.sqlite3Strlen30(zName);
-			nCol=pList.nExpr;
-			pIndex=new Index();
-			// sqlite3DbMallocZero( db,
-			//    Index.Length +              /* Index structure  */
-			//    sizeof( int ) * nCol +           /* Index.aiColumn   */
-			//    sizeof( int ) * ( nCol + 1 ) +       /* Index.aiRowEst   */
-			//    sizeof( char* ) * nCol +        /* Index.azColl     */
-			//    u8.Length * nCol +            /* Index.aSortOrder */
-			//    nName + 1 +                  /* Index.zName      */
-			//    nExtra                       /* Collation sequence names */
-			//);
-			//if ( db.mallocFailed != 0 )
-			//{
-			//  goto exit_create_index;
-			//}
-			pIndex.azColl=new string[nCol+1];
-			//(char*)(pIndex[1]);
-			pIndex.aiColumn=new int[nCol+1];
-			//(int )(pIndex->azColl[nCol]);
-			pIndex.aiRowEst=new int[nCol+1];
-			//(unsigned )(pIndex->aiColumn[nCol]);
-			pIndex.aSortOrder=new byte[nCol+1];
-			//(u8 )(pIndex->aiRowEst[nCol+1]);
-			//pIndex.zName = null;// (char)( &pIndex->aSortOrder[nCol] );
-			zExtra=new StringBuilder(nName+1);
-			// (char)( &pIndex.zName[nName + 1] );
-			if(zName.Length==nName)
-				pIndex.zName=zName;
-			else {
-				pIndex.zName=zName.Substring(0,nName);
-			}
-			// memcpy( pIndex.zName, zName, nName + 1 );
-			pIndex.pTable=pTab;
-			pIndex.nColumn=pList.nExpr;
-			pIndex.onError=(u8)onError;
-			pIndex.autoIndex=(u8)(pName==null?1:0);
-			pIndex.pSchema=db.aDb[iDb].pSchema;
-			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-			///
-			///<summary>
-			///Check to see if we should honor DESC requests on index columns
-			///
-			///</summary>
-			if(pDb.pSchema.file_format>=4) {
-				sortOrderMask=1;
-				///
-				///<summary>
-				///Honor DESC 
-				///</summary>
-			}
-			else {
-				sortOrderMask=0;
-				///
-				///<summary>
-				///Ignore DESC 
-				///</summary>
-			}
-			///
-			///<summary>
-			///Scan the names of the columns of the table to be indexed and
-			///load the column indices into the Index structure.  Report an error
-			///if any column is not found.
-			///
-			///TODO:  Add a test to make sure that the same column is not named
-			///more than once within the same index.  Only the first instance of
-			///the column will ever be used by the optimizer.  Note that using the
-			///same column more than once cannot be an error because that would
-			///</summary>
-			///<param name="break backwards compatibility "> it needs to be a warning.</param>
-			///<param name=""></param>
-			for(i=0;i<pList.nExpr;i++) {
-				//, pListItem++){
-				pListItem=pList.a[i];
-				string zColName=pListItem.zName;
-				Column pTabCol;
-				byte requestedSortOrder;
-				string zColl;
-				///
-				///<summary>
-				///Collation sequence name 
-				///</summary>
-				for(j=0;j<pTab.nCol;j++) {
-					//, pTabCol++){
-					pTabCol=pTab.aCol[j];
-					if(zColName.Equals(pTabCol.zName,StringComparison.InvariantCultureIgnoreCase))
-						break;
-				}
-				if(j>=pTab.nCol) {
-					utilc.sqlite3ErrorMsg(pParse,"table %s has no column named %s",pTab.zName,zColName);
-					pParse.checkSchema=1;
-					goto exit_create_index;
-				}
-				pIndex.aiColumn[i]=j;
-				///
-				///<summary>
-				///</summary>
-				///<param name="Justification of the ALWAYS(pListItem">>pColl):  Because of</param>
-				///<param name="the way the "idxlist" non">terminal is constructed by the parser,</param>
-				///<param name="if pListItem">>pColl</param>
-				///<param name="must exist or else there must have been an OOM error.  But if there">must exist or else there must have been an OOM error.  But if there</param>
-				///<param name="was an OOM error, we would never reach this point. ">was an OOM error, we would never reach this point. </param>
-				if(pListItem.pExpr!=null&&ALWAYS(pListItem.pExpr.pColl)) {
-					int nColl;
-					zColl=pListItem.pExpr.pColl.zName;
-					nColl=StringExtensions.sqlite3Strlen30(zColl);
-					Debug.Assert(nExtra>=nColl);
-					zExtra=new StringBuilder(zColl.Substring(0,nColl));
-					// memcpy( zExtra, zColl, nColl );
-					zColl=zExtra.ToString();
-					//zExtra += nColl;
-					nExtra-=nColl;
-				}
-				else {
-					zColl=pTab.aCol[j].zColl;
-					if(zColl==null) {
-						zColl=db.pDfltColl.zName;
-					}
-				}
-				if(0==db.init.busy&&sqlite3LocateCollSeq(pParse,zColl)==null) {
-					goto exit_create_index;
-				}
-				pIndex.azColl[i]=zColl;
-				requestedSortOrder=(u8)((pListItem.sortOrder&sortOrderMask)!=0?1:0);
-				pIndex.aSortOrder[i]=(u8)requestedSortOrder;
-			}
-			sqlite3DefaultRowEst(pIndex);
-			if(pTab==pParse.pNewTable) {
-				///
-				///<summary>
-				///This routine has been called to create an automatic index as a
-				///result of a PRIMARY KEY or UNIQUE clause on a column definition, or
-				///a PRIMARY KEY or UNIQUE clause following the column definitions.
-				///i.e. one of:
-				///
-				///CREATE TABLE t(x PRIMARY KEY, y);
-				///CREATE TABLE t(x, y, UNIQUE(x, y));
-				///
-				///Either way, check to see if the table already has such an index. If
-				///so, don't bother creating this one. This only applies to
-				///automatically created indices. Users can do as they wish with
-				///explicit indices.
-				///
-				///Two UNIQUE or PRIMARY KEY constraints are considered equivalent
-				///(and thus suppressing the second one) even if they have different
-				///sort orders.
-				///
-				///If there are different collating sequences or if the columns of
-				///the constraint occur in different orders, then the constraints are
-				///considered distinct and both result in separate indices.
-				///
-				///</summary>
-				Index pIdx;
-				for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-					int k;
-					Debug.Assert(pIdx.onError!=OE_None);
-					Debug.Assert(pIdx.autoIndex!=0);
-					Debug.Assert(pIndex.onError!=OE_None);
-					if(pIdx.nColumn!=pIndex.nColumn)
-						continue;
-					for(k=0;k<pIdx.nColumn;k++) {
-						string z1;
-						string z2;
-						if(pIdx.aiColumn[k]!=pIndex.aiColumn[k])
-							break;
-						z1=pIdx.azColl[k];
-						z2=pIndex.azColl[k];
-						if(z1!=z2&&!z1.Equals(z2,StringComparison.InvariantCultureIgnoreCase))
-							break;
-					}
-					if(k==pIdx.nColumn) {
-						if(pIdx.onError!=pIndex.onError) {
-							///
-							///<summary>
-							///This constraint creates the same index as a previous
-							///constraint specified somewhere in the CREATE TABLE statement.
-							///However the ON CONFLICT clauses are different. If both this
-							///constraint and the previous equivalent constraint have explicit
-							///ON CONFLICT clauses this is an error. Otherwise, use the
-							///explicitly specified behavior for the index.
-							///
-							///</summary>
-							if(!(pIdx.onError==OE_Default||pIndex.onError==OE_Default)) {
-								utilc.sqlite3ErrorMsg(pParse,"conflicting ON CONFLICT clauses specified",0);
-							}
-							if(pIdx.onError==OE_Default) {
-								pIdx.onError=pIndex.onError;
-							}
-						}
-						goto exit_create_index;
-					}
-				}
-			}
-			///
-			///<summary>
-			///Link the new Index structure to its table and to the other
-			///</summary>
-			///<param name="in">memory database structures.</param>
-			///<param name=""></param>
-			if(db.init.busy!=0) {
-				Index p;
-				Debug.Assert(sqlite3SchemaMutexHeld(db,0,pIndex.pSchema));
-				p=sqlite3HashInsert(ref pIndex.pSchema.idxHash,pIndex.zName,StringExtensions.sqlite3Strlen30(pIndex.zName),pIndex);
-				if(p!=null) {
-					Debug.Assert(p==pIndex);
-					///
-					///<summary>
-					///Malloc must have failed 
-					///</summary>
-					//        db.mallocFailed = 1;
-					goto exit_create_index;
-				}
-				db.flags|=SQLITE_InternChanges;
-				if(pTblName!=null) {
-					pIndex.tnum=db.init.newTnum;
-				}
-			}
-			///
-			///<summary>
-			///If the db.init.busy is 0 then create the index on disk.  This
-			///involves writing the index into the master table and filling in the
-			///index with the current table contents.
-			///
-			///The db.init.busy is 0 when the user first enters a CREATE INDEX
-			///command.  db.init.busy is 1 when a database is opened and
-			///CREATE INDEX statements are read out of the master table.  In
-			///the latter case the index already exists on disk, which is why
-			///we don't want to recreate it.
-			///
-			///If pTblName==0 it means this index is generated as a primary key
-			///or UNIQUE constraint of a CREATE TABLE statement.  Since the table
-			///has just been created, it contains no data and the index initialization
-			///step can be skipped.
-			///
-			///</summary>
-			else//if ( 0 == db.init.busy )
-			 {
-				Vdbe v;
-				string zStmt;
-				int iMem=++pParse.nMem;
-				v=pParse.sqlite3GetVdbe();
-				if(v==null)
-					goto exit_create_index;
-				///
-				///<summary>
-				///Create the rootpage for the index
-				///
-				///</summary>
-				sqlite3BeginWriteOperation(pParse,1,iDb);
-				v.sqlite3VdbeAddOp2(OP_CreateIndex,iDb,iMem);
-				///
-				///<summary>
-				///Gather the complete text of the CREATE INDEX statement into
-				///the zStmt variable
-				///
-				///</summary>
-				if(pStart!=null) {
-					Debug.Assert(pEnd!=null);
-					///
-					///<summary>
-					///A named index with an explicit CREATE INDEX statement 
-					///</summary>
-					zStmt=io.sqlite3MPrintf(db,"CREATE%s INDEX %.*s",onError==OE_None?"":" UNIQUE",(int)(pName.zRestSql.Length-pEnd.zRestSql.Length)+1,pName.zRestSql);
-				}
-				else {
-					///
-					///<summary>
-					///An automatic index created by a PRIMARY KEY or UNIQUE constraint 
-					///</summary>
-					///
-					///<summary>
-					///zStmt = io.sqlite3MPrintf(""); 
-					///</summary>
-					zStmt=null;
-				}
-				///
-				///<summary>
-				///Add an entry in sqlite_master for this index
-				///
-				///</summary>
-				sqlite3NestedParse(pParse,"INSERT INTO %Q.%s VALUES('index',%Q,%Q,#%d,%Q);",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),pIndex.zName,pTab.zName,iMem,zStmt);
-				db.sqlite3DbFree(ref zStmt);
-				///
-				///<summary>
-				///Fill the index with data and reparse the schema. Code an OP_Expire
-				///</summary>
-				///<param name="to invalidate all pre">compiled statements.</param>
-				///<param name=""></param>
-				if(pTblName!=null) {
-					sqlite3RefillIndex(pParse,pIndex,iMem);
-					sqlite3ChangeCookie(pParse,iDb);
-					v.sqlite3VdbeAddParseSchemaOp(iDb,io.sqlite3MPrintf(db,"name='%q' AND type='index'",pIndex.zName));
-					v.sqlite3VdbeAddOp1(OpCode.OP_Expire,0);
-				}
-			}
-			///
-			///<summary>
-			///When adding an index to the list of indices for a table, make
-			///sure all indices labeled OE_Replace come after all those labeled
-			///OE_Ignore.  This is necessary for the correct constraint check
-			///processing (in sqlite3GenerateConstraintChecks()) as part of
-			///UPDATE and INSERT statements.
-			///
-			///</summary>
-			if(db.init.busy!=0||pTblName==null) {
-				if(onError!=OE_Replace||pTab.pIndex==null||pTab.pIndex.onError==OE_Replace) {
-					pIndex.pNext=pTab.pIndex;
-					pTab.pIndex=pIndex;
-				}
-				else {
-					Index pOther=pTab.pIndex;
-					while(pOther.pNext!=null&&pOther.pNext.onError!=OE_Replace) {
-						pOther=pOther.pNext;
-					}
-					pIndex.pNext=pOther.pNext;
-					pOther.pNext=pIndex;
-				}
-				pRet=pIndex;
-				pIndex=null;
-			}
-			///
-			///<summary>
-			///Clean up before exiting 
-			///</summary>
-			exit_create_index:
-			if(pIndex!=null) {
-				//sqlite3DbFree(db, ref pIndex.zColAff );
-				db.sqlite3DbFree(ref pIndex);
-			}
-			exprc.sqlite3ExprListDelete(db,ref pList);
-			sqlite3SrcListDelete(db,ref pTblName);
-			db.sqlite3DbFree(ref zName);
-			return pRet;
-		}
-		///<summary>
-		/// Fill the Index.aiRowEst[] array with default information - information
-		/// to be used when we have not run the ANALYZE command.
-		///
-		/// aiRowEst[0] is suppose to contain the number of elements in the index.
-		/// Since we do not know, guess 1 million.  aiRowEst[1] is an estimate of the
-		/// number of rows in the table that match any particular value of the
-		/// first column of the index.  aiRowEst[2] is an estimate of the number
-		/// of rows that match any particular combiniation of the first 2 columns
-		/// of the index.  And so forth.  It must always be the case that
-		///
-		///           aiRowEst[N]<=aiRowEst[N-1]
-		///           aiRowEst[N]>=1
-		///
-		/// Apart from that, we have little to go on besides intuition as to
-		/// how aiRowEst[] should be initialized.  The numbers generated here
-		/// are based on typical values found in actual indices.
-		///
-		///</summary>
-		static void sqlite3DefaultRowEst(Index pIdx) {
-			int[] a=pIdx.aiRowEst;
-			int i;
-			int n;
-			Debug.Assert(a!=null);
-			a[0]=(int)pIdx.pTable.nRowEst;
-			if(a[0]<10)
-				a[0]=10;
-			n=10;
-			for(i=1;i<=pIdx.nColumn;i++) {
-				a[i]=n;
-				if(n>5)
-					n--;
-			}
-			if(pIdx.onError!=OE_None) {
-				a[pIdx.nColumn]=1;
-			}
-		}
-		///<summary>
-		/// This routine will drop an existing named index.  This routine
-		/// implements the DROP INDEX statement.
-		///
-		///</summary>
-		static void sqlite3DropIndex(Parse pParse,SrcList pName,int ifExists) {
-			Index pIndex;
-			Vdbe v;
-			sqlite3 db=pParse.db;
-			int iDb;
-			Debug.Assert(pParse.nErr==0);
-			///
-			///<summary>
-			///Never called with prior errors 
-			///</summary>
-			//if ( db.mallocFailed != 0 )
-			//{
-			//  goto exit_drop_index;
-			//}
-			Debug.Assert(pName.nSrc==1);
-			if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
-				goto exit_drop_index;
-			}
-			pIndex=sqlite3FindIndex(db,pName.a[0].zName,pName.a[0].zDatabase);
-			if(pIndex==null) {
-				if(ifExists==0) {
-					utilc.sqlite3ErrorMsg(pParse,"no such index: %S",pName,0);
-				}
-				else {
-					sqlite3CodeVerifyNamedSchema(pParse,pName.a[0].zDatabase);
-				}
-				pParse.checkSchema=1;
-				goto exit_drop_index;
-			}
-			if(pIndex.autoIndex!=0) {
-				utilc.sqlite3ErrorMsg(pParse,"index associated with UNIQUE "+"or PRIMARY KEY constraint cannot be dropped",0);
-				goto exit_drop_index;
-			}
-			iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
-			#if !SQLITE_OMIT_AUTHORIZATION
+                ///
+                ///<summary>
+                ///If pList==0, it means this routine was called to make a primary
+                ///key out of the last column added to the table under construction.
+                ///So create a fake list to simulate this.
+                ///</summary>
+                if (pList == null)
+                {
+                    nullId.zRestSql = pTab.aCol[pTab.nCol - 1].zName;
+                    nullId.Length = StringExtensions.sqlite3Strlen30(nullId.zRestSql);
+                    pList = pParse.sqlite3ExprListAppend(null, null);
+                    if (pList == null)
+                        goto exit_create_index;
+                    pParse.sqlite3ExprListSetName(pList, nullId, 0);
+                    pList.a[0].sortOrder = (u8)sortOrder;
+                }
+                ///
+                ///<summary>
+                ///Figure out how many bytes of space are required to store explicitly
+                ///specified collation sequence names.
+                ///
+                ///</summary>
+                for (i = 0; i < pList.nExpr; i++)
+                {
+                    Expr pExpr = pList.a[i].pExpr;
+                    if (pExpr != null)
+                    {
+                        CollSeq pColl = pExpr.pColl;
+                        ///
+                        ///<summary>
+                        ///Either pColl!=0 or there was an OOM failure.  But if an OOM
+                        ///failure we have quit before reaching this point. 
+                        ///</summary>
+                        if (ALWAYS(pColl != null))
+                        {
+                            nExtra += (1 + StringExtensions.sqlite3Strlen30(pColl.zName));
+                        }
+                    }
+                }
+                ///
+                ///<summary>
+                ///Allocate the index structure.
+                ///
+                ///</summary>
+                nName = StringExtensions.sqlite3Strlen30(zName);
+                nCol = pList.nExpr;
+                pIndex = new Index();
+                // sqlite3DbMallocZero( db,
+                //    Index.Length +              /* Index structure  */
+                //    sizeof( int ) * nCol +           /* Index.aiColumn   */
+                //    sizeof( int ) * ( nCol + 1 ) +       /* Index.aiRowEst   */
+                //    sizeof( char* ) * nCol +        /* Index.azColl     */
+                //    u8.Length * nCol +            /* Index.aSortOrder */
+                //    nName + 1 +                  /* Index.zName      */
+                //    nExtra                       /* Collation sequence names */
+                //);
+                //if ( db.mallocFailed != 0 )
+                //{
+                //  goto exit_create_index;
+                //}
+                pIndex.azColl = new string[nCol + 1];
+                //(char*)(pIndex[1]);
+                pIndex.aiColumn = new int[nCol + 1];
+                //(int )(pIndex->azColl[nCol]);
+                pIndex.aiRowEst = new int[nCol + 1];
+                //(unsigned )(pIndex->aiColumn[nCol]);
+                pIndex.aSortOrder = new byte[nCol + 1];
+                //(u8 )(pIndex->aiRowEst[nCol+1]);
+                //pIndex.zName = null;// (char)( &pIndex->aSortOrder[nCol] );
+                zExtra = new StringBuilder(nName + 1);
+                // (char)( &pIndex.zName[nName + 1] );
+                if (zName.Length == nName)
+                    pIndex.zName = zName;
+                else
+                {
+                    pIndex.zName = zName.Substring(0, nName);
+                }
+                // memcpy( pIndex.zName, zName, nName + 1 );
+                pIndex.pTable = pTab;
+                pIndex.nColumn = pList.nExpr;
+                pIndex.onError = (u8)onError;
+                pIndex.autoIndex = (u8)(pName == null ? 1 : 0);
+                pIndex.pSchema = db.aDb[iDb].pSchema;
+                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                ///
+                ///<summary>
+                ///Check to see if we should honor DESC requests on index columns
+                ///
+                ///</summary>
+                if (pDb.pSchema.file_format >= 4)
+                {
+                    sortOrderMask = 1;
+                    ///
+                    ///<summary>
+                    ///Honor DESC 
+                    ///</summary>
+                }
+                else
+                {
+                    sortOrderMask = 0;
+                    ///
+                    ///<summary>
+                    ///Ignore DESC 
+                    ///</summary>
+                }
+                ///
+                ///<summary>
+                ///Scan the names of the columns of the table to be indexed and
+                ///load the column indices into the Index structure.  Report an error
+                ///if any column is not found.
+                ///
+                ///TODO:  Add a test to make sure that the same column is not named
+                ///more than once within the same index.  Only the first instance of
+                ///the column will ever be used by the optimizer.  Note that using the
+                ///same column more than once cannot be an error because that would
+                ///</summary>
+                ///<param name="break backwards compatibility "> it needs to be a warning.</param>
+                ///<param name=""></param>
+                for (i = 0; i < pList.nExpr; i++)
+                {
+                    //, pListItem++){
+                    pListItem = pList.a[i];
+                    string zColName = pListItem.zName;
+                    Column pTabCol;
+                    byte requestedSortOrder;
+                    string zColl;
+                    ///
+                    ///<summary>
+                    ///Collation sequence name 
+                    ///</summary>
+                    for (j = 0; j < pTab.nCol; j++)
+                    {
+                        //, pTabCol++){
+                        pTabCol = pTab.aCol[j];
+                        if (zColName.Equals(pTabCol.zName, StringComparison.InvariantCultureIgnoreCase))
+                            break;
+                    }
+                    if (j >= pTab.nCol)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "table %s has no column named %s", pTab.zName, zColName);
+                        pParse.checkSchema = 1;
+                        goto exit_create_index;
+                    }
+                    pIndex.aiColumn[i] = j;
+                    ///
+                    ///<summary>
+                    ///</summary>
+                    ///<param name="Justification of the ALWAYS(pListItem">>pColl):  Because of</param>
+                    ///<param name="the way the "idxlist" non">terminal is constructed by the parser,</param>
+                    ///<param name="if pListItem">>pColl</param>
+                    ///<param name="must exist or else there must have been an OOM error.  But if there">must exist or else there must have been an OOM error.  But if there</param>
+                    ///<param name="was an OOM error, we would never reach this point. ">was an OOM error, we would never reach this point. </param>
+                    if (pListItem.pExpr != null && ALWAYS(pListItem.pExpr.pColl))
+                    {
+                        int nColl;
+                        zColl = pListItem.pExpr.pColl.zName;
+                        nColl = StringExtensions.sqlite3Strlen30(zColl);
+                        Debug.Assert(nExtra >= nColl);
+                        zExtra = new StringBuilder(zColl.Substring(0, nColl));
+                        // memcpy( zExtra, zColl, nColl );
+                        zColl = zExtra.ToString();
+                        //zExtra += nColl;
+                        nExtra -= nColl;
+                    }
+                    else
+                    {
+                        zColl = pTab.aCol[j].zColl;
+                        if (zColl == null)
+                        {
+                            zColl = db.pDfltColl.zName;
+                        }
+                    }
+                    if (0 == db.init.busy && build.sqlite3LocateCollSeq(pParse, zColl) == null)
+                    {
+                        goto exit_create_index;
+                    }
+                    pIndex.azColl[i] = zColl;
+                    requestedSortOrder = (u8)((pListItem.sortOrder & sortOrderMask) != 0 ? 1 : 0);
+                    pIndex.aSortOrder[i] = (u8)requestedSortOrder;
+                }
+                sqlite3DefaultRowEst(pIndex);
+                if (pTab == pParse.pNewTable)
+                {
+                    ///
+                    ///<summary>
+                    ///This routine has been called to create an automatic index as a
+                    ///result of a PRIMARY KEY or UNIQUE clause on a column definition, or
+                    ///a PRIMARY KEY or UNIQUE clause following the column definitions.
+                    ///i.e. one of:
+                    ///
+                    ///CREATE TABLE t(x PRIMARY KEY, y);
+                    ///CREATE TABLE t(x, y, UNIQUE(x, y));
+                    ///
+                    ///Either way, check to see if the table already has such an index. If
+                    ///so, don't bother creating this one. This only applies to
+                    ///automatically created indices. Users can do as they wish with
+                    ///explicit indices.
+                    ///
+                    ///Two UNIQUE or PRIMARY KEY constraints are considered equivalent
+                    ///(and thus suppressing the second one) even if they have different
+                    ///sort orders.
+                    ///
+                    ///If there are different collating sequences or if the columns of
+                    ///the constraint occur in different orders, then the constraints are
+                    ///considered distinct and both result in separate indices.
+                    ///
+                    ///</summary>
+                    Index pIdx;
+                    for (pIdx = pTab.pIndex; pIdx != null; pIdx = pIdx.pNext)
+                    {
+                        int k;
+                        Debug.Assert(pIdx.onError != OE_None);
+                        Debug.Assert(pIdx.autoIndex != 0);
+                        Debug.Assert(pIndex.onError != OE_None);
+                        if (pIdx.nColumn != pIndex.nColumn)
+                            continue;
+                        for (k = 0; k < pIdx.nColumn; k++)
+                        {
+                            string z1;
+                            string z2;
+                            if (pIdx.aiColumn[k] != pIndex.aiColumn[k])
+                                break;
+                            z1 = pIdx.azColl[k];
+                            z2 = pIndex.azColl[k];
+                            if (z1 != z2 && !z1.Equals(z2, StringComparison.InvariantCultureIgnoreCase))
+                                break;
+                        }
+                        if (k == pIdx.nColumn)
+                        {
+                            if (pIdx.onError != pIndex.onError)
+                            {
+                                ///
+                                ///<summary>
+                                ///This constraint creates the same index as a previous
+                                ///constraint specified somewhere in the CREATE TABLE statement.
+                                ///However the ON CONFLICT clauses are different. If both this
+                                ///constraint and the previous equivalent constraint have explicit
+                                ///ON CONFLICT clauses this is an error. Otherwise, use the
+                                ///explicitly specified behavior for the index.
+                                ///
+                                ///</summary>
+                                if (!(pIdx.onError == OE_Default || pIndex.onError == OE_Default))
+                                {
+                                    utilc.sqlite3ErrorMsg(pParse, "conflicting ON CONFLICT clauses specified", 0);
+                                }
+                                if (pIdx.onError == OE_Default)
+                                {
+                                    pIdx.onError = pIndex.onError;
+                                }
+                            }
+                            goto exit_create_index;
+                        }
+                    }
+                }
+                ///
+                ///<summary>
+                ///Link the new Index structure to its table and to the other
+                ///</summary>
+                ///<param name="in">memory database structures.</param>
+                ///<param name=""></param>
+                if (db.init.busy != 0)
+                {
+                    Index p;
+                    Debug.Assert(sqlite3SchemaMutexHeld(db, 0, pIndex.pSchema));
+                    p = sqlite3HashInsert(ref pIndex.pSchema.idxHash, pIndex.zName, StringExtensions.sqlite3Strlen30(pIndex.zName), pIndex);
+                    if (p != null)
+                    {
+                        Debug.Assert(p == pIndex);
+                        ///
+                        ///<summary>
+                        ///Malloc must have failed 
+                        ///</summary>
+                        //        db.mallocFailed = 1;
+                        goto exit_create_index;
+                    }
+                    db.flags |= SQLITE_InternChanges;
+                    if (pTblName != null)
+                    {
+                        pIndex.tnum = db.init.newTnum;
+                    }
+                }
+                ///
+                ///<summary>
+                ///If the db.init.busy is 0 then create the index on disk.  This
+                ///involves writing the index into the master table and filling in the
+                ///index with the current table contents.
+                ///
+                ///The db.init.busy is 0 when the user first enters a CREATE INDEX
+                ///command.  db.init.busy is 1 when a database is opened and
+                ///CREATE INDEX statements are read out of the master table.  In
+                ///the latter case the index already exists on disk, which is why
+                ///we don't want to recreate it.
+                ///
+                ///If pTblName==0 it means this index is generated as a primary key
+                ///or UNIQUE constraint of a CREATE TABLE statement.  Since the table
+                ///has just been created, it contains no data and the index initialization
+                ///step can be skipped.
+                ///
+                ///</summary>
+                else//if ( 0 == db.init.busy )
+                {
+                    Vdbe v;
+                    string zStmt;
+                    int iMem = ++pParse.nMem;
+                    v = pParse.sqlite3GetVdbe();
+                    if (v == null)
+                        goto exit_create_index;
+                    ///
+                    ///<summary>
+                    ///Create the rootpage for the index
+                    ///
+                    ///</summary>
+                    sqlite3BeginWriteOperation(pParse, 1, iDb);
+                    v.sqlite3VdbeAddOp2(OP_CreateIndex, iDb, iMem);
+                    ///
+                    ///<summary>
+                    ///Gather the complete text of the CREATE INDEX statement into
+                    ///the zStmt variable
+                    ///
+                    ///</summary>
+                    if (pStart != null)
+                    {
+                        Debug.Assert(pEnd != null);
+                        ///
+                        ///<summary>
+                        ///A named index with an explicit CREATE INDEX statement 
+                        ///</summary>
+                        zStmt = io.sqlite3MPrintf(db, "CREATE%s INDEX %.*s", onError == OE_None ? "" : " UNIQUE", (int)(pName.zRestSql.Length - pEnd.zRestSql.Length) + 1, pName.zRestSql);
+                    }
+                    else
+                    {
+                        ///
+                        ///<summary>
+                        ///An automatic index created by a PRIMARY KEY or UNIQUE constraint 
+                        ///</summary>
+                        ///
+                        ///<summary>
+                        ///zStmt = io.sqlite3MPrintf(""); 
+                        ///</summary>
+                        zStmt = null;
+                    }
+                    ///
+                    ///<summary>
+                    ///Add an entry in sqlite_master for this index
+                    ///
+                    ///</summary>
+                    build.sqlite3NestedParse(pParse, "INSERT INTO %Q.%s VALUES('index',%Q,%Q,#%d,%Q);", db.aDb[iDb].zName, SCHEMA_TABLE(iDb), pIndex.zName, pTab.zName, iMem, zStmt);
+                    db.sqlite3DbFree(ref zStmt);
+                    ///
+                    ///<summary>
+                    ///Fill the index with data and reparse the schema. Code an OP_Expire
+                    ///</summary>
+                    ///<param name="to invalidate all pre">compiled statements.</param>
+                    ///<param name=""></param>
+                    if (pTblName != null)
+                    {
+                        sqlite3RefillIndex(pParse, pIndex, iMem);
+                        sqlite3ChangeCookie(pParse, iDb);
+                        v.sqlite3VdbeAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "name='%q' AND type='index'", pIndex.zName));
+                        v.sqlite3VdbeAddOp1(OpCode.OP_Expire, 0);
+                    }
+                }
+                ///
+                ///<summary>
+                ///When adding an index to the list of indices for a table, make
+                ///sure all indices labeled OE_Replace come after all those labeled
+                ///OE_Ignore.  This is necessary for the correct constraint check
+                ///processing (in sqlite3GenerateConstraintChecks()) as part of
+                ///UPDATE and INSERT statements.
+                ///
+                ///</summary>
+                if (db.init.busy != 0 || pTblName == null)
+                {
+                    if (onError != OE_Replace || pTab.pIndex == null || pTab.pIndex.onError == OE_Replace)
+                    {
+                        pIndex.pNext = pTab.pIndex;
+                        pTab.pIndex = pIndex;
+                    }
+                    else
+                    {
+                        Index pOther = pTab.pIndex;
+                        while (pOther.pNext != null && pOther.pNext.onError != OE_Replace)
+                        {
+                            pOther = pOther.pNext;
+                        }
+                        pIndex.pNext = pOther.pNext;
+                        pOther.pNext = pIndex;
+                    }
+                    pRet = pIndex;
+                    pIndex = null;
+                }
+            ///
+            ///<summary>
+            ///Clean up before exiting 
+            ///</summary>
+            exit_create_index:
+                if (pIndex != null)
+                {
+                    //sqlite3DbFree(db, ref pIndex.zColAff );
+                    db.sqlite3DbFree(ref pIndex);
+                }
+                exprc.sqlite3ExprListDelete(db, ref pList);
+                build.sqlite3SrcListDelete(db, ref pTblName);
+                db.sqlite3DbFree(ref zName);
+                return pRet;
+            }
+            ///<summary>
+            /// Fill the Index.aiRowEst[] array with default information - information
+            /// to be used when we have not run the ANALYZE command.
+            ///
+            /// aiRowEst[0] is suppose to contain the number of elements in the index.
+            /// Since we do not know, guess 1 million.  aiRowEst[1] is an estimate of the
+            /// number of rows in the table that match any particular value of the
+            /// first column of the index.  aiRowEst[2] is an estimate of the number
+            /// of rows that match any particular combiniation of the first 2 columns
+            /// of the index.  And so forth.  It must always be the case that
+            ///
+            ///           aiRowEst[N]<=aiRowEst[N-1]
+            ///           aiRowEst[N]>=1
+            ///
+            /// Apart from that, we have little to go on besides intuition as to
+            /// how aiRowEst[] should be initialized.  The numbers generated here
+            /// are based on typical values found in actual indices.
+            ///
+            ///</summary>
+            public static void sqlite3DefaultRowEst(Index pIdx)
+            {
+                int[] a = pIdx.aiRowEst;
+                int i;
+                int n;
+                Debug.Assert(a != null);
+                a[0] = (int)pIdx.pTable.nRowEst;
+                if (a[0] < 10)
+                    a[0] = 10;
+                n = 10;
+                for (i = 1; i <= pIdx.nColumn; i++)
+                {
+                    a[i] = n;
+                    if (n > 5)
+                        n--;
+                }
+                if (pIdx.onError != OE_None)
+                {
+                    a[pIdx.nColumn] = 1;
+                }
+            }
+            ///<summary>
+            /// This routine will drop an existing named index.  This routine
+            /// implements the DROP INDEX statement.
+            ///
+            ///</summary>
+            public static void sqlite3DropIndex(Parse pParse, SrcList pName, int ifExists)
+            {
+                Index pIndex;
+                Vdbe v;
+                sqlite3 db = pParse.db;
+                int iDb;
+                Debug.Assert(pParse.nErr == 0);
+                ///
+                ///<summary>
+                ///Never called with prior errors 
+                ///</summary>
+                //if ( db.mallocFailed != 0 )
+                //{
+                //  goto exit_drop_index;
+                //}
+                Debug.Assert(pName.nSrc == 1);
+                if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                {
+                    goto exit_drop_index;
+                }
+                pIndex = build.sqlite3FindIndex(db, pName.a[0].zName, pName.a[0].zDatabase);
+                if (pIndex == null)
+                {
+                    if (ifExists == 0)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "no such index: %S", pName, 0);
+                    }
+                    else
+                    {
+                        sqlite3CodeVerifyNamedSchema(pParse, pName.a[0].zDatabase);
+                    }
+                    pParse.checkSchema = 1;
+                    goto exit_drop_index;
+                }
+                if (pIndex.autoIndex != 0)
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "index associated with UNIQUE " + "or PRIMARY KEY constraint cannot be dropped", 0);
+                    goto exit_drop_index;
+                }
+                iDb = sqlite3SchemaToIndex(db, pIndex.pSchema);
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	{
 int code = SQLITE_DROP_INDEX;
 Table pTab = pIndex.pTable;
@@ -3662,1008 +3940,1100 @@ goto exit_drop_index;
 }
 }
 #endif
-			///
-			///<summary>
-			///Generate code to remove the index and from the master table 
-			///</summary>
-			v=pParse.sqlite3GetVdbe();
-			if(v!=null) {
-				sqlite3BeginWriteOperation(pParse,1,iDb);
-				sqlite3NestedParse(pParse,"DELETE FROM %Q.%s WHERE name=%Q AND type='index'",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),pIndex.zName);
-				if(sqlite3FindTable(db,"sqlite_stat1",db.aDb[iDb].zName)!=null) {
-					sqlite3NestedParse(pParse,"DELETE FROM %Q.sqlite_stat1 WHERE idx=%Q",db.aDb[iDb].zName,pIndex.zName);
-				}
-				sqlite3ChangeCookie(pParse,iDb);
-				destroyRootPage(pParse,pIndex.tnum,iDb);
-				v.sqlite3VdbeAddOp4(OP_DropIndex,iDb,0,0,pIndex.zName,0);
-			}
-			exit_drop_index:
-			sqlite3SrcListDelete(db,ref pName);
-		}
-		///
-		///<summary>
-		///pArray is a pointer to an array of objects.  Each object in the
-		///array is szEntry bytes in size.  This routine allocates a new
-		///object on the end of the array.
-		///
-		///pnEntry is the number of entries already in use.  pnAlloc is
-		///the previously allocated size of the array.  initSize is the
-		///suggested initial array size allocation.
-		///
-		///The index of the new entry is returned in pIdx.
-		///
-		///This routine returns a pointer to the array of objects.  This
-		///might be the same as the pArray parameter or it might be a different
-		///pointer if the array was resized.
-		///
-		///</summary>
-		static T[] sqlite3ArrayAllocate<T>(sqlite3 db,///
-		///<summary>
-		///Connection to notify of malloc failures 
-		///</summary>
-		T[] pArray,///
-		///<summary>
-		///Array of objects.  Might be reallocated 
-		///</summary>
-		int szEntry,///
-		///<summary>
-		///Size of each object in the array 
-		///</summary>
-		int initSize,///
-		///<summary>
-		///Suggested initial allocation, in elements 
-		///</summary>
-		ref int pnEntry,///
-		///<summary>
-		///Number of objects currently in use 
-		///</summary>
-		ref int pnAlloc,///
-		///<summary>
-		///Current size of the allocation, in elements 
-		///</summary>
-		ref int pIdx///
-		///<summary>
-		///Write the index of a new slot here 
-		///</summary>
-		) where T : new() {
-			//char* z;
-			if(pnEntry>=pnAlloc) {
-				//void* pNew;
-				int newSize;
-				newSize=(pnAlloc)*2+initSize;
-				//pNew = sqlite3DbRealloc(db, pArray, newSize * szEntry);
-				//if (pNew == 0)
-				//{
-				//  pIdx = -1;
-				//  return pArray;
-				//}
-				pnAlloc=newSize;
-				//sqlite3DbMallocSize(db, pNew)/szEntry;
-				//pArray = pNew;
-				Array.Resize(ref pArray,newSize);
-			}
-			pArray[pnEntry]=new T();
-			//z = (char)pArray;
-			//memset(z[*pnEntry * szEntry], 0, szEntry);
-			pIdx=pnEntry;
-			++pnEntry;
-			return pArray;
-		}
-		///<summary>
-		/// Append a new element to the given IdList.  Create a new IdList if
-		/// need be.
-		///
-		/// A new IdList is returned, or NULL if malloc() fails.
-		///
-		///</summary>
-		// OVERLOADS, so I don't need to rewrite parse.c
-		static IdList sqlite3IdListAppend(sqlite3 db,int null_2,Token pToken) {
-			return sqlite3IdListAppend(db,null,pToken);
-		}
-		static IdList sqlite3IdListAppend(sqlite3 db,IdList pList,Token pToken) {
-			int i=0;
-			if(pList==null) {
-				pList=new IdList();
-				//sqlite3DbMallocZero(db, sizeof(IdList));
-				if(pList==null)
-					return null;
-				pList.nAlloc=0;
-			}
-			pList.a=(IdList_item[])sqlite3ArrayAllocate(db,pList.a,-1,//sizeof(pList.a[0]),
-			5,ref pList.nId,ref pList.nAlloc,ref i);
-			if(i<0) {
-				sqlite3IdListDelete(db,ref pList);
-				return null;
-			}
-			pList.a[i].zName=sqlite3NameFromToken(db,pToken);
-			return pList;
-		}
-		///<summary>
-		/// Delete an IdList.
-		///
-		///</summary>
-		static void sqlite3IdListDelete(sqlite3 db,ref IdList pList) {
-			int i;
-			if(pList==null)
-				return;
-			for(i=0;i<pList.nId;i++) {
-				db.sqlite3DbFree(ref pList.a[i].zName);
-			}
-			db.sqlite3DbFree(ref pList.a);
-			db.sqlite3DbFree(ref pList);
-		}
-		///<summary>
-		/// Return the index in pList of the identifier named zId.  Return -1
-		/// if not found.
-		///
-		///</summary>
-		static int sqlite3IdListIndex(IdList pList,string zName) {
-			int i;
-			if(pList==null)
-				return -1;
-			for(i=0;i<pList.nId;i++) {
-				if(pList.a[i].zName.Equals(zName,StringComparison.InvariantCultureIgnoreCase))
-					return i;
-			}
-			return -1;
-		}
-		///
-		///<summary>
-		///Expand the space allocated for the given SrcList object by
-		///creating nExtra new slots beginning at iStart.  iStart is zero based.
-		///New slots are zeroed.
-		///
-		///For example, suppose a SrcList initially contains two entries: A,B.
-		///To append 3 new entries onto the end, do this:
-		///
-		///sqlite3SrcListEnlarge(db, pSrclist, 3, 2);
-		///
-		///After the call above it would contain:  A, B, nil, nil, nil.
-		///If the iStart argument had been 1 instead of 2, then the result
-		///would have been:  A, nil, nil, nil, B.  To prepend the new slots,
-		///the iStart value would be 0.  The result then would
-		///be: nil, nil, nil, A, B.
-		///
-		///If a memory allocation fails the SrcList is unchanged.  The
-		///db.mallocFailed flag will be set to true.
-		///
-		///</summary>
-		static SrcList sqlite3SrcListEnlarge(sqlite3 db,///
-		///<summary>
-		///Database connection to notify of OOM errors 
-		///</summary>
-		SrcList pSrc,///
-		///<summary>
-		///The SrcList to be enlarged 
-		///</summary>
-		int nExtra,///
-		///<summary>
-		///Number of new slots to add to pSrc.a[] 
-		///</summary>
-		int iStart///
-		///<summary>
-		///Index in pSrc.a[] of first new slot 
-		///</summary>
-		) {
-			int i;
-			///
-			///<summary>
-			///Sanity checking on calling parameters 
-			///</summary>
-			Debug.Assert(iStart>=0);
-			Debug.Assert(nExtra>=1);
-			Debug.Assert(pSrc!=null);
-			Debug.Assert(iStart<=pSrc.nSrc);
-			///
-			///<summary>
-			///Allocate additional space if needed 
-			///</summary>
-			if(pSrc.nSrc+nExtra>pSrc.nAlloc) {
-				int nAlloc=pSrc.nSrc+nExtra;
-				int nGot;
-				// sqlite3DbRealloc(db, pSrc,
-				//     sizeof(*pSrc) + (nAlloc-1)*sizeof(pSrc.a[0]) );
-				pSrc.nAlloc=(i16)nAlloc;
-				Array.Resize(ref pSrc.a,nAlloc);
-				//    nGot = (sqlite3DbMallocSize(db, pNew) - sizeof(*pSrc))/sizeof(pSrc->a[0])+1;
-				//pSrc->nAlloc = (u16)nGot;
-			}
-			///
-			///<summary>
-			///Move existing slots that come after the newly inserted slots
-			///out of the way 
-			///</summary>
-			for(i=pSrc.nSrc-1;i>=iStart;i--) {
-				pSrc.a[i+nExtra]=pSrc.a[i];
-			}
-			pSrc.nSrc+=(i16)nExtra;
-			///
-			///<summary>
-			///Zero the newly allocated slots 
-			///</summary>
-			//memset(&pSrc.a[iStart], 0, sizeof(pSrc.a[0])*nExtra);
-			for(i=iStart;i<iStart+nExtra;i++) {
-				pSrc.a[i]=new SrcList_item();
-				pSrc.a[i].iCursor=-1;
-			}
-			///
-			///<summary>
-			///Return a pointer to the enlarged SrcList 
-			///</summary>
-			return pSrc;
-		}
-		///<summary>
-		/// Append a new table name to the given SrcList.  Create a new SrcList if
-		/// need be.  A new entry is created in the SrcList even if pTable is NULL.
-		///
-		/// A SrcList is returned, or NULL if there is an OOM error.  The returned
-		/// SrcList might be the same as the SrcList that was input or it might be
-		/// a new one.  If an OOM error does occurs, then the prior value of pList
-		/// that is input to this routine is automatically freed.
-		///
-		/// If pDatabase is not null, it means that the table has an optional
-		/// database name prefix.  Like this:  "database.table".  The pDatabase
-		/// points to the table name and the pTable points to the database name.
-		/// The SrcList.a[].zName field is filled with the table name which might
-		/// come from pTable (if pDatabase is NULL) or from pDatabase.
-		/// SrcList.a[].zDatabase is filled with the database name from pTable,
-		/// or with NULL if no database is specified.
-		///
-		/// In other words, if call like this:
-		///
-		///         sqlite3SrcListAppend(D,A,B,0);
-		///
-		/// Then B is a table name and the database name is unspecified.  If called
-		/// like this:
-		///
-		///         sqlite3SrcListAppend(D,A,B,C);
-		///
-		/// Then C is the table name and B is the database name.  If C is defined
-		/// then so is B.  In other words, we never have a case where:
-		///
-		///         sqlite3SrcListAppend(D,A,0,C);
-		///
-		/// Both pTable and pDatabase are assumed to be quoted.  They are dequoted
-		/// before being added to the SrcList.
-		///
-		///</summary>
-		// OVERLOADS, so I don't need to rewrite parse.c
-		static SrcList sqlite3SrcListAppend(sqlite3 db,int null_2,Token pTable,int null_4) {
-			return sqlite3SrcListAppend(db,null,pTable,null);
-		}
-		static SrcList sqlite3SrcListAppend(sqlite3 db,int null_2,Token pTable,Token pDatabase) {
-			return sqlite3SrcListAppend(db,null,pTable,pDatabase);
-		}
-		static SrcList sqlite3SrcListAppend(sqlite3 db,///
-		///<summary>
-		///Connection to notify of malloc failures 
-		///</summary>
-		SrcList pList,///
-		///<summary>
-		///Append to this SrcList. NULL creates a new SrcList 
-		///</summary>
-		Token pTable,///
-		///<summary>
-		///Table to append 
-		///</summary>
-		Token pDatabase///
-		///<summary>
-		///Database of the table 
-		///</summary>
-		) {
-			SrcList_item pItem;
-			Debug.Assert(pDatabase==null||pTable!=null);
-			///
-			///<summary>
-			///Cannot have C without B 
-			///</summary>
-			if(pList==null) {
-				pList=new SrcList();
-				//sqlite3DbMallocZero(db, SrcList.Length );
-				//if ( pList == null ) return null;
-				pList.nAlloc=1;
-				pList.a=new SrcList_item[1];
-			}
-			pList=sqlite3SrcListEnlarge(db,pList,1,pList.nSrc);
-			//if ( db.mallocFailed != 0 )
-			//{
-			//  sqlite3SrcListDelete( db, ref pList );
-			//  return null;
-			//}
-			pItem=pList.a[pList.nSrc-1];
-			if(pDatabase!=null&&String.IsNullOrEmpty(pDatabase.zRestSql)) {
-				pDatabase=null;
-			}
-			if(pDatabase!=null) {
-				Token pTemp=pDatabase;
-				pDatabase=pTable;
-				pTable=pTemp;
-			}
-			pItem.zName=sqlite3NameFromToken(db,pTable);
-			pItem.zDatabase=sqlite3NameFromToken(db,pDatabase);
-			return pList;
-		}
-		///<summary>
-		/// Assign VdbeCursor index numbers to all tables in a SrcList
-		///
-		///</summary>
-		static void sqlite3SrcListAssignCursors(Parse pParse,SrcList pList) {
-			int i;
-			SrcList_item pItem;
-			Debug.Assert(pList!=null///
-			///<summary>
-			///|| pParse.db.mallocFailed != 0 
-			///</summary>
-			);
-			if(pList!=null) {
-				for(i=0;i<pList.nSrc;i++) {
-					pItem=pList.a[i];
-					if(pItem.iCursor>=0)
-						break;
-					pItem.iCursor=pParse.nTab++;
-					if(pItem.pSelect!=null) {
-						sqlite3SrcListAssignCursors(pParse,pItem.pSelect.pSrc);
-					}
-				}
-			}
-		}
-		///
-		///<summary>
-		///Delete an entire SrcList including all its substructure.
-		///
-		///</summary>
-		static void sqlite3SrcListDelete(sqlite3 db,ref SrcList pList) {
-			int i;
-			SrcList_item pItem;
-			if(pList==null)
-				return;
-			for(i=0;i<pList.nSrc;i++) {
-				//, pItem++){
-				pItem=pList.a[i];
-				db.sqlite3DbFree(ref pItem.zDatabase);
-				db.sqlite3DbFree(ref pItem.zName);
-				db.sqlite3DbFree(ref pItem.zAlias);
-				db.sqlite3DbFree(ref pItem.zIndex);
-				sqlite3DeleteTable(db,ref pItem.pTab);
-				sqlite3SelectDelete(db,ref pItem.pSelect);
-				exprc.sqlite3ExprDelete(db,ref pItem.pOn);
-				sqlite3IdListDelete(db,ref pItem.pUsing);
-			}
-			db.sqlite3DbFree(ref pList);
-		}
-		///<summary>
-		/// This routine is called by the parser to add a new term to the
-		/// end of a growing FROM clause.  The "p" parameter is the part of
-		/// the FROM clause that has already been constructed.  "p" is NULL
-		/// if this is the first term of the FROM clause.  pTable and pDatabase
-		/// are the name of the table and database named in the FROM clause term.
-		/// pDatabase is NULL if the database name qualifier is missing - the
-		/// usual case.  If the term has a alias, then pAlias points to the
-		/// alias token.  If the term is a subquery, then pSubquery is the
-		/// SELECT statement that the subquery encodes.  The pTable and
-		/// pDatabase parameters are NULL for subqueries.  The pOn and pUsing
-		/// parameters are the content of the ON and USING clauses.
-		///
-		/// Return a new SrcList which encodes is the FROM with the new
-		/// term added.
-		///
-		///</summary>
-		// OVERLOADS, so I don't need to rewrite parse.c
-		static SrcList sqlite3SrcListAppendFromTerm(Parse pParse,SrcList p,int null_3,int null_4,Token pAlias,Select pSubquery,Expr pOn,IdList pUsing) {
-			return sqlite3SrcListAppendFromTerm(pParse,p,null,null,pAlias,pSubquery,pOn,pUsing);
-		}
-		static SrcList sqlite3SrcListAppendFromTerm(Parse pParse,SrcList p,Token pTable,Token pDatabase,Token pAlias,int null_6,Expr pOn,IdList pUsing) {
-			return sqlite3SrcListAppendFromTerm(pParse,p,pTable,pDatabase,pAlias,null,pOn,pUsing);
-		}
-		static SrcList sqlite3SrcListAppendFromTerm(Parse pParse,///
-		///<summary>
-		///Parsing context 
-		///</summary>
-		SrcList p,///
-		///<summary>
-		///The left part of the FROM clause already seen 
-		///</summary>
-		Token pTable,///
-		///<summary>
-		///Name of the table to add to the FROM clause 
-		///</summary>
-		Token pDatabase,///
-		///<summary>
-		///Name of the database containing pTable 
-		///</summary>
-		Token pAlias,///
-		///<summary>
-		///</summary>
-		///<param name="The right">hand side of the AS subexpression </param>
-		Select pSubquery,///
-		///<summary>
-		///A subquery used in place of a table name 
-		///</summary>
-		Expr pOn,///
-		///<summary>
-		///The ON clause of a join 
-		///</summary>
-		IdList pUsing///
-		///<summary>
-		///The USING clause of a join 
-		///</summary>
-		) {
-			SrcList_item pItem;
-			sqlite3 db=pParse.db;
-			if(null==p&&(pOn!=null||pUsing!=null)) {
-				utilc.sqlite3ErrorMsg(pParse,"a JOIN clause is required before %s",(pOn!=null?"ON":"USING"));
-				goto append_from_error;
-			}
-			p=sqlite3SrcListAppend(db,p,pTable,pDatabase);
-			//if ( p == null || NEVER( p.nSrc == 0 ) )
-			//{
-			//  goto append_from_error;
-			//}
-			pItem=p.a[p.nSrc-1];
-			Debug.Assert(pAlias!=null);
-			if(pAlias.Length!=0) {
-				pItem.zAlias=sqlite3NameFromToken(db,pAlias);
-			}
-			pItem.pSelect=pSubquery;
-			pItem.pOn=pOn;
-			pItem.pUsing=pUsing;
-			return p;
-			append_from_error:
-			Debug.Assert(p==null);
-			exprc.sqlite3ExprDelete(db,ref pOn);
-			sqlite3IdListDelete(db,ref pUsing);
-			sqlite3SelectDelete(db,ref pSubquery);
-			return null;
-		}
-		///<summary>
-		/// Add an INDEXED BY or NOT INDEXED clause to the most recently added
-		/// element of the source-list passed as the second argument.
-		///
-		///</summary>
-		static void sqlite3SrcListIndexedBy(Parse pParse,SrcList p,Token pIndexedBy) {
-			Debug.Assert(pIndexedBy!=null);
-			if(p!=null&&ALWAYS(p.nSrc>0)) {
-				SrcList_item pItem=p.a[p.nSrc-1];
-				Debug.Assert(0==pItem.notIndexed&&pItem.zIndex==null);
-				if(pIndexedBy.Length==1&&null==pIndexedBy.zRestSql) {
-					///
-					///<summary>
-					///A "NOT INDEXED" clause was supplied. See parse.y
-					///construct "indexed_opt" for details. 
-					///</summary>
-					pItem.notIndexed=1;
-				}
-				else {
-					pItem.zIndex=sqlite3NameFromToken(pParse.db,pIndexedBy);
-				}
-			}
-		}
-		///<summary>
-		/// When building up a FROM clause in the parser, the join operator
-		/// is initially attached to the left operand.  But the code generator
-		/// expects the join operator to be on the right operand.  This routine
-		/// Shifts all join operators from left to right for an entire FROM
-		/// clause.
-		///
-		/// Example: Suppose the join is like this:
-		///
-		///           A natural cross join B
-		///
-		/// The operator is "natural cross join".  The A and B operands are stored
-		/// in p.a[0] and p.a[1], respectively.  The parser initially stores the
-		/// operator with A.  This routine shifts that operator over to B.
-		///
-		///</summary>
-		static void sqlite3SrcListShiftJoinType(SrcList p) {
-			if(p!=null&&p.a!=null) {
-				int i;
-				for(i=p.nSrc-1;i>0;i--) {
-					p.a[i].jointype=p.a[i-1].jointype;
-				}
-				p.a[0].jointype=0;
-			}
-		}
-		///<summary>
-		/// Begin a transaction
-		///
-		///</summary>
-		static void sqlite3BeginTransaction(Parse pParse,int type) {
-			sqlite3 db;
-			Vdbe v;
-			int i;
-			Debug.Assert(pParse!=null);
-			db=pParse.db;
-			Debug.Assert(db!=null);
-			///
-			///<summary>
-			///if( db.aDb[0].pBt==0 ) return; 
-			///</summary>
-			if(sqlite3AuthCheck(pParse,SQLITE_TRANSACTION,"BEGIN",null,null)!=0) {
-				return;
-			}
-			v=pParse.sqlite3GetVdbe();
-			if(v==null)
-				return;
-			if(type!=TK_DEFERRED) {
-				for(i=0;i<db.nDb;i++) {
-					v.sqlite3VdbeAddOp2(OP_Transaction,i,(type==TK_EXCLUSIVE)?2:1);
-                    vdbeaux.sqlite3VdbeUsesBtree(v, i);
-				}
-			}
-			v.sqlite3VdbeAddOp2(OP_AutoCommit,0,0);
-		}
-		///<summary>
-		/// Commit a transaction
-		///
-		///</summary>
-		static void sqlite3CommitTransaction(Parse pParse) {
-			sqlite3 db;
-			Vdbe v;
-			Debug.Assert(pParse!=null);
-			db=pParse.db;
-			Debug.Assert(db!=null);
-			///
-			///<summary>
-			///if( db.aDb[0].pBt==0 ) return; 
-			///</summary>
-			if(sqlite3AuthCheck(pParse,SQLITE_TRANSACTION,"COMMIT",null,null)!=0) {
-				return;
-			}
-			v=pParse.sqlite3GetVdbe();
-			if(v!=null) {
-				v.sqlite3VdbeAddOp2(OP_AutoCommit,1,0);
-			}
-		}
-		///
-		///<summary>
-		///Rollback a transaction
-		///
-		///</summary>
-		static void sqlite3RollbackTransaction(Parse pParse) {
-			sqlite3 db;
-			Vdbe v;
-			Debug.Assert(pParse!=null);
-			db=pParse.db;
-			Debug.Assert(db!=null);
-			///
-			///<summary>
-			///if( db.aDb[0].pBt==0 ) return; 
-			///</summary>
-			if(sqlite3AuthCheck(pParse,SQLITE_TRANSACTION,"ROLLBACK",null,null)!=0) {
-				return;
-			}
-			v=pParse.sqlite3GetVdbe();
-			if(v!=null) {
-				v.sqlite3VdbeAddOp2(OP_AutoCommit,1,1);
-			}
-		}
-		///<summary>
-		/// This function is called by the parser when it parses a command to create,
-		/// release or rollback an SQL savepoint.
-		///
-		///</summary>
-		#if !SQLITE_OMIT_AUTHORIZATION
+                ///
+                ///<summary>
+                ///Generate code to remove the index and from the master table 
+                ///</summary>
+                v = pParse.sqlite3GetVdbe();
+                if (v != null)
+                {
+                    sqlite3BeginWriteOperation(pParse, 1, iDb);
+                    build.sqlite3NestedParse(pParse, "DELETE FROM %Q.%s WHERE name=%Q AND type='index'", db.aDb[iDb].zName, SCHEMA_TABLE(iDb), pIndex.zName);
+                    if (build.sqlite3FindTable(db, "sqlite_stat1", db.aDb[iDb].zName) != null)
+                    {
+                        build.sqlite3NestedParse(pParse, "DELETE FROM %Q.sqlite_stat1 WHERE idx=%Q", db.aDb[iDb].zName, pIndex.zName);
+                    }
+                    sqlite3ChangeCookie(pParse, iDb);
+                    destroyRootPage(pParse, pIndex.tnum, iDb);
+                    v.sqlite3VdbeAddOp4(OP_DropIndex, iDb, 0, 0, pIndex.zName, 0);
+                }
+            exit_drop_index:
+                build.sqlite3SrcListDelete(db, ref pName);
+            }
+            ///
+            ///<summary>
+            ///pArray is a pointer to an array of objects.  Each object in the
+            ///array is szEntry bytes in size.  This routine allocates a new
+            ///object on the end of the array.
+            ///
+            ///pnEntry is the number of entries already in use.  pnAlloc is
+            ///the previously allocated size of the array.  initSize is the
+            ///suggested initial array size allocation.
+            ///
+            ///The index of the new entry is returned in pIdx.
+            ///
+            ///This routine returns a pointer to the array of objects.  This
+            ///might be the same as the pArray parameter or it might be a different
+            ///pointer if the array was resized.
+            ///
+            ///</summary>
+            public static T[] sqlite3ArrayAllocate<T>(sqlite3 db,///
+                ///<summary>
+                ///Connection to notify of malloc failures 
+                ///</summary>
+            T[] pArray,///
+                ///<summary>
+                ///Array of objects.  Might be reallocated 
+                ///</summary>
+            int szEntry,///
+                ///<summary>
+                ///Size of each object in the array 
+                ///</summary>
+            int initSize,///
+                ///<summary>
+                ///Suggested initial allocation, in elements 
+                ///</summary>
+            ref int pnEntry,///
+                ///<summary>
+                ///Number of objects currently in use 
+                ///</summary>
+            ref int pnAlloc,///
+                ///<summary>
+                ///Current size of the allocation, in elements 
+                ///</summary>
+            ref int pIdx///
+                ///<summary>
+                ///Write the index of a new slot here 
+                ///</summary>
+            ) where T : new()
+            {
+                //char* z;
+                if (pnEntry >= pnAlloc)
+                {
+                    //void* pNew;
+                    int newSize;
+                    newSize = (pnAlloc) * 2 + initSize;
+                    //pNew = sqlite3DbRealloc(db, pArray, newSize * szEntry);
+                    //if (pNew == 0)
+                    //{
+                    //  pIdx = -1;
+                    //  return pArray;
+                    //}
+                    pnAlloc = newSize;
+                    //sqlite3DbMallocSize(db, pNew)/szEntry;
+                    //pArray = pNew;
+                    Array.Resize(ref pArray, newSize);
+                }
+                pArray[pnEntry] = new T();
+                //z = (char)pArray;
+                //memset(z[*pnEntry * szEntry], 0, szEntry);
+                pIdx = pnEntry;
+                ++pnEntry;
+                return pArray;
+            }
+            ///<summary>
+            /// Append a new element to the given IdList.  Create a new IdList if
+            /// need be.
+            ///
+            /// A new IdList is returned, or NULL if malloc() fails.
+            ///
+            ///</summary>
+            // OVERLOADS, so I don't need to rewrite parse.c
+            public static IdList sqlite3IdListAppend(sqlite3 db, int null_2, Token pToken)
+            {
+                return build.sqlite3IdListAppend(db, null, pToken);
+            }
+            public static IdList sqlite3IdListAppend(sqlite3 db, IdList pList, Token pToken)
+            {
+                int i = 0;
+                if (pList == null)
+                {
+                    pList = new IdList();
+                    //sqlite3DbMallocZero(db, sizeof(IdList));
+                    if (pList == null)
+                        return null;
+                    pList.nAlloc = 0;
+                }
+                pList.a = (IdList_item[])sqlite3ArrayAllocate(db, pList.a, -1,//sizeof(pList.a[0]),
+                5, ref pList.nId, ref pList.nAlloc, ref i);
+                if (i < 0)
+                {
+                    build.sqlite3IdListDelete(db, ref pList);
+                    return null;
+                }
+                pList.a[i].zName = build.sqlite3NameFromToken(db, pToken);
+                return pList;
+            }
+            ///<summary>
+            /// Delete an IdList.
+            ///
+            ///</summary>
+            public static void sqlite3IdListDelete(sqlite3 db, ref IdList pList)
+            {
+                int i;
+                if (pList == null)
+                    return;
+                for (i = 0; i < pList.nId; i++)
+                {
+                    db.sqlite3DbFree(ref pList.a[i].zName);
+                }
+                db.sqlite3DbFree(ref pList.a);
+                db.sqlite3DbFree(ref pList);
+            }
+            ///<summary>
+            /// Return the index in pList of the identifier named zId.  Return -1
+            /// if not found.
+            ///
+            ///</summary>
+            public static int sqlite3IdListIndex(IdList pList, string zName)
+            {
+                int i;
+                if (pList == null)
+                    return -1;
+                for (i = 0; i < pList.nId; i++)
+                {
+                    if (pList.a[i].zName.Equals(zName, StringComparison.InvariantCultureIgnoreCase))
+                        return i;
+                }
+                return -1;
+            }
+            ///
+            ///<summary>
+            ///Expand the space allocated for the given SrcList object by
+            ///creating nExtra new slots beginning at iStart.  iStart is zero based.
+            ///New slots are zeroed.
+            ///
+            ///For example, suppose a SrcList initially contains two entries: A,B.
+            ///To append 3 new entries onto the end, do this:
+            ///
+            ///build.sqlite3SrcListEnlarge(db, pSrclist, 3, 2);
+            ///
+            ///After the call above it would contain:  A, B, nil, nil, nil.
+            ///If the iStart argument had been 1 instead of 2, then the result
+            ///would have been:  A, nil, nil, nil, B.  To prepend the new slots,
+            ///the iStart value would be 0.  The result then would
+            ///be: nil, nil, nil, A, B.
+            ///
+            ///If a memory allocation fails the SrcList is unchanged.  The
+            ///db.mallocFailed flag will be set to true.
+            ///
+            ///</summary>
+            public static SrcList sqlite3SrcListEnlarge(sqlite3 db,///
+                ///<summary>
+                ///Database connection to notify of OOM errors 
+                ///</summary>
+            SrcList pSrc,///
+                ///<summary>
+                ///The SrcList to be enlarged 
+                ///</summary>
+            int nExtra,///
+                ///<summary>
+                ///Number of new slots to add to pSrc.a[] 
+                ///</summary>
+            int iStart///
+                ///<summary>
+                ///Index in pSrc.a[] of first new slot 
+                ///</summary>
+            )
+            {
+                int i;
+                ///
+                ///<summary>
+                ///Sanity checking on calling parameters 
+                ///</summary>
+                Debug.Assert(iStart >= 0);
+                Debug.Assert(nExtra >= 1);
+                Debug.Assert(pSrc != null);
+                Debug.Assert(iStart <= pSrc.nSrc);
+                ///
+                ///<summary>
+                ///Allocate additional space if needed 
+                ///</summary>
+                if (pSrc.nSrc + nExtra > pSrc.nAlloc)
+                {
+                    int nAlloc = pSrc.nSrc + nExtra;
+                    int nGot;
+                    // sqlite3DbRealloc(db, pSrc,
+                    //     sizeof(*pSrc) + (nAlloc-1)*sizeof(pSrc.a[0]) );
+                    pSrc.nAlloc = (i16)nAlloc;
+                    Array.Resize(ref pSrc.a, nAlloc);
+                    //    nGot = (sqlite3DbMallocSize(db, pNew) - sizeof(*pSrc))/sizeof(pSrc->a[0])+1;
+                    //pSrc->nAlloc = (u16)nGot;
+                }
+                ///
+                ///<summary>
+                ///Move existing slots that come after the newly inserted slots
+                ///out of the way 
+                ///</summary>
+                for (i = pSrc.nSrc - 1; i >= iStart; i--)
+                {
+                    pSrc.a[i + nExtra] = pSrc.a[i];
+                }
+                pSrc.nSrc += (i16)nExtra;
+                ///
+                ///<summary>
+                ///Zero the newly allocated slots 
+                ///</summary>
+                //memset(&pSrc.a[iStart], 0, sizeof(pSrc.a[0])*nExtra);
+                for (i = iStart; i < iStart + nExtra; i++)
+                {
+                    pSrc.a[i] = new SrcList_item();
+                    pSrc.a[i].iCursor = -1;
+                }
+                ///
+                ///<summary>
+                ///Return a pointer to the enlarged SrcList 
+                ///</summary>
+                return pSrc;
+            }
+            ///<summary>
+            /// Append a new table name to the given SrcList.  Create a new SrcList if
+            /// need be.  A new entry is created in the SrcList even if pTable is NULL.
+            ///
+            /// A SrcList is returned, or NULL if there is an OOM error.  The returned
+            /// SrcList might be the same as the SrcList that was input or it might be
+            /// a new one.  If an OOM error does occurs, then the prior value of pList
+            /// that is input to this routine is automatically freed.
+            ///
+            /// If pDatabase is not null, it means that the table has an optional
+            /// database name prefix.  Like this:  "database.table".  The pDatabase
+            /// points to the table name and the pTable points to the database name.
+            /// The SrcList.a[].zName field is filled with the table name which might
+            /// come from pTable (if pDatabase is NULL) or from pDatabase.
+            /// SrcList.a[].zDatabase is filled with the database name from pTable,
+            /// or with NULL if no database is specified.
+            ///
+            /// In other words, if call like this:
+            ///
+            ///         build.sqlite3SrcListAppend(D,A,B,0);
+            ///
+            /// Then B is a table name and the database name is unspecified.  If called
+            /// like this:
+            ///
+            ///         build.sqlite3SrcListAppend(D,A,B,C);
+            ///
+            /// Then C is the table name and B is the database name.  If C is defined
+            /// then so is B.  In other words, we never have a case where:
+            ///
+            ///         build.sqlite3SrcListAppend(D,A,0,C);
+            ///
+            /// Both pTable and pDatabase are assumed to be quoted.  They are dequoted
+            /// before being added to the SrcList.
+            ///
+            ///</summary>
+            // OVERLOADS, so I don't need to rewrite parse.c
+            public static SrcList sqlite3SrcListAppend(sqlite3 db, int null_2, Token pTable, int null_4)
+            {
+                return build.sqlite3SrcListAppend(db, null, pTable, null);
+            }
+            public static SrcList sqlite3SrcListAppend(sqlite3 db, int null_2, Token pTable, Token pDatabase)
+            {
+                return build.sqlite3SrcListAppend(db, null, pTable, pDatabase);
+            }
+            public static SrcList sqlite3SrcListAppend(sqlite3 db,///
+                ///<summary>
+                ///Connection to notify of malloc failures 
+                ///</summary>
+            SrcList pList,///
+                ///<summary>
+                ///Append to this SrcList. NULL creates a new SrcList 
+                ///</summary>
+            Token pTable,///
+                ///<summary>
+                ///Table to append 
+                ///</summary>
+            Token pDatabase///
+                ///<summary>
+                ///Database of the table 
+                ///</summary>
+            )
+            {
+                SrcList_item pItem;
+                Debug.Assert(pDatabase == null || pTable != null);
+                ///
+                ///<summary>
+                ///Cannot have C without B 
+                ///</summary>
+                if (pList == null)
+                {
+                    pList = new SrcList();
+                    //sqlite3DbMallocZero(db, SrcList.Length );
+                    //if ( pList == null ) return null;
+                    pList.nAlloc = 1;
+                    pList.a = new SrcList_item[1];
+                }
+                pList = build.sqlite3SrcListEnlarge(db, pList, 1, pList.nSrc);
+                //if ( db.mallocFailed != 0 )
+                //{
+                //  build.sqlite3SrcListDelete( db, ref pList );
+                //  return null;
+                //}
+                pItem = pList.a[pList.nSrc - 1];
+                if (pDatabase != null && String.IsNullOrEmpty(pDatabase.zRestSql))
+                {
+                    pDatabase = null;
+                }
+                if (pDatabase != null)
+                {
+                    Token pTemp = pDatabase;
+                    pDatabase = pTable;
+                    pTable = pTemp;
+                }
+                pItem.zName = build.sqlite3NameFromToken(db, pTable);
+                pItem.zDatabase = build.sqlite3NameFromToken(db, pDatabase);
+                return pList;
+            }
+            ///<summary>
+            /// Assign VdbeCursor index numbers to all tables in a SrcList
+            ///
+            ///</summary>
+            public static void sqlite3SrcListAssignCursors(Parse pParse, SrcList pList)
+            {
+                int i;
+                SrcList_item pItem;
+                Debug.Assert(pList != null///
+                    ///<summary>
+                    ///|| pParse.db.mallocFailed != 0 
+                    ///</summary>
+                );
+                if (pList != null)
+                {
+                    for (i = 0; i < pList.nSrc; i++)
+                    {
+                        pItem = pList.a[i];
+                        if (pItem.iCursor >= 0)
+                            break;
+                        pItem.iCursor = pParse.nTab++;
+                        if (pItem.pSelect != null)
+                        {
+                            sqlite3SrcListAssignCursors(pParse, pItem.pSelect.pSrc);
+                        }
+                    }
+                }
+            }
+            ///
+            ///<summary>
+            ///Delete an entire SrcList including all its substructure.
+            ///
+            ///</summary>
+            public static void sqlite3SrcListDelete(sqlite3 db, ref SrcList pList)
+            {
+                int i;
+                SrcList_item pItem;
+                if (pList == null)
+                    return;
+                for (i = 0; i < pList.nSrc; i++)
+                {
+                    //, pItem++){
+                    pItem = pList.a[i];
+                    db.sqlite3DbFree(ref pItem.zDatabase);
+                    db.sqlite3DbFree(ref pItem.zName);
+                    db.sqlite3DbFree(ref pItem.zAlias);
+                    db.sqlite3DbFree(ref pItem.zIndex);
+                    build.sqlite3DeleteTable(db, ref pItem.pTab);
+                    sqlite3SelectDelete(db, ref pItem.pSelect);
+                    exprc.sqlite3ExprDelete(db, ref pItem.pOn);
+                    build.sqlite3IdListDelete(db, ref pItem.pUsing);
+                }
+                db.sqlite3DbFree(ref pList);
+            }
+            ///<summary>
+            /// This routine is called by the parser to add a new term to the
+            /// end of a growing FROM clause.  The "p" parameter is the part of
+            /// the FROM clause that has already been constructed.  "p" is NULL
+            /// if this is the first term of the FROM clause.  pTable and pDatabase
+            /// are the name of the table and database named in the FROM clause term.
+            /// pDatabase is NULL if the database name qualifier is missing - the
+            /// usual case.  If the term has a alias, then pAlias points to the
+            /// alias token.  If the term is a subquery, then pSubquery is the
+            /// SELECT statement that the subquery encodes.  The pTable and
+            /// pDatabase parameters are NULL for subqueries.  The pOn and pUsing
+            /// parameters are the content of the ON and USING clauses.
+            ///
+            /// Return a new SrcList which encodes is the FROM with the new
+            /// term added.
+            ///
+            ///</summary>
+            // OVERLOADS, so I don't need to rewrite parse.c
+            public static SrcList sqlite3SrcListAppendFromTerm(Parse pParse, SrcList p, int null_3, int null_4, Token pAlias, Select pSubquery, Expr pOn, IdList pUsing)
+            {
+                return build.sqlite3SrcListAppendFromTerm(pParse, p, null, null, pAlias, pSubquery, pOn, pUsing);
+            }
+            public static SrcList sqlite3SrcListAppendFromTerm(Parse pParse, SrcList p, Token pTable, Token pDatabase, Token pAlias, int null_6, Expr pOn, IdList pUsing)
+            {
+                return build.sqlite3SrcListAppendFromTerm(pParse, p, pTable, pDatabase, pAlias, null, pOn, pUsing);
+            }
+            public static SrcList sqlite3SrcListAppendFromTerm(Parse pParse,///
+                ///<summary>
+                ///Parsing context 
+                ///</summary>
+            SrcList p,///
+                ///<summary>
+                ///The left part of the FROM clause already seen 
+                ///</summary>
+            Token pTable,///
+                ///<summary>
+                ///Name of the table to add to the FROM clause 
+                ///</summary>
+            Token pDatabase,///
+                ///<summary>
+                ///Name of the database containing pTable 
+                ///</summary>
+            Token pAlias,///
+                ///<summary>
+                ///</summary>
+                ///<param name="The right">hand side of the AS subexpression </param>
+            Select pSubquery,///
+                ///<summary>
+                ///A subquery used in place of a table name 
+                ///</summary>
+            Expr pOn,///
+                ///<summary>
+                ///The ON clause of a join 
+                ///</summary>
+            IdList pUsing///
+                ///<summary>
+                ///The USING clause of a join 
+                ///</summary>
+            )
+            {
+                SrcList_item pItem;
+                sqlite3 db = pParse.db;
+                if (null == p && (pOn != null || pUsing != null))
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "a JOIN clause is required before %s", (pOn != null ? "ON" : "USING"));
+                    goto append_from_error;
+                }
+                p = build.sqlite3SrcListAppend(db, p, pTable, pDatabase);
+                //if ( p == null || NEVER( p.nSrc == 0 ) )
+                //{
+                //  goto append_from_error;
+                //}
+                pItem = p.a[p.nSrc - 1];
+                Debug.Assert(pAlias != null);
+                if (pAlias.Length != 0)
+                {
+                    pItem.zAlias = build.sqlite3NameFromToken(db, pAlias);
+                }
+                pItem.pSelect = pSubquery;
+                pItem.pOn = pOn;
+                pItem.pUsing = pUsing;
+                return p;
+            append_from_error:
+                Debug.Assert(p == null);
+                exprc.sqlite3ExprDelete(db, ref pOn);
+                build.sqlite3IdListDelete(db, ref pUsing);
+                sqlite3SelectDelete(db, ref pSubquery);
+                return null;
+            }
+            ///<summary>
+            /// Add an INDEXED BY or NOT INDEXED clause to the most recently added
+            /// element of the source-list passed as the second argument.
+            ///
+            ///</summary>
+            public static void sqlite3SrcListIndexedBy(Parse pParse, SrcList p, Token pIndexedBy)
+            {
+                Debug.Assert(pIndexedBy != null);
+                if (p != null && ALWAYS(p.nSrc > 0))
+                {
+                    SrcList_item pItem = p.a[p.nSrc - 1];
+                    Debug.Assert(0 == pItem.notIndexed && pItem.zIndex == null);
+                    if (pIndexedBy.Length == 1 && null == pIndexedBy.zRestSql)
+                    {
+                        ///
+                        ///<summary>
+                        ///A "NOT INDEXED" clause was supplied. See parse.y
+                        ///construct "indexed_opt" for details. 
+                        ///</summary>
+                        pItem.notIndexed = 1;
+                    }
+                    else
+                    {
+                        pItem.zIndex = build.sqlite3NameFromToken(pParse.db, pIndexedBy);
+                    }
+                }
+            }
+            ///<summary>
+            /// When building up a FROM clause in the parser, the join operator
+            /// is initially attached to the left operand.  But the code generator
+            /// expects the join operator to be on the right operand.  This routine
+            /// Shifts all join operators from left to right for an entire FROM
+            /// clause.
+            ///
+            /// Example: Suppose the join is like this:
+            ///
+            ///           A natural cross join B
+            ///
+            /// The operator is "natural cross join".  The A and B operands are stored
+            /// in p.a[0] and p.a[1], respectively.  The parser initially stores the
+            /// operator with A.  This routine shifts that operator over to B.
+            ///
+            ///</summary>
+            public static void sqlite3SrcListShiftJoinType(SrcList p)
+            {
+                if (p != null && p.a != null)
+                {
+                    int i;
+                    for (i = p.nSrc - 1; i > 0; i--)
+                    {
+                        p.a[i].jointype = p.a[i - 1].jointype;
+                    }
+                    p.a[0].jointype = 0;
+                }
+            }
+            ///<summary>
+            /// Begin a transaction
+            ///
+            ///</summary>
+            public static void sqlite3BeginTransaction(Parse pParse, int type)
+            {
+                sqlite3 db;
+                Vdbe v;
+                int i;
+                Debug.Assert(pParse != null);
+                db = pParse.db;
+                Debug.Assert(db != null);
+                ///
+                ///<summary>
+                ///if( db.aDb[0].pBt==0 ) return; 
+                ///</summary>
+                if (sqlite3AuthCheck(pParse, SQLITE_TRANSACTION, "BEGIN", null, null) != 0)
+                {
+                    return;
+                }
+                v = pParse.sqlite3GetVdbe();
+                if (v == null)
+                    return;
+                if (type != TK_DEFERRED)
+                {
+                    for (i = 0; i < db.nDb; i++)
+                    {
+                        v.sqlite3VdbeAddOp2(OP_Transaction, i, (type == TK_EXCLUSIVE) ? 2 : 1);
+                        vdbeaux.sqlite3VdbeUsesBtree(v, i);
+                    }
+                }
+                v.sqlite3VdbeAddOp2(OP_AutoCommit, 0, 0);
+            }
+            ///<summary>
+            /// Commit a transaction
+            ///
+            ///</summary>
+            public static void sqlite3CommitTransaction(Parse pParse)
+            {
+                sqlite3 db;
+                Vdbe v;
+                Debug.Assert(pParse != null);
+                db = pParse.db;
+                Debug.Assert(db != null);
+                ///
+                ///<summary>
+                ///if( db.aDb[0].pBt==0 ) return; 
+                ///</summary>
+                if (sqlite3AuthCheck(pParse, SQLITE_TRANSACTION, "COMMIT", null, null) != 0)
+                {
+                    return;
+                }
+                v = pParse.sqlite3GetVdbe();
+                if (v != null)
+                {
+                    v.sqlite3VdbeAddOp2(OP_AutoCommit, 1, 0);
+                }
+            }
+            ///
+            ///<summary>
+            ///Rollback a transaction
+            ///
+            ///</summary>
+            public static void sqlite3RollbackTransaction(Parse pParse)
+            {
+                sqlite3 db;
+                Vdbe v;
+                Debug.Assert(pParse != null);
+                db = pParse.db;
+                Debug.Assert(db != null);
+                ///
+                ///<summary>
+                ///if( db.aDb[0].pBt==0 ) return; 
+                ///</summary>
+                if (sqlite3AuthCheck(pParse, SQLITE_TRANSACTION, "ROLLBACK", null, null) != 0)
+                {
+                    return;
+                }
+                v = pParse.sqlite3GetVdbe();
+                if (v != null)
+                {
+                    v.sqlite3VdbeAddOp2(OP_AutoCommit, 1, 1);
+                }
+            }
+            ///<summary>
+            /// This function is called by the parser when it parses a command to create,
+            /// release or rollback an SQL savepoint.
+            ///
+            ///</summary>
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																						const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
 #endif
-		static void sqlite3Savepoint(Parse pParse,int op,Token pName) {
-			string zName=sqlite3NameFromToken(pParse.db,pName);
-			if(zName!=null) {
-				Vdbe v=pParse.sqlite3GetVdbe();
-				#if !SQLITE_OMIT_AUTHORIZATION
+            public static void sqlite3Savepoint(Parse pParse, int op, Token pName)
+            {
+                string zName = build.sqlite3NameFromToken(pParse.db, pName);
+                if (zName != null)
+                {
+                    Vdbe v = pParse.sqlite3GetVdbe();
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																												Debug.Assert( !SAVEPOINT_BEGIN && SAVEPOINT_RELEASE==1 && SAVEPOINT_ROLLBACK==2 );
 #endif
-				if(null==v
-				#if !SQLITE_OMIT_AUTHORIZATION
+                    if (null == v
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																												|| sqlite3AuthCheck(pParse, SQLITE_SAVEPOINT, az[op], zName, 0)
 #endif
-				) {
-					pParse.db.sqlite3DbFree(ref zName);
-					return;
-				}
-				v.sqlite3VdbeAddOp4(OP_Savepoint,op,0,0,zName,P4_DYNAMIC);
-			}
-		}
-		///<summary>
-		/// Make sure the TEMP database is open and available for use.  Return
-		/// the number of errors.  Leave any error messages in the pParse structure.
-		///
-		///</summary>
-		static int sqlite3OpenTempDatabase(Parse pParse) {
-			sqlite3 db=pParse.db;
-			if(db.aDb[1].pBt==null&&pParse.explain==0) {
-				SqlResult rc;
-				Btree pBt=null;
-				const int flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_EXCLUSIVE|SQLITE_OPEN_DELETEONCLOSE|SQLITE_OPEN_TEMP_DB;
-				rc=(SqlResult)Btree.Open(db.pVfs,null,db,ref pBt,0,flags);
-				if(rc!=SqlResult.SQLITE_OK) {
-					utilc.sqlite3ErrorMsg(pParse,"unable to open a temporary database "+"file for storing temporary tables");
-					pParse.rc=rc;
-					return 1;
-				}
-				db.aDb[1].pBt=pBt;
-				Debug.Assert(db.aDb[1].pSchema!=null);
-				if(SQLITE_NOMEM==pBt.sqlite3BtreeSetPageSize(db.nextPagesize,-1,0)) {
-					//  db.mallocFailed = 1;
-				}
-			}
-			return 0;
-		}
-		///<summary>
-		/// Generate VDBE code that will verify the schema cookie and start
-		/// a read-transaction for all named database files.
-		///
-		/// It is important that all schema cookies be verified and all
-		/// read transactions be started before anything else happens in
-		/// the VDBE program.  But this routine can be called after much other
-		/// code has been generated.  So here is what we do:
-		///
-		/// The first time this routine is called, we code an OP_Goto that
-		/// will jump to a subroutine at the end of the program.  Then we
-		/// record every database that needs its schema verified in the
-		/// pParse.cookieMask field.  Later, after all other code has been
-		/// generated, the subroutine that does the cookie verifications and
-		/// starts the transactions will be coded and the OP_Goto P2 value
-		/// will be made to point to that subroutine.  The generation of the
-		/// cookie verification subroutine code happens in sqlite3FinishCoding().
-		///
-		/// If iDb<0 then code the OP_Goto only - don't set flag to verify the
-		/// schema on any databases.  This can be used to position the OP_Goto
-		/// early in the code, before we know if any database tables will be used.
-		///
-		///</summary>
-		static void sqlite3CodeVerifySchema(Parse pParse,int iDb) {
-			Parse pToplevel=sqlite3ParseToplevel(pParse);
-			if(pToplevel.cookieGoto==0) {
-                Vdbe v = pToplevel.sqlite3GetVdbe();
-				if(v==null)
-					return;
-				///
-				///<summary>
-				///This only happens if there was a prior error 
-				///</summary>
-				pToplevel.cookieGoto=v.sqlite3VdbeAddOp2(OP_Goto,0,0)+1;
-			}
-			if(iDb>=0) {
-				sqlite3 db=pToplevel.db;
-				yDbMask mask;
-				Debug.Assert(iDb<db.nDb);
-				Debug.Assert(db.aDb[iDb].pBt!=null||iDb==1);
-				Debug.Assert(iDb<SQLITE_MAX_ATTACHED+2);
-				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-				mask=((yDbMask)1)<<iDb;
-				if((pToplevel.cookieMask&mask)==0) {
-					pToplevel.cookieMask|=mask;
-					pToplevel.cookieValue[iDb]=db.aDb[iDb].pSchema.schema_cookie;
-					if(0==OMIT_TEMPDB&&iDb==1) {
-						sqlite3OpenTempDatabase(pToplevel);
-					}
-				}
-			}
-		}
-		///<summary>
-		/// If argument zDb is NULL, then call sqlite3CodeVerifySchema() for each
-		/// attached database. Otherwise, invoke it for the database named zDb only.
-		///
-		///</summary>
-		static void sqlite3CodeVerifyNamedSchema(Parse pParse,string zDb) {
-			sqlite3 db=pParse.db;
-			int i;
-			for(i=0;i<db.nDb;i++) {
-				Db pDb=db.aDb[i];
-				if(pDb.pBt!=null&&(null==zDb||0==zDb.CompareTo(pDb.zName))) {
-					sqlite3CodeVerifySchema(pParse,i);
-				}
-			}
-		}
-		///<summary>
-		/// Generate VDBE code that prepares for doing an operation that
-		/// might change the database.
-		///
-		/// This routine starts a new transaction if we are not already within
-		/// a transaction.  If we are already within a transaction, then a checkpoint
-		/// is set if the setStatement parameter is true.  A checkpoint should
-		/// be set for operations that might fail (due to a constraint) part of
-		/// the way through and which will need to undo some writes without having to
-		/// rollback the whole transaction.  For operations where all constraints
-		/// can be checked before any changes are made to the database, it is never
-		/// necessary to undo a write and the checkpoint should not be set.
-		///
-		///</summary>
-		static void sqlite3BeginWriteOperation(Parse pParse,int setStatement,int iDb) {
-			Parse pToplevel=sqlite3ParseToplevel(pParse);
-			sqlite3CodeVerifySchema(pParse,iDb);
-			pToplevel.writeMask|=((yDbMask)1)<<iDb;
-			pToplevel.isMultiWrite|=(u8)setStatement;
-		}
-		///<summary>
-		/// Indicate that the statement currently under construction might write
-		/// more than one entry (example: deleting one row then inserting another,
-		/// inserting multiple rows in a table, or inserting a row and index entries.)
-		/// If an abort occurs after some of these writes have completed, then it will
-		/// be necessary to undo the completed writes.
-		///
-		///</summary>
-		static void sqlite3MultiWrite(Parse pParse) {
-			Parse pToplevel=sqlite3ParseToplevel(pParse);
-			pToplevel.isMultiWrite=1;
-		}
-		///<summary>
-		///
-		/// The code generator calls this routine if is discovers that it is
-		/// possible to abort a statement prior to completion.  In order to
-		/// perform this abort without corrupting the database, we need to make
-		/// sure that the statement is protected by a statement transaction.
-		///
-		/// Technically, we only need to set the mayAbort flag if the
-		/// isMultiWrite flag was previously set.  There is a time dependency
-		/// such that the abort must occur after the multiwrite.  This makes
-		/// some statements involving the REPLACE conflict resolution algorithm
-		/// go a little faster.  But taking advantage of this time dependency
-		/// makes it more difficult to prove that the code is correct (in
-		/// particular, it prevents us from writing an effective
-		/// implementation of sqlite3AssertMayAbort()) and so we have chosen
-		/// to take the safe route and skip the optimization.
-		///
-		///</summary>
-		static void sqlite3MayAbort(Parse pParse) {
-			Parse pToplevel=sqlite3ParseToplevel(pParse);
-			pToplevel.mayAbort=1;
-		}
-		///<summary>
-		/// Code an OP_Halt that causes the vdbe to return an SQLITE_CONSTRAINT
-		/// error. The onError parameter determines which (if any) of the statement
-		/// and/or current transaction is rolled back.
-		///
-		///</summary>
-		static void sqlite3HaltConstraint(Parse pParse,int onError,string p4,int p4type) {
-			Vdbe v=pParse.sqlite3GetVdbe();
-			if(onError==OE_Abort) {
-				sqlite3MayAbort(pParse);
-			}
-			v.sqlite3VdbeAddOp4(OP_Halt,SQLITE_CONSTRAINT,onError,0,p4,p4type);
-		}
-		static void sqlite3HaltConstraint(Parse pParse,int onError,byte[] p4,int p4type) {
-			Vdbe v=pParse.sqlite3GetVdbe();
-			if(onError==OE_Abort) {
-				sqlite3MayAbort(pParse);
-			}
-			v.sqlite3VdbeAddOp4(OP_Halt,SQLITE_CONSTRAINT,onError,0,p4,p4type);
-		}
-		///<summary>
-		/// Check to see if pIndex uses the collating sequence pColl.  Return
-		/// true if it does and false if it does not.
-		///
-		///</summary>
-		#if !SQLITE_OMIT_REINDEX
-		static bool collationMatch(string zColl,Index pIndex) {
-			int i;
-			Debug.Assert(zColl!=null);
-			for(i=0;i<pIndex.nColumn;i++) {
-				string z=pIndex.azColl[i];
-				Debug.Assert(z!=null);
-				if(z.Equals(zColl,StringComparison.InvariantCultureIgnoreCase)) {
-					return true;
-				}
-			}
-			return false;
-		}
-		#endif
-		///<summary>
-		/// Recompute all indices of pTab that use the collating sequence pColl.
-		/// If pColl == null then recompute all indices of pTab.
-		///</summary>
-		#if !SQLITE_OMIT_REINDEX
-		static void reindexTable(Parse pParse,Table pTab,string zColl) {
-			Index pIndex;
-			///
-			///<summary>
-			///An index associated with pTab 
-			///</summary>
-			for(pIndex=pTab.pIndex;pIndex!=null;pIndex=pIndex.pNext) {
-				if(zColl==null||collationMatch(zColl,pIndex)) {
-					int iDb=sqlite3SchemaToIndex(pParse.db,pTab.pSchema);
-					sqlite3BeginWriteOperation(pParse,0,iDb);
-					sqlite3RefillIndex(pParse,pIndex,-1);
-				}
-			}
-		}
-		#endif
-		///<summary>
-		/// Recompute all indices of all tables in all databases where the
-		/// indices use the collating sequence pColl.  If pColl == null then recompute
-		/// all indices everywhere.
-		///</summary>
-		#if !SQLITE_OMIT_REINDEX
-		static void reindexDatabases(Parse pParse,string zColl) {
-			Db pDb;
-			///
-			///<summary>
-			///A single database 
-			///</summary>
-			int iDb;
-			///
-			///<summary>
-			///The database index number 
-			///</summary>
-			sqlite3 db=pParse.db;
-			///
-			///<summary>
-			///The database connection 
-			///</summary>
-			HashElem k;
-			///
-			///<summary>
-			///For looping over tables in pDb 
-			///</summary>
-			Table pTab;
-			///
-			///<summary>
-			///A table in the database 
-			///</summary>
-			Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
-			///
-			///<summary>
-			///Needed for schema access 
-			///</summary>
-			for(iDb=0;iDb<db.nDb;iDb++)//, pDb++ )
-			 {
-				pDb=db.aDb[iDb];
-				Debug.Assert(pDb!=null);
-				for(k=pDb.pSchema.tblHash.first;k!=null;k=k.next)//for ( k = sqliteHashFirst( pDb.pSchema.tblHash ) ; k != null ; k = sqliteHashNext( k ) )
-				 {
-					pTab=(Table)k.data;
-					// sqliteHashData( k );
-					reindexTable(pParse,pTab,zColl);
-				}
-			}
-		}
-		#endif
-		///<summary>
-		/// Generate code for the REINDEX command.
-		///
-		///        REINDEX                            -- 1
-		///        REINDEX  <collation>               -- 2
-		///        REINDEX  ?<database>.?<tablename>  -- 3
-		///        REINDEX  ?<database>.?<indexname>  -- 4
-		///
-		/// Form 1 causes all indices in all attached databases to be rebuilt.
-		/// Form 2 rebuilds all indices in all databases that use the named
-		/// collating function.  Forms 3 and 4 rebuild the named index or all
-		/// indices associated with the named table.
-		///</summary>
-		#if !SQLITE_OMIT_REINDEX
-		// OVERLOADS, so I don't need to rewrite parse.c
-		static void sqlite3Reindex(Parse pParse,int null_2,int null_3) {
-			sqlite3Reindex(pParse,null,null);
-		}
-		static void sqlite3Reindex(Parse pParse,Token pName1,Token pName2) {
-			CollSeq pColl;
-			///
-			///<summary>
-			///Collating sequence to be reindexed, or NULL 
-			///</summary>
-			string z;
-			///
-			///<summary>
-			///Name of a table or index 
-			///</summary>
-			string zDb;
-			///
-			///<summary>
-			///Name of the database 
-			///</summary>
-			Table pTab;
-			///
-			///<summary>
-			///A table in the database 
-			///</summary>
-			Index pIndex;
-			///
-			///<summary>
-			///An index associated with pTab 
-			///</summary>
-			int iDb;
-			///
-			///<summary>
-			///The database index number 
-			///</summary>
-			sqlite3 db=pParse.db;
-			///
-			///<summary>
-			///The database connection 
-			///</summary>
-			Token pObjName=new Token();
-			///
-			///<summary>
-			///Name of the table or index to be reindexed 
-			///</summary>
-			///
-			///<summary>
-			///Read the database schema. If an error occurs, leave an error message
-			///and code in pParse and return NULL. 
-			///</summary>
-			if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
-				return;
-			}
-			if(pName1==null) {
-				reindexDatabases(pParse,null);
-				return;
-			}
-			else
-				if(NEVER(pName2==null)||pName2.zRestSql==null||pName2.zRestSql.Length==0) {
-					string zColl;
-					Debug.Assert(pName1.zRestSql!=null);
-					zColl=sqlite3NameFromToken(pParse.db,pName1);
-					if(zColl==null)
-						return;
-					pColl=sqlite3FindCollSeq(db,ENC(db),zColl,0);
-					if(pColl!=null) {
-						reindexDatabases(pParse,zColl);
-						db.sqlite3DbFree(ref zColl);
-						return;
-					}
-					db.sqlite3DbFree(ref zColl);
-				}
-			iDb=sqlite3TwoPartName(pParse,pName1,pName2,ref pObjName);
-			if(iDb<0)
-				return;
-			z=sqlite3NameFromToken(db,pObjName);
-			if(z==null)
-				return;
-			zDb=db.aDb[iDb].zName;
-			pTab=sqlite3FindTable(db,z,zDb);
-			if(pTab!=null) {
-				reindexTable(pParse,pTab,null);
-				db.sqlite3DbFree(ref z);
-				return;
-			}
-			pIndex=sqlite3FindIndex(db,z,zDb);
-			db.sqlite3DbFree(ref z);
-			if(pIndex!=null) {
-				sqlite3BeginWriteOperation(pParse,0,iDb);
-				sqlite3RefillIndex(pParse,pIndex,-1);
-				return;
-			}
-			utilc.sqlite3ErrorMsg(pParse,"unable to identify the object to be reindexed");
-		}
-		#endif
-		///
-		///<summary>
-		///Return a dynamicly allocated KeyInfo structure that can be used
-		///with OP_OpenRead or OP_OpenWrite to access database index pIdx.
-		///
-		///If successful, a pointer to the new structure is returned. In this case
-		///the caller is responsible for calling sqlite3DbFree(db, ) on the returned
-		///pointer. If an error occurs (out of memory or missing collation
-		///sequence), NULL is returned and the state of pParse updated to reflect
-		///the error.
-		///</summary>
-		static KeyInfo sqlite3IndexKeyinfo(Parse pParse,Index pIdx) {
-			int i;
-			int nCol=pIdx.nColumn;
-			//int nBytes = KeyInfo.Length + (nCol - 1) * CollSeq*.Length + nCol;
-			sqlite3 db=pParse.db;
-			KeyInfo pKey=new KeyInfo();
-			// (KeyInfo)sqlite3DbMallocZero(db, nBytes);
-			if(pKey!=null) {
-				pKey.db=pParse.db;
-				pKey.aSortOrder=new byte[nCol];
-				pKey.aColl=new CollSeq[nCol];
-				// (u8)&(pKey.aColl[nCol]);
-				//        Debug.Assert(pKey.aSortOrder[nCol] == (((u8)pKey)[nBytes]));
-				for(i=0;i<nCol;i++) {
-					string zColl=pIdx.azColl[i];
-					Debug.Assert(zColl!=null);
-					pKey.aColl[i]=sqlite3LocateCollSeq(pParse,zColl);
-					pKey.aSortOrder[i]=pIdx.aSortOrder[i];
-				}
-				pKey.nField=(u16)nCol;
-			}
-			if(pParse.nErr!=0) {
-				pKey=null;
-				db.sqlite3DbFree(ref pKey);
-			}
-			return pKey;
-		}
-	}
+)
+                    {
+                        pParse.db.sqlite3DbFree(ref zName);
+                        return;
+                    }
+                    v.sqlite3VdbeAddOp4(OP_Savepoint, op, 0, 0, zName, P4_DYNAMIC);
+                }
+            }
+            ///<summary>
+            /// Make sure the TEMP database is open and available for use.  Return
+            /// the number of errors.  Leave any error messages in the pParse structure.
+            ///
+            ///</summary>
+            public static int sqlite3OpenTempDatabase(Parse pParse)
+            {
+                sqlite3 db = pParse.db;
+                if (db.aDb[1].pBt == null && pParse.explain == 0)
+                {
+                    SqlResult rc;
+                    Btree pBt = null;
+                    const int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_EXCLUSIVE | SQLITE_OPEN_DELETEONCLOSE | SQLITE_OPEN_TEMP_DB;
+                    rc = (SqlResult)Btree.Open(db.pVfs, null, db, ref pBt, 0, flags);
+                    if (rc != SqlResult.SQLITE_OK)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "unable to open a temporary database " + "file for storing temporary tables");
+                        pParse.rc = rc;
+                        return 1;
+                    }
+                    db.aDb[1].pBt = pBt;
+                    Debug.Assert(db.aDb[1].pSchema != null);
+                    if (SQLITE_NOMEM == pBt.sqlite3BtreeSetPageSize(db.nextPagesize, -1, 0))
+                    {
+                        //  db.mallocFailed = 1;
+                    }
+                }
+                return 0;
+            }
+            ///<summary>
+            /// Generate VDBE code that will verify the schema cookie and start
+            /// a read-transaction for all named database files.
+            ///
+            /// It is important that all schema cookies be verified and all
+            /// read transactions be started before anything else happens in
+            /// the VDBE program.  But this routine can be called after much other
+            /// code has been generated.  So here is what we do:
+            ///
+            /// The first time this routine is called, we code an OP_Goto that
+            /// will jump to a subroutine at the end of the program.  Then we
+            /// record every database that needs its schema verified in the
+            /// pParse.cookieMask field.  Later, after all other code has been
+            /// generated, the subroutine that does the cookie verifications and
+            /// starts the transactions will be coded and the OP_Goto P2 value
+            /// will be made to point to that subroutine.  The generation of the
+            /// cookie verification subroutine code happens in sqlite3FinishCoding().
+            ///
+            /// If iDb<0 then code the OP_Goto only - don't set flag to verify the
+            /// schema on any databases.  This can be used to position the OP_Goto
+            /// early in the code, before we know if any database tables will be used.
+            ///
+            ///</summary>
+            public static void sqlite3CodeVerifySchema(Parse pParse, int iDb)
+            {
+                Parse pToplevel = sqlite3ParseToplevel(pParse);
+                if (pToplevel.cookieGoto == 0)
+                {
+                    Vdbe v = pToplevel.sqlite3GetVdbe();
+                    if (v == null)
+                        return;
+                    ///
+                    ///<summary>
+                    ///This only happens if there was a prior error 
+                    ///</summary>
+                    pToplevel.cookieGoto = v.sqlite3VdbeAddOp2(OP_Goto, 0, 0) + 1;
+                }
+                if (iDb >= 0)
+                {
+                    sqlite3 db = pToplevel.db;
+                    yDbMask mask;
+                    Debug.Assert(iDb < db.nDb);
+                    Debug.Assert(db.aDb[iDb].pBt != null || iDb == 1);
+                    Debug.Assert(iDb < SQLITE_MAX_ATTACHED + 2);
+                    Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                    mask = ((yDbMask)1) << iDb;
+                    if ((pToplevel.cookieMask & mask) == 0)
+                    {
+                        pToplevel.cookieMask |= mask;
+                        pToplevel.cookieValue[iDb] = db.aDb[iDb].pSchema.schema_cookie;
+                        if (0 == OMIT_TEMPDB && iDb == 1)
+                        {
+                            sqlite3OpenTempDatabase(pToplevel);
+                        }
+                    }
+                }
+            }
+            ///<summary>
+            /// If argument zDb is NULL, then call sqlite3CodeVerifySchema() for each
+            /// attached database. Otherwise, invoke it for the database named zDb only.
+            ///
+            ///</summary>
+            public static void sqlite3CodeVerifyNamedSchema(Parse pParse, string zDb)
+            {
+                sqlite3 db = pParse.db;
+                int i;
+                for (i = 0; i < db.nDb; i++)
+                {
+                    Db pDb = db.aDb[i];
+                    if (pDb.pBt != null && (null == zDb || 0 == zDb.CompareTo(pDb.zName)))
+                    {
+                        sqlite3CodeVerifySchema(pParse, i);
+                    }
+                }
+            }
+            ///<summary>
+            /// Generate VDBE code that prepares for doing an operation that
+            /// might change the database.
+            ///
+            /// This routine starts a new transaction if we are not already within
+            /// a transaction.  If we are already within a transaction, then a checkpoint
+            /// is set if the setStatement parameter is true.  A checkpoint should
+            /// be set for operations that might fail (due to a constraint) part of
+            /// the way through and which will need to undo some writes without having to
+            /// rollback the whole transaction.  For operations where all constraints
+            /// can be checked before any changes are made to the database, it is never
+            /// necessary to undo a write and the checkpoint should not be set.
+            ///
+            ///</summary>
+            public static void sqlite3BeginWriteOperation(Parse pParse, int setStatement, int iDb)
+            {
+                Parse pToplevel = sqlite3ParseToplevel(pParse);
+                sqlite3CodeVerifySchema(pParse, iDb);
+                pToplevel.writeMask |= ((yDbMask)1) << iDb;
+                pToplevel.isMultiWrite |= (u8)setStatement;
+            }
+            ///<summary>
+            /// Indicate that the statement currently under construction might write
+            /// more than one entry (example: deleting one row then inserting another,
+            /// inserting multiple rows in a table, or inserting a row and index entries.)
+            /// If an abort occurs after some of these writes have completed, then it will
+            /// be necessary to undo the completed writes.
+            ///
+            ///</summary>
+            public static void sqlite3MultiWrite(Parse pParse)
+            {
+                Parse pToplevel = sqlite3ParseToplevel(pParse);
+                pToplevel.isMultiWrite = 1;
+            }
+            ///<summary>
+            ///
+            /// The code generator calls this routine if is discovers that it is
+            /// possible to abort a statement prior to completion.  In order to
+            /// perform this abort without corrupting the database, we need to make
+            /// sure that the statement is protected by a statement transaction.
+            ///
+            /// Technically, we only need to set the mayAbort flag if the
+            /// isMultiWrite flag was previously set.  There is a time dependency
+            /// such that the abort must occur after the multiwrite.  This makes
+            /// some statements involving the REPLACE conflict resolution algorithm
+            /// go a little faster.  But taking advantage of this time dependency
+            /// makes it more difficult to prove that the code is correct (in
+            /// particular, it prevents us from writing an effective
+            /// implementation of sqlite3AssertMayAbort()) and so we have chosen
+            /// to take the safe route and skip the optimization.
+            ///
+            ///</summary>
+            public static void sqlite3MayAbort(Parse pParse)
+            {
+                Parse pToplevel = sqlite3ParseToplevel(pParse);
+                pToplevel.mayAbort = 1;
+            }
+            ///<summary>
+            /// Code an OP_Halt that causes the vdbe to return an SQLITE_CONSTRAINT
+            /// error. The onError parameter determines which (if any) of the statement
+            /// and/or current transaction is rolled back.
+            ///
+            ///</summary>
+            public static void sqlite3HaltConstraint(Parse pParse, int onError, string p4, int p4type)
+            {
+                Vdbe v = pParse.sqlite3GetVdbe();
+                if (onError == OE_Abort)
+                {
+                    build.sqlite3MayAbort(pParse);
+                }
+                v.sqlite3VdbeAddOp4(OP_Halt, SQLITE_CONSTRAINT, onError, 0, p4, p4type);
+            }
+            static void sqlite3HaltConstraint(Parse pParse, int onError, byte[] p4, int p4type)
+            {
+                Vdbe v = pParse.sqlite3GetVdbe();
+                if (onError == OE_Abort)
+                {
+                    build.sqlite3MayAbort(pParse);
+                }
+                v.sqlite3VdbeAddOp4(OP_Halt, SQLITE_CONSTRAINT, onError, 0, p4, p4type);
+            }
+            ///<summary>
+            /// Check to see if pIndex uses the collating sequence pColl.  Return
+            /// true if it does and false if it does not.
+            ///
+            ///</summary>
+#if !SQLITE_OMIT_REINDEX
+            static bool collationMatch(string zColl, Index pIndex)
+            {
+                int i;
+                Debug.Assert(zColl != null);
+                for (i = 0; i < pIndex.nColumn; i++)
+                {
+                    string z = pIndex.azColl[i];
+                    Debug.Assert(z != null);
+                    if (z.Equals(zColl, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+#endif
+            ///<summary>
+            /// Recompute all indices of pTab that use the collating sequence pColl.
+            /// If pColl == null then recompute all indices of pTab.
+            ///</summary>
+#if !SQLITE_OMIT_REINDEX
+            static void reindexTable(Parse pParse, Table pTab, string zColl)
+            {
+                Index pIndex;
+                ///
+                ///<summary>
+                ///An index associated with pTab 
+                ///</summary>
+                for (pIndex = pTab.pIndex; pIndex != null; pIndex = pIndex.pNext)
+                {
+                    if (zColl == null || collationMatch(zColl, pIndex))
+                    {
+                        int iDb = sqlite3SchemaToIndex(pParse.db, pTab.pSchema);
+                        sqlite3BeginWriteOperation(pParse, 0, iDb);
+                        sqlite3RefillIndex(pParse, pIndex, -1);
+                    }
+                }
+            }
+#endif
+            ///<summary>
+            /// Recompute all indices of all tables in all databases where the
+            /// indices use the collating sequence pColl.  If pColl == null then recompute
+            /// all indices everywhere.
+            ///</summary>
+#if !SQLITE_OMIT_REINDEX
+            static void reindexDatabases(Parse pParse, string zColl)
+            {
+                Db pDb;
+                ///
+                ///<summary>
+                ///A single database 
+                ///</summary>
+                int iDb;
+                ///
+                ///<summary>
+                ///The database index number 
+                ///</summary>
+                sqlite3 db = pParse.db;
+                ///
+                ///<summary>
+                ///The database connection 
+                ///</summary>
+                HashElem k;
+                ///
+                ///<summary>
+                ///For looping over tables in pDb 
+                ///</summary>
+                Table pTab;
+                ///
+                ///<summary>
+                ///A table in the database 
+                ///</summary>
+                Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
+                ///
+                ///<summary>
+                ///Needed for schema access 
+                ///</summary>
+                for (iDb = 0; iDb < db.nDb; iDb++)//, pDb++ )
+                {
+                    pDb = db.aDb[iDb];
+                    Debug.Assert(pDb != null);
+                    for (k = pDb.pSchema.tblHash.first; k != null; k = k.next)//for ( k = sqliteHashFirst( pDb.pSchema.tblHash ) ; k != null ; k = sqliteHashNext( k ) )
+                    {
+                        pTab = (Table)k.data;
+                        // sqliteHashData( k );
+                        reindexTable(pParse, pTab, zColl);
+                    }
+                }
+            }
+#endif
+            ///<summary>
+            /// Generate code for the REINDEX command.
+            ///
+            ///        REINDEX                            -- 1
+            ///        REINDEX  <collation>               -- 2
+            ///        REINDEX  ?<database>.?<tablename>  -- 3
+            ///        REINDEX  ?<database>.?<indexname>  -- 4
+            ///
+            /// Form 1 causes all indices in all attached databases to be rebuilt.
+            /// Form 2 rebuilds all indices in all databases that use the named
+            /// collating function.  Forms 3 and 4 rebuild the named index or all
+            /// indices associated with the named table.
+            ///</summary>
+#if !SQLITE_OMIT_REINDEX
+            // OVERLOADS, so I don't need to rewrite parse.c
+            public static void sqlite3Reindex(Parse pParse, int null_2, int null_3)
+            {
+                build.sqlite3Reindex(pParse, null, null);
+            }
+            public static void sqlite3Reindex(Parse pParse, Token pName1, Token pName2)
+            {
+                CollSeq pColl;
+                ///
+                ///<summary>
+                ///Collating sequence to be reindexed, or NULL 
+                ///</summary>
+                string z;
+                ///
+                ///<summary>
+                ///Name of a table or index 
+                ///</summary>
+                string zDb;
+                ///
+                ///<summary>
+                ///Name of the database 
+                ///</summary>
+                Table pTab;
+                ///
+                ///<summary>
+                ///A table in the database 
+                ///</summary>
+                Index pIndex;
+                ///
+                ///<summary>
+                ///An index associated with pTab 
+                ///</summary>
+                int iDb;
+                ///
+                ///<summary>
+                ///The database index number 
+                ///</summary>
+                sqlite3 db = pParse.db;
+                ///
+                ///<summary>
+                ///The database connection 
+                ///</summary>
+                Token pObjName = new Token();
+                ///
+                ///<summary>
+                ///Name of the table or index to be reindexed 
+                ///</summary>
+                ///
+                ///<summary>
+                ///Read the database schema. If an error occurs, leave an error message
+                ///and code in pParse and return NULL. 
+                ///</summary>
+                if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                {
+                    return;
+                }
+                if (pName1 == null)
+                {
+                    reindexDatabases(pParse, null);
+                    return;
+                }
+                else
+                    if (NEVER(pName2 == null) || pName2.zRestSql == null || pName2.zRestSql.Length == 0)
+                    {
+                        string zColl;
+                        Debug.Assert(pName1.zRestSql != null);
+                        zColl = build.sqlite3NameFromToken(pParse.db, pName1);
+                        if (zColl == null)
+                            return;
+                        pColl = sqlite3FindCollSeq(db, ENC(db), zColl, 0);
+                        if (pColl != null)
+                        {
+                            reindexDatabases(pParse, zColl);
+                            db.sqlite3DbFree(ref zColl);
+                            return;
+                        }
+                        db.sqlite3DbFree(ref zColl);
+                    }
+                iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pObjName);
+                if (iDb < 0)
+                    return;
+                z = build.sqlite3NameFromToken(db, pObjName);
+                if (z == null)
+                    return;
+                zDb = db.aDb[iDb].zName;
+                pTab = build.sqlite3FindTable(db, z, zDb);
+                if (pTab != null)
+                {
+                    reindexTable(pParse, pTab, null);
+                    db.sqlite3DbFree(ref z);
+                    return;
+                }
+                pIndex = build.sqlite3FindIndex(db, z, zDb);
+                db.sqlite3DbFree(ref z);
+                if (pIndex != null)
+                {
+                    sqlite3BeginWriteOperation(pParse, 0, iDb);
+                    sqlite3RefillIndex(pParse, pIndex, -1);
+                    return;
+                }
+                utilc.sqlite3ErrorMsg(pParse, "unable to identify the object to be reindexed");
+            }
+#endif
+            ///
+            ///<summary>
+            ///Return a dynamicly allocated KeyInfo structure that can be used
+            ///with OP_OpenRead or OP_OpenWrite to access database index pIdx.
+            ///
+            ///If successful, a pointer to the new structure is returned. In this case
+            ///the caller is responsible for calling sqlite3DbFree(db, ) on the returned
+            ///pointer. If an error occurs (out of memory or missing collation
+            ///sequence), NULL is returned and the state of pParse updated to reflect
+            ///the error.
+            ///</summary>
+            public static KeyInfo sqlite3IndexKeyinfo(Parse pParse, Index pIdx)
+            {
+                int i;
+                int nCol = pIdx.nColumn;
+                //int nBytes = KeyInfo.Length + (nCol - 1) * CollSeq*.Length + nCol;
+                sqlite3 db = pParse.db;
+                KeyInfo pKey = new KeyInfo();
+                // (KeyInfo)sqlite3DbMallocZero(db, nBytes);
+                if (pKey != null)
+                {
+                    pKey.db = pParse.db;
+                    pKey.aSortOrder = new byte[nCol];
+                    pKey.aColl = new CollSeq[nCol];
+                    // (u8)&(pKey.aColl[nCol]);
+                    //        Debug.Assert(pKey.aSortOrder[nCol] == (((u8)pKey)[nBytes]));
+                    for (i = 0; i < nCol; i++)
+                    {
+                        string zColl = pIdx.azColl[i];
+                        Debug.Assert(zColl != null);
+                        pKey.aColl[i] = build.sqlite3LocateCollSeq(pParse, zColl);
+                        pKey.aSortOrder[i] = pIdx.aSortOrder[i];
+                    }
+                    pKey.nField = (u16)nCol;
+                }
+                if (pParse.nErr != 0)
+                {
+                    pKey = null;
+                    db.sqlite3DbFree(ref pKey);
+                }
+                return pKey;
+            }
+        }
+    }
 }

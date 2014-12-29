@@ -749,7 +749,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			pItem = pSelect.pSrc.a [0];
-			pSrc = sqlite3LocateTable (pParse, 0, pItem.zName, pItem.zDatabase);
+			pSrc = build.sqlite3LocateTable (pParse, 0, pItem.zName, pItem.zDatabase);
 			if (pSrc == null) {
 				return 0;
 				///
@@ -888,7 +888,7 @@ namespace Community.CsharpSqlite
 																																																															#endif
 			iDbSrc = sqlite3SchemaToIndex (pParse.db, pSrc.pSchema);
 			v = pParse.sqlite3GetVdbe ();
-			sqlite3CodeVerifySchema (pParse, iDbSrc);
+			build.sqlite3CodeVerifySchema (pParse, iDbSrc);
 			iSrc = pParse.nTab++;
 			iDest = pParse.nTab++;
 			regAutoinc = pParse.autoIncBegin (iDbDest, pDest);
@@ -922,7 +922,7 @@ namespace Community.CsharpSqlite
 			if (pDest.iPKey >= 0) {
 				addr1 = v.sqlite3VdbeAddOp2 (OP_Rowid, iSrc, regRowid);
 				addr2 = v.sqlite3VdbeAddOp3 (OP_NotExists, iDest, 0, regRowid);
-				sqlite3HaltConstraint (pParse, onError, "PRIMARY KEY must be unique", P4_STATIC);
+				build.sqlite3HaltConstraint (pParse, onError, "PRIMARY KEY must be unique", P4_STATIC);
 				v.sqlite3VdbeJumpHere (addr2);
 				pParse.autoIncStep (regAutoinc, regRowid);
 			}
@@ -947,12 +947,12 @@ namespace Community.CsharpSqlite
 				Debug.Assert (pSrcIdx != null);
 				v.sqlite3VdbeAddOp2 (OP_Close, iSrc, 0);
 				v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
-				pKey = sqlite3IndexKeyinfo (pParse, pSrcIdx);
+				pKey = build.sqlite3IndexKeyinfo (pParse, pSrcIdx);
 				v.sqlite3VdbeAddOp4 (OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey, P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pSrcIdx.zName );
 #endif
-				pKey = sqlite3IndexKeyinfo (pParse, pDestIdx);
+				pKey = build.sqlite3IndexKeyinfo (pParse, pDestIdx);
 				v.sqlite3VdbeAddOp4 (OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey, P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pDestIdx.zName );

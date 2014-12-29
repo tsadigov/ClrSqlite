@@ -37,7 +37,7 @@ namespace Community.CsharpSqlite {
 				exprc.sqlite3ExprDelete(db,ref pTmp.pWhere);
 				exprc.sqlite3ExprListDelete(db,ref pTmp.pExprList);
 				sqlite3SelectDelete(db,ref pTmp.pSelect);
-				sqlite3IdListDelete(db,ref pTmp.pIdList);
+				build.sqlite3IdListDelete(db,ref pTmp.pIdList);
 				pTriggerStep=null;
 				db.sqlite3DbFree(ref pTmp);
 			}
@@ -195,7 +195,7 @@ namespace Community.CsharpSqlite {
 				///<summary>
 				///Figure out the db that the the trigger will be created in 
 				///</summary>
-				iDb=sqlite3TwoPartName(pParse,pName1,pName2,ref pName);
+				iDb=build.sqlite3TwoPartName(pParse,pName1,pName2,ref pName);
 				if(iDb<0) {
 					goto trigger_cleanup;
 				}
@@ -278,8 +278,8 @@ namespace Community.CsharpSqlite {
 			///Check that the trigger name is not reserved and that no trigger of the
 			///specified name exists 
 			///</summary>
-			zName=sqlite3NameFromToken(db,pName);
-			if(zName==null||SQLITE_OK!=sqlite3CheckObjectName(pParse,zName)) {
+			zName=build.sqlite3NameFromToken(db,pName);
+			if(zName==null||SQLITE_OK!=build.sqlite3CheckObjectName(pParse,zName)) {
 				goto trigger_cleanup;
 			}
 			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
@@ -289,7 +289,7 @@ namespace Community.CsharpSqlite {
 				}
 				else {
 					Debug.Assert(0==db.init.busy);
-					sqlite3CodeVerifySchema(pParse,iDb);
+					build.sqlite3CodeVerifySchema(pParse,iDb);
 				}
 				goto trigger_cleanup;
 			}
@@ -362,8 +362,8 @@ goto trigger_cleanup;
 			pParse.pNewTrigger=pTrigger;
 			trigger_cleanup:
 			db.sqlite3DbFree(ref zName);
-			sqlite3SrcListDelete(db,ref pTableName);
-			sqlite3IdListDelete(db,ref pColumns);
+			build.sqlite3SrcListDelete(db,ref pTableName);
+			build.sqlite3IdListDelete(db,ref pColumns);
 			exprc.sqlite3ExprDelete(db,ref pWhen);
 			if(pParse.pNewTrigger==null) {
 				sqlite3DeleteTrigger(db,ref pTrigger);
@@ -451,12 +451,12 @@ goto trigger_cleanup;
 				v=pParse.sqlite3GetVdbe();
 				if(v==null)
 					goto triggerfinish_cleanup;
-				sqlite3BeginWriteOperation(pParse,0,iDb);
+				build.sqlite3BeginWriteOperation(pParse,0,iDb);
 				z=pAll.zRestSql.Substring(0,pAll.Length);
 				//sqlite3DbStrNDup( db, (char*)pAll.z, pAll.n );
-				sqlite3NestedParse(pParse,"INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),zName,pTrig.table,z);
+				build.sqlite3NestedParse(pParse,"INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),zName,pTrig.table,z);
 				db.sqlite3DbFree(ref z);
-				sqlite3ChangeCookie(pParse,iDb);
+				build.sqlite3ChangeCookie(pParse,iDb);
 				v.sqlite3VdbeAddParseSchemaOp(iDb,io.sqlite3MPrintf(db,"type='trigger' AND name='%q'",zName));
 			}
 			if(db.init.busy!=0) {
@@ -598,7 +598,7 @@ goto trigger_cleanup;
 			//}
 			//else
 			//{
-			//  sqlite3IdListDelete( db, ref pColumn );
+			//  build.sqlite3IdListDelete( db, ref pColumn );
 			//}
 			exprc.sqlite3ExprListDelete(db,ref pEList);
 			sqlite3SelectDelete(db,ref pSelect);
@@ -683,7 +683,7 @@ goto trigger_cleanup;
 			db.sqlite3DbFree(ref pTrigger.zName);
 			db.sqlite3DbFree(ref pTrigger.table);
 			exprc.sqlite3ExprDelete(db,ref pTrigger.pWhen);
-			sqlite3IdListDelete(db,ref pTrigger.pColumns);
+			build.sqlite3IdListDelete(db,ref pTrigger.pColumns);
 			pTrigger=null;
 			db.sqlite3DbFree(ref pTrigger);
 		}
@@ -730,14 +730,14 @@ goto trigger_cleanup;
 					utilc.sqlite3ErrorMsg(pParse,"no such trigger: %S",pName,0);
 				}
 				else {
-					sqlite3CodeVerifyNamedSchema(pParse,zDb);
+					build.sqlite3CodeVerifyNamedSchema(pParse,zDb);
 				}
 				pParse.checkSchema=1;
 				goto drop_trigger_cleanup;
 			}
 			sqlite3DropTriggerPtr(pParse,pTrigger);
 			drop_trigger_cleanup:
-			sqlite3SrcListDelete(db,ref pName);
+			build.sqlite3SrcListDelete(db,ref pName);
 		}
 		///<summary>
 		/// Return a pointer to the Table structure for the table that a trigger
@@ -804,12 +804,12 @@ return;
 				///8 
 				///</summary>
 				};
-				sqlite3BeginWriteOperation(pParse,0,iDb);
-				sqlite3OpenMasterTable(pParse,iDb);
+				build.sqlite3BeginWriteOperation(pParse,0,iDb);
+				build.sqlite3OpenMasterTable(pParse,iDb);
 				_base=v.sqlite3VdbeAddOpList(dropTrigger.Length,dropTrigger);
 				v.sqlite3VdbeChangeP4(_base+1,pTrigger.zName,P4_TRANSIENT);
 				v.sqlite3VdbeChangeP4(_base+4,"trigger",P4_STATIC);
-				sqlite3ChangeCookie(pParse,iDb);
+				build.sqlite3ChangeCookie(pParse,iDb);
 				v.sqlite3VdbeAddOp2(OP_Close,0,0);
 				v.sqlite3VdbeAddOp4(OP_DropTrigger,iDb,0,0,pTrigger.zName,0);
 				if(pParse.nMem<3) {
@@ -867,7 +867,7 @@ return;
 			if(pIdList==null||NEVER(pEList==null))
 				return 1;
 			for(e=0;e<pEList.nExpr;e++) {
-				if(sqlite3IdListIndex(pIdList,pEList.a[e].zName)>=0)
+				if(build.sqlite3IdListIndex(pIdList,pEList.a[e].zName)>=0)
 					return 1;
 			}
 			return 0;
@@ -948,7 +948,7 @@ return;
 			///<summary>
 			///SrcList to be returned 
 			///</summary>
-			pSrc=sqlite3SrcListAppend(pParse.db,0,pStep.target,0);
+			pSrc=build.sqlite3SrcListAppend(pParse.db,0,pStep.target,0);
 			//if ( pSrc != null )
 			//{
 			Debug.Assert(pSrc.nSrc>0);
