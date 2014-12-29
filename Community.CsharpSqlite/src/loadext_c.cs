@@ -791,7 +791,7 @@ wsdAutoext.nExt = 0;
 				sqlite3_mutex_leave (mutex);
 				zErrmsg = "";
 				if (xInit != null && xInit (db, ref zErrmsg, (sqlite3_api_routines)sqlite3Apis) != 0) {
-					sqlite3Error (db, SQLITE_ERROR, "automatic extension loading failed: %s", zErrmsg);
+                    utilc.sqlite3Error(db, SQLITE_ERROR, "automatic extension loading failed: %s", zErrmsg);
 					go = false;
 				}
 				db.sqlite3DbFree (ref zErrmsg);

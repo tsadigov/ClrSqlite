@@ -256,7 +256,7 @@ aOverflow= null;
                 if (pKey != null)
                 {
                     Debug.Assert(nKey == (i64)(int)nKey);
-                    pIdxKey = sqlite3VdbeRecordUnpack(this.pKeyInfo, (int)nKey, pKey, aSpace, 16);
+                    pIdxKey = vdbeaux.sqlite3VdbeRecordUnpack(this.pKeyInfo, (int)nKey, pKey, aSpace, 16);
                     //sizeof( aSpace ) );
                     //if ( pIdxKey == null )
                     //  return SQLITE_NOMEM;
@@ -268,7 +268,7 @@ aOverflow= null;
                 rc = this.sqlite3BtreeMovetoUnpacked(pIdxKey, nKey, bias != 0 ? 1 : 0, ref pRes);
                 if (pKey != null)
                 {
-                    sqlite3VdbeDeleteUnpackedRecord(pIdxKey);
+                    vdbeaux.sqlite3VdbeDeleteUnpackedRecord(pIdxKey);
                 }
                 return rc;
             }
@@ -1168,9 +1168,9 @@ aOverflow= null;
                             if (pPage.hasData != 0)
                             {
                                 u32 Dummy0 = 0;
-                                pCell += getVarint32(pPage.aData, pCell, out Dummy0);
+                                pCell += utilc.getVarint32(pPage.aData, pCell, out Dummy0);
                             }
-                            getVarint(pPage.aData, pCell, out nCellKey);
+                            utilc.getVarint(pPage.aData, pCell, out nCellKey);
                             if (nCellKey == intKey)
                             {
                                 c = 0;
@@ -1211,7 +1211,7 @@ aOverflow= null;
                                 ///<param name="This branch runs if the record">size field of the cell is a</param>
                                 ///<param name="single byte varint and the record fits entirely on the main">single byte varint and the record fits entirely on the main</param>
                                 ///<param name="b">tree page.  </param>
-                                c = sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 1, pIdxKey);
+                                c = vdbeaux.sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 1, pIdxKey);
                                 //c = sqlite3VdbeRecordCompare( nCell, (void*)&pCell[1], pIdxKey );
                             }
                             else
@@ -1224,7 +1224,7 @@ aOverflow= null;
                                     ///</summary>
                                     ///<param name="The record">size field is a 2 byte varint and the record</param>
                                     ///<param name="fits entirely on the main b">tree page.  </param>
-                                    c = sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 2, pIdxKey);
+                                    c = vdbeaux.sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 2, pIdxKey);
                                     //c = sqlite3VdbeRecordCompare( nCell, (void*)&pCell[2], pIdxKey );
                                 }
                                 else
@@ -1255,7 +1255,7 @@ aOverflow= null;
                                         // sqlite3_free(ref pCellKey );
                                         goto moveto_finish;
                                     }
-                                    c = sqlite3VdbeRecordCompare(nCell, pCellKey, pIdxKey);
+                                    c = vdbeaux.sqlite3VdbeRecordCompare(nCell, pCellKey, pIdxKey);
                                     pCellKey = null;
                                     // sqlite3_free(ref pCellKey );
                                 }

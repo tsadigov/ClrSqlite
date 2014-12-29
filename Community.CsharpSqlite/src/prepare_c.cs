@@ -369,7 +369,7 @@ namespace Community.CsharpSqlite {
 			}
 			pDb.pSchema.enc=ENC(db);
 			if(pDb.pSchema.cache_size==0) {
-				size=sqlite3AbsInt32((int)meta[BTREE_DEFAULT_CACHE_SIZE-1]);
+                size = utilc.sqlite3AbsInt32((int)meta[BTREE_DEFAULT_CACHE_SIZE - 1]);
 				if(size==0) {
 					size=SQLITE_DEFAULT_CACHE_SIZE;
 				}
@@ -736,7 +736,7 @@ db.xAuth = 0;
 					rc=pBt.sqlite3BtreeSchemaLocked();
 					if(rc!=0) {
 						string zDb=db.aDb[i].zName;
-						sqlite3Error(db,rc,"database schema is locked: %s",zDb);
+						utilc.sqlite3Error(db,rc,"database schema is locked: %s",zDb);
 						testcase(db.flags&SQLITE_ReadUncommitted);
 						goto end_prepare;
 					}
@@ -751,7 +751,7 @@ db.xAuth = 0;
 				testcase(nBytes==mxLen);
 				testcase(nBytes==mxLen+1);
 				if(nBytes>mxLen) {
-					sqlite3Error(db,SQLITE_TOOBIG,"statement too long");
+					utilc.sqlite3Error(db,SQLITE_TOOBIG,"statement too long");
 					rc=sqlite3ApiExit(db,SQLITE_TOOBIG);
 					goto end_prepare;
 				}
@@ -828,25 +828,25 @@ db.xAuth = 0;
 			Debug.Assert(db.init.busy==0||saveSqlFlag==0);
 			if(db.init.busy==0) {
 				Vdbe pVdbe=pParse.pVdbe;
-				sqlite3VdbeSetSql(pVdbe,zSql,(int)(zSql.Length-(pParse.zTail==null?0:pParse.zTail.Length)),saveSqlFlag);
+                vdbeaux.sqlite3VdbeSetSql(pVdbe, zSql, (int)(zSql.Length - (pParse.zTail == null ? 0 : pParse.zTail.Length)), saveSqlFlag);
 			}
 			if(pParse.pVdbe!=null&&(rc!=SQLITE_OK///
 			///<summary>
 			///|| db.mallocFailed != 0 
 			///</summary>
 			)) {
-				sqlite3VdbeFinalize(ref pParse.pVdbe);
+                vdbeaux.sqlite3VdbeFinalize(ref pParse.pVdbe);
 				//Debug.Assert( ppStmt == null );
 			}
 			else {
 				ppStmt=pParse.pVdbe;
 			}
 			if(zErrMsg!="") {
-				sqlite3Error(db,rc,"%s",zErrMsg);
+				utilc.sqlite3Error(db,rc,"%s",zErrMsg);
 				db.sqlite3DbFree(ref zErrMsg);
 			}
 			else {
-				sqlite3Error(db,rc,0);
+				utilc.sqlite3Error(db,rc,0);
 			}
 			while(pParse.pTriggerPrg!=null) {
 				TriggerPrg pT=pParse.pTriggerPrg;
@@ -922,7 +922,8 @@ db.xAuth = 0;
 		) {
 			int rc;
 			//  assert( ppStmt!=0 );
-			if(!sqlite3SafetyCheckOk(db)) {
+            if (!utilc.sqlite3SafetyCheckOk(db))
+            {
 				ppStmt=null;
 				pzTail=null;
 				return SQLITE_MISUSE_BKPT();
@@ -953,7 +954,7 @@ db.xAuth = 0;
 			string zSql;
 			sqlite3 db;
 			Debug.Assert(sqlite3_mutex_held(p.sqlite3VdbeDb().mutex));
-			zSql=sqlite3_sql((sqlite3_stmt)p);
+            zSql = vdbeaux.sqlite3_sql((sqlite3_stmt)p);
 			Debug.Assert(zSql!=null);
 			///
 			///<summary>
@@ -972,10 +973,10 @@ db.xAuth = 0;
 			else {
 				Debug.Assert(pNew!=null);
 			}
-			sqlite3VdbeSwap((Vdbe)pNew,p);
+            vdbeaux.sqlite3VdbeSwap((Vdbe)pNew, p);
             vdbeapi.sqlite3TransferBindings(pNew, (sqlite3_stmt)p);
 			((Vdbe)pNew).sqlite3VdbeResetStepResult();
-			sqlite3VdbeFinalize(ref pNew);
+            vdbeaux.sqlite3VdbeFinalize(ref pNew);
 			return SQLITE_OK;
 		}
 		//C# Overload for ignore error out

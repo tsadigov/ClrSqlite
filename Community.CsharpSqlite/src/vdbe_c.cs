@@ -325,7 +325,7 @@ namespace Community.CsharpSqlite {
 			//2 * nField * sizeof( u32 );
 			Debug.Assert(iCur<p.nCursor);
 			if(p.apCsr[iCur]!=null) {
-				sqlite3VdbeFreeCursor(p,p.apCsr[iCur]);
+                vdbeaux.sqlite3VdbeFreeCursor(p, p.apCsr[iCur]);
 				p.apCsr[iCur]=null;
 			}
 			//if ( SQLITE_OK == sqlite3VdbeMemGrow( pMem, nByte, 0 ) )

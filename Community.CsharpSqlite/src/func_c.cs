@@ -1696,7 +1696,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
                     {
                         i64 v = vdbeapi.sqlite3_value_int64(argv[0]);
                         p.rSum += v;
-                        if (!(p.approx | p.overflow != 0) && 0 != sqlite3AddInt64(ref p.iSum, v))
+                        if (!(p.approx | p.overflow != 0) && 0 != utilc.sqlite3AddInt64(ref p.iSum, v))
                         {
                             p.overflow = 1;
                         }

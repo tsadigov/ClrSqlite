@@ -844,7 +844,7 @@ pOp.cnt = 0;
 				///</summary>
 				) {
 					if(n!=P4_KEYINFO&&n!=P4_VTAB) {
-						freeP4(db,n,_p4);
+                        vdbeaux.freeP4(db, n, _p4);
 					}
 					return;
 				}
@@ -854,7 +854,7 @@ pOp.cnt = 0;
 					addr=this.nOp-1;
 				}
 				pOp=this.lOp[addr];
-				freeP4(db,pOp.p4type,pOp.p4.p);
+                vdbeaux.freeP4(db, pOp.p4type, pOp.p4.p);
 				pOp.p4.p=null;
 				if(n==P4_INT32) {
 					///
@@ -1144,7 +1144,7 @@ pOp.cnt = 0;
 				int addr=this.sqlite3VdbeAddOp3(OP_ParseSchema,iDb,0,0);
 				this.sqlite3VdbeChangeP4(addr,zWhere,P4_DYNAMIC);
 				for(j=0;j<this.db.nDb;j++)
-					sqlite3VdbeUsesBtree(this,j);
+                    vdbeaux.sqlite3VdbeUsesBtree(this, j);
 			}
 			public void sqlite3VdbeLinkSubProgram(SubProgram p) {
 				p.pNext=this.pProgram;
@@ -1192,7 +1192,7 @@ pOp.cnt = 0;
 				Mem pColName;
 				int n;
 				sqlite3 db=this.db;
-				releaseMemArray(this.aColName,this.nResColumn*COLNAME_N);
+                vdbeaux.releaseMemArray(this.aColName, this.nResColumn * COLNAME_N);
 				db.sqlite3DbFree(ref this.aColName);
 				n=nResColumn*COLNAME_N;
 				this.nResColumn=(u16)nResColumn;
@@ -1335,11 +1335,11 @@ pOp.cnt = 0;
 				//{
 				//  p.rc = SQLITE_NOMEM;
 				//}
-				closeAllCursors(this);
+                vdbeaux.closeAllCursors(this);
 				if(this.magic!=VDBE_MAGIC_RUN) {
 					return SQLITE_OK;
 				}
-				checkActiveVdbeCnt(db);
+                vdbeaux.checkActiveVdbeCnt(db);
 				///
 				///<summary>
 				///No commit or rollback needed if the program never started 
@@ -1399,7 +1399,7 @@ pOp.cnt = 0;
 								///so, abort any other statements this handle currently has active.
 								///
 								///</summary>
-								invalidateCursorsOnModifiedBtrees(db);
+                                vdbeaux.invalidateCursorsOnModifiedBtrees(db);
 								sqlite3RollbackAll(db);
 								sqlite3CloseSavepoints(db);
 								db.autoCommit=1;
@@ -1440,7 +1440,7 @@ pOp.cnt = 0;
 								///<param name="or hit an 'OR FAIL' constraint and there are no deferred foreign">or hit an 'OR FAIL' constraint and there are no deferred foreign</param>
 								///<param name="key constraints to hold up the transaction. This means a commit ">key constraints to hold up the transaction. This means a commit </param>
 								///<param name="is required. ">is required. </param>
-								rc=vdbeCommit(db,this);
+								rc=vdbeaux.vdbeCommit(db,this);
 							}
 							if(rc==SQLITE_BUSY&&this.readOnly) {
 								this.sqlite3VdbeLeave();
@@ -1471,7 +1471,7 @@ pOp.cnt = 0;
 									eStatementOp=SAVEPOINT_ROLLBACK;
 								}
 								else {
-									invalidateCursorsOnModifiedBtrees(db);
+                                    vdbeaux.invalidateCursorsOnModifiedBtrees(db);
 									sqlite3RollbackAll(db);
 									sqlite3CloseSavepoints(db);
 									db.autoCommit=1;
@@ -1494,7 +1494,7 @@ pOp.cnt = 0;
 								db.sqlite3DbFree(ref this.zErrMsg);
 								this.zErrMsg=null;
 							}
-							invalidateCursorsOnModifiedBtrees(db);
+                            vdbeaux.invalidateCursorsOnModifiedBtrees(db);
 							sqlite3RollbackAll(db);
 							sqlite3CloseSavepoints(db);
 							db.autoCommit=1;
@@ -1508,10 +1508,10 @@ pOp.cnt = 0;
 					///<param name=""></param>
 					if(this.changeCntOn) {
 						if(eStatementOp!=SAVEPOINT_ROLLBACK) {
-							sqlite3VdbeSetChanges(db,this.nChange);
+                            vdbeaux.sqlite3VdbeSetChanges(db, this.nChange);
 						}
 						else {
-							sqlite3VdbeSetChanges(db,0);
+                            vdbeaux.sqlite3VdbeSetChanges(db, 0);
 						}
 						this.nChange=0;
 					}
@@ -1541,7 +1541,7 @@ pOp.cnt = 0;
 					Debug.Assert(db.activeVdbeCnt>=db.writeVdbeCnt);
 				}
 				this.magic=VDBE_MAGIC_HALT;
-				checkActiveVdbeCnt(db);
+                vdbeaux.checkActiveVdbeCnt(db);
 				//if ( p.db.mallocFailed != 0 )
 				//{
 				//  p.rc = SQLITE_NOMEM;
@@ -1592,11 +1592,11 @@ pOp.cnt = 0;
 						this.zErrMsg="";
 						//else if ( p.rc != 0 )
 						//{
-						//  sqlite3Error( db, p.rc, 0 );
+						//  utilc.sqlite3Error( db, p.rc, 0 );
 						//}
 						//else
 						//{
-						//  sqlite3Error( db, SQLITE_OK, 0 );
+						//  utilc.sqlite3Error( db, SQLITE_OK, 0 );
 						//}
 					}
 					if(this.runOnlyOnce!=0)
@@ -1611,7 +1611,7 @@ pOp.cnt = 0;
 						///called), set the database error in this case as well.
 						///
 						///</summary>
-						sqlite3Error(db,this.rc,0);
+						utilc.sqlite3Error(db,this.rc,0);
 						sqlite3ValueSetStr(db.pErr,-1,this.zErrMsg,SqliteEncoding.UTF8,SQLITE_TRANSIENT);
 						db.sqlite3DbFree(ref this.zErrMsg);
 						this.zErrMsg="";
@@ -1621,7 +1621,7 @@ pOp.cnt = 0;
 				///Reclaim all memory used by the VDBE
 				///
 				///</summary>
-				Cleanup(this);
+                vdbeaux.Cleanup(this);
 				///
 				///<summary>
 				///Save profiling information from this VDBE run.
@@ -2122,7 +2122,7 @@ start = sqlite3Hwtime();
 								VdbeFrame pFrame=this.pFrame;
 								this.pFrame=pFrame.pParent;
 								this.nFrame--;
-								sqlite3VdbeSetChanges(db,this.nChange);
+                                vdbeaux.sqlite3VdbeSetChanges(db, this.nChange);
 								opcodeIndex=pFrame.sqlite3VdbeFrameRestore();
 								lastRowid=db.lastRowid;
 								if(pOp.p2==OE_Ignore) {
@@ -2627,19 +2627,19 @@ pOp.p1 = pOut.n;
 								iB=pIn2.u.i;
 								switch(pOp.OpCode) {
 								case OpCode.OP_Add: {
-									if(sqlite3AddInt64(ref iB,iA)!=0)
+                                    if (utilc.sqlite3AddInt64(ref iB, iA) != 0)
 										fp_math=true;
 									// goto fp_math
 									break;
 								}
 								case OpCode.OP_Subtract: {
-									if(sqlite3SubInt64(ref iB,iA)!=0)
+									if(utilc.sqlite3SubInt64(ref iB,iA)!=0)
 										fp_math=true;
 									// goto fp_math
 									break;
 								}
 								case OpCode.OP_Multiply: {
-									if(sqlite3MulInt64(ref iB,iA)!=0)
+                                    if (utilc.sqlite3MulInt64(ref iB, iA) != 0)
 										fp_math=true;
 									// goto fp_math
 									break;
@@ -2828,7 +2828,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///<param name="immediately call the destructor for any non">static values.</param>
 							///<param name=""></param>
 							if(ctx.pVdbeFunc!=null) {
-								sqlite3VdbeDeleteAuxData(ctx.pVdbeFunc,pOp.p1);
+                                vdbeaux.sqlite3VdbeDeleteAuxData(ctx.pVdbeFunc, pOp.p1);
 								pOp.p4.pVdbeFunc=ctx.pVdbeFunc;
 								pOp.p4type=P4_VDBEFUNC;
 							}
@@ -3880,10 +3880,10 @@ MemSetTypeFlag(pOut, MEM_Int);
 								if((pRec.flags&MEM_Zero)!=0&&pRec.n>0) {
 									pRec.sqlite3VdbeMemExpandBlob();
 								}
-								serial_type=sqlite3VdbeSerialType(pRec,file_format);
-								len=(int)sqlite3VdbeSerialTypeLen(serial_type);
+                                serial_type = vdbeaux.sqlite3VdbeSerialType(pRec, file_format);
+                                len = (int)vdbeaux.sqlite3VdbeSerialTypeLen(serial_type);
 								nData+=(u64)len;
-								nHdr+=sqlite3VarintLen(serial_type);
+								nHdr+=utilc.sqlite3VarintLen(serial_type);
 								if((pRec.flags&MEM_Zero)!=0) {
 									///
 									///<summary>
@@ -3901,8 +3901,8 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///<summary>
 							///Add the initial header varint and total the size 
 							///</summary>
-							nHdr+=nVarint=sqlite3VarintLen((u64)nHdr);
-							if(nVarint<sqlite3VarintLen((u64)nHdr)) {
+							nHdr+=nVarint=utilc.sqlite3VarintLen((u64)nHdr);
+							if(nVarint<utilc.sqlite3VarintLen((u64)nHdr)) {
 								nHdr++;
 							}
 							nByte=(i64)((u64)nHdr+nData-(u64)nZero);
@@ -3927,12 +3927,12 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///<summary>
 							///Write the record 
 							///</summary>
-							i=putVarint32(zNewRecord,nHdr);
+							i=utilc.putVarint32(zNewRecord,nHdr);
 							for(int pD0=0;pD0<nField;pD0++)//for (pRec = pData0; pRec <= pLast; pRec++)
 							 {
 								pRec=this.aMem[pOp.p1+pD0];
-								serial_type=sqlite3VdbeSerialType(pRec,file_format);
-								i+=putVarint32(zNewRecord,i,(int)serial_type);
+                                serial_type = vdbeaux.sqlite3VdbeSerialType(pRec, file_format);
+                                i += utilc.putVarint32(zNewRecord, i, (int)serial_type);
 								///
 								///<summary>
 								///serial type 
@@ -3945,7 +3945,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								///serial data 
 								///</summary>
 								pRec=this.aMem[pOp.p1+pD0];
-								i+=(int)sqlite3VdbeSerialPut(zNewRecord,i,(int)nByte-i,pRec,file_format);
+                                i += (int)vdbeaux.sqlite3VdbeSerialPut(zNewRecord, i, (int)nByte - i, pRec, file_format);
 							}
 							//TODO -- Remove this  for testing Debug.Assert( i == nByte );
 							Debug.Assert(pOp.p3>0&&pOp.p3<=this.nMem);
@@ -4149,7 +4149,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 												}
 											}
 											if(p1==SAVEPOINT_ROLLBACK&&(db.flags&SQLITE_InternChanges)!=0) {
-												sqlite3ExpirePreparedStatements(db);
+                                                vdbeaux.sqlite3ExpirePreparedStatements(db);
 												sqlite3ResetInternalSchema(db,-1);
 												db.flags=(db.flags|SQLITE_InternChanges);
 											}
@@ -4434,7 +4434,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								///Invalidate all prepared statements whenever the TEMP database
 								///schema is changed.  Ticket #1644 
 								///</summary>
-								sqlite3ExpirePreparedStatements(db);
+                                vdbeaux.sqlite3ExpirePreparedStatements(db);
 								this.expired=false;
 							}
 							break;
@@ -4763,7 +4763,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<param name=""></param>
 						case OpCode.OP_Close: {
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							sqlite3VdbeFreeCursor(this,this.apCsr[pOp.p1]);
+                            vdbeaux.sqlite3VdbeFreeCursor(this, this.apCsr[pOp.p1]);
 							this.apCsr[pOp.p1]=null;
 							break;
 						}
@@ -5171,7 +5171,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									///<summary>
 									///zeroblobs already expanded 
 									///</summary>
-									pIdxKey=sqlite3VdbeRecordUnpack(pC.pKeyInfo,pIn3.n,pIn3.zBLOB,aTempRec,0);
+                                    pIdxKey = vdbeaux.sqlite3VdbeRecordUnpack(pC.pKeyInfo, pIn3.n, pIn3.zBLOB, aTempRec, 0);
 									//sizeof( aTempRec ) );
 									if(pIdxKey==null) {
 										goto no_mem;
@@ -5180,7 +5180,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								}
 								rc=pC.pCursor.sqlite3BtreeMovetoUnpacked(pIdxKey,0,0,ref res);
 								if(pOp.p4.i==0) {
-									sqlite3VdbeDeleteUnpackedRecord(pIdxKey);
+                                    vdbeaux.sqlite3VdbeDeleteUnpackedRecord(pIdxKey);
 								}
 								if(rc!=SQLITE_OK) {
 									break;
@@ -5873,7 +5873,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///<param name="to guard against future changes to the code generator.">to guard against future changes to the code generator.</param>
 							///<param name=""></param>
 							Debug.Assert(pC.deferredMoveto==false);
-							rc=sqlite3VdbeCursorMoveto(pC);
+                            rc = vdbeaux.sqlite3VdbeCursorMoveto(pC);
 							if(NEVER(rc!=SQLITE_OK))
 								goto abort_due_to_error;
 							pC.pCursor.sqlite3BtreeSetCachedRowid(0);
@@ -5904,7 +5904,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///
 						///</summary>
 						case OpCode.OP_ResetCount: {
-							sqlite3VdbeSetChanges(db,this.nChange);
+                            vdbeaux.sqlite3VdbeSetChanges(db, this.nChange);
 							this.nChange=0;
 							break;
 						}
@@ -5967,7 +5967,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///<param name="a no">op and can never fail.  But we leave it in place as a safety.</param>
 							///<param name=""></param>
 							Debug.Assert(pC.deferredMoveto==false);
-							rc=sqlite3VdbeCursorMoveto(pC);
+                            rc = vdbeaux.sqlite3VdbeCursorMoveto(pC);
 							if(NEVER(rc!=SQLITE_OK))
 								goto abort_due_to_error;
 							if(pC.isIndex) {
@@ -6063,7 +6063,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									}
 									else {
 										Debug.Assert(pC.pCursor!=null);
-										rc=sqlite3VdbeCursorMoveto(pC);
+                                        rc = vdbeaux.sqlite3VdbeCursorMoveto(pC);
 										if(rc!=0)
 											goto abort_due_to_error;
 										if(pC.rowidIsValid) {
@@ -6405,13 +6405,13 @@ MemSetTypeFlag(pOut, MEM_Int);
 							pCrsr=pC.pCursor;
 							pOut.flags=MEM_Null;
 							if(ALWAYS(pCrsr!=null)) {
-								rc=sqlite3VdbeCursorMoveto(pC);
+                                rc = vdbeaux.sqlite3VdbeCursorMoveto(pC);
 								if(NEVER(rc!=0))
 									goto abort_due_to_error;
 								Debug.Assert(!pC.deferredMoveto);
 								Debug.Assert(!pC.isTable);
 								if(!pC.nullRow) {
-									rc=sqlite3VdbeIdxRowid(db,pCrsr,ref rowid);
+                                    rc = vdbeaux.sqlite3VdbeIdxRowid(db, pCrsr, ref rowid);
 									if(rc!=SQLITE_OK) {
 										goto abort_due_to_error;
 									}
@@ -6492,7 +6492,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 																																																																																																																																																																																						                  Debug.Assert( memIsValid( r.aMem[rI] ) );
 #endif
 								}
-								rc=sqlite3VdbeIdxKeyCompare(pC,r,ref res);
+                                rc = vdbeaux.sqlite3VdbeIdxKeyCompare(pC, r, ref res);
 								if(pOp.OpCode==OpCode.OP_IdxLT) {
 									res=-res;
 								}
@@ -7661,7 +7661,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
 						///<param name="then only the currently executing statement is affected.">then only the currently executing statement is affected.</param>
 						case OpCode.OP_Expire: {
 							if(pOp.p1==0) {
-								sqlite3ExpirePreparedStatements(db);
+                                vdbeaux.sqlite3ExpirePreparedStatements(db);
 							}
 							else {
 								this.expired=true;
@@ -8406,7 +8406,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 if (btCursor != null)
                 {
                     ///The record is stored in a B">Tree
-                    rc =(int) sqlite3VdbeCursorMoveto(vdbeCursor);
+                    rc = (int)vdbeaux.sqlite3VdbeCursorMoveto(vdbeCursor);
                     if (rc != 0)
                         return (int)ColumnResult.abort_due_to_error;
                         //goto  abort_due_to_error;
@@ -8428,7 +8428,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                                 rc = btCursor.sqlite3BtreeKeySize(ref payloadSize64);
                                 Debug.Assert(rc == SQLITE_OK);
                                 ///True because of CursorMoveto() call above 
-                                ///sqlite3BtreeParseCellPtr() uses getVarint32() to extract the
+                                ///sqlite3BtreeParseCellPtr() uses utilc.getVarint32() to extract the
                                 ///payload size, so it is impossible for payloadSize64 to be
                                 ///larger than 32 bits. 
                                 Debug.Assert(((u64)payloadSize64 & SQLITE_MAX_U32) == (u64)payloadSize64);
@@ -8535,7 +8535,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                     ///
                     ///Size of the header size field at start of record 
                     int szHdr;
-                    szHdr = getVarint32(zData, out offsetIntoData);
+                    szHdr = utilc.getVarint32(zData, out offsetIntoData);
                     ///Make sure a corrupt database has not given us an oversize header.
                     ///Do this now to avoid an oversize memory allocation.
                     ///
@@ -8600,9 +8600,9 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                         if (idxHeader < idxEndHeader)
                         {
                             clumnOffsets[i] = offsetIntoData;
-                            idxHeader += getVarint32(zData, idxHeader, out columnTypes[i]);
-                            //getVarint32(zIdx, aType[i]);
-                            szField = sqlite3VdbeSerialTypeLen(columnTypes[i]);
+                            idxHeader += utilc.getVarint32(zData, idxHeader, out columnTypes[i]);
+                            //utilc.getVarint32(zIdx, aType[i]);
+                            szField = vdbeaux.sqlite3VdbeSerialTypeLen(columnTypes[i]);
                             offsetIntoData += szField;
                             if (offsetIntoData < szField)
                             {
@@ -8646,11 +8646,11 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                     if (zRecord != null)
                     {
                         sqlite3VdbeMemReleaseExternal(pDest);
-                        sqlite3VdbeSerialGet(zRecord, (int)clumnOffsets[clumnNumber_p2], columnTypes[clumnNumber_p2], pDest);
+                        vdbeaux.sqlite3VdbeSerialGet(zRecord, (int)clumnOffsets[clumnNumber_p2], columnTypes[clumnNumber_p2], pDest);
                     }
                     else
                     {
-                        len = (int)sqlite3VdbeSerialTypeLen(columnTypes[clumnNumber_p2]);
+                        len = (int)vdbeaux.sqlite3VdbeSerialTypeLen(columnTypes[clumnNumber_p2]);
                         sqlite3VdbeMemMove(sMem, pDest);
                         rc = sqlite3VdbeMemFromBtree(btCursor, (int)clumnOffsets[clumnNumber_p2], len, vdbeCursor.isIndex, sMem);
                         if (rc != SQLITE_OK)
@@ -8659,7 +8659,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                         }
                         zData = sMem.zBLOB;
                         sMem.zBLOB = null;
-                        sqlite3VdbeSerialGet(zData, columnTypes[clumnNumber_p2], pDest);
+                        vdbeaux.sqlite3VdbeSerialGet(zData, columnTypes[clumnNumber_p2], pDest);
                     }
                     pDest.enc = encoding;
                 }

@@ -269,7 +269,7 @@ namespace Community.CsharpSqlite {
 				///</summary>
 				//db.pnBytesFreed = nByte;
 				for(pVdbe=db.pVdbe;pVdbe!=null;pVdbe=pVdbe.pNext) {
-					sqlite3VdbeDeleteObject(db,ref pVdbe);
+                    vdbeaux.sqlite3VdbeDeleteObject(db, ref pVdbe);
 				}
 				db.pnBytesFreed=0;
 				pHighwater=0;

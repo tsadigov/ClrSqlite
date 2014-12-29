@@ -722,7 +722,7 @@ break;
 									db.flags=(int)(db.flags&~aFlagOp[i].mask);
 								}
 							if(oldFlags!=db.flags) {
-								sqlite3ExpirePreparedStatements(db);
+                                vdbeaux.sqlite3ExpirePreparedStatements(db);
 							}
 							if(pRes!=0) {
 								pRes=(db.flags&aFlagOp[i].mask)!=0?1:0;
@@ -860,7 +860,7 @@ break;
 			if(db==null) {
 				return SQLITE_OK;
 			}
-			if(!sqlite3SafetyCheckSickOrOk(db)) {
+			if(!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return SQLITE_MISUSE_BKPT();
 			}
 			sqlite3_mutex_enter(db.mutex);
@@ -885,15 +885,15 @@ break;
 			///If there are any outstanding VMs, return SQLITE_BUSY. 
 			///</summary>
 			if(db.pVdbe!=null) {
-				sqlite3Error(db,SQLITE_BUSY,"unable to close due to unfinalised statements");
+				utilc.sqlite3Error(db,SQLITE_BUSY,"unable to close due to unfinalised statements");
 				sqlite3_mutex_leave(db.mutex);
 				return SQLITE_BUSY;
 			}
-			Debug.Assert(sqlite3SafetyCheckSickOrOk(db));
+			Debug.Assert(utilc.sqlite3SafetyCheckSickOrOk(db));
 			for(j=0;j<db.nDb;j++) {
 				Btree pBt=db.aDb[j].pBt;
 				if(pBt!=null&&pBt.sqlite3BtreeIsInBackup()) {
-					sqlite3Error(db,SQLITE_BUSY,"unable to close due to unfinished backup operation");
+					utilc.sqlite3Error(db,SQLITE_BUSY,"unable to close due to unfinished backup operation");
 					sqlite3_mutex_leave(db.mutex);
 					return SQLITE_BUSY;
 				}
@@ -961,7 +961,7 @@ break;
 			}
 			sqlite3HashClear(db.aModule);
 			#endif
-			sqlite3Error(db,SQLITE_OK,0);
+			utilc.sqlite3Error(db,SQLITE_OK,0);
 			///
 			///<summary>
 			///Deallocates any cached error strings. 
@@ -1019,7 +1019,7 @@ break;
 			sqlite3VtabRollback(db);
 			sqlite3EndBenignMalloc();
 			if((db.flags&SQLITE_InternChanges)!=0) {
-				sqlite3ExpirePreparedStatements(db);
+                vdbeaux.sqlite3ExpirePreparedStatements(db);
 				sqlite3ResetInternalSchema(db,-1);
 			}
 			///
@@ -1397,12 +1397,12 @@ enc = SqliteEncoding.UTF16BE;
 			p=sqlite3FindFunction(db,zFunctionName,nName,nArg,enc,0);
 			if(p!=null&&p.iPrefEnc==enc&&p.nArg==nArg) {
 				if(db.activeVdbeCnt!=0) {
-					sqlite3Error(db,SQLITE_BUSY,"unable to delete/modify user-function due to active statements");
+					utilc.sqlite3Error(db,SQLITE_BUSY,"unable to delete/modify user-function due to active statements");
 					//Debug.Assert( 0 == db.mallocFailed );
 					return SQLITE_BUSY;
 				}
 				else {
-					sqlite3ExpirePreparedStatements(db);
+                    vdbeaux.sqlite3ExpirePreparedStatements(db);
 				}
 			}
 			p=sqlite3FindFunction(db,zFunctionName,nName,nArg,enc,1);
@@ -1750,10 +1750,10 @@ return pRet;
   }
   if( iDb<0 ){
     rc = SQLITE_ERROR;
-    sqlite3Error(db, SQLITE_ERROR, "unknown database: %s", zDb);
+    utilc.sqlite3Error(db, SQLITE_ERROR, "unknown database: %s", zDb);
   }else{
     rc = sqlite3Checkpoint(db, iDb, eMode, pnLog, pnCkpt);
-    sqlite3Error(db, rc, 0);
+    utilc.sqlite3Error(db, rc, 0);
   }
   rc = sqlite3ApiExit(db, rc);
   sqlite3_mutex_leave(db->mutex);
@@ -1865,7 +1865,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 			if(db==null) {
 				return sqlite3ErrStr(SQLITE_NOMEM);
 			}
-			if(!sqlite3SafetyCheckSickOrOk(db)) {
+			if(!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return sqlite3ErrStr(SQLITE_MISUSE_BKPT());
 			}
 			sqlite3_mutex_enter(db.mutex);
@@ -1906,7 +1906,7 @@ string z;
 if( null==db ){
 return (void )outOfMem;
 }
-if( null==sqlite3SafetyCheckSickOrOk(db) ){
+if( null==utilc.sqlite3SafetyCheckSickOrOk(db) ){
 return (void )misuse;
 }
 sqlite3_mutex_enter(db->mutex);
@@ -1936,7 +1936,7 @@ return z;
 		///passed to this function, we assume a malloc() failed during sqlite3_open().
 		///</summary>
 		static public int sqlite3_errcode(sqlite3 db) {
-			if(db!=null&&!sqlite3SafetyCheckSickOrOk(db)) {
+			if(db!=null&&!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return SQLITE_MISUSE_BKPT();
 			}
 			if(null==db///
@@ -1949,7 +1949,7 @@ return z;
 			return db.errCode&db.errMask;
 		}
 		static int sqlite3_extended_errcode(sqlite3 db) {
-			if(db!=null&&!sqlite3SafetyCheckSickOrOk(db)) {
+			if(db!=null&&!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return SQLITE_MISUSE_BKPT();
 			}
 			if(null==db///
@@ -2000,10 +2000,10 @@ return z;
 			pColl=sqlite3FindCollSeq(db,enc2,zName,0);
 			if(pColl!=null&&pColl.xCmp!=null) {
 				if(db.activeVdbeCnt!=0) {
-					sqlite3Error(db,SQLITE_BUSY,"unable to delete/modify collation sequence due to active statements");
+					utilc.sqlite3Error(db,SQLITE_BUSY,"unable to delete/modify collation sequence due to active statements");
 					return SQLITE_BUSY;
 				}
-				sqlite3ExpirePreparedStatements(db);
+                vdbeaux.sqlite3ExpirePreparedStatements(db);
 				///
 				///<summary>
 				///If collation sequence pColl was created directly by a call to
@@ -2035,7 +2035,7 @@ return z;
 			pColl.xDel=xDel;
 			pColl.enc=(enc2|(enc&SqliteEncoding.UTF16_ALIGNED));
 			pColl.type=collType;
-			sqlite3Error(db,SQLITE_OK,0);
+			utilc.sqlite3Error(db,SQLITE_OK,0);
 			return SQLITE_OK;
 		}
 		///
@@ -2624,7 +2624,7 @@ return z;
 			rc=sqlite3ParseUri(zVfs,zFilename,ref flags,ref db.pVfs,ref zOpen,ref zErrMsg);
 			if(rc!=SQLITE_OK) {
 				//if( rc==SQLITE_NOMEM ) db.mallocFailed = 1;
-				sqlite3Error(db,rc,zErrMsg.Length>0?"%s":"",zErrMsg);
+				utilc.sqlite3Error(db,rc,zErrMsg.Length>0?"%s":"",zErrMsg);
 				//sqlite3_free(zErrMsg);
 				goto opendb_out;
 			}
@@ -2637,7 +2637,7 @@ return z;
 				if(rc==SQLITE_IOERR_NOMEM) {
 					rc=SQLITE_NOMEM;
 				}
-				sqlite3Error(db,rc,0);
+				utilc.sqlite3Error(db,rc,0);
 				goto opendb_out;
 			}
 			db.aDb[0].pSchema=sqlite3SchemaGet(db,db.aDb[0].pBt);
@@ -2664,7 +2664,7 @@ return z;
 			///<param name="database schema yet. This is delayed until the first time the database">database schema yet. This is delayed until the first time the database</param>
 			///<param name="is accessed.">is accessed.</param>
 			///<param name=""></param>
-			sqlite3Error(db,SQLITE_OK,0);
+			utilc.sqlite3Error(db,SQLITE_OK,0);
 			func.sqlite3RegisterBuiltinFunctions(db);
 			///
 			///<summary>
@@ -2705,7 +2705,7 @@ rc = sqlite3IcuInit(db);
 rc = sqlite3RtreeInit(db);
 }
 #endif
-			sqlite3Error(db,rc,0);
+			utilc.sqlite3Error(db,rc,0);
 			///
 			///<summary>
 			///</summary>
@@ -3081,7 +3081,7 @@ error_out:
         zColumnName );
         rc = SQLITE_ERROR;
       }
-      sqlite3Error( db, rc, ( !String.IsNullOrEmpty( zErrMsg ) ? "%s" : null ), zErrMsg );
+      utilc.sqlite3Error( db, rc, ( !String.IsNullOrEmpty( zErrMsg ) ? "%s" : null ), zErrMsg );
       sqlite3DbFree( db, ref zErrMsg );
       rc = sqlite3ApiExit( db, rc );
       sqlite3_mutex_leave( db.mutex );

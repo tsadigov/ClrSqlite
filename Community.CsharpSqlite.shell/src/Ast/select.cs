@@ -567,11 +567,11 @@ namespace Community.CsharpSqlite
                             {
                                 if (zTName != null)
                                 {
-                                    sqlite3ErrorMsg(pParse, "no such table: %s", zTName);
+                                    utilc.sqlite3ErrorMsg(pParse, "no such table: %s", zTName);
                                 }
                                 else
                                 {
-                                    sqlite3ErrorMsg(pParse, "no tables specified");
+                                    utilc.sqlite3ErrorMsg(pParse, "no tables specified");
                                 }
                             }
                         }
@@ -582,7 +582,7 @@ namespace Community.CsharpSqlite
                 //#if SQLITE_MAX_COLUMN
                 if (p.pEList != null && p.pEList.nExpr > db.aLimit[SQLITE_LIMIT_COLUMN])
                 {
-                    sqlite3ErrorMsg(pParse, "too many columns in result set");
+                    utilc.sqlite3ErrorMsg(pParse, "too many columns in result set");
                 }
                 //#endif
                 return WRC_Continue;
@@ -883,7 +883,7 @@ namespace Community.CsharpSqlite
                         mxSelect = db.aLimit[SQLITE_LIMIT_COMPOUND_SELECT];
                         if (mxSelect != 0 && cnt > mxSelect)
                         {
-                            sqlite3ErrorMsg(pParse, "too many terms in compound SELECT");
+                            utilc.sqlite3ErrorMsg(pParse, "too many terms in compound SELECT");
                             goto select_end;
                         }
                     }
@@ -1000,7 +1000,7 @@ namespace Community.CsharpSqlite
                     ///</summary>
                     if (addrSortIndex >= 0 && pOrderBy == null)
                     {
-                        sqlite3VdbeChangeToNoop(v, addrSortIndex, 1);
+                        vdbeaux.sqlite3VdbeChangeToNoop(v, addrSortIndex, 1);
                         p.addrOpenEphm[2] = -1;
                     }
                     ///
@@ -1346,7 +1346,7 @@ namespace Community.CsharpSqlite
                         else
                         {
                             pWInfo.sqlite3WhereEnd();
-                            sqlite3VdbeChangeToNoop(v, addrSortingIdx, 1);
+                            vdbeaux.sqlite3VdbeChangeToNoop(v, addrSortingIdx, 1);
                         }
                         ///
                         ///<summary>
@@ -1727,13 +1727,13 @@ namespace Community.CsharpSqlite
                 dest = pDest;
                 if (pPrior.pOrderBy != null)
                 {
-                    sqlite3ErrorMsg(pParse, "ORDER BY clause should come after %s not before", selectOpName(p.TokenOp));
+                    utilc.sqlite3ErrorMsg(pParse, "ORDER BY clause should come after %s not before", selectOpName(p.TokenOp));
                     rc = 1;
                     goto multi_select_end;
                 }
                 if (pPrior.pLimit != null)
                 {
-                    sqlite3ErrorMsg(pParse, "LIMIT clause should come after %s not before", selectOpName(p.TokenOp));
+                    utilc.sqlite3ErrorMsg(pParse, "LIMIT clause should come after %s not before", selectOpName(p.TokenOp));
                     rc = 1;
                     goto multi_select_end;
                 }
@@ -1764,7 +1764,7 @@ namespace Community.CsharpSqlite
                 Debug.Assert(p.pEList != null && pPrior.pEList != null);
                 if (p.pEList.nExpr != pPrior.pEList.nExpr)
                 {
-                    sqlite3ErrorMsg(pParse, "SELECTs to the left and right of %s" + " do not have the same number of result columns", selectOpName(p.TokenOp));
+                    utilc.sqlite3ErrorMsg(pParse, "SELECTs to the left and right of %s" + " do not have the same number of result columns", selectOpName(p.TokenOp));
                     rc = 1;
                     goto multi_select_end;
                 }

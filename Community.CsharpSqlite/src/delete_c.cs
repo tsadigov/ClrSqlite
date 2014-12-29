@@ -87,7 +87,7 @@ Select pSelect = null;      /* Complete SELECT tree */
 /* Check that there isn't an ORDER BY without a LIMIT clause.
 */
 if( pOrderBy!=null && (pLimit == null) ) {
-sqlite3ErrorMsg(pParse, "ORDER BY without LIMIT on %s", zStmtType);
+utilc.sqlite3ErrorMsg(pParse, "ORDER BY without LIMIT on %s", zStmtType);
 pParse.parseError = 1;
 goto limit_where_cleanup_2;
 }

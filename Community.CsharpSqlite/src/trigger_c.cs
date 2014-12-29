@@ -184,7 +184,7 @@ namespace Community.CsharpSqlite {
 				///If TEMP was specified, then the trigger name may not be qualified. 
 				///</summary>
 				if(pName2.Length>0) {
-					sqlite3ErrorMsg(pParse,"temporary trigger may not have qualified name");
+					utilc.sqlite3ErrorMsg(pParse,"temporary trigger may not have qualified name");
 					goto trigger_cleanup;
 				}
 				iDb=1;
@@ -270,7 +270,7 @@ namespace Community.CsharpSqlite {
 				goto trigger_cleanup;
 			}
 			if(IsVirtual(pTab)) {
-				sqlite3ErrorMsg(pParse,"cannot create triggers on virtual tables");
+				utilc.sqlite3ErrorMsg(pParse,"cannot create triggers on virtual tables");
 				goto trigger_cleanup;
 			}
 			///
@@ -285,7 +285,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 			if((db.aDb[iDb].pSchema.trigHash).sqlite3HashFind(zName,StringExtensions.sqlite3Strlen30(zName),(Trigger)null)!=null) {
 				if(noErr==0) {
-					sqlite3ErrorMsg(pParse,"trigger %T already exists",pName);
+					utilc.sqlite3ErrorMsg(pParse,"trigger %T already exists",pName);
 				}
 				else {
 					Debug.Assert(0==db.init.busy);
@@ -298,7 +298,7 @@ namespace Community.CsharpSqlite {
 			///Do not create a trigger on a system table 
 			///</summary>
 			if(pTab.zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)) {
-				sqlite3ErrorMsg(pParse,"cannot create trigger on system table");
+				utilc.sqlite3ErrorMsg(pParse,"cannot create trigger on system table");
 				pParse.nErr++;
 				goto trigger_cleanup;
 			}
@@ -309,11 +309,11 @@ namespace Community.CsharpSqlite {
 			///
 			///</summary>
 			if(pTab.pSelect!=null&&tr_tm!=TK_INSTEAD) {
-				sqlite3ErrorMsg(pParse,"cannot create %s trigger on view: %S",(tr_tm==TK_BEFORE)?"BEFORE":"AFTER",pTableName,0);
+				utilc.sqlite3ErrorMsg(pParse,"cannot create %s trigger on view: %S",(tr_tm==TK_BEFORE)?"BEFORE":"AFTER",pTableName,0);
 				goto trigger_cleanup;
 			}
 			if(pTab.pSelect==null&&tr_tm==TK_INSTEAD) {
-				sqlite3ErrorMsg(pParse,"cannot create INSTEAD OF"+" trigger on table: %S",pTableName,0);
+				utilc.sqlite3ErrorMsg(pParse,"cannot create INSTEAD OF"+" trigger on table: %S",pTableName,0);
 				goto trigger_cleanup;
 			}
 			iTabDb=sqlite3SchemaToIndex(db,pTab.pSchema);
@@ -727,7 +727,7 @@ goto trigger_cleanup;
 			}
 			if(pTrigger==null) {
 				if(noErr==0) {
-					sqlite3ErrorMsg(pParse,"no such trigger: %S",pName,0);
+					utilc.sqlite3ErrorMsg(pParse,"no such trigger: %S",pName,0);
 				}
 				else {
 					sqlite3CodeVerifyNamedSchema(pParse,zDb);
@@ -1232,7 +1232,7 @@ return;
 				pProgram.token=pTrigger.GetHashCode();
 				pPrg.aColmask[0]=pSubParse.oldmask;
 				pPrg.aColmask[1]=pSubParse.newmask;
-				sqlite3VdbeDelete(ref v);
+                vdbeaux.sqlite3VdbeDelete(ref v);
 			}
 			Debug.Assert(null==pSubParse.pAinc&&null==pSubParse.pZombieTab);
 			Debug.Assert(null==pSubParse.pTriggerPrg&&0==pSubParse.nMaxArg);

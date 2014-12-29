@@ -103,7 +103,7 @@ return SQLITE_OK;
 /// user-supplied authorization function returned an illegal value.
 ///</summary>
 static void sqliteAuthBadReturnCode(Parse *pParse){
-sqlite3ErrorMsg(pParse, "authorizer malfunction");
+utilc.sqlite3ErrorMsg(pParse, "authorizer malfunction");
 pParse->rc = SQLITE_ERROR;
 }
 
@@ -129,9 +129,9 @@ int sqlite3AuthReadCol(
   rc = db->xAuth(db->pAuthArg, SQLITE_READ, zTab,zCol,zDb,pParse->zAuthContext);
   if( rc==SQLITE_DENY ){
 if( db->nDb>2 || iDb!=0 ){
-  sqlite3ErrorMsg(pParse, "access to %s.%s.%s is prohibited",zDb,zTab,zCol);
+  utilc.sqlite3ErrorMsg(pParse, "access to %s.%s.%s is prohibited",zDb,zTab,zCol);
 }else{
-  sqlite3ErrorMsg(pParse, "access to %s.%s is prohibited", zTab, zCol);
+  utilc.sqlite3ErrorMsg(pParse, "access to %s.%s is prohibited", zTab, zCol);
 }
 pParse->rc = SQLITE_AUTH;
   }else if( rc!=SQLITE_IGNORE && rc!=SQLITE_OK ){
@@ -227,7 +227,7 @@ return SQLITE_OK;
 }
 rc = db->xAuth(db->pAuthArg, code, zArg1, zArg2, zArg3, pParse->zAuthContext);
 if( rc==SQLITE_DENY ){
-sqlite3ErrorMsg(pParse, "not authorized");
+utilc.sqlite3ErrorMsg(pParse, "not authorized");
 pParse->rc = SQLITE_AUTH;
 }else if( rc!=SQLITE_OK && rc!=SQLITE_IGNORE ){
 rc = SQLITE_DENY;

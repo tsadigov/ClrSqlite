@@ -440,7 +440,7 @@ namespace Community.CsharpSqlite {
 				///Set the error code of the destination database handle. 
 				///</summary>
 				rc=(this.rc==SQLITE_DONE)?SQLITE_OK:this.rc;
-				sqlite3Error(this.pDestDb,rc,0);
+				utilc.sqlite3Error(this.pDestDb,rc,0);
 				///
 				///<summary>
 				///Exit the mutexes and free the backup context structure. 
@@ -634,13 +634,13 @@ namespace Community.CsharpSqlite {
 				pParse=new Parse();
 				//sqlite3StackAllocZero(pErrorDb, sizeof(*pParse));
 				if(pParse==null) {
-					sqlite3Error(pErrorDb,SQLITE_NOMEM,"out of memory");
+					utilc.sqlite3Error(pErrorDb,SQLITE_NOMEM,"out of memory");
 					rc=SQLITE_NOMEM;
 				}
 				else {
 					pParse.db=pDb;
 					if(sqlite3OpenTempDatabase(pParse)!=0) {
-						sqlite3Error(pErrorDb,pParse.rc,"%s",pParse.zErrMsg);
+						utilc.sqlite3Error(pErrorDb,pParse.rc,"%s",pParse.zErrMsg);
 						rc=SQLITE_ERROR;
 					}
 					pErrorDb.sqlite3DbFree(ref pParse.zErrMsg);
@@ -651,7 +651,7 @@ namespace Community.CsharpSqlite {
 				}
 			}
 			if(i<0) {
-				sqlite3Error(pErrorDb,SQLITE_ERROR,"unknown database %s",zDb);
+				utilc.sqlite3Error(pErrorDb,SQLITE_ERROR,"unknown database %s",zDb);
 				return null;
 			}
 			return pDb.aDb[i].pBt;
@@ -700,7 +700,7 @@ namespace Community.CsharpSqlite {
 			sqlite3_mutex_enter(pSrcDb.mutex);
 			sqlite3_mutex_enter(pDestDb.mutex);
 			if(pSrcDb==pDestDb) {
-				sqlite3Error(pDestDb,SQLITE_ERROR,"source and destination must be distinct");
+				utilc.sqlite3Error(pDestDb,SQLITE_ERROR,"source and destination must be distinct");
 				p=null;
 			}
 			else {
@@ -715,7 +715,7 @@ namespace Community.CsharpSqlite {
 				// (sqlite3_backup)sqlite3_malloc( sizeof( sqlite3_backup ) );
 				//if ( null == p )
 				//{
-				//  sqlite3Error( pDestDb, SQLITE_NOMEM, 0 );
+				//  utilc.sqlite3Error( pDestDb, SQLITE_NOMEM, 0 );
 				//}
 			}
 			///

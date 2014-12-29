@@ -7477,7 +7477,7 @@ return;
 				///<summary>
 				///Silence some compiler warnings 
 				///</summary>
-				sqlite3ErrorMsg(pParse,"parser stack overflow");
+				utilc.sqlite3ErrorMsg(pParse,"parser stack overflow");
 				pParse.parseError=1;
 				//#line 1664  "parse.c"
 				this.pParse=pParse;
@@ -7530,7 +7530,7 @@ return;
 				///</summary>
 				Debug.Assert(yyminor.yy0Token.zRestSql.Length>0);
 				//TOKEN.z[0]);  /* The tokenizer always gives us a token */
-				sqlite3ErrorMsg(pParse,"near \"%T\": syntax error",yyminor.yy0Token);
+				utilc.sqlite3ErrorMsg(pParse,"near \"%T\": syntax error",yyminor.yy0Token);
 				//&TOKEN);
 				pParse.parseError=1;
 				//#line 3661 "parse.c"
@@ -10622,7 +10622,7 @@ return yy_default[stateno];
 				///</summary>
 				///<param name="in the virtual machine.  #N is the N">th register. </param>
 				if(pParse.nested==0) {
-					sqlite3ErrorMsg(pParse,"near \"%T\": syntax error",yymsp[0].minor.yy0Token);
+					utilc.sqlite3ErrorMsg(pParse,"near \"%T\": syntax error",yymsp[0].minor.yy0Token);
 					yygotominor.yy118.pExpr=null;
 				}
 				else {
@@ -10681,7 +10681,7 @@ return yy_default[stateno];
 			//#line 793 "parse.y"
 			{
 				if(yymsp[-1].minor.yy322!=null&&yymsp[-1].minor.yy322.nExpr>pParse.db.aLimit[SQLITE_LIMIT_FUNCTION_ARG]) {
-					sqlite3ErrorMsg(pParse,"too many arguments on function %T",yymsp[-4].minor.yy0Token);
+					utilc.sqlite3ErrorMsg(pParse,"too many arguments on function %T",yymsp[-4].minor.yy0Token);
 				}
 				yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(yymsp[-1].minor.yy322,yymsp[-4].minor.yy0Token);
 				yygotominor.yy118.spanSet(yymsp[-4].minor.yy0Token,yymsp[0].minor.yy0Token);
@@ -11478,7 +11478,7 @@ return yy_default[stateno];
 			//#line 1229 "parse.y"
 			{
 				yygotominor.yy0Token=yymsp[0].minor.yy0Token;
-				sqlite3ErrorMsg(pParse,"qualified table names are not allowed on INSERT, UPDATE, and DELETE "+"statements within triggers");
+				utilc.sqlite3ErrorMsg(pParse,"qualified table names are not allowed on INSERT, UPDATE, and DELETE "+"statements within triggers");
 			}
 			//#line 3384 "parse.c"
 			break;
@@ -11489,7 +11489,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1241 "parse.y"
 			{
-				sqlite3ErrorMsg(pParse,"the INDEXED BY clause is not allowed on UPDATE or DELETE statements "+"within triggers");
+				utilc.sqlite3ErrorMsg(pParse,"the INDEXED BY clause is not allowed on UPDATE or DELETE statements "+"within triggers");
 			}
 			//#line 3393 "parse.c"
 			break;
@@ -11500,7 +11500,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1246 "parse.y"
 			{
-				sqlite3ErrorMsg(pParse,"the NOT INDEXED clause is not allowed on UPDATE or DELETE statements "+"within triggers");
+				utilc.sqlite3ErrorMsg(pParse,"the NOT INDEXED clause is not allowed on UPDATE or DELETE statements "+"within triggers");
 			}
 			//#line 3402 "parse.c"
 			break;

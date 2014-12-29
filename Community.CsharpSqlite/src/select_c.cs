@@ -139,12 +139,12 @@ namespace Community.CsharpSqlite {
 				if(pC==null) {
 					zSp="";
 				}
-				sqlite3ErrorMsg(pParse,"unknown or unsupported join type: "+"%T %T%s%T",pA,pB,zSp,pC);
+				utilc.sqlite3ErrorMsg(pParse,"unknown or unsupported join type: "+"%T %T%s%T",pA,pB,zSp,pC);
 				jointype=JT_INNER;
 			}
 			else
 				if((jointype&JT_OUTER)!=0&&(jointype&(JT_LEFT|JT_RIGHT))!=JT_LEFT) {
-					sqlite3ErrorMsg(pParse,"RIGHT and FULL OUTER JOINs are not currently supported");
+					utilc.sqlite3ErrorMsg(pParse,"RIGHT and FULL OUTER JOINs are not currently supported");
 					jointype=JT_INNER;
 				}
 			return jointype;
@@ -343,7 +343,7 @@ namespace Community.CsharpSqlite {
 				///</summary>
 				if((pRight.jointype&JT_NATURAL)!=0) {
 					if(pRight.pOn!=null||pRight.pUsing!=null) {
-						sqlite3ErrorMsg(pParse,"a NATURAL join may not have "+"an ON or USING clause","");
+						utilc.sqlite3ErrorMsg(pParse,"a NATURAL join may not have "+"an ON or USING clause","");
 						return 1;
 					}
 					for(j=0;j<pRightTab.nCol;j++) {
@@ -375,7 +375,7 @@ namespace Community.CsharpSqlite {
 				///
 				///</summary>
 				if(pRight.pOn!=null&&pRight.pUsing!=null) {
-					sqlite3ErrorMsg(pParse,"cannot have both ON and USING "+"clauses in the same join");
+					utilc.sqlite3ErrorMsg(pParse,"cannot have both ON and USING "+"clauses in the same join");
 					return 1;
 				}
 				///
@@ -426,7 +426,7 @@ namespace Community.CsharpSqlite {
 						zName=pList.a[j].zName;
                         iRightCol = pRightTab.columnIndex(zName);
 						if(iRightCol<0||0==tableAndColumnIndex(pSrc,i+1,zName,ref iLeft,ref iLeftCol)) {
-							sqlite3ErrorMsg(pParse,"cannot join using column %s - column "+"not present in both tables",zName);
+							utilc.sqlite3ErrorMsg(pParse,"cannot join using column %s - column "+"not present in both tables",zName);
 							return 1;
 						}
 						addWhereTerm(pParse,pSrc,iLeft,iLeftCol,i+1,iRightCol,isOuter?1:0,ref p.pWhere);
@@ -564,7 +564,7 @@ namespace Community.CsharpSqlite {
 		) {
 			var eDest=pDest.eDest;
 			if(nExpr>1&&(eDest==SelectResultType.Mem||eDest==SelectResultType.Set)) {
-				sqlite3ErrorMsg(pParse,"only a single result allowed for "+"a SELECT that is part of an expression");
+				utilc.sqlite3ErrorMsg(pParse,"only a single result allowed for "+"a SELECT that is part of an expression");
 				return true;
 			}
 			else {
@@ -3394,7 +3394,7 @@ break;
 				for(pIdx=pTab.pIndex;pIdx!=null&&!pIdx.zName.Equals(zIndex,StringComparison.InvariantCultureIgnoreCase);pIdx=pIdx.pNext)
 					;
 				if(null==pIdx) {
-					sqlite3ErrorMsg(pParse,"no such index: %s",zIndex);
+					utilc.sqlite3ErrorMsg(pParse,"no such index: %s",zIndex);
 					pParse.checkSchema=1;
 					return SQLITE_ERROR;
 				}
@@ -3517,7 +3517,7 @@ break;
 					Expr pE=pFunc.pExpr;
 					Debug.Assert(!pE.ExprHasProperty(EP_xIsSelect));
 					if(pE.x.pList==null||pE.x.pList.nExpr!=1) {
-						sqlite3ErrorMsg(pParse,"DISTINCT aggregates must have exactly one "+"argument");
+						utilc.sqlite3ErrorMsg(pParse,"DISTINCT aggregates must have exactly one "+"argument");
 						pFunc.iDistinct=-1;
 					}
 					else {

@@ -49,7 +49,7 @@ namespace Community.CsharpSqlite
         ///<param name=""></param>
         ///<param name="The member variables sqlite.errCode, sqlite.zErrMsg and sqlite.zErrMsg16">The member variables sqlite.errCode, sqlite.zErrMsg and sqlite.zErrMsg16</param>
         ///<param name="store the most recent error code and, if applicable, string. The">store the most recent error code and, if applicable, string. The</param>
-        ///<param name="internal function sqlite3Error() is used to set these variables">internal function sqlite3Error() is used to set these variables</param>
+        ///<param name="internal function utilc.sqlite3Error() is used to set these variables">internal function utilc.sqlite3Error() is used to set these variables</param>
         ///<param name="consistently.">consistently.</param>
         ///<param name=""></param>
 

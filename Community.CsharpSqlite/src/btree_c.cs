@@ -2629,10 +2629,10 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                             u32 i;
                                             int dist;
                                             closest = 0;
-                                            dist = sqlite3AbsInt32((int)(Converter.sqlite3Get4byte(aData, 8) - nearby));
+                                            dist = utilc.sqlite3AbsInt32((int)(Converter.sqlite3Get4byte(aData, 8) - nearby));
                                             for (i = 1; i < k; i++)
                                             {
-                                                int d2 = sqlite3AbsInt32((int)(Converter.sqlite3Get4byte(aData, 8 + i * 4) - nearby));
+                                                int d2 = utilc.sqlite3AbsInt32((int)(Converter.sqlite3Get4byte(aData, 8 + i * 4) - nearby));
                                                 if (d2 < dist)
                                                 {
                                                     closest = i;

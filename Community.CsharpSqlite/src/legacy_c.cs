@@ -226,12 +226,12 @@ namespace Community.CsharpSqlite
 ///True if callback data is initialized 
 ///</summary>
 
-			if (!sqlite3SafetyCheckOk (db))
+            if (!utilc.sqlite3SafetyCheckOk(db))
 				return SQLITE_MISUSE_BKPT ();
 			if (zSql == null)
 				zSql = "";
 			sqlite3_mutex_enter (db.mutex);
-			sqlite3Error (db, SQLITE_OK, 0);
+            utilc.sqlite3Error(db, SQLITE_OK, 0);
 			while ((result == SqlResult.SQLITE_OK || (result == SqlResult.SQLITE_SCHEMA && (++nRetry) < 2)) && zSql != "") {
 				int nCol;
 				string[] azVals = null;
@@ -294,14 +294,14 @@ namespace Community.CsharpSqlite
 						}
 						if (xCallback (pArg, nCol, azVals, azCols) != 0) {
 							result = SqlResult.SQLITE_ABORT;
-							sqlite3VdbeFinalize (ref pStmt);
+                            vdbeaux.sqlite3VdbeFinalize(ref pStmt);
 							pStmt = null;
-							sqlite3Error (db, SQLITE_ABORT, 0);
+                            utilc.sqlite3Error(db, SQLITE_ABORT, 0);
 							goto exec_out;
 						}
 					}
 					if (result != SqlResult.SQLITE_ROW) {
-						result = (SqlResult)sqlite3VdbeFinalize (ref pStmt);
+                        result = (SqlResult)vdbeaux.sqlite3VdbeFinalize(ref pStmt);
 						pStmt = null;
 						if (result != SqlResult.SQLITE_SCHEMA) {
 							nRetry = 0;
@@ -321,7 +321,7 @@ namespace Community.CsharpSqlite
 			}
 			exec_out:
 			if (pStmt != null)
-				sqlite3VdbeFinalize (ref pStmt);
+                vdbeaux.sqlite3VdbeFinalize(ref pStmt);
 			db.sqlite3DbFree (ref azCols);
 			result = (SqlResult)sqlite3ApiExit (db, (int)result);
 			if (result != SqlResult.SQLITE_OK && ALWAYS (result == (SqlResult)sqlite3_errcode (db)) && pzErrMsg != null) {
@@ -332,7 +332,7 @@ namespace Community.CsharpSqlite
 				//   memcpy(pzErrMsg, sqlite3_errmsg(db), nErrMsg);
 				//}else{
 				//rc = SQLITE_NOMEM;
-				//sqlite3Error(db, SQLITE_NOMEM, 0);
+				//utilc.sqlite3Error(db, SQLITE_NOMEM, 0);
 				//}
 				pzErrMsg = sqlite3_errmsg (db);
 			}

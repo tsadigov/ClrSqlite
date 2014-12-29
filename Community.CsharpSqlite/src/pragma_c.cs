@@ -161,7 +161,7 @@ namespace Community.CsharpSqlite {
 			sqlite3 db=pParse.db;
 			if(db.aDb[1].pBt!=null) {
 				if(0==db.autoCommit||db.aDb[1].pBt.sqlite3BtreeIsInReadTrans()) {
-					sqlite3ErrorMsg(pParse,"temporary storage cannot be changed "+"from within a transaction");
+					utilc.sqlite3ErrorMsg(pParse,"temporary storage cannot be changed "+"from within a transaction");
 					return SQLITE_ERROR;
 				}
 				BTreeMethods.sqlite3BtreeClose(ref db.aDb[1].pBt);
@@ -567,7 +567,7 @@ goto pragma_out;
 				int addr;
 				if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 					goto pragma_out;
-				sqlite3VdbeUsesBtree(v,iDb);
+                vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 				if(null==zRight) {
 					v.sqlite3VdbeSetNumCols(1);
 					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"cache_size",SQLITE_STATIC);
@@ -578,7 +578,7 @@ goto pragma_out;
 					v.sqlite3VdbeChangeP1(addr+6,SQLITE_DEFAULT_CACHE_SIZE);
 				}
 				else {
-					int size=sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
+                    int size = utilc.sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
 					sqlite3BeginWriteOperation(pParse,0,iDb);
 					v.sqlite3VdbeAddOp2(OP_Integer,size,1);
 					v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_DEFAULT_CACHE_SIZE,1);
@@ -816,7 +816,7 @@ goto pragma_out;
 										}
 										for(ii=db.nDb-1;ii>=0;ii--) {
 											if(db.aDb[ii].pBt!=null&&(ii==iDb||pId2.Length==0)) {
-												sqlite3VdbeUsesBtree(v,ii);
+                                                vdbeaux.sqlite3VdbeUsesBtree(v, ii);
 												v.sqlite3VdbeAddOp3(OP_JournalMode,ii,1,eMode);
 											}
 										}
@@ -931,7 +931,7 @@ goto pragma_out;
 															v.sqlite3VdbeChangeP2(iAddr+2,iAddr+4);
 															v.sqlite3VdbeChangeP1(iAddr+4,eAuto-1);
 															v.sqlite3VdbeChangeP1(iAddr+5,iDb);
-															sqlite3VdbeUsesBtree(v,iDb);
+                                                            vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 														}
 													}
 												}
@@ -987,7 +987,7 @@ goto pragma_out;
 															returnSingleInt(pParse,"cache_size",pDb.pSchema.cache_size);
 														}
 														else {
-															int size=sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
+                                                            int size = utilc.sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
 															pDb.pSchema.cache_size=size;
 															pDb.pBt.SetCacheSize(pDb.pSchema.cache_size);
 														}
@@ -1043,7 +1043,7 @@ goto pragma_out;
 																		int res=0;
 																		rc=sqlite3OsAccess(db.pVfs,zRight,SQLITE_ACCESS_READWRITE,ref res);
 																		if(rc!=SQLITE_OK||res==0) {
-																			sqlite3ErrorMsg(pParse,"not a writable directory");
+																			utilc.sqlite3ErrorMsg(pParse,"not a writable directory");
 																			goto pragma_out;
 																		}
 																	}
@@ -1116,7 +1116,7 @@ ref iDummy );
 }
 if ( res != SQLITE_OK )
 {
-sqlite3ErrorMsg( pParse, "failed to set lock proxy file" );
+utilc.sqlite3ErrorMsg( pParse, "failed to set lock proxy file" );
 goto pragma_out;
 }
 }
@@ -1141,7 +1141,7 @@ else
 																	}
 																	else {
 																		if(0==db.autoCommit) {
-																			sqlite3ErrorMsg(pParse,"Safety level may not be changed inside a transaction");
+																			utilc.sqlite3ErrorMsg(pParse,"Safety level may not be changed inside a transaction");
 																		}
 																		else {
 																			pDb.safety_level=(byte)(getSafetyLevel(zRight)+1);
@@ -1702,7 +1702,7 @@ break;
 }
 if ( encnames[iEnc].zName == null )
 {
-sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
+utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 }
 }
 }
@@ -1742,7 +1742,7 @@ sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																												///<summary>
 																												///</summary>
 																												///<param name="Cookie index. 1 for schema">cookie. </param>
-																												sqlite3VdbeUsesBtree(v,iDb);
+                                                                                                                vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 																												switch(zLeft[0]) {
 																												case 'f':
 																												case 'F':

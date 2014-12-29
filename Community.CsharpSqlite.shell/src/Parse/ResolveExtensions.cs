@@ -686,7 +686,7 @@ namespace Community.CsharpSqlite
                                 pOrig = pEList.a[j].pExpr;
                                 if (0 == pNC.allowAgg && pOrig.ExprHasProperty(EP_Agg))
                                 {
-                                    sqlite3ErrorMsg(pParse, "misuse of aliased aggregate %s", zAs);
+                                    utilc.sqlite3ErrorMsg(pParse, "misuse of aliased aggregate %s", zAs);
                                     return WRC_Abort;
                                 }
                                 resolveAlias(pParse, pEList, j, pExpr, "");
@@ -738,16 +738,16 @@ namespace Community.CsharpSqlite
                     zErr = cnt == 0 ? "no such column" : "ambiguous column name";
                     if (zDb != null)
                     {
-                        sqlite3ErrorMsg(pParse, "%s: %s.%s.%s", zErr, zDb, zTab, zCol);
+                        utilc.sqlite3ErrorMsg(pParse, "%s: %s.%s.%s", zErr, zDb, zTab, zCol);
                     }
                     else
                         if (zTab != null)
                         {
-                            sqlite3ErrorMsg(pParse, "%s: %s.%s", zErr, zTab, zCol);
+                            utilc.sqlite3ErrorMsg(pParse, "%s: %s.%s", zErr, zTab, zCol);
                         }
                         else
                         {
-                            sqlite3ErrorMsg(pParse, "%s: %s", zErr, zCol);
+                            utilc.sqlite3ErrorMsg(pParse, "%s: %s", zErr, zCol);
                         }
                     pParse.checkSchema = 1;
                     pTopNC.nErr++;
@@ -989,7 +989,7 @@ break;
 auth = sqlite3AuthCheck(pParse, SQLITE_FUNCTION, 0, pDef.zName, 0);
 if( auth!=SQLITE_OK ){
 if( auth==SQLITE_DENY ){
-sqlite3ErrorMsg(pParse, "not authorized to use function: %s",
+utilc.sqlite3ErrorMsg(pParse, "not authorized to use function: %s",
 pDef.zName);
 pNC.nErr++;
 }
@@ -1000,20 +1000,20 @@ return WRC_Prune;
 #endif
                             if (is_agg && 0 == pNC.allowAgg)
                             {
-                                sqlite3ErrorMsg(pParse, "misuse of aggregate function %.*s()", nId, zId);
+                                utilc.sqlite3ErrorMsg(pParse, "misuse of aggregate function %.*s()", nId, zId);
                                 pNC.nErr++;
                                 is_agg = false;
                             }
                             else
                                 if (no_such_func)
                                 {
-                                    sqlite3ErrorMsg(pParse, "no such function: %.*s", nId, zId);
+                                    utilc.sqlite3ErrorMsg(pParse, "no such function: %.*s", nId, zId);
                                     pNC.nErr++;
                                 }
                                 else
                                     if (wrong_num_args)
                                     {
-                                        sqlite3ErrorMsg(pParse, "wrong number of arguments to function %.*s()", nId, zId);
+                                        utilc.sqlite3ErrorMsg(pParse, "wrong number of arguments to function %.*s()", nId, zId);
                                         pNC.nErr++;
                                     }
                             if (is_agg)
@@ -1051,7 +1051,7 @@ return WRC_Prune;
 #if !SQLITE_OMIT_CHECK
                                 if (pNC.isCheck != 0)
                                 {
-                                    sqlite3ErrorMsg(pParse, "subqueries prohibited in CHECK constraints");
+                                    utilc.sqlite3ErrorMsg(pParse, "subqueries prohibited in CHECK constraints");
                                 }
 #endif
                                 pWalker.sqlite3WalkSelect(pExpr.x.pSelect);
@@ -1068,7 +1068,7 @@ return WRC_Prune;
                         {
                             if (pNC.isCheck != 0)
                             {
-                                sqlite3ErrorMsg(pParse, "parameters prohibited in CHECK constraints");
+                                utilc.sqlite3ErrorMsg(pParse, "parameters prohibited in CHECK constraints");
                             }
                             break;
                         }
@@ -1099,7 +1099,7 @@ return WRC_Prune;
                 ///Largest permissible value of i 
             )
             {
-                sqlite3ErrorMsg(pParse, "%r %s BY term out of range - should be " + "between 1 and %d", i, zType, mx);
+                utilc.sqlite3ErrorMsg(pParse, "%r %s BY term out of range - should be " + "between 1 and %d", i, zType, mx);
             }
 
 
@@ -1143,7 +1143,7 @@ return WRC_Prune;
                 //#if SQLITE_MAX_COLUMN
                 if (pOrderBy.nExpr > db.aLimit[SQLITE_LIMIT_COLUMN])
                 {
-                    sqlite3ErrorMsg(pParse, "too many terms in ORDER BY clause");
+                    utilc.sqlite3ErrorMsg(pParse, "too many terms in ORDER BY clause");
                     return 1;
                 }
                 //#endif
@@ -1218,7 +1218,7 @@ return WRC_Prune;
                 {
                     if (pOrderBy.a[i].done == 0)
                     {
-                        sqlite3ErrorMsg(pParse, "%r ORDER BY term does not match any " + "column in the result set", i + 1);
+                        utilc.sqlite3ErrorMsg(pParse, "%r ORDER BY term does not match any " + "column in the result set", i + 1);
                         return 1;
                     }
                 }
@@ -1261,7 +1261,7 @@ return WRC_Prune;
                 //#if SQLITE_MAX_COLUMN
                 if (pOrderBy.nExpr > db.aLimit[SQLITE_LIMIT_COLUMN])
                 {
-                    sqlite3ErrorMsg(pParse, "too many terms in %s BY clause", zType);
+                    utilc.sqlite3ErrorMsg(pParse, "too many terms in %s BY clause", zType);
                     return 1;
                 }
                 //#endif
@@ -1541,7 +1541,7 @@ return WRC_Prune;
                     ///</summary>
                     if (p.pHaving != null && pGroupBy == null)
                     {
-                        sqlite3ErrorMsg(pParse, "a GROUP BY clause is required before HAVING");
+                        utilc.sqlite3ErrorMsg(pParse, "a GROUP BY clause is required before HAVING");
                         return WRC_Abort;
                     }
                     ///
@@ -1606,7 +1606,7 @@ return WRC_Prune;
                             pItem = pGroupBy.a[i];
                             if ((pItem.pExpr.Flags & ExprFlags.EP_Agg) != 0)//HasProperty(pItem.pExpr, EP_Agg) )
                             {
-                                sqlite3ErrorMsg(pParse, "aggregate functions are not allowed in " + "the GROUP BY clause");
+                                utilc.sqlite3ErrorMsg(pParse, "aggregate functions are not allowed in " + "the GROUP BY clause");
                                 return WRC_Abort;
                             }
                         }

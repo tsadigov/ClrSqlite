@@ -1321,7 +1321,7 @@ WhereCost pCost            /* Lowest cost query plan */
             pColl = sqlite3GetCollSeq( db, SqliteEncoding.UTF8, null, pIdx.azColl[0] );
             if ( pColl == null )
             {
-              sqlite3ErrorMsg( pParse, "no such collation sequence: %s",
+              utilc.sqlite3ErrorMsg( pParse, "no such collation sequence: %s",
                   pIdx.azColl );
               return SQLITE_ERROR;
             }

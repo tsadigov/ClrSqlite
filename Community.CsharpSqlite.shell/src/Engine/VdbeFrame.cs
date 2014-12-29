@@ -179,9 +179,9 @@ namespace Community.CsharpSqlite
 				VdbeCursor[] apCsr = this.aChildCsr;
 				// (VdbeCursor)aMem[p.nChildMem];
 				for (i = 0; i < this.nChildCsr; i++) {
-					sqlite3VdbeFreeCursor (this.v, apCsr [i]);
+                    vdbeaux.sqlite3VdbeFreeCursor(this.v, apCsr[i]);
 				}
-				releaseMemArray (this.aChildMem, this.nChildMem);
+                vdbeaux.releaseMemArray(this.aChildMem, this.nChildMem);
 				//this=null;
 				// sqlite3DbFree( p.v.db, p );
 			}

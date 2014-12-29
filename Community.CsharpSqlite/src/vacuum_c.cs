@@ -39,7 +39,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static int vacuumFinalize(sqlite3 db,sqlite3_stmt pStmt,string pzErrMsg) {
 			int rc;
-			rc=sqlite3VdbeFinalize(ref pStmt);
+            rc = vdbeaux.sqlite3VdbeFinalize(ref pStmt);
 			if(rc!=0) {
 				sqlite3SetString(ref pzErrMsg,db,sqlite3_errmsg(db));
 			}

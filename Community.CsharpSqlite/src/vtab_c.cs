@@ -185,7 +185,7 @@ namespace Community.CsharpSqlite {
 			sqlite3 db=pVTab.db;
 			Debug.Assert(db!=null);
 			Debug.Assert(pVTab.nRef>0);
-			Debug.Assert(sqlite3SafetyCheckOk(db));
+            Debug.Assert(utilc.sqlite3SafetyCheckOk(db));
 			pVTab.nRef--;
 			if(pVTab.nRef==0) {
 				object p=pVTab.pVtab;
@@ -262,7 +262,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
 			Debug.Assert(sqlite3_mutex_held(db.mutex));
 			if(p!=null) {
-				sqlite3ExpirePreparedStatements(db);
+                vdbeaux.sqlite3ExpirePreparedStatements(db);
 				do {
 					VTable pNext=p.pNext;
 					sqlite3VtabUnlock(p);
@@ -579,7 +579,7 @@ namespace Community.CsharpSqlite {
 			string zErr="";
 			sqlite3_mutex_enter(db.mutex);
 			if(null==db.pVtabCtx||null==(pTab=db.pVtabCtx.pTab)) {
-				sqlite3Error(db,SQLITE_MISUSE,0);
+				utilc.sqlite3Error(db,SQLITE_MISUSE,0);
 				sqlite3_mutex_leave(db.mutex);
 				return SQLITE_MISUSE_BKPT();
 			}
@@ -606,14 +606,14 @@ namespace Community.CsharpSqlite {
 					db.pVtabCtx.pTab=null;
 				}
 				else {
-					sqlite3Error(db,SQLITE_ERROR,(zErr!=null?"%s":null),zErr);
+					utilc.sqlite3Error(db,SQLITE_ERROR,(zErr!=null?"%s":null),zErr);
 					zErr=null;
 					//sqlite3DbFree( db, zErr );
 					rc=SQLITE_ERROR;
 				}
 				pParse.declareVtab=0;
 				if(pParse.pVdbe!=null) {
-					sqlite3VdbeFinalize(ref pParse.pVdbe);
+                    vdbeaux.sqlite3VdbeFinalize(ref pParse.pVdbe);
 				}
 				sqlite3DeleteTable(db,ref pParse.pNewTable);
 				//sqlite3StackFree( db, pParse );
@@ -1001,7 +1001,7 @@ namespace Community.CsharpSqlite {
 			}
 			va_end(ref ap);
 			if(rc!=SQLITE_OK)
-				sqlite3Error(db,rc,0);
+				utilc.sqlite3Error(db,rc,0);
 			sqlite3_mutex_leave(db.mutex);
 			return rc;
 		}

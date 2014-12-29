@@ -1756,7 +1756,7 @@ void *sqlite3_wsd_find(void *K, int L);
 					}
 					else
 						if(!pItem.zDatabase.Equals(zDb,StringComparison.InvariantCultureIgnoreCase)) {
-							sqlite3ErrorMsg(this.pParse,"%s %T cannot reference objects in database %s",this.zType,this.pName,pItem.zDatabase);
+							utilc.sqlite3ErrorMsg(this.pParse,"%s %T cannot reference objects in database %s",this.zType,this.pName,pItem.zDatabase);
 							return 1;
 						}
 					#if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_TRIGGER
@@ -2051,7 +2051,7 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 																																																												    //  void *sqlite3TestTextToPtr(const char);
 #endif
 		//void sqlite3SetString(char **, sqlite3*, const char*, ...);
-		//void sqlite3ErrorMsg(Parse*, const char*, ...);
+		//void utilc.sqlite3ErrorMsg(Parse*, const char*, ...);
 		//int StringExtensions.sqlite3Dequote(char);
 		//int sqlite3KeywordCode(const unsigned char*, int);
 		//int sqlite3RunParser(Parse*, const char*, char *);
@@ -2225,7 +2225,7 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void sqlite3RegisterDateTimeFunctions(void);
 		//void sqlite3RegisterGlobalFunctions(void);
 		//int sqlite3SafetyCheckOk(sqlite3);
-		//int sqlite3SafetyCheckSickOrOk(sqlite3);
+		//int utilc.sqlite3SafetyCheckSickOrOk(sqlite3);
 		//void sqlite3ChangeCookie(Parse*, int);
 		#if !(SQLITE_OMIT_VIEW) && !(SQLITE_OMIT_TRIGGER)
 		//void sqlite3MaterializeView(Parse*, Table*, Expr*, int);
@@ -2391,7 +2391,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//int putVarint32(unsigned char*, u32);
 		//u8 sqlite3GetVarint(const unsigned char *, u64 );
 		//u8 sqlite3GetVarint32(const unsigned char *, u32 );
-		//int sqlite3VarintLen(u64 v);
+		//int utilc.sqlite3VarintLen(u64 v);
 		///<summary>
 		/// The header of a record consists of a sequence variable-length integers.
 		/// These integers are almost always small and are encoded as a single byte.
@@ -2405,12 +2405,12 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		///     x = sqlite3GetVarint32( A, B );
 		///     x = putVarint32( A, B );
 		///
-		///     x = getVarint32( A, B );
+		///     x = utilc.getVarint32( A, B );
 		///     x = putVarint32( A, B );
 		///
 		///
 		///</summary>
-		//#define getVarint32(A,B)  (u8)((*(A)<(u8)0x80) ? ((B) = (u32)*(A)),1 : sqlite3GetVarint32((A), (u32 )&(B)))
+		//#define utilc.getVarint32(A,B)  (u8)((*(A)<(u8)0x80) ? ((B) = (u32)*(A)),1 : sqlite3GetVarint32((A), (u32 )&(B)))
 		//#define putVarint32(A,B)  (u8)(((u32)(B)<(u32)0x80) ? (*(A) = (unsigned char)(B)),1 : sqlite3PutVarint32((A), (B)))
 		//#define getVarint    sqlite3GetVarint
 		//#define putVarint    sqlite3PutVarint
@@ -2420,7 +2420,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//int sqlite3IndexAffinityOk(Expr pExpr, char idx_affinity);
 		//char sqlite3ExprAffinity(Expr pExpr);
 		//int Converter.sqlite3Atoi64(const char*, i64*, int, u8);
-		//void sqlite3Error(sqlite3*, int, const char*,...);
+		//void utilc.sqlite3Error(sqlite3*, int, const char*,...);
 		//void *Converter.sqlite3HexToBlob(sqlite3*, string z, int n);
 		//u8 Converter.sqlite3HexToInt(int h);
 		//int sqlite3TwoPartName(Parse *, Token *, Token *, Token *);
@@ -2435,7 +2435,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//int sqlite3CheckObjectName(Parse *, string );
 		//void sqlite3VdbeSetChanges(sqlite3 *, int);
 		//int sqlite3AddInt64(i64*,i64);
-		//int sqlite3SubInt64(i64*,i64);
+		//int utilc.sqlite3SubInt64(i64*,i64);
 		//int sqlite3MulInt64(i64*,i64);
 		//int sqlite3AbsInt32(int);
 		#if SQLITE_ENABLE_8_3_NAMES

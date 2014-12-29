@@ -569,7 +569,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				if(pTab==null)
 					goto exit_begin_add_column;
 				if(IsVirtual(pTab)) {
-					sqlite3ErrorMsg(this,"virtual tables may not be altered");
+					utilc.sqlite3ErrorMsg(this,"virtual tables may not be altered");
 					goto exit_begin_add_column;
 				}
 				///
@@ -577,7 +577,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				///Make sure this is not an attempt to ALTER a view. 
 				///</summary>
 				if(pTab.pSelect!=null) {
-					sqlite3ErrorMsg(this,"Cannot add a column to a view");
+					utilc.sqlite3ErrorMsg(this,"Cannot add a column to a view");
 					goto exit_begin_add_column;
 				}
 				if(SQLITE_OK!=this.isSystemTable(pTab.zName)) {
@@ -733,19 +733,19 @@ return;
 				///
 				///</summary>
 				if(pCol.isPrimKey!=0) {
-					sqlite3ErrorMsg(this,"Cannot add a PRIMARY KEY column");
+					utilc.sqlite3ErrorMsg(this,"Cannot add a PRIMARY KEY column");
 					return;
 				}
 				if(pNew.pIndex!=null) {
-					sqlite3ErrorMsg(this,"Cannot add a UNIQUE column");
+					utilc.sqlite3ErrorMsg(this,"Cannot add a UNIQUE column");
 					return;
 				}
 				if((db.flags&SQLITE_ForeignKeys)!=0&&pNew.pFKey!=null&&pDflt!=null) {
-					sqlite3ErrorMsg(this,"Cannot add a REFERENCES column with non-NULL default value");
+					utilc.sqlite3ErrorMsg(this,"Cannot add a REFERENCES column with non-NULL default value");
 					return;
 				}
 				if(pCol.notNull!=0&&pDflt==null) {
-					sqlite3ErrorMsg(this,"Cannot add a NOT NULL column with default value NULL");
+					utilc.sqlite3ErrorMsg(this,"Cannot add a NOT NULL column with default value NULL");
 					return;
 				}
 				///
@@ -761,7 +761,7 @@ return;
 						return;
 					}
 					if(pVal==null) {
-						sqlite3ErrorMsg(this,"Cannot add a column with non-constant default");
+						utilc.sqlite3ErrorMsg(this,"Cannot add a column with non-constant default");
 						return;
 					}
 					sqlite3ValueFree(ref pVal);
@@ -815,7 +815,7 @@ return;
 					int r2=this.sqlite3GetTempReg();
 					int j1;
 					v.sqlite3VdbeAddOp3(OP_ReadCookie,iDb,r1,BTREE_FILE_FORMAT);
-					sqlite3VdbeUsesBtree(v,iDb);
+                    vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 					v.sqlite3VdbeAddOp2(OP_Integer,minFormat,r2);
 					j1=v.sqlite3VdbeAddOp3(OP_Ge,r2,0,r1);
 					v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_FILE_FORMAT,r2);
@@ -834,7 +834,7 @@ return;
 			///</summary>
 			int isSystemTable(string zName) {
 				if(zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)) {
-					sqlite3ErrorMsg(this,"table %s may not be altered",zName);
+					utilc.sqlite3ErrorMsg(this,"table %s may not be altered",zName);
 					return 1;
 				}
 				return 0;
@@ -933,7 +933,7 @@ return;
 				///
 				///</summary>
 				if(sqlite3FindTable(db,zName,zDb)!=null||sqlite3FindIndex(db,zName,zDb)!=null) {
-					sqlite3ErrorMsg(this,"there is already another table or index with this name: %s",zName);
+					utilc.sqlite3ErrorMsg(this,"there is already another table or index with this name: %s",zName);
 					goto exit_rename_table;
 				}
 				///
@@ -950,7 +950,7 @@ return;
 				}
 				#if !SQLITE_OMIT_VIEW
 				if(pTab.pSelect!=null) {
-					sqlite3ErrorMsg(this,"view %s may not be altered",pTab.zName);
+					utilc.sqlite3ErrorMsg(this,"view %s may not be altered",pTab.zName);
 					goto exit_rename_table;
 				}
 				#endif
@@ -2125,7 +2125,7 @@ goto attach_end;
 				}
 				if(null==pIdx) {
 					if(0==this.disableTriggers) {
-						sqlite3ErrorMsg(this,"foreign key mismatch");
+						utilc.sqlite3ErrorMsg(this,"foreign key mismatch");
 					}
 					this.db.sqlite3DbFree(ref aiCol);
 					return 1;
@@ -3392,7 +3392,7 @@ goto attach_end;
 					switch(this.sLastToken.TokenType) {
 					case TokenType.TK_SPACE: {
 						if(db.u1.isInterrupted) {
-							sqlite3ErrorMsg(this,"interrupt");
+							utilc.sqlite3ErrorMsg(this,"interrupt");
 							this.rc=SqlResult.SQLITE_INTERRUPT;
 							goto abort_parse;
 						}
@@ -3452,7 +3452,7 @@ sqlite3ParserStackPeak(pEngine)
 					nErr++;
 				}
 				if(this.pVdbe!=null&&this.nErr>0&&this.nested==0) {
-					sqlite3VdbeDelete(ref this.pVdbe);
+                    vdbeaux.sqlite3VdbeDelete(ref this.pVdbe);
 					this.pVdbe=null;
 				}
 				#if !SQLITE_OMIT_SHARED_CACHE
@@ -3995,11 +3995,11 @@ isView = false;
 					}
 				}
 				if(pColumn==null&&nColumn!=0&&nColumn!=(pTab.nCol-nHidden)) {
-					sqlite3ErrorMsg(this,"table %S has %d columns but %d values were supplied",pTabList,0,pTab.nCol-nHidden,nColumn);
+					utilc.sqlite3ErrorMsg(this,"table %S has %d columns but %d values were supplied",pTabList,0,pTab.nCol-nHidden,nColumn);
 					goto insert_cleanup;
 				}
 				if(pColumn!=null&&nColumn!=pColumn.nId) {
-					sqlite3ErrorMsg(this,"%d values for %d columns",nColumn,pColumn.nId);
+					utilc.sqlite3ErrorMsg(this,"%d values for %d columns",nColumn,pColumn.nId);
 					goto insert_cleanup;
 				}
 				///
@@ -4035,7 +4035,7 @@ isView = false;
 								keyColumn=i;
 							}
 							else {
-								sqlite3ErrorMsg(this,"table %S has no column named %s",pTabList,0,pColumn.a[i].zName);
+								utilc.sqlite3ErrorMsg(this,"table %S has no column named %s",pTabList,0,pColumn.a[i].zName);
 								this.checkSchema=1;
 								goto insert_cleanup;
 							}
@@ -5431,7 +5431,7 @@ isView = false;
 							pRowidExpr=pChanges.a[i].pExpr;
 						}
 						else {
-							sqlite3ErrorMsg(this,"no such column: %s",pChanges.a[i].zName);
+							utilc.sqlite3ErrorMsg(this,"no such column: %s",pChanges.a[i].zName);
 							this.checkSchema=1;
 							goto update_cleanup;
 						}
@@ -6024,12 +6024,12 @@ aXRef[j] = -1;
 				///<param name="In either case leave an error message in pParse and return non">zero.</param>
 				///<param name=""></param>
 				if((IsVirtual(pTab)&&sqlite3GetVTable(this.db,pTab).pMod.pModule.xUpdate==null)||((pTab.tabFlags&TF_Readonly)!=0&&(this.db.flags&SQLITE_WriteSchema)==0&&this.nested==0)) {
-					sqlite3ErrorMsg(this,"table %s may not be modified",pTab.zName);
+					utilc.sqlite3ErrorMsg(this,"table %s may not be modified",pTab.zName);
 					return true;
 				}
 				#if !SQLITE_OMIT_VIEW
 				if(viewOk==0&&pTab.pSelect!=null) {
-					sqlite3ErrorMsg(this,"cannot modify %s because it is a view",pTab.zName);
+					utilc.sqlite3ErrorMsg(this,"cannot modify %s because it is a view",pTab.zName);
 					return true;
 				}
 				#endif
@@ -6796,7 +6796,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				int rc=SQLITE_OK;
 				int mxHeight=this.db.aLimit[SQLITE_LIMIT_EXPR_DEPTH];
 				if(nHeight>mxHeight) {
-					sqlite3ErrorMsg(this,"Expression tree is too large (maximum depth %d)",mxHeight);
+					utilc.sqlite3ErrorMsg(this,"Expression tree is too large (maximum depth %d)",mxHeight);
 					rc=SQLITE_ERROR;
 				}
 				return rc;
@@ -7368,7 +7368,7 @@ return;
 					AggInfo pInfo=pExpr.pAggInfo;
 					if(pInfo==null) {
 						Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
-						sqlite3ErrorMsg(this,"misuse of aggregate: %s()",pExpr.u.zToken);
+						utilc.sqlite3ErrorMsg(this,"misuse of aggregate: %s()",pExpr.u.zToken);
 					}
 					else {
 						inReg=pInfo.aFunc[pExpr.iAgg].iMem;
@@ -7437,7 +7437,7 @@ return;
 					nId=StringExtensions.sqlite3Strlen30(zId);
 					pDef=sqlite3FindFunction(this.db,zId,nId,nFarg,enc,0);
 					if(pDef==null) {
-						sqlite3ErrorMsg(this,"unknown function: %.*s()",nId,zId);
+						utilc.sqlite3ErrorMsg(this,"unknown function: %.*s()",nId,zId);
 						break;
 					}
 					///
@@ -7770,7 +7770,7 @@ return;
 				case TK_RAISE: {
 					Debug.Assert(pExpr.affinity==OE_Rollback||pExpr.affinity==OE_Abort||pExpr.affinity==OE_Fail||pExpr.affinity==OE_Ignore);
 					if(null==this.pTriggerTab) {
-						sqlite3ErrorMsg(this,"RAISE() may only be used within a trigger-program");
+						utilc.sqlite3ErrorMsg(this,"RAISE() may only be used within a trigger-program");
 						return 0;
 					}
 					if(pExpr.affinity==OE_Abort) {
@@ -8405,7 +8405,7 @@ return;
 				testcase(pEList!=null&&pEList.nExpr==mx);
 				testcase(pEList!=null&&pEList.nExpr==mx+1);
 				if(pEList!=null&&pEList.nExpr>mx) {
-					sqlite3ErrorMsg(this,"too many columns in %s",zObject);
+					utilc.sqlite3ErrorMsg(this,"too many columns in %s",zObject);
 				}
 			}
 			public Expr sqlite3ExprFunction(int null_2,Token pToken) {
@@ -8466,7 +8466,7 @@ return;
 						testcase(i==db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]-1);
 						testcase(i==db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]);
 						if(bOk==false||i<1||i>db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]) {
-							sqlite3ErrorMsg(this,"variable number must be between ?1 and ?%d",db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]);
+							utilc.sqlite3ErrorMsg(this,"variable number must be between ?1 and ?%d",db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]);
 							x=0;
 						}
 						if(i>this.nVar) {
@@ -8510,7 +8510,7 @@ return;
 					}
 				}
 				if(this.nErr==0&&this.nVar>db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]) {
-					sqlite3ErrorMsg(this,"too many SQL variables");
+					utilc.sqlite3ErrorMsg(this,"too many SQL variables");
 				}
 			}
 			public void exprCommute(Expr pExpr) {
@@ -9246,7 +9246,7 @@ return;
 				//+ sizeof(*pIdxOrderBy)*nOrderBy );
 				//if ( pIdxInfo == null )
 				//{
-				//  sqlite3ErrorMsg( pParse, "out of memory" );
+				//  utilc.sqlite3ErrorMsg( pParse, "out of memory" );
 				//  /* (double)0 In case of SQLITE_OMIT_FLOATING_POINT... */
 				//  return null;
 				//}
@@ -9325,17 +9325,17 @@ return;
 					//}
 					// else 
 					if(String.IsNullOrEmpty(pVtab.zErrMsg)) {
-						sqlite3ErrorMsg(this,"%s",sqlite3ErrStr(rc));
+						utilc.sqlite3ErrorMsg(this,"%s",sqlite3ErrStr(rc));
 					}
 					else {
-						sqlite3ErrorMsg(this,"%s",pVtab.zErrMsg);
+						utilc.sqlite3ErrorMsg(this,"%s",pVtab.zErrMsg);
 					}
 				}
 				//sqlite3_free( pVtab.zErrMsg );
 				pVtab.zErrMsg=null;
 				for(i=0;i<p.nConstraint;i++) {
 					if(!p.aConstraint[i].usable&&p.aConstraintUsage[i].argvIndex>0) {
-						sqlite3ErrorMsg(this,"table %s: xBestIndex returned an invalid plan",pTab.zName);
+						utilc.sqlite3ErrorMsg(this,"table %s: xBestIndex returned an invalid plan",pTab.zName);
 					}
 				}
 				return this.nErr;
@@ -10813,7 +10813,7 @@ range_est_fallback:
 				///</summary>
 				testcase(pTabList.nSrc==BMS);
 				if(pTabList.nSrc>BMS) {
-					sqlite3ErrorMsg(this,"at most %d tables in a join",BMS);
+					utilc.sqlite3ErrorMsg(this,"at most %d tables in a join",BMS);
 					return null;
 				}
 				///
@@ -11212,7 +11212,7 @@ range_est_fallback:
 					pIdx=pTabList.a[bestJ].pIndex;
 					if(pIdx!=null) {
 						if((bestPlan.plan.wsFlags&WHERE_INDEXED)==0) {
-							sqlite3ErrorMsg(this,"cannot use index: %s",pIdx.zName);
+							utilc.sqlite3ErrorMsg(this,"cannot use index: %s",pIdx.zName);
 							goto whereBeginError;
 						}
 						else {
@@ -12010,7 +12010,7 @@ range_est_fallback:
 								///<param name="expression we need to rerun this code each time.">expression we need to rerun this code each time.</param>
 								///<param name=""></param>
 								if(testAddr!=0&&pE2.sqlite3ExprIsConstant()==0) {
-									sqlite3VdbeChangeToNoop(v,testAddr-1,2);
+                                    vdbeaux.sqlite3VdbeChangeToNoop(v, testAddr - 1, 2);
 									testAddr=0;
 								}
 								///
@@ -12306,7 +12306,7 @@ range_est_fallback:
 					}
 					else {
 						#if SQLITE_OMIT_FLOATING_POINT
-																																																																																																																																														sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
+																																																																																																																																														utilc.sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
 #else
 						codeReal(v,z,negFlag,iMem);
 						#endif
@@ -12513,14 +12513,14 @@ range_est_fallback:
 				pMod=(Module)db.aModule.sqlite3HashFind(zMod,StringExtensions.sqlite3Strlen30(zMod),(Module)null);
 				if(null==pMod) {
 					string zModule=pTab.azModuleArg[0];
-					sqlite3ErrorMsg(this,"no such module: %s",zModule);
+					utilc.sqlite3ErrorMsg(this,"no such module: %s",zModule);
 					rc=SQLITE_ERROR;
 				}
 				else {
 					string zErr=null;
 					rc=vtabCallConstructor(db,pTab,pMod,pMod.pModule.xConnect,ref zErr);
 					if(rc!=SQLITE_OK) {
-						sqlite3ErrorMsg(this,"%s",zErr);
+						utilc.sqlite3ErrorMsg(this,"%s",zErr);
 					}
 					zErr=null;
 					//sqlite3DbFree( db, zErr );

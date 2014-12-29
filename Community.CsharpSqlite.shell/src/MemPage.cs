@@ -289,17 +289,17 @@ namespace Community.CsharpSqlite
 				Debug.Assert (n == 4 - 4 * this.leaf);
 				if (this.intKey != 0) {
 					if (this.hasData != 0) {
-						n += (u16)getVarint32 (pCell, iCell + n, out nPayload);
+                        n += (u16)utilc.getVarint32(pCell, iCell + n, out nPayload);
 					}
 					else {
 						nPayload = 0;
 					}
-					n += (u16)getVarint (pCell, iCell + n, out pInfo.nKey);
+                    n += (u16)utilc.getVarint(pCell, iCell + n, out pInfo.nKey);
 					pInfo.nData = nPayload;
 				}
 				else {
 					pInfo.nData = 0;
-					n += (u16)getVarint32 (pCell, iCell + n, out nPayload);
+                    n += (u16)utilc.getVarint32(pCell, iCell + n, out nPayload);
 					pInfo.nKey = nPayload;
 				}
 				pInfo.nPayload = nPayload;
@@ -445,8 +445,8 @@ namespace Community.CsharpSqlite
 				if (this.intKey != 0) {
 					int pEnd;
 					if (this.hasData != 0) {
-						_pIter += getVarint32 (pCell, out nSize);
-						// pIter += getVarint32( pIter, out nSize );
+                        _pIter += utilc.getVarint32(pCell, out nSize);
+						// pIter += utilc.getVarint32( pIter, out nSize );
 					}
 					else {
 						nSize = 0;
@@ -465,8 +465,8 @@ namespace Community.CsharpSqlite
 					//while( (pIter++)&0x80 && pIter<pEnd );
 				}
 				else {
-					_pIter += getVarint32 (pCell, _pIter, out nSize);
-					//pIter += getVarint32( pIter, out nSize );
+                    _pIter += utilc.getVarint32(pCell, _pIter, out nSize);
+					//pIter += utilc.getVarint32( pIter, out nSize );
 				}
 				testcase (nSize == this.maxLocal);
 				testcase (nSize == this.maxLocal + 1);
@@ -1465,13 +1465,13 @@ namespace Community.CsharpSqlite
 					nHeader += 4;
 				}
 				if (this.hasData != 0) {
-					nHeader += (int)putVarint (pCell, nHeader, (int)(nData + nZero));
+                    nHeader += (int)utilc.putVarint(pCell, nHeader, (int)(nData + nZero));
 					//putVarint( pCell[nHeader], nData + nZero );
 				}
 				else {
 					nData = nZero = 0;
 				}
-				nHeader += putVarint (pCell, nHeader, (u64)nKey);
+                nHeader += utilc.putVarint(pCell, nHeader, (u64)nKey);
 				//putVarint( pCell[nHeader], *(u64*)&nKey );
 				this.btreeParseCellPtr (pCell, ref info);
 				Debug.Assert (info.nHeader == nHeader);
@@ -3078,7 +3078,7 @@ namespace Community.CsharpSqlite
 								j--;
 								pNew.btreeParseCellPtr (apCell [j], ref info);
 								pCell = pTemp;
-								sz = 4 + putVarint (pCell, 4, (u64)info.nKey);
+                                sz = 4 + utilc.putVarint(pCell, 4, (u64)info.nKey);
 								pTemp = null;
 							}
 							else {

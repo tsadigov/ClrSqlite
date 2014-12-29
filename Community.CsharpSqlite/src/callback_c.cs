@@ -162,7 +162,7 @@ sqlite3ValueFree(ref pTmp);
 				sqlite3 db=pParse.db;
 				CollSeq p=sqlite3GetCollSeq(db,ENC(db),pColl,zName);
 				if(null==p) {
-					sqlite3ErrorMsg(pParse,"no such collation sequence: %s",zName);
+					utilc.sqlite3ErrorMsg(pParse,"no such collation sequence: %s",zName);
 					pParse.nErr++;
 					return SQLITE_ERROR;
 				}

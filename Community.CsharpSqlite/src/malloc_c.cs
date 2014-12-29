@@ -1155,7 +1155,7 @@ sqlite3DbFree(db, ref p);
 ///<summary>
 ///If the db handle is not NULL, then we must hold the connection handle
 ///mutex here. Otherwise the read (and possible write) of db.mallocFailed
-///is unsafe, as is the call to sqlite3Error().
+///is unsafe, as is the call to utilc.sqlite3Error().
 ///
 ///</summary>
 
@@ -1166,7 +1166,7 @@ sqlite3DbFree(db, ref p);
 ///</summary>
 
 			rc == SQLITE_IOERR_NOMEM) {
-				sqlite3Error (db, SQLITE_NOMEM, "");
+                utilc.sqlite3Error(db, SQLITE_NOMEM, "");
 				//db.mallocFailed = 0;
 				rc = SQLITE_NOMEM;
 			}

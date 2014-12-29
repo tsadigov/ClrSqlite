@@ -112,12 +112,12 @@ int sqlite3_blob_open(
     pTab = sqlite3LocateTable(pParse, 0, zTable, zDb);
     if( pTab && IsVirtual(pTab) ){
       pTab = 0;
-      sqlite3ErrorMsg(pParse, "cannot open virtual table: %s", zTable);
+      utilc.sqlite3ErrorMsg(pParse, "cannot open virtual table: %s", zTable);
     }
 #if !SQLITE_OMIT_VIEW
 																			    if( pTab && pTab->pSelect ){
       pTab = 0;
-      sqlite3ErrorMsg(pParse, "cannot open view: %s", zTable);
+      utilc.sqlite3ErrorMsg(pParse, "cannot open view: %s", zTable);
     }
 #endif
 																			    if( null==pTab ){
@@ -294,7 +294,7 @@ blob_open_out:
   if( v && (rc!=SQLITE_OK || db->mallocFailed) ){
     sqlite3VdbeFinalize(v);
   }
-  sqlite3Error(db, rc, zErr);
+  utilc.sqlite3Error(db, rc, zErr);
   sqlite3DbFree(db, zErr);
   sqlite3StackFree(db, pParse);
   rc = sqlite3ApiExit(db, rc);
@@ -346,7 +346,7 @@ static int blobReadWrite(
   if( n<0 || iOffset<0 || (iOffset+n)>p->nByte ){
     /* Request is out of range. Return a transient error. */
     rc = SQLITE_ERROR;
-    sqlite3Error(db, SQLITE_ERROR, 0);
+    utilc.sqlite3Error(db, SQLITE_ERROR, 0);
   } else if( v==0 ){
     /* If there is no statement handle, then the blob-handle has
     ** already been invalidated. Return SQLITE_ABORT in this case.

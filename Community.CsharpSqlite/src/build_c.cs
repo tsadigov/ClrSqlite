@@ -201,7 +201,7 @@ p.zName, P4_STATIC );
 					for(iDb=0,mask=1;iDb<db.nDb;mask<<=1,iDb++) {
 						if((mask&pParse.cookieMask)==0)
 							continue;
-						sqlite3VdbeUsesBtree(v,iDb);
+						vdbeaux.sqlite3VdbeUsesBtree(v,iDb);
 						v.sqlite3VdbeAddOp2(OP_Transaction,iDb,(mask&pParse.writeMask)!=0);
 						if(db.init.busy==0) {
 							Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
@@ -264,7 +264,7 @@ p.zName, P4_STATIC );
 				///</summary>
 				if(pParse.pAinc!=null&&pParse.nTab==0)
 					pParse.nTab=1;
-				sqlite3VdbeMakeReady(v,pParse);
+                vdbeaux.sqlite3VdbeMakeReady(v, pParse);
 				pParse.rc=SqlResult.SQLITE_DONE;
 				pParse.colNamesSet=0;
 			}
@@ -410,10 +410,10 @@ p.zName, P4_STATIC );
 			if(p==null) {
 				string zMsg=isView!=0?"no such view":"no such table";
 				if(zDbase!=null) {
-					sqlite3ErrorMsg(pParse,"%s: %s.%s",zMsg,zDbase,zName);
+					utilc.sqlite3ErrorMsg(pParse,"%s: %s.%s",zMsg,zDbase,zName);
 				}
 				else {
-					sqlite3ErrorMsg(pParse,"%s: %s",zMsg,zName);
+					utilc.sqlite3ErrorMsg(pParse,"%s: %s",zMsg,zName);
 				}
 				pParse.checkSchema=1;
 			}
@@ -849,14 +849,14 @@ p.zName, P4_STATIC );
 			sqlite3 db=pParse.db;
 			if(ALWAYS(pName2!=null)&&pName2.Length>0) {
 				if(db.init.busy!=0) {
-					sqlite3ErrorMsg(pParse,"corrupt database");
+					utilc.sqlite3ErrorMsg(pParse,"corrupt database");
 					pParse.nErr++;
 					return -1;
 				}
 				pUnqual=pName2;
 				iDb=sqlite3FindDb(db,pName1);
 				if(iDb<0) {
-					sqlite3ErrorMsg(pParse,"unknown database %T",pName1);
+					utilc.sqlite3ErrorMsg(pParse,"unknown database %T",pName1);
 					pParse.nErr++;
 					return -1;
 				}
@@ -878,7 +878,7 @@ p.zName, P4_STATIC );
 		///</summary>
 		static int sqlite3CheckObjectName(Parse pParse,string zName) {
 			if(0==pParse.db.init.busy&&pParse.nested==0&&(pParse.db.flags&SQLITE_WriteSchema)==0&&zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)) {
-				sqlite3ErrorMsg(pParse,"object name reserved for internal use: %s",zName);
+				utilc.sqlite3ErrorMsg(pParse,"object name reserved for internal use: %s",zName);
 				return SQLITE_ERROR;
 			}
 			return SQLITE_OK;
@@ -977,7 +977,7 @@ p.zName, P4_STATIC );
 				///If creating a temp table, the name may not be qualified. Unless 
 				///the database name is "temp" anyway.  
 				///</summary>
-				sqlite3ErrorMsg(pParse,"temporary table name must be unqualified");
+				utilc.sqlite3ErrorMsg(pParse,"temporary table name must be unqualified");
 				return;
 			}
 			if(OMIT_TEMPDB==0&&isTemp!=0)
@@ -1034,7 +1034,7 @@ goto begin_table_error;
 				pTable=sqlite3FindTable(db,zName,zDb);
 				if(pTable!=null) {
 					if(noErr==0) {
-						sqlite3ErrorMsg(pParse,"table %T already exists",pName);
+						utilc.sqlite3ErrorMsg(pParse,"table %T already exists",pName);
 					}
 					else {
 						Debug.Assert(0==db.init.busy);
@@ -1043,7 +1043,7 @@ goto begin_table_error;
 					goto begin_table_error;
 				}
 				if(sqlite3FindIndex(db,zName,zDb)!=null) {
-					sqlite3ErrorMsg(pParse,"there is already an index named %s",zName);
+					utilc.sqlite3ErrorMsg(pParse,"there is already an index named %s",zName);
 					goto begin_table_error;
 				}
 			}
@@ -1104,7 +1104,7 @@ goto begin_table_error;
 				reg2=pParse.regRoot=++pParse.nMem;
 				reg3=++pParse.nMem;
 				v.sqlite3VdbeAddOp3(OP_ReadCookie,iDb,reg3,BTREE_FILE_FORMAT);
-				sqlite3VdbeUsesBtree(v,iDb);
+                vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 				j1=v.sqlite3VdbeAddOp1(OpCode.OP_If,reg3);
 				fileFormat=(db.flags&SQLITE_LegacyFileFmt)!=0?1:SQLITE_MAX_FILE_FORMAT;
 				v.sqlite3VdbeAddOp2(OpCode.OP_Integer,fileFormat,reg3);
@@ -1180,7 +1180,7 @@ goto begin_table_error;
 				return;
 			#if SQLITE_MAX_COLUMN || !SQLITE_MAX_COLUMN
 			if(p.nCol+1>db.aLimit[SQLITE_LIMIT_COLUMN]) {
-				sqlite3ErrorMsg(pParse,"too many columns on %s",p.zName);
+				utilc.sqlite3ErrorMsg(pParse,"too many columns on %s",p.zName);
 				return;
 			}
 			#endif
@@ -1190,7 +1190,7 @@ goto begin_table_error;
 			for(i=0;i<p.nCol;i++) {
 				if(z.Equals(p.aCol[i].zName,StringComparison.InvariantCultureIgnoreCase)) {
 					//STRICMP(z, p.aCol[i].zName) ){
-					sqlite3ErrorMsg(pParse,"duplicate column name: %s",z);
+					utilc.sqlite3ErrorMsg(pParse,"duplicate column name: %s",z);
 					db.sqlite3DbFree(ref z);
 					return;
 				}
@@ -1342,7 +1342,7 @@ goto begin_table_error;
 			if(p!=null) {
 				pCol=(p.aCol[p.nCol-1]);
 				if(pSpan.pExpr.sqlite3ExprIsConstantOrFunction()==0) {
-					sqlite3ErrorMsg(pParse,"default value of column [%s] is not constant",pCol.zName);
+					utilc.sqlite3ErrorMsg(pParse,"default value of column [%s] is not constant",pCol.zName);
 				}
 				else {
 					///
@@ -1412,7 +1412,7 @@ goto begin_table_error;
 			if(pTab==null||IN_DECLARE_VTAB(pParse))
 				goto primary_key_exit;
 			if((pTab.tabFlags&TF_HasPrimaryKey)!=0) {
-				sqlite3ErrorMsg(pParse,"table \"%s\" has more than one primary key",pTab.zName);
+				utilc.sqlite3ErrorMsg(pParse,"table \"%s\" has more than one primary key",pTab.zName);
 				goto primary_key_exit;
 			}
 			pTab.tabFlags|=TF_HasPrimaryKey;
@@ -1446,7 +1446,7 @@ goto begin_table_error;
 			else
 				if(autoInc!=0) {
 					#if !SQLITE_OMIT_AUTOINCREMENT
-					sqlite3ErrorMsg(pParse,"AUTOINCREMENT is only allowed on an "+"INTEGER PRIMARY KEY");
+					utilc.sqlite3ErrorMsg(pParse,"AUTOINCREMENT is only allowed on an "+"INTEGER PRIMARY KEY");
 					#endif
 				}
 				else {
@@ -1559,7 +1559,7 @@ goto begin_table_error;
 			if(0==initbusy&&(pColl==null||pColl.xCmp==null)) {
 				pColl=sqlite3GetCollSeq(db,enc,pColl,zName);
 				if(pColl==null) {
-					sqlite3ErrorMsg(pParse,"no such collation sequence: %s",zName);
+					utilc.sqlite3ErrorMsg(pParse,"no such collation sequence: %s",zName);
 				}
 			}
 			return pColl;
@@ -2079,7 +2079,7 @@ goto begin_table_error;
 			int iDb;
 			sqlite3 db=pParse.db;
 			if(pParse.nVar>0) {
-				sqlite3ErrorMsg(pParse,"parameters are not allowed in views");
+				utilc.sqlite3ErrorMsg(pParse,"parameters are not allowed in views");
 				sqlite3SelectDelete(db,ref pSelect);
 				return;
 			}
@@ -2220,7 +2220,7 @@ goto begin_table_error;
 			///
 			///</summary>
 			if(pTable.nCol<0) {
-				sqlite3ErrorMsg(pParse,"view %s is circularly defined",pTable.zName);
+				utilc.sqlite3ErrorMsg(pParse,"view %s is circularly defined",pTable.zName);
 				return 1;
 			}
 			Debug.Assert(pTable.nCol>=0);
@@ -2507,7 +2507,7 @@ goto exit_drop_table;
 }
 #endif
 			if(pTab.zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)) {
-				sqlite3ErrorMsg(pParse,"table %s may not be dropped",pTab.zName);
+				utilc.sqlite3ErrorMsg(pParse,"table %s may not be dropped",pTab.zName);
 				goto exit_drop_table;
 			}
 			#if !SQLITE_OMIT_VIEW
@@ -2517,11 +2517,11 @@ goto exit_drop_table;
 			///on a table.
 			///</summary>
 			if(isView!=0&&pTab.pSelect==null) {
-				sqlite3ErrorMsg(pParse,"use DROP TABLE to delete table %s",pTab.zName);
+				utilc.sqlite3ErrorMsg(pParse,"use DROP TABLE to delete table %s",pTab.zName);
 				goto exit_drop_table;
 			}
 			if(0==isView&&pTab.pSelect!=null) {
-				sqlite3ErrorMsg(pParse,"use DROP VIEW to delete view %s",pTab.zName);
+				utilc.sqlite3ErrorMsg(pParse,"use DROP VIEW to delete view %s",pTab.zName);
 				goto exit_drop_table;
 			}
 			#endif
@@ -2661,14 +2661,14 @@ goto exit_drop_table;
 				if(NEVER(iCol<0))
 					goto fk_end;
 				if(pToCol!=null&&pToCol.nExpr!=1) {
-					sqlite3ErrorMsg(pParse,"foreign key on %s"+" should reference only one column of table %T",p.aCol[iCol].zName,pTo);
+					utilc.sqlite3ErrorMsg(pParse,"foreign key on %s"+" should reference only one column of table %T",p.aCol[iCol].zName,pTo);
 					goto fk_end;
 				}
 				nCol=1;
 			}
 			else
 				if(pToCol!=null&&pToCol.nExpr!=pFromCol.nExpr) {
-					sqlite3ErrorMsg(pParse,"number of columns in foreign key does not match the number of "+"columns in the referenced table");
+					utilc.sqlite3ErrorMsg(pParse,"number of columns in foreign key does not match the number of "+"columns in the referenced table");
 					goto fk_end;
 				}
 				else {
@@ -2712,7 +2712,7 @@ goto exit_drop_table;
 						}
 					}
 					if(j>=p.nCol) {
-						sqlite3ErrorMsg(pParse,"unknown column \"%s\" in foreign key definition",pFromCol.a[i].zName);
+						utilc.sqlite3ErrorMsg(pParse,"unknown column \"%s\" in foreign key definition",pFromCol.a[i].zName);
 						goto fk_end;
 					}
 				}
@@ -3117,17 +3117,17 @@ return;
 			Debug.Assert(pTab!=null);
 			Debug.Assert(pParse.nErr==0);
 			if(pTab.zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)&&!pTab.zName.StartsWith("sqlite_altertab_",System.StringComparison.InvariantCultureIgnoreCase)) {
-				sqlite3ErrorMsg(pParse,"table %s may not be indexed",pTab.zName);
+				utilc.sqlite3ErrorMsg(pParse,"table %s may not be indexed",pTab.zName);
 				goto exit_create_index;
 			}
 			#if !SQLITE_OMIT_VIEW
 			if(pTab.pSelect!=null) {
-				sqlite3ErrorMsg(pParse,"views may not be indexed");
+				utilc.sqlite3ErrorMsg(pParse,"views may not be indexed");
 				goto exit_create_index;
 			}
 			#endif
 			if(IsVirtual(pTab)) {
-				sqlite3ErrorMsg(pParse,"virtual tables may not be indexed");
+				utilc.sqlite3ErrorMsg(pParse,"virtual tables may not be indexed");
 				goto exit_create_index;
 			}
 			///
@@ -3154,13 +3154,13 @@ return;
 				}
 				if(0==db.init.busy) {
 					if(sqlite3FindTable(db,zName,null)!=null) {
-						sqlite3ErrorMsg(pParse,"there is already a table named %s",zName);
+						utilc.sqlite3ErrorMsg(pParse,"there is already a table named %s",zName);
 						goto exit_create_index;
 					}
 				}
 				if(sqlite3FindIndex(db,zName,pDb.zName)!=null) {
 					if(ifNotExist==0) {
-						sqlite3ErrorMsg(pParse,"index %s already exists",zName);
+						utilc.sqlite3ErrorMsg(pParse,"index %s already exists",zName);
 					}
 					else {
 						Debug.Assert(0==db.init.busy);
@@ -3326,7 +3326,7 @@ goto exit_create_index;
 						break;
 				}
 				if(j>=pTab.nCol) {
-					sqlite3ErrorMsg(pParse,"table %s has no column named %s",pTab.zName,zColName);
+					utilc.sqlite3ErrorMsg(pParse,"table %s has no column named %s",pTab.zName,zColName);
 					pParse.checkSchema=1;
 					goto exit_create_index;
 				}
@@ -3420,7 +3420,7 @@ goto exit_create_index;
 							///
 							///</summary>
 							if(!(pIdx.onError==OE_Default||pIndex.onError==OE_Default)) {
-								sqlite3ErrorMsg(pParse,"conflicting ON CONFLICT clauses specified",0);
+								utilc.sqlite3ErrorMsg(pParse,"conflicting ON CONFLICT clauses specified",0);
 							}
 							if(pIdx.onError==OE_Default) {
 								pIdx.onError=pIndex.onError;
@@ -3634,7 +3634,7 @@ goto exit_create_index;
 			pIndex=sqlite3FindIndex(db,pName.a[0].zName,pName.a[0].zDatabase);
 			if(pIndex==null) {
 				if(ifExists==0) {
-					sqlite3ErrorMsg(pParse,"no such index: %S",pName,0);
+					utilc.sqlite3ErrorMsg(pParse,"no such index: %S",pName,0);
 				}
 				else {
 					sqlite3CodeVerifyNamedSchema(pParse,pName.a[0].zDatabase);
@@ -3643,7 +3643,7 @@ goto exit_create_index;
 				goto exit_drop_index;
 			}
 			if(pIndex.autoIndex!=0) {
-				sqlite3ErrorMsg(pParse,"index associated with UNIQUE "+"or PRIMARY KEY constraint cannot be dropped",0);
+				utilc.sqlite3ErrorMsg(pParse,"index associated with UNIQUE "+"or PRIMARY KEY constraint cannot be dropped",0);
 				goto exit_drop_index;
 			}
 			iDb=sqlite3SchemaToIndex(db,pIndex.pSchema);
@@ -4091,7 +4091,7 @@ goto exit_drop_index;
 			SrcList_item pItem;
 			sqlite3 db=pParse.db;
 			if(null==p&&(pOn!=null||pUsing!=null)) {
-				sqlite3ErrorMsg(pParse,"a JOIN clause is required before %s",(pOn!=null?"ON":"USING"));
+				utilc.sqlite3ErrorMsg(pParse,"a JOIN clause is required before %s",(pOn!=null?"ON":"USING"));
 				goto append_from_error;
 			}
 			p=sqlite3SrcListAppend(db,p,pTable,pDatabase);
@@ -4187,7 +4187,7 @@ goto exit_drop_index;
 			if(type!=TK_DEFERRED) {
 				for(i=0;i<db.nDb;i++) {
 					v.sqlite3VdbeAddOp2(OP_Transaction,i,(type==TK_EXCLUSIVE)?2:1);
-					sqlite3VdbeUsesBtree(v,i);
+                    vdbeaux.sqlite3VdbeUsesBtree(v, i);
 				}
 			}
 			v.sqlite3VdbeAddOp2(OP_AutoCommit,0,0);
@@ -4276,7 +4276,7 @@ goto exit_drop_index;
 				const int flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_EXCLUSIVE|SQLITE_OPEN_DELETEONCLOSE|SQLITE_OPEN_TEMP_DB;
 				rc=(SqlResult)Btree.Open(db.pVfs,null,db,ref pBt,0,flags);
 				if(rc!=SqlResult.SQLITE_OK) {
-					sqlite3ErrorMsg(pParse,"unable to open a temporary database "+"file for storing temporary tables");
+					utilc.sqlite3ErrorMsg(pParse,"unable to open a temporary database "+"file for storing temporary tables");
 					pParse.rc=rc;
 					return 1;
 				}
@@ -4624,7 +4624,7 @@ goto exit_drop_index;
 				sqlite3RefillIndex(pParse,pIndex,-1);
 				return;
 			}
-			sqlite3ErrorMsg(pParse,"unable to identify the object to be reindexed");
+			utilc.sqlite3ErrorMsg(pParse,"unable to identify the object to be reindexed");
 		}
 		#endif
 		///

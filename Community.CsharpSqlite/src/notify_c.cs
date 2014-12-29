@@ -202,7 +202,7 @@ addToBlockedList(db);
 
 leaveMutex();
 assert( !db->mallocFailed );
-sqlite3Error(db, rc, (rc?"database is deadlocked":0));
+utilc.sqlite3Error(db, rc, (rc?"database is deadlocked":0));
 sqlite3_mutex_leave(db->mutex);
 return rc;
 }
