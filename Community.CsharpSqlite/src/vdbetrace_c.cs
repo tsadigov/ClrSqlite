@@ -188,7 +188,7 @@ namespace Community.CsharpSqlite
 						testcase (zRawSql [izRawSql] == ':');
 						testcase (zRawSql [izRawSql] == '$');
 						testcase (zRawSql [izRawSql] == '@');
-						idx = sqlite3VdbeParameterIndex (p, zRawSql.Substring (izRawSql, nToken), nToken);
+						idx = vdbeapi.sqlite3VdbeParameterIndex (p, zRawSql.Substring (izRawSql, nToken), nToken);
 						Debug.Assert (idx > 0);
 					}
 					izRawSql += nToken;

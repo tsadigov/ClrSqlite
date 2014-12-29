@@ -320,7 +320,7 @@ return SQLITE_OK;
 		///
 		/// A MEM_Null value will never be passed to this function. This function is
 		/// used for converting values to text for returning to the user (i.e. via
-		/// sqlite3_value_text()), or for ensuring that values to be used as btree
+		/// vdbeapi.sqlite3_value_text()), or for ensuring that values to be used as btree
 		/// keys are strings. In the former case a NULL pointer is returned the
 		/// user and the later is an internal programming error.
 		///
@@ -1420,7 +1420,7 @@ return SQLITE_NOMEM;
 		}
 		///<summary>
 		///This function is only available internally, it is not part of the
-		/// external API. It works in a similar way to sqlite3_value_text(),
+		/// external API. It works in a similar way to vdbeapi.sqlite3_value_text(),
 		/// except the data returned is in the encoding specified by the second
 		/// parameter, which must be one of SqliteEncoding.UTF16BE, SqliteEncoding.UTF16LE or
 		/// SqliteEncoding.UTF8.

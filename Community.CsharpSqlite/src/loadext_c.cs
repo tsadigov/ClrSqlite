@@ -61,7 +61,7 @@ namespace Community.CsharpSqlite
 		//# define sqlite3_bind_text16            0
 		//# define sqlite3_collation_needed16     0
 		//# define sqlite3_column_decltype16      0
-		//# define sqlite3_column_name16          0
+		//# define vdbeapi.sqlite3_column_name16          0
 		//# define sqlite3_column_text16          0
 		//# define sqlite3_complete16             0
 		//# define sqlite3_create_collation16     0
@@ -83,9 +83,9 @@ namespace Community.CsharpSqlite
 
 		//# define sqlite3_result_text16be        0
 		//# define sqlite3_result_text16le        0
-		//# define sqlite3_value_text16           0
-		//# define sqlite3_value_text16be         0
-		//# define sqlite3_value_text16le         0
+		//# define vdbeapi.sqlite3_value_text16           0
+		//# define vdbeapi.sqlite3_value_text16be         0
+		//# define vdbeapi.sqlite3_value_text16le         0
 		//# define sqlite3_column_database_name16 0
 		//# define sqlite3_column_table_name16    0
 		//# define sqlite3_column_origin_name16   0
@@ -185,7 +185,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		static sqlite3_api_routines sqlite3Apis = new sqlite3_api_routines ();
 
 		//{
-		//  sqlite3_aggregate_context,
+		//  vdbeapi.sqlite3_aggregate_context,
 		#if !SQLITE_OMIT_DEPRECATED
 																																								    /  sqlite3_aggregate_count,
 #else
@@ -211,7 +211,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  sqlite3_column_blob,
 		//  sqlite3_column_bytes,
 		//  sqlite3_column_bytes16,
-		//  sqlite3_column_count,
+		//  vdbeapi.sqlite3_column_count,
 		//  sqlite3_column_database_name,
 		//  sqlite3_column_database_name16,
 		//  sqlite3_column_decltype,
@@ -219,8 +219,8 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  sqlite3_column_double,
 		//  sqlite3_column_int,
 		//  sqlite3_column_int64,
-		//  sqlite3_column_name,
-		//  sqlite3_column_name16,
+		//  vdbeapi.sqlite3_column_name,
+		//  vdbeapi.sqlite3_column_name16,
 		//  sqlite3_column_origin_name,
 		//  sqlite3_column_origin_name16,
 		//  sqlite3_column_table_name,
@@ -304,17 +304,17 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  sqlite3_update_hook,
 		//  sqlite3_user_data,
 		//  sqlite3_value_blob,
-		//  sqlite3_value_bytes,
-		//  sqlite3_value_bytes16,
+		//  vdbeapi.sqlite3_value_bytes,
+		//  vdbeapi.sqlite3_value_bytes16,
 		//  sqlite3_value_double,
 		//  sqlite3_value_int,
 		//  sqlite3_value_int64,
 		//  sqlite3_value_numeric_type,
-		//  sqlite3_value_text,
-		//  sqlite3_value_text16,
-		//  sqlite3_value_text16be,
-		//  sqlite3_value_text16le,
-		//  sqlite3_value_type,
+		//  vdbeapi.sqlite3_value_text,
+		//  vdbeapi.sqlite3_value_text16,
+		//  vdbeapi.sqlite3_value_text16be,
+		//  vdbeapi.sqlite3_value_text16le,
+		//  vdbeapi.sqlite3_value_type,
 		//  sqlite3_vmprintf,
 		//  /*
 		//  ** The original API set ends here.  All extensions can call any
@@ -378,7 +378,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  sqlite3_result_error_code,
 		//  sqlite3_test_control,
 		//  sqlite3_randomness,
-		//  sqlite3_context_db_handle,
+		//  vdbeapi.sqlite3_context_db_handle,
 		//  /*
 		//  ** Added for 3.6.0
 		//  */

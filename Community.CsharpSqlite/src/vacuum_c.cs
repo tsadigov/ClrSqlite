@@ -66,7 +66,7 @@ namespace Community.CsharpSqlite {
       //VVA_ONLY( rc = ) sqlite3_step(pStmt);
       Debug.Assert( rc != SQLITE_ROW );
 #else
-			sqlite3_step(pStmt);
+            vdbeapi.sqlite3_step(pStmt);
 			#endif
 			return vacuumFinalize(db,pStmt,pzErrMsg);
 		}
@@ -81,8 +81,9 @@ namespace Community.CsharpSqlite {
 			rc=sqlite3_prepare(db,zSql,-1,ref pStmt,0);
 			if(rc!=SQLITE_OK)
 				return rc;
-			while(SqlResult.SQLITE_ROW==sqlite3_step(pStmt)) {
-				rc=execSql(db,pzErrMsg,sqlite3_column_text(pStmt,0));
+            while (SqlResult.SQLITE_ROW == vdbeapi.sqlite3_step(pStmt))
+            {
+				rc=execSql(db,pzErrMsg,vdbeapi.sqlite3_column_text(pStmt,0));
 				if(rc!=SQLITE_OK) {
 					vacuumFinalize(db,pStmt,pzErrMsg);
 					return rc;

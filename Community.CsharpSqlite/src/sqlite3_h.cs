@@ -387,7 +387,7 @@ namespace Community.CsharpSqlite
 ///<param name="sqlite3_exec() callback is a NULL pointer.  ^The 4th argument to the">sqlite3_exec() callback is a NULL pointer.  ^The 4th argument to the</param>
 ///<param name="sqlite3_exec() callback is an array of pointers to strings where each">sqlite3_exec() callback is an array of pointers to strings where each</param>
 ///<param name="entry represents the name of corresponding result column as obtained">entry represents the name of corresponding result column as obtained</param>
-///<param name="from [sqlite3_column_name()].">from [sqlite3_column_name()].</param>
+///<param name="from [vdbeapi.sqlite3_column_name()].">from [vdbeapi.sqlite3_column_name()].</param>
 ///<param name=""></param>
 ///<param name="^If the 2nd parameter to sqlite3_exec() is a NULL pointer, a pointer">^If the 2nd parameter to sqlite3_exec() is a NULL pointer, a pointer</param>
 ///<param name="to an empty string, or a pointer that contains only whitespace and/or ">to an empty string, or a pointer that contains only whitespace and/or </param>
@@ -2682,7 +2682,7 @@ namespace Community.CsharpSqlite
 ///<param name="[sqlite3_column_value()] is unprotected.">[sqlite3_column_value()] is unprotected.</param>
 ///<param name="Unprotected sqlite3_value objects may only be used with">Unprotected sqlite3_value objects may only be used with</param>
 ///<param name="[sqlite3_result_value()] and [sqlite3_bind_value()].">[sqlite3_result_value()] and [sqlite3_bind_value()].</param>
-///<param name="The [sqlite3_value_blob | sqlite3_value_type()] family of">The [sqlite3_value_blob | sqlite3_value_type()] family of</param>
+///<param name="The [sqlite3_value_blob | vdbeapi.sqlite3_value_type()] family of">The [sqlite3_value_blob | vdbeapi.sqlite3_value_type()] family of</param>
 ///<param name="interfaces require protected sqlite3_value objects.">interfaces require protected sqlite3_value objects.</param>
 ///<param name=""></param>
 
@@ -2697,8 +2697,8 @@ namespace Community.CsharpSqlite
 ///<param name="is always first parameter to [application">defined SQL functions].</param>
 ///<param name="The application">defined SQL function implementation will pass this</param>
 ///<param name="pointer through into calls to [sqlite3_result_int | sqlite3_result()],">pointer through into calls to [sqlite3_result_int | sqlite3_result()],</param>
-///<param name="[sqlite3_aggregate_context()], [sqlite3_user_data()],">[sqlite3_aggregate_context()], [sqlite3_user_data()],</param>
-///<param name="[sqlite3_context_db_handle()], [sqlite3_get_auxdata()],">[sqlite3_context_db_handle()], [sqlite3_get_auxdata()],</param>
+///<param name="[vdbeapi.sqlite3_aggregate_context()], [sqlite3_user_data()],">[vdbeapi.sqlite3_aggregate_context()], [sqlite3_user_data()],</param>
+///<param name="[vdbeapi.sqlite3_context_db_handle()], [sqlite3_get_auxdata()],">[vdbeapi.sqlite3_context_db_handle()], [sqlite3_get_auxdata()],</param>
 ///<param name="and/or [sqlite3_set_auxdata()].">and/or [sqlite3_set_auxdata()].</param>
 ///<param name=""></param>
 
@@ -2889,16 +2889,16 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-		//SQLITE_API int sqlite3_column_count(sqlite3_stmt *pStmt);
+		//SQLITE_API int vdbeapi.sqlite3_column_count(sqlite3_stmt *pStmt);
 		///
 ///<summary>
 ///CAPI3REF: Column Names In A Result Set
 ///
 ///^These routines return the name assigned to a particular column
-///in the result set of a [SELECT] statement.  ^The sqlite3_column_name()
+///in the result set of a [SELECT] statement.  ^The vdbeapi.sqlite3_column_name()
 ///</summary>
 ///<param name="interface returns a pointer to a zero">8 string</param>
-///<param name="and sqlite3_column_name16() returns a pointer to a zero">terminated</param>
+///<param name="and vdbeapi.sqlite3_column_name16() returns a pointer to a zero">terminated</param>
 ///<param name="UTF">16 string.  ^The first parameter is the [prepared statement]</param>
 ///<param name="that implements the [SELECT] statement. ^The second parameter is the">that implements the [SELECT] statement. ^The second parameter is the</param>
 ///<param name="column number.  ^The leftmost column is number 0.">column number.  ^The leftmost column is number 0.</param>
@@ -2907,7 +2907,7 @@ namespace Community.CsharpSqlite
 ///<param name="is destroyed by [sqlite3_finalize()] or until the statement is automatically">is destroyed by [sqlite3_finalize()] or until the statement is automatically</param>
 ///<param name="reprepared by the first call to [sqlite3_step()] for a particular run">reprepared by the first call to [sqlite3_step()] for a particular run</param>
 ///<param name="or until the next call to">or until the next call to</param>
-///<param name="sqlite3_column_name() or sqlite3_column_name16() on the same column.">sqlite3_column_name() or sqlite3_column_name16() on the same column.</param>
+///<param name="vdbeapi.sqlite3_column_name() or vdbeapi.sqlite3_column_name16() on the same column.">vdbeapi.sqlite3_column_name() or vdbeapi.sqlite3_column_name16() on the same column.</param>
 ///<param name=""></param>
 ///<param name="^If sqlite3_malloc() fails during the processing of either routine">^If sqlite3_malloc() fails during the processing of either routine</param>
 ///<param name="(for example during a conversion from UTF">16) then a</param>
@@ -2919,8 +2919,8 @@ namespace Community.CsharpSqlite
 ///<param name="one release of SQLite to the next.">one release of SQLite to the next.</param>
 ///<param name=""></param>
 
-		//SQLITE_API string sqlite3_column_name(sqlite3_stmt*, int N);
-		//SQLITE_API const void *sqlite3_column_name16(sqlite3_stmt*, int N);
+		//SQLITE_API string vdbeapi.sqlite3_column_name(sqlite3_stmt*, int N);
+		//SQLITE_API const void *vdbeapi.sqlite3_column_name16(sqlite3_stmt*, int N);
 		///
 ///<summary>
 ///CAPI3REF: Source Of Data In A Query Result
@@ -3101,7 +3101,7 @@ namespace Community.CsharpSqlite
 ///interfaces) then sqlite3_data_count(P) returns 0.
 ///^The sqlite3_data_count(P) routine also returns 0 if P is a NULL pointer.
 ///
-///See also: [sqlite3_column_count()]
+///See also: [vdbeapi.sqlite3_column_count()]
 ///
 ///</summary>
 
@@ -3120,7 +3120,7 @@ namespace Community.CsharpSqlite
 ///and the second argument is the index of the column for which information
 ///should be returned. ^The leftmost column of the result set has the index 0.
 ///^The number of columns in the result can be determined using
-///[sqlite3_column_count()].
+///[vdbeapi.sqlite3_column_count()].
 ///
 ///If the SQL statement does not currently point to a valid row, or if the
 ///column index is out of range, the result is undefined.
@@ -3178,8 +3178,8 @@ namespace Community.CsharpSqlite
 ///<param name="may only be used with [sqlite3_bind_value()] and [sqlite3_result_value()].">may only be used with [sqlite3_bind_value()] and [sqlite3_result_value()].</param>
 ///<param name="If the [unprotected sqlite3_value] object returned by">If the [unprotected sqlite3_value] object returned by</param>
 ///<param name="[sqlite3_column_value()] is used in any other way, including calls">[sqlite3_column_value()] is used in any other way, including calls</param>
-///<param name="to routines like [sqlite3_value_int()], [sqlite3_value_text()],">to routines like [sqlite3_value_int()], [sqlite3_value_text()],</param>
-///<param name="or [sqlite3_value_bytes()], then the behavior is undefined.">or [sqlite3_value_bytes()], then the behavior is undefined.</param>
+///<param name="to routines like [sqlite3_value_int()], [vdbeapi.sqlite3_value_text()],">to routines like [sqlite3_value_int()], [vdbeapi.sqlite3_value_text()],</param>
+///<param name="or [vdbeapi.sqlite3_value_bytes()], then the behavior is undefined.">or [vdbeapi.sqlite3_value_bytes()], then the behavior is undefined.</param>
 ///<param name=""></param>
 ///<param name="These routines attempt to convert the value where appropriate.  ^For">These routines attempt to convert the value where appropriate.  ^For</param>
 ///<param name="example, if the internal representation is FLOAT and a text result">example, if the internal representation is FLOAT and a text result</param>
@@ -3506,9 +3506,9 @@ namespace Community.CsharpSqlite
 ///<param name="except that  these routines take a single [protected sqlite3_value] object">except that  these routines take a single [protected sqlite3_value] object</param>
 ///<param name="pointer instead of a [sqlite3_stmt*] pointer and an integer column number.">pointer instead of a [sqlite3_stmt*] pointer and an integer column number.</param>
 ///<param name=""></param>
-///<param name="^The sqlite3_value_text16() interface extracts a UTF">16 string</param>
+///<param name="^The vdbeapi.sqlite3_value_text16() interface extracts a UTF">16 string</param>
 ///<param name="in the native byte">order of the host machine.  ^The</param>
-///<param name="sqlite3_value_text16be() and sqlite3_value_text16le() interfaces">sqlite3_value_text16be() and sqlite3_value_text16le() interfaces</param>
+///<param name="vdbeapi.sqlite3_value_text16be() and vdbeapi.sqlite3_value_text16le() interfaces">vdbeapi.sqlite3_value_text16be() and vdbeapi.sqlite3_value_text16le() interfaces</param>
 ///<param name="extract UTF">endian respectively.</param>
 ///<param name=""></param>
 ///<param name="^(The sqlite3_value_numeric_type() interface attempts to apply">^(The sqlite3_value_numeric_type() interface attempts to apply</param>
@@ -3520,26 +3520,26 @@ namespace Community.CsharpSqlite
 ///<param name="The [SQLITE_INTEGER | datatype] after conversion is returned.)^">The [SQLITE_INTEGER | datatype] after conversion is returned.)^</param>
 ///<param name=""></param>
 ///<param name="Please pay particular attention to the fact that the pointer returned">Please pay particular attention to the fact that the pointer returned</param>
-///<param name="from [sqlite3_value_blob()], [sqlite3_value_text()], or">from [sqlite3_value_blob()], [sqlite3_value_text()], or</param>
-///<param name="[sqlite3_value_text16()] can be invalidated by a subsequent call to">[sqlite3_value_text16()] can be invalidated by a subsequent call to</param>
-///<param name="[sqlite3_value_bytes()], [sqlite3_value_bytes16()], [sqlite3_value_text()],">[sqlite3_value_bytes()], [sqlite3_value_bytes16()], [sqlite3_value_text()],</param>
-///<param name="or [sqlite3_value_text16()].">or [sqlite3_value_text16()].</param>
+///<param name="from [sqlite3_value_blob()], [vdbeapi.sqlite3_value_text()], or">from [sqlite3_value_blob()], [vdbeapi.sqlite3_value_text()], or</param>
+///<param name="[vdbeapi.sqlite3_value_text16()] can be invalidated by a subsequent call to">[vdbeapi.sqlite3_value_text16()] can be invalidated by a subsequent call to</param>
+///<param name="[vdbeapi.sqlite3_value_bytes()], [vdbeapi.sqlite3_value_bytes16()], [vdbeapi.sqlite3_value_text()],">[vdbeapi.sqlite3_value_bytes()], [vdbeapi.sqlite3_value_bytes16()], [vdbeapi.sqlite3_value_text()],</param>
+///<param name="or [vdbeapi.sqlite3_value_text16()].">or [vdbeapi.sqlite3_value_text16()].</param>
 ///<param name=""></param>
 ///<param name="These routines must be called from the same thread as">These routines must be called from the same thread as</param>
 ///<param name="the SQL function that supplied the [sqlite3_value*] parameters.">the SQL function that supplied the [sqlite3_value*] parameters.</param>
 ///<param name=""></param>
 
 		//SQLITE_API const void *sqlite3_value_blob(sqlite3_value);
-		//SQLITE_API int sqlite3_value_bytes(sqlite3_value);
-		//SQLITE_API int sqlite3_value_bytes16(sqlite3_value);
+		//SQLITE_API int vdbeapi.sqlite3_value_bytes(sqlite3_value);
+		//SQLITE_API int vdbeapi.sqlite3_value_bytes16(sqlite3_value);
 		//SQLITE_API double sqlite3_value_double(sqlite3_value);
 		//SQLITE_API int sqlite3_value_int(sqlite3_value);
 		//SQLITE_API sqlite3_int64 sqlite3_value_int64(sqlite3_value);
-		//SQLITE_API const unsigned char *sqlite3_value_text(sqlite3_value);
-		//SQLITE_API const void *sqlite3_value_text16(sqlite3_value);
-		//SQLITE_API const void *sqlite3_value_text16le(sqlite3_value);
-		//SQLITE_API const void *sqlite3_value_text16be(sqlite3_value);
-		//SQLITE_API int sqlite3_value_type(sqlite3_value);
+		//SQLITE_API const unsigned char *vdbeapi.sqlite3_value_text(sqlite3_value);
+		//SQLITE_API const void *vdbeapi.sqlite3_value_text16(sqlite3_value);
+		//SQLITE_API const void *vdbeapi.sqlite3_value_text16le(sqlite3_value);
+		//SQLITE_API const void *vdbeapi.sqlite3_value_text16be(sqlite3_value);
+		//SQLITE_API int vdbeapi.sqlite3_value_type(sqlite3_value);
 		//SQLITE_API int sqlite3_value_numeric_type(sqlite3_value);
 		///
 ///<summary>
@@ -3548,30 +3548,30 @@ namespace Community.CsharpSqlite
 ///Implementations of aggregate SQL functions use this
 ///routine to allocate memory for storing their state.
 ///
-///^The first time the sqlite3_aggregate_context(C,N) routine is called 
+///^The first time the vdbeapi.sqlite3_aggregate_context(C,N) routine is called 
 ///for a particular aggregate function, SQLite
 ///allocates N of memory, zeroes out that memory, and returns a pointer
 ///to the new memory. ^On second and subsequent calls to
-///sqlite3_aggregate_context() for the same aggregate function instance,
-///the same buffer is returned.  Sqlite3_aggregate_context() is normally
+///vdbeapi.sqlite3_aggregate_context() for the same aggregate function instance,
+///the same buffer is returned.  vdbeapi.sqlite3_aggregate_context() is normally
 ///called once for each invocation of the xStep callback and then one
 ///last time when the xFinal callback is invoked.  ^(When no rows match
 ///an aggregate query, the xStep() callback of the aggregate function
 ///implementation is never called and xFinal() is called exactly once.
-///In those cases, sqlite3_aggregate_context() might be called for the
+///In those cases, vdbeapi.sqlite3_aggregate_context() might be called for the
 ///first time from within xFinal().)^
 ///
-///^The sqlite3_aggregate_context(C,N) routine returns a NULL pointer if N is
+///^The vdbeapi.sqlite3_aggregate_context(C,N) routine returns a NULL pointer if N is
 ///less than or equal to zero or if a memory allocate error occurs.
 ///
-///^(The amount of space allocated by sqlite3_aggregate_context(C,N) is
+///^(The amount of space allocated by vdbeapi.sqlite3_aggregate_context(C,N) is
 ///determined by the N parameter on first successful call.  Changing the
-///value of N in subsequent call to sqlite3_aggregate_context() within
+///value of N in subsequent call to vdbeapi.sqlite3_aggregate_context() within
 ///the same aggregate function instance will not resize the memory
 ///allocation.)^
 ///
 ///^SQLite automatically frees the memory allocated by 
-///sqlite3_aggregate_context() when the aggregate query concludes.
+///vdbeapi.sqlite3_aggregate_context() when the aggregate query concludes.
 ///
 ///The first parameter must be a copy of the
 ///[sqlite3_context | SQL function context] that is the first parameter
@@ -3583,7 +3583,7 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-		//SQLITE_API void *sqlite3_aggregate_context(sqlite3_context*, int nBytes);
+		//SQLITE_API void *vdbeapi.sqlite3_aggregate_context(sqlite3_context*, int nBytes);
 		///
 ///<summary>
 ///CAPI3REF: User Data For Functions
@@ -3604,7 +3604,7 @@ namespace Community.CsharpSqlite
 ///<summary>
 ///CAPI3REF: Database Connection For Functions
 ///
-///^The sqlite3_context_db_handle() interface returns a copy of
+///^The vdbeapi.sqlite3_context_db_handle() interface returns a copy of
 ///the pointer to the [database connection] (the 1st parameter)
 ///of the [sqlite3_create_function()]
 ///and [sqlite3_create_function16()] routines that originally
@@ -3612,7 +3612,7 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-		//SQLITE_API sqlite3 *sqlite3_context_db_handle(sqlite3_context);
+		//SQLITE_API sqlite3 *vdbeapi.sqlite3_context_db_handle(sqlite3_context);
 		///
 ///<summary>
 ///CAPI3REF: Function Auxiliary Data

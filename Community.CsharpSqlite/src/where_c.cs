@@ -1267,7 +1267,7 @@ WhereCost pCost            /* Lowest cost query plan */
       {
         IndexSample[] aSample = pIdx.aSample;
         int i = 0;
-        int eType = sqlite3_value_type( pVal );
+        int eType = vdbeapi.sqlite3_value_type( pVal );
 
         if ( eType == SQLITE_INTEGER || eType == SQLITE_FLOAT )
         {
@@ -1566,7 +1566,7 @@ whereEqualScanEst_cancel:
         rc = valueFromExpr( pParse, pList.a[i].pExpr, aff, ref pVal );
         if ( rc != 0 )
           break;
-        if ( pVal == null || sqlite3_value_type( pVal ) == SQLITE_NULL )
+        if ( pVal == null || vdbeapi.sqlite3_value_type( pVal ) == SQLITE_NULL )
         {
           nNotFound++;
           continue;

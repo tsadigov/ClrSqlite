@@ -1652,7 +1652,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 		///<summary>
 		/// Set the number of result columns that will be returned by this SQL
 		/// statement. This is now set at compile time, rather than during
-		/// execution of the vdbe program so that sqlite3_column_count() can
+		/// execution of the vdbe program so that vdbeapi.sqlite3_column_count() can
 		/// be called on an SQL statement before sqlite3_step().
 		///
 		///</summary>

@@ -493,7 +493,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void setDateTimeToCurrent(sqlite3_context context, DateTime p)
             {
-                sqlite3 db = sqlite3_context_db_handle(context);
+                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
                 sqlite3OsCurrentTimeInt64(db.pVfs, ref p.iJD);
                 p.validJD = 1;
             }
@@ -1088,14 +1088,14 @@ namespace Community.CsharpSqlite
                     setDateTimeToCurrent(context, p);
                 }
                 else
-                    if ((eType = sqlite3_value_type(argv[0])) == SQLITE_FLOAT || eType == SQLITE_INTEGER)
+                    if ((eType = vdbeapi.sqlite3_value_type(argv[0])) == SQLITE_FLOAT || eType == SQLITE_INTEGER)
                     {
-                        p.iJD = (long)(sqlite3_value_double(argv[0]) * 86400000.0 + 0.5);
+                        p.iJD = (long)(vdbeapi.sqlite3_value_double(argv[0]) * 86400000.0 + 0.5);
                         p.validJD = 1;
                     }
                     else
                     {
-                        z = sqlite3_value_text(argv[0]);
+                        z = vdbeapi.sqlite3_value_text(argv[0]);
                         if (String.IsNullOrEmpty(z) || parseDateOrTime(context, z, ref p) != 0)
                         {
                             return 1;
@@ -1103,7 +1103,7 @@ namespace Community.CsharpSqlite
                     }
                 for (i = 1; i < argc; i++)
                 {
-                    z = sqlite3_value_text(argv[i]);
+                    z = vdbeapi.sqlite3_value_text(argv[i]);
                     if (String.IsNullOrEmpty(z) || parseModifier(context, z, p) != 0)
                         return 1;
                 }
@@ -1213,7 +1213,7 @@ namespace Community.CsharpSqlite
                     int i, j;
                     StringBuilder z;
                     sqlite3 db;
-                    string zFmt = sqlite3_value_text(argv[0]);
+                    string zFmt = vdbeapi.sqlite3_value_text(argv[0]);
                     StringBuilder zdtBuf = new StringBuilder(100);
                     sqlite3_value[] argv1 = new sqlite3_value[argc - 1];
                     for (i = 0; i < argc - 1; i++)
@@ -1222,7 +1222,7 @@ namespace Community.CsharpSqlite
                     }
                     if (String.IsNullOrEmpty(zFmt) || isDate(context, argc - 1, argv1, ref x) != 0)
                         return;
-                    db = sqlite3_context_db_handle(context);
+                    db = vdbeapi.sqlite3_context_db_handle(context);
                     for (i = 0, n = 1; i < zFmt.Length; i++, n++)
                     {
                         if (zFmt[i] == '%')
@@ -1490,7 +1490,7 @@ sqlite3_int64 rT;
 char zdtBuf[20];
 UNUSED_PARAMETER(argc);
 UNUSED_PARAMETER(argv);
-db = sqlite3_context_db_handle(context);
+db = vdbeapi.sqlite3_context_db_handle(context);
   sqlite3OsCurrentTimeInt64(db->pVfs, &iT);
   t = iT/1000 - 10000*(sqlite3_int64)21086676;
 #if HAVE_GMTIME_R

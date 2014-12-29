@@ -1377,12 +1377,12 @@ if( db ) sqlite3_interrupt(db);
 		if (rc != Sqlite3.SQLITE_OK || null == pSelect) {
 			return rc;
 		}
-		rc = (int)Sqlite3.sqlite3_step (pSelect);
+		rc = (int)Sqlite3.vdbeapi.sqlite3_step (pSelect);
 		while (rc == Sqlite3.SQLITE_ROW) {
-			fprintf (_out, "%s;\n", Sqlite3.sqlite3_column_text (pSelect, 0));
-			rc = (int)Sqlite3.sqlite3_step (pSelect);
+			fprintf (_out, "%s;\n", Sqlite3.vdbeapi.sqlite3_column_text (pSelect, 0));
+			rc = (int)Sqlite3.vdbeapi.sqlite3_step (pSelect);
 		}
-		return Sqlite3.sqlite3_finalize (pSelect);
+		return Sqlite3.vdbeapi.sqlite3_finalize (pSelect);
 	}
 
 	///<summary>
@@ -1451,12 +1451,12 @@ if( db ) sqlite3_interrupt(db);
 				appendText (zSelect, zTmp.ToString (), '\'');
 			}
 			appendText (zSelect, " || ' VALUES(' || ", '\0');
-			rc = (int)Sqlite3.sqlite3_step (pTableInfo);
+			rc = (int)Sqlite3.vdbeapi.sqlite3_step (pTableInfo);
 			while (rc == Sqlite3.SQLITE_ROW) {
-				string zText = (string)Sqlite3.sqlite3_column_text (pTableInfo, 1);
+				string zText = (string)Sqlite3.vdbeapi.sqlite3_column_text (pTableInfo, 1);
 				appendText (zSelect, "quote(", '\0');
 				appendText (zSelect, zText, '"');
-				rc = (int)Sqlite3.sqlite3_step (pTableInfo);
+				rc = (int)Sqlite3.vdbeapi.sqlite3_step (pTableInfo);
 				if (rc == Sqlite3.SQLITE_ROW) {
 					appendText (zSelect, ") || ',' || ", '\0');
 				}
@@ -1464,7 +1464,7 @@ if( db ) sqlite3_interrupt(db);
 					appendText (zSelect, ") ", '\0');
 				}
 			}
-			rc = Sqlite3.sqlite3_finalize (pTableInfo);
+			rc = Sqlite3.vdbeapi.sqlite3_finalize (pTableInfo);
 			if (rc != Sqlite3.SQLITE_OK) {
 				//if ( zSelect ) free( ref zSelect );
 				return 1;
@@ -1979,9 +1979,9 @@ if( db ) sqlite3_interrupt(db);
 													rc = 1;
 												}
 												else {
-													nCol = Sqlite3.sqlite3_column_count (pStmt);
+													nCol = Sqlite3.vdbeapi.sqlite3_column_count (pStmt);
 												}
-												Sqlite3.sqlite3_finalize (pStmt);
+												Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
 												if (nCol == 0)
 													return 0;
 												zSql = new StringBuilder (nByte + 20 + nCol * 2);
@@ -1999,7 +1999,7 @@ if( db ) sqlite3_interrupt(db);
 												free (ref zSql);
 												if (rc != 0) {
 													fprintf (stderr, "Error: %s\n", Sqlite3.sqlite3_errmsg (db));
-													Sqlite3.sqlite3_finalize (pStmt);
+													Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
 													return 1;
 												}
 												try {
@@ -2012,7 +2012,7 @@ if( db ) sqlite3_interrupt(db);
 												}
 												if (_in == null) {
 													fprintf (stderr, "cannot open file: %s\n", zFile);
-													Sqlite3.sqlite3_finalize (pStmt);
+													Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
 													return 0;
 												}
 												azCol = new string[nCol + 1];
@@ -2053,10 +2053,10 @@ if( db ) sqlite3_interrupt(db);
 														break;
 													}
 													for (i = 0; i < nCol; i++) {
-														Sqlite3.sqlite3_bind_text (pStmt, i + 1, azCol [i], -1, Sqlite3.SQLITE_STATIC);
+														Sqlite3.vdbeapi.sqlite3_bind_text (pStmt, i + 1, azCol [i], -1, Sqlite3.SQLITE_STATIC);
 													}
-													Sqlite3.sqlite3_step (pStmt);
-													rc = Sqlite3.sqlite3_reset (pStmt);
+													Sqlite3.vdbeapi.sqlite3_step (pStmt);
+													rc = Sqlite3.vdbeapi.sqlite3_reset (pStmt);
 													zLine.Length = 0;
 													// free(zLine);
 													if (rc != Sqlite3.SQLITE_OK) {
@@ -2069,7 +2069,7 @@ if( db ) sqlite3_interrupt(db);
 												//free( ref azCol );
 												_in.Close ();
 												// fclose( _in );
-												Sqlite3.sqlite3_finalize (pStmt);
+												Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
 												Sqlite3.sqlite3_exec (p.db, zCommit.ToString (), null, null, ref sDummy);
 											}
 											else
@@ -2810,7 +2810,7 @@ enableTimer = booleanValue(azArg[1]);
          */
          
 		//var rcc = Sqlite3.sqlite3_prepare(db, sql, -1, ref vdbe,  sDummy);
-		//Sqlite3.sqlite3_step(vdbe);
+		//Sqlite3.vdbeapi.sqlite3_step(vdbe);
 		//pParse.pVdbe.sqlite3VdbeExec();
 		string zErrMsg = null;
 		callback_data data = null;

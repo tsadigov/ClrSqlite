@@ -166,8 +166,8 @@ namespace Community.CsharpSqlite
 
 			Debug.Assert (argc == 2);
 			UNUSED_PARAMETER (argc);
-			zRegex = sqlite3_value_text (argv [0]);
-			zTest = sqlite3_value_text (argv [1]);
+			zRegex = vdbeapi.sqlite3_value_text (argv [0]);
+			zTest = vdbeapi.sqlite3_value_text (argv [1]);
 			if (zTest == null || String.IsNullOrEmpty (zRegex)) {
 				context.sqlite3_result_int (0);
 				return;
@@ -515,14 +515,14 @@ namespace Community.CsharpSqlite
 			SumCtx p;
 			int type;
 			Debug.Assert (argc <= 1);
-			Mem pMem = sqlite3_aggregate_context (context, 1);
+			Mem pMem = vdbeapi.sqlite3_aggregate_context (context, 1);
 			//sizeof(*p));
 			if (pMem._SumCtx == null)
 				pMem._SumCtx = new SumCtx ();
 			p = pMem._SumCtx;
 			if (p.Context == null)
 				p.Context = pMem;
-			if (argc == 0 || SQLITE_NULL == sqlite3_value_type (argv [0])) {
+			if (argc == 0 || SQLITE_NULL == vdbeapi.sqlite3_value_type (argv [0])) {
 				p.cnt++;
 				p.iSum += 1;
 			}
@@ -531,7 +531,7 @@ namespace Community.CsharpSqlite
 				if (p != null && type != SQLITE_NULL) {
 					p.cnt++;
 					if (type == SQLITE_INTEGER) {
-						i64 v = sqlite3_value_int64 (argv [0]);
+                        i64 v = vdbeapi.sqlite3_value_int64(argv[0]);
 						if (v == 40 || v == 41) {
 							context.sqlite3_result_error ("value of " + v + " handed to x_count", -1);
 							return;
@@ -549,7 +549,7 @@ namespace Community.CsharpSqlite
 						}
 					}
 					else {
-						p.rSum += sqlite3_value_double (argv [0]);
+                        p.rSum += vdbeapi.sqlite3_value_double(argv[0]);
 						p.approx = true;
 					}
 				}
@@ -559,7 +559,7 @@ namespace Community.CsharpSqlite
 		static void x_CountFinalize (sqlite3_context context)
 		{
 			SumCtx p;
-			Mem pMem = sqlite3_aggregate_context (context, 0);
+			Mem pMem = vdbeapi.sqlite3_aggregate_context (context, 0);
 			p = pMem._SumCtx;
 			if (p != null && p.cnt > 0) {
 				if (p.overflow != 0) {

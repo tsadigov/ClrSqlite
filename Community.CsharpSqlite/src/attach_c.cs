@@ -21,7 +21,7 @@ namespace Community.CsharpSqlite {
 		static void attachFunc(sqlite3_context context,int NotUsed,sqlite3_value[] argv) {
 			int i;
 			int rc=0;
-			sqlite3 db=sqlite3_context_db_handle(context);
+			sqlite3 db=vdbeapi.sqlite3_context_db_handle(context);
 			string zName;
 			string zFile;
 			string zPath="";
@@ -31,8 +31,8 @@ namespace Community.CsharpSqlite {
 			string zErrDyn="";
 			sqlite3_vfs pVfs=null;
 			UNUSED_PARAMETER(NotUsed);
-			zFile=argv[0].z!=null&&(argv[0].z.Length>0)&&argv[0].flags!=MEM_Null?sqlite3_value_text(argv[0]):"";
-			zName=argv[1].z!=null&&(argv[1].z.Length>0)&&argv[1].flags!=MEM_Null?sqlite3_value_text(argv[1]):"";
+			zFile=argv[0].z!=null&&(argv[0].z.Length>0)&&argv[0].flags!=MEM_Null?vdbeapi.sqlite3_value_text(argv[0]):"";
+			zName=argv[1].z!=null&&(argv[1].z.Length>0)&&argv[1].flags!=MEM_Null?vdbeapi.sqlite3_value_text(argv[1]):"";
 			//if( zFile==null ) zFile = "";
 			//if ( zName == null ) zName = "";
 			///
@@ -143,7 +143,7 @@ namespace Community.CsharpSqlite {
 				//extern void sqlite3CodecGetKey(sqlite3*, int, void**, int*);
 				int nKey;
 				string zKey;
-				int t=sqlite3_value_type(argv[2]);
+				int t=vdbeapi.sqlite3_value_type(argv[2]);
 				switch(t) {
 				case SQLITE_INTEGER:
 				case SQLITE_FLOAT:
@@ -153,8 +153,8 @@ namespace Community.CsharpSqlite {
 				break;
 				case SQLITE_TEXT:
 				case SQLITE_BLOB:
-				nKey=sqlite3_value_bytes(argv[2]);
-				zKey=sqlite3_value_blob(argv[2]).ToString();
+				nKey=vdbeapi.sqlite3_value_bytes(argv[2]);
+                zKey = vdbeapi.sqlite3_value_blob(argv[2]).ToString();
 				// (char *)sqlite3_value_blob(argv[2]);
 				rc=sqlite3CodecAttach(db,db.nDb-1,zKey,nKey);
 				break;
@@ -227,9 +227,9 @@ namespace Community.CsharpSqlite {
 		///     SELECT sqlite_detach(x)
 		///</summary>
 		static void detachFunc(sqlite3_context context,int NotUsed,sqlite3_value[] argv) {
-			string zName=zName=argv[0].z!=null&&(argv[0].z.Length>0)?sqlite3_value_text(argv[0]):"";
-			//(sqlite3_value_text(argv[0]);
-			sqlite3 db=sqlite3_context_db_handle(context);
+			string zName=zName=argv[0].z!=null&&(argv[0].z.Length>0)?vdbeapi.sqlite3_value_text(argv[0]):"";
+			//(vdbeapi.sqlite3_value_text(argv[0]);
+			sqlite3 db=vdbeapi.sqlite3_context_db_handle(context);
 			int i;
 			Db pDb=null;
 			StringBuilder zErr=new StringBuilder(200);

@@ -54,16 +54,16 @@ namespace Community.CsharpSqlite
 
 		static void renameTableFunc (sqlite3_context context, int NotUsed, sqlite3_value[] argv)
 		{
-			string bResult = sqlite3_value_text (argv [0]);
+			string bResult = vdbeapi.sqlite3_value_text (argv [0]);
 			string zSql = bResult == null ? "" : bResult;
-			string zTableName = sqlite3_value_text (argv [1]);
+			string zTableName = vdbeapi.sqlite3_value_text (argv [1]);
 			TokenType token = 0;
 			Token tname = new Token ();
 			int zCsr = 0;
 			int zLoc = 0;
 			int len = 0;
 			string zRet;
-			sqlite3 db = sqlite3_context_db_handle (context);
+			sqlite3 db = vdbeapi.sqlite3_context_db_handle (context);
 			UNUSED_PARAMETER (NotUsed);
 			///
 ///<summary>
@@ -130,12 +130,12 @@ namespace Community.CsharpSqlite
 		#if !SQLITE_OMIT_FOREIGN_KEY
 		static void renameParentFunc (sqlite3_context context, int NotUsed, sqlite3_value[] argv)
 		{
-			sqlite3 db = sqlite3_context_db_handle (context);
+			sqlite3 db = vdbeapi.sqlite3_context_db_handle (context);
 			string zOutput = "";
 			string zResult;
-			string zInput = sqlite3_value_text (argv [0]);
-			string zOld = sqlite3_value_text (argv [1]);
-			string zNew = sqlite3_value_text (argv [2]);
+			string zInput = vdbeapi.sqlite3_value_text (argv [0]);
+			string zOld = vdbeapi.sqlite3_value_text (argv [1]);
+			string zNew = vdbeapi.sqlite3_value_text (argv [2]);
 			int zIdx;
 			///
 ///<summary>
@@ -206,8 +206,8 @@ namespace Community.CsharpSqlite
 
 		static void renameTriggerFunc (sqlite3_context context, int NotUsed, sqlite3_value[] argv)
 		{
-			string zSql = sqlite3_value_text (argv [0]);
-			string zTableName = sqlite3_value_text (argv [1]);
+			string zSql = vdbeapi.sqlite3_value_text (argv [0]);
+			string zTableName = vdbeapi.sqlite3_value_text (argv [1]);
 			TokenType token = 0;
 			Token tname = new Token ();
 			int dist = 3;
@@ -215,7 +215,7 @@ namespace Community.CsharpSqlite
 			int zLoc = 0;
 			int len = 1;
 			string zRet;
-			sqlite3 db = sqlite3_context_db_handle (context);
+			sqlite3 db = vdbeapi.sqlite3_context_db_handle (context);
 			UNUSED_PARAMETER (NotUsed);
 			///
 ///<summary>

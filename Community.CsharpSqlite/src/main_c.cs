@@ -1512,7 +1512,7 @@ return rc;
 			int rc;
 			sqlite3_mutex_enter(db.mutex);
 			if(sqlite3FindFunction(db,zName,nName,nArg,SqliteEncoding.UTF8,0)==null) {
-				sqlite3CreateFunc(db,zName,nArg,SqliteEncoding.UTF8,0,(dxFunc)sqlite3InvalidFunction,null,null,null);
+                sqlite3CreateFunc(db, zName, nArg, SqliteEncoding.UTF8, 0, (dxFunc)vdbeapi.sqlite3InvalidFunction, null, null, null);
 			}
 			rc=sqlite3ApiExit(db,SQLITE_OK);
 			sqlite3_mutex_leave(db.mutex);
@@ -1875,7 +1875,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 			//}
 			//else
 			{
-				z=sqlite3_value_text(db.pErr);
+				z=vdbeapi.sqlite3_value_text(db.pErr);
 				//Debug.Assert( 0 == db.mallocFailed );
 				if(String.IsNullOrEmpty(z)) {
 					z=sqlite3ErrStr(db.errCode);
@@ -1913,13 +1913,13 @@ sqlite3_mutex_enter(db->mutex);
 if( db->mallocFailed ){
 z = (void )outOfMem;
 }else{
-z = sqlite3_value_text16(db->pErr);
+z = vdbeapi.sqlite3_value_text16(db->pErr);
 if( z==0 ){
 sqlite3ValueSetStr(db->pErr, -1, sqlite3ErrStr(db->errCode),
 SqliteEncoding.UTF8, SQLITE_STATIC);
-z = sqlite3_value_text16(db->pErr);
+z = vdbeapi.sqlite3_value_text16(db->pErr);
 }
-/* A malloc() may have failed within the call to sqlite3_value_text16()
+/* A malloc() may have failed within the call to vdbeapi.sqlite3_value_text16()
 ** above. If this is the case, then the db->mallocFailed flag needs to
 ** be cleared before returning. Do this directly, instead of via
 ** sqlite3ApiExit(), to avoid setting the database handle error message.

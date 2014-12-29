@@ -157,7 +157,7 @@ namespace Community.CsharpSqlite {
 							}
 						}
 					}
-					sqlite3_finalize(pStmt);
+					vdbeapi.sqlite3_finalize(pStmt);
 				}
 				else
 					if(argv[0]==null||argv[0]=="") {
@@ -931,7 +931,7 @@ db.xAuth = 0;
 			sqlite3BtreeEnterAll(db);
 			rc=sqlite3Prepare(db,zSql,nBytes,saveSqlFlag,pOld,ref ppStmt,ref pzTail);
 			if(rc==SQLITE_SCHEMA) {
-				sqlite3_finalize(ppStmt);
+                vdbeapi.sqlite3_finalize(ppStmt);
 				rc=sqlite3Prepare(db,zSql,nBytes,saveSqlFlag,pOld,ref ppStmt,ref pzTail);
 			}
 			sqlite3BtreeLeaveAll(db);
@@ -973,7 +973,7 @@ db.xAuth = 0;
 				Debug.Assert(pNew!=null);
 			}
 			sqlite3VdbeSwap((Vdbe)pNew,p);
-			sqlite3TransferBindings(pNew,(sqlite3_stmt)p);
+            vdbeapi.sqlite3TransferBindings(pNew, (sqlite3_stmt)p);
 			((Vdbe)pNew).sqlite3VdbeResetStepResult();
 			sqlite3VdbeFinalize(ref pNew);
 			return SQLITE_OK;

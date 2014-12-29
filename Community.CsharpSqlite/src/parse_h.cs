@@ -8624,8 +8624,8 @@ return;
 					Vdbe pReprepare=this.pReprepare;
 					int iCol=pRight.iColumn;
 					pVal=pReprepare.sqlite3VdbeGetValue(iCol,(byte)SQLITE_AFF_NONE);
-					if(pVal!=null&&sqlite3_value_type(pVal)==SQLITE_TEXT) {
-						z=sqlite3_value_text(pVal);
+					if(pVal!=null&&vdbeapi.sqlite3_value_type(pVal)==SQLITE_TEXT) {
+						z=vdbeapi.sqlite3_value_text(pVal);
 					}
 					this.pVdbe.sqlite3VdbeSetVarmask(iCol);
 					///

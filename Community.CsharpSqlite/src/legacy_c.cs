@@ -251,10 +251,10 @@ namespace Community.CsharpSqlite
 					continue;
 				}
 				callbackIsInit = 0;
-				nCol = sqlite3_column_count (pStmt);
+				nCol = vdbeapi.sqlite3_column_count (pStmt);
 				while (true) {
 					int i;
-					result = sqlite3_step (pStmt);
+                    result = vdbeapi.sqlite3_step(pStmt);
 					///
 ///<summary>
 ///Invoke the callback function if required 
@@ -269,11 +269,11 @@ namespace Community.CsharpSqlite
 							//  goto exec_out;
 							//}
 							for (i = 0; i < nCol; i++) {
-								azCols [i] = sqlite3_column_name (pStmt, i);
+								azCols [i] = vdbeapi.sqlite3_column_name (pStmt, i);
 								///
 ///<summary>
 ///sqlite3VdbeSetColName() installs column names as UTF8
-///strings so there is no way for sqlite3_column_name() to fail. 
+///strings so there is no way for vdbeapi.sqlite3_column_name() to fail. 
 ///</summary>
 
 								Debug.Assert (azCols [i] != null);
@@ -284,8 +284,9 @@ namespace Community.CsharpSqlite
 							azVals = new string[nCol];
 							// azCols[nCol];
 							for (i = 0; i < nCol; i++) {
-								azVals [i] = sqlite3_column_text (pStmt, i);
-								if (azVals [i] == null && sqlite3_column_type (pStmt, i) != SQLITE_NULL) {
+								azVals [i] = vdbeapi.sqlite3_column_text (pStmt, i);
+                                if (azVals[i] == null && vdbeapi.sqlite3_column_type(pStmt, i) != SQLITE_NULL)
+                                {
 									//db.mallocFailed = 1;
 									//goto exec_out;
 								}

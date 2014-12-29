@@ -2847,7 +2847,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///If the function returned an error, throw an exception 
 							///</summary>
 							if(ctx.isError!=0) {
-								sqlite3SetString(ref this.zErrMsg,db,sqlite3_value_text(ctx.s));
+								sqlite3SetString(ref this.zErrMsg,db,vdbeapi.sqlite3_value_text(ctx.s));
 								rc=ctx.isError;
 							}
 							///
@@ -7418,7 +7418,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///</summary>
 							///<param name="IMP: R">23230 </param>
 							if(ctx.isError!=0) {
-								sqlite3SetString(ref this.zErrMsg,db,sqlite3_value_text(ctx.s));
+								sqlite3SetString(ref this.zErrMsg,db,vdbeapi.sqlite3_value_text(ctx.s));
 								rc=ctx.isError;
 							}
 							sqlite3VdbeMemRelease(ctx.s);
@@ -7447,7 +7447,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							rc=sqlite3VdbeMemFinalize(pMem,pOp.p4.pFunc);
 							this.aMem[pOp.p1]=pMem;
 							if(rc!=0) {
-								sqlite3SetString(ref this.zErrMsg,db,sqlite3_value_text(pMem));
+								sqlite3SetString(ref this.zErrMsg,db,vdbeapi.sqlite3_value_text(pMem));
 							}
 							sqlite3VdbeChangeEncoding(pMem,encoding);
 							#if SQLITE_TEST

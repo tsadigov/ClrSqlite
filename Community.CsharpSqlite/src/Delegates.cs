@@ -305,12 +305,12 @@ namespace Community.CsharpSqlite
     public static Func<sqlite3_stmt, Int32, Byte[]> ColumnBlob = sqlite3_column_blob;
     public static Func<sqlite3_stmt, Int32, Int32> ColumnBytes = sqlite3_column_bytes;
     public static Func<sqlite3_stmt, Int32, Int32> ColumnBytes16 = sqlite3_column_bytes16;
-    public static Func<sqlite3_stmt, Int32> ColumnCount = sqlite3_column_count;
+    public static Func<sqlite3_stmt, Int32> ColumnCount = vdbeapi.sqlite3_column_count;
     public static Func<sqlite3_stmt, Int32, String> ColumnDecltype = sqlite3_column_decltype;
     public static Func<sqlite3_stmt, Int32, Double> ColumnDouble = sqlite3_column_double;
     public static Func<sqlite3_stmt, Int32, Int32> ColumnInt = sqlite3_column_int;
     public static Func<sqlite3_stmt, Int32, Int64> ColumnInt64 = sqlite3_column_int64;
-    public static Func<sqlite3_stmt, Int32, String> ColumnName = sqlite3_column_name;
+    public static Func<sqlite3_stmt, Int32, String> ColumnName = vdbeapi.sqlite3_column_name;
     public static Func<sqlite3_stmt, Int32, String> ColumnText = sqlite3_column_text;
     public static Func<sqlite3_stmt, Int32, Int32> ColumnType = sqlite3_column_type;
     public static Func<sqlite3_stmt, Int32, sqlite3_value> ColumnValue = sqlite3_column_value;
@@ -345,19 +345,19 @@ namespace Community.CsharpSqlite
     public static PrepareDelegate PrepareV2 = sqlite3_prepare_v2;
     public static PrepareDelegateNoTail PrepareV2NoTail = sqlite3_prepare_v2;
 
-    public static Func<sqlite3_context, Int32, Mem> AggregateContext = sqlite3_aggregate_context;
+    public static Func<sqlite3_context, Int32, Mem> AggregateContext = vdbeapi.sqlite3_aggregate_context;
     public static Func<sqlite3_context, Int32, Object> GetAuxdata = sqlite3_get_auxdata;
-    public static Func<sqlite3_context, sqlite3> ContextDbHandle = sqlite3_context_db_handle;
+    public static Func<sqlite3_context, sqlite3> ContextDbHandle = vdbeapi.sqlite3_context_db_handle;
     public static Func<sqlite3_context, Object> UserData = sqlite3_user_data;
 
     public static Func<sqlite3_value, Byte[]> ValueBlob = sqlite3_value_blob;
-    public static Func<sqlite3_value, Int32> ValueBytes = sqlite3_value_bytes;
-    public static Func<sqlite3_value, Int32> ValueBytes16 = sqlite3_value_bytes16;
+    public static Func<sqlite3_value, Int32> ValueBytes = vdbeapi.sqlite3_value_bytes;
+    public static Func<sqlite3_value, Int32> ValueBytes16 = vdbeapi.sqlite3_value_bytes16;
     public static Func<sqlite3_value, Double> ValueDouble = sqlite3_value_double;
     public static Func<sqlite3_value, Int32> ValueInt = sqlite3_value_int;
     public static Func<sqlite3_value, Int64> ValueInt64 = sqlite3_value_int64;
-    public static Func<sqlite3_value, String> ValueText = sqlite3_value_text;
-    public static Func<sqlite3_value, Int32> ValueType = sqlite3_value_type;
+    public static Func<sqlite3_value, String> ValueText = vdbeapi.sqlite3_value_text;
+    public static Func<sqlite3_value, Int32> ValueType = vdbeapi.sqlite3_value_type;
 #endif
 	}
 }
