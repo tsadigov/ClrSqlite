@@ -367,7 +367,7 @@ return SQLITE_MISUSE_BKPT();
 #if !SQLITE_OMIT_TRACE
                     if (db.xProfile != null && 0 == db.init.busy)
                     {
-                        sqlite3OsCurrentTimeInt64(db.pVfs, ref p.startTime);
+                        os.sqlite3OsCurrentTimeInt64(db.pVfs, ref p.startTime);
                     }
 #endif
                     db.activeVdbeCnt++;
@@ -397,7 +397,7 @@ return SQLITE_MISUSE_BKPT();
                 if (rc != SqlResult.SQLITE_ROW && db.xProfile != null && 0 == db.init.busy && p.zSql != null)
                 {
                     sqlite3_int64 iNow = 0;
-                    sqlite3OsCurrentTimeInt64(db.pVfs, ref iNow);
+                    os.sqlite3OsCurrentTimeInt64(db.pVfs, ref iNow);
                     db.xProfile(db.pProfileArg, p.zSql, (iNow - p.startTime) * 1000000);
                 }
 #endif

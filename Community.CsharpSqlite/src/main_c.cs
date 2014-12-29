@@ -1254,7 +1254,7 @@ break;
 				if(delay<=0)
 					return 0;
 			}
-			sqlite3OsSleep(db.pVfs,delay*1000);
+			os.sqlite3OsSleep(db.pVfs,delay*1000);
 			return 1;
 			#else
 																																																																					sqlite3 db = (sqlite3)ptr;
@@ -2414,7 +2414,7 @@ return z;
 				zFile.Append('\0');
 				//[iOut++] = '\0';
 			}
-			ppVfs=sqlite3_vfs_find(zVfs);
+			ppVfs=os.sqlite3_vfs_find(zVfs);
 			if(ppVfs==null) {
 				pzErrMsg=io.sqlite3_mprintf("no such vfs: %s",zVfs);
 				rc=SQLITE_ERROR;
@@ -3095,7 +3095,7 @@ error_out:
 		static public int sqlite3_sleep(int ms) {
 			sqlite3_vfs pVfs;
 			int rc;
-			pVfs=sqlite3_vfs_find(null);
+			pVfs=os.sqlite3_vfs_find(null);
 			if(pVfs==null)
 				return 0;
 			///
@@ -3104,7 +3104,7 @@ error_out:
 			///API uses microseconds. Hence the 1000's.
 			///
 			///</summary>
-			rc=(sqlite3OsSleep(pVfs,1000*ms)/1000);
+			rc=(os.sqlite3OsSleep(pVfs,1000*ms)/1000);
 			return rc;
 		}
 		///
@@ -3156,7 +3156,7 @@ error_out:
 					}
 					else
 						if(fd.pMethods!=null) {
-							rc=sqlite3OsFileControl(fd,(u32)op,ref pArg);
+							rc=os.sqlite3OsFileControl(fd,(u32)op,ref pArg);
 						}
 						else {
 							rc=SQLITE_NOTFOUND;

@@ -505,7 +505,7 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
             public static int read32bits(sqlite3_file fd, int offset, ref u32 pRes)
             {
                 byte[] ac = new byte[4];
-                int rc = sqlite3OsRead(fd, ac, ac.Length, offset);
+                int rc = os.sqlite3OsRead(fd, ac, ac.Length, offset);
                 if (rc == SQLITE_OK)
                 {
                     pRes = Converter.sqlite3Get4byte(ac);
@@ -525,7 +525,7 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
             {
                 byte[] ac = new byte[4];
                 Converter.put32bits(ac, val);
-                return sqlite3OsWrite(fd, ac, 4, offset);
+                return os.sqlite3OsWrite(fd, ac, 4, offset);
             }
 
             ///
@@ -695,7 +695,7 @@ assert( (pPg->flags&PGHDR_DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
                 ///</summary>
 
                 zMaster[0] = 0;
-                if (SQLITE_OK != (rc = sqlite3OsFileSize(pJrnl, ref szJ)) || szJ < 16 || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, (int)(szJ - 16), ref len)) || len >= nMaster || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, szJ - 12, ref cksum)) || SQLITE_OK != (rc = sqlite3OsRead(pJrnl, aMagic, 8, szJ - 8)) || memcmp(aMagic, aJournalMagic, 8) != 0 || SQLITE_OK != (rc = sqlite3OsRead(pJrnl, zMaster, len, (long)(szJ - 16 - len))))
+                if (SQLITE_OK != (rc = os.sqlite3OsFileSize(pJrnl, ref szJ)) || szJ < 16 || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, (int)(szJ - 16), ref len)) || len >= nMaster || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, szJ - 12, ref cksum)) || SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, aMagic, 8, szJ - 8)) || memcmp(aMagic, aJournalMagic, 8) != 0 || SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, zMaster, len, (long)(szJ - 16 - len))))
                 {
                     return rc;
                 }
@@ -823,7 +823,7 @@ static void pagerReportSize(Pager X){}
                 if (rc == SQLITE_OK && 0 == isInWal)
                 {
                     i64 iOffset = (pgno - 1) * (i64)pPager.pageSize;
-                    rc = sqlite3OsRead(pPager.fd, pPg.pData, pgsz, iOffset);
+                    rc = os.sqlite3OsRead(pPager.fd, pPg.pData, pgsz, iOffset);
                     if (rc == SQLITE_IOERR_SHORT_READ)
                     {
                         rc = SQLITE_OK;
@@ -1242,7 +1242,7 @@ return rc;
                         rc = write32bits(pPager.sjfd, offset, pPg.pgno);
                         if (rc == SQLITE_OK)
                         {
-                            rc = sqlite3OsWrite(pPager.sjfd, pData2, pPager.pageSize, offset + 4);
+                            rc = os.sqlite3OsWrite(pPager.sjfd, pData2, pPager.pageSize, offset + 4);
                         }
                     }
                 }
@@ -1601,7 +1601,7 @@ return rc;
                     //  return SQLITE_NOMEM;
                     //}
                     //zPathname[0] = 0; /* Make sure initialized even if FullPathname() fails */
-                    rc = sqlite3OsFullPathname(pVfs, zFilename, nPathname, zPathname);
+                    rc = os.sqlite3OsFullPathname(pVfs, zFilename, nPathname, zPathname);
                     nPathname = StringExtensions.sqlite3Strlen30(zPathname);
                     z = zUri = zFilename;
                     //.Substring(StringExtensions.sqlite3Strlen30( zFilename ) );
@@ -1721,7 +1721,7 @@ memcpy(&pPager.zWal[nPathname], "-wal", 4);
                     ///VFS flags returned by xOpen() 
                     ///</summary>
 
-                    rc = sqlite3OsOpen(pVfs, pPager.zFilename, pPager.fd, vfsFlags, ref fout);
+                    rc = os.sqlite3OsOpen(pVfs, pPager.zFilename, pPager.fd, vfsFlags, ref fout);
                     Debug.Assert(0 == memDb);
                     readOnly = (fout & SQLITE_OPEN_READONLY) != 0;
                     ///
@@ -1809,7 +1809,7 @@ szPageDflt = ii;
                 if (rc != SQLITE_OK)
                 {
                     Debug.Assert(null == pPager.pTmpSpace);
-                    sqlite3OsClose(pPager.fd);
+                    os.sqlite3OsClose(pPager.fd);
                     //sqlite3_free( ref pPager );
                     return rc;
                 }
@@ -2080,7 +2080,7 @@ szPageDflt = ii;
                             rc = write32bits(pPager.jfd, iOff, pPg.pgno);
                             if (rc != SQLITE_OK)
                                 return rc;
-                            rc = sqlite3OsWrite(pPager.jfd, pData2, pPager.pageSize, iOff + 4);
+                            rc = os.sqlite3OsWrite(pPager.jfd, pData2, pPager.pageSize, iOff + 4);
                             if (rc != SQLITE_OK)
                                 return rc;
                             rc = write32bits(pPager.jfd, iOff + pPager.pageSize + 4, cksum);

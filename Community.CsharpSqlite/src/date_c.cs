@@ -494,7 +494,7 @@ namespace Community.CsharpSqlite
             static void setDateTimeToCurrent(sqlite3_context context, DateTime p)
             {
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
-                sqlite3OsCurrentTimeInt64(db.pVfs, ref p.iJD);
+                os.sqlite3OsCurrentTimeInt64(db.pVfs, ref p.iJD);
                 p.validJD = 1;
             }
 

@@ -325,7 +325,7 @@ namespace Community.CsharpSqlite {
 								rc=pSrcPager.sqlite3PagerGet(iSrcPg,ref pSrcPg);
 								if(rc==SQLITE_OK) {
                                     byte[] zData = pSrcPg.sqlite3PagerGetData();
-									rc=sqlite3OsWrite(pFile,zData,pgszSrc,iOff);
+									rc=os.sqlite3OsWrite(pFile,zData,pgszSrc,iOff);
 								}
 								PagerMethods.sqlite3PagerUnref(pSrcPg);
 							}

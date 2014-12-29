@@ -128,7 +128,7 @@ namespace Community.CsharpSqlite
 				u8[] k = new u8[256];
 				wsdPrng.j = 0;
 				wsdPrng.i = 0;
-				sqlite3OsRandomness (sqlite3_vfs_find (""), 256, k);
+				os.sqlite3OsRandomness (os.sqlite3_vfs_find (""), 256, k);
 				for (i = 0; i < 255; i++) {
 					wsdPrng.s [i] = (u8)i;
 				}

@@ -1041,7 +1041,7 @@ goto pragma_out;
 																	if(zRight.Length>0) {
 																		int rc;
 																		int res=0;
-																		rc=sqlite3OsAccess(db.pVfs,zRight,SQLITE_ACCESS_READWRITE,ref res);
+																		rc=os.sqlite3OsAccess(db.pVfs,zRight,SQLITE_ACCESS_READWRITE,ref res);
 																		if(rc!=SQLITE_OK||res==0) {
 																			utilc.sqlite3ErrorMsg(pParse,"not a writable directory");
 																			goto pragma_out;

@@ -4069,7 +4069,7 @@ memset(&winSysInfo, 0, sizeof(SYSTEM_INFO));
 GetSystemInfo(&winSysInfo);
 Debug.Assert(winSysInfo.dwAllocationGranularity > 0);
 #endif
-			sqlite3_vfs_register (winVfs, 1);
+			os.sqlite3_vfs_register (winVfs, 1);
 			return SQLITE_OK;
 		}
 

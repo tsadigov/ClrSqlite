@@ -147,9 +147,9 @@ namespace Community.CsharpSqlite
 			int backupTruncateFile (int iSize)
 			{
 				long iCurrent = 0;
-				int rc = sqlite3OsFileSize (this, ref iCurrent);
+				int rc = os.sqlite3OsFileSize (this, ref iCurrent);
 				if (rc == SQLITE_OK && iCurrent > iSize) {
-					rc = sqlite3OsTruncate (this, iSize);
+					rc = os.sqlite3OsTruncate (this, iSize);
 				}
 				return rc;
 			}

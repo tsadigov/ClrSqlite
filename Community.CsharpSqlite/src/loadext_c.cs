@@ -490,19 +490,19 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			if (zProc == null || zProc == "") {
 				zProc = "sqlite3_extension_init";
 			}
-			handle = sqlite3OsDlOpen (pVfs, zFile);
+			handle = os.sqlite3OsDlOpen (pVfs, zFile);
 			if (handle == IntPtr.Zero) {
 				//    if( pzErrMsg ){
 				pzErrMsg = "";
 				//*pzErrMsg = zErrmsg = sqlite3_malloc(nMsg);
 				//if( zErrmsg !=null){
 				io.sqlite3_snprintf (nMsg, zErrmsg, "unable to open shared library [%s]", zFile);
-				sqlite3OsDlError (pVfs, nMsg - 1, zErrmsg.ToString ());
+				os.sqlite3OsDlError (pVfs, nMsg - 1, zErrmsg.ToString ());
 				return SQLITE_ERROR;
 			}
 			//xInit = (int()(sqlite3*,char**,const sqlite3_api_routines))
 			//                 sqlite3OsDlSym(pVfs, handle, zProc);
-			xInit = (dxInit)sqlite3OsDlSym (pVfs, handle, ref zProc);
+			xInit = (dxInit)os.sqlite3OsDlSym (pVfs, handle, ref zProc);
 			Debugger.Break ();
 			// TODO --
 			//if( xInit==0 ){
@@ -578,7 +578,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			int i;
 			Debug.Assert (sqlite3_mutex_held (db.mutex));
 			for (i = 0; i < db.nExtension; i++) {
-				sqlite3OsDlClose (db.pVfs, (HANDLE)db.aExtension [i]);
+				os.sqlite3OsDlClose (db.pVfs, (HANDLE)db.aExtension [i]);
 			}
 			db.sqlite3DbFree (ref db.aExtension);
 		}

@@ -1920,7 +1920,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         //  return SQLITE_NOMEM;
                         //}
                         sqlite3FileSuffix3(zMainFile, zMaster);
-                        rc = sqlite3OsAccess(pVfs, zMaster, SQLITE_ACCESS_EXISTS, ref res);
+                        rc = os.sqlite3OsAccess(pVfs, zMaster, SQLITE_ACCESS_EXISTS, ref res);
                     }
                     while (rc == SQLITE_OK && res == 1);
                     if (rc == SQLITE_OK)
@@ -1929,7 +1929,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         ///<summary>
                         ///Open the master journal. 
                         ///</summary>
-                        rc = sqlite3OsOpenMalloc(ref pVfs, zMaster, ref pMaster, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_EXCLUSIVE | SQLITE_OPEN_MASTER_JOURNAL, ref rc);
+                        rc = os.sqlite3OsOpenMalloc(ref pVfs, zMaster, ref pMaster, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_EXCLUSIVE | SQLITE_OPEN_MASTER_JOURNAL, ref rc);
                     }
                     if (rc != SQLITE_OK)
                     {
@@ -1964,12 +1964,12 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             {
                                 needSync = true;
                             }
-                            rc = sqlite3OsWrite(pMaster, Encoding.UTF8.GetBytes(zFile), StringExtensions.sqlite3Strlen30(zFile), offset);
+                            rc = os.sqlite3OsWrite(pMaster, Encoding.UTF8.GetBytes(zFile), StringExtensions.sqlite3Strlen30(zFile), offset);
                             offset += StringExtensions.sqlite3Strlen30(zFile);
                             if (rc != SQLITE_OK)
                             {
-                                sqlite3OsCloseFree(pMaster);
-                                sqlite3OsDelete(pVfs, zMaster, 0);
+                                os.sqlite3OsCloseFree(pMaster);
+                                os.sqlite3OsDelete(pVfs, zMaster, 0);
                                 db.sqlite3DbFree(ref zMaster);
                                 return rc;
                             }
@@ -1981,10 +1981,10 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///flag is set this is not required.
                     ///
                     ///</summary>
-                    if (needSync && 0 == (sqlite3OsDeviceCharacteristics(pMaster) & SQLITE_IOCAP_SEQUENTIAL) && SQLITE_OK != (rc = sqlite3OsSync(pMaster, SQLITE_SYNC_NORMAL)))
+                    if (needSync && 0 == (os.sqlite3OsDeviceCharacteristics(pMaster) & SQLITE_IOCAP_SEQUENTIAL) && SQLITE_OK != (rc = os.sqlite3OsSync(pMaster, SQLITE_SYNC_NORMAL)))
                     {
-                        sqlite3OsCloseFree(pMaster);
-                        sqlite3OsDelete(pVfs, zMaster, 0);
+                        os.sqlite3OsCloseFree(pMaster);
+                        os.sqlite3OsDelete(pVfs, zMaster, 0);
                         db.sqlite3DbFree(ref zMaster);
                         return rc;
                     }
@@ -2009,7 +2009,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             rc = pBt.sqlite3BtreeCommitPhaseOne(zMaster);
                         }
                     }
-                    sqlite3OsCloseFree(pMaster);
+                    os.sqlite3OsCloseFree(pMaster);
                     Debug.Assert(rc != SQLITE_BUSY);
                     if (rc != SQLITE_OK)
                     {
@@ -2023,7 +2023,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///transaction files are deleted.
                     ///
                     ///</summary>
-                    rc = sqlite3OsDelete(pVfs, zMaster, 1);
+                    rc = os.sqlite3OsDelete(pVfs, zMaster, 1);
                     db.sqlite3DbFree(ref zMaster);
                     if (rc != 0)
                     {
