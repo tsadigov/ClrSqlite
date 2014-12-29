@@ -387,7 +387,7 @@ namespace Community.CsharpSqlite {
                     }
                     else
                     {
-                        zBuf = sqlite3_mprintf("%.*f", n, r);
+                        zBuf = io.sqlite3_mprintf("%.*f", n, r);
                         if (zBuf == null)
                         {
                             context.sqlite3_result_error_nomem();
@@ -1024,7 +1024,7 @@ break;
             ///
             ///<summary>
             ///Implementation of the sqlite_log() function.  This is a wrapper around
-            ///sqlite3_log().  The return value is NULL.  The function exists purely for
+            ///io.sqlite3_log().  The return value is NULL.  The function exists purely for
             ///</summary>
             ///<param name="its side">effects.</param>
             ///<param name=""></param>
@@ -1032,7 +1032,7 @@ break;
             {
                 UNUSED_PARAMETER(argc);
                 UNUSED_PARAMETER(context);
-                sqlite3_log(sqlite3_value_int(argv[0]), "%s", sqlite3_value_text(argv[1]));
+                io.sqlite3_log(sqlite3_value_int(argv[0]), "%s", sqlite3_value_text(argv[1]));
             }
             ///<summary>
             /// Implementation of the sqlite_compileoption_used() function.
@@ -1946,7 +1946,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                     //}
                     else
                     {
-                        context.sqlite3_result_text(sqlite3StrAccumFinish(pAccum), -1, null);
+                        context.sqlite3_result_text(io.sqlite3StrAccumFinish(pAccum), -1, null);
                         //sqlite3_free );
                     }
                 }

@@ -262,7 +262,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  sqlite3_libversion,
 		//  sqlite3_libversion_number,
 		//  sqlite3_malloc,
-		//  sqlite3_mprintf,
+		//  io.sqlite3_mprintf,
 		//  sqlite3_open,
 		//  sqlite3_open16,
 		//  sqlite3_prepare,
@@ -286,7 +286,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  sqlite3_rollback_hook,
 		//  sqlite3_set_authorizer,
 		//  sqlite3_set_auxdata,
-		//  sqlite3_snprintf,
+		//  io.sqlite3_snprintf,
 		//  sqlite3_step,
 		//  sqlite3_table_column_metadata,
 		#if !SQLITE_OMIT_DEPRECATED
@@ -407,7 +407,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//  sqlite3_db_mutex,
 		//  sqlite3_db_status,
 		//  sqlite3_extended_errcode,
-		//  sqlite3_log,
+		//  io.sqlite3_log,
 		//  sqlite3_soft_heap_limit64,
 		//  sqlite3_sourceid,
 		//  sqlite3_stmt_status,
@@ -483,7 +483,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 
 			if ((db.flags & SQLITE_LoadExtension) == 0) {
 				//if( pzErrMsg != null){
-				pzErrMsg = sqlite3_mprintf ("not authorized");
+				pzErrMsg = io.sqlite3_mprintf ("not authorized");
 				//}
 				return SQLITE_ERROR;
 			}
@@ -496,7 +496,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 				pzErrMsg = "";
 				//*pzErrMsg = zErrmsg = sqlite3_malloc(nMsg);
 				//if( zErrmsg !=null){
-				sqlite3_snprintf (nMsg, zErrmsg, "unable to open shared library [%s]", zFile);
+				io.sqlite3_snprintf (nMsg, zErrmsg, "unable to open shared library [%s]", zFile);
 				sqlite3OsDlError (pVfs, nMsg - 1, zErrmsg.ToString ());
 				return SQLITE_ERROR;
 			}
@@ -509,7 +509,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			//  if( pzErrMsg ){
 			//          *pzErrMsg = zErrmsg = sqlite3_malloc(nMsg);
 			//    if( zErrmsg ){
-			//      sqlite3_snprintf(nMsg, zErrmsg,
+			//      io.sqlite3_snprintf(nMsg, zErrmsg,
 			//          "no entry point [%s] in shared library [%s]", zProc,zFile);
 			//      sqlite3OsDlError(pVfs, nMsg-1, zErrmsg);
 			//    }
@@ -518,7 +518,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			//  return SQLITE_ERROR;
 			//  }else if( xInit(db, ref zErrmsg, sqlite3Apis) ){
 			////    if( pzErrMsg !=null){
-			//      pzErrMsg = sqlite3_mprintf("error during initialization: %s", zErrmsg);
+			//      pzErrMsg = io.sqlite3_mprintf("error during initialization: %s", zErrmsg);
 			//    //}
 			//    sqlite3DbFree(db,ref zErrmsg);
 			//    sqlite3OsDlClose(pVfs, ref handle);

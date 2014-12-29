@@ -568,7 +568,7 @@ break;
                 {
                     sCheck.anRef[i] = 1;
                 }
-                sqlite3StrAccumInit(sCheck.errMsg, null, 1000, 20000);
+                io.sqlite3StrAccumInit(sCheck.errMsg, null, 1000, 20000);
                 //sCheck.errMsg.useMalloc = 2;
                 ///
                 ///<summary>
@@ -646,8 +646,8 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
                 //}
                 pnErr = sCheck.nErr;
                 if (sCheck.nErr == 0)
-                    sqlite3StrAccumReset(sCheck.errMsg);
-                return sqlite3StrAccumFinish(sCheck.errMsg);
+                    io.sqlite3StrAccumReset(sCheck.errMsg);
+                return io.sqlite3StrAccumFinish(sCheck.errMsg);
             }
             public Schema sqlite3BtreeSchema(int nBytes, dxFreeSchema xFree)
             {

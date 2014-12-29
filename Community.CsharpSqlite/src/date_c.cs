@@ -1066,7 +1066,7 @@ namespace Community.CsharpSqlite
 			if (isDate (context, argc, argv, ref x) == 0) {
 				zdtBuf.Length = 0;
 				computeYMD_HMS (x);
-				sqlite3_snprintf (100, zdtBuf, "%04d-%02d-%02d %02d:%02d:%02d", x.Y, x.M, x.D, x.h, x.m, (int)(x.s));
+				io.sqlite3_snprintf (100, zdtBuf, "%04d-%02d-%02d %02d:%02d:%02d", x.Y, x.M, x.D, x.h, x.m, (int)(x.s));
 				context.sqlite3_result_text (zdtBuf, -1, SQLITE_TRANSIENT);
 			}
 		}
@@ -1083,7 +1083,7 @@ namespace Community.CsharpSqlite
 			if (isDate (context, argc, argv, ref x) == 0) {
 				zdtBuf.Length = 0;
 				computeHMS (x);
-				sqlite3_snprintf (100, zdtBuf, "%02d:%02d:%02d", x.h, x.m, (int)x.s);
+				io.sqlite3_snprintf (100, zdtBuf, "%02d:%02d:%02d", x.h, x.m, (int)x.s);
 				context.sqlite3_result_text (zdtBuf, -1, SQLITE_TRANSIENT);
 			}
 		}
@@ -1100,7 +1100,7 @@ namespace Community.CsharpSqlite
 			if (isDate (context, argc, argv, ref x) == 0) {
 				StringBuilder zdtBuf = new StringBuilder (100);
 				computeYMD (x);
-				sqlite3_snprintf (100, zdtBuf, "%04d-%02d-%02d", x.Y, x.M, x.D);
+				io.sqlite3_snprintf (100, zdtBuf, "%04d-%02d-%02d", x.Y, x.M, x.D);
 				context.sqlite3_result_text (zdtBuf, -1, SQLITE_TRANSIENT);
 			}
 		}
@@ -1217,7 +1217,7 @@ namespace Community.CsharpSqlite
 						zdtTemp.Length = 0;
 						switch ((char)zFmt [i]) {
 						case 'd':
-							sqlite3_snprintf (3, zdtTemp, "%02d", x.D);
+							io.sqlite3_snprintf (3, zdtTemp, "%02d", x.D);
 							z.Append (zdtTemp);
 							j += 2;
 							break;
@@ -1225,13 +1225,13 @@ namespace Community.CsharpSqlite
 							double s = x.s;
 							if (s > 59.999)
 								s = 59.999;
-							sqlite3_snprintf (7, zdtTemp, "%06.3f", s);
+							io.sqlite3_snprintf (7, zdtTemp, "%06.3f", s);
 							z.Append (zdtTemp);
 							j = StringExtensions.sqlite3Strlen30 (z);
 							break;
 						}
 						case 'H':
-							sqlite3_snprintf (3, zdtTemp, "%02d", x.h);
+							io.sqlite3_snprintf (3, zdtTemp, "%02d", x.h);
 							z.Append (zdtTemp);
 							j += 2;
 							break;
@@ -1263,41 +1263,41 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 								wd = (int)(((x.iJD + 43200000) / 86400000) % 7);
-								sqlite3_snprintf (3, zdtTemp, "%02d", (nDay + 7 - wd) / 7);
+								io.sqlite3_snprintf (3, zdtTemp, "%02d", (nDay + 7 - wd) / 7);
 								z.Append (zdtTemp);
 								j += 2;
 							}
 							else {
-								sqlite3_snprintf (4, zdtTemp, "%03d", nDay + 1);
+								io.sqlite3_snprintf (4, zdtTemp, "%03d", nDay + 1);
 								z.Append (zdtTemp);
 								j += 3;
 							}
 							break;
 						}
 						case 'J': {
-							sqlite3_snprintf (20, zdtTemp, "%.16g", x.iJD / 86400000.0);
+							io.sqlite3_snprintf (20, zdtTemp, "%.16g", x.iJD / 86400000.0);
 							z.Append (zdtTemp);
 							j = StringExtensions.sqlite3Strlen30 (z);
 							break;
 						}
 						case 'm':
-							sqlite3_snprintf (3, zdtTemp, "%02d", x.M);
+							io.sqlite3_snprintf (3, zdtTemp, "%02d", x.M);
 							z.Append (zdtTemp);
 							j += 2;
 							break;
 						case 'M':
-							sqlite3_snprintf (3, zdtTemp, "%02d", x.m);
+							io.sqlite3_snprintf (3, zdtTemp, "%02d", x.m);
 							z.Append (zdtTemp);
 							j += 2;
 							break;
 						case 's': {
-							sqlite3_snprintf (30, zdtTemp, "%lld", (i64)(x.iJD / 1000 - 21086676 * (i64)10000));
+							io.sqlite3_snprintf (30, zdtTemp, "%lld", (i64)(x.iJD / 1000 - 21086676 * (i64)10000));
 							z.Append (zdtTemp);
 							j = StringExtensions.sqlite3Strlen30 (z);
 							break;
 						}
 						case 'S':
-							sqlite3_snprintf (3, zdtTemp, "%02d", (int)x.s);
+							io.sqlite3_snprintf (3, zdtTemp, "%02d", (int)x.s);
 							z.Append (zdtTemp);
 							j += 2;
 							break;
@@ -1306,7 +1306,7 @@ namespace Community.CsharpSqlite
 							break;
 						}
 						case 'Y': {
-							sqlite3_snprintf (5, zdtTemp, "%04d", x.Y);
+							io.sqlite3_snprintf (5, zdtTemp, "%04d", x.Y);
 							z.Append (zdtTemp);
 							j = StringExtensions.sqlite3Strlen30 (z);
 							break;

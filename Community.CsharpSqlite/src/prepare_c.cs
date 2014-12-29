@@ -66,7 +66,7 @@ namespace Community.CsharpSqlite {
 					}
 					sqlite3SetString(ref pData.pzErrMsg,db,"malformed database schema (%s)",zObj);
 					if(!String.IsNullOrEmpty(zExtra)) {
-						pData.pzErrMsg=sqlite3MAppendf(db,pData.pzErrMsg,"%s - %s",pData.pzErrMsg,zExtra);
+						pData.pzErrMsg=io.sqlite3MAppendf(db,pData.pzErrMsg,"%s - %s",pData.pzErrMsg,zExtra);
 					}
 				}
 				pData.rc=//db.mallocFailed != 0 ? SQLITE_NOMEM :
@@ -412,7 +412,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(db.init.busy!=0);
 			{
 				string zSql;
-				zSql=sqlite3MPrintf(db,"SELECT name, rootpage, sql FROM '%q'.%s ORDER BY rowid",db.aDb[iDb].zName,zMasterName);
+				zSql=io.sqlite3MPrintf(db,"SELECT name, rootpage, sql FROM '%q'.%s ORDER BY rowid",db.aDb[iDb].zName,zMasterName);
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																{
 int (*xAuth)(void*,int,const char*,const char*,const char*,const char*);

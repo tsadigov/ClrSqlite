@@ -1236,7 +1236,7 @@ public static bool ISAUTOVACUUM =false;
 					if (zMsg1.Length > 0) {
                         this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
 					}
-					sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
+					io.sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
 					va_end (ref ap);
 				}
 				//if( pCheck.errMsg.mallocFailed ){
@@ -1297,7 +1297,7 @@ public static bool ISAUTOVACUUM =false;
 				byte[] hit = null;
 				i64 nMinKey = 0;
 				i64 nMaxKey = 0;
-				sqlite3_snprintf (200, zContext, "Page %d: ", iPage);
+				io.sqlite3_snprintf (200, zContext, "Page %d: ", iPage);
 				///
 ///<summary>
 ///Check that the page exists
@@ -1349,7 +1349,7 @@ public static bool ISAUTOVACUUM =false;
 ///
 ///</summary>
 
-					sqlite3_snprintf (200, zContext, "On tree page %d cell %d: ", iPage, i);
+					io.sqlite3_snprintf (200, zContext, "On tree page %d cell %d: ", iPage, i);
 					int iCell = pPage.findCell (i);
 					//pCell = findCell( pPage, i );
 					pCell = pPage.aData;
@@ -1411,7 +1411,7 @@ public static bool ISAUTOVACUUM =false;
 				}
 				if (0 == pPage.leaf) {
 					pgno = (int)Converter.sqlite3Get4byte (pPage.aData, pPage.hdrOffset + 8);
-					sqlite3_snprintf (200, zContext, "On page %d at right child: ", iPage);
+					io.sqlite3_snprintf (200, zContext, "On page %d at right child: ", iPage);
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if (pBt.autoVacuum) {
 						this.checkPtrmap ((u32)pgno, PTRMAP_BTREE, (u32)iPage, zContext.ToString ());
@@ -1708,7 +1708,7 @@ public static bool ISAUTOVACUUM =false;
 					if (zMsg1.Length > 0) {
                         this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
 					}
-					sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
+					io.sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
 					va_end (ref ap);
 				}
 			}

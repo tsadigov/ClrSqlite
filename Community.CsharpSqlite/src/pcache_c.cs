@@ -436,7 +436,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 				if (pPg != null) {
 					int rc;
 					#if SQLITE_LOG_CACHE_SPILL
-																																																																																															      sqlite3_log(SQLITE_FULL, 
+																																																																																															      io.sqlite3_log(SQLITE_FULL, 
                   "spill page %d making room for %d - cache used: %d/%d",
                   pPg->pgno, pgno,
                   sqlite3GlobalConfig.pcache.xPagecount(pCache->pCache),

@@ -324,7 +324,7 @@ dummy += (uint)x;
 					lock (lock_va_list) {
 						string z;
 						va_start (ap, zFormat);
-						z = sqlite3VMPrintf (db, zFormat, ap);
+						z = io.sqlite3VMPrintf (db, zFormat, ap);
 						va_end (ref ap);
 						sqlite3ValueSetStr (db.pErr, -1, z, SqliteEncoding.UTF8, (dxDel)SQLITE_DYNAMIC);
 					}
@@ -360,7 +360,7 @@ dummy += (uint)x;
 			//va_list ap;
 			lock (lock_va_list) {
 				va_start (ap, zFormat);
-				zMsg = sqlite3VMPrintf (db, zFormat, ap);
+				zMsg = io.sqlite3VMPrintf (db, zFormat, ap);
 				va_end (ref ap);
 			}
 			if (db.suppressErr != 0) {
@@ -1144,7 +1144,7 @@ return n;
 		///</summary>
 		static void logBadConnection (string zType)
 		{
-			sqlite3_log (SQLITE_MISUSE, "API call with %s database connection pointer", zType);
+			io.sqlite3_log (SQLITE_MISUSE, "API call with %s database connection pointer", zType);
 		}
 
 		///<summary>

@@ -313,7 +313,7 @@ return SQLITE_OK;
 		}
 		///<summary>
 		/// Add MEM_Str to the set of representations for the given Mem.  Numbers
-		/// are converted using sqlite3_snprintf().  Converting a BLOB to a string
+		/// are converted using io.sqlite3_snprintf().  Converting a BLOB to a string
 		/// is a no-op.
 		///
 		/// Existing representations MEM_Int and MEM_Real are *not* invalidated.
@@ -341,11 +341,11 @@ return SQLITE_OK;
 			///
 			///<summary>
 			///</summary>
-			///<param name="For a Real or Integer, use sqlite3_snprintf() to produce the UTF">8</param>
+			///<param name="For a Real or Integer, use io.sqlite3_snprintf() to produce the UTF">8</param>
 			///<param name="string representation of the value. Then, if the required encoding">string representation of the value. Then, if the required encoding</param>
 			///<param name="is UTF">16be do a translation.</param>
 			///<param name=""></param>
-			///<param name="FIX ME: It would be better if sqlite3_snprintf() could do UTF">16.</param>
+			///<param name="FIX ME: It would be better if io.sqlite3_snprintf() could do UTF">16.</param>
 			///<param name=""></param>
 			if((fg&MEM_Int)!=0) {
 				pMem.z=pMem.u.i.ToString();
@@ -1566,7 +1566,7 @@ return SQLITE_NOMEM;
 					sqlite3VdbeMemSetInt64(pVal,(i64)pExpr.u.iValue*negInt);
 				}
 				else {
-					zVal=sqlite3MPrintf(db,"%s%s",zNeg,pExpr.u.zToken);
+					zVal=io.sqlite3MPrintf(db,"%s%s",zNeg,pExpr.u.zToken);
 					//if ( zVal == null ) goto no_mem;
 					sqlite3ValueSetStr(pVal,-1,zVal,SqliteEncoding.UTF8,SQLITE_DYNAMIC);
 					if(op==TK_FLOAT)

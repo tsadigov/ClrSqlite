@@ -1105,7 +1105,7 @@ pOp.cnt = 0;
 			}
 			public bool vdbeSafety() {
 				if(this.db==null) {
-					sqlite3_log(SQLITE_MISUSE,"API called with finalized prepared statement");
+					io.sqlite3_log(SQLITE_MISUSE,"API called with finalized prepared statement");
 					return true;
 				}
 				else {
@@ -1114,7 +1114,7 @@ pOp.cnt = 0;
 			}
 			public bool vdbeSafetyNotNull() {
 				if(this==null) {
-					sqlite3_log(SQLITE_MISUSE,"API called with NULL prepared statement");
+					io.sqlite3_log(SQLITE_MISUSE,"API called with NULL prepared statement");
 					return true;
 				}
 				else {
@@ -2147,12 +2147,12 @@ start = sqlite3Hwtime();
 								Debug.Assert(this.rc!=SQLITE_OK);
 								sqlite3SetString(ref this.zErrMsg,db,"%s",pOp.p4.z);
 								testcase(sqlite3GlobalConfig.xLog!=null);
-								sqlite3_log(pOp.p1,"abort at %d in [%s]: %s",opcodeIndex,this.zSql,pOp.p4.z);
+								io.sqlite3_log(pOp.p1,"abort at %d in [%s]: %s",opcodeIndex,this.zSql,pOp.p4.z);
 							}
 							else
 								if(this.rc!=0) {
 									testcase(sqlite3GlobalConfig.xLog!=null);
-									sqlite3_log(pOp.p1,"constraint failed at %d in [%s]",opcodeIndex,this.zSql);
+									io.sqlite3_log(pOp.p1,"constraint failed at %d in [%s]",opcodeIndex,this.zSql);
 								}
 							rc=this.sqlite3VdbeHalt();
 							Debug.Assert(rc==SQLITE_BUSY||rc==SQLITE_OK||rc==SQLITE_ERROR);
@@ -6716,7 +6716,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								initData.db=db;
 								initData.iDb=pOp.p1;
 								initData.pzErrMsg=this.zErrMsg;
-								zSql=sqlite3MPrintf(db,"SELECT name, rootpage, sql FROM '%q'.%s WHERE %s ORDER BY rowid",db.aDb[iDb].zName,zMaster,pOp.p4.z);
+								zSql=io.sqlite3MPrintf(db,"SELECT name, rootpage, sql FROM '%q'.%s WHERE %s ORDER BY rowid",db.aDb[iDb].zName,zMaster,pOp.p4.z);
 								if(String.IsNullOrEmpty(zSql)) {
 									rc=SQLITE_NOMEM;
 								}
@@ -8243,7 +8243,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					Debug.Assert(rc!=0);
 					this.rc=rc;
 					testcase(sqlite3GlobalConfig.xLog!=null);
-					sqlite3_log(rc,"statement aborts at %d: [%s] %s",opcodeIndex,this.zSql,this.zErrMsg);
+					io.sqlite3_log(rc,"statement aborts at %d: [%s] %s",opcodeIndex,this.zSql,this.zErrMsg);
 					this.sqlite3VdbeHalt();
 					//if ( rc == SQLITE_IOERR_NOMEM ) db.mallocFailed = 1;
 					rc=SQLITE_ERROR;

@@ -231,7 +231,7 @@ namespace Community.CsharpSqlite
 
 		///
 ///<summary>
-///P4 is a string obtained from sqlite3_mprintf=(); 
+///P4 is a string obtained from io.sqlite3_mprintf=(); 
 ///</summary>
 
 		const int P4_REAL = (-12);

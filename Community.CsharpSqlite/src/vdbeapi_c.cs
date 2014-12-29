@@ -569,7 +569,7 @@ return SQLITE_MISUSE_BKPT();
 			string zName = context.pFunc.zName;
 			string zErr;
 			UNUSED_PARAMETER2 (NotUsed, NotUsed2);
-			zErr = sqlite3_mprintf ("unable to use function %s in the requested context", zName);
+			zErr = io.sqlite3_mprintf ("unable to use function %s in the requested context", zName);
 			context.sqlite3_result_error (zErr, -1);
 			//sqlite3_free( ref zErr );
 		}
@@ -1069,7 +1069,7 @@ pStmt, N, (const void*()(Mem))sqlite3_value_text16, COLNAME_COLUMN);
 			if (p.magic != VDBE_MAGIC_RUN || p.currentOpCodeIndex >= 0) {
 				sqlite3Error (p.db, SQLITE_MISUSE, 0);
 				sqlite3_mutex_leave (p.db.mutex);
-				sqlite3_log (SQLITE_MISUSE, "bind on a busy prepared statement: [%s]", p.zSql);
+				io.sqlite3_log (SQLITE_MISUSE, "bind on a busy prepared statement: [%s]", p.zSql);
 				return SQLITE_MISUSE_BKPT ();
 			}
 			if (i < 1 || i > p.nVar) {

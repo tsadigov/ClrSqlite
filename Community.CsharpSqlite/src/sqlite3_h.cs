@@ -1541,33 +1541,33 @@ namespace Community.CsharpSqlite
 ///<param name="These routines are work">alikes of the "printf()" family of functions</param>
 ///<param name="from the standard C library.">from the standard C library.</param>
 ///<param name=""></param>
-///<param name="^The sqlite3_mprintf() and sqlite3_vmprintf() routines write their">^The sqlite3_mprintf() and sqlite3_vmprintf() routines write their</param>
+///<param name="^The io.sqlite3_mprintf() and sqlite3_vmprintf() routines write their">^The io.sqlite3_mprintf() and sqlite3_vmprintf() routines write their</param>
 ///<param name="results into memory obtained from [sqlite3_malloc()].">results into memory obtained from [sqlite3_malloc()].</param>
 ///<param name="The strings returned by these two routines should be">The strings returned by these two routines should be</param>
 ///<param name="released by [sqlite3_free()].  ^Both routines return a">released by [sqlite3_free()].  ^Both routines return a</param>
 ///<param name="NULL pointer if [sqlite3_malloc()] is unable to allocate enough">NULL pointer if [sqlite3_malloc()] is unable to allocate enough</param>
 ///<param name="memory to hold the resulting string.">memory to hold the resulting string.</param>
 ///<param name=""></param>
-///<param name="^(The sqlite3_snprintf() routine is similar to "snprintf()" from">^(The sqlite3_snprintf() routine is similar to "snprintf()" from</param>
+///<param name="^(The io.sqlite3_snprintf() routine is similar to "snprintf()" from">^(The io.sqlite3_snprintf() routine is similar to "snprintf()" from</param>
 ///<param name="the standard C library.  The result is written into the">the standard C library.  The result is written into the</param>
 ///<param name="buffer supplied as the second parameter whose size is given by">buffer supplied as the second parameter whose size is given by</param>
 ///<param name="the first parameter. Note that the order of the">the first parameter. Note that the order of the</param>
 ///<param name="first two parameters is reversed from snprintf().)^  This is an">first two parameters is reversed from snprintf().)^  This is an</param>
 ///<param name="historical accident that cannot be fixed without breaking">historical accident that cannot be fixed without breaking</param>
-///<param name="backwards compatibility.  ^(Note also that sqlite3_snprintf()">backwards compatibility.  ^(Note also that sqlite3_snprintf()</param>
+///<param name="backwards compatibility.  ^(Note also that io.sqlite3_snprintf()">backwards compatibility.  ^(Note also that io.sqlite3_snprintf()</param>
 ///<param name="returns a pointer to its buffer instead of the number of">returns a pointer to its buffer instead of the number of</param>
 ///<param name="characters actually written into the buffer.)^  We admit that">characters actually written into the buffer.)^  We admit that</param>
 ///<param name="the number of characters written would be a more useful return">the number of characters written would be a more useful return</param>
-///<param name="value but we cannot change the implementation of sqlite3_snprintf()">value but we cannot change the implementation of sqlite3_snprintf()</param>
+///<param name="value but we cannot change the implementation of io.sqlite3_snprintf()">value but we cannot change the implementation of io.sqlite3_snprintf()</param>
 ///<param name="now without breaking compatibility.">now without breaking compatibility.</param>
 ///<param name=""></param>
-///<param name="^As long as the buffer size is greater than zero, sqlite3_snprintf()">^As long as the buffer size is greater than zero, sqlite3_snprintf()</param>
+///<param name="^As long as the buffer size is greater than zero, io.sqlite3_snprintf()">^As long as the buffer size is greater than zero, io.sqlite3_snprintf()</param>
 ///<param name="guarantees that the buffer is always zero">terminated.  ^The first</param>
 ///<param name="parameter "n" is the total size of the buffer, including space for">parameter "n" is the total size of the buffer, including space for</param>
 ///<param name="the zero terminator.  So the longest string that can be completely">the zero terminator.  So the longest string that can be completely</param>
 ///<param name="written will be n">1 characters.</param>
 ///<param name=""></param>
-///<param name="^The sqlite3_vsnprintf() routine is a varargs version of sqlite3_snprintf().">^The sqlite3_vsnprintf() routine is a varargs version of sqlite3_snprintf().</param>
+///<param name="^The sqlite3_vsnprintf() routine is a varargs version of io.sqlite3_snprintf().">^The sqlite3_vsnprintf() routine is a varargs version of io.sqlite3_snprintf().</param>
 ///<param name=""></param>
 ///<param name="These routines all implement some additional formatting">These routines all implement some additional formatting</param>
 ///<param name="options that are useful for constructing SQL statements.">options that are useful for constructing SQL statements.</param>
@@ -1589,7 +1589,7 @@ namespace Community.CsharpSqlite
 ///<param name="One can use this text in an SQL statement as follows:">One can use this text in an SQL statement as follows:</param>
 ///<param name=""></param>
 ///<param name="<blockquote><pre>"><blockquote><pre></param>
-///<param name="string zSQL = sqlite3_mprintf("INSERT INTO table VALUES('%q')", zText);">string zSQL = sqlite3_mprintf("INSERT INTO table VALUES('%q')", zText);</param>
+///<param name="string zSQL = io.sqlite3_mprintf("INSERT INTO table VALUES('%q')", zText);">string zSQL = io.sqlite3_mprintf("INSERT INTO table VALUES('%q')", zText);</param>
 ///<param name="sqlite3_exec(db, zSQL, 0, 0, 0);">sqlite3_exec(db, zSQL, 0, 0, 0);</param>
 ///<param name="sqlite3_free(zSQL);">sqlite3_free(zSQL);</param>
 ///<param name="</pre></blockquote>"></pre></blockquote></param>
@@ -1617,7 +1617,7 @@ namespace Community.CsharpSqlite
 ///<param name="single quotes).)^  So, for example, one could say:">single quotes).)^  So, for example, one could say:</param>
 ///<param name=""></param>
 ///<param name="<blockquote><pre>"><blockquote><pre></param>
-///<param name="string zSQL = sqlite3_mprintf("INSERT INTO table VALUES(%Q)", zText);">string zSQL = sqlite3_mprintf("INSERT INTO table VALUES(%Q)", zText);</param>
+///<param name="string zSQL = io.sqlite3_mprintf("INSERT INTO table VALUES(%Q)", zText);">string zSQL = io.sqlite3_mprintf("INSERT INTO table VALUES(%Q)", zText);</param>
 ///<param name="sqlite3_exec(db, zSQL, 0, 0, 0);">sqlite3_exec(db, zSQL, 0, 0, 0);</param>
 ///<param name="sqlite3_free(zSQL);">sqlite3_free(zSQL);</param>
 ///<param name="</pre></blockquote>"></pre></blockquote></param>
@@ -1630,7 +1630,7 @@ namespace Community.CsharpSqlite
 ///<param name="the result, [sqlite3_free()] is called on the input string.)^">the result, [sqlite3_free()] is called on the input string.)^</param>
 ///<param name=""></param>
 
-		//SQLITE_API char *sqlite3_mprintf(const char*,...);
+		//SQLITE_API char *io.sqlite3_mprintf(const char*,...);
 		//SQLITE_API char *sqlite3_vmprintf(const char*, va_list);
 		//SQLITE_API char *sqlite3_snprintf(int,char*,const char*, ...);
 		//SQLITE_API char *sqlite3_vsnprintf(int,char*,const char*, va_list);
@@ -4480,7 +4480,7 @@ namespace Community.CsharpSqlite
 ///</pre></blockquote>)^
 ///
 ///If the xEntryPoint routine encounters an error, it should make *pzErrMsg
-///point to an appropriate error message (obtained from [sqlite3_mprintf()])
+///point to an appropriate error message (obtained from [io.sqlite3_mprintf()])
 ///and return an appropriate [error code].  ^SQLite ensures that *pzErrMsg
 ///is NULL before calling the xEntryPoint().  ^SQLite will invoke
 ///[sqlite3_free()] on *pzErrMsg after xEntryPoint() returns.  ^If any
@@ -4777,7 +4777,7 @@ namespace Community.CsharpSqlite
 		/// common to all module implementations.
 		///
 		/// ^Virtual tables methods can set an error message by assigning a
-		/// string obtained from [sqlite3_mprintf()] to zErrMsg.  The method should
+		/// string obtained from [io.sqlite3_mprintf()] to zErrMsg.  The method should
 		/// take care that any prior string is freed by a call to [sqlite3_free()]
 		/// prior to assigning a new string to zErrMsg.  ^After the error message
 		/// is delivered up to the client application, the string will be automatically
@@ -4787,7 +4787,7 @@ namespace Community.CsharpSqlite
 		//struct sqlite3_vtab {
 		//  const sqlite3_module *pModule;  /* The module for this virtual table */
 		//  int nRef;                       /* NO LONGER USED */
-		//  string zErrMsg;                  /* Error message from sqlite3_mprintf() */
+		//  string zErrMsg;                  /* Error message from io.sqlite3_mprintf() */
 		//  /* Virtual table implementations will typically add additional fields */
 		//};
 		public class sqlite3_vtab
@@ -4809,7 +4809,7 @@ namespace Community.CsharpSqlite
 			public string zErrMsg;
 		///
 ///<summary>
-///Error message from sqlite3_mprintf() 
+///Error message from io.sqlite3_mprintf() 
 ///</summary>
 
 		///
@@ -6285,19 +6285,19 @@ namespace Community.CsharpSqlite
 ///<summary>
 ///CAPI3REF: Error Logging Interface
 ///
-///^The [sqlite3_log()] interface writes a message into the error log
+///^The [io.sqlite3_log()] interface writes a message into the error log
 ///established by the [SQLITE_CONFIG_LOG] option to [sqlite3_config()].
 ///^If logging is enabled, the zFormat string and subsequent arguments are
 ///used with [sqlite3_snprintf()] to generate the final output string.
 ///
-///The sqlite3_log() interface is intended for use by extensions such as
+///The io.sqlite3_log() interface is intended for use by extensions such as
 ///virtual tables, collating functions, and SQL functions.  While there is
-///nothing to prevent an application from calling sqlite3_log(), doing so
+///nothing to prevent an application from calling io.sqlite3_log(), doing so
 ///is considered bad form.
 ///
 ///The zFormat string must not be NULL.
 ///
-///To avoid deadlocks and other threading problems, the sqlite3_log() routine
+///To avoid deadlocks and other threading problems, the io.sqlite3_log() routine
 ///will not use dynamically allocated memory.  The log message is stored in
 ///</summary>
 ///<param name="a fixed">length buffer on the stack.  If the log message is longer than</param>
@@ -6305,7 +6305,7 @@ namespace Community.CsharpSqlite
 ///<param name="buffer.">buffer.</param>
 ///<param name=""></param>
 
-		//SQLITE_API void sqlite3_log(int iErrCode, string zFormat, ...);
+		//SQLITE_API void io.sqlite3_log(int iErrCode, string zFormat, ...);
 		///
 ///<summary>
 ///</summary>

@@ -442,7 +442,7 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
     {
       StringBuilder zRet = new StringBuilder( 1024 );
 
-      sqlite3_snprintf( 1024, zRet,
+      io.sqlite3_snprintf( 1024, zRet,
       "Filename:      %s\n" +
       "State:         %s errCode=%d\n" +
       "Lock:          %s\n" +

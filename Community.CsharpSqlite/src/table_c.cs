@@ -88,13 +88,13 @@ p.azResult = azNew;
 if( p.nRow==0 ){
 p.nColumn = (int)nCol;
 for(i=0; i<nCol; i++){
-z = sqlite3_mprintf("%s", colv[i]);
+z = io.sqlite3_mprintf("%s", colv[i]);
 if( z==null ) goto malloc_failed;
 p.azResult[p.nData++ -1] = z;
 }
 }else if( p.nColumn!=nCol ){
 //sqlite3_free(ref p.zErrMsg);
-p.zErrMsg = sqlite3_mprintf(
+p.zErrMsg = io.sqlite3_mprintf(
 "sqlite3_get_table() called with two or more incompatible queries"
 );
 p.rc = SQLITE_ERROR;
@@ -170,7 +170,7 @@ if( (rc&0xff)==SQLITE_ABORT ){
 if( res.zErrMsg !=""){
 if( pzErrMsg !=null ){
 //sqlite3_free(ref pzErrMsg);
-pzErrMsg = sqlite3_mprintf("%s",res.zErrMsg);
+pzErrMsg = io.sqlite3_mprintf("%s",res.zErrMsg);
 }
 //sqlite3_free(ref res.zErrMsg);
 }

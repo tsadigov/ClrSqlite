@@ -2256,7 +2256,7 @@ return z;
 						iIn++;
 					if(iIn!=7&&(iIn!=16||String.Compare("localhost",zUri.Substring(7,9),StringComparison.InvariantCultureIgnoreCase)!=0))//memcmp("localhost", &zUri[7], 9)) )
 					 {
-						pzErrMsg=sqlite3_mprintf("invalid uri authority: %.*s",iIn-7,zUri.Substring(7));
+						pzErrMsg=io.sqlite3_mprintf("invalid uri authority: %.*s",iIn-7,zUri.Substring(7));
 						rc=SQLITE_ERROR;
 						goto parse_uri_out;
 					}
@@ -2389,12 +2389,12 @@ return z;
 								}
 							}
 							if(mode==0) {
-								pzErrMsg=sqlite3_mprintf("no such %s mode: %s",zModeType,zVal);
+								pzErrMsg=io.sqlite3_mprintf("no such %s mode: %s",zModeType,zVal);
 								rc=SQLITE_ERROR;
 								goto parse_uri_out;
 							}
 							if(mode>limit) {
-								pzErrMsg=sqlite3_mprintf("%s mode not allowed: %s",zModeType,zVal);
+								pzErrMsg=io.sqlite3_mprintf("%s mode not allowed: %s",zModeType,zVal);
 								rc=SQLITE_PERM;
 								goto parse_uri_out;
 							}
@@ -2416,7 +2416,7 @@ return z;
 			}
 			ppVfs=sqlite3_vfs_find(zVfs);
 			if(ppVfs==null) {
-				pzErrMsg=sqlite3_mprintf("no such vfs: %s",zVfs);
+				pzErrMsg=io.sqlite3_mprintf("no such vfs: %s",zVfs);
 				rc=SQLITE_ERROR;
 			}
 			parse_uri_out:
@@ -2923,23 +2923,23 @@ return SQLITE_OK;
 		///1.  Serve as a convenient place to set a breakpoint in a debugger
 		///to detect when version error conditions occurs.
 		///
-		///2.  Invoke sqlite3_log() to provide the source code location where
+		///2.  Invoke io.sqlite3_log() to provide the source code location where
 		///</summary>
 		///<param name="a low">level error is first detected.</param>
 		///<param name=""></param>
 		static int sqlite3CorruptError(int lineno) {
 			testcase(sqlite3GlobalConfig.xLog!=null);
-			sqlite3_log(SQLITE_CORRUPT,"database corruption at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
+			io.sqlite3_log(SQLITE_CORRUPT,"database corruption at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
 			return SQLITE_CORRUPT;
 		}
 		static int sqlite3MisuseError(int lineno) {
 			testcase(sqlite3GlobalConfig.xLog!=null);
-			sqlite3_log(SQLITE_MISUSE,"misuse at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
+			io.sqlite3_log(SQLITE_MISUSE,"misuse at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
 			return SQLITE_MISUSE;
 		}
 		static int sqlite3CantopenError(int lineno) {
 			testcase(sqlite3GlobalConfig.xLog!=null);
-			sqlite3_log(SQLITE_CANTOPEN,"cannot open file at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
+			io.sqlite3_log(SQLITE_CANTOPEN,"cannot open file at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
 			return SQLITE_CANTOPEN;
 		}
 		#if !SQLITE_OMIT_DEPRECATED
@@ -3077,7 +3077,7 @@ error_out:
       if ( SQLITE_OK == rc && null == pTab )
       {
         sqlite3DbFree( db, ref zErrMsg );
-        zErrMsg = sqlite3MPrintf( db, "no such table column: %s.%s", zTableName,
+        zErrMsg = io.sqlite3MPrintf( db, "no such table column: %s.%s", zTableName,
         zColumnName );
         rc = SQLITE_ERROR;
       }

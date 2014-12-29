@@ -370,7 +370,7 @@ namespace Community.CsharpSqlite {
 			string[] azArg=pTab.azModuleArg;
 			int nArg=pTab.nModuleArg;
 			string zErr=null;
-			string zModuleName=sqlite3MPrintf(db,"%s",pTab.zName);
+			string zModuleName=io.sqlite3MPrintf(db,"%s",pTab.zName);
 			//if ( String.IsNullOrEmpty( zModuleName ) )
 			//{
 			//  return SQLITE_NOMEM;
@@ -399,10 +399,10 @@ namespace Community.CsharpSqlite {
 			//  db.mallocFailed = 1;
 			if(SQLITE_OK!=rc) {
 				if(zErr=="") {
-					pzErr=sqlite3MPrintf(db,"vtable constructor failed: %s",zModuleName);
+					pzErr=io.sqlite3MPrintf(db,"vtable constructor failed: %s",zModuleName);
 				}
 				else {
-					pzErr=sqlite3MPrintf(db,"%s",zErr);
+					pzErr=io.sqlite3MPrintf(db,"%s",zErr);
 					zErr=null;
 					//sqlite3_free( zErr );
 				}
@@ -419,7 +419,7 @@ namespace Community.CsharpSqlite {
 					pVTable.nRef=1;
 					if(sCtx.pTab!=null) {
 						string zFormat="vtable constructor did not declare schema: %s";
-						pzErr=sqlite3MPrintf(db,zFormat,pTab.zName);
+						pzErr=io.sqlite3MPrintf(db,zFormat,pTab.zName);
 						sqlite3VtabUnlock(pVTable);
 						rc=SQLITE_ERROR;
 					}
@@ -547,7 +547,7 @@ namespace Community.CsharpSqlite {
 			///
 			///</summary>
 			if(null==pMod) {
-				pzErr=sqlite3MPrintf(db,"no such module: %s",zMod);
+				pzErr=io.sqlite3MPrintf(db,"no such module: %s",zMod);
 				rc=SQLITE_ERROR;
 			}
 			else {

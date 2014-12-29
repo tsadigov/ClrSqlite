@@ -153,7 +153,7 @@ namespace Community.CsharpSqlite
 
 			int izRawSql = 0;
 			db = p.db;
-			sqlite3StrAccumInit (_out, null, 100, db.aLimit [SQLITE_LIMIT_LENGTH]);
+			io.sqlite3StrAccumInit (_out, null, 100, db.aLimit [SQLITE_LIMIT_LENGTH]);
 			_out.db = db;
 			if (db.callStackDepth > 1) {
 				while (izRawSql < zRawSql.Length) {
@@ -200,11 +200,11 @@ namespace Community.CsharpSqlite
 					}
 					else
 						if ((pVar.flags & MEM_Int) != 0) {
-							sqlite3XPrintf (_out, "%lld", pVar.u.i);
+							io.sqlite3XPrintf (_out, "%lld", pVar.u.i);
 						}
 						else
 							if ((pVar.flags & MEM_Real) != 0) {
-								sqlite3XPrintf (_out, "%!.15g", pVar.r);
+								io.sqlite3XPrintf (_out, "%!.15g", pVar.r);
 							}
 							else
 								if ((pVar.flags & MEM_Str) != 0) {
@@ -216,29 +216,29 @@ memset(&utf8, 0, sizeof(utf8));
 utf8.db = db;
 sqlite3VdbeMemSetStr(&utf8, pVar.z, pVar.n, enc, SQLITE_STATIC);
 sqlite3VdbeChangeEncoding(&utf8, SqliteEncoding.UTF8);
-sqlite3XPrintf(_out, "'%.*q'", utf8.n, utf8.z);
+io.sqlite3XPrintf(_out, "'%.*q'", utf8.n, utf8.z);
 sqlite3VdbeMemRelease(&utf8);
 }else
 #endif
 									{
-										sqlite3XPrintf (_out, "'%.*q'", pVar.n, pVar.z);
+										io.sqlite3XPrintf (_out, "'%.*q'", pVar.n, pVar.z);
 									}
 								}
 								else
 									if ((pVar.flags & MEM_Zero) != 0) {
-										sqlite3XPrintf (_out, "zeroblob(%d)", pVar.u.nZero);
+										io.sqlite3XPrintf (_out, "zeroblob(%d)", pVar.u.nZero);
 									}
 									else {
 										Debug.Assert ((pVar.flags & MEM_Blob) != 0);
                                         _out.sqlite3StrAccumAppend("x'", 2);
 										for (i = 0; i < pVar.n; i++) {
-											sqlite3XPrintf (_out, "%02x", pVar.zBLOB [i] & 0xff);
+											io.sqlite3XPrintf (_out, "%02x", pVar.zBLOB [i] & 0xff);
 										}
                                         _out.sqlite3StrAccumAppend( "'", 1);
 									}
 				}
 			}
-			return sqlite3StrAccumFinish (_out);
+			return io.sqlite3StrAccumFinish (_out);
 		}
 	#endif
 	}

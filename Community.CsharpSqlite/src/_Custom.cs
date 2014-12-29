@@ -50,12 +50,12 @@ namespace Community.CsharpSqlite
 
 		static void fprintf (TextWriter tw, string zFormat, params object[] ap)
 		{
-			tw.Write (sqlite3_mprintf (zFormat, ap));
+			tw.Write (io.sqlite3_mprintf (zFormat, ap));
 		}
 
 		static void printf (string zFormat, params object[] ap)
 		{
-			Console.Out.Write (sqlite3_mprintf (zFormat, ap));
+			Console.Out.Write (io.sqlite3_mprintf (zFormat, ap));
 		}
 
 		//Byte Buffer Testing

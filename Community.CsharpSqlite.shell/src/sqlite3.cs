@@ -581,7 +581,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 {
                     return null;
                 }
-                sqlite3StrAccumInit(txt, null, 0, SQLITE_MAX_LENGTH);
+                io.sqlite3StrAccumInit(txt, null, 0, SQLITE_MAX_LENGTH);
                 txt.db = this;
                 txt.sqlite3StrAccumAppend(" (", 2);
                 for (i = 0; i < nEq; i++)
@@ -598,7 +598,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                     txt.explainAppendTerm(i, aCol[aiColumn[j]].zName, "<");
                 }
                 txt.sqlite3StrAccumAppend(")", 1);
-                return sqlite3StrAccumFinish(txt);
+                return io.sqlite3StrAccumFinish(txt);
             }
 
             public void whereInfoFree(WhereInfo pWInfo)

@@ -457,7 +457,7 @@ goto trigger_cleanup;
 				sqlite3NestedParse(pParse,"INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),zName,pTrig.table,z);
 				db.sqlite3DbFree(ref z);
 				sqlite3ChangeCookie(pParse,iDb);
-				v.sqlite3VdbeAddParseSchemaOp(iDb,sqlite3MPrintf(db,"type='trigger' AND name='%q'",zName));
+				v.sqlite3VdbeAddParseSchemaOp(iDb,io.sqlite3MPrintf(db,"type='trigger' AND name='%q'",zName));
 			}
 			if(db.init.busy!=0) {
 				Trigger pLink=pTrig;
@@ -1190,7 +1190,7 @@ return;
         );
 #endif
 				#if !SQLITE_OMIT_TRACE
-				v.sqlite3VdbeChangeP4(-1,sqlite3MPrintf(db,"-- TRIGGER %s",pTrigger.zName),P4_DYNAMIC);
+				v.sqlite3VdbeChangeP4(-1,io.sqlite3MPrintf(db,"-- TRIGGER %s",pTrigger.zName),P4_DYNAMIC);
 				#endif
 				///
 				///<summary>

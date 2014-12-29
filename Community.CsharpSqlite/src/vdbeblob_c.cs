@@ -139,7 +139,7 @@ int sqlite3_blob_open(
     }
     if( iCol==pTab->nCol ){
       sqlite3DbFree(db, zErr);
-      zErr = sqlite3MPrintf(db, "no such column: \"%s\"", zColumn);
+      zErr = io.sqlite3MPrintf(db, "no such column: \"%s\"", zColumn);
       rc = SQLITE_ERROR;
       sqlite3BtreeLeaveAll(db);
       goto blob_open_out;
@@ -179,7 +179,7 @@ int sqlite3_blob_open(
       }
       if( zFault ){
         sqlite3DbFree(db, zErr);
-        zErr = sqlite3MPrintf(db, "cannot open %s column for writing", zFault);
+        zErr = io.sqlite3MPrintf(db, "cannot open %s column for writing", zFault);
         rc = SQLITE_ERROR;
         sqlite3BtreeLeaveAll(db);
         goto blob_open_out;
@@ -247,7 +247,7 @@ int sqlite3_blob_open(
       nAttempt++;
       rc = sqlite3_finalize((sqlite3_stmt )v);
       sqlite3DbFree(db, zErr);
-      zErr = sqlite3MPrintf(db, sqlite3_errmsg(db));
+      zErr = io.sqlite3MPrintf(db, sqlite3_errmsg(db));
       v = 0;
     }
   } while( nAttempt<5 && rc==SQLITE_SCHEMA );
@@ -262,7 +262,7 @@ int sqlite3_blob_open(
 
     if( type<12 ){
       sqlite3DbFree(db, zErr);
-      zErr = sqlite3MPrintf(db, "cannot open value of type %s",
+      zErr = io.sqlite3MPrintf(db, "cannot open value of type %s",
           type==0?"null": type==7?"real": "integer"
       );
       rc = SQLITE_ERROR;
@@ -286,7 +286,7 @@ int sqlite3_blob_open(
     rc = SQLITE_OK;
   }else if( rc==SQLITE_OK ){
     sqlite3DbFree(db, zErr);
-    zErr = sqlite3MPrintf(db, "no such rowid: %lld", iRow);
+    zErr = io.sqlite3MPrintf(db, "no such rowid: %lld", iRow);
     rc = SQLITE_ERROR;
   }
 

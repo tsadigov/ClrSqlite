@@ -486,10 +486,10 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 			//#endif
 			//  }
 			//if( 0 == dwLen ){
-			//  sqlite3_snprintf(nBuf, zBuf, "OsError 0x%x (%u)", error, error);
+			//  io.sqlite3_snprintf(nBuf, zBuf, "OsError 0x%x (%u)", error, error);
 			//}else{
 			//  /* copy a maximum of nBuf chars to output buffer */
-			//  sqlite3_snprintf(nBuf, zBuf, "%s", zOut);
+			//  io.sqlite3_snprintf(nBuf, zBuf, "%s", zOut);
 			//  /* free the UTF8 buffer */
 			//  free(zOut);
 			//}
@@ -502,7 +502,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 		/// winLogError().
 		///
 		/// This routine is invoked after an error occurs in an OS function.
-		/// It logs a message using sqlite3_log() containing the current value of
+		/// It logs a message using io.sqlite3_log() containing the current value of
 		/// error code and, if possible, the human-readable equivalent from
 		/// FormatMessage.
 		///
@@ -568,7 +568,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 			for (i = 0; i < zMsg.Length && zMsg [i] != '\r' && zMsg [i] != '\n'; i++) {
 			}
 			zMsg = zMsg.Substring (0, i);
-			sqlite3_log (errcode, "os_win.c:%d: (%d) %s(%s) - %s", iLine, iErrno, zFunc, zPath, zMsg);
+			io.sqlite3_log (errcode, "os_win.c:%d: (%d) %s(%s) - %s", iLine, iErrno, zFunc, zPath, zMsg);
 			return errcode;
 		}
 
@@ -2094,7 +2094,7 @@ static int winOpenSharedMemory(winFile *pDbFd){
   }
   memset(pNew, 0, sizeof(*pNew));
   pNew->zFilename = (char)&pNew[1];
-  sqlite3_snprintf(nName+15, pNew->zFilename, "%s-shm", pDbFd->zPath);
+  io.sqlite3_snprintf(nName+15, pNew->zFilename, "%s-shm", pDbFd->zPath);
   sqlite3FileSuffix3(pDbFd->zPath, pNew->zFilename); 
 
   /* Look to see if there is an existing winShmNode that can be used.
@@ -2736,14 +2736,14 @@ shmpage_out:
         return SQLITE_IOERR;
 #endif
 			//if( sqlite3_temp_directory ){
-			//  sqlite3_snprintf(MAX_PATH-30, zTempPath, "%s", sqlite3_temp_directory);
+			//  io.sqlite3_snprintf(MAX_PATH-30, zTempPath, "%s", sqlite3_temp_directory);
 			//}else if( isNT() ){
 			//  string zMulti;
 			//  WCHAR zWidePath[MAX_PATH];
 			//  GetTempPathW(MAX_PATH-30, zWidePath);
 			//  zMulti = unicodeToUtf8(zWidePath);
 			//  if( zMulti ){
-			//    sqlite3_snprintf(MAX_PATH-30, zTempPath, "%s", zMulti);
+			//    io.sqlite3_snprintf(MAX_PATH-30, zTempPath, "%s", zMulti);
 			//    free(zMulti);
 			//  }else{
 			//    return SQLITE_NOMEM;
@@ -2763,7 +2763,7 @@ shmpage_out:
 			//  GetTempPathA(MAX_PATH-30, zMbcsPath);
 			//  zUtf8 = sqlite3_win32_mbcs_to_utf8(zMbcsPath);
 			//  if( zUtf8 ){
-			//    sqlite3_snprintf(MAX_PATH-30, zTempPath, "%s", zUtf8);
+			//    io.sqlite3_snprintf(MAX_PATH-30, zTempPath, "%s", zUtf8);
 			//    free(zUtf8);
 			//  }else{
 			//    return SQLITE_NOMEM;
@@ -3539,7 +3539,7 @@ return SQLITE_OK;
 				#endif
 			}
 			if (zOut != null) {
-				// sqlite3_snprintf(pVfs.mxPathname, zFull, "%s", zOut);
+				// io.sqlite3_snprintf(pVfs.mxPathname, zFull, "%s", zOut);
 				if (zFull.Length > pVfs.mxPathname)
 					zFull.Length = pVfs.mxPathname;
 				zFull.Append (zOut);

@@ -402,13 +402,13 @@ namespace Community.CsharpSqlite
         ///<param name="<dd> ^The SQLITE_CONFIG_LOG option takes two arguments: a pointer to a"><dd> ^The SQLITE_CONFIG_LOG option takes two arguments: a pointer to a</param>
         ///<param name="function with a call signature of void()(void*,int,const char), ">function with a call signature of void()(void*,int,const char), </param>
         ///<param name="and a pointer to void. ^If the function pointer is not NULL, it is">and a pointer to void. ^If the function pointer is not NULL, it is</param>
-        ///<param name="invoked by [sqlite3_log()] to process each logging event.  ^If the">invoked by [sqlite3_log()] to process each logging event.  ^If the</param>
-        ///<param name="function pointer is NULL, the [sqlite3_log()] interface becomes a no">op.</param>
+        ///<param name="invoked by [io.sqlite3_log()] to process each logging event.  ^If the">invoked by [io.sqlite3_log()] to process each logging event.  ^If the</param>
+        ///<param name="function pointer is NULL, the [io.sqlite3_log()] interface becomes a no">op.</param>
         ///<param name="^The void pointer that is the second argument to SQLITE_CONFIG_LOG is">^The void pointer that is the second argument to SQLITE_CONFIG_LOG is</param>
         ///<param name="passed through as the first parameter to the application">defined logger</param>
         ///<param name="function whenever that function is invoked.  ^The second parameter to">function whenever that function is invoked.  ^The second parameter to</param>
         ///<param name="the logger function is a copy of the first parameter to the corresponding">the logger function is a copy of the first parameter to the corresponding</param>
-        ///<param name="[sqlite3_log()] call and is intended to be a [result code] or an">[sqlite3_log()] call and is intended to be a [result code] or an</param>
+        ///<param name="[io.sqlite3_log()] call and is intended to be a [result code] or an">[io.sqlite3_log()] call and is intended to be a [result code] or an</param>
         ///<param name="[extended result code].  ^The third parameter passed to the logger is">[extended result code].  ^The third parameter passed to the logger is</param>
         ///<param name="log message after formatting via [sqlite3_snprintf()].">log message after formatting via [sqlite3_snprintf()].</param>
         ///<param name="The SQLite logging interface is not reentrant; the logger function">The SQLite logging interface is not reentrant; the logger function</param>

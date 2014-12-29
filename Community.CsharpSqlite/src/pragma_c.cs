@@ -510,7 +510,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			if(zLeft=="")
 				return;
 			if(minusFlag!=0) {
-				zRight=(pValue==null)?"":sqlite3MPrintf(db,"-%T",pValue);
+				zRight=(pValue==null)?"":io.sqlite3MPrintf(db,"-%T",pValue);
 			}
 			else {
 				zRight=sqlite3NameFromToken(db,pValue);
@@ -1053,7 +1053,7 @@ goto pragma_out;
 																	//sqlite3_free( ref sqlite3_temp_directory );
 																	if(zRight.Length>0) {
 																		sqlite3_temp_directory=zRight;
-																		//sqlite3_mprintf("%s", zRight);
+																		//io.sqlite3_mprintf("%s", zRight);
 																	}
 																	else {
 																		sqlite3_temp_directory="";
@@ -1498,7 +1498,7 @@ else
 																											v.sqlite3VdbeAddOp3(OP_IntegrityCk,2,cnt,1);
 																											v.sqlite3VdbeChangeP5((u8)i);
 																											addr=v.sqlite3VdbeAddOp1(OpCode.OP_IsNull,2);
-																											v.sqlite3VdbeAddOp4(OP_String8,0,3,0,sqlite3MPrintf(db,"*** in database %s ***\n",db.aDb[i].zName),P4_DYNAMIC);
+																											v.sqlite3VdbeAddOp4(OP_String8,0,3,0,io.sqlite3MPrintf(db,"*** in database %s ***\n",db.aDb[i].zName),P4_DYNAMIC);
 																											v.sqlite3VdbeAddOp3(OP_Move,2,4,1);
 																											v.sqlite3VdbeAddOp3(OP_Concat,4,3,2);
 																											v.sqlite3VdbeAddOp2(OP_ResultRow,2,1);

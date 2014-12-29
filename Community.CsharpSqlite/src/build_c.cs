@@ -309,7 +309,7 @@ p.zName, P4_STATIC );
 			//  va_list ap;
 			lock(lock_va_list) {
 				va_start(ap,zFormat);
-				zSql=sqlite3VMPrintf(db,zFormat,ap);
+				zSql=io.sqlite3VMPrintf(db,zFormat,ap);
 				va_end(ref ap);
 			}
 			//if( zSql=="" ){
@@ -1697,7 +1697,7 @@ goto begin_table_error;
 			//  db.mallocFailed = 1;
 			//  return 0;
 			//}
-			//sqlite3_snprintf(n, zStmt,"CREATE TABLE ");
+			//io.sqlite3_snprintf(n, zStmt,"CREATE TABLE ");
 			zStmt.Append("CREATE TABLE ");
 			k=StringExtensions.sqlite3Strlen30(zStmt);
 			identPut(zStmt,ref k,p.zName);
@@ -1736,7 +1736,7 @@ goto begin_table_error;
 				int len;
 				string zType;
 				zStmt.Append(zSep);
-				//  sqlite3_snprintf(n-k, zStmt[k], zSep);
+				//  io.sqlite3_snprintf(n-k, zStmt[k], zSep);
 				k=StringExtensions.sqlite3Strlen30(zStmt);
 				//  k += strlen(zStmt[k]);
 				zSep=zSep2;
@@ -1967,7 +1967,7 @@ goto begin_table_error;
 				}
 				else {
 					n=(int)(pParse.sNameToken.zRestSql.Length-pEnd.zRestSql.Length)+1;
-					zStmt=sqlite3MPrintf(db,"CREATE %s %.*s",zType2,n,pParse.sNameToken.zRestSql);
+					zStmt=io.sqlite3MPrintf(db,"CREATE %s %.*s",zType2,n,pParse.sNameToken.zRestSql);
 				}
 				///
 				///<summary>
@@ -1997,7 +1997,7 @@ goto begin_table_error;
 				///<summary>
 				///Reparse everything to update our internal data structures 
 				///</summary>
-				v.sqlite3VdbeAddParseSchemaOp(iDb,sqlite3MPrintf(db,"tbl_name='%q'",p.zName));
+				v.sqlite3VdbeAddParseSchemaOp(iDb,io.sqlite3MPrintf(db,"tbl_name='%q'",p.zName));
 			}
 			///
 			///<summary>
@@ -3174,7 +3174,7 @@ return;
 				Index pLoop;
 				for(pLoop=pTab.pIndex,n=1;pLoop!=null;pLoop=pLoop.pNext,n++) {
 				}
-				zName=sqlite3MPrintf(db,"sqlite_autoindex_%s_%d",pTab.zName,n);
+				zName=io.sqlite3MPrintf(db,"sqlite_autoindex_%s_%d",pTab.zName,n);
 				if(zName==null) {
 					goto exit_create_index;
 				}
@@ -3499,7 +3499,7 @@ goto exit_create_index;
 					///<summary>
 					///A named index with an explicit CREATE INDEX statement 
 					///</summary>
-					zStmt=sqlite3MPrintf(db,"CREATE%s INDEX %.*s",onError==OE_None?"":" UNIQUE",(int)(pName.zRestSql.Length-pEnd.zRestSql.Length)+1,pName.zRestSql);
+					zStmt=io.sqlite3MPrintf(db,"CREATE%s INDEX %.*s",onError==OE_None?"":" UNIQUE",(int)(pName.zRestSql.Length-pEnd.zRestSql.Length)+1,pName.zRestSql);
 				}
 				else {
 					///
@@ -3508,7 +3508,7 @@ goto exit_create_index;
 					///</summary>
 					///
 					///<summary>
-					///zStmt = sqlite3MPrintf(""); 
+					///zStmt = io.sqlite3MPrintf(""); 
 					///</summary>
 					zStmt=null;
 				}
@@ -3528,7 +3528,7 @@ goto exit_create_index;
 				if(pTblName!=null) {
 					sqlite3RefillIndex(pParse,pIndex,iMem);
 					sqlite3ChangeCookie(pParse,iDb);
-					v.sqlite3VdbeAddParseSchemaOp(iDb,sqlite3MPrintf(db,"name='%q' AND type='index'",pIndex.zName));
+					v.sqlite3VdbeAddParseSchemaOp(iDb,io.sqlite3MPrintf(db,"name='%q' AND type='index'",pIndex.zName));
 					v.sqlite3VdbeAddOp1(OpCode.OP_Expire,0);
 				}
 			}

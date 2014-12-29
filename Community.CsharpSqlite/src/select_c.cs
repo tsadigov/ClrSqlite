@@ -960,7 +960,7 @@ namespace Community.CsharpSqlite {
 		static void explainTempTable(Parse pParse,string zUsage) {
 			if(pParse.explain==2) {
 				Vdbe v=pParse.pVdbe;
-				string zMsg=sqlite3MPrintf(pParse.db,"USE TEMP B-TREE FOR %s",zUsage);
+				string zMsg=io.sqlite3MPrintf(pParse.db,"USE TEMP B-TREE FOR %s",zUsage);
 				v.sqlite3VdbeAddOp4(OP_Explain,pParse.iSelectId,0,0,zMsg,P4_DYNAMIC);
 			}
 		}
@@ -1026,7 +1026,7 @@ static void explainSetInteger(ref int a, int b){ a = b;}
 			Debug.Assert(op==TK_UNION||op==TK_EXCEPT||op==TK_INTERSECT||op==TK_ALL);
 			if(pParse.explain==2) {
 				Vdbe v=pParse.pVdbe;
-				string zMsg=sqlite3MPrintf(pParse.db,"COMPOUND SUBQUERIES %d AND %d %s(%s)",iSub1,iSub2,bUseTmp?"USING TEMP B-TREE ":"",selectOpName((TokenType)op));
+				string zMsg=io.sqlite3MPrintf(pParse.db,"COMPOUND SUBQUERIES %d AND %d %s(%s)",iSub1,iSub2,bUseTmp?"USING TEMP B-TREE ":"",selectOpName((TokenType)op));
 				v.sqlite3VdbeAddOp4(OP_Explain,pParse.iSelectId,0,0,zMsg,P4_DYNAMIC);
 			}
 		}
@@ -1291,7 +1291,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 						else
 							if(fullNames) {
 								string zName;
-								zName=sqlite3MPrintf(db,"%s.%s",pTab.zName,zCol);
+								zName=io.sqlite3MPrintf(db,"%s.%s",pTab.zName,zCol);
 								v.sqlite3VdbeSetColName(i,COLNAME_NAME,zName,SQLITE_DYNAMIC);
 							}
 							else {
@@ -1423,19 +1423,19 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 						pTab=pColExpr.pTab;
 						if(iCol<0)
 							iCol=pTab.iPKey;
-						zName=sqlite3MPrintf(db,"%s",iCol>=0?pTab.aCol[iCol].zName:"rowid");
+						zName=io.sqlite3MPrintf(db,"%s",iCol>=0?pTab.aCol[iCol].zName:"rowid");
 					}
 					else
 						if(pColExpr.op==TK_ID) {
 							Debug.Assert(!pColExpr.ExprHasProperty(EP_IntValue));
-							zName=sqlite3MPrintf(db,"%s",pColExpr.u.zToken);
+							zName=io.sqlite3MPrintf(db,"%s",pColExpr.u.zToken);
 						}
 						else {
 							///
 							///<summary>
 							///Use the original text of the column expression as its name 
 							///</summary>
-							zName=sqlite3MPrintf(db,"%s",pEList.a[i].zSpan);
+							zName=io.sqlite3MPrintf(db,"%s",pEList.a[i].zSpan);
 						}
 				}
 				//if ( db.mallocFailed != 0 )
@@ -1454,7 +1454,7 @@ static void explainComposite(Parse v, int w,int x,int y,bool z) {}
 					if(aCol[j].zName.Equals(zName,StringComparison.InvariantCultureIgnoreCase)) {
 						string zNewName;
 						//zName[nName] = 0;
-						zNewName=sqlite3MPrintf(db,"%s:%d",zName.Substring(0,nName),++cnt);
+						zNewName=io.sqlite3MPrintf(db,"%s:%d",zName.Substring(0,nName),++cnt);
 						db.sqlite3DbFree(ref zName);
 						zName=zNewName;
 						j=-1;

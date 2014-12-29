@@ -226,7 +226,7 @@ namespace Community.CsharpSqlite
 ///Load new statistics out of the sqlite_stat1 table 
 ///</summary>
 
-			zSql = sqlite3MPrintf (db, "SELECT tbl, idx, stat FROM %Q.sqlite_stat1", sInfo.zDatabase);
+			zSql = io.sqlite3MPrintf (db, "SELECT tbl, idx, stat FROM %Q.sqlite_stat1", sInfo.zDatabase);
 			//if ( zSql == null )
 			//{
 			//  rc = SQLITE_NOMEM;
@@ -249,7 +249,7 @@ namespace Community.CsharpSqlite
   {
     sqlite3_stmt pStmt = null;
 
-    zSql = sqlite3MPrintf( db,
+    zSql = io.sqlite3MPrintf( db,
     "SELECT idx,sampleno,sample FROM %Q.sqlite_stat2", sInfo.zDatabase );
     //if( null==zSql ){
     //rc = SQLITE_NOMEM;

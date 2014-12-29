@@ -496,13 +496,13 @@ namespace Community.CsharpSqlite {
           c = 's';
         }
 
-        sqlite3_snprintf( 100, zCsr, "%c", c );
+        io.sqlite3_snprintf( 100, zCsr, "%c", c );
         zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
-        sqlite3_snprintf( 100, zCsr, "%d[", pMem.n );
+        io.sqlite3_snprintf( 100, zCsr, "%d[", pMem.n );
         zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         for ( i = 0; i < 16 && i < pMem.n; i++ )
         {
-          sqlite3_snprintf( 100, zCsr, "%02X", ( (int)pMem.zBLOB[i] & 0xFF ) );
+          io.sqlite3_snprintf( 100, zCsr, "%02X", ( (int)pMem.zBLOB[i] & 0xFF ) );
           zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         }
         for ( i = 0; i < 16 && i < pMem.n; i++ )
@@ -514,11 +514,11 @@ namespace Community.CsharpSqlite {
             zBuf.Append( z );//*zCsr++ = z;
         }
 
-        sqlite3_snprintf( 100, zCsr, "]%s", encnames[pMem.enc] );
+        io.sqlite3_snprintf( 100, zCsr, "]%s", encnames[pMem.enc] );
         zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         if ( ( f & MEM_Zero ) != 0 )
         {
-          sqlite3_snprintf( 100, zCsr, "+%dz", pMem.u.nZero );
+          io.sqlite3_snprintf( 100, zCsr, "+%dz", pMem.u.nZero );
           zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         }
         //*zCsr = '\0';
@@ -547,7 +547,7 @@ namespace Community.CsharpSqlite {
           zBuf.Append( 's' );
         }
         //k = 2;
-        sqlite3_snprintf( 100, zCsr, "%d", pMem.n );//zBuf[k], "%d", pMem.n );
+        io.sqlite3_snprintf( 100, zCsr, "%d", pMem.n );//zBuf[k], "%d", pMem.n );
         zBuf.Append( zCsr );
         //k += StringExtensions.sqlite3Strlen30( &zBuf[k] );
         zBuf.Append( '[' );// zBuf[k++] = '[';
@@ -564,7 +564,7 @@ namespace Community.CsharpSqlite {
           }
         }
         zBuf.Append( ']' );//zBuf[k++] = ']';
-        sqlite3_snprintf( 100, zCsr, encnames[pMem.enc] );//& zBuf[k], encnames[pMem.enc] );
+        io.sqlite3_snprintf( 100, zCsr, encnames[pMem.enc] );//& zBuf[k], encnames[pMem.enc] );
         zBuf.Append( zCsr );
         //k += StringExtensions.sqlite3Strlen30( &zBuf[k] );
         //zBuf[k++] = 0;

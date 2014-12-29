@@ -1120,7 +1120,7 @@ sqlite3DbFree(db, ref p);
 			lock (lock_va_list) {
 				string z;
 				va_start (ap, zFormat);
-				z = sqlite3VMPrintf (db, zFormat, ap);
+				z = io.sqlite3VMPrintf (db, zFormat, ap);
 				va_end (ref ap);
 				db.sqlite3DbFree (ref pz);
 				pz = z;

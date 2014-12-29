@@ -107,7 +107,7 @@ namespace Community.CsharpSqlite
 					Debug.Assert (len > 0);
 				}
 				while (token != TokenType.TK_LP && token != TokenType.TK_USING);
-				zRet = sqlite3MPrintf (db, "%.*s\"%w\"%s", zLoc, zSql.Substring (0, zLoc), zTableName, zSql.Substring (zLoc + tname.Length));
+				zRet = io.sqlite3MPrintf (db, "%.*s\"%w\"%s", zLoc, zSql.Substring (0, zLoc), zTableName, zSql.Substring (zLoc + tname.Length));
 				context.sqlite3_result_text (zRet, -1, SQLITE_DYNAMIC);
 			}
 		}
@@ -177,7 +177,7 @@ namespace Community.CsharpSqlite
 						break;
 					StringExtensions.sqlite3Dequote (ref zParent);
 					if (zOld.Equals (zParent, StringComparison.InvariantCultureIgnoreCase)) {
-						string zOut = sqlite3MPrintf (db, "%s%.*s\"%w\"", zOutput, zIdx - zLeft, zInput.Substring (zLeft), zNew);
+						string zOut = io.sqlite3MPrintf (db, "%s%.*s\"%w\"", zOutput, zIdx - zLeft, zInput.Substring (zLeft), zNew);
 						db.sqlite3DbFree (ref zOutput);
 						zOutput = zOut;
 						zIdx += n;
@@ -187,7 +187,7 @@ namespace Community.CsharpSqlite
 					db.sqlite3DbFree (ref zParent);
 				}
 			}
-			zResult = sqlite3MPrintf (db, "%s%s", zOutput, zInput.Substring (zLeft));
+			zResult = io.sqlite3MPrintf (db, "%s%s", zOutput, zInput.Substring (zLeft));
 			context.sqlite3_result_text (zResult, -1, SQLITE_DYNAMIC);
 			db.sqlite3DbFree (ref zOutput);
 		}
@@ -284,7 +284,7 @@ namespace Community.CsharpSqlite
 ///<param name="in the CREATE TRIGGER statement.">in the CREATE TRIGGER statement.</param>
 ///<param name=""></param>
 
-				zRet = sqlite3MPrintf (db, "%.*s\"%w\"%s", zLoc, zSql.Substring (0, zLoc), zTableName, zSql.Substring (zLoc + tname.Length));
+				zRet = io.sqlite3MPrintf (db, "%.*s\"%w\"%s", zLoc, zSql.Substring (0, zLoc), zTableName, zSql.Substring (zLoc + tname.Length));
 				context.sqlite3_result_text (zRet, -1, SQLITE_DYNAMIC);
 			}
 		}
@@ -339,10 +339,10 @@ namespace Community.CsharpSqlite
 		{
 			string zNew;
 			if (String.IsNullOrEmpty (zWhere)) {
-				zNew = sqlite3MPrintf (db, "name=%Q", zConstant);
+				zNew = io.sqlite3MPrintf (db, "name=%Q", zConstant);
 			}
 			else {
-				zNew = sqlite3MPrintf (db, "%s OR name=%Q", zWhere, zConstant);
+				zNew = io.sqlite3MPrintf (db, "%s OR name=%Q", zWhere, zConstant);
 				db.sqlite3DbFree (ref zWhere);
 			}
 			return zNew;

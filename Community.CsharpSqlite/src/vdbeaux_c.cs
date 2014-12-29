@@ -654,7 +654,7 @@ namespace Community.CsharpSqlite {
 			case P4_KEYINFO: {
 				int i,j;
 				KeyInfo pKeyInfo=pOp.p4.pKeyInfo;
-				sqlite3_snprintf(nTemp,zTemp,"keyinfo(%d",pKeyInfo.nField);
+				io.sqlite3_snprintf(nTemp,zTemp,"keyinfo(%d",pKeyInfo.nField);
 				i=StringExtensions.sqlite3Strlen30(zTemp);
 				for(j=0;j<pKeyInfo.nField;j++) {
 					CollSeq pColl=pKeyInfo.aColl[j];
@@ -690,24 +690,24 @@ namespace Community.CsharpSqlite {
 			}
 			case P4_COLLSEQ: {
 				CollSeq pColl=pOp.p4.pColl;
-				sqlite3_snprintf(nTemp,zTemp,"collseq(%.20s)",(pColl!=null?pColl.zName:"null"));
+				io.sqlite3_snprintf(nTemp,zTemp,"collseq(%.20s)",(pColl!=null?pColl.zName:"null"));
 				break;
 			}
 			case P4_FUNCDEF: {
 				FuncDef pDef=pOp.p4.pFunc;
-				sqlite3_snprintf(nTemp,zTemp,"%s(%d)",pDef.zName,pDef.nArg);
+				io.sqlite3_snprintf(nTemp,zTemp,"%s(%d)",pDef.zName,pDef.nArg);
 				break;
 			}
 			case P4_INT64: {
-				sqlite3_snprintf(nTemp,zTemp,"%lld",pOp.p4.pI64);
+				io.sqlite3_snprintf(nTemp,zTemp,"%lld",pOp.p4.pI64);
 				break;
 			}
 			case P4_INT32: {
-				sqlite3_snprintf(nTemp,zTemp,"%d",pOp.p4.i);
+				io.sqlite3_snprintf(nTemp,zTemp,"%d",pOp.p4.i);
 				break;
 			}
 			case P4_REAL: {
-				sqlite3_snprintf(nTemp,zTemp,"%.16g",pOp.p4.pReal);
+				io.sqlite3_snprintf(nTemp,zTemp,"%.16g",pOp.p4.pReal);
 				break;
 			}
 			case P4_MEM: {
@@ -718,11 +718,11 @@ namespace Community.CsharpSqlite {
 				}
 				else
 					if((pMem.flags&MEM_Int)!=0) {
-						sqlite3_snprintf(nTemp,zTemp,"%lld",pMem.u.i);
+						io.sqlite3_snprintf(nTemp,zTemp,"%lld",pMem.u.i);
 					}
 					else
 						if((pMem.flags&MEM_Real)!=0) {
-							sqlite3_snprintf(nTemp,zTemp,"%.16g",pMem.r);
+							io.sqlite3_snprintf(nTemp,zTemp,"%.16g",pMem.r);
 						}
 						else {
 							Debug.Assert((pMem.flags&MEM_Blob)!=0);
@@ -733,16 +733,16 @@ namespace Community.CsharpSqlite {
 			#if !SQLITE_OMIT_VIRTUALTABLE
 			case P4_VTAB: {
 				sqlite3_vtab pVtab=pOp.p4.pVtab.pVtab;
-				sqlite3_snprintf(nTemp,zTemp,"vtab:%p:%p",pVtab,pVtab.pModule);
+				io.sqlite3_snprintf(nTemp,zTemp,"vtab:%p:%p",pVtab,pVtab.pModule);
 				break;
 			}
 			#endif
 			case P4_INTARRAY: {
-				sqlite3_snprintf(nTemp,zTemp,"intarray");
+				io.sqlite3_snprintf(nTemp,zTemp,"intarray");
 				break;
 			}
 			case P4_SUBPROGRAM: {
-				sqlite3_snprintf(nTemp,zTemp,"program");
+				io.sqlite3_snprintf(nTemp,zTemp,"program");
 				break;
 			}
 			default: {
@@ -848,7 +848,7 @@ void sqlite3VdbeLeave(Vdbe *p){
         pOut = System.Console.Out;
       zP4 = displayP4( pOp, zPtr, 50 );
       StringBuilder zOut = new StringBuilder( 10 );
-      sqlite3_snprintf( 999, zOut, zFormat1, pc,
+      io.sqlite3_snprintf( 999, zOut, zFormat1, pc,
       sqlite3OpcodeName( pOp.opcode ), pOp.p1, pOp.p2, pOp.p3, zP4, pOp.p5,
 #if SQLITE_DEBUG
 																																																 pOp.zComment != null ? pOp.zComment : ""
@@ -1280,7 +1280,7 @@ if ( pOp.opcode == OP_Trace && pOp.p4.z != null )
 {
 int i, j;
 string z = "";//char z[1000];
-sqlite3_snprintf( 1000, z, "%s", pOp.p4.z );
+io.sqlite3_snprintf( 1000, z, "%s", pOp.p4.z );
 //for(i=0; CharExtensions.sqlite3Isspace(z[i]); i++){}
 //for(j=0; z[i]; i++){
 //if( CharExtensions.sqlite3Isspace(z[i]) ){
@@ -1796,7 +1796,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 					db.sqlite3DbFree(ref zMaster);
 					sqlite3_randomness(sizeof(u32),ref iRandom);
 					//random.Length
-					zMaster=sqlite3MPrintf(db,"%s-mj%08X",zMainFile,iRandom&0x7fffffff);
+					zMaster=io.sqlite3MPrintf(db,"%s-mj%08X",zMainFile,iRandom&0x7fffffff);
 					//if (!zMaster)
 					//{
 					//  return SQLITE_NOMEM;

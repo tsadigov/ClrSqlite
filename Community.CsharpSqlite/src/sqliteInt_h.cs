@@ -1928,7 +1928,7 @@ void *sqlite3_wsd_find(void *K, int L);
 		/// The SQLITE_*_BKPT macros are substitutes for the error codes with
 		/// the same name but without the _BKPT suffix.  These macros invoke
 		/// routines that report the line-number on which the error originated
-		/// using sqlite3_log().  The routines also provide a convenient place
+		/// using io.sqlite3_log().  The routines also provide a convenient place
 		/// to set a debugger breakpoint.
 		///
 		///</summary>
@@ -2039,9 +2039,9 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//#endif
 		//void sqlite3VXPrintf(StrAccum*, int, const char*, va_list);
 		#if !SQLITE_OMIT_TRACE
-		//void sqlite3XPrintf(StrAccum*, const char*, ...);
+		//void io.sqlite3XPrintf(StrAccum*, const char*, ...);
 		#endif
-		//char *sqlite3MPrintf(sqlite3*,const char*, ...);
+		//char *io.sqlite3MPrintf(sqlite3*,const char*, ...);
 		//char *sqlite3VMPrintf(sqlite3*,const char*, va_list);
 		//char *sqlite3MAppendf(sqlite3*,char*,const char*,...);
 		#if SQLITE_TEST || SQLITE_DEBUG

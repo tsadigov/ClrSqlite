@@ -45,18 +45,18 @@ namespace Community.CsharpSqlite {
 			///
 			///</summary>
 			if(db.nDb>=db.aLimit[SQLITE_LIMIT_ATTACHED]+2) {
-				zErrDyn=sqlite3MPrintf(db,"too many attached databases - max %d",db.aLimit[SQLITE_LIMIT_ATTACHED]);
+				zErrDyn=io.sqlite3MPrintf(db,"too many attached databases - max %d",db.aLimit[SQLITE_LIMIT_ATTACHED]);
 				goto attach_error;
 			}
 			if(0==db.autoCommit) {
-				zErrDyn=sqlite3MPrintf(db,"cannot ATTACH database within transaction");
+				zErrDyn=io.sqlite3MPrintf(db,"cannot ATTACH database within transaction");
 				goto attach_error;
 			}
 			for(i=0;i<db.nDb;i++) {
 				string z=db.aDb[i].zName;
 				Debug.Assert(z!=null&&zName!=null);
 				if(z.Equals(zName,StringComparison.InvariantCultureIgnoreCase)) {
-					zErrDyn=sqlite3MPrintf(db,"database %s is already in use",zName);
+					zErrDyn=io.sqlite3MPrintf(db,"database %s is already in use",zName);
 					goto attach_error;
 				}
 			}
@@ -112,7 +112,7 @@ namespace Community.CsharpSqlite {
 			db.nDb++;
 			if(rc==SQLITE_CONSTRAINT) {
 				rc=SQLITE_ERROR;
-				zErrDyn=sqlite3MPrintf(db,"database is already attached");
+				zErrDyn=io.sqlite3MPrintf(db,"database is already attached");
 			}
 			else
 				if(rc==SQLITE_OK) {
@@ -124,7 +124,7 @@ namespace Community.CsharpSqlite {
 					//}
 					//else 
 					if(aNew.pSchema.file_format!=0&&aNew.pSchema.enc!=ENC(db)) {
-						zErrDyn=sqlite3MPrintf(db,"attached databases must use the same text encoding as main database");
+						zErrDyn=io.sqlite3MPrintf(db,"attached databases must use the same text encoding as main database");
 						rc=SQLITE_ERROR;
 					}
 					pPager=aNew.pBt.sqlite3BtreePager();
@@ -197,11 +197,11 @@ namespace Community.CsharpSqlite {
 				if(rc==SQLITE_NOMEM||rc==SQLITE_IOERR_NOMEM) {
 					////        db.mallocFailed = 1;
 					db.sqlite3DbFree(ref zErrDyn);
-					zErrDyn=sqlite3MPrintf(db,"out of memory");
+					zErrDyn=io.sqlite3MPrintf(db,"out of memory");
 				}
 				else
 					if(zErrDyn=="") {
-						zErrDyn=sqlite3MPrintf(db,"unable to open database: %s",zFile);
+						zErrDyn=io.sqlite3MPrintf(db,"unable to open database: %s",zFile);
 					}
 				goto attach_error;
 			}
@@ -244,19 +244,19 @@ namespace Community.CsharpSqlite {
 					break;
 			}
 			if(i>=db.nDb) {
-				sqlite3_snprintf(200,zErr,"no such database: %s",zName);
+				 io.sqlite3_snprintf(200,zErr,"no such database: %s",zName);
 				goto detach_error;
 			}
 			if(i<2) {
-				sqlite3_snprintf(200,zErr,"cannot detach database %s",zName);
+				io.sqlite3_snprintf(200,zErr,"cannot detach database %s",zName);
 				goto detach_error;
 			}
 			if(0==db.autoCommit) {
-				sqlite3_snprintf(200,zErr,"cannot DETACH database within transaction");
+				io.sqlite3_snprintf(200,zErr,"cannot DETACH database within transaction");
 				goto detach_error;
 			}
 			if(pDb.pBt.sqlite3BtreeIsInReadTrans()||pDb.pBt.sqlite3BtreeIsInBackup()) {
-				sqlite3_snprintf(200,zErr,"database %s is locked",zName);
+				io.sqlite3_snprintf(200,zErr,"database %s is locked",zName);
 				goto detach_error;
 			}
 			BTreeMethods.sqlite3BtreeClose(ref pDb.pBt);

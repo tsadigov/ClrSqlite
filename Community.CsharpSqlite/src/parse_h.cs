@@ -607,7 +607,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				Debug.Assert(nAlloc>=pNew.nCol&&nAlloc%8==0&&nAlloc-pNew.nCol<8);
 				pNew.aCol=new Column[nAlloc];
 				// (Column*)sqlite3DbMallocZero( db, sizeof(Column) * nAlloc );
-				pNew.zName=sqlite3MPrintf(db,"sqlite_altertab_%s",pTab.zName);
+				pNew.zName=io.sqlite3MPrintf(db,"sqlite_altertab_%s",pTab.zName);
 				if(pNew.aCol==null||pNew.zName==null) {
 					//        db.mallocFailed = 1;
 					goto exit_begin_add_column;
@@ -1123,7 +1123,7 @@ goto exit_rename_table;
 				///<summary>
 				///Reload the table, index and permanent trigger schemas. 
 				///</summary>
-				zWhere=sqlite3MPrintf(this.db,"tbl_name=%Q",zName);
+				zWhere=io.sqlite3MPrintf(this.db,"tbl_name=%Q",zName);
 				if(zWhere==null)
 					return;
 				v.sqlite3VdbeAddParseSchemaOp(iDb,zWhere);
@@ -1168,7 +1168,7 @@ goto exit_rename_table;
 					}
 				}
 				if(!String.IsNullOrEmpty(zWhere)) {
-					zWhere=sqlite3MPrintf(this.db,"type='trigger' AND (%s)",zWhere);
+					zWhere=io.sqlite3MPrintf(this.db,"type='trigger' AND (%s)",zWhere);
 					//sqlite3DbFree( pParse.db, ref zWhere );
 					//zWhere = zNew;
 				}
@@ -3400,7 +3400,7 @@ goto attach_end;
 					}
 					case TokenType.TK_ILLEGAL: {
 						db.sqlite3DbFree(ref pzErrMsg);
-						pzErrMsg=sqlite3MPrintf(db,"unrecognized token: \"%T\"",(object)this.sLastToken);
+						pzErrMsg=io.sqlite3MPrintf(db,"unrecognized token: \"%T\"",(object)this.sLastToken);
 						nErr++;
 						goto abort_parse;
 					}
@@ -3447,7 +3447,7 @@ sqlite3ParserStackPeak(pEngine)
 				//assert( pzErrMsg!=0 );
 				if(this.zErrMsg!=null) {
 					pzErrMsg=this.zErrMsg;
-					sqlite3_log(this.rc,"%s",pzErrMsg);
+					io.sqlite3_log(this.rc,"%s",pzErrMsg);
 					this.zErrMsg="";
 					nErr++;
 				}
@@ -4672,7 +4672,7 @@ isView = false;
 					case OE_Fail: {
 						string zMsg;
 						v.sqlite3VdbeAddOp3(OP_HaltIfNull,SQLITE_CONSTRAINT,onError,regData+i);
-						zMsg=sqlite3MPrintf(this.db,"%s.%s may not be NULL",pTab.zName,pTab.aCol[i].zName);
+						zMsg=io.sqlite3MPrintf(this.db,"%s.%s may not be NULL",pTab.zName,pTab.aCol[i].zName);
 						v.sqlite3VdbeChangeP4(-1,zMsg,P4_DYNAMIC);
 						break;
 					}
@@ -4887,7 +4887,7 @@ isView = false;
 						StrAccum errMsg=new StrAccum(200);
 						string zSep;
 						string zErr;
-						sqlite3StrAccumInit(errMsg,null,0,200);
+						io.sqlite3StrAccumInit(errMsg,null,0,200);
 						errMsg.db=this.db;
 						zSep=pIdx.nColumn>1?"columns ":"column ";
 						for(j=0;j<pIdx.nColumn;j++) {
@@ -4897,7 +4897,7 @@ isView = false;
                             errMsg.sqlite3StrAccumAppend(zCol, -1);
 						}
                         errMsg.sqlite3StrAccumAppend(pIdx.nColumn > 1 ? " are not unique" : " is not unique", -1);
-						zErr=sqlite3StrAccumFinish(errMsg);
+						zErr=io.sqlite3StrAccumFinish(errMsg);
 						sqlite3HaltConstraint(this,onError,zErr,0);
 						errMsg.db.sqlite3DbFree(ref zErr);
 						break;
@@ -10668,19 +10668,19 @@ range_est_fallback:
 					if((flags&WHERE_MULTI_OR)!=0||(wctrlFlags&WHERE_ONETABLE_ONLY)!=0)
 						return;
 					isSearch=(pLevel.plan.nEq>0)||(flags&(WHERE_BTM_LIMIT|WHERE_TOP_LIMIT))!=0||(wctrlFlags&(WHERE_ORDERBY_MIN|WHERE_ORDERBY_MAX))!=0;
-					zMsg.Append(sqlite3MPrintf(db,"%s",isSearch?"SEARCH":"SCAN"));
+					zMsg.Append(io.sqlite3MPrintf(db,"%s",isSearch?"SEARCH":"SCAN"));
 					if(pItem.pSelect!=null) {
-						zMsg.Append(sqlite3MAppendf(db,null," SUBQUERY %d",pItem.iSelectId));
+						zMsg.Append(io.sqlite3MAppendf(db,null," SUBQUERY %d",pItem.iSelectId));
 					}
 					else {
-						zMsg.Append(sqlite3MAppendf(db,null," TABLE %s",pItem.zName));
+						zMsg.Append(io.sqlite3MAppendf(db,null," TABLE %s",pItem.zName));
 					}
 					if(pItem.zAlias!=null) {
-						zMsg.Append(sqlite3MAppendf(db,null," AS %s",pItem.zAlias));
+						zMsg.Append(io.sqlite3MAppendf(db,null," AS %s",pItem.zAlias));
 					}
 					if((flags&WHERE_INDEXED)!=0) {
 						string zWhere=db.explainIndexRange(pLevel,pItem.pTab);
-						zMsg.Append(sqlite3MAppendf(db,null," USING %s%sINDEX%s%s%s",((flags&WHERE_TEMP_INDEX)!=0?"AUTOMATIC ":""),((flags&WHERE_IDX_ONLY)!=0?"COVERING ":""),((flags&WHERE_TEMP_INDEX)!=0?"":" "),((flags&WHERE_TEMP_INDEX)!=0?"":pLevel.plan.u.pIdx.zName),zWhere!=null?zWhere:""));
+						zMsg.Append(io.sqlite3MAppendf(db,null," USING %s%sINDEX%s%s%s",((flags&WHERE_TEMP_INDEX)!=0?"AUTOMATIC ":""),((flags&WHERE_IDX_ONLY)!=0?"COVERING ":""),((flags&WHERE_TEMP_INDEX)!=0?"":" "),((flags&WHERE_TEMP_INDEX)!=0?"":pLevel.plan.u.pIdx.zName),zWhere!=null?zWhere:""));
 						db.sqlite3DbFree(ref zWhere);
 					}
 					else
@@ -10706,7 +10706,7 @@ range_est_fallback:
 						else
 							if((flags&WHERE_VIRTUALTABLE)!=0) {
 								sqlite3_index_info pVtabIdx=pLevel.plan.u.pVtabIdx;
-								zMsg.Append(sqlite3MAppendf(db,null," VIRTUAL TABLE INDEX %d:%s",pVtabIdx.idxNum,pVtabIdx.idxStr));
+								zMsg.Append(io.sqlite3MAppendf(db,null," VIRTUAL TABLE INDEX %d:%s",pVtabIdx.idxNum,pVtabIdx.idxStr));
 							}
 					#endif
 					if((wctrlFlags&(WHERE_ORDERBY_MIN|WHERE_ORDERBY_MAX))!=0) {
@@ -10716,7 +10716,7 @@ range_est_fallback:
 					else {
 						nRow=(sqlite3_int64)pLevel.plan.nRow;
 					}
-					zMsg.Append(sqlite3MAppendf(db,null," (~%lld rows)",nRow));
+					zMsg.Append(io.sqlite3MAppendf(db,null," (~%lld rows)",nRow));
 					v.sqlite3VdbeAddOp4(OP_Explain,iId,iLevel,iFrom,zMsg,P4_DYNAMIC);
 				}
 			}
@@ -11892,7 +11892,7 @@ range_est_fallback:
 				}
 				#if !SQLITE_OMIT_EXPLAIN
 				if(this.explain==2) {
-					string zMsg=sqlite3MPrintf(this.db,"EXECUTE %s%s SUBQUERY %d",testAddr!=0?"":"CORRELATED ",pExpr.Operator==TokenType.TK_IN?"LIST":"SCALAR",this.iNextSelectId);
+					string zMsg=io.sqlite3MPrintf(this.db,"EXECUTE %s%s SUBQUERY %d",testAddr!=0?"":"CORRELATED ",pExpr.Operator==TokenType.TK_IN?"LIST":"SCALAR",this.iNextSelectId);
 					v.sqlite3VdbeAddOp4(OP_Explain,this.iSelectId,0,0,zMsg,P4_DYNAMIC);
 				}
 				#endif
@@ -12430,7 +12430,7 @@ range_est_fallback:
 						this.sNameToken.Length=this.sNameToken.zRestSql.Length;
 						//(int)( pEnd.z - pParse.sNameToken.z ) + pEnd.n;
 					}
-					zStmt=sqlite3MPrintf(db,"CREATE VIRTUAL TABLE %T",this.sNameToken.zRestSql.Substring(0,this.sNameToken.Length));
+					zStmt=io.sqlite3MPrintf(db,"CREATE VIRTUAL TABLE %T",this.sNameToken.zRestSql.Substring(0,this.sNameToken.Length));
 					///
 					///<summary>
 					///A slot for the record has already been allocated in the 
@@ -12448,7 +12448,7 @@ range_est_fallback:
 					v=this.sqlite3GetVdbe();
 					sqlite3ChangeCookie(this,iDb);
 					v.sqlite3VdbeAddOp2(OP_Expire,0,0);
-					zWhere=sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);
+					zWhere=io.sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);
 					v.sqlite3VdbeAddParseSchemaOp(iDb,zWhere);
 					v.sqlite3VdbeAddOp4(OP_VCreate,iDb,0,0,pTab.zName,StringExtensions.sqlite3Strlen30(pTab.zName)+1);
 				}

@@ -328,7 +328,7 @@ namespace Community.CsharpSqlite
                         if (pTab == null)
                             return WRC_Abort;
                         pTab.nRef = 1;
-                        pTab.zName = sqlite3MPrintf(db, "sqlite_subquery_%p_", pTab);
+                        pTab.zName = io.sqlite3MPrintf(db, "sqlite_subquery_%p_", pTab);
                         while (pSel.pPrior != null)
                         {
                             pSel = pSel.pPrior;
@@ -548,7 +548,7 @@ namespace Community.CsharpSqlite
                                         pExpr = pParse.sqlite3PExpr(TK_DOT, pLeft, pRight, 0);
                                         if (longNames)
                                         {
-                                            zColname = sqlite3MPrintf(db, "%s.%s", zTabName, zName);
+                                            zColname = io.sqlite3MPrintf(db, "%s.%s", zTabName, zName);
                                             zToFree = zColname;
                                         }
                                     }
