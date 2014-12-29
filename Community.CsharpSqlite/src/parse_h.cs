@@ -1163,7 +1163,7 @@ goto exit_rename_table;
 					sqlite3 db=this.db;
 					for(pTrig=sqlite3TriggerList(this,pTab);pTrig!=null;pTrig=pTrig.pNext) {
 						if(pTrig.pSchema==pTempSchema) {
-							zWhere=whereOrName(db,zWhere,pTrig.zName);
+							zWhere=alter.whereOrName(db,zWhere,pTrig.zName);
 						}
 					}
 				}
@@ -1184,7 +1184,7 @@ goto exit_rename_table;
 				FKey p;
 				string zWhere="";
 				for(p=sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
-					zWhere=whereOrName(this.db,zWhere,p.pFrom.zName);
+					zWhere=alter.whereOrName(this.db,zWhere,p.pFrom.zName);
 				}
 				return zWhere;
 			}
@@ -3383,7 +3383,7 @@ goto attach_end;
 				i<zSql.Length) {
 					Debug.Assert(i>=0);
 					//pParse->sLastToken.z = &zSql[i];
-					i+=(this.sLastToken=Sqlite3.GetToken(zSql,i)).Length;
+                    i += (this.sLastToken = Sqlite3.Lexer.GetToken(zSql, i)).Length;
 					//Log.WriteLine("token :" + this.sLastToken);
 					if(i>mxSqlLen) {
 						this.rc=SqlResult.SQLITE_TOOBIG;

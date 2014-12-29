@@ -9,6 +9,7 @@ namespace Community.CsharpSqlite
 {
 	public partial class Sqlite3
 	{
+
 		///
 ///<summary>
 ///

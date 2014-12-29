@@ -2620,6 +2620,18 @@ enableTimer = booleanValue(azArg[1]);
 				#if !(_WIN32) && !(WIN32) && !(__OS2__) && !(__RTP__) && !(_WRS_KERNEL)
 																																																																												BEGIN_TIMER;
 #endif
+                int leftat = 0;
+                int red = 0;
+                do
+                {
+                    red = testtokenize(zSql, leftat);
+                    leftat+=red;
+                }
+                while (leftat<zSql.Length);
+                
+                
+
+
 				rc = Sqlite3.sqlite3_exec (p.db, zSql.ToString (), (dxCallback)callback, p, ref zErrMsg);
 				#if !(_WIN32) && !(WIN32) && !(__OS2__) && !(__RTP__) && !(_WRS_KERNEL)
 																																																																												END_TIMER;
@@ -3003,7 +3015,15 @@ return 0;
 			else {
 				//int rc;
 				open_db (data);
+
+                
+
 				rc = Sqlite3.sqlite3_exec (data.db, zFirstCmd.ToString (), (dxCallback)callback, data, ref zErrMsg);
+
+
+                
+                
+
 				if (rc != 0 && zErrMsg != "") {
 					fprintf (stderr, "SQL error: %s\n", zErrMsg);
 					exit (1);
@@ -3053,6 +3073,15 @@ return 0;
 		}
 		return rc;
 	}
+
+    private static int testtokenize(StringBuilder zFirstCmd,int leftAt)
+    {
+        TokenType tk = new TokenType();
+        var result = Sqlite3.Lexer.sqlite3GetToken(zFirstCmd.ToString(), leftAt, ref tk);
+        var tkn=zFirstCmd.ToString().Substring(leftAt, result);
+        Console.WriteLine("\tr: " + result + "   \ttk:" + tk+"  \t"+tkn);
+        return result;
+    }
 
 	// Helper Variables for C#
 	static TextReader stdin = Console.In;

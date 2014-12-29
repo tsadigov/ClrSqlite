@@ -2211,7 +2211,7 @@ FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
                 }
                 DateUtils.sqlite3RegisterDateTimeFunctions();
 #if !SQLITE_OMIT_ALTERTABLE
-                sqlite3AlterFunctions();
+                alter.sqlite3AlterFunctions();
 #endif
             }
         }

@@ -386,13 +386,10 @@ set { _op = value; }
 #endif
                 return cp;
             }
-            public///<summary>
                 /// pExpr is an operand of a comparison operator.  aff2 is the
                 /// type affinity of the other operand.  This routine returns the
                 /// type affinity that should be used for the comparison operator.
-                ///
-                ///</summary>
-            char sqlite3CompareAffinity(char aff2)
+            public char sqlite3CompareAffinity(char aff2)
             {
                 char aff1 = this.sqlite3ExprAffinity();
                 if (aff1 != '\0' && aff2 != '\0')
