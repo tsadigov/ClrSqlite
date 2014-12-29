@@ -4637,7 +4637,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///<param name="rooted at page 1 of a zero">byte database.  </param>
 							Debug.Assert(rc==SQLITE_EMPTY||rc==SQLITE_OK);
 							if(rc==SQLITE_EMPTY) {
-								sqlite3MemFreeBtCursor(ref pCur.pCursor);
+								mempoolMethods.sqlite3MemFreeBtCursor(ref pCur.pCursor);
 								rc=SQLITE_OK;
 							}
 							///

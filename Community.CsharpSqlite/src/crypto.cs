@@ -132,7 +132,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 			public codec_ctx Copy() {
 				codec_ctx c=new codec_ctx();
 				c.mode_rekey=mode_rekey;
-				c.buffer=sqlite3MemMalloc(buffer.Length);
+				c.buffer=mempoolMethods.sqlite3MemMalloc(buffer.Length);
 				c.pBt=pBt;
 				if(read_ctx!=null)
 					c.read_ctx=read_ctx.Copy();
@@ -414,7 +414,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 			}
 			CODEC_TRACE("sqlite3Codec: switch mode=%d offset=%d\n",mode,offset);
 			if(ctx.buffer.Length!=pg_sz)
-				ctx.buffer=sqlite3MemMalloc(pg_sz);
+				ctx.buffer=mempoolMethods.sqlite3MemMalloc(pg_sz);
 			switch(mode) {
 			case SQLITE_DECRYPT:
 			codec_cipher(ctx.read_ctx,pgno,CIPHER_DECRYPT,pg_sz,pData,ctx.buffer);
@@ -484,7 +484,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 				///<param name="pre">allocate a page buffer of PageSize bytes. This will</param>
 				///<param name="be used as a persistent buffer for encryption and decryption">be used as a persistent buffer for encryption and decryption</param>
 				///<param name="operations to avoid overhead of multiple memory allocations">operations to avoid overhead of multiple memory allocations</param>
-				ctx.buffer=sqlite3MemMalloc(ctx.pBt.GetPageSize());
+				ctx.buffer=mempoolMethods.sqlite3MemMalloc(ctx.pBt.GetPageSize());
 				//sqlite3Malloc(sqlite3BtreeGetPageSize(ctx.pBt);
 				//if(ctx.buffer == null) return SQLITE_NOMEM;
 				///
@@ -528,7 +528,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 				// If we are reopening an existing database, redo the header information setup 
 				//
 				BtShared pBt=db.aDb[0].pBt.pBt;
-				byte[] zDbHeader=sqlite3MemMalloc((int)pBt.pageSize);
+				byte[] zDbHeader=mempoolMethods.sqlite3MemMalloc((int)pBt.pageSize);
 				// pBt.pPager.pCodec.buffer;
 				pBt.pPager.sqlite3PagerReadFileheader(zDbHeader.Length,zDbHeader);
 				if(Converter.sqlite3Get4byte(zDbHeader)>0)// Existing Database, need to reset some values

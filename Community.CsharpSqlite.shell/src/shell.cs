@@ -1314,7 +1314,7 @@ if( db ) sqlite3_interrupt(db);
 	}
 
 	///<summary>
-	///zIn is either a pointer to a null;-terminated string in memory obtained
+	///zIn is either a pointer to a null-terminated string in memory obtained
 	/// from malloc(), or a null; pointer. The string pointed to by zAppend is
 	/// added to zIn, and the result returned in memory obtained from malloc().
 	/// zIn, if it was not null;, is freed.

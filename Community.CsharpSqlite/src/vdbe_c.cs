@@ -340,7 +340,7 @@ namespace Community.CsharpSqlite {
 					// (u32)&pMem.z[ROUND8(sizeof( VdbeCursor ))];
 				}
 				if(isBtreeCursor!=0) {
-					pCx.pCursor=sqlite3MemMallocBtCursor(pCx.pCursor);
+					pCx.pCursor=mempoolMethods.sqlite3MemMallocBtCursor(pCx.pCursor);
 					// (BtCursor)&pMem.z[ROUND8(sizeof( VdbeCursor )) + 2 * nField * sizeof( u32 )];
 					pCx.pCursor.sqlite3BtreeCursorZero();
 				}

@@ -256,7 +256,7 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
 		static int sqlite3MallocInit ()
 		{
 			if (sqlite3GlobalConfig.m.xMalloc == null) {
-				sqlite3MemSetDefault ();
+				mempoolMethods.sqlite3MemSetDefault ();
 			}
 			mem0 = new Mem0Global (0, 0, null, 0, null, null, 1, 1, 8, 8);
 			//memset(&mem0, 0, sizeof(mem0));

@@ -649,19 +649,19 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             {
                 if (pPrior != null)
                     for (int i = 0; i < pPrior.Length; i++)
-                        sqlite3MemFreeMem(ref pPrior[i]);
+                        mempoolMethods.sqlite3MemFreeMem(ref pPrior[i]);
             }
 
             public void sqlite3DbFree(ref Mem pPrior)
             {
                 if (pPrior != null)
-                    sqlite3MemFreeMem(ref pPrior);
+                    mempoolMethods.sqlite3MemFreeMem(ref pPrior);
             }
 
             public void sqlite3DbFree(ref int[] pPrior)
             {
                 if (pPrior != null)
-                    sqlite3MemFreeInt(ref pPrior);
+                    mempoolMethods.sqlite3MemFreeInt(ref pPrior);
             }
         }
     }
