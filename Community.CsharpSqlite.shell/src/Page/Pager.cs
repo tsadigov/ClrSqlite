@@ -1881,7 +1881,7 @@ return (pPager->pWal!=0);
                     if (this.pagerUseWal())
                     {
                         Debug.Assert(!this.jfd.isOpen);
-                        sqlite3WalEndReadTransaction(this.pWal);
+                        wal.sqlite3WalEndReadTransaction(this.pWal);
                         this.eState = PAGER_OPEN;
                     }
                     else
@@ -2175,10 +2175,10 @@ PagerMethods.sqlite3PagerUnref(p);
                         ///<param name="lock held on the database file.">lock held on the database file.</param>
                         ///<param name=""></param>
 
-                        rc2 = sqlite3WalEndWriteTransaction(this.pWal);
+                        rc2 = wal.sqlite3WalEndWriteTransaction(this.pWal);
                         Debug.Assert(rc2 == SQLITE_OK);
                     }
-                    if (!this.exclusiveMode && (!this.pagerUseWal() || sqlite3WalExclusiveMode(this.pWal, 0)))
+                    if (!this.exclusiveMode && (!this.pagerUseWal() || wal.sqlite3WalExclusiveMode(this.pWal, 0)))
                     {
                         rc2 = this.pagerUnlockDb(SHARED_LOCK);
                         this.changeCountDone = false;
@@ -3337,7 +3337,7 @@ PagerMethods.sqlite3PagerUnref(p);
 
                     Debug.Assert(this.eState == PAGER_OPEN);
                     Debug.Assert(this.eLock >= SHARED_LOCK || this.noReadlock != 0);
-                    nPage = sqlite3WalDbsize(this.pWal);
+                    nPage = wal.sqlite3WalDbsize(this.pWal);
                     ///
                     ///<summary>
                     ///</summary>
@@ -3577,7 +3577,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         i64 offset = pSavepoint.iSubRec * (4 + this.pageSize);
                         if (this.pagerUseWal())
                         {
-                            rc = sqlite3WalSavepointUndo(this.pWal, pSavepoint.aWalData);
+                            rc = wal.sqlite3WalSavepointUndo(this.pWal, pSavepoint.aWalData);
                         }
                         for (ii = pSavepoint.iSubRec; rc == SQLITE_OK && ii < this.nSubRec; ii++)
                         {
@@ -5430,14 +5430,14 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                             ///
                             ///</summary>
 
-                            if (this.exclusiveMode && sqlite3WalExclusiveMode(this.pWal, -1))
+                            if (this.exclusiveMode && wal.sqlite3WalExclusiveMode(this.pWal, -1))
                             {
                                 rc = this.pagerLockDb(EXCLUSIVE_LOCK);
                                 if (rc != SQLITE_OK)
                                 {
                                     return rc;
                                 }
-                                sqlite3WalExclusiveMode(this.pWal, 1);
+                                wal.sqlite3WalExclusiveMode(this.pWal, 1);
                             }
                             ///
                             ///<summary>
@@ -5448,7 +5448,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                             ///<param name="holds the write">lock. If possible, the upper layer will call it.</param>
                             ///<param name=""></param>
 
-                            rc = sqlite3WalBeginWriteTransaction(this.pWal);
+                            rc = wal.sqlite3WalBeginWriteTransaction(this.pWal);
                         }
                         else
                         {
@@ -6270,7 +6270,7 @@ rc = pager_incr_changecounter(pPager, 0);
                             //}
                             if (this.pagerUseWal())
                             {
-                                sqlite3WalSavepoint(this.pWal, aNew[ii].aWalData);
+                                wal.sqlite3WalSavepoint(this.pWal, aNew[ii].aWalData);
                             }
                             this.nSavepoint = ii + 1;
                         }
@@ -6692,8 +6692,8 @@ this.memDb != 0
                     Debug.Assert(eMode == PAGER_LOCKINGMODE_QUERY || eMode == PAGER_LOCKINGMODE_NORMAL || eMode == PAGER_LOCKINGMODE_EXCLUSIVE);
                     Debug.Assert(PAGER_LOCKINGMODE_QUERY < 0);
                     Debug.Assert(PAGER_LOCKINGMODE_NORMAL >= 0 && PAGER_LOCKINGMODE_EXCLUSIVE >= 0);
-                    Debug.Assert(this.exclusiveMode || false == sqlite3WalHeapMemory(this.pWal));
-                    if (eMode >= 0 && !this.tempFile && !sqlite3WalHeapMemory(this.pWal))
+                    Debug.Assert(this.exclusiveMode || false == wal.sqlite3WalHeapMemory(this.pWal));
+                    if (eMode >= 0 && !this.tempFile && !wal.sqlite3WalHeapMemory(this.pWal))
                     {
                         this.exclusiveMode = eMode != 0;
                     }
@@ -6889,7 +6889,7 @@ this.memDb != 0
                     if (iLimit >= -1)
                     {
                         this.journalSizeLimit = iLimit;
-                        sqlite3WalLimit(this.pWal, iLimit);
+                        wal.sqlite3WalLimit(this.pWal, iLimit);
                     }
                     return this.journalSizeLimit;
                 }

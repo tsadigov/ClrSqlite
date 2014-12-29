@@ -818,7 +818,7 @@ static void pagerReportSize(Pager X){}
                     ///</summary>
                     ///<param name="Try to pull the page from the write">ahead log. </param>
 
-                    rc = sqlite3WalRead(pPager.pWal, pgno, ref isInWal, pgsz, pPg.pData);
+                    rc = wal.sqlite3WalRead(pPager.pWal, pgno, ref isInWal, pgsz, pPg.pData);
                 }
                 if (rc == SQLITE_OK && 0 == isInWal)
                 {
