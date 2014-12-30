@@ -7073,7 +7073,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 				///</summary>
 				{
 					//#line 403 "parse.y"
-					sqlite3SelectDelete(pParse.db,ref (yypminor.yy387));
+					SelectMethods.sqlite3SelectDelete(pParse.db,ref (yypminor.yy387));
 					//#line 1399 "parse.c"
 				}
 				break;
@@ -9098,7 +9098,7 @@ return yy_default[stateno];
 			//#line 163 "parse.y"
 			{
 				build.sqlite3EndTable(pParse,0,0,yymsp[0].minor.yy387);
-				sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387);
+				SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387);
 			}
 			//#line 2231 "parse.c"
 			break;
@@ -9772,7 +9772,7 @@ return yy_default[stateno];
 			{
 				SelectDest dest=new SelectDest(SelectResultType.Output,'\0',0,0,0);
 				Select.sqlite3Select(pParse,yymsp[0].minor.yy387,ref dest);
-				sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387);
+				SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387);
 			}
 			//#line 2512 "parse.c"
 			break;
@@ -9799,7 +9799,7 @@ return yy_default[stateno];
 					yymsp[0].minor.yy387.pPrior=yymsp[-2].minor.yy387;
 				}
 				else {
-					sqlite3SelectDelete(pParse.db,ref yymsp[-2].minor.yy387);
+					SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[-2].minor.yy387);
 				}
 				yygotominor.yy387=yymsp[0].minor.yy387;
 			}
@@ -10067,7 +10067,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 540 "parse.y"
 			{
-				yygotominor.yy4=sqlite3JoinType(pParse,yymsp[-1].minor.yy0Token,0,0);
+				yygotominor.yy4=SelectMethods.sqlite3JoinType(pParse,yymsp[-1].minor.yy0Token,0,0);
 			}
 			//#line 2665 "parse.c"
 			break;
@@ -10078,7 +10078,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 541 "parse.y"
 			{
-				yygotominor.yy4=sqlite3JoinType(pParse,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy0Token,0);
+                yygotominor.yy4 = SelectMethods.sqlite3JoinType(pParse, yymsp[-2].minor.yy0Token, yymsp[-1].minor.yy0Token, 0);
 			}
 			//#line 2670 "parse.c"
 			break;
@@ -10089,7 +10089,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 543 "parse.y"
 			{
-				yygotominor.yy4=sqlite3JoinType(pParse,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy0Token);
+                yygotominor.yy4 = SelectMethods.sqlite3JoinType(pParse, yymsp[-3].minor.yy0Token, yymsp[-2].minor.yy0Token, yymsp[-1].minor.yy0Token);
 			}
 			//#line 2675 "parse.c"
 			break;
@@ -11000,7 +11000,7 @@ return yy_default[stateno];
 					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
 				}
 				else {
-					sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
+					SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
 				}
 				yygotominor.yy118.zStart=yymsp[-2].minor.yy0Token.zRestSql;
 				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
@@ -11022,7 +11022,7 @@ return yy_default[stateno];
 					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
 				}
 				else {
-					sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
+					SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
 				}
 				if(yymsp[-3].minor.yy4!=0)
 					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
@@ -11070,7 +11070,7 @@ return yy_default[stateno];
 					pParse.sqlite3ExprSetHeight(p);
 				}
 				else {
-					sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
+					SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
 				}
 				yygotominor.yy118.zStart=yymsp[-3].minor.yy0Token.zRestSql;
 				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);

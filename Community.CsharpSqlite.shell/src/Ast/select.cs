@@ -235,7 +235,7 @@ namespace Community.CsharpSqlite
             {
                 Walker w = new Walker();
                 w.xSelectCallback = Select.selectExpander;
-                w.xExprCallback = exprWalkNoop;
+                w.xExprCallback = SelectMethods.exprWalkNoop;
                 w.pParse = pParse;
                 w.sqlite3WalkSelect(pSelect);
             }
@@ -333,7 +333,7 @@ namespace Community.CsharpSqlite
                         {
                             pSel = pSel.pPrior;
                         }
-                        selectColumnsFromExprList(pParse, pSel.pEList, ref pTab.nCol, ref pTab.aCol);
+                        SelectMethods.selectColumnsFromExprList(pParse, pSel.pEList, ref pTab.nCol, ref pTab.aCol);
                         pTab.iPKey = -1;
                         pTab.nRowEst = 1000000;
                         pTab.tabFlags |= TF_Ephemeral;
@@ -368,7 +368,7 @@ namespace Community.CsharpSqlite
                     ///<summary>
                     ///Locate the index named by the INDEXED BY clause, if any. 
                     ///</summary>
-                    if (sqlite3IndexedByLookup(pParse, pFrom) != 0)
+                    if (SelectMethods.sqlite3IndexedByLookup(pParse, pFrom) != 0)
                     {
                         return WRC_Abort;
                     }
@@ -382,7 +382,7 @@ namespace Community.CsharpSqlite
                     ///<summary>
                     ///db.mallocFailed != 0 || 
                     ///</summary>
-                sqliteProcessJoin(pParse, p) != 0)
+                SelectMethods.sqliteProcessJoin(pParse, p) != 0)
                 {
                     return WRC_Abort;
                 }
@@ -519,7 +519,7 @@ namespace Community.CsharpSqlite
                                     if (i > 0 && (zTName == null || zTName.Length == 0))
                                     {
                                         int iDummy = 0;
-                                        if ((pFrom.jointype & JT_NATURAL) != 0 && tableAndColumnIndex(pTabList, i, zName, ref iDummy, ref iDummy) != 0)
+                                        if ((pFrom.jointype & JT_NATURAL) != 0 && SelectMethods.tableAndColumnIndex(pTabList, i, zName, ref iDummy, ref iDummy) != 0)
                                         {
                                             ///
                                             ///<summary>
@@ -626,7 +626,7 @@ namespace Community.CsharpSqlite
                     ///</summary>
                 )
                     return;
-                sqlite3SelectAddTypeInfo(pParse, p);
+                SelectMethods.sqlite3SelectAddTypeInfo(pParse, p);
             }
 
 
@@ -795,7 +795,7 @@ namespace Community.CsharpSqlite
                 ///
                 ///</summary>
 #if !SQLITE_OMIT_SUBQUERY
-                if (checkForMultiColumnSelectError(pParse, pDest, pEList.nExpr))
+                if (SelectMethods.checkForMultiColumnSelectError(pParse, pDest, pEList.nExpr))
                 {
                     goto select_end;
                 }
@@ -827,7 +827,7 @@ namespace Community.CsharpSqlite
                     ///Check to see if the subquery can be absorbed into the parent. 
                     ///</summary>
                     isAggSub = (pSub.selFlags & SelectFlags.Aggregate) != 0;
-                    if (flattenSubquery(pParse, p, i, isAgg, isAggSub) != 0)
+                    if (SelectMethods.flattenSubquery(pParse, p, i, isAgg, isAggSub) != 0)
                     {
                         if (isAggSub)
                         {
@@ -840,7 +840,7 @@ namespace Community.CsharpSqlite
                     {
                         dest.Init(SelectResultType.EphemTab, pItem.iCursor);
                         Debug.Assert(0 == pItem.isPopulated);
-                        explainSetInteger(ref pItem.iSelectId, (int)pParse.iNextSelectId);
+                        SelectMethods.explainSetInteger(ref pItem.iSelectId, (int)pParse.iNextSelectId);
                         sqlite3Select(pParse, pSub, ref dest);
                         pItem.isPopulated = 1;
                         pItem.pTab.nRowEst = (uint)pSub.nSelectRow;
@@ -888,7 +888,7 @@ namespace Community.CsharpSqlite
                         }
                     }
                     rc = multiSelect(pParse, p, pDest);
-                    explainSetInteger(ref pParse.iSelectId, iRestoreSelectId);
+                    SelectMethods.explainSetInteger(ref pParse.iSelectId, iRestoreSelectId);
                     return rc;
                 }
 #endif
@@ -931,7 +931,7 @@ namespace Community.CsharpSqlite
                 if (pOrderBy != null)
                 {
                     KeyInfo pKeyInfo;
-                    pKeyInfo = keyInfoFromExprList(pParse, pOrderBy);
+                    pKeyInfo = SelectMethods.keyInfoFromExprList(pParse, pOrderBy);
                     pOrderBy.iECursor = pParse.nTab++;
                     p.addrOpenEphm[2] = addrSortIndex = v.sqlite3VdbeAddOp4(OP_OpenEphemeral, pOrderBy.iECursor, pOrderBy.nExpr + 2, 0, pKeyInfo, P4_KEYINFO_HANDOFF);
                 }
@@ -955,7 +955,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
                 iEnd = v.sqlite3VdbeMakeLabel();
                 p.nSelectRow = (double)IntegerExtensions.LARGEST_INT64;
-                computeLimitRegisters(pParse, p, iEnd);
+                SelectMethods.computeLimitRegisters(pParse, p, iEnd);
                 ///
                 ///<summary>
                 ///Open a virtual index to use for the distinct set.
@@ -966,7 +966,7 @@ namespace Community.CsharpSqlite
                     KeyInfo pKeyInfo;
                     Debug.Assert(isAgg || pGroupBy != null);
                     distinct = pParse.nTab++;
-                    pKeyInfo = keyInfoFromExprList(pParse, p.pEList);
+                    pKeyInfo = SelectMethods.keyInfoFromExprList(pParse, p.pEList);
                     v.sqlite3VdbeAddOp4(OP_OpenEphemeral, distinct, 0, 0, pKeyInfo, P4_KEYINFO_HANDOFF);
                     v.sqlite3VdbeChangeP5(BTREE_UNORDERED);
                 }
@@ -1009,7 +1009,7 @@ namespace Community.CsharpSqlite
                     ///
                     ///</summary>
                     Debug.Assert(!isDistinct);
-                    selectInnerLoop(pParse, p, pEList, 0, 0, pOrderBy, -1, pDest, pWInfo.iContinue, pWInfo.iBreak);
+                    SelectMethods.selectInnerLoop(pParse, p, pEList, 0, 0, pOrderBy, -1, pDest, pWInfo.iContinue, pWInfo.iBreak);
                     ///
                     ///<summary>
                     ///End the database scan loop.
@@ -1166,7 +1166,7 @@ namespace Community.CsharpSqlite
                         ///
                         ///</summary>
                         sAggInfo.sortingIdx = pParse.nTab++;
-                        pKeyInfo = keyInfoFromExprList(pParse, pGroupBy);
+                        pKeyInfo = SelectMethods.keyInfoFromExprList(pParse, pGroupBy);
                         addrSortingIdx = v.sqlite3VdbeAddOp4(OP_OpenEphemeral, sAggInfo.sortingIdx, sAggInfo.nSortingColumn, 0, pKeyInfo, P4_KEYINFO_HANDOFF);
                         ///
                         ///<summary>
@@ -1228,7 +1228,7 @@ namespace Community.CsharpSqlite
                             int regRecord;
                             int nCol;
                             int nGroupBy;
-                            explainTempTable(pParse, isDistinct && 0 == (p.selFlags & SelectFlags.Distinct) ? "DISTINCT" : "GROUP BY");
+                            SelectMethods.explainTempTable(pParse, isDistinct && 0 == (p.selFlags & SelectFlags.Distinct) ? "DISTINCT" : "GROUP BY");
                             groupBySort = 1;
                             nGroupBy = pGroupBy.nExpr;
                             nCol = nGroupBy + 1;
@@ -1330,7 +1330,7 @@ namespace Community.CsharpSqlite
                         ///the current row
                         ///</summary>
                         v.sqlite3VdbeJumpHere(j1);
-                        updateAccumulator(pParse, sAggInfo);
+                        SelectMethods.updateAccumulator(pParse, sAggInfo);
                         v.sqlite3VdbeAddOp2(OP_Integer, 1, iUseFlag);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "indicate data in accumulator" );
@@ -1381,9 +1381,9 @@ namespace Community.CsharpSqlite
                         v.sqlite3VdbeAddOp2(OP_IfPos, iUseFlag, addrOutputRow + 2);
                         VdbeComment(v, "Groupby result generator entry point");
                         v.sqlite3VdbeAddOp1(OpCode.OP_Return, regOutputRow);
-                        finalizeAggFunctions(pParse, sAggInfo);
+                        SelectMethods.finalizeAggFunctions(pParse, sAggInfo);
                         pParse.sqlite3ExprIfFalse(pHaving, addrOutputRow + 1, SQLITE_JUMPIFNULL);
-                        selectInnerLoop(pParse, p, p.pEList, 0, 0, pOrderBy, distinct, pDest, addrOutputRow + 1, addrSetAbort);
+                        SelectMethods.selectInnerLoop(pParse, p, p.pEList, 0, 0, pOrderBy, distinct, pDest, addrOutputRow + 1, addrSetAbort);
                         v.sqlite3VdbeAddOp1(OpCode.OP_Return, regOutputRow);
                         VdbeComment(v, "end groupby result generator");
                         ///
@@ -1392,7 +1392,7 @@ namespace Community.CsharpSqlite
                         ///<param name="Generate a subroutine that will reset the group">by accumulator</param>
                         ///<param name=""></param>
                         v.sqlite3VdbeResolveLabel(addrReset);
-                        resetAccumulator(pParse, sAggInfo);
+                        SelectMethods.resetAccumulator(pParse, sAggInfo);
                         v.sqlite3VdbeAddOp1(OpCode.OP_Return, regReset);
                     }
                     ///
@@ -1404,7 +1404,7 @@ namespace Community.CsharpSqlite
                         ExprList pDel = null;
 #if !SQLITE_OMIT_BTREECOUNT
                         Table pTab;
-                        if ((pTab = isSimpleCount(p, sAggInfo)) != null)
+                        if ((pTab = SelectMethods.isSimpleCount(p, sAggInfo)) != null)
                         {
                             ///
                             ///<summary>
@@ -1523,7 +1523,7 @@ namespace Community.CsharpSqlite
                             ///
                             ///</summary>
                             ExprList pMinMax = null;
-                            int flag = minMaxQuery(p);
+                            int flag = SelectMethods.minMaxQuery(p);
                             if (flag != 0)
                             {
                                 Debug.Assert(!p.pEList.a[0].pExpr.ExprHasProperty(EP_xIsSelect));
@@ -1542,14 +1542,14 @@ namespace Community.CsharpSqlite
                             ///of output.
                             ///
                             ///</summary>
-                            resetAccumulator(pParse, sAggInfo);
+                            SelectMethods.resetAccumulator(pParse, sAggInfo);
                             pWInfo = pParse.sqlite3WhereBegin(pTabList, pWhere, ref pMinMax, (byte)flag);
                             if (pWInfo == null)
                             {
                                 exprc.sqlite3ExprListDelete(db, ref pDel);
                                 goto select_end;
                             }
-                            updateAccumulator(pParse, sAggInfo);
+                            SelectMethods.updateAccumulator(pParse, sAggInfo);
                             if (pMinMax == null && flag != 0)
                             {
                                 v.sqlite3VdbeAddOp2(OP_Goto, 0, pWInfo.iBreak);
@@ -1559,11 +1559,11 @@ namespace Community.CsharpSqlite
 #endif
                             }
                             pWInfo.sqlite3WhereEnd();
-                            finalizeAggFunctions(pParse, sAggInfo);
+                            SelectMethods.finalizeAggFunctions(pParse, sAggInfo);
                         }
                         pOrderBy = null;
                         pParse.sqlite3ExprIfFalse(pHaving, addrEnd, SQLITE_JUMPIFNULL);
-                        selectInnerLoop(pParse, p, p.pEList, 0, 0, null, -1, pDest, addrEnd, addrEnd);
+                        SelectMethods.selectInnerLoop(pParse, p, p.pEList, 0, 0, null, -1, pDest, addrEnd, addrEnd);
                         exprc.sqlite3ExprListDelete(db, ref pDel);
                     }
                     v.sqlite3VdbeResolveLabel(addrEnd);
@@ -1574,7 +1574,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
                 if (distinct >= 0)
                 {
-                    explainTempTable(pParse, "DISTINCT");
+                    SelectMethods.explainTempTable(pParse, "DISTINCT");
                 }
                 ///
                 ///<summary>
@@ -1584,8 +1584,8 @@ namespace Community.CsharpSqlite
                 ///</summary>
                 if (pOrderBy != null)
                 {
-                    explainTempTable(pParse, "ORDER BY");
-                    generateSortTail(pParse, p, v, pEList.nExpr, pDest);
+                    SelectMethods.explainTempTable(pParse, "ORDER BY");
+                    SelectMethods.generateSortTail(pParse, p, v, pEList.nExpr, pDest);
                 }
                 ///
                 ///<summary>
@@ -1607,7 +1607,7 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
             select_end:
-                explainSetInteger(ref pParse.iSelectId, iRestoreSelectId);
+                SelectMethods.explainSetInteger(ref pParse.iSelectId, iRestoreSelectId);
                 ///
                 ///<summary>
                 ///Identify column names if results of the SELECT are to be output.
@@ -1615,7 +1615,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
                 if (rc == SQLITE_OK && pDest.eDest == SelectResultType.Output)
                 {
-                    generateColumnNames(pParse, pTabList, pEList);
+                    SelectMethods.generateColumnNames(pParse, pTabList, pEList);
                 }
                 db.sqlite3DbFree(ref sAggInfo.aCol);
                 db.sqlite3DbFree(ref sAggInfo.aFunc);
@@ -1727,13 +1727,13 @@ namespace Community.CsharpSqlite
                 dest = pDest;
                 if (pPrior.pOrderBy != null)
                 {
-                    utilc.sqlite3ErrorMsg(pParse, "ORDER BY clause should come after %s not before", selectOpName(p.TokenOp));
+                    utilc.sqlite3ErrorMsg(pParse, "ORDER BY clause should come after %s not before", SelectMethods.selectOpName(p.TokenOp));
                     rc = 1;
                     goto multi_select_end;
                 }
                 if (pPrior.pLimit != null)
                 {
-                    utilc.sqlite3ErrorMsg(pParse, "LIMIT clause should come after %s not before", selectOpName(p.TokenOp));
+                    utilc.sqlite3ErrorMsg(pParse, "LIMIT clause should come after %s not before", SelectMethods.selectOpName(p.TokenOp));
                     rc = 1;
                     goto multi_select_end;
                 }
@@ -1764,7 +1764,7 @@ namespace Community.CsharpSqlite
                 Debug.Assert(p.pEList != null && pPrior.pEList != null);
                 if (p.pEList.nExpr != pPrior.pEList.nExpr)
                 {
-                    utilc.sqlite3ErrorMsg(pParse, "SELECTs to the left and right of %s" + " do not have the same number of result columns", selectOpName(p.TokenOp));
+                    utilc.sqlite3ErrorMsg(pParse, "SELECTs to the left and right of %s" + " do not have the same number of result columns", SelectMethods.selectOpName(p.TokenOp));
                     rc = 1;
                     goto multi_select_end;
                 }
@@ -1775,7 +1775,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
                 if (p.pOrderBy != null)
                 {
-                    return multiSelectOrderBy(pParse, p, pDest);
+                    return SelectMethods.multiSelectOrderBy(pParse, p, pDest);
                 }
                 ///
                 ///<summary>
@@ -1791,7 +1791,7 @@ namespace Community.CsharpSqlite
                             Debug.Assert(pPrior.pLimit == null);
                             pPrior.pLimit = p.pLimit;
                             pPrior.pOffset = p.pOffset;
-                            explainSetInteger(ref iSub1, pParse.iNextSelectId);
+                            SelectMethods.explainSetInteger(ref iSub1, pParse.iNextSelectId);
                             rc = Select.sqlite3Select(pParse, pPrior, ref dest);
                             p.pLimit = null;
                             p.pOffset = null;
@@ -1809,7 +1809,7 @@ namespace Community.CsharpSqlite
 																																																																																																																													              VdbeComment( v, "Jump ahead if LIMIT reached" );
 #endif
                             }
-                            explainSetInteger(ref iSub2, pParse.iNextSelectId);
+                            SelectMethods.explainSetInteger(ref iSub2, pParse.iNextSelectId);
                             rc = Select.sqlite3Select(pParse, p, ref dest);
                             testcase(rc != SQLITE_OK);
                             pDelete = p.pPrior;
@@ -1902,7 +1902,7 @@ namespace Community.CsharpSqlite
                             ///</summary>
                             Debug.Assert(pPrior.pOrderBy == null);
                             uniondest.Init(priorOp, unionTab);
-                            explainSetInteger(ref iSub1, pParse.iNextSelectId);
+                            SelectMethods.explainSetInteger(ref iSub1, pParse.iNextSelectId);
                             rc = Select.sqlite3Select(pParse, pPrior, ref uniondest);
                             if (rc != 0)
                             {
@@ -1928,7 +1928,7 @@ namespace Community.CsharpSqlite
                             pOffset = p.pOffset;
                             p.pOffset = null;
                             uniondest.eDest = op;
-                            explainSetInteger(ref iSub2, pParse.iNextSelectId);
+                            SelectMethods.explainSetInteger(ref iSub2, pParse.iNextSelectId);
                             rc = Select.sqlite3Select(pParse, p, ref uniondest);
                             testcase(rc != SQLITE_OK);
                             ///
@@ -1963,14 +1963,14 @@ namespace Community.CsharpSqlite
                                     Select pFirst = p;
                                     while (pFirst.pPrior != null)
                                         pFirst = pFirst.pPrior;
-                                    generateColumnNames(pParse, null, pFirst.pEList);
+                                    SelectMethods.generateColumnNames(pParse, null, pFirst.pEList);
                                 }
                                 iBreak = v.sqlite3VdbeMakeLabel();
                                 iCont = v.sqlite3VdbeMakeLabel();
-                                computeLimitRegisters(pParse, p, iBreak);
+                                SelectMethods.computeLimitRegisters(pParse, p, iBreak);
                                 v.sqlite3VdbeAddOp2(OP_Rewind, unionTab, iBreak);
                                 iStart = v.sqlite3VdbeCurrentAddr();
-                                selectInnerLoop(pParse, p, p.pEList, unionTab, p.pEList.nExpr, null, -1, dest, iCont, iBreak);
+                                SelectMethods.selectInnerLoop(pParse, p, p.pEList, unionTab, p.pEList.nExpr, null, -1, dest, iCont, iBreak);
                                 v.sqlite3VdbeResolveLabel(iCont);
                                 v.sqlite3VdbeAddOp2(OP_Next, unionTab, iStart);
                                 v.sqlite3VdbeResolveLabel(iBreak);
@@ -2008,7 +2008,7 @@ namespace Community.CsharpSqlite
                             ///
                             ///</summary>
                             intersectdest.Init(SelectResultType.Union, tab1);
-                            explainSetInteger(ref iSub1, pParse.iNextSelectId);
+                            SelectMethods.explainSetInteger(ref iSub1, pParse.iNextSelectId);
                             rc = Select.sqlite3Select(pParse, pPrior, ref intersectdest);
                             if (rc != 0)
                             {
@@ -2028,7 +2028,7 @@ namespace Community.CsharpSqlite
                             pOffset = p.pOffset;
                             p.pOffset = null;
                             intersectdest.iParm = tab2;
-                            explainSetInteger(ref iSub2, pParse.iNextSelectId);
+                            SelectMethods.explainSetInteger(ref iSub2, pParse.iNextSelectId);
                             rc = Select.sqlite3Select(pParse, p, ref intersectdest);
                             testcase(rc != SQLITE_OK);
                             p.pPrior = pPrior;
@@ -2049,17 +2049,17 @@ namespace Community.CsharpSqlite
                                 Select pFirst = p;
                                 while (pFirst.pPrior != null)
                                     pFirst = pFirst.pPrior;
-                                generateColumnNames(pParse, null, pFirst.pEList);
+                                SelectMethods.generateColumnNames(pParse, null, pFirst.pEList);
                             }
                             iBreak = v.sqlite3VdbeMakeLabel();
                             iCont = v.sqlite3VdbeMakeLabel();
-                            computeLimitRegisters(pParse, p, iBreak);
+                            SelectMethods.computeLimitRegisters(pParse, p, iBreak);
                             v.sqlite3VdbeAddOp2(OP_Rewind, tab1, iBreak);
                             r1 = pParse.sqlite3GetTempReg();
                             iStart = v.sqlite3VdbeAddOp2(OP_RowKey, tab1, r1);
                             v.sqlite3VdbeAddOp4Int(OP_NotFound, tab2, iCont, r1, 0);
                             pParse.sqlite3ReleaseTempReg(r1);
-                            selectInnerLoop(pParse, p, p.pEList, tab1, p.pEList.nExpr, null, -1, dest, iCont, iBreak);
+                            SelectMethods.selectInnerLoop(pParse, p, p.pEList, tab1, p.pEList.nExpr, null, -1, dest, iCont, iBreak);
                             v.sqlite3VdbeResolveLabel(iCont);
                             v.sqlite3VdbeAddOp2(OP_Next, tab1, iStart);
                             v.sqlite3VdbeResolveLabel(iBreak);
@@ -2068,7 +2068,7 @@ namespace Community.CsharpSqlite
                             break;
                         }
                 }
-                explainComposite(pParse, p.tk_op, iSub1, iSub2, p.tk_op != TK_ALL);
+                SelectMethods.explainComposite(pParse, p.tk_op, iSub1, iSub2, p.tk_op != TK_ALL);
                 ///
                 ///<summary>
                 ///Compute collating sequences used by
@@ -2125,7 +2125,7 @@ namespace Community.CsharpSqlite
                     for (i = 0; i < nCol; i++)
                     {
                         //, apColl++){
-                        apColl = multiSelectCollSeq(pParse, p, i);
+                        apColl = SelectMethods.multiSelectCollSeq(pParse, p, i);
                         if (null == apColl)
                         {
                             apColl = db.pDfltColl;
@@ -2157,7 +2157,7 @@ namespace Community.CsharpSqlite
             multi_select_end:
                 pDest.iMem = dest.iMem;
                 pDest.nMem = dest.nMem;
-                sqlite3SelectDelete(db, ref pDelete);
+                SelectMethods.sqlite3SelectDelete(db, ref pDelete);
                 return rc;
             }
 #endif

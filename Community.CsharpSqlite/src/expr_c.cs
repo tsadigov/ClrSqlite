@@ -366,7 +366,7 @@ namespace Community.CsharpSqlite
                     }
                     if (p.ExprHasProperty(EP_xIsSelect))
                     {
-                        sqlite3SelectDelete(db, ref p.x.pSelect);
+                        SelectMethods.sqlite3SelectDelete(db, ref p.x.pSelect);
                     }
                     else
                     {

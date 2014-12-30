@@ -3249,7 +3249,7 @@ goto attach_end;
 					exprc.sqlite3ExprDelete(db,ref pWhere);
 					exprc.sqlite3ExprDelete(db,ref pWhen);
 					exprc.sqlite3ExprListDelete(db,ref pList);
-					sqlite3SelectDelete(db,ref pSelect);
+					SelectMethods.sqlite3SelectDelete(db,ref pSelect);
 					switch(action) {
 					case OE_Restrict:
 					pStep.op=TK_SELECT;
@@ -4436,7 +4436,7 @@ isView = false;
 				insert_cleanup:
 				build.sqlite3SrcListDelete(db,ref pTabList);
 				exprc.sqlite3ExprListDelete(db,ref pList);
-				sqlite3SelectDelete(db,ref pSelect);
+				SelectMethods.sqlite3SelectDelete(db,ref pSelect);
 				build.sqlite3IdListDelete(db,ref pColumn);
 				db.sqlite3DbFree(ref aRegIdx);
 			}
@@ -5992,7 +5992,7 @@ aXRef[j] = -1;
 				///<summary>
 				///Cleanup 
 				///</summary>
-				sqlite3SelectDelete(db,ref pSelect);
+				SelectMethods.sqlite3SelectDelete(db,ref pSelect);
 			}
 			public Table sqlite3SrcListLookup(SrcList pSrc) {
 				SrcList_item pItem=pSrc.a[0];
@@ -6004,7 +6004,8 @@ aXRef[j] = -1;
 				if(pTab!=null) {
 					pTab.nRef++;
 				}
-				if(sqlite3IndexedByLookup(this,pItem)!=0) {
+                if (SelectMethods.sqlite3IndexedByLookup(this, pItem) != 0)
+                {
 					pTab=null;
 				}
 				return pTab;
@@ -6071,13 +6072,13 @@ aXRef[j] = -1;
 					//}
 					//else
 					//{
-					//  sqlite3SelectDelete( db, ref pDup );
+					//  SelectMethods.sqlite3SelectDelete( db, ref pDup );
 					//}
 					pDup=Select.sqlite3SelectNew(this,null,pFrom,pWhere,null,null,null,0,null,null);
 				}
                 dest.Init( SelectResultType.EphemTab, iCur);
 				Select.sqlite3Select(this,pDup,ref dest);
-				sqlite3SelectDelete(db,ref pDup);
+				SelectMethods.sqlite3SelectDelete(db,ref pDup);
 			}
 			public void sqlite3DeleteFrom(///
 			///<summary>

@@ -142,7 +142,7 @@ return pInClause;
 
 /* something went wrong. clean up anything allocated. */
 limit_where_cleanup_1:
-sqlite3SelectDelete(pParse.db, pSelect);
+SelectMethods.sqlite3SelectDelete(pParse.db, pSelect);
 return null;
 
 limit_where_cleanup_2:

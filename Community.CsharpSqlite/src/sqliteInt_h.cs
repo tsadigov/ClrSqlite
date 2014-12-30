@@ -2078,7 +2078,7 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//void build.sqlite3ResetInternalSchema(sqlite3*, int);
 		//void sqlite3BeginParse(Parse*,int);
 		//void sqlite3CommitInternalChanges(sqlite3);
-		//Table *sqlite3ResultSetOfSelect(Parse*,Select);
+		//Table *SelectMethods.sqlite3ResultSetOfSelect(Parse*,Select);
 		//void sqlite3OpenMasterTable(Parse *, int);
 		//void build.sqlite3StartTable(Parse*,Token*,Token*,int,int,int,int);
 		//void build.sqlite3AddColumn(Parse*,Token);
@@ -2142,7 +2142,7 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 		//int sqlite3Select(Parse*, Select*, SelectDest);
 		//Select *sqlite3SelectNew(Parse*,ExprList*,SrcList*,Expr*,ExprList*,
 		//                         Expr*,ExprList*,int,Expr*,Expr);
-		//void sqlite3SelectDelete(sqlite3*, Select);
+		//void SelectMethods.sqlite3SelectDelete(sqlite3*, Select);
 		//Table *sqlite3SrcListLookup(Parse*, SrcList);
 		//int sqlite3IsReadOnly(Parse*, Table*, int);
 		//void sqlite3OpenTable(Parse*, int iCur, int iDb, Table*, int);

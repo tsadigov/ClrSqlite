@@ -36,7 +36,7 @@ namespace Community.CsharpSqlite {
 				pTriggerStep=pTriggerStep.pNext;
 				exprc.sqlite3ExprDelete(db,ref pTmp.pWhere);
 				exprc.sqlite3ExprListDelete(db,ref pTmp.pExprList);
-				sqlite3SelectDelete(db,ref pTmp.pSelect);
+				SelectMethods.sqlite3SelectDelete(db,ref pTmp.pSelect);
 				build.sqlite3IdListDelete(db,ref pTmp.pIdList);
 				pTriggerStep=null;
 				db.sqlite3DbFree(ref pTmp);
@@ -494,7 +494,7 @@ goto trigger_cleanup;
 			TriggerStep pTriggerStep=new TriggerStep();
 			// sqlite3DbMallocZero( db, sizeof(TriggerStep ))
 			if(pTriggerStep==null) {
-				sqlite3SelectDelete(db,ref pSelect);
+				SelectMethods.sqlite3SelectDelete(db,ref pSelect);
 				return null;
 			}
 			pTriggerStep.op=TK_SELECT;
@@ -601,7 +601,7 @@ goto trigger_cleanup;
 			//  build.sqlite3IdListDelete( db, ref pColumn );
 			//}
 			exprc.sqlite3ExprListDelete(db,ref pEList);
-			sqlite3SelectDelete(db,ref pSelect);
+			SelectMethods.sqlite3SelectDelete(db,ref pSelect);
 			return pTriggerStep;
 		}
 		///<summary>
@@ -1025,7 +1025,7 @@ return;
 					Select pSelect=exprc.sqlite3SelectDup(db,pStep.pSelect,0);
                     sDest.Init(SelectResultType.Discard, 0);
 					Select.sqlite3Select(pParse,pSelect,ref sDest);
-					sqlite3SelectDelete(db,ref pSelect);
+					SelectMethods.sqlite3SelectDelete(db,ref pSelect);
 					break;
 				}
 				}
