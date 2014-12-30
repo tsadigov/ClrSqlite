@@ -367,7 +367,7 @@ sqlite3ValueFree(ref pTmp);
 			FuncDef pOther;
 			int nName=StringExtensions.sqlite3Strlen30(pDef.zName);
 			u8 c1=(u8)pDef.zName[0];
-			int h=(sqlite3UpperToLower[c1]+nName)%ArraySize(pHash.a);
+			int h=(_Custom.sqlite3UpperToLower[c1]+nName)%ArraySize(pHash.a);
 			pOther=functionSearch(pHash,h,pDef.zName,nName);
 			if(pOther!=null) {
 				Debug.Assert(pOther!=pDef&&pOther.pNext!=pDef);
@@ -443,7 +443,7 @@ sqlite3ValueFree(ref pTmp);
 			///Hash value 
 			///</summary>
 			Debug.Assert(enc==SqliteEncoding.UTF8||enc==SqliteEncoding.UTF16LE||enc==SqliteEncoding.UTF16BE);
-			h=(sqlite3UpperToLower[(u8)zName[0]]+nName)%ArraySize(db.aFunc.a);
+			h=(_Custom.sqlite3UpperToLower[(u8)zName[0]]+nName)%ArraySize(db.aFunc.a);
 			///
 			///<summary>
 			///</summary>

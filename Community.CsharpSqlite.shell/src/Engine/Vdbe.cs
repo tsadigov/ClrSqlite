@@ -3144,7 +3144,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///</summary>
 						///<param name="integer or a floating">point number.)</param>
 						///<param name="If the value is text or blob, try to convert it to an using the">If the value is text or blob, try to convert it to an using the</param>
-						///<param name="equivalent of atoi() or atof() and store 0 if no such conversion">equivalent of atoi() or atof() and store 0 if no such conversion</param>
+						///<param name="equivalent of _Custom.atoi() or atof() and store 0 if no such conversion">equivalent of _Custom.atoi() or atof() and store 0 if no such conversion</param>
 						///<param name="is possible.">is possible.</param>
 						///<param name=""></param>
 						///<param name="A NULL value is not changed by this routine.  It remains NULL.">A NULL value is not changed by this routine.  It remains NULL.</param>
@@ -3166,7 +3166,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///Force the value in register P1 to be an integer.  If
 						///The value is currently a real number, drop its fractional part.
 						///If the value is text or blob, try to convert it to an integer using the
-						///equivalent of atoi() and store 0 if no such conversion is possible.
+						///equivalent of _Custom.atoi() and store 0 if no such conversion is possible.
 						///
 						///A NULL value is not changed by this routine.  It remains NULL.
 						///</summary>
@@ -3189,7 +3189,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///Force the value in register P1 to be a floating point number.
 						///If The value is currently an integer, convert it.
 						///If the value is text or blob, try to convert it to an integer using the
-						///equivalent of atoi() and store 0.0 if no such conversion is possible.
+						///equivalent of _Custom.atoi() and store 0.0 if no such conversion is possible.
 						///
 						///A NULL value is not changed by this routine.  It remains NULL.
 						///</summary>

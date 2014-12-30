@@ -1181,7 +1181,7 @@ return SQLITE_NOMEM;
 		/// negative, zero or positive if pMem1 is less than, equal to, or greater
 		/// than pMem2. Sorting order is NULL's first, followed by numbers (integers
 		/// and reals) sorted numerically, followed by text ordered by the collating
-		/// sequence pColl and finally blob's ordered by memcmp().
+		/// sequence pColl and finally blob's ordered by _Custom.memcmp().
 		///
 		/// Two NULL values are considered equal by this function.
 		///
@@ -1312,11 +1312,11 @@ return SQLITE_NOMEM;
 			///</summary>
 			if((pMem1.flags&MEM_Blob)!=0)
 				if(pMem1.zBLOB!=null)
-					rc=memcmp(pMem1.zBLOB,pMem2.zBLOB,(pMem1.n>pMem2.n)?pMem2.n:pMem1.n);
+					rc=_Custom.memcmp(pMem1.zBLOB,pMem2.zBLOB,(pMem1.n>pMem2.n)?pMem2.n:pMem1.n);
 				else
-					rc=memcmp(pMem1.z,pMem2.zBLOB,(pMem1.n>pMem2.n)?pMem2.n:pMem1.n);
+					rc=_Custom.memcmp(pMem1.z,pMem2.zBLOB,(pMem1.n>pMem2.n)?pMem2.n:pMem1.n);
 			else
-				rc=memcmp(pMem1.z,pMem2.z,(pMem1.n>pMem2.n)?pMem2.n:pMem1.n);
+				rc=_Custom.memcmp(pMem1.z,pMem2.z,(pMem1.n>pMem2.n)?pMem2.n:pMem1.n);
 			if(rc==0) {
 				rc=pMem1.n-pMem2.n;
 			}

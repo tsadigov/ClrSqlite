@@ -1023,7 +1023,7 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
                 nPage = nPageHeader = Converter.sqlite3Get4byte(pPage1.aData, 28);
                 //get4byte(28+(u8*)pPage1->aData);
                 pBt.pPager.sqlite3PagerPagecount(out nPageFile);
-                if (nPage == 0 || memcmp(pPage1.aData, 24, pPage1.aData, 92, 4) != 0)//memcmp(24 + (u8*)pPage1.aData, 92 + (u8*)pPage1.aData, 4) != 0)
+                if (nPage == 0 || _Custom.memcmp(pPage1.aData, 24, pPage1.aData, 92, 4) != 0)//_Custom.memcmp(24 + (u8*)pPage1.aData, 92 + (u8*)pPage1.aData, 4) != 0)
                 {
                     nPage = nPageFile;
                 }
@@ -1033,7 +1033,7 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
                     u32 usableSize;
                     u8[] page1 = pPage1.aData;
                     rc = SQLITE_NOTADB;
-                    if (memcmp(page1, zMagicHeader, 16) != 0)
+                    if (_Custom.memcmp(page1, zMagicHeader, 16) != 0)
                     {
                         goto page1_init_failed;
                     }
@@ -1082,7 +1082,7 @@ rc = SQLITE_NOTADB;
                     ///<param name="embedded fraction must be 12.5% for both leaf">data.</param>
                     ///<param name="The original design allowed these amounts to vary, but as of">The original design allowed these amounts to vary, but as of</param>
                     ///<param name="version 3.6.0, we require them to be fixed.">version 3.6.0, we require them to be fixed.</param>
-                    if (memcmp(page1, 21, "\x0040\x0020\x0020", 3) != 0)//   "\100\040\040"
+                    if (_Custom.memcmp(page1, 21, "\x0040\x0020\x0020", 3) != 0)//   "\100\040\040"
                     {
                         goto page1_init_failed;
                     }
@@ -1878,7 +1878,7 @@ static int countWriteCursors( BtShared pBt )
   int iPage = pCur.iPage;
   info = new CellInfo();//memset(info, 0, sizeof(info));
   btreeParseCell( pCur.apPage[iPage], pCur.aiIdx[iPage], ref info );
-  Debug.Assert( info.GetHashCode() == pCur.info.GetHashCode() || info.Equals( pCur.info ) );//memcmp(info, pCur.info, sizeof(info))==0 );
+  Debug.Assert( info.GetHashCode() == pCur.info.GetHashCode() || info.Equals( pCur.info ) );//_Custom.memcmp(info, pCur.info, sizeof(info))==0 );
 }
 #else
             //  #define assertCellInfo(x)

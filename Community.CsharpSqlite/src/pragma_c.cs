@@ -125,7 +125,7 @@ namespace Community.CsharpSqlite {
 				return BTREE_AUTOVACUUM_FULL;
 			if(z.Equals("incremental",StringComparison.InvariantCultureIgnoreCase))
 				return BTREE_AUTOVACUUM_INCR;
-			i=atoi(z);
+			i=_Custom.atoi(z);
 			return (u8)((i>=0&&i<=2)?i:0);
 		}
 		#endif
@@ -1821,7 +1821,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																												}
 																												else
 																													if(zLeft.Equals("file_format",StringComparison.InvariantCultureIgnoreCase)) {
-																														pDb.pSchema.file_format=(u8)atoi(zRight);
+																														pDb.pSchema.file_format=(u8)_Custom.atoi(zRight);
 																														build.sqlite3ResetInternalSchema(db,-1);
 																													}
 																													else

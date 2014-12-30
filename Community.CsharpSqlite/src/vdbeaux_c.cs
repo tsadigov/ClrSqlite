@@ -604,18 +604,18 @@ namespace Community.CsharpSqlite
       if ( null == p )
         return;
       //      va_list ap;
-      lock ( lock_va_list )
+      lock ( _Custom.lock_va_list )
       {
         Debug.Assert( p.nOp > 0 || p.aOp == null );
         Debug.Assert( p.aOp == null || p.aOp[p.nOp - 1].zComment == null /* || p.db.mallocFailed != 0 */);
         if ( p.nOp != 0 )
         {
           string pz;// = p.aOp[p.nOp-1].zComment;
-          va_start( ap, zFormat );
+          _Custom.va_start( ap, zFormat );
           //sqlite3DbFree(db, ref pz);
           pz = sqlite3VMPrintf( p.db, zFormat, ap );
           p.aOp[p.nOp - 1].zComment = pz;
-          va_end( ref ap );
+          _Custom.va_end( ref ap );
         }
       }
     }
@@ -624,7 +624,7 @@ namespace Community.CsharpSqlite
       if ( null == p )
         return;
       //va_list ap;
-      lock ( lock_va_list )
+      lock ( _Custom.lock_va_list )
       {
         sqlite3VdbeAddOp0( p, OP_Noop );
         Debug.Assert( p.nOp > 0 || p.aOp == null );
@@ -632,11 +632,11 @@ namespace Community.CsharpSqlite
         if ( p.nOp != 0 )
         {
           string pz; // = p.aOp[p.nOp - 1].zComment;
-          va_start( ap, zFormat );
+          _Custom.va_start( ap, zFormat );
           //sqlite3DbFree(db,ref pz);
           pz = sqlite3VMPrintf( p.db, zFormat, ap );
           p.aOp[p.nOp - 1].zComment = pz;
-          va_end( ref ap );
+          _Custom.va_end( ref ap );
         }
       }
     }

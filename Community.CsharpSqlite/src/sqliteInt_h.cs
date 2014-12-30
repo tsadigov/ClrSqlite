@@ -2460,7 +2460,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 		//void sqlite3ValueApplyAffinity(sqlite3_value *, u8, u8);
 		//#if !SQLITE_AMALGAMATION
 		//extern const unsigned char sqlite3OpcodeProperty[];
-		//extern const unsigned char sqlite3UpperToLower[];
+		//extern const unsigned char _Custom.sqlite3UpperToLower[];
 		//extern const unsigned char sqlite3CtypeMap[];
 		//extern const Token sqlite3IntTokens[];
 		//extern SQLITE_WSD struct Sqlite3Config sqlite3Config;

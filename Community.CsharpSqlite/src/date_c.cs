@@ -205,15 +205,15 @@ namespace Community.CsharpSqlite
                 //char nextC;
                 //int pVal;
                 int cnt = 0;
-                //va_start( ap, zDate );
+                //_Custom.va_start( ap, zDate );
                 int zIndex = 0;
                 //do
                 //{
-                //N = va_arg( ap, ( Int32 ) 0 );
-                //min = va_arg( ap, ( Int32 ) 0 );
-                //max = va_arg( ap, ( Int32 ) 0 );
-                //nextC = (char)va_arg( ap, "char" );
-                //pVal = va_arg( ap, ( Int32 ) 0 );
+                //N = _Custom.va_arg( ap, ( Int32 ) 0 );
+                //min = _Custom.va_arg( ap, ( Int32 ) 0 );
+                //max = _Custom.va_arg( ap, ( Int32 ) 0 );
+                //nextC = (char)_Custom.va_arg( ap, "char" );
+                //pVal = _Custom.va_arg( ap, ( Int32 ) 0 );
                 val = 0;
                 while (N-- != 0)
                 {
@@ -233,7 +233,7 @@ namespace Community.CsharpSqlite
                 cnt++;
             //} while ( nextC != 0 && zIndex < zDate.Length );
             end_getDigits:
-                //va_end( ap );
+                //_Custom.va_end( ap );
                 return cnt;
             }
 
@@ -648,14 +648,14 @@ namespace Community.CsharpSqlite
             /// routine will always fail.
             ///
             ///</summary>
-            static int osLocaltime(time_t t, tm pTm)
+            static int osLocaltime(time_t t, _Custom.tm pTm)
             {
                 int rc;
 #if (!(HAVE_LOCALTIME_R) || !HAVE_LOCALTIME_R) && (!(HAVE_LOCALTIME_S) || !HAVE_LOCALTIME_S)
-                tm pX;
+                _Custom.tm pX;
                 sqlite3_mutex mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
                 sqlite3_mutex_enter(mutex);
-                pX = localtime(t);
+                pX = _Custom.localtime(t);
 #if !SQLITE_OMIT_BUILTIN_TEST
                 if (sqlite3GlobalConfig.bLocaltimeFault)
                     pX = null;
@@ -707,7 +707,7 @@ namespace Community.CsharpSqlite
                 DateTime x;
                 DateTime y = new DateTime();
                 time_t t;
-                tm sLocal = new tm();
+                _Custom.tm sLocal = new _Custom.tm();
                 ///
                 ///<summary>
                 ///Initialize the contents of sLocal to avoid a compiler warning. 

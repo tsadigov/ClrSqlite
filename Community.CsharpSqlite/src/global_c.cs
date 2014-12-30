@@ -52,8 +52,8 @@ namespace Community.CsharpSqlite
 ///<param name=""></param>
 
 		//
-		// Replaced in C# with sqlite3UpperToLower class
-		//    static int[] sqlite3UpperToLower = new int[]  {
+		// Replaced in C# with _Custom.sqlite3UpperToLower class
+		//    static int[] _Custom.sqlite3UpperToLower = new int[]  {
 		//#if SQLITE_ASCII
 		//0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
 		//18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
@@ -111,7 +111,7 @@ namespace Community.CsharpSqlite
 ///<param name=""></param>
 ///<param name="(x & ~(map[x]&0x20))">(x & ~(map[x]&0x20))</param>
 ///<param name=""></param>
-///<param name="Standard function tolower() is implemented using the sqlite3UpperToLower[]">Standard function tolower() is implemented using the sqlite3UpperToLower[]</param>
+///<param name="Standard function tolower() is implemented using the _Custom.sqlite3UpperToLower[]">Standard function tolower() is implemented using the _Custom.sqlite3UpperToLower[]</param>
 ///<param name="array. tolower() is used more often than toupper() by SQLite.">array. tolower() is used more often than toupper() by SQLite.</param>
 ///<param name=""></param>
 ///<param name="Bit 0x40 is set if the character non">alphanumeric and can be used in an </param>

@@ -728,7 +728,7 @@ namespace Community.CsharpSqlite
                     width = 0;
                     if (c == '*')
                     {
-                        width = va_arg(ap, (Int32)0);
+                        width = _Custom.va_arg(ap, (Int32)0);
                         if (width < 0)
                         {
                             flag_leftjustify = true;
@@ -759,7 +759,7 @@ namespace Community.CsharpSqlite
                         c = fmt[++_fmt];
                         if (c == '*')
                         {
-                            precision = va_arg(ap, (Int32)0);
+                            precision = _Custom.va_arg(ap, (Int32)0);
                             if (precision < 0)
                                 precision = -precision;
                             c = fmt[++_fmt];
@@ -877,16 +877,16 @@ namespace Community.CsharpSqlite
                                 i64 v;
                                 if (flag_longlong)
                                 {
-                                    v = (Int64)va_arg(ap, (Int64)0);
+                                    v = (Int64)_Custom.va_arg(ap, (Int64)0);
                                 }
                                 else
                                     if (flag_long)
                                     {
-                                        v = (Int64)va_arg(ap, (Int64)0);
+                                        v = (Int64)_Custom.va_arg(ap, (Int64)0);
                                     }
                                     else
                                     {
-                                        v = (Int32)va_arg(ap, (Int32)0);
+                                        v = (Int32)_Custom.va_arg(ap, (Int32)0);
                                     }
                                 if (v < 0)
                                 {
@@ -916,16 +916,16 @@ namespace Community.CsharpSqlite
                             {
                                 if (flag_longlong)
                                 {
-                                    longvalue = va_arg(ap, (Int64)0);
+                                    longvalue = _Custom.va_arg(ap, (Int64)0);
                                 }
                                 else
                                     if (flag_long)
                                     {
-                                        longvalue = va_arg(ap, (Int64)0);
+                                        longvalue = _Custom.va_arg(ap, (Int64)0);
                                     }
                                     else
                                     {
-                                        longvalue = va_arg(ap, (Int64)0);
+                                        longvalue = _Custom.va_arg(ap, (Int64)0);
                                     }
                                 prefix = '\0';
                             }
@@ -1024,7 +1024,7 @@ namespace Community.CsharpSqlite
                         case etFLOAT:
                         case etEXP:
                         case etGENERIC:
-                            realvalue = va_arg(ap, (Double)0);
+                            realvalue = _Custom.va_arg(ap, (Double)0);
 #if SQLITE_OMIT_FLOATING_POINT
 																																																																																	length = 0;
 #else
@@ -1350,7 +1350,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                             break;
                         case etSIZE:
                             ap[0] = pAccum.nChar;
-                            // *(va_arg(ap,int)) = pAccum.nChar;
+                            // *(_Custom.va_arg(ap,int)) = pAccum.nChar;
                             length = width = 0;
                             break;
                         case etPERCENT:
@@ -1359,7 +1359,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                             length = 1;
                             break;
                         case etCHARX:
-                            c = va_arg(ap, (Char)0);
+                            c = _Custom.va_arg(ap, (Char)0);
                             buf[0] = (char)c;
                             if (precision >= 0)
                             {
@@ -1377,7 +1377,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                         case etDYNSTRING:
                             bufpt = 0;
                             //
-                            string bufStr = (string)va_arg(ap, "string");
+                            string bufStr = (string)_Custom.va_arg(ap, "string");
                             if (bufStr.Length > buf.Length)
                                 buf = new char[bufStr.Length];
                             bufStr.ToCharArray().CopyTo(buf, 0);
@@ -1421,7 +1421,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                                 ///Quote character 
                                 ///</summary>
 
-                                string escarg = (string)va_arg(ap, "char*") + '\0';
+                                string escarg = (string)_Custom.va_arg(ap, "char*") + '\0';
                                 isnull = (escarg == "" || escarg == "NULL\0");
                                 if (isnull)
                                     escarg = (xtype == etSQLESCAPE2) ? "NULL\0" : "(NULL)\0";
@@ -1477,14 +1477,14 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                         case etTOKEN:
                             {
                                 Token pToken;
-                                if (ap[vaNEXT] is String)
+                                if (ap[_Custom.vaNEXT] is String)
                                 {
                                     pToken = new Token();
-                                    pToken.zRestSql = va_arg(ap, (String)null);
+                                    pToken.zRestSql = _Custom.va_arg(ap, (String)null);
                                     pToken.Length = pToken.zRestSql.Length;
                                 }
                                 else
-                                    pToken = va_arg(ap, (Token)null);
+                                    pToken = _Custom.va_arg(ap, (Token)null);
                                 if (pToken != null)
                                 {
                                     pAccum.sqlite3StrAccumAppend(pToken.zRestSql.ToString(), (int)pToken.Length);
@@ -1494,8 +1494,8 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                             }
                         case etSRCLIST:
                             {
-                                SrcList pSrc = va_arg(ap, (SrcList)null);
-                                int k = va_arg(ap, (Int32)0);
+                                SrcList pSrc = _Custom.va_arg(ap, (SrcList)null);
+                                int k = _Custom.va_arg(ap, (Int32)0);
                                 SrcList_item pItem = pSrc.a[k];
                                 Debug.Assert(k >= 0 && k < pSrc.nSrc);
                                 if (pItem.zDatabase != null)
@@ -1673,11 +1673,11 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
             {
                 string z;
                 //va_list ap;
-                lock (lock_va_list)
+                lock (_Custom.lock_va_list)
                 {
-                    va_start(ap, zFormat);
+                    _Custom.va_start(ap, zFormat);
                     z = io.sqlite3VMPrintf(db, zFormat, ap);
-                    va_end(ref ap);
+                    _Custom.va_end(ref ap);
                 }
                 return z;
             }
@@ -1695,11 +1695,11 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
             {
                 string z;
                 //va_list ap;
-                lock (lock_va_list)
+                lock (_Custom.lock_va_list)
                 {
-                    va_start(ap, zFormat);
+                    _Custom.va_start(ap, zFormat);
                     z = io.sqlite3VMPrintf(db, zFormat, ap);
-                    va_end(ref ap);
+                    _Custom.va_end(ref ap);
                     db.sqlite3DbFree(ref zStr);
                 }
                 return z;
@@ -1738,11 +1738,11 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                     return "";
 #endif
                 //va_list ap;
-                lock (lock_va_list)
+                lock (_Custom.lock_va_list)
                 {
-                    va_start(ap, zFormat);
+                    _Custom.va_start(ap, zFormat);
                     z = sqlite3_vmprintf(zFormat, ap);
-                    va_end(ref ap);
+                    _Custom.va_end(ref ap);
                 }
                 return z;
             }
@@ -1780,13 +1780,13 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
             {
                 //string z;
                 //va_list ap;
-                lock (lock_va_list)
+                lock (_Custom.lock_va_list)
                 {
                     //StrAccum acc = new StrAccum( SQLITE_PRINT_BUF_SIZE );
                     zBuf.EnsureCapacity(SQLITE_PRINT_BUF_SIZE);
-                    va_start(ap, zFormat);
+                    _Custom.va_start(ap, zFormat);
                     sqlite3_vsnprintf(n, zBuf, zFormat, ap);
-                    va_end(ref ap);
+                    _Custom.va_end(ref ap);
                 }
                 return;
             }
@@ -1802,9 +1802,9 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
             //  }
             //  sqlite3StrAccumInit( acc, null, n, 0 );
             //  //acc.useMalloc = 0;
-            //  va_start( ap, zFormat );
+            //  _Custom.va_start( ap, zFormat );
             //  io.sqlite3VXPrintf( acc, 0, zFormat, ap );
-            //  va_end( ap );
+            //  _Custom.va_end( ap );
             //  z = sqlite3StrAccumFinish( acc );
             //  return ( zBuf = z );
             //}
@@ -1837,11 +1837,11 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                 if (sqlite3GlobalConfig.xLog != null)
                 {
                     //va_list ap;                             /* Vararg list */
-                    lock (lock_va_list)
+                    lock (_Custom.lock_va_list)
                     {
-                        va_start(ap, zFormat);
+                        _Custom.va_start(ap, zFormat);
                         renderLogMsg(iErrCode, zFormat, ap);
-                        va_end(ref ap);
+                        _Custom.va_end(ref ap);
                     }
                 }
             }
@@ -1859,14 +1859,14 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
     static void sqlite3DebugPrintf( string zFormat, params va_list[] ap )
     {
       //va_list ap;
-      lock ( lock_va_list )
+      lock ( _Custom.lock_va_list )
       {
         //StrAccum acc = new StrAccum( SQLITE_PRINT_BUF_SIZE );
         sqlite3StrAccumInit( acc, null, SQLITE_PRINT_BUF_SIZE, 0 );
         //acc.useMalloc = 0;
-        va_start( ap, zFormat );
+        _Custom.va_start( ap, zFormat );
         io.sqlite3VXPrintf( acc, 0, zFormat, ap );
-        va_end( ref ap );
+        _Custom.va_end( ref ap );
       }
       Console.Write( sqlite3StrAccumFinish( acc ) );
       //fflush(stdout);
@@ -1881,11 +1881,11 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
             public static void sqlite3XPrintf(StrAccum p, string zFormat, params object[] ap)
             {
                 //va_list ap;
-                lock (lock_va_list)
+                lock (_Custom.lock_va_list)
                 {
-                    va_start(ap, zFormat);
+                    _Custom.va_start(ap, zFormat);
                     io.sqlite3VXPrintf(p, 1, zFormat, ap);
-                    va_end(ref ap);
+                    _Custom.va_end(ref ap);
                 }
             }
 #endif

@@ -15,16 +15,16 @@ namespace Community.CsharpSqlite
 	public partial class StringExtensions
 	{
 
-		private static Community.CsharpSqlite.Sqlite3.SQLite3UpperToLower UpperToLower {
+		private static Sqlite3._Custom.SQLite3UpperToLower UpperToLower {
 			get {
-				return Sqlite3.UpperToLower;
+				return Sqlite3._Custom.UpperToLower;
 			}
 		}
 
 		///<summary>
 		///Convenient short-hand
 		///</summary>
-		//#define UpperToLower sqlite3UpperToLower
+		//#define UpperToLower _Custom.sqlite3UpperToLower
 		///<summary>
 		/// Some systems have stricmp().  Others have strcasecmp().  Because
 		/// there is no consistency, we will define our own.
@@ -345,12 +345,12 @@ dummy += (uint)x;
                     db.errCode = err_code;
                     if (zFormat != null)
                     {
-                        lock (lock_va_list)
+                        lock (_Custom.lock_va_list)
                         {
                             string z;
-                            va_start(ap, zFormat);
+                            _Custom.va_start(ap, zFormat);
                             z = io.sqlite3VMPrintf(db, zFormat, ap);
-                            va_end(ref ap);
+                            _Custom.va_end(ref ap);
                             sqlite3ValueSetStr(db.pErr, -1, z, SqliteEncoding.UTF8, (dxDel)SQLITE_DYNAMIC);
                         }
                     }
@@ -384,11 +384,11 @@ dummy += (uint)x;
                 string zMsg;
                 sqlite3 db = pParse.db;
                 //va_list ap;
-                lock (lock_va_list)
+                lock (_Custom.lock_va_list)
                 {
-                    va_start(ap, zFormat);
+                    _Custom.va_start(ap, zFormat);
                     zMsg = io.sqlite3VMPrintf(db, zFormat, ap);
-                    va_end(ref ap);
+                    _Custom.va_end(ref ap);
                 }
                 if (db.suppressErr != 0)
                 {

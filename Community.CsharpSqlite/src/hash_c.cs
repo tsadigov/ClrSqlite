@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(nKey>=0);
 			int _z=0;
 			while(nKey>0) {
-				h=(h<<3)^h^((_z<z.Length)?(int)sqlite3UpperToLower[(byte)z[_z++]]:0);
+				h=(h<<3)^h^((_z<z.Length)?(int)_Custom.sqlite3UpperToLower[(byte)z[_z++]]:0);
 				nKey--;
 			}
 			return (u32)h;

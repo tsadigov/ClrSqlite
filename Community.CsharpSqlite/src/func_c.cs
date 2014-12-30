@@ -658,9 +658,9 @@ break;
             ///<param name=""></param>
             //#if defined(SQLITE_EBCDIC)
             //# define sqlite3Utf8Read(A,C)  (*(A++))
-            //# define GlogUpperToLower(A)   A = sqlite3UpperToLower[A]
+            //# define GlogUpperToLower(A)   A = _Custom.sqlite3UpperToLower[A]
             //#else
-            //# define GlogUpperToLower(A)   if( !((A)&~0x7f) ){ A = sqlite3UpperToLower[A]; }
+            //# define GlogUpperToLower(A)   if( !((A)&~0x7f) ){ A = _Custom.sqlite3UpperToLower[A]; }
             //#endif
             static compareInfo globInfo = new compareInfo('*', '?', '[', false);
             ///
@@ -785,16 +785,16 @@ break;
                             if (noCase)
                             {
                                 if (0 == ((c2) & ~0x7f))
-                                    c2 = (u32)sqlite3UpperToLower[c2];
+                                    c2 = (u32)_Custom.sqlite3UpperToLower[c2];
                                 //GlogUpperToLower(c2);
                                 if (0 == ((c) & ~0x7f))
-                                    c = (u32)sqlite3UpperToLower[c];
+                                    c = (u32)_Custom.sqlite3UpperToLower[c];
                                 //GlogUpperToLower(c);
                                 while (c2 != 0 && c2 != c)
                                 {
                                     c2 = sqlite3Utf8Read(zString, ref zString);
                                     if (0 == ((c2) & ~0x7f))
-                                        c2 = (u32)sqlite3UpperToLower[c2];
+                                        c2 = (u32)_Custom.sqlite3UpperToLower[c2];
                                     //GlogUpperToLower(c2);
                                 }
                             }
@@ -881,10 +881,10 @@ break;
                                     if (noCase)
                                     {
                                         if (c < 0x80)
-                                            c = (u32)sqlite3UpperToLower[c];
+                                            c = (u32)_Custom.sqlite3UpperToLower[c];
                                         //GlogUpperToLower(c);
                                         if (c2 < 0x80)
-                                            c2 = (u32)sqlite3UpperToLower[c2];
+                                            c2 = (u32)_Custom.sqlite3UpperToLower[c2];
                                         //GlogUpperToLower(c2);
                                     }
                                     if (c != c2)
@@ -1361,7 +1361,7 @@ break;
                     //}
                     //loopLimit = nStr - nPattern;
                     //for(i=j=0; i<=loopLimit; i++){
-                    //  if( zStr[i]!=zPattern[0] || memcmp(&zStr[i], zPattern, nPattern) ){
+                    //  if( zStr[i]!=zPattern[0] || _Custom._Custom._Custom._Custom.memcmp(&zStr[i], zPattern, nPattern) ){
                     //    zOut[j++] = zStr[i];
                     //  }else{
                     //    u8 *zOld;
@@ -1539,7 +1539,7 @@ break;
                             for (i = 0; i < nChar; i++)
                             {
                                 len = aLen[i];
-                                if (len <= nIn && memcmp(zBlob, izIn, azChar[i], len) == 0)
+                                if (len <= nIn && _Custom.memcmp(zBlob, izIn, azChar[i], len) == 0)
                                     break;
                             }
                             if (i >= nChar)
@@ -1556,7 +1556,7 @@ break;
                             for (i = 0; i < nChar; i++)
                             {
                                 len = aLen[i];
-                                if (len <= nIn && memcmp(zBlob, izIn + nIn - len, azChar[i], len) == 0)
+                                if (len <= nIn && _Custom.memcmp(zBlob, izIn + nIn - len, azChar[i], len) == 0)
                                     break;
                             }
                             if (i >= nChar)
@@ -2195,7 +2195,7 @@ LIKEFUNC("like", 3, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
 				LIKEFUNC("like",2,likeInfoNorm,SQLITE_FUNC_LIKE),
 				LIKEFUNC("like",3,likeInfoNorm,SQLITE_FUNC_LIKE),
 				#endif
-				FUNCTION("regexp",2,0,0,regexpFunc),
+				FUNCTION("regexp",2,0,0,_Custom.regexpFunc),
 			};
                 int i;
 #if SQLITE_OMIT_WSD

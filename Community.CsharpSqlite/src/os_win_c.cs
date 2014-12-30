@@ -1167,7 +1167,7 @@ free(pFile.zDeleteOnClose);
 #else
 				id.lastErrno = (u32)Marshal.GetLastWin32Error ();
 				#endif
-				if ((id.lastErrno == ERROR_HANDLE_DISK_FULL) || (id.lastErrno == ERROR_DISK_FULL)) {
+				if ((id.lastErrno == _Custom.ERROR_HANDLE_DISK_FULL) || (id.lastErrno == _Custom.ERROR_DISK_FULL)) {
 					return SQLITE_FULL;
 				}
 				else {
@@ -3273,7 +3273,7 @@ pFile.zDeleteOnClose = zConverted;
 #else
 			error = Marshal.GetLastWin32Error ();
 			#endif
-			return ((rc == INVALID_FILE_ATTRIBUTES) && (error == ERROR_FILE_NOT_FOUND)) ? SQLITE_OK : winLogError (SQLITE_IOERR_DELETE, "winDelete", zFilename);
+			return ((rc == INVALID_FILE_ATTRIBUTES) && (error == _Custom.ERROR_FILE_NOT_FOUND)) ? SQLITE_OK : winLogError (SQLITE_IOERR_DELETE, "winDelete", zFilename);
 		}
 
 		///

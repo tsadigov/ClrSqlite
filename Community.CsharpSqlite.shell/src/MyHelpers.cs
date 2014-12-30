@@ -109,7 +109,7 @@ namespace Community.CsharpSqlite
         {
             return x < 256 && (sqlite3CtypeMap[((byte)x)] & 0x08) != 0;
         }
-        //# define sqlite3Tolower(x)   (sqlite3UpperToLower[(unsigned char)(x)])
+        //# define sqlite3Tolower(x)   (_Custom.sqlite3UpperToLower[(unsigned char)(x)])
 #else
 																														// define sqlite3Toupper(x)   toupper((unsigned char)(x))
 // define CharExtensions.sqlite3Isspace(x)   isspace((unsigned char)(x))

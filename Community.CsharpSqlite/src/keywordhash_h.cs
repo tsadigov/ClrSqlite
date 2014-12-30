@@ -1279,8 +1279,8 @@ namespace Community.CsharpSqlite
 			int h, i;
 			if (n < 2)
 				return TK_ID;
-			h = ((sqlite3UpperToLower [z [iOffset + 0]]) * 4 ^ //(charMap(z[iOffset+0]) * 4) ^
-			(sqlite3UpperToLower [z [iOffset + n - 1]] * 3) ^ //(charMap(z[iOffset+n - 1]) * 3) ^
+			h = ((_Custom.sqlite3UpperToLower [z [iOffset + 0]]) * 4 ^ //(charMap(z[iOffset+0]) * 4) ^
+			(_Custom.sqlite3UpperToLower [z [iOffset + n - 1]] * 3) ^ //(charMap(z[iOffset+n - 1]) * 3) ^
 			n) % 127;
 			for (i = (aHash [h]) - 1; i >= 0; i = (aNext [i]) - 1) {
 				if (aLen [i] == n && String.Compare (zText, aOffset [i], z, iOffset, n, StringComparison.InvariantCultureIgnoreCase) == 0) {

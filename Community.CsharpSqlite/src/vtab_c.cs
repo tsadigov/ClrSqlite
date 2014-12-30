@@ -911,7 +911,7 @@ namespace Community.CsharpSqlite {
 			//sqlite3DbStrDup(db, pDef.zName);
 			if(zLowerName!=null) {
 				//for(z=(unsigned char)zLowerName; *z; z++){
-				//  *z = sqlite3UpperToLower[*z];
+				//  *z = _Custom.sqlite3UpperToLower[*z];
 				//}
 				rc=pMod.xFindFunction(pVtab,nArg,zLowerName.ToLowerInvariant(),ref xFunc,ref pArg);
 				db.sqlite3DbFree(ref zLowerName);
@@ -982,7 +982,7 @@ namespace Community.CsharpSqlite {
 			//va_list ap;
 			int rc=SQLITE_OK;
 			sqlite3_mutex_enter(db.mutex);
-			va_start(ap,"op");
+			_Custom.va_start(ap,"op");
 			switch(op) {
 			case SQLITE_VTAB_CONSTRAINT_SUPPORT: {
 				VtabCtx p=db.pVtabCtx;
@@ -991,7 +991,7 @@ namespace Community.CsharpSqlite {
 				}
 				else {
 					Debug.Assert(p.pTab==null||(p.pTab.tabFlags&TF_Virtual)!=0);
-					p.pVTable.bConstraint=(Byte)va_arg(ap,(Int32)0);
+					p.pVTable.bConstraint=(Byte)_Custom.va_arg(ap,(Int32)0);
 				}
 				break;
 			}
@@ -999,7 +999,7 @@ namespace Community.CsharpSqlite {
 			rc=SQLITE_MISUSE_BKPT();
 			break;
 			}
-			va_end(ref ap);
+			_Custom.va_end(ref ap);
 			if(rc!=SQLITE_OK)
 				utilc.sqlite3Error(db,rc,0);
 			sqlite3_mutex_leave(db.mutex);

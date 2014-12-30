@@ -235,9 +235,9 @@ timeDiff(&sBegin.ru_stime, &sEnd.ru_stime));
 //va_list ap;
 string z;
 if( iotrace==null ) return;
-va_start(ap, zFormat);
+_Custom.va_start(ap, zFormat);
 z = sqlite3_vmprintf(zFormat, ap);
-va_end(ap);
+_Custom.va_end(ap);
 fprintf(iotrace, "%s", z);
 sqlite3_free(ref z);
 }
@@ -1615,7 +1615,7 @@ if( db ) sqlite3_interrupt(db);
 	static int booleanValue (string zArg)
 	{
 		int val = Char.IsDigit (zArg [0]) ? Convert.ToInt32 (zArg) : 0;
-		// atoi( zArg );
+		// _Custom.atoi( zArg );
 		int j;
 		//for ( j = 0 ; zArg[j] ; j++ )
 		//{
@@ -2402,7 +2402,7 @@ sqlite3IoTrace = iotracePrintf;
 																									if (c == 't' && n > 4 && strncmp (azArg [0], "timeout", n) == 0 && nArg >= 2) {
 																										open_db (p);
 																										Sqlite3.sqlite3_busy_timeout (p.db, Convert.ToInt32 (azArg [1]));
-																										//atoi( azArg[1] ) );
+																										//_Custom.atoi( azArg[1] ) );
 																									}
 																									else
 																										#if HAS_TIMER
@@ -2415,7 +2415,7 @@ enableTimer = booleanValue(azArg[1]);
 																											Debug.Assert (nArg <= ArraySize (azArg));
 																											for (j = 1; j < nArg && j < ArraySize (p.colWidth); j++) {
 																												p.colWidth [j - 1] = Char.IsDigit (azArg [j] [0]) ? Convert.ToInt32 (azArg [j].ToString ()) : 1;
-																												//atoi( azArg[j] );
+																												//_Custom.atoi( azArg[j] );
 																											}
 																										}
 																										else {

@@ -695,7 +695,7 @@ assert( (pPg->flags&PGHDR_DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
                 ///</summary>
 
                 zMaster[0] = 0;
-                if (SQLITE_OK != (rc = os.sqlite3OsFileSize(pJrnl, ref szJ)) || szJ < 16 || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, (int)(szJ - 16), ref len)) || len >= nMaster || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, szJ - 12, ref cksum)) || SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, aMagic, 8, szJ - 8)) || memcmp(aMagic, aJournalMagic, 8) != 0 || SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, zMaster, len, (long)(szJ - 16 - len))))
+                if (SQLITE_OK != (rc = os.sqlite3OsFileSize(pJrnl, ref szJ)) || szJ < 16 || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, (int)(szJ - 16), ref len)) || len >= nMaster || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, szJ - 12, ref cksum)) || SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, aMagic, 8, szJ - 8)) || _Custom.memcmp(aMagic, aJournalMagic, 8) != 0 || SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, zMaster, len, (long)(szJ - 16 - len))))
                 {
                     return rc;
                 }

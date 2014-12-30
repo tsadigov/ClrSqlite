@@ -520,7 +520,7 @@ namespace Community.CsharpSqlite
             ///<param name=""></param>
 
 #if SQLITE_ASCII
-            //# define charMap(X) sqlite3UpperToLower[(unsigned char)X]
+            //# define charMap(X) _Custom.sqlite3UpperToLower[(unsigned char)X]
 #endif
             //#if SQLITE_EBCDIC
             //# define charMap(X) ebcdicToAscii[(unsigned char)X]

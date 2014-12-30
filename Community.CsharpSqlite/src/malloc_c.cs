@@ -1117,11 +1117,11 @@ sqlite3DbFree(db, ref p);
 		static void sqlite3SetString (ref string pz, sqlite3 db, string zFormat, params string[] ap)
 		{
 			//va_list ap;
-			lock (lock_va_list) {
+			lock (_Custom.lock_va_list) {
 				string z;
-				va_start (ap, zFormat);
+				_Custom.va_start (ap, zFormat);
 				z = io.sqlite3VMPrintf (db, zFormat, ap);
-				va_end (ref ap);
+				_Custom.va_end (ref ap);
 				db.sqlite3DbFree (ref pz);
 				pz = z;
 			}

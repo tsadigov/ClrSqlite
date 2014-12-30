@@ -1539,7 +1539,7 @@ return (pPager->pWal!=0);
                         {
                             return rc;
                         }
-                        if (memcmp(aMagic, aJournalMagic, aMagic.Length) != 0)
+                        if (_Custom.memcmp(aMagic, aJournalMagic, aMagic.Length) != 0)
                         {
                             return SQLITE_DONE;
                         }
@@ -4260,7 +4260,7 @@ pPager.pWal = 0;
                                 Converter.put32bits(zHeader, aJournalMagic.Length, this.nRec);
                                 iNextHdrOffset = this.journalHdrOffset();
                                 rc = os.sqlite3OsRead(this.jfd, aMagic, 8, iNextHdrOffset);
-                                if (rc == SQLITE_OK && 0 == memcmp(aMagic, aJournalMagic, 8))
+                                if (rc == SQLITE_OK && 0 == _Custom.memcmp(aMagic, aJournalMagic, 8))
                                 {
                                     u8[] zerobyte = new u8[1];
                                     rc = os.sqlite3OsWrite(this.jfd, zerobyte, 1, iNextHdrOffset);
@@ -4957,7 +4957,7 @@ pPager.pWal = 0;
                                 Array.Clear(dbFileVers, 0, dbFileVers.Length);
                                 // memset( dbFileVers, 0, sizeof( dbFileVers ) );
                             }
-                            if (memcmp(this.dbFileVers, dbFileVers, dbFileVers.Length) != 0)
+                            if (_Custom.memcmp(this.dbFileVers, dbFileVers, dbFileVers.Length) != 0)
                             {
                                 this.pager_reset();
                             }

@@ -1226,10 +1226,10 @@ public static bool ISAUTOVACUUM =false;
 				if (0 == this.mxErr)
 					return;
 				//va_list ap;
-				lock (lock_va_list) {
+				lock (_Custom.lock_va_list) {
 					this.mxErr--;
 					this.nErr++;
-					va_start (ap, zFormat);
+					_Custom.va_start (ap, zFormat);
 					if (this.errMsg.zText.Length != 0) {
                         this.errMsg.sqlite3StrAccumAppend("\n", 1);
 					}
@@ -1237,7 +1237,7 @@ public static bool ISAUTOVACUUM =false;
                         this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
 					}
 					io.sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
-					va_end (ref ap);
+					_Custom.va_end (ref ap);
 				}
 				//if( pCheck.errMsg.mallocFailed ){
 				//  pCheck.mallocFailed = 1;
@@ -1698,10 +1698,10 @@ public static bool ISAUTOVACUUM =false;
 				if (0 == this.mxErr)
 					return;
 				//va_list ap;
-				lock (lock_va_list) {
+				lock (_Custom.lock_va_list) {
 					this.mxErr--;
 					this.nErr++;
-					va_start (ap, zFormat);
+					_Custom.va_start (ap, zFormat);
 					if (this.errMsg.zText.Length != 0) {
                         this.errMsg.sqlite3StrAccumAppend("\n", 1);
 					}
@@ -1709,7 +1709,7 @@ public static bool ISAUTOVACUUM =false;
                         this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
 					}
 					io.sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
-					va_end (ref ap);
+					_Custom.va_end (ref ap);
 				}
 			}
 		}

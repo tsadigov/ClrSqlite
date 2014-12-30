@@ -322,11 +322,11 @@ p.zName, P4_STATIC );
                 ///Nesting should only be of limited depth 
                 ///</summary>
                 //  va_list ap;
-                lock (lock_va_list)
+                lock (_Custom.lock_va_list)
                 {
-                    va_start(ap, zFormat);
+                    _Custom.va_start(ap, zFormat);
                     zSql = io.sqlite3VMPrintf(db, zFormat, ap);
-                    va_end(ref ap);
+                    _Custom.va_end(ref ap);
                 }
                 //if( zSql=="" ){
                 //  return;   /* A malloc must have failed */
@@ -1238,8 +1238,8 @@ goto begin_table_error;
             ///
             ///</summary>
             //#define STRICMP(x, y) (\
-            //sqlite3UpperToLower[*(unsigned char )(x)]==   \
-            //sqlite3UpperToLower[*(unsigned char )(y)]     \
+            //_Custom.sqlite3UpperToLower[*(unsigned char )(x)]==   \
+            //_Custom.sqlite3UpperToLower[*(unsigned char )(y)]     \
             //&& sqlite3StrICmp((x)+1,(y)+1)==0 )
             ///<summary>
             /// Add a new column to the table currently being constructed.
@@ -1359,7 +1359,7 @@ goto begin_table_error;
                 return SQLITE_AFF_NUMERIC;
                 //      string zEnd = pType.z.Substring(pType.n);
                 //      while( zIn!=zEnd ){
-                //        h = (h<<8) + sqlite3UpperToLower[*zIn];
+                //        h = (h<<8) + _Custom.sqlite3UpperToLower[*zIn];
                 //        zIn++;
                 //        if( h==(('c'<<24)+('h'<<16)+('a'<<8)+'r') ){             /* CHAR */
                 //          aff = SQLITE_AFF_TEXT;

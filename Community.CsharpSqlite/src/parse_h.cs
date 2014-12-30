@@ -8519,10 +8519,10 @@ return;
 				Debug.Assert(allowedOp(pExpr.op)&&pExpr.op!=TK_IN);
 				pExpr.pRight.pColl=this.sqlite3ExprCollSeq(pExpr.pRight);
 				pExpr.pLeft.pColl=this.sqlite3ExprCollSeq(pExpr.pLeft);
-				SWAP(ref pExpr.pRight.pColl,ref pExpr.pLeft.pColl);
+				_Custom.SWAP(ref pExpr.pRight.pColl,ref pExpr.pLeft.pColl);
 				pExpr.pRight.Flags=((pExpr.pRight.Flags&~ExprFlags.EP_ExpCollate)|expLeft);
 				pExpr.pLeft.Flags=((pExpr.pLeft.Flags&~ExprFlags.EP_ExpCollate)|expRight);
-				SWAP(ref pExpr.pRight,ref pExpr.pLeft);
+                _Custom.SWAP(ref pExpr.pRight, ref pExpr.pLeft);
 				if(pExpr.op>=TK_GT) {
 					Debug.Assert(TK_LT==TK_GT+2);
 					Debug.Assert(TK_GE==TK_LE+2);

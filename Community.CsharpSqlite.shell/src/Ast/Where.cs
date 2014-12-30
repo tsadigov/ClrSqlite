@@ -952,7 +952,7 @@ namespace Community.CsharpSqlite {
 								///
 								///</summary>
 								if(nEq<pIdx.nColumn&&bRev==(pIdx.aSortOrder[nEq]==SQLITE_SO_ASC?1:0)) {
-									SWAP(ref pRangeEnd,ref pRangeStart);
+                                    _Custom.SWAP(ref pRangeEnd, ref pRangeStart);
 								}
 								testcase(pRangeStart!=null&&(pRangeStart.eOperator&WO_LE)!=0);
 								testcase(pRangeStart!=null&&(pRangeStart.eOperator&WO_GE)!=0);
