@@ -1202,7 +1202,7 @@ goto begin_table_error;
                     ///sqlite3EndTable will generate.
                     if (isView != 0 || isVirtual != 0)
                     {
-                        v.sqlite3VdbeAddOp2(OP_Integer, 0, reg2);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, reg2);
                     }
                     else
                     {
@@ -1703,7 +1703,7 @@ goto begin_table_error;
                 sqlite3 db = pParse.db;
                 Vdbe v = pParse.pVdbe;
                 Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
-                v.sqlite3VdbeAddOp2(OP_Integer, db.aDb[iDb].pSchema.schema_cookie + 1, r1);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Integer, db.aDb[iDb].pSchema.schema_cookie + 1, r1);
                 v.sqlite3VdbeAddOp3(OP_SetCookie, iDb, BTREE_SCHEMA_VERSION, r1);
                 pParse.sqlite3ReleaseTempReg(r1);
             }

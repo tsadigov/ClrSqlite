@@ -580,7 +580,7 @@ goto pragma_out;
 				else {
                     int size = utilc.sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
 					build.sqlite3BeginWriteOperation(pParse,0,iDb);
-					v.sqlite3VdbeAddOp2(OP_Integer,size,1);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,size,1);
 					v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_DEFAULT_CACHE_SIZE,1);
 					Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 					pDb.pSchema.cache_size=size;
@@ -954,7 +954,7 @@ goto pragma_out;
 														iLimit=0x7fffffff;
 													}
 													build.sqlite3BeginWriteOperation(pParse,0,iDb);
-													v.sqlite3VdbeAddOp2(OP_Integer,iLimit,1);
+													v.sqlite3VdbeAddOp2(OpCode.OP_Integer,iLimit,1);
 													addr=v.sqlite3VdbeAddOp1(OpCode.OP_IncrVacuum,iDb);
 													v.sqlite3VdbeAddOp1(OpCode.OP_ResultRow,1);
 													v.sqlite3VdbeAddOp2(OP_AddImm,1,-1);
@@ -1199,17 +1199,17 @@ else
 																						nHidden++;
 																						continue;
 																					}
-																					v.sqlite3VdbeAddOp2(OP_Integer,i-nHidden,1);
+																					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i-nHidden,1);
 																					v.sqlite3VdbeAddOp4(OP_String8,0,2,0,pCol.zName,0);
 																					v.sqlite3VdbeAddOp4(OP_String8,0,3,0,pCol.zType!=null?pCol.zType:"",0);
-																					v.sqlite3VdbeAddOp2(OP_Integer,(pCol.notNull!=0?1:0),4);
+																					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,(pCol.notNull!=0?1:0),4);
 																					if(pCol.zDflt!=null) {
 																						v.sqlite3VdbeAddOp4(OP_String8,0,5,0,pCol.zDflt,0);
 																					}
 																					else {
 																						v.sqlite3VdbeAddOp2(OP_Null,0,5);
 																					}
-																					v.sqlite3VdbeAddOp2(OP_Integer,pCol.isPrimKey!=0?1:0,6);
+																					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,pCol.isPrimKey!=0?1:0,6);
 																					v.sqlite3VdbeAddOp2(OP_ResultRow,1,6);
 																				}
 																			}
@@ -1231,8 +1231,8 @@ else
 																					v.sqlite3VdbeSetColName(2,COLNAME_NAME,"name",SQLITE_STATIC);
 																					for(i=0;i<pIdx.nColumn;i++) {
 																						int cnum=pIdx.aiColumn[i];
-																						v.sqlite3VdbeAddOp2(OP_Integer,i,1);
-																						v.sqlite3VdbeAddOp2(OP_Integer,cnum,2);
+																						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,1);
+																						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,cnum,2);
 																						Debug.Assert(pTab.nCol>cnum);
 																						v.sqlite3VdbeAddOp4(OP_String8,0,3,0,pTab.aCol[cnum].zName,0);
 																						v.sqlite3VdbeAddOp2(OP_ResultRow,1,3);
@@ -1257,9 +1257,9 @@ else
 																							v.sqlite3VdbeSetColName(1,COLNAME_NAME,"name",SQLITE_STATIC);
 																							v.sqlite3VdbeSetColName(2,COLNAME_NAME,"unique",SQLITE_STATIC);
 																							while(pIdx!=null) {
-																								v.sqlite3VdbeAddOp2(OP_Integer,i,1);
+																								v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,1);
 																								v.sqlite3VdbeAddOp4(OP_String8,0,2,0,pIdx.zName,0);
-																								v.sqlite3VdbeAddOp2(OP_Integer,(pIdx.onError!=OE_None)?1:0,3);
+																								v.sqlite3VdbeAddOp2(OpCode.OP_Integer,(pIdx.onError!=OE_None)?1:0,3);
 																								v.sqlite3VdbeAddOp2(OP_ResultRow,1,3);
 																								++i;
 																								pIdx=pIdx.pNext;
@@ -1281,7 +1281,7 @@ else
 																							if(db.aDb[i].pBt==null)
 																								continue;
 																							Debug.Assert(db.aDb[i].zName!=null);
-																							v.sqlite3VdbeAddOp2(OP_Integer,i,1);
+																							v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,1);
 																							v.sqlite3VdbeAddOp4(OP_String8,0,2,0,db.aDb[i].zName,0);
 																							v.sqlite3VdbeAddOp4(OP_String8,0,3,0,db.aDb[i].pBt.GetFilename(),0);
 																							v.sqlite3VdbeAddOp2(OP_ResultRow,1,3);
@@ -1299,7 +1299,7 @@ else
 																							 {
 																								CollSeq pColl=((CollSeq[])p.data)[0];
 																								// sqliteHashData( p );
-																								v.sqlite3VdbeAddOp2(OP_Integer,i++,1);
+																								v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i++,1);
 																								v.sqlite3VdbeAddOp4(OP_String8,0,2,0,pColl.zName,0);
 																								v.sqlite3VdbeAddOp2(OP_ResultRow,1,2);
 																							}
@@ -1334,8 +1334,8 @@ else
 																												string zCol=pFK.aCol[j].zCol;
 																												string zOnDelete=actionName(pFK.aAction[0]);
 																												string zOnUpdate=actionName(pFK.aAction[1]);
-																												v.sqlite3VdbeAddOp2(OP_Integer,i,1);
-																												v.sqlite3VdbeAddOp2(OP_Integer,j,2);
+																												v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,1);
+																												v.sqlite3VdbeAddOp2(OpCode.OP_Integer,j,2);
 																												v.sqlite3VdbeAddOp4(OP_String8,0,3,0,pFK.zTo,0);
 																												v.sqlite3VdbeAddOp4(OP_String8,0,4,0,pTab.aCol[pFK.aCol[j].iFrom].zName,0);
 																												v.sqlite3VdbeAddOp4(zCol!=null?OP_String8:OP_Null,0,5,0,zCol,0);
@@ -1439,7 +1439,7 @@ else
 																												mxErr=SQLITE_INTEGRITY_CHECK_ERROR_MAX;
 																											}
 																										}
-																										v.sqlite3VdbeAddOp2(OP_Integer,mxErr,1);
+																										v.sqlite3VdbeAddOp2(OpCode.OP_Integer,mxErr,1);
 																										///
 																										///<summary>
 																										///reg[1] holds errors left 
@@ -1477,10 +1477,10 @@ else
 																												Table pTab=(Table)x.data;
 																												// sqliteHashData( x );
 																												Index pIdx;
-																												v.sqlite3VdbeAddOp2(OP_Integer,pTab.tnum,2+cnt);
+																												v.sqlite3VdbeAddOp2(OpCode.OP_Integer,pTab.tnum,2+cnt);
 																												cnt++;
 																												for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-																													v.sqlite3VdbeAddOp2(OP_Integer,pIdx.tnum,2+cnt);
+																													v.sqlite3VdbeAddOp2(OpCode.OP_Integer,pIdx.tnum,2+cnt);
 																													cnt++;
 																												}
 																											}
@@ -1525,7 +1525,7 @@ else
 																												v.sqlite3VdbeAddOp2(OpCode.OP_Halt,0,0);
 																												v.sqlite3VdbeJumpHere(addr);
 																												pParse.sqlite3OpenTableAndIndices(pTab,1,OP_OpenRead);
-																												v.sqlite3VdbeAddOp2(OP_Integer,0,2);
+																												v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,2);
 																												///
 																												///<summary>
 																												///reg(2) will count entries 

@@ -1183,11 +1183,11 @@ namespace Community.CsharpSqlite
                         pParse.nMem += pGroupBy.nExpr;
                         iBMem = pParse.nMem + 1;
                         pParse.nMem += pGroupBy.nExpr;
-                        v.sqlite3VdbeAddOp2(OP_Integer, 0, iAbortFlag);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, iAbortFlag);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "clear abort flag" );
 #endif
-                        v.sqlite3VdbeAddOp2(OP_Integer, 0, iUseFlag);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, iUseFlag);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "indicate accumulator empty" );
 #endif
@@ -1331,7 +1331,7 @@ namespace Community.CsharpSqlite
                         ///</summary>
                         v.sqlite3VdbeJumpHere(j1);
                         SelectMethods.updateAccumulator(pParse, sAggInfo);
-                        v.sqlite3VdbeAddOp2(OP_Integer, 1, iUseFlag);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 1, iUseFlag);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "indicate data in accumulator" );
 #endif
@@ -1373,7 +1373,7 @@ namespace Community.CsharpSqlite
                         ///<param name="order to signal the caller to abort.">order to signal the caller to abort.</param>
                         ///<param name=""></param>
                         addrSetAbort = v.sqlite3VdbeCurrentAddr();
-                        v.sqlite3VdbeAddOp2(OP_Integer, 1, iAbortFlag);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 1, iAbortFlag);
                         VdbeComment(v, "set abort flag");
                         v.sqlite3VdbeAddOp1(OpCode.OP_Return, regOutputRow);
                         v.sqlite3VdbeResolveLabel(addrOutputRow);

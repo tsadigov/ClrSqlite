@@ -314,7 +314,7 @@ namespace Community.CsharpSqlite
         //#define OpCode.OP_Goto                                 1
         
         
-        public const int OP_Integer = 7;
+        
 
         public const int OP_Int64 = 8;
 

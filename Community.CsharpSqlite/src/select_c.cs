@@ -860,7 +860,7 @@ namespace Community.CsharpSqlite {
                     ///</summary>
                     case SelectResultType.Exists:
                         {
-                            v.sqlite3VdbeAddOp2(OP_Integer, 1, iParm);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 1, iParm);
                             ///
                             ///<summary>
                             ///The LIMIT clause will terminate the loop for us 
@@ -1693,7 +1693,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     ///</summary>
                     if (p.pLimit.sqlite3ExprIsInteger(ref n) != 0)
                     {
-                        v.sqlite3VdbeAddOp2(OP_Integer, n, iLimit);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, n, iLimit);
                         VdbeComment(v, "LIMIT counter");
                         if (n == 0)
                         {
@@ -1728,14 +1728,14 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
 																																																																																																																													          VdbeComment( v, "OFFSET counter" );
 #endif
                         addr1 = v.sqlite3VdbeAddOp1(OpCode.OP_IfPos, iOffset);
-                        v.sqlite3VdbeAddOp2(OP_Integer, 0, iOffset);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, iOffset);
                         v.sqlite3VdbeJumpHere(addr1);
                         v.sqlite3VdbeAddOp3(OpCode.OP_Add, iLimit, iOffset, iOffset + 1);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "LIMIT+OFFSET" );
 #endif
                         addr1 = v.sqlite3VdbeAddOp1(OpCode.OP_IfPos, iLimit);
-                        v.sqlite3VdbeAddOp2(OP_Integer, -1, iOffset + 1);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, -1, iOffset + 1);
                         v.sqlite3VdbeJumpHere(addr1);
                     }
                 }
@@ -1855,7 +1855,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     v.sqlite3VdbeAddOp3(OpCode.OP_Jump, j2 + 2, iContinue, j2 + 2);
                     v.sqlite3VdbeJumpHere(j1);
                     pParse.sqlite3ExprCodeCopy(pIn.iMem, regPrev + 1, pIn.nMem);
-                    v.sqlite3VdbeAddOp2(OP_Integer, 1, regPrev);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 1, regPrev);
                 }
                 //if ( pParse.db.mallocFailed != 0 ) return 0;
                 ///
@@ -1909,7 +1909,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
 																																																																											/* If any row exist in the result set, record that fact and abort.
 */
 case SelectResultType.Exists: {
-sqlite3VdbeAddOp2(v, OP_Integer, 1, pDest.iParm);
+sqlite3VdbeAddOp2(v, OpCode.OP_Integer, 1, pDest.iParm);
 /* The LIMIT clause will terminate the loop for us */
 break;
 }
@@ -2413,7 +2413,7 @@ break;
                         ///</summary>
                     );
                     regPrev = pParse.sqlite3GetTempRange(nExpr + 1);
-                    v.sqlite3VdbeAddOp2(OP_Integer, 0, regPrev);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, regPrev);
                     pKeyDup = new KeyInfo();
                     //sqlite3DbMallocZero(db,
                     //sizeof(*pKeyDup) + nExpr*(sizeof(CollSeq)+1) );
@@ -2488,7 +2488,7 @@ break;
                 pPrior.iLimit = regLimitA;
                 SelectMethods.explainSetInteger(ref iSub1, pParse.iNextSelectId);
                 Select.sqlite3Select(pParse, pPrior, ref destA);
-                v.sqlite3VdbeAddOp2(OP_Integer, 1, regEofA);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 1, regEofA);
                 v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrA);
                 VdbeNoopComment(v, "End coroutine for left SELECT");
                 ///
@@ -2507,7 +2507,7 @@ break;
                 Select.sqlite3Select(pParse, p, ref destB);
                 p.iLimit = savedLimit;
                 p.iOffset = savedOffset;
-                v.sqlite3VdbeAddOp2(OP_Integer, 1, regEofB);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 1, regEofB);
                 v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrB);
                 VdbeNoopComment(v, "End coroutine for right SELECT");
                 ///
@@ -2620,8 +2620,8 @@ break;
                 ///
                 ///</summary>
                 v.sqlite3VdbeJumpHere(j1);
-                v.sqlite3VdbeAddOp2(OP_Integer, 0, regEofA);
-                v.sqlite3VdbeAddOp2(OP_Integer, 0, regEofB);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, regEofA);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, regEofB);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regAddrA, addrSelectA);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regAddrB, addrSelectB);
                 v.sqlite3VdbeAddOp2(OP_If, regEofA, addrEofA);

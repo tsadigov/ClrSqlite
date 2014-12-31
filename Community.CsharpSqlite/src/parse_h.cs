@@ -816,7 +816,7 @@ return;
 					int j1;
 					v.sqlite3VdbeAddOp3(OP_ReadCookie,iDb,r1,BTREE_FILE_FORMAT);
                     vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
-					v.sqlite3VdbeAddOp2(OP_Integer,minFormat,r2);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,minFormat,r2);
 					j1=v.sqlite3VdbeAddOp3(OP_Ge,r2,0,r1);
 					v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_FILE_FORMAT,r2);
 					v.sqlite3VdbeJumpHere(j1);
@@ -1449,9 +1449,9 @@ return;
 ** not been populated. In this case populate it now.  */
     if ( pTab.pIndex == pIdx )
     {
-      sqlite3VdbeAddOp2( v, OP_Integer, SQLITE_INDEX_SAMPLES, regSamplerecno );
-      sqlite3VdbeAddOp2( v, OP_Integer, SQLITE_INDEX_SAMPLES * 2 - 1, regTemp );
-      sqlite3VdbeAddOp2( v, OP_Integer, SQLITE_INDEX_SAMPLES * 2, regTemp2 );
+      sqlite3VdbeAddOp2( v, OpCode.OP_Integer, SQLITE_INDEX_SAMPLES, regSamplerecno );
+      sqlite3VdbeAddOp2( v, OpCode.OP_Integer, SQLITE_INDEX_SAMPLES * 2 - 1, regTemp );
+      sqlite3VdbeAddOp2( v, OpCode.OP_Integer, SQLITE_INDEX_SAMPLES * 2, regTemp2 );
 
       sqlite3VdbeAddOp2( v, OP_Count, iIdxCur, regLast );
       sqlite3VdbeAddOp2( v, OP_Null, 0, regFirst );
@@ -1464,8 +1464,8 @@ return;
     }
 
     /* Zero the regSampleno and regRecno registers. */
-    sqlite3VdbeAddOp2( v, OP_Integer, 0, regSampleno );
-    sqlite3VdbeAddOp2( v, OP_Integer, 0, regRecno );
+    sqlite3VdbeAddOp2( v, OpCode.OP_Integer, 0, regSampleno );
+    sqlite3VdbeAddOp2( v, OpCode.OP_Integer, 0, regRecno );
     sqlite3VdbeAddOp2( v, OP_Copy, regFirst, regSamplerecno );
 #endif
 					///
@@ -1487,7 +1487,7 @@ return;
 					///<param name="Cells iMem through iMem+nCol are initialized to 0. The others are ">Cells iMem through iMem+nCol are initialized to 0. The others are </param>
 					///<param name="initialized to contain an SQL NULL.">initialized to contain an SQL NULL.</param>
 					for(i=0;i<=nCol;i++) {
-						v.sqlite3VdbeAddOp2(OP_Integer,0,iMem+i);
+						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,iMem+i);
 					}
 					for(i=0;i<nCol;i++) {
 						v.sqlite3VdbeAddOp2(OP_Null,0,iMem+nCol+i+1);
@@ -1527,7 +1527,7 @@ return;
         sqlite3VdbeAddOp2( v, OP_AddImm, regSampleno, 1 );
         sqlite3VdbeAddOp3( v, OP_Subtract, regRecno, regLast, regTemp );
         sqlite3VdbeAddOp2( v, OP_AddImm, regTemp, -1 );
-        sqlite3VdbeAddOp2( v, OP_Integer, SQLITE_INDEX_SAMPLES, regTemp2 );
+        sqlite3VdbeAddOp2( v, OpCode.OP_Integer, SQLITE_INDEX_SAMPLES, regTemp2 );
         sqlite3VdbeAddOp3( v, OP_Subtract, regSampleno, regTemp2, regTemp2 );
         sqlite3VdbeAddOp3( v, OP_Divide, regTemp2, regTemp, regTemp );
         sqlite3VdbeAddOp3( v, OP_Add, regSamplerecno, regTemp, regSamplerecno );
@@ -3847,7 +3847,7 @@ isView = false;
 					///<param name=""></param>
 					int rc=0,j1;
 					regEof=++this.nMem;
-					v.sqlite3VdbeAddOp2(OP_Integer,0,regEof);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regEof);
 					///
 					///<summary>
 					///</summary>
@@ -3857,7 +3857,7 @@ isView = false;
 #endif
                     dest.Init(SelectResultType.Coroutine, ++this.nMem);
 					addrSelect=v.sqlite3VdbeCurrentAddr()+2;
-					v.sqlite3VdbeAddOp2(OP_Integer,addrSelect-1,dest.iParm);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,addrSelect-1,dest.iParm);
 					j1=v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,0);
 					#if SQLITE_DEBUG
 																																																																																																																																			        VdbeComment( v, "Jump over SELECT coroutine" );
@@ -3875,7 +3875,7 @@ isView = false;
 					) {
 						goto insert_cleanup;
 					}
-					v.sqlite3VdbeAddOp2(OP_Integer,1,regEof);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,regEof);
 					///
 					///<summary>
 					///</summary>
@@ -4059,7 +4059,7 @@ isView = false;
 				///</summary>
 				if((db.flags&SQLITE_CountRows)!=0) {
 					regRowCount=++this.nMem;
-					v.sqlite3VdbeAddOp2(OP_Integer,0,regRowCount);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regRowCount);
 				}
 				///
 				///<summary>
@@ -4147,7 +4147,7 @@ isView = false;
 					///<param name="not happened yet) so we substitute a rowid of ">1</param>
 					///<param name=""></param>
 					if(keyColumn<0) {
-						v.sqlite3VdbeAddOp2(OP_Integer,-1,regCols);
+						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,-1,regCols);
 					}
 					else {
 						int j1;
@@ -4163,7 +4163,7 @@ isView = false;
 							this.sqlite3ExprCode(pList.a[keyColumn].pExpr,regCols);
 						}
 						j1=v.sqlite3VdbeAddOp1(OpCode.OP_NotNull,regCols);
-						v.sqlite3VdbeAddOp2(OP_Integer,-1,regCols);
+						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,-1,regCols);
 						v.sqlite3VdbeJumpHere(j1);
 						v.sqlite3VdbeAddOp1(OpCode.OP_MustBeInt,regCols);
 					}
@@ -4498,7 +4498,7 @@ isView = false;
 					v.sqlite3VdbeAddOp3(OP_Column,0,1,memId);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,addr+9);
 					v.sqlite3VdbeAddOp2(OP_Next,0,addr+2);
-					v.sqlite3VdbeAddOp2(OP_Integer,0,memId);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,memId);
 					v.sqlite3VdbeAddOp0(OP_Close);
 				}
 			}
@@ -5578,7 +5578,7 @@ aXRef[j] = -1;
 				///</summary>
 				if((db.flags&SQLITE_CountRows)!=0&&null==this.pTriggerTab) {
 					regRowCount=++this.nMem;
-					v.sqlite3VdbeAddOp2(OP_Integer,0,regRowCount);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regRowCount);
 				}
 				if(!isView) {
 					///
@@ -6296,7 +6296,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///</summary>
 				if((db.flags&SQLITE_CountRows)!=0) {
 					memCnt=++this.nMem;
-					v.sqlite3VdbeAddOp2(OP_Integer,0,memCnt);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,memCnt);
 				}
 				#if !SQLITE_OMIT_TRUNCATE_OPTIMIZATION
 				///
@@ -7330,7 +7330,7 @@ return;
 						}
 						else {
 							regFree1=r1=this.sqlite3GetTempReg();
-							v.sqlite3VdbeAddOp2(OP_Integer,0,r1);
+							v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,r1);
 							r2=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree2);
 							v.sqlite3VdbeAddOp3(OP_Subtract,r2,r1,target);
 							testcase(regFree2==0);
@@ -7357,7 +7357,7 @@ return;
 					Debug.Assert((int)TokenType.TK_NOTNULL==(int)OpCode.OP_NotNull);
 					testcase(op==TK_ISNULL);
 					testcase(op==TK_NOTNULL);
-					v.sqlite3VdbeAddOp2(OP_Integer,1,target);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,target);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					testcase(regFree1==0);
 					addr=v.sqlite3VdbeAddOp1((OpCode)op,r1);
@@ -7535,7 +7535,7 @@ return;
 					int destIfNull=v.sqlite3VdbeMakeLabel();
 					v.sqlite3VdbeAddOp2(OP_Null,0,target);
 					this.sqlite3ExprCodeIN(pExpr,destIfFalse,destIfNull);
-					v.sqlite3VdbeAddOp2(OP_Integer,1,target);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,target);
 					v.sqlite3VdbeResolveLabel(destIfFalse);
 					v.sqlite3VdbeAddOp2(OP_AddImm,target,0);
 					v.sqlite3VdbeResolveLabel(destIfNull);
@@ -9053,7 +9053,7 @@ return;
 				Debug.Assert(v!=null);
 				regIsInit=++this.nMem;
 				addrInit=v.sqlite3VdbeAddOp1(OpCode.OP_If,regIsInit);
-				v.sqlite3VdbeAddOp2(OP_Integer,1,regIsInit);
+				v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,regIsInit);
 				///
 				///<summary>
 				///Count the number of columns that will be added to the index
@@ -11759,7 +11759,7 @@ range_est_fallback:
 						int iMem=++this.nMem;
 						int iAddr;
 						iAddr=v.sqlite3VdbeAddOp1(OpCode.OP_If,iMem);
-						v.sqlite3VdbeAddOp2(OP_Integer,1,iMem);
+						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,iMem);
 						this.sqlite3OpenTable(iTab,iDb,pTab,OP_OpenRead);
 						eType=IN_INDEX_ROWID;
 						v.sqlite3VdbeJumpHere(iAddr);
@@ -11793,7 +11793,7 @@ range_est_fallback:
 								KeyInfo pKey;
 								pKey=build.sqlite3IndexKeyinfo(this,pIdx);
 								iAddr=v.sqlite3VdbeAddOp1(OpCode.OP_If,iMem);
-								v.sqlite3VdbeAddOp2(OP_Integer,1,iMem);
+								v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,iMem);
 								v.sqlite3VdbeAddOp4(OP_OpenRead,iTab,pIdx.tnum,iDb,pKey,P4_KEYINFO_HANDOFF);
 								#if SQLITE_DEBUG
 																																																																																																																																																																																																				              VdbeComment( v, "%s", pIdx.zName );
@@ -11884,7 +11884,7 @@ range_est_fallback:
 				if(!pExpr.ExprHasAnyProperty(EP_VarSelect)&&null==this.pTriggerTab) {
 					int mem=++this.nMem;
 					v.sqlite3VdbeAddOp1(OpCode.OP_If,mem);
-					testAddr=v.sqlite3VdbeAddOp2(OP_Integer,1,mem);
+					testAddr=v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,mem);
 					Debug.Assert(testAddr>0///
 					///<summary>
 					///|| pParse.db.mallocFailed != 0 
@@ -12079,7 +12079,7 @@ range_est_fallback:
 					}
 					else {
 						dest.eDest=SelectResultType.Exists;
-						v.sqlite3VdbeAddOp2(OP_Integer,0,dest.iParm);
+						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,dest.iParm);
 						#if SQLITE_DEBUG
 																																																																																																																																														              VdbeComment( v, "Init EXISTS result" );
 #endif
@@ -12258,7 +12258,7 @@ range_est_fallback:
 						///</summary>
 						j2=v.sqlite3VdbeAddOp1(OpCode.OP_NotNull,rRhsHasNull);
 						j3=v.sqlite3VdbeAddOp4Int(OP_Found,pExpr.iTable,0,rRhsHasNull,1);
-						v.sqlite3VdbeAddOp2(OP_Integer,-1,rRhsHasNull);
+						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,-1,rRhsHasNull);
 						v.sqlite3VdbeJumpHere(j3);
 						v.sqlite3VdbeAddOp2(OP_AddImm,rRhsHasNull,1);
 						v.sqlite3VdbeJumpHere(j2);
@@ -12290,7 +12290,7 @@ range_est_fallback:
 					Debug.Assert(i>=0);
 					if(negFlag)
 						i=-i;
-					v.sqlite3VdbeAddOp2(OP_Integer,i,iMem);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,iMem);
 				}
 				else {
 					int c;

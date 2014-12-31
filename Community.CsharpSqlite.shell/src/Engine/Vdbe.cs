@@ -700,8 +700,8 @@ pOp.cnt = 0;
 								if(opcode==OP_VFilter) {
 									int n;
 									Debug.Assert(this.nOp-i>=3);
-									Debug.Assert(this.lOp[i-1].opcode==OP_Integer);
-									//pOp[-1].opcode==OP_Integer );
+									Debug.Assert(this.lOp[i-1].OpCode==OpCode.OP_Integer);
+									//pOp[-1].opcode==OpCode.OP_Integer );
 									n=this.lOp[i-1].p1;
 									//pOp[-1].p1;
 									if(n>nMaxArgs)

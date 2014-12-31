@@ -507,7 +507,7 @@ namespace Community.CsharpSqlite {
 				if(pLevel.iFrom>0&&(pTabItem.jointype&JT_LEFT)!=0)// Check value of pTabItem[0].jointype
 				 {
 					pLevel.iLeftJoin=++pParse.nMem;
-					v.sqlite3VdbeAddOp2(OP_Integer,0,pLevel.iLeftJoin);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,pLevel.iLeftJoin);
 					#if SQLITE_DEBUG
 																																																																																																																								        VdbeComment( v, "init LEFT JOIN no-match flag" );
 #endif
@@ -542,8 +542,8 @@ namespace Community.CsharpSqlite {
 						if(k==nConstraint)
 							break;
 					}
-					v.sqlite3VdbeAddOp2(OP_Integer,pVtabIdx.idxNum,iReg);
-					v.sqlite3VdbeAddOp2(OP_Integer,j-1,iReg+1);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,pVtabIdx.idxNum,iReg);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,j-1,iReg+1);
 					v.sqlite3VdbeAddOp4(OP_VFilter,iCur,addrBrk,iReg,pVtabIdx.idxStr,pVtabIdx.needToFreeIdxStr!=0?P4_MPRINTF:P4_STATIC);
 					pVtabIdx.needToFreeIdxStr=0;
 					for(j=0;j<nConstraint;j++) {
@@ -1263,7 +1263,7 @@ namespace Community.CsharpSqlite {
 										regRowid=++pParse.nMem;
 										v.sqlite3VdbeAddOp2(OP_Null,0,regRowset);
 									}
-									iRetInit=v.sqlite3VdbeAddOp2(OP_Integer,0,regReturn);
+									iRetInit=v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regReturn);
 									for(ii=0;ii<pOrWc.nTerm;ii++) {
 										WhereTerm pOrTerm=pOrWc.a[ii];
 										if(pOrTerm.leftCursor==iCur||pOrTerm.eOperator==WO_AND) {
@@ -1383,7 +1383,7 @@ namespace Community.CsharpSqlite {
 				///</summary>
 				if(pLevel.iLeftJoin!=0) {
 					pLevel.addrFirst=v.sqlite3VdbeCurrentAddr();
-					v.sqlite3VdbeAddOp2(OP_Integer,1,pLevel.iLeftJoin);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,pLevel.iLeftJoin);
 					#if SQLITE_DEBUG
 																																																																																																																								        VdbeComment( v, "record LEFT JOIN hit" );
 #endif
