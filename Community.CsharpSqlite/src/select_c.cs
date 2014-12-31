@@ -917,7 +917,7 @@ namespace Community.CsharpSqlite {
                                 }
                                 else
                                 {
-                                    v.sqlite3VdbeAddOp2(OP_ResultRow, regResult, nColumn);
+                                    v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow, regResult, nColumn);
                                     pParse.sqlite3ExprCacheAffinityChange(regResult, nColumn);
                                 }
                             break;
@@ -1231,7 +1231,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                             }
                             if (eDest == SelectResultType.Output)
                             {
-                                v.sqlite3VdbeAddOp2(OP_ResultRow, pDest.iMem, nColumn);
+                                v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow, pDest.iMem, nColumn);
                                 pParse.sqlite3ExprCacheAffinityChange(pDest.iMem, nColumn);
                             }
                             else
@@ -1954,14 +1954,14 @@ break;
                     ///destination other than the ones handled above or SelectResultType.Output.
                     ///
                     ///For SelectResultType.Output, results are stored in a sequence of registers.
-                    ///Then the OP_ResultRow opcode is used to cause sqlite3_step() to
+                    ///Then the OpCode.OP_ResultRow opcode is used to cause sqlite3_step() to
                     ///return the next row of result.
                     ///
                     ///</summary>
                     default:
                         {
                             Debug.Assert(pDest.eDest == SelectResultType.Output);
-                            v.sqlite3VdbeAddOp2(OP_ResultRow, pIn.iMem, pIn.nMem);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow, pIn.iMem, pIn.nMem);
                             pParse.sqlite3ExprCacheAffinityChange(pIn.iMem, pIn.nMem);
                             break;
                         }

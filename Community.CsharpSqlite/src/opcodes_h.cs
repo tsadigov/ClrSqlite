@@ -332,8 +332,6 @@ namespace Community.CsharpSqlite
 
         
 
-        public const int OP_ResultRow = 16;
-
         public const int OP_Concat = 91///
             ///<summary>
             ///same as TK_CONCAT   

@@ -4429,7 +4429,7 @@ isView = false;
 				///
 				///</summary>
 				if((db.flags&SQLITE_CountRows)!=0&&0==this.nested&&null==this.pTriggerTab) {
-					v.sqlite3VdbeAddOp2(OP_ResultRow,regRowCount,1);
+					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,regRowCount,1);
 					v.sqlite3VdbeSetNumCols(1);
 					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows inserted",SQLITE_STATIC);
 				}
@@ -5836,7 +5836,7 @@ aXRef[j] = -1;
 				///
 				///</summary>
 				if((db.flags&SQLITE_CountRows)!=0&&null==this.pTriggerTab&&0==this.nested) {
-					v.sqlite3VdbeAddOp2(OP_ResultRow,regRowCount,1);
+					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,regRowCount,1);
 					v.sqlite3VdbeSetNumCols(1);
 					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows updated",SQLITE_STATIC);
 				}
@@ -6427,7 +6427,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///
 				///</summary>
 				if((db.flags&SQLITE_CountRows)!=0&&0==this.nested&&null==this.pTriggerTab) {
-					v.sqlite3VdbeAddOp2(OP_ResultRow,memCnt,1);
+					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,memCnt,1);
 					v.sqlite3VdbeSetNumCols(1);
 					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows deleted",SQLITE_STATIC);
 				}

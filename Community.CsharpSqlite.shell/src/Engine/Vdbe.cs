@@ -3488,7 +3488,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///of integers in P4.
 						///
 						///The permutation is only valid until the next OP_Permutation, OP_Compare,
-						///OP_Halt, or OP_ResultRow.  Typically the OP_Permutation should occur
+						///OP_Halt, or OpCode.OP_ResultRow.  Typically the OP_Permutation should occur
 						///immediately prior to the OP_Compare.
 						///
 						///</summary>

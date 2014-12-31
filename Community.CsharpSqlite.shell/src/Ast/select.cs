@@ -643,7 +643,7 @@ namespace Community.CsharpSqlite
             ///
             ///     pDest.eDest    Result
             ///     ------------    -------------------------------------------
-            ///     SelectResultType.Output      Generate a row of output (using the OP_ResultRow
+            ///     SelectResultType.Output      Generate a row of output (using the OpCode.OP_ResultRow
             ///                     opcode) for each row in the result set.
             ///
             ///     SelectResultType.Mem         Only valid if the result is a single column.
