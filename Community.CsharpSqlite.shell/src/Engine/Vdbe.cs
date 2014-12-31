@@ -785,6 +785,15 @@ pOp.cnt = 0;
 					this.lOp[this.nOp-1].p5=val;
 				}
 			}
+            public void sqlite3VdbeChangeP5(OpCode val)
+            {
+                Debug.Assert(this != null);
+                if (this.lOp != null)
+                {
+                    Debug.Assert(this.nOp > 0);
+                    this.lOp[this.nOp - 1].p5 = (u8)val;
+                }
+            }
 			public void sqlite3VdbeJumpHere(int addr) {
 				Debug.Assert(addr>=0);
 				this.sqlite3VdbeChangeP2(addr,this.nOp);

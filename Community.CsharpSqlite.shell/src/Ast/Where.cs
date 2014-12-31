@@ -87,7 +87,7 @@ namespace Community.CsharpSqlite {
 			/** Jump here to start the next IN combination */public int addrCont;
 			/** Jump here to continue with the next loop cycle */public int addrFirst;
 			/** First instruction of interior of the loop */public u8 iFrom;
-			/** Which entry in the FROM clause */public u8 op,p5;
+			/** Which entry in the FROM clause */public OpCode op;public u8 p5;
 			///<summary>
 			///Opcode and P5 of the opcode that ends the loop
 			///</summary>
@@ -261,7 +261,7 @@ namespace Community.CsharpSqlite {
 				for(i=this.nLevel-1;i>=0;i--) {
 					pLevel=this.a[i];
 					v.sqlite3VdbeResolveLabel(pLevel.addrCont);
-					if(pLevel.op!=OP_Noop) {
+					if(pLevel.op!=OpCode.OP_Noop) {
 						v.sqlite3VdbeAddOp2(pLevel.op,pLevel.p1,pLevel.p2);
 						v.sqlite3VdbeChangeP5(pLevel.p5);
 					}
@@ -289,7 +289,7 @@ namespace Community.CsharpSqlite {
 						if(pLevel.iIdxCur>=0) {
 							v.sqlite3VdbeAddOp1(OpCode.OP_NullRow,pLevel.iIdxCur);
 						}
-						if(pLevel.op==OP_Return) {
+						if(pLevel.op==OpCode.OP_Return) {
 							v.sqlite3VdbeAddOp2(OpCode.OP_Gosub,pLevel.p1,pLevel.addrFirst);
 						}
 						else {
@@ -552,7 +552,7 @@ namespace Community.CsharpSqlite {
 							pLevel.disableTerm(pWC.a[iTerm]);
 						}
 					}
-					pLevel.op=OP_VNext;
+					pLevel.op=OpCode.OP_VNext;
 					pLevel.p1=iCur;
 					pLevel.p2=v.sqlite3VdbeCurrentAddr();
 					pParse.sqlite3ReleaseTempRange(iReg,nConstraint+2);
@@ -588,7 +588,7 @@ namespace Community.CsharpSqlite {
 						#if SQLITE_DEBUG
 																																																																																																																																																				          VdbeComment( v, "pk" );
 #endif
-						pLevel.op=OP_Noop;
+						pLevel.op=OpCode.OP_Noop;
 					}
 					else
 						if((pLevel.plan.wsFlags&WHERE_ROWID_RANGE)!=0) {
@@ -704,7 +704,7 @@ namespace Community.CsharpSqlite {
 								pLevel.disableTerm(pEnd);
 							}
 							start=v.sqlite3VdbeCurrentAddr();
-							pLevel.op=(u8)(bRev!=0?OP_Prev:OP_Next);
+                            pLevel.op = (bRev != 0 ? OpCode.OP_Prev : OpCode.OP_Next);
 							pLevel.p1=iCur;
 							pLevel.p2=start;
 							if(pStart==null&&pEnd==null) {
@@ -1103,14 +1103,14 @@ namespace Community.CsharpSqlite {
 								///
 								///</summary>
 								if((pLevel.plan.wsFlags&WHERE_UNIQUE)!=0) {
-									pLevel.op=OP_Noop;
+									pLevel.op=OpCode.OP_Noop;
 								}
 								else
 									if(bRev!=0) {
-										pLevel.op=OP_Prev;
+										pLevel.op=OpCode.OP_Prev;
 									}
 									else {
-										pLevel.op=OP_Next;
+										pLevel.op=OpCode.OP_Next;
 									}
 								pLevel.p1=iIdxCur;
 							}
@@ -1205,7 +1205,7 @@ namespace Community.CsharpSqlite {
 									Debug.Assert(pTerm.eOperator==WO_OR);
 									Debug.Assert((pTerm.wtFlags&TERM_ORINFO)!=0);
 									pOrWc=pTerm.u.pOrInfo.wc;
-									pLevel.op=OP_Return;
+									pLevel.op=OpCode.OP_Return;
 									pLevel.p1=regReturn;
 									///
 									///<summary>
@@ -1323,9 +1323,9 @@ namespace Community.CsharpSqlite {
 									///scan of the entire table.
 									///
 									///</summary>
-									u8[] aStep=new u8[] {
-										OP_Next,
-										OP_Prev
+									OpCode[] aStep=new OpCode[] {
+										OpCode.OP_Next,
+										OpCode.OP_Prev
 									};
 									u8[] aStart=new u8[] {
 										OP_Rewind,

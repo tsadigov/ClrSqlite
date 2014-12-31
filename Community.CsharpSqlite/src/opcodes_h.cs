@@ -313,9 +313,6 @@ namespace Community.CsharpSqlite
 
         //#define OpCode.OP_Goto                                 1
         
-
-        public const int OP_Return = 3;
-
         public const int OP_Yield = 4;
 
         public const int OP_HaltIfNull = 5;
