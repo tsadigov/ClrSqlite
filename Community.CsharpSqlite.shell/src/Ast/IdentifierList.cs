@@ -16,6 +16,7 @@ using Pgno = System.UInt32;
 
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar = System.Int16;
+using System.Collections.Generic;
 
 #else
 using ynVar = System.Int32; 
@@ -43,18 +44,20 @@ namespace Community.CsharpSqlite
         ///</summary>
         public class IdList_item
         {
-            public string zName;
-            ///
             ///<summary>
             ///Name of the identifier 
             ///</summary>
-            public int idx;
-            ///
+            public string zName;
+
             ///<summary>
             ///Index in some Table.aCol[] of a column named zName 
             ///</summary>
+            public int idx;            
         }
-        public class IdList
+
+        //TODO: List<IdList_item>
+
+        public class IdList 
         {
             public IdList_item[] a;
             public int nId;

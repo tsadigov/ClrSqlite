@@ -6725,7 +6725,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									db.init.busy=1;
 									initData.rc=SQLITE_OK;
 									//Debug.Assert( 0 == db.mallocFailed );
-									rc=sqlite3_exec(db,zSql,(dxCallback)sqlite3InitCallback,(object)initData,0);
+                                    rc = legacy.sqlite3_exec(db, zSql, (dxCallback)sqlite3InitCallback, (object)initData, 0);
 									if(rc==SQLITE_OK)
 										rc=initData.rc;
 									db.sqlite3DbFree(ref zSql);

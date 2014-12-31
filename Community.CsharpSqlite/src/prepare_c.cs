@@ -419,7 +419,7 @@ int (*xAuth)(void*,int,const char*,const char*,const char*,const char*);
 xAuth = db.xAuth;
 db.xAuth = 0;
 #endif
-				rc=sqlite3_exec(db,zSql,(dxCallback)sqlite3InitCallback,initData,0);
+				rc=legacy.sqlite3_exec(db,zSql,(dxCallback)sqlite3InitCallback,initData,0);
 				pzErrMsg=initData.pzErrMsg;
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																db.xAuth = xAuth;

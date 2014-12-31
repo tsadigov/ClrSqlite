@@ -233,7 +233,7 @@ namespace Community.CsharpSqlite
 			//}
 			//else
 			{
-				rc = sqlite3_exec (db, zSql, (dxCallback)analysisLoader, sInfo, 0);
+				rc = legacy.sqlite3_exec (db, zSql, (dxCallback)analysisLoader, sInfo, 0);
 				db.sqlite3DbFree (ref zSql);
 				///
 ///<summary>

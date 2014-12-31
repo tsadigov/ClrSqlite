@@ -1494,7 +1494,7 @@ if( db ) sqlite3_interrupt(db);
 	static int run_schema_dump_query (callback_data p, string zQuery, string pzErrMsg)
 	{
 		int rc;
-		rc = Sqlite3.sqlite3_exec (p.db, zQuery, (dxCallback)dump_callback, p, ref pzErrMsg);
+		rc = Sqlite3.legacy.sqlite3_exec (p.db, zQuery, (dxCallback)dump_callback, p, ref pzErrMsg);
 		if (rc == Sqlite3.SQLITE_CORRUPT) {
 			StringBuilder zQ2;
 			int len = strlen30 (zQuery);
@@ -1504,7 +1504,7 @@ if( db ) sqlite3_interrupt(db);
 			if (zQ2 == null)
 				return rc;
 			Sqlite3.io.sqlite3_snprintf (zQ2.Capacity, zQ2, "%s ORDER BY rowid DESC", zQuery);
-			rc = Sqlite3.sqlite3_exec (p.db, zQ2.ToString (), (dxCallback)dump_callback, p, ref pzErrMsg);
+            rc = Sqlite3.legacy.sqlite3_exec(p.db, zQ2.ToString(), (dxCallback)dump_callback, p, ref pzErrMsg);
 			free (ref zQ2);
 		}
 		return rc;
@@ -1747,7 +1747,7 @@ if( db ) sqlite3_interrupt(db);
 					data.colWidth [1] = 15;
 					data.colWidth [2] = 58;
 					data.cnt = 0;
-					Sqlite3.sqlite3_exec (p.db, "PRAGMA database_list; ", (dxCallback)callback, data, ref zErrMsg);
+                    Sqlite3.legacy.sqlite3_exec(p.db, "PRAGMA database_list; ", (dxCallback)callback, data, ref zErrMsg);
 					if (zErrMsg != "") {
 						fprintf (stderr, "Error: %s\n", zErrMsg);
 						//sqlite3_free( ref zErrMsg );
@@ -1760,7 +1760,7 @@ if( db ) sqlite3_interrupt(db);
 						fprintf (p._out, "BEGIN TRANSACTION;\n");
 						p.writableSchema = false;
 						string sDummy = "";
-						Sqlite3.sqlite3_exec (p.db, "PRAGMA writable_schema=ON", null, null, ref sDummy);
+                        Sqlite3.legacy.sqlite3_exec(p.db, "PRAGMA writable_schema=ON", null, null, ref sDummy);
 						if (nArg == 1) {
 							run_schema_dump_query (p, "SELECT name, type, sql FROM sqlite_master " + "WHERE sql NOT null; AND type=='table'", null);
 							run_table_dump_query (p._out, p.db, "SELECT sql FROM sqlite_master " + "WHERE sql NOT null; AND type IN ('index','trigger','view')");
@@ -1778,7 +1778,7 @@ if( db ) sqlite3_interrupt(db);
 							fprintf (p._out, "PRAGMA writable_schema=OFF;\n");
 							p.writableSchema = false;
 						}
-						Sqlite3.sqlite3_exec (p.db, "PRAGMA writable_schema=OFF", 0, 0, 0);
+						Sqlite3.legacy.sqlite3_exec (p.db, "PRAGMA writable_schema=OFF", 0, 0, 0);
 						if (zErrMsg != "") {
 							fprintf (stderr, "Error: %s\n", zErrMsg);
 							//sqlite3_free( ref zErrMsg );
@@ -2022,7 +2022,7 @@ if( db ) sqlite3_interrupt(db);
 													// fclose( _in );
 													return 0;
 												}
-												Sqlite3.sqlite3_exec (p.db, "BEGIN", 0, 0, 0);
+                                                Sqlite3.legacy.sqlite3_exec(p.db, "BEGIN", 0, 0, 0);
 												zCommit = "COMMIT";
 												while ((zLine.Append (local_getline ("", _in))).Length != 0) {
 													string z;
@@ -2070,7 +2070,7 @@ if( db ) sqlite3_interrupt(db);
 												_in.Close ();
 												// fclose( _in );
 												Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
-												Sqlite3.sqlite3_exec (p.db, zCommit.ToString (), null, null, ref sDummy);
+                                                Sqlite3.legacy.sqlite3_exec(p.db, zCommit.ToString(), null, null, ref sDummy);
 											}
 											else
 												if (c == 'i' && strncmp (azArg [0], "indices", n) == 0 && nArg > 1) {
@@ -2082,7 +2082,7 @@ if( db ) sqlite3_interrupt(db);
 													data.showHeader = false;
 													data.mode = MODE_List;
 													zShellStatic = azArg [1].ToString ();
-													Sqlite3.sqlite3_exec (p.db, "SELECT name FROM sqlite_master " + "WHERE type='index' AND tbl_name LIKE shellstatic() " + "UNION ALL " + "SELECT name FROM sqlite_temp_master " + "WHERE type='index' AND tbl_name LIKE shellstatic() " + "ORDER BY 1", (dxCallback)callback, data, ref zErrMsg);
+                                                    Sqlite3.legacy.sqlite3_exec(p.db, "SELECT name FROM sqlite_master " + "WHERE type='index' AND tbl_name LIKE shellstatic() " + "UNION ALL " + "SELECT name FROM sqlite_temp_master " + "WHERE type='index' AND tbl_name LIKE shellstatic() " + "ORDER BY 1", (dxCallback)callback, data, ref zErrMsg);
 													zShellStatic = "";
 													if (zErrMsg != "") {
 														fprintf (stderr, "Error: %s\n", zErrMsg);
@@ -2314,12 +2314,12 @@ sqlite3IoTrace = iotracePrintf;
 																								}
 																								else {
 																									zShellStatic = azArg [1].ToString ();
-																									Sqlite3.sqlite3_exec (p.db, "SELECT sql FROM " + "  (SELECT sql sql, type type, tbl_name tbl_name, name name" + "     FROM sqlite_master UNION ALL" + "   SELECT sql, type, tbl_name, name FROM sqlite_temp_master) " + "WHERE tbl_name LIKE shellstatic() AND type!='meta' AND sql NOTNULL " + "ORDER BY substr(type,2,1), name", (dxCallback)callback, data, ref zErrMsg);
+                                                                                                    Sqlite3.legacy.sqlite3_exec(p.db, "SELECT sql FROM " + "  (SELECT sql sql, type type, tbl_name tbl_name, name name" + "     FROM sqlite_master UNION ALL" + "   SELECT sql, type, tbl_name, name FROM sqlite_temp_master) " + "WHERE tbl_name LIKE shellstatic() AND type!='meta' AND sql NOTNULL " + "ORDER BY substr(type,2,1), name", (dxCallback)callback, data, ref zErrMsg);
 																									zShellStatic = "";
 																								}
 																						}
 																						else {
-																							Sqlite3.sqlite3_exec (p.db, "SELECT sql FROM " + "  (SELECT sql sql, type type, tbl_name tbl_name, name name" + "     FROM sqlite_master UNION ALL" + "   SELECT sql, type, tbl_name, name FROM sqlite_temp_master) " + "WHERE type!='meta' AND sql NOTNULL AND name NOT LIKE 'sqlite_%'" + "ORDER BY substr(type,2,1), name", (dxCallback)callback, data, ref zErrMsg);
+                                                                                            Sqlite3.legacy.sqlite3_exec(p.db, "SELECT sql FROM " + "  (SELECT sql sql, type type, tbl_name tbl_name, name name" + "     FROM sqlite_master UNION ALL" + "   SELECT sql, type, tbl_name, name FROM sqlite_temp_master) " + "WHERE type!='meta' AND sql NOTNULL AND name NOT LIKE 'sqlite_%'" + "ORDER BY substr(type,2,1), name", (dxCallback)callback, data, ref zErrMsg);
 																						}
 																						if (zErrMsg != "") {
 																							fprintf (stderr, "Error: %s\n", zErrMsg);
@@ -2628,11 +2628,11 @@ enableTimer = booleanValue(azArg[1]);
                     leftat+=red;
                 }
                 while (leftat<zSql.Length);
-                
-                
 
 
-				rc = Sqlite3.sqlite3_exec (p.db, zSql.ToString (), (dxCallback)callback, p, ref zErrMsg);
+
+
+                rc = Sqlite3.legacy.sqlite3_exec(p.db, zSql.ToString(), (dxCallback)callback, p, ref zErrMsg);
 				#if !(_WIN32) && !(WIN32) && !(__OS2__) && !(__RTP__) && !(_WRS_KERNEL)
 																																																																												END_TIMER;
 #endif
@@ -3016,9 +3016,9 @@ return 0;
 				//int rc;
 				open_db (data);
 
-                
 
-				rc = Sqlite3.sqlite3_exec (data.db, zFirstCmd.ToString (), (dxCallback)callback, data, ref zErrMsg);
+
+                rc = Sqlite3.legacy.sqlite3_exec(data.db, zFirstCmd.ToString(), (dxCallback)callback, data, ref zErrMsg);
 
 
                 
