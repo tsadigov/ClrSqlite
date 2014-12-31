@@ -225,7 +225,7 @@ p.zName, P4_STATIC );
                             for (i = 0; i < pParse.nVtabLock; i++)
                             {
                                 VTable vtab = sqlite3GetVTable(db, pParse.apVtabLock[i]);
-                                v.sqlite3VdbeAddOp4(OP_VBegin, 0, 0, 0, vtab, P4_VTAB);
+                                v.sqlite3VdbeAddOp4(OpCode.OP_VBegin, 0, 0, 0, vtab, P4_VTAB);
                             }
                             pParse.nVtabLock = 0;
 #endif
@@ -1170,7 +1170,7 @@ goto begin_table_error;
                     sqlite3BeginWriteOperation(pParse, 0, iDb);
                     if (isVirtual != 0)
                     {
-                        v.sqlite3VdbeAddOp0(OP_VBegin);
+                        v.sqlite3VdbeAddOp0(OpCode.OP_VBegin);
                     }
                     ///
                     ///<summary>
@@ -2724,7 +2724,7 @@ goto exit_drop_table;
 #if !SQLITE_OMIT_VIRTUALTABLE
                     if (IsVirtual(pTab))
                     {
-                        v.sqlite3VdbeAddOp0(OP_VBegin);
+                        v.sqlite3VdbeAddOp0(OpCode.OP_VBegin);
                     }
 #endif
                     pParse.sqlite3FkDropTable(pName, pTab);
@@ -2785,7 +2785,7 @@ goto exit_drop_table;
                     ///</summary>
                     if (IsVirtual(pTab))
                     {
-                        v.sqlite3VdbeAddOp4(OP_VDestroy, iDb, 0, 0, pTab.zName, 0);
+                        v.sqlite3VdbeAddOp4(OpCode.OP_VDestroy, iDb, 0, 0, pTab.zName, 0);
                     }
                     v.sqlite3VdbeAddOp4(OP_DropTable, iDb, 0, 0, pTab.zName, 0);
                     sqlite3ChangeCookie(pParse, iDb);

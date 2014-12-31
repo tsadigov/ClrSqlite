@@ -996,7 +996,7 @@ goto exit_rename_table;
 				if(pVTab!=null) {
 					int i=++this.nMem;
 					v.sqlite3VdbeAddOp4(OP_String8,0,i,0,zName,0);
-					v.sqlite3VdbeAddOp4(OP_VRename,i,0,0,pVTab,P4_VTAB);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_VRename, i, 0, 0, pVTab, P4_VTAB);
 					build.sqlite3MayAbort(this);
 				}
 				#endif
@@ -4350,7 +4350,7 @@ isView = false;
 					if(IsVirtual(pTab)) {
 						VTable pVTab=sqlite3GetVTable(db,pTab);
 						this.sqlite3VtabMakeWritable(pTab);
-						v.sqlite3VdbeAddOp4(OP_VUpdate,1,pTab.nCol+2,regIns,pVTab,P4_VTAB);
+                        v.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 1, pTab.nCol + 2, regIns, pVTab, P4_VTAB);
 						v.sqlite3VdbeChangeP5((byte)(onError==OE_Default?OE_Abort:onError));
 						build.sqlite3MayAbort(this);
 					}
@@ -5982,7 +5982,7 @@ aXRef[j] = -1;
 					v.sqlite3VdbeAddOp3(OP_Column,ephemTab,i+1+((pRowid!=null)?1:0),iReg+2+i);
 				}
 				this.sqlite3VtabMakeWritable(pTab);
-				v.sqlite3VdbeAddOp4(OP_VUpdate,0,pTab.nCol+2,iReg,pVTab,P4_VTAB);
+                v.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 0, pTab.nCol + 2, iReg, pVTab, P4_VTAB);
 				v.sqlite3VdbeChangeP5((byte)(onError==OE_Default?OE_Abort:onError));
 				build.sqlite3MayAbort(this);
 				v.sqlite3VdbeAddOp2(OP_Next,ephemTab,addr+1);
@@ -6378,7 +6378,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 					if(IsVirtual(pTab)) {
 						VTable pVTab=sqlite3GetVTable(db,pTab);
 						this.sqlite3VtabMakeWritable(pTab);
-						v.sqlite3VdbeAddOp4(OP_VUpdate,0,1,iRowid,pVTab,P4_VTAB);
+                        v.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 0, 1, iRowid, pVTab, P4_VTAB);
 						v.sqlite3VdbeChangeP5(OE_Abort);
 						build.sqlite3MayAbort(this);
 					}
@@ -11301,7 +11301,7 @@ range_est_fallback:
 						if((pLevel.plan.wsFlags&WHERE_VIRTUALTABLE)!=0) {
 							VTable pVTab=sqlite3GetVTable(db,pTab);
 							int iCur=pTabItem.iCursor;
-							v.sqlite3VdbeAddOp4(OP_VOpen,iCur,0,0,pVTab,P4_VTAB);
+                            v.sqlite3VdbeAddOp4(OpCode.OP_VOpen, iCur, 0, 0, pVTab, P4_VTAB);
 						}
 						else
 							#endif
@@ -12451,7 +12451,7 @@ range_est_fallback:
 					v.sqlite3VdbeAddOp2(OP_Expire,0,0);
 					zWhere=io.sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);
 					v.sqlite3VdbeAddParseSchemaOp(iDb,zWhere);
-					v.sqlite3VdbeAddOp4(OP_VCreate,iDb,0,0,pTab.zName,StringExtensions.sqlite3Strlen30(pTab.zName)+1);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_VCreate, iDb, 0, 0, pTab.zName, StringExtensions.sqlite3Strlen30(pTab.zName) + 1);
 				}
 				///
 				///<summary>

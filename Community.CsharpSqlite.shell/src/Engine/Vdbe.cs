@@ -633,6 +633,15 @@ pOp.cnt = 0;
 				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
+            public int sqlite3VdbeAddOp4(OpCode op, int p1, int p2, int p3, VTable pP4, int p4type)
+            {
+                Debug.Assert(pP4 != null);
+                union_p4 _p4 = new union_p4();
+                _p4.pVtab = pP4;
+                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                this.sqlite3VdbeChangeP4(addr, _p4, p4type);
+                return addr;
+            }
             public int sqlite3VdbeAddOp4Int(///
                 ///Add the opcode to this VM 
             int op,///
@@ -715,24 +724,28 @@ pOp.cnt = 0;
 				for(i=0;i<this.nOp;i++)//  for(pOp=p->aOp, i=p->nOp-1; i>=0; i--, pOp++)
 				 {
 					pOp=this.lOp[i];
-					u8 opcode=pOp.opcode;
-					pOp.opflags=(u8)sqlite3OpcodeProperty[opcode];
-					if(opcode==OP_Function||opcode==OP_AggStep) {
+					OpCode opcode=pOp.OpCode;
+					pOp.opflags=(u8)sqlite3OpcodeProperty[(u8)opcode];
+                    if (opcode == OpCode.OP_Function || opcode == OpCode.OP_AggStep)
+                    {
 						if(pOp.p5>nMaxArgs)
 							nMaxArgs=pOp.p5;
 					}
 					else
-						if((opcode==OP_Transaction&&pOp.p2!=0)||opcode==OP_Vacuum) {
+                        if ((opcode == OpCode.OP_Transaction && pOp.p2 != 0) || opcode == OpCode.OP_Vacuum)
+                        {
 							this.readOnly=false;
 							#if !SQLITE_OMIT_VIRTUALTABLE
 						}
 						else
-							if(opcode==OP_VUpdate) {
+                            if (opcode == OpCode.OP_VUpdate)
+                            {
 								if(pOp.p2>nMaxArgs)
 									nMaxArgs=pOp.p2;
 							}
 							else
-								if(opcode==OP_VFilter) {
+                                if (opcode == OpCode.OP_VFilter)
+                                {
 									int n;
 									Debug.Assert(this.nOp-i>=3);
 									Debug.Assert(this.lOp[i-1].OpCode==OpCode.OP_Integer);
@@ -1163,7 +1176,7 @@ pOp.cnt = 0;
 					this.sqlite3VdbeAddOp2(OP_Rowid,iTabCur,regOut);
 				}
 				else {
-					int op=IsVirtual(pTab)?OP_VColumn:OP_Column;
+                    OpCode op = IsVirtual(pTab) ? OpCode.OP_VColumn : OpCode.OP_Column;
 					this.sqlite3VdbeAddOp3(op,iTabCur,iCol,regOut);
 				}
 				if(iCol>=0) {

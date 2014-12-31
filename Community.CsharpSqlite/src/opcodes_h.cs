@@ -676,25 +676,10 @@ namespace Community.CsharpSqlite
 
         public const int OP_Expire = 122;
 
-        public const int OP_TableLock = 123;
+        
 
-        public const int OP_VBegin = 124;
-
-        public const int OP_VCreate = 125;
-
-        public const int OP_VDestroy = 126;
-
-        public const int OP_VOpen = 127;
-
-        public const int OP_VFilter = 128;
-
-        public const int OP_VColumn = 129;
-
-        public const int OP_VNext = 131;
-
-        public const int OP_VRename = 132;
-
-        public const int OP_VUpdate = 133;
+        
+        
 
         public const int OP_Pagecount = 134;
 

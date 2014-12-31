@@ -544,7 +544,7 @@ namespace Community.CsharpSqlite {
 					}
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,pVtabIdx.idxNum,iReg);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,j-1,iReg+1);
-					v.sqlite3VdbeAddOp4(OP_VFilter,iCur,addrBrk,iReg,pVtabIdx.idxStr,pVtabIdx.needToFreeIdxStr!=0?P4_MPRINTF:P4_STATIC);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_VFilter, iCur, addrBrk, iReg, pVtabIdx.idxStr, pVtabIdx.needToFreeIdxStr != 0 ? P4_MPRINTF : P4_STATIC);
 					pVtabIdx.needToFreeIdxStr=0;
 					for(j=0;j<nConstraint;j++) {
 						if(aUsage[j].omit!=false) {
