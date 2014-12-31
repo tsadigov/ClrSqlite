@@ -1198,7 +1198,7 @@ namespace Community.CsharpSqlite
                         ///it might be a single loop that uses an index to extract information
                         ///in the right order to begin with.
                         ///</summary>
-                        v.sqlite3VdbeAddOp2(OP_Gosub, regReset, addrReset);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regReset, addrReset);
                         pWInfo = pParse.sqlite3WhereBegin(pTabList, pWhere, ref pGroupBy, 0);
                         if (pWInfo == null)
                             goto select_end;
@@ -1312,7 +1312,7 @@ namespace Community.CsharpSqlite
                         ///
                         ///</summary>
                         pParse.sqlite3ExprCodeMove(iBMem, iAMem, pGroupBy.nExpr);
-                        v.sqlite3VdbeAddOp2(OP_Gosub, regOutputRow, addrOutputRow);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regOutputRow, addrOutputRow);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "output one row" );
 #endif
@@ -1320,7 +1320,7 @@ namespace Community.CsharpSqlite
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "check abort flag" );
 #endif
-                        v.sqlite3VdbeAddOp2(OP_Gosub, regReset, addrReset);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regReset, addrReset);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "reset accumulator" );
 #endif
@@ -1353,7 +1353,7 @@ namespace Community.CsharpSqlite
                         ///Output the final row of result
                         ///
                         ///</summary>
-                        v.sqlite3VdbeAddOp2(OP_Gosub, regOutputRow, addrOutputRow);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regOutputRow, addrOutputRow);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "output final row" );
 #endif

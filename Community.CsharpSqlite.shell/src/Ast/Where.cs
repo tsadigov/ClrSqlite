@@ -290,7 +290,7 @@ namespace Community.CsharpSqlite {
 							v.sqlite3VdbeAddOp1(OpCode.OP_NullRow,pLevel.iIdxCur);
 						}
 						if(pLevel.op==OP_Return) {
-							v.sqlite3VdbeAddOp2(OP_Gosub,pLevel.p1,pLevel.addrFirst);
+							v.sqlite3VdbeAddOp2(OpCode.OP_Gosub,pLevel.p1,pLevel.addrFirst);
 						}
 						else {
 							v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,pLevel.addrFirst);
@@ -1172,7 +1172,7 @@ namespace Community.CsharpSqlite {
 									int regReturn=++pParse.nMem;
 									///
 									///<summary>
-									///Register used with OP_Gosub 
+									///Register used with OpCode.OP_Gosub 
 									///</summary>
 									int regRowset=0;
 									///
@@ -1286,7 +1286,7 @@ namespace Community.CsharpSqlite {
 													r=pParse.sqlite3ExprCodeGetColumn(pTabItem.pTab,-1,iCur,regRowid);
 													v.sqlite3VdbeAddOp4Int(OP_RowSetTest,regRowset,v.sqlite3VdbeCurrentAddr()+2,r,iSet);
 												}
-												v.sqlite3VdbeAddOp2(OP_Gosub,regReturn,iLoopBody);
+												v.sqlite3VdbeAddOp2(OpCode.OP_Gosub,regReturn,iLoopBody);
 												///
 												///<summary>
 												///The pSubWInfo.untestedTerms flag means that this OR term

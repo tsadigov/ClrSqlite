@@ -313,7 +313,6 @@ namespace Community.CsharpSqlite
 
         //#define OpCode.OP_Goto                                 1
         
-        public const int OP_Gosub = 2;
 
         public const int OP_Return = 3;
 

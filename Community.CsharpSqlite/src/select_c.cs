@@ -2543,7 +2543,7 @@ break;
                 else
                 {
                     addrEofA = v.sqlite3VdbeAddOp2(OP_If, regEofB, labelEnd);
-                    v.sqlite3VdbeAddOp2(OP_Gosub, regOutB, addrOutB);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regOutB, addrOutB);
                     v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrB);
                     v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, addrEofA);
                     p.nSelectRow += pPrior.nSelectRow;
@@ -2564,7 +2564,7 @@ break;
                 {
                     VdbeNoopComment(v, "eof-B subroutine");
                     addrEofB = v.sqlite3VdbeAddOp2(OP_If, regEofA, labelEnd);
-                    v.sqlite3VdbeAddOp2(OP_Gosub, regOutA, addrOutA);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regOutA, addrOutA);
                     v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrA);
                     v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, addrEofB);
                 }
@@ -2574,7 +2574,7 @@ break;
                 ///
                 ///</summary>
                 VdbeNoopComment(v, "A-lt-B subroutine");
-                addrAltB = v.sqlite3VdbeAddOp2(OP_Gosub, regOutA, addrOutA);
+                addrAltB = v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regOutA, addrOutA);
                 v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrA);
                 v.sqlite3VdbeAddOp2(OP_If, regEofA, addrEofA);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, labelCmpr);
@@ -2609,7 +2609,7 @@ break;
                 addrAgtB = v.sqlite3VdbeCurrentAddr();
                 if (op == TK_ALL || op == TK_UNION)
                 {
-                    v.sqlite3VdbeAddOp2(OP_Gosub, regOutB, addrOutB);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regOutB, addrOutB);
                 }
                 v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrB);
                 v.sqlite3VdbeAddOp2(OP_If, regEofB, addrEofB);
@@ -2622,8 +2622,8 @@ break;
                 v.sqlite3VdbeJumpHere(j1);
                 v.sqlite3VdbeAddOp2(OP_Integer, 0, regEofA);
                 v.sqlite3VdbeAddOp2(OP_Integer, 0, regEofB);
-                v.sqlite3VdbeAddOp2(OP_Gosub, regAddrA, addrSelectA);
-                v.sqlite3VdbeAddOp2(OP_Gosub, regAddrB, addrSelectB);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regAddrA, addrSelectA);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regAddrB, addrSelectB);
                 v.sqlite3VdbeAddOp2(OP_If, regEofA, addrEofA);
                 v.sqlite3VdbeAddOp2(OP_If, regEofB, addrEofB);
                 ///
