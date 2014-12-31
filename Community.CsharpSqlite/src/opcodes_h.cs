@@ -332,14 +332,6 @@ namespace Community.CsharpSqlite
 
         
 
-        public const int OP_Blob = 11;
-
-        public const int OP_Variable = 12;
-
-        public const int OP_Move = 13;
-
-        public const int OP_Copy = 14;
-
         public const int OP_SCopy = 15;
 
         public const int OP_ResultRow = 16;

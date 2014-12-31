@@ -2451,8 +2451,8 @@ break;
                 {
                     regLimitA = ++pParse.nMem;
                     regLimitB = ++pParse.nMem;
-                    v.sqlite3VdbeAddOp2(OP_Copy, (p.iOffset != 0) ? p.iOffset + 1 : p.iLimit, regLimitA);
-                    v.sqlite3VdbeAddOp2(OP_Copy, regLimitA, regLimitB);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Copy, (p.iOffset != 0) ? p.iOffset + 1 : p.iLimit, regLimitA);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Copy, regLimitA, regLimitB);
                 }
                 else
                 {

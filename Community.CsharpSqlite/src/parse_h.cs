@@ -2282,7 +2282,7 @@ goto attach_end;
 						v.sqlite3VdbeAddOp3(OP_OpenRead,iCur,pIdx.tnum,iDb);
 						v.sqlite3VdbeChangeP4(-1,pKey,P4_KEYINFO_HANDOFF);
 						for(i=0;i<nCol;i++) {
-							v.sqlite3VdbeAddOp2(OP_Copy,aiCol[i]+1+regData,regTemp+i);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_Copy, aiCol[i] + 1 + regData, regTemp + i);
 						}
 						///
 						///<summary>
@@ -5659,7 +5659,7 @@ aXRef[j] = -1;
 						}
 					}
 					if(chngRowid==false) {
-						v.sqlite3VdbeAddOp2(OP_Copy,regOldRowid,regNewRowid);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Copy, regOldRowid, regNewRowid);
 					}
 				}
 				///
@@ -6526,7 +6526,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 					///</summary>
 					///<param name="Populate the OLD.* pseudo">table register array. These values will be </param>
 					///<param name="used by any BEFORE and AFTER triggers that exist.  ">used by any BEFORE and AFTER triggers that exist.  </param>
-					v.sqlite3VdbeAddOp2(OP_Copy,iRowid,iOld);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Copy, iRowid, iOld);
 					for(iCol=0;iCol<pTab.nCol;iCol++) {
 						if(mask==0xffffffff||(mask&(1<<iCol))!=0) {
 							v.sqlite3ExprCodeGetColumnOfTable(pTab,iCur,iCol,iOld+iCol+1);
@@ -7048,7 +7048,7 @@ return;
 				yColCache p;
 				if(NEVER(iFrom==iTo))
 					return;
-				this.pVdbe.sqlite3VdbeAddOp3(OP_Move,iFrom,iTo,nReg);
+                this.pVdbe.sqlite3VdbeAddOp3(OpCode.OP_Move, iFrom, iTo, nReg);
 				for(i=0;i<SQLITE_N_COLCACHE;i++)// p=pParse.aColCache... p++)
 				 {
 					p=this.aColCache[i];
@@ -7063,7 +7063,7 @@ return;
 				if(NEVER(iFrom==iTo))
 					return;
 				for(i=0;i<nReg;i++) {
-					this.pVdbe.sqlite3VdbeAddOp2(OP_Copy,iFrom+i,iTo+i);
+                    this.pVdbe.sqlite3VdbeAddOp2(OpCode.OP_Copy, iFrom + i, iTo + i);
 				}
 			}
 			public int usedAsColumnCache(int iFrom,int iTo) {
@@ -7183,7 +7183,7 @@ return;
 					n=StringExtensions.sqlite3Strlen30(z)-1;
 					Debug.Assert(z[n]=='\'');
 					zBlob=Converter.sqlite3HexToBlob(v.sqlite3VdbeDb(),z,n);
-					v.sqlite3VdbeAddOp4(OP_Blob,n/2,target,0,zBlob,P4_DYNAMIC);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_Blob, n / 2, target, 0, zBlob, P4_DYNAMIC);
 					break;
 				}
 				#endif
@@ -7191,7 +7191,7 @@ return;
 					Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
 					Debug.Assert(pExpr.u.zToken!=null);
 					Debug.Assert(pExpr.u.zToken.Length!=0);
-					v.sqlite3VdbeAddOp2(OP_Variable,pExpr.iColumn,target);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Variable, pExpr.iColumn, target);
 					if(pExpr.u.zToken.Length>1) {
 						Debug.Assert(pExpr.u.zToken[0]=='?'||pExpr.u.zToken.CompareTo(this.azVar[pExpr.iColumn-1])==0);
 						v.sqlite3VdbeChangeP4(-1,this.azVar[pExpr.iColumn-1],P4_STATIC);
@@ -7808,7 +7808,7 @@ return;
 				int inReg;
 				Debug.Assert(target>0&&target<=this.nMem);
 				if(pExpr!=null&&pExpr.op==TK_REGISTER) {
-					this.pVdbe.sqlite3VdbeAddOp2(OP_Copy,pExpr.iTable,target);
+                    this.pVdbe.sqlite3VdbeAddOp2(OpCode.OP_Copy, pExpr.iTable, target);
 				}
 				else {
 					inReg=this.sqlite3ExprCodeTarget(pExpr,target);
@@ -7840,7 +7840,7 @@ return;
 				if(ALWAYS(pExpr.op!=TK_REGISTER)) {
 					int iMem;
 					iMem=++this.nMem;
-					v.sqlite3VdbeAddOp2(OP_Copy,inReg,iMem);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Copy, inReg, iMem);
 					pExpr.iTable=iMem;
 					pExpr.op2=pExpr.op;
 					pExpr.op=TK_REGISTER;
@@ -7892,7 +7892,7 @@ return;
 					Expr pExpr=pItem.pExpr;
 					int inReg=this.sqlite3ExprCodeTarget(pExpr,target+i);
 					if(inReg!=target+i) {
-						this.pVdbe.sqlite3VdbeAddOp2(doHardCopy?OP_Copy:OP_SCopy,inReg,target+i);
+                        this.pVdbe.sqlite3VdbeAddOp2(doHardCopy ? OpCode.OP_Copy : OpCode.OP_SCopy, inReg, target + i);
 					}
 				}
 				return n;

@@ -1484,30 +1484,25 @@ else
 																													cnt++;
 																												}
 																											}
-																											///
-																											///<summary>
+
 																											///Make sure sufficient number of registers have been allocated 
-																											///</summary>
+																											
 																											if(pParse.nMem<cnt+4) {
 																												pParse.nMem=cnt+4;
 																											}
-																											///
-																											///<summary>
-																											///</summary>
-																											///<param name="Do the b">tree integrity checks </param>
+																											
+																											///Do the b-tree integrity checks 
 																											v.sqlite3VdbeAddOp3(OP_IntegrityCk,2,cnt,1);
 																											v.sqlite3VdbeChangeP5((u8)i);
 																											addr=v.sqlite3VdbeAddOp1(OpCode.OP_IsNull,2);
 																											v.sqlite3VdbeAddOp4(OP_String8,0,3,0,io.sqlite3MPrintf(db,"*** in database %s ***\n",db.aDb[i].zName),P4_DYNAMIC);
-																											v.sqlite3VdbeAddOp3(OP_Move,2,4,1);
+                                                                                                            v.sqlite3VdbeAddOp3(OpCode.OP_Move, 2, 4, 1);
 																											v.sqlite3VdbeAddOp3(OP_Concat,4,3,2);
 																											v.sqlite3VdbeAddOp2(OP_ResultRow,2,1);
 																											v.sqlite3VdbeJumpHere(addr);
-																											///
-																											///<summary>
-																											///Make sure all the indices are constructed correctly.
-																											///
-																											///</summary>
+																											
+                                                                                                            ///Make sure all the indices are constructed correctly.
+																											
 																											for(x=pTbls.first;x!=null&&!isQuick;x=x.next) {
 																												;
 																												//          for(x=sqliteHashFirst(pTbls); x && !isQuick; x=sqliteHashNext(x)){
