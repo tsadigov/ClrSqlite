@@ -573,6 +573,14 @@ pOp.cnt = 0;
 				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
+            public int sqlite3VdbeAddOp4(OpCode op, int p1, int p2, int p3, i64 pP4, int p4type)
+            {
+                union_p4 _p4 = new union_p4();
+                _p4.pI64 = pP4;
+                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                this.sqlite3VdbeChangeP4(addr, _p4, p4type);
+                return addr;
+            }
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,double pP4,int p4type) {
 				union_p4 _p4=new union_p4();
 				_p4.pReal=pP4;

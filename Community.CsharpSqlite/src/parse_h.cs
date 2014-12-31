@@ -12303,7 +12303,7 @@ range_est_fallback:
 						if(negFlag) {
 							value=c==2?IntegerExtensions.SMALLEST_INT64:-value;
 						}
-						v.sqlite3VdbeAddOp4(OP_Int64,0,iMem,0,value,P4_INT64);
+						v.sqlite3VdbeAddOp4(OpCode.OP_Int64,0,iMem,0,value,P4_INT64);
 					}
 					else {
 						#if SQLITE_OMIT_FLOATING_POINT

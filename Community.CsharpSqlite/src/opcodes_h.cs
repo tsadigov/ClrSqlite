@@ -316,8 +316,6 @@ namespace Community.CsharpSqlite
         
         
 
-        public const int OP_Int64 = 8;
-
         public const int OP_Real = 130///
             ///<summary>
             ///same as TK_FLOAT    

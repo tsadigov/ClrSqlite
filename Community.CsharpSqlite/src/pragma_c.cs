@@ -201,7 +201,7 @@ namespace Community.CsharpSqlite {
 			//  memcpy( pI64, &value, sizeof( value ) );
 			//}
 			//sqlite3VdbeAddOp4( v, OP_Int64, 0, mem, 0, (char*)pI64, P4_INT64 );
-			v.sqlite3VdbeAddOp4(OP_Int64,0,mem,0,value,P4_INT64);
+			v.sqlite3VdbeAddOp4(OpCode.OP_Int64,0,mem,0,value,P4_INT64);
 			v.sqlite3VdbeSetNumCols(1);
 			v.sqlite3VdbeSetColName(0,COLNAME_NAME,zLabel,SQLITE_STATIC);
 			v.sqlite3VdbeAddOp2(OP_ResultRow,mem,1);
