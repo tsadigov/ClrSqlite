@@ -1296,7 +1296,7 @@ namespace Community.CsharpSqlite
                                 pParse.sqlite3ExprCode(pGroupBy.a[j].pExpr, iBMem + j);
                             }
                         }
-                        v.sqlite3VdbeAddOp4(OP_Compare, iAMem, iBMem, pGroupBy.nExpr, pKeyInfo, P4_KEYINFO);
+                        v.sqlite3VdbeAddOp4(OpCode.OP_Compare, iAMem, iBMem, pGroupBy.nExpr, pKeyInfo, P4_KEYINFO);
                         j1 = v.sqlite3VdbeCurrentAddr();
                         v.sqlite3VdbeAddOp3(OpCode.OP_Jump, j1 + 1, 0, j1 + 1);
                         ///

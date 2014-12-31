@@ -602,6 +602,14 @@ pOp.cnt = 0;
 				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
+            public int sqlite3VdbeAddOp4(OpCode op, int p1, int p2, int p3, CollSeq pP4, int p4type)
+            {
+                union_p4 _p4 = new union_p4();
+                _p4.pColl = pP4;
+                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                this.sqlite3VdbeChangeP4(addr, _p4, p4type);
+                return addr;
+            }
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,KeyInfo pP4,int p4type) {
 				union_p4 _p4=new union_p4();
 				_p4.pKeyInfo=pP4;
@@ -609,6 +617,14 @@ pOp.cnt = 0;
 				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
+            public int sqlite3VdbeAddOp4(OpCode op, int p1, int p2, int p3, KeyInfo pP4, int p4type)
+            {
+                union_p4 _p4 = new union_p4();
+                _p4.pKeyInfo = pP4;
+                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                this.sqlite3VdbeChangeP4(addr, _p4, p4type);
+                return addr;
+            }
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,VTable pP4,int p4type) {
 				Debug.Assert(pP4!=null);
 				union_p4 _p4=new union_p4();

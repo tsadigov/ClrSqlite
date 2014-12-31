@@ -1851,7 +1851,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 {
                     int j1, j2;
                     j1 = v.sqlite3VdbeAddOp1(OpCode.OP_IfNot, regPrev);
-                    j2 = v.sqlite3VdbeAddOp4(OP_Compare, pIn.iMem, regPrev + 1, pIn.nMem, pKeyInfo, p4type);
+                    j2 = v.sqlite3VdbeAddOp4(OpCode.OP_Compare, pIn.iMem, regPrev + 1, pIn.nMem, pKeyInfo, p4type);
                     v.sqlite3VdbeAddOp3(OpCode.OP_Jump, j2 + 2, iContinue, j2 + 2);
                     v.sqlite3VdbeJumpHere(j1);
                     pParse.sqlite3ExprCodeCopy(pIn.iMem, regPrev + 1, pIn.nMem);
@@ -2633,7 +2633,7 @@ break;
                 ///</summary>
                 v.sqlite3VdbeResolveLabel(labelCmpr);
                 v.sqlite3VdbeAddOp4(OP_Permutation, 0, 0, 0, aPermute, P4_INTARRAY);
-                v.sqlite3VdbeAddOp4(OP_Compare, destA.iMem, destB.iMem, nOrderBy, pKeyMerge, P4_KEYINFO_HANDOFF);
+                v.sqlite3VdbeAddOp4(OpCode.OP_Compare, destA.iMem, destB.iMem, nOrderBy, pKeyMerge, P4_KEYINFO_HANDOFF);
                 v.sqlite3VdbeAddOp3(OpCode.OP_Jump, addrAltB, addrAeqB, addrAgtB);
                 ///
                 ///<summary>

@@ -491,10 +491,8 @@ namespace Community.CsharpSqlite
 
         public const int OP_Permutation = 23;
 
-        public const int OP_Compare = 24;
-
-        public const int OP_Jump = 25;
-
+        
+        
         public const int OP_And = 69///
             ///<summary>
             ///same as TK_AND      
