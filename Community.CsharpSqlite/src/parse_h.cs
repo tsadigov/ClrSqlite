@@ -4671,7 +4671,7 @@ isView = false;
 					case OE_Rollback:
 					case OE_Fail: {
 						string zMsg;
-						v.sqlite3VdbeAddOp3(OP_HaltIfNull,SQLITE_CONSTRAINT,onError,regData+i);
+						v.sqlite3VdbeAddOp3(OpCode.OP_HaltIfNull,SQLITE_CONSTRAINT,onError,regData+i);
 						zMsg=io.sqlite3MPrintf(this.db,"%s.%s may not be NULL",pTab.zName,pTab.aCol[i].zName);
 						v.sqlite3VdbeChangeP4(-1,zMsg,P4_DYNAMIC);
 						break;
