@@ -4919,7 +4919,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///jump, in3 
 							///</summary>
 							int res;
-							int oc;
+                            OpCode oc;
 							VdbeCursor pC;
 							UnpackedRecord r;
 							int nField;
@@ -4935,12 +4935,12 @@ MemSetTypeFlag(pOut, MEM_Int);
 							pC=this.apCsr[pOp.p1];
 							Debug.Assert(pC!=null);
 							Debug.Assert(pC.pseudoTableReg==0);
-							Debug.Assert(OP_SeekLe==OP_SeekLt+1);
-							Debug.Assert(OP_SeekGe==OP_SeekLt+2);
-							Debug.Assert(OP_SeekGt==OP_SeekLt+3);
+                            Debug.Assert(OpCode.OP_SeekLe == OpCode.OP_SeekLt + 1);
+                            Debug.Assert(OpCode.OP_SeekGe == OpCode.OP_SeekLt + 2);
+                            Debug.Assert(OpCode.OP_SeekGt == OpCode.OP_SeekLt + 3);
 							Debug.Assert(pC.isOrdered);
 							if(pC.pCursor!=null) {
-								oc=pOp.opcode;
+								oc=pOp.OpCode;
 								pC.nullRow=false;
 								if(pC.isTable) {
 									///
@@ -4982,16 +4982,18 @@ MemSetTypeFlag(pOut, MEM_Int);
 											///</summary>
 											res=1;
 											if(pIn3.r<0) {
-												if(oc>=OP_SeekGe) {
-													Debug.Assert(oc==OP_SeekGe||oc==OP_SeekGt);
+                                                if (oc >= OpCode.OP_SeekGe)
+                                                {
+                                                    Debug.Assert(oc == OpCode.OP_SeekGe || oc == OpCode.OP_SeekGt);
 													rc=pC.pCursor.sqlite3BtreeFirst(ref res);
 													if(rc!=SQLITE_OK)
 														goto abort_due_to_error;
 												}
 											}
 											else {
-												if(oc<=OP_SeekLe) {
-													Debug.Assert(oc==OP_SeekLt||oc==OP_SeekLe);
+                                                if (oc <= OpCode.OP_SeekLe)
+                                                {
+                                                    Debug.Assert(oc == OpCode.OP_SeekLt || oc == OpCode.OP_SeekLe);
 													rc=pC.pCursor.sqlite3BtreeLast(ref res);
 													if(rc!=SQLITE_OK)
 														goto abort_due_to_error;
@@ -5003,7 +5005,8 @@ MemSetTypeFlag(pOut, MEM_Int);
 											break;
 										}
 										else
-											if(oc==OP_SeekLt||oc==OP_SeekGe) {
+                                            if (oc == OpCode.OP_SeekLt || oc == OpCode.OP_SeekGe)
+                                            {
 												///
 												///<summary>
 												///Use the ceiling() function to convert real.int 
@@ -5016,7 +5019,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 												///<summary>
 												///Use the floor() function to convert real.int 
 												///</summary>
-												Debug.Assert(oc==OP_SeekLe||oc==OP_SeekGt);
+                                                Debug.Assert(oc == OpCode.OP_SeekLe || oc == OpCode.OP_SeekGt);
 												if(pIn3.r<(double)iKey)
 													iKey--;
 											}
@@ -5046,11 +5049,11 @@ MemSetTypeFlag(pOut, MEM_Int);
 									///}
 									///
 									///</summary>
-									r.flags=(u16)(UNPACKED_INCRKEY*(1&(oc-OP_SeekLt)));
-									Debug.Assert(oc!=OP_SeekGt||r.flags==UNPACKED_INCRKEY);
-									Debug.Assert(oc!=OP_SeekLe||r.flags==UNPACKED_INCRKEY);
-									Debug.Assert(oc!=OP_SeekGe||r.flags==0);
-									Debug.Assert(oc!=OP_SeekLt||r.flags==0);
+                                    r.flags = (u16)(UNPACKED_INCRKEY * (1 & (oc - OpCode.OP_SeekLt)));
+                                    Debug.Assert(oc != OpCode.OP_SeekGt || r.flags == UNPACKED_INCRKEY);
+                                    Debug.Assert(oc != OpCode.OP_SeekLe || r.flags == UNPACKED_INCRKEY);
+                                    Debug.Assert(oc != OpCode.OP_SeekGe || r.flags == 0);
+                                    Debug.Assert(oc != OpCode.OP_SeekLt || r.flags == 0);
 									r.aMem=new Mem[r.nField];
 									for(int rI=0;rI<r.nField;rI++)
 										r.aMem[rI]=aMem[pOp.p3+rI];
@@ -5078,9 +5081,11 @@ MemSetTypeFlag(pOut, MEM_Int);
 																																																																																																																																																													                sqlite3_search_count.iValue++;
 #endif
 																#endif
-								if(oc>=OP_SeekGe) {
-									Debug.Assert(oc==OP_SeekGe||oc==OP_SeekGt);
-									if(res<0||(res==0&&oc==OP_SeekGt)) {
+                                if (oc >= OpCode.OP_SeekGe)
+                                {
+                                    Debug.Assert(oc == OpCode.OP_SeekGe || oc == OpCode.OP_SeekGt);
+                                    if (res < 0 || (res == 0 && oc == OpCode.OP_SeekGt))
+                                    {
 										rc=pC.pCursor.sqlite3BtreeNext(ref res);
 										if(rc!=SQLITE_OK)
 											goto abort_due_to_error;
@@ -5091,8 +5096,9 @@ MemSetTypeFlag(pOut, MEM_Int);
 									}
 								}
 								else {
-									Debug.Assert(oc==OP_SeekLt||oc==OP_SeekLe);
-									if(res>0||(res==0&&oc==OP_SeekLt)) {
+                                    Debug.Assert(oc == OpCode.OP_SeekLt || oc == OpCode.OP_SeekLe);
+                                    if (res > 0 || (res == 0 && oc == OpCode.OP_SeekLt))
+                                    {
 										rc=pC.pCursor.sqlite3BtreePrevious(ref res);
 										if(rc!=SQLITE_OK)
 											goto abort_due_to_error;

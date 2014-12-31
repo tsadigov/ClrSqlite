@@ -571,16 +571,7 @@ namespace Community.CsharpSqlite
 
         public const int OP_Close = 43;
 
-        public const int OP_SeekLt = 44;
-
-        public const int OP_SeekLe = 45;
-
-        public const int OP_SeekGe = 46;
-
-        public const int OP_SeekGt = 47;
-
-        public const int OP_Seek = 48;
-
+        
         public const int OP_NotFound = 49;
 
         public const int OP_Found = 50;

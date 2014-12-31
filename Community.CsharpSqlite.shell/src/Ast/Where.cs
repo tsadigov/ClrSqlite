@@ -626,27 +626,27 @@ namespace Community.CsharpSqlite {
 								///seek opcodes.  It depends on a particular ordering of TK_xx
 								///
 								///</summary>
-								u8[] aMoveOp=new u8[] {
+								OpCode[] aMoveOp=new OpCode[] {
 									///
 									///<summary>
 									///TK_GT 
 									///</summary>
-									OP_SeekGt,
+									OpCode.OP_SeekGt,
 									///
 									///<summary>
 									///TK_LE 
 									///</summary>
-									OP_SeekLe,
+									OpCode.OP_SeekLe,
 									///
 									///<summary>
 									///TK_LT 
 									///</summary>
-									OP_SeekLt,
+									OpCode.OP_SeekLt,
 									///
 									///<summary>
 									///TK_GE 
 									///</summary>
-									OP_SeekGe
+									OpCode.OP_SeekGe
 								};
 								Debug.Assert(TK_LE==TK_GT+1);
 								///
@@ -1090,7 +1090,7 @@ namespace Community.CsharpSqlite {
 									iRowidReg=iReleaseReg=pParse.sqlite3GetTempReg();
 									v.sqlite3VdbeAddOp2(OP_IdxRowid,iIdxCur,iRowidReg);
 									pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
-									v.sqlite3VdbeAddOp2(OP_Seek,iCur,iRowidReg);
+                                    v.sqlite3VdbeAddOp2(OpCode.OP_Seek, iCur, iRowidReg);
 									///
 									///<summary>
 									///Deferred seek 
