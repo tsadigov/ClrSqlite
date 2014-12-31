@@ -54,7 +54,7 @@ namespace Community.CsharpSqlite
 		) {
 			if(pParse.explain==2) {
 				string zEqp=Sqlite3.io.sqlite3MPrintf(pParse.db,"SCAN TABLE %s %s%s(~%d rows)",pTab.zName,pIdx!=null?"USING COVERING INDEX ":"",pIdx!=null?pIdx.zName:"",pTab.nRowEst);
-                pParse.pVdbe.sqlite3VdbeAddOp4(Sqlite3.OP_Explain, pParse.iSelectId, 0, 0, zEqp, Sqlite3.P4_DYNAMIC);
+                pParse.pVdbe.sqlite3VdbeAddOp4(OpCode.OP_Explain, pParse.iSelectId, 0, 0, zEqp, Sqlite3.P4_DYNAMIC);
 			}
 		}
 		#else

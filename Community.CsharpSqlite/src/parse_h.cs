@@ -10718,7 +10718,7 @@ range_est_fallback:
 						nRow=(sqlite3_int64)pLevel.plan.nRow;
 					}
 					zMsg.Append(io.sqlite3MAppendf(db,null," (~%lld rows)",nRow));
-					v.sqlite3VdbeAddOp4(OP_Explain,iId,iLevel,iFrom,zMsg,P4_DYNAMIC);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_Explain, iId, iLevel, iFrom, zMsg, P4_DYNAMIC);
 				}
 			}
 			public WhereInfo sqlite3WhereBegin(///
@@ -11894,7 +11894,7 @@ range_est_fallback:
 				#if !SQLITE_OMIT_EXPLAIN
 				if(this.explain==2) {
 					string zMsg=io.sqlite3MPrintf(this.db,"EXECUTE %s%s SUBQUERY %d",testAddr!=0?"":"CORRELATED ",pExpr.Operator==TokenType.TK_IN?"LIST":"SCALAR",this.iNextSelectId);
-					v.sqlite3VdbeAddOp4(OP_Explain,this.iSelectId,0,0,zMsg,P4_DYNAMIC);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_Explain, this.iSelectId, 0, 0, zMsg, P4_DYNAMIC);
 				}
 				#endif
 				switch(pExpr.Operator) {

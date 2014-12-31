@@ -1043,7 +1043,7 @@ namespace Community.CsharpSqlite {
                 {
                     Vdbe v = pParse.pVdbe;
                     string zMsg = io.sqlite3MPrintf(pParse.db, "USE TEMP B-TREE FOR %s", zUsage);
-                    v.sqlite3VdbeAddOp4(OP_Explain, pParse.iSelectId, 0, 0, zMsg, P4_DYNAMIC);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_Explain, pParse.iSelectId, 0, 0, zMsg, P4_DYNAMIC);
                 }
             }
             ///<summary>
@@ -1113,7 +1113,7 @@ static void SelectMethods.explainSetInteger(ref int a, int b){ a = b;}
                 {
                     Vdbe v = pParse.pVdbe;
                     string zMsg = io.sqlite3MPrintf(pParse.db, "COMPOUND SUBQUERIES %d AND %d %s(%s)", iSub1, iSub2, bUseTmp ? "USING TEMP B-TREE " : "", SelectMethods.selectOpName((TokenType)op));
-                    v.sqlite3VdbeAddOp4(OP_Explain, pParse.iSelectId, 0, 0, zMsg, P4_DYNAMIC);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_Explain, pParse.iSelectId, 0, 0, zMsg, P4_DYNAMIC);
                 }
             }
 #else

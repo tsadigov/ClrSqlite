@@ -686,7 +686,6 @@ namespace Community.CsharpSqlite
         public const int OP_MaxPgcnt = 135;
 
 
-        public const int OP_Explain = 138;
 
         ///
         ///<summary>
