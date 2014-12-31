@@ -1060,7 +1060,7 @@ goto exit_rename_table;
 				#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
 				if((db.flags&SQLITE_ForeignKeys)!=0) {
 					FKey p;
-					for(p=sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
+					for(p=fkeyc.sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
 						Table pFrom=p.pFrom;
 						if(pFrom!=pTab) {
 							this.reloadTableSchema(p.pFrom,pFrom.zName);
@@ -1183,7 +1183,7 @@ goto exit_rename_table;
 			string whereForeignKeys(Table pTab) {
 				FKey p;
 				string zWhere="";
-				for(p=sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
+				for(p=fkeyc.sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
 					zWhere=alter.whereOrName(this.db,zWhere,p.pFrom.zName);
 				}
 				return zWhere;
@@ -2597,7 +2597,7 @@ goto attach_end;
 					///<summary>
 					///VDBE has already been allocated 
 					///</summary>
-					if(sqlite3FkReferences(pTab)==null) {
+					if(fkeyc.sqlite3FkReferences(pTab)==null) {
 						///
 						///<summary>
 						///Search for a deferred foreign key constraint for which this table
@@ -2804,7 +2804,7 @@ goto attach_end;
 				///<summary>
 				///Loop through all the foreign key constraints that refer to this table 
 				///</summary>
-				for(pFKey=sqlite3FkReferences(pTab);pFKey!=null;pFKey=pFKey.pNextTo) {
+				for(pFKey=fkeyc.sqlite3FkReferences(pTab);pFKey!=null;pFKey=pFKey.pNextTo) {
 					Index pIdx=null;
 					///
 					///<summary>
@@ -2885,15 +2885,15 @@ goto attach_end;
 					int i;
 					for(p=pTab.pFKey;p!=null;p=p.pNextFrom) {
 						for(i=0;i<p.nCol;i++)
-							mask|=COLUMN_MASK(p.aCol[i].iFrom);
+							mask|=fkeyc.COLUMN_MASK(p.aCol[i].iFrom);
 					}
-					for(p=sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
+					for(p=fkeyc.sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
 						Index pIdx;
 						int[] iDummy;
 						this.locateFkeyIndex(pTab,p,out pIdx,out iDummy);
 						if(pIdx!=null) {
 							for(i=0;i<pIdx.nColumn;i++)
-								mask|=COLUMN_MASK(pIdx.aiColumn[i]);
+								mask|=fkeyc.COLUMN_MASK(pIdx.aiColumn[i]);
 						}
 					}
 				}
@@ -2939,7 +2939,7 @@ goto attach_end;
 						///table in question is either the child or parent table for any 
 						///foreign key constraint.  
 						///</summary>
-						return (sqlite3FkReferences(pTab)!=null||pTab.pFKey!=null)?1:0;
+						return (fkeyc.sqlite3FkReferences(pTab)!=null||pTab.pFKey!=null)?1:0;
 					}
 					else {
 						///
@@ -2966,7 +2966,7 @@ goto attach_end;
 						///<summary>
 						///Check if any parent key columns are being modified. 
 						///</summary>
-						for(p=sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
+						for(p=fkeyc.sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
 							for(i=0;i<p.nCol;i++) {
 								string zKey=p.aCol[i].zCol;
 								int iKey;
@@ -3307,7 +3307,7 @@ goto attach_end;
 					///<summary>
 					///Iterator variable 
 					///</summary>
-					for(pFKey=sqlite3FkReferences(pTab);pFKey!=null;pFKey=pFKey.pNextTo) {
+					for(pFKey=fkeyc.sqlite3FkReferences(pTab);pFKey!=null;pFKey=pFKey.pNextTo) {
 						Trigger pAction=this.fkActionTrigger(pTab,pFKey,pChanges);
 						if(pAction!=null) {
 							sqlite3CodeRowTriggerDirect(this,pAction,pTab,regOld,OE_Abort,0);

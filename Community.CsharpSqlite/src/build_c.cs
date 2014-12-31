@@ -722,7 +722,7 @@ p.zName, P4_STATIC );
                 ///<summary>
                 ///Delete any foreign keys attached to this table. 
                 ///</summary>
-                sqlite3FkDelete(db, pTable);
+                fkeyc.sqlite3FkDelete(db, pTable);
                 ///
                 ///<summary>
                 ///Delete the Table structure itself.
