@@ -332,8 +332,6 @@ namespace Community.CsharpSqlite
 
         
 
-        public const int OP_SCopy = 15;
-
         public const int OP_ResultRow = 16;
 
         public const int OP_Concat = 91///

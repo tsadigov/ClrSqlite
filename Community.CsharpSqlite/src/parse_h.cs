@@ -1600,7 +1600,7 @@ return;
 					///<param name="If K>0 then it is always the case the D>0 so division by zero">If K>0 then it is always the case the D>0 so division by zero</param>
 					///<param name="is never possible.">is never possible.</param>
 					///<param name=""></param>
-					v.sqlite3VdbeAddOp2(OP_SCopy,iMem,regSampleno);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, iMem, regSampleno);
 					if(jZeroRows<0) {
 						jZeroRows=v.sqlite3VdbeAddOp1(OpCode.OP_IfNot,iMem);
 					}
@@ -2255,7 +2255,7 @@ goto attach_end;
 						///the value. Otherwise, the value inserted into the child key column
 						///will have INTEGER affinity applied to it, which may not be correct.  
 						///</summary>
-						v.sqlite3VdbeAddOp2(OP_SCopy,aiCol[0]+1+regData,regTemp);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, aiCol[0] + 1 + regData, regTemp);
 						iMustBeInt=v.sqlite3VdbeAddOp2(OP_MustBeInt,regTemp,0);
 						///
 						///<summary>
@@ -4246,7 +4246,7 @@ isView = false;
 						}
 						else
 							if(pSelect!=null) {
-								v.sqlite3VdbeAddOp2(OP_SCopy,regFromSelect+keyColumn,regRowid);
+                                v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regFromSelect + keyColumn, regRowid);
 							}
 							else {
 								VdbeOp pOp;
@@ -4334,7 +4334,7 @@ isView = false;
 							}
 							else
 								if(pSelect!=null) {
-									v.sqlite3VdbeAddOp2(OP_SCopy,regFromSelect+j,iRegStore);
+                                    v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regFromSelect + j, iRegStore);
 								}
 								else {
 									this.sqlite3ExprCode(pList.a[j].pExpr,iRegStore);
@@ -4828,13 +4828,13 @@ isView = false;
 					for(i=0;i<pIdx.nColumn;i++) {
 						int idx=pIdx.aiColumn[i];
 						if(idx==pTab.iPKey) {
-							v.sqlite3VdbeAddOp2(OP_SCopy,regRowid,regIdx+i);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regRowid, regIdx + i);
 						}
 						else {
-							v.sqlite3VdbeAddOp2(OP_SCopy,regData+idx,regIdx+i);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regData + idx, regIdx + i);
 						}
 					}
-					v.sqlite3VdbeAddOp2(OP_SCopy,regRowid,regIdx+i);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regRowid, regIdx + i);
 					v.sqlite3VdbeAddOp3(OP_MakeRecord,regIdx,pIdx.nColumn+1,aRegIdx[iCur]);
 					v.sqlite3VdbeChangeP4(-1,v.sqlite3IndexAffinityStr(pIdx),P4_TRANSIENT);
 					this.sqlite3ExprCacheAffinityChange(regIdx,pIdx.nColumn+1);
@@ -4870,7 +4870,7 @@ isView = false;
 					///Check to see if the new index entry will be unique 
 					///</summary>
 					regR=this.sqlite3GetTempReg();
-					v.sqlite3VdbeAddOp2(OP_SCopy,regOldRowid,regR);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regOldRowid, regR);
 					j3=v.sqlite3VdbeAddOp4(OP_IsUnique,baseCur+iCur+1,0,regR,regIdx,//regR, SQLITE_INT_TO_PTR(regIdx),
 					P4_INT32);
 					this.sqlite3ReleaseTempRange(regIdx,pIdx.nColumn+1);
@@ -6665,7 +6665,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				for(j=0;j<nCol;j++) {
 					int idx=pIdx.aiColumn[j];
 					if(idx==pTab.iPKey) {
-						v.sqlite3VdbeAddOp2(OP_SCopy,regBase+nCol,regBase+j);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regBase + nCol, regBase + j);
 					}
 					else {
 						v.sqlite3VdbeAddOp3(OP_Column,iCur,idx,regBase+j);
@@ -7228,7 +7228,7 @@ return;
 					testcase(to_op==OP_ToInt);
 					testcase(to_op==OP_ToReal);
 					if(inReg!=target) {
-						v.sqlite3VdbeAddOp2(OP_SCopy,inReg,target);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, inReg, target);
 						inReg=target;
 					}
 					v.sqlite3VdbeAddOp1((OpCode)to_op,inReg);
@@ -7818,7 +7818,7 @@ return;
 					///</summary>
 					);
 					if(inReg!=target&&this.pVdbe!=null) {
-						this.pVdbe.sqlite3VdbeAddOp2(OP_SCopy,inReg,target);
+                        this.pVdbe.sqlite3VdbeAddOp2(OpCode.OP_SCopy, inReg, target);
 					}
 				}
 				return target;
@@ -10587,7 +10587,7 @@ range_est_fallback:
 							regBase=r1;
 						}
 						else {
-							v.sqlite3VdbeAddOp2(OP_SCopy,r1,regBase+j);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, r1, regBase + j);
 						}
 					}
 					testcase(pTerm.eOperator&WO_ISNULL);

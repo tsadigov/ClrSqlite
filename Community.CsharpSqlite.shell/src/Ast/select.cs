@@ -1256,7 +1256,7 @@ namespace Community.CsharpSqlite
                                     r2 = pParse.sqlite3ExprCodeGetColumn(pCol.pTab, pCol.iColumn, pCol.iTable, r1);
                                     if (r1 != r2)
                                     {
-                                        v.sqlite3VdbeAddOp2(OP_SCopy, r2, r1);
+                                        v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, r2, r1);
                                     }
                                     j++;
                                 }
