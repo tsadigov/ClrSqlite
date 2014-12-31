@@ -99,7 +99,7 @@ namespace Community.CsharpSqlite
 ///Used when p4type is P4_INTARRAY 
 ///</summary>
 
-		public Community.CsharpSqlite.Sqlite3.SubProgram pProgram;
+		public Community.CsharpSqlite.SubProgram pProgram;
 
 		///
 ///<summary>

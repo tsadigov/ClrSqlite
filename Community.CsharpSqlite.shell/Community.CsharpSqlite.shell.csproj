@@ -325,9 +325,11 @@
     <Compile Include="src\BTree.cs" />
     <Compile Include="src\BtreeExtensions.cs" />
     <Compile Include="src\Db.cs" />
+    <Compile Include="src\Engine\SubProgram.cs" />
     <Compile Include="src\Engine\Vdbe.cs" />
     <Compile Include="src\Engine\VdbeFrame.cs" />
     <Compile Include="src\Engine\VdbeOp.cs" />
+    <Compile Include="src\Engine\VdbeOpList.cs" />
     <Compile Include="src\Index.cs" />
     <Compile Include="src\Mem.cs" />
     <Compile Include="src\MemType.cs" />
