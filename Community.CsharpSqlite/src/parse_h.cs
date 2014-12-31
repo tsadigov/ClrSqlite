@@ -1500,7 +1500,7 @@ return;
 					endOfLoop=v.sqlite3VdbeMakeLabel();
 					v.sqlite3VdbeAddOp2(OP_Rewind,iIdxCur,endOfLoop);
 					topOfLoop=v.sqlite3VdbeCurrentAddr();
-					v.sqlite3VdbeAddOp2(OP_AddImm,iMem,1);
+					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,iMem,1);
 					for(i=0;i<nCol;i++) {
 						v.sqlite3VdbeAddOp3(OP_Column,iIdxCur,i,regCol);
 						CollSeq pColl;
@@ -1569,7 +1569,7 @@ return;
 						///<summary>
 						///Set jump dest for the OP_Ne 
 						///</summary>
-						v.sqlite3VdbeAddOp2(OP_AddImm,iMem+i+1,1);
+						v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,iMem+i+1,1);
 						v.sqlite3VdbeAddOp3(OP_Column,iIdxCur,i,iMem+nCol+i+1);
 					}
 					///
@@ -1608,7 +1608,7 @@ return;
 						v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,regTemp,0," ",0);
 						v.sqlite3VdbeAddOp3(OP_Concat,regTemp,regSampleno,regSampleno);
 						v.sqlite3VdbeAddOp3(OP_Add,iMem,iMem+i+1,regTemp);
-						v.sqlite3VdbeAddOp2(OP_AddImm,regTemp,-1);
+						v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regTemp,-1);
 						v.sqlite3VdbeAddOp3(OP_Divide,iMem+i+1,regTemp,regTemp);
 						v.sqlite3VdbeAddOp1(OpCode.OP_ToInt,regTemp);
 						v.sqlite3VdbeAddOp3(OP_Concat,regTemp,regSampleno,regSampleno);
@@ -4373,7 +4373,7 @@ isView = false;
 				///
 				///</summary>
 				if((db.flags&SQLITE_CountRows)!=0) {
-					v.sqlite3VdbeAddOp2(OP_AddImm,regRowCount,1);
+					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regRowCount,1);
 				}
 				#if !SQLITE_OMIT_TRIGGER
 				if(pTrigger!=null) {
@@ -5797,7 +5797,7 @@ aXRef[j] = -1;
 				///
 				///</summary>
 				if((db.flags&SQLITE_CountRows)!=0&&null==this.pTriggerTab) {
-					v.sqlite3VdbeAddOp2(OP_AddImm,regRowCount,1);
+					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regRowCount,1);
 				}
 				sqlite3CodeRowTrigger(this,pTrigger,TK_UPDATE,pChanges,TRIGGER_AFTER,pTab,regOldRowid,onError,addr);
 				///
@@ -6349,7 +6349,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 					regRowid=this.sqlite3ExprCodeGetColumn(pTab,-1,iCur,iRowid);
 					v.sqlite3VdbeAddOp2(OP_RowSetAdd,iRowSet,regRowid);
 					if((db.flags&SQLITE_CountRows)!=0) {
-						v.sqlite3VdbeAddOp2(OP_AddImm,memCnt,1);
+						v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,memCnt,1);
 					}
 					pWInfo.sqlite3WhereEnd();
 					///
@@ -7361,7 +7361,7 @@ return;
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					testcase(regFree1==0);
 					addr=v.sqlite3VdbeAddOp1((OpCode)op,r1);
-					v.sqlite3VdbeAddOp2(OP_AddImm,target,-1);
+					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,target,-1);
 					v.sqlite3VdbeJumpHere(addr);
 					break;
 				}
@@ -7537,7 +7537,7 @@ return;
 					this.sqlite3ExprCodeIN(pExpr,destIfFalse,destIfNull);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,target);
 					v.sqlite3VdbeResolveLabel(destIfFalse);
-					v.sqlite3VdbeAddOp2(OP_AddImm,target,0);
+					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,target,0);
 					v.sqlite3VdbeResolveLabel(destIfNull);
 					break;
 				}
@@ -12260,7 +12260,7 @@ range_est_fallback:
 						j3=v.sqlite3VdbeAddOp4Int(OP_Found,pExpr.iTable,0,rRhsHasNull,1);
 						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,-1,rRhsHasNull);
 						v.sqlite3VdbeJumpHere(j3);
-						v.sqlite3VdbeAddOp2(OP_AddImm,rRhsHasNull,1);
+						v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,rRhsHasNull,1);
 						v.sqlite3VdbeJumpHere(j2);
 						///
 						///<summary>

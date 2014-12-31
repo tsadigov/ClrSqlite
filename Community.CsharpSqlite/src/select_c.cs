@@ -509,7 +509,7 @@ namespace Community.CsharpSqlite {
                         iLimit = pSelect.iLimit;
                     }
                     addr1 = v.sqlite3VdbeAddOp1(OpCode.OP_IfZero, iLimit);
-                    v.sqlite3VdbeAddOp2(OP_AddImm, iLimit, -1);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_AddImm, iLimit, -1);
                     addr2 = v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
                     v.sqlite3VdbeJumpHere(addr1);
                     v.sqlite3VdbeAddOp1(OpCode.OP_Last, pOrderBy.iECursor);
@@ -532,7 +532,7 @@ namespace Community.CsharpSqlite {
                 if (p.iOffset != 0 && iContinue != 0)
                 {
                     int addr;
-                    v.sqlite3VdbeAddOp2(OP_AddImm, p.iOffset, -1);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_AddImm, p.iOffset, -1);
                     addr = v.sqlite3VdbeAddOp1(OpCode.OP_IfNeg, p.iOffset);
                     v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, iContinue);
 #if SQLITE_DEBUG

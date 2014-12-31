@@ -405,8 +405,7 @@ namespace Community.CsharpSqlite
 
         ;
 
-        public const int OP_AddImm = 20;
-
+        
         public const int OP_MustBeInt = 21;
 
         public const int OP_RealAffinity = 22;

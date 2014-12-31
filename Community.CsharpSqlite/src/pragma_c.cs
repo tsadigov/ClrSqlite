@@ -957,7 +957,7 @@ goto pragma_out;
 													v.sqlite3VdbeAddOp2(OpCode.OP_Integer,iLimit,1);
 													addr=v.sqlite3VdbeAddOp1(OpCode.OP_IncrVacuum,iDb);
 													v.sqlite3VdbeAddOp1(OpCode.OP_ResultRow,1);
-													v.sqlite3VdbeAddOp2(OP_AddImm,1,-1);
+													v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,1,-1);
 													v.sqlite3VdbeAddOp2(OP_IfPos,1,addr);
 													v.sqlite3VdbeJumpHere(addr);
 												}
@@ -1526,7 +1526,7 @@ else
 																												///reg(2) will count entries 
 																												///</summary>
 																												loopTop=v.sqlite3VdbeAddOp2(OP_Rewind,1,0);
-																												v.sqlite3VdbeAddOp2(OP_AddImm,2,1);
+																												v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,2,1);
 																												///
 																												///<summary>
 																												///increment entry count 
