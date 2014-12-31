@@ -113,6 +113,7 @@ namespace Community.CsharpSqlite
 
 		public struct VdbeOpList
 		{
+            //TODO: OpCOde
 			public u8 opcode;
 
 			///
@@ -141,9 +142,9 @@ namespace Community.CsharpSqlite
 ///Third parameter 
 ///</summary>
 
-			public VdbeOpList (u8 opcode, int p1, int p2, int p3)
+			public VdbeOpList (OpCode opcode, int p1, int p2, int p3)
 			{
-				this.opcode = opcode;
+				this.opcode =(u8) opcode;
 				this.p1 = p1;
 				this.p2 = p2;
 				this.p3 = p3;

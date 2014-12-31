@@ -543,26 +543,26 @@ goto pragma_out;
 			///</summary>
 			if(zLeft.Equals("default_cache_size",StringComparison.InvariantCultureIgnoreCase)) {
 				VdbeOpList[] getCacheSize=new VdbeOpList[] {
-					new VdbeOpList(OP_Transaction,0,0,0),
+					new VdbeOpList(OpCode.OP_Transaction,0,0,0),
 					///
 					///<summary>
 					///0 
 					///</summary>
-					new VdbeOpList(OP_ReadCookie,0,1,BTREE_DEFAULT_CACHE_SIZE),
+					new VdbeOpList(OpCode.OP_ReadCookie,0,1,BTREE_DEFAULT_CACHE_SIZE),
 					///
 					///<summary>
 					///1 
 					///</summary>
-					new VdbeOpList(OP_IfPos,1,7,0),
-					new VdbeOpList(OP_Integer,0,2,0),
-					new VdbeOpList(OP_Subtract,1,2,1),
-					new VdbeOpList(OP_IfPos,1,7,0),
-					new VdbeOpList(OP_Integer,0,1,0),
+					new VdbeOpList(OpCode.OP_IfPos,1,7,0),
+					new VdbeOpList(OpCode.OP_Integer,0,2,0),
+					new VdbeOpList(OpCode.OP_Subtract,1,2,1),
+					new VdbeOpList(OpCode.OP_IfPos,1,7,0),
+					new VdbeOpList(OpCode.OP_Integer,0,1,0),
 					///
 					///<summary>
 					///6 
 					///</summary>
-					new VdbeOpList(OP_ResultRow,1,1,0),
+					new VdbeOpList(OpCode.OP_ResultRow,1,1,0),
 				};
 				int addr;
 				if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
@@ -893,32 +893,32 @@ goto pragma_out;
 															///<param name="that this really is an auto">vacuum capable database.</param>
 															///<param name=""></param>
 															VdbeOpList[] setMeta6=new VdbeOpList[] {
-																new VdbeOpList(OP_Transaction,0,1,0),
+																new VdbeOpList(OpCode.OP_Transaction,0,1,0),
 																///
 																///<summary>
 																///0 
 																///</summary>
-																new VdbeOpList(OP_ReadCookie,0,1,BTREE_LARGEST_ROOT_PAGE),
+																new VdbeOpList(OpCode.OP_ReadCookie,0,1,BTREE_LARGEST_ROOT_PAGE),
 																///
 																///<summary>
 																///1 
 																///</summary>
-																new VdbeOpList(OP_If,1,0,0),
+																new VdbeOpList(OpCode.OP_If,1,0,0),
 																///
 																///<summary>
 																///2 
 																///</summary>
-																new VdbeOpList(OP_Halt,SQLITE_OK,OE_Abort,0),
+																new VdbeOpList(OpCode.OP_Halt,SQLITE_OK,OE_Abort,0),
 																///
 																///<summary>
 																///3 
 																///</summary>
-																new VdbeOpList(OP_Integer,0,1,0),
+																new VdbeOpList(OpCode.OP_Integer,0,1,0),
 																///
 																///<summary>
 																///4 
 																///</summary>
-																new VdbeOpList(OP_SetCookie,0,BTREE_INCR_VACUUM,1),
+																new VdbeOpList(OpCode.OP_SetCookie,0,BTREE_INCR_VACUUM,1),
 															///
 															///<summary>
 															///5 
@@ -1401,22 +1401,22 @@ else
 																										///
 																										///</summary>
 																										VdbeOpList[] endCode=new VdbeOpList[] {
-																											new VdbeOpList(OP_AddImm,1,0,0),
+																											new VdbeOpList(OpCode.OP_AddImm,1,0,0),
 																											///
 																											///<summary>
 																											///0 
 																											///</summary>
-																											new VdbeOpList(OP_IfNeg,1,0,0),
+																											new VdbeOpList(OpCode.OP_IfNeg,1,0,0),
 																											///
 																											///<summary>
 																											///1 
 																											///</summary>
-																											new VdbeOpList(OP_String8,0,3,0),
+																											new VdbeOpList(OpCode.OP_String8,0,3,0),
 																											///
 																											///<summary>
 																											///2 
 																											///</summary>
-																											new VdbeOpList(OP_ResultRow,3,1,0),
+																											new VdbeOpList(OpCode.OP_ResultRow,3,1,0),
 																										};
 																										bool isQuick=(zLeft[0]=='q');
 																										///
@@ -1460,7 +1460,7 @@ else
 																											///<summary>
 																											///Halt if out of errors 
 																											///</summary>
-																											v.sqlite3VdbeAddOp2(OP_Halt,0,0);
+																											v.sqlite3VdbeAddOp2(OpCode.OP_Halt,0,0);
 																											v.sqlite3VdbeJumpHere(addr);
 																											///
 																											///<summary>
@@ -1522,7 +1522,7 @@ else
 																												///<summary>
 																												///Stop if out of errors 
 																												///</summary>
-																												v.sqlite3VdbeAddOp2(OP_Halt,0,0);
+																												v.sqlite3VdbeAddOp2(OpCode.OP_Halt,0,0);
 																												v.sqlite3VdbeJumpHere(addr);
 																												pParse.sqlite3OpenTableAndIndices(pTab,1,OP_OpenRead);
 																												v.sqlite3VdbeAddOp2(OP_Integer,0,2);
@@ -1540,33 +1540,33 @@ else
 																													int jmp2;
 																													int r1;
 																													VdbeOpList[] idxErr=new VdbeOpList[] {
-																														new VdbeOpList(OP_AddImm,1,-1,0),
-																														new VdbeOpList(OP_String8,0,3,0),
+																														new VdbeOpList(OpCode.OP_AddImm,1,-1,0),
+																														new VdbeOpList(OpCode.OP_String8,0,3,0),
 																														///
 																														///<summary>
 																														///1 
 																														///</summary>
-																														new VdbeOpList(OP_Rowid,1,4,0),
-																														new VdbeOpList(OP_String8,0,5,0),
+																														new VdbeOpList(OpCode.OP_Rowid,1,4,0),
+																														new VdbeOpList(OpCode.OP_String8,0,5,0),
 																														///
 																														///<summary>
 																														///3 
 																														///</summary>
-																														new VdbeOpList(OP_String8,0,6,0),
+																														new VdbeOpList(OpCode.OP_String8,0,6,0),
 																														///
 																														///<summary>
 																														///4 
 																														///</summary>
-																														new VdbeOpList(OP_Concat,4,3,3),
-																														new VdbeOpList(OP_Concat,5,3,3),
-																														new VdbeOpList(OP_Concat,6,3,3),
-																														new VdbeOpList(OP_ResultRow,3,1,0),
-																														new VdbeOpList(OP_IfPos,1,0,0),
+																														new VdbeOpList(OpCode.OP_Concat,4,3,3),
+																														new VdbeOpList(OpCode.OP_Concat,5,3,3),
+																														new VdbeOpList(OpCode.OP_Concat,6,3,3),
+																														new VdbeOpList(OpCode.OP_ResultRow,3,1,0),
+																														new VdbeOpList(OpCode.OP_IfPos,1,0,0),
 																														///
 																														///<summary>
 																														///9 
 																														///</summary>
-																														new VdbeOpList(OP_Halt,0,0,0),
+																														new VdbeOpList(OpCode.OP_Halt,0,0,0),
 																													};
 																													r1=pParse.sqlite3GenerateIndexKey(pIdx,1,3,false);
 																													jmp2=v.sqlite3VdbeAddOp4Int(OP_Found,j+2,0,r1,pIdx.nColumn+1);
@@ -1581,39 +1581,39 @@ else
 																												v.sqlite3VdbeJumpHere(loopTop);
 																												for(j=0,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,j++) {
 																													VdbeOpList[] cntIdx=new VdbeOpList[] {
-																														new VdbeOpList(OP_Integer,0,3,0),
-																														new VdbeOpList(OP_Rewind,0,0,0),
+																														new VdbeOpList(OpCode.OP_Integer,0,3,0),
+																														new VdbeOpList(OpCode.OP_Rewind,0,0,0),
 																														///
 																														///<summary>
 																														///1 
 																														///</summary>
-																														new VdbeOpList(OP_AddImm,3,1,0),
-																														new VdbeOpList(OP_Next,0,0,0),
+																														new VdbeOpList(OpCode.OP_AddImm,3,1,0),
+																														new VdbeOpList(OpCode.OP_Next,0,0,0),
 																														///
 																														///<summary>
 																														///3 
 																														///</summary>
-																														new VdbeOpList(OP_Eq,2,0,3),
+																														new VdbeOpList(OpCode.OP_Eq,2,0,3),
 																														///
 																														///<summary>
 																														///4 
 																														///</summary>
-																														new VdbeOpList(OP_AddImm,1,-1,0),
-																														new VdbeOpList(OP_String8,0,2,0),
+																														new VdbeOpList(OpCode.OP_AddImm,1,-1,0),
+																														new VdbeOpList(OpCode.OP_String8,0,2,0),
 																														///
 																														///<summary>
 																														///6 
 																														///</summary>
-																														new VdbeOpList(OP_String8,0,3,0),
+																														new VdbeOpList(OpCode.OP_String8,0,3,0),
 																														///
 																														///<summary>
 																														///7 
 																														///</summary>
-																														new VdbeOpList(OP_Concat,3,2,2),
-																														new VdbeOpList(OP_ResultRow,2,1,0),
+																														new VdbeOpList(OpCode.OP_Concat,3,2,2),
+																														new VdbeOpList(OpCode.OP_ResultRow,2,1,0),
 																													};
 																													addr=v.sqlite3VdbeAddOp1(OpCode.OP_IfPos,1);
-																													v.sqlite3VdbeAddOp2(OP_Halt,0,0);
+																													v.sqlite3VdbeAddOp2(OpCode.OP_Halt,0,0);
 																													v.sqlite3VdbeJumpHere(addr);
 																													addr=v.sqlite3VdbeAddOpList(ArraySize(cntIdx),cntIdx);
 																													v.sqlite3VdbeChangeP1(addr+1,j+2);
@@ -1762,17 +1762,17 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																													///Write the specified cookie value 
 																													///</summary>
 																													VdbeOpList[] setCookie=new VdbeOpList[] {
-																														new VdbeOpList(OP_Transaction,0,1,0),
+																														new VdbeOpList(OpCode.OP_Transaction,0,1,0),
 																														///
 																														///<summary>
 																														///0 
 																														///</summary>
-																														new VdbeOpList(OP_Integer,0,1,0),
+																														new VdbeOpList(OpCode.OP_Integer,0,1,0),
 																														///
 																														///<summary>
 																														///1 
 																														///</summary>
-																														new VdbeOpList(OP_SetCookie,0,0,1),
+																														new VdbeOpList(OpCode.OP_SetCookie,0,0,1),
 																													///
 																													///<summary>
 																													///2 
@@ -1790,17 +1790,17 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																													///Read the specified cookie value 
 																													///</summary>
 																													VdbeOpList[] readCookie=new VdbeOpList[] {
-																														new VdbeOpList(OP_Transaction,0,0,0),
+																														new VdbeOpList(OpCode.OP_Transaction,0,0,0),
 																														///
 																														///<summary>
 																														///0 
 																														///</summary>
-																														new VdbeOpList(OP_ReadCookie,0,1,0),
+																														new VdbeOpList(OpCode.OP_ReadCookie,0,1,0),
 																														///
 																														///<summary>
 																														///1 
 																														///</summary>
-																														new VdbeOpList(OP_ResultRow,1,1,0)
+																														new VdbeOpList(OpCode.OP_ResultRow,1,1,0)
 																													};
 																													int addr=v.sqlite3VdbeAddOpList(readCookie.Length,readCookie);
 																													// ArraySize(readCookie), readCookie);

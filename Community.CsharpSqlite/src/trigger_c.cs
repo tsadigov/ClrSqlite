@@ -782,23 +782,23 @@ return;
 			if((v=pParse.sqlite3GetVdbe())!=null) {
 				int _base;
 				VdbeOpList[] dropTrigger=new VdbeOpList[] {
-					new VdbeOpList(OP_Rewind,0,ADDR(9),0),
-					new VdbeOpList(OP_String8,0,1,0),
+					new VdbeOpList(OpCode.OP_Rewind,0,ADDR(9),0),
+					new VdbeOpList(OpCode.OP_String8,0,1,0),
 					///
 					///<summary>
 					///1 
 					///</summary>
-					new VdbeOpList(OP_Column,0,1,2),
-					new VdbeOpList(OP_Ne,2,ADDR(8),1),
-					new VdbeOpList(OP_String8,0,1,0),
+					new VdbeOpList(OpCode.OP_Column,0,1,2),
+					new VdbeOpList(OpCode.OP_Ne,2,ADDR(8),1),
+					new VdbeOpList(OpCode.OP_String8,0,1,0),
 					///
 					///<summary>
 					///4: "trigger" 
 					///</summary>
-					new VdbeOpList(OP_Column,0,0,2),
-					new VdbeOpList(OP_Ne,2,ADDR(8),1),
-					new VdbeOpList(OP_Delete,0,0,0),
-					new VdbeOpList(OP_Next,0,ADDR(1),0),
+					new VdbeOpList(OpCode.OP_Column,0,0,2),
+					new VdbeOpList(OpCode.OP_Ne,2,ADDR(8),1),
+					new VdbeOpList(OpCode.OP_Delete,0,0,0),
+					new VdbeOpList(OpCode.OP_Next,0,ADDR(1),0),
 				///
 				///<summary>
 				///8 
@@ -1219,7 +1219,7 @@ return;
 				if(iEndTrigger!=0) {
 					v.sqlite3VdbeResolveLabel(iEndTrigger);
 				}
-				v.sqlite3VdbeAddOp0(OP_Halt);
+				v.sqlite3VdbeAddOp0(OpCode.OP_Halt);
 				#if SQLITE_DEBUG
 																																																																																																        VdbeComment( v, "End: %s.%s", pTrigger.zName, onErrorText( orconf ) );
 #endif

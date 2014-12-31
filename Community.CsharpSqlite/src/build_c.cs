@@ -192,7 +192,7 @@ p.zName, P4_STATIC );
 );
                 if (v != null)
                 {
-                    v.sqlite3VdbeAddOp0(OP_Halt);
+                    v.sqlite3VdbeAddOp0(OpCode.OP_Halt);
                     ///
                     ///<summary>
                     ///The cookie mask contains one bit for each database file open.
@@ -4768,7 +4768,7 @@ goto exit_drop_index;
                 {
                     build.sqlite3MayAbort(pParse);
                 }
-                v.sqlite3VdbeAddOp4(OP_Halt, SQLITE_CONSTRAINT, onError, 0, p4, p4type);
+                v.sqlite3VdbeAddOp4(OpCode.OP_Halt, SQLITE_CONSTRAINT, onError, 0, p4, p4type);
             }
             static void sqlite3HaltConstraint(Parse pParse, int onError, byte[] p4, int p4type)
             {
@@ -4777,7 +4777,7 @@ goto exit_drop_index;
                 {
                     build.sqlite3MayAbort(pParse);
                 }
-                v.sqlite3VdbeAddOp4(OP_Halt, SQLITE_CONSTRAINT, onError, 0, p4, p4type);
+                v.sqlite3VdbeAddOp4(OpCode.OP_Halt, SQLITE_CONSTRAINT, onError, 0, p4, p4type);
             }
             ///<summary>
             /// Check to see if pIndex uses the collating sequence pColl.  Return

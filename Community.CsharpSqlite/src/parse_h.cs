@@ -3885,7 +3885,7 @@ isView = false;
 					///<summary>
 					///yield X 
 					///</summary>
-					v.sqlite3VdbeAddOp2(OP_Halt,SQLITE_INTERNAL,OE_Abort);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Halt,SQLITE_INTERNAL,OE_Abort);
 					#if SQLITE_DEBUG
 																																																																																																																																			        VdbeComment( v, "End of SELECT coroutine" );
 #endif
@@ -7779,7 +7779,7 @@ return;
 					}
 					Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
 					if(pExpr.affinity==OE_Ignore) {
-						v.sqlite3VdbeAddOp4(OP_Halt,SQLITE_OK,OE_Ignore,0,pExpr.u.zToken,0);
+						v.sqlite3VdbeAddOp4(OpCode.OP_Halt,SQLITE_OK,OE_Ignore,0,pExpr.u.zToken,0);
 					}
 					else {
 						build.sqlite3HaltConstraint(this,pExpr.affinity,pExpr.u.zToken,0);

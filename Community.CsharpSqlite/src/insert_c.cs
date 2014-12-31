@@ -969,7 +969,7 @@ namespace Community.CsharpSqlite
 			v.sqlite3VdbeAddOp2 (OP_Close, iSrc, 0);
 			v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
 			if (emptyDestTest != 0) {
-				v.sqlite3VdbeAddOp2 (OP_Halt, SQLITE_OK, 0);
+				v.sqlite3VdbeAddOp2 (OpCode.OP_Halt, SQLITE_OK, 0);
 				v.sqlite3VdbeJumpHere (emptyDestTest);
 				v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
 				return 0;
