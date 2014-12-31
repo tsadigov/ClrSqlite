@@ -552,7 +552,7 @@ namespace Community.CsharpSqlite
                         freeP4(db, pOp.p4type, pOp.p4.p);
                         pOp = p.lOp[addr + N] = new VdbeOp();
                         //memset(pOp, 0, sizeof(pOp[0]));
-                        pOp.opcode = OP_Noop;
+                        pOp.OpCode= OpCode.OP_Noop;
                         //pOp++;
                     }
                 }
@@ -626,7 +626,7 @@ namespace Community.CsharpSqlite
       //va_list ap;
       lock ( _Custom.lock_va_list )
       {
-        sqlite3VdbeAddOp0( p, OP_Noop );
+        sqlite3VdbeAddOp0( p, OpCode.OP_Noop );
         Debug.Assert( p.nOp > 0 || p.aOp == null );
         Debug.Assert( p.aOp == null || p.aOp[p.nOp - 1].zComment == null /* || p.db.mallocFailed != 0 */);
         if ( p.nOp != 0 )

@@ -25,7 +25,7 @@ namespace Community.CsharpSqlite
 #if !SQLITE_OMIT_TRACE
                     if (v != null)
                     {
-                        v.sqlite3VdbeAddOp0(Sqlite3.OP_Trace);
+                        v.sqlite3VdbeAddOp0(OpCode.OP_Trace);
                     }
 #endif
                 }

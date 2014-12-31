@@ -79,7 +79,7 @@ int sqlite3_blob_open(
     {OP_VerifyCookie, 0, 0, 0},    /* 1: Check the schema cookie */
     {OP_TableLock, 0, 0, 0},       /* 2: Acquire a read or write lock */
 
-    /* One of the following two instructions is replaced by an OP_Noop. */
+    /* One of the following two instructions is replaced by an OpCode.OP_Noop. */
     {OP_OpenRead, 0, 0, 0},        /* 3: Open cursor 0 for reading */
     {OP_OpenWrite, 0, 0, 0},       /* 4: Open cursor 0 for read/write */
 

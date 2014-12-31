@@ -924,7 +924,7 @@ namespace Community.CsharpSqlite
                 ///index might end up being unused if the data can be
                 ///</summary>
                 ///<param name="extracted in pre">sorted order.  If that is the case, then the</param>
-                ///<param name="OP_OpenEphemeral instruction will be changed to an OP_Noop once">OP_OpenEphemeral instruction will be changed to an OP_Noop once</param>
+                ///<param name="OP_OpenEphemeral instruction will be changed to an OpCode.OP_Noop once">OP_OpenEphemeral instruction will be changed to an OpCode.OP_Noop once</param>
                 ///<param name="we figure out that the sorting index is not needed.  The addrSortIndex">we figure out that the sorting index is not needed.  The addrSortIndex</param>
                 ///<param name="variable is used to facilitate that change.">variable is used to facilitate that change.</param>
                 ///<param name=""></param>
@@ -995,7 +995,7 @@ namespace Community.CsharpSqlite
                     ///<summary>
                     ///If sorting index that was created by a prior OP_OpenEphemeral
                     ///instruction ended up not being needed, then change the OP_OpenEphemeral
-                    ///into an OP_Noop.
+                    ///into an OpCode.OP_Noop.
                     ///
                     ///</summary>
                     if (addrSortIndex >= 0 && pOrderBy == null)

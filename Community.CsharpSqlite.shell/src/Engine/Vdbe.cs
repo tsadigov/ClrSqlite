@@ -617,37 +617,48 @@ pOp.cnt = 0;
 				this.sqlite3VdbeChangeP4(addr,_p4,p4type);
 				return addr;
 			}
-			public int sqlite3VdbeAddOp4Int(///
-			///<summary>
-			///Add the opcode to this VM 
-			///</summary>
-			int op,///
-			///<summary>
-			///The new opcode 
-			///</summary>
-			int p1,///
-			///<summary>
-			///The P1 operand 
-			///</summary>
-			int p2,///
-			///<summary>
-			///The P2 operand 
-			///</summary>
-			int p3,///
-			///<summary>
-			///The P3 operand 
-			///</summary>
-			int p4///
-			///<summary>
-			///The P4 operand as an integer 
-			///</summary>
-			) {
-				union_p4 _p4=new union_p4();
-				_p4.i=p4;
-				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);
-				this.sqlite3VdbeChangeP4(addr,_p4,P4_INT32);
-				return addr;
-			}
+            public int sqlite3VdbeAddOp4Int(///
+                ///Add the opcode to this VM 
+            int op,///
+                ///The new opcode 
+            int p1,///
+                ///The P1 operand 
+            int p2,///
+                ///The P2 operand 
+            int p3,///
+                ///The P3 operand 
+            int p4///
+                ///The P4 operand as an integer 
+            )
+            {
+                union_p4 _p4 = new union_p4();
+                _p4.i = p4;
+                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                this.sqlite3VdbeChangeP4(addr, _p4, P4_INT32);
+                return addr;
+            }
+
+            public int sqlite3VdbeAddOp4Int(///
+                ///Add the opcode to this VM 
+            OpCode op,///
+                ///The new opcode 
+            int p1,///
+                ///The P1 operand 
+            int p2,///
+                ///The P2 operand 
+            int p3,///
+                ///The P3 operand 
+            int p4///
+                ///The P4 operand as an integer 
+            )
+            {
+                union_p4 _p4 = new union_p4();
+                _p4.i = p4;
+                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                this.sqlite3VdbeChangeP4(addr, _p4, P4_INT32);
+                return addr;
+            }
+
 			public int sqlite3VdbeMakeLabel() {
 				int i;
 				i=this.nLabel++;
@@ -8214,7 +8225,7 @@ break;
 						default: {
 							///
 							///<summary>
-							///This is really OP_Noop and OP_Explain 
+							///This is really OpCode.OP_Noop and OP_Explain 
 							///</summary>
 							Debug.Assert(pOp.OpCode==OpCode.OP_Noop||pOp.OpCode==OpCode.OP_Explain);
 							break;

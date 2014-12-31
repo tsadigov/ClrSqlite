@@ -597,7 +597,7 @@ namespace Community.CsharpSqlite {
 							///Case 2:  We have an inequality comparison against the ROWID field.
 							///
 							///</summary>
-							int testOp=OP_Noop;
+							OpCode testOp=OpCode.OP_Noop;
 							int start;
 							int memEndValue=0;
 							WhereTerm pStart,pEnd;
@@ -696,10 +696,10 @@ namespace Community.CsharpSqlite {
 								memEndValue=++pParse.nMem;
 								pParse.sqlite3ExprCode(pX.pRight,memEndValue);
 								if(pX.op==TK_LT||pX.op==TK_GT) {
-									testOp=bRev!=0?OP_Le:OP_Ge;
+									testOp=bRev!=0?OpCode.OP_Le:OpCode.OP_Ge;
 								}
 								else {
-									testOp=bRev!=0?OP_Lt:OP_Gt;
+									testOp=bRev!=0?OpCode.OP_Lt:OpCode.OP_Gt;
 								}
 								pLevel.disableTerm(pEnd);
 							}
@@ -713,7 +713,7 @@ namespace Community.CsharpSqlite {
 							else {
 								Debug.Assert(pLevel.p5==0);
 							}
-							if(testOp!=OP_Noop) {
+							if(testOp!=OpCode.OP_Noop) {
 								iRowidReg=iReleaseReg=pParse.sqlite3GetTempReg();
 								v.sqlite3VdbeAddOp2(OP_Rowid,iCur,iRowidReg);
 								pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
@@ -757,52 +757,52 @@ namespace Community.CsharpSqlite {
 								///<param name="constraints but an index is selected anyway, in order">constraints but an index is selected anyway, in order</param>
 								///<param name="to force the output order to conform to an ORDER BY.">to force the output order to conform to an ORDER BY.</param>
 								///<param name=""></param>
-								u8[] aStartOp=new u8[] {
+								OpCode[] aStartOp=new OpCode[] {
 									0,
 									0,
-									OP_Rewind,
+									OpCode.OP_Rewind,
 									///
 									///<summary>
 									///2: (!start_constraints && startEq &&  !bRev) 
 									///</summary>
-									OP_Last,
+									OpCode.OP_Last,
 									///
 									///<summary>
 									///3: (!start_constraints && startEq &&   bRev) 
 									///</summary>
-									OP_SeekGt,
+									OpCode.OP_SeekGt,
 									///
 									///<summary>
 									///4: (start_constraints  && !startEq && !bRev) 
 									///</summary>
-									OP_SeekLt,
+									OpCode.OP_SeekLt,
 									///
 									///<summary>
 									///5: (start_constraints  && !startEq &&  bRev) 
 									///</summary>
-									OP_SeekGe,
+									OpCode.OP_SeekGe,
 									///
 									///<summary>
 									///6: (start_constraints  &&  startEq && !bRev) 
 									///</summary>
-									OP_SeekLe
+									OpCode.OP_SeekLe
 								///
 								///<summary>
 								///7: (start_constraints  &&  startEq &&  bRev) 
 								///</summary>
 								};
-								u8[] aEndOp=new u8[] {
-									OP_Noop,
+								OpCode[] aEndOp=new OpCode[] {
+									OpCode.OP_Noop,
 									///
 									///<summary>
 									///0: (!end_constraints) 
 									///</summary>
-									OP_IdxGE,
+									OpCode.OP_IdxGE,
 									///
 									///<summary>
 									///1: (end_constraints && !bRev) 
 									///</summary>
-									OP_IdxLT
+									OpCode.OP_IdxLT
 								///
 								///<summary>
 								///2: (end_constraints && bRev) 
@@ -873,7 +873,7 @@ namespace Community.CsharpSqlite {
 								///<summary>
 								///Number of extra registers needed 
 								///</summary>
-								int op;
+								OpCode op;
 								///
 								///<summary>
 								///Instruction opcode 
@@ -1003,13 +1003,13 @@ namespace Community.CsharpSqlite {
 								pParse.codeApplyAffinity(regBase,nConstraint,zStartAff.ToString());
 								op=aStartOp[(start_constraints<<2)+(startEq<<1)+bRev];
 								Debug.Assert(op!=0);
-								testcase(op==OP_Rewind);
-								testcase(op==OP_Last);
-								testcase(op==OP_SeekGt);
-								testcase(op==OP_SeekGe);
-								testcase(op==OP_SeekLe);
-								testcase(op==OP_SeekLt);
-								v.sqlite3VdbeAddOp4Int(op,iIdxCur,addrNxt,regBase,nConstraint);
+								testcase(op==OpCode.OP_Rewind);
+                                testcase(op == OpCode.OP_Last);
+                                testcase(op == OpCode.OP_SeekGt);
+                                testcase(op == OpCode.OP_SeekGe);
+                                testcase(op == OpCode.OP_SeekLe);
+                                testcase(op == OpCode.OP_SeekLt);
+								v.sqlite3VdbeAddOp4Int((u8)op,iIdxCur,addrNxt,regBase,nConstraint);
 								///
 								///<summary>
 								///Load the value for the inequality constraint at the end of the
@@ -1058,11 +1058,11 @@ namespace Community.CsharpSqlite {
 								///Check if the index cursor is past the end of the range. 
 								///</summary>
 								op=aEndOp[((pRangeEnd!=null||nEq!=0)?1:0)*(1+bRev)];
-								testcase(op==OP_Noop);
-								testcase(op==OP_IdxGE);
-								testcase(op==OP_IdxLT);
-								if(op!=OP_Noop) {
-									v.sqlite3VdbeAddOp4Int(op,iIdxCur,addrNxt,regBase,nConstraint);
+								testcase(op==OpCode.OP_Noop);
+                                testcase(op == OpCode.OP_IdxGE);
+                                testcase(op == OpCode.OP_IdxLT);
+								if(op!=OpCode.OP_Noop) {
+									v.sqlite3VdbeAddOp4Int((u8)op,iIdxCur,addrNxt,regBase,nConstraint);
 									v.sqlite3VdbeChangeP5((u8)(endEq!=bRev?1:0));
 								}
 								///
