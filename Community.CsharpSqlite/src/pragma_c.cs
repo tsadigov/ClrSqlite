@@ -1207,7 +1207,7 @@ else
 																						v.sqlite3VdbeAddOp4(OP_String8,0,5,0,pCol.zDflt,0);
 																					}
 																					else {
-																						v.sqlite3VdbeAddOp2(OP_Null,0,5);
+																						v.sqlite3VdbeAddOp2(OpCode.OP_Null,0,5);
 																					}
 																					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,pCol.isPrimKey!=0?1:0,6);
 																					v.sqlite3VdbeAddOp2(OP_ResultRow,1,6);
@@ -1338,7 +1338,7 @@ else
 																												v.sqlite3VdbeAddOp2(OpCode.OP_Integer,j,2);
 																												v.sqlite3VdbeAddOp4(OP_String8,0,3,0,pFK.zTo,0);
 																												v.sqlite3VdbeAddOp4(OP_String8,0,4,0,pTab.aCol[pFK.aCol[j].iFrom].zName,0);
-																												v.sqlite3VdbeAddOp4(zCol!=null?OP_String8:OP_Null,0,5,0,zCol,0);
+                                                                                                                v.sqlite3VdbeAddOp4(zCol != null ? OpCode.OP_String8 : OpCode.OP_Null, 0, 5, 0, zCol, 0);
 																												v.sqlite3VdbeAddOp4(OP_String8,0,6,0,zOnUpdate,0);
 																												v.sqlite3VdbeAddOp4(OP_String8,0,7,0,zOnDelete,0);
 																												v.sqlite3VdbeAddOp4(OP_String8,0,8,0,"NONE",0);

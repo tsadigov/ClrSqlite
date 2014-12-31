@@ -330,9 +330,7 @@ namespace Community.CsharpSqlite
 
         ;
 
-        public const int OP_String = 9;
-
-        public const int OP_Null = 10;
+        
 
         public const int OP_Blob = 11;
 

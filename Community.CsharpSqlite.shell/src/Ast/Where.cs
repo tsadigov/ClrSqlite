@@ -995,7 +995,7 @@ namespace Community.CsharpSqlite {
 								}
 								else
 									if(isMinQuery!=0) {
-										v.sqlite3VdbeAddOp2(OP_Null,0,regBase+nEq);
+										v.sqlite3VdbeAddOp2(OpCode.OP_Null,0,regBase+nEq);
 										nConstraint++;
 										startEq=0;
 										start_constraints=1;
@@ -1261,7 +1261,7 @@ namespace Community.CsharpSqlite {
 									if((wctrlFlags&WHERE_DUPLICATES_OK)==0) {
 										regRowset=++pParse.nMem;
 										regRowid=++pParse.nMem;
-										v.sqlite3VdbeAddOp2(OP_Null,0,regRowset);
+										v.sqlite3VdbeAddOp2(OpCode.OP_Null,0,regRowset);
 									}
 									iRetInit=v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regReturn);
 									for(ii=0;ii<pOrWc.nTerm;ii++) {

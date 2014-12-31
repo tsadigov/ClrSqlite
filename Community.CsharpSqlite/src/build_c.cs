@@ -1210,7 +1210,7 @@ goto begin_table_error;
                     }
                     sqlite3OpenMasterTable(pParse, iDb);
                     v.sqlite3VdbeAddOp2(OP_NewRowid, 0, reg1);
-                    v.sqlite3VdbeAddOp2(OP_Null, 0, reg3);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, reg3);
                     v.sqlite3VdbeAddOp3(OP_Insert, 0, reg3, reg1);
                     v.sqlite3VdbeChangeP5(OPFLAG_APPEND);
                     v.sqlite3VdbeAddOp0(OP_Close);

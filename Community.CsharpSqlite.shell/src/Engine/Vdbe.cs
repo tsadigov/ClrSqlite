@@ -542,7 +542,7 @@ pOp.cnt = 0;
                 return addr;
             }
 			public int sqlite3VdbeAddOp4(int op,int p1,int p2,int p3,byte[] pP4,int p4type) {
-				Debug.Assert(op==OP_Null||pP4!=null);
+				Debug.Assert(op==(u8)OpCode.OP_Null||pP4!=null);
 				union_p4 _p4=new union_p4();
 				_p4.z=Encoding.UTF8.GetString(pP4,0,pP4.Length);
 				int addr=this.sqlite3VdbeAddOp3(op,p1,p2,p3);

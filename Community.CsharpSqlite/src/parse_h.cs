@@ -1490,7 +1490,7 @@ return;
 						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,iMem+i);
 					}
 					for(i=0;i<nCol;i++) {
-						v.sqlite3VdbeAddOp2(OP_Null,0,iMem+nCol+i+1);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, iMem + nCol + i + 1);
 					}
 					///
 					///<summary>
@@ -1635,7 +1635,7 @@ return;
 					v.sqlite3VdbeJumpHere(jZeroRows);
 					jZeroRows=v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
 				}
-				v.sqlite3VdbeAddOp2(OP_Null,0,regIdxname);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regIdxname);
 				v.sqlite3VdbeAddOp4(OP_MakeRecord,regTabname,3,regRec,"aaa",0);
 				v.sqlite3VdbeAddOp2(OP_NewRowid,iStatCur,regRowid);
 				v.sqlite3VdbeAddOp3(OP_Insert,iStatCur,regRec,regRowid);
@@ -4238,7 +4238,7 @@ isView = false;
 						///<summary>
 						///The row that the VUpdate opcode will delete: none 
 						///</summary>
-						v.sqlite3VdbeAddOp2(OP_Null,0,regIns);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regIns);
 					}
 					if(keyColumn>=0) {
 						if(useTempTable) {
@@ -4282,7 +4282,7 @@ isView = false;
 					}
 					else
 						if(IsVirtual(pTab)) {
-							v.sqlite3VdbeAddOp2(OP_Null,0,regRowid);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regRowid);
 						}
 						else {
 							v.sqlite3VdbeAddOp3(OP_NewRowid,baseCur,regRowid,regAutoinc);
@@ -4306,7 +4306,7 @@ isView = false;
 							///in its place.  So will fill this column with a NULL to avoid
 							///taking up data space with information that will never be used. 
 							///</summary>
-							v.sqlite3VdbeAddOp2(OP_Null,0,iRegStore);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, iRegStore);
 							continue;
 						}
 						if(pColumn==null) {
@@ -5549,7 +5549,7 @@ aXRef[j] = -1;
 				///Begin the database scan
 				///
 				///</summary>
-				v.sqlite3VdbeAddOp2(OP_Null,0,regOldRowid);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regOldRowid);
 				ExprList NullOrderby=null;
 				pWInfo=this.sqlite3WhereBegin(pTabList,pWhere,ref NullOrderby,WHERE_ONEPASS_DESIRED);
 				if(pWInfo==null)
@@ -5655,7 +5655,7 @@ aXRef[j] = -1;
 							v.sqlite3ExprCodeGetColumnOfTable(pTab,iCur,i,regOld+i);
 						}
 						else {
-							v.sqlite3VdbeAddOp2(OP_Null,0,regOld+i);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regOld + i);
 						}
 					}
 					if(chngRowid==false) {
@@ -5681,7 +5681,7 @@ aXRef[j] = -1;
 				newmask=(int)sqlite3TriggerColmask(this,pTrigger,pChanges,1,TRIGGER_BEFORE,pTab,onError);
 				for(i=0;i<pTab.nCol;i++) {
 					if(i==pTab.iPKey) {
-						v.sqlite3VdbeAddOp2(OP_Null,0,regNew+i);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regNew + i);
 					}
 					else {
 						j=aXRef[i];
@@ -6341,7 +6341,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 					///<summary>
 					///Collect rowids of every row to be deleted.
 					///</summary>
-					v.sqlite3VdbeAddOp2(OP_Null,0,iRowSet);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, iRowSet);
 					ExprList elDummy=null;
 					pWInfo=this.sqlite3WhereBegin(pTabList,pWhere,ref elDummy,WHERE_DUPLICATES_OK);
 					if(pWInfo==null)
@@ -7168,7 +7168,7 @@ return;
 					break;
 				}
 				case TK_NULL: {
-					v.sqlite3VdbeAddOp2(OP_Null,0,target);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, target);
 					break;
 				}
 				#if !SQLITE_OMIT_BLOB_LITERAL
@@ -7533,7 +7533,7 @@ return;
 				case TK_IN: {
 					int destIfFalse=v.sqlite3VdbeMakeLabel();
 					int destIfNull=v.sqlite3VdbeMakeLabel();
-					v.sqlite3VdbeAddOp2(OP_Null,0,target);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, target);
 					this.sqlite3ExprCodeIN(pExpr,destIfFalse,destIfNull);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,target);
 					v.sqlite3VdbeResolveLabel(destIfFalse);
@@ -7758,7 +7758,7 @@ return;
 						this.sqlite3ExprCachePop(1);
 					}
 					else {
-						v.sqlite3VdbeAddOp2(OP_Null,0,target);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, target);
 					}
 					#if !NDEBUG
 																																																																																																																																			            Debug.Assert( /* db.mallocFailed != 0 || */ pParse.nErr > 0
@@ -10421,7 +10421,7 @@ range_est_fallback:
 				else
 					if(pX.Operator==TokenType.TK_ISNULL) {
 						iReg=iTarget;
-						v.sqlite3VdbeAddOp2(OP_Null,0,iReg);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, iReg);
 						#if !SQLITE_OMIT_SUBQUERY
 					}
 					else {
@@ -11920,7 +11920,7 @@ range_est_fallback:
 					///the LHS of the IN operator 
 					///</summary>
 					if(rMayHaveNull!=0) {
-						v.sqlite3VdbeAddOp2(OP_Null,0,rMayHaveNull);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, rMayHaveNull);
 					}
 					affinity=pLeft.sqlite3ExprAffinity();
 					///
@@ -11996,7 +11996,7 @@ range_est_fallback:
 							///</summary>
 							r1=this.sqlite3GetTempReg();
 							r2=this.sqlite3GetTempReg();
-							v.sqlite3VdbeAddOp2(OP_Null,0,r2);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, r2);
 							for(i=0;i<pList.nExpr;i++) {
 								//, pItem++){
 								pItem=pList.a[i];
@@ -12072,7 +12072,7 @@ range_est_fallback:
 					dest.Init(0,++this.nMem);
 					if(pExpr.Operator==TokenType.TK_SELECT) {
 						dest.eDest=SelectResultType.Mem;
-						v.sqlite3VdbeAddOp2(OP_Null,0,dest.iParm);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, dest.iParm);
 						#if SQLITE_DEBUG
 																																																																																																																																														              VdbeComment( v, "Init subquery result" );
 #endif

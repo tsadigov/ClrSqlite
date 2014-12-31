@@ -3743,13 +3743,13 @@ break;
                 }
                 for (i = 0; i < pAggInfo.nColumn; i++)
                 {
-                    v.sqlite3VdbeAddOp2(OP_Null, 0, pAggInfo.aCol[i].iMem);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, pAggInfo.aCol[i].iMem);
                 }
                 for (i = 0; i < pAggInfo.nFunc; i++)
                 {
                     //, pFunc++){
                     pFunc = pAggInfo.aFunc[i];
-                    v.sqlite3VdbeAddOp2(OP_Null, 0, pFunc.iMem);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, pFunc.iMem);
                     if (pFunc.iDistinct >= 0)
                     {
                         Expr pE = pFunc.pExpr;
