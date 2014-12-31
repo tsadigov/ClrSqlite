@@ -818,7 +818,7 @@ return;
                     vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,minFormat,r2);
 					j1=v.sqlite3VdbeAddOp3(OP_Ge,r2,0,r1);
-					v.sqlite3VdbeAddOp3(OP_SetCookie,iDb,BTREE_FILE_FORMAT,r2);
+					v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie,iDb,BTREE_FILE_FORMAT,r2);
 					v.sqlite3VdbeJumpHere(j1);
 					this.sqlite3ReleaseTempReg(r1);
 					this.sqlite3ReleaseTempReg(r2);
@@ -995,7 +995,7 @@ goto exit_rename_table;
 				#if !SQLITE_OMIT_VIRTUALTABLE
 				if(pVTab!=null) {
 					int i=++this.nMem;
-					v.sqlite3VdbeAddOp4(OP_String8,0,i,0,zName,0);
+					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,i,0,zName,0);
                     v.sqlite3VdbeAddOp4(OpCode.OP_VRename, i, 0, 0, pVTab, P4_VTAB);
 					build.sqlite3MayAbort(this);
 				}
@@ -1419,7 +1419,7 @@ return;
 				///<param name="Establish a read">cache level. </param>
 				sqlite3TableLock(this,iDb,pTab.tnum,0,pTab.zName);
 				iIdxCur=this.nTab++;
-				v.sqlite3VdbeAddOp4(OP_String8,0,regTabname,0,pTab.zName,0);
+				v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,regTabname,0,pTab.zName,0);
 				for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
 					int nCol;
 					KeyInfo pKey;
@@ -1441,7 +1441,7 @@ return;
 					///<summary>
 					///Populate the registers containing the index names. 
 					///</summary>
-					v.sqlite3VdbeAddOp4(OP_String8,0,regIdxname,0,pIdx.zName,0);
+					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,regIdxname,0,pIdx.zName,0);
 					#if SQLITE_ENABLE_STAT2
 																																																																																																																																																															
     /* If this iteration of the loop is generating code to analyze the
@@ -1605,7 +1605,7 @@ return;
 						jZeroRows=v.sqlite3VdbeAddOp1(OpCode.OP_IfNot,iMem);
 					}
 					for(i=0;i<nCol;i++) {
-						v.sqlite3VdbeAddOp4(OP_String8,0,regTemp,0," ",0);
+						v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,regTemp,0," ",0);
 						v.sqlite3VdbeAddOp3(OP_Concat,regTemp,regSampleno,regSampleno);
 						v.sqlite3VdbeAddOp3(OP_Add,iMem,iMem+i+1,regTemp);
 						v.sqlite3VdbeAddOp2(OP_AddImm,regTemp,-1);
@@ -4489,7 +4489,7 @@ isView = false;
 					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pDb.pSchema));
 					this.sqlite3OpenTable(0,p.iDb,pDb.pSchema.pSeqTab,OP_OpenRead);
 					addr=v.sqlite3VdbeCurrentAddr();
-					v.sqlite3VdbeAddOp4(OP_String8,0,memId-1,0,p.pTab.zName,0);
+					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,memId-1,0,p.pTab.zName,0);
 					v.sqlite3VdbeAddOp2(OP_Rewind,0,addr+9);
 					v.sqlite3VdbeAddOp3(OP_Column,0,0,memId);
 					v.sqlite3VdbeAddOp3(OP_Ne,memId-1,addr+7,memId);
@@ -7164,7 +7164,7 @@ return;
 				#endif
 				case TK_STRING: {
 					Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
-					v.sqlite3VdbeAddOp4(OP_String8,0,target,0,pExpr.u.zToken,0);
+					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,target,0,pExpr.u.zToken,0);
 					break;
 				}
 				case TK_NULL: {
@@ -7621,7 +7621,7 @@ return;
 					///
 					///<summary>
 					///If the column has REAL affinity, it may currently be stored as an
-					///integer. Use OP_RealAffinity to make sure it is really real.  
+					///integer. Use OpCode.OP_RealAffinity to make sure it is really real.  
 					///</summary>
 					if(pExpr.iColumn>=0&&pTab.aCol[pExpr.iColumn].affinity==SQLITE_AFF_REAL) {
 						v.sqlite3VdbeAddOp1(OpCode.OP_RealAffinity,target);

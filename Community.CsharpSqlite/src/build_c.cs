@@ -1704,7 +1704,7 @@ goto begin_table_error;
                 Vdbe v = pParse.pVdbe;
                 Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
                 v.sqlite3VdbeAddOp2(OpCode.OP_Integer, db.aDb[iDb].pSchema.schema_cookie + 1, r1);
-                v.sqlite3VdbeAddOp3(OP_SetCookie, iDb, BTREE_SCHEMA_VERSION, r1);
+                v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTREE_SCHEMA_VERSION, r1);
                 pParse.sqlite3ReleaseTempReg(r1);
             }
             ///<summary>

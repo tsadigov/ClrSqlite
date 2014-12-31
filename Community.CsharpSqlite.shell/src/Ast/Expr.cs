@@ -718,7 +718,7 @@ set { _op = value; }
                 ///
                 ///    *  Any expression that evaluates to two or more opcodes.
                 ///
-                ///    *  Any OpCode.OP_Integer, OP_Real, OP_String, OP_Blob, OP_Null,
+                ///    *  Any OpCode.OP_Integer, OpCode.OP_Real, OP_String, OP_Blob, OP_Null,
                 ///       or OP_Variable that does not need to be placed in a
                 ///       specific register.
                 ///

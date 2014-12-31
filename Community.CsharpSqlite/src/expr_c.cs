@@ -1187,7 +1187,7 @@ return null;
                     if (negateFlag)
                         value = -value;
                     //zV = dup8bytes(v,  value);
-                    v.sqlite3VdbeAddOp4(OP_Real, 0, iMem, 0, value, P4_REAL);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_Real, 0, iMem, 0, value, P4_REAL);
                 }
             }
 #endif

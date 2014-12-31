@@ -74,7 +74,7 @@ namespace Community.CsharpSqlite
 	/// function is capable of transforming these types of expressions into
 	/// sqlite3_value objects.
 	///
-	/// If parameter iReg is not negative, code an OP_RealAffinity instruction
+	/// If parameter iReg is not negative, code an OpCode.OP_RealAffinity instruction
 	/// on register iReg. This is used when an equivalent integer value is
 	/// stored in place of an 8-byte floating point value in order to save
 	/// space.

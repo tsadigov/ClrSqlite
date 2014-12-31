@@ -316,20 +316,19 @@ namespace Community.CsharpSqlite
         
         
 
-        public const int OP_Real = 130///
+        //public const int OpCode.OP_Real = 130///
             ///<summary>
             ///same as TK_FLOAT    
             ///</summary>
 
-        ;
+        
 
-        public const int OP_String8 = 94///
+        //public const int OpCode.OP_String8 = 94///
             ///<summary>
             ///same as TK_STRING   
             ///</summary>
 
-        ;
-
+        
         
 
         public const int OP_Concat = 91///
@@ -555,7 +554,7 @@ namespace Community.CsharpSqlite
 
         public const int OP_ReadCookie = 35;
 
-        public const int OP_SetCookie = 36;
+        //public const int OP_SetCookie = 36;
 
         public const int OP_VerifyCookie = 37;
 
