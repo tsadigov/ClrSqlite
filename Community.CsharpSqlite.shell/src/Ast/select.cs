@@ -1361,7 +1361,7 @@ namespace Community.CsharpSqlite
                         ///<summary>
                         ///Jump over the subroutines
                         ///</summary>
-                        v.sqlite3VdbeAddOp2(OP_Goto, 0, addrEnd);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, addrEnd);
                         ///
                         ///<summary>
                         ///Generate a subroutine that outputs a single row of the result
@@ -1552,7 +1552,7 @@ namespace Community.CsharpSqlite
                             SelectMethods.updateAccumulator(pParse, sAggInfo);
                             if (pMinMax == null && flag != 0)
                             {
-                                v.sqlite3VdbeAddOp2(OP_Goto, 0, pWInfo.iBreak);
+                                v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, pWInfo.iBreak);
 #if SQLITE_DEBUG
 																																																																																																																																																																															              VdbeComment( v, "%s() by index",
               ( flag == WHERE_ORDERBY_MIN ? "min" : "max" ) );

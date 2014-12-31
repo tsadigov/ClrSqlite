@@ -293,7 +293,7 @@ namespace Community.CsharpSqlite {
 							v.sqlite3VdbeAddOp2(OP_Gosub,pLevel.p1,pLevel.addrFirst);
 						}
 						else {
-							v.sqlite3VdbeAddOp2(OP_Goto,0,pLevel.addrFirst);
+							v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,pLevel.addrFirst);
 						}
 						v.sqlite3VdbeJumpHere(addr);
 					}
@@ -1306,7 +1306,7 @@ namespace Community.CsharpSqlite {
 										}
 									}
 									v.sqlite3VdbeChangeP1(iRetInit,v.sqlite3VdbeCurrentAddr());
-									v.sqlite3VdbeAddOp2(OP_Goto,0,pLevel.addrBrk);
+									v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,pLevel.addrBrk);
 									v.sqlite3VdbeResolveLabel(iLoopBody);
 									if(this.nLevel>1)
 										pParse.db.sqlite3DbFree(ref pOrTab);

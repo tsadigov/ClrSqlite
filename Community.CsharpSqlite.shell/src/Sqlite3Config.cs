@@ -7,96 +7,98 @@ namespace Community.CsharpSqlite
 {
     public partial class Sqlite3
     {
+        public class config_cs
+        {
 
-        ///<summary>
-        /// This API allows applications to modify the global configuration of
-        /// the SQLite library at run-time.
-        ///
-        /// This routine should only be called when there are no outstanding
-        /// database connections or memory allocations.  This routine is not
-        /// threadsafe.  Failure to heed these warnings can lead to unpredictable
-        /// behavior.
-        ///
-        ///</summary>
-        // Overloads for ap assignments
-        static int sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
-        {
-            //  va_list ap;
-            int rc = SQLITE_OK;
-            switch (op)
+            ///<summary>
+            /// This API allows applications to modify the global configuration of
+            /// the SQLite library at run-time.
+            ///
+            /// This routine should only be called when there are no outstanding
+            /// database connections or memory allocations.  This routine is not
+            /// threadsafe.  Failure to heed these warnings can lead to unpredictable
+            /// behavior.
+            ///
+            ///</summary>
+            // Overloads for ap assignments
+            static int sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
             {
-                case SqliteConfig.PCACHE:
-                    {
-                        ///
-                        ///<summary>
-                        ///Specify an alternative malloc implementation 
-                        ///</summary>
-                        sqlite3GlobalConfig.pcache = ap;
-                        //sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)_Custom.va_arg(ap, "sqlite3_pcache_methods");
-                        break;
-                    }
-            }
-            return rc;
-        }
-        static int sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
-        {
-            //  va_list ap;
-            int rc = SQLITE_OK;
-            switch (op)
-            {
-                case SqliteConfig.GETPCACHE:
-                    {
-                        if (sqlite3GlobalConfig.pcache.xInit == null)
+                //  va_list ap;
+                int rc = SQLITE_OK;
+                switch (op)
+                {
+                    case SqliteConfig.PCACHE:
                         {
-                            sqlite3PCacheSetDefault();
+                            ///
+                            ///<summary>
+                            ///Specify an alternative malloc implementation 
+                            ///</summary>
+                            sqlite3GlobalConfig.pcache = ap;
+                            //sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)_Custom.va_arg(ap, "sqlite3_pcache_methods");
+                            break;
                         }
-                        ap = sqlite3GlobalConfig.pcache;
-                        //_Custom.va_arg(ap, sqlite3_pcache_methods) = sqlite3GlobalConfig.pcache;
-                        break;
-                    }
+                }
+                return rc;
             }
-            return rc;
-        }
-        static int sqlite3_config(int op, sqlite3_mem_methods ap)
-        {
-            //  va_list ap;
-            int rc = SQLITE_OK;
-            switch ((SqliteConfig)op)
+            static int sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
             {
-                case SqliteConfig.MALLOC:
-                    {
-                        ///
-                        ///<summary>
-                        ///Specify an alternative malloc implementation 
-                        ///</summary>
-                        sqlite3GlobalConfig.m = ap;
-                        // (sqlite3_mem_methods)_Custom.va_arg( ap, "sqlite3_mem_methods" );
-                        break;
-                    }
+                //  va_list ap;
+                int rc = SQLITE_OK;
+                switch (op)
+                {
+                    case SqliteConfig.GETPCACHE:
+                        {
+                            if (sqlite3GlobalConfig.pcache.xInit == null)
+                            {
+                                sqlite3PCacheSetDefault();
+                            }
+                            ap = sqlite3GlobalConfig.pcache;
+                            //_Custom.va_arg(ap, sqlite3_pcache_methods) = sqlite3GlobalConfig.pcache;
+                            break;
+                        }
+                }
+                return rc;
             }
-            return rc;
-        }
-        static int sqlite3_config(SqliteConfig op, ref sqlite3_mem_methods ap)
-        {
-            //  va_list ap;
-            int rc = SQLITE_OK;
-            switch (op)
+            static int sqlite3_config(int op, sqlite3_mem_methods ap)
             {
-                case SqliteConfig.GETMALLOC:
-                    {
-                        ///
-                        ///<summary>
-                        ///Retrieve the current malloc() implementation 
-                        ///</summary>
-                        //if ( sqlite3GlobalConfig.m.xMalloc == null ) sqlite3MemSetDefault();
-                        ap = sqlite3GlobalConfig.m;
-                        //_Custom.va_arg(ap, sqlite3_mem_methods) =  sqlite3GlobalConfig.m;
-                        break;
-                    }
+                //  va_list ap;
+                int rc = SQLITE_OK;
+                switch ((SqliteConfig)op)
+                {
+                    case SqliteConfig.MALLOC:
+                        {
+                            ///
+                            ///<summary>
+                            ///Specify an alternative malloc implementation 
+                            ///</summary>
+                            sqlite3GlobalConfig.m = ap;
+                            // (sqlite3_mem_methods)_Custom.va_arg( ap, "sqlite3_mem_methods" );
+                            break;
+                        }
+                }
+                return rc;
             }
-            return rc;
+            static int sqlite3_config(SqliteConfig op, ref sqlite3_mem_methods ap)
+            {
+                //  va_list ap;
+                int rc = SQLITE_OK;
+                switch (op)
+                {
+                    case SqliteConfig.GETMALLOC:
+                        {
+                            ///
+                            ///<summary>
+                            ///Retrieve the current malloc() implementation 
+                            ///</summary>
+                            //if ( sqlite3GlobalConfig.m.xMalloc == null ) sqlite3MemSetDefault();
+                            ap = sqlite3GlobalConfig.m;
+                            //_Custom.va_arg(ap, sqlite3_mem_methods) =  sqlite3GlobalConfig.m;
+                            break;
+                        }
+                }
+                return rc;
+            }
         }
-
 
         public class Sqlite3Config
         {

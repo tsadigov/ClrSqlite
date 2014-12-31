@@ -510,7 +510,7 @@ namespace Community.CsharpSqlite {
                     }
                     addr1 = v.sqlite3VdbeAddOp1(OpCode.OP_IfZero, iLimit);
                     v.sqlite3VdbeAddOp2(OP_AddImm, iLimit, -1);
-                    addr2 = v.sqlite3VdbeAddOp0(OP_Goto);
+                    addr2 = v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
                     v.sqlite3VdbeJumpHere(addr1);
                     v.sqlite3VdbeAddOp1(OpCode.OP_Last, pOrderBy.iECursor);
                     v.sqlite3VdbeAddOp1(OpCode.OP_Delete, pOrderBy.iECursor);
@@ -534,7 +534,7 @@ namespace Community.CsharpSqlite {
                     int addr;
                     v.sqlite3VdbeAddOp2(OP_AddImm, p.iOffset, -1);
                     addr = v.sqlite3VdbeAddOp1(OpCode.OP_IfNeg, p.iOffset);
-                    v.sqlite3VdbeAddOp2(OP_Goto, 0, iContinue);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, iContinue);
 #if SQLITE_DEBUG
 																																																																																																				        VdbeComment( v, "skip OFFSET records" );
 #endif
@@ -1697,7 +1697,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                         VdbeComment(v, "LIMIT counter");
                         if (n == 0)
                         {
-                            v.sqlite3VdbeAddOp2(OP_Goto, 0, iBreak);
+                            v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, iBreak);
                         }
                         else
                         {
@@ -2476,7 +2476,7 @@ break;
                 ///merge loop
                 ///
                 ///</summary>
-                j1 = v.sqlite3VdbeAddOp0(OP_Goto);
+                j1 = v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
                 addrSelectA = v.sqlite3VdbeCurrentAddr();
                 ///
                 ///<summary>
@@ -2538,14 +2538,14 @@ break;
                 VdbeNoopComment(v, "eof-A subroutine");
                 if (op == TK_EXCEPT || op == TK_INTERSECT)
                 {
-                    addrEofA = v.sqlite3VdbeAddOp2(OP_Goto, 0, labelEnd);
+                    addrEofA = v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, labelEnd);
                 }
                 else
                 {
                     addrEofA = v.sqlite3VdbeAddOp2(OP_If, regEofB, labelEnd);
                     v.sqlite3VdbeAddOp2(OP_Gosub, regOutB, addrOutB);
                     v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrB);
-                    v.sqlite3VdbeAddOp2(OP_Goto, 0, addrEofA);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, addrEofA);
                     p.nSelectRow += pPrior.nSelectRow;
                 }
                 ///
@@ -2566,7 +2566,7 @@ break;
                     addrEofB = v.sqlite3VdbeAddOp2(OP_If, regEofA, labelEnd);
                     v.sqlite3VdbeAddOp2(OP_Gosub, regOutA, addrOutA);
                     v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrA);
-                    v.sqlite3VdbeAddOp2(OP_Goto, 0, addrEofB);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, addrEofB);
                 }
                 ///
                 ///<summary>
@@ -2577,7 +2577,7 @@ break;
                 addrAltB = v.sqlite3VdbeAddOp2(OP_Gosub, regOutA, addrOutA);
                 v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrA);
                 v.sqlite3VdbeAddOp2(OP_If, regEofA, addrEofA);
-                v.sqlite3VdbeAddOp2(OP_Goto, 0, labelCmpr);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, labelCmpr);
                 ///
                 ///<summary>
                 ///Generate code to handle the case of A==B
@@ -2598,7 +2598,7 @@ break;
                         VdbeNoopComment(v, "A-eq-B subroutine");
                         addrAeqB = v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrA);
                         v.sqlite3VdbeAddOp2(OP_If, regEofA, addrEofA);
-                        v.sqlite3VdbeAddOp2(OP_Goto, 0, labelCmpr);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, labelCmpr);
                     }
                 ///
                 ///<summary>
@@ -2613,7 +2613,7 @@ break;
                 }
                 v.sqlite3VdbeAddOp1(OpCode.OP_Yield, regAddrB);
                 v.sqlite3VdbeAddOp2(OP_If, regEofB, addrEofB);
-                v.sqlite3VdbeAddOp2(OP_Goto, 0, labelCmpr);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, labelCmpr);
                 ///
                 ///<summary>
                 ///This code runs once to initialize everything.

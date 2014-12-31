@@ -909,7 +909,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				addr1 = v.sqlite3VdbeAddOp2 (OP_Rewind, iDest, 0);
-				emptyDestTest = v.sqlite3VdbeAddOp2 (OP_Goto, 0, 0);
+				emptyDestTest = v.sqlite3VdbeAddOp2 (OpCode.OP_Goto, 0, 0);
 				v.sqlite3VdbeJumpHere (addr1);
 			}
 			else {

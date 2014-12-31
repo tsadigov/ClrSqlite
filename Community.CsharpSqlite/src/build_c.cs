@@ -247,7 +247,7 @@ p.zName, P4_STATIC );
                         }
                         codeTableLocks(pParse);
                         pParse.sqlite3AutoincrementBegin();
-                        v.sqlite3VdbeAddOp2(OP_Goto, 0, pParse.cookieGoto);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, pParse.cookieGoto);
                     }
                 }
                 ///
@@ -4632,17 +4632,17 @@ goto exit_drop_index;
             /// the VDBE program.  But this routine can be called after much other
             /// code has been generated.  So here is what we do:
             ///
-            /// The first time this routine is called, we code an OP_Goto that
+            /// The first time this routine is called, we code an OpCode.OP_Goto that
             /// will jump to a subroutine at the end of the program.  Then we
             /// record every database that needs its schema verified in the
             /// pParse.cookieMask field.  Later, after all other code has been
             /// generated, the subroutine that does the cookie verifications and
-            /// starts the transactions will be coded and the OP_Goto P2 value
+            /// starts the transactions will be coded and the OpCode.OP_Goto P2 value
             /// will be made to point to that subroutine.  The generation of the
             /// cookie verification subroutine code happens in sqlite3FinishCoding().
             ///
-            /// If iDb<0 then code the OP_Goto only - don't set flag to verify the
-            /// schema on any databases.  This can be used to position the OP_Goto
+            /// If iDb<0 then code the OpCode.OP_Goto only - don't set flag to verify the
+            /// schema on any databases.  This can be used to position the OpCode.OP_Goto
             /// early in the code, before we know if any database tables will be used.
             ///
             ///</summary>
@@ -4658,7 +4658,7 @@ goto exit_drop_index;
                     ///<summary>
                     ///This only happens if there was a prior error 
                     ///</summary>
-                    pToplevel.cookieGoto = v.sqlite3VdbeAddOp2(OP_Goto, 0, 0) + 1;
+                    pToplevel.cookieGoto = v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, 0) + 1;
                 }
                 if (iDb >= 0)
                 {
