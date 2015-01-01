@@ -138,7 +138,7 @@ namespace Community.CsharpSqlite {
 #endif
                 Debug.Assert(db != null);
                 Debug.Assert(pVfs != null);
-                Debug.Assert(sqlite3_mutex_held(db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
                 Debug.Assert((flags & 0xff) == flags);
                 ///
                 ///<summary>
@@ -224,7 +224,7 @@ zFullPathname=null;//sqlite3_free(ref zFullPathname);
 																																																																											else{
 /* In debug mode, we mark all persistent databases as sharable
 ** even when they are not.  This exercises the locking code and
-** gives more opportunity for asserts(sqlite3_mutex_held())
+** gives more opportunity for asserts(Sqlite3.sqlite3_mutex_held())
 ** statements to find locking problems.
 */
 p.sharable = 1;
@@ -317,7 +317,7 @@ if( p.sharable ){
 sqlite3_mutex *mutexShared;
 pBt.nRef = 1;
 mutexShared = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
-if( SQLITE_THREADSAFE && sqlite3GlobalConfig.bCoreMutex ){
+if( SQLITE_THREADSAFE && Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex ){
 pBt.mutex = sqlite3MutexAlloc(SQLITE_MUTEX_FAST);
 if( pBt.mutex==null ){
 rc = SQLITE_NOMEM;
@@ -393,7 +393,7 @@ break;
                 }
                 if (mutexOpen != null)
                 {
-                    Debug.Assert(sqlite3_mutex_held(mutexOpen));
+                    Debug.Assert(Sqlite3.sqlite3_mutex_held(mutexOpen));
                     sqlite3_mutex_leave(mutexOpen);
                 }
                 return rc;
@@ -665,9 +665,9 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
             public int sqlite3BtreeSchemaLocked()
             {
                 int rc;
-                Debug.Assert(sqlite3_mutex_held(this.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(this.db.mutex));
                 sqlite3BtreeEnter(this);
-                rc = this.querySharedCacheTableLock(MASTER_ROOT, READ_LOCK);
+                rc = this.querySharedCacheTableLock(sqliteinth.MASTER_ROOT, READ_LOCK);
                 Debug.Assert(rc == SQLITE_OK || rc == SQLITE_LOCKED_SHAREDCACHE);
                 sqlite3BtreeLeave(this);
                 return rc;
@@ -751,7 +751,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
                 ///<param name=""></param>
                 if (NEVER(pBt.pCursor))
                 {
-                    sqlite3ConnectionBlocked(this.db, pBt.pCursor.pBtree.db);
+                    sqliteinth.sqlite3ConnectionBlocked(this.db, pBt.pCursor.pBtree.db);
                     return SQLITE_LOCKED_SHAREDCACHE;
                 }
                 rc = pBt.btreeGetPage((Pgno)iTable, ref pPage, 0);
@@ -873,7 +873,7 @@ releasePage(pPage);
                 BtShared pBt = this.pBt;
                 sqlite3BtreeEnter(this);
                 Debug.Assert(this.inTrans > (byte)TransType.TRANS_NONE);
-                Debug.Assert(SQLITE_OK == this.querySharedCacheTableLock(MASTER_ROOT, READ_LOCK));
+                Debug.Assert(SQLITE_OK == this.querySharedCacheTableLock(sqliteinth.MASTER_ROOT, READ_LOCK));
                 Debug.Assert(pBt.pPage1 != null);
                 Debug.Assert(idx >= 0 && idx <= 15);
                 pMeta = Converter.sqlite3Get4byte(pBt.pPage1.aData, 36 + idx * 4);
@@ -930,7 +930,7 @@ releasePage(pPage);
             public int SetCacheSize(int mxPage)
             {
                 BtShared pBt = this.pBt;
-                Debug.Assert(sqlite3_mutex_held(this.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(this.db.mutex));
                 sqlite3BtreeEnter(this);
                 pBt.pPager.sqlite3PagerSetCachesize(mxPage);
                 sqlite3BtreeLeave(this);
@@ -955,7 +955,7 @@ releasePage(pPage);
             )
             {
                 BtShared pBt = this.pBt;
-                Debug.Assert(sqlite3_mutex_held(this.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(this.db.mutex));
                 Debug.Assert(level >= 1 && level <= 3);
                 sqlite3BtreeEnter(this);
                 pBt.pPager.sqlite3PagerSetSafetyLevel(level, fullSync, ckptFullSync);
@@ -1006,7 +1006,7 @@ releasePage(pPage);
             {
                 BtShared pBt = this.pBt;
                 int rc;
-                Debug.Assert(sqlite3_mutex_held(this.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(this.db.mutex));
                 sqlite3BtreeEnter(this);
                 Debug.Assert(pBt != null && pBt.pPager != null);
                 rc = pBt.pPager.sqlite3PagerNosync() ? 1 : 0;
@@ -1137,7 +1137,7 @@ goto trans_begun;
                 ///<param name="Any read">lock on</param>
                 ///<param name="page 1. So if some other shared">lock</param>
                 ///<param name="on page 1, the transaction cannot be opened. ">on page 1, the transaction cannot be opened. </param>
-                rc = this.querySharedCacheTableLock(MASTER_ROOT, READ_LOCK);
+                rc = this.querySharedCacheTableLock(sqliteinth.MASTER_ROOT, READ_LOCK);
                 if (SQLITE_OK != rc)
                     goto trans_begun;
                 pBt.initiallyEmpty = pBt.nPage == 0;
@@ -1426,10 +1426,10 @@ sqlite3BtreeTripAllCursors(p, rc);
                     if (pBt.btreeGetPage(1, ref pPage1, 0) == SQLITE_OK)
                     {
                         Pgno nPage = Converter.sqlite3Get4byte(pPage1.aData, 28);
-                        testcase(nPage == 0);
+                        sqliteinth.testcase(nPage == 0);
                         if (nPage == 0)
                             pBt.pPager.sqlite3PagerPagecount(out nPage);
-                        testcase(pBt.nPage != nPage);
+                        sqliteinth.testcase(pBt.nPage != nPage);
                         pBt.nPage = nPage;
                         BTreeMethods.releasePage(pPage1);
                     }
@@ -1468,8 +1468,8 @@ sqlite3BtreeTripAllCursors(p, rc);
                 if (this != null && this.inTrans == TransType.TRANS_WRITE)
                 {
                     BtShared pBt = this.pBt;
-                    Debug.Assert(op == SAVEPOINT_RELEASE || op == SAVEPOINT_ROLLBACK);
-                    Debug.Assert(iSavepoint >= 0 || (iSavepoint == -1 && op == SAVEPOINT_ROLLBACK));
+                    Debug.Assert(op == sqliteinth.SAVEPOINT_RELEASE || op == sqliteinth.SAVEPOINT_ROLLBACK);
+                    Debug.Assert(iSavepoint >= 0 || (iSavepoint == -1 && op == sqliteinth.SAVEPOINT_ROLLBACK));
                     sqlite3BtreeEnter(this);
                     rc = pBt.pPager.sqlite3PagerSavepoint(op, iSavepoint);
                     if (rc == SQLITE_OK)

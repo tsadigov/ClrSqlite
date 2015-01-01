@@ -285,7 +285,7 @@ namespace Community.CsharpSqlite
           p.iAddr = 0;
         }
 
-        if ( pRet.p4type == P4_SUBPROGRAM )
+        if ( pRet.p4type ==  P4Usage.P4_SUBPROGRAM )
         {
           //int nByte =  p.nSub + 1 ) * sizeof( SubProgram* );
           int j;
@@ -315,8 +315,8 @@ namespace Community.CsharpSqlite
     ** to be rolled back). This condition is true if the main program or any
     ** sub-programs contains any of the following:
     **
-    **   *  OP_Halt with P1=SQLITE_CONSTRAINT and P2=OE_Abort.
-    **   *  OP_HaltIfNull with P1=SQLITE_CONSTRAINT and P2=OE_Abort.
+    **   *  OP_Halt with P1=SQLITE_CONSTRAINT and P2=OnConstraintError.OE_Abort.
+    **   *  OP_HaltIfNull with P1=SQLITE_CONSTRAINT and P2=OnConstraintError.OE_Abort.
     **   *  OP_Destroy
     **   *  OP_VUpdate
     **   *  OP_VRename
@@ -345,7 +345,7 @@ namespace Community.CsharpSqlite
 																																																 || ( opcode == OP_FkCounter && pOp.p1 == 0 && pOp.p2 == 1 )
 #endif
 																																																 || ( ( opcode == OP_Halt || opcode == OP_HaltIfNull )
-        && ( pOp.p1 == SQLITE_CONSTRAINT && pOp.p2 == OE_Abort ) )
+        && ( pOp.p1 == SQLITE_CONSTRAINT && pOp.p2 == OnConstraintError.OE_Abort ) )
         )
         {
           hasAbort = 1;
@@ -429,7 +429,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void freeEphemeralFunction(sqlite3 db, FuncDef pDef)
             {
-                if (ALWAYS(pDef) && (pDef.flags & SQLITE_FUNC_EPHEM) != 0)
+                if (Sqlite3.ALWAYS(pDef) && (pDef.flags & FuncFlags.SQLITE_FUNC_EPHEM) != 0)
                 {
                     pDef = null;
                     db.sqlite3DbFree(ref pDef);
@@ -440,30 +440,30 @@ namespace Community.CsharpSqlite
             /// Delete a P4 value if necessary.
             ///
             ///</summary>
-            public static void freeP4(sqlite3 db, int p4type, object p4)
+            public static void freeP4(sqlite3 db, P4Usage p4type, object p4)
             {
                 if (p4 != null)
                 {
                     switch (p4type)
                     {
-                        case P4_REAL:
-                        case P4_INT64:
-                        case P4_DYNAMIC:
-                        case P4_KEYINFO:
-                        case P4_INTARRAY:
-                        case P4_KEYINFO_HANDOFF:
+                        case P4Usage.P4_REAL:
+                        case P4Usage.P4_INT64:
+                        case P4Usage.P4_DYNAMIC:
+                        case P4Usage.P4_KEYINFO:
+                        case P4Usage.P4_INTARRAY:
+                        case P4Usage.P4_KEYINFO_HANDOFF:
                             {
                                 db.sqlite3DbFree(ref p4);
                                 break;
                             }
-                        case P4_MPRINTF:
+                        case P4Usage.P4_MPRINTF:
                             {
                                 if (db.pnBytesFreed == 0)
                                     p4 = null;
                                 // sqlite3_free( ref p4 );
                                 break;
                             }
-                        case P4_VDBEFUNC:
+                        case P4Usage.P4_VDBEFUNC:
                             {
                                 VdbeFunc pVdbeFunc = (VdbeFunc)p4;
                                 freeEphemeralFunction(db, pVdbeFunc.pFunc);
@@ -472,12 +472,12 @@ namespace Community.CsharpSqlite
                                 db.sqlite3DbFree(ref pVdbeFunc);
                                 break;
                             }
-                        case P4_FUNCDEF:
+                        case P4Usage.P4_FUNCDEF:
                             {
                                 freeEphemeralFunction(db, (FuncDef)p4);
                                 break;
                             }
-                        case P4_MEM:
+                        case P4Usage.P4_MEM:
                             {
                                 if (db.pnBytesFreed == 0)
                                 {
@@ -492,7 +492,7 @@ namespace Community.CsharpSqlite
                                 }
                                 break;
                             }
-                        case P4_VTAB:
+                        case P4Usage.P4_VTAB:
                             {
                                 if (db.pnBytesFreed == 0)
                                     sqlite3VtabUnlock((VTable)p4);
@@ -568,15 +568,15 @@ namespace Community.CsharpSqlite
             /// A value of n==0 means copy bytes of zP4 up to and including the
             /// first null byte.  If n>0 then copy n+1 bytes of zP4.
             ///
-            /// If n==P4_KEYINFO it means that zP4 is a pointer to a KeyInfo structure.
+            /// If n== P4Usage.P4_KEYINFO it means that zP4 is a pointer to a KeyInfo structure.
             /// A copy is made of the KeyInfo structure into memory obtained from
             /// sqlite3Malloc, to be freed when the Vdbe is finalized.
-            /// n==P4_KEYINFO_HANDOFF indicates that zP4 points to a KeyInfo structure
+            /// n== P4Usage.P4_KEYINFO_HANDOFF indicates that zP4 points to a KeyInfo structure
             /// stored in memory that the caller has obtained from sqlite3Malloc. The
             /// caller should not free the allocation, it will be freed when the Vdbe is
             /// finalized.
             ///
-            /// Other values of n (P4_STATIC, P4_COLLSEQ etc.) indicate that zP4 points
+            /// Other values of n ( P4Usage.P4_STATIC,  P4Usage.P4_COLLSEQ etc.) indicate that zP4 points
             /// to a string or structure that is guaranteed to exist for the lifetime of
             /// the Vdbe. In these cases we can just copy the pointer.
             ///
@@ -680,8 +680,8 @@ namespace Community.CsharpSqlite
                 Debug.Assert(nTemp >= 20);
                 switch (pOp.p4type)
                 {
-                    case P4_KEYINFO_STATIC:
-                    case P4_KEYINFO:
+                    case  P4Usage.P4_KEYINFO_STATIC:
+                    case  P4Usage.P4_KEYINFO:
                         {
                             int i, j;
                             KeyInfo pKeyInfo = pOp.p4.pKeyInfo;
@@ -724,34 +724,34 @@ namespace Community.CsharpSqlite
                             Debug.Assert(i < nTemp);
                             break;
                         }
-                    case P4_COLLSEQ:
+                    case  P4Usage.P4_COLLSEQ:
                         {
                             CollSeq pColl = pOp.p4.pColl;
                             io.sqlite3_snprintf(nTemp, zTemp, "collseq(%.20s)", (pColl != null ? pColl.zName : "null"));
                             break;
                         }
-                    case P4_FUNCDEF:
+                    case  P4Usage.P4_FUNCDEF:
                         {
                             FuncDef pDef = pOp.p4.pFunc;
                             io.sqlite3_snprintf(nTemp, zTemp, "%s(%d)", pDef.zName, pDef.nArg);
                             break;
                         }
-                    case P4_INT64:
+                    case  P4Usage.P4_INT64:
                         {
                             io.sqlite3_snprintf(nTemp, zTemp, "%lld", pOp.p4.pI64);
                             break;
                         }
-                    case P4_INT32:
+                    case  P4Usage.P4_INT32:
                         {
                             io.sqlite3_snprintf(nTemp, zTemp, "%d", pOp.p4.i);
                             break;
                         }
-                    case P4_REAL:
+                    case  P4Usage.P4_REAL:
                         {
                             io.sqlite3_snprintf(nTemp, zTemp, "%.16g", pOp.p4.pReal);
                             break;
                         }
-                    case P4_MEM:
+                    case  P4Usage.P4_MEM:
                         {
                             Mem pMem = pOp.p4.pMem;
                             Debug.Assert((pMem.flags & MEM_Null) == 0);
@@ -777,19 +777,19 @@ namespace Community.CsharpSqlite
                             break;
                         }
 #if !SQLITE_OMIT_VIRTUALTABLE
-                    case P4_VTAB:
+                    case  P4Usage.P4_VTAB:
                         {
                             sqlite3_vtab pVtab = pOp.p4.pVtab.pVtab;
                             io.sqlite3_snprintf(nTemp, zTemp, "vtab:%p:%p", pVtab, pVtab.pModule);
                             break;
                         }
 #endif
-                    case P4_INTARRAY:
+                    case  P4Usage.P4_INTARRAY:
                         {
                             io.sqlite3_snprintf(nTemp, zTemp, "intarray");
                             break;
                         }
-                    case P4_SUBPROGRAM:
+                    case  P4Usage.P4_SUBPROGRAM:
                         {
                             io.sqlite3_snprintf(nTemp, zTemp, "program");
                             break;
@@ -860,7 +860,7 @@ void sqlite3VdbeEnter(Vdbe *p){
   aDb = db.aDb;
   nDb = db.nDb;
   for(i=0, mask=1; i<nDb; i++, mask += mask){
-    if( i!=1 && (mask & p.lockMask)!=0 && ALWAYS(aDb[i].pBt!=0) ){
+    if( i!=1 && (mask & p.lockMask)!=0 && Sqlite3.ALWAYS(aDb[i].pBt!=0) ){
       sqlite3BtreeEnter(aDb[i].pBt);
     }
   }
@@ -881,7 +881,7 @@ void sqlite3VdbeLeave(Vdbe *p){
   aDb = db.aDb;
   nDb = db.nDb;
   for(i=0, mask=1; i<nDb; i++, mask += mask){
-    if( i!=1 && (mask & p.lockMask)!=0 && ALWAYS(aDb[i].pBt!=0) ){
+    if( i!=1 && (mask & p.lockMask)!=0 && Sqlite3.ALWAYS(aDb[i].pBt!=0) ){
       sqlite3BtreeLeave(aDb[i].pBt);
     }
   }
@@ -1088,7 +1088,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         ///
                         ///<summary>
                         ///On the first call to sqlite3_step(), pSub will hold a NULL.  It is
-                        ///initialized to a BLOB by the P4_SUBPROGRAM processing logic below 
+                        ///initialized to a BLOB by the  P4Usage.P4_SUBPROGRAM processing logic below 
                         ///</summary>
                         apSub = p.aMem[9]._SubProgram;
                         //    apSub = (SubProgram*)pSub->z;
@@ -1170,7 +1170,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             ///
                             ///<summary>
                             ///When an OP_Program opcode is encounter (the only opcode that has
-                            ///a P4_SUBPROGRAM argument), expand the size of the array of subprograms
+                            ///a  P4Usage.P4_SUBPROGRAM argument), expand the size of the array of subprograms
                             ///</summary>
                             ///<param name="kept in p"> assuming this subprogram</param>
                             ///<param name="has not already been seen.">has not already been seen.</param>
@@ -1191,7 +1191,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             }
                             pMem = p.pResultSet[i_pMem++];
                             //pMem++;
-                            if (pOp.p4type == P4_SUBPROGRAM)
+                            if (pOp.p4type ==  P4Usage.P4_SUBPROGRAM)
                             {
                                 //Debugger.Break(); // TODO
                                 //int nByte = 0;//(nSub+1)*sizeof(SubProgram);
@@ -1265,7 +1265,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         z = displayP4(pOp, pMem.z, 32);
                         if (z != pMem.z)
                         {
-                            sqlite3VdbeMemSetStr(pMem, z, -1, SqliteEncoding.UTF8, null);
+                            pMem.sqlite3VdbeMemSetStr(z, -1, SqliteEncoding.UTF8, null);
                         }
                         else
                         {
@@ -1349,7 +1349,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 #endif
 #if !SQLITE_OMIT_TRACE && SQLITE_ENABLE_IOTRACE
 																																																/*
-** Print an IOTRACE message showing SQL content.
+** Print an sqliteinth.IOTRACE message showing SQL content.
 */
 static void sqlite3VdbeIOTraceSql( Vdbe p )
 {
@@ -1793,7 +1793,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 																																																																								      /* With this option, sqlite3VtabSync() is defined to be simply
 ** SQLITE_OK so p is not used.
 */
-      UNUSED_PARAMETER( p );
+      Sqlite3.sqliteinth.UNUSED_PARAMETER( p );
 #endif
                 ///
                 ///<summary>
@@ -1919,7 +1919,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         //{
                         //  return SQLITE_NOMEM;
                         //}
-                        sqlite3FileSuffix3(zMainFile, zMaster);
+                        sqliteinth.sqlite3FileSuffix3(zMainFile, zMaster);
                         rc = os.sqlite3OsAccess(pVfs, zMaster, SQLITE_ACCESS_EXISTS, ref res);
                     }
                     while (rc == SQLITE_OK && res == 1);
@@ -2128,8 +2128,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<summary>
             ///</summary>
             ///<param name="If the Vdbe passed as the first argument opened a statement">transaction,</param>
-            ///<param name="close it now. Argument eOp must be either SAVEPOINT_ROLLBACK or">close it now. Argument eOp must be either SAVEPOINT_ROLLBACK or</param>
-            ///<param name="SAVEPOINT_RELEASE. If it is SAVEPOINT_ROLLBACK, then the statement">SAVEPOINT_RELEASE. If it is SAVEPOINT_ROLLBACK, then the statement</param>
+            ///<param name="close it now. Argument eOp must be either sqliteinth.SAVEPOINT_ROLLBACK or">close it now. Argument eOp must be either sqliteinth.SAVEPOINT_ROLLBACK or</param>
+            ///<param name="SAVEPOINT_RELEASE. If it is sqliteinth.SAVEPOINT_ROLLBACK, then the statement">SAVEPOINT_RELEASE. If it is sqliteinth.SAVEPOINT_ROLLBACK, then the statement</param>
             ///<param name="transaction is rolled back. If eOp is SAVEPOINT_RELEASE, then the">transaction is rolled back. If eOp is SAVEPOINT_RELEASE, then the</param>
             ///<param name="statement transaction is commtted.">statement transaction is commtted.</param>
             ///<param name=""></param>
@@ -2306,7 +2306,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         return rc;
                     p.lastRowid = p.movetoTarget;
                     if (res != 0)
-                        return SQLITE_CORRUPT_BKPT();
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
                     p.rowidIsValid = true;
 #if SQLITE_TEST
 #if !TCLSH
@@ -2319,7 +2319,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     p.cacheStatus = CACHE_STALE;
                 }
                 else
-                    if (ALWAYS(p.pCursor != null))
+                    if (Sqlite3.ALWAYS(p.pCursor != null))
                     {
                         int hasMoved = 0;
                         int rc = p.pCursor.sqlite3BtreeCursorHasMoved(ref hasMoved);
@@ -3369,7 +3369,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 Mem m = null;
                 Mem v = null;
                 v = sqlite3Malloc(v);
-                UNUSED_PARAMETER(db);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(db);
                 ///
                 ///<summary>
                 ///Get the size of the index entry.  Only indices entries of less
@@ -3385,7 +3385,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<summary>
                 ///pCur is always valid so KeySize cannot fail 
                 ///</summary>
-                Debug.Assert(((u32)nCellKey & SQLITE_MAX_U32) == (u64)nCellKey);
+                Debug.Assert(((u32)nCellKey & sqliteinth.SQLITE_MAX_U32) == (u64)nCellKey);
                 ///
                 ///<summary>
                 ///Read in the complete content of the index entry 
@@ -3402,9 +3402,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///The index entry must begin with a header size 
                 ///</summary>
                 utilc.getVarint32(m.zBLOB, 0, out szHdr);
-                testcase(szHdr == 3);
-                testcase(szHdr == m.n);
-                if (unlikely(szHdr < 3 || (int)szHdr > m.n))
+                sqliteinth.testcase(szHdr == 3);
+                sqliteinth.testcase(szHdr == m.n);
+                if (sqliteinth.unlikely(szHdr < 3 || (int)szHdr > m.n))
                 {
                     goto idx_rowid_corruption;
                 }
@@ -3414,21 +3414,21 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<param name="The last field of the index should be an integer "> the ROWID.</param>
                 ///<param name="Verify that the last entry really is an integer. ">Verify that the last entry really is an integer. </param>
                 utilc.getVarint32(m.zBLOB, szHdr - 1, out typeRowid);
-                testcase(typeRowid == 1);
-                testcase(typeRowid == 2);
-                testcase(typeRowid == 3);
-                testcase(typeRowid == 4);
-                testcase(typeRowid == 5);
-                testcase(typeRowid == 6);
-                testcase(typeRowid == 8);
-                testcase(typeRowid == 9);
-                if (unlikely(typeRowid < 1 || typeRowid > 9 || typeRowid == 7))
+                sqliteinth.testcase(typeRowid == 1);
+                sqliteinth.testcase(typeRowid == 2);
+                sqliteinth.testcase(typeRowid == 3);
+                sqliteinth.testcase(typeRowid == 4);
+                sqliteinth.testcase(typeRowid == 5);
+                sqliteinth.testcase(typeRowid == 6);
+                sqliteinth.testcase(typeRowid == 8);
+                sqliteinth.testcase(typeRowid == 9);
+                if (sqliteinth.unlikely(typeRowid < 1 || typeRowid > 9 || typeRowid == 7))
                 {
                     goto idx_rowid_corruption;
                 }
                 lenRowid = (u32)sqlite3VdbeSerialTypeLen(typeRowid);
-                testcase((u32)m.n == szHdr + lenRowid);
-                if (unlikely((u32)m.n < szHdr + lenRowid))
+                sqliteinth.testcase((u32)m.n == szHdr + lenRowid);
+                if (sqliteinth.unlikely((u32)m.n < szHdr + lenRowid))
                 {
                     goto idx_rowid_corruption;
                 }
@@ -3446,9 +3446,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///allocated.  Free the m object and return SQLITE_CORRUPT. 
             ///</summary>
             idx_rowid_corruption:
-                //testcase( m.zMalloc != 0 );
+                //sqliteinth.testcase( m.zMalloc != 0 );
                 sqlite3VdbeMemRelease(m);
-                return SQLITE_CORRUPT_BKPT();
+            return sqliteinth.SQLITE_CORRUPT_BKPT();
             }
             ///<summary>
             /// Compare the key of the index entry that cursor pC is pointing to against
@@ -3495,7 +3495,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 if (nCellKey <= 0 || nCellKey > 0x7fffffff)
                 {
                     res = 0;
-                    return SQLITE_CORRUPT_BKPT();
+                    return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
                 m = sqlite3Malloc(m);
                 // memset(&m, 0, sizeof(m));
@@ -3516,7 +3516,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             public static void sqlite3VdbeSetChanges(sqlite3 db, int nChange)
             {
-                Debug.Assert(sqlite3_mutex_held(db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
                 db.nChange = nChange;
                 db.nTotalChange += nChange;
             }

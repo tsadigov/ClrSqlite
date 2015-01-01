@@ -30,7 +30,7 @@ namespace Community.CsharpSqlite {
 			Db aNew=null;
 			string zErrDyn="";
 			sqlite3_vfs pVfs=null;
-			UNUSED_PARAMETER(NotUsed);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
 			zFile=argv[0].z!=null&&(argv[0].z.Length>0)&&argv[0].flags!=MEM_Null?vdbeapi.sqlite3_value_text(argv[0]):"";
 			zName=argv[1].z!=null&&(argv[1].z.Length>0)&&argv[1].flags!=MEM_Null?vdbeapi.sqlite3_value_text(argv[1]):"";
 			//if( zFile==null ) zFile = "";
@@ -123,7 +123,7 @@ namespace Community.CsharpSqlite {
 					//  rc = SQLITE_NOMEM;
 					//}
 					//else 
-					if(aNew.pSchema.file_format!=0&&aNew.pSchema.enc!=ENC(db)) {
+					if(aNew.pSchema.file_format!=0&&aNew.pSchema.enc!=sqliteinth.ENC(db)) {
 						zErrDyn=io.sqlite3MPrintf(db,"attached databases must use the same text encoding as main database");
 						rc=SQLITE_ERROR;
 					}
@@ -233,7 +233,7 @@ namespace Community.CsharpSqlite {
 			int i;
 			Db pDb=null;
 			StringBuilder zErr=new StringBuilder(200);
-			UNUSED_PARAMETER(NotUsed);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
 			if(zName==null)
 				zName="";
 			for(i=0;i<db.nDb;i++) {

@@ -103,11 +103,11 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		int tr_tm,///
 		///<summary>
-		///One of TK_BEFORE, TK_AFTER, TK_INSTEAD 
+		///One of Sqlite3.TK_BEFORE, Sqlite3.TK_AFTER, Sqlite3.TK_INSTEAD 
 		///</summary>
 		int op,///
 		///<summary>
-		///One of TK_INSERT, TK_UPDATE, TK_DELETE 
+		///One of Sqlite3.TK_INSERT, Sqlite3.TK_UPDATE, Sqlite3.TK_DELETE 
 		///</summary>
 		IdList pColumns,///
 		///<summary>
@@ -176,7 +176,7 @@ namespace Community.CsharpSqlite {
 			///pName1.z might be NULL, but not pName1 itself 
 			///</summary>
 			Debug.Assert(pName2!=null);
-			Debug.Assert(op==TK_INSERT||op==TK_UPDATE||op==TK_DELETE);
+			Debug.Assert(op==Sqlite3.TK_INSERT||op==Sqlite3.TK_UPDATE||op==Sqlite3.TK_DELETE);
 			Debug.Assert(op>0&&op<0xff);
 			if(isTemp!=0) {
 				///
@@ -269,7 +269,7 @@ namespace Community.CsharpSqlite {
 				}
 				goto trigger_cleanup;
 			}
-			if(IsVirtual(pTab)) {
+			if(pTab.IsVirtual()) {
 				utilc.sqlite3ErrorMsg(pParse,"cannot create triggers on virtual tables");
 				goto trigger_cleanup;
 			}
@@ -308,11 +308,11 @@ namespace Community.CsharpSqlite {
 			///of triggers.
 			///
 			///</summary>
-			if(pTab.pSelect!=null&&tr_tm!=TK_INSTEAD) {
-				utilc.sqlite3ErrorMsg(pParse,"cannot create %s trigger on view: %S",(tr_tm==TK_BEFORE)?"BEFORE":"AFTER",pTableName,0);
+			if(pTab.pSelect!=null&&tr_tm!=Sqlite3.TK_INSTEAD) {
+				utilc.sqlite3ErrorMsg(pParse,"cannot create %s trigger on view: %S",(tr_tm==Sqlite3.TK_BEFORE)?"BEFORE":"AFTER",pTableName,0);
 				goto trigger_cleanup;
 			}
-			if(pTab.pSelect==null&&tr_tm==TK_INSTEAD) {
+			if(pTab.pSelect==null&&tr_tm==Sqlite3.TK_INSTEAD) {
 				utilc.sqlite3ErrorMsg(pParse,"cannot create INSTEAD OF"+" trigger on table: %S",pTableName,0);
 				goto trigger_cleanup;
 			}
@@ -338,8 +338,8 @@ goto trigger_cleanup;
 			///INSTEAD OF trigger into a BEFORE trigger.  It simplifies code
 			///elsewhere.
 			///</summary>
-			if(tr_tm==TK_INSTEAD) {
-				tr_tm=TK_BEFORE;
+			if(tr_tm==Sqlite3.TK_INSTEAD) {
+				tr_tm=Sqlite3.TK_BEFORE;
 			}
 			///
 			///<summary>
@@ -355,7 +355,7 @@ goto trigger_cleanup;
 			pTrigger.pSchema=db.aDb[iDb].pSchema;
 			pTrigger.pTabSchema=pTab.pSchema;
 			pTrigger.op=(u8)op;
-			pTrigger.tr_tm=tr_tm==TK_BEFORE?TRIGGER_BEFORE:TRIGGER_AFTER;
+			pTrigger.tr_tm=tr_tm==Sqlite3.TK_BEFORE?TriggerType.TRIGGER_BEFORE:TriggerType.TRIGGER_AFTER;
 			pTrigger.pWhen=exprc.sqlite3ExprDup(db,pWhen,EXPRDUP_REDUCE);
 			pTrigger.pColumns=exprc.sqlite3IdListDup(db,pColumns);
 			Debug.Assert(pParse.pNewTrigger==null);
@@ -454,7 +454,7 @@ goto trigger_cleanup;
 				build.sqlite3BeginWriteOperation(pParse,0,iDb);
 				z=pAll.zRestSql.Substring(0,pAll.Length);
 				//sqlite3DbStrNDup( db, (char*)pAll.z, pAll.n );
-				build.sqlite3NestedParse(pParse,"INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')",db.aDb[iDb].zName,SCHEMA_TABLE(iDb),zName,pTrig.table,z);
+				build.sqlite3NestedParse(pParse,"INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')",db.aDb[iDb].zName,sqliteinth.SCHEMA_TABLE(iDb),zName,pTrig.table,z);
 				db.sqlite3DbFree(ref z);
 				build.sqlite3ChangeCookie(pParse,iDb);
 				v.sqlite3VdbeAddParseSchemaOp(iDb,io.sqlite3MPrintf(db,"type='trigger' AND name='%q'",zName));
@@ -497,9 +497,9 @@ goto trigger_cleanup;
 				SelectMethods.sqlite3SelectDelete(db,ref pSelect);
 				return null;
 			}
-			pTriggerStep.op=TK_SELECT;
+			pTriggerStep.op=Sqlite3.TK_SELECT;
 			pTriggerStep.pSelect=pSelect;
-			pTriggerStep.orconf=OE_Default;
+			pTriggerStep.orconf=OnConstraintError.OE_Default;
 			return pTriggerStep;
 		}
 		///
@@ -547,13 +547,13 @@ goto trigger_cleanup;
 		///
 		///</summary>
 		// OVERLOADS, so I don't need to rewrite parse.c
-		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,int null_4,int null_5,u8 orconf) {
+		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,int null_4,int null_5,OnConstraintError orconf) {
 			return sqlite3TriggerInsertStep(db,pTableName,pColumn,null,null,orconf);
 		}
-		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,ExprList pEList,int null_5,u8 orconf) {
+		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,ExprList pEList,int null_5,OnConstraintError orconf) {
 			return sqlite3TriggerInsertStep(db,pTableName,pColumn,pEList,null,orconf);
 		}
-		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,int null_4,Select pSelect,u8 orconf) {
+		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,int null_4,Select pSelect,OnConstraintError orconf) {
 			return sqlite3TriggerInsertStep(db,pTableName,pColumn,null,pSelect,orconf);
 		}
 		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,///
@@ -576,9 +576,9 @@ goto trigger_cleanup;
 		///<summary>
 		///A SELECT statement that supplies values 
 		///</summary>
-		u8 orconf///
+		OnConstraintError orconf///
 		///<summary>
-		///The conflict algorithm (OE_Abort, OE_Replace, etc.) 
+		///The conflict algorithm (OnConstraintError.OE_Abort, OnConstraintError.OE_Replace, etc.) 
 		///</summary>
 		) {
 			TriggerStep pTriggerStep;
@@ -588,7 +588,7 @@ goto trigger_cleanup;
 			///|| db.mallocFailed != 0 
 			///</summary>
 			);
-			pTriggerStep=triggerStepAllocate(db,TK_INSERT,pTableName);
+			pTriggerStep=triggerStepAllocate(db,Sqlite3.TK_INSERT,pTableName);
 			//if ( pTriggerStep != null )
 			//{
 			pTriggerStep.pSelect=exprc.sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
@@ -626,13 +626,13 @@ goto trigger_cleanup;
 		///<summary>
 		///The WHERE clause 
 		///</summary>
-		u8 orconf///
+		OnConstraintError orconf///
 		///<summary>
-		///The conflict algorithm. (OE_Abort, OE_Ignore, etc) 
+		///The conflict algorithm. (OnConstraintError.OE_Abort, OnConstraintError.OE_Ignore, etc) 
 		///</summary>
 		) {
 			TriggerStep pTriggerStep;
-			pTriggerStep=triggerStepAllocate(db,TK_UPDATE,pTableName);
+			pTriggerStep=triggerStepAllocate(db,Sqlite3.TK_UPDATE,pTableName);
 			//if ( pTriggerStep != null )
 			//{
 			pTriggerStep.pExprList=exprc.sqlite3ExprListDup(db,pEList,EXPRDUP_REDUCE);
@@ -663,11 +663,11 @@ goto trigger_cleanup;
 		///</summary>
 		) {
 			TriggerStep pTriggerStep;
-			pTriggerStep=triggerStepAllocate(db,TK_DELETE,pTableName);
+			pTriggerStep=triggerStepAllocate(db,Sqlite3.TK_DELETE,pTableName);
 			//if ( pTriggerStep != null )
 			//{
 			pTriggerStep.pWhere=exprc.sqlite3ExprDup(db,pWhere,EXPRDUP_REDUCE);
-			pTriggerStep.orconf=OE_Default;
+			pTriggerStep.orconf=OnConstraintError.OE_Default;
 			//}
 			exprc.sqlite3ExprDelete(db,ref pWhere);
 			return pTriggerStep;
@@ -712,7 +712,7 @@ goto trigger_cleanup;
 			zName=pName.a[0].zName;
 			nName=StringExtensions.sqlite3Strlen30(zName);
 			Debug.Assert(zDb!=null||sqlite3BtreeHoldsAllMutexes(db));
-			for(i=OMIT_TEMPDB;i<db.nDb;i++) {
+			for(i=sqliteinth.OMIT_TEMPDB;i<db.nDb;i++) {
 				int j=(i<2)?i^1:i;
 				///
 				///<summary>
@@ -807,8 +807,8 @@ return;
 				build.sqlite3BeginWriteOperation(pParse,0,iDb);
 				build.sqlite3OpenMasterTable(pParse,iDb);
 				_base=v.sqlite3VdbeAddOpList(dropTrigger.Length,dropTrigger);
-				v.sqlite3VdbeChangeP4(_base+1,pTrigger.zName,P4_TRANSIENT);
-				v.sqlite3VdbeChangeP4(_base+4,"trigger",P4_STATIC);
+				v.sqlite3VdbeChangeP4(_base+1,pTrigger.zName, P4Usage.P4_TRANSIENT);
+				v.sqlite3VdbeChangeP4(_base+4,"trigger", P4Usage.P4_STATIC);
 				build.sqlite3ChangeCookie(pParse,iDb);
 				v.sqlite3VdbeAddOp2(OP_Close,0,0);
 				v.sqlite3VdbeAddOp4(OP_DropTrigger,iDb,0,0,pTrigger.zName,0);
@@ -827,7 +827,7 @@ return;
 			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 			pHash=(db.aDb[iDb].pSchema.trigHash);
 			pTrigger=sqlite3HashInsert(ref pHash,zName,StringExtensions.sqlite3Strlen30(zName),(Trigger)null);
-			if(ALWAYS(pTrigger!=null)) {
+			if(Sqlite3.ALWAYS(pTrigger!=null)) {
 				if(pTrigger.pSchema==pTrigger.pTabSchema) {
 					Table pTab=tableOfTrigger(pTrigger);
 					//Trigger** pp;
@@ -889,24 +889,24 @@ return;
 		///</summary>
 		int op,///
 		///<summary>
-		///one of TK_DELETE, TK_INSERT, TK_UPDATE 
+		///one of Sqlite3.TK_DELETE, Sqlite3.TK_INSERT, Sqlite3.TK_UPDATE 
 		///</summary>
 		ExprList pChanges,///
 		///<summary>
 		///Columns that change in an UPDATE statement 
 		///</summary>
-		out int pMask///
+		out TriggerType pMask///
 		///<summary>
-		///OUT: Mask of TRIGGER_BEFORE|TRIGGER_AFTER 
+		///OUT: Mask of TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER 
 		///</summary>
 		) {
-			int mask=0;
+			TriggerType mask=0;
 			Trigger pList=null;
 			Trigger p;
 			if((pParse.db.flags&SQLITE_EnableTrigger)!=0) {
 				pList=sqlite3TriggerList(pParse,pTab);
 			}
-			Debug.Assert(pList==null||IsVirtual(pTab)==false);
+			Debug.Assert(pList==null||pTab.IsVirtual()==false);
 			for(p=pList;p!=null;p=p.pNext) {
 				if(p.op==op&&checkColumnOverlap(p.pColumns,pChanges)!=0) {
 					mask|=p.tr_tm;
@@ -976,9 +976,9 @@ return;
 		///<summary>
 		///List of statements inside the trigger body 
 		///</summary>
-		int orconf///
+		OnConstraintError orconf///
 		///<summary>
-		///Conflict algorithm. (OE_Abort, etc) 
+		///Conflict algorithm. (OnConstraintError.OE_Abort, etc) 
 		///</summary>
 		) {
 			TriggerStep pStep;
@@ -1004,22 +1004,22 @@ return;
 				///<param name="INSERT INTO t1 ... ;            "> insert into t2 uses REPLACE policy</param>
 				///<param name="INSERT OR IGNORE INTO t1 ... ;  "> insert into t2 uses IGNORE policy</param>
 				///<param name=""></param>
-				pParse.eOrconf=(orconf==OE_Default)?pStep.orconf:(u8)orconf;
+				pParse.eOrconf = orconf.Filter(OnConstraintError.OE_Default,pStep.orconf);
 				switch(pStep.op) {
-				case TK_UPDATE: {
+				case Sqlite3.TK_UPDATE: {
 					pParse.sqlite3Update(targetSrcList(pParse,pStep),exprc.sqlite3ExprListDup(db,pStep.pExprList,0),exprc.sqlite3ExprDup(db,pStep.pWhere,0),pParse.eOrconf);
 					break;
 				}
-				case TK_INSERT: {
+				case Sqlite3.TK_INSERT: {
 					pParse.sqlite3Insert(targetSrcList(pParse,pStep),exprc.sqlite3ExprListDup(db,pStep.pExprList,0),exprc.sqlite3SelectDup(db,pStep.pSelect,0),exprc.sqlite3IdListDup(db,pStep.pIdList),pParse.eOrconf);
 					break;
 				}
-				case TK_DELETE: {
+				case Sqlite3.TK_DELETE: {
 					pParse.sqlite3DeleteFrom(targetSrcList(pParse,pStep),exprc.sqlite3ExprDup(db,pStep.pWhere,0));
 					break;
 				}
 				default:
-				Debug.Assert(pStep.op==TK_SELECT);
+				Debug.Assert(pStep.op==Sqlite3.TK_SELECT);
 				{
 					SelectDest sDest=new SelectDest();
 					Select pSelect=exprc.sqlite3SelectDup(db,pStep.pSelect,0);
@@ -1029,7 +1029,7 @@ return;
 					break;
 				}
 				}
-				if(pStep.op!=TK_SELECT) {
+				if(pStep.op!=Sqlite3.TK_SELECT) {
 					v.sqlite3VdbeAddOp0(OP_ResetCount);
 				}
 			}
@@ -1044,17 +1044,17 @@ return;
     {
       switch ( onError )
       {
-        case OE_Abort:
+        case OnConstraintError.OE_Abort:
           return "abort";
-        case OE_Rollback:
+        case OnConstraintError.OE_Rollback:
           return "rollback";
-        case OE_Fail:
+        case OnConstraintError.OE_Fail:
           return "fail";
-        case OE_Replace:
+        case OnConstraintError.OE_Replace:
           return "replace";
-        case OE_Ignore:
+        case OnConstraintError.OE_Ignore:
           return "ignore";
-        case OE_Default:
+        case OnConstraintError.OE_Default:
           return "default";
       }
       return "n/a";
@@ -1093,12 +1093,12 @@ return;
 		///<summary>
 		///The table pTrigger is attached to 
 		///</summary>
-		int orconf///
+		OnConstraintError orconf///
 		///<summary>
 		///ON CONFLICT policy to code trigger program with 
 		///</summary>
 		) {
-			Parse pTop=sqlite3ParseToplevel(pParse);
+			Parse pTop=sqliteinth.sqlite3ParseToplevel(pParse);
 			sqlite3 db=pParse.db;
 			///
 			///<summary>
@@ -1182,15 +1182,15 @@ return;
 				#if SQLITE_DEBUG
 																																																																																																        VdbeComment( v, "Start: %s.%s (%s %s%s%s ON %s)",
           pTrigger.zName != null ? pTrigger.zName : "", onErrorText( orconf ),
-          ( pTrigger.tr_tm == TRIGGER_BEFORE ? "BEFORE" : "AFTER" ),
-            ( pTrigger.op == TK_UPDATE ? "UPDATE" : "" ),
-            ( pTrigger.op == TK_INSERT ? "INSERT" : "" ),
-            ( pTrigger.op == TK_DELETE ? "DELETE" : "" ),
+          ( pTrigger.tr_tm == TriggerType.TRIGGER_BEFORE ? "BEFORE" : "AFTER" ),
+            ( pTrigger.op == Sqlite3.TK_UPDATE ? "UPDATE" : "" ),
+            ( pTrigger.op == Sqlite3.TK_INSERT ? "INSERT" : "" ),
+            ( pTrigger.op == Sqlite3.TK_DELETE ? "DELETE" : "" ),
           pTab.zName
         );
 #endif
 				#if !SQLITE_OMIT_TRACE
-				v.sqlite3VdbeChangeP4(-1,io.sqlite3MPrintf(db,"-- TRIGGER %s",pTrigger.zName),P4_DYNAMIC);
+				v.sqlite3VdbeChangeP4(-1,io.sqlite3MPrintf(db,"-- TRIGGER %s",pTrigger.zName), P4Usage.P4_DYNAMIC);
 				#endif
 				///
 				///<summary>
@@ -1203,7 +1203,7 @@ return;
 					if(SQLITE_OK==ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
 					) {
 						iEndTrigger=v.sqlite3VdbeMakeLabel();
-						pSubParse.sqlite3ExprIfFalse(pWhen,iEndTrigger,SQLITE_JUMPIFNULL);
+						pSubParse.sqlite3ExprIfFalse(pWhen,iEndTrigger,sqliteinth.SQLITE_JUMPIFNULL);
 					}
 					exprc.sqlite3ExprDelete(db,ref pWhen);
 				}
@@ -1258,12 +1258,12 @@ return;
 		///<summary>
 		///The table trigger pTrigger is attached to 
 		///</summary>
-		int orconf///
+		OnConstraintError orconf///
 		///<summary>
 		///ON CONFLICT algorithm. 
 		///</summary>
 		) {
-			Parse pRoot=sqlite3ParseToplevel(pParse);
+			Parse pRoot=sqliteinth.sqlite3ParseToplevel(pParse);
 			TriggerPrg pPrg;
 			Debug.Assert(pTrigger.zName==null||pTab==tableOfTrigger(pTrigger));
 			///
@@ -1307,7 +1307,7 @@ return;
 		///<summary>
 		///Reg array containing OLD.* and NEW.* values 
 		///</summary>
-		int orconf,///
+		OnConstraintError orconf,///
 		///<summary>
 		///ON CONFLICT policy 
 		///</summary>
@@ -1333,7 +1333,7 @@ return;
 			if(pPrg!=null) {
 				bool bRecursive=(!String.IsNullOrEmpty(p.zName)&&0==(pParse.db.flags&SQLITE_RecTriggers));
 				v.sqlite3VdbeAddOp3(OP_Program,reg,ignoreJump,++pParse.nMem);
-				v.sqlite3VdbeChangeP4(-1,pPrg.pProgram,P4_SUBPROGRAM);
+				v.sqlite3VdbeChangeP4(-1,pPrg.pProgram, P4Usage.P4_SUBPROGRAM);
 				#if SQLITE_DEBUG
 																																																																																																        VdbeComment
             ( v, "Call: %s.%s", ( !String.IsNullOrEmpty( p.zName ) ? p.zName : "fkey" ), onErrorText( orconf ) );
@@ -1400,15 +1400,15 @@ return;
 		///</summary>
 		int op,///
 		///<summary>
-		///One of TK_UPDATE, TK_INSERT, TK_DELETE 
+		///One of Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT, Sqlite3.TK_DELETE 
 		///</summary>
 		ExprList pChanges,///
 		///<summary>
 		///Changes list for any UPDATE OF triggers 
 		///</summary>
-		int tr_tm,///
+		TriggerType tr_tm,///
 		///<summary>
-		///One of TRIGGER_BEFORE, TRIGGER_AFTER 
+		///One of TriggerType.TRIGGER_BEFORE, TriggerType.TRIGGER_AFTER 
 		///</summary>
 		Table pTab,///
 		///<summary>
@@ -1418,7 +1418,7 @@ return;
 		///<summary>
 		///The first in an array of registers (see above) 
 		///</summary>
-		int orconf,///
+		OnConstraintError orconf,///
 		///<summary>
 		///ON CONFLICT policy 
 		///</summary>
@@ -1432,9 +1432,9 @@ return;
 			///<summary>
 			///Used to iterate through pTrigger list 
 			///</summary>
-			Debug.Assert(op==TK_UPDATE||op==TK_INSERT||op==TK_DELETE);
-			Debug.Assert(tr_tm==TRIGGER_BEFORE||tr_tm==TRIGGER_AFTER);
-			Debug.Assert((op==TK_UPDATE)==(pChanges!=null));
+			Debug.Assert(op==Sqlite3.TK_UPDATE||op==Sqlite3.TK_INSERT||op==Sqlite3.TK_DELETE);
+			Debug.Assert(tr_tm==TriggerType.TRIGGER_BEFORE||tr_tm==TriggerType.TRIGGER_AFTER);
+			Debug.Assert((op==Sqlite3.TK_UPDATE)==(pChanges!=null));
 			for(p=pTrigger;p!=null;p=p.pNext) {
 				///
 				///<summary>
@@ -1475,11 +1475,11 @@ return;
 		///<param name="Parameter isNew must be either 1 or 0. If it is 0, then the mask returned">Parameter isNew must be either 1 or 0. If it is 0, then the mask returned</param>
 		///<param name="applies to the old.* table. If 1, the new.* table.">applies to the old.* table. If 1, the new.* table.</param>
 		///<param name=""></param>
-		///<param name="Parameter tr_tm must be a mask with one or both of the TRIGGER_BEFORE">Parameter tr_tm must be a mask with one or both of the TRIGGER_BEFORE</param>
-		///<param name="and TRIGGER_AFTER bits set. Values accessed by BEFORE triggers are only">and TRIGGER_AFTER bits set. Values accessed by BEFORE triggers are only</param>
-		///<param name="included in the returned mask if the TRIGGER_BEFORE bit is set in the">included in the returned mask if the TRIGGER_BEFORE bit is set in the</param>
+		///<param name="Parameter tr_tm must be a mask with one or both of the TriggerType.TRIGGER_BEFORE">Parameter tr_tm must be a mask with one or both of the TriggerType.TRIGGER_BEFORE</param>
+		///<param name="and TriggerType.TRIGGER_AFTER bits set. Values accessed by BEFORE triggers are only">and TriggerType.TRIGGER_AFTER bits set. Values accessed by BEFORE triggers are only</param>
+		///<param name="included in the returned mask if the TriggerType.TRIGGER_BEFORE bit is set in the">included in the returned mask if the TriggerType.TRIGGER_BEFORE bit is set in the</param>
 		///<param name="tr_tm parameter. Similarly, values accessed by AFTER triggers are only">tr_tm parameter. Similarly, values accessed by AFTER triggers are only</param>
-		///<param name="included in the returned mask if the TRIGGER_AFTER bit is set in tr_tm.">included in the returned mask if the TRIGGER_AFTER bit is set in tr_tm.</param>
+		///<param name="included in the returned mask if the TriggerType.TRIGGER_AFTER bit is set in tr_tm.">included in the returned mask if the TriggerType.TRIGGER_AFTER bit is set in tr_tm.</param>
 		///<param name=""></param>
 		static u32 sqlite3TriggerColmask(Parse pParse,///
 		///<summary>
@@ -1497,20 +1497,20 @@ return;
 		///<summary>
 		///1 for new.* ref mask, 0 for old.* ref mask 
 		///</summary>
-		int tr_tm,///
+		TriggerType tr_tm,///
 		///<summary>
-		///Mask of TRIGGER_BEFORE|TRIGGER_AFTER 
+		///Mask of TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER 
 		///</summary>
 		Table pTab,///
 		///<summary>
 		///The table to code triggers from 
 		///</summary>
-		int orconf///
+		OnConstraintError orconf///
 		///<summary>
 		///Default ON CONFLICT policy for trigger steps 
 		///</summary>
 		) {
-			int op=pChanges!=null?TK_UPDATE:TK_DELETE;
+			int op=pChanges!=null?Sqlite3.TK_UPDATE:Sqlite3.TK_DELETE;
 			u32 mask=0;
 			Trigger p;
 			Debug.Assert(isNew==1||isNew==0);

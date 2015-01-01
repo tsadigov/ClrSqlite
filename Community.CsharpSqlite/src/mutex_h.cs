@@ -142,7 +142,7 @@ namespace Community.CsharpSqlite
 			return true;
 		}
 
-		//#define sqlite3_mutex_held(X)     ((void)(X),1)
+		//#define Sqlite3.sqlite3_mutex_held(X)     ((void)(X),1)
 		static bool sqlite3_mutex_notheld (sqlite3_mutex m)
 		{
 			return true;
@@ -296,7 +296,7 @@ namespace Community.CsharpSqlite
         ///<param name="sqlite3_mutex_leave() is a NULL pointer, then all three routines">sqlite3_mutex_leave() is a NULL pointer, then all three routines</param>
         ///<param name="behave as no">ops.</param>
         ///<param name=""></param>
-        ///<param name="See also: [sqlite3_mutex_held()] and [sqlite3_mutex_notheld()].">See also: [sqlite3_mutex_held()] and [sqlite3_mutex_notheld()].</param>
+        ///<param name="See also: [Sqlite3.sqlite3_mutex_held()] and [sqlite3_mutex_notheld()].">See also: [Sqlite3.sqlite3_mutex_held()] and [sqlite3_mutex_notheld()].</param>
         ///<param name=""></param>
 
         //SQLITE_API sqlite3_mutex *sqlite3_mutex_alloc(int);
@@ -342,7 +342,7 @@ namespace Community.CsharpSqlite
         ///   <li>  [sqlite3_mutex_enter()] </li>
         ///   <li>  [sqlite3_mutex_try()] </li>
         ///   <li>  [sqlite3_mutex_leave()] </li>
-        ///   <li>  [sqlite3_mutex_held()] </li>
+        ///   <li>  [Sqlite3.sqlite3_mutex_held()] </li>
         ///   <li>  [sqlite3_mutex_notheld()] </li>
         /// </ul>)^
         ///

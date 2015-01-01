@@ -119,7 +119,7 @@ return osType==2;
 																			
 #if SQLITE_DEBUG
 																			    /*
-** The sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
+** The Sqlite3.sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
 ** intended for use only inside Debug.Assert() statements.
 */
     static bool winMutexHeld( sqlite3_mutex p )
@@ -191,7 +191,7 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
       //if ( Interlocked.CompareExchange(ref winMutex_lock, 1, 0 ) == 0 )
       {
         int i;
-        for ( i = 0; i < ArraySize( winMutex_staticMutexes ); i++ )
+        for ( i = 0; i < Sqlite3.ArraySize( winMutex_staticMutexes ); i++ )
         {
           if (winMutex_staticMutexes[i].mutex== null) winMutex_staticMutexes[i].mutex = new Mutex();
           //InitializeCriticalSection( winMutex_staticMutexes[i].mutex );
@@ -218,7 +218,7 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
         if ( winMutex_isInit == 1 )
         {
           int i;
-          for ( i = 0; i < ArraySize( winMutex_staticMutexes ); i++ )
+          for ( i = 0; i < Sqlite3.ArraySize( winMutex_staticMutexes ); i++ )
           {
             DeleteCriticalSection( winMutex_staticMutexes[i].mutex );
           }
@@ -291,7 +291,7 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
           {
             Debug.Assert( winMutex_isInit == 1 );
             Debug.Assert( iType - 2 >= 0 );
-            Debug.Assert( iType - 2 < ArraySize( winMutex_staticMutexes ) );
+            Debug.Assert( iType - 2 < Sqlite3.ArraySize( winMutex_staticMutexes ) );
             p = winMutex_staticMutexes[iType - 2];
             p.id = iType;
             break;
@@ -367,7 +367,7 @@ p.nRef++;
 rc = SQLITE_OK;
 }
 #else
-																			      UNUSED_PARAMETER( p );
+																			      Sqlite3.sqliteinth.UNUSED_PARAMETER( p );
 #endif
 																			#if SQLITE_DEBUG
 																			      if ( rc == SQLITE_OK && p.trace != 0 )

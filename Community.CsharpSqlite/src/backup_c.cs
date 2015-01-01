@@ -756,7 +756,7 @@ namespace Community.CsharpSqlite {
 		/// are considered fatal except for SQLITE_BUSY and SQLITE_LOCKED.
 		///</summary>
 		public static bool isFatalError(int rc) {
-			return (rc!=SQLITE_OK&&rc!=SQLITE_BUSY&&ALWAYS(rc!=SQLITE_LOCKED));
+			return (rc!=SQLITE_OK&&rc!=SQLITE_BUSY&&Sqlite3.ALWAYS(rc!=SQLITE_LOCKED));
 		}
 	#if !SQLITE_OMIT_VACUUM
 	#endif

@@ -67,7 +67,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             /// Set the collating sequence for expression pExpr to be the collating
             /// sequence named by pToken.   Return a pointer to the revised expression.
-            /// The collating sequence is marked as "explicit" using the EP_ExpCollate
+            /// The collating sequence is marked as "explicit" using the ExprFlags.EP_ExpCollate
             /// flag.  An explicit collating sequence will override implicit
             /// collating sequences.
             ///
@@ -139,12 +139,12 @@ namespace Community.CsharpSqlite
             /// If dequote is false, no dequoting is performance.  The deQuote
             /// parameter is ignored if pToken is NULL or if the token does not
             /// appear to be quoted.  If the quotes were of the form "..." (double-quotes)
-            /// then the EP_DblQuoted flag is set on the expression node.
+            /// then the ExprFlags.EP_DblQuoted flag is set on the expression node.
             ///
-            /// Special case:  If op==TK_INTEGER and pToken points to a string that
+            /// Special case:  If op==Sqlite3.TK_INTEGER and pToken points to a string that
             /// can be translated into a 32-bit integer, then the token is not
             /// stored in u.zToken.  Instead, the integer values is written
-            /// into u.iValue and the EP_IntValue flag is set.  No extra storage
+            /// into u.iValue and the ExprFlags.EP_IntValue flag is set.  No extra storage
             /// is allocated to hold the integer text and the dequote flag is ignored.
             ///</summary>
             public static Expr CreateExpr(sqlite3 db,///
@@ -311,7 +311,7 @@ namespace Community.CsharpSqlite
                     }
                     else
                     {
-                        Expr pNew = CreateExpr(db, TK_AND, null, false);
+                        Expr pNew = CreateExpr(db, Sqlite3.TK_AND, null, false);
                         exprc.sqlite3ExprAttachSubtrees(db, pNew, pLeft, pRight);
                         return pNew;
                     }
@@ -351,12 +351,12 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///</summary>
                 ///<param name="Sanity check: Assert that the IntValue is non">negative if it exists </param>
-                Debug.Assert(!p.ExprHasProperty(EP_IntValue) || p.u.iValue >= 0);
-                if (!p.ExprHasAnyProperty(EP_TokenOnly))
+                Debug.Assert(!p.ExprHasProperty(ExprFlags.EP_IntValue) || p.u.iValue >= 0);
+                if (!p.ExprHasAnyProperty(ExprFlags.EP_TokenOnly))
                 {
                     exprc.sqlite3ExprDelete(db, ref p.pLeft);
                     exprc.sqlite3ExprDelete(db, ref p.pRight);
-                    if (!p.ExprHasProperty(EP_Reduced) && (p.flags2 & EP2_MallocedToken) != 0)
+                    if (!p.ExprHasProperty(ExprFlags.EP_Reduced) && (p.flags2 & EP2_MallocedToken) != 0)
                     {
 #if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
 																																																																																																																								sqlite3DbFree( db, ref p.u._zToken );
@@ -364,7 +364,7 @@ namespace Community.CsharpSqlite
                         db.sqlite3DbFree(ref p.u.zToken);
 #endif
                     }
-                    if (p.ExprHasProperty(EP_xIsSelect))
+                    if (p.ExprHasProperty(ExprFlags.EP_xIsSelect))
                     {
                         SelectMethods.sqlite3SelectDelete(db, ref p.x.pSelect);
                     }
@@ -373,7 +373,7 @@ namespace Community.CsharpSqlite
                         exprc.sqlite3ExprListDelete(db, ref p.x.pList);
                     }
                 }
-                if (!p.ExprHasProperty(EP_Static))
+                if (!p.ExprHasProperty(ExprFlags.EP_Static))
                 {
                     db.sqlite3DbFree(ref p);
                 }
@@ -386,9 +386,9 @@ namespace Community.CsharpSqlite
             ///</summary>
             static int exprStructSize(Expr p)
             {
-                if (p.ExprHasProperty(EP_TokenOnly))
+                if (p.ExprHasProperty(ExprFlags.EP_TokenOnly))
                     return EXPR_TOKENONLYSIZE;
-                if (p.ExprHasProperty(EP_Reduced))
+                if (p.ExprHasProperty(ExprFlags.EP_Reduced))
                     return EXPR_REDUCEDSIZE;
                 return EXPR_FULLSIZE;
             }
@@ -421,7 +421,7 @@ namespace Community.CsharpSqlite
                     //if ( pzBuffer !=null)
                     //{
                     //  zAlloc = pzBuffer;
-                    //  staticFlag = EP_Static;
+                    //  staticFlag = ExprFlags.EP_Static;
                     //}
                     //else
                     //{
@@ -441,7 +441,7 @@ namespace Community.CsharpSqlite
                         int nStructSize = p.dupedExprStructSize(flags);
                         int nNewSize = nStructSize & 0xfff;
                         int nToken;
-                        if (!p.ExprHasProperty(EP_IntValue) && !String.IsNullOrEmpty(p.u.zToken))
+                        if (!p.ExprHasProperty(ExprFlags.EP_IntValue) && !String.IsNullOrEmpty(p.u.zToken))
                         {
                             nToken = StringExtensions.sqlite3Strlen30(p.u.zToken);
                         }
@@ -451,8 +451,8 @@ namespace Community.CsharpSqlite
                         }
                         if (isReduced)
                         {
-                            Debug.Assert(!p.ExprHasProperty(EP_Reduced));
-                            pNew = p.Copy(EXPR_TOKENONLYSIZE);
+                            Debug.Assert(!p.ExprHasProperty(ExprFlags.EP_Reduced));
+                            pNew = p.Copy((ExprFlags)Sqlite3.EXPR_TOKENONLYSIZE);
                             //memcpy( zAlloc, p, nNewSize );
                         }
                         else
@@ -464,7 +464,7 @@ namespace Community.CsharpSqlite
                         }
                         ///
                         ///<summary>
-                        ///Set the EP_Reduced, EP_TokenOnly, and EP_Static flags appropriately. 
+                        ///Set the ExprFlags.EP_Reduced, ExprFlags.EP_TokenOnly, and ExprFlags.EP_Static flags appropriately. 
                         ///</summary>
                         unchecked
                         {
@@ -489,7 +489,7 @@ namespace Community.CsharpSqlite
                             ///<summary>
                             ///Fill in the pNew.x.pSelect or pNew.x.pList member. 
                             ///</summary>
-                            if (p.ExprHasProperty(EP_xIsSelect))
+                            if (p.ExprHasProperty(ExprFlags.EP_xIsSelect))
                             {
                                 pNew.x.pSelect = exprc.sqlite3SelectDup(db, p.x.pSelect, isReduced ? 1 : 0);
                             }
@@ -502,10 +502,10 @@ namespace Community.CsharpSqlite
                         ///<summary>
                         ///Fill in pNew.pLeft and pNew.pRight. 
                         ///</summary>
-                        if (pNew.ExprHasAnyProperty(EP_Reduced | EP_TokenOnly))
+                        if (pNew.ExprHasAnyProperty(ExprFlags.EP_Reduced | ExprFlags.EP_TokenOnly))
                         {
                             //zAlloc += dupedExprNodeSize( p, flags );
-                            if (pNew.ExprHasProperty(EP_Reduced))
+                            if (pNew.ExprHasProperty(ExprFlags.EP_Reduced))
                             {
                                 pNew.pLeft = exprDup(db, p.pLeft, EXPRDUP_REDUCE, ref pzBuffer);
                                 pNew.pRight = exprDup(db, p.pRight, EXPRDUP_REDUCE, ref pzBuffer);
@@ -518,7 +518,7 @@ namespace Community.CsharpSqlite
                         else
                         {
                             pNew.flags2 = 0;
-                            if (!p.ExprHasAnyProperty(EP_TokenOnly))
+                            if (!p.ExprHasAnyProperty(ExprFlags.EP_TokenOnly))
                             {
                                 pNew.pLeft = exprc.sqlite3ExprDup(db, p.pLeft, 0);
                                 pNew.pRight = exprc.sqlite3ExprDup(db, p.pRight, 0);
@@ -775,7 +775,7 @@ return null;
             ///
             ///
             ///</summary>
-            public static int exprNodeIsConstant(Walker pWalker, ref Expr pExpr)
+            public static WRC exprNodeIsConstant(Walker pWalker, ref Expr pExpr)
             {
                 ///
                 ///<summary>
@@ -783,10 +783,10 @@ return null;
                 ///the ON or USING clauses of a join disqualifies the expression
                 ///from being considered constant. 
                 ///</summary>
-                if (pWalker.u.i == 3 && pExpr.ExprHasAnyProperty(EP_FromJoin))
+                if (pWalker.u.i == 3 && pExpr.ExprHasAnyProperty(ExprFlags.EP_FromJoin))
                 {
                     pWalker.u.i = 0;
-                    return WRC_Abort;
+                    return WRC.WRC_Abort;
                 }
                 switch (pExpr.Operator)
                 {
@@ -807,31 +807,31 @@ return null;
                     case TokenType.TK_COLUMN:
                     case TokenType.TK_AGG_FUNCTION:
                     case TokenType.TK_AGG_COLUMN:
-                        testcase(pExpr.Operator == TokenType.TK_ID);
-                        testcase(pExpr.Operator == TokenType.TK_COLUMN);
-                        testcase(pExpr.Operator == TokenType.TK_AGG_FUNCTION);
-                        testcase(pExpr.Operator == TokenType.TK_AGG_COLUMN);
+                        sqliteinth.testcase(pExpr.Operator == TokenType.TK_ID);
+                        sqliteinth.testcase(pExpr.Operator == TokenType.TK_COLUMN);
+                        sqliteinth.testcase(pExpr.Operator == TokenType.TK_AGG_FUNCTION);
+                        sqliteinth.testcase(pExpr.Operator == TokenType.TK_AGG_COLUMN);
                         pWalker.u.i = 0;
-                        return WRC_Abort;
+                        return WRC.WRC_Abort;
                     default:
-                        testcase(pExpr.Operator == TokenType.TK_SELECT);
+                        sqliteinth.testcase(pExpr.Operator == TokenType.TK_SELECT);
                         ///
                         ///<summary>
                         ///selectNodeIsConstant will disallow 
                         ///</summary>
-                        testcase(pExpr.Operator == TokenType.TK_EXISTS);
+                        sqliteinth.testcase(pExpr.Operator == TokenType.TK_EXISTS);
                         ///
                         ///<summary>
                         ///selectNodeIsConstant will disallow 
                         ///</summary>
-                        return WRC_Continue;
+                        return WRC.WRC_Continue;
                 }
             }
-            public static int selectNodeIsConstant(Walker pWalker, Select NotUsed)
+            public static WRC selectNodeIsConstant(Walker pWalker, Select NotUsed)
             {
-                UNUSED_PARAMETER(NotUsed);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 pWalker.u.i = 0;
-                return WRC_Abort;
+                return WRC.WRC_Abort;
             }
             ///<summary>
             /// Generate an OP_IsNull instruction that tests register iReg and jumps
@@ -878,7 +878,7 @@ return null;
             public static int sqlite3ExprNeedsNoAffinityChange(Expr p, char aff)
             {
                 TokenType op;
-                if (aff == SQLITE_AFF_NONE)
+                if (aff == sqliteinth.SQLITE_AFF_NONE)
                     return 1;
                 while (p.Operator == TokenType.TK_UPLUS || p.Operator == TokenType.TK_UMINUS)
                 {
@@ -891,15 +891,15 @@ return null;
                 {
                     case TokenType.TK_INTEGER:
                         {
-                            return (aff == SQLITE_AFF_INTEGER || aff == SQLITE_AFF_NUMERIC) ? 1 : 0;
+                            return (aff == sqliteinth.SQLITE_AFF_INTEGER || aff == sqliteinth.SQLITE_AFF_NUMERIC) ? 1 : 0;
                         }
                     case TokenType.TK_FLOAT:
                         {
-                            return (aff == SQLITE_AFF_REAL || aff == SQLITE_AFF_NUMERIC) ? 1 : 0;
+                            return (aff == sqliteinth.SQLITE_AFF_REAL || aff == sqliteinth.SQLITE_AFF_NUMERIC) ? 1 : 0;
                         }
                     case TokenType.TK_STRING:
                         {
-                            return (aff == SQLITE_AFF_TEXT) ? 1 : 0;
+                            return (aff == sqliteinth.SQLITE_AFF_TEXT) ? 1 : 0;
                         }
                     case TokenType.TK_BLOB:
                         {
@@ -912,7 +912,7 @@ return null;
                             ///<summary>
                             ///p cannot be part of a CHECK constraint 
                             ///</summary>
-                            return (p.iColumn < 0 && (aff == SQLITE_AFF_INTEGER || aff == SQLITE_AFF_NUMERIC)) ? 1 : 0;
+                            return (p.iColumn < 0 && (aff == sqliteinth.SQLITE_AFF_INTEGER || aff == sqliteinth.SQLITE_AFF_NUMERIC)) ? 1 : 0;
                         }
                     default:
                         {
@@ -968,8 +968,8 @@ return null;
                 ///</summary>
                 if ((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0)
                 {
-                    testcase((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct);
-                    testcase((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Aggregate);
+                    sqliteinth.testcase((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct);
+                    sqliteinth.testcase((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Aggregate);
                     return 0;
                     ///
                     ///<summary>
@@ -1020,7 +1020,7 @@ return null;
                 ///<summary>
                 ///FROM clause is not a view 
                 ///</summary>
-                if (IsVirtual(pTab))
+                if (pTab.IsVirtual())
                     return 0;
                 ///
                 ///<summary>
@@ -1054,7 +1054,7 @@ return null;
             ///
             ///   IN_INDEX_ROWID - The cursor was opened on a database table.
             ///   IN_INDEX_INDEX - The cursor was opened on a database index.
-            ///   IN_INDEX_EPH -   The cursor was opened on a specially created and
+            ///   sqliteinth.IN_INDEX_EPH -   The cursor was opened on a specially created and
             ///                    populated epheremal table.
             ///
             /// An existing b-tree may only be used if the SELECT is of the simple
@@ -1174,7 +1174,7 @@ return null;
             ///</summary>
             public static void codeReal(Vdbe v, string z, bool negateFlag, int iMem)
             {
-                if (ALWAYS(!String.IsNullOrEmpty(z)))
+                if (Sqlite3.ALWAYS(!String.IsNullOrEmpty(z)))
                 {
                     double value = 0;
                     //string zV;
@@ -1187,7 +1187,7 @@ return null;
                     if (negateFlag)
                         value = -value;
                     //zV = dup8bytes(v,  value);
-                    v.sqlite3VdbeAddOp4(OpCode.OP_Real, 0, iMem, 0, value, P4_REAL);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_Real, 0, iMem, 0, value,  P4Usage.P4_REAL);
                 }
             }
 #endif
@@ -1269,7 +1269,7 @@ return null;
 ** Return true if any register in the range iFrom..iTo (inclusive)
 ** is used as part of the column cache.
 **
-** This routine is used within Debug.Assert() and testcase() macros only
+** This routine is used within Debug.Assert() and sqliteinth.testcase() macros only
 ** and does not appear in a normal build.
 */
     static int usedAsColumnCache( Parse pParse, int iFrom, int iTo )
@@ -1331,11 +1331,11 @@ return null;
             ///<summary>
             /// If pExpr is a constant expression that is appropriate for
             /// factoring out of a loop, then evaluate the expression
-            /// into a register and convert the expression into a TK_REGISTER
+            /// into a register and convert the expression into a Sqlite3.TK_REGISTER
             /// expression.
             ///
             ///</summary>
-            public static int evalConstExpr(Walker pWalker, ref Expr pExpr)
+            public static WRC evalConstExpr(Walker pWalker, ref Expr pExpr)
             {
                 Parse pParse = pWalker.pParse;
                 switch (pExpr.Operator)
@@ -1343,7 +1343,7 @@ return null;
                     case TokenType.TK_IN:
                     case TokenType.TK_REGISTER:
                         {
-                            return WRC_Prune;
+                            return WRC.WRC_Prune;
                         }
                     case TokenType.TK_FUNCTION:
                     case TokenType.TK_AGG_FUNCTION:
@@ -1357,7 +1357,7 @@ return null;
                             ///
                             ///</summary>
                             ExprList pList = pExpr.x.pList;
-                            Debug.Assert(!pExpr.ExprHasProperty(EP_xIsSelect));
+                            Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
                             if (pList != null)
                             {
                                 int i = pList.nExpr;
@@ -1367,7 +1367,7 @@ return null;
                                 {
                                     //, pItem++){
                                     pItem = pList.a[pList.nExpr - i];
-                                    if (ALWAYS(pItem.pExpr != null))
+                                    if (Sqlite3.ALWAYS(pItem.pExpr != null))
                                         pItem.pExpr.Flags |= ExprFlags.EP_FixedDest;
                                 }
                             }
@@ -1384,14 +1384,14 @@ return null;
                     pExpr.Operator2 = pExpr.Operator;
                     pExpr.Operator = TokenType.TK_REGISTER;
                     pExpr.iTable = r2;
-                    return WRC_Prune;
+                    return WRC.WRC_Prune;
                 }
-                return WRC_Continue;
+                return WRC.WRC_Continue;
             }
             ///<summary>
             /// Preevaluate constant subexpressions within pExpr and store the
             /// results in registers.  Modify pExpr so that the constant subexpresions
-            /// are TK_REGISTER opcodes that refer to the precomputed values.
+            /// are Sqlite3.TK_REGISTER opcodes that refer to the precomputed values.
             ///
             /// This routine is a no-op if the jump to the cookie-check code has
             /// already occur.  Since the cookie-check jump is generated prior to
@@ -1431,9 +1431,9 @@ return null;
             /// continues straight thru if the expression is false.
             ///
             /// If the expression evaluates to NULL (neither true nor false), then
-            /// take the jump if the jumpIfNull flag is SQLITE_JUMPIFNULL.
+            /// take the jump if the jumpIfNull flag is sqliteinth.SQLITE_JUMPIFNULL.
             ///
-            /// This code depends on the fact that certain token values (ex: TK_EQ)
+            /// This code depends on the fact that certain token values (ex: Sqlite3.TK_EQ)
             /// are the same as opcode values (ex: OP_Eq) that implement the corresponding
             /// operation.  Special comments in vdbe.c and the mkopcodeh.awk script in
             /// the make process cause these values to align.  Assert()s in the code
@@ -1446,7 +1446,7 @@ return null;
             /// continues straight thru if the expression is true.
             ///
             /// If the expression evaluates to NULL (neither true nor false) then
-            /// jump if jumpIfNull is SQLITE_JUMPIFNULL or fall through if jumpIfNull
+            /// jump if jumpIfNull is sqliteinth.SQLITE_JUMPIFNULL or fall through if jumpIfNull
             /// is 0.
             ///
             ///</summary>
@@ -1473,9 +1473,9 @@ return null;
                 {
                     return pB == pA ? 0 : 2;
                 }
-                Debug.Assert(!pA.ExprHasAnyProperty(EP_TokenOnly | EP_Reduced));
-                Debug.Assert(!pB.ExprHasAnyProperty(EP_TokenOnly | EP_Reduced));
-                if (pA.ExprHasProperty(EP_xIsSelect) || pB.ExprHasProperty(EP_xIsSelect))
+                Debug.Assert(!pA.ExprHasAnyProperty(ExprFlags.EP_TokenOnly | ExprFlags.EP_Reduced));
+                Debug.Assert(!pB.ExprHasAnyProperty(ExprFlags.EP_TokenOnly | ExprFlags.EP_Reduced));
+                if (pA.ExprHasProperty(ExprFlags.EP_xIsSelect) || pB.ExprHasProperty(ExprFlags.EP_xIsSelect))
                 {
                     return 2;
                 }
@@ -1491,9 +1491,9 @@ return null;
                     return 2;
                 if (pA.iTable != pB.iTable || pA.iColumn != pB.iColumn)
                     return 2;
-                if (pA.ExprHasProperty(EP_IntValue))
+                if (pA.ExprHasProperty(ExprFlags.EP_IntValue))
                 {
-                    if (!pB.ExprHasProperty(EP_IntValue) || pA.u.iValue != pB.u.iValue)
+                    if (!pB.ExprHasProperty(ExprFlags.EP_IntValue) || pA.u.iValue != pB.u.iValue)
                     {
                         return 2;
                     }
@@ -1501,7 +1501,7 @@ return null;
                 else
                     if (pA.Operator != TokenType.TK_COLUMN && pA.u.zToken != null)
                     {
-                        if (pB.ExprHasProperty(EP_IntValue) || NEVER(pB.u.zToken == null))
+                        if (pB.ExprHasProperty(ExprFlags.EP_IntValue) || NEVER(pB.u.zToken == null))
                             return 2;
                         if (!pA.u.zToken.Equals(pB.u.zToken, StringComparison.InvariantCultureIgnoreCase))
                         {
@@ -1577,7 +1577,7 @@ return null;
             /// for additional information.
             ///
             ///</summary>
-            static int analyzeAggregate(Walker pWalker, ref Expr pExpr)
+            static WRC analyzeAggregate(Walker pWalker, ref Expr pExpr)
             {
                 int i;
                 NameContext pNC = pWalker.u.pNC;
@@ -1589,14 +1589,14 @@ return null;
                     case TokenType.TK_AGG_COLUMN:
                     case TokenType.TK_COLUMN:
                         {
-                            testcase(pExpr.Operator == TokenType.TK_AGG_COLUMN);
-                            testcase(pExpr.Operator == TokenType.TK_COLUMN);
+                            sqliteinth.testcase(pExpr.Operator == TokenType.TK_AGG_COLUMN);
+                            sqliteinth.testcase(pExpr.Operator == TokenType.TK_COLUMN);
                             ///
                             ///<summary>
                             ///Check to see if the column is in one of the tables in the FROM
                             ///clause of the aggregate query 
                             ///</summary>
-                            if (ALWAYS(pSrcList != null))
+                            if (Sqlite3.ALWAYS(pSrcList != null))
                             {
                                 SrcList_item pItem;
                                 // = pSrcList.a;
@@ -1605,7 +1605,7 @@ return null;
                                     //, pItem++){
                                     pItem = pSrcList.a[i];
                                     AggInfo_col pCol;
-                                    Debug.Assert(!pExpr.ExprHasAnyProperty(EP_TokenOnly | EP_Reduced));
+                                    Debug.Assert(!pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly | ExprFlags.EP_Reduced));
                                     if (pExpr.iTable == pItem.iCursor)
                                     {
                                         ///
@@ -1665,7 +1665,7 @@ return null;
                                         ///<summary>
                                         ///There is now an entry for pExpr in pAggInfo.aCol[] (either
                                         ///because it was there before or because we just created it).
-                                        ///Convert the pExpr to be a TK_AGG_COLUMN referring to that
+                                        ///Convert the pExpr to be a Sqlite3.TK_AGG_COLUMN referring to that
                                         ///pAggInfo.aCol[] entry.
                                         ///
                                         ///</summary>
@@ -1685,7 +1685,7 @@ return null;
                                 ///end loop over pSrcList 
                                 ///</summary>
                             }
-                            return WRC_Prune;
+                            return WRC.WRC_Prune;
                         }
                     case TokenType.TK_AGG_FUNCTION:
                         {
@@ -1725,11 +1725,11 @@ return null;
                                     i = addAggInfoFunc(pParse.db, pAggInfo);
                                     if (i >= 0)
                                     {
-                                        Debug.Assert(!pExpr.ExprHasProperty(EP_xIsSelect));
+                                        Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
                                         pItem = pAggInfo.aFunc[i];
                                         pItem.pExpr = pExpr;
                                         pItem.iMem = ++pParse.nMem;
-                                        Debug.Assert(!pExpr.ExprHasProperty(EP_IntValue));
+                                        Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
                                         pItem.pFunc = sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0);
                                         if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)
                                         {
@@ -1746,18 +1746,18 @@ return null;
                                 ///Make pExpr point to the appropriate pAggInfo.aFunc[] entry
                                 ///
                                 ///</summary>
-                                Debug.Assert(!pExpr.ExprHasAnyProperty(EP_TokenOnly | EP_Reduced));
+                                Debug.Assert(!pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly | ExprFlags.EP_Reduced));
                                 pExpr.ExprSetIrreducible();
                                 pExpr.iAgg = (short)i;
                                 pExpr.pAggInfo = pAggInfo;
-                                return WRC_Prune;
+                                return WRC.WRC_Prune;
                             }
                             break;
                         }
                 }
-                return WRC_Continue;
+                return WRC.WRC_Continue;
             }
-            static int analyzeAggregatesInSelect(Walker pWalker, Select pSelect)
+            static WRC analyzeAggregatesInSelect(Walker pWalker, Select pSelect)
             {
                 NameContext pNC = pWalker.u.pNC;
                 if (pNC.nDepth == 0)
@@ -1765,11 +1765,11 @@ return null;
                     pNC.nDepth++;
                     pWalker.sqlite3WalkSelect(pSelect);
                     pNC.nDepth--;
-                    return WRC_Prune;
+                    return WRC.WRC_Prune;
                 }
                 else
                 {
-                    return WRC_Continue;
+                    return WRC.WRC_Continue;
                 }
             }
             ///<summary>

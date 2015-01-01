@@ -120,7 +120,7 @@ namespace Community.CsharpSqlite
     };
 
     /*
-    ** The sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
+    ** The Sqlite3.sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
     ** intended for use inside Debug.Assert() statements.
     */
     static bool debugMutexHeld( sqlite3_mutex pX )

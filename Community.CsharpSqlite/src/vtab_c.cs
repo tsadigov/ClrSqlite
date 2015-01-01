@@ -171,7 +171,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static VTable sqlite3GetVTable(sqlite3 db,Table pTab) {
 			VTable pVtab;
-			Debug.Assert(IsVirtual(pTab));
+			Debug.Assert(pTab.IsVirtual());
 			for(pVtab=pTab.pVTable;pVtab!=null&&pVtab.db!=db;pVtab=pVtab.pNext)
 				;
 			return pVtab;
@@ -260,7 +260,7 @@ namespace Community.CsharpSqlite {
 			VTable p=db.pDisconnect;
 			db.pDisconnect=null;
 			Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
-			Debug.Assert(sqlite3_mutex_held(db.mutex));
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
 			if(p!=null) {
                 vdbeaux.sqlite3ExpirePreparedStatements(db);
 				do {
@@ -409,10 +409,10 @@ namespace Community.CsharpSqlite {
 				db.sqlite3DbFree(ref pVTable);
 			}
 			else
-				if(ALWAYS(pVTable.pVtab)) {
+				if(Sqlite3.ALWAYS(pVTable.pVtab)) {
 					///
 					///<summary>
-					///Justification of ALWAYS():  A correct vtab constructor must allocate
+					///Justification of Sqlite3.ALWAYS():  A correct vtab constructor must allocate
 					///the sqlite3_vtab object if successful.  
 					///</summary>
 					pVTable.pVtab.pModule=pMod.pModule;
@@ -532,7 +532,7 @@ namespace Community.CsharpSqlite {
 			Module pMod;
 			string zMod;
 			pTab=build.sqlite3FindTable(db,zTab,db.aDb[iDb].zName);
-			Debug.Assert(pTab!=null&&(pTab.tabFlags&TF_Virtual)!=0&&null==pTab.pVTable);
+			Debug.Assert(pTab!=null&&(pTab.tabFlags&TableFlags.TF_Virtual)!=0&&null==pTab.pVTable);
 			///
 			///<summary>
 			///Locate the required virtual table module 
@@ -555,10 +555,10 @@ namespace Community.CsharpSqlite {
 			}
 			///
 			///<summary>
-			///Justification of ALWAYS():  The xConstructor method is required to
+			///Justification of Sqlite3.ALWAYS():  The xConstructor method is required to
 			///create a valid sqlite3_vtab if it returns SQLITE_OK. 
 			///</summary>
-			if(rc==SQLITE_OK&&ALWAYS(sqlite3GetVTable(db,pTab))) {
+			if(rc==SQLITE_OK&&Sqlite3.ALWAYS(sqlite3GetVTable(db,pTab))) {
 				rc=growVTrans(db);
 				if(rc==SQLITE_OK) {
 					addToVTrans(db,sqlite3GetVTable(db,pTab));
@@ -581,9 +581,9 @@ namespace Community.CsharpSqlite {
 			if(null==db.pVtabCtx||null==(pTab=db.pVtabCtx.pTab)) {
 				utilc.sqlite3Error(db,SQLITE_MISUSE,0);
 				sqlite3_mutex_leave(db.mutex);
-				return SQLITE_MISUSE_BKPT();
+                return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 			}
-			Debug.Assert((pTab.tabFlags&TF_Virtual)!=0);
+			Debug.Assert((pTab.tabFlags&TableFlags.TF_Virtual)!=0);
 			pParse=new Parse();
 			//sqlite3StackAllocZero(db, sizeof(*pParse));
 			//if ( pParse == null )
@@ -596,7 +596,7 @@ namespace Community.CsharpSqlite {
 				pParse.db=db;
 				pParse.nQueryLoop=1;
 				if(SQLITE_OK==pParse.sqlite3RunParser(zCreateTable,ref zErr)&&pParse.pNewTable!=null//&& !db.mallocFailed
-				&&null==pParse.pNewTable.pSelect&&(pParse.pNewTable.tabFlags&TF_Virtual)==0) {
+				&&null==pParse.pNewTable.pSelect&&(pParse.pNewTable.tabFlags&TableFlags.TF_Virtual)==0) {
 					if(null==pTab.aCol) {
 						pTab.aCol=pParse.pNewTable.aCol;
 						pTab.nCol=pParse.pNewTable.nCol;
@@ -635,7 +635,7 @@ namespace Community.CsharpSqlite {
 			int rc=SQLITE_OK;
 			Table pTab;
 			pTab=build.sqlite3FindTable(db,zTab,db.aDb[iDb].zName);
-			if(ALWAYS(pTab!=null&&pTab.pVTable!=null)) {
+			if(Sqlite3.ALWAYS(pTab!=null&&pTab.pVTable!=null)) {
 				VTable p=vtabDisconnectAll(db,pTab);
 				Debug.Assert(rc==SQLITE_OK);
 				object obj=p.pVtab;
@@ -760,7 +760,8 @@ namespace Community.CsharpSqlite {
 			///virtual module tables in this case, so return SQLITE_LOCKED.
 			///
 			///</summary>
-			if(sqlite3VtabInSync(db)) {
+            if (sqliteinth.sqlite3VtabInSync(db))
+            {
 				return SQLITE_LOCKED;
 			}
 			if(null==pVTab) {
@@ -799,7 +800,7 @@ namespace Community.CsharpSqlite {
 		/// as the second argument to the virtual table method invoked.
 		///
 		/// If op is SAVEPOINT_BEGIN, the xSavepoint method is invoked. If it is
-		/// SAVEPOINT_ROLLBACK, the xRollbackTo method. Otherwise, if op is
+		/// sqliteinth.SAVEPOINT_ROLLBACK, the xRollbackTo method. Otherwise, if op is
 		/// SAVEPOINT_RELEASE, then the xRelease method of each virtual table with
 		/// an open transaction is invoked.
 		///
@@ -811,7 +812,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static int sqlite3VtabSavepoint(sqlite3 db,int op,int iSavepoint) {
 			int rc=SQLITE_OK;
-			Debug.Assert(op==SAVEPOINT_RELEASE||op==SAVEPOINT_ROLLBACK||op==SAVEPOINT_BEGIN);
+            Debug.Assert(op == sqliteinth.SAVEPOINT_RELEASE || op == sqliteinth.SAVEPOINT_ROLLBACK || op == sqliteinth.SAVEPOINT_BEGIN);
 			Debug.Assert(iSavepoint>=0);
 			if(db.aVTrans!=null) {
 				int i;
@@ -822,11 +823,11 @@ namespace Community.CsharpSqlite {
 						smdxFunctionArg xMethod=null;
 						//int (*xMethod)(sqlite3_vtab *, int);
 						switch(op) {
-						case SAVEPOINT_BEGIN:
+                            case sqliteinth.SAVEPOINT_BEGIN:
 						xMethod=pMod.xSavepoint;
 						pVTab.iSavepoint=iSavepoint+1;
 						break;
-						case SAVEPOINT_ROLLBACK:
+						case sqliteinth.SAVEPOINT_ROLLBACK:
 						xMethod=pMod.xRollbackTo;
 						break;
 						default:
@@ -888,12 +889,12 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			if(NEVER(pExpr==null))
 				return pDef;
-			if(pExpr.op!=TK_COLUMN)
+			if(pExpr.op!=Sqlite3.TK_COLUMN)
 				return pDef;
 			pTab=pExpr.pTab;
 			if(NEVER(pTab==null))
 				return pDef;
-			if((pTab.tabFlags&TF_Virtual)==0)
+			if((pTab.tabFlags&TableFlags.TF_Virtual)==0)
 				return pDef;
 			pVtab=sqlite3GetVTable(db,pTab).pVtab;
 			Debug.Assert(pVtab!=null);
@@ -936,7 +937,7 @@ namespace Community.CsharpSqlite {
 			//memcpy(pNew.zName, pDef.zName, StringExtensions.sqlite3Strlen30(pDef.zName)+1);
 			pNew.xFunc=xFunc;
 			pNew.pUserData=pArg;
-			pNew.flags|=SQLITE_FUNC_EPHEM;
+            pNew.flags |= FuncFlags.SQLITE_FUNC_EPHEM;
 			return pNew;
 		}
 		///<summary>
@@ -965,8 +966,14 @@ namespace Community.CsharpSqlite {
 			//static const unsigned char aMap[] = { 
 			//  SQLITE_ROLLBACK, SQLITE_ABORT, SQLITE_FAIL, SQLITE_IGNORE, SQLITE_REPLACE 
 			//};
-			Debug.Assert(OE_Rollback==1&&OE_Abort==2&&OE_Fail==3);
-			Debug.Assert(OE_Ignore==4&&OE_Replace==5);
+			Debug.Assert(
+                (int)OnConstraintError.OE_Rollback==1
+                &&(int)OnConstraintError.OE_Abort==2
+                &&(int)OnConstraintError.OE_Fail==3);
+
+			Debug.Assert((int)OnConstraintError.OE_Ignore==4
+                &&(int)OnConstraintError.OE_Replace==5);
+
 			Debug.Assert(db.vtabOnConflict>=1&&db.vtabOnConflict<=5);
 			return (int)aMap[db.vtabOnConflict-1];
 		}
@@ -987,16 +994,16 @@ namespace Community.CsharpSqlite {
 			case SQLITE_VTAB_CONSTRAINT_SUPPORT: {
 				VtabCtx p=db.pVtabCtx;
 				if(null==p) {
-					rc=SQLITE_MISUSE_BKPT();
+					rc=Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 				}
 				else {
-					Debug.Assert(p.pTab==null||(p.pTab.tabFlags&TF_Virtual)!=0);
+                    Debug.Assert(p.pTab == null || (p.pTab.tabFlags.HasAnyProperty(  TableFlags.TF_Virtual)));
 					p.pVTable.bConstraint=(Byte)_Custom.va_arg(ap,(Int32)0);
 				}
 				break;
 			}
 			default:
-			rc=SQLITE_MISUSE_BKPT();
+			rc=Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 			break;
 			}
 			_Custom.va_end(ref ap);

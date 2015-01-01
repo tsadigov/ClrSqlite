@@ -44,16 +44,16 @@ static  int mutexIsInit = 0;
 ///</summary>
 static int sqlite3MutexInit(){ 
   int rc = SQLITE_OK;
-  if( null==sqlite3GlobalConfig.mutex.xMutexAlloc ){
+  if( null==Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexAlloc ){
     /* If the xMutexAlloc method has not been set, then the user did not
     ** install a mutex implementation via sqlite3_config() prior to 
     ** sqlite3_initialize() being called. This block copies pointers to
-    ** the default implementation into the sqlite3GlobalConfig structure.
+    ** the default implementation into the Sqlite3.sqliteinth.sqlite3GlobalConfig structure.
     */
     sqlite3_mutex_methods pFrom;
-    sqlite3_mutex_methods pTo = sqlite3GlobalConfig.mutex;
+    sqlite3_mutex_methods pTo = Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex;
 
-    if( sqlite3GlobalConfig.bCoreMutex ){
+    if( Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex ){
       pFrom = sqlite3DefaultMutex();
     }else{
       pFrom = sqlite3NoopMutex();
@@ -63,7 +63,7 @@ static int sqlite3MutexInit(){
     //       sizeof(*pTo) - offsetof(sqlite3_mutex_methods, xMutexFree));
     pTo.Copy(pFrom);
   }
-  rc = sqlite3GlobalConfig.mutex.xMutexInit();
+  rc = Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexInit();
 
 #if SQLITE_DEBUG
 																			  mutexIsInit = 1; //GLOBAL(int, mutexIsInit) = 1;
@@ -78,8 +78,8 @@ static int sqlite3MutexInit(){
 ///</summary>
 static int sqlite3MutexEnd(){
   int rc = SQLITE_OK;
-  if( sqlite3GlobalConfig.mutex.xMutexEnd !=null){
-    rc = sqlite3GlobalConfig.mutex.xMutexEnd();
+  if( Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexEnd !=null){
+    rc = Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexEnd();
   }
 
 #if SQLITE_DEBUG
@@ -96,15 +96,15 @@ static sqlite3_mutex sqlite3_mutex_alloc(int id){
 #if !SQLITE_OMIT_AUTOINIT
 																			  if( sqlite3_initialize()!=0 ) return null;
 #endif
-																			  return sqlite3GlobalConfig.mutex.xMutexAlloc(id);
+																			  return Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexAlloc(id);
 }
 
 static sqlite3_mutex sqlite3MutexAlloc(int id){
-  if( !sqlite3GlobalConfig.bCoreMutex ){
+  if( !Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex ){
     return null;
   }
   Debug.Assert( mutexIsInit !=0 );//assert( GLOBAL(int, mutexIsInit) );
-  return sqlite3GlobalConfig.mutex.xMutexAlloc(id);
+  return Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexAlloc(id);
 }
 
 ///<summary>
@@ -112,7 +112,7 @@ static sqlite3_mutex sqlite3MutexAlloc(int id){
 ///</summary>
 static void sqlite3_mutex_free( sqlite3_mutex p){
   if( p!=null ){
-    sqlite3GlobalConfig.mutex.xMutexFree( p);
+    Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexFree( p);
   }
 }
 
@@ -122,7 +122,7 @@ static void sqlite3_mutex_free( sqlite3_mutex p){
 ///</summary>
 static void sqlite3_mutex_enter(sqlite3_mutex p){
   if( p !=null){
-    sqlite3GlobalConfig.mutex.xMutexEnter(p);
+    Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexEnter(p);
   }
 }
 
@@ -133,7 +133,7 @@ static void sqlite3_mutex_enter(sqlite3_mutex p){
 static int sqlite3_mutex_try(sqlite3_mutex p){
   int rc = SQLITE_OK;
   if( p!=null ){
-    return sqlite3GlobalConfig.mutex.xMutexTry(p);
+    return Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexTry(p);
   }
   return rc;
 }
@@ -146,21 +146,21 @@ static int sqlite3_mutex_try(sqlite3_mutex p){
 ///</summary>
 static void sqlite3_mutex_leave(sqlite3_mutex p){
   if( p !=null){
-    sqlite3GlobalConfig.mutex.xMutexLeave(p);
+    Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexLeave(p);
   }
 }
 
 #if !NDEBUG
 																			///<summary>
-/// The sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
+/// The Sqlite3.sqlite3_mutex_held() and sqlite3_mutex_notheld() routine are
 /// intended for use inside assert() statements.
 ///</summary>
-static bool sqlite3_mutex_held(sqlite3_mutex p){
-  return p==null || sqlite3GlobalConfig.mutex.xMutexHeld(p);
+static bool Sqlite3.sqlite3_mutex_held(sqlite3_mutex p){
+  return p==null || Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexHeld(p);
 }
 
     static bool sqlite3_mutex_notheld(sqlite3_mutex p){
-  return p == null || sqlite3GlobalConfig.mutex.xMutexNotheld( p );
+  return p == null || Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexNotheld( p );
 }
 #endif
 																			

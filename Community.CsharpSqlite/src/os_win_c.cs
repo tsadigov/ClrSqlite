@@ -751,8 +751,8 @@ DWORD nNumberOfBytesToLockHigh
 winFile *pFile = HANDLE_TO_WINFILE(phFile);
 BOOL bReturn = FALSE;
 
-UNUSED_PARAMETER(dwFileOffsetHigh);
-UNUSED_PARAMETER(nNumberOfBytesToLockHigh);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(dwFileOffsetHigh);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(nNumberOfBytesToLockHigh);
 
 if (!pFile.hMutex) return TRUE;
 winceMutexAcquire(pFile.hMutex);
@@ -815,8 +815,8 @@ DWORD nNumberOfBytesToUnlockHigh
 winFile *pFile = HANDLE_TO_WINFILE(phFile);
 BOOL bReturn = FALSE;
 
-UNUSED_PARAMETER(dwFileOffsetHigh);
-UNUSED_PARAMETER(nNumberOfBytesToUnlockHigh);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(dwFileOffsetHigh);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(nNumberOfBytesToUnlockHigh);
 
 if (!pFile.hMutex) return TRUE;
 winceMutexAcquire(pFile.hMutex);
@@ -875,8 +875,8 @@ DWORD nNumberOfBytesToLockLow,
 DWORD nNumberOfBytesToLockHigh,
 LPOVERLAPPED lpOverlapped
 ){
-UNUSED_PARAMETER(dwReserved);
-UNUSED_PARAMETER(nNumberOfBytesToLockHigh);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(dwReserved);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(nNumberOfBytesToLockHigh);
 
 /* If the caller wants a shared read lock, forward this call
 ** to winceLockFile */
@@ -1267,7 +1267,7 @@ free(pFile.zDeleteOnClose);
 			sqlite3_file pFile = (sqlite3_file)id;
 			bool rc;
 			#else
-																																																									UNUSED_PARAMETER(id);
+																																																									Sqlite3.sqliteinth.UNUSED_PARAMETER(id);
 #endif
 			Debug.Assert (pFile != null);
 			///
@@ -1289,7 +1289,7 @@ free(pFile.zDeleteOnClose);
         return SQLITE_FULL;
 #endif
 			#if !SQLITE_TEST
-			UNUSED_PARAMETER (flags);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (flags);
 			#else
 																																																									      if ( (flags&0x0F)==SQLITE_SYNC_FULL )
       {
@@ -1840,7 +1840,7 @@ free(pFile.zDeleteOnClose);
 
 		static int winDeviceCharacteristics (sqlite3_file id)
 		{
-			UNUSED_PARAMETER (id);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (id);
 			return 0;
 		}
 
@@ -1877,7 +1877,7 @@ static void winShmLeaveMutex(void){
 }
 #if SQLITE_DEBUG
 																																						static int winShmMutexHeld(void) {
-  return sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER));
+  return Sqlite3.sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER));
 }
 #endif
 																																						
@@ -1981,7 +1981,7 @@ static int winShmSystemLock(
   int rc = 0;           /* Result code form Lock/UnlockFileEx() */
 
   /* Access to the winShmNode object is serialized by the caller */
-  Debug.Assert( sqlite3_mutex_held(pFile->mutex) || pFile->nRef==0 );
+  Debug.Assert( Sqlite3.sqlite3_mutex_held(pFile->mutex) || pFile->nRef==0 );
 
   /* Initialize the locking parameters */
   dwFlags = LOCKFILE_FAIL_IMMEDIATELY;
@@ -2128,7 +2128,7 @@ static int winOpenSharedMemory(winFile *pDbFd){
                  SQLITE_OPEN_WAL | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, /* Mode flags */
                  0);
     if( SQLITE_OK!=rc ){
-      rc = SQLITE_CANTOPEN_BKPT;
+      rc =  sqliteinth.SQLITE_CANTOPEN_BKPT;
       goto shm_open_err;
     }
 
@@ -2337,7 +2337,7 @@ static int winShmLock(
 static void winShmBarrier(
   sqlite3_file *fd          /* Database holding the shared memory */
 ){
-  UNUSED_PARAMETER(fd);
+  Sqlite3.sqliteinth.UNUSED_PARAMETER(fd);
   /* MemoryBarrier(); // does not work -- do not know why not */
   winShmEnterMutex();
   winShmLeaveMutex();
@@ -2924,7 +2924,7 @@ shmpage_out:
 
 			Debug.Assert (eType == SQLITE_OPEN_MAIN_DB || eType == SQLITE_OPEN_TEMP_DB || eType == SQLITE_OPEN_MAIN_JOURNAL || eType == SQLITE_OPEN_TEMP_JOURNAL || eType == SQLITE_OPEN_SUBJOURNAL || eType == SQLITE_OPEN_MASTER_JOURNAL || eType == SQLITE_OPEN_TRANSIENT_DB || eType == SQLITE_OPEN_WAL);
 			Debug.Assert (pFile != null);
-			UNUSED_PARAMETER (pVfs);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (pVfs);
 			pFile.fs = null;
 			//.h = INVALID_HANDLE_VALUE;
 			///
@@ -3104,7 +3104,7 @@ isTemp = 1;
 					return winOpen (pVfs, zName, pFile, ((flags | SQLITE_OPEN_READONLY) & ~(SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE)), out pOutFlags);
 				}
 				else {
-					return SQLITE_CANTOPEN_BKPT ();
+                    return sqliteinth.SQLITE_CANTOPEN_BKPT();
 				}
 			}
 			//if ( pOutFlags )
@@ -3131,7 +3131,7 @@ isTemp = 1;
 ){
 CloseHandle(h);
 free(zConverted);
-return SQLITE_CANTOPEN_BKPT;
+return  sqliteinth.SQLITE_CANTOPEN_BKPT;
 }
 if( isTemp ){
 pFile.zDeleteOnClose = zConverted;
@@ -3184,8 +3184,8 @@ pFile.zDeleteOnClose = zConverted;
 			int rc;
 			int error;
 			string zConverted;
-			UNUSED_PARAMETER (pVfs);
-			UNUSED_PARAMETER (syncDir);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (pVfs);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (syncDir);
 			#if SQLITE_TEST
 																																																									      if ( SimulateIOError() )
         return SQLITE_IOERR_DELETE;
@@ -3308,7 +3308,7 @@ pFile.zDeleteOnClose = zConverted;
 			// DWORD attr;
 			int rc = 0;
 			//  void *zConverted;
-			UNUSED_PARAMETER (pVfs);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (pVfs);
 			#if SQLITE_TEST
 																																																									      if ( SimulateIOError() )
       {
@@ -3450,13 +3450,13 @@ pFile.zDeleteOnClose = zConverted;
 		{
 			#if __CYGWIN__
 																																																									SimulateIOError( return SQLITE_ERROR );
-UNUSED_PARAMETER(nFull);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(nFull);
 cygwin_conv_to_full_win32_path(zRelative, zFull);
 return SQLITE_OK;
 #endif
 			#if SQLITE_OS_WINCE
 																																																									SimulateIOError( return SQLITE_ERROR );
-UNUSED_PARAMETER(nFull);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(nFull);
 /* WinCE has no concept of a relative pathname, or so I am told. */
 sqlite3_snprintf(pVfs.mxPathname, zFull, "%s", zRelative);
 return SQLITE_OK;
@@ -3488,7 +3488,7 @@ return SQLITE_OK;
 																																																									      if ( SimulateIOError() )
         return SQLITE_ERROR;
 #endif
-			UNUSED_PARAMETER (nFull);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (nFull);
 			//convertUtf8Filename(zRelative));
 			if (isNT ()) {
 				//string zTemp;
@@ -3570,8 +3570,8 @@ return SQLITE_OK;
 																																																									int bytesPerSector = SQLITE_DEFAULT_SECTOR_SIZE;
 /* GetDiskFreeSpace is not supported under WINCE */
 #if SQLITE_OS_WINCE
-																																																									UNUSED_PARAMETER(pVfs);
-UNUSED_PARAMETER(zRelative);
+																																																									Sqlite3.sqliteinth.UNUSED_PARAMETER(pVfs);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(zRelative);
 #else
 																																																									StringBuilder zFullpath = new StringBuilder( MAX_PATH + 1 );
 int rc;
@@ -3669,7 +3669,7 @@ bytesPerSector = GetbytesPerSector( zConverted );
 		//static void winDlOpen(sqlite3_vfs pVfs, string zFilename){
 		//  HANDLE h;
 		//  void *zConverted = convertUtf8Filename(zFilename);
-		//  UNUSED_PARAMETER(pVfs);
+		//  Sqlite3.sqliteinth.UNUSED_PARAMETER(pVfs);
 		//  if( zConverted==0 ){
 		//    return 0;
 		//  }
@@ -3692,11 +3692,11 @@ bytesPerSector = GetbytesPerSector( zConverted );
 		//  return (void)h;
 		//}
 		//static void winDlError(sqlite3_vfs pVfs, int nBuf, string zBufOut){
-		//  UNUSED_PARAMETER(pVfs);
+		//  Sqlite3.sqliteinth.UNUSED_PARAMETER(pVfs);
 		//  getLastErrorMsg(nBuf, zBufOut);
 		//}
 		//    static object winDlSym(sqlite3_vfs pVfs, HANDLE pHandle, String zSymbol){
-		//  UNUSED_PARAMETER(pVfs);
+		//  Sqlite3.sqliteinth.UNUSED_PARAMETER(pVfs);
 		//#if SQLITE_OS_WINCE
 		//      /* The GetProcAddressA() routine is only available on wince. */
 		//      return GetProcAddressA((HANDLE)pHandle, zSymbol);
@@ -3708,7 +3708,7 @@ bytesPerSector = GetbytesPerSector( zConverted );
 		//   }
 		//    static void winDlClose( sqlite3_vfs pVfs, HANDLE pHandle )
 		//   {
-		//  UNUSED_PARAMETER(pVfs);
+		//  Sqlite3.sqliteinth.UNUSED_PARAMETER(pVfs);
 		//     FreeLibrary((HANDLE)pHandle);
 		//   }
 		//TODO -- Fix This
@@ -3760,7 +3760,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 		static int winRandomness (sqlite3_vfs pVfs, int nBuf, byte[] zBuf)
 		{
 			int n = 0;
-			UNUSED_PARAMETER (pVfs);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (pVfs);
 			#if (SQLITE_TEST)
 																																																									      n = nBuf;
       Array.Clear( zBuf, 0, n );// memset( zBuf, 0, nBuf );
@@ -3817,7 +3817,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 		static int winSleep (sqlite3_vfs pVfs, int microsec)
 		{
 			Thread.Sleep (((microsec + 999) / 1000));
-			UNUSED_PARAMETER (pVfs);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (pVfs);
 			return ((microsec + 999) / 1000) * 1000;
 		}
 
@@ -3893,7 +3893,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
       }
 #endif
 																																																									#endif
-			UNUSED_PARAMETER (pVfs);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (pVfs);
 			return 0;
 		}
 
@@ -3951,7 +3951,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 
 		static int winGetLastError (sqlite3_vfs pVfs, int nBuf, ref string zBuf)
 		{
-			UNUSED_PARAMETER (pVfs);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (pVfs);
 			return getLastErrorMsg (nBuf, ref zBuf);
 		}
 

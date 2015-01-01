@@ -381,7 +381,7 @@ namespace Community.CsharpSqlite {
 				///<summary>
 				///Copy Btree meta values 
 				///</summary>
-				for(i=0;i<ArraySize(aCopy);i+=2) {
+				for(i=0;i<Sqlite3.ArraySize(aCopy);i+=2) {
 					///
 					///<summary>
 					///GetMeta() and UpdateMeta() cannot fail in this context because

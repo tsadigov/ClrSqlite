@@ -739,7 +739,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			public int saveAllCursors (Pgno iRoot, BtCursor pExcept)
 			{
 				BtCursor p;
-				Debug.Assert (sqlite3_mutex_held (this.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
 				Debug.Assert (pExcept == null || pExcept.pBt == this);
 				for (p = this.pCursor; p != null; p = p.pNext) {
 					if (p != pExcept && (0 == iRoot || p.pgnoRoot == iRoot) && p.eState == CURSOR_VALID) {
@@ -756,7 +756,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			{
 				int nPagesPerMapPage;
 				Pgno iPtrMap, ret;
-				Debug.Assert (sqlite3_mutex_held (this.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
 				if (pgno < 2)
 					return 0;
 				nPagesPerMapPage = (int)(this.usableSize / 5 + 1);
@@ -802,7 +802,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 
 				if (pRC != 0)
 					return;
-				Debug.Assert (sqlite3_mutex_held (this.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
 				///
 ///<summary>
 ///</summary>
@@ -811,7 +811,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				Debug.Assert (false == PTRMAP_ISPAGE (this, PENDING_BYTE_PAGE (this)));
 				Debug.Assert (this.autoVacuum);
 				if (key == 0) {
-					pRC = SQLITE_CORRUPT_BKPT ();
+					pRC = sqliteinth.SQLITE_CORRUPT_BKPT();
 					return;
 				}
 				iPtrmap = PTRMAP_PAGENO (this, key);
@@ -822,7 +822,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				}
 				offset = (int)PTRMAP_PTROFFSET (iPtrmap, key);
 				if (offset < 0) {
-					pRC = SQLITE_CORRUPT_BKPT ();
+					pRC = sqliteinth.SQLITE_CORRUPT_BKPT();
 					goto ptrmap_exit;
 				}
 				Debug.Assert (offset <= (int)this.usableSize - 5);
@@ -866,7 +866,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 ///</summary>
 
 				int rc;
-				Debug.Assert (sqlite3_mutex_held (this.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
 				iPtrmap = (int)PTRMAP_PAGENO (this, key);
 				rc = this.pPager.sqlite3PagerGet ((u32)iPtrmap, ref pDbPage);
 				if (rc != 0) {
@@ -876,7 +876,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				offset = (int)PTRMAP_PTROFFSET ((u32)iPtrmap, key);
 				if (offset < 0) {
 					PagerMethods.sqlite3PagerUnref (pDbPage);
-					return SQLITE_CORRUPT_BKPT ();
+					return sqliteinth.SQLITE_CORRUPT_BKPT();
 				}
 				Debug.Assert (offset <= (int)this.usableSize - 5);
 				// Under C# pEType will always exist. No need to test; //
@@ -887,7 +887,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				pPgno = Converter.sqlite3Get4byte (pPtrmap, offset + 1);
 				PagerMethods.sqlite3PagerUnref (pDbPage);
 				if (pEType < 1 || pEType > 5)
-					return SQLITE_CORRUPT_BKPT ();
+					return sqliteinth.SQLITE_CORRUPT_BKPT();
 				return SQLITE_OK;
 			}
 
@@ -915,7 +915,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			{
 				int rc;
 				DbPage pDbPage = null;
-				Debug.Assert (sqlite3_mutex_held (this.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
 				rc = this.pPager.sqlite3PagerAcquire (pgno, ref pDbPage, (u8)noContent);
 				if (rc != 0)
 					return rc;
@@ -926,7 +926,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			public MemPage btreePageLookup (Pgno pgno)
 			{
 				DbPage pDbPage;
-				Debug.Assert (sqlite3_mutex_held (this.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
 				pDbPage = this.pPager.sqlite3PagerLookup (pgno);
 				if (pDbPage) {
 					return pDbPage.btreePageFromDbPage (pgno, this);

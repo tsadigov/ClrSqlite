@@ -23,8 +23,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
 
 
 
@@ -55,7 +53,7 @@ namespace Community.CsharpSqlite
             ///Trigger this program was coded from 
             ///</summary>
 
-            public int orconf;
+            public OnConstraintError orconf;
 
             ///
             ///<summary>
@@ -93,12 +91,15 @@ namespace Community.CsharpSqlite
         /// In that cases, the constants below can be ORed together.
         ///
         ///</summary>
-        private const u8 TRIGGER_BEFORE = 1;
+        public enum TriggerType : byte
+        {
+            TRIGGER_BEFORE = 1,
 
-        //#define TRIGGER_BEFORE  1
-        private const u8 TRIGGER_AFTER = 2;
+            //#define TriggerType.TRIGGER_BEFORE  1
+            TRIGGER_AFTER = 2
+        }
 
-        //#define TRIGGER_AFTER   2
+        //#define TriggerType.TRIGGER_AFTER   2
         ///
         ///<summary>
         ///An instance of struct TriggerStep is used to store a single SQL statement
@@ -114,7 +115,7 @@ namespace Community.CsharpSqlite
         ///<param name=""SELECT" statement. The meanings of the other members is determined by the">"SELECT" statement. The meanings of the other members is determined by the</param>
         ///<param name="value of "op" as follows:">value of "op" as follows:</param>
         ///<param name=""></param>
-        ///<param name="(op == TK_INSERT)">(op == TK_INSERT)</param>
+        ///<param name="(op == Sqlite3.TK_INSERT)">(op == Sqlite3.TK_INSERT)</param>
         ///<param name="orconf    ">> stores the ON CONFLICT algorithm</param>
         ///<param name="pSelect   ">> If this is an INSERT INTO ... SELECT ... statement, then</param>
         ///<param name="this stores a pointer to the SELECT statement. Otherwise NULL.">this stores a pointer to the SELECT statement. Otherwise NULL.</param>
@@ -125,12 +126,12 @@ namespace Community.CsharpSqlite
         ///<param name="statement, then this stores the column">names to be</param>
         ///<param name="inserted into.">inserted into.</param>
         ///<param name=""></param>
-        ///<param name="(op == TK_DELETE)">(op == TK_DELETE)</param>
+        ///<param name="(op == Sqlite3.TK_DELETE)">(op == Sqlite3.TK_DELETE)</param>
         ///<param name="target    ">> A token holding the quoted name of the table to delete from.</param>
         ///<param name="pWhere    ">> The WHERE clause of the DELETE statement if one is specified.</param>
         ///<param name="Otherwise NULL.">Otherwise NULL.</param>
         ///<param name=""></param>
-        ///<param name="(op == TK_UPDATE)">(op == TK_UPDATE)</param>
+        ///<param name="(op == Sqlite3.TK_UPDATE)">(op == Sqlite3.TK_UPDATE)</param>
         ///<param name="target    ">> A token holding the quoted name of the table to update rows of.</param>
         ///<param name="pWhere    ">> The WHERE clause of the UPDATE statement if one is specified.</param>
         ///<param name="Otherwise NULL.">Otherwise NULL.</param>
@@ -146,10 +147,10 @@ namespace Community.CsharpSqlite
 
             ///
             ///<summary>
-            ///One of TK_DELETE, TK_UPDATE, TK_INSERT, TK_SELECT 
+            ///One of Sqlite3.TK_DELETE, Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT, Sqlite3.TK_SELECT 
             ///</summary>
 
-            public u8 orconf;
+            public OnConstraintError orconf;
 
             ///
             ///<summary>
@@ -266,14 +267,14 @@ namespace Community.CsharpSqlite
 
             ///
             ///<summary>
-            ///One of TK_DELETE, TK_UPDATE, TK_INSERT         
+            ///One of Sqlite3.TK_DELETE, Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT         
             ///</summary>
 
-            public u8 tr_tm;
+            public TriggerType tr_tm;
 
             ///
             ///<summary>
-            ///One of TRIGGER_BEFORE, TRIGGER_AFTER 
+            ///One of TriggerType.TRIGGER_BEFORE, TriggerType.TRIGGER_AFTER 
             ///</summary>
 
             public Expr pWhen;
@@ -344,5 +345,4 @@ namespace Community.CsharpSqlite
 
 
 
-    }
 }

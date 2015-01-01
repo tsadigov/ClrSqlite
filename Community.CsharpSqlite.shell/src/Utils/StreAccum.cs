@@ -105,8 +105,8 @@ namespace Community.CsharpSqlite
                 Debug.Assert(z != null || N == 0);
                 if (p.tooBig)//|| p.mallocFailed != 0 )
                 {
-                    testcase(p.tooBig);
-                    //testcase( p.mallocFailed );
+                    sqliteinth.testcase(p.tooBig);
+                    //sqliteinth.testcase( p.mallocFailed );
                     return;
                 }
                 if (N < 0)

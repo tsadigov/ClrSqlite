@@ -644,7 +644,7 @@ namespace Community.CsharpSqlite
             /// is available.  This routine returns 0 on success and
             /// non-zero on any kind of error.
             ///
-            /// If the sqlite3GlobalConfig.bLocaltimeFault variable is true then this
+            /// If the Sqlite3.sqliteinth.sqlite3GlobalConfig.bLocaltimeFault variable is true then this
             /// routine will always fail.
             ///
             ///</summary>
@@ -657,7 +657,7 @@ namespace Community.CsharpSqlite
                 sqlite3_mutex_enter(mutex);
                 pX = _Custom.localtime(t);
 #if !SQLITE_OMIT_BUILTIN_TEST
-                if (sqlite3GlobalConfig.bLocaltimeFault)
+                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bLocaltimeFault)
                     pX = null;
 #endif
                 if (pX != null)
@@ -666,7 +666,7 @@ namespace Community.CsharpSqlite
                 rc = pX == null ? 1 : 0;
 #else
 #if !SQLITE_OMIT_BUILTIN_TEST
-																																																									  if( sqlite3GlobalConfig.bLocaltimeFault ) return 1;
+																																																									  if( Sqlite3.sqliteinth.sqlite3GlobalConfig.bLocaltimeFault ) return 1;
 #endif
 #if (HAVE_LOCALTIME_R) && HAVE_LOCALTIME_R
 																																																									  rc = localtime_r(t, pTm)==0;
@@ -794,7 +794,7 @@ namespace Community.CsharpSqlite
                 StringBuilder z = new StringBuilder(zMod.ToLower());
                 zdtBuf.Length = 0;
                 //z = zdtBuf;
-                //for(n=0; n<ArraySize(zdtBuf)-1 && zMod[n]; n++){
+                //for(n=0; n<Sqlite3.ArraySize(zdtBuf)-1 && zMod[n]; n++){
                 //  z.Append( zMod.Substring( n ).ToLower() );
                 //}
                 //z[n] = 0;
@@ -1269,10 +1269,10 @@ namespace Community.CsharpSqlite
                             i++;
                         }
                     }
-                    testcase(n == (u64)(zdtBuf.Length - 1));
-                    testcase(n == (u64)zdtBuf.Length);
-                    testcase(n == (u64)db.aLimit[SQLITE_LIMIT_LENGTH] + 1);
-                    testcase(n == (u64)db.aLimit[SQLITE_LIMIT_LENGTH]);
+                    sqliteinth.testcase(n == (u64)(zdtBuf.Length - 1));
+                    sqliteinth.testcase(n == (u64)zdtBuf.Length);
+                    sqliteinth.testcase(n == (u64)db.aLimit[SQLITE_LIMIT_LENGTH] + 1);
+                    sqliteinth.testcase(n == (u64)db.aLimit[SQLITE_LIMIT_LENGTH]);
                     if (n < (u64)zdtBuf.Capacity)
                     {
                         z = zdtBuf;
@@ -1417,7 +1417,7 @@ namespace Community.CsharpSqlite
                         }
                     }
                     //z[j] = 0;
-                    context.sqlite3_result_text(z, -1, z == zdtBuf ? SQLITE_TRANSIENT : SQLITE_DYNAMIC);
+                    context.sqlite3_result_text(z, -1, z == zdtBuf ? SQLITE_TRANSIENT : sqliteinth.SQLITE_DYNAMIC);
                 }
             }
 
@@ -1432,7 +1432,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void ctimeFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 timeFunc(context, 0, null);
             }
 
@@ -1444,7 +1444,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void cdateFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 dateFunc(context, 0, null);
             }
 
@@ -1456,7 +1456,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void ctimestampFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 datetimeFunc(context, 0, null);
             }
 
@@ -1488,8 +1488,8 @@ string zFormat = (char )sqlite3_user_data(context);
 sqlite3 db;
 sqlite3_int64 rT;
 char zdtBuf[20];
-UNUSED_PARAMETER(argc);
-UNUSED_PARAMETER(argv);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(argv);
 db = vdbeapi.sqlite3_context_db_handle(context);
   sqlite3OsCurrentTimeInt64(db->pVfs, &iT);
   t = iT/1000 - 10000*(sqlite3_int64)21086676;
@@ -1523,14 +1523,14 @@ db = vdbeapi.sqlite3_context_db_handle(context);
             {
                 FuncDef[] aDateTimeFuncs = new FuncDef[] {
 				#if !SQLITE_OMIT_DATETIME_FUNCS
-				FUNCTION ("julianday", -1, 0, 0, (dxFunc)juliandayFunc),
-				FUNCTION ("date", -1, 0, 0, (dxFunc)dateFunc),
-				FUNCTION ("time", -1, 0, 0, (dxFunc)timeFunc),
-				FUNCTION ("datetime", -1, 0, 0, (dxFunc)datetimeFunc),
-				FUNCTION ("strftime", -1, 0, 0, (dxFunc)strftimeFunc),
-				FUNCTION ("current_time", 0, 0, 0, (dxFunc)ctimeFunc),
-				FUNCTION ("current_timestamp", 0, 0, 0, (dxFunc)ctimestampFunc),
-				FUNCTION ("current_date", 0, 0, 0, (dxFunc)cdateFunc),
+				FuncDef.FUNCTION ("julianday", -1, 0, 0, (dxFunc)juliandayFunc),
+				FuncDef.FUNCTION ("date", -1, 0, 0, (dxFunc)dateFunc),
+				FuncDef.FUNCTION ("time", -1, 0, 0, (dxFunc)timeFunc),
+				FuncDef.FUNCTION ("datetime", -1, 0, 0, (dxFunc)datetimeFunc),
+				FuncDef.FUNCTION ("strftime", -1, 0, 0, (dxFunc)strftimeFunc),
+				FuncDef.FUNCTION ("current_time", 0, 0, 0, (dxFunc)ctimeFunc),
+				FuncDef.FUNCTION ("current_timestamp", 0, 0, 0, (dxFunc)ctimestampFunc),
+				FuncDef.FUNCTION ("current_date", 0, 0, 0, (dxFunc)cdateFunc),
 			#else
 																																																									STR_FUNCTION("current_time",      0, "%H:%M:%S",          0, currentTimeFunc),
 STR_FUNCTION("current_date",      0, "%Y-%m-%d",          0, currentTimeFunc),
@@ -1545,7 +1545,7 @@ FuncDef[] aFunc = (FuncDef)GLOBAL( FuncDef, aDateTimeFuncs );
                 FuncDefHash pHash = sqlite3GlobalFunctions;
                 FuncDef[] aFunc = aDateTimeFuncs;
 #endif
-                for (i = 0; i < ArraySize(aDateTimeFuncs); i++)
+                for (i = 0; i < Sqlite3.ArraySize(aDateTimeFuncs); i++)
                 {
                     sqlite3FuncDefInsert(pHash, aFunc[i]);
                 }

@@ -1089,7 +1089,7 @@ aOverflow= null;
             {
                 int rc;
                 Debug.Assert(this.cursorHoldsMutex());
-                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(this.pBtree.db.mutex));
                 // Not needed in C# // Debug.Assert( pRes != 0 );
                 Debug.Assert((pIdxKey == null) == (this.pKeyInfo == null));
                 ///
@@ -1325,7 +1325,7 @@ aOverflow= null;
             {
                 int rc;
                 Debug.Assert(this.cursorHoldsMutex());
-                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(this.pBtree.db.mutex));
                 ///
                 ///<summary>
                 ///</summary>
@@ -1367,7 +1367,7 @@ aOverflow= null;
             {
                 int rc;
                 Debug.Assert(this.cursorHoldsMutex());
-                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(this.pBtree.db.mutex));
                 rc = this.moveToRoot();
                 if (rc == SQLITE_OK)
                 {
@@ -1468,7 +1468,7 @@ aOverflow= null;
                     Debug.Assert(this.apPage[0].intKey == 1 || this.apPage[0].intKey == 0);
                     if ((this.pKeyInfo == null) != (this.apPage[0].intKey != 0))
                     {
-                        return SQLITE_CORRUPT_BKPT();
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
                 }
                 ///
@@ -1491,7 +1491,7 @@ aOverflow= null;
                 {
                     Pgno subpage;
                     if (pRoot.pgno != 1)
-                        return SQLITE_CORRUPT_BKPT();
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
                     subpage = Converter.sqlite3Get4byte(pRoot.aData, pRoot.hdrOffset + 8);
                     this.State = BtCursorState.CURSOR_VALID;
                     rc = this.moveToChild(subpage);
@@ -1525,7 +1525,7 @@ aOverflow= null;
                 Debug.Assert(this.iPage < BTCURSOR_MAX_DEPTH);
                 if (this.iPage >= (BTCURSOR_MAX_DEPTH - 1))
                 {
-                    return SQLITE_CORRUPT_BKPT();
+                    return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
                 rc = BTreeMethods.getAndInitPage(pBt, newPgno, ref pNewPage);
                 if (rc != 0)
@@ -1537,16 +1537,16 @@ aOverflow= null;
                 this.validNKey = false;
                 if (pNewPage.nCell < 1 || pNewPage.intKey != this.apPage[i].intKey)
                 {
-                    return SQLITE_CORRUPT_BKPT();
+                    return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
                 return SQLITE_OK;
             }
             public byte[] DataFetch(ref int pAmt, ref int outOffset)
             {
                 byte[] p = null;
-                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(this.pBtree.db.mutex));
                 Debug.Assert(this.cursorHoldsMutex());
-                if (ALWAYS(this.State == BtCursorState.CURSOR_VALID))
+                if (Sqlite3.ALWAYS(this.State == BtCursorState.CURSOR_VALID))
                 {
                     p = this.fetchPayload(ref pAmt, ref outOffset, true);
                 }
@@ -1555,9 +1555,9 @@ aOverflow= null;
             public byte[] KeyFetch(ref int pAmt, ref int outOffset)
             {
                 byte[] p = null;
-                Debug.Assert(sqlite3_mutex_held(this.pBtree.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(this.pBtree.db.mutex));
                 Debug.Assert(this.cursorHoldsMutex());
-                if (ALWAYS(this.State == BtCursorState.CURSOR_VALID))
+                if (Sqlite3.ALWAYS(this.State == BtCursorState.CURSOR_VALID))
                 {
                     p = this.fetchPayload(ref pAmt, ref outOffset, false);
                 }
@@ -1702,7 +1702,7 @@ return SQLITE_ABORT;
                     ///<summary>
                     ///Trying to read or write past the end of the data is an error 
                     ///</summary>
-                    return SQLITE_CORRUPT_BKPT();
+                    return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
                 ///
                 ///<summary>
@@ -1747,7 +1747,7 @@ int nOvfl = (pCur.info.nPayload-pCur.info.nLocal+ovflSize-1)/ovflSize;
 pCur.aOverflow = (Pgno *)sqlite3MallocZero(sizeof(Pgno)*nOvfl);
 /* nOvfl is always positive.  If it were zero, fetchPayload would have
 ** been used instead of this routine. */
-if( ALWAYS(nOvfl) && !pCur.aOverflow ){
+if( Sqlite3.ALWAYS(nOvfl) && !pCur.aOverflow ){
 rc = SQLITE_NOMEM;
 }
 }
@@ -1822,7 +1822,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                 }
                 if (rc == SQLITE_OK && amt > 0)
                 {
-                    return SQLITE_CORRUPT_BKPT();
+                    return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
                 return rc;
             }

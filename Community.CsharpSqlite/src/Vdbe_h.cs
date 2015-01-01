@@ -4,138 +4,146 @@ using u64 = System.UInt64;
 
 namespace Community.CsharpSqlite
 {
-	public partial class Sqlite3
-	{
 
-	
-		const int P4_NOTUSED = 0;
+    public enum P4Usage
+    {
+         P4_NOTUSED = 0,
+
+        ///
+        ///<summary>
+        ///The P4 parameter is not used 
+        ///</summary>
+
+         P4_DYNAMIC = (-1),
+
+        ///
+        ///<summary>
+        ///Poer to a string obtained from sqliteMalloc=(), 
+        ///</summary>
+
+         P4_STATIC = (-2),
+
+        ///
+        ///<summary>
+        ///Poer to a static string 
+        ///</summary>
+
+         P4_COLLSEQ = (-4),
+
+        ///
+        ///<summary>
+        ///P4 is a poer to a CollSeq structure 
+        ///</summary>
+
+         P4_FUNCDEF = (-5),
+
+        ///
+        ///<summary>
+        ///P4 is a poer to a FuncDef structure 
+        ///</summary>
+
+         P4_KEYINFO = (-6),
+
+        ///
+        ///<summary>
+        ///P4 is a poer to a KeyInfo structure 
+        ///</summary>
+
+         P4_VDBEFUNC = (-7),
+
+        ///
+        ///<summary>
+        ///P4 is a poer to a VdbeFunc structure 
+        ///</summary>
+
+         P4_MEM = (-8),
+
+        ///
+        ///<summary>
+        ///P4 is a poer to a Mem*    structure 
+        ///</summary>
+
+         P4_TRANSIENT = 0,
+
+        ///
+        ///<summary>
+        ///P4 is a poer to a transient string 
+        ///</summary>
+
+         P4_VTAB = (-10),
+
+        ///
+        ///<summary>
+        ///P4 is a poer to an sqlite3_vtab structure 
+        ///</summary>
+
+         P4_MPRINTF = (-11),
+
+        ///
+        ///<summary>
+        ///P4 is a string obtained from io.sqlite3_mprf=(), 
+        ///</summary>
+
+         P4_REAL = (-12),
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="P4 is a 64">bit floating po value </param>
+
+         P4_INT64 = (-13),
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="P4 is a 64">bit signed eger </param>
+
+         P4_INT32 = (-14),
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="P4 is a 32">bit signed eger </param>
+
+         P4_INTARRAY = (-15),
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="#define  P4_INTARRAY (">bit egers </param>
+
+         P4_SUBPROGRAM = (-18),
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="#define  P4_SUBPROGRAM  (">18) /* P4 is a poer to a SubProgram structure </param>
+        ///
+
+        
 
 		///
 ///<summary>
-///The P4 parameter is not used 
-///</summary>
-
-		public const int P4_DYNAMIC = (-1);
-
-		///
-///<summary>
-///Pointer to a string obtained from sqliteMalloc=(); 
-///</summary>
-
-		const int P4_STATIC = (-2);
-
-		///
-///<summary>
-///Pointer to a static string 
-///</summary>
-
-		const int P4_COLLSEQ = (-4);
-
-		///
-///<summary>
-///P4 is a pointer to a CollSeq structure 
-///</summary>
-
-		const int P4_FUNCDEF = (-5);
-
-		///
-///<summary>
-///P4 is a pointer to a FuncDef structure 
-///</summary>
-
-		const int P4_KEYINFO = (-6);
-
-		///
-///<summary>
-///P4 is a pointer to a KeyInfo structure 
-///</summary>
-
-		const int P4_VDBEFUNC = (-7);
-
-		///
-///<summary>
-///P4 is a pointer to a VdbeFunc structure 
-///</summary>
-
-		const int P4_MEM = (-8);
-
-		///
-///<summary>
-///P4 is a pointer to a Mem*    structure 
-///</summary>
-
-		const int P4_TRANSIENT = 0;
-
-		///
-///<summary>
-///P4 is a pointer to a transient string 
-///</summary>
-
-		const int P4_VTAB = (-10);
-
-		///
-///<summary>
-///P4 is a pointer to an sqlite3_vtab structure 
-///</summary>
-
-		const int P4_MPRINTF = (-11);
-
-		///
-///<summary>
-///P4 is a string obtained from io.sqlite3_mprintf=(); 
-///</summary>
-
-		const int P4_REAL = (-12);
-
-		///
-///<summary>
-///</summary>
-///<param name="P4 is a 64">bit floating point value </param>
-
-		const int P4_INT64 = (-13);
-
-		///
-///<summary>
-///</summary>
-///<param name="P4 is a 64">bit signed integer </param>
-
-		const int P4_INT32 = (-14);
-
-		///
-///<summary>
-///</summary>
-///<param name="P4 is a 32">bit signed integer </param>
-
-		const int P4_INTARRAY = (-15);
-
-		///
-///<summary>
-///</summary>
-///<param name="#define P4_INTARRAY (">bit integers </param>
-
-		const int P4_SUBPROGRAM = (-18);
-
-		///
-///<summary>
-///</summary>
-///<param name="#define P4_SUBPROGRAM  (">18) /* P4 is a pointer to a SubProgram structure </param>
-
-		///
-///<summary>
-///When adding a P4 argument using P4_KEYINFO, a copy of the KeyInfo structure
+///When adding a P4 argument using  P4_KEYINFO, a copy of the KeyInfo structure
 ///is made.  That copy is freed when the Vdbe is finalized.  But if the
-///argument is P4_KEYINFO_HANDOFF, the passed in pointer is used.  It still
+///argument is  P4_KEYINFO_HANDOFF, the passed in pointer is used.  It still
 ///gets freed when the Vdbe is finalized so it still should be obtained
 ///from a single sqliteMalloc().  But no copy is made and the calling
 ///function should *not* try to free the KeyInfo.
 ///</summary>
 
-		const int P4_KEYINFO_HANDOFF = (-16);
+		 P4_KEYINFO_HANDOFF = (-16),
 
-		// #define P4_KEYINFO_HANDOFF (-16)
-		const int P4_KEYINFO_STATIC = (-17);
+		// #define  P4_KEYINFO_HANDOFF (-16)
+		 P4_KEYINFO_STATIC = (-17)
 
-		// #define P4_KEYINFO_STATIC  (-17)
+    }
+		
+
+	public partial class Sqlite3
+	{
+
+		// #define  P4Usage.P4_KEYINFO_STATIC  (-17)
 		///
 ///<summary>
 ///The Vdbe.aColName array contains 5n Mem structures, where n is the
@@ -157,15 +165,15 @@ namespace Community.CsharpSqlite
 		//#   define COLNAME_N      2      /* Store the name and decltype */
 		//# endif
 		//#endif
-		const int COLNAME_NAME = 0;
+        public const int COLNAME_NAME = 0;
 
-		const int COLNAME_DECLTYPE = 1;
+        public const int COLNAME_DECLTYPE = 1;
 
-		const int COLNAME_DATABASE = 2;
+        public const int COLNAME_DATABASE = 2;
 
-		const int COLNAME_TABLE = 3;
+        public const int COLNAME_TABLE = 3;
 
-		const int COLNAME_COLUMN = 4;
+        public const int COLNAME_COLUMN = 4;
 
 		#if SQLITE_ENABLE_COLUMN_METADATA
 																																						const int COLNAME_N = 5;     /* Number of COLNAME_xxx symbols */
@@ -260,27 +268,6 @@ namespace Community.CsharpSqlite
 		//#if !SQLITE_OMIT_TRIGGER
 		//void sqlite3VdbeLinkSubProgram(Vdbe *, SubProgram );
 		//#endif
-		#if !NDEBUG
-																																						    //void sqlite3VdbeComment(Vdbe*, const char*, ...);
-    static void VdbeComment( Vdbe v, string zFormat, params object[] ap )
-    {
-      sqlite3VdbeComment( v, zFormat, ap );
-    }// define VdbeComment(X)  sqlite3VdbeComment X
-    //void sqlite3VdbeNoopComment(Vdbe*, const char*, ...);
-    static void VdbeNoopComment( Vdbe v, string zFormat, params object[] ap )
-    {
-      sqlite3VdbeNoopComment( v, zFormat, ap );
-    }// define VdbeNoopComment(X)  sqlite3VdbeNoopComment X
-#else
-		//# define VdbeComment(X)
-		static void VdbeComment (Vdbe v, string zFormat, params object[] ap)
-		{
-		}
-
-		//# define VdbeNoopComment(X)
-		static void VdbeNoopComment (Vdbe v, string zFormat, params object[] ap)
-		{
-		}
-	#endif
+		
 	}
 }

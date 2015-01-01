@@ -6,163 +6,163 @@ namespace Community.CsharpSqlite
 {
     public partial class Sqlite3
     {
-        //#define TK_SEMI                            1
-        //#define TK_EXPLAIN                         2
-        //#define TK_QUERY                           3
-        //#define TK_PLAN                            4
-        //#define TK_BEGIN                           5
-        //#define TK_TRANSACTION                     6
-        //#define TK_DEFERRED                        7
-        //#define TK_IMMEDIATE                       8
-        //#define TK_EXCLUSIVE                       9
-        //#define TK_COMMIT                         10
-        //#define TK_END                            11
-        //#define TK_ROLLBACK                       12
-        //#define TK_SAVEPOINT                      13
-        //#define TK_RELEASE                        14
-        //#define TK_TO                             15
-        //#define TK_TABLE                          16
-        //#define TK_CREATE                         17
-        //#define TK_IF                             18
-        //#define TK_NOT                            19
-        //#define TK_EXISTS                         20
-        //#define TK_TEMP                           21
-        //#define TK_LP                             22
-        //#define TK_RP                             23
-        //#define TK_AS                             24
-        //#define TK_COMMA                          25
-        //#define TK_ID                             26
-        //#define TK_INDEXED                        27
-        //#define TK_ABORT                          28
-        //#define TK_ACTION                         29
-        //#define TK_AFTER                          30
-        //#define TK_ANALYZE                        31
-        //#define TK_ASC                            32
-        //#define TK_ATTACH                         33
-        //#define TK_BEFORE                         34
-        //#define TK_BY                             35
-        //#define TK_CASCADE                        36
-        //#define TK_CAST                           37
-        //#define TK_COLUMNKW                       38
-        //#define TK_CONFLICT                       39
-        //#define TK_DATABASE                       40
-        //#define TK_DESC                           41
-        //#define TK_DETACH                         42
-        //#define TK_EACH                           43
-        //#define TK_FAIL                           44
-        //#define TK_FOR                            45
-        //#define TK_IGNORE                         46
-        //#define TK_INITIALLY                      47
-        //#define TK_INSTEAD                        48
-        //#define TK_LIKE_KW                        49
-        //#define TK_MATCH                          50
-        //#define TK_NO                             51
-        //#define TK_KEY                            52
-        //#define TK_OF                             53
-        //#define TK_OFFSET                         54
-        //#define TK_PRAGMA                         55
-        //#define TK_RAISE                          56
-        //#define TK_REPLACE                        57
-        //#define TK_RESTRICT                       58
-        //#define TK_ROW                            59
-        //#define TK_TRIGGER                        60
-        //#define TK_VACUUM                         61
-        //#define TK_VIEW                           62
-        //#define TK_VIRTUAL                        63
-        //#define TK_REINDEX                        64
-        //#define TK_RENAME                         65
-        //#define TK_CTIME_KW                       66
-        //#define TK_ANY                            67
-        //#define TK_OR                             68
-        //#define TK_AND                            69
-        //#define TK_IS                             70
-        //#define TK_BETWEEN                        71
-        //#define TK_IN                             72
-        //#define TK_ISNULL                         73
-        //#define TK_NOTNULL                        74
-        //#define TK_NE                             75
-        //#define TK_EQ                             76
-        //#define TK_GT                             77
-        //#define TK_LE                             78
-        //#define TK_LT                             79
-        //#define TK_GE                             80
-        //#define TK_ESCAPE                         81
-        //#define TK_BITAND                         82
-        //#define TK_BITOR                          83
-        //#define TK_LSHIFT                         84
-        //#define TK_RSHIFT                         85
-        //#define TK_PLUS                           86
-        //#define TK_MINUS                          87
-        //#define TK_STAR                           88
-        //#define TK_SLASH                          89
-        //#define TK_REM                            90
-        //#define TK_CONCAT                         91
-        //#define TK_COLLATE                        92
-        //#define TK_BITNOT                         93
-        //#define TK_STRING                         94
-        //#define TK_JOIN_KW                        95
-        //#define TK_CONSTRAINT                     96
-        //#define TK_DEFAULT                        97
-        //#define TK_NULL                           98
-        //#define TK_PRIMARY                        99
-        //#define TK_UNIQUE                         100
-        //#define TK_CHECK                          101
-        //#define TK_REFERENCES                     102
-        //#define TK_AUTOINCR                       103
-        //#define TK_ON                             104
-        //#define TK_INSERT                         105
-        //#define TK_DELETE                         106
-        //#define TK_UPDATE                         107
-        //#define TK_SET                            108
-        //#define TK_DEFERRABLE                     109
-        //#define TK_FOREIGN                        110
-        //#define TK_DROP                           111
-        //#define TK_UNION                          112
-        //#define TK_ALL                            113
-        //#define TK_EXCEPT                         114
-        //#define TK_INTERSECT                      115
-        //#define TK_SELECT                         116
-        //#define TK_DISTINCT                       117
-        //#define TK_DOT                            118
-        //#define TK_FROM                           119
-        //#define TK_JOIN                           120
-        //#define TK_USING                          121
-        //#define TK_ORDER                          122
-        //#define TK_GROUP                          123
-        //#define TK_HAVING                         124
-        //#define TK_LIMIT                          125
-        //#define TK_WHERE                          126
-        //#define TK_INTO                           127
-        //#define TK_VALUES                         128
-        //#define TK_INTEGER                        129
-        //#define TK_FLOAT                          130
-        //#define TK_BLOB                           131
-        //#define TK_REGISTER                       132
-        //#define TK_VARIABLE                       133
-        //#define TK_CASE                           134
-        //#define TK_WHEN                           135
-        //#define TK_THEN                           136
-        //#define TK_ELSE                           137
-        //#define TK_INDEX                          138
-        //#define TK_ALTER                          139
-        //#define TK_ADD                            140
-        //#define TK_TO_TEXT                        141
-        //#define TK_TO_BLOB                        142
-        //#define TK_TO_NUMERIC                     143
-        //#define TK_TO_INT                         144
-        //#define TK_TO_REAL                        145
-        //#define TK_ISNOT                          146
-        //#define TK_END_OF_FILE                    147
-        //#define TK_ILLEGAL                        148
-        //#define TK_SPACE                          149
-        //#define TK_UNCLOSED_STRING                150
-        //#define TK_FUNCTION                       151
-        //#define TK_COLUMN                         152
-        //#define TK_AGG_FUNCTION                   153
-        //#define TK_AGG_COLUMN                     154
-        //#define TK_CONST_FUNC                     155
-        //#define TK_UMINUS                         156
-        //#define TK_UPLUS                          157
+        //#define Sqlite3.TK_SEMI                            1
+        //#define Sqlite3.TK_EXPLAIN                         2
+        //#define Sqlite3.TK_QUERY                           3
+        //#define Sqlite3.TK_PLAN                            4
+        //#define Sqlite3.TK_BEGIN                           5
+        //#define Sqlite3.TK_TRANSACTION                     6
+        //#define Sqlite3.TK_DEFERRED                        7
+        //#define Sqlite3.TK_IMMEDIATE                       8
+        //#define Sqlite3.TK_EXCLUSIVE                       9
+        //#define Sqlite3.TK_COMMIT                         10
+        //#define Sqlite3.TK_END                            11
+        //#define Sqlite3.TK_ROLLBACK                       12
+        //#define Sqlite3.TK_SAVEPOINT                      13
+        //#define Sqlite3.TK_RELEASE                        14
+        //#define Sqlite3.TK_TO                             15
+        //#define Sqlite3.TK_TABLE                          16
+        //#define Sqlite3.TK_CREATE                         17
+        //#define Sqlite3.TK_IF                             18
+        //#define Sqlite3.TK_NOT                            19
+        //#define Sqlite3.TK_EXISTS                         20
+        //#define Sqlite3.TK_TEMP                           21
+        //#define Sqlite3.TK_LP                             22
+        //#define Sqlite3.TK_RP                             23
+        //#define Sqlite3.TK_AS                             24
+        //#define Sqlite3.TK_COMMA                          25
+        //#define Sqlite3.TK_ID                             26
+        //#define Sqlite3.TK_INDEXED                        27
+        //#define Sqlite3.TK_ABORT                          28
+        //#define Sqlite3.TK_ACTION                         29
+        //#define Sqlite3.TK_AFTER                          30
+        //#define Sqlite3.TK_ANALYZE                        31
+        //#define Sqlite3.TK_ASC                            32
+        //#define Sqlite3.TK_ATTACH                         33
+        //#define Sqlite3.TK_BEFORE                         34
+        //#define Sqlite3.TK_BY                             35
+        //#define Sqlite3.TK_CASCADE                        36
+        //#define Sqlite3.TK_CAST                           37
+        //#define Sqlite3.TK_COLUMNKW                       38
+        //#define Sqlite3.TK_CONFLICT                       39
+        //#define Sqlite3.TK_DATABASE                       40
+        //#define Sqlite3.TK_DESC                           41
+        //#define Sqlite3.TK_DETACH                         42
+        //#define Sqlite3.TK_EACH                           43
+        //#define Sqlite3.TK_FAIL                           44
+        //#define Sqlite3.TK_FOR                            45
+        //#define Sqlite3.TK_IGNORE                         46
+        //#define Sqlite3.TK_INITIALLY                      47
+        //#define Sqlite3.TK_INSTEAD                        48
+        //#define Sqlite3.TK_LIKE_KW                        49
+        //#define Sqlite3.TK_MATCH                          50
+        //#define Sqlite3.TK_NO                             51
+        //#define Sqlite3.TK_KEY                            52
+        //#define Sqlite3.TK_OF                             53
+        //#define Sqlite3.TK_OFFSET                         54
+        //#define Sqlite3.TK_PRAGMA                         55
+        //#define Sqlite3.TK_RAISE                          56
+        //#define Sqlite3.TK_REPLACE                        57
+        //#define Sqlite3.TK_RESTRICT                       58
+        //#define Sqlite3.TK_ROW                            59
+        //#define Sqlite3.TK_TRIGGER                        60
+        //#define Sqlite3.TK_VACUUM                         61
+        //#define Sqlite3.TK_VIEW                           62
+        //#define Sqlite3.TK_VIRTUAL                        63
+        //#define Sqlite3.TK_REINDEX                        64
+        //#define Sqlite3.TK_RENAME                         65
+        //#define Sqlite3.TK_CTIME_KW                       66
+        //#define Sqlite3.TK_ANY                            67
+        //#define Sqlite3.TK_OR                             68
+        //#define Sqlite3.TK_AND                            69
+        //#define Sqlite3.TK_IS                             70
+        //#define Sqlite3.TK_BETWEEN                        71
+        //#define Sqlite3.TK_IN                             72
+        //#define Sqlite3.TK_ISNULL                         73
+        //#define Sqlite3.TK_NOTNULL                        74
+        //#define Sqlite3.TK_NE                             75
+        //#define Sqlite3.TK_EQ                             76
+        //#define Sqlite3.TK_GT                             77
+        //#define Sqlite3.TK_LE                             78
+        //#define Sqlite3.TK_LT                             79
+        //#define Sqlite3.TK_GE                             80
+        //#define Sqlite3.TK_ESCAPE                         81
+        //#define Sqlite3.TK_BITAND                         82
+        //#define Sqlite3.TK_BITOR                          83
+        //#define Sqlite3.TK_LSHIFT                         84
+        //#define Sqlite3.TK_RSHIFT                         85
+        //#define Sqlite3.TK_PLUS                           86
+        //#define Sqlite3.TK_MINUS                          87
+        //#define Sqlite3.TK_STAR                           88
+        //#define Sqlite3.TK_SLASH                          89
+        //#define Sqlite3.TK_REM                            90
+        //#define Sqlite3.TK_CONCAT                         91
+        //#define Sqlite3.TK_COLLATE                        92
+        //#define Sqlite3.TK_BITNOT                         93
+        //#define Sqlite3.TK_STRING                         94
+        //#define Sqlite3.TK_JOIN_KW                        95
+        //#define Sqlite3.TK_CONSTRAINT                     96
+        //#define Sqlite3.TK_DEFAULT                        97
+        //#define Sqlite3.TK_NULL                           98
+        //#define Sqlite3.TK_PRIMARY                        99
+        //#define Sqlite3.TK_UNIQUE                         100
+        //#define Sqlite3.TK_CHECK                          101
+        //#define Sqlite3.TK_REFERENCES                     102
+        //#define Sqlite3.TK_AUTOINCR                       103
+        //#define Sqlite3.TK_ON                             104
+        //#define Sqlite3.TK_INSERT                         105
+        //#define Sqlite3.TK_DELETE                         106
+        //#define Sqlite3.TK_UPDATE                         107
+        //#define Sqlite3.TK_SET                            108
+        //#define Sqlite3.TK_DEFERRABLE                     109
+        //#define Sqlite3.TK_FOREIGN                        110
+        //#define Sqlite3.TK_DROP                           111
+        //#define Sqlite3.TK_UNION                          112
+        //#define Sqlite3.TK_ALL                            113
+        //#define Sqlite3.TK_EXCEPT                         114
+        //#define Sqlite3.TK_INTERSECT                      115
+        //#define Sqlite3.TK_SELECT                         116
+        //#define Sqlite3.TK_DISTINCT                       117
+        //#define Sqlite3.TK_DOT                            118
+        //#define Sqlite3.TK_FROM                           119
+        //#define Sqlite3.TK_JOIN                           120
+        //#define Sqlite3.TK_USING                          121
+        //#define Sqlite3.TK_ORDER                          122
+        //#define Sqlite3.TK_GROUP                          123
+        //#define Sqlite3.TK_HAVING                         124
+        //#define Sqlite3.TK_LIMIT                          125
+        //#define Sqlite3.TK_WHERE                          126
+        //#define Sqlite3.TK_INTO                           127
+        //#define Sqlite3.TK_VALUES                         128
+        //#define Sqlite3.TK_INTEGER                        129
+        //#define Sqlite3.TK_FLOAT                          130
+        //#define Sqlite3.TK_BLOB                           131
+        //#define Sqlite3.TK_REGISTER                       132
+        //#define Sqlite3.TK_VARIABLE                       133
+        //#define Sqlite3.TK_CASE                           134
+        //#define Sqlite3.TK_WHEN                           135
+        //#define Sqlite3.TK_THEN                           136
+        //#define Sqlite3.TK_ELSE                           137
+        //#define Sqlite3.TK_INDEX                          138
+        //#define Sqlite3.TK_ALTER                          139
+        //#define Sqlite3.TK_ADD                            140
+        //#define Sqlite3.TK_TO_TEXT                        141
+        //#define Sqlite3.TK_TO_BLOB                        142
+        //#define Sqlite3.TK_TO_NUMERIC                     143
+        //#define Sqlite3.TK_TO_INT                         144
+        //#define Sqlite3.TK_TO_REAL                        145
+        //#define Sqlite3.TK_ISNOT                          146
+        //#define Sqlite3.TK_END_OF_FILE                    147
+        //#define Sqlite3.TK_ILLEGAL                        148
+        //#define Sqlite3.TK_SPACE                          149
+        //#define Sqlite3.TK_UNCLOSED_STRING                150
+        //#define Sqlite3.TK_FUNCTION                       151
+        //#define Sqlite3.TK_COLUMN                         152
+        //#define Sqlite3.TK_AGG_FUNCTION                   153
+        //#define Sqlite3.TK_AGG_COLUMN                     154
+        //#define Sqlite3.TK_CONST_FUNC                     155
+        //#define Sqlite3.TK_UMINUS                         156
+        //#define Sqlite3.TK_UPLUS                          157
         public const int TK_SEMI = 1;
 
         public const int TK_EXPLAIN = 2;
@@ -548,7 +548,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///The sqlite3KeywordCode function looks up an identifier to determine if
             ///it is a keyword.  If it is a keyword, the token code of that keyword is
-            ///returned.  If the input is not a keyword, TK_ID is returned.
+            ///returned.  If the input is not a keyword, Sqlite3.TK_ID is returned.
             ///
             ///The implementation of this routine was generated by a program,
             ///mkkeywordhash.h, located in the tool subdirectory of the distribution.
@@ -612,11 +612,11 @@ namespace Community.CsharpSqlite
                     case '\f':
                     case '\r':
                         {
-                            testcase(z[iOffset + 0] == ' ');
-                            testcase(z[iOffset + 0] == '\t');
-                            testcase(z[iOffset + 0] == '\n');
-                            testcase(z[iOffset + 0] == '\f');
-                            testcase(z[iOffset + 0] == '\r');
+                            sqliteinth.testcase(z[iOffset + 0] == ' ');
+                            sqliteinth.testcase(z[iOffset + 0] == '\t');
+                            sqliteinth.testcase(z[iOffset + 0] == '\n');
+                            sqliteinth.testcase(z[iOffset + 0] == '\f');
+                            sqliteinth.testcase(z[iOffset + 0] == '\r');
                             for (i = 1; z.Length > iOffset + i && CharExtensions.sqlite3Isspace(z[iOffset + i]); i++)
                             {
                             }
@@ -799,9 +799,9 @@ namespace Community.CsharpSqlite
                     case '"':
                         {
                             int delim = z[iOffset + 0];
-                            testcase(delim == '`');
-                            testcase(delim == '\'');
-                            testcase(delim == '"');
+                            sqliteinth.testcase(delim == '`');
+                            sqliteinth.testcase(delim == '\'');
+                            sqliteinth.testcase(delim == '"');
                             for (i = 1; (iOffset + i) < z.Length && (c = (byte)z[iOffset + i]) != 0; i++)
                             {
                                 if (c == delim)
@@ -866,16 +866,16 @@ namespace Community.CsharpSqlite
                     case '8':
                     case '9':
                         {
-                            testcase(z[iOffset] == '0');
-                            testcase(z[iOffset] == '1');
-                            testcase(z[iOffset] == '2');
-                            testcase(z[iOffset] == '3');
-                            testcase(z[iOffset] == '4');
-                            testcase(z[iOffset] == '5');
-                            testcase(z[iOffset] == '6');
-                            testcase(z[iOffset] == '7');
-                            testcase(z[iOffset] == '8');
-                            testcase(z[iOffset] == '9');
+                            sqliteinth.testcase(z[iOffset] == '0');
+                            sqliteinth.testcase(z[iOffset] == '1');
+                            sqliteinth.testcase(z[iOffset] == '2');
+                            sqliteinth.testcase(z[iOffset] == '3');
+                            sqliteinth.testcase(z[iOffset] == '4');
+                            sqliteinth.testcase(z[iOffset] == '5');
+                            sqliteinth.testcase(z[iOffset] == '6');
+                            sqliteinth.testcase(z[iOffset] == '7');
+                            sqliteinth.testcase(z[iOffset] == '8');
+                            sqliteinth.testcase(z[iOffset] == '9');
                             tokenType = TokenType.TK_INTEGER;
                             for (i = 0; z.Length > iOffset + i && CharExtensions.sqlite3Isdigit(z[iOffset + i]); i++)
                             {
@@ -959,9 +959,9 @@ namespace Community.CsharpSqlite
                     case ':':
                         {
                             int n = 0;
-                            testcase(z[iOffset + 0] == '$');
-                            testcase(z[iOffset + 0] == '@');
-                            testcase(z[iOffset + 0] == ':');
+                            sqliteinth.testcase(z[iOffset + 0] == '$');
+                            sqliteinth.testcase(z[iOffset + 0] == '@');
+                            sqliteinth.testcase(z[iOffset + 0] == ':');
                             tokenType = TokenType.TK_VARIABLE;
                             for (i = 1; z.Length > iOffset + i && (c = (byte)z[iOffset + i]) != 0; i++)
                             {
@@ -1007,8 +1007,8 @@ namespace Community.CsharpSqlite
                     case 'x':
                     case 'X':
                         {
-                            testcase(z[iOffset + 0] == 'x');
-                            testcase(z[iOffset + 0] == 'X');
+                            sqliteinth.testcase(z[iOffset + 0] == 'x');
+                            sqliteinth.testcase(z[iOffset + 0] == 'X');
                             if (z.Length > iOffset + 1 && z[iOffset + 1] == '\'')
                             {
                                 tokenType = TokenType.TK_BLOB;

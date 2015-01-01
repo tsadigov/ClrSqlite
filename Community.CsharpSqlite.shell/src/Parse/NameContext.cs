@@ -14,8 +14,7 @@ using unsigned = System.UInt64;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
+    
         ///<summary>
         /// A NameContext defines a context in which to resolve table and column
         /// names.  The context consists of a list of tables (the pSrcList) field and
@@ -40,7 +39,7 @@ namespace Community.CsharpSqlite
         ///</summary>
         public class NameContext
         {
-            public Parse pParse;
+            public Sqlite3.Parse pParse;
             ///
             ///<summary>
             ///The parser 
@@ -115,25 +114,25 @@ namespace Community.CsharpSqlite
                 ///</summary>
             int resolveAttachExpr(Expr pExpr)
             {
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 if (pExpr != null)
                 {
-                    if (pExpr.op != TK_ID)
+                    if (pExpr.op != Sqlite3.TK_ID)
                     {
-                        rc = ResolveExtensions.sqlite3ResolveExprNames(this, ref pExpr);
-                        if (rc == SQLITE_OK && pExpr.sqlite3ExprIsConstant() == 0)
+                        rc = Sqlite3.ResolveExtensions.sqlite3ResolveExprNames(this, ref pExpr);
+                        if (rc == Sqlite3.SQLITE_OK && pExpr.sqlite3ExprIsConstant() == 0)
                         {
-                            utilc.sqlite3ErrorMsg(this.pParse, "invalid name: \"%s\"", pExpr.u.zToken);
-                            return SQLITE_ERROR;
+                            Sqlite3.utilc.sqlite3ErrorMsg(this.pParse, "invalid name: \"%s\"", pExpr.u.zToken);
+                            return Sqlite3.SQLITE_ERROR;
                         }
                     }
                     else
                     {
-                        pExpr.op = TK_STRING;
+                        pExpr.op = Sqlite3.TK_STRING;
                     }
                 }
                 return rc;
             }
         }
-    }
+    
 }

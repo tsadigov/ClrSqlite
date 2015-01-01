@@ -41,23 +41,23 @@ namespace Community.CsharpSqlite
 		//#define MEM_Frame     0x0040   /* Value is a VdbeFrame object */
 		//#define MEM_Invalid   0x0080   /* Value is undefined */
 		//#define MEM_TypeMask  0x00ff   /* Mask of type bits */
-		const int MEM_Null = 0x0001;
+		public const int MEM_Null = 0x0001;
 
-		const int MEM_Str = 0x0002;
+        public const int MEM_Str = 0x0002;
 
-		const int MEM_Int = 0x0004;
+        public const int MEM_Int = 0x0004;
 
-		const int MEM_Real = 0x0008;
+        public const int MEM_Real = 0x0008;
 
-		const int MEM_Blob = 0x0010;
+        public const int MEM_Blob = 0x0010;
 
-		const int MEM_RowSet = 0x0020;
+        public const int MEM_RowSet = 0x0020;
 
-		const int MEM_Frame = 0x0040;
+        public const int MEM_Frame = 0x0040;
 
-		const int MEM_Invalid = 0x0080;
+        public const int MEM_Invalid = 0x0080;
 
-		const int MEM_TypeMask = 0x00ff;
+        public const int MEM_TypeMask = 0x00ff;
 
 		///
 ///<summary>

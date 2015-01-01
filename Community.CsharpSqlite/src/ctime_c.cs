@@ -108,7 +108,7 @@ namespace Community.CsharpSqlite
 																																																									"ENABLE_ICU",
 #endif
 			#if SQLITE_ENABLE_IOTRACE
-																																																									"ENABLE_IOTRACE",
+																																																									"ENABLE_sqliteinth.IOTRACE",
 #endif
 			#if SQLITE_ENABLE_LOAD_EXTENSION
 																																																									"ENABLE_LOAD_EXTENSION",
@@ -400,12 +400,12 @@ namespace Community.CsharpSqlite
 			//n = StringExtensions.sqlite3Strlen30(zOptName);
 			///
 ///<summary>
-///Since ArraySize(azCompileOpt) is normally in single digits, a
+///Since Sqlite3.ArraySize(azCompileOpt) is normally in single digits, a
 ///linear search is adequate.  No need for a binary search. 
 ///</summary>
 
 			if (!String.IsNullOrEmpty (zOptName))
-				for (i = 0; i < ArraySize (azCompileOpt); i++) {
+				for (i = 0; i < Sqlite3.ArraySize (azCompileOpt); i++) {
 					int n1 = (zOptName.Length - n < azCompileOpt [i].Length) ? zOptName.Length - n : azCompileOpt [i].Length;
 					if (String.Compare (zOptName, n, azCompileOpt [i], 0, n1, StringComparison.InvariantCultureIgnoreCase) == 0)
 						return 1;
@@ -422,7 +422,7 @@ namespace Community.CsharpSqlite
 
 		static string sqlite3_compileoption_get (int N)
 		{
-			if (N >= 0 && N < ArraySize (azCompileOpt)) {
+			if (N >= 0 && N < Sqlite3.ArraySize (azCompileOpt)) {
 				return azCompileOpt [N];
 			}
 			return null;

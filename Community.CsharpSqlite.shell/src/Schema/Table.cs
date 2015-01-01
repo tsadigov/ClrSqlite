@@ -23,8 +23,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
 
 
 
@@ -45,13 +43,13 @@ namespace Community.CsharpSqlite
         ///that the datatype of the PRIMARY KEY must be INTEGER for this field to
         ///be set.  An INTEGER PRIMARY KEY is used as the rowid for each row of
         ///the table.  If a table has no INTEGER PRIMARY KEY, then a random rowid
-        ///is generated for each row of the table.  TF_HasPrimaryKey is set if
+        ///is generated for each row of the table.  TableFlags.TF_HasPrimaryKey is set if
         ///the table has any PRIMARY KEY, INTEGER or otherwise.
         ///
         ///Table.tnum is the page number for the root BTree page of the table in the
         ///database file.  If Table.iDb is the index of the database table backend
         ///in sqlite.aDb[].  0 is for the main database and 1 is for the file that
-        ///holds temporary tables and indices.  If TF_Ephemeral is set
+        ///holds temporary tables and indices.  If TableFlags.TF_Ephemeral is set
         ///then the table is stored in a file that is automatically deleted
         ///when the VDBE cursor to the table is closed.  In this case Table.tnum
         ///refers VDBE cursor number that holds the table open, not to the root
@@ -126,14 +124,14 @@ namespace Community.CsharpSqlite
             ///Number of pointers to this Table 
             ///</summary>
 
-            public u8 tabFlags;
+            public TableFlags tabFlags;
 
             ///
             ///<summary>
-            ///Mask of TF_* values 
+            ///Mask of TableFlags.TF_* values 
             ///</summary>
 
-            public u8 keyConf;
+            public OnConstraintError keyConf;
 
             ///
             ///<summary>
@@ -259,6 +257,38 @@ namespace Community.CsharpSqlite
                 }
                 return -1;
             }
+
+
+            ///<summary>
+            ///aCol[].zType and aCol[].pColl missing
+            ///</summary>
+            ///<summary>
+            /// Test to see whether or not a table is a virtual table.  This is
+            /// done as a macro so that it will be optimized out when virtual
+            /// table support is omitted from the build.
+            ///
+            ///</summary>
+#if !SQLITE_OMIT_VIRTUALTABLE
+            //#  define IsVirtual(X)      (((X)->tabFlags & TableFlags.TF_Virtual)!=0)
+            public bool IsVirtual()
+            {
+                return (this.tabFlags & TableFlags.TF_Virtual) != 0;
+            }
+            
+#else
+																																																												    //  define IsVirtual(X)      0
+    static bool IsVirtual( Table T )
+    {
+      return false;
+    }
+    //  define IsHiddenColumn(X) 0
+    static bool IsHiddenColumn( Column C )
+    {
+      return false;
+    }
+#endif
+
+
         };
 
 
@@ -268,56 +298,58 @@ namespace Community.CsharpSqlite
         ///
         ///</summary>
 
-        //#define TF_Readonly        0x01    /* Read-only system table */
-        //#define TF_Ephemeral       0x02    /* An ephemeral table */
-        //#define TF_HasPrimaryKey   0x04    /* Table has a primary key */
-        //#define TF_Autoincrement   0x08    /* Integer primary key is autoincrement */
-        //#define TF_Virtual         0x10    /* Is a virtual table */
-        //#define TF_NeedMetadata    0x20    /* aCol[].zType and aCol[].pColl missing */
+        //#define TableFlags.TF_Readonly        0x01    /* Read-only system table */
+        //#define TableFlags.TF_Ephemeral       0x02    /* An ephemeral table */
+        //#define TableFlags.TF_HasPrimaryKey   0x04    /* Table has a primary key */
+        //#define TableFlags.TF_Autoincrement   0x08    /* Integer primary key is autoincrement */
+        //#define TableFlags.TF_Virtual         0x10    /* Is a virtual table */
+        //#define TableFlags.TF_NeedMetadata    0x20    /* aCol[].zType and aCol[].pColl missing */
         ///
         ///<summary>
         ///Allowed values for Tabe.tabFlags.
         ///
         ///</summary>
+        public enum TableFlags:byte//TODO: change back to int
+        {
 
-        private const int TF_Readonly = 0x01;
+            TF_Readonly = 0x01,
 
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="Read">only system table </param>
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Read">only system table </param>
 
-        private const int TF_Ephemeral = 0x02;
+            TF_Ephemeral = 0x02,
 
-        ///
-        ///<summary>
-        ///An ephemeral table 
-        ///</summary>
+            ///
+            ///<summary>
+            ///An ephemeral table 
+            ///</summary>
 
-        private const int TF_HasPrimaryKey = 0x04;
+            TF_HasPrimaryKey = 0x04,
 
-        ///
-        ///<summary>
-        ///Table has a primary key 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Table has a primary key 
+            ///</summary>
 
-        private const int TF_Autoincrement = 0x08;
+            TF_Autoincrement = 0x08,
 
-        ///
-        ///<summary>
-        ///Integer primary key is autoincrement 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Integer primary key is autoincrement 
+            ///</summary>
 
-        private const int TF_Virtual = 0x10;
+            TF_Virtual = 0x10,
 
-        ///
-        ///<summary>
-        ///Is a virtual table 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Is a virtual table 
+            ///</summary>
 
-        private const int TF_NeedMetadata = 0x20;
+            TF_NeedMetadata = 0x20
+        }
 
 
-
-    }
+    
 }

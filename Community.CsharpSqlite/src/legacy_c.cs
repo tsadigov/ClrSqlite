@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_callback = Sqlite3.dxCallback;
+	
 	using sqlite3_stmt = Sqlite3.Vdbe;
 
 	public partial class Sqlite3
@@ -63,63 +63,37 @@ namespace Community.CsharpSqlite
             int NoCallback, int NoArgs, int NoErrors)
             {
                 string Errors = "";
-                return legacy.sqlite3_exec(db, zSql, null, null, ref Errors);
+                return sqlite3_exec(db, zSql, null, null, ref Errors);
             }
 
-            static public int exec(sqlite3 db, ///
-                ///<summary>
-                ///The database on which the SQL executes 
-                ///</summary>
-
-            string zSql, ///
-                ///<summary>
-                ///The SQL to be executed 
-                ///</summary>
-
-            sqlite3_callback xCallback, ///
-                ///<summary>
-                ///Invoke this callback routine 
-                ///</summary>
-
-            object pArg, ///
-                ///<summary>
-                ///First argument to xCallback() 
-                ///</summary>
-
-            int NoErrors)
+            static public int exec(
+                /*The database on which the SQL executes */sqlite3 db,
+                /*The SQL to be executed */string zSql,
+                /*Invoke this callback routine *///sqlite3_callback 
+                dxCallback xCallback,
+                /*First argument to xCallback() */object pArg, 
+                int NoErrors)
             {
                 string Errors = "";
                 return legacy.sqlite3_exec(db, zSql, xCallback, pArg, ref Errors);
             }
 
-            static public int exec(sqlite3 db, ///
-                ///<summary>
-                ///The database on which the SQL executes 
-                ///</summary>
 
-            string zSql, ///
-                ///<summary>
-                ///The SQL to be executed 
-                ///</summary>
-
-            sqlite3_callback xCallback, ///
-                ///<summary>
-                ///Invoke this callback routine 
-                ///</summary>
-
-            object pArg, ///
-                ///<summary>
-                ///First argument to xCallback() 
-                ///</summary>
-
-            ref string pzErrMsg///
-                ///<summary>
-                ///Write error messages here 
-                ///</summary>
-
+            static public int exec(
+                /*The database on which the SQL executes */
+                sqlite3 db,
+                /*The SQL to be executed */
+                string zSql,
+                /*Invoke this callback routine */ 
+                //sqlite3_callback 
+                dxCallback xCallback,
+                /*First argument to xCallback() */               
+                object pArg,
+                /*Write error messages here */
+                ref string pzErrMsg
             )
             {
-                return legacy.sqlite3_exec(db, zSql, xCallback, pArg, ref pzErrMsg);
+                return sqlite3_exec(db, zSql, xCallback, pArg, ref pzErrMsg);
             }
 
 
@@ -150,7 +124,8 @@ namespace Community.CsharpSqlite
                 ///The SQL to be executed 
                 ///</summary>
 
-            sqlite3_callback xCallback, ///
+            //sqlite3_callback 
+                dxCallback xCallback, ///
                 ///<summary>
                 ///Invoke this callback routine 
                 ///</summary>
@@ -180,7 +155,8 @@ namespace Community.CsharpSqlite
                 ///The SQL to be executed 
                 ///</summary>
 
-            sqlite3_callback xCallback, ///
+            //sqlite3_callback 
+                dxCallback xCallback, ///
                 ///<summary>
                 ///Invoke this callback routine 
                 ///</summary>
@@ -234,7 +210,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
 
                 if (!utilc.sqlite3SafetyCheckOk(db))
-                    return SQLITE_MISUSE_BKPT();
+                    return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                 if (zSql == null)
                     zSql = "";
                 sqlite3_mutex_enter(db.mutex);
@@ -344,7 +320,7 @@ namespace Community.CsharpSqlite
                     vdbeaux.sqlite3VdbeFinalize(ref pStmt);
                 db.sqlite3DbFree(ref azCols);
                 result = (SqlResult)sqlite3ApiExit(db, (int)result);
-                if (result != SqlResult.SQLITE_OK && ALWAYS(result == (SqlResult)sqlite3_errcode(db)) && pzErrMsg != null)
+                if (result != SqlResult.SQLITE_OK && Sqlite3.ALWAYS(result == (SqlResult)sqlite3_errcode(db)) && pzErrMsg != null)
                 {
                     //int nErrMsg = 1 + StringExtensions.sqlite3Strlen30(sqlite3_errmsg(db));
                     //pzErrMsg = sqlite3Malloc(nErrMsg);

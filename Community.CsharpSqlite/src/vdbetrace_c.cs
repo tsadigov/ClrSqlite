@@ -185,9 +185,9 @@ namespace Community.CsharpSqlite
 					}
 					else {
 						Debug.Assert (zRawSql [izRawSql] == ':' || zRawSql [izRawSql] == '$' || zRawSql [izRawSql] == '@');
-						testcase (zRawSql [izRawSql] == ':');
-						testcase (zRawSql [izRawSql] == '$');
-						testcase (zRawSql [izRawSql] == '@');
+						sqliteinth.testcase (zRawSql [izRawSql] == ':');
+						sqliteinth.testcase (zRawSql [izRawSql] == '$');
+						sqliteinth.testcase (zRawSql [izRawSql] == '@');
 						idx = vdbeapi.sqlite3VdbeParameterIndex (p, zRawSql.Substring (izRawSql, nToken), nToken);
 						Debug.Assert (idx > 0);
 					}

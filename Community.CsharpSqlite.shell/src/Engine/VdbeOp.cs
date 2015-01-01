@@ -5,6 +5,14 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
+    using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
+    using WhereInfo = Community.CsharpSqlite.Sqlite3.WhereInfo;
+    using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
+    using WherePlan = Community.CsharpSqlite.Sqlite3.WherePlan;
+    using sqlite3_value = Sqlite3.Mem;
+    using Mem = Community.CsharpSqlite.Sqlite3.Mem;
+    using Parse = Community.CsharpSqlite.Sqlite3.Parse;
+
 	///<summary>
 	/// A single instruction of the virtual machine has an opcode
 	/// and as many as three operands.  The instruction is recorded
@@ -22,7 +30,7 @@ namespace Community.CsharpSqlite
 
 		///
 ///<summary>
-///Integer value if p4type==P4_INT32 
+///Integer value if p4type== P4Usage.P4_INT32 
 ///</summary>
 
 		public object p;
@@ -40,76 +48,76 @@ namespace Community.CsharpSqlite
 
 		///
 ///<summary>
-///Used when p4type is P4_INT64 
+///Used when p4type is  P4Usage.P4_INT64 
 ///</summary>
 
 		public double pReal;
 
 		///
 ///<summary>
-///Used when p4type is P4_REAL 
+///Used when p4type is  P4Usage.P4_REAL 
 ///</summary>
 
-		public Community.CsharpSqlite.Sqlite3.FuncDef pFunc;
+		public FuncDef pFunc;
 
 		///
 ///<summary>
-///Used when p4type is P4_FUNCDEF 
+///Used when p4type is  P4Usage.P4_FUNCDEF 
 ///</summary>
 
-		public Community.CsharpSqlite.Sqlite3.VdbeFunc pVdbeFunc;
+		public VdbeFunc pVdbeFunc;
 
 		///
 ///<summary>
-///Used when p4type is P4_VDBEFUNC 
+///Used when p4type is  P4Usage.P4_VDBEFUNC 
 ///</summary>
 
-		public Community.CsharpSqlite.Sqlite3.CollSeq pColl;
+		public CollSeq pColl;
 
 		///
 ///<summary>
-///Used when p4type is P4_COLLSEQ 
+///Used when p4type is  P4Usage.P4_COLLSEQ 
 ///</summary>
 
-		public Community.CsharpSqlite.Sqlite3.Mem pMem;
+		public Mem pMem;
 
 		///
 ///<summary>
-///Used when p4type is P4_MEM 
+///Used when p4type is  P4Usage.P4_MEM 
 ///</summary>
 
-		public Community.CsharpSqlite.Sqlite3.VTable pVtab;
+		public VTable pVtab;
 
 		///
 ///<summary>
-///Used when p4type is P4_VTAB 
+///Used when p4type is  P4Usage.P4_VTAB 
 ///</summary>
 
-		public Community.CsharpSqlite.Sqlite3.KeyInfo pKeyInfo;
+		public KeyInfo pKeyInfo;
 
 		///
 ///<summary>
-///Used when p4type is P4_KEYINFO 
+///Used when p4type is  P4Usage.P4_KEYINFO 
 ///</summary>
 
 		public int[] ai;
 
 		///
 ///<summary>
-///Used when p4type is P4_INTARRAY 
+///Used when p4type is  P4Usage.P4_INTARRAY 
 ///</summary>
 
 		public Community.CsharpSqlite.SubProgram pProgram;
 
 		///
 ///<summary>
-///Used when p4type is P4_SUBPROGRAM 
+///Used when p4type is  P4Usage.P4_SUBPROGRAM 
 ///</summary>
 
-		public Community.CsharpSqlite.Sqlite3.dxDel pFuncDel;
+		public dxDel pFuncDel;
 	///
 ///<summary>
-///Used when p4type is P4_FUNCDEL 
+///Used when p4type is  P4Usage.P4_FUNCDEL 
 ///</summary>
 
 	};
@@ -120,7 +128,12 @@ namespace Community.CsharpSqlite
 		{
 		}
 
-		public byte opcode {
+		
+		///
+///<summary>
+///What operation to perform 
+///</summary>
+public byte opcode {
 			get;
 			set;
 		}
@@ -134,31 +147,27 @@ namespace Community.CsharpSqlite
 			}
 		}
 
-		///
-///<summary>
-///What operation to perform 
-///</summary>
-
-		public int p4type;
+        ///<summary>
+        ///One of the  P4Usage.P4_xxx constants for p4 
+        ///</summary>
+		public P4Usage p4type;
 
 		///
-///<summary>
-///One of the P4_xxx constants for p4 
-///</summary>
 
-		public byte opflags;
+        ///
+        ///<summary>
+        ///Mask of the OPFLG_* flags in opcodes.h 
+        ///</summary>
 
-		///
-///<summary>
-///Mask of the OPFLG_* flags in opcodes.h 
-///</summary>
+
+		public OpFlag opflags;
+
+        ///
+        ///<summary>
+        ///Fifth parameter is an unsigned character 
+        ///</summary>
 
 		public byte p5;
-
-		///
-///<summary>
-///Fifth parameter is an unsigned character 
-///</summary>
 
 		#if DEBUG_CLASS_VDBEOP || DEBUG_CLASS_ALL
 																																																								public int _p1;              /* First operand */
@@ -182,26 +191,26 @@ get { return _p3; }
 set { _p3 = value; }
 }
 #else
-		public int p1;
 
-		///
-///<summary>
-///First operand 
-///</summary>
+        ///<summary>
+        ///First operand 
+        ///</summary>
+        public int p1;
 
+
+        ///<summary>
+        ///Second parameter (often the jump destination) 
+        ///</summary>
 		public int p2;
 
-		///
-///<summary>
-///Second parameter (often the jump destination) 
-///</summary>
 
-		public int p3;
 
-		///
-///<summary>
-///The third parameter 
-///</summary>
+        ///<summary>
+        ///The third parameter 
+        ///</summary>
+        public int p3;
+
+
 
 		#endif
 		public union_p4 p4 = new union_p4 ();

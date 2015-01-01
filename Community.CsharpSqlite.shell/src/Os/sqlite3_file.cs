@@ -783,6 +783,21 @@ namespace Community.CsharpSqlite
                 ct.xGetLastError = this.xGetLastError;
                 ct.xCurrentTimeInt64 = this.xCurrentTimeInt64;
             }
+
+
+
+
+#if SQLITE_ENABLE_ATOMIC_WRITE
+																																																												//  int sqlite3JournalOpen(sqlite3_vfs *, string , sqlite3_file *, int, int);
+//  int sqlite3JournalSize(sqlite3_vfs );
+//  int sqlite3JournalCreate(sqlite3_file );
+#else
+            //#define sqlite3JournalSize(pVfs) ((pVfs)->szOsFile)
+            public int sqlite3JournalSize()
+            {
+                return this.szOsFile;
+            }
+#endif
         }
 
         ///

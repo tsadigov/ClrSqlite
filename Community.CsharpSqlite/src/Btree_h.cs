@@ -130,7 +130,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 ///<param name="The file contains at most 1 b">tree </param>
 
-		const int BTREE_UNORDERED = 16;
+		public const int BTREE_UNORDERED = 16;
 
 		///
 ///<summary>

@@ -23,8 +23,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
 
 
 
@@ -94,7 +92,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///True if constraint checking is deferred till COMMIT 
             ///</summary>
-            public u8[] aAction = new u8[2];
+            public OnConstraintError[] aAction = new OnConstraintError[2];
             ///<summary>
             ///ON DELETE and ON UPDATE actions, respectively
             ///</summary>
@@ -138,4 +136,3 @@ namespace Community.CsharpSqlite
         };
 
     }
-}

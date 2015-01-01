@@ -11,7 +11,8 @@ namespace Community.CsharpSqlite
 {
 	using sqlite_int64 = System.Int64;
 	using System.Globalization;
-
+    using sqliteinth = Sqlite3.sqliteinth;
+    using System.Collections.Generic;
 	public partial class StringExtensions
 	{
 
@@ -174,8 +175,93 @@ namespace Community.CsharpSqlite
 			return 0x3fffffff & (iLen == -1 ? z.Length : iLen);
 		}
 	}
-	public partial class MathExtensions
+	public static class MathExtensions
 	{
+
+        public static bool Intersects(this SortOrder a, SortOrder b) {
+            return (a & b) != (SortOrder)0;
+        }
+         public static bool HasProperty(this byte val,byte flag)
+        {
+            return (val & flag) == flag;
+        }
+
+         public static bool HasAnyProperty(this TableFlags val, TableFlags flag)
+        {
+            return (val & flag) != 0;
+        }
+
+        public static bool HasAnyProperty(this byte val, byte flag)
+        {
+            return (val & flag) != 0;
+        }
+        
+        public static byte SetProperty(this byte val, byte flag)
+        {
+            return (byte)(val|flag);
+        }
+        public static byte ClearProperty(this byte val, byte flag)
+        {
+            return (byte)(val & ~flag);
+        }
+
+        public static bool Has(this OpFlag val, OpFlag flag)
+        {
+            return 0 == (val & flag);
+        }
+        public static T Filter<T>(this T o, T when, T then)
+        {
+            return (o.Equals(when)) ? then : o;
+        }
+
+        public static bool In<T>(this T o, params T[] c)
+        {
+            List<T> l = new List<T>(c);
+            return l.Contains(o);
+        }
+
+        /// Round up a number to the next larger multiple of 8.  This is used
+        /// to force 8-byte alignment on 64-bit architectures.
+        ///
+        ///</summary>
+        //#define ROUND8(x)     (((x)+7)&~7)
+        public static int ROUND8(this int x)
+        {
+            return (x + 7) & ~7;
+        }
+        ///<summary>
+        /// Round down to the nearest multiple of 8
+        ///
+        ///</summary>
+        //#define ROUNDDOWN8(x) ((x)&~7)
+        public static int ROUNDDOWN8(this int x)
+        {
+            return x & ~7;
+        }
+
+
+        ///<summary>
+        ///Prepare a crude estimate of the logarithm of the input value.
+        ///The results need not be exact.  This is only used for estimating
+        ///the total cost of performing operations with O(logN) or O(NlogN)
+        ///complexity.  Because N is just a guess, it is no great tragedy if
+        ///logN is a little off.
+        ///
+        ///</summary>
+        public static double estLog(double N)
+        {
+            double logN = 1;
+            double x = 10;
+            while (N > x)
+            {
+                logN += 1;
+                x *= 10;
+            }
+            return logN;
+        }
+
+
+
         ///<summary>
         ///Macro to find the minimum of two numeric values.
         ///
@@ -250,7 +336,7 @@ namespace Community.CsharpSqlite
 			#else
 																																																												rc = isnan(x);
 #endif
-			testcase (rc);
+			sqliteinth.testcase (rc);
 			return rc;
 		}
 	#endif
@@ -293,7 +379,7 @@ namespace Community.CsharpSqlite
 #endif
             ///
             ///<summary>
-            ///Routine needed to support the testcase() macro.
+            ///Routine needed to support the sqliteinth.testcase() macro.
             ///</summary>
 
 #if SQLITE_COVERAGE_TEST
@@ -351,7 +437,7 @@ dummy += (uint)x;
                             _Custom.va_start(ap, zFormat);
                             z = io.sqlite3VMPrintf(db, zFormat, ap);
                             _Custom.va_end(ref ap);
-                            sqlite3ValueSetStr(db.pErr, -1, z, SqliteEncoding.UTF8, (dxDel)SQLITE_DYNAMIC);
+                            sqlite3ValueSetStr(db.pErr, -1, z, SqliteEncoding.UTF8, (dxDel)sqliteinth.SQLITE_DYNAMIC);
                         }
                     }
                     else
@@ -437,9 +523,9 @@ dummy += (uint)x;
                 if (c == 0)
                 {
                     c = zNum[18 * incr] - '8';
-                    testcase(c == (-1));
-                    testcase(c == 0);
-                    testcase(c == (+1));
+                    sqliteinth.testcase(c == (-1));
+                    sqliteinth.testcase(c == 0);
+                    sqliteinth.testcase(c == (+1));
                 }
                 return c;
             }
@@ -1115,7 +1201,7 @@ dummy += (uint)x;
                     //p -= 2;
                     n = sqlite3GetVarint(p, offset, out v64);
                     Debug.Assert(n > 3 && n <= 9);
-                    if ((v64 & SQLITE_MAX_U32) != v64)
+                    if ((v64 & sqliteinth.SQLITE_MAX_U32) != v64)
                     {
                         v = 0xffffffff;
                     }
@@ -1188,7 +1274,7 @@ return n;
                     i++;
                     v >>= 7;
                 }
-                while (v != 0 && ALWAYS(i < 9));
+                while (v != 0 && Sqlite3.ALWAYS(i < 9));
                 return i;
             }
 
@@ -1230,7 +1316,7 @@ return n;
                 {
                     if (utilc.sqlite3SafetyCheckSickOrOk(db))
                     {
-                        testcase(sqlite3GlobalConfig.xLog != null);
+                        sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog != null);
                         logBadConnection("unopened");
                     }
                     return false;
@@ -1247,7 +1333,7 @@ return n;
                 magic = db.magic;
                 if (magic != SQLITE_MAGIC_SICK && magic != SQLITE_MAGIC_OPEN && magic != SQLITE_MAGIC_BUSY)
                 {
-                    testcase(sqlite3GlobalConfig.xLog != null);
+                    sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog != null);
                     logBadConnection("invalid");
                     return false;
                 }
@@ -1267,22 +1353,22 @@ return n;
             public static int sqlite3AddInt64(ref i64 pA, i64 iB)
             {
                 i64 iA = pA;
-                testcase(iA == 0);
-                testcase(iA == 1);
-                testcase(iB == -1);
-                testcase(iB == 0);
+                sqliteinth.testcase(iA == 0);
+                sqliteinth.testcase(iA == 1);
+                sqliteinth.testcase(iB == -1);
+                sqliteinth.testcase(iB == 0);
                 if (iB >= 0)
                 {
-                    testcase(iA > 0 && IntegerExtensions.LARGEST_INT64 - iA == iB);
-                    testcase(iA > 0 && IntegerExtensions.LARGEST_INT64 - iA == iB - 1);
+                    sqliteinth.testcase(iA > 0 && IntegerExtensions.LARGEST_INT64 - iA == iB);
+                    sqliteinth.testcase(iA > 0 && IntegerExtensions.LARGEST_INT64 - iA == iB - 1);
                     if (iA > 0 && IntegerExtensions.LARGEST_INT64 - iA < iB)
                         return 1;
                     pA += iB;
                 }
                 else
                 {
-                    testcase(iA < 0 && -(iA + IntegerExtensions.LARGEST_INT64) == iB + 1);
-                    testcase(iA < 0 && -(iA + IntegerExtensions.LARGEST_INT64) == iB + 2);
+                    sqliteinth.testcase(iA < 0 && -(iA + IntegerExtensions.LARGEST_INT64) == iB + 1);
+                    sqliteinth.testcase(iA < 0 && -(iA + IntegerExtensions.LARGEST_INT64) == iB + 2);
                     if (iA < 0 && -(iA + IntegerExtensions.LARGEST_INT64) > iB + 1)
                         return 1;
                     pA += iB;
@@ -1292,11 +1378,11 @@ return n;
 
             public static int sqlite3SubInt64(ref i64 pA, i64 iB)
             {
-                testcase(iB == IntegerExtensions.SMALLEST_INT64 + 1);
+                sqliteinth.testcase(iB == IntegerExtensions.SMALLEST_INT64 + 1);
                 if (iB == IntegerExtensions.SMALLEST_INT64)
                 {
-                    testcase((pA) == (-1));
-                    testcase((pA) == 0);
+                    sqliteinth.testcase((pA) == (-1));
+                    sqliteinth.testcase((pA) == 0);
                     if ((pA) >= 0)
                         return 1;
                     pA -= iB;
@@ -1326,10 +1412,10 @@ return n;
                     return 1;
                 Debug.Assert(iA1 * iB0 == 0 || iA0 * iB1 == 0);
                 r = iA1 * iB0 + iA0 * iB1;
-                testcase(r == (-TWOPOWER31) - 1);
-                testcase(r == (-TWOPOWER31));
-                testcase(r == TWOPOWER31);
-                testcase(r == TWOPOWER31 - 1);
+                sqliteinth.testcase(r == (-TWOPOWER31) - 1);
+                sqliteinth.testcase(r == (-TWOPOWER31));
+                sqliteinth.testcase(r == TWOPOWER31);
+                sqliteinth.testcase(r == TWOPOWER31 - 1);
                 if (r < (-TWOPOWER31) || r >= TWOPOWER31)
                     return 1;
                 r *= TWOPOWER32;
@@ -1376,7 +1462,7 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
     int i, sz;
     sz = StringExtensions.sqlite3Strlen30(z);
     for(i=sz-1; i>0 && z[i]!='/' && z[i]!='.'; i--){}
-    if( z[i]=='.' && ALWAYS(sz>i+4) ) memcpy(&z[i+1], &z[sz-3], 4);
+    if( z[i]=='.' && Sqlite3.ALWAYS(sz>i+4) ) memcpy(&z[i+1], &z[sz-3], 4);
   }
 }
 #endif
@@ -1426,11 +1512,11 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 ///
 ///</summary>
 
-			testcase (i == 10);
+			sqliteinth.testcase (i == 10);
 			if (i > 10) {
 				return false;
 			}
-			testcase (v - neg == 2147483647);
+			sqliteinth.testcase (v - neg == 2147483647);
 			if (v - neg > 2147483647) {
 				return false;
 			}
@@ -1924,9 +2010,9 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 				else {
 					pNum = (i64)u;
 				}
-			testcase (i - zDx == 18);
-			testcase (i - zDx == 19);
-			testcase (i - zDx == 20);
+			sqliteinth.testcase (i - zDx == 18);
+			sqliteinth.testcase (i - zDx == 19);
+			sqliteinth.testcase (i - zDx == 20);
 			if ((c != 0 && i < length) || i == zDx || i - zDx > 19 * incr) {
 				///
 ///<summary>

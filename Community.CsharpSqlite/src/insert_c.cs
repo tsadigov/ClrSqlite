@@ -328,8 +328,8 @@ namespace Community.CsharpSqlite
 		///  CHECK            REPLACE      Illegal.  The results in an exception.
 		///
 		/// Which action to take is determined by the overrideError parameter.
-		/// Or if overrideError==OE_Default, then the pParse.onError parameter
-		/// is used.  Or if pParse.onError==OE_Default then the onError value
+		/// Or if overrideError==OnConstraintError.OE_Default, then the pParse.onError parameter
+		/// is used.  Or if pParse.onError==OnConstraintError.OE_Default then the onError value
 		/// for the constraint is used.
 		///
 		/// The calling routine must open a read/write cursor for pTab with
@@ -392,7 +392,7 @@ namespace Community.CsharpSqlite
 		///
 		///    *   The index is over the same set of columns
 		///    *   The same DESC and ASC markings occurs on all columns
-		///    *   The same onError processing (OE_Abort, OE_Ignore, etc)
+		///    *   The same onError processing (OnConstraintError.OE_Abort, OnConstraintError.OE_Ignore, etc)
 		///    *   The same collating sequence on each column
 		///
 		///</summary>
@@ -500,7 +500,7 @@ namespace Community.CsharpSqlite
 ///A SELECT statement to use as the data source 
 ///</summary>
 
-		int onError, ///
+		OnConstraintError onError, ///
 ///<summary>
 ///How to handle constraint errors 
 ///</summary>
@@ -620,7 +620,7 @@ namespace Community.CsharpSqlite
 
 			}
 			#endif
-			if ((pDest.tabFlags & TF_Virtual) != 0) {
+			if ((pDest.tabFlags & TableFlags.TF_Virtual) != 0) {
 				return 0;
 				///
 ///<summary>
@@ -628,10 +628,10 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			}
-			if (onError == OE_Default) {
-				onError = OE_Abort;
+			if (onError == OnConstraintError.OE_Default) {
+				onError = OnConstraintError.OE_Abort;
 			}
-			if (onError != OE_Abort && onError != OE_Rollback) {
+			if (onError != OnConstraintError.OE_Abort && onError != OnConstraintError.OE_Rollback) {
 				return 0;
 				///
 ///<summary>
@@ -766,7 +766,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			}
-			if ((pSrc.tabFlags & TF_Virtual) != 0) {
+			if ((pSrc.tabFlags & TableFlags.TF_Virtual) != 0) {
 				return 0;
 				///
 ///<summary>
@@ -825,7 +825,7 @@ namespace Community.CsharpSqlite
 				}
 			}
 			for (pDestIdx = pDest.pIndex; pDestIdx != null; pDestIdx = pDestIdx.pNext) {
-				if (pDestIdx.onError != OE_None) {
+				if (pDestIdx.onError != OnConstraintError.OE_None) {
 					destHasUniqueIdx = true;
 				}
 				for (pSrcIdx = pSrc.pIndex; pSrcIdx != null; pSrcIdx = pSrcIdx.pNext) {
@@ -922,7 +922,7 @@ namespace Community.CsharpSqlite
 			if (pDest.iPKey >= 0) {
 				addr1 = v.sqlite3VdbeAddOp2 (OP_Rowid, iSrc, regRowid);
 				addr2 = v.sqlite3VdbeAddOp3 (OP_NotExists, iDest, 0, regRowid);
-				build.sqlite3HaltConstraint (pParse, onError, "PRIMARY KEY must be unique", P4_STATIC);
+				build.sqlite3HaltConstraint (pParse, onError, "PRIMARY KEY must be unique",  P4Usage.P4_STATIC);
 				v.sqlite3VdbeJumpHere (addr2);
 				pParse.autoIncStep (regAutoinc, regRowid);
 			}
@@ -932,11 +932,11 @@ namespace Community.CsharpSqlite
 				}
 				else {
 					addr1 = v.sqlite3VdbeAddOp2 (OP_Rowid, iSrc, regRowid);
-					Debug.Assert ((pDest.tabFlags & TF_Autoincrement) == 0);
+					Debug.Assert ((pDest.tabFlags & TableFlags.TF_Autoincrement) == 0);
 				}
 			v.sqlite3VdbeAddOp2 (OP_RowData, iSrc, regData);
 			v.sqlite3VdbeAddOp3 (OP_Insert, iDest, regData, regRowid);
-			v.sqlite3VdbeChangeP5 (OPFLAG_NCHANGE | OPFLAG_LASTROWID | OPFLAG_APPEND);
+            v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_NCHANGE | OpFlag.OPFLAG_LASTROWID | OpFlag.OPFLAG_APPEND);
 			v.sqlite3VdbeChangeP4 (-1, pDest.zName, 0);
 			v.sqlite3VdbeAddOp2 (OP_Next, iSrc, addr1);
 			for (pDestIdx = pDest.pIndex; pDestIdx != null; pDestIdx = pDestIdx.pNext) {
@@ -948,12 +948,12 @@ namespace Community.CsharpSqlite
 				v.sqlite3VdbeAddOp2 (OP_Close, iSrc, 0);
 				v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
 				pKey = build.sqlite3IndexKeyinfo (pParse, pSrcIdx);
-				v.sqlite3VdbeAddOp4 (OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey, P4_KEYINFO_HANDOFF);
+				v.sqlite3VdbeAddOp4 (OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pSrcIdx.zName );
 #endif
 				pKey = build.sqlite3IndexKeyinfo (pParse, pDestIdx);
-				v.sqlite3VdbeAddOp4 (OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey, P4_KEYINFO_HANDOFF);
+				v.sqlite3VdbeAddOp4 (OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pDestIdx.zName );
 #endif

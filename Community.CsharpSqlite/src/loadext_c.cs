@@ -576,7 +576,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		static void sqlite3CloseExtensions (sqlite3 db)
 		{
 			int i;
-			Debug.Assert (sqlite3_mutex_held (db.mutex));
+			Debug.Assert (Sqlite3.sqlite3_mutex_held (db.mutex));
 			for (i = 0; i < db.nExtension; i++) {
 				os.sqlite3OsDlClose (db.pVfs, (HANDLE)db.aExtension [i]);
 			}

@@ -40,7 +40,7 @@ namespace Community.CsharpSqlite
 static void lockBtreeMutex(Btree *p){
   assert( p->locked==0 );
   assert( sqlite3_mutex_notheld(p->pBt->mutex) );
-  assert( sqlite3_mutex_held(p->db->mutex) );
+  assert( Sqlite3.sqlite3_mutex_held(p->db->mutex) );
 
   sqlite3_mutex_enter(p->pBt->mutex);
   p->pBt->db = p->db;
@@ -54,8 +54,8 @@ static void lockBtreeMutex(Btree *p){
 static void unlockBtreeMutex(Btree *p){
   BtShared *pBt = p->pBt;
   assert( p->locked==1 );
-  assert( sqlite3_mutex_held(pBt->mutex) );
-  assert( sqlite3_mutex_held(p->db->mutex) );
+  assert( Sqlite3.sqlite3_mutex_held(pBt->mutex) );
+  assert( Sqlite3.sqlite3_mutex_held(p->db->mutex) );
   assert( p->db==pBt->db );
 
   sqlite3_mutex_leave(pBt->mutex);
@@ -96,7 +96,7 @@ void sqlite3BtreeEnter(Btree *p){
   assert( p->sharable || p->wantToLock==0 );
 
   /* We should already hold a lock on the database connection */
-  assert( sqlite3_mutex_held(p->db->mutex) );
+  assert( Sqlite3.sqlite3_mutex_held(p->db->mutex) );
 
   /* Unless the database is sharable and unlocked, then BtShared.db
   ** should already be set correctly. */
@@ -160,8 +160,8 @@ if( p->wantToLock==0 ){
 int sqlite3BtreeHoldsMutex(Btree *p){
   assert( p->sharable==0 || p->locked==0 || p->wantToLock>0 );
   assert( p->sharable==0 || p->locked==0 || p->db==p->pBt->db );
-  assert( p->sharable==0 || p->locked==0 || sqlite3_mutex_held(p->pBt->mutex) );
-  assert( p->sharable==0 || p->locked==0 || sqlite3_mutex_held(p->db->mutex) );
+  assert( p->sharable==0 || p->locked==0 || Sqlite3.sqlite3_mutex_held(p->pBt->mutex) );
+  assert( p->sharable==0 || p->locked==0 || Sqlite3.sqlite3_mutex_held(p->db->mutex) );
 
   return (p->sharable==0 || p->locked);
 }
@@ -200,7 +200,7 @@ void sqlite3BtreeLeaveCursor(BtCursor *pCur){
 void sqlite3BtreeEnterAll(sqlite3 db){
   int i;
   Btree *p;
-  assert( sqlite3_mutex_held(db->mutex) );
+  assert( Sqlite3.sqlite3_mutex_held(db->mutex) );
   for(i=0; i<db->nDb; i++){
 p = db->aDb[i].pBt;
 if( p ) sqlite3BtreeEnter(p);
@@ -209,7 +209,7 @@ if( p ) sqlite3BtreeEnter(p);
 void sqlite3BtreeLeaveAll(sqlite3 db){
   int i;
   Btree *p;
-  assert( sqlite3_mutex_held(db->mutex) );
+  assert( Sqlite3.sqlite3_mutex_held(db->mutex) );
   for(i=0; i<db->nDb; i++){
 p = db->aDb[i].pBt;
 if( p ) sqlite3BtreeLeave(p);
@@ -233,14 +233,14 @@ int sqlite3BtreeSharable(Btree *p){
 */
 int sqlite3BtreeHoldsAllMutexes(sqlite3 db){
   int i;
-  if( !sqlite3_mutex_held(db->mutex) ){
+  if( !Sqlite3.sqlite3_mutex_held(db->mutex) ){
 return 0;
   }
   for(i=0; i<db->nDb; i++){
 Btree *p;
 p = db->aDb[i].pBt;
 if( p && p->sharable &&
-     (p->wantToLock==0 || !sqlite3_mutex_held(p->pBt->mutex)) ){
+     (p->wantToLock==0 || !Sqlite3.sqlite3_mutex_held(p->pBt->mutex)) ){
   return 0;
 }
   }
@@ -265,7 +265,7 @@ int sqlite3SchemaMutexHeld(sqlite3 db, int iDb, Schema *pSchema){
   assert( db!=0 );
   if( pSchema ) iDb = sqlite3SchemaToIndex(db, pSchema);
   assert( iDb>=0 && iDb<db->nDb );
-  if( !sqlite3_mutex_held(db->mutex) ) return 0;
+  if( !Sqlite3.sqlite3_mutex_held(db->mutex) ) return 0;
   if( iDb==1 ) return 1;
   p = db->aDb[iDb].pBt;
   assert( p!=0 );

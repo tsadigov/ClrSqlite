@@ -77,7 +77,7 @@ sqlite3ValueFree(ref pTmp);
 				SqliteEncoding.UTF8
 			};
 			for(i=0;i<3;i++) {
-				pColl2=sqlite3FindCollSeq(db,aEnc[i],z,0);
+				pColl2=db.sqlite3FindCollSeq(aEnc[i],z,0);
 				if(pColl2.xCmp!=null) {
 					pColl=pColl2.Copy();
 					//memcpy(pColl, pColl2, sizeof(CollSeq));
@@ -126,7 +126,7 @@ sqlite3ValueFree(ref pTmp);
 			CollSeq p;
 			p=pColl;
 			if(p==null) {
-				p=sqlite3FindCollSeq(db,enc,zName,0);
+				p=db.sqlite3FindCollSeq(enc,zName,0);
 			}
 			if(p==null||p.xCmp==null) {
 				///
@@ -136,7 +136,7 @@ sqlite3ValueFree(ref pTmp);
 				///
 				///</summary>
 				callCollNeeded(db,enc,zName);
-				p=sqlite3FindCollSeq(db,enc,zName,0);
+                p = db.sqlite3FindCollSeq(enc, zName, 0);
 			}
 			if(p!=null&&p.xCmp==null&&synthCollSeq(db,p)!=0) {
 				p=null;
@@ -160,7 +160,7 @@ sqlite3ValueFree(ref pTmp);
 			if(pColl!=null) {
 				string zName=pColl.zName;
 				sqlite3 db=pParse.db;
-				CollSeq p=sqlite3GetCollSeq(db,ENC(db),pColl,zName);
+                CollSeq p = sqlite3GetCollSeq(db, sqliteinth.ENC(db), pColl, zName);
 				if(null==p) {
 					utilc.sqlite3ErrorMsg(pParse,"no such collation sequence: %s",zName);
 					pParse.nErr++;
@@ -246,41 +246,7 @@ sqlite3ValueFree(ref pTmp);
 			}
 			return pColl;
 		}
-		///<summary>
-		/// Parameter zName points to a UTF-8 encoded string nName bytes long.
-		/// Return the CollSeq* pointer for the collation sequence named zName
-		/// for the encoding 'enc' from the database 'db'.
-		///
-		/// If the entry specified is not found and 'create' is true, then create a
-		/// new entry.  Otherwise return NULL.
-		///
-		/// A separate function build.sqlite3LocateCollSeq() is a wrapper around
-		/// this routine.  build.sqlite3LocateCollSeq() invokes the collation factory
-		/// if necessary and generates an error message if the collating sequence
-		/// cannot be found.
-		///
-		/// See also: build.sqlite3LocateCollSeq(), sqlite3GetCollSeq()
-		///
-		///</summary>
-		static CollSeq sqlite3FindCollSeq(sqlite3 db,SqliteEncoding enc,string zName,u8 create) {
-			CollSeq[] pColl;
-			if(zName!=null) {
-				pColl=findCollSeqEntry(db,zName,create);
-			}
-			else {
-				pColl=new CollSeq[(int)enc];
-				pColl[(int)enc-1]=db.pDfltColl;
-			}
-			Debug.Assert(SqliteEncoding.UTF8==(SqliteEncoding)1&&SqliteEncoding.UTF16LE==(SqliteEncoding)2&&SqliteEncoding.UTF16BE==(SqliteEncoding)3);
-			Debug.Assert(enc>=SqliteEncoding.UTF8&&enc<=SqliteEncoding.UTF16BE);
-			if(pColl!=null) {
-				enc-=1;
-				// if (pColl != null) pColl += enc - 1;
-				return pColl[(int)enc];
-			}
-			else
-				return null;
-		}
+		
 		///<summary>
 		///During the search for the best function definition, this procedure
 		/// is called to test how well the function passed as the first argument
@@ -367,7 +333,7 @@ sqlite3ValueFree(ref pTmp);
 			FuncDef pOther;
 			int nName=StringExtensions.sqlite3Strlen30(pDef.zName);
 			u8 c1=(u8)pDef.zName[0];
-			int h=(_Custom.sqlite3UpperToLower[c1]+nName)%ArraySize(pHash.a);
+			int h=(_Custom.sqlite3UpperToLower[c1]+nName)%Sqlite3.ArraySize(pHash.a);
 			pOther=functionSearch(pHash,h,pDef.zName,nName);
 			if(pOther!=null) {
 				Debug.Assert(pOther!=pDef&&pOther.pNext!=pDef);
@@ -443,7 +409,7 @@ sqlite3ValueFree(ref pTmp);
 			///Hash value 
 			///</summary>
 			Debug.Assert(enc==SqliteEncoding.UTF8||enc==SqliteEncoding.UTF16LE||enc==SqliteEncoding.UTF16BE);
-			h=(_Custom.sqlite3UpperToLower[(u8)zName[0]]+nName)%ArraySize(db.aFunc.a);
+			h=(_Custom.sqlite3UpperToLower[(u8)zName[0]]+nName)%Sqlite3.ArraySize(db.aFunc.a);
 			///
 			///<summary>
 			///</summary>
@@ -545,9 +511,10 @@ sqlite3ValueFree(ref pTmp);
 			sqlite3HashClear(temp1);
 			sqlite3HashClear(pSchema.fkeyHash);
 			pSchema.pSeqTab=null;
-			if((pSchema.flags&DB_SchemaLoaded)!=0) {
+            if ((pSchema.flags & sqliteinth.DB_SchemaLoaded) != 0)
+            {
 				pSchema.iGeneration++;
-				pSchema.flags=(u16)(pSchema.flags&(~DB_SchemaLoaded));
+                pSchema.flags = (u16)(pSchema.flags & (~sqliteinth.DB_SchemaLoaded));
 			}
 			p.Clear();
 		}

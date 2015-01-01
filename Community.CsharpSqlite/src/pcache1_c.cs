@@ -495,7 +495,7 @@ namespace Community.CsharpSqlite
 		{
 			if (pcache1.isInit) {
 				PgFreeslot p;
-				sz = ROUNDDOWN8 (sz);
+                sz = sz.ROUNDDOWN8();
 				pcache1.szSlot = sz;
 				pcache1.nSlot = pcache1.nFreeSlot = n;
 				pcache1.nReserve = n > 90 ? 10 : (n / 10 + 1);
@@ -560,7 +560,7 @@ namespace Community.CsharpSqlite
 					sqlite3StatusAdd (SQLITE_STATUS_PAGECACHE_OVERFLOW, sz);
 					sqlite3_mutex_leave (pcache1.mutex);
 				}
-				sqlite3MemdebugSetType (p, MemType.PCACHE);
+				sqliteinth.sqlite3MemdebugSetType (p, MemType.PCACHE);
 			}
 			return p;
 		}
@@ -589,8 +589,8 @@ namespace Community.CsharpSqlite
 			}
 			else {
 				int iSize;
-				Debug.Assert (sqlite3MemdebugHasType (p, MemType.PCACHE));
-				sqlite3MemdebugSetType (p, MemType.HEAP);
+				Debug.Assert (sqliteinth.sqlite3MemdebugHasType (p, MemType.PCACHE));
+                sqliteinth.sqlite3MemdebugSetType(p, MemType.HEAP);
 				iSize = sqlite3MallocSize (p.pData);
 				sqlite3_mutex_enter (pcache1.mutex);
 				sqlite3StatusAdd (SQLITE_STATUS_PAGECACHE_OVERFLOW, -iSize);
@@ -647,7 +647,7 @@ static int pcache1MemSize(object p){
 		///
 		/// The pointer is allowed to be NULL, which is prudent.  But it turns out
 		/// that the current implementation happens to never call this routine
-		/// with a NULL pointer, so we mark the NULL test with ALWAYS().
+		/// with a NULL pointer, so we mark the NULL test with Sqlite3.ALWAYS().
 		///
 		///</summary>
 		static void pcache1FreePage (ref PgHdr1 p)
@@ -739,7 +739,7 @@ static int pcache1MemSize(object p){
 			PgHdr1[] apNew;
 			int nNew;
 			int i;
-			Debug.Assert (sqlite3_mutex_held (p.pGroup.mutex));
+			Debug.Assert (Sqlite3.sqlite3_mutex_held (p.pGroup.mutex));
 			nNew = p.nHash * 2;
 			if (nNew < 256) {
 				nNew = 256;
@@ -791,7 +791,7 @@ static int pcache1MemSize(object p){
 				return;
 			pCache = pPage.pCache;
 			pGroup = pCache.pGroup;
-			Debug.Assert (sqlite3_mutex_held (pGroup.mutex));
+			Debug.Assert (Sqlite3.sqlite3_mutex_held (pGroup.mutex));
 			if (pPage.pLruNext != null || pPage == pGroup.pLruTail) {
 				if (pPage.pLruPrev != null) {
 					pPage.pLruPrev.pLruNext = pPage.pLruNext;
@@ -824,7 +824,7 @@ static int pcache1MemSize(object p){
 			PCache1 pCache = pPage.pCache;
 			PgHdr1 pp;
 			PgHdr1 pPrev = null;
-			Debug.Assert (sqlite3_mutex_held (pCache.pGroup.mutex));
+			Debug.Assert (Sqlite3.sqlite3_mutex_held (pCache.pGroup.mutex));
 			h = (int)(pPage.iKey % pCache.nHash);
 			for (pp = pCache.apHash [h]; pp != pPage; pPrev = pp, pp = pp.pNext)
 				;
@@ -843,7 +843,7 @@ static int pcache1MemSize(object p){
 		///</summary>
 		static void pcache1EnforceMaxPage (PGroup pGroup)
 		{
-			Debug.Assert (sqlite3_mutex_held (pGroup.mutex));
+			Debug.Assert (Sqlite3.sqlite3_mutex_held (pGroup.mutex));
 			while (pGroup.nCurrentPage > pGroup.nMaxPage && pGroup.pLruTail != null) {
 				PgHdr1 p = pGroup.pLruTail;
 				Debug.Assert (p.pCache.pGroup == pGroup);
@@ -879,7 +879,7 @@ static int pcache1MemSize(object p){
 																																																									      uint nPage = 0;
 #endif
 			uint h;
-			Debug.Assert (sqlite3_mutex_held (pCache.pGroup.mutex));
+			Debug.Assert (Sqlite3.sqlite3_mutex_held (pCache.pGroup.mutex));
 			for (h = 0; h < pCache.nHash; h++) {
 				PgHdr1 pPrev = null;
 				PgHdr1 pp = pCache.apHash [h];
@@ -923,11 +923,11 @@ static int pcache1MemSize(object p){
 		///</summary>
 		static int pcache1Init<T> (T NotUsed)
 		{
-			UNUSED_PARAMETER (NotUsed);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (NotUsed);
 			Debug.Assert (pcache1.isInit == false);
 			pcache1 = new PCacheGlobal ();
 			//memset(&pcache1, 0, sizeof(pcache1));
-			if (sqlite3GlobalConfig.bCoreMutex) {
+			if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex) {
 				pcache1.grp.mutex = sqlite3_mutex_alloc (SQLITE_MUTEX_STATIC_LRU);
 				pcache1.mutex = sqlite3_mutex_alloc (SQLITE_MUTEX_STATIC_PMEM);
 			}
@@ -944,7 +944,7 @@ static int pcache1MemSize(object p){
 		///</summary>
 		static void pcache1Shutdown<T> (T NotUsed)
 		{
-			UNUSED_PARAMETER (NotUsed);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (NotUsed);
 			Debug.Assert (pcache1.isInit);
 			pcache1 = new PCacheGlobal ();
 			//;memset( &pcache1, 0, sizeof( pcache1 ) );
@@ -994,7 +994,7 @@ static int pcache1MemSize(object p){
 			#if (SQLITE_ENABLE_MEMORY_MANAGEMENT) || !SQLITE_THREADSAF
 			const int separateCache = 0;
 			#else
-																																																									  int separateCache = sqlite3GlobalConfig.bCoreMutex>0;
+																																																									  int separateCache = Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex>0;
 #endif
 			//sz = sizeof( PCache1 ) + sizeof( PGroup ) * separateCache;
 			pCache = new PCache1 ();
@@ -1357,61 +1357,41 @@ static int pcache1MemSize(object p){
 ///</summary>
 
 		static void sqlite3PCacheSetDefault ()
-		{
-			sqlite3_pcache_methods defaultMethods = new sqlite3_pcache_methods (0, ///
-///<summary>
-///pArg 
-///</summary>
+        
+        {
+			sqlite3_pcache_methods defaultMethods = new sqlite3_pcache_methods (
+                ///pArg 
+                0, ///
+                ///xInit 
 
 			(dxPC_Init)pcache1Init, ///
-///<summary>
-///xInit 
-///</summary>
+                ///xShutdown 
 
 			(dxPC_Shutdown)pcache1Shutdown, ///
-///<summary>
-///xShutdown 
-///</summary>
+                ///xCreate 
 
 			(dxPC_Create)pcache1Create, ///
-///<summary>
-///xCreate 
-///</summary>
+                ///xCachesize 
 
 			(dxPC_Cachesize)pcache1Cachesize, ///
-///<summary>
-///xCachesize 
-///</summary>
+                ///xPagecount 
 
 			(dxPC_Pagecount)pcache1Pagecount, ///
-///<summary>
-///xPagecount 
-///</summary>
+                ///xFetch 
 
 			(dxPC_Fetch)pcache1Fetch, ///
-///<summary>
-///xFetch 
-///</summary>
+                ///xUnpin 
 
 			(dxPC_Unpin)pcache1Unpin, ///
-///<summary>
-///xUnpin 
-///</summary>
+                ///xRekey 
 
 			(dxPC_Rekey)pcache1Rekey, ///
-///<summary>
-///xRekey 
-///</summary>
+                ///xTruncate 
 
 			(dxPC_Truncate)pcache1Truncate, ///
-///<summary>
-///xTruncate 
-///</summary>
+                ///xDestroy 
 
 			(dxPC_Destroy)pcache1Destroy///
-///<summary>
-///xDestroy 
-///</summary>
 
 			);
             sqlite3_config(SqliteConfig.PCACHE, defaultMethods);

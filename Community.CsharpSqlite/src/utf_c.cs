@@ -315,7 +315,7 @@ Debugger.Break (); // TODO -
 //unsigned char *z;                     /* Output iterator */
 //unsigned int c;
 
-Debug.Assert( pMem.db==null || sqlite3_mutex_held(pMem.db.mutex) );
+Debug.Assert( pMem.db==null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex) );
 Debug.Assert( (pMem.flags&MEM_Str )!=0);
 Debug.Assert( pMem.enc!=desiredEnc );
 Debug.Assert( pMem.enc!=0 );
@@ -505,7 +505,7 @@ return rc;
 			//Debug.Assert( z<=zTerm );
 			//for ( int i = 0 ; i < zTerm ; i++ )      //while( *z!=0 && z<zTerm ){
 			//{
-			//  SQLITE_SKIP_UTF8( ref z);//  SQLITE_SKIP_UTF8(z);
+			//  sqliteinth.SQLITE_SKIP_UTF8( ref z);//  sqliteinth.SQLITE_SKIP_UTF8(z);
 			//  r++;
 			//}
 			//return r;

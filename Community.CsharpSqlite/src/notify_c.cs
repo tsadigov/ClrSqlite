@@ -48,7 +48,7 @@ namespace Community.CsharpSqlite
 */
 
 //define assertMutexHeld() \
-assert( sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)) )
+assert( Sqlite3.sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)) )
 
 /*
 ** Head of a linked list of all sqlite3 objects created by this process
@@ -271,8 +271,8 @@ nArg = 0;
 
 sqlite3BeginBenignMalloc();
 assert( aArg==aDyn || (aDyn==0 && aArg==aStatic) );
-assert( nArg<=(int)ArraySize(aStatic) || aArg==aDyn );
-if( (!aDyn && nArg==(int)ArraySize(aStatic))
+assert( nArg<=(int)Sqlite3.ArraySize(aStatic) || aArg==aDyn );
+if( (!aDyn && nArg==(int)Sqlite3.ArraySize(aStatic))
 || (aDyn && nArg==(int)(sqlite3DbMallocSize(db, aDyn)/sizeof(void*)))
 ){
 /* The aArg[] array needs to grow. */

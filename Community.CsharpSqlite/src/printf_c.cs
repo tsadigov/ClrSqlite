@@ -807,7 +807,7 @@ namespace Community.CsharpSqlite
 
                     infop = fmtinfo[0];
                     xtype = etINVALID;
-                    for (idx = 0; idx < ArraySize(fmtinfo); idx++)
+                    for (idx = 0; idx < Sqlite3.ArraySize(fmtinfo); idx++)
                     {
                         if (c == fmtinfo[idx].fmttype)
                         {
@@ -1825,7 +1825,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                 sqlite3StrAccumInit(acc, null, SQLITE_PRINT_BUF_SIZE * 3, 0);
                 //acc.useMalloc = 0;
                 io.sqlite3VXPrintf(acc, 0, zFormat, ap);
-                sqlite3GlobalConfig.xLog(sqlite3GlobalConfig.pLogArg, iErrCode, io.sqlite3StrAccumFinish(acc));
+                Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog(Sqlite3.sqliteinth.sqlite3GlobalConfig.pLogArg, iErrCode, io.sqlite3StrAccumFinish(acc));
             }
 
             ///<summary>
@@ -1834,7 +1834,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
             ///</summary>
             public static void sqlite3_log(int iErrCode, string zFormat, params va_list[] ap)
             {
-                if (sqlite3GlobalConfig.xLog != null)
+                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog != null)
                 {
                     //va_list ap;                             /* Vararg list */
                     lock (_Custom.lock_va_list)

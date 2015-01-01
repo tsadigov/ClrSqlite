@@ -422,8 +422,8 @@ namespace Community.CsharpSqlite
             ///</summary>
             static int sqlite3MemInit(object NotUsed)
             {
-                UNUSED_PARAMETER(NotUsed);
-                if (!sqlite3GlobalConfig.bMemstat)
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+                if (!Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat)
                 {
                     ///
                     ///<summary>
@@ -442,7 +442,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void sqlite3MemShutdown(object NotUsed)
             {
-                UNUSED_PARAMETER(NotUsed);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 return;
             }
 
@@ -450,7 +450,7 @@ namespace Community.CsharpSqlite
             /// This routine is the only routine in this file with external linkage.
             ///
             /// Populate the low-level memory allocation function pointers in
-            /// sqlite3GlobalConfig.m with pointers to the routines in this file.
+            /// Sqlite3.sqliteinth.sqlite3GlobalConfig.m with pointers to the routines in this file.
             ///
             ///</summary>
             public static void sqlite3MemSetDefault()

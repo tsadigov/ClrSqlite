@@ -23,8 +23,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
 
 
         ///<summary>
@@ -62,10 +60,10 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Preferred text encoding (SqliteEncoding.UTF8, 16LE, 16BE) 
             ///</summary>
-            public u8 flags;
+            public FuncFlags flags;
             ///
             ///<summary>
-            ///Some combination of SQLITE_FUNC_* 
+            ///Some combination of FuncFlags.SQLITE_FUNC_* 
             ///</summary>
             public object pUserData;
             ///
@@ -100,7 +98,7 @@ namespace Community.CsharpSqlite
             public FuncDef()
             {
             }
-            public FuncDef(i16 nArg, SqliteEncoding iPrefEnc, u8 iflags, object pUserData, FuncDef pNext, dxFunc xFunc, dxStep xStep, dxFinal xFinalize, string zName, FuncDef pHash, FuncDestructor pDestructor)
+            public FuncDef(i16 nArg, SqliteEncoding iPrefEnc, FuncFlags iflags, object pUserData, FuncDef pNext, dxFunc xFunc, dxStep xStep, dxFinal xFinalize, string zName, FuncDef pHash, FuncDestructor pDestructor)
             {
                 this.nArg = nArg;
                 this.iPrefEnc = iPrefEnc;
@@ -114,7 +112,7 @@ namespace Community.CsharpSqlite
                 this.pHash = pHash;
                 this.pDestructor = pDestructor;
             }
-            public FuncDef(string zName, SqliteEncoding iPrefEnc, i16 nArg, int iArg, u8 iflags, dxFunc xFunc)
+            public FuncDef(string zName, SqliteEncoding iPrefEnc, i16 nArg, int iArg, FuncFlags iflags, dxFunc xFunc)
             {
                 this.nArg = nArg;
                 this.iPrefEnc = iPrefEnc;
@@ -126,7 +124,7 @@ namespace Community.CsharpSqlite
                 this.xFinalize = null;
                 this.zName = zName;
             }
-            public FuncDef(string zName, SqliteEncoding iPrefEnc, i16 nArg, int iArg, u8 iflags, dxStep xStep, dxFinal xFinal)
+            public FuncDef(string zName, SqliteEncoding iPrefEnc, i16 nArg, int iArg, FuncFlags iflags, dxStep xStep, dxFinal xFinal)
             {
                 this.nArg = nArg;
                 this.iPrefEnc = iPrefEnc;
@@ -138,7 +136,7 @@ namespace Community.CsharpSqlite
                 this.xFinalize = xFinal;
                 this.zName = zName;
             }
-            public FuncDef(string zName, SqliteEncoding iPrefEnc, i16 nArg, object arg, dxFunc xFunc, u8 flags)
+            public FuncDef(string zName, SqliteEncoding iPrefEnc, i16 nArg, object arg, dxFunc xFunc, FuncFlags flags)
             {
                 this.nArg = nArg;
                 this.iPrefEnc = iPrefEnc;
@@ -166,6 +164,64 @@ namespace Community.CsharpSqlite
                 c.pDestructor = pDestructor;
                 return c;
             }
+
+
+            //   ExtensibleClassFactory methods
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Built">in coalesce() or ifnull() function </param>
+            ///<summary>
+            /// The following three macros, FUNCTION(), LIKEFUNC() and AGGREGATE() are
+            /// used to create the initializers for the FuncDef structures.
+            ///
+            ///   FUNCTION(zName, nArg, iArg, bNC, xFunc)
+            ///     Used to create a scalar function definition of a function zName
+            ///     implemented by C function xFunc that accepts nArg arguments. The
+            ///     value passed as iArg is cast to a (void) and made available
+            ///     as the user-data (sqlite3_user_data()) for the function. If
+            ///     argument bNC is true, then the FuncFlags.SQLITE_FUNC_NEEDCOLL flag is set.
+            ///
+            ///   AGGREGATE(zName, nArg, iArg, bNC, xStep, xFinal)
+            ///     Used to create an aggregate function definition implemented by
+            ///     the C functions xStep and xFinal. The first four parameters
+            ///     are interpreted in the same way as the first 4 parameters to
+            ///     FUNCTION().
+            ///
+            ///   LIKEFUNC(zName, nArg, pArg, flags)
+            ///     Used to create a scalar function definition of a function zName
+            ///     that accepts nArg arguments and is implemented by a call to C
+            ///     function likeFunc. Argument pArg is cast to a (void ) and made
+            ///     available as the function user-data (sqlite3_user_data()). The
+            ///     FuncDef.flags variable is set to the value passed as the flags
+            ///     parameter.
+            ///
+            ///</summary>
+            //#define FUNCTION(zName, nArg, iArg, bNC, xFunc) \
+            //  {nArg, SqliteEncoding.UTF8, bNC*FuncFlags.SQLITE_FUNC_NEEDCOLL, \
+            //SQLITE_INT_TO_PTR(iArg), 0, xFunc, 0, 0, #zName, 0, 0}
+            public static FuncDef FUNCTION(string zName, i16 nArg, int iArg, u8 bNC, dxFunc xFunc)
+            {
+                return new FuncDef(zName, SqliteEncoding.UTF8, nArg, iArg, (FuncFlags)(bNC * (u8)FuncFlags.SQLITE_FUNC_NEEDCOLL), xFunc);
+            }
+            //#define STR_FUNCTION(zName, nArg, pArg, bNC, xFunc) \
+            //  {nArg, SqliteEncoding.UTF8, bNC*FuncFlags.SQLITE_FUNC_NEEDCOLL, \
+            //pArg, 0, xFunc, 0, 0, #zName, 0, 0}
+            //#define LIKEFUNC(zName, nArg, arg, flags) \
+            //  {nArg, SqliteEncoding.UTF8, flags, (void )arg, 0, likeFunc, 0, 0, #zName, 0, 0}
+            public static FuncDef LIKEFUNC(string zName, i16 nArg, object arg, FuncFlags flags)
+            {
+                return new FuncDef(zName, SqliteEncoding.UTF8, nArg, arg, Sqlite3.func.likeFunc, flags);
+            }
+            //#define AGGREGATE(zName, nArg, arg, nc, xStep, xFinal) \
+            //  {nArg, SqliteEncoding.UTF8, nc*FuncFlags.SQLITE_FUNC_NEEDCOLL, \
+            //SQLITE_INT_TO_PTR(arg), 0, 0, xStep,xFinal,#zName,0,0}
+            public static FuncDef AGGREGATE(string zName, i16 nArg, int arg, u8 nc, dxStep xStep, dxFinal xFinal)
+            {
+                return new FuncDef(zName, SqliteEncoding.UTF8, nArg, arg, (FuncFlags)(nc * (u8)FuncFlags.SQLITE_FUNC_NEEDCOLL), xStep, xFinal);
+            }
+
+
         };
 
         ///<summary>
@@ -196,6 +252,7 @@ namespace Community.CsharpSqlite
             public object pUserData;
         };
 
+
         ///
         ///<summary>
         ///Possible values for FuncDef.flags
@@ -208,93 +265,42 @@ namespace Community.CsharpSqlite
         //#define SQLITE_FUNC_PRIVATE  0x10 /* Allowed for internal use only */
         //#define SQLITE_FUNC_COUNT    0x20 /* Built-in count() aggregate */
         //#define SQLITE_FUNC_COALESCE 0x40 /* Built-in coalesce() or ifnull() function */
-        private const int SQLITE_FUNC_LIKE = 0x01;
-        ///
-        ///<summary>
-        ///Candidate for the LIKE optimization 
-        ///</summary>
-        private const int SQLITE_FUNC_CASE = 0x02;
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="Case">type function </param>
-        private const int SQLITE_FUNC_EPHEM = 0x04;
-        ///
-        ///<summary>
-        ///Ephermeral.  Delete with VDBE 
-        ///</summary>
-        private const int SQLITE_FUNC_NEEDCOLL = 0x08;
-        ///
-        ///<summary>
-        ///sqlite3GetFuncCollSeq() might be called 
-        ///</summary>
-        private const int SQLITE_FUNC_PRIVATE = 0x10;
-        ///
-        ///<summary>
-        ///Allowed for internal use only 
-        ///</summary>
-        private const int SQLITE_FUNC_COUNT = 0x20;
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="Built">in count() aggregate </param>
-        private const int SQLITE_FUNC_COALESCE = 0x40;
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="Built">in coalesce() or ifnull() function </param>
-        ///<summary>
-        /// The following three macros, FUNCTION(), LIKEFUNC() and AGGREGATE() are
-        /// used to create the initializers for the FuncDef structures.
-        ///
-        ///   FUNCTION(zName, nArg, iArg, bNC, xFunc)
-        ///     Used to create a scalar function definition of a function zName
-        ///     implemented by C function xFunc that accepts nArg arguments. The
-        ///     value passed as iArg is cast to a (void) and made available
-        ///     as the user-data (sqlite3_user_data()) for the function. If
-        ///     argument bNC is true, then the SQLITE_FUNC_NEEDCOLL flag is set.
-        ///
-        ///   AGGREGATE(zName, nArg, iArg, bNC, xStep, xFinal)
-        ///     Used to create an aggregate function definition implemented by
-        ///     the C functions xStep and xFinal. The first four parameters
-        ///     are interpreted in the same way as the first 4 parameters to
-        ///     FUNCTION().
-        ///
-        ///   LIKEFUNC(zName, nArg, pArg, flags)
-        ///     Used to create a scalar function definition of a function zName
-        ///     that accepts nArg arguments and is implemented by a call to C
-        ///     function likeFunc. Argument pArg is cast to a (void ) and made
-        ///     available as the function user-data (sqlite3_user_data()). The
-        ///     FuncDef.flags variable is set to the value passed as the flags
-        ///     parameter.
-        ///
-        ///</summary>
-        //#define FUNCTION(zName, nArg, iArg, bNC, xFunc) \
-        //  {nArg, SqliteEncoding.UTF8, bNC*SQLITE_FUNC_NEEDCOLL, \
-        //SQLITE_INT_TO_PTR(iArg), 0, xFunc, 0, 0, #zName, 0, 0}
-        private static FuncDef FUNCTION(string zName, i16 nArg, int iArg, u8 bNC, dxFunc xFunc)
+        public enum FuncFlags : byte
         {
-            return new FuncDef(zName, SqliteEncoding.UTF8, nArg, iArg, (u8)(bNC * SQLITE_FUNC_NEEDCOLL), xFunc);
-        }
-        //#define STR_FUNCTION(zName, nArg, pArg, bNC, xFunc) \
-        //  {nArg, SqliteEncoding.UTF8, bNC*SQLITE_FUNC_NEEDCOLL, \
-        //pArg, 0, xFunc, 0, 0, #zName, 0, 0}
-        //#define LIKEFUNC(zName, nArg, arg, flags) \
-        //  {nArg, SqliteEncoding.UTF8, flags, (void )arg, 0, likeFunc, 0, 0, #zName, 0, 0}
-        private static FuncDef LIKEFUNC(string zName, i16 nArg, object arg, u8 flags)
-        {
-            return new FuncDef(zName, SqliteEncoding.UTF8, nArg, arg, func.likeFunc, flags);
-        }
-        //#define AGGREGATE(zName, nArg, arg, nc, xStep, xFinal) \
-        //  {nArg, SqliteEncoding.UTF8, nc*SQLITE_FUNC_NEEDCOLL, \
-        //SQLITE_INT_TO_PTR(arg), 0, 0, xStep,xFinal,#zName,0,0}
-        private static FuncDef AGGREGATE(string zName, i16 nArg, int arg, u8 nc, dxStep xStep, dxFinal xFinal)
-        {
-            return new FuncDef(zName, SqliteEncoding.UTF8, nArg, arg, (u8)(nc * SQLITE_FUNC_NEEDCOLL), xStep, xFinal);
+            SQLITE_FUNC_LIKE = 0x01,
+            ///
+            ///<summary>
+            ///Candidate for the LIKE optimization 
+            ///</summary>
+            SQLITE_FUNC_CASE = 0x02,
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Case">type function </param>
+            SQLITE_FUNC_EPHEM = 0x04,
+            ///
+            ///<summary>
+            ///Ephermeral.  Delete with VDBE 
+            ///</summary>
+            SQLITE_FUNC_NEEDCOLL = 0x08,
+            ///
+            ///<summary>
+            ///sqlite3GetFuncCollSeq() might be called 
+            ///</summary>
+            SQLITE_FUNC_PRIVATE = 0x10,
+            ///
+            ///<summary>
+            ///Allowed for internal use only 
+            ///</summary>
+            SQLITE_FUNC_COUNT = 0x20,
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Built">in count() aggregate </param>
+            SQLITE_FUNC_COALESCE = 0x4
         }
 
 
 
-
+        
     }
-}

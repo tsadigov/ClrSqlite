@@ -1146,127 +1146,127 @@ namespace Community.CsharpSqlite
 
 		static byte[] aCode =  {
 			//aCode[121
-			TK_REINDEX,
-			TK_INDEXED,
-			TK_INDEX,
-			TK_DESC,
-			TK_ESCAPE,
-			TK_EACH,
-			TK_CHECK,
-			TK_KEY,
-			TK_BEFORE,
-			TK_FOREIGN,
-			TK_FOR,
-			TK_IGNORE,
-			TK_LIKE_KW,
-			TK_EXPLAIN,
-			TK_INSTEAD,
-			TK_ADD,
-			TK_DATABASE,
-			TK_AS,
-			TK_SELECT,
-			TK_TABLE,
-			TK_JOIN_KW,
-			TK_THEN,
-			TK_END,
-			TK_DEFERRABLE,
-			TK_ELSE,
-			TK_EXCEPT,
-			TK_TRANSACTION,
-			TK_ACTION,
-			TK_ON,
-			TK_JOIN_KW,
-			TK_ALTER,
-			TK_RAISE,
-			TK_EXCLUSIVE,
-			TK_EXISTS,
-			TK_SAVEPOINT,
-			TK_INTERSECT,
-			TK_TRIGGER,
-			TK_REFERENCES,
-			TK_CONSTRAINT,
-			TK_INTO,
-			TK_OFFSET,
-			TK_OF,
-			TK_SET,
-			TK_TEMP,
-			TK_TEMP,
-			TK_OR,
-			TK_UNIQUE,
-			TK_QUERY,
-			TK_ATTACH,
-			TK_HAVING,
-			TK_GROUP,
-			TK_UPDATE,
-			TK_BEGIN,
-			TK_JOIN_KW,
-			TK_RELEASE,
-			TK_BETWEEN,
-			TK_NOTNULL,
-			TK_NOT,
-			TK_NO,
-			TK_NULL,
-			TK_LIKE_KW,
-			TK_CASCADE,
-			TK_ASC,
-			TK_DELETE,
-			TK_CASE,
-			TK_COLLATE,
-			TK_CREATE,
-			TK_CTIME_KW,
-			TK_DETACH,
-			TK_IMMEDIATE,
-			TK_JOIN,
-			TK_INSERT,
-			TK_MATCH,
-			TK_PLAN,
-			TK_ANALYZE,
-			TK_PRAGMA,
-			TK_ABORT,
-			TK_VALUES,
-			TK_VIRTUAL,
-			TK_LIMIT,
-			TK_WHEN,
-			TK_WHERE,
-			TK_RENAME,
-			TK_AFTER,
-			TK_REPLACE,
-			TK_AND,
-			TK_DEFAULT,
-			TK_AUTOINCR,
-			TK_TO,
-			TK_IN,
-			TK_CAST,
-			TK_COLUMNKW,
-			TK_COMMIT,
-			TK_CONFLICT,
-			TK_JOIN_KW,
-			TK_CTIME_KW,
-			TK_CTIME_KW,
-			TK_PRIMARY,
-			TK_DEFERRED,
-			TK_DISTINCT,
-			TK_IS,
-			TK_DROP,
-			TK_FAIL,
-			TK_FROM,
-			TK_JOIN_KW,
-			TK_LIKE_KW,
-			TK_BY,
-			TK_IF,
-			TK_ISNULL,
-			TK_ORDER,
-			TK_RESTRICT,
-			TK_JOIN_KW,
-			TK_JOIN_KW,
-			TK_ROLLBACK,
-			TK_ROW,
-			TK_UNION,
-			TK_USING,
-			TK_VACUUM,
-			TK_VIEW,
-			TK_INITIALLY,
-			TK_ALL,
+			Sqlite3.TK_REINDEX,
+			Sqlite3.TK_INDEXED,
+			Sqlite3.TK_INDEX,
+			Sqlite3.TK_DESC,
+			Sqlite3.TK_ESCAPE,
+			Sqlite3.TK_EACH,
+			Sqlite3.TK_CHECK,
+			Sqlite3.TK_KEY,
+			Sqlite3.TK_BEFORE,
+			Sqlite3.TK_FOREIGN,
+			Sqlite3.TK_FOR,
+			Sqlite3.TK_IGNORE,
+			Sqlite3.TK_LIKE_KW,
+			Sqlite3.TK_EXPLAIN,
+			Sqlite3.TK_INSTEAD,
+			Sqlite3.TK_ADD,
+			Sqlite3.TK_DATABASE,
+			Sqlite3.TK_AS,
+			Sqlite3.TK_SELECT,
+			Sqlite3.TK_TABLE,
+			Sqlite3.TK_JOIN_KW,
+			Sqlite3.TK_THEN,
+			Sqlite3.TK_END,
+			Sqlite3.TK_DEFERRABLE,
+			Sqlite3.TK_ELSE,
+			Sqlite3.TK_EXCEPT,
+			Sqlite3.TK_TRANSACTION,
+			Sqlite3.TK_ACTION,
+			Sqlite3.TK_ON,
+			Sqlite3.TK_JOIN_KW,
+			Sqlite3.TK_ALTER,
+			Sqlite3.TK_RAISE,
+			Sqlite3.TK_EXCLUSIVE,
+			Sqlite3.TK_EXISTS,
+			Sqlite3.TK_SAVEPOINT,
+			Sqlite3.TK_INTERSECT,
+			Sqlite3.TK_TRIGGER,
+			Sqlite3.TK_REFERENCES,
+			Sqlite3.TK_CONSTRAINT,
+			Sqlite3.TK_INTO,
+			Sqlite3.TK_OFFSET,
+			Sqlite3.TK_OF,
+			Sqlite3.TK_SET,
+			Sqlite3.TK_TEMP,
+			Sqlite3.TK_TEMP,
+			Sqlite3.TK_OR,
+			Sqlite3.TK_UNIQUE,
+			Sqlite3.TK_QUERY,
+			Sqlite3.TK_ATTACH,
+			Sqlite3.TK_HAVING,
+			Sqlite3.TK_GROUP,
+			Sqlite3.TK_UPDATE,
+			Sqlite3.TK_BEGIN,
+			Sqlite3.TK_JOIN_KW,
+			Sqlite3.TK_RELEASE,
+			Sqlite3.TK_BETWEEN,
+			Sqlite3.TK_NOTNULL,
+			Sqlite3.TK_NOT,
+			Sqlite3.TK_NO,
+			Sqlite3.TK_NULL,
+			Sqlite3.TK_LIKE_KW,
+			Sqlite3.TK_CASCADE,
+			Sqlite3.TK_ASC,
+			Sqlite3.TK_DELETE,
+			Sqlite3.TK_CASE,
+			Sqlite3.TK_COLLATE,
+			Sqlite3.TK_CREATE,
+			Sqlite3.TK_CTIME_KW,
+			Sqlite3.TK_DETACH,
+			Sqlite3.TK_IMMEDIATE,
+			Sqlite3.TK_JOIN,
+			Sqlite3.TK_INSERT,
+			Sqlite3.TK_MATCH,
+			Sqlite3.TK_PLAN,
+			Sqlite3.TK_ANALYZE,
+			Sqlite3.TK_PRAGMA,
+			Sqlite3.TK_ABORT,
+			Sqlite3.TK_VALUES,
+			Sqlite3.TK_VIRTUAL,
+			Sqlite3.TK_LIMIT,
+			Sqlite3.TK_WHEN,
+			Sqlite3.TK_WHERE,
+			Sqlite3.TK_RENAME,
+			Sqlite3.TK_AFTER,
+			Sqlite3.TK_REPLACE,
+			Sqlite3.TK_AND,
+			Sqlite3.TK_DEFAULT,
+			Sqlite3.TK_AUTOINCR,
+			Sqlite3.TK_TO,
+			Sqlite3.TK_IN,
+			Sqlite3.TK_CAST,
+			Sqlite3.TK_COLUMNKW,
+			Sqlite3.TK_COMMIT,
+			Sqlite3.TK_CONFLICT,
+			Sqlite3.TK_JOIN_KW,
+			Sqlite3.TK_CTIME_KW,
+			Sqlite3.TK_CTIME_KW,
+			Sqlite3.TK_PRIMARY,
+			Sqlite3.TK_DEFERRED,
+			Sqlite3.TK_DISTINCT,
+			Sqlite3.TK_IS,
+			Sqlite3.TK_DROP,
+			Sqlite3.TK_FAIL,
+			Sqlite3.TK_FROM,
+			Sqlite3.TK_JOIN_KW,
+			Sqlite3.TK_LIKE_KW,
+			Sqlite3.TK_BY,
+			Sqlite3.TK_IF,
+			Sqlite3.TK_ISNULL,
+			Sqlite3.TK_ORDER,
+			Sqlite3.TK_RESTRICT,
+			Sqlite3.TK_JOIN_KW,
+			Sqlite3.TK_JOIN_KW,
+			Sqlite3.TK_ROLLBACK,
+			Sqlite3.TK_ROW,
+			Sqlite3.TK_UNION,
+			Sqlite3.TK_USING,
+			Sqlite3.TK_VACUUM,
+			Sqlite3.TK_VIEW,
+			Sqlite3.TK_INITIALLY,
+			Sqlite3.TK_ALL,
 		};
 
 		static TokenType keywordCode (string z, int iOffset, int n)
@@ -1278,733 +1278,733 @@ namespace Community.CsharpSqlite
 		{
 			int h, i;
 			if (n < 2)
-				return TK_ID;
+				return Sqlite3.TK_ID;
 			h = ((_Custom.sqlite3UpperToLower [z [iOffset + 0]]) * 4 ^ //(charMap(z[iOffset+0]) * 4) ^
 			(_Custom.sqlite3UpperToLower [z [iOffset + n - 1]] * 3) ^ //(charMap(z[iOffset+n - 1]) * 3) ^
 			n) % 127;
 			for (i = (aHash [h]) - 1; i >= 0; i = (aNext [i]) - 1) {
 				if (aLen [i] == n && String.Compare (zText, aOffset [i], z, iOffset, n, StringComparison.InvariantCultureIgnoreCase) == 0) {
-					testcase (i == 0);
+					sqliteinth.testcase (i == 0);
 					///
 ///<summary>
 ///REINDEX 
 ///</summary>
 
-					testcase (i == 1);
+					sqliteinth.testcase (i == 1);
 					///
 ///<summary>
 ///INDEXED 
 ///</summary>
 
-					testcase (i == 2);
+					sqliteinth.testcase (i == 2);
 					///
 ///<summary>
 ///INDEX 
 ///</summary>
 
-					testcase (i == 3);
+                    sqliteinth.testcase(i == 3);
 					///
 ///<summary>
 ///DESC 
 ///</summary>
 
-					testcase (i == 4);
+					sqliteinth.testcase (i == 4);
 					///
 ///<summary>
 ///ESCAPE 
 ///</summary>
 
-					testcase (i == 5);
+					sqliteinth.testcase (i == 5);
 					///
 ///<summary>
 ///EACH 
 ///</summary>
 
-					testcase (i == 6);
+					sqliteinth.testcase (i == 6);
 					///
 ///<summary>
 ///CHECK 
 ///</summary>
 
-					testcase (i == 7);
+					sqliteinth.testcase (i == 7);
 					///
 ///<summary>
 ///KEY 
 ///</summary>
 
-					testcase (i == 8);
+					sqliteinth.testcase (i == 8);
 					///
 ///<summary>
 ///BEFORE 
 ///</summary>
 
-					testcase (i == 9);
+					sqliteinth.testcase (i == 9);
 					///
 ///<summary>
 ///FOREIGN 
 ///</summary>
 
-					testcase (i == 10);
+					sqliteinth.testcase (i == 10);
 					///
 ///<summary>
 ///FOR 
 ///</summary>
 
-					testcase (i == 11);
+					sqliteinth.testcase (i == 11);
 					///
 ///<summary>
 ///IGNORE 
 ///</summary>
 
-					testcase (i == 12);
+					sqliteinth.testcase (i == 12);
 					///
 ///<summary>
 ///REGEXP 
 ///</summary>
 
-					testcase (i == 13);
+					sqliteinth.testcase (i == 13);
 					///
 ///<summary>
 ///EXPLAIN 
 ///</summary>
 
-					testcase (i == 14);
+					sqliteinth.testcase (i == 14);
 					///
 ///<summary>
 ///INSTEAD 
 ///</summary>
 
-					testcase (i == 15);
+					sqliteinth.testcase (i == 15);
 					///
 ///<summary>
 ///ADD 
 ///</summary>
 
-					testcase (i == 16);
+					sqliteinth.testcase (i == 16);
 					///
 ///<summary>
 ///DATABASE 
 ///</summary>
 
-					testcase (i == 17);
+					sqliteinth.testcase (i == 17);
 					///
 ///<summary>
 ///AS 
 ///</summary>
 
-					testcase (i == 18);
+					sqliteinth.testcase (i == 18);
 					///
 ///<summary>
 ///SELECT 
 ///</summary>
 
-					testcase (i == 19);
+					sqliteinth.testcase (i == 19);
 					///
 ///<summary>
 ///TABLE 
 ///</summary>
 
-					testcase (i == 20);
+					sqliteinth.testcase (i == 20);
 					///
 ///<summary>
 ///LEFT 
 ///</summary>
 
-					testcase (i == 21);
+					sqliteinth.testcase (i == 21);
 					///
 ///<summary>
 ///THEN 
 ///</summary>
 
-					testcase (i == 22);
+					sqliteinth.testcase (i == 22);
 					///
 ///<summary>
 ///END 
 ///</summary>
 
-					testcase (i == 23);
+					sqliteinth.testcase (i == 23);
 					///
 ///<summary>
 ///DEFERRABLE 
 ///</summary>
 
-					testcase (i == 24);
+					sqliteinth.testcase (i == 24);
 					///
 ///<summary>
 ///ELSE 
 ///</summary>
 
-					testcase (i == 25);
+					sqliteinth.testcase (i == 25);
 					///
 ///<summary>
 ///EXCEPT 
 ///</summary>
 
-					testcase (i == 26);
+					sqliteinth.testcase (i == 26);
 					///
 ///<summary>
 ///TRANSACTION 
 ///</summary>
 
-					testcase (i == 27);
+					sqliteinth.testcase (i == 27);
 					///
 ///<summary>
 ///ACTION 
 ///</summary>
 
-					testcase (i == 28);
+					sqliteinth.testcase (i == 28);
 					///
 ///<summary>
 ///ON 
 ///</summary>
 
-					testcase (i == 29);
+					sqliteinth.testcase (i == 29);
 					///
 ///<summary>
 ///NATURAL 
 ///</summary>
 
-					testcase (i == 30);
+					sqliteinth.testcase (i == 30);
 					///
 ///<summary>
 ///ALTER 
 ///</summary>
 
-					testcase (i == 31);
+					sqliteinth.testcase (i == 31);
 					///
 ///<summary>
 ///RAISE 
 ///</summary>
 
-					testcase (i == 32);
+					sqliteinth.testcase (i == 32);
 					///
 ///<summary>
 ///EXCLUSIVE 
 ///</summary>
 
-					testcase (i == 33);
+					sqliteinth.testcase (i == 33);
 					///
 ///<summary>
 ///EXISTS 
 ///</summary>
 
-					testcase (i == 34);
+					sqliteinth.testcase (i == 34);
 					///
 ///<summary>
 ///SAVEPOINT 
 ///</summary>
 
-					testcase (i == 35);
+					sqliteinth.testcase (i == 35);
 					///
 ///<summary>
 ///INTERSECT 
 ///</summary>
 
-					testcase (i == 36);
+					sqliteinth.testcase (i == 36);
 					///
 ///<summary>
 ///TRIGGER 
 ///</summary>
 
-					testcase (i == 37);
+					sqliteinth.testcase (i == 37);
 					///
 ///<summary>
 ///REFERENCES 
 ///</summary>
 
-					testcase (i == 38);
+					sqliteinth.testcase (i == 38);
 					///
 ///<summary>
 ///CONSTRAINT 
 ///</summary>
 
-					testcase (i == 39);
+					sqliteinth.testcase (i == 39);
 					///
 ///<summary>
 ///INTO 
 ///</summary>
 
-					testcase (i == 40);
+					sqliteinth.testcase (i == 40);
 					///
 ///<summary>
 ///OFFSET 
 ///</summary>
 
-					testcase (i == 41);
+					sqliteinth.testcase (i == 41);
 					///
 ///<summary>
 ///OF 
 ///</summary>
 
-					testcase (i == 42);
+					sqliteinth.testcase (i == 42);
 					///
 ///<summary>
 ///SET 
 ///</summary>
 
-					testcase (i == 43);
+					sqliteinth.testcase (i == 43);
 					///
 ///<summary>
 ///TEMPORARY 
 ///</summary>
 
-					testcase (i == 44);
+					sqliteinth.testcase (i == 44);
 					///
 ///<summary>
 ///TEMP 
 ///</summary>
 
-					testcase (i == 45);
+					sqliteinth.testcase (i == 45);
 					///
 ///<summary>
 ///OR 
 ///</summary>
 
-					testcase (i == 46);
+					sqliteinth.testcase (i == 46);
 					///
 ///<summary>
 ///UNIQUE 
 ///</summary>
 
-					testcase (i == 47);
+					sqliteinth.testcase (i == 47);
 					///
 ///<summary>
 ///QUERY 
 ///</summary>
 
-					testcase (i == 48);
+					sqliteinth.testcase (i == 48);
 					///
 ///<summary>
 ///ATTACH 
 ///</summary>
 
-					testcase (i == 49);
+					sqliteinth.testcase (i == 49);
 					///
 ///<summary>
 ///HAVING 
 ///</summary>
 
-					testcase (i == 50);
+					sqliteinth.testcase (i == 50);
 					///
 ///<summary>
 ///GROUP 
 ///</summary>
 
-					testcase (i == 51);
+					sqliteinth.testcase (i == 51);
 					///
 ///<summary>
 ///UPDATE 
 ///</summary>
 
-					testcase (i == 52);
+					sqliteinth.testcase (i == 52);
 					///
 ///<summary>
 ///BEGIN 
 ///</summary>
 
-					testcase (i == 53);
+					sqliteinth.testcase (i == 53);
 					///
 ///<summary>
 ///INNER 
 ///</summary>
 
-					testcase (i == 54);
+					sqliteinth.testcase (i == 54);
 					///
 ///<summary>
 ///RELEASE 
 ///</summary>
 
-					testcase (i == 55);
+					sqliteinth.testcase (i == 55);
 					///
 ///<summary>
 ///BETWEEN 
 ///</summary>
 
-					testcase (i == 56);
+					sqliteinth.testcase (i == 56);
 					///
 ///<summary>
 ///NOTNULL 
 ///</summary>
 
-					testcase (i == 57);
+					sqliteinth.testcase (i == 57);
 					///
 ///<summary>
 ///NOT 
 ///</summary>
 
-					testcase (i == 58);
+					sqliteinth.testcase (i == 58);
 					///
 ///<summary>
 ///NO 
 ///</summary>
 
-					testcase (i == 59);
+					sqliteinth.testcase (i == 59);
 					///
 ///<summary>
 ///NULL 
 ///</summary>
 
-					testcase (i == 60);
+					sqliteinth.testcase (i == 60);
 					///
 ///<summary>
 ///LIKE 
 ///</summary>
 
-					testcase (i == 61);
+					sqliteinth.testcase (i == 61);
 					///
 ///<summary>
 ///CASCADE 
 ///</summary>
 
-					testcase (i == 62);
+					sqliteinth.testcase (i == 62);
 					///
 ///<summary>
 ///ASC 
 ///</summary>
 
-					testcase (i == 63);
+					sqliteinth.testcase (i == 63);
 					///
 ///<summary>
 ///DELETE 
 ///</summary>
 
-					testcase (i == 64);
+					sqliteinth.testcase (i == 64);
 					///
 ///<summary>
 ///CASE 
 ///</summary>
 
-					testcase (i == 65);
+					sqliteinth.testcase (i == 65);
 					///
 ///<summary>
 ///COLLATE 
 ///</summary>
 
-					testcase (i == 66);
+					sqliteinth.testcase (i == 66);
 					///
 ///<summary>
 ///CREATE 
 ///</summary>
 
-					testcase (i == 67);
+					sqliteinth.testcase (i == 67);
 					///
 ///<summary>
 ///CURRENT_DATE 
 ///</summary>
 
-					testcase (i == 68);
+					sqliteinth.testcase (i == 68);
 					///
 ///<summary>
 ///DETACH 
 ///</summary>
 
-					testcase (i == 69);
+					sqliteinth.testcase (i == 69);
 					///
 ///<summary>
 ///IMMEDIATE 
 ///</summary>
 
-					testcase (i == 70);
+					sqliteinth.testcase (i == 70);
 					///
 ///<summary>
 ///JOIN 
 ///</summary>
 
-					testcase (i == 71);
+					sqliteinth.testcase (i == 71);
 					///
 ///<summary>
 ///INSERT 
 ///</summary>
 
-					testcase (i == 72);
+					sqliteinth.testcase (i == 72);
 					///
 ///<summary>
 ///MATCH 
 ///</summary>
 
-					testcase (i == 73);
+					sqliteinth.testcase (i == 73);
 					///
 ///<summary>
 ///PLAN 
 ///</summary>
 
-					testcase (i == 74);
+					sqliteinth.testcase (i == 74);
 					///
 ///<summary>
 ///ANALYZE 
 ///</summary>
 
-					testcase (i == 75);
+					sqliteinth.testcase (i == 75);
 					///
 ///<summary>
 ///PRAGMA 
 ///</summary>
 
-					testcase (i == 76);
+					sqliteinth.testcase (i == 76);
 					///
 ///<summary>
 ///ABORT 
 ///</summary>
 
-					testcase (i == 77);
+					sqliteinth.testcase (i == 77);
 					///
 ///<summary>
 ///VALUES 
 ///</summary>
 
-					testcase (i == 78);
+					sqliteinth.testcase (i == 78);
 					///
 ///<summary>
 ///VIRTUAL 
 ///</summary>
 
-					testcase (i == 79);
+					sqliteinth.testcase (i == 79);
 					///
 ///<summary>
 ///LIMIT 
 ///</summary>
 
-					testcase (i == 80);
+					sqliteinth.testcase (i == 80);
 					///
 ///<summary>
 ///WHEN 
 ///</summary>
 
-					testcase (i == 81);
+					sqliteinth.testcase (i == 81);
 					///
 ///<summary>
 ///WHERE 
 ///</summary>
 
-					testcase (i == 82);
+					sqliteinth.testcase (i == 82);
 					///
 ///<summary>
 ///RENAME 
 ///</summary>
 
-					testcase (i == 83);
+					sqliteinth.testcase (i == 83);
 					///
 ///<summary>
 ///AFTER 
 ///</summary>
 
-					testcase (i == 84);
+					sqliteinth.testcase (i == 84);
 					///
 ///<summary>
 ///REPLACE 
 ///</summary>
 
-					testcase (i == 85);
+					sqliteinth.testcase (i == 85);
 					///
 ///<summary>
 ///AND 
 ///</summary>
 
-					testcase (i == 86);
+					sqliteinth.testcase (i == 86);
 					///
 ///<summary>
 ///DEFAULT 
 ///</summary>
 
-					testcase (i == 87);
+					sqliteinth.testcase (i == 87);
 					///
 ///<summary>
 ///AUTOINCREMENT 
 ///</summary>
 
-					testcase (i == 88);
+					sqliteinth.testcase (i == 88);
 					///
 ///<summary>
 ///TO 
 ///</summary>
 
-					testcase (i == 89);
+					sqliteinth.testcase (i == 89);
 					///
 ///<summary>
 ///IN 
 ///</summary>
 
-					testcase (i == 90);
+					sqliteinth.testcase (i == 90);
 					///
 ///<summary>
 ///CAST 
 ///</summary>
 
-					testcase (i == 91);
+					sqliteinth.testcase (i == 91);
 					///
 ///<summary>
 ///COLUMN 
 ///</summary>
 
-					testcase (i == 92);
+					sqliteinth.testcase (i == 92);
 					///
 ///<summary>
 ///COMMIT 
 ///</summary>
 
-					testcase (i == 93);
+					sqliteinth.testcase (i == 93);
 					///
 ///<summary>
 ///CONFLICT 
 ///</summary>
 
-					testcase (i == 94);
+					sqliteinth.testcase (i == 94);
 					///
 ///<summary>
 ///CROSS 
 ///</summary>
 
-					testcase (i == 95);
+					sqliteinth.testcase (i == 95);
 					///
 ///<summary>
 ///CURRENT_TIMESTAMP 
 ///</summary>
 
-					testcase (i == 96);
+					sqliteinth.testcase (i == 96);
 					///
 ///<summary>
 ///CURRENT_TIME 
 ///</summary>
 
-					testcase (i == 97);
+					sqliteinth.testcase (i == 97);
 					///
 ///<summary>
 ///PRIMARY 
 ///</summary>
 
-					testcase (i == 98);
+					sqliteinth.testcase (i == 98);
 					///
 ///<summary>
 ///DEFERRED 
 ///</summary>
 
-					testcase (i == 99);
+					sqliteinth.testcase (i == 99);
 					///
 ///<summary>
 ///DISTINCT 
 ///</summary>
 
-					testcase (i == 100);
+					sqliteinth.testcase (i == 100);
 					///
 ///<summary>
 ///IS 
 ///</summary>
 
-					testcase (i == 101);
+					sqliteinth.testcase (i == 101);
 					///
 ///<summary>
 ///DROP 
 ///</summary>
 
-					testcase (i == 102);
+					sqliteinth.testcase (i == 102);
 					///
 ///<summary>
 ///FAIL 
 ///</summary>
 
-					testcase (i == 103);
+					sqliteinth.testcase (i == 103);
 					///
 ///<summary>
 ///FROM 
 ///</summary>
 
-					testcase (i == 104);
+					sqliteinth.testcase (i == 104);
 					///
 ///<summary>
 ///FULL 
 ///</summary>
 
-					testcase (i == 105);
+					sqliteinth.testcase (i == 105);
 					///
 ///<summary>
 ///GLOB 
 ///</summary>
 
-					testcase (i == 106);
+					sqliteinth.testcase (i == 106);
 					///
 ///<summary>
 ///BY 
 ///</summary>
 
-					testcase (i == 107);
+					sqliteinth.testcase (i == 107);
 					///
 ///<summary>
 ///IF 
 ///</summary>
 
-					testcase (i == 108);
+					sqliteinth.testcase (i == 108);
 					///
 ///<summary>
 ///ISNULL 
 ///</summary>
 
-					testcase (i == 109);
+					sqliteinth.testcase (i == 109);
 					///
 ///<summary>
 ///ORDER 
 ///</summary>
 
-					testcase (i == 110);
+					sqliteinth.testcase (i == 110);
 					///
 ///<summary>
 ///RESTRICT 
 ///</summary>
 
-					testcase (i == 111);
+					sqliteinth.testcase (i == 111);
 					///
 ///<summary>
 ///OUTER 
 ///</summary>
 
-					testcase (i == 112);
+					sqliteinth.testcase (i == 112);
 					///
 ///<summary>
 ///RIGHT 
 ///</summary>
 
-					testcase (i == 113);
+					sqliteinth.testcase (i == 113);
 					///
 ///<summary>
 ///ROLLBACK 
 ///</summary>
 
-					testcase (i == 114);
+					sqliteinth.testcase (i == 114);
 					///
 ///<summary>
 ///ROW 
 ///</summary>
 
-					testcase (i == 115);
+					sqliteinth.testcase (i == 115);
 					///
 ///<summary>
 ///UNION 
 ///</summary>
 
-					testcase (i == 116);
+					sqliteinth.testcase (i == 116);
 					///
 ///<summary>
 ///USING 
 ///</summary>
 
-					testcase (i == 117);
+					sqliteinth.testcase (i == 117);
 					///
 ///<summary>
 ///VACUUM 
 ///</summary>
 
-					testcase (i == 118);
+					sqliteinth.testcase (i == 118);
 					///
 ///<summary>
 ///VIEW 
 ///</summary>
 
-					testcase (i == 119);
+					sqliteinth.testcase (i == 119);
 					///
 ///<summary>
 ///INITIALLY 
 ///</summary>
 
-					testcase (i == 120);
+					sqliteinth.testcase (i == 120);
 					///
 ///<summary>
 ///ALL 
@@ -2013,7 +2013,7 @@ namespace Community.CsharpSqlite
 					return aCode [i];
 				}
 			}
-			return TK_ID;
+			return Sqlite3.TK_ID;
 		}
 
 		static int sqlite3KeywordCode (string z, int n)

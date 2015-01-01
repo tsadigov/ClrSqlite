@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace System
-//Community.CsharpSqlite
+namespace Community.CsharpSqlite
 {
 	public static class ExprExtensions
 	{
@@ -19,14 +18,14 @@ namespace System
 		/// value.
 		///
 		///</summary>
-		public static void heightOfExpr (this Community.CsharpSqlite.Sqlite3.Expr _this, ref int pnHeight)
+		public static void heightOfExpr (this Expr _this, ref int pnHeight)
 		{
 			if (null != _this && _this.nHeight > pnHeight) {
 				pnHeight = _this.nHeight;
 			}
 		}
 
-		public static void heightOfExprList (this Community.CsharpSqlite.Sqlite3.ExprList _this, ref int pnHeight)
+		public static void heightOfExprList (this ExprList _this, ref int pnHeight)
 		{
 			if (_this != null) {
 				int i;

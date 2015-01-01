@@ -60,8 +60,8 @@ namespace Community.CsharpSqlite {
 					if(zObj==null) {
 						zObj="?";
 						#if SQLITE_OMIT_UTF16
-						if(ENC(db)!=SqliteEncoding.UTF8)
-							zObj=encnames[((int)ENC(db))].zName;
+						if(sqliteinth.ENC(db)!=SqliteEncoding.UTF8)
+                            zObj = encnames[((int)sqliteinth.ENC(db))].zName;
 						#endif
 					}
 					sqlite3SetString(ref pData.pzErrMsg,db,"malformed database schema (%s)",zObj);
@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite {
 					}
 				}
 				pData.rc=//db.mallocFailed != 0 ? SQLITE_NOMEM :
-				SQLITE_CORRUPT_BKPT();
+                sqliteinth.SQLITE_CORRUPT_BKPT();
 			}
 		}
 		///<summary>
@@ -92,9 +92,10 @@ namespace Community.CsharpSqlite {
 			sqlite3 db=pData.db;
 			int iDb=pData.iDb;
 			Debug.Assert(argc==3);
-			UNUSED_PARAMETER2(NotUsed,argc);
-			Debug.Assert(sqlite3_mutex_held(db.mutex));
-			DbClearProperty(db,iDb,DB_Empty);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed,argc);
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
+			db.DbClearProperty(iDb,sqliteinth.DB_Empty);
+            
 			//if ( db.mallocFailed != 0 )
 			//{
 			//  corruptSchema( pData, argv[0], "" );
@@ -231,7 +232,7 @@ namespace Community.CsharpSqlite {
 #endif
 			Debug.Assert(iDb>=0&&iDb<db.nDb);
 			Debug.Assert(db.aDb[iDb].pSchema!=null);
-			Debug.Assert(sqlite3_mutex_held(db.mutex));
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
 			Debug.Assert(iDb==1||sqlite3BtreeHoldsMutex(db.aDb[iDb].pBt));
 			///
 			///<summary>
@@ -240,13 +241,14 @@ namespace Community.CsharpSqlite {
 			///initialised. zMasterName is the name of the master table.
 			///
 			///</summary>
-			if(OMIT_TEMPDB==0&&iDb==1) {
+            if (sqliteinth.OMIT_TEMPDB == 0 && iDb == 1)
+            {
 				zMasterSchema=temp_master_schema;
 			}
 			else {
 				zMasterSchema=master_schema;
 			}
-			zMasterName=SCHEMA_TABLE(iDb);
+            zMasterName = sqliteinth.SCHEMA_TABLE(iDb);
 			///
 			///<summary>
 			///Construct the schema tables.  
@@ -265,8 +267,8 @@ namespace Community.CsharpSqlite {
 				goto error_out;
 			}
 			pTab=build.sqlite3FindTable(db,zMasterName,db.aDb[iDb].zName);
-			if(ALWAYS(pTab)) {
-				pTab.tabFlags|=TF_Readonly;
+			if(Sqlite3.ALWAYS(pTab)) {
+				pTab.tabFlags|=TableFlags.TF_Readonly;
 			}
 			///
 			///<summary>
@@ -275,8 +277,9 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			pDb=db.aDb[iDb];
 			if(pDb.pBt==null) {
-				if(OMIT_TEMPDB==0&&ALWAYS(iDb==1)) {
-					DbSetProperty(db,1,DB_SchemaLoaded);
+                if (Sqlite3.sqliteinth.OMIT_TEMPDB == 0 && Sqlite3.ALWAYS(iDb == 1))
+                {
+                    db.DbSetProperty(1, sqliteinth.DB_SchemaLoaded);
 				}
 				return SQLITE_OK;
 			}
@@ -322,7 +325,7 @@ namespace Community.CsharpSqlite {
 			///<param name="Note: The #defined SQLITE_UTF* symbols in sqliteInt.h correspond to">Note: The #defined SQLITE_UTF* symbols in sqliteInt.h correspond to</param>
 			///<param name="the possible values of meta[BTREE_TEXT_ENCODING">1].</param>
 			///<param name=""></param>
-			for(i=0;i<ArraySize(meta);i++) {
+			for(i=0;i<Sqlite3.ArraySize(meta);i++) {
 				meta[i]=pDb.pBt.sqlite3BtreeGetMeta(i+1);
 			}
 			pDb.pSchema.schema_cookie=(int)meta[BTREE_SCHEMA_VERSION-1];
@@ -350,14 +353,15 @@ namespace Community.CsharpSqlite {
 						encoding=SqliteEncoding.UTF8;
 					db.aDb[0].pSchema.enc=encoding;
 					//ENC( db ) = encoding;
-					db.pDfltColl=sqlite3FindCollSeq(db,SqliteEncoding.UTF8,"BINARY",0);
+					db.pDfltColl=db.sqlite3FindCollSeq(SqliteEncoding.UTF8,"BINARY",0);
 				}
 				else {
 					///
 					///<summary>
 					///If opening an attached database, the encoding much match ENC(db) 
 					///</summary>
-					if((SqliteEncoding)meta[BTREE_TEXT_ENCODING-1]!=ENC(db)) {
+                    if ((SqliteEncoding)meta[BTREE_TEXT_ENCODING - 1] != sqliteinth.ENC(db))
+                    {
 						sqlite3SetString(ref pzErrMsg,db,"attached databases must use the same"+" text encoding as main database");
 						rc=SQLITE_ERROR;
 						goto initone_error_out;
@@ -365,9 +369,9 @@ namespace Community.CsharpSqlite {
 				}
 			}
 			else {
-				DbSetProperty(db,iDb,DB_Empty);
+                db.DbSetProperty(iDb, sqliteinth.DB_Empty);
 			}
-			pDb.pSchema.enc=ENC(db);
+            pDb.pSchema.enc = sqliteinth.ENC(db);
 			if(pDb.pSchema.cache_size==0) {
                 size = utilc.sqlite3AbsInt32((int)meta[BTREE_DEFAULT_CACHE_SIZE - 1]);
 				if(size==0) {
@@ -388,7 +392,8 @@ namespace Community.CsharpSqlite {
 			if(pDb.pSchema.file_format==0) {
 				pDb.pSchema.file_format=1;
 			}
-			if(pDb.pSchema.file_format>SQLITE_MAX_FILE_FORMAT) {
+            if (pDb.pSchema.file_format > sqliteinth.SQLITE_MAX_FILE_FORMAT)
+            {
 				sqlite3SetString(ref pzErrMsg,db,"unsupported file format");
 				rc=SQLITE_ERROR;
 				goto initone_error_out;
@@ -457,7 +462,7 @@ db.xAuth = 0;
 				///even when its contents have been corrupted.
 				///
 				///</summary>
-				DbSetProperty(db,iDb,DB_SchemaLoaded);
+				db.DbSetProperty(iDb,sqliteinth.DB_SchemaLoaded);
 				rc=SQLITE_OK;
 			}
 			initone_error_out:
@@ -485,11 +490,11 @@ db.xAuth = 0;
 		static int sqlite3Init(sqlite3 db,ref string pzErrMsg) {
 			int i,rc;
 			bool commit_internal=!((db.flags&SQLITE_InternChanges)!=0);
-			Debug.Assert(sqlite3_mutex_held(db.mutex));
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
 			rc=SQLITE_OK;
 			db.init.busy=1;
 			for(i=0;rc==SQLITE_OK&&i<db.nDb;i++) {
-				if(DbHasProperty(db,i,DB_SchemaLoaded)||i==1)
+				if(db.DbHasProperty(i,sqliteinth.DB_SchemaLoaded)||i==1)
 					continue;
 				rc=sqlite3InitOne(db,i,ref pzErrMsg);
 				if(rc!=0) {
@@ -504,7 +509,7 @@ db.xAuth = 0;
 			///
 			///</summary>
 			#if !SQLITE_OMIT_TEMPDB
-			if(rc==SQLITE_OK&&ALWAYS(db.nDb>1)&&!DbHasProperty(db,1,DB_SchemaLoaded)) {
+			if(rc==SQLITE_OK&&Sqlite3.ALWAYS(db.nDb>1)&&!db.DbHasProperty(1,sqliteinth.DB_SchemaLoaded)) {
 				rc=sqlite3InitOne(db,1,ref pzErrMsg);
 				if(rc!=0) {
 					build.sqlite3ResetInternalSchema(db,1);
@@ -525,7 +530,7 @@ db.xAuth = 0;
 		static SqlResult sqlite3ReadSchema(Parse pParse) {
 			SqlResult rc=SqlResult.SQLITE_OK;
 			sqlite3 db=pParse.db;
-			Debug.Assert(sqlite3_mutex_held(db.mutex));
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
 			if(0==db.init.busy) {
 				rc=(SqlResult)sqlite3Init(db,ref pParse.zErrMsg);
 			}
@@ -547,7 +552,7 @@ db.xAuth = 0;
 			int rc;
 			u32 cookie=0;
 			Debug.Assert(pParse.checkSchema!=0);
-			Debug.Assert(sqlite3_mutex_held(db.mutex));
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
 			for(iDb=0;iDb<db.nDb;iDb++) {
 				int openedTransaction=0;
 				///
@@ -606,7 +611,7 @@ db.xAuth = 0;
 		/// attached database is returned.
 		///
 		///</summary>
-		static int sqlite3SchemaToIndex(sqlite3 db,Schema pSchema) {
+		public static int sqlite3SchemaToIndex(sqlite3 db,Schema pSchema) {
 			int i=-1000000;
 			///
 			///<summary>
@@ -621,9 +626,9 @@ db.xAuth = 0;
 			///<param name="more likely to cause a segfault than ">1 (of course there are assert()</param>
 			///<param name="statements too, but it never hurts to play the odds).">statements too, but it never hurts to play the odds).</param>
 			///<param name=""></param>
-			Debug.Assert(sqlite3_mutex_held(db.mutex));
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
 			if(pSchema!=null) {
-				for(i=0;ALWAYS(i<db.nDb);i++) {
+				for(i=0;Sqlite3.ALWAYS(i<db.nDb);i++) {
 					if(db.aDb[i].pSchema==pSchema) {
 						break;
 					}
@@ -702,7 +707,7 @@ db.xAuth = 0;
 			pParse.sLastToken.zRestSql="";
 			//  assert( ppStmt && *ppStmt==0 );
 			//Debug.Assert( 0 == db.mallocFailed );
-			Debug.Assert(sqlite3_mutex_held(db.mutex));
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
 			///
 			///<summary>
 			///Check to verify that it is possible to get a read lock on all
@@ -737,7 +742,7 @@ db.xAuth = 0;
 					if(rc!=0) {
 						string zDb=db.aDb[i].zName;
 						utilc.sqlite3Error(db,rc,"database schema is locked: %s",zDb);
-						testcase(db.flags&SQLITE_ReadUncommitted);
+						sqliteinth.testcase(db.flags&SQLITE_ReadUncommitted);
 						goto end_prepare;
 					}
 				}
@@ -748,8 +753,8 @@ db.xAuth = 0;
 			if(nBytes>=0&&(nBytes==0||zSql[nBytes-1]!=0)) {
 				string zSqlCopy;
 				int mxLen=db.aLimit[SQLITE_LIMIT_SQL_LENGTH];
-				testcase(nBytes==mxLen);
-				testcase(nBytes==mxLen+1);
+				sqliteinth.testcase(nBytes==mxLen);
+				sqliteinth.testcase(nBytes==mxLen+1);
 				if(nBytes>mxLen) {
 					utilc.sqlite3Error(db,SQLITE_TOOBIG,"statement too long");
 					rc=sqlite3ApiExit(db,SQLITE_TOOBIG);
@@ -926,7 +931,7 @@ db.xAuth = 0;
             {
 				ppStmt=null;
 				pzTail=null;
-				return SQLITE_MISUSE_BKPT();
+				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			sqlite3_mutex_enter(db.mutex);
 			sqlite3BtreeEnterAll(db);
@@ -953,7 +958,7 @@ db.xAuth = 0;
 			sqlite3_stmt pNew=new sqlite3_stmt();
 			string zSql;
 			sqlite3 db;
-			Debug.Assert(sqlite3_mutex_held(p.sqlite3VdbeDb().mutex));
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(p.sqlite3VdbeDb().mutex));
             zSql = vdbeaux.sqlite3_sql((sqlite3_stmt)p);
 			Debug.Assert(zSql!=null);
 			///
@@ -961,7 +966,7 @@ db.xAuth = 0;
 			///Reprepare only called for prepare_v2() statements 
 			///</summary>
 			db=p.sqlite3VdbeDb();
-			Debug.Assert(sqlite3_mutex_held(db.mutex));
+			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
 			rc=sqlite3LockAndPrepare(db,zSql,-1,0,p,ref pNew,0);
 			if(rc!=0) {
 				if(rc==SQLITE_NOMEM) {
@@ -1128,7 +1133,7 @@ int rc = SQLITE_OK;
 assert( ppStmt );
 *ppStmt = 0;
 if( !sqlite3SafetyCheckOk(db) ){
-return SQLITE_MISUSE_BKPT;
+return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT;
 }
 sqlite3_mutex_enter(db.mutex);
 zSql8 = sqlite3Utf16to8(db, zSql, nBytes, SqliteEncoding.UTF16NATIVE);

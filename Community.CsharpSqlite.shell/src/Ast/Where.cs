@@ -29,18 +29,19 @@ namespace Community.CsharpSqlite {
 		/// is.  None of the fields in this object should be used outside of
 		/// the where.c module.
 		///
-		/// Within the union, pIdx is only used when wsFlags&WHERE_INDEXED is true.
-		/// pTerm is only used when wsFlags&WHERE_MULTI_OR is true.  And pVtabIdx
-		/// is only used when wsFlags&WHERE_VIRTUALTABLE is true.  It is never the
+		/// Within the union, pIdx is only used when wsFlags&wherec.WHERE_INDEXED is true.
+		/// pTerm is only used when wsFlags&wherec.WHERE_MULTI_OR is true.  And pVtabIdx
+		/// is only used when wsFlags&wherec.WHERE_VIRTUALTABLE is true.  It is never the
 		/// case that more than one of these conditions is true.
 		///
 		///</summary>
 		public class WherePlan {
-			public u32 wsFlags;
-			///
-			///<summary>
-			///WHERE_* flags that describe the strategy 
-			///</summary>
+            ///
+            ///<summary>
+            ///wherec.WHERE_* flags that describe the strategy 
+            ///</summary>
+            public u32 wsFlags;
+			
 			public u32 nEq;
 			///<summary>
 			///Number of == constraints
@@ -53,7 +54,7 @@ namespace Community.CsharpSqlite {
 				public Index pIdx;
 				///
 				///<summary>
-				///Index when WHERE_INDEXED is true 
+				///Index when wherec.WHERE_INDEXED is true 
 				///</summary>
 				public WhereTerm pTerm;
 				///
@@ -116,7 +117,7 @@ namespace Community.CsharpSqlite {
 				public __in _in=new __in();
 			///
 			///<summary>
-			///Used when plan.wsFlags&WHERE_IN_ABLE 
+			///Used when plan.wsFlags&wherec.WHERE_IN_ABLE 
 			///</summary>
 			}
 			public _u u=new _u();
@@ -135,8 +136,8 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			///<param name="Index info for n">th source table </param>
 			public void disableTerm(WhereTerm pTerm) {
-				if(pTerm!=null&&(pTerm.wtFlags&TERM_CODED)==0&&(this.iLeftJoin==0||pTerm.pExpr.ExprHasProperty(EP_FromJoin))) {
-					pTerm.wtFlags|=TERM_CODED;
+				if(pTerm!=null&&(pTerm.wtFlags&WhereTermFlags.TERM_CODED)==0&&(this.iLeftJoin==0||pTerm.pExpr.ExprHasProperty(ExprFlags.EP_FromJoin))) {
+					pTerm.wtFlags|=WhereTermFlags.TERM_CODED;
 					if(pTerm.iParent>=0) {
 						WhereTerm pOther=pTerm.pWC.a[pTerm.iParent];
 						if((--pOther.nChild)==0) {
@@ -146,29 +147,7 @@ namespace Community.CsharpSqlite {
 				}
 			}
 		}
-		///<summary>
-		/// Flags appropriate for the wctrlFlags parameter of sqlite3WhereBegin()
-		/// and the WhereInfo.wctrlFlags member.
-		///
-		///</summary>
-		//#define WHERE_ORDERBY_NORMAL   0x0000 /* No-op */
-		//#define WHERE_ORDERBY_MIN      0x0001 /* ORDER BY processing for min() func */
-		//#define WHERE_ORDERBY_MAX      0x0002 /* ORDER BY processing for max() func */
-		//#define WHERE_ONEPASS_DESIRED  0x0004 /* Want to do one-pass UPDATE/DELETE */
-		//#define WHERE_DUPLICATES_OK    0x0008 /* Ok to return a row more than once */
-		//#define WHERE_OMIT_OPEN        0x0010  /* Table cursors are already open */
-		//#define WHERE_OMIT_CLOSE       0x0020  /* Omit close of table & index cursors */
-		//#define WHERE_FORCE_TABLE      0x0040 /* Do not use an index-only search */
-		//#define WHERE_ONETABLE_ONLY    0x0080 /* Only code the 1st table in pTabList */
-		private const int WHERE_ORDERBY_NORMAL=0x0000;
-		private const int WHERE_ORDERBY_MIN=0x0001;
-		private const int WHERE_ORDERBY_MAX=0x0002;
-		private const int WHERE_ONEPASS_DESIRED=0x0004;
-		private const int WHERE_DUPLICATES_OK=0x0008;
-		private const int WHERE_OMIT_OPEN=0x0010;
-		private const int WHERE_OMIT_CLOSE=0x0020;
-		private const int WHERE_FORCE_TABLE=0x0040;
-		private const int WHERE_ONETABLE_ONLY=0x0080;
+		
 		///<summary>
 		/// The WHERE clause processing routine has two halves.  The
 		/// first part does the start of the WHERE loop and the second
@@ -265,7 +244,7 @@ namespace Community.CsharpSqlite {
 						v.sqlite3VdbeAddOp2(pLevel.op,pLevel.p1,pLevel.p2);
 						v.sqlite3VdbeChangeP5(pLevel.p5);
 					}
-					if((pLevel.plan.wsFlags&WHERE_IN_ABLE)!=0&&pLevel.u._in.nIn>0) {
+					if((pLevel.plan.wsFlags&wherec.WHERE_IN_ABLE)!=0&&pLevel.u._in.nIn>0) {
 						InLoop pIn;
 						int j;
 						v.sqlite3VdbeResolveLabel(pLevel.addrNxt);
@@ -282,8 +261,8 @@ namespace Community.CsharpSqlite {
 					if(pLevel.iLeftJoin!=0) {
 						int addr;
 						addr=v.sqlite3VdbeAddOp1(OpCode.OP_IfPos,pLevel.iLeftJoin);
-						Debug.Assert((pLevel.plan.wsFlags&WHERE_IDX_ONLY)==0||(pLevel.plan.wsFlags&WHERE_INDEXED)!=0);
-						if((pLevel.plan.wsFlags&WHERE_IDX_ONLY)==0) {
+						Debug.Assert((pLevel.plan.wsFlags&wherec.WHERE_IDX_ONLY)==0||(pLevel.plan.wsFlags&wherec.WHERE_INDEXED)!=0);
+						if((pLevel.plan.wsFlags&wherec.WHERE_IDX_ONLY)==0) {
 							v.sqlite3VdbeAddOp1(OpCode.OP_NullRow,pTabList.a[i].iCursor);
 						}
 						if(pLevel.iIdxCur>=0) {
@@ -317,12 +296,12 @@ namespace Community.CsharpSqlite {
 					SrcList_item pTabItem=pTabList.a[pLevel.iFrom];
 					Table pTab=pTabItem.pTab;
 					Debug.Assert(pTab!=null);
-					if((pTab.tabFlags&TF_Ephemeral)==0&&pTab.pSelect==null&&(this.wctrlFlags&WHERE_OMIT_CLOSE)==0) {
+					if((pTab.tabFlags&TableFlags.TF_Ephemeral)==0&&pTab.pSelect==null&&(this.wctrlFlags&wherec.WHERE_OMIT_CLOSE)==0) {
 						u32 ws=pLevel.plan.wsFlags;
-						if(0==this.okOnePass&&(ws&WHERE_IDX_ONLY)==0) {
+						if(0==this.okOnePass&&(ws&wherec.WHERE_IDX_ONLY)==0) {
 							v.sqlite3VdbeAddOp1(OpCode.OP_Close,pTabItem.iCursor);
 						}
-						if((ws&WHERE_INDEXED)!=0&&(ws&WHERE_TEMP_INDEX)==0) {
+						if((ws&wherec.WHERE_INDEXED)!=0&&(ws&wherec.WHERE_TEMP_INDEX)==0) {
 							v.sqlite3VdbeAddOp1(OpCode.OP_Close,pLevel.iIdxCur);
 						}
 					}
@@ -342,7 +321,7 @@ namespace Community.CsharpSqlite {
 					///reference the index.
 					///
 					///</summary>
-					if((pLevel.plan.wsFlags&WHERE_INDEXED)!=0)///* && 0 == db.mallocFailed */ )
+					if((pLevel.plan.wsFlags&wherec.WHERE_INDEXED)!=0)///* && 0 == db.mallocFailed */ )
 					 {
 						int k,j,last;
 						VdbeOp pOp;
@@ -363,7 +342,7 @@ namespace Community.CsharpSqlite {
 										break;
 									}
 								}
-								Debug.Assert((pLevel.plan.wsFlags&WHERE_IDX_ONLY)==0||j<pIdx.nColumn);
+								Debug.Assert((pLevel.plan.wsFlags&wherec.WHERE_IDX_ONLY)==0||j<pIdx.nColumn);
 							}
 							else
 								if(pOp.OpCode==OpCode.OP_Rowid) {
@@ -392,7 +371,7 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			u16 wctrlFlags,///
 			///<summary>
-			///One of the WHERE_* flags defined in sqliteInt.h 
+			///One of the wherec.WHERE_* flags defined in sqliteInt.h 
 			///</summary>
 			Bitmask notReady///
 			///<summary>
@@ -480,8 +459,8 @@ namespace Community.CsharpSqlite {
 				pLevel=this.a[iLevel];
 				pTabItem=this.pTabList.a[pLevel.iFrom];
 				iCur=pTabItem.iCursor;
-				bRev=(pLevel.plan.wsFlags&WHERE_REVERSE)!=0?1:0;
-				omitTable=((pLevel.plan.wsFlags&WHERE_IDX_ONLY)!=0&&(wctrlFlags&WHERE_FORCE_TABLE)==0)?1:0;
+				bRev=(pLevel.plan.wsFlags&wherec.WHERE_REVERSE)!=0?1:0;
+				omitTable=((pLevel.plan.wsFlags&wherec.WHERE_IDX_ONLY)!=0&&(wctrlFlags&wherec.WHERE_FORCE_TABLE)==0)?1:0;
 				///
 				///<summary>
 				///Create labels for the "break" and "continue" instructions
@@ -504,7 +483,7 @@ namespace Community.CsharpSqlite {
 				///row of the left table of the join.
 				///
 				///</summary>
-				if(pLevel.iFrom>0&&(pTabItem.jointype&JT_LEFT)!=0)// Check value of pTabItem[0].jointype
+                if (pLevel.iFrom > 0 && (pTabItem.jointype & JoinType.JT_LEFT) != 0)// Check value of pTabItem[0].jointype
 				 {
 					pLevel.iLeftJoin=++pParse.nMem;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,pLevel.iLeftJoin);
@@ -513,7 +492,7 @@ namespace Community.CsharpSqlite {
 #endif
 				}
 				#if !SQLITE_OMIT_VIRTUALTABLE
-				if((pLevel.plan.wsFlags&WHERE_VIRTUALTABLE)!=0) {
+				if((pLevel.plan.wsFlags&wherec.WHERE_VIRTUALTABLE)!=0) {
 					///
 					///<summary>
 					///</summary>
@@ -544,7 +523,7 @@ namespace Community.CsharpSqlite {
 					}
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,pVtabIdx.idxNum,iReg);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,j-1,iReg+1);
-                    v.sqlite3VdbeAddOp4(OpCode.OP_VFilter, iCur, addrBrk, iReg, pVtabIdx.idxStr, pVtabIdx.needToFreeIdxStr != 0 ? P4_MPRINTF : P4_STATIC);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_VFilter, iCur, addrBrk, iReg, pVtabIdx.idxStr, pVtabIdx.needToFreeIdxStr != 0 ? P4Usage.P4_MPRINTF : P4Usage.P4_STATIC);
 					pVtabIdx.needToFreeIdxStr=0;
 					for(j=0;j<nConstraint;j++) {
 						if(aUsage[j].omit!=false) {
@@ -560,7 +539,7 @@ namespace Community.CsharpSqlite {
 				}
 				else
 					#endif
-					if((pLevel.plan.wsFlags&WHERE_ROWID_EQ)!=0) {
+					if((pLevel.plan.wsFlags&wherec.WHERE_ROWID_EQ)!=0) {
 						///
 						///<summary>
 						///Case 1:  We can directly reference a single row using an
@@ -570,12 +549,12 @@ namespace Community.CsharpSqlite {
 						///
 						///</summary>
 						iReleaseReg=pParse.sqlite3GetTempReg();
-						pTerm=pWC.findTerm(iCur,-1,notReady,WO_EQ|WO_IN,null);
+						pTerm=pWC.findTerm(iCur,-1,notReady,wherec.WO_EQ|wherec.WO_IN,null);
 						Debug.Assert(pTerm!=null);
 						Debug.Assert(pTerm.pExpr!=null);
 						Debug.Assert(pTerm.leftCursor==iCur);
 						Debug.Assert(omitTable==0);
-						testcase(pTerm.wtFlags&TERM_VIRTUAL);
+						sqliteinth.testcase(pTerm.wtFlags&WhereTermFlags.TERM_VIRTUAL);
 						///
 						///<summary>
 						///</summary>
@@ -591,7 +570,7 @@ namespace Community.CsharpSqlite {
 						pLevel.op=OpCode.OP_Noop;
 					}
 					else
-						if((pLevel.plan.wsFlags&WHERE_ROWID_RANGE)!=0) {
+						if((pLevel.plan.wsFlags&wherec.WHERE_ROWID_RANGE)!=0) {
 							///
 							///<summary>
 							///Case 2:  We have an inequality comparison against the ROWID field.
@@ -602,8 +581,8 @@ namespace Community.CsharpSqlite {
 							int memEndValue=0;
 							WhereTerm pStart,pEnd;
 							Debug.Assert(omitTable==0);
-							pStart=pWC.findTerm(iCur,-1,notReady,WO_GT|WO_GE,null);
-							pEnd=pWC.findTerm(iCur,-1,notReady,WO_LT|WO_LE,null);
+							pStart=pWC.findTerm(iCur,-1,notReady,wherec.WO_GT|wherec.WO_GE,null);
+							pEnd=pWC.findTerm(iCur,-1,notReady,wherec.WO_LT|wherec.WO_LE,null);
 							if(bRev!=0) {
 								pTerm=pStart;
 								pStart=pEnd;
@@ -622,48 +601,48 @@ namespace Community.CsharpSqlite {
 								///</summary>
 								///
 								///<summary>
-								///The following constant maps TK_xx codes into corresponding
-								///seek opcodes.  It depends on a particular ordering of TK_xx
+								///The following constant maps Sqlite3.TK_xx codes into corresponding
+								///seek opcodes.  It depends on a particular ordering of Sqlite3.TK_xx
 								///
 								///</summary>
 								OpCode[] aMoveOp=new OpCode[] {
 									///
 									///<summary>
-									///TK_GT 
+									///Sqlite3.TK_GT 
 									///</summary>
 									OpCode.OP_SeekGt,
 									///
 									///<summary>
-									///TK_LE 
+									///Sqlite3.TK_LE 
 									///</summary>
 									OpCode.OP_SeekLe,
 									///
 									///<summary>
-									///TK_LT 
+									///Sqlite3.TK_LT 
 									///</summary>
 									OpCode.OP_SeekLt,
 									///
 									///<summary>
-									///TK_GE 
+									///Sqlite3.TK_GE 
 									///</summary>
 									OpCode.OP_SeekGe
 								};
-								Debug.Assert(TK_LE==TK_GT+1);
+								Debug.Assert(Sqlite3.TK_LE==Sqlite3.TK_GT+1);
 								///
 								///<summary>
 								///Make sure the ordering.. 
 								///</summary>
-								Debug.Assert(TK_LT==TK_GT+2);
+								Debug.Assert(Sqlite3.TK_LT==Sqlite3.TK_GT+2);
 								///
 								///<summary>
-								///... of the TK_xx values... 
+								///... of the Sqlite3.TK_xx values... 
 								///</summary>
-								Debug.Assert(TK_GE==TK_GT+3);
+								Debug.Assert(Sqlite3.TK_GE==Sqlite3.TK_GT+3);
 								///
 								///<summary>
 								///... is correcct. 
 								///</summary>
-								testcase(pStart.wtFlags&TERM_VIRTUAL);
+								sqliteinth.testcase(pStart.wtFlags&WhereTermFlags.TERM_VIRTUAL);
 								///
 								///<summary>
 								///</summary>
@@ -672,7 +651,7 @@ namespace Community.CsharpSqlite {
 								Debug.Assert(pX!=null);
 								Debug.Assert(pStart.leftCursor==iCur);
 								r1=pParse.sqlite3ExprCodeTemp(pX.pRight,ref rTemp);
-								v.sqlite3VdbeAddOp3(aMoveOp[pX.op-TK_GT],iCur,addrBrk,r1);
+								v.sqlite3VdbeAddOp3(aMoveOp[pX.op-Sqlite3.TK_GT],iCur,addrBrk,r1);
 								#if SQLITE_DEBUG
 																																																																																																																																																																																																												            VdbeComment( v, "pk" );
 #endif
@@ -688,14 +667,14 @@ namespace Community.CsharpSqlite {
 								pX=pEnd.pExpr;
 								Debug.Assert(pX!=null);
 								Debug.Assert(pEnd.leftCursor==iCur);
-								testcase(pEnd.wtFlags&TERM_VIRTUAL);
+								sqliteinth.testcase(pEnd.wtFlags&WhereTermFlags.TERM_VIRTUAL);
 								///
 								///<summary>
 								///</summary>
 								///<param name="EV: R">11662 </param>
 								memEndValue=++pParse.nMem;
 								pParse.sqlite3ExprCode(pX.pRight,memEndValue);
-								if(pX.op==TK_LT||pX.op==TK_GT) {
+								if(pX.op==Sqlite3.TK_LT||pX.op==Sqlite3.TK_GT) {
 									testOp=bRev!=0?OpCode.OP_Le:OpCode.OP_Ge;
 								}
 								else {
@@ -718,11 +697,11 @@ namespace Community.CsharpSqlite {
 								v.sqlite3VdbeAddOp2(OP_Rowid,iCur,iRowidReg);
 								pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
 								v.sqlite3VdbeAddOp3(testOp,memEndValue,addrBrk,iRowidReg);
-								v.sqlite3VdbeChangeP5(SQLITE_AFF_NUMERIC|SQLITE_JUMPIFNULL);
+                                v.sqlite3VdbeChangeP5(sqliteinth.SQLITE_AFF_NUMERIC | sqliteinth.SQLITE_JUMPIFNULL);
 							}
 						}
 						else
-							if((pLevel.plan.wsFlags&(WHERE_COLUMN_RANGE|WHERE_COLUMN_EQ))!=0) {
+							if((pLevel.plan.wsFlags&(wherec.WHERE_COLUMN_RANGE|wherec.WHERE_COLUMN_EQ))!=0) {
 								///
 								///<summary>
 								///Case 3: A scan using an index.
@@ -907,7 +886,7 @@ namespace Community.CsharpSqlite {
 								///this requires some special handling.
 								///
 								///</summary>
-								if((wctrlFlags&WHERE_ORDERBY_MIN)!=0&&((pLevel.plan.wsFlags&WHERE_ORDERBY)!=0)&&(pIdx.nColumn>nEq)) {
+								if((wctrlFlags&wherec.WHERE_ORDERBY_MIN)!=0&&((pLevel.plan.wsFlags&wherec.WHERE_ORDERBY)!=0)&&(pIdx.nColumn>nEq)) {
 									///
 									///<summary>
 									///Debug.Assert( pOrderBy.nExpr==1 ); 
@@ -925,12 +904,12 @@ namespace Community.CsharpSqlite {
 								///of the range.
 								///
 								///</summary>
-								if((pLevel.plan.wsFlags&WHERE_TOP_LIMIT)!=0) {
-									pRangeEnd=pWC.findTerm(iCur,k,notReady,(WO_LT|WO_LE),pIdx);
+								if((pLevel.plan.wsFlags&wherec.WHERE_TOP_LIMIT)!=0) {
+									pRangeEnd=pWC.findTerm(iCur,k,notReady,(wherec.WO_LT|wherec.WO_LE),pIdx);
 									nExtraReg=1;
 								}
-								if((pLevel.plan.wsFlags&WHERE_BTM_LIMIT)!=0) {
-									pRangeStart=pWC.findTerm(iCur,k,notReady,(WO_GT|WO_GE),pIdx);
+								if((pLevel.plan.wsFlags&wherec.WHERE_BTM_LIMIT)!=0) {
+									pRangeStart=pWC.findTerm(iCur,k,notReady,(wherec.WO_GT|wherec.WO_GE),pIdx);
 									nExtraReg=1;
 								}
 								///
@@ -951,15 +930,15 @@ namespace Community.CsharpSqlite {
 								///start and end terms (pRangeStart and pRangeEnd).
 								///
 								///</summary>
-								if(nEq<pIdx.nColumn&&bRev==(pIdx.aSortOrder[nEq]==SQLITE_SO_ASC?1:0)) {
+								if(nEq<pIdx.nColumn&&bRev==(pIdx.aSortOrder[nEq]==SortOrder.SQLITE_SO_ASC?1:0)) {
                                     _Custom.SWAP(ref pRangeEnd, ref pRangeStart);
 								}
-								testcase(pRangeStart!=null&&(pRangeStart.eOperator&WO_LE)!=0);
-								testcase(pRangeStart!=null&&(pRangeStart.eOperator&WO_GE)!=0);
-								testcase(pRangeEnd!=null&&(pRangeEnd.eOperator&WO_LE)!=0);
-								testcase(pRangeEnd!=null&&(pRangeEnd.eOperator&WO_GE)!=0);
-								startEq=(null==pRangeStart||(pRangeStart.eOperator&(WO_LE|WO_GE))!=0)?1:0;
-								endEq=(null==pRangeEnd||(pRangeEnd.eOperator&(WO_LE|WO_GE))!=0)?1:0;
+								sqliteinth.testcase(pRangeStart!=null&&(pRangeStart.eOperator&wherec.WO_LE)!=0);
+								sqliteinth.testcase(pRangeStart!=null&&(pRangeStart.eOperator&wherec.WO_GE)!=0);
+								sqliteinth.testcase(pRangeEnd!=null&&(pRangeEnd.eOperator&wherec.WO_LE)!=0);
+								sqliteinth.testcase(pRangeEnd!=null&&(pRangeEnd.eOperator&wherec.WO_GE)!=0);
+								startEq=(null==pRangeStart||(pRangeStart.eOperator&(wherec.WO_LE|wherec.WO_GE))!=0)?1:0;
+								endEq=(null==pRangeEnd||(pRangeEnd.eOperator&(wherec.WO_LE|wherec.WO_GE))!=0)?1:0;
 								start_constraints=(pRangeStart!=null||nEq>0)?1:0;
 								///
 								///<summary>
@@ -969,25 +948,26 @@ namespace Community.CsharpSqlite {
 								if(pRangeStart!=null) {
 									Expr pRight=pRangeStart.pExpr.pRight;
 									pParse.sqlite3ExprCode(pRight,regBase+nEq);
-									if((pRangeStart.wtFlags&TERM_VNULL)==0) {
+									if((pRangeStart.wtFlags&WhereTermFlags.TERM_VNULL)==0) {
 										exprc.sqlite3ExprCodeIsNullJump(v,pRight,regBase+nEq,addrNxt);
 									}
 									if(zStartAff.Length!=0) {
-										if(pRight.sqlite3CompareAffinity(zStartAff[nEq])==SQLITE_AFF_NONE) {
+                                        if (pRight.sqlite3CompareAffinity(zStartAff[nEq]) == sqliteinth.SQLITE_AFF_NONE)
+                                        {
 											///
 											///<summary>
 											///Since the comparison is to be performed with no conversions
 											///applied to the operands, set the affinity to apply to pRight to 
 											///SQLITE_AFF_NONE.  
 											///</summary>
-											zStartAff[nEq]=SQLITE_AFF_NONE;
+                                            zStartAff[nEq] = sqliteinth.SQLITE_AFF_NONE;
 										}
 										if((exprc.sqlite3ExprNeedsNoAffinityChange(pRight,zStartAff[nEq]))!=0) {
-											zStartAff[nEq]=SQLITE_AFF_NONE;
+                                            zStartAff[nEq] = sqliteinth.SQLITE_AFF_NONE;
 										}
 									}
 									nConstraint++;
-									testcase(pRangeStart.wtFlags&TERM_VIRTUAL);
+									sqliteinth.testcase(pRangeStart.wtFlags&WhereTermFlags.TERM_VIRTUAL);
 									///
 									///<summary>
 									///</summary>
@@ -1003,12 +983,12 @@ namespace Community.CsharpSqlite {
 								pParse.codeApplyAffinity(regBase,nConstraint,zStartAff.ToString());
 								op=aStartOp[(start_constraints<<2)+(startEq<<1)+bRev];
 								Debug.Assert(op!=0);
-								testcase(op==OpCode.OP_Rewind);
-                                testcase(op == OpCode.OP_Last);
-                                testcase(op == OpCode.OP_SeekGt);
-                                testcase(op == OpCode.OP_SeekGe);
-                                testcase(op == OpCode.OP_SeekLe);
-                                testcase(op == OpCode.OP_SeekLt);
+								sqliteinth.testcase(op==OpCode.OP_Rewind);
+                                sqliteinth.testcase(op == OpCode.OP_Last);
+                                sqliteinth.testcase(op == OpCode.OP_SeekGt);
+                                sqliteinth.testcase(op == OpCode.OP_SeekGe);
+                                sqliteinth.testcase(op == OpCode.OP_SeekLe);
+                                sqliteinth.testcase(op == OpCode.OP_SeekLt);
 								v.sqlite3VdbeAddOp4Int((u8)op,iIdxCur,addrNxt,regBase,nConstraint);
 								///
 								///<summary>
@@ -1021,26 +1001,27 @@ namespace Community.CsharpSqlite {
 									Expr pRight=pRangeEnd.pExpr.pRight;
 									pParse.sqlite3ExprCacheRemove(regBase+nEq,1);
 									pParse.sqlite3ExprCode(pRight,regBase+nEq);
-									if((pRangeEnd.wtFlags&TERM_VNULL)==0) {
+									if((pRangeEnd.wtFlags&WhereTermFlags.TERM_VNULL)==0) {
 										exprc.sqlite3ExprCodeIsNullJump(v,pRight,regBase+nEq,addrNxt);
 									}
 									if(zEndAff.Length>0) {
-										if(pRight.sqlite3CompareAffinity(zEndAff[nEq])==SQLITE_AFF_NONE) {
+                                        if (pRight.sqlite3CompareAffinity(zEndAff[nEq]) == sqliteinth.SQLITE_AFF_NONE)
+                                        {
 											///
 											///<summary>
 											///Since the comparison is to be performed with no conversions
 											///applied to the operands, set the affinity to apply to pRight to 
 											///SQLITE_AFF_NONE.  
 											///</summary>
-											zEndAff[nEq]=SQLITE_AFF_NONE;
+                                            zEndAff[nEq] = sqliteinth.SQLITE_AFF_NONE;
 										}
 										if((exprc.sqlite3ExprNeedsNoAffinityChange(pRight,zEndAff[nEq]))!=0) {
-											zEndAff[nEq]=SQLITE_AFF_NONE;
+                                            zEndAff[nEq] = sqliteinth.SQLITE_AFF_NONE;
 										}
 									}
 									pParse.codeApplyAffinity(regBase,nEq+1,zEndAff.ToString());
 									nConstraint++;
-									testcase(pRangeEnd.wtFlags&TERM_VIRTUAL);
+									sqliteinth.testcase(pRangeEnd.wtFlags&WhereTermFlags.TERM_VIRTUAL);
 									///
 									///<summary>
 									///</summary>
@@ -1058,9 +1039,9 @@ namespace Community.CsharpSqlite {
 								///Check if the index cursor is past the end of the range. 
 								///</summary>
 								op=aEndOp[((pRangeEnd!=null||nEq!=0)?1:0)*(1+bRev)];
-								testcase(op==OpCode.OP_Noop);
-                                testcase(op == OpCode.OP_IdxGE);
-                                testcase(op == OpCode.OP_IdxLT);
+								sqliteinth.testcase(op==OpCode.OP_Noop);
+                                sqliteinth.testcase(op == OpCode.OP_IdxGE);
+                                sqliteinth.testcase(op == OpCode.OP_IdxLT);
 								if(op!=OpCode.OP_Noop) {
 									v.sqlite3VdbeAddOp4Int((u8)op,iIdxCur,addrNxt,regBase,nConstraint);
 									v.sqlite3VdbeChangeP5((u8)(endEq!=bRev?1:0));
@@ -1073,9 +1054,9 @@ namespace Community.CsharpSqlite {
 								///
 								///</summary>
 								r1=pParse.sqlite3GetTempReg();
-								testcase(pLevel.plan.wsFlags&WHERE_BTM_LIMIT);
-								testcase(pLevel.plan.wsFlags&WHERE_TOP_LIMIT);
-								if((pLevel.plan.wsFlags&(WHERE_BTM_LIMIT|WHERE_TOP_LIMIT))!=0) {
+								sqliteinth.testcase(pLevel.plan.wsFlags&wherec.WHERE_BTM_LIMIT);
+								sqliteinth.testcase(pLevel.plan.wsFlags&wherec.WHERE_TOP_LIMIT);
+								if((pLevel.plan.wsFlags&(wherec.WHERE_BTM_LIMIT|wherec.WHERE_TOP_LIMIT))!=0) {
 									v.sqlite3VdbeAddOp3(OP_Column,iIdxCur,nEq,r1);
 									v.sqlite3VdbeAddOp2(OP_IsNull,r1,addrCont);
 								}
@@ -1102,7 +1083,7 @@ namespace Community.CsharpSqlite {
 								///WHERE clause terms made redundant by the index range scan.
 								///
 								///</summary>
-								if((pLevel.plan.wsFlags&WHERE_UNIQUE)!=0) {
+								if((pLevel.plan.wsFlags&wherec.WHERE_UNIQUE)!=0) {
 									pLevel.op=OpCode.OP_Noop;
 								}
 								else
@@ -1116,7 +1097,7 @@ namespace Community.CsharpSqlite {
 							}
 							else
 								#if !SQLITE_OMIT_OR_OPTIMIZATION
-								if((pLevel.plan.wsFlags&WHERE_MULTI_OR)!=0) {
+								if((pLevel.plan.wsFlags&wherec.WHERE_MULTI_OR)!=0) {
 									///
 									///<summary>
 									///Case 4:  Two or more separately indexed terms connected by OR
@@ -1202,8 +1183,8 @@ namespace Community.CsharpSqlite {
 									int ii;
 									pTerm=pLevel.plan.u.pTerm;
 									Debug.Assert(pTerm!=null);
-									Debug.Assert(pTerm.eOperator==WO_OR);
-									Debug.Assert((pTerm.wtFlags&TERM_ORINFO)!=0);
+									Debug.Assert(pTerm.eOperator==wherec.WO_OR);
+									Debug.Assert((pTerm.wtFlags&WhereTermFlags.TERM_ORINFO)!=0);
 									pOrWc=pTerm.u.pOrInfo.wc;
 									pLevel.op=OpCode.OP_Return;
 									pLevel.p1=regReturn;
@@ -1258,7 +1239,7 @@ namespace Community.CsharpSqlite {
 									///<param name="fall through to the next instruction, just as an OP_Next does if">fall through to the next instruction, just as an OP_Next does if</param>
 									///<param name="called on an uninitialized cursor.">called on an uninitialized cursor.</param>
 									///<param name=""></param>
-									if((wctrlFlags&WHERE_DUPLICATES_OK)==0) {
+									if((wctrlFlags&wherec.WHERE_DUPLICATES_OK)==0) {
 										regRowset=++pParse.nMem;
 										regRowid=++pParse.nMem;
 										v.sqlite3VdbeAddOp2(OpCode.OP_Null,0,regRowset);
@@ -1266,7 +1247,7 @@ namespace Community.CsharpSqlite {
 									iRetInit=v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regReturn);
 									for(ii=0;ii<pOrWc.nTerm;ii++) {
 										WhereTerm pOrTerm=pOrWc.a[ii];
-										if(pOrTerm.leftCursor==iCur||pOrTerm.eOperator==WO_AND) {
+										if(pOrTerm.leftCursor==iCur||pOrTerm.eOperator==wherec.WO_AND) {
 											WhereInfo pSubWInfo;
 											///
 											///<summary>
@@ -1277,10 +1258,10 @@ namespace Community.CsharpSqlite {
 											///Loop through table entries that match term pOrTerm. 
 											///</summary>
 											ExprList elDummy=null;
-											pSubWInfo=pParse.sqlite3WhereBegin(pOrTab,pOrTerm.pExpr,ref elDummy,WHERE_OMIT_OPEN|WHERE_OMIT_CLOSE|WHERE_FORCE_TABLE|WHERE_ONETABLE_ONLY);
+											pSubWInfo=pParse.sqlite3WhereBegin(pOrTab,pOrTerm.pExpr,ref elDummy,wherec.WHERE_OMIT_OPEN|wherec.WHERE_OMIT_CLOSE|wherec.WHERE_FORCE_TABLE|wherec.WHERE_ONETABLE_ONLY);
 											if(pSubWInfo!=null) {
 												pParse.explainOneScan(pOrTab,pSubWInfo.a[0],iLevel,pLevel.iFrom,0);
-												if((wctrlFlags&WHERE_DUPLICATES_OK)==0) {
+												if((wctrlFlags&wherec.WHERE_DUPLICATES_OK)==0) {
 													int iSet=((ii==pOrWc.nTerm-1)?-1:ii);
 													int r;
 													r=pParse.sqlite3ExprCodeGetColumn(pTabItem.pTab,-1,iCur,regRowid);
@@ -1353,27 +1334,27 @@ namespace Community.CsharpSqlite {
 				 {
 					pTerm=pWC.a[pWC.nTerm-j];
 					Expr pE;
-					testcase(pTerm.wtFlags&TERM_VIRTUAL);
+					sqliteinth.testcase(pTerm.wtFlags&WhereTermFlags.TERM_VIRTUAL);
 					///
 					///<summary>
 					///</summary>
 					///<param name="IMP: R">11662 </param>
-					testcase(pTerm.wtFlags&TERM_CODED);
-					if((pTerm.wtFlags&(TERM_VIRTUAL|TERM_CODED))!=0)
+					sqliteinth.testcase(pTerm.wtFlags&WhereTermFlags.TERM_CODED);
+					if((pTerm.wtFlags&(WhereTermFlags.TERM_VIRTUAL|WhereTermFlags.TERM_CODED))!=0)
 						continue;
 					if((pTerm.prereqAll&notReady)!=0) {
-						testcase(this.untestedTerms==0&&(this.wctrlFlags&WHERE_ONETABLE_ONLY)!=0);
+						sqliteinth.testcase(this.untestedTerms==0&&(this.wctrlFlags&wherec.WHERE_ONETABLE_ONLY)!=0);
 						this.untestedTerms=1;
 						continue;
 					}
 					pE=pTerm.pExpr;
 					Debug.Assert(pE!=null);
-                    if (pLevel.iLeftJoin != 0 && !((pE.Flags & ExprFlags.EP_FromJoin) == ExprFlags.EP_FromJoin))// !ExprHasProperty(pE, EP_FromJoin) ){
+                    if (pLevel.iLeftJoin != 0 && !((pE.Flags & ExprFlags.EP_FromJoin) == ExprFlags.EP_FromJoin))// !ExprHasProperty(pE, ExprFlags.EP_FromJoin) ){
 					 {
 						continue;
 					}
-					pParse.sqlite3ExprIfFalse(pE,addrCont,SQLITE_JUMPIFNULL);
-					pTerm.wtFlags|=TERM_CODED;
+					pParse.sqlite3ExprIfFalse(pE,addrCont,sqliteinth.SQLITE_JUMPIFNULL);
+					pTerm.wtFlags|=WhereTermFlags.TERM_CODED;
 				}
 				///
 				///<summary>
@@ -1391,21 +1372,21 @@ namespace Community.CsharpSqlite {
 					for(j=0;j<pWC.nTerm;j++)//, pTerm++)
 					 {
 						pTerm=pWC.a[j];
-						testcase(pTerm.wtFlags&TERM_VIRTUAL);
+						sqliteinth.testcase(pTerm.wtFlags&WhereTermFlags.TERM_VIRTUAL);
 						///
 						///<summary>
 						///</summary>
 						///<param name="IMP: R">11662 </param>
-						testcase(pTerm.wtFlags&TERM_CODED);
-						if((pTerm.wtFlags&(TERM_VIRTUAL|TERM_CODED))!=0)
+						sqliteinth.testcase(pTerm.wtFlags&WhereTermFlags.TERM_CODED);
+						if((pTerm.wtFlags&(WhereTermFlags.TERM_VIRTUAL|WhereTermFlags.TERM_CODED))!=0)
 							continue;
 						if((pTerm.prereqAll&notReady)!=0) {
 							Debug.Assert(this.untestedTerms!=0);
 							continue;
 						}
 						Debug.Assert(pTerm.pExpr!=null);
-						pParse.sqlite3ExprIfFalse(pTerm.pExpr,addrCont,SQLITE_JUMPIFNULL);
-						pTerm.wtFlags|=TERM_CODED;
+						pParse.sqlite3ExprIfFalse(pTerm.pExpr,addrCont,sqliteinth.SQLITE_JUMPIFNULL);
+						pTerm.wtFlags|=WhereTermFlags.TERM_CODED;
 					}
 				}
 				pParse.sqlite3ReleaseTempReg(iReleaseReg);

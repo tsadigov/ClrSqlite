@@ -20,62 +20,159 @@ namespace Community.CsharpSqlite
 	using sqlite3_stmt = Sqlite3.Vdbe;
 	using sqlite3_value = Sqlite3.Mem;
 
+
+
+
+
+
+
+
+    public delegate void dxAuth(object pAuthArg, int b, string c, string d, string e, string f);
+
+    public delegate int dxBusy(object pBtShared, int iValue);
+
+    public delegate void dxFreeAux(object pAuxArg);
+
+    public delegate int dxCallback(object pCallbackArg, sqlite3_int64 argc, object p2, object p3);
+
+    public delegate void dxalarmCallback(object pNotUsed, sqlite3_int64 iNotUsed, int size);
+
+    public delegate void dxCollNeeded(object pCollNeededArg, Sqlite3.sqlite3 db, int eTextRep, string collationName);
+
+    public delegate int dxCommitCallback(object pCommitArg);
+
+    public delegate int dxCompare(object pCompareArg, int size1, string Key1, int size2, string Key2);
+
+    public delegate bool dxCompare4(string Key1, int size1, string Key2, int size2);
+
+    public delegate void dxDel(ref string pDelArg);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //sqlite3_module
+    public delegate int smdxCreateConnect(Sqlite3.sqlite3 db, object pAux, int argc, string[] constargv, out sqlite3_vtab ppVTab, out string pError);
+
+    public delegate int smdxBestIndex(sqlite3_vtab pVTab, ref sqlite3_index_info pIndex);
+
+    public delegate int smdxDisconnect(ref object pVTab);
+
+    public delegate int smdxDestroy(ref object pVTab);
+
+    public delegate int smdxOpen(sqlite3_vtab pVTab, out sqlite3_vtab_cursor ppCursor);
+
+    public delegate int smdxClose(ref sqlite3_vtab_cursor pCursor);
+
+    public delegate int smdxFilter(sqlite3_vtab_cursor pCursor, int idxNum, string idxStr, int argc, sqlite3_value[] argv);
+
+    public delegate int smdxNext(sqlite3_vtab_cursor pCursor);
+
+    public delegate int smdxEof(sqlite3_vtab_cursor pCursor);
+
+    public delegate int smdxColumn(sqlite3_vtab_cursor pCursor, sqlite3_context p2, int p3);
+
+    public delegate int smdxRowid(sqlite3_vtab_cursor pCursor, out sqlite3_int64 pRowid);
+
+    public delegate int smdxUpdate(sqlite3_vtab pVTab, int p1, sqlite3_value[] p2, out sqlite3_int64 p3);
+
+    public delegate int smdxFunction(sqlite3_vtab pVTab);
+
+    public delegate int smdxFindFunction(sqlite3_vtab pVtab, int nArg, string zName, ref dxFunc pxFunc, ref object ppArg);
+
+    public delegate int smdxRename(sqlite3_vtab pVtab, string zNew);
+
+    public delegate int smdxFunctionArg(sqlite3_vtab pVTab, int nArg);
+
+
+
+
+
+
+
+
+    ///
+    ///<summary>
+    ///FUNCTIONS
+    ///
+    ///
+    ///</summary>
+
+    public delegate void dxFunc(sqlite3_context ctx, int intValue, sqlite3_value[] value);
+
+    public delegate void dxStep(sqlite3_context ctx, int intValue, sqlite3_value[] value);
+
+    public delegate void dxFinal(sqlite3_context ctx);
+
+    public delegate void dxFDestroy(object pArg);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // needs ref
+    public delegate void dxDelCollSeq(ref object pDelArg);
+
+    // needs ref
+    public delegate void dxLog(object pLogArg, int i, string msg);
+
+    public delegate void dxLogcallback(object pCallbackArg, int argc, string p2);
+
+    public delegate void dxProfile(object pProfileArg, string msg, sqlite3_int64 time);
+
+    public delegate int dxProgress(object pProgressArg);
+
+    public delegate void dxRollbackCallback(object pRollbackArg);
+
+    public delegate void dxTrace(object pTraceArg, string msg);
+
+    public delegate void dxUpdateCallback(object pUpdateArg, int b, string c, string d, sqlite3_int64 e);
+
+    public delegate int dxWalCallback(object pWalArg, Sqlite3.sqlite3 db, string zDb, int nEntry);
+
+
+
+
+
+
+
+
+
+
+
+
+
 	public partial class Sqlite3
 	{
-		public delegate void dxAuth (object pAuthArg, int b, string c, string d, string e, string f);
-
-		public delegate int dxBusy (object pBtShared, int iValue);
-
-		public delegate void dxFreeAux (object pAuxArg);
-
-		public delegate int dxCallback (object pCallbackArg, sqlite3_int64 argc, object p2, object p3);
-
-		public delegate void dxalarmCallback (object pNotUsed, sqlite3_int64 iNotUsed, int size);
-
-		public delegate void dxCollNeeded (object pCollNeededArg, sqlite3 db, int eTextRep, string collationName);
-
-		public delegate int dxCommitCallback (object pCommitArg);
-
-		public delegate int dxCompare (object pCompareArg, int size1, string Key1, int size2, string Key2);
-
-		public delegate bool dxCompare4 (string Key1, int size1, string Key2, int size2);
-
-		public delegate void dxDel (ref string pDelArg);
-
-		// needs ref
-		public delegate void dxDelCollSeq (ref object pDelArg);
-
-		// needs ref
-		public delegate void dxLog (object pLogArg, int i, string msg);
-
-		public delegate void dxLogcallback (object pCallbackArg, int argc, string p2);
-
-		public delegate void dxProfile (object pProfileArg, string msg, sqlite3_int64 time);
-
-		public delegate int dxProgress (object pProgressArg);
-
-		public delegate void dxRollbackCallback (object pRollbackArg);
-
-		public delegate void dxTrace (object pTraceArg, string msg);
-
-		public delegate void dxUpdateCallback (object pUpdateArg, int b, string c, string d, sqlite3_int64 e);
-
-		public delegate int dxWalCallback (object pWalArg, sqlite3 db, string zDb, int nEntry);
-
-		///
-///<summary>
-///FUNCTIONS
-///
-///
-///</summary>
-
-		public delegate void dxFunc (sqlite3_context ctx, int intValue, sqlite3_value[] value);
-
-		public delegate void dxStep (sqlite3_context ctx, int intValue, sqlite3_value[] value);
-
-		public delegate void dxFinal (sqlite3_context ctx);
-
-		public delegate void dxFDestroy (object pArg);
+		
+		
 
 		//
 		public delegate string dxColname (sqlite3_value pVal);
@@ -130,39 +227,7 @@ namespace Community.CsharpSqlite
 
 		public delegate int dxStress (object obj, PgHdr pPhHdr);
 
-		//sqlite3_module
-		public delegate int smdxCreateConnect (sqlite3 db, object pAux, int argc, string[] constargv, out sqlite3_vtab ppVTab, out string pError);
-
-		public delegate int smdxBestIndex (sqlite3_vtab pVTab, ref sqlite3_index_info pIndex);
-
-		public delegate int smdxDisconnect (ref object pVTab);
-
-		public delegate int smdxDestroy (ref object pVTab);
-
-		public delegate int smdxOpen (sqlite3_vtab pVTab, out sqlite3_vtab_cursor ppCursor);
-
-		public delegate int smdxClose (ref sqlite3_vtab_cursor pCursor);
-
-		public delegate int smdxFilter (sqlite3_vtab_cursor pCursor, int idxNum, string idxStr, int argc, sqlite3_value[] argv);
-
-		public delegate int smdxNext (sqlite3_vtab_cursor pCursor);
-
-		public delegate int smdxEof (sqlite3_vtab_cursor pCursor);
-
-		public delegate int smdxColumn (sqlite3_vtab_cursor pCursor, sqlite3_context p2, int p3);
-
-		public delegate int smdxRowid (sqlite3_vtab_cursor pCursor, out sqlite3_int64 pRowid);
-
-		public delegate int smdxUpdate (sqlite3_vtab pVTab, int p1, sqlite3_value[] p2, out sqlite3_int64 p3);
-
-		public delegate int smdxFunction (sqlite3_vtab pVTab);
-
-		public delegate int smdxFindFunction (sqlite3_vtab pVtab, int nArg, string zName, ref dxFunc pxFunc, ref object ppArg);
-
-		public delegate int smdxRename (sqlite3_vtab pVtab, string zNew);
-
-		public delegate int smdxFunctionArg (sqlite3_vtab pVTab, int nArg);
-
+		
 		//AutoExtention
 		public delegate int dxInit (sqlite3 db, ref string zMessage, sqlite3_api_routines sar);
 
@@ -244,14 +309,14 @@ namespace Community.CsharpSqlite
 		public delegate int dxColumn_I (sqlite3_stmt pStmt, int i);
 
 		// Walker Methods
-		public delegate int dxExprCallback (Walker W, ref Expr E);
+		public delegate WRC dxExprCallback (Walker W, ref Expr E);
 
 		///
 ///<summary>
 ///Callback for expressions 
 ///</summary>
 
-		public delegate int dxSelectCallback (Walker W, Select S);
+		public delegate WRC dxSelectCallback (Walker W, Select S);
 
 		///
 ///<summary>

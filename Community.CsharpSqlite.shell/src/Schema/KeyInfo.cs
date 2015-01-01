@@ -23,8 +23,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
 
 
 
@@ -36,7 +34,7 @@ namespace Community.CsharpSqlite
         ///</summary>
         public class KeyInfo
         {
-            public sqlite3 db;
+            public Sqlite3.sqlite3 db;
             ///
             ///<summary>
             ///The database connection 
@@ -51,7 +49,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Number of entries in aColl[] 
             ///</summary>
-            public u8[] aSortOrder;
+            public SortOrder[] aSortOrder;
             ///<summary>
             ///Sort order for each column.  May be NULL
             ///</summary>
@@ -76,4 +74,3 @@ namespace Community.CsharpSqlite
 
 
     }
-}

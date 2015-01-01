@@ -79,7 +79,6 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///All backends 
             ///</summary>
-
             public int flags;
 
             ///
@@ -214,7 +213,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Limits 
             ///</summary>
-            public int[] aLimit = new int[SQLITE_N_LIMIT];
+            public int[] aLimit = new int[sqliteinth.SQLITE_N_LIMIT];
 
 
             public class sqlite3InitInfo
@@ -577,7 +576,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 Column[] aCol = pTab.aCol;
                 int[] aiColumn = pIndex.aiColumn;
                 StrAccum txt = new StrAccum(100);
-                if (nEq == 0 && (pPlan.wsFlags & (WHERE_BTM_LIMIT | WHERE_TOP_LIMIT)) == 0)
+                if (nEq == 0 && (pPlan.wsFlags & (wherec.WHERE_BTM_LIMIT | wherec.WHERE_TOP_LIMIT)) == 0)
                 {
                     return null;
                 }
@@ -589,11 +588,11 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                     txt.explainAppendTerm(i, aCol[aiColumn[i]].zName, "=");
                 }
                 j = i;
-                if ((pPlan.wsFlags & WHERE_BTM_LIMIT) != 0)
+                if ((pPlan.wsFlags & wherec.WHERE_BTM_LIMIT) != 0)
                 {
                     txt.explainAppendTerm(i++, aCol[aiColumn[j]].zName, ">");
                 }
-                if ((pPlan.wsFlags & WHERE_TOP_LIMIT) != 0)
+                if ((pPlan.wsFlags & wherec.WHERE_TOP_LIMIT) != 0)
                 {
                     txt.explainAppendTerm(i, aCol[aiColumn[j]].zName, "<");
                 }
@@ -603,7 +602,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
 
             public void whereInfoFree(WhereInfo pWInfo)
             {
-                if (ALWAYS(pWInfo != null))
+                if (Sqlite3.ALWAYS(pWInfo != null))
                 {
                     int i;
                     for (i = 0; i < pWInfo.nLevel; i++)
@@ -622,7 +621,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                             }
                             this.sqlite3DbFree(ref pInfo);
                         }
-                        if (pWInfo.a[i] != null && (pWInfo.a[i].plan.wsFlags & WHERE_TEMP_INDEX) != 0)
+                        if (pWInfo.a[i] != null && (pWInfo.a[i].plan.wsFlags & wherec.WHERE_TEMP_INDEX) != 0)
                         {
                             Index pIdx = pWInfo.a[i].plan.u.pIdx;
                             if (pIdx != null)
@@ -663,6 +662,79 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 if (pPrior != null)
                     mempoolMethods.sqlite3MemFreeInt(ref pPrior);
             }
+
+
+
+            ///<summary>
+            /// These macros can be used to test, set, or clear bits in the
+            /// Db.pSchema->flags field.
+            ///
+            ///</summary>
+            //#define DbHasProperty(D,I,P)     (((D)->aDb[I].pSchema->flags&(P))==(P))
+            public bool DbHasProperty( int I, ushort P)
+            {
+                sqlite3 D = this;
+                return (D.aDb[I].pSchema.flags & P) == P;
+            }
+            //#define DbHasAnyProperty(D,I,P)  (((D)->aDb[I].pSchema->flags&(P))!=0)
+            //#define DbSetProperty(D,I,P)     (D)->aDb[I].pSchema->flags|=(P)
+            public void DbSetProperty(int I, ushort P)
+            {
+                sqlite3 D = this;
+                D.aDb[I].pSchema.flags = (u16)(D.aDb[I].pSchema.flags | P);
+            }
+            //#define DbClearProperty(D,I,P)   (D)->aDb[I].pSchema->flags&=~(P)
+            public void DbClearProperty( int I, ushort P)
+            {
+                sqlite3 D = this;
+                D.aDb[I].pSchema.flags = (u16)(D.aDb[I].pSchema.flags & ~P);
+            }
+
+
+
+            ///<summary>
+            /// Parameter zName points to a UTF-8 encoded string nName bytes long.
+            /// Return the CollSeq* pointer for the collation sequence named zName
+            /// for the encoding 'enc' from the database 'db'.
+            ///
+            /// If the entry specified is not found and 'create' is true, then create a
+            /// new entry.  Otherwise return NULL.
+            ///
+            /// A separate function build.sqlite3LocateCollSeq() is a wrapper around
+            /// this routine.  build.sqlite3LocateCollSeq() invokes the collation factory
+            /// if necessary and generates an error message if the collating sequence
+            /// cannot be found.
+            ///
+            /// See also: build.sqlite3LocateCollSeq(), sqlite3GetCollSeq()
+            ///
+            ///</summary>
+            public CollSeq sqlite3FindCollSeq( SqliteEncoding enc, string zName, u8 create)
+            {
+                sqlite3 db = this;
+                CollSeq[] pColl;
+                if (zName != null)
+                {
+                    pColl = findCollSeqEntry(db, zName, create);
+                }
+                else
+                {
+                    pColl = new CollSeq[(int)enc];
+                    pColl[(int)enc - 1] = db.pDfltColl;
+                }
+                Debug.Assert(SqliteEncoding.UTF8 == (SqliteEncoding)1 && SqliteEncoding.UTF16LE == (SqliteEncoding)2 && SqliteEncoding.UTF16BE == (SqliteEncoding)3);
+                Debug.Assert(enc >= SqliteEncoding.UTF8 && enc <= SqliteEncoding.UTF16BE);
+                if (pColl != null)
+                {
+                    enc -= 1;
+                    // if (pColl != null) pColl += enc - 1;
+                    return pColl[(int)enc];
+                }
+                else
+                    return null;
+            }
         }
+ 
+    
+    
     }
 }

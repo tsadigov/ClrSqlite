@@ -13,7 +13,7 @@ using u32 = System.UInt32;
 using u64 = System.UInt64;
 using unsigned = System.UInt64;
 using Pgno = System.UInt32;
-
+using Hash=Community.CsharpSqlite.Sqlite3.Hash;
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar = System.Int16;
 using System.Collections.Generic;
@@ -24,8 +24,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
         ///
         ///<summary>
         ///An instance of the following structure stores a database schema.
@@ -133,4 +131,3 @@ namespace Community.CsharpSqlite
         };
 
     }
-}

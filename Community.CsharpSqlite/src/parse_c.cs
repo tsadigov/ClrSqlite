@@ -47,12 +47,12 @@ namespace Community.CsharpSqlite {
 		//#define YYNOERRORRECOVERY 1
 		const int YYNOERRORRECOVERY=1;
 		///<summary>
-		/// Make yytestcase() the same as testcase()
+		/// Make yysqliteinth.testcase() the same as sqliteinth.testcase()
 		///
 		///</summary>
-		//#define yytestcase(X) testcase(X)
+		//#define yysqliteinth.testcase(X) sqliteinth.testcase(X)
 		static void yytestcase<T>(T X) {
-			testcase(X);
+			sqliteinth.testcase(X);
 		}
 		///<summary>
 		/// An instance of this structure holds information about the
@@ -90,8 +90,8 @@ namespace Community.CsharpSqlite {
 		}
 		///<summary>
 		/// An instance of the following structure describes the event of a
-		/// TRIGGER.  "a" is the event type, one of TK_UPDATE, TK_INSERT,
-		/// TK_DELETE, or TK_INSTEAD.  If the event is of the form
+		/// TRIGGER.  "a" is the event type, one of Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT,
+		/// Sqlite3.TK_DELETE, or Sqlite3.TK_INSTEAD.  If the event is of the form
 		///
 		///      UPDATE ON (a,b,c)
 		///
@@ -136,8 +136,8 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		//#line 892 "parse.y"
 		///<summary>
-		///A routine to convert a binary TK_IS or TK_ISNOT expression into a
-		/// unary TK_ISNULL or TK_NOTNULL expression.
+		///A routine to convert a binary Sqlite3.TK_IS or Sqlite3.TK_ISNOT expression into a
+		/// unary Sqlite3.TK_ISNULL or Sqlite3.TK_NOTNULL expression.
 		///</summary>
 		//#line 920 "parse.y"
 		///
@@ -254,16 +254,16 @@ namespace Community.CsharpSqlite {
 		///
 		///<summary>
 		///</summary>
-		///<param name="Define the yytestcase() macro to be a no">op if is not already defined</param>
+		///<param name="Define the yysqliteinth.testcase() macro to be a no">op if is not already defined</param>
 		///<param name="otherwise.">otherwise.</param>
 		///<param name=""></param>
-		///<param name="Applications can choose to define yytestcase() in the %include section">Applications can choose to define yytestcase() in the %include section</param>
+		///<param name="Applications can choose to define yysqliteinth.testcase() in the %include section">Applications can choose to define yysqliteinth.testcase() in the %include section</param>
 		///<param name="to a macro that can assist in verifying code coverage.  For production">to a macro that can assist in verifying code coverage.  For production</param>
-		///<param name="code the yytestcase() macro should be turned off.  But it is useful">code the yytestcase() macro should be turned off.  But it is useful</param>
+		///<param name="code the yysqliteinth.testcase() macro should be turned off.  But it is useful">code the yysqliteinth.testcase() macro should be turned off.  But it is useful</param>
 		///<param name="for testing.">for testing.</param>
 		///<param name=""></param>
-		//#if !yytestcase
-		//# define yytestcase(X)
+		//#if !yysqliteinth.testcase
+		//# define yysqliteinth.testcase(X)
 		//#endif
 		///
 		///<summary>
@@ -7472,7 +7472,7 @@ return;
 				///stack every overflows 
 				///</summary>
 				//#line 38 "parse.y"
-				UNUSED_PARAMETER(yypMinor);
+				Sqlite3.sqliteinth.UNUSED_PARAMETER(yypMinor);
 				///
 				///<summary>
 				///Silence some compiler warnings 
@@ -7523,7 +7523,7 @@ return;
 				//       sqlite3ParserARG_FETCH;
 				//#define TOKEN (yyminor.yy0)
 				//#line 32 "parse.y"
-				UNUSED_PARAMETER(yymajor);
+				Sqlite3.sqliteinth.UNUSED_PARAMETER(yymajor);
 				///
 				///<summary>
 				///Silence some compiler warnings 
@@ -8826,7 +8826,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 122 "parse.y"
 			{
-				yygotominor.yy4=TK_DEFERRED;
+				yygotominor.yy4=Sqlite3.TK_DEFERRED;
 			}
 			//#line 2132 "parse.c"
 			break;
@@ -8840,25 +8840,25 @@ return yy_default[stateno];
 			///<summary>
 			///transtype ::= IMMEDIATE 
 			///</summary>
-			//yytestcase(yyruleno==15);
+			//yysqliteinth.testcase(yyruleno==15);
 			case 16:
 			///
 			///<summary>
 			///transtype ::= EXCLUSIVE 
 			///</summary>
-			//yytestcase(yyruleno==16);
+			//yysqliteinth.testcase(yyruleno==16);
 			case 115:
 			///
 			///<summary>
 			///multiselect_op ::= UNION 
 			///</summary>
-			//yytestcase(yyruleno==114);
+			//yysqliteinth.testcase(yyruleno==114);
 			case 117:
 			///
 			///<summary>
 			///multiselect_op ::= EXCEPT|INTERSECT 
 			///</summary>
-			//yytestcase(yyruleno==116);
+			//yysqliteinth.testcase(yyruleno==116);
 			//#line 123 "parse.y"
 			{
 				yygotominor.yy4=yymsp[0].major;
@@ -8875,7 +8875,7 @@ return yy_default[stateno];
 			///<summary>
 			///cmd ::= END trans_opt 
 			///</summary>
-			//yytestcase(yyruleno==18);
+			//yysqliteinth.testcase(yyruleno==18);
 			//#line 126 "parse.y"
 			{
 				build.sqlite3CommitTransaction(pParse);
@@ -8900,7 +8900,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 132 "parse.y"
 			{
-				build.sqlite3Savepoint(pParse,SAVEPOINT_BEGIN,yymsp[0].minor.yy0Token);
+                build.sqlite3Savepoint(pParse, sqliteinth.SAVEPOINT_BEGIN, yymsp[0].minor.yy0Token);
 			}
 			//#line 2159 "parse.c"
 			break;
@@ -8911,7 +8911,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 135 "parse.y"
 			{
-				build.sqlite3Savepoint(pParse,SAVEPOINT_RELEASE,yymsp[0].minor.yy0Token);
+                build.sqlite3Savepoint(pParse, sqliteinth.SAVEPOINT_RELEASE, yymsp[0].minor.yy0Token);
 			}
 			//#line 2166 "parse.c"
 			break;
@@ -8922,7 +8922,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 138 "parse.y"
 			{
-				build.sqlite3Savepoint(pParse,SAVEPOINT_ROLLBACK,yymsp[0].minor.yy0Token);
+				build.sqlite3Savepoint(pParse,sqliteinth.SAVEPOINT_ROLLBACK,yymsp[0].minor.yy0Token);
 			}
 			//#line 2173 "parse.c"
 			break;
@@ -8959,67 +8959,67 @@ return yy_default[stateno];
 			///<summary>
 			///temp ::= 
 			///</summary>
-			//yytestcase(yyruleno == 31);
+			//yysqliteinth.testcase(yyruleno == 31);
 			case 70:
 			///
 			///<summary>
 			///autoinc ::= 
 			///</summary>
-			//yytestcase(yyruleno == 70);
+			//yysqliteinth.testcase(yyruleno == 70);
 			case 83:
 			///
 			///<summary>
 			///defer_subclause ::= NOT DEFERRABLE init_deferred_pred_opt 
 			///</summary>
-			//yytestcase(yyruleno == 83);
+			//yysqliteinth.testcase(yyruleno == 83);
 			case 85:
 			///
 			///<summary>
 			///init_deferred_pred_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno == 85);
+			//yysqliteinth.testcase(yyruleno == 85);
 			case 87:
 			///
 			///<summary>
 			///init_deferred_pred_opt ::= INITIALLY IMMEDIATE 
 			///</summary>
-			//yytestcase(yyruleno == 87);
+			//yysqliteinth.testcase(yyruleno == 87);
 			case 98:
 			///
 			///<summary>
 			///defer_subclause_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno == 98);
+			//yysqliteinth.testcase(yyruleno == 98);
 			case 109:
 			///
 			///<summary>
 			///ifexists ::= 
 			///</summary>
-			//yytestcase(yyruleno == 109);
+			//yysqliteinth.testcase(yyruleno == 109);
 			case 120:
 			///
 			///<summary>
 			///distinct ::= ALL 
 			///</summary>
-			//yytestcase(yyruleno == 120);
+			//yysqliteinth.testcase(yyruleno == 120);
 			case 121:
 			///
 			///<summary>
 			///distinct ::= 
 			///</summary>
-			//yytestcase(yyruleno == 121);
+			//yysqliteinth.testcase(yyruleno == 121);
 			case 222:
 			///
 			///<summary>
 			///between_op ::= BETWEEN 
 			///</summary>
-			//yytestcase(yyruleno == 223);
+			//yysqliteinth.testcase(yyruleno == 223);
 			case 225:
 			///
 			///<summary>
 			///in_op ::= IN 
 			///</summary>
-			//yytestcase(yyruleno == 226);
+			//yysqliteinth.testcase(yyruleno == 226);
 			//#line 153 "parse.y"
 			{
 				yygotominor.yy4=0;
@@ -9036,43 +9036,43 @@ return yy_default[stateno];
 			///<summary>
 			///temp ::= TEMP 
 			///</summary>
-			//yytestcase(yyruleno == 30);
+			//yysqliteinth.testcase(yyruleno == 30);
 			case 71:
 			///
 			///<summary>
 			///autoinc ::= AUTOINCR 
 			///</summary>
-			//yytestcase(yyruleno == 71);
+			//yysqliteinth.testcase(yyruleno == 71);
 			case 86:
 			///
 			///<summary>
 			///init_deferred_pred_opt ::= INITIALLY DEFERRED 
 			///</summary>
-			//yytestcase(yyruleno == 86);
+			//yysqliteinth.testcase(yyruleno == 86);
 			case 108:
 			///
 			///<summary>
 			///ifexists ::= IF EXISTS 
 			///</summary>
-			//yytestcase(yyruleno == 108);
+			//yysqliteinth.testcase(yyruleno == 108);
 			case 119:
 			///
 			///<summary>
 			///distinct ::= DISTINCT 
 			///</summary>
-			//yytestcase(yyruleno == 119);
+			//yysqliteinth.testcase(yyruleno == 119);
 			case 223:
 			///
 			///<summary>
 			///between_op ::= NOT BETWEEN 
 			///</summary>
-			//yytestcase(yyruleno == 224);
+			//yysqliteinth.testcase(yyruleno == 224);
 			case 226:
 			///
 			///<summary>
 			///in_op ::= NOT IN 
 			///</summary>
-			//yytestcase(yyruleno == 227);
+			//yysqliteinth.testcase(yyruleno == 227);
 			//#line 154 "parse.y"
 			{
 				yygotominor.yy4=1;
@@ -9138,127 +9138,127 @@ return yy_default[stateno];
 			///<summary>
 			///id ::= INDEXED 
 			///</summary>
-			//yytestcase(yyruleno==39);
+			//yysqliteinth.testcase(yyruleno==39);
 			case 40:
 			///
 			///<summary>
 			///ids ::= ID|STRING 
 			///</summary>
-			//yytestcase(yyruleno==40);
+			//yysqliteinth.testcase(yyruleno==40);
 			case 41:
 			///
 			///<summary>
 			///nm ::= id 
 			///</summary>
-			//yytestcase(yyruleno==41);
+			//yysqliteinth.testcase(yyruleno==41);
 			case 42:
 			///
 			///<summary>
 			///nm ::= STRING 
 			///</summary>
-			//yytestcase(yyruleno==42);
+			//yysqliteinth.testcase(yyruleno==42);
 			case 43:
 			///
 			///<summary>
 			///nm ::= JOIN_KW 
 			///</summary>
-			//yytestcase(yyruleno==43);
+			//yysqliteinth.testcase(yyruleno==43);
 			case 46:
 			///
 			///<summary>
 			///typetoken ::= typename 
 			///</summary>
-			//yytestcase(yyruleno==46);
+			//yysqliteinth.testcase(yyruleno==46);
 			case 49:
 			///
 			///<summary>
 			///typename ::= ids 
 			///</summary>
-			//yytestcase(yyruleno==49);
+			//yysqliteinth.testcase(yyruleno==49);
 			case 127:
 			///
 			///<summary>
 			///as ::= AS nm 
 			///</summary>
-			////yytestcase(yyruleno == 127);
+			////yysqliteinth.testcase(yyruleno == 127);
 			case 128:
 			///
 			///<summary>
 			///as ::= ids 
 			///</summary>
-			////yytestcase(yyruleno == 128);
+			////yysqliteinth.testcase(yyruleno == 128);
 			case 138:
 			///
 			///<summary>
 			///dbnm ::= DOT nm 
 			///</summary>
-			////yytestcase(yyruleno == 138);
+			////yysqliteinth.testcase(yyruleno == 138);
 			case 147:
 			///
 			///<summary>
 			///indexed_opt ::= INDEXED BY nm 
 			///</summary>
-			////yytestcase(yyruleno == 147);
+			////yysqliteinth.testcase(yyruleno == 147);
 			case 251:
 			///
 			///<summary>
 			///collate ::= COLLATE ids 
 			///</summary>
-			//testcase(yyruleno == 251);
+			//sqliteinth.testcase(yyruleno == 251);
 			case 260:
 			///
 			///<summary>
 			///nmnum ::= plus_num 
 			///</summary>
-			//testcase(yyruleno == 260);
+			//sqliteinth.testcase(yyruleno == 260);
 			case 261:
 			///
 			///<summary>
 			///nmnum ::= nm 
 			///</summary>
-			//testcase(yyruleno == 261);
+			//sqliteinth.testcase(yyruleno == 261);
 			case 262:
 			///
 			///<summary>
 			///nmnum ::= ON 
 			///</summary>
-			//testcase(yyruleno == 262);
+			//sqliteinth.testcase(yyruleno == 262);
 			case 263:
 			///
 			///<summary>
 			///nmnum ::= DELETE 
 			///</summary>
-			//testcase(yyruleno == 263);
+			//sqliteinth.testcase(yyruleno == 263);
 			case 264:
 			///
 			///<summary>
 			///nmnum ::= DEFAULT 
 			///</summary>
-			//testcase(yyruleno == 264);
+			//sqliteinth.testcase(yyruleno == 264);
 			case 265:
 			///
 			///<summary>
 			///plus_num ::= plus_opt number 
 			///</summary>
-			//testcase(yyruleno == 265);
+			//sqliteinth.testcase(yyruleno == 265);
 			case 266:
 			///
 			///<summary>
 			///minus_num ::= MINUS number 
 			///</summary>
-			//testcase(yyruleno == 266);
+			//sqliteinth.testcase(yyruleno == 266);
 			case 267:
 			///
 			///<summary>
 			///number ::= INTEGER|FLOAT 
 			///</summary>
-			//testcase(yyruleno == 267);
+			//sqliteinth.testcase(yyruleno == 267);
 			case 285:
 			///
 			///<summary>
 			///trnm ::= nm 
 			///</summary>
-			//testcase(yyruleno == 285);
+			//sqliteinth.testcase(yyruleno == 285);
 			//#line 189 "parse.y"
 			{
 				yygotominor.yy0Token=yymsp[0].minor.yy0Token;
@@ -9327,7 +9327,7 @@ return yy_default[stateno];
 			///<summary>
 			///ccons ::= DEFAULT PLUS term 
 			///</summary>
-			//yytestcase(yyruleno==59);
+			//yysqliteinth.testcase(yyruleno==59);
 			//#line 274 "parse.y"
 			{
 				build.sqlite3AddDefaultValue(pParse,yymsp[0].minor.yy118);
@@ -9353,7 +9353,7 @@ return yy_default[stateno];
 			//#line 277 "parse.y"
 			{
 				ExprSpan v=new ExprSpan();
-				v.pExpr=pParse.sqlite3PExpr(TK_UMINUS,yymsp[0].minor.yy118.pExpr,0,0);
+				v.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_UMINUS,yymsp[0].minor.yy118.pExpr,0,0);
 				v.zStart=yymsp[-1].minor.yy0Token.zRestSql;
 				v.zEnd=yymsp[0].minor.yy118.zEnd;
 				build.sqlite3AddDefaultValue(pParse,v);
@@ -9368,7 +9368,7 @@ return yy_default[stateno];
 			//#line 284 "parse.y"
 			{
 				ExprSpan v=new ExprSpan();
-				v.spanExpr(pParse,TK_STRING,yymsp[0].minor.yy0Token);
+				v.spanExpr(pParse,Sqlite3.TK_STRING,yymsp[0].minor.yy0Token);
 				build.sqlite3AddDefaultValue(pParse,v);
 			}
 			//#line 2330 "parse.c"
@@ -9385,7 +9385,7 @@ return yy_default[stateno];
 			///ccons ::= PRIMARY KEY sortorder onconf autoinc 
 			//#line 296 "parse.y"
 			{
-				build.sqlite3AddPrimaryKey(pParse,0,yymsp[-1].minor.yy4,yymsp[0].minor.yy4,yymsp[-2].minor.yy4);
+				build.sqlite3AddPrimaryKey(pParse,0,(OnConstraintError)yymsp[-1].minor.yy4,yymsp[0].minor.yy4,(SortOrder)yymsp[-2].minor.yy4);
 			}
 			//#line 2340 "parse.c"
 			break;
@@ -9393,7 +9393,7 @@ return yy_default[stateno];
 			///ccons ::= UNIQUE onconf 
 			//#line 297 "parse.y"
 			{
-				build.sqlite3CreateIndex(pParse,0,0,0,0,yymsp[0].minor.yy4,0,0,0,0);
+				build.sqlite3CreateIndex( pParse,0,0,0,0,(OnConstraintError)yymsp[0].minor.yy4,0,0,(SortOrder)0,0);
 			}
 			//#line 2345 "parse.c"
 			break;
@@ -9442,7 +9442,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 315 "parse.y"
 			{
-				yygotominor.yy4=OE_None*0x0101;
+				yygotominor.yy4=(int)OnConstraintError.OE_None*0x0101;
 				///
 				///<summary>
 				///</summary>
@@ -9471,7 +9471,7 @@ return yy_default[stateno];
 			///<summary>
 			///refarg ::= ON INSERT refact 
 			///</summary>
-			//yytestcase(yyruleno==75);
+			//yysqliteinth.testcase(yyruleno==75);
 			//#line 318 "parse.y"
 			{
 				yygotominor.yy215.value=0;
@@ -9510,7 +9510,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 323 "parse.y"
 			{
-				yygotominor.yy4=OE_SetNull;
+				yygotominor.yy4=(int)OnConstraintError.OE_SetNull;
 				///
 				///<summary>
 				///</summary>
@@ -9525,7 +9525,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 324 "parse.y"
 			{
-				yygotominor.yy4=OE_SetDflt;
+				yygotominor.yy4=(int)OnConstraintError.OE_SetDflt;
 				///
 				///<summary>
 				///</summary>
@@ -9540,7 +9540,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 325 "parse.y"
 			{
-				yygotominor.yy4=OE_Cascade;
+				yygotominor.yy4=(int)OnConstraintError.OE_Cascade;
 				///
 				///<summary>
 				///</summary>
@@ -9555,7 +9555,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 326 "parse.y"
 			{
-				yygotominor.yy4=OE_Restrict;
+				yygotominor.yy4=(int)OnConstraintError.OE_Restrict;
 				///
 				///<summary>
 				///</summary>
@@ -9570,7 +9570,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 327 "parse.y"
 			{
-				yygotominor.yy4=OE_None;
+				yygotominor.yy4=(int)OnConstraintError.OE_None;
 				///
 				///<summary>
 				///</summary>
@@ -9588,19 +9588,19 @@ return yy_default[stateno];
 			///<summary>
 			///defer_subclause_opt ::= defer_subclause 
 			///</summary>
-			//yytestcase(yyruleno==99);
+			//yysqliteinth.testcase(yyruleno==99);
 			case 101:
 			///
 			///<summary>
 			///onconf ::= ON CONFLICT resolvetype 
 			///</summary>
-			//yytestcase(yyruleno==101);
+			//yysqliteinth.testcase(yyruleno==101);
 			case 104:
 			///
 			///<summary>
 			///resolvetype ::= raisetype 
 			///</summary>
-			//yytestcase(yyruleno==104);
+			//yysqliteinth.testcase(yyruleno==104);
 			//#line 330 "parse.y"
 			{
 				yygotominor.yy4=yymsp[0].minor.yy4;
@@ -9637,7 +9637,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 346 "parse.y"
 			{
-				build.sqlite3AddPrimaryKey(pParse,yymsp[-3].minor.yy322,yymsp[0].minor.yy4,yymsp[-2].minor.yy4,0);
+                build.sqlite3AddPrimaryKey(pParse, yymsp[-3].minor.yy322, (OnConstraintError)yymsp[0].minor.yy4, yymsp[-2].minor.yy4, (SortOrder)0);
 			}
 			//#line 2439 "parse.c"
 			break;
@@ -9648,7 +9648,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 348 "parse.y"
 			{
-				build.sqlite3CreateIndex(pParse,0,0,0,yymsp[-2].minor.yy322,yymsp[0].minor.yy4,0,0,0,0);
+				build.sqlite3CreateIndex( pParse,0,0,0,yymsp[-2].minor.yy322, (OnConstraintError)yymsp[0].minor.yy4,0,0,(SortOrder)0,0);
 			}
 			//#line 2444 "parse.c"
 			break;
@@ -9682,7 +9682,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 366 "parse.y"
 			{
-				yygotominor.yy4=OE_Default;
+				yygotominor.yy4=(int)OnConstraintError.OE_Default;
 			}
 			//#line 2462 "parse.c"
 			break;
@@ -9693,7 +9693,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 368 "parse.y"
 			{
-				yygotominor.yy210=OE_Default;
+                yygotominor.yy210 = (int)OnConstraintError.OE_Default;
 			}
 			//#line 2467 "parse.c"
 			break;
@@ -9715,7 +9715,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 371 "parse.y"
 			{
-				yygotominor.yy4=OE_Ignore;
+                yygotominor.yy4 = (int)OnConstraintError.OE_Ignore;
 			}
 			//#line 2477 "parse.c"
 			break;
@@ -9726,7 +9726,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 372 "parse.y"
 			{
-				yygotominor.yy4=OE_Replace;
+                yygotominor.yy4 = (int)OnConstraintError.OE_Replace;
 			}
 			//#line 2482 "parse.c"
 			break;
@@ -9812,7 +9812,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 420 "parse.y"
 			{
-				yygotominor.yy4=TK_ALL;
+				yygotominor.yy4=Sqlite3.TK_ALL;
 			}
 			//#line 2535 "parse.c"
 			break;
@@ -9837,7 +9837,7 @@ return yy_default[stateno];
 			///<summary>
 			///idxlist_opt ::= LP idxlist RP 
 			///</summary>
-			//yytestcase(yyruleno==247);
+			//yysqliteinth.testcase(yyruleno==247);
 			//#line 445 "parse.y"
 			{
 				yygotominor.yy322=yymsp[-1].minor.yy322;
@@ -9854,25 +9854,25 @@ return yy_default[stateno];
 			///<summary>
 			///orderby_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==151);
+			//yysqliteinth.testcase(yyruleno==151);
 			case 159:
 			///
 			///<summary>
 			///groupby_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==159);
+			//yysqliteinth.testcase(yyruleno==159);
 			case 240:
 			///
 			///<summary>
 			///exprlist ::= 
 			///</summary>
-			//yytestcase(yyruleno==240);
+			//yysqliteinth.testcase(yyruleno==240);
 			case 246:
 			///
 			///<summary>
 			///idxlist_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==246);
+			//yysqliteinth.testcase(yyruleno==246);
 			//#line 446 "parse.y"
 			{
 				yygotominor.yy322=null;
@@ -9900,7 +9900,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 452 "parse.y"
 			{
-				Expr p=exprc.sqlite3Expr(pParse.db,TK_ALL,null);
+				Expr p=exprc.sqlite3Expr(pParse.db,Sqlite3.TK_ALL,null);
 				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-1].minor.yy322,p);
 			}
 			//#line 2574 "parse.c"
@@ -9912,9 +9912,9 @@ return yy_default[stateno];
 			///</summary>
 			//#line 456 "parse.y"
 			{
-				Expr pRight=pParse.sqlite3PExpr(TK_ALL,0,0,yymsp[0].minor.yy0Token);
-				Expr pLeft=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[-2].minor.yy0Token);
-				Expr pDot=pParse.sqlite3PExpr(TK_DOT,pLeft,pRight,0);
+				Expr pRight=pParse.sqlite3PExpr(Sqlite3.TK_ALL,0,0,yymsp[0].minor.yy0Token);
+				Expr pLeft=pParse.sqlite3PExpr(Sqlite3.TK_ID,0,0,yymsp[-2].minor.yy0Token);
+				Expr pDot=pParse.sqlite3PExpr(Sqlite3.TK_DOT,pLeft,pRight,0);
 				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-3].minor.yy322,pDot);
 			}
 			//#line 2584 "parse.c"
@@ -9962,8 +9962,8 @@ return yy_default[stateno];
 			//#line 490 "parse.y"
 			{
 				yygotominor.yy259=yymsp[-1].minor.yy259;
-				if(ALWAYS(yygotominor.yy259!=null&&yygotominor.yy259.nSrc>0))
-					yygotominor.yy259.a[yygotominor.yy259.nSrc-1].jointype=(u8)yymsp[0].minor.yy4;
+				if(Sqlite3.ALWAYS(yygotominor.yy259!=null&&yygotominor.yy259.nSrc>0))
+					yygotominor.yy259.a[yygotominor.yy259.nSrc-1].jointype=(JoinType)yymsp[0].minor.yy4;
 			}
 			//#line 2610 "parse.c"
 			break;
@@ -10030,7 +10030,7 @@ return yy_default[stateno];
 			///<summary>
 			///indexed_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==146);
+			//yysqliteinth.testcase(yyruleno==146);
 			//#line 530 "parse.y"
 			{
 				yygotominor.yy0Token.zRestSql=null;
@@ -10056,7 +10056,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 539 "parse.y"
 			{
-				yygotominor.yy4=JT_INNER;
+                yygotominor.yy4 = (int) JoinType.JT_INNER;
 			}
 			//#line 2660 "parse.c"
 			break;
@@ -10067,7 +10067,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 540 "parse.y"
 			{
-				yygotominor.yy4=SelectMethods.sqlite3JoinType(pParse,yymsp[-1].minor.yy0Token,0,0);
+				yygotominor.yy4=(int)SelectMethods.sqlite3JoinType(pParse,yymsp[-1].minor.yy0Token,0,0);
 			}
 			//#line 2665 "parse.c"
 			break;
@@ -10078,7 +10078,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 541 "parse.y"
 			{
-                yygotominor.yy4 = SelectMethods.sqlite3JoinType(pParse, yymsp[-2].minor.yy0Token, yymsp[-1].minor.yy0Token, 0);
+                yygotominor.yy4 = (int)SelectMethods.sqlite3JoinType(pParse, yymsp[-2].minor.yy0Token, yymsp[-1].minor.yy0Token, 0);
 			}
 			//#line 2670 "parse.c"
 			break;
@@ -10089,7 +10089,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 543 "parse.y"
 			{
-                yygotominor.yy4 = SelectMethods.sqlite3JoinType(pParse, yymsp[-3].minor.yy0Token, yymsp[-2].minor.yy0Token, yymsp[-1].minor.yy0Token);
+                yygotominor.yy4 =(int) SelectMethods.sqlite3JoinType(pParse, yymsp[-3].minor.yy0Token, yymsp[-2].minor.yy0Token, yymsp[-1].minor.yy0Token);
 			}
 			//#line 2675 "parse.c"
 			break;
@@ -10103,31 +10103,31 @@ return yy_default[stateno];
 			///<summary>
 			///sortitem ::= expr 
 			///</summary>
-			//yytestcase(yyruleno==155);
+			//yysqliteinth.testcase(yyruleno==155);
 			case 162:
 			///
 			///<summary>
 			///having_opt ::= HAVING expr 
 			///</summary>
-			//yytestcase(yyruleno==162);
+			//yysqliteinth.testcase(yyruleno==162);
 			case 169:
 			///
 			///<summary>
 			///where_opt ::= WHERE expr 
 			///</summary>
-			//yytestcase(yyruleno==169);
+			//yysqliteinth.testcase(yyruleno==169);
 			case 235:
 			///
 			///<summary>
 			///case_else ::= ELSE expr 
 			///</summary>
-			//yytestcase(yyruleno==235);
+			//yysqliteinth.testcase(yyruleno==235);
 			case 237:
 			///
 			///<summary>
 			///case_operand ::= expr 
 			///</summary>
-			//yytestcase(yyruleno==237);
+			//yysqliteinth.testcase(yyruleno==237);
 			//#line 547 "parse.y"
 			{
 				yygotominor.yy314=yymsp[0].minor.yy118.pExpr;
@@ -10144,25 +10144,25 @@ return yy_default[stateno];
 			///<summary>
 			///having_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==161);
+			//yysqliteinth.testcase(yyruleno==161);
 			case 168:
 			///
 			///<summary>
 			///where_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==168);
+			//yysqliteinth.testcase(yyruleno==168);
 			case 236:
 			///
 			///<summary>
 			///case_else ::= 
 			///</summary>
-			//yytestcase(yyruleno==236);
+			//yysqliteinth.testcase(yyruleno==236);
 			case 238:
 			///
 			///<summary>
 			///case_operand ::= 
 			///</summary>
-			//yytestcase(yyruleno==238);
+			//yysqliteinth.testcase(yyruleno==238);
 			//#line 548 "parse.y"
 			{
 				yygotominor.yy314=null;
@@ -10191,7 +10191,7 @@ return yy_default[stateno];
 			///<summary>
 			///inscollist_opt ::= LP inscollist RP 
 			///</summary>
-			//yytestcase(yyruleno==181);
+			//yysqliteinth.testcase(yyruleno==181);
 			//#line 567 "parse.y"
 			{
 				yygotominor.yy384=yymsp[-1].minor.yy384;
@@ -10208,7 +10208,7 @@ return yy_default[stateno];
 			///<summary>
 			///inscollist_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==180);
+			//yysqliteinth.testcase(yyruleno==180);
 			//#line 568 "parse.y"
 			{
 				yygotominor.yy384=null;
@@ -10225,13 +10225,13 @@ return yy_default[stateno];
 			///<summary>
 			///groupby_opt ::= GROUP BY nexprlist 
 			///</summary>
-			//yytestcase(yyruleno==160);
+			//yysqliteinth.testcase(yyruleno==160);
 			case 239:
 			///
 			///<summary>
 			///exprlist ::= nexprlist 
 			///</summary>
-			//yytestcase(yyruleno==239);
+			//yysqliteinth.testcase(yyruleno==239);
 			//#line 579 "parse.y"
 			{
 				yygotominor.yy322=yymsp[0].minor.yy322;
@@ -10247,7 +10247,7 @@ return yy_default[stateno];
 			{
 				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-3].minor.yy322,yymsp[-1].minor.yy314);
 				if(yygotominor.yy322!=null)
-					yygotominor.yy322.a[yygotominor.yy322.nExpr-1].sortOrder=(u8)yymsp[0].minor.yy4;
+					yygotominor.yy322.a[yygotominor.yy322.nExpr-1].sortOrder=(SortOrder)yymsp[0].minor.yy4;
 			}
 			//#line 2726 "parse.c"
 			break;
@@ -10259,8 +10259,8 @@ return yy_default[stateno];
 			//#line 584 "parse.y"
 			{
 				yygotominor.yy322=pParse.sqlite3ExprListAppend(0,yymsp[-1].minor.yy314);
-				if(yygotominor.yy322!=null&&ALWAYS(yygotominor.yy322.a!=null))
-					yygotominor.yy322.a[0].sortOrder=(u8)yymsp[0].minor.yy4;
+				if(yygotominor.yy322!=null&&Sqlite3.ALWAYS(yygotominor.yy322.a!=null))
+					yygotominor.yy322.a[0].sortOrder=(SortOrder)yymsp[0].minor.yy4;
 			}
 			//#line 2734 "parse.c"
 			break;
@@ -10274,10 +10274,10 @@ return yy_default[stateno];
 			///<summary>
 			///sortorder ::= 
 			///</summary>
-			//yytestcase(yyruleno==158);
+			//yysqliteinth.testcase(yyruleno==158);
 			//#line 592 "parse.y"
 			{
-				yygotominor.yy4=SQLITE_SO_ASC;
+                yygotominor.yy4 = (int)SortOrder.SQLITE_SO_ASC;
 			}
 			//#line 2740 "parse.c"
 			break;
@@ -10288,7 +10288,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 593 "parse.y"
 			{
-				yygotominor.yy4=SQLITE_SO_DESC;
+				yygotominor.yy4=(int)SortOrder.SQLITE_SO_DESC;
 			}
 			//#line 2745 "parse.c"
 			break;
@@ -10361,7 +10361,7 @@ return yy_default[stateno];
 			{
 				build.sqlite3SrcListIndexedBy(pParse,yymsp[-4].minor.yy259,yymsp[-3].minor.yy0Token);
 				pParse.sqlite3ExprListCheckLength(yymsp[-1].minor.yy322,"set list");
-				pParse.sqlite3Update(yymsp[-4].minor.yy259,yymsp[-1].minor.yy322,yymsp[0].minor.yy314,yymsp[-5].minor.yy210);
+				pParse.sqlite3Update(yymsp[-4].minor.yy259,yymsp[-1].minor.yy322,yymsp[0].minor.yy314, (OnConstraintError)yymsp[-5].minor.yy210);
 			}
 			//#line 2782 "parse.c"
 			break;
@@ -10396,7 +10396,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 683 "parse.y"
 			{
-				pParse.sqlite3Insert(yymsp[-5].minor.yy259,yymsp[-1].minor.yy322,0,yymsp[-4].minor.yy384,yymsp[-7].minor.yy210);
+				pParse.sqlite3Insert(yymsp[-5].minor.yy259,yymsp[-1].minor.yy322,0,yymsp[-4].minor.yy384,(OnConstraintError)yymsp[-7].minor.yy210);
 			}
 			//#line 2803 "parse.c"
 			break;
@@ -10407,7 +10407,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 685 "parse.y"
 			{
-				pParse.sqlite3Insert(yymsp[-2].minor.yy259,0,yymsp[0].minor.yy387,yymsp[-1].minor.yy384,yymsp[-4].minor.yy210);
+				pParse.sqlite3Insert(yymsp[-2].minor.yy259,0,yymsp[0].minor.yy387,yymsp[-1].minor.yy384,(OnConstraintError)yymsp[-4].minor.yy210);
 			}
 			//#line 2808 "parse.c"
 			break;
@@ -10418,7 +10418,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 687 "parse.y"
 			{
-				pParse.sqlite3Insert(yymsp[-3].minor.yy259,0,0,yymsp[-2].minor.yy384,yymsp[-5].minor.yy210);
+				pParse.sqlite3Insert(yymsp[-3].minor.yy259,0,0,yymsp[-2].minor.yy384,(OnConstraintError)yymsp[-5].minor.yy210);
 			}
 			//#line 2813 "parse.c"
 			break;
@@ -10440,7 +10440,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 691 "parse.y"
 			{
-				yygotominor.yy210=OE_Replace;
+				yygotominor.yy210=(int)OnConstraintError.OE_Replace;
 			}
 			//#line 2823 "parse.c"
 			break;
@@ -10454,7 +10454,7 @@ return yy_default[stateno];
 			///<summary>
 			///nexprlist ::= nexprlist COMMA expr 
 			///</summary>
-			//yytestcase(yyruleno==241);
+			//yysqliteinth.testcase(yyruleno==241);
 			//#line 698 "parse.y"
 			{
 				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-2].minor.yy322,yymsp[0].minor.yy118.pExpr);
@@ -10471,7 +10471,7 @@ return yy_default[stateno];
 			///<summary>
 			///nexprlist ::= expr 
 			///</summary>
-			//yytestcase(yyruleno==242);
+			//yysqliteinth.testcase(yyruleno==242);
 			//#line 700 "parse.y"
 			{
 				yygotominor.yy322=pParse.sqlite3ExprListAppend(0,yymsp[0].minor.yy118.pExpr);
@@ -10533,13 +10533,13 @@ return yy_default[stateno];
 			///<summary>
 			///term ::= INTEGER|FLOAT|BLOB 
 			///</summary>
-			//yytestcase(yyruleno==191);
+			//yysqliteinth.testcase(yyruleno==191);
 			case 192:
 			///
 			///<summary>
 			///term ::= STRING 
 			///</summary>
-			//yytestcase(yyruleno==192);
+			//yysqliteinth.testcase(yyruleno==192);
 			//#line 745 "parse.y"
 			{
 				yygotominor.yy118.spanExpr(pParse,yymsp[0].major,yymsp[0].minor.yy0Token);
@@ -10556,10 +10556,10 @@ return yy_default[stateno];
 			///<summary>
 			///expr ::= JOIN_KW 
 			///</summary>
-			//yytestcase(yyruleno==188);
+			//yysqliteinth.testcase(yyruleno==188);
 			//#line 746 "parse.y"
 			{
-				yygotominor.yy118.spanExpr(pParse,TK_ID,yymsp[0].minor.yy0Token);
+				yygotominor.yy118.spanExpr(pParse,Sqlite3.TK_ID,yymsp[0].minor.yy0Token);
 			}
 			//#line 2868 "parse.c"
 			break;
@@ -10570,9 +10570,9 @@ return yy_default[stateno];
 			///</summary>
 			//#line 748 "parse.y"
 			{
-				Expr temp1=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[-2].minor.yy0Token);
-				Expr temp2=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[0].minor.yy0Token);
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_DOT,temp1,temp2,0);
+				Expr temp1=pParse.sqlite3PExpr(Sqlite3.TK_ID,0,0,yymsp[-2].minor.yy0Token);
+				Expr temp2=pParse.sqlite3PExpr(Sqlite3.TK_ID,0,0,yymsp[0].minor.yy0Token);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_DOT,temp1,temp2,0);
 				yygotominor.yy118.spanSet(yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token);
 			}
 			//#line 2878 "parse.c"
@@ -10584,11 +10584,11 @@ return yy_default[stateno];
 			///</summary>
 			//#line 754 "parse.y"
 			{
-				Expr temp1=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[-4].minor.yy0Token);
-				Expr temp2=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[-2].minor.yy0Token);
-				Expr temp3=pParse.sqlite3PExpr(TK_ID,0,0,yymsp[0].minor.yy0Token);
-				Expr temp4=pParse.sqlite3PExpr(TK_DOT,temp2,temp3,0);
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_DOT,temp1,temp4,0);
+				Expr temp1=pParse.sqlite3PExpr(Sqlite3.TK_ID,0,0,yymsp[-4].minor.yy0Token);
+				Expr temp2=pParse.sqlite3PExpr(Sqlite3.TK_ID,0,0,yymsp[-2].minor.yy0Token);
+				Expr temp3=pParse.sqlite3PExpr(Sqlite3.TK_ID,0,0,yymsp[0].minor.yy0Token);
+				Expr temp4=pParse.sqlite3PExpr(Sqlite3.TK_DOT,temp2,temp3,0);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_DOT,temp1,temp4,0);
 				yygotominor.yy118.spanSet(yymsp[-4].minor.yy0Token,yymsp[0].minor.yy0Token);
 			}
 			//#line 2890 "parse.c"
@@ -10611,7 +10611,7 @@ return yy_default[stateno];
 					yygotominor.yy118.pExpr=null;
 				}
 				else {
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_REGISTER,0,0,yymsp[0].minor.yy0Token);
+					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_REGISTER,0,0,yymsp[0].minor.yy0Token);
 					if(yygotominor.yy118.pExpr!=null)
 						Converter.sqlite3GetInt32(yymsp[0].minor.yy0Token.zRestSql,1,ref yygotominor.yy118.pExpr.iTable);
 				}
@@ -10626,7 +10626,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 777 "parse.y"
 			{
-				yygotominor.yy118.spanExpr(pParse,TK_VARIABLE,yymsp[0].minor.yy0Token);
+				yygotominor.yy118.spanExpr(pParse,Sqlite3.TK_VARIABLE,yymsp[0].minor.yy0Token);
 				pParse.sqlite3ExprAssignVarNumber(yygotominor.yy118.pExpr);
 				yygotominor.yy118.spanSet(yymsp[0].minor.yy0Token,yymsp[0].minor.yy0Token);
 			}
@@ -10653,7 +10653,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 788 "parse.y"
 			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_CAST,yymsp[-3].minor.yy118.pExpr,0,yymsp[-1].minor.yy0Token);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_CAST,yymsp[-3].minor.yy118.pExpr,0,yymsp[-1].minor.yy0Token);
 				yygotominor.yy118.spanSet(yymsp[-5].minor.yy0Token,yymsp[0].minor.yy0Token);
 			}
 			//#line 2933 "parse.c"
@@ -10718,43 +10718,43 @@ return yy_default[stateno];
 			///<summary>
 			///expr ::= expr OR expr 
 			///</summary>
-			//yytestcase(yyruleno==201);
+			//yysqliteinth.testcase(yyruleno==201);
 			case 202:
 			///
 			///<summary>
 			///expr ::= expr LT|GT|GE|LE expr 
 			///</summary>
-			//yytestcase(yyruleno==202);
+			//yysqliteinth.testcase(yyruleno==202);
 			case 203:
 			///
 			///<summary>
 			///expr ::= expr EQ|NE expr 
 			///</summary>
-			//yytestcase(yyruleno==203);
+			//yysqliteinth.testcase(yyruleno==203);
 			case 204:
 			///
 			///<summary>
 			///expr ::= expr BITAND|BITOR|LSHIFT|RSHIFT expr 
 			///</summary>
-			//yytestcase(yyruleno==204);
+			//yysqliteinth.testcase(yyruleno==204);
 			case 205:
 			///
 			///<summary>
 			///expr ::= expr PLUS|MINUS expr 
 			///</summary>
-			//yytestcase(yyruleno==205);
+			//yysqliteinth.testcase(yyruleno==205);
 			case 206:
 			///
 			///<summary>
 			///expr ::= expr STAR|SLASH|REM expr 
 			///</summary>
-			//yytestcase(yyruleno==206);
+			//yysqliteinth.testcase(yyruleno==206);
 			case 207:
 			///
 			///<summary>
 			///expr ::= expr CONCAT expr 
 			///</summary>
-			//yytestcase(yyruleno==207);
+			//yysqliteinth.testcase(yyruleno==207);
 			//#line 834 "parse.y"
 			{
 				yygotominor.yy118.spanBinaryExpr(pParse,yymsp[-1].major,yymsp[-2].minor.yy118,yymsp[0].minor.yy118);
@@ -10771,7 +10771,7 @@ return yy_default[stateno];
 			///<summary>
 			///likeop ::= MATCH 
 			///</summary>
-			//yytestcase(yyruleno==210);
+			//yysqliteinth.testcase(yyruleno==210);
 			//#line 847 "parse.y"
 			{
 				yygotominor.yy342.eOperator=yymsp[0].minor.yy0Token;
@@ -10789,7 +10789,7 @@ return yy_default[stateno];
 			///<summary>
 			///likeop ::= NOT MATCH 
 			///</summary>
-			//yytestcase(yyruleno==211);
+			//yysqliteinth.testcase(yyruleno==211);
 			//#line 848 "parse.y"
 			{
 				yygotominor.yy342.eOperator=yymsp[0].minor.yy0Token;
@@ -10809,7 +10809,7 @@ return yy_default[stateno];
 				pList=pParse.sqlite3ExprListAppend(pList,yymsp[-2].minor.yy118.pExpr);
 				yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(pList,yymsp[-1].minor.yy342.eOperator);
 				if(yymsp[-1].minor.yy342.not)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
+					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_NOT,yygotominor.yy118.pExpr,0,0);
 				yygotominor.yy118.zStart=yymsp[-2].minor.yy118.zStart;
 				yygotominor.yy118.zEnd=yymsp[0].minor.yy118.zEnd;
 				if(yygotominor.yy118.pExpr!=null)
@@ -10830,7 +10830,7 @@ return yy_default[stateno];
 				pList=pParse.sqlite3ExprListAppend(pList,yymsp[0].minor.yy118.pExpr);
 				yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(pList,yymsp[-3].minor.yy342.eOperator);
 				if(yymsp[-3].minor.yy342.not)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
+					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_NOT,yygotominor.yy118.pExpr,0,0);
 				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
 				yygotominor.yy118.zEnd=yymsp[0].minor.yy118.zEnd;
 				if(yygotominor.yy118.pExpr!=null)
@@ -10856,7 +10856,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 890 "parse.y"
 			{
-				yygotominor.yy118.spanUnaryPostfix(pParse,TK_NOTNULL,yymsp[-2].minor.yy118,yymsp[0].minor.yy0Token);
+				yygotominor.yy118.spanUnaryPostfix(pParse,Sqlite3.TK_NOTNULL,yymsp[-2].minor.yy118,yymsp[0].minor.yy0Token);
 			}
 			//#line 3031 "parse.c"
 			break;
@@ -10867,8 +10867,8 @@ return yy_default[stateno];
 			///</summary>
 			//#line 911 "parse.y"
 			{
-				yygotominor.yy118.spanBinaryExpr(pParse,TK_IS,yymsp[-2].minor.yy118,yymsp[0].minor.yy118);
-				pParse.binaryToUnaryIfNull(yymsp[0].minor.yy118.pExpr,yygotominor.yy118.pExpr,TK_ISNULL);
+				yygotominor.yy118.spanBinaryExpr(pParse,Sqlite3.TK_IS,yymsp[-2].minor.yy118,yymsp[0].minor.yy118);
+				pParse.binaryToUnaryIfNull(yymsp[0].minor.yy118.pExpr,yygotominor.yy118.pExpr,Sqlite3.TK_ISNULL);
 			}
 			//#line 3039 "parse.c"
 			break;
@@ -10879,8 +10879,8 @@ return yy_default[stateno];
 			///</summary>
 			//#line 915 "parse.y"
 			{
-				yygotominor.yy118.spanBinaryExpr(pParse,TK_ISNOT,yymsp[-3].minor.yy118,yymsp[0].minor.yy118);
-				pParse.binaryToUnaryIfNull(yymsp[0].minor.yy118.pExpr,yygotominor.yy118.pExpr,TK_NOTNULL);
+				yygotominor.yy118.spanBinaryExpr(pParse,Sqlite3.TK_ISNOT,yymsp[-3].minor.yy118,yymsp[0].minor.yy118);
+				pParse.binaryToUnaryIfNull(yymsp[0].minor.yy118.pExpr,yygotominor.yy118.pExpr,Sqlite3.TK_NOTNULL);
 			}
 			//#line 3047 "parse.c"
 			break;
@@ -10894,7 +10894,7 @@ return yy_default[stateno];
 			///<summary>
 			///expr ::= BITNOT expr 
 			///</summary>
-			//yytestcase(yyruleno==219);
+			//yysqliteinth.testcase(yyruleno==219);
 			//#line 938 "parse.y"
 			{
 				yygotominor.yy118.spanUnaryPrefix(pParse,yymsp[-1].major,yymsp[0].minor.yy118,yymsp[-1].minor.yy0Token);
@@ -10908,7 +10908,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 941 "parse.y"
 			{
-				yygotominor.yy118.spanUnaryPrefix(pParse,TK_UMINUS,yymsp[0].minor.yy118,yymsp[-1].minor.yy0Token);
+				yygotominor.yy118.spanUnaryPrefix(pParse,Sqlite3.TK_UMINUS,yymsp[0].minor.yy118,yymsp[-1].minor.yy0Token);
 			}
 			//#line 3058 "parse.c"
 			break;
@@ -10919,7 +10919,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 943 "parse.y"
 			{
-				yygotominor.yy118.spanUnaryPrefix(pParse,TK_UPLUS,yymsp[0].minor.yy118,yymsp[-1].minor.yy0Token);
+				yygotominor.yy118.spanUnaryPrefix(pParse,Sqlite3.TK_UPLUS,yymsp[0].minor.yy118,yymsp[-1].minor.yy0Token);
 			}
 			//#line 3063 "parse.c"
 			break;
@@ -10932,7 +10932,7 @@ return yy_default[stateno];
 			{
 				ExprList pList=pParse.sqlite3ExprListAppend(0,yymsp[-2].minor.yy118.pExpr);
 				pList=pParse.sqlite3ExprListAppend(pList,yymsp[0].minor.yy118.pExpr);
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_BETWEEN,yymsp[-4].minor.yy118.pExpr,0,0);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_BETWEEN,yymsp[-4].minor.yy118.pExpr,0,0);
 				if(yygotominor.yy118.pExpr!=null) {
 					yygotominor.yy118.pExpr.x.pList=pList;
 				}
@@ -10940,7 +10940,7 @@ return yy_default[stateno];
 					exprc.sqlite3ExprListDelete(pParse.db,ref pList);
 				}
 				if(yymsp[-3].minor.yy4!=0)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
+					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_NOT,yygotominor.yy118.pExpr,0,0);
 				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
 				yygotominor.yy118.zEnd=yymsp[0].minor.yy118.zEnd;
 			}
@@ -10965,11 +10965,11 @@ return yy_default[stateno];
 					///regardless of the value of expr1.
 					///
 					///</summary>
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_INTEGER,0,0,sqlite3IntTokens[yymsp[-3].minor.yy4]);
+					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_INTEGER,0,0,sqlite3IntTokens[yymsp[-3].minor.yy4]);
 					exprc.sqlite3ExprDelete(pParse.db,ref yymsp[-4].minor.yy118.pExpr);
 				}
 				else {
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_IN,yymsp[-4].minor.yy118.pExpr,0,0);
+					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_IN,yymsp[-4].minor.yy118.pExpr,0,0);
 					if(yygotominor.yy118.pExpr!=null) {
 						yygotominor.yy118.pExpr.x.pList=yymsp[-1].minor.yy322;
 						pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
@@ -10978,7 +10978,7 @@ return yy_default[stateno];
 						exprc.sqlite3ExprListDelete(pParse.db,ref yymsp[-1].minor.yy322);
 					}
 					if(yymsp[-3].minor.yy4!=0)
-						yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
+						yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_NOT,yygotominor.yy118.pExpr,0,0);
 				}
 				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
 				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
@@ -10993,10 +10993,10 @@ return yy_default[stateno];
 			///</summary>
 			//#line 990 "parse.y"
 			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_SELECT,0,0,0);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_SELECT,0,0,0);
 				if(yygotominor.yy118.pExpr!=null) {
 					yygotominor.yy118.pExpr.x.pSelect=yymsp[-1].minor.yy387;
-					yygotominor.yy118.pExpr.ExprSetProperty(EP_xIsSelect);
+					yygotominor.yy118.pExpr.ExprSetProperty(ExprFlags.EP_xIsSelect);
 					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
 				}
 				else {
@@ -11015,17 +11015,17 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1002 "parse.y"
 			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_IN,yymsp[-4].minor.yy118.pExpr,0,0);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_IN,yymsp[-4].minor.yy118.pExpr,0,0);
 				if(yygotominor.yy118.pExpr!=null) {
 					yygotominor.yy118.pExpr.x.pSelect=yymsp[-1].minor.yy387;
-					yygotominor.yy118.pExpr.ExprSetProperty(EP_xIsSelect);
+					yygotominor.yy118.pExpr.ExprSetProperty(ExprFlags.EP_xIsSelect);
 					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
 				}
 				else {
 					SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387);
 				}
 				if(yymsp[-3].minor.yy4!=0)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
+					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_NOT,yygotominor.yy118.pExpr,0,0);
 				yygotominor.yy118.zStart=yymsp[-4].minor.yy118.zStart;
 				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
 				//z[yymsp[0].minor.yy0.n];
@@ -11040,17 +11040,17 @@ return yy_default[stateno];
 			//#line 1015 "parse.y"
 			{
 				SrcList pSrc=build.sqlite3SrcListAppend(pParse.db,0,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token);
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_IN,yymsp[-3].minor.yy118.pExpr,0,0);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_IN,yymsp[-3].minor.yy118.pExpr,0,0);
 				if(yygotominor.yy118.pExpr!=null) {
 					yygotominor.yy118.pExpr.x.pSelect=Select.sqlite3SelectNew(pParse,0,pSrc,0,0,0,0,0,0,0);
-					yygotominor.yy118.pExpr.ExprSetProperty(EP_xIsSelect);
+					yygotominor.yy118.pExpr.ExprSetProperty(ExprFlags.EP_xIsSelect);
 					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
 				}
 				else {
 					build.sqlite3SrcListDelete(pParse.db,ref pSrc);
 				}
 				if(yymsp[-2].minor.yy4!=0)
-					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_NOT,yygotominor.yy118.pExpr,0,0);
+					yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_NOT,yygotominor.yy118.pExpr,0,0);
 				yygotominor.yy118.zStart=yymsp[-3].minor.yy118.zStart;
 				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql!=null?yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length):yymsp[-1].minor.yy0Token.zRestSql.Substring(yymsp[-1].minor.yy0Token.Length);
 			}
@@ -11063,10 +11063,10 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1029 "parse.y"
 			{
-				Expr p=yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_EXISTS,0,0,0);
+				Expr p=yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_EXISTS,0,0,0);
 				if(p!=null) {
 					p.x.pSelect=yymsp[-1].minor.yy387;
-					p.ExprSetProperty(EP_xIsSelect);
+					p.ExprSetProperty(ExprFlags.EP_xIsSelect);
 					pParse.sqlite3ExprSetHeight(p);
 				}
 				else {
@@ -11085,7 +11085,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1044 "parse.y"
 			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_CASE,yymsp[-3].minor.yy314,yymsp[-1].minor.yy314,0);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_CASE,yymsp[-3].minor.yy314,yymsp[-1].minor.yy314,0);
 				if(yygotominor.yy118.pExpr!=null) {
 					yygotominor.yy118.pExpr.x.pList=yymsp[-2].minor.yy322;
 					pParse.sqlite3ExprSetHeight(yygotominor.yy118.pExpr);
@@ -11130,7 +11130,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1090 "parse.y"
 			{
-				build.sqlite3CreateIndex(pParse,yymsp[-6].minor.yy0Token,yymsp[-5].minor.yy0Token,build.sqlite3SrcListAppend(pParse.db,0,yymsp[-3].minor.yy0Token,0),yymsp[-1].minor.yy322,yymsp[-9].minor.yy4,yymsp[-10].minor.yy0Token,yymsp[0].minor.yy0Token,SQLITE_SO_ASC,yymsp[-7].minor.yy4);
+				build.sqlite3CreateIndex(pParse,yymsp[-6].minor.yy0Token,yymsp[-5].minor.yy0Token,build.sqlite3SrcListAppend(pParse.db,0,yymsp[-3].minor.yy0Token,0),yymsp[-1].minor.yy322, (OnConstraintError)yymsp[-9].minor.yy4,yymsp[-10].minor.yy0Token,yymsp[0].minor.yy0Token,SortOrder.SQLITE_SO_ASC,yymsp[-7].minor.yy4);
 			}
 			//#line 3216 "parse.c"
 			break;
@@ -11144,10 +11144,10 @@ return yy_default[stateno];
 			///<summary>
 			///raisetype ::= ABORT 
 			///</summary>
-			//yytestcase(yyruleno==298);
+			//yysqliteinth.testcase(yyruleno==298);
 			//#line 1097 "parse.y"
 			{
-				yygotominor.yy4=OE_Abort;
+				yygotominor.yy4=(int)OnConstraintError.OE_Abort;
 			}
 			//#line 3222 "parse.c"
 			break;
@@ -11158,7 +11158,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1098 "parse.y"
 			{
-				yygotominor.yy4=OE_None;
+				yygotominor.yy4=(int)OnConstraintError.OE_None;
 			}
 			//#line 3227 "parse.c"
 			break;
@@ -11171,14 +11171,14 @@ return yy_default[stateno];
 			{
 				Expr p=null;
 				if(yymsp[-1].minor.yy0Token.Length>0) {
-					p=exprc.sqlite3Expr(pParse.db,TK_COLUMN,null);
+					p=exprc.sqlite3Expr(pParse.db,Sqlite3.TK_COLUMN,null);
 					pParse.sqlite3ExprSetCollByToken(p,yymsp[-1].minor.yy0Token);
 				}
 				yygotominor.yy322=pParse.sqlite3ExprListAppend(yymsp[-4].minor.yy322,p);
 				pParse.sqlite3ExprListSetName(yygotominor.yy322,yymsp[-2].minor.yy0Token,1);
 				pParse.sqlite3ExprListCheckLength(yygotominor.yy322,"index");
 				if(yygotominor.yy322!=null)
-					yygotominor.yy322.a[yygotominor.yy322.nExpr-1].sortOrder=(u8)yymsp[0].minor.yy4;
+					yygotominor.yy322.a[yygotominor.yy322.nExpr-1].sortOrder=(SortOrder)yymsp[0].minor.yy4;
 			}
 			//#line 3242 "parse.c"
 			break;
@@ -11191,14 +11191,14 @@ return yy_default[stateno];
 			{
 				Expr p=null;
 				if(yymsp[-1].minor.yy0Token.Length>0) {
-					p=pParse.sqlite3PExpr(TK_COLUMN,0,0,0);
+					p=pParse.sqlite3PExpr(Sqlite3.TK_COLUMN,0,0,0);
 					pParse.sqlite3ExprSetCollByToken(p,yymsp[-1].minor.yy0Token);
 				}
 				yygotominor.yy322=pParse.sqlite3ExprListAppend(0,p);
 				pParse.sqlite3ExprListSetName(yygotominor.yy322,yymsp[-2].minor.yy0Token,1);
 				pParse.sqlite3ExprListCheckLength(yygotominor.yy322,"index");
 				if(yygotominor.yy322!=null)
-					yygotominor.yy322.a[yygotominor.yy322.nExpr-1].sortOrder=(u8)yymsp[0].minor.yy4;
+					yygotominor.yy322.a[yygotominor.yy322.nExpr-1].sortOrder=(SortOrder)yymsp[0].minor.yy4;
 			}
 			//#line 3257 "parse.c"
 			break;
@@ -11235,7 +11235,7 @@ return yy_default[stateno];
 			///<summary>
 			///cmd ::= VACUUM nm 
 			///</summary>
-			//yytestcase(yyruleno==254);
+			//yysqliteinth.testcase(yyruleno==254);
 			//#line 1143 "parse.y"
 			{
 				sqlite3Vacuum(pParse);
@@ -11335,10 +11335,10 @@ return yy_default[stateno];
 			///<summary>
 			///trigger_time ::= 
 			///</summary>
-			//yytestcase(yyruleno==275);
+			//yysqliteinth.testcase(yyruleno==275);
 			//#line 1190 "parse.y"
 			{
-				yygotominor.yy4=TK_BEFORE;
+				yygotominor.yy4=Sqlite3.TK_BEFORE;
 			}
 			//#line 3322 "parse.c"
 			break;
@@ -11349,7 +11349,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1191 "parse.y"
 			{
-				yygotominor.yy4=TK_AFTER;
+				yygotominor.yy4=Sqlite3.TK_AFTER;
 			}
 			//#line 3327 "parse.c"
 			break;
@@ -11360,7 +11360,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1192 "parse.y"
 			{
-				yygotominor.yy4=TK_INSTEAD;
+				yygotominor.yy4=Sqlite3.TK_INSTEAD;
 			}
 			//#line 3332 "parse.c"
 			break;
@@ -11374,7 +11374,7 @@ return yy_default[stateno];
 			///<summary>
 			///trigger_event ::= UPDATE 
 			///</summary>
-			//yytestcase(yyruleno==277);
+			//yysqliteinth.testcase(yyruleno==277);
 			//#line 1197 "parse.y"
 			{
 				yygotominor.yy90.a=yymsp[0].major;
@@ -11389,7 +11389,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1199 "parse.y"
 			{
-				yygotominor.yy90.a=TK_UPDATE;
+				yygotominor.yy90.a=Sqlite3.TK_UPDATE;
 				yygotominor.yy90.b=yymsp[0].minor.yy384;
 			}
 			//#line 3343 "parse.c"
@@ -11404,7 +11404,7 @@ return yy_default[stateno];
 			///<summary>
 			///key_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==303);
+			//yysqliteinth.testcase(yyruleno==303);
 			//#line 1206 "parse.y"
 			{
 				yygotominor.yy314=null;
@@ -11421,7 +11421,7 @@ return yy_default[stateno];
 			///<summary>
 			///key_opt ::= KEY expr 
 			///</summary>
-			//yytestcase(yyruleno==304);
+			//yysqliteinth.testcase(yyruleno==304);
 			//#line 1207 "parse.y"
 			{
 				yygotominor.yy314=yymsp[0].minor.yy118.pExpr;
@@ -11496,7 +11496,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1259 "parse.y"
 			{
-				yygotominor.yy203=sqlite3TriggerUpdateStep(pParse.db,yymsp[-4].minor.yy0Token,yymsp[-1].minor.yy322,yymsp[0].minor.yy314,yymsp[-5].minor.yy210);
+				yygotominor.yy203=sqlite3TriggerUpdateStep(pParse.db,yymsp[-4].minor.yy0Token,yymsp[-1].minor.yy322,yymsp[0].minor.yy314,(OnConstraintError)yymsp[-5].minor.yy210);
 			}
 			//#line 3407 "parse.c"
 			break;
@@ -11507,7 +11507,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1264 "parse.y"
 			{
-				yygotominor.yy203=sqlite3TriggerInsertStep(pParse.db,yymsp[-5].minor.yy0Token,yymsp[-4].minor.yy384,yymsp[-1].minor.yy322,0,yymsp[-7].minor.yy210);
+				yygotominor.yy203=sqlite3TriggerInsertStep( pParse.db,yymsp[-5].minor.yy0Token,yymsp[-4].minor.yy384,yymsp[-1].minor.yy322,0,(OnConstraintError)yymsp[-7].minor.yy210);
 			}
 			//#line 3412 "parse.c"
 			break;
@@ -11518,7 +11518,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1267 "parse.y"
 			{
-				yygotominor.yy203=sqlite3TriggerInsertStep(pParse.db,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy384,0,yymsp[0].minor.yy387,yymsp[-4].minor.yy210);
+				yygotominor.yy203=sqlite3TriggerInsertStep(pParse.db,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy384,0,yymsp[0].minor.yy387,(OnConstraintError)yymsp[-4].minor.yy210);
 			}
 			//#line 3417 "parse.c"
 			break;
@@ -11551,9 +11551,9 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1277 "parse.y"
 			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_RAISE,0,0,0);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_RAISE,0,0,0);
 				if(yygotominor.yy118.pExpr!=null) {
-					yygotominor.yy118.pExpr.affinity=(char)OE_Ignore;
+					yygotominor.yy118.pExpr.affinity=(char)OnConstraintError.OE_Ignore;
 				}
 				yygotominor.yy118.zStart=yymsp[-3].minor.yy0Token.zRestSql;
 				yygotominor.yy118.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
@@ -11568,7 +11568,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1285 "parse.y"
 			{
-				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(TK_RAISE,0,0,yymsp[-1].minor.yy0Token);
+				yygotominor.yy118.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_RAISE,0,0,yymsp[-1].minor.yy0Token);
 				if(yygotominor.yy118.pExpr!=null) {
 					yygotominor.yy118.pExpr.affinity=(char)yymsp[-3].minor.yy4;
 				}
@@ -11585,7 +11585,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1296 "parse.y"
 			{
-				yygotominor.yy4=OE_Rollback;
+				yygotominor.yy4=(int)OnConstraintError.OE_Rollback;
 			}
 			//#line 3456 "parse.c"
 			break;
@@ -11596,7 +11596,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1298 "parse.y"
 			{
-				yygotominor.yy4=OE_Fail;
+                yygotominor.yy4 = (int)OnConstraintError.OE_Fail;
 			}
 			//#line 3461 "parse.c"
 			break;
@@ -11765,13 +11765,13 @@ return yy_default[stateno];
 			///<summary>
 			///vtabargtoken ::= lp anylist RP 
 			///</summary>
-			//yytestcase(yyruleno==324);
+			//yysqliteinth.testcase(yyruleno==324);
 			case 325:
 			///
 			///<summary>
 			///lp ::= LP 
 			///</summary>
-			//yytestcase(yyruleno==325);
+			//yysqliteinth.testcase(yyruleno==325);
 			//#line 1365 "parse.y"
 			{
 				pParse.sqlite3VtabArgExtend(yymsp[0].minor.yy0Token);
@@ -11783,202 +11783,202 @@ return yy_default[stateno];
 			///<summary>
 			///(0) input ::= cmdlist 
 			///</summary>
-			//yytestcase(yyruleno==0);
+			//yysqliteinth.testcase(yyruleno==0);
 			///
 			///<summary>
 			///(1) cmdlist ::= cmdlist ecmd 
 			///</summary>
-			//yytestcase(yyruleno==1);
+			//yysqliteinth.testcase(yyruleno==1);
 			///
 			///<summary>
 			///(2) cmdlist ::= ecmd 
 			///</summary>
-			//yytestcase(yyruleno==2);
+			//yysqliteinth.testcase(yyruleno==2);
 			///
 			///<summary>
 			///(3) ecmd ::= SEMI 
 			///</summary>
-			//yytestcase(yyruleno==3);
+			//yysqliteinth.testcase(yyruleno==3);
 			///
 			///<summary>
 			///(4) ecmd ::= explain cmdx SEMI 
 			///</summary>
-			//yytestcase(yyruleno==4);
+			//yysqliteinth.testcase(yyruleno==4);
 			///
 			///<summary>
 			///(10) trans_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==10);
+			//yysqliteinth.testcase(yyruleno==10);
 			///
 			///<summary>
 			///(11) trans_opt ::= TRANSACTION 
 			///</summary>
-			//yytestcase(yyruleno==11);
+			//yysqliteinth.testcase(yyruleno==11);
 			///
 			///<summary>
 			///(12) trans_opt ::= TRANSACTION nm 
 			///</summary>
-			//yytestcase(yyruleno==12);
+			//yysqliteinth.testcase(yyruleno==12);
 			///
 			///<summary>
 			///(20) savepoint_opt ::= SAVEPOINT 
 			///</summary>
-			//yytestcase(yyruleno==20);
+			//yysqliteinth.testcase(yyruleno==20);
 			///
 			///<summary>
 			///(21) savepoint_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==21);
+			//yysqliteinth.testcase(yyruleno==21);
 			///
 			///<summary>
 			///(25) cmd ::= create_table create_table_args 
 			///</summary>
-			//yytestcase(yyruleno==25);
+			//yysqliteinth.testcase(yyruleno==25);
 			///
 			///<summary>
 			///(34) columnlist ::= columnlist COMMA column 
 			///</summary>
-			//yytestcase(yyruleno==34);
+			//yysqliteinth.testcase(yyruleno==34);
 			///
 			///<summary>
 			///(35) columnlist ::= column 
 			///</summary>
-			//yytestcase(yyruleno==35);
+			//yysqliteinth.testcase(yyruleno==35);
 			///
 			///<summary>
 			///(44) type ::= 
 			///</summary>
-			//yytestcase(yyruleno==44);
+			//yysqliteinth.testcase(yyruleno==44);
 			///
 			///<summary>
 			///(51) signed ::= plus_num 
 			///</summary>
-			//yytestcase(yyruleno==51);
+			//yysqliteinth.testcase(yyruleno==51);
 			///
 			///<summary>
 			///(52) signed ::= minus_num 
 			///</summary>
-			//yytestcase(yyruleno==52);
+			//yysqliteinth.testcase(yyruleno==52);
 			///
 			///<summary>
 			///(53) carglist ::= carglist carg 
 			///</summary>
-			//yytestcase(yyruleno==53);
+			//yysqliteinth.testcase(yyruleno==53);
 			///
 			///<summary>
 			///(54) carglist ::= 
 			///</summary>
-			//yytestcase(yyruleno==54);
+			//yysqliteinth.testcase(yyruleno==54);
 			///
 			///<summary>
 			///(55) carg ::= CONSTRAINT nm ccons 
 			///</summary>
-			//yytestcase(yyruleno==55);
+			//yysqliteinth.testcase(yyruleno==55);
 			///
 			///<summary>
 			///(56) carg ::= ccons 
 			///</summary>
-			//yytestcase(yyruleno==56);
+			//yysqliteinth.testcase(yyruleno==56);
 			///
 			///<summary>
 			///(62) ccons ::= NULL onconf 
 			///</summary>
-			//yytestcase(yyruleno==62);
+			//yysqliteinth.testcase(yyruleno==62);
 			///
 			///<summary>
 			///(90) conslist ::= conslist COMMA tcons 
 			///</summary>
-			//yytestcase(yyruleno==90);
+			//yysqliteinth.testcase(yyruleno==90);
 			///
 			///<summary>
 			///(91) conslist ::= conslist tcons 
 			///</summary>
-			//yytestcase(yyruleno==91);
+			//yysqliteinth.testcase(yyruleno==91);
 			///
 			///<summary>
 			///(92) conslist ::= tcons 
 			///</summary>
-			//yytestcase(yyruleno==92);
+			//yysqliteinth.testcase(yyruleno==92);
 			///
 			///<summary>
 			///(93) tcons ::= CONSTRAINT nm 
 			///</summary>
-			//yytestcase(yyruleno==93);
+			//yysqliteinth.testcase(yyruleno==93);
 			///
 			///<summary>
 			///(268) plus_opt ::= PLUS 
 			///</summary>
-			//yytestcase(yyruleno==268);
+			//yysqliteinth.testcase(yyruleno==268);
 			///
 			///<summary>
 			///(269) plus_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==269);
+			//yysqliteinth.testcase(yyruleno==269);
 			///
 			///<summary>
 			///(279) foreach_clause ::= 
 			///</summary>
-			//yytestcase(yyruleno==279);
+			//yysqliteinth.testcase(yyruleno==279);
 			///
 			///<summary>
 			///(280) foreach_clause ::= FOR EACH ROW 
 			///</summary>
-			//yytestcase(yyruleno==280);
+			//yysqliteinth.testcase(yyruleno==280);
 			///
 			///<summary>
 			///(287) tridxby ::= 
 			///</summary>
-			//yytestcase(yyruleno==287);
+			//yysqliteinth.testcase(yyruleno==287);
 			///
 			///<summary>
 			///(305) database_kw_opt ::= DATABASE 
 			///</summary>
-			//yytestcase(yyruleno==305);
+			//yysqliteinth.testcase(yyruleno==305);
 			///
 			///<summary>
 			///(306) database_kw_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==306);
+			//yysqliteinth.testcase(yyruleno==306);
 			///
 			///<summary>
 			///(314) kwcolumn_opt ::= 
 			///</summary>
-			//yytestcase(yyruleno==314);
+			//yysqliteinth.testcase(yyruleno==314);
 			///
 			///<summary>
 			///(315) kwcolumn_opt ::= COLUMNKW 
 			///</summary>
-			//yytestcase(yyruleno==315);
+			//yysqliteinth.testcase(yyruleno==315);
 			///
 			///<summary>
 			///(319) vtabarglist ::= vtabarg 
 			///</summary>
-			//yytestcase(yyruleno==319);
+			//yysqliteinth.testcase(yyruleno==319);
 			///
 			///<summary>
 			///(320) vtabarglist ::= vtabarglist COMMA vtabarg 
 			///</summary>
-			//yytestcase(yyruleno==320);
+			//yysqliteinth.testcase(yyruleno==320);
 			///
 			///<summary>
 			///(322) vtabarg ::= vtabarg vtabargtoken 
 			///</summary>
-			//yytestcase(yyruleno==322);
+			//yysqliteinth.testcase(yyruleno==322);
 			///
 			///<summary>
 			///(326) anylist ::= 
 			///</summary>
-			//yytestcase(yyruleno==326);
+			//yysqliteinth.testcase(yyruleno==326);
 			///
 			///<summary>
 			///(327) anylist ::= anylist LP anylist RP 
 			///</summary>
-			//yytestcase(yyruleno==327);
+			//yysqliteinth.testcase(yyruleno==327);
 			///
 			///<summary>
 			///(328) anylist ::= anylist ANY 
 			///</summary>
-			//yytestcase(yyruleno==328);
+			//yysqliteinth.testcase(yyruleno==328);
 			break;
 			}
 			;

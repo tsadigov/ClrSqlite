@@ -1122,7 +1122,7 @@ return (pPager->pWal!=0);
                         {
                             this.eLock = (u8)eLock;
                         }
-                        IOTRACE("UNLOCK %p %d\n", this, eLock);
+                        sqliteinth.IOTRACE("UNLOCK %p %d\n", this, eLock);
                     }
                     return rc;
                 }
@@ -1137,7 +1137,7 @@ return (pPager->pWal!=0);
                         if (rc == SQLITE_OK && (this.eLock != UNKNOWN_LOCK || eLock == EXCLUSIVE_LOCK))
                         {
                             this.eLock = (u8)eLock;
-                            IOTRACE("LOCK %p %d\n", this, eLock);
+                            sqliteinth.IOTRACE("LOCK %p %d\n", this, eLock);
                         }
                     }
                     return rc;
@@ -1220,7 +1220,7 @@ return (pPager->pWal!=0);
                         ///Local cache of jsl 
                         ///</summary>
 
-                        IOTRACE("JZEROHDR %p\n", this);
+                        sqliteinth.IOTRACE("JZEROHDR %p\n", this);
                         if (doTruncate != 0 || iLimit == 0)
                         {
                             rc = os.sqlite3OsTruncate(this.jfd, 0);
@@ -1435,7 +1435,7 @@ return (pPager->pWal!=0);
 
                     for (nWrite = 0; rc == SQLITE_OK && nWrite < this.JOURNAL_HDR_SZ(); nWrite += nHeader)
                     {
-                        IOTRACE("JHDR %p %lld %d\n", this, this.journalHdr, nHeader);
+                        sqliteinth.IOTRACE("JHDR %p %lld %d\n", this, this.journalHdr, nHeader);
                         rc = os.sqlite3OsWrite(this.jfd, zHeader, (int)nHeader, this.journalOff);
                         Debug.Assert(this.journalHdr <= this.journalOff);
                         this.journalOff += (int)nHeader;
@@ -1617,12 +1617,12 @@ return (pPager->pWal!=0);
                         ///<summary>
                         ///</summary>
                         ///<param name="Update the page">size to match the value read from the journal.</param>
-                        ///<param name="Use a testcase() macro to make sure that malloc failure within">Use a testcase() macro to make sure that malloc failure within</param>
+                        ///<param name="Use a sqliteinth.testcase() macro to make sure that malloc failure within">Use a sqliteinth.testcase() macro to make sure that malloc failure within</param>
                         ///<param name="PagerSetPagesize() is tested.">PagerSetPagesize() is tested.</param>
                         ///<param name=""></param>
 
                         rc = this.sqlite3PagerSetPagesize(ref iPageSize, -1);
-                        testcase(rc != SQLITE_OK);
+                        sqliteinth.testcase(rc != SQLITE_OK);
                         ///
                         ///<summary>
                         ///</summary>
@@ -1819,7 +1819,7 @@ return (pPager->pWal!=0);
                         if (pgno <= p.nOrig)
                         {
                             rc |= sqlite3BitvecSet(p.pInSavepoint, pgno);
-                            testcase(rc == SQLITE_NOMEM);
+                            sqliteinth.testcase(rc == SQLITE_NOMEM);
                             Debug.Assert(rc == SQLITE_OK || rc == SQLITE_NOMEM);
                         }
                     }
@@ -2540,7 +2540,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     if (this.fd.isOpen   && (this.eState >= PAGER_WRITER_DBMOD || this.eState == PAGER_OPEN) && isSynced)
                     {
                         i64 ofst = (pgno - 1) * this.pageSize;
-                        testcase(0 == isSavepnt && pPg != null && (pPg.flags & PGHDR_NEED_SYNC) != 0);
+                        sqliteinth.testcase(0 == isSavepnt && pPg != null && (pPg.flags & PGHDR_NEED_SYNC) != 0);
                         Debug.Assert(!this.pagerUseWal());
                         rc = os.sqlite3OsWrite(this.fd, aData, this.pageSize, ofst);
                         if (pgno > this.dbFileSize)
@@ -2899,9 +2899,9 @@ PagerMethods.sqlite3PagerUnref(p);
                                 byte[] pTmp = this.pTmpSpace;
                                 Array.Clear(pTmp, 0, szPage);
                                 //memset( pTmp, 0, szPage );
-                                testcase((newSize - szPage) < currentSize);
-                                testcase((newSize - szPage) == currentSize);
-                                testcase((newSize - szPage) > currentSize);
+                                sqliteinth.testcase((newSize - szPage) < currentSize);
+                                sqliteinth.testcase((newSize - szPage) == currentSize);
+                                sqliteinth.testcase((newSize - szPage) > currentSize);
                                 rc = os.sqlite3OsWrite(this.fd, pTmp, szPage, newSize - szPage);
                             }
                             if (rc == SQLITE_OK)
@@ -3272,7 +3272,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         zMaster = new byte[this.pVfs.mxPathname + 1];
                         //pPager.pTmpSpace );
                         rc = PagerMethods.readMasterJournal(this.jfd, zMaster, (u32)this.pVfs.mxPathname + 1);
-                        testcase(rc != SQLITE_OK);
+                        sqliteinth.testcase(rc != SQLITE_OK);
                     }
                     if (rc == SQLITE_OK && (this.eState >= PAGER_WRITER_DBMOD || this.eState == PAGER_OPEN))
                     {
@@ -3281,7 +3281,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     if (rc == SQLITE_OK)
                     {
                         rc = this.pager_end_transaction(zMaster[0] != '\0' ? 1 : 0);
-                        testcase(rc != SQLITE_OK);
+                        sqliteinth.testcase(rc != SQLITE_OK);
                     }
                     if (rc == SQLITE_OK && zMaster[0] != '\0' && res != 0)
                     {
@@ -3293,7 +3293,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         ///</summary>
 
                         rc = this.pager_delmaster(Encoding.UTF8.GetString(zMaster, 0, zMaster.Length));
-                        testcase(rc != SQLITE_OK);
+                        sqliteinth.testcase(rc != SQLITE_OK);
                     }
                     ///
                     ///<summary>
@@ -3988,7 +3988,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     Debug.Assert(!this.pagerUseWal());
                     if (this.fd.isOpen  )
                     {
-                        IOTRACE("DBHDR %p 0 %d\n", this, N);
+                        sqliteinth.IOTRACE("DBHDR %p 0 %d\n", this, N);
                         rc = os.sqlite3OsRead(this.fd, pDest, N, 0);
                         if (rc == SQLITE_IOERR_SHORT_READ)
                         {
@@ -4157,7 +4157,7 @@ pPager.pWal = 0;
 																																																																						      enable_simulated_io_errors();
 #endif
                     PAGERTRACE("CLOSE %d\n", PagerMethods.PAGERID(this));
-                    IOTRACE("CLOSE %p\n", this);
+                    sqliteinth.IOTRACE("CLOSE %p\n", this);
                     os.sqlite3OsClose(this.jfd);
                     os.sqlite3OsClose(this.fd);
                     //sqlite3_free( ref pTmp );
@@ -4287,12 +4287,12 @@ pPager.pWal = 0;
                                 if (this.fullSync && 0 == (iDc & SQLITE_IOCAP_SEQUENTIAL))
                                 {
                                     PAGERTRACE("SYNC journal of %d\n", PagerMethods.PAGERID(this));
-                                    IOTRACE("JSYNC %p\n", this);
+                                    sqliteinth.IOTRACE("JSYNC %p\n", this);
                                     rc = os.sqlite3OsSync(this.jfd, this.syncFlags);
                                     if (rc != SQLITE_OK)
                                         return rc;
                                 }
-                                IOTRACE("JHDR %p %lld\n", this, this.journalHdr);
+                                sqliteinth.IOTRACE("JHDR %p %lld\n", this, this.journalHdr);
                                 rc = os.sqlite3OsWrite(this.jfd, zHeader, zHeader.Length, this.journalHdr);
                                 if (rc != SQLITE_OK)
                                     return rc;
@@ -4300,7 +4300,7 @@ pPager.pWal = 0;
                             if (0 == (iDc & SQLITE_IOCAP_SEQUENTIAL))
                             {
                                 PAGERTRACE("SYNC journal of %d\n", PagerMethods.PAGERID(this));
-                                IOTRACE("JSYNC %p\n", this);
+                                sqliteinth.IOTRACE("JSYNC %p\n", this);
                                 rc = os.sqlite3OsSync(this.jfd, this.syncFlags | (this.syncFlags == SQLITE_SYNC_FULL ? SQLITE_SYNC_DATAONLY : 0));
                                 if (rc != SQLITE_OK)
                                     return rc;
@@ -4479,7 +4479,7 @@ pPager.pWal = 0;
 
                             this.pBackup.sqlite3BackupUpdate(pgno, pList.pData);
                             PAGERTRACE("STORE %d page %d hash(%08x)\n", PagerMethods.PAGERID(this), pgno, pList.pager_pagehash());
-                            IOTRACE("PGOUT %p %d\n", this, pgno);
+                            sqliteinth.IOTRACE("PGOUT %p %d\n", this, pgno);
 #if SQLITE_TEST
 #if !TCLSH
 																																																																																																												          PAGER_INCR( ref sqlite3_pager_writedb_count );
@@ -4856,7 +4856,7 @@ pPager.pWal = 0;
                                     Debug.Assert(rc != SQLITE_OK || this.jfd.isOpen);
                                     if (rc == SQLITE_OK && (fout & SQLITE_OPEN_READONLY) != 0)
                                     {
-                                        rc = SQLITE_CANTOPEN_BKPT();
+                                        rc = sqliteinth.SQLITE_CANTOPEN_BKPT();
                                         os.sqlite3OsClose(this.jfd);
                                     }
                                 }
@@ -4945,7 +4945,7 @@ pPager.pWal = 0;
                                 goto failed;
                             if (nPage > 0)
                             {
-                                IOTRACE("CKVERS %p %d\n", this, dbFileVers.Length);
+                                sqliteinth.IOTRACE("CKVERS %p %d\n", this, dbFileVers.Length);
                                 rc = os.sqlite3OsRead(this.fd, dbFileVers, dbFileVers.Length, 24);
                                 if (rc != SQLITE_OK)
                                 {
@@ -5112,7 +5112,7 @@ pPager.pWal = 0;
                     Debug.Assert(this.assert_pager_state());
                     if (pgno == 0)
                     {
-                        return SQLITE_CORRUPT_BKPT();
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
                     ///
                     ///<summary>
@@ -5177,7 +5177,7 @@ pPager.pWal = 0;
 
                         if (pgno > PAGER_MAX_PGNO || pgno == PAGER_MJ_PGNO(this))
                         {
-                            rc = SQLITE_CORRUPT_BKPT();
+                            rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                             goto pager_acquire_err;
                         }
                         if (
@@ -5213,19 +5213,19 @@ this.memDb != 0
 #else
                                     sqlite3BitvecSet(this.pInJournal, pgno);
 #endif
-                                    testcase(rc == SQLITE_NOMEM);
+                                    sqliteinth.testcase(rc == SQLITE_NOMEM);
                                 }
 #if !NDEBUG || SQLITE_COVERAGE_TEST
 																																																																																																																															            rc = addToSavepointBitvecs( pPager, pgno ); //TESTONLY( rc = ) addToSavepointBitvecs(pPager, pgno);
 #else
                                 this.addToSavepointBitvecs(pgno);
 #endif
-                                testcase(rc == SQLITE_NOMEM);
+                                sqliteinth.testcase(rc == SQLITE_NOMEM);
                                 sqlite3EndBenignMalloc();
                             }
                             //memset(pPg.pData, 0, pPager.pageSize);
                             Array.Clear(pPg.pData, 0, this.pageSize);
-                            IOTRACE("ZERO %p %d\n", this, pgno);
+                            sqliteinth.IOTRACE("ZERO %p %d\n", this, pgno);
                         }
                         else
                         {
@@ -5418,7 +5418,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                         return this.errCode;
                     Debug.Assert(this.eState >= PAGER_READER && this.eState < PAGER_ERROR);
                     this.subjInMemory = (u8)subjInMemory;
-                    if (ALWAYS(this.eState == PAGER_READER))
+                    if (Sqlite3.ALWAYS(this.eState == PAGER_READER))
                     {
                         Debug.Assert(this.pInJournal == null);
                         if (this.pagerUseWal())
@@ -5542,7 +5542,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                     //# define DIRECT_MODE 0
                     bool DIRECT_MODE = false;
                     Debug.Assert(isDirectMode == false);
-                    UNUSED_PARAMETER(isDirectMode);
+                    Sqlite3.sqliteinth.UNUSED_PARAMETER(isDirectMode);
 #else
 																																																																						// define DIRECT_MODE isDirectMode
 int DIRECT_MODE = isDirectMode;
@@ -5572,7 +5572,7 @@ int DIRECT_MODE = isDirectMode;
                         ///<param name="above is always successful "> hence the ALWAYS on rc==SQLITE_OK.</param>
                         ///<param name=""></param>
 
-                        if (!DIRECT_MODE && ALWAYS(rc == SQLITE_OK))
+                        if (!DIRECT_MODE && Sqlite3.ALWAYS(rc == SQLITE_OK))
                         {
                             rc = PagerMethods.sqlite3PagerWrite(pPgHdr);
                         }
@@ -5785,7 +5785,7 @@ int DIRECT_MODE = isDirectMode;
                                 pList.pDirty = null;
                             }
                             Debug.Assert(rc == SQLITE_OK);
-                            if (ALWAYS(pList))
+                            if (Sqlite3.ALWAYS(pList))
                             {
                                 rc = this.pagerWalFrames(pList, this.dbSize, 1, (this.fullSync ? this.syncFlags : (byte)0));
                             }
@@ -5970,7 +5970,7 @@ rc = pager_incr_changecounter(pPager, 0);
                             {
                                 rc = this.sqlite3PagerSync();
                             }
-                            IOTRACE("DBSYNC %p\n", this);
+                            sqliteinth.IOTRACE("DBSYNC %p\n", this);
                         }
                     }
                 commit_phase_one_exit:
@@ -6094,7 +6094,7 @@ rc = pager_incr_changecounter(pPager, 0);
                     if (this.pagerUseWal())
                     {
                         int rc2;
-                        rc = this.sqlite3PagerSavepoint(SAVEPOINT_ROLLBACK, -1);
+                        rc = this.sqlite3PagerSavepoint(sqliteinth.SAVEPOINT_ROLLBACK, -1);
                         rc2 = this.pager_end_transaction(this.setMaster);
                         if (rc == SQLITE_OK)
                             rc = rc2;
@@ -6285,9 +6285,9 @@ rc = pager_incr_changecounter(pPager, 0);
                     /// The savepoint to release or rollback need not be the most recently
                     /// created savepoint.
                     ///
-                    /// Parameter op is always either SAVEPOINT_ROLLBACK or SAVEPOINT_RELEASE.
+                    /// Parameter op is always either sqliteinth.SAVEPOINT_ROLLBACK or SAVEPOINT_RELEASE.
                     /// If it is SAVEPOINT_RELEASE, then release and destroy the savepoint with
-                    /// index iSavepoint. If it is SAVEPOINT_ROLLBACK, then rollback all changes
+                    /// index iSavepoint. If it is sqliteinth.SAVEPOINT_ROLLBACK, then rollback all changes
                     /// that have occurred since the specified savepoint was created.
                     ///
                     /// The savepoint to rollback or release is identified by parameter
@@ -6319,8 +6319,8 @@ rc = pager_incr_changecounter(pPager, 0);
                     ///Return code 
                     ///</summary>
 
-                    Debug.Assert(op == SAVEPOINT_RELEASE || op == SAVEPOINT_ROLLBACK);
-                    Debug.Assert(iSavepoint >= 0 || op == SAVEPOINT_ROLLBACK);
+                    Debug.Assert(op == sqliteinth.SAVEPOINT_RELEASE || op == sqliteinth.SAVEPOINT_ROLLBACK);
+                    Debug.Assert(iSavepoint >= 0 || op == sqliteinth.SAVEPOINT_ROLLBACK);
                     if (rc == SQLITE_OK && iSavepoint < this.nSavepoint)
                     {
                         int ii;
@@ -6343,7 +6343,7 @@ rc = pager_incr_changecounter(pPager, 0);
                         ///
                         ///</summary>
 
-                        nNew = iSavepoint + ((op == SAVEPOINT_RELEASE) ? 0 : 1);
+                        nNew = iSavepoint + ((op == sqliteinth.SAVEPOINT_RELEASE) ? 0 : 1);
                         for (ii = nNew; ii < this.nSavepoint; ii++)
                         {
                             sqlite3BitvecDestroy(ref this.aSavepoint[ii].pInSavepoint);
@@ -6355,7 +6355,7 @@ rc = pager_incr_changecounter(pPager, 0);
                         ///</summary>
                         ///<param name="the sub">journal to zero bytes in size. </param>
 
-                        if (op == SAVEPOINT_RELEASE)
+                        if (op == sqliteinth.SAVEPOINT_RELEASE)
                         {
                             if (nNew == 0 && this.sjfd.isOpen)
                             {
@@ -6559,7 +6559,7 @@ this.memDb != 0
                         return rc;
                     }
                     PAGERTRACE("MOVE %d page %d (needSync=%d) moves to %d\n", PagerMethods.PAGERID(this), pPg.pgno, (pPg.flags & PGHDR_NEED_SYNC) != 0 ? 1 : 0, pgno);
-                    IOTRACE("MOVE %p %d %d\n", this, pPg.pgno, pgno);
+                    sqliteinth.IOTRACE("MOVE %p %d %d\n", this, pPg.pgno, pgno);
                     ///
                     ///<summary>
                     ///If the journal needs to be sync()ed before page pPg.pgno can

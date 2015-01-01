@@ -385,7 +385,7 @@ namespace Community.CsharpSqlite {
 		///    always preferred, even if the affinity is REAL, because
 		///    an integer representation is more space efficient on disk.
 		///
-		/// SQLITE_AFF_TEXT:
+		/// sqliteinth.SQLITE_AFF_TEXT:
 		///    Convert pRec to a text representation.
 		///
 		/// SQLITE_AFF_NONE:
@@ -405,7 +405,7 @@ namespace Community.CsharpSqlite {
 		///Use this text encoding 
 		///</summary>
 		) {
-			if(affinity==SQLITE_AFF_TEXT) {
+			if(affinity==sqliteinth.SQLITE_AFF_TEXT) {
 				///
 				///<summary>
 				///Only attempt the conversion to TEXT if there is an integer or real
@@ -427,8 +427,9 @@ namespace Community.CsharpSqlite {
 				pRec.flags=(u16)(pRec.flags&~(MEM_Real|MEM_Int));
 			}
 			else
-				if(affinity!=SQLITE_AFF_NONE) {
-					Debug.Assert(affinity==SQLITE_AFF_INTEGER||affinity==SQLITE_AFF_REAL||affinity==SQLITE_AFF_NUMERIC);
+                if (affinity != sqliteinth.SQLITE_AFF_NONE)
+                {
+                    Debug.Assert(affinity == sqliteinth.SQLITE_AFF_INTEGER || affinity == sqliteinth.SQLITE_AFF_REAL || affinity == sqliteinth.SQLITE_AFF_NUMERIC);
 					applyNumericAffinity(pRec);
 					if((pRec.flags&MEM_Real)!=0) {
 						sqlite3VdbeIntegerAffinity(pRec);

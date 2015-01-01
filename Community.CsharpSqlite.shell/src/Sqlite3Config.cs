@@ -33,8 +33,8 @@ namespace Community.CsharpSqlite
                             ///<summary>
                             ///Specify an alternative malloc implementation 
                             ///</summary>
-                            sqlite3GlobalConfig.pcache = ap;
-                            //sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)_Custom.va_arg(ap, "sqlite3_pcache_methods");
+                            Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache = ap;
+                            //Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)_Custom.va_arg(ap, "sqlite3_pcache_methods");
                             break;
                         }
                 }
@@ -48,12 +48,12 @@ namespace Community.CsharpSqlite
                 {
                     case SqliteConfig.GETPCACHE:
                         {
-                            if (sqlite3GlobalConfig.pcache.xInit == null)
+                            if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xInit == null)
                             {
                                 sqlite3PCacheSetDefault();
                             }
-                            ap = sqlite3GlobalConfig.pcache;
-                            //_Custom.va_arg(ap, sqlite3_pcache_methods) = sqlite3GlobalConfig.pcache;
+                            ap = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache;
+                            //_Custom.va_arg(ap, sqlite3_pcache_methods) = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache;
                             break;
                         }
                 }
@@ -71,7 +71,7 @@ namespace Community.CsharpSqlite
                             ///<summary>
                             ///Specify an alternative malloc implementation 
                             ///</summary>
-                            sqlite3GlobalConfig.m = ap;
+                            Sqlite3.sqliteinth.sqlite3GlobalConfig.m = ap;
                             // (sqlite3_mem_methods)_Custom.va_arg( ap, "sqlite3_mem_methods" );
                             break;
                         }
@@ -90,9 +90,9 @@ namespace Community.CsharpSqlite
                             ///<summary>
                             ///Retrieve the current malloc() implementation 
                             ///</summary>
-                            //if ( sqlite3GlobalConfig.m.xMalloc == null ) sqlite3MemSetDefault();
-                            ap = sqlite3GlobalConfig.m;
-                            //_Custom.va_arg(ap, sqlite3_mem_methods) =  sqlite3GlobalConfig.m;
+                            //if ( Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc == null ) sqlite3MemSetDefault();
+                            ap = Sqlite3.sqliteinth.sqlite3GlobalConfig.m;
+                            //_Custom.va_arg(ap, sqlite3_mem_methods) =  Sqlite3.sqliteinth.sqlite3GlobalConfig.m;
                             break;
                         }
                 }
@@ -111,7 +111,18 @@ namespace Community.CsharpSqlite
             public int nLookaside; /* Default lookaside buffer count */
             public sqlite3_mem_methods m; /* Low-level memory allocation interface */
             public sqlite3_mutex_methods mutex; /* Low-level mutex interface */
-            public sqlite3_pcache_methods pcache; /* Low-level page-cache interface */
+
+            sqlite3_pcache_methods m_pcache;
+            public sqlite3_pcache_methods pcache {
+                get {
+                    return m_pcache;
+                }
+                set {
+                    m_pcache = value;
+                }
+            } 
+            
+            /* Low-level page-cache interface */
             public byte[] pHeap; /* Heap storage space */
             public int nHeap; /* Size of pHeap[] */
             public int mnReq, mxReq; /* Min and max heap requests sizes */

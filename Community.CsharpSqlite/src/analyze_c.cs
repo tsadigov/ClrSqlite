@@ -101,7 +101,7 @@ namespace Community.CsharpSqlite
 			int v;
 			string z;
 			Debug.Assert (argc == 3);
-			UNUSED_PARAMETER2 (NotUsed, argc);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER2 (NotUsed, argc);
 			if (argv == null || argv [0] == null || argv [2] == null) {
 				return 0;
 			}
@@ -162,8 +162,8 @@ namespace Community.CsharpSqlite
     sqlite3DbFree( db, ref pIdx.aSample );
   }
 #else
-			UNUSED_PARAMETER (db);
-			UNUSED_PARAMETER (pIdx);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (db);
+			Sqlite3.sqliteinth.UNUSED_PARAMETER (pIdx);
 			#endif
 		}
 

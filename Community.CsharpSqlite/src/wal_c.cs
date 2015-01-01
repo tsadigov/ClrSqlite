@@ -931,9 +931,9 @@ static void walCleanupHash(Wal *pWal){
   int i;                          /* Used to iterate through aHash[] */
 
   Debug.Assert( pWal->writeLock );
-  testcase( pWal->hdr.mxFrame==HASHTABLE_NPAGE_ONE-1 );
-  testcase( pWal->hdr.mxFrame==HASHTABLE_NPAGE_ONE );
-  testcase( pWal->hdr.mxFrame==HASHTABLE_NPAGE_ONE+1 );
+  sqliteinth.testcase( pWal->hdr.mxFrame==HASHTABLE_NPAGE_ONE-1 );
+  sqliteinth.testcase( pWal->hdr.mxFrame==HASHTABLE_NPAGE_ONE );
+  sqliteinth.testcase( pWal->hdr.mxFrame==HASHTABLE_NPAGE_ONE+1 );
 
   if( pWal->hdr.mxFrame==0 ) return;
 
@@ -1155,7 +1155,7 @@ static int walIndexRecover(Wal *pWal){
     ** are able to understand */
     version = sqlite3Get4byte(&aBuf[4]);
     if( version!=WAL_MAX_VERSION ){
-      rc = SQLITE_CANTOPEN_BKPT;
+      rc =  sqliteinth.SQLITE_CANTOPEN_BKPT;
       goto finished;
     }
 
@@ -1188,8 +1188,8 @@ static int walIndexRecover(Wal *pWal){
         pWal->hdr.mxFrame = iFrame;
         pWal->hdr.nPage = nTruncate;
         pWal->hdr.szPage = (u16)((szPage&0xff00) | (szPage>>16));
-        testcase( szPage<=32768 );
-        testcase( szPage>=65536 );
+        sqliteinth.testcase( szPage<=32768 );
+        sqliteinth.testcase( szPage>=65536 );
         aFrameCksum[0] = pWal->hdr.aFrameCksum[0];
         aFrameCksum[1] = pWal->hdr.aFrameCksum[1];
       }
@@ -1470,7 +1470,7 @@ static void walMergesort(
 
   memset(aSub, 0, sizeof(aSub));
   Debug.Assert( nList<=HASHTABLE_NPAGE && nList>0 );
-  Debug.Assert( HASHTABLE_NPAGE==(1<<(ArraySize(aSub)-1)) );
+  Debug.Assert( HASHTABLE_NPAGE==(1<<(Sqlite3.ArraySize(aSub)-1)) );
 
   for(iList=0; iList<nList; iList++){
     nMerge = 1;
@@ -1485,7 +1485,7 @@ static void walMergesort(
     aSub[iSub].nList = nMerge;
   }
 
-  for(iSub++; iSub<ArraySize(aSub); iSub++){
+  for(iSub++; iSub<Sqlite3.ArraySize(aSub); iSub++){
     if( nList & (1<<iSub) ){
       struct Sublist *p = aSub[iSub];
       Debug.Assert( p->nList<=(1<<iSub) );
@@ -1680,8 +1680,8 @@ static int walCheckpoint(
   int (*xBusy)(void) = 0;        /* Function to call when waiting for locks */
 
   szPage = walPagesize(pWal);
-  testcase( szPage<=32768 );
-  testcase( szPage>=65536 );
+  sqliteinth.testcase( szPage<=32768 );
+  sqliteinth.testcase( szPage>=65536 );
   pInfo = walCkptInfo(pWal);
   if( pInfo->nBackfill>=pWal->hdr.mxFrame ) return SQLITE_OK;
 
@@ -1746,11 +1746,11 @@ static int walCheckpoint(
       Debug.Assert( walFramePgno(pWal, iFrame)==iDbpage );
       if( iFrame<=nBackfill || iFrame>mxSafeFrame || iDbpage>mxPage ) continue;
       iOffset = walFrameOffset(iFrame, szPage) + WAL_FRAME_HDRSIZE;
-      /* testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL file */
+      /* sqliteinth.testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL file */
       rc = sqlite3OsRead(pWal->pWalFd, zBuf, szPage, iOffset);
       if( rc!=SQLITE_OK ) break;
       iOffset = (iDbpage-1)*(i64)szPage;
-      testcase( IS_BIG_INT(iOffset) );
+      sqliteinth.testcase( IS_BIG_INT(iOffset) );
       rc = sqlite3OsWrite(pWal->pDbFd, zBuf, szPage, iOffset);
       if( rc!=SQLITE_OK ) break;
     }
@@ -1759,7 +1759,7 @@ static int walCheckpoint(
     if( rc==SQLITE_OK ){
       if( mxSafeFrame==walIndexHdr(pWal)->mxFrame ){
         i64 szDb = pWal->hdr.nPage*(i64)szPage;
-        testcase( IS_BIG_INT(szDb) );
+        sqliteinth.testcase( IS_BIG_INT(szDb) );
         rc = sqlite3OsTruncate(pWal->pDbFd, szDb);
         if( rc==SQLITE_OK && sync_flags ){
           rc = sqlite3OsSync(pWal->pDbFd, sync_flags);
@@ -1904,8 +1904,8 @@ static int walIndexTryHdr(Wal *pWal, int *pChanged){
     *pChanged = 1;
     memcpy(&pWal->hdr, &h1, sizeof(WalIndexHdr));
     pWal->szPage = (pWal->hdr.szPage&0xfe00) + ((pWal->hdr.szPage&0x0001)<<16);
-    testcase( pWal->szPage<=32768 );
-    testcase( pWal->szPage>=65536 );
+    sqliteinth.testcase( pWal->szPage<=32768 );
+    sqliteinth.testcase( pWal->szPage>=65536 );
   }
 
   /* The header was successfully read. Return zero. */
@@ -1979,7 +1979,7 @@ static int walIndexReadHdr(Wal *pWal, int *pChanged){
   ** this version of SQLite cannot understand.
   */
   if( badHdr==0 && pWal->hdr.iVersion!=WALINDEX_MAX_VERSION ){
-    rc = SQLITE_CANTOPEN_BKPT;
+    rc =  sqliteinth.SQLITE_CANTOPEN_BKPT;
   }
 
   return rc;
@@ -2237,10 +2237,10 @@ int sqlite3WalBeginReadTransaction(Wal *pWal, int *pChanged){
   do{
     rc = walTryBeginRead(pWal, pChanged, 0, ++cnt);
   }while( rc==WAL_RETRY );
-  testcase( (rc&0xff)==SQLITE_BUSY );
-  testcase( (rc&0xff)==SQLITE_IOERR );
-  testcase( rc==SQLITE_PROTOCOL );
-  testcase( rc==SQLITE_OK );
+  sqliteinth.testcase( (rc&0xff)==SQLITE_BUSY );
+  sqliteinth.testcase( (rc&0xff)==SQLITE_IOERR );
+  sqliteinth.testcase( rc==SQLITE_PROTOCOL );
+  sqliteinth.testcase( rc==SQLITE_OK );
   return rc;
 }
 
@@ -2364,11 +2364,11 @@ int sqlite3WalRead(
     i64 iOffset;
     sz = pWal->hdr.szPage;
     sz = (pWal->hdr.szPage&0xfe00) + ((pWal->hdr.szPage&0x0001)<<16);
-    testcase( sz<=32768 );
-    testcase( sz>=65536 );
+    sqliteinth.testcase( sz<=32768 );
+    sqliteinth.testcase( sz>=65536 );
     iOffset = walFrameOffset(iRead, sz) + WAL_FRAME_HDRSIZE;
     *pInWal = 1;
-    /* testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL */
+    /* sqliteinth.testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL */
     return sqlite3OsRead(pWal->pWalFd, pOut, nOut, iOffset);
   }
 
@@ -2381,7 +2381,7 @@ int sqlite3WalRead(
 ** Return the size of the database in pages (or zero, if unknown).
 */
 Pgno sqlite3WalDbsize(Wal *pWal){
-  if( pWal && ALWAYS(pWal->readLock>=0) ){
+  if( pWal && Sqlite3.ALWAYS(pWal->readLock>=0) ){
     return pWal->hdr.nPage;
   }
   return 0;
@@ -2460,7 +2460,7 @@ int sqlite3WalEndWriteTransaction(Wal *pWal){
 */
 int sqlite3WalUndo(Wal *pWal, int (*xUndo)(void *, Pgno), object  *pUndoCtx){
   int rc = SQLITE_OK;
-  if( ALWAYS(pWal->writeLock) ){
+  if( Sqlite3.ALWAYS(pWal->writeLock) ){
     Pgno iMax = pWal->hdr.mxFrame;
     Pgno iFrame;
   
@@ -2470,7 +2470,7 @@ int sqlite3WalUndo(Wal *pWal, int (*xUndo)(void *, Pgno), object  *pUndoCtx){
     memcpy(&pWal->hdr, (void )walIndexHdr(pWal), sizeof(WalIndexHdr));
 
     for(iFrame=pWal->hdr.mxFrame+1; 
-        ALWAYS(rc==SQLITE_OK) && iFrame<=iMax; 
+        Sqlite3.ALWAYS(rc==SQLITE_OK) && iFrame<=iMax; 
         iFrame++
     ){
       /* This call cannot fail. Unless the page for which the page number
@@ -2613,9 +2613,9 @@ static int walRestartLog(Wal *pWal){
       rc = walTryBeginRead(pWal, &notUsed, 1, ++cnt);
     }while( rc==WAL_RETRY );
     Debug.Assert( (rc&0xff)!=SQLITE_BUSY ); /* BUSY not possible when useWal==1 */
-    testcase( (rc&0xff)==SQLITE_IOERR );
-    testcase( rc==SQLITE_PROTOCOL );
-    testcase( rc==SQLITE_OK );
+    sqliteinth.testcase( (rc&0xff)==SQLITE_IOERR );
+    sqliteinth.testcase( rc==SQLITE_PROTOCOL );
+    sqliteinth.testcase( rc==SQLITE_OK );
   }
   return rc;
 }
@@ -2695,7 +2695,7 @@ int sqlite3WalFrames(
     void *pData;
    
     iOffset = walFrameOffset(++iFrame, szPage);
-    /* testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL */
+    /* sqliteinth.testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL */
     
     /* Populate and write the frame header */
     nDbsize = (isCommit && p->pDirty==0) ? nTruncate : 0;
@@ -2735,7 +2735,7 @@ int sqlite3WalFrames(
 																			      pData = pLast->pData;
 #endif
 																			      walEncodeFrame(pWal, pLast->pgno, nTruncate, pData, aFrame);
-      /* testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL */
+      /* sqliteinth.testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL */
       rc = sqlite3OsWrite(pWal->pWalFd, aFrame, sizeof(aFrame), iOffset);
       if( rc!=SQLITE_OK ){
         return rc;
@@ -2771,8 +2771,8 @@ int sqlite3WalFrames(
   if( rc==SQLITE_OK ){
     /* Update the private copy of the header. */
     pWal->hdr.szPage = (u16)((szPage&0xff00) | (szPage>>16));
-    testcase( szPage<=32768 );
-    testcase( szPage>=65536 );
+    sqliteinth.testcase( szPage<=32768 );
+    sqliteinth.testcase( szPage>=65536 );
     pWal->hdr.mxFrame = iFrame;
     if( isCommit ){
       pWal->hdr.iChange++;

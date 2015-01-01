@@ -174,7 +174,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
 
                 Debug.Assert(argc == 2);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 zRegex = vdbeapi.sqlite3_value_text(argv[0]);
                 zTest = vdbeapi.sqlite3_value_text(argv[1]);
                 if (zTest == null || String.IsNullOrEmpty(zRegex))

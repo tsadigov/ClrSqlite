@@ -145,7 +145,7 @@ static sqlite_u3264 g_elapsed;
     static void local_ioerr()
     {
 #if TRACE
-																																						      IOTRACE( "IOERR\n" );
+																																						      sqliteinth.IOTRACE( "IOERR\n" );
 #endif
 																																						#if !TCLSH
 																																						      sqlite3_io_error_hit++;

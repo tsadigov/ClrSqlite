@@ -7,9 +7,20 @@ using u8=System.Byte;
 using u16=System.UInt16;
 using u32=System.UInt32;
 using sqlite3_int64=System.Int64;
+
+using Parse=Community.CsharpSqlite.Sqlite3.Parse;
+
+
 namespace Community.CsharpSqlite {
+    using WherePlan=Community.CsharpSqlite.Sqlite3.WherePlan;
 	using sqlite3_value=Sqlite3.Mem;
-	public partial class Sqlite3 {
+
+    using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
+    using WhereInfo = Community.CsharpSqlite.Sqlite3.WhereInfo;
+    using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
+    using sqliteinth = Sqlite3.sqliteinth;
+    using exprc = Sqlite3.exprc;
+
 		///
 		///<summary>
 		///2001 September 15
@@ -38,21 +49,7 @@ namespace Community.CsharpSqlite {
 		///<param name=""></param>
 		///<param name=""></param>
 		//#include "sqliteInt.h"
-		///<summary>
-		/// Trace output macros
-		///
-		///</summary>
-		#if (SQLITE_TEST) || (SQLITE_DEBUG)
-																																																    static bool sqlite3WhereTrace = false;
-#endif
-		#if (SQLITE_TEST) && (SQLITE_DEBUG) && TRACE
-																																																// define WHERETRACE(X)  if(sqlite3WhereTrace) sqlite3DebugPrintf X
-static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace ) sqlite3DebugPrintf( X, ap ); }
-#else
-		//# define WHERETRACE(X)
-		static void WHERETRACE(string X,params object[] ap) {
-		}
-		#endif
+		
 		///
 		///<summary>
 		///Forward reference
@@ -80,7 +77,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/// where X is a column name and <op> is one of certain operators,
 		/// then WhereTerm.leftCursor and WhereTerm.u.leftColumn record the
 		/// cursor number and column number for X.  WhereTerm.eOperator records
-		/// the <op> using a bitmask encoding defined by WO_xxx below.  The
+		/// the <op> using a bitmask encoding defined by wherec.WO_xxx below.  The
 		/// use of a bitmask encoding for the operator allows us to search
 		/// quickly for terms that match any of several different operators.
 		///
@@ -88,7 +85,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///
 		///         (t1.X <op> <expr>) OR (t1.Y <op> <expr>) OR ....
 		///
-		/// In this second case, wtFlag as the TERM_ORINFO set and eOperator==WO_OR
+		/// In this second case, wtFlag as the WhereTermFlags.TERM_ORINFO set and eOperator==wherec.WO_OR
 		/// and the WhereTerm.u.pOrInfo field points to auxiliary information that
 		/// is collected about the
 		///
@@ -139,24 +136,24 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				public WhereOrInfo pOrInfo;
 				///
 				///<summary>
-				///Extra information if eOperator==WO_OR 
+				///Extra information if eOperator==wherec.WO_OR 
 				///</summary>
 				public WhereAndInfo pAndInfo;
 			///
 			///<summary>
-			///Extra information if eOperator==WO_AND 
+			///Extra information if eOperator==wherec.WO_AND 
 			///</summary>
 			}
 			public _u u=new _u();
 			public u16 eOperator;
 			///
 			///<summary>
-			///A WO_xx value describing <op> 
+			///A wherec.WO_xx value describing <op> 
 			///</summary>
-			public u8 wtFlags;
+			public WhereTermFlags wtFlags;
 			///
 			///<summary>
-			///TERM_xxx bit flags.  See below 
+			///WhereTermFlags.TERM_xxx bit flags.  See below 
 			///</summary>
 			public u8 nChild;
 			///
@@ -194,7 +191,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				char aff;
 				if(this.leftCursor!=pSrc.iCursor)
 					return 0;
-				if(this.eOperator!=WO_EQ)
+				if(this.eOperator!=wherec.WO_EQ)
 					return 0;
 				if((this.prereqRight&notReady)!=0)
 					return 0;
@@ -209,61 +206,65 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///Allowed values of WhereTerm.wtFlags
 		///
 		///</summary>
-		//#define TERM_DYNAMIC    0x01   /* Need to call exprc.sqlite3ExprDelete(db, ref pExpr) */
-		//#define TERM_VIRTUAL    0x02   /* Added by the optimizer.  Do not code */
-		//#define TERM_CODED      0x04   /* This term is already coded */
-		//#define TERM_COPIED     0x08   /* Has a child */
-		//#define TERM_ORINFO     0x10   /* Need to free the WhereTerm.u.pOrInfo object */
-		//#define TERM_ANDINFO    0x20   /* Need to free the WhereTerm.u.pAndInfo obj */
-		//#define TERM_OR_OK      0x40   /* Used during OR-clause processing */
+		//#define WhereTermFlags.TERM_DYNAMIC    0x01   /* Need to call exprc.sqlite3ExprDelete(db, ref pExpr) */
+		//#define WhereTermFlags.TERM_VIRTUAL    0x02   /* Added by the optimizer.  Do not code */
+		//#define WhereTermFlags.TERM_CODED      0x04   /* This term is already coded */
+		//#define WhereTermFlags.TERM_COPIED     0x08   /* Has a child */
+		//#define WhereTermFlags.TERM_ORINFO     0x10   /* Need to free the WhereTerm.u.pOrInfo object */
+		//#define WhereTermFlags.TERM_ANDINFO    0x20   /* Need to free the WhereTerm.u.pAndInfo obj */
+		//#define WhereTermFlags.TERM_OR_OK      0x40   /* Used during OR-clause processing */
 		#if SQLITE_ENABLE_STAT2
-																																																    //  define TERM_VNULL    0x80   /* Manufactured x>NULL or x<=NULL term */
+																																																    //  define WhereTermFlags.TERM_VNULL    0x80   /* Manufactured x>NULL or x<=NULL term */
 #else
-		//#  define TERM_VNULL    0x00   /* Disabled if not using stat2 */
+		//#  define WhereTermFlags.TERM_VNULL    0x00   /* Disabled if not using stat2 */
 		#endif
-		const int TERM_DYNAMIC=0x01;
-		///
-		///<summary>
-		///Need to call exprc.sqlite3ExprDelete(db, ref pExpr) 
-		///</summary>
-		const int TERM_VIRTUAL=0x02;
-		///
-		///<summary>
-		///Added by the optimizer.  Do not code 
-		///</summary>
-		const int TERM_CODED=0x04;
-		///
-		///<summary>
-		///This term is already coded 
-		///</summary>
-		const int TERM_COPIED=0x08;
-		///
-		///<summary>
-		///Has a child 
-		///</summary>
-		const int TERM_ORINFO=0x10;
-		///
-		///<summary>
-		///Need to free the WhereTerm.u.pOrInfo object 
-		///</summary>
-		const int TERM_ANDINFO=0x20;
-		///
-		///<summary>
-		///Need to free the WhereTerm.u.pAndInfo obj 
-		///</summary>
-		const int TERM_OR_OK=0x40;
-		///
-		///<summary>
-		///</summary>
-		///<param name="Used during OR">clause processing </param>
-		#if SQLITE_ENABLE_STAT2
+
+        public enum WhereTermFlags:byte
+        {
+            TERM_DYNAMIC = 0x01,
+            ///
+            ///<summary>
+            ///Need to call exprc.sqlite3ExprDelete(db, ref pExpr) 
+            ///</summary>
+            TERM_VIRTUAL = 0x02,
+            ///
+            ///<summary>
+            ///Added by the optimizer.  Do not code 
+            ///</summary>
+            TERM_CODED = 0x04,
+            ///
+            ///<summary>
+            ///This term is already coded 
+            ///</summary>
+            TERM_COPIED = 0x08,
+            ///
+            ///<summary>
+            ///Has a child 
+            ///</summary>
+            TERM_ORINFO = 0x10,
+            ///
+            ///<summary>
+            ///Need to free the WhereTerm.u.pOrInfo object 
+            ///</summary>
+            TERM_ANDINFO = 0x20,
+            ///
+            ///<summary>
+            ///Need to free the WhereTerm.u.pAndInfo obj 
+            ///</summary>
+            TERM_OR_OK = 0x40,
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Used during OR">clause processing </param>
+#if SQLITE_ENABLE_STAT2
 																																																    const int TERM_VNULL = 0x80;  /* Manufactured x>NULL or x<=NULL term */
 #else
-		const int TERM_VNULL=0x00;
-		///<summary>
-		///Disabled if not using stat2
-		///</summary>
-		#endif
+            TERM_VNULL = 0x0
+            ///<summary>
+            ///Disabled if not using stat2
+            ///</summary>
+#endif
+        }
 		///<summary>
 		/// An instance of the following structure holds all information about a
 		/// WHERE clause.  Mostly this is a container for one or more WhereTerms.
@@ -288,7 +289,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			public u8 op;
 			///
 			///<summary>
-			///Split operator.  TK_AND or TK_OR 
+			///Split operator.  Sqlite3.TK_AND or Sqlite3.TK_OR 
 			///</summary>
 			public int nTerm;
 			///
@@ -335,14 +336,14 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				for(i=this.nTerm-1;i>=0;i--)//, a++)
 				 {
 					a=this.a[i];
-					if((a.wtFlags&TERM_DYNAMIC)!=0) {
+					if((a.wtFlags&WhereTermFlags.TERM_DYNAMIC)!=0) {
 						exprc.sqlite3ExprDelete(db,ref a.pExpr);
 					}
-					if((a.wtFlags&TERM_ORINFO)!=0) {
+					if((a.wtFlags&WhereTermFlags.TERM_ORINFO)!=0) {
 						db.whereOrInfoDelete(a.u.pOrInfo);
 					}
 					else
-						if((a.wtFlags&TERM_ANDINFO)!=0) {
+						if((a.wtFlags&WhereTermFlags.TERM_ANDINFO)!=0) {
 							db.whereAndInfoDelete(a.u.pAndInfo);
 						}
 				}
@@ -366,7 +367,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				this.pParse=pParse;
 				this.pMaskSet=pMaskSet;
 				this.nTerm=0;
-				this.nSlot=ArraySize(this.aStatic)-1;
+				this.nSlot=Sqlite3.ArraySize(this.aStatic)-1;
 				this.a=this.aStatic;
 				this.vmask=0;
 			}
@@ -380,7 +381,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			///
 			/// This routine will increase the size of the pWC.a[] array as necessary.
 			///
-			/// If the wtFlags argument includes TERM_DYNAMIC, then responsibility
+			/// If the wtFlags argument includes WhereTermFlags.TERM_DYNAMIC, then responsibility
 			/// for freeing the expression p is Debug.Assumed by the WhereClause object pWC.
 			/// This is true even if this routine fails to allocate a new WhereTerm.
 			///
@@ -390,10 +391,10 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			/// the pWC.a[] array.
 			///
 			///</summary>
-			int whereClauseInsert(Expr p,u8 wtFlags) {
+			int whereClauseInsert(Expr p,WhereTermFlags wtFlags) {
 				WhereTerm pTerm;
 				int idx;
-				testcase(wtFlags&TERM_VIRTUAL);
+				sqliteinth.testcase(wtFlags&WhereTermFlags.TERM_VIRTUAL);
 				///
 				///<summary>
 				///</summary>
@@ -404,7 +405,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 					Array.Resize(ref this.a,this.nSlot*2);
 					//pWC.a = sqlite3DbMallocRaw(db, sizeof(pWC.a[0])*pWC.nSlot*2 );
 					//if( pWC.a==null ){
-					//  if( wtFlags & TERM_DYNAMIC ){
+					//  if( wtFlags & WhereTermFlags.TERM_DYNAMIC ){
 					//    exprc.sqlite3ExprDelete(db, ref p);
 					//  }
 					//  pWC.a = pOld;
@@ -455,7 +456,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			///</summary>
 			u32 op,///
 			///<summary>
-			///Mask of WO_xx values describing operator 
+			///Mask of wherec.WO_xx values describing operator 
 			///</summary>
 			Index pIdx///
 			///<summary>
@@ -465,12 +466,12 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				WhereTerm pTerm;
 				int k;
 				Debug.Assert(iCur>=0);
-				op&=WO_ALL;
+				op&=wherec.WO_ALL;
 				for(k=this.nTerm;k!=0;k--)//, pTerm++)
 				 {
 					pTerm=this.a[this.nTerm-k];
 					if(pTerm.leftCursor==iCur&&(pTerm.prereqRight&notReady)==0&&pTerm.u.leftColumn==iColumn&&(pTerm.eOperator&op)!=0) {
-						if(pIdx!=null&&pTerm.eOperator!=WO_ISNULL) {
+						if(pIdx!=null&&pTerm.eOperator!=wherec.WO_ISNULL) {
 							Expr pX=pTerm.pExpr;
 							CollSeq pColl;
 							char idxaff;
@@ -490,7 +491,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 							pColl=pParse.sqlite3BinaryCompareCollSeq(pX.pLeft,pX.pRight);
 							Debug.Assert(pColl!=null||pParse.nErr!=0);
 							for(j=0;pIdx.aiColumn[j]!=iColumn;j++) {
-								if(NEVER(j>=pIdx.nColumn))
+								if(Sqlite3.NEVER(j>=pIdx.nColumn))
 									return null;
 							}
 							if(pColl!=null&&!pColl.zName.Equals(pIdx.azColl[j],StringComparison.InvariantCultureIgnoreCase))
@@ -511,7 +512,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			}
 		}
 		///<summary>
-		/// A WhereTerm with eOperator==WO_OR has its u.pOrInfo pointer set to
+		/// A WhereTerm with eOperator==wherec.WO_OR has its u.pOrInfo pointer set to
 		/// a dynamically allocated instance of the following structure.
 		///
 		///</summary>
@@ -529,7 +530,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		};
 
 		///<summary>
-		/// A WhereTerm with eOperator==WO_AND has its u.pAndInfo pointer set to
+		/// A WhereTerm with eOperator==wherec.WO_AND has its u.pAndInfo pointer set to
 		/// a dynamically allocated instance of the following structure.
 		///
 		///</summary>
@@ -573,7 +574,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			///<summary>
 			///Number of Debug.Assigned cursor values
 			///</summary>
-			public int[] ix=new int[BMS];
+			public int[] ix=new int[Sqlite3.BMS];
 			///
 			///<summary>
 			///Cursor Debug.Assigned to each bit 
@@ -593,20 +594,20 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 				return 0;
 			}
 			public void createMask(int iCursor) {
-				Debug.Assert(this.n<ArraySize(this.ix));
+				Debug.Assert(this.n<Sqlite3.ArraySize(this.ix));
 				this.ix[this.n++]=iCursor;
 			}
 			public Bitmask exprTableUsage(Expr p) {
 				Bitmask mask=0;
 				if(p==null)
 					return 0;
-				if(p.op==TK_COLUMN) {
+				if(p.op==Sqlite3.TK_COLUMN) {
 					mask=this.getMask(p.iTable);
 					return mask;
 				}
 				mask=this.exprTableUsage(p.pRight);
 				mask|=this.exprTableUsage(p.pLeft);
-				if(p.ExprHasProperty(EP_xIsSelect)) {
+				if(p.ExprHasProperty(ExprFlags.EP_xIsSelect)) {
 					mask|=this.exprSelectTableUsage(p.x.pSelect);
 				}
 				else {
@@ -665,6 +666,51 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 			}
 		};
 
+
+    public class wherec{
+
+
+        ///<summary>
+        /// Flags appropriate for the wctrlFlags parameter of sqlite3WhereBegin()
+        /// and the WhereInfo.wctrlFlags member.
+        ///
+        ///</summary>
+        //#define wherec.WHERE_ORDERBY_NORMAL   0x0000 /* No-op */
+        //#define wherec.WHERE_ORDERBY_MIN      0x0001 /* ORDER BY processing for min() func */
+        //#define wherec.WHERE_ORDERBY_MAX      0x0002 /* ORDER BY processing for max() func */
+        //#define wherec.WHERE_ONEPASS_DESIRED  0x0004 /* Want to do one-pass UPDATE/DELETE */
+        //#define wherec.WHERE_DUPLICATES_OK    0x0008 /* Ok to return a row more than once */
+        //#define wherec.WHERE_OMIT_OPEN        0x0010  /* Table cursors are already open */
+        //#define wherec.WHERE_OMIT_CLOSE       0x0020  /* Omit close of table & index cursors */
+        //#define wherec.WHERE_FORCE_TABLE      0x0040 /* Do not use an index-only search */
+        //#define wherec.WHERE_ONETABLE_ONLY    0x0080 /* Only code the 1st table in pTabList */
+        public const int WHERE_ORDERBY_NORMAL = 0x0000;
+        public const int WHERE_ORDERBY_MIN = 0x0001;
+        public const int WHERE_ORDERBY_MAX = 0x0002;
+        public const int WHERE_ONEPASS_DESIRED = 0x0004;
+        public const int WHERE_DUPLICATES_OK = 0x0008;
+        public const int WHERE_OMIT_OPEN = 0x0010;
+        public const int WHERE_OMIT_CLOSE = 0x0020;
+        public const int WHERE_FORCE_TABLE = 0x0040;
+        public const int WHERE_ONETABLE_ONLY = 0x0080;
+
+
+
+        ///<summary>
+		/// Trace output macros
+		///
+		///</summary>
+		#if (SQLITE_TEST) || (SQLITE_DEBUG)
+																																																    static bool sqlite3WhereTrace = false;
+#endif
+		#if (SQLITE_TEST) && (SQLITE_DEBUG) && TRACE
+																																																// define WHERETRACE(X)  if(sqlite3WhereTrace) sqlite3DebugPrintf X
+static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace ) sqlite3DebugPrintf( X, ap ); }
+#else
+		//# define WHERETRACE(X)
+		public static void WHERETRACE(string X,params object[] ap) {
+		}
+		#endif
 		///
 		///<summary>
 		///Bitmasks for the operators that indices are able to exploit.  An
@@ -672,48 +718,48 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///<param name="OR">ed combination of these values can be used when searching for</param>
 		///<param name="terms in the where clause.">terms in the where clause.</param>
 		///<param name=""></param>
-		//#define WO_IN     0x001
-		//#define WO_EQ     0x002
-		//#define WO_LT     (WO_EQ<<(TK_LT-TK_EQ))
-		//#define WO_LE     (WO_EQ<<(TK_LE-TK_EQ))
-		//#define WO_GT     (WO_EQ<<(TK_GT-TK_EQ))
-		//#define WO_GE     (WO_EQ<<(TK_GE-TK_EQ))
-		//#define WO_MATCH  0x040
-		//#define WO_ISNULL 0x080
-		//#define WO_OR     0x100       /* Two or more OR-connected terms */
-		//#define WO_AND    0x200       /* Two or more AND-connected terms */
-		//#define WO_NOOP   0x800       /* This term does not restrict search space */
-		//#define WO_ALL    0xfff       /* Mask of all possible WO_* values */
-		//#define WO_SINGLE 0x0ff       /* Mask of all non-compound WO_* values */
-		const int WO_IN=0x001;
-		const int WO_EQ=0x002;
-		const int WO_LT=(WO_EQ<<(TK_LT-TK_EQ));
-		const int WO_LE=(WO_EQ<<(TK_LE-TK_EQ));
-		const int WO_GT=(WO_EQ<<(TK_GT-TK_EQ));
-		const int WO_GE=(WO_EQ<<(TK_GE-TK_EQ));
-		const int WO_MATCH=0x040;
-		const int WO_ISNULL=0x080;
-		const int WO_OR=0x100;
+		//#define wherec.WO_IN     0x001
+		//#define wherec.WO_EQ     0x002
+		//#define wherec.WO_LT     (wherec.WO_EQ<<(Sqlite3.TK_LT-Sqlite3.TK_EQ))
+		//#define wherec.WO_LE     (wherec.WO_EQ<<(Sqlite3.TK_LE-Sqlite3.TK_EQ))
+		//#define wherec.WO_GT     (wherec.WO_EQ<<(Sqlite3.TK_GT-Sqlite3.TK_EQ))
+		//#define wherec.WO_GE     (wherec.WO_EQ<<(Sqlite3.TK_GE-Sqlite3.TK_EQ))
+		//#define wherec.WO_MATCH  0x040
+		//#define wherec.WO_ISNULL 0x080
+		//#define wherec.WO_OR     0x100       /* Two or more OR-connected terms */
+		//#define wherec.WO_AND    0x200       /* Two or more AND-connected terms */
+		//#define wherec.WO_NOOP   0x800       /* This term does not restrict search space */
+		//#define wherec.WO_ALL    0xfff       /* Mask of all possible wherec.WO_* values */
+		//#define wherec.WO_SINGLE 0x0ff       /* Mask of all non-compound wherec.WO_* values */
+		public const int WO_IN=0x001;
+        public const int WO_EQ = 0x002;
+        public const int WO_LT = (wherec.WO_EQ << (Sqlite3.TK_LT - Sqlite3.TK_EQ));
+        public const int WO_LE = (wherec.WO_EQ << (Sqlite3.TK_LE - Sqlite3.TK_EQ));
+        public const int WO_GT = (wherec.WO_EQ << (Sqlite3.TK_GT - Sqlite3.TK_EQ));
+        public const int WO_GE = (wherec.WO_EQ << (Sqlite3.TK_GE - Sqlite3.TK_EQ));
+        public const int WO_MATCH = 0x040;
+        public const int WO_ISNULL = 0x080;
+        public const int WO_OR = 0x100;
 		///
 		///<summary>
 		///</summary>
 		///<param name="Two or more OR">connected terms </param>
-		const int WO_AND=0x200;
+		public const int WO_AND=0x200;
 		///
 		///<summary>
 		///</summary>
 		///<param name="Two or more AND">connected terms </param>
-		const int WO_NOOP=0x800;
+        public const int WO_NOOP = 0x800;
 		///
 		///<summary>
 		///This term does not restrict search space 
 		///</summary>
-		const int WO_ALL=0xfff;
+        public const int WO_ALL = 0xfff;
 		///
 		///<summary>
 		///Mask of all possible WO_* values 
 		///</summary>
-		const int WO_SINGLE=0x0ff;
+		public const int WO_SINGLE=0x0ff;
 		///
 		///<summary>
 		///</summary>
@@ -724,9 +770,9 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/// strategies are appropriate.
 		///
 		/// The least significant 12 bits is reserved as a mask for WO_ values above.
-		/// The WhereLevel.wsFlags field is usually set to WO_IN|WO_EQ|WO_ISNULL.
+		/// The WhereLevel.wsFlags field is usually set to WO_IN|wherec.WO_EQ|wherec.WO_ISNULL.
 		/// But if the table is the right table of a left join, WhereLevel.wsFlags
-		/// is set to WO_IN|WO_EQ.  The WhereLevel.wsFlags field can then be used as
+		/// is set to WO_IN|wherec.WO_EQ.  The WhereLevel.wsFlags field can then be used as
 		/// the "op" parameter to findTerm when we are resolving equality constraints.
 		/// ISNULL constraints will then not be used on the right table of a left
 		/// join.  Tickets #2177 and #2189.
@@ -751,25 +797,25 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		//#define WHERE_VIRTUALTABLE 0x08000000  /* Use virtual-table processing */
 		//#define WHERE_MULTI_OR     0x10000000  /* OR using multiple indices */
 		//#define WHERE_TEMP_INDEX   0x20000000  /* Uses an ephemeral index */
-		const int WHERE_ROWID_EQ=0x00001000;
-		const int WHERE_ROWID_RANGE=0x00002000;
-		const int WHERE_COLUMN_EQ=0x00010000;
-		const int WHERE_COLUMN_RANGE=0x00020000;
-		const int WHERE_COLUMN_IN=0x00040000;
-		const int WHERE_COLUMN_NULL=0x00080000;
-		const int WHERE_INDEXED=0x000f0000;
-		const int WHERE_IN_ABLE=0x000f1000;
-		const int WHERE_NOT_FULLSCAN=0x100f3000;
-		const int WHERE_TOP_LIMIT=0x00100000;
-		const int WHERE_BTM_LIMIT=0x00200000;
-		const int WHERE_BOTH_LIMIT=0x00300000;
-		const int WHERE_IDX_ONLY=0x00800000;
-		const int WHERE_ORDERBY=0x01000000;
-		const int WHERE_REVERSE=0x02000000;
-		const int WHERE_UNIQUE=0x04000000;
-		const int WHERE_VIRTUALTABLE=0x08000000;
-		const int WHERE_MULTI_OR=0x10000000;
-		const int WHERE_TEMP_INDEX=0x20000000;
+		public const int WHERE_ROWID_EQ=0x00001000;
+        public const int WHERE_ROWID_RANGE = 0x00002000;
+        public const int WHERE_COLUMN_EQ = 0x00010000;
+        public const int WHERE_COLUMN_RANGE = 0x00020000;
+        public const int WHERE_COLUMN_IN = 0x00040000;
+        public const int WHERE_COLUMN_NULL = 0x00080000;
+        public const int WHERE_INDEXED = 0x000f0000;
+        public const int WHERE_IN_ABLE = 0x000f1000;
+        public const int WHERE_NOT_FULLSCAN = 0x100f3000;
+        public const int WHERE_TOP_LIMIT = 0x00100000;
+        public const int WHERE_BTM_LIMIT = 0x00200000;
+        public const int WHERE_BOTH_LIMIT = 0x00300000;
+        public const int WHERE_IDX_ONLY = 0x00800000;
+        public const int WHERE_ORDERBY = 0x01000000;
+        public const int WHERE_REVERSE = 0x02000000;
+        public const int WHERE_UNIQUE = 0x04000000;
+        public const int WHERE_VIRTUALTABLE = 0x08000000;
+        public const int WHERE_MULTI_OR = 0x10000000;
+        public const int WHERE_TEMP_INDEX = 0x20000000;
 		///
 		///<summary>
 		///Initialize a preallocated WhereClause structure.
@@ -835,7 +881,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/// previously invoked sqlite3ResolveExprNames() on the expression.  See
 		/// the header comment on that routine for additional information.
 		/// The sqlite3ResolveExprNames() routines looks for column names and
-		/// sets their opcodes to TK_COLUMN and their Expr.iTable fields to
+		/// sets their opcodes to Sqlite3.TK_COLUMN and their Expr.iTable fields to
 		/// the VDBE cursor number of the table.  This routine just has to
 		/// translate the cursor numbers into bitmask values and OR all
 		/// the bitmasks together.
@@ -857,12 +903,12 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///<param name="expression < column expression <= column column IN">expression < column expression <= column column IN</param>
 		///<param name="(expression">list) column IN (subquery) column IS NULL</param>
 		///<param name=""></param>
-		static bool allowedOp(int op) {
-			Debug.Assert(TK_GT>TK_EQ&&TK_GT<TK_GE);
-			Debug.Assert(TK_LT>TK_EQ&&TK_LT<TK_GE);
-			Debug.Assert(TK_LE>TK_EQ&&TK_LE<TK_GE);
-			Debug.Assert(TK_GE==TK_EQ+4);
-			return op==TK_IN||(op>=TK_EQ&&op<=TK_GE)||op==TK_ISNULL;
+		public static bool allowedOp(int op) {
+			Debug.Assert(Sqlite3.TK_GT>Sqlite3.TK_EQ&&Sqlite3.TK_GT<Sqlite3.TK_GE);
+			Debug.Assert(Sqlite3.TK_LT>Sqlite3.TK_EQ&&Sqlite3.TK_LT<Sqlite3.TK_GE);
+			Debug.Assert(Sqlite3.TK_LE>Sqlite3.TK_EQ&&Sqlite3.TK_LE<Sqlite3.TK_GE);
+			Debug.Assert(Sqlite3.TK_GE==Sqlite3.TK_EQ+4);
+			return op==Sqlite3.TK_IN||(op>=Sqlite3.TK_EQ&&op<=Sqlite3.TK_GE)||op==Sqlite3.TK_ISNULL;
 		}
 		///<summary>
 		/// Swap two objects of type TYPE.
@@ -878,35 +924,35 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/// the commutation. So "Y collate NOCASE op X" becomes
 		/// "X collate NOCASE op Y". This is because any collation sequence on
 		/// the left hand side of a comparison overrides any collation sequence
-		/// attached to the right. For the same reason the EP_ExpCollate flag
+		/// attached to the right. For the same reason the ExprFlags.EP_ExpCollate flag
 		/// is not commuted.
 		///
 		///</summary>
 		///<summary>
-		/// Translate from TK_xx operator to WO_xx bitmask.
+		/// Translate from Sqlite3.TK_xx operator to WO_xx bitmask.
 		///
 		///</summary>
-		static u16 operatorMask(int op) {
+		public static u16 operatorMask(int op) {
 			u16 c;
 			Debug.Assert(allowedOp(op));
-			if(op==TK_IN) {
-				c=WO_IN;
+			if(op==Sqlite3.TK_IN) {
+				c=wherec.WO_IN;
 			}
 			else
-				if(op==TK_ISNULL) {
-					c=WO_ISNULL;
+				if(op==Sqlite3.TK_ISNULL) {
+					c=wherec.WO_ISNULL;
 				}
 				else {
-					Debug.Assert((WO_EQ<<(op-TK_EQ))<0x7fff);
-					c=(u16)(WO_EQ<<(op-TK_EQ));
+					Debug.Assert((wherec.WO_EQ<<(op-Sqlite3.TK_EQ))<0x7fff);
+					c=(u16)(wherec.WO_EQ<<(op-Sqlite3.TK_EQ));
 				}
-			Debug.Assert(op!=TK_ISNULL||c==WO_ISNULL);
-			Debug.Assert(op!=TK_IN||c==WO_IN);
-			Debug.Assert(op!=TK_EQ||c==WO_EQ);
-			Debug.Assert(op!=TK_LT||c==WO_LT);
-			Debug.Assert(op!=TK_LE||c==WO_LE);
-			Debug.Assert(op!=TK_GT||c==WO_GT);
-			Debug.Assert(op!=TK_GE||c==WO_GE);
+			Debug.Assert(op!=Sqlite3.TK_ISNULL||c==wherec.WO_ISNULL);
+			Debug.Assert(op!=Sqlite3.TK_IN||c==wherec.WO_IN);
+			Debug.Assert(op!=Sqlite3.TK_EQ||c==wherec.WO_EQ);
+			Debug.Assert(op!=Sqlite3.TK_LT||c==wherec.WO_LT);
+			Debug.Assert(op!=Sqlite3.TK_LE||c==wherec.WO_LE);
+			Debug.Assert(op!=Sqlite3.TK_GT||c==wherec.WO_GT);
+			Debug.Assert(op!=Sqlite3.TK_GE||c==wherec.WO_GE);
 			return c;
 		}
 		///
@@ -962,7 +1008,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/// A WhereOrTerm object is computed and attached to the term under
 		/// analysis, regardless of the outcome of the analysis.  Hence:
 		///
-		///     WhereTerm.wtFlags   |=  TERM_ORINFO
+		///     WhereTerm.wtFlags   |=  WhereTermFlags.TERM_ORINFO
 		///     WhereTerm.u.pOrInfo  =  a dynamically allocated WhereOrTerm object
 		///
 		/// The term being analyzed must have two or more of OR-connected subterms.
@@ -1040,9 +1086,9 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		/// If the expression is of the form "X <op> Y" where both X and Y are
 		/// columns, then the original expression is unchanged and a new virtual
 		/// term of the form "Y <op> X" is added to the WHERE clause and
-		/// analyzed separately.  The original term is marked with TERM_COPIED
-		/// and the new term is marked with TERM_DYNAMIC (because it's pExpr
-		/// needs to be freed with the WhereClause) and TERM_VIRTUAL (because it
+		/// analyzed separately.  The original term is marked with WhereTermFlags.TERM_COPIED
+		/// and the new term is marked with WhereTermFlags.TERM_DYNAMIC (because it's pExpr
+		/// needs to be freed with the WhereClause) and WhereTermFlags.TERM_VIRTUAL (because it
 		/// is a commuted copy of a prior term.)  The original term has nChild=1
 		/// and the copy has idxParent set to the index of the original term.
 		///</summary>
@@ -1072,23 +1118,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
 		///
 		///</summary>
 		///
-		///<summary>
-		///Prepare a crude estimate of the logarithm of the input value.
-		///The results need not be exact.  This is only used for estimating
-		///the total cost of performing operations with O(logN) or O(NlogN)
-		///complexity.  Because N is just a guess, it is no great tragedy if
-		///logN is a little off.
-		///
-		///</summary>
-		static double estLog(double N) {
-			double logN=1;
-			double x=10;
-			while(N>x) {
-				logN+=1;
-				x*=10;
-			}
-			return logN;
-		}
+		
 		///<summary>
 		/// Two routines for printing the content of an sqlite3_index_info
 		/// structure.  Used for testing and debugging only.  If neither
@@ -1136,10 +1166,11 @@ sqlite3DebugPrintf( "  estimatedCost=%g\n", p.estimatedCost );
 }
 #else
 		//#define TRACE_IDX_INPUTS(A)
-		static void TRACE_IDX_INPUTS(sqlite3_index_info p) {
+		public static void TRACE_IDX_INPUTS(sqlite3_index_info p) {
 		}
 		//#define TRACE_IDX_OUTPUTS(A)
-		static void TRACE_IDX_OUTPUTS(sqlite3_index_info p) {
+        public static void TRACE_IDX_OUTPUTS(sqlite3_index_info p)
+        {
 		}
 	#endif
 	///<summary>
@@ -1263,7 +1294,7 @@ WhereCost pCost            /* Lowest cost query plan */
     {
       piRegion = 0;
       Debug.Assert( roundUp == 0 || roundUp == 1 );
-      if ( ALWAYS( pVal ) )
+      if ( Sqlite3.ALWAYS( pVal ) )
       {
         IndexSample[] aSample = pIdx.aSample;
         int i = 0;
@@ -1396,8 +1427,8 @@ sqlite3DbFree(db, ref zSample);
     ref sqlite3_value pp
     )
     {
-      if ( pExpr.op == TK_VARIABLE
-      || ( pExpr.op == TK_REGISTER && pExpr.op2 == TK_VARIABLE )
+      if ( pExpr.op == Sqlite3.TK_VARIABLE
+      || ( pExpr.op == Sqlite3.TK_REGISTER && pExpr.op2 == Sqlite3.TK_VARIABLE )
       )
       {
         int iVar = pExpr.iColumn;

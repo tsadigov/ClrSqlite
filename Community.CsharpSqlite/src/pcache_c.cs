@@ -262,7 +262,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     {
                         pCache.pPage1 = null;
                     }
-                    sqlite3GlobalConfig.pcache.xUnpin(pCache.pCache, p, false);
+                    Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xUnpin(pCache.pCache, p, false);
                 }
             }
 
@@ -275,7 +275,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
             ///</summary>
             public static int sqlite3PcacheInitialize()
             {
-                if (sqlite3GlobalConfig.pcache.xInit == null)
+                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xInit == null)
                 {
                     ///
                     ///<summary>
@@ -286,19 +286,19 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 
                     sqlite3PCacheSetDefault();
                 }
-                return sqlite3GlobalConfig.pcache.xInit(sqlite3GlobalConfig.pcache.pArg);
+                return Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xInit(Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.pArg);
             }
 
             public static void sqlite3PcacheShutdown()
             {
-                if (sqlite3GlobalConfig.pcache.xShutdown != null)
+                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xShutdown != null)
                 {
                     ///
                     ///<summary>
                     ///</summary>
                     ///<param name="IMPLEMENTATION">56589 The xShutdown() method may be NULL. </param>
 
-                    sqlite3GlobalConfig.pcache.xShutdown(sqlite3GlobalConfig.pcache.pArg);
+                    Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xShutdown(Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.pArg);
                 }
             }
 
@@ -367,7 +367,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 Debug.Assert(pCache.nRef == 0 && pCache.pDirty == null);
                 if (pCache.pCache != null)
                 {
-                    sqlite3GlobalConfig.pcache.xDestroy(ref pCache.pCache);
+                    Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xDestroy(ref pCache.pCache);
                     pCache.pCache = null;
                 }
                 pCache.szPage = szPage;
@@ -417,18 +417,18 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     int nByte;
                     nByte = pCache.szPage + pCache.szExtra + 0;
                     // sizeof( PgHdr );
-                    p = sqlite3GlobalConfig.pcache.xCreate(nByte, pCache.bPurgeable);
+                    p = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xCreate(nByte, pCache.bPurgeable);
                     //if ( null == p )
                     //{
                     //  return SQLITE_NOMEM;
                     //}
-                    sqlite3GlobalConfig.pcache.xCachesize(p, pCache.nMax);
+                    Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xCachesize(p, pCache.nMax);
                     pCache.pCache = p;
                 }
                 eCreate = createFlag * (1 + ((!pCache.bPurgeable || null == pCache.pDirty) ? 1 : 0));
                 if (pCache.pCache != null)
                 {
-                    pPage = sqlite3GlobalConfig.pcache.xFetch(pCache.pCache, pgno, eCreate);
+                    pPage = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xFetch(pCache.pCache, pgno, eCreate);
                 }
                 if (null == pPage && eCreate == 1)
                 {
@@ -460,7 +460,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 																																																																																															      io.sqlite3_log(SQLITE_FULL, 
                   "spill page %d making room for %d - cache used: %d/%d",
                   pPg->pgno, pgno,
-                  sqlite3GlobalConfig.pcache.xPagecount(pCache->pCache),
+                  Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xPagecount(pCache->pCache),
                   pCache->nMax);
 #endif
                         rc = pCache.xStress(pCache.pStress, pPg);
@@ -469,7 +469,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                             return rc;
                         }
                     }
-                    pPage = sqlite3GlobalConfig.pcache.xFetch(pCache.pCache, pgno, 2);
+                    pPage = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xFetch(pCache.pCache, pgno, 2);
                 }
                 if (pPage != null)
                 {
@@ -553,7 +553,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 {
                     pCache.pPage1 = null;
                 }
-                sqlite3GlobalConfig.pcache.xUnpin(pCache.pCache, p, true);
+                Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xUnpin(pCache.pCache, p, true);
             }
 
             ///<summary>
@@ -626,7 +626,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 PCache pCache = p.pCache;
                 Debug.Assert(p.nRef > 0);
                 Debug.Assert(newPgno > 0);
-                sqlite3GlobalConfig.pcache.xRekey(pCache.pCache, p, p.pgno, newPgno);
+                Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xRekey(pCache.pCache, p, p.pgno, newPgno);
                 p.pgno = newPgno;
                 if ((p.flags & PGHDR_DIRTY) != 0 && (p.flags & PGHDR_NEED_SYNC) != 0)
                 {
@@ -663,7 +663,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                         ///</summary>
 
                         Debug.Assert(p.pgno > 0);
-                        if (ALWAYS(p.pgno > pgno))
+                        if (Sqlite3.ALWAYS(p.pgno > pgno))
                         {
                             Debug.Assert((p.flags & PGHDR_DIRTY) != 0);
                             sqlite3PcacheMakeClean(p);
@@ -675,7 +675,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                         pCache.pPage1.pData = sqlite3Malloc(pCache.szPage);
                         pgno = 1;
                     }
-                    sqlite3GlobalConfig.pcache.xTruncate(pCache.pCache, pgno + 1);
+                    Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xTruncate(pCache.pCache, pgno + 1);
                 }
             }
 
@@ -687,7 +687,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
             {
                 if (pCache.pCache != null)
                 {
-                    sqlite3GlobalConfig.pcache.xDestroy(ref pCache.pCache);
+                    Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xDestroy(ref pCache.pCache);
                 }
             }
 
@@ -769,7 +769,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     p = pIn;
                     pIn = p.pDirty;
                     p.pDirty = null;
-                    for (i = 0; ALWAYS(i < N_SORT_BUCKET - 1); i++)
+                    for (i = 0; Sqlite3.ALWAYS(i < N_SORT_BUCKET - 1); i++)
                     {
                         if (a[i] == null)
                         {
@@ -836,7 +836,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 int nPage = 0;
                 if (pCache.pCache != null)
                 {
-                    nPage = sqlite3GlobalConfig.pcache.xPagecount(pCache.pCache);
+                    nPage = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xPagecount(pCache.pCache);
                 }
                 return nPage;
             }
@@ -860,7 +860,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 pCache.nMax = mxPage;
                 if (pCache.pCache != null)
                 {
-                    sqlite3GlobalConfig.pcache.xCachesize(pCache.pCache, mxPage);
+                    Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xCachesize(pCache.pCache, mxPage);
                 }
             }
 #if SQLITE_CHECK_PAGES  || (SQLITE_DEBUG)

@@ -775,6 +775,6 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-		public static int[] sqlite3OpcodeProperty;
+		public static OpFlag[] sqlite3OpcodeProperty;
 	}
 }

@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite {
                 pColl = sqlite3GetFuncCollSeq(context);
                 Debug.Assert(pColl != null);
                 Debug.Assert(mask == -1 || mask == 0);
-                testcase(mask == 0);
+                sqliteinth.testcase(mask == 0);
                 iBest = 0;
                 if (vdbeapi.sqlite3_value_type(argv[0]) == SQLITE_NULL)
                     return;
@@ -92,7 +92,7 @@ namespace Community.CsharpSqlite {
             static void typeofFunc(sqlite3_context context, int NotUsed, sqlite3_value[] argv)
             {
                 string z = "";
-                UNUSED_PARAMETER(NotUsed);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
                     case SQLITE_INTEGER:
@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite {
             {
                 int len;
                 Debug.Assert(argc == 1);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
                     case SQLITE_BLOB:
@@ -141,7 +141,7 @@ namespace Community.CsharpSqlite {
                             while (iz < z.Length && z[iz] != '\0')
                             {
                                 len++;
-                                SQLITE_SKIP_UTF8(z, ref iz);
+                                sqliteinth.SQLITE_SKIP_UTF8(z, ref iz);
                             }
                             context.sqlite3_result_int(len);
                             break;
@@ -163,7 +163,7 @@ namespace Community.CsharpSqlite {
             static void absFunc(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
                 Debug.Assert(argc == 1);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
                     case SQLITE_INTEGER:
@@ -263,7 +263,7 @@ namespace Community.CsharpSqlite {
                         len = z.Length;
                         //for ( z2 = z ; z2 != "" ; len++ )
                         //{
-                        //  SQLITE_SKIP_UTF8( ref z2 );
+                        //  sqliteinth.SQLITE_SKIP_UTF8( ref z2 );
                         //}
                     }
                 }
@@ -315,12 +315,12 @@ namespace Community.CsharpSqlite {
                 {
                     //while ( z != "" && p1 != 0 )
                     //{
-                    //  SQLITE_SKIP_UTF8( ref z );
+                    //  sqliteinth.SQLITE_SKIP_UTF8( ref z );
                     //  p1--;
                     //}
                     //for ( z2 = z ; z2 != "" && p2 != 0 ; p2-- )
                     //{
-                    //  SQLITE_SKIP_UTF8( ref z2 );
+                    //  sqliteinth.SQLITE_SKIP_UTF8( ref z2 );
                     //}
                     context.sqlite3_result_text(z, p1, p2 <= z.Length - p1 ? p2 : z.Length - p1, SQLITE_TRANSIENT);
                 }
@@ -411,8 +411,8 @@ namespace Community.CsharpSqlite {
             //  char* z;
             //  sqlite3* db = vdbeapi.sqlite3_context_db_handle( context );
             //  assert( nByte > 0 );
-            //  testcase( nByte == db->aLimit[SQLITE_LIMIT_LENGTH] );
-            //  testcase( nByte == db->aLimit[SQLITE_LIMIT_LENGTH] + 1 );
+            //  sqliteinth.testcase( nByte == db->aLimit[SQLITE_LIMIT_LENGTH] );
+            //  sqliteinth.testcase( nByte == db->aLimit[SQLITE_LIMIT_LENGTH] + 1 );
             //  if ( nByte > db->aLimit[SQLITE_LIMIT_LENGTH] )
             //  {
             //    sqlite3_result_error_toobig( context );
@@ -437,7 +437,7 @@ namespace Community.CsharpSqlite {
                 string z1;
                 string z2;
                 int i, n;
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 z2 = vdbeapi.sqlite3_value_text(argv[0]);
                 n = vdbeapi.sqlite3_value_bytes(argv[0]);
                 ///
@@ -465,7 +465,7 @@ namespace Community.CsharpSqlite {
                 string z1;
                 string z2;
                 int i, n;
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 z2 = vdbeapi.sqlite3_value_text(argv[0]);
                 n = vdbeapi.sqlite3_value_bytes(argv[0]);
                 ///
@@ -525,7 +525,7 @@ break;
             static void randomFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
                 sqlite_int64 r = 0;
-                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 sqlite3_randomness(sizeof(sqlite_int64), ref r);
                 if (r < 0)
                 {
@@ -554,7 +554,7 @@ break;
                 int n;
                 char[] p;
                 Debug.Assert(argc == 1);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 n = vdbeapi.sqlite3_value_int(argv[0]);
                 if (n < 1)
                 {
@@ -590,7 +590,7 @@ break;
             static void last_insert_rowid(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
-                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
                 ///</summary>
@@ -610,7 +610,7 @@ break;
             static void changes(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
-                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 context.sqlite3_result_int(sqlite3_changes(db));
             }
             ///<summary>
@@ -621,7 +621,7 @@ break;
             static void total_changes(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
                 sqlite3 db = (sqlite3)vdbeapi.sqlite3_context_db_handle(context);
-                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
                 ///</summary>
@@ -776,7 +776,7 @@ break;
                                     int len = 0;
                                     while (len < zString.Length && patternCompare(inPattern.Substring(inPattern.Length - zPattern.Length - 1), zString.Substring(len), pInfo, esc) == false)
                                     {
-                                        SQLITE_SKIP_UTF8(zString, ref len);
+                                        sqliteinth.SQLITE_SKIP_UTF8(zString, ref len);
                                     }
                                     return len < zString.Length;
                                 }
@@ -936,8 +936,8 @@ break;
                 ///
                 ///</summary>
                 nPat = vdbeapi.sqlite3_value_bytes(argv[0]);
-                testcase(nPat == db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH]);
-                testcase(nPat == db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH] + 1);
+                sqliteinth.testcase(nPat == db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH]);
+                sqliteinth.testcase(nPat == db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH] + 1);
                 if (nPat > db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH])
                 {
                     context.sqlite3_result_error("LIKE or GLOB pattern too complex", -1);
@@ -984,7 +984,7 @@ break;
             static void nullifFunc(sqlite3_context context, int NotUsed, sqlite3_value[] argv)
             {
                 CollSeq pColl = sqlite3GetFuncCollSeq(context);
-                UNUSED_PARAMETER(NotUsed);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 if (sqlite3MemCompare(argv[0], argv[1], pColl) != 0)
                 {
                     context.sqlite3_result_value(argv[0]);
@@ -997,7 +997,7 @@ break;
             ///</summary>
             static void versionFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
                 ///</summary>
@@ -1013,7 +1013,7 @@ break;
             ///</summary>
             static void sourceidFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
                 ///</summary>
@@ -1030,8 +1030,8 @@ break;
             ///<param name=""></param>
             static void errlogFunc(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
-                UNUSED_PARAMETER(argc);
-                UNUSED_PARAMETER(context);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(context);
                 io.sqlite3_log(vdbeapi.sqlite3_value_int(argv[0]), "%s", vdbeapi.sqlite3_value_text(argv[1]));
             }
             ///<summary>
@@ -1045,7 +1045,7 @@ break;
             {
                 string zOptName;
                 Debug.Assert(argc == 1);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 ///
                 ///<summary>
                 ///</summary>
@@ -1069,7 +1069,7 @@ break;
             {
                 int n;
                 Debug.Assert(argc == 1);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 ///
                 ///<summary>
                 ///</summary>
@@ -1117,7 +1117,7 @@ break;
             static void quoteFunc(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
                 Debug.Assert(argc == 1);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
                     case SQLITE_INTEGER:
@@ -1212,7 +1212,7 @@ break;
                 byte[] pBlob;
                 //string zHex, z;
                 Debug.Assert(argc == 1);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 pBlob = vdbeapi.sqlite3_value_blob(argv[0]);
                 n = vdbeapi.sqlite3_value_bytes(argv[0]);
                 Debug.Assert(n == (pBlob == null ? 0 : pBlob.Length));
@@ -1244,10 +1244,10 @@ break;
                 i64 n;
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
                 Debug.Assert(argc == 1);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 n = vdbeapi.sqlite3_value_int64(argv[0]);
-                testcase(n == db.aLimit[SQLITE_LIMIT_LENGTH]);
-                testcase(n == db.aLimit[SQLITE_LIMIT_LENGTH] + 1);
+                sqliteinth.testcase(n == db.aLimit[SQLITE_LIMIT_LENGTH]);
+                sqliteinth.testcase(n == db.aLimit[SQLITE_LIMIT_LENGTH] + 1);
                 if (n > db.aLimit[SQLITE_LIMIT_LENGTH])
                 {
                     context.sqlite3_result_error_toobig();
@@ -1317,7 +1317,7 @@ break;
                 ///Loop counters 
                 ///</summary>
                 Debug.Assert(argc == 3);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 zStr = vdbeapi.sqlite3_value_text(argv[0]);
                 if (zStr == null)
                     return;
@@ -1367,8 +1367,8 @@ break;
                     //    u8 *zOld;
                     // sqlite3 db = vdbeapi.sqlite3_context_db_handle( context );
                     //    nOut += nRep - nPattern;
-                    //testcase( nOut-1==db->aLimit[SQLITE_LIMIT_LENGTH] );
-                    //testcase( nOut-2==db->aLimit[SQLITE_LIMIT_LENGTH] );
+                    //sqliteinth.testcase( nOut-1==db->aLimit[SQLITE_LIMIT_LENGTH] );
+                    //sqliteinth.testcase( nOut-2==db->aLimit[SQLITE_LIMIT_LENGTH] );
                     //if( nOut-1>db->aLimit[SQLITE_LIMIT_LENGTH] ){
                     //      sqlite3_result_error_toobig(context);
                     //      sqlite3_free(zOut);
@@ -1503,7 +1503,7 @@ break;
                             int iz = 0;
                             for (nChar = 0; iz < zBytes.Length; nChar++)
                             {
-                                SQLITE_SKIP_UTF8(zBytes, ref iz);
+                                sqliteinth.SQLITE_SKIP_UTF8(zBytes, ref iz);
                             }
                             if (nChar > 0)
                             {
@@ -1518,7 +1518,7 @@ break;
                                 int iz1 = 0;
                                 for (int ii = 0; ii < nChar; ii++)
                                 {
-                                    SQLITE_SKIP_UTF8(zBytes, ref iz1);
+                                    sqliteinth.SQLITE_SKIP_UTF8(zBytes, ref iz1);
                                     aLen[ii] = iz1 - iz0;
                                     azChar[ii] = new byte[aLen[ii]];
                                     Buffer.BlockCopy(zBytes, iz0, azChar[ii], 0, azChar[ii].Length);
@@ -1680,7 +1680,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
                 SumCtx p;
                 int type;
                 Debug.Assert(argc == 1);
-                UNUSED_PARAMETER(argc);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 Mem pMem = vdbeapi.sqlite3_aggregate_context(context, 1);
                 //sizeof(*p));
                 if (pMem._SumCtx == null)
@@ -1831,7 +1831,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             {
                 Mem pArg = (Mem)argv[0];
                 Mem pBest;
-                UNUSED_PARAMETER(NotUsed);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 if (vdbeapi.sqlite3_value_type(argv[0]) == SQLITE_NULL)
                     return;
                 pBest = (Mem)vdbeapi.sqlite3_aggregate_context(context, 1);
@@ -1871,7 +1871,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 pRes = (sqlite3_value)vdbeapi.sqlite3_aggregate_context(context, 0);
                 if (pRes != null)
                 {
-                    if (ALWAYS(pRes.flags != 0))
+                    if (Sqlite3.ALWAYS(pRes.flags != 0))
                     {
                         context.sqlite3_result_value(pRes);
                     }
@@ -2019,13 +2019,13 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             /// Set the LIKEOPT flag on the 2-argument function with the given name.
             ///
             ///</summary>
-            static void setLikeOptFlag(sqlite3 db, string zName, int flagVal)
+            static void setLikeOptFlag(sqlite3 db, string zName, FuncFlags flagVal)
             {
                 FuncDef pDef;
                 pDef = sqlite3FindFunction(db, zName, StringExtensions.sqlite3Strlen30(zName), 2, SqliteEncoding.UTF8, 0);
-                if (ALWAYS(pDef != null))
+                if (Sqlite3.ALWAYS(pDef != null))
                 {
-                    pDef.flags = (byte)flagVal;
+                    pDef.flags = flagVal;
                 }
             }
             ///<summary>
@@ -2048,8 +2048,8 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 sqlite3CreateFunc(db, "like", 2, SqliteEncoding.UTF8, pInfo, (dxFunc)likeFunc, null, null, null);
                 sqlite3CreateFunc(db, "like", 3, SqliteEncoding.UTF8, pInfo, (dxFunc)likeFunc, null, null, null);
                 sqlite3CreateFunc(db, "glob", 2, SqliteEncoding.UTF8, globInfo, (dxFunc)likeFunc, null, null, null);
-                setLikeOptFlag(db, "glob", SQLITE_FUNC_LIKE | SQLITE_FUNC_CASE);
-                setLikeOptFlag(db, "like", caseSensitive != 0 ? (SQLITE_FUNC_LIKE | SQLITE_FUNC_CASE) : SQLITE_FUNC_LIKE);
+                setLikeOptFlag(db, "glob", FuncFlags.SQLITE_FUNC_LIKE | FuncFlags.SQLITE_FUNC_CASE);
+                setLikeOptFlag(db, "like", caseSensitive != 0 ? (FuncFlags.SQLITE_FUNC_LIKE | FuncFlags.SQLITE_FUNC_CASE) : FuncFlags.SQLITE_FUNC_LIKE);
             }
             ///<summary>
             /// pExpr points to an expression which implements a function.  If
@@ -2066,9 +2066,9 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 {
                     return false;
                 }
-                Debug.Assert(!pExpr.ExprHasProperty(EP_xIsSelect));
+                Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
                 pDef = sqlite3FindFunction(db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), 2, SqliteEncoding.UTF8, 0);
-                if (NEVER(pDef == null) || (pDef.flags & SQLITE_FUNC_LIKE) == 0)
+                if (NEVER(pDef == null) || (pDef.flags & FuncFlags.SQLITE_FUNC_LIKE) == 0)
                 {
                     return false;
                 }
@@ -2086,7 +2086,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 // Debug.Assert((char*)&likeInfoAlt == (char*)&likeInfoAlt.matchAll);
                 // Debug.Assert(&((char*)&likeInfoAlt)[1] == (char*)&likeInfoAlt.matchOne);
                 // Debug.Assert(&((char*)&likeInfoAlt)[2] == (char*)&likeInfoAlt.matchSet);
-                pIsNocase = (pDef.flags & SQLITE_FUNC_CASE) == 0;
+                pIsNocase = (pDef.flags & FuncFlags.SQLITE_FUNC_CASE) == 0;
                 return true;
             }
             ///
@@ -2111,70 +2111,70 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 ///<param name="are read">only after initialization is complete.</param>
                 ///<param name=""></param>
                 FuncDef[] aBuiltinFunc = {
-				FUNCTION("ltrim",1,1,0,trimFunc),
-				FUNCTION("ltrim",2,1,0,trimFunc),
-				FUNCTION("rtrim",1,2,0,trimFunc),
-				FUNCTION("rtrim",2,2,0,trimFunc),
-				FUNCTION("trim",1,3,0,trimFunc),
-				FUNCTION("trim",2,3,0,trimFunc),
-				FUNCTION("min",-1,0,1,minmaxFunc),
-				FUNCTION("min",0,0,1,null),
-				AGGREGATE("min",1,0,1,minmaxStep,minMaxFinalize),
-				FUNCTION("max",-1,1,1,minmaxFunc),
-				FUNCTION("max",0,1,1,null),
-				AGGREGATE("max",1,1,1,minmaxStep,minMaxFinalize),
-				FUNCTION("typeof",1,0,0,typeofFunc),
-				FUNCTION("length",1,0,0,lengthFunc),
-				FUNCTION("substr",2,0,0,substrFunc),
-				FUNCTION("substr",3,0,0,substrFunc),
-				FUNCTION("abs",1,0,0,absFunc),
-				#if !SQLITE_OMIT_FLOATING_POINT
-				FUNCTION("round",1,0,0,roundFunc),
-				FUNCTION("round",2,0,0,roundFunc),
-				#endif
-				FUNCTION("upper",1,0,0,upperFunc),
-				FUNCTION("lower",1,0,0,lowerFunc),
-				FUNCTION("coalesce",1,0,0,null),
-				FUNCTION("coalesce",0,0,0,null),
+				    FuncDef.FUNCTION("ltrim",1,1,0,trimFunc),
+				    FuncDef.FUNCTION("ltrim",2,1,0,trimFunc),
+				    FuncDef.FUNCTION("rtrim",1,2,0,trimFunc),
+				    FuncDef.FUNCTION("rtrim",2,2,0,trimFunc),
+				    FuncDef.FUNCTION("trim",1,3,0,trimFunc),
+				    FuncDef.FUNCTION("trim",2,3,0,trimFunc),
+				    FuncDef.FUNCTION("min",-1,0,1,minmaxFunc),
+				    FuncDef.FUNCTION("min",0,0,1,null),
+				    FuncDef.AGGREGATE("min",1,0,1,minmaxStep,minMaxFinalize),
+				    FuncDef.FUNCTION("max",-1,1,1,minmaxFunc),
+				    FuncDef.FUNCTION("max",0,1,1,null),
+				    FuncDef.AGGREGATE("max",1,1,1,minmaxStep,minMaxFinalize),
+				    FuncDef.FUNCTION("typeof",1,0,0,typeofFunc),
+				    FuncDef.FUNCTION("length",1,0,0,lengthFunc),
+				    FuncDef.FUNCTION("substr",2,0,0,substrFunc),
+				    FuncDef.FUNCTION("substr",3,0,0,substrFunc),
+				    FuncDef.FUNCTION("abs",1,0,0,absFunc),
+				    #if !SQLITE_OMIT_FLOATING_POINT
+				    FuncDef.FUNCTION("round",1,0,0,roundFunc),
+				    FuncDef.FUNCTION("round",2,0,0,roundFunc),
+				    #endif
+				    FuncDef.FUNCTION("upper",1,0,0,upperFunc),
+				    FuncDef.FUNCTION("lower",1,0,0,lowerFunc),
+				    FuncDef.FUNCTION("coalesce",1,0,0,null),
+				    FuncDef.FUNCTION("coalesce",0,0,0,null),
 				///
 				///<summary>
 				///</summary>
 				///<param name="FUNCTION(coalesce,          ">1, 0, 0, ifnullFunc       ), </param>
 				// use versionFunc here just for a dummy placeholder
-				new FuncDef(-1,SqliteEncoding.UTF8,SQLITE_FUNC_COALESCE,null,null,versionFunc,null,null,"coalesce",null,null),
-				FUNCTION("hex",1,0,0,hexFunc),
+				new FuncDef(-1,SqliteEncoding.UTF8,FuncFlags.SQLITE_FUNC_COALESCE,null,null,versionFunc,null,null,"coalesce",null,null),
+				FuncDef.FUNCTION("hex",1,0,0,hexFunc),
 				///
 				///<summary>
 				///FUNCTION(ifnull,             2, 0, 0, ifnullFunc       ), 
 				///</summary>
 				// use versionFunc here just for a dummy placeholder
-				new FuncDef(2,SqliteEncoding.UTF8,SQLITE_FUNC_COALESCE,null,null,versionFunc,null,null,"ifnull",null,null),
-				FUNCTION("random",0,0,0,randomFunc),
-				FUNCTION("randomblob",1,0,0,randomBlob),
-				FUNCTION("nullif",2,0,1,nullifFunc),
-				FUNCTION("sqlite_version",0,0,0,versionFunc),
-				FUNCTION("sqlite_source_id",0,0,0,sourceidFunc),
-				FUNCTION("sqlite_log",2,0,0,errlogFunc),
+				new FuncDef(2,SqliteEncoding.UTF8,FuncFlags.SQLITE_FUNC_COALESCE,null,null,versionFunc,null,null,"ifnull",null,null),
+				FuncDef.FUNCTION("random",0,0,0,randomFunc),
+				FuncDef.FUNCTION("randomblob",1,0,0,randomBlob),
+				FuncDef.FUNCTION("nullif",2,0,1,nullifFunc),
+				FuncDef.FUNCTION("sqlite_version",0,0,0,versionFunc),
+				FuncDef.FUNCTION("sqlite_source_id",0,0,0,sourceidFunc),
+				FuncDef.FUNCTION("sqlite_log",2,0,0,errlogFunc),
 				#if !SQLITE_OMIT_COMPILEOPTION_DIAGS
-				FUNCTION("sqlite_compileoption_used",1,0,0,compileoptionusedFunc),
-				FUNCTION("sqlite_compileoption_get",1,0,0,compileoptiongetFunc),
+				FuncDef.FUNCTION("sqlite_compileoption_used",1,0,0,compileoptionusedFunc),
+				FuncDef.FUNCTION("sqlite_compileoption_get",1,0,0,compileoptiongetFunc),
 				#endif
-				FUNCTION("quote",1,0,0,quoteFunc),
-				FUNCTION("last_insert_rowid",0,0,0,last_insert_rowid),
-				FUNCTION("changes",0,0,0,changes),
-				FUNCTION("total_changes",0,0,0,total_changes),
-				FUNCTION("replace",3,0,0,replaceFunc),
-				FUNCTION("zeroblob",1,0,0,zeroblobFunc),
+				FuncDef.FUNCTION("quote",1,0,0,quoteFunc),
+				FuncDef.FUNCTION("last_insert_rowid",0,0,0,last_insert_rowid),
+				FuncDef.FUNCTION("changes",0,0,0,changes),
+				FuncDef.FUNCTION("total_changes",0,0,0,total_changes),
+				FuncDef.FUNCTION("replace",3,0,0,replaceFunc),
+				FuncDef.FUNCTION("zeroblob",1,0,0,zeroblobFunc),
 				#if SQLITE_SOUNDEX
 																																																																																				FUNCTION("soundex",            1, 0, 0, soundexFunc      ),
 #endif
 				#if !SQLITE_OMIT_LOAD_EXTENSION
-				FUNCTION("load_extension",1,0,0,loadExt),
-				FUNCTION("load_extension",2,0,0,loadExt),
+				FuncDef.FUNCTION("load_extension",1,0,0,loadExt),
+				FuncDef.FUNCTION("load_extension",2,0,0,loadExt),
 				#endif
-				AGGREGATE("sum",1,0,0,sumStep,sumFinalize),
-				AGGREGATE("total",1,0,0,sumStep,totalFinalize),
-				AGGREGATE("avg",1,0,0,sumStep,avgFinalize),
+				FuncDef.AGGREGATE("sum",1,0,0,sumStep,sumFinalize),
+				FuncDef.AGGREGATE("total",1,0,0,sumStep,totalFinalize),
+				FuncDef.AGGREGATE("avg",1,0,0,sumStep,avgFinalize),
 				///
 				///<summary>
 				///AGGREGATE("count",             0, 0, 0, countStep,       countFinalize  ), 
@@ -2183,19 +2183,19 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
 				///<summary>
 				///AGGREGATE(count,             0, 0, 0, countStep,       countFinalize  ), 
 				///</summary>
-				new FuncDef(0,SqliteEncoding.UTF8,SQLITE_FUNC_COUNT,null,null,null,countStep,countFinalize,"count",null,null),
-				AGGREGATE("count",1,0,0,countStep,countFinalize),
-				AGGREGATE("group_concat",1,0,0,groupConcatStep,groupConcatFinalize),
-				AGGREGATE("group_concat",2,0,0,groupConcatStep,groupConcatFinalize),
-				LIKEFUNC("glob",2,globInfo,SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
+				new FuncDef(0,SqliteEncoding.UTF8,FuncFlags.SQLITE_FUNC_COUNT,null,null,null,countStep,countFinalize,"count",null,null),
+				FuncDef.AGGREGATE("count",1,0,0,countStep,countFinalize),
+				FuncDef.AGGREGATE("group_concat",1,0,0,groupConcatStep,groupConcatFinalize),
+				FuncDef.AGGREGATE("group_concat",2,0,0,groupConcatStep,groupConcatFinalize),
+				FuncDef.LIKEFUNC("glob",2,globInfo,FuncFlags.SQLITE_FUNC_LIKE|FuncFlags.SQLITE_FUNC_CASE),
 				#if SQLITE_CASE_SENSITIVE_LIKE
-																																																																																				LIKEFUNC("like", 2, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
-LIKEFUNC("like", 3, likeInfoAlt, SQLITE_FUNC_LIKE|SQLITE_FUNC_CASE),
+																																																																																				LIKEFUNC("like", 2, likeInfoAlt, FuncFlags.SQLITE_FUNC_LIKE|FuncFlags.SQLITE_FUNC_CASE),
+LIKEFUNC("like", 3, likeInfoAlt, FuncFlags.SQLITE_FUNC_LIKE|FuncFlags.SQLITE_FUNC_CASE),
 #else
-				LIKEFUNC("like",2,likeInfoNorm,SQLITE_FUNC_LIKE),
-				LIKEFUNC("like",3,likeInfoNorm,SQLITE_FUNC_LIKE),
+				FuncDef.LIKEFUNC("like",2,likeInfoNorm,FuncFlags.SQLITE_FUNC_LIKE),
+				FuncDef.LIKEFUNC("like",3,likeInfoNorm,FuncFlags.SQLITE_FUNC_LIKE),
 				#endif
-				FUNCTION("regexp",2,0,0,_Custom.regexpFunc),
+				FuncDef.FUNCTION("regexp",2,0,0,_Custom.regexpFunc),
 			};
                 int i;
 #if SQLITE_OMIT_WSD
@@ -2205,7 +2205,7 @@ FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
                 FuncDefHash pHash = sqlite3GlobalFunctions;
                 FuncDef[] aFunc = aBuiltinFunc;
 #endif
-                for (i = 0; i < ArraySize(aBuiltinFunc); i++)
+                for (i = 0; i < Sqlite3.ArraySize(aBuiltinFunc); i++)
                 {
                     sqlite3FuncDefInsert(pHash, aFunc[i]);
                 }

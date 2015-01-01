@@ -165,7 +165,7 @@ namespace Community.CsharpSqlite {
 					elem=this.first;
 					count=(int)this.count;
 				}
-				while(count-->0&&ALWAYS(elem)) {
+				while(count-->0&&Sqlite3.ALWAYS(elem)) {
 					if(elem.nKey==nKey&&elem.pKey.Equals(pKey,StringComparison.InvariantCultureIgnoreCase)) {
 						return elem;
 					}

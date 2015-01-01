@@ -110,7 +110,7 @@ int sqlite3_blob_open(
 
     sqlite3BtreeEnterAll(db);
     pTab = build.sqlite3LocateTable(pParse, 0, zTable, zDb);
-    if( pTab && IsVirtual(pTab) ){
+    if( pTab && pTab.IsVirtual() ){
       pTab = 0;
       utilc.sqlite3ErrorMsg(pParse, "cannot open virtual table: %s", zTable);
     }
@@ -338,7 +338,7 @@ static int blobReadWrite(
   Vdbe *v;
   sqlite3 db;
 
-  if( p==0 ) return SQLITE_MISUSE_BKPT();
+  if( p==0 ) return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
   db = p->db;
   sqlite3_mutex_enter(db->mutex);
   v = (Vdbe)p->pStmt;

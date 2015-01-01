@@ -7,7 +7,7 @@ namespace Community.CsharpSqlite
 {
     public static class SelectExtensions
     {
-        public static void heightOfSelect(this Sqlite3.Select _this,ref int pnHeight)
+        public static void heightOfSelect(this Select _this,ref int pnHeight)
         {
             if (_this != null)
             {

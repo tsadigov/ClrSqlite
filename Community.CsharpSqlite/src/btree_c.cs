@@ -101,7 +101,7 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
 /// sqlite3_open(), sqlite3_open16(), or sqlite3_open_v2().
 ///</summary>
 int sqlite3_enable_shared_cache(int enable){
-sqlite3GlobalConfig.sharedCacheEnabled = enable;
+Sqlite3.sqliteinth.sqlite3GlobalConfig.sharedCacheEnabled = enable;
 return SQLITE_OK;
 }
 #endif
@@ -453,7 +453,7 @@ pLock.eLock = READ_LOCK;
 #if SQLITE_DEBUG
 																																																		static bool cursorHoldsMutex( BtCursor p )
 {
-  return sqlite3_mutex_held( p.pBt.mutex );
+  return Sqlite3.sqlite3_mutex_held( p.pBt.mutex );
 }
 #else
 #endif
@@ -473,7 +473,7 @@ pCur.aOverflow = null;
 ///</summary>
 static void invalidateAllOverflowCache(BtShared pBt){
 BtCursor p;
-Debug.Assert( sqlite3_mutex_held(pBt.mutex) );
+Debug.Assert( Sqlite3.sqlite3_mutex_held(pBt.mutex) );
 for(p=pBt.pCursor; p!=null; p=p.pNext){
 invalidateOverflowCache(p);
 }
@@ -665,10 +665,10 @@ static u16 cellSize( MemPage pPage, int iCell )
             )
             {
                 int rc;
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 if (pgno > pBt.btreePagecount())
                 {
-                    rc = SQLITE_CORRUPT_BKPT();
+                    rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
                 else
                 {
@@ -682,7 +682,7 @@ static u16 cellSize( MemPage pPage, int iCell )
                         }
                     }
                 }
-                testcase(pgno == 0);
+                sqliteinth.testcase(pgno == 0);
                 Debug.Assert(pgno != 0 || rc == SQLITE_CORRUPT);
                 return rc;
             }
@@ -699,7 +699,7 @@ static u16 cellSize( MemPage pPage, int iCell )
                     //TODO -- find out why corrupt9 & diskfull fail on this tests 
                     //Debug.Assert(  PagerMethods.sqlite3PagerGetExtra ( pPage.pDbPage ) == pPage );
                     //Debug.Assert( sqlite3PagerGetData( pPage.pDbPage ) == pPage.aData );
-                    Debug.Assert(sqlite3_mutex_held(pPage.pBt.mutex));
+                    Debug.Assert(Sqlite3.sqlite3_mutex_held(pPage.pBt.mutex));
                     PagerMethods.sqlite3PagerUnref(pPage.pDbPage);
                 }
             }
@@ -718,7 +718,7 @@ static u16 cellSize( MemPage pPage, int iCell )
                 Debug.Assert(pData.sqlite3PagerPageRefcount() > 0);
                 if (pPage.isInit != 0)
                 {
-                    Debug.Assert(sqlite3_mutex_held(pPage.pBt.mutex));
+                    Debug.Assert(Sqlite3.sqlite3_mutex_held(pPage.pBt.mutex));
                     pPage.isInit = 0;
                     if (pData.sqlite3PagerPageRefcount() > 1)
                     {
@@ -742,7 +742,7 @@ static u16 cellSize( MemPage pPage, int iCell )
             {
                 BtShared pBt = (BtShared)pArg;
                 Debug.Assert(pBt.db != null);
-                Debug.Assert(sqlite3_mutex_held(pBt.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.db.mutex));
                 return sqlite3InvokeBusyHandler(pBt.db.busyHandler);
             }
 
@@ -770,10 +770,10 @@ if( GLOBAL(BtShared*,sqlite3SharedCacheList)==pBt ){
 GLOBAL(BtShared*,sqlite3SharedCacheList) = pBt.pNext;
 }else{
 pList = GLOBAL(BtShared*,sqlite3SharedCacheList);
-while( ALWAYS(pList) && pList.pNext!=pBt ){
+while( Sqlite3.ALWAYS(pList) && pList.pNext!=pBt ){
 pList=pList.pNext;
 }
-if( ALWAYS(pList) ){
+if( Sqlite3.ALWAYS(pList) ){
 pList.pNext = pBt.pNext;
 }
 }
@@ -820,7 +820,7 @@ return removed;
                 ///<summary>
                 ///Close all cursors opened via this handle.  
                 ///</summary>
-                Debug.Assert(sqlite3_mutex_held(p.db.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(p.db.mutex));
                 sqlite3BtreeEnter(p);
                 pCur = pBt.pCursor;
                 while (pCur != null)
@@ -1006,7 +1006,7 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
                 ///<summary>
                 ///Number of pages in the database according to hdr 
                 ///</summary>
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 Debug.Assert(pBt.pPage1 == null);
                 rc = pBt.pPager.sqlite3PagerSharedLock();
                 if (rc != SQLITE_OK)
@@ -1113,7 +1113,7 @@ rc = SQLITE_NOTADB;
                     }
                     if ((pBt.db.flags & SQLITE_RecoveryMode) == 0 && nPage > nPageFile)
                     {
-                        rc = SQLITE_CORRUPT_BKPT();
+                        rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                         goto page1_init_failed;
                     }
                     if (usableSize < 480)
@@ -1167,7 +1167,7 @@ rc = SQLITE_NOTADB;
             ///<param name="If there is a transaction in progress, this routine is a no">op.</param>
             public static void unlockBtreeIfUnused(BtShared pBt)
             {
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 Debug.Assert(pBt.pCursor == null || pBt.inTransaction > TransType.TRANS_NONE);
                 if (pBt.inTransaction == TransType.TRANS_NONE && pBt.pPage1 != null)
                 {
@@ -1188,7 +1188,7 @@ rc = SQLITE_NOTADB;
                 MemPage pP1;
                 byte[] data;
                 int rc;
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 if (pBt.nPage > 0)
                 {
                     return SQLITE_OK;
@@ -1306,7 +1306,7 @@ rc = SQLITE_NOTADB;
                 Pager pPager = pBt.pPager;
                 int rc;
                 Debug.Assert(eType == PTRMAP_OVERFLOW2 || eType == PTRMAP_OVERFLOW1 || eType == PTRMAP_BTREE || eType == PTRMAP_ROOTPAGE);
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 Debug.Assert(pDbPage.pBt == pBt);
                 ///
                 ///<summary>
@@ -1411,7 +1411,7 @@ rc = SQLITE_NOTADB;
                 ///</summary>
                 ///<param name="Number of pages still on the free">list </param>
                 int rc;
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 Debug.Assert(iLastPg > nFin);
                 if (!PTRMAP_ISPAGE(pBt, iLastPg) && iLastPg != PENDING_BYTE_PAGE(pBt))
                 {
@@ -1429,7 +1429,7 @@ rc = SQLITE_NOTADB;
                     }
                     if (eType == PTRMAP_ROOTPAGE)
                     {
-                        return SQLITE_CORRUPT_BKPT();
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
                     if (eType == PTRMAP_FREEPAGE)
                     {
@@ -1558,7 +1558,7 @@ rc = SQLITE_NOTADB;
 #else
                 int nRef = 0;
 #endif
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 pBt.invalidateAllOverflowCache();
                 Debug.Assert(pBt.autoVacuum);
                 if (!pBt.incrVacuum)
@@ -1603,7 +1603,7 @@ rc = SQLITE_NOTADB;
                         ///<param name="is either a pointer">byte page. If one</param>
                         ///<param name="is encountered, this indicates corruption.">is encountered, this indicates corruption.</param>
                         ///<param name=""></param>
-                        return SQLITE_CORRUPT_BKPT();
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
                     nFree = Converter.sqlite3Get4byte(pBt.pPage1.aData, 36);
                     nEntry = (int)pBt.usableSize / 5;
@@ -1618,7 +1618,7 @@ rc = SQLITE_NOTADB;
                         nFin--;
                     }
                     if (nFin > nOrig)
-                        return SQLITE_CORRUPT_BKPT();
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
                     for (iFree = nOrig; iFree > nFin && rc == SQLITE_OK; iFree--)
                     {
                         rc = incrVacuumStep(pBt, nFin, iFree);
@@ -1783,14 +1783,14 @@ static int countWriteCursors( BtShared pBt )
             ///<param name="using the sqlite3BtreeSavepoint() function.">using the sqlite3BtreeSavepoint() function.</param>
             ///
             ///<summary>
-            ///The second argument to this function, op, is always SAVEPOINT_ROLLBACK
+            ///The second argument to this function, op, is always sqliteinth.SAVEPOINT_ROLLBACK
             ///or SAVEPOINT_RELEASE. This function either releases or rolls back the
             ///savepoint identified by parameter iSavepoint, depending on the value
             ///of op.
             ///
             ///Normally, iSavepoint is greater than or equal to zero. However, if op is
             ///</summary>
-            ///<param name="SAVEPOINT_ROLLBACK, then iSavepoint may also be ">1. In this case the</param>
+            ///<param name="sqliteinth.SAVEPOINT_ROLLBACK, then iSavepoint may also be ">1. In this case the</param>
             ///<param name="contents of the entire transaction are rolled back. This is different">contents of the entire transaction are rolled back. This is different</param>
             ///<param name="from a normal transaction rollback, as no locks are released and the">from a normal transaction rollback, as no locks are released and the</param>
             ///<param name="transaction remains open.">transaction remains open.</param>
@@ -1979,7 +1979,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
                 MemPage pPage = null;
                 ppPage = null;
                 int rc = SQLITE_OK;
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 // Debug.Assert( pPgnoNext);
 #if !SQLITE_OMIT_AUTOVACUUM
                 ///
@@ -2394,14 +2394,14 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 ///<summary>
                 ///Total size of the database file 
                 ///</summary>
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 pPage1 = pBt.pPage1;
                 mxPage = pBt.btreePagecount();
                 n = Converter.sqlite3Get4byte(pPage1.aData, 36);
-                testcase(n == mxPage - 1);
+                sqliteinth.testcase(n == mxPage - 1);
                 if (n >= mxPage)
                 {
-                    return SQLITE_CORRUPT_BKPT();
+                    return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
                 if (n > 0)
                 {
@@ -2466,10 +2466,10 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         {
                             iTrunk = Converter.sqlite3Get4byte(pPage1.aData, 32);
                         }
-                        testcase(iTrunk == mxPage);
+                        sqliteinth.testcase(iTrunk == mxPage);
                         if (iTrunk > mxPage)
                         {
-                            rc = SQLITE_CORRUPT_BKPT();
+                            rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                         }
                         else
                         {
@@ -2513,7 +2513,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                 ///<summary>
                                 ///Value of k is out of range.  Database corruption 
                                 ///</summary>
-                                rc = SQLITE_CORRUPT_BKPT();
+                                rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                                 goto end_allocate_page;
 #if !SQLITE_OMIT_AUTOVACUUM
                             }
@@ -2571,10 +2571,10 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                         Pgno iNewTrunk = Converter.sqlite3Get4byte(pTrunk.aData, 8);
                                         if (iNewTrunk > mxPage)
                                         {
-                                            rc = SQLITE_CORRUPT_BKPT();
+                                            rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                                             goto end_allocate_page;
                                         }
-                                        testcase(iNewTrunk == mxPage);
+                                        sqliteinth.testcase(iNewTrunk == mxPage);
                                         rc = pBt.btreeGetPage(iNewTrunk, ref pNewTrunk, 0);
                                         if (rc != SQLITE_OK)
                                         {
@@ -2645,13 +2645,13 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                             closest = 0;
                                         }
                                         iPage = Converter.sqlite3Get4byte(aData, 8 + closest * 4);
-                                        testcase(iPage == mxPage);
+                                        sqliteinth.testcase(iPage == mxPage);
                                         if (iPage > mxPage)
                                         {
-                                            rc = SQLITE_CORRUPT_BKPT();
+                                            rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                                             goto end_allocate_page;
                                         }
-                                        testcase(iPage == mxPage);
+                                        sqliteinth.testcase(iPage == mxPage);
                                         if (0 == searchList || iPage == nearby)
                                         {
                                             int noContent;
@@ -2748,7 +2748,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                     if ((ppPage).pDbPage.sqlite3PagerPageRefcount() > 1)
                     {
                         BTreeMethods.releasePage(ppPage);
-                        return SQLITE_CORRUPT_BKPT();
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
                     (ppPage).isInit = 0;
                 }
@@ -2804,7 +2804,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 ///<summary>
                 ///</summary>
                 ///<param name="Initial number of pages on free">list </param>
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 Debug.Assert(iPage > 1);
                 Debug.Assert(null == pMemPage || pMemPage.pgno == iPage);
                 if (pMemPage != null)
@@ -2883,7 +2883,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                     Debug.Assert(pBt.usableSize > 32);
                     if (nLeaf > (u32)pBt.usableSize / 4 - 2)
                     {
-                        rc = SQLITE_CORRUPT_BKPT();
+                        rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                         goto freepage_out;
                     }
                     if (nLeaf < (u32)pBt.usableSize / 4 - 8)
@@ -2970,7 +2970,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 int rc;
                 int nOvfl;
                 u32 ovflPageSize;
-                Debug.Assert(sqlite3_mutex_held(pPage.pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pPage.pBt.mutex));
                 pPage.btreeParseCellPtr(pCell, ref info);
                 if (info.iOverflow == 0)
                 {
@@ -2997,7 +2997,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         ///overflow page. Therefore if ovflPgno<2 or past the end of the
                         ///file the database must be corrupt. 
                         ///</summary>
-                        return SQLITE_CORRUPT_BKPT();
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
                     if (nOvfl != 0)
                     {
@@ -3020,7 +3020,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         ///<param name="caller is iterating through or using in some other way, this">caller is iterating through or using in some other way, this</param>
                         ///<param name="can be problematic.">can be problematic.</param>
                         ///<param name=""></param>
-                        rc = SQLITE_CORRUPT_BKPT();
+                        rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
                     else
                     {
@@ -3294,7 +3294,7 @@ return rc;
                         rc = pBt.ptrmapGet(pgnoRoot, ref eType, ref iPtrPage);
                         if (eType == PTRMAP_ROOTPAGE || eType == PTRMAP_FREEPAGE)
                         {
-                            rc = SQLITE_CORRUPT_BKPT();
+                            rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                         }
                         if (rc != SQLITE_OK)
                         {
@@ -3404,10 +3404,10 @@ return rc;
                 int rc;
                 byte[] pCell;
                 int i;
-                Debug.Assert(sqlite3_mutex_held(pBt.mutex));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(pBt.mutex));
                 if (pgno > pBt.btreePagecount())
                 {
-                    return SQLITE_CORRUPT_BKPT();
+                    return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
                 rc = getAndInitPage(pBt, pgno, ref pPage);
                 if (rc != 0)
@@ -3703,7 +3703,7 @@ return rc;
 int sqlite3BtreePutData(BtCursor pCsr, u32 offset, u32 amt, void *z){
 int rc;
 Debug.Assert( cursorHoldsMutex(pCsr) );
-Debug.Assert( sqlite3_mutex_held(pCsr.pBtree.db.mutex) );
+Debug.Assert( Sqlite3.sqlite3_mutex_held(pCsr.pBtree.db.mutex) );
 Debug.Assert( pCsr.isIncrblobHandle );
 
 rc = restoreCursorPosition(pCsr);
@@ -3745,7 +3745,7 @@ return accessPayload(pCsr, offset, amt, (byte[] *)z, 1);
 */
 static void sqlite3BtreeCacheOverflow(BtCursor pCur){
 Debug.Assert( cursorHoldsMutex(pCur) );
-Debug.Assert( sqlite3_mutex_held(pCur.pBtree.db.mutex) );
+Debug.Assert( Sqlite3.sqlite3_mutex_held(pCur.pBtree.db.mutex) );
 invalidateOverflowCache(pCur)
 pCur.isIncrblobHandle = 1;
 }

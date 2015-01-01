@@ -24,8 +24,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
         ///<summary>
         /// An instance of this structure can hold a simple list of identifiers,
         /// such as the list "a,b,c" in the following statements:
@@ -83,4 +81,3 @@ namespace Community.CsharpSqlite
         };
 
     }
-}

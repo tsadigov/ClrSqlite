@@ -135,11 +135,11 @@ namespace Community.CsharpSqlite
 		//#define SQLITE_VERSION        "3.7.7"
 		//#define SQLITE_VERSION_NUMBER 3007007
 		//#define SQLITE_SOURCE_ID      "2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2"
-		private const string SQLITE_VERSION = "3.7.7(C#)";
+		public const string SQLITE_VERSION = "3.7.7(C#)";
 
-		private const int SQLITE_VERSION_NUMBER = 300700701;
+		public const int SQLITE_VERSION_NUMBER = 300700701;
 
-		private const string SQLITE_SOURCE_ID = "Ported to C# from 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2";
+		public const string SQLITE_SOURCE_ID = "Ported to C# from 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2";
 
 		///
 ///<summary>
@@ -576,61 +576,61 @@ namespace Community.CsharpSqlite
 		//#define SQLITE_CORRUPT_VTAB            (SQLITE_CORRUPT | (1<<8))
 		//#define SQLITE_READONLY_RECOVERY       (SQLITE_READONLY | (1<<8))
 		//#define SQLITE_READONLY_CANTLOCK       (SQLITE_READONLY | (2<<8))
-		private const int SQLITE_IOERR_READ = (SQLITE_IOERR | (1 << 8));
+		public const int SQLITE_IOERR_READ = (SQLITE_IOERR | (1 << 8));
 
-		private const int SQLITE_IOERR_SHORT_READ = (SQLITE_IOERR | (2 << 8));
+		public const int SQLITE_IOERR_SHORT_READ = (SQLITE_IOERR | (2 << 8));
 
-		private const int SQLITE_IOERR_WRITE = (SQLITE_IOERR | (3 << 8));
+		public const int SQLITE_IOERR_WRITE = (SQLITE_IOERR | (3 << 8));
 
-		private const int SQLITE_IOERR_FSYNC = (SQLITE_IOERR | (4 << 8));
+		public const int SQLITE_IOERR_FSYNC = (SQLITE_IOERR | (4 << 8));
 
-		private const int SQLITE_IOERR_DIR_FSYNC = (SQLITE_IOERR | (5 << 8));
+		public const int SQLITE_IOERR_DIR_FSYNC = (SQLITE_IOERR | (5 << 8));
 
-		private const int SQLITE_IOERR_TRUNCATE = (SQLITE_IOERR | (6 << 8));
+		public const int SQLITE_IOERR_TRUNCATE = (SQLITE_IOERR | (6 << 8));
 
-		private const int SQLITE_IOERR_FSTAT = (SQLITE_IOERR | (7 << 8));
+		public const int SQLITE_IOERR_FSTAT = (SQLITE_IOERR | (7 << 8));
 
-		private const int SQLITE_IOERR_UNLOCK = (SQLITE_IOERR | (8 << 8));
+		public const int SQLITE_IOERR_UNLOCK = (SQLITE_IOERR | (8 << 8));
 
-		private const int SQLITE_IOERR_RDLOCK = (SQLITE_IOERR | (9 << 8));
+		public const int SQLITE_IOERR_RDLOCK = (SQLITE_IOERR | (9 << 8));
 
-		private const int SQLITE_IOERR_DELETE = (SQLITE_IOERR | (10 << 8));
+		public const int SQLITE_IOERR_DELETE = (SQLITE_IOERR | (10 << 8));
 
-		private const int SQLITE_IOERR_BLOCKED = (SQLITE_IOERR | (11 << 8));
+		public const int SQLITE_IOERR_BLOCKED = (SQLITE_IOERR | (11 << 8));
 
-		private const int SQLITE_IOERR_NOMEM = (SQLITE_IOERR | (12 << 8));
+		public const int SQLITE_IOERR_NOMEM = (SQLITE_IOERR | (12 << 8));
 
-		private const int SQLITE_IOERR_ACCESS = (SQLITE_IOERR | (13 << 8));
+		public const int SQLITE_IOERR_ACCESS = (SQLITE_IOERR | (13 << 8));
 
-		private const int SQLITE_IOERR_CHECKRESERVEDLOCK = (SQLITE_IOERR | (14 << 8));
+		public const int SQLITE_IOERR_CHECKRESERVEDLOCK = (SQLITE_IOERR | (14 << 8));
 
-		private const int SQLITE_IOERR_LOCK = (SQLITE_IOERR | (15 << 8));
+		public const int SQLITE_IOERR_LOCK = (SQLITE_IOERR | (15 << 8));
 
-		private const int SQLITE_IOERR_CLOSE = (SQLITE_IOERR | (16 << 8));
+		public const int SQLITE_IOERR_CLOSE = (SQLITE_IOERR | (16 << 8));
 
-		private const int SQLITE_IOERR_DIR_CLOSE = (SQLITE_IOERR | (17 << 8));
+		public const int SQLITE_IOERR_DIR_CLOSE = (SQLITE_IOERR | (17 << 8));
 
-		private const int SQLITE_IOERR_SHMOPEN = (SQLITE_IOERR | (18 << 8));
+		public const int SQLITE_IOERR_SHMOPEN = (SQLITE_IOERR | (18 << 8));
 
-		private const int SQLITE_IOERR_SHMSIZE = (SQLITE_IOERR | (19 << 8));
+		public const int SQLITE_IOERR_SHMSIZE = (SQLITE_IOERR | (19 << 8));
 
-		private const int SQLITE_IOERR_SHMLOCK = (SQLITE_IOERR | (20 << 8));
+		public const int SQLITE_IOERR_SHMLOCK = (SQLITE_IOERR | (20 << 8));
 
-		private const int SQLITE_IOERR_SHMMAP = (SQLITE_IOERR | (21 << 8));
+		public const int SQLITE_IOERR_SHMMAP = (SQLITE_IOERR | (21 << 8));
 
-		private const int SQLITE_IOERR_SEEK = (SQLITE_IOERR | (22 << 8));
+		public const int SQLITE_IOERR_SEEK = (SQLITE_IOERR | (22 << 8));
 
-		private const int SQLITE_LOCKED_SHAREDCACHE = (SQLITE_LOCKED | (1 << 8));
+		public const int SQLITE_LOCKED_SHAREDCACHE = (SQLITE_LOCKED | (1 << 8));
 
-		private const int SQLITE_BUSY_RECOVERY = (SQLITE_BUSY | (1 << 8));
+		public const int SQLITE_BUSY_RECOVERY = (SQLITE_BUSY | (1 << 8));
 
-		private const int SQLITE_CANTOPEN_NOTEMPDIR = (SQLITE_CANTOPEN | (1 << 8));
+		public const int SQLITE_CANTOPEN_NOTEMPDIR = (SQLITE_CANTOPEN | (1 << 8));
 
-		private const int SQLITE_CORRUPT_VTAB = (SQLITE_CORRUPT | (1 << 8));
+		public const int SQLITE_CORRUPT_VTAB = (SQLITE_CORRUPT | (1 << 8));
 
-		private const int SQLITE_READONLY_RECOVERY = (SQLITE_READONLY | (1 << 8));
+		public const int SQLITE_READONLY_RECOVERY = (SQLITE_READONLY | (1 << 8));
 
-		private const int SQLITE_READONLY_CANTLOCK = (SQLITE_READONLY | (2 << 8));
+		public const int SQLITE_READONLY_CANTLOCK = (SQLITE_READONLY | (2 << 8));
 
 		///
 ///<summary>
@@ -739,29 +739,29 @@ namespace Community.CsharpSqlite
 		//#define SQLITE_IOCAP_SAFE_APPEND            0x00000200
 		//#define SQLITE_IOCAP_SEQUENTIAL             0x00000400
 		//#define SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN  0x00000800
-		private const int SQLITE_IOCAP_ATOMIC = 0x00000001;
+		public const int SQLITE_IOCAP_ATOMIC = 0x00000001;
 
-		private const int SQLITE_IOCAP_ATOMIC512 = 0x00000002;
+		public const int SQLITE_IOCAP_ATOMIC512 = 0x00000002;
 
-		private const int SQLITE_IOCAP_ATOMIC1K = 0x00000004;
+		public const int SQLITE_IOCAP_ATOMIC1K = 0x00000004;
 
-		private const int SQLITE_IOCAP_ATOMIC2K = 0x00000008;
+		public const int SQLITE_IOCAP_ATOMIC2K = 0x00000008;
 
-		private const int SQLITE_IOCAP_ATOMIC4K = 0x00000010;
+		public const int SQLITE_IOCAP_ATOMIC4K = 0x00000010;
 
-		private const int SQLITE_IOCAP_ATOMIC8K = 0x00000020;
+		public const int SQLITE_IOCAP_ATOMIC8K = 0x00000020;
 
-		private const int SQLITE_IOCAP_ATOMIC16K = 0x00000040;
+		public const int SQLITE_IOCAP_ATOMIC16K = 0x00000040;
 
-		private const int SQLITE_IOCAP_ATOMIC32K = 0x00000080;
+		public const int SQLITE_IOCAP_ATOMIC32K = 0x00000080;
 
-		private const int SQLITE_IOCAP_ATOMIC64K = 0x00000100;
+		public const int SQLITE_IOCAP_ATOMIC64K = 0x00000100;
 
-		private const int SQLITE_IOCAP_SAFE_APPEND = 0x00000200;
+		public const int SQLITE_IOCAP_SAFE_APPEND = 0x00000200;
 
-		private const int SQLITE_IOCAP_SEQUENTIAL = 0x00000400;
+		public const int SQLITE_IOCAP_SEQUENTIAL = 0x00000400;
 
-		private const int SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN = 0x00000800;
+		public const int SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN = 0x00000800;
 
 		///
 ///<summary>
@@ -778,15 +778,15 @@ namespace Community.CsharpSqlite
 		//#define SQLITE_LOCK_RESERVED      2
 		//#define SQLITE_LOCK_PENDING       3
 		//#define SQLITE_LOCK_EXCLUSIVE     4
-		private const int SQLITE_LOCK_NONE = 0;
+		public const int SQLITE_LOCK_NONE = 0;
 
-		private const int SQLITE_LOCK_SHARED = 1;
+		public const int SQLITE_LOCK_SHARED = 1;
 
-		private const int SQLITE_LOCK_RESERVED = 2;
+		public const int SQLITE_LOCK_RESERVED = 2;
 
-		private const int SQLITE_LOCK_PENDING = 3;
+		public const int SQLITE_LOCK_PENDING = 3;
 
-		private const int SQLITE_LOCK_EXCLUSIVE = 4;
+		public const int SQLITE_LOCK_EXCLUSIVE = 4;
 
 		///
 ///<summary>
@@ -820,11 +820,11 @@ namespace Community.CsharpSqlite
 		//#define SQLITE_SYNC_NORMAL        0x00002
 		//#define SQLITE_SYNC_FULL          0x00003
 		//#define SQLITE_SYNC_DATAONLY      0x00010
-		private const int SQLITE_SYNC_NORMAL = 0x00002;
+		public const int SQLITE_SYNC_NORMAL = 0x00002;
 
-		private const int SQLITE_SYNC_FULL = 0x00003;
+		public const int SQLITE_SYNC_FULL = 0x00003;
 
-		private const int SQLITE_SYNC_DATAONLY = 0x00010;
+		public const int SQLITE_SYNC_DATAONLY = 0x00010;
 
 		
 
@@ -855,7 +855,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 		//#define SQLITE_SHM_NLOCK        8
-		private const int SQLITE_SHM_NLOCK = 8;
+		public const int SQLITE_SHM_NLOCK = 8;
 
 		///
 ///<summary>
@@ -1128,11 +1128,11 @@ namespace Community.CsharpSqlite
 		//#define SQLITE_DBCONFIG_LOOKASIDE       1001  /* void* int int */
 		//#define SQLITE_DBCONFIG_ENABLE_FKEY     1002  /* int int* */
 		//#define SQLITE_DBCONFIG_ENABLE_TRIGGER  1003  /* int int* */
-		private const int SQLITE_DBCONFIG_LOOKASIDE = 1001;
+		public const int SQLITE_DBCONFIG_LOOKASIDE = 1001;
 
-		private const int SQLITE_DBCONFIG_ENABLE_FKEY = 1002;
+		public const int SQLITE_DBCONFIG_ENABLE_FKEY = 1002;
 
-		private const int SQLITE_DBCONFIG_ENABLE_TRIGGER = 1003;
+		public const int SQLITE_DBCONFIG_ENABLE_TRIGGER = 1003;
 
 		///
 ///<summary>
@@ -1865,9 +1865,9 @@ namespace Community.CsharpSqlite
 
 		//#define SQLITE_DENY   1   /* Abort the SQL statement with an error */
 		//#define SQLITE_IGNORE 2   /* Don't allow access, but don't generate an error */
-		private const int SQLITE_DENY = 1;
+		public const int SQLITE_DENY = 1;
 
-		private const int SQLITE_IGNORE = 2;
+		public const int SQLITE_IGNORE = 2;
 
 		///
 ///<summary>
@@ -1929,71 +1929,71 @@ namespace Community.CsharpSqlite
 		//#define SQLITE_FUNCTION             31   /* NULL            Function Name   */
 		//#define SQLITE_SAVEPOINT            32   /* Operation       Savepoint Name  */
 		//#define SQLITE_COPY                  0   /* No longer used */
-		private const int SQLITE_CREATE_INDEX = 1;
+		public const int SQLITE_CREATE_INDEX = 1;
 
-		private const int SQLITE_CREATE_TABLE = 2;
+		public const int SQLITE_CREATE_TABLE = 2;
 
-		private const int SQLITE_CREATE_TEMP_INDEX = 3;
+		public const int SQLITE_CREATE_TEMP_INDEX = 3;
 
-		private const int SQLITE_CREATE_TEMP_TABLE = 4;
+		public const int SQLITE_CREATE_TEMP_TABLE = 4;
 
-		private const int SQLITE_CREATE_TEMP_TRIGGER = 5;
+		public const int SQLITE_CREATE_TEMP_TRIGGER = 5;
 
-		private const int SQLITE_CREATE_TEMP_VIEW = 6;
+		public const int SQLITE_CREATE_TEMP_VIEW = 6;
 
-		private const int SQLITE_CREATE_TRIGGER = 7;
+		public const int SQLITE_CREATE_TRIGGER = 7;
 
-		private const int SQLITE_CREATE_VIEW = 8;
+		public const int SQLITE_CREATE_VIEW = 8;
 
-		private const int SQLITE_DELETE = 9;
+		public const int SQLITE_DELETE = 9;
 
-		private const int SQLITE_DROP_INDEX = 10;
+		public const int SQLITE_DROP_INDEX = 10;
 
-		private const int SQLITE_DROP_TABLE = 11;
+		public const int SQLITE_DROP_TABLE = 11;
 
-		private const int SQLITE_DROP_TEMP_INDEX = 12;
+		public const int SQLITE_DROP_TEMP_INDEX = 12;
 
-		private const int SQLITE_DROP_TEMP_TABLE = 13;
+		public const int SQLITE_DROP_TEMP_TABLE = 13;
 
-		private const int SQLITE_DROP_TEMP_TRIGGER = 14;
+		public const int SQLITE_DROP_TEMP_TRIGGER = 14;
 
-		private const int SQLITE_DROP_TEMP_VIEW = 15;
+		public const int SQLITE_DROP_TEMP_VIEW = 15;
 
-		private const int SQLITE_DROP_TRIGGER = 16;
+		public const int SQLITE_DROP_TRIGGER = 16;
 
-		private const int SQLITE_DROP_VIEW = 17;
+		public const int SQLITE_DROP_VIEW = 17;
 
-		private const int SQLITE_INSERT = 18;
+		public const int SQLITE_INSERT = 18;
 
-		private const int SQLITE_PRAGMA = 19;
+		public const int SQLITE_PRAGMA = 19;
 
-		private const int SQLITE_READ = 20;
+		public const int SQLITE_READ = 20;
 
-		private const int SQLITE_SELECT = 21;
+		public const int SQLITE_SELECT = 21;
 
-		private const int SQLITE_TRANSACTION = 22;
+		public const int SQLITE_TRANSACTION = 22;
 
-		private const int SQLITE_UPDATE = 23;
+		public const int SQLITE_UPDATE = 23;
 
-		private const int SQLITE_ATTACH = 24;
+		public const int SQLITE_ATTACH = 24;
 
-		private const int SQLITE_DETACH = 25;
+		public const int SQLITE_DETACH = 25;
 
-		private const int SQLITE_ALTER_TABLE = 26;
+		public const int SQLITE_ALTER_TABLE = 26;
 
-		private const int SQLITE_REINDEX = 27;
+		public const int SQLITE_REINDEX = 27;
 
-		private const int SQLITE_ANALYZE = 28;
+		public const int SQLITE_ANALYZE = 28;
 
-		private const int SQLITE_CREATE_VTABLE = 29;
+		public const int SQLITE_CREATE_VTABLE = 29;
 
-		private const int SQLITE_DROP_VTABLE = 30;
+		public const int SQLITE_DROP_VTABLE = 30;
 
-		private const int SQLITE_FUNCTION = 31;
+		public const int SQLITE_FUNCTION = 31;
 
-		private const int SQLITE_SAVEPOINT = 32;
+		public const int SQLITE_SAVEPOINT = 32;
 
-		private const int SQLITE_COPY = 0;
+		public const int SQLITE_COPY = 0;
 
 		///
 ///<summary>
@@ -2141,7 +2141,7 @@ namespace Community.CsharpSqlite
 ///<param name=""./" to avoid ambiguity.">"./" to avoid ambiguity.</param>
 ///<param name=""></param>
 ///<param name="^If the filename is an empty string, then a private, temporary">^If the filename is an empty string, then a private, temporary</param>
-///<param name="on">disk database will be created.  ^This private database will be</param>
+///<param name="on">disk database will be created.  ^This public database will be</param>
 ///<param name="automatically deleted as soon as the database connection is closed.">automatically deleted as soon as the database connection is closed.</param>
 ///<param name=""></param>
 ///<param name="[[URI filenames in sqlite3_open()]] <h3>URI Filenames</h3>">[[URI filenames in sqlite3_open()]] <h3>URI Filenames</h3></param>
@@ -2231,10 +2231,10 @@ namespace Community.CsharpSqlite
 ///<param name="C:. Note that the %20 escaping in this example is not strictly ">C:. Note that the %20 escaping in this example is not strictly </param>
 ///<param name="necessary "> space characters can be used literally</param>
 ///<param name="in URI filenames.">in URI filenames.</param>
-///<param name="<tr><td> file:data.db?mode=ro&cache=private <td> "><tr><td> file:data.db?mode=ro&cache=private <td> </param>
+///<param name="<tr><td> file:data.db?mode=ro&cache=public <td> "><tr><td> file:data.db?mode=ro&cache=public <td> </param>
 ///<param name="Open file "data.db" in the current directory for read">only access.</param>
 ///<param name="Regardless of whether or not shared">cache mode is enabled by</param>
-///<param name="default, use a private cache.">default, use a private cache.</param>
+///<param name="default, use a public cache.">default, use a public cache.</param>
 ///<param name="<tr><td> file:/home/fred/data.db?vfs=unix">nolock <td></param>
 ///<param name="Open file "/home/fred/data.db". Use the special VFS "unix">nolock".</param>
 ///<param name="<tr><td> file:data.db?mode=readonly <td> "><tr><td> file:data.db?mode=readonly <td> </param>
@@ -2469,27 +2469,27 @@ namespace Community.CsharpSqlite
 		//#define SQLITE_LIMIT_LIKE_PATTERN_LENGTH       8
 		//#define SQLITE_LIMIT_VARIABLE_NUMBER           9
 		//#define SQLITE_LIMIT_TRIGGER_DEPTH            10
-		private const int SQLITE_LIMIT_LENGTH = 0;
+		public const int SQLITE_LIMIT_LENGTH = 0;
 
-		private const int SQLITE_LIMIT_SQL_LENGTH = 1;
+		public const int SQLITE_LIMIT_SQL_LENGTH = 1;
 
-		private const int SQLITE_LIMIT_COLUMN = 2;
+		public const int SQLITE_LIMIT_COLUMN = 2;
 
-		private const int SQLITE_LIMIT_EXPR_DEPTH = 3;
+		public const int SQLITE_LIMIT_EXPR_DEPTH = 3;
 
-		private const int SQLITE_LIMIT_COMPOUND_SELECT = 4;
+		public const int SQLITE_LIMIT_COMPOUND_SELECT = 4;
 
-		private const int SQLITE_LIMIT_VDBE_OP = 5;
+		public const int SQLITE_LIMIT_VDBE_OP = 5;
 
-		private const int SQLITE_LIMIT_FUNCTION_ARG = 6;
+		public const int SQLITE_LIMIT_FUNCTION_ARG = 6;
 
-		private const int SQLITE_LIMIT_ATTACHED = 7;
+		public const int SQLITE_LIMIT_ATTACHED = 7;
 
-		private const int SQLITE_LIMIT_LIKE_PATTERN_LENGTH = 8;
+		public const int SQLITE_LIMIT_LIKE_PATTERN_LENGTH = 8;
 
-		private const int SQLITE_LIMIT_VARIABLE_NUMBER = 9;
+		public const int SQLITE_LIMIT_VARIABLE_NUMBER = 9;
 
-		private const int SQLITE_LIMIT_TRIGGER_DEPTH = 10;
+		public const int SQLITE_LIMIT_TRIGGER_DEPTH = 10;
 
 		///
 ///<summary>
@@ -2757,7 +2757,7 @@ namespace Community.CsharpSqlite
 ///the special value [SQLITE_STATIC], then SQLite assumes that the
 ///information is in static, unmanaged space and does not need to be freed.
 ///^If the fifth argument has the value [SQLITE_TRANSIENT], then
-///SQLite makes its own private copy of the data immediately, before
+///SQLite makes its own public copy of the data immediately, before
 ///the sqlite3_bind_*() routine returns.
 ///
 ///^The sqlite3_bind_zeroblob() routine binds a BLOB of length N that
@@ -3669,7 +3669,7 @@ namespace Community.CsharpSqlite
 ///argument is SQLITE_STATIC, it means that the content pointer is constant
 ///and will never change.  It does not need to be destroyed.  ^The
 ///SQLITE_TRANSIENT value means that the content will likely change in
-///the near future and that SQLite should make its own private copy of
+///the near future and that SQLite should make its own public copy of
 ///the content before returning.
 ///
 ///The typedef is necessary to work around problems in certain
@@ -3725,7 +3725,7 @@ namespace Community.CsharpSqlite
 ///<param name="sqlite3_result_error16() is non">negative then SQLite takes that many</param>
 ///<param name="bytes (not characters) from the 2nd parameter as the error message.">bytes (not characters) from the 2nd parameter as the error message.</param>
 ///<param name="^The sqlite3_result_error() and sqlite3_result_error16()">^The sqlite3_result_error() and sqlite3_result_error16()</param>
-///<param name="routines make a private copy of the error message text before">routines make a private copy of the error message text before</param>
+///<param name="routines make a public copy of the error message text before">routines make a public copy of the error message text before</param>
 ///<param name="they return.  Hence, the calling function can deallocate or">they return.  Hence, the calling function can deallocate or</param>
 ///<param name="modify the text after they return without harm.">modify the text after they return without harm.</param>
 ///<param name="^The sqlite3_result_error_code() function changes the error code">^The sqlite3_result_error_code() function changes the error code</param>
@@ -4527,172 +4527,7 @@ namespace Community.CsharpSqlite
 		//typedef struct sqlite3_index_info sqlite3_index_info;
 		//typedef struct sqlite3_vtab_cursor sqlite3_vtab_cursor;
 		//typedef struct sqlite3_module sqlite3_module;
-		///<summary>
-		/// CAPI3REF: Virtual Table Object
-		/// KEYWORDS: sqlite3_module {virtual table module}
-		///
-		/// This structure, sometimes called a "virtual table module",
-		/// defines the implementation of a [virtual tables].
-		/// This structure consists mostly of methods for the module.
-		///
-		/// ^A virtual table module is created by filling in a persistent
-		/// instance of this structure and passing a pointer to that instance
-		/// to [sqlite3_create_module()] or [sqlite3_create_module_v2()].
-		/// ^The registration remains valid until it is replaced by a different
-		/// module or until the [database connection] closes.  The content
-		/// of this structure must not change while it is registered with
-		/// any database connection.
-		///
-		///</summary>
-		//struct sqlite3_module {
-		//  int iVersion;
-		//  int (*xCreate)(sqlite3*, object  *pAux,
-		//               int argc, string[] argv,
-		//               sqlite3_vtab **ppVTab, char*);
-		//  int (*xConnect)(sqlite3*, object  *pAux,
-		//               int argc, string[] argv,
-		//               sqlite3_vtab **ppVTab, char*);
-		//  int (*xBestIndex)(sqlite3_vtab *pVTab, sqlite3_index_info);
-		//  int (*xDisconnect)(sqlite3_vtab *pVTab);
-		//  int (*xDestroy)(sqlite3_vtab *pVTab);
-		//  int (*xOpen)(sqlite3_vtab *pVTab, sqlite3_vtab_cursor **ppCursor);
-		//  int (*xClose)(sqlite3_vtab_cursor);
-		//  int (*xFilter)(sqlite3_vtab_cursor*, int idxNum, string idxStr,
-		//                int argc, sqlite3_value **argv);
-		//  int (*xNext)(sqlite3_vtab_cursor);
-		//  int (*xEof)(sqlite3_vtab_cursor);
-		//  int (*xColumn)(sqlite3_vtab_cursor*, sqlite3_context*, int);
-		//  int (*xRowid)(sqlite3_vtab_cursor*, sqlite3_int64 *pRowid);
-		//  int (*xUpdate)(sqlite3_vtab *, int, sqlite3_value **, sqlite3_int64 );
-		//  int (*xBegin)(sqlite3_vtab *pVTab);
-		//  int (*xSync)(sqlite3_vtab *pVTab);
-		//  int (*xCommit)(sqlite3_vtab *pVTab);
-		//  int (*xRollback)(sqlite3_vtab *pVTab);
-		//  int (*xFindFunction)(sqlite3_vtab *pVtab, int nArg, string zName,
-		//                       void (**pxFunc)(sqlite3_context*,int,sqlite3_value*),
-		//                       void **ppArg);
-		//  int (*xRename)(sqlite3_vtab *pVtab, string zNew);
-		///* The methods above are in version 1 of the sqlite_module object. Those 
-		//** below are for version 2 and greater. */
-		//int (*xSavepoint)(sqlite3_vtab *pVTab, int);
-		//int (*xRelease)(sqlite3_vtab *pVTab, int);
-		//int (*xRollbackTo)(sqlite3_vtab *pVTab, int);
-		//};
-		// MINIMAL STRUCTURE
-		public class sqlite3_module
-		{
-			public int iVersion;
-
-			public smdxCreateConnect xCreate;
-
-			public smdxCreateConnect xConnect;
-
-			public smdxBestIndex xBestIndex;
-
-			public smdxDisconnect xDisconnect;
-
-			public smdxDestroy xDestroy;
-
-			public smdxOpen xOpen;
-
-			public smdxClose xClose;
-
-			public smdxFilter xFilter;
-
-			public smdxNext xNext;
-
-			public smdxEof xEof;
-
-			public smdxColumn xColumn;
-
-			public smdxRowid xRowid;
-
-			public smdxUpdate xUpdate;
-
-			public smdxFunction xBegin;
-
-			public smdxFunction xSync;
-
-			public smdxFunction xCommit;
-
-			public smdxFunction xRollback;
-
-			public smdxFindFunction xFindFunction;
-
-			public smdxRename xRename;
-
-			///
-///<summary>
-///The methods above are in version 1 of the sqlite_module object. Those 
-///below are for version 2 and greater. 
-///</summary>
-
-			public smdxFunctionArg xSavepoint;
-
-			public smdxFunctionArg xRelease;
-
-			public smdxFunctionArg xRollbackTo;
-
-			//Version 1
-			public sqlite3_module (int iVersion, smdxCreateConnect xCreate, smdxCreateConnect xConnect, smdxBestIndex xBestIndex, smdxDisconnect xDisconnect, smdxDestroy xDestroy, smdxOpen xOpen, smdxClose xClose, smdxFilter xFilter, smdxNext xNext, smdxEof xEof, smdxColumn xColumn, smdxRowid xRowid, smdxUpdate xUpdate, smdxFunction xBegin, smdxFunction xSync, smdxFunction xCommit, smdxFunction xRollback, smdxFindFunction xFindFunction, smdxRename xRename)
-			{
-				this.iVersion = iVersion;
-				this.xCreate = xCreate;
-				this.xConnect = xConnect;
-				this.xBestIndex = xBestIndex;
-				this.xDisconnect = xDisconnect;
-				this.xDestroy = xDestroy;
-				this.xOpen = xOpen;
-				this.xClose = xClose;
-				this.xFilter = xFilter;
-				this.xNext = xNext;
-				this.xEof = xEof;
-				this.xColumn = xColumn;
-				this.xRowid = xRowid;
-				this.xUpdate = xUpdate;
-				this.xBegin = xBegin;
-				this.xSync = xSync;
-				this.xCommit = xCommit;
-				this.xRollback = xRollback;
-				this.xFindFunction = xFindFunction;
-				this.xRename = xRename;
-			}
-
-			//Version 2
-			public sqlite3_module (int iVersion, smdxCreateConnect xCreate, smdxCreateConnect xConnect, smdxBestIndex xBestIndex, smdxDisconnect xDisconnect, smdxDestroy xDestroy, smdxOpen xOpen, smdxClose xClose, smdxFilter xFilter, smdxNext xNext, smdxEof xEof, smdxColumn xColumn, smdxRowid xRowid, smdxUpdate xUpdate, smdxFunction xBegin, smdxFunction xSync, smdxFunction xCommit, smdxFunction xRollback, smdxFindFunction xFindFunction, smdxRename xRename, ///
-///<summary>
-///The methods above are in version 1 of the sqlite_module object. Those 
-///below are for version 2 and greater. 
-///</summary>
-
-			smdxFunctionArg xSavepoint, smdxFunctionArg xRelease, smdxFunctionArg xRollbackTo)
-			{
-				this.iVersion = iVersion;
-				this.xCreate = xCreate;
-				this.xConnect = xConnect;
-				this.xBestIndex = xBestIndex;
-				this.xDisconnect = xDisconnect;
-				this.xDestroy = xDestroy;
-				this.xOpen = xOpen;
-				this.xClose = xClose;
-				this.xFilter = xFilter;
-				this.xNext = xNext;
-				this.xEof = xEof;
-				this.xColumn = xColumn;
-				this.xRowid = xRowid;
-				this.xUpdate = xUpdate;
-				this.xBegin = xBegin;
-				this.xSync = xSync;
-				this.xCommit = xCommit;
-				this.xRollback = xRollback;
-				this.xFindFunction = xFindFunction;
-				this.xRename = xRename;
-				this.xSavepoint = xSavepoint;
-				this.xRelease = xRelease;
-				this.xRollbackTo = xRollbackTo;
-			}
-		}
-
+		
 		
 
 		///
@@ -4765,97 +4600,8 @@ namespace Community.CsharpSqlite
 		//  void *pClientData,         /* Client data for xCreate/xConnect */
 		//  void(*xDestroy)(void)     /* Module destructor function */
 		//);
-		///<summary>
-		/// CAPI3REF: Virtual Table Instance Object
-		/// KEYWORDS: sqlite3_vtab
-		///
-		/// Every [virtual table module] implementation uses a subclass
-		/// of this object to describe a particular instance
-		/// of the [virtual table].  Each subclass will
-		/// be tailored to the specific needs of the module implementation.
-		/// The purpose of this superclass is to define certain fields that are
-		/// common to all module implementations.
-		///
-		/// ^Virtual tables methods can set an error message by assigning a
-		/// string obtained from [io.sqlite3_mprintf()] to zErrMsg.  The method should
-		/// take care that any prior string is freed by a call to [sqlite3_free()]
-		/// prior to assigning a new string to zErrMsg.  ^After the error message
-		/// is delivered up to the client application, the string will be automatically
-		/// freed by sqlite3_free() and the zErrMsg field will be zeroed.
-		///
-		///</summary>
-		//struct sqlite3_vtab {
-		//  const sqlite3_module *pModule;  /* The module for this virtual table */
-		//  int nRef;                       /* NO LONGER USED */
-		//  string zErrMsg;                  /* Error message from io.sqlite3_mprintf() */
-		//  /* Virtual table implementations will typically add additional fields */
-		//};
-		public class sqlite3_vtab
-		{
-			public sqlite3_module pModule;
+		
 
-			///
-///<summary>
-///The module for this virtual table 
-///</summary>
-
-			public int nRef;
-
-			///
-///<summary>
-///Used internally 
-///</summary>
-
-			public string zErrMsg;
-		///
-///<summary>
-///Error message from io.sqlite3_mprintf() 
-///</summary>
-
-		///
-///<summary>
-///Virtual table implementations will typically add additional fields 
-///</summary>
-
-		};
-
-
-		///<summary>
-		/// CAPI3REF: Virtual Table Cursor Object
-		/// KEYWORDS: sqlite3_vtab_cursor {virtual table cursor}
-		///
-		/// Every [virtual table module] implementation uses a subclass of the
-		/// following structure to describe cursors that point into the
-		/// [virtual table] and are used
-		/// to loop through the virtual table.  Cursors are created using the
-		/// [sqlite3_module.xOpen | xOpen] method of the module and are destroyed
-		/// by the [sqlite3_module.xClose | xClose] method.  Cursors are used
-		/// by the [xFilter], [xNext], [xEof], [xColumn], and [xRowid] methods
-		/// of the module.  Each module implementation will define
-		/// the content of a cursor structure to suit its own needs.
-		///
-		/// This superclass exists in order to define fields of the cursor that
-		/// are common to all implementations.
-		///
-		///</summary>
-		//struct sqlite3_vtab_cursor {
-		//  sqlite3_vtab *pVtab;      /* Virtual table of this cursor */
-		//  /* Virtual table implementations will typically add additional fields */
-		//};
-		public class sqlite3_vtab_cursor
-		{
-			public sqlite3_vtab pVtab;
-		///
-///<summary>
-///Virtual table of this cursor 
-///</summary>
-
-		///
-///<summary>
-///Virtual table implementations will typically add additional fields 
-///</summary>
-
-		};
 
 
 		///
@@ -5163,7 +4909,7 @@ namespace Community.CsharpSqlite
 ///<summary>
 ///CAPI3REF: Mutex Verification Routines
 ///
-///The sqlite3_mutex_held() and sqlite3_mutex_notheld() routines
+///The Sqlite3.sqlite3_mutex_held() and sqlite3_mutex_notheld() routines
 ///are intended for use inside Debug.Assert() statements.  ^The SQLite core
 ///never uses these routines except inside an Debug.Assert() and applications
 ///are advised to follow the lead of the core.  ^The SQLite core only
@@ -5180,19 +4926,19 @@ namespace Community.CsharpSqlite
 ///versions of these routines, it should at least provide stubs that always
 ///return true so that one does not get spurious assertion failures.
 ///
-///^If the argument to sqlite3_mutex_held() is a NULL pointer then
+///^If the argument to Sqlite3.sqlite3_mutex_held() is a NULL pointer then
 ///</summary>
 ///<param name="the routine should return 1.   This seems counter">intuitive since</param>
 ///<param name="clearly the mutex cannot be held if it does not exist.  But">clearly the mutex cannot be held if it does not exist.  But</param>
 ///<param name="the reason the mutex does not exist is because the build is not">the reason the mutex does not exist is because the build is not</param>
 ///<param name="using mutexes.  And we do not want the Debug.Assert() containing the">using mutexes.  And we do not want the Debug.Assert() containing the</param>
-///<param name="call to sqlite3_mutex_held() to fail, so a non">zero return is</param>
+///<param name="call to Sqlite3.sqlite3_mutex_held() to fail, so a non">zero return is</param>
 ///<param name="the appropriate thing to do.  ^The sqlite3_mutex_notheld()">the appropriate thing to do.  ^The sqlite3_mutex_notheld()</param>
 ///<param name="interface should also return 1 when given a NULL pointer.">interface should also return 1 when given a NULL pointer.</param>
 ///<param name=""></param>
 
 		//#if !NDEBUG
-		//SQLITE_API int sqlite3_mutex_held(sqlite3_mutex);
+		//SQLITE_API int Sqlite3.sqlite3_mutex_held(sqlite3_mutex);
 		//SQLITE_API int sqlite3_mutex_notheld(sqlite3_mutex);
 		//#endif
 		///
@@ -5887,7 +5633,11 @@ namespace Community.CsharpSqlite
 		{
 			public object pArg;
 
-			public dxPC_Init xInit;
+            dxPC_Init m_xInit;
+            public dxPC_Init xInit {
+                get { return m_xInit; }
+                set { m_xInit = value; }
+            }
 
 			//int (*xInit)(void);
 			public dxPC_Shutdown xShutdown;

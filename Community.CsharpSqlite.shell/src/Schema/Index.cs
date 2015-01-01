@@ -23,11 +23,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
-
-
-
 
         ///<summary>
         ///A prefix match is considered OK
@@ -52,7 +47,7 @@ namespace Community.CsharpSqlite
         /// Ex1.aCol[], hence Ex2.aiColumn[1]==0.
         ///
         /// The Index.onError field determines whether or not the indexed columns
-        /// must be unique and what to do if they are not.  When Index.onError=OE_None,
+        /// must be unique and what to do if they are not.  When Index.onError=OnConstraintError.OE_None,
         /// it means this is not a unique index.  Otherwise it is a unique index
         /// and the value of Index.onError indicate the which conflict resolution
         /// algorithm to employ whenever an attempt is made to insert a non-unique
@@ -91,7 +86,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Page containing root of this index in database file 
             ///</summary>
-            public u8 onError;
+            public OnConstraintError onError;
             ///
             ///<summary>
             ///OE_Abort, OE_Ignore, OE_Replace, or OE_None 
@@ -121,7 +116,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Schema containing this index 
             ///</summary>
-            public u8[] aSortOrder;
+            public SortOrder[] aSortOrder;
             ///
             ///<summary>
             ///Array of size Index.nColumn. True==DESC, False==ASC 
@@ -188,5 +183,4 @@ namespace Community.CsharpSqlite
 
 
 
-    }
 }

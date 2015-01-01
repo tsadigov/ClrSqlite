@@ -71,7 +71,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static int sqlite3StatusValue(int op) {
 			wsdStatInit();
-			Debug.Assert(op>=0&&op<ArraySize(wsdStat.nowValue));
+			Debug.Assert(op>=0&&op<Sqlite3.ArraySize(wsdStat.nowValue));
 			return wsdStat.nowValue[op];
 		}
 		///<summary>
@@ -81,7 +81,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static void sqlite3StatusAdd(int op,int N) {
 			wsdStatInit();
-			Debug.Assert(op>=0&&op<ArraySize(wsdStat.nowValue));
+			Debug.Assert(op>=0&&op<Sqlite3.ArraySize(wsdStat.nowValue));
 			wsdStat.nowValue[op]+=N;
 			if(wsdStat.nowValue[op]>wsdStat.mxValue[op]) {
 				wsdStat.mxValue[op]=wsdStat.nowValue[op];
@@ -93,7 +93,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static void sqlite3StatusSet(int op,int X) {
 			wsdStatInit();
-			Debug.Assert(op>=0&&op<ArraySize(wsdStat.nowValue));
+			Debug.Assert(op>=0&&op<Sqlite3.ArraySize(wsdStat.nowValue));
 			wsdStat.nowValue[op]=X;
 			if(wsdStat.nowValue[op]>wsdStat.mxValue[op]) {
 				wsdStat.mxValue[op]=wsdStat.nowValue[op];
@@ -109,8 +109,8 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static int sqlite3_status(int op,ref int pCurrent,ref int pHighwater,int resetFlag) {
 			wsdStatInit();
-			if(op<0||op>=ArraySize(wsdStat.nowValue)) {
-				return SQLITE_MISUSE_BKPT();
+			if(op<0||op>=Sqlite3.ArraySize(wsdStat.nowValue)) {
+				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			pCurrent=wsdStat.nowValue[op];
 			pHighwater=wsdStat.mxValue[op];
@@ -163,9 +163,9 @@ namespace Community.CsharpSqlite {
 			case SQLITE_DBSTATUS_LOOKASIDE_HIT:
 			case SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE:
 			case SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL: {
-				testcase(op==SQLITE_DBSTATUS_LOOKASIDE_HIT);
-				testcase(op==SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE);
-				testcase(op==SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL);
+				sqliteinth.testcase(op==SQLITE_DBSTATUS_LOOKASIDE_HIT);
+				sqliteinth.testcase(op==SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE);
+				sqliteinth.testcase(op==SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL);
 				Debug.Assert((op-SQLITE_DBSTATUS_LOOKASIDE_HIT)>=0);
 				Debug.Assert((op-SQLITE_DBSTATUS_LOOKASIDE_HIT)<3);
 				pCurrent=0;
@@ -221,9 +221,9 @@ namespace Community.CsharpSqlite {
 				//db.pnBytesFreed = nByte;
 				for(i=0;i<db.nDb;i++) {
 					Schema pSchema=db.aDb[i].pSchema;
-					if(ALWAYS(pSchema!=null)) {
+					if(Sqlite3.ALWAYS(pSchema!=null)) {
 						HashElem p;
-						//nByte += (int)(sqlite3GlobalConfig.m.xRoundup(sizeof(HashElem)) * (
+						//nByte += (int)(Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xRoundup(sizeof(HashElem)) * (
 						//    pSchema.tblHash.count 
 						//  + pSchema.trigHash.count
 						//  + pSchema.idxHash.count

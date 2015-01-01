@@ -9,6 +9,7 @@ namespace Community.CsharpSqlite
     public partial class Sqlite3
     {
 
+
         public class alter
         {
             ///
@@ -66,11 +67,11 @@ namespace Community.CsharpSqlite
                 int len = 0;
                 string zRet;
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
-                UNUSED_PARAMETER(NotUsed);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 
                 ///The principle used to locate the table name in the CREATE TABLE
                 ///statement is that the table name is the first non-space token that
-                ///is immediately followed by a TK_LP or TK_USING token.
+                ///is immediately followed by a Sqlite3.TK_LP or Sqlite3.TK_USING token.
 
                 if (!String.IsNullOrEmpty(zSql))
                 {
@@ -111,7 +112,7 @@ namespace Community.CsharpSqlite
                     }
                     while (token != TokenType.TK_LP && token != TokenType.TK_USING);
                     zRet = io.sqlite3MPrintf(db, "%.*s\"%w\"%s", zLoc, zSql.Substring(0, zLoc), zTableName, zSql.Substring(zLoc + tname.Length));
-                    context.sqlite3_result_text(zRet, -1, SQLITE_DYNAMIC);
+                    context.sqlite3_result_text(zRet, -1, sqliteinth.SQLITE_DYNAMIC);
                 }
             }
 
@@ -163,7 +164,7 @@ namespace Community.CsharpSqlite
                 ///Type of token 
                 ///</summary>
 
-                UNUSED_PARAMETER(NotUsed);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 for (zIdx = 0; zIdx < zInput.Length; zIdx += n)//z=zInput; *z; z=z+n)
                 {
                     n = Lexer.sqlite3GetToken(zInput, zIdx, ref token);
@@ -194,7 +195,7 @@ namespace Community.CsharpSqlite
                     }
                 }
                 zResult = io.sqlite3MPrintf(db, "%s%s", zOutput, zInput.Substring(zLeft));
-                context.sqlite3_result_text(zResult, -1, SQLITE_DYNAMIC);
+                context.sqlite3_result_text(zResult, -1, sqliteinth.SQLITE_DYNAMIC);
                 db.sqlite3DbFree(ref zOutput);
             }
 
@@ -222,13 +223,13 @@ namespace Community.CsharpSqlite
                 int len = 1;
                 string zRet;
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
-                UNUSED_PARAMETER(NotUsed);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 ///
                 ///<summary>
                 ///The principle used to locate the table name in the CREATE TRIGGER
                 ///statement is that the table name is the first token that is immediatedly
-                ///preceded by either TK_ON or TK_DOT and immediatedly followed by one
-                ///of TK_WHEN, TK_BEGIN or TK_FOR.
+                ///preceded by either Sqlite3.TK_ON or Sqlite3.TK_DOT and immediatedly followed by one
+                ///of Sqlite3.TK_WHEN, Sqlite3.TK_BEGIN or Sqlite3.TK_FOR.
                 ///
                 ///</summary>
 
@@ -271,7 +272,7 @@ namespace Community.CsharpSqlite
                         ///
                         ///<summary>
                         ///Variable 'dist' stores the number of tokens read since the most
-                        ///recent TK_DOT or TK_ON. This means that when a WHEN, FOR or BEGIN
+                        ///recent Sqlite3.TK_DOT or Sqlite3.TK_ON. This means that when a WHEN, FOR or BEGIN
                         ///token is read and 'dist' equals 2, the condition stated above
                         ///to be met.
                         ///
@@ -296,7 +297,7 @@ namespace Community.CsharpSqlite
                     ///<param name=""></param>
 
                     zRet = io.sqlite3MPrintf(db, "%.*s\"%w\"%s", zLoc, zSql.Substring(0, zLoc), zTableName, zSql.Substring(zLoc + tname.Length));
-                    context.sqlite3_result_text(zRet, -1, SQLITE_DYNAMIC);
+                    context.sqlite3_result_text(zRet, -1, sqliteinth.SQLITE_DYNAMIC);
                 }
             }
 
@@ -309,12 +310,12 @@ namespace Community.CsharpSqlite
             public static void sqlite3AlterFunctions()
             {
                 aAlterTableFuncs = new FuncDef[] {
-				FUNCTION ("sqlite_rename_table", 2, 0, 0, renameTableFunc),
+				FuncDef.FUNCTION ("sqlite_rename_table", 2, 0, 0, renameTableFunc),
 				#if !SQLITE_OMIT_TRIGGER
-				FUNCTION ("sqlite_rename_trigger", 2, 0, 0, renameTriggerFunc),
+				FuncDef.FUNCTION ("sqlite_rename_trigger", 2, 0, 0, renameTriggerFunc),
 				#endif
 				#if !SQLITE_OMIT_FOREIGN_KEY
-				FUNCTION ("sqlite_rename_parent", 3, 0, 0, renameParentFunc),
+				FuncDef.FUNCTION ("sqlite_rename_parent", 3, 0, 0, renameParentFunc),
 			#endif
 			};
                 int i;
@@ -325,7 +326,7 @@ namespace Community.CsharpSqlite
                 FuncDefHash pHash = sqlite3GlobalFunctions;
                 FuncDef[] aFunc = aAlterTableFuncs;
 #endif
-                for (i = 0; i < ArraySize(aAlterTableFuncs); i++)
+                for (i = 0; i < Sqlite3.ArraySize(aAlterTableFuncs); i++)
                 {
                     sqlite3FuncDefInsert(pHash, aFunc[i]);
                 }

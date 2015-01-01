@@ -392,7 +392,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void vfsUnlink(sqlite3_vfs pVfs)
             {
-                Debug.Assert(sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)));
+                Debug.Assert(Sqlite3.sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)));
                 if (pVfs == null)
                 {
                     ///

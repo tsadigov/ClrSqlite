@@ -55,14 +55,14 @@ namespace Community.CsharpSqlite
             /// If the result set column is a simple column reference, then this routine
             /// makes an exact copy.  But for any other kind of expression, this
             /// routine make a copy of the result set column as the argument to the
-            /// TK_AS operator.  The TK_AS operator causes the expression to be
+            /// Sqlite3.TK_AS operator.  The Sqlite3.TK_AS operator causes the expression to be
             /// evaluated just once and then reused for each alias.
             ///
-            /// The reason for suppressing the TK_AS term when the expression is a simple
+            /// The reason for suppressing the Sqlite3.TK_AS term when the expression is a simple
             /// column reference is so that the column reference will be recognized as
             /// usable by indices within the WHERE clause processing logic.
             ///
-            /// Hack:  The TK_AS operator is inhibited if zType[0]=='G'.  This means
+            /// Hack:  The Sqlite3.TK_AS operator is inhibited if zType[0]=='G'.  This means
             /// that in a GROUP BY clause, the expression is evaluated twice.  Hence:
             ///
             ///     SELECT random()%5 AS x, count(*) FROM tab GROUP BY x
@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite
                 if (pOrig.Operator != TokenType.TK_COLUMN && (zType.Length == 0 || zType[0] != 'G'))
                 {
                     pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
-                    pDup = pParse.sqlite3PExpr(TK_AS, pDup, null, null);
+                    pDup = pParse.sqlite3PExpr(Sqlite3.TK_AS, pDup, null, null);
                     if (pDup == null)
                         return;
                     if (pEList.a[iCol].iAlias == 0)
@@ -131,7 +131,7 @@ namespace Community.CsharpSqlite
                     pDup.iTable = pEList.a[iCol].iAlias;
                 }
                 else
-                    if (pOrig.ExprHasProperty(EP_IntValue) || pOrig.u.zToken == null)
+                    if (pOrig.ExprHasProperty(ExprFlags.EP_IntValue) || pOrig.u.zToken == null)
                     {
                         pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
                         if (pDup == null)
@@ -158,12 +158,12 @@ namespace Community.CsharpSqlite
                 }
                 ///
                 ///<summary>
-                ///Before calling exprc.sqlite3ExprDelete(), set the EP_Static flag. This 
+                ///Before calling exprc.sqlite3ExprDelete(), set the ExprFlags.EP_Static flag. This 
                 ///prevents ExprDelete() from deleting the Expr structure itself,
                 ///allowing it to be repopulated by the memcpy() on the following line.
                 ///
                 ///</summary>
-                pExpr.ExprSetProperty(EP_Static);
+                pExpr.ExprSetProperty(ExprFlags.EP_Static);
                 exprc.sqlite3ExprDelete(db, ref pExpr);
                 pExpr.CopyFrom(pDup);
                 //memcpy(pExpr, pDup, sizeof(*pExpr));
@@ -204,7 +204,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///Loop counter 
                 ///</summary>
-                UNUSED_PARAMETER(pParse);
+                Sqlite3.sqliteinth.UNUSED_PARAMETER(pParse);
                 if (pE.Operator == TokenType.TK_ID)
                 {
                     string zCol = pE.u.zToken;
@@ -286,7 +286,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///</summary>
                 ///<param name="Saved value of db">>suppressErr </param>
-                Debug.Assert(pE.sqlite3ExprIsInteger(ref i) == 0);
+                Debug.Assert( ! pE.sqlite3ExprIsInteger(ref i) );
                 pEList = pSelect.pEList;
                 ///
                 ///<summary>
@@ -342,7 +342,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static Expr sqlite3CreateColumnExpr(sqlite3 db, SrcList pSrc, int iSrc, int iCol)
             {
-                Expr p = exprc.CreateExpr(db, TK_COLUMN, null, false);
+                Expr p = exprc.CreateExpr(db, Sqlite3.TK_COLUMN, null, false);
                 if (p != null)
                 {
                     SrcList_item pItem = pSrc.a[iSrc];
@@ -355,11 +355,11 @@ namespace Community.CsharpSqlite
                     else
                     {
                         p.iColumn = (ynVar)iCol;
-                        testcase(iCol == BMS);
-                        testcase(iCol == BMS - 1);
+                        sqliteinth.testcase(iCol == BMS);
+                        sqliteinth.testcase(iCol == BMS - 1);
                         pItem.colUsed |= ((Bitmask)1) << (iCol >= BMS ? BMS - 1 : iCol);
                     }
-                    p.ExprSetProperty(EP_Resolved);
+                    p.ExprSetProperty(ExprFlags.EP_Resolved);
                 }
                 return p;
             }
@@ -378,7 +378,7 @@ namespace Community.CsharpSqlite
             ///    pExpr->pTab          Points to the Table structure of X.Y (even if
             ///                         X and/or Y are implied.)
             ///    pExpr->iColumn       Set to the column number within the table.
-            ///    pExpr->op            Set to TK_COLUMN.
+            ///    pExpr->op            Set to Sqlite3.TK_COLUMN.
             ///    pExpr->pLeft         Any expression this points to is deleted
             ///    pExpr->pRight        Any expression this points to is deleted.
             ///
@@ -390,10 +390,10 @@ namespace Community.CsharpSqlite
             /// can be used.
             ///
             /// If the name cannot be resolved unambiguously, leave an error message
-            /// in pParse and return WRC_Abort.  Return WRC_Prune on success.
+            /// in pParse and return WRC.WRC_Abort.  Return WRC.WRC_Prune on success.
             ///
             ///</summary>
-            public static int lookupName(Parse pParse,///
+            public static WRC lookupName(Parse pParse,///
                 ///The parsing context 
             string zDb,///
                 ///Name of the database containing table, or NULL 
@@ -458,7 +458,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///The Z in X.Y.Z cannot be NULL 
                 ///</summary>
-                Debug.Assert(!pExpr.ExprHasAnyProperty(EP_TokenOnly | EP_Reduced));
+                Debug.Assert(!pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly | ExprFlags.EP_Reduced));
                 ///
                 ///<summary>
                 ///</summary>
@@ -532,7 +532,7 @@ namespace Community.CsharpSqlite
                                     pExpr.iColumn = (short)(j == pTab.iPKey ? -1 : j);
                                     if (i < pSrcList.nSrc - 1)
                                     {
-                                        if ((pSrcList.a[i + 1].jointype & JT_NATURAL) != 0)// pItem[1].jointype
+                                        if ((pSrcList.a[i + 1].jointype &  JoinType.JT_NATURAL) != 0)// pItem[1].jointype
                                         {
                                             ///
                                             ///<summary>
@@ -579,14 +579,14 @@ namespace Community.CsharpSqlite
                     {
                         int op = pParse.eTriggerOp;
                         Table pTab = null;
-                        Debug.Assert(op == TK_DELETE || op == TK_UPDATE || op == TK_INSERT);
-                        if (op != TK_DELETE && "new".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
+                        Debug.Assert(op == Sqlite3.TK_DELETE || op == Sqlite3.TK_UPDATE || op == Sqlite3.TK_INSERT);
+                        if (op != Sqlite3.TK_DELETE && "new".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
                         {
                             pExpr.iTable = 1;
                             pTab = pParse.pTriggerTab;
                         }
                         else
-                            if (op != TK_INSERT && "old".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
+                            if (op != Sqlite3.TK_INSERT && "old".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 pExpr.iTable = 0;
                                 pTab = pParse.pTriggerTab;
@@ -621,19 +621,19 @@ namespace Community.CsharpSqlite
                                 cnt++;
                                 if (iCol < 0)
                                 {
-                                    pExpr.affinity = SQLITE_AFF_INTEGER;
+                                    pExpr.affinity = sqliteinth.SQLITE_AFF_INTEGER;
                                 }
                                 else
                                     if (pExpr.iTable == 0)
                                     {
-                                        testcase(iCol == 31);
-                                        testcase(iCol == 32);
+                                        sqliteinth.testcase(iCol == 31);
+                                        sqliteinth.testcase(iCol == 32);
                                         pParse.oldmask |= (iCol >= 32 ? 0xffffffff : (((u32)1) << iCol));
                                     }
                                     else
                                     {
-                                        testcase(iCol == 31);
-                                        testcase(iCol == 32);
+                                        sqliteinth.testcase(iCol == 31);
+                                        sqliteinth.testcase(iCol == 32);
                                         pParse.newmask |= (iCol >= 32 ? 0xffffffff : (((u32)1) << iCol));
                                     }
                                 pExpr.iColumn = (i16)iCol;
@@ -656,7 +656,7 @@ namespace Community.CsharpSqlite
                         ///<summary>
                         ///</summary>
                         ///<param name="IMP: R">55124 </param>
-                        pExpr.affinity = SQLITE_AFF_INTEGER;
+                        pExpr.affinity = sqliteinth.SQLITE_AFF_INTEGER;
                     }
                     ///
                     ///<summary>
@@ -684,10 +684,10 @@ namespace Community.CsharpSqlite
                                 Debug.Assert(pExpr.x.pList == null);
                                 Debug.Assert(pExpr.x.pSelect == null);
                                 pOrig = pEList.a[j].pExpr;
-                                if (0 == pNC.allowAgg && pOrig.ExprHasProperty(EP_Agg))
+                                if (0 == pNC.allowAgg && pOrig.ExprHasProperty(ExprFlags.EP_Agg))
                                 {
                                     utilc.sqlite3ErrorMsg(pParse, "misuse of aliased aggregate %s", zAs);
-                                    return WRC_Abort;
+                                    return WRC.WRC_Abort;
                                 }
                                 resolveAlias(pParse, pEList, j, pExpr, "");
                                 cnt = 1;
@@ -720,11 +720,11 @@ namespace Community.CsharpSqlite
                 ///<param name="Because no reference was made to outer contexts, the pNC.nRef">Because no reference was made to outer contexts, the pNC.nRef</param>
                 ///<param name="fields are not changed in any context.">fields are not changed in any context.</param>
                 ///<param name=""></param>
-                if (cnt == 0 && zTab == null && pExpr.ExprHasProperty(EP_DblQuoted))
+                if (cnt == 0 && zTab == null && pExpr.ExprHasProperty(ExprFlags.EP_DblQuoted))
                 {
                     pExpr.Operator = TokenType.TK_STRING;
                     pExpr.pTab = null;
-                    return WRC_Prune;
+                    return WRC.WRC_Prune;
                 }
                 ///
                 ///<summary>
@@ -764,7 +764,7 @@ namespace Community.CsharpSqlite
                 if (pExpr.iColumn >= 0 && pMatch != null)
                 {
                     int n = pExpr.iColumn;
-                    testcase(n == BMS - 1);
+                    sqliteinth.testcase(n == BMS - 1);
                     if (n >= BMS)
                     {
                         n = BMS - 1;
@@ -786,7 +786,7 @@ namespace Community.CsharpSqlite
                 if (cnt == 1)
                 {
                     Debug.Assert(pNC != null);
-                    sqlite3AuthRead(pParse, pExpr, pSchema, pNC.pSrcList);
+                    sqliteinth.sqlite3AuthRead(pParse, pExpr, pSchema, pNC.pSrcList);
                     ///
                     ///<summary>
                     ///Increment the nRef value on all name contexts from TopNC up to
@@ -800,11 +800,11 @@ namespace Community.CsharpSqlite
                             break;
                         pTopNC = pTopNC.pNext;
                     }
-                    return WRC_Prune;
+                    return WRC.WRC_Prune;
                 }
                 else
                 {
-                    return WRC_Abort;
+                    return WRC.WRC_Abort;
                 }
             }
 
@@ -817,16 +817,16 @@ namespace Community.CsharpSqlite
             ///<summary>
             /// This routine is callback for sqlite3WalkExpr().
             ///
-            /// Resolve symbolic names into TK_COLUMN operators for the current
+            /// Resolve symbolic names into Sqlite3.TK_COLUMN operators for the current
             /// node in the expression tree.  Return 0 to continue the search down
             /// the tree or 2 to abort the tree walk.
             ///
             /// This routine also does error checking and name resolution for
             /// function names.  The operator for aggregate functions is changed
-            /// to TK_AGG_FUNCTION.
+            /// to Sqlite3.TK_AGG_FUNCTION.
             ///
             ///</summary>
-            public static int resolveExprStep(Walker pWalker, ref Expr pExpr)
+            public static WRC resolveExprStep(Walker pWalker, ref Expr pExpr)
             {
                 NameContext pNC;
                 Parse pParse;
@@ -834,9 +834,9 @@ namespace Community.CsharpSqlite
                 Debug.Assert(pNC != null);
                 pParse = pNC.pParse;
                 Debug.Assert(pParse == pWalker.pParse);
-                if (pExpr.ExprHasAnyProperty(EP_Resolved))
-                    return WRC_Prune;
-                pExpr.ExprSetProperty(EP_Resolved);
+                if (pExpr.ExprHasAnyProperty(ExprFlags.EP_Resolved))
+                    return WRC.WRC_Prune;
+                pExpr.ExprSetProperty(ExprFlags.EP_Resolved);
 #if !NDEBUG
 																																																																		      if ( pNC.pSrcList != null && pNC.pSrcList.nAlloc > 0 )
       {
@@ -851,16 +851,16 @@ namespace Community.CsharpSqlite
                 switch (pExpr.Operator)
                 {
 #if (SQLITE_ENABLE_UPDATE_DELETE_LIMIT) && !(SQLITE_OMIT_SUBQUERY)
-																																																																		/* The special operator TK_ROW means use the rowid for the first
+																																																																		/* The special operator Sqlite3.TK_ROW means use the rowid for the first
 ** column in the FROM clause.  This is used by the LIMIT and ORDER BY
 ** clause processing on UPDATE and DELETE statements.
 */
-case TK_ROW: {
+case Sqlite3.TK_ROW: {
 SrcList pSrcList = pNC.pSrcList;
 SrcList_item pItem;
 Debug.Assert( pSrcList !=null && pSrcList.nSrc==1 );
 pItem = pSrcList.a[0];
-pExpr.op = TK_COLUMN;
+pExpr.op = Sqlite3.TK_COLUMN;
 pExpr.pTab = pItem.pTab;
 pExpr.iTable = pItem.iCursor;
 pExpr.iColumn = -1;
@@ -963,8 +963,8 @@ break;
                             ///</summary>
                             SqliteEncoding enc = pParse.db.aDbStatic[0].pSchema.enc;
                             // ENC( pParse.db );   /* The database encoding */
-                            testcase(pExpr.Operator == TokenType.TK_CONST_FUNC);
-                            Debug.Assert(!pExpr.ExprHasProperty(EP_xIsSelect));
+                            sqliteinth.testcase(pExpr.Operator == TokenType.TK_CONST_FUNC);
+                            Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
                             zId = pExpr.u.zToken;
                             nId = StringExtensions.sqlite3Strlen30(zId);
                             pDef = sqlite3FindFunction(pParse.db, zId, nId, n, enc, 0);
@@ -993,8 +993,8 @@ utilc.sqlite3ErrorMsg(pParse, "not authorized to use function: %s",
 pDef.zName);
 pNC.nErr++;
 }
-pExpr.op = TK_NULL;
-return WRC_Prune;
+pExpr.op = Sqlite3.TK_NULL;
+return WRC.WRC_Prune;
 }
 }
 #endif
@@ -1032,20 +1032,20 @@ return WRC_Prune;
                             ///type of the function
                             ///
                             ///</summary>
-                            return WRC_Prune;
+                            return WRC.WRC_Prune;
                         }
 #if !SQLITE_OMIT_SUBQUERY
                     case TokenType.TK_SELECT:
                     case TokenType.TK_EXISTS:
                         {
-                            testcase(pExpr.Operator == TokenType.TK_EXISTS);
+                            sqliteinth.testcase(pExpr.Operator == TokenType.TK_EXISTS);
                             goto case TokenType.TK_IN;
                         }
 #endif
                     case TokenType.TK_IN:
                         {
-                            testcase(pExpr.Operator == TokenType.TK_IN);
-                            if (pExpr.ExprHasProperty(EP_xIsSelect))
+                            sqliteinth.testcase(pExpr.Operator == TokenType.TK_IN);
+                            if (pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect))
                             {
                                 int nRef = pNC.nRef;
 #if !SQLITE_OMIT_CHECK
@@ -1058,7 +1058,7 @@ return WRC_Prune;
                                 Debug.Assert(pNC.nRef >= nRef);
                                 if (nRef != pNC.nRef)
                                 {
-                                    pExpr.ExprSetProperty(EP_VarSelect);
+                                    pExpr.ExprSetProperty(ExprFlags.EP_VarSelect);
                                 }
                             }
                             break;
@@ -1078,7 +1078,7 @@ return WRC_Prune;
                     ///<summary>
                     ///|| pParse.db.mallocFailed != 0 
                     ///</summary>
-                ) ? WRC_Abort : WRC_Continue;
+                ) ? WRC.WRC_Abort : WRC.WRC_Continue;
             }
 
 
@@ -1171,7 +1171,7 @@ return WRC_Prune;
                         if (pItem.done != 0)
                             continue;
                         pE = pItem.pExpr;
-                        if (pE.sqlite3ExprIsInteger(ref iCol) != 0)
+                        if (pE.sqlite3ExprIsInteger(ref iCol) )
                         {
                             if (iCol <= 0 || iCol > pEList.nExpr)
                             {
@@ -1198,7 +1198,7 @@ return WRC_Prune;
                             CollSeq pColl = pE.pColl;
                             ExprFlags flags = pE.Flags & ExprFlags.EP_ExpCollate;
                             exprc.sqlite3ExprDelete(db, ref pE);
-                            pItem.pExpr = pE = exprc.sqlite3Expr(db, TK_INTEGER, null);
+                            pItem.pExpr = pE = exprc.sqlite3Expr(db, Sqlite3.TK_INTEGER, null);
                             if (pE == null)
                                 return 1;
                             pE.pColl = pColl;
@@ -1366,7 +1366,7 @@ return WRC_Prune;
                         pItem.iCol = (u16)iCol;
                         continue;
                     }
-                    if (pE.sqlite3ExprIsInteger(ref iCol) != 0)
+                    if (pE.sqlite3ExprIsInteger(ref iCol))
                     {
                         ///
                         ///<summary>
@@ -1401,7 +1401,7 @@ return WRC_Prune;
             /// Resolve names in the SELECT statement p and all of its descendents.
             ///
             ///</summary>
-            public static int resolveSelectStep(Walker pWalker, Select p)
+            public static WRC resolveSelectStep(Walker pWalker, Select p)
             {
                 NameContext pOuterNC;
                 ///Context that contains this SELECT 
@@ -1426,7 +1426,7 @@ return WRC_Prune;
                 Debug.Assert(p != null);
                 if ((p.selFlags & SelectFlags.Resolved) != 0)
                 {
-                    return WRC_Prune;
+                    return WRC.WRC_Prune;
                 }
                 pOuterNC = pWalker.u.pNC;
                 pParse = pWalker.pParse;
@@ -1449,7 +1449,7 @@ return WRC_Prune;
                         ///<summary>
                         ///|| db.mallocFailed != 0 
                         ///</summary>
-                    ) ? WRC_Abort : WRC_Prune;
+                    ) ? WRC.WRC_Abort : WRC.WRC_Prune;
                 }
                 isCompound = p.pPrior != null;
                 nCompound = 0;
@@ -1470,7 +1470,7 @@ return WRC_Prune;
                     sNC.pParse = pParse;
                     if (sqlite3ResolveExprNames(sNC, ref p.pLimit) != 0 || sqlite3ResolveExprNames(sNC, ref p.pOffset) != 0)
                     {
-                        return WRC_Abort;
+                        return WRC.WRC_Abort;
                     }
                     ///
                     ///<summary>
@@ -1492,7 +1492,7 @@ return WRC_Prune;
                         Expr pX = pEList.a[i].pExpr;
                         if (sqlite3ResolveExprNames(sNC, ref pX) != 0)
                         {
-                            return WRC_Abort;
+                            return WRC.WRC_Abort;
                         }
                     }
                     ///
@@ -1515,7 +1515,7 @@ return WRC_Prune;
                                 ///|| db.mallocFailed != 0 
                                 ///</summary>
                             )
-                                return WRC_Abort;
+                                return WRC.WRC_Abort;
                         }
                     }
                     ///
@@ -1542,7 +1542,7 @@ return WRC_Prune;
                     if (p.pHaving != null && pGroupBy == null)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "a GROUP BY clause is required before HAVING");
-                        return WRC_Abort;
+                        return WRC.WRC_Abort;
                     }
                     ///
                     ///<summary>
@@ -1558,7 +1558,7 @@ return WRC_Prune;
                     sNC.pEList = p.pEList;
                     if (sqlite3ResolveExprNames(sNC, ref p.pWhere) != 0 || sqlite3ResolveExprNames(sNC, ref p.pHaving) != 0)
                     {
-                        return WRC_Abort;
+                        return WRC.WRC_Abort;
                     }
                     ///
                     ///<summary>
@@ -1578,11 +1578,11 @@ return WRC_Prune;
                     ///<param name=""></param>
                     if (!isCompound && resolveOrderGroupBy(sNC, p, p.pOrderBy, "ORDER") != 0)
                     {
-                        return WRC_Abort;
+                        return WRC.WRC_Abort;
                     }
                     //if ( db.mallocFailed != 0 )
                     //{
-                    //  return WRC_Abort;
+                    //  return WRC.WRC_Abort;
                     //}
                     ///
                     ///<summary>
@@ -1599,15 +1599,15 @@ return WRC_Prune;
                             ///</summary>
                         )
                         {
-                            return WRC_Abort;
+                            return WRC.WRC_Abort;
                         }
                         for (i = 0; i < pGroupBy.nExpr; i++)//, pItem++)
                         {
                             pItem = pGroupBy.a[i];
-                            if ((pItem.pExpr.Flags & ExprFlags.EP_Agg) != 0)//HasProperty(pItem.pExpr, EP_Agg) )
+                            if ((pItem.pExpr.Flags & ExprFlags.EP_Agg) != 0)//HasProperty(pItem.pExpr, ExprFlags.EP_Agg) )
                             {
                                 utilc.sqlite3ErrorMsg(pParse, "aggregate functions are not allowed in " + "the GROUP BY clause");
-                                return WRC_Abort;
+                                return WRC.WRC_Abort;
                             }
                         }
                     }
@@ -1627,9 +1627,9 @@ return WRC_Prune;
                 ///</summary>
                 if (isCompound && resolveCompoundOrderBy(pParse, pLeftmost) != 0)
                 {
-                    return WRC_Abort;
+                    return WRC.WRC_Abort;
                 }
-                return WRC_Prune;
+                return WRC.WRC_Prune;
             }
 
 
@@ -1655,7 +1655,7 @@ return WRC_Prune;
             ///
             /// The node at the root of the subtree is modified as follows:
             ///
-            ///    Expr.op        Changed to TK_COLUMN
+            ///    Expr.op        Changed to Sqlite3.TK_COLUMN
             ///    Expr.pTab      Points to the Table object for X.Y
             ///    Expr.iColumn   The column index in X.Y.  -1 for the rowid.
             ///    Expr.iTable    The VDBE cursor number for X.Y
@@ -1677,8 +1677,8 @@ return WRC_Prune;
             /// Function calls are checked to make sure that the function is
             /// defined and that the correct number of arguments are specified.
             /// If the function is an aggregate function, then the pNC.hasAgg is
-            /// set and the opcode is changed from TK_FUNCTION to TK_AGG_FUNCTION.
-            /// If an expression contains aggregate functions then the EP_Agg
+            /// set and the opcode is changed from Sqlite3.TK_FUNCTION to Sqlite3.TK_AGG_FUNCTION.
+            /// If an expression contains aggregate functions then the ExprFlags.EP_Agg
             /// property on the expression is set.
             ///
             /// An error message is left in pParse if anything is amiss.  The number
@@ -1720,18 +1720,18 @@ pParse.nHeight += pExpr.nHeight;
 #endif
                 if (pNC.nErr > 0 || w.pParse.nErr > 0)
                 {
-                    pExpr.ExprSetProperty(EP_Error);
+                    pExpr.ExprSetProperty(ExprFlags.EP_Error);
                 }
                 if (pNC.hasAgg != 0)
                 {
-                    pExpr.ExprSetProperty(EP_Agg);
+                    pExpr.ExprSetProperty(ExprFlags.EP_Agg);
                 }
                 else
                     if (savedHasAgg != 0)
                     {
                         pNC.hasAgg = 1;
                     }
-                return pExpr.ExprHasProperty(EP_Error) ? 1 : 0;
+                return pExpr.ExprHasProperty(ExprFlags.EP_Error) ? 1 : 0;
             }
 
 

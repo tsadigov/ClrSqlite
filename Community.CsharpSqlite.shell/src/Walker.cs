@@ -19,18 +19,18 @@ using ynVar=System.Int16;
 using ynVar = System.Int32; 
 #endif
 namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+    using sqliteinth = Sqlite3.sqliteinth;
 		///
 		///<summary>
 		///</summary>
 		///<param name="Context pointer passed down through the tree">walk.</param>
 		///<param name=""></param>
 		public class Walker {
-			public dxExprCallback xExprCallback;
+			public Sqlite3.dxExprCallback xExprCallback;
 			//)(Walker*, Expr);     /* Callback for expressions */
-			public dxSelectCallback xSelectCallback;
+			public Sqlite3.dxSelectCallback xSelectCallback;
 			//)(Walker*,Select);  /* Callback for SELECTs */
-			public Parse pParse;
+			public Sqlite3.Parse pParse;
 			///
 			///<summary>
 			///Parser context.  
@@ -85,47 +85,49 @@ namespace Community.CsharpSqlite {
 			/// The return value from the callback should be one of the WRC_
 			/// constants to specify how to proceed with the walk.
 			///
-			///    WRC_Continue      Continue descending down the tree.
+			///    WRC.WRC_Continue      Continue descending down the tree.
 			///
-			///    WRC_Prune         Do not descend into child nodes.  But allow
+			///    WRC.WRC_Prune         Do not descend into child nodes.  But allow
 			///                      the walk to continue with sibling nodes.
 			///
-			///    WRC_Abort         Do no more callbacks.  Unwind the stack and
+			///    WRC.WRC_Abort         Do no more callbacks.  Unwind the stack and
 			///                      return the top-level walk call.
 			///
-			/// The return value from this routine is WRC_Abort to abandon the tree walk
-			/// and WRC_Continue to continue.
+			/// The return value from this routine is WRC.WRC_Abort to abandon the tree walk
+			/// and WRC.WRC_Continue to continue.
 			///
 			///</summary>
-			int sqlite3WalkExpr(ref Expr pExpr) {
-				int rc;
+			WRC sqlite3WalkExpr(ref Expr pExpr) {
+				WRC rc;
 				if(pExpr==null)
-					return WRC_Continue;
-				testcase(pExpr.ExprHasProperty(EP_TokenOnly));
-				testcase(pExpr.ExprHasProperty(EP_Reduced));
+                    return WRC.WRC_Continue;
+				sqliteinth.testcase(pExpr.ExprHasProperty(ExprFlags.EP_TokenOnly));
+				sqliteinth.testcase(pExpr.ExprHasProperty(ExprFlags.EP_Reduced));
 				rc=this.xExprCallback(this,ref pExpr);
-				if(rc==WRC_Continue&&!pExpr.ExprHasAnyProperty(EP_TokenOnly)) {
+                if (rc == WRC.WRC_Continue && !pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly))
+                {
 					if(this.sqlite3WalkExpr(ref pExpr.pLeft)!=0)
-						return WRC_Abort;
+                        return WRC.WRC_Abort;
 					if(this.sqlite3WalkExpr(ref pExpr.pRight)!=0)
-						return WRC_Abort;
-					if(pExpr.ExprHasProperty(EP_xIsSelect)) {
+                        return WRC.WRC_Abort;
+					if(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect)) {
 						if(this.sqlite3WalkSelect(pExpr.x.pSelect)!=0)
-							return WRC_Abort;
+                            return WRC.WRC_Abort;
 					}
 					else {
 						if(this.sqlite3WalkExprList(pExpr.x.pList)!=0)
-							return WRC_Abort;
+                            return WRC.WRC_Abort;
 					}
 				}
-				return rc&WRC_Abort;
+                return rc & WRC.WRC_Abort;
 			}
-			public///<summary>
-			/// Call sqlite3WalkExpr() for every expression in list p or until
-			/// an abort request is seen.
-			///
-			///</summary>
-			int sqlite3WalkExprList(ExprList p) {
+
+            ///<summary>
+            /// Call sqlite3WalkExpr() for every expression in list p or until
+            /// an abort request is seen.
+            ///</summary>
+			public
+			WRC sqlite3WalkExprList(ExprList p) {
 				int i;
 				ExprList_item pItem;
 				if(p!=null) {
@@ -133,75 +135,77 @@ namespace Community.CsharpSqlite {
 						//, pItem++){
 						pItem=p.a[p.nExpr-i];
 						if(this.sqlite3WalkExpr(ref pItem.pExpr)!=0)
-							return WRC_Abort;
+                            return WRC.WRC_Abort;
 					}
 				}
-				return WRC_Continue;
+                return WRC.WRC_Continue;
 			}
-			public///<summary>
-			/// Walk all expressions associated with SELECT statement p.  Do
-			/// not invoke the SELECT callback on p, but do (of course) invoke
-			/// any expr callbacks and SELECT callbacks that come from subqueries.
-			/// Return WRC_Abort or WRC_Continue.
-			///
-			///</summary>
-			int sqlite3WalkSelectExpr(Select p) {
+
+
+            ///<summary>
+            /// Walk all expressions associated with SELECT statement p.  Do
+            /// not invoke the SELECT callback on p, but do (of course) invoke
+            /// any expr callbacks and SELECT callbacks that come from subqueries.
+            /// Return WRC.WRC_Abort or WRC.WRC_Continue.
+            ///
+            ///</summary>
+			public	WRC sqlite3WalkSelectExpr(Select p) {
 				if(this.sqlite3WalkExprList(p.pEList)!=0)
-					return WRC_Abort;
+                    return WRC.WRC_Abort;
 				if(this.sqlite3WalkExpr(ref p.pWhere)!=0)
-					return WRC_Abort;
+                    return WRC.WRC_Abort;
 				if(this.sqlite3WalkExprList(p.pGroupBy)!=0)
-					return WRC_Abort;
+                    return WRC.WRC_Abort;
 				if(this.sqlite3WalkExpr(ref p.pHaving)!=0)
-					return WRC_Abort;
+                    return WRC.WRC_Abort;
 				if(this.sqlite3WalkExprList(p.pOrderBy)!=0)
-					return WRC_Abort;
+                    return WRC.WRC_Abort;
 				if(this.sqlite3WalkExpr(ref p.pLimit)!=0)
-					return WRC_Abort;
+                    return WRC.WRC_Abort;
 				if(this.sqlite3WalkExpr(ref p.pOffset)!=0)
-					return WRC_Abort;
-				return WRC_Continue;
+                    return WRC.WRC_Abort;
+                return WRC.WRC_Continue;
 			}
 			public///<summary>
 			/// Walk the parse trees associated with all subqueries in the
 			/// FROM clause of SELECT statement p.  Do not invoke the select
 			/// callback on p, but do invoke it on each FROM clause subquery
 			/// and on any subqueries further down in the tree.  Return
-			/// WRC_Abort or WRC_Continue;
+			/// WRC.WRC_Abort or WRC.WRC_Continue;
 			///
 			///</summary>
-			int sqlite3WalkSelectFrom(Select p) {
+			WRC sqlite3WalkSelectFrom(Select p) {
 				SrcList pSrc;
 				int i;
 				SrcList_item pItem;
 				pSrc=p.pSrc;
-				if(ALWAYS(pSrc)) {
+				if(Sqlite3.ALWAYS(pSrc)) {
 					for(i=pSrc.nSrc;i>0;i--)// pItem++ )
 					 {
 						pItem=pSrc.a[pSrc.nSrc-i];
 						if(this.sqlite3WalkSelect(pItem.pSelect)!=0) {
-							return WRC_Abort;
+                            return WRC.WRC_Abort;
 						}
 					}
 				}
-				return WRC_Continue;
+				return WRC.WRC_Continue;
 			}
-			public int sqlite3WalkSelect(Select p) {
-				int rc;
+			public WRC sqlite3WalkSelect(Select p) {
+                WRC rc;
 				if(p==null||this.xSelectCallback==null)
-					return WRC_Continue;
-				rc=WRC_Continue;
+                    return WRC.WRC_Continue;
+                rc = WRC.WRC_Continue;
 				while(p!=null) {
 					rc=this.xSelectCallback(this,p);
 					if(rc!=0)
 						break;
 					if(this.sqlite3WalkSelectExpr(p)!=0)
-						return WRC_Abort;
+                        return WRC.WRC_Abort;
 					if(this.sqlite3WalkSelectFrom(p)!=0)
-						return WRC_Abort;
+                        return WRC.WRC_Abort;
 					p=p.pPrior;
 				}
-				return rc&WRC_Abort;
+                return rc & WRC.WRC_Abort;
 			}
 		}
 		///
@@ -219,11 +223,13 @@ namespace Community.CsharpSqlite {
 		///<param name="Return code from the parse">tree walking primitives and their</param>
 		///<param name="callbacks.">callbacks.</param>
 		///<param name=""></param>
-		//#define WRC_Continue    0   /* Continue down into children */
-		//#define WRC_Prune       1   /* Omit children but continue walking siblings */
-		//#define WRC_Abort       2   /* Abandon the tree walk */
-		private const int WRC_Continue=0;
-		private const int WRC_Prune=1;
-		private const int WRC_Abort=2;
-	}
+		//#define WRC.WRC_Continue    0   /* Continue down into children */
+		//#define WRC.WRC_Prune       1   /* Omit children but continue walking siblings */
+		//#define WRC.WRC_Abort       2   /* Abandon the tree walk */
+        public enum WRC
+        {
+            WRC_Continue = 0,
+            WRC_Prune = 1,
+            WRC_Abort = 2
+        }
 }

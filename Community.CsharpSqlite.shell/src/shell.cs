@@ -3,10 +3,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Community.CsharpSqlite;
-using dxCallback = Community.CsharpSqlite.Sqlite3.dxCallback;
+
 using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
 using sqlite3_backup = Community.CsharpSqlite.Sqlite3.sqlite3_backup;
-using sqlite3_context = Community.CsharpSqlite.Sqlite3.sqlite3_context;
+
 using sqlite3_int64 = System.Int64;
 using sqlite3_stmt = Community.CsharpSqlite.Sqlite3.Vdbe;
 using sqlite3_value = Community.CsharpSqlite.Sqlite3.Mem;
@@ -152,7 +152,7 @@ timeDiff(&sBegin.ru_stime, &sEnd.ru_stime));
 	///<summary>
 	/// Used to prevent warnings about unused parameters
 	///</summary>
-	//#define UNUSED_PARAMETER(x) (void)(x)
+	//#define Sqlite3.sqliteinth.UNUSED_PARAMETER(x) (void)(x)
 	static void UNUSED_PARAMETER<T> (T x)
 	{
 	}
@@ -307,8 +307,8 @@ sqlite3_free(ref z);
 	{
 		Debug.Assert (0 == argc);
 		Debug.Assert (zShellStatic != null);
-		UNUSED_PARAMETER (argc);
-		UNUSED_PARAMETER (argv);
+		Sqlite3.sqliteinth.UNUSED_PARAMETER (argc);
+		Sqlite3.sqliteinth.UNUSED_PARAMETER (argv);
 		context.sqlite3_result_text (zShellStatic, -1, Sqlite3.SQLITE_STATIC);
 	}
 
@@ -630,7 +630,7 @@ sqlite3_free(ref z);
 	/// Number of elements in an array
 	///
 	///</summary>
-	//#define ArraySize(X)  (int)(sizeof(X)/sizeof(X[0]))
+	//#define Sqlite3.ArraySize(X)  (int)(sizeof(X)/sizeof(X[0]))
 	static int ArraySize<T> (T[] X)
 	{
 		return X.Length;
@@ -1074,7 +1074,7 @@ sqlite3_free(ref z);
 ** This routine runs when the user presses Ctrl-C
 */
 static void interrupt_handler(int NotUsed){
-UNUSED_PARAMETER(NotUsed);
+Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
 seenInterrupt = 1;
 if( db ) sqlite3_interrupt(db);
 }
@@ -1111,7 +1111,7 @@ if( db ) sqlite3_interrupt(db);
 			if (p.cnt++ == 0) {
 				for (i = 0; i < nArg; i++) {
 					int w, n;
-					if (i < ArraySize (p.colWidth)) {
+					if (i < Sqlite3.ArraySize (p.colWidth)) {
 						w = p.colWidth [i];
 					}
 					else {
@@ -1125,7 +1125,7 @@ if( db ) sqlite3_interrupt(db);
 						if (w < n)
 							w = n;
 					}
-					if (i < ArraySize (p.actualWidth)) {
+					if (i < Sqlite3.ArraySize (p.actualWidth)) {
 						p.actualWidth [i] = w;
 					}
 					if (p.showHeader) {
@@ -1135,7 +1135,7 @@ if( db ) sqlite3_interrupt(db);
 				if (p.showHeader) {
 					for (i = 0; i < nArg; i++) {
 						int w;
-						if (i < ArraySize (p.actualWidth)) {
+						if (i < Sqlite3.ArraySize (p.actualWidth)) {
 							w = p.actualWidth [i];
 						}
 						else {
@@ -1149,7 +1149,7 @@ if( db ) sqlite3_interrupt(db);
 				break;
 			for (i = 0; i < nArg; i++) {
 				int w;
-				if (i < ArraySize (p.actualWidth)) {
+				if (i < Sqlite3.ArraySize (p.actualWidth)) {
 					w = p.actualWidth [i];
 				}
 				else {
@@ -1399,7 +1399,7 @@ if( db ) sqlite3_interrupt(db);
 		string zType;
 		string zSql;
 		callback_data p = (callback_data)pArg;
-		UNUSED_PARAMETER (azCol);
+		Sqlite3.sqliteinth.UNUSED_PARAMETER (azCol);
 		if (nArg != 3)
 			return 1;
 		zTable = ((string[])azArg) [0];
@@ -1544,7 +1544,7 @@ if( db ) sqlite3_interrupt(db);
 			Sqlite3.sqlite3_open (p.zDbFilename, out p.db);
 			db = p.db;
 			if (db != null && Sqlite3.sqlite3_errcode (db) == Sqlite3.SQLITE_OK) {
-				Sqlite3.sqlite3_create_function (db, "shellstatic", 0, SqliteEncoding.UTF8, 0, (Sqlite3.dxFunc)shellstaticFunc, null, null);
+				Sqlite3.sqlite3_create_function (db, "shellstatic", 0, SqliteEncoding.UTF8, 0, (dxFunc)shellstaticFunc, null, null);
 			}
 			if (db == null || Sqlite3.SQLITE_OK != Sqlite3.sqlite3_errcode (db)) {
 				fprintf (stderr, "Unable to open database \"%s\": %s\n", p.zDbFilename, Sqlite3.sqlite3_errmsg (db));
@@ -1653,7 +1653,7 @@ if( db ) sqlite3_interrupt(db);
 ///
 ///</summary>
 
-		while (i < zLine.Length && nArg < ArraySize (azArg)) {
+		while (i < zLine.Length && nArg < Sqlite3.ArraySize (azArg)) {
 			while (isspace (zLine [i])) {
 				i++;
 			}
@@ -1821,7 +1821,7 @@ if( db ) sqlite3_interrupt(db);
 										p.mode = MODE_Explain;
 										p.showHeader = true;
 										Array.Clear (p.colWidth, 0, p.colWidth.Length);
-										// memset( p.colWidth, 0, ArraySize( p.colWidth ) );
+										// memset( p.colWidth, 0, Sqlite3.ArraySize( p.colWidth ) );
 										p.colWidth [0] = 4;
 										///
 ///<summary>
@@ -2203,11 +2203,11 @@ sqlite3IoTrace = iotracePrintf;
 																	if (c == 'p' && strncmp (azArg [0], "prompt", n) == 0 && (nArg == 2 || nArg == 3)) {
 																		if (nArg >= 2) {
 																			mainPrompt = azArg [1].ToString ();
-																			//strncpy( mainPrompt, azArg[1], (int)ArraySize( mainPrompt ) - 1 );
+																			//strncpy( mainPrompt, azArg[1], (int)Sqlite3.ArraySize( mainPrompt ) - 1 );
 																		}
 																		if (nArg >= 3) {
 																			continuePrompt = azArg [2].ToString ();
-																			// continuePromptstrncpy( continuePrompt, azArg[2], (int)ArraySize( continuePrompt ) - 1 );
+																			// continuePromptstrncpy( continuePrompt, azArg[2], (int)Sqlite3.ArraySize( continuePrompt ) - 1 );
 																		}
 																	}
 																	else
@@ -2345,7 +2345,7 @@ sqlite3IoTrace = iotracePrintf;
 																								output_c_string (p._out, p.separator);
 																								fprintf (p._out, "\n");
 																								fprintf (p._out, "%9.9s: ", "width");
-																								for (ii = 0; ii < (int)ArraySize (p.colWidth) && p.colWidth [ii] != 0; ii++) {
+																								for (ii = 0; ii < (int)Sqlite3.ArraySize (p.colWidth) && p.colWidth [ii] != 0; ii++) {
 																									fprintf (p._out, "%d ", p.colWidth [ii]);
 																								}
 																								fprintf (p._out, "\n");
@@ -2412,8 +2412,8 @@ enableTimer = booleanValue(azArg[1]);
 #endif
 																										if (c == 'w' && strncmp (azArg [0], "width", n) == 0) {
 																											int j;
-																											Debug.Assert (nArg <= ArraySize (azArg));
-																											for (j = 1; j < nArg && j < ArraySize (p.colWidth); j++) {
+																											Debug.Assert (nArg <= Sqlite3.ArraySize (azArg));
+																											for (j = 1; j < nArg && j < Sqlite3.ArraySize (p.colWidth); j++) {
 																												p.colWidth [j - 1] = Char.IsDigit (azArg [j] [0]) ? Convert.ToInt32 (azArg [j].ToString ()) : 1;
 																												//_Custom.atoi( azArg[j] );
 																											}

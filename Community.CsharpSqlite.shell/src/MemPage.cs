@@ -178,7 +178,7 @@ namespace Community.CsharpSqlite
 */public int findOverflowCell (int iCell)
 			{
 				int i;
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				for (i = this.nOverflow - 1; i >= 0; i--) {
 					int k;
 					_OvflCell pOvfl;
@@ -280,7 +280,7 @@ namespace Community.CsharpSqlite
 ///Number of bytes of cell payload 
 ///</summary>
 
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				if (pInfo.pCell != pCell)
 					pInfo.pCell = pCell;
 				pInfo.iCell = iCell;
@@ -304,9 +304,9 @@ namespace Community.CsharpSqlite
 				}
 				pInfo.nPayload = nPayload;
 				pInfo.nHeader = n;
-				testcase (nPayload == this.maxLocal);
-				testcase (nPayload == this.maxLocal + 1);
-				if (likely (nPayload <= this.maxLocal)) {
+				sqliteinth.testcase (nPayload == this.maxLocal);
+				sqliteinth.testcase (nPayload == this.maxLocal + 1);
+				if (sqliteinth.likely (nPayload <= this.maxLocal)) {
 					///
 ///<summary>
 ///This is the (easy) common case where the entire payload fits
@@ -354,8 +354,8 @@ namespace Community.CsharpSqlite
 					minLocal = this.minLocal;
 					maxLocal = this.maxLocal;
 					surplus = (int)(minLocal + (nPayload - minLocal) % (this.pBt.usableSize - 4));
-					testcase (surplus == maxLocal);
-					testcase (surplus == maxLocal + 1);
+					sqliteinth.testcase (surplus == maxLocal);
+					sqliteinth.testcase (surplus == maxLocal + 1);
 					if (surplus <= maxLocal) {
 						pInfo.nLocal = (u16)surplus;
 					}
@@ -468,13 +468,13 @@ namespace Community.CsharpSqlite
                     _pIter += utilc.getVarint32(pCell, _pIter, out nSize);
 					//pIter += utilc.getVarint32( pIter, out nSize );
 				}
-				testcase (nSize == this.maxLocal);
-				testcase (nSize == this.maxLocal + 1);
+				sqliteinth.testcase (nSize == this.maxLocal);
+				sqliteinth.testcase (nSize == this.maxLocal + 1);
 				if (nSize > this.maxLocal) {
 					int minLocal = this.minLocal;
 					nSize = (u32)(minLocal + (nSize - minLocal) % (this.pBt.usableSize - 4));
-					testcase (nSize == this.maxLocal);
-					testcase (nSize == this.maxLocal + 1);
+					sqliteinth.testcase (nSize == this.maxLocal);
+					sqliteinth.testcase (nSize == this.maxLocal + 1);
 					if (nSize > this.maxLocal) {
 						nSize = (u32)minLocal;
 					}
@@ -622,7 +622,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert (this.pBt != null);
 				Debug.Assert (this.pBt.usableSize <= SQLITE_MAX_PAGE_SIZE);
 				Debug.Assert (this.nOverflow == 0);
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				temp = this.pBt.pPager.sqlite3PagerTempSpace ();
 				data = this.aData;
 				hdr = this.hdrOffset;
@@ -646,8 +646,8 @@ namespace Community.CsharpSqlite
 					pAddr = cellOffset + i * 2;
 					// &data[cellOffset + i * 2];
 					pc = get2byte (data, pAddr);
-					testcase (pc == iCellFirst);
-					testcase (pc == iCellLast);
+					sqliteinth.testcase (pc == iCellFirst);
+					sqliteinth.testcase (pc == iCellLast);
 					#if !(SQLITE_ENABLE_OVERSIZE_CELL_CHECK)
 					///
 ///<summary>
@@ -656,7 +656,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 					if (pc < iCellFirst || pc > iCellLast) {
-						return SQLITE_CORRUPT_BKPT ();
+						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
 					#endif
 					Debug.Assert (pc >= iCellFirst && pc <= iCellLast);
@@ -669,12 +669,12 @@ namespace Community.CsharpSqlite
     }
 #else
 					if (cbrk < iCellFirst || pc + size > usableSize) {
-						return SQLITE_CORRUPT_BKPT ();
+						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
 					#endif
 					Debug.Assert (cbrk + size <= usableSize && cbrk >= iCellFirst);
-					testcase (cbrk + size == usableSize);
-					testcase (pc + size == usableSize);
+					sqliteinth.testcase (cbrk + size == usableSize);
+					sqliteinth.testcase (pc + size == usableSize);
 					Buffer.BlockCopy (temp, pc, data, cbrk, size);
 					//memcpy(data[cbrk], ref temp[pc], size);
 					put2byte (data, pAddr, cbrk);
@@ -689,7 +689,7 @@ namespace Community.CsharpSqlite
 				//memset(data[iCellFirst], 0, cbrk-iCellFirst);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				if (cbrk - iCellFirst != this.nFree) {
-					return SQLITE_CORRUPT_BKPT ();
+					return sqliteinth.SQLITE_CORRUPT_BKPT();
 				}
 				return SQLITE_OK;
 			}
@@ -753,7 +753,7 @@ namespace Community.CsharpSqlite
 
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (this.pBt != null);
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				Debug.Assert (nByte >= 0);
 				///
 ///<summary>
@@ -769,10 +769,10 @@ namespace Community.CsharpSqlite
 				gap = this.cellOffset + 2 * this.nCell;
                 top = BTreeMethods.get2byteNotZero(data, hdr + 5);
 				if (gap > top)
-					return SQLITE_CORRUPT_BKPT ();
-				testcase (gap + 2 == top);
-				testcase (gap + 1 == top);
-				testcase (gap == top);
+					return sqliteinth.SQLITE_CORRUPT_BKPT();
+				sqliteinth.testcase (gap + 2 == top);
+				sqliteinth.testcase (gap + 1 == top);
+				sqliteinth.testcase (gap == top);
 				if (nFrag >= 60) {
 					///
 ///<summary>
@@ -803,13 +803,13 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 							if (pc > usableSize - 4 || pc < addr + 4) {
-								return SQLITE_CORRUPT_BKPT ();
+								return sqliteinth.SQLITE_CORRUPT_BKPT();
 							}
 							size = get2byte (data, pc + 2);
 							if (size >= nByte) {
 								int x = size - nByte;
-								testcase (x == 4);
-								testcase (x == 3);
+								sqliteinth.testcase (x == 4);
+								sqliteinth.testcase (x == 3);
 								if (x < 4) {
 									///
 ///<summary>
@@ -824,7 +824,7 @@ namespace Community.CsharpSqlite
 								}
 								else
 									if (size + pc > usableSize) {
-										return SQLITE_CORRUPT_BKPT ();
+										return sqliteinth.SQLITE_CORRUPT_BKPT();
 									}
 									else {
 										///
@@ -847,7 +847,7 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-				testcase (gap + 2 + nByte == top);
+				sqliteinth.testcase (gap + 2 + nByte == top);
 				if (gap + 2 + nByte > top) {
 					rc = this.defragmentPage ();
 					if (rc != 0)
@@ -899,7 +899,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (start >= this.hdrOffset + 6 + this.childPtrSize);
 				Debug.Assert ((start + size) <= (int)this.pBt.usableSize);
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				Debug.Assert (size >= 0);
 				///
 ///<summary>
@@ -935,12 +935,12 @@ namespace Community.CsharpSqlite
 				Debug.Assert (start <= iLast);
 				while ((pbegin = get2byte (data, addr)) < start && pbegin > 0) {
 					if (pbegin < addr + 4) {
-						return SQLITE_CORRUPT_BKPT ();
+						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
 					addr = pbegin;
 				}
 				if (pbegin > iLast) {
-					return SQLITE_CORRUPT_BKPT ();
+					return sqliteinth.SQLITE_CORRUPT_BKPT();
 				}
 				Debug.Assert (pbegin > addr || pbegin == 0);
 				put2byte (data, addr, start);
@@ -962,7 +962,7 @@ namespace Community.CsharpSqlite
 					if (pbegin + psize + 3 >= pnext && pnext > 0) {
 						int frag = pnext - (pbegin + psize);
 						if ((frag < 0) || (frag > (int)data [hdr + 7])) {
-							return SQLITE_CORRUPT_BKPT ();
+							return sqliteinth.SQLITE_CORRUPT_BKPT();
 						}
 						data [hdr + 7] -= (u8)frag;
 						x = get2byte (data, pnext);
@@ -1012,7 +1012,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				Debug.Assert (this.hdrOffset == (this.pgno == 1 ? 100 : 0));
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				this.leaf = (u8)(flagByte >> 3);
 				Debug.Assert (PTF_LEAF == 1 << 3);
 				flagByte &= ~PTF_LEAF;
@@ -1032,7 +1032,7 @@ namespace Community.CsharpSqlite
 						this.minLocal = pBt.minLocal;
 					}
 					else {
-						return SQLITE_CORRUPT_BKPT ();
+						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
 				return SQLITE_OK;
 			}
@@ -1049,7 +1049,7 @@ namespace Community.CsharpSqlite
 			int btreeInitPage ()
 			{
 				Debug.Assert (this.pBt != null);
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				Debug.Assert (this.pgno == PagerMethods.sqlite3PagerPagenumber (this.pDbPage));
 				Debug.Assert (this ==  PagerMethods.sqlite3PagerGetExtra  (this.pDbPage));
                 Debug.Assert(this.aData == this.pDbPage.sqlite3PagerGetData());
@@ -1118,7 +1118,7 @@ namespace Community.CsharpSqlite
 					hdr = this.hdrOffset;
 					data = this.aData;
 					if (this.decodeFlags (data [hdr]) != 0)
-						return SQLITE_CORRUPT_BKPT ();
+						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					Debug.Assert (pBt.pageSize >= 512 && pBt.pageSize <= 65536);
 					this.maskPage = (u16)(pBt.pageSize - 1);
 					this.nOverflow = 0;
@@ -1132,9 +1132,9 @@ namespace Community.CsharpSqlite
 ///To many cells for a single page.  The page must be corrupt 
 ///</summary>
 
-						return SQLITE_CORRUPT_BKPT ();
+						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
-					testcase (this.nCell == MX_CELL (pBt));
+					sqliteinth.testcase (this.nCell == MX_CELL (pBt));
 					///
 ///<summary>
 ///A malformed database page might cause us to read past the end
@@ -1158,14 +1158,14 @@ namespace Community.CsharpSqlite
       for ( i = 0; i < pPage.nCell; i++ )
       {
         pc = (u16)get2byte( data, cellOffset + i * 2 );
-        testcase( pc == iCellFirst );
-        testcase( pc == iCellLast );
+        sqliteinth.testcase( pc == iCellFirst );
+        sqliteinth.testcase( pc == iCellLast );
         if ( pc < iCellFirst || pc > iCellLast )
         {
           return SQLITE_CORRUPT_BKPT();
         }
         sz = cellSizePtr( pPage, data, pc );
-        testcase( pc + sz == usableSize );
+        sqliteinth.testcase( pc + sz == usableSize );
         if ( pc + sz > usableSize )
         {
           return SQLITE_CORRUPT_BKPT();
@@ -1190,7 +1190,7 @@ namespace Community.CsharpSqlite
 ///Start of free block is off the page 
 ///</summary>
 
-							return SQLITE_CORRUPT_BKPT ();
+							return sqliteinth.SQLITE_CORRUPT_BKPT();
 						}
 						next = (u16)get2byte (data, pc);
 						size = (u16)get2byte (data, pc + 2);
@@ -1201,7 +1201,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 ///<param name="the free">block must lie on the database page.  </param>
 
-							return SQLITE_CORRUPT_BKPT ();
+							return sqliteinth.SQLITE_CORRUPT_BKPT();
 						}
 						nFree = (u16)(nFree + size);
 						pc = next;
@@ -1218,7 +1218,7 @@ namespace Community.CsharpSqlite
 ///<param name=""></param>
 
 					if (nFree > usableSize) {
-						return SQLITE_CORRUPT_BKPT ();
+						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
 					this.nFree = (u16)(nFree - iCellFirst);
 					this.isInit = 1;
@@ -1240,7 +1240,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert ( PagerMethods.sqlite3PagerGetExtra  (this.pDbPage) == this);
                 Debug.Assert(this.pDbPage.sqlite3PagerGetData() == data);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
-				Debug.Assert (sqlite3_mutex_held (pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (pBt.mutex));
 				if (pBt.secureDelete) {
 					Array.Clear (data, hdr, (int)(pBt.usableSize - hdr));
 					//memset(&data[hdr], 0, pBt->usableSize - hdr);
@@ -1291,7 +1291,7 @@ namespace Community.CsharpSqlite
 				BtShared pBt = this.pBt;
 				u8 isInitOrig = this.isInit;
 				Pgno pgno = this.pgno;
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				rc = this.btreeInitPage ();
 				if (rc != SQLITE_OK) {
 					goto set_child_ptrmaps_out;
@@ -1331,7 +1331,7 @@ namespace Community.CsharpSqlite
 ///<param name="overflow page in the list.">overflow page in the list.</param>
 */public int modifyPagePointer (Pgno iFrom, Pgno iTo, u8 eType)
 			{
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				if (eType == PTRMAP_OVERFLOW2) {
 					///
@@ -1340,7 +1340,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 					if (Converter.sqlite3Get4byte (this.aData) != iFrom) {
-						return SQLITE_CORRUPT_BKPT ();
+						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
 					Converter.sqlite3Put4byte (this.aData, iTo);
 				}
@@ -1371,7 +1371,7 @@ namespace Community.CsharpSqlite
 					}
 					if (i == nCell) {
 						if (eType != PTRMAP_BTREE || Converter.sqlite3Get4byte (this.aData, this.hdrOffset + 8) != iFrom) {
-							return SQLITE_CORRUPT_BKPT ();
+							return sqliteinth.SQLITE_CORRUPT_BKPT();
 						}
 						Converter.sqlite3Put4byte (this.aData, this.hdrOffset + 8, iTo);
 					}
@@ -1445,7 +1445,7 @@ namespace Community.CsharpSqlite
 				Pgno pgnoOvfl = 0;
 				int nHeader;
 				CellInfo info = new CellInfo ();
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				///
 ///<summary>
 ///pPage is not necessarily writeable since pCell might be auxiliary
@@ -1490,7 +1490,7 @@ namespace Community.CsharpSqlite
 				}
 				else {
 					if (NEVER (nKey > 0x7fffffff || pKey == null)) {
-						return SQLITE_CORRUPT_BKPT ();
+						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
 					nPayload += (int)nKey;
 					pSrc = pKey;
@@ -1675,16 +1675,16 @@ namespace Community.CsharpSqlite
 																																																																																								  Debug.Assert( sz == cellSize( pPage, idx ) );
 #endif
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				data = this.aData;
 				ptr = this.cellOffset + 2 * idx;
 				//ptr = &data[pPage.cellOffset + 2 * idx];
 				pc = (u32)get2byte (data, ptr);
 				hdr = this.hdrOffset;
-				testcase (pc == get2byte (data, hdr + 5));
-				testcase (pc + sz == this.pBt.usableSize);
+				sqliteinth.testcase (pc == get2byte (data, hdr + 5));
+				sqliteinth.testcase (pc + sz == this.pBt.usableSize);
 				if (pc < (u32)get2byte (data, hdr + 5) || pc + sz > this.pBt.usableSize) {
-					pRC = SQLITE_CORRUPT_BKPT ();
+					pRC = sqliteinth.SQLITE_CORRUPT_BKPT();
 					return;
 				}
 				rc = this.freeSpace (pc, sz);
@@ -1813,8 +1813,8 @@ namespace Community.CsharpSqlite
 					return;
 				Debug.Assert (i >= 0 && i <= this.nCell + this.nOverflow);
 				Debug.Assert (this.nCell <= MX_CELL (this.pBt) && MX_CELL (this.pBt) <= 10921);
-				Debug.Assert (this.nOverflow <= ArraySize (this.aOvfl));
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.nOverflow <= Sqlite3.ArraySize (this.aOvfl));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				///
 ///<summary>
 ///The cell should normally be sized correctly.  However, when moving a
@@ -1964,7 +1964,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				Debug.Assert (this.nOverflow == 0);
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				Debug.Assert (nCell >= 0 && nCell <= (int)MX_CELL (this.pBt) && (int)MX_CELL (this.pBt) <= 10921);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				///
@@ -2055,7 +2055,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				Debug.Assert (this.nOverflow == 0);
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				Debug.Assert (nCell >= 0 && nCell <= MX_CELL (this.pBt) && MX_CELL (this.pBt) <= 5460);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				///
@@ -2140,7 +2140,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				Debug.Assert (this.nOverflow == 0);
-				Debug.Assert (sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
 				Debug.Assert (nCell >= 0 && nCell <= MX_CELL (this.pBt) && MX_CELL (this.pBt) <= 5460);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				///
@@ -2216,7 +2216,7 @@ namespace Community.CsharpSqlite
 ///Page number of pNew 
 ///</summary>
 
-				Debug.Assert (sqlite3_mutex_held (pPage.pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (pPage.pBt.mutex));
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (pPage.nOverflow == 1);
 				///
@@ -2225,7 +2225,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				if (pPage.nCell <= 0)
-					return SQLITE_CORRUPT_BKPT ();
+					return sqliteinth.SQLITE_CORRUPT_BKPT();
 				///
 ///<summary>
 ///</summary>
@@ -2566,7 +2566,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				pBt = this.pBt;
-				Debug.Assert (sqlite3_mutex_held (pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (pBt.mutex));
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				#if FALSE
 																																																																																								TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
@@ -2855,7 +2855,7 @@ namespace Community.CsharpSqlite
 						k++;
                         if (k > BTreeMethods.NB + 1)
                         {
-							rc = SQLITE_CORRUPT_BKPT ();
+							rc = sqliteinth.SQLITE_CORRUPT_BKPT();
 							goto balance_cleanup;
 						}
 					}
@@ -2932,7 +2932,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				if (apOld [0].pgno <= 1) {
-					rc = SQLITE_CORRUPT_BKPT ();
+					rc = sqliteinth.SQLITE_CORRUPT_BKPT();
 					goto balance_cleanup;
 				}
 				pageFlags = apOld [0].aData [0];
@@ -3347,7 +3347,7 @@ ptrmapCheckPages(pParent, 1);
 ///</summary>
 
 				Debug.Assert (this.nOverflow > 0);
-				Debug.Assert (sqlite3_mutex_held (pBt.mutex));
+				Debug.Assert (Sqlite3.sqlite3_mutex_held (pBt.mutex));
 				///
 ///<summary>
 ///</summary>
