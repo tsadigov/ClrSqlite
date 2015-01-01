@@ -311,68 +311,6 @@ namespace Community.CsharpSqlite
 
 
 
-        //#define OpCode.OP_Goto                                 1
-        
-        
-        
-
-        //public const int OpCode.OP_Real = 130///
-            ///<summary>
-            ///same as Sqlite3.TK_FLOAT    
-            ///</summary>
-
-        
-
-        //public const int OpCode.OP_String8 = 94///
-            ///<summary>
-            ///same as Sqlite3.TK_STRING   
-            ///</summary>
-
-        
-        
-
-        public const int OP_Concat = 91///
-            ///<summary>
-            ///same as Sqlite3.TK_CONCAT   
-            ///</summary>
-
-        ;
-
-        public const int OP_Add = 86///
-            ///<summary>
-            ///same as Sqlite3.TK_PLUS     
-            ///</summary>
-
-        ;
-
-        public const int OP_Subtract = 87///
-            ///<summary>
-            ///same as Sqlite3.TK_MINUS    
-            ///</summary>
-
-        ;
-
-        public const int OP_Multiply = 88///
-            ///<summary>
-            ///same as Sqlite3.TK_STAR     
-            ///</summary>
-
-        ;
-
-        public const int OP_Divide = 89///
-            ///<summary>
-            ///same as Sqlite3.TK_SLASH    
-            ///</summary>
-
-        ;
-
-        public const int OP_Remainder = 90///
-            ///<summary>
-            ///same as Sqlite3.TK_REM      
-            ///</summary>
-
-        ;
-
         public const int OP_CollSeq = 17;
 
         public const int OP_Function = 18;

@@ -1607,12 +1607,12 @@ return;
 					}
 					for(i=0;i<nCol;i++) {
 						v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,regTemp,0," ",0);
-						v.sqlite3VdbeAddOp3(OP_Concat,regTemp,regSampleno,regSampleno);
-						v.sqlite3VdbeAddOp3(OP_Add,iMem,iMem+i+1,regTemp);
+						v.sqlite3VdbeAddOp3(OpCode.OP_Concat,regTemp,regSampleno,regSampleno);
+						v.sqlite3VdbeAddOp3(OpCode.OP_Add,iMem,iMem+i+1,regTemp);
 						v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regTemp,-1);
-						v.sqlite3VdbeAddOp3(OP_Divide,iMem+i+1,regTemp,regTemp);
+						v.sqlite3VdbeAddOp3(OpCode.OP_Divide,iMem+i+1,regTemp,regTemp);
 						v.sqlite3VdbeAddOp1(OpCode.OP_ToInt,regTemp);
-						v.sqlite3VdbeAddOp3(OP_Concat,regTemp,regSampleno,regSampleno);
+						v.sqlite3VdbeAddOp3(OpCode.OP_Concat,regTemp,regSampleno,regSampleno);
 					}
 					v.sqlite3VdbeAddOp4(OP_MakeRecord,regTabname,3,regRec,"aaa",0);
 					v.sqlite3VdbeAddOp2(OP_NewRowid,iStatCur,regRowid);
@@ -7290,17 +7290,17 @@ return;
 				case Sqlite3.TK_LSHIFT:
 				case Sqlite3.TK_RSHIFT:
 				case Sqlite3.TK_CONCAT: {
-					Debug.Assert(Sqlite3.TK_AND==OP_And);
-					Debug.Assert(Sqlite3.TK_OR==OP_Or);
-					Debug.Assert(Sqlite3.TK_PLUS==OP_Add);
-					Debug.Assert(Sqlite3.TK_MINUS==OP_Subtract);
-					Debug.Assert(Sqlite3.TK_REM==OP_Remainder);
-					Debug.Assert(Sqlite3.TK_BITAND==OP_BitAnd);
-					Debug.Assert(Sqlite3.TK_BITOR==OP_BitOr);
-					Debug.Assert(Sqlite3.TK_SLASH==OP_Divide);
-					Debug.Assert(Sqlite3.TK_LSHIFT==OP_ShiftLeft);
-					Debug.Assert(Sqlite3.TK_RSHIFT==OP_ShiftRight);
-					Debug.Assert(Sqlite3.TK_CONCAT==OP_Concat);
+                    Debug.Assert(Sqlite3.TK_AND == (int)OpCode.OP_And);
+                    Debug.Assert(Sqlite3.TK_OR == (int)OpCode.OP_Or);
+                    Debug.Assert(Sqlite3.TK_PLUS == (int)OpCode.OP_Add);
+                    Debug.Assert(Sqlite3.TK_MINUS == (int)OpCode.OP_Subtract);
+                    Debug.Assert(Sqlite3.TK_REM == (int)OpCode.OP_Remainder);
+                    Debug.Assert(Sqlite3.TK_BITAND == (int)OpCode.OP_BitAnd);
+                    Debug.Assert(Sqlite3.TK_BITOR == (int)OpCode.OP_BitOr);
+                    Debug.Assert(Sqlite3.TK_SLASH == (int)OpCode.OP_Divide);
+                    Debug.Assert(Sqlite3.TK_LSHIFT == (int)OpCode.OP_ShiftLeft);
+                    Debug.Assert(Sqlite3.TK_RSHIFT == (int)OpCode.OP_ShiftRight);
+                    Debug.Assert(Sqlite3.TK_CONCAT == (int)OpCode.OP_Concat);
 					sqliteinth.testcase(op==Sqlite3.TK_AND);
 					sqliteinth.testcase(op==Sqlite3.TK_OR);
 					sqliteinth.testcase(op==Sqlite3.TK_PLUS);
@@ -7336,7 +7336,7 @@ return;
 							regFree1=r1=this.sqlite3GetTempReg();
 							v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,r1);
 							r2=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree2);
-							v.sqlite3VdbeAddOp3(OP_Subtract,r2,r1,target);
+							v.sqlite3VdbeAddOp3(OpCode.OP_Subtract,r2,r1,target);
 							sqliteinth.testcase(regFree2==0);
 						}
 					inReg=target;

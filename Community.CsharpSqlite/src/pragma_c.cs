@@ -1498,7 +1498,7 @@ else
 																											addr=v.sqlite3VdbeAddOp1(OpCode.OP_IsNull,2);
 																											v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,3,0,io.sqlite3MPrintf(db,"*** in database %s ***\n",db.aDb[i].zName), P4Usage.P4_DYNAMIC);
                                                                                                             v.sqlite3VdbeAddOp3(OpCode.OP_Move, 2, 4, 1);
-																											v.sqlite3VdbeAddOp3(OP_Concat,4,3,2);
+																											v.sqlite3VdbeAddOp3(OpCode.OP_Concat,4,3,2);
 																											v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,2,1);
 																											v.sqlite3VdbeJumpHere(addr);
 																											
