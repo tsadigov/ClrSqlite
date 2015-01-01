@@ -9,7 +9,9 @@ using i16 = System.Int16;
 using sqlite3_int64 = System.Int64;
 using u32 = System.UInt32;
 
-
+using System.Threading;
+using DWORD = System.UInt64;
+using System.IO;
 
 namespace Community.CsharpSqlite
 {
@@ -25,7 +27,13 @@ namespace Community.CsharpSqlite
         /// for their own use.  The pMethods entry is a pointer to an
         /// [sqlite3_io_methods] object that defines methods for performing
         /// I/O operations on the open file.
-        ///
+        ///---------------------------------------------------
+        ///  This subclass is a subclass of sqlite3_file.  Each open memory-journal
+        /// is an instance of this class.
+        ///------------------------------------------------------
+        /// The winFile structure is a subclass of sqlite3_file* specific to the win32
+        /// portability layer.
+        /// 
         ///</summary>
         //typedef struct sqlite3_file sqlite3_file;
         //struct sqlite3_file {
@@ -33,6 +41,89 @@ namespace Community.CsharpSqlite
         //};
         public partial class sqlite3_file
         {
+            public sqlite3_vfs pVfs;
+
+            ///
+            ///<summary>
+            ///The VFS used to open this file 
+            ///</summary>
+
+            public FileStream fs;
+
+            ///
+            ///<summary>
+            ///Filestream access to this file
+            ///</summary>
+
+            // public HANDLE h;            /* Handle for accessing the file */
+            public int locktype;
+
+            ///
+            ///<summary>
+            ///Type of lock currently held on this file 
+            ///</summary>
+
+            public int sharedLockByte;
+
+            ///
+            ///<summary>
+            ///Randomly chosen byte used as a shared lock 
+            ///</summary>
+
+            public DWORD lastErrno;
+
+            ///
+            ///<summary>
+            ///The Windows errno from the last I/O error 
+            ///</summary>
+
+            public DWORD sectorSize;
+
+            ///
+            ///<summary>
+            ///Sector size of the device file is on 
+            ///</summary>
+
+#if !SQLITE_OMIT_WAL
+																																																									public winShm pShm;            /* Instance of shared memory on this file */
+#else
+            public object pShm;
+
+            ///
+            ///<summary>
+            ///DUMMY Instance of shared memory on this file 
+            ///</summary>
+
+#endif
+            public string zPath;
+
+            ///
+            ///<summary>
+            ///Full pathname of this file 
+            ///</summary>
+
+            public int szChunk;
+
+            ///<summary>
+            ///Chunk size configured by FCNTL_CHUNK_SIZE
+            ///</summary>
+#if SQLITE_OS_WINCE
+																																																									Wstring zDeleteOnClose;  /* Name of file to delete when closing */
+HANDLE hMutex;          /* Mutex used to control access to shared lock */
+HANDLE hShared;         /* Shared memory segment used for locking */
+winceLock local;        /* Locks obtained by this instance of sqlite3_file */
+winceLock *shared;      /* Global shared lock memory for the file  */
+#endif
+            public void Clear()
+            {
+                pMethods = null;
+                fs = null;
+                locktype = 0;
+                sharedLockByte = 0;
+                lastErrno = 0;
+                sectorSize = 0;
+            }
+
             public Community.CsharpSqlite.Sqlite3.sqlite3_io_methods pMethods;
             ///
             ///<summary>
@@ -59,6 +150,47 @@ namespace Community.CsharpSqlite
                 get { return this.pMethods != null; }
             }
 
+
+            //public sqlite3_io_methods pMethods; /* Parent class. MUST BE FIRST */
+            public FileChunk pFirst;
+
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Head of in">list </param>
+
+            public FilePoint endpoint;
+
+            ///
+            ///<summary>
+            ///Pointer to the end of the file 
+            ///</summary>
+
+            public FilePoint readpoint;
+
+            ///
+            ///<summary>
+            ///Pointer to the end of the last xRead() 
+            ///</summary>
+
+            public///<summary>
+                /// If pFile is currently larger than iSize bytes, then truncate it to
+                /// exactly iSize bytes. If pFile is not larger than iSize bytes, then
+                /// this function is a no-op.
+                ///
+                /// Return SQLITE_OK if everything is successful, or an SQLite error
+                /// code if an error occurs.
+                ///</summary>
+            int backupTruncateFile(int iSize)
+            {
+                long iCurrent = 0;
+                int rc = os.sqlite3OsFileSize(this, ref iCurrent);
+                if (rc == SQLITE_OK && iCurrent > iSize)
+                {
+                    rc = os.sqlite3OsTruncate(this, iSize);
+                }
+                return rc;
+            }
         }
 
         ///<summary>

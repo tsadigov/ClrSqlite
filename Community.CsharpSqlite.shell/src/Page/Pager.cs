@@ -447,7 +447,7 @@ namespace Community.CsharpSqlite
         ///<param name="sub">codes.</param>
         ///<param name=""></param>
 
-        public partial class Pager
+        public  class Pager
         {
 
             public sqlite3_vfs pVfs;

@@ -680,14 +680,12 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             //#define DbSetProperty(D,I,P)     (D)->aDb[I].pSchema->flags|=(P)
             public void DbSetProperty(int I, ushort P)
             {
-                sqlite3 D = this;
-                D.aDb[I].pSchema.flags = (u16)(D.aDb[I].pSchema.flags | P);
+                this.aDb[I].pSchema.flags = (u16)(this.aDb[I].pSchema.flags | P);
             }
             //#define DbClearProperty(D,I,P)   (D)->aDb[I].pSchema->flags&=~(P)
             public void DbClearProperty( int I, ushort P)
             {
-                sqlite3 D = this;
-                D.aDb[I].pSchema.flags = (u16)(D.aDb[I].pSchema.flags & ~P);
+                this.aDb[I].pSchema.flags = (u16)(this.aDb[I].pSchema.flags & ~P);
             }
 
 

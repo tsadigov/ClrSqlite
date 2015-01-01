@@ -107,55 +107,6 @@ namespace Community.CsharpSqlite
 		};
 
 
-		///<summary>
-		/// This subclass is a subclass of sqlite3_file.  Each open memory-journal
-		/// is an instance of this class.
-		///
-		///</summary>
-		public partial class sqlite3_file
-		{
-			//public sqlite3_io_methods pMethods; /* Parent class. MUST BE FIRST */
-			public FileChunk pFirst;
-
-			///
-///<summary>
-///</summary>
-///<param name="Head of in">list </param>
-
-			public FilePoint endpoint;
-
-			///
-///<summary>
-///Pointer to the end of the file 
-///</summary>
-
-			public FilePoint readpoint;
-
-			///
-///<summary>
-///Pointer to the end of the last xRead() 
-///</summary>
-
-			public///<summary>
-			/// If pFile is currently larger than iSize bytes, then truncate it to
-			/// exactly iSize bytes. If pFile is not larger than iSize bytes, then
-			/// this function is a no-op.
-			///
-			/// Return SQLITE_OK if everything is successful, or an SQLite error
-			/// code if an error occurs.
-			///</summary>
-			int backupTruncateFile (int iSize)
-			{
-				long iCurrent = 0;
-				int rc = os.sqlite3OsFileSize (this, ref iCurrent);
-				if (rc == SQLITE_OK && iCurrent > iSize) {
-					rc = os.sqlite3OsTruncate (this, iSize);
-				}
-				return rc;
-			}
-		}
-
-
         public class memjrnl {
 
             ///<summary>

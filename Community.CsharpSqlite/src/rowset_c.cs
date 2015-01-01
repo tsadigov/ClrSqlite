@@ -10,6 +10,147 @@ namespace Community.CsharpSqlite
 {
 	using sqlite3_int64 = System.Int64;
 
+
+    ///<summary>
+    /// Each entry in a RowSet is an instance of the following object.
+    ///
+    ///</summary>
+    public class RowSetEntry
+    {
+        public i64 v;
+
+        ///
+        ///<summary>
+        ///ROWID value for this entry 
+        ///</summary>
+
+        public RowSetEntry pRight;
+
+        ///
+        ///<summary>
+        ///Right subtree (larger entries) or list 
+        ///</summary>
+
+        public RowSetEntry pLeft;
+        ///
+        ///<summary>
+        ///Left subtree (smaller entries) 
+        ///</summary>
+
+    };
+
+
+    ///<summary>
+    /// Index entries are allocated in large chunks (instances of the
+    /// following structure) to reduce memory allocation overhead.  The
+    /// chunks are kept on a linked list so that they can be deallocated
+    /// when the RowSet is destroyed.
+    ///
+    ///</summary>
+    public class RowSetChunk
+    {
+        public RowSetChunk pNextChunk;
+
+        ///
+        ///<summary>
+        ///Next chunk on list of them all 
+        ///</summary>
+
+        public RowSetEntry[] aEntry = new RowSetEntry[Sqlite3.ROWSET_ENTRY_PER_CHUNK];
+        ///
+        ///<summary>
+        ///Allocated entries 
+        ///</summary>
+
+    };
+
+
+    ///<summary>
+    /// A RowSet in an instance of the following structure.
+    ///
+    /// A typedef of this structure if found in sqliteInt.h.
+    ///
+    ///</summary>
+    public class RowSet
+    {
+        public RowSetChunk pChunk;
+
+        ///
+        ///<summary>
+        ///List of all chunk allocations 
+        ///</summary>
+
+        public Sqlite3.sqlite3 db;
+
+        ///
+        ///<summary>
+        ///The database connection 
+        ///</summary>
+
+        public RowSetEntry pEntry;
+
+        ///
+        ///<summary>
+        ////* List of entries using pRight 
+        ///</summary>
+
+        public RowSetEntry pLast;
+
+        ///
+        ///<summary>
+        ///Last entry on the pEntry list 
+        ///</summary>
+
+        public RowSetEntry[] pFresh;
+
+        ///
+        ///<summary>
+        ///Source of new entry objects 
+        ///</summary>
+
+        public RowSetEntry pTree;
+
+        ///
+        ///<summary>
+        ///Binary tree of entries 
+        ///</summary>
+
+        public int nFresh;
+
+        ///
+        ///<summary>
+        ///Number of objects on pFresh 
+        ///</summary>
+
+        public bool isSorted;
+
+        ///
+        ///<summary>
+        ///True if pEntry is sorted 
+        ///</summary>
+
+        public u8 iBatch;
+
+        ///
+        ///<summary>
+        ///Current insert batch 
+        ///</summary>
+
+        public RowSet(Sqlite3.sqlite3 db, int N)
+        {
+            this.pChunk = null;
+            this.db = db;
+            this.pEntry = null;
+            this.pLast = null;
+            this.pFresh = new RowSetEntry[N];
+            this.pTree = null;
+            this.nFresh = N;
+            this.isSorted = true;
+            this.iBatch = 0;
+        }
+    };
+
+
 	public partial class Sqlite3
 	{
 		///
@@ -100,146 +241,10 @@ namespace Community.CsharpSqlite
 		///</summary>
 		//#define ROWSET_ENTRY_PER_CHUNK  \
 		//                     ((ROWSET_ALLOCATION_SIZE-8)/sizeof(struct RowSetEntry))
-		const int ROWSET_ENTRY_PER_CHUNK = 63;
+		public const int ROWSET_ENTRY_PER_CHUNK = 63;
 
-		///<summary>
-		/// Each entry in a RowSet is an instance of the following object.
-		///
-		///</summary>
-		public class RowSetEntry
-		{
-			public i64 v;
+		
 
-			///
-///<summary>
-///ROWID value for this entry 
-///</summary>
-
-			public RowSetEntry pRight;
-
-			///
-///<summary>
-///Right subtree (larger entries) or list 
-///</summary>
-
-			public RowSetEntry pLeft;
-		///
-///<summary>
-///Left subtree (smaller entries) 
-///</summary>
-
-		};
-
-
-		///<summary>
-		/// Index entries are allocated in large chunks (instances of the
-		/// following structure) to reduce memory allocation overhead.  The
-		/// chunks are kept on a linked list so that they can be deallocated
-		/// when the RowSet is destroyed.
-		///
-		///</summary>
-		public class RowSetChunk
-		{
-			public RowSetChunk pNextChunk;
-
-			///
-///<summary>
-///Next chunk on list of them all 
-///</summary>
-
-			public RowSetEntry[] aEntry = new RowSetEntry[ROWSET_ENTRY_PER_CHUNK];
-		///
-///<summary>
-///Allocated entries 
-///</summary>
-
-		};
-
-
-		///<summary>
-		/// A RowSet in an instance of the following structure.
-		///
-		/// A typedef of this structure if found in sqliteInt.h.
-		///
-		///</summary>
-		public class RowSet
-		{
-			public RowSetChunk pChunk;
-
-			///
-///<summary>
-///List of all chunk allocations 
-///</summary>
-
-			public sqlite3 db;
-
-			///
-///<summary>
-///The database connection 
-///</summary>
-
-			public RowSetEntry pEntry;
-
-			///
-///<summary>
-////* List of entries using pRight 
-///</summary>
-
-			public RowSetEntry pLast;
-
-			///
-///<summary>
-///Last entry on the pEntry list 
-///</summary>
-
-			public RowSetEntry[] pFresh;
-
-			///
-///<summary>
-///Source of new entry objects 
-///</summary>
-
-			public RowSetEntry pTree;
-
-			///
-///<summary>
-///Binary tree of entries 
-///</summary>
-
-			public int nFresh;
-
-			///
-///<summary>
-///Number of objects on pFresh 
-///</summary>
-
-			public bool isSorted;
-
-			///
-///<summary>
-///True if pEntry is sorted 
-///</summary>
-
-			public u8 iBatch;
-
-			///
-///<summary>
-///Current insert batch 
-///</summary>
-
-			public RowSet (sqlite3 db, int N)
-			{
-				this.pChunk = null;
-				this.db = db;
-				this.pEntry = null;
-				this.pLast = null;
-				this.pFresh = new RowSetEntry[N];
-				this.pTree = null;
-				this.nFresh = N;
-				this.isSorted = true;
-				this.iBatch = 0;
-			}
-		};
 
 
 		///<summary>
