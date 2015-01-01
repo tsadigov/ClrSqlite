@@ -252,7 +252,7 @@ namespace Community.CsharpSqlite {
 						 {
 							pIn=pLevel.u._in.aInLoop[j-1];
 							v.sqlite3VdbeJumpHere(pIn.addrInTop+1);
-							v.sqlite3VdbeAddOp2(OP_Next,pIn.iCur,pIn.addrInTop);
+							v.sqlite3VdbeAddOp2( OpCode.OP_Next,pIn.iCur,pIn.addrInTop);
 							v.sqlite3VdbeJumpHere(pIn.addrInTop-1);
 						}
 						db.sqlite3DbFree(ref pLevel.u._in.aInLoop);
@@ -502,7 +502,7 @@ namespace Community.CsharpSqlite {
 					int iReg;
 					///
 					///<summary>
-					///P3 Value for OP_VFilter 
+					///P3 Value for  OpCode.OP_VFilter 
 					///</summary>
 					sqlite3_index_info pVtabIdx=pLevel.plan.u.pVtabIdx;
 					int nConstraint=pVtabIdx.nConstraint;
@@ -561,8 +561,8 @@ namespace Community.CsharpSqlite {
 						///<param name="EV: R">11662 </param>
 						iRowidReg=pParse.codeEqualityTerm(pTerm,pLevel,iReleaseReg);
 						addrNxt=pLevel.addrNxt;
-						v.sqlite3VdbeAddOp2(OP_MustBeInt,iRowidReg,addrNxt);
-						v.sqlite3VdbeAddOp3(OP_NotExists,iCur,addrNxt,iRowidReg);
+						v.sqlite3VdbeAddOp2( OpCode.OP_MustBeInt,iRowidReg,addrNxt);
+                        v.sqlite3VdbeAddOp3(OpCode.OP_NotExists, iCur, addrNxt, iRowidReg);
 						pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
 						#if SQLITE_DEBUG
 																																																																																																																																																				          VdbeComment( v, "pk" );
@@ -660,7 +660,7 @@ namespace Community.CsharpSqlite {
 								pLevel.disableTerm(pStart);
 							}
 							else {
-								v.sqlite3VdbeAddOp2(bRev!=0?OP_Last:OP_Rewind,iCur,addrBrk);
+                                v.sqlite3VdbeAddOp2(bRev != 0 ?  OpCode.OP_Last : OpCode.OP_Rewind, iCur, addrBrk);
 							}
 							if(pEnd!=null) {
 								Expr pX;
@@ -694,7 +694,7 @@ namespace Community.CsharpSqlite {
 							}
 							if(testOp!=OpCode.OP_Noop) {
 								iRowidReg=iReleaseReg=pParse.sqlite3GetTempReg();
-								v.sqlite3VdbeAddOp2(OP_Rowid,iCur,iRowidReg);
+                                v.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iCur, iRowidReg);
 								pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
 								v.sqlite3VdbeAddOp3(testOp,memEndValue,addrBrk,iRowidReg);
                                 v.sqlite3VdbeChangeP5(sqliteinth.SQLITE_AFF_NUMERIC | sqliteinth.SQLITE_JUMPIFNULL);
@@ -1057,8 +1057,8 @@ namespace Community.CsharpSqlite {
 								sqliteinth.testcase(pLevel.plan.wsFlags&wherec.WHERE_BTM_LIMIT);
 								sqliteinth.testcase(pLevel.plan.wsFlags&wherec.WHERE_TOP_LIMIT);
 								if((pLevel.plan.wsFlags&(wherec.WHERE_BTM_LIMIT|wherec.WHERE_TOP_LIMIT))!=0) {
-									v.sqlite3VdbeAddOp3(OP_Column,iIdxCur,nEq,r1);
-									v.sqlite3VdbeAddOp2(OP_IsNull,r1,addrCont);
+									v.sqlite3VdbeAddOp3( OpCode.OP_Column,iIdxCur,nEq,r1);
+                                    v.sqlite3VdbeAddOp2(OpCode.OP_IsNull, r1, addrCont);
 								}
 								pParse.sqlite3ReleaseTempReg(r1);
 								///
@@ -1069,7 +1069,7 @@ namespace Community.CsharpSqlite {
 								pLevel.disableTerm(pRangeEnd);
 								if(0==omitTable) {
 									iRowidReg=iReleaseReg=pParse.sqlite3GetTempReg();
-									v.sqlite3VdbeAddOp2(OP_IdxRowid,iIdxCur,iRowidReg);
+									v.sqlite3VdbeAddOp2( OpCode.OP_IdxRowid,iIdxCur,iRowidReg);
 									pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
                                     v.sqlite3VdbeAddOp2(OpCode.OP_Seek, iCur, iRowidReg);
 									///
@@ -1231,12 +1231,12 @@ namespace Community.CsharpSqlite {
 									///equivalent to an empty rowset.
 									///
 									///Also initialize regReturn to contain the address of the instruction
-									///immediately following the OP_Return at the bottom of the loop. This
+									///immediately following the  OpCode.OP_Return at the bottom of the loop. This
 									///is required in a few obscure LEFT JOIN cases where control jumps
 									///over the top of the loop into the body of it. In this case the
 									///</summary>
-									///<param name="correct response for the end">loop code (the OP_Return) is to</param>
-									///<param name="fall through to the next instruction, just as an OP_Next does if">fall through to the next instruction, just as an OP_Next does if</param>
+									///<param name="correct response for the end">loop code (the  OpCode.OP_Return) is to</param>
+									///<param name="fall through to the next instruction, just as an  OpCode.OP_Next does if">fall through to the next instruction, just as an  OpCode.OP_Next does if</param>
 									///<param name="called on an uninitialized cursor.">called on an uninitialized cursor.</param>
 									///<param name=""></param>
 									if((wctrlFlags&wherec.WHERE_DUPLICATES_OK)==0) {
@@ -1265,7 +1265,7 @@ namespace Community.CsharpSqlite {
 													int iSet=((ii==pOrWc.nTerm-1)?-1:ii);
 													int r;
 													r=pParse.sqlite3ExprCodeGetColumn(pTabItem.pTab,-1,iCur,regRowid);
-													v.sqlite3VdbeAddOp4Int(OP_RowSetTest,regRowset,v.sqlite3VdbeCurrentAddr()+2,r,iSet);
+													v.sqlite3VdbeAddOp4Int( OpCode.OP_RowSetTest,regRowset,v.sqlite3VdbeCurrentAddr()+2,r,iSet);
 												}
 												v.sqlite3VdbeAddOp2(OpCode.OP_Gosub,regReturn,iLoopBody);
 												///
@@ -1308,9 +1308,9 @@ namespace Community.CsharpSqlite {
 										OpCode.OP_Next,
 										OpCode.OP_Prev
 									};
-									u8[] aStart=new u8[] {
-										OP_Rewind,
-										OP_Last
+									OpCode[] aStart=new OpCode[] {
+										OpCode.OP_Rewind,
+										 OpCode.OP_Last
 									};
 									Debug.Assert(bRev==0||bRev==1);
 									Debug.Assert(omitTable==0);

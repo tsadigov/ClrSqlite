@@ -810,8 +810,8 @@ return;
 				v.sqlite3VdbeChangeP4(_base+1,pTrigger.zName, P4Usage.P4_TRANSIENT);
 				v.sqlite3VdbeChangeP4(_base+4,"trigger", P4Usage.P4_STATIC);
 				build.sqlite3ChangeCookie(pParse,iDb);
-				v.sqlite3VdbeAddOp2(OP_Close,0,0);
-				v.sqlite3VdbeAddOp4(OP_DropTrigger,iDb,0,0,pTrigger.zName,0);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Close, 0, 0);
+				v.sqlite3VdbeAddOp4( OpCode.OP_DropTrigger,iDb,0,0,pTrigger.zName,0);
 				if(pParse.nMem<3) {
 					pParse.nMem=3;
 				}
@@ -1030,7 +1030,7 @@ return;
 				}
 				}
 				if(pStep.op!=Sqlite3.TK_SELECT) {
-					v.sqlite3VdbeAddOp0(OP_ResetCount);
+					v.sqlite3VdbeAddOp0( OpCode.OP_ResetCount);
 				}
 			}
 			return 0;
@@ -1215,7 +1215,7 @@ return;
 				///
 				///<summary>
 				///</summary>
-				///<param name="Insert an OP_Halt at the end of the sub">program. </param>
+				///<param name="Insert an  OpCode.OP_Halt at the end of the sub">program. </param>
 				if(iEndTrigger!=0) {
 					v.sqlite3VdbeResolveLabel(iEndTrigger);
 				}
@@ -1327,12 +1327,12 @@ return;
 			//|| pParse.db.mallocFailed );
 			///
 			///<summary>
-			///Code the OP_Program opcode in the parent VDBE. P4 of the OP_Program 
+			///Code the  OpCode.OP_Program opcode in the parent VDBE. P4 of the  OpCode.OP_Program 
 			///</summary>
 			///<param name="is a pointer to the sub">vdbe containing the trigger program.  </param>
 			if(pPrg!=null) {
 				bool bRecursive=(!String.IsNullOrEmpty(p.zName)&&0==(pParse.db.flags&SQLITE_RecTriggers));
-				v.sqlite3VdbeAddOp3(OP_Program,reg,ignoreJump,++pParse.nMem);
+				v.sqlite3VdbeAddOp3( OpCode.OP_Program,reg,ignoreJump,++pParse.nMem);
 				v.sqlite3VdbeChangeP4(-1,pPrg.pProgram, P4Usage.P4_SUBPROGRAM);
 				#if SQLITE_DEBUG
 																																																																																																        VdbeComment
@@ -1341,7 +1341,7 @@ return;
 				///
 				///<summary>
 				///</summary>
-				///<param name="Set the P5 operand of the OP_Program instruction to non">zero if</param>
+				///<param name="Set the P5 operand of the  OpCode.OP_Program instruction to non">zero if</param>
 				///<param name="recursive invocation of this trigger program is disallowed. Recursive">recursive invocation of this trigger program is disallowed. Recursive</param>
 				///<param name="invocation is disallowed if (a) the sub">program is really a trigger,</param>
 				///<param name="not a foreign key action, and (b) the flag to enable recursive triggers">not a foreign key action, and (b) the flag to enable recursive triggers</param>

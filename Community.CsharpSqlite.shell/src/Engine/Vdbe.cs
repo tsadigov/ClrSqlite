@@ -149,7 +149,7 @@ namespace Community.CsharpSqlite {
 			public Mem[] aVar;
 			///
 			///<summary>
-			///Values for the OP_Variable opcode. 
+			///Values for the  OpCode.OP_Variable opcode. 
 			///</summary>
 			public string[] azVar;
 			///
@@ -1216,7 +1216,7 @@ pOp.cnt = 0;
 			///</summary>
 			) {
 				if(iCol<0||iCol==pTab.iPKey) {
-					this.sqlite3VdbeAddOp2(OP_Rowid,iTabCur,regOut);
+                    this.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iTabCur, regOut);
 				}
 				else {
                     OpCode op = pTab.IsVirtual() ? OpCode.OP_VColumn : OpCode.OP_Column;
@@ -1264,7 +1264,7 @@ pOp.cnt = 0;
 			}
 			public void sqlite3VdbeAddParseSchemaOp(int iDb,string zWhere) {
 				int j;
-				int addr=this.sqlite3VdbeAddOp3(OP_ParseSchema,iDb,0,0);
+				int addr=this.sqlite3VdbeAddOp3( OpCode.OP_ParseSchema,iDb,0,0);
 				this.sqlite3VdbeChangeP4(addr,zWhere, P4Usage.P4_DYNAMIC);
 				for(j=0;j<this.db.nDb;j++)
                     vdbeaux.sqlite3VdbeUsesBtree(this, j);
@@ -1896,12 +1896,12 @@ fclose(out);
 					int iCompare=0;
 					///
 					///<summary>
-					///Result of last OP_Compare operation 
+					///Result of last  OpCode.OP_Compare operation 
 					///</summary>
 					int[] aPermute=null;
 					///
 					///<summary>
-					///Permutation of columns for OP_Compare 
+					///Permutation of columns for  OpCode.OP_Compare 
 					///</summary>
 					i64 lastRowid=db.lastRowid;
 					///
@@ -2105,7 +2105,7 @@ start = sqlite3Hwtime();
 						///<param name=""></param>
 						///<param name="The formatting of each case is important.  The makefile for SQLite">The formatting of each case is important.  The makefile for SQLite</param>
 						///<param name="generates two C files "opcodes.h" and "opcodes.c" by scanning this">generates two C files "opcodes.h" and "opcodes.c" by scanning this</param>
-						///<param name="file looking for lines that begin with "case OP_".  The opcodes.h files">file looking for lines that begin with "case OP_".  The opcodes.h files</param>
+						///<param name="file looking for lines that begin with "case  OpCode.OP_".  The opcodes.h files">file looking for lines that begin with "case  OpCode.OP_".  The opcodes.h files</param>
 						///<param name="will be filled with #defines that give unique integer values to each">will be filled with #defines that give unique integer values to each</param>
 						///<param name="opcode and the opcodes.c file is filled with an array of strings where">opcode and the opcodes.c file is filled with an array of strings where</param>
 						///<param name="each string is the symbolic name for the corresponding opcode.  If the">each string is the symbolic name for the corresponding opcode.  If the</param>
@@ -2211,7 +2211,7 @@ start = sqlite3Hwtime();
 								break;
 							///
 							///<summary>
-							///Fall through into OP_Halt 
+							///Fall through into  OpCode.OP_Halt 
 							///</summary>
 							goto case OpCode.OP_Halt;
 						}
@@ -2254,11 +2254,11 @@ start = sqlite3Hwtime();
 									///
 									///<summary>
 									///</summary>
-									///<param name="Instruction pc is the OP_Program that invoked the sub">program </param>
-									///<param name="currently being halted. If the p2 instruction of this OP_Halt">currently being halted. If the p2 instruction of this OP_Halt</param>
+									///<param name="Instruction pc is the  OpCode.OP_Program that invoked the sub">program </param>
+									///<param name="currently being halted. If the p2 instruction of this  OpCode.OP_Halt">currently being halted. If the p2 instruction of this  OpCode.OP_Halt</param>
 									///<param name="instruction is set to OnConstraintError.OE_Ignore, then the sub">program is throwing</param>
 									///<param name="an IGNORE exception. In this case jump to the address specified">an IGNORE exception. In this case jump to the address specified</param>
-									///<param name="as the p2 of the calling OP_Program.  ">as the p2 of the calling OP_Program.  </param>
+									///<param name="as the p2 of the calling  OpCode.OP_Program.  ">as the p2 of the calling  OpCode.OP_Program.  </param>
 									opcodeIndex=this.lOp[opcodeIndex].p2-1;
 								}
 								lOp=this.lOp;
@@ -2344,7 +2344,7 @@ start = sqlite3Hwtime();
 						///
 						///</summary>
 						///<param name="P4 points to a nul terminated UTF">8 string. This opcode is transformed</param>
-						///<param name="into an OP_String before it is executed for the first time.">into an OP_String before it is executed for the first time.</param>
+						///<param name="into an  OpCode.OP_String before it is executed for the first time.">into an  OpCode.OP_String before it is executed for the first time.</param>
 						case OpCode.OP_String8: {
 							///
 							///<summary>
@@ -2376,7 +2376,7 @@ pOp.p1 = pOut.n;
 							}
 							///
 							///<summary>
-							///Fall through to the next case, OP_String 
+							///Fall through to the next case,  OpCode.OP_String 
 							///</summary>
 							goto case OpCode.OP_String;
 						}
@@ -2496,7 +2496,7 @@ pOp.p1 = pOut.n;
 						///Make a copy of register P1 into register P2.
 						///
 						///This instruction makes a deep copy of the value.  A duplicate
-						///is made of any string or blob constant.  See also OP_SCopy.
+						///is made of any string or blob constant.  See also  OpCode.OP_SCopy.
 						///
 						///</summary>
 						case OpCode.OP_Copy: {
@@ -2526,7 +2526,7 @@ pOp.p1 = pOut.n;
 						///original and hence if the original changes so will the copy.
 						///Worse, if the original is deallocated, the copy becomes invalid.
 						///Thus the program must guarantee that the original will not change
-						///during the lifetime of the copy.  Use OP_Copy to make a complete
+						///during the lifetime of the copy.  Use  OpCode.OP_Copy to make a complete
 						///copy.
 						///
 						///</summary>
@@ -2937,8 +2937,8 @@ MemSetTypeFlag(pOut, MEM_Int);
 								//Debug.Assert(pOp > aOp);
 								Debug.Assert(this.lOp[opcodeIndex-1].p4type== P4Usage.P4_COLLSEQ);
 								//Debug.Assert(pOp[-1].p4type ==  P4Usage.P4_COLLSEQ);
-								Debug.Assert(this.lOp[opcodeIndex-1].opcode==OP_CollSeq);
-								//Debug.Assert(pOp[-1].opcode == OP_CollSeq);
+                                Debug.Assert(this.lOp[opcodeIndex - 1].OpCode == OpCode.OP_CollSeq);
+								//Debug.Assert(pOp[-1].opcode ==  OpCode.OP_CollSeq);
 								ctx.pColl=this.lOp[opcodeIndex-1].p4.pColl;
 								//ctx.pColl = pOp[-1].p4.pColl;
 							}
@@ -3058,7 +3058,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							i64 iA;
 							u64 uA;
 							i64 iB;
-							u8 op;
+							OpCode op;
 							pIn1=aMem[pOp.p1];
 							pIn2=aMem[pOp.p2];
 							pOut=aMem[pOp.p3];
@@ -3068,32 +3068,34 @@ MemSetTypeFlag(pOut, MEM_Int);
 							}
 							iA=sqlite3VdbeIntValue(pIn2);
 							iB=sqlite3VdbeIntValue(pIn1);
-							op=pOp.opcode;
-							if(op==OP_BitAnd) {
+							op=pOp.OpCode;
+                            if (op == OpCode.OP_BitAnd)
+                            {
 								iA&=iB;
 							}
 							else
-								if(op==OP_BitOr) {
+                                if (op == OpCode.OP_BitOr)
+                                {
 									iA|=iB;
 								}
 								else
 									if(iB!=0) {
-										Debug.Assert(op==OP_ShiftRight||op==OP_ShiftLeft);
+										Debug.Assert(op== OpCode.OP_ShiftRight||op== OpCode.OP_ShiftLeft);
 										///
 										///<summary>
 										///If shifting by a negative amount, shift in the other direction 
 										///</summary>
 										if(iB<0) {
-											Debug.Assert(OP_ShiftRight==OP_ShiftLeft+1);
-											op=(u8)(2*OP_ShiftLeft+1-op);
+											Debug.Assert( OpCode.OP_ShiftRight== OpCode.OP_ShiftLeft+1);
+											op=(OpCode)(2*(u8)OpCode.OP_ShiftLeft+1-op);
 											iB=iB>(-64)?-iB:64;
 										}
 										if(iB>=64) {
-											iA=(iA>=0||op==OP_ShiftLeft)?0:-1;
+											iA=(iA>=0||op== OpCode.OP_ShiftLeft)?0:-1;
 										}
 										else {
 											//uA = (ulong)(iA << 0); // memcpy( &uA, &iA, sizeof( uA ) );
-											if(op==OP_ShiftLeft) {
+											if(op== OpCode.OP_ShiftLeft) {
 												iA=iA<<(int)iB;
 											}
 											else {
@@ -3483,11 +3485,11 @@ MemSetTypeFlag(pOut, MEM_Int);
 									///
 									///<summary>
 									///If sqliteinth.SQLITE_NULLEQ is set (which will only happen if the operator is
-									///OP_Eq or OP_Ne) then take the jump or not depending on whether
+									///OP_Eq or  OpCode.OP_Ne) then take the jump or not depending on whether
 									///or not both operands are null.
 									///
 									///</summary>
-									Debug.Assert(pOp.opcode==OP_Eq||pOp.opcode==OP_Ne);
+									Debug.Assert(pOp.OpCode== OpCode.OP_Eq||pOp.OpCode== OpCode.OP_Ne);
 									res=(pIn1.flags&pIn3.flags&MEM_Null)==0?1:0;
 								}
 								else {
@@ -3571,12 +3573,12 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<summary>
 						///Opcode: Permutation * * * P4 *
 						///
-						///Set the permutation used by the OP_Compare operator to be the array
+						///Set the permutation used by the  OpCode.OP_Compare operator to be the array
 						///of integers in P4.
 						///
-						///The permutation is only valid until the next OP_Permutation, OP_Compare,
-						///OP_Halt, or OpCode.OP_ResultRow.  Typically the OP_Permutation should occur
-						///immediately prior to the OP_Compare.
+						///The permutation is only valid until the next  OpCode.OP_Permutation,  OpCode.OP_Compare,
+						///OP_Halt, or OpCode.OP_ResultRow.  Typically the  OpCode.OP_Permutation should occur
+						///immediately prior to the  OpCode.OP_Compare.
 						///
 						///</summary>
 						case OpCode.OP_Permutation: {
@@ -3592,7 +3594,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///</summary>
 						///<param name="Compare two vectors of registers in reg(P1)..reg(P1+P3">1) (call this</param>
 						///<param name="vector "A") and in reg(P2)..reg(P2+P3">1) ("B").  Save the result of</param>
-						///<param name="the comparison for use by the next OP_Jump instruct.">the comparison for use by the next OP_Jump instruct.</param>
+						///<param name="the comparison for use by the next  OpCode.OP_Jump instruct.">the comparison for use by the next  OpCode.OP_Jump instruct.</param>
 						///<param name=""></param>
 						///<param name="P4 is a KeyInfo structure that defines collating sequences and sort">P4 is a KeyInfo structure that defines collating sequences and sort</param>
 						///<param name="orders for the comparison.  The permutation applies to registers">orders for the comparison.  The permutation applies to registers</param>
@@ -3611,7 +3613,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///Opcode: Jump P1 P2 P3 * *
 						///
 						///Jump to the instruction at address P1, P2, or P3 depending on whether
-						///in the most recent OP_Compare instruction the P1 vector was less than
+						///in the most recent  OpCode.OP_Compare instruction the P1 vector was less than
 						///equal to, or greater than the P2 vector, respectively.
 						///
 						///</summary>
@@ -3815,7 +3817,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<param name=""></param>
 						///<param name="If the OPFLAG_CLEARCACHE bit is set on P5 and P1 is a pseudo">table cursor,</param>
 						///<param name="then the cache of the cursor is reset prior to extracting the column.">then the cache of the cursor is reset prior to extracting the column.</param>
-						///<param name="The first OP_Column against a pseudo">table after the value of the content</param>
+						///<param name="The first  OpCode.OP_Column against a pseudo">table after the value of the content</param>
 						///<param name="register has changed should have this bit set.">register has changed should have this bit set.</param>
 						///<param name=""></param>
 						case OpCode.OP_Column: {
@@ -3868,7 +3870,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///
 						///Convert P2 registers beginning with P1 into the [record format]
 						///use as a data record in a database table or as a key
-						///in an index.  The OP_Column opcode can decode the record later.
+						///in an index.  The  OpCode.OP_Column opcode can decode the record later.
 						///
 						///P4 may be a string that is P2 characters long.  The nth character of the
 						///string indicates the column affinity that should be used for the nth
@@ -4539,7 +4541,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							sqlite3VdbeMemIntegerify(pIn3);
 							///
 							///<summary>
-							///See note about index shifting on OP_ReadCookie 
+							///See note about index shifting on  OpCode.OP_ReadCookie 
 							///</summary>
 							rc=pDb.pBt.sqlite3BtreeUpdateMeta(pOp.p2,(u32)pIn3.u.i);
 							if(pOp.p2==(int)BTreeProp.SCHEMA_VERSION) {
@@ -4585,7 +4587,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///This operation is used to detect when that the cookie has changed
 						///and that the current process needs to reread the schema.
 						///
-						///Either a transaction needs to have been started or an OP_Open needs
+						///Either a transaction needs to have been started or an  OpCode.OP_Open needs
 						///to be executed (to establish a read lock) before this opcode is
 						///invoked.
 						///
@@ -4731,7 +4733,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								p2=(int)pIn2.u.i;
 								///
 								///<summary>
-								///The p2 value always comes from a prior OP_CreateTable opcode and
+								///The p2 value always comes from a prior  OpCode.OP_CreateTable opcode and
 								///that opcode will always set the p2 value to 2 or more or else fail.
 								///If there were a failure, the prepared statement would have halted
 								///before reaching this instruction. 
@@ -4804,7 +4806,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///
 						///Opcode: OpenAutoindex P1 P2 * P4 *
 						///
-						///This opcode works the same as OP_OpenEphemeral.  It has a
+						///This opcode works the same as  OpCode.OP_OpenEphemeral.  It has a
 						///different name to distinguish its use.  Tables created using
 						///by this opcode will be used for automatically created transient
 						///indices in joins.
@@ -4865,7 +4867,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///</summary>
 						///<param name="A pseudo">table created by this opcode is used to hold a single</param>
 						///<param name="row output from the sorter so that the row can be decomposed into">row output from the sorter so that the row can be decomposed into</param>
-						///<param name="individual columns using the OP_Column opcode.  The OP_Column opcode">individual columns using the OP_Column opcode.  The OP_Column opcode</param>
+						///<param name="individual columns using the  OpCode.OP_Column opcode.  The  OpCode.OP_Column opcode">individual columns using the  OpCode.OP_Column opcode.  The  OpCode.OP_Column opcode</param>
 						///<param name="is the only cursor opcode that works with a pseudo">table.</param>
 						///<param name=""></param>
 						///<param name="P3 is the number of fields in the records that will be stored by">P3 is the number of fields in the records that will be stored by</param>
@@ -5105,7 +5107,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									///
 									///<summary>
 									///The next line of code computes as follows, only faster:
-									///if( oc==OP_SeekGt || oc==OP_SeekLe ){
+									///if( oc== OpCode.OP_SeekGt || oc== OpCode.OP_SeekLe ){
 									///r.flags = UNPACKED_INCRKEY;
 									///}else{
 									///r.flags = 0;
@@ -5341,7 +5343,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///
 						///</summary>
 						///<param name="Cursor P1 is open on an index b"> that is to say, a btree which</param>
-						///<param name="no data and where the key are records generated by OP_MakeRecord with">no data and where the key are records generated by OP_MakeRecord with</param>
+						///<param name="no data and where the key are records generated by  OpCode.OP_MakeRecord with">no data and where the key are records generated by  OpCode.OP_MakeRecord with</param>
 						///<param name="the list field being the integer ROWID of the entry that the index">the list field being the integer ROWID of the entry that the index</param>
 						///<param name="entry refers to.">entry refers to.</param>
 						///<param name=""></param>
@@ -5811,10 +5813,10 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///sqlite3_last_insert_rowid() function (otherwise it is unmodified).
 						///
 						///If the OPFLAG_USESEEKRESULT flag of P5 is set and if the result of
-						///the last seek operation (OP_NotExists) was a success, then this
+						///the last seek operation ( OpCode.OP_NotExists) was a success, then this
 						///operation will not attempt to find the appropriate row before doing
 						///the insert but will instead overwrite the row that the cursor is
-						///currently pointing to.  Presumably, the prior OP_NotExists opcode
+						///currently pointing to.  Presumably, the prior  OpCode.OP_NotExists opcode
 						///has already positioned the cursor correctly.  This is an optimization
 						///that boosts performance by avoiding redundant seeks.
 						///
@@ -5835,13 +5837,13 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<param name="cause any problems.)">cause any problems.)</param>
 						///<param name=""></param>
 						///<param name="This instruction only works on tables.  The equivalent instruction">This instruction only works on tables.  The equivalent instruction</param>
-						///<param name="for indices is OP_IdxInsert.">for indices is OP_IdxInsert.</param>
+						///<param name="for indices is  OpCode.OP_IdxInsert.">for indices is  OpCode.OP_IdxInsert.</param>
 						///<param name=""></param>
 						///
 						///<summary>
 						///Opcode: InsertInt P1 P2 P3 P4 P5
 						///
-						///This works exactly like OP_Insert except that the key is the
+						///This works exactly like  OpCode.OP_Insert except that the key is the
 						///integer value P3, not the value of the integer stored in register P3.
 						///
 						///</summary>
@@ -5974,7 +5976,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<param name="If P4 is not NULL, then it is the name of the table that P1 is">If P4 is not NULL, then it is the name of the table that P1 is</param>
 						///<param name="pointing to.  The update hook will be invoked, if it exists.">pointing to.  The update hook will be invoked, if it exists.</param>
 						///<param name="If P4 is not NULL then the P1 cursor must have been positioned">If P4 is not NULL then the P1 cursor must have been positioned</param>
-						///<param name="using OP_NotFound prior to invoking this opcode.">using OP_NotFound prior to invoking this opcode.</param>
+						///<param name="using  OpCode.OP_NotFound prior to invoking this opcode.">using  OpCode.OP_NotFound prior to invoking this opcode.</param>
 						///<param name=""></param>
 						case OpCode.OP_Delete: {
 							i64 iKey;
@@ -5998,13 +6000,13 @@ MemSetTypeFlag(pOut, MEM_Int);
 								Debug.Assert(pC.rowidIsValid);
 								///
 								///<summary>
-								///lastRowid set by previous OP_NotFound 
+								///lastRowid set by previous  OpCode.OP_NotFound 
 								///</summary>
 								iKey=pC.lastRowid;
 							}
 							///
 							///<summary>
-							///The OP_Delete opcode always follows an OP_NotExists or OP_Last or
+							///The  OpCode.OP_Delete opcode always follows an  OpCode.OP_NotExists or  OpCode.OP_Last or
 							///OP_Column on the same table without any intervening operations that
 							///might move or invalidate the cursor.  Hence cursor pC is always pointing
 							///to the row to be deleted and the sqlite3VdbeCursorMoveto() operation
@@ -6100,7 +6102,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							Debug.Assert(pCrsr.sqlite3BtreeCursorIsValid());
 							///
 							///<summary>
-							///The OP_RowKey and OP_RowData opcodes always follow OP_NotExists or
+							///The  OpCode.OP_RowKey and  OpCode.OP_RowData opcodes always follow  OpCode.OP_NotExists or
 							///OP_Rewind/Op_Next with no intervening instructions that might invalidate
 							///the cursor.  Hence the following sqlite3VdbeCursorMoveto() call is always
 							///</summary>
@@ -6165,7 +6167,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///P1 is currently point to.
 						///
 						///P1 can be either an ordinary table or a virtual table.  There used to
-						///be a separate OP_VRowid opcode for use with virtual tables, but this
+						///be a separate  OpCode.OP_VRowid opcode for use with virtual tables, but this
 						///one opcode now works for both table types.
 						///
 						///</summary>
@@ -6225,7 +6227,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<summary>
 						///Opcode: NullRow P1 * * * *
 						///
-						///Move the cursor P1 to a null row.  Any OP_Column operations
+						///Move the cursor P1 to a null row.  Any  OpCode.OP_Column operations
 						///that occur while the cursor is on the null row will always
 						///write a NULL.
 						///
@@ -6284,12 +6286,12 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<summary>
 						///Opcode: Sort P1 P2 * * *
 						///
-						///This opcode does exactly the same thing as OP_Rewind except that
+						///This opcode does exactly the same thing as  OpCode.OP_Rewind except that
 						///it increments an undocumented global variable used for testing.
 						///
 						///Sorting is accomplished by writing records into a sorting index,
 						///then rewinding that index and playing it back from beginning to
-						///end.  We use the OP_Sort opcode instead of OP_Rewind to do the
+						///end.  We use the  OpCode.OP_Sort opcode instead of  OpCode.OP_Rewind to do the
 						///rewinding so that the global variable will be incremented and
 						///regression tests can determine whether or not the optimizer is
 						///correctly optimizing out sorts.
@@ -6312,7 +6314,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							this.aCounter[SQLITE_STMTSTATUS_SORT-1]++;
 							///
 							///<summary>
-							///Fall through into OP_Rewind 
+							///Fall through into  OpCode.OP_Rewind 
 							///</summary>
 							goto case OpCode.OP_Rewind;
 						}
@@ -6447,7 +6449,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<param name="insert is likely to be an append.">insert is likely to be an append.</param>
 						///<param name=""></param>
 						///<param name="This instruction only works for indices.  The equivalent instruction">This instruction only works for indices.  The equivalent instruction</param>
-						///<param name="for tables is OP_Insert.">for tables is OP_Insert.</param>
+						///<param name="for tables is  OpCode.OP_Insert.">for tables is  OpCode.OP_Insert.</param>
 						///<param name=""></param>
 						case OpCode.OP_IdxInsert: {
 							///
@@ -6705,7 +6707,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									build.sqlite3RootPageMoved(db,iDb,iMoved,pOp.p1);
 									///
 									///<summary>
-									///All OP_Destroy operations occur on the same btree 
+									///All  OpCode.OP_Destroy operations occur on the same btree 
 									///</summary>
 									Debug.Assert(resetSchemaOnFault==0||resetSchemaOnFault==iDb+1);
 									resetSchemaOnFault=(u8)(iDb+1);
@@ -6779,7 +6781,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///P1>1.  Write the root page number of the new table into
 						///register P2.
 						///
-						///See documentation on OP_CreateTable for additional information.
+						///See documentation on  OpCode.OP_CreateTable for additional information.
 						///
 						///</summary>
 						case OpCode.OP_CreateIndex:
@@ -7328,7 +7330,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 						///<param name=""></param>
 						///<param name="The address of the cell in the parent frame is determined by adding">The address of the cell in the parent frame is determined by adding</param>
 						///<param name="the value of the P1 argument to the value of the P1 argument to the">the value of the P1 argument to the value of the P1 argument to the</param>
-						///<param name="calling OP_Program instruction.">calling OP_Program instruction.</param>
+						///<param name="calling  OpCode.OP_Program instruction.">calling  OpCode.OP_Program instruction.</param>
 						///<param name=""></param>
 						case OpCode.OP_Param: {
 							///
@@ -7547,7 +7549,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								Debug.Assert(this.lOp[opcodeIndex-1].p4type== P4Usage.P4_COLLSEQ);
 								//pOp[-1].p4type ==  P4Usage.P4_COLLSEQ );
 								Debug.Assert(this.lOp[opcodeIndex-1].OpCode==OpCode.OP_CollSeq);
-								// pOp[-1].opcode == OP_CollSeq );
+								// pOp[-1].opcode ==  OpCode.OP_CollSeq );
 								ctx.pColl=this.lOp[opcodeIndex-1].p4.pColl;
 								;
 								// pOp[-1].p4.pColl;
@@ -7610,7 +7612,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 ** completes into mem[P3+2].  However on an error, mem[P3+1] and
 ** mem[P3+2] are initialized to -1.
 */
-cDebug.Ase OP_Checkpoint: {
+cDebug.Ase  OpCode.OP_Checkpoint: {
   aRes[0] = 0;
   aRes[1] = aRes[2] = -1;
   Debug.Assert( pOp.p2==SQLITE_CHECKPOINT_PDebug.AsSIVE
@@ -7823,7 +7825,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
 ** P4 contains a pointer to the name of the table being locked. This is only
 ** used to generate an error message if the lock cannot be obtained.
 */
-case OP_TableLock:
+case  OpCode.OP_TableLock:
 {
 u8 isWriteLock = (u8)pOp.p3;
 if( isWriteLock || 0==(db.flags&SQLITE_ReadUncommitted) ){
@@ -8322,7 +8324,7 @@ break;
 						default: {
 							///
 							///<summary>
-							///This is really OpCode.OP_Noop and OP_Explain 
+							///This is really OpCode.OP_Noop and  OpCode.OP_Explain 
 							///</summary>
 							Debug.Assert(pOp.OpCode==OpCode.OP_Noop||pOp.OpCode==OpCode.OP_Explain);
 							break;

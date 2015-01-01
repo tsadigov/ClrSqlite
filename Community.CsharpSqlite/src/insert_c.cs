@@ -892,7 +892,7 @@ namespace Community.CsharpSqlite
 			iSrc = pParse.nTab++;
 			iDest = pParse.nTab++;
 			regAutoinc = pParse.autoIncBegin (iDbDest, pDest);
-			pParse.sqlite3OpenTable (iDest, iDbDest, pDest, OP_OpenWrite);
+            pParse.sqlite3OpenTable(iDest, iDbDest, pDest, OpCode.OP_OpenWrite);
 			if ((pDest.iPKey < 0 && pDest.pIndex != null) || destHasUniqueIdx) {
 				///
 ///<summary>
@@ -908,70 +908,70 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-				addr1 = v.sqlite3VdbeAddOp2 (OP_Rewind, iDest, 0);
+                addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iDest, 0);
 				emptyDestTest = v.sqlite3VdbeAddOp2 (OpCode.OP_Goto, 0, 0);
 				v.sqlite3VdbeJumpHere (addr1);
 			}
 			else {
 				emptyDestTest = 0;
 			}
-			pParse.sqlite3OpenTable (iSrc, iDbSrc, pSrc, OP_OpenRead);
-			emptySrcTest = v.sqlite3VdbeAddOp2 (OP_Rewind, iSrc, 0);
+            pParse.sqlite3OpenTable(iSrc, iDbSrc, pSrc, OpCode.OP_OpenRead);
+            emptySrcTest = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iSrc, 0);
 			regData = pParse.sqlite3GetTempReg ();
 			regRowid = pParse.sqlite3GetTempReg ();
 			if (pDest.iPKey >= 0) {
-				addr1 = v.sqlite3VdbeAddOp2 (OP_Rowid, iSrc, regRowid);
-				addr2 = v.sqlite3VdbeAddOp3 (OP_NotExists, iDest, 0, regRowid);
+                addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iSrc, regRowid);
+                addr2 = v.sqlite3VdbeAddOp3(OpCode.OP_NotExists, iDest, 0, regRowid);
 				build.sqlite3HaltConstraint (pParse, onError, "PRIMARY KEY must be unique",  P4Usage.P4_STATIC);
 				v.sqlite3VdbeJumpHere (addr2);
 				pParse.autoIncStep (regAutoinc, regRowid);
 			}
 			else
 				if (pDest.pIndex == null) {
-					addr1 = v.sqlite3VdbeAddOp2 (OP_NewRowid, iDest, regRowid);
+                    addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_NewRowid, iDest, regRowid);
 				}
 				else {
-					addr1 = v.sqlite3VdbeAddOp2 (OP_Rowid, iSrc, regRowid);
+                    addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iSrc, regRowid);
 					Debug.Assert ((pDest.tabFlags & TableFlags.TF_Autoincrement) == 0);
 				}
-			v.sqlite3VdbeAddOp2 (OP_RowData, iSrc, regData);
-			v.sqlite3VdbeAddOp3 (OP_Insert, iDest, regData, regRowid);
+            v.sqlite3VdbeAddOp2(OpCode.OP_RowData, iSrc, regData);
+            v.sqlite3VdbeAddOp3(OpCode.OP_Insert, iDest, regData, regRowid);
             v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_NCHANGE | OpFlag.OPFLAG_LASTROWID | OpFlag.OPFLAG_APPEND);
 			v.sqlite3VdbeChangeP4 (-1, pDest.zName, 0);
-			v.sqlite3VdbeAddOp2 (OP_Next, iSrc, addr1);
+            v.sqlite3VdbeAddOp2(OpCode.OP_Next, iSrc, addr1);
 			for (pDestIdx = pDest.pIndex; pDestIdx != null; pDestIdx = pDestIdx.pNext) {
 				for (pSrcIdx = pSrc.pIndex; pSrcIdx != null; pSrcIdx = pSrcIdx.pNext) {
 					if (xferCompatibleIndex (pDestIdx, pSrcIdx))
 						break;
 				}
 				Debug.Assert (pSrcIdx != null);
-				v.sqlite3VdbeAddOp2 (OP_Close, iSrc, 0);
-				v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Close, iSrc, 0);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Close, iDest, 0);
 				pKey = build.sqlite3IndexKeyinfo (pParse, pSrcIdx);
-				v.sqlite3VdbeAddOp4 (OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
+				v.sqlite3VdbeAddOp4 ( OpCode.OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pSrcIdx.zName );
 #endif
 				pKey = build.sqlite3IndexKeyinfo (pParse, pDestIdx);
-				v.sqlite3VdbeAddOp4 (OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
+                v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey, P4Usage.P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pDestIdx.zName );
 #endif
-				addr1 = v.sqlite3VdbeAddOp2 (OP_Rewind, iSrc, 0);
-				v.sqlite3VdbeAddOp2 (OP_RowKey, iSrc, regData);
-				v.sqlite3VdbeAddOp3 (OP_IdxInsert, iDest, regData, 1);
-				v.sqlite3VdbeAddOp2 (OP_Next, iSrc, addr1 + 1);
+				addr1 = v.sqlite3VdbeAddOp2 ( OpCode.OP_Rewind, iSrc, 0);
+				v.sqlite3VdbeAddOp2 ( OpCode.OP_RowKey, iSrc, regData);
+				v.sqlite3VdbeAddOp3 ( OpCode.OP_IdxInsert, iDest, regData, 1);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Next, iSrc, addr1 + 1);
 				v.sqlite3VdbeJumpHere (addr1);
 			}
 			v.sqlite3VdbeJumpHere (emptySrcTest);
 			pParse.sqlite3ReleaseTempReg (regRowid);
 			pParse.sqlite3ReleaseTempReg (regData);
-			v.sqlite3VdbeAddOp2 (OP_Close, iSrc, 0);
-			v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
+            v.sqlite3VdbeAddOp2(OpCode.OP_Close, iSrc, 0);
+            v.sqlite3VdbeAddOp2(OpCode.OP_Close, iDest, 0);
 			if (emptyDestTest != 0) {
 				v.sqlite3VdbeAddOp2 (OpCode.OP_Halt, SQLITE_OK, 0);
 				v.sqlite3VdbeJumpHere (emptyDestTest);
-				v.sqlite3VdbeAddOp2 (OP_Close, iDest, 0);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Close, iDest, 0);
 				return 0;
 			}
 			else {

@@ -105,13 +105,13 @@ namespace Community.CsharpSqlite {
 		static void sqlite3Vacuum(Parse pParse) {
             Vdbe v = pParse.sqlite3GetVdbe();
 			if(v!=null) {
-				v.sqlite3VdbeAddOp2(OP_Vacuum,0,0);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Vacuum, 0, 0);
 			}
 			return;
 		}
 		///
 		///<summary>
-		///This routine implements the OP_Vacuum opcode of the VDBE.
+		///This routine implements the  OpCode.OP_Vacuum opcode of the VDBE.
 		///
 		///</summary>
 		static int sqlite3RunVacuum(ref string pzErrMsg,sqlite3 db) {

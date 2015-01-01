@@ -133,7 +133,7 @@ void sqliteinth.sqlite3TableLock(
 }
 
 ///<summary>
-/// Code an OP_TableLock instruction for each table locked by the
+/// Code an  OpCode.OP_TableLock instruction for each table locked by the
 /// statement (configured by calls to sqliteinth.sqlite3TableLock()).
 ///</summary>
 static void codeTableLocks( Parse pParse )
@@ -148,7 +148,7 @@ for ( i = 0 ; i < pParse.nTableLock ; i++ )
 {
 TableLock p = pParse.aTableLock[i];
 int p1 = p.iDb;
-sqlite3VdbeAddOp4( pVdbe, OP_TableLock, p1, p.iTab, p.isWriteLock,
+sqlite3VdbeAddOp4( pVdbe,  OpCode.OP_TableLock, p1, p.iTab, p.isWriteLock,
 p.zName,  P4Usage.P4_STATIC );
 }
 }
@@ -212,11 +212,11 @@ p.zName,  P4Usage.P4_STATIC );
                             if ((mask & pParse.cookieMask) == 0)
                                 continue;
                             vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
-                            v.sqlite3VdbeAddOp2(OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
+                            v.sqlite3VdbeAddOp2((int) OpCode.OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
                             if (db.init.busy == 0)
                             {
                                 Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
-                                v.sqlite3VdbeAddOp3(OP_VerifyCookie, iDb, pParse.cookieValue[iDb], (int)db.aDb[iDb].pSchema.iGeneration);
+                                v.sqlite3VdbeAddOp3(OpCode.OP_VerifyCookie, iDb, pParse.cookieValue[iDb], (int)db.aDb[iDb].pSchema.iGeneration);
                             }
                         }
 #if !SQLITE_OMIT_VIRTUALTABLE
@@ -296,7 +296,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// Run the parser and code generator recursively in order to generate
             /// code for the SQL statement given onto the end of the pParse context
             /// currently under construction.  When the parser is run recursively
-            /// this way, the final OP_Halt is not appended and other initialization
+            /// this way, the final  OpCode.OP_Halt is not appended and other initialization
             /// and finalization steps are omitted because those are handling by the
             /// outermost parser.
             ///
@@ -801,7 +801,7 @@ p.zName,  P4Usage.P4_STATIC );
             {
                 Vdbe v = p.sqlite3GetVdbe();
                 sqliteinth.sqlite3TableLock(p, iDb, sqliteinth.MASTER_ROOT, 1, sqliteinth.SCHEMA_TABLE(iDb));
-                v.sqlite3VdbeAddOp3(OP_OpenWrite, 0, sqliteinth.MASTER_ROOT, iDb);
+                v.sqlite3VdbeAddOp3(OpCode.OP_OpenWrite, 0, sqliteinth.MASTER_ROOT, iDb);
                 v.sqlite3VdbeChangeP4(-1, (int)5,  P4Usage.P4_INT32);
                 ///
                 ///<summary>
@@ -1181,7 +1181,7 @@ goto begin_table_error;
                     reg1 = pParse.regRowid = ++pParse.nMem;
                     reg2 = pParse.regRoot = ++pParse.nMem;
                     reg3 = ++pParse.nMem;
-                    v.sqlite3VdbeAddOp3(OP_ReadCookie, iDb, reg3, BTREE_FILE_FORMAT);
+                    v.sqlite3VdbeAddOp3( OpCode.OP_ReadCookie, iDb, reg3, BTREE_FILE_FORMAT);
                     vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
                     j1 = v.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
                     fileFormat = (db.flags & SQLITE_LegacyFileFmt) != 0 ? 1 : sqliteinth.SQLITE_MAX_FILE_FORMAT;
@@ -1206,14 +1206,14 @@ goto begin_table_error;
                     }
                     else
                     {
-                        v.sqlite3VdbeAddOp2(OP_CreateTable, iDb, reg2);
+                        v.sqlite3VdbeAddOp2( OpCode.OP_CreateTable, iDb, reg2);
                     }
                     sqlite3OpenMasterTable(pParse, iDb);
-                    v.sqlite3VdbeAddOp2(OP_NewRowid, 0, reg1);
+                    v.sqlite3VdbeAddOp2( OpCode.OP_NewRowid, 0, reg1);
                     v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, reg3);
-                    v.sqlite3VdbeAddOp3(OP_Insert, 0, reg3, reg1);
+                    v.sqlite3VdbeAddOp3( OpCode.OP_Insert, 0, reg3, reg1);
                     v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_APPEND);
-                    v.sqlite3VdbeAddOp0(OP_Close);
+                    v.sqlite3VdbeAddOp0(OpCode.OP_Close);
                 }
                 ///
                 ///<summary>
@@ -2082,7 +2082,7 @@ goto begin_table_error;
                         SelectDest dest = new SelectDest();
                         Table pSelTab;
                         Debug.Assert(pParse.nTab == 1);
-                        v.sqlite3VdbeAddOp3(OP_OpenWrite, 1, pParse.regRoot, iDb);
+                        v.sqlite3VdbeAddOp3(OpCode.OP_OpenWrite, 1, pParse.regRoot, iDb);
                         v.sqlite3VdbeChangeP5(1);
                         pParse.nTab = 2;
                         dest.Init(SelectResultType.Table, 1);
@@ -2528,7 +2528,7 @@ db.xAuth = xAuth;
             {
                 Vdbe v = pParse.sqlite3GetVdbe();
                 int r1 = pParse.sqlite3GetTempReg();
-                v.sqlite3VdbeAddOp3(OP_Destroy, iTable, r1, iDb);
+                v.sqlite3VdbeAddOp3( OpCode.OP_Destroy, iTable, r1, iDb);
                 build.sqlite3MayAbort(pParse);
 #if !SQLITE_OMIT_AUTOVACUUM
                 ///
@@ -2568,10 +2568,10 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 ///<summary>
                 ///</summary>
                 ///<param name="If the database may be auto">vacuum capable (if SQLITE_OMIT_AUTOVACUUM</param>
-                ///<param name="is not defined), then it is important to call OP_Destroy on the">is not defined), then it is important to call OP_Destroy on the</param>
+                ///<param name="is not defined), then it is important to call  OpCode.OP_Destroy on the">is not defined), then it is important to call  OpCode.OP_Destroy on the</param>
                 ///<param name="table and index root">pages in order, starting with the numerically</param>
                 ///<param name="largest root">pages</param>
-                ///<param name="to be destroyed is relocated by an earlier OP_Destroy. i.e. if the">to be destroyed is relocated by an earlier OP_Destroy. i.e. if the</param>
+                ///<param name="to be destroyed is relocated by an earlier  OpCode.OP_Destroy. i.e. if the">to be destroyed is relocated by an earlier  OpCode.OP_Destroy. i.e. if the</param>
                 ///<param name="following were coded:">following were coded:</param>
                 ///<param name=""></param>
                 ///<param name="OP_Destroy 4 0">OP_Destroy 4 0</param>
@@ -2787,7 +2787,7 @@ goto exit_drop_table;
                     {
                         v.sqlite3VdbeAddOp4(OpCode.OP_VDestroy, iDb, 0, 0, pTab.zName, 0);
                     }
-                    v.sqlite3VdbeAddOp4(OP_DropTable, iDb, 0, 0, pTab.zName, 0);
+                    v.sqlite3VdbeAddOp4( OpCode.OP_DropTable, iDb, 0, 0, pTab.zName, 0);
                     sqlite3ChangeCookie(pParse, iDb);
                 }
                 sqliteViewResetAll(db, iDb);
@@ -3084,16 +3084,16 @@ return;
                 else
                 {
                     tnum = pIndex.tnum;
-                    v.sqlite3VdbeAddOp2(OP_Clear, tnum, iDb);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Clear, tnum, iDb);
                 }
                 pKey = build.sqlite3IndexKeyinfo(pParse, pIndex);
-                v.sqlite3VdbeAddOp4(OP_OpenWrite, iIdx, tnum, iDb, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
+                v.sqlite3VdbeAddOp4( OpCode.OP_OpenWrite, iIdx, tnum, iDb, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
                 if (memRootPage >= 0)
                 {
                     v.sqlite3VdbeChangeP5(1);
                 }
-                pParse.sqlite3OpenTable(iTab, iDb, pTab, OP_OpenRead);
-                addr1 = v.sqlite3VdbeAddOp2(OP_Rewind, iTab, 0);
+                pParse.sqlite3OpenTable(iTab, iDb, pTab,  OpCode.OP_OpenRead);
+                addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iTab, 0);
                 regRecord = pParse.sqlite3GetTempReg();
                 regIdxKey = pParse.sqlite3GenerateIndexKey(pIndex, iTab, regRecord, true);
                 if (pIndex.onError != OnConstraintError.OE_None)
@@ -3104,23 +3104,23 @@ return;
                     // SQLITE_INT_TO_PTR( regIdxKey );
                     ///
                     ///<summary>
-                    ///The registers accessed by the OP_IsUnique opcode were allocated
+                    ///The registers accessed by the  OpCode.OP_IsUnique opcode were allocated
                     ///using sqlite3GetTempRange() inside of the sqlite3GenerateIndexKey()
                     ///call above. Just before that function was freed they were released
                     ///(made available to the compiler for reuse) using
-                    ///sqlite3ReleaseTempRange(). So in some ways having the OP_IsUnique
+                    ///sqlite3ReleaseTempRange(). So in some ways having the  OpCode.OP_IsUnique
                     ///opcode use the values stored within seems dangerous. However, since
                     ///we can be sure that no other temp registers have been allocated
                     ///since sqlite3ReleaseTempRange() was called, it is safe to do so.
                     ///
                     ///</summary>
-                    v.sqlite3VdbeAddOp4(OP_IsUnique, iIdx, j2, regRowid, pRegKey,  P4Usage.P4_INT32);
+                    v.sqlite3VdbeAddOp4( OpCode.OP_IsUnique, iIdx, j2, regRowid, pRegKey,  P4Usage.P4_INT32);
                     build.sqlite3HaltConstraint(pParse, OnConstraintError.OE_Abort, "indexed columns are not unique",  P4Usage.P4_STATIC);
                 }
-                v.sqlite3VdbeAddOp2(OP_IdxInsert, iIdx, regRecord);
+                v.sqlite3VdbeAddOp2( OpCode.OP_IdxInsert, iIdx, regRecord);
                 v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_USESEEKRESULT);
                 pParse.sqlite3ReleaseTempReg(regRecord);
-                v.sqlite3VdbeAddOp2(OP_Next, iTab, addr1 + 1);
+                v.sqlite3VdbeAddOp2( OpCode.OP_Next, iTab, addr1 + 1);
                 v.sqlite3VdbeJumpHere(addr1);
                 v.sqlite3VdbeAddOp1(OpCode.OP_Close, iTab);
                 v.sqlite3VdbeAddOp1(OpCode.OP_Close, iIdx);
@@ -3744,7 +3744,7 @@ goto exit_create_index;
                     ///
                     ///</summary>
                     sqlite3BeginWriteOperation(pParse, 1, iDb);
-                    v.sqlite3VdbeAddOp2(OP_CreateIndex, iDb, iMem);
+                    v.sqlite3VdbeAddOp2( OpCode.OP_CreateIndex, iDb, iMem);
                     ///
                     ///<summary>
                     ///Gather the complete text of the CREATE INDEX statement into
@@ -3781,7 +3781,7 @@ goto exit_create_index;
                     db.sqlite3DbFree(ref zStmt);
                     ///
                     ///<summary>
-                    ///Fill the index with data and reparse the schema. Code an OP_Expire
+                    ///Fill the index with data and reparse the schema. Code an  OpCode.OP_Expire
                     ///</summary>
                     ///<param name="to invalidate all pre">compiled statements.</param>
                     ///<param name=""></param>
@@ -3952,7 +3952,7 @@ goto exit_drop_index;
                     }
                     sqlite3ChangeCookie(pParse, iDb);
                     destroyRootPage(pParse, pIndex.tnum, iDb);
-                    v.sqlite3VdbeAddOp4(OP_DropIndex, iDb, 0, 0, pIndex.zName, 0);
+                    v.sqlite3VdbeAddOp4( OpCode.OP_DropIndex, iDb, 0, 0, pIndex.zName, 0);
                 }
             exit_drop_index:
                 build.sqlite3SrcListDelete(db, ref pName);
@@ -4505,11 +4505,11 @@ goto exit_drop_index;
                 {
                     for (i = 0; i < db.nDb; i++)
                     {
-                        v.sqlite3VdbeAddOp2(OP_Transaction, i, (type == Sqlite3.TK_EXCLUSIVE) ? 2 : 1);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Transaction, i, (type == Sqlite3.TK_EXCLUSIVE) ? 2 : 1);
                         vdbeaux.sqlite3VdbeUsesBtree(v, i);
                     }
                 }
-                v.sqlite3VdbeAddOp2(OP_AutoCommit, 0, 0);
+                v.sqlite3VdbeAddOp2(OpCode.OP_AutoCommit, 0, 0);
             }
             ///<summary>
             /// Commit a transaction
@@ -4533,7 +4533,7 @@ goto exit_drop_index;
                 v = pParse.sqlite3GetVdbe();
                 if (v != null)
                 {
-                    v.sqlite3VdbeAddOp2(OP_AutoCommit, 1, 0);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_AutoCommit, 1, 0);
                 }
             }
             ///
@@ -4559,7 +4559,7 @@ goto exit_drop_index;
                 v = pParse.sqlite3GetVdbe();
                 if (v != null)
                 {
-                    v.sqlite3VdbeAddOp2(OP_AutoCommit, 1, 1);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_AutoCommit, 1, 1);
                 }
             }
             ///<summary>
@@ -4588,7 +4588,7 @@ goto exit_drop_index;
                         pParse.db.sqlite3DbFree(ref zName);
                         return;
                     }
-                    v.sqlite3VdbeAddOp4(OP_Savepoint, op, 0, 0, zName,  P4Usage.P4_DYNAMIC);
+                    v.sqlite3VdbeAddOp4( OpCode.OP_Savepoint, op, 0, 0, zName,  P4Usage.P4_DYNAMIC);
                 }
             }
             ///<summary>
@@ -4753,7 +4753,7 @@ goto exit_drop_index;
                 pToplevel.mayAbort = 1;
             }
             ///<summary>
-            /// Code an OP_Halt that causes the vdbe to return an SQLITE_CONSTRAINT
+            /// Code an  OpCode.OP_Halt that causes the vdbe to return an SQLITE_CONSTRAINT
             /// error. The onError parameter determines which (if any) of the statement
             /// and/or current transaction is rolled back.
             ///
@@ -4992,7 +4992,7 @@ goto exit_drop_index;
             ///
             ///<summary>
             ///Return a dynamicly allocated KeyInfo structure that can be used
-            ///with OP_OpenRead or OP_OpenWrite to access database index pIdx.
+            ///with  OpCode.OP_OpenRead or  OpCode.OP_OpenWrite to access database index pIdx.
             ///
             ///If successful, a pointer to the new structure is returned. In this case
             ///the caller is responsible for calling sqlite3DbFree(db, ) on the returned

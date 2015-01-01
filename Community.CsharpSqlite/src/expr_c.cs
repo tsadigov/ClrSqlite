@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             ///<summary>
             /// Return the P5 value that should be used for a binary comparison
-            /// opcode (OP_Eq, OP_Ge etc.) used to compare pExpr1 and pExpr2.
+            /// opcode ( OpCode.OP_Eq,  OpCode.OP_Ge etc.) used to compare pExpr1 and pExpr2.
             ///
             ///</summary>
             ///<summary>
@@ -834,10 +834,10 @@ return null;
                 return WRC.WRC_Abort;
             }
             ///<summary>
-            /// Generate an OP_IsNull instruction that tests register iReg and jumps
+            /// Generate an  OpCode.OP_IsNull instruction that tests register iReg and jumps
             /// to location iDest if the value in iReg is NULL.  The value in iReg
             /// was computed by pExpr.  If we can look at pExpr at compile-time and
-            /// determine that it can never generate a NULL, then the OP_IsNull operation
+            /// determine that it can never generate a NULL, then the  OpCode.OP_IsNull operation
             /// can be omitted.
             ///
             ///</summary>
@@ -847,7 +847,7 @@ return null;
                 ///</summary>
             Expr pExpr,///
                 ///<summary>
-                ///Only generate OP_IsNull if this expr can be NULL 
+                ///Only generate  OpCode.OP_IsNull if this expr can be NULL 
                 ///</summary>
             int iReg,///
                 ///<summary>
@@ -861,15 +861,15 @@ return null;
             {
                 if (pExpr.sqlite3ExprCanBeNull() != 0)
                 {
-                    v.sqlite3VdbeAddOp2(OP_IsNull, iReg, iDest);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_IsNull, iReg, iDest);
                 }
             }
             ///<summary>
             /// Return TRUE if the given expression is a constant which would be
-            /// unchanged by OP_Affinity with the affinity given in the second
+            /// unchanged by  OpCode.OP_Affinity with the affinity given in the second
             /// argument.
             ///
-            /// This routine is used to determine if the OP_Affinity operation
+            /// This routine is used to determine if the  OpCode.OP_Affinity operation
             /// can be omitted.  When in doubt return FALSE.  A false negative
             /// is harmless.  A false positive, however, can result in the wrong
             /// answer.
@@ -1352,7 +1352,7 @@ return null;
                             ///
                             ///<summary>
                             ///The arguments to a function have a fixed destination.
-                            ///Mark them this way to avoid generated unneeded OP_SCopy
+                            ///Mark them this way to avoid generated unneeded  OpCode.OP_SCopy
                             ///instructions.
                             ///
                             ///</summary>
@@ -1434,7 +1434,7 @@ return null;
             /// take the jump if the jumpIfNull flag is sqliteinth.SQLITE_JUMPIFNULL.
             ///
             /// This code depends on the fact that certain token values (ex: Sqlite3.TK_EQ)
-            /// are the same as opcode values (ex: OP_Eq) that implement the corresponding
+            /// are the same as opcode values (ex:  OpCode.OP_Eq) that implement the corresponding
             /// operation.  Special comments in vdbe.c and the mkopcodeh.awk script in
             /// the make process cause these values to align.  Assert()s in the code
             /// below verify that the numbers are aligned correctly.
