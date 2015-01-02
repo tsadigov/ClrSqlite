@@ -224,7 +224,7 @@ p.zName,  P4Usage.P4_STATIC );
                             int i;
                             for (i = 0; i < pParse.nVtabLock; i++)
                             {
-                                VTable vtab = sqlite3GetVTable(db, pParse.apVtabLock[i]);
+                                VTable vtab = Sqlite3.vtab.sqlite3GetVTable(db, pParse.apVtabLock[i]);
                                 v.sqlite3VdbeAddOp4(OpCode.OP_VBegin, 0, 0, 0, vtab,  P4Usage.P4_VTAB);
                             }
                             pParse.nVtabLock = 0;
@@ -597,7 +597,7 @@ p.zName,  P4Usage.P4_STATIC );
                     }
                 }
                 db.flags &= ~SQLITE_InternChanges;
-                sqlite3VtabUnlockList(db);
+                vtab.sqlite3VtabUnlockList(db);
                 sqlite3BtreeLeaveAll(db);
                 ///
                 ///<summary>
@@ -735,7 +735,7 @@ p.zName,  P4Usage.P4_STATIC );
                 exprc.sqlite3ExprDelete(db, ref pTable.pCheck);
 #endif
 #if !SQLITE_OMIT_VIRTUALTABLE
-                sqlite3VtabClear(db, pTable);
+                vtab.sqlite3VtabClear(db, pTable);
 #endif
                 pTable = null;
                 //      sqlite3DbFree( db, ref pTable );

@@ -495,7 +495,7 @@ namespace Community.CsharpSqlite
                         case P4Usage.P4_VTAB:
                             {
                                 if (db.pnBytesFreed == 0)
-                                    sqlite3VtabUnlock((VTable)p4);
+                                    vtab.sqlite3VtabUnlock((VTable)p4);
                                 break;
                             }
                     }
@@ -1803,7 +1803,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///required, as an xSync() callback may add an attached database
                 ///to the transaction.
                 ///</summary>
-                rc = sqlite3VtabSync(db, ref p.zErrMsg);
+                rc = vtab.sqlite3VtabSync(db, ref p.zErrMsg);
                 ///
                 ///<summary>
                 ///This loop determines (a) if the commit hook should be invoked and
@@ -1880,7 +1880,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     }
                     if (rc == SQLITE_OK)
                     {
-                        sqlite3VtabCommit(db);
+                        vtab.sqlite3VtabCommit(db);
                     }
                 }
                 ///
@@ -2055,7 +2055,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 #if SQLITE_TEST
 																																																																																																        enable_simulated_io_errors();
 #endif
-                    sqlite3VtabCommit(db);
+                    vtab.sqlite3VtabCommit(db);
                 }
 #endif
                 return rc;

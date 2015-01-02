@@ -1069,7 +1069,7 @@ pOp.cnt = 0;
 																if(n== P4Usage.P4_VTAB) {
 																	pOp.p4.pVtab=_p4.pVtab;
 																	pOp.p4type= P4Usage.P4_VTAB;
-																	sqlite3VtabLock(_p4.pVtab);
+																	vtab.sqlite3VtabLock(_p4.pVtab);
 																	Debug.Assert((_p4.pVtab).db==this.db);
 																}
 																else
@@ -1401,10 +1401,10 @@ pOp.cnt = 0;
 					this.iStatement=0;
 					if(rc==SQLITE_OK) {
 						if(eOp==sqliteinth.SAVEPOINT_ROLLBACK) {
-							rc=sqlite3VtabSavepoint(db,sqliteinth.SAVEPOINT_ROLLBACK,iSavepoint);
+                            rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_ROLLBACK, iSavepoint);
 						}
 						if(rc==SQLITE_OK) {
-                            rc = sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_RELEASE, iSavepoint);
+                            rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_RELEASE, iSavepoint);
 						}
 					}
 					///
@@ -4185,7 +4185,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									///</summary>
 									///<param name="that the db">>aVTrans[] array is empty.  </param>
 									Debug.Assert(db.autoCommit==0||db.nVTrans==0);
-                                    rc = sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, db.nStatement + db.nSavepoint);
+                                    rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, db.nStatement + db.nSavepoint);
 									if(rc!=SQLITE_OK)
 										goto abort_due_to_error;
 									#endif
@@ -4316,7 +4316,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 											db.nDeferredCons=pSavepoint.nDeferredCons;
 										}
 										if(0==isTransaction) {
-											rc=sqlite3VtabSavepoint(db,p1,iSavepoint);
+                                            rc = vtab.sqlite3VtabSavepoint(db, p1, iSavepoint);
 											if(rc!=SQLITE_OK)
 												goto abort_due_to_error;
 										}
@@ -4463,7 +4463,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 										db.nStatement++;
 										this.iStatement=db.nSavepoint+db.nStatement;
 									}
-                                    rc = sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, this.iStatement - 1);
+                                    rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, this.iStatement - 1);
 									if(rc==SQLITE_OK) {
 										rc=pBt.sqlite3BtreeBeginStmt(this.iStatement);
 									}
@@ -7858,7 +7858,7 @@ break;
 						case OpCode.OP_VBegin: {
 							VTable pVTab;
 							pVTab=pOp.p4.pVtab;
-							rc=sqlite3VtabBegin(db,pVTab);
+                            rc = vtab.sqlite3VtabBegin(db, pVTab);
 							if(pVTab!=null)
 								importVtabErrMsg(this,pVTab.pVtab);
 							break;
@@ -7873,7 +7873,7 @@ break;
 						///for that table.
 						///</summary>
 						case OpCode.OP_VCreate: {
-							rc=sqlite3VtabCallCreate(db,pOp.p1,pOp.p4.z,ref this.zErrMsg);
+							rc=vtab.sqlite3VtabCallCreate(db,pOp.p1,pOp.p4.z,ref this.zErrMsg);
 							break;
 						}
 						#endif
@@ -7887,7 +7887,7 @@ break;
 						///</summary>
 						case OpCode.OP_VDestroy: {
 							this.inVtabMethod=2;
-							rc=sqlite3VtabCallDestroy(db,pOp.p1,pOp.p4.z);
+							rc=vtab.sqlite3VtabCallDestroy(db,pOp.p1,pOp.p4.z);
 							this.inVtabMethod=0;
 							break;
 						}

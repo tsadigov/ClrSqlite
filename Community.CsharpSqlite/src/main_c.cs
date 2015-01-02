@@ -956,7 +956,7 @@ break;
 			///<param name="SQL statements below, as the v">table implementation may be storing</param>
 			///<param name="some prepared statements internally.">some prepared statements internally.</param>
 			///<param name=""></param>
-			sqlite3VtabRollback(db);
+            vtab.sqlite3VtabRollback(db);
 			///
 			///<summary>
 			///If there are any outstanding VMs, return SQLITE_BUSY. 
@@ -1093,7 +1093,7 @@ break;
 					db.aDb[i].inTrans=0;
 				}
 			}
-			sqlite3VtabRollback(db);
+            vtab.sqlite3VtabRollback(db);
 			sqlite3EndBenignMalloc();
 			if((db.flags&SQLITE_InternChanges)!=0) {
                 vdbeaux.sqlite3ExpirePreparedStatements(db);

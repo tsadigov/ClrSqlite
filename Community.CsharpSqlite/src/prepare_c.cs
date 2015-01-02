@@ -747,7 +747,7 @@ db.xAuth = 0;
 					}
 				}
 			}
-			sqlite3VtabUnlockList(db);
+            vtab.sqlite3VtabUnlockList(db);
 			pParse.db=db;
 			pParse.nQueryLoop=(double)1;
 			if(nBytes>=0&&(nBytes==0||zSql[nBytes-1]!=0)) {
