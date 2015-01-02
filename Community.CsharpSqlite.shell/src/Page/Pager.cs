@@ -16,7 +16,7 @@ namespace Community.CsharpSqlite
     using System.Text;
     using DbPage = Sqlite3.PgHdr;
     using System.Diagnostics;
-
+    using codec_ctx = Sqlite3.crypto.codec_ctx;
 
 
     
@@ -2549,11 +2549,11 @@ PagerMethods.sqlite3PagerUnref(p);
                         }
                         if (this.pBackup != null)
                         {
-                            if (PagerMethods.CODEC1(this, aData, pgno, SQLITE_DECRYPT))
+                            if (PagerMethods.CODEC1(this, aData, pgno, crypto.SQLITE_DECRYPT))
                                 rc = SQLITE_NOMEM;
                             // CODEC1( pPager, aData, pgno, 3, rc = SQLITE_NOMEM );
                             this.pBackup.sqlite3BackupUpdate(pgno, (u8[])aData);
-                            if (PagerMethods.CODEC2(this, aData, pgno, SQLITE_ENCRYPT_READ_CTX, ref aData))
+                            if (PagerMethods.CODEC2(this, aData, pgno, crypto.SQLITE_ENCRYPT_READ_CTX, ref aData))
                                 rc = SQLITE_NOMEM;
                             //CODEC2( pPager, aData, pgno, 7, rc = SQLITE_NOMEM, aData);
                         }
@@ -2653,7 +2653,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         ///Decode the page just read from disk 
                         ///</summary>
 
-                        if (PagerMethods.CODEC1(this, pData, pPg.pgno, SQLITE_DECRYPT))
+                        if (PagerMethods.CODEC1(this, pData, pPg.pgno, crypto.SQLITE_DECRYPT))
                             rc = SQLITE_NOMEM;
                         //PagerMethods.CODEC1(pPager, pData, pPg.pgno, 3, rc=SQLITE_NOMEM);
                         PCacheMethods.sqlite3PcacheRelease(pPg);
@@ -4446,7 +4446,7 @@ pPager.pWal = 0;
                             ///Encode the database 
                             ///</summary>
 
-                            if (PagerMethods.CODEC2(this, pList.pData, pgno, SQLITE_ENCRYPT_WRITE_CTX, ref pData))
+                            if (PagerMethods.CODEC2(this, pList.pData, pgno, crypto.SQLITE_ENCRYPT_WRITE_CTX, ref pData))
                                 return SQLITE_NOMEM;
                             //     PagerMethods.CODEC2(pPager, pList.pData, pgno, 6, return SQLITE_NOMEM, pData);
                             ///
@@ -5593,7 +5593,7 @@ int DIRECT_MODE = isDirectMode;
                             {
                                 u8[] zBuf = null;
                                 Debug.Assert(this.dbFileSize > 0);
-                                if (PagerMethods.CODEC2(this, pPgHdr.pData, 1, SQLITE_ENCRYPT_WRITE_CTX, ref zBuf))
+                                if (PagerMethods.CODEC2(this, pPgHdr.pData, 1, crypto.SQLITE_ENCRYPT_WRITE_CTX, ref zBuf))
                                     return rc = SQLITE_NOMEM;
                                 //PagerMethods.CODEC2(pPager, pPgHdr.pData, 1, 6, rc=SQLITE_NOMEM, zBuf);
                                 if (rc == SQLITE_OK)

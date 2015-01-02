@@ -1929,11 +1929,11 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																															#if SQLITE_HAS_CODEC
 																															// needed to support key/rekey/hexrekey with pragma cmds
 																															if(zLeft.Equals("key",StringComparison.InvariantCultureIgnoreCase)&&!String.IsNullOrEmpty(zRight)) {
-																																sqlite3_key(db,zRight,StringExtensions.sqlite3Strlen30(zRight));
+                                                                                                                                crypto.sqlite3_key(db, zRight, StringExtensions.sqlite3Strlen30(zRight));
 																															}
 																															else
 																																if(zLeft.Equals("rekey",StringComparison.InvariantCultureIgnoreCase)&&!String.IsNullOrEmpty(zRight)) {
-																																	sqlite3_rekey(db,zRight,StringExtensions.sqlite3Strlen30(zRight));
+																																	crypto.sqlite3_rekey(db,zRight,StringExtensions.sqlite3Strlen30(zRight));
 																																}
 																																else
 																																	if(!String.IsNullOrEmpty(zRight)&&(zLeft.Equals("hexkey",StringComparison.InvariantCultureIgnoreCase)||zLeft.Equals("hexrekey",StringComparison.InvariantCultureIgnoreCase))) {
@@ -1950,10 +1950,10 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																																			zKey.Append(Convert.ToChar((h2&0x0f)|((h1&0xf)<<4)));
 																																		}
 																																		if((zLeft[3]&0xf)==0xb) {
-																																			sqlite3_key(db,zKey.ToString(),zKey.Length);
+                                                                                                                                            crypto.sqlite3_key(db, zKey.ToString(), zKey.Length);
 																																		}
 																																		else {
-																																			sqlite3_rekey(db,zKey.ToString(),zKey.Length);
+																																			crypto.sqlite3_rekey(db,zKey.ToString(),zKey.Length);
 																																		}
 																																	}
 																																	else
@@ -1962,7 +1962,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																																		if(zLeft.Equals("activate_extensions",StringComparison.InvariantCultureIgnoreCase)) {
 																																			#if SQLITE_HAS_CODEC
 																																			if(!String.IsNullOrEmpty(zRight)&&zRight.Length>4&&StringExtensions.sqlite3StrNICmp(zRight,"see-",4)==0) {
-																																				sqlite3_activate_see(zRight.Substring(4));
+                                                                                                                                                crypto.sqlite3_activate_see(zRight.Substring(4));
 																																			}
 																																			#endif
 																																			#if SQLITE_ENABLE_CEROD

@@ -860,7 +860,7 @@ static void pagerReportSize(Pager X){}
                         //memcpy(&pPager.dbFileVers, dbFileVers, sizeof(pPager.dbFileVers));
                     }
                 }
-                if (CODEC1(pPager, pPg.pData, pgno, SQLITE_DECRYPT))
+                if (CODEC1(pPager, pPg.pData, pgno, crypto.SQLITE_DECRYPT))
                     rc = SQLITE_NOMEM;
                 //CODEC1(pPager, pPg.pData, pgno, 3, rc = SQLITE_NOMEM);
 #if SQLITE_TEST
@@ -1235,7 +1235,7 @@ return rc;
                         byte[] pData = pPg.pData;
                         i64 offset = pPager.nSubRec * (4 + pPager.pageSize);
                         byte[] pData2 = null;
-                        if (CODEC2(pPager, pData, pPg.pgno, SQLITE_ENCRYPT_READ_CTX, ref pData2))
+                        if (CODEC2(pPager, pData, pPg.pgno, crypto.SQLITE_ENCRYPT_READ_CTX, ref pData2))
                             return SQLITE_NOMEM;
                         //CODEC2(pPager, pData, pPg.pgno, 7, return SQLITE_NOMEM, pData2);
                         PAGERTRACE("STMT-JOURNAL %d page %d\n", PagerMethods.PAGERID(pPager), pPg.pgno);
@@ -2061,7 +2061,7 @@ szPageDflt = ii;
                             Debug.Assert(pPg.pgno != ((PENDING_BYTE / (pPager.pageSize)) + 1));
                             //PAGER_MJ_PGNO(pPager) );
                             Debug.Assert(pPager.journalHdr <= pPager.journalOff);
-                            if (CODEC2(pPager, pData, pPg.pgno, SQLITE_ENCRYPT_READ_CTX, ref pData2))
+                            if (CODEC2(pPager, pData, pPg.pgno, crypto.SQLITE_ENCRYPT_READ_CTX, ref pData2))
                                 return SQLITE_NOMEM;
                             // CODEC2(pPager, pData, pPg.pgno, 7, return SQLITE_NOMEM, pData2);
                             cksum = pPager.pager_cksum(pData2);

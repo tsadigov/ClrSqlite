@@ -247,7 +247,7 @@ namespace Community.CsharpSqlite {
 				//extern void sqlite3CodecGetKey(sqlite3*, int, void**, int*);
 				int nKey;
 				string zKey;
-				sqlite3CodecGetKey(db,0,out zKey,out nKey);
+                crypto.sqlite3CodecGetKey(db, 0, out zKey, out nKey);
 				// sqlite3CodecGetKey(db, 0, (void**)&zKey, nKey);
 				if(nKey!=0)
 					db.nextPagesize=0;

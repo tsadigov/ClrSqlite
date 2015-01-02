@@ -19,7 +19,7 @@ namespace Community.CsharpSqlite
 	using sqlite3_pcache = Sqlite3.PCache1;
 	using sqlite3_stmt = Sqlite3.Vdbe;
 	using sqlite3_value = Sqlite3.Mem;
-
+    using codec_ctx=Sqlite3.crypto.codec_ctx;
 
 
 

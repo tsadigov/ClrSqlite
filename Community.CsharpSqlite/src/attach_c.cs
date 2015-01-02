@@ -156,17 +156,17 @@ namespace Community.CsharpSqlite {
 				nKey=vdbeapi.sqlite3_value_bytes(argv[2]);
                 zKey = vdbeapi.sqlite3_value_blob(argv[2]).ToString();
 				// (char *)sqlite3_value_blob(argv[2]);
-				rc=sqlite3CodecAttach(db,db.nDb-1,zKey,nKey);
+                rc = crypto.sqlite3CodecAttach(db, db.nDb - 1, zKey, nKey);
 				break;
 				case SQLITE_NULL:
 				///
 				///<summary>
 				///No key specified.  Use the key from the main database 
 				///</summary>
-				sqlite3CodecGetKey(db,0,out zKey,out nKey);
+				crypto.sqlite3CodecGetKey(db,0,out zKey,out nKey);
 				//sqlite3CodecGetKey(db, 0, (void**)&zKey, nKey);
 				if(nKey>0||db.aDb[0].pBt.GetReserve()>0) {
-					rc=sqlite3CodecAttach(db,db.nDb-1,zKey,nKey);
+                    rc = crypto.sqlite3CodecAttach(db, db.nDb - 1, zKey, nKey);
 				}
 				break;
 				}
