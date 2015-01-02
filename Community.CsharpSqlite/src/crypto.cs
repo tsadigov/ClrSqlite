@@ -195,7 +195,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                 ctx.pass_sz = nKey;
                 if (!String.IsNullOrEmpty(zKey) && nKey > 0)
                 {
-                    //ctx.pass = sqlite3Malloc(nKey);
+                    //ctx.pass = malloc_cs.sqlite3Malloc(nKey);
                     //if(ctx.pass == null) return SQLITE_NOMEM;
                     ctx.pass = zKey;
                     //memcpy(ctx.pass, zKey, nKey);
@@ -213,11 +213,11 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
             static int cipher_ctx_init(ref cipher_ctx iCtx)
             {
                 iCtx = new cipher_ctx();
-                //iCtx = sqlite3Malloc( sizeof( cipher_ctx ) );
+                //iCtx = malloc_cs.sqlite3Malloc( sizeof( cipher_ctx ) );
                 //ctx = *iCtx;
                 //if ( ctx == null ) return SQLITE_NOMEM;
                 //memset( ctx, 0, sizeof( cipher_ctx ) );
-                //ctx.key =  sqlite3Malloc( EVP_MAX_KEY_LENGTH );
+                //ctx.key =  malloc_cs.sqlite3Malloc( EVP_MAX_KEY_LENGTH );
                 //if ( ctx.key == null ) return SQLITE_NOMEM;
                 return SQLITE_OK;
             }
@@ -255,7 +255,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                 //memcpy(target, source, sizeof(cipher_ctx);
                 //target.key = key; //restore pointer to previously allocated key data
                 //memcpy(target.key, source.key, EVP_MAX_KEY_LENGTH);
-                //target.pass = sqlite3Malloc(source.pass_sz);
+                //target.pass = malloc_cs.sqlite3Malloc(source.pass_sz);
                 //if(target.pass == null) return SQLITE_NOMEM;
                 //memcpy(target.pass, source.pass, source.pass_sz);
                 return SQLITE_OK;
@@ -515,7 +515,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                     Pager pPager = pDb.pBt.pBt.pPager;
                     sqlite3_file fd;
                     ctx = new codec_ctx();
-                    //sqlite3Malloc(sizeof(codec_ctx);
+                    //malloc_cs.sqlite3Malloc(sizeof(codec_ctx);
                     //if(ctx == null) return SQLITE_NOMEM;
                     //memset(ctx, 0, sizeof(codec_ctx); /* initialize all pointers and values to 0 */
                     ctx.pBt = pDb.pBt;
@@ -534,7 +534,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                     ///<param name="be used as a persistent buffer for encryption and decryption">be used as a persistent buffer for encryption and decryption</param>
                     ///<param name="operations to avoid overhead of multiple memory allocations">operations to avoid overhead of multiple memory allocations</param>
                     ctx.buffer = mempoolMethods.sqlite3MemMalloc(ctx.pBt.GetPageSize());
-                    //sqlite3Malloc(sqlite3BtreeGetPageSize(ctx.pBt);
+                    //malloc_cs.sqlite3Malloc(sqlite3BtreeGetPageSize(ctx.pBt);
                     //if(ctx.buffer == null) return SQLITE_NOMEM;
                     ///
                     ///<summary>
@@ -542,7 +542,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                     ///</summary>
                     ctx.read_ctx.iv_sz = FILE_HEADER_SZ;
                     ctx.read_ctx.iv = new byte[ctx.read_ctx.iv_sz];
-                    //sqlite3Malloc( ctx.iv_sz );
+                    //malloc_cs.sqlite3Malloc( ctx.iv_sz );
                     Buffer.BlockCopy(Encoding.UTF8.GetBytes(SQLITE_FILE_HEADER), 0, ctx.read_ctx.iv, 0, FILE_HEADER_SZ);
                     pDb.pBt.sqlite3BtreePager().sqlite3pager_sqlite3PagerSetCodec(sqlite3Codec, null, sqlite3FreeCodecArg, ctx);
                     codec_set_cipher_name(db, nDb, CIPHER, 0);

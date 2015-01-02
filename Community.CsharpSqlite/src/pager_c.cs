@@ -1422,7 +1422,7 @@ return rc;
             /// successfully, SQLITE_OK is returned and *ppPager set to point to
             /// the new pager object. If an error occurs, *ppPager is set to NULL
             /// and error code returned. This function may return SQLITE_NOMEM
-            /// (sqlite3Malloc() is used to allocate memory), SQLITE_CANTOPEN or
+            /// (malloc_cs.sqlite3Malloc() is used to allocate memory), SQLITE_CANTOPEN or
             /// various SQLITE_IO_XXX errors.
             ///
             ///</summary>
@@ -1595,7 +1595,7 @@ return rc;
                     string z;
                     nPathname = pVfs.mxPathname + 1;
                     zPathname = new StringBuilder(nPathname * 2);
-                    // sqlite3Malloc( nPathname * 2 );
+                    // malloc_cs.sqlite3Malloc( nPathname * 2 );
                     //if ( zPathname == null )
                     //{
                     //  return SQLITE_NOMEM;
@@ -1628,7 +1628,7 @@ return rc;
                     }
                     if (rc != SQLITE_OK)
                     {
-                        //sqlite3_free( ref zPathname );
+                        //malloc_cs.sqlite3_free( ref zPathname );
                         return rc;
                     }
                 }
@@ -1648,7 +1648,7 @@ return rc;
                 ///<param name="Journal file name               (nPathname+8+1 bytes)">Journal file name               (nPathname+8+1 bytes)</param>
                 ///<param name=""></param>
 
-                //pPtr = (u8 *)sqlite3MallocZero(
+                //pPtr = (u8 *)malloc_cs.sqlite3MallocZero(
                 //  ROUND8(sizeof(*pPager)) +           /* Pager structure */
                 //  ROUND8(pcacheSize)      +           /* PCache object */
                 //  ROUND8(pVfs.szOsFile)   +           /* The main db file */
@@ -1661,7 +1661,7 @@ return rc;
                 //);
                 //  Debug.Assert( EIGHT_BYTE_ALIGNMENT(SQLITE_INT_TO_PTR(journalFileSize)));
                 //if( !pPtr ){
-                //  //sqlite3_free(zPathname);
+                //  //malloc_cs.sqlite3_free(zPathname);
                 //  return SQLITE_NOMEM;
                 //}
                 pPager = new Pager();
@@ -1699,7 +1699,7 @@ memcpy(pPager.zWal, zPathname, nPathname);
 memcpy(&pPager.zWal[nPathname], "-wal", 4);
         sqlite3FileSuffix3(pPager.zFilename, pPager.zWal);
 #endif
-                    //sqlite3_free( ref zPathname );
+                    //malloc_cs.sqlite3_free( ref zPathname );
                 }
                 else
                 {
@@ -1810,7 +1810,7 @@ szPageDflt = ii;
                 {
                     Debug.Assert(null == pPager.pTmpSpace);
                     os.sqlite3OsClose(pPager.fd);
-                    //sqlite3_free( ref pPager );
+                    //malloc_cs.sqlite3_free( ref pPager );
                     return rc;
                 }
                 ///

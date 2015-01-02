@@ -460,7 +460,7 @@ namespace Community.CsharpSqlite
                             {
                                 if (db.pnBytesFreed == 0)
                                     p4 = null;
-                                // sqlite3_free( ref p4 );
+                                // malloc_cs.sqlite3_free( ref p4 );
                                 break;
                             }
                         case P4Usage.P4_VDBEFUNC:
@@ -564,15 +564,15 @@ namespace Community.CsharpSqlite
             /// few minor changes to the program.
             ///
             /// If n>=0 then the P4 operand is dynamic, meaning that a copy of
-            /// the string is made into memory obtained from sqlite3Malloc().
+            /// the string is made into memory obtained from malloc_cs.sqlite3Malloc().
             /// A value of n==0 means copy bytes of zP4 up to and including the
             /// first null byte.  If n>0 then copy n+1 bytes of zP4.
             ///
             /// If n== P4Usage.P4_KEYINFO it means that zP4 is a pointer to a KeyInfo structure.
             /// A copy is made of the KeyInfo structure into memory obtained from
-            /// sqlite3Malloc, to be freed when the Vdbe is finalized.
+            /// malloc_cs.sqlite3Malloc, to be freed when the Vdbe is finalized.
             /// n== P4Usage.P4_KEYINFO_HANDOFF indicates that zP4 points to a KeyInfo structure
-            /// stored in memory that the caller has obtained from sqlite3Malloc. The
+            /// stored in memory that the caller has obtained from malloc_cs.sqlite3Malloc. The
             /// caller should not free the allocation, it will be freed when the Vdbe is
             /// finalized.
             ///
@@ -968,8 +968,8 @@ void sqlite3VdbeLeave(Vdbe *p){
                             pEnd.z = null;
                             pEnd.n = 0;
                             pEnd.flags = MEM_Null;
-                            sqlite3_free(ref pEnd._Mem);
-                            sqlite3_free(ref pEnd.zBLOB);
+                            malloc_cs.sqlite3_free(ref pEnd._Mem);
+                            malloc_cs.sqlite3_free(ref pEnd.zBLOB);
                         }
                     }
                     //        db.mallocFailed = malloc_failed;
@@ -1104,7 +1104,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 if (i_pMem >= p.pResultSet.Length)
                     Array.Resize(ref p.pResultSet, 8 + p.pResultSet.Length);
                 {
-                    p.pResultSet[i_pMem] = sqlite3Malloc(p.pResultSet[i_pMem]);
+                    p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
                 }
                 pMem = p.pResultSet[i_pMem++];
                 do
@@ -1122,7 +1122,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                     {
                         p.rc = SQLITE_INTERRUPT;
                         rc = SQLITE_ERROR;
-                        sqlite3SetString(ref p.zErrMsg, db, sqlite3ErrStr(p.rc));
+                        malloc_cs.sqlite3SetString(ref p.zErrMsg, db, sqlite3ErrStr(p.rc));
                     }
                     else
                     {
@@ -1163,7 +1163,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             ///</summary>
                             if (p.pResultSet[i_pMem] == null)
                             {
-                                p.pResultSet[i_pMem] = sqlite3Malloc(p.pResultSet[i_pMem]);
+                                p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
                             }
                             pMem = p.pResultSet[i_pMem++];
                             //pMem++;
@@ -1187,7 +1187,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             pMem.enc = SqliteEncoding.UTF8;
                             if (p.pResultSet[i_pMem] == null)
                             {
-                                p.pResultSet[i_pMem] = sqlite3Malloc(p.pResultSet[i_pMem]);
+                                p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
                             }
                             pMem = p.pResultSet[i_pMem++];
                             //pMem++;
@@ -1223,7 +1223,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         pMem.ValType = ValType.SQLITE_INTEGER;
                         if (p.pResultSet[i_pMem] == null)
                         {
-                            p.pResultSet[i_pMem] = sqlite3Malloc(p.pResultSet[i_pMem]);
+                            p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
                         }
                         //--------------------------
                         pMem = p.pResultSet[i_pMem++];
@@ -1237,7 +1237,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         pMem.ValType = ValType.SQLITE_INTEGER;
                         if (p.pResultSet[i_pMem] == null)
                         {
-                            p.pResultSet[i_pMem] = sqlite3Malloc(p.pResultSet[i_pMem]);
+                            p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
                         }
                         //----------------------------
                         pMem = p.pResultSet[i_pMem++];
@@ -1251,7 +1251,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         pMem.ValType = ValType.SQLITE_INTEGER;
                         if (p.pResultSet[i_pMem] == null)
                         {
-                            p.pResultSet[i_pMem] = sqlite3Malloc(p.pResultSet[i_pMem]);
+                            p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
                         }
                         //-----------------------
                         pMem = p.pResultSet[i_pMem++];
@@ -1276,7 +1276,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         pMem.type = SQLITE_TEXT;
                         if (p.pResultSet[i_pMem] == null)
                         {
-                            p.pResultSet[i_pMem] = sqlite3Malloc(p.pResultSet[i_pMem]);
+                            p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
                         }
                         //--------------------------------
                         pMem = p.pResultSet[i_pMem++];
@@ -1296,7 +1296,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             pMem.enc = SqliteEncoding.UTF8;
                             if (p.pResultSet[i_pMem] == null)
                             {
-                                p.pResultSet[i_pMem] = sqlite3Malloc(p.pResultSet[i_pMem]);
+                                p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
                             }
                             //----------------------------------
                             pMem = p.pResultSet[i_pMem++];
@@ -1591,7 +1591,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 p.aMem = new Mem[nMem + 1];
                 for (n = 0; n <= nMem; n++)
                 {
-                    p.aMem[n] = sqlite3Malloc(p.aMem[n]);
+                    p.aMem[n] = malloc_cs.sqlite3Malloc(p.aMem[n]);
                     p.aMem[n].db = db;
                 }
                 //p.aMem--;         /* aMem[] goes from 1..nMem */
@@ -1604,7 +1604,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 p.aVar = new Mem[nVar == 0 ? 1 : nVar];
                 for (n = 0; n < nVar; n++)
                 {
-                    p.aVar[n] = sqlite3Malloc(p.aVar[n]);
+                    p.aVar[n] = malloc_cs.sqlite3Malloc(p.aVar[n]);
                 }
                 p.nVar = (ynVar)nVar;
                 //
@@ -2800,7 +2800,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             else
                             {
                                 result.z = null;
-                                result.zBLOB = sqlite3Malloc((int)len);
+                                result.zBLOB = malloc_cs.sqlite3Malloc((int)len);
                                 result.flags = MEM_Blob | MEM_Ephem;
                                 if (len <= buf.Length - offset)
                                 {
@@ -2989,7 +2989,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             else
                             {
                                 pMem.flags = MEM_Blob | MEM_Ephem;
-                                pMem.zBLOB = sqlite3Malloc(len);
+                                pMem.zBLOB = malloc_cs.sqlite3Malloc(len);
                                 buf.CopyTo(pMem.zBLOB, 0);
                                 pMem.n = len;
                                 // len;
@@ -3008,7 +3008,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// The calling function might provide szSpace bytes of memory
             /// space at pSpace.  This space can be used to hold the returned
             /// VDbeParsedRecord structure if it is large enough.  If it is
-            /// not big enough, space is obtained from sqlite3Malloc().
+            /// not big enough, space is obtained from malloc_cs.sqlite3Malloc().
             ///
             /// The returned structure should be closed by a call to
             /// sqlite3VdbeDeleteUnpackedRecord().
@@ -3093,7 +3093,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 u = 0;
                 while (idx < (int)szHdr && u < p.nField && d <= nKey)
                 {
-                    p.aMem[u] = sqlite3Malloc(p.aMem[u]);
+                    p.aMem[u] = malloc_cs.sqlite3Malloc(p.aMem[u]);
                     //---------------------------------
                     pMem = p.aMem[u];
                     u32 serial_type = 0;
@@ -3368,7 +3368,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///</summary>
                 Mem m = null;
                 Mem v = null;
-                v = sqlite3Malloc(v);
+                v = malloc_cs.sqlite3Malloc(v);
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(db);
                 ///
                 ///<summary>
@@ -3390,7 +3390,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<summary>
                 ///Read in the complete content of the index entry 
                 ///</summary>
-                m = sqlite3Malloc(m);
+                m = malloc_cs.sqlite3Malloc(m);
                 // memset(&m, 0, sizeof(m));
                 rc = sqlite3VdbeMemFromBtree(pCur, 0, (int)nCellKey, true, m);
                 if (rc != 0)
@@ -3497,7 +3497,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     res = 0;
                     return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
-                m = sqlite3Malloc(m);
+                m = malloc_cs.sqlite3Malloc(m);
                 // memset(&m, 0, sizeof(m));
                 rc = sqlite3VdbeMemFromBtree(pC.pCursor, 0, (int)nCellKey, true, m);
                 if (rc != 0)

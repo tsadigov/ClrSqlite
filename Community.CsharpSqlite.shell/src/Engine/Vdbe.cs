@@ -724,7 +724,7 @@ pOp.cnt = 0;
 				if(i>=this.nLabelAlloc) {
 					int n=this.nLabelAlloc==0?15:this.nLabelAlloc*2+5;
 					if(this.aLabel==null)
-						this.aLabel=sqlite3Malloc(this.aLabel,n);
+						this.aLabel=malloc_cs.sqlite3Malloc(this.aLabel,n);
 					else
 						Array.Resize(ref this.aLabel,n);
 					//p.aLabel = sqlite3DbReallocOrFree(p.db, p.aLabel,
@@ -1323,7 +1323,7 @@ pOp.cnt = 0;
 				// (Mem)sqlite3DbMallocZero(db, Mem.Length * n);
 				//if (p.aColName == 0) return;
 				while(n-->0) {
-					this.aColName[n]=sqlite3Malloc(this.aColName[n]);
+					this.aColName[n]=malloc_cs.sqlite3Malloc(this.aColName[n]);
 					pColName=this.aColName[n];
 					pColName.flags=MEM_Null;
 					pColName.db=this.db;
@@ -1424,7 +1424,7 @@ pOp.cnt = 0;
 				if((deferred!=0&&db.nDeferredCons>0)||(0==deferred&&this.nFkConstraint>0)) {
 					this.rc=SQLITE_CONSTRAINT;
 					this.errorAction=OnConstraintError.OE_Abort;
-					sqlite3SetString(ref this.zErrMsg,db,"foreign key constraint failed");
+					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"foreign key constraint failed");
 					return SQLITE_ERROR;
 				}
 				return SQLITE_OK;
@@ -2270,7 +2270,7 @@ start = sqlite3Hwtime();
 							this.currentOpCodeIndex=opcodeIndex;
 							if(pOp.p4.z!=null) {
 								Debug.Assert(this.rc!=SQLITE_OK);
-								sqlite3SetString(ref this.zErrMsg,db,"%s",pOp.p4.z);
+								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"%s",pOp.p4.z);
 								sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog!=null);
 								io.sqlite3_log(pOp.p1,"abort at %d in [%s]: %s",opcodeIndex,this.zSql,pOp.p4.z);
 							}
@@ -2394,7 +2394,7 @@ pOp.p1 = pOut.n;
 							///<param name="out2">prerelease </param>
 							Debug.Assert(pOp.p4.z!=null);
 							pOut.flags=MEM_Str|MEM_Static|MEM_Term;
-							sqlite3_free(ref pOut.zBLOB);
+							malloc_cs.sqlite3_free(ref pOut.zBLOB);
 							pOut.z=pOp.p4.z;
 							pOut.n=pOp.p1;
 							#if SQLITE_OMIT_UTF16
@@ -2622,7 +2622,7 @@ pOp.p1 = pOut.n;
 										pOut.z=pIn2.z.Substring(0,pIn2.n)+Encoding.UTF8.GetString(pIn1.zBLOB,0,pIn1.zBLOB.Length);
 								}
 							else {
-								pOut.zBLOB=sqlite3Malloc(pIn1.n+pIn2.n);
+								pOut.zBLOB=malloc_cs.sqlite3Malloc(pIn1.n+pIn2.n);
 								Buffer.BlockCopy(pIn2.zBLOB,0,pOut.zBLOB,0,pIn2.n);
 								if(pIn1.zBLOB!=null)
 									Buffer.BlockCopy(pIn1.zBLOB,0,pOut.zBLOB,pIn2.n,pIn1.n);
@@ -2972,7 +2972,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///If the function returned an error, throw an exception 
 							///</summary>
 							if(ctx.isError!=0) {
-								sqlite3SetString(ref this.zErrMsg,db,vdbeapi.sqlite3_value_text(ctx.s));
+								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,vdbeapi.sqlite3_value_text(ctx.s));
 								rc=ctx.isError;
 							}
 							///
@@ -4050,7 +4050,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							//{
 							//  goto no_mem;
 							//}
-							zNewRecord=sqlite3Malloc((int)nByte);
+							zNewRecord=malloc_cs.sqlite3Malloc((int)nByte);
 							// (u8 )pOut.z;
 							///
 							///<summary>
@@ -4171,7 +4171,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									///statements (i.e. open read/write incremental blob handles).
 									///
 									///</summary>
-									sqlite3SetString(ref this.zErrMsg,db,"cannot open savepoint - ","SQL statements in progress");
+									malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"cannot open savepoint - ","SQL statements in progress");
 									rc=SQLITE_BUSY;
 								}
 								else {
@@ -4232,7 +4232,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									iSavepoint++;
 								}
 								if(null==pSavepoint) {
-									sqlite3SetString(ref this.zErrMsg,db,"no such savepoint: %s",zName);
+									malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"no such savepoint: %s",zName);
 									rc=SQLITE_ERROR;
 								}
 								else
@@ -4244,7 +4244,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 										///if there are any active statements at all.
 										///
 										///</summary>
-										sqlite3SetString(ref this.zErrMsg,db,"cannot %s savepoint - SQL statements in progress",(p1==sqliteinth.SAVEPOINT_ROLLBACK?"rollback":"release"));
+										malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"cannot %s savepoint - SQL statements in progress",(p1==sqliteinth.SAVEPOINT_ROLLBACK?"rollback":"release"));
 										rc=SQLITE_BUSY;
 									}
 									else {
@@ -4357,7 +4357,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								///that the other VMs must complete first.
 								///
 								///</summary>
-								sqlite3SetString(ref this.zErrMsg,db,"cannot rollback transaction - "+"SQL statements in progress");
+								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"cannot rollback transaction - "+"SQL statements in progress");
 								rc=SQLITE_BUSY;
 							}
 							else
@@ -4368,7 +4368,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 									///return an error indicating that the other VMs must complete first.
 									///
 									///</summary>
-									sqlite3SetString(ref this.zErrMsg,db,"cannot commit transaction - "+"SQL statements in progress");
+									malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"cannot commit transaction - "+"SQL statements in progress");
 									rc=SQLITE_BUSY;
 								}
 								else
@@ -4402,7 +4402,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 										goto vdbe_return;
 									}
 									else {
-										sqlite3SetString(ref this.zErrMsg,db,(0==desiredAutoCommit)?"cannot start a transaction within a transaction":((iRollback!=0)?"cannot rollback - no transaction is active":"cannot commit - no transaction is active"));
+										malloc_cs.sqlite3SetString(ref this.zErrMsg,db,(0==desiredAutoCommit)?"cannot start a transaction within a transaction":((iRollback!=0)?"cannot rollback - no transaction is active":"cannot commit - no transaction is active"));
 										rc=SQLITE_ERROR;
 									}
 							break;
@@ -5919,7 +5919,7 @@ MemSetTypeFlag(pOut, MEM_Int);
                             if (((OpFlag)pOp.p5 & OpFlag.OPFLAG_LASTROWID) != 0)
 								db.lastRowid=lastRowid=iKey;
 							if((pData.flags&MEM_Null)!=0) {
-								sqlite3_free(ref pData.zBLOB);
+								malloc_cs.sqlite3_free(ref pData.zBLOB);
 								pData.z=null;
 								pData.n=0;
 							}
@@ -6141,11 +6141,11 @@ MemSetTypeFlag(pOut, MEM_Int);
 							}
 							pOut.n=(int)n;
 							if(pC.isIndex) {
-								pOut.zBLOB=sqlite3Malloc((int)n);
+								pOut.zBLOB=malloc_cs.sqlite3Malloc((int)n);
 								rc=pCrsr.sqlite3BtreeKey(0,n,pOut.zBLOB);
 							}
 							else {
-								pOut.zBLOB=sqlite3Malloc((int)pCrsr.info.nData);
+								pOut.zBLOB=malloc_cs.sqlite3Malloc((int)pCrsr.info.nData);
 								rc=pCrsr.sqlite3BtreeData(0,(u32)n,pOut.zBLOB);
 							}
 							pOut.MemSetTypeFlag(MEM_Blob);
@@ -6991,7 +6991,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///</summary>
 							nRoot=pOp.p2;
 							Debug.Assert(nRoot>0);
-							aRoot=sqlite3Malloc(aRoot,(nRoot+1));
+							aRoot=malloc_cs.sqlite3Malloc(aRoot,(nRoot+1));
 							// sqlite3DbMallocRaw(db, sizeof(int) * (nRoot + 1));
 							if(aRoot==null)
 								goto no_mem;
@@ -7020,7 +7020,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								}
 								else {
                                     pIn1.sqlite3VdbeMemSetStr(z, -1, SqliteEncoding.UTF8, null);
-									//sqlite3_free );
+									//malloc_cs.sqlite3_free );
 								}
 							#if SQLITE_TEST
 																																																																																																																																				              UPDATE_MAX_BLOBSIZE( pIn1 );
@@ -7236,7 +7236,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							}
 							if(this.nFrame>=db.aLimit[SQLITE_LIMIT_TRIGGER_DEPTH]) {
 								rc=SQLITE_ERROR;
-								sqlite3SetString(ref this.zErrMsg,db,"too many levels of trigger recursion");
+								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"too many levels of trigger recursion");
 								break;
 							}
 							///
@@ -7285,7 +7285,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 								for(int i=0;i<pFrame.aChildMem.Length;i++)//pMem = VdbeFrameMem( pFrame ) ; pMem != pEnd ; pMem++ )
 								 {
 									//pFrame.aMem[i] = pFrame.aMem[pFrame.nMem+i];
-									pMem=sqlite3Malloc(pMem);
+									pMem=malloc_cs.sqlite3Malloc(pMem);
 									pMem.flags=MEM_Null;
 									pMem.db=db;
 									pFrame.aChildMem[i]=pMem;
@@ -7560,7 +7560,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							///</summary>
 							///<param name="IMP: R">23230 </param>
 							if(ctx.isError!=0) {
-								sqlite3SetString(ref this.zErrMsg,db,vdbeapi.sqlite3_value_text(ctx.s));
+								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,vdbeapi.sqlite3_value_text(ctx.s));
 								rc=ctx.isError;
 							}
 							sqlite3VdbeMemRelease(ctx.s);
@@ -7589,7 +7589,7 @@ MemSetTypeFlag(pOut, MEM_Int);
 							rc=sqlite3VdbeMemFinalize(pMem,pOp.p4.pFunc);
 							this.aMem[pOp.p1]=pMem;
 							if(rc!=0) {
-								sqlite3SetString(ref this.zErrMsg,db,vdbeapi.sqlite3_value_text(pMem));
+								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,vdbeapi.sqlite3_value_text(pMem));
 							}
 							sqlite3VdbeChangeEncoding(pMem,encoding);
 							#if SQLITE_TEST
@@ -7703,7 +7703,7 @@ if( (eNew!=eOld)
 ){
 if( null==db.autoCommit || db.activeVdbeCnt>1 ){
 rc = SQLITE_ERROR;
-sqlite3SetString(&p.zErrMsg, db, 
+malloc_cs.sqlite3SetString(&p.zErrMsg, db, 
 "cannot change %s wal mode from within a transaction",
 (eNew==PAGER_JOURNALMODE_WAL ? "into" : "out of")
 );
@@ -7837,7 +7837,7 @@ rc = sqlite3BtreeLockTable( db.aDb[p1].pBt, pOp.p2, isWriteLock );
 if ( ( rc & 0xFF ) == SQLITE_LOCKED )
 {
 string z = pOp.p4.z;
-sqlite3SetString( ref p.zErrMsg, db, "database table is locked: ", z );
+malloc_cs.sqlite3SetString( ref p.zErrMsg, db, "database table is locked: ", z );
 }
 }
 break;
@@ -8417,7 +8417,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					///
 					///</summary>
 					too_big:
-					sqlite3SetString(ref this.zErrMsg,db,"string or blob too big");
+					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"string or blob too big");
 					rc=SQLITE_TOOBIG;
 					goto vdbe_error_halt;
 					///
@@ -8427,7 +8427,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					///</summary>
 					no_mem:
 					//db.mallocFailed = 1;
-					sqlite3SetString(ref this.zErrMsg,db,"out of memory");
+					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"out of memory");
 					rc=SQLITE_NOMEM;
 					goto vdbe_error_halt;
 					///
@@ -8440,7 +8440,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					//Debug.Assert( p.zErrMsg); /// Not needed in C#
 					//if ( db.mallocFailed != 0 ) rc = SQLITE_NOMEM;
 					if(rc!=SQLITE_IOERR_NOMEM) {
-						sqlite3SetString(ref this.zErrMsg,db,"%s",sqlite3ErrStr(rc));
+						malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"%s",sqlite3ErrStr(rc));
 					}
 					goto vdbe_error_halt;
 					///
@@ -8453,7 +8453,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					Debug.Assert(db.u1.isInterrupted);
 					rc=SQLITE_INTERRUPT;
 					this.rc=rc;
-					sqlite3SetString(ref this.zErrMsg,db,sqlite3ErrStr(rc));
+					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,sqlite3ErrStr(rc));
 					goto vdbe_error_halt;
 				}
 				finally {
@@ -8524,7 +8524,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 Mem pDest = aMem[pOp.p3];
                 ///For storing the record being decoded 
                 Mem sMem = null;
-                sMem = sqlite3Malloc(sMem);
+                sMem = malloc_cs.sqlite3Malloc(sMem);
 
 
                 ///Index into header 
@@ -8568,7 +8568,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                         if ((vdbeCursor.cacheStatus == this.cacheCtr) && (vdbeCursor.aRow != -1))
                         {
                             payloadSize = vdbeCursor.payloadSize;
-                            zRecord = sqlite3Malloc((int)payloadSize);
+                            zRecord = malloc_cs.sqlite3Malloc((int)payloadSize);
                             Buffer.BlockCopy(btCursor.info.pCell, vdbeCursor.aRow, zRecord, 0, (int)payloadSize);
                         }
                         else{
@@ -8846,9 +8846,9 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 #endif
                 REGISTER_TRACE(this, pOp.p3, pDest);
                 if (zData != null && zData != zRecord)
-                    sqlite3_free(ref zData);
-                //sqlite3_free( ref zRec );
-                sqlite3_free(ref sMem);
+                    malloc_cs.sqlite3_free(ref zData);
+                //malloc_cs.sqlite3_free( ref zRec );
+                malloc_cs.sqlite3_free(ref sMem);
                 return rc;
             }
 

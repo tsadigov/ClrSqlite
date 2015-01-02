@@ -508,7 +508,7 @@ rc = sqlite3_complete(zSql8);
 rc = SQLITE_NOMEM;
 }
 sqlite3ValueFree(pVal);
-return sqlite3ApiExit(0, rc);
+return malloc_cs.sqlite3ApiExit(0, rc);
 }
 #endif
 	#endif

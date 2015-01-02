@@ -215,7 +215,7 @@ int nBuf                   /* Bytes buffered before opening the file */
 JournalFile p = (JournalFile )pJfd;
 memset(p, 0, sqlite3JournalSize(pVfs));
 if( nBuf>0 ){
-p.zBuf = sqlite3MallocZero(nBuf);
+p.zBuf = malloc_cs.sqlite3MallocZero(nBuf);
 if( null==p.zBuf ){
 return SQLITE_NOMEM;
 }

@@ -116,10 +116,10 @@ namespace Community.CsharpSqlite
         ///
         /// ^Virtual tables methods can set an error message by assigning a
         /// string obtained from [io.sqlite3_mprintf()] to zErrMsg.  The method should
-        /// take care that any prior string is freed by a call to [sqlite3_free()]
+        /// take care that any prior string is freed by a call to [malloc_cs.sqlite3_free()]
         /// prior to assigning a new string to zErrMsg.  ^After the error message
         /// is delivered up to the client application, the string will be automatically
-        /// freed by sqlite3_free() and the zErrMsg field will be zeroed.
+        /// freed by malloc_cs.sqlite3_free() and the zErrMsg field will be zeroed.
         ///
         ///</summary>
         //struct sqlite3_vtab {

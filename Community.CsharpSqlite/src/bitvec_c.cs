@@ -239,7 +239,7 @@ namespace Community.CsharpSqlite
 			Bitvec p;
 			//Debug.Assert( sizeof(p)==BITVEC_SZ );
 			p = new Bitvec ();
-			//sqlite3MallocZero( sizeof(p) );
+			//malloc_cs.sqlite3MallocZero( sizeof(p) );
 			if (p != null) {
 				p.iSize = iSize;
 			}
@@ -462,7 +462,7 @@ namespace Community.CsharpSqlite
 					sqlite3BitvecDestroy (ref p.u.apSub [i]);
 				}
 			}
-			//sqlite3_free( ref p );
+			//malloc_cs.sqlite3_free( ref p );
 		}
 
 		///
@@ -547,7 +547,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			pBitvec = sqlite3BitvecCreate (sz);
-			pV = sqlite3_malloc ((int)(sz + 7) / 8 + 1);
+            pV = malloc_cs.sqlite3_malloc((int)(sz + 7) / 8 + 1);
 			pTmpSpace = new u32[BITVEC_SZ];
 			// sqlite3_malloc( BITVEC_SZ );
 			if (pBitvec == null || pV == null || pTmpSpace == null)
@@ -625,8 +625,8 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			bitvec_end:
-			//sqlite3_free( ref pTmpSpace );
-			//sqlite3_free( ref pV );
+			//malloc_cs.sqlite3_free( ref pTmpSpace );
+			//malloc_cs.sqlite3_free( ref pV );
 			sqlite3BitvecDestroy (ref pBitvec);
 			return rc;
 		}

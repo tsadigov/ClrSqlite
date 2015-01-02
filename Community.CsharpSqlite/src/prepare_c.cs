@@ -64,7 +64,7 @@ namespace Community.CsharpSqlite {
                             zObj = encnames[((int)sqliteinth.ENC(db))].zName;
 						#endif
 					}
-					sqlite3SetString(ref pData.pzErrMsg,db,"malformed database schema (%s)",zObj);
+					malloc_cs.sqlite3SetString(ref pData.pzErrMsg,db,"malformed database schema (%s)",zObj);
 					if(!String.IsNullOrEmpty(zExtra)) {
 						pData.pzErrMsg=io.sqlite3MAppendf(db,pData.pzErrMsg,"%s - %s",pData.pzErrMsg,zExtra);
 					}
@@ -295,11 +295,11 @@ namespace Community.CsharpSqlite {
 				if(rc!=SQLITE_OK) {
 					#if SQLITE_OMIT_WAL
 					if(pDb.pBt.pBt.pSchema.file_format==2)
-						sqlite3SetString(ref pzErrMsg,db,"%s (wal format detected)",sqlite3ErrStr(rc));
+						malloc_cs.sqlite3SetString(ref pzErrMsg,db,"%s (wal format detected)",sqlite3ErrStr(rc));
 					else
-						sqlite3SetString(ref pzErrMsg,db,"%s",sqlite3ErrStr(rc));
+						malloc_cs.sqlite3SetString(ref pzErrMsg,db,"%s",sqlite3ErrStr(rc));
 					#else
-																																																																																																																								          sqlite3SetString( ref pzErrMsg, db, "%s", sqlite3ErrStr( rc ) );
+																																																																																																																								          malloc_cs.sqlite3SetString( ref pzErrMsg, db, "%s", sqlite3ErrStr( rc ) );
 #endif
 					goto initone_error_out;
 				}
@@ -362,7 +362,7 @@ namespace Community.CsharpSqlite {
 					///</summary>
                     if ((SqliteEncoding)meta[BTREE_TEXT_ENCODING - 1] != sqliteinth.ENC(db))
                     {
-						sqlite3SetString(ref pzErrMsg,db,"attached databases must use the same"+" text encoding as main database");
+						malloc_cs.sqlite3SetString(ref pzErrMsg,db,"attached databases must use the same"+" text encoding as main database");
 						rc=SQLITE_ERROR;
 						goto initone_error_out;
 					}
@@ -394,7 +394,7 @@ namespace Community.CsharpSqlite {
 			}
             if (pDb.pSchema.file_format > sqliteinth.SQLITE_MAX_FILE_FORMAT)
             {
-				sqlite3SetString(ref pzErrMsg,db,"unsupported file format");
+				malloc_cs.sqlite3SetString(ref pzErrMsg,db,"unsupported file format");
 				rc=SQLITE_ERROR;
 				goto initone_error_out;
 			}
@@ -757,7 +757,7 @@ db.xAuth = 0;
 				sqliteinth.testcase(nBytes==mxLen+1);
 				if(nBytes>mxLen) {
 					utilc.sqlite3Error(db,SQLITE_TOOBIG,"statement too long");
-					rc=sqlite3ApiExit(db,SQLITE_TOOBIG);
+					rc=malloc_cs.sqlite3ApiExit(db,SQLITE_TOOBIG);
 					goto end_prepare;
 				}
 				zSqlCopy=zSql.Substring(0,nBytes);
@@ -859,7 +859,7 @@ db.xAuth = 0;
 				db.sqlite3DbFree(ref pT);
 			}
 			end_prepare:
-			rc=sqlite3ApiExit(db,rc);
+			rc=malloc_cs.sqlite3ApiExit(db,rc);
 			Debug.Assert((rc&db.errMask)==rc);
 			return rc;
 		}
@@ -1152,7 +1152,7 @@ Debugger.Break (); // TODO --
 //  pzTail = (u8 *)zSql + sqlite3Utf16ByteLen(zSql, chars_parsed);
 }
 sqlite3DbFree(db,ref zSql8);
-rc = sqlite3ApiExit(db, rc);
+rc = malloc_cs.sqlite3ApiExit(db, rc);
 sqlite3_mutex_leave(db.mutex);
 return rc;
 }

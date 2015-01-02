@@ -101,7 +101,7 @@ return ( p == null || p.expired ) ? 1 : 0;
 #endif
                     sqlite3_mutex_enter(mutex);
                     rc = vdbeaux.sqlite3VdbeFinalize(ref v);
-                    rc = sqlite3ApiExit(db, rc);
+                    rc = malloc_cs.sqlite3ApiExit(db, rc);
                     sqlite3_mutex_leave(mutex);
                 }
                 return rc;
@@ -130,7 +130,7 @@ return ( p == null || p.expired ) ? 1 : 0;
                     rc = v.sqlite3VdbeReset();
                     v.sqlite3VdbeRewind();
                     Debug.Assert((rc & (v.db.errMask)) == rc);
-                    rc = sqlite3ApiExit(v.db, rc);
+                    rc = malloc_cs.sqlite3ApiExit(v.db, rc);
                     sqlite3_mutex_leave(v.db.mutex);
                 }
                 return rc;
@@ -177,10 +177,10 @@ return ( p == null || p.expired ) ? 1 : 0;
                     if (p.zBLOB == null && p.z != null)
                     {
                         if (p.z.Length == 0)
-                            p.zBLOB = sqlite3Malloc(1);
+                            p.zBLOB = malloc_cs.sqlite3Malloc(1);
                         else
                         {
-                            p.zBLOB = sqlite3Malloc(p.z.Length);
+                            p.zBLOB = malloc_cs.sqlite3Malloc(p.z.Length);
                             Debug.Assert(p.zBLOB.Length == p.z.Length);
                             for (int i = 0; i < p.zBLOB.Length; i++)
                                 p.zBLOB[i] = (u8)p.z[i];
@@ -411,7 +411,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                     }
                 }
                 db.errCode = (int)rc;
-                if (SQLITE_NOMEM == sqlite3ApiExit(p.db, p.rc))
+                if (SQLITE_NOMEM == malloc_cs.sqlite3ApiExit(p.db, p.rc))
                 {
                     p.rc = SQLITE_NOMEM;
                 }
@@ -530,7 +530,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                         //}
                     }
                 }
-                rc = (SqlResult)sqlite3ApiExit(db, (int)rc);
+                rc = (SqlResult)malloc_cs.sqlite3ApiExit(db, (int)rc);
                 sqlite3_mutex_leave(db.mutex);
                 return rc;
             }
@@ -594,7 +594,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                 Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 zErr = io.sqlite3_mprintf("unable to use function %s in the requested context", zName);
                 context.sqlite3_result_error(zErr, -1);
-                //sqlite3_free( ref zErr );
+                //malloc_cs.sqlite3_free( ref zErr );
             }
 
             ///<summary>
@@ -627,7 +627,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                         {
                             pMem.z = null;
                         }
-                        pMem._Mem = sqlite3Malloc(pMem._Mem);
+                        pMem._Mem = malloc_cs.sqlite3Malloc(pMem._Mem);
                         pMem._Mem.flags = 0;
                         pMem._Mem.z = null;
                     }
@@ -831,7 +831,7 @@ return p.pMem.n;
                 Vdbe p = pStmt;
                 if (p != null)
                 {
-                    p.rc = sqlite3ApiExit(p.db, p.rc);
+                    p.rc = malloc_cs.sqlite3ApiExit(p.db, p.rc);
                     sqlite3_mutex_leave(p.db.mutex);
                 }
             }
@@ -1195,7 +1195,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                             rc = sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));
                         }
                         utilc.sqlite3Error(p.db, rc, 0);
-                        rc = sqlite3ApiExit(p.db, rc);
+                        rc = malloc_cs.sqlite3ApiExit(p.db, rc);
                     }
                     sqlite3_mutex_leave(p.db.mutex);
                 }
@@ -1253,7 +1253,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                             rc = sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));
                         }
                         utilc.sqlite3Error(p.db, rc, 0);
-                        rc = sqlite3ApiExit(p.db, rc);
+                        rc = malloc_cs.sqlite3ApiExit(p.db, rc);
                     }
                     sqlite3_mutex_leave(p.db.mutex);
                 }

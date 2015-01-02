@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite {
 			int rc;
             rc = vdbeaux.sqlite3VdbeFinalize(ref pStmt);
 			if(rc!=0) {
-				sqlite3SetString(ref pzErrMsg,db,sqlite3_errmsg(db));
+				malloc_cs.sqlite3SetString(ref pzErrMsg,db,sqlite3_errmsg(db));
 			}
 			return rc;
 		}
@@ -58,7 +58,7 @@ namespace Community.CsharpSqlite {
 				return SQLITE_NOMEM;
 			}
 			if(SQLITE_OK!=sqlite3_prepare(db,zSql,-1,ref pStmt,0)) {
-				sqlite3SetString(ref pzErrMsg,db,sqlite3_errmsg(db));
+				malloc_cs.sqlite3SetString(ref pzErrMsg,db,sqlite3_errmsg(db));
 				return sqlite3_errcode(db);
 			}
 			#if !NDEBUG
@@ -173,11 +173,11 @@ namespace Community.CsharpSqlite {
 			///Number of attached databases 
 			///</summary>
 			if(0==db.autoCommit) {
-				sqlite3SetString(ref pzErrMsg,db,"cannot VACUUM from within a transaction");
+				malloc_cs.sqlite3SetString(ref pzErrMsg,db,"cannot VACUUM from within a transaction");
 				return SQLITE_ERROR;
 			}
 			if(db.activeVdbeCnt>1) {
-				sqlite3SetString(ref pzErrMsg,db,"cannot VACUUM - SQL statements in progress");
+				malloc_cs.sqlite3SetString(ref pzErrMsg,db,"cannot VACUUM - SQL statements in progress");
 				return SQLITE_ERROR;
 			}
 			///

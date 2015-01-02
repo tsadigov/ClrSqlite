@@ -144,7 +144,7 @@ namespace Community.CsharpSqlite
 
 			public void Clear ()
 			{
-				sqlite3_free (ref this.pData);
+				malloc_cs.sqlite3_free (ref this.pData);
 				this.pData = null;
 				this.pExtra = null;
 				this.pDirty = null;

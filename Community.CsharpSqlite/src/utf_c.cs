@@ -376,7 +376,7 @@ len = pMem.n * 2 + 2;
 ** byte past the end.
 **
 ** Variable zOut is set to point at the output buffer, space obtained
-** from sqlite3Malloc().
+** from malloc_cs.sqlite3Malloc().
 */
 Debugger.Break (); // TODO -
 //zIn = (u8*)pMem.z;
@@ -562,7 +562,7 @@ return rc;
 	#if !SQLITE_OMIT_UTF16
 																			/*
 ** Convert a UTF-16 string in the native encoding into a UTF-8 string.
-** Memory to hold the UTF-8 string is obtained from sqlite3Malloc and must
+** Memory to hold the UTF-8 string is obtained from malloc_cs.sqlite3Malloc and must
 ** be freed by the calling function.
 **
 ** NULL is returned if there is an allocation error.

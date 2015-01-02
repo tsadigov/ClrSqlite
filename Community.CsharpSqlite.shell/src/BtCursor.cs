@@ -184,7 +184,7 @@ aOverflow= null;
                 ///</summary>
                 if (0 == this.apPage[0].intKey)
                 {
-                    byte[] pKey = sqlite3Malloc((int)this.nKey);
+                    byte[] pKey = malloc_cs.sqlite3Malloc((int)this.nKey);
                     //if( pKey !=null){
                     rc = this.sqlite3BtreeKey(0, (u32)this.nKey, pKey);
                     if (rc == SQLITE_OK)
@@ -192,7 +192,7 @@ aOverflow= null;
                         this.pKey = pKey;
                     }
                     //else{
-                    //  sqlite3_free(ref pKey);
+                    //  malloc_cs.sqlite3_free(ref pKey);
                     //}
                     //}else{
                     //  rc = SQLITE_NOMEM;
@@ -216,7 +216,7 @@ aOverflow= null;
             public void sqlite3BtreeClearCursor()
             {
                 Debug.Assert(this.cursorHoldsMutex());
-                sqlite3_free(ref this.pKey);
+                malloc_cs.sqlite3_free(ref this.pKey);
                 this.eState = CURSOR_INVALID;
             }
             public int btreeMoveto(///
@@ -285,7 +285,7 @@ aOverflow= null;
                 rc = this.btreeMoveto(this.pKey, this.nKey, 0, ref this.skipNext);
                 if (rc == SQLITE_OK)
                 {
-                    //sqlite3_free(ref pCur.pKey);
+                    //malloc_cs.sqlite3_free(ref pCur.pKey);
                     this.pKey = null;
                     Debug.Assert(this.eState == CURSOR_VALID || this.eState == CURSOR_INVALID);
                 }
@@ -560,7 +560,7 @@ aOverflow= null;
                     //allocateTempSpace(pBt);
                     //pTmp = pBt.pTmpSpace;
                     rc = PagerMethods.sqlite3PagerWrite(pLeaf.pDbPage);
-                    byte[] pNext_4 = sqlite3Malloc(nCell + 4);
+                    byte[] pNext_4 = malloc_cs.sqlite3Malloc(nCell + 4);
                     Buffer.BlockCopy(pLeaf.aData, pCell - 4, pNext_4, 0, nCell + 4);
                     pPage.insertCell(iCellIdx, pNext_4, nCell + 4, null, n, ref rc);
                     //insertCell( pPage, iCellIdx, pCell - 4, nCell + 4, pTmp, n, ref rc );
@@ -1242,7 +1242,7 @@ aOverflow= null;
                                     //          u8 * const pCellBody = pCell - pPage->childPtrSize;
                                     pPage.btreeParseCellPtr(pCellBody, ref this.info);
                                     nCell = (int)this.info.nKey;
-                                    pCellKey = sqlite3Malloc(nCell);
+                                    pCellKey = malloc_cs.sqlite3Malloc(nCell);
                                     //if ( pCellKey == null )
                                     //{
                                     //  rc = SQLITE_NOMEM;
@@ -1252,12 +1252,12 @@ aOverflow= null;
                                     if (rc != 0)
                                     {
                                         pCellKey = null;
-                                        // sqlite3_free(ref pCellKey );
+                                        // malloc_cs.sqlite3_free(ref pCellKey );
                                         goto moveto_finish;
                                     }
                                     c = vdbeaux.sqlite3VdbeRecordCompare(nCell, pCellKey, pIdxKey);
                                     pCellKey = null;
-                                    // sqlite3_free(ref pCellKey );
+                                    // malloc_cs.sqlite3_free(ref pCellKey );
                                 }
                         }
                         if (c == 0)
@@ -1597,7 +1597,7 @@ aOverflow= null;
                 }
                 //aPayload = pCur.info.pCell;
                 //aPayload += pCur.info.nHeader;
-                aPayload = sqlite3Malloc(this.info.nSize - this.info.nHeader);
+                aPayload = malloc_cs.sqlite3Malloc(this.info.nSize - this.info.nHeader);
                 if (pPage.intKey != 0)
                 {
                     nKey = 0;
@@ -1744,7 +1744,7 @@ return SQLITE_ABORT;
 */
 if( pCur.isIncrblobHandle && !pCur.aOverflow ){
 int nOvfl = (pCur.info.nPayload-pCur.info.nLocal+ovflSize-1)/ovflSize;
-pCur.aOverflow = (Pgno *)sqlite3MallocZero(sizeof(Pgno)*nOvfl);
+pCur.aOverflow = (Pgno *)malloc_cs.sqlite3MallocZero(sizeof(Pgno)*nOvfl);
 /* nOvfl is always positive.  If it were zero, fetchPayload would have
 ** been used instead of this routine. */
 if( Sqlite3.ALWAYS(nOvfl) && !pCur.aOverflow ){
@@ -1895,7 +1895,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                     BTreeMethods.invalidateOverflowCache(this);
                     ///
                     ///<summary>
-                    ///sqlite3_free(ref pCur); 
+                    ///malloc_cs.sqlite3_free(ref pCur); 
                     ///</summary>
                     sqlite3BtreeLeave(pBtree);
                 }

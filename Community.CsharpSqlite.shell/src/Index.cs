@@ -46,7 +46,7 @@ namespace Community.CsharpSqlite
     ///
     /// ^The idxNum and idxPtr values are recorded and passed into the
     /// [xFilter] method.
-    /// ^[sqlite3_free()] is used to free idxPtr if and only if
+    /// ^[malloc_cs.sqlite3_free()] is used to free idxPtr if and only if
     /// needToFreeIdxPtr is true.
     ///
     /// ^The orderByConsumed means that output from [xFilter]/[xNext] will occur in
@@ -80,7 +80,7 @@ namespace Community.CsharpSqlite
     //  } *aConstraintUsage;
     //  int idxNum;                /* Number used to identify the index */
     //  char *idxStr;              /* String, possibly obtained from sqlite3_malloc */
-    //  int needToFreeIdxStr;      /* Free idxStr using sqlite3_free() if true */
+    //  int needToFreeIdxStr;      /* Free idxStr using malloc_cs.sqlite3_free() if true */
     //  int orderByConsumed;       /* True if output is already ordered */
     //  double estimatedCost;      /* Estimated cost of using this index */
     //};
@@ -202,7 +202,7 @@ namespace Community.CsharpSqlite
 
         ///
         ///<summary>
-        ///String, possibly obtained from sqlite3Malloc 
+        ///String, possibly obtained from malloc_cs.sqlite3Malloc 
         ///</summary>
 
         public int needToFreeIdxStr;

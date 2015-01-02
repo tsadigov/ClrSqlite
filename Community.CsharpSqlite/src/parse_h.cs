@@ -3363,7 +3363,7 @@ goto attach_end;
 				i=0;
 				Debug.Assert(pzErrMsg!=null);
 				pEngine=sqlite3ParserAlloc();
-				//sqlite3ParserAlloc((void*(*)(size_t))sqlite3Malloc);
+				//sqlite3ParserAlloc((void*(*)(size_t))malloc_cs.sqlite3Malloc);
 				//if ( pEngine == null )
 				//{
 				//  db.mallocFailed = 1;
@@ -3436,14 +3436,14 @@ sqlite3ParserStackPeak(pEngine)
 );
 #endif
 				pEngine.sqlite3ParserFree(null);
-				//sqlite3_free );
+				//malloc_cs.sqlite3_free );
 				db.lookaside.bEnabled=enableLookaside;
 				//if ( db.mallocFailed != 0 )
 				//{
 				//  pParse.rc = SQLITE_NOMEM;
 				//}
 				if(this.rc!=SQLITE_OK&&this.rc!=SqlResult.SQLITE_DONE&&this.zErrMsg=="") {
-					sqlite3SetString(ref this.zErrMsg,db,sqlite3ErrStr(this.rc));
+					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,sqlite3ErrStr(this.rc));
 				}
 				//assert( pzErrMsg!=0 );
 				if(this.zErrMsg!=null) {
@@ -3466,7 +3466,7 @@ pParse.nTableLock = 0;
 #endif
 				#if !SQLITE_OMIT_VIRTUALTABLE
 				this.apVtabLock=null;
-				//sqlite3_free( pParse.apVtabLock );
+				//malloc_cs.sqlite3_free( pParse.apVtabLock );
 				#endif
 				if(!sqliteinth.IN_DECLARE_VTAB(this)) {
 					///
@@ -9347,7 +9347,7 @@ return;
 						utilc.sqlite3ErrorMsg(this,"%s",pVtab.zErrMsg);
 					}
 				}
-				//sqlite3_free( pVtab.zErrMsg );
+				//malloc_cs.sqlite3_free( pVtab.zErrMsg );
 				pVtab.zErrMsg=null;
 				for(i=0;i<p.nConstraint;i++) {
 					if(!p.aConstraint[i].usable&&p.aConstraintUsage[i].argvIndex>0) {
@@ -9585,7 +9585,7 @@ range_est_fallback:
 				}
 				// memset(pUsage, 0, sizeof(pUsage[0])*pIdxInfo.nConstraint);
 				if(pIdxInfo.needToFreeIdxStr!=0) {
-					//sqlite3_free(ref pIdxInfo.idxStr);
+					//malloc_cs.sqlite3_free(ref pIdxInfo.idxStr);
 				}
 				pIdxInfo.idxStr=null;
 				pIdxInfo.idxNum=0;
@@ -10365,7 +10365,7 @@ range_est_fallback:
 					sqlite3_index_info p=null;
 					this.bestVirtualIndex(pWC,pSrc,notReady,notValid,pOrderBy,ref pCost,ref p);
 					if(p.needToFreeIdxStr!=0) {
-						//sqlite3_free(ref p.idxStr);
+						//malloc_cs.sqlite3_free(ref p.idxStr);
 					}
 					this.db.sqlite3DbFree(ref p);
 				}

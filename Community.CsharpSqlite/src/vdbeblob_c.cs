@@ -297,7 +297,7 @@ blob_open_out:
   utilc.sqlite3Error(db, rc, zErr);
   sqlite3DbFree(db, zErr);
   sqlite3StackFree(db, pParse);
-  rc = sqlite3ApiExit(db, rc);
+  rc = malloc_cs.sqlite3ApiExit(db, rc);
   sqlite3_mutex_leave(db->mutex);
   return rc;
 }
@@ -368,7 +368,7 @@ static int blobReadWrite(
       v->rc = rc;
     }
   }
-  rc = sqlite3ApiExit(db, rc);
+  rc = malloc_cs.sqlite3ApiExit(db, rc);
   sqlite3_mutex_leave(db->mutex);
   return rc;
 }

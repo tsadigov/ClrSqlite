@@ -279,7 +279,7 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
         case SQLITE_MUTEX_FAST:
         case SQLITE_MUTEX_RECURSIVE:
           {
-            p = new sqlite3_mutex();//sqlite3MallocZero( sizeof(*p) );
+            p = new sqlite3_mutex();//malloc_cs.sqlite3MallocZero( sizeof(*p) );
             if ( p != null )
             {
               p.id = iType;
@@ -313,7 +313,7 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
       Debug.Assert( p.id == SQLITE_MUTEX_FAST || p.id == SQLITE_MUTEX_RECURSIVE );
       DeleteCriticalSection( p.mutex );
       p.owner = 0;
-      //sqlite3_free( p );
+      //malloc_cs.sqlite3_free( p );
     }
 
     /*

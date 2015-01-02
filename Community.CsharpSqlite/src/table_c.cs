@@ -17,7 +17,7 @@ namespace Community.CsharpSqlite
 	///    May you share freely, never taking more than you give.
 	///
 	///
-	/// This file contains the sqlite3_get_table() and //sqlite3_free_table()
+	/// This file contains the sqlite3_get_table() and //malloc_cs.sqlite3_free_table()
 	/// interface routines.  These are just wrappers around the main
 	/// interface routine of sqlite3_exec().
 	///
@@ -93,7 +93,7 @@ if( z==null ) goto malloc_failed;
 p.azResult[p.nData++ -1] = z;
 }
 }else if( p.nColumn!=nCol ){
-//sqlite3_free(ref p.zErrMsg);
+//malloc_cs.sqlite3_free(ref p.zErrMsg);
 p.zErrMsg = io.sqlite3_mprintf(
 "sqlite3_get_table() called with two or more incompatible queries"
 );
@@ -131,7 +131,7 @@ return 1;
 **
 ** The result that is written to ***pazResult is held in memory obtained
 ** from malloc().  But the caller cannot free this memory directly.
-** Instead, the entire table should be passed to //sqlite3_free_table() when
+** Instead, the entire table should be passed to //malloc_cs.sqlite3_free_table() when
 ** the calling procedure is finished using it.
 */
 static public int sqlite3_get_table(
@@ -166,27 +166,27 @@ rc = sqlite3_exec(db, zSql, (dxCallback) sqlite3_get_table_cb, res, ref pzErrMsg
 //Debug.Assert( sizeof(res.azResult[0])>= sizeof(res.nData) );
 //res.azResult = SQLITE_INT_TO_PTR( res.nData );
 if( (rc&0xff)==SQLITE_ABORT ){
-//sqlite3_free_table(ref res.azResult[1] );
+//malloc_cs.sqlite3_free_table(ref res.azResult[1] );
 if( res.zErrMsg !=""){
 if( pzErrMsg !=null ){
-//sqlite3_free(ref pzErrMsg);
+//malloc_cs.sqlite3_free(ref pzErrMsg);
 pzErrMsg = io.sqlite3_mprintf("%s",res.zErrMsg);
 }
-//sqlite3_free(ref res.zErrMsg);
+//malloc_cs.sqlite3_free(ref res.zErrMsg);
 }
 db.errCode = res.rc;  /* Assume 32-bit assignment is atomic */
 return res.rc;
 }
-//sqlite3_free(ref res.zErrMsg);
+//malloc_cs.sqlite3_free(ref res.zErrMsg);
 if( rc!=SQLITE_OK ){
-//sqlite3_free_table(ref res.azResult[1]);
+//malloc_cs.sqlite3_free_table(ref res.azResult[1]);
 return rc;
 }
 if( res.nAlloc>res.nData ){
 string[] azNew;
 Array.Resize(ref res.azResult, res.nData-1);//sqlite3_realloc( res.azResult, sizeof(char*)*(res.nData+1) );
 //if( azNew==null ){
-//  //sqlite3_free_table(ref res.azResult[1]);
+//  //malloc_cs.sqlite3_free_table(ref res.azResult[1]);
 //  db.errCode = SQLITE_NOMEM;
 //  return SQLITE_NOMEM;
 //}
@@ -202,7 +202,7 @@ return rc;
 /*
 ** This routine frees the space the sqlite3_get_table() malloced.
 */
-static void //sqlite3_free_table(
+static void //malloc_cs.sqlite3_free_table(
 ref string azResult            /* Result returned from from sqlite3_get_table() */
 ){
 if( azResult !=null){
@@ -210,8 +210,8 @@ int i, n;
 //azResult--;
 //Debug.Assert( azResult!=0 );
 //n = SQLITE_PTR_TO_INT(azResult[0]);
-//for(i=1; i<n; i++){ if( azResult[i] ) //sqlite3_free(azResult[i]); }
-//sqlite3_free(ref azResult);
+//for(i=1; i<n; i++){ if( azResult[i] ) //malloc_cs.sqlite3_free(azResult[i]); }
+//malloc_cs.sqlite3_free(ref azResult);
 }
 }
 

@@ -368,7 +368,7 @@ namespace Community.CsharpSqlite
 ///<param name="subsequent statements are skipped.  ^If the 5th parameter to sqlite3_exec()">subsequent statements are skipped.  ^If the 5th parameter to sqlite3_exec()</param>
 ///<param name="is not NULL then any error message is written into memory obtained">is not NULL then any error message is written into memory obtained</param>
 ///<param name="from [sqlite3_malloc()] and passed back through the 5th parameter.">from [sqlite3_malloc()] and passed back through the 5th parameter.</param>
-///<param name="To avoid memory leaks, the application should invoke [sqlite3_free()]">To avoid memory leaks, the application should invoke [sqlite3_free()]</param>
+///<param name="To avoid memory leaks, the application should invoke [malloc_cs.sqlite3_free()]">To avoid memory leaks, the application should invoke [malloc_cs.sqlite3_free()]</param>
 ///<param name="on error message strings returned through the 5th parameter of">on error message strings returned through the 5th parameter of</param>
 ///<param name="of sqlite3_exec() after the error message string is no longer needed.">of sqlite3_exec() after the error message string is no longer needed.</param>
 ///<param name="^If the 5th parameter to sqlite3_exec() is not NULL and no errors">^If the 5th parameter to sqlite3_exec() is not NULL and no errors</param>
@@ -1474,8 +1474,8 @@ namespace Community.CsharpSqlite
 ///<param name="string representation as returned by [sqlite3_column_text()].">string representation as returned by [sqlite3_column_text()].</param>
 ///<param name=""></param>
 ///<param name="A result table might consist of one or more memory allocations.">A result table might consist of one or more memory allocations.</param>
-///<param name="It is not safe to pass a result table directly to [sqlite3_free()].">It is not safe to pass a result table directly to [sqlite3_free()].</param>
-///<param name="A result table should be deallocated using [sqlite3_free_table()].">A result table should be deallocated using [sqlite3_free_table()].</param>
+///<param name="It is not safe to pass a result table directly to [malloc_cs.sqlite3_free()].">It is not safe to pass a result table directly to [malloc_cs.sqlite3_free()].</param>
+///<param name="A result table should be deallocated using [malloc_cs.sqlite3_free_table()].">A result table should be deallocated using [malloc_cs.sqlite3_free_table()].</param>
 ///<param name=""></param>
 ///<param name="^(As an example of the result table format, suppose a query result">^(As an example of the result table format, suppose a query result</param>
 ///<param name="is as follows:">is as follows:</param>
@@ -1509,11 +1509,11 @@ namespace Community.CsharpSqlite
 ///<param name="pointer given in its 3rd parameter.">pointer given in its 3rd parameter.</param>
 ///<param name=""></param>
 ///<param name="After the application has finished with the result from sqlite3_get_table(),">After the application has finished with the result from sqlite3_get_table(),</param>
-///<param name="it must pass the result table pointer to sqlite3_free_table() in order to">it must pass the result table pointer to sqlite3_free_table() in order to</param>
+///<param name="it must pass the result table pointer to malloc_cs.sqlite3_free_table() in order to">it must pass the result table pointer to malloc_cs.sqlite3_free_table() in order to</param>
 ///<param name="release the memory that was malloced.  Because of the way the">release the memory that was malloced.  Because of the way the</param>
 ///<param name="[sqlite3_malloc()] happens within sqlite3_get_table(), the calling">[sqlite3_malloc()] happens within sqlite3_get_table(), the calling</param>
-///<param name="function must not try to call [sqlite3_free()] directly.  Only">function must not try to call [sqlite3_free()] directly.  Only</param>
-///<param name="[sqlite3_free_table()] is able to release the memory properly and safely.">[sqlite3_free_table()] is able to release the memory properly and safely.</param>
+///<param name="function must not try to call [malloc_cs.sqlite3_free()] directly.  Only">function must not try to call [malloc_cs.sqlite3_free()] directly.  Only</param>
+///<param name="[malloc_cs.sqlite3_free_table()] is able to release the memory properly and safely.">[malloc_cs.sqlite3_free_table()] is able to release the memory properly and safely.</param>
 ///<param name=""></param>
 ///<param name="The sqlite3_get_table() interface is implemented as a wrapper around">The sqlite3_get_table() interface is implemented as a wrapper around</param>
 ///<param name="[sqlite3_exec()].  The sqlite3_get_table() routine does not have access">[sqlite3_exec()].  The sqlite3_get_table() routine does not have access</param>
@@ -1532,7 +1532,7 @@ namespace Community.CsharpSqlite
 		//  int *pnColumn,        /* Number of result columns written here */
 		//  char **pzErrmsg       /* Error msg written here */
 		//);
-		//SQLITE_API void sqlite3_free_table(char **result);
+		//SQLITE_API void malloc_cs.sqlite3_free_table(char **result);
 		///
 ///<summary>
 ///CAPI3REF: Formatted String Printing Functions
@@ -1544,7 +1544,7 @@ namespace Community.CsharpSqlite
 ///<param name="^The io.sqlite3_mprintf() and sqlite3_vmprintf() routines write their">^The io.sqlite3_mprintf() and sqlite3_vmprintf() routines write their</param>
 ///<param name="results into memory obtained from [sqlite3_malloc()].">results into memory obtained from [sqlite3_malloc()].</param>
 ///<param name="The strings returned by these two routines should be">The strings returned by these two routines should be</param>
-///<param name="released by [sqlite3_free()].  ^Both routines return a">released by [sqlite3_free()].  ^Both routines return a</param>
+///<param name="released by [malloc_cs.sqlite3_free()].  ^Both routines return a">released by [malloc_cs.sqlite3_free()].  ^Both routines return a</param>
 ///<param name="NULL pointer if [sqlite3_malloc()] is unable to allocate enough">NULL pointer if [sqlite3_malloc()] is unable to allocate enough</param>
 ///<param name="memory to hold the resulting string.">memory to hold the resulting string.</param>
 ///<param name=""></param>
@@ -1591,7 +1591,7 @@ namespace Community.CsharpSqlite
 ///<param name="<blockquote><pre>"><blockquote><pre></param>
 ///<param name="string zSQL = io.sqlite3_mprintf("INSERT INTO table VALUES('%q')", zText);">string zSQL = io.sqlite3_mprintf("INSERT INTO table VALUES('%q')", zText);</param>
 ///<param name="sqlite3_exec(db, zSQL, 0, 0, 0);">sqlite3_exec(db, zSQL, 0, 0, 0);</param>
-///<param name="sqlite3_free(zSQL);">sqlite3_free(zSQL);</param>
+///<param name="malloc_cs.sqlite3_free(zSQL);">malloc_cs.sqlite3_free(zSQL);</param>
 ///<param name="</pre></blockquote>"></pre></blockquote></param>
 ///<param name=""></param>
 ///<param name="Because the %q format string is used, the '\'' character in zText">Because the %q format string is used, the '\'' character in zText</param>
@@ -1619,7 +1619,7 @@ namespace Community.CsharpSqlite
 ///<param name="<blockquote><pre>"><blockquote><pre></param>
 ///<param name="string zSQL = io.sqlite3_mprintf("INSERT INTO table VALUES(%Q)", zText);">string zSQL = io.sqlite3_mprintf("INSERT INTO table VALUES(%Q)", zText);</param>
 ///<param name="sqlite3_exec(db, zSQL, 0, 0, 0);">sqlite3_exec(db, zSQL, 0, 0, 0);</param>
-///<param name="sqlite3_free(zSQL);">sqlite3_free(zSQL);</param>
+///<param name="malloc_cs.sqlite3_free(zSQL);">malloc_cs.sqlite3_free(zSQL);</param>
 ///<param name="</pre></blockquote>"></pre></blockquote></param>
 ///<param name=""></param>
 ///<param name="The code above will render a correct SQL statement in the zSQL">The code above will render a correct SQL statement in the zSQL</param>
@@ -1627,7 +1627,7 @@ namespace Community.CsharpSqlite
 ///<param name=""></param>
 ///<param name="^(The "%z" formatting option works like "%s" but with the">^(The "%z" formatting option works like "%s" but with the</param>
 ///<param name="addition that after the string has been read and copied into">addition that after the string has been read and copied into</param>
-///<param name="the result, [sqlite3_free()] is called on the input string.)^">the result, [sqlite3_free()] is called on the input string.)^</param>
+///<param name="the result, [malloc_cs.sqlite3_free()] is called on the input string.)^">the result, [malloc_cs.sqlite3_free()] is called on the input string.)^</param>
 ///<param name=""></param>
 
 		//SQLITE_API char *io.sqlite3_mprintf(const char*,...);
@@ -1651,15 +1651,15 @@ namespace Community.CsharpSqlite
 ///<param name="sqlite3_malloc() is zero or negative then sqlite3_malloc() returns">sqlite3_malloc() is zero or negative then sqlite3_malloc() returns</param>
 ///<param name="a NULL pointer.">a NULL pointer.</param>
 ///<param name=""></param>
-///<param name="^Calling sqlite3_free() with a pointer previously returned">^Calling sqlite3_free() with a pointer previously returned</param>
+///<param name="^Calling malloc_cs.sqlite3_free() with a pointer previously returned">^Calling malloc_cs.sqlite3_free() with a pointer previously returned</param>
 ///<param name="by sqlite3_malloc() or sqlite3_realloc() releases that memory so">by sqlite3_malloc() or sqlite3_realloc() releases that memory so</param>
-///<param name="that it might be reused.  ^The sqlite3_free() routine is">that it might be reused.  ^The sqlite3_free() routine is</param>
+///<param name="that it might be reused.  ^The malloc_cs.sqlite3_free() routine is">that it might be reused.  ^The malloc_cs.sqlite3_free() routine is</param>
 ///<param name="a no">op if is called with a NULL pointer.  Passing a NULL pointer</param>
-///<param name="to sqlite3_free() is harmless.  After being freed, memory">to sqlite3_free() is harmless.  After being freed, memory</param>
+///<param name="to malloc_cs.sqlite3_free() is harmless.  After being freed, memory">to malloc_cs.sqlite3_free() is harmless.  After being freed, memory</param>
 ///<param name="should neither be read nor written.  Even reading previously freed">should neither be read nor written.  Even reading previously freed</param>
 ///<param name="memory might result in a segmentation fault or other severe error.">memory might result in a segmentation fault or other severe error.</param>
 ///<param name="Memory corruption, a segmentation fault, or other severe error">Memory corruption, a segmentation fault, or other severe error</param>
-///<param name="might result if sqlite3_free() is called with a non">NULL pointer that</param>
+///<param name="might result if malloc_cs.sqlite3_free() is called with a non">NULL pointer that</param>
 ///<param name="was not obtained from sqlite3_malloc() or sqlite3_realloc().">was not obtained from sqlite3_malloc() or sqlite3_realloc().</param>
 ///<param name=""></param>
 ///<param name="^(The sqlite3_realloc() interface attempts to resize a">^(The sqlite3_realloc() interface attempts to resize a</param>
@@ -1670,7 +1670,7 @@ namespace Community.CsharpSqlite
 ///<param name="sqlite3_malloc(N) where N is the second parameter to sqlite3_realloc().">sqlite3_malloc(N) where N is the second parameter to sqlite3_realloc().</param>
 ///<param name="^If the second parameter to sqlite3_realloc() is zero or">^If the second parameter to sqlite3_realloc() is zero or</param>
 ///<param name="negative then the behavior is exactly the same as calling">negative then the behavior is exactly the same as calling</param>
-///<param name="sqlite3_free(P) where P is the first parameter to sqlite3_realloc().">sqlite3_free(P) where P is the first parameter to sqlite3_realloc().</param>
+///<param name="malloc_cs.sqlite3_free(P) where P is the first parameter to sqlite3_realloc().">malloc_cs.sqlite3_free(P) where P is the first parameter to sqlite3_realloc().</param>
 ///<param name="^sqlite3_realloc() returns a pointer to a memory allocation">^sqlite3_realloc() returns a pointer to a memory allocation</param>
 ///<param name="of at least N bytes in size or NULL if sufficient memory is unavailable.">of at least N bytes in size or NULL if sufficient memory is unavailable.</param>
 ///<param name="^If M is the size of the prior allocation, then min(N,M) bytes">^If M is the size of the prior allocation, then min(N,M) bytes</param>
@@ -1697,25 +1697,25 @@ namespace Community.CsharpSqlite
 ///<param name="they are reported back as [SQLITE_CANTOPEN] or">they are reported back as [SQLITE_CANTOPEN] or</param>
 ///<param name="[SQLITE_IOERR] rather than [SQLITE_NOMEM].">[SQLITE_IOERR] rather than [SQLITE_NOMEM].</param>
 ///<param name=""></param>
-///<param name="The pointer arguments to [sqlite3_free()] and [sqlite3_realloc()]">The pointer arguments to [sqlite3_free()] and [sqlite3_realloc()]</param>
+///<param name="The pointer arguments to [malloc_cs.sqlite3_free()] and [sqlite3_realloc()]">The pointer arguments to [malloc_cs.sqlite3_free()] and [sqlite3_realloc()]</param>
 ///<param name="must be either NULL or else pointers obtained from a prior">must be either NULL or else pointers obtained from a prior</param>
 ///<param name="invocation of [sqlite3_malloc()] or [sqlite3_realloc()] that have">invocation of [sqlite3_malloc()] or [sqlite3_realloc()] that have</param>
 ///<param name="not yet been released.">not yet been released.</param>
 ///<param name=""></param>
 ///<param name="The application must not read or write any part of">The application must not read or write any part of</param>
 ///<param name="a block of memory after it has been released using">a block of memory after it has been released using</param>
-///<param name="[sqlite3_free()] or [sqlite3_realloc()].">[sqlite3_free()] or [sqlite3_realloc()].</param>
+///<param name="[malloc_cs.sqlite3_free()] or [sqlite3_realloc()].">[malloc_cs.sqlite3_free()] or [sqlite3_realloc()].</param>
 ///<param name=""></param>
 
 		//SQLITE_API void *sqlite3_malloc(int);
 		//SQLITE_API void *sqlite3_realloc(void*, int);
-		//SQLITE_API void sqlite3_free(void);
+		//SQLITE_API void malloc_cs.sqlite3_free(void);
 		///
 ///<summary>
 ///CAPI3REF: Memory Allocator Statistics
 ///
 ///SQLite provides these two interfaces for reporting on the status
-///of the [sqlite3_malloc()], [sqlite3_free()], and [sqlite3_realloc()]
+///of the [sqlite3_malloc()], [malloc_cs.sqlite3_free()], and [sqlite3_realloc()]
 ///</summary>
 ///<param name="routines, which form the built">in memory allocation subsystem.</param>
 ///<param name=""></param>
@@ -3262,7 +3262,7 @@ namespace Community.CsharpSqlite
 ///<param name="[sqlite3_finalize()] is called.  ^The memory space used to hold strings">[sqlite3_finalize()] is called.  ^The memory space used to hold strings</param>
 ///<param name="and BLOBs is freed automatically.  Do <b>not</b> pass the pointers returned">and BLOBs is freed automatically.  Do <b>not</b> pass the pointers returned</param>
 ///<param name="[sqlite3_column_blob()], [sqlite3_column_text()], etc. into">[sqlite3_column_blob()], [sqlite3_column_text()], etc. into</param>
-///<param name="[sqlite3_free()].">[sqlite3_free()].</param>
+///<param name="[malloc_cs.sqlite3_free()].">[malloc_cs.sqlite3_free()].</param>
 ///<param name=""></param>
 ///<param name="^(If a memory allocation error occurs during the evaluation of any">^(If a memory allocation error occurs during the evaluation of any</param>
 ///<param name="of these routines, a default value is returned.  The default value">of these routines, a default value is returned.  The default value</param>
@@ -4051,7 +4051,7 @@ namespace Community.CsharpSqlite
 ///<param name="the [temp_store_directory pragma] always assumes that any string">the [temp_store_directory pragma] always assumes that any string</param>
 ///<param name="that this variable points to is held in memory obtained from ">that this variable points to is held in memory obtained from </param>
 ///<param name="[sqlite3_malloc] and the pragma may attempt to free that memory">[sqlite3_malloc] and the pragma may attempt to free that memory</param>
-///<param name="using [sqlite3_free].">using [sqlite3_free].</param>
+///<param name="using [malloc_cs.sqlite3_free].">using [malloc_cs.sqlite3_free].</param>
 ///<param name="Hence, if this variable is modified directly, either it should be">Hence, if this variable is modified directly, either it should be</param>
 ///<param name="made NULL or made to point to memory obtained from [sqlite3_malloc]">made NULL or made to point to memory obtained from [sqlite3_malloc]</param>
 ///<param name="or else the use of the [temp_store_directory pragma] should be avoided.">or else the use of the [temp_store_directory pragma] should be avoided.</param>
@@ -4424,7 +4424,7 @@ namespace Community.CsharpSqlite
 ///[sqlite3_load_extension()] interface shall attempt to
 ///fill *pzErrMsg with error message text stored in memory
 ///obtained from [sqlite3_malloc()]. The calling function
-///should free this memory by calling [sqlite3_free()].
+///should free this memory by calling [malloc_cs.sqlite3_free()].
 ///
 ///^Extension loading must be enabled using
 ///[sqlite3_enable_load_extension()] prior to calling this API,
@@ -4483,7 +4483,7 @@ namespace Community.CsharpSqlite
 ///point to an appropriate error message (obtained from [io.sqlite3_mprintf()])
 ///and return an appropriate [error code].  ^SQLite ensures that *pzErrMsg
 ///is NULL before calling the xEntryPoint().  ^SQLite will invoke
-///[sqlite3_free()] on *pzErrMsg after xEntryPoint() returns.  ^If any
+///[malloc_cs.sqlite3_free()] on *pzErrMsg after xEntryPoint() returns.  ^If any
 ///xEntryPoint() returns an error, the [sqlite3_open()], [sqlite3_open16()],
 ///or [sqlite3_open_v2()] call that provoked the xEntryPoint() will fail.
 ///

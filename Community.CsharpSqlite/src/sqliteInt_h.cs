@@ -1344,10 +1344,10 @@ void *sqlite3_wsd_find(void *K, int L);
             //int sqlite3StrICmp(string , string );
             //int StringExtensions.sqlite3Strlen30(const char);
             //#define StringExtensions.sqlite3StrNICmp sqlite3_strnicmp
-            //int sqlite3MallocInit(void);
-            //void sqlite3MallocEnd(void);
-            //void *sqlite3Malloc(int);
-            //void *sqlite3MallocZero(int);
+            //int malloc_cs.sqlite3MallocInit(void);
+            //void malloc_cs.sqlite3MallocEnd(void);
+            //void *malloc_cs.sqlite3Malloc(int);
+            //void *malloc_cs.sqlite3MallocZero(int);
             //void *sqlite3DbMallocZero(sqlite3*, int);
             //void *sqlite3DbMallocRaw(sqlite3*, int);
             //char *sqlite3DbStrDup(sqlite3*,const char);
@@ -1356,7 +1356,7 @@ void *sqlite3_wsd_find(void *K, int L);
             //void *sqlite3DbReallocOrFree(sqlite3 *, object  *, int);
             //void *sqlite3DbRealloc(sqlite3 *, object  *, int);
             //void sqlite3DbFree(sqlite3*, void);
-            //int sqlite3MallocSize(void);
+            //int malloc_cs.sqlite3MallocSize(void);
             //int sqlite3DbMallocSize(sqlite3*, void);
             //void *sqlite3ScratchMalloc(int);
             //void //sqlite3ScratchFree(void);
@@ -1422,7 +1422,7 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
 #if SQLITE_TEST
 																																																												    //  void *sqlite3TestTextToPtr(const char);
 #endif
-            //void sqlite3SetString(char **, sqlite3*, const char*, ...);
+            //void malloc_cs.sqlite3SetString(char **, sqlite3*, const char*, ...);
             //void utilc.sqlite3ErrorMsg(Parse*, const char*, ...);
             //int StringExtensions.sqlite3Dequote(char);
             //int sqlite3KeywordCode(const unsigned char*, int);
@@ -1883,7 +1883,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
             //  void ()(sqlite3_context*,int,sqlite3_value *), object  ()(sqlite3_context),
             //  FuncDestructor *pDestructor
             //);
-            //int sqlite3ApiExit(sqlite3 db, int);
+            //int malloc_cs.sqlite3ApiExit(sqlite3 db, int);
             //int sqlite3OpenTempDatabase(Parse );
             //void sqlite3StrAccumAppend(StrAccum*,const char*,int);
             //char *sqlite3StrAccumFinish(StrAccum);

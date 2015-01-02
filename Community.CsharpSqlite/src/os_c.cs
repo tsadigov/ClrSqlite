@@ -62,9 +62,9 @@ namespace Community.CsharpSqlite
 
     //define DO_OS_MALLOC_TEST(x)                                       \
     //if (sqlite3_memdebug_vfs_oom_test && (!x || !sqlite3IsMemJournal(x))) {  \
-    //  void *pTstAlloc = sqlite3Malloc(10);                             \
+    //  void *pTstAlloc = malloc_cs.sqlite3Malloc(10);                             \
     //  if (!pTstAlloc) return SQLITE_IOERR_NOMEM;                       \
-    //  sqlite3_free(pTstAlloc);                                         \
+    //  malloc_cs.sqlite3_free(pTstAlloc);                                         \
     //}
     static void DO_OS_MALLOC_TEST( sqlite3_file x )
     {
@@ -97,7 +97,7 @@ namespace Community.CsharpSqlite
             {
                 DO_OS_MALLOC_TEST(id);
                 if (pBuf == null)
-                    pBuf = sqlite3Malloc(amt);
+                    pBuf = malloc_cs.sqlite3Malloc(amt);
                 return id.pMethods.xRead(id, pBuf, amt, offset);
             }
 
@@ -294,7 +294,7 @@ namespace Community.CsharpSqlite
                 int rc = SQLITE_NOMEM;
                 sqlite3_file pFile;
                 pFile = new sqlite3_file();
-                //sqlite3Malloc(ref pVfs.szOsFile);
+                //malloc_cs.sqlite3Malloc(ref pVfs.szOsFile);
                 if (pFile != null)
                 {
                     rc = sqlite3OsOpen(pVfs, zFile, pFile, flags, ref pOutFlags);
@@ -316,7 +316,7 @@ namespace Community.CsharpSqlite
                 int rc = SQLITE_OK;
                 Debug.Assert(pFile != null);
                 rc = sqlite3OsClose(pFile);
-                //sqlite3_free( ref pFile );
+                //malloc_cs.sqlite3_free( ref pFile );
                 return rc;
             }
 
@@ -333,7 +333,7 @@ namespace Community.CsharpSqlite
             {
                 //void *p = sqlite3_malloc(10);
                 //if( p==null ) return SQLITE_NOMEM;
-                //sqlite3_free(ref p);
+                //malloc_cs.sqlite3_free(ref p);
                 return sqlite3_os_init();
             }
 

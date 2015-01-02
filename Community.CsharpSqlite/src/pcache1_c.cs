@@ -519,7 +519,7 @@ namespace Community.CsharpSqlite
 		/// Malloc function used within this file to allocate space from the buffer
 		/// configured using sqlite3_config(SQLITE_CONFIG_PAGECACHE) option. If no
 		/// such buffer exists or there is no space left in it, this function falls
-		/// back to sqlite3Malloc().
+		/// back to malloc_cs.sqlite3Malloc().
 		///
 		/// Multiple threads can run this routine at the same time.  Global variables
 		/// in pcache1 need to be protected via mutex.
@@ -546,16 +546,16 @@ namespace Community.CsharpSqlite
 				///
 ///<summary>
 ///Memory is not available in the SQLITE_CONFIG_PAGECACHE pool.  Get
-///it from sqlite3Malloc instead.
+///it from malloc_cs.sqlite3Malloc instead.
 ///
 ///</summary>
 
 				p = new PgHdr ();
-				// sqlite3Malloc( nByte );
+				// malloc_cs.sqlite3Malloc( nByte );
 				//if ( p != null )
 				{
 					int sz = nByte;
-					//sqlite3MallocSize( p );
+					//malloc_cs.sqlite3MallocSize( p );
 					sqlite3_mutex_enter (pcache1.mutex);
 					sqlite3StatusAdd (SQLITE_STATUS_PAGECACHE_OVERFLOW, sz);
 					sqlite3_mutex_leave (pcache1.mutex);
@@ -591,11 +591,11 @@ namespace Community.CsharpSqlite
 				int iSize;
 				Debug.Assert (sqliteinth.sqlite3MemdebugHasType (p, MemType.PCACHE));
                 sqliteinth.sqlite3MemdebugSetType(p, MemType.HEAP);
-				iSize = sqlite3MallocSize (p.pData);
+				iSize = malloc_cs.sqlite3MallocSize (p.pData);
 				sqlite3_mutex_enter (pcache1.mutex);
 				sqlite3StatusAdd (SQLITE_STATUS_PAGECACHE_OVERFLOW, -iSize);
 				sqlite3_mutex_leave (pcache1.mutex);
-				sqlite3_free (ref p.pData);
+				malloc_cs.sqlite3_free (ref p.pData);
 			}
 		}
 
@@ -610,7 +610,7 @@ static int pcache1MemSize(object p){
     int iSize;
     Debug.Assert( sqlite3MemdebugHasType(p, MemType.PCACHE) );
     sqlite3MemdebugSetType(p, MemType.HEAP);
-    iSize = sqlite3MallocSize(p);
+    iSize = malloc_cs.sqlite3MallocSize(p);
     sqlite3MemdebugSetType(p, MemType.PCACHE);
     return iSize;
   }
@@ -665,7 +665,7 @@ static int pcache1MemSize(object p){
 		///<summary>
 		/// Malloc function used by SQLite to obtain space from the buffer configured
 		/// using sqlite3_config(SQLITE_CONFIG_PAGECACHE) option. If no such buffer
-		/// exists, this function falls back to sqlite3Malloc().
+		/// exists, this function falls back to malloc_cs.sqlite3Malloc().
 		///
 		///</summary>
 		static PgHdr sqlite3PageMalloc (int sz)
@@ -680,7 +680,7 @@ static int pcache1MemSize(object p){
 		static void sqlite3PageFree (ref byte[] p)
 		{
 			if (p != null) {
-				sqlite3_free (ref p);
+				malloc_cs.sqlite3_free (ref p);
 				p = null;
 			}
 		}
@@ -715,7 +715,7 @@ static int pcache1MemSize(object p){
 				return pcache1.bUnderPressure;
 			}
 			else {
-				return sqlite3HeapNearlyFull ();
+                return malloc_cs.sqlite3HeapNearlyFull();
 			}
 		}
 
@@ -766,7 +766,7 @@ static int pcache1MemSize(object p){
 						apNew [h] = pPage;
 					}
 				}
-				//sqlite3_free( p.apHash );
+				//malloc_cs.sqlite3_free( p.apHash );
 				p.apHash = apNew;
 				p.nHash = nNew;
 			}
@@ -1343,8 +1343,8 @@ static int pcache1MemSize(object p){
 			pGroup.mxPinned = pGroup.nMaxPage + 10 - pGroup.nMinPage;
 			pcache1EnforceMaxPage (pGroup);
 			pcache1LeaveMutex (pGroup);
-			//sqlite3_free(  pCache.apHash );
-			//sqlite3_free( pCache );
+			//malloc_cs.sqlite3_free(  pCache.apHash );
+			//malloc_cs.sqlite3_free( pCache );
 			p = null;
 		}
 
@@ -1400,7 +1400,7 @@ static int pcache1MemSize(object p){
 																			/*
 ** This function is called to free superfluous dynamically allocated memory
 ** held by the pager system. Memory in use by any SQLite pager allocated
-** by the current thread may be sqlite3_free()ed.
+** by the current thread may be malloc_cs.sqlite3_free()ed.
 **
 ** nReq is the number of bytes of memory required. Once this much has
 ** been released, the function returns. The return value is the total number 

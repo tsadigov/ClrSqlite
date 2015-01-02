@@ -239,7 +239,7 @@ _Custom.va_start(ap, zFormat);
 z = sqlite3_vmprintf(zFormat, ap);
 _Custom.va_end(ap);
 fprintf(iotrace, "%s", z);
-sqlite3_free(ref z);
+malloc_cs.sqlite3_free(ref z);
 }
 #endif
 	///<summary>
@@ -1425,7 +1425,7 @@ if( db ) sqlite3_interrupt(db);
 						}
 						zIns = Sqlite3.io.sqlite3_mprintf ("INSERT INTO sqlite_master(type,name,tbl_name,rootpage,sql)" + "VALUES('table','%q','%q',0,'%q');", zTable, zTable, zSql);
 						fprintf (p._out, "%s\n", zIns);
-						//sqlite.sqlite3_free( ref zIns );
+						//sqlite.malloc_cs.sqlite3_free( ref zIns );
 						return 0;
 					}
 					else {
@@ -1498,7 +1498,7 @@ if( db ) sqlite3_interrupt(db);
 		if (rc == Sqlite3.SQLITE_CORRUPT) {
 			StringBuilder zQ2;
 			int len = strlen30 (zQuery);
-			//if ( pzErrMsg ) sqlite3_free( ref pzErrMsg );
+			//if ( pzErrMsg ) malloc_cs.sqlite3_free( ref pzErrMsg );
 			zQ2 = new StringBuilder (len + 100);
 			// malloc( len + 100 );
 			if (zQ2 == null)
@@ -1750,7 +1750,7 @@ if( db ) sqlite3_interrupt(db);
                     Sqlite3.legacy.sqlite3_exec(p.db, "PRAGMA database_list; ", (dxCallback)callback, data, ref zErrMsg);
 					if (zErrMsg != "") {
 						fprintf (stderr, "Error: %s\n", zErrMsg);
-						//sqlite3_free( ref zErrMsg );
+						//malloc_cs.sqlite3_free( ref zErrMsg );
 					}
 				}
 				else
@@ -1781,7 +1781,7 @@ if( db ) sqlite3_interrupt(db);
 						Sqlite3.legacy.sqlite3_exec (p.db, "PRAGMA writable_schema=OFF", 0, 0, 0);
 						if (zErrMsg != "") {
 							fprintf (stderr, "Error: %s\n", zErrMsg);
-							//sqlite3_free( ref zErrMsg );
+							//malloc_cs.sqlite3_free( ref zErrMsg );
 						}
 						else {
 							fprintf (p._out, "COMMIT;\n");
@@ -1972,7 +1972,7 @@ if( db ) sqlite3_interrupt(db);
 												nByte = strlen30 (zSql);
 												string sDummy = null;
 												rc = Sqlite3.sqlite3_prepare (p.db, zSql.ToString (), -1, ref pStmt, ref sDummy);
-												//sqlite3_free( ref zSql );
+												//malloc_cs.sqlite3_free( ref zSql );
 												if (rc != 0) {
 													fprintf (stderr, "Error: %s\n", Sqlite3.sqlite3_errmsg (db));
 													nCol = 0;
@@ -2086,7 +2086,7 @@ if( db ) sqlite3_interrupt(db);
 													zShellStatic = "";
 													if (zErrMsg != "") {
 														fprintf (stderr, "Error: %s\n", zErrMsg);
-														//sqlite3_free( ref zErrMsg );
+														//malloc_cs.sqlite3_free( ref zErrMsg );
 													}
 												}
 												else
@@ -2122,7 +2122,7 @@ sqlite3IoTrace = iotracePrintf;
 														rc = Sqlite3.sqlite3_load_extension (p.db, zFile, zProc, ref zErrMsg);
 														if (rc != Sqlite3.SQLITE_OK) {
 															fprintf (stderr, "%s\n", zErrMsg);
-															//sqlite3_free( ref zErrMsg );
+															//malloc_cs.sqlite3_free( ref zErrMsg );
 															rc = 1;
 														}
 													}
@@ -2323,7 +2323,7 @@ sqlite3IoTrace = iotracePrintf;
 																						}
 																						if (zErrMsg != "") {
 																							fprintf (stderr, "Error: %s\n", zErrMsg);
-																							//sqlite3_free( ref zErrMsg );
+																							//malloc_cs.sqlite3_free( ref zErrMsg );
 																						}
 																					}
 																					else
@@ -2368,7 +2368,7 @@ sqlite3IoTrace = iotracePrintf;
 																									}
 																									if (zErrMsg != "") {
 																										fprintf (stderr, "Error: %s\n", zErrMsg);
-																										//sqlite3_free( ref zErrMsg );
+																										//malloc_cs.sqlite3_free( ref zErrMsg );
 																									}
 																									if (rc == Sqlite3.SQLITE_OK) {
 																										int len, maxlen = 0;
@@ -2396,7 +2396,7 @@ sqlite3IoTrace = iotracePrintf;
 																									else {
 																										rc = 1;
 																									}
-																									//sqlite.sqlite3_free_table( azResult );
+																									//sqlite.malloc_cs.sqlite3_free_table( azResult );
 																								}
 																								else
 																									if (c == 't' && n > 4 && strncmp (azArg [0], "timeout", n) == 0 && nArg >= 2) {
@@ -2646,7 +2646,7 @@ enableTimer = booleanValue(azArg[1]);
 					}
 					if (zErrMsg != "") {
 						printf ("%s %s\n", zPrefix, zErrMsg);
-						//sqlite3_free( ref zErrMsg );
+						//malloc_cs.sqlite3_free( ref zErrMsg );
 						zErrMsg = null;
 					}
 					else {

@@ -1436,7 +1436,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                                 if (n > etBUFSIZE)
                                 {
                                     buf = new char[n];
-                                    //bufpt = zExtra = sqlite3Malloc(n);
+                                    //bufpt = zExtra = malloc_cs.sqlite3Malloc(n);
                                     //if ( bufpt == 0 )
                                     //{
                                     //  pAccum->mallocFailed = 1;
@@ -1609,7 +1609,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                 //  }
                 //  else
                 //  {
-                //    sqlite3_free( ref p.zText );
+                //    malloc_cs.sqlite3_free( ref p.zText );
                 //  }
                 //}
                 p.zText.Length = 0;
@@ -1706,7 +1706,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
             }
 
             ///<summary>
-            /// Print into memory obtained from sqlite3Malloc().  Omit the internal
+            /// Print into memory obtained from malloc_cs.sqlite3Malloc().  Omit the internal
             /// %-conversion extensions.
             ///
             ///</summary>
@@ -1725,7 +1725,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
             }
 
             ///<summary>
-            /// Print into memory obtained from sqlite3Malloc()().  Omit the internal
+            /// Print into memory obtained from malloc_cs.sqlite3Malloc()().  Omit the internal
             /// %-conversion extensions.
             ///
             ///</summary>

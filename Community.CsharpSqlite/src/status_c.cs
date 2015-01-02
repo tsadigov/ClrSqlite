@@ -229,10 +229,10 @@ namespace Community.CsharpSqlite {
 						//  + pSchema.idxHash.count
 						//  + pSchema.fkeyHash.count
 						//));
-						//nByte += (int)sqlite3MallocSize( pSchema.tblHash.ht );
-						//nByte += (int)sqlite3MallocSize( pSchema.trigHash.ht );
-						//nByte += (int)sqlite3MallocSize( pSchema.idxHash.ht );
-						//nByte += (int)sqlite3MallocSize( pSchema.fkeyHash.ht );
+						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.tblHash.ht );
+						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.trigHash.ht );
+						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.idxHash.ht );
+						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.fkeyHash.ht );
 						for(p=sqliteHashFirst(pSchema.trigHash);p!=null;p=sqliteHashNext(p)) {
 							Trigger t=(Trigger)sqliteHashData(p);
 							sqlite3DeleteTrigger(db,ref t);

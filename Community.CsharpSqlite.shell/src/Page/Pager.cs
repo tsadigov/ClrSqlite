@@ -1848,7 +1848,7 @@ return (pPager->pWal!=0);
                     {
                         os.sqlite3OsClose(this.sjfd);
                     }
-                    //sqlite3_free( ref pPager.aSavepoint );
+                    //malloc_cs.sqlite3_free( ref pPager.aSavepoint );
                     this.aSavepoint = null;
                     this.nSavepoint = 0;
                     this.nSubRec = 0;
@@ -2695,7 +2695,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     /// the file-system using os.sqlite3OsDelete().
                     ///
                     /// If an IO error within this function, an error code is returned. This
-                    /// function allocates memory by calling sqlite3Malloc(). If an allocation
+                    /// function allocates memory by calling malloc_cs.sqlite3Malloc(). If an allocation
                     /// fails, SQLITE_NOMEM is returned. Otherwise, if no IO or malloc errors
                     /// occur, SQLITE_OK is returned.
                     ///
@@ -2759,7 +2759,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///</summary>
 
                     pMaster = new sqlite3_file();
-                    // (sqlite3_file*)sqlite3MallocZero( pVfs.szOsFile * 2 );
+                    // (sqlite3_file*)malloc_cs.sqlite3MallocZero( pVfs.szOsFile * 2 );
                     pJournal = new sqlite3_file();
                     // (sqlite3_file*)( ( (u8*)pMaster ) + pVfs.szOsFile );
                     //if ( null == pMaster )
@@ -2784,7 +2784,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         //rc = os.sqlite3OsFileSize(pMaster, &nMasterJournal);
                         //if (rc != SQLITE_OK) goto delmaster_out;
                         //nMasterPtr = pVfs.mxPathname + 1;
-                        //  zMasterJournal = sqlite3Malloc((int)nMasterJournal + nMasterPtr + 1);
+                        //  zMasterJournal = malloc_cs.sqlite3Malloc((int)nMasterJournal + nMasterPtr + 1);
                         //  if ( !zMasterJournal )
                         //  {
                         //    rc = SQLITE_NOMEM;
@@ -2834,7 +2834,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         //
                         //os.sqlite3OsClose(pMaster);
                         //rc = os.sqlite3OsDelete( pVfs, zMaster, 0 );
-                        //sqlite3_free( ref zMasterJournal );
+                        //malloc_cs.sqlite3_free( ref zMasterJournal );
                     }
                     if (rc != SQLITE_OK)
                         goto delmaster_out;
@@ -2845,7 +2845,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     {
                         os.sqlite3OsClose(pMaster);
                         Debug.Assert(!pJournal.isOpen);
-                        //sqlite3_free( ref pMaster );
+                        //malloc_cs.sqlite3_free( ref pMaster );
                     }
                     return rc;
                 }
@@ -3869,7 +3869,7 @@ PagerMethods.sqlite3PagerUnref(p);
                             this.dbSize = (Pgno)(nByte / pageSize);
                             this.pageSize = (int)pageSize;
                             sqlite3PageFree(ref this.pTmpSpace);
-                            this.pTmpSpace = sqlite3Malloc(pageSize);
+                            this.pTmpSpace = malloc_cs.sqlite3Malloc(pageSize);
                             // pNew;
                             PCacheMethods.sqlite3PcacheSetPageSize(this.pPCache, (int)pageSize);
                         }
@@ -4160,7 +4160,7 @@ pPager.pWal = 0;
                     sqliteinth.IOTRACE("CLOSE %p\n", this);
                     os.sqlite3OsClose(this.jfd);
                     os.sqlite3OsClose(this.fd);
-                    //sqlite3_free( ref pTmp );
+                    //malloc_cs.sqlite3_free( ref pTmp );
                     PCacheMethods.sqlite3PcacheClose(this.pPCache);
 #if SQLITE_HAS_CODEC
                     if (this.xCodecFree != null)
@@ -4168,7 +4168,7 @@ pPager.pWal = 0;
 #endif
                     Debug.Assert(null == this.aSavepoint && !this.pInJournal);
                     Debug.Assert(!this.jfd.isOpen && !this.sjfd.isOpen);
-                    //sqlite3_free( ref pPager );
+                    //malloc_cs.sqlite3_free( ref pPager );
                     return SQLITE_OK;
                 }
 
@@ -6170,7 +6170,7 @@ rc = pager_incr_changecounter(pPager, 0);
                 {
                     int perPageSize = this.pageSize + this.nExtra + 20;
                     //+ sizeof(PgHdr) + 5*sizeof(void*);
-                    return perPageSize * PCacheMethods.sqlite3PcachePagecount(this.pPCache) + 0 // Not readily available under C#// sqlite3MallocSize(pPager);
+                    return perPageSize * PCacheMethods.sqlite3PcachePagecount(this.pPCache) + 0 // Not readily available under C#// malloc_cs.sqlite3MallocSize(pPager);
                     + this.pageSize;
                 }
 

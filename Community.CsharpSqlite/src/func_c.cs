@@ -394,7 +394,7 @@ namespace Community.CsharpSqlite {
                             return;
                         }
                         Converter.sqlite3AtoF(zBuf, ref r, StringExtensions.sqlite3Strlen30(zBuf), SqliteEncoding.UTF8);
-                        //sqlite3_free( ref zBuf );
+                        //malloc_cs.sqlite3_free( ref zBuf );
                     }
                 context.sqlite3_result_double(r);
             }
@@ -420,7 +420,7 @@ namespace Community.CsharpSqlite {
             //  }
             //  else
             //  {
-            //    z = sqlite3Malloc( (int)nByte );
+            //    z = malloc_cs.sqlite3Malloc( (int)nByte );
             //    if ( !z )
             //    {
             //      sqlite3_result_error_nomem( context );
@@ -456,7 +456,7 @@ namespace Community.CsharpSqlite {
                     //(char)sqlite3Toupper( z1[i] );
                     //}
                     context.sqlite3_result_text(z2.Length == 0 ? "" : z2.Substring(0, n).ToUpper(), -1, null);
-                    //sqlite3_free );
+                    //malloc_cs.sqlite3_free );
                     // }
                 }
             }
@@ -484,7 +484,7 @@ namespace Community.CsharpSqlite {
                     //    z1[i] = (char)sqlite3Tolower( z1[i] );
                     //  }
                     context.sqlite3_result_text(z2.Length == 0 ? "" : z2.Substring(0, n).ToLower(), -1, null);
-                    //sqlite3_free );
+                    //malloc_cs.sqlite3_free );
                     //}
                 }
             }
@@ -579,7 +579,7 @@ break;
                         p[i] = (char)(_p & 0x7F);
                     }
                     context.sqlite3_result_blob(new string(p), n, null);
-                    //sqlite3_free );
+                    //malloc_cs.sqlite3_free );
                 }
             }
             ///<summary>
@@ -1153,7 +1153,7 @@ break;
                                 //zText[0] = 'X';
                                 //zText[1] = '\'';
                                 context.sqlite3_result_text(zText, -1, SQLITE_TRANSIENT);
-                                //sqlite3_free( zText );
+                                //malloc_cs.sqlite3_free( zText );
                             }
                             break;
                         }
@@ -1189,7 +1189,7 @@ break;
                                 j++;
                                 //z[j] = '\0'; ;
                                 context.sqlite3_result_text(z, j, null);
-                                //sqlite3_free );
+                                //malloc_cs.sqlite3_free );
                             }
                             break;
                         }
@@ -1232,7 +1232,7 @@ break;
                         zHex.Append(hexdigits[c & 0xf]);
                     }
                     context.sqlite3_result_text(zHex, n * 2, null);
-                    //sqlite3_free );
+                    //malloc_cs.sqlite3_free );
                 }
             }
             ///<summary>
@@ -1371,14 +1371,14 @@ break;
                     //sqliteinth.testcase( nOut-2==db->aLimit[SQLITE_LIMIT_LENGTH] );
                     //if( nOut-1>db->aLimit[SQLITE_LIMIT_LENGTH] ){
                     //      sqlite3_result_error_toobig(context);
-                    //      sqlite3_free(zOut);
+                    //      malloc_cs.sqlite3_free(zOut);
                     //      return;
                     //    }
                     //    zOld = zOut;
                     //    zOut = sqlite3_realloc(zOut, (int)nOut);
                     //    if( zOut==0 ){
                     //      sqlite3_result_error_nomem(context);
-                    //      sqlite3_free(zOld);
+                    //      malloc_cs.sqlite3_free(zOld);
                     //      return;
                     //    }
                     //    memcpy(&zOut[j], zRep, nRep);
@@ -1408,7 +1408,7 @@ break;
                 else
                 {
                     context.sqlite3_result_text(zOut, j, null);
-                    //sqlite3_free );
+                    //malloc_cs.sqlite3_free );
                 }
             }
             ///
@@ -1566,7 +1566,7 @@ break;
                     }
                     if (zCharSet != null)
                     {
-                        //sqlite3_free( ref azChar );
+                        //malloc_cs.sqlite3_free( ref azChar );
                     }
                 }
                 StringBuilder sb = new StringBuilder(nIn);
@@ -1947,7 +1947,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                     else
                     {
                         context.sqlite3_result_text(io.sqlite3StrAccumFinish(pAccum), -1, null);
-                        //sqlite3_free );
+                        //malloc_cs.sqlite3_free );
                     }
                 }
             }

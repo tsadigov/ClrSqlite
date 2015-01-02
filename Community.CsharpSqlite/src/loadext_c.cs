@@ -115,7 +115,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 // define sqlite3_trace         0
 #endif
 		#if SQLITE_OMIT_GET_TABLE
-		//# define //sqlite3_free_table    0
+		//# define //malloc_cs.sqlite3_free_table    0
 		//# define sqlite3_get_table     0
 		static public int sqlite3_get_table (sqlite3 db, ///
 ///<summary>
@@ -251,8 +251,8 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		//0,
 		#endif
 		//  sqlite3_finalize,
-		//  //sqlite3_free,
-		//  //sqlite3_free_table,
+		//  //malloc_cs.sqlite3_free,
+		//  //malloc_cs.sqlite3_free_table,
 		//  sqlite3_get_autocommit,
 		//  sqlite3_get_auxdata,
 		//  sqlite3_get_table,
@@ -563,7 +563,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			int rc;
 			sqlite3_mutex_enter (db.mutex);
 			rc = sqlite3LoadExtension (db, zFile, zProc, ref pzErrMsg);
-			rc = sqlite3ApiExit (db, rc);
+			rc = malloc_cs.sqlite3ApiExit (db, rc);
 			sqlite3_mutex_leave (db.mutex);
 			return rc;
 		}
@@ -733,11 +733,11 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 				wsdAutoextInit ();
 				sqlite3_mutex_enter (mutex);
 				#if SQLITE_OMIT_WSD
-																																																																																//sqlite3_free( ref wsdAutoext.aExt );
+																																																																																//malloc_cs.sqlite3_free( ref wsdAutoext.aExt );
 wsdAutoext.aExt = null;
 wsdAutoext.nExt = 0;
 #else
-				//sqlite3_free( ref sqlite3Autoext.aExt );
+				//malloc_cs.sqlite3_free( ref sqlite3Autoext.aExt );
 				sqlite3Autoext.aExt = null;
 				sqlite3Autoext.nExt = 0;
 				#endif

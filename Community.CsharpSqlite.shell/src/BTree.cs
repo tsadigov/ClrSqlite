@@ -167,7 +167,7 @@ namespace Community.CsharpSqlite {
                     vfsFlags = (vfsFlags & ~SQLITE_OPEN_MAIN_DB) | SQLITE_OPEN_TEMP_DB;
                 }
                 p = new Btree();
-                //sqlite3MallocZero(sizeof(Btree));
+                //malloc_cs.sqlite3MallocZero(sizeof(Btree));
                 //if( !p ){
                 //  return SQLITE_NOMEM;
                 //}
@@ -185,11 +185,11 @@ p.lock.iTable = 1;
 if( !isMemdb && !isTempDb ){
 if( vfsFlags & SQLITE_OPEN_SHAREDCACHE ){
 int nFullPathname = pVfs.mxPathname+1;
-string zFullPathname = sqlite3Malloc(nFullPathname);
+string zFullPathname = malloc_cs.sqlite3Malloc(nFullPathname);
 sqlite3_mutex *mutexShared;
 p.sharable = 1;
 if( !zFullPathname ){
-p = null;//sqlite3_free(ref p);
+p = null;//malloc_cs.sqlite3_free(ref p);
 return SQLITE_NOMEM;
 }
 sqlite3OsFullPathname(pVfs, zFilename, nFullPathname, zFullPathname);
@@ -207,8 +207,8 @@ Btree pExisting = db.aDb[iDb].pBt;
 if( pExisting && pExisting.pBt==pBt ){
 sqlite3_mutex_leave(mutexShared);
 sqlite3_mutex_leave(mutexOpen);
-zFullPathname = null;//sqlite3_free(ref zFullPathname);
-p=null;//sqlite3_free(ref p);
+zFullPathname = null;//malloc_cs.sqlite3_free(ref zFullPathname);
+p=null;//malloc_cs.sqlite3_free(ref p);
 return SQLITE_CONSTRAINT;
 }
 }
@@ -218,7 +218,7 @@ break;
 }
 }
 sqlite3_mutex_leave(mutexShared);
-zFullPathname=null;//sqlite3_free(ref zFullPathname);
+zFullPathname=null;//malloc_cs.sqlite3_free(ref zFullPathname);
 }
 #if SQLITE_DEBUG
 																																																																											else{
@@ -247,7 +247,7 @@ p.sharable = 1;
                     Debug.Assert(sizeof(u16) == 2);
                     Debug.Assert(sizeof(Pgno) == 4);
                     pBt = new BtShared();
-                    //sqlite3MallocZero( sizeof(pBt) );
+                    //malloc_cs.sqlite3MallocZero( sizeof(pBt) );
                     //if( pBt==null ){
                     //  rc = SQLITE_NOMEM;
                     //  goto btree_open_out;
@@ -372,9 +372,9 @@ break;
                         pBt.pPager.sqlite3PagerClose();
                     }
                     pBt = null;
-                    //    sqlite3_free(ref pBt);
+                    //    malloc_cs.sqlite3_free(ref pBt);
                     p = null;
-                    //    sqlite3_free(ref p);
+                    //    malloc_cs.sqlite3_free(ref p);
                     ppBtree = null;
                 }
                 else
@@ -556,7 +556,7 @@ break;
                     sqlite3BtreeLeave(this);
                     return "";
                 }
-                sCheck.anRef = sqlite3Malloc(sCheck.anRef, (int)sCheck.nPage + 1);
+                sCheck.anRef = malloc_cs.sqlite3Malloc(sCheck.anRef, (int)sCheck.nPage + 1);
                 //if( !sCheck.anRef ){
                 //  pnErr = 1;
                 //  sqlite3BtreeLeave(p);
@@ -638,7 +638,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
                 ///</summary>
                 sqlite3BtreeLeave(this);
                 sCheck.anRef = null;
-                // sqlite3_free( ref sCheck.anRef );
+                // malloc_cs.sqlite3_free( ref sCheck.anRef );
                 //if( sCheck.mallocFailed ){
                 //  sqlite3StrAccumReset(sCheck.errMsg);
                 //  pnErr = sCheck.nErr+1;

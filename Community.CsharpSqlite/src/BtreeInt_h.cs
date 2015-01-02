@@ -341,7 +341,7 @@ namespace Community.CsharpSqlite
 			{
 				_OvflCell cp = new _OvflCell ();
 				if (pCell != null) {
-					cp.pCell = sqlite3Malloc (pCell.Length);
+					cp.pCell = malloc_cs.sqlite3Malloc (pCell.Length);
 					Buffer.BlockCopy (pCell, 0, cp.pCell, 0, pCell.Length);
 				}
 				cp.idx = idx;
@@ -1477,7 +1477,7 @@ public static bool ISAUTOVACUUM =false;
 
 				data = pPage.aData;
 				hdr = pPage.hdrOffset;
-				hit = sqlite3Malloc (pBt.pageSize);
+				hit = malloc_cs.sqlite3Malloc (pBt.pageSize);
 				//if( hit==null ){
 				//  pCheck.mallocFailed = 1;
 				//}else

@@ -51,7 +51,7 @@ namespace Community.CsharpSqlite
 ///
 ///This driver uses malloc()/free() directly rather than going through
 ///</summary>
-///<param name="the SQLite">wrappers sqlite3Malloc()/sqlite3DbFree(db,ref  ).  Those wrappers</param>
+///<param name="the SQLite">wrappers malloc_cs.sqlite3Malloc()/sqlite3DbFree(db,ref  ).  Those wrappers</param>
 ///<param name="are designed for use on embedded systems where memory is scarce and">are designed for use on embedded systems where memory is scarce and</param>
 ///<param name="malloc failures happen frequently.  Win32 does not typically run on">malloc failures happen frequently.  Win32 does not typically run on</param>
 ///<param name="embedded systems, and when it does the developers normally have bigger">embedded systems, and when it does the developers normally have bigger</param>
@@ -1965,8 +1965,8 @@ static void winShmPurge(sqlite3_vfs *pVfs, int deleteFlag){
         SimulateIOErrorBenign(0);
       }
       *pp = p->pNext;
-      sqlite3_free(p->aRegion);
-      sqlite3_free(p);
+      malloc_cs.sqlite3_free(p->aRegion);
+      malloc_cs.sqlite3_free(p);
     }else{
       pp = p->pNext;
     }
@@ -1998,7 +1998,7 @@ static int winOpenSharedMemory(winFile *pDbFd){
   nName = StringExtensions.sqlite3Strlen30(pDbFd->zPath);
   pNew = sqlite3_malloc( sizeof(*pShmNode) + nName + 15 );
   if( pNew==0 ){
-    sqlite3_free(p);
+    malloc_cs.sqlite3_free(p);
     return SQLITE_NOMEM;
   }
   memset(pNew, 0, sizeof(*pNew));
@@ -2017,7 +2017,7 @@ static int winOpenSharedMemory(winFile *pDbFd){
     if( sqlite3StrICmp(pShmNode->zFilename, pNew->zFilename)==0 ) break;
   }
   if( pShmNode ){
-    sqlite3_free(pNew);
+    malloc_cs.sqlite3_free(pNew);
   }else{
     pShmNode = pNew;
     pNew = 0;
@@ -2083,8 +2083,8 @@ static int winOpenSharedMemory(winFile *pDbFd){
 shm_open_err:
   winShmSystemLock(pShmNode, _SHM_UNLCK, WIN_SHM_DMS, 1);
   winShmPurge(pDbFd->pVfs, 0);      /* This call frees pShmNode if required */
-  sqlite3_free(p);
-  sqlite3_free(pNew);
+  malloc_cs.sqlite3_free(p);
+  malloc_cs.sqlite3_free(pNew);
   winShmLeaveMutex();
   return rc;
 }
@@ -2114,7 +2114,7 @@ static int winShmUnmap(
   *pp = p->pNext;
 
   /* Free the connection p */
-  sqlite3_free(p);
+  malloc_cs.sqlite3_free(p);
   pDbFd->pShm = 0;
   sqlite3_mutex_leave(pShmNode->mutex);
 

@@ -242,7 +242,7 @@ namespace Community.CsharpSqlite
                 {
                     FileChunk pTmp = pChunk;
                     pChunk = pChunk.pNext;
-                    //sqlite3_free( ref pTmp );
+                    //malloc_cs.sqlite3_free( ref pTmp );
                 }
                 sqlite3MemJournalOpen(pJfd);
                 return SQLITE_OK;

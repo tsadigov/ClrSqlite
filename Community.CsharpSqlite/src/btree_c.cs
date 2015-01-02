@@ -353,7 +353,7 @@ break;
 ** with table iTable, allocate one and link it into the list.
 */
 if( !pLock ){
-pLock = (BtLock *)sqlite3MallocZero(sizeof(BtLock));
+pLock = (BtLock *)malloc_cs.sqlite3MallocZero(sizeof(BtLock));
 if( !pLock ){
 return SQLITE_NOMEM;
 }
@@ -400,7 +400,7 @@ if( pLock.pBtree==p ){
 ppIter = pLock.pNext;
 Debug.Assert( pLock.iTable!=1 || pLock==&p.lock );
 if( pLock.iTable!=1 ){
-pLock=null;//sqlite3_free(ref pLock);
+pLock=null;//malloc_cs.sqlite3_free(ref pLock);
 }
 }else{
 ppIter = &pLock.pNext;
@@ -463,7 +463,7 @@ pLock.eLock = READ_LOCK;
 ///</summary>
 static void invalidateOverflowCache(BtCursor pCur){
 Debug.Assert( cursorHoldsMutex(pCur) );
-//sqlite3_free(ref pCur.aOverflow);
+//malloc_cs.sqlite3_free(ref pCur.aOverflow);
 pCur.aOverflow = null;
 }
 
@@ -797,7 +797,7 @@ return removed;
             {
                 if (null == pBt.pTmpSpace)
                 {
-                    pBt.pTmpSpace = sqlite3Malloc(pBt.pageSize);
+                    pBt.pTmpSpace = malloc_cs.sqlite3Malloc(pBt.pageSize);
                 }
             }
             ///
@@ -869,7 +869,7 @@ return removed;
                     // sqlite3DbFree(0, pBt->pSchema);
                     //freeTempSpace(pBt);
                     pBt = null;
-                    //sqlite3_free(ref pBt);
+                    //malloc_cs.sqlite3_free(ref pBt);
                 }
 #if !SQLITE_OMIT_SHARED_CACHE
 																																																																											Debug.Assert( p.wantToLock==null );
@@ -877,7 +877,7 @@ Debug.Assert( p.locked==null );
 if( p.pPrev ) p.pPrev.pNext = p.pNext;
 if( p.pNext ) p.pNext.pPrev = p.pPrev;
 #endif
-                //sqlite3_free(ref p);
+                //malloc_cs.sqlite3_free(ref p);
                 return SQLITE_OK;
             }
             ///
@@ -3657,7 +3657,7 @@ return rc;
             ///<param name=""></param>
             ///<param name="Just before the shared">btree is closed, the function passed as the </param>
             ///<param name="xFree argument when the memory allocation was made is invoked on the ">xFree argument when the memory allocation was made is invoked on the </param>
-            ///<param name="blob of allocated memory. The xFree function should not call sqlite3_free()">blob of allocated memory. The xFree function should not call sqlite3_free()</param>
+            ///<param name="blob of allocated memory. The xFree function should not call malloc_cs.sqlite3_free()">blob of allocated memory. The xFree function should not call malloc_cs.sqlite3_free()</param>
             ///<param name="on the memory, the btree layer does that.">on the memory, the btree layer does that.</param>
             ///
             ///<summary>

@@ -1224,7 +1224,7 @@ WhereCost pCost            /* Lowest cost query plan */
 	///<summary>
 	/// Allocate and populate an sqlite3_index_info structure. It is the
 	/// responsibility of the caller to eventually release the structure
-	/// by passing the pointer returned by this function to //sqlite3_free().
+	/// by passing the pointer returned by this function to //malloc_cs.sqlite3_free().
 	///</summary>
 	///<summary>
 	/// The table object reference passed as the second argument to this function

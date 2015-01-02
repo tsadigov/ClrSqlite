@@ -276,10 +276,10 @@ if( (!aDyn && nArg==(int)Sqlite3.ArraySize(aStatic))
 || (aDyn && nArg==(int)(sqlite3DbMallocSize(db, aDyn)/sizeof(void*)))
 ){
 /* The aArg[] array needs to grow. */
-void **pNew = (void **)sqlite3Malloc(nArg*sizeof(void *)*2);
+void **pNew = (void **)malloc_cs.sqlite3Malloc(nArg*sizeof(void *)*2);
 if( pNew ){
 memcpy(pNew, aArg, nArg*sizeof(void *));
-//sqlite3_free(aDyn);
+//malloc_cs.sqlite3_free(aDyn);
 aDyn = aArg = pNew;
 }else{
 /* This occurs when the array of context pointers that need to
@@ -332,7 +332,7 @@ pp = &p->pNextBlocked;
 if( nArg!=0 ){
 xUnlockNotify(aArg, nArg);
 }
-//sqlite3_free(aDyn);
+//malloc_cs.sqlite3_free(aDyn);
 leaveMutex();         /* Leave STATIC_MASTER mutex */
 }
 

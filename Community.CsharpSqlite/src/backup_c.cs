@@ -456,7 +456,7 @@ namespace Community.CsharpSqlite {
 					///<param name="EVIDENCE">21591 The sqlite3_backup object is created by a</param>
 					///<param name="call to sqlite3_backup_init() and is destroyed by a call to">call to sqlite3_backup_init() and is destroyed by a call to</param>
 					///<param name="sqlite3_backup_finish(). ">sqlite3_backup_finish(). </param>
-					//sqlite3_free( ref p );
+					//malloc_cs.sqlite3_free( ref p );
 				}
 				sqlite3_mutex_leave(mutex);
 				return rc;
@@ -739,7 +739,7 @@ namespace Community.CsharpSqlite {
 					///sqlite3_backup structure.
 					///
 					///</summary>
-					//sqlite3_free( ref p );
+					//malloc_cs.sqlite3_free( ref p );
 					p=null;
 				}
 			}

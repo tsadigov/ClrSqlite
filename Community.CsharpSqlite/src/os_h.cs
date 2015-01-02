@@ -334,7 +334,7 @@ namespace Community.CsharpSqlite
 ///<summary>
 ///Convenience functions for opening and closing files using
 ///</summary>
-///<param name="sqlite3Malloc() to obtain space for the file">handle structure.</param>
+///<param name="malloc_cs.sqlite3Malloc() to obtain space for the file">handle structure.</param>
 ///<param name=""></param>
 
 	//int sqlite3OsOpenMalloc(sqlite3_vfs *, string , sqlite3_file **, int,int);

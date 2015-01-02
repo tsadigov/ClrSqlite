@@ -51,12 +51,12 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(pH!=null);
 			elem=pH.first;
 			pH.first=null;
-			//sqlite3_free( ref pH.ht );
+			//malloc_cs.sqlite3_free( ref pH.ht );
 			pH.ht=null;
 			pH.htsize=0;
 			while(elem!=null) {
 				HashElem next_elem=elem.next;
-				////sqlite3_free(ref  elem );
+				////malloc_cs.sqlite3_free(ref  elem );
 				elem=next_elem;
 			}
 			pH.count=0;
@@ -154,22 +154,22 @@ if( new_size==pH->htsize ) return false;
 #endif
 			///
 			///<summary>
-			///There is a call to sqlite3Malloc() inside rehash(). If there is
+			///There is a call to malloc_cs.sqlite3Malloc() inside rehash(). If there is
 			///already an allocation at pH.ht, then if this malloc() fails it
 			///is benign (since failing to resize a hash table is a performance
 			///hit only, not a fatal error).
 			///</summary>
 			sqlite3BeginBenignMalloc();
 			new_ht=new _ht[new_size];
-			//(struct _ht )sqlite3Malloc( new_size*sizeof(struct _ht) );
+			//(struct _ht )malloc_cs.sqlite3Malloc( new_size*sizeof(struct _ht) );
 			for(int i=0;i<new_size;i++)
 				new_ht[i]=new _ht();
 			sqlite3EndBenignMalloc();
 			if(new_ht==null)
 				return false;
-			//sqlite3_free( ref pH.ht );
+			//malloc_cs.sqlite3_free( ref pH.ht );
 			pH.ht=new_ht;
-			// pH.htsize = new_size = sqlite3MallocSize(new_ht)/sizeof(struct _ht);
+			// pH.htsize = new_size = malloc_cs.sqlite3MallocSize(new_ht)/sizeof(struct _ht);
 			//memset(new_ht, 0, new_size*sizeof(struct _ht));
 			pH.htsize=new_size;
 			for(elem=pH.first,pH.first=null;elem!=null;elem=next_elem) {
@@ -221,7 +221,7 @@ if( new_size==pH->htsize ) return false;
 				pEntry.count--;
 				Debug.Assert(pEntry.count>=0);
 			}
-			//sqlite3_free( ref elem );
+			//malloc_cs.sqlite3_free( ref elem );
 			pH.count--;
 			if(pH.count<=0) {
 				Debug.Assert(pH.first==null);
@@ -293,7 +293,7 @@ if( new_size==pH->htsize ) return false;
 			if(data==null)
 				return data;
 			new_elem=new HashElem();
-			//(HashElem)sqlite3Malloc( sizeof(HashElem) );
+			//(HashElem)malloc_cs.sqlite3Malloc( sizeof(HashElem) );
 			if(new_elem==null)
 				return data;
 			new_elem.pKey=pKey;

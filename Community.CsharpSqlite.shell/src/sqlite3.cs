@@ -617,7 +617,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
 
                             if (pInfo.needToFreeIdxStr != 0)
                             {
-                                //sqlite3_free( ref pInfo.idxStr );
+                                //malloc_cs.sqlite3_free( ref pInfo.idxStr );
                             }
                             this.sqlite3DbFree(ref pInfo);
                         }

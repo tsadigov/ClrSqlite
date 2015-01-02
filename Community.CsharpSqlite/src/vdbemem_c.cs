@@ -400,7 +400,7 @@ return SQLITE_OK;
 				///</summary>
 				///<param name="IMP: R">23230 </param>
 				Debug.Assert(0==(pMem.flags&MEM_Dyn)&&pMem.xDel==null);
-				sqlite3DbFree(pMem.db,ref pMem.zBLOB);
+                malloc_cs.sqlite3DbFree(pMem.db, ref pMem.zBLOB);
 				//zMalloc );
 				ctx.s.CopyTo(ref pMem);
 				//memcpy(pMem, &ctx.s, sizeof(ctx.s));
@@ -453,7 +453,7 @@ return SQLITE_OK;
 		///</summary>
 		static void sqlite3VdbeMemRelease(Mem p) {
 			sqlite3VdbeMemReleaseExternal(p);
-			sqlite3DbFree(p.db,ref p.zBLOB);
+            malloc_cs.sqlite3DbFree(p.db, ref p.zBLOB);
 			//zMalloc );
 			p.z=null;
 			//p.zMalloc = 0;
@@ -700,7 +700,7 @@ return r;
 				sqlite3RowSetClear(pMem.u.pRowSet);
 			}
 			pMem.MemSetTypeFlag(MEM_Null);
-			sqlite3_free(ref pMem.zBLOB);
+			malloc_cs.sqlite3_free(ref pMem.zBLOB);
 			pMem.z=null;
 			pMem.type=SQLITE_NULL;
 		}
@@ -833,7 +833,7 @@ return r;
 			pFrom.flags=MEM_Null;
 			pFrom.xDel=null;
 			pFrom.z=null;
-			sqlite3_free(ref pFrom.zBLOB);
+			malloc_cs.sqlite3_free(ref pFrom.zBLOB);
 			//pFrom.zMalloc=0;
 		}
 		///<summary>
@@ -945,7 +945,7 @@ return r;
 			Debug.Assert(enc==0);
 			{
 				pMem.z=null;
-				pMem.zBLOB=sqlite3Malloc(n);
+				pMem.zBLOB=malloc_cs.sqlite3Malloc(n);
 				Buffer.BlockCopy(zBlob,offset,pMem.zBLOB,0,n);
 			}
 			pMem.n=nByte;
@@ -1069,9 +1069,9 @@ return r;
 						int n1,n2;
 						Mem c1=null;
 						Mem c2=null;
-						c1=sqlite3Malloc(c1);
+						c1=malloc_cs.sqlite3Malloc(c1);
 						// memset( &c1, 0, sizeof( c1 ) );
-						c2=sqlite3Malloc(c2);
+						c2=malloc_cs.sqlite3Malloc(c2);
 						// memset( &c2, 0, sizeof( c2 ) );
 						sqlite3VdbeMemShallowCopy(c1,pMem1,MEM_Ephem);
 						sqlite3VdbeMemShallowCopy(c2,pMem2,MEM_Ephem);
@@ -1174,7 +1174,7 @@ return r;
 			Debug.Assert(zData!=null);
 			if(offset+amt<=available&&(pMem.flags&MEM_Dyn)==0) {
 				sqlite3VdbeMemRelease(pMem);
-				pMem.zBLOB=sqlite3Malloc(amt);
+				pMem.zBLOB=malloc_cs.sqlite3Malloc(amt);
 				Buffer.BlockCopy(zData,offset,pMem.zBLOB,0,amt);
 				//pMem.z = &zData[offset];
 				pMem.flags=MEM_Blob|MEM_Ephem;
@@ -1184,7 +1184,7 @@ return r;
 					pMem.enc=0;
 					pMem.type=SQLITE_BLOB;
 					pMem.z=null;
-					pMem.zBLOB=sqlite3Malloc(amt);
+					pMem.zBLOB=malloc_cs.sqlite3Malloc(amt);
 					pMem.flags=MEM_Blob|MEM_Dyn|MEM_Term;
 					if(key) {
 						rc=pCur.sqlite3BtreeKey((u32)offset,(u32)amt,pMem.zBLOB);
@@ -1200,7 +1200,7 @@ return r;
 					}
 				}
 			pMem.n=amt;
-			sqlite3_free(ref zData);
+			malloc_cs.sqlite3_free(ref zData);
 			return rc;
 		}
 		///<summary>
@@ -1267,7 +1267,7 @@ return r;
 		///</summary>
 		static sqlite3_value sqlite3ValueNew(sqlite3 db) {
 			Mem p=null;
-			p=sqlite3DbMallocZero(db,p);
+            p = malloc_cs.sqlite3DbMallocZero(db, p);
 			//if ( p != null )
 			//{
 			p.flags=MEM_Null;

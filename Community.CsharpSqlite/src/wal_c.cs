@@ -552,7 +552,7 @@ static int walIndexPage(Wal *pWal, int iPage, volatile u32 **ppPage){
   /* Request a pointer to the required page from the VFS */
   if( pWal->apWiData[iPage]==0 ){
     if( pWal->exclusiveMode==WAL_HEAPMEMORY_MODE ){
-      pWal->apWiData[iPage] = (u32 volatile )sqlite3MallocZero(WALINDEX_PGSZ);
+      pWal->apWiData[iPage] = (u32 volatile )malloc_cs.sqlite3MallocZero(WALINDEX_PGSZ);
       if( null==pWal->apWiData[iPage] ) rc = SQLITE_NOMEM;
     }else{
       rc = sqlite3OsShmMap(pWal->pDbFd, iPage, WALINDEX_PGSZ, 
@@ -1195,7 +1195,7 @@ static int walIndexRecover(Wal *pWal){
       }
     }
 
-    sqlite3_free(aFrame);
+    malloc_cs.sqlite3_free(aFrame);
   }
 
 finished:
@@ -1240,7 +1240,7 @@ static void walIndexClose(Wal *pWal, int isDelete){
   if( pWal->exclusiveMode==WAL_HEAPMEMORY_MODE ){
     int i;
     for(i=0; i<pWal->nWiData; i++){
-      sqlite3_free((void )pWal->apWiData[i]);
+      malloc_cs.sqlite3_free((void )pWal->apWiData[i]);
       pWal->apWiData[i] = 0;
     }
   }else{
@@ -1292,7 +1292,7 @@ int sqlite3WalOpen(
 
   /* Allocate an instance of struct Wal to return. */
   *ppWal = 0;
-  pRet = (Wal)sqlite3MallocZero(sizeof(Wal) + pVfs->szOsFile);
+  pRet = (Wal)malloc_cs.sqlite3MallocZero(sizeof(Wal) + pVfs->szOsFile);
   if( null==pRet ){
     return SQLITE_NOMEM;
   }
@@ -1315,7 +1315,7 @@ int sqlite3WalOpen(
   if( rc!=SQLITE_OK ){
     walIndexClose(pRet, 0);
     sqlite3OsClose(pRet->pWalFd);
-    sqlite3_free(pRet);
+    malloc_cs.sqlite3_free(pRet);
   }else{
     *ppWal = pRet;
     WALTRACE(("WAL%d: opened\n", pRet));
@@ -1843,8 +1843,8 @@ int sqlite3WalClose(
       sqlite3OsDelete(pWal->pVfs, pWal->zWalName, 0);
     }
     WALTRACE(("WAL%p: closed\n", pWal));
-    sqlite3_free((void )pWal->apWiData);
-    sqlite3_free(pWal);
+    malloc_cs.sqlite3_free((void )pWal->apWiData);
+    malloc_cs.sqlite3_free(pWal);
   }
   return rc;
 }

@@ -319,11 +319,11 @@ namespace Community.CsharpSqlite
                 if (pStmt != null)
                     vdbeaux.sqlite3VdbeFinalize(ref pStmt);
                 db.sqlite3DbFree(ref azCols);
-                result = (SqlResult)sqlite3ApiExit(db, (int)result);
+                result = (SqlResult)malloc_cs.sqlite3ApiExit(db, (int)result);
                 if (result != SqlResult.SQLITE_OK && Sqlite3.ALWAYS(result == (SqlResult)sqlite3_errcode(db)) && pzErrMsg != null)
                 {
                     //int nErrMsg = 1 + StringExtensions.sqlite3Strlen30(sqlite3_errmsg(db));
-                    //pzErrMsg = sqlite3Malloc(nErrMsg);
+                    //pzErrMsg = malloc_cs.sqlite3Malloc(nErrMsg);
                     //if (pzErrMsg)
                     //{
                     //   memcpy(pzErrMsg, sqlite3_errmsg(db), nErrMsg);

@@ -204,7 +204,7 @@ return rc;
 			lock(pMaster) {
 				Sqlite3.sqliteinth.sqlite3GlobalConfig.isMutexInit=1;
 				if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit==0) {
-					rc=sqlite3MallocInit();
+					rc=malloc_cs.sqlite3MallocInit();
 				}
 				if(rc==SQLITE_OK) {
 					Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit=1;
@@ -334,7 +334,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 				Sqlite3.sqliteinth.sqlite3GlobalConfig.isPCacheInit=0;
 			}
 			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit!=0) {
-				sqlite3MallocEnd();
+				malloc_cs.sqlite3MallocEnd();
 				Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit=0;
 			}
 			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isMutexInit!=0) {
@@ -674,7 +674,7 @@ break;
 			//*/
 			//if ( db.lookaside.bMalloced )
 			//{
-			//  //sqlite3_free( db.lookaside.pStart );
+			//  //malloc_cs.sqlite3_free( db.lookaside.pStart );
 			//}
 			///* The size of a lookaside slot needs to be larger than a pointer
 			//** to be useful.
@@ -690,7 +690,7 @@ break;
 			//{
 			//  sz = ROUNDDOWN8(sz); /* IMP: R-33038-09382 */
 			//  sqlite3BeginBenignMalloc();
-			//  pStart = sqlite3Malloc( sz*cnt );  /* IMP: R-61949-35727 */
+			//  pStart = malloc_cs.sqlite3Malloc( sz*cnt );  /* IMP: R-61949-35727 */
 			//  sqlite3EndBenignMalloc();
 			//}else{
 			//  sz = ROUNDDOWN8(sz); /* IMP: R-33038-09382 */
@@ -1070,9 +1070,9 @@ break;
 			///</summary>
 			//if ( db.lookaside.bMalloced )
 			//{
-			//  sqlite3_free( ref db.lookaside.pStart );
+			//  malloc_cs.sqlite3_free( ref db.lookaside.pStart );
 			//}
-			//sqlite3_free( ref db );
+			//malloc_cs.sqlite3_free( ref db );
 			return SQLITE_OK;
 		}
 		///<summary>
@@ -1545,7 +1545,7 @@ enc = SqliteEncoding.UTF16BE;
 				db.sqlite3DbFree(ref pArg);
 			}
 			//_out:
-			rc=sqlite3ApiExit(db,rc);
+			rc=malloc_cs.sqlite3ApiExit(db,rc);
 			sqlite3_mutex_leave(db.mutex);
 			return rc;
 		}
@@ -1567,7 +1567,7 @@ Debug.Assert( 0==db.mallocFailed );
 zFunc8 = sqlite3Utf16to8(db, zFunctionName, -1, SqliteEncoding.UTF16NATIVE);
 rc = sqlite3CreateFunc(db, zFunc8, nArg, eTextRep, p, xFunc, xStep, xFinal, null);
 sqlite3DbFree(db,ref zFunc8);
-rc = sqlite3ApiExit(db, rc);
+rc = malloc_cs.sqlite3ApiExit(db, rc);
 sqlite3_mutex_leave(db.mutex);
 return rc;
 }
@@ -1591,7 +1591,7 @@ return rc;
 			if(sqlite3FindFunction(db,zName,nName,nArg,SqliteEncoding.UTF8,0)==null) {
                 sqlite3CreateFunc(db, zName, nArg, SqliteEncoding.UTF8, 0, (dxFunc)vdbeapi.sqlite3InvalidFunction, null, null, null);
 			}
-			rc=sqlite3ApiExit(db,SQLITE_OK);
+			rc=malloc_cs.sqlite3ApiExit(db,SQLITE_OK);
 			sqlite3_mutex_leave(db.mutex);
 			return rc;
 		}
@@ -1832,7 +1832,7 @@ return pRet;
     rc = sqlite3Checkpoint(db, iDb, eMode, pnLog, pnCkpt);
     utilc.sqlite3Error(db, rc, 0);
   }
-  rc = sqlite3ApiExit(db, rc);
+  rc = malloc_cs.sqlite3ApiExit(db, rc);
   sqlite3_mutex_leave(db->mutex);
   return rc;
 #endif
@@ -1999,7 +1999,7 @@ z = vdbeapi.sqlite3_value_text16(db->pErr);
 /* A malloc() may have failed within the call to vdbeapi.sqlite3_value_text16()
 ** above. If this is the case, then the db->mallocFailed flag needs to
 ** be cleared before returning. Do this directly, instead of via
-** sqlite3ApiExit(), to avoid setting the database handle error message.
+** malloc_cs.sqlite3ApiExit(), to avoid setting the database handle error message.
 */
 db->mallocFailed = 0;
 }
@@ -2254,13 +2254,13 @@ return z;
 		///<param name="If successful, SQLITE_OK is returned. In this case *ppVfs is set to point to">If successful, SQLITE_OK is returned. In this case *ppVfs is set to point to</param>
 		///<param name="the VFS that should be used to open the database file. *pzFile is set to">the VFS that should be used to open the database file. *pzFile is set to</param>
 		///<param name="point to a buffer containing the name of the file to open. It is the ">point to a buffer containing the name of the file to open. It is the </param>
-		///<param name="responsibility of the caller to eventually call sqlite3_free() to release">responsibility of the caller to eventually call sqlite3_free() to release</param>
+		///<param name="responsibility of the caller to eventually call malloc_cs.sqlite3_free() to release">responsibility of the caller to eventually call malloc_cs.sqlite3_free() to release</param>
 		///<param name="this buffer.">this buffer.</param>
 		///<param name=""></param>
 		///<param name="If an error occurs, then an SQLite error code is returned and *pzErrMsg">If an error occurs, then an SQLite error code is returned and *pzErrMsg</param>
 		///<param name="may be set to point to a buffer containing an English language error ">may be set to point to a buffer containing an English language error </param>
 		///<param name="message. It is the responsibility of the caller to eventually release">message. It is the responsibility of the caller to eventually release</param>
-		///<param name="this buffer by calling sqlite3_free().">this buffer by calling sqlite3_free().</param>
+		///<param name="this buffer by calling malloc_cs.sqlite3_free().">this buffer by calling malloc_cs.sqlite3_free().</param>
 		static int sqlite3ParseUri(string zDefaultVfs,///
 		///<summary>
 		///VFS to use if no "vfs=xxx" query option 
@@ -2498,7 +2498,7 @@ return z;
 			}
 			parse_uri_out:
 			if(rc!=SQLITE_OK) {
-				//sqlite3_free(zFile);
+				//malloc_cs.sqlite3_free(zFile);
 				zFile=null;
 			}
 			pFlags=flags;
@@ -2631,13 +2631,13 @@ return z;
 			///Allocate the sqlite data structure 
 			///</summary>
 			db=new sqlite3();
-			//sqlite3MallocZero( sqlite3.Length );
+			//malloc_cs.sqlite3MallocZero( sqlite3.Length );
 			if(db==null)
 				goto opendb_out;
 			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.bFullMutex&&isThreadsafe!=0) {
 				db.mutex=sqlite3MutexAlloc(SQLITE_MUTEX_RECURSIVE);
 				if(db.mutex==null) {
-					//sqlite3_free( ref db );
+					//malloc_cs.sqlite3_free( ref db );
 					goto opendb_out;
 				}
 			}
@@ -2702,7 +2702,7 @@ return z;
 			if(rc!=SQLITE_OK) {
 				//if( rc==SQLITE_NOMEM ) db.mallocFailed = 1;
 				utilc.sqlite3Error(db,rc,zErrMsg.Length>0?"%s":"",zErrMsg);
-				//sqlite3_free(zErrMsg);
+				//malloc_cs.sqlite3_free(zErrMsg);
 				goto opendb_out;
 			}
 			///
@@ -2802,7 +2802,7 @@ SQLITE_DEFAULT_LOCKING_MODE);
 			setupLookaside(db,null,Sqlite3.sqliteinth.sqlite3GlobalConfig.szLookaside,Sqlite3.sqliteinth.sqlite3GlobalConfig.nLookaside);
 			sqlite3_wal_autocheckpoint(db,SQLITE_DEFAULT_WAL_AUTOCHECKPOINT);
 			opendb_out:
-			//sqlite3_free(zOpen);
+			//malloc_cs.sqlite3_free(zOpen);
 			if(db!=null) {
 				Debug.Assert(db.mutex!=null||isThreadsafe==0||!Sqlite3.sqliteinth.sqlite3GlobalConfig.bFullMutex);
 				sqlite3_mutex_leave(db.mutex);
@@ -2817,7 +2817,7 @@ SQLITE_DEFAULT_LOCKING_MODE);
 					db.magic=SQLITE_MAGIC_SICK;
 				}
 			ppDb=db;
-			return sqlite3ApiExit(0,rc);
+			return malloc_cs.sqlite3ApiExit(0,rc);
 		}
 		///
 		///<summary>
@@ -2881,7 +2881,7 @@ rc = SQLITE_NOMEM;
 }
 sqlite3ValueFree(pVal);
 
-return sqlite3ApiExit(0, rc);
+return malloc_cs.sqlite3ApiExit(0, rc);
 }
 #endif
 		///
@@ -2893,7 +2893,7 @@ return sqlite3ApiExit(0, rc);
 			sqlite3_mutex_enter(db.mutex);
 			//Debug.Assert( 0 == db.mallocFailed );
 			rc=createCollation(db,zName,enc,CollationType.USER,pCtx,xCompare,null);
-			rc=sqlite3ApiExit(db,rc);
+			rc=malloc_cs.sqlite3ApiExit(db,rc);
 			sqlite3_mutex_leave(db.mutex);
 			return rc;
 		}
@@ -2909,7 +2909,7 @@ return sqlite3ApiExit(0, rc);
 			sqlite3_mutex_enter(db.mutex);
 			//Debug.Assert( 0 == db.mallocFailed );
 			rc=createCollation(db,zName,enc,CollationType.USER,pCtx,xCompare,xDel);
-			rc=sqlite3ApiExit(db,rc);
+			rc=malloc_cs.sqlite3ApiExit(db,rc);
 			sqlite3_mutex_leave(db.mutex);
 			return rc;
 		}
@@ -2933,7 +2933,7 @@ return sqlite3ApiExit(0, rc);
 //    rc = createCollation(db, zName8, (u8)enc, CollationType.USER, pCtx, xCompare, 0);
 //    sqlite3DbFree(db,ref zName8);
 //  }
-//  rc = sqlite3ApiExit(db, rc);
+//  rc = malloc_cs.sqlite3ApiExit(db, rc);
 //  sqlite3_mutex_leave(db.mutex);
 //  return rc;
 //}
@@ -3160,7 +3160,7 @@ error_out:
       }
       utilc.sqlite3Error( db, rc, ( !String.IsNullOrEmpty( zErrMsg ) ? "%s" : null ), zErrMsg );
       sqlite3DbFree( db, ref zErrMsg );
-      rc = sqlite3ApiExit( db, rc );
+      rc = malloc_cs.sqlite3ApiExit( db, rc );
       sqlite3_mutex_leave( db.mutex );
       return rc;
     }

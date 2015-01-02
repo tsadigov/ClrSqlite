@@ -459,7 +459,7 @@ set { _flags = value; }
 ///</summary>
 
 			// Not used under c#
-			//public string zMalloc;      /* Dynamic buffer allocated by sqlite3Malloc() */
+			//public string zMalloc;      /* Dynamic buffer allocated by malloc_cs.sqlite3Malloc() */
 			public Mem _Mem;
 
 			///
@@ -528,7 +528,7 @@ set { _flags = value; }
 				if (zBLOB == null)
 					ct.zBLOB = null;
 				else {
-					ct.zBLOB = sqlite3Malloc (zBLOB.Length);
+					ct.zBLOB = malloc_cs.sqlite3Malloc (zBLOB.Length);
 					Buffer.BlockCopy (zBLOB, 0, ct.zBLOB, 0, zBLOB.Length);
 				}
 				ct.n = n;
@@ -589,7 +589,7 @@ set { _flags = value; }
                     sqlite3RowSetClear(pMem.u.pRowSet);
                 }
                 pMem.MemSetTypeFlag(MEM_Null);
-                sqlite3_free(ref pMem.zBLOB);
+                malloc_cs.sqlite3_free(ref pMem.zBLOB);
                 pMem.z = null;
                 pMem.type = SQLITE_NULL;
             }
@@ -727,7 +727,7 @@ set { _flags = value; }
                     if (enc == 0)
                     {
                         pMem.z = null;
-                        pMem.zBLOB = sqlite3Malloc(n);
+                        pMem.zBLOB = malloc_cs.sqlite3Malloc(n);
                         for (int i = 0; i < n && i < z.Length - offset; i++)
                             pMem.zBLOB[i] = (byte)z[offset + i];
                     }
@@ -735,7 +735,7 @@ set { _flags = value; }
                     {
                         pMem.z = n > 0 && z.Length - offset > n ? z.Substring(offset, n) : z.Substring(offset);
                         //memcpy(pMem.z, z, nAlloc);
-                        sqlite3_free(ref pMem.zBLOB);
+                        malloc_cs.sqlite3_free(ref pMem.zBLOB);
                     }
                 }
                 else
@@ -747,14 +747,14 @@ set { _flags = value; }
                         {
                             pMem.z = null;
                             if (pMem.zBLOB != null)
-                                sqlite3_free(ref pMem.zBLOB);
+                                malloc_cs.sqlite3_free(ref pMem.zBLOB);
                             pMem.zBLOB = Encoding.UTF8.GetBytes(offset == 0 ? z : z.Length + offset < n ? z.Substring(offset, n) : z.Substring(offset));
                         }
                         else
                         {
                             pMem.z = n > 0 && z.Length - offset > n ? z.Substring(offset, n) : z.Substring(offset);
                             //memcpy(pMem.z, z, nAlloc);
-                            sqlite3_free(ref pMem.zBLOB);
+                            malloc_cs.sqlite3_free(ref pMem.zBLOB);
                         }
                         pMem.xDel = null;
                     }
@@ -765,14 +765,14 @@ set { _flags = value; }
                         {
                             pMem.z = null;
                             if (pMem.zBLOB != null)
-                                sqlite3_free(ref pMem.zBLOB);
+                                malloc_cs.sqlite3_free(ref pMem.zBLOB);
                             pMem.zBLOB = Encoding.UTF8.GetBytes(offset == 0 ? z : z.Length + offset < n ? z.Substring(offset, n) : z.Substring(offset));
                         }
                         else
                         {
                             pMem.z = n > 0 && z.Length - offset > n ? z.Substring(offset, n) : z.Substring(offset);
                             //memcpy(pMem.z, z, nAlloc);
-                            sqlite3_free(ref pMem.zBLOB);
+                            malloc_cs.sqlite3_free(ref pMem.zBLOB);
                         }
                         pMem.xDel = xDel;
                         flags |= (u16)((xDel == SQLITE_STATIC) ? MEM_Static : MEM_Dyn);
@@ -816,7 +816,7 @@ return SQLITE_NOMEM;
                 pMem.n = n;
                 pMem.z = null;
                 //memset(pMem.z, 0, n);
-                pMem.zBLOB = sqlite3Malloc(n);
+                pMem.zBLOB = malloc_cs.sqlite3Malloc(n);
                 //}
 #endif
             }

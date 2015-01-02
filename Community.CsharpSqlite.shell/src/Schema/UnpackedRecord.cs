@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite
         ///Allowed values of UnpackedRecord.flags
         ///
         ///</summary>
-        //#define UNPACKED_NEED_FREE     0x0001  /* Memory is from sqlite3Malloc() */
+        //#define UNPACKED_NEED_FREE     0x0001  /* Memory is from malloc_cs.sqlite3Malloc() */
         //#define UNPACKED_NEED_DESTROY  0x0002  /* apMem[]s should all be destroyed */
         //#define UNPACKED_IGNORE_ROWID  0x0004  /* Ignore trailing rowid on key1 */
         //#define UNPACKED_INCRKEY       0x0008  /* Make this key an epsilon larger */
@@ -88,7 +88,7 @@ namespace Community.CsharpSqlite
         private const int UNPACKED_NEED_FREE = 0x0001;
         ///
         ///<summary>
-        ///Memory is from sqlite3Malloc() 
+        ///Memory is from malloc_cs.sqlite3Malloc() 
         ///</summary>
         private const int UNPACKED_NEED_DESTROY = 0x0002;
         ///

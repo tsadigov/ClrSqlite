@@ -476,7 +476,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     if (null == pPage.pData)
                     {
                         //          memset(pPage, 0, sizeof(PgHdr));
-                        pPage.pData = sqlite3Malloc(pCache.szPage);
+                        pPage.pData = malloc_cs.sqlite3Malloc(pCache.szPage);
                         //          pPage->pData = (void*)&pPage[1];
                         //pPage->pExtra = (void*)&((char*)pPage->pData)[pCache->szPage];
                         //memset(pPage->pExtra, 0, pCache->szExtra);
@@ -672,7 +672,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     if (pgno == 0 && pCache.pPage1 != null)
                     {
                         // memset( pCache.pPage1.pData, 0, pCache.szPage );
-                        pCache.pPage1.pData = sqlite3Malloc(pCache.szPage);
+                        pCache.pPage1.pData = malloc_cs.sqlite3Malloc(pCache.szPage);
                         pgno = 1;
                     }
                     Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xTruncate(pCache.pCache, pgno + 1);

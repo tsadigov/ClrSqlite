@@ -431,7 +431,7 @@ namespace Community.CsharpSqlite
                     ///hold the STATIC_MEM mutex when the routines here are invoked. 
                     ///</summary>
 
-                    mem0.mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MEM);
+                    malloc_cs.mem0.mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MEM);
                 }
                 return SQLITE_OK;
             }

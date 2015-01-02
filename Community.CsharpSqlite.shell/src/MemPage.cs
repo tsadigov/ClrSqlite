@@ -164,7 +164,7 @@ namespace Community.CsharpSqlite
 						cp.aOvfl [i] = aOvfl [i].Copy ();
 				}
 				if (aData != null) {
-					cp.aData = sqlite3Malloc (aData.Length);
+					cp.aData = malloc_cs.sqlite3Malloc (aData.Length);
 					Buffer.BlockCopy (aData, 0, cp.aData, 0, aData.Length);
 				}
 				return cp;
@@ -421,7 +421,7 @@ namespace Community.CsharpSqlite
 			public u16 cellSizePtr (byte[] pCell, int offset)
 			{
 				CellInfo info = new CellInfo ();
-				info.pCell = sqlite3Malloc (pCell.Length);
+				info.pCell = malloc_cs.sqlite3Malloc (pCell.Length);
 				Buffer.BlockCopy (pCell, offset, info.pCell, 0, pCell.Length - offset);
 				this.btreeParseCellPtr (info.pCell, ref info);
 				return info.nSize;
@@ -1601,7 +1601,7 @@ namespace Community.CsharpSqlite
 						//memcpy(pPayload, pSrc, n);
 					}
 					else {
-						byte[] pZeroBlob = sqlite3Malloc (n);
+						byte[] pZeroBlob = malloc_cs.sqlite3Malloc (n);
 						// memset(pPayload, 0, n);
 						Buffer.BlockCopy (pZeroBlob, 0, pPayload, pPayloadIndex, n);
 					}
@@ -2699,7 +2699,7 @@ namespace Community.CsharpSqlite
 				//   + nMaxCells*sizeof(u16)                       /* szCell */
 				//   + pBt.pageSize                               /* aSpace1 */
 				//   + k*nOld;                                     /* Page copies (apCopy) */
-				apCell = sqlite3ScratchMalloc (apCell, nMaxCells);
+				apCell = malloc_cs.sqlite3ScratchMalloc (apCell, nMaxCells);
 				//if( apCell==null ){
 				//  rc = SQLITE_NOMEM;
 				//  goto balance_cleanup;
@@ -2781,7 +2781,7 @@ namespace Community.CsharpSqlite
 					}
 					if (i < nOld - 1 && 0 == leafData) {
 						u16 sz = (u16)szNew [i];
-						byte[] pTemp = sqlite3Malloc (sz + leafCorrection);
+						byte[] pTemp = malloc_cs.sqlite3Malloc (sz + leafCorrection);
 						Debug.Assert (nCell < nMaxCells);
 						szCell [nCell] = sz;
 						//pTemp = &aSpace1[iSpace1];
@@ -3057,7 +3057,7 @@ namespace Community.CsharpSqlite
 						Debug.Assert (j < nMaxCells);
 						pCell = apCell [j];
 						sz = szCell [j] + leafCorrection;
-						pTemp = sqlite3Malloc (sz);
+						pTemp = malloc_cs.sqlite3Malloc (sz);
 						//&aOvflSpace[iOvflSpace];
 						if (0 == pNew.leaf) {
 							Buffer.BlockCopy (pCell, 0, pNew.aData, 8, 4);
@@ -3083,7 +3083,7 @@ namespace Community.CsharpSqlite
 							}
 							else {
 								//------------ pCell -= 4;
-								byte[] _pCell_4 = sqlite3Malloc (pCell.Length + 4);
+								byte[] _pCell_4 = malloc_cs.sqlite3Malloc (pCell.Length + 4);
 								Buffer.BlockCopy (pCell, 0, _pCell_4, 4, pCell.Length);
 								pCell = _pCell_4;
 								//
@@ -3290,7 +3290,7 @@ ptrmapCheckPages(pParent, 1);
 ///</summary>
 
 				balance_cleanup:
-				sqlite3ScratchFree (apCell);
+                malloc_cs.sqlite3ScratchFree(apCell);
 				for (i = 0; i < nOld; i++) {
 					BTreeMethods.releasePage(apOld [i]);
 				}

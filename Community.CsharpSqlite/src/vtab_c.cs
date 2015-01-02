@@ -108,7 +108,7 @@ namespace Community.CsharpSqlite
                     {
                         xDestroy(ref pAux);
                     }
-                rc = sqlite3ApiExit(db, SQLITE_OK);
+                rc = malloc_cs.sqlite3ApiExit(db, SQLITE_OK);
                 sqlite3_mutex_leave(db.mutex);
                 return rc;
             }
@@ -437,7 +437,7 @@ namespace Community.CsharpSqlite
                     {
                         pzErr = io.sqlite3MPrintf(db, "%s", zErr);
                         zErr = null;
-                        //sqlite3_free( zErr );
+                        //malloc_cs.sqlite3_free( zErr );
                     }
                     db.sqlite3DbFree(ref pVTable);
                 }
@@ -676,7 +676,7 @@ namespace Community.CsharpSqlite
                     //sqlite3StackFree( db, pParse );
                 }
                 Debug.Assert((rc & 0xff) == rc);
-                rc = sqlite3ApiExit(db, rc);
+                rc = malloc_cs.sqlite3ApiExit(db, rc);
                 sqlite3_mutex_leave(db.mutex);
                 return rc;
             }
@@ -783,7 +783,7 @@ namespace Community.CsharpSqlite
                         pzErrmsg = pVtab.zErrMsg;
                         // sqlite3DbStrDup( db, pVtab.zErrMsg );
                         pVtab.zErrMsg = null;
-                        //sqlite3_free( ref pVtab.zErrMsg );
+                        //malloc_cs.sqlite3_free( ref pVtab.zErrMsg );
                     }
                 }
                 db.aVTrans = aVTrans;

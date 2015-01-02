@@ -102,13 +102,13 @@ namespace Community.CsharpSqlite {
 				//if ( rc == SQLITE_NOMEM )
 				//db.mallocFailed = 1;
 				context.sqlite3_result_error(zErr,-1);
-				//sqlite3_free( zErr );
+				//malloc_cs.sqlite3_free( zErr );
 				return;
 			}
 			Debug.Assert(pVfs!=null);
 			flags|=SQLITE_OPEN_MAIN_DB;
 			rc=Btree.Open(pVfs,zPath,db,ref aNew.pBt,0,(int)flags);
-			//sqlite3_free( zPath );
+			//malloc_cs.sqlite3_free( zPath );
 			db.nDb++;
 			if(rc==SQLITE_CONSTRAINT) {
 				rc=SQLITE_ERROR;

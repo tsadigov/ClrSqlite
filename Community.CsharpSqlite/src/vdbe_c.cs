@@ -421,7 +421,7 @@ namespace Community.CsharpSqlite {
 					for(int i=0;i<pRec.zBLOB.Length;i++)
 						sb.Append((char)pRec.zBLOB[i]);
 					pRec.z=sb.ToString();
-					sqlite3_free(ref pRec.zBLOB);
+					malloc_cs.sqlite3_free(ref pRec.zBLOB);
 					pRec.flags=(u16)(pRec.flags&~MEM_Blob);
 				}
 				pRec.flags=(u16)(pRec.flags&~(MEM_Real|MEM_Int));
@@ -683,7 +683,7 @@ namespace Community.CsharpSqlite {
 			db.sqlite3DbFree(ref p.zErrMsg);
 			p.zErrMsg=pVtab.zErrMsg;
 			// sqlite3DbStrDup( db, pVtab.zErrMsg );
-			//sqlite3_free( pVtab.zErrMsg );
+			//malloc_cs.sqlite3_free( pVtab.zErrMsg );
 			pVtab.zErrMsg=null;
 		}
 	/**
@@ -702,7 +702,7 @@ namespace Community.CsharpSqlite {
     ** return SQLITE_BUSY.
     **
     ** If an error occurs, an error message is written to memory obtained
-    ** from sqlite3Malloc() and p.zErrMsg is made to point to that memory.
+    ** from malloc_cs.sqlite3Malloc() and p.zErrMsg is made to point to that memory.
     ** The error code is stored in p.rc and this routine returns SQLITE_ERROR.
     **
     ** If the callback ever returns non-zero, then the program exits

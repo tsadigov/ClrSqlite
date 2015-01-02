@@ -160,7 +160,7 @@ namespace Community.CsharpSqlite
         case SQLITE_MUTEX_FAST:
         case SQLITE_MUTEX_RECURSIVE:
           {
-            pNew = new sqlite3_debug_mutex();//sqlite3Malloc(sizeof(*pNew));
+            pNew = new sqlite3_debug_mutex();//malloc_cs.sqlite3Malloc(sizeof(*pNew));
             if ( pNew != null )
             {
               pNew.id = id;
@@ -188,7 +188,7 @@ namespace Community.CsharpSqlite
       sqlite3_debug_mutex p = (sqlite3_debug_mutex)pX;
       Debug.Assert( p.cnt == 0 );
       Debug.Assert( p.id == SQLITE_MUTEX_FAST || p.id == SQLITE_MUTEX_RECURSIVE );
-      //sqlite3_free(ref p);
+      //malloc_cs.sqlite3_free(ref p);
     }
 
     /*

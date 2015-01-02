@@ -1051,7 +1051,7 @@ goto pragma_out;
                                                                     {
 																		invalidateTempStorage(pParse);
 																	}
-																	//sqlite3_free( ref sqlite3_temp_directory );
+																	//malloc_cs.sqlite3_free( ref sqlite3_temp_directory );
 																	if(zRight.Length>0) {
 																		sqlite3_temp_directory=zRight;
 																		//io.sqlite3_mprintf("%s", zRight);
