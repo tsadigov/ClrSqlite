@@ -250,24 +250,24 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static void sqlite3VdbeMemStoreType(Mem pMem) {
 			if((pMem.Flags&MemFlags.MEM_Null)!=0) {
-				pMem.ValType=ValType.SQLITE_NULL;
+				pMem.ValType=FoundationalType.SQLITE_NULL;
 				pMem.z=null;
 				pMem.zBLOB=null;
 			}
 			else
 				if((pMem.Flags&MemFlags.MEM_Int)!=0) {
-					pMem.ValType=ValType.SQLITE_INTEGER;
+					pMem.ValType=FoundationalType.SQLITE_INTEGER;
 				}
 				else
 					if((pMem.Flags&MemFlags.MEM_Real)!=0) {
-						pMem.ValType=ValType.SQLITE_FLOAT;
+						pMem.ValType=FoundationalType.SQLITE_FLOAT;
 					}
 					else
 						if((pMem.Flags&MemFlags.MEM_Str)!=0) {
-							pMem.ValType=ValType.SQLITE_TEXT;
+							pMem.ValType=FoundationalType.SQLITE_TEXT;
 						}
 						else {
-							pMem.ValType=ValType.SQLITE_BLOB;
+							pMem.ValType=FoundationalType.SQLITE_BLOB;
 						}
 		}
 		///<summary>
@@ -443,9 +443,10 @@ namespace Community.CsharpSqlite {
 		/// loss of information and return the revised type of the argument.
 		///
 		///</summary>
-		static int sqlite3_value_numeric_type(sqlite3_value pVal) {
+		static FoundationalType sqlite3_value_numeric_type(sqlite3_value pVal) {
 			Mem pMem=(Mem)pVal;
-			if(pMem.type==SQLITE_TEXT) {
+            if (pMem.type == FoundationalType.SQLITE_TEXT)
+            {
 				applyNumericAffinity(pMem);
 				sqlite3VdbeMemStoreType(pMem);
 			}

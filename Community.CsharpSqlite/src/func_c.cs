@@ -72,11 +72,11 @@ namespace Community.CsharpSqlite {
                 Debug.Assert(mask == -1 || mask == 0);
                 sqliteinth.testcase(mask == 0);
                 iBest = 0;
-                if (vdbeapi.sqlite3_value_type(argv[0]) == SQLITE_NULL)
+                if (vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL)
                     return;
                 for (i = 1; i < argc; i++)
                 {
-                    if (vdbeapi.sqlite3_value_type(argv[i]) == SQLITE_NULL)
+                    if (vdbeapi.sqlite3_value_type(argv[i]) == FoundationalType.SQLITE_NULL)
                         return;
                     if ((sqlite3MemCompare(argv[iBest], argv[i], pColl) ^ mask) >= 0)
                     {
@@ -95,16 +95,16 @@ namespace Community.CsharpSqlite {
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
-                    case SQLITE_INTEGER:
+                    case FoundationalType.SQLITE_INTEGER:
                         z = "integer";
                         break;
-                    case SQLITE_TEXT:
+                    case FoundationalType.SQLITE_TEXT:
                         z = "text";
                         break;
-                    case SQLITE_FLOAT:
+                    case FoundationalType.SQLITE_FLOAT:
                         z = "real";
                         break;
-                    case SQLITE_BLOB:
+                    case FoundationalType.SQLITE_BLOB:
                         z = "blob";
                         break;
                     default:
@@ -124,14 +124,14 @@ namespace Community.CsharpSqlite {
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
-                    case SQLITE_BLOB:
-                    case SQLITE_INTEGER:
-                    case SQLITE_FLOAT:
+                    case FoundationalType.SQLITE_BLOB:
+                    case FoundationalType.SQLITE_INTEGER:
+                    case FoundationalType.SQLITE_FLOAT:
                         {
                             context.sqlite3_result_int(vdbeapi.sqlite3_value_bytes(argv[0]));
                             break;
                         }
-                    case SQLITE_TEXT:
+                    case FoundationalType.SQLITE_TEXT:
                         {
                             byte[] z = vdbeapi.sqlite3_value_blob(argv[0]);
                             if (z == null)
@@ -166,7 +166,7 @@ namespace Community.CsharpSqlite {
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
-                    case SQLITE_INTEGER:
+                    case FoundationalType.SQLITE_INTEGER:
                         {
                             i64 iVal = vdbeapi.sqlite3_value_int64(argv[0]);
                             if (iVal < 0)
@@ -187,7 +187,7 @@ namespace Community.CsharpSqlite {
                             context.sqlite3_result_int64(iVal);
                             break;
                         }
-                    case SQLITE_NULL:
+                    case FoundationalType.SQLITE_NULL:
                         {
                             ///
                             ///<summary>
@@ -234,17 +234,17 @@ namespace Community.CsharpSqlite {
                 byte[] zBLOB = null;
                 string z2;
                 int len;
-                int p0type;
+                FoundationalType p0type;
                 int p1, p2;
                 int negP2 = 0;
                 Debug.Assert(argc == 3 || argc == 2);
-                if (vdbeapi.sqlite3_value_type(argv[1]) == SQLITE_NULL || (argc == 3 && vdbeapi.sqlite3_value_type(argv[2]) == SQLITE_NULL))
+                if (vdbeapi.sqlite3_value_type(argv[1]) == FoundationalType.SQLITE_NULL || (argc == 3 && vdbeapi.sqlite3_value_type(argv[2]) == FoundationalType.SQLITE_NULL))
                 {
                     return;
                 }
                 p0type = vdbeapi.sqlite3_value_type(argv[0]);
                 p1 = vdbeapi.sqlite3_value_int(argv[1]);
-                if (p0type == SQLITE_BLOB)
+                if (p0type == FoundationalType.SQLITE_BLOB)
                 {
                     len = vdbeapi.sqlite3_value_bytes(argv[0]);
                     zBLOB = argv[0].zBLOB;
@@ -311,7 +311,7 @@ namespace Community.CsharpSqlite {
                     }
                 }
                 Debug.Assert(p1 >= 0 && p2 >= 0);
-                if (p0type != SQLITE_BLOB)
+                if (p0type != FoundationalType.SQLITE_BLOB)
                 {
                     //while ( z != "" && p1 != 0 )
                     //{
@@ -358,7 +358,7 @@ namespace Community.CsharpSqlite {
                 Debug.Assert(argc == 1 || argc == 2);
                 if (argc == 2)
                 {
-                    if (SQLITE_NULL == vdbeapi.sqlite3_value_type(argv[1]))
+                    if (FoundationalType.SQLITE_NULL == vdbeapi.sqlite3_value_type(argv[1]))
                         return;
                     n = vdbeapi.sqlite3_value_int(argv[1]);
                     if (n > 30)
@@ -366,7 +366,7 @@ namespace Community.CsharpSqlite {
                     if (n < 0)
                         n = 0;
                 }
-                if (vdbeapi.sqlite3_value_type(argv[0]) == SQLITE_NULL)
+                if (vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL)
                     return;
                 r = vdbeapi.sqlite3_value_double(argv[0]);
                 ///
@@ -1120,13 +1120,13 @@ break;
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
-                    case SQLITE_INTEGER:
-                    case SQLITE_FLOAT:
+                    case FoundationalType.SQLITE_INTEGER:
+                    case FoundationalType.SQLITE_FLOAT:
                         {
                             context.sqlite3_result_value(argv[0]);
                             break;
                         }
-                    case SQLITE_BLOB:
+                    case FoundationalType.SQLITE_BLOB:
                         {
                             StringBuilder zText;
                             byte[] zBlob = vdbeapi.sqlite3_value_blob(argv[0]);
@@ -1157,7 +1157,7 @@ break;
                             }
                             break;
                         }
-                    case SQLITE_TEXT:
+                    case FoundationalType.SQLITE_TEXT:
                         {
                             int i, j;
                             int n;
@@ -1195,7 +1195,7 @@ break;
                         }
                     default:
                         {
-                            Debug.Assert(vdbeapi.sqlite3_value_type(argv[0]) == SQLITE_NULL);
+                            Debug.Assert(vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL);
                             context.sqlite3_result_text("NULL", 4, SQLITE_STATIC);
                             break;
                         }
@@ -1330,13 +1330,13 @@ break;
                 zPattern = vdbeapi.sqlite3_value_text(argv[1]);
                 if (zPattern == null)
                 {
-                    Debug.Assert(vdbeapi.sqlite3_value_type(argv[1]) == SQLITE_NULL//|| vdbeapi.sqlite3_context_db_handle( context ).mallocFailed != 0
+                    Debug.Assert(vdbeapi.sqlite3_value_type(argv[1]) == FoundationalType.SQLITE_NULL//|| vdbeapi.sqlite3_context_db_handle( context ).mallocFailed != 0
                     );
                     return;
                 }
                 if (zPattern == "")
                 {
-                    Debug.Assert(vdbeapi.sqlite3_value_type(argv[1]) != SQLITE_NULL);
+                    Debug.Assert(vdbeapi.sqlite3_value_type(argv[1]) != FoundationalType.SQLITE_NULL);
                     context.sqlite3_result_value(argv[0]);
                     return;
                 }
@@ -1466,7 +1466,7 @@ break;
                 ///</summary>
                 byte[] zBytes = null;
                 byte[] zBlob = null;
-                if (vdbeapi.sqlite3_value_type(argv[0]) == SQLITE_NULL)
+                if (vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL)
                 {
                     return;
                 }
@@ -1678,7 +1678,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
             static void sumStep(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
                 SumCtx p;
-                int type;
+                FoundationalType type;
                 Debug.Assert(argc == 1);
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
                 Mem pMem = vdbeapi.sqlite3_aggregate_context(context, 1);
@@ -1689,10 +1689,10 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
                 if (p.Context == null)
                     p.Context = pMem;
                 type = sqlite3_value_numeric_type(argv[0]);
-                if (p != null && type != SQLITE_NULL)
+                if (p != null && type != FoundationalType.SQLITE_NULL)
                 {
                     p.cnt++;
-                    if (type == SQLITE_INTEGER)
+                    if (type == FoundationalType.SQLITE_INTEGER)
                     {
                         i64 v = vdbeapi.sqlite3_value_int64(argv[0]);
                         p.rSum += v;
@@ -1804,7 +1804,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
                 CountCtx p = new CountCtx();
                 p.Context = vdbeapi.sqlite3_aggregate_context(context, 1);
                 //sizeof(*p));
-                if ((argc == 0 || SQLITE_NULL != vdbeapi.sqlite3_value_type(argv[0])) && p.Context != null)
+                if ((argc == 0 || FoundationalType.SQLITE_NULL != vdbeapi.sqlite3_value_type(argv[0])) && p.Context != null)
                 {
                     p.n++;
                 }
@@ -1832,7 +1832,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 Mem pArg = (Mem)argv[0];
                 Mem pBest;
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
-                if (vdbeapi.sqlite3_value_type(argv[0]) == SQLITE_NULL)
+                if (vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL)
                     return;
                 pBest = (Mem)vdbeapi.sqlite3_aggregate_context(context, 1);
                 //sizeof(*pBest));
@@ -1889,7 +1889,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 string zSep;
                 int nVal, nSep;
                 Debug.Assert(argc == 1 || argc == 2);
-                if (vdbeapi.sqlite3_value_type(argv[0]) == SQLITE_NULL)
+                if (vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL)
                     return;
                 Mem pMem = vdbeapi.sqlite3_aggregate_context(context, 1);
                 //sizeof(*pAccum));

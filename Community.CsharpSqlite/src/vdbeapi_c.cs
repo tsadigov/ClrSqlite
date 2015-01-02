@@ -238,7 +238,7 @@ public static string vdbeapi.sqlite3_value_text16le(sqlite3_value pVal){
 return sqlite3ValueText(pVal, SqliteEncoding.UTF16LE);
 }
 #endif
-            public static int sqlite3_value_type(sqlite3_value pval)
+            public static FoundationalType sqlite3_value_type(sqlite3_value pval)
             {
                 return pval.type;
             }
@@ -783,7 +783,7 @@ return p.pMem.n;
                     //         0, 0,  /* pScopyFrom, pFiller */
                     //#endif
                     //         0, 0 };
-                    Mem nullMem = new Mem(null, "", (double)0, 0, 0, MEM_Null, SQLITE_NULL, 0
+                    Mem nullMem = new Mem(null, "", (double)0, 0, 0, MEM_Null, FoundationalType.SQLITE_NULL, 0
 #if SQLITE_DEBUG
 																																																																																												         , null, null  /* pScopyFrom, pFiller */
 #endif
@@ -919,9 +919,9 @@ return p.pMem.n;
 //  return val;
 //}
 #endif
-            public static int sqlite3_column_type(sqlite3_stmt pStmt, int i)
+            public static FoundationalType sqlite3_column_type(sqlite3_stmt pStmt, int i)
             {
-                int iType = vdbeapi.sqlite3_value_type(columnMem(pStmt, i));
+                FoundationalType iType = vdbeapi.sqlite3_value_type(columnMem(pStmt, i));
                 columnMallocFailure(pStmt);
                 return iType;
             }
@@ -1334,17 +1334,17 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                 int rc;
                 switch (pValue.type)
                 {
-                    case SQLITE_INTEGER:
+                    case FoundationalType.SQLITE_INTEGER:
                         {
                             rc = sqlite3_bind_int64(pStmt, i, pValue.u.i);
                             break;
                         }
-                    case SQLITE_FLOAT:
+                    case FoundationalType.SQLITE_FLOAT:
                         {
                             rc = sqlite3_bind_double(pStmt, i, pValue.r);
                             break;
                         }
-                    case SQLITE_BLOB:
+                    case FoundationalType.SQLITE_BLOB:
                         {
                             if ((pValue.flags & MEM_Zero) != 0)
                             {
@@ -1356,7 +1356,7 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                             }
                             break;
                         }
-                    case SQLITE_TEXT:
+                    case FoundationalType.SQLITE_TEXT:
                         {
                             rc = bindText(pStmt, i, pValue.z, pValue.n, SQLITE_TRANSIENT, pValue.enc);
                             break;

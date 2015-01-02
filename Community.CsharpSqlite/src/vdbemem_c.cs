@@ -8,6 +8,53 @@ using u32=System.UInt32;
 namespace Community.CsharpSqlite {
 	using sqlite3_value=Sqlite3.Mem;
 	using System.Globalization;
+
+
+
+    ///
+    ///<summary>
+    ///CAPI3REF: Fundamental Datatypes
+    ///KEYWORDS: SQLITE_TEXT
+    ///
+    ///^(Every value in SQLite has one of five fundamental datatypes:
+    ///
+    ///<ul>
+    ///</summary>
+    ///<param name="<li> 64">bit signed integer</param>
+    ///<param name="<li> 64">bit IEEE floating point number</param>
+    ///<param name="<li> string"><li> string</param>
+    ///<param name="<li> BLOB"><li> BLOB</param>
+    ///<param name="<li> NULL"><li> NULL</param>
+    ///<param name="</ul>)^"></ul>)^</param>
+    ///<param name=""></param>
+    ///<param name="These constants are codes for each of those types.">These constants are codes for each of those types.</param>
+    ///<param name=""></param>
+    ///<param name="Note that the SQLITE_TEXT constant was also used in SQLite version 2">Note that the SQLITE_TEXT constant was also used in SQLite version 2</param>
+    ///<param name="for a completely different meaning.  Software that links against both">for a completely different meaning.  Software that links against both</param>
+    ///<param name="SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not">SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not</param>
+    ///<param name="SQLITE_TEXT.">SQLITE_TEXT.</param>
+    ///<param name=""></param>
+    //#define SQLITE_INTEGER  1
+    //#define SQLITE_FLOAT    2
+    //#define SQLITE_BLOB     4
+    //#define SQLITE_NULL     5
+    //#if SQLITE_TEXT
+    //# undef SQLITE_TEXT
+    //#else
+    //# define SQLITE_TEXT     3
+    //#endif
+    //#define SQLITE3_TEXT     3
+    public enum FoundationalType : byte
+    {
+        SQLITE_INTEGER = 1,
+        SQLITE_FLOAT = 2,
+        SQLITE_BLOB = 4,
+        SQLITE_NULL = 5,
+        SQLITE_TEXT = 3,
+        SQLITE3_TEXT = 3
+    };
+
+    
 	[Flags]
 	public enum MemFlags : short {
 		MEM_Null=0x0001,
@@ -31,54 +78,10 @@ namespace Community.CsharpSqlite {
 	#endif
 	// TODO -- Convert back to inline for speed
 	}
-	public enum ValType : byte {
-		SQLITE_INTEGER=1,
-		SQLITE_FLOAT=2,
-		SQLITE_BLOB=4,
-		SQLITE_NULL=5,
-		SQLITE_TEXT=3,
-		SQLITE3_TEXT=3
-	}
+	
 	public partial class Sqlite3 {
-		///
-		///<summary>
-		///CAPI3REF: Fundamental Datatypes
-		///KEYWORDS: SQLITE_TEXT
-		///
-		///^(Every value in SQLite has one of five fundamental datatypes:
-		///
-		///<ul>
-		///</summary>
-		///<param name="<li> 64">bit signed integer</param>
-		///<param name="<li> 64">bit IEEE floating point number</param>
-		///<param name="<li> string"><li> string</param>
-		///<param name="<li> BLOB"><li> BLOB</param>
-		///<param name="<li> NULL"><li> NULL</param>
-		///<param name="</ul>)^"></ul>)^</param>
-		///<param name=""></param>
-		///<param name="These constants are codes for each of those types.">These constants are codes for each of those types.</param>
-		///<param name=""></param>
-		///<param name="Note that the SQLITE_TEXT constant was also used in SQLite version 2">Note that the SQLITE_TEXT constant was also used in SQLite version 2</param>
-		///<param name="for a completely different meaning.  Software that links against both">for a completely different meaning.  Software that links against both</param>
-		///<param name="SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not">SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not</param>
-		///<param name="SQLITE_TEXT.">SQLITE_TEXT.</param>
-		///<param name=""></param>
-		//#define SQLITE_INTEGER  1
-		//#define SQLITE_FLOAT    2
-		//#define SQLITE_BLOB     4
-		//#define SQLITE_NULL     5
-		//#if SQLITE_TEXT
-		//# undef SQLITE_TEXT
-		//#else
-		//# define SQLITE_TEXT     3
-		//#endif
-		//#define SQLITE3_TEXT     3
-		public const u8 SQLITE_INTEGER=1;
-		public const u8 SQLITE_FLOAT=2;
-		public const u8 SQLITE_BLOB=4;
-		public const u8 SQLITE_NULL=5;
-		public const u8 SQLITE_TEXT=3;
-		public const u8 SQLITE3_TEXT=3;
+		
+
 		///
 		///<summary>
 		///2004 May 26
@@ -702,7 +705,7 @@ return r;
 			pMem.MemSetTypeFlag(MEM_Null);
 			malloc_cs.sqlite3_free(ref pMem.zBLOB);
 			pMem.z=null;
-			pMem.type=SQLITE_NULL;
+            pMem.type = FoundationalType.SQLITE_NULL;
 		}
 		#endif
 		
@@ -951,7 +954,7 @@ return r;
 			pMem.n=nByte;
 			pMem.flags=MEM_Blob|MEM_Term;
 			pMem.enc=(enc==0?SqliteEncoding.UTF8:enc);
-			pMem.type=(enc==0?SQLITE_BLOB:SQLITE_TEXT);
+            pMem.type = (enc == 0 ? FoundationalType.SQLITE_BLOB : FoundationalType.SQLITE_TEXT);
 			if(nByte>iLimit) {
 				return SQLITE_TOOBIG;
 			}
@@ -1182,7 +1185,7 @@ return r;
 			else
 				if(SQLITE_OK==(rc=sqlite3VdbeMemGrow(pMem,amt+2,0))) {
 					pMem.enc=0;
-					pMem.type=SQLITE_BLOB;
+                    pMem.type = FoundationalType.SQLITE_BLOB;
 					pMem.z=null;
 					pMem.zBLOB=malloc_cs.sqlite3Malloc(amt);
 					pMem.flags=MEM_Blob|MEM_Dyn|MEM_Term;
@@ -1271,7 +1274,7 @@ return r;
 			//if ( p != null )
 			//{
 			p.flags=MEM_Null;
-			p.type=SQLITE_NULL;
+            p.type = FoundationalType.SQLITE_NULL;
 			p.db=db;
 			//}
 			return p;
@@ -1355,7 +1358,7 @@ return r;
 					//if ( zVal == null ) goto no_mem;
                     sqlite3ValueSetStr(pVal, -1, zVal, SqliteEncoding.UTF8, sqliteinth.SQLITE_DYNAMIC);
 					if(op==Sqlite3.TK_FLOAT)
-						pVal.type=SQLITE_FLOAT;
+                        pVal.type = FoundationalType.SQLITE_FLOAT;
 				}
                 if ((op == Sqlite3.TK_INTEGER || op == Sqlite3.TK_FLOAT) && affinity == sqliteinth.SQLITE_AFF_NONE)
                 {

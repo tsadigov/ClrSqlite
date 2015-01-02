@@ -1080,7 +1080,7 @@ namespace Community.CsharpSqlite
             {
                 int i;
                 string z;
-                int eType;
+                FoundationalType eType;
                 p = new DateTime();
                 //memset(p, 0, sizeof(*p));
                 if (argc == 0)
@@ -1088,7 +1088,7 @@ namespace Community.CsharpSqlite
                     setDateTimeToCurrent(context, p);
                 }
                 else
-                    if ((eType = vdbeapi.sqlite3_value_type(argv[0])) == SQLITE_FLOAT || eType == SQLITE_INTEGER)
+                    if ((eType = vdbeapi.sqlite3_value_type(argv[0])) == FoundationalType.SQLITE_FLOAT || eType == FoundationalType.SQLITE_INTEGER)
                     {
                         p.iJD = (long)(vdbeapi.sqlite3_value_double(argv[0]) * 86400000.0 + 0.5);
                         p.validJD = 1;

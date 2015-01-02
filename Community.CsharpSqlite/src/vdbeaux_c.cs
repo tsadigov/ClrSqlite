@@ -1155,7 +1155,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         if (p.explain == 1)
                         {
                             pMem.flags = MEM_Int;
-                            pMem.ValType = ValType.SQLITE_INTEGER;
+                            pMem.ValType = FoundationalType.SQLITE_INTEGER;
                             pMem.u.i = i;
                             ///
                             ///<summary>
@@ -1183,7 +1183,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             ///</summary>
                             Debug.Assert(pMem.z != null);
                             pMem.n = StringExtensions.sqlite3Strlen30(pMem.z);
-                            pMem.ValType = ValType.SQLITE_TEXT;
+                            pMem.ValType = FoundationalType.SQLITE_TEXT;
                             pMem.enc = SqliteEncoding.UTF8;
                             if (p.pResultSet[i_pMem] == null)
                             {
@@ -1220,7 +1220,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         ///<summary>
                         ///P1 
                         ///</summary>
-                        pMem.ValType = ValType.SQLITE_INTEGER;
+                        pMem.ValType = FoundationalType.SQLITE_INTEGER;
                         if (p.pResultSet[i_pMem] == null)
                         {
                             p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
@@ -1234,7 +1234,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         ///<summary>
                         ///P2 
                         ///</summary>
-                        pMem.ValType = ValType.SQLITE_INTEGER;
+                        pMem.ValType = FoundationalType.SQLITE_INTEGER;
                         if (p.pResultSet[i_pMem] == null)
                         {
                             p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
@@ -1248,7 +1248,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         ///<summary>
                         ///P3 
                         ///</summary>
-                        pMem.ValType = ValType.SQLITE_INTEGER;
+                        pMem.ValType = FoundationalType.SQLITE_INTEGER;
                         if (p.pResultSet[i_pMem] == null)
                         {
                             p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
@@ -1273,7 +1273,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             pMem.n = StringExtensions.sqlite3Strlen30(pMem.z);
                             pMem.enc = SqliteEncoding.UTF8;
                         }
-                        pMem.type = SQLITE_TEXT;
+                        pMem.type = FoundationalType.SQLITE_TEXT;
                         if (p.pResultSet[i_pMem] == null)
                         {
                             p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
@@ -1292,7 +1292,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             pMem.n = 2;
                             pMem.z = pOp.p5.ToString("x2");
                             //sqlite3_snprintf( 3, pMem.z, "%.2x", pOp.p5 );   /* P5 */
-                            pMem.type = SQLITE_TEXT;
+                            pMem.type = FoundationalType.SQLITE_TEXT;
                             pMem.enc = SqliteEncoding.UTF8;
                             if (p.pResultSet[i_pMem] == null)
                             {
@@ -1318,7 +1318,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                                 ///<summary>
                                 ///Comment 
                                 ///</summary>
-                                pMem.type = SQLITE_NULL;
+                                pMem.type = FoundationalType.SQLITE_NULL;
                             }
                         }
                         p.nResColumn = (u16)(8 - 4 * (p.explain - 1));

@@ -424,14 +424,14 @@ set { _flags = value; }
 ///</summary>
 
 			#endif
-			public u8 type;
+            public FoundationalType type;
 
-			public ValType ValType {
+			public FoundationalType ValType {
 				get {
-					return (ValType)type;
+					return (FoundationalType)type;
 				}
 				set {
-					type = (u8)value;
+                    type = (FoundationalType)value;
 				}
 			}
 
@@ -497,7 +497,7 @@ set { _flags = value; }
 			{
 			}
 
-			public Mem (sqlite3 db, string z, double r, int i, int n, u16 flags, u8 type, SqliteEncoding enc
+			public Mem (sqlite3 db, string z, double r, int i, int n, u16 flags, FoundationalType type, SqliteEncoding enc
 			#if SQLITE_DEBUG
 																																																																								         , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
 #endif
@@ -591,7 +591,7 @@ set { _flags = value; }
                 pMem.MemSetTypeFlag(MEM_Null);
                 malloc_cs.sqlite3_free(ref pMem.zBLOB);
                 pMem.z = null;
-                pMem.type = SQLITE_NULL;
+                pMem.type = FoundationalType.SQLITE_NULL;
             }
 #endif
 
@@ -780,7 +780,7 @@ set { _flags = value; }
                 pMem.n = nByte;
                 pMem.flags = flags;
                 pMem.enc = ((byte)enc == 0 ? SqliteEncoding.UTF8 : enc);
-                pMem.type = (enc == 0 ? SQLITE_BLOB : SQLITE_TEXT);
+                pMem.type = (enc == 0 ? FoundationalType.SQLITE_BLOB : FoundationalType.SQLITE_TEXT);
 #if !SQLITE_OMIT_UTF16
 																																																																		if( pMem.enc!=SqliteEncoding.UTF8 && sqlite3VdbeMemHandleBom(pMem)!=0 ){
 return SQLITE_NOMEM;
@@ -804,7 +804,7 @@ return SQLITE_NOMEM;
                 Mem pMem = this;
                 sqlite3VdbeMemRelease(pMem);
                 pMem.flags = MEM_Blob | MEM_Zero;
-                pMem.type = SQLITE_BLOB;
+                pMem.type = FoundationalType.SQLITE_BLOB;
                 pMem.n = 0;
                 if (n < 0)
                     n = 0;
@@ -831,7 +831,7 @@ return SQLITE_NOMEM;
                 sqlite3VdbeMemRelease(pMem);
                 pMem.u.i = val;
                 pMem.flags = MEM_Int;
-                pMem.type = SQLITE_INTEGER;
+                pMem.type = FoundationalType.SQLITE_INTEGER;
             }
             ///<summary>
             /// Delete any previous value and set the value stored in pMem to val,
@@ -850,7 +850,7 @@ return SQLITE_NOMEM;
                     sqlite3VdbeMemRelease(pMem);
                     pMem.r = val;
                     pMem.flags = MEM_Real;
-                    pMem.type = SQLITE_FLOAT;
+                    pMem.type = FoundationalType.SQLITE_FLOAT;
                 }
             }
         

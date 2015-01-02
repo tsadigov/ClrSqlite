@@ -143,22 +143,22 @@ namespace Community.CsharpSqlite {
 				//extern void sqlite3CodecGetKey(sqlite3*, int, void**, int*);
 				int nKey;
 				string zKey;
-				int t=vdbeapi.sqlite3_value_type(argv[2]);
+                FoundationalType t = vdbeapi.sqlite3_value_type(argv[2]);
 				switch(t) {
-				case SQLITE_INTEGER:
-				case SQLITE_FLOAT:
+                    case FoundationalType.SQLITE_INTEGER:
+                    case FoundationalType.SQLITE_FLOAT:
 				zErrDyn="Invalid key value";
 				//sqlite3DbStrDup( db, "Invalid key value" );
 				rc=SQLITE_ERROR;
 				break;
-				case SQLITE_TEXT:
-				case SQLITE_BLOB:
+                    case FoundationalType.SQLITE_TEXT:
+                    case FoundationalType.SQLITE_BLOB:
 				nKey=vdbeapi.sqlite3_value_bytes(argv[2]);
                 zKey = vdbeapi.sqlite3_value_blob(argv[2]).ToString();
 				// (char *)sqlite3_value_blob(argv[2]);
                 rc = crypto.sqlite3CodecAttach(db, db.nDb - 1, zKey, nKey);
 				break;
-				case SQLITE_NULL:
+                    case FoundationalType.SQLITE_NULL:
 				///
 				///<summary>
 				///No key specified.  Use the key from the main database 

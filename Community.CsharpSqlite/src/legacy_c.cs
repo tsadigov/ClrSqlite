@@ -277,7 +277,7 @@ namespace Community.CsharpSqlite
                                 for (i = 0; i < nCol; i++)
                                 {
                                     azVals[i] = vdbeapi.sqlite3_column_text(pStmt, i);
-                                    if (azVals[i] == null && vdbeapi.sqlite3_column_type(pStmt, i) != SQLITE_NULL)
+                                    if (azVals[i] == null && vdbeapi.sqlite3_column_type(pStmt, i) != FoundationalType.SQLITE_NULL)
                                     {
                                         //db.mallocFailed = 1;
                                         //goto exec_out;

@@ -543,7 +543,7 @@ namespace Community.CsharpSqlite
             public static void x_CountStep(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
                 SumCtx p;
-                int type;
+                FoundationalType type;
                 Debug.Assert(argc <= 1);
                 Mem pMem = vdbeapi.sqlite3_aggregate_context(context, 1);
                 //sizeof(*p));
@@ -552,7 +552,7 @@ namespace Community.CsharpSqlite
                 p = pMem._SumCtx;
                 if (p.Context == null)
                     p.Context = pMem;
-                if (argc == 0 || SQLITE_NULL == vdbeapi.sqlite3_value_type(argv[0]))
+                if (argc == 0 || FoundationalType.SQLITE_NULL == vdbeapi.sqlite3_value_type(argv[0]))
                 {
                     p.cnt++;
                     p.iSum += 1;
@@ -560,10 +560,10 @@ namespace Community.CsharpSqlite
                 else
                 {
                     type = sqlite3_value_numeric_type(argv[0]);
-                    if (p != null && type != SQLITE_NULL)
+                    if (p != null && type != FoundationalType.SQLITE_NULL)
                     {
                         p.cnt++;
-                        if (type == SQLITE_INTEGER)
+                        if (type == FoundationalType.SQLITE_INTEGER)
                         {
                             i64 v = vdbeapi.sqlite3_value_int64(argv[0]);
                             if (v == 40 || v == 41)
