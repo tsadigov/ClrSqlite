@@ -218,28 +218,28 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///Name of the pragma 
 			///</summary>
-			public int mask;
+			public SqliteFlags mask;
 			///
 			///<summary>
 			///Mask for the db.flags value 
 			///</summary>
-			public sPragmaType(string zName,int mask) {
+			public sPragmaType(string zName,SqliteFlags mask) {
 				this.zName=zName;
 				this.mask=mask;
 			}
 		}
 		static int flagPragma(Parse pParse,string zLeft,string zRight) {
 			sPragmaType[] aPragma=new sPragmaType[] {
-				new sPragmaType("full_column_names",SQLITE_FullColNames),
-				new sPragmaType("short_column_names",SQLITE_ShortColNames),
-				new sPragmaType("count_changes",SQLITE_CountRows),
-				new sPragmaType("empty_result_callbacks",SQLITE_NullCallback),
-				new sPragmaType("legacy_file_format",SQLITE_LegacyFileFmt),
-				new sPragmaType("fullfsync",SQLITE_FullFSync),
-				new sPragmaType("checkpoint_fullfsync",SQLITE_CkptFullFSync),
-				new sPragmaType("reverse_unordered_selects",SQLITE_ReverseOrder),
+				new sPragmaType("full_column_names",SqliteFlags.SQLITE_FullColNames),
+				new sPragmaType("short_column_names",SqliteFlags.SQLITE_ShortColNames),
+				new sPragmaType("count_changes",SqliteFlags.SQLITE_CountRows),
+				new sPragmaType("empty_result_callbacks",SqliteFlags.SQLITE_NullCallback),
+				new sPragmaType("legacy_file_format",SqliteFlags.SQLITE_LegacyFileFmt),
+				new sPragmaType("fullfsync",SqliteFlags.SQLITE_FullFSync),
+				new sPragmaType("checkpoint_fullfsync",SqliteFlags.SQLITE_CkptFullFSync),
+				new sPragmaType("reverse_unordered_selects",SqliteFlags.SQLITE_ReverseOrder),
 				#if !SQLITE_OMIT_AUTOMATIC_INDEX
-				new sPragmaType("automatic_index",SQLITE_AutoIndex),
+				new sPragmaType("automatic_index",SqliteFlags.SQLITE_AutoIndex),
 				#endif
 				#if SQLITE_DEBUG
 																																																																																																								new sPragmaType( "sql_trace",                SQLITE_SqlTrace      ),
@@ -247,28 +247,28 @@ new sPragmaType( "vdbe_listing",             SQLITE_VdbeListing   ),
 new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 #endif
 				#if !SQLITE_OMIT_CHECK
-				new sPragmaType("ignore_check_constraints",SQLITE_IgnoreChecks),
+				new sPragmaType("ignore_check_constraints",SqliteFlags.SQLITE_IgnoreChecks),
 				#endif
 				///
 				///<summary>
 				///The following is VERY experimental 
 				///</summary>
-				new sPragmaType("writable_schema",SQLITE_WriteSchema|SQLITE_RecoveryMode),
-				new sPragmaType("omit_readlock",SQLITE_NoReadlock),
+				new sPragmaType("writable_schema",SqliteFlags.SQLITE_WriteSchema|SqliteFlags.SQLITE_RecoveryMode),
+				new sPragmaType("omit_readlock",SqliteFlags.SQLITE_NoReadlock),
 				///
 				///<summary>
 				///TODO: Maybe it shouldn't be possible to change the ReadUncommitted
 				///flag if there are any active statements. 
 				///</summary>
-				new sPragmaType("read_uncommitted",SQLITE_ReadUncommitted),
-				new sPragmaType("recursive_triggers",SQLITE_RecTriggers),
+				new sPragmaType("read_uncommitted",SqliteFlags.SQLITE_ReadUncommitted),
+				new sPragmaType("recursive_triggers",SqliteFlags.SQLITE_RecTriggers),
 				///
 				///<summary>
 				///</summary>
 				///<param name="This flag may only be set if both foreign">key and trigger support</param>
 				///<param name="are present in the build.  ">are present in the build.  </param>
 				#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
-				new sPragmaType("foreign_keys",SQLITE_ForeignKeys),
+				new sPragmaType("foreign_keys",SqliteFlags.SQLITE_ForeignKeys),
 			#endif
 			};
 			int i;
@@ -290,7 +290,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 							returnSingleInt(pParse,p.zName,((db.flags&p.mask)!=0)?1:0);
 						}
 						else {
-							int mask=p.mask;
+                            SqliteFlags mask = p.mask;
 							///
 							///<summary>
 							///Mask of bits to set or clear. 
@@ -301,7 +301,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 								///Foreign key support may not be enabled or disabled while not
 								///</summary>
 								///<param name="in auto">commit mode.  </param>
-								mask&=~(SQLITE_ForeignKeys);
+                                mask &= ~(SqliteFlags.SQLITE_ForeignKeys);
 							}
 							if(sqlite3GetBoolean(zRight)!=0) {
 								db.flags|=mask;
@@ -1964,7 +1964,7 @@ sqlite3_activate_cerod(&zRight[6]);
 			///</summary>
 			#if !SQLITE_OMIT_PAGER_PRAGMAS
 			if(db.autoCommit!=0) {
-				pDb.pBt.sqlite3BtreeSetSafetyLevel(pDb.safety_level,((db.flags&SQLITE_FullFSync)!=0)?1:0,((db.flags&SQLITE_CkptFullFSync)!=0)?1:0);
+                pDb.pBt.sqlite3BtreeSetSafetyLevel(pDb.safety_level, ((db.flags & SqliteFlags.SQLITE_FullFSync) != 0) ? 1 : 0, ((db.flags & SqliteFlags.SQLITE_CkptFullFSync) != 0) ? 1 : 0);
 			}
 			#endif
 			pragma_out:

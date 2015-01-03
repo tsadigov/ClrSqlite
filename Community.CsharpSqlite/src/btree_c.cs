@@ -1111,7 +1111,7 @@ rc = SQLITE_NOTADB;
                         rc = pBt.pPager.sqlite3PagerSetPagesize(ref pBt.pageSize, (int)(pageSize - usableSize));
                         return rc;
                     }
-                    if ((pBt.db.flags & SQLITE_RecoveryMode) == 0 && nPage > nPageFile)
+                    if ((pBt.db.flags & SqliteFlags.SQLITE_RecoveryMode) == 0 && nPage > nPageFile)
                     {
                         rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                         goto page1_init_failed;

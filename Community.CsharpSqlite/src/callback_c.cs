@@ -439,7 +439,8 @@ sqlite3ValueFree(ref pTmp);
 			///<param name="new function.  But the FuncDefs for built">only.</param>
 			///<param name="So we must not search for built">ins when creating a new function.</param>
 			///<param name=""></param>
-			if(0==createFlag&&(pBest==null||(db.flags&SQLITE_PreferBuiltin)!=0)) {
+            if (0 == createFlag && (pBest == null || (db.flags & SqliteFlags.SQLITE_PreferBuiltin) != 0))
+            {
 				#if SQLITE_OMIT_WSD
 																																																																																				FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
 #else

@@ -1312,7 +1312,7 @@ return n;
                     return false;
                 }
                 magic = db.magic;
-                if (magic != SQLITE_MAGIC_OPEN)
+                if (magic != Sqlite3.SQLITE_MAGIC_OPEN)
                 {
                     if (utilc.sqlite3SafetyCheckSickOrOk(db))
                     {
@@ -1331,7 +1331,7 @@ return n;
             {
                 u32 magic;
                 magic = db.magic;
-                if (magic != SQLITE_MAGIC_SICK && magic != SQLITE_MAGIC_OPEN && magic != SQLITE_MAGIC_BUSY)
+                if (magic != Sqlite3.SQLITE_MAGIC_SICK && magic != Sqlite3.SQLITE_MAGIC_OPEN && magic != Sqlite3.SQLITE_MAGIC_BUSY)
                 {
                     sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog != null);
                     logBadConnection("invalid");

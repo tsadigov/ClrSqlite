@@ -26,6 +26,16 @@ namespace Community.CsharpSqlite
     using sqliteinth = Sqlite3.sqliteinth;
     
     using io = Sqlite3.io;
+
+    public static class Sqlite3Extensions{
+        public static void sqlite3DbFree(this sqlite3 th,ref string pString)
+        {
+        }
+
+        public static void sqlite3DbFree<T>(this sqlite3 th,ref T pT) where T : class
+        {
+        }
+    }
         ///
         ///<summary>
         ///Each database connection is an instance of the following structure.
@@ -81,7 +91,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///All backends 
             ///</summary>
-            public int flags;
+            public SqliteFlags flags;
 
             ///
             ///<summary>
@@ -638,13 +648,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 }
             }
 
-            public void sqlite3DbFree(ref string pString)
-            {
-            }
-
-            public void sqlite3DbFree<T>(ref T pT) where T : class
-            {
-            }
+            
 
             public void sqlite3DbFree(ref Mem[] pPrior)
             {
@@ -733,7 +737,9 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                     return null;
             }
         }
- 
+
+
+        
     
     
     }

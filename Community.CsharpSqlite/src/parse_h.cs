@@ -740,7 +740,8 @@ return;
 					utilc.sqlite3ErrorMsg(this,"Cannot add a UNIQUE column");
 					return;
 				}
-				if((db.flags&SQLITE_ForeignKeys)!=0&&pNew.pFKey!=null&&pDflt!=null) {
+                if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0 && pNew.pFKey != null && pDflt != null)
+                {
 					utilc.sqlite3ErrorMsg(this,"Cannot add a REFERENCES column with non-NULL default value");
 					return;
 				}
@@ -775,11 +776,11 @@ return;
 				//sqlite3DbStrNDup(db, (char*)pColDef.z, pColDef.n);
 				if(zCol!=null) {
 					//  char zEnd = zCol[pColDef.n-1];
-					int savedDbFlags=db.flags;
+                    SqliteFlags savedDbFlags = db.flags;
 					//      while( zEnd>zCol && (*zEnd==';' || CharExtensions.sqlite3Isspace(*zEnd)) ){
 					//    zEnd-- = '\0';
 					//  }
-					db.flags|=SQLITE_PreferBuiltin;
+                    db.flags |= SqliteFlags.SQLITE_PreferBuiltin;
 					build.sqlite3NestedParse(this,"UPDATE \"%w\".%s SET "+"sql = substr(sql,1,%d) || ', ' || %Q || substr(sql,%d) "+"WHERE type = 'table' AND name = %Q",zDb,sqliteinth.SCHEMA_TABLE(iDb),pNew.addColOffset,zCol,pNew.addColOffset+1,zTab);
 					db.sqlite3DbFree(ref zCol);
 					db.flags=savedDbFlags;
@@ -905,7 +906,7 @@ return;
 				///<summary>
 				///</summary>
 				///<param name="Non">tab with an xRename() </param>
-				int savedDbFlags;
+                SqliteFlags savedDbFlags;
 				///
 				///<summary>
 				///</summary>
@@ -919,7 +920,7 @@ return;
 					goto exit_rename_table;
 				iDb=sqlite3SchemaToIndex(this.db,pTab.pSchema);
 				zDb=db.aDb[iDb].zName;
-				db.flags|=SQLITE_PreferBuiltin;
+                db.flags |= SqliteFlags.SQLITE_PreferBuiltin;
 				///
 				///<summary>
 				///Get a NULL terminated version of the new table name. 
@@ -1008,7 +1009,8 @@ goto exit_rename_table;
 				zTabName=pTab.zName;
 				nTabName=sqlite3Utf8CharLen(zTabName,-1);
 				#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
-				if((db.flags&SQLITE_ForeignKeys)!=0) {
+                if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
+                {
 					///
 					///<summary>
 					///</summary>
@@ -1059,7 +1061,8 @@ goto exit_rename_table;
 				}
 				#endif
 				#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
-				if((db.flags&SQLITE_ForeignKeys)!=0) {
+                if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
+                {
 					FKey p;
 					for(p=fkeyc.sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
 						Table pFrom=p.pFrom;
@@ -2590,7 +2593,8 @@ goto attach_end;
 			///</summary>
 			void sqlite3FkDropTable(SrcList pName,Table pTab) {
 				sqlite3 db=this.db;
-				if((db.flags&SQLITE_ForeignKeys)!=0&&!pTab.IsVirtual()&&null==pTab.pSelect) {
+                if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0 && !pTab.IsVirtual() && null == pTab.pSelect)
+                {
 					int iSkip=0;
 					Vdbe v=this.sqlite3GetVdbe();
 					Debug.Assert(v!=null);
@@ -2702,7 +2706,7 @@ goto attach_end;
 				///<summary>
 				///</summary>
 				///<param name="If foreign">op. </param>
-				if((db.flags&SQLITE_ForeignKeys)==0)
+                if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) == 0)
 					return;
 				iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
 				zDb=db.aDb[iDb].zName;
@@ -2881,7 +2885,8 @@ goto attach_end;
 			///</summary>
 			) {
 				u32 mask=0;
-				if((this.db.flags&SQLITE_ForeignKeys)!=0) {
+                if ((this.db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
+                {
 					FKey p;
 					int i;
 					for(p=pTab.pFKey;p!=null;p=p.pNextFrom) {
@@ -2932,7 +2937,8 @@ goto attach_end;
 			///True for UPDATE that affects rowid 
 			///</summary>
 			) {
-				if((this.db.flags&SQLITE_ForeignKeys)!=0) {
+                if ((this.db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
+                {
 					if(null==aChange) {
 						///
 						///<summary>
@@ -3302,7 +3308,8 @@ goto attach_end;
 				///<param name="refer to table pTab. If there is an action a6ssociated with the FK ">refer to table pTab. If there is an action a6ssociated with the FK </param>
 				///<param name="for this operation (either update or delete), invoke the associated ">for this operation (either update or delete), invoke the associated </param>
 				///<param name="trigger sub">program.  </param>
-				if((this.db.flags&SQLITE_ForeignKeys)!=0) {
+                if ((this.db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
+                {
 					FKey pFKey;
 					///
 					///<summary>
@@ -4058,7 +4065,7 @@ isView = false;
 				///Initialize the count of rows to be inserted
 				///
 				///</summary>
-				if((db.flags&SQLITE_CountRows)!=0) {
+				if((db.flags&SqliteFlags.SQLITE_CountRows)!=0) {
 					regRowCount=++this.nMem;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regRowCount);
 				}
@@ -4374,7 +4381,8 @@ isView = false;
 				///Update the count of rows that are inserted
 				///
 				///</summary>
-				if((db.flags&SQLITE_CountRows)!=0) {
+                if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0)
+                {
 					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regRowCount,1);
 				}
 				#if !SQLITE_OMIT_TRIGGER
@@ -4430,7 +4438,8 @@ isView = false;
 				///invoke the callback function.
 				///
 				///</summary>
-				if((db.flags&SQLITE_CountRows)!=0&&0==this.nested&&null==this.pTriggerTab) {
+                if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0 && 0 == this.nested && null == this.pTriggerTab)
+                {
 					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,regRowCount,1);
 					v.sqlite3VdbeSetNumCols(1);
 					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows inserted",SQLITE_STATIC);
@@ -4697,7 +4706,8 @@ isView = false;
 				///
 				///</summary>
 				#if !SQLITE_OMIT_CHECK
-				if(pTab.pCheck!=null&&(this.db.flags&SQLITE_IgnoreChecks)==0) {
+                if (pTab.pCheck != null && (this.db.flags & SqliteFlags.SQLITE_IgnoreChecks) == 0)
+                {
 					int allOk=v.sqlite3VdbeMakeLabel();
 					this.ckBase=regData;
 					this.sqlite3ExprIfTrue(pTab.pCheck,allOk,sqliteinth.SQLITE_JUMPIFNULL);
@@ -4779,7 +4789,8 @@ isView = false;
 						///<param name="table.">table.</param>
 						///<param name=""></param>
 						Trigger pTrigger=null;
-						if((this.db.flags&SQLITE_RecTriggers)!=0) {
+                        if ((this.db.flags & SqliteFlags.SQLITE_RecTriggers) != 0)
+                        {
 							TriggerType iDummy;
 							pTrigger=sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
 						}
@@ -4913,7 +4924,8 @@ isView = false;
 						Trigger pTrigger=null;
 						Debug.Assert(onError==OnConstraintError.OE_Replace);
 						build.sqlite3MultiWrite(this);
-						if((this.db.flags&SQLITE_RecTriggers)!=0) {
+                        if ((this.db.flags & SqliteFlags.SQLITE_RecTriggers) != 0)
+                        {
 							TriggerType iDummy;
 							pTrigger=sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
 						}
@@ -5578,7 +5590,8 @@ aXRef[j] = -1;
 				///Initialize the count of updated rows
 				///
 				///</summary>
-				if((db.flags&SQLITE_CountRows)!=0&&null==this.pTriggerTab) {
+                if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0 && null == this.pTriggerTab)
+                {
 					regRowCount=++this.nMem;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regRowCount);
 				}
@@ -5798,7 +5811,8 @@ aXRef[j] = -1;
 				///Increment the row counter 
 				///
 				///</summary>
-				if((db.flags&SQLITE_CountRows)!=0&&null==this.pTriggerTab) {
+                if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0 && null == this.pTriggerTab)
+                {
 					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regRowCount,1);
 				}
 				sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_UPDATE,pChanges,TriggerType.TRIGGER_AFTER,pTab,regOldRowid,onError,addr);
@@ -5837,7 +5851,8 @@ aXRef[j] = -1;
 				///invoke the callback function.
 				///
 				///</summary>
-				if((db.flags&SQLITE_CountRows)!=0&&null==this.pTriggerTab&&0==this.nested) {
+                if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0 && null == this.pTriggerTab && 0 == this.nested)
+                {
 					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,regRowCount,1);
 					v.sqlite3VdbeSetNumCols(1);
 					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows updated",SQLITE_STATIC);
@@ -6029,7 +6044,8 @@ aXRef[j] = -1;
 				///<param name=""></param>
 				if((pTab.IsVirtual()&&vtab.sqlite3GetVTable(this.db,pTab).pMod.pModule.xUpdate==null)
                     ||
-                    ((pTab.tabFlags&TableFlags.TF_Readonly)!=0&&(this.db.flags&SQLITE_WriteSchema)==0&&this.nested==0)) {
+                    ((pTab.tabFlags & TableFlags.TF_Readonly) != 0 && (this.db.flags & SqliteFlags.SQLITE_WriteSchema) == 0 && this.nested == 0))
+                {
 
 					utilc.sqlite3ErrorMsg(this,"table %s may not be modified",pTab.zName);
 					return true;
@@ -6300,7 +6316,8 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///Initialize the counter of the number of rows deleted, if
 				///we are counting rows.
 				///</summary>
-				if((db.flags&SQLITE_CountRows)!=0) {
+                if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0)
+                {
 					memCnt=++this.nMem;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,memCnt);
 				}
@@ -6354,7 +6371,8 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 						goto delete_from_cleanup;
 					regRowid=this.sqlite3ExprCodeGetColumn(pTab,-1,iCur,iRowid);
 					v.sqlite3VdbeAddOp2( OpCode.OP_RowSetAdd,iRowSet,regRowid);
-					if((db.flags&SQLITE_CountRows)!=0) {
+                    if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0)
+                    {
 						v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,memCnt,1);
 					}
 					pWInfo.sqlite3WhereEnd();
@@ -6429,7 +6447,8 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///invoke the callback function.
 				///
 				///</summary>
-				if((db.flags&SQLITE_CountRows)!=0&&0==this.nested&&null==this.pTriggerTab) {
+                if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0 && 0 == this.nested && null == this.pTriggerTab)
+                {
 					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,memCnt,1);
 					v.sqlite3VdbeSetNumCols(1);
 					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows deleted",SQLITE_STATIC);
@@ -6677,7 +6696,8 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				}
 				if(doMakeRec) {
 					string zAff;
-					if(pTab.pSelect!=null||(this.db.flags&SQLITE_IdxRealAsInt)!=0) {
+                    if (pTab.pSelect != null || (this.db.flags & SqliteFlags.SQLITE_IdxRealAsInt) != 0)
+                    {
 						zAff="";
 					}
 					else {
@@ -6881,7 +6901,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///</summary>
 				///<param name="for testing only "> to verify that SQLite always gets the same answer</param>
 				///<param name="with and without the column cache.">with and without the column cache.</param>
-				if((this.db.flags&SQLITE_ColumnCache)!=0)
+                if ((this.db.flags & SqliteFlags.SQLITE_ColumnCache) != 0)
 					return;
 				///
 				///<summary>
@@ -7866,7 +7886,7 @@ return;
 				Walker w;
 				if(this.cookieGoto!=0)
 					return;
-				if((this.db.flags&SQLITE_FactorOutConst)!=0)
+                if ((this.db.flags & SqliteFlags.SQLITE_FactorOutConst) != 0)
 					return;
 				w=new Walker();
 				w.xExprCallback=(dxExprCallback)exprc.evalConstExpr;
@@ -8894,7 +8914,8 @@ return;
 					///</summary>
 					return;
 				}
-				if((this.db.flags&SQLITE_AutoIndex)==0) {
+                if ((this.db.flags & SqliteFlags.SQLITE_AutoIndex) == 0)
+                {
 					///
 					///<summary>
 					///</summary>
@@ -10315,7 +10336,8 @@ range_est_fallback:
 				///where application behaviour depends on the (undefined) order that
 				///SQLite outputs rows in in the absence of an ORDER BY clause.  
 				///</summary>
-				if(null==pOrderBy&&(this.db.flags&SQLITE_ReverseOrder)!=0) {
+                if (null == pOrderBy && (this.db.flags & SqliteFlags.SQLITE_ReverseOrder) != 0)
+                {
 					pCost.plan.wsFlags|=wherec.WHERE_REVERSE;
 				}
 				Debug.Assert(pOrderBy!=null||(pCost.plan.wsFlags&wherec.WHERE_ORDERBY)==0);

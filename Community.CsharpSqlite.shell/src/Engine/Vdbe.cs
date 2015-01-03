@@ -1644,9 +1644,10 @@ pOp.cnt = 0;
 					///<summary>
 					///Rollback or commit any schema changes that occurred. 
 					///</summary>
-					if(this.rc!=Sqlite3.SQLITE_OK&&(db.flags&SQLITE_InternChanges)!=0) {
+                    if (this.rc != Sqlite3.SQLITE_OK && (db.flags & SqliteFlags.SQLITE_InternChanges) != 0)
+                    {
 						build.sqlite3ResetInternalSchema(db,-1);
-						db.flags=(db.flags|SQLITE_InternChanges);
+                        db.flags = (db.flags | SqliteFlags.SQLITE_InternChanges);
 					}
 					///
 					///<summary>
@@ -4282,10 +4283,11 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 													goto abort_due_to_error;
 												}
 											}
-											if(p1==sqliteinth.SAVEPOINT_ROLLBACK&&(db.flags&SQLITE_InternChanges)!=0) {
+                                            if (p1 == sqliteinth.SAVEPOINT_ROLLBACK && (db.flags & SqliteFlags.SQLITE_InternChanges) != 0)
+                                            {
                                                 vdbeaux.sqlite3ExpirePreparedStatements(db);
 												build.sqlite3ResetInternalSchema(db,-1);
-												db.flags=(db.flags|SQLITE_InternChanges);
+                                                db.flags = (db.flags | SqliteFlags.SQLITE_InternChanges);
 											}
 										}
 										///
@@ -4553,7 +4555,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 								///When the schema cookie changes, record the new cookie internally 
 								///</summary>
 								pDb.pSchema.schema_cookie=(int)pIn3.u.i;
-								db.flags|=SQLITE_InternChanges;
+                                db.flags |= SqliteFlags.SQLITE_InternChanges;
 							}
 							else
 								if(pOp.p2==(int)BTreeProp.FILE_FORMAT) {
@@ -8874,7 +8876,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///</summary>
                 if (Sqlite3.SQLITE_OK != (rc = this.sqlite3VdbeCheckFk(0)))
                 {
-                    Debug.Assert((db.flags & SQLITE_CountRows) != 0);
+                    Debug.Assert((db.flags & SqliteFlags.SQLITE_CountRows) != 0);
                     Debug.Assert(this.usesStmtJournal);
                     return rc;
                 }
@@ -8896,7 +8898,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///<param name="The statement transaction is never a top">level transaction.  Hence</param>
                 ///<param name="the RELEASE call below can never fail.">the RELEASE call below can never fail.</param>
                 ///<param name=""></param>
-                Debug.Assert(this.iStatement == 0 || (db.flags & SQLITE_CountRows) != 0);
+                Debug.Assert(this.iStatement == 0 || (db.flags & SqliteFlags.SQLITE_CountRows) != 0);
                 rc = this.sqlite3VdbeCloseStatement(sqliteinth.SAVEPOINT_RELEASE);
                 if (NEVER(rc != Sqlite3.SQLITE_OK))
                 {

@@ -1364,8 +1364,8 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 )
                     return;
                 pParse.colNamesSet = 1;
-                fullNames = (db.flags & Sqlite3.SQLITE_FullColNames) != 0;
-                shortNames = (db.flags & Sqlite3.SQLITE_ShortColNames) != 0;
+                fullNames = (db.flags & SqliteFlags.SQLITE_FullColNames) != 0;
+                shortNames = (db.flags & SqliteFlags.SQLITE_ShortColNames) != 0;
                 v.sqlite3VdbeSetNumCols(pEList.nExpr);
                 for (i = 0; i < pEList.nExpr; i++)
                 {
@@ -1617,10 +1617,10 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             {
                 Table pTab;
                 sqlite3 db = pParse.db;
-                int savedFlags;
+                SqliteFlags savedFlags;
                 savedFlags = db.flags;
-                db.flags &= ~Sqlite3.SQLITE_FullColNames;
-                db.flags |= Sqlite3.SQLITE_ShortColNames;
+                db.flags &= ~SqliteFlags.SQLITE_FullColNames;
+                db.flags |= SqliteFlags.SQLITE_ShortColNames;
                 Select.sqlite3SelectPrep(pParse, pSelect, null);
                 if (pParse.nErr != 0)
                     return null;
@@ -3028,7 +3028,7 @@ break;
                 ///<summary>
                 ///Unable to flatten compound queries 
                 ///</summary>
-                if ((db.flags & Sqlite3.SQLITE_QueryFlattener) != 0)
+                if ((db.flags & SqliteFlags.SQLITE_QueryFlattener) != 0)
                     return 0;
                 pSrc = p.pSrc;
                 Debug.Assert(pSrc != null && iFrom >= 0 && iFrom < pSrc.nSrc);

@@ -736,12 +736,12 @@ break;
 			///<summary>
 			///The opcode 
 			///</summary>
-			public u32 mask;
+			public SqliteFlags mask;
 			///
 			///<summary>
 			///Mask of the bit in sqlite3.flags to set/clear 
 			///</summary>
-			public _aFlagOp(int op,u32 mask) {
+			public _aFlagOp(int op,SqliteFlags mask) {
 				this.op=op;
 				this.mask=mask;
 			}
@@ -777,8 +777,8 @@ break;
 				}
 				default: {
 					_aFlagOp[] aFlagOp=new _aFlagOp[] {
-						new _aFlagOp(SQLITE_DBCONFIG_ENABLE_FKEY,SQLITE_ForeignKeys),
-						new _aFlagOp(SQLITE_DBCONFIG_ENABLE_TRIGGER,SQLITE_EnableTrigger),
+						new _aFlagOp(SQLITE_DBCONFIG_ENABLE_FKEY,SqliteFlags.SQLITE_ForeignKeys),
+						new _aFlagOp(SQLITE_DBCONFIG_ENABLE_TRIGGER,SqliteFlags.SQLITE_EnableTrigger),
 					};
 					uint i;
 					rc=Sqlite3.SQLITE_ERROR;
@@ -790,13 +790,13 @@ break;
 						if(aFlagOp[i].op==op) {
 							int onoff=_Custom.va_arg(ap,(Int32)0);
 							int pRes=_Custom.va_arg(ap,(Int32)0);
-							int oldFlags=db.flags;
+                            SqliteFlags oldFlags = db.flags;
 							if(onoff>0) {
-								db.flags=(int)((u32)db.flags|aFlagOp[i].mask);
+								db.flags=(db.flags|aFlagOp[i].mask);
 							}
 							else
 								if(onoff==0) {
-									db.flags=(int)(db.flags&~aFlagOp[i].mask);
+									db.flags=(db.flags&~aFlagOp[i].mask);
 								}
 							if(oldFlags!=db.flags) {
                                 vdbeaux.sqlite3ExpirePreparedStatements(db);
@@ -1049,7 +1049,7 @@ break;
 			#if !SQLITE_OMIT_LOAD_EXTENSION
 			sqlite3CloseExtensions(db);
 			#endif
-			db.magic=SQLITE_MAGIC_ERROR;
+            db.magic = Sqlite3.SQLITE_MAGIC_ERROR;
 			///
 			///<summary>
 			///The temp.database schema is allocated differently from the other schema
@@ -1061,7 +1061,7 @@ break;
 			///</summary>
 			db.sqlite3DbFree(ref db.aDb[1].pSchema);
 			db.mutex.sqlite3_mutex_leave();
-			db.magic=SQLITE_MAGIC_CLOSED;
+            db.magic = Sqlite3.SQLITE_MAGIC_CLOSED;
 			sqlite3_mutex_free(db.mutex);
 			Debug.Assert(db.lookaside.nOut==0);
 			///
@@ -1095,7 +1095,8 @@ break;
 			}
             vtab.sqlite3VtabRollback(db);
 			sqlite3EndBenignMalloc();
-			if((db.flags&SQLITE_InternChanges)!=0) {
+            if ((db.flags & SqliteFlags.SQLITE_InternChanges) != 0)
+            {
                 vdbeaux.sqlite3ExpirePreparedStatements(db);
 				build.sqlite3ResetInternalSchema(db,-1);
 			}
@@ -2644,7 +2645,7 @@ return z;
 			db.mutex.sqlite3_mutex_enter();
 			db.errMask=0xff;
 			db.nDb=2;
-			db.magic=SQLITE_MAGIC_BUSY;
+            db.magic = Sqlite3.SQLITE_MAGIC_BUSY;
 			Array.Copy(db.aDbStatic,db.aDb,db.aDbStatic.Length);
 			// db.aDb = db.aDbStatic;
 			Debug.Assert(db.aLimit.Length==aHardLimit.Length);
@@ -2653,9 +2654,9 @@ return z;
 			db.autoCommit=1;
 			db.nextAutovac=-1;
 			db.nextPagesize=0;
-			db.flags|=SQLITE_ShortColNames|SQLITE_AutoIndex|SQLITE_EnableTrigger;
+            db.flags |= SqliteFlags.SQLITE_ShortColNames | SqliteFlags.SQLITE_AutoIndex | SqliteFlags.SQLITE_EnableTrigger;
 			if(sqliteinth.SQLITE_DEFAULT_FILE_FORMAT<4)
-				db.flags|=SQLITE_LegacyFileFmt
+                db.flags |= SqliteFlags.SQLITE_LegacyFileFmt
 				#if SQLITE_ENABLE_LOAD_EXTENSION
 																																																																																												| SQLITE_LoadExtension
 #endif
@@ -2729,7 +2730,7 @@ return z;
 			db.aDb[0].safety_level=3;
 			db.aDb[1].zName="temp";
 			db.aDb[1].safety_level=1;
-			db.magic=SQLITE_MAGIC_OPEN;
+            db.magic = Sqlite3.SQLITE_MAGIC_OPEN;
 			//if ( db.mallocFailed != 0 )
 			//{
 			//  goto opendb_out;
@@ -2814,7 +2815,7 @@ SQLITE_DEFAULT_LOCKING_MODE);
 			}
 			else
 				if(rc!=Sqlite3.SQLITE_OK) {
-					db.magic=SQLITE_MAGIC_SICK;
+                    db.magic = Sqlite3.SQLITE_MAGIC_SICK;
 				}
 			ppDb=db;
 			return malloc_cs.sqlite3ApiExit(0,rc);
@@ -3437,7 +3438,7 @@ error_out:
 					//sqlite3 db = _Custom.va_arg(ap, sqlite3);
 					int x=_Custom.va_arg(ap,(Int32)0);
 					//int x = _Custom.va_arg(ap,int);
-					db.flags=(x&SQLITE_OptMask)|(db.flags&~SQLITE_OptMask);
+                    db.flags = ((SqliteFlags)x & SqliteFlags.SQLITE_OptMask) | (db.flags & ~SqliteFlags.SQLITE_OptMask);
 					break;
 				}
 				//#if SQLITE_N_KEYWORD

@@ -849,7 +849,7 @@ return;
 					}
 				}
 				sqlite3DeleteTrigger(db,ref pTrigger);
-				db.flags|=SQLITE_InternChanges;
+                db.flags |= SqliteFlags.SQLITE_InternChanges;
 			}
 		}
 		///<summary>
@@ -903,7 +903,8 @@ return;
 			TriggerType mask=0;
 			Trigger pList=null;
 			Trigger p;
-			if((pParse.db.flags&SQLITE_EnableTrigger)!=0) {
+            if ((pParse.db.flags & SqliteFlags.SQLITE_EnableTrigger) != 0)
+            {
 				pList=sqlite3TriggerList(pParse,pTab);
 			}
 			Debug.Assert(pList==null||pTab.IsVirtual()==false);
@@ -1331,7 +1332,7 @@ return;
 			///</summary>
 			///<param name="is a pointer to the sub">vdbe containing the trigger program.  </param>
 			if(pPrg!=null) {
-				bool bRecursive=(!String.IsNullOrEmpty(p.zName)&&0==(pParse.db.flags&SQLITE_RecTriggers));
+                bool bRecursive = (!String.IsNullOrEmpty(p.zName) && 0 == (pParse.db.flags & SqliteFlags.SQLITE_RecTriggers));
 				v.sqlite3VdbeAddOp3( OpCode.OP_Program,reg,ignoreJump,++pParse.nMem);
 				v.sqlite3VdbeChangeP4(-1,pPrg.pProgram, P4Usage.P4_SUBPROGRAM);
 				#if SQLITE_DEBUG

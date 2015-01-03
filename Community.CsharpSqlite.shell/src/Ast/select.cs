@@ -426,8 +426,8 @@ namespace Community.CsharpSqlite
                     ///</summary>
                     ExprList_item[] a = pEList.a;
                     ExprList pNew = null;
-                    int flags = pParse.db.flags;
-                    bool longNames = (flags & Sqlite3.SQLITE_FullColNames) != 0 && (flags & Sqlite3.SQLITE_ShortColNames) == 0;
+                    SqliteFlags flags = pParse.db.flags;
+                    bool longNames = (flags & SqliteFlags.SQLITE_FullColNames) != 0 && (flags & SqliteFlags.SQLITE_ShortColNames) == 0;
                     for (k = 0; k < pEList.nExpr; k++)
                     {
                         Expr pE = a[k].pExpr;
@@ -920,7 +920,7 @@ namespace Community.CsharpSqlite
                 ///<param name="Use the SQLITE_GroupByOrder flag with SQLITE_TESTCTRL_OPTIMIZER">Use the SQLITE_GroupByOrder flag with SQLITE_TESTCTRL_OPTIMIZER</param>
                 ///<param name="to disable this optimization for testing purposes.">to disable this optimization for testing purposes.</param>
                 ///<param name=""></param>
-                if (exprc.sqlite3ExprListCompare(p.pGroupBy, pOrderBy) == 0 && (db.flags & Sqlite3.SQLITE_GroupByOrder) == 0)
+                if (exprc.sqlite3ExprListCompare(p.pGroupBy, pOrderBy) == 0 && (db.flags & SqliteFlags.SQLITE_GroupByOrder) == 0)
                 {
                     pOrderBy = null;
                 }

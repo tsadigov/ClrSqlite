@@ -12,28 +12,31 @@ namespace Community.CsharpSqlite
 
 		public class sqlite3_mutex
 		{
+            
+		}
+        public static class sqlite3_mutex_Extensions {
             //#define sqlite3_mutex_free(X)
-            public void sqlite3_mutex_enter()
+            public static void sqlite3_mutex_enter(this sqlite3_mutex p)
             {
             }
 
             //#define sqlite3_mutex_try(X)      Sqlite3.SQLITE_OK
-            public void sqlite3_mutex_leave()
+            public static void sqlite3_mutex_leave(this sqlite3_mutex p)
             {
             }
 
             //#define X.sqlite3_mutex_leave()
-            public bool sqlite3_mutex_held()
+            public static bool sqlite3_mutex_held(this sqlite3_mutex p)
             {
                 return true;
             }
 
             //#define Sqlite3.X.sqlite3_mutex_held()     ((void)(X),1)
-            public bool sqlite3_mutex_notheld()
+            public static bool sqlite3_mutex_notheld(this sqlite3_mutex p)
             {
                 return true;
             }
-		}
+        }
 #endif
 	public partial class Sqlite3
 	{

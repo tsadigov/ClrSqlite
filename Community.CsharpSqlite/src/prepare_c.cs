@@ -55,7 +55,8 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///0 == db.mallocFailed && 
 			///</summary>
-			(db.flags&SQLITE_RecoveryMode)==0) {
+            (db.flags & SqliteFlags.SQLITE_RecoveryMode) == 0)
+            {
 				{
 					if(zObj==null) {
 						zObj="?";
@@ -407,7 +408,7 @@ namespace Community.CsharpSqlite {
 			///
 			///</summary>
 			if(iDb==0&&meta[BTREE_FILE_FORMAT-1]>=4) {
-				db.flags&=~SQLITE_LegacyFileFmt;
+                db.flags &= ~SqliteFlags.SQLITE_LegacyFileFmt;
 			}
 			///
 			///<summary>
@@ -450,7 +451,8 @@ db.xAuth = 0;
 				///before that point, jump to error_out.
 				///</summary>
 			}
-			if(rc==Sqlite3.SQLITE_OK||(db.flags&SQLITE_RecoveryMode)!=0) {
+            if (rc == Sqlite3.SQLITE_OK || (db.flags & SqliteFlags.SQLITE_RecoveryMode) != 0)
+            {
 				///
 				///<summary>
 				///Black magic: If the SQLITE_RecoveryMode flag is set, then consider
@@ -489,7 +491,7 @@ db.xAuth = 0;
 		///</summary>
 		static int sqlite3Init(sqlite3 db,ref string pzErrMsg) {
 			int i,rc;
-			bool commit_internal=!((db.flags&SQLITE_InternChanges)!=0);
+            bool commit_internal = !((db.flags & SqliteFlags.SQLITE_InternChanges) != 0);
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			rc=Sqlite3.SQLITE_OK;
 			db.init.busy=1;
@@ -742,7 +744,7 @@ db.xAuth = 0;
 					if(rc!=0) {
 						string zDb=db.aDb[i].zName;
 						utilc.sqlite3Error(db,rc,"database schema is locked: %s",zDb);
-						sqliteinth.testcase(db.flags&SQLITE_ReadUncommitted);
+                        sqliteinth.testcase(db.flags & SqliteFlags.SQLITE_ReadUncommitted);
 						goto end_prepare;
 					}
 				}

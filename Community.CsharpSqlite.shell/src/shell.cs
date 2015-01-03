@@ -2792,6 +2792,7 @@ enableTimer = booleanValue(azArg[1]);
         Sqlite3.Btree btree = null;
         r = Sqlite3.Btree.Open(pSrc.pVfs, "hehehe", pSrc, ref btree, 0, 262);
 		/*
+         
         Community.CsharpSqlite.Sqlite3.Parse pParse = new Community.CsharpSqlite.Sqlite3.Parse ();
 		String ErrMsg = null;
 		var sql = "CREATE TABLE aaaa(bbb int);";
@@ -2843,12 +2844,9 @@ enableTimer = booleanValue(azArg[1]);
 		#if SIGINT
 																																						signal(SIGINT, interrupt_handler);
 #endif
-		///
-///<summary>
-///</summary>
-///<param name="Do an initial pass through the command">line argument to locate</param>
-///<param name="the name of the database file, the name of the initialization file,">the name of the database file, the name of the initialization file,</param>
-///<param name="and the first command to execute.">and the first command to execute.</param>
+//Do an initial pass through the command-line argument to locate
+//the name of the database file, the name of the initialization file,
+//and the first command to execute.
 
 		for (i = 0; i < argc - 1; i++) {
 			string z;
@@ -2867,10 +2865,12 @@ enableTimer = booleanValue(azArg[1]);
 					zInitFile = argv [i];
 				}
 		}
+
+
 		if (i < argc) {
-			#if (SQLITE_OS_OS2) && SQLITE_OS_OS2
-																																																									data.zDbFilename = (string )convertCpPathToUtf8( argv[i++] );
-#else
+			#if (SQLITE_OS_OS2) && SQLITE_OS_OS2																																																									
+            data.zDbFilename = (string )convertCpPathToUtf8( argv[i++] );
+            #else
 			data.zDbFilename = argv [i++];
 			#endif
 		}

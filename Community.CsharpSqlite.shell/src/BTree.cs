@@ -154,7 +154,7 @@ namespace Community.CsharpSqlite {
                 ///A BTREE_SINGLE database is always a temporary and/or ephemeral 
                 ///</summary>
                 Debug.Assert((flags & BTREE_SINGLE) == 0 || isTempDb);
-                if ((db.flags & SQLITE_NoReadlock) != 0)
+                if ((db.flags & SqliteFlags.SQLITE_NoReadlock) != 0)
                 {
                     flags |= BTREE_NO_READLOCK;
                 }

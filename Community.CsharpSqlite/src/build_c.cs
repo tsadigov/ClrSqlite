@@ -538,7 +538,7 @@ p.zName,  P4Usage.P4_STATIC );
                     }
                     freeIndex(db, ref pIndex);
                 }
-                db.flags |= SQLITE_InternChanges;
+                db.flags |= SqliteFlags.SQLITE_InternChanges;
             }
             ///<summary>
             /// Erase all schema information from the in-memory hash tables of
@@ -596,7 +596,7 @@ p.zName,  P4Usage.P4_STATIC );
                         sqlite3SchemaClear(pDb.pSchema);
                     }
                 }
-                db.flags &= ~SQLITE_InternChanges;
+                db.flags &= ~SqliteFlags.SQLITE_InternChanges;
                 vtab.sqlite3VtabUnlockList(db);
                 sqlite3BtreeLeaveAll(db);
                 ///
@@ -640,7 +640,7 @@ p.zName,  P4Usage.P4_STATIC );
             ///</summary>
             public static void sqlite3CommitInternalChanges(sqlite3 db)
             {
-                db.flags &= ~SQLITE_InternChanges;
+                db.flags &= ~SqliteFlags.SQLITE_InternChanges;
             }
             ///<summary>
             /// Delete memory allocated for the column names of a table or view (the
@@ -761,7 +761,7 @@ p.zName,  P4Usage.P4_STATIC );
                 pDb = db.aDb[iDb];
                 p = sqlite3HashInsert(ref pDb.pSchema.tblHash, zTabName, StringExtensions.sqlite3Strlen30(zTabName), (Table)null);
                 build.sqlite3DeleteTable(db, ref p);
-                db.flags |= SQLITE_InternChanges;
+                db.flags |= SqliteFlags.SQLITE_InternChanges;
             }
             ///<summary>
             /// Given a token, return a string that consists of the text of that
@@ -942,7 +942,7 @@ p.zName,  P4Usage.P4_STATIC );
             ///</summary>
             public static int sqlite3CheckObjectName(Parse pParse, string zName)
             {
-                if (0 == pParse.db.init.busy && pParse.nested == 0 && (pParse.db.flags & SQLITE_WriteSchema) == 0 && zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase))
+                if (0 == pParse.db.init.busy && pParse.nested == 0 && (pParse.db.flags & SqliteFlags.SQLITE_WriteSchema) == 0 && zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase))
                 {
                     utilc.sqlite3ErrorMsg(pParse, "object name reserved for internal use: %s", zName);
                     return Sqlite3.SQLITE_ERROR;
@@ -1184,7 +1184,7 @@ goto begin_table_error;
                     v.sqlite3VdbeAddOp3( OpCode.OP_ReadCookie, iDb, reg3, BTREE_FILE_FORMAT);
                     vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
                     j1 = v.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
-                    fileFormat = (db.flags & SQLITE_LegacyFileFmt) != 0 ? 1 : sqliteinth.SQLITE_MAX_FILE_FORMAT;
+                    fileFormat = (db.flags & SqliteFlags.SQLITE_LegacyFileFmt) != 0 ? 1 : sqliteinth.SQLITE_MAX_FILE_FORMAT;
                     v.sqlite3VdbeAddOp2(OpCode.OP_Integer, fileFormat, reg3);
                     v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTREE_FILE_FORMAT, reg3);
                     v.sqlite3VdbeAddOp2(OpCode.OP_Integer, (int)sqliteinth.ENC(db), reg3);
@@ -2169,7 +2169,7 @@ goto begin_table_error;
                     }
                     pParse.pNewTable = null;
                     db.nTable++;
-                    db.flags |= SQLITE_InternChanges;
+                    db.flags |= SqliteFlags.SQLITE_InternChanges;
 #if !SQLITE_OMIT_ALTERTABLE
                     if (p.pSelect == null)
                     {
@@ -3706,7 +3706,7 @@ goto exit_create_index;
                         //        db.mallocFailed = 1;
                         goto exit_create_index;
                     }
-                    db.flags |= SQLITE_InternChanges;
+                    db.flags |= SqliteFlags.SQLITE_InternChanges;
                     if (pTblName != null)
                     {
                         pIndex.tnum = db.init.newTnum;

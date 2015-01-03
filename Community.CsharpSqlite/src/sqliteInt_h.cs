@@ -90,6 +90,121 @@ namespace Community.CsharpSqlite
 
     ///
     ///<summary>
+    ///Possible values for the sqlite3.flags.
+    ///
+    ///</summary>
+    public enum SqliteFlags:uint
+    {
+
+        //#define SQLITE_VdbeTrace      0x00000100  /* True to trace VDBE execution */
+        //#define SQLITE_InternChanges  0x00000200  /* Uncommitted Hash table changes */
+        //#define SQLITE_FullColNames   0x00000400  /* Show full column names on SELECT */
+        //#define SQLITE_ShortColNames  0x00000800  /* Show short columns names */
+        //#define SQLITE_CountRows      0x00001000  /* Count rows changed by INSERT, */
+        //                                          /*   DELETE, or UPDATE and return */
+        //                                          /*   the count using a callback. */
+        //#define SQLITE_NullCallback   0x00002000  /* Invoke the callback once if the */
+        //                                          /*   result set is empty */
+        //#define SQLITE_SqlTrace       0x00004000  /* Debug print SQL as it executes */
+        //#define SQLITE_VdbeListing    0x00008000  /* Debug listings of VDBE programs */
+        //#define SQLITE_WriteSchema    0x00010000  /* OK to update SQLITE_MASTER */
+        //#define SQLITE_NoReadlock     0x00020000  /* Readlocks are omitted when 
+        //                                          ** accessing read-only databases */
+        //#define SQLITE_IgnoreChecks   0x00040000  /* Do not enforce check constraints */
+        //#define SQLITE_ReadUncommitted 0x0080000  /* For shared-cache mode */
+        //#define SQLITE_LegacyFileFmt  0x00100000  /* Create new databases in format 1 */
+        //#define SQLITE_FullFSync      0x00200000  /* Use full fsync on the backend */
+        //#define SQLITE_CkptFullFSync  0x00400000  /* Use full fsync for checkpoint */
+        //#define SQLITE_RecoveryMode   0x00800000  /* Ignore schema errors */
+        //#define SQLITE_ReverseOrder   0x01000000  /* Reverse unordered SELECTs */
+        //#define SQLITE_RecTriggers    0x02000000  /* Enable recursive triggers */
+        //#define SQLITE_ForeignKeys    0x04000000  /* Enforce foreign key constraints  */
+        //#define SQLITE_AutoIndex      0x08000000  /* Enable automatic indexes */
+        //#define SQLITE_PreferBuiltin  0x10000000  /* Preference to built-in funcs */
+        //#define SQLITE_LoadExtension  0x20000000  /* Enable load_extension */
+        //define SQLITE_EnableTrigger  0x40000000  /* True to enable triggers */
+        SQLITE_VdbeTrace = 0x00000100,
+        SQLITE_InternChanges = 0x00000200,
+        SQLITE_FullColNames = 0x00000400,
+        SQLITE_ShortColNames = 0x00000800,
+        SQLITE_CountRows = 0x00001000,
+        SQLITE_NullCallback = 0x00002000,
+        SQLITE_SqlTrace = 0x00004000,
+        SQLITE_VdbeListing = 0x00008000,
+        SQLITE_WriteSchema = 0x00010000,
+        SQLITE_NoReadlock = 0x00020000,
+        SQLITE_IgnoreChecks = 0x00040000,
+        SQLITE_ReadUncommitted = 0x0080000,
+        SQLITE_LegacyFileFmt = 0x00100000,
+        SQLITE_FullFSync = 0x00200000,
+        SQLITE_CkptFullFSync = 0x00400000,
+        SQLITE_RecoveryMode = 0x00800000,
+        SQLITE_ReverseOrder = 0x01000000,
+        SQLITE_RecTriggers = 0x02000000,
+        SQLITE_ForeignKeys = 0x04000000,
+        SQLITE_AutoIndex = 0x08000000,
+        SQLITE_PreferBuiltin = 0x10000000,
+        SQLITE_LoadExtension = 0x20000000,
+        SQLITE_EnableTrigger = 0x40000000,
+        ///
+        ///<summary>
+        ///Bits of the sqlite3.flags field that are used by the
+        ///sqlite3_test_control(SQLITE_TESTCTRL_OPTIMIZATIONS,...) interface.
+        ///</summary>
+        ///<param name="These must be the low">order bits of the flags field.</param>
+        ///<param name=""></param>
+        //#define SQLITE_QueryFlattener 0x01        /* Disable query flattening */
+        //#define SQLITE_ColumnCache    0x02        /* Disable the column cache */
+        //#define SQLITE_IndexSort      0x04        /* Disable indexes for sorting */
+        //#define SQLITE_IndexSearch    0x08        /* Disable indexes for searching */
+        //#define SQLITE_IndexCover     0x10        /* Disable index covering table */
+        //#define SQLITE_GroupByOrder   0x20        /* Disable GROUPBY cover of ORDERBY */
+        //#define SQLITE_FactorOutConst 0x40        /* Disable factoring out constants */
+        //#define SQLITE_IdxRealAsInt   0x80        /* Store REAL as INT in indices */
+        //#define SQLITE_OptMask        0xff        /* Mask of all disablable opts */
+        SQLITE_QueryFlattener = 0x01,
+        SQLITE_ColumnCache = 0x02,
+        SQLITE_IndexSort = 0x04,
+        SQLITE_IndexSearch = 0x08,
+        SQLITE_IndexCover = 0x10,
+        SQLITE_GroupByOrder = 0x20,
+        SQLITE_FactorOutConst = 0x40,
+        SQLITE_IdxRealAsInt = 0x80,
+        SQLITE_OptMask = 0xff,
+        
+
+
+
+
+    }
+
+    public partial class Sqlite3{
+
+    ///<summary>
+        /// Possible values for the sqlite.magic field.
+        /// The numbers are obtained at random and have no special meaning, other
+        /// than being distinct from one another.
+        ///
+        ///</summary>
+       private const int SQLITE_MAGIC_OPEN = 0x1029a697;
+            //#define SQLITE_MAGIC_OPEN     0xa029a697  /* Database is open */
+
+        private const int SQLITE_MAGIC_CLOSED = 0x2f3c2d33;
+            //#define SQLITE_MAGIC_CLOSED   0x9f3c2d33  /* Database is closed */
+
+        private const int SQLITE_MAGIC_SICK = 0x3b771290;
+            //#define SQLITE_MAGIC_SICK     0x4b771290  /* Error and awaiting close */
+
+        private const int SQLITE_MAGIC_BUSY = 0x403b7906;
+            //#define SQLITE_MAGIC_BUSY     0xf03b7906  /* Database currently in use */
+
+        private const int SQLITE_MAGIC_ERROR = 0x55357930;
+            //#define SQLITE_MAGIC_ERROR    0xb5357930  /* An SQLITE_MISUSE error occurred */
+
+    }
+
+    ///
+    ///<summary>
     ///A sort order can be either ASC or DESC.
     ///
     ///</summary>
@@ -188,113 +303,6 @@ namespace Community.CsharpSqlite
 #if !(SQLITE_MALLOC_SOFT_LIMIT)
         public const int SQLITE_MALLOC_SOFT_LIMIT = 1024;
 #endif
-
-
-
-
-
-        ///
-        ///<summary>
-        ///Possible values for the sqlite3.flags.
-        ///
-        ///</summary>
-        //#define SQLITE_VdbeTrace      0x00000100  /* True to trace VDBE execution */
-        //#define SQLITE_InternChanges  0x00000200  /* Uncommitted Hash table changes */
-        //#define SQLITE_FullColNames   0x00000400  /* Show full column names on SELECT */
-        //#define SQLITE_ShortColNames  0x00000800  /* Show short columns names */
-        //#define SQLITE_CountRows      0x00001000  /* Count rows changed by INSERT, */
-        //                                          /*   DELETE, or UPDATE and return */
-        //                                          /*   the count using a callback. */
-        //#define SQLITE_NullCallback   0x00002000  /* Invoke the callback once if the */
-        //                                          /*   result set is empty */
-        //#define SQLITE_SqlTrace       0x00004000  /* Debug print SQL as it executes */
-        //#define SQLITE_VdbeListing    0x00008000  /* Debug listings of VDBE programs */
-        //#define SQLITE_WriteSchema    0x00010000  /* OK to update SQLITE_MASTER */
-        //#define SQLITE_NoReadlock     0x00020000  /* Readlocks are omitted when 
-        //                                          ** accessing read-only databases */
-        //#define SQLITE_IgnoreChecks   0x00040000  /* Do not enforce check constraints */
-        //#define SQLITE_ReadUncommitted 0x0080000  /* For shared-cache mode */
-        //#define SQLITE_LegacyFileFmt  0x00100000  /* Create new databases in format 1 */
-        //#define SQLITE_FullFSync      0x00200000  /* Use full fsync on the backend */
-        //#define SQLITE_CkptFullFSync  0x00400000  /* Use full fsync for checkpoint */
-        //#define SQLITE_RecoveryMode   0x00800000  /* Ignore schema errors */
-        //#define SQLITE_ReverseOrder   0x01000000  /* Reverse unordered SELECTs */
-        //#define SQLITE_RecTriggers    0x02000000  /* Enable recursive triggers */
-        //#define SQLITE_ForeignKeys    0x04000000  /* Enforce foreign key constraints  */
-        //#define SQLITE_AutoIndex      0x08000000  /* Enable automatic indexes */
-        //#define SQLITE_PreferBuiltin  0x10000000  /* Preference to built-in funcs */
-        //#define SQLITE_LoadExtension  0x20000000  /* Enable load_extension */
-        //define SQLITE_EnableTrigger  0x40000000  /* True to enable triggers */
-        public const int SQLITE_VdbeTrace = 0x00000100;
-        public const int SQLITE_InternChanges = 0x00000200;
-        public const int SQLITE_FullColNames = 0x00000400;
-        public const int SQLITE_ShortColNames = 0x00000800;
-        public const int SQLITE_CountRows = 0x00001000;
-        public const int SQLITE_NullCallback = 0x00002000;
-        public const int SQLITE_SqlTrace = 0x00004000;
-        public const int SQLITE_VdbeListing = 0x00008000;
-        public const int SQLITE_WriteSchema = 0x00010000;
-        public const int SQLITE_NoReadlock = 0x00020000;
-        public const int SQLITE_IgnoreChecks = 0x00040000;
-        public const int SQLITE_ReadUncommitted = 0x0080000;
-        public const int SQLITE_LegacyFileFmt = 0x00100000;
-        public const int SQLITE_FullFSync = 0x00200000;
-        public const int SQLITE_CkptFullFSync = 0x00400000;
-        public const int SQLITE_RecoveryMode = 0x00800000;
-        public const int SQLITE_ReverseOrder = 0x01000000;
-        public const int SQLITE_RecTriggers = 0x02000000;
-        public const int SQLITE_ForeignKeys = 0x04000000;
-        public const int SQLITE_AutoIndex = 0x08000000;
-        public const int SQLITE_PreferBuiltin = 0x10000000;
-        public const int SQLITE_LoadExtension = 0x20000000;
-        public const int SQLITE_EnableTrigger = 0x40000000;
-        ///
-        ///<summary>
-        ///Bits of the sqlite3.flags field that are used by the
-        ///sqlite3_test_control(SQLITE_TESTCTRL_OPTIMIZATIONS,...) interface.
-        ///</summary>
-        ///<param name="These must be the low">order bits of the flags field.</param>
-        ///<param name=""></param>
-        //#define SQLITE_QueryFlattener 0x01        /* Disable query flattening */
-        //#define SQLITE_ColumnCache    0x02        /* Disable the column cache */
-        //#define SQLITE_IndexSort      0x04        /* Disable indexes for sorting */
-        //#define SQLITE_IndexSearch    0x08        /* Disable indexes for searching */
-        //#define SQLITE_IndexCover     0x10        /* Disable index covering table */
-        //#define SQLITE_GroupByOrder   0x20        /* Disable GROUPBY cover of ORDERBY */
-        //#define SQLITE_FactorOutConst 0x40        /* Disable factoring out constants */
-        //#define SQLITE_IdxRealAsInt   0x80        /* Store REAL as INT in indices */
-        //#define SQLITE_OptMask        0xff        /* Mask of all disablable opts */
-        public const int SQLITE_QueryFlattener = 0x01;
-        public const int SQLITE_ColumnCache = 0x02;
-        public const int SQLITE_IndexSort = 0x04;
-        public const int SQLITE_IndexSearch = 0x08;
-        public const int SQLITE_IndexCover = 0x10;
-        public const int SQLITE_GroupByOrder = 0x20;
-        public const int SQLITE_FactorOutConst = 0x40;
-        public const int SQLITE_IdxRealAsInt = 0x80;
-        public const int SQLITE_OptMask = 0xff;
-        ///<summary>
-        /// Possible values for the sqlite.magic field.
-        /// The numbers are obtained at random and have no special meaning, other
-        /// than being distinct from one another.
-        ///
-        ///</summary>
-        public const int SQLITE_MAGIC_OPEN = 0x1029a697;
-        //#define SQLITE_MAGIC_OPEN     0xa029a697  /* Database is open */
-        public const int SQLITE_MAGIC_CLOSED = 0x2f3c2d33;
-        //#define SQLITE_MAGIC_CLOSED   0x9f3c2d33  /* Database is closed */
-        public const int SQLITE_MAGIC_SICK = 0x3b771290;
-        //#define SQLITE_MAGIC_SICK     0x4b771290  /* Error and awaiting close */
-        public const int SQLITE_MAGIC_BUSY = 0x403b7906;
-        //#define SQLITE_MAGIC_BUSY     0xf03b7906  /* Database currently in use */
-        public const int SQLITE_MAGIC_ERROR = 0x55357930;
-        //#define SQLITE_MAGIC_ERROR    0xb5357930  /* An SQLITE_MISUSE error occurred */
-            
-
-
-
-
-
 
 
 

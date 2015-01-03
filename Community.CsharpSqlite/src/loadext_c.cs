@@ -481,7 +481,8 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 ///
 ///</summary>
 
-			if ((db.flags & SQLITE_LoadExtension) == 0) {
+            if ((db.flags & SqliteFlags.SQLITE_LoadExtension) == 0)
+            {
 				//if( pzErrMsg != null){
 				pzErrMsg = io.sqlite3_mprintf ("not authorized");
 				//}
@@ -595,10 +596,10 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		{
 			db.mutex.sqlite3_mutex_enter();
 			if (onoff != 0) {
-				db.flags |= SQLITE_LoadExtension;
+                db.flags |= SqliteFlags.SQLITE_LoadExtension;
 			}
 			else {
-				db.flags &= ~SQLITE_LoadExtension;
+                db.flags &= ~SqliteFlags.SQLITE_LoadExtension;
 			}
 			db.mutex.sqlite3_mutex_leave();
             

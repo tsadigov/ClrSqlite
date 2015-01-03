@@ -863,7 +863,8 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-			if ((pParse.db.flags & SQLITE_ForeignKeys) != 0 && pDest.pFKey != null) {
+            if ((pParse.db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0 && pDest.pFKey != null)
+            {
 				return 0;
 			}
 			#endif

@@ -247,7 +247,7 @@ namespace Community.CsharpSqlite
                         ///Invoke the callback function if required 
                         ///</summary>
 
-                        if (xCallback != null && (SqlResult.SQLITE_ROW == result || (SqlResult.SQLITE_DONE == result && callbackIsInit == 0 && (db.flags & SQLITE_NullCallback) != 0)))
+                        if (xCallback != null && (SqlResult.SQLITE_ROW == result || (SqlResult.SQLITE_DONE == result && callbackIsInit == 0 && (db.flags & SqliteFlags.SQLITE_NullCallback) != 0)))
                         {
                             if (0 == callbackIsInit)
                             {

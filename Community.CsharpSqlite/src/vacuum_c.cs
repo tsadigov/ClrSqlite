@@ -135,7 +135,7 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///SQL statements 
 			///</summary>
-			int saved_flags;
+            SqliteFlags saved_flags;
 			///
 			///<summary>
 			///Saved value of the db.flags 
@@ -190,8 +190,8 @@ namespace Community.CsharpSqlite {
 			saved_nChange=db.nChange;
 			saved_nTotalChange=db.nTotalChange;
 			saved_xTrace=db.xTrace;
-			db.flags|=SQLITE_WriteSchema|SQLITE_IgnoreChecks|SQLITE_PreferBuiltin;
-			db.flags&=~(SQLITE_ForeignKeys|SQLITE_ReverseOrder);
+            db.flags |= SqliteFlags.SQLITE_WriteSchema | SqliteFlags.SQLITE_IgnoreChecks | SqliteFlags.SQLITE_PreferBuiltin;
+            db.flags &= ~(SqliteFlags.SQLITE_ForeignKeys | SqliteFlags.SQLITE_ReverseOrder);
 			db.xTrace=null;
 			pMain=db.aDb[0].pBt;
 			isMemDb=pMain.sqlite3BtreePager().sqlite3PagerIsMemdb();
