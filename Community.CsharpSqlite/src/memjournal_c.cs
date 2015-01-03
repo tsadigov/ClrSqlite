@@ -9,7 +9,53 @@ using u32 = System.UInt32;
 namespace Community.CsharpSqlite
 {
 	using sqlite3_int64 = System.Int64;
-	using MemJournal = Sqlite3.sqlite3_file;
+	using MemJournal = sqlite3_file;
+
+
+    ///<summary>
+    /// The rollback journal is composed of a linked list of these structures.
+    ///
+    ///</summary>
+    public class FileChunk
+    {
+        public FileChunk pNext;
+
+        ///
+        ///<summary>
+        ///Next chunk in the journal 
+        ///</summary>
+
+        public byte[] zChunk = new byte[Sqlite3.JOURNAL_CHUNKSIZE];
+        ///
+        ///<summary>
+        ///Content of this chunk 
+        ///</summary>
+
+    };
+
+
+    ///<summary>
+    /// An instance of this object serves as a cursor into the rollback journal.
+    /// The cursor can be either for reading or writing.
+    ///
+    ///</summary>
+    public class FilePoint
+    {
+        public long iOffset;
+
+        ///
+        ///<summary>
+        ///Offset from the beginning of the file 
+        ///</summary>
+
+        public FileChunk pChunk;
+        ///
+        ///<summary>
+        ///Specific chunk into which cursor points 
+        ///</summary>
+
+    };
+
 
 	public partial class Sqlite3
 	{
@@ -59,52 +105,8 @@ namespace Community.CsharpSqlite
 		///
 		///</summary>
 		//#define JOURNAL_CHUNKSIZE ((int)(1024-sizeof(FileChunk*)))
-		const int JOURNAL_CHUNKSIZE = 4096;
+		public const int JOURNAL_CHUNKSIZE = 4096;
 
-
-		///<summary>
-		/// The rollback journal is composed of a linked list of these structures.
-		///
-		///</summary>
-		public class FileChunk
-		{
-			public FileChunk pNext;
-
-			///
-///<summary>
-///Next chunk in the journal 
-///</summary>
-
-			public byte[] zChunk = new byte[JOURNAL_CHUNKSIZE];
-		///
-///<summary>
-///Content of this chunk 
-///</summary>
-
-		};
-
-
-		///<summary>
-		/// An instance of this object serves as a cursor into the rollback journal.
-		/// The cursor can be either for reading or writing.
-		///
-		///</summary>
-		public class FilePoint
-		{
-			public long iOffset;
-
-			///
-///<summary>
-///Offset from the beginning of the file 
-///</summary>
-
-			public FileChunk pChunk;
-		///
-///<summary>
-///Specific chunk into which cursor points 
-///</summary>
-
-		};
 
 
         public class memjrnl {
