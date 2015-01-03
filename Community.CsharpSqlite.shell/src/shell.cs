@@ -1978,7 +1978,7 @@ if( db ) sqlite3_interrupt(db);
 													rc = 1;
 												}
 												else {
-													nCol = Sqlite3.vdbeapi.sqlite3_column_count (pStmt);
+                                                    nCol = pStmt.getColumnCount();
 												}
 												Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
 												if (nCol == 0)
@@ -2619,15 +2619,7 @@ enableTimer = booleanValue(azArg[1]);
 				#if !(_WIN32) && !(WIN32) && !(__OS2__) && !(__RTP__) && !(_WRS_KERNEL)
 																																																																												BEGIN_TIMER;
 #endif
-                int leftat = 0;
-                int red = 0;
-                do
-                {
-                    red = testtokenize(zSql, leftat);
-                    leftat+=red;
-                }
-                while (leftat<zSql.Length);
-
+                testTheTokenizer(zSql);
 
 
 
@@ -2666,6 +2658,20 @@ enableTimer = booleanValue(azArg[1]);
 		free (ref zLine);
 		return errCnt;
 	}
+
+    private static void testTheTokenizer(StringBuilder zSql)
+    {
+
+        int leftat = 0;
+        int red = 0;
+        do
+        {
+            red = testtokenize(zSql, leftat);
+            leftat += red;
+        }
+        while (leftat < zSql.Length);
+
+    }
 
 	///<summary>
 	/// Return a pathname which is the user's home directory
@@ -2891,35 +2897,24 @@ fprintf(stderr, "C-SQLite: Error, no database filename specified\n");
 exit(0);
 return 0;
 }
-#endif
-		///
-///<summary>
+        #endif
 ///Go ahead and open the database file if it already exists.  If the
 ///file does not exist, delay opening it.  This prevents empty database
 ///files from being created if a user mistypes the database name argument
-///</summary>
-///<param name="to the sqlite command">line tool.</param>
+///to the sqlite command-line tool.
 
 		if (File.Exists (data.zDbFilename)) {
 			open_db (data);
 		}
-		///
-///<summary>
-///</summary>
-///<param name="Process the initialization file if there is one.  If no ">init option</param>
-///<param name="is given on the command line, look for a file named ~/.sqliterc and">is given on the command line, look for a file named ~/.sqliterc and</param>
-///<param name="try to process it.">try to process it.</param>
-///<param name=""></param>
+///Process the initialization file if there is one.  If no-init option
+///is given on the command line, look for a file named ~/.sqliterc and
+///try to process it.
 
 		process_sqliterc (data, zInitFile);
-		///
-///<summary>
-///</summary>
-///<param name="Make a second pass through the command">line argument and set</param>
-///<param name="options.  This second pass is delayed until after the initialization">options.  This second pass is delayed until after the initialization</param>
-///<param name="file is processed so that the command">line arguments will override</param>
-///<param name="settings in the initialization file.">settings in the initialization file.</param>
-///<param name=""></param>
+///Make a second pass through the command-line argument and set
+///options.  This second pass is delayed until after the initialization
+///file is processed so that the command-line arguments will override
+///settings in the initialization file.
 
 		for (i = 1; i < argc && argv [i] [0] == '-'; i++) {
 			string z = argv [i];
@@ -3001,11 +2996,7 @@ return 0;
 																		}
 		}
 		if (zFirstCmd.Length > 0) {
-			///
-///<summary>
 ///Run just the command that follows the database name
-///
-///</summary>
 
 			if (zFirstCmd [0] == '.') {
 				do_meta_command (zFirstCmd, data);
@@ -3015,13 +3006,7 @@ return 0;
 				//int rc;
 				open_db (data);
 
-
-
                 rc = Sqlite3.legacy.sqlite3_exec(data.db, zFirstCmd.ToString(), (dxCallback)callback, data, ref zErrMsg);
-
-
-                
-                
 
 				if (rc != 0 && zErrMsg != "") {
 					fprintf (stderr, "SQL error: %s\n", zErrMsg);

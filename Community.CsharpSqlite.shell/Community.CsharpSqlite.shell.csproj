@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Community.CsharpSqlite</RootNamespace>
-    <AssemblyName>C#-SQLite3.1</AssemblyName>
+    <AssemblyName>C#-SQLite3.12</AssemblyName>
     <StartupObject>Shell</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>

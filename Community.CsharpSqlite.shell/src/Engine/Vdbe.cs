@@ -9220,8 +9220,12 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
             }
 #endif
 
+            
+
 
         }
-	#endif
+	
+
+#endif
 	}
 }

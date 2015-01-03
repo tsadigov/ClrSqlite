@@ -4,8 +4,9 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-	
-	using sqlite3_stmt = Sqlite3.Vdbe;
+
+    using System.Linq;
+    using sqlite3_stmt = Sqlite3.Vdbe;
 
 	public partial class Sqlite3
 	{
@@ -99,14 +100,10 @@ namespace Community.CsharpSqlite
 
             //OVERLOADS 
             public static int sqlite3_exec(sqlite3 db, ///
-                ///<summary>
                 ///The database on which the SQL executes 
-                ///</summary>
 
             string zSql, ///
-                ///<summary>
                 ///The SQL to be executed 
-                ///</summary>
 
             int NoCallback, int NoArgs, int NoErrors)
             {
@@ -115,25 +112,17 @@ namespace Community.CsharpSqlite
             }
 
             public static  int sqlite3_exec(sqlite3 db, ///
-                ///<summary>
                 ///The database on which the SQL executes 
-                ///</summary>
 
             string zSql, ///
-                ///<summary>
                 ///The SQL to be executed 
-                ///</summary>
 
             //sqlite3_callback 
                 dxCallback xCallback, ///
-                ///<summary>
                 ///Invoke this callback routine 
-                ///</summary>
 
             object pArg, ///
-                ///<summary>
                 ///First argument to xCallback() 
-                ///</summary>
 
             int NoErrors)
             {
@@ -146,68 +135,40 @@ namespace Community.CsharpSqlite
 
 
             static public int sqlite3_exec(sqlite3 db, ///
-                ///<summary>
                 ///The database on which the SQL executes 
-                ///</summary>
 
             string zSql, ///
-                ///<summary>
                 ///The SQL to be executed 
-                ///</summary>
 
             //sqlite3_callback 
                 dxCallback xCallback, ///
-                ///<summary>
                 ///Invoke this callback routine 
-                ///</summary>
 
             object pArg, ///
-                ///<summary>
                 ///First argument to xCallback() 
-                ///</summary>
 
             ref string pzErrMsg///
-                ///<summary>
                 ///Write error messages here 
-                ///</summary>
 
             )
             {
                 SqlResult result = SqlResult.SQLITE_OK;
-                ///
-                ///<summary>
                 ///Return code 
-                ///</summary>
 
                 string zLeftover = "";
-                ///
-                ///<summary>
                 ///Tail of unprocessed SQL 
-                ///</summary>
 
                 sqlite3_stmt pStmt = null;
-                ///
-                ///<summary>
                 ///The current SQL statement 
-                ///</summary>
 
                 string[] azCols = null;
-                ///
-                ///<summary>
                 ///Names of result columns 
-                ///</summary>
 
                 int nRetry = 0;
-                ///
-                ///<summary>
                 ///Number of retry attempts 
-                ///</summary>
 
                 int callbackIsInit;
-                ///
-                ///<summary>
                 ///True if callback data is initialized 
-                ///</summary>
 
                 if (!utilc.sqlite3SafetyCheckOk(db))
                     return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
@@ -228,16 +189,12 @@ namespace Community.CsharpSqlite
                     }
                     if (pStmt == null)
                     {
-                        ///
-                        ///<summary>
-                        ///</summary>
-                        ///<param name="this happens for a comment or white">space </param>
-
+                        ///this happens for a comment or white-space 
                         zSql = zLeftover;
                         continue;
                     }
                     callbackIsInit = 0;
-                    nCol = vdbeapi.sqlite3_column_count(pStmt);
+                    nCol = pStmt.getColumnCount();
                     while (true)
                     {
                         int i;
@@ -251,23 +208,27 @@ namespace Community.CsharpSqlite
                         {
                             if (0 == callbackIsInit)
                             {
-                                azCols = new string[nCol];
                                 //sqlite3DbMallocZero(db, 2*nCol*sizeof(const char*) + 1);
                                 //if ( azCols == null )
                                 //{
                                 //  goto exec_out;
                                 //}
-                                for (i = 0; i < nCol; i++)
-                                {
-                                    azCols[i] = vdbeapi.sqlite3_column_name(pStmt, i);
-                                    ///
-                                    ///<summary>
-                                    ///sqlite3VdbeSetColName() installs column names as UTF8
-                                    ///strings so there is no way for vdbeapi.sqlite3_column_name() to fail. 
-                                    ///</summary>
 
-                                    Debug.Assert(azCols[i] != null);
-                                }
+                                azCols=Enumerable.Range(0, nCol)
+                                    .Select(idx => { 
+                                        var name = vdbeapi.sqlite3_column_name(pStmt, idx);
+                                        ///
+                                        ///<summary>
+                                        ///sqlite3VdbeSetColName() installs column names as UTF8
+                                        ///strings so there is no way for vdbeapi.sqlite3_column_name() to fail. 
+                                        ///</summary>
+
+                                        Debug.Assert(null != name);
+
+                                        return name; })
+                                    .ToArray();
+
+                                
                                 callbackIsInit = 1;
                             }
                             if (result == SqlResult.SQLITE_ROW)

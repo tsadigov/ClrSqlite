@@ -15,9 +15,20 @@ namespace Community.CsharpSqlite
 	using sqlite3_stmt = Sqlite3.Vdbe;
 	using sqlite3_value = Mem;
 
+    public static partial class VdbeExtensions
+    {
+        ///<summary>
+            /// Return the number of columns in the result set for the statement pStmt.
+            ///</summary>
+            public static int getColumnCount(this sqlite3_stmt pStmt)
+            {
+                Sqlite3.Vdbe pVm = pStmt;
+                return pVm != null ? (int)pVm.nResColumn : 0;
+            }
+    }
 	public partial class Sqlite3
 	{
-        public class vdbeapi
+        public static class vdbeapi
         {
             ///<summary>
             /// 2004 May 26
@@ -718,14 +729,7 @@ Debug.Assert( p != null && p.pMem != null && p.pFunc != null && p.pFunc.xStep !=
 return p.pMem.n;
 }
 #endif
-            ///<summary>
-            /// Return the number of columns in the result set for the statement pStmt.
-            ///</summary>
-            public static int sqlite3_column_count(sqlite3_stmt pStmt)
-            {
-                Vdbe pVm = pStmt;
-                return pVm != null ? (int)pVm.nResColumn : 0;
-            }
+            
 
             ///<summary>
             /// Return the number of values available from the current row of the
@@ -962,7 +966,7 @@ return p.pMem.n;
                 int n;
                 sqlite3 db = p.db;
                 Debug.Assert(db != null);
-                n = vdbeapi.sqlite3_column_count(pStmt);
+                n = pStmt.getColumnCount();
                 if (N < n && N >= 0)
                 {
                     N += useType * n;
