@@ -23,8 +23,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
 
 
 
@@ -57,7 +55,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Number of entries in apMem[] 
             ///</summary>
-            public u16 flags;
+            public UnpackedRecordFlags flags;
             ///
             ///<summary>
             ///Boolean settings.  UNPACKED_... below 
@@ -67,50 +65,53 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Used by UNPACKED_PREFIX_SEARCH 
             ///</summary>
-            public Mem[] aMem;
+            public Community.CsharpSqlite.Mem[] aMem;
             ///
             ///<summary>
             ///Values 
             ///</summary>
         };
 
+
+        [Flags]
+        public enum UnpackedRecordFlags:ushort { 
         ///
         ///<summary>
         ///Allowed values of UnpackedRecord.flags
         ///
         ///</summary>
-        //#define UNPACKED_NEED_FREE     0x0001  /* Memory is from malloc_cs.sqlite3Malloc() */
-        //#define UNPACKED_NEED_DESTROY  0x0002  /* apMem[]s should all be destroyed */
-        //#define UNPACKED_IGNORE_ROWID  0x0004  /* Ignore trailing rowid on key1 */
-        //#define UNPACKED_INCRKEY       0x0008  /* Make this key an epsilon larger */
-        //#define UNPACKED_PREFIX_MATCH  0x0010  /* A prefix match is considered OK */
-        //#define UNPACKED_PREFIX_SEARCH 0x0020  /* A prefix match is considered OK */
-        private const int UNPACKED_NEED_FREE = 0x0001;
+        //#define UnpackedRecordFlags.UNPACKED_NEED_FREE     0x0001  /* Memory is from malloc_cs.sqlite3Malloc() */
+        //#define UnpackedRecordFlags.UNPACKED_NEED_DESTROY  0x0002  /* apMem[]s should all be destroyed */
+        //#define UnpackedRecordFlags.UNPACKED_IGNORE_ROWID  0x0004  /* Ignore trailing rowid on key1 */
+        //#define UnpackedRecordFlags.UNPACKED_INCRKEY       0x0008  /* Make this key an epsilon larger */
+        //#define UnpackedRecordFlags.UNPACKED_PREFIX_MATCH  0x0010  /* A prefix match is considered OK */
+        //#define UnpackedRecordFlags.UNPACKED_PREFIX_SEARCH 0x0020  /* A prefix match is considered OK */
+        UNPACKED_NEED_FREE = 0x0001,
         ///
         ///<summary>
         ///Memory is from malloc_cs.sqlite3Malloc() 
         ///</summary>
-        private const int UNPACKED_NEED_DESTROY = 0x0002;
+        UNPACKED_NEED_DESTROY = 0x0002,
         ///
         ///<summary>
         ///apMem[]s should all be destroyed 
         ///</summary>
-        private const int UNPACKED_IGNORE_ROWID = 0x0004;
+        UNPACKED_IGNORE_ROWID = 0x0004,
         ///
         ///<summary>
         ///Ignore trailing rowid on key1 
         ///</summary>
-        private const int UNPACKED_INCRKEY = 0x0008;
+        UNPACKED_INCRKEY = 0x0008,
         ///
         ///<summary>
         ///Make this key an epsilon larger 
         ///</summary>
-        private const int UNPACKED_PREFIX_MATCH = 0x0010;
+        UNPACKED_PREFIX_MATCH = 0x0010,
         ///
         ///<summary>
         ///A prefix match is considered OK 
         ///</summary>
-        private const int UNPACKED_PREFIX_SEARCH = 0x0020;
+        UNPACKED_PREFIX_SEARCH = 0x0020
 
 
 

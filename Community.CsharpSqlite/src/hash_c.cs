@@ -42,7 +42,7 @@ namespace Community.CsharpSqlite {
 		/// to the empty state.
 		///
 		///</summary>
-		static void sqlite3HashClear(Hash pH) {
+		public static void sqlite3HashClear(Hash pH) {
 			HashElem elem;
 			///
 			///<summary>
@@ -65,7 +65,7 @@ namespace Community.CsharpSqlite {
 		/// The hashing function.
 		///
 		///</summary>
-		static u32 strHash(string z,int nKey) {
+		public static u32 strHash(string z,int nKey) {
 			int h=0;
 			Debug.Assert(nKey>=0);
 			int _z=0;
@@ -252,7 +252,7 @@ if( new_size==pH->htsize ) return false;
 		///element corresponding to "key" is removed from the hash table.
 		///
 		///</summary>
-		static T sqlite3HashInsert<T>(ref Hash pH,string pKey,int nKey,T data) where T : class {
+		public static T sqlite3HashInsert<T>(ref Hash pH,string pKey,int nKey,T data) where T : class {
 			u32 h;
 			///
 			///<summary>

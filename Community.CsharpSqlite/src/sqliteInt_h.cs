@@ -32,7 +32,7 @@ using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite
 {
-    using sqlite3_value = Sqlite3.Mem;
+    using sqlite3_value = Mem;
 
     ///<summary>
     /// SQLite supports many different ways to resolve a constraint
@@ -1726,10 +1726,10 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
             public static void sqlite3AuthRead(Parse a, Expr b, Schema c, SrcList d)
             {
             }
-            //# define sqlite3AuthCheck(a,b,c,d,e)    SQLITE_OK
+            //# define sqlite3AuthCheck(a,b,c,d,e)    Sqlite3.SQLITE_OK
             public static int sqlite3AuthCheck(Parse a, int b, string c, byte[] d, byte[] e)
             {
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
             //# define sqlite3AuthContextPush(a,b,c)
             public static void sqlite3AuthContextPush(Parse a, AuthContext b, string c)
@@ -1928,10 +1928,10 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
     {
     }
 
-    //  define sqlite3VtabSync(X,Y) SQLITE_OK
+    //  define sqlite3VtabSync(X,Y) Sqlite3.SQLITE_OK
     static int sqlite3VtabSync( sqlite3 X, ref string Y )
     {
-      return SQLITE_OK;
+      return Sqlite3.SQLITE_OK;
     }
 
     //  define sqlite3VtabRollback(X)
@@ -1958,10 +1958,10 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
     static void sqlite3VtabUnlockList( sqlite3 X )
     {
     }
-    //  define sqlite3VtabSavepoint(X, Y, Z) SQLITE_OK
+    //  define sqlite3VtabSavepoint(X, Y, Z) Sqlite3.SQLITE_OK
     static int sqlite3VtabSavepoint( sqlite3 X, int Y, int Z )
     {
-      return SQLITE_OK;
+      return Sqlite3.SQLITE_OK;
     }
     //  define sqlite3VtabInSync(db) ((db)->nVTrans>0 && (db)->aVTrans==0)
     static bool sqlite3VtabInSync( sqlite3 db )

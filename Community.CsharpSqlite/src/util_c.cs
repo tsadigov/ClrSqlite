@@ -406,7 +406,7 @@ dummy += (uint)x;
             /// encoded in UTF-8.
             ///
             /// To clear the most recent error for sqlite handle "db", sqlite3Error
-            /// should be called with err_code set to SQLITE_OK and zFormat set
+            /// should be called with err_code set to Sqlite3.SQLITE_OK and zFormat set
             /// to NULL.
             ///
             ///</summary>
@@ -2095,7 +2095,7 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 		/// binary value has been obtained from malloc and must be freed by
 		/// the calling routine.
 		///</summary>
-		public static byte[] sqlite3HexToBlob (Sqlite3.sqlite3 db, string z, int n)
+		public static byte[] sqlite3HexToBlob (sqlite3 db, string z, int n)
 		{
 			StringBuilder zBlob;
 			int i;

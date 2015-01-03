@@ -11,7 +11,7 @@ using u64=System.UInt64;
 using Pgno=System.UInt32;
 using sqlite3_int64=System.Int64;
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Sqlite3.Mem;
+	using sqlite3_value=Mem;
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -163,7 +163,7 @@ static void sqlite3IoTrace( string X, params object[] ap ) {  }
 			///</summary>
 			#if SQLITE_OMIT_WSD
 																																																																					rc = sqlite3_wsd_init(4096, 24);
-if( rc!=SQLITE_OK ){
+if( rc!=Sqlite3.SQLITE_OK ){
 return rc;
 }
 #endif
@@ -175,7 +175,7 @@ return rc;
 			///<param name="must be complete.  So isInit must not be set until the very end">must be complete.  So isInit must not be set until the very end</param>
 			///<param name="of this routine.">of this routine.</param>
 			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isInit!=0)
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			///
 			///<summary>
 			///Make sure the mutex subsystem is initialized.  If unable to
@@ -206,7 +206,7 @@ return rc;
 				if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit==0) {
 					rc=malloc_cs.sqlite3MallocInit();
 				}
-				if(rc==SQLITE_OK) {
+				if(rc==Sqlite3.SQLITE_OK) {
 					Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit=1;
 					if(Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex==null) {
 						Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex=sqlite3MutexAlloc(SQLITE_MUTEX_RECURSIVE);
@@ -215,18 +215,18 @@ return rc;
 						}
 					}
 				}
-				if(rc==SQLITE_OK) {
+				if(rc==Sqlite3.SQLITE_OK) {
 					Sqlite3.sqliteinth.sqlite3GlobalConfig.nRefInitMutex++;
 				}
 			}
 			//sqlite3_mutex_leave( pMaster );
 			///
 			///<summary>
-			///If rc is not SQLITE_OK at this point, then either the malloc
+			///If rc is not Sqlite3.SQLITE_OK at this point, then either the malloc
 			///subsystem could not be initialized or the system failed to allocate
 			///the pInitMutex mutex. Return an error in either case.  
 			///</summary>
-			if(rc!=SQLITE_OK) {
+			if(rc!=Sqlite3.SQLITE_OK) {
 				return rc;
 			}
 			///
@@ -260,11 +260,11 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isPCacheInit==0) {
 						rc=PCacheMethods.sqlite3PcacheInitialize();
 					}
-					if(rc==SQLITE_OK) {
+					if(rc==Sqlite3.SQLITE_OK) {
 						Sqlite3.sqliteinth.sqlite3GlobalConfig.isPCacheInit=1;
 						rc=sqlite3_os_init();
 					}
-					if(rc==SQLITE_OK) {
+					if(rc==Sqlite3.SQLITE_OK) {
 						sqlite3PCacheBufferSetup(Sqlite3.sqliteinth.sqlite3GlobalConfig.pPage,Sqlite3.sqliteinth.sqlite3GlobalConfig.szPage,Sqlite3.sqliteinth.sqlite3GlobalConfig.nPage);
 						Sqlite3.sqliteinth.sqlite3GlobalConfig.isInit=1;
 					}
@@ -299,7 +299,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 #if !NDEBUG
 #if !SQLITE_OMIT_FLOATING_POINT
       /* This section of code's only "output" is via Debug.Assert() statements. */
-      if ( rc == SQLITE_OK )
+      if ( rc == Sqlite3.SQLITE_OK )
       {
         //u64 x = ( ( (u64)1 ) << 63 ) - 1;
         //double y;
@@ -341,7 +341,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 				sqlite3MutexEnd();
 				Sqlite3.sqliteinth.sqlite3GlobalConfig.isMutexInit=0;
 			}
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		
         
@@ -356,9 +356,9 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 ///
 ///</summary>
     // Overloads for ap assignments
-        static int sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
+        public static int sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
     {      //  va_list ap;
-      int rc = SQLITE_OK;
+      int rc = Sqlite3.SQLITE_OK;
       switch ( op )
       {
           case SqliteConfig.PCACHE:
@@ -371,9 +371,9 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
       return rc;
     }
 
-        static int sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
+        public static int sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
     {      //  va_list ap;
-      int rc = SQLITE_OK;
+      int rc = Sqlite3.SQLITE_OK;
       switch ( op )
       {
           case SqliteConfig.GETPCACHE:
@@ -389,9 +389,9 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
       return rc;
     }
 
-        static int sqlite3_config(SqliteConfig op, sqlite3_mem_methods ap)
+        public static int sqlite3_config(SqliteConfig op, sqlite3_mem_methods ap)
     {      //  va_list ap;
-      int rc = SQLITE_OK;
+      int rc = Sqlite3.SQLITE_OK;
       switch ( op )
       {
           case SqliteConfig.MALLOC:
@@ -404,9 +404,9 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
       return rc;
     }
 
-        static int sqlite3_config(SqliteConfig op, ref sqlite3_mem_methods ap)
+        public static int sqlite3_config(SqliteConfig op, ref sqlite3_mem_methods ap)
     {      //  va_list ap;
-      int rc = SQLITE_OK;
+      int rc = Sqlite3.SQLITE_OK;
       switch ( op )
       {
           case SqliteConfig.GETMALLOC:
@@ -424,7 +424,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 																																														    static int sqlite3_config( int op, sqlite3_mutex_methods ap )
     {
       //  va_list ap;
-      int rc = SQLITE_OK;
+      int rc = Sqlite3.SQLITE_OK;
       switch ( op )
       {
         case SQLITE_CONFIG_MUTEX:
@@ -440,7 +440,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
     static int sqlite3_config( int op, ref sqlite3_mutex_methods ap )
     {
       //  va_list ap;
-      int rc = SQLITE_OK;
+      int rc = Sqlite3.SQLITE_OK;
       switch ( op )
       {
         case SQLITE_CONFIG_GETMUTEX:
@@ -453,10 +453,10 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
       return rc;
     }
 #endif
-        static int sqlite3_config(SqliteConfig op, params object[] ap)
+        public static int sqlite3_config(SqliteConfig op, params object[] ap)
         {
 			//  va_list ap;
-			int rc=SQLITE_OK;
+			int rc=Sqlite3.SQLITE_OK;
 			///
 			///<summary>
 			///sqlite3_config() shall return SQLITE_MISUSE if it is invoked while
@@ -642,7 +642,7 @@ break;
 					break;
 				}
 				default: {
-					rc=SQLITE_ERROR;
+					rc=Sqlite3.SQLITE_ERROR;
 					break;
 				}
 				}
@@ -652,7 +652,7 @@ break;
 		}
 		///<summary>
 		/// Set up the lookaside buffers for a database connection.
-		/// Return SQLITE_OK on success.
+		/// Return Sqlite3.SQLITE_OK on success.
 		/// If lookaside is already active, return SQLITE_BUSY.
 		///
 		/// The sz parameter is the number of bytes in each lookaside slot.
@@ -721,7 +721,7 @@ break;
 			//  db.lookaside.bEnabled = 0;
 			//  db.lookaside.bMalloced = 0;
 			//}
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		///<summary>
 		/// Return the mutex associated with a database connection.
@@ -781,7 +781,7 @@ break;
 						new _aFlagOp(SQLITE_DBCONFIG_ENABLE_TRIGGER,SQLITE_EnableTrigger),
 					};
 					uint i;
-					rc=SQLITE_ERROR;
+					rc=Sqlite3.SQLITE_ERROR;
 					///
 					///<summary>
 					///</summary>
@@ -804,7 +804,7 @@ break;
 							if(pRes!=0) {
 								pRes=(db.flags&aFlagOp[i].mask)!=0?1:0;
 							}
-							rc=SQLITE_OK;
+							rc=Sqlite3.SQLITE_OK;
 							break;
 						}
 					}
@@ -935,12 +935,12 @@ break;
 			///</summary>
 			int j;
 			if(db==null) {
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 			if(!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 			}
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			///
 			///<summary>
 			///Force xDestroy calls on all virtual tables 
@@ -963,7 +963,7 @@ break;
 			///</summary>
 			if(db.pVdbe!=null) {
 				utilc.sqlite3Error(db,SQLITE_BUSY,"unable to close due to unfinalised statements");
-				sqlite3_mutex_leave(db.mutex);
+				db.mutex.sqlite3_mutex_leave();
 				return SQLITE_BUSY;
 			}
 			Debug.Assert(utilc.sqlite3SafetyCheckSickOrOk(db));
@@ -971,7 +971,7 @@ break;
 				Btree pBt=db.aDb[j].pBt;
 				if(pBt!=null&&pBt.sqlite3BtreeIsInBackup()) {
 					utilc.sqlite3Error(db,SQLITE_BUSY,"unable to close due to unfinished backup operation");
-					sqlite3_mutex_leave(db.mutex);
+					db.mutex.sqlite3_mutex_leave();
 					return SQLITE_BUSY;
 				}
 			}
@@ -1038,7 +1038,7 @@ break;
 			}
 			sqlite3HashClear(db.aModule);
 			#endif
-			utilc.sqlite3Error(db,SQLITE_OK,0);
+			utilc.sqlite3Error(db,Sqlite3.SQLITE_OK,0);
 			///
 			///<summary>
 			///Deallocates any cached error strings. 
@@ -1060,7 +1060,7 @@ break;
 			///
 			///</summary>
 			db.sqlite3DbFree(ref db.aDb[1].pSchema);
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			db.magic=SQLITE_MAGIC_CLOSED;
 			sqlite3_mutex_free(db.mutex);
 			Debug.Assert(db.lookaside.nOut==0);
@@ -1073,7 +1073,7 @@ break;
 			//  malloc_cs.sqlite3_free( ref db.lookaside.pStart );
 			//}
 			//malloc_cs.sqlite3_free( ref db );
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		///<summary>
 		/// Rollback all database files.
@@ -1082,7 +1082,7 @@ break;
 		static void sqlite3RollbackAll(sqlite3 db) {
 			int i;
 			int inTrans=0;
-			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
+			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			sqlite3BeginBenignMalloc();
 			for(i=0;i<db.nDb;i++) {
 				if(db.aDb[i].pBt!=null) {
@@ -1121,12 +1121,12 @@ break;
 			string[] aMsg=new string[] {
 				///
 				///<summary>
-				///SQLITE_OK          
+				///Sqlite3.SQLITE_OK          
 				///</summary>
 				"not an error",
 				///
 				///<summary>
-				///SQLITE_ERROR       
+				///Sqlite3.SQLITE_ERROR       
 				///</summary>
 				"SQL logic error or missing database",
 				///
@@ -1371,12 +1371,12 @@ return 1;
 		///
 		///</summary>
 		static int sqlite3_busy_handler(sqlite3 db,dxBusy xBusy,object pArg) {
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			db.busyHandler.xFunc=xBusy;
 			db.busyHandler.pArg=pArg;
 			db.busyHandler.nBusy=0;
-			sqlite3_mutex_leave(db.mutex);
-			return SQLITE_OK;
+			db.mutex.sqlite3_mutex_leave();
+			return Sqlite3.SQLITE_OK;
 		}
 		#if !SQLITE_OMIT_PROGRESS_CALLBACK
 		///<summary>
@@ -1386,7 +1386,7 @@ return 1;
 		///</summary>
 		static void sqlite3_progress_handler(sqlite3 db,int nOps,dxProgress xProgress,//int (xProgress)(void),
 		object pArg) {
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			if(nOps>0) {
 				db.xProgress=xProgress;
 				db.nProgressOps=nOps;
@@ -1397,7 +1397,7 @@ return 1;
 				db.nProgressOps=0;
 				db.pProgressArg=null;
 			}
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 		}
 		#endif
 		///<summary>
@@ -1412,7 +1412,7 @@ return 1;
 			else {
 				sqlite3_busy_handler(db,null,null);
 			}
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		///<summary>
 		/// Cause any pending operation to stop at its earliest opportunity.
@@ -1434,7 +1434,7 @@ return 1;
 		FuncDestructor pDestructor) {
 			FuncDef p;
 			int nName;
-			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
+			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			if(zFunctionName==null||(xFunc!=null&&(xFinal!=null||xStep!=null))||(xFunc==null&&(xFinal!=null&&xStep==null))||(xFunc==null&&(xFinal==null&&xStep!=null))||(nArg<-1||nArg>SQLITE_MAX_FUNCTION_ARG)||(255<(nName=StringExtensions.sqlite3Strlen30(zFunctionName)))) {
 				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 			}
@@ -1452,11 +1452,11 @@ enc = SqliteEncoding.UTF16NATIVE;
 int rc;
 rc = sqlite3CreateFunc(db, zFunctionName, nArg, SqliteEncoding.UTF8,
 pUserData, xFunc, xStep, xFinal, pDestructor);
-if( rc==SQLITE_OK ){
+if( rc==Sqlite3.SQLITE_OK ){
 rc = sqlite3CreateFunc(db, zFunctionName, nArg, SqliteEncoding.UTF16LE,
 pUserData, xFunc, xStep, xFinal, pDestructor);
 }
-if( rc!=SQLITE_OK ){
+if( rc!=Sqlite3.SQLITE_OK ){
 return rc;
 }
 enc = SqliteEncoding.UTF16BE;
@@ -1508,7 +1508,7 @@ enc = SqliteEncoding.UTF16BE;
 			p.xFinalize=xFinal;
 			p.pUserData=pUserData;
 			p.nArg=(i16)nArg;
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		///<summary>
 		/// Create new user functions.
@@ -1525,9 +1525,9 @@ enc = SqliteEncoding.UTF16BE;
 		dxFinal xFinal,//)(sqlite3_context)
 		dxFDestroy xDestroy//)(void )
 		) {
-			int rc=SQLITE_ERROR;
+			int rc=Sqlite3.SQLITE_ERROR;
 			FuncDestructor pArg=null;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			if(xDestroy!=null) {
 				pArg=new FuncDestructor();
 				//(FuncDestructor )sqlite3DbMallocZero(db, sizeof(FuncDestructor));
@@ -1540,13 +1540,13 @@ enc = SqliteEncoding.UTF16BE;
 			}
 			rc=sqlite3CreateFunc(db,zFunc,nArg,enc,p,xFunc,xStep,xFinal,pArg);
 			if(pArg!=null&&pArg.nRef==0) {
-				Debug.Assert(rc!=SQLITE_OK);
+				Debug.Assert(rc!=Sqlite3.SQLITE_OK);
 				//xDestroy(p);
 				db.sqlite3DbFree(ref pArg);
 			}
 			//_out:
 			rc=malloc_cs.sqlite3ApiExit(db,rc);
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return rc;
 		}
 		#if !SQLITE_OMIT_UTF16
@@ -1562,13 +1562,13 @@ dxFinal xFinal  //)(sqlite3_context)
 ){
 int rc;
 string zFunc8;
-sqlite3_mutex_enter(db.mutex);
+db.mutex.sqlite3_mutex_enter();
 Debug.Assert( 0==db.mallocFailed );
 zFunc8 = sqlite3Utf16to8(db, zFunctionName, -1, SqliteEncoding.UTF16NATIVE);
 rc = sqlite3CreateFunc(db, zFunc8, nArg, eTextRep, p, xFunc, xStep, xFinal, null);
 sqlite3DbFree(db,ref zFunc8);
 rc = malloc_cs.sqlite3ApiExit(db, rc);
-sqlite3_mutex_leave(db.mutex);
+db.mutex.sqlite3_mutex_leave();
 return rc;
 }
 #endif
@@ -1587,12 +1587,12 @@ return rc;
 		static int sqlite3_overload_function(sqlite3 db,string zName,int nArg) {
 			int nName=StringExtensions.sqlite3Strlen30(zName);
 			int rc;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			if(sqlite3FindFunction(db,zName,nName,nArg,SqliteEncoding.UTF8,0)==null) {
                 sqlite3CreateFunc(db, zName, nArg, SqliteEncoding.UTF8, 0, (dxFunc)vdbeapi.sqlite3InvalidFunction, null, null, null);
 			}
-			rc=malloc_cs.sqlite3ApiExit(db,SQLITE_OK);
-			sqlite3_mutex_leave(db.mutex);
+			rc=malloc_cs.sqlite3ApiExit(db,Sqlite3.SQLITE_OK);
+			db.mutex.sqlite3_mutex_leave();
 			return rc;
 		}
 		#if !SQLITE_OMIT_TRACE
@@ -1607,11 +1607,11 @@ return rc;
 		static object sqlite3_trace(sqlite3 db,dxTrace xTrace,object pArg) {
 			// (*xTrace)(void*,const char), object pArg){
 			object pOld;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			pOld=db.pTraceArg;
 			db.xTrace=xTrace;
 			db.pTraceArg=pArg;
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return pOld;
 		}
 		///<summary>
@@ -1626,11 +1626,11 @@ return rc;
 		static object sqlite3_profile(sqlite3 db,dxProfile xProfile,//void (*xProfile)(void*,const char*,sqlite_u3264),
 		object pArg) {
 			object pOld;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			pOld=db.pProfileArg;
 			db.xProfile=xProfile;
 			db.pProfileArg=pArg;
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return pOld;
 		}
 		#endif
@@ -1652,11 +1652,11 @@ return rc;
 		///</summary>
 		) {
 			object pOld;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			pOld=db.pCommitArg;
 			db.xCommitCallback=xCallback;
 			db.pCommitArg=pArg;
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return pOld;
 		}
 		///<summary>
@@ -1675,11 +1675,11 @@ return rc;
 		///</summary>
 		) {
 			object pRet;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			pRet=db.pUpdateArg;
 			db.xUpdateCallback=xCallback;
 			db.pUpdateArg=pArg;
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return pRet;
 		}
 		///<summary>
@@ -1698,11 +1698,11 @@ return rc;
 		///</summary>
 		) {
 			object pRet;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			pRet=db.pRollbackArg;
 			db.xRollbackCallback=xCallback;
 			db.pRollbackArg=pArg;
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return pRet;
 		}
 		#if !SQLITE_OMIT_WAL
@@ -1723,7 +1723,7 @@ sqlite3BeginBenignMalloc();
 sqlite3_wal_checkpoint(db, zDb);
 sqlite3EndBenignMalloc();
 }
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 #endif
 		///<summary>
@@ -1748,7 +1748,7 @@ sqlite3_wal_hook(db, sqlite3WalDefaultHook, SQLITE_INT_TO_PTR(nFrame));
 sqlite3_wal_hook(db, 0, 0);
 }
 #endif
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		///<summary>
 		/// Register a callback to be invoked each time a transaction is written
@@ -1767,11 +1767,11 @@ sqlite3_wal_hook(db, 0, 0);
 		) {
 			#if !SQLITE_OMIT_WAL
 																																																																					void *pRet;
-sqlite3_mutex_enter(db.mutex);
+db.mutex.sqlite3_mutex_enter();
 pRet = db.pWalArg;
 db.xWalCallback = xCallback;
 db.pWalArg = pArg;
-sqlite3_mutex_leave(db.mutex);
+db.mutex.sqlite3_mutex_leave();
 return pRet;
 #else
 			return null;
@@ -1805,7 +1805,7 @@ return pRet;
 			#if SQLITE_OMIT_WAL
 			pnLog=0;
 			pnCkpt=0;
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 			#else
 																																																																					  int rc;                         /* Return code */
   int iDb = SQLITE_MAX_ATTACHED;  /* sqlite3.aDb[] index of db to checkpoint */
@@ -1826,8 +1826,8 @@ return pRet;
     iDb = build.sqlite3FindDbName(db, zDb);
   }
   if( iDb<0 ){
-    rc = SQLITE_ERROR;
-    utilc.sqlite3Error(db, SQLITE_ERROR, "unknown database: %s", zDb);
+    rc = Sqlite3.SQLITE_ERROR;
+    utilc.sqlite3Error(db, Sqlite3.SQLITE_ERROR, "unknown database: %s", zDb);
   }else{
     rc = sqlite3Checkpoint(db, iDb, eMode, pnLog, pnCkpt);
     utilc.sqlite3Error(db, rc, 0);
@@ -1855,7 +1855,7 @@ return pRet;
 /// If a transaction is open on the database being checkpointed, this
 /// function returns SQLITE_LOCKED and a checkpoint is not attempted. If
 /// an error occurs while running the checkpoint, an SQLite error code is
-/// returned (i.e. SQLITE_IOERR). Otherwise, SQLITE_OK.
+/// returned (i.e. SQLITE_IOERR). Otherwise, Sqlite3.SQLITE_OK.
 ///
 /// The mutex on database handle db should be held by the caller. The mutex
 /// associated with the specific b-tree being checkpointed is taken by
@@ -1868,7 +1868,7 @@ return pRet;
 /// Parameter eMode is one of SQLITE_CHECKPOINT_PASSIVE, FULL or RESTART.
 ///</summary>
 int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
-  int rc = SQLITE_OK;             /* Return code */
+  int rc = Sqlite3.SQLITE_OK;             /* Return code */
   int i;                          /* Used to iterate through attached dbs */
   int bBusy = 0;                  /* True if SQLITE_BUSY has been encountered */
 
@@ -1876,19 +1876,19 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
   Debug.Assert( !pnLog || *pnLog==-1 );
   Debug.Assert( !pnCkpt || *pnCkpt==-1 );
 
-  for(i=0; i<db->nDb && rc==SQLITE_OK; i++){
+  for(i=0; i<db->nDb && rc==Sqlite3.SQLITE_OK; i++){
     if( i==iDb || iDb==SQLITE_MAX_ATTACHED ){
       rc = sqlite3BtreeCheckpoint(db->aDb[i].pBt, eMode, pnLog, pnCkpt);
       pnLog = 0;
       pnCkpt = 0;
       if( rc==SQLITE_BUSY ){
         bBusy = 1;
-        rc = SQLITE_OK;
+        rc = Sqlite3.SQLITE_OK;
       }
     }
   }
 
-  return (rc==SQLITE_OK && bBusy) ? SQLITE_BUSY : rc;
+  return (rc==Sqlite3.SQLITE_OK && bBusy) ? SQLITE_BUSY : rc;
 }
 #endif
 		///<summary>
@@ -1945,7 +1945,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 			if(!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return sqlite3ErrStr(Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT());
 			}
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			//if ( db.mallocFailed != 0 )
 			//{
 			//  z = sqlite3ErrStr( SQLITE_NOMEM );
@@ -1958,7 +1958,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 					z=sqlite3ErrStr(db.errCode);
 				}
 			}
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return z;
 		}
 		#if !SQLITE_OMIT_UTF16
@@ -2050,7 +2050,7 @@ return z;
 			CollSeq pColl;
 			SqliteEncoding enc2;
 			int nName=StringExtensions.sqlite3Strlen30(zName);
-			Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
+			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			///
 			///<summary>
 			///If SqliteEncoding.UTF16 is specified as the encoding type, transform this
@@ -2112,8 +2112,8 @@ return z;
 			pColl.xDel=xDel;
 			pColl.enc=(enc2|(enc&SqliteEncoding.UTF16_ALIGNED));
 			pColl.type=collType;
-			utilc.sqlite3Error(db,SQLITE_OK,0);
-			return SQLITE_OK;
+			utilc.sqlite3Error(db,Sqlite3.SQLITE_OK,0);
+			return Sqlite3.SQLITE_OK;
 		}
 		///
 		///<summary>
@@ -2251,7 +2251,7 @@ return z;
 		///<param name="pFlags may be updated before returning if the URI filename contains ">pFlags may be updated before returning if the URI filename contains </param>
 		///<param name=""cache=xxx" or "mode=xxx" query parameters.">"cache=xxx" or "mode=xxx" query parameters.</param>
 		///<param name=""></param>
-		///<param name="If successful, SQLITE_OK is returned. In this case *ppVfs is set to point to">If successful, SQLITE_OK is returned. In this case *ppVfs is set to point to</param>
+		///<param name="If successful, Sqlite3.SQLITE_OK is returned. In this case *ppVfs is set to point to">If successful, Sqlite3.SQLITE_OK is returned. In this case *ppVfs is set to point to</param>
 		///<param name="the VFS that should be used to open the database file. *pzFile is set to">the VFS that should be used to open the database file. *pzFile is set to</param>
 		///<param name="point to a buffer containing the name of the file to open. It is the ">point to a buffer containing the name of the file to open. It is the </param>
 		///<param name="responsibility of the caller to eventually call malloc_cs.sqlite3_free() to release">responsibility of the caller to eventually call malloc_cs.sqlite3_free() to release</param>
@@ -2283,10 +2283,10 @@ return z;
 		///</summary>
 		ref string pzErrMsg///
 		///<summary>
-		///OUT: Error message (if rc!=SQLITE_OK) 
+		///OUT: Error message (if rc!=Sqlite3.SQLITE_OK) 
 		///</summary>
 		) {
-			int rc=SQLITE_OK;
+			int rc=Sqlite3.SQLITE_OK;
 			int flags=pFlags;
 			string zVfs=zDefaultVfs;
 			StringBuilder zFile=null;
@@ -2334,7 +2334,7 @@ return z;
 					if(iIn!=7&&(iIn!=16||String.Compare("localhost",zUri.Substring(7,9),StringComparison.InvariantCultureIgnoreCase)!=0))//_Custom.memcmp("localhost", &zUri[7], 9)) )
 					 {
 						pzErrMsg=io.sqlite3_mprintf("invalid uri authority: %.*s",iIn-7,zUri.Substring(7));
-						rc=SQLITE_ERROR;
+						rc=Sqlite3.SQLITE_ERROR;
 						goto parse_uri_out;
 					}
 				}
@@ -2467,7 +2467,7 @@ return z;
 							}
 							if(mode==0) {
 								pzErrMsg=io.sqlite3_mprintf("no such %s mode: %s",zModeType,zVal);
-								rc=SQLITE_ERROR;
+								rc=Sqlite3.SQLITE_ERROR;
 								goto parse_uri_out;
 							}
 							if(mode>limit) {
@@ -2494,10 +2494,10 @@ return z;
 			ppVfs=os.sqlite3_vfs_find(zVfs);
 			if(ppVfs==null) {
 				pzErrMsg=io.sqlite3_mprintf("no such vfs: %s",zVfs);
-				rc=SQLITE_ERROR;
+				rc=Sqlite3.SQLITE_ERROR;
 			}
 			parse_uri_out:
-			if(rc!=SQLITE_OK) {
+			if(rc!=Sqlite3.SQLITE_OK) {
 				//malloc_cs.sqlite3_free(zFile);
 				zFile=null;
 			}
@@ -2641,7 +2641,7 @@ return z;
 					goto opendb_out;
 				}
 			}
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			db.errMask=0xff;
 			db.nDb=2;
 			db.magic=SQLITE_MAGIC_BUSY;
@@ -2699,7 +2699,7 @@ return z;
 			///</summary>
 			db.openFlags=flags;
 			rc=sqlite3ParseUri(zVfs,zFilename,ref flags,ref db.pVfs,ref zOpen,ref zErrMsg);
-			if(rc!=SQLITE_OK) {
+			if(rc!=Sqlite3.SQLITE_OK) {
 				//if( rc==SQLITE_NOMEM ) db.mallocFailed = 1;
 				utilc.sqlite3Error(db,rc,zErrMsg.Length>0?"%s":"",zErrMsg);
 				//malloc_cs.sqlite3_free(zErrMsg);
@@ -2710,7 +2710,7 @@ return z;
 			///Open the backend database driver 
 			///</summary>
 			rc=Btree.Open(db.pVfs,zOpen,db,ref db.aDb[0].pBt,0,flags|SQLITE_OPEN_MAIN_DB);
-			if(rc!=SQLITE_OK) {
+			if(rc!=Sqlite3.SQLITE_OK) {
 				if(rc==SQLITE_IOERR_NOMEM) {
 					rc=SQLITE_NOMEM;
 				}
@@ -2741,7 +2741,7 @@ return z;
 			///<param name="database schema yet. This is delayed until the first time the database">database schema yet. This is delayed until the first time the database</param>
 			///<param name="is accessed.">is accessed.</param>
 			///<param name=""></param>
-			utilc.sqlite3Error(db,SQLITE_OK,0);
+			utilc.sqlite3Error(db,Sqlite3.SQLITE_OK,0);
 			func.sqlite3RegisterBuiltinFunctions(db);
 			///
 			///<summary>
@@ -2751,7 +2751,7 @@ return z;
 			///<param name=""></param>
 			sqlite3AutoLoadExtensions(db);
 			rc=sqlite3_errcode(db);
-			if(rc!=SQLITE_OK) {
+			if(rc!=Sqlite3.SQLITE_OK) {
 				goto opendb_out;
 			}
 			#if SQLITE_ENABLE_FTS1
@@ -2761,24 +2761,24 @@ rc = sqlite3Fts1Init(db);
 }
 #endif
 			#if SQLITE_ENABLE_FTS2
-																																																																					if( 0==db.mallocFailed && rc==SQLITE_OK ){
+																																																																					if( 0==db.mallocFailed && rc==Sqlite3.SQLITE_OK ){
 extern int sqlite3Fts2Init(sqlite3);
 rc = sqlite3Fts2Init(db);
 }
 #endif
 			#if SQLITE_ENABLE_FTS3
-																																																																					if( 0==db.mallocFailed && rc==SQLITE_OK ){
+																																																																					if( 0==db.mallocFailed && rc==Sqlite3.SQLITE_OK ){
 rc = sqlite3Fts3Init(db);
 }
 #endif
 			#if SQLITE_ENABLE_ICU
-																																																																					if( 0==db.mallocFailed && rc==SQLITE_OK ){
+																																																																					if( 0==db.mallocFailed && rc==Sqlite3.SQLITE_OK ){
 extern int sqlite3IcuInit(sqlite3);
 rc = sqlite3IcuInit(db);
 }
 #endif
 			#if SQLITE_ENABLE_RTREE
-																																																																					if( 0==db.mallocFailed && rc==SQLITE_OK){
+																																																																					if( 0==db.mallocFailed && rc==Sqlite3.SQLITE_OK){
 rc = sqlite3RtreeInit(db);
 }
 #endif
@@ -2805,7 +2805,7 @@ SQLITE_DEFAULT_LOCKING_MODE);
 			//malloc_cs.sqlite3_free(zOpen);
 			if(db!=null) {
 				Debug.Assert(db.mutex!=null||isThreadsafe==0||!Sqlite3.sqliteinth.sqlite3GlobalConfig.bFullMutex);
-				sqlite3_mutex_leave(db.mutex);
+				db.mutex.sqlite3_mutex_leave();
 			}
 			rc=sqlite3_errcode(db);
 			if(rc==SQLITE_NOMEM) {
@@ -2813,7 +2813,7 @@ SQLITE_DEFAULT_LOCKING_MODE);
 				db=null;
 			}
 			else
-				if(rc!=SQLITE_OK) {
+				if(rc!=Sqlite3.SQLITE_OK) {
 					db.magic=SQLITE_MAGIC_SICK;
 				}
 			ppDb=db;
@@ -2873,7 +2873,7 @@ if( zFilename8 ){
 rc = openDatabase(zFilename8, ppDb,
 SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
 Debug.Assert(*ppDb || rc==SQLITE_NOMEM );
-if( rc==SQLITE_OK && !DbHasProperty(*ppDb, 0, DB_SchemaLoaded) ){
+if( rc==Sqlite3.SQLITE_OK && !DbHasProperty(*ppDb, 0, DB_SchemaLoaded) ){
 ENC(*ppDb) = SqliteEncoding.UTF16NATIVE;
 }
 }else{
@@ -2890,11 +2890,11 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 		///</summary>
 		static int sqlite3_create_collation(sqlite3 db,string zName,SqliteEncoding enc,object pCtx,dxCompare xCompare) {
 			int rc;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			//Debug.Assert( 0 == db.mallocFailed );
 			rc=createCollation(db,zName,enc,CollationType.USER,pCtx,xCompare,null);
 			rc=malloc_cs.sqlite3ApiExit(db,rc);
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return rc;
 		}
 		///
@@ -2906,11 +2906,11 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 		dxDelCollSeq xDel//void(*xDel)(void)
 		) {
 			int rc;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			//Debug.Assert( 0 == db.mallocFailed );
 			rc=createCollation(db,zName,enc,CollationType.USER,pCtx,xCompare,xDel);
 			rc=malloc_cs.sqlite3ApiExit(db,rc);
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return rc;
 		}
 		#if !SQLITE_OMIT_UTF16
@@ -2924,9 +2924,9 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 //  void* pCtx,
 //  int(*xCompare)(void*,int,const void*,int,const void)
 //){
-//  int rc = SQLITE_OK;
+//  int rc = Sqlite3.SQLITE_OK;
 //  string zName8;
-//  sqlite3_mutex_enter(db.mutex);
+//  db.mutex.sqlite3_mutex_enter();
 //  Debug.Assert( 0==db.mallocFailed );
 //  zName8 = sqlite3Utf16to8(db, zName, -1, SqliteEncoding.UTF16NATIVE);
 //  if( zName8 ){
@@ -2934,7 +2934,7 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 //    sqlite3DbFree(db,ref zName8);
 //  }
 //  rc = malloc_cs.sqlite3ApiExit(db, rc);
-//  sqlite3_mutex_leave(db.mutex);
+//  db.mutex.sqlite3_mutex_leave();
 //  return rc;
 //}
 #endif
@@ -2944,12 +2944,12 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 		///db. Replace any previously installed collation sequence factory.
 		///</summary>
 		static int sqlite3_collation_needed(sqlite3 db,object pCollNeededArg,dxCollNeeded xCollNeeded) {
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			db.xCollNeeded=xCollNeeded;
 			db.xCollNeeded16=null;
 			db.pCollNeededArg=pCollNeededArg;
-			sqlite3_mutex_leave(db.mutex);
-			return SQLITE_OK;
+			db.mutex.sqlite3_mutex_leave();
+			return Sqlite3.SQLITE_OK;
 		}
 		#if !SQLITE_OMIT_UTF16
 																																														/*
@@ -2961,12 +2961,12 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 //  void pCollNeededArg,
 //  void(*xCollNeeded16)(void*,sqlite3*,int eTextRep,const void)
 //){
-//  sqlite3_mutex_enter(db.mutex);
+//  db.mutex.sqlite3_mutex_enter();
 //  db.xCollNeeded = 0;
 //  db.xCollNeeded16 = xCollNeeded16;
 //  db.pCollNeededArg = pCollNeededArg;
-//  sqlite3_mutex_leave(db.mutex);
-//  return SQLITE_OK;
+//  db.mutex.sqlite3_mutex_leave();
+//  return Sqlite3.SQLITE_OK;
 //}
 #endif
 		#if !SQLITE_OMIT_DEPRECATED
@@ -2976,7 +2976,7 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 */
 static int sqlite3_global_recover()
 {
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 #endif
 		///
@@ -3066,7 +3066,7 @@ void sqlite3_thread_cleanup()
       sqlite3_mutex_enter( db.mutex );
       sqlite3BtreeEnterAll( db );
       rc = sqlite3Init( db, ref zErrMsg );
-      if ( SQLITE_OK != rc )
+      if ( Sqlite3.SQLITE_OK != rc )
       {
         goto error_out;
       }
@@ -3151,12 +3151,12 @@ error_out:
       //if ( pAutoinc )
       pAutoinc = autoinc;
 
-      if ( SQLITE_OK == rc && null == pTab )
+      if ( Sqlite3.SQLITE_OK == rc && null == pTab )
       {
         sqlite3DbFree( db, ref zErrMsg );
         zErrMsg = io.sqlite3MPrintf( db, "no such table column: %s.%s", zTableName,
         zColumnName );
-        rc = SQLITE_ERROR;
+        rc = Sqlite3.SQLITE_ERROR;
       }
       utilc.sqlite3Error( db, rc, ( !String.IsNullOrEmpty( zErrMsg ) ? "%s" : null ), zErrMsg );
       sqlite3DbFree( db, ref zErrMsg );
@@ -3190,10 +3190,10 @@ error_out:
 		///
 		///</summary>
 		static int sqlite3_extended_result_codes(sqlite3 db,bool onoff) {
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			db.errMask=(int)(onoff?0xffffffff:0xff);
-			sqlite3_mutex_leave(db.mutex);
-			return SQLITE_OK;
+			db.mutex.sqlite3_mutex_leave();
+			return Sqlite3.SQLITE_OK;
 		}
 		///
 		///<summary>
@@ -3201,9 +3201,9 @@ error_out:
 		///
 		///</summary>
 		static int sqlite3_file_control(sqlite3 db,string zDbName,int op,ref sqlite3_int64 pArg) {
-			int rc=SQLITE_ERROR;
+			int rc=Sqlite3.SQLITE_ERROR;
 			int iDb;
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			if(zDbName==null) {
 				iDb=0;
 			}
@@ -3229,7 +3229,7 @@ error_out:
 #else
 						pArg=(long)fd.fs.Handle;
 						#endif
-						rc=SQLITE_OK;
+						rc=Sqlite3.SQLITE_OK;
 					}
 					else
 						if(fd.pMethods!=null) {
@@ -3241,7 +3241,7 @@ error_out:
 					sqlite3BtreeLeave(pBtree);
 				}
 			}
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return rc;
 		}
 		///
@@ -3415,9 +3415,9 @@ error_out:
 				case SQLITE_TESTCTRL_RESERVE: {
 					sqlite3 db=_Custom.va_arg(ap,(sqlite3)null);
 					int x=_Custom.va_arg(ap,(Int32)0);
-					sqlite3_mutex_enter(db.mutex);
+					db.mutex.sqlite3_mutex_enter();
 					db.aDb[0].pBt.sqlite3BtreeSetPageSize(0,x,0);
-					sqlite3_mutex_leave(db.mutex);
+					db.mutex.sqlite3_mutex_leave();
 					break;
 				}
 				///

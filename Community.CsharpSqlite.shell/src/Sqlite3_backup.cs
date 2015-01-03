@@ -28,7 +28,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			for (p = _this; p != null; p = p.pNext) {
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (p.pSrc.pBt.mutex));
+				Debug.Assert (p.pSrc.pBt.mutex.sqlite3_mutex_held());
 				p.iNext = 1;
 			}
 		}

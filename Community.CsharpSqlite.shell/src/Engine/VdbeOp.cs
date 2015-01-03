@@ -6,11 +6,9 @@ using System.Text;
 namespace Community.CsharpSqlite
 {
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
-    using WhereInfo = Community.CsharpSqlite.Sqlite3.WhereInfo;
-    using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
-    using WherePlan = Community.CsharpSqlite.Sqlite3.WherePlan;
-    using sqlite3_value = Sqlite3.Mem;
-    using Mem = Community.CsharpSqlite.Sqlite3.Mem;
+    
+    using sqlite3_value = Mem;
+    
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
 
 	///<summary>
@@ -289,7 +287,7 @@ public u64 cycles;         /* Total time spend executing this instruction */
                     str = pDb.zName;
                     break;
                 case OpCode.OP_ParseSchema:
-                    str = Sqlite3.vdbeaux.displayP4(this, "", 30);
+                    str = vdbeaux.displayP4(this, "", 30);
                     break;
                 case OpCode.OP_ReadCookie:
                 case OpCode.OP_SetCookie:

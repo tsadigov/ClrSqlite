@@ -178,7 +178,7 @@ namespace Community.CsharpSqlite
 */public int findOverflowCell (int iCell)
 			{
 				int i;
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				for (i = this.nOverflow - 1; i >= 0; i--) {
 					int k;
 					_OvflCell pOvfl;
@@ -280,7 +280,7 @@ namespace Community.CsharpSqlite
 ///Number of bytes of cell payload 
 ///</summary>
 
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				if (pInfo.pCell != pCell)
 					pInfo.pCell = pCell;
 				pInfo.iCell = iCell;
@@ -622,7 +622,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert (this.pBt != null);
 				Debug.Assert (this.pBt.usableSize <= SQLITE_MAX_PAGE_SIZE);
 				Debug.Assert (this.nOverflow == 0);
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				temp = this.pBt.pPager.sqlite3PagerTempSpace ();
 				data = this.aData;
 				hdr = this.hdrOffset;
@@ -691,13 +691,13 @@ namespace Community.CsharpSqlite
 				if (cbrk - iCellFirst != this.nFree) {
 					return sqliteinth.SQLITE_CORRUPT_BKPT();
 				}
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			public///<summary>
 			/// Allocate nByte bytes of space from within the B-Tree page passed
 			/// as the first argument. Write into pIdx the index into pPage.aData[]
-			/// of the first byte of allocated space. Return either SQLITE_OK or
+			/// of the first byte of allocated space. Return either Sqlite3.SQLITE_OK or
 			/// an error code (usually SQLITE_CORRUPT).
 			///
 			/// The caller guarantees that there is sufficient space to make the
@@ -753,7 +753,7 @@ namespace Community.CsharpSqlite
 
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (this.pBt != null);
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (nByte >= 0);
 				///
 ///<summary>
@@ -836,7 +836,7 @@ namespace Community.CsharpSqlite
 										put2byte (data, pc + 2, x);
 									}
 								pIdx = pc + x;
-								return SQLITE_OK;
+								return Sqlite3.SQLITE_OK;
 							}
 						}
 					}
@@ -869,7 +869,7 @@ namespace Community.CsharpSqlite
 				put2byte (data, hdr + 5, top);
 				Debug.Assert (top + nByte <= (int)this.pBt.usableSize);
 				pIdx = top;
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			public///<summary>
@@ -899,7 +899,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (start >= this.hdrOffset + 6 + this.childPtrSize);
 				Debug.Assert ((start + size) <= (int)this.pBt.usableSize);
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (size >= 0);
 				///
 ///<summary>
@@ -988,7 +988,7 @@ namespace Community.CsharpSqlite
 					put2byte (data, hdr + 5, top);
 				}
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			public///<summary>
@@ -1012,7 +1012,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				Debug.Assert (this.hdrOffset == (this.pgno == 1 ? 100 : 0));
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				this.leaf = (u8)(flagByte >> 3);
 				Debug.Assert (PTF_LEAF == 1 << 3);
 				flagByte &= ~PTF_LEAF;
@@ -1034,22 +1034,22 @@ namespace Community.CsharpSqlite
 					else {
 						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			public///<summary>
 			/// Initialize the auxiliary information for a disk block.
 			///
-			/// Return SQLITE_OK on success.  If we see that the page does
+			/// Return Sqlite3.SQLITE_OK on success.  If we see that the page does
 			/// not contain a well-formed database page, then return
-			/// SQLITE_CORRUPT.  Note that a return of SQLITE_OK does not
+			/// SQLITE_CORRUPT.  Note that a return of Sqlite3.SQLITE_OK does not
 			/// guarantee that the page is well-formed.  It only shows that
 			/// we failed to detect any corruption.
 			///</summary>
 			int btreeInitPage ()
 			{
 				Debug.Assert (this.pBt != null);
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (this.pgno == PagerMethods.sqlite3PagerPagenumber (this.pDbPage));
 				Debug.Assert (this ==  PagerMethods.sqlite3PagerGetExtra  (this.pDbPage));
                 Debug.Assert(this.aData == this.pDbPage.sqlite3PagerGetData());
@@ -1223,7 +1223,7 @@ namespace Community.CsharpSqlite
 					this.nFree = (u16)(nFree - iCellFirst);
 					this.isInit = 1;
 				}
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			public///<summary>
@@ -1240,7 +1240,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert ( PagerMethods.sqlite3PagerGetExtra  (this.pDbPage) == this);
                 Debug.Assert(this.pDbPage.sqlite3PagerGetData() == data);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (pBt.mutex));
+				Debug.Assert (pBt.mutex.sqlite3_mutex_held());
 				if (pBt.secureDelete) {
 					Array.Clear (data, hdr, (int)(pBt.usableSize - hdr));
 					//memset(&data[hdr], 0, pBt->usableSize - hdr);
@@ -1291,9 +1291,9 @@ namespace Community.CsharpSqlite
 				BtShared pBt = this.pBt;
 				u8 isInitOrig = this.isInit;
 				Pgno pgno = this.pgno;
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				rc = this.btreeInitPage ();
-				if (rc != SQLITE_OK) {
+				if (rc != Sqlite3.SQLITE_OK) {
 					goto set_child_ptrmaps_out;
 				}
 				nCell = this.nCell;
@@ -1331,7 +1331,7 @@ namespace Community.CsharpSqlite
 ///<param name="overflow page in the list.">overflow page in the list.</param>
 */public int modifyPagePointer (Pgno iFrom, Pgno iTo, u8 eType)
 			{
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				if (eType == PTRMAP_OVERFLOW2) {
 					///
@@ -1377,7 +1377,7 @@ namespace Community.CsharpSqlite
 					}
 					this.isInit = isInitOrig;
 				}
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			//#  define assertParentIndex(x,y,z)
@@ -1445,7 +1445,7 @@ namespace Community.CsharpSqlite
 				Pgno pgnoOvfl = 0;
 				int nHeader;
 				CellInfo info = new CellInfo ();
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				///
 ///<summary>
 ///pPage is not necessarily writeable since pCell might be auxiliary
@@ -1535,7 +1535,7 @@ namespace Community.CsharpSqlite
 ///<param name="may misinterpret the uninitialised values and delete the">may misinterpret the uninitialised values and delete the</param>
 ///<param name="wrong pages from the database.">wrong pages from the database.</param>
 
-						if (pBt.autoVacuum && rc == SQLITE_OK) {
+						if (pBt.autoVacuum && rc == Sqlite3.SQLITE_OK) {
 							u8 eType = (u8)(pgnoPtrmap != 0 ? PTRMAP_OVERFLOW2 : PTRMAP_OVERFLOW1);
 							pBt.ptrmapPut (pgnoOvfl, eType, pgnoPtrmap, ref rc);
 							if (rc != 0) {
@@ -1618,7 +1618,7 @@ namespace Community.CsharpSqlite
 					}
 				}
                 BTreeMethods.releasePage(pToRelease);
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			/**
@@ -1675,7 +1675,7 @@ namespace Community.CsharpSqlite
 																																																																																								  Debug.Assert( sz == cellSize( pPage, idx ) );
 #endif
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				data = this.aData;
 				ptr = this.cellOffset + 2 * idx;
 				//ptr = &data[pPage.cellOffset + 2 * idx];
@@ -1814,7 +1814,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert (i >= 0 && i <= this.nCell + this.nOverflow);
 				Debug.Assert (this.nCell <= MX_CELL (this.pBt) && MX_CELL (this.pBt) <= 10921);
 				Debug.Assert (this.nOverflow <= Sqlite3.ArraySize (this.aOvfl));
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				///
 ///<summary>
 ///The cell should normally be sized correctly.  However, when moving a
@@ -1842,7 +1842,7 @@ namespace Community.CsharpSqlite
 				}
 				else {
 					int rc = PagerMethods.sqlite3PagerWrite (this.pDbPage);
-					if (rc != SQLITE_OK) {
+					if (rc != Sqlite3.SQLITE_OK) {
 						pRC = rc;
 						return;
 					}
@@ -1964,7 +1964,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				Debug.Assert (this.nOverflow == 0);
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (  pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (nCell >= 0 && nCell <= (int)MX_CELL (this.pBt) && (int)MX_CELL (this.pBt) <= 10921);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				///
@@ -2055,7 +2055,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				Debug.Assert (this.nOverflow == 0);
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (nCell >= 0 && nCell <= MX_CELL (this.pBt) && MX_CELL (this.pBt) <= 5460);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				///
@@ -2140,7 +2140,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				Debug.Assert (this.nOverflow == 0);
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.pBt.mutex));
+				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (nCell >= 0 && nCell <= MX_CELL (this.pBt) && MX_CELL (this.pBt) <= 5460);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				///
@@ -2216,7 +2216,7 @@ namespace Community.CsharpSqlite
 ///Page number of pNew 
 ///</summary>
 
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (pPage.pBt.mutex));
+				Debug.Assert (pPage.pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (pPage.nOverflow == 1);
 				///
@@ -2235,7 +2235,7 @@ namespace Community.CsharpSqlite
 ///<param name=""></param>
 
                 rc = BTreeMethods.allocateBtreePage(pBt, ref pNew, ref pgnoNew, 0, 0);
-				if (rc == SQLITE_OK) {
+				if (rc == Sqlite3.SQLITE_OK) {
 					int pOut = 4;
 					//u8 pOut = &pSpace[4];
 					u8[] pCell = pPage.aOvfl [0].pCell;
@@ -2344,7 +2344,7 @@ namespace Community.CsharpSqlite
 ///<param name="which are called often under normal circumstances.">which are called often under normal circumstances.</param>
 */public void copyNodeContent (MemPage pTo, ref int pRC)
 			{
-				if ((pRC) == SQLITE_OK) {
+				if ((pRC) == Sqlite3.SQLITE_OK) {
 					BtShared pBt = this.pBt;
 					u8[] aFrom = this.aData;
 					u8[] aTo = pTo.aData;
@@ -2376,7 +2376,7 @@ namespace Community.CsharpSqlite
 
 					pTo.isInit = 0;
 					rc = pTo.btreeInitPage ();
-					if (rc != SQLITE_OK) {
+					if (rc != Sqlite3.SQLITE_OK) {
 						pRC = rc;
 						return;
 					}
@@ -2496,7 +2496,7 @@ namespace Community.CsharpSqlite
 ///Next divider slot in pParent.aCell[] 
 ///</summary>
 
-				int rc = SQLITE_OK;
+				int rc = Sqlite3.SQLITE_OK;
 				///
 ///<summary>
 ///The return code 
@@ -2566,7 +2566,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				pBt = this.pBt;
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (pBt.mutex));
+				Debug.Assert (pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				#if FALSE
 																																																																																								TRACE("BALANCE: begin page %d child of %d\n", pPage.pgno, pParent.pgno);
@@ -2965,7 +2965,7 @@ namespace Community.CsharpSqlite
 #endif
 						 {
 							pBt.ptrmapPut (pNew.pgno, PTRMAP_BTREE, this.pgno, ref rc);
-							if (rc != SQLITE_OK) {
+							if (rc != Sqlite3.SQLITE_OK) {
 								goto balance_cleanup;
 							}
 						}
@@ -3111,7 +3111,7 @@ namespace Community.CsharpSqlite
 						Debug.Assert (sz <= pBt.maxLocal + 23);
 						Debug.Assert (iOvflSpace <= (int)pBt.pageSize);
 						this.insertCell (nxDiv, pCell, sz, pTemp, pNew.pgno, ref rc);
-						if (rc != SQLITE_OK)
+						if (rc != Sqlite3.SQLITE_OK)
 							goto balance_cleanup;
 						Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 						j++;
@@ -3317,7 +3317,7 @@ ptrmapCheckPages(pParent, 1);
 ///<param name="page is also updated.">page is also updated.</param>
 ///<param name=""></param>
 ///<param name="If successful, ppChild is set to contain a reference to the child">If successful, ppChild is set to contain a reference to the child</param>
-///<param name="page and SQLITE_OK is returned. In this case the caller is required">page and SQLITE_OK is returned. In this case the caller is required</param>
+///<param name="page and Sqlite3.SQLITE_OK is returned. In this case the caller is required">page and Sqlite3.SQLITE_OK is returned. In this case the caller is required</param>
 ///<param name="to call releasePage() on ppChild exactly once. If an error occurs,">to call releasePage() on ppChild exactly once. If an error occurs,</param>
 ///<param name="an error code is returned and ppChild is set to 0.">an error code is returned and ppChild is set to 0.</param>
 */public int balance_deeper (ref MemPage ppChild)
@@ -3347,7 +3347,7 @@ ptrmapCheckPages(pParent, 1);
 ///</summary>
 
 				Debug.Assert (this.nOverflow > 0);
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (pBt.mutex));
+				Debug.Assert (pBt.mutex.sqlite3_mutex_held());
 				///
 ///<summary>
 ///</summary>
@@ -3357,7 +3357,7 @@ ptrmapCheckPages(pParent, 1);
 ///<param name=""></param>
 
 				rc = PagerMethods.sqlite3PagerWrite (this.pDbPage);
-				if (rc == SQLITE_OK) {
+				if (rc == Sqlite3.SQLITE_OK) {
 					rc = BTreeMethods.allocateBtreePage (pBt, ref pChild, ref pgnoChild, this.pgno, 0);
 					this.copyNodeContent (pChild, ref rc);
 					#if !SQLITE_OMIT_AUTOVACUUM
@@ -3394,7 +3394,7 @@ ptrmapCheckPages(pParent, 1);
 				this.zeroPage (pChild.aData [0] & ~PTF_LEAF);
 				Converter.sqlite3Put4byte (this.aData, this.hdrOffset + 8, pgnoChild);
 				ppChild = pChild;
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
   /*

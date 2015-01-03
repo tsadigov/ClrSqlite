@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_value = Sqlite3.Mem;
+	using sqlite3_value = Mem;
 
 	public partial class Sqlite3
 	{
@@ -75,8 +75,8 @@ namespace Community.CsharpSqlite
 ///
 /// The third and fourth arguments to the auth function are the name of
 /// the table and the column that are being accessed.  The auth function
-/// should return either SQLITE_OK, SQLITE_DENY, or SQLITE_IGNORE.  If
-/// SQLITE_OK is returned, it means that access is allowed.  SQLITE_DENY
+/// should return either Sqlite3.SQLITE_OK, SQLITE_DENY, or SQLITE_IGNORE.  If
+/// Sqlite3.SQLITE_OK is returned, it means that access is allowed.  SQLITE_DENY
 /// means that the SQL statement will never-run - the sqlite3_exec() call
 /// will return with an error.  SQLITE_IGNORE means that the SQL statement
 /// should run but attempts to read the specified column will return NULL
@@ -95,7 +95,7 @@ db->xAuth = xAuth;
 db->pAuthArg = pArg;
 sqlite3ExpirePreparedStatements(db);
 sqlite3_mutex_leave(db->mutex);
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 
 ///<summary>
@@ -104,7 +104,7 @@ return SQLITE_OK;
 ///</summary>
 static void sqliteAuthBadReturnCode(Parse *pParse){
 utilc.sqlite3ErrorMsg(pParse, "authorizer malfunction");
-pParse->rc = SQLITE_ERROR;
+pParse->rc = Sqlite3.SQLITE_ERROR;
 }
 
 ///<summary>
@@ -134,7 +134,7 @@ if( db->nDb>2 || iDb!=0 ){
   utilc.sqlite3ErrorMsg(pParse, "access to %s.%s is prohibited", zTab, zCol);
 }
 pParse->rc = SQLITE_AUTH;
-  }else if( rc!=SQLITE_IGNORE && rc!=SQLITE_OK ){
+  }else if( rc!=SQLITE_IGNORE && rc!=Sqlite3.SQLITE_OK ){
 sqliteAuthBadReturnCode(pParse);
   }
   return rc;
@@ -201,7 +201,7 @@ pExpr->op = Sqlite3.TK_NULL;
 
 ///<summary>
 /// Do an authorization check using the code and arguments given.  Return
-/// either SQLITE_OK (zero) or SQLITE_IGNORE or SQLITE_DENY.  If SQLITE_DENY
+/// either Sqlite3.SQLITE_OK (zero) or SQLITE_IGNORE or SQLITE_DENY.  If SQLITE_DENY
 /// is returned, then the error count and error message in pParse are
 /// modified appropriately.
 ///</summary>
@@ -219,17 +219,17 @@ int rc;
 ** or if the parser is being invoked from within sqlite3_declare_vtab.
 */
 if( db->init.busy || IN_DECLARE_VTAB ){
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 
 if( db->xAuth==0 ){
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 rc = db->xAuth(db->pAuthArg, code, zArg1, zArg2, zArg3, pParse->zAuthContext);
 if( rc==SQLITE_DENY ){
 utilc.sqlite3ErrorMsg(pParse, "not authorized");
 pParse->rc = SQLITE_AUTH;
-}else if( rc!=SQLITE_OK && rc!=SQLITE_IGNORE ){
+}else if( rc!=Sqlite3.SQLITE_OK && rc!=SQLITE_IGNORE ){
 rc = SQLITE_DENY;
 sqliteAuthBadReturnCode(pParse);
 }

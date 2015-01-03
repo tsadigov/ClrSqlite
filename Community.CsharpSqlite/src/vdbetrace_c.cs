@@ -195,19 +195,19 @@ namespace Community.CsharpSqlite
 					nextIndex = idx + 1;
 					Debug.Assert (idx > 0 && idx <= p.nVar);
 					pVar = p.aVar [idx - 1];
-					if ((pVar.flags & MEM.MEM_Null) != 0) {
+					if ((pVar.flags & MemFlags.MEM_Null) != 0) {
                         _out.sqlite3StrAccumAppend("NULL", 4);
 					}
 					else
-						if ((pVar.flags & MEM.MEM_Int) != 0) {
+						if ((pVar.flags & MemFlags.MEM_Int) != 0) {
 							io.sqlite3XPrintf (_out, "%lld", pVar.u.i);
 						}
 						else
-							if ((pVar.flags & MEM.MEM_Real) != 0) {
+							if ((pVar.flags & MemFlags.MEM_Real) != 0) {
 								io.sqlite3XPrintf (_out, "%!.15g", pVar.r);
 							}
 							else
-								if ((pVar.flags & MEM.MEM_Str) != 0) {
+								if ((pVar.flags & MemFlags.MEM_Str) != 0) {
 									#if !SQLITE_OMIT_UTF16
 																																																																																																																																																																											SqliteEncoding enc = ENC(db);
 if( enc!=SqliteEncoding.UTF8 ){
@@ -225,11 +225,11 @@ io.sqlite3XPrintf(_out, "'%.*q'", utf8.n, utf8.z);
 									}
 								}
 								else
-									if ((pVar.flags & MEM.MEM_Zero) != 0) {
+									if ((pVar.flags & MemFlags.MEM_Zero) != 0) {
 										io.sqlite3XPrintf (_out, "zeroblob(%d)", pVar.u.nZero);
 									}
 									else {
-										Debug.Assert ((pVar.flags & MEM.MEM_Blob) != 0);
+										Debug.Assert ((pVar.flags & MemFlags.MEM_Blob) != 0);
                                         _out.sqlite3StrAccumAppend("x'", 2);
 										for (i = 0; i < pVar.n; i++) {
 											io.sqlite3XPrintf (_out, "%02x", pVar.zBLOB [i] & 0xff);

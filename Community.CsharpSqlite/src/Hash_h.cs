@@ -3,7 +3,7 @@ using u32=System.UInt32;
 using System;
 using System.Diagnostics;
 namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+	
 		///
 		///<summary>
 		///2001 September 22
@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite {
 				Debug.Assert(pKey!=null);
 				Debug.Assert(nKey>=0);
 				if(this.ht!=null) {
-					h=strHash(pKey,nKey)%this.htsize;
+					h=Sqlite3.strHash(pKey,nKey)%this.htsize;
 				}
 				else {
 					h=0;
@@ -181,7 +181,8 @@ namespace Community.CsharpSqlite {
 				this.ht=null;
 			}
 		}
-		///
+		
+        ///
 		///<summary>
 		///Each element in the hash table is an instance of the following
 		///</summary>
@@ -233,7 +234,8 @@ namespace Community.CsharpSqlite {
 		///Key associated with this element 
 		///</summary>
 		};
-
+        public partial class Sqlite3
+        {
 		///
 		///<summary>
 		///Access routines.  To delete, insert a NULL pointer.

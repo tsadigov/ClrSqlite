@@ -181,7 +181,7 @@ namespace Community.CsharpSqlite
 		#if SQLITE_OMIT_DECLTYPE
 																																						const int COLNAME_N = 1;     /* Number of COLNAME_xxx symbols */
 #else
-		const int COLNAME_N = 2;
+		public const int COLNAME_N = 2;
 
 		#endif
 		#endif

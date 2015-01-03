@@ -9,11 +9,8 @@ using u32=System.UInt32;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
-    using WhereInfo = Community.CsharpSqlite.Sqlite3.WhereInfo;
-    using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
-    using WherePlan = Community.CsharpSqlite.Sqlite3.WherePlan;
-    using sqlite3_value = Sqlite3.Mem;
-    using Mem = Community.CsharpSqlite.Sqlite3.Mem;
+    using sqlite3_value = Mem;
+    
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using exprc = Community.CsharpSqlite.Sqlite3.exprc;
     using utilc = Community.CsharpSqlite.Sqlite3.utilc;
@@ -1440,7 +1437,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             /// Only the column names are computed.  Column.zType, Column.zColl,
             /// and other fields of Column are zeroed.
             ///
-            /// Return SQLITE_OK on success.  If a memory allocation error occurs,
+            /// Return Sqlite3.SQLITE_OK on success.  If a memory allocation error occurs,
             /// store NULL in paCol and 0 in pnCol and return SQLITE_NOMEM.
             ///
             ///</summary>
@@ -3619,8 +3616,8 @@ break;
             /// If the source-list item passed as an argument was augmented with an
             /// INDEXED BY clause, then try to locate the specified index. If there
             /// was such a clause and the named index cannot be found, return
-            /// SQLITE_ERROR and leave an error in pParse. Otherwise, populate
-            /// pFrom.pIndex and return SQLITE_OK.
+            /// Sqlite3.SQLITE_ERROR and leave an error in pParse. Otherwise, populate
+            /// pFrom.pIndex and return Sqlite3.SQLITE_OK.
             ///
             ///</summary>
             public static int sqlite3IndexedByLookup(Parse pParse, SrcList_item pFrom)

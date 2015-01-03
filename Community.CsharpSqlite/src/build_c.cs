@@ -224,14 +224,14 @@ p.zName,  P4Usage.P4_STATIC );
                             int i;
                             for (i = 0; i < pParse.nVtabLock; i++)
                             {
-                                VTable vtab = Sqlite3.vtab.sqlite3GetVTable(db, pParse.apVtabLock[i]);
-                                v.sqlite3VdbeAddOp4(OpCode.OP_VBegin, 0, 0, 0, vtab,  P4Usage.P4_VTAB);
+                                VTable vtable = vtab.sqlite3GetVTable(db, pParse.apVtabLock[i]);
+                                v.sqlite3VdbeAddOp4(OpCode.OP_VBegin, 0, 0, 0, vtable,  P4Usage.P4_VTAB);
                             }
                             pParse.nVtabLock = 0;
 #endif
                             ///
                             ///<summary>
-                            ///Once all the cookies have been verified and transactions opened,
+                            ///Once all the cookies have been verifiedand transactions opened,
                             ///</summary>
                             ///<param name="obtain the required table">op unless the</param>
                             ///<param name="shared">cache feature is enabled.</param>
@@ -945,9 +945,9 @@ p.zName,  P4Usage.P4_STATIC );
                 if (0 == pParse.db.init.busy && pParse.nested == 0 && (pParse.db.flags & SQLITE_WriteSchema) == 0 && zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase))
                 {
                     utilc.sqlite3ErrorMsg(pParse, "object name reserved for internal use: %s", zName);
-                    return SQLITE_ERROR;
+                    return Sqlite3.SQLITE_ERROR;
                 }
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
             ///
             ///<summary>
@@ -1054,7 +1054,7 @@ p.zName,  P4Usage.P4_STATIC );
                 zName = build.sqlite3NameFromToken(db, pName);
                 if (zName == null)
                     return;
-                if (SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
+                if (Sqlite3.SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
                 {
                     goto begin_table_error;
                 }
@@ -2348,7 +2348,7 @@ goto begin_table_error;
 #if !SQLITE_OMIT_VIRTUALTABLE
                 if (pParse.sqlite3VtabCallConnect(pTable) != 0)
                 {
-                    return SQLITE_ERROR;
+                    return Sqlite3.SQLITE_ERROR;
                 }
 #endif
                 if (pTable.IsVirtual())
@@ -3380,7 +3380,7 @@ return;
                     zName = build.sqlite3NameFromToken(db, pName);
                     if (zName == null)
                         goto exit_create_index;
-                    if (SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
+                    if (Sqlite3.SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
                     {
                         goto exit_create_index;
                     }

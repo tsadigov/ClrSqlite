@@ -206,7 +206,7 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
       //    Thread.Sleep( 1 );
       //  }
       //}
-      return SQLITE_OK;
+      return Sqlite3.SQLITE_OK;
     }
 
     static int winMutexEnd()
@@ -225,7 +225,7 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
           winMutex_isInit = 0;
         }
       }
-      return SQLITE_OK;
+      return Sqlite3.SQLITE_OK;
     }
 
     /*
@@ -320,7 +320,7 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
     ** The sqlite3_mutex_enter() and sqlite3_mutex_try() routines attempt
     ** to enter a mutex.  If another thread is already within the mutex,
     ** sqlite3_mutex_enter() will block and sqlite3_mutex_try() will return
-    ** SQLITE_BUSY.  The sqlite3_mutex_try() interface returns SQLITE_OK
+    ** SQLITE_BUSY.  The sqlite3_mutex_try() interface returns Sqlite3.SQLITE_OK
     ** upon successful entry.  Mutexes created using SQLITE_MUTEX_RECURSIVE can
     ** be entered multiple times by the same thread.  In such cases the,
     ** mutex must be exited an equal number of times before another thread
@@ -364,13 +364,13 @@ new sqlite3_mutex( SQLITE_W32_MUTEX_INITIALIZER, 0, 0, (DWORD)0
 																			if( mutexIsNT() && TryEnterCriticalSection(p.mutex) ){
 p.owner = tid;
 p.nRef++;
-rc = SQLITE_OK;
+rc = Sqlite3.SQLITE_OK;
 }
 #else
 																			      Sqlite3.sqliteinth.UNUSED_PARAMETER( p );
 #endif
 																			#if SQLITE_DEBUG
-																			      if ( rc == SQLITE_OK && p.trace != 0 )
+																			      if ( rc == Sqlite3.SQLITE_OK && p.trace != 0 )
       {
         printf( "try mutex {0} ({1}) with nRef={2}\n", p.GetHashCode(), p.owner, p.nRef );
       }

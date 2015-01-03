@@ -25,16 +25,13 @@ namespace Community.CsharpSqlite
 {
 
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
-    using WhereInfo = Community.CsharpSqlite.Sqlite3.WhereInfo;
-    using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
-    using WherePlan = Community.CsharpSqlite.Sqlite3.WherePlan;
-    using sqlite3_value = Sqlite3.Mem;
+    using sqlite3_value = Mem;
     using exprc = Community.CsharpSqlite.Sqlite3.exprc;
     using utilc = Community.CsharpSqlite.Sqlite3.utilc;
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using build = Sqlite3.build;
     using sqliteinth = Sqlite3.sqliteinth;
-    using vdbeaux=Sqlite3.vdbeaux;
+    
     using ResolveExtensions = Sqlite3.ResolveExtensions;
 
         ///

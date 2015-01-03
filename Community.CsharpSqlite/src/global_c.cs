@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_value = Sqlite3.Mem;
+	using sqlite3_value = Mem;
 
 	public partial class Sqlite3
 	{

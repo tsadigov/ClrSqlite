@@ -280,18 +280,18 @@ int sqlite3SchemaMutexHeld(sqlite3*,int,Schema);
 #endif
 																																						#else
 		//# define sqlite3BtreeSharable(X) 0
-		static bool sqlite3BtreeSharable (Btree X)
+		public static bool sqlite3BtreeSharable (Btree X)
 		{
 			return false;
 		}
 
 		//# define sqlite3BtreeLeave(X)
-		static void sqlite3BtreeLeave (Btree X)
+		public static void sqlite3BtreeLeave (Btree X)
 		{
 		}
 
 		//# define sqlite3BtreeEnterCursor(X)
-		static void sqlite3BtreeEnterCursor (BtCursor X)
+		public static void sqlite3BtreeEnterCursor (BtCursor X)
 		{
 		}
 
@@ -312,13 +312,13 @@ int sqlite3SchemaMutexHeld(sqlite3*,int,Schema);
 		}
 
 		//# define sqlite3BtreeHoldsAllMutexes(X) 1
-		static bool sqlite3BtreeHoldsAllMutexes (sqlite3 X)
+		public static bool sqlite3BtreeHoldsAllMutexes (sqlite3 X)
 		{
 			return true;
 		}
 
 		//# define sqlite3SchemaMutexHeld(X,Y,Z) 1
-		static bool sqlite3SchemaMutexHeld (sqlite3 X, int y, Schema z)
+		public static bool sqlite3SchemaMutexHeld (sqlite3 X, int y, Schema z)
 		{
 			return true;
 		}

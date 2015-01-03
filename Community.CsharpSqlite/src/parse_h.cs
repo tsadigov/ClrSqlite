@@ -24,7 +24,7 @@ namespace Community.CsharpSqlite {
 	using u64=System.UInt64;
 	using unsigned=System.UInt64;
 	using Pgno=System.UInt32;
-	using sqlite3_value=Sqlite3.Mem;
+	using sqlite3_value=Mem;
 	#if !SQLITE_MAX_VARIABLE_NUMBER
 	using ynVar=System.Int16;
 	#else
@@ -580,7 +580,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 					utilc.sqlite3ErrorMsg(this,"Cannot add a column to a view");
 					goto exit_begin_add_column;
 				}
-				if(SQLITE_OK!=this.isSystemTable(pTab.zName)) {
+				if(Sqlite3.SQLITE_OK!=this.isSystemTable(pTab.zName)) {
 					goto exit_begin_add_column;
 				}
 				Debug.Assert(pTab.addColOffset>0);
@@ -943,10 +943,10 @@ return;
 				///that the table is being renamed to.
 				///
 				///</summary>
-				if(SQLITE_OK!=this.isSystemTable(pTab.zName)) {
+				if(Sqlite3.SQLITE_OK!=this.isSystemTable(pTab.zName)) {
 					goto exit_rename_table;
 				}
-				if(SQLITE_OK!=build.sqlite3CheckObjectName(this,zName)) {
+				if(Sqlite3.SQLITE_OK!=build.sqlite3CheckObjectName(this,zName)) {
 					goto exit_rename_table;
 				}
 				#if !SQLITE_OMIT_VIEW
@@ -1845,7 +1845,7 @@ return;
 				sName=new NameContext();
 				// memset( &sName, 0, sizeof(NameContext));
 				sName.pParse=this;
-				if(SQLITE_OK!=(rc=sName.resolveAttachExpr(pFilename))||SQLITE_OK!=(rc=sName.resolveAttachExpr(pDbname))||SQLITE_OK!=(rc=sName.resolveAttachExpr(pKey))) {
+				if(Sqlite3.SQLITE_OK!=(rc=sName.resolveAttachExpr(pFilename))||Sqlite3.SQLITE_OK!=(rc=sName.resolveAttachExpr(pDbname))||Sqlite3.SQLITE_OK!=(rc=sName.resolveAttachExpr(pKey))) {
 					this.nErr++;
 					goto attach_end;
 				}
@@ -1858,7 +1858,7 @@ if( pAuthArg->op==Sqlite3.TK_STRING ){
   zAuthArg = 0;
 }
 rc = sqlite3AuthCheck(pParse, type, zAuthArg, 0, 0);
-if(rc!=SQLITE_OK ){
+if(rc!=Sqlite3.SQLITE_OK ){
 goto attach_end;
 }
 }
@@ -3358,7 +3358,7 @@ goto attach_end;
 				if(db.activeVdbeCnt==0) {
 					db.u1.isInterrupted=false;
 				}
-				this.rc=SQLITE_OK;
+				this.rc=Sqlite3.SQLITE_OK;
 				this.zTail=new StringBuilder(zSql);
 				i=0;
 				Debug.Assert(pzErrMsg!=null);
@@ -3415,7 +3415,7 @@ goto attach_end;
 					}
 					default: {
 						pEngine.sqlite3Parser(this.sLastToken.TokenType,this.sLastToken,this);
-						if(this.rc!=SQLITE_OK) {
+						if(this.rc!=Sqlite3.SQLITE_OK) {
 							goto abort_parse;
 						}
 						break;
@@ -3424,7 +3424,7 @@ goto attach_end;
 				}
 				abort_parse:
 				this.zTail=new StringBuilder(zSql.Length<=i?"":zSql.Substring(i,zSql.Length-i));
-				if(zSql.Length>=i&&nErr==0&&this.rc==SQLITE_OK) {
+				if(zSql.Length>=i&&nErr==0&&this.rc==Sqlite3.SQLITE_OK) {
 					if(lastTokenParsed!=Sqlite3.TK_SEMI) {
 						pEngine.sqlite3Parser(TokenType.TK_SEMI,this.sLastToken,this);
 					}
@@ -3442,7 +3442,7 @@ sqlite3ParserStackPeak(pEngine)
 				//{
 				//  pParse.rc = SQLITE_NOMEM;
 				//}
-				if(this.rc!=SQLITE_OK&&this.rc!=SqlResult.SQLITE_DONE&&this.zErrMsg=="") {
+				if(this.rc!=Sqlite3.SQLITE_OK&&this.rc!=SqlResult.SQLITE_DONE&&this.zErrMsg=="") {
 					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,sqlite3ErrStr(this.rc));
 				}
 				//assert( pzErrMsg!=0 );
@@ -3495,7 +3495,7 @@ pParse.nTableLock = 0;
 					this.pZombieTab=p.pNextZombie;
 					build.sqlite3DeleteTable(db,ref p);
 				}
-				if(nErr>0&&this.rc==SQLITE_OK) {
+				if(nErr>0&&this.rc==Sqlite3.SQLITE_OK) {
 					this.rc=SqlResult.SQLITE_ERROR;
 				}
 				//Log.Unindent();
@@ -6237,9 +6237,9 @@ isView = false;
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																					rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
 #else
-				rcauth=SQLITE_OK;
+				rcauth=Sqlite3.SQLITE_OK;
 				#endif
-				Debug.Assert(rcauth==SQLITE_OK||rcauth==SQLITE_DENY||rcauth==SQLITE_IGNORE);
+				Debug.Assert(rcauth==Sqlite3.SQLITE_OK||rcauth==SQLITE_DENY||rcauth==SQLITE_IGNORE);
 				if(rcauth==SQLITE_DENY) {
 					goto delete_from_cleanup;
 				}
@@ -6312,7 +6312,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///this optimization caused the row change count (the value returned by 
 				///API function sqlite3_count_changes) to be set incorrectly.  
 				///</summary>
-				if(rcauth==SQLITE_OK&&pWhere==null&&null==pTrigger&&!pTab.IsVirtual()&&0==this.sqlite3FkRequired(pTab,null,0)) {
+				if(rcauth==Sqlite3.SQLITE_OK&&pWhere==null&&null==pTrigger&&!pTab.IsVirtual()&&0==this.sqlite3FkRequired(pTab,null,0)) {
 					Debug.Assert(!isView);
                     v.sqlite3VdbeAddOp4(OpCode.OP_Clear, pTab.tnum, iDb, memCnt, pTab.zName, P4Usage.P4_STATIC);
 					for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
@@ -6797,11 +6797,11 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				return addr;
 			}
 			public int sqlite3ExprCheckHeight(int nHeight) {
-				int rc=SQLITE_OK;
+				int rc=Sqlite3.SQLITE_OK;
 				int mxHeight=this.db.aLimit[SQLITE_LIMIT_EXPR_DEPTH];
 				if(nHeight>mxHeight) {
 					utilc.sqlite3ErrorMsg(this,"Expression tree is too large (maximum depth %d)",mxHeight);
-					rc=SQLITE_ERROR;
+					rc=Sqlite3.SQLITE_ERROR;
 				}
 				return rc;
 			}
@@ -7794,7 +7794,7 @@ return;
 					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
                     if ((OnConstraintError)pExpr.affinity == OnConstraintError.OE_Ignore)
                     {
-						v.sqlite3VdbeAddOp4(OpCode.OP_Halt,SQLITE_OK,(int)OnConstraintError.OE_Ignore,0,pExpr.u.zToken,0);
+						v.sqlite3VdbeAddOp4(OpCode.OP_Halt,Sqlite3.SQLITE_OK,(int)OnConstraintError.OE_Ignore,0,pExpr.u.zToken,0);
 					}
 					else {
 						build.sqlite3HaltConstraint( this,(OnConstraintError)pExpr.affinity,pExpr.u.zToken,(P4Usage)0);
@@ -9335,7 +9335,7 @@ return;
 				wherec.TRACE_IDX_INPUTS(p);
 				rc=pVtab.pModule.xBestIndex(pVtab,ref p);
 				wherec.TRACE_IDX_OUTPUTS(p);
-				if(rc!=SQLITE_OK) {
+				if(rc!=Sqlite3.SQLITE_OK) {
 					//if ( rc == SQLITE_NOMEM )
 					//{
 					//  pParse.db.mallocFailed = 1;
@@ -9382,7 +9382,7 @@ return;
 			///OUT: Return value 
 			///</summary>
 			) {
-				int rc=SQLITE_OK;
+				int rc=Sqlite3.SQLITE_OK;
 				#if SQLITE_ENABLE_STAT2
 																																																																																																				
       if ( nEq == 0 && p.aSample != null )
@@ -9403,7 +9403,7 @@ return;
           Debug.Assert( pLower.eOperator == wherec.WO_GT || pLower.eOperator == wherec.WO_GE );
           roundUpLower = ( pLower.eOperator == wherec.WO_GT ) ? 1 : 0;
         }
-        if ( rc == SQLITE_OK && pUpper != null )
+        if ( rc == Sqlite3.SQLITE_OK && pUpper != null )
         {
           Expr pExpr = pUpper.pExpr.pRight;
           rc = valueFromExpr( pParse, pExpr, aff, ref pUpperVal );
@@ -9411,7 +9411,7 @@ return;
           roundUpUpper = ( pUpper.eOperator == wherec.WO_LE ) ? 1 : 0;
         }
 
-        if ( rc != SQLITE_OK || ( pLowerVal == null && pUpperVal == null ) )
+        if ( rc != Sqlite3.SQLITE_OK || ( pLowerVal == null && pUpperVal == null ) )
         {
           sqlite3ValueFree( ref pLowerVal );
           sqlite3ValueFree( ref pUpperVal );
@@ -9432,7 +9432,7 @@ return;
         else
         {
           rc = whereRangeRegion( pParse, p, pUpperVal, roundUpUpper, out iUpper );
-          if ( rc == SQLITE_OK )
+          if ( rc == Sqlite3.SQLITE_OK )
           {
             rc = whereRangeRegion( pParse, p, pLowerVal, roundUpLower, out iLower );
           }
@@ -12528,7 +12528,7 @@ range_est_fallback:
 				int rc;
 				Debug.Assert(pTab!=null);
 				if((pTab.tabFlags&TableFlags.TF_Virtual)==0||vtab.sqlite3GetVTable(db,pTab)!=null) {
-					return SQLITE_OK;
+					return Sqlite3.SQLITE_OK;
 				}
 				///
 				///<summary>
@@ -12539,12 +12539,12 @@ range_est_fallback:
 				if(null==pMod) {
 					string zModule=pTab.azModuleArg[0];
 					utilc.sqlite3ErrorMsg(this,"no such module: %s",zModule);
-					rc=SQLITE_ERROR;
+					rc=Sqlite3.SQLITE_ERROR;
 				}
 				else {
 					string zErr=null;
 					rc=vtab.vtabCallConstructor(db,pTab,pMod,pMod.pModule.xConnect,ref zErr);
-					if(rc!=SQLITE_OK) {
+					if(rc!=Sqlite3.SQLITE_OK) {
 						utilc.sqlite3ErrorMsg(this,"%s",zErr);
 					}
 					zErr=null;

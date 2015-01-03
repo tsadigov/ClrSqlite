@@ -1,6 +1,6 @@
 namespace Community.CsharpSqlite
 {
-	using sqlite3_value = Sqlite3.Mem;
+	using sqlite3_value = Mem;
 	using System;
 
 	public partial class Sqlite3

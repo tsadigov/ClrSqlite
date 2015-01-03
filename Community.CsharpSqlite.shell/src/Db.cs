@@ -23,8 +23,7 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
+    using Btree = Sqlite3.Btree;
         //typedef struct AggInfo AggInfo;
         //typedef struct AuthContext AuthContext;
         //typedef struct AutoincInfo AutoincInfo;
@@ -96,7 +95,7 @@ namespace Community.CsharpSqlite
             ///Name of this database  
             ///</summary>
 
-            public Btree pBt;
+            public Community.CsharpSqlite.Sqlite3.Btree pBt;
 
             ///
             ///<summary>
@@ -126,4 +125,3 @@ namespace Community.CsharpSqlite
         };
 
     }
-}

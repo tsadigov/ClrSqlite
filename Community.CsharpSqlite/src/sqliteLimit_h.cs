@@ -159,7 +159,7 @@ namespace Community.CsharpSqlite
 ///<param name="is used internally to track attached databases.">is used internally to track attached databases.</param>
 
 		#if !SQLITE_MAX_ATTACHED
-		const int SQLITE_MAX_ATTACHED = 10;
+		public const int SQLITE_MAX_ATTACHED = 10;
 
 		#endif
 		///

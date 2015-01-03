@@ -17,8 +17,6 @@ using System.Diagnostics;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
         ///<summary>
         /// An objected used to accumulate the text of a string where we
         /// do not necessarily know how big the string will be in the end.
@@ -105,7 +103,7 @@ namespace Community.CsharpSqlite
                 Debug.Assert(z != null || N == 0);
                 if (p.tooBig)//|| p.mallocFailed != 0 )
                 {
-                    sqliteinth.testcase(p.tooBig);
+                    Sqlite3.sqliteinth.testcase(p.tooBig);
                     //sqliteinth.testcase( p.mallocFailed );
                     return;
                 }
@@ -113,7 +111,7 @@ namespace Community.CsharpSqlite
                 {
                     N = StringExtensions.sqlite3Strlen30(z);
                 }
-                if (N == 0 || NEVER(z == null))
+                if (N == 0 || Sqlite3.NEVER(z == null))
                 {
                     return;
                 }
@@ -159,5 +157,4 @@ namespace Community.CsharpSqlite
         }
 
 
-    }
 }

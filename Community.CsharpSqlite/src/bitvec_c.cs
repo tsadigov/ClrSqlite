@@ -8,7 +8,102 @@ using BITVEC_TELEM = System.Byte;
 
 namespace Community.CsharpSqlite
 {
-	public partial class Sqlite3
+
+    public class Bitvec
+    {
+        public u32 iSize;
+
+        ///
+        ///<summary>
+        ///Maximum bit index.  Max iSize is 4,294,967,296. 
+        ///</summary>
+
+        public u32 nSet;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="Number of bits that are set "> only valid for aHash</param>
+        ///<param name="element.  Max is BITVEC_NINT.  For BITVEC_SZ of 512,">element.  Max is BITVEC_NINT.  For BITVEC_SZ of 512,</param>
+        ///<param name="this would be 125. ">this would be 125. </param>
+
+        public u32 iDivisor;
+
+        ///
+        ///<summary>
+        ///Number of bits handled by each apSub[] entry. 
+        ///</summary>
+
+        ///
+        ///<summary>
+        ///Should >=0 for apSub element. 
+        ///</summary>
+
+        ///
+        ///<summary>
+        ///Max iDivisor is max(u32) / BITVEC_NPTR + 1.  
+        ///</summary>
+
+        ///
+        ///<summary>
+        ///For a BITVEC_SZ of 512, this would be 34,359,739. 
+        ///</summary>
+
+        public _u u = new _u();
+
+        public static implicit operator bool(Bitvec b)
+        {
+            return (b != null);
+        }
+    };
+	
+    //sizeof(Bitvec *));
+		///<summary>
+		/// A bitmap is an instance of the following structure.
+		///
+		/// This bitmap records the existence of zero or more bits
+		/// with values between 1 and iSize, inclusive.
+		///
+		/// There are three possible representations of the bitmap.
+		/// If iSize<=BITVEC_NBIT, then Bitvec.u.aBitmap[] is a straight
+		/// bitmap.  The least significant bit is bit 1.
+		///
+		/// If iSize>BITVEC_NBIT and iDivisor==0 then Bitvec.u.aHash[] is
+		/// a hash table that will hold up to BITVEC_MXHASH distinct values.
+		///
+		/// Otherwise, the value i is redirected into one of BITVEC_NPTR
+		/// sub-bitmaps pointed to by Bitvec.u.apSub[].  Each subbitmap
+		/// handles up to iDivisor separate values of i.  apSub[0] holds
+		/// values between 1 and iDivisor.  apSub[1] holds values between
+		/// iDivisor+1 and 2*iDivisor.  apSub[N] holds values between
+		/// N*iDivisor+1 and (N+1)*iDivisor.  Each subbitmap is normalized
+		/// to hold deal with values between 1 and iDivisor.
+		///</summary>
+		public class _u
+		{
+			public BITVEC_TELEM[] aBitmap = new byte[Sqlite3.BITVEC_NELEM];
+
+			///
+///<summary>
+///Bitmap representation 
+///</summary>
+
+			public u32[] aHash = new u32[Sqlite3.BITVEC_NINT];
+
+			///
+///<summary>
+///Hash table representation 
+///</summary>
+
+			public Bitvec[] apSub = new Bitvec[Sqlite3.BITVEC_NPTR];
+		///
+///<summary>
+///Recursive representation 
+///</summary>
+
+		}
+    
+    public partial class Sqlite3
 	{
 		///
 ///<summary>
@@ -96,7 +191,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 		//#define BITVEC_NELEM     (BITVEC_USIZE/sizeof(BITVEC_TELEM))
-		static int BITVEC_NELEM = (int)(BITVEC_USIZE / sizeof(BITVEC_TELEM));
+		public static int BITVEC_NELEM = (int)(BITVEC_USIZE / sizeof(BITVEC_TELEM));
 
 		///
 ///<summary>
@@ -135,98 +230,9 @@ namespace Community.CsharpSqlite
 
 		public static int BITVEC_NPTR = (int)(BITVEC_USIZE / 4);
 
-		//sizeof(Bitvec *));
-		///<summary>
-		/// A bitmap is an instance of the following structure.
-		///
-		/// This bitmap records the existence of zero or more bits
-		/// with values between 1 and iSize, inclusive.
-		///
-		/// There are three possible representations of the bitmap.
-		/// If iSize<=BITVEC_NBIT, then Bitvec.u.aBitmap[] is a straight
-		/// bitmap.  The least significant bit is bit 1.
-		///
-		/// If iSize>BITVEC_NBIT and iDivisor==0 then Bitvec.u.aHash[] is
-		/// a hash table that will hold up to BITVEC_MXHASH distinct values.
-		///
-		/// Otherwise, the value i is redirected into one of BITVEC_NPTR
-		/// sub-bitmaps pointed to by Bitvec.u.apSub[].  Each subbitmap
-		/// handles up to iDivisor separate values of i.  apSub[0] holds
-		/// values between 1 and iDivisor.  apSub[1] holds values between
-		/// iDivisor+1 and 2*iDivisor.  apSub[N] holds values between
-		/// N*iDivisor+1 and (N+1)*iDivisor.  Each subbitmap is normalized
-		/// to hold deal with values between 1 and iDivisor.
-		///</summary>
-		public class _u
-		{
-			public BITVEC_TELEM[] aBitmap = new byte[BITVEC_NELEM];
+		
 
-			///
-///<summary>
-///Bitmap representation 
-///</summary>
-
-			public u32[] aHash = new u32[BITVEC_NINT];
-
-			///
-///<summary>
-///Hash table representation 
-///</summary>
-
-			public Bitvec[] apSub = new Bitvec[BITVEC_NPTR];
-		///
-///<summary>
-///Recursive representation 
-///</summary>
-
-		}
-
-		public class Bitvec
-		{
-			public u32 iSize;
-
-			///
-///<summary>
-///Maximum bit index.  Max iSize is 4,294,967,296. 
-///</summary>
-
-			public u32 nSet;
-
-			///
-///<summary>
-///</summary>
-///<param name="Number of bits that are set "> only valid for aHash</param>
-///<param name="element.  Max is BITVEC_NINT.  For BITVEC_SZ of 512,">element.  Max is BITVEC_NINT.  For BITVEC_SZ of 512,</param>
-///<param name="this would be 125. ">this would be 125. </param>
-
-			public u32 iDivisor;
-
-			///
-///<summary>
-///Number of bits handled by each apSub[] entry. 
-///</summary>
-
-			///
-///<summary>
-///Should >=0 for apSub element. 
-///</summary>
-
-			///
-///<summary>
-///Max iDivisor is max(u32) / BITVEC_NPTR + 1.  
-///</summary>
-
-			///
-///<summary>
-///For a BITVEC_SZ of 512, this would be 34,359,739. 
-///</summary>
-
-			public _u u = new _u ();
-
-			public static implicit operator bool (Bitvec b) {
-				return (b != null);
-			}
-		};
+		
 
 
 		///<summary>
@@ -296,7 +302,7 @@ namespace Community.CsharpSqlite
 		{
 			u32 h;
 			if (p == null)
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			Debug.Assert (i > 0);
 			Debug.Assert (i <= p.iSize);
 			i--;
@@ -312,7 +318,7 @@ namespace Community.CsharpSqlite
 			}
 			if (p.iSize <= BITVEC_NBIT) {
 				p.u.aBitmap [i / BITVEC_SZELEM] |= (byte)(1 << (int)(i & (BITVEC_SZELEM - 1)));
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 			h = BITVEC_HASH (i++);
 			///
@@ -350,7 +356,7 @@ namespace Community.CsharpSqlite
 
 			do {
 				if (p.u.aHash [h] == i)
-					return SQLITE_OK;
+					return Sqlite3.SQLITE_OK;
 				h++;
 				if (h >= BITVEC_NINT)
 					h = 0;
@@ -400,7 +406,7 @@ namespace Community.CsharpSqlite
 			bitvec_set_end:
 			p.nSet++;
 			p.u.aHash [h] = i;
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 
 		///<summary>

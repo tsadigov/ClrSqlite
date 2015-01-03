@@ -6,7 +6,7 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_value = Sqlite3.Mem;
+	using sqlite3_value = Mem;
 	using sqlite3_pcache = Sqlite3.PCache1;
 
     public partial class Sqlite3
@@ -464,7 +464,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                   pCache->nMax);
 #endif
                         rc = pCache.xStress(pCache.pStress, pPg);
-                        if (rc != SQLITE_OK && rc != SQLITE_BUSY)
+                        if (rc != Sqlite3.SQLITE_OK && rc != SQLITE_BUSY)
                         {
                             return rc;
                         }
@@ -498,7 +498,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     }
                 }
                 ppPage = pPage;
-                return (pPage == null && eCreate != 0) ? SQLITE_NOMEM : SQLITE_OK;
+                return (pPage == null && eCreate != 0) ? SQLITE_NOMEM : Sqlite3.SQLITE_OK;
             }
 
             ///<summary>

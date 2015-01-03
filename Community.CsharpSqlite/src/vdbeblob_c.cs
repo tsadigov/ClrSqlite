@@ -92,7 +92,7 @@ int sqlite3_blob_open(
   };
 
   Vdbe *v = 0;
-  int rc = SQLITE_OK;
+  int rc = Sqlite3.SQLITE_OK;
   string zErr = 0;
   Table *pTab;
   Parse *pParse;
@@ -126,7 +126,7 @@ int sqlite3_blob_open(
         zErr = pParse->zErrMsg;
         pParse->zErrMsg = 0;
       }
-      rc = SQLITE_ERROR;
+      rc = Sqlite3.SQLITE_ERROR;
       sqlite3BtreeLeaveAll(db);
       goto blob_open_out;
     }
@@ -140,7 +140,7 @@ int sqlite3_blob_open(
     if( iCol==pTab->nCol ){
       sqlite3DbFree(db, zErr);
       zErr = io.sqlite3MPrintf(db, "no such column: \"%s\"", zColumn);
-      rc = SQLITE_ERROR;
+      rc = Sqlite3.SQLITE_ERROR;
       sqlite3BtreeLeaveAll(db);
       goto blob_open_out;
     }
@@ -180,7 +180,7 @@ int sqlite3_blob_open(
       if( zFault ){
         sqlite3DbFree(db, zErr);
         zErr = io.sqlite3MPrintf(db, "cannot open %s column for writing", zFault);
-        rc = SQLITE_ERROR;
+        rc = Sqlite3.SQLITE_ERROR;
         sqlite3BtreeLeaveAll(db);
         goto blob_open_out;
       }
@@ -265,7 +265,7 @@ int sqlite3_blob_open(
       zErr = io.sqlite3MPrintf(db, "cannot open value of type %s",
           type==0?"null": type==7?"real": "integer"
       );
-      rc = SQLITE_ERROR;
+      rc = Sqlite3.SQLITE_ERROR;
       goto blob_open_out;
     }
     pBlob = (Incrblob )sqlite3DbMallocZero(db, sizeof(Incrblob));
@@ -283,15 +283,15 @@ int sqlite3_blob_open(
     pBlob->nByte = sqlite3VdbeSerialTypeLen(type);
     pBlob->db = db;
     *ppBlob = (sqlite3_blob )pBlob;
-    rc = SQLITE_OK;
-  }else if( rc==SQLITE_OK ){
+    rc = Sqlite3.SQLITE_OK;
+  }else if( rc==Sqlite3.SQLITE_OK ){
     sqlite3DbFree(db, zErr);
     zErr = io.sqlite3MPrintf(db, "no such rowid: %lld", iRow);
-    rc = SQLITE_ERROR;
+    rc = Sqlite3.SQLITE_ERROR;
   }
 
 blob_open_out:
-  if( v && (rc!=SQLITE_OK || db->mallocFailed) ){
+  if( v && (rc!=Sqlite3.SQLITE_OK || db->mallocFailed) ){
     sqlite3VdbeFinalize(v);
   }
   utilc.sqlite3Error(db, rc, zErr);
@@ -318,7 +318,7 @@ int sqlite3_blob_close(sqlite3_blob *pBlob){
     sqlite3DbFree(db, ref p);
     sqlite3_mutex_leave(db->mutex);
   }else{
-    rc = SQLITE_OK;
+    rc = Sqlite3.SQLITE_OK;
   }
   return rc;
 }
@@ -345,8 +345,8 @@ static int blobReadWrite(
 
   if( n<0 || iOffset<0 || (iOffset+n)>p->nByte ){
     /* Request is out of range. Return a transient error. */
-    rc = SQLITE_ERROR;
-    utilc.sqlite3Error(db, SQLITE_ERROR, 0);
+    rc = Sqlite3.SQLITE_ERROR;
+    utilc.sqlite3Error(db, Sqlite3.SQLITE_ERROR, 0);
   } else if( v==0 ){
     /* If there is no statement handle, then the blob-handle has
     ** already been invalidated. Return SQLITE_ABORT in this case.

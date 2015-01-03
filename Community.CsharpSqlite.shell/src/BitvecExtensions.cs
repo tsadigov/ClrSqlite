@@ -12,7 +12,7 @@ namespace Community.CsharpSqlite
 {
 	public static class BitvecExtensions
 	{
-		public static int sqlite3BitvecTest (Community.CsharpSqlite.Sqlite3.Bitvec _this, u32 i)
+		public static int sqlite3BitvecTest (Bitvec _this, u32 i)
 		{
 			if (_this == null || i == 0)
 				return 0;
@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite
 			}
 		}
 
-		public static int sqlite3BitvecSet (this Community.CsharpSqlite.Sqlite3.Bitvec _this, u32 i)
+		public static int sqlite3BitvecSet (this Bitvec _this, u32 i)
 		{
 			u32 h;
 			if (_this == null)
@@ -134,7 +134,7 @@ namespace Community.CsharpSqlite
 				{
 					Buffer.BlockCopy (_this.u.aHash, 0, aiValues, 0, aiValues.Length * (sizeof(u32)));
 					// memcpy(aiValues, p->u.aHash, sizeof(p->u.aHash));
-					_this.u.apSub = new Community.CsharpSqlite.Sqlite3.Bitvec[Sqlite3.BITVEC_NPTR];
+					_this.u.apSub = new Bitvec[Sqlite3.BITVEC_NPTR];
 					//memset(p->u.apSub, 0, sizeof(p->u.apSub));
 					_this.iDivisor = (u32)((_this.iSize + Sqlite3.BITVEC_NPTR - 1) / Sqlite3.BITVEC_NPTR);
 					rc = _this.sqlite3BitvecSet (i);
@@ -152,7 +152,7 @@ namespace Community.CsharpSqlite
 			return Sqlite3.SQLITE_OK;
 		}
 
-		public static void sqlite3BitvecClear (this Community.CsharpSqlite.Sqlite3.Bitvec _this, u32 i, u32[] pBuf)
+		public static void sqlite3BitvecClear (this Bitvec _this, u32 i, u32[] pBuf)
 		{
 			if (_this == null)
 				return;

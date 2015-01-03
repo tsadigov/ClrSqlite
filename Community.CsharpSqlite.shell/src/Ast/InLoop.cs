@@ -23,8 +23,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
 
 
 
@@ -67,4 +65,3 @@ namespace Community.CsharpSqlite
 
 
     }
-}

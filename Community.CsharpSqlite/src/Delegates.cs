@@ -18,7 +18,7 @@ namespace Community.CsharpSqlite
 	using DbPage = Sqlite3.PgHdr;
 	using sqlite3_pcache = Sqlite3.PCache1;
 	using sqlite3_stmt = Sqlite3.Vdbe;
-	using sqlite3_value = Sqlite3.Mem;
+	using sqlite3_value = Mem;
     using codec_ctx=Sqlite3.crypto.codec_ctx;
 
 
@@ -37,7 +37,7 @@ namespace Community.CsharpSqlite
 
     public delegate void dxalarmCallback(object pNotUsed, sqlite3_int64 iNotUsed, int size);
 
-    public delegate void dxCollNeeded(object pCollNeededArg, Sqlite3.sqlite3 db, int eTextRep, string collationName);
+    public delegate void dxCollNeeded(object pCollNeededArg, sqlite3 db, int eTextRep, string collationName);
 
     public delegate int dxCommitCallback(object pCommitArg);
 
@@ -47,6 +47,34 @@ namespace Community.CsharpSqlite
 
     public delegate void dxDel(ref string pDelArg);
 
+
+
+
+
+    //Mem Methods
+    public delegate int dxMemInit(object o);
+
+    public delegate void dxMemShutdown(object o);
+
+    public delegate byte[] dxMalloc(int nSize);
+
+    public delegate int[] dxMallocInt(int nSize);
+
+    public delegate Mem dxMallocMem(Mem pMem);
+
+    public delegate void dxFree(ref byte[] pOld);
+
+    public delegate void dxFreeInt(ref int[] pOld);
+
+    public delegate void dxFreeMem(ref Mem pOld);
+
+    public delegate byte[] dxRealloc(byte[] pOld, int nSize);
+
+    public delegate int dxSize(byte[] pArray);
+
+    public delegate int dxRoundup(int nSize);
+
+		
 
 
 
@@ -63,7 +91,7 @@ namespace Community.CsharpSqlite
 
 
     //sqlite3_module
-    public delegate int smdxCreateConnect(Sqlite3.sqlite3 db, object pAux, int argc, string[] constargv, out sqlite3_vtab ppVTab, out string pError);
+    public delegate int smdxCreateConnect(sqlite3 db, object pAux, int argc, string[] constargv, out sqlite3_vtab ppVTab, out string pError);
 
     public delegate int smdxBestIndex(sqlite3_vtab pVTab, ref sqlite3_index_info pIndex);
 
@@ -155,7 +183,7 @@ namespace Community.CsharpSqlite
 
     public delegate void dxUpdateCallback(object pUpdateArg, int b, string c, string d, sqlite3_int64 e);
 
-    public delegate int dxWalCallback(object pWalArg, Sqlite3.sqlite3 db, string zDb, int nEntry);
+    public delegate int dxWalCallback(object pWalArg, sqlite3 db, string zDb, int nEntry);
 
 
 
@@ -274,31 +302,7 @@ namespace Community.CsharpSqlite
 		//Faults
 		public delegate void void_function ();
 
-		//Mem Methods
-		public delegate int dxMemInit (object o);
-
-		public delegate void dxMemShutdown (object o);
-
-		public delegate byte[] dxMalloc (int nSize);
-
-		public delegate int[] dxMallocInt (int nSize);
-
-		public delegate Mem dxMallocMem (Mem pMem);
-
-		public delegate void dxFree (ref byte[] pOld);
-
-		public delegate void dxFreeInt (ref int[] pOld);
-
-		public delegate void dxFreeMem (ref Mem pOld);
-
-		public delegate byte[] dxRealloc (byte[] pOld, int nSize);
-
-		public delegate int dxSize (byte[] pArray);
-
-		public delegate int dxRoundup (int nSize);
-
 		
-
 
         //MUTEX delegates where here
 

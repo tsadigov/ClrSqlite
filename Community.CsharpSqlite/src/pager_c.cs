@@ -409,8 +409,8 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
 
             //# define pagerRollbackWal(x) 0
             //# define pagerWalFrames(v,w,x,y,z) 0
-            //# define pagerOpenWalIfPresent(z) SQLITE_OK
-            //# define pagerBeginReadTransaction(z) SQLITE_OK
+            //# define pagerOpenWalIfPresent(z) Sqlite3.SQLITE_OK
+            //# define pagerBeginReadTransaction(z) Sqlite3.SQLITE_OK
 #endif
 #if NDEBUG
             ///
@@ -482,7 +482,7 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
 #endif
             ///<summary>
             /// Read a 32-bit integer from the given file descriptor.  Store the integer
-            /// that is read in pRes.  Return SQLITE_OK if everything worked, or an
+            /// that is read in pRes.  Return Sqlite3.SQLITE_OK if everything worked, or an
             /// error code is something goes wrong.
             ///
             /// All values are stored on disk as big-endian.
@@ -506,7 +506,7 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
             {
                 byte[] ac = new byte[4];
                 int rc = os.sqlite3OsRead(fd, ac, ac.Length, offset);
-                if (rc == SQLITE_OK)
+                if (rc == Sqlite3.SQLITE_OK)
                 {
                     pRes = Converter.sqlite3Get4byte(ac);
                 }
@@ -517,7 +517,7 @@ static bool CODEC2( Pager P, byte[] D, uint N, int X, ref byte[] O ) { O = D; re
 
             
             ///<summary>
-            /// Write a 32-bit integer into the given file descriptor.  Return SQLITE_OK
+            /// Write a 32-bit integer into the given file descriptor.  Return Sqlite3.SQLITE_OK
             /// on success or an error code is something goes wrong.
             ///
             ///</summary>
@@ -651,7 +651,7 @@ assert( (pPg->flags&PGHDR_DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
             /// journal file name.
             ///
             /// If it is determined that no master journal file name is present
-            /// zMaster[0] is set to 0 and SQLITE_OK returned.
+            /// zMaster[0] is set to 0 and Sqlite3.SQLITE_OK returned.
             ///
             /// If an error occurs while reading from the journal file, an SQLite
             /// error code is returned.
@@ -695,7 +695,7 @@ assert( (pPg->flags&PGHDR_DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
                 ///</summary>
 
                 zMaster[0] = 0;
-                if (SQLITE_OK != (rc = os.sqlite3OsFileSize(pJrnl, ref szJ)) || szJ < 16 || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, (int)(szJ - 16), ref len)) || len >= nMaster || SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, szJ - 12, ref cksum)) || SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, aMagic, 8, szJ - 8)) || _Custom.memcmp(aMagic, aJournalMagic, 8) != 0 || SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, zMaster, len, (long)(szJ - 16 - len))))
+                if (Sqlite3.SQLITE_OK != (rc = os.sqlite3OsFileSize(pJrnl, ref szJ)) || szJ < 16 || Sqlite3.SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, (int)(szJ - 16), ref len)) || len >= nMaster || Sqlite3.SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, szJ - 12, ref cksum)) || Sqlite3.SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, aMagic, 8, szJ - 8)) || _Custom.memcmp(aMagic, aJournalMagic, 8) != 0 || Sqlite3.SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, zMaster, len, (long)(szJ - 16 - len))))
                 {
                     return rc;
                 }
@@ -714,7 +714,7 @@ assert( (pPg->flags&PGHDR_DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
                     ///<summary>
                     ///If the checksum doesn't add up, then one or more of the disk sectors
                     ///containing the master journal filename is corrupted. This means
-                    ///definitely roll back, so just return SQLITE_OK and report a (nul)
+                    ///definitely roll back, so just return Sqlite3.SQLITE_OK and report a (nul)
                     ///</summary>
                     ///<param name="master">journal filename.</param>
                     ///<param name=""></param>
@@ -723,7 +723,7 @@ assert( (pPg->flags&PGHDR_DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
                 }
                 if (len == 0)
                     zMaster[0] = 0;
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             ///
@@ -761,7 +761,7 @@ static void pagerReportSize(Pager X){}
             /// the value read from the database file.
             ///
             /// If an IO error occurs, then the IO error is returned to the caller.
-            /// Otherwise, SQLITE_OK is returned.
+            /// Otherwise, Sqlite3.SQLITE_OK is returned.
             ///
             ///</summary>
             public static int readDbPage(PgHdr pPg)
@@ -778,7 +778,7 @@ static void pagerReportSize(Pager X){}
                 ///Page number to read 
                 ///</summary>
 
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 ///
                 ///<summary>
                 ///Return code 
@@ -809,7 +809,7 @@ static void pagerReportSize(Pager X){}
                     Debug.Assert(pPager.tempFile);
                     Array.Clear(pPg.pData, 0, pPager.pageSize);
                     // memset(pPg.pData, 0, pPager.pageSize);
-                    return SQLITE_OK;
+                    return Sqlite3.SQLITE_OK;
                 }
                 if (pPager.pagerUseWal())
                 {
@@ -820,13 +820,13 @@ static void pagerReportSize(Pager X){}
 
                     rc = wal.sqlite3WalRead(pPager.pWal, pgno, ref isInWal, pgsz, pPg.pData);
                 }
-                if (rc == SQLITE_OK && 0 == isInWal)
+                if (rc == Sqlite3.SQLITE_OK && 0 == isInWal)
                 {
                     i64 iOffset = (pgno - 1) * (i64)pPager.pageSize;
                     rc = os.sqlite3OsRead(pPager.fd, pPg.pData, pgsz, iOffset);
                     if (rc == SQLITE_IOERR_SHORT_READ)
                     {
-                        rc = SQLITE_OK;
+                        rc = Sqlite3.SQLITE_OK;
                     }
                 }
                 if (pgno == 1)
@@ -894,10 +894,10 @@ static void pagerReportSize(Pager X){}
 /// it is discarded. Otherwise, if there are one or more outstanding
 /// references, the page content is reloaded from the database. If the
 /// attempt to reload content from the database is required and fails,
-/// return an SQLite error code. Otherwise, SQLITE_OK.
+/// return an SQLite error code. Otherwise, Sqlite3.SQLITE_OK.
 ///</summary>
 static int pagerUndoCallback(void *pCtx, Pgno iPg){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 Pager *pPager = (Pager *)pCtx;
 PgHdr *pPg;
 
@@ -907,7 +907,7 @@ if( PCacheMethods.sqlite3PcachePageRefcount(pPg)==1 ){
 sqlite3PcacheDrop(pPg);
 }else{
 rc = readDbPage(pPg);
-if( rc==SQLITE_OK ){
+if( rc==Sqlite3.SQLITE_OK ){
 pPager.xReiniter(pPg);
 }
 PagerMethods.sqlite3PagerUnref(pPg);
@@ -944,7 +944,7 @@ PgHdr *pList;                   /* List of dirty pages to revert */
 pPager.dbSize = pPager.dbOrigSize;
 rc = sqlite3WalUndo(pPager.pWal, pagerUndoCallback, (void *)pPager);
 pList = PCacheMethods.sqlite3PcacheDirtyList(pPager.pPCache);
-while( pList && rc==SQLITE_OK ){
+while( pList && rc==Sqlite3.SQLITE_OK ){
 PgHdr *pNext = pList->pDirty;
 rc = pagerUndoCallback((void *)pPager, pList->pgno);
 pList = pNext;
@@ -1001,7 +1001,7 @@ if( pList->pgno==1 ) pager_write_changecounter(pList);
 rc = sqlite3WalFrames(pPager.pWal, 
 pPager.pageSize, pList, nTruncate, isCommit, syncFlags
 );
-if( rc==SQLITE_OK && pPager.pBackup ){
+if( rc==Sqlite3.SQLITE_OK && pPager.pBackup ){
 PgHdr *p;
 for(p=pList; p; p=p->pDirty){
 sqlite3BackupUpdate(pPager.pBackup, p->pgno, (u8 *)p->pData);
@@ -1041,7 +1041,7 @@ assert( pPager.eState==PAGER_OPEN || pPager.eState==PAGER_READER );
 sqlite3WalEndReadTransaction(pPager.pWal);
 
 rc = sqlite3WalBeginReadTransaction(pPager.pWal, &changed);
-if( rc!=SQLITE_OK || changed ){
+if( rc!=Sqlite3.SQLITE_OK || changed ){
 pager_reset(pPager);
 }
 
@@ -1059,7 +1059,7 @@ return rc;
 /// if no error occurs, make sure Pager.journalMode is not set to
 /// PAGER_JOURNALMODE_WAL.
 ///
-/// Return SQLITE_OK or an error code.
+/// Return Sqlite3.SQLITE_OK or an error code.
 ///
 /// The caller must hold a SHARED lock on the database file to call this
 /// function. Because an EXCLUSIVE lock on the db file is required to delete
@@ -1068,7 +1068,7 @@ return rc;
 /// other connection.
 ///</summary>
 static int pagerOpenWalIfPresent(Pager *pPager){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 Debug.Assert( pPager.eState==PAGER_OPEN );
 Debug.Assert( pPager.eLock>=SHARED_LOCK || pPager.noReadlock );
 
@@ -1086,7 +1086,7 @@ rc = sqlite3OsAccess(
 pPager.pVfs, pPager.zWal, SQLITE_ACCESS_EXISTS, &isWal
 );
 }
-if( rc==SQLITE_OK ){
+if( rc==Sqlite3.SQLITE_OK ){
 if( isWal ){
 sqliteinth.testcase( PCacheMethods.sqlite3PcachePagecount(pPager.pPCache)==0 );
 rc = sqlite3PagerOpenWal(pPager, 0);
@@ -1119,14 +1119,14 @@ return rc;
             ///Try to obtain a lock of type locktype on the database file. If
             ///</summary>
             ///<param name="a similar or greater lock is already held, this function is a no">op</param>
-            ///<param name="(returning SQLITE_OK immediately).">(returning SQLITE_OK immediately).</param>
+            ///<param name="(returning Sqlite3.SQLITE_OK immediately).">(returning Sqlite3.SQLITE_OK immediately).</param>
             ///<param name=""></param>
             ///<param name="Otherwise, attempt to obtain the lock using sqlite3OsLock(). Invoke">Otherwise, attempt to obtain the lock using sqlite3OsLock(). Invoke</param>
             ///<param name="the busy callback if the lock is currently not available. Repeat">the busy callback if the lock is currently not available. Repeat</param>
             ///<param name="until the busy callback returns false or until the attempt to">until the busy callback returns false or until the attempt to</param>
             ///<param name="obtain the lock succeeds.">obtain the lock succeeds.</param>
             ///<param name=""></param>
-            ///<param name="Return SQLITE_OK on success and an error code if we cannot obtain">Return SQLITE_OK on success and an error code if we cannot obtain</param>
+            ///<param name="Return Sqlite3.SQLITE_OK on success and an error code if we cannot obtain">Return Sqlite3.SQLITE_OK on success and an error code if we cannot obtain</param>
             ///<param name="the lock. If the lock is obtained successfully, set the Pager.state">the lock. If the lock is obtained successfully, set the Pager.state</param>
             ///<param name="variable to locktype before returning.">variable to locktype before returning.</param>
             ///<param name=""></param>
@@ -1202,7 +1202,7 @@ return rc;
             /// If successful, set the bit corresponding to pPg.pgno in the bitvecs
             /// for all open savepoints before returning.
             ///
-            /// This function returns SQLITE_OK if everything is successful, an IO
+            /// This function returns Sqlite3.SQLITE_OK if everything is successful, an IO
             /// error code if the attempt to write to the sub-journal fails, or
             /// SQLITE_NOMEM if a malloc fails while setting a bit in a savepoint
             /// bitvec.
@@ -1210,7 +1210,7 @@ return rc;
             ///</summary>
             public static int subjournalPage(PgHdr pPg)
             {
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 Pager pPager = pPg.pPager;
                 if (pPager.journalMode != PAGER_JOURNALMODE_OFF)
                 {
@@ -1230,7 +1230,7 @@ return rc;
                     ///<param name="If the sub">journal was opened successfully (or was already open),</param>
                     ///<param name="write the journal record into the file.  ">write the journal record into the file.  </param>
 
-                    if (rc == SQLITE_OK)
+                    if (rc == Sqlite3.SQLITE_OK)
                     {
                         byte[] pData = pPg.pData;
                         i64 offset = pPager.nSubRec * (4 + pPager.pageSize);
@@ -1240,13 +1240,13 @@ return rc;
                         //CODEC2(pPager, pData, pPg.pgno, 7, return SQLITE_NOMEM, pData2);
                         PAGERTRACE("STMT-JOURNAL %d page %d\n", PagerMethods.PAGERID(pPager), pPg.pgno);
                         rc = write32bits(pPager.sjfd, offset, pPg.pgno);
-                        if (rc == SQLITE_OK)
+                        if (rc == Sqlite3.SQLITE_OK)
                         {
                             rc = os.sqlite3OsWrite(pPager.sjfd, pData2, pPager.pageSize, offset + 4);
                         }
                     }
                 }
-                if (rc == SQLITE_OK)
+                if (rc == Sqlite3.SQLITE_OK)
                 {
                     pPager.nSubRec++;
                     Debug.Assert(pPager.nSavepoint > 0);
@@ -1269,16 +1269,16 @@ return rc;
             /// journal file.
             ///
             /// If successful, PCacheMethods.sqlite3PcacheMakeClean() is called on the page and
-            /// SQLITE_OK returned. If an IO error occurs while trying to make the
+            /// Sqlite3.SQLITE_OK returned. If an IO error occurs while trying to make the
             /// page clean, the IO error code is returned. If the page cannot be
-            /// made clean for some other reason, but no error occurs, then SQLITE_OK
+            /// made clean for some other reason, but no error occurs, then Sqlite3.SQLITE_OK
             /// is returned by PCacheMethods.sqlite3PcacheMakeClean() is not called.
             ///
             ///</summary>
             static int pagerStress(object p, PgHdr pPg)
             {
                 Pager pPager = (Pager)p;
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 Debug.Assert(pPg.pPager == pPager);
                 Debug.Assert((pPg.flags & PGHDR_DIRTY) != 0);
                 ///
@@ -1301,12 +1301,12 @@ return rc;
                 ///</summary>
 
                 if (NEVER(pPager.errCode != 0))
-                    return SQLITE_OK;
+                    return Sqlite3.SQLITE_OK;
                 if (pPager.doNotSpill != 0)
-                    return SQLITE_OK;
+                    return Sqlite3.SQLITE_OK;
                 if (pPager.doNotSyncSpill != 0 && (pPg.flags & PGHDR_NEED_SYNC) != 0)
                 {
-                    return SQLITE_OK;
+                    return Sqlite3.SQLITE_OK;
                 }
                 pPg.pDirty = null;
                 if (pPager.pagerUseWal())
@@ -1320,7 +1320,7 @@ return rc;
                     {
                         rc = subjournalPage(pPg);
                     }
-                    if (rc == SQLITE_OK)
+                    if (rc == Sqlite3.SQLITE_OK)
                     {
                         rc = pPager.pagerWalFrames(pPg, 0, 0, 0);
                     }
@@ -1367,7 +1367,7 @@ return rc;
                     ///<param name="executed.">executed.</param>
                     ///<param name=""></param>
 
-                    if (NEVER(rc == SQLITE_OK && pPg.pgno > pPager.dbSize && pPg.subjRequiresPage()))
+                    if (NEVER(rc == Sqlite3.SQLITE_OK && pPg.pgno > pPager.dbSize && pPg.subjRequiresPage()))
                     {
                         rc = subjournalPage(pPg);
                     }
@@ -1376,7 +1376,7 @@ return rc;
                     ///Write the contents of the page out to the database file. 
                     ///</summary>
 
-                    if (rc == SQLITE_OK)
+                    if (rc == Sqlite3.SQLITE_OK)
                     {
                         Debug.Assert((pPg.flags & PGHDR_NEED_SYNC) == 0);
                         rc = pPager.pager_write_pagelist(pPg);
@@ -1387,7 +1387,7 @@ return rc;
                 ///Mark the page as clean. 
                 ///</summary>
 
-                if (rc == SQLITE_OK)
+                if (rc == Sqlite3.SQLITE_OK)
                 {
                     PAGERTRACE("STRESS %d page %d\n", PagerMethods.PAGERID(pPager), pPg.pgno);
                     PCacheMethods.sqlite3PcacheMakeClean(pPg);
@@ -1419,7 +1419,7 @@ return rc;
             /// of the xOpen() method of the supplied VFS when opening files.
             ///
             /// If the pager object is allocated and the specified file opened
-            /// successfully, SQLITE_OK is returned and *ppPager set to point to
+            /// successfully, Sqlite3.SQLITE_OK is returned and *ppPager set to point to
             /// the new pager object. If an error occurs, *ppPager is set to NULL
             /// and error code returned. This function may return SQLITE_NOMEM
             /// (malloc_cs.sqlite3Malloc() is used to allocate memory), SQLITE_CANTOPEN or
@@ -1470,7 +1470,7 @@ return rc;
                 ///Pager object to allocate and return 
                 ///</summary>
 
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 ///
                 ///<summary>
                 ///Return code 
@@ -1612,7 +1612,7 @@ return rc;
                     //}
                     nUri = zUri.Length;
                     //        &z[1] - zUri;
-                    if (rc == SQLITE_OK && nPathname + 8 > pVfs.mxPathname)
+                    if (rc == Sqlite3.SQLITE_OK && nPathname + 8 > pVfs.mxPathname)
                     {
                         ///
                         ///<summary>
@@ -1626,7 +1626,7 @@ return rc;
 
                         rc =  sqliteinth.SQLITE_CANTOPEN_BKPT();
                     }
-                    if (rc != SQLITE_OK)
+                    if (rc != Sqlite3.SQLITE_OK)
                     {
                         //malloc_cs.sqlite3_free( ref zPathname );
                         return rc;
@@ -1736,7 +1736,7 @@ memcpy(&pPager.zWal[nPathname], "-wal", 4);
                     ///
                     ///</summary>
 
-                    if (rc == SQLITE_OK && !readOnly)
+                    if (rc == Sqlite3.SQLITE_OK && !readOnly)
                     {
                         pPager.setSectorSize();
                         Debug.Assert(SQLITE_DEFAULT_PAGE_SIZE <= SQLITE_MAX_DEFAULT_PAGE_SIZE);
@@ -1793,11 +1793,11 @@ szPageDflt = ii;
                 ///
                 ///</summary>
 
-                if (rc == SQLITE_OK)
+                if (rc == Sqlite3.SQLITE_OK)
                 {
                     Debug.Assert(pPager.memDb == 0);
                     rc = pPager.sqlite3PagerSetPagesize(ref szPageDflt, -1);
-                    sqliteinth.testcase(rc != SQLITE_OK);
+                    sqliteinth.testcase(rc != Sqlite3.SQLITE_OK);
                 }
                 ///
                 ///<summary>
@@ -1806,7 +1806,7 @@ szPageDflt = ii;
                 ///
                 ///</summary>
 
-                if (rc != SQLITE_OK)
+                if (rc != Sqlite3.SQLITE_OK)
                 {
                     Debug.Assert(null == pPager.pTmpSpace);
                     os.sqlite3OsClose(pPager.fd);
@@ -1926,7 +1926,7 @@ szPageDflt = ii;
                 ///</summary>
 
                 ppPager = pPager;
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             ///
@@ -1971,7 +1971,7 @@ szPageDflt = ii;
             {
                 byte[] pData = pPg.pData;
                 Pager pPager = pPg.pPager;
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 ///
                 ///<summary>
                 ///</summary>
@@ -2016,7 +2016,7 @@ szPageDflt = ii;
                 if (pPager.eState == PAGER_WRITER_LOCKED)
                 {
                     rc = pPager.pager_open_journal();
-                    if (rc != SQLITE_OK)
+                    if (rc != Sqlite3.SQLITE_OK)
                         return rc;
                 }
                 Debug.Assert(pPager.eState >= PAGER_WRITER_CACHEMOD);
@@ -2078,13 +2078,13 @@ szPageDflt = ii;
 
                             pPg.flags |= PGHDR_NEED_SYNC;
                             rc = write32bits(pPager.jfd, iOff, pPg.pgno);
-                            if (rc != SQLITE_OK)
+                            if (rc != Sqlite3.SQLITE_OK)
                                 return rc;
                             rc = os.sqlite3OsWrite(pPager.jfd, pData2, pPager.pageSize, iOff + 4);
-                            if (rc != SQLITE_OK)
+                            if (rc != Sqlite3.SQLITE_OK)
                                 return rc;
                             rc = write32bits(pPager.jfd, iOff + pPager.pageSize + 4, cksum);
-                            if (rc != SQLITE_OK)
+                            if (rc != Sqlite3.SQLITE_OK)
                                 return rc;
                             sqliteinth.IOTRACE("JOUT %p %d %lld %d\n", pPager, pPg.pgno, pPager.journalOff, pPager.pageSize);
 #if SQLITE_TEST
@@ -2102,9 +2102,9 @@ szPageDflt = ii;
                             Debug.Assert(pPager.pInJournal != null);
                             rc = sqlite3BitvecSet(pPager.pInJournal, pPg.pgno);
                             sqliteinth.testcase(rc == SQLITE_NOMEM);
-                            Debug.Assert(rc == SQLITE_OK || rc == SQLITE_NOMEM);
+                            Debug.Assert(rc == Sqlite3.SQLITE_OK || rc == SQLITE_NOMEM);
                             rc |= pPager.addToSavepointBitvecs(pPg.pgno);
-                            if (rc != SQLITE_OK)
+                            if (rc != Sqlite3.SQLITE_OK)
                             {
                                 Debug.Assert(rc == SQLITE_NOMEM);
                                 return rc;
@@ -2151,7 +2151,7 @@ szPageDflt = ii;
             ///Mark a data page as writeable. This routine must be called before
             ///making changes to a page. The caller must check the return value
             ///of this function and be careful not to change any page data unless
-            ///this routine returns SQLITE_OK.
+            ///this routine returns Sqlite3.SQLITE_OK.
             ///
             ///The difference between this function and pager_write() is that this
             ///function also deals with the special case where 2 or more pages
@@ -2160,12 +2160,12 @@ szPageDflt = ii;
             ///<param name="must have been written to the journal file before returning.">must have been written to the journal file before returning.</param>
             ///<param name=""></param>
             ///<param name="If an error occurs, SQLITE_NOMEM or an IO error code is returned">If an error occurs, SQLITE_NOMEM or an IO error code is returned</param>
-            ///<param name="as appropriate. Otherwise, SQLITE_OK.">as appropriate. Otherwise, SQLITE_OK.</param>
+            ///<param name="as appropriate. Otherwise, Sqlite3.SQLITE_OK.">as appropriate. Otherwise, Sqlite3.SQLITE_OK.</param>
             ///<param name=""></param>
 
             public static int sqlite3PagerWrite(DbPage pDbPage)
             {
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 PgHdr pPg = pDbPage;
                 Pager pPager = pPg.pPager;
                 u32 nPagePerSector = (u32)(pPager.sectorSize / pPager.pageSize);
@@ -2247,7 +2247,7 @@ szPageDflt = ii;
                     Debug.Assert(nPage > 0);
                     Debug.Assert(pg1 <= pPg.pgno);
                     Debug.Assert((pg1 + nPage) > pPg.pgno);
-                    for (ii = 0; ii < nPage && rc == SQLITE_OK; ii++)
+                    for (ii = 0; ii < nPage && rc == Sqlite3.SQLITE_OK; ii++)
                     {
                         u32 pg = (u32)(pg1 + ii);
                         PgHdr pPage = new PgHdr();
@@ -2256,7 +2256,7 @@ szPageDflt = ii;
                             if (pg != ((PENDING_BYTE / (pPager.pageSize)) + 1))//PAGER_MJ_PGNO(pPager))
                             {
                                 rc = pPager.sqlite3PagerGet(pg, ref pPage);
-                                if (rc == SQLITE_OK)
+                                if (rc == Sqlite3.SQLITE_OK)
                                 {
                                     rc = pager_write(pPage);
                                     if ((pPage.flags & PGHDR_NEED_SYNC) != 0)
@@ -2287,7 +2287,7 @@ szPageDflt = ii;
                     ///
                     ///</summary>
 
-                    if (rc == SQLITE_OK && needSync)
+                    if (rc == Sqlite3.SQLITE_OK && needSync)
                     {
                         Debug.Assert(
 #if SQLITE_OMIT_MEMORYDB
@@ -2395,7 +2395,7 @@ szPageDflt = ii;
 /// Parameter eMode is one of SQLITE_CHECKPOINT_PASSIVE, FULL or RESTART.
 ///</summary>
 int sqlite3PagerCheckpoint(Pager *pPager, int eMode, int *pnLog, int *pnCkpt){
-  int rc = SQLITE_OK;
+  int rc = Sqlite3.SQLITE_OK;
   if( pPager.pWal ){
     rc = sqlite3WalCheckpoint(pPager.pWal, eMode,
         pPager.xBusyHandler, pPager.pBusyHandlerArg,
@@ -2428,7 +2428,7 @@ int rc;                         /* Return code */
 
 assert( pPager.eLock==SHARED_LOCK || pPager.eLock==EXCLUSIVE_LOCK );
 rc = pagerLockDb(pPager, EXCLUSIVE_LOCK);
-if( rc!=SQLITE_OK ){
+if( rc!=Sqlite3.SQLITE_OK ){
 /* If the attempt to grab the exclusive lock failed, release the
 ** pending lock that may have been obtained instead.  */
 pagerUnlockDb(pPager, SHARED_LOCK);
@@ -2444,7 +2444,7 @@ return rc;
 ** in. Otherwise, use the normal shared-memory.
 */
 static int pagerOpenWal(Pager *pPager){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 
 assert( pPager.pWal==0 && pPager.tempFile==0 );
 assert( pPager.eLock==SHARED_LOCK || pPager.eLock==EXCLUSIVE_LOCK || pPager.noReadlock);
@@ -2461,7 +2461,7 @@ rc = pagerExclusiveLock(pPager);
 /* Open the connection to the log file. If this operation fails, 
 ** (e.g. due to malloc() failure), return an error code.
 */
-if( rc==SQLITE_OK ){
+if( rc==Sqlite3.SQLITE_OK ){
 rc = sqlite3WalOpen(pPager.pVfs, 
 pPager.fd, pPager.zWal, pPager.exclusiveMode, &pPager.pWal
         pPager.journalSizeLimit, &pPager.pWal
@@ -2479,19 +2479,19 @@ return rc;
 ** If the pager passed as the first argument is open on a real database
 ** file (not a temp file or an in-memory database), and the WAL file
 ** is not already open, make an attempt to open it now. If successful,
-** return SQLITE_OK. If an error occurs or the VFS used by the pager does 
+** return Sqlite3.SQLITE_OK. If an error occurs or the VFS used by the pager does 
 ** not support the xShmXXX() methods, return an error code. *pbOpen is
 ** not modified in either case.
 **
 ** If the pager is open on a temp-file (or in-memory database), or if
-** the WAL file is already open, set *pbOpen to 1 and return SQLITE_OK
+** the WAL file is already open, set *pbOpen to 1 and return Sqlite3.SQLITE_OK
 ** without doing anything.
 */
 int sqlite3PagerOpenWal(
 Pager *pPager,                  /* Pager object */
 int *pbOpen                     /* OUT: Set to true if call is a no-op */
 ){
-int rc = SQLITE_OK;             /* Return code */
+int rc = Sqlite3.SQLITE_OK;             /* Return code */
 
 assert( assert_pager_state(pPager) );
 assert( pPager.eState==PAGER_OPEN   || pbOpen );
@@ -2506,7 +2506,7 @@ if( !sqlite3PagerWalSupported(pPager) ) return SQLITE_CANTOPEN;
 sqlite3OsClose(pPager.jfd);
 
 rc = pagerOpenWal(pPager);
-if( rc==SQLITE_OK ){
+if( rc==Sqlite3.SQLITE_OK ){
 pPager.journalMode = PAGER_JOURNALMODE_WAL;
 pPager.eState = PAGER_OPEN;
 }
@@ -2527,7 +2527,7 @@ return rc;
 ** If successful, the EXCLUSIVE lock is not released before returning.
 */
 int sqlite3PagerCloseWal(Pager *pPager){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 
 assert( pPager.journalMode==PAGER_JOURNALMODE_WAL );
 
@@ -2538,12 +2538,12 @@ assert( pPager.journalMode==PAGER_JOURNALMODE_WAL );
 if( !pPager.pWal ){
 int logexists = 0;
 rc = pagerLockDb(pPager, SHARED_LOCK);
-if( rc==SQLITE_OK ){
+if( rc==Sqlite3.SQLITE_OK ){
 rc = sqlite3OsAccess(
 pPager.pVfs, pPager.zWal, SQLITE_ACCESS_EXISTS, &logexists
 );
 }
-if( rc==SQLITE_OK && logexists ){
+if( rc==Sqlite3.SQLITE_OK && logexists ){
 rc = pagerOpenWal(pPager);
 }
 }
@@ -2551,9 +2551,9 @@ rc = pagerOpenWal(pPager);
 /* Checkpoint and close the log. Because an EXCLUSIVE lock is held on
 ** the database file, the log and log-summary files will be deleted.
 */
-if( rc==SQLITE_OK && pPager.pWal ){
+if( rc==Sqlite3.SQLITE_OK && pPager.pWal ){
 rc = pagerExclusiveLock(pPager);
-if( rc==SQLITE_OK ){
+if( rc==Sqlite3.SQLITE_OK ){
 rc = sqlite3WalClose(pPager.pWal, pPager.ckptSyncFlags,
            pPager.pageSize, (u8*)pPager.pTmpSpace);
 pPager.pWal = 0;

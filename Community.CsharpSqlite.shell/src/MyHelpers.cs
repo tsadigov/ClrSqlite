@@ -23,9 +23,9 @@ namespace Community.CsharpSqlite
 {
 	public static class MyHelpers
 	{
-		public static Sqlite3.VdbeFrame GetRoot (this Sqlite3.VdbeFrame _this)
+		public static VdbeFrame GetRoot (this VdbeFrame _this)
 		{
-			Sqlite3.VdbeFrame pFrame = null;
+			VdbeFrame pFrame = null;
 			if (null != pFrame)
 				for (pFrame = _this; pFrame.pParent != null; pFrame = pFrame.pParent)
 					;

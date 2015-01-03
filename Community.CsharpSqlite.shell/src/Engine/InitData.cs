@@ -14,7 +14,7 @@ namespace Community.CsharpSqlite
     ///</summary>
     public class InitData
     {
-        public Sqlite3.sqlite3 db;
+        public sqlite3 db;
         ///
         ///<summary>
         ///The database being initialized 

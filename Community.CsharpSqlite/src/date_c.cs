@@ -8,68 +8,9 @@ using u64 = System.UInt64;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_value = Sqlite3.Mem;
+	using sqlite3_value = Mem;
 
-	public partial class Sqlite3
-	{
-		///<summary>
-		/// 2003 October 31
-		///
-		/// The author disclaims copyright to this source code.  In place of
-		/// a legal notice, here is a blessing:
-		///
-		///    May you do good and not evil.
-		///    May you find forgiveness for yourself and forgive others.
-		///    May you share freely, never taking more than you give.
-		///
-		///
-		/// This file contains the C functions that implement date and time
-		/// functions for SQLite.
-		///
-		/// There is only one exported symbol in this file - the function
-		/// sqlite3RegisterDateTimeFunctions() found at the bottom of the file.
-		/// All other code has file scope.
-		///
-		/// SQLite processes all times and dates as Julian Day numbers.  The
-		/// dates and times are stored as the number of days since noon
-		/// in Greenwich on November 24, 4714 B.C. according to the Gregorian
-		/// calendar system.
-		///
-		/// 1970-01-01 00:00:00 is JD 2440587.5
-		/// 2000-01-01 00:00:00 is JD 2451544.5
-		///
-		/// This implemention requires years to be expressed as a 4-digit number
-		/// which means that only dates between 0000-01-01 and 9999-12-31 can
-		/// be represented, even though julian day numbers allow a much wider
-		/// range of dates.
-		///
-		/// The Gregorian calendar system is used for all dates and times,
-		/// even those that predate the Gregorian calendar.  Historians usually
-		/// use the Julian calendar for dates prior to 1582-10-15 and for some
-		/// dates afterwards, depending on locale.  Beware of this difference.
-		///
-		/// The conversion algorithms are implemented based on descriptions
-		/// in the following text:
-		///
-		///      Jean Meeus
-		///      Astronomical Algorithms, 2nd Edition, 1998
-		///      ISBM 0-943396-61-1
-		///      Willmann-Bell, Inc
-		///      Richmond, Virginia (USA)
-		///
-		///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-		///  C#-SQLite is an independent reimplementation of the SQLite software library
-		///
-		///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-		///
-		///
-		///
-		///</summary>
-		//#include "sqliteInt.h"
-		//#include <stdlib.h>
-		//#include <assert.h>
-		//#include <time.h>
-		#if !SQLITE_OMIT_DATETIME_FUNCS
+    #if !SQLITE_OMIT_DATETIME_FUNCS
 		///<summary>
 		/// A structure for holding a single date and time.
 		///
@@ -154,7 +95,68 @@ namespace Community.CsharpSqlite
 				ct.validTZ = validJD;
 			}
 		};
-
+#endif
+	public partial class Sqlite3
+	{
+		///<summary>
+		/// 2003 October 31
+		///
+		/// The author disclaims copyright to this source code.  In place of
+		/// a legal notice, here is a blessing:
+		///
+		///    May you do good and not evil.
+		///    May you find forgiveness for yourself and forgive others.
+		///    May you share freely, never taking more than you give.
+		///
+		///
+		/// This file contains the C functions that implement date and time
+		/// functions for SQLite.
+		///
+		/// There is only one exported symbol in this file - the function
+		/// sqlite3RegisterDateTimeFunctions() found at the bottom of the file.
+		/// All other code has file scope.
+		///
+		/// SQLite processes all times and dates as Julian Day numbers.  The
+		/// dates and times are stored as the number of days since noon
+		/// in Greenwich on November 24, 4714 B.C. according to the Gregorian
+		/// calendar system.
+		///
+		/// 1970-01-01 00:00:00 is JD 2440587.5
+		/// 2000-01-01 00:00:00 is JD 2451544.5
+		///
+		/// This implemention requires years to be expressed as a 4-digit number
+		/// which means that only dates between 0000-01-01 and 9999-12-31 can
+		/// be represented, even though julian day numbers allow a much wider
+		/// range of dates.
+		///
+		/// The Gregorian calendar system is used for all dates and times,
+		/// even those that predate the Gregorian calendar.  Historians usually
+		/// use the Julian calendar for dates prior to 1582-10-15 and for some
+		/// dates afterwards, depending on locale.  Beware of this difference.
+		///
+		/// The conversion algorithms are implemented based on descriptions
+		/// in the following text:
+		///
+		///      Jean Meeus
+		///      Astronomical Algorithms, 2nd Edition, 1998
+		///      ISBM 0-943396-61-1
+		///      Willmann-Bell, Inc
+		///      Richmond, Virginia (USA)
+		///
+		///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+		///  C#-SQLite is an independent reimplementation of the SQLite software library
+		///
+		///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+		///
+		///
+		///
+		///</summary>
+		//#include "sqliteInt.h"
+		//#include <stdlib.h>
+		//#include <assert.h>
+		//#include <time.h>
+		#if !SQLITE_OMIT_DATETIME_FUNCS
+		
 		// Temporary String for use in this module
 		static StringBuilder zdtTemp = new StringBuilder (100);
 
@@ -654,7 +656,7 @@ namespace Community.CsharpSqlite
 #if (!(HAVE_LOCALTIME_R) || !HAVE_LOCALTIME_R) && (!(HAVE_LOCALTIME_S) || !HAVE_LOCALTIME_S)
                 _Custom.tm pX;
                 sqlite3_mutex mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
-                sqlite3_mutex_enter(mutex);
+                mutex.sqlite3_mutex_enter();
                 pX = _Custom.localtime(t);
 #if !SQLITE_OMIT_BUILTIN_TEST
                 if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bLocaltimeFault)
@@ -662,7 +664,7 @@ namespace Community.CsharpSqlite
 #endif
                 if (pX != null)
                     pTm = pX;
-                sqlite3_mutex_leave(mutex);
+                mutex.sqlite3_mutex_leave();
                 rc = pX == null ? 1 : 0;
 #else
 #if !SQLITE_OMIT_BUILTIN_TEST
@@ -682,9 +684,9 @@ namespace Community.CsharpSqlite
             ///<summary>
             /// Compute the difference (in milliseconds) between localtime and UTC
             /// (a.k.a. GMT) for the time value p where p is in UTC. If no error occurs,
-            /// return this value and set *pRc to SQLITE_OK.
+            /// return this value and set *pRc to Sqlite3.SQLITE_OK.
             ///
-            /// Or, if an error does occur, set *pRc to SQLITE_ERROR. The returned value
+            /// Or, if an error does occur, set *pRc to Sqlite3.SQLITE_ERROR. The returned value
             /// is undefined in this case.
             ///</summary>
             static sqlite3_int64 localtimeOffset(DateTime p, ///
@@ -699,7 +701,7 @@ namespace Community.CsharpSqlite
 
             out int pRc///
                 ///<summary>
-                ///OUT: Error code. SQLITE_OK or ERROR 
+                ///OUT: Error code. Sqlite3.SQLITE_OK or ERROR 
                 ///</summary>
 
             )
@@ -738,7 +740,7 @@ namespace Community.CsharpSqlite
                 if (osLocaltime(t, sLocal) != 0)
                 {
                     pCtx.sqlite3_result_error("local time unavailable", -1);
-                    pRc = SQLITE_ERROR;
+                    pRc = Sqlite3.SQLITE_ERROR;
                     return 0;
                 }
                 y.Y = sLocal.tm_year;
@@ -754,7 +756,7 @@ namespace Community.CsharpSqlite
                 y.validJD = 0;
                 y.validTZ = 0;
                 computeJD(y);
-                pRc = SQLITE_OK;
+                pRc = Sqlite3.SQLITE_OK;
                 return (int)(y.iJD - x.iJD);
             }
 
@@ -846,7 +848,7 @@ namespace Community.CsharpSqlite
                                     long c1;
                                     computeJD(p);
                                     c1 = localtimeOffset(p, pCtx, out rc);
-                                    if (rc == SQLITE_OK)
+                                    if (rc == Sqlite3.SQLITE_OK)
                                     {
                                         p.iJD -= c1;
                                         clearYMD_HMS_TZ(p);

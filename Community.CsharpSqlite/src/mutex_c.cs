@@ -43,7 +43,7 @@ static  int mutexIsInit = 0;
 /// Initialize the mutex system.
 ///</summary>
 static int sqlite3MutexInit(){ 
-  int rc = SQLITE_OK;
+  int rc = Sqlite3.SQLITE_OK;
   if( null==Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexAlloc ){
     /* If the xMutexAlloc method has not been set, then the user did not
     ** install a mutex implementation via sqlite3_config() prior to 
@@ -77,7 +77,7 @@ static int sqlite3MutexInit(){
 /// sqlite3MutexInit().
 ///</summary>
 static int sqlite3MutexEnd(){
-  int rc = SQLITE_OK;
+  int rc = Sqlite3.SQLITE_OK;
   if( Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexEnd !=null){
     rc = Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexEnd();
   }
@@ -127,11 +127,11 @@ static void sqlite3_mutex_enter(sqlite3_mutex p){
 }
 
 ///<summary>
-/// Obtain the mutex p. If successful, return SQLITE_OK. Otherwise, if another
+/// Obtain the mutex p. If successful, return Sqlite3.SQLITE_OK. Otherwise, if another
 /// thread holds the mutex and it cannot be obtained, return SQLITE_BUSY.
 ///</summary>
 static int sqlite3_mutex_try(sqlite3_mutex p){
-  int rc = SQLITE_OK;
+  int rc = Sqlite3.SQLITE_OK;
   if( p!=null ){
     return Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex.xMutexTry(p);
   }

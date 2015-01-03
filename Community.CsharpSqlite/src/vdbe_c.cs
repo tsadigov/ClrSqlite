@@ -23,7 +23,7 @@ using yDbMask = System.Int64;
 using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Sqlite3.Mem;
+	using sqlite3_value=Mem;
 	using Op=VdbeOp;
 	using System;
 	using System.Collections.Generic;
@@ -239,7 +239,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		//#define ExpandBlob(P) (((P).flags&MEM.MEM_Zero)?sqlite3VdbeMemExpandBlob(P):0)
 		static int ExpandBlob(Mem P) {
-			return (P.flags&MEM.MEM_Zero)!=0?P.sqlite3VdbeMemExpandBlob():0;
+			return (P.flags&MemFlags.MEM_Zero)!=0?P.sqlite3VdbeMemExpandBlob():0;
 		}
 		///<summary>
 		/// Argument pMem points at a register that will be passed to a
@@ -248,7 +248,7 @@ namespace Community.CsharpSqlite {
 		/// routines.
 		///
 		///</summary>
-		static void sqlite3VdbeMemStoreType(Mem pMem) {
+		public static void sqlite3VdbeMemStoreType(Mem pMem) {
 			if((pMem.Flags&MemFlags.MEM_Null)!=0) {
 				pMem.ValType=FoundationalType.SQLITE_NULL;
 				pMem.z=null;
@@ -328,7 +328,7 @@ namespace Community.CsharpSqlite {
                 vdbeaux.sqlite3VdbeFreeCursor(p, p.apCsr[iCur]);
 				p.apCsr[iCur]=null;
 			}
-			//if ( SQLITE_OK == sqlite3VdbeMemGrow( pMem, nByte, 0 ) )
+			//if ( Sqlite3.SQLITE_OK == sqlite3VdbeMemGrow( pMem, nByte, 0 ) )
 			{
 				p.apCsr[iCur]=pCx=new VdbeCursor();
 				// (VdbeCursor)pMem.z;
@@ -355,21 +355,21 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static void applyNumericAffinity(Mem pRec) {
-			if((pRec.flags&(MEM.MEM_Real|MEM.MEM_Int))==0) {
+			if((pRec.flags&(MemFlags.MEM_Real|MemFlags.MEM_Int))==0) {
 				double rValue=0.0;
 				i64 iValue=0;
 				SqliteEncoding enc=pRec.enc;
-				if((pRec.flags&MEM.MEM_Str)==0)
+				if((pRec.flags&MemFlags.MEM_Str)==0)
 					return;
 				if(Converter.sqlite3AtoF(pRec.z,ref rValue,pRec.n,enc)==false)
 					return;
 				if(0==Converter.sqlite3Atoi64(pRec.z,ref iValue,pRec.n,enc)) {
 					pRec.u.i=iValue;
-					pRec.flags|=MEM.MEM_Int;
+					pRec.flags|=MemFlags.MEM_Int;
 				}
 				else {
 					pRec.r=rValue;
-					pRec.flags|=MEM.MEM_Real;
+					pRec.flags|=MemFlags.MEM_Real;
 				}
 			}
 		}
@@ -413,25 +413,25 @@ namespace Community.CsharpSqlite {
 				///representation.
 				///
 				///</summary>
-				if(0==(pRec.flags&MEM.MEM_Str)&&(pRec.flags&(MEM.MEM_Real|MEM.MEM_Int))!=0) {
+				if(0==(pRec.flags&MemFlags.MEM_Str)&&(pRec.flags&(MemFlags.MEM_Real|MemFlags.MEM_Int))!=0) {
 					vdbemem_cs.sqlite3VdbeMemStringify(pRec,enc);
 				}
-				if((pRec.flags&(MEM.MEM_Blob|MEM.MEM_Str))==(MEM.MEM_Blob|MEM.MEM_Str)) {
+				if((pRec.flags&(MemFlags.MEM_Blob|MemFlags.MEM_Str))==(MemFlags.MEM_Blob|MemFlags.MEM_Str)) {
 					StringBuilder sb=new StringBuilder(pRec.zBLOB.Length);
 					for(int i=0;i<pRec.zBLOB.Length;i++)
 						sb.Append((char)pRec.zBLOB[i]);
 					pRec.z=sb.ToString();
 					malloc_cs.sqlite3_free(ref pRec.zBLOB);
-					pRec.flags=(pRec.flags&~MEM.MEM_Blob);
+					pRec.flags=(pRec.flags&~MemFlags.MEM_Blob);
 				}
-				pRec.flags=(pRec.flags&~(MEM.MEM_Real|MEM.MEM_Int));
+				pRec.flags=(pRec.flags&~(MemFlags.MEM_Real|MemFlags.MEM_Int));
 			}
 			else
                 if (affinity != sqliteinth.SQLITE_AFF_NONE)
                 {
                     Debug.Assert(affinity == sqliteinth.SQLITE_AFF_INTEGER || affinity == sqliteinth.SQLITE_AFF_REAL || affinity == sqliteinth.SQLITE_AFF_NUMERIC);
 					applyNumericAffinity(pRec);
-					if((pRec.flags&MEM.MEM_Real)!=0) {
+					if((pRec.flags&MemFlags.MEM_Real)!=0) {
 						pRec.sqlite3VdbeIntegerAffinity();
 					}
 				}
@@ -457,7 +457,7 @@ namespace Community.CsharpSqlite {
 		/// not the internal Mem type.
 		///
 		///</summary>
-		static void sqlite3ValueApplyAffinity(sqlite3_value pVal,char affinity,SqliteEncoding enc) {
+		public static void sqlite3ValueApplyAffinity(sqlite3_value pVal,char affinity,SqliteEncoding enc) {
 			applyAffinity((Mem)pVal,affinity,enc);
 		}
 		#if SQLITE_DEBUG
@@ -704,16 +704,16 @@ namespace Community.CsharpSqlite {
     **
     ** If an error occurs, an error message is written to memory obtained
     ** from malloc_cs.sqlite3Malloc() and p.zErrMsg is made to point to that memory.
-    ** The error code is stored in p.rc and this routine returns SQLITE_ERROR.
+    ** The error code is stored in p.rc and this routine returns Sqlite3.SQLITE_ERROR.
     **
     ** If the callback ever returns non-zero, then the program exits
     ** immediately.  There will be no error message but the p.rc field is
-    ** set to SQLITE_ABORT and this routine will return SQLITE_ERROR.
+    ** set to SQLITE_ABORT and this routine will return Sqlite3.SQLITE_ERROR.
     **
     ** A memory allocation error causes p.rc to be set to SQLITE_NOMEM and this
-    ** routine to return SQLITE_ERROR.
+    ** routine to return Sqlite3.SQLITE_ERROR.
     **
-    ** Other fatal errors return SQLITE_ERROR.
+    ** Other fatal errors return Sqlite3.SQLITE_ERROR.
     **
     ** After this routine has finished, sqlite3VdbeFinalize() should be
     ** used to clean up the mess that was left behind.

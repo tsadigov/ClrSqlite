@@ -86,189 +86,10 @@ namespace Community.CsharpSqlite
 	using sqlite3_int64 = System.Int64;
 
 
-    ///<summary>
-    /// Each entry in a RowSet is an instance of the following object.
-    ///
-    ///</summary>
-    public class RowSetEntry
-    {
-        public i64 v;
-
-        ///
-        ///<summary>
-        ///ROWID value for this entry 
-        ///</summary>
-
-        public RowSetEntry pRight;
-
-        ///
-        ///<summary>
-        ///Right subtree (larger entries) or list 
-        ///</summary>
-
-        public RowSetEntry pLeft;
-        ///
-        ///<summary>
-        ///Left subtree (smaller entries) 
-        ///</summary>
+   
 
 
-
-        ///<summary>
-        /// Convert a sorted list of elements (connected by pRight) into a binary
-        /// tree with depth of iDepth.  A depth of 1 means the tree contains a single
-        /// node taken from the head of *ppList.  A depth of 2 means a tree with
-        /// three nodes.  And so forth.
-        ///
-        /// Use as many entries from the input list as required and update the
-        /// *ppList to point to the unused elements of the list.  If the input
-        /// list contains too few elements, then construct an incomplete tree
-        /// and leave *ppList set to NULL.
-        ///
-        /// Return a pointer to the root of the constructed binary tree.
-        ///
-        ///</summary>
-        public static RowSetEntry rowSetNDeepTree(ref RowSetEntry ppList, int iDepth)
-        {
-            RowSetEntry p;
-            ///
-            ///<summary>
-            ///Root of the new tree 
-            ///</summary>
-
-            RowSetEntry pLeft;
-            ///
-            ///<summary>
-            ///Left subtree 
-            ///</summary>
-
-            if (ppList == null)
-            {
-                return null;
-            }
-            if (iDepth == 1)
-            {
-                p = ppList;
-                ppList = p.pRight;
-                p.pLeft = p.pRight = null;
-                return p;
-            }
-            pLeft = rowSetNDeepTree(ref ppList, iDepth - 1);
-            p = ppList;
-            if (p == null)
-            {
-                return pLeft;
-            }
-            p.pLeft = pLeft;
-            ppList = p.pRight;
-            p.pRight = rowSetNDeepTree(ref ppList, iDepth - 1);
-            return p;
-        }
-    };
-
-    public static class RowSetEntryExtensions {
-
-
-
-
-        ///<summary>
-        /// The input, pIn, is a binary tree (or subtree) of RowSetEntry objects.
-        /// Convert this tree into a linked list connected by the pRight pointers
-        /// and return pointers to the first and last elements of the new list.
-        ///
-        ///</summary>
-        public static void rowSetTreeToList(
-            /*Root of the input tree */this RowSetEntry pIn, 
-            /*Write head of the output list here */ref RowSetEntry ppFirst,
-            /*Write tail of the output list here */ref RowSetEntry ppLast
-        )
-        {
-            Debug.Assert(pIn != null);
-            if (pIn.pLeft != null)
-            {
-                RowSetEntry p = new RowSetEntry();
-                rowSetTreeToList(pIn.pLeft, ref ppFirst, ref p);
-                p.pRight = pIn;
-            }
-            else
-            {
-                ppFirst = pIn;
-            }
-            if (pIn.pRight != null)
-            {
-                rowSetTreeToList(pIn.pRight, ref pIn.pRight, ref ppLast);
-            }
-            else
-            {
-                ppLast = pIn;
-            }
-            Debug.Assert((ppLast).pRight == null);
-        }
-
-		
-		
-
-        ///<summary>
-        /// Convert a sorted list of elements into a binary tree. Make the tree
-        /// as deep as it needs to be in order to contain the entire list.
-        ///
-        ///</summary>
-        public static RowSetEntry rowSetListToTree(this RowSetEntry pList)
-        {
-            
-
-            int iDepth;
-            ///Depth of the tree so far 
-
-            RowSetEntry p;
-            ///Current tree root 
-
-            RowSetEntry pLeft;
-            ///Left subtree 
-
-            Debug.Assert(pList != null);
-            p = pList;
-            pList = p.pRight;
-            p.pLeft = p.pRight = null;
-            for (iDepth = 1; pList != null; iDepth++)
-            {
-                pLeft = p;
-                p = pList;
-                pList = p.pRight;
-                p.pLeft = pLeft;
-                p.pRight = RowSetEntry.rowSetNDeepTree(ref pList, iDepth);
-            }
-            return p;
-        }
-
-        
-
-    }
-
-
-    ///<summary>
-    /// Index entries are allocated in large chunks (instances of the
-    /// following structure) to reduce memory allocation overhead.  The
-    /// chunks are kept on a linked list so that they can be deallocated
-    /// when the RowSet is destroyed.
-    ///
-    ///</summary>
-    public class RowSetChunk
-    {
-        public RowSetChunk pNextChunk;
-
-        ///
-        ///<summary>
-        ///Next chunk on list of them all 
-        ///</summary>
-
-        public RowSetEntry[] aEntry = new RowSetEntry[Sqlite3.ROWSET_ENTRY_PER_CHUNK];
-        ///
-        ///<summary>
-        ///Allocated entries 
-        ///</summary>
-
-    };
+   
 
 
     ///<summary>
@@ -286,7 +107,7 @@ namespace Community.CsharpSqlite
         ///List of all chunk allocations 
         ///</summary>
 
-        public Sqlite3.sqlite3 db;
+        public sqlite3 db;
 
         ///
         ///<summary>
@@ -342,7 +163,7 @@ namespace Community.CsharpSqlite
         ///Current insert batch 
         ///</summary>
 
-        public RowSet(Sqlite3.sqlite3 db, int N)
+        public RowSet(sqlite3 db, int N)
         {
             this.pChunk = null;
             this.db = db;
@@ -372,7 +193,7 @@ namespace Community.CsharpSqlite
         /// allocation of entries available to be filled.
         ///
         ///</summary>
-        public RowSet sqlite3RowSetInit(Sqlite3.sqlite3 db, object pSpace, u32 N)
+        public RowSet sqlite3RowSetInit(sqlite3 db, object pSpace, u32 N)
         {
             RowSet p = new RowSet(db, (int)N);
             //Debug.Assert(N >= ROUND8(sizeof(*p)) );
@@ -666,9 +487,196 @@ namespace Community.CsharpSqlite
 
 
         //----------------------------------------------------------------------------------
+
+        ///<summary>
+        /// Index entries are allocated in large chunks (instances of the
+        /// following structure) to reduce memory allocation overhead.  The
+        /// chunks are kept on a linked list so that they can be deallocated
+        /// when the RowSet is destroyed.
+        ///
+        ///</summary>
+        public class RowSetChunk
+        {
+            public RowSetChunk pNextChunk;
+
+            ///
+            ///<summary>
+            ///Next chunk on list of them all 
+            ///</summary>
+
+            public RowSetEntry[] aEntry = new RowSetEntry[Sqlite3.ROWSET_ENTRY_PER_CHUNK];
+            ///
+            ///<summary>
+            ///Allocated entries 
+            ///</summary>
+
+        };
+
+
+
+        ///<summary>
+        /// Each entry in a RowSet is an instance of the following object.
+        ///
+        ///</summary>
+        public class RowSetEntry
+        {
+            public i64 v;
+
+            ///
+            ///<summary>
+            ///ROWID value for this entry 
+            ///</summary>
+
+            public RowSetEntry pRight;
+
+            ///
+            ///<summary>
+            ///Right subtree (larger entries) or list 
+            ///</summary>
+
+            public RowSetEntry pLeft;
+            ///
+            ///<summary>
+            ///Left subtree (smaller entries) 
+            ///</summary>
+
+
+
+            ///<summary>
+            /// Convert a sorted list of elements (connected by pRight) into a binary
+            /// tree with depth of iDepth.  A depth of 1 means the tree contains a single
+            /// node taken from the head of *ppList.  A depth of 2 means a tree with
+            /// three nodes.  And so forth.
+            ///
+            /// Use as many entries from the input list as required and update the
+            /// *ppList to point to the unused elements of the list.  If the input
+            /// list contains too few elements, then construct an incomplete tree
+            /// and leave *ppList set to NULL.
+            ///
+            /// Return a pointer to the root of the constructed binary tree.
+            ///
+            ///</summary>
+            public static RowSetEntry rowSetNDeepTree(ref RowSetEntry ppList, int iDepth)
+            {
+                RowSetEntry p;
+                ///
+                ///<summary>
+                ///Root of the new tree 
+                ///</summary>
+
+                RowSetEntry pLeft;
+                ///
+                ///<summary>
+                ///Left subtree 
+                ///</summary>
+
+                if (ppList == null)
+                {
+                    return null;
+                }
+                if (iDepth == 1)
+                {
+                    p = ppList;
+                    ppList = p.pRight;
+                    p.pLeft = p.pRight = null;
+                    return p;
+                }
+                pLeft = rowSetNDeepTree(ref ppList, iDepth - 1);
+                p = ppList;
+                if (p == null)
+                {
+                    return pLeft;
+                }
+                p.pLeft = pLeft;
+                ppList = p.pRight;
+                p.pRight = rowSetNDeepTree(ref ppList, iDepth - 1);
+                return p;
+            }
+        };
+
     };
 
 
+
+    public static class RowSetEntryExtensions
+    {
+
+
+
+
+        ///<summary>
+        /// The input, pIn, is a binary tree (or subtree) of RowSetEntry objects.
+        /// Convert this tree into a linked list connected by the pRight pointers
+        /// and return pointers to the first and last elements of the new list.
+        ///
+        ///</summary>
+        public static void rowSetTreeToList(
+            /*Root of the input tree */this RowSet.RowSetEntry pIn,
+            /*Write head of the output list here */ref RowSet.RowSetEntry ppFirst,
+            /*Write tail of the output list here */ref RowSet.RowSetEntry ppLast
+        )
+        {
+            Debug.Assert(null != pIn);
+            if (null != pIn.pLeft)
+            {
+                RowSet.RowSetEntry p = new RowSet.RowSetEntry();
+                rowSetTreeToList(pIn.pLeft, ref ppFirst, ref p);
+                p.pRight = pIn;
+            }
+            else
+            {
+                ppFirst = pIn;
+            }
+            if (pIn.pRight != null)
+            {
+                rowSetTreeToList(pIn.pRight, ref pIn.pRight, ref ppLast);
+            }
+            else
+            {
+                ppLast = pIn;
+            }
+            Debug.Assert((ppLast).pRight == null);
+        }
+
+
+
+
+        ///<summary>
+        /// Convert a sorted list of elements into a binary tree. Make the tree
+        /// as deep as it needs to be in order to contain the entire list.
+        ///
+        ///</summary>
+        public static RowSet.RowSetEntry rowSetListToTree(this RowSet.RowSetEntry pList)
+        {
+
+
+            int iDepth;
+            ///Depth of the tree so far 
+
+            RowSet.RowSetEntry p;
+            ///Current tree root 
+
+            RowSet.RowSetEntry pLeft;
+            ///Left subtree 
+
+            Debug.Assert(pList != null);
+            p = pList;
+            pList = p.pRight;
+            p.pLeft = p.pRight = null;
+            for (iDepth = 1; pList != null; iDepth++)
+            {
+                pLeft = p;
+                p = pList;
+                pList = p.pRight;
+                p.pLeft = pLeft;
+                p.pRight = RowSet.RowSetEntry.rowSetNDeepTree(ref pList, iDepth);
+            }
+            return p;
+        }
+
+
+
+    }
 	public partial class Sqlite3
 	{
 		

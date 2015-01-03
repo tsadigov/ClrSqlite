@@ -159,34 +159,34 @@ namespace Community.CsharpSqlite
 		/// Return N random u8s.
 		///
 		///</summary>
-		static void sqlite3_randomness (int N, ref i64 pBuf)
+		public static void sqlite3_randomness (int N, ref i64 pBuf)
 		{
 			u8[] zBuf = new u8[N];
 			pBuf = 0;
 			#if SQLITE_THREADSAFE
 																																																									      sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_PRNG );
 #endif
-			sqlite3_mutex_enter (mutex);
+			mutex.sqlite3_mutex_enter();
 			while (N-- > 0) {
 				pBuf = (u32)((pBuf << 8) + randomu8 ());
 				//  zBuf[N] = randomu8();
 			}
-			sqlite3_mutex_leave (mutex);
+			mutex.sqlite3_mutex_leave();
 		}
 
-		static void sqlite3_randomness (byte[] pBuf, int Offset, int N)
+		public static void sqlite3_randomness (byte[] pBuf, int Offset, int N)
 		{
 			i64 iBuf = System.DateTime.Now.Ticks;
 			#if SQLITE_THREADSAFE
 																																																									  sqlite3_mutex mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_PRNG);
 #endif
-			sqlite3_mutex_enter (mutex);
+			mutex.sqlite3_mutex_enter();
 			while (N-- > 0) {
 				iBuf = (u32)((iBuf << 8) + randomu8 ());
 				//  zBuf[N] = randomu8();
 				pBuf [Offset++] = (byte)iBuf;
 			}
-			sqlite3_mutex_leave (mutex);
+			mutex.sqlite3_mutex_leave();
 		}
 
 		#if !SQLITE_OMIT_BUILTIN_TEST

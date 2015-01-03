@@ -987,7 +987,7 @@ break;
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																								if( pDef ){
 auth = sqlite3AuthCheck(pParse, SQLITE_FUNCTION, 0, pDef.zName, 0);
-if( auth!=SQLITE_OK ){
+if( auth!=Sqlite3.SQLITE_OK ){
 if( auth==SQLITE_DENY ){
 utilc.sqlite3ErrorMsg(pParse, "not authorized to use function: %s",
 pDef.zName);

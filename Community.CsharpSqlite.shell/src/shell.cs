@@ -4,12 +4,11 @@ using System.IO;
 using System.Text;
 using Community.CsharpSqlite;
 
-using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
 using sqlite3_backup = Community.CsharpSqlite.Sqlite3.sqlite3_backup;
 
 using sqlite3_int64 = System.Int64;
 using sqlite3_stmt = Community.CsharpSqlite.Sqlite3.Vdbe;
-using sqlite3_value = Community.CsharpSqlite.Sqlite3.Mem;
+using sqlite3_value = Community.CsharpSqlite.Mem;
 using va_list = System.Object;
 
 class Shell
@@ -183,7 +182,7 @@ timeDiff(&sBegin.ru_stime, &sEnd.ru_stime));
 ///
 ///</summary>
 
-	static Sqlite3.sqlite3 db = null;
+	static sqlite3 db = null;
 
 	///
 ///<summary>

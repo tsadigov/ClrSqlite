@@ -45,7 +45,7 @@ namespace Community.CsharpSqlite
         ///See above 
         ///</summary>
 
-        public Community.CsharpSqlite.Sqlite3.Bitvec pInSavepoint;
+        public Bitvec pInSavepoint;
 
         ///
         ///<summary>

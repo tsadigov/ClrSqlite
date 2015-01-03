@@ -19,7 +19,12 @@ using ynVar=System.Int16;
 using ynVar = System.Int32; 
 #endif
 namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+    using Vdbe = Sqlite3.Vdbe;
+    using Parse = Sqlite3.Parse;
+    using sqliteinth = Sqlite3.sqliteinth;
+    using exprc = Sqlite3.exprc;
+    using _Custom = Sqlite3._Custom;
+
 		///<summary>
 		/// A WherePlan object holds information that describes a lookup
 		/// strategy.
@@ -157,7 +162,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		public class WhereInfo {
-			public Parse pParse;
+			public Sqlite3.Parse pParse;
 			///
 			///<summary>
 			///Parsing and code generating context 
@@ -687,7 +692,7 @@ namespace Community.CsharpSqlite {
 							pLevel.p1=iCur;
 							pLevel.p2=start;
 							if(pStart==null&&pEnd==null) {
-								pLevel.p5=SQLITE_STMTSTATUS_FULLSCAN_STEP;
+                                pLevel.p5 = Sqlite3.SQLITE_STMTSTATUS_FULLSCAN_STEP;
 							}
 							else {
 								Debug.Assert(pLevel.p5==0);
@@ -1317,7 +1322,7 @@ namespace Community.CsharpSqlite {
 									pLevel.op=aStep[bRev];
 									pLevel.p1=iCur;
 									pLevel.p2=1+v.sqlite3VdbeAddOp2(aStart[bRev],iCur,addrBrk);
-									pLevel.p5=SQLITE_STMTSTATUS_FULLSCAN_STEP;
+									pLevel.p5=Sqlite3.SQLITE_STMTSTATUS_FULLSCAN_STEP;
 								}
 				notReady&=~pWC.pMaskSet.getMask(iCur);
 				///
@@ -1394,4 +1399,3 @@ namespace Community.CsharpSqlite {
 			}
 		}
 	}
-}

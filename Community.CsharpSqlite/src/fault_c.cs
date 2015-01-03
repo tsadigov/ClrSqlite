@@ -104,7 +104,7 @@ BenignMallocHooks *x = &GLOBAL(BenignMallocHooks,sqlite3Hooks)
 		/// indicates that subsequent malloc failures are non-benign.
 		///
 		///</summary>
-		static void sqlite3BeginBenignMalloc ()
+		public static void sqlite3BeginBenignMalloc ()
 		{
 			wsdHooksInit ();
 			if (wsdHooks.xBenignBegin != null) {
@@ -112,7 +112,7 @@ BenignMallocHooks *x = &GLOBAL(BenignMallocHooks,sqlite3Hooks)
 			}
 		}
 
-		static void sqlite3EndBenignMalloc ()
+		public static void sqlite3EndBenignMalloc ()
 		{
 			wsdHooksInit ();
 			if (wsdHooks.xBenignEnd != null) {

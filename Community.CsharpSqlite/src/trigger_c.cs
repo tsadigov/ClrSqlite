@@ -279,7 +279,7 @@ namespace Community.CsharpSqlite {
 			///specified name exists 
 			///</summary>
 			zName=build.sqlite3NameFromToken(db,pName);
-			if(zName==null||SQLITE_OK!=build.sqlite3CheckObjectName(pParse,zName)) {
+			if(zName==null||Sqlite3.SQLITE_OK!=build.sqlite3CheckObjectName(pParse,zName)) {
 				goto trigger_cleanup;
 			}
 			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
@@ -1200,7 +1200,7 @@ return;
 				///<param name="OP_Halt inserted at the end of the program.  ">OP_Halt inserted at the end of the program.  </param>
 				if(pTrigger.pWhen!=null) {
 					pWhen=exprc.sqlite3ExprDup(db,pTrigger.pWhen,0);
-					if(SQLITE_OK==ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
+					if(Sqlite3.SQLITE_OK==ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
 					) {
 						iEndTrigger=v.sqlite3VdbeMakeLabel();
 						pSubParse.sqlite3ExprIfFalse(pWhen,iEndTrigger,sqliteinth.SQLITE_JUMPIFNULL);

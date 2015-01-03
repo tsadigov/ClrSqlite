@@ -7,7 +7,7 @@ using u8=System.Byte;
 using u32=System.UInt32;
 using u64=System.UInt64;
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Sqlite3.Mem;
+	using sqlite3_value=Mem;
 	using sqlite_int64=System.Int64;
     public partial class Sqlite3
     {
@@ -2009,7 +2009,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             public static void sqlite3RegisterBuiltinFunctions(sqlite3 db)
             {
                 int rc = sqlite3_overload_function(db, "MATCH", 2);
-                Debug.Assert(rc == SQLITE_NOMEM || rc == SQLITE_OK);
+                Debug.Assert(rc == SQLITE_NOMEM || rc == Sqlite3.SQLITE_OK);
                 if (rc == SQLITE_NOMEM)
                 {
                     ////        db.mallocFailed = 1;
@@ -2249,8 +2249,8 @@ FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
         ///<summary>
         ///</summary>
         ///<param name="True if non">integer value was input to the sum </param>
-        public Community.CsharpSqlite.Sqlite3.Mem _M;
-        public Community.CsharpSqlite.Sqlite3.Mem Context
+        public Community.CsharpSqlite.Mem _M;
+        public Community.CsharpSqlite.Mem Context
         {
             get
             {

@@ -30,13 +30,23 @@ namespace Community.CsharpSqlite
 {
     using Op = VdbeOp;
     using sqlite3_stmt = Sqlite3.Vdbe;
-    using sqlite3_value = Sqlite3.Mem;
+    using sqlite3_value = Mem;
+    using Vdbe = Sqlite3.Vdbe;
+    using malloc_cs = Sqlite3.malloc_cs;    
     using System;
+    using BTreeMethods=Sqlite3.BTreeMethods;     
     using System.Collections.Generic;
-    public partial class Sqlite3
-    {
+    using Parse = Sqlite3.Parse;
+    using Btree = Sqlite3.Btree;
+    using os = Sqlite3.os;
+    using io = Sqlite3.io;
+    using BtCursor = Sqlite3.BtCursor;
+    using utilc = Sqlite3.utilc;
+    using sqliteinth = Sqlite3.sqliteinth;
+    //public partial class Sqlite3
+    //{
 
-        public class vdbeaux
+        public static class  vdbeaux
         {
             ///
             ///<summary>
@@ -486,7 +496,7 @@ namespace Community.CsharpSqlite
                                 }
                                 else
                                 {
-                                    Mem p = (Mem)p4;
+                                    Community.CsharpSqlite.Mem p = (Mem)p4;
                                     //sqlite3DbFree( db, ref p.zMalloc );
                                     db.sqlite3DbFree(ref p);
                                 }
@@ -754,24 +764,24 @@ namespace Community.CsharpSqlite
                     case  P4Usage.P4_MEM:
                         {
                             Mem pMem = pOp.p4.pMem;
-                            Debug.Assert((pMem.flags & MEM.MEM_Null) == 0);
-                            if ((pMem.flags & MEM.MEM_Str) != 0)
+                            Debug.Assert((pMem.flags & MemFlags.MEM_Null) == 0);
+                            if ((pMem.flags & MemFlags.MEM_Str) != 0)
                             {
                                 zTemp.Append(pMem.z);
                             }
                             else
-                                if ((pMem.flags & MEM.MEM_Int) != 0)
+                                if ((pMem.flags & MemFlags.MEM_Int) != 0)
                                 {
                                     io.sqlite3_snprintf(nTemp, zTemp, "%lld", pMem.u.i);
                                 }
                                 else
-                                    if ((pMem.flags & MEM.MEM_Real) != 0)
+                                    if ((pMem.flags & MemFlags.MEM_Real) != 0)
                                     {
                                         io.sqlite3_snprintf(nTemp, zTemp, "%.16g", pMem.r);
                                     }
                                     else
                                     {
-                                        Debug.Assert((pMem.flags & MEM.MEM_Blob) != 0);
+                                        Debug.Assert((pMem.flags & MemFlags.MEM_Blob) != 0);
                                         zTemp = new StringBuilder("(blob)");
                                     }
                             break;
@@ -822,7 +832,7 @@ namespace Community.CsharpSqlite
                 Debug.Assert(i >= 0 && i < p.db.nDb && i < (int)sizeof(yDbMask) * 8);
                 Debug.Assert(i < (int)sizeof(yDbMask) * 8);
                 p.btreeMask |= ((yDbMask)1) << i;
-                if (i != 1 && sqlite3BtreeSharable(p.db.aDb[i].pBt))
+                if (i != 1 && Sqlite3.sqlite3BtreeSharable(p.db.aDb[i].pBt))
                 {
                     p.lockMask |= ((yDbMask)1) << i;
                 }
@@ -956,7 +966,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         ///<param name=""></param>
                         if (pEnd != null)
                         {
-                            if ((pEnd.flags & (MEM.MEM_Agg | MEM.MEM_Dyn | MEM.MEM_Frame | MEM.MEM_RowSet)) != 0)
+                            if ((pEnd.flags & (MemFlags.MEM_Agg | MemFlags.MEM_Dyn | MemFlags.MEM_Frame | MemFlags.MEM_RowSet)) != 0)
                             {
                                 pEnd.sqlite3VdbeMemRelease();
                             }
@@ -967,7 +977,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             //}
                             pEnd.z = null;
                             pEnd.n = 0;
-                            pEnd.flags = MEM.MEM_Null;
+                            pEnd.flags = MemFlags.MEM_Null;
                             malloc_cs.sqlite3_free(ref pEnd._Mem);
                             malloc_cs.sqlite3_free(ref pEnd.zBLOB);
                         }
@@ -1033,7 +1043,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 ///<summary>
                 ///Loop counter 
                 ///</summary>
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 ///
                 ///<summary>
                 ///Return code 
@@ -1041,10 +1051,10 @@ void sqlite3VdbeLeave(Vdbe *p){
                 if (p.pResultSet == null)
                     p.pResultSet = new Mem[0];
                 //Mem* pMem = p.pResultSet = p.aMem[1];   /* First Mem of result set */
-                Mem pMem;
+                Community.CsharpSqlite.Mem pMem;
                 Debug.Assert(p.explain != 0);
-                Debug.Assert(p.magic == VDBE_MAGIC_RUN);
-                Debug.Assert(p.rc == SQLITE_OK || p.rc == SQLITE_BUSY || p.rc == SQLITE_NOMEM);
+                Debug.Assert(p.magic == VdbeMagic.VDBE_MAGIC_RUN);
+                Debug.Assert(p.rc == Sqlite3.SQLITE_OK || p.rc == Sqlite3.SQLITE_BUSY || p.rc == Sqlite3.SQLITE_NOMEM);
                 ///
                 ///<summary>
                 ///Even though this opcode does not use dynamic strings for
@@ -1058,7 +1068,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 //  /* This happens if a malloc() inside a call to sqlite3_column_text() or
                 //  ** sqlite3_column_text16() failed.  */
                 //  db.mallocFailed = 1;
-                //  return SQLITE_ERROR;
+                //  return Sqlite3.SQLITE_ERROR;
                 //}
                 ///
                 ///<summary>
@@ -1083,7 +1093,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                     ///</summary>
                     Debug.Assert(p.nMem > 9);
                     pSub = p.aMem[9];
-                    if ((pSub.flags & MEM.MEM_Blob) != 0)
+                    if ((pSub.flags & MemFlags.MEM_Blob) != 0)
                     {
                         ///
                         ///<summary>
@@ -1114,15 +1124,15 @@ void sqlite3VdbeLeave(Vdbe *p){
                 while (i < nRow && p.explain == 2 && p.lOp[i].OpCode != OpCode.OP_Explain);
                 if (i >= nRow)
                 {
-                    p.rc = SQLITE_OK;
-                    rc = SQLITE_DONE;
+                    p.rc = Sqlite3.SQLITE_OK;
+                    rc = Sqlite3.SQLITE_DONE;
                 }
                 else
                     if (db.u1.isInterrupted)
                     {
-                        p.rc = SQLITE_INTERRUPT;
-                        rc = SQLITE_ERROR;
-                        malloc_cs.sqlite3SetString(ref p.zErrMsg, db, sqlite3ErrStr(p.rc));
+                        p.rc = Sqlite3.SQLITE_INTERRUPT;
+                        rc = Sqlite3.SQLITE_ERROR;
+                        malloc_cs.sqlite3SetString(ref p.zErrMsg, db, Sqlite3.sqlite3ErrStr(p.rc));
                     }
                     else
                     {
@@ -1154,7 +1164,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         }
                         if (p.explain == 1)
                         {
-                            pMem.flags = MEM.MEM_Int;
+                            pMem.flags = MemFlags.MEM_Int;
                             pMem.ValType = FoundationalType.SQLITE_INTEGER;
                             pMem.u.i = i;
                             ///
@@ -1175,8 +1185,8 @@ void sqlite3VdbeLeave(Vdbe *p){
                             ///<param name="kept in p"> assuming this subprogram</param>
                             ///<param name="has not already been seen.">has not already been seen.</param>
                             ///<param name=""></param>
-                            pMem.flags = MEM.MEM_Static | MEM.MEM_Str | MEM.MEM_Term;
-                            pMem.z = sqlite3OpcodeName(pOp.OpCode);
+                            pMem.flags = MemFlags.MEM_Static | MemFlags.MEM_Str | MemFlags.MEM_Term;
+                            pMem.z = Sqlite3.sqlite3OpcodeName(pOp.OpCode);
                             ///
                             ///<summary>
                             ///Opcode 
@@ -1203,18 +1213,18 @@ void sqlite3VdbeLeave(Vdbe *p){
                                 }
                                 if (j == nSub)
                                 {
-                                    // && SQLITE_OK==sqlite3VdbeMemGrow(pSub, nByte, 1) ){
+                                    // && Sqlite3.SQLITE_OK==sqlite3VdbeMemGrow(pSub, nByte, 1) ){
                                     Array.Resize(ref apSub, nSub + 1);
                                     pSub._SubProgram = apSub;
                                     // (SubProgram)pSub.z;
                                     apSub[nSub++] = pOp.p4.pProgram;
-                                    pSub.flags |= MEM.MEM_Blob;
+                                    pSub.flags |= MemFlags.MEM_Blob;
                                     pSub.n = 0;
                                     //nSub*sizeof(SubProgram);
                                 }
                             }
                         }
-                        pMem.flags = MEM.MEM_Int;
+                        pMem.flags = MemFlags.MEM_Int;
                         pMem.u.i = pOp.p1;
                         ///
                         ///<summary>
@@ -1228,7 +1238,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         //--------------------------
                         pMem = p.pResultSet[i_pMem++];
                         //pMem++;
-                        pMem.flags = MEM.MEM_Int;
+                        pMem.flags = MemFlags.MEM_Int;
                         pMem.u.i = pOp.p2;
                         ///
                         ///<summary>
@@ -1242,7 +1252,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         //----------------------------
                         pMem = p.pResultSet[i_pMem++];
                         //pMem++;
-                        pMem.flags = MEM.MEM_Int;
+                        pMem.flags = MemFlags.MEM_Int;
                         pMem.u.i = pOp.p3;
                         ///
                         ///<summary>
@@ -1259,7 +1269,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         //if ( sqlite3VdbeMemGrow( pMem, 32, 0 ) != 0 )
                         //{                                                     /* P4 */
                         //  Debug.Assert( p.db.mallocFailed != 0 );
-                        //  return SQLITE_ERROR;
+                        //  return Sqlite3.SQLITE_ERROR;
                         //}
                         pMem.Flags = MemFlags.MEM_Dyn | MemFlags.MEM_Str | MemFlags.MEM_Term;
                         z = displayP4(pOp, pMem.z, 32);
@@ -1286,9 +1296,9 @@ void sqlite3VdbeLeave(Vdbe *p){
                             //if ( sqlite3VdbeMemGrow( pMem, 4, 0 ) != 0 )
                             //{
                             //  Debug.Assert( p.db.mallocFailed != 0 );
-                            //  return SQLITE_ERROR;
+                            //  return Sqlite3.SQLITE_ERROR;
                             //}
-                            pMem.flags = MEM.MEM_Dyn | MEM.MEM_Str | MEM.MEM_Term;
+                            pMem.flags = MemFlags.MEM_Dyn | MemFlags.MEM_Str | MemFlags.MEM_Term;
                             pMem.n = 2;
                             pMem.z = pOp.p5.ToString("x2");
                             //sqlite3_snprintf( 3, pMem.z, "%.2x", pOp.p5 );   /* P5 */
@@ -1313,7 +1323,7 @@ void sqlite3VdbeLeave(Vdbe *p){
           else
 #endif
                             {
-                                pMem.flags = MEM.MEM_Null;
+                                pMem.flags = MemFlags.MEM_Null;
                                 ///
                                 ///<summary>
                                 ///Comment 
@@ -1322,8 +1332,8 @@ void sqlite3VdbeLeave(Vdbe *p){
                             }
                         }
                         p.nResColumn = (u16)(8 - 4 * (p.explain - 1));
-                        p.rc = SQLITE_OK;
-                        rc = SQLITE_ROW;
+                        p.rc = Sqlite3.SQLITE_OK;
+                        rc = Sqlite3.SQLITE_ROW;
                     }
                 return rc;
             }
@@ -1495,7 +1505,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///</summary>
                 Debug.Assert(p != null);
                 Debug.Assert(pParse != null);
-                Debug.Assert(p.magic == VDBE_MAGIC_INIT);
+                Debug.Assert(p.magic == VdbeMagic.VDBE_MAGIC_INIT);
                 db = p.db;
                 //Debug.Assert( db.mallocFailed == 0 );
                 nVar = pParse.nVar;
@@ -1621,7 +1631,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     //
                     for (n = 0; n < nVar; n++)
                     {
-                        p.aVar[n].flags = MEM.MEM_Null;
+                        p.aVar[n].flags = MemFlags.MEM_Null;
                         p.aVar[n].db = db;
                     }
                 }
@@ -1635,7 +1645,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///<param name="not from 0..nMem">1 </param>
                     for (n = 0; n <= nMem; n++)
                     {
-                        p.aMem[n].flags = MEM.MEM_Null;
+                        p.aMem[n].flags = MemFlags.MEM_Null;
                         p.aMem[n].n = 0;
                         p.aMem[n].z = null;
                         p.aMem[n].zBLOB = null;
@@ -1787,11 +1797,11 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<summary>
                 ///</summary>
                 ///<param name="Number of databases with an active write">transaction </param>
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 bool needXcommit = false;
 #if SQLITE_OMIT_VIRTUALTABLE
 																																																																								      /* With this option, sqlite3VtabSync() is defined to be simply
-** SQLITE_OK so p is not used.
+** Sqlite3.SQLITE_OK so p is not used.
 */
       Sqlite3.sqliteinth.UNUSED_PARAMETER( p );
 #endif
@@ -1813,7 +1823,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///file is required for an atomic commit.
                 ///
                 ///</summary>
-                for (i = 0; rc == SQLITE_OK && i < db.nDb; i++)
+                for (i = 0; rc == Sqlite3.SQLITE_OK && i < db.nDb; i++)
                 {
                     Btree pBt = db.aDb[i].pBt;
                     if (pBt.sqlite3BtreeIsInTrans())
@@ -1824,7 +1834,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         rc = pBt.sqlite3BtreePager().sqlite3PagerExclusiveLock();
                     }
                 }
-                if (rc != SQLITE_OK)
+                if (rc != Sqlite3.SQLITE_OK)
                 {
                     return rc;
                 }
@@ -1837,7 +1847,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     rc = db.xCommitCallback(db.pCommitArg);
                     if (rc != 0)
                     {
-                        return SQLITE_CONSTRAINT;
+                        return Sqlite3.SQLITE_CONSTRAINT;
                     }
                 }
                 ///
@@ -1854,7 +1864,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<param name=""></param>
                 if (0 == StringExtensions.sqlite3Strlen30(db.aDb[0].pBt.GetFilename()) || nTrans <= 1)
                 {
-                    for (i = 0; rc == SQLITE_OK && i < db.nDb; i++)
+                    for (i = 0; rc == Sqlite3.SQLITE_OK && i < db.nDb; i++)
                     {
                         Btree pBt = db.aDb[i].pBt;
                         if (pBt != null)
@@ -1870,7 +1880,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///but could happen. In this case abandon processing and return the error.
                     ///
                     ///</summary>
-                    for (i = 0; rc == SQLITE_OK && i < db.nDb; i++)
+                    for (i = 0; rc == Sqlite3.SQLITE_OK && i < db.nDb; i++)
                     {
                         Btree pBt = db.aDb[i].pBt;
                         if (pBt != null)
@@ -1878,7 +1888,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             rc = pBt.sqlite3BtreeCommitPhaseTwo(0);
                         }
                     }
-                    if (rc == SQLITE_OK)
+                    if (rc == Sqlite3.SQLITE_OK)
                     {
                         vtab.sqlite3VtabCommit(db);
                     }
@@ -1912,7 +1922,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     {
                         i64 iRandom = 0;
                         db.sqlite3DbFree(ref zMaster);
-                        sqlite3_randomness(sizeof(u32), ref iRandom);
+                        Sqlite3.sqlite3_randomness(sizeof(u32), ref iRandom);
                         //random.Length
                         zMaster = io.sqlite3MPrintf(db, "%s-mj%08X", zMainFile, iRandom & 0x7fffffff);
                         //if (!zMaster)
@@ -1920,18 +1930,18 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         //  return SQLITE_NOMEM;
                         //}
                         sqliteinth.sqlite3FileSuffix3(zMainFile, zMaster);
-                        rc = os.sqlite3OsAccess(pVfs, zMaster, SQLITE_ACCESS_EXISTS, ref res);
+                        rc = os.sqlite3OsAccess(pVfs, zMaster, Sqlite3.SQLITE_ACCESS_EXISTS, ref res);
                     }
-                    while (rc == SQLITE_OK && res == 1);
-                    if (rc == SQLITE_OK)
+                    while (rc == Sqlite3.SQLITE_OK && res == 1);
+                    if (rc == Sqlite3.SQLITE_OK)
                     {
                         ///
                         ///<summary>
                         ///Open the master journal. 
                         ///</summary>
-                        rc = os.sqlite3OsOpenMalloc(ref pVfs, zMaster, ref pMaster, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_EXCLUSIVE | SQLITE_OPEN_MASTER_JOURNAL, ref rc);
+                        rc = os.sqlite3OsOpenMalloc(ref pVfs, zMaster, ref pMaster, Sqlite3.SQLITE_OPEN_READWRITE | Sqlite3.SQLITE_OPEN_CREATE | Sqlite3.SQLITE_OPEN_EXCLUSIVE | Sqlite3.SQLITE_OPEN_MASTER_JOURNAL, ref rc);
                     }
-                    if (rc != SQLITE_OK)
+                    if (rc != Sqlite3.SQLITE_OK)
                     {
                         db.sqlite3DbFree(ref zMaster);
                         return rc;
@@ -1966,7 +1976,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             }
                             rc = os.sqlite3OsWrite(pMaster, Encoding.UTF8.GetBytes(zFile), StringExtensions.sqlite3Strlen30(zFile), offset);
                             offset += StringExtensions.sqlite3Strlen30(zFile);
-                            if (rc != SQLITE_OK)
+                            if (rc != Sqlite3.SQLITE_OK)
                             {
                                 os.sqlite3OsCloseFree(pMaster);
                                 os.sqlite3OsDelete(pVfs, zMaster, 0);
@@ -1981,7 +1991,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///flag is set this is not required.
                     ///
                     ///</summary>
-                    if (needSync && 0 == (os.sqlite3OsDeviceCharacteristics(pMaster) & SQLITE_IOCAP_SEQUENTIAL) && SQLITE_OK != (rc = os.sqlite3OsSync(pMaster, SQLITE_SYNC_NORMAL)))
+                    if (needSync && 0 == (os.sqlite3OsDeviceCharacteristics(pMaster) & Sqlite3.SQLITE_IOCAP_SEQUENTIAL) && Sqlite3.SQLITE_OK != (rc = os.sqlite3OsSync(pMaster, Sqlite3.SQLITE_SYNC_NORMAL)))
                     {
                         os.sqlite3OsCloseFree(pMaster);
                         os.sqlite3OsDelete(pVfs, zMaster, 0);
@@ -2001,7 +2011,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///file before the failure occurred.
                     ///
                     ///</summary>
-                    for (i = 0; rc == SQLITE_OK && i < db.nDb; i++)
+                    for (i = 0; rc == Sqlite3.SQLITE_OK && i < db.nDb; i++)
                     {
                         Btree pBt = db.aDb[i].pBt;
                         if (pBt != null)
@@ -2010,8 +2020,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         }
                     }
                     os.sqlite3OsCloseFree(pMaster);
-                    Debug.Assert(rc != SQLITE_BUSY);
-                    if (rc != SQLITE_OK)
+                    Debug.Assert(rc != Sqlite3.SQLITE_BUSY);
+                    if (rc != Sqlite3.SQLITE_OK)
                     {
                         db.sqlite3DbFree(ref zMaster);
                         return rc;
@@ -2042,7 +2052,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 #if SQLITE_TEST
 																																																																																																        disable_simulated_io_errors();
 #endif
-                    sqlite3BeginBenignMalloc();
+                    Sqlite3.sqlite3BeginBenignMalloc();
                     for (i = 0; i < db.nDb; i++)
                     {
                         Btree pBt = db.aDb[i].pBt;
@@ -2051,7 +2061,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             pBt.sqlite3BtreeCommitPhaseTwo(0);
                         }
                     }
-                    sqlite3EndBenignMalloc();
+                    Sqlite3.sqlite3EndBenignMalloc();
 #if SQLITE_TEST
 																																																																																																        enable_simulated_io_errors();
 #endif
@@ -2079,7 +2089,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       p = db.pVdbe;
       while ( p != null )
       {
-        if ( p.magic == VDBE_MAGIC_RUN && p.pc >= 0 )
+        if ( p.magic == VdbeMagic.VDBE_MAGIC_RUN && p.pc >= 0 )
         {
           cnt++;
           if ( p.readOnly == false )
@@ -2120,7 +2130,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     Btree p = db.aDb[i].pBt;
                     if (p != null && p.sqlite3BtreeIsInTrans())
                     {
-                        p.sqlite3BtreeTripAllCursors(SQLITE_ABORT);
+                        p.sqlite3BtreeTripAllCursors(Sqlite3.SQLITE_ABORT);
                     }
                 }
             }
@@ -2134,17 +2144,17 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<param name="statement transaction is commtted.">statement transaction is commtted.</param>
             ///<param name=""></param>
             ///<param name="If an IO error occurs, an SQLITE_IOERR_XXX error code is returned.">If an IO error occurs, an SQLITE_IOERR_XXX error code is returned.</param>
-            ///<param name="Otherwise SQLITE_OK.">Otherwise SQLITE_OK.</param>
+            ///<param name="Otherwise Sqlite3.SQLITE_OK.">Otherwise Sqlite3.SQLITE_OK.</param>
             ///<param name=""></param>
             ///<summary>
             /// This function is called when a transaction opened by the database
             /// handle associated with the VM passed as an argument is about to be
             /// committed. If there are outstanding deferred foreign key constraint
-            /// violations, return SQLITE_ERROR. Otherwise, SQLITE_OK.
+            /// violations, return Sqlite3.SQLITE_ERROR. Otherwise, Sqlite3.SQLITE_OK.
             ///
             /// If there are outstanding FK violations and this function returns
-            /// SQLITE_ERROR, set the result of the VM to SQLITE_CONSTRAINT and write
-            /// an error message to it. Then return SQLITE_ERROR.
+            /// Sqlite3.SQLITE_ERROR, set the result of the VM to SQLITE_CONSTRAINT and write
+            /// an error message to it. Then return Sqlite3.SQLITE_ERROR.
             ///
             ///</summary>
 #if !SQLITE_OMIT_FOREIGN_KEY
@@ -2164,7 +2174,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             ///<summary>
             /// Each VDBE holds the result of the most recent sqlite3_step() call
-            /// in p.rc.  This routine sets that result back to SQLITE_OK.
+            /// in p.rc.  This routine sets that result back to Sqlite3.SQLITE_OK.
             ///
             ///</summary>
             ///<summary>
@@ -2175,8 +2185,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// again.
             ///
             /// To look at it another way, this routine resets the state of the
-            /// virtual machine from VDBE_MAGIC_RUN or VDBE_MAGIC_HALT back to
-            /// VDBE_MAGIC_INIT.
+            /// virtual machine from VdbeMagic.VDBE_MAGIC_RUN or VdbeMagic.VDBE_MAGIC_HALT back to
+            /// VdbeMagic.VDBE_MAGIC_INIT.
             ///
             ///</summary>
             ///<summary>
@@ -2186,8 +2196,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             public static int sqlite3VdbeFinalize(ref Vdbe p)
             {
-                int rc = SQLITE_OK;
-                if (p.magic == VDBE_MAGIC_RUN || p.magic == VDBE_MAGIC_HALT)
+                int rc = Sqlite3.SQLITE_OK;
+                if (p.magic == VdbeMagic.VDBE_MAGIC_RUN || p.magic == VdbeMagic.VDBE_MAGIC_HALT)
                 {
                     rc = p.sqlite3VdbeReset();
                     Debug.Assert((rc & p.db.errMask) == rc);
@@ -2231,7 +2241,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 int i;
                 Debug.Assert(p.db == null || p.db == db);
                 releaseMemArray(p.aVar, p.nVar);
-                releaseMemArray(p.aColName, p.nResColumn, COLNAME_N);
+                releaseMemArray(p.aColName, p.nResColumn, Sqlite3.COLNAME_N);
                 for (pSub = p.pProgram; pSub != null; pSub = pNext)
                 {
                     pNext = pSub.pNext;
@@ -2255,7 +2265,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             public static void sqlite3VdbeDelete(ref Vdbe p)
             {
                 sqlite3 db;
-                if (NEVER(p == null))
+                if (Sqlite3.NEVER(p == null))
                     return;
                 Cleanup(p);
                 db = p.db;
@@ -2272,7 +2282,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 {
                     p.pNext.pPrev = p.pPrev;
                 }
-                p.magic = VDBE_MAGIC_DEAD;
+                p.magic = VdbeMagic.VDBE_MAGIC_DEAD;
                 p.db = null;
                 sqlite3VdbeDeleteObject(db, ref p);
             }
@@ -2316,7 +2326,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 #endif
 #endif
                     p.deferredMoveto = false;
-                    p.cacheStatus = CACHE_STALE;
+                    p.cacheStatus = Sqlite3.CACHE_STALE;
                 }
                 else
                     if (Sqlite3.ALWAYS(p.pCursor != null))
@@ -2327,11 +2337,11 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             return rc;
                         if (hasMoved != 0)
                         {
-                            p.cacheStatus = CACHE_STALE;
+                            p.cacheStatus = Sqlite3.CACHE_STALE;
                             p.nullRow = true;
                         }
                     }
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
             ///<summary>
             /// The following functions:
@@ -2382,13 +2392,13 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<param name=""></param>
             public static u32 sqlite3VdbeSerialType(Mem pMem, int file_format)
             {
-                MEM flags = pMem.flags;
+                MemFlags flags = pMem.flags;
                 int n;
-                if ((flags & MEM.MEM_Null) != 0)
+                if ((flags & MemFlags.MEM_Null) != 0)
                 {
                     return 0;
                 }
-                if ((flags & MEM.MEM_Int) != 0)
+                if ((flags & MemFlags.MEM_Int) != 0)
                 {
                     ///
                     ///<summary>
@@ -2427,7 +2437,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         return 5;
                     return 6;
                 }
-                if ((flags & MEM.MEM_Real) != 0)
+                if ((flags & MemFlags.MEM_Real) != 0)
                 {
                     return 7;
                 }
@@ -2435,14 +2445,14 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///<summary>
                     ///pMem.db.mallocFailed != 0 || 
                     ///</summary>
-                (flags & (MEM.MEM_Str | MEM.MEM_Blob)) != 0);
+                (flags & (MemFlags.MEM_Str | MemFlags.MEM_Blob)) != 0);
                 n = pMem.n;
-                if ((flags & MEM.MEM_Zero) != 0)
+                if ((flags & MemFlags.MEM_Zero) != 0)
                 {
                     n += pMem.u.nZero;
                 }
                 else
-                    if ((flags & MEM.MEM_Blob) != 0)
+                    if ((flags & MemFlags.MEM_Blob) != 0)
                     {
                         n = pMem.zBLOB != null ? pMem.zBLOB.Length : pMem.z != null ? pMem.z.Length : 0;
                     }
@@ -2455,7 +2465,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         pMem.n = n;
                     }
                 Debug.Assert(n >= 0);
-                return (u32)((n * 2) + 12 + (((flags & MEM.MEM_Str) != 0) ? 1 : 0));
+                return (u32)((n * 2) + 12 + (((flags & MemFlags.MEM_Str) != 0) ? 1 : 0));
             }
             ///<summary>
             /// Return the length of the data corresponding to the supplied serial-type.
@@ -2608,13 +2618,13 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         {
                         }
                         else
-                            if (pMem.zBLOB != null && ((pMem.flags & MEM.MEM_Blob) != 0 || pMem.z == null))
+                            if (pMem.zBLOB != null && ((pMem.flags & MemFlags.MEM_Blob) != 0 || pMem.z == null))
                                 Buffer.BlockCopy(pMem.zBLOB, 0, buf, offset, (int)len);
                             //memcpy( buf, pMem.z, len );
                             else
                                 Buffer.BlockCopy(Encoding.UTF8.GetBytes(pMem.z), 0, buf, offset, (int)len);
                     //memcpy( buf, pMem.z, len );
-                    if ((pMem.flags & MEM.MEM_Zero) != 0)
+                    if ((pMem.flags & MemFlags.MEM_Zero) != 0)
                     {
                         len += (u32)pMem.u.nZero;
                         Debug.Assert(nBuf >= 0);
@@ -2674,7 +2684,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///<summary>
                             ///NULL 
                             ///</summary>
-                            result.flags = MEM.MEM_Null;
+                            result.flags = MemFlags.MEM_Null;
                             result.n = 0;
                             result.z = null;
                             result.zBLOB = null;
@@ -2684,28 +2694,28 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         {
                             ///<param name="1">byte signed integer </param>
                             result.u.i = (sbyte)buf[offset + 0];
-                            result.flags = MEM.MEM_Int;
+                            result.flags = MemFlags.MEM_Int;
                             return 1;
                         }
                     case 2:
                         {
                             ///<param name="2">byte signed integer </param>
                             result.u.i = (int)((((sbyte)buf[offset + 0]) << 8) | buf[offset + 1]);
-                            result.flags = MEM.MEM_Int;
+                            result.flags = MemFlags.MEM_Int;
                             return 2;
                         }
                     case 3:
                         {
                             ///<param name="3">byte signed integer </param>
                             result.u.i = (int)((((sbyte)buf[offset + 0]) << 16) | (buf[offset + 1] << 8) | buf[offset + 2]);
-                            result.flags = MEM.MEM_Int;
+                            result.flags = MemFlags.MEM_Int;
                             return 3;
                         }
                     case 4:
                         {
                             ///<param name="4">byte signed integer </param>
                             result.u.i = (int)(((sbyte)buf[offset + 0] << 24) | (buf[offset + 1] << 16) | (buf[offset + 2] << 8) | buf[offset + 3]);
-                            result.flags = MEM.MEM_Int;
+                            result.flags = MemFlags.MEM_Int;
                             return 4;
                         }
                     case 5:
@@ -2715,7 +2725,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             u32 y = (u32)((buf[offset + 2] << 24) | (buf[offset + 3] << 16) | (buf[offset + 4] << 8) | buf[offset + 5]);
                             x = (x << 32) | y;
                             result.u.i = (i64)x;
-                            result.flags = MEM.MEM_Int;
+                            result.flags = MemFlags.MEM_Int;
                             return 6;
                         }
                     case 6:
@@ -2748,7 +2758,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             if (serial_type == 6)
                             {
                                 result.u.i = (i64)x;
-                                result.flags = MEM.MEM_Int;
+                                result.flags = MemFlags.MEM_Int;
                             }
                             else
                             {
@@ -2762,7 +2772,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                                 result.r = BitConverter.Int64BitsToDouble((long)x);
                                 // memcpy(pMem.r, x, sizeof(x))
 #endif
-                                result.flags = (MathExtensions.sqlite3IsNaN(result.r) ? MEM.MEM_Null : MEM.MEM_Real);
+                                result.flags = (MathExtensions.sqlite3IsNaN(result.r) ? MemFlags.MEM_Null : MemFlags.MEM_Real);
                             }
                             return 8;
                         }
@@ -2772,7 +2782,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         {
                             ///Integer 1 
                             result.u.i = serial_type - 8;
-                            result.flags = MEM.MEM_Int;
+                            result.flags = MemFlags.MEM_Int;
                             return 0;
                         }
                     default:
@@ -2782,7 +2792,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             result.xDel = null;
                             if ((serial_type & 0x01) != 0)
                             {
-                                result.flags = MEM.MEM_Str | MEM.MEM_Ephem;
+                                result.flags = MemFlags.MEM_Str | MemFlags.MEM_Ephem;
                                 if (len <= buf.Length - offset)
                                 {
                                     result.z = Encoding.UTF8.GetString(buf, offset, (int)len);
@@ -2801,7 +2811,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             {
                                 result.z = null;
                                 result.zBLOB = malloc_cs.sqlite3Malloc((int)len);
-                                result.flags = MEM.MEM_Blob | MEM.MEM_Ephem;
+                                result.flags = MemFlags.MEM_Blob | MemFlags.MEM_Ephem;
                                 if (len <= buf.Length - offset)
                                 {
                                     Buffer.BlockCopy(buf, offset, result.zBLOB, 0, (int)len);
@@ -2851,7 +2861,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///<summary>
                             ///NULL 
                             ///</summary>
-                            pMem.flags = MEM.MEM_Null;
+                            pMem.flags = MemFlags.MEM_Null;
                             break;
                         }
                     case 1:
@@ -2861,7 +2871,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///</summary>
                             ///<param name="1">byte signed integer </param>
                             pMem.u.i = (sbyte)buf[0];
-                            pMem.flags = MEM.MEM_Int;
+                            pMem.flags = MemFlags.MEM_Int;
                             return 1;
                         }
                     case 2:
@@ -2871,7 +2881,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///</summary>
                             ///<param name="2">byte signed integer </param>
                             pMem.u.i = (int)(((buf[0]) << 8) | buf[1]);
-                            pMem.flags = MEM.MEM_Int;
+                            pMem.flags = MemFlags.MEM_Int;
                             return 2;
                         }
                     case 3:
@@ -2881,7 +2891,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///</summary>
                             ///<param name="3">byte signed integer </param>
                             pMem.u.i = (int)(((buf[0]) << 16) | (buf[1] << 8) | buf[2]);
-                            pMem.flags = MEM.MEM_Int;
+                            pMem.flags = MemFlags.MEM_Int;
                             return 3;
                         }
                     case 4:
@@ -2891,7 +2901,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///</summary>
                             ///<param name="4">byte signed integer </param>
                             pMem.u.i = (int)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
-                            pMem.flags = MEM.MEM_Int;
+                            pMem.flags = MemFlags.MEM_Int;
                             return 4;
                         }
                     case 5:
@@ -2904,7 +2914,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             u32 y = (u32)((buf[2] << 24) | (buf[3] << 16) | (buf[4] << 8) | buf[5]);
                             x = (x << 32) | y;
                             pMem.u.i = (i64)x;
-                            pMem.flags = MEM.MEM_Int;
+                            pMem.flags = MemFlags.MEM_Int;
                             return 6;
                         }
                     case 6:
@@ -2940,7 +2950,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             if (serial_type == 6)
                             {
                                 pMem.u.i = (i64)x;
-                                pMem.flags = MEM.MEM_Int;
+                                pMem.flags = MemFlags.MEM_Int;
                             }
                             else
                             {
@@ -2954,7 +2964,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                                 pMem.r = BitConverter.Int64BitsToDouble((long)x);
                                 // memcpy(pMem.r, x, sizeof(x))
 #endif
-                                pMem.flags = MEM.MEM_Real;
+                                pMem.flags = MemFlags.MEM_Real;
                             }
                             return 8;
                         }
@@ -2970,7 +2980,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///Integer 1 
                             ///</summary>
                             pMem.u.i = serial_type - 8;
-                            pMem.flags = MEM.MEM_Int;
+                            pMem.flags = MemFlags.MEM_Int;
                             return 0;
                         }
                     default:
@@ -2979,7 +2989,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             pMem.xDel = null;
                             if ((serial_type & 0x01) != 0)
                             {
-                                pMem.flags = MEM.MEM_Str | MEM.MEM_Ephem;
+                                pMem.flags = MemFlags.MEM_Str | MemFlags.MEM_Ephem;
                                 pMem.z = Encoding.UTF8.GetString(buf, 0, len);
                                 //memcpy( buf, pMem.z, len );
                                 pMem.n = pMem.z.Length;
@@ -2988,7 +2998,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             }
                             else
                             {
-                                pMem.flags = MEM.MEM_Blob | MEM.MEM_Ephem;
+                                pMem.flags = MemFlags.MEM_Blob | MemFlags.MEM_Ephem;
                                 pMem.zBLOB = malloc_cs.sqlite3Malloc(len);
                                 buf.CopyTo(pMem.zBLOB, 0);
                                 pMem.n = len;
@@ -3079,7 +3089,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 {
                     p = pSpace;
                     //(UnpackedRecord)pSpace;
-                    p.flags = UNPACKED_NEED_DESTROY;
+                    p.flags = UnpackedRecordFlags.UNPACKED_NEED_DESTROY;
                     //p->aMem = pMem = (Mem)&( (char)p )[ROUND8( sizeof( UnpackedRecord ) )];
                     //Debug.Assert( EIGHT_BYTE_ALIGNMENT( pMem ) );
                     // GetVarint( aKey, szHdr );
@@ -3136,7 +3146,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       //  if ( NEVER( pMem->zMalloc ) )  pMem .sqlite3VdbeMemRelease();
       //}
 #endif
-                if ((p.flags & UNPACKED_NEED_FREE) != 0)
+                if ((p.flags & UnpackedRecordFlags.UNPACKED_NEED_FREE) != 0)
                 {
                     p.pKeyInfo.db.sqlite3DbFree(ref p.aMem);
                     p = null;
@@ -3240,7 +3250,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 idx1 = (u32)((szHdr1 = pKey1[offset]) <= 0x7f ? 1 : utilc.getVarint32(pKey1, offset, out szHdr1));
                 // GetVarint( aKey1, szHdr1 );
                 d1 = (int)szHdr1;
-                if ((pPKey2.flags & UNPACKED_IGNORE_ROWID) != 0)
+                if ((pPKey2.flags & UnpackedRecordFlags.UNPACKED_IGNORE_ROWID) != 0)
                 {
                     szHdr1--;
                 }
@@ -3288,11 +3298,11 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         ///<param name="pPKey2">>rowid to the value of the rowid field in (pKey1, nKey1).</param>
                         ///<param name="This is used by the OP_IsUnique opcode.">This is used by the OP_IsUnique opcode.</param>
                         ///<param name=""></param>
-                        if ((pPKey2.flags & UNPACKED_PREFIX_SEARCH) != 0 && i == (pPKey2.nField - 1))
+                        if ((pPKey2.flags & UnpackedRecordFlags.UNPACKED_PREFIX_SEARCH) != 0 && i == (pPKey2.nField - 1))
                         {
                             Debug.Assert(idx1 == szHdr1 && rc != 0);
-                            Debug.Assert((mem1.flags & MEM.MEM_Int) != 0);
-                            pPKey2.flags = (ushort)(pPKey2.flags & ~UNPACKED_PREFIX_SEARCH);
+                            Debug.Assert((mem1.flags & MemFlags.MEM_Int) != 0);
+                            pPKey2.flags = (pPKey2.flags & ~UnpackedRecordFlags.UNPACKED_PREFIX_SEARCH);
                             pPKey2.rowid = mem1.u.i;
                         }
                         return rc;
@@ -3319,12 +3329,12 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///
                 ///</summary>
                 Debug.Assert(rc == 0);
-                if ((pPKey2.flags & UNPACKED_INCRKEY) != 0)
+                if ((pPKey2.flags & UnpackedRecordFlags.UNPACKED_INCRKEY) != 0)
                 {
                     rc = -1;
                 }
                 else
-                    if ((pPKey2.flags & UNPACKED_PREFIX_MATCH) != 0)
+                    if ((pPKey2.flags & UnpackedRecordFlags.UNPACKED_PREFIX_MATCH) != 0)
                     {
                         ///
                         ///<summary>
@@ -3341,7 +3351,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<summary>
             /// pCur points at an index entry created using the OP_MakeRecord opcode.
             /// Read the rowid (the last field in the record) and store it in *rowid.
-            /// Return SQLITE_OK if everything works, or an error code otherwise.
+            /// Return Sqlite3.SQLITE_OK if everything works, or an error code otherwise.
             ///
             /// pCur might be pointing to text obtained from a corrupt database file.
             /// So the content cannot be trusted.  Do appropriate checks on the content.
@@ -3380,7 +3390,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<param name=""></param>
                 Debug.Assert(pCur.sqlite3BtreeCursorIsValid());
                 rc = pCur.sqlite3BtreeKeySize(ref nCellKey);
-                Debug.Assert(rc == SQLITE_OK);
+                Debug.Assert(rc == Sqlite3.SQLITE_OK);
                 ///
                 ///<summary>
                 ///pCur is always valid so KeySize cannot fail 
@@ -3439,7 +3449,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 sqlite3VdbeSerialGet(m.zBLOB, (int)(m.n - lenRowid), typeRowid, v);
                 rowid = v.u.i;
                 m.sqlite3VdbeMemRelease();
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             ///
             ///<summary>
             ///Jump here if database corruption is detected after m has been
@@ -3454,7 +3464,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// Compare the key of the index entry that cursor pC is pointing to against
             /// the key string in pUnpacked.  Write into *pRes a number
             /// that is negative, zero, or positive if pC is less than, equal to,
-            /// or greater than pUnpacked.  Return SQLITE_OK on success.
+            /// or greater than pUnpacked.  Return Sqlite3.SQLITE_OK on success.
             ///
             /// pUnpacked is either created without a rowid or is truncated so that it
             /// omits the rowid at the end.  The rowid at the end of the index entry
@@ -3482,7 +3492,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 Mem m = null;
                 Debug.Assert(pCur.sqlite3BtreeCursorIsValid());
                 rc = pCur.sqlite3BtreeKeySize(ref nCellKey);
-                Debug.Assert(rc == SQLITE_OK);
+                Debug.Assert(rc == Sqlite3.SQLITE_OK);
                 ///
                 ///<summary>
                 ///pCur is always valid so KeySize cannot fail 
@@ -3504,10 +3514,10 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 {
                     return rc;
                 }
-                Debug.Assert((pUnpacked.flags & UNPACKED_IGNORE_ROWID) != 0);
+                Debug.Assert((pUnpacked.flags & UnpackedRecordFlags.UNPACKED_IGNORE_ROWID) != 0);
                 res = sqlite3VdbeRecordCompare(m.n, m.zBLOB, pUnpacked);
                 m.sqlite3VdbeMemRelease();
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
             ///<summary>
             /// This routine sets the value to be returned by subsequent calls to
@@ -3516,7 +3526,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             public static void sqlite3VdbeSetChanges(sqlite3 db, int nChange)
             {
-                Debug.Assert(Sqlite3.sqlite3_mutex_held(db.mutex));
+                Debug.Assert(db.mutex.sqlite3_mutex_held());
                 db.nChange = nChange;
                 db.nTotalChange += nChange;
             }
@@ -3566,4 +3576,4 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<param name=""></param>
         }
     }
-}
+//}

@@ -694,7 +694,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			///</summary>
 			int btreeSetHasContent (Pgno pgno)
 			{
-				int rc = SQLITE_OK;
+				int rc = Sqlite3.SQLITE_OK;
 				if (null == this.pHasContent) {
 					Debug.Assert (pgno <= this.nPage);
 					this.pHasContent = sqlite3BitvecCreate (this.nPage);
@@ -703,7 +703,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 					//  rc = SQLITE_NOMEM;
 					//}
 				}
-				if (rc == SQLITE_OK && pgno <= sqlite3BitvecSize (this.pHasContent)) {
+				if (rc == Sqlite3.SQLITE_OK && pgno <= sqlite3BitvecSize (this.pHasContent)) {
 					rc = sqlite3BitvecSet (this.pHasContent, pgno);
 				}
 				return rc;
@@ -739,24 +739,26 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			public int saveAllCursors (Pgno iRoot, BtCursor pExcept)
 			{
 				BtCursor p;
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
+				Debug.Assert (this.mutex.sqlite3_mutex_held());
 				Debug.Assert (pExcept == null || pExcept.pBt == this);
 				for (p = this.pCursor; p != null; p = p.pNext) {
 					if (p != pExcept && (0 == iRoot || p.pgnoRoot == iRoot) && p.eState == CURSOR_VALID) {
 						int rc = p.saveCursorPosition ();
-						if (SQLITE_OK != rc) {
+						if (Sqlite3.SQLITE_OK != rc) {
 							return rc;
 						}
 					}
 				}
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			public Pgno ptrmapPageno (Pgno pgno)
 			{
 				int nPagesPerMapPage;
 				Pgno iPtrMap, ret;
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
+                Debug.Assert(this.mutex.sqlite3_mutex_held());
+
+				
 				if (pgno < 2)
 					return 0;
 				nPagesPerMapPage = (int)(this.usableSize / 5 + 1);
@@ -802,7 +804,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 
 				if (pRC != 0)
 					return;
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
+				Debug.Assert (this.mutex.sqlite3_mutex_held());
 				///
 ///<summary>
 ///</summary>
@@ -816,7 +818,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				}
 				iPtrmap = PTRMAP_PAGENO (this, key);
 				rc = this.pPager.sqlite3PagerGet (iPtrmap, ref pDbPage);
-				if (rc != SQLITE_OK) {
+				if (rc != Sqlite3.SQLITE_OK) {
 					pRC = rc;
 					return;
 				}
@@ -830,7 +832,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				if (eType != pPtrmap [offset] || Converter.sqlite3Get4byte (pPtrmap, offset + 1) != parent) {
 					TRACE ("PTRMAP_UPDATE: %d->(%d,%d)\n", key, eType, parent);
 					pRC = rc = PagerMethods.sqlite3PagerWrite (pDbPage);
-					if (rc == SQLITE_OK) {
+					if (rc == Sqlite3.SQLITE_OK) {
 						pPtrmap [offset] = eType;
 						Converter.sqlite3Put4byte (pPtrmap, offset + 1, parent);
 					}
@@ -866,7 +868,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 ///</summary>
 
 				int rc;
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
+				Debug.Assert (this.mutex.sqlite3_mutex_held());
 				iPtrmap = (int)PTRMAP_PAGENO (this, key);
 				rc = this.pPager.sqlite3PagerGet ((u32)iPtrmap, ref pDbPage);
 				if (rc != 0) {
@@ -888,7 +890,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				PagerMethods.sqlite3PagerUnref (pDbPage);
 				if (pEType < 1 || pEType > 5)
 					return sqliteinth.SQLITE_CORRUPT_BKPT();
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			public int btreeGetPage (///
@@ -915,18 +917,18 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			{
 				int rc;
 				DbPage pDbPage = null;
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
+				Debug.Assert (this.mutex.sqlite3_mutex_held());
 				rc = this.pPager.sqlite3PagerAcquire (pgno, ref pDbPage, (u8)noContent);
 				if (rc != 0)
 					return rc;
 				ppPage = pDbPage.btreePageFromDbPage (pgno, this);
-				return SQLITE_OK;
+				return Sqlite3.SQLITE_OK;
 			}
 
 			public MemPage btreePageLookup (Pgno pgno)
 			{
 				DbPage pDbPage;
-				Debug.Assert (Sqlite3.sqlite3_mutex_held (this.mutex));
+				Debug.Assert (this.mutex.sqlite3_mutex_held());
 				pDbPage = this.pPager.sqlite3PagerLookup (pgno);
 				if (pDbPage) {
 					return pDbPage.btreePageFromDbPage (pgno, this);
@@ -940,99 +942,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			}
 		}
 
-		///<summary>
-		/// An instance of the following structure is used to hold information
-		/// about a cell.  The parseCellPtr() function fills in this structure
-		/// based on information extract from the raw disk page.
-		///
-		///</summary>
-		//typedef struct CellInfo CellInfo;
-		public struct CellInfo
-		{
-			int _iCell;
-            public int iCell { 
-                get { 
-                    return _iCell; 
-                } 
-                set { 
-                    _iCell = value; 
-                } 
-            }
-
-			///
-///<summary>
-///</summary>
-///<param name="Offset to start of cell content "> Needed for C# </param>
-
-			public byte[] pCell;
-
-			///
-///<summary>
-///Pointer to the start of cell content 
-///</summary>
-
-			public i64 nKey;
-
-			///
-///<summary>
-///The key for INTKEY tables, or number of bytes in key 
-///</summary>
-
-			public u32 nData;
-
-			///
-///<summary>
-///Number of bytes of data 
-///</summary>
-
-			public u32 nPayload;
-
-			///
-///<summary>
-///Total amount of payload 
-///</summary>
-
-			public u16 nHeader;
-
-			///
-///<summary>
-///Size of the cell content header in bytes 
-///</summary>
-
-			public u16 nLocal;
-
-			///
-///<summary>
-///Amount of payload held locally 
-///</summary>
-
-			public u16 iOverflow;
-
-			///<summary>
-			///Offset to overflow page number.  Zero if no overflow
-			///</summary>
-			public u16 nSize;
-
-			///
-///<summary>
-///</summary>
-///<param name="Size of the cell content on the main b">tree page </param>
-
-			public bool Equals (CellInfo ci)
-			{
-				if (ci.iCell >= ci.pCell.Length || iCell >= this.pCell.Length)
-					return false;
-				if (ci.pCell [ci.iCell] != this.pCell [iCell])
-					return false;
-				if (ci.nKey != this.nKey || ci.nData != this.nData || ci.nPayload != this.nPayload)
-					return false;
-				if (ci.nHeader != this.nHeader || ci.nLocal != this.nLocal)
-					return false;
-				if (ci.iOverflow != this.iOverflow || ci.nSize != this.nSize)
-					return false;
-				return true;
-			}
-		}
+		
 
 	
 		///<summary>
@@ -1683,7 +1593,7 @@ public static bool ISAUTOVACUUM =false;
 				u8 ePtrmapType = 0;
 				Pgno iPtrmapParent = 0;
 				rc = this.pBt.ptrmapGet (iChild, ref ePtrmapType, ref iPtrmapParent);
-				if (rc != SQLITE_OK) {
+				if (rc != Sqlite3.SQLITE_OK) {
 					//if( rc==SQLITE_NOMEM || rc==SQLITE_IOERR_NOMEM ) pCheck.mallocFailed = 1;
 					this.checkAppendMsg (zContext, "Failed to read ptrmap key=%d", iChild);
 					return;
@@ -1739,4 +1649,103 @@ public static bool ISAUTOVACUUM =false;
 	//#define get4byte sqlite3Get4byte
 	//#define put4byte sqlite3Put4byte
 	}
+
+
+
+    ///<summary>
+    /// An instance of the following structure is used to hold information
+    /// about a cell.  The parseCellPtr() function fills in this structure
+    /// based on information extract from the raw disk page.
+    ///
+    ///</summary>
+    //typedef struct CellInfo CellInfo;
+    public struct CellInfo
+    {
+        int _iCell;
+        public int iCell
+        {
+            get
+            {
+                return _iCell;
+            }
+            set
+            {
+                _iCell = value;
+            }
+        }
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="Offset to start of cell content "> Needed for C# </param>
+
+        public byte[] pCell;
+
+        ///
+        ///<summary>
+        ///Pointer to the start of cell content 
+        ///</summary>
+
+        public i64 nKey;
+
+        ///
+        ///<summary>
+        ///The key for INTKEY tables, or number of bytes in key 
+        ///</summary>
+
+        public u32 nData;
+
+        ///
+        ///<summary>
+        ///Number of bytes of data 
+        ///</summary>
+
+        public u32 nPayload;
+
+        ///
+        ///<summary>
+        ///Total amount of payload 
+        ///</summary>
+
+        public u16 nHeader;
+
+        ///
+        ///<summary>
+        ///Size of the cell content header in bytes 
+        ///</summary>
+
+        public u16 nLocal;
+
+        ///
+        ///<summary>
+        ///Amount of payload held locally 
+        ///</summary>
+
+        public u16 iOverflow;
+
+        ///<summary>
+        ///Offset to overflow page number.  Zero if no overflow
+        ///</summary>
+        public u16 nSize;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="Size of the cell content on the main b">tree page </param>
+
+        public bool Equals(CellInfo ci)
+        {
+            if (ci.iCell >= ci.pCell.Length || iCell >= this.pCell.Length)
+                return false;
+            if (ci.pCell[ci.iCell] != this.pCell[iCell])
+                return false;
+            if (ci.nKey != this.nKey || ci.nData != this.nData || ci.nPayload != this.nPayload)
+                return false;
+            if (ci.nHeader != this.nHeader || ci.nLocal != this.nLocal)
+                return false;
+            if (ci.iOverflow != this.iOverflow || ci.nSize != this.nSize)
+                return false;
+            return true;
+        }
+    }
 }

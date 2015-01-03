@@ -5,7 +5,7 @@ using i16=System.Int16;
 using u8=System.Byte;
 using u16=System.UInt16;
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Sqlite3.Mem;
+	using sqlite3_value=Mem;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2005 May 23
@@ -86,10 +86,10 @@ sqlite3ValueFree(ref pTmp);
 					///<summary>
 					///Do not copy the destructor 
 					///</summary>
-					return SQLITE_OK;
+					return Sqlite3.SQLITE_OK;
 				}
 			}
-			return SQLITE_ERROR;
+			return Sqlite3.SQLITE_ERROR;
 		}
 		///<summary>
 		/// This function is responsible for invoking the collation factory callback
@@ -164,7 +164,7 @@ sqlite3ValueFree(ref pTmp);
 				if(null==p) {
 					utilc.sqlite3ErrorMsg(pParse,"no such collation sequence: %s",zName);
 					pParse.nErr++;
-					return SQLITE_ERROR;
+					return Sqlite3.SQLITE_ERROR;
 				}
 				//
 				//Debug.Assert(p == pColl);
@@ -177,7 +177,7 @@ sqlite3ValueFree(ref pTmp);
 					pColl.xDel=p.xDel;
 				}
 			}
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		///<summary>
 		/// Locate and return an entry from the db.aCollSeq hash table. If the entry
@@ -193,7 +193,7 @@ sqlite3ValueFree(ref pTmp);
 		/// each collation sequence structure.
 		///
 		///</summary>
-		static CollSeq[] findCollSeqEntry(sqlite3 db,///
+		public static CollSeq[] findCollSeqEntry(sqlite3 db,///
 		///<summary>
 		///Database connection 
 		///</summary>

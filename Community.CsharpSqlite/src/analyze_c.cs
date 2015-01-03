@@ -174,13 +174,13 @@ namespace Community.CsharpSqlite
 ///arrays. The contents of sqlite_stat2 are used to populate the
 ///Index.aSample[] arrays.
 ///
-///If the sqlite_stat1 table is not present in the database, SQLITE_ERROR
+///If the sqlite_stat1 table is not present in the database, Sqlite3.SQLITE_ERROR
 ///is returned. In this case, even if SQLITE_ENABLE_STAT2 was defined 
 ///during compilation and the sqlite_stat2 table is present, no data is 
 ///read from it.
 ///
 ///If SQLITE_ENABLE_STAT2 was defined during compilation and the 
-///sqlite_stat2 table is not present in the database, SQLITE_ERROR is
+///sqlite_stat2 table is not present in the database, Sqlite3.SQLITE_ERROR is
 ///returned. However, in this case, data is read from the sqlite_stat1
 ///table (if it is present) before returning.
 ///
@@ -219,7 +219,7 @@ namespace Community.CsharpSqlite
 			sInfo.db = db;
 			sInfo.zDatabase = db.aDb [iDb].zName;
 			if (build.sqlite3FindTable (db, "sqlite_stat1", sInfo.zDatabase) == null) {
-				return SQLITE_ERROR;
+				return Sqlite3.SQLITE_ERROR;
 			}
 			///
 ///<summary>
@@ -241,11 +241,11 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				#if SQLITE_ENABLE_STAT2
-																																																																															  if ( rc == SQLITE_OK && null == build.sqlite3FindTable( db, "sqlite_stat2", sInfo.zDatabase ) )
+																																																																															  if ( rc == Sqlite3.SQLITE_OK && null == build.sqlite3FindTable( db, "sqlite_stat2", sInfo.zDatabase ) )
   {
-    rc = SQLITE_ERROR;
+    rc = Sqlite3.SQLITE_ERROR;
   }
-  if ( rc == SQLITE_OK )
+  if ( rc == Sqlite3.SQLITE_OK )
   {
     sqlite3_stmt pStmt = null;
 
@@ -258,7 +258,7 @@ namespace Community.CsharpSqlite
     sqlite3DbFree( db, ref zSql );
     //}
 
-    if ( rc == SQLITE_OK )
+    if ( rc == Sqlite3.SQLITE_OK )
     {
       while ( sqlite3_step( pStmt ) == SQLITE_ROW )
       {

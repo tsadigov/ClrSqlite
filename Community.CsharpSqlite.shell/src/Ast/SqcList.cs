@@ -18,10 +18,7 @@ using System.Diagnostics;
 namespace Community.CsharpSqlite
 {
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
-    using WhereInfo = Community.CsharpSqlite.Sqlite3.WhereInfo;
-    using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
-    using WherePlan = Community.CsharpSqlite.Sqlite3.WherePlan;
-    using sqlite3_value = Sqlite3.Mem;
+    using sqlite3_value = Mem;
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using exprc = Community.CsharpSqlite.Sqlite3.exprc;
     using sqliteinth = Sqlite3.sqliteinth;
@@ -89,7 +86,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///Parser context 
                 ///</summary>
-                Sqlite3.sqlite3 db = pParse.db;
+                sqlite3 db = pParse.db;
                 ///
                 ///<summary>
                 ///Data_base connection 

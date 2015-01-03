@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite
         ///</summary>
         public class VTable
         {
-            public Community.CsharpSqlite.Sqlite3.sqlite3 db;
+            public Community.CsharpSqlite.sqlite3 db;
             ///
             ///<summary>
             ///Database connection associated with this table 

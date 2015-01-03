@@ -162,13 +162,13 @@ namespace Community.CsharpSqlite {
 			if(db.aDb[1].pBt!=null) {
 				if(0==db.autoCommit||db.aDb[1].pBt.sqlite3BtreeIsInReadTrans()) {
 					utilc.sqlite3ErrorMsg(pParse,"temporary storage cannot be changed "+"from within a transaction");
-					return SQLITE_ERROR;
+					return Sqlite3.SQLITE_ERROR;
 				}
 				BTreeMethods.sqlite3BtreeClose(ref db.aDb[1].pBt);
 				db.aDb[1].pBt=null;
 				build.sqlite3ResetInternalSchema(db,-1);
 			}
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		#endif
 		#if !SQLITE_OMIT_PAGER_PRAGMAS
@@ -181,12 +181,12 @@ namespace Community.CsharpSqlite {
 			int ts=getTempStore(zStorageType);
 			sqlite3 db=pParse.db;
 			if(db.temp_store==ts)
-				return SQLITE_OK;
-			if(invalidateTempStorage(pParse)!=SQLITE_OK) {
-				return SQLITE_ERROR;
+				return Sqlite3.SQLITE_OK;
+			if(invalidateTempStorage(pParse)!=Sqlite3.SQLITE_OK) {
+				return Sqlite3.SQLITE_ERROR;
 			}
 			db.temp_store=(u8)ts;
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		#endif
 		///<summary>
@@ -379,30 +379,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 				return null;
 			return azModeName[eMode];
 		}
-		///<summary>
-		/// Process a pragma statement.
-		///
-		/// Pragmas are of this form:
-		///
-		///      PRAGMA [database.]id [= value]
-		///
-		/// The identifier might also be a string.  The value is a string, and
-		/// identifier, or a number.  If minusFlag is true, then the value is
-		/// a number that was preceded by a minus sign.
-		///
-		/// If the left side is "database.id" then pId1 is the database name
-		/// and pId2 is the id.  If the left side is just "id" then pId1 is the
-		/// id and pId2 is any empty string.
-		///
-		///</summary>
-		class EncName {
-			public string zName;
-			public SqliteEncoding enc;
-			public EncName(string zName,SqliteEncoding enc) {
-				this.zName=zName;
-				this.enc=enc;
-			}
-		};
+		
 
 		static EncName[] encnames=new EncName[] {
 			new EncName("UTF8",SqliteEncoding.UTF8),
@@ -883,7 +860,7 @@ goto pragma_out;
 														///<param name="as an auto">vacuum capable db.</param>
 														///<param name=""></param>
 														int rc=pBt.sqlite3BtreeSetAutoVacuum(eAuto);
-														if(rc==SQLITE_OK&&(eAuto==1||eAuto==2)) {
+														if(rc==Sqlite3.SQLITE_OK&&(eAuto==1||eAuto==2)) {
 															///
 															///<summary>
 															///When setting the auto_vacuum mode to either "full" or
@@ -908,7 +885,7 @@ goto pragma_out;
 																///<summary>
 																///2 
 																///</summary>
-																new VdbeOpList(OpCode.OP_Halt,SQLITE_OK,(int)OnConstraintError.OE_Abort,0),
+																new VdbeOpList(OpCode.OP_Halt,Sqlite3.SQLITE_OK,(int)OnConstraintError.OE_Abort,0),
 																///
 																///<summary>
 																///3 
@@ -1042,7 +1019,7 @@ goto pragma_out;
 																		int rc;
 																		int res=0;
 																		rc=os.sqlite3OsAccess(db.pVfs,zRight,SQLITE_ACCESS_READWRITE,ref res);
-																		if(rc!=SQLITE_OK||res==0) {
+																		if(rc!=Sqlite3.SQLITE_OK||res==0) {
 																			utilc.sqlite3ErrorMsg(pParse,"not a writable directory");
 																			goto pragma_out;
 																		}
@@ -1115,7 +1092,7 @@ else
 res = sqlite3OsFileControl( pFile, SQLITE_SET_LOCKPROXYFILE,
 ref iDummy );
 }
-if ( res != SQLITE_OK )
+if ( res != Sqlite3.SQLITE_OK )
 {
 utilc.sqlite3ErrorMsg( pParse, "failed to set lock proxy file" );
 goto pragma_out;
@@ -1916,7 +1893,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
                                                                   zState = "closed";
                                                                 }
                                                                 else if ( sqlite3_file_control( db, i != 0 ? db.aDb[i].zName : null,
-                                                         SQLITE_FCNTL_LOCKSTATE, ref j ) == SQLITE_OK )
+                                                         SQLITE_FCNTL_LOCKSTATE, ref j ) == Sqlite3.SQLITE_OK )
                                                                 {
                                                                   zState = azLockName[j];
                                                                 }
@@ -1997,4 +1974,31 @@ sqlite3_activate_cerod(&zRight[6]);
 		}
 	#endif
 	}
+
+    ///<summary>
+    /// Process a pragma statement.
+    ///
+    /// Pragmas are of this form:
+    ///
+    ///      PRAGMA [database.]id [= value]
+    ///
+    /// The identifier might also be a string.  The value is a string, and
+    /// identifier, or a number.  If minusFlag is true, then the value is
+    /// a number that was preceded by a minus sign.
+    ///
+    /// If the left side is "database.id" then pId1 is the database name
+    /// and pId2 is the id.  If the left side is just "id" then pId1 is the
+    /// id and pId2 is any empty string.
+    ///
+    ///</summary>
+    class EncName
+    {
+        public string zName;
+        public SqliteEncoding enc;
+        public EncName(string zName, SqliteEncoding enc)
+        {
+            this.zName = zName;
+            this.enc = enc;
+        }
+    };
 }

@@ -84,7 +84,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static int sqlite3OsClose(sqlite3_file pId)
             {
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 if (pId.pMethods != null)
                 {
                     rc = pId.pMethods.xClose(pId);
@@ -209,7 +209,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
 
                 rc = pVfs.xOpen(pVfs, zPath, pFile, flags & 0x87f3f, out pFlagsOut);
-                Debug.Assert(rc == SQLITE_OK || pFile.pMethods == null);
+                Debug.Assert(rc == Sqlite3.SQLITE_OK || pFile.pMethods == null);
                 return rc;
             }
 
@@ -298,7 +298,7 @@ namespace Community.CsharpSqlite
                 if (pFile != null)
                 {
                     rc = sqlite3OsOpen(pVfs, zFile, pFile, flags, ref pOutFlags);
-                    if (rc != SQLITE_OK)
+                    if (rc != Sqlite3.SQLITE_OK)
                     {
                         pFile = null;
                         // was  sqlite3DbFree(db,ref  pFile);
@@ -313,7 +313,7 @@ namespace Community.CsharpSqlite
 
             public static int sqlite3OsCloseFree(sqlite3_file pFile)
             {
-                int rc = SQLITE_OK;
+                int rc = Sqlite3.SQLITE_OK;
                 Debug.Assert(pFile != null);
                 rc = sqlite3OsClose(pFile);
                 //malloc_cs.sqlite3_free( ref pFile );
@@ -373,7 +373,7 @@ namespace Community.CsharpSqlite
 #if SQLITE_THREADSAFE
 																																																									      mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #endif
-                sqlite3_mutex_enter(mutex);
+                mutex.sqlite3_mutex_enter();
                 for (pVfs = vfsList; pVfs != null; pVfs = pVfs.pNext)
                 {
                     if (zVfs == null || zVfs == "")
@@ -382,7 +382,7 @@ namespace Community.CsharpSqlite
                         break;
                     //strcmp(zVfs, pVfs.zName) == null) break;
                 }
-                sqlite3_mutex_leave(mutex);
+                mutex.sqlite3_mutex_leave();
                 return pVfs;
             }
 
@@ -392,7 +392,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void vfsUnlink(sqlite3_vfs pVfs)
             {
-                Debug.Assert(Sqlite3.sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)));
+                Debug.Assert(Sqlite3.sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER).sqlite3_mutex_held());
                 if (pVfs == null)
                 {
                     ///
@@ -436,7 +436,7 @@ namespace Community.CsharpSqlite
                     return rc;
 #endif
                 mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
-                sqlite3_mutex_enter(mutex);
+                mutex.sqlite3_mutex_enter();
                 vfsUnlink(pVfs);
                 if (makeDflt != 0 || vfsList == null)
                 {
@@ -449,8 +449,8 @@ namespace Community.CsharpSqlite
                     vfsList.pNext = pVfs;
                 }
                 Debug.Assert(vfsList != null);
-                sqlite3_mutex_leave(mutex);
-                return SQLITE_OK;
+                mutex.sqlite3_mutex_leave();
+                return Sqlite3.SQLITE_OK;
             }
 
             ///
@@ -464,10 +464,10 @@ namespace Community.CsharpSqlite
 #if SQLITE_THREADSAFE
 																																																									      sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #endif
-                sqlite3_mutex_enter(mutex);
+                mutex.sqlite3_mutex_enter();
                 vfsUnlink(pVfs);
-                sqlite3_mutex_leave(mutex);
-                return SQLITE_OK;
+                mutex.sqlite3_mutex_leave();
+                return Sqlite3.SQLITE_OK;
             }
         }
     }

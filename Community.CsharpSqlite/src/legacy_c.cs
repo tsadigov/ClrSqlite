@@ -213,16 +213,16 @@ namespace Community.CsharpSqlite
                     return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                 if (zSql == null)
                     zSql = "";
-                sqlite3_mutex_enter(db.mutex);
-                utilc.sqlite3Error(db, SQLITE_OK, 0);
+                db.mutex.sqlite3_mutex_enter();
+                utilc.sqlite3Error(db, Sqlite3.SQLITE_OK, 0);
                 while ((result == SqlResult.SQLITE_OK || (result == SqlResult.SQLITE_SCHEMA && (++nRetry) < 2)) && zSql != "")
                 {
                     int nCol;
                     string[] azVals = null;
                     pStmt = null;
                     result = (SqlResult)sqlite3_prepare(db, zSql, -1, ref pStmt, ref zLeftover);
-                    Debug.Assert(result == SQLITE_OK || pStmt == null);
-                    if (result != SQLITE_OK)
+                    Debug.Assert(result == Sqlite3.SQLITE_OK || pStmt == null);
+                    if (result != Sqlite3.SQLITE_OK)
                     {
                         continue;
                     }
@@ -339,7 +339,7 @@ namespace Community.CsharpSqlite
                         pzErrMsg = "";
                     }
                 Debug.Assert((result & (SqlResult)db.errMask) == result);
-                sqlite3_mutex_leave(db.mutex);
+                db.mutex.sqlite3_mutex_leave();
                 return (int)result;
             }
 

@@ -7,11 +7,8 @@ using System.Threading.Tasks;
 namespace Community.CsharpSqlite
 {
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
-    using WhereInfo = Community.CsharpSqlite.Sqlite3.WhereInfo;
-    using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
-    using WherePlan = Community.CsharpSqlite.Sqlite3.WherePlan;
-    using sqlite3_value = Sqlite3.Mem;
-    using Mem = Community.CsharpSqlite.Sqlite3.Mem;
+    using sqlite3_value = Mem;
+    
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using utilc = Sqlite3.utilc;
     using System.Diagnostics;

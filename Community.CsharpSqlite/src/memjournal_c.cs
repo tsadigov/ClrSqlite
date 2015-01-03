@@ -154,7 +154,7 @@ namespace Community.CsharpSqlite
                 while (nRead >= 0 && (pChunk = pChunk.pNext) != null && nRead > 0);
                 p.readpoint.iOffset = (int)(iOfst + iAmt);
                 p.readpoint.pChunk = pChunk;
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             ///<summary>
@@ -226,7 +226,7 @@ namespace Community.CsharpSqlite
                     nWrite -= iSpace;
                     p.endpoint.iOffset += iSpace;
                 }
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             ///<summary>
@@ -247,7 +247,7 @@ namespace Community.CsharpSqlite
                     //malloc_cs.sqlite3_free( ref pTmp );
                 }
                 sqlite3MemJournalOpen(pJfd);
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             ///<summary>
@@ -257,7 +257,7 @@ namespace Community.CsharpSqlite
             public static int memjrnlClose(MemJournal pJfd)
             {
                 memjrnlTruncate(pJfd, 0);
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             ///<summary>
@@ -272,7 +272,7 @@ namespace Community.CsharpSqlite
             public static int memjrnlSync(sqlite3_file NotUsed, int NotUsed2)
             {
                 Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             ///
@@ -285,7 +285,7 @@ namespace Community.CsharpSqlite
             {
                 MemJournal p = (MemJournal)pJfd;
                 pSize = p.endpoint.iOffset;
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             ///<summary>

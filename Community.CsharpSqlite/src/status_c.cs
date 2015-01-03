@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Sqlite3.Mem;
+	using sqlite3_value=Mem;
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -117,7 +117,7 @@ namespace Community.CsharpSqlite {
 			if(resetFlag!=0) {
 				wsdStat.mxValue[op]=wsdStat.nowValue[op];
 			}
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 		///
 		///<summary>
@@ -145,12 +145,12 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		///<param name="Reset high">water mark if true </param>
 		) {
-			int rc=SQLITE_OK;
+			int rc=Sqlite3.SQLITE_OK;
 			///
 			///<summary>
 			///Return code 
 			///</summary>
-			sqlite3_mutex_enter(db.mutex);
+			db.mutex.sqlite3_mutex_enter();
 			switch(op) {
 			case SQLITE_DBSTATUS_LOOKASIDE_USED: {
 				pCurrent=db.lookaside.nOut;
@@ -277,11 +277,11 @@ namespace Community.CsharpSqlite {
 				break;
 			}
 			default: {
-				rc=SQLITE_ERROR;
+				rc=Sqlite3.SQLITE_ERROR;
 				break;
 			}
 			}
-			sqlite3_mutex_leave(db.mutex);
+			db.mutex.sqlite3_mutex_leave();
 			return rc;
 		}
 	}

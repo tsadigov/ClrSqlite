@@ -29,7 +29,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             for (p = _this; p != null; p = p.pNext)
             {
-                Debug.Assert(Sqlite3.sqlite3_mutex_held(p.pSrc.pBt.mutex));
+                Debug.Assert(p.pSrc.pBt.mutex.sqlite3_mutex_held());
                 if (!Sqlite3.isFatalError(p.rc) && iPage < p.iNext)
                 {
                     ///
@@ -41,9 +41,9 @@ namespace Community.CsharpSqlite
                     ///</summary>
                     int rc;
                     Debug.Assert(p.pDestDb != null);
-                    Sqlite3.sqlite3_mutex_enter(p.pDestDb.mutex);
+                    p.pDestDb.mutex.sqlite3_mutex_enter();
                     rc = p.backupOnePage(iPage, aData);
-                    Sqlite3.sqlite3_mutex_leave(p.pDestDb.mutex);
+                    p.pDestDb.mutex.sqlite3_mutex_leave();
                     Debug.Assert(rc != Sqlite3.SQLITE_BUSY && rc != Sqlite3.SQLITE_LOCKED);
                     if (rc != Sqlite3.SQLITE_OK)
                     {

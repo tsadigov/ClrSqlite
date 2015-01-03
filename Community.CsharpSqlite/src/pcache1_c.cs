@@ -464,13 +464,13 @@ namespace Community.CsharpSqlite
 		//#define pcache1EnterMutex(X) sqlite3_mutex_enter((X).mutex)
 		static void pcache1EnterMutex (PGroup X)
 		{
-			sqlite3_mutex_enter (X.mutex);
+			X.mutex.sqlite3_mutex_enter();
 		}
 
 		//#define pcache1LeaveMutex(X) sqlite3_mutex_leave((X).mutex)
 		static void pcache1LeaveMutex (PGroup X)
 		{
-			sqlite3_mutex_leave (X.mutex);
+			X.mutex.sqlite3_mutex_leave();
 		}
 
 		///
@@ -528,10 +528,10 @@ namespace Community.CsharpSqlite
 		static PgHdr pcache1Alloc (int nByte)
 		{
 			PgHdr p = null;
-			Debug.Assert (sqlite3_mutex_notheld (pcache1.grp.mutex));
+            Debug.Assert(pcache1.grp.mutex.sqlite3_mutex_notheld());
 			sqlite3StatusSet (SQLITE_STATUS_PAGECACHE_SIZE, nByte);
 			if (nByte <= pcache1.szSlot) {
-				sqlite3_mutex_enter (pcache1.mutex);
+				pcache1.mutex.sqlite3_mutex_enter();
 				p = pcache1.pFree._PgHdr;
 				if (p != null) {
 					pcache1.pFree = pcache1.pFree.pNext;
@@ -540,7 +540,7 @@ namespace Community.CsharpSqlite
 					Debug.Assert (pcache1.nFreeSlot >= 0);
 					sqlite3StatusAdd (SQLITE_STATUS_PAGECACHE_USED, 1);
 				}
-				sqlite3_mutex_leave (pcache1.mutex);
+				pcache1.mutex.sqlite3_mutex_leave();
 			}
 			if (p == null) {
 				///
@@ -556,9 +556,9 @@ namespace Community.CsharpSqlite
 				{
 					int sz = nByte;
 					//malloc_cs.sqlite3MallocSize( p );
-					sqlite3_mutex_enter (pcache1.mutex);
+					pcache1.mutex.sqlite3_mutex_enter();
 					sqlite3StatusAdd (SQLITE_STATUS_PAGECACHE_OVERFLOW, sz);
-					sqlite3_mutex_leave (pcache1.mutex);
+					pcache1.mutex.sqlite3_mutex_leave();
 				}
 				sqliteinth.sqlite3MemdebugSetType (p, MemType.PCACHE);
 			}
@@ -576,7 +576,7 @@ namespace Community.CsharpSqlite
 			if (p.CacheAllocated)//if ( p >= pcache1.pStart && p < pcache1.pEnd )
 			 {
 				PgFreeslot pSlot = new PgFreeslot ();
-				sqlite3_mutex_enter (pcache1.mutex);
+				pcache1.mutex.sqlite3_mutex_enter();
 				sqlite3StatusAdd (SQLITE_STATUS_PAGECACHE_USED, -1);
 				pSlot._PgHdr = p;
 				// pSlot = (PgFreeslot)p;
@@ -585,16 +585,16 @@ namespace Community.CsharpSqlite
 				pcache1.nFreeSlot++;
 				pcache1.bUnderPressure = pcache1.nFreeSlot < pcache1.nReserve;
 				Debug.Assert (pcache1.nFreeSlot <= pcache1.nSlot);
-				sqlite3_mutex_leave (pcache1.mutex);
+				pcache1.mutex.sqlite3_mutex_leave();
 			}
 			else {
 				int iSize;
 				Debug.Assert (sqliteinth.sqlite3MemdebugHasType (p, MemType.PCACHE));
                 sqliteinth.sqlite3MemdebugSetType(p, MemType.HEAP);
 				iSize = malloc_cs.sqlite3MallocSize (p.pData);
-				sqlite3_mutex_enter (pcache1.mutex);
+				pcache1.mutex.sqlite3_mutex_enter();
 				sqlite3StatusAdd (SQLITE_STATUS_PAGECACHE_OVERFLOW, -iSize);
-				sqlite3_mutex_leave (pcache1.mutex);
+				pcache1.mutex.sqlite3_mutex_leave();
 				malloc_cs.sqlite3_free (ref p.pData);
 			}
 		}
@@ -739,7 +739,7 @@ static int pcache1MemSize(object p){
 			PgHdr1[] apNew;
 			int nNew;
 			int i;
-			Debug.Assert (Sqlite3.sqlite3_mutex_held (p.pGroup.mutex));
+			Debug.Assert (p.pGroup.mutex.sqlite3_mutex_held());
 			nNew = p.nHash * 2;
 			if (nNew < 256) {
 				nNew = 256;
@@ -770,7 +770,7 @@ static int pcache1MemSize(object p){
 				p.apHash = apNew;
 				p.nHash = nNew;
 			}
-			return (p.apHash != null ? SQLITE_OK : SQLITE_NOMEM);
+			return (p.apHash != null ? Sqlite3.SQLITE_OK : SQLITE_NOMEM);
 		}
 
 		///<summary>
@@ -791,7 +791,7 @@ static int pcache1MemSize(object p){
 				return;
 			pCache = pPage.pCache;
 			pGroup = pCache.pGroup;
-			Debug.Assert (Sqlite3.sqlite3_mutex_held (pGroup.mutex));
+			Debug.Assert (pGroup.mutex.sqlite3_mutex_held());
 			if (pPage.pLruNext != null || pPage == pGroup.pLruTail) {
 				if (pPage.pLruPrev != null) {
 					pPage.pLruPrev.pLruNext = pPage.pLruNext;
@@ -824,7 +824,7 @@ static int pcache1MemSize(object p){
 			PCache1 pCache = pPage.pCache;
 			PgHdr1 pp;
 			PgHdr1 pPrev = null;
-			Debug.Assert (Sqlite3.sqlite3_mutex_held (pCache.pGroup.mutex));
+			Debug.Assert (pCache.pGroup.mutex.sqlite3_mutex_held());
 			h = (int)(pPage.iKey % pCache.nHash);
 			for (pp = pCache.apHash [h]; pp != pPage; pPrev = pp, pp = pp.pNext)
 				;
@@ -843,7 +843,7 @@ static int pcache1MemSize(object p){
 		///</summary>
 		static void pcache1EnforceMaxPage (PGroup pGroup)
 		{
-			Debug.Assert (Sqlite3.sqlite3_mutex_held (pGroup.mutex));
+			Debug.Assert (pGroup.mutex.sqlite3_mutex_held());
 			while (pGroup.nCurrentPage > pGroup.nMaxPage && pGroup.pLruTail != null) {
 				PgHdr1 p = pGroup.pLruTail;
 				Debug.Assert (p.pCache.pGroup == pGroup);
@@ -879,7 +879,7 @@ static int pcache1MemSize(object p){
 																																																									      uint nPage = 0;
 #endif
 			uint h;
-			Debug.Assert (Sqlite3.sqlite3_mutex_held (pCache.pGroup.mutex));
+			Debug.Assert (pCache.pGroup.mutex.sqlite3_mutex_held());
 			for (h = 0; h < pCache.nHash; h++) {
 				PgHdr1 pPrev = null;
 				PgHdr1 pp = pCache.apHash [h];
@@ -933,7 +933,7 @@ static int pcache1MemSize(object p){
 			}
 			pcache1.grp.mxPinned = 10;
 			pcache1.isInit = true;
-			return SQLITE_OK;
+			return Sqlite3.SQLITE_OK;
 		}
 
 		///<summary>
@@ -1356,7 +1356,7 @@ static int pcache1MemSize(object p){
 ///
 ///</summary>
 
-		static void sqlite3PCacheSetDefault ()
+		public static void sqlite3PCacheSetDefault ()
         
         {
 			sqlite3_pcache_methods defaultMethods = new sqlite3_pcache_methods (

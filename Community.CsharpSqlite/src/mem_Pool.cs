@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
-
+    using BtCursor = Sqlite3.BtCursor;
+    using sqlite3_mem_methods = Sqlite3.sqlite3_mem_methods;
+    using malloc_cs = Sqlite3.malloc_cs;
         public class mempoolMethods
         {
 
@@ -367,7 +367,7 @@ namespace Community.CsharpSqlite
 
             static int sqlite3MemInit()
             {
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             static void sqlite3MemShutdown()
@@ -431,9 +431,9 @@ namespace Community.CsharpSqlite
                     ///hold the STATIC_MEM mutex when the routines here are invoked. 
                     ///</summary>
 
-                    malloc_cs.mem0.mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MEM);
+                    malloc_cs.mem0.mutex = Sqlite3.sqlite3MutexAlloc(Sqlite3.SQLITE_MUTEX_STATIC_MEM);
                 }
-                return SQLITE_OK;
+                return Sqlite3.SQLITE_OK;
             }
 
             ///<summary>
@@ -456,8 +456,7 @@ namespace Community.CsharpSqlite
             public static void sqlite3MemSetDefault()
             {
                 sqlite3_mem_methods defaultMethods = new sqlite3_mem_methods(sqlite3MemMalloc, sqlite3MemMallocInt, sqlite3MemMallocMem, sqlite3MemFree, sqlite3MemFreeInt, sqlite3MemFreeMem, sqlite3MemRealloc, sqlite3MemSize, sqlite3MemRoundup, (dxMemInit)sqlite3MemInit, (dxMemShutdown)sqlite3MemShutdown, 0);
-                sqlite3_config(SqliteConfig.MALLOC, defaultMethods);
+                Sqlite3.sqlite3_config(SqliteConfig.MALLOC, defaultMethods);
             }
         }
     }
-}

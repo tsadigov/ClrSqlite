@@ -583,7 +583,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
             /// exactly iSize bytes. If pFile is not larger than iSize bytes, then
             /// this function is a no-op.
             ///
-            /// Return SQLITE_OK if everything is successful, or an SQLite error
+            /// Return Sqlite3.SQLITE_OK if everything is successful, or an SQLite error
             /// code if an error occurs.
             ///</summary>
         int backupTruncateFile(int iSize)
@@ -963,11 +963,11 @@ winceLock *shared;      /* Global shared lock memory for the file  */
         //#define SQLITE_ACCESS_EXISTS    0
         //#define SQLITE_ACCESS_READWRITE 1   /* Used by PRAGMA temp_store_directory */
         //#define SQLITE_ACCESS_READ      2   /* Unused */
-        private const int SQLITE_ACCESS_EXISTS = 0;
+        public const int SQLITE_ACCESS_EXISTS = 0;
 
-        private const int SQLITE_ACCESS_READWRITE = 1;
+        public const int SQLITE_ACCESS_READWRITE = 1;
 
-        private const int SQLITE_ACCESS_READ = 2;
+        public const int SQLITE_ACCESS_READ = 2;
 
         ///
         ///<summary>

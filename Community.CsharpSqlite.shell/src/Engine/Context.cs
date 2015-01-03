@@ -19,11 +19,8 @@ using u64 = System.UInt64;
 namespace Community.CsharpSqlite
 {
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
-    using WhereInfo = Community.CsharpSqlite.Sqlite3.WhereInfo;
-    using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
-    using WherePlan = Community.CsharpSqlite.Sqlite3.WherePlan;
-    using sqlite3_value = Sqlite3.Mem;
-    using Mem = Community.CsharpSqlite.Sqlite3.Mem;
+    using sqlite3_value = Mem;
+    
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
 
 
@@ -69,7 +66,7 @@ namespace Community.CsharpSqlite
         ///</summary>
 
 
-        public Sqlite3.Mem pMem;
+        public Mem pMem;
 
         ///<summary>
         ///Error code returned by the function. 
@@ -159,76 +156,76 @@ namespace Community.CsharpSqlite
         public void sqlite3_result_blob(string z, int n, dxDel xDel)
         {
             Debug.Assert(n >= 0);
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.setResultStrOrError(z, n, 0, xDel);
         }
 
         public void sqlite3_result_double(double rVal)
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.s.sqlite3VdbeMemSetDouble(rVal);
         }
 
         public void sqlite3_result_error(string z, int n)
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.setResultStrOrError(z, n, SqliteEncoding.UTF8, Sqlite3.SQLITE_TRANSIENT);
             this.isError = Sqlite3.SQLITE_ERROR;
         }
 
         public void sqlite3_result_int(int iVal)
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.s.sqlite3VdbeMemSetInt64((i64)iVal);
         }
 
         public void sqlite3_result_int64(i64 iVal)
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.s.sqlite3VdbeMemSetInt64(iVal);
         }
 
         public void sqlite3_result_null()
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.s.sqlite3VdbeMemSetNull();
         }
 
         public void sqlite3_result_text(string z, int o, //Offset
         int n, dxDel xDel)
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.setResultStrOrError(z, o, n, SqliteEncoding.UTF8, xDel);
         }
 
         public void sqlite3_result_text(StringBuilder z, int n, dxDel xDel)
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.setResultStrOrError(z.ToString(), n, SqliteEncoding.UTF8, xDel);
         }
 
         public void sqlite3_result_text(string z, int n, dxDel xDel)
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.setResultStrOrError(z, n, SqliteEncoding.UTF8, xDel);
         }
 
         public void sqlite3_result_value(sqlite3_value pValue)
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
-            Sqlite3.vdbemem_cs.sqlite3VdbeMemCopy(this.s, pValue);
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
+            vdbemem_cs.sqlite3VdbeMemCopy(this.s, pValue);
         }
 
         public void sqlite3_result_zeroblob(int n)
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.s.sqlite3VdbeMemSetZeroBlob(n);
         }
 
         public void sqlite3_result_error_code(int errCode)
         {
             this.isError = errCode;
-            if ((this.s.flags & MEM.MEM_Null) != 0)
+            if ((this.s.flags & MemFlags.MEM_Null) != 0)
             {
                 this.setResultStrOrError(Sqlite3.sqlite3ErrStr(errCode), -1, SqliteEncoding.UTF8, Sqlite3.SQLITE_STATIC);
             }
@@ -239,7 +236,7 @@ namespace Community.CsharpSqlite
         ///</summary>
         public void sqlite3_result_error_toobig()
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.isError = Sqlite3.SQLITE_ERROR;
             this.setResultStrOrError("string or blob too big", -1, SqliteEncoding.UTF8, Sqlite3.SQLITE_STATIC);
         }
@@ -249,7 +246,7 @@ namespace Community.CsharpSqlite
         ///</summary>
         public void sqlite3_result_error_nomem()
         {
-            Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
+            Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.s.sqlite3VdbeMemSetNull();
             this.isError = Sqlite3.SQLITE_NOMEM;
             //pCtx.s.db.mallocFailed = 1;

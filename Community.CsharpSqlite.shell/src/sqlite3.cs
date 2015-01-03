@@ -22,8 +22,10 @@ using ynVar = System.Int32;
 #endif
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
+    using Vdbe = Sqlite3.Vdbe;
+    using sqliteinth = Sqlite3.sqliteinth;
+    
+    using io = Sqlite3.io;
         ///
         ///<summary>
         ///Each database connection is an instance of the following structure.
@@ -73,7 +75,7 @@ namespace Community.CsharpSqlite
             ///Number of backends currently in use 
             ///</summary>
 
-            public Db[] aDb = new Db[SQLITE_MAX_ATTACHED];
+            public Db[] aDb = new Db[Sqlite3.SQLITE_MAX_ATTACHED];
 
             ///
             ///<summary>
@@ -580,7 +582,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 {
                     return null;
                 }
-                io.sqlite3StrAccumInit(txt, null, 0, SQLITE_MAX_LENGTH);
+                io.sqlite3StrAccumInit(txt, null, 0, Sqlite3.SQLITE_MAX_LENGTH);
                 txt.db = this;
                 txt.sqlite3StrAccumAppend(" (", 2);
                 for (i = 0; i < nEq; i++)
@@ -712,7 +714,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 CollSeq[] pColl;
                 if (zName != null)
                 {
-                    pColl = findCollSeqEntry(db, zName, create);
+                    pColl = Sqlite3.findCollSeqEntry(db, zName, create);
                 }
                 else
                 {
@@ -735,4 +737,3 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
     
     
     }
-}

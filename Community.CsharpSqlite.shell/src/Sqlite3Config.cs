@@ -5,102 +5,106 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
+    using MemPage = Sqlite3.MemPage;
+    using sqlite3_mem_methods = Sqlite3.sqlite3_mem_methods;
+    using sqlite3_mutex_methods = Sqlite3.sqlite3_mutex_methods;
+    using sqlite3_pcache_methods = Sqlite3.sqlite3_pcache_methods;
+
+    public class config_cs
     {
-        public class config_cs
+
+        ///<summary>
+        /// This API allows applications to modify the global configuration of
+        /// the SQLite library at run-time.
+        ///
+        /// This routine should only be called when there are no outstanding
+        /// database connections or memory allocations.  This routine is not
+        /// threadsafe.  Failure to heed these warnings can lead to unpredictable
+        /// behavior.
+        ///
+        ///</summary>
+        // Overloads for ap assignments
+        static int sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
         {
-
-            ///<summary>
-            /// This API allows applications to modify the global configuration of
-            /// the SQLite library at run-time.
-            ///
-            /// This routine should only be called when there are no outstanding
-            /// database connections or memory allocations.  This routine is not
-            /// threadsafe.  Failure to heed these warnings can lead to unpredictable
-            /// behavior.
-            ///
-            ///</summary>
-            // Overloads for ap assignments
-            static int sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
+            //  va_list ap;
+            int rc = Sqlite3.SQLITE_OK;
+            switch (op)
             {
-                //  va_list ap;
-                int rc = SQLITE_OK;
-                switch (op)
-                {
-                    case SqliteConfig.PCACHE:
-                        {
-                            ///
-                            ///<summary>
-                            ///Specify an alternative malloc implementation 
-                            ///</summary>
-                            Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache = ap;
-                            //Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)_Custom.va_arg(ap, "sqlite3_pcache_methods");
-                            break;
-                        }
-                }
-                return rc;
+                case SqliteConfig.PCACHE:
+                    {
+                        ///
+                        ///<summary>
+                        ///Specify an alternative malloc implementation 
+                        ///</summary>
+                        Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache = ap;
+                        //Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)_Custom.va_arg(ap, "sqlite3_pcache_methods");
+                        break;
+                    }
             }
-            static int sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
-            {
-                //  va_list ap;
-                int rc = SQLITE_OK;
-                switch (op)
-                {
-                    case SqliteConfig.GETPCACHE:
-                        {
-                            if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xInit == null)
-                            {
-                                sqlite3PCacheSetDefault();
-                            }
-                            ap = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache;
-                            //_Custom.va_arg(ap, sqlite3_pcache_methods) = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache;
-                            break;
-                        }
-                }
-                return rc;
-            }
-            static int sqlite3_config(int op, sqlite3_mem_methods ap)
-            {
-                //  va_list ap;
-                int rc = SQLITE_OK;
-                switch ((SqliteConfig)op)
-                {
-                    case SqliteConfig.MALLOC:
-                        {
-                            ///
-                            ///<summary>
-                            ///Specify an alternative malloc implementation 
-                            ///</summary>
-                            Sqlite3.sqliteinth.sqlite3GlobalConfig.m = ap;
-                            // (sqlite3_mem_methods)_Custom.va_arg( ap, "sqlite3_mem_methods" );
-                            break;
-                        }
-                }
-                return rc;
-            }
-            static int sqlite3_config(SqliteConfig op, ref sqlite3_mem_methods ap)
-            {
-                //  va_list ap;
-                int rc = SQLITE_OK;
-                switch (op)
-                {
-                    case SqliteConfig.GETMALLOC:
-                        {
-                            ///
-                            ///<summary>
-                            ///Retrieve the current malloc() implementation 
-                            ///</summary>
-                            //if ( Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc == null ) sqlite3MemSetDefault();
-                            ap = Sqlite3.sqliteinth.sqlite3GlobalConfig.m;
-                            //_Custom.va_arg(ap, sqlite3_mem_methods) =  Sqlite3.sqliteinth.sqlite3GlobalConfig.m;
-                            break;
-                        }
-                }
-                return rc;
-            }
+            return rc;
         }
-
-        public class Sqlite3Config
+        static int sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
+        {
+            //  va_list ap;
+            int rc = Sqlite3.SQLITE_OK;
+            switch (op)
+            {
+                case SqliteConfig.GETPCACHE:
+                    {
+                        if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xInit == null)
+                        {
+                            Sqlite3.sqlite3PCacheSetDefault();
+                        }
+                        ap = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache;
+                        //_Custom.va_arg(ap, sqlite3_pcache_methods) = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache;
+                        break;
+                    }
+            }
+            return rc;
+        }
+        static int sqlite3_config(int op, sqlite3_mem_methods ap)
+        {
+            //  va_list ap;
+            int rc = Sqlite3.SQLITE_OK;
+            switch ((SqliteConfig)op)
+            {
+                case SqliteConfig.MALLOC:
+                    {
+                        ///
+                        ///<summary>
+                        ///Specify an alternative malloc implementation 
+                        ///</summary>
+                        Sqlite3.sqliteinth.sqlite3GlobalConfig.m = ap;
+                        // (sqlite3_mem_methods)_Custom.va_arg( ap, "sqlite3_mem_methods" );
+                        break;
+                    }
+            }
+            return rc;
+        }
+        static int sqlite3_config(SqliteConfig op, ref sqlite3_mem_methods ap)
+        {
+            //  va_list ap;
+            int rc = Sqlite3.SQLITE_OK;
+            switch (op)
+            {
+                case SqliteConfig.GETMALLOC:
+                    {
+                        ///
+                        ///<summary>
+                        ///Retrieve the current malloc() implementation 
+                        ///</summary>
+                        //if ( Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc == null ) sqlite3MemSetDefault();
+                        ap = Sqlite3.sqliteinth.sqlite3GlobalConfig.m;
+                        //_Custom.va_arg(ap, sqlite3_mem_methods) =  Sqlite3.sqliteinth.sqlite3GlobalConfig.m;
+                        break;
+                    }
+            }
+            return rc;
+        }
+    }
+      
+    
+    public class Sqlite3Config
         {
             public bool bMemstat; /* True to enable memory status */
             public bool bCoreMutex; /* True to enable core mutexing */
@@ -246,7 +250,7 @@ namespace Community.CsharpSqlite
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="it is not possible to change the [threading mode] from its default">it is not possible to change the [threading mode] from its default</param>
         ///<param name="value of Single">thread and so [sqlite3_config()] will return </param>
-        ///<param name="[SQLITE_ERROR] if called with the SQLITE_CONFIG_SINGLETHREAD">[SQLITE_ERROR] if called with the SQLITE_CONFIG_SINGLETHREAD</param>
+        ///<param name="[Sqlite3.SQLITE_ERROR] if called with the SQLITE_CONFIG_SINGLETHREAD">[Sqlite3.SQLITE_ERROR] if called with the SQLITE_CONFIG_SINGLETHREAD</param>
         ///<param name="configuration option.</dd>">configuration option.</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_MULTITHREAD]] <dt>SQLITE_CONFIG_MULTITHREAD</dt>">[[SQLITE_CONFIG_MULTITHREAD]] <dt>SQLITE_CONFIG_MULTITHREAD</dt></param>
@@ -260,7 +264,7 @@ namespace Community.CsharpSqlite
         ///<param name="[database connection] at the same time.  ^If SQLite is compiled with">[database connection] at the same time.  ^If SQLite is compiled with</param>
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="it is not possible to set the Multi">thread [threading mode] and</param>
-        ///<param name="[sqlite3_config()] will return [SQLITE_ERROR] if called with the">[sqlite3_config()] will return [SQLITE_ERROR] if called with the</param>
+        ///<param name="[sqlite3_config()] will return [Sqlite3.SQLITE_ERROR] if called with the">[sqlite3_config()] will return [Sqlite3.SQLITE_ERROR] if called with the</param>
         ///<param name="SQLITE_CONFIG_MULTITHREAD configuration option.</dd>">SQLITE_CONFIG_MULTITHREAD configuration option.</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_SERIALIZED]] <dt>SQLITE_CONFIG_SERIALIZED</dt>">[[SQLITE_CONFIG_SERIALIZED]] <dt>SQLITE_CONFIG_SERIALIZED</dt></param>
@@ -276,7 +280,7 @@ namespace Community.CsharpSqlite
         ///<param name="^If SQLite is compiled with">^If SQLite is compiled with</param>
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="it is not possible to set the Serialized [threading mode] and">it is not possible to set the Serialized [threading mode] and</param>
-        ///<param name="[sqlite3_config()] will return [SQLITE_ERROR] if called with the">[sqlite3_config()] will return [SQLITE_ERROR] if called with the</param>
+        ///<param name="[sqlite3_config()] will return [Sqlite3.SQLITE_ERROR] if called with the">[sqlite3_config()] will return [Sqlite3.SQLITE_ERROR] if called with the</param>
         ///<param name="SQLITE_CONFIG_SERIALIZED configuration option.</dd>">SQLITE_CONFIG_SERIALIZED configuration option.</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_MALLOC]] <dt>SQLITE_CONFIG_MALLOC</dt>">[[SQLITE_CONFIG_MALLOC]] <dt>SQLITE_CONFIG_MALLOC</dt></param>
@@ -375,7 +379,7 @@ namespace Community.CsharpSqlite
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="the entire mutexing subsystem is omitted from the build and hence calls to">the entire mutexing subsystem is omitted from the build and hence calls to</param>
         ///<param name="[sqlite3_config()] with the SQLITE_CONFIG_MUTEX configuration option will">[sqlite3_config()] with the SQLITE_CONFIG_MUTEX configuration option will</param>
-        ///<param name="return [SQLITE_ERROR].</dd>">return [SQLITE_ERROR].</dd></param>
+        ///<param name="return [Sqlite3.SQLITE_ERROR].</dd>">return [Sqlite3.SQLITE_ERROR].</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_GETMUTEX]] <dt>SQLITE_CONFIG_GETMUTEX</dt>">[[SQLITE_CONFIG_GETMUTEX]] <dt>SQLITE_CONFIG_GETMUTEX</dt></param>
         ///<param name="<dd> ^(This option takes a single argument which is a pointer to an"><dd> ^(This option takes a single argument which is a pointer to an</param>
@@ -388,7 +392,7 @@ namespace Community.CsharpSqlite
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="the entire mutexing subsystem is omitted from the build and hence calls to">the entire mutexing subsystem is omitted from the build and hence calls to</param>
         ///<param name="[sqlite3_config()] with the SQLITE_CONFIG_GETMUTEX configuration option will">[sqlite3_config()] with the SQLITE_CONFIG_GETMUTEX configuration option will</param>
-        ///<param name="return [SQLITE_ERROR].</dd>">return [SQLITE_ERROR].</dd></param>
+        ///<param name="return [Sqlite3.SQLITE_ERROR].</dd>">return [Sqlite3.SQLITE_ERROR].</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_LOOKASIDE]] <dt>SQLITE_CONFIG_LOOKASIDE</dt>">[[SQLITE_CONFIG_LOOKASIDE]] <dt>SQLITE_CONFIG_LOOKASIDE</dt></param>
         ///<param name="<dd> ^(This option takes two arguments that determine the default"><dd> ^(This option takes two arguments that determine the default</param>
@@ -498,4 +502,4 @@ namespace Community.CsharpSqlite
             URI = 17
         }
     }
-}
+

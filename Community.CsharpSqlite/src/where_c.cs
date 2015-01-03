@@ -12,12 +12,10 @@ using Parse=Community.CsharpSqlite.Sqlite3.Parse;
 
 
 namespace Community.CsharpSqlite {
-    using WherePlan=Community.CsharpSqlite.Sqlite3.WherePlan;
-	using sqlite3_value=Sqlite3.Mem;
+	using sqlite3_value=Mem;
 
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
-    using WhereInfo = Community.CsharpSqlite.Sqlite3.WhereInfo;
-    using sqlite3 = Community.CsharpSqlite.Sqlite3.sqlite3;
+    
     using sqliteinth = Sqlite3.sqliteinth;
     using exprc = Sqlite3.exprc;
 
@@ -1279,7 +1277,7 @@ WhereCost pCost            /* Lowest cost query plan */
 	///
 	///If successful, this function determines which of the regions value 
 	///pVal lies in, sets *piRegion to the region index (a value between 0
-	///and SQLITE_INDEX_SAMPLES+1, inclusive) and returns SQLITE_OK.
+	///and SQLITE_INDEX_SAMPLES+1, inclusive) and returns Sqlite3.SQLITE_OK.
 	///Or, if an OOM occurs while converting text values between encodings,
 	///SQLITE_NOMEM is returned and *piRegion is undefined.
 	///</summary>
@@ -1354,7 +1352,7 @@ WhereCost pCost            /* Lowest cost query plan */
             {
               utilc.sqlite3ErrorMsg( pParse, "no such collation sequence: %s",
                   pIdx.azColl );
-              return SQLITE_ERROR;
+              return Sqlite3.SQLITE_ERROR;
             }
             z = sqlite3ValueText( pVal, pColl.enc );
             //if( null==z ){
@@ -1400,7 +1398,7 @@ sqlite3DbFree(db, ref zSample);
         Debug.Assert( i >= 0 && i <= SQLITE_INDEX_SAMPLES );
         piRegion = i;
       }
-      return SQLITE_OK;
+      return Sqlite3.SQLITE_OK;
     }
 #endif
 	///<summary>
@@ -1417,7 +1415,7 @@ sqlite3DbFree(db, ref zSample);
 	///
 	/// If neither of the above apply, set *pp to NULL.
 	///
-	/// If an error occurs, return an error code. Otherwise, SQLITE_OK.
+	/// If an error occurs, return an error code. Otherwise, Sqlite3.SQLITE_OK.
 	///</summary>
 	#if SQLITE_ENABLE_STAT2
 																																												    static int valueFromExpr(
@@ -1434,7 +1432,7 @@ sqlite3DbFree(db, ref zSample);
         int iVar = pExpr.iColumn;
         sqlite3VdbeSetVarmask( pParse.pVdbe, iVar ); /* IMP: R-23257-02778 */
         pp = sqlite3VdbeGetValue( pParse.pReprepare, iVar, (u8)aff );
-        return SQLITE_OK;
+        return Sqlite3.SQLITE_OK;
       }
       return sqlite3ValueFromExpr( pParse.db, pExpr, SqliteEncoding.UTF8, aff, ref pp );
     }
@@ -1489,7 +1487,7 @@ sqlite3DbFree(db, ref zSample);
 ** for that index.  When pExpr==NULL that means the constraint is
 ** "x IS NULL" instead of "x=VALUE".
 **
-** Write the estimated row count into *pnRow and return SQLITE_OK. 
+** Write the estimated row count into *pnRow and return Sqlite3.SQLITE_OK. 
 ** If unable to make an estimate, leave *pnRow unchanged and return
 ** non-zero.
 **
@@ -1558,7 +1556,7 @@ whereEqualScanEst_cancel:
 **
 **        WHERE x IN (1,2,3,4)
 **
-** Write the estimated row count into *pnRow and return SQLITE_OK. 
+** Write the estimated row count into *pnRow and return Sqlite3.SQLITE_OK. 
 ** If unable to make an estimate, leave *pnRow unchanged and return
 ** non-zero.
 **
@@ -1578,7 +1576,7 @@ whereEqualScanEst_cancel:
       int iLower = 0;
       int iUpper = 0;           /* Range of histogram regions containing pRhs */
       char aff;                 /* Column affinity */
-      int rc = SQLITE_OK;       /* Subfunction return code */
+      int rc = Sqlite3.SQLITE_OK;       /* Subfunction return code */
       double nRowEst;           /* New estimate of the number of rows */
       int nSpan = 0;            /* Number of histogram regions spanned */
       int nSingle = 0;          /* Histogram regions hit by a single value */
@@ -1619,7 +1617,7 @@ whereEqualScanEst_cancel:
             aSpan[iLower++] = 1;
         }
       }
-      if ( rc == SQLITE_OK )
+      if ( rc == Sqlite3.SQLITE_OK )
       {
         for ( i = nSpan = 0; i <= SQLITE_INDEX_SAMPLES; i++ )
         {
