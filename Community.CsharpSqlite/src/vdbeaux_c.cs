@@ -754,24 +754,24 @@ namespace Community.CsharpSqlite
                     case  P4Usage.P4_MEM:
                         {
                             Mem pMem = pOp.p4.pMem;
-                            Debug.Assert((pMem.flags & MEM_Null) == 0);
-                            if ((pMem.flags & MEM_Str) != 0)
+                            Debug.Assert((pMem.flags & MEM.MEM_Null) == 0);
+                            if ((pMem.flags & MEM.MEM_Str) != 0)
                             {
                                 zTemp.Append(pMem.z);
                             }
                             else
-                                if ((pMem.flags & MEM_Int) != 0)
+                                if ((pMem.flags & MEM.MEM_Int) != 0)
                                 {
                                     io.sqlite3_snprintf(nTemp, zTemp, "%lld", pMem.u.i);
                                 }
                                 else
-                                    if ((pMem.flags & MEM_Real) != 0)
+                                    if ((pMem.flags & MEM.MEM_Real) != 0)
                                     {
                                         io.sqlite3_snprintf(nTemp, zTemp, "%.16g", pMem.r);
                                     }
                                     else
                                     {
-                                        Debug.Assert((pMem.flags & MEM_Blob) != 0);
+                                        Debug.Assert((pMem.flags & MEM.MEM_Blob) != 0);
                                         zTemp = new StringBuilder("(blob)");
                                     }
                             break;
@@ -956,9 +956,9 @@ void sqlite3VdbeLeave(Vdbe *p){
                         ///<param name=""></param>
                         if (pEnd != null)
                         {
-                            if ((pEnd.flags & (MEM_Agg | MEM_Dyn | MEM_Frame | MEM_RowSet)) != 0)
+                            if ((pEnd.flags & (MEM.MEM_Agg | MEM.MEM_Dyn | MEM.MEM_Frame | MEM.MEM_RowSet)) != 0)
                             {
-                                sqlite3VdbeMemRelease(pEnd);
+                                pEnd.sqlite3VdbeMemRelease();
                             }
                             //else if ( pEnd.zMalloc != null )
                             //{
@@ -967,7 +967,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             //}
                             pEnd.z = null;
                             pEnd.n = 0;
-                            pEnd.flags = MEM_Null;
+                            pEnd.flags = MEM.MEM_Null;
                             malloc_cs.sqlite3_free(ref pEnd._Mem);
                             malloc_cs.sqlite3_free(ref pEnd.zBLOB);
                         }
@@ -1083,7 +1083,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                     ///</summary>
                     Debug.Assert(p.nMem > 9);
                     pSub = p.aMem[9];
-                    if ((pSub.flags & MEM_Blob) != 0)
+                    if ((pSub.flags & MEM.MEM_Blob) != 0)
                     {
                         ///
                         ///<summary>
@@ -1154,7 +1154,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         }
                         if (p.explain == 1)
                         {
-                            pMem.flags = MEM_Int;
+                            pMem.flags = MEM.MEM_Int;
                             pMem.ValType = FoundationalType.SQLITE_INTEGER;
                             pMem.u.i = i;
                             ///
@@ -1175,7 +1175,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             ///<param name="kept in p"> assuming this subprogram</param>
                             ///<param name="has not already been seen.">has not already been seen.</param>
                             ///<param name=""></param>
-                            pMem.flags = MEM_Static | MEM_Str | MEM_Term;
+                            pMem.flags = MEM.MEM_Static | MEM.MEM_Str | MEM.MEM_Term;
                             pMem.z = sqlite3OpcodeName(pOp.OpCode);
                             ///
                             ///<summary>
@@ -1208,13 +1208,13 @@ void sqlite3VdbeLeave(Vdbe *p){
                                     pSub._SubProgram = apSub;
                                     // (SubProgram)pSub.z;
                                     apSub[nSub++] = pOp.p4.pProgram;
-                                    pSub.flags |= MEM_Blob;
+                                    pSub.flags |= MEM.MEM_Blob;
                                     pSub.n = 0;
                                     //nSub*sizeof(SubProgram);
                                 }
                             }
                         }
-                        pMem.flags = MEM_Int;
+                        pMem.flags = MEM.MEM_Int;
                         pMem.u.i = pOp.p1;
                         ///
                         ///<summary>
@@ -1228,7 +1228,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         //--------------------------
                         pMem = p.pResultSet[i_pMem++];
                         //pMem++;
-                        pMem.flags = MEM_Int;
+                        pMem.flags = MEM.MEM_Int;
                         pMem.u.i = pOp.p2;
                         ///
                         ///<summary>
@@ -1242,7 +1242,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         //----------------------------
                         pMem = p.pResultSet[i_pMem++];
                         //pMem++;
-                        pMem.flags = MEM_Int;
+                        pMem.flags = MEM.MEM_Int;
                         pMem.u.i = pOp.p3;
                         ///
                         ///<summary>
@@ -1288,7 +1288,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             //  Debug.Assert( p.db.mallocFailed != 0 );
                             //  return SQLITE_ERROR;
                             //}
-                            pMem.flags = MEM_Dyn | MEM_Str | MEM_Term;
+                            pMem.flags = MEM.MEM_Dyn | MEM.MEM_Str | MEM.MEM_Term;
                             pMem.n = 2;
                             pMem.z = pOp.p5.ToString("x2");
                             //sqlite3_snprintf( 3, pMem.z, "%.2x", pOp.p5 );   /* P5 */
@@ -1304,7 +1304,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 #if SQLITE_DEBUG
 																																																																																																																																																          if ( pOp.zComment != null )
           {
-            pMem.flags = MEM_Str | MEM_Term;
+            pMem.flags = MEM.MEM_Str | MEM.MEM_Term;
             pMem.z = pOp.zComment;
             pMem.n = pMem.z == null ? 0 : StringExtensions.sqlite3Strlen30( pMem.z );
             pMem.enc = SqliteEncoding.UTF8;
@@ -1313,7 +1313,7 @@ void sqlite3VdbeLeave(Vdbe *p){
           else
 #endif
                             {
-                                pMem.flags = MEM_Null;
+                                pMem.flags = MEM.MEM_Null;
                                 ///
                                 ///<summary>
                                 ///Comment 
@@ -1569,7 +1569,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 //if( p->aVar ){
                 //  p->nVar = (ynVar)nVar;
                 //  for(n=0; n<nVar; n++){
-                //    p->aVar[n].flags = MEM_Null;
+                //    p->aVar[n].flags = MEM.MEM_Null;
                 //    p->aVar[n].db = db;
                 //  }
                 //}
@@ -1621,7 +1621,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     //
                     for (n = 0; n < nVar; n++)
                     {
-                        p.aVar[n].flags = MEM_Null;
+                        p.aVar[n].flags = MEM.MEM_Null;
                         p.aVar[n].db = db;
                     }
                 }
@@ -1635,7 +1635,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///<param name="not from 0..nMem">1 </param>
                     for (n = 0; n <= nMem; n++)
                     {
-                        p.aMem[n].flags = MEM_Null;
+                        p.aMem[n].flags = MEM.MEM_Null;
                         p.aMem[n].n = 0;
                         p.aMem[n].z = null;
                         p.aMem[n].zBLOB = null;
@@ -1748,7 +1748,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       int i;
       //TODO for(i=0; i<p.nCursor; i++) Debug.Assert( p.apCsr==null || p.apCsr[i]==null );
       for ( i = 1; i <= p.nMem; i++ )
-        Debug.Assert( p.aMem != null || p.aMem[i].flags == MEM_Null );
+        Debug.Assert( p.aMem != null || p.aMem[i].flags == MEM.MEM_Null );
 #endif
                 db.sqlite3DbFree(ref p.zErrMsg);
                 p.pResultSet = null;
@@ -2382,13 +2382,13 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<param name=""></param>
             public static u32 sqlite3VdbeSerialType(Mem pMem, int file_format)
             {
-                int flags = pMem.flags;
+                MEM flags = pMem.flags;
                 int n;
-                if ((flags & MEM_Null) != 0)
+                if ((flags & MEM.MEM_Null) != 0)
                 {
                     return 0;
                 }
-                if ((flags & MEM_Int) != 0)
+                if ((flags & MEM.MEM_Int) != 0)
                 {
                     ///
                     ///<summary>
@@ -2427,7 +2427,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         return 5;
                     return 6;
                 }
-                if ((flags & MEM_Real) != 0)
+                if ((flags & MEM.MEM_Real) != 0)
                 {
                     return 7;
                 }
@@ -2435,14 +2435,14 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///<summary>
                     ///pMem.db.mallocFailed != 0 || 
                     ///</summary>
-                (flags & (MEM_Str | MEM_Blob)) != 0);
+                (flags & (MEM.MEM_Str | MEM.MEM_Blob)) != 0);
                 n = pMem.n;
-                if ((flags & MEM_Zero) != 0)
+                if ((flags & MEM.MEM_Zero) != 0)
                 {
                     n += pMem.u.nZero;
                 }
                 else
-                    if ((flags & MEM_Blob) != 0)
+                    if ((flags & MEM.MEM_Blob) != 0)
                     {
                         n = pMem.zBLOB != null ? pMem.zBLOB.Length : pMem.z != null ? pMem.z.Length : 0;
                     }
@@ -2455,7 +2455,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         pMem.n = n;
                     }
                 Debug.Assert(n >= 0);
-                return (u32)((n * 2) + 12 + (((flags & MEM_Str) != 0) ? 1 : 0));
+                return (u32)((n * 2) + 12 + (((flags & MEM.MEM_Str) != 0) ? 1 : 0));
             }
             ///<summary>
             /// Return the length of the data corresponding to the supplied serial-type.
@@ -2601,20 +2601,20 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///</summary>
                 if (serial_type >= 12)
                 {
-                    // TO DO -- PASS TESTS WITH THIS ON Debug.Assert( pMem.n + ( ( pMem.flags & MEM_Zero ) != 0 ? pMem.u.nZero : 0 ) == (int)sqlite3VdbeSerialTypeLen( serial_type ) );
+                    // TO DO -- PASS TESTS WITH THIS ON Debug.Assert( pMem.n + ( ( pMem.flags & MEM.MEM_Zero ) != 0 ? pMem.u.nZero : 0 ) == (int)sqlite3VdbeSerialTypeLen( serial_type ) );
                     Debug.Assert(pMem.n <= nBuf);
                     if ((len = (u32)pMem.n) != 0)
                         if (pMem.zBLOB == null && String.IsNullOrEmpty(pMem.z))
                         {
                         }
                         else
-                            if (pMem.zBLOB != null && ((pMem.flags & MEM_Blob) != 0 || pMem.z == null))
+                            if (pMem.zBLOB != null && ((pMem.flags & MEM.MEM_Blob) != 0 || pMem.z == null))
                                 Buffer.BlockCopy(pMem.zBLOB, 0, buf, offset, (int)len);
                             //memcpy( buf, pMem.z, len );
                             else
                                 Buffer.BlockCopy(Encoding.UTF8.GetBytes(pMem.z), 0, buf, offset, (int)len);
                     //memcpy( buf, pMem.z, len );
-                    if ((pMem.flags & MEM_Zero) != 0)
+                    if ((pMem.flags & MEM.MEM_Zero) != 0)
                     {
                         len += (u32)pMem.u.nZero;
                         Debug.Assert(nBuf >= 0);
@@ -2674,7 +2674,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///<summary>
                             ///NULL 
                             ///</summary>
-                            result.flags = MEM_Null;
+                            result.flags = MEM.MEM_Null;
                             result.n = 0;
                             result.z = null;
                             result.zBLOB = null;
@@ -2684,28 +2684,28 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         {
                             ///<param name="1">byte signed integer </param>
                             result.u.i = (sbyte)buf[offset + 0];
-                            result.flags = MEM_Int;
+                            result.flags = MEM.MEM_Int;
                             return 1;
                         }
                     case 2:
                         {
                             ///<param name="2">byte signed integer </param>
                             result.u.i = (int)((((sbyte)buf[offset + 0]) << 8) | buf[offset + 1]);
-                            result.flags = MEM_Int;
+                            result.flags = MEM.MEM_Int;
                             return 2;
                         }
                     case 3:
                         {
                             ///<param name="3">byte signed integer </param>
                             result.u.i = (int)((((sbyte)buf[offset + 0]) << 16) | (buf[offset + 1] << 8) | buf[offset + 2]);
-                            result.flags = MEM_Int;
+                            result.flags = MEM.MEM_Int;
                             return 3;
                         }
                     case 4:
                         {
                             ///<param name="4">byte signed integer </param>
                             result.u.i = (int)(((sbyte)buf[offset + 0] << 24) | (buf[offset + 1] << 16) | (buf[offset + 2] << 8) | buf[offset + 3]);
-                            result.flags = MEM_Int;
+                            result.flags = MEM.MEM_Int;
                             return 4;
                         }
                     case 5:
@@ -2715,7 +2715,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             u32 y = (u32)((buf[offset + 2] << 24) | (buf[offset + 3] << 16) | (buf[offset + 4] << 8) | buf[offset + 5]);
                             x = (x << 32) | y;
                             result.u.i = (i64)x;
-                            result.flags = MEM_Int;
+                            result.flags = MEM.MEM_Int;
                             return 6;
                         }
                     case 6:
@@ -2748,7 +2748,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             if (serial_type == 6)
                             {
                                 result.u.i = (i64)x;
-                                result.flags = MEM_Int;
+                                result.flags = MEM.MEM_Int;
                             }
                             else
                             {
@@ -2762,7 +2762,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                                 result.r = BitConverter.Int64BitsToDouble((long)x);
                                 // memcpy(pMem.r, x, sizeof(x))
 #endif
-                                result.flags = (u16)(MathExtensions.sqlite3IsNaN(result.r) ? MEM_Null : MEM_Real);
+                                result.flags = (MathExtensions.sqlite3IsNaN(result.r) ? MEM.MEM_Null : MEM.MEM_Real);
                             }
                             return 8;
                         }
@@ -2772,7 +2772,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         {
                             ///Integer 1 
                             result.u.i = serial_type - 8;
-                            result.flags = MEM_Int;
+                            result.flags = MEM.MEM_Int;
                             return 0;
                         }
                     default:
@@ -2782,7 +2782,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             result.xDel = null;
                             if ((serial_type & 0x01) != 0)
                             {
-                                result.flags = MEM_Str | MEM_Ephem;
+                                result.flags = MEM.MEM_Str | MEM.MEM_Ephem;
                                 if (len <= buf.Length - offset)
                                 {
                                     result.z = Encoding.UTF8.GetString(buf, offset, (int)len);
@@ -2801,7 +2801,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             {
                                 result.z = null;
                                 result.zBLOB = malloc_cs.sqlite3Malloc((int)len);
-                                result.flags = MEM_Blob | MEM_Ephem;
+                                result.flags = MEM.MEM_Blob | MEM.MEM_Ephem;
                                 if (len <= buf.Length - offset)
                                 {
                                     Buffer.BlockCopy(buf, offset, result.zBLOB, 0, (int)len);
@@ -2851,7 +2851,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///<summary>
                             ///NULL 
                             ///</summary>
-                            pMem.flags = MEM_Null;
+                            pMem.flags = MEM.MEM_Null;
                             break;
                         }
                     case 1:
@@ -2861,7 +2861,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///</summary>
                             ///<param name="1">byte signed integer </param>
                             pMem.u.i = (sbyte)buf[0];
-                            pMem.flags = MEM_Int;
+                            pMem.flags = MEM.MEM_Int;
                             return 1;
                         }
                     case 2:
@@ -2871,7 +2871,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///</summary>
                             ///<param name="2">byte signed integer </param>
                             pMem.u.i = (int)(((buf[0]) << 8) | buf[1]);
-                            pMem.flags = MEM_Int;
+                            pMem.flags = MEM.MEM_Int;
                             return 2;
                         }
                     case 3:
@@ -2881,7 +2881,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///</summary>
                             ///<param name="3">byte signed integer </param>
                             pMem.u.i = (int)(((buf[0]) << 16) | (buf[1] << 8) | buf[2]);
-                            pMem.flags = MEM_Int;
+                            pMem.flags = MEM.MEM_Int;
                             return 3;
                         }
                     case 4:
@@ -2891,7 +2891,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///</summary>
                             ///<param name="4">byte signed integer </param>
                             pMem.u.i = (int)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
-                            pMem.flags = MEM_Int;
+                            pMem.flags = MEM.MEM_Int;
                             return 4;
                         }
                     case 5:
@@ -2904,7 +2904,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             u32 y = (u32)((buf[2] << 24) | (buf[3] << 16) | (buf[4] << 8) | buf[5]);
                             x = (x << 32) | y;
                             pMem.u.i = (i64)x;
-                            pMem.flags = MEM_Int;
+                            pMem.flags = MEM.MEM_Int;
                             return 6;
                         }
                     case 6:
@@ -2940,7 +2940,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             if (serial_type == 6)
                             {
                                 pMem.u.i = (i64)x;
-                                pMem.flags = MEM_Int;
+                                pMem.flags = MEM.MEM_Int;
                             }
                             else
                             {
@@ -2954,7 +2954,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                                 pMem.r = BitConverter.Int64BitsToDouble((long)x);
                                 // memcpy(pMem.r, x, sizeof(x))
 #endif
-                                pMem.flags = MEM_Real;
+                                pMem.flags = MEM.MEM_Real;
                             }
                             return 8;
                         }
@@ -2970,7 +2970,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             ///Integer 1 
                             ///</summary>
                             pMem.u.i = serial_type - 8;
-                            pMem.flags = MEM_Int;
+                            pMem.flags = MEM.MEM_Int;
                             return 0;
                         }
                     default:
@@ -2979,7 +2979,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             pMem.xDel = null;
                             if ((serial_type & 0x01) != 0)
                             {
-                                pMem.flags = MEM_Str | MEM_Ephem;
+                                pMem.flags = MEM.MEM_Str | MEM.MEM_Ephem;
                                 pMem.z = Encoding.UTF8.GetString(buf, 0, len);
                                 //memcpy( buf, pMem.z, len );
                                 pMem.n = pMem.z.Length;
@@ -2988,7 +2988,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             }
                             else
                             {
-                                pMem.flags = MEM_Blob | MEM_Ephem;
+                                pMem.flags = MEM.MEM_Blob | MEM.MEM_Ephem;
                                 pMem.zBLOB = malloc_cs.sqlite3Malloc(len);
                                 buf.CopyTo(pMem.zBLOB, 0);
                                 pMem.n = len;
@@ -3133,7 +3133,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       //  ** strings and blobs static.  And none of the elements are
       //  ** ever transformed, so there is never anything to delete.
       //  */
-      //  if ( NEVER( pMem->zMalloc ) ) sqlite3VdbeMemRelease( pMem );
+      //  if ( NEVER( pMem->zMalloc ) )  pMem .sqlite3VdbeMemRelease();
       //}
 #endif
                 if ((p.flags & UNPACKED_NEED_FREE) != 0)
@@ -3268,7 +3268,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///Do the comparison
                     ///
                     ///</summary>
-                    rc = sqlite3MemCompare(mem1, pPKey2.aMem[i], i < nField ? pKeyInfo.aColl[i] : null);
+                    rc = vdbemem_cs.sqlite3MemCompare(mem1, pPKey2.aMem[i], i < nField ? pKeyInfo.aColl[i] : null);
                     if (rc != 0)
                     {
                         //Debug.Assert( mem1.zMalloc==null );  /* See comment below */
@@ -3291,7 +3291,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         if ((pPKey2.flags & UNPACKED_PREFIX_SEARCH) != 0 && i == (pPKey2.nField - 1))
                         {
                             Debug.Assert(idx1 == szHdr1 && rc != 0);
-                            Debug.Assert((mem1.flags & MEM_Int) != 0);
+                            Debug.Assert((mem1.flags & MEM.MEM_Int) != 0);
                             pPKey2.flags = (ushort)(pPKey2.flags & ~UNPACKED_PREFIX_SEARCH);
                             pPKey2.rowid = mem1.u.i;
                         }
@@ -3303,7 +3303,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<summary>
                 ///No memory allocation is ever used on mem1.  Prove this using
                 ///the following Debug.Assert().  If the Debug.Assert() fails, it indicates a
-                ///memory leak and a need to call sqlite3VdbeMemRelease(&mem1).
+                ///memory leak and a need to call &mem1.sqlite3VdbeMemRelease().
                 ///
                 ///</summary>
                 //Debug.Assert( mem1.zMalloc==null );
@@ -3392,7 +3392,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///</summary>
                 m = malloc_cs.sqlite3Malloc(m);
                 // memset(&m, 0, sizeof(m));
-                rc = sqlite3VdbeMemFromBtree(pCur, 0, (int)nCellKey, true, m);
+                rc = vdbemem_cs.sqlite3VdbeMemFromBtree(pCur, 0, (int)nCellKey, true, m);
                 if (rc != 0)
                 {
                     return rc;
@@ -3438,7 +3438,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///</summary>
                 sqlite3VdbeSerialGet(m.zBLOB, (int)(m.n - lenRowid), typeRowid, v);
                 rowid = v.u.i;
-                sqlite3VdbeMemRelease(m);
+                m.sqlite3VdbeMemRelease();
                 return SQLITE_OK;
             ///
             ///<summary>
@@ -3447,7 +3447,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             idx_rowid_corruption:
                 //sqliteinth.testcase( m.zMalloc != 0 );
-                sqlite3VdbeMemRelease(m);
+                m.sqlite3VdbeMemRelease();
             return sqliteinth.SQLITE_CORRUPT_BKPT();
             }
             ///<summary>
@@ -3499,14 +3499,14 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 }
                 m = malloc_cs.sqlite3Malloc(m);
                 // memset(&m, 0, sizeof(m));
-                rc = sqlite3VdbeMemFromBtree(pC.pCursor, 0, (int)nCellKey, true, m);
+                rc = vdbemem_cs.sqlite3VdbeMemFromBtree(pC.pCursor, 0, (int)nCellKey, true, m);
                 if (rc != 0)
                 {
                     return rc;
                 }
                 Debug.Assert((pUnpacked.flags & UNPACKED_IGNORE_ROWID) != 0);
                 res = sqlite3VdbeRecordCompare(m.n, m.zBLOB, pUnpacked);
-                sqlite3VdbeMemRelease(m);
+                m.sqlite3VdbeMemRelease();
                 return SQLITE_OK;
             }
             ///<summary>

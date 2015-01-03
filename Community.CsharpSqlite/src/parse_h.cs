@@ -756,7 +756,7 @@ return;
 				///</summary>
 				if(pDflt!=null) {
 					sqlite3_value pVal=null;
-                    if (sqlite3ValueFromExpr(db, pDflt, SqliteEncoding.UTF8, sqliteinth.SQLITE_AFF_NONE, ref pVal) != 0)
+                    if (vdbemem_cs.sqlite3ValueFromExpr(db, pDflt, SqliteEncoding.UTF8, sqliteinth.SQLITE_AFF_NONE, ref pVal) != 0)
                     {
 						//        db.mallocFailed = 1;
 						return;
@@ -765,7 +765,7 @@ return;
 						utilc.sqlite3ErrorMsg(this,"Cannot add a column with non-constant default");
 						return;
 					}
-					sqlite3ValueFree(ref pVal);
+                    vdbemem_cs.sqlite3ValueFree(ref pVal);
 				}
 				///
 				///<summary>
@@ -8695,7 +8695,7 @@ return;
 						z=null;
 					}
 				}
-				sqlite3ValueFree(ref pVal);
+                vdbemem_cs.sqlite3ValueFree(ref pVal);
 				return (z!=null)?1:0;
 			}
 			public void bestOrClauseIndex(///

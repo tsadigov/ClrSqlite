@@ -426,7 +426,7 @@ dummy += (uint)x;
             }
             public static void sqlite3Error(sqlite3 db, int err_code, string zFormat, params object[] ap)
             {
-                if (db != null && (db.pErr != null || (db.pErr = sqlite3ValueNew(db)) != null))
+                if (db != null && (db.pErr != null || (db.pErr = vdbemem_cs.sqlite3ValueNew(db)) != null))
                 {
                     db.errCode = err_code;
                     if (zFormat != null)
@@ -437,12 +437,12 @@ dummy += (uint)x;
                             _Custom.va_start(ap, zFormat);
                             z = io.sqlite3VMPrintf(db, zFormat, ap);
                             _Custom.va_end(ref ap);
-                            sqlite3ValueSetStr(db.pErr, -1, z, SqliteEncoding.UTF8, (dxDel)sqliteinth.SQLITE_DYNAMIC);
+                            vdbemem_cs.sqlite3ValueSetStr(db.pErr, -1, z, SqliteEncoding.UTF8, (dxDel)sqliteinth.SQLITE_DYNAMIC);
                         }
                     }
                     else
                     {
-                        sqlite3ValueSetStr(db.pErr, 0, null, SqliteEncoding.UTF8, SQLITE_STATIC);
+                        vdbemem_cs.sqlite3ValueSetStr(db.pErr, 0, null, SqliteEncoding.UTF8, SQLITE_STATIC);
                     }
                 }
             }

@@ -78,7 +78,7 @@ namespace Community.CsharpSqlite {
                 {
                     if (vdbeapi.sqlite3_value_type(argv[i]) == FoundationalType.SQLITE_NULL)
                         return;
-                    if ((sqlite3MemCompare(argv[iBest], argv[i], pColl) ^ mask) >= 0)
+                    if ((vdbemem_cs.sqlite3MemCompare(argv[iBest], argv[i], pColl) ^ mask) >= 0)
                     {
                         iBest = i;
                     }
@@ -985,7 +985,7 @@ break;
             {
                 CollSeq pColl = sqlite3GetFuncCollSeq(context);
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
-                if (sqlite3MemCompare(argv[0], argv[1], pColl) != 0)
+                if (vdbemem_cs.sqlite3MemCompare(argv[0], argv[1], pColl) != 0)
                 {
                     context.sqlite3_result_value(argv[0]);
                 }
@@ -1854,15 +1854,15 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                     ///<param name="aggregate, or 0 for min().">aggregate, or 0 for min().</param>
                     ///<param name=""></param>
                     max = vdbeapi.sqlite3_context_db_handle(context) != null && (int)vdbeapi.sqlite3_user_data(context) != 0;
-                    cmp = sqlite3MemCompare(pBest, pArg, pColl);
+                    cmp = vdbemem_cs.sqlite3MemCompare(pBest, pArg, pColl);
                     if ((max && cmp < 0) || (!max && cmp > 0))
                     {
-                        sqlite3VdbeMemCopy(pBest, pArg);
+                        vdbemem_cs.sqlite3VdbeMemCopy(pBest, pArg);
                     }
                 }
                 else
                 {
-                    sqlite3VdbeMemCopy(pBest, pArg);
+                    vdbemem_cs.sqlite3VdbeMemCopy(pBest, pArg);
                 }
             }
             static void minMaxFinalize(sqlite3_context context)
@@ -1875,7 +1875,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                     {
                         context.sqlite3_result_value(pRes);
                     }
-                    sqlite3VdbeMemRelease(pRes);
+                    pRes.sqlite3VdbeMemRelease();
                 }
             }
             ///<summary>

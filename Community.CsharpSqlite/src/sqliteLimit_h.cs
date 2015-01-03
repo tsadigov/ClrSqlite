@@ -37,7 +37,7 @@ namespace Community.CsharpSqlite
 ///<param name=""></param>
 
 		#if !SQLITE_MAX_LENGTH
-		const int SQLITE_MAX_LENGTH = 1000000000;
+		public const int SQLITE_MAX_LENGTH = 1000000000;
 
 		#endif
 		///

@@ -350,7 +350,7 @@ set { _i = value; }
 
 				///
 ///<summary>
-///Integer value used when MEM_Int is set in flags 
+///Integer value used when MEM.MEM_Int is set in flags 
 ///</summary>
 
 				#endif
@@ -358,46 +358,45 @@ set { _i = value; }
 
 				///
 ///<summary>
-///Used when bit MEM_Zero is set in flags 
+///Used when bit MEM.MEM_Zero is set in flags 
 ///</summary>
 
 				public FuncDef pDef;
 
 				///
 ///<summary>
-///Used only when flags==MEM_Agg 
+///Used only when flags==MEM.MEM_Agg 
 ///</summary>
 
 				public RowSet pRowSet;
 
 				///
 ///<summary>
-///Used only when flags==MEM_RowSet 
+///Used only when flags==MEM.MEM_RowSet 
 ///</summary>
 
 				public VdbeFrame pFrame;
 			///
 ///<summary>
-///Used when flags==MEM_Frame 
+///Used when flags==MEM.MEM_Frame 
 ///</summary>
 
 			}
 
 			public union_ip u;
 
-			public byte[] zBLOB;
-
-			///
 ///<summary>
 ///BLOB value 
 ///</summary>
+			public byte[] zBLOB;
 
-			public int n;
-
-			///
+			
 ///<summary>
 ///Number of characters in string value, excluding '\0' 
 ///</summary>
+			public int n;
+
+
 
 			#if DEBUG_CLASS_MEM || DEBUG_CLASS_ALL
 																																																																								public u16 _flags;              /* First operand */
@@ -407,20 +406,20 @@ get { return _flags; }
 set { _flags = value; }
 }
 #else
-			public u16 flags;
+			public MEM flags;//TODO:u16
 
 			public MemFlags Flags {
 				get {
 					return (MemFlags)flags;
 				}
 				set {
-					flags = (u16)value;
+					flags = (MEM)value;
 				}
 			}
 
 			///
 ///<summary>
-///Some combination of MEM_Null, MEM_Str, MEM_Dyn, etc. 
+///Some combination of MEM.MEM_Null, MEM.MEM_Str, MEM.MEM_Dyn, etc. 
 ///</summary>
 
 			#endif
@@ -497,7 +496,7 @@ set { _flags = value; }
 			{
 			}
 
-			public Mem (sqlite3 db, string z, double r, int i, int n, u16 flags, FoundationalType type, SqliteEncoding enc
+			public Mem (sqlite3 db, string z, double r, int i, int n, MEM flags, FoundationalType type, SqliteEncoding enc
 			#if SQLITE_DEBUG
 																																																																								         , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
 #endif
@@ -544,10 +543,10 @@ set { _flags = value; }
 			///
 			///</summary>
 			#if SQLITE_DEBUG
-																																																																    //define memIsValid(M)  ((M)->flags & MEM_Invalid)==0
+																																																																    //define memIsValid(M)  ((M)->flags & MEM.MEM_Invalid)==0
     static bool memIsValid( Mem M )
     {
-      return ( ( M ).flags & MEM_Invalid ) == 0;
+      return ( ( M ).flags & MEM.MEM_Invalid ) == 0;
     }
 #else
 			bool memIsValid ()
@@ -560,14 +559,14 @@ set { _flags = value; }
 				return SQLITE_OK;
 			}
 
-			public///<summary>
+			///<summary>
 			/// Clear any existing type flags from a Mem and replace them with f
 			///</summary>
 			//#define MemSetTypeFlag(p, f) \
-			//   ((p)->flags = ((p)->flags&~(MEM_TypeMask|MEM_Zero))|f)
-			void MemSetTypeFlag (int f)
+			//   ((p)->flags = ((p)->flags&~(MEM.MEM_TypeMask|MEM.MEM_Zero))|f)
+			public void MemSetTypeFlag (MEM f)
 			{
-				this.flags = (u16)(this.flags & ~(MEM_TypeMask | MEM_Zero) | f);
+				this.flags = (this.flags & ~(MEM.MEM_TypeMask | MEM.MEM_Zero) | f);
 			}
 
 
@@ -578,17 +577,17 @@ set { _flags = value; }
             public void sqlite3VdbeMemSetNull()
             {
                 Mem pMem = this;
-                if ((pMem.flags & MEM_Frame) != 0)
+                if ((pMem.flags & MEM.MEM_Frame) != 0)
                 {
                     VdbeFrame pFrame = pMem.u.pFrame;
                     pFrame.pParent = pFrame.v.pDelFrame;
                     pFrame.v.pDelFrame = pFrame;
                 }
-                if ((pMem.flags & MEM_RowSet) != 0)
+                if ((pMem.flags & MEM.MEM_RowSet) != 0)
                 {
-                    sqlite3RowSetClear(pMem.u.pRowSet);
+                    pMem.u.pRowSet.sqlite3RowSetClear();
                 }
-                pMem.MemSetTypeFlag(MEM_Null);
+                pMem.MemSetTypeFlag(MEM.MEM_Null);
                 malloc_cs.sqlite3_free(ref pMem.zBLOB);
                 pMem.z = null;
                 pMem.type = FoundationalType.SQLITE_NULL;
@@ -657,13 +656,13 @@ set { _flags = value; }
                 ///<summary>
                 ///Maximum allowed string or blob size 
                 ///</summary>
-                u16 flags = 0;
+                MEM flags = 0;
                 ///
                 ///<summary>
                 ///</summary>
                 ///<param name="New value for pMem">>flags </param>
                 Debug.Assert(pMem.db == null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex));
-                Debug.Assert((pMem.flags & MEM_RowSet) == 0);
+                Debug.Assert((pMem.flags & MEM.MEM_RowSet) == 0);
                 ///
                 ///<summary>
                 ///If z is a NULL pointer, set pMem to contain an SQL NULL. 
@@ -681,7 +680,7 @@ set { _flags = value; }
                 {
                     iLimit = SQLITE_MAX_LENGTH;
                 }
-                flags = (u16)(enc == 0 ? MEM_Blob : MEM_Str);
+                flags = (enc == 0 ? MEM.MEM_Blob : MEM.MEM_Str);
                 if (nByte < 0)
                 {
                     Debug.Assert(enc != 0);
@@ -697,19 +696,19 @@ set { _flags = value; }
                         {
                         }
                     }
-                    flags |= MEM_Term;
+                    flags |= MEM.MEM_Term;
                 }
                 ///
                 ///<summary>
                 ///The following block sets the new values of Mem.z and Mem.xDel. It
                 ///also sets a flag in local variable "flags" to indicate the memory
-                ///management (one of MEM_Dyn or MEM_Static).
+                ///management (one of MEM.MEM_Dyn or MEM.MEM_Static).
                 ///
                 ///</summary>
                 if (xDel == SQLITE_TRANSIENT)
                 {
                     u32 nAlloc = (u32)nByte;
-                    if ((flags & MEM_Term) != 0)
+                    if ((flags & MEM.MEM_Term) != 0)
                     {
                         nAlloc += (u32)(enc == SqliteEncoding.UTF8 ? 1 : 2);
                     }
@@ -717,7 +716,7 @@ set { _flags = value; }
                     {
                         return SQLITE_TOOBIG;
                     }
-                    if (sqlite3VdbeMemGrow(pMem, (int)nAlloc, 0) != 0)
+                    if (vdbemem_cs.sqlite3VdbeMemGrow(pMem, (int)nAlloc, 0) != 0)
                     {
                         return SQLITE_NOMEM;
                     }
@@ -741,7 +740,7 @@ set { _flags = value; }
                 else
                     if (xDel == sqliteinth.SQLITE_DYNAMIC)
                     {
-                        sqlite3VdbeMemRelease(pMem);
+                        pMem.sqlite3VdbeMemRelease();
                         //pMem.zMalloc = pMem.z = (char*)z;
                         if (enc == 0)
                         {
@@ -760,7 +759,7 @@ set { _flags = value; }
                     }
                     else
                     {
-                        sqlite3VdbeMemRelease(pMem);
+                        pMem.sqlite3VdbeMemRelease();
                         if (enc == 0)
                         {
                             pMem.z = null;
@@ -775,7 +774,7 @@ set { _flags = value; }
                             malloc_cs.sqlite3_free(ref pMem.zBLOB);
                         }
                         pMem.xDel = xDel;
-                        flags |= (u16)((xDel == SQLITE_STATIC) ? MEM_Static : MEM_Dyn);
+                        flags |= ((xDel == SQLITE_STATIC) ? MEM.MEM_Static : MEM.MEM_Dyn);
                     }
                 pMem.n = nByte;
                 pMem.flags = flags;
@@ -802,8 +801,8 @@ return SQLITE_NOMEM;
             public void sqlite3VdbeMemSetZeroBlob( int n)
             {
                 Mem pMem = this;
-                sqlite3VdbeMemRelease(pMem);
-                pMem.flags = MEM_Blob | MEM_Zero;
+                pMem.sqlite3VdbeMemRelease();
+                pMem.flags = MEM.MEM_Blob | MEM.MEM_Zero;
                 pMem.type = FoundationalType.SQLITE_BLOB;
                 pMem.n = 0;
                 if (n < 0)
@@ -811,7 +810,7 @@ return SQLITE_NOMEM;
                 pMem.u.nZero = n;
                 pMem.enc = SqliteEncoding.UTF8;
 #if SQLITE_OMIT_INCRBLOB
-                sqlite3VdbeMemGrow(pMem, n, 0);
+                vdbemem_cs.sqlite3VdbeMemGrow(pMem, n, 0);
                 //if( pMem.z!= null ){
                 pMem.n = n;
                 pMem.z = null;
@@ -828,9 +827,9 @@ return SQLITE_NOMEM;
             public void sqlite3VdbeMemSetInt64( i64 val)
             {
                 Mem pMem = this;
-                sqlite3VdbeMemRelease(pMem);
+                pMem.sqlite3VdbeMemRelease();
                 pMem.u.i = val;
-                pMem.flags = MEM_Int;
+                pMem.flags = MEM.MEM_Int;
                 pMem.type = FoundationalType.SQLITE_INTEGER;
             }
             ///<summary>
@@ -847,14 +846,419 @@ return SQLITE_NOMEM;
                 }
                 else
                 {
-                    sqlite3VdbeMemRelease(pMem);
+                    pMem.sqlite3VdbeMemRelease();
                     pMem.r = val;
-                    pMem.flags = MEM_Real;
+                    pMem.flags = MEM.MEM_Real;
                     pMem.type = FoundationalType.SQLITE_FLOAT;
                 }
             }
+
+
+
+            ///<summary>
+            /// Delete any previous value and set the value of pMem to be an
+            /// empty boolean index.
+            ///
+            ///</summary>
+            public void sqlite3VdbeMemSetRowSet()
+            {
+                Mem pMem = this;
+                sqlite3 db = pMem.db;
+                Debug.Assert(db != null);
+                Debug.Assert((pMem.flags & MEM.MEM_RowSet) == 0);
+                pMem.sqlite3VdbeMemRelease();
+                //pMem.zMalloc = sqlite3DbMallocRaw( db, 64 );
+                //if ( db.mallocFailed != 0 )
+                //{
+                //  pMem.flags = MEM.MEM_Null;
+                //}
+                //else
+                {
+                    //Debug.Assert( pMem.zMalloc );
+                    pMem.u.pRowSet = new RowSet(db, 5);
+                    // sqlite3RowSetInit( db, pMem.zMalloc,
+                    //     sqlite3DbMallocSize( db, pMem.zMalloc ) );
+                    Debug.Assert(pMem.u.pRowSet != null);
+                    pMem.flags = MEM.MEM_RowSet;
+                }
+            }
+
+
+            ///<summary>
+            /// If the memory cell contains a string value that must be freed by
+            /// invoking an external callback, free it now. Calling this function
+            /// does not free any Mem.zMalloc buffer.
+            ///
+            ///</summary>
+            public void sqlite3VdbeMemReleaseExternal()
+            {
+                var p = this;
+                Debug.Assert(p.db == null || Sqlite3.sqlite3_mutex_held(p.db.mutex));
+                sqliteinth.testcase(p.flags & MEM.MEM_Agg);
+                sqliteinth.testcase(p.flags & MEM.MEM_Dyn);
+                sqliteinth.testcase(p.flags & MEM.MEM_RowSet);
+                sqliteinth.testcase(p.flags & MEM.MEM_Frame);
+                if ((p.flags & (MEM.MEM_Agg | MEM.MEM_Dyn | MEM.MEM_RowSet | MEM.MEM_Frame)) != 0)
+                {
+                    if ((p.flags & MEM.MEM_Agg) != 0)
+                    {
+                        vdbemem_cs.sqlite3VdbeMemFinalize(p, p.u.pDef);
+                        Debug.Assert((p.flags & MEM.MEM_Agg) == 0);
+                        p.sqlite3VdbeMemRelease();
+                    }
+                    else
+                        if ((p.flags & MEM.MEM_Dyn) != 0 && p.xDel != null)
+                        {
+                            Debug.Assert((p.flags & MEM.MEM_RowSet) == 0);
+                            p.xDel(ref p.z);
+                            p.xDel = null;
+                        }
+                        else
+                            if ((p.flags & MEM.MEM_RowSet) != 0)
+                            {
+                                p.u.pRowSet.sqlite3RowSetClear();
+                            }
+                            else
+                                if ((p.flags & MEM.MEM_Frame) != 0)
+                                {
+                                    p.sqlite3VdbeMemSetNull();
+                                }
+                }
+                p.n = 0;
+                p.z = null;
+                p.zBLOB = null;
+            }
+
+
+      /*      ///<summary>
+            /// If the memory cell contains a string value that must be freed by
+            /// invoking an external callback, free it now. Calling this function
+            /// does not free any Mem.zMalloc buffer.
+            ///
+            ///</summary>
+            public void sqlite3VdbeMemReleaseExternal()
+            {
+                Mem p = this;
+                Debug.Assert(p.db == null || Sqlite3.sqlite3_mutex_held(p.db.mutex));
+                sqliteinth.testcase(p.flags & MEM.MEM_Agg);
+                sqliteinth.testcase(p.flags & MEM.MEM_Dyn);
+                sqliteinth.testcase(p.flags & MEM.MEM_RowSet);
+                sqliteinth.testcase(p.flags & MEM.MEM_Frame);
+                if ((p.flags & (MEM.MEM_Agg | MEM.MEM_Dyn | MEM.MEM_RowSet | MEM.MEM_Frame)) != 0)
+                {
+                    if ((p.flags & MEM.MEM_Agg) != 0)
+                    {
+                        sqlite3VdbeMemFinalize(p, p.u.pDef);
+                        Debug.Assert((p.flags & MEM.MEM_Agg) == 0);
+                        p.sqlite3VdbeMemRelease();
+                    }
+                    else
+                        if ((p.flags & MEM.MEM_Dyn) != 0 && p.xDel != null)
+                        {
+                            Debug.Assert((p.flags & MEM.MEM_RowSet) == 0);
+                            p.xDel(ref p.z);
+                            p.xDel = null;
+                        }
+                        else
+                            if ((p.flags & MEM.MEM_RowSet) != 0)
+                            {
+                                sqlite3RowSetClear(p.u.pRowSet);
+                            }
+                            else
+                                if ((p.flags & MEM.MEM_Frame) != 0)
+                                {
+                                    sqlite3VdbeMemSetNull(p);
+                                }
+                }
+                p.n = 0;
+                p.z = null;
+                p.zBLOB = null;
+            }
+
+            */
+
+
+            ///<summary>
+            /// Release any memory held by the Mem. This may leave the Mem in an
+            /// inconsistent state, for example with (Mem.z==0) and
+            /// (Mem.type==SQLITE_TEXT).
+            ///
+            ///</summary>
+            public void sqlite3VdbeMemRelease()
+            {
+                Mem p = this;
+                p.sqlite3VdbeMemReleaseExternal();
+                malloc_cs.sqlite3DbFree(p.db, ref p.zBLOB);
+                //zMalloc );
+                p.z = null;
+                //p.zMalloc = 0;
+                p.xDel = null;
+            }
+
+
+            ///<summary>
+            /// Convert pMem to type integer.  Invalidate any prior representations.
+            ///
+            ///</summary>
+            public int sqlite3VdbeMemIntegerify()
+            {
+                Mem pMem = this;
+                Debug.Assert(pMem.db == null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex));
+                Debug.Assert((pMem.flags & MEM.MEM_RowSet) == 0);
+                //assert( EIGHT_BYTE_ALIGNMENT(pMem) );
+                pMem.u.i = pMem.sqlite3VdbeIntValue();
+                pMem.MemSetTypeFlag(MEM.MEM_Int);
+                return SQLITE_OK;
+            }
+            ///<summary>
+            /// Convert pMem so that it is of type MEM.MEM_Real.
+            /// Invalidate any prior representations.
+            ///
+            ///</summary>
+            public int sqlite3VdbeMemRealify()
+            {
+                Mem pMem = this;
+                Debug.Assert(pMem.db == null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex));
+                //assert( EIGHT_BYTE_ALIGNMENT(pMem) );
+                pMem.r = pMem.sqlite3VdbeRealValue();
+                pMem.MemSetTypeFlag(MEM.MEM_Real);
+                return SQLITE_OK;
+            }
+            ///<summary>
+            /// Convert pMem so that it has types MEM.MEM_Real or MEM.MEM_Int or both.
+            /// Invalidate any prior representations.
+            ///
+            /// Every effort is made to force the conversion, even if the input
+            /// is a string that does not look completely like a number.  Convert
+            /// as much of the string as we can and ignore the rest.
+            ///
+            ///</summary>
+            public int sqlite3VdbeMemNumerify()
+            {
+                Mem pMem = this;
+                if ((pMem.flags & (MEM.MEM_Int | MEM.MEM_Real | MEM.MEM_Null)) == 0)
+                {
+                    Debug.Assert((pMem.flags & (MEM.MEM_Blob | MEM.MEM_Str)) != 0);
+                    Debug.Assert(pMem.db == null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex));
+                    if ((pMem.flags & MEM.MEM_Blob) != 0 && pMem.z == null)
+                    {
+                        if (0 == Converter.sqlite3Atoi64(Encoding.UTF8.GetString(pMem.zBLOB, 0, pMem.zBLOB.Length), ref pMem.u.i, pMem.n, pMem.enc))
+                            pMem.MemSetTypeFlag(MEM.MEM_Int);
+                        else
+                        {
+                            pMem.r = pMem.sqlite3VdbeRealValue();
+                            pMem.MemSetTypeFlag(MEM.MEM_Real);
+                            pMem.sqlite3VdbeIntegerAffinity();
+                        }
+                    }
+                    else
+                        if (0 == Converter.sqlite3Atoi64(pMem.z, ref pMem.u.i, pMem.n, pMem.enc))
+                        {
+                            pMem.MemSetTypeFlag(MEM.MEM_Int);
+                        }
+                        else
+                        {
+                            pMem.r = pMem.sqlite3VdbeRealValue();
+                            pMem.MemSetTypeFlag(MEM.MEM_Real);
+                            pMem.sqlite3VdbeIntegerAffinity();
+                        }
+                }
+                Debug.Assert((pMem.flags & (MEM.MEM_Int | MEM.MEM_Real | MEM.MEM_Null)) != 0);
+                pMem.flags = (pMem.flags & ~(MEM.MEM_Str | MEM.MEM_Blob));
+                return SQLITE_OK;
+            }
+
+
+            ///<summary>
+            /// Return some kind of integer value which is the best we can do
+            /// at representing the value that *pMem describes as an integer.
+            /// If pMem is an integer, then the value is exact.  If pMem is
+            /// a floating-point then the value returned is the integer part.
+            /// If pMem is a string or blob, then we make an attempt to convert
+            /// it into a integer and return that.  If pMem represents an
+            /// an SQL-NULL value, return 0.
+            ///
+            /// If pMem represents a string value, its encoding might be changed.
+            ///
+            ///</summary>
+            public i64 sqlite3VdbeIntValue()
+            {
+                Mem pMem = this;
+                MEM flags;
+                Debug.Assert(pMem.db == null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex));
+                // assert( EIGHT_BYTE_ALIGNMENT(pMem) );
+                flags = pMem.flags;
+                if ((flags & MEM.MEM_Int) != 0)
+                {
+                    return pMem.u.i;
+                }
+                else
+                    if ((flags & MEM.MEM_Real) != 0)
+                    {
+                        return vdbemem_cs.doubleToInt64(pMem.r);
+                    }
+                    else
+                        if ((flags & (MEM.MEM_Str)) != 0)
+                        {
+                            i64 value = 0;
+                            Debug.Assert(pMem.z != null || pMem.n == 0);
+                            sqliteinth.testcase(pMem.z == null);
+                            Converter.sqlite3Atoi64(pMem.z, ref value, pMem.n, pMem.enc);
+                            return value;
+                        }
+                        else
+                            if ((flags & (MEM.MEM_Blob)) != 0)
+                            {
+                                i64 value = 0;
+                                Debug.Assert(pMem.zBLOB != null || pMem.n == 0);
+                                sqliteinth.testcase(pMem.zBLOB == null);
+                                Converter.sqlite3Atoi64(Encoding.UTF8.GetString(pMem.zBLOB, 0, pMem.n), ref value, pMem.n, pMem.enc);
+                                return value;
+                            }
+                            else
+                            {
+                                return 0;
+                            }
+            }
+            ///<summary>
+            /// Return the best representation of pMem that we can get into a
+            /// double.  If pMem is already a double or an integer, return its
+            /// value.  If it is a string or blob, try to convert it to a double.
+            /// If it is a NULL, return 0.0.
+            ///
+            ///</summary>
+            public double sqlite3VdbeRealValue()
+            {
+                Mem pMem = this;
+                Debug.Assert(pMem.db == null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex));
+                //assert( EIGHT_BYTE_ALIGNMENT(pMem) );
+                if ((pMem.flags & MEM.MEM_Real) != 0)
+                {
+                    return pMem.r;
+                }
+                else
+                    if ((pMem.flags & MEM.MEM_Int) != 0)
+                    {
+                        return (double)pMem.u.i;
+                    }
+                    else
+                        if ((pMem.flags & (MEM.MEM_Str)) != 0)
+                        {
+                            ///
+                            ///<summary>
+                            ///(double)0 In case of SQLITE_OMIT_FLOATING_POINT... 
+                            ///</summary>
+                            double val = (double)0;
+                            Converter.sqlite3AtoF(pMem.z, ref val, pMem.n, pMem.enc);
+                            return val;
+                        }
+                        else
+                            if ((pMem.flags & (MEM.MEM_Blob)) != 0)
+                            {
+                                ///
+                                ///<summary>
+                                ///(double)0 In case of SQLITE_OMIT_FLOATING_POINT... 
+                                ///</summary>
+                                double val = (double)0;
+                                Debug.Assert(pMem.zBLOB != null || pMem.n == 0);
+                                Converter.sqlite3AtoF(Encoding.UTF8.GetString(pMem.zBLOB, 0, pMem.n), ref val, pMem.n, pMem.enc);
+                                return val;
+                            }
+                            else
+                            {
+                                ///
+                                ///<summary>
+                                ///(double)0 In case of SQLITE_OMIT_FLOATING_POINT... 
+                                ///</summary>
+                                return (double)0;
+                            }
+            }
+
+
+            ///<summary>
+            /// The MEM structure is already a MEM.MEM_Real.  Try to also make it a
+            /// MEM.MEM_Int if we can.
+            ///
+            ///</summary>
+            public void sqlite3VdbeIntegerAffinity()
+            {
+                Mem pMem = this;
+                Debug.Assert((pMem.flags & MEM.MEM_Real) != 0);
+                Debug.Assert((pMem.flags & MEM.MEM_RowSet) == 0);
+                Debug.Assert(pMem.db == null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex));
+                //assert( EIGHT_BYTE_ALIGNMENT(pMem) );
+                pMem.u.i = vdbemem_cs.doubleToInt64(pMem.r);
+                ///
+                ///<summary>
+                ///Only mark the value as an integer if
+                ///
+                ///</summary>
+                ///<param name="(1) the round">op, and</param>
+                ///<param name="(2) The integer is neither the largest nor the smallest">(2) The integer is neither the largest nor the smallest</param>
+                ///<param name="possible integer (ticket #3922)">possible integer (ticket #3922)</param>
+                ///<param name=""></param>
+                ///<param name="The second and third terms in the following conditional enforces">The second and third terms in the following conditional enforces</param>
+                ///<param name="the second condition under the assumption that addition overflow causes">the second condition under the assumption that addition overflow causes</param>
+                ///<param name="values to wrap around.  On x86 hardware, the third term is always">values to wrap around.  On x86 hardware, the third term is always</param>
+                ///<param name="true and could be omitted.  But we leave it in because other">true and could be omitted.  But we leave it in because other</param>
+                ///<param name="architectures might behave differently.">architectures might behave differently.</param>
+                ///<param name=""></param>
+                if (pMem.r == (double)pMem.u.i && pMem.u.i > IntegerExtensions.SMALLEST_INT64 && Sqlite3.ALWAYS(pMem.u.i < IntegerExtensions.LARGEST_INT64))
+                {
+                    pMem.flags |= MEM.MEM_Int;
+                }
+            }
+
+
+            ///<summary>
+            ///Make the given Mem object MEM.MEM_Dyn.  In other words, make it so
+            ///that any TEXT or BLOB content is stored in memory obtained from
+            ///malloc().  In this way, we know that the memory is safe to be
+            ///overwritten or altered.
+            ///
+            ///Return SQLITE_OK on success or SQLITE_NOMEM if malloc fails.
+            ///
+            ///</summary>
+            public int sqlite3VdbeMemMakeWriteable()
+            {
+                Mem pMem = this;
+                MEM f;
+                Debug.Assert(pMem.db == null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex));
+                Debug.Assert((pMem.flags & MEM.MEM_RowSet) == 0);
+                pMem.expandBlob();
+                f = pMem.flags;
+                if ((f & (MEM.MEM_Str | MEM.MEM_Blob)) != 0)// TODO -- && pMem.z != pMem.zMalloc )
+                {
+                    if (vdbemem_cs.sqlite3VdbeMemGrow(pMem, pMem.n + 2, 1) != 0)
+                        //{
+                        //  return SQLITE_NOMEM;
+                        //}
+                        //pMem.z[pMem->n] = 0;
+                        //pMem.z[pMem->n + 1] = 0;
+                        pMem.flags |= MEM.MEM_Term;
+#if SQLITE_DEBUG
+																																																																																								        pMem.pScopyFrom = null;
+#endif
+                }
+                return SQLITE_OK;
+            }
+
+
+            ///<summary>
+            /// Call sqlite3VdbeMemExpandBlob() on the supplied value (type Mem*)
+            /// P if required.
+            ///
+            ///</summary>
+            //#define expandBlob(P) (((P)->flags&MEM.MEM_Zero)?sqlite3VdbeMemExpandBlob(P):0)
+            public void expandBlob()
+            {
+                Mem P = this;
+                if ((P.flags & MEM.MEM_Zero) != 0)
+                    P.sqlite3VdbeMemExpandBlob();
+            }
         
 		}
+
 
 		// TODO -- Convert back to inline for speed
 

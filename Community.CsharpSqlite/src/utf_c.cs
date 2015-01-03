@@ -316,7 +316,7 @@ Debugger.Break (); // TODO -
 //unsigned int c;
 
 Debug.Assert( pMem.db==null || Sqlite3.sqlite3_mutex_held(pMem.db.mutex) );
-Debug.Assert( (pMem.flags&MEM_Str )!=0);
+Debug.Assert( (pMem.flags&MEM.MEM_Str )!=0);
 Debug.Assert( pMem.enc!=desiredEnc );
 Debug.Assert( pMem.enc!=0 );
 Debug.Assert( pMem.n>=0 );
@@ -426,10 +426,10 @@ Debugger.Break (); // TODO -
 //*z = 0;
 //Debug.Assert( (pMem->n+(desiredEnc==SqliteEncoding.UTF8?1:2))<=len );
 
-//sqlite3VdbeMemRelease(pMem);
-//pMem->flags &= ~(MEM_Static|MEM_Dyn|MEM_Ephem);
+//pMem.sqlite3VdbeMemRelease();
+//pMem->flags &= ~(MEM.MEM_Static|MEM.MEM_Dyn|MEM.MEM_Ephem);
 //pMem->enc = desiredEnc;
-//pMem->flags |= (MEM_Term|MEM_Dyn);
+//pMem->flags |= (MEM.MEM_Term|MEM.MEM_Dyn);
 //pMem.z = (char*)zOut;
 //pMem.zMalloc = pMem.z;
 
@@ -478,7 +478,7 @@ Debugger.Break (); // TODO -
 //memmove(pMem.z, pMem.z[2], pMem.n);
 //pMem.z[pMem.n] = '\0';
 //pMem.z[pMem.n+1] = '\0';
-pMem.flags |= MEM_Term;
+pMem.flags |= MEM.MEM_Term;
 pMem.enc = bom;
 }
 }
@@ -575,12 +575,12 @@ Mem m = Pool.Allocate_Mem();
 //  sqlite3VdbeMemSetStr(&m, z, nByte, enc, SQLITE_STATIC);
 //  sqlite3VdbeChangeEncoding(&m, SqliteEncoding.UTF8);
 //  if( db.mallocFailed !=0{
-//    sqlite3VdbeMemRelease(&m);
+//    &m.sqlite3VdbeMemRelease();
 //    m.z = 0;
 //  }
-//  Debug.Assert( (m.flags & MEM_Term)!=0 || db.mallocFailed !=0);
-//  Debug.Assert( (m.flags & MEM_Str)!=0 || db.mallocFailed !=0);
-  assert( (m.flags & MEM_Dyn)!=0 || db->mallocFailed );
+//  Debug.Assert( (m.flags & MEM.MEM_Term)!=0 || db.mallocFailed !=0);
+//  Debug.Assert( (m.flags & MEM.MEM_Str)!=0 || db.mallocFailed !=0);
+  assert( (m.flags & MEM.MEM_Dyn)!=0 || db->mallocFailed );
   assert( m.z || db->mallocFailed );
   return m.z;
 }

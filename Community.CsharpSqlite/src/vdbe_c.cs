@@ -149,8 +149,8 @@ namespace Community.CsharpSqlite {
 																																																		#endif
 		///
 		///<summary>
-		///The next global variable records the size of the largest MEM_Blob
-		///or MEM_Str that has been used by a VDBE opcode.  The test procedures
+		///The next global variable records the size of the largest MEM.MEM_Blob
+		///or MEM.MEM_Str that has been used by a VDBE opcode.  The test procedures
 		///</summary>
 		///<param name="use this information to make sure that the zero">blob functionality</param>
 		///<param name="is working correctly.   This variable has no function other than to">is working correctly.   This variable has no function other than to</param>
@@ -165,12 +165,12 @@ namespace Community.CsharpSqlite {
     static void updateMaxBlobsize( Mem p )
     {
 #if !TCLSH
-																																																		      if ( ( p.flags & ( MEM_Str | MEM_Blob ) ) != 0 && p.n > sqlite3_max_blobsize )
+																																																		      if ( ( p.flags & ( MEM.MEM_Str | MEM.MEM_Blob ) ) != 0 && p.n > sqlite3_max_blobsize )
       {
         sqlite3_max_blobsize = p.n;
       }
 #else
-																																																		      if ( ( p.flags & ( MEM_Str | MEM_Blob ) ) != 0 && p.n > sqlite3_max_blobsize.iValue )
+																																																		      if ( ( p.flags & ( MEM.MEM_Str | MEM.MEM_Blob ) ) != 0 && p.n > sqlite3_max_blobsize.iValue )
       {
         sqlite3_max_blobsize.iValue = p.n;
       }
@@ -213,10 +213,10 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		///<param name="already. Return non">zero if a malloc() fails.</param>
 		//#define Stringify(P, enc) \
-		//   if(((P).flags&(MEM_Str|MEM_Blob))==0 && sqlite3VdbeMemStringify(P,enc)) \
+		//   if(((P).flags&(MEM.MEM_Str|MEM.MEM_Blob))==0 && vdbemem_cs.sqlite3VdbeMemStringify(P,enc)) \
 		//     { goto no_mem; }
 		///<summary>
-		/// An ephemeral string value (signified by the MEM_Ephem flag) contains
+		/// An ephemeral string value (signified by the MEM.MEM_Ephem flag) contains
 		/// a pointer to a dynamically allocated string where some other entity
 		/// is responsible for deallocating that string.  Because the register
 		/// does not control the string, it might be deleted without the register
@@ -224,11 +224,11 @@ namespace Community.CsharpSqlite {
 		///
 		/// This routine converts an ephemeral string into a dynamically allocated
 		/// string that the register itself controls.  In other words, it
-		/// converts an MEM_Ephem string into an MEM_Dyn string.
+		/// converts an MEM.MEM_Ephem string into an MEM.MEM_Dyn string.
 		///
 		///</summary>
 		//#define Deephemeralize(P) \
-		//   if( ((P).flags&MEM_Ephem)!=0 \
+		//   if( ((P).flags&MEM.MEM_Ephem)!=0 \
 		//       && sqlite3VdbeMemMakeWriteable(P) ){ goto no_mem;}
 		static void Deephemeralize(Mem P) {
 		}
@@ -237,9 +237,9 @@ namespace Community.CsharpSqlite {
 		/// P if required.
 		///
 		///</summary>
-		//#define ExpandBlob(P) (((P).flags&MEM_Zero)?sqlite3VdbeMemExpandBlob(P):0)
+		//#define ExpandBlob(P) (((P).flags&MEM.MEM_Zero)?sqlite3VdbeMemExpandBlob(P):0)
 		static int ExpandBlob(Mem P) {
-			return (P.flags&MEM_Zero)!=0?P.sqlite3VdbeMemExpandBlob():0;
+			return (P.flags&MEM.MEM_Zero)!=0?P.sqlite3VdbeMemExpandBlob():0;
 		}
 		///<summary>
 		/// Argument pMem points at a register that will be passed to a
@@ -355,21 +355,21 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static void applyNumericAffinity(Mem pRec) {
-			if((pRec.flags&(MEM_Real|MEM_Int))==0) {
+			if((pRec.flags&(MEM.MEM_Real|MEM.MEM_Int))==0) {
 				double rValue=0.0;
 				i64 iValue=0;
 				SqliteEncoding enc=pRec.enc;
-				if((pRec.flags&MEM_Str)==0)
+				if((pRec.flags&MEM.MEM_Str)==0)
 					return;
 				if(Converter.sqlite3AtoF(pRec.z,ref rValue,pRec.n,enc)==false)
 					return;
 				if(0==Converter.sqlite3Atoi64(pRec.z,ref iValue,pRec.n,enc)) {
 					pRec.u.i=iValue;
-					pRec.flags|=MEM_Int;
+					pRec.flags|=MEM.MEM_Int;
 				}
 				else {
 					pRec.r=rValue;
-					pRec.flags|=MEM_Real;
+					pRec.flags|=MEM.MEM_Real;
 				}
 			}
 		}
@@ -413,26 +413,26 @@ namespace Community.CsharpSqlite {
 				///representation.
 				///
 				///</summary>
-				if(0==(pRec.flags&MEM_Str)&&(pRec.flags&(MEM_Real|MEM_Int))!=0) {
-					sqlite3VdbeMemStringify(pRec,enc);
+				if(0==(pRec.flags&MEM.MEM_Str)&&(pRec.flags&(MEM.MEM_Real|MEM.MEM_Int))!=0) {
+					vdbemem_cs.sqlite3VdbeMemStringify(pRec,enc);
 				}
-				if((pRec.flags&(MEM_Blob|MEM_Str))==(MEM_Blob|MEM_Str)) {
+				if((pRec.flags&(MEM.MEM_Blob|MEM.MEM_Str))==(MEM.MEM_Blob|MEM.MEM_Str)) {
 					StringBuilder sb=new StringBuilder(pRec.zBLOB.Length);
 					for(int i=0;i<pRec.zBLOB.Length;i++)
 						sb.Append((char)pRec.zBLOB[i]);
 					pRec.z=sb.ToString();
 					malloc_cs.sqlite3_free(ref pRec.zBLOB);
-					pRec.flags=(u16)(pRec.flags&~MEM_Blob);
+					pRec.flags=(pRec.flags&~MEM.MEM_Blob);
 				}
-				pRec.flags=(u16)(pRec.flags&~(MEM_Real|MEM_Int));
+				pRec.flags=(pRec.flags&~(MEM.MEM_Real|MEM.MEM_Int));
 			}
 			else
                 if (affinity != sqliteinth.SQLITE_AFF_NONE)
                 {
                     Debug.Assert(affinity == sqliteinth.SQLITE_AFF_INTEGER || affinity == sqliteinth.SQLITE_AFF_REAL || affinity == sqliteinth.SQLITE_AFF_NUMERIC);
 					applyNumericAffinity(pRec);
-					if((pRec.flags&MEM_Real)!=0) {
-						sqlite3VdbeIntegerAffinity(pRec);
+					if((pRec.flags&MEM.MEM_Real)!=0) {
+						pRec.sqlite3VdbeIntegerAffinity();
 					}
 				}
 		}
@@ -474,24 +474,24 @@ namespace Community.CsharpSqlite {
 
       string[] encnames = new string[] { "(X)", "(8)", "(16LE)", "(16BE)" };
 
-      if ( ( f & MEM_Blob ) != 0 )
+      if ( ( f & MEM.MEM_Blob ) != 0 )
       {
         int i;
         char c;
-        if ( ( f & MEM_Dyn ) != 0 )
+        if ( ( f & MEM.MEM_Dyn ) != 0 )
         {
           c = 'z';
-          Debug.Assert( ( f & ( MEM_Static | MEM_Ephem ) ) == 0 );
+          Debug.Assert( ( f & ( MEM.MEM_Static | MEM.MEM_Ephem ) ) == 0 );
         }
-        else if ( ( f & MEM_Static ) != 0 )
+        else if ( ( f & MEM.MEM_Static ) != 0 )
         {
           c = 't';
-          Debug.Assert( ( f & ( MEM_Dyn | MEM_Ephem ) ) == 0 );
+          Debug.Assert( ( f & ( MEM.MEM_Dyn | MEM.MEM_Ephem ) ) == 0 );
         }
-        else if ( ( f & MEM_Ephem ) != 0 )
+        else if ( ( f & MEM.MEM_Ephem ) != 0 )
         {
           c = 'e';
-          Debug.Assert( ( f & ( MEM_Static | MEM_Dyn ) ) == 0 );
+          Debug.Assert( ( f & ( MEM.MEM_Static | MEM.MEM_Dyn ) ) == 0 );
         }
         else
         {
@@ -518,31 +518,31 @@ namespace Community.CsharpSqlite {
 
         io.sqlite3_snprintf( 100, zCsr, "]%s", encnames[pMem.enc] );
         zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
-        if ( ( f & MEM_Zero ) != 0 )
+        if ( ( f & MEM.MEM_Zero ) != 0 )
         {
           io.sqlite3_snprintf( 100, zCsr, "+%dz", pMem.u.nZero );
           zBuf.Append( zCsr );//zCsr += StringExtensions.sqlite3Strlen30(zCsr);
         }
         //*zCsr = '\0';
       }
-      else if ( ( f & MEM_Str ) != 0 )
+      else if ( ( f & MEM.MEM_Str ) != 0 )
       {
         int j;//, k;
         zBuf.Append( ' ' );
-        if ( ( f & MEM_Dyn ) != 0 )
+        if ( ( f & MEM.MEM_Dyn ) != 0 )
         {
           zBuf.Append( 'z' );
-          Debug.Assert( ( f & ( MEM_Static | MEM_Ephem ) ) == 0 );
+          Debug.Assert( ( f & ( MEM.MEM_Static | MEM.MEM_Ephem ) ) == 0 );
         }
-        else if ( ( f & MEM_Static ) != 0 )
+        else if ( ( f & MEM.MEM_Static ) != 0 )
         {
           zBuf.Append( 't' );
-          Debug.Assert( ( f & ( MEM_Dyn | MEM_Ephem ) ) == 0 );
+          Debug.Assert( ( f & ( MEM.MEM_Dyn | MEM.MEM_Ephem ) ) == 0 );
         }
-        else if ( ( f & MEM_Ephem ) != 0 )
+        else if ( ( f & MEM.MEM_Ephem ) != 0 )
         {
           zBuf.Append( 's' ); //zBuf.Append( 'e' );
-          Debug.Assert( ( f & ( MEM_Static | MEM_Dyn ) ) == 0 );
+          Debug.Assert( ( f & ( MEM.MEM_Static | MEM.MEM_Dyn ) ) == 0 );
         }
         else
         {
@@ -579,25 +579,25 @@ namespace Community.CsharpSqlite {
 */
     static void memTracePrint( FILE _out, Mem p )
     {
-      if ( ( p.flags & MEM_Null ) != 0 )
+      if ( ( p.flags & MEM.MEM_Null ) != 0 )
       {
         fprintf( _out, " NULL" );
       }
-      else if ( ( p.flags & ( MEM_Int | MEM_Str ) ) == ( MEM_Int | MEM_Str ) )
+      else if ( ( p.flags & ( MEM.MEM_Int | MEM.MEM_Str ) ) == ( MEM.MEM_Int | MEM.MEM_Str ) )
       {
         fprintf( _out, " si:%lld", p.u.i );
 #if !SQLITE_OMIT_FLOATING_POINT
 																																																		      }
-      else if ( ( p.flags & MEM_Int ) != 0 )
+      else if ( ( p.flags & MEM.MEM_Int ) != 0 )
       {
         fprintf( _out, " i:%lld", p.u.i );
 #endif
 																																																		      }
-      else if ( ( p.flags & MEM_Real ) != 0 )
+      else if ( ( p.flags & MEM.MEM_Real ) != 0 )
       {
         fprintf( _out, " r:%g", p.r );
       }
-      else if ( ( p.flags & MEM_RowSet ) != 0 )
+      else if ( ( p.flags & MEM.MEM_RowSet ) != 0 )
       {
         fprintf( _out, " (rowset)" );
       }

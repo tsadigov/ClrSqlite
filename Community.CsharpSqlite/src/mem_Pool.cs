@@ -268,7 +268,7 @@ namespace Community.CsharpSqlite
         pPrior._SumCtx = null;
         pPrior._MD5Context = null;
         pPrior._SubProgram = null;
-        pPrior.flags = MEM_Null;
+        pPrior.flags = MEM.MEM_Null;
         pPrior.r = 0;
         pPrior.u.i = 0;
         pPrior.n = 0;

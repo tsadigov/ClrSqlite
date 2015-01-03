@@ -1044,7 +1044,7 @@ break;
 			///Deallocates any cached error strings. 
 			///</summary>
 			if(db.pErr!=null) {
-				sqlite3ValueFree(ref db.pErr);
+                vdbemem_cs.sqlite3ValueFree(ref db.pErr);
 			}
 			#if !SQLITE_OMIT_LOAD_EXTENSION
 			sqlite3CloseExtensions(db);

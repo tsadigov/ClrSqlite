@@ -151,8 +151,8 @@ return ( p == null || p.expired ) ? 1 : 0;
                 sqlite3_mutex_enter(mutex);
                 for (i = 0; i < p.nVar; i++)
                 {
-                    sqlite3VdbeMemRelease(p.aVar[i]);
-                    p.aVar[i].flags = MEM_Null;
+                    p.aVar[i].sqlite3VdbeMemRelease();
+                    p.aVar[i].flags = MEM.MEM_Null;
                 }
                 if (p.isPrepareV2 && p.expmask != 0)
                 {
@@ -171,7 +171,7 @@ return ( p == null || p.expired ) ? 1 : 0;
             public static byte[] sqlite3_value_blob(sqlite3_value pVal)
             {
                 Mem p = pVal;
-                if ((p.flags & (MEM_Blob | MEM_Str)) != 0)
+                if ((p.flags & (MEM.MEM_Blob | MEM.MEM_Str)) != 0)
                 {
                     p.sqlite3VdbeMemExpandBlob();
                     if (p.zBLOB == null && p.z != null)
@@ -187,8 +187,8 @@ return ( p == null || p.expired ) ? 1 : 0;
                         }
                         p.z = null;
                     }
-                    p.flags = (u16)(p.flags & ~MEM_Str);
-                    p.flags |= MEM_Blob;
+                    p.flags = (p.flags & ~MEM.MEM_Str);
+                    p.flags |= MEM.MEM_Blob;
                     return p.n > 0 ? p.zBLOB : null;
                 }
                 else
@@ -199,32 +199,32 @@ return ( p == null || p.expired ) ? 1 : 0;
 
             public static int sqlite3_value_bytes(sqlite3_value pVal)
             {
-                return sqlite3ValueBytes(pVal, SqliteEncoding.UTF8);
+                return vdbemem_cs.sqlite3ValueBytes(pVal, SqliteEncoding.UTF8);
             }
 
             public static int sqlite3_value_bytes16(sqlite3_value pVal)
             {
-                return sqlite3ValueBytes(pVal, SqliteEncoding.UTF16NATIVE);
+                return vdbemem_cs.sqlite3ValueBytes(pVal, SqliteEncoding.UTF16NATIVE);
             }
 
             public static double sqlite3_value_double(sqlite3_value pVal)
             {
-                return sqlite3VdbeRealValue(pVal);
+                return pVal.sqlite3VdbeRealValue();
             }
 
             public static int sqlite3_value_int(sqlite3_value pVal)
             {
-                return (int)sqlite3VdbeIntValue(pVal);
+                return (int)pVal.sqlite3VdbeIntValue();
             }
 
             public static sqlite_int64 sqlite3_value_int64(sqlite3_value pVal)
             {
-                return sqlite3VdbeIntValue(pVal);
+                return pVal.sqlite3VdbeIntValue();
             }
 
             public static string sqlite3_value_text(sqlite3_value pVal)
             {
-                return sqlite3ValueText(pVal, SqliteEncoding.UTF8);
+                return vdbemem_cs.sqlite3ValueText(pVal, SqliteEncoding.UTF8);
             }
 
 #if !SQLITE_OMIT_UTF16
@@ -610,18 +610,18 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                 Debug.Assert(Sqlite3.sqlite3_mutex_held(p.s.db.mutex));
                 pMem = p.pMem;
                 sqliteinth.testcase(nByte < 0);
-                if ((pMem.flags & MEM_Agg) == 0)
+                if ((pMem.flags & MEM.MEM_Agg) == 0)
                 {
                     if (nByte <= 0)
                     {
-                        sqlite3VdbeMemReleaseExternal(pMem);
+                        pMem.sqlite3VdbeMemReleaseExternal();
                         pMem.flags = 0;
                         pMem.z = null;
                     }
                     else
                     {
-                        sqlite3VdbeMemGrow(pMem, nByte, 0);
-                        pMem.flags = MEM_Agg;
+                        vdbemem_cs.sqlite3VdbeMemGrow(pMem, nByte, 0);
+                        pMem.flags = MEM.MEM_Agg;
                         pMem.u.pDef = p.pFunc;
                         if (pMem.z != null)
                         {
@@ -778,12 +778,12 @@ return p.pMem.n;
                     //#if defined(SQLITE_DEBUG) && defined(__GNUC__)
                     //      __attribute__((aligned(8))) 
                     //#endif
-                    //      = {0, "", (double)0, {0}, 0, MEM_Null, SQLITE_NULL, 0,
+                    //      = {0, "", (double)0, {0}, 0, MEM.MEM_Null, SQLITE_NULL, 0,
                     //#if SQLITE_DEBUG
                     //         0, 0,  /* pScopyFrom, pFiller */
                     //#endif
                     //         0, 0 };
-                    Mem nullMem = new Mem(null, "", (double)0, 0, 0, MEM_Null, FoundationalType.SQLITE_NULL, 0
+                    Mem nullMem = new Mem(null, "", (double)0, 0, 0, MEM.MEM_Null, FoundationalType.SQLITE_NULL, 0
 #if SQLITE_DEBUG
 																																																																																												         , null, null  /* pScopyFrom, pFiller */
 #endif
@@ -903,10 +903,10 @@ return p.pMem.n;
             public static sqlite3_value sqlite3_column_value(sqlite3_stmt pStmt, int i)
             {
                 Mem pOut = columnMem(pStmt, i);
-                if ((pOut.flags & MEM_Static) != 0)
+                if ((pOut.flags & MEM.MEM_Static) != 0)
                 {
-                    pOut.flags = (u16)(pOut.flags & ~MEM_Static);
-                    pOut.flags |= MEM_Ephem;
+                    pOut.flags = (pOut.flags & ~MEM.MEM_Static);
+                    pOut.flags |= MEM.MEM_Ephem;
                 }
                 columnMallocFailure(pStmt);
                 return (sqlite3_value)pOut;
@@ -1121,8 +1121,8 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 }
                 i--;
                 pVar = p.aVar[i];
-                sqlite3VdbeMemRelease(pVar);
-                pVar.flags = MEM_Null;
+                pVar.sqlite3VdbeMemRelease();
+                pVar.flags = MEM.MEM_Null;
                 utilc.sqlite3Error(p.db, SQLITE_OK, 0);
                 ///
                 ///<summary>
@@ -1189,10 +1189,10 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                     if (zData != null)
                     {
                         pVar = p.aVar[i - 1];
-                        rc = sqlite3VdbeMemSetBlob(pVar, zData, nData, encoding, xDel);
+                        rc = pVar.sqlite3VdbeMemSetBlob(zData, nData, encoding, xDel);
                         if (rc == SQLITE_OK && encoding != 0)
                         {
-                            rc = sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));
+                            rc = vdbemem_cs.sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));
                         }
                         utilc.sqlite3Error(p.db, rc, 0);
                         rc = malloc_cs.sqlite3ApiExit(p.db, rc);
@@ -1250,7 +1250,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                         rc = pVar.sqlite3VdbeMemSetStr(zData, nData, encoding, xDel);
                         if (rc == SQLITE_OK && encoding != 0)
                         {
-                            rc = sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));
+                            rc = vdbemem_cs.sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));
                         }
                         utilc.sqlite3Error(p.db, rc, 0);
                         rc = malloc_cs.sqlite3ApiExit(p.db, rc);
@@ -1346,7 +1346,7 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                         }
                     case FoundationalType.SQLITE_BLOB:
                         {
-                            if ((pValue.flags & MEM_Zero) != 0)
+                            if ((pValue.flags & MEM.MEM_Zero) != 0)
                             {
                                 rc = sqlite3_bind_zeroblob(pStmt, i, pValue.u.nZero);
                             }
@@ -1457,7 +1457,7 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                 sqlite3_mutex_enter(pTo.db.mutex);
                 for (i = 0; i < pFrom.nVar; i++)
                 {
-                    sqlite3VdbeMemMove(pTo.aVar[i], pFrom.aVar[i]);
+                    vdbemem_cs.sqlite3VdbeMemMove(pTo.aVar[i], pFrom.aVar[i]);
                 }
                 sqlite3_mutex_leave(pTo.db.mutex);
                 return SQLITE_OK;

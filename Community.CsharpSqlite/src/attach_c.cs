@@ -31,8 +31,8 @@ namespace Community.CsharpSqlite {
 			string zErrDyn="";
 			sqlite3_vfs pVfs=null;
 			Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
-			zFile=argv[0].z!=null&&(argv[0].z.Length>0)&&argv[0].flags!=MEM_Null?vdbeapi.sqlite3_value_text(argv[0]):"";
-			zName=argv[1].z!=null&&(argv[1].z.Length>0)&&argv[1].flags!=MEM_Null?vdbeapi.sqlite3_value_text(argv[1]):"";
+			zFile=argv[0].z!=null&&(argv[0].z.Length>0)&&argv[0].flags!=MEM.MEM_Null?vdbeapi.sqlite3_value_text(argv[0]):"";
+			zName=argv[1].z!=null&&(argv[1].z.Length>0)&&argv[1].flags!=MEM.MEM_Null?vdbeapi.sqlite3_value_text(argv[1]):"";
 			//if( zFile==null ) zFile = "";
 			//if ( zName == null ) zName = "";
 			///

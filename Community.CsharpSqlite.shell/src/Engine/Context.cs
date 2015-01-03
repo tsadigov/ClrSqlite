@@ -216,7 +216,7 @@ namespace Community.CsharpSqlite
         public void sqlite3_result_value(sqlite3_value pValue)
         {
             Debug.Assert(Sqlite3.sqlite3_mutex_held(this.s.db.mutex));
-            Sqlite3.sqlite3VdbeMemCopy(this.s, pValue);
+            Sqlite3.vdbemem_cs.sqlite3VdbeMemCopy(this.s, pValue);
         }
 
         public void sqlite3_result_zeroblob(int n)
@@ -228,7 +228,7 @@ namespace Community.CsharpSqlite
         public void sqlite3_result_error_code(int errCode)
         {
             this.isError = errCode;
-            if ((this.s.flags & Sqlite3.MEM_Null) != 0)
+            if ((this.s.flags & MEM.MEM_Null) != 0)
             {
                 this.setResultStrOrError(Sqlite3.sqlite3ErrStr(errCode), -1, SqliteEncoding.UTF8, Sqlite3.SQLITE_STATIC);
             }
