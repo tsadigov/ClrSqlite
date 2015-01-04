@@ -2,37 +2,36 @@ using System.Diagnostics;
 
 namespace Community.CsharpSqlite
 {
-  using sqlite3_stmt = Sqlite3.Vdbe;
+	using sqlite3_stmt = Sqlite3.Vdbe;
 
-  public partial class Sqlite3
-  {
-    ///<summary>
-/// 2007 May 1
-///
-/// The author disclaims copyright to this source code.  In place of
-/// a legal notice, here is a blessing:
-///
-///    May you do good and not evil.
-///    May you find forgiveness for yourself and forgive others.
-///    May you share freely, never taking more than you give.
-///
-///
-///
-/// This file contains code used to implement incremental BLOB I/O.
-///
-///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-///  C#-SQLite is an independent reimplementation of the SQLite software library
-///
-///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-///
-///
-///
-///</summary>
-    //#include "sqliteInt.h"
-    //#include "vdbeInt.h"
-
-#if !SQLITE_OMIT_INCRBLOB
-///<summary>
+	public partial class Sqlite3
+	{
+	///<summary>
+	/// 2007 May 1
+	///
+	/// The author disclaims copyright to this source code.  In place of
+	/// a legal notice, here is a blessing:
+	///
+	///    May you do good and not evil.
+	///    May you find forgiveness for yourself and forgive others.
+	///    May you share freely, never taking more than you give.
+	///
+	///
+	///
+	/// This file contains code used to implement incremental BLOB I/O.
+	///
+	///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+	///  C#-SQLite is an independent reimplementation of the SQLite software library
+	///
+	///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+	///
+	///
+	///
+	///</summary>
+	//#include "sqliteInt.h"
+	//#include "vdbeInt.h"
+	#if !SQLITE_OMIT_INCRBLOB
+																			///<summary>
 /// Valid sqlite3_blob* handles point to Incrblob structures.
 ///</summary>
 typedef struct Incrblob Incrblob;
@@ -66,7 +65,7 @@ int sqlite3_blob_open(
   ** vdbe program will take advantage of the various transaction,
   ** locking and error handling infrastructure built into the vdbe.
   **
-  ** After seeking the cursor, the vdbe executes an OP_ResultRow.
+  ** After seeking the cursor, the vdbe executes an OpCode.OP_ResultRow.
   ** Code external to the Vdbe then "borrows" the b-tree cursor and
   ** uses it to implement the blob_read(), blob_write() and 
   ** blob_bytes() functions.
@@ -80,20 +79,20 @@ int sqlite3_blob_open(
     {OP_VerifyCookie, 0, 0, 0},    /* 1: Check the schema cookie */
     {OP_TableLock, 0, 0, 0},       /* 2: Acquire a read or write lock */
 
-    /* One of the following two instructions is replaced by an OP_Noop. */
+    /* One of the following two instructions is replaced by an OpCode.OP_Noop. */
     {OP_OpenRead, 0, 0, 0},        /* 3: Open cursor 0 for reading */
     {OP_OpenWrite, 0, 0, 0},       /* 4: Open cursor 0 for read/write */
 
     {OP_Variable, 1, 1, 1},        /* 5: Push the rowid to the stack */
     {OP_NotExists, 0, 9, 1},       /* 6: Seek the cursor */
     {OP_Column, 0, 0, 1},          /* 7  */
-    {OP_ResultRow, 1, 0, 0},       /* 8  */
+    {OpCode.OP_ResultRow, 1, 0, 0},       /* 8  */
     {OP_Close, 0, 0, 0},           /* 9  */
     {OP_Halt, 0, 0, 0},            /* 10 */
   };
 
   Vdbe *v = 0;
-  int rc = SQLITE_OK;
+  int rc = Sqlite3.SQLITE_OK;
   string zErr = 0;
   Table *pTab;
   Parse *pParse;
@@ -110,24 +109,24 @@ int sqlite3_blob_open(
     pParse->db = db;
 
     sqlite3BtreeEnterAll(db);
-    pTab = sqlite3LocateTable(pParse, 0, zTable, zDb);
-    if( pTab && IsVirtual(pTab) ){
+    pTab = build.sqlite3LocateTable(pParse, 0, zTable, zDb);
+    if( pTab && pTab.IsVirtual() ){
       pTab = 0;
-      sqlite3ErrorMsg(pParse, "cannot open virtual table: %s", zTable);
+      utilc.sqlite3ErrorMsg(pParse, "cannot open virtual table: %s", zTable);
     }
 #if !SQLITE_OMIT_VIEW
-    if( pTab && pTab->pSelect ){
+																			    if( pTab && pTab->pSelect ){
       pTab = 0;
-      sqlite3ErrorMsg(pParse, "cannot open view: %s", zTable);
+      utilc.sqlite3ErrorMsg(pParse, "cannot open view: %s", zTable);
     }
 #endif
-    if( null==pTab ){
+																			    if( null==pTab ){
       if( pParse->zErrMsg ){
         sqlite3DbFree(db, zErr);
         zErr = pParse->zErrMsg;
         pParse->zErrMsg = 0;
       }
-      rc = SQLITE_ERROR;
+      rc = Sqlite3.SQLITE_ERROR;
       sqlite3BtreeLeaveAll(db);
       goto blob_open_out;
     }
@@ -140,8 +139,8 @@ int sqlite3_blob_open(
     }
     if( iCol==pTab->nCol ){
       sqlite3DbFree(db, zErr);
-      zErr = sqlite3MPrintf(db, "no such column: \"%s\"", zColumn);
-      rc = SQLITE_ERROR;
+      zErr = io.sqlite3MPrintf(db, "no such column: \"%s\"", zColumn);
+      rc = Sqlite3.SQLITE_ERROR;
       sqlite3BtreeLeaveAll(db);
       goto blob_open_out;
     }
@@ -154,7 +153,7 @@ int sqlite3_blob_open(
       string zFault = 0;
       Index *pIdx;
 #if !SQLITE_OMIT_FOREIGN_KEY
-      if( db->flags&SQLITE_ForeignKeys ){
+																			      if( db->flags&SQLITE_ForeignKeys ){
         /* Check that the column is not part of an FK child key definition. It
         ** is not necessary to check if it is part of a parent key, as parent
         ** key columns must be indexed. The check below will pick up this 
@@ -170,7 +169,7 @@ int sqlite3_blob_open(
         }
       }
 #endif
-      for(pIdx=pTab->pIndex; pIdx; pIdx=pIdx->pNext){
+																			      for(pIdx=pTab->pIndex; pIdx; pIdx=pIdx->pNext){
         int j;
         for(j=0; j<pIdx->nColumn; j++){
           if( pIdx->aiColumn[j]==iCol ){
@@ -180,8 +179,8 @@ int sqlite3_blob_open(
       }
       if( zFault ){
         sqlite3DbFree(db, zErr);
-        zErr = sqlite3MPrintf(db, "cannot open %s column for writing", zFault);
-        rc = SQLITE_ERROR;
+        zErr = io.sqlite3MPrintf(db, "cannot open %s column for writing", zFault);
+        rc = Sqlite3.SQLITE_ERROR;
         sqlite3BtreeLeaveAll(db);
         goto blob_open_out;
       }
@@ -207,14 +206,14 @@ int sqlite3_blob_open(
 
       /* Configure the OP_TableLock instruction */
 #if SQLITE_OMIT_SHARED_CACHE
-      sqlite3VdbeChangeToNoop(v, 2, 1);
+																			      sqlite3VdbeChangeToNoop(v, 2, 1);
 #else
-      sqlite3VdbeChangeP1(v, 2, iDb);
+																			      sqlite3VdbeChangeP1(v, 2, iDb);
       sqlite3VdbeChangeP2(v, 2, pTab->tnum);
       sqlite3VdbeChangeP3(v, 2, flags);
       sqlite3VdbeChangeP4(v, 2, pTab->zName, P4_TRANSIENT);
 #endif
-
+																			
       /* Remove either the OP_OpenWrite or OpenRead. Set the P2 
       ** parameter of the other to pTab->tnum.  */
       sqlite3VdbeChangeToNoop(v, 4 - flags, 1);
@@ -248,7 +247,7 @@ int sqlite3_blob_open(
       nAttempt++;
       rc = sqlite3_finalize((sqlite3_stmt )v);
       sqlite3DbFree(db, zErr);
-      zErr = sqlite3MPrintf(db, sqlite3_errmsg(db));
+      zErr = io.sqlite3MPrintf(db, sqlite3_errmsg(db));
       v = 0;
     }
   } while( nAttempt<5 && rc==SQLITE_SCHEMA );
@@ -263,10 +262,10 @@ int sqlite3_blob_open(
 
     if( type<12 ){
       sqlite3DbFree(db, zErr);
-      zErr = sqlite3MPrintf(db, "cannot open value of type %s",
+      zErr = io.sqlite3MPrintf(db, "cannot open value of type %s",
           type==0?"null": type==7?"real": "integer"
       );
-      rc = SQLITE_ERROR;
+      rc = Sqlite3.SQLITE_ERROR;
       goto blob_open_out;
     }
     pBlob = (Incrblob )sqlite3DbMallocZero(db, sizeof(Incrblob));
@@ -284,21 +283,21 @@ int sqlite3_blob_open(
     pBlob->nByte = sqlite3VdbeSerialTypeLen(type);
     pBlob->db = db;
     *ppBlob = (sqlite3_blob )pBlob;
-    rc = SQLITE_OK;
-  }else if( rc==SQLITE_OK ){
+    rc = Sqlite3.SQLITE_OK;
+  }else if( rc==Sqlite3.SQLITE_OK ){
     sqlite3DbFree(db, zErr);
-    zErr = sqlite3MPrintf(db, "no such rowid: %lld", iRow);
-    rc = SQLITE_ERROR;
+    zErr = io.sqlite3MPrintf(db, "no such rowid: %lld", iRow);
+    rc = Sqlite3.SQLITE_ERROR;
   }
 
 blob_open_out:
-  if( v && (rc!=SQLITE_OK || db->mallocFailed) ){
+  if( v && (rc!=Sqlite3.SQLITE_OK || db->mallocFailed) ){
     sqlite3VdbeFinalize(v);
   }
-  sqlite3Error(db, rc, zErr);
+  utilc.sqlite3Error(db, rc, zErr);
   sqlite3DbFree(db, zErr);
   sqlite3StackFree(db, pParse);
-  rc = sqlite3ApiExit(db, rc);
+  rc = malloc_cs.sqlite3ApiExit(db, rc);
   sqlite3_mutex_leave(db->mutex);
   return rc;
 }
@@ -319,7 +318,7 @@ int sqlite3_blob_close(sqlite3_blob *pBlob){
     sqlite3DbFree(db, ref p);
     sqlite3_mutex_leave(db->mutex);
   }else{
-    rc = SQLITE_OK;
+    rc = Sqlite3.SQLITE_OK;
   }
   return rc;
 }
@@ -339,15 +338,15 @@ static int blobReadWrite(
   Vdbe *v;
   sqlite3 db;
 
-  if( p==0 ) return SQLITE_MISUSE_BKPT();
+  if( p==0 ) return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
   db = p->db;
   sqlite3_mutex_enter(db->mutex);
   v = (Vdbe)p->pStmt;
 
   if( n<0 || iOffset<0 || (iOffset+n)>p->nByte ){
     /* Request is out of range. Return a transient error. */
-    rc = SQLITE_ERROR;
-    sqlite3Error(db, SQLITE_ERROR, 0);
+    rc = Sqlite3.SQLITE_ERROR;
+    utilc.sqlite3Error(db, Sqlite3.SQLITE_ERROR, 0);
   } else if( v==0 ){
     /* If there is no statement handle, then the blob-handle has
     ** already been invalidated. Return SQLITE_ABORT in this case.
@@ -369,7 +368,7 @@ static int blobReadWrite(
       v->rc = rc;
     }
   }
-  rc = sqlite3ApiExit(db, rc);
+  rc = malloc_cs.sqlite3ApiExit(db, rc);
   sqlite3_mutex_leave(db->mutex);
   return rc;
 }
@@ -399,6 +398,6 @@ int sqlite3_blob_bytes(sqlite3_blob *pBlob){
   return p ? p->nByte : 0;
 }
 
-#endif // * #if !SQLITE_OMIT_INCRBLOB */
-  }
+#endif
+	}
 }

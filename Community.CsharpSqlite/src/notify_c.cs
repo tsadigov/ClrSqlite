@@ -2,36 +2,42 @@ using System.Diagnostics;
 
 namespace Community.CsharpSqlite
 {
-  public partial class Sqlite3
-  {
-    /*
-    ** 2009 March 3
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    **
-    ** This file contains the implementation of the sqlite3_unlock_notify()
-    ** API method and its associated functionality.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2009-12-07 16:39:13 1ed88e9d01e9eda5cbc622e7614277f29bcc551c
-    **
-    *************************************************************************
-    */
-    //#include "sqliteInt.h"
-    //#include "btreeInt.h"
+	public partial class Sqlite3
+	{
+	///
+///<summary>
+///2009 March 3
+///
+///The author disclaims copyright to this source code.  In place of
+///a legal notice, here is a blessing:
+///
+///May you do good and not evil.
+///May you find forgiveness for yourself and forgive others.
+///May you share freely, never taking more than you give.
+///
+///
+///
+///This file contains the implementation of the sqlite3_unlock_notify()
+///API method and its associated functionality.
+///
+///</summary>
+///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+///<param name=""></param>
+///<param name="SQLITE_SOURCE_ID: 2009">07 16:39:13 1ed88e9d01e9eda5cbc622e7614277f29bcc551c</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name=""></param>
 
-    /* Omit this entire file if SQLITE_ENABLE_UNLOCK_NOTIFY is not defined. */
-#if SQLITE_ENABLE_UNLOCK_NOTIFY
+	//#include "sqliteInt.h"
+	//#include "btreeInt.h"
+	///
+///<summary>
+///Omit this entire file if SQLITE_ENABLE_UNLOCK_NOTIFY is not defined. 
+///</summary>
 
+	#if SQLITE_ENABLE_UNLOCK_NOTIFY
+																			
 /*
 ** Public interfaces:
 **
@@ -41,8 +47,8 @@ namespace Community.CsharpSqlite
 **   sqlite3_unlock_notify()
 */
 
-//#define assertMutexHeld() \
-assert( sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)) )
+//define assertMutexHeld() \
+assert( Sqlite3.sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)) )
 
 /*
 ** Head of a linked list of all sqlite3 objects created by this process
@@ -53,7 +59,7 @@ assert( sqlite3_mutex_held(sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER)) )
 static sqlite3 *SQLITE_WSD sqlite3BlockedList = 0;
 
 #if !NDEBUG
-/*
+																			/*
 ** This function is a complex assert() that verifies the following
 ** properties of the blocked connections list:
 **
@@ -86,9 +92,9 @@ assert( db==0 || p->pBlockingConnection!=db );
 }
 }
 #else
-//# define checkListProperties(x)
+																			// define checkListProperties(x)
 #endif
-
+																			
 /*
 ** Remove connection db from the blocked connections list. If connection
 ** db is not currently a part of the list, this function is a no-op.
@@ -163,7 +169,7 @@ sqlite3 *db,
 void (*xNotify)(void **, int),
 void *pArg
 ){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 
 sqlite3_mutex_enter(db->mutex);
 enterMutex();
@@ -196,7 +202,7 @@ addToBlockedList(db);
 
 leaveMutex();
 assert( !db->mallocFailed );
-sqlite3Error(db, rc, (rc?"database is deadlocked":0));
+utilc.sqlite3Error(db, rc, (rc?"database is deadlocked":0));
 sqlite3_mutex_leave(db->mutex);
 return rc;
 }
@@ -265,15 +271,15 @@ nArg = 0;
 
 sqlite3BeginBenignMalloc();
 assert( aArg==aDyn || (aDyn==0 && aArg==aStatic) );
-assert( nArg<=(int)ArraySize(aStatic) || aArg==aDyn );
-if( (!aDyn && nArg==(int)ArraySize(aStatic))
+assert( nArg<=(int)Sqlite3.ArraySize(aStatic) || aArg==aDyn );
+if( (!aDyn && nArg==(int)Sqlite3.ArraySize(aStatic))
 || (aDyn && nArg==(int)(sqlite3DbMallocSize(db, aDyn)/sizeof(void*)))
 ){
 /* The aArg[] array needs to grow. */
-void **pNew = (void **)sqlite3Malloc(nArg*sizeof(void *)*2);
+void **pNew = (void **)malloc_cs.sqlite3Malloc(nArg*sizeof(void *)*2);
 if( pNew ){
 memcpy(pNew, aArg, nArg*sizeof(void *));
-//sqlite3_free(aDyn);
+//malloc_cs.sqlite3_free(aDyn);
 aDyn = aArg = pNew;
 }else{
 /* This occurs when the array of context pointers that need to
@@ -326,7 +332,7 @@ pp = &p->pNextBlocked;
 if( nArg!=0 ){
 xUnlockNotify(aArg, nArg);
 }
-//sqlite3_free(aDyn);
+//malloc_cs.sqlite3_free(aDyn);
 leaveMutex();         /* Leave STATIC_MASTER mutex */
 }
 
@@ -342,5 +348,5 @@ checkListProperties(db);
 leaveMutex();
 }
 #endif
-  }
+	}
 }

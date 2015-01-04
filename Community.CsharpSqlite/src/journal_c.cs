@@ -1,42 +1,45 @@
 namespace Community.CsharpSqlite
 {
-  public partial class Sqlite3
-  {
-    /*
-    ** 2007 August 22
-    **
-    ** The author disclaims copyright to this source code.  In place of
-    ** a legal notice, here is a blessing:
-    **
-    **    May you do good and not evil.
-    **    May you find forgiveness for yourself and forgive others.
-    **    May you share freely, never taking more than you give.
-    **
-    *************************************************************************
-    **
-    ** This file implements a special kind of sqlite3_file object used
-    ** by SQLite to create journal files if the atomic-write optimization
-    ** is enabled.
-    **
-    ** The distinctive characteristic of this sqlite3_file is that the
-    ** actual on disk file is created lazily. When the file is created,
-    ** the caller specifies a buffer size for an in-memory buffer to
-    ** be used to service read() and write() requests. The actual file
-    ** on disk is not created or populated until either:
-    **
-    **   1) The in-memory representation grows too large for the allocated
-    **      buffer, or
-    **   2) The sqlite3JournalCreate() function is called.
-    *************************************************************************
-    **  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-    **  C#-SQLite is an independent reimplementation of the SQLite software library
-    **
-    **  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
-    **
-    *************************************************************************
-    */
-#if SQLITE_ENABLE_ATOMIC_WRITE
-    //#include "sqliteInt.h"
+	public partial class Sqlite3
+	{
+	///
+///<summary>
+///2007 August 22
+///
+///The author disclaims copyright to this source code.  In place of
+///a legal notice, here is a blessing:
+///
+///May you do good and not evil.
+///May you find forgiveness for yourself and forgive others.
+///May you share freely, never taking more than you give.
+///
+///
+///
+///This file implements a special kind of sqlite3_file object used
+///</summary>
+///<param name="by SQLite to create journal files if the atomic">write optimization</param>
+///<param name="is enabled.">is enabled.</param>
+///<param name=""></param>
+///<param name="The distinctive characteristic of this sqlite3_file is that the">The distinctive characteristic of this sqlite3_file is that the</param>
+///<param name="actual on disk file is created lazily. When the file is created,">actual on disk file is created lazily. When the file is created,</param>
+///<param name="the caller specifies a buffer size for an in">memory buffer to</param>
+///<param name="be used to service read() and write() requests. The actual file">be used to service read() and write() requests. The actual file</param>
+///<param name="on disk is not created or populated until either:">on disk is not created or populated until either:</param>
+///<param name=""></param>
+///<param name="1) The in">memory representation grows too large for the allocated</param>
+///<param name="buffer, or">buffer, or</param>
+///<param name="2) The sqlite3JournalCreate() function is called.">2) The sqlite3JournalCreate() function is called.</param>
+///<param name=""></param>
+///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+///<param name=""></param>
+///<param name="SQLITE_SOURCE_ID: 2010">23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3</param>
+///<param name=""></param>
+///<param name=""></param>
+///<param name=""></param>
+
+	#if SQLITE_ENABLE_ATOMIC_WRITE
+																			    //include "sqliteInt.h"
 
 /*
 ** A JournalFile object is a subclass of sqlite3_file used by
@@ -59,11 +62,11 @@ typedef struct JournalFile JournalFile;
 ** for JournalFile p.
 */
 static int createFile(JournalFile p){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 if( null==p.pReal ){
 sqlite3_file pReal = (sqlite3_file )&p[1];
 rc = sqlite3OsOpen(p.pVfs, p.zJournal, pReal, p.flags, 0);
-if( rc==SQLITE_OK ){
+if( rc==Sqlite3.SQLITE_OK ){
 p.pReal = pReal;
 if( p.iSize>0 ){
 Debug.Assert(p.iSize<=p.nBuf);
@@ -83,7 +86,7 @@ if( p.pReal ){
 sqlite3OsClose(p.pReal);
 }
 sqlite3DbFree(db,p.zBuf);
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 
 /*
@@ -95,7 +98,7 @@ void *zBuf,            /* Put the results here */
 int iAmt,              /* Number of bytes to read */
 sqlite_int64 iOfst     /* Begin reading at this offset */
 ){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 JournalFile *p = (JournalFile )pJfd;
 if( p->pReal ){
 rc = sqlite3OsRead(p->pReal, zBuf, iAmt, iOfst);
@@ -116,12 +119,12 @@ string zBuf,      /* Take data to be written from here */
 int iAmt,              /* Number of bytes to write */
 sqlite_int64 iOfst     /* Begin writing at this offset into the file */
 ){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 JournalFile p = (JournalFile )pJfd;
 if( null==p.pReal && (iOfst+iAmt)>p.nBuf ){
 rc = createFile(p);
 }
-if( rc==SQLITE_OK ){
+if( rc==Sqlite3.SQLITE_OK ){
 if( p.pReal ){
 rc = sqlite3OsWrite(p.pReal, zBuf, iAmt, iOfst);
 }else{
@@ -138,7 +141,7 @@ return rc;
 ** Truncate the file.
 */
 static int jrnlTruncate(sqlite3_file pJfd, sqlite_int64 size){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 JournalFile p = (JournalFile )pJfd;
 if( p.pReal ){
 rc = sqlite3OsTruncate(p.pReal, size);
@@ -157,7 +160,7 @@ JournalFile p = (JournalFile )pJfd;
 if( p.pReal ){
 rc = sqlite3OsSync(p.pReal, flags);
 }else{
-rc = SQLITE_OK;
+rc = Sqlite3.SQLITE_OK;
 }
 return rc;
 }
@@ -166,7 +169,7 @@ return rc;
 ** Query the size of the file in bytes.
 */
 static int jrnlFileSize(sqlite3_file pJfd, sqlite_int64 pSize){
-int rc = SQLITE_OK;
+int rc = Sqlite3.SQLITE_OK;
 JournalFile p = (JournalFile )pJfd;
 if( p.pReal ){
 rc = sqlite3OsFileSize(p.pReal, pSize);
@@ -212,7 +215,7 @@ int nBuf                   /* Bytes buffered before opening the file */
 JournalFile p = (JournalFile )pJfd;
 memset(p, 0, sqlite3JournalSize(pVfs));
 if( nBuf>0 ){
-p.zBuf = sqlite3MallocZero(nBuf);
+p.zBuf = malloc_cs.sqlite3MallocZero(nBuf);
 if( null==p.zBuf ){
 return SQLITE_NOMEM;
 }
@@ -224,7 +227,7 @@ p.nBuf = nBuf;
 p.flags = flags;
 p.zJournal = zName;
 p.pVfs = pVfs;
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 
 /*
@@ -233,7 +236,7 @@ return SQLITE_OK;
 */
 int sqlite3JournalCreate(sqlite3_file p){
 if( p.pMethods!=&JournalFileMethods ){
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 return createFile((JournalFile )p);
 }
@@ -246,5 +249,5 @@ int sqlite3JournalSize(sqlite3_vfs pVfs){
 return (pVfs->szOsFile+sizeof(JournalFile));
 }
 #endif
-  }
+	}
 }

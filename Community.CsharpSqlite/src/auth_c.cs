@@ -4,41 +4,42 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-  using sqlite3_value = Sqlite3.Mem;
+	using sqlite3_value = Mem;
 
-  public partial class Sqlite3
-  {
-/*
-** 2003 January 11
-**
-** The author disclaims copyright to this source code.  In place of
-** a legal notice, here is a blessing:
-**
-**    May you do good and not evil.
-**    May you find forgiveness for yourself and forgive others.
-**    May you share freely, never taking more than you give.
-**
-*************************************************************************
-** This file contains code used to implement the sqlite3_set_authorizer()
-** API.  This facility is an optional feature of the library.  Embedded
-** systems that do not need this facility may omit it by recompiling
-** the library with -DSQLITE_OMIT_AUTHORIZATION=1
-*************************************************************************
-**  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-**  C#-SQLite is an independent reimplementation of the SQLite software library
-**
-**  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
-**
-*************************************************************************
-*/
-//#include "sqliteInt.h"
-
+	public partial class Sqlite3
+	{
+	///
 ///<summary>
-/// All of the code in this file may be omitted by defining a single
-/// macro.
+///2003 January 11
+///
+///The author disclaims copyright to this source code.  In place of
+///a legal notice, here is a blessing:
+///
+///May you do good and not evil.
+///May you find forgiveness for yourself and forgive others.
+///May you share freely, never taking more than you give.
+///
+///
+///This file contains code used to implement the sqlite3_set_authorizer()
+///API.  This facility is an optional feature of the library.  Embedded
+///systems that do not need this facility may omit it by recompiling
 ///</summary>
-#if !SQLITE_OMIT_AUTHORIZATION
+///<param name="the library with ">DSQLITE_OMIT_AUTHORIZATION=1</param>
+///<param name=""></param>
+///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+///<param name=""></param>
+///<param name="SQLITE_SOURCE_ID: 2010">23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3</param>
+///<param name=""></param>
+///<param name=""></param>
 
+	//#include "sqliteInt.h"
+	///<summary>
+	/// All of the code in this file may be omitted by defining a single
+	/// macro.
+	///</summary>
+	#if !SQLITE_OMIT_AUTHORIZATION
+																			
 ///<summary>
 /// Set or clear the access authorization function.
 ///
@@ -74,8 +75,8 @@ namespace Community.CsharpSqlite
 ///
 /// The third and fourth arguments to the auth function are the name of
 /// the table and the column that are being accessed.  The auth function
-/// should return either SQLITE_OK, SQLITE_DENY, or SQLITE_IGNORE.  If
-/// SQLITE_OK is returned, it means that access is allowed.  SQLITE_DENY
+/// should return either Sqlite3.SQLITE_OK, SQLITE_DENY, or SQLITE_IGNORE.  If
+/// Sqlite3.SQLITE_OK is returned, it means that access is allowed.  SQLITE_DENY
 /// means that the SQL statement will never-run - the sqlite3_exec() call
 /// will return with an error.  SQLITE_IGNORE means that the SQL statement
 /// should run but attempts to read the specified column will return NULL
@@ -94,7 +95,7 @@ db->xAuth = xAuth;
 db->pAuthArg = pArg;
 sqlite3ExpirePreparedStatements(db);
 sqlite3_mutex_leave(db->mutex);
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 
 ///<summary>
@@ -102,8 +103,8 @@ return SQLITE_OK;
 /// user-supplied authorization function returned an illegal value.
 ///</summary>
 static void sqliteAuthBadReturnCode(Parse *pParse){
-sqlite3ErrorMsg(pParse, "authorizer malfunction");
-pParse->rc = SQLITE_ERROR;
+utilc.sqlite3ErrorMsg(pParse, "authorizer malfunction");
+pParse->rc = Sqlite3.SQLITE_ERROR;
 }
 
 ///<summary>
@@ -128,24 +129,24 @@ int sqlite3AuthReadCol(
   rc = db->xAuth(db->pAuthArg, SQLITE_READ, zTab,zCol,zDb,pParse->zAuthContext);
   if( rc==SQLITE_DENY ){
 if( db->nDb>2 || iDb!=0 ){
-  sqlite3ErrorMsg(pParse, "access to %s.%s.%s is prohibited",zDb,zTab,zCol);
+  utilc.sqlite3ErrorMsg(pParse, "access to %s.%s.%s is prohibited",zDb,zTab,zCol);
 }else{
-  sqlite3ErrorMsg(pParse, "access to %s.%s is prohibited", zTab, zCol);
+  utilc.sqlite3ErrorMsg(pParse, "access to %s.%s is prohibited", zTab, zCol);
 }
 pParse->rc = SQLITE_AUTH;
-  }else if( rc!=SQLITE_IGNORE && rc!=SQLITE_OK ){
+  }else if( rc!=SQLITE_IGNORE && rc!=Sqlite3.SQLITE_OK ){
 sqliteAuthBadReturnCode(pParse);
   }
   return rc;
 }
 
 ///<summary>
-/// The pExpr should be a TK_COLUMN expression.  The table referred to
+/// The pExpr should be a Sqlite3.TK_COLUMN expression.  The table referred to
 /// is in pTabList or else it is the NEW or OLD table of a trigger.
 /// Check to see if it is OK to read this particular column.
 ///
-/// If the auth function returns SQLITE_IGNORE, change the TK_COLUMN
-/// instruction into a TK_NULL.  If the auth function returns SQLITE_DENY,
+/// If the auth function returns SQLITE_IGNORE, change the Sqlite3.TK_COLUMN
+/// instruction into a Sqlite3.TK_NULL.  If the auth function returns SQLITE_DENY,
 /// then generate an error.
 ///</summary>
 void sqlite3AuthRead(
@@ -168,12 +169,12 @@ if( iDb<0 ){
 ** temporary table. */
 return;
 }
-  Debug.Assert( pExpr->op==TK_COLUMN || pExpr->op==TK_TRIGGER );
-  if( pExpr->op==TK_TRIGGER ){
+  Debug.Assert( pExpr->op==Sqlite3.TK_COLUMN || pExpr->op==Sqlite3.TK_TRIGGER );
+  if( pExpr->op==Sqlite3.TK_TRIGGER ){
 pTab = pParse->pTriggerTab;
   }else{
 Debug.Assert( pTabList );
-for(iSrc=0; ALWAYS(iSrc<pTabList->nSrc); iSrc++){
+for(iSrc=0; Sqlite3.ALWAYS(iSrc<pTabList->nSrc); iSrc++){
   if( pExpr->iTable==pTabList->a[iSrc].iCursor ){
     pTab = pTabList->a[iSrc].pTab;
 	break;
@@ -194,13 +195,13 @@ zCol = "ROWID";
 }
 Debug.Assert( iDb>=0 && iDb<db->nDb );
   if( SQLITE_IGNORE==sqlite3AuthReadCol(pParse, pTab->zName, zCol, iDb) ){
-pExpr->op = TK_NULL;
+pExpr->op = Sqlite3.TK_NULL;
 }
 }
 
 ///<summary>
 /// Do an authorization check using the code and arguments given.  Return
-/// either SQLITE_OK (zero) or SQLITE_IGNORE or SQLITE_DENY.  If SQLITE_DENY
+/// either Sqlite3.SQLITE_OK (zero) or SQLITE_IGNORE or SQLITE_DENY.  If SQLITE_DENY
 /// is returned, then the error count and error message in pParse are
 /// modified appropriately.
 ///</summary>
@@ -218,17 +219,17 @@ int rc;
 ** or if the parser is being invoked from within sqlite3_declare_vtab.
 */
 if( db->init.busy || IN_DECLARE_VTAB ){
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 
 if( db->xAuth==0 ){
-return SQLITE_OK;
+return Sqlite3.SQLITE_OK;
 }
 rc = db->xAuth(db->pAuthArg, code, zArg1, zArg2, zArg3, pParse->zAuthContext);
 if( rc==SQLITE_DENY ){
-sqlite3ErrorMsg(pParse, "not authorized");
+utilc.sqlite3ErrorMsg(pParse, "not authorized");
 pParse->rc = SQLITE_AUTH;
-}else if( rc!=SQLITE_OK && rc!=SQLITE_IGNORE ){
+}else if( rc!=Sqlite3.SQLITE_OK && rc!=SQLITE_IGNORE ){
 rc = SQLITE_DENY;
 sqliteAuthBadReturnCode(pParse);
 }
@@ -262,6 +263,6 @@ pContext->pParse = 0;
 }
 }
 
-#endif //* SQLITE_OMIT_AUTHORIZATION */
-  }
+#endif
+	}
 }
