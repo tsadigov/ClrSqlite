@@ -51,16 +51,10 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
             //C# Alias
-            static public int exec(sqlite3 db, ///
-                ///<summary>
-                ///The database on which the SQL executes 
-                ///</summary>
-
-            string zSql, ///
-                ///<summary>
+            static public int exec(sqlite3 db,                 
+                ///The database on which the SQL executes                 
+            string zSql, 
                 ///The SQL to be executed 
-                ///</summary>
-
             int NoCallback, int NoArgs, int NoErrors)
             {
                 string Errors = "";
@@ -99,24 +93,19 @@ namespace Community.CsharpSqlite
 
 
             //OVERLOADS 
-            public static int sqlite3_exec(sqlite3 db, ///
-                ///The database on which the SQL executes 
-
-            string zSql, ///
-                ///The SQL to be executed 
-
-            int NoCallback, int NoArgs, int NoErrors)
+            public static int sqlite3_exec(
+                /*The database on which the SQL executes */ sqlite3 db, 
+                /*The SQL to be executed */string zSql, 
+                int NoCallback, int NoArgs, int NoErrors)
             {
                 string Errors = "";
                 return sqlite3_exec(db, zSql, null, null, ref Errors);
             }
 
-            public static  int sqlite3_exec(sqlite3 db, ///
+            public static  int sqlite3_exec(sqlite3 db, 
                 ///The database on which the SQL executes 
-
-            string zSql, ///
+            string zSql, 
                 ///The SQL to be executed 
-
             //sqlite3_callback 
                 dxCallback xCallback, ///
                 ///Invoke this callback routine 
@@ -152,23 +141,24 @@ namespace Community.CsharpSqlite
 
             )
             {
-                SqlResult result = SqlResult.SQLITE_OK;
                 ///Return code 
-
-                string zLeftover = "";
+                SqlResult result = SqlResult.SQLITE_OK;
+                
                 ///Tail of unprocessed SQL 
-
-                sqlite3_stmt pStmt = null;
+                string zLeftover = "";
+                
                 ///The current SQL statement 
-
-                string[] azCols = null;
+                sqlite3_stmt pStmt = null;
+                
                 ///Names of result columns 
-
+                string[] azCols = null;
+                
+                ///Number of retry attempts
                 int nRetry = 0;
-                ///Number of retry attempts 
-
-                int callbackIsInit;
+                 
                 ///True if callback data is initialized 
+                int callbackIsInit;
+                
 
                 if (!utilc.sqlite3SafetyCheckOk(db))
                     return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
@@ -199,11 +189,8 @@ namespace Community.CsharpSqlite
                     {
                         int i;
                         result = vdbeapi.sqlite3_step(pStmt);
-                        ///
-                        ///<summary>
-                        ///Invoke the callback function if required 
-                        ///</summary>
 
+                        ///Invoke the callback function if required 
                         if (xCallback != null && (SqlResult.SQLITE_ROW == result || (SqlResult.SQLITE_DONE == result && callbackIsInit == 0 && (db.flags & SqliteFlags.SQLITE_NullCallback) != 0)))
                         {
                             if (0 == callbackIsInit)
@@ -216,16 +203,13 @@ namespace Community.CsharpSqlite
 
                                 azCols=Enumerable.Range(0, nCol)
                                     .Select(idx => { 
-                                        var name = vdbeapi.sqlite3_column_name(pStmt, idx);
-                                        ///
-                                        ///<summary>
+                                        var name = vdbeapi.sqlite3_column_name(pStmt, idx);                                        
                                         ///sqlite3VdbeSetColName() installs column names as UTF8
-                                        ///strings so there is no way for vdbeapi.sqlite3_column_name() to fail. 
-                                        ///</summary>
-
+                                        ///strings so there is no way for vdbeapi.sqlite3_column_name() to fail.
                                         Debug.Assert(null != name);
 
-                                        return name; })
+                                        return name; 
+                                    })
                                     .ToArray();
 
                                 
@@ -245,7 +229,7 @@ namespace Community.CsharpSqlite
                                     }
                                 }
                             }
-                            if (xCallback(pArg, nCol, azVals, azCols) != 0)
+                            if (xCallback(pArg, nCol, azVals, azCols) != 0)//-----<<----------<<----------<<----------<<-----
                             {
                                 result = SqlResult.SQLITE_ABORT;
                                 vdbeaux.sqlite3VdbeFinalize(ref pStmt);
@@ -254,11 +238,11 @@ namespace Community.CsharpSqlite
                                 goto exec_out;
                             }
                         }
-                        if (result != SqlResult.SQLITE_ROW)
+                        if (SqlResult.SQLITE_ROW != result)
                         {
                             result = (SqlResult)vdbeaux.sqlite3VdbeFinalize(ref pStmt);
                             pStmt = null;
-                            if (result != SqlResult.SQLITE_SCHEMA)
+                            if (SqlResult.SQLITE_SCHEMA != result)
                             {
                                 nRetry = 0;
                                 if ((zSql = zLeftover) != "")
