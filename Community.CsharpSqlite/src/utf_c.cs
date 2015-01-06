@@ -338,7 +338,7 @@ Debugger.Break (); // TODO -
 //  u8 temp;
 //  int rc;
 //  rc = sqlite3VdbeMemMakeWriteable(pMem);
-//  if( rc!=Sqlite3.SQLITE_OK ){
+//  if( rc!=SqlResult.SQLITE_OK ){
 //    Debug.Assert( rc==SQLITE_NOMEM );
 //    return SQLITE_NOMEM;
 //  }
@@ -441,7 +441,7 @@ sqlite3VdbeMemPrettyPrint(pMem, zBuf);
 fprintf(stderr, "OUTPUT: %s\n", zBuf);
 }
 #endif
-																																						return Sqlite3.SQLITE_OK;
+																																						return SqlResult.SQLITE_OK;
 }
 
 ///<summary>
@@ -454,7 +454,7 @@ fprintf(stderr, "OUTPUT: %s\n", zBuf);
 /// changed by this function.
 ///</summary>
 static int sqlite3VdbeMemHandleBom(Mem pMem){
-int rc = Sqlite3.SQLITE_OK;
+var rc = SqlResult.SQLITE_OK;
 int bom = 0;
 byte[] b01 = new byte[2];
 Encoding.Unicode.GetBytes( pMem.z, 0, 1,b01,0 );
@@ -472,7 +472,7 @@ bom = SqliteEncoding.UTF16LE;
 
 if( bom!=0 ){
 rc = sqlite3VdbeMemMakeWriteable(pMem);
-if( rc==Sqlite3.SQLITE_OK ){
+if( rc==SqlResult.SQLITE_OK ){
 pMem.n -= 2;
 Debugger.Break (); // TODO -
 //memmove(pMem.z, pMem.z[2], pMem.n);

@@ -940,14 +940,14 @@ p.zName,  P4Usage.P4_STATIC );
             /// is reserved for internal use.
             ///
             ///</summary>
-            public static int sqlite3CheckObjectName(Parse pParse, string zName)
+            public static SqlResult sqlite3CheckObjectName(Parse pParse, string zName)
             {
                 if (0 == pParse.db.init.busy && pParse.nested == 0 && (pParse.db.flags & SqliteFlags.SQLITE_WriteSchema) == 0 && zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase))
                 {
                     utilc.sqlite3ErrorMsg(pParse, "object name reserved for internal use: %s", zName);
-                    return Sqlite3.SQLITE_ERROR;
+                    return SqlResult.SQLITE_ERROR;
                 }
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             ///
             ///<summary>
@@ -1054,7 +1054,7 @@ p.zName,  P4Usage.P4_STATIC );
                 zName = build.sqlite3NameFromToken(db, pName);
                 if (zName == null)
                     return;
-                if (Sqlite3.SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
+                if (SqlResult.SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
                 {
                     goto begin_table_error;
                 }
@@ -2315,7 +2315,7 @@ goto begin_table_error;
             /// the columns of the view in the pTable structure.  Return the number
             /// of errors.  If an error is seen leave an error message in pParse.zErrMsg.
             ///</summary>
-            public static int sqlite3ViewGetColumnNames(Parse pParse, Table pTable)
+            public static SqlResult sqlite3ViewGetColumnNames(Parse pParse, Table pTable)
             {
                 Table pSelTab;
                 ///
@@ -2327,7 +2327,7 @@ goto begin_table_error;
                 ///<summary>
                 ///Copy of the SELECT that implements the view 
                 ///</summary>
-                int nErr = 0;
+                SqlResult nErr = (SqlResult)0;
                 ///
                 ///<summary>
                 ///Number of errors encountered 
@@ -2348,7 +2348,7 @@ goto begin_table_error;
 #if !SQLITE_OMIT_VIRTUALTABLE
                 if (pParse.sqlite3VtabCallConnect(pTable) != 0)
                 {
-                    return Sqlite3.SQLITE_ERROR;
+                    return SqlResult.SQLITE_ERROR;
                 }
 #endif
                 if (pTable.IsVirtual())
@@ -2382,7 +2382,7 @@ goto begin_table_error;
                 if (pTable.nCol < 0)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "view %s is circularly defined", pTable.zName);
-                    return 1;
+                    return (SqlResult)1;
                 }
                 Debug.Assert(pTable.nCol >= 0);
                 ///
@@ -3380,7 +3380,7 @@ return;
                     zName = build.sqlite3NameFromToken(db, pName);
                     if (zName == null)
                         goto exit_create_index;
-                    if (Sqlite3.SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
+                    if (SqlResult.SQLITE_OK != sqlite3CheckObjectName(pParse, zName))
                     {
                         goto exit_create_index;
                     }
@@ -4613,7 +4613,7 @@ goto exit_drop_index;
                     }
                     db.aDb[1].pBt = pBt;
                     Debug.Assert(db.aDb[1].pSchema != null);
-                    if (SQLITE_NOMEM == pBt.sqlite3BtreeSetPageSize(db.nextPagesize, -1, 0))
+                    if (SqlResult.SQLITE_NOMEM == pBt.sqlite3BtreeSetPageSize(db.nextPagesize, -1, 0))
                     {
                         //  db.mallocFailed = 1;
                     }
@@ -4765,7 +4765,7 @@ goto exit_drop_index;
                 {
                     build.sqlite3MayAbort(pParse);
                 }
-                v.sqlite3VdbeAddOp4(OpCode.OP_Halt, SQLITE_CONSTRAINT,(int) onError, 0, p4, p4type);
+                v.sqlite3VdbeAddOp4(OpCode.OP_Halt, (int)SqlResult.SQLITE_CONSTRAINT, (int)onError, 0, p4, p4type);
             }
             static void sqlite3HaltConstraint(Parse pParse,OnConstraintError onError, byte[] p4, P4Usage p4type)
             {
@@ -4774,7 +4774,7 @@ goto exit_drop_index;
                 {
                     build.sqlite3MayAbort(pParse);
                 }
-                v.sqlite3VdbeAddOp4(OpCode.OP_Halt, SQLITE_CONSTRAINT, (int)onError, 0, p4, p4type);
+                v.sqlite3VdbeAddOp4(OpCode.OP_Halt, (int)SqlResult.SQLITE_CONSTRAINT, (int)onError, 0, p4, p4type);
             }
             ///<summary>
             /// Check to see if pIndex uses the collating sequence pColl.  Return

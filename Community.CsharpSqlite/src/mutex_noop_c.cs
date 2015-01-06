@@ -58,14 +58,14 @@ namespace Community.CsharpSqlite
 			return 1;
 		}
 
-		static int noopMutexInit ()
+		static SqlResult noopMutexInit ()
 		{
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 
-		static int noopMutexEnd ()
+		static SqlResult noopMutexEnd ()
 		{
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 
 		static sqlite3_mutex noopMutexAlloc (int id)
@@ -81,9 +81,9 @@ namespace Community.CsharpSqlite
 		{
 		}
 
-		static int noopMutexTry (sqlite3_mutex p)
+		static SqlResult noopMutexTry (sqlite3_mutex p)
 		{
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 
 		static void noopMutexLeave (sqlite3_mutex p)
@@ -139,11 +139,11 @@ namespace Community.CsharpSqlite
     */
     static int debugMutexInit()
     {
-      return Sqlite3.SQLITE_OK;
+      return SqlResult.SQLITE_OK;
     }
     static int debugMutexEnd()
     {
-      return Sqlite3.SQLITE_OK;
+      return SqlResult.SQLITE_OK;
     }
 
     /*
@@ -195,7 +195,7 @@ namespace Community.CsharpSqlite
     ** The sqlite3_mutex_enter() and sqlite3_mutex_try() routines attempt
     ** to enter a mutex.  If another thread is already within the mutex,
     ** sqlite3_mutex_enter() will block and sqlite3_mutex_try() will return
-    ** SQLITE_BUSY.  The sqlite3_mutex_try() interface returns Sqlite3.SQLITE_OK
+    ** SQLITE_BUSY.  The sqlite3_mutex_try() interface returns SqlResult.SQLITE_OK
     ** upon successful entry.  Mutexes created using SQLITE_MUTEX_RECURSIVE can
     ** be entered multiple times by the same thread.  In such cases the,
     ** mutex must be exited an equal number of times before another thread
@@ -214,7 +214,7 @@ namespace Community.CsharpSqlite
       sqlite3_debug_mutex p = (sqlite3_debug_mutex)pX;
       Debug.Assert( p.id == SQLITE_MUTEX_RECURSIVE || debugMutexNotheld( p ) );
       p.cnt++;
-      return Sqlite3.SQLITE_OK;
+      return SqlResult.SQLITE_OK;
     }
 
     /*

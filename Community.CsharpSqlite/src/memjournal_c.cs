@@ -115,7 +115,7 @@ namespace Community.CsharpSqlite
             /// Read data from the in-memory journal file.  This is the implementation
             /// of the sqlite3_vfs.xRead method.
             ///</summary>
-            public static int memjrnlRead(/*The journal file from which to read */sqlite3_file pJfd, /*Put the results here */byte[] zBuf,
+            public static SqlResult memjrnlRead(/*The journal file from which to read */sqlite3_file pJfd, /*Put the results here */byte[] zBuf,
                 /*Number of bytes to read */int iAmt, /*Begin reading at this offset */sqlite3_int64 iOfst)
             {
                 MemJournal p = (MemJournal)pJfd;
@@ -154,14 +154,14 @@ namespace Community.CsharpSqlite
                 while (nRead >= 0 && (pChunk = pChunk.pNext) != null && nRead > 0);
                 p.readpoint.iOffset = (int)(iOfst + iAmt);
                 p.readpoint.pChunk = pChunk;
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///<summary>
             /// Write data to the file.
             ///
             ///</summary>
-            public static int memjrnlWrite(sqlite3_file pJfd, ///
+            public static SqlResult memjrnlWrite(sqlite3_file pJfd, ///
                 ///The journal file into which to write 
 
             byte[] zBuf, ///
@@ -204,7 +204,7 @@ namespace Community.CsharpSqlite
                         // sqlite3_malloc( sizeof( FileChunk ) );
                         if (null == pNew)
                         {
-                            return SQLITE_IOERR_NOMEM;
+                            return SqlResult.SQLITE_IOERR_NOMEM;
                         }
                         pNew.pNext = null;
                         if (pChunk != null)
@@ -226,14 +226,14 @@ namespace Community.CsharpSqlite
                     nWrite -= iSpace;
                     p.endpoint.iOffset += iSpace;
                 }
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///<summary>
             /// Truncate the file.
             ///
             ///</summary>
-            public static int memjrnlTruncate(sqlite3_file pJfd, sqlite3_int64 size)
+            public static SqlResult memjrnlTruncate(sqlite3_file pJfd, sqlite3_int64 size)
             {
                 MemJournal p = (MemJournal)pJfd;
                 FileChunk pChunk;
@@ -247,17 +247,17 @@ namespace Community.CsharpSqlite
                     //malloc_cs.sqlite3_free( ref pTmp );
                 }
                 sqlite3MemJournalOpen(pJfd);
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///<summary>
             /// Close the file.
             ///
             ///</summary>
-            public static int memjrnlClose(MemJournal pJfd)
+            public static SqlResult memjrnlClose(MemJournal pJfd)
             {
                 memjrnlTruncate(pJfd, 0);
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///<summary>
@@ -269,10 +269,10 @@ namespace Community.CsharpSqlite
             /// part of SQLite causes Sync to be called by mistake.
             ///
             ///</summary>
-            public static int memjrnlSync(sqlite3_file NotUsed, int NotUsed2)
+            public static SqlResult memjrnlSync(sqlite3_file NotUsed, int NotUsed2)
             {
                 Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///
@@ -281,11 +281,11 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
 
-            public static int memjrnlFileSize(sqlite3_file pJfd, ref long pSize)
+            public static SqlResult memjrnlFileSize(sqlite3_file pJfd, ref long pSize)
             {
                 MemJournal p = (MemJournal)pJfd;
                 pSize = p.endpoint.iOffset;
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///<summary>

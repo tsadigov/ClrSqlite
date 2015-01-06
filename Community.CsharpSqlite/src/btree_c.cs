@@ -102,7 +102,7 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
 ///</summary>
 int sqlite3_enable_shared_cache(int enable){
 Sqlite3.sqliteinth.sqlite3GlobalConfig.sharedCacheEnabled = enable;
-return Sqlite3.SQLITE_OK;
+return SqlResult.SQLITE_OK;
 }
 #endif
 #if SQLITE_OMIT_SHARED_CACHE
@@ -116,8 +116,8 @@ return Sqlite3.SQLITE_OK;
             ///<param name="shared">cache feature disabled, then there is only ever one user</param>
             ///<param name="of each BtShared structure and so this locking is not necessary.">of each BtShared structure and so this locking is not necessary.</param>
             ///<param name="So define the lock related functions as no">ops.</param>
-            //#define querySharedCacheTableLock(a,b,c) Sqlite3.SQLITE_OK
-            //#define setSharedCacheTableLock(a,b,c) Sqlite3.SQLITE_OK
+            //#define querySharedCacheTableLock(a,b,c) SqlResult.SQLITE_OK
+            //#define setSharedCacheTableLock(a,b,c) SqlResult.SQLITE_OK
             //#define clearAllSharedCacheTableLocks(a)
             //#define downgradeAllSharedCacheTableLocks(a)
             //#define hasSharedCacheTableLock(a,b,c,d) 1
@@ -247,7 +247,7 @@ return 0;
 ///<summary>
 /// Query to see if Btree handle p may obtain a lock of type eLock
 /// (READ_LOCK or WRITE_LOCK) on the table with root-page iTab. Return
-/// Sqlite3.SQLITE_OK if the lock may be obtained (by calling
+/// SqlResult.SQLITE_OK if the lock may be obtained (by calling
 /// setSharedCacheTableLock()), or SQLITE_LOCKED if not.
 ///</summary>
 static int querySharedCacheTableLock(Btree p, Pgno iTab, u8 eLock){
@@ -268,7 +268,7 @@ Debug.Assert( eLock==READ_LOCK || pBt.inTransaction==TRANS_WRITE );
 
 /* This routine is a no-op if the shared-cache is not enabled */
 if( !p.sharable ){
-return Sqlite3.SQLITE_OK;
+return SqlResult.SQLITE_OK;
 }
 
 /* If some other connection is holding an exclusive lock, the
@@ -300,7 +300,7 @@ pBt.isPending = 1;
 return SQLITE_LOCKED_SHAREDCACHE;
 }
 }
-return Sqlite3.SQLITE_OK;
+return SqlResult.SQLITE_OK;
 }
 #endif
 #if !SQLITE_OMIT_SHARED_CACHE
@@ -316,9 +316,9 @@ return Sqlite3.SQLITE_OK;
 ///
 ///   (b) No other Btree objects hold a lock that conflicts
 ///       with the requested lock (i.e. querySharedCacheTableLock() has
-///       already been called and returned Sqlite3.SQLITE_OK).
+///       already been called and returned SqlResult.SQLITE_OK).
 ///
-/// Sqlite3.SQLITE_OK is returned if the lock is added successfully. SQLITE_NOMEM
+/// SqlResult.SQLITE_OK is returned if the lock is added successfully. SQLITE_NOMEM
 /// is returned if a malloc attempt fails.
 ///</summary>
 static int setSharedCacheTableLock(Btree p, Pgno iTable, u8 eLock){
@@ -339,7 +339,7 @@ Debug.Assert( 0==(p.db.flags&SQLITE_ReadUncommitted) || eLock==WRITE_LOCK );
 /* This function should only be called on a sharable b-tree after it
 ** has been determined that no other b-tree holds a conflicting lock.  */
 Debug.Assert( p.sharable );
-Debug.Assert( Sqlite3.SQLITE_OK==querySharedCacheTableLock(p, iTable, eLock) );
+Debug.Assert( SqlResult.SQLITE_OK==querySharedCacheTableLock(p, iTable, eLock) );
 
 /* First search the list for an existing lock on this table. */
 for(pIter=pBt.pLock; pIter; pIter=pIter.pNext){
@@ -372,7 +372,7 @@ if( eLock>pLock.eLock ){
 pLock.eLock = eLock;
 }
 
-return Sqlite3.SQLITE_OK;
+return SqlResult.SQLITE_OK;
 }
 #endif
 #if !SQLITE_OMIT_SHARED_CACHE
@@ -549,7 +549,7 @@ p.eState = CURSOR_INVALID;
             //#define restoreCursorPosition(p) \
             //  (p.eState>=CURSOR_REQUIRESEEK ? \
             //         btreeRestoreCursorPosition(p) : \
-            //         Sqlite3.SQLITE_OK)
+            //         SqlResult.SQLITE_OK)
             ///<summary>
             /// Determine whether or not a cursor has moved from the position it
             /// was last placed at.  Cursors can move when the row they are pointing
@@ -574,7 +574,7 @@ p.eState = CURSOR_INVALID;
             /// This routine updates the pointer map entry for page number 'key'
             /// so that it maps to type 'eType' and parent page number 'pgno'.
             ///
-            /// If pRC is initially non-zero (non-Sqlite3.SQLITE_OK) then this routine is
+            /// If pRC is initially non-zero (non-SqlResult.SQLITE_OK) then this routine is
             /// a no-op.  If an error occurs, the appropriate error code is written
             /// into pRC.
             ///</summary>
@@ -584,11 +584,11 @@ p.eState = CURSOR_INVALID;
             ///
             ///This routine retrieves the pointer map entry for page 'key', writing
             ///the type and parent page number to pEType and pPgno respectively.
-            ///An error code is returned if something goes wrong, otherwise Sqlite3.SQLITE_OK.
+            ///An error code is returned if something goes wrong, otherwise SqlResult.SQLITE_OK.
             ///</summary>
 #else
 																																																		//define ptrmapPut(w,x,y,z,rc)
-//define ptrmapGet(w,x,y,z) Sqlite3.SQLITE_OK
+//define ptrmapGet(w,x,y,z) SqlResult.SQLITE_OK
 //define ptrmapPutOvflPtr(x, y, rc)
 #endif
             ///<summary>
@@ -650,7 +650,7 @@ static u16 cellSize( MemPage pPage, int iCell )
             /// If an error occurs, then the value ppPage is set to is undefined. It
             /// may remain unchanged, or it may be set to an invalid value.
             ///</summary>
-            public static int getAndInitPage(BtShared pBt,///
+            public static SqlResult getAndInitPage(BtShared pBt,///
                 ///<summary>
                 ///The database file 
                 ///</summary>
@@ -664,7 +664,7 @@ static u16 cellSize( MemPage pPage, int iCell )
                 ///</summary>
             )
             {
-                int rc;
+                SqlResult rc;
                 Debug.Assert(pBt.mutex.sqlite3_mutex_held());
                 if (pgno > pBt.btreePagecount())
                 {
@@ -673,17 +673,17 @@ static u16 cellSize( MemPage pPage, int iCell )
                 else
                 {
                     rc = pBt.btreeGetPage(pgno, ref ppPage, 0);
-                    if (rc == Sqlite3.SQLITE_OK)
+                    if (rc == SqlResult.SQLITE_OK)
                     {
                         rc = ppPage.btreeInitPage();
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             BTreeMethods.releasePage(ppPage);
                         }
                     }
                 }
                 sqliteinth.testcase(pgno == 0);
-                Debug.Assert(pgno != 0 || rc == SQLITE_CORRUPT);
+                Debug.Assert(pgno != 0 || rc == SqlResult.SQLITE_CORRUPT);
                 return rc;
             }
             ///<summary>
@@ -812,7 +812,7 @@ return removed;
             ///<summary>
             ///Close an open database and invalidate all cursors.
             ///</summary>
-            public static int sqlite3BtreeClose(ref Btree p)
+            public static SqlResult sqlite3BtreeClose(ref Btree p)
             {
                 BtShared pBt = p.pBt;
                 BtCursor pCur;
@@ -878,7 +878,7 @@ if( p.pPrev ) p.pPrev.pNext = p.pNext;
 if( p.pNext ) p.pNext.pPrev = p.pPrev;
 #endif
                 //malloc_cs.sqlite3_free(ref p);
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             ///
             ///<summary>
@@ -974,14 +974,14 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
             ///Get a reference to pPage1 of the database file.  This will
             ///also acquire a readlock on that file.
             ///
-            ///Sqlite3.SQLITE_OK is returned on success.  If the file is not a
+            ///SqlResult.SQLITE_OK is returned on success.  If the file is not a
             ///</summary>
             ///<param name="well">formed database file, then SQLITE_CORRUPT is returned.</param>
             ///<param name="SQLITE_BUSY is returned if the database is locked.  SQLITE_NOMEM">SQLITE_BUSY is returned if the database is locked.  SQLITE_NOMEM</param>
             ///<param name="is returned if we run out of memory.">is returned if we run out of memory.</param>
-            public static int lockBtree(BtShared pBt)
+            public static SqlResult lockBtree(BtShared pBt)
             {
-                int rc;
+                SqlResult rc;
                 ///
                 ///<summary>
                 ///Result code from subfunctions 
@@ -1009,10 +1009,10 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
                 Debug.Assert(pBt.mutex.sqlite3_mutex_held());
                 Debug.Assert(pBt.pPage1 == null);
                 rc = pBt.pPager.sqlite3PagerSharedLock();
-                if (rc != Sqlite3.SQLITE_OK)
+                if (rc != SqlResult.SQLITE_OK)
                     return rc;
                 rc = pBt.btreeGetPage(1, ref pPage1, 0);
-                if (rc != Sqlite3.SQLITE_OK)
+                if (rc != SqlResult.SQLITE_OK)
                     return rc;
                 ///
                 ///<summary>
@@ -1032,7 +1032,7 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
                     u32 pageSize;
                     u32 usableSize;
                     u8[] page1 = pPage1.aData;
-                    rc = SQLITE_NOTADB;
+                    rc = SqlResult.SQLITE_NOTADB;
                     if (_Custom.memcmp(page1, zMagicHeader, 16) != 0)
                     {
                         goto page1_init_failed;
@@ -1057,7 +1057,7 @@ goto page1_init_failed;
 
 /* If the write version is set to 2, this database should be accessed
 ** in WAL mode. If the log is not already open, open it now. Then 
-** return Sqlite3.SQLITE_OK and return without populating BtShared.pPage1.
+** return SqlResult.SQLITE_OK and return without populating BtShared.pPage1.
 ** The caller detects this and calls this function again. This is
 ** required as the version of page 1 currently in the page1 buffer
 ** may not be the latest version - there may be a newer one in the log
@@ -1066,11 +1066,11 @@ goto page1_init_failed;
 if( page1[19]==2 && pBt.doNotUseWAL==false ){
 int isOpen = 0;
 rc = sqlite3PagerOpenWal(pBt.pPager, ref isOpen);
-if( rc!=Sqlite3.SQLITE_OK ){
+if( rc!=SqlResult.SQLITE_OK ){
 goto page1_init_failed;
 }else if( isOpen==0 ){
 releasePage(pPage1);
-return Sqlite3.SQLITE_OK;
+return SqlResult.SQLITE_OK;
 }
 rc = SQLITE_NOTADB;
 }
@@ -1101,7 +1101,7 @@ rc = SQLITE_NOTADB;
                         ///</summary>
                         ///<param name="of BtShared.pageSize, we have discovered that the page">size is</param>
                         ///<param name="actually pageSize. Unlock the database, leave pBt.pPage1 at">actually pageSize. Unlock the database, leave pBt.pPage1 at</param>
-                        ///<param name="zero and return Sqlite3.SQLITE_OK. The caller will call this function">zero and return Sqlite3.SQLITE_OK. The caller will call this function</param>
+                        ///<param name="zero and return SqlResult.SQLITE_OK. The caller will call this function">zero and return SqlResult.SQLITE_OK. The caller will call this function</param>
                         ///<param name="again with the correct page">size.</param>
                         ///<param name=""></param>
                         BTreeMethods.releasePage(pPage1);
@@ -1150,7 +1150,7 @@ rc = SQLITE_NOTADB;
                 Debug.Assert(pBt.maxLeaf + 23 <= MX_CELL_SIZE(pBt));
                 pBt.pPage1 = pPage1;
                 pBt.nPage = nPage;
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             page1_init_failed:
                 BTreeMethods.releasePage(pPage1);
                 pBt.pPage1 = null;
@@ -1183,15 +1183,15 @@ rc = SQLITE_NOTADB;
             ///into a new empty database by initializing the first page of
             ///the database.
             ///</summary>
-            public static int newDatabase(BtShared pBt)
+            public static SqlResult newDatabase(BtShared pBt)
             {
                 MemPage pP1;
                 byte[] data;
-                int rc;
+                SqlResult rc;
                 Debug.Assert(pBt.mutex.sqlite3_mutex_held());
                 if (pBt.nPage > 0)
                 {
-                    return Sqlite3.SQLITE_OK;
+                    return SqlResult.SQLITE_OK;
                 }
                 pP1 = pBt.pPage1;
                 Debug.Assert(pP1 != null);
@@ -1222,7 +1222,7 @@ rc = SQLITE_NOTADB;
 #endif
                 pBt.nPage = 1;
                 data[31] = 1;
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             ///
             ///<summary>
@@ -1271,7 +1271,7 @@ rc = SQLITE_NOTADB;
             ///can be written to. The caller has already promised not to write to that
             ///page.
             ///</summary>
-            public static int relocatePage(BtShared pBt,///
+            public static SqlResult relocatePage(BtShared pBt,///
                 ///<summary>
                 ///Btree 
                 ///</summary>
@@ -1304,7 +1304,7 @@ rc = SQLITE_NOTADB;
                 ///</summary>
                 Pgno iDbPage = pDbPage.pgno;
                 Pager pPager = pBt.pPager;
-                int rc;
+                SqlResult rc;
                 Debug.Assert(eType == PTRMAP_OVERFLOW2 || eType == PTRMAP_OVERFLOW1 || eType == PTRMAP_BTREE || eType == PTRMAP_ROOTPAGE);
                 Debug.Assert(pBt.mutex.sqlite3_mutex_held());
                 Debug.Assert(pDbPage.pBt == pBt);
@@ -1314,7 +1314,7 @@ rc = SQLITE_NOTADB;
                 ///</summary>
                 TRACE("AUTOVACUUM: Moving %d to free page %d (ptr page %d type %d)\n", iDbPage, iFreePage, iPtrPage, eType);
                 rc = pPager.sqlite3PagerMovepage(pDbPage.pDbPage, iFreePage, isCommit);
-                if (rc != Sqlite3.SQLITE_OK)
+                if (rc != SqlResult.SQLITE_OK)
                 {
                     return rc;
                 }
@@ -1333,7 +1333,7 @@ rc = SQLITE_NOTADB;
                 if (eType == PTRMAP_BTREE || eType == PTRMAP_ROOTPAGE)
                 {
                     rc = pDbPage.setChildPtrmaps();
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         return rc;
                     }
@@ -1344,7 +1344,7 @@ rc = SQLITE_NOTADB;
                     if (nextOvfl != 0)
                     {
                         pBt.ptrmapPut(nextOvfl, PTRMAP_OVERFLOW2, iFreePage, ref rc);
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             return rc;
                         }
@@ -1360,19 +1360,19 @@ rc = SQLITE_NOTADB;
                 if (eType != PTRMAP_ROOTPAGE)
                 {
                     rc = pBt.btreeGetPage(iPtrPage, ref pPtrPage, 0);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         return rc;
                     }
                     rc = PagerMethods.sqlite3PagerWrite(pPtrPage.pDbPage);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         BTreeMethods.releasePage(pPtrPage);
                         return rc;
                     }
                     rc = pPtrPage.modifyPagePointer(iDbPage, iFreePage, eType);
                     releasePage(pPtrPage);
-                    if (rc == Sqlite3.SQLITE_OK)
+                    if (rc == SqlResult.SQLITE_OK)
                     {
                         pBt.ptrmapPut(iFreePage, eType, iPtrPage, ref rc);
                     }
@@ -1388,7 +1388,7 @@ rc = SQLITE_NOTADB;
             ///<summary>
             ///</summary>
             ///<param name="Perform a single step of an incremental">vacuum. If successful,</param>
-            ///<param name="return Sqlite3.SQLITE_OK. If there is no work to do (and therefore no">return Sqlite3.SQLITE_OK. If there is no work to do (and therefore no</param>
+            ///<param name="return SqlResult.SQLITE_OK. If there is no work to do (and therefore no">return SqlResult.SQLITE_OK. If there is no work to do (and therefore no</param>
             ///<param name="point in calling this function again), return SQLITE_DONE.">point in calling this function again), return SQLITE_DONE.</param>
             ///<param name=""></param>
             ///<param name="More specificly, this function attempts to re">organize the</param>
@@ -1403,14 +1403,14 @@ rc = SQLITE_NOTADB;
             ///<param name="incrVacuumStep() will be called a finite amount of times">incrVacuumStep() will be called a finite amount of times</param>
             ///<param name="which may or may not empty the freelist.  A full autovacuum">which may or may not empty the freelist.  A full autovacuum</param>
             ///<param name="has nFin>0.  A "PRAGMA incremental_vacuum" has nFin==null.">has nFin>0.  A "PRAGMA incremental_vacuum" has nFin==null.</param>
-            public static int incrVacuumStep(BtShared pBt, Pgno nFin, Pgno iLastPg)
+            public static SqlResult incrVacuumStep(BtShared pBt, Pgno nFin, Pgno iLastPg)
             {
                 Pgno nFreeList;
                 ///
                 ///<summary>
                 ///</summary>
                 ///<param name="Number of pages still on the free">list </param>
-                int rc;
+                SqlResult rc;
                 Debug.Assert(pBt.mutex.sqlite3_mutex_held());
                 Debug.Assert(iLastPg > nFin);
                 if (!PTRMAP_ISPAGE(pBt, iLastPg) && iLastPg != PENDING_BYTE_PAGE(pBt))
@@ -1420,10 +1420,10 @@ rc = SQLITE_NOTADB;
                     nFreeList = Converter.sqlite3Get4byte(pBt.pPage1.aData, 36);
                     if (nFreeList == 0)
                     {
-                        return SQLITE_DONE;
+                        return SqlResult.SQLITE_DONE;
                     }
                     rc = pBt.ptrmapGet(iLastPg, ref eType, ref iPtrPage);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         return rc;
                     }
@@ -1446,7 +1446,7 @@ rc = SQLITE_NOTADB;
                             Pgno iFreePg = 0;
                             MemPage pFreePg = new MemPage();
                             rc = allocateBtreePage(pBt, ref pFreePg, ref iFreePg, iLastPg, 1);
-                            if (rc != Sqlite3.SQLITE_OK)
+                            if (rc != SqlResult.SQLITE_OK)
                             {
                                 return rc;
                             }
@@ -1463,7 +1463,7 @@ rc = SQLITE_NOTADB;
                         ///</summary>
                         MemPage pLastPg = new MemPage();
                         rc = pBt.btreeGetPage(iLastPg, ref pLastPg, 0);
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             return rc;
                         }
@@ -1481,7 +1481,7 @@ rc = SQLITE_NOTADB;
                         {
                             MemPage pFreePg = new MemPage();
                             rc = allocateBtreePage(pBt, ref pFreePg, ref iFreePg, 0, 0);
-                            if (rc != Sqlite3.SQLITE_OK)
+                            if (rc != SqlResult.SQLITE_OK)
                             {
                                 BTreeMethods.releasePage(pLastPg);
                                 return rc;
@@ -1491,12 +1491,12 @@ rc = SQLITE_NOTADB;
                         while (nFin != 0 && iFreePg > nFin);
                         Debug.Assert(iFreePg < iLastPg);
                         rc = PagerMethods.sqlite3PagerWrite(pLastPg.pDbPage);
-                        if (rc == Sqlite3.SQLITE_OK)
+                        if (rc == SqlResult.SQLITE_OK)
                         {
                             rc = BTreeMethods.relocatePage(pBt, pLastPg, eType, iPtrPage, iFreePg, (nFin != 0) ? 1 : 0);
                         }
                         BTreeMethods.releasePage(pLastPg);
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             return rc;
                         }
@@ -1511,13 +1511,13 @@ rc = SQLITE_NOTADB;
                         {
                             MemPage pPg = new MemPage();
                             rc = pBt.btreeGetPage(iLastPg, ref pPg, 0);
-                            if (rc != Sqlite3.SQLITE_OK)
+                            if (rc != SqlResult.SQLITE_OK)
                             {
                                 return rc;
                             }
                             rc = PagerMethods.sqlite3PagerWrite(pPg.pDbPage);
                             BTreeMethods.releasePage(pPg);
-                            if (rc != Sqlite3.SQLITE_OK)
+                            if (rc != SqlResult.SQLITE_OK)
                             {
                                 return rc;
                             }
@@ -1527,7 +1527,7 @@ rc = SQLITE_NOTADB;
                     pBt.pPager.sqlite3PagerTruncateImage(iLastPg);
                     pBt.nPage = iLastPg;
                 }
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             ///
             ///<summary>
@@ -1537,20 +1537,20 @@ rc = SQLITE_NOTADB;
             ///<param name=""></param>
             ///<param name="If the incremental vacuum is finished after this function has run,">If the incremental vacuum is finished after this function has run,</param>
             ///<param name="SQLITE_DONE is returned. If it is not finished, but no error occurred,">SQLITE_DONE is returned. If it is not finished, but no error occurred,</param>
-            ///<param name="Sqlite3.SQLITE_OK is returned. Otherwise an SQLite error code.">Sqlite3.SQLITE_OK is returned. Otherwise an SQLite error code.</param>
+            ///<param name="SqlResult.SQLITE_OK is returned. Otherwise an SQLite error code.">SqlResult.SQLITE_OK is returned. Otherwise an SQLite error code.</param>
             ///
             ///<summary>
             ///This routine is called prior to sqlite3PagerCommit when a transaction
             ///</summary>
             ///<param name="is commited for an auto">vacuum database.</param>
             ///<param name=""></param>
-            ///<param name="If Sqlite3.SQLITE_OK is returned, then pnTrunc is set to the number of pages">If Sqlite3.SQLITE_OK is returned, then pnTrunc is set to the number of pages</param>
+            ///<param name="If SqlResult.SQLITE_OK is returned, then pnTrunc is set to the number of pages">If SqlResult.SQLITE_OK is returned, then pnTrunc is set to the number of pages</param>
             ///<param name="the database file should be truncated to during the commit process.">the database file should be truncated to during the commit process.</param>
             ///<param name="i.e. the database has been reorganized so that only the first pnTrunc">i.e. the database has been reorganized so that only the first pnTrunc</param>
             ///<param name="pages are in use.">pages are in use.</param>
-            public static int autoVacuumCommit(BtShared pBt)
+            public static SqlResult autoVacuumCommit(BtShared pBt)
             {
-                int rc = Sqlite3.SQLITE_OK;
+                SqlResult rc = SqlResult.SQLITE_OK;
                 Pager pPager = pBt.pPager;
                 // VVA_ONLY( int nRef = sqlite3PagerRefcount(pPager) );
 #if !NDEBUG || DEBUG
@@ -1619,11 +1619,11 @@ rc = SQLITE_NOTADB;
                     }
                     if (nFin > nOrig)
                         return sqliteinth.SQLITE_CORRUPT_BKPT();
-                    for (iFree = nOrig; iFree > nFin && rc == Sqlite3.SQLITE_OK; iFree--)
+                    for (iFree = nOrig; iFree > nFin && rc == SqlResult.SQLITE_OK; iFree--)
                     {
                         rc = incrVacuumStep(pBt, nFin, iFree);
                     }
-                    if ((rc == SQLITE_DONE || rc == Sqlite3.SQLITE_OK) && nFree > 0)
+                    if ((rc == SqlResult.SQLITE_DONE || rc == SqlResult.SQLITE_OK) && nFree > 0)
                     {
                         rc = PagerMethods.sqlite3PagerWrite(pBt.pPage1.pDbPage);
                         Converter.sqlite3Put4byte(pBt.pPage1.aData, 32, 0);
@@ -1632,7 +1632,7 @@ rc = SQLITE_NOTADB;
                         pBt.pPager.sqlite3PagerTruncateImage(nFin);
                         pBt.nPage = nFin;
                     }
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         pPager.sqlite3PagerRollback();
                     }
@@ -1641,7 +1641,7 @@ rc = SQLITE_NOTADB;
                 return rc;
             }
 #else
-																																																		// define setChildPtrmaps(x) Sqlite3.SQLITE_OK
+																																																		// define setChildPtrmaps(x) SqlResult.SQLITE_OK
 #endif
             ///
             ///<summary>
@@ -1922,7 +1922,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             ///
             ///The caller must position the cursor prior to invoking this routine.
             ///
-            ///This routine cannot fail.  It always returns Sqlite3.SQLITE_OK.
+            ///This routine cannot fail.  It always returns SqlResult.SQLITE_OK.
             ///</summary>
             ///
             ///<summary>
@@ -1934,7 +1934,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             ///<param name="valid entry.  In other words, the calling procedure must guarantee">valid entry.  In other words, the calling procedure must guarantee</param>
             ///<param name="that the cursor has Cursor.eState==CURSOR_VALID.">that the cursor has Cursor.eState==CURSOR_VALID.</param>
             ///<param name=""></param>
-            ///<param name="Failure is not possible.  This function always returns Sqlite3.SQLITE_OK.">Failure is not possible.  This function always returns Sqlite3.SQLITE_OK.</param>
+            ///<param name="Failure is not possible.  This function always returns SqlResult.SQLITE_OK.">Failure is not possible.  This function always returns SqlResult.SQLITE_OK.</param>
             ///<param name="It might just as well be a procedure (returning void) but we continue">It might just as well be a procedure (returning void) but we continue</param>
             ///<param name="to return an integer result code for historical reasons.">to return an integer result code for historical reasons.</param>
             ///
@@ -1957,7 +1957,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             ///<param name="on ppPage to free the reference. In no reference was obtained (because">on ppPage to free the reference. In no reference was obtained (because</param>
             ///<param name="the pointer">map was used to obtain the value for pPgnoNext), then</param>
             ///<param name="ppPage is set to zero.">ppPage is set to zero.</param>
-            public static int getOverflowPage(BtShared pBt,///
+            public static SqlResult getOverflowPage(BtShared pBt,///
                 ///<summary>
                 ///The database file 
                 ///</summary>
@@ -1978,7 +1978,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
                 Pgno next = 0;
                 MemPage pPage = null;
                 ppPage = null;
-                int rc = Sqlite3.SQLITE_OK;
+                SqlResult rc = SqlResult.SQLITE_OK;
                 Debug.Assert(pBt.mutex.sqlite3_mutex_held());
                 // Debug.Assert( pPgnoNext);
 #if !SQLITE_OMIT_AUTOVACUUM
@@ -2002,20 +2002,20 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
                     if (iGuess <= pBt.btreePagecount())
                     {
                         rc = pBt.ptrmapGet(iGuess, ref eType, ref pgno);
-                        if (rc == Sqlite3.SQLITE_OK && eType == PTRMAP_OVERFLOW2 && pgno == ovfl)
+                        if (rc == SqlResult.SQLITE_OK && eType == PTRMAP_OVERFLOW2 && pgno == ovfl)
                         {
                             next = iGuess;
-                            rc = SQLITE_DONE;
+                            rc = SqlResult.SQLITE_DONE;
                         }
                     }
                 }
 #endif
-                Debug.Assert(next == 0 || rc == SQLITE_DONE);
-                if (rc == Sqlite3.SQLITE_OK)
+                Debug.Assert(next == 0 || rc == SqlResult.SQLITE_DONE);
+                if (rc == SqlResult.SQLITE_OK)
                 {
                     rc = pBt.btreeGetPage(ovfl, ref pPage, 0);
-                    Debug.Assert(rc == Sqlite3.SQLITE_OK || pPage == null);
-                    if (rc == Sqlite3.SQLITE_OK)
+                    Debug.Assert(rc == SqlResult.SQLITE_OK || pPage == null);
+                    if (rc == SqlResult.SQLITE_OK)
                     {
                         next = Converter.sqlite3Get4byte(pPage.aData);
                     }
@@ -2029,7 +2029,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
                 {
                     BTreeMethods.releasePage(pPage);
                 }
-                return (rc == SQLITE_DONE ? Sqlite3.SQLITE_OK : rc);
+                return (rc == SqlResult.SQLITE_DONE ? SqlResult.SQLITE_OK : rc);
             }
             ///
             ///<summary>
@@ -2041,9 +2041,9 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             ///then PagerMethods.sqlite3PagerWrite() is called on pDbPage and nByte bytes
             ///of data are copied from the buffer pBuf to pPayload.
             ///
-            ///Sqlite3.SQLITE_OK is returned on success, otherwise an error code.
+            ///SqlResult.SQLITE_OK is returned on success, otherwise an error code.
             ///</summary>
-            public static int copyPayload(byte[] pPayload,///
+            public static SqlResult copyPayload(byte[] pPayload,///
                 ///<summary>
                 ///Pointer to page data 
                 ///</summary>
@@ -2079,8 +2079,8 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
                     ///<summary>
                     ///Copy data from buffer to page (a write operation) 
                     ///</summary>
-                    int rc = PagerMethods.sqlite3PagerWrite(pDbPage);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    SqlResult rc = PagerMethods.sqlite3PagerWrite(pDbPage);
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         return rc;
                     }
@@ -2096,7 +2096,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
                     Buffer.BlockCopy(pPayload, (int)payloadOffset, pBuf, (int)pBufOffset, (int)nByte);
                     //memcpy(pBuf, pPayload, nByte);
                 }
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             //static int copyPayload(
             //  byte[] pPayload,           /* Pointer to page data */
@@ -2107,8 +2107,8 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             //){
             //  if( eOp!=0 ){
             //    /* Copy data from buffer to page (a write operation) */
-            //    int rc = PagerMethods.sqlite3PagerWrite(pDbPage);
-            //    if( rc!=Sqlite3.SQLITE_OK ){
+            //    var rc = PagerMethods.sqlite3PagerWrite(pDbPage);
+            //    if( rc!=SqlResult.SQLITE_OK ){
             //      return rc;
             //    }
             //    memcpy(pPayload, pBuf, nByte);
@@ -2116,7 +2116,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             //    /* Copy data from page to buffer (a read operation) */
             //    memcpy(pBuf, pPayload, nByte);
             //  }
-            //  return Sqlite3.SQLITE_OK;
+            //  return SqlResult.SQLITE_OK;
             //}
             ///
             ///<summary>
@@ -2156,7 +2156,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             ///The caller must ensure that pCur is pointing to a valid row
             ///in the table.
             ///
-            ///Return Sqlite3.SQLITE_OK on success or an error code if anything goes
+            ///Return SqlResult.SQLITE_OK on success or an error code if anything goes
             ///wrong.  An error is returned if "offset+amt" is larger than
             ///the available payload.
             ///</summary>
@@ -2166,7 +2166,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
             ///"amt" bytes will be transfered into pBuf[].  The transfer
             ///begins at "offset".
             ///
-            ///Return Sqlite3.SQLITE_OK on success or an error code if anything goes
+            ///Return SqlResult.SQLITE_OK on success or an error code if anything goes
             ///wrong.  An error is returned if "offset+amt" is larger than
             ///the available payload.
             ///</summary>
@@ -2289,13 +2289,13 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
             ///<param name="key in ascending order.">key in ascending order.</param>
             ///
             ///<summary>
-            ///Move the cursor to the first entry in the table.  Return Sqlite3.SQLITE_OK
+            ///Move the cursor to the first entry in the table.  Return SqlResult.SQLITE_OK
             ///on success.  Set pRes to 0 if the cursor actually points to something
             ///or set pRes to 1 if the table is empty.
             ///</summary>
             ///
             ///<summary>
-            ///Move the cursor to the last entry in the table.  Return Sqlite3.SQLITE_OK
+            ///Move the cursor to the last entry in the table.  Return SqlResult.SQLITE_OK
             ///on success.  Set pRes to 0 if the cursor actually points to something
             ///or set pRes to 1 if the table is empty.
             ///</summary>
@@ -2360,7 +2360,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
             ///been referenced and the calling routine is responsible for calling
             ///PagerMethods.sqlite3PagerUnref() on the new page when it is done.
             ///
-            ///Sqlite3.SQLITE_OK is returned on success.  Any other return value indicates
+            ///SqlResult.SQLITE_OK is returned on success.  Any other return value indicates
             ///an error.  ppPage and pPgno are undefined in the event of an error.
             ///Do not invoke PagerMethods.sqlite3PagerUnref() on ppPage if an error is returned.
             ///
@@ -2373,10 +2373,10 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
             ///<param name="If the "exact" parameter is not 0, and the page">number nearby exists</param>
             ///<param name="anywhere on the free">list, then it is guarenteed to be returned. This</param>
             ///<param name="is only used by auto">vacuum databases when allocating a new table.</param>
-            public static int allocateBtreePage(BtShared pBt, ref MemPage ppPage, ref Pgno pPgno, Pgno nearby, u8 exact)
+            public static SqlResult allocateBtreePage(BtShared pBt, ref MemPage ppPage, ref Pgno pPgno, Pgno nearby, u8 exact)
             {
                 MemPage pPage1;
-                int rc;
+                SqlResult rc;
                 u32 n;
                 ///
                 ///<summary>
@@ -2547,7 +2547,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                         else
                                         {
                                             rc = PagerMethods.sqlite3PagerWrite(pPrevTrunk.pDbPage);
-                                            if (rc != Sqlite3.SQLITE_OK)
+                                            if (rc != SqlResult.SQLITE_OK)
                                             {
                                                 goto end_allocate_page;
                                             }
@@ -2576,12 +2576,12 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                         }
                                         sqliteinth.testcase(iNewTrunk == mxPage);
                                         rc = pBt.btreeGetPage(iNewTrunk, ref pNewTrunk, 0);
-                                        if (rc != Sqlite3.SQLITE_OK)
+                                        if (rc != SqlResult.SQLITE_OK)
                                         {
                                             goto end_allocate_page;
                                         }
                                         rc = PagerMethods.sqlite3PagerWrite(pNewTrunk.pDbPage);
-                                        if (rc != Sqlite3.SQLITE_OK)
+                                        if (rc != SqlResult.SQLITE_OK)
                                         {
                                             BTreeMethods.releasePage(pNewTrunk);
                                             goto end_allocate_page;
@@ -2669,10 +2669,10 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                             // sqlite3Put4byte( aData, 4, k - 1 );
                                             noContent = !pBt.btreeGetHasContent(pPgno) ? 1 : 0;
                                             rc = pBt.btreeGetPage(pPgno, ref ppPage, noContent);
-                                            if (rc == Sqlite3.SQLITE_OK)
+                                            if (rc == SqlResult.SQLITE_OK)
                                             {
                                                 rc = PagerMethods.sqlite3PagerWrite((ppPage).pDbPage);
-                                                if (rc != Sqlite3.SQLITE_OK)
+                                                if (rc != SqlResult.SQLITE_OK)
                                                 {
                                                     BTreeMethods.releasePage(ppPage);
                                                 }
@@ -2712,7 +2712,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         TRACE("ALLOCATE: %d from end of file (pointer-map page)\n", pPgno);
                         Debug.Assert(pBt.nPage != PENDING_BYTE_PAGE(pBt));
                         rc = pBt.btreeGetPage(pBt.nPage, ref pPg, 1);
-                        if (rc == Sqlite3.SQLITE_OK)
+                        if (rc == SqlResult.SQLITE_OK)
                         {
                             rc = PagerMethods.sqlite3PagerWrite(pPg.pDbPage);
                             BTreeMethods.releasePage(pPg);
@@ -2733,7 +2733,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                     if (rc != 0)
                         return rc;
                     rc = PagerMethods.sqlite3PagerWrite((ppPage).pDbPage);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         BTreeMethods.releasePage(ppPage);
                     }
@@ -2743,7 +2743,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
             end_allocate_page:
                 BTreeMethods.releasePage(pTrunk);
                 BTreeMethods.releasePage(pPrevTrunk);
-                if (rc == Sqlite3.SQLITE_OK)
+                if (rc == SqlResult.SQLITE_OK)
                 {
                     if ((ppPage).pDbPage.sqlite3PagerPageRefcount() > 1)
                     {
@@ -2756,7 +2756,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 {
                     ppPage = null;
                 }
-                Debug.Assert(rc != Sqlite3.SQLITE_OK || sqlite3PagerIswriteable((ppPage).pDbPage));
+                Debug.Assert(rc != SqlResult.SQLITE_OK || sqlite3PagerIswriteable((ppPage).pDbPage));
                 return rc;
             }
             ///
@@ -2772,7 +2772,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
             ///<param name=""></param>
             ///<param name="If a pointer to a MemPage object is passed as the second argument,">If a pointer to a MemPage object is passed as the second argument,</param>
             ///<param name="its reference count is not altered by this function.">its reference count is not altered by this function.</param>
-            static int freePage2(BtShared pBt, MemPage pMemPage, Pgno iPage)
+            static SqlResult freePage2(BtShared pBt, MemPage pMemPage, Pgno iPage)
             {
                 MemPage pTrunk = null;
                 ///
@@ -2794,7 +2794,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 ///<summary>
                 ///Page being freed. May be NULL. 
                 ///</summary>
-                int rc;
+                SqlResult rc;
                 ///
                 ///<summary>
                 ///Return Code 
@@ -2875,7 +2875,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                     ///</summary>
                     iTrunk = Converter.sqlite3Get4byte(pPage1.aData, 32);
                     rc = pBt.btreeGetPage(iTrunk, ref pTrunk, 0);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         goto freepage_out;
                     }
@@ -2906,7 +2906,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         ///<param name="to read "usableSize/4">8".</param>
                         ///<param name=""></param>
                         rc = PagerMethods.sqlite3PagerWrite(pTrunk.pDbPage);
-                        if (rc == Sqlite3.SQLITE_OK)
+                        if (rc == SqlResult.SQLITE_OK)
                         {
                             Converter.sqlite3Put4byte(pTrunk.aData, (u32)4, nLeaf + 1);
                             Converter.sqlite3Put4byte(pTrunk.aData, (u32)8 + nLeaf * 4, iPage);
@@ -2929,12 +2929,12 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 ///<param name="first trunk in the free">list is full. Either way, the page being freed</param>
                 ///<param name="will become the new first trunk page in the free">list.</param>
                 ///<param name=""></param>
-                if (pPage == null && Sqlite3.SQLITE_OK != (rc = pBt.btreeGetPage(iPage, ref pPage, 0)))
+                if (pPage == null && SqlResult.SQLITE_OK != (rc = pBt.btreeGetPage(iPage, ref pPage, 0)))
                 {
                     goto freepage_out;
                 }
                 rc = PagerMethods.sqlite3PagerWrite(pPage.pDbPage);
-                if (rc != Sqlite3.SQLITE_OK)
+                if (rc != SqlResult.SQLITE_OK)
                 {
                     goto freepage_out;
                 }
@@ -2951,9 +2951,9 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 BTreeMethods.releasePage(pTrunk);
                 return rc;
             }
-            public static void freePage(MemPage pPage, ref int pRC)
+            public static void freePage(MemPage pPage, ref SqlResult pRC)
             {
-                if ((pRC) == Sqlite3.SQLITE_OK)
+                if ((pRC) == SqlResult.SQLITE_OK)
                 {
                     pRC = freePage2(pPage.pBt, pPage, pPage.pgno);
                 }
@@ -2962,19 +2962,19 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
             ///<summary>
             ///Free any overflow pages associated with the given Cell.
             ///</summary>
-            public static int clearCell(MemPage pPage, int pCell)
+            public static SqlResult clearCell(MemPage pPage, int pCell)
             {
                 BtShared pBt = pPage.pBt;
                 CellInfo info = new CellInfo();
                 Pgno ovflPgno;
-                int rc;
+                SqlResult rc;
                 int nOvfl;
                 u32 ovflPageSize;
                 Debug.Assert(pPage.pBt.mutex.sqlite3_mutex_held());
                 pPage.btreeParseCellPtr(pCell, ref info);
                 if (info.iOverflow == 0)
                 {
-                    return Sqlite3.SQLITE_OK;
+                    return SqlResult.SQLITE_OK;
                     ///
                     ///<summary>
                     ///No overflow pages. Return without doing anything 
@@ -3034,7 +3034,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         return rc;
                     ovflPgno = iNext;
                 }
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             ///
             ///<summary>
@@ -3195,12 +3195,12 @@ return 1;
             ///BTREE_INTKEY|BTREE_LEAFDATA     Used for SQL tables with rowid keys
             ///BTREE_ZERODATA                  Used for SQL indices
             ///</summary>
-            public static int btreeCreateTable(Btree p, ref int piTable, int createTabFlags)
+            public static SqlResult btreeCreateTable(Btree p, ref int piTable, int createTabFlags)
             {
                 BtShared pBt = p.pBt;
                 MemPage pRoot = new MemPage();
                 Pgno pgnoRoot = 0;
-                int rc;
+                SqlResult rc;
                 int ptfFlags;
                 ///
                 ///<summary>
@@ -3264,7 +3264,7 @@ return rc;
                     ///
                     ///</summary>
                     rc = allocateBtreePage(pBt, ref pPageMove, ref pgnoMove, pgnoRoot, 1);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         return rc;
                     }
@@ -3287,7 +3287,7 @@ return rc;
                         ///Move the page currently at pgnoRoot to pgnoMove. 
                         ///</summary>
                         rc = pBt.btreeGetPage(pgnoRoot, ref pRoot, 0);
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             return rc;
                         }
@@ -3296,7 +3296,7 @@ return rc;
                         {
                             rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                         }
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             releasePage(pRoot);
                             return rc;
@@ -3309,17 +3309,17 @@ return rc;
                         ///<summary>
                         ///Obtain the page at pgnoRoot 
                         ///</summary>
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             return rc;
                         }
                         rc = pBt.btreeGetPage(pgnoRoot, ref pRoot, 0);
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             return rc;
                         }
                         rc = PagerMethods.sqlite3PagerWrite(pRoot.pDbPage);
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             BTreeMethods.releasePage(pRoot);
                             return rc;
@@ -3374,7 +3374,7 @@ return rc;
                 PagerMethods.sqlite3PagerUnref(pRoot.pDbPage);
                 Debug.Assert((pBt.openFlags & BTREE_SINGLE) == 0 || pgnoRoot == 2);
                 piTable = (int)pgnoRoot;
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///
@@ -3382,7 +3382,7 @@ return rc;
             ///Erase the given database page and all its children.  Return
             ///the page to the freelist.
             ///</summary>
-            public static int clearDatabasePage(BtShared pBt,///
+            public static SqlResult clearDatabasePage(BtShared pBt,///
                 ///<summary>
                 ///The BTree that contains the table 
                 ///</summary>
@@ -3401,7 +3401,7 @@ return rc;
             )
             {
                 MemPage pPage = new MemPage();
-                int rc;
+                SqlResult rc;
                 byte[] pCell;
                 int i;
                 Debug.Assert(pBt.mutex.sqlite3_mutex_held());
@@ -3512,7 +3512,7 @@ return rc;
             ///<param name="The first argument, pCur, is a cursor opened on some b">tree. Count the</param>
             ///<param name="number of entries in the b">tree and write the result to pnEntry.</param>
             ///<param name=""></param>
-            ///<param name="Sqlite3.SQLITE_OK is returned if the operation is successfully executed.">Sqlite3.SQLITE_OK is returned if the operation is successfully executed.</param>
+            ///<param name="SqlResult.SQLITE_OK is returned if the operation is successfully executed.">SqlResult.SQLITE_OK is returned if the operation is successfully executed.</param>
             ///<param name="Otherwise, if an error is encountered (i.e. an IO error or database">Otherwise, if an error is encountered (i.e. an IO error or database</param>
             ///<param name="corruption) an SQLite error code is returned.">corruption) an SQLite error code is returned.</param>
 #endif
@@ -3620,7 +3620,7 @@ return rc;
 ** Parameter eMode is one of SQLITE_CHECKPOINT_PASSIVE, FULL or RESTART.
 */
 static int sqlite3BtreeCheckpointBtree *p, int eMode, int *pnLog, int *pnCkpt){
-int rc = Sqlite3.SQLITE_OK;
+var rc = SqlResult.SQLITE_OK;
 if( p != null){
 BtShared pBt = p.pBt;
 sqlite3BtreeEnter(p);
@@ -3663,7 +3663,7 @@ return rc;
             ///<summary>
             ///Return SQLITE_LOCKED_SHAREDCACHE if another user of the same shared
             ///btree as the argument handle holds an exclusive lock on the
-            ///sqlite_master table. Otherwise Sqlite3.SQLITE_OK.
+            ///sqlite_master table. Otherwise SqlResult.SQLITE_OK.
             ///</summary>
 #if !SQLITE_OMIT_SHARED_CACHE
 																																							/*
@@ -3672,7 +3672,7 @@ return rc;
 ** if it is false.
 */
 int sqlite3BtreeLockTable(Btree p, int iTab, u8 isWriteLock){
-int rc = Sqlite3.SQLITE_OK;
+var rc = SqlResult.SQLITE_OK;
 Debug.Assert( p.inTrans!=TRANS_NONE );
 if( p.sharable ){
 u8 lockType = READ_LOCK + isWriteLock;
@@ -3681,7 +3681,7 @@ Debug.Assert( isWriteLock==null || isWriteLock==1 );
 
 sqlite3BtreeEnter(p);
 rc = querySharedCacheTableLock(p, iTab, lockType);
-if( rc==Sqlite3.SQLITE_OK ){
+if( rc==SqlResult.SQLITE_OK ){
 rc = setSharedCacheTableLock(p, iTab, lockType);
 }
 sqlite3BtreeLeave(p);
@@ -3707,7 +3707,7 @@ Debug.Assert( Sqlite3.pCsr.pBtree.db.mutex.sqlite3_mutex_held() );
 Debug.Assert( pCsr.isIncrblobHandle );
 
 rc = restoreCursorPosition(pCsr);
-if( rc!=Sqlite3.SQLITE_OK ){
+if( rc!=SqlResult.SQLITE_OK ){
 return rc;
 }
 Debug.Assert( pCsr.eState!=CURSOR_REQUIRESEEK );

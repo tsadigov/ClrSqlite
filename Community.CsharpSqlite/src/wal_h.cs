@@ -69,7 +69,7 @@ namespace Community.CsharpSqlite
             }
 
             //# define sqlite3WalRead(v,w,x,y,z)             0
-            public static int sqlite3WalRead(Wal v, Pgno w, ref int x, int y, u8[] z)
+            public static SqlResult sqlite3WalRead(Wal v, Pgno w, ref int x, int y, u8[] z)
             {
                 return 0;
             }
@@ -81,15 +81,15 @@ namespace Community.CsharpSqlite
             }
 
             //# define sqlite3WalBeginWriteTransaction(y)    0
-            public static int sqlite3WalBeginWriteTransaction(Wal y)
+            public static SqlResult sqlite3WalBeginWriteTransaction(Wal y)
             {
                 return 0;
             }
 
             //# define sqlite3WalEndWriteTransaction(x)      0
-            public static int sqlite3WalEndWriteTransaction(Wal x)
+            public static SqlResult sqlite3WalEndWriteTransaction(Wal x)
             {
-                return 0;
+                return (SqlResult)0;
             }
 
             //# define sqlite3WalUndo(x,y,z)                 0
@@ -104,9 +104,9 @@ namespace Community.CsharpSqlite
             }
 
             //# define sqlite3WalSavepointUndo(y,z)          0
-            public static int sqlite3WalSavepointUndo(Wal y, object z)
+            public static SqlResult sqlite3WalSavepointUndo(Wal y, object z)
             {
-                return 0;
+                return (SqlResult)0;
             }
 
             //# define sqlite3WalFrames(u,v,w,x,y,z)         0

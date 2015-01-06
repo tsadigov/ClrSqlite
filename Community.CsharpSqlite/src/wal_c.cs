@@ -528,11 +528,11 @@ struct WalIterator {
 ** numbered from zero.
 **
 ** If this call is successful, *ppPage is set to point to the wal-index
-** page and Sqlite3.SQLITE_OK is returned. If an error (an OOM or VFS error) occurs,
+** page and SqlResult.SQLITE_OK is returned. If an error (an OOM or VFS error) occurs,
 ** then an SQLite error code is returned and *ppPage is set to 0.
 */
 static int walIndexPage(Wal *pWal, int iPage, volatile u32 **ppPage){
-  int rc = Sqlite3.SQLITE_OK;
+  var rc = SqlResult.SQLITE_OK;
 
   /* Enlarge the pWal->apWiData[] array if required */
   if( pWal->nWiData<=iPage ){
@@ -560,13 +560,13 @@ static int walIndexPage(Wal *pWal, int iPage, volatile u32 **ppPage){
       );
       if( rc==SQLITE_READONLY ){
         pWal->readOnly |= WAL_SHM_RDONLY;
-        rc = Sqlite3.SQLITE_OK;
+        rc = SqlResult.SQLITE_OK;
       }
     }
   }
 
   *ppPage = pWal->apWiData[iPage];
-  Debug.Assert( iPage==0 || *ppPage || rc!=Sqlite3.SQLITE_OK );
+  Debug.Assert( iPage==0 || *ppPage || rc!=SqlResult.SQLITE_OK );
   return rc;
 }
 
@@ -790,12 +790,12 @@ static string walLockName(int lockIdx){
 */
 static int walLockShared(Wal *pWal, int lockIdx){
   int rc;
-  if( pWal->exclusiveMode ) return Sqlite3.SQLITE_OK;
+  if( pWal->exclusiveMode ) return SqlResult.SQLITE_OK;
   rc = sqlite3OsShmLock(pWal->pDbFd, lockIdx, 1,
                         SQLITE_SHM_LOCK | SQLITE_SHM_SHARED);
   WALTRACE(("WAL%p: acquire SHARED-%s %s\n", pWal,
             walLockName(lockIdx), rc ? "failed" : "ok"));
-  VVA_ONLY( pWal->lockError = (u8)(rc!=Sqlite3.SQLITE_OK && rc!=SQLITE_BUSY); )
+  VVA_ONLY( pWal->lockError = (u8)(rc!=SqlResult.SQLITE_OK && rc!=SQLITE_BUSY); )
   return rc;
 }
 static void walUnlockShared(Wal *pWal, int lockIdx){
@@ -806,12 +806,12 @@ static void walUnlockShared(Wal *pWal, int lockIdx){
 }
 static int walLockExclusive(Wal *pWal, int lockIdx, int n){
   int rc;
-  if( pWal->exclusiveMode ) return Sqlite3.SQLITE_OK;
+  if( pWal->exclusiveMode ) return SqlResult.SQLITE_OK;
   rc = sqlite3OsShmLock(pWal->pDbFd, lockIdx, n,
                         SQLITE_SHM_LOCK | SQLITE_SHM_EXCLUSIVE);
   WALTRACE(("WAL%p: acquire EXCLUSIVE-%s cnt=%d %s\n", pWal,
             walLockName(lockIdx), n, rc ? "failed" : "ok"));
-  VVA_ONLY( pWal->lockError = (u8)(rc!=Sqlite3.SQLITE_OK && rc!=SQLITE_BUSY); )
+  VVA_ONLY( pWal->lockError = (u8)(rc!=SqlResult.SQLITE_OK && rc!=SQLITE_BUSY); )
   return rc;
 }
 static void walUnlockExclusive(Wal *pWal, int lockIdx, int n){
@@ -861,9 +861,9 @@ static int walHashGet(
   volatile u32 *aPgno;
 
   rc = walIndexPage(pWal, iHash, &aPgno);
-  Debug.Assert( rc==Sqlite3.SQLITE_OK || iHash>0 );
+  Debug.Assert( rc==SqlResult.SQLITE_OK || iHash>0 );
 
-  if( rc==Sqlite3.SQLITE_OK ){
+  if( rc==SqlResult.SQLITE_OK ){
     u32 iZero;
     volatile ht_slot *aHash;
 
@@ -995,7 +995,7 @@ static int walIndexAppend(Wal *pWal, u32 iFrame, u32 iPage){
   /* Assuming the wal-index file was successfully mapped, populate the
   ** page number array and hash table entry.
   */
-  if( rc==Sqlite3.SQLITE_OK ){
+  if( rc==SqlResult.SQLITE_OK ){
     int iKey;                     /* Hash table key */
     int idx;                      /* Value to write to hash-table slot */
     int nCollide;                 /* Number of hash collisions */
@@ -1101,7 +1101,7 @@ static int walIndexRecover(Wal *pWal){
   memset(&pWal->hdr, 0, sizeof(WalIndexHdr));
 
   rc = sqlite3OsFileSize(pWal->pWalFd, &nSize);
-  if( rc!=Sqlite3.SQLITE_OK ){
+  if( rc!=SqlResult.SQLITE_OK ){
     goto recovery_error;
   }
 
@@ -1118,7 +1118,7 @@ static int walIndexRecover(Wal *pWal){
 
     /* Read in the WAL header. */
     rc = sqlite3OsRead(pWal->pWalFd, aBuf, WAL_HDRSIZE, 0);
-    if( rc!=Sqlite3.SQLITE_OK ){
+    if( rc!=SqlResult.SQLITE_OK ){
       goto recovery_error;
     }
 
@@ -1177,11 +1177,11 @@ static int walIndexRecover(Wal *pWal){
 
       /* Read and decode the next log frame. */
       rc = sqlite3OsRead(pWal->pWalFd, aFrame, szFrame, iOffset);
-      if( rc!=Sqlite3.SQLITE_OK ) break;
+      if( rc!=SqlResult.SQLITE_OK ) break;
       isValid = walDecodeFrame(pWal, &pgno, &nTruncate, aData, aFrame);
       if( null==isValid ) break;
       rc = walIndexAppend(pWal, ++iFrame, pgno);
-      if( rc!=Sqlite3.SQLITE_OK ) break;
+      if( rc!=SqlResult.SQLITE_OK ) break;
 
       /* If nTruncate is non-zero, this is a commit record. */
       if( nTruncate ){
@@ -1199,7 +1199,7 @@ static int walIndexRecover(Wal *pWal){
   }
 
 finished:
-  if( rc==Sqlite3.SQLITE_OK ){
+  if( rc==SqlResult.SQLITE_OK ){
     volatile WalCkptInfo *pInfo;
     int i;
     pWal->hdr.aFrameCksum[0] = aFrameCksum[0];
@@ -1221,7 +1221,7 @@ finished:
     ** checkpointing the log file.
     */
     if( pWal->hdr.nPage ){
-      io.sqlite3_log(Sqlite3.SQLITE_OK, "Recovered %d frames from WAL file %s",
+      io.sqlite3_log(SqlResult.SQLITE_OK, "Recovered %d frames from WAL file %s",
           pWal->hdr.nPage, pWal->zWalName
       );
     }
@@ -1259,7 +1259,7 @@ static void walIndexClose(Wal *pWal, int isDelete){
 ** were to do this just after this client opened one of these files, the
 ** system would be badly broken.
 **
-** If the log file is successfully opened, Sqlite3.SQLITE_OK is returned and 
+** If the log file is successfully opened, SqlResult.SQLITE_OK is returned and 
 ** *ppWal is set to point to a new WAL handle. If an error occurs,
 ** an SQLite error code is returned and *ppWal is left unmodified.
 */
@@ -1308,11 +1308,11 @@ int sqlite3WalOpen(
   /* Open file handle on the write-ahead log file. */
   flags = (SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_WAL);
   rc = sqlite3OsOpen(pVfs, zWalName, pRet->pWalFd, flags, &flags);
-  if( rc==Sqlite3.SQLITE_OK && flags&SQLITE_OPEN_READONLY ){
+  if( rc==SqlResult.SQLITE_OK && flags&SQLITE_OPEN_READONLY ){
     pRet->readOnly = WAL_RDONLY;
   }
 
-  if( rc!=Sqlite3.SQLITE_OK ){
+  if( rc!=SqlResult.SQLITE_OK ){
     walIndexClose(pRet, 0);
     sqlite3OsClose(pRet->pWalFd);
     malloc_cs.sqlite3_free(pRet);
@@ -1519,7 +1519,7 @@ static void walIteratorFree(WalIterator *p){
 ** lock.
 **
 ** On success, make *pp point to the newly allocated WalInterator object
-** return Sqlite3.SQLITE_OK. Otherwise, return an error code. If this routine
+** return SqlResult.SQLITE_OK. Otherwise, return an error code. If this routine
 ** returns an error, the value of *pp is undefined.
 **
 ** The calling routine should invoke walIteratorFree() to destroy the
@@ -1532,7 +1532,7 @@ static int walIteratorInit(Wal *pWal, WalIterator **pp){
   int nByte;                      /* Number of bytes to allocate */
   int i;                          /* Iterator variable */
   ht_slot *aTmp;                  /* Temp space used by merge-sort */
-  int rc = Sqlite3.SQLITE_OK;             /* Return Code */
+  var rc = SqlResult.SQLITE_OK;             /* Return Code */
 
   /* This routine only runs while holding the checkpoint lock. And
   ** it only runs if there is actually content in the log (mxFrame>0).
@@ -1562,13 +1562,13 @@ static int walIteratorInit(Wal *pWal, WalIterator **pp){
     rc = SQLITE_NOMEM;
   }
 
-  for(i=0; rc==Sqlite3.SQLITE_OK && i<nSegment; i++){
+  for(i=0; rc==SqlResult.SQLITE_OK && i<nSegment; i++){
     volatile ht_slot *aHash;
     u32 iZero;
     volatile u32 *aPgno;
 
     rc = walHashGet(pWal, i, &aHash, &aPgno, &iZero);
-    if( rc==Sqlite3.SQLITE_OK ){
+    if( rc==SqlResult.SQLITE_OK ){
       int j;                      /* Counter variable */
       int nEntry;                 /* Number of entries in this segment */
       ht_slot *aIndex;            /* Sorted index for this segment */
@@ -1594,7 +1594,7 @@ static int walIteratorInit(Wal *pWal, WalIterator **pp){
   }
   sqlite3ScratchFree(aTmp);
 
-  if( rc!=Sqlite3.SQLITE_OK ){
+  if( rc!=SqlResult.SQLITE_OK ){
     walIteratorFree(p);
   }
   *pp = p;
@@ -1683,11 +1683,11 @@ static int walCheckpoint(
   sqliteinth.testcase( szPage<=32768 );
   sqliteinth.testcase( szPage>=65536 );
   pInfo = walCkptInfo(pWal);
-  if( pInfo->nBackfill>=pWal->hdr.mxFrame ) return Sqlite3.SQLITE_OK;
+  if( pInfo->nBackfill>=pWal->hdr.mxFrame ) return SqlResult.SQLITE_OK;
 
   /* Allocate the iterator */
   rc = walIteratorInit(pWal, &pIter);
-  if( rc!=Sqlite3.SQLITE_OK ){
+  if( rc!=SqlResult.SQLITE_OK ){
     return rc;
   }
   Debug.Assert( pIter );
@@ -1706,7 +1706,7 @@ static int walCheckpoint(
     if( mxSafeFrame>y ){
       Debug.Assert( y<=pWal->hdr.mxFrame );
       rc = walBusyLock(pWal, xBusy, pBusyArg, WAL_READ_LOCK(i), 1);
-      if( rc==Sqlite3.SQLITE_OK ){
+      if( rc==SqlResult.SQLITE_OK ){
         pInfo->aReadMark[i] = READMARK_NOT_USED;
         walUnlockExclusive(pWal, WAL_READ_LOCK(i), 1);
       }else if( rc==SQLITE_BUSY ){
@@ -1719,7 +1719,7 @@ static int walCheckpoint(
   }
 
   if( pInfo->nBackfill<mxSafeFrame
-   && (rc = walBusyLock(pWal, xBusy, pBusyArg, WAL_READ_LOCK(0), 1))==Sqlite3.SQLITE_OK
+   && (rc = walBusyLock(pWal, xBusy, pBusyArg, WAL_READ_LOCK(0), 1))==SqlResult.SQLITE_OK
   ){
     i64 nSize;                    /* Current size of database file */
     u32 nBackfill = pInfo->nBackfill;
@@ -1732,40 +1732,40 @@ static int walCheckpoint(
     /* If the database file may grow as a result of this checkpoint, hint
     ** about the eventual size of the db file to the VFS layer. 
     */
-    if( rc==Sqlite3.SQLITE_OK ){
+    if( rc==SqlResult.SQLITE_OK ){
       i64 nReq = ((i64)mxPage * szPage);
       rc = sqlite3OsFileSize(pWal->pDbFd, &nSize);
-      if( rc==Sqlite3.SQLITE_OK && nSize<nReq ){
+      if( rc==SqlResult.SQLITE_OK && nSize<nReq ){
         sqlite3OsFileControl(pWal->pDbFd, SQLITE_FCNTL_SIZE_HINT, &nReq);
       }
     }
 
     /* Iterate through the contents of the WAL, copying data to the db file. */
-    while( rc==Sqlite3.SQLITE_OK && 0==walIteratorNext(pIter, &iDbpage, &iFrame) ){
+    while( rc==SqlResult.SQLITE_OK && 0==walIteratorNext(pIter, &iDbpage, &iFrame) ){
       i64 iOffset;
       Debug.Assert( walFramePgno(pWal, iFrame)==iDbpage );
       if( iFrame<=nBackfill || iFrame>mxSafeFrame || iDbpage>mxPage ) continue;
       iOffset = walFrameOffset(iFrame, szPage) + WAL_FRAME_HDRSIZE;
       /* sqliteinth.testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL file */
       rc = sqlite3OsRead(pWal->pWalFd, zBuf, szPage, iOffset);
-      if( rc!=Sqlite3.SQLITE_OK ) break;
+      if( rc!=SqlResult.SQLITE_OK ) break;
       iOffset = (iDbpage-1)*(i64)szPage;
       sqliteinth.testcase( IS_BIG_INT(iOffset) );
       rc = sqlite3OsWrite(pWal->pDbFd, zBuf, szPage, iOffset);
-      if( rc!=Sqlite3.SQLITE_OK ) break;
+      if( rc!=SqlResult.SQLITE_OK ) break;
     }
 
     /* If work was actually accomplished... */
-    if( rc==Sqlite3.SQLITE_OK ){
+    if( rc==SqlResult.SQLITE_OK ){
       if( mxSafeFrame==walIndexHdr(pWal)->mxFrame ){
         i64 szDb = pWal->hdr.nPage*(i64)szPage;
         sqliteinth.testcase( IS_BIG_INT(szDb) );
         rc = sqlite3OsTruncate(pWal->pDbFd, szDb);
-        if( rc==Sqlite3.SQLITE_OK && sync_flags ){
+        if( rc==SqlResult.SQLITE_OK && sync_flags ){
           rc = sqlite3OsSync(pWal->pDbFd, sync_flags);
         }
       }
-      if( rc==Sqlite3.SQLITE_OK ){
+      if( rc==SqlResult.SQLITE_OK ){
         pInfo->nBackfill = mxSafeFrame;
       }
     }
@@ -1777,7 +1777,7 @@ static int walCheckpoint(
   if( rc==SQLITE_BUSY ){
     /* Reset the return code so as not to report a checkpoint failure
     ** just because there are active readers.  */
-    rc = Sqlite3.SQLITE_OK;
+    rc = SqlResult.SQLITE_OK;
   }
 
   /* If this is an SQLITE_CHECKPOINT_RESTART operation, and the entire wal
@@ -1785,14 +1785,14 @@ static int walCheckpoint(
   ** readers have finished using the wal file. This ensures that the next
   ** process to write to the database restarts the wal file.
   */
-  if( rc==Sqlite3.SQLITE_OK && eMode!=SQLITE_CHECKPOINT_PASSIVE ){
+  if( rc==SqlResult.SQLITE_OK && eMode!=SQLITE_CHECKPOINT_PASSIVE ){
     Debug.Assert( pWal->writeLock );
     if( pInfo->nBackfill<pWal->hdr.mxFrame ){
       rc = SQLITE_BUSY;
     }else if( eMode==SQLITE_CHECKPOINT_RESTART ){
       Debug.Assert( mxSafeFrame==pWal->hdr.mxFrame );
       rc = walBusyLock(pWal, xBusy, pBusyArg, WAL_READ_LOCK(1), WAL_NREADER-1);
-      if( rc==Sqlite3.SQLITE_OK ){
+      if( rc==SqlResult.SQLITE_OK ){
         walUnlockExclusive(pWal, WAL_READ_LOCK(1), WAL_NREADER-1);
       }
     }
@@ -1812,7 +1812,7 @@ int sqlite3WalClose(
   int nBuf,
   u8 *zBuf                        /* Buffer of at least nBuf bytes */
 ){
-  int rc = Sqlite3.SQLITE_OK;
+  var rc = SqlResult.SQLITE_OK;
   if( pWal ){
     int isDelete = 0;             /* True to unlink wal and wal-index files */
 
@@ -1825,14 +1825,14 @@ int sqlite3WalClose(
     ** The EXCLUSIVE lock is not released before returning.
     */
     rc = sqlite3OsLock(pWal->pDbFd, SQLITE_LOCK_EXCLUSIVE);
-    if( rc==Sqlite3.SQLITE_OK ){
+    if( rc==SqlResult.SQLITE_OK ){
       if( pWal->exclusiveMode==WAL_NORMAL_MODE ){
         pWal->exclusiveMode = WAL_EXCLUSIVE_MODE;
       }
       rc = sqlite3WalCheckpoint(
           pWal, SQLITE_CHECKPOINT_PASSIVE, 0, 0, sync_flags, nBuf, zBuf, 0, 0
       );
-      if( rc==Sqlite3.SQLITE_OK ){
+      if( rc==SqlResult.SQLITE_OK ){
         isDelete = 1;
       }
     }
@@ -1921,7 +1921,7 @@ static int walIndexTryHdr(Wal *pWal, int *pChanged){
 ** changed by this opertion.  If pWal->hdr is unchanged, set *pChanged
 ** to 0.
 **
-** If the wal-index header is successfully read, return Sqlite3.SQLITE_OK. 
+** If the wal-index header is successfully read, return SqlResult.SQLITE_OK. 
 ** Otherwise an SQLite error code.
 */
 static int walIndexReadHdr(Wal *pWal, int *pChanged){
@@ -1934,7 +1934,7 @@ static int walIndexReadHdr(Wal *pWal, int *pChanged){
   */
   Debug.Assert( pChanged );
   rc = walIndexPage(pWal, 0, &page0);
-  if( rc!=Sqlite3.SQLITE_OK ){
+  if( rc!=SqlResult.SQLITE_OK ){
     return rc;
   };
   Debug.Assert( page0 || pWal->writeLock==0 );
@@ -1952,13 +1952,13 @@ static int walIndexReadHdr(Wal *pWal, int *pChanged){
   Debug.Assert( badHdr==0 || pWal->writeLock==0 );
   if( badHdr ){
     if( pWal->readOnly & WAL_SHM_RDONLY ){
-      if( Sqlite3.SQLITE_OK==(rc = walLockShared(pWal, WAL_WRITE_LOCK)) ){
+      if( SqlResult.SQLITE_OK==(rc = walLockShared(pWal, WAL_WRITE_LOCK)) ){
         walUnlockShared(pWal, WAL_WRITE_LOCK);
         rc = SQLITE_READONLY_RECOVERY;
       }
-    }else if( Sqlite3.SQLITE_OK==(rc = walLockExclusive(pWal, WAL_WRITE_LOCK, 1)) ){
+    }else if( SqlResult.SQLITE_OK==(rc = walLockExclusive(pWal, WAL_WRITE_LOCK, 1)) ){
       pWal->writeLock = 1;
-      if( Sqlite3.SQLITE_OK==(rc = walIndexPage(pWal, 0, &page0)) ){
+      if( SqlResult.SQLITE_OK==(rc = walIndexPage(pWal, 0, &page0)) ){
         badHdr = walIndexTryHdr(pWal, pChanged);
         if( badHdr ){
           /* If the wal-index header is still malformed even while holding
@@ -1996,7 +1996,7 @@ static int walIndexReadHdr(Wal *pWal, int *pChanged){
 ** other transient condition.  When that happens, it returns WAL_RETRY to
 ** indicate to the caller that it is safe to retry immediately.
 **
-** On success return Sqlite3.SQLITE_OK.  On a permanent failure (such an
+** On success return SqlResult.SQLITE_OK.  On a permanent failure (such an
 ** I/O error or an SQLITE_BUSY because another process is running
 ** recovery) return a positive error code.
 **
@@ -2046,7 +2046,7 @@ static int walTryBeginRead(Wal *pWal, int *pChanged, int useWal, int cnt){
   u32 mxReadMark;                 /* Largest aReadMark[] value */
   int mxI;                        /* Index of largest aReadMark[] value */
   int i;                          /* Loop counter */
-  int rc = Sqlite3.SQLITE_OK;             /* Return code  */
+  var rc = SqlResult.SQLITE_OK;             /* Return code  */
 
   Debug.Assert( pWal->readLock<0 );     /* Not currently locked */
 
@@ -2097,14 +2097,14 @@ static int walTryBeginRead(Wal *pWal, int *pChanged, int useWal, int cnt){
         ** must be zeroed before the requested page is returned.
         */
         rc = WAL_RETRY;
-      }else if( Sqlite3.SQLITE_OK==(rc = walLockShared(pWal, WAL_RECOVER_LOCK)) ){
+      }else if( SqlResult.SQLITE_OK==(rc = walLockShared(pWal, WAL_RECOVER_LOCK)) ){
         walUnlockShared(pWal, WAL_RECOVER_LOCK);
         rc = WAL_RETRY;
       }else if( rc==SQLITE_BUSY ){
         rc = SQLITE_BUSY_RECOVERY;
       }
     }
-    if( rc!=Sqlite3.SQLITE_OK ){
+    if( rc!=SqlResult.SQLITE_OK ){
       return rc;
     }
   }
@@ -2116,7 +2116,7 @@ static int walTryBeginRead(Wal *pWal, int *pChanged, int useWal, int cnt){
     */
     rc = walLockShared(pWal, WAL_READ_LOCK(0));
     walShmBarrier(pWal);
-    if( rc==Sqlite3.SQLITE_OK ){
+    if( rc==SqlResult.SQLITE_OK ){
       if( memcmp((void )walIndexHdr(pWal), &pWal->hdr, sizeof(WalIndexHdr)) ){
         /* It is not safe to allow the reader to continue here if frames
         ** may have been appended to the log before READ_LOCK(0) was obtained.
@@ -2135,7 +2135,7 @@ static int walTryBeginRead(Wal *pWal, int *pChanged, int useWal, int cnt){
         return WAL_RETRY;
       }
       pWal->readLock = 0;
-      return Sqlite3.SQLITE_OK;
+      return SqlResult.SQLITE_OK;
     }else if( rc!=SQLITE_BUSY ){
       return rc;
     }
@@ -2163,7 +2163,7 @@ static int walTryBeginRead(Wal *pWal, int *pChanged, int useWal, int cnt){
     ){
       for(i=1; i<WAL_NREADER; i++){
         rc = walLockExclusive(pWal, WAL_READ_LOCK(i), 1);
-        if( rc==Sqlite3.SQLITE_OK ){
+        if( rc==SqlResult.SQLITE_OK ){
           mxReadMark = pInfo->aReadMark[i] = pWal->hdr.mxFrame;
           mxI = i;
           walUnlockExclusive(pWal, WAL_READ_LOCK(i), 1);
@@ -2240,7 +2240,7 @@ int sqlite3WalBeginReadTransaction(Wal *pWal, int *pChanged){
   sqliteinth.testcase( (rc&0xff)==SQLITE_BUSY );
   sqliteinth.testcase( (rc&0xff)==SQLITE_IOERR );
   sqliteinth.testcase( rc==SQLITE_PROTOCOL );
-  sqliteinth.testcase( rc==Sqlite3.SQLITE_OK );
+  sqliteinth.testcase( rc==SqlResult.SQLITE_OK );
   return rc;
 }
 
@@ -2286,7 +2286,7 @@ int sqlite3WalRead(
   */
   if( iLast==0 || pWal->readLock==0 ){
     *pInWal = 0;
-    return Sqlite3.SQLITE_OK;
+    return SqlResult.SQLITE_OK;
   }
 
   /* Search the hash table or tables for an entry matching page number
@@ -2323,7 +2323,7 @@ int sqlite3WalRead(
     int rc;                       /* Error code */
 
     rc = walHashGet(pWal, iHash, &aHash, &aPgno, &iZero);
-    if( rc!=Sqlite3.SQLITE_OK ){
+    if( rc!=SqlResult.SQLITE_OK ){
       return rc;
     }
     nCollide = HASHTABLE_NSLOT;
@@ -2373,7 +2373,7 @@ int sqlite3WalRead(
   }
 
   *pInWal = 0;
-  return Sqlite3.SQLITE_OK;
+  return SqlResult.SQLITE_OK;
 }
 
 
@@ -2443,7 +2443,7 @@ int sqlite3WalEndWriteTransaction(Wal *pWal){
     walUnlockExclusive(pWal, WAL_WRITE_LOCK, 1);
     pWal->writeLock = 0;
   }
-  return Sqlite3.SQLITE_OK;
+  return SqlResult.SQLITE_OK;
 }
 
 /*
@@ -2452,14 +2452,14 @@ int sqlite3WalEndWriteTransaction(Wal *pWal){
 **
 ** Additionally, the callback function is invoked for each frame written
 ** to the WAL since the start of the transaction. If the callback returns
-** other than Sqlite3.SQLITE_OK, it is not invoked again and the error code is
+** other than SqlResult.SQLITE_OK, it is not invoked again and the error code is
 ** returned to the caller.
 **
 ** Otherwise, if the callback function does not return an error, this
-** function returns Sqlite3.SQLITE_OK.
+** function returns SqlResult.SQLITE_OK.
 */
 int sqlite3WalUndo(Wal *pWal, int (*xUndo)(void *, Pgno), object  *pUndoCtx){
-  int rc = Sqlite3.SQLITE_OK;
+  var rc = SqlResult.SQLITE_OK;
   if( Sqlite3.ALWAYS(pWal->writeLock) ){
     Pgno iMax = pWal->hdr.mxFrame;
     Pgno iFrame;
@@ -2470,7 +2470,7 @@ int sqlite3WalUndo(Wal *pWal, int (*xUndo)(void *, Pgno), object  *pUndoCtx){
     memcpy(&pWal->hdr, (void )walIndexHdr(pWal), sizeof(WalIndexHdr));
 
     for(iFrame=pWal->hdr.mxFrame+1; 
-        Sqlite3.ALWAYS(rc==Sqlite3.SQLITE_OK) && iFrame<=iMax; 
+        Sqlite3.ALWAYS(rc==SqlResult.SQLITE_OK) && iFrame<=iMax; 
         iFrame++
     ){
       /* This call cannot fail. Unless the page for which the page number
@@ -2489,7 +2489,7 @@ int sqlite3WalUndo(Wal *pWal, int (*xUndo)(void *, Pgno), object  *pUndoCtx){
     }
     walCleanupHash(pWal);
   }
-  Debug.Assert( rc==Sqlite3.SQLITE_OK );
+  Debug.Assert( rc==SqlResult.SQLITE_OK );
   return rc;
 }
 
@@ -2514,7 +2514,7 @@ void sqlite3WalSavepoint(Wal *pWal, u32 *aWalData){
 ** by a call to WalSavepoint().
 */
 int sqlite3WalSavepointUndo(Wal *pWal, u32 *aWalData){
-  int rc = Sqlite3.SQLITE_OK;
+  var rc = SqlResult.SQLITE_OK;
 
   Debug.Assert( pWal->writeLock );
   Debug.Assert( aWalData[3]!=pWal->nCkpt || aWalData[0]<=pWal->hdr.mxFrame );
@@ -2546,12 +2546,12 @@ int sqlite3WalSavepointUndo(Wal *pWal, u32 *aWalData){
 ** it sets pWal->hdr.mxFrame to 0. Otherwise, pWal->hdr.mxFrame is left
 ** unchanged.
 **
-** Sqlite3.SQLITE_OK is returned if no error is encountered (regardless of whether
+** SqlResult.SQLITE_OK is returned if no error is encountered (regardless of whether
 ** or not pWal->hdr.mxFrame is modified). An SQLite error code is returned
 ** if an error occurs.
 */
 static int walRestartLog(Wal *pWal){
-  int rc = Sqlite3.SQLITE_OK;
+  var rc = SqlResult.SQLITE_OK;
   int cnt;
 
   if( pWal->readLock==0 ){
@@ -2561,7 +2561,7 @@ static int walRestartLog(Wal *pWal){
       u32 salt1;
       sqlite3_randomness(4, &salt1);
       rc = walLockExclusive(pWal, WAL_READ_LOCK(1), WAL_NREADER-1);
-      if( rc==Sqlite3.SQLITE_OK ){
+      if( rc==SqlResult.SQLITE_OK ){
         /* If all readers are using WAL_READ_LOCK(0) (in other words if no
         ** readers are currently using the WAL), then the transactions
         ** frames will overwrite the start of the existing log. Update the
@@ -2583,7 +2583,7 @@ static int walRestartLog(Wal *pWal){
           int rx;
           sqlite3BeginBenignMalloc();
           rx = sqlite3OsFileSize(pWal->pWalFd, &sz);
-          if( rx==Sqlite3.SQLITE_OK && (sz > pWal->mxWalSize) ){
+          if( rx==SqlResult.SQLITE_OK && (sz > pWal->mxWalSize) ){
             rx = sqlite3OsTruncate(pWal->pWalFd, pWal->mxWalSize);
           }
           sqlite3EndBenignMalloc();
@@ -2615,7 +2615,7 @@ static int walRestartLog(Wal *pWal){
     Debug.Assert( (rc&0xff)!=SQLITE_BUSY ); /* BUSY not possible when useWal==1 */
     sqliteinth.testcase( (rc&0xff)==SQLITE_IOERR );
     sqliteinth.testcase( rc==SQLITE_PROTOCOL );
-    sqliteinth.testcase( rc==Sqlite3.SQLITE_OK );
+    sqliteinth.testcase( rc==SqlResult.SQLITE_OK );
   }
   return rc;
 }
@@ -2652,7 +2652,7 @@ int sqlite3WalFrames(
   /* See if it is possible to write these frames into the start of the
   ** log file, instead of appending to it at pWal->hdr.mxFrame.
   */
-  if( Sqlite3.SQLITE_OK!=(rc = walRestartLog(pWal)) ){
+  if( SqlResult.SQLITE_OK!=(rc = walRestartLog(pWal)) ){
     return rc;
   }
 
@@ -2682,7 +2682,7 @@ int sqlite3WalFrames(
 
     rc = sqlite3OsWrite(pWal->pWalFd, aWalHdr, sizeof(aWalHdr), 0);
     WALTRACE(("WAL%p: wal-header write %s\n", pWal, rc ? "failed" : "ok"));
-    if( rc!=Sqlite3.SQLITE_OK ){
+    if( rc!=SqlResult.SQLITE_OK ){
       return rc;
     }
   }
@@ -2706,13 +2706,13 @@ int sqlite3WalFrames(
 #endif
 																			    walEncodeFrame(pWal, p->pgno, nDbsize, pData, aFrame);
     rc = sqlite3OsWrite(pWal->pWalFd, aFrame, sizeof(aFrame), iOffset);
-    if( rc!=Sqlite3.SQLITE_OK ){
+    if( rc!=SqlResult.SQLITE_OK ){
       return rc;
     }
 
     /* Write the page data */
     rc = sqlite3OsWrite(pWal->pWalFd, pData, szPage, iOffset+sizeof(aFrame));
-    if( rc!=Sqlite3.SQLITE_OK ){
+    if( rc!=SqlResult.SQLITE_OK ){
       return rc;
     }
     pLast = p;
@@ -2737,12 +2737,12 @@ int sqlite3WalFrames(
 																			      walEncodeFrame(pWal, pLast->pgno, nTruncate, pData, aFrame);
       /* sqliteinth.testcase( IS_BIG_INT(iOffset) ); // requires a 4GiB WAL */
       rc = sqlite3OsWrite(pWal->pWalFd, aFrame, sizeof(aFrame), iOffset);
-      if( rc!=Sqlite3.SQLITE_OK ){
+      if( rc!=SqlResult.SQLITE_OK ){
         return rc;
       }
       iOffset += WAL_FRAME_HDRSIZE;
       rc = sqlite3OsWrite(pWal->pWalFd, pData, szPage, iOffset); 
-      if( rc!=Sqlite3.SQLITE_OK ){
+      if( rc!=SqlResult.SQLITE_OK ){
         return rc;
       }
       nLast++;
@@ -2758,17 +2758,17 @@ int sqlite3WalFrames(
   ** be in use by existing readers is being overwritten.
   */
   iFrame = pWal->hdr.mxFrame;
-  for(p=pList; p && rc==Sqlite3.SQLITE_OK; p=p->pDirty){
+  for(p=pList; p && rc==SqlResult.SQLITE_OK; p=p->pDirty){
     iFrame++;
     rc = walIndexAppend(pWal, iFrame, p->pgno);
   }
-  while( nLast>0 && rc==Sqlite3.SQLITE_OK ){
+  while( nLast>0 && rc==SqlResult.SQLITE_OK ){
     iFrame++;
     nLast--;
     rc = walIndexAppend(pWal, iFrame, pLast->pgno);
   }
 
-  if( rc==Sqlite3.SQLITE_OK ){
+  if( rc==SqlResult.SQLITE_OK ){
     /* Update the private copy of the header. */
     pWal->hdr.szPage = (u16)((szPage&0xff00) | (szPage>>16));
     sqliteinth.testcase( szPage<=32768 );
@@ -2839,21 +2839,21 @@ int sqlite3WalCheckpoint(
   */
   if( eMode!=SQLITE_CHECKPOINT_PASSIVE ){
     rc = walBusyLock(pWal, xBusy, pBusyArg, WAL_WRITE_LOCK, 1);
-    if( rc==Sqlite3.SQLITE_OK ){
+    if( rc==SqlResult.SQLITE_OK ){
       pWal->writeLock = 1;
     }else if( rc==SQLITE_BUSY ){
       eMode2 = SQLITE_CHECKPOINT_PASSIVE;
-      rc = Sqlite3.SQLITE_OK;
+      rc = SqlResult.SQLITE_OK;
     }
   }
 
   /* Read the wal-index header. */
-  if( rc==Sqlite3.SQLITE_OK ){
+  if( rc==SqlResult.SQLITE_OK ){
     rc = walIndexReadHdr(pWal, &isChanged);
   }
 
   /* Copy data from the log to the database file. */
-  if( rc==Sqlite3.SQLITE_OK ){
+  if( rc==SqlResult.SQLITE_OK ){
     if( pWal->hdr.mxFrame && walPagesize(pWal)!=nBuf ){
       rc = SQLITE_CORRUPT_BKPT;
     }else{
@@ -2861,7 +2861,7 @@ int sqlite3WalCheckpoint(
     }
 
     /* If no error occurred, set the output variables. */
-    if( rc==Sqlite3.SQLITE_OK || rc==SQLITE_BUSY ){
+    if( rc==SqlResult.SQLITE_OK || rc==SQLITE_BUSY ){
       if( pnLog ) *pnLog = (int)pWal->hdr.mxFrame;
       if( pnCkpt ) *pnCkpt = (int)(walCkptInfo(pWal)->nBackfill);
     }
@@ -2882,7 +2882,7 @@ int sqlite3WalCheckpoint(
   walUnlockExclusive(pWal, WAL_CKPT_LOCK, 1);
   pWal->ckptLock = 0;
   WALTRACE(("WAL%p: checkpoint %s\n", pWal, rc ? "failed" : "ok"));
-  return (rc==Sqlite3.SQLITE_OK && eMode!=eMode2 ? SQLITE_BUSY : rc);
+  return (rc==SqlResult.SQLITE_OK && eMode!=eMode2 ? SQLITE_BUSY : rc);
 }
 
 /* Return the value to pass to a sqlite3_wal_hook callback, the
@@ -2940,7 +2940,7 @@ int sqlite3WalExclusiveMode(Wal *pWal, int op){
   if( op==0 ){
     if( pWal->exclusiveMode ){
       pWal->exclusiveMode = 0;
-      if( walLockShared(pWal, WAL_READ_LOCK(pWal->readLock))!=Sqlite3.SQLITE_OK ){
+      if( walLockShared(pWal, WAL_READ_LOCK(pWal->readLock))!=SqlResult.SQLITE_OK ){
         pWal->exclusiveMode = 1;
       }
       rc = pWal->exclusiveMode==0;

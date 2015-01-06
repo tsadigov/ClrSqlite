@@ -1437,11 +1437,11 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             /// Only the column names are computed.  Column.zType, Column.zColl,
             /// and other fields of Column are zeroed.
             ///
-            /// Return Sqlite3.SQLITE_OK on success.  If a memory allocation error occurs,
+            /// Return SqlResult.SQLITE_OK on success.  If a memory allocation error occurs,
             /// store NULL in paCol and 0 in pnCol and return SQLITE_NOMEM.
             ///
             ///</summary>
-            public static int selectColumnsFromExprList(Parse pParse,///
+            public static SqlResult selectColumnsFromExprList(Parse pParse,///
                 ///<summary>
                 ///Parsing context 
                 ///</summary>
@@ -1605,7 +1605,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 //  pnCol = 0;
                 //  return SQLITE_NOMEM;
                 //}
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///<summary>
@@ -2080,7 +2080,7 @@ break;
             ///
             ///</summary>
 #if !SQLITE_OMIT_COMPOUND_SELECT
-            public static int multiSelectOrderBy(Parse pParse,///
+            public static SqlResult multiSelectOrderBy(Parse pParse,///
                 ///<summary>
                 ///Parsing context 
                 ///</summary>
@@ -2687,7 +2687,7 @@ break;
                 ///subqueries ***
                 ///</summary>
                 SelectMethods.explainComposite(pParse, p.tk_op, iSub1, iSub2, false);
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 #endif
 #if !(SQLITE_OMIT_SUBQUERY) || !(SQLITE_OMIT_VIEW)
@@ -3616,11 +3616,11 @@ break;
             /// If the source-list item passed as an argument was augmented with an
             /// INDEXED BY clause, then try to locate the specified index. If there
             /// was such a clause and the named index cannot be found, return
-            /// Sqlite3.SQLITE_ERROR and leave an error in pParse. Otherwise, populate
-            /// pFrom.pIndex and return Sqlite3.SQLITE_OK.
+            /// SqlResult.SQLITE_ERROR and leave an error in pParse. Otherwise, populate
+            /// pFrom.pIndex and return SqlResult.SQLITE_OK.
             ///
             ///</summary>
-            public static int sqlite3IndexedByLookup(Parse pParse, SrcList_item pFrom)
+            public static SqlResult sqlite3IndexedByLookup(Parse pParse, SrcList_item pFrom)
             {
                 if (pFrom.pTab != null && pFrom.zIndex != null && pFrom.zIndex.Length != 0)
                 {
@@ -3633,11 +3633,11 @@ break;
                     {
                         utilc.sqlite3ErrorMsg(pParse, "no such index: %s", zIndex);
                         pParse.checkSchema = 1;
-                        return Sqlite3.SQLITE_ERROR;
+                        return SqlResult.SQLITE_ERROR;
                     }
                     pFrom.pIndex = pIdx;
                 }
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             ///<summary>
             /// No-op routine for the parse-tree walker.

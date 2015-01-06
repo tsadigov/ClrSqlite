@@ -406,25 +406,22 @@ dummy += (uint)x;
             /// encoded in UTF-8.
             ///
             /// To clear the most recent error for sqlite handle "db", sqlite3Error
-            /// should be called with err_code set to Sqlite3.SQLITE_OK and zFormat set
+            /// should be called with err_code set to SqlResult.SQLITE_OK and zFormat set
             /// to NULL.
             ///
             ///</summary>
             //Overloads
             public static void sqlite3Error(sqlite3 db, int err_code, int noString)
             {
-                utilc.sqlite3Error(db, err_code, err_code == 0 ? null : "");
+                utilc.sqlite3Error(db, (SqlResult)err_code, err_code == 0 ? null : "");
             }
             public static void sqlite3Error(sqlite3 db, SqlResult err, int noString)
             {
                 utilc.sqlite3Error(db, (int)err, noString);
             }
 
-            public static void sqlite3Error(sqlite3 db, SqlResult err, string zFormat, params object[] ap)
-            {
-                utilc.sqlite3Error(db, (int)err, zFormat, ap);
-            }
-            public static void sqlite3Error(sqlite3 db, int err_code, string zFormat, params object[] ap)
+           
+            public static void sqlite3Error(sqlite3 db, SqlResult err_code, string zFormat, params object[] ap)
             {
                 if (db != null && (db.pErr != null || (db.pErr = vdbemem_cs.sqlite3ValueNew(db)) != null))
                 {
@@ -1285,7 +1282,7 @@ return n;
             ///</summary>
             static void logBadConnection(string zType)
             {
-                io.sqlite3_log(SQLITE_MISUSE, "API call with %s database connection pointer", zType);
+                io.sqlite3_log(SqlResult.SQLITE_MISUSE, "API call with %s database connection pointer", zType);
             }
 
             ///<summary>

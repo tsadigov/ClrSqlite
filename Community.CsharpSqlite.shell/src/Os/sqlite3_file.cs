@@ -389,13 +389,13 @@ namespace Community.CsharpSqlite
     ///
     ///</summary>
 
-    public delegate int dxOpen(sqlite3_vfs vfs, string zName, sqlite3_file db, int flags, out int pOutFlags);
+    public delegate SqlResult dxOpen(sqlite3_vfs vfs, string zName, sqlite3_file db, int flags, out int pOutFlags);
 
-    public delegate int dxDelete(sqlite3_vfs vfs, string zName, int syncDir);
+    public delegate SqlResult dxDelete(sqlite3_vfs vfs, string zName, int syncDir);
 
-    public delegate int dxAccess(sqlite3_vfs vfs, string zName, int flags, out int pResOut);
+    public delegate SqlResult dxAccess(sqlite3_vfs vfs, string zName, int flags, out int pResOut);
 
-    public delegate int dxFullPathname(sqlite3_vfs vfs, string zName, int nOut, StringBuilder zOut);
+    public delegate SqlResult dxFullPathname(sqlite3_vfs vfs, string zName, int nOut, StringBuilder zOut);
 
     public delegate HANDLE dxDlOpen(sqlite3_vfs vfs, string zFilename);
 
@@ -579,18 +579,18 @@ winceLock *shared;      /* Global shared lock memory for the file  */
         ///</summary>
 
         public///<summary>
-            /// If pFile is currently larger than iSize bytes, then truncate it to
-            /// exactly iSize bytes. If pFile is not larger than iSize bytes, then
-            /// this function is a no-op.
-            ///
-            /// Return Sqlite3.SQLITE_OK if everything is successful, or an SQLite error
-            /// code if an error occurs.
-            ///</summary>
-        int backupTruncateFile(int iSize)
+              /// If pFile is currently larger than iSize bytes, then truncate it to
+              /// exactly iSize bytes. If pFile is not larger than iSize bytes, then
+              /// this function is a no-op.
+              ///
+              /// Return SqlResult.SQLITE_OK if everything is successful, or an SQLite error
+              /// code if an error occurs.
+              ///</summary>
+        SqlResult backupTruncateFile(int iSize)
         {
             long iCurrent = 0;
-            int rc = Sqlite3.os.sqlite3OsFileSize(this, ref iCurrent);
-            if (rc == Sqlite3.SQLITE_OK && iCurrent > iSize)
+            SqlResult rc = Sqlite3.os.sqlite3OsFileSize(this, ref iCurrent);
+            if (rc == SqlResult.SQLITE_OK && iCurrent > iSize)
             {
                 rc = Sqlite3.os.sqlite3OsTruncate(this, iSize);
             }
@@ -880,29 +880,29 @@ winceLock *shared;      /* Global shared lock memory for the file  */
         ///
         ///</summary>
 
-        public delegate int dxClose(sqlite3_file File_ID);
+        public delegate SqlResult dxClose(sqlite3_file File_ID);
 
-        public delegate int dxCheckReservedLock(sqlite3_file File_ID, ref int pRes);
+        public delegate SqlResult dxCheckReservedLock(sqlite3_file File_ID, ref int pRes);
 
         public delegate int dxDeviceCharacteristics(sqlite3_file File_ID);
 
-        public delegate int dxFileControl(sqlite3_file File_ID, int op, ref sqlite3_int64 pArgs);
+        public delegate SqlResult dxFileControl(sqlite3_file File_ID, int op, ref sqlite3_int64 pArgs);
 
-        public delegate int dxFileSize(sqlite3_file File_ID, ref long size);
+        public delegate SqlResult dxFileSize(sqlite3_file File_ID, ref long size);
 
-        public delegate int dxLock(sqlite3_file File_ID, int locktype);
+        public delegate SqlResult dxLock(sqlite3_file File_ID, int locktype);
 
-        public delegate int dxRead(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
+        public delegate SqlResult dxRead(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
 
         public delegate int dxSectorSize(sqlite3_file File_ID);
 
-        public delegate int dxSync(sqlite3_file File_ID, int flags);
+        public delegate SqlResult dxSync(sqlite3_file File_ID, int flags);
 
-        public delegate int dxTruncate(sqlite3_file File_ID, sqlite3_int64 size);
+        public delegate SqlResult dxTruncate(sqlite3_file File_ID, sqlite3_int64 size);
 
-        public delegate int dxUnlock(sqlite3_file File_ID, int locktype);
+        public delegate SqlResult dxUnlock(sqlite3_file File_ID, int locktype);
 
-        public delegate int dxWrite(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
+        public delegate SqlResult dxWrite(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
 
         public delegate int dxShmMap(sqlite3_file File_ID, int iPg, int pgsz, int pInt, out object pvolatile);
 

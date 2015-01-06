@@ -52,7 +52,7 @@ namespace Community.CsharpSqlite
         /// either case, SQLITE_TOOBIG is returned.
         ///
         ///</summary>
-        public static int sqlite3VdbeMemSetBlob(this Mem pMem,///
+        public static SqlResult sqlite3VdbeMemSetBlob(this Mem pMem,///
             ///Memory cell to set to string value 
         byte[] zBlob,///
             ///Blob pointer 
@@ -67,7 +67,7 @@ namespace Community.CsharpSqlite
             return pMem.sqlite3VdbeMemSetBlob( zBlob, 0, n >= 0 ? n : zBlob.Length, enc, xDel);
         }
         // Call w/o offset
-        public static int sqlite3VdbeMemSetBlob(this Mem pMem,///
+        public static SqlResult sqlite3VdbeMemSetBlob(this Mem pMem,///
             ///Memory cell to set to string value 
         byte[] zBlob,///
             ///Blob pointer 
@@ -96,7 +96,7 @@ namespace Community.CsharpSqlite
             if (zBlob == null || zBlob.Length < offset)
             {
                 pMem.sqlite3VdbeMemSetNull();
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             if (pMem.db != null)
             {
@@ -141,9 +141,9 @@ namespace Community.CsharpSqlite
             pMem.type = (enc == 0 ? FoundationalType.SQLITE_BLOB : FoundationalType.SQLITE_TEXT);
             if (nByte > iLimit)
             {
-                return Sqlite3.SQLITE_TOOBIG;
+                return SqlResult.SQLITE_TOOBIG;
             }
-            return Sqlite3.SQLITE_OK;
+            return SqlResult.SQLITE_OK;
         }
 
 
@@ -328,33 +328,33 @@ namespace Community.CsharpSqlite
             /// representation is already stored using the requested encoding, then this
             /// routine is a no-op.
             ///
-            /// Sqlite3.SQLITE_OK is returned if the conversion is successful (or not required).
+            /// SqlResult.SQLITE_OK is returned if the conversion is successful (or not required).
             /// SQLITE_NOMEM may be returned if a malloc() fails during conversion
             /// between formats.
             ///
             ///</summary>
-            public static int sqlite3VdbeChangeEncoding(Mem pMem, SqliteEncoding desiredEnc)
+            public static SqlResult sqlite3VdbeChangeEncoding(Mem pMem, SqliteEncoding desiredEnc)
             {
-                int rc;
+                SqlResult rc;
                 Debug.Assert((pMem.flags & MemFlags.MEM_RowSet) == 0);
                 Debug.Assert(desiredEnc == SqliteEncoding.UTF8 || desiredEnc == SqliteEncoding.UTF16LE || desiredEnc == SqliteEncoding.UTF16BE);
                 if ((pMem.flags & MemFlags.MEM_Str) == 0 || pMem.enc == desiredEnc)
                 {
                     if (String.IsNullOrEmpty(pMem.z) && pMem.zBLOB != null)
                         pMem.z = Encoding.UTF8.GetString(pMem.zBLOB, 0, pMem.zBLOB.Length);
-                    return Sqlite3.SQLITE_OK;
+                    return SqlResult.SQLITE_OK;
                 }
                 Debug.Assert(pMem.db == null || pMem.db.mutex.sqlite3_mutex_held());
 #if SQLITE_OMIT_UTF16
-                return Sqlite3.SQLITE_ERROR;
+                return SqlResult.SQLITE_ERROR;
 #else
 																																																																		
-/* MemTranslate() may return Sqlite3.SQLITE_OK or SQLITE_NOMEM. If NOMEM is returned,
+/* MemTranslate() may return SqlResult.SQLITE_OK or SQLITE_NOMEM. If NOMEM is returned,
 ** then the encoding of the value may not have changed.
 */
 rc = sqlite3VdbeMemTranslate(pMem, (u8)desiredEnc);
-Debug.Assert(rc==Sqlite3.SQLITE_OK    || rc==SQLITE_NOMEM);
-Debug.Assert(rc==Sqlite3.SQLITE_OK    || pMem.enc!=desiredEnc);
+Debug.Assert(rc==SqlResult.SQLITE_OK    || rc==SQLITE_NOMEM);
+Debug.Assert(rc==SqlResult.SQLITE_OK    || pMem.enc!=desiredEnc);
 Debug.Assert(rc==SQLITE_NOMEM || pMem.enc==desiredEnc);
 return rc;
 #endif
@@ -373,7 +373,7 @@ return rc;
             /// not set, Mem.n is zeroed.
             ///
             ///</summary>
-            public static int sqlite3VdbeMemGrow(Mem pMem, int n, int preserve)
+            public static SqlResult sqlite3VdbeMemGrow(Mem pMem, int n, int preserve)
             {
                 // TODO -- What do we want to do about this routine?
                 //Debug.Assert( 1 >=
@@ -420,7 +420,7 @@ return rc;
                     pMem.flags = (pMem.flags & ~(MemFlags.MEM_Ephem | MemFlags.MEM_Static));
                 }
                 pMem.xDel = null;
-                return pMem.z != null ? Sqlite3.SQLITE_OK : Sqlite3.SQLITE_NOMEM;
+                return pMem.z != null ? SqlResult.SQLITE_OK : SqlResult.SQLITE_NOMEM;
             }
             ///
             
@@ -465,18 +465,18 @@ pMem.u.i = 0;
 pMem.flags = (u16)( pMem.flags & ~( MEM.MEM_Zero | MEM.MEM_Static | MEM.MEM_Ephem | MEM.MEM_Term ) );
 pMem.flags |= MEM.MEM_Dyn;
 }
-return Sqlite3.SQLITE_OK;
+return SqlResult.SQLITE_OK;
 }
 #endif
             ///<summary>
             /// Make sure the given Mem is \u0000 terminated.
             ///</summary>
-            public static int sqlite3VdbeMemNulTerminate(Mem pMem)
+            public static SqlResult sqlite3VdbeMemNulTerminate(Mem pMem)
             {
                 Debug.Assert(pMem.db == null || pMem.db.mutex.sqlite3_mutex_held());
                 if ((pMem.flags & MemFlags.MEM_Term) != 0 || (pMem.flags & MemFlags.MEM_Str) == 0)
                 {
-                    return Sqlite3.SQLITE_OK;
+                    return SqlResult.SQLITE_OK;
                     ///
                     ///<summary>
                     ///Nothing to do 
@@ -491,7 +491,7 @@ return Sqlite3.SQLITE_OK;
                 if (pMem.z != null && pMem.n < pMem.z.Length)
                     pMem.z = pMem.z.Substring(0, pMem.n);
                 pMem.flags |= MemFlags.MEM_Term;
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             ///<summary>
             /// Add MEM.MEM_Str to the set of representations for the given Mem.  Numbers
@@ -507,9 +507,9 @@ return Sqlite3.SQLITE_OK;
             /// user and the later is an internal programming error.
             ///
             ///</summary>
-            public static int sqlite3VdbeMemStringify(Mem pMem, SqliteEncoding enc)
+            public static SqlResult sqlite3VdbeMemStringify(Mem pMem, SqliteEncoding enc)
             {
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
                 var fg = pMem.flags;
                 const int nByte = 32;
                 Debug.Assert(pMem.db == null || pMem.db.mutex.sqlite3_mutex_held());
@@ -520,7 +520,7 @@ return Sqlite3.SQLITE_OK;
                 //assert( EIGHT_BYTE_ALIGNMENT(pMem) );
                 if (sqlite3VdbeMemGrow(pMem, nByte, 0) != 0)
                 {
-                    return Sqlite3.SQLITE_NOMEM;
+                    return SqlResult.SQLITE_NOMEM;
                 }
                 ///
                 ///<summary>
@@ -565,13 +565,13 @@ return Sqlite3.SQLITE_OK;
             /// This routine calls the finalize method for that function.  The
             /// result of the aggregate is stored back into pMem.
             ///
-            /// Return Sqlite3.SQLITE_ERROR if the finalizer reports an error.  Sqlite3.SQLITE_OK
+            /// Return SqlResult.SQLITE_ERROR if the finalizer reports an error.  SqlResult.SQLITE_OK
             /// otherwise.
             ///
             ///</summary>
-            public static int sqlite3VdbeMemFinalize(Mem pMem, FuncDef pFunc)
+            public static SqlResult sqlite3VdbeMemFinalize(Mem pMem, FuncDef pFunc)
             {
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
                 if (Sqlite3.ALWAYS(pFunc != null && pFunc.xFinalize != null))
                 {
                     sqlite3_context ctx = new sqlite3_context();
@@ -706,9 +706,9 @@ return r;
             /// freed before the copy is made.
             ///
             ///</summary>
-            public static int sqlite3VdbeMemCopy(Mem pTo, Mem pFrom)
+            public static SqlResult sqlite3VdbeMemCopy(Mem pTo, Mem pFrom)
             {
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
                 Debug.Assert((pFrom.flags & MemFlags.MEM_RowSet) == 0);
                 pTo.sqlite3VdbeMemReleaseExternal();
                 pFrom.CopyTo(ref pTo);
@@ -928,7 +928,7 @@ return r;
             /// to read from the disk) then the pMem is left in an inconsistent state.
             ///
             ///</summary>
-            public static int sqlite3VdbeMemFromBtree(BtCursor pCur,///
+            public static SqlResult sqlite3VdbeMemFromBtree(BtCursor pCur,///
                 ///<summary>
                 ///Cursor pointing at record to retrieve. 
                 ///</summary>
@@ -960,7 +960,7 @@ return r;
                 ///<summary>
                 ///Number of bytes available on the local btree page 
                 ///</summary>
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
                 ///
                 ///<summary>
                 ///Return code 
@@ -991,7 +991,7 @@ return r;
                     pMem.flags = MemFlags.MEM_Blob | MemFlags.MEM_Ephem;
                 }
                 else
-                    if (Sqlite3.SQLITE_OK == (rc = sqlite3VdbeMemGrow(pMem, amt + 2, 0)))
+                    if (SqlResult.SQLITE_OK == (rc = sqlite3VdbeMemGrow(pMem, amt + 2, 0)))
                     {
                         pMem.enc = 0;
                         pMem.type = FoundationalType.SQLITE_BLOB;
@@ -1009,7 +1009,7 @@ return r;
                         }
                         //pMem.z[amt] = 0;
                         //pMem.z[amt+1] = 0;
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
                             pMem.sqlite3VdbeMemRelease();
                         }
@@ -1048,7 +1048,7 @@ return r;
                 // expandBlob(pVal);
                 if ((pVal.flags & MemFlags.MEM_Str) != 0)
                 {
-                    if (sqlite3VdbeChangeEncoding(pVal, enc & ~SqliteEncoding.UTF16_ALIGNED) != Sqlite3.SQLITE_OK)
+                    if (sqlite3VdbeChangeEncoding(pVal, enc & ~SqliteEncoding.UTF16_ALIGNED) != SqlResult.SQLITE_OK)
                     {
                         return null;
                         // Encoding Error
@@ -1056,7 +1056,7 @@ return r;
                     if ((enc & SqliteEncoding.UTF16_ALIGNED) != 0 && 1 == (1 & (pVal.z[0])))//1==(1&SQLITE_PTR_TO_INT(pVal.z))
                     {
                         Debug.Assert((pVal.flags & (MemFlags.MEM_Ephem | MemFlags.MEM_Static)) != 0);
-                        if (pVal.sqlite3VdbeMemMakeWriteable() != Sqlite3.SQLITE_OK)
+                        if (pVal.sqlite3VdbeMemMakeWriteable() != SqlResult.SQLITE_OK)
                         {
                             return null;
                         }
@@ -1111,7 +1111,7 @@ return r;
             /// cannot be converted to a value, then ppVal is set to NULL.
             ///
             ///</summary>
-            public static int sqlite3ValueFromExpr(sqlite3 db,///
+            public static SqlResult sqlite3ValueFromExpr(sqlite3 db,///
                 ///<summary>
                 ///The database connection 
                 ///</summary>
@@ -1141,7 +1141,7 @@ return r;
                 if (pExpr == null)
                 {
                     ppVal = null;
-                    return Sqlite3.SQLITE_OK;
+                    return SqlResult.SQLITE_OK;
                 }
                 op = pExpr.op;
                 ///
@@ -1213,7 +1213,7 @@ return r;
                         ///<summary>
                         ///</summary>
                         ///<param name="This branch happens for multiple negative signs.  Ex: ">5) </param>
-                        if (Sqlite3.SQLITE_OK == sqlite3ValueFromExpr(db, pExpr.pLeft, enc, affinity, ref pVal))
+                        if (SqlResult.SQLITE_OK == sqlite3ValueFromExpr(db, pExpr.pLeft, enc, affinity, ref pVal))
                         {
                             pVal.sqlite3VdbeMemNumerify();
                             if (pVal.u.i == IntegerExtensions.SMALLEST_INT64)
@@ -1259,14 +1259,14 @@ return r;
                     Sqlite3.sqlite3VdbeMemStoreType(pVal);
                 }
                 ppVal = pVal;
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             no_mem:
                 //db.mallocFailed = 1;
                 db.sqlite3DbFree(ref zVal);
                 pVal = null;
                 // sqlite3ValueFree(pVal);
                 ppVal = null;
-                return Sqlite3.SQLITE_NOMEM;
+                return SqlResult.SQLITE_NOMEM;
             }
             ///<summary>
             /// Change the string value of an sqlite3_value object

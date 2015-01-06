@@ -20,7 +20,7 @@ namespace Community.CsharpSqlite
             {
             }
 
-            //#define sqlite3_mutex_try(X)      Sqlite3.SQLITE_OK
+            //#define sqlite3_mutex_try(X)      SqlResult.SQLITE_OK
             public static void sqlite3_mutex_leave(this sqlite3_mutex p)
             {
             }
@@ -152,20 +152,20 @@ namespace Community.CsharpSqlite
 		
 
 		//#define $.sqlite3_mutex_enter()
-		static int sqlite3_mutex_try (int iType)
+		static SqlResult sqlite3_mutex_try (int iType)
 		{
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 
 		
 
 		//#define sqlite3_mutex_notheld(X)  ((void)(X),1)
-		static int sqlite3MutexInit ()
+		static SqlResult sqlite3MutexInit ()
 		{
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 
-		//#define sqlite3MutexInit()        Sqlite3.SQLITE_OK
+		//#define sqlite3MutexInit()        SqlResult.SQLITE_OK
 		static void sqlite3MutexEnd ()
 		{
 		}
@@ -282,7 +282,7 @@ namespace Community.CsharpSqlite
         ///<param name="^The sqlite3_mutex_enter() and sqlite3_mutex_try() routines attempt">^The sqlite3_mutex_enter() and sqlite3_mutex_try() routines attempt</param>
         ///<param name="to enter a mutex.  ^If another thread is already within the mutex,">to enter a mutex.  ^If another thread is already within the mutex,</param>
         ///<param name="sqlite3_mutex_enter() will block and sqlite3_mutex_try() will return">sqlite3_mutex_enter() will block and sqlite3_mutex_try() will return</param>
-        ///<param name="SQLITE_BUSY.  ^The sqlite3_mutex_try() interface returns [Sqlite3.SQLITE_OK]">SQLITE_BUSY.  ^The sqlite3_mutex_try() interface returns [Sqlite3.SQLITE_OK]</param>
+        ///<param name="SQLITE_BUSY.  ^The sqlite3_mutex_try() interface returns [SqlResult.SQLITE_OK]">SQLITE_BUSY.  ^The sqlite3_mutex_try() interface returns [SqlResult.SQLITE_OK]</param>
         ///<param name="upon successful entry.  ^(Mutexes created using">upon successful entry.  ^(Mutexes created using</param>
         ///<param name="SQLITE_MUTEX_RECURSIVE can be entered multiple times by the same thread.">SQLITE_MUTEX_RECURSIVE can be entered multiple times by the same thread.</param>
         ///<param name="In such cases the,">In such cases the,</param>
@@ -376,7 +376,7 @@ namespace Community.CsharpSqlite
         /// memory allocation for a fast or recursive mutex.
         ///
         /// ^SQLite will invoke the xMutexEnd() method when [sqlite3_shutdown()] is
-        /// called, but only if the prior call to xMutexInit returned Sqlite3.SQLITE_OK.
+        /// called, but only if the prior call to xMutexInit returned SqlResult.SQLITE_OK.
         /// If xMutexInit fails in any way, it is expected to clean up after itself
         /// prior to returning.
         ///
@@ -447,9 +447,9 @@ namespace Community.CsharpSqlite
         }
 
         //Mutex Methods
-        public delegate int dxMutexInit();
+        public delegate SqlResult dxMutexInit();
 
-        public delegate int dxMutexEnd();
+        public delegate SqlResult dxMutexEnd();
 
         public delegate sqlite3_mutex dxMutexAlloc(int iNumber);
 
@@ -457,7 +457,7 @@ namespace Community.CsharpSqlite
 
         public delegate void dxMutexEnter(sqlite3_mutex sm);
 
-        public delegate int dxMutexTry(sqlite3_mutex sm);
+        public delegate SqlResult dxMutexTry(sqlite3_mutex sm);
 
         public delegate void dxMutexLeave(sqlite3_mutex sm);
 

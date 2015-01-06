@@ -178,13 +178,13 @@ namespace Community.CsharpSqlite {
 			/// <summary>
 			/// Value to return
 			/// </summary>
-			public int rc;
+			public SqlResult rc;
 			public SqlResult result {
 				get {
 					return (SqlResult)rc;
 				}
 				set {
-					rc=(int)value;
+					rc=value;
 				}
 			}
 			public OnConstraintError errorAction;
@@ -1228,7 +1228,7 @@ pOp.cnt = 0;
 			}
 			public bool vdbeSafety() {
 				if(this.db==null) {
-					io.sqlite3_log(SQLITE_MISUSE,"API called with finalized prepared statement");
+					io.sqlite3_log(SqlResult.SQLITE_MISUSE, "API called with finalized prepared statement");
 					return true;
 				}
 				else {
@@ -1237,14 +1237,14 @@ pOp.cnt = 0;
 			}
 			public bool vdbeSafetyNotNull() {
 				if(this==null) {
-					io.sqlite3_log(SQLITE_MISUSE,"API called with NULL prepared statement");
+					io.sqlite3_log(SqlResult.SQLITE_MISUSE, "API called with NULL prepared statement");
 					return true;
 				}
 				else {
 					return this.vdbeSafety();
 				}
 			}
-			public int growOpArray() {
+			public SqlResult growOpArray() {
 				//VdbeOp pNew;
 				int nNew=(this.nOpAlloc!=0?this.nOpAlloc*2:1024/4);
 				//(int)(1024/sizeof(Op)));
@@ -1259,8 +1259,8 @@ pOp.cnt = 0;
 					this.aOp=new VdbeOp[nNew];
 				else
 					Array.Resize(ref this.aOp,nNew);
-				return (this.aOp!=null?Sqlite3.SQLITE_OK:SQLITE_NOMEM);
-				//  return (pNew ? Sqlite3.SQLITE_OK : SQLITE_NOMEM);
+				return (this.aOp!=null? SqlResult.SQLITE_OK: SqlResult.SQLITE_NOMEM);
+				//  return (pNew ? SqlResult.SQLITE_OK : SQLITE_NOMEM);
 			}
 			public void sqlite3VdbeAddParseSchemaOp(int iDb,string zWhere) {
 				int j;
@@ -1296,7 +1296,7 @@ pOp.cnt = 0;
       }
 #endif
 				this.currentOpCodeIndex=-1;
-				this.rc=Sqlite3.SQLITE_OK;
+				this.rc= SqlResult.SQLITE_OK;
 				this.errorAction=OnConstraintError.OE_Abort;
 				this.magic=VdbeMagic.VDBE_MAGIC_RUN;
 				this.nChange=0;
@@ -1329,7 +1329,7 @@ pOp.cnt = 0;
 					pColName.db=this.db;
 				}
 			}
-			public int sqlite3VdbeSetColName(///
+			public SqlResult sqlite3VdbeSetColName(///
 			///<summary>
 			///Vdbe being configured 
 			///</summary>
@@ -1350,7 +1350,7 @@ pOp.cnt = 0;
 			///Memory management strategy for zName 
 			///</summary>
 			) {
-				int rc;
+                SqlResult rc;
 				Mem pColName;
 				Debug.Assert(idx<this.nResColumn);
 				Debug.Assert(var<COLNAME_N);
@@ -1365,9 +1365,9 @@ pOp.cnt = 0;
 				Debug.Assert(rc!=0||null==zName||(pColName.flags&MemFlags.MEM_Term)!=0);
 				return rc;
 			}
-			public int sqlite3VdbeCloseStatement(int eOp) {
+			public SqlResult sqlite3VdbeCloseStatement(int eOp) {
 				sqlite3 db=this.db;
-				int rc=Sqlite3.SQLITE_OK;
+                SqlResult rc = SqlResult.SQLITE_OK;
 				///
 				///<summary>
 				///</summary>
@@ -1383,27 +1383,27 @@ pOp.cnt = 0;
 					Debug.Assert(db.nStatement>0);
 					Debug.Assert(this.iStatement==(db.nStatement+db.nSavepoint));
 					for(i=0;i<db.nDb;i++) {
-						int rc2=Sqlite3.SQLITE_OK;
+                        SqlResult rc2 = SqlResult.SQLITE_OK;
 						Btree pBt=db.aDb[i].pBt;
 						if(pBt!=null) {
 							if(eOp==sqliteinth.SAVEPOINT_ROLLBACK) {
 								rc2=pBt.sqlite3BtreeSavepoint(sqliteinth.SAVEPOINT_ROLLBACK,iSavepoint);
 							}
-							if(rc2==Sqlite3.SQLITE_OK) {
+							if(rc2== SqlResult.SQLITE_OK) {
                                 rc2 = pBt.sqlite3BtreeSavepoint(sqliteinth.SAVEPOINT_RELEASE, iSavepoint);
 							}
-							if(rc==Sqlite3.SQLITE_OK) {
+							if(rc== SqlResult.SQLITE_OK) {
 								rc=rc2;
 							}
 						}
 					}
 					db.nStatement--;
 					this.iStatement=0;
-					if(rc==Sqlite3.SQLITE_OK) {
+					if(rc==SqlResult.SQLITE_OK) {
 						if(eOp==sqliteinth.SAVEPOINT_ROLLBACK) {
                             rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_ROLLBACK, iSavepoint);
 						}
-						if(rc==Sqlite3.SQLITE_OK) {
+						if(rc==SqlResult.SQLITE_OK) {
                             rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_RELEASE, iSavepoint);
 						}
 					}
@@ -1419,18 +1419,18 @@ pOp.cnt = 0;
 				}
 				return rc;
 			}
-			public int sqlite3VdbeCheckFk(int deferred) {
+			public SqlResult sqlite3VdbeCheckFk(int deferred) {
 				sqlite3 db=this.db;
 				if((deferred!=0&&db.nDeferredCons>0)||(0==deferred&&this.nFkConstraint>0)) {
-					this.rc=SQLITE_CONSTRAINT;
+					this.rc= SqlResult.SQLITE_CONSTRAINT;
 					this.errorAction=OnConstraintError.OE_Abort;
 					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"foreign key constraint failed");
-					return Sqlite3.SQLITE_ERROR;
+					return SqlResult.SQLITE_ERROR;
 				}
-				return Sqlite3.SQLITE_OK;
+				return SqlResult.SQLITE_OK;
 			}
-			public int sqlite3VdbeHalt() {
-				int rc;
+			public SqlResult sqlite3VdbeHalt() {
+                SqlResult rc;
 				///
 				///<summary>
 				///Used to store transient return codes 
@@ -1460,7 +1460,7 @@ pOp.cnt = 0;
 				//}
                 vdbeaux.closeAllCursors(this);
 				if(this.magic!=VdbeMagic.VDBE_MAGIC_RUN) {
-					return Sqlite3.SQLITE_OK;
+					return SqlResult.SQLITE_OK;
 				}
                 vdbeaux.checkActiveVdbeCnt(db);
 				///
@@ -1468,7 +1468,7 @@ pOp.cnt = 0;
 				///No commit or rollback needed if the program never started 
 				///</summary>
 				if(this.currentOpCodeIndex>=0) {
-					int mrc;
+                    SqlResult mrc;
 					///
 					///<summary>
 					///Primary error code from p.rc 
@@ -1488,13 +1488,13 @@ pOp.cnt = 0;
 					///<summary>
 					///Check for one of the special errors 
 					///</summary>
-					mrc=this.rc&0xff;
-					Debug.Assert(this.rc!=SQLITE_IOERR_BLOCKED);
+					mrc=this.rc&(SqlResult)0xff;
+					Debug.Assert(this.rc!= SqlResult.SQLITE_IOERR_BLOCKED);
 					///
 					///<summary>
 					///This error no longer exists 
 					///</summary>
-					isSpecialError=mrc==SQLITE_NOMEM||mrc==SQLITE_IOERR||mrc==SQLITE_INTERRUPT||mrc==SQLITE_FULL;
+					isSpecialError=mrc== SqlResult.SQLITE_NOMEM ||mrc== SqlResult.SQLITE_IOERR ||mrc== SqlResult.SQLITE_INTERRUPT ||mrc== SqlResult.SQLITE_FULL;
 					if(isSpecialError) {
 						///
 						///<summary>
@@ -1511,8 +1511,8 @@ pOp.cnt = 0;
 						///<param name="pagerStress() in pager.c), the rollback is required to restore ">pagerStress() in pager.c), the rollback is required to restore </param>
 						///<param name="the pager to a consistent state.">the pager to a consistent state.</param>
 						///<param name=""></param>
-						if(!this.readOnly||mrc!=SQLITE_INTERRUPT) {
-							if((mrc==SQLITE_NOMEM||mrc==SQLITE_FULL)&&this.usesStmtJournal) {
+						if(!this.readOnly||mrc!= SqlResult.SQLITE_INTERRUPT) {
+							if((mrc== SqlResult.SQLITE_NOMEM ||mrc== SqlResult.SQLITE_FULL)&&this.usesStmtJournal) {
 								eStatementOp=sqliteinth.SAVEPOINT_ROLLBACK;
 							}
 							else {
@@ -1533,7 +1533,7 @@ pOp.cnt = 0;
 					///<summary>
 					///Check for immediate foreign key violations. 
 					///</summary>
-					if(this.rc==Sqlite3.SQLITE_OK) {
+					if(this.rc==SqlResult.SQLITE_OK) {
 						this.sqlite3VdbeCheckFk(0);
 					}
 					///
@@ -1548,14 +1548,14 @@ pOp.cnt = 0;
                     if (!sqliteinth.sqlite3VtabInSync(db) && db.autoCommit != 0 && db.writeVdbeCnt == ((this.readOnly == false) ? 1 : 0))
                     {
                         
-						if(this.rc==Sqlite3.SQLITE_OK||(this.errorAction==OnConstraintError.OE_Fail&&!isSpecialError)) {
+						if(this.rc== SqlResult.SQLITE_OK||(this.errorAction==OnConstraintError.OE_Fail&&!isSpecialError)) {
 							rc=this.sqlite3VdbeCheckFk(1);
-							if(rc!=Sqlite3.SQLITE_OK) {
+							if(rc!= SqlResult.SQLITE_OK) {
 								if(NEVER(this.readOnly)) {
 									this.sqlite3VdbeLeave();
-									return Sqlite3.SQLITE_ERROR;
+									return SqlResult.SQLITE_ERROR;
 								}
-								rc=SQLITE_CONSTRAINT;
+								rc= SqlResult.SQLITE_CONSTRAINT;
 							}
 							else {
 								///
@@ -1567,12 +1567,12 @@ pOp.cnt = 0;
 								///<param name="is required. ">is required. </param>
 								rc=vdbeaux.vdbeCommit(db,this);
 							}
-							if(rc==SQLITE_BUSY&&this.readOnly) {
+							if(rc== SqlResult.SQLITE_BUSY && this.readOnly) {
 								this.sqlite3VdbeLeave();
-								return SQLITE_BUSY;
+								return SqlResult.SQLITE_BUSY;
 							}
 							else
-								if(rc!=Sqlite3.SQLITE_OK) {
+								if(rc!= SqlResult.SQLITE_OK) {
 									this.rc=rc;
 									sqlite3RollbackAll(db);
 								}
@@ -1588,7 +1588,7 @@ pOp.cnt = 0;
 					}
 					else
 						if(eStatementOp==0) {
-							if(this.rc==Sqlite3.SQLITE_OK||this.errorAction==OnConstraintError.OE_Fail) {
+							if(this.rc== SqlResult.SQLITE_OK||this.errorAction==OnConstraintError.OE_Fail) {
                                 eStatementOp = sqliteinth.SAVEPOINT_RELEASE;
 							}
 							else
@@ -1608,13 +1608,13 @@ pOp.cnt = 0;
 					///<param name="If eStatementOp is non">zero, then a statement transaction needs to</param>
 					///<param name="be committed or rolled back. Call sqlite3VdbeCloseStatement() to">be committed or rolled back. Call sqlite3VdbeCloseStatement() to</param>
 					///<param name="do so. If this operation returns an error, and the current statement">do so. If this operation returns an error, and the current statement</param>
-					///<param name="error code is Sqlite3.SQLITE_OK or SQLITE_CONSTRAINT, then promote the">error code is Sqlite3.SQLITE_OK or SQLITE_CONSTRAINT, then promote the</param>
+					///<param name="error code is SqlResult.SQLITE_OK or SQLITE_CONSTRAINT, then promote the">error code is SqlResult.SQLITE_OK or SQLITE_CONSTRAINT, then promote the</param>
 					///<param name="current statement error code.">current statement error code.</param>
 					///<param name=""></param>
 					if(eStatementOp!=0) {
 						rc=this.sqlite3VdbeCloseStatement(eStatementOp);
 						if(rc!=0) {
-							if(this.rc==Sqlite3.SQLITE_OK||this.rc==SQLITE_CONSTRAINT) {
+							if(this.rc== SqlResult.SQLITE_OK||this.rc==SqlResult.SQLITE_CONSTRAINT) {
 								this.rc=rc;
 								db.sqlite3DbFree(ref this.zErrMsg);
 								this.zErrMsg=null;
@@ -1644,7 +1644,7 @@ pOp.cnt = 0;
 					///<summary>
 					///Rollback or commit any schema changes that occurred. 
 					///</summary>
-                    if (this.rc != Sqlite3.SQLITE_OK && (db.flags & SqliteFlags.SQLITE_InternChanges) != 0)
+                    if (this.rc != SqlResult.SQLITE_OK && (db.flags & SqliteFlags.SQLITE_InternChanges) != 0)
                     {
 						build.sqlite3ResetInternalSchema(db,-1);
                         db.flags = (db.flags | SqliteFlags.SQLITE_InternChanges);
@@ -1683,12 +1683,12 @@ pOp.cnt = 0;
 					sqliteinth.sqlite3ConnectionUnlocked(db);
 				}
 				Debug.Assert(db.activeVdbeCnt>0||db.autoCommit==0||db.nStatement==0);
-				return (this.rc==SQLITE_BUSY?SQLITE_BUSY:Sqlite3.SQLITE_OK);
+				return (this.rc== SqlResult.SQLITE_BUSY ? SqlResult.SQLITE_BUSY : SqlResult.SQLITE_OK);
 			}
 			public void sqlite3VdbeResetStepResult() {
-				this.rc=Sqlite3.SQLITE_OK;
+				this.rc=SqlResult.SQLITE_OK;
 			}
-			public int sqlite3VdbeReset() {
+			public SqlResult sqlite3VdbeReset() {
 				sqlite3 db;
 				db=this.db;
 				///
@@ -1722,7 +1722,7 @@ pOp.cnt = 0;
 						//}
 						//else
 						//{
-						//  utilc.sqlite3Error( db, Sqlite3.SQLITE_OK, 0 );
+						//  utilc.sqlite3Error( db, SqlResult.SQLITE_OK, 0 );
 						//}
 					}
 					if(this.runOnlyOnce!=0)
@@ -1809,7 +1809,7 @@ fclose(out);
 			public void sqlite3VdbeCountChanges() {
 				this.changeCntOn=true;
 			}
-			public int sqlite3VdbeExec(///
+			public SqlResult sqlite3VdbeExec(///
 			///<summary>
 			///The VDBE 
 			///</summary>
@@ -1833,11 +1833,11 @@ fclose(out);
 					///Copy of p.aOp 
 					///</summary>
 					Op pOp;
-					///
-					///<summary>
-					///Current operation 
-					///</summary>
-					int rc=Sqlite3.SQLITE_OK;
+                    ///
+                    ///<summary>
+                    ///Current operation 
+                    ///</summary>
+                    SqlResult rc =SqlResult.SQLITE_OK;
 					///
 					///<summary>
 					///Value to return 
@@ -1923,7 +1923,7 @@ int origPc;                  /* Program counter at start of opcode */
 					///sqlite3_step() verifies this 
 					///</summary>
 					this.sqlite3VdbeEnter();
-					if(this.rc==SQLITE_NOMEM) {
+					if(this.rc== SqlResult.SQLITE_NOMEM) {
 						///
 						///<summary>
 						///This happens if a malloc() inside a call to sqlite3_column_text() or
@@ -1931,8 +1931,8 @@ int origPc;                  /* Program counter at start of opcode */
 						///</summary>
 						goto no_mem;
 					}
-					Debug.Assert(this.rc==Sqlite3.SQLITE_OK||this.rc==SQLITE_BUSY);
-					this.rc=Sqlite3.SQLITE_OK;
+					Debug.Assert(this.rc==SqlResult.SQLITE_OK||this.rc==SqlResult.SQLITE_BUSY);
+					this.rc=SqlResult.SQLITE_OK;
 					Debug.Assert(this.explain==0);
 					this.pResultSet=null;
 					db.busyHandler.nBusy=0;
@@ -1961,7 +1961,7 @@ int origPc;                  /* Program counter at start of opcode */
       sqlite3EndBenignMalloc();
 #endif
 					#region for
-					for(opcodeIndex=this.currentOpCodeIndex;rc==Sqlite3.SQLITE_OK;opcodeIndex++) {
+					for(opcodeIndex=this.currentOpCodeIndex;rc==SqlResult.SQLITE_OK;opcodeIndex++) {
 						Debug.Assert(opcodeIndex>=0&&opcodeIndex<this.nOp);
 						//      if ( db.mallocFailed != 0 ) goto no_mem;
 						#if VDBE_PROFILE
@@ -2022,7 +2022,7 @@ start = sqlite3Hwtime();
 								int prc;
 								prc=db.xProgress(db.pProgressArg);
 								if(prc!=0) {
-									rc=SQLITE_INTERRUPT;
+									rc= SqlResult.SQLITE_INTERRUPT;
 									goto vdbe_error_halt;
 								}
 								nProgressOps=0;
@@ -2225,7 +2225,7 @@ start = sqlite3Hwtime();
 						///automatically.
 						///
 						///P1 is the result code returned by sqlite3_exec(), sqlite3_reset(),
-						///or sqlite3_finalize().  For a normal halt, this should be Sqlite3.SQLITE_OK (0).
+						///or sqlite3_finalize().  For a normal halt, this should be SqlResult.SQLITE_OK (0).
 						///For errors, it can be some other value.  If P1!=0 then P2 will determine
 						///whether or not to rollback the current transaction.  Do not rollback
 						///if P2==OnConstraintError.OE_Fail. Do the rollback if P2==OnConstraintError.OE_Rollback.  If P2==OnConstraintError.OE_Abort,
@@ -2241,7 +2241,7 @@ start = sqlite3Hwtime();
 						///</summary>
 						case OpCode.OP_Halt: {
 							pIn3=aMem[pOp.p3];
-							if(pOp.p1==Sqlite3.SQLITE_OK&&this.pFrame!=null) {
+							if(pOp.p1==(int)SqlResult.SQLITE_OK&&this.pFrame!=null) {
 								///
 								///<summary>
 								///</summary>
@@ -2267,11 +2267,11 @@ start = sqlite3Hwtime();
 								aMem=this.aMem;
 								break;
 							}
-							this.rc=pOp.p1;
+							this.rc=(SqlResult)pOp.p1;
 							this.errorAction=(OnConstraintError)pOp.p2;
 							this.currentOpCodeIndex=opcodeIndex;
 							if(pOp.p4.z!=null) {
-								Debug.Assert(this.rc!=Sqlite3.SQLITE_OK);
+								Debug.Assert(this.rc!=SqlResult.SQLITE_OK);
 								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"%s",pOp.p4.z);
 								sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog!=null);
 								io.sqlite3_log(pOp.p1,"abort at %d in [%s]: %s",opcodeIndex,this.zSql,pOp.p4.z);
@@ -2282,14 +2282,14 @@ start = sqlite3Hwtime();
 									io.sqlite3_log(pOp.p1,"constraint failed at %d in [%s]",opcodeIndex,this.zSql);
 								}
 							rc=this.sqlite3VdbeHalt();
-							Debug.Assert(rc==SQLITE_BUSY||rc==Sqlite3.SQLITE_OK||rc==Sqlite3.SQLITE_ERROR);
-							if(rc==SQLITE_BUSY) {
-								this.rc=rc=SQLITE_BUSY;
+							Debug.Assert(rc== SqlResult.SQLITE_BUSY ||rc==SqlResult.SQLITE_OK||rc==SqlResult.SQLITE_ERROR);
+							if(rc== SqlResult.SQLITE_BUSY) {
+								this.rc=rc= SqlResult.SQLITE_BUSY;
 							}
 							else {
-								Debug.Assert(rc==Sqlite3.SQLITE_OK||this.rc==SQLITE_CONSTRAINT);
-								Debug.Assert(rc==Sqlite3.SQLITE_OK||db.nDeferredCons>0);
-								rc=this.rc!=0?Sqlite3.SQLITE_ERROR:SQLITE_DONE;
+								Debug.Assert(rc==SqlResult.SQLITE_OK||this.rc== SqlResult.SQLITE_CONSTRAINT);
+								Debug.Assert(rc==SqlResult.SQLITE_OK||db.nDeferredCons>0);
+								rc=this.rc!=0?SqlResult.SQLITE_ERROR: SqlResult.SQLITE_DONE;
 							}
 							goto vdbe_return;
 						}
@@ -2359,7 +2359,7 @@ start = sqlite3Hwtime();
 																																																																																																																																				if( encoding!=SqliteEncoding.UTF8 ){
 rc = sqlite3VdbeMemSetStr(pOut, pOp.p4.z, -1, SqliteEncoding.UTF8, SQLITE_STATIC);
 if( rc==SQLITE_TOOBIG ) goto too_big;
-if( Sqlite3.SQLITE_OK!=sqlite3VdbeChangeEncoding(pOut, encoding) ) goto no_mem;
+if( SqlResult.SQLITE_OK!=sqlite3VdbeChangeEncoding(pOut, encoding) ) goto no_mem;
 Debug.Assert( pOut.zMalloc==pOut.z );
 Debug.Assert( pOut.flags & MEM.MEM_Dyn );
 pOut.zMalloc = 0;
@@ -3158,7 +3158,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
                             applyAffinity(pIn1, sqliteinth.SQLITE_AFF_NUMERIC, encoding);
 							if((pIn1.flags&MemFlags.MEM_Int)==0) {
 								if(pOp.p2==0) {
-									rc=SQLITE_MISMATCH;
+									rc=SqlResult.SQLITE_MISMATCH;
 									goto abort_due_to_error;
 								}
 								else {
@@ -4040,7 +4040,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							}
 							nByte=(i64)((u64)nHdr+nData-(u64)nZero);
 							if(nByte>db.aLimit[SQLITE_LIMIT_LENGTH]) {
-                                return (int)ColumnResult.too_big;
+                                return (SqlResult)ColumnResult.too_big;
 							}
 							///
 							///<summary>
@@ -4176,7 +4176,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 									///
 									///</summary>
 									malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"cannot open savepoint - ","SQL statements in progress");
-									rc=SQLITE_BUSY;
+									rc= SqlResult.SQLITE_BUSY;
 								}
 								else {
 									nName=StringExtensions.sqlite3Strlen30(zName);
@@ -4190,7 +4190,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 									///<param name="that the db">>aVTrans[] array is empty.  </param>
 									Debug.Assert(db.autoCommit==0||db.nVTrans==0);
                                     rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, db.nStatement + db.nSavepoint);
-									if(rc!=Sqlite3.SQLITE_OK)
+									if(rc!=SqlResult.SQLITE_OK)
 										goto abort_due_to_error;
 									#endif
 									///
@@ -4237,7 +4237,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 								}
 								if(null==pSavepoint) {
 									malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"no such savepoint: %s",zName);
-									rc=Sqlite3.SQLITE_ERROR;
+									rc=SqlResult.SQLITE_ERROR;
 								}
 								else
 									if(db.writeVdbeCnt>0||(p1==sqliteinth.SAVEPOINT_ROLLBACK&&db.activeVdbeCnt>1)) {
@@ -4249,7 +4249,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 										///
 										///</summary>
 										malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"cannot %s savepoint - SQL statements in progress",(p1==sqliteinth.SAVEPOINT_ROLLBACK?"rollback":"release"));
-										rc=SQLITE_BUSY;
+										rc= SqlResult.SQLITE_BUSY;
 									}
 									else {
 										///
@@ -4262,14 +4262,14 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 										int isTransaction=(pSavepoint.pNext==null&&db.isTransactionSavepoint!=0)?1:0;
                                         if (isTransaction != 0 && p1 == sqliteinth.SAVEPOINT_RELEASE)
                                         {
-											if((rc=this.sqlite3VdbeCheckFk(1))!=Sqlite3.SQLITE_OK) {
+											if((rc=this.sqlite3VdbeCheckFk(1))!=SqlResult.SQLITE_OK) {
 												goto vdbe_return;
 											}
 											db.autoCommit=1;
-											if(this.sqlite3VdbeHalt()==SQLITE_BUSY) {
+											if(this.sqlite3VdbeHalt()== SqlResult.SQLITE_BUSY) {
 												this.currentOpCodeIndex=opcodeIndex;
 												db.autoCommit=0;
-												this.rc=rc=SQLITE_BUSY;
+												this.rc=rc= SqlResult.SQLITE_BUSY;
 												goto vdbe_return;
 											}
 											db.isTransactionSavepoint=0;
@@ -4279,7 +4279,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 											iSavepoint=db.nSavepoint-iSavepoint-1;
 											for(ii=0;ii<db.nDb;ii++) {
 												rc=db.aDb[ii].pBt.sqlite3BtreeSavepoint(p1,iSavepoint);
-												if(rc!=Sqlite3.SQLITE_OK) {
+												if(rc!=SqlResult.SQLITE_OK) {
 													goto abort_due_to_error;
 												}
 											}
@@ -4322,7 +4322,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 										}
 										if(0==isTransaction) {
                                             rc = vtab.sqlite3VtabSavepoint(db, p1, iSavepoint);
-											if(rc!=Sqlite3.SQLITE_OK)
+											if(rc!=SqlResult.SQLITE_OK)
 												goto abort_due_to_error;
 										}
 									}
@@ -4363,7 +4363,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 								///
 								///</summary>
 								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"cannot rollback transaction - "+"SQL statements in progress");
-								rc=SQLITE_BUSY;
+								rc=SqlResult.SQLITE_BUSY;
 							}
 							else
 								if(turnOnAC!=0&&0==iRollback&&db.writeVdbeCnt>0) {
@@ -4374,7 +4374,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 									///
 									///</summary>
 									malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"cannot commit transaction - "+"SQL statements in progress");
-									rc=SQLITE_BUSY;
+									rc= SqlResult.SQLITE_BUSY;
 								}
 								else
 									if(desiredAutoCommit!=db.autoCommit) {
@@ -4384,31 +4384,31 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 											db.autoCommit=1;
 										}
 										else
-											if((rc=this.sqlite3VdbeCheckFk(1))!=Sqlite3.SQLITE_OK) {
+											if((rc=this.sqlite3VdbeCheckFk(1))!=SqlResult.SQLITE_OK) {
 												goto vdbe_return;
 											}
 											else {
 												db.autoCommit=(u8)desiredAutoCommit;
-												if(this.sqlite3VdbeHalt()==SQLITE_BUSY) {
+												if(this.sqlite3VdbeHalt()== SqlResult.SQLITE_BUSY) {
 													this.currentOpCodeIndex=opcodeIndex;
 													db.autoCommit=(u8)(desiredAutoCommit==0?1:0);
-													this.rc=rc=SQLITE_BUSY;
+													this.rc=rc= SqlResult.SQLITE_BUSY;
 													goto vdbe_return;
 												}
 											}
 										Debug.Assert(db.nStatement==0);
 										sqlite3CloseSavepoints(db);
-										if(this.rc==Sqlite3.SQLITE_OK) {
-											rc=SQLITE_DONE;
+										if(this.rc==SqlResult.SQLITE_OK) {
+											rc= SqlResult.SQLITE_DONE;
 										}
 										else {
-											rc=Sqlite3.SQLITE_ERROR;
+											rc=SqlResult.SQLITE_ERROR;
 										}
 										goto vdbe_return;
 									}
 									else {
 										malloc_cs.sqlite3SetString(ref this.zErrMsg,db,(0==desiredAutoCommit)?"cannot start a transaction within a transaction":((iRollback!=0)?"cannot rollback - no transaction is active":"cannot commit - no transaction is active"));
-										rc=Sqlite3.SQLITE_ERROR;
+										rc=SqlResult.SQLITE_ERROR;
 									}
 							break;
 						}
@@ -4453,12 +4453,12 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							pBt=db.aDb[pOp.p1].pBt;
 							if(pBt!=null) {
 								rc=pBt.sqlite3BtreeBeginTrans(pOp.p2);
-								if(rc==SQLITE_BUSY) {
+								if(rc==SqlResult.SQLITE_BUSY) {
 									this.currentOpCodeIndex=opcodeIndex;
-									this.rc=rc=SQLITE_BUSY;
+									this.rc=rc=SqlResult.SQLITE_BUSY;
 									goto vdbe_return;
 								}
-								if(rc!=Sqlite3.SQLITE_OK) {
+								if(rc!=SqlResult.SQLITE_OK) {
 									goto abort_due_to_error;
 								}
 								if(pOp.p2!=0&&this.usesStmtJournal&&(db.autoCommit==0||db.activeVdbeCnt>1)) {
@@ -4469,7 +4469,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 										this.iStatement=db.nSavepoint+db.nStatement;
 									}
                                     rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, this.iStatement - 1);
-									if(rc==Sqlite3.SQLITE_OK) {
+									if(rc==SqlResult.SQLITE_OK) {
 										rc=pBt.sqlite3BtreeBeginStmt(this.iStatement);
 									}
 									///
@@ -4636,7 +4636,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 									build.sqlite3ResetInternalSchema(db,pOp.p1);
 								}
 								this.expired=true;
-								rc=SQLITE_SCHEMA;
+								rc= SqlResult.SQLITE_SCHEMA;
 							}
 							break;
 						}
@@ -4706,7 +4706,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							VdbeCursor pCur;
 							Db pDb;
 							if(this.expired) {
-								rc=SQLITE_ABORT;
+								rc= SqlResult.SQLITE_ABORT;
 								break;
 							}
 							nField=0;
@@ -4768,14 +4768,14 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///
 							///<summary>
 							///Since it performs no memory allocation or IO, the only values that
-							///sqlite3BtreeCursor() may return are SQLITE_EMPTY and Sqlite3.SQLITE_OK. 
+							///sqlite3BtreeCursor() may return are SQLITE_EMPTY and SqlResult.SQLITE_OK. 
 							///SQLITE_EMPTY is only returned when attempting to open the table
 							///</summary>
 							///<param name="rooted at page 1 of a zero">byte database.  </param>
-							Debug.Assert(rc==SQLITE_EMPTY||rc==Sqlite3.SQLITE_OK);
-							if(rc==SQLITE_EMPTY) {
+							Debug.Assert(rc==SqlResult.SQLITE_EMPTY||rc==SqlResult.SQLITE_OK);
+							if(rc==SqlResult.SQLITE_EMPTY) {
 								mempoolMethods.sqlite3MemFreeBtCursor(ref pCur.pCursor);
-								rc=Sqlite3.SQLITE_OK;
+								rc=SqlResult.SQLITE_OK;
 							}
 							///
 							///<summary>
@@ -4827,10 +4827,10 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 								goto no_mem;
 							pCx.nullRow=true;
 							rc=Btree.Open(db.pVfs,null,db,ref pCx.pBt,BTREE_OMIT_JOURNAL|BTREE_SINGLE|pOp.p5,vfsFlags);
-							if(rc==Sqlite3.SQLITE_OK) {
+							if(rc==SqlResult.SQLITE_OK) {
 								rc=pCx.pBt.sqlite3BtreeBeginTrans(1);
 							}
-							if(rc==Sqlite3.SQLITE_OK) {
+							if(rc==SqlResult.SQLITE_OK) {
 								///
 								///<summary>
 								///If a transient index is required, create it by calling
@@ -4843,7 +4843,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 									int pgno=0;
 									Debug.Assert(pOp.p4type== P4Usage.P4_KEYINFO);
                                     rc = pCx.pBt.sqlite3BtreeCreateTable(ref pgno, BTREE_BLOBKEY);
-									if(rc==Sqlite3.SQLITE_OK) {
+									if(rc==SqlResult.SQLITE_OK) {
 										Debug.Assert(pgno==sqliteinth.MASTER_ROOT+1);
 										rc=pCx.pBt.sqlite3BtreeCursor(pgno,1,pOp.p4.pKeyInfo,pCx.pCursor);
 										pCx.pKeyInfo=pOp.p4.pKeyInfo;
@@ -5056,7 +5056,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
                                                 {
                                                     Debug.Assert(oc == OpCode.OP_SeekGe || oc == OpCode.OP_SeekGt);
 													rc=pC.pCursor.sqlite3BtreeFirst(ref res);
-													if(rc!=Sqlite3.SQLITE_OK)
+													if(rc!=SqlResult.SQLITE_OK)
 														goto abort_due_to_error;
 												}
 											}
@@ -5065,7 +5065,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
                                                 {
                                                     Debug.Assert(oc == OpCode.OP_SeekLt || oc == OpCode.OP_SeekLe);
 													rc=pC.pCursor.sqlite3BtreeLast(ref res);
-													if(rc!=Sqlite3.SQLITE_OK)
+													if(rc!=SqlResult.SQLITE_OK)
 														goto abort_due_to_error;
 												}
 											}
@@ -5095,7 +5095,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 											}
 									}
 									rc=pC.pCursor.sqlite3BtreeMovetoUnpacked(null,iKey,0,ref res);
-									if(rc!=Sqlite3.SQLITE_OK) {
+									if(rc!=SqlResult.SQLITE_OK) {
 										goto abort_due_to_error;
 									}
 									if(res==0) {
@@ -5137,7 +5137,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 #endif
 									ExpandBlob(r.aMem[0]);
 									rc=pC.pCursor.sqlite3BtreeMovetoUnpacked(r,0,0,ref res);
-									if(rc!=Sqlite3.SQLITE_OK) {
+									if(rc!=SqlResult.SQLITE_OK) {
 										goto abort_due_to_error;
 									}
 									pC.rowidIsValid=false;
@@ -5157,7 +5157,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
                                     if (res < 0 || (res == 0 && oc == OpCode.OP_SeekGt))
                                     {
 										rc=pC.pCursor.sqlite3BtreeNext(ref res);
-										if(rc!=Sqlite3.SQLITE_OK)
+										if(rc!=SqlResult.SQLITE_OK)
 											goto abort_due_to_error;
 										pC.rowidIsValid=false;
 									}
@@ -5170,7 +5170,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
                                     if (res > 0 || (res == 0 && oc == OpCode.OP_SeekLt))
                                     {
 										rc=pC.pCursor.sqlite3BtreePrevious(ref res);
-										if(rc!=Sqlite3.SQLITE_OK)
+										if(rc!=SqlResult.SQLITE_OK)
 											goto abort_due_to_error;
 										pC.rowidIsValid=false;
 									}
@@ -5325,7 +5325,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 								if(pOp.p4.i==0) {
                                     vdbeaux.sqlite3VdbeDeleteUnpackedRecord(pIdxKey);
 								}
-								if(rc!=Sqlite3.SQLITE_OK) {
+								if(rc!=SqlResult.SQLITE_OK) {
 									break;
 								}
 								alreadyExists=(res==0)?1:0;
@@ -5646,7 +5646,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 									v=pC.pCursor.sqlite3BtreeGetCachedRowid();
 									if(v==0) {
 										rc=pC.pCursor.sqlite3BtreeLast(ref res);
-										if(rc!=Sqlite3.SQLITE_OK) {
+										if(rc!=SqlResult.SQLITE_OK) {
 											goto abort_due_to_error;
 										}
 										if(res!=0) {
@@ -5659,7 +5659,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 										else {
 											Debug.Assert(pC.pCursor.sqlite3BtreeCursorIsValid());
 											rc=pC.pCursor.sqlite3BtreeKeySize(ref v);
-											Debug.Assert(rc==Sqlite3.SQLITE_OK);
+											Debug.Assert(rc==SqlResult.SQLITE_OK);
 											///
 											///<summary>
 											///Cannot fail following BtreeLast() 
@@ -5710,7 +5710,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 										///mem(P3) holds an integer 
 										///</summary>
 										if(pMem.u.i==MAX_ROWID||pC.useRandomRowid) {
-											rc=SQLITE_FULL;
+											rc= SqlResult.SQLITE_FULL;
 											///
 											///<summary>
 											///</summary>
@@ -5755,7 +5755,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 									///</summary>
 									///<param name="ensure non">zero </param>
 									cnt=0;
-									while(((rc=pC.pCursor.sqlite3BtreeMovetoUnpacked(null,v,0,ref res))==Sqlite3.SQLITE_OK)&&(res==0)&&(++cnt<100)) {
+									while(((rc=pC.pCursor.sqlite3BtreeMovetoUnpacked(null,v,0,ref res))==SqlResult.SQLITE_OK)&&(res==0)&&(++cnt<100)) {
 										///
 										///<summary>
 										///</summary>
@@ -5781,8 +5781,8 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 										///</summary>
 										///<param name="ensure non">zero </param>
 									}
-									if(rc==Sqlite3.SQLITE_OK&&res==0) {
-										rc=SQLITE_FULL;
+									if(rc==SqlResult.SQLITE_OK&&res==0) {
+										rc= SqlResult.SQLITE_FULL;
 										///
 										///<summary>
 										///</summary>
@@ -5947,7 +5947,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///<summary>
 							///</summary>
 							///<param name="Invoke the update">hook if required. </param>
-							if(rc==Sqlite3.SQLITE_OK&&db.xUpdateCallback!=null&&pOp.p4.z!=null) {
+							if(rc==SqlResult.SQLITE_OK&&db.xUpdateCallback!=null&&pOp.p4.z!=null) {
 								zDb=db.aDb[pC.iDb].zName;
 								zTbl=pOp.p4.z;
                                 op = ((
@@ -6022,7 +6022,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///<param name=""></param>
 							Debug.Assert(pC.deferredMoveto==false);
                             rc = vdbeaux.sqlite3VdbeCursorMoveto(pC);
-							if(NEVER(rc!=Sqlite3.SQLITE_OK))
+							if(NEVER(rc!=SqlResult.SQLITE_OK))
 								goto abort_due_to_error;
 							pC.pCursor.sqlite3BtreeSetCachedRowid(0);
 							rc=pC.pCursor.sqlite3BtreeDelete();
@@ -6031,7 +6031,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///<summary>
 							///</summary>
 							///<param name="Invoke the update">hook if required. </param>
-							if(rc==Sqlite3.SQLITE_OK&&db.xUpdateCallback!=null&&pOp.p4.z!=null) {
+							if(rc==SqlResult.SQLITE_OK&&db.xUpdateCallback!=null&&pOp.p4.z!=null) {
 								string zDb=db.aDb[pC.iDb].zName;
 								string zTbl=pOp.p4.z;
 								db.xUpdateCallback(db.pUpdateArg,SQLITE_DELETE,zDb,zTbl,iKey);
@@ -6116,12 +6116,12 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///<param name=""></param>
 							Debug.Assert(pC.deferredMoveto==false);
                             rc = vdbeaux.sqlite3VdbeCursorMoveto(pC);
-							if(NEVER(rc!=Sqlite3.SQLITE_OK))
+							if(NEVER(rc!=SqlResult.SQLITE_OK))
 								goto abort_due_to_error;
 							if(pC.isIndex) {
 								Debug.Assert(!pC.isTable);
 								rc=pCrsr.sqlite3BtreeKeySize(ref n64);
-								Debug.Assert(rc==Sqlite3.SQLITE_OK);
+								Debug.Assert(rc==SqlResult.SQLITE_OK);
 								///
 								///<summary>
 								///True because of CursorMoveto() call above 
@@ -6133,7 +6133,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							}
 							else {
 								rc=pCrsr.sqlite3BtreeDataSize(ref n);
-								Debug.Assert(rc==Sqlite3.SQLITE_OK);
+								Debug.Assert(rc==SqlResult.SQLITE_OK);
 								///
 								///<summary>
 								///DataSize() cannot fail 
@@ -6221,7 +6221,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 										}
 										else {
 											rc=pC.pCursor.sqlite3BtreeKeySize(ref v);
-											Debug.Assert(rc==Sqlite3.SQLITE_OK);
+											Debug.Assert(rc==SqlResult.SQLITE_OK);
 											///
 											///<summary>
 											///Always so because of CursorMoveto() above 
@@ -6477,7 +6477,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							if(Sqlite3.ALWAYS(pCrsr!=null)) {
 								Debug.Assert(!pC.isTable);
 								ExpandBlob(pIn2);
-								if(rc==Sqlite3.SQLITE_OK) {
+								if(rc==SqlResult.SQLITE_OK) {
 									nKey=pIn2.n;
 									zKey=(pIn2.flags&MemFlags.MEM_Blob)!=0?pIn2.zBLOB:Encoding.UTF8.GetBytes(pIn2.z);
                                     rc = pCrsr.sqlite3BtreeInsert(zKey, nKey, null, 0, 0, (pOp.p3 != 0) ? 1 : 0, (((OpFlag)pOp.p5 & OpFlag.OPFLAG_USESEEKRESULT) != 0 ? pC.seekResult : 0));
@@ -6521,7 +6521,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 #endif
 								}
 								rc=pCrsr.sqlite3BtreeMovetoUnpacked(r,0,0,ref res);
-								if(rc==Sqlite3.SQLITE_OK&&res==0) {
+								if(rc==SqlResult.SQLITE_OK&&res==0) {
 									rc=pCrsr.sqlite3BtreeDelete();
 								}
 								Debug.Assert(!pC.deferredMoveto);
@@ -6562,7 +6562,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 								Debug.Assert(!pC.isTable);
 								if(!pC.nullRow) {
                                     rc = vdbeaux.sqlite3VdbeIdxRowid(db, pCrsr, ref rowid);
-									if(rc!=Sqlite3.SQLITE_OK) {
+									if(rc!=SqlResult.SQLITE_OK) {
 										goto abort_due_to_error;
 									}
 									pOut.u.i=rowid;
@@ -6700,7 +6700,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 #endif
 							pOut.flags=MemFlags.MEM_Null;
 							if(iCnt>1) {
-								rc=SQLITE_LOCKED;
+								rc=SqlResult.SQLITE_LOCKED;
 								this.errorAction=OnConstraintError.OE_Abort;
 							}
 							else {
@@ -6711,7 +6711,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 								pOut.flags=MemFlags.MEM_Int;
 								pOut.u.i=iMoved;
 								#if !SQLITE_OMIT_AUTOVACUUM
-								if(rc==Sqlite3.SQLITE_OK&&iMoved!=0) {
+								if(rc==SqlResult.SQLITE_OK&&iMoved!=0) {
 									build.sqlite3RootPageMoved(db,iDb,iMoved,pOp.p1);
 									///
 									///<summary>
@@ -6868,21 +6868,21 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 								initData.pzErrMsg=this.zErrMsg;
 								zSql=io.sqlite3MPrintf(db,"SELECT name, rootpage, sql FROM '%q'.%s WHERE %s ORDER BY rowid",db.aDb[iDb].zName,zMaster,pOp.p4.z);
 								if(String.IsNullOrEmpty(zSql)) {
-									rc=SQLITE_NOMEM;
+									rc=SqlResult.SQLITE_NOMEM;
 								}
 								else {
 									Debug.Assert(0==db.init.busy);
 									db.init.busy=1;
-									initData.rc=Sqlite3.SQLITE_OK;
+									initData.rc=SqlResult.SQLITE_OK;
 									//Debug.Assert( 0 == db.mallocFailed );
                                     rc = legacy.sqlite3_exec(db, zSql, (dxCallback)sqlite3InitCallback, (object)initData, 0);
-									if(rc==Sqlite3.SQLITE_OK)
+									if(rc==SqlResult.SQLITE_OK)
 										rc=initData.rc;
 									db.sqlite3DbFree(ref zSql);
 									db.init.busy=0;
 								}
 							}
-							if(rc==SQLITE_NOMEM) {
+                                    if (rc == SqlResult.SQLITE_NOMEM) {
 								goto no_mem;
 							}
 							break;
@@ -7244,7 +7244,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 									break;
 							}
 							if(this.nFrame>=db.aLimit[SQLITE_LIMIT_TRIGGER_DEPTH]) {
-								rc=Sqlite3.SQLITE_ERROR;
+								rc=SqlResult.SQLITE_ERROR;
 								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"too many levels of trigger recursion");
 								break;
 							}
@@ -7631,7 +7631,7 @@ cDebug.Ase  OpCode.OP_Checkpoint: {
   );
   rc = sqlite3Checkpoint(db, pOp.p1, pOp.p2, ref aRes[1], ref aRes[2]);
   if( rc==SQLITE_BUSY ){
-    rc = Sqlite3.SQLITE_OK;
+    rc = SqlResult.SQLITE_OK;
     aRes[0] = 1;
   }
   for(i=0, pMem = aMem[pOp.p3]; i<3; i++, pMem++){
@@ -7712,7 +7712,7 @@ if( (eNew!=eOld)
 && (eOld==PAGER_JOURNALMODE_WAL || eNew==PAGER_JOURNALMODE_WAL)
 ){
 if( null==db.autoCommit || db.activeVdbeCnt>1 ){
-rc = Sqlite3.SQLITE_ERROR;
+rc = SqlResult.SQLITE_ERROR;
 malloc_cs.sqlite3SetString(&p.zErrMsg, db, 
 "cannot change %s wal mode from within a transaction",
 (eNew==PAGER_JOURNALMODE_WAL ? "into" : "out of")
@@ -7727,7 +7727,7 @@ if( eOld==PAGER_JOURNALMODE_WAL ){
 ** after a successful return. 
 */
 rc = sqlite3PagerCloseWal(pPager);
-if( rc==Sqlite3.SQLITE_OK ){
+if( rc==SqlResult.SQLITE_OK ){
 sqlite3PagerSetJournalMode(pPager, eNew);
 }
 }else if( eOld==PAGER_JOURNALMODE_MEMORY ){
@@ -7740,7 +7740,7 @@ sqlite3PagerSetJournalMode(pPager, PAGER_JOURNALMODE_OFF);
 ** mode, this transaction always uses a rollback journal.
 */
 Debug.Assert( sqlite3BtreeIsInTrans(pBt)==0 );
-if( rc==Sqlite3.SQLITE_OK ){
+if( rc==SqlResult.SQLITE_OK ){
 rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
 }
 }
@@ -7793,9 +7793,10 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
 							Debug.Assert((this.btreeMask&(((yDbMask)1)<<pOp.p1))!=0);
 							pBt=db.aDb[pOp.p1].pBt;
 							rc=pBt.sqlite3BtreeIncrVacuum();
-							if(rc==SQLITE_DONE) {
+                            if (rc == SqlResult.SQLITE_DONE)
+                            {
 								opcodeIndex=pOp.p2-1;
-								rc=Sqlite3.SQLITE_OK;
+								rc=SqlResult.SQLITE_OK;
 							}
 							break;
 						}
@@ -7922,7 +7923,7 @@ break;
 							Debug.Assert(pVtab!=null&&pModule!=null);
 							rc=pModule.xOpen(pVtab,out pVtabCursor);
 							importVtabErrMsg(this,pVtab);
-							if(Sqlite3.SQLITE_OK==rc) {
+							if(SqlResult.SQLITE_OK==rc) {
 								///
 								///<summary>
 								///Initialize sqlite3_vtab_cursor base class 
@@ -8015,7 +8016,7 @@ break;
 								rc=pModule.xFilter(pVtabCursor,iQuery,pOp.p4.z,nArg,apArg);
 								this.inVtabMethod=0;
 								importVtabErrMsg(this,pVtab);
-								if(rc==Sqlite3.SQLITE_OK) {
+								if(rc==SqlResult.SQLITE_OK) {
 									res=pModule.xEof(pVtabCursor);
 								}
 								if(res!=0) {
@@ -8127,7 +8128,7 @@ break;
 							rc=pModule.xNext(pCur.pVtabCursor);
 							this.inVtabMethod=0;
 							importVtabErrMsg(this,pVtab);
-							if(rc==Sqlite3.SQLITE_OK) {
+							if(rc==SqlResult.SQLITE_OK) {
 								res=pModule.xEof(pCur.pVtabCursor);
 							}
 							if(0==res) {
@@ -8226,14 +8227,14 @@ break;
 								rc=pModule.xUpdate(pVtab,nArg,apArg,out rowid);
 								db.vtabOnConflict=vtabOnConflict;
 								importVtabErrMsg(this,pVtab);
-								if(rc==Sqlite3.SQLITE_OK&&pOp.p1!=0) {
+								if(rc==SqlResult.SQLITE_OK&&pOp.p1!=0) {
 									Debug.Assert(nArg>1&&apArg[0]!=null&&(apArg[0].flags&MemFlags.MEM_Null)!=0);
 									db.lastRowid=lastRowid=rowid;
 								}
-								if(rc==SQLITE_CONSTRAINT&&pOp.p4.pVtab.bConstraint!=0) {
+								if(rc==SqlResult.SQLITE_CONSTRAINT&&pOp.p4.pVtab.bConstraint!=0) {
                                     if ((OnConstraintError)pOp.p5 == OnConstraintError.OE_Ignore)
                                     {
-										rc=Sqlite3.SQLITE_OK;
+										rc=SqlResult.SQLITE_OK;
 									}
 									else {
                                         this.errorAction = ((OnConstraintError)pOp.p5).Filter(OnConstraintError.OE_Replace, OnConstraintError.OE_Abort);
@@ -8407,7 +8408,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					io.sqlite3_log(rc,"statement aborts at %d: [%s] %s",opcodeIndex,this.zSql,this.zErrMsg);
 					this.sqlite3VdbeHalt();
 					//if ( rc == SQLITE_IOERR_NOMEM ) db.mallocFailed = 1;
-					rc=Sqlite3.SQLITE_ERROR;
+					rc=SqlResult.SQLITE_ERROR;
 					if(resetSchemaOnFault>0) {
 						build.sqlite3ResetInternalSchema(db,resetSchemaOnFault-1);
 					}
@@ -8429,7 +8430,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					///</summary>
 					too_big:
 					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"string or blob too big");
-					rc=SQLITE_TOOBIG;
+					rc=SqlResult.SQLITE_TOOBIG;
 					goto vdbe_error_halt;
 					///
 					///<summary>
@@ -8439,7 +8440,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					no_mem:
 					//db.mallocFailed = 1;
 					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"out of memory");
-					rc=SQLITE_NOMEM;
+					rc=SqlResult.SQLITE_NOMEM;
 					goto vdbe_error_halt;
 					///
 					///<summary>
@@ -8450,7 +8451,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					abort_due_to_error:
 					//Debug.Assert( p.zErrMsg); /// Not needed in C#
 					//if ( db.mallocFailed != 0 ) rc = SQLITE_NOMEM;
-					if(rc!=SQLITE_IOERR_NOMEM) {
+					if(rc!=SqlResult.SQLITE_IOERR_NOMEM) {
 						malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"%s",sqlite3ErrStr(rc));
 					}
 					goto vdbe_error_halt;
@@ -8462,7 +8463,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					///</summary>
 					abort_due_to_interrupt:
 					Debug.Assert(db.u1.isInterrupted);
-					rc=SQLITE_INTERRUPT;
+					rc=SqlResult.SQLITE_INTERRUPT;
 					this.rc=rc;
 					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,sqlite3ErrStr(rc));
 					goto vdbe_error_halt;
@@ -8479,7 +8480,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 too_big
 
             }
-            private int OpCode_Column(Op pOp, int rc, sqlite3 db, SqliteEncoding encoding, Mem[] aMem)
+            private SqlResult OpCode_Column(Op pOp, SqlResult rc, sqlite3 db, SqliteEncoding encoding, Mem[] aMem)
             {
                 
                 
@@ -8567,7 +8568,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 if (btCursor != null)
                 {
                     ///The record is stored in a B">Tree
-                    rc = (int)vdbeaux.sqlite3VdbeCursorMoveto(vdbeCursor);
+                    rc = vdbeaux.sqlite3VdbeCursorMoveto(vdbeCursor);
                     if (rc != 0)
                         return (int)ColumnResult.abort_due_to_error;
                         //goto  abort_due_to_error;
@@ -8587,7 +8588,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                             {
                                 Debug.Assert(btCursor.sqlite3BtreeCursorIsValid());
                                 rc = btCursor.sqlite3BtreeKeySize(ref payloadSize64);
-                                Debug.Assert(rc == Sqlite3.SQLITE_OK);
+                                Debug.Assert(rc == SqlResult.SQLITE_OK);
                                 ///True because of CursorMoveto() call above 
                                 ///sqlite3BtreeParseCellPtr() uses utilc.getVarint32() to extract the
                                 ///payload size, so it is impossible for payloadSize64 to be
@@ -8599,7 +8600,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                             {
                                 Debug.Assert(btCursor.sqlite3BtreeCursorIsValid());
                                 rc = btCursor.sqlite3BtreeDataSize(ref payloadSize);
-                                Debug.Assert(rc == Sqlite3.SQLITE_OK);
+                                Debug.Assert(rc == SqlResult.SQLITE_OK);
                                 ///
                                 ///<summary>
                                 ///DataSize() cannot fail 
@@ -8633,12 +8634,12 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 if (payloadSize == 0)
                 {
                     Debug.Assert((pDest.flags & MemFlags.MEM_Null) != 0);
-                    return (int)ColumnResult.op_column_out;
+                    return (SqlResult)ColumnResult.op_column_out;
                 }
                 Debug.Assert(db.aLimit[SQLITE_LIMIT_LENGTH] >= 0);
                 if (payloadSize > (u32)db.aLimit[SQLITE_LIMIT_LENGTH])
                 {
-                    return (int)ColumnResult.too_big;
+                    return (SqlResult)ColumnResult.too_big;
                 }
 
 
@@ -8709,7 +8710,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                     if (offsetIntoData > 98307)
                     {
                         rc = sqliteinth.SQLITE_CORRUPT_BKPT();
-                        return (int)ColumnResult.op_column_out;
+                        return (SqlResult)ColumnResult.op_column_out;
                     }
                     ///Compute in len the number of bytes of data we need to read in order
                     ///to get nField type values.  offset is an upper bound on this.  But
@@ -8736,9 +8737,9 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                         sMem.db = null;
                         sMem.flags = 0;
                         rc = vdbemem_cs.sqlite3VdbeMemFromBtree(btCursor, 0, len, vdbeCursor.isIndex, sMem);
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
-                            return (int)ColumnResult.op_column_out;
+                            return (SqlResult)ColumnResult.op_column_out;
                         }
                         zData = sMem.zBLOB;
                     }
@@ -8793,7 +8794,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                     if ((idxHeader > idxEndHeader) || (offsetIntoData > payloadSize) || (idxHeader == idxEndHeader && offsetIntoData != payloadSize))
                     {
                         rc = sqliteinth.SQLITE_CORRUPT_BKPT();
-                        return (int)ColumnResult.op_column_out;
+                        return (SqlResult)ColumnResult.op_column_out;
                     }
                 }
                 ///Get the column information. If aOffset[p2] is non"zero, then
@@ -8803,7 +8804,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///a pointer to a Mem object.
                 if (clumnOffsets[clumnNumber_p2] != 0)
                 {
-                    Debug.Assert(rc == Sqlite3.SQLITE_OK);
+                    Debug.Assert(rc == SqlResult.SQLITE_OK);
                     if (zRecord != null)
                     {
                         pDest.sqlite3VdbeMemReleaseExternal();
@@ -8814,9 +8815,9 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                         len = (int)vdbeaux.sqlite3VdbeSerialTypeLen(columnTypes[clumnNumber_p2]);
                         vdbemem_cs.sqlite3VdbeMemMove(sMem, pDest);
                         rc = vdbemem_cs.sqlite3VdbeMemFromBtree(btCursor, (int)clumnOffsets[clumnNumber_p2], len, vdbeCursor.isIndex, sMem);
-                        if (rc != Sqlite3.SQLITE_OK)
+                        if (rc != SqlResult.SQLITE_OK)
                         {
-                            return (int)ColumnResult.op_column_out;
+                            return (SqlResult)ColumnResult.op_column_out;
                         }
                         zData = sMem.zBLOB;
                         sMem.zBLOB = null;
@@ -8863,7 +8864,8 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 return rc;
             }
 
-            private yDbMask OpCode_ResultRow(int opcodeIndex, int dataOffset, int columnCount, int rc, Mem[] memoryBuffer)
+            //yDbMask 
+            private SqlResult OpCode_ResultRow(int opcodeIndex, int dataOffset, int columnCount, SqlResult rc, Mem[] memoryBuffer)
             {
                 //Mem[] pMem;
                 int i;
@@ -8874,7 +8876,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///not return the number of rows modified. And do not RELEASE the statement
                 ///transaction. It needs to be rolled back.  
                 ///</summary>
-                if (Sqlite3.SQLITE_OK != (rc = this.sqlite3VdbeCheckFk(0)))
+                if (SqlResult.SQLITE_OK != (rc = this.sqlite3VdbeCheckFk(0)))
                 {
                     Debug.Assert((db.flags & SqliteFlags.SQLITE_CountRows) != 0);
                     Debug.Assert(this.usesStmtJournal);
@@ -8900,7 +8902,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///<param name=""></param>
                 Debug.Assert(this.iStatement == 0 || (db.flags & SqliteFlags.SQLITE_CountRows) != 0);
                 rc = this.sqlite3VdbeCloseStatement(sqliteinth.SAVEPOINT_RELEASE);
-                if (NEVER(rc != Sqlite3.SQLITE_OK))
+                if (NEVER(rc != SqlResult.SQLITE_OK))
                 {
                     return rc;
                 }
@@ -8937,7 +8939,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///
                 ///</summary>
                 this.currentOpCodeIndex = opcodeIndex + 1;
-                rc = SQLITE_ROW;
+                rc = SqlResult.SQLITE_ROW;
                 return rc;
             }
 

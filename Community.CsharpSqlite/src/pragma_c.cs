@@ -157,18 +157,18 @@ namespace Community.CsharpSqlite {
 		/// Invalidate temp storage, either when the temp storage is changed
 		/// from default, or when 'file' and the temp_store_directory has changed
 		///</summary>
-		static int invalidateTempStorage(Parse pParse) {
+		static SqlResult invalidateTempStorage(Parse pParse) {
 			sqlite3 db=pParse.db;
 			if(db.aDb[1].pBt!=null) {
 				if(0==db.autoCommit||db.aDb[1].pBt.sqlite3BtreeIsInReadTrans()) {
 					utilc.sqlite3ErrorMsg(pParse,"temporary storage cannot be changed "+"from within a transaction");
-					return Sqlite3.SQLITE_ERROR;
+					return SqlResult.SQLITE_ERROR;
 				}
 				BTreeMethods.sqlite3BtreeClose(ref db.aDb[1].pBt);
 				db.aDb[1].pBt=null;
 				build.sqlite3ResetInternalSchema(db,-1);
 			}
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 		#endif
 		#if !SQLITE_OMIT_PAGER_PRAGMAS
@@ -177,16 +177,16 @@ namespace Community.CsharpSqlite {
 		/// as needing reloading.  This must be done when using the SQLITE_TEMP_STORE
 		/// or DEFAULT_TEMP_STORE pragmas.
 		///</summary>
-		static int changeTempStorage(Parse pParse,string zStorageType) {
+		static SqlResult changeTempStorage(Parse pParse,string zStorageType) {
 			int ts=getTempStore(zStorageType);
 			sqlite3 db=pParse.db;
 			if(db.temp_store==ts)
-				return Sqlite3.SQLITE_OK;
-			if(invalidateTempStorage(pParse)!=Sqlite3.SQLITE_OK) {
-				return Sqlite3.SQLITE_ERROR;
+				return SqlResult.SQLITE_OK;
+			if(invalidateTempStorage(pParse)!=SqlResult.SQLITE_OK) {
+				return SqlResult.SQLITE_ERROR;
 			}
 			db.temp_store=(u8)ts;
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 		#endif
 		///<summary>
@@ -591,7 +591,7 @@ goto pragma_out;
 						///<param name="buffer that the pager module resizes using sqlite3_realloc().">buffer that the pager module resizes using sqlite3_realloc().</param>
 						///<param name=""></param>
 						db.nextPagesize=Converter.sqlite3Atoi(zRight);
-						if(SQLITE_NOMEM==pBt.sqlite3BtreeSetPageSize(db.nextPagesize,-1,0)) {
+						if(SqlResult.SQLITE_NOMEM == pBt.sqlite3BtreeSetPageSize(db.nextPagesize,-1,0)) {
 							////        db.mallocFailed = 1;
 						}
 					}
@@ -859,8 +859,8 @@ goto pragma_out;
 														///<param name="creates the database file. It is important that it is created">creates the database file. It is important that it is created</param>
 														///<param name="as an auto">vacuum capable db.</param>
 														///<param name=""></param>
-														int rc=pBt.sqlite3BtreeSetAutoVacuum(eAuto);
-														if(rc==Sqlite3.SQLITE_OK&&(eAuto==1||eAuto==2)) {
+														var rc=pBt.sqlite3BtreeSetAutoVacuum(eAuto);
+														if(rc==SqlResult.SQLITE_OK&&(eAuto==1||eAuto==2)) {
 															///
 															///<summary>
 															///When setting the auto_vacuum mode to either "full" or
@@ -885,7 +885,7 @@ goto pragma_out;
 																///<summary>
 																///2 
 																///</summary>
-																new VdbeOpList(OpCode.OP_Halt,Sqlite3.SQLITE_OK,(int)OnConstraintError.OE_Abort,0),
+																new VdbeOpList(OpCode.OP_Halt,(int)SqlResult.SQLITE_OK,(int)OnConstraintError.OE_Abort,0),
 																///
 																///<summary>
 																///3 
@@ -1016,10 +1016,10 @@ goto pragma_out;
 																else {
 																	#if !SQLITE_OMIT_WSD
 																	if(zRight.Length>0) {
-																		int rc;
+																		SqlResult rc;
 																		int res=0;
 																		rc=os.sqlite3OsAccess(db.pVfs,zRight,SQLITE_ACCESS_READWRITE,ref res);
-																		if(rc!=Sqlite3.SQLITE_OK||res==0) {
+																		if(rc!=SqlResult.SQLITE_OK||res==0) {
 																			utilc.sqlite3ErrorMsg(pParse,"not a writable directory");
 																			goto pragma_out;
 																		}
@@ -1092,7 +1092,7 @@ else
 res = sqlite3OsFileControl( pFile, SQLITE_SET_LOCKPROXYFILE,
 ref iDummy );
 }
-if ( res != Sqlite3.SQLITE_OK )
+if ( res != SqlResult.SQLITE_OK )
 {
 utilc.sqlite3ErrorMsg( pParse, "failed to set lock proxy file" );
 goto pragma_out;
@@ -1893,7 +1893,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
                                                                   zState = "closed";
                                                                 }
                                                                 else if ( sqlite3_file_control( db, i != 0 ? db.aDb[i].zName : null,
-                                                         SQLITE_FCNTL_LOCKSTATE, ref j ) == Sqlite3.SQLITE_OK )
+                                                         SQLITE_FCNTL_LOCKSTATE, ref j ) == SqlResult.SQLITE_OK )
                                                                 {
                                                                   zState = azLockName[j];
                                                                 }

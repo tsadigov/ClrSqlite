@@ -734,7 +734,7 @@ static int pcache1MemSize(object p){
 		/// The PCache mutex must be held when this function is called.
 		///
 		///</summary>
-		static int pcache1ResizeHash (PCache1 p)
+		static SqlResult pcache1ResizeHash (PCache1 p)
 		{
 			PgHdr1[] apNew;
 			int nNew;
@@ -770,7 +770,7 @@ static int pcache1MemSize(object p){
 				p.apHash = apNew;
 				p.nHash = nNew;
 			}
-			return (p.apHash != null ? Sqlite3.SQLITE_OK : SQLITE_NOMEM);
+			return (p.apHash != null ? SqlResult.SQLITE_OK : SqlResult.SQLITE_NOMEM);
 		}
 
 		///<summary>
@@ -921,7 +921,7 @@ static int pcache1MemSize(object p){
 		/// Implementation of the sqlite3_pcache.xInit method.
 		///
 		///</summary>
-		static int pcache1Init<T> (T NotUsed)
+		static SqlResult pcache1Init<T> (T NotUsed)
 		{
 			Sqlite3.sqliteinth.UNUSED_PARAMETER (NotUsed);
 			Debug.Assert (pcache1.isInit == false);
@@ -933,7 +933,7 @@ static int pcache1MemSize(object p){
 			}
 			pcache1.grp.mxPinned = 10;
 			pcache1.isInit = true;
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 
 		///<summary>

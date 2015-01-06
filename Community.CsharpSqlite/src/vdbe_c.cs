@@ -238,8 +238,8 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		//#define ExpandBlob(P) (((P).flags&MEM.MEM_Zero)?sqlite3VdbeMemExpandBlob(P):0)
-		static int ExpandBlob(Mem P) {
-			return (P.flags&MemFlags.MEM_Zero)!=0?P.sqlite3VdbeMemExpandBlob():0;
+		static SqlResult ExpandBlob(Mem P) {
+			return (P.flags&MemFlags.MEM_Zero)!=0?P.sqlite3VdbeMemExpandBlob():(SqlResult)0;
 		}
 		///<summary>
 		/// Argument pMem points at a register that will be passed to a
@@ -328,7 +328,7 @@ namespace Community.CsharpSqlite {
                 vdbeaux.sqlite3VdbeFreeCursor(p, p.apCsr[iCur]);
 				p.apCsr[iCur]=null;
 			}
-			//if ( Sqlite3.SQLITE_OK == sqlite3VdbeMemGrow( pMem, nByte, 0 ) )
+			//if ( SqlResult.SQLITE_OK == sqlite3VdbeMemGrow( pMem, nByte, 0 ) )
 			{
 				p.apCsr[iCur]=pCx=new VdbeCursor();
 				// (VdbeCursor)pMem.z;
@@ -704,16 +704,16 @@ namespace Community.CsharpSqlite {
     **
     ** If an error occurs, an error message is written to memory obtained
     ** from malloc_cs.sqlite3Malloc() and p.zErrMsg is made to point to that memory.
-    ** The error code is stored in p.rc and this routine returns Sqlite3.SQLITE_ERROR.
+    ** The error code is stored in p.rc and this routine returns SqlResult.SQLITE_ERROR.
     **
     ** If the callback ever returns non-zero, then the program exits
     ** immediately.  There will be no error message but the p.rc field is
-    ** set to SQLITE_ABORT and this routine will return Sqlite3.SQLITE_ERROR.
+    ** set to SQLITE_ABORT and this routine will return SqlResult.SQLITE_ERROR.
     **
     ** A memory allocation error causes p.rc to be set to SQLITE_NOMEM and this
-    ** routine to return Sqlite3.SQLITE_ERROR.
+    ** routine to return SqlResult.SQLITE_ERROR.
     **
-    ** Other fatal errors return Sqlite3.SQLITE_ERROR.
+    ** Other fatal errors return SqlResult.SQLITE_ERROR.
     **
     ** After this routine has finished, sqlite3VdbeFinalize() should be
     ** used to clean up the mess that was left behind.

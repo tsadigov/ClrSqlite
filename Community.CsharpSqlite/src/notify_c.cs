@@ -169,7 +169,7 @@ sqlite3 *db,
 void (*xNotify)(void **, int),
 void *pArg
 ){
-int rc = Sqlite3.SQLITE_OK;
+var rc = SqlResult.SQLITE_OK;
 
 sqlite3_mutex_enter(db->mutex);
 enterMutex();

@@ -43,7 +43,7 @@ namespace Community.CsharpSqlite
             /// cache database pages that are not currently in use.
             ///
             ///</summary>
-            static int sqlite3_release_memory(int n)
+            static SqlResult sqlite3_release_memory(int n)
             {
 #if SQLITE_ENABLE_MEMORY_MANAGEMENT
 																																																												int nRet = 0;
@@ -51,7 +51,7 @@ nRet += sqlite3PcacheReleaseMemory(n-nRet);
 return nRet;
 #else
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(n);
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
 #endif
             }
 
@@ -257,7 +257,7 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
             /// Initialize the memory allocation subsystem.
             ///
             ///</summary>
-            public static int sqlite3MallocInit()
+            public static SqlResult sqlite3MallocInit()
             {
                 if (Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc == null)
                 {
@@ -359,7 +359,7 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
             /// Change the alarm callback
             ///
             ///</summary>
-            static int sqlite3MemoryAlarm(dxalarmCallback xCallback, //void(*xCallback)(object pArg, sqlite3_int64 used,int N),
+            static SqlResult sqlite3MemoryAlarm(dxalarmCallback xCallback, //void(*xCallback)(object pArg, sqlite3_int64 used,int N),
             object pArg, sqlite3_int64 iThreshold)
             {
                 int nUsed;
@@ -370,7 +370,7 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
                 nUsed = sqlite3StatusValue(SQLITE_STATUS_MEMORY_USED);
                 mem0.nearlyFull = (iThreshold > 0 && iThreshold <= nUsed);
                 mem0.mutex.sqlite3_mutex_leave();
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///<summary>
@@ -1199,13 +1199,13 @@ sqlite3DbFree(db, ref p);
             ///<param name="is set to SQLITE_NOMEM.">is set to SQLITE_NOMEM.</param>
             ///<param name=""></param>
 
-            public static int sqlite3ApiExit(int zero, int rc)
+            public static SqlResult sqlite3ApiExit(int zero, SqlResult rc)
             {
                 sqlite3 db = null;
                 return malloc_cs.sqlite3ApiExit(db, rc);
             }
 
-            public static int sqlite3ApiExit(sqlite3 db, int rc)
+            public static SqlResult sqlite3ApiExit(sqlite3 db, SqlResult rc)
             {
                 ///
                 ///<summary>
@@ -1221,13 +1221,13 @@ sqlite3DbFree(db, ref p);
                     ///db != null && db.mallocFailed != 0 || 
                     ///</summary>
 
-                rc == SQLITE_IOERR_NOMEM)
+                rc == SqlResult.SQLITE_IOERR_NOMEM)
                 {
-                    utilc.sqlite3Error(db, SQLITE_NOMEM, "");
+                    utilc.sqlite3Error(db, SqlResult.SQLITE_NOMEM, "");
                     //db.mallocFailed = 0;
-                    rc = SQLITE_NOMEM;
+                    rc = SqlResult.SQLITE_NOMEM;
                 }
-                return rc & (db != null ? db.errMask : 0xff);
+                return rc & (db != null ? db.errMask : (SqlResult)0xff);
             }
         }
     }

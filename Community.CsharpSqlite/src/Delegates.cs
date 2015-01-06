@@ -39,7 +39,7 @@ namespace Community.CsharpSqlite
 
     public delegate void dxCollNeeded(object pCollNeededArg, sqlite3 db, int eTextRep, string collationName);
 
-    public delegate int dxCommitCallback(object pCommitArg);
+    public delegate SqlResult dxCommitCallback(object pCommitArg);
 
     public delegate int dxCompare(object pCompareArg, int size1, string Key1, int size2, string Key2);
 
@@ -52,7 +52,7 @@ namespace Community.CsharpSqlite
 
 
     //Mem Methods
-    public delegate int dxMemInit(object o);
+    public delegate SqlResult dxMemInit(object o);
 
     public delegate void dxMemShutdown(object o);
 
@@ -91,37 +91,37 @@ namespace Community.CsharpSqlite
 
 
     //sqlite3_module
-    public delegate int smdxCreateConnect(sqlite3 db, object pAux, int argc, string[] constargv, out sqlite3_vtab ppVTab, out string pError);
+    public delegate SqlResult smdxCreateConnect(sqlite3 db, object pAux, int argc, string[] constargv, out sqlite3_vtab ppVTab, out string pError);
 
     public delegate int smdxBestIndex(sqlite3_vtab pVTab, ref sqlite3_index_info pIndex);
 
     public delegate int smdxDisconnect(ref object pVTab);
 
-    public delegate int smdxDestroy(ref object pVTab);
+    public delegate SqlResult smdxDestroy(ref object pVTab);
 
-    public delegate int smdxOpen(sqlite3_vtab pVTab, out sqlite3_vtab_cursor ppCursor);
+    public delegate SqlResult smdxOpen(sqlite3_vtab pVTab, out sqlite3_vtab_cursor ppCursor);
 
     public delegate int smdxClose(ref sqlite3_vtab_cursor pCursor);
 
-    public delegate int smdxFilter(sqlite3_vtab_cursor pCursor, int idxNum, string idxStr, int argc, sqlite3_value[] argv);
+    public delegate SqlResult smdxFilter(sqlite3_vtab_cursor pCursor, int idxNum, string idxStr, int argc, sqlite3_value[] argv);
 
-    public delegate int smdxNext(sqlite3_vtab_cursor pCursor);
+    public delegate SqlResult smdxNext(sqlite3_vtab_cursor pCursor);
 
     public delegate int smdxEof(sqlite3_vtab_cursor pCursor);
 
-    public delegate int smdxColumn(sqlite3_vtab_cursor pCursor, sqlite3_context p2, int p3);
+    public delegate SqlResult smdxColumn(sqlite3_vtab_cursor pCursor, sqlite3_context p2, int p3);
 
-    public delegate int smdxRowid(sqlite3_vtab_cursor pCursor, out sqlite3_int64 pRowid);
+    public delegate SqlResult smdxRowid(sqlite3_vtab_cursor pCursor, out sqlite3_int64 pRowid);
 
-    public delegate int smdxUpdate(sqlite3_vtab pVTab, int p1, sqlite3_value[] p2, out sqlite3_int64 p3);
+    public delegate SqlResult smdxUpdate(sqlite3_vtab pVTab, int p1, sqlite3_value[] p2, out sqlite3_int64 p3);
 
-    public delegate int smdxFunction(sqlite3_vtab pVTab);
+    public delegate SqlResult smdxFunction(sqlite3_vtab pVTab);
 
     public delegate int smdxFindFunction(sqlite3_vtab pVtab, int nArg, string zName, ref dxFunc pxFunc, ref object ppArg);
 
-    public delegate int smdxRename(sqlite3_vtab pVtab, string zNew);
+    public delegate SqlResult smdxRename(sqlite3_vtab pVtab, string zNew);
 
-    public delegate int smdxFunctionArg(sqlite3_vtab pVTab, int nArg);
+    public delegate SqlResult smdxFunctionArg(sqlite3_vtab pVTab, int nArg);
 
 
 
@@ -253,7 +253,7 @@ namespace Community.CsharpSqlite
 		//Module
 		public delegate void dxDestroy (ref PgHdr pDestroyArg);
 
-		public delegate int dxStress (object obj, PgHdr pPhHdr);
+		public delegate SqlResult dxStress (object obj, PgHdr pPhHdr);
 
 		
 		//AutoExtention
@@ -328,7 +328,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 		// pcache Methods
-		public delegate int dxPC_Init (object NotUsed);
+		public delegate SqlResult dxPC_Init (object NotUsed);
 
 		public delegate void dxPC_Shutdown (object NotUsed);
 

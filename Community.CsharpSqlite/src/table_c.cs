@@ -97,7 +97,7 @@ p.azResult[p.nData++ -1] = z;
 p.zErrMsg = io.sqlite3_mprintf(
 "sqlite3_get_table() called with two or more incompatible queries"
 );
-p.rc = Sqlite3.SQLITE_ERROR;
+p.rc = SqlResult.SQLITE_ERROR;
 return 1;
 }
 
@@ -155,7 +155,7 @@ res.nRow = 0;
 res.nColumn = 0;
 res.nData = 1;
 res.nAlloc = 20;
-res.rc = Sqlite3.SQLITE_OK;
+res.rc = SqlResult.SQLITE_OK;
 res.azResult = new string[res.nAlloc];// sqlite3_malloc( sizeof( char* ) * res.nAlloc );
 if( res.azResult==null ){
 db.errCode = SQLITE_NOMEM;
@@ -178,7 +178,7 @@ db.errCode = res.rc;  /* Assume 32-bit assignment is atomic */
 return res.rc;
 }
 //malloc_cs.sqlite3_free(ref res.zErrMsg);
-if( rc!=Sqlite3.SQLITE_OK ){
+if( rc!=SqlResult.SQLITE_OK ){
 //malloc_cs.sqlite3_free_table(ref res.azResult[1]);
 return rc;
 }

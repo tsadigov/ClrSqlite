@@ -493,7 +493,7 @@ namespace Community.CsharpSqlite
 int sqlite3_complete16(const void *zSql){
 sqlite3_value pVal;
 char const *zSql8;
-int rc = SQLITE_NOMEM;
+var rc = SQLITE_NOMEM;
 
 #if !SQLITE_OMIT_AUTOINIT
 																			rc = sqlite3_initialize();

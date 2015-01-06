@@ -39,13 +39,13 @@ namespace Community.CsharpSqlite
                     ///the new data into the backup.
                     ///
                     ///</summary>
-                    int rc;
+                    SqlResult rc;
                     Debug.Assert(p.pDestDb != null);
                     p.pDestDb.mutex.sqlite3_mutex_enter();
                     rc = p.backupOnePage(iPage, aData);
                     p.pDestDb.mutex.sqlite3_mutex_leave();
-                    Debug.Assert(rc != Sqlite3.SQLITE_BUSY && rc != Sqlite3.SQLITE_LOCKED);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    Debug.Assert(rc != SqlResult.SQLITE_BUSY && rc != SqlResult.SQLITE_LOCKED);
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         p.rc = rc;
                     }

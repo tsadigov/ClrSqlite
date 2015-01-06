@@ -41,11 +41,11 @@ namespace Community.CsharpSqlite
 			}
 		}
 
-		public static int sqlite3BitvecSet (this Bitvec _this, u32 i)
+		public static SqlResult sqlite3BitvecSet (this Bitvec _this, u32 i)
 		{
 			u32 h;
 			if (_this == null)
-				return Sqlite3.SQLITE_OK;
+				return SqlResult.SQLITE_OK;
 			Debug.Assert (i > 0);
 			Debug.Assert (i <= _this.iSize);
 			i--;
@@ -61,7 +61,7 @@ namespace Community.CsharpSqlite
 			}
 			if (_this.iSize <= Sqlite3.BITVEC_NBIT) {
 				_this.u.aBitmap [i / Sqlite3.BITVEC_SZELEM] |= (byte)(1 << (int)(i & (Sqlite3.BITVEC_SZELEM - 1)));
-				return Sqlite3.SQLITE_OK;
+				return SqlResult.SQLITE_OK;
 			}
 			h = Sqlite3.BITVEC_HASH (i++);
 			///
@@ -99,7 +99,7 @@ namespace Community.CsharpSqlite
 
 			do {
 				if (_this.u.aHash [h] == i)
-					return Sqlite3.SQLITE_OK;
+					return SqlResult.SQLITE_OK;
 				h++;
 				if (h >= Sqlite3.BITVEC_NINT)
 					h = 0;
@@ -123,7 +123,7 @@ namespace Community.CsharpSqlite
 			bitvec_set_rehash:
 			if (_this.nSet >= Sqlite3.BITVEC_MXHASH) {
 				u32 j;
-				int rc;
+				SqlResult rc;
 				u32[] aiValues = new u32[Sqlite3.BITVEC_NINT];
 				// = sqlite3StackAllocRaw(0, sizeof(p->u.aHash));
 				//if ( aiValues == null )
@@ -149,7 +149,7 @@ namespace Community.CsharpSqlite
 			bitvec_set_end:
 			_this.nSet++;
 			_this.u.aHash [h] = i;
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 
 		public static void sqlite3BitvecClear (this Bitvec _this, u32 i, u32[] pBuf)

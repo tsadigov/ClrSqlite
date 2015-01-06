@@ -697,7 +697,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static SelectDest sdDummy = null;
             static bool bDummy = false;
-            public static int sqlite3Select(Sqlite3.Parse pParse,/*The SELECT statement being coded.*/ Select p,/*What to do with the query results */ref SelectDest pDest)
+            public static SqlResult sqlite3Select(Sqlite3.Parse pParse,/*The SELECT statement being coded.*/ Select p,/*What to do with the query results */ref SelectDest pDest)
             {
                 ///Loop counters 
                 int i, j;
@@ -736,7 +736,7 @@ namespace Community.CsharpSqlite
                 int distinct;
 
                 ///Value to return from this function 
-                int rc = 1;
+                var rc = (SqlResult)1;
 
                 ///Address of an OP_OpenEphemeral instruction 
                 int addrSortIndex;
@@ -757,7 +757,7 @@ namespace Community.CsharpSqlite
                 db = pParse.db;
                 if (p == null/*|| db.mallocFailed != 0 */|| pParse.nErr != 0)
                 {
-                    return 1;
+                    return (SqlResult)1;
                 }
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																											if (sqlite3AuthCheck(pParse, SQLITE_SELECT, 0, 0, 0)) return 1;
@@ -1619,7 +1619,7 @@ namespace Community.CsharpSqlite
                 ///Identify column names if results of the SELECT are to be output.
                 ///
                 ///</summary>
-            if (rc == Sqlite3.SQLITE_OK && pDest.eDest == SelectResultType.Output)
+            if (rc == SqlResult.SQLITE_OK && pDest.eDest == SelectResultType.Output)
                 {
                     SelectMethods.generateColumnNames(pParse, pTabList, pEList);
                 }
@@ -1660,7 +1660,7 @@ namespace Community.CsharpSqlite
             /// Notice that because of the way SQLite parses compound SELECTs, the
             /// individual selects always group from left to right.
             ///</summary>
-            static int multiSelect(Sqlite3.Parse pParse,///
+            static SqlResult multiSelect(Sqlite3.Parse pParse,///
                 ///<summary>
                 ///Parsing context 
                 ///</summary>
@@ -1674,7 +1674,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
             )
             {
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
                 ///
                 ///<summary>
                 ///Success code from a subroutine 
@@ -1734,13 +1734,13 @@ namespace Community.CsharpSqlite
                 if (pPrior.pOrderBy != null)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "ORDER BY clause should come after %s not before", SelectMethods.selectOpName(p.TokenOp));
-                    rc = 1;
+                    rc = (SqlResult)1;
                     goto multi_select_end;
                 }
                 if (pPrior.pLimit != null)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "LIMIT clause should come after %s not before", SelectMethods.selectOpName(p.TokenOp));
-                    rc = 1;
+                    rc = (SqlResult)1;
                     goto multi_select_end;
                 }
                 v = pParse.sqlite3GetVdbe();
@@ -1771,7 +1771,7 @@ namespace Community.CsharpSqlite
                 if (p.pEList.nExpr != pPrior.pEList.nExpr)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "SELECTs to the left and right of %s" + " do not have the same number of result columns", SelectMethods.selectOpName(p.TokenOp));
-                    rc = 1;
+                    rc = (SqlResult)1;
                     goto multi_select_end;
                 }
                 ///
@@ -1817,7 +1817,7 @@ namespace Community.CsharpSqlite
                             }
                             SelectMethods.explainSetInteger(ref iSub2, pParse.iNextSelectId);
                             rc = Select.sqlite3Select(pParse, p, ref dest);
-                            sqliteinth.testcase(rc != Sqlite3.SQLITE_OK);
+                            sqliteinth.testcase(rc != SqlResult.SQLITE_OK);
                             pDelete = p.pPrior;
                             p.pPrior = pPrior;
                             p.nSelectRow += pPrior.nSelectRow;
@@ -1936,7 +1936,7 @@ namespace Community.CsharpSqlite
                             uniondest.eDest = op;
                             SelectMethods.explainSetInteger(ref iSub2, pParse.iNextSelectId);
                             rc = Select.sqlite3Select(pParse, p, ref uniondest);
-                            sqliteinth.testcase(rc != Sqlite3.SQLITE_OK);
+                            sqliteinth.testcase(rc != SqlResult.SQLITE_OK);
                             ///
                             ///<summary>
                             ///Query flattening in Select.sqlite3Select() might refill p.pOrderBy.
@@ -2036,7 +2036,7 @@ namespace Community.CsharpSqlite
                             intersectdest.iParm = tab2;
                             SelectMethods.explainSetInteger(ref iSub2, pParse.iNextSelectId);
                             rc = Select.sqlite3Select(pParse, p, ref intersectdest);
-                            sqliteinth.testcase(rc != Sqlite3.SQLITE_OK);
+                            sqliteinth.testcase(rc != SqlResult.SQLITE_OK);
                             p.pPrior = pPrior;
                             if (p.nSelectRow > pPrior.nSelectRow)
                                 p.nSelectRow = pPrior.nSelectRow;

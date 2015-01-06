@@ -117,39 +117,27 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		#if SQLITE_OMIT_GET_TABLE
 		//# define //malloc_cs.sqlite3_free_table    0
 		//# define sqlite3_get_table     0
-		static public int sqlite3_get_table (sqlite3 db, ///
-///<summary>
+		static public SqlResult sqlite3_get_table (sqlite3 db, ///
 ///An open database 
-///</summary>
 
 		string zSql, ///
-///<summary>
 ///SQL to be evaluated 
-///</summary>
 
 		ref string[] pazResult, ///
-///<summary>
 ///Results of the query 
-///</summary>
 
 		ref int pnRow, ///
-///<summary>
 ///Number of result rows written here 
-///</summary>
 
 		ref int pnColumn, ///
-///<summary>
 ///Number of result columns written here 
-///</summary>
 
 		ref string pzErrmsg///
-///<summary>
 ///Error msg written here 
-///</summary>
 
 		)
 		{
-			return 0;
+			return (SqlResult)0;
 		}
 
 		#endif
@@ -433,14 +421,14 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		/// default entry point name (sqlite3_extension_init) is used.  Use
 		/// of the default name is recommended.
 		///
-		/// Return Sqlite3.SQLITE_OK on success and Sqlite3.SQLITE_ERROR if something goes wrong.
+		/// Return SqlResult.SQLITE_OK on success and SqlResult.SQLITE_ERROR if something goes wrong.
 		///
 		/// If an error occurs and pzErrMsg is not 0, then fill pzErrMsg with
 		/// error message text.  The calling function should free this memory
 		/// by calling sqlite3DbFree(db, ).
 		///
 		///</summary>
-		static int sqlite3LoadExtension (sqlite3 db, ///
+		static SqlResult sqlite3LoadExtension (sqlite3 db, ///
 ///<summary>
 ///Load the extension into this database connection 
 ///</summary>
@@ -486,7 +474,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 				//if( pzErrMsg != null){
 				pzErrMsg = io.sqlite3_mprintf ("not authorized");
 				//}
-				return Sqlite3.SQLITE_ERROR;
+				return SqlResult.SQLITE_ERROR;
 			}
 			if (zProc == null || zProc == "") {
 				zProc = "sqlite3_extension_init";
@@ -499,7 +487,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 				//if( zErrmsg !=null){
 				io.sqlite3_snprintf (nMsg, zErrmsg, "unable to open shared library [%s]", zFile);
 				os.sqlite3OsDlError (pVfs, nMsg - 1, zErrmsg.ToString ());
-				return Sqlite3.SQLITE_ERROR;
+				return SqlResult.SQLITE_ERROR;
 			}
 			//xInit = (int()(sqlite3*,char**,const sqlite3_api_routines))
 			//                 sqlite3OsDlSym(pVfs, handle, zProc);
@@ -516,14 +504,14 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			//    }
 			//    sqlite3OsDlClose(pVfs, handle);
 			//  }
-			//  return Sqlite3.SQLITE_ERROR;
+			//  return SqlResult.SQLITE_ERROR;
 			//  }else if( xInit(db, ref zErrmsg, sqlite3Apis) ){
 			////    if( pzErrMsg !=null){
 			//      pzErrMsg = io.sqlite3_mprintf("error during initialization: %s", zErrmsg);
 			//    //}
 			//    sqlite3DbFree(db,ref zErrmsg);
 			//    sqlite3OsDlClose(pVfs, ref handle);
-			//    return Sqlite3.SQLITE_ERROR;
+			//    return SqlResult.SQLITE_ERROR;
 			//  }
 			//  /* Append the new shared library handle to the db.aExtension array. */
 			//  aHandle = sqlite3DbMallocZero(db, sizeof(handle)*db.nExtension+1);
@@ -536,10 +524,10 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			//  sqlite3DbFree(db,ref db.aExtension);
 			//  db.aExtension = aHandle;
 			//  db.aExtension[db.nExtension++] = handle;
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 
-		static public int sqlite3_load_extension (sqlite3 db, ///
+		static public SqlResult sqlite3_load_extension (sqlite3 db, ///
 ///<summary>
 ///Load the extension into this database connection 
 ///</summary>
@@ -561,7 +549,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 
 		)
 		{
-			int rc;
+			SqlResult rc;
 			db.mutex.sqlite3_mutex_enter();
 			rc = sqlite3LoadExtension (db, zFile, zProc, ref pzErrMsg);
 			rc = malloc_cs.sqlite3ApiExit (db, rc);
@@ -592,7 +580,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 ///
 ///</summary>
 
-		static public int sqlite3_enable_load_extension (sqlite3 db, int onoff)
+		static public SqlResult sqlite3_enable_load_extension (sqlite3 db, int onoff)
 		{
 			db.mutex.sqlite3_mutex_enter();
 			if (onoff != 0) {
@@ -603,7 +591,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			}
 			db.mutex.sqlite3_mutex_leave();
             
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 
 		#endif
@@ -677,9 +665,9 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 		/// Register a statically linked extension that is automatically
 		/// loaded by every new database connection.
 		///</summary>
-		static int sqlite3_auto_extension (dxInit xInit)
+		static SqlResult sqlite3_auto_extension (dxInit xInit)
 		{
-			int rc = Sqlite3.SQLITE_OK;
+			var rc = SqlResult.SQLITE_OK;
 			#if !SQLITE_OMIT_AUTOINIT
 			rc = sqlite3_initialize ();
 			if (rc != 0) {
@@ -713,7 +701,7 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 				wsdAutoext.nExt++;
 				//}
 				mutex.sqlite3_mutex_leave();
-				Debug.Assert ((rc & 0xff) == rc);
+				Debug.Assert ((rc & (SqlResult)0xff) == rc);
 				return rc;
 			}
 		}
@@ -725,7 +713,7 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 		static void sqlite3_reset_auto_extension ()
 		{
 			#if !SQLITE_OMIT_AUTOINIT
-			if (sqlite3_initialize () == Sqlite3.SQLITE_OK)
+			if (sqlite3_initialize () == SqlResult.SQLITE_OK)
 			#endif
 			 {
 				#if SQLITE_THREADSAFE
@@ -794,7 +782,7 @@ wsdAutoext.nExt = 0;
 				mutex.sqlite3_mutex_leave();
 				zErrmsg = "";
 				if (xInit != null && xInit (db, ref zErrmsg, (sqlite3_api_routines)sqlite3Apis) != 0) {
-                    utilc.sqlite3Error(db, Sqlite3.SQLITE_ERROR, "automatic extension loading failed: %s", zErrmsg);
+                    utilc.sqlite3Error(db, SqlResult.SQLITE_ERROR, "automatic extension loading failed: %s", zErrmsg);
 					go = false;
 				}
 				db.sqlite3DbFree (ref zErrmsg);

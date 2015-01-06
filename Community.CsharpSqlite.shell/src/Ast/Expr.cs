@@ -778,7 +778,7 @@ set { _op = value; }
         public bool sqlite3ExprIsInteger(ref int pValue)
         {
             
-            int rc = 0;
+            var rc = 0;
             ///
             ///<summary>
             ///</summary>

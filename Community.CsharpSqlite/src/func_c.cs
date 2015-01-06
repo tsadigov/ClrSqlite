@@ -2008,9 +2008,9 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             }
             public static void sqlite3RegisterBuiltinFunctions(sqlite3 db)
             {
-                int rc = sqlite3_overload_function(db, "MATCH", 2);
-                Debug.Assert(rc == SQLITE_NOMEM || rc == Sqlite3.SQLITE_OK);
-                if (rc == SQLITE_NOMEM)
+                var rc = sqlite3_overload_function(db, "MATCH", 2);
+                Debug.Assert(rc == SqlResult.SQLITE_NOMEM || rc == SqlResult.SQLITE_OK);
+                if (rc == SqlResult.SQLITE_NOMEM)
                 {
                     ////        db.mallocFailed = 1;
                 }

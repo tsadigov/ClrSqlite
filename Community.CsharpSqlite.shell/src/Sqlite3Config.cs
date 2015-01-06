@@ -24,10 +24,10 @@ namespace Community.CsharpSqlite
         ///
         ///</summary>
         // Overloads for ap assignments
-        static int sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
+        static SqlResult sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
         {
             //  va_list ap;
-            int rc = Sqlite3.SQLITE_OK;
+            var rc = SqlResult.SQLITE_OK;
             switch (op)
             {
                 case SqliteConfig.PCACHE:
@@ -43,10 +43,10 @@ namespace Community.CsharpSqlite
             }
             return rc;
         }
-        static int sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
+        static SqlResult sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
         {
             //  va_list ap;
-            int rc = Sqlite3.SQLITE_OK;
+            var rc = SqlResult.SQLITE_OK;
             switch (op)
             {
                 case SqliteConfig.GETPCACHE:
@@ -62,10 +62,10 @@ namespace Community.CsharpSqlite
             }
             return rc;
         }
-        static int sqlite3_config(int op, sqlite3_mem_methods ap)
+        static SqlResult sqlite3_config(int op, sqlite3_mem_methods ap)
         {
             //  va_list ap;
-            int rc = Sqlite3.SQLITE_OK;
+            var rc = SqlResult.SQLITE_OK;
             switch ((SqliteConfig)op)
             {
                 case SqliteConfig.MALLOC:
@@ -81,10 +81,10 @@ namespace Community.CsharpSqlite
             }
             return rc;
         }
-        static int sqlite3_config(SqliteConfig op, ref sqlite3_mem_methods ap)
+        static SqlResult sqlite3_config(SqliteConfig op, ref sqlite3_mem_methods ap)
         {
             //  va_list ap;
-            int rc = Sqlite3.SQLITE_OK;
+            var rc = SqlResult.SQLITE_OK;
             switch (op)
             {
                 case SqliteConfig.GETMALLOC:
@@ -250,7 +250,7 @@ namespace Community.CsharpSqlite
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="it is not possible to change the [threading mode] from its default">it is not possible to change the [threading mode] from its default</param>
         ///<param name="value of Single">thread and so [sqlite3_config()] will return </param>
-        ///<param name="[Sqlite3.SQLITE_ERROR] if called with the SQLITE_CONFIG_SINGLETHREAD">[Sqlite3.SQLITE_ERROR] if called with the SQLITE_CONFIG_SINGLETHREAD</param>
+        ///<param name="[SqlResult.SQLITE_ERROR] if called with the SQLITE_CONFIG_SINGLETHREAD">[SqlResult.SQLITE_ERROR] if called with the SQLITE_CONFIG_SINGLETHREAD</param>
         ///<param name="configuration option.</dd>">configuration option.</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_MULTITHREAD]] <dt>SQLITE_CONFIG_MULTITHREAD</dt>">[[SQLITE_CONFIG_MULTITHREAD]] <dt>SQLITE_CONFIG_MULTITHREAD</dt></param>
@@ -264,7 +264,7 @@ namespace Community.CsharpSqlite
         ///<param name="[database connection] at the same time.  ^If SQLite is compiled with">[database connection] at the same time.  ^If SQLite is compiled with</param>
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="it is not possible to set the Multi">thread [threading mode] and</param>
-        ///<param name="[sqlite3_config()] will return [Sqlite3.SQLITE_ERROR] if called with the">[sqlite3_config()] will return [Sqlite3.SQLITE_ERROR] if called with the</param>
+        ///<param name="[sqlite3_config()] will return [SqlResult.SQLITE_ERROR] if called with the">[sqlite3_config()] will return [SqlResult.SQLITE_ERROR] if called with the</param>
         ///<param name="SQLITE_CONFIG_MULTITHREAD configuration option.</dd>">SQLITE_CONFIG_MULTITHREAD configuration option.</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_SERIALIZED]] <dt>SQLITE_CONFIG_SERIALIZED</dt>">[[SQLITE_CONFIG_SERIALIZED]] <dt>SQLITE_CONFIG_SERIALIZED</dt></param>
@@ -280,7 +280,7 @@ namespace Community.CsharpSqlite
         ///<param name="^If SQLite is compiled with">^If SQLite is compiled with</param>
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="it is not possible to set the Serialized [threading mode] and">it is not possible to set the Serialized [threading mode] and</param>
-        ///<param name="[sqlite3_config()] will return [Sqlite3.SQLITE_ERROR] if called with the">[sqlite3_config()] will return [Sqlite3.SQLITE_ERROR] if called with the</param>
+        ///<param name="[sqlite3_config()] will return [SqlResult.SQLITE_ERROR] if called with the">[sqlite3_config()] will return [SqlResult.SQLITE_ERROR] if called with the</param>
         ///<param name="SQLITE_CONFIG_SERIALIZED configuration option.</dd>">SQLITE_CONFIG_SERIALIZED configuration option.</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_MALLOC]] <dt>SQLITE_CONFIG_MALLOC</dt>">[[SQLITE_CONFIG_MALLOC]] <dt>SQLITE_CONFIG_MALLOC</dt></param>
@@ -379,7 +379,7 @@ namespace Community.CsharpSqlite
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="the entire mutexing subsystem is omitted from the build and hence calls to">the entire mutexing subsystem is omitted from the build and hence calls to</param>
         ///<param name="[sqlite3_config()] with the SQLITE_CONFIG_MUTEX configuration option will">[sqlite3_config()] with the SQLITE_CONFIG_MUTEX configuration option will</param>
-        ///<param name="return [Sqlite3.SQLITE_ERROR].</dd>">return [Sqlite3.SQLITE_ERROR].</dd></param>
+        ///<param name="return [SqlResult.SQLITE_ERROR].</dd>">return [SqlResult.SQLITE_ERROR].</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_GETMUTEX]] <dt>SQLITE_CONFIG_GETMUTEX</dt>">[[SQLITE_CONFIG_GETMUTEX]] <dt>SQLITE_CONFIG_GETMUTEX</dt></param>
         ///<param name="<dd> ^(This option takes a single argument which is a pointer to an"><dd> ^(This option takes a single argument which is a pointer to an</param>
@@ -392,7 +392,7 @@ namespace Community.CsharpSqlite
         ///<param name="the [SQLITE_THREADSAFE | SQLITE_THREADSAFE=0] compile">time option then</param>
         ///<param name="the entire mutexing subsystem is omitted from the build and hence calls to">the entire mutexing subsystem is omitted from the build and hence calls to</param>
         ///<param name="[sqlite3_config()] with the SQLITE_CONFIG_GETMUTEX configuration option will">[sqlite3_config()] with the SQLITE_CONFIG_GETMUTEX configuration option will</param>
-        ///<param name="return [Sqlite3.SQLITE_ERROR].</dd>">return [Sqlite3.SQLITE_ERROR].</dd></param>
+        ///<param name="return [SqlResult.SQLITE_ERROR].</dd>">return [SqlResult.SQLITE_ERROR].</dd></param>
         ///<param name=""></param>
         ///<param name="[[SQLITE_CONFIG_LOOKASIDE]] <dt>SQLITE_CONFIG_LOOKASIDE</dt>">[[SQLITE_CONFIG_LOOKASIDE]] <dt>SQLITE_CONFIG_LOOKASIDE</dt></param>
         ///<param name="<dd> ^(This option takes two arguments that determine the default"><dd> ^(This option takes two arguments that determine the default</param>

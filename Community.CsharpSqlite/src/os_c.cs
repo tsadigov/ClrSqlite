@@ -82,9 +82,9 @@ namespace Community.CsharpSqlite
             /// of this would be completely automatic if SQLite were coded using
             /// C++ instead of plain old C.
             ///</summary>
-            public static int sqlite3OsClose(sqlite3_file pId)
+            public static SqlResult sqlite3OsClose(sqlite3_file pId)
             {
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
                 if (pId.pMethods != null)
                 {
                     rc = pId.pMethods.xClose(pId);
@@ -93,7 +93,7 @@ namespace Community.CsharpSqlite
                 return rc;
             }
 
-            public static int sqlite3OsRead(sqlite3_file id, byte[] pBuf, int amt, i64 offset)
+            public static SqlResult  sqlite3OsRead(sqlite3_file id, byte[] pBuf, int amt, i64 offset)
             {
                 DO_OS_MALLOC_TEST(id);
                 if (pBuf == null)
@@ -101,46 +101,46 @@ namespace Community.CsharpSqlite
                 return id.pMethods.xRead(id, pBuf, amt, offset);
             }
 
-            public static int sqlite3OsWrite(sqlite3_file id, byte[] pBuf, int amt, i64 offset)
+            public static SqlResult sqlite3OsWrite(sqlite3_file id, byte[] pBuf, int amt, i64 offset)
             {
                 DO_OS_MALLOC_TEST(id);
                 return id.pMethods.xWrite(id, pBuf, amt, offset);
             }
 
-            public static int sqlite3OsTruncate(sqlite3_file id, i64 size)
+            public static SqlResult sqlite3OsTruncate(sqlite3_file id, i64 size)
             {
                 return id.pMethods.xTruncate(id, size);
             }
 
-            public static int sqlite3OsSync(sqlite3_file id, int flags)
+            public static SqlResult sqlite3OsSync(sqlite3_file id, int flags)
             {
                 DO_OS_MALLOC_TEST(id);
                 return id.pMethods.xSync(id, flags);
             }
 
-            public static int sqlite3OsFileSize(sqlite3_file id, ref long pSize)
+            public static SqlResult sqlite3OsFileSize(sqlite3_file id, ref long pSize)
             {
                 return id.pMethods.xFileSize(id, ref pSize);
             }
 
-            public static int sqlite3OsLock(sqlite3_file id, int lockType)
+            public static SqlResult sqlite3OsLock(sqlite3_file id, int lockType)
             {
                 DO_OS_MALLOC_TEST(id);
                 return id.pMethods.xLock(id, lockType);
             }
 
-            public static int sqlite3OsUnlock(sqlite3_file id, int lockType)
+            public static SqlResult sqlite3OsUnlock(sqlite3_file id, int lockType)
             {
                 return id.pMethods.xUnlock(id, lockType);
             }
 
-            public static int sqlite3OsCheckReservedLock(sqlite3_file id, ref int pResOut)
+            public static SqlResult sqlite3OsCheckReservedLock(sqlite3_file id, ref int pResOut)
             {
                 DO_OS_MALLOC_TEST(id);
                 return id.pMethods.xCheckReservedLock(id, ref pResOut);
             }
 
-            public static int sqlite3OsFileControl(sqlite3_file id, u32 op, ref sqlite3_int64 pArg)
+            public static SqlResult sqlite3OsFileControl(sqlite3_file id, u32 op, ref sqlite3_int64 pArg)
             {
                 return id.pMethods.xFileControl(id, (int)op, ref pArg);
             }
@@ -196,9 +196,9 @@ namespace Community.CsharpSqlite
             /// VFS methods.
             ///
             ///</summary>
-            public static int sqlite3OsOpen(sqlite3_vfs pVfs, string zPath, sqlite3_file pFile, int flags, ref int pFlagsOut)
+            public static SqlResult sqlite3OsOpen(sqlite3_vfs pVfs, string zPath, sqlite3_file pFile, int flags, ref int pFlagsOut)
             {
-                int rc;
+                SqlResult rc;
                 DO_OS_MALLOC_TEST(null);
                 ///
                 ///<summary>
@@ -209,22 +209,22 @@ namespace Community.CsharpSqlite
                 ///</summary>
 
                 rc = pVfs.xOpen(pVfs, zPath, pFile, flags & 0x87f3f, out pFlagsOut);
-                Debug.Assert(rc == Sqlite3.SQLITE_OK || pFile.pMethods == null);
+                Debug.Assert(rc == SqlResult.SQLITE_OK || pFile.pMethods == null);
                 return rc;
             }
 
-            public static int sqlite3OsDelete(sqlite3_vfs pVfs, string zPath, int dirSync)
+            public static SqlResult sqlite3OsDelete(sqlite3_vfs pVfs, string zPath, int dirSync)
             {
                 return pVfs.xDelete(pVfs, zPath, dirSync);
             }
 
-            public static int sqlite3OsAccess(sqlite3_vfs pVfs, string zPath, int flags, ref int pResOut)
+            public static SqlResult sqlite3OsAccess(sqlite3_vfs pVfs, string zPath, int flags, ref int pResOut)
             {
                 DO_OS_MALLOC_TEST(null);
                 return pVfs.xAccess(pVfs, zPath, flags, out pResOut);
             }
 
-            public static int sqlite3OsFullPathname(sqlite3_vfs pVfs, string zPath, int nPathOut, StringBuilder zPathOut)
+            public static SqlResult sqlite3OsFullPathname(sqlite3_vfs pVfs, string zPath, int nPathOut, StringBuilder zPathOut)
             {
                 zPathOut.Length = 0;
                 //zPathOut[0] = 0;
@@ -289,16 +289,16 @@ namespace Community.CsharpSqlite
                 return rc;
             }
 
-            public static int sqlite3OsOpenMalloc(ref sqlite3_vfs pVfs, string zFile, ref sqlite3_file ppFile, int flags, ref int pOutFlags)
+            public static SqlResult sqlite3OsOpenMalloc(ref sqlite3_vfs pVfs, string zFile, ref sqlite3_file ppFile, int flags, ref int pOutFlags)
             {
-                int rc = SQLITE_NOMEM;
+                SqlResult rc = SqlResult.SQLITE_NOMEM;
                 sqlite3_file pFile;
                 pFile = new sqlite3_file();
                 //malloc_cs.sqlite3Malloc(ref pVfs.szOsFile);
                 if (pFile != null)
                 {
                     rc = sqlite3OsOpen(pVfs, zFile, pFile, flags, ref pOutFlags);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         pFile = null;
                         // was  sqlite3DbFree(db,ref  pFile);
@@ -311,9 +311,9 @@ namespace Community.CsharpSqlite
                 return rc;
             }
 
-            public static int sqlite3OsCloseFree(sqlite3_file pFile)
+            public static SqlResult sqlite3OsCloseFree(sqlite3_file pFile)
             {
-                int rc = Sqlite3.SQLITE_OK;
+                SqlResult rc = SqlResult.SQLITE_OK;
                 Debug.Assert(pFile != null);
                 rc = sqlite3OsClose(pFile);
                 //malloc_cs.sqlite3_free( ref pFile );
@@ -329,7 +329,7 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
 
-            static int sqlite3OsInit()
+            static SqlResult sqlite3OsInit()
             {
                 //void *p = sqlite3_malloc(10);
                 //if( p==null ) return SQLITE_NOMEM;
@@ -366,7 +366,7 @@ namespace Community.CsharpSqlite
 																																																									      sqlite3_mutex mutex;
 #endif
 #if !SQLITE_OMIT_AUTOINIT
-                int rc = sqlite3_initialize();
+                SqlResult rc = sqlite3_initialize();
                 if (rc != 0)
                     return null;
 #endif
@@ -427,11 +427,11 @@ namespace Community.CsharpSqlite
             /// true.
             ///
             ///</summary>
-            public static int sqlite3_vfs_register(sqlite3_vfs pVfs, int makeDflt)
+            public static SqlResult sqlite3_vfs_register(sqlite3_vfs pVfs, int makeDflt)
             {
                 sqlite3_mutex mutex;
 #if !SQLITE_OMIT_AUTOINIT
-                int rc = sqlite3_initialize();
+                SqlResult rc = sqlite3_initialize();
                 if (rc != 0)
                     return rc;
 #endif
@@ -450,7 +450,7 @@ namespace Community.CsharpSqlite
                 }
                 Debug.Assert(vfsList != null);
                 mutex.sqlite3_mutex_leave();
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///
@@ -459,7 +459,7 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
 
-            static int sqlite3_vfs_unregister(sqlite3_vfs pVfs)
+            static SqlResult sqlite3_vfs_unregister(sqlite3_vfs pVfs)
             {
 #if SQLITE_THREADSAFE
 																																																									      sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
@@ -467,7 +467,7 @@ namespace Community.CsharpSqlite
                 mutex.sqlite3_mutex_enter();
                 vfsUnlink(pVfs);
                 mutex.sqlite3_mutex_leave();
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
         }
     }

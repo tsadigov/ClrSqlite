@@ -107,7 +107,8 @@ namespace Community.CsharpSqlite {
 		/// then this routine is not threadsafe.
 		///
 		///</summary>
-		static int sqlite3_status(int op,ref int pCurrent,ref int pHighwater,int resetFlag) {
+        static SqlResult sqlite3_status(int op, ref int pCurrent, ref int pHighwater, int resetFlag)
+        {
 			wsdStatInit();
 			if(op<0||op>=Sqlite3.ArraySize(wsdStat.nowValue)) {
 				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
@@ -117,14 +118,14 @@ namespace Community.CsharpSqlite {
 			if(resetFlag!=0) {
 				wsdStat.mxValue[op]=wsdStat.nowValue[op];
 			}
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 		///
 		///<summary>
 		///Query status information for a single database connection
 		///
 		///</summary>
-		static int sqlite3_db_status(sqlite3 db,///
+		static SqlResult sqlite3_db_status(sqlite3 db,///
 		///<summary>
 		///The database connection whose status is desired 
 		///</summary>
@@ -145,7 +146,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		///<param name="Reset high">water mark if true </param>
 		) {
-			int rc=Sqlite3.SQLITE_OK;
+			var rc=SqlResult.SQLITE_OK;
 			///
 			///<summary>
 			///Return code 
@@ -277,7 +278,7 @@ namespace Community.CsharpSqlite {
 				break;
 			}
 			default: {
-				rc=Sqlite3.SQLITE_ERROR;
+				rc=SqlResult.SQLITE_ERROR;
 				break;
 			}
 			}

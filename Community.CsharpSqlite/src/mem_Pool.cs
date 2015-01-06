@@ -365,9 +365,9 @@ namespace Community.CsharpSqlite
                 pPrior = null;
             }
 
-            static int sqlite3MemInit()
+            static SqlResult sqlite3MemInit()
             {
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             static void sqlite3MemShutdown()
@@ -420,7 +420,7 @@ namespace Community.CsharpSqlite
             /// Initialize this module.
             ///
             ///</summary>
-            static int sqlite3MemInit(object NotUsed)
+            static SqlResult sqlite3MemInit(object NotUsed)
             {
                 Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
                 if (!Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat)
@@ -433,7 +433,7 @@ namespace Community.CsharpSqlite
 
                     malloc_cs.mem0.mutex = Sqlite3.sqlite3MutexAlloc(Sqlite3.SQLITE_MUTEX_STATIC_MEM);
                 }
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///<summary>

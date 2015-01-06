@@ -37,8 +37,9 @@ namespace Community.CsharpSqlite {
 		/// Finalize a prepared statement.  If there was an error, store the
 		/// text of the error message in *pzErrMsg.  Return the result code.
 		///</summary>
-		static int vacuumFinalize(sqlite3 db,sqlite3_stmt pStmt,string pzErrMsg) {
-			int rc;
+        static SqlResult vacuumFinalize(sqlite3 db, sqlite3_stmt pStmt, string pzErrMsg)
+        {
+            SqlResult rc;
             rc = vdbeaux.sqlite3VdbeFinalize(ref pStmt);
 			if(rc!=0) {
 				malloc_cs.sqlite3SetString(ref pzErrMsg,db,sqlite3_errmsg(db));
@@ -48,16 +49,16 @@ namespace Community.CsharpSqlite {
 		///<summary>
 		/// Execute zSql on database db. Return an error code.
 		///</summary>
-		static int execSql(sqlite3 db,string pzErrMsg,string zSql) {
+		static SqlResult execSql(sqlite3 db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
 			#if !NDEBUG
 																																																																		      int rc;
       //VVA_ONLY( int rc; )
 #endif
 			if(zSql==null) {
-				return SQLITE_NOMEM;
+                return SqlResult.SQLITE_NOMEM;
 			}
-			if(Sqlite3.SQLITE_OK!=sqlite3_prepare(db,zSql,-1,ref pStmt,0)) {
+			if(SqlResult.SQLITE_OK!=sqlite3_prepare(db,zSql,-1,ref pStmt,0)) {
 				malloc_cs.sqlite3SetString(ref pzErrMsg,db,sqlite3_errmsg(db));
 				return sqlite3_errcode(db);
 			}
@@ -75,16 +76,16 @@ namespace Community.CsharpSqlite {
 		/// one column. Execute this as SQL on the same database.
 		///
 		///</summary>
-		static int execExecSql(sqlite3 db,string pzErrMsg,string zSql) {
+		static SqlResult execExecSql(sqlite3 db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
-			int rc;
+            SqlResult rc;
 			rc=sqlite3_prepare(db,zSql,-1,ref pStmt,0);
-			if(rc!=Sqlite3.SQLITE_OK)
+			if(rc!=SqlResult.SQLITE_OK)
 				return rc;
             while (SqlResult.SQLITE_ROW == vdbeapi.sqlite3_step(pStmt))
             {
 				rc=execSql(db,pzErrMsg,vdbeapi.sqlite3_column_text(pStmt,0));
-				if(rc!=Sqlite3.SQLITE_OK) {
+				if(rc!=SqlResult.SQLITE_OK) {
 					vacuumFinalize(db,pStmt,pzErrMsg);
 					return rc;
 				}
@@ -114,8 +115,9 @@ namespace Community.CsharpSqlite {
 		///This routine implements the  OpCode.OP_Vacuum opcode of the VDBE.
 		///
 		///</summary>
-		static int sqlite3RunVacuum(ref string pzErrMsg,sqlite3 db) {
-			int rc=Sqlite3.SQLITE_OK;
+        static SqlResult sqlite3RunVacuum(ref string pzErrMsg, sqlite3 db)
+        {
+			var rc=SqlResult.SQLITE_OK;
 			///
 			///<summary>
 			///Return code from service routines 
@@ -174,11 +176,11 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			if(0==db.autoCommit) {
 				malloc_cs.sqlite3SetString(ref pzErrMsg,db,"cannot VACUUM from within a transaction");
-				return Sqlite3.SQLITE_ERROR;
+				return SqlResult.SQLITE_ERROR;
 			}
 			if(db.activeVdbeCnt>1) {
 				malloc_cs.sqlite3SetString(ref pzErrMsg,db,"cannot VACUUM - SQL statements in progress");
-				return Sqlite3.SQLITE_ERROR;
+				return SqlResult.SQLITE_ERROR;
 			}
 			///
 			///<summary>
@@ -224,7 +226,7 @@ namespace Community.CsharpSqlite {
 				pDb=db.aDb[db.nDb-1];
 				Debug.Assert(pDb.zName=="vacuum_db");
 			}
-			if(rc!=Sqlite3.SQLITE_OK)
+			if(rc!=SqlResult.SQLITE_OK)
 				goto end_of_vacuum;
 			pDb=db.aDb[db.nDb-1];
 			Debug.Assert(db.aDb[db.nDb-1].zName=="vacuum_db");
@@ -262,11 +264,11 @@ namespace Community.CsharpSqlite {
 			}
 			if(pTemp.sqlite3BtreeSetPageSize(pMain.GetPageSize(),nRes,0)!=0||(!isMemDb&&pTemp.sqlite3BtreeSetPageSize(db.nextPagesize,nRes,0)!=0)//|| NEVER( db.mallocFailed != 0 )
 			) {
-				rc=SQLITE_NOMEM;
+                rc = SqlResult.SQLITE_NOMEM;
 				goto end_of_vacuum;
 			}
 			rc=execSql(db,pzErrMsg,"PRAGMA vacuum_db.synchronous=OFF");
-			if(rc!=Sqlite3.SQLITE_OK) {
+			if(rc!=SqlResult.SQLITE_OK) {
 				goto end_of_vacuum;
 			}
 			#if !SQLITE_OMIT_AUTOVACUUM
@@ -277,7 +279,7 @@ namespace Community.CsharpSqlite {
 			///Begin a transaction 
 			///</summary>
 			rc=execSql(db,pzErrMsg,"BEGIN EXCLUSIVE;");
-			if(rc!=Sqlite3.SQLITE_OK)
+			if(rc!=SqlResult.SQLITE_OK)
 				goto end_of_vacuum;
 			///
 			///<summary>
@@ -286,13 +288,13 @@ namespace Community.CsharpSqlite {
 			///
 			///</summary>
 			rc=execExecSql(db,pzErrMsg,"SELECT 'CREATE TABLE vacuum_db.' || substr(sql,14) "+"  FROM sqlite_master WHERE type='table' AND name!='sqlite_sequence'"+"   AND rootpage>0");
-			if(rc!=Sqlite3.SQLITE_OK)
+			if(rc!=SqlResult.SQLITE_OK)
 				goto end_of_vacuum;
 			rc=execExecSql(db,pzErrMsg,"SELECT 'CREATE INDEX vacuum_db.' || substr(sql,14)"+"  FROM sqlite_master WHERE sql LIKE 'CREATE INDEX %' ");
-			if(rc!=Sqlite3.SQLITE_OK)
+			if(rc!=SqlResult.SQLITE_OK)
 				goto end_of_vacuum;
 			rc=execExecSql(db,pzErrMsg,"SELECT 'CREATE UNIQUE INDEX vacuum_db.' || substr(sql,21) "+"  FROM sqlite_master WHERE sql LIKE 'CREATE UNIQUE INDEX %'");
-			if(rc!=Sqlite3.SQLITE_OK)
+			if(rc!=SqlResult.SQLITE_OK)
 				goto end_of_vacuum;
 			///
 			///<summary>
@@ -302,7 +304,7 @@ namespace Community.CsharpSqlite {
 			///
 			///</summary>
 			rc=execExecSql(db,pzErrMsg,"SELECT 'INSERT INTO vacuum_db.' || quote(name) "+"|| ' SELECT * FROM main.' || quote(name) || ';'"+"FROM main.sqlite_master "+"WHERE type = 'table' AND name!='sqlite_sequence' "+"  AND rootpage>0");
-			if(rc!=Sqlite3.SQLITE_OK)
+			if(rc!=SqlResult.SQLITE_OK)
 				goto end_of_vacuum;
 			///
 			///<summary>
@@ -310,10 +312,10 @@ namespace Community.CsharpSqlite {
 			///
 			///</summary>
 			rc=execExecSql(db,pzErrMsg,"SELECT 'DELETE FROM vacuum_db.' || quote(name) || ';' "+"FROM vacuum_db.sqlite_master WHERE name='sqlite_sequence' ");
-			if(rc!=Sqlite3.SQLITE_OK)
+			if(rc!=SqlResult.SQLITE_OK)
 				goto end_of_vacuum;
 			rc=execExecSql(db,pzErrMsg,"SELECT 'INSERT INTO vacuum_db.' || quote(name) "+"|| ' SELECT * FROM main.' || quote(name) || ';' "+"FROM vacuum_db.sqlite_master WHERE name=='sqlite_sequence';");
-			if(rc!=Sqlite3.SQLITE_OK)
+			if(rc!=SqlResult.SQLITE_OK)
 				goto end_of_vacuum;
 			///
 			///<summary>
@@ -389,14 +391,14 @@ namespace Community.CsharpSqlite {
 					///</summary>
 					meta=pMain.sqlite3BtreeGetMeta(aCopy[i]);
 					rc=pTemp.sqlite3BtreeUpdateMeta(aCopy[i],(u32)(meta+aCopy[i+1]));
-					if(NEVER(rc!=Sqlite3.SQLITE_OK))
+					if(NEVER(rc!=SqlResult.SQLITE_OK))
 						goto end_of_vacuum;
 				}
 				rc=pMain.sqlite3BtreeCopyFile(pTemp);
-				if(rc!=Sqlite3.SQLITE_OK)
+				if(rc!=SqlResult.SQLITE_OK)
 					goto end_of_vacuum;
 				rc=pTemp.sqlite3BtreeCommit();
-				if(rc!=Sqlite3.SQLITE_OK)
+				if(rc!=SqlResult.SQLITE_OK)
 					goto end_of_vacuum;
 				#if !SQLITE_OMIT_AUTOVACUUM
 				pMain.sqlite3BtreeSetAutoVacuum(pTemp.GetAutoVacuum());
@@ -421,7 +423,7 @@ namespace Community.CsharpSqlite {
 				///<param name="This both clears the schemas and reduces the size of the db">>aDb[]</param>
 				///<param name="array. ">array. </param>
 			}
-			Debug.Assert(rc==Sqlite3.SQLITE_OK);
+			Debug.Assert(rc==SqlResult.SQLITE_OK);
 			rc=pMain.sqlite3BtreeSetPageSize(pTemp.GetPageSize(),nRes,1);
 			end_of_vacuum:
 			db.flags=saved_flags;

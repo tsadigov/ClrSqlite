@@ -85,9 +85,9 @@ return ( p == null || p.expired ) ? 1 : 0;
             /// sqlite3_errcode(), sqlite3_errmsg() and sqlite3_errmsg16().
             ///
             ///</summary>
-            public static int sqlite3_finalize(sqlite3_stmt pStmt)
+            public static SqlResult sqlite3_finalize(sqlite3_stmt pStmt)
             {
-                int rc;
+                SqlResult rc;
                 if (pStmt == null)
                 {
                     ///
@@ -96,7 +96,7 @@ return ( p == null || p.expired ) ? 1 : 0;
                     ///<param name="IMPLEMENTATION">12904 Invoking sqlite3_finalize() on a NULL</param>
                     ///<param name="pointer is a harmless no">op. </param>
 
-                    rc = Sqlite3.SQLITE_OK;
+                    rc = SqlResult.SQLITE_OK;
                 }
                 else
                 {
@@ -127,12 +127,12 @@ return ( p == null || p.expired ) ? 1 : 0;
             /// sqlite3_errcode(), sqlite3_errmsg() and sqlite3_errmsg16().
             ///
             ///</summary>
-            public static int sqlite3_reset(sqlite3_stmt pStmt)
+            public static SqlResult sqlite3_reset(sqlite3_stmt pStmt)
             {
-                int rc;
+                SqlResult rc;
                 if (pStmt == null)
                 {
-                    rc = Sqlite3.SQLITE_OK;
+                    rc = SqlResult.SQLITE_OK;
                 }
                 else
                 {
@@ -151,10 +151,10 @@ return ( p == null || p.expired ) ? 1 : 0;
             /// Set all the parameters in the compiled SQL statement to NULL.
             ///
             ///</summary>
-            public static int sqlite3_clear_bindings(sqlite3_stmt pStmt)
+            public static SqlResult sqlite3_clear_bindings(sqlite3_stmt pStmt)
             {
                 int i;
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
                 Vdbe p = (Vdbe)pStmt;
 #if SQLITE_THREADSAFE
 																																																																					      sqlite3_mutex mutex = ( (Vdbe)pStmt ).db.mutex;
@@ -257,7 +257,7 @@ return sqlite3ValueText(pVal, SqliteEncoding.UTF16LE);
 #if !SQLITE_OMIT_UTF16
 																																														//void sqlite3_result_error16(sqlite3_context pCtx, string z, int n){
 //  Debug.Assert( Sqlite3.pCtx.s.db.mutex.sqlite3_mutex_held() );
-//  pCtx.isError = Sqlite3.SQLITE_ERROR;
+//  pCtx.isError = SqlResult.SQLITE_ERROR;
 //  sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16NATIVE, SQLITE_TRANSIENT);
 //}
 #endif
@@ -295,16 +295,16 @@ sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16LE, xDel);
             /// invokes callbacks registered with sqlite3_wal_hook() as required.
             ///
             ///</summary>
-            static int doWalCallbacks(sqlite3 db)
+            static SqlResult doWalCallbacks(sqlite3 db)
             {
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
 #if !SQLITE_OMIT_WAL
 																																																																					int i;
 for(i=0; i<db->nDb; i++){
 Btree *pBt = db->aDb[i].pBt;
 if( pBt ){
 int nEntry = sqlite3PagerWalCallback(sqlite3BtreePager(pBt));
-if( db->xWalCallback && nEntry>0 && rc==Sqlite3.SQLITE_OK ){
+if( db->xWalCallback && nEntry>0 && rc==SqlResult.SQLITE_OK ){
 rc = db->xWalCallback(db->pWalArg, db, db->aDb[i].zName, nEntry);
 }
 }
@@ -325,7 +325,7 @@ rc = db->xWalCallback(db->pWalArg, db, db->aDb[i].zName, nEntry);
             ///
             ///</summary>
 
-            static int sqlite3Step(Vdbe p)
+            static SqlResult sqlite3Step(Vdbe p)
             {
                 sqlite3 db;
                 SqlResult rc;
@@ -414,17 +414,17 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 #endif
                 if (rc == SqlResult.SQLITE_DONE)
                 {
-                    Debug.Assert(p.rc == Sqlite3.SQLITE_OK);
+                    Debug.Assert(p.rc == SqlResult.SQLITE_OK);
                     p.rc = doWalCallbacks(db);
-                    if (p.rc != Sqlite3.SQLITE_OK)
+                    if (p.rc != SqlResult.SQLITE_OK)
                     {
                         rc = SqlResult.SQLITE_ERROR;
                     }
                 }
-                db.errCode = (int)rc;
-                if (SQLITE_NOMEM == malloc_cs.sqlite3ApiExit(p.db, p.rc))
+                db.errCode = rc;
+                if (SqlResult.SQLITE_NOMEM == malloc_cs.sqlite3ApiExit(p.db, p.rc))
                 {
-                    p.rc = SQLITE_NOMEM;
+                    p.rc = SqlResult.SQLITE_NOMEM;
                 }
             end_of_step:
                 ///
@@ -452,7 +452,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 
                     rc = db.ErrCode = p.result;
                 }
-                return ((int)rc & db.errMask);
+                return (rc & db.errMask);
             }
 
             ///<summary>
@@ -513,7 +513,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                     sqlite3_reset(pStmt);
                     v.expired = false;
                 }
-                if (rc2 != Sqlite3.SQLITE_OK && Sqlite3.ALWAYS(v.isPrepareV2) && Sqlite3.ALWAYS(db.pErr != null))
+                if (rc2 != SqlResult.SQLITE_OK && Sqlite3.ALWAYS(v.isPrepareV2) && Sqlite3.ALWAYS(db.pErr != null))
                 {
                     ///
                     ///<summary>
@@ -533,7 +533,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                     {
                         v.zErrMsg = zErr;
                         // sqlite3DbStrDup(db, zErr);
-                        v.rc = (int)rc2;
+                        v.rc = (SqlResult)rc2;
                         //else
                         //{
                         //  v.zErrMsg = "";
@@ -541,7 +541,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                         //}
                     }
                 }
-                rc = (SqlResult)malloc_cs.sqlite3ApiExit(db, (int)rc);
+                rc = (SqlResult)malloc_cs.sqlite3ApiExit(db, rc);
                 db.mutex.sqlite3_mutex_leave();
                 return rc;
             }
@@ -795,7 +795,7 @@ return p.pMem.n;
                     if (pVm != null && Sqlite3.ALWAYS(pVm.db != null))
                     {
                         pVm.db.mutex.sqlite3_mutex_enter();
-                        utilc.sqlite3Error(pVm.db, SQLITE_RANGE, 0);
+                        utilc.sqlite3Error(pVm.db, SqlResult.SQLITE_RANGE, 0);
                     }
                     pOut = nullMem;
                 }
@@ -827,7 +827,7 @@ return p.pMem.n;
                 ///<summary>
                 ///If malloc() failed during an encoding conversion within an
                 ///sqlite3_column_XXX API, then set the return code of the statement to
-                ///SQLITE_NOMEM. The next call to _step() (if any) will return Sqlite3.SQLITE_ERROR
+                ///SQLITE_NOMEM. The next call to _step() (if any) will return SqlResult.SQLITE_ERROR
                 ///and _finalize() will return NOMEM.
                 ///
                 ///</summary>
@@ -1093,7 +1093,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
             ///<summary>
             /// Unbind the value bound to variable i in virtual machine p. This is the
             /// the same as binding a NULL value to the column. If the "i" parameter is
-            /// out of range, then SQLITE_RANGE is returned. Othewise Sqlite3.SQLITE_OK.
+            /// out of range, then SQLITE_RANGE is returned. Othewise SqlResult.SQLITE_OK.
             ///
             /// A successful evaluation of this routine acquires the mutex on p.
             /// the mutex is released if any kind of error occurs.
@@ -1102,7 +1102,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
             /// value in any case.
             ///
             ///</summary>
-            public static int vdbeUnbind(Vdbe p, int i)
+            public static SqlResult vdbeUnbind(Vdbe p, int i)
             {
                 Mem pVar;
                 if (p.vdbeSafetyNotNull())
@@ -1112,22 +1112,22 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 p.db.mutex.sqlite3_mutex_enter();
                 if (p.magic != VdbeMagic.VDBE_MAGIC_RUN || p.currentOpCodeIndex >= 0)
                 {
-                    utilc.sqlite3Error(p.db, SQLITE_MISUSE, 0);
+                    utilc.sqlite3Error(p.db, SqlResult.SQLITE_MISUSE, 0);
                     p.db.mutex.sqlite3_mutex_leave();
-                    io.sqlite3_log(SQLITE_MISUSE, "bind on a busy prepared statement: [%s]", p.zSql);
+                    io.sqlite3_log(SqlResult.SQLITE_MISUSE, "bind on a busy prepared statement: [%s]", p.zSql);
                     return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 if (i < 1 || i > p.nVar)
                 {
-                    utilc.sqlite3Error(p.db, SQLITE_RANGE, 0);
+                    utilc.sqlite3Error(p.db, SqlResult.SQLITE_RANGE, 0);
                     p.db.mutex.sqlite3_mutex_leave();
-                    return SQLITE_RANGE;
+                    return SqlResult.SQLITE_RANGE;
                 }
                 i--;
                 pVar = p.aVar[i];
                 pVar.sqlite3VdbeMemRelease();
                 pVar.flags = MemFlags.MEM_Null;
-                utilc.sqlite3Error(p.db, Sqlite3.SQLITE_OK, 0);
+                utilc.sqlite3Error(p.db, SqlResult.SQLITE_OK, 0);
                 ///
                 ///<summary>
                 ///If the bit corresponding to this variable in Vdbe.expmask is set, then 
@@ -1145,14 +1145,14 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 {
                     p.expired = true;
                 }
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
             ///<summary>
             /// Bind a text or BLOB value.
             ///
             ///</summary>
-            static int bindBlob(sqlite3_stmt pStmt, ///
+            static SqlResult bindBlob(sqlite3_stmt pStmt, ///
                 ///<summary>
                 ///The statement to bind against 
                 ///</summary>
@@ -1186,15 +1186,15 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
             {
                 Vdbe p = pStmt;
                 Mem pVar;
-                int rc;
+                SqlResult rc;
                 rc = vdbeUnbind(p, i);
-                if (rc == Sqlite3.SQLITE_OK)
+                if (rc == SqlResult.SQLITE_OK)
                 {
                     if (zData != null)
                     {
                         pVar = p.aVar[i - 1];
                         rc = pVar.sqlite3VdbeMemSetBlob(zData, nData, encoding, xDel);
-                        if (rc == Sqlite3.SQLITE_OK && encoding != 0)
+                        if (rc == SqlResult.SQLITE_OK && encoding != 0)
                         {
                             rc = vdbemem_cs.sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));
                         }
@@ -1210,7 +1210,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
             /// Bind a text value.
             ///
             ///</summary>
-            public static int bindText(sqlite3_stmt pStmt, ///
+            public static SqlResult bindText(sqlite3_stmt pStmt, ///
                 ///<summary>
                 ///The statement to bind against 
                 ///</summary>
@@ -1244,15 +1244,15 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
             {
                 Vdbe p = pStmt;
                 Mem pVar;
-                int rc;
+                SqlResult rc;
                 rc = vdbeUnbind(p, i);
-                if (rc == Sqlite3.SQLITE_OK)
+                if (rc == SqlResult.SQLITE_OK)
                 {
                     if (zData != null)
                     {
                         pVar = p.aVar[i - 1];
                         rc = pVar.sqlite3VdbeMemSetStr(zData, nData, encoding, xDel);
-                        if (rc == Sqlite3.SQLITE_OK && encoding != 0)
+                        if (rc == SqlResult.SQLITE_OK && encoding != 0)
                         {
                             rc = vdbemem_cs.sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));
                         }
@@ -1269,12 +1269,12 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 return rc;
             }
 
-            public static int sqlite3_bind_double(sqlite3_stmt pStmt, int i, double rValue)
+            public static SqlResult sqlite3_bind_double(sqlite3_stmt pStmt, int i, double rValue)
             {
-                int rc;
+                SqlResult rc;
                 Vdbe p = pStmt;
                 rc = vdbeUnbind(p, i);
-                if (rc == Sqlite3.SQLITE_OK)
+                if (rc == SqlResult.SQLITE_OK)
                 {
                     p.aVar[i - 1].sqlite3VdbeMemSetDouble( rValue);
                     p.db.mutex.sqlite3_mutex_leave();
@@ -1282,17 +1282,17 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 return rc;
             }
 
-            public static int sqlite3_bind_int(sqlite3_stmt p, int i, int iValue)
+            public static SqlResult sqlite3_bind_int(sqlite3_stmt p, int i, int iValue)
             {
                 return sqlite3_bind_int64(p, i, (i64)iValue);
             }
 
-            public static int sqlite3_bind_int64(sqlite3_stmt pStmt, int i, sqlite_int64 iValue)
+            public static SqlResult sqlite3_bind_int64(sqlite3_stmt pStmt, int i, sqlite_int64 iValue)
             {
-                int rc;
+                SqlResult rc;
                 Vdbe p = pStmt;
                 rc = vdbeUnbind(p, i);
-                if (rc == Sqlite3.SQLITE_OK)
+                if (rc == SqlResult.SQLITE_OK)
                 {
                     p.aVar[i - 1].sqlite3VdbeMemSetInt64( iValue);
                     p.db.mutex.sqlite3_mutex_leave();
@@ -1300,24 +1300,24 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 return rc;
             }
 
-            public static int sqlite3_bind_null(sqlite3_stmt pStmt, int i)
+            public static SqlResult sqlite3_bind_null(sqlite3_stmt pStmt, int i)
             {
-                int rc;
+                SqlResult rc;
                 Vdbe p = (Vdbe)pStmt;
                 rc = vdbeUnbind(p, i);
-                if (rc == Sqlite3.SQLITE_OK)
+                if (rc == SqlResult.SQLITE_OK)
                 {
                     p.db.mutex.sqlite3_mutex_leave();
                 }
                 return rc;
             }
 
-            public static int sqlite3_bind_text(sqlite3_stmt pStmt, int i, string zData, int nData, dxDel xDel)
+            public static SqlResult sqlite3_bind_text(sqlite3_stmt pStmt, int i, string zData, int nData, dxDel xDel)
             {
                 return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF8);
             }
 
-            public static int sqlite3_bind_blob(sqlite3_stmt pStmt, int i, byte[] zData, int nData, dxDel xDel)
+            public static SqlResult sqlite3_bind_blob(sqlite3_stmt pStmt, int i, byte[] zData, int nData, dxDel xDel)
             {
                 return bindBlob(pStmt, i, zData, nData >= 0 ? nData : zData.Length, xDel, 0);
             }
@@ -1333,9 +1333,9 @@ dxDel xDel
 return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
 }
 #endif
-            public static int sqlite3_bind_value(sqlite3_stmt pStmt, int i, sqlite3_value pValue)
+            public static SqlResult sqlite3_bind_value(sqlite3_stmt pStmt, int i, sqlite3_value pValue)
             {
-                int rc;
+                SqlResult rc;
                 switch (pValue.type)
                 {
                     case FoundationalType.SQLITE_INTEGER:
@@ -1374,12 +1374,12 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                 return rc;
             }
 
-            public static int sqlite3_bind_zeroblob(sqlite3_stmt pStmt, int i, int n)
+            public static SqlResult sqlite3_bind_zeroblob(sqlite3_stmt pStmt, int i, int n)
             {
-                int rc;
+                SqlResult rc;
                 Vdbe p = pStmt;
                 rc = vdbeUnbind(p, i);
-                if (rc == Sqlite3.SQLITE_OK)
+                if (rc == SqlResult.SQLITE_OK)
                 {
                     p.aVar[i - 1].sqlite3VdbeMemSetZeroBlob( n);
                     p.db.mutex.sqlite3_mutex_leave();
@@ -1451,7 +1451,7 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
             /// Transfer all bindings from the first statement over to the second.
             ///
             ///</summary>
-            public static int sqlite3TransferBindings(sqlite3_stmt pFromStmt, sqlite3_stmt pToStmt)
+            public static SqlResult sqlite3TransferBindings(sqlite3_stmt pFromStmt, sqlite3_stmt pToStmt)
             {
                 Vdbe pFrom = (Vdbe)pFromStmt;
                 Vdbe pTo = (Vdbe)pToStmt;
@@ -1464,7 +1464,7 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                     vdbemem_cs.sqlite3VdbeMemMove(pTo.aVar[i], pFrom.aVar[i]);
                 }
                 pTo.db.mutex.sqlite3_mutex_leave();
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
 
 #if !SQLITE_OMIT_DEPRECATED
@@ -1477,8 +1477,8 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
 /// will not bother to check for that condition.
 ///
 /// If the two statements contain a different number of bindings, then
-/// an Sqlite3.SQLITE_ERROR is returned.  Nothing else can go wrong, so otherwise
-/// Sqlite3.SQLITE_OK is returned.
+/// an SqlResult.SQLITE_ERROR is returned.  Nothing else can go wrong, so otherwise
+/// SqlResult.SQLITE_OK is returned.
 ///</summary>
 static int sqlite3_transfer_bindings( sqlite3_stmt pFromStmt, sqlite3_stmt pToStmt )
 {
@@ -1486,7 +1486,7 @@ Vdbe pFrom = (Vdbe)pFromStmt;
 Vdbe pTo = (Vdbe)pToStmt;
 if ( pFrom.nVar != pTo.nVar )
 {
-return Sqlite3.SQLITE_ERROR;
+return SqlResult.SQLITE_ERROR;
 }
 if( pTo.isPrepareV2 && pTo.expmask ){
 pTo.expired = 1;

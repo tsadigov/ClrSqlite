@@ -67,7 +67,7 @@ sqlite3ValueFree(ref pTmp);
 		/// possible.
 		///
 		///</summary>
-		static int synthCollSeq(sqlite3 db,CollSeq pColl) {
+		static SqlResult synthCollSeq(sqlite3 db,CollSeq pColl) {
 			CollSeq pColl2;
 			string z=pColl.zName;
 			int i;
@@ -86,10 +86,10 @@ sqlite3ValueFree(ref pTmp);
 					///<summary>
 					///Do not copy the destructor 
 					///</summary>
-					return Sqlite3.SQLITE_OK;
+					return SqlResult.SQLITE_OK;
 				}
 			}
-			return Sqlite3.SQLITE_ERROR;
+			return SqlResult.SQLITE_ERROR;
 		}
 		///<summary>
 		/// This function is responsible for invoking the collation factory callback
@@ -156,7 +156,7 @@ sqlite3ValueFree(ref pTmp);
 		/// from the main database is substituted, if one is available.
 		///
 		///</summary>
-		static int sqlite3CheckCollSeq(Parse pParse,CollSeq pColl) {
+		static SqlResult sqlite3CheckCollSeq(Parse pParse,CollSeq pColl) {
 			if(pColl!=null) {
 				string zName=pColl.zName;
 				sqlite3 db=pParse.db;
@@ -164,7 +164,7 @@ sqlite3ValueFree(ref pTmp);
 				if(null==p) {
 					utilc.sqlite3ErrorMsg(pParse,"no such collation sequence: %s",zName);
 					pParse.nErr++;
-					return Sqlite3.SQLITE_ERROR;
+					return SqlResult.SQLITE_ERROR;
 				}
 				//
 				//Debug.Assert(p == pColl);
@@ -177,7 +177,7 @@ sqlite3ValueFree(ref pTmp);
 					pColl.xDel=p.xDel;
 				}
 			}
-			return Sqlite3.SQLITE_OK;
+			return SqlResult.SQLITE_OK;
 		}
 		///<summary>
 		/// Locate and return an entry from the db.aCollSeq hash table. If the entry

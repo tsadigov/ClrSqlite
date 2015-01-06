@@ -3,7 +3,41 @@ using System.Diagnostics;
 
 namespace Community.CsharpSqlite
 {
-	
+    //SQLITE_API int sqlite3_vtab_on_conflict(sqlite3 );
+    ///
+    ///<summary>
+    ///CAPI3REF: Conflict resolution modes
+    ///
+    ///These constants are returned by [sqlite3_vtab_on_conflict()] to
+    ///inform a [virtual table] implementation what the [ON CONFLICT] mode
+    ///is for the SQL statement being evaluated.
+    ///
+    ///Note that the [SQLITE_IGNORE] constant is also used as a potential
+    ///return value from the [sqlite3_set_authorizer()] callback and that
+    ///[SQLITE_ABORT] is also a [result code].
+    ///
+    ///</summary>
+    public enum VTabConflictPolicy
+    {
+        //#define SQLITE_ROLLBACK 1
+        SQLITE_ROLLBACK = 1,
+
+        ///
+        ///<summary>
+        SQLITE_IGNORE = 2 ,// Also used by sqlite3_authorizer() callback 
+        ///</summary>
+
+        //#define SQLITE_FAIL     3
+        SQLITE_FAIL = 3,
+
+        ///
+        ///<summary>
+        SQLITE_ABORT = 4,  // Also an error code 
+        ///</summary>
+
+        //#define SQLITE_REPLACE  5
+        SQLITE_REPLACE = 5
+    }
 	public partial class Sqlite3
 	{
 		///
@@ -310,7 +344,7 @@ namespace Community.CsharpSqlite
 ///CAPI3REF: Closing A Database Connection
 ///
 ///^The sqlite3_close() routine is the destructor for the [sqlite3] object.
-///^Calls to sqlite3_close() return Sqlite3.SQLITE_OK if the [sqlite3] object is
+///^Calls to sqlite3_close() return SqlResult.SQLITE_OK if the [sqlite3] object is
 ///successfully destroyed and all associated resources are deallocated.
 ///
 ///Applications must [sqlite3_finalize | finalize] all [prepared statements]
@@ -342,331 +376,44 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 		//typedef int (*sqlite3_callback)(void*,int,char**, char*);
+		
 		///
-///<summary>
-///</summary>
-///<param name="CAPI3REF: One">Step Query Execution Interface</param>
-///<param name=""></param>
-///<param name="The sqlite3_exec() interface is a convenience wrapper around">The sqlite3_exec() interface is a convenience wrapper around</param>
-///<param name="[sqlite3_prepare_v2()], [sqlite3_step()], and [sqlite3_finalize()],">[sqlite3_prepare_v2()], [sqlite3_step()], and [sqlite3_finalize()],</param>
-///<param name="that allows an application to run multiple statements of SQL">that allows an application to run multiple statements of SQL</param>
-///<param name="without having to use a lot of C code. ">without having to use a lot of C code. </param>
-///<param name=""></param>
-///<param name="^The sqlite3_exec() interface runs zero or more UTF">8 encoded,</param>
-///<param name="semicolon">separate SQL statements passed into its 2nd argument,</param>
-///<param name="in the context of the [database connection] passed in as its 1st">in the context of the [database connection] passed in as its 1st</param>
-///<param name="argument.  ^If the callback function of the 3rd argument to">argument.  ^If the callback function of the 3rd argument to</param>
-///<param name="sqlite3_exec() is not NULL, then it is invoked for each result row">sqlite3_exec() is not NULL, then it is invoked for each result row</param>
-///<param name="coming out of the evaluated SQL statements.  ^The 4th argument to">coming out of the evaluated SQL statements.  ^The 4th argument to</param>
-///<param name="sqlite3_exec() is relayed through to the 1st argument of each">sqlite3_exec() is relayed through to the 1st argument of each</param>
-///<param name="callback invocation.  ^If the callback pointer to sqlite3_exec()">callback invocation.  ^If the callback pointer to sqlite3_exec()</param>
-///<param name="is NULL, then no callback is ever invoked and result rows are">is NULL, then no callback is ever invoked and result rows are</param>
-///<param name="ignored.">ignored.</param>
-///<param name=""></param>
-///<param name="^If an error occurs while evaluating the SQL statements passed into">^If an error occurs while evaluating the SQL statements passed into</param>
-///<param name="sqlite3_exec(), then execution of the current statement stops and">sqlite3_exec(), then execution of the current statement stops and</param>
-///<param name="subsequent statements are skipped.  ^If the 5th parameter to sqlite3_exec()">subsequent statements are skipped.  ^If the 5th parameter to sqlite3_exec()</param>
-///<param name="is not NULL then any error message is written into memory obtained">is not NULL then any error message is written into memory obtained</param>
-///<param name="from [sqlite3_malloc()] and passed back through the 5th parameter.">from [sqlite3_malloc()] and passed back through the 5th parameter.</param>
-///<param name="To avoid memory leaks, the application should invoke [malloc_cs.sqlite3_free()]">To avoid memory leaks, the application should invoke [malloc_cs.sqlite3_free()]</param>
-///<param name="on error message strings returned through the 5th parameter of">on error message strings returned through the 5th parameter of</param>
-///<param name="of sqlite3_exec() after the error message string is no longer needed.">of sqlite3_exec() after the error message string is no longer needed.</param>
-///<param name="^If the 5th parameter to sqlite3_exec() is not NULL and no errors">^If the 5th parameter to sqlite3_exec() is not NULL and no errors</param>
-///<param name="occur, then sqlite3_exec() sets the pointer in its 5th parameter to">occur, then sqlite3_exec() sets the pointer in its 5th parameter to</param>
-///<param name="NULL before returning.">NULL before returning.</param>
-///<param name=""></param>
-///<param name="^If an sqlite3_exec() callback returns non">zero, the sqlite3_exec()</param>
-///<param name="routine returns SQLITE_ABORT without invoking the callback again and">routine returns SQLITE_ABORT without invoking the callback again and</param>
-///<param name="without running any subsequent SQL statements.">without running any subsequent SQL statements.</param>
-///<param name=""></param>
-///<param name="^The 2nd argument to the sqlite3_exec() callback function is the">^The 2nd argument to the sqlite3_exec() callback function is the</param>
-///<param name="number of columns in the result.  ^The 3rd argument to the sqlite3_exec()">number of columns in the result.  ^The 3rd argument to the sqlite3_exec()</param>
-///<param name="callback is an array of pointers to strings obtained as if from">callback is an array of pointers to strings obtained as if from</param>
-///<param name="[sqlite3_column_text()], one for each column.  ^If an element of a">[sqlite3_column_text()], one for each column.  ^If an element of a</param>
-///<param name="result row is NULL then the corresponding string pointer for the">result row is NULL then the corresponding string pointer for the</param>
-///<param name="sqlite3_exec() callback is a NULL pointer.  ^The 4th argument to the">sqlite3_exec() callback is a NULL pointer.  ^The 4th argument to the</param>
-///<param name="sqlite3_exec() callback is an array of pointers to strings where each">sqlite3_exec() callback is an array of pointers to strings where each</param>
-///<param name="entry represents the name of corresponding result column as obtained">entry represents the name of corresponding result column as obtained</param>
-///<param name="from [vdbeapi.sqlite3_column_name()].">from [vdbeapi.sqlite3_column_name()].</param>
-///<param name=""></param>
-///<param name="^If the 2nd parameter to sqlite3_exec() is a NULL pointer, a pointer">^If the 2nd parameter to sqlite3_exec() is a NULL pointer, a pointer</param>
-///<param name="to an empty string, or a pointer that contains only whitespace and/or ">to an empty string, or a pointer that contains only whitespace and/or </param>
-///<param name="SQL comments, then no SQL statements are evaluated and the database">SQL comments, then no SQL statements are evaluated and the database</param>
-///<param name="is not changed.">is not changed.</param>
-///<param name=""></param>
-///<param name="Restrictions:">Restrictions:</param>
-///<param name=""></param>
-///<param name="<ul>"><ul></param>
-///<param name="<li> The application must insure that the 1st parameter to sqlite3_exec()"><li> The application must insure that the 1st parameter to sqlite3_exec()</param>
-///<param name="is a valid and open [database connection].">is a valid and open [database connection].</param>
-///<param name="<li> The application must not close [database connection] specified by"><li> The application must not close [database connection] specified by</param>
-///<param name="the 1st parameter to sqlite3_exec() while sqlite3_exec() is running.">the 1st parameter to sqlite3_exec() while sqlite3_exec() is running.</param>
-///<param name="<li> The application must not modify the SQL statement text passed into"><li> The application must not modify the SQL statement text passed into</param>
-///<param name="the 2nd parameter of sqlite3_exec() while sqlite3_exec() is running.">the 2nd parameter of sqlite3_exec() while sqlite3_exec() is running.</param>
-///<param name="</ul>"></ul></param>
-///<param name=""></param>
 
-		//SQLITE_API int sqlite3_exec(
-		//  sqlite3*,                                  /* An open database */
-		//  string sql,                           /* SQL to be evaluated */
-		//  int (*callback)(void*,int,char**,char*),  /* Callback function */
-		//  void *,                                    /* 1st argument to callback */
-		//  char **errmsg                              /* Error msg written here */
-		//);
-		///
-///<summary>
-///CAPI3REF: Result Codes
-///KEYWORDS: Sqlite3.SQLITE_OK {error code} {error codes}
-///KEYWORDS: {result code} {result codes}
-///
-///Many SQLite functions return an integer result code from the set shown
-///here in order to indicates success or failure.
-///
-///New error codes may be added in future versions of SQLite.
-///
-///See also: [SQLITE_IOERR_READ | extended result codes],
-///[sqlite3_vtab_on_conflict()] [SQLITE_ROLLBACK | result codes].
-///
-///</summary>
+        ///
+        ///<summary>
+        ///CAPI3REF: Flags For File Open Operations
+        ///
+        ///These bit values are intended for use in the
+        ///3rd parameter to the [sqlite3_open_v2()] interface and
+        ///in the 4th parameter to the [sqlite3_vfs.xOpen] method.
+        ///
+        ///</summary>
 
-		//#define Sqlite3.SQLITE_OK           0   /* Successful result */
-		///* beginning-of-error-codes */
-		//#define Sqlite3.SQLITE_ERROR        1   /* SQL error or missing database */
-		//#define SQLITE_INTERNAL     2   /* Internal logic error in SQLite */
-		//#define SQLITE_PERM         3   /* Access permission denied */
-		//#define SQLITE_ABORT        4   /* Callback routine requested an abort */
-		//#define SQLITE_BUSY         5   /* The database file is locked */
-		//#define SQLITE_LOCKED       6   /* A table in the database is locked */
-		//#define SQLITE_NOMEM        7   /* A malloc() failed */
-		//#define SQLITE_READONLY     8   /* Attempt to write a readonly database */
-		//#define SQLITE_INTERRUPT    9   /* Operation terminated by sqlite3_interrupt()*/
-		//#define SQLITE_IOERR       10   /* Some kind of disk I/O error occurred */
-		//#define SQLITE_CORRUPT     11   /* The database disk image is malformed */
-		//#define SQLITE_NOTFOUND    12   /* Unknown opcode in sqlite3_file_control() */
-		//#define SQLITE_FULL        13   /* Insertion failed because database is full */
-		//#define SQLITE_CANTOPEN    14   /* Unable to open the database file */
-		//#define SQLITE_PROTOCOL    15   /* Database lock protocol error */
-		//#define SQLITE_EMPTY       16   /* Database is empty */
-		//#define SQLITE_SCHEMA      17   /* The database schema changed */
-		//#define SQLITE_TOOBIG      18   /* String or BLOB exceeds size limit */
-		//#define SQLITE_CONSTRAINT  19   /* Abort due to constraint violation */
-		//#define SQLITE_MISMATCH    20   /* Data type mismatch */
-		//#define SQLITE_MISUSE      21   /* Library used incorrectly */
-		//#define SQLITE_NOLFS       22   /* Uses OS features not supported on host */
-		//#define SQLITE_AUTH        23   /* Authorization denied */
-		//#define SQLITE_FORMAT      24   /* Auxiliary database format error */
-		//#define SQLITE_RANGE       25   /* 2nd parameter to sqlite3_bind out of range */
-		//#define SQLITE_NOTADB      26   /* File opened that is not a database file */
-		//#define SQLITE_ROW         100  /* sqlite3_step() has another row ready */
-		//#define SQLITE_DONE        101  /* sqlite3_step() has finished executing */
-		///
-///<summary>
-///</summary>
-///<param name="end">codes </param>
+        //#define SQLITE_OPEN_READONLY         0x00000001  /* Ok for sqlite3_open_v2() */
+        //#define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
+        //#define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */
+        //#define SQLITE_OPEN_DELETEONCLOSE    0x00000008  /* VFS only */
+        //#define SQLITE_OPEN_EXCLUSIVE        0x00000010  /* VFS only */
+        //#define SQLITE_OPEN_AUTOPROXY        0x00000020  /* VFS only */
+        //#define SQLITE_OPEN_URI              0x00000040  /* Ok for sqlite3_open_v2() */
+        //#define SQLITE_OPEN_MAIN_DB          0x00000100  /* VFS only */
+        //#define SQLITE_OPEN_TEMP_DB          0x00000200  /* VFS only */
+        //#define SQLITE_OPEN_TRANSIENT_DB     0x00000400  /* VFS only */
+        //#define SQLITE_OPEN_MAIN_JOURNAL     0x00000800  /* VFS only */
+        //#define SQLITE_OPEN_TEMP_JOURNAL     0x00001000  /* VFS only */
+        //#define SQLITE_OPEN_SUBJOURNAL       0x00002000  /* VFS only */
+        //#define SQLITE_OPEN_MASTER_JOURNAL   0x00004000  /* VFS only */
+        //#define SQLITE_OPEN_NOMUTEX          0x00008000  /* Ok for sqlite3_open_v2() */
+        //#define SQLITE_OPEN_FULLMUTEX        0x00010000  /* Ok for sqlite3_open_v2() */
+        //#define SQLITE_OPEN_SHAREDCACHE      0x00020000  /* Ok for sqlite3_open_v2() */
+        //#define SQLITE_OPEN_PRIVATECACHE     0x00040000  /* Ok for sqlite3_open_v2() */
+        //#define SQLITE_OPEN_WAL              0x00080000  /* VFS only */
+        ///
+        ///<summary>
+        ///Reserved:                           0x00F00000 
+        ///</summary>
 
-		public const int SQLITE_OK = 0;
-
-		public const int SQLITE_ERROR = 1;
-
-		public const int SQLITE_INTERNAL = 2;
-
-		public const int SQLITE_PERM = 3;
-
-		public const int SQLITE_ABORT = 4;
-
-		public const int SQLITE_BUSY = 5;
-
-		public const int SQLITE_LOCKED = 6;
-
-		public const int SQLITE_NOMEM = 7;
-
-		public const int SQLITE_READONLY = 8;
-
-		public const int SQLITE_INTERRUPT = 9;
-
-		public const int SQLITE_IOERR = 10;
-
-		public const int SQLITE_CORRUPT = 11;
-
-		public const int SQLITE_NOTFOUND = 12;
-
-		public const int SQLITE_FULL = 13;
-
-		public const int SQLITE_CANTOPEN = 14;
-
-		public const int SQLITE_PROTOCOL = 15;
-
-		public const int SQLITE_EMPTY = 16;
-
-		public const int SQLITE_SCHEMA = 17;
-
-		public const int SQLITE_TOOBIG = 18;
-
-		public const int SQLITE_CONSTRAINT = 19;
-
-		public const int SQLITE_MISMATCH = 20;
-
-		public const int SQLITE_MISUSE = 21;
-
-		public const int SQLITE_NOLFS = 22;
-
-		public const int SQLITE_AUTH = 23;
-
-		public const int SQLITE_FORMAT = 24;
-
-		public const int SQLITE_RANGE = 25;
-
-		public const int SQLITE_NOTADB = 26;
-
-		public const int SQLITE_ROW = 100;
-
-		public const int SQLITE_DONE = 101;
-
-		///
-///<summary>
-///CAPI3REF: Extended Result Codes
-///KEYWORDS: {extended error code} {extended error codes}
-///KEYWORDS: {extended result code} {extended result codes}
-///
-///In its default configuration, SQLite API routines return one of 26 integer
-///[Sqlite3.SQLITE_OK | result codes].  However, experience has shown that many of
-///</summary>
-///<param name="these result codes are too coarse">grained.  They do not provide as</param>
-///<param name="much information about problems as programmers might like.  In an effort to">much information about problems as programmers might like.  In an effort to</param>
-///<param name="address this, newer versions of SQLite (version 3.3.8 and later) include">address this, newer versions of SQLite (version 3.3.8 and later) include</param>
-///<param name="support for additional result codes that provide more detailed information">support for additional result codes that provide more detailed information</param>
-///<param name="about errors. The extended result codes are enabled or disabled">about errors. The extended result codes are enabled or disabled</param>
-///<param name="on a per database connection basis using the">on a per database connection basis using the</param>
-///<param name="[sqlite3_extended_result_codes()] API.">[sqlite3_extended_result_codes()] API.</param>
-///<param name=""></param>
-///<param name="Some of the available extended result codes are listed here.">Some of the available extended result codes are listed here.</param>
-///<param name="One may expect the number of extended result codes will be expand">One may expect the number of extended result codes will be expand</param>
-///<param name="over time.  Software that uses extended result codes should expect">over time.  Software that uses extended result codes should expect</param>
-///<param name="to see new result codes in future releases of SQLite.">to see new result codes in future releases of SQLite.</param>
-///<param name=""></param>
-///<param name="The Sqlite3.SQLITE_OK result code will never be extended.  It will always">The Sqlite3.SQLITE_OK result code will never be extended.  It will always</param>
-///<param name="be exactly zero.">be exactly zero.</param>
-///<param name=""></param>
-
-		//#define SQLITE_IOERR_READ              (SQLITE_IOERR | (1<<8))
-		//#define SQLITE_IOERR_SHORT_READ        (SQLITE_IOERR | (2<<8))
-		//#define SQLITE_IOERR_WRITE             (SQLITE_IOERR | (3<<8))
-		//#define SQLITE_IOERR_FSYNC             (SQLITE_IOERR | (4<<8))
-		//#define SQLITE_IOERR_DIR_FSYNC         (SQLITE_IOERR | (5<<8))
-		//#define SQLITE_IOERR_TRUNCATE          (SQLITE_IOERR | (6<<8))
-		//#define SQLITE_IOERR_FSTAT             (SQLITE_IOERR | (7<<8))
-		//#define SQLITE_IOERR_UNLOCK            (SQLITE_IOERR | (8<<8))
-		//#define SQLITE_IOERR_RDLOCK            (SQLITE_IOERR | (9<<8))
-		//#define SQLITE_IOERR_DELETE            (SQLITE_IOERR | (10<<8))
-		//#define SQLITE_IOERR_BLOCKED           (SQLITE_IOERR | (11<<8))
-		//#define SQLITE_IOERR_NOMEM             (SQLITE_IOERR | (12<<8))
-		//#define SQLITE_IOERR_ACCESS            (SQLITE_IOERR | (13<<8))
-		//#define SQLITE_IOERR_CHECKRESERVEDLOCK (SQLITE_IOERR | (14<<8))
-		//#define SQLITE_IOERR_LOCK              (SQLITE_IOERR | (15<<8))
-		//#define SQLITE_IOERR_CLOSE             (SQLITE_IOERR | (16<<8))
-		//#define SQLITE_IOERR_DIR_CLOSE         (SQLITE_IOERR | (17<<8))
-		//#define SQLITE_IOERR_SHMOPEN           (SQLITE_IOERR | (18<<8))
-		//#define SQLITE_IOERR_SHMSIZE           (SQLITE_IOERR | (19<<8))
-		//#define SQLITE_IOERR_SHMLOCK           (SQLITE_IOERR | (20<<8))
-		//#define SQLITE_IOERR_SHMMAP            (SQLITE_IOERR | (21<<8))
-		//#define SQLITE_IOERR_SEEK              (SQLITE_IOERR | (22<<8))
-		//#define SQLITE_LOCKED_SHAREDCACHE      (SQLITE_LOCKED |  (1<<8))
-		//#define SQLITE_BUSY_RECOVERY           (SQLITE_BUSY   |  (1<<8))
-		//#define SQLITE_CANTOPEN_NOTEMPDIR      (SQLITE_CANTOPEN | (1<<8))
-		//#define SQLITE_CORRUPT_VTAB            (SQLITE_CORRUPT | (1<<8))
-		//#define SQLITE_READONLY_RECOVERY       (SQLITE_READONLY | (1<<8))
-		//#define SQLITE_READONLY_CANTLOCK       (SQLITE_READONLY | (2<<8))
-		public const int SQLITE_IOERR_READ = (SQLITE_IOERR | (1 << 8));
-
-		public const int SQLITE_IOERR_SHORT_READ = (SQLITE_IOERR | (2 << 8));
-
-		public const int SQLITE_IOERR_WRITE = (SQLITE_IOERR | (3 << 8));
-
-		public const int SQLITE_IOERR_FSYNC = (SQLITE_IOERR | (4 << 8));
-
-		public const int SQLITE_IOERR_DIR_FSYNC = (SQLITE_IOERR | (5 << 8));
-
-		public const int SQLITE_IOERR_TRUNCATE = (SQLITE_IOERR | (6 << 8));
-
-		public const int SQLITE_IOERR_FSTAT = (SQLITE_IOERR | (7 << 8));
-
-		public const int SQLITE_IOERR_UNLOCK = (SQLITE_IOERR | (8 << 8));
-
-		public const int SQLITE_IOERR_RDLOCK = (SQLITE_IOERR | (9 << 8));
-
-		public const int SQLITE_IOERR_DELETE = (SQLITE_IOERR | (10 << 8));
-
-		public const int SQLITE_IOERR_BLOCKED = (SQLITE_IOERR | (11 << 8));
-
-		public const int SQLITE_IOERR_NOMEM = (SQLITE_IOERR | (12 << 8));
-
-		public const int SQLITE_IOERR_ACCESS = (SQLITE_IOERR | (13 << 8));
-
-		public const int SQLITE_IOERR_CHECKRESERVEDLOCK = (SQLITE_IOERR | (14 << 8));
-
-		public const int SQLITE_IOERR_LOCK = (SQLITE_IOERR | (15 << 8));
-
-		public const int SQLITE_IOERR_CLOSE = (SQLITE_IOERR | (16 << 8));
-
-		public const int SQLITE_IOERR_DIR_CLOSE = (SQLITE_IOERR | (17 << 8));
-
-		public const int SQLITE_IOERR_SHMOPEN = (SQLITE_IOERR | (18 << 8));
-
-		public const int SQLITE_IOERR_SHMSIZE = (SQLITE_IOERR | (19 << 8));
-
-		public const int SQLITE_IOERR_SHMLOCK = (SQLITE_IOERR | (20 << 8));
-
-		public const int SQLITE_IOERR_SHMMAP = (SQLITE_IOERR | (21 << 8));
-
-		public const int SQLITE_IOERR_SEEK = (SQLITE_IOERR | (22 << 8));
-
-		public const int SQLITE_LOCKED_SHAREDCACHE = (SQLITE_LOCKED | (1 << 8));
-
-		public const int SQLITE_BUSY_RECOVERY = (SQLITE_BUSY | (1 << 8));
-
-		public const int SQLITE_CANTOPEN_NOTEMPDIR = (SQLITE_CANTOPEN | (1 << 8));
-
-		public const int SQLITE_CORRUPT_VTAB = (SQLITE_CORRUPT | (1 << 8));
-
-		public const int SQLITE_READONLY_RECOVERY = (SQLITE_READONLY | (1 << 8));
-
-		public const int SQLITE_READONLY_CANTLOCK = (SQLITE_READONLY | (2 << 8));
-
-		///
-///<summary>
-///CAPI3REF: Flags For File Open Operations
-///
-///These bit values are intended for use in the
-///3rd parameter to the [sqlite3_open_v2()] interface and
-///in the 4th parameter to the [sqlite3_vfs.xOpen] method.
-///
-///</summary>
-
-		//#define SQLITE_OPEN_READONLY         0x00000001  /* Ok for sqlite3_open_v2() */
-		//#define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
-		//#define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */
-		//#define SQLITE_OPEN_DELETEONCLOSE    0x00000008  /* VFS only */
-		//#define SQLITE_OPEN_EXCLUSIVE        0x00000010  /* VFS only */
-		//#define SQLITE_OPEN_AUTOPROXY        0x00000020  /* VFS only */
-		//#define SQLITE_OPEN_URI              0x00000040  /* Ok for sqlite3_open_v2() */
-		//#define SQLITE_OPEN_MAIN_DB          0x00000100  /* VFS only */
-		//#define SQLITE_OPEN_TEMP_DB          0x00000200  /* VFS only */
-		//#define SQLITE_OPEN_TRANSIENT_DB     0x00000400  /* VFS only */
-		//#define SQLITE_OPEN_MAIN_JOURNAL     0x00000800  /* VFS only */
-		//#define SQLITE_OPEN_TEMP_JOURNAL     0x00001000  /* VFS only */
-		//#define SQLITE_OPEN_SUBJOURNAL       0x00002000  /* VFS only */
-		//#define SQLITE_OPEN_MASTER_JOURNAL   0x00004000  /* VFS only */
-		//#define SQLITE_OPEN_NOMUTEX          0x00008000  /* Ok for sqlite3_open_v2() */
-		//#define SQLITE_OPEN_FULLMUTEX        0x00010000  /* Ok for sqlite3_open_v2() */
-		//#define SQLITE_OPEN_SHAREDCACHE      0x00020000  /* Ok for sqlite3_open_v2() */
-		//#define SQLITE_OPEN_PRIVATECACHE     0x00040000  /* Ok for sqlite3_open_v2() */
-		//#define SQLITE_OPEN_WAL              0x00080000  /* VFS only */
-		///
-///<summary>
-///Reserved:                           0x00F00000 
-///</summary>
-
-		public const int SQLITE_OPEN_READONLY = 0x00000001;
+        public const int SQLITE_OPEN_READONLY = 0x00000001;
 
 		public const int SQLITE_OPEN_READWRITE = 0x00000002;
 
@@ -891,10 +638,10 @@ namespace Community.CsharpSqlite
 ///<param name="sqlite3_os_init().  Similarly, ^sqlite3_shutdown()">sqlite3_os_init().  Similarly, ^sqlite3_shutdown()</param>
 ///<param name="will invoke sqlite3_os_end().">will invoke sqlite3_os_end().</param>
 ///<param name=""></param>
-///<param name="^The sqlite3_initialize() routine returns [Sqlite3.SQLITE_OK] on success.">^The sqlite3_initialize() routine returns [Sqlite3.SQLITE_OK] on success.</param>
+///<param name="^The sqlite3_initialize() routine returns [SqlResult.SQLITE_OK] on success.">^The sqlite3_initialize() routine returns [SqlResult.SQLITE_OK] on success.</param>
 ///<param name="^If for some reason, sqlite3_initialize() is unable to initialize">^If for some reason, sqlite3_initialize() is unable to initialize</param>
 ///<param name="the library (perhaps it is unable to allocate a needed resource such">the library (perhaps it is unable to allocate a needed resource such</param>
-///<param name="as a mutex) it returns an [error code] other than [Sqlite3.SQLITE_OK].">as a mutex) it returns an [error code] other than [Sqlite3.SQLITE_OK].</param>
+///<param name="as a mutex) it returns an [error code] other than [SqlResult.SQLITE_OK].">as a mutex) it returns an [error code] other than [SqlResult.SQLITE_OK].</param>
 ///<param name=""></param>
 ///<param name="^The sqlite3_initialize() routine is called internally by many other">^The sqlite3_initialize() routine is called internally by many other</param>
 ///<param name="SQLite interfaces so that an application usually does not need to">SQLite interfaces so that an application usually does not need to</param>
@@ -931,7 +678,7 @@ namespace Community.CsharpSqlite
 ///<param name="option) the application must supply a suitable implementation for">option) the application must supply a suitable implementation for</param>
 ///<param name="sqlite3_os_init() and sqlite3_os_end().  An application">supplied</param>
 ///<param name="implementation of sqlite3_os_init() or sqlite3_os_end()">implementation of sqlite3_os_init() or sqlite3_os_end()</param>
-///<param name="must return [Sqlite3.SQLITE_OK] on success and some other [error code] upon">must return [Sqlite3.SQLITE_OK] on success and some other [error code] upon</param>
+///<param name="must return [SqlResult.SQLITE_OK] on success and some other [error code] upon">must return [SqlResult.SQLITE_OK] on success and some other [error code] upon</param>
 ///<param name="failure.">failure.</param>
 ///<param name=""></param>
 
@@ -966,7 +713,7 @@ namespace Community.CsharpSqlite
 ///<param name="vary depending on the [configuration option]">vary depending on the [configuration option]</param>
 ///<param name="in the first argument.">in the first argument.</param>
 ///<param name=""></param>
-///<param name="^When a configuration option is set, sqlite3_config() returns [Sqlite3.SQLITE_OK].">^When a configuration option is set, sqlite3_config() returns [Sqlite3.SQLITE_OK].</param>
+///<param name="^When a configuration option is set, sqlite3_config() returns [SqlResult.SQLITE_OK].">^When a configuration option is set, sqlite3_config() returns [SqlResult.SQLITE_OK].</param>
 ///<param name="^If the option is unknown or SQLite is unable to set the option">^If the option is unknown or SQLite is unable to set the option</param>
 ///<param name="then this routine returns a non">zero [error code].</param>
 ///<param name=""></param>
@@ -987,7 +734,7 @@ namespace Community.CsharpSqlite
 ///<param name="that indicates what aspect of the [database connection] is being configured.">that indicates what aspect of the [database connection] is being configured.</param>
 ///<param name="Subsequent arguments vary depending on the configuration verb.">Subsequent arguments vary depending on the configuration verb.</param>
 ///<param name=""></param>
-///<param name="^Calls to sqlite3_db_config() return Sqlite3.SQLITE_OK if and only if">^Calls to sqlite3_db_config() return Sqlite3.SQLITE_OK if and only if</param>
+///<param name="^Calls to sqlite3_db_config() return SqlResult.SQLITE_OK if and only if">^Calls to sqlite3_db_config() return SqlResult.SQLITE_OK if and only if</param>
 ///<param name="the call is considered successful.">the call is considered successful.</param>
 ///<param name=""></param>
 
@@ -1773,15 +1520,15 @@ namespace Community.CsharpSqlite
 ///<param name="points during the compilation process, as logic is being created">points during the compilation process, as logic is being created</param>
 ///<param name="to perform various actions, the authorizer callback is invoked to">to perform various actions, the authorizer callback is invoked to</param>
 ///<param name="see if those actions are allowed.  ^The authorizer callback should">see if those actions are allowed.  ^The authorizer callback should</param>
-///<param name="return [Sqlite3.SQLITE_OK] to allow the action, [SQLITE_IGNORE] to disallow the">return [Sqlite3.SQLITE_OK] to allow the action, [SQLITE_IGNORE] to disallow the</param>
+///<param name="return [SqlResult.SQLITE_OK] to allow the action, [SQLITE_IGNORE] to disallow the">return [SqlResult.SQLITE_OK] to allow the action, [SQLITE_IGNORE] to disallow the</param>
 ///<param name="specific action but allow the SQL statement to continue to be">specific action but allow the SQL statement to continue to be</param>
 ///<param name="compiled, or [SQLITE_DENY] to cause the entire SQL statement to be">compiled, or [SQLITE_DENY] to cause the entire SQL statement to be</param>
 ///<param name="rejected with an error.  ^If the authorizer callback returns">rejected with an error.  ^If the authorizer callback returns</param>
-///<param name="any value other than [SQLITE_IGNORE], [Sqlite3.SQLITE_OK], or [SQLITE_DENY]">any value other than [SQLITE_IGNORE], [Sqlite3.SQLITE_OK], or [SQLITE_DENY]</param>
+///<param name="any value other than [SQLITE_IGNORE], [SqlResult.SQLITE_OK], or [SQLITE_DENY]">any value other than [SQLITE_IGNORE], [SqlResult.SQLITE_OK], or [SQLITE_DENY]</param>
 ///<param name="then the [sqlite3_prepare_v2()] or equivalent call that triggered">then the [sqlite3_prepare_v2()] or equivalent call that triggered</param>
 ///<param name="the authorizer will fail with an error message.">the authorizer will fail with an error message.</param>
 ///<param name=""></param>
-///<param name="When the callback returns [Sqlite3.SQLITE_OK], that means the operation">When the callback returns [Sqlite3.SQLITE_OK], that means the operation</param>
+///<param name="When the callback returns [SqlResult.SQLITE_OK], that means the operation">When the callback returns [SqlResult.SQLITE_OK], that means the operation</param>
 ///<param name="requested is ok.  ^When the callback returns [SQLITE_DENY], the">requested is ok.  ^When the callback returns [SQLITE_DENY], the</param>
 ///<param name="[sqlite3_prepare_v2()] or equivalent call that triggered the">[sqlite3_prepare_v2()] or equivalent call that triggered the</param>
 ///<param name="authorizer will fail with an error message explaining that">authorizer will fail with an error message explaining that</param>
@@ -1798,7 +1545,7 @@ namespace Community.CsharpSqlite
 ///<param name="and the callback returns [SQLITE_IGNORE] then the">and the callback returns [SQLITE_IGNORE] then the</param>
 ///<param name="[prepared statement] statement is constructed to substitute">[prepared statement] statement is constructed to substitute</param>
 ///<param name="a NULL value in place of the table column that would have">a NULL value in place of the table column that would have</param>
-///<param name="been read if [Sqlite3.SQLITE_OK] had been returned.  The [SQLITE_IGNORE]">been read if [Sqlite3.SQLITE_OK] had been returned.  The [SQLITE_IGNORE]</param>
+///<param name="been read if [SqlResult.SQLITE_OK] had been returned.  The [SQLITE_IGNORE]">been read if [SqlResult.SQLITE_OK] had been returned.  The [SQLITE_IGNORE]</param>
 ///<param name="return can be used to deny an untrusted user access to individual">return can be used to deny an untrusted user access to individual</param>
 ///<param name="columns of a table.">columns of a table.</param>
 ///<param name="^If the action code is [SQLITE_DELETE] and the callback returns">^If the action code is [SQLITE_DELETE] and the callback returns</param>
@@ -1853,7 +1600,7 @@ namespace Community.CsharpSqlite
 ///CAPI3REF: Authorizer Return Codes
 ///
 ///The [sqlite3_set_authorizer | authorizer callback function] must
-///return either [Sqlite3.SQLITE_OK] or one of these two constants in order
+///return either [SqlResult.SQLITE_OK] or one of these two constants in order
 ///to signal SQLite whether or not the action is permitted.  See the
 ///[sqlite3_set_authorizer | authorizer documentation] for additional
 ///information.
@@ -1865,9 +1612,14 @@ namespace Community.CsharpSqlite
 
 		//#define SQLITE_DENY   1   /* Abort the SQL statement with an error */
 		//#define SQLITE_IGNORE 2   /* Don't allow access, but don't generate an error */
-		public const int SQLITE_DENY = 1;
+        public enum AuthResult
+        {
+            SQLITE_DENY = 1,
 
-		public const int SQLITE_IGNORE = 2;
+            SQLITE_IGNORE = 2,
+
+            SQLITE_OK = 0//tural added
+        }
 
 		///
 ///<summary>
@@ -2073,7 +1825,7 @@ namespace Community.CsharpSqlite
 ///<param name="if SQLite is unable to allocate memory to hold the [sqlite3] object,">if SQLite is unable to allocate memory to hold the [sqlite3] object,</param>
 ///<param name="a NULL will be written into *ppDb instead of a pointer to the [sqlite3]">a NULL will be written into *ppDb instead of a pointer to the [sqlite3]</param>
 ///<param name="object.)^ ^(If the database is opened (and/or created) successfully, then">object.)^ ^(If the database is opened (and/or created) successfully, then</param>
-///<param name="[Sqlite3.SQLITE_OK] is returned.  Otherwise an [error code] is returned.)^ ^The">[Sqlite3.SQLITE_OK] is returned.  Otherwise an [error code] is returned.)^ ^The</param>
+///<param name="[SqlResult.SQLITE_OK] is returned.  Otherwise an [error code] is returned.)^ ^The">[SqlResult.SQLITE_OK] is returned.  Otherwise an [error code] is returned.)^ ^The</param>
 ///<param name="[sqlite3_errmsg()] or [sqlite3_errmsg16()] routines can be used to obtain">[sqlite3_errmsg()] or [sqlite3_errmsg16()] routines can be used to obtain</param>
 ///<param name="an English language description of the error following a failure of any">an English language description of the error following a failure of any</param>
 ///<param name="of the sqlite3_open() routines.">of the sqlite3_open() routines.</param>
@@ -2532,7 +2284,7 @@ namespace Community.CsharpSqlite
 ///<param name="SQL statement using [sqlite3_finalize()] after it has finished with it.">SQL statement using [sqlite3_finalize()] after it has finished with it.</param>
 ///<param name="ppStmt may not be NULL.">ppStmt may not be NULL.</param>
 ///<param name=""></param>
-///<param name="^On success, the sqlite3_prepare() family of routines return [Sqlite3.SQLITE_OK];">^On success, the sqlite3_prepare() family of routines return [Sqlite3.SQLITE_OK];</param>
+///<param name="^On success, the sqlite3_prepare() family of routines return [SqlResult.SQLITE_OK];">^On success, the sqlite3_prepare() family of routines return [SqlResult.SQLITE_OK];</param>
 ///<param name="otherwise an [error code] is returned.">otherwise an [error code] is returned.</param>
 ///<param name=""></param>
 ///<param name="The sqlite3_prepare_v2() and sqlite3_prepare16_v2() interfaces are">The sqlite3_prepare_v2() and sqlite3_prepare16_v2() interfaces are</param>
@@ -2553,7 +2305,7 @@ namespace Community.CsharpSqlite
 ///<param name="<li>"><li></param>
 ///<param name="^When an error occurs, [sqlite3_step()] will return one of the detailed">^When an error occurs, [sqlite3_step()] will return one of the detailed</param>
 ///<param name="[error codes] or [extended error codes].  ^The legacy behavior was that">[error codes] or [extended error codes].  ^The legacy behavior was that</param>
-///<param name="[sqlite3_step()] would only return a generic [Sqlite3.SQLITE_ERROR] result code">[sqlite3_step()] would only return a generic [Sqlite3.SQLITE_ERROR] result code</param>
+///<param name="[sqlite3_step()] would only return a generic [SqlResult.SQLITE_ERROR] result code">[sqlite3_step()] would only return a generic [SqlResult.SQLITE_ERROR] result code</param>
 ///<param name="and the application would have to make a second call to [sqlite3_reset()]">and the application would have to make a second call to [sqlite3_reset()]</param>
 ///<param name="in order to find the underlying cause of the problem. With the "v2" prepare">in order to find the underlying cause of the problem. With the "v2" prepare</param>
 ///<param name="interfaces, the underlying reason for the error is returned immediately.">interfaces, the underlying reason for the error is returned immediately.</param>
@@ -2779,7 +2531,7 @@ namespace Community.CsharpSqlite
 ///<param name="^Bindings are not cleared by the [sqlite3_reset()] routine.">^Bindings are not cleared by the [sqlite3_reset()] routine.</param>
 ///<param name="^Unbound parameters are interpreted as NULL.">^Unbound parameters are interpreted as NULL.</param>
 ///<param name=""></param>
-///<param name="^The sqlite3_bind_* routines return [Sqlite3.SQLITE_OK] on success or an">^The sqlite3_bind_* routines return [Sqlite3.SQLITE_OK] on success or an</param>
+///<param name="^The sqlite3_bind_* routines return [SqlResult.SQLITE_OK] on success or an">^The sqlite3_bind_* routines return [SqlResult.SQLITE_OK] on success or an</param>
 ///<param name="[error code] if anything goes wrong.">[error code] if anything goes wrong.</param>
 ///<param name="^[SQLITE_RANGE] is returned if the parameter">^[SQLITE_RANGE] is returned if the parameter</param>
 ///<param name="index is out of range.  ^[SQLITE_NOMEM] is returned if malloc() fails.">index is out of range.  ^[SQLITE_NOMEM] is returned if malloc() fails.</param>
@@ -3026,7 +2778,7 @@ namespace Community.CsharpSqlite
 ///interface will continue to be supported.
 ///
 ///^In the legacy interface, the return value will be either [SQLITE_BUSY],
-///[SQLITE_DONE], [SQLITE_ROW], [Sqlite3.SQLITE_ERROR], or [SQLITE_MISUSE].
+///[SQLITE_DONE], [SQLITE_ROW], [SqlResult.SQLITE_ERROR], or [SQLITE_MISUSE].
 ///^With the "v2" interface, any of the other [result codes] or
 ///[extended result codes] might be returned as well.
 ///
@@ -3048,7 +2800,7 @@ namespace Community.CsharpSqlite
 ///sqlite3_step() is called again to retrieve the next row of data.
 ///
 ///</summary>
-///<param name="^[Sqlite3.SQLITE_ERROR] means that a run">time error (such as a constraint</param>
+///<param name="^[SqlResult.SQLITE_ERROR] means that a run">time error (such as a constraint</param>
 ///<param name="violation) has occurred.  sqlite3_step() should not be called again on">violation) has occurred.  sqlite3_step() should not be called again on</param>
 ///<param name="the VM. More information may be found by calling [sqlite3_errmsg()].">the VM. More information may be found by calling [sqlite3_errmsg()].</param>
 ///<param name="^With the legacy interface, a more specific error code (for example,">^With the legacy interface, a more specific error code (for example,</param>
@@ -3060,7 +2812,7 @@ namespace Community.CsharpSqlite
 ///<param name="[SQLITE_MISUSE] means that the this routine was called inappropriately.">[SQLITE_MISUSE] means that the this routine was called inappropriately.</param>
 ///<param name="Perhaps it was called on a [prepared statement] that has">Perhaps it was called on a [prepared statement] that has</param>
 ///<param name="already been [sqlite3_finalize | finalized] or on one that had">already been [sqlite3_finalize | finalized] or on one that had</param>
-///<param name="previously returned [Sqlite3.SQLITE_ERROR] or [SQLITE_DONE].  Or it could">previously returned [Sqlite3.SQLITE_ERROR] or [SQLITE_DONE].  Or it could</param>
+///<param name="previously returned [SqlResult.SQLITE_ERROR] or [SQLITE_DONE].  Or it could">previously returned [SqlResult.SQLITE_ERROR] or [SQLITE_DONE].  Or it could</param>
 ///<param name="be the case that the same database connection is being used by two or">be the case that the same database connection is being used by two or</param>
 ///<param name="more threads at the same moment in time.">more threads at the same moment in time.</param>
 ///<param name=""></param>
@@ -3077,7 +2829,7 @@ namespace Community.CsharpSqlite
 ///<param name="can be used to restore the legacy behavior.">can be used to restore the legacy behavior.</param>
 ///<param name=""></param>
 ///<param name="<b>Goofy Interface Alert:</b> In the legacy interface, the sqlite3_step()"><b>Goofy Interface Alert:</b> In the legacy interface, the sqlite3_step()</param>
-///<param name="API always returns a generic error code, [Sqlite3.SQLITE_ERROR], following any">API always returns a generic error code, [Sqlite3.SQLITE_ERROR], following any</param>
+///<param name="API always returns a generic error code, [SqlResult.SQLITE_ERROR], following any">API always returns a generic error code, [SqlResult.SQLITE_ERROR], following any</param>
 ///<param name="error other than [SQLITE_BUSY] and [SQLITE_MISUSE].  You must call">error other than [SQLITE_BUSY] and [SQLITE_MISUSE].  You must call</param>
 ///<param name="[sqlite3_reset()] or [sqlite3_finalize()] in order to find one of the">[sqlite3_reset()] or [sqlite3_finalize()] in order to find one of the</param>
 ///<param name="specific [error codes] that better describes the error.">specific [error codes] that better describes the error.</param>
@@ -3288,7 +3040,7 @@ namespace Community.CsharpSqlite
 ///^The sqlite3_finalize() function is called to delete a [prepared statement].
 ///^If the most recent evaluation of the statement encountered no errors
 ///or if the statement is never been evaluated, then sqlite3_finalize() returns
-///Sqlite3.SQLITE_OK.  ^If the most recent evaluation of statement S failed, then
+///SqlResult.SQLITE_OK.  ^If the most recent evaluation of statement S failed, then
 ///sqlite3_finalize(S) returns the appropriate [error code] or
 ///[extended error code].
 ///
@@ -3327,7 +3079,7 @@ namespace Community.CsharpSqlite
 ///<param name="^If the most recent call to [sqlite3_step(S)] for the">^If the most recent call to [sqlite3_step(S)] for the</param>
 ///<param name="[prepared statement] S returned [SQLITE_ROW] or [SQLITE_DONE],">[prepared statement] S returned [SQLITE_ROW] or [SQLITE_DONE],</param>
 ///<param name="or if [sqlite3_step(S)] has never before been called on S,">or if [sqlite3_step(S)] has never before been called on S,</param>
-///<param name="then [sqlite3_reset(S)] returns [Sqlite3.SQLITE_OK].">then [sqlite3_reset(S)] returns [Sqlite3.SQLITE_OK].</param>
+///<param name="then [sqlite3_reset(S)] returns [SqlResult.SQLITE_OK].">then [sqlite3_reset(S)] returns [SqlResult.SQLITE_OK].</param>
 ///<param name=""></param>
 ///<param name="^If the most recent call to [sqlite3_step(S)] for the">^If the most recent call to [sqlite3_step(S)] for the</param>
 ///<param name="[prepared statement] S indicated an error, then">[prepared statement] S indicated an error, then</param>
@@ -3730,8 +3482,8 @@ namespace Community.CsharpSqlite
 ///<param name="modify the text after they return without harm.">modify the text after they return without harm.</param>
 ///<param name="^The sqlite3_result_error_code() function changes the error code">^The sqlite3_result_error_code() function changes the error code</param>
 ///<param name="returned by SQLite as a result of an error in a function.  ^By default,">returned by SQLite as a result of an error in a function.  ^By default,</param>
-///<param name="the error code is Sqlite3.SQLITE_ERROR.  ^A subsequent call to sqlite3_result_error()">the error code is Sqlite3.SQLITE_ERROR.  ^A subsequent call to sqlite3_result_error()</param>
-///<param name="or sqlite3_result_error16() resets the error code to Sqlite3.SQLITE_ERROR.">or sqlite3_result_error16() resets the error code to Sqlite3.SQLITE_ERROR.</param>
+///<param name="the error code is SqlResult.SQLITE_ERROR.  ^A subsequent call to sqlite3_result_error()">the error code is SqlResult.SQLITE_ERROR.  ^A subsequent call to sqlite3_result_error()</param>
+///<param name="or sqlite3_result_error16() resets the error code to SqlResult.SQLITE_ERROR.">or sqlite3_result_error16() resets the error code to SqlResult.SQLITE_ERROR.</param>
 ///<param name=""></param>
 ///<param name="^The sqlite3_result_toobig() interface causes SQLite to throw an error">^The sqlite3_result_toobig() interface causes SQLite to throw an error</param>
 ///<param name="indicating that a string or BLOB is too long to represent.">indicating that a string or BLOB is too long to represent.</param>
@@ -4236,7 +3988,7 @@ namespace Community.CsharpSqlite
 ///Existing database connections continue use the sharing mode
 ///that was in effect at the time they were opened.)^
 ///
-///^(This routine returns [Sqlite3.SQLITE_OK] if shared cache was enabled or disabled
+///^(This routine returns [SqlResult.SQLITE_OK] if shared cache was enabled or disabled
 ///successfully.  An [error code] is returned otherwise.)^
 ///
 ///^Shared cache is disabled by default. But this might change in
@@ -4419,7 +4171,7 @@ namespace Community.CsharpSqlite
 ///^zProc may be 0, in which case the name of the entry point
 ///defaults to "sqlite3_extension_init".
 ///^The sqlite3_load_extension() interface returns
-///[Sqlite3.SQLITE_OK] on success and [Sqlite3.SQLITE_ERROR] if something goes wrong.
+///[SqlResult.SQLITE_OK] on success and [SqlResult.SQLITE_ERROR] if something goes wrong.
 ///^If an error occurs and pzErrMsg is not 0, then the
 ///[sqlite3_load_extension()] interface shall attempt to
 ///fill *pzErrMsg with error message text stored in memory
@@ -4689,7 +4441,7 @@ namespace Community.CsharpSqlite
 ///<param name="^For the main database file, the database name is "main".">^For the main database file, the database name is "main".</param>
 ///<param name="^For TEMP tables, the database name is "temp".">^For TEMP tables, the database name is "temp".</param>
 ///<param name=""></param>
-///<param name="^(On success, [Sqlite3.SQLITE_OK] is returned and the new [BLOB handle] is written">^(On success, [Sqlite3.SQLITE_OK] is returned and the new [BLOB handle] is written</param>
+///<param name="^(On success, [SqlResult.SQLITE_OK] is returned and the new [BLOB handle] is written">^(On success, [SqlResult.SQLITE_OK] is returned and the new [BLOB handle] is written</param>
 ///<param name="to *ppBlob. Otherwise an [error code] is returned and *ppBlob is set">to *ppBlob. Otherwise an [error code] is returned and *ppBlob is set</param>
 ///<param name="to be a null pointer.)^">to be a null pointer.)^</param>
 ///<param name="^This function sets the [database connection] error code and message">^This function sets the [database connection] error code and message</param>
@@ -4811,15 +4563,15 @@ namespace Community.CsharpSqlite
 ///<param name="from the open BLOB, starting at offset iOffset.)^">from the open BLOB, starting at offset iOffset.)^</param>
 ///<param name=""></param>
 ///<param name="^If offset iOffset is less than N bytes from the end of the BLOB,">^If offset iOffset is less than N bytes from the end of the BLOB,</param>
-///<param name="[Sqlite3.SQLITE_ERROR] is returned and no data is read.  ^If N or iOffset is">[Sqlite3.SQLITE_ERROR] is returned and no data is read.  ^If N or iOffset is</param>
-///<param name="less than zero, [Sqlite3.SQLITE_ERROR] is returned and no data is read.">less than zero, [Sqlite3.SQLITE_ERROR] is returned and no data is read.</param>
+///<param name="[SqlResult.SQLITE_ERROR] is returned and no data is read.  ^If N or iOffset is">[SqlResult.SQLITE_ERROR] is returned and no data is read.  ^If N or iOffset is</param>
+///<param name="less than zero, [SqlResult.SQLITE_ERROR] is returned and no data is read.">less than zero, [SqlResult.SQLITE_ERROR] is returned and no data is read.</param>
 ///<param name="^The size of the blob (and hence the maximum value of N+iOffset)">^The size of the blob (and hence the maximum value of N+iOffset)</param>
 ///<param name="can be determined using the [sqlite3_blob_bytes()] interface.">can be determined using the [sqlite3_blob_bytes()] interface.</param>
 ///<param name=""></param>
 ///<param name="^An attempt to read from an expired [BLOB handle] fails with an">^An attempt to read from an expired [BLOB handle] fails with an</param>
 ///<param name="error code of [SQLITE_ABORT].">error code of [SQLITE_ABORT].</param>
 ///<param name=""></param>
-///<param name="^(On success, sqlite3_blob_read() returns Sqlite3.SQLITE_OK.">^(On success, sqlite3_blob_read() returns Sqlite3.SQLITE_OK.</param>
+///<param name="^(On success, sqlite3_blob_read() returns SqlResult.SQLITE_OK.">^(On success, sqlite3_blob_read() returns SqlResult.SQLITE_OK.</param>
 ///<param name="Otherwise, an [error code] or an [extended error code] is returned.)^">Otherwise, an [error code] or an [extended error code] is returned.)^</param>
 ///<param name=""></param>
 ///<param name="This routine only works on a [BLOB handle] which has been created">This routine only works on a [BLOB handle] which has been created</param>
@@ -4847,8 +4599,8 @@ namespace Community.CsharpSqlite
 ///<param name="^This function may only modify the contents of the BLOB; it is">^This function may only modify the contents of the BLOB; it is</param>
 ///<param name="not possible to increase the size of a BLOB using this API.">not possible to increase the size of a BLOB using this API.</param>
 ///<param name="^If offset iOffset is less than N bytes from the end of the BLOB,">^If offset iOffset is less than N bytes from the end of the BLOB,</param>
-///<param name="[Sqlite3.SQLITE_ERROR] is returned and no data is written.  ^If N is">[Sqlite3.SQLITE_ERROR] is returned and no data is written.  ^If N is</param>
-///<param name="less than zero [Sqlite3.SQLITE_ERROR] is returned and no data is written.">less than zero [Sqlite3.SQLITE_ERROR] is returned and no data is written.</param>
+///<param name="[SqlResult.SQLITE_ERROR] is returned and no data is written.  ^If N is">[SqlResult.SQLITE_ERROR] is returned and no data is written.  ^If N is</param>
+///<param name="less than zero [SqlResult.SQLITE_ERROR] is returned and no data is written.">less than zero [SqlResult.SQLITE_ERROR] is returned and no data is written.</param>
 ///<param name="The size of the BLOB (and hence the maximum value of N+iOffset)">The size of the BLOB (and hence the maximum value of N+iOffset)</param>
 ///<param name="can be determined using the [sqlite3_blob_bytes()] interface.">can be determined using the [sqlite3_blob_bytes()] interface.</param>
 ///<param name=""></param>
@@ -4859,7 +4611,7 @@ namespace Community.CsharpSqlite
 ///<param name="have been overwritten by the statement that expired the BLOB handle">have been overwritten by the statement that expired the BLOB handle</param>
 ///<param name="or by other independent statements.">or by other independent statements.</param>
 ///<param name=""></param>
-///<param name="^(On success, sqlite3_blob_write() returns Sqlite3.SQLITE_OK.">^(On success, sqlite3_blob_write() returns Sqlite3.SQLITE_OK.</param>
+///<param name="^(On success, sqlite3_blob_write() returns SqlResult.SQLITE_OK.">^(On success, sqlite3_blob_write() returns SqlResult.SQLITE_OK.</param>
 ///<param name="Otherwise, an  [error code] or an [extended error code] is returned.)^">Otherwise, an  [error code] or an [extended error code] is returned.)^</param>
 ///<param name=""></param>
 ///<param name="This routine only works on a [BLOB handle] which has been created">This routine only works on a [BLOB handle] which has been created</param>
@@ -5022,11 +4774,11 @@ namespace Community.CsharpSqlite
 ///<param name="underlying sqlite3_io_methods.xFileControl method.">underlying sqlite3_io_methods.xFileControl method.</param>
 ///<param name=""></param>
 ///<param name="^If the second parameter (zDbName) does not match the name of any">^If the second parameter (zDbName) does not match the name of any</param>
-///<param name="open database file, then Sqlite3.SQLITE_ERROR is returned.  ^This error">open database file, then Sqlite3.SQLITE_ERROR is returned.  ^This error</param>
+///<param name="open database file, then SqlResult.SQLITE_ERROR is returned.  ^This error">open database file, then SqlResult.SQLITE_ERROR is returned.  ^This error</param>
 ///<param name="code is not remembered and will not be recalled by [sqlite3_errcode()]">code is not remembered and will not be recalled by [sqlite3_errcode()]</param>
 ///<param name="or [sqlite3_errmsg()].  The underlying xFileControl method might">or [sqlite3_errmsg()].  The underlying xFileControl method might</param>
-///<param name="also return Sqlite3.SQLITE_ERROR.  There is no way to distinguish between">also return Sqlite3.SQLITE_ERROR.  There is no way to distinguish between</param>
-///<param name="an incorrect zDbName and an Sqlite3.SQLITE_ERROR return from the underlying">an incorrect zDbName and an Sqlite3.SQLITE_ERROR return from the underlying</param>
+///<param name="also return SqlResult.SQLITE_ERROR.  There is no way to distinguish between">also return SqlResult.SQLITE_ERROR.  There is no way to distinguish between</param>
+///<param name="an incorrect zDbName and an SqlResult.SQLITE_ERROR return from the underlying">an incorrect zDbName and an SqlResult.SQLITE_ERROR return from the underlying</param>
 ///<param name="xFileControl method.">xFileControl method.</param>
 ///<param name=""></param>
 ///<param name="See also: [SQLITE_FCNTL_LOCKSTATE]">See also: [SQLITE_FCNTL_LOCKSTATE]</param>
@@ -5137,7 +4889,7 @@ namespace Community.CsharpSqlite
 ///^(Other parameters record only the highwater mark and not the current
 ///value.  For these latter parameters nothing is written into *pCurrent.)^
 ///
-///^The sqlite3_status() routine returns Sqlite3.SQLITE_OK on success and a
+///^The sqlite3_status() routine returns SqlResult.SQLITE_OK on success and a
 ///</summary>
 ///<param name="non">zero [error code] on failure.</param>
 ///<param name=""></param>
@@ -5285,7 +5037,7 @@ namespace Community.CsharpSqlite
 ///the resetFlg is true, then the highest instantaneous value is
 ///reset back down to the current value.
 ///
-///^The sqlite3_db_status() routine returns Sqlite3.SQLITE_OK on success and a
+///^The sqlite3_db_status() routine returns SqlResult.SQLITE_OK on success and a
 ///</summary>
 ///<param name="non">zero [error code] on failure.</param>
 ///<param name=""></param>
@@ -5766,11 +5518,11 @@ namespace Community.CsharpSqlite
 ///<param name="the source and destination databases specified by [sqlite3_backup] object B.">the source and destination databases specified by [sqlite3_backup] object B.</param>
 ///<param name="^If N is negative, all remaining source pages are copied. ">^If N is negative, all remaining source pages are copied. </param>
 ///<param name="^If sqlite3_backup_step(B,N) successfully copies N pages and there">^If sqlite3_backup_step(B,N) successfully copies N pages and there</param>
-///<param name="are still more pages to be copied, then the function returns [Sqlite3.SQLITE_OK].">are still more pages to be copied, then the function returns [Sqlite3.SQLITE_OK].</param>
+///<param name="are still more pages to be copied, then the function returns [SqlResult.SQLITE_OK].">are still more pages to be copied, then the function returns [SqlResult.SQLITE_OK].</param>
 ///<param name="^If sqlite3_backup_step(B,N) successfully finishes copying all pages">^If sqlite3_backup_step(B,N) successfully finishes copying all pages</param>
 ///<param name="from source to destination, then it returns [SQLITE_DONE].">from source to destination, then it returns [SQLITE_DONE].</param>
 ///<param name="^If an error occurs while running sqlite3_backup_step(B,N),">^If an error occurs while running sqlite3_backup_step(B,N),</param>
-///<param name="then an [error code] is returned. ^As well as [Sqlite3.SQLITE_OK] and">then an [error code] is returned. ^As well as [Sqlite3.SQLITE_OK] and</param>
+///<param name="then an [error code] is returned. ^As well as [SqlResult.SQLITE_OK] and">then an [error code] is returned. ^As well as [SqlResult.SQLITE_OK] and</param>
 ///<param name="[SQLITE_DONE], a call to sqlite3_backup_step() may return [SQLITE_READONLY],">[SQLITE_DONE], a call to sqlite3_backup_step() may return [SQLITE_READONLY],</param>
 ///<param name="[SQLITE_NOMEM], [SQLITE_BUSY], [SQLITE_LOCKED], or an">[SQLITE_NOMEM], [SQLITE_BUSY], [SQLITE_LOCKED], or an</param>
 ///<param name="[SQLITE_IOERR_ACCESS | SQLITE_IOERR_XXX] extended error code.">[SQLITE_IOERR_ACCESS | SQLITE_IOERR_XXX] extended error code.</param>
@@ -5829,7 +5581,7 @@ namespace Community.CsharpSqlite
 ///<param name="The [sqlite3_backup] object is invalid">The [sqlite3_backup] object is invalid</param>
 ///<param name="and may not be used following a call to sqlite3_backup_finish().">and may not be used following a call to sqlite3_backup_finish().</param>
 ///<param name=""></param>
-///<param name="^The value returned by sqlite3_backup_finish is [Sqlite3.SQLITE_OK] if no">^The value returned by sqlite3_backup_finish is [Sqlite3.SQLITE_OK] if no</param>
+///<param name="^The value returned by sqlite3_backup_finish is [SqlResult.SQLITE_OK] if no">^The value returned by sqlite3_backup_finish is [SqlResult.SQLITE_OK] if no</param>
 ///<param name="sqlite3_backup_step() errors occurred, regardless or whether or not">sqlite3_backup_step() errors occurred, regardless or whether or not</param>
 ///<param name="sqlite3_backup_step() completed.">sqlite3_backup_step() completed.</param>
 ///<param name="^If an out">memory condition or IO error occurred during any prior</param>
@@ -5952,7 +5704,7 @@ namespace Community.CsharpSqlite
 ///<param name="crash or deadlock may be the result.">crash or deadlock may be the result.</param>
 ///<param name=""></param>
 ///<param name="^Unless deadlock is detected (see below), sqlite3_unlock_notify() always">^Unless deadlock is detected (see below), sqlite3_unlock_notify() always</param>
-///<param name="returns Sqlite3.SQLITE_OK.">returns Sqlite3.SQLITE_OK.</param>
+///<param name="returns SqlResult.SQLITE_OK.">returns SqlResult.SQLITE_OK.</param>
 ///<param name=""></param>
 ///<param name="<b>Callback Invocation Details</b>"><b>Callback Invocation Details</b></param>
 ///<param name=""></param>
@@ -6078,7 +5830,7 @@ namespace Community.CsharpSqlite
 ///<param name="is the number of pages currently in the write">ahead log file,</param>
 ///<param name="including those that were just committed.">including those that were just committed.</param>
 ///<param name=""></param>
-///<param name="The callback function should normally return [Sqlite3.SQLITE_OK].  ^If an error">The callback function should normally return [Sqlite3.SQLITE_OK].  ^If an error</param>
+///<param name="The callback function should normally return [SqlResult.SQLITE_OK].  ^If an error">The callback function should normally return [SqlResult.SQLITE_OK].  ^If an error</param>
 ///<param name="code is returned, that error will propagate back up through the">code is returned, that error will propagate back up through the</param>
 ///<param name="SQLite code base to cause the statement that provoked the callback">SQLite code base to cause the statement that provoked the callback</param>
 ///<param name="to report an error, though the commit will have still occurred. If the">to report an error, though the commit will have still occurred. If the</param>
@@ -6183,7 +5935,7 @@ namespace Community.CsharpSqlite
 ///<param name="the log file before returning. If pnCkpt is not NULL, then *pnCkpt is set to">the log file before returning. If pnCkpt is not NULL, then *pnCkpt is set to</param>
 ///<param name="the total number of checkpointed frames (including any that were already">the total number of checkpointed frames (including any that were already</param>
 ///<param name="checkpointed when this function is called). *pnLog and *pnCkpt may be">checkpointed when this function is called). *pnLog and *pnCkpt may be</param>
-///<param name="populated even if sqlite3_wal_checkpoint_v2() returns other than Sqlite3.SQLITE_OK.">populated even if sqlite3_wal_checkpoint_v2() returns other than Sqlite3.SQLITE_OK.</param>
+///<param name="populated even if sqlite3_wal_checkpoint_v2() returns other than SqlResult.SQLITE_OK.">populated even if sqlite3_wal_checkpoint_v2() returns other than SqlResult.SQLITE_OK.</param>
 ///<param name="If no values are available because of an error, they are both set to ">1</param>
 ///<param name="before returning to communicate this to the caller.">before returning to communicate this to the caller.</param>
 ///<param name=""></param>
@@ -6212,12 +5964,12 @@ namespace Community.CsharpSqlite
 ///<param name="error occurs while processing an attached database, processing is abandoned ">error occurs while processing an attached database, processing is abandoned </param>
 ///<param name="and the error code returned to the caller immediately. If no error ">and the error code returned to the caller immediately. If no error </param>
 ///<param name="(SQLITE_BUSY or otherwise) is encountered while processing the attached ">(SQLITE_BUSY or otherwise) is encountered while processing the attached </param>
-///<param name="databases, Sqlite3.SQLITE_OK is returned.">databases, Sqlite3.SQLITE_OK is returned.</param>
+///<param name="databases, SqlResult.SQLITE_OK is returned.">databases, SqlResult.SQLITE_OK is returned.</param>
 ///<param name=""></param>
 ///<param name="If database zDb is the name of an attached database that is not in WAL">If database zDb is the name of an attached database that is not in WAL</param>
-///<param name="mode, Sqlite3.SQLITE_OK is returned and both *pnLog and *pnCkpt set to ">1. If</param>
+///<param name="mode, SqlResult.SQLITE_OK is returned and both *pnLog and *pnCkpt set to ">1. If</param>
 ///<param name="zDb is not NULL (or a zero length string) and is not the name of any">zDb is not NULL (or a zero length string) and is not the name of any</param>
-///<param name="attached database, Sqlite3.SQLITE_ERROR is returned to the caller.">attached database, Sqlite3.SQLITE_ERROR is returned to the caller.</param>
+///<param name="attached database, SqlResult.SQLITE_ERROR is returned to the caller.">attached database, SqlResult.SQLITE_ERROR is returned to the caller.</param>
 ///<param name=""></param>
 
 		//SQLITE_API int sqlite3_wal_checkpoint_v2(
@@ -6301,7 +6053,7 @@ namespace Community.CsharpSqlite
 ///<param name="[sqlite3_vtab_on_conflict()] function indicates that the current ON ">[sqlite3_vtab_on_conflict()] function indicates that the current ON </param>
 ///<param name="CONFLICT policy is REPLACE, the virtual table implementation should ">CONFLICT policy is REPLACE, the virtual table implementation should </param>
 ///<param name="silently replace the appropriate rows within the xUpdate callback and">silently replace the appropriate rows within the xUpdate callback and</param>
-///<param name="return Sqlite3.SQLITE_OK. Or, if this is not possible, it may return">return Sqlite3.SQLITE_OK. Or, if this is not possible, it may return</param>
+///<param name="return SqlResult.SQLITE_OK. Or, if this is not possible, it may return">return SqlResult.SQLITE_OK. Or, if this is not possible, it may return</param>
 ///<param name="SQLITE_CONSTRAINT, in which case SQLite falls back to OR ABORT ">SQLITE_CONSTRAINT, in which case SQLite falls back to OR ABORT </param>
 ///<param name="constraint handling.">constraint handling.</param>
 ///<param name="</dl>"></dl></param>
@@ -6323,39 +6075,7 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-		//SQLITE_API int sqlite3_vtab_on_conflict(sqlite3 );
-		///
-///<summary>
-///CAPI3REF: Conflict resolution modes
-///
-///These constants are returned by [sqlite3_vtab_on_conflict()] to
-///inform a [virtual table] implementation what the [ON CONFLICT] mode
-///is for the SQL statement being evaluated.
-///
-///Note that the [SQLITE_IGNORE] constant is also used as a potential
-///return value from the [sqlite3_set_authorizer()] callback and that
-///[SQLITE_ABORT] is also a [result code].
-///
-///</summary>
-
-		//#define SQLITE_ROLLBACK 1
-		public const int SQLITE_ROLLBACK = 1;
-
-		///
-///<summary>
-///#define SQLITE_IGNORE 2 // Also used by sqlite3_authorizer() callback 
-///</summary>
-
-		//#define SQLITE_FAIL     3
-		public const int SQLITE_FAIL = 3;
-
-		///
-///<summary>
-///#define SQLITE_ABORT 4  // Also an error code 
-///</summary>
-
-		//#define SQLITE_REPLACE  5
-		public const int SQLITE_REPLACE = 5;
+		
 	///
 ///<summary>
 ///Undo the hack that converts floating point types to integer for

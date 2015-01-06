@@ -273,7 +273,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
             /// functions are threadsafe.
             ///
             ///</summary>
-            public static int sqlite3PcacheInitialize()
+            public static SqlResult sqlite3PcacheInitialize()
             {
                 if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xInit == null)
                 {
@@ -377,7 +377,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
             /// Try to obtain a page from the cache.
             ///
             ///</summary>
-            public static int sqlite3PcacheFetch(PCache pCache, ///
+            public static SqlResult sqlite3PcacheFetch(PCache pCache, ///
                 ///<summary>
                 ///Obtain the page from this cache 
                 ///</summary>
@@ -455,7 +455,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     }
                     if (pPg != null)
                     {
-                        int rc;
+                        SqlResult rc;
 #if SQLITE_LOG_CACHE_SPILL
 																																																																																															      io.sqlite3_log(SQLITE_FULL, 
                   "spill page %d making room for %d - cache used: %d/%d",
@@ -464,7 +464,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                   pCache->nMax);
 #endif
                         rc = pCache.xStress(pCache.pStress, pPg);
-                        if (rc != Sqlite3.SQLITE_OK && rc != SQLITE_BUSY)
+                        if (rc != SqlResult.SQLITE_OK && rc != SqlResult.SQLITE_BUSY)
                         {
                             return rc;
                         }
@@ -498,7 +498,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     }
                 }
                 ppPage = pPage;
-                return (pPage == null && eCreate != 0) ? SQLITE_NOMEM : Sqlite3.SQLITE_OK;
+                return (pPage == null && eCreate != 0) ? SqlResult.SQLITE_NOMEM : SqlResult.SQLITE_OK;
             }
 
             ///<summary>

@@ -276,7 +276,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///Database connection 
                 ///</summary>
-                int rc;
+                SqlResult rc;
                 ///
                 ///<summary>
                 ///Return code from subprocedures 
@@ -987,7 +987,7 @@ break;
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																								if( pDef ){
 auth = sqlite3AuthCheck(pParse, SQLITE_FUNCTION, 0, pDef.zName, 0);
-if( auth!=Sqlite3.SQLITE_OK ){
+if( auth!=SqlResult.SQLITE_OK ){
 if( auth==SQLITE_DENY ){
 utilc.sqlite3ErrorMsg(pParse, "not authorized to use function: %s",
 pDef.zName);
@@ -1685,7 +1685,7 @@ return WRC.WRC_Prune;
             /// if errors is returned.
             ///
             ///</summary>
-            public static int sqlite3ResolveExprNames(NameContext pNC,///
+            public static SqlResult sqlite3ResolveExprNames(NameContext pNC,///
                 ///<summary>
                 ///Namespace to resolve expressions in. 
                 ///</summary>
@@ -1731,7 +1731,7 @@ pParse.nHeight += pExpr.nHeight;
                     {
                         pNC.hasAgg = 1;
                     }
-                return pExpr.ExprHasProperty(ExprFlags.EP_Error) ? 1 : 0;
+                return (SqlResult) (pExpr.ExprHasProperty(ExprFlags.EP_Error) ? 1 : 0);
             }
 
 

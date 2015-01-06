@@ -684,9 +684,9 @@ namespace Community.CsharpSqlite
             ///<summary>
             /// Compute the difference (in milliseconds) between localtime and UTC
             /// (a.k.a. GMT) for the time value p where p is in UTC. If no error occurs,
-            /// return this value and set *pRc to Sqlite3.SQLITE_OK.
+            /// return this value and set *pRc to SqlResult.SQLITE_OK.
             ///
-            /// Or, if an error does occur, set *pRc to Sqlite3.SQLITE_ERROR. The returned value
+            /// Or, if an error does occur, set *pRc to SqlResult.SQLITE_ERROR. The returned value
             /// is undefined in this case.
             ///</summary>
             static sqlite3_int64 localtimeOffset(DateTime p, ///
@@ -699,9 +699,9 @@ namespace Community.CsharpSqlite
                 ///Write error here if one occurs 
                 ///</summary>
 
-            out int pRc///
+            out SqlResult pRc///
                 ///<summary>
-                ///OUT: Error code. Sqlite3.SQLITE_OK or ERROR 
+                ///OUT: Error code. SqlResult.SQLITE_OK or ERROR 
                 ///</summary>
 
             )
@@ -740,7 +740,7 @@ namespace Community.CsharpSqlite
                 if (osLocaltime(t, sLocal) != 0)
                 {
                     pCtx.sqlite3_result_error("local time unavailable", -1);
-                    pRc = Sqlite3.SQLITE_ERROR;
+                    pRc = SqlResult.SQLITE_ERROR;
                     return 0;
                 }
                 y.Y = sLocal.tm_year;
@@ -756,7 +756,7 @@ namespace Community.CsharpSqlite
                 y.validJD = 0;
                 y.validTZ = 0;
                 computeJD(y);
-                pRc = Sqlite3.SQLITE_OK;
+                pRc = SqlResult.SQLITE_OK;
                 return (int)(y.iJD - x.iJD);
             }
 
@@ -788,9 +788,9 @@ namespace Community.CsharpSqlite
             /// to context pCtx. If the error is an unrecognized modifier, no error is
             /// written to pCtx.
             ///</summary>
-            static int parseModifier(sqlite3_context pCtx, string zMod, DateTime p)
+            static SqlResult parseModifier(sqlite3_context pCtx, string zMod, DateTime p)
             {
-                int rc = 1;
+                var rc = (SqlResult)1;
                 int n;
                 double r = 0;
                 StringBuilder z = new StringBuilder(zMod.ToLower());
@@ -848,7 +848,7 @@ namespace Community.CsharpSqlite
                                     long c1;
                                     computeJD(p);
                                     c1 = localtimeOffset(p, pCtx, out rc);
-                                    if (rc == Sqlite3.SQLITE_OK)
+                                    if (rc == SqlResult.SQLITE_OK)
                                     {
                                         p.iJD -= c1;
                                         clearYMD_HMS_TZ(p);
@@ -947,7 +947,7 @@ namespace Community.CsharpSqlite
                             }
                             if (!Converter.sqlite3AtoF(z.ToString(), ref r, n, SqliteEncoding.UTF8))
                             {
-                                rc = 1;
+                                rc = (SqlResult)1;
                                 break;
                             }
                             Debug.Assert(n >= 1);
@@ -1052,7 +1052,7 @@ namespace Community.CsharpSqlite
                                                 }
                                                 else
                                                 {
-                                                    rc = 1;
+                                                    rc = (SqlResult)1;
                                                 }
                             clearYMD_HMS_TZ(p);
                             break;

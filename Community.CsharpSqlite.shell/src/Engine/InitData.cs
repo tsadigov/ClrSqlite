@@ -29,7 +29,7 @@ namespace Community.CsharpSqlite
         ///<summary>
         ///Error message stored here 
         ///</summary>
-        public int rc;
+        public SqlResult rc;
         ///
         ///<summary>
         ///Result code stored here 

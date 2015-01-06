@@ -62,11 +62,11 @@ typedef struct JournalFile JournalFile;
 ** for JournalFile p.
 */
 static int createFile(JournalFile p){
-int rc = Sqlite3.SQLITE_OK;
+var rc = SqlResult.SQLITE_OK;
 if( null==p.pReal ){
 sqlite3_file pReal = (sqlite3_file )&p[1];
 rc = sqlite3OsOpen(p.pVfs, p.zJournal, pReal, p.flags, 0);
-if( rc==Sqlite3.SQLITE_OK ){
+if( rc==SqlResult.SQLITE_OK ){
 p.pReal = pReal;
 if( p.iSize>0 ){
 Debug.Assert(p.iSize<=p.nBuf);
@@ -86,7 +86,7 @@ if( p.pReal ){
 sqlite3OsClose(p.pReal);
 }
 sqlite3DbFree(db,p.zBuf);
-return Sqlite3.SQLITE_OK;
+return SqlResult.SQLITE_OK;
 }
 
 /*
@@ -98,7 +98,7 @@ void *zBuf,            /* Put the results here */
 int iAmt,              /* Number of bytes to read */
 sqlite_int64 iOfst     /* Begin reading at this offset */
 ){
-int rc = Sqlite3.SQLITE_OK;
+var rc = SqlResult.SQLITE_OK;
 JournalFile *p = (JournalFile )pJfd;
 if( p->pReal ){
 rc = sqlite3OsRead(p->pReal, zBuf, iAmt, iOfst);
@@ -119,12 +119,12 @@ string zBuf,      /* Take data to be written from here */
 int iAmt,              /* Number of bytes to write */
 sqlite_int64 iOfst     /* Begin writing at this offset into the file */
 ){
-int rc = Sqlite3.SQLITE_OK;
+var rc = SqlResult.SQLITE_OK;
 JournalFile p = (JournalFile )pJfd;
 if( null==p.pReal && (iOfst+iAmt)>p.nBuf ){
 rc = createFile(p);
 }
-if( rc==Sqlite3.SQLITE_OK ){
+if( rc==SqlResult.SQLITE_OK ){
 if( p.pReal ){
 rc = sqlite3OsWrite(p.pReal, zBuf, iAmt, iOfst);
 }else{
@@ -141,7 +141,7 @@ return rc;
 ** Truncate the file.
 */
 static int jrnlTruncate(sqlite3_file pJfd, sqlite_int64 size){
-int rc = Sqlite3.SQLITE_OK;
+var rc = SqlResult.SQLITE_OK;
 JournalFile p = (JournalFile )pJfd;
 if( p.pReal ){
 rc = sqlite3OsTruncate(p.pReal, size);
@@ -160,7 +160,7 @@ JournalFile p = (JournalFile )pJfd;
 if( p.pReal ){
 rc = sqlite3OsSync(p.pReal, flags);
 }else{
-rc = Sqlite3.SQLITE_OK;
+rc = SqlResult.SQLITE_OK;
 }
 return rc;
 }
@@ -169,7 +169,7 @@ return rc;
 ** Query the size of the file in bytes.
 */
 static int jrnlFileSize(sqlite3_file pJfd, sqlite_int64 pSize){
-int rc = Sqlite3.SQLITE_OK;
+var rc = SqlResult.SQLITE_OK;
 JournalFile p = (JournalFile )pJfd;
 if( p.pReal ){
 rc = sqlite3OsFileSize(p.pReal, pSize);
@@ -227,7 +227,7 @@ p.nBuf = nBuf;
 p.flags = flags;
 p.zJournal = zName;
 p.pVfs = pVfs;
-return Sqlite3.SQLITE_OK;
+return SqlResult.SQLITE_OK;
 }
 
 /*
@@ -236,7 +236,7 @@ return Sqlite3.SQLITE_OK;
 */
 int sqlite3JournalCreate(sqlite3_file p){
 if( p.pMethods!=&JournalFileMethods ){
-return Sqlite3.SQLITE_OK;
+return SqlResult.SQLITE_OK;
 }
 return createFile((JournalFile )p);
 }

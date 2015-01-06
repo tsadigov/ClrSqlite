@@ -516,9 +516,9 @@ set { _flags = value; }
             return true;
         }
 
-        public int sqlite3VdbeMemExpandBlob()
+        public SqlResult sqlite3VdbeMemExpandBlob()
         {
-            return Sqlite3.SQLITE_OK;
+            return SqlResult.SQLITE_OK;
         }
 
         ///<summary>
@@ -558,7 +558,7 @@ set { _flags = value; }
 
 
 
-        public int sqlite3VdbeMemSetStr(
+        public SqlResult sqlite3VdbeMemSetStr(
         string z,///
             ///<summary>
             ///String pointer 
@@ -584,7 +584,7 @@ set { _flags = value; }
             return pMem.sqlite3VdbeMemSetStr(z, 0, n, enc, xDel);
         }
         // Call w/o offset
-        public int sqlite3VdbeMemSetStr(
+        public SqlResult sqlite3VdbeMemSetStr(
         string z,///
             ///<summary>
             ///String pointer 
@@ -632,7 +632,7 @@ set { _flags = value; }
             if (z == null || z.Length < offset)
             {
                 pMem.sqlite3VdbeMemSetNull();
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             if (pMem.db != null)
             {
@@ -676,11 +676,11 @@ set { _flags = value; }
                 }
                 if (nByte > iLimit)
                 {
-                    return Sqlite3.SQLITE_TOOBIG;
+                    return SqlResult.SQLITE_TOOBIG;
                 }
                 if (vdbemem_cs.sqlite3VdbeMemGrow(pMem, (int)nAlloc, 0) != 0)
                 {
-                    return Sqlite3.SQLITE_NOMEM;
+                    return SqlResult.SQLITE_NOMEM;
                 }
                 //if ( nAlloc < z.Length )
                 //pMem.z = new byte[nAlloc]; Buffer.BlockCopy( z, 0, pMem.z, 0, (int)nAlloc ); }
@@ -749,9 +749,9 @@ return SQLITE_NOMEM;
 #endif
             if (nByte > iLimit)
             {
-                return Sqlite3.SQLITE_TOOBIG;
+                return SqlResult.SQLITE_TOOBIG;
             }
-            return Sqlite3.SQLITE_OK;
+            return SqlResult.SQLITE_OK;
         }
 
 
@@ -962,7 +962,7 @@ return SQLITE_NOMEM;
         /// Convert pMem to type integer.  Invalidate any prior representations.
         ///
         ///</summary>
-        public int sqlite3VdbeMemIntegerify()
+        public SqlResult sqlite3VdbeMemIntegerify()
         {
             Mem pMem = this;
             Debug.Assert(pMem.db == null || pMem.db.mutex.sqlite3_mutex_held());
@@ -970,21 +970,21 @@ return SQLITE_NOMEM;
             //assert( EIGHT_BYTE_ALIGNMENT(pMem) );
             pMem.u.i = pMem.sqlite3VdbeIntValue();
             pMem.MemSetTypeFlag(MemFlags.MEM_Int);
-            return Sqlite3.SQLITE_OK;
+            return SqlResult.SQLITE_OK;
         }
         ///<summary>
         /// Convert pMem so that it is of type MEM.MEM_Real.
         /// Invalidate any prior representations.
         ///
         ///</summary>
-        public int sqlite3VdbeMemRealify()
+        public SqlResult sqlite3VdbeMemRealify()
         {
             Mem pMem = this;
             Debug.Assert(pMem.db == null || pMem.db.mutex.sqlite3_mutex_held());
             //assert( EIGHT_BYTE_ALIGNMENT(pMem) );
             pMem.r = pMem.sqlite3VdbeRealValue();
             pMem.MemSetTypeFlag(MemFlags.MEM_Real);
-            return Sqlite3.SQLITE_OK;
+            return SqlResult.SQLITE_OK;
         }
         ///<summary>
         /// Convert pMem so that it has types MEM.MEM_Real or MEM.MEM_Int or both.
@@ -995,7 +995,7 @@ return SQLITE_NOMEM;
         /// as much of the string as we can and ignore the rest.
         ///
         ///</summary>
-        public int sqlite3VdbeMemNumerify()
+        public SqlResult sqlite3VdbeMemNumerify()
         {
             Mem pMem = this;
             if ((pMem.flags & (MemFlags.MEM_Int | MemFlags.MEM_Real | MemFlags.MEM_Null)) == 0)
@@ -1027,7 +1027,7 @@ return SQLITE_NOMEM;
             }
             Debug.Assert((pMem.flags & (MemFlags.MEM_Int | MemFlags.MEM_Real | MemFlags.MEM_Null)) != 0);
             pMem.flags = (pMem.flags & ~(MemFlags.MEM_Str | MemFlags.MEM_Blob));
-            return Sqlite3.SQLITE_OK;
+            return SqlResult.SQLITE_OK;
         }
 
 
@@ -1178,10 +1178,10 @@ return SQLITE_NOMEM;
         ///malloc().  In this way, we know that the memory is safe to be
         ///overwritten or altered.
         ///
-        ///Return Sqlite3.SQLITE_OK on success or SQLITE_NOMEM if malloc fails.
+        ///Return SqlResult.SQLITE_OK on success or SQLITE_NOMEM if malloc fails.
         ///
         ///</summary>
-        public int sqlite3VdbeMemMakeWriteable()
+        public SqlResult sqlite3VdbeMemMakeWriteable()
         {
             Mem pMem = this;
             MemFlags f;
@@ -1202,7 +1202,7 @@ return SQLITE_NOMEM;
 																																																																																								        pMem.pScopyFrom = null;
 #endif
             }
-            return Sqlite3.SQLITE_OK;
+            return SqlResult.SQLITE_OK;
         }
 
 
@@ -1354,7 +1354,7 @@ static int sqlite3VdbeCheckFk( Vdbe p, int i ) { return 0; }
 	#if !SQLITE_OMIT_INCRBLOB
 																																//  int sqlite3VdbeMemExpandBlob(Mem );
 #else
-	//  #define sqlite3VdbeMemExpandBlob(x) Sqlite3.SQLITE_OK
+	//  #define sqlite3VdbeMemExpandBlob(x) SqlResult.SQLITE_OK
 	#endif
 	//#endif //* !_VDBEINT_H_) */
 	}

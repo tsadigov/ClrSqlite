@@ -105,10 +105,10 @@ namespace Community.CsharpSqlite
             ///Flags passed to sqlite3_vfs.xOpen() 
             ///</summary>
 
-            public int errCode;
+            public SqlResult errCode;
             public SqlResult ErrCode {
                 get { return (SqlResult)errCode; }
-                set { errCode = (int)value; }
+                set { errCode = (SqlResult)value; }
             }
 
             ///
@@ -116,7 +116,7 @@ namespace Community.CsharpSqlite
             ///Most recent error code (SQLITE_) 
             ///</summary>
 
-            public int errMask;
+            public SqlResult errMask;
 
             ///
             ///<summary>

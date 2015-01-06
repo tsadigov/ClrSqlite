@@ -658,43 +658,43 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 ///</summary>
 
 			public///<summary>
-			/// Set bit pgno of the BtShared.pHasContent bitvec. This is called
-			/// when a page that previously contained data becomes a free-list leaf
-			/// page.
-			///
-			/// The BtShared.pHasContent bitvec exists to work around an obscure
-			/// bug caused by the interaction of two useful IO optimizations surrounding
-			/// free-list leaf pages:
-			///
-			///   1) When all data is deleted from a page and the page becomes
-			///      a free-list leaf page, the page is not written to the database
-			///      (as free-list leaf pages contain no meaningful data). Sometimes
-			///      such a page is not even journalled (as it will not be modified,
-			///      why bother journalling it?).
-			///
-			///   2) When a free-list leaf page is reused, its content is not read
-			///      from the database or written to the journal file (why should it
-			///      be, if it is not at all meaningful?).
-			///
-			/// By themselves, these optimizations work fine and provide a handy
-			/// performance boost to bulk delete or insert operations. However, if
-			/// a page is moved to the free-list and then reused within the same
-			/// transaction, a problem comes up. If the page is not journalled when
-			/// it is moved to the free-list and it is also not journalled when it
-			/// is extracted from the free-list and reused, then the original data
-			/// may be lost. In the event of a rollback, it may not be possible
-			/// to restore the database to its original configuration.
-			///
-			/// The solution is the BtShared.pHasContent bitvec. Whenever a page is
-			/// moved to become a free-list leaf page, the corresponding bit is
-			/// set in the bitvec. Whenever a leaf page is extracted from the free-list,
-			/// optimization 2 above is omitted if the corresponding bit is already
-			/// set in BtShared.pHasContent. The contents of the bitvec are cleared
-			/// at the end of every transaction.
-			///</summary>
-			int btreeSetHasContent (Pgno pgno)
+                  /// Set bit pgno of the BtShared.pHasContent bitvec. This is called
+                  /// when a page that previously contained data becomes a free-list leaf
+                  /// page.
+                  ///
+                  /// The BtShared.pHasContent bitvec exists to work around an obscure
+                  /// bug caused by the interaction of two useful IO optimizations surrounding
+                  /// free-list leaf pages:
+                  ///
+                  ///   1) When all data is deleted from a page and the page becomes
+                  ///      a free-list leaf page, the page is not written to the database
+                  ///      (as free-list leaf pages contain no meaningful data). Sometimes
+                  ///      such a page is not even journalled (as it will not be modified,
+                  ///      why bother journalling it?).
+                  ///
+                  ///   2) When a free-list leaf page is reused, its content is not read
+                  ///      from the database or written to the journal file (why should it
+                  ///      be, if it is not at all meaningful?).
+                  ///
+                  /// By themselves, these optimizations work fine and provide a handy
+                  /// performance boost to bulk delete or insert operations. However, if
+                  /// a page is moved to the free-list and then reused within the same
+                  /// transaction, a problem comes up. If the page is not journalled when
+                  /// it is moved to the free-list and it is also not journalled when it
+                  /// is extracted from the free-list and reused, then the original data
+                  /// may be lost. In the event of a rollback, it may not be possible
+                  /// to restore the database to its original configuration.
+                  ///
+                  /// The solution is the BtShared.pHasContent bitvec. Whenever a page is
+                  /// moved to become a free-list leaf page, the corresponding bit is
+                  /// set in the bitvec. Whenever a leaf page is extracted from the free-list,
+                  /// optimization 2 above is omitted if the corresponding bit is already
+                  /// set in BtShared.pHasContent. The contents of the bitvec are cleared
+                  /// at the end of every transaction.
+                  ///</summary>
+            SqlResult btreeSetHasContent (Pgno pgno)
 			{
-				int rc = Sqlite3.SQLITE_OK;
+                SqlResult rc = SqlResult.SQLITE_OK;
 				if (null == this.pHasContent) {
 					Debug.Assert (pgno <= this.nPage);
 					this.pHasContent = sqlite3BitvecCreate (this.nPage);
@@ -703,7 +703,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 					//  rc = SQLITE_NOMEM;
 					//}
 				}
-				if (rc == Sqlite3.SQLITE_OK && pgno <= sqlite3BitvecSize (this.pHasContent)) {
+				if (rc == SqlResult.SQLITE_OK && pgno <= sqlite3BitvecSize (this.pHasContent)) {
 					rc = sqlite3BitvecSet (this.pHasContent, pgno);
 				}
 				return rc;
@@ -736,20 +736,20 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 			{
 			}
 
-			public int saveAllCursors (Pgno iRoot, BtCursor pExcept)
+			public SqlResult saveAllCursors (Pgno iRoot, BtCursor pExcept)
 			{
 				BtCursor p;
 				Debug.Assert (this.mutex.sqlite3_mutex_held());
 				Debug.Assert (pExcept == null || pExcept.pBt == this);
 				for (p = this.pCursor; p != null; p = p.pNext) {
 					if (p != pExcept && (0 == iRoot || p.pgnoRoot == iRoot) && p.eState == CURSOR_VALID) {
-						int rc = p.saveCursorPosition ();
-						if (Sqlite3.SQLITE_OK != rc) {
+                        SqlResult rc = p.saveCursorPosition ();
+						if (SqlResult.SQLITE_OK != rc) {
 							return rc;
 						}
 					}
 				}
-				return Sqlite3.SQLITE_OK;
+				return SqlResult.SQLITE_OK;
 			}
 
 			public Pgno ptrmapPageno (Pgno pgno)
@@ -770,7 +770,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				return ret;
 			}
 
-			public void ptrmapPut (Pgno key, u8 eType, Pgno parent, ref int pRC)
+			public void ptrmapPut (Pgno key, u8 eType, Pgno parent, ref SqlResult pRC)
 			{
 				PgHdr pDbPage = new PgHdr ();
 				///
@@ -791,12 +791,12 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 ///</summary>
 
 				int offset;
-				///
-///<summary>
-///Offset in pointer map page 
-///</summary>
+                ///
+                ///<summary>
+                ///Offset in pointer map page 
+                ///</summary>
 
-				int rc;
+                SqlResult rc;
 				///
 ///<summary>
 ///Return code from subfunctions 
@@ -818,7 +818,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				}
 				iPtrmap = PTRMAP_PAGENO (this, key);
 				rc = this.pPager.sqlite3PagerGet (iPtrmap, ref pDbPage);
-				if (rc != Sqlite3.SQLITE_OK) {
+				if (rc != SqlResult.SQLITE_OK) {
 					pRC = rc;
 					return;
 				}
@@ -832,7 +832,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				if (eType != pPtrmap [offset] || Converter.sqlite3Get4byte (pPtrmap, offset + 1) != parent) {
 					TRACE ("PTRMAP_UPDATE: %d->(%d,%d)\n", key, eType, parent);
 					pRC = rc = PagerMethods.sqlite3PagerWrite (pDbPage);
-					if (rc == Sqlite3.SQLITE_OK) {
+					if (rc == SqlResult.SQLITE_OK) {
 						pPtrmap [offset] = eType;
 						Converter.sqlite3Put4byte (pPtrmap, offset + 1, parent);
 					}
@@ -841,7 +841,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				PagerMethods.sqlite3PagerUnref (pDbPage);
 			}
 
-			public int ptrmapGet (Pgno key, ref u8 pEType, ref Pgno pPgno)
+			public SqlResult ptrmapGet (Pgno key, ref u8 pEType, ref Pgno pPgno)
 			{
 				PgHdr pDbPage = new PgHdr ();
 				///
@@ -867,7 +867,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 ///Offset of entry in pointer map 
 ///</summary>
 
-				int rc;
+				SqlResult rc;
 				Debug.Assert (this.mutex.sqlite3_mutex_held());
 				iPtrmap = (int)PTRMAP_PAGENO (this, key);
 				rc = this.pPager.sqlite3PagerGet ((u32)iPtrmap, ref pDbPage);
@@ -890,39 +890,31 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 				PagerMethods.sqlite3PagerUnref (pDbPage);
 				if (pEType < 1 || pEType > 5)
 					return sqliteinth.SQLITE_CORRUPT_BKPT();
-				return Sqlite3.SQLITE_OK;
+				return SqlResult.SQLITE_OK;
 			}
 
-			public int btreeGetPage (///
-///<summary>
+			public SqlResult btreeGetPage (///
 ///The btree 
-///</summary>
 
 			Pgno pgno, ///
-///<summary>
 ///Number of the page to fetch 
-///</summary>
 
 			ref MemPage ppPage, ///
-///<summary>
 ///Return the page in this parameter 
-///</summary>
 
 			int noContent///
-///<summary>
 ///Do not load page content if true 
-///</summary>
 
 			)
 			{
-				int rc;
+                SqlResult rc;
 				DbPage pDbPage = null;
 				Debug.Assert (this.mutex.sqlite3_mutex_held());
 				rc = this.pPager.sqlite3PagerAcquire (pgno, ref pDbPage, (u8)noContent);
 				if (rc != 0)
 					return rc;
 				ppPage = pDbPage.btreePageFromDbPage (pgno, this);
-				return Sqlite3.SQLITE_OK;
+				return SqlResult.SQLITE_OK;
 			}
 
 			public MemPage btreePageLookup (Pgno pgno)
@@ -1197,7 +1189,8 @@ public static bool ISAUTOVACUUM =false;
 			)
 			{
 				MemPage pPage = new MemPage ();
-				int i, rc, depth, d2, pgno, cnt;
+				int i, depth, d2, pgno, cnt;
+                SqlResult rc;
 				int hdr, cellStart;
 				int nCell;
 				u8[] data;
@@ -1232,7 +1225,7 @@ public static bool ISAUTOVACUUM =false;
 
 				pPage.isInit = 0;
 				if ((rc = pPage.btreeInitPage ()) != 0) {
-					Debug.Assert (rc == SQLITE_CORRUPT);
+					Debug.Assert (rc == SqlResult.SQLITE_CORRUPT);
 					///
 ///<summary>
 ///The only possible error from InitPage 
@@ -1589,11 +1582,11 @@ public static bool ISAUTOVACUUM =false;
 
 			)
 			{
-				int rc;
+				SqlResult rc;
 				u8 ePtrmapType = 0;
 				Pgno iPtrmapParent = 0;
 				rc = this.pBt.ptrmapGet (iChild, ref ePtrmapType, ref iPtrmapParent);
-				if (rc != Sqlite3.SQLITE_OK) {
+				if (rc != SqlResult.SQLITE_OK) {
 					//if( rc==SQLITE_NOMEM || rc==SQLITE_IOERR_NOMEM ) pCheck.mallocFailed = 1;
 					this.checkAppendMsg (zContext, "Failed to read ptrmap key=%d", iChild);
 					return;

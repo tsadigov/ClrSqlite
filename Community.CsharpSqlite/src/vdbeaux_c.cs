@@ -1007,7 +1007,7 @@ void sqlite3VdbeLeave(Vdbe *p){
             ///</summary>
             ///<param name="When p">>explain==1, first the main program is listed, then each of</param>
             ///<param name="the trigger subprograms are listed one by one.">the trigger subprograms are listed one by one.</param>
-            public static int sqlite3VdbeList(Vdbe p///
+            public static SqlResult sqlite3VdbeList(Vdbe p///
                 ///<summary>
                 ///The VDBE 
                 ///</summary>
@@ -1043,7 +1043,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 ///<summary>
                 ///Loop counter 
                 ///</summary>
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
                 ///
                 ///<summary>
                 ///Return code 
@@ -1054,7 +1054,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 Community.CsharpSqlite.Mem pMem;
                 Debug.Assert(p.explain != 0);
                 Debug.Assert(p.magic == VdbeMagic.VDBE_MAGIC_RUN);
-                Debug.Assert(p.rc == Sqlite3.SQLITE_OK || p.rc == Sqlite3.SQLITE_BUSY || p.rc == Sqlite3.SQLITE_NOMEM);
+                Debug.Assert(p.rc == SqlResult.SQLITE_OK || p.rc == SqlResult.SQLITE_BUSY || p.rc == SqlResult.SQLITE_NOMEM);
                 ///
                 ///<summary>
                 ///Even though this opcode does not use dynamic strings for
@@ -1068,7 +1068,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 //  /* This happens if a malloc() inside a call to sqlite3_column_text() or
                 //  ** sqlite3_column_text16() failed.  */
                 //  db.mallocFailed = 1;
-                //  return Sqlite3.SQLITE_ERROR;
+                //  return SqlResult.SQLITE_ERROR;
                 //}
                 ///
                 ///<summary>
@@ -1124,14 +1124,14 @@ void sqlite3VdbeLeave(Vdbe *p){
                 while (i < nRow && p.explain == 2 && p.lOp[i].OpCode != OpCode.OP_Explain);
                 if (i >= nRow)
                 {
-                    p.rc = Sqlite3.SQLITE_OK;
-                    rc = Sqlite3.SQLITE_DONE;
+                    p.rc = SqlResult.SQLITE_OK;
+                    rc = SqlResult.SQLITE_DONE;
                 }
                 else
                     if (db.u1.isInterrupted)
                     {
-                        p.rc = Sqlite3.SQLITE_INTERRUPT;
-                        rc = Sqlite3.SQLITE_ERROR;
+                        p.rc = SqlResult.SQLITE_INTERRUPT;
+                        rc = SqlResult.SQLITE_ERROR;
                         malloc_cs.sqlite3SetString(ref p.zErrMsg, db, Sqlite3.sqlite3ErrStr(p.rc));
                     }
                     else
@@ -1213,7 +1213,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                                 }
                                 if (j == nSub)
                                 {
-                                    // && Sqlite3.SQLITE_OK==sqlite3VdbeMemGrow(pSub, nByte, 1) ){
+                                    // && SqlResult.SQLITE_OK==sqlite3VdbeMemGrow(pSub, nByte, 1) ){
                                     Array.Resize(ref apSub, nSub + 1);
                                     pSub._SubProgram = apSub;
                                     // (SubProgram)pSub.z;
@@ -1269,7 +1269,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         //if ( sqlite3VdbeMemGrow( pMem, 32, 0 ) != 0 )
                         //{                                                     /* P4 */
                         //  Debug.Assert( p.db.mallocFailed != 0 );
-                        //  return Sqlite3.SQLITE_ERROR;
+                        //  return SqlResult.SQLITE_ERROR;
                         //}
                         pMem.Flags = MemFlags.MEM_Dyn | MemFlags.MEM_Str | MemFlags.MEM_Term;
                         z = displayP4(pOp, pMem.z, 32);
@@ -1296,7 +1296,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             //if ( sqlite3VdbeMemGrow( pMem, 4, 0 ) != 0 )
                             //{
                             //  Debug.Assert( p.db.mallocFailed != 0 );
-                            //  return Sqlite3.SQLITE_ERROR;
+                            //  return SqlResult.SQLITE_ERROR;
                             //}
                             pMem.flags = MemFlags.MEM_Dyn | MemFlags.MEM_Str | MemFlags.MEM_Term;
                             pMem.n = 2;
@@ -1332,8 +1332,8 @@ void sqlite3VdbeLeave(Vdbe *p){
                             }
                         }
                         p.nResColumn = (u16)(8 - 4 * (p.explain - 1));
-                        p.rc = Sqlite3.SQLITE_OK;
-                        rc = Sqlite3.SQLITE_ROW;
+                        p.rc = SqlResult.SQLITE_OK;
+                        rc = SqlResult.SQLITE_ROW;
                     }
                 return rc;
             }
@@ -1789,19 +1789,19 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<param name="write">transaction spanning more than one database file, this routine</param>
             ///<param name="takes care of the master journal trickery.">takes care of the master journal trickery.</param>
             ///<param name=""></param>
-            public static int vdbeCommit(sqlite3 db, Vdbe p)
+            public static SqlResult vdbeCommit(sqlite3 db, Vdbe p)
             {
                 int i;
                 int nTrans = 0;
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Number of databases with an active write">transaction </param>
-                int rc = Sqlite3.SQLITE_OK;
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Number of databases with an active write">transaction </param>
+                SqlResult rc = SqlResult.SQLITE_OK;
                 bool needXcommit = false;
 #if SQLITE_OMIT_VIRTUALTABLE
 																																																																								      /* With this option, sqlite3VtabSync() is defined to be simply
-** Sqlite3.SQLITE_OK so p is not used.
+** SqlResult.SQLITE_OK so p is not used.
 */
       Sqlite3.sqliteinth.UNUSED_PARAMETER( p );
 #endif
@@ -1823,7 +1823,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///file is required for an atomic commit.
                 ///
                 ///</summary>
-                for (i = 0; rc == Sqlite3.SQLITE_OK && i < db.nDb; i++)
+                for (i = 0; rc == SqlResult.SQLITE_OK && i < db.nDb; i++)
                 {
                     Btree pBt = db.aDb[i].pBt;
                     if (pBt.sqlite3BtreeIsInTrans())
@@ -1834,7 +1834,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         rc = pBt.sqlite3BtreePager().sqlite3PagerExclusiveLock();
                     }
                 }
-                if (rc != Sqlite3.SQLITE_OK)
+                if (rc != SqlResult.SQLITE_OK)
                 {
                     return rc;
                 }
@@ -1847,7 +1847,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     rc = db.xCommitCallback(db.pCommitArg);
                     if (rc != 0)
                     {
-                        return Sqlite3.SQLITE_CONSTRAINT;
+                        return SqlResult.SQLITE_CONSTRAINT;
                     }
                 }
                 ///
@@ -1864,7 +1864,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<param name=""></param>
                 if (0 == StringExtensions.sqlite3Strlen30(db.aDb[0].pBt.GetFilename()) || nTrans <= 1)
                 {
-                    for (i = 0; rc == Sqlite3.SQLITE_OK && i < db.nDb; i++)
+                    for (i = 0; rc == SqlResult.SQLITE_OK && i < db.nDb; i++)
                     {
                         Btree pBt = db.aDb[i].pBt;
                         if (pBt != null)
@@ -1880,7 +1880,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///but could happen. In this case abandon processing and return the error.
                     ///
                     ///</summary>
-                    for (i = 0; rc == Sqlite3.SQLITE_OK && i < db.nDb; i++)
+                    for (i = 0; rc == SqlResult.SQLITE_OK && i < db.nDb; i++)
                     {
                         Btree pBt = db.aDb[i].pBt;
                         if (pBt != null)
@@ -1888,7 +1888,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             rc = pBt.sqlite3BtreeCommitPhaseTwo(0);
                         }
                     }
-                    if (rc == Sqlite3.SQLITE_OK)
+                    if (rc == SqlResult.SQLITE_OK)
                     {
                         vtab.sqlite3VtabCommit(db);
                     }
@@ -1932,16 +1932,17 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         sqliteinth.sqlite3FileSuffix3(zMainFile, zMaster);
                         rc = os.sqlite3OsAccess(pVfs, zMaster, Sqlite3.SQLITE_ACCESS_EXISTS, ref res);
                     }
-                    while (rc == Sqlite3.SQLITE_OK && res == 1);
-                    if (rc == Sqlite3.SQLITE_OK)
+                    while (rc == SqlResult.SQLITE_OK && res == 1);
+                    if (rc == SqlResult.SQLITE_OK)
                     {
                         ///
                         ///<summary>
                         ///Open the master journal. 
                         ///</summary>
-                        rc = os.sqlite3OsOpenMalloc(ref pVfs, zMaster, ref pMaster, Sqlite3.SQLITE_OPEN_READWRITE | Sqlite3.SQLITE_OPEN_CREATE | Sqlite3.SQLITE_OPEN_EXCLUSIVE | Sqlite3.SQLITE_OPEN_MASTER_JOURNAL, ref rc);
+                        int flags = Sqlite3.SQLITE_OPEN_READWRITE | Sqlite3.SQLITE_OPEN_CREATE | Sqlite3.SQLITE_OPEN_EXCLUSIVE | Sqlite3.SQLITE_OPEN_MASTER_JOURNAL;
+                        rc = os.sqlite3OsOpenMalloc(ref pVfs, zMaster, ref pMaster, flags, ref flags);
                     }
-                    if (rc != Sqlite3.SQLITE_OK)
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         db.sqlite3DbFree(ref zMaster);
                         return rc;
@@ -1976,7 +1977,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             }
                             rc = os.sqlite3OsWrite(pMaster, Encoding.UTF8.GetBytes(zFile), StringExtensions.sqlite3Strlen30(zFile), offset);
                             offset += StringExtensions.sqlite3Strlen30(zFile);
-                            if (rc != Sqlite3.SQLITE_OK)
+                            if (rc != SqlResult.SQLITE_OK)
                             {
                                 os.sqlite3OsCloseFree(pMaster);
                                 os.sqlite3OsDelete(pVfs, zMaster, 0);
@@ -1991,7 +1992,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///flag is set this is not required.
                     ///
                     ///</summary>
-                    if (needSync && 0 == (os.sqlite3OsDeviceCharacteristics(pMaster) & Sqlite3.SQLITE_IOCAP_SEQUENTIAL) && Sqlite3.SQLITE_OK != (rc = os.sqlite3OsSync(pMaster, Sqlite3.SQLITE_SYNC_NORMAL)))
+                    if (needSync && 0 == (os.sqlite3OsDeviceCharacteristics(pMaster) & Sqlite3.SQLITE_IOCAP_SEQUENTIAL) && SqlResult.SQLITE_OK != (rc = os.sqlite3OsSync(pMaster, Sqlite3.SQLITE_SYNC_NORMAL)))
                     {
                         os.sqlite3OsCloseFree(pMaster);
                         os.sqlite3OsDelete(pVfs, zMaster, 0);
@@ -2011,7 +2012,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///file before the failure occurred.
                     ///
                     ///</summary>
-                    for (i = 0; rc == Sqlite3.SQLITE_OK && i < db.nDb; i++)
+                    for (i = 0; rc == SqlResult.SQLITE_OK && i < db.nDb; i++)
                     {
                         Btree pBt = db.aDb[i].pBt;
                         if (pBt != null)
@@ -2020,8 +2021,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         }
                     }
                     os.sqlite3OsCloseFree(pMaster);
-                    Debug.Assert(rc != Sqlite3.SQLITE_BUSY);
-                    if (rc != Sqlite3.SQLITE_OK)
+                    Debug.Assert(rc != SqlResult.SQLITE_BUSY);
+                    if (rc != SqlResult.SQLITE_OK)
                     {
                         db.sqlite3DbFree(ref zMaster);
                         return rc;
@@ -2130,7 +2131,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     Btree p = db.aDb[i].pBt;
                     if (p != null && p.sqlite3BtreeIsInTrans())
                     {
-                        p.sqlite3BtreeTripAllCursors(Sqlite3.SQLITE_ABORT);
+                        p.sqlite3BtreeTripAllCursors(SqlResult.SQLITE_ABORT);
                     }
                 }
             }
@@ -2144,17 +2145,17 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<param name="statement transaction is commtted.">statement transaction is commtted.</param>
             ///<param name=""></param>
             ///<param name="If an IO error occurs, an SQLITE_IOERR_XXX error code is returned.">If an IO error occurs, an SQLITE_IOERR_XXX error code is returned.</param>
-            ///<param name="Otherwise Sqlite3.SQLITE_OK.">Otherwise Sqlite3.SQLITE_OK.</param>
+            ///<param name="Otherwise SqlResult.SQLITE_OK.">Otherwise SqlResult.SQLITE_OK.</param>
             ///<param name=""></param>
             ///<summary>
             /// This function is called when a transaction opened by the database
             /// handle associated with the VM passed as an argument is about to be
             /// committed. If there are outstanding deferred foreign key constraint
-            /// violations, return Sqlite3.SQLITE_ERROR. Otherwise, Sqlite3.SQLITE_OK.
+            /// violations, return SqlResult.SQLITE_ERROR. Otherwise, SqlResult.SQLITE_OK.
             ///
             /// If there are outstanding FK violations and this function returns
-            /// Sqlite3.SQLITE_ERROR, set the result of the VM to SQLITE_CONSTRAINT and write
-            /// an error message to it. Then return Sqlite3.SQLITE_ERROR.
+            /// SqlResult.SQLITE_ERROR, set the result of the VM to SQLITE_CONSTRAINT and write
+            /// an error message to it. Then return SqlResult.SQLITE_ERROR.
             ///
             ///</summary>
 #if !SQLITE_OMIT_FOREIGN_KEY
@@ -2174,7 +2175,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             ///<summary>
             /// Each VDBE holds the result of the most recent sqlite3_step() call
-            /// in p.rc.  This routine sets that result back to Sqlite3.SQLITE_OK.
+            /// in p.rc.  This routine sets that result back to SqlResult.SQLITE_OK.
             ///
             ///</summary>
             ///<summary>
@@ -2194,9 +2195,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// the result code.  Write any error message text into pzErrMsg.
             ///
             ///</summary>
-            public static int sqlite3VdbeFinalize(ref Vdbe p)
+            public static SqlResult sqlite3VdbeFinalize(ref Vdbe p)
             {
-                int rc = Sqlite3.SQLITE_OK;
+                SqlResult rc = SqlResult.SQLITE_OK;
                 if (p.magic == VdbeMagic.VDBE_MAGIC_RUN || p.magic == VdbeMagic.VDBE_MAGIC_HALT)
                 {
                     rc = p.sqlite3VdbeReset();
@@ -2301,12 +2302,12 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             ///<param name="not been deleted out from under the cursor, then this routine is a no">op.</param>
             ///<param name=""></param>
-            public static int sqlite3VdbeCursorMoveto(VdbeCursor p)
+            public static SqlResult sqlite3VdbeCursorMoveto(VdbeCursor p)
             {
                 if (p.deferredMoveto)
                 {
                     int res = 0;
-                    int rc;
+                    SqlResult rc;
 #if SQLITE_TEST
 																																																																																																        //extern int sqlite3_search_count;
 #endif
@@ -2332,7 +2333,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     if (Sqlite3.ALWAYS(p.pCursor != null))
                     {
                         int hasMoved = 0;
-                        int rc = p.pCursor.sqlite3BtreeCursorHasMoved(ref hasMoved);
+                        SqlResult rc = p.pCursor.sqlite3BtreeCursorHasMoved(ref hasMoved);
                         if (rc != 0)
                             return rc;
                         if (hasMoved != 0)
@@ -2341,7 +2342,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             p.nullRow = true;
                         }
                     }
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             ///<summary>
             /// The following functions:
@@ -3221,7 +3222,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///</summary>
                 int i = 0;
                 int nField;
-                int rc = 0;
+                var rc = 0;
                 byte[] aKey1 = new byte[pKey1.Length - offset];
                 //Buffer.BlockCopy( pKey1, offset, aKey1, 0, aKey1.Length );
                 KeyInfo pKeyInfo;
@@ -3351,16 +3352,16 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<summary>
             /// pCur points at an index entry created using the OP_MakeRecord opcode.
             /// Read the rowid (the last field in the record) and store it in *rowid.
-            /// Return Sqlite3.SQLITE_OK if everything works, or an error code otherwise.
+            /// Return SqlResult.SQLITE_OK if everything works, or an error code otherwise.
             ///
             /// pCur might be pointing to text obtained from a corrupt database file.
             /// So the content cannot be trusted.  Do appropriate checks on the content.
             ///
             ///</summary>
-            public static int sqlite3VdbeIdxRowid(sqlite3 db, BtCursor pCur, ref i64 rowid)
+            public static SqlResult sqlite3VdbeIdxRowid(sqlite3 db, BtCursor pCur, ref i64 rowid)
             {
                 i64 nCellKey = 0;
-                int rc;
+                SqlResult rc;
                 u32 szHdr = 0;
                 ///
                 ///<summary>
@@ -3390,7 +3391,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<param name=""></param>
                 Debug.Assert(pCur.sqlite3BtreeCursorIsValid());
                 rc = pCur.sqlite3BtreeKeySize(ref nCellKey);
-                Debug.Assert(rc == Sqlite3.SQLITE_OK);
+                Debug.Assert(rc == SqlResult.SQLITE_OK);
                 ///
                 ///<summary>
                 ///pCur is always valid so KeySize cannot fail 
@@ -3449,7 +3450,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 sqlite3VdbeSerialGet(m.zBLOB, (int)(m.n - lenRowid), typeRowid, v);
                 rowid = v.u.i;
                 m.sqlite3VdbeMemRelease();
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             ///
             ///<summary>
             ///Jump here if database corruption is detected after m has been
@@ -3464,7 +3465,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// Compare the key of the index entry that cursor pC is pointing to against
             /// the key string in pUnpacked.  Write into *pRes a number
             /// that is negative, zero, or positive if pC is less than, equal to,
-            /// or greater than pUnpacked.  Return Sqlite3.SQLITE_OK on success.
+            /// or greater than pUnpacked.  Return SqlResult.SQLITE_OK on success.
             ///
             /// pUnpacked is either created without a rowid or is truncated so that it
             /// omits the rowid at the end.  The rowid at the end of the index entry
@@ -3472,7 +3473,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// of the keys prior to the final rowid, not the entire key.
             ///
             ///</summary>
-            public static int sqlite3VdbeIdxKeyCompare(VdbeCursor pC,///
+            public static SqlResult sqlite3VdbeIdxKeyCompare(VdbeCursor pC,///
                 ///<summary>
                 ///The cursor to compare against 
                 ///</summary>
@@ -3487,12 +3488,12 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             )
             {
                 i64 nCellKey = 0;
-                int rc;
+                SqlResult rc;
                 BtCursor pCur = pC.pCursor;
                 Mem m = null;
                 Debug.Assert(pCur.sqlite3BtreeCursorIsValid());
                 rc = pCur.sqlite3BtreeKeySize(ref nCellKey);
-                Debug.Assert(rc == Sqlite3.SQLITE_OK);
+                Debug.Assert(rc == SqlResult.SQLITE_OK);
                 ///
                 ///<summary>
                 ///pCur is always valid so KeySize cannot fail 
@@ -3517,7 +3518,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 Debug.Assert((pUnpacked.flags & UnpackedRecordFlags.UNPACKED_IGNORE_ROWID) != 0);
                 res = sqlite3VdbeRecordCompare(m.n, m.zBLOB, pUnpacked);
                 m.sqlite3VdbeMemRelease();
-                return Sqlite3.SQLITE_OK;
+                return SqlResult.SQLITE_OK;
             }
             ///<summary>
             /// This routine sets the value to be returned by subsequent calls to

@@ -20,7 +20,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static void attachFunc(sqlite3_context context,int NotUsed,sqlite3_value[] argv) {
 			int i;
-			int rc=0;
+            SqlResult rc =(SqlResult)0;
 			sqlite3 db=vdbeapi.sqlite3_context_db_handle(context);
 			string zName;
 			string zFile;
@@ -98,7 +98,7 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			flags=(int)db.openFlags;
 			rc=sqlite3ParseUri(db.pVfs.zName,zFile,ref flags,ref pVfs,ref zPath,ref zErr);
-			if(rc!=Sqlite3.SQLITE_OK) {
+			if(rc!=SqlResult.SQLITE_OK) {
 				//if ( rc == SQLITE_NOMEM )
 				//db.mallocFailed = 1;
 				context.sqlite3_result_error(zErr,-1);
@@ -110,12 +110,13 @@ namespace Community.CsharpSqlite {
 			rc=Btree.Open(pVfs,zPath,db,ref aNew.pBt,0,(int)flags);
 			//malloc_cs.sqlite3_free( zPath );
 			db.nDb++;
-			if(rc==SQLITE_CONSTRAINT) {
-				rc=Sqlite3.SQLITE_ERROR;
+            if (rc == SqlResult.SQLITE_CONSTRAINT)
+            {
+				rc=SqlResult.SQLITE_ERROR;
 				zErrDyn=io.sqlite3MPrintf(db,"database is already attached");
 			}
 			else
-				if(rc==Sqlite3.SQLITE_OK) {
+				if(rc==SqlResult.SQLITE_OK) {
 					Pager pPager;
 					aNew.pSchema=sqlite3SchemaGet(db,aNew.pBt);
 					//if ( aNew.pSchema == null )
@@ -125,7 +126,7 @@ namespace Community.CsharpSqlite {
 					//else 
 					if(aNew.pSchema.file_format!=0&&aNew.pSchema.enc!=sqliteinth.ENC(db)) {
 						zErrDyn=io.sqlite3MPrintf(db,"attached databases must use the same text encoding as main database");
-						rc=Sqlite3.SQLITE_ERROR;
+						rc=SqlResult.SQLITE_ERROR;
 					}
 					pPager=aNew.pBt.sqlite3BtreePager();
 					pPager.sqlite3PagerLockingMode(db.dfltLockMode);
@@ -134,11 +135,11 @@ namespace Community.CsharpSqlite {
 			aNew.safety_level=3;
 			aNew.zName=zName;
 			//sqlite3DbStrDup(db, zName);
-			//if( rc==Sqlite3.SQLITE_OK && aNew.zName==0 ){
+			//if( rc==SqlResult.SQLITE_OK && aNew.zName==0 ){
 			//  rc = SQLITE_NOMEM;
 			//}
 			#if SQLITE_HAS_CODEC
-			if(rc==Sqlite3.SQLITE_OK) {
+			if(rc==SqlResult.SQLITE_OK) {
 				//extern int sqlite3CodecAttach(sqlite3*, int, const void*, int);
 				//extern void sqlite3CodecGetKey(sqlite3*, int, void**, int*);
 				int nKey;
@@ -149,7 +150,7 @@ namespace Community.CsharpSqlite {
                     case FoundationalType.SQLITE_FLOAT:
 				zErrDyn="Invalid key value";
 				//sqlite3DbStrDup( db, "Invalid key value" );
-				rc=Sqlite3.SQLITE_ERROR;
+				rc=SqlResult.SQLITE_ERROR;
 				break;
                     case FoundationalType.SQLITE_TEXT:
                     case FoundationalType.SQLITE_BLOB:
@@ -179,7 +180,7 @@ namespace Community.CsharpSqlite {
 			///remove the entry from the db.aDb[] array. i.e. put everything back the way
 			///we found it.
 			///</summary>
-			if(rc==Sqlite3.SQLITE_OK) {
+			if(rc==SqlResult.SQLITE_OK) {
 				sqlite3BtreeEnterAll(db);
 				rc=sqlite3Init(db,ref zErrDyn);
 				sqlite3BtreeLeaveAll(db);
@@ -194,7 +195,8 @@ namespace Community.CsharpSqlite {
 				}
 				build.sqlite3ResetInternalSchema(db,-1);
 				db.nDb=iDb;
-				if(rc==SQLITE_NOMEM||rc==SQLITE_IOERR_NOMEM) {
+                if (rc == SqlResult.SQLITE_NOMEM || rc == SqlResult.SQLITE_IOERR_NOMEM)
+                {
 					////        db.mallocFailed = 1;
 					db.sqlite3DbFree(ref zErrDyn);
 					zErrDyn=io.sqlite3MPrintf(db,"out of memory");

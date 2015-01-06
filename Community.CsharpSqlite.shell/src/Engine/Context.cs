@@ -71,7 +71,7 @@ namespace Community.CsharpSqlite
         ///<summary>
         ///Error code returned by the function. 
         ///</summary>
-        public int isError;
+        public SqlResult isError;
 
 
         ///<summary>
@@ -118,7 +118,7 @@ namespace Community.CsharpSqlite
         dxDel xDel//void (*xDel)(void)     /* Destructor function */
         )
         {
-            if (this.s.sqlite3VdbeMemSetStr(z, o, n, enc, xDel) == Sqlite3.SQLITE_TOOBIG)
+            if (this.s.sqlite3VdbeMemSetStr(z, o, n, enc, xDel) == SqlResult.SQLITE_TOOBIG)
             {
                 this.sqlite3_result_error_toobig();
             }
@@ -147,7 +147,7 @@ namespace Community.CsharpSqlite
         dxDel xDel//void (*xDel)(void)     /* Destructor function */
         )
         {
-            if (this.s.sqlite3VdbeMemSetStr(z, n, enc, xDel) == Sqlite3.SQLITE_TOOBIG)
+            if (this.s.sqlite3VdbeMemSetStr(z, n, enc, xDel) == SqlResult.SQLITE_TOOBIG)
             {
                 this.sqlite3_result_error_toobig();
             }
@@ -170,7 +170,7 @@ namespace Community.CsharpSqlite
         {
             Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.setResultStrOrError(z, n, SqliteEncoding.UTF8, Sqlite3.SQLITE_TRANSIENT);
-            this.isError = Sqlite3.SQLITE_ERROR;
+            this.isError = SqlResult.SQLITE_ERROR;
         }
 
         public void sqlite3_result_int(int iVal)
@@ -222,7 +222,7 @@ namespace Community.CsharpSqlite
             this.s.sqlite3VdbeMemSetZeroBlob(n);
         }
 
-        public void sqlite3_result_error_code(int errCode)
+        public void sqlite3_result_error_code(SqlResult errCode)
         {
             this.isError = errCode;
             if ((this.s.flags & MemFlags.MEM_Null) != 0)
@@ -237,7 +237,7 @@ namespace Community.CsharpSqlite
         public void sqlite3_result_error_toobig()
         {
             Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
-            this.isError = Sqlite3.SQLITE_ERROR;
+            this.isError = SqlResult.SQLITE_ERROR;
             this.setResultStrOrError("string or blob too big", -1, SqliteEncoding.UTF8, Sqlite3.SQLITE_STATIC);
         }
 
@@ -248,7 +248,7 @@ namespace Community.CsharpSqlite
         {
             Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
             this.s.sqlite3VdbeMemSetNull();
-            this.isError = Sqlite3.SQLITE_NOMEM;
+            this.isError = SqlResult.SQLITE_NOMEM;
             //pCtx.s.db.mallocFailed = 1;
         }
     }

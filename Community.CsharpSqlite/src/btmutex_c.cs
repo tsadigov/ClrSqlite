@@ -110,7 +110,7 @@ void sqlite3BtreeEnter(Btree *p){
   ** want without having to go throught the ascending lock
   ** procedure that follows.  Just be sure not to block.
   */
-  if( sqlite3_mutex_try(p->pBt->mutex)==Sqlite3.SQLITE_OK ){
+  if( sqlite3_mutex_try(p->pBt->mutex)==SqlResult.SQLITE_OK ){
 p->pBt->db = p->db;
 p->locked = 1;
 return;

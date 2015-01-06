@@ -95,35 +95,35 @@ namespace Community.CsharpSqlite
             ///Next outer name context.  NULL for outermost 
             ///</summary>
             public///<summary>
-                /// Resolve an expression that was part of an ATTACH or DETACH statement. This
-                /// is slightly different from resolving a normal SQL expression, because simple
-                /// identifiers are treated as strings, not possible column names or aliases.
-                ///
-                /// i.e. if the parser sees:
-                ///
-                ///     ATTACH DATABASE abc AS def
-                ///
-                /// it treats the two expressions as literal strings 'abc' and 'def' instead of
-                /// looking for columns of the same name.
-                ///
-                /// This only applies to the root node of pExpr, so the statement:
-                ///
-                ///     ATTACH DATABASE abc||def AS 'db2'
-                ///
-                /// will fail because neither abc or def can be resolved.
-                ///</summary>
-            int resolveAttachExpr(Expr pExpr)
+                  /// Resolve an expression that was part of an ATTACH or DETACH statement. This
+                  /// is slightly different from resolving a normal SQL expression, because simple
+                  /// identifiers are treated as strings, not possible column names or aliases.
+                  ///
+                  /// i.e. if the parser sees:
+                  ///
+                  ///     ATTACH DATABASE abc AS def
+                  ///
+                  /// it treats the two expressions as literal strings 'abc' and 'def' instead of
+                  /// looking for columns of the same name.
+                  ///
+                  /// This only applies to the root node of pExpr, so the statement:
+                  ///
+                  ///     ATTACH DATABASE abc||def AS 'db2'
+                  ///
+                  /// will fail because neither abc or def can be resolved.
+                  ///</summary>
+            SqlResult resolveAttachExpr(Expr pExpr)
             {
-                int rc = Sqlite3.SQLITE_OK;
+                var rc = SqlResult.SQLITE_OK;
                 if (pExpr != null)
                 {
                     if (pExpr.op != Sqlite3.TK_ID)
                     {
                         rc = Sqlite3.ResolveExtensions.sqlite3ResolveExprNames(this, ref pExpr);
-                        if (rc == Sqlite3.SQLITE_OK && pExpr.sqlite3ExprIsConstant() == 0)
+                        if (rc == SqlResult.SQLITE_OK && pExpr.sqlite3ExprIsConstant() == 0)
                         {
                             Sqlite3.utilc.sqlite3ErrorMsg(this.pParse, "invalid name: \"%s\"", pExpr.u.zToken);
-                            return Sqlite3.SQLITE_ERROR;
+                            return SqlResult.SQLITE_ERROR;
                         }
                     }
                     else

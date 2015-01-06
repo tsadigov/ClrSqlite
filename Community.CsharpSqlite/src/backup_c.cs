@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///</summary>
 			///<param name="Source b">tree file </param>
-			public int rc;
+			public SqlResult rc;
 			///
 			///<summary>
 			///Backup process error code 
@@ -114,8 +114,8 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			/// Copy nPage pages from the source b-tree to the destination.
 			///</summary>
-			public int sqlite3_backup_step(int nPage) {
-				int rc;
+			public SqlResult sqlite3_backup_step(int nPage) {
+                SqlResult rc;
 				int destMode;
 				///
 				///<summary>
@@ -170,16 +170,16 @@ namespace Community.CsharpSqlite {
 					///<param name="SQLITE_BUSY immediately.">SQLITE_BUSY immediately.</param>
 					///<param name=""></param>
 					if(this.pDestDb!=null&&this.pSrc.pBt.inTransaction==TransType.TRANS_WRITE) {
-						rc=SQLITE_BUSY;
+                        rc = SqlResult.SQLITE_BUSY;
 					}
 					else {
-						rc=Sqlite3.SQLITE_OK;
+						rc=SqlResult.SQLITE_OK;
 					}
 					///
 					///<summary>
 					///Lock the destination database, if it is not locked already. 
 					///</summary>
-					if(Sqlite3.SQLITE_OK==rc&&this.bDestLocked==0&&Sqlite3.SQLITE_OK==(rc=this.pDest.sqlite3BtreeBeginTrans(2))) {
+					if(SqlResult.SQLITE_OK==rc&&this.bDestLocked==0&&SqlResult.SQLITE_OK==(rc=this.pDest.sqlite3BtreeBeginTrans(2))) {
 						this.bDestLocked=1;
 						this.iDestSchema=this.pDest.sqlite3BtreeGetMeta(BTREE_SCHEMA_VERSION);
 					}
@@ -190,7 +190,7 @@ namespace Community.CsharpSqlite {
 					///<param name="one now. If a transaction is opened here, then it will be closed">one now. If a transaction is opened here, then it will be closed</param>
 					///<param name="before this function exits.">before this function exits.</param>
 					///<param name=""></param>
-					if(rc==Sqlite3.SQLITE_OK&&!this.pSrc.sqlite3BtreeIsInReadTrans()) {
+					if(rc==SqlResult.SQLITE_OK&&!this.pSrc.sqlite3BtreeIsInReadTrans()) {
 						rc=this.pSrc.sqlite3BtreeBeginTrans(0);
 						bCloseTrans=1;
 					}
@@ -202,8 +202,8 @@ namespace Community.CsharpSqlite {
 					pgszSrc=this.pSrc.GetPageSize();
 					pgszDest=this.pDest.GetPageSize();
 					destMode=this.pDest.sqlite3BtreePager().sqlite3PagerGetJournalMode();
-					if(Sqlite3.SQLITE_OK==rc&&destMode==PAGER_JOURNALMODE_WAL&&pgszSrc!=pgszDest) {
-						rc=SQLITE_READONLY;
+					if(SqlResult.SQLITE_OK==rc&&destMode==PAGER_JOURNALMODE_WAL&&pgszSrc!=pgszDest) {
+                        rc = SqlResult.SQLITE_READONLY;
 					}
 					///
 					///<summary>
@@ -226,18 +226,18 @@ namespace Community.CsharpSqlite {
 							///Source page object 
 							///</summary>
 							rc=pSrcPager.sqlite3PagerGet((u32)iSrcPg,ref pSrcPg);
-							if(rc==Sqlite3.SQLITE_OK) {
+							if(rc==SqlResult.SQLITE_OK) {
                                 rc = this.backupOnePage(iSrcPg, pSrcPg.sqlite3PagerGetData());
 								PagerMethods.sqlite3PagerUnref(pSrcPg);
 							}
 						}
 						this.iNext++;
 					}
-					if(rc==Sqlite3.SQLITE_OK) {
+					if(rc==SqlResult.SQLITE_OK) {
 						this.nPagecount=nSrcPage;
 						this.nRemaining=(nSrcPage+1-this.iNext);
 						if(this.iNext>nSrcPage) {
-							rc=SQLITE_DONE;
+                            rc = SqlResult.SQLITE_DONE;
 						}
 						else
 							if(0==this.isAttached) {
@@ -252,7 +252,8 @@ namespace Community.CsharpSqlite {
 					///<param name="the case where the source and destination databases have the">the case where the source and destination databases have the</param>
 					///<param name="same schema version.">same schema version.</param>
 					///<param name=""></param>
-					if(rc==SQLITE_DONE&&(rc=this.pDest.sqlite3BtreeUpdateMeta(1,this.iDestSchema+1))==Sqlite3.SQLITE_OK) {
+                    if (rc == SqlResult.SQLITE_DONE && (rc = this.pDest.sqlite3BtreeUpdateMeta(1, this.iDestSchema + 1)) == SqlResult.SQLITE_OK)
+                    {
 						Pgno nDestTruncate;
 						if(this.pDestDb!=null) {
 							build.sqlite3ResetInternalSchema(this.pDestDb,-1);
@@ -319,24 +320,24 @@ namespace Community.CsharpSqlite {
 							///Write the extra pages and truncate the database file as required. 
 							///</summary>
                             iEnd = MathExtensions.MIN(PENDING_BYTE + pgszDest, iSize);
-							for(iOff=PENDING_BYTE+pgszSrc;rc==Sqlite3.SQLITE_OK&&iOff<iEnd;iOff+=pgszSrc) {
+							for(iOff=PENDING_BYTE+pgszSrc;rc==SqlResult.SQLITE_OK&&iOff<iEnd;iOff+=pgszSrc) {
 								PgHdr pSrcPg=null;
 								u32 iSrcPg=(u32)((iOff/pgszSrc)+1);
 								rc=pSrcPager.sqlite3PagerGet(iSrcPg,ref pSrcPg);
-								if(rc==Sqlite3.SQLITE_OK) {
+								if(rc==SqlResult.SQLITE_OK) {
                                     byte[] zData = pSrcPg.sqlite3PagerGetData();
 									rc=os.sqlite3OsWrite(pFile,zData,pgszSrc,iOff);
 								}
 								PagerMethods.sqlite3PagerUnref(pSrcPg);
 							}
-							if(rc==Sqlite3.SQLITE_OK) {
+							if(rc==SqlResult.SQLITE_OK) {
 								rc=pFile.backupTruncateFile((int)iSize);
 							}
 							///
 							///<summary>
 							///Sync the database file to disk. 
 							///</summary>
-							if(rc==Sqlite3.SQLITE_OK) {
+							if(rc==SqlResult.SQLITE_OK) {
 								rc=pDestPager.sqlite3PagerSync();
 							}
 						}
@@ -347,8 +348,8 @@ namespace Community.CsharpSqlite {
 						///<summary>
 						///Finish committing the transaction to the destination database. 
 						///</summary>
-						if(Sqlite3.SQLITE_OK==rc&&Sqlite3.SQLITE_OK==(rc=this.pDest.sqlite3BtreeCommitPhaseTwo(0))) {
-							rc=SQLITE_DONE;
+						if(SqlResult.SQLITE_OK==rc&&SqlResult.SQLITE_OK==(rc=this.pDest.sqlite3BtreeCommitPhaseTwo(0))) {
+							rc= SqlResult.SQLITE_DONE;
 						}
 					}
 					///
@@ -367,14 +368,14 @@ namespace Community.CsharpSqlite {
       int rc2;
       rc2 = sqlite3BtreeCommitPhaseOne( p.pSrc, "" );
       rc2 |= sqlite3BtreeCommitPhaseTwo( p.pSrc, 0 );
-      Debug.Assert( rc2 == Sqlite3.SQLITE_OK );
+      Debug.Assert( rc2 == SqlResult.SQLITE_OK );
 #else
 						this.pSrc.sqlite3BtreeCommitPhaseOne(null);
 						this.pSrc.sqlite3BtreeCommitPhaseTwo(0);
 						#endif
 					}
-					if(rc==SQLITE_IOERR_NOMEM) {
-						rc=SQLITE_NOMEM;
+					if(rc== SqlResult.SQLITE_IOERR_NOMEM) {
+						rc= SqlResult.SQLITE_NOMEM;
 					}
 					this.rc=rc;
 				}
@@ -388,18 +389,18 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			/// Release all resources associated with an sqlite3_backup* handle.
 			///</summary>
-			public int sqlite3_backup_finish() {
+			public SqlResult sqlite3_backup_finish() {
 				sqlite3_backup pp;
 				///
 				///<summary>
 				///Ptr to head of pagers backup list 
 				///</summary>
 				sqlite3_mutex mutex;
-				///
-				///<summary>
-				///Mutex to protect source database 
-				///</summary>
-				int rc;
+                ///
+                ///<summary>
+                ///Mutex to protect source database 
+                ///</summary>
+                SqlResult rc;
 				///
 				///<summary>
 				///Value to return 
@@ -409,7 +410,7 @@ namespace Community.CsharpSqlite {
 				///Enter the mutexes 
 				///</summary>
 				if(this==null)
-					return Sqlite3.SQLITE_OK;
+					return SqlResult.SQLITE_OK;
 				this.pSrcDb.mutex.sqlite3_mutex_enter();
 				sqlite3BtreeEnter(this.pSrc);
 				mutex=this.pSrcDb.mutex;
@@ -439,7 +440,7 @@ namespace Community.CsharpSqlite {
 				///<summary>
 				///Set the error code of the destination database handle. 
 				///</summary>
-				rc=(this.rc==SQLITE_DONE)?Sqlite3.SQLITE_OK:this.rc;
+				rc=(this.rc== SqlResult.SQLITE_DONE) ?SqlResult.SQLITE_OK:this.rc;
 				utilc.sqlite3Error(this.pDestDb,rc,0);
 				///
 				///<summary>
@@ -480,7 +481,7 @@ namespace Community.CsharpSqlite {
 			/// page iSrcPg from the source database. Copy this data into the
 			/// destination database.
 			///</summary>
-			int backupOnePage(Pgno iSrcPg,byte[] zSrcData) {
+			SqlResult backupOnePage(Pgno iSrcPg,byte[] zSrcData) {
 				Pager pDestPager=this.pDest.sqlite3BtreePager();
 				int nSrcPgsz=this.pSrc.GetPageSize();
 				int nDestPgsz=this.pDest.GetPageSize();
@@ -490,7 +491,7 @@ namespace Community.CsharpSqlite {
 				int nSrcReserve=this.pSrc.GetReserve();
 				int nDestReserve=this.pDest.GetReserve();
 				#endif
-				int rc=Sqlite3.SQLITE_OK;
+				var rc=SqlResult.SQLITE_OK;
 				i64 iOff;
 				Debug.Assert(this.bDestLocked!=0);
 				Debug.Assert(!isFatalError(this.rc));
@@ -503,7 +504,7 @@ namespace Community.CsharpSqlite {
 				///<param name="page sizes of the source and destination differ.">page sizes of the source and destination differ.</param>
 				///<param name=""></param>
 				if(nSrcPgsz!=nDestPgsz&&pDestPager.sqlite3PagerIsMemdb()) {
-					rc=SQLITE_READONLY;
+					rc= SqlResult.SQLITE_READONLY;
 				}
 				#if SQLITE_HAS_CODEC
 				///
@@ -513,7 +514,7 @@ namespace Community.CsharpSqlite {
 				///
 				///</summary>
 				if(nSrcPgsz!=nDestPgsz&&pDestPager.sqlite3PagerGetCodec()!=null) {
-					rc=SQLITE_READONLY;
+					rc= SqlResult.SQLITE_READONLY;
 				}
 				///
 				///<summary>
@@ -526,8 +527,8 @@ namespace Community.CsharpSqlite {
 				if(nSrcReserve!=nDestReserve) {
 					u32 newPgsz=(u32)nSrcPgsz;
 					rc=pDestPager.sqlite3PagerSetPagesize(ref newPgsz,nSrcReserve);
-					if(rc==Sqlite3.SQLITE_OK&&newPgsz!=nSrcPgsz)
-						rc=SQLITE_READONLY;
+					if(rc==SqlResult.SQLITE_OK&&newPgsz!=nSrcPgsz)
+						rc= SqlResult.SQLITE_READONLY;
 				}
 				#endif
 				///
@@ -537,12 +538,12 @@ namespace Community.CsharpSqlite {
 				///of the destination page.
 				///
 				///</summary>
-				for(iOff=iEnd-(i64)nSrcPgsz;rc==Sqlite3.SQLITE_OK&&iOff<iEnd;iOff+=nDestPgsz) {
+				for(iOff=iEnd-(i64)nSrcPgsz;rc==SqlResult.SQLITE_OK&&iOff<iEnd;iOff+=nDestPgsz) {
 					DbPage pDestPg=null;
 					u32 iDest=(u32)(iOff/nDestPgsz)+1;
 					if(iDest==PENDING_BYTE_PAGE(this.pDest.pBt))
 						continue;
-					if(Sqlite3.SQLITE_OK==(rc=pDestPager.sqlite3PagerGet(iDest,ref pDestPg))&&Sqlite3.SQLITE_OK==(rc=PagerMethods.sqlite3PagerWrite(pDestPg))) {
+					if(SqlResult.SQLITE_OK==(rc=pDestPager.sqlite3PagerGet(iDest,ref pDestPg))&&SqlResult.SQLITE_OK==(rc=PagerMethods.sqlite3PagerWrite(pDestPg))) {
 						//string zIn = &zSrcData[iOff%nSrcPgsz];
                         byte[] zDestData = pDestPg.sqlite3PagerGetData();
 						//string zOut = &zDestData[iOff % nDestPgsz];
@@ -582,8 +583,8 @@ namespace Community.CsharpSqlite {
 			/// Attempt to set the page size of the destination to match the page size
 			/// of the source.
 			///</summary>
-			int setDestPgsz() {
-				int rc;
+			SqlResult setDestPgsz() {
+				SqlResult rc;
 				rc=this.pDest.sqlite3BtreeSetPageSize(this.pSrc.GetPageSize(),-1,0);
 				return rc;
 			}
@@ -630,18 +631,18 @@ namespace Community.CsharpSqlite {
 			int i=build.sqlite3FindDbName(pDb,zDb);
 			if(i==1) {
 				Parse pParse;
-				int rc=0;
+				var rc=(SqlResult)0;
 				pParse=new Parse();
 				//sqlite3StackAllocZero(pErrorDb, sizeof(*pParse));
 				if(pParse==null) {
-					utilc.sqlite3Error(pErrorDb,SQLITE_NOMEM,"out of memory");
-					rc=SQLITE_NOMEM;
+					utilc.sqlite3Error(pErrorDb, SqlResult.SQLITE_NOMEM, "out of memory");
+					rc= SqlResult.SQLITE_NOMEM;
 				}
 				else {
 					pParse.db=pDb;
 					if(build.sqlite3OpenTempDatabase(pParse)!=0) {
 						utilc.sqlite3Error(pErrorDb,pParse.rc,"%s",pParse.zErrMsg);
-						rc=Sqlite3.SQLITE_ERROR;
+						rc=SqlResult.SQLITE_ERROR;
 					}
 					pErrorDb.sqlite3DbFree(ref pParse.zErrMsg);
 					//sqlite3StackFree( pErrorDb, pParse );
@@ -651,7 +652,7 @@ namespace Community.CsharpSqlite {
 				}
 			}
 			if(i<0) {
-				utilc.sqlite3Error(pErrorDb,Sqlite3.SQLITE_ERROR,"unknown database %s",zDb);
+				utilc.sqlite3Error(pErrorDb,SqlResult.SQLITE_ERROR,"unknown database %s",zDb);
 				return null;
 			}
 			return pDb.aDb[i].pBt;
@@ -700,7 +701,7 @@ namespace Community.CsharpSqlite {
 			pSrcDb.mutex.sqlite3_mutex_enter();
 			pDestDb.mutex.sqlite3_mutex_enter();
 			if(pSrcDb==pDestDb) {
-				utilc.sqlite3Error(pDestDb,Sqlite3.SQLITE_ERROR,"source and destination must be distinct");
+				utilc.sqlite3Error(pDestDb,SqlResult.SQLITE_ERROR,"source and destination must be distinct");
 				p=null;
 			}
 			else {
@@ -730,7 +731,7 @@ namespace Community.CsharpSqlite {
 				p.pSrcDb=pSrcDb;
 				p.iNext=1;
 				p.isAttached=0;
-				if(null==p.pSrc||null==p.pDest||p.setDestPgsz()==SQLITE_NOMEM) {
+				if(null==p.pSrc||null==p.pDest||p.setDestPgsz()==SqlResult.SQLITE_NOMEM) {
 					///
 					///<summary>
 					///One (or both) of the named databases did not exist or an OOM
@@ -755,8 +756,8 @@ namespace Community.CsharpSqlite {
 		/// considered fatal if encountered during a backup operation. All errors
 		/// are considered fatal except for SQLITE_BUSY and SQLITE_LOCKED.
 		///</summary>
-		public static bool isFatalError(int rc) {
-			return (rc!=Sqlite3.SQLITE_OK&&rc!=SQLITE_BUSY&&Sqlite3.ALWAYS(rc!=SQLITE_LOCKED));
+		public static bool isFatalError(SqlResult rc) {
+			return (rc!=SqlResult.SQLITE_OK&&rc!=SqlResult.SQLITE_BUSY&&Sqlite3.ALWAYS(rc!=SqlResult.SQLITE_LOCKED));
 		}
 	#if !SQLITE_OMIT_VACUUM
 	#endif
