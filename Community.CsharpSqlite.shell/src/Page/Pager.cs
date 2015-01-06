@@ -3451,7 +3451,7 @@ PagerMethods.sqlite3PagerUnref(p);
 
                     if (pSavepoint != null)
                     {
-                        pDone = sqlite3BitvecCreate(pSavepoint.nOrig);
+                        pDone = Bitvec.sqlite3BitvecCreate(pSavepoint.nOrig);
                         //if ( null == pDone )
                         //{
                         //  return SQLITE_NOMEM;
@@ -5311,7 +5311,7 @@ this.memDb != 0
                         return this.errCode;
                     if (!this.pagerUseWal() && this.journalMode != PAGER_JOURNALMODE_OFF)
                     {
-                        this.pInJournal = sqlite3BitvecCreate(this.dbSize);
+                        this.pInJournal = Bitvec.sqlite3BitvecCreate(this.dbSize);
                         //if (pPager.pInJournal == null)
                         //{
                         //  return SQLITE_NOMEM;
@@ -6251,7 +6251,7 @@ rc = pager_incr_changecounter(pPager, 0);
                                 aNew[ii].iOffset = (int)this.JOURNAL_HDR_SZ();
                             }
                             aNew[ii].iSubRec = this.nSubRec;
-                            aNew[ii].pInSavepoint = sqlite3BitvecCreate(this.dbSize);
+                            aNew[ii].pInSavepoint = Bitvec.sqlite3BitvecCreate(this.dbSize);
                             //if ( null == aNew[ii].pInSavepoint )
                             //{
                             //  return SQLITE_NOMEM;

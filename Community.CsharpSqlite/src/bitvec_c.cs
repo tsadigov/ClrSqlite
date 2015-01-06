@@ -55,6 +55,30 @@ namespace Community.CsharpSqlite
         {
             return (b != null);
         }
+
+
+
+
+
+
+
+        ///<summary>
+        /// Create a new bitmap object able to handle bits between 0 and iSize,
+        /// inclusive.  Return a pointer to the new object.  Return NULL if
+        /// malloc fails.
+        ///</summary>
+        public static Bitvec sqlite3BitvecCreate(u32 iSize)
+        {
+            Bitvec p;
+            //Debug.Assert( sizeof(p)==BITVEC_SZ );
+            p = new Bitvec();
+            //malloc_cs.sqlite3MallocZero( sizeof(p) );
+            if (p != null)
+            {
+                p.iSize = iSize;
+            }
+            return p;
+        }
     };
 	
     //sizeof(Bitvec *));
@@ -235,22 +259,6 @@ namespace Community.CsharpSqlite
 		
 
 
-		///<summary>
-		/// Create a new bitmap object able to handle bits between 0 and iSize,
-		/// inclusive.  Return a pointer to the new object.  Return NULL if
-		/// malloc fails.
-		///</summary>
-		public static Bitvec sqlite3BitvecCreate (u32 iSize)
-		{
-			Bitvec p;
-			//Debug.Assert( sizeof(p)==BITVEC_SZ );
-			p = new Bitvec ();
-			//malloc_cs.sqlite3MallocZero( sizeof(p) );
-			if (p != null) {
-				p.iSize = iSize;
-			}
-			return p;
-		}
 
 		///<summary>
 		/// Check to see if the i-th bit is set.  Return true or false.
@@ -310,7 +318,7 @@ namespace Community.CsharpSqlite
 				u32 bin = i / p.iDivisor;
 				i = i % p.iDivisor;
 				if (p.u.apSub [bin] == null) {
-					p.u.apSub [bin] = sqlite3BitvecCreate (p.iDivisor);
+                    p.u.apSub[bin] = Bitvec.sqlite3BitvecCreate(p.iDivisor);
 					//if ( p.u.apSub[bin] == null )
 					//  return SQLITE_NOMEM;
 				}
@@ -552,7 +560,7 @@ namespace Community.CsharpSqlite
 ///bits to act as the reference 
 ///</summary>
 
-			pBitvec = sqlite3BitvecCreate (sz);
+            pBitvec = Bitvec.sqlite3BitvecCreate(sz);
             pV = malloc_cs.sqlite3_malloc((int)(sz + 7) / 8 + 1);
 			pTmpSpace = new u32[BITVEC_SZ];
 			// sqlite3_malloc( BITVEC_SZ );

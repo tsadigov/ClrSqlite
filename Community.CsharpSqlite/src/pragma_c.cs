@@ -74,7 +74,7 @@ namespace Community.CsharpSqlite {
 			if(CharExtensions.sqlite3Isdigit(z[0])) {
 				return (u8)Converter.sqlite3Atoi(z);
 			}
-			n=StringExtensions.sqlite3Strlen30(z);
+            n = z.sqlite3Strlen30();
 			for(i=0;i<Sqlite3.ArraySize(iLength);i++) {
 				if(iLength[i]==n&&StringExtensions.sqlite3StrNICmp(zText.Substring(iOffset[i]),z,n)==0) {
 					return iValue[i];

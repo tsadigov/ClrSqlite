@@ -13,7 +13,7 @@ namespace Community.CsharpSqlite
 	using System.Globalization;
     using sqliteinth = Sqlite3.sqliteinth;
     using System.Collections.Generic;
-	public partial class StringExtensions
+    public static partial class StringExtensions
 	{
 
 		private static Sqlite3._Custom.SQLite3UpperToLower UpperToLower {
@@ -164,7 +164,7 @@ namespace Community.CsharpSqlite
 			return 0x3fffffff & (iLen == -1 ? z.Length : iLen);
 		}
 
-		public static int sqlite3Strlen30 (string z)
+		public static int sqlite3Strlen30 (this string z)
 		{
 			//string z2 = z;
 			if (z == null)

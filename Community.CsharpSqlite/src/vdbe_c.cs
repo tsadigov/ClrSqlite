@@ -216,6 +216,7 @@ namespace Community.CsharpSqlite {
 		//   if(((P).flags&(MEM.MEM_Str|MEM.MEM_Blob))==0 && vdbemem_cs.sqlite3VdbeMemStringify(P,enc)) \
 		//     { goto no_mem; }
 		///<summary>
+        
 		/// An ephemeral string value (signified by the MEM.MEM_Ephem flag) contains
 		/// a pointer to a dynamically allocated string where some other entity
 		/// is responsible for deallocating that string.  Because the register

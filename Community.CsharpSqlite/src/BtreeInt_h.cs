@@ -697,7 +697,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
                 SqlResult rc = SqlResult.SQLITE_OK;
 				if (null == this.pHasContent) {
 					Debug.Assert (pgno <= this.nPage);
-					this.pHasContent = sqlite3BitvecCreate (this.nPage);
+                    this.pHasContent = Bitvec.sqlite3BitvecCreate(this.nPage);
 					//if ( null == pBt.pHasContent )
 					//{
 					//  rc = SQLITE_NOMEM;

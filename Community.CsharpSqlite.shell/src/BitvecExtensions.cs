@@ -53,7 +53,7 @@ namespace Community.CsharpSqlite
 				u32 bin = i / _this.iDivisor;
 				i = i % _this.iDivisor;
 				if (_this.u.apSub [bin] == null) {
-					_this.u.apSub [bin] = Sqlite3.sqlite3BitvecCreate (_this.iDivisor);
+					_this.u.apSub [bin] = Bitvec.sqlite3BitvecCreate (_this.iDivisor);
 					//if ( p.u.apSub[bin] == null )
 					//  return SQLITE_NOMEM;
 				}
