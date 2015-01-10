@@ -26,9 +26,9 @@ namespace Community.CsharpSqlite {
 		///<param name="Context pointer passed down through the tree">walk.</param>
 		///<param name=""></param>
 		public class Walker {
-			public Sqlite3.dxExprCallback xExprCallback;
+			public dxExprCallback xExprCallback;
 			//)(Walker*, Expr);     /* Callback for expressions */
-			public Sqlite3.dxSelectCallback xSelectCallback;
+			public dxSelectCallback xSelectCallback;
 			//)(Walker*,Select);  /* Callback for SELECTs */
 			public Sqlite3.Parse pParse;
 			///

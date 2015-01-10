@@ -20,7 +20,7 @@ namespace Community.CsharpSqlite
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     using sqlite3_value = Mem;
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
-    using exprc = Community.CsharpSqlite.Sqlite3.exprc;
+    
     using sqliteinth = Sqlite3.sqliteinth;
 
         public class SrcList

@@ -26,7 +26,7 @@ namespace Community.CsharpSqlite
 
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     using sqlite3_value = Mem;
-    using exprc = Community.CsharpSqlite.Sqlite3.exprc;
+    
     using utilc = Community.CsharpSqlite.Sqlite3.utilc;
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using build = Sqlite3.build;

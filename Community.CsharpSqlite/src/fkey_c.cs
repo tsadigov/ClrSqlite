@@ -6,8 +6,6 @@ using u8=System.Byte;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
         public class fkeyc
         {
             ///
@@ -204,7 +202,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///Copy of pFKey.pNextFrom 
                 ///</summary>
-                Debug.Assert(db == null || sqlite3SchemaMutexHeld(db, 0, pTab.pSchema));
+                Debug.Assert(db == null || Sqlite3.sqlite3SchemaMutexHeld(db, 0, pTab.pSchema));
                 for (pFKey = pTab.pFKey; pFKey != null; pFKey = pNext)
                 {
                     ///
@@ -221,7 +219,7 @@ namespace Community.CsharpSqlite
                         {
                             FKey p = pFKey.pNextTo;
                             string z = (p != null ? pFKey.pNextTo.zTo : pFKey.zTo);
-                            sqlite3HashInsert(ref pTab.pSchema.fkeyHash, z, StringExtensions.sqlite3Strlen30(z), p);
+                            Sqlite3.sqlite3HashInsert( ref pTab.pSchema.fkeyHash, z, StringExtensions.sqlite3Strlen30(z), p);
                         }
                         if (pFKey.pNextTo != null)
                         {
@@ -249,5 +247,5 @@ namespace Community.CsharpSqlite
             }
 #endif
         }
-    }
+    
 }

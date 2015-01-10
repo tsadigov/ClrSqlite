@@ -27,7 +27,7 @@ namespace Community.CsharpSqlite
 {
 
     using sqliteinth=Sqlite3.sqliteinth;
-    using exprc = Sqlite3.exprc;
+    
 
     ///
     ///<summary>

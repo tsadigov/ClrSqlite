@@ -12,7 +12,7 @@ namespace Community.CsharpSqlite {
     using sqlite3_value = Mem;
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
-    using exprc = Community.CsharpSqlite.Sqlite3.exprc;
+    
     using utilc = Community.CsharpSqlite.Sqlite3.utilc;
     using io = Sqlite3.io;
     using build = Community.CsharpSqlite.Sqlite3.build;

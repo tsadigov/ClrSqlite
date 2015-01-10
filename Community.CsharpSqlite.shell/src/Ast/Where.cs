@@ -22,7 +22,7 @@ namespace Community.CsharpSqlite {
     using Vdbe = Sqlite3.Vdbe;
     using Parse = Sqlite3.Parse;
     using sqliteinth = Sqlite3.sqliteinth;
-    using exprc = Sqlite3.exprc;
+    
     using _Custom = Sqlite3._Custom;
 
 		///<summary>

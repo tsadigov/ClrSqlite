@@ -367,7 +367,7 @@ sqlite3ValueFree(ref pTmp);
 		/// match that requested.
 		///
 		///</summary>
-		static FuncDef sqlite3FindFunction(sqlite3 db,///
+		public static FuncDef sqlite3FindFunction(sqlite3 db,///
 		///<summary>
 		///An open database 
 		///</summary>

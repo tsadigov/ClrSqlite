@@ -15,8 +15,11 @@ using ynVar = System.Int32;
 #endif
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
+    using sqliteinth=Sqlite3.sqliteinth;
+    using Vdbe=Sqlite3.Vdbe;
+    using Parse=Sqlite3.Parse;
+    using build=Sqlite3.build;
+
         public class exprc
         {
             ///<summary>
@@ -356,7 +359,7 @@ namespace Community.CsharpSqlite
                 {
                     exprc.sqlite3ExprDelete(db, ref p.pLeft);
                     exprc.sqlite3ExprDelete(db, ref p.pRight);
-                    if (!p.ExprHasProperty(ExprFlags.EP_Reduced) && (p.flags2 & EP2_MallocedToken) != 0)
+                    if (!p.ExprHasProperty(ExprFlags.EP_Reduced) && (p.flags2 & Sqlite3.EP2_MallocedToken) != 0)
                     {
 #if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
 																																																																																																																								sqlite3DbFree( db, ref p.u._zToken );
@@ -387,10 +390,10 @@ namespace Community.CsharpSqlite
             static int exprStructSize(Expr p)
             {
                 if (p.ExprHasProperty(ExprFlags.EP_TokenOnly))
-                    return EXPR_TOKENONLYSIZE;
+                    return Sqlite3.EXPR_TOKENONLYSIZE;
                 if (p.ExprHasProperty(ExprFlags.EP_Reduced))
-                    return EXPR_REDUCEDSIZE;
-                return EXPR_FULLSIZE;
+                    return Sqlite3.EXPR_REDUCEDSIZE;
+                return Sqlite3.EXPR_FULLSIZE;
             }
             ///<summary>
             /// This function is similar to exprc.sqlite3ExprDup(), except that if pzBuffer
@@ -410,7 +413,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
                 if (p != null)
                 {
-                    bool isReduced = (flags & EXPRDUP_REDUCE) != 0;
+                    bool isReduced = (flags & Sqlite3.EXPRDUP_REDUCE) != 0;
                     Expr zAlloc = new Expr();
                     ExprFlags staticFlag = 0;
                     Debug.Assert(pzBuffer == null || isReduced);
@@ -507,8 +510,8 @@ namespace Community.CsharpSqlite
                             //zAlloc += dupedExprNodeSize( p, flags );
                             if (pNew.ExprHasProperty(ExprFlags.EP_Reduced))
                             {
-                                pNew.pLeft = exprDup(db, p.pLeft, EXPRDUP_REDUCE, ref pzBuffer);
-                                pNew.pRight = exprDup(db, p.pRight, EXPRDUP_REDUCE, ref pzBuffer);
+                                pNew.pLeft = exprDup(db, p.pLeft, Sqlite3.EXPRDUP_REDUCE, ref pzBuffer);
+                                pNew.pRight = exprDup(db, p.pRight, Sqlite3.EXPRDUP_REDUCE, ref pzBuffer);
                             }
                             //if ( pzBuffer != null )
                             //{
@@ -1013,7 +1016,7 @@ return null;
                 ///FROM is not a subquery or view 
                 ///</summary>
                 pTab = pSrc.a[0].pTab;
-                if (NEVER(pTab == null))
+                if (Sqlite3.NEVER(pTab == null))
                     return 0;
                 Debug.Assert(pTab.pSelect == null);
                 ///
@@ -1379,7 +1382,7 @@ return null;
                     int r1 = ++pParse.nMem;
                     int r2;
                     r2 = pParse.sqlite3ExprCodeTarget(pExpr, r1);
-                    if (NEVER(r1 != r2))
+                    if (Sqlite3.NEVER(r1 != r2))
                         pParse.sqlite3ReleaseTempReg(r1);
                     pExpr.Operator2 = pExpr.Operator;
                     pExpr.Operator = TokenType.TK_REGISTER;
@@ -1501,7 +1504,7 @@ return null;
                 else
                     if (pA.Operator != TokenType.TK_COLUMN && pA.u.zToken != null)
                     {
-                        if (pB.ExprHasProperty(ExprFlags.EP_IntValue) || NEVER(pB.u.zToken == null))
+                        if (pB.ExprHasProperty(ExprFlags.EP_IntValue) || Sqlite3.NEVER(pB.u.zToken == null))
                             return 2;
                         if (!pA.u.zToken.Equals(pB.u.zToken, StringComparison.InvariantCultureIgnoreCase))
                         {
@@ -1730,7 +1733,7 @@ return null;
                                         pItem.pExpr = pExpr;
                                         pItem.iMem = ++pParse.nMem;
                                         Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
-                                        pItem.pFunc = sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0);
+                                        pItem.pFunc = Sqlite3.sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0);
                                         if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)
                                         {
                                             pItem.iDistinct = pParse.nTab++;
@@ -1828,5 +1831,4 @@ return null;
             ///
             ///</summary>
         }
-    }
 }

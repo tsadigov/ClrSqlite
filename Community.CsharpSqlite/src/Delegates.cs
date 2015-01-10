@@ -20,6 +20,9 @@ namespace Community.CsharpSqlite
 	using sqlite3_stmt = Sqlite3.Vdbe;
 	using sqlite3_value = Mem;
     using codec_ctx=Sqlite3.crypto.codec_ctx;
+    using PgHdr=Sqlite3.PgHdr;
+    using Btree = Sqlite3.Btree;
+    using sqlite3_api_routines=Sqlite3.sqlite3_api_routines;
 
 
 
@@ -197,8 +200,6 @@ namespace Community.CsharpSqlite
 
 
 
-	public partial class Sqlite3
-	{
 		
 		
 
@@ -349,6 +350,10 @@ namespace Community.CsharpSqlite
 		public delegate void dxPC_Destroy (ref sqlite3_pcache pCache);
 
 		public delegate void dxIter (PgHdr p);
+
+
+        public partial class Sqlite3
+        {
 	#if NET_35 || NET_40
 																			    //API Simplifications -- Actions
     public static Action<sqlite3_context, String, Int32, dxDel> ResultBlob = sqlite3_result_blob;
