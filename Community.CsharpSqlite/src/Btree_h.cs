@@ -261,7 +261,7 @@ namespace Community.CsharpSqlite
 		}
 
 		//# define sqlite3BtreeEnterAll(X)
-		static void sqlite3BtreeEnterAll (sqlite3 p)
+		public static void sqlite3BtreeEnterAll (sqlite3 p)
 		{
 		}
 
@@ -301,7 +301,7 @@ int sqlite3SchemaMutexHeld(sqlite3*,int,Schema);
 		}
 
 		//# define sqlite3BtreeLeaveAll(X)
-		static void sqlite3BtreeLeaveAll (sqlite3 X)
+		public static void sqlite3BtreeLeaveAll (sqlite3 X)
 		{
 		}
 

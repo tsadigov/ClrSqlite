@@ -338,7 +338,7 @@ static int blobReadWrite(
   Vdbe *v;
   sqlite3 db;
 
-  if( p==0 ) return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+  if( p==0 ) return sqliteinth.SQLITE_MISUSE_BKPT();
   db = p->db;
   sqlite3_mutex_enter(db->mutex);
   v = (Vdbe)p->pStmt;

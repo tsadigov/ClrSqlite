@@ -646,7 +646,7 @@ namespace Community.CsharpSqlite
             /// is available.  This routine returns 0 on success and
             /// non-zero on any kind of error.
             ///
-            /// If the Sqlite3.sqliteinth.sqlite3GlobalConfig.bLocaltimeFault variable is true then this
+            /// If the sqliteinth.sqlite3GlobalConfig.bLocaltimeFault variable is true then this
             /// routine will always fail.
             ///
             ///</summary>
@@ -659,7 +659,7 @@ namespace Community.CsharpSqlite
                 mutex.sqlite3_mutex_enter();
                 pX = _Custom.localtime(t);
 #if !SQLITE_OMIT_BUILTIN_TEST
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bLocaltimeFault)
+                if (sqliteinth.sqlite3GlobalConfig.bLocaltimeFault)
                     pX = null;
 #endif
                 if (pX != null)
@@ -668,7 +668,7 @@ namespace Community.CsharpSqlite
                 rc = pX == null ? 1 : 0;
 #else
 #if !SQLITE_OMIT_BUILTIN_TEST
-																																																									  if( Sqlite3.sqliteinth.sqlite3GlobalConfig.bLocaltimeFault ) return 1;
+																																																									  if( sqliteinth.sqlite3GlobalConfig.bLocaltimeFault ) return 1;
 #endif
 #if (HAVE_LOCALTIME_R) && HAVE_LOCALTIME_R
 																																																									  rc = localtime_r(t, pTm)==0;
@@ -1434,7 +1434,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void ctimeFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 timeFunc(context, 0, null);
             }
 
@@ -1446,7 +1446,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void cdateFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 dateFunc(context, 0, null);
             }
 
@@ -1458,7 +1458,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void ctimestampFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 datetimeFunc(context, 0, null);
             }
 
@@ -1490,8 +1490,8 @@ string zFormat = (char )sqlite3_user_data(context);
 sqlite3 db;
 sqlite3_int64 rT;
 char zdtBuf[20];
-Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
-Sqlite3.sqliteinth.UNUSED_PARAMETER(argv);
+sqliteinth.UNUSED_PARAMETER(argc);
+sqliteinth.UNUSED_PARAMETER(argv);
 db = vdbeapi.sqlite3_context_db_handle(context);
   sqlite3OsCurrentTimeInt64(db->pVfs, &iT);
   t = iT/1000 - 10000*(sqlite3_int64)21086676;

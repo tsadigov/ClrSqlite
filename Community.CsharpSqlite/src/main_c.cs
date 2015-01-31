@@ -140,7 +140,7 @@ static void sqlite3IoTrace( string X, params object[] ap ) {  }
 		///       without blocking.
 		///
 		///</summary>
-		static SqlResult sqlite3_initialize() {
+		public static SqlResult sqlite3_initialize() {
 			//--------------------------------------------------------------------
 			// Under C#, Need to initialize some static variables
 			//
@@ -148,8 +148,8 @@ static void sqlite3IoTrace( string X, params object[] ap ) {  }
 				sqlite3_version=SQLITE_VERSION;
 			if(sqlite3OpcodeProperty==null)
 				sqlite3OpcodeProperty=Array.ConvertAll(Sqlite3.OPFLG_INITIALIZER,(i)=>(OpFlag)i);
-			if(Sqlite3.sqliteinth.sqlite3GlobalConfig==null)
-				Sqlite3.sqliteinth.sqlite3GlobalConfig=sqlite3Config;
+			if(sqliteinth.sqlite3GlobalConfig==null)
+				sqliteinth.sqlite3GlobalConfig=sqlite3Config;
 			//--------------------------------------------------------------------
 			sqlite3_mutex pMaster;
 			///
@@ -174,7 +174,7 @@ return rc;
 			///<param name="to sqlite3_initialize() should be a no">op.  But the initialization</param>
 			///<param name="must be complete.  So isInit must not be set until the very end">must be complete.  So isInit must not be set until the very end</param>
 			///<param name="of this routine.">of this routine.</param>
-			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isInit!=0)
+			if(sqliteinth.sqlite3GlobalConfig.isInit!=0)
 				return SqlResult.SQLITE_OK;
 			///
 			///<summary>
@@ -202,21 +202,21 @@ return rc;
 			pMaster=sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
 			//sqlite3_mutex_enter( pMaster );
 			lock(pMaster) {
-				Sqlite3.sqliteinth.sqlite3GlobalConfig.isMutexInit=1;
-				if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit==0) {
+				sqliteinth.sqlite3GlobalConfig.isMutexInit=1;
+				if(sqliteinth.sqlite3GlobalConfig.isMallocInit==0) {
 					rc=malloc_cs.sqlite3MallocInit();
 				}
 				if(rc==SqlResult.SQLITE_OK) {
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit=1;
-					if(Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex==null) {
-						Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex=sqlite3MutexAlloc(SQLITE_MUTEX_RECURSIVE);
-						if(Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex&&Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex==null) {
+					sqliteinth.sqlite3GlobalConfig.isMallocInit=1;
+					if(sqliteinth.sqlite3GlobalConfig.pInitMutex==null) {
+						sqliteinth.sqlite3GlobalConfig.pInitMutex=sqlite3MutexAlloc(SQLITE_MUTEX_RECURSIVE);
+						if(sqliteinth.sqlite3GlobalConfig.bCoreMutex&&sqliteinth.sqlite3GlobalConfig.pInitMutex==null) {
 							rc=SqlResult.SQLITE_NOMEM;
 						}
 					}
 				}
 				if(rc==SqlResult.SQLITE_OK) {
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.nRefInitMutex++;
+					sqliteinth.sqlite3GlobalConfig.nRefInitMutex++;
 				}
 			}
 			//sqlite3_mutex_leave( pMaster );
@@ -245,10 +245,10 @@ return rc;
 			///<param name="methods.  The sqlite3_pcache_methods.xInit() all is embedded in the">methods.  The sqlite3_pcache_methods.xInit() all is embedded in the</param>
 			///<param name="call to PCacheMethods.sqlite3PcacheInitialize().">call to PCacheMethods.sqlite3PcacheInitialize().</param>
 			///<param name=""></param>
-			//sqlite3_mutex_enter( Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex );
-			lock(Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex) {
-				if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isInit==0&&Sqlite3.sqliteinth.sqlite3GlobalConfig.inProgress==0) {
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.inProgress=1;
+			//sqlite3_mutex_enter( sqliteinth.sqlite3GlobalConfig.pInitMutex );
+			lock(sqliteinth.sqlite3GlobalConfig.pInitMutex) {
+				if(sqliteinth.sqlite3GlobalConfig.isInit==0&&sqliteinth.sqlite3GlobalConfig.inProgress==0) {
+					sqliteinth.sqlite3GlobalConfig.inProgress=1;
 					#if SQLITE_OMIT_WSD
 																																																																																																																			FuncDefHash *pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
 memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
@@ -257,21 +257,21 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					FuncDefHash pHash=sqlite3GlobalFunctions;
 					#endif
 					func.sqlite3RegisterGlobalFunctions();
-					if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isPCacheInit==0) {
+					if(sqliteinth.sqlite3GlobalConfig.isPCacheInit==0) {
 						rc=PCacheMethods.sqlite3PcacheInitialize();
 					}
 					if(rc==SqlResult.SQLITE_OK) {
-						Sqlite3.sqliteinth.sqlite3GlobalConfig.isPCacheInit=1;
+						sqliteinth.sqlite3GlobalConfig.isPCacheInit=1;
 						rc=sqlite3_os_init();
 					}
 					if(rc==SqlResult.SQLITE_OK) {
-						sqlite3PCacheBufferSetup(Sqlite3.sqliteinth.sqlite3GlobalConfig.pPage,Sqlite3.sqliteinth.sqlite3GlobalConfig.szPage,Sqlite3.sqliteinth.sqlite3GlobalConfig.nPage);
-						Sqlite3.sqliteinth.sqlite3GlobalConfig.isInit=1;
+						sqlite3PCacheBufferSetup(sqliteinth.sqlite3GlobalConfig.pPage,sqliteinth.sqlite3GlobalConfig.szPage,sqliteinth.sqlite3GlobalConfig.nPage);
+						sqliteinth.sqlite3GlobalConfig.isInit=1;
 					}
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.inProgress=0;
+					sqliteinth.sqlite3GlobalConfig.inProgress=0;
 				}
 			}
-			//sqlite3_mutex_leave( Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex );
+			//sqlite3_mutex_leave( sqliteinth.sqlite3GlobalConfig.pInitMutex );
 			///
 			///<summary>
 			///Go back under the static mutex and clean up the recursive
@@ -281,10 +281,10 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 			//sqlite3_mutex_enter( pMaster );
 			lock(pMaster) {
 				sqliteinth.sqlite3GlobalConfig.nRefInitMutex--;
-				if(Sqlite3.sqliteinth.sqlite3GlobalConfig.nRefInitMutex<=0) {
-					Debug.Assert(Sqlite3.sqliteinth.sqlite3GlobalConfig.nRefInitMutex==0);
-					//sqlite3_mutex_free( ref Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex );
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.pInitMutex=null;
+				if(sqliteinth.sqlite3GlobalConfig.nRefInitMutex<=0) {
+					Debug.Assert(sqliteinth.sqlite3GlobalConfig.nRefInitMutex==0);
+					//sqlite3_mutex_free( ref sqliteinth.sqlite3GlobalConfig.pInitMutex );
+					sqliteinth.sqlite3GlobalConfig.pInitMutex=null;
 				}
 			}
 			//sqlite3_mutex_leave( pMaster );
@@ -324,22 +324,22 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 		///<param name="when this routine is invoked, then this routine is a harmless no">op.</param>
 		///<param name=""></param>
 		public static SqlResult sqlite3_shutdown() {
-			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isInit!=0) {
+			if(sqliteinth.sqlite3GlobalConfig.isInit!=0) {
 				sqlite3_os_end();
 				sqlite3_reset_auto_extension();
-				Sqlite3.sqliteinth.sqlite3GlobalConfig.isInit=0;
+				sqliteinth.sqlite3GlobalConfig.isInit=0;
 			}
-			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isPCacheInit!=0) {
+			if(sqliteinth.sqlite3GlobalConfig.isPCacheInit!=0) {
 				PCacheMethods.sqlite3PcacheShutdown();
-				Sqlite3.sqliteinth.sqlite3GlobalConfig.isPCacheInit=0;
+				sqliteinth.sqlite3GlobalConfig.isPCacheInit=0;
 			}
-			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit!=0) {
+			if(sqliteinth.sqlite3GlobalConfig.isMallocInit!=0) {
 				malloc_cs.sqlite3MallocEnd();
-				Sqlite3.sqliteinth.sqlite3GlobalConfig.isMallocInit=0;
+				sqliteinth.sqlite3GlobalConfig.isMallocInit=0;
 			}
-			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isMutexInit!=0) {
+			if(sqliteinth.sqlite3GlobalConfig.isMutexInit!=0) {
 				sqlite3MutexEnd();
-				Sqlite3.sqliteinth.sqlite3GlobalConfig.isMutexInit=0;
+				sqliteinth.sqlite3GlobalConfig.isMutexInit=0;
 			}
 			return SqlResult.SQLITE_OK;
 		}
@@ -430,7 +430,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
         case SQLITE_CONFIG_MUTEX:
           {
             /* Specify an alternative mutex implementation */
-            Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex = ap;// (sqlite3_mutex_methods)_Custom.va_arg( ap, "sqlite3_mutex_methods" );
+            sqliteinth.sqlite3GlobalConfig.mutex = ap;// (sqlite3_mutex_methods)_Custom.va_arg( ap, "sqlite3_mutex_methods" );
             break;
           }
       }
@@ -446,7 +446,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
         case SQLITE_CONFIG_GETMUTEX:
           {
             /* Retrieve the current mutex implementation */
-            ap = Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex;// *_Custom.va_arg(ap, sqlite3_mutex_methods) =  Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex;
+            ap = sqliteinth.sqlite3GlobalConfig.mutex;// *_Custom.va_arg(ap, sqlite3_mutex_methods) =  sqliteinth.sqlite3GlobalConfig.mutex;
             break;
           }
       }
@@ -462,8 +462,8 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 			///sqlite3_config() shall return SQLITE_MISUSE if it is invoked while
 			///the SQLite library is in use. 
 			///</summary>
-			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.isInit!=0)
-				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+			if(sqliteinth.sqlite3GlobalConfig.isInit!=0)
+				return sqliteinth.SQLITE_MISUSE_BKPT();
 			lock(_Custom.lock_va_list) {
 				_Custom.va_start(ap,null);
 
@@ -479,35 +479,35 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 																																																																																												          case SQLITE_CONFIG_SINGLETHREAD:
             {
               /* Disable all mutexing */
-              Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex = false;
-              Sqlite3.sqliteinth.sqlite3GlobalConfig.bFullMutex = false;
+              sqliteinth.sqlite3GlobalConfig.bCoreMutex = false;
+              sqliteinth.sqlite3GlobalConfig.bFullMutex = false;
               break;
             }
           case SQLITE_CONFIG_MULTITHREAD:
             {
               /* Disable mutexing of database connections */
               /* Enable mutexing of core data structures */
-              Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex = true;
-              Sqlite3.sqliteinth.sqlite3GlobalConfig.bFullMutex = false;
+              sqliteinth.sqlite3GlobalConfig.bCoreMutex = true;
+              sqliteinth.sqlite3GlobalConfig.bFullMutex = false;
               break;
             }
           case SQLITE_CONFIG_SERIALIZED:
             {
               /* Enable all mutexing */
-              Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex = true;
-              Sqlite3.sqliteinth.sqlite3GlobalConfig.bFullMutex = true;
+              sqliteinth.sqlite3GlobalConfig.bCoreMutex = true;
+              sqliteinth.sqlite3GlobalConfig.bFullMutex = true;
               break;
             }
           case SQLITE_CONFIG_MUTEX:
             {
               /* Specify an alternative mutex implementation */
-              Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex = _Custom.va_arg( ap, (sqlite3_mutex_methods)null );
+              sqliteinth.sqlite3GlobalConfig.mutex = _Custom.va_arg( ap, (sqlite3_mutex_methods)null );
               break;
             }
           case SQLITE_CONFIG_GETMUTEX:
             {
               /* Retrieve the current mutex implementation */
-              Debugger.Break(); // TODO -- *_Custom.va_arg(ap, sqlite3_mutex_methods) = Sqlite3.sqliteinth.sqlite3GlobalConfig.mutex;
+              Debugger.Break(); // TODO -- *_Custom.va_arg(ap, sqlite3_mutex_methods) = sqliteinth.sqlite3GlobalConfig.mutex;
               break;
             }
 #endif
@@ -518,7 +518,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					///<summary>
 					///Specify an alternative malloc implementation 
 					///</summary>
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.m=_Custom.va_arg(ap,(sqlite3_mem_methods)null);
+					sqliteinth.sqlite3GlobalConfig.m=_Custom.va_arg(ap,(sqlite3_mem_methods)null);
 					break;
 				}
 				case SqliteConfig.GETMALLOC: {
@@ -526,8 +526,8 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					///<summary>
 					///Retrieve the current malloc() implementation 
 					///</summary>
-					//if ( Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc == null ) sqlite3MemSetDefault();
-					//Debugger.Break(); // TODO --//_Custom.va_arg(ap, sqlite3_mem_methods) =  Sqlite3.sqliteinth.sqlite3GlobalConfig.m;
+					//if ( sqliteinth.sqlite3GlobalConfig.m.xMalloc == null ) sqlite3MemSetDefault();
+					//Debugger.Break(); // TODO --//_Custom.va_arg(ap, sqlite3_mem_methods) =  sqliteinth.sqlite3GlobalConfig.m;
 					break;
 				}
 				case SqliteConfig.MEMSTATUS: {
@@ -535,7 +535,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					///<summary>
 					///Enable or disable the malloc status collection 
 					///</summary>
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat=_Custom.va_arg(ap,(Int32)0)!=0;
+					sqliteinth.sqlite3GlobalConfig.bMemstat=_Custom.va_arg(ap,(Int32)0)!=0;
 					break;
 				}
 				case SqliteConfig.SCRATCH: {
@@ -543,9 +543,9 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					///<summary>
 					///Designate a buffer for scratch memory space 
 					///</summary>
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch=_Custom.va_arg(ap,(Byte[][])null);
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.szScratch=_Custom.va_arg(ap,(Int32)0);
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.nScratch=_Custom.va_arg(ap,(Int32)0);
+					sqliteinth.sqlite3GlobalConfig.pScratch=_Custom.va_arg(ap,(Byte[][])null);
+					sqliteinth.sqlite3GlobalConfig.szScratch=_Custom.va_arg(ap,(Int32)0);
+					sqliteinth.sqlite3GlobalConfig.nScratch=_Custom.va_arg(ap,(Int32)0);
 					break;
 				}
 				case SqliteConfig.PAGECACHE: {
@@ -553,9 +553,9 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					///<summary>
 					///Designate a buffer for page cache memory space 
 					///</summary>
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.pPage=_Custom.va_arg(ap,(MemPage)null);
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.szPage=_Custom.va_arg(ap,(Int32)0);
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.nPage=_Custom.va_arg(ap,(Int32)0);
+					sqliteinth.sqlite3GlobalConfig.pPage=_Custom.va_arg(ap,(MemPage)null);
+					sqliteinth.sqlite3GlobalConfig.szPage=_Custom.va_arg(ap,(Int32)0);
+					sqliteinth.sqlite3GlobalConfig.nPage=_Custom.va_arg(ap,(Int32)0);
 					break;
 				}
 				case SqliteConfig.PCACHE: {
@@ -564,56 +564,56 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					///Specify an alternative page cache implementation 
 					///</summary>
 					Debugger.Break();
-					// TODO --Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)_Custom.va_arg(ap, "sqlite3_pcache_methods");
+					// TODO --sqliteinth.sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)_Custom.va_arg(ap, "sqlite3_pcache_methods");
 					break;
 				}
 				case SqliteConfig.GETPCACHE: {
-					if(Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache.xInit==null) {
+					if(sqliteinth.sqlite3GlobalConfig.pcache.xInit==null) {
 						sqlite3PCacheSetDefault();
 					}
 					Debugger.Break();
-					// TODO -- *_Custom.va_arg(ap, sqlite3_pcache_methods) = Sqlite3.sqliteinth.sqlite3GlobalConfig.pcache;
+					// TODO -- *_Custom.va_arg(ap, sqlite3_pcache_methods) = sqliteinth.sqlite3GlobalConfig.pcache;
 					break;
 				}
 				#if SQLITE_ENABLE_MEMSYS3 || SQLITE_ENABLE_MEMSYS5
 																																																																																												case SQLITE_CONFIG_HEAP: {
 /* Designate a buffer for heap memory space */
-Sqlite3.sqliteinth.sqlite3GlobalConfig.pHeap = _Custom.va_arg(ap, void);
-Sqlite3.sqliteinth.sqlite3GlobalConfig.nHeap = _Custom.va_arg(ap, int);
-Sqlite3.sqliteinth.sqlite3GlobalConfig.mnReq = _Custom.va_arg(ap, int);
+sqliteinth.sqlite3GlobalConfig.pHeap = _Custom.va_arg(ap, void);
+sqliteinth.sqlite3GlobalConfig.nHeap = _Custom.va_arg(ap, int);
+sqliteinth.sqlite3GlobalConfig.mnReq = _Custom.va_arg(ap, int);
 
-if( Sqlite3.sqliteinth.sqlite3GlobalConfig.mnReq<1 ){
-  Sqlite3.sqliteinth.sqlite3GlobalConfig.mnReq = 1;
-}else if( Sqlite3.sqliteinth.sqlite3GlobalConfig.mnReq>(1<<12) ){
+if( sqliteinth.sqlite3GlobalConfig.mnReq<1 ){
+  sqliteinth.sqlite3GlobalConfig.mnReq = 1;
+}else if( sqliteinth.sqlite3GlobalConfig.mnReq>(1<<12) ){
   /* cap min request size at 2^12 */
-  Sqlite3.sqliteinth.sqlite3GlobalConfig.mnReq = (1<<12);
+  sqliteinth.sqlite3GlobalConfig.mnReq = (1<<12);
 }
 
-if(  Sqlite3.sqliteinth.sqlite3GlobalConfig.pHeap==0 ){
+if(  sqliteinth.sqlite3GlobalConfig.pHeap==0 ){
 /* If the heap pointer is NULL, then restore the malloc implementation
 ** back to NULL pointers too.  This will cause the malloc to go
 ** back to its default implementation when sqlite3_initialize() is
 ** run.
 */
-memset(& Sqlite3.sqliteinth.sqlite3GlobalConfig.m, 0, sizeof( Sqlite3.sqliteinth.sqlite3GlobalConfig.m));
+memset(& sqliteinth.sqlite3GlobalConfig.m, 0, sizeof( sqliteinth.sqlite3GlobalConfig.m));
 }else{
 /* The heap pointer is not NULL, then install one of the
 ** mem5.c/mem3.c methods. If neither ENABLE_MEMSYS3 nor
 ** ENABLE_MEMSYS5 is defined, return an error.
 */
 #if SQLITE_ENABLE_MEMSYS3
-																																																																																												Sqlite3.sqliteinth.sqlite3GlobalConfig.m = *sqlite3MemGetMemsys3();
+																																																																																												sqliteinth.sqlite3GlobalConfig.m = *sqlite3MemGetMemsys3();
 #endif
 																																																																																												#if SQLITE_ENABLE_MEMSYS5
-																																																																																												Sqlite3.sqliteinth.sqlite3GlobalConfig.m = *sqlite3MemGetMemsys5();
+																																																																																												sqliteinth.sqlite3GlobalConfig.m = *sqlite3MemGetMemsys5();
 #endif
 																																																																																												}
 break;
 }
 #endif
 				case SqliteConfig.LOOKASIDE: {
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.szLookaside=_Custom.va_arg(ap,(Int32)0);
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.nLookaside=_Custom.va_arg(ap,(Int32)0);
+					sqliteinth.sqlite3GlobalConfig.szLookaside=_Custom.va_arg(ap,(Int32)0);
+					sqliteinth.sqlite3GlobalConfig.nLookaside=_Custom.va_arg(ap,(Int32)0);
 					break;
 				}
 				///
@@ -628,17 +628,17 @@ break;
 					///<summary>
 					///MSVC is picky about pulling func ptrs from va lists.
 					///http://support.microsoft.com/kb/47961
-					///Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog = _Custom.va_arg(ap, void()(void*,int,const char));
+					///sqliteinth.sqlite3GlobalConfig.xLog = _Custom.va_arg(ap, void()(void*,int,const char));
 					///
 					///</summary>
 					//typedef void(*LOGFUNC_t)(void*,int,const char);
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog=_Custom.va_arg(ap,(dxLog)null);
+					sqliteinth.sqlite3GlobalConfig.xLog=_Custom.va_arg(ap,(dxLog)null);
 					//"LOGFUNC_t" );
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.pLogArg=_Custom.va_arg(ap,(Object)null);
+					sqliteinth.sqlite3GlobalConfig.pLogArg=_Custom.va_arg(ap,(Object)null);
 					break;
 				}
 				case SqliteConfig.URI: {
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.bOpenUri=_Custom.va_arg(ap,(Boolean)true);
+					sqliteinth.sqlite3GlobalConfig.bOpenUri=_Custom.va_arg(ap,(Boolean)true);
 					break;
 				}
 				default: {
@@ -863,7 +863,7 @@ break;
 		static int nocaseCollatingFunc(object NotUsed,int nKey1,string pKey1,int nKey2,string pKey2) {
 			int n=(nKey1<nKey2)?nKey1:nKey2;
 			int r=StringExtensions.sqlite3StrNICmp(pKey1,pKey2,(nKey1<nKey2)?nKey1:nKey2);
-			Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+			sqliteinth.UNUSED_PARAMETER(NotUsed);
 			if(0==r) {
 				r=nKey1-nKey2;
 			}
@@ -938,7 +938,7 @@ break;
 				return SqlResult.SQLITE_OK;
 			}
 			if(!utilc.sqlite3SafetyCheckSickOrOk(db)) {
-				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			db.mutex.sqlite3_mutex_enter();
 			///
@@ -1027,16 +1027,16 @@ break;
 				}
 				db.sqlite3DbFree(ref pColl);
 			}
-			sqlite3HashClear(db.aCollSeq);
+            db.aCollSeq.sqlite3HashClear();
 			#if !SQLITE_OMIT_VIRTUALTABLE
-			for(i=sqliteHashFirst(db.aModule);i!=null;i=sqliteHashNext(i)) {
-				Module pMod=(Module)sqliteHashData(i);
+			for(i= db.aModule.sqliteHashFirst();i!=null;i= i.sqliteHashNext()) {
+				Module pMod=(Module)i.sqliteHashData();
 				if(pMod.xDestroy!=null) {
 					pMod.xDestroy(ref pMod.pAux);
 				}
 				db.sqlite3DbFree(ref pMod);
 			}
-			sqlite3HashClear(db.aModule);
+            db.aModule.sqlite3HashClear();
 			#endif
 			utilc.sqlite3Error(db,SqlResult.SQLITE_OK,0);
 			///
@@ -1437,7 +1437,7 @@ return 1;
 			int nName;
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			if(zFunctionName==null||(xFunc!=null&&(xFinal!=null||xStep!=null))||(xFunc==null&&(xFinal!=null&&xStep==null))||(xFunc==null&&(xFinal==null&&xStep!=null))||(nArg<-1||nArg>SQLITE_MAX_FUNCTION_ARG)||(255<(nName=StringExtensions.sqlite3Strlen30(zFunctionName)))) {
-				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			#if !SQLITE_OMIT_UTF16
 																																																																					/* If SqliteEncoding.UTF16 is specified as the encoding type, transform this
@@ -1740,8 +1740,8 @@ return SqlResult.SQLITE_OK;
 		///</summary>
 		static SqlResult sqlite3_wal_autocheckpoint(sqlite3 db,int nFrame) {
 			#if SQLITE_OMIT_WAL
-			Sqlite3.sqliteinth.UNUSED_PARAMETER(db);
-			Sqlite3.sqliteinth.UNUSED_PARAMETER(nFrame);
+			sqliteinth.UNUSED_PARAMETER(db);
+			sqliteinth.UNUSED_PARAMETER(nFrame);
 			#else
 																																																																					if( nFrame>0 ){
 sqlite3_wal_hook(db, sqlite3WalDefaultHook, SQLITE_INT_TO_PTR(nFrame));
@@ -1944,7 +1944,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 				return sqlite3ErrStr(SqlResult.SQLITE_NOMEM);
 			}
 			if(!utilc.sqlite3SafetyCheckSickOrOk(db)) {
-				return sqlite3ErrStr(Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT());
+				return sqlite3ErrStr(sqliteinth.SQLITE_MISUSE_BKPT());
 			}
 			db.mutex.sqlite3_mutex_enter();
 			//if ( db.mallocFailed != 0 )
@@ -2015,7 +2015,7 @@ return z;
 		///</summary>
 		static public SqlResult sqlite3_errcode(sqlite3 db) {
 			if(db!=null&&!utilc.sqlite3SafetyCheckSickOrOk(db)) {
-				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			if(null==db///
 			///<summary>
@@ -2028,7 +2028,7 @@ return z;
 		}
 		static SqlResult sqlite3_extended_errcode(sqlite3 db) {
 			if(db!=null&&!utilc.sqlite3SafetyCheckSickOrOk(db)) {
-				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			if(null==db///
 			///<summary>
@@ -2066,7 +2066,7 @@ return z;
 				enc2=SqliteEncoding.UTF16NATIVE;
 			}
 			if(enc2<SqliteEncoding.UTF8||enc2>SqliteEncoding.UTF16BE) {
-				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			///
 			///<summary>
@@ -2295,7 +2295,7 @@ return z;
 			int nUri=StringExtensions.sqlite3Strlen30(zUri);
 			pzErrMsg=null;
 			ppVfs=null;
-			if(((flags&SQLITE_OPEN_URI)!=0||Sqlite3.sqliteinth.sqlite3GlobalConfig.bOpenUri)&&nUri>=5&&_Custom.memcmp(zUri,"file:",5)==0) {
+			if(((flags&SQLITE_OPEN_URI)!=0||sqliteinth.sqlite3GlobalConfig.bOpenUri)&&nUri>=5&&_Custom.memcmp(zUri,"file:",5)==0) {
 				string zOpt;
 				int eState;
 				///
@@ -2592,8 +2592,8 @@ return z;
 			///READWRITE | CREATE 
 			///</summary>
 			if(((1<<(flags&7))&0x46)==0)
-				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
-			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex==false) {
+				return sqliteinth.SQLITE_MISUSE_BKPT();
+			if(sqliteinth.sqlite3GlobalConfig.bCoreMutex==false) {
 				isThreadsafe=0;
 			}
 			else
@@ -2605,13 +2605,13 @@ return z;
 						isThreadsafe=1;
 					}
 					else {
-						isThreadsafe=Sqlite3.sqliteinth.sqlite3GlobalConfig.bFullMutex?1:0;
+						isThreadsafe=sqliteinth.sqlite3GlobalConfig.bFullMutex?1:0;
 					}
 			if((flags&SQLITE_OPEN_PRIVATECACHE)!=0) {
 				flags&=~SQLITE_OPEN_SHAREDCACHE;
 			}
 			else
-				if(Sqlite3.sqliteinth.sqlite3GlobalConfig.sharedCacheEnabled) {
+				if(sqliteinth.sqlite3GlobalConfig.sharedCacheEnabled) {
 					flags|=SQLITE_OPEN_SHAREDCACHE;
 				}
 			///
@@ -2635,7 +2635,7 @@ return z;
 			//malloc_cs.sqlite3MallocZero( sqlite3.Length );
 			if(db==null)
 				goto opendb_out;
-			if(Sqlite3.sqliteinth.sqlite3GlobalConfig.bFullMutex&&isThreadsafe!=0) {
+			if(sqliteinth.sqlite3GlobalConfig.bFullMutex&&isThreadsafe!=0) {
 				db.mutex=sqlite3MutexAlloc(SQLITE_MUTEX_RECURSIVE);
 				if(db.mutex==null) {
 					//malloc_cs.sqlite3_free( ref db );
@@ -2718,8 +2718,8 @@ return z;
 				utilc.sqlite3Error(db,rc,0);
 				goto opendb_out;
 			}
-			db.aDb[0].pSchema=sqlite3SchemaGet(db,db.aDb[0].pBt);
-			db.aDb[1].pSchema=sqlite3SchemaGet(db,null);
+			db.aDb[0].pSchema= SchemaExtensions.sqlite3SchemaGet(db.aDb[0].pBt, db);
+            db.aDb[1].pSchema = SchemaExtensions.sqlite3SchemaGet(null, db);
 			///
 			///<summary>
 			///The default safety_level for the main database is 'full'; for the temp
@@ -2800,12 +2800,12 @@ SQLITE_DEFAULT_LOCKING_MODE);
 			///<summary>
 			///</summary>
 			///<param name="Enable the lookaside">malloc subsystem </param>
-			setupLookaside(db,null,Sqlite3.sqliteinth.sqlite3GlobalConfig.szLookaside,Sqlite3.sqliteinth.sqlite3GlobalConfig.nLookaside);
+			setupLookaside(db,null,sqliteinth.sqlite3GlobalConfig.szLookaside,sqliteinth.sqlite3GlobalConfig.nLookaside);
 			sqlite3_wal_autocheckpoint(db,SQLITE_DEFAULT_WAL_AUTOCHECKPOINT);
 			opendb_out:
 			//malloc_cs.sqlite3_free(zOpen);
 			if(db!=null) {
-				Debug.Assert(db.mutex!=null||isThreadsafe==0||!Sqlite3.sqliteinth.sqlite3GlobalConfig.bFullMutex);
+				Debug.Assert(db.mutex!=null||isThreadsafe==0||!sqliteinth.sqlite3GlobalConfig.bFullMutex);
 				db.mutex.sqlite3_mutex_leave();
 			}
 			rc=sqlite3_errcode(db);
@@ -3006,17 +3006,17 @@ return SqlResult.SQLITE_OK;
 		///<param name="a low">level error is first detected.</param>
 		///<param name=""></param>
 		static SqlResult sqlite3CorruptError(int lineno) {
-			sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog!=null);
+			sqliteinth.testcase(sqliteinth.sqlite3GlobalConfig.xLog!=null);
 			io.sqlite3_log(SqlResult.SQLITE_CORRUPT,"database corruption at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
 			return SqlResult.SQLITE_CORRUPT;
 		}
 		static SqlResult sqlite3MisuseError(int lineno) {
-			sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog!=null);
+			sqliteinth.testcase(sqliteinth.sqlite3GlobalConfig.xLog!=null);
 			io.sqlite3_log(SqlResult.SQLITE_MISUSE,"misuse at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
 			return SqlResult.SQLITE_MISUSE;
 		}
 		static SqlResult sqlite3CantopenError(int lineno) {
-			sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog!=null);
+			sqliteinth.testcase(sqliteinth.sqlite3GlobalConfig.xLog!=null);
 			io.sqlite3_log(SqlResult.SQLITE_CANTOPEN,"cannot open file at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
 			return SqlResult.SQLITE_CANTOPEN;
 		}
@@ -3301,7 +3301,7 @@ error_out:
 				case SQLITE_TESTCTRL_BITVEC_TEST: {
 					int sz=_Custom.va_arg(ap,(Int32)0);
 					int[] aProg=_Custom.va_arg(ap,(Int32[])null);
-					rc=sqlite3BitvecBuiltinTest((u32)sz,aProg);
+					rc=BitvecExtensions.sqlite3BitvecBuiltinTest((u32)sz,aProg);
 					break;
 				}
 				///
@@ -3501,7 +3501,7 @@ error_out:
 				///<param name="undo this setting.">undo this setting.</param>
 				///<param name=""></param>
 				case SQLITE_TESTCTRL_LOCALTIME_FAULT: {
-					Sqlite3.sqliteinth.sqlite3GlobalConfig.bLocaltimeFault=_Custom.va_arg(ap,(Boolean)true);
+					sqliteinth.sqlite3GlobalConfig.bLocaltimeFault=_Custom.va_arg(ap,(Boolean)true);
 					break;
 				}
 				}

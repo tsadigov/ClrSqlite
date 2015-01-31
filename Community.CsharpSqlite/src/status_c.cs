@@ -111,7 +111,7 @@ namespace Community.CsharpSqlite {
         {
 			wsdStatInit();
 			if(op<0||op>=Sqlite3.ArraySize(wsdStat.nowValue)) {
-				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			pCurrent=wsdStat.nowValue[op];
 			pHighwater=wsdStat.mxValue[op];
@@ -224,7 +224,7 @@ namespace Community.CsharpSqlite {
 					Schema pSchema=db.aDb[i].pSchema;
 					if(Sqlite3.ALWAYS(pSchema!=null)) {
 						HashElem p;
-						//nByte += (int)(Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xRoundup(sizeof(HashElem)) * (
+						//nByte += (int)(sqliteinth.sqlite3GlobalConfig.m.xRoundup(sizeof(HashElem)) * (
 						//    pSchema.tblHash.count 
 						//  + pSchema.trigHash.count
 						//  + pSchema.idxHash.count
@@ -234,12 +234,12 @@ namespace Community.CsharpSqlite {
 						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.trigHash.ht );
 						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.idxHash.ht );
 						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.fkeyHash.ht );
-						for(p=sqliteHashFirst(pSchema.trigHash);p!=null;p=sqliteHashNext(p)) {
-							Trigger t=(Trigger)sqliteHashData(p);
-							sqlite3DeleteTrigger(db,ref t);
+						for(p= pSchema.trigHash.sqliteHashFirst();p!=null;p=p.sqliteHashNext()) {
+							Trigger t=(Trigger)p.sqliteHashData();
+							TriggerParser.sqlite3DeleteTrigger(db,ref t);
 						}
-						for(p=sqliteHashFirst(pSchema.tblHash);p!=null;p=sqliteHashNext(p)) {
-							Table t=(Table)sqliteHashData(p);
+						for(p= pSchema.tblHash.sqliteHashFirst();p!=null;p=p.sqliteHashNext()) {
+							Table t=(Table)p.sqliteHashData();
 							build.sqlite3DeleteTable(db,ref t);
 						}
 					}

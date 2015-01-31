@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Community.CsharpSqlite
-{
-    public partial class Sqlite3
-    {
+{  
         public enum MemType
         {
             //#define MEMTYPE_HEAP       0x01  /* General heap allocations */
@@ -20,5 +18,5 @@ namespace Community.CsharpSqlite
             PCACHE = 0x08,
             DB = 0x10
         }
-    }
+ 
 }

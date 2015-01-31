@@ -122,7 +122,7 @@ namespace Community.CsharpSqlite
                         rc = Sqlite3.ResolveExtensions.sqlite3ResolveExprNames(this, ref pExpr);
                         if (rc == SqlResult.SQLITE_OK && pExpr.sqlite3ExprIsConstant() == 0)
                         {
-                            Sqlite3.utilc.sqlite3ErrorMsg(this.pParse, "invalid name: \"%s\"", pExpr.u.zToken);
+                            utilc.sqlite3ErrorMsg(this.pParse, "invalid name: \"%s\"", pExpr.u.zToken);
                             return SqlResult.SQLITE_ERROR;
                         }
                     }

@@ -175,209 +175,209 @@ namespace Community.CsharpSqlite
 
 		public const string SQLITE_SOURCE_ID = "Ported to C# from 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2";
 
-		///
-///<summary>
-///</summary>
-///<param name="CAPI3REF: Run">Time Library Version Numbers</param>
-///<param name="KEYWORDS: sqlite3_version, sqlite3_sourceid">KEYWORDS: sqlite3_version, sqlite3_sourceid</param>
-///<param name=""></param>
-///<param name="These interfaces provide the same information as the [SQLITE_VERSION],">These interfaces provide the same information as the [SQLITE_VERSION],</param>
-///<param name="[SQLITE_VERSION_NUMBER], and [SQLITE_SOURCE_ID] C preprocessor macros">[SQLITE_VERSION_NUMBER], and [SQLITE_SOURCE_ID] C preprocessor macros</param>
-///<param name="but are associated with the library instead of the header file.  ^(Cautious">but are associated with the library instead of the header file.  ^(Cautious</param>
-///<param name="programmers might include Debug.Assert() statements in their application to">programmers might include Debug.Assert() statements in their application to</param>
-///<param name="verify that values returned by these interfaces match the macros in">verify that values returned by these interfaces match the macros in</param>
-///<param name="the header, and thus insure that the application is">the header, and thus insure that the application is</param>
-///<param name="compiled with matching library and header files.">compiled with matching library and header files.</param>
-///<param name=""></param>
-///<param name="<blockquote><pre>"><blockquote><pre></param>
-///<param name="Debug.Assert( sqlite3_libversion_number()==SQLITE_VERSION_NUMBER );">Debug.Assert( sqlite3_libversion_number()==SQLITE_VERSION_NUMBER );</param>
-///<param name="Debug.Assert( strcmp(sqlite3_sourceid(),SQLITE_SOURCE_ID)==0 );">Debug.Assert( strcmp(sqlite3_sourceid(),SQLITE_SOURCE_ID)==0 );</param>
-///<param name="Debug.Assert( strcmp(sqlite3_libversion(),SQLITE_VERSION)==0 );">Debug.Assert( strcmp(sqlite3_libversion(),SQLITE_VERSION)==0 );</param>
-///<param name="</pre></blockquote>)^"></pre></blockquote>)^</param>
-///<param name=""></param>
-///<param name="^The sqlite3_version[] string constant contains the text of [SQLITE_VERSION]">^The sqlite3_version[] string constant contains the text of [SQLITE_VERSION]</param>
-///<param name="macro.  ^The sqlite3_libversion() function returns a pointer to the">macro.  ^The sqlite3_libversion() function returns a pointer to the</param>
-///<param name="to the sqlite3_version[] string constant.  The sqlite3_libversion()">to the sqlite3_version[] string constant.  The sqlite3_libversion()</param>
-///<param name="function is provided for use in DLLs since DLL users usually do not have">function is provided for use in DLLs since DLL users usually do not have</param>
-///<param name="direct access to string constants within the DLL.  ^The">direct access to string constants within the DLL.  ^The</param>
-///<param name="sqlite3_libversion_number() function returns an integer equal to">sqlite3_libversion_number() function returns an integer equal to</param>
-///<param name="[SQLITE_VERSION_NUMBER].  ^The sqlite3_sourceid() function returns ">[SQLITE_VERSION_NUMBER].  ^The sqlite3_sourceid() function returns </param>
-///<param name="a pointer to a string constant whose value is the same as the ">a pointer to a string constant whose value is the same as the </param>
-///<param name="[SQLITE_SOURCE_ID] C preprocessor macro.">[SQLITE_SOURCE_ID] C preprocessor macro.</param>
-///<param name=""></param>
-///<param name="See also: [sqlite_version()] and [sqlite_source_id()].">See also: [sqlite_version()] and [sqlite_source_id()].</param>
-///<param name=""></param>
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="CAPI3REF: Run">Time Library Version Numbers</param>
+        ///<param name="KEYWORDS: sqlite3_version, sqlite3_sourceid">KEYWORDS: sqlite3_version, sqlite3_sourceid</param>
+        ///<param name=""></param>
+        ///<param name="These interfaces provide the same information as the [SQLITE_VERSION],">These interfaces provide the same information as the [SQLITE_VERSION],</param>
+        ///<param name="[SQLITE_VERSION_NUMBER], and [SQLITE_SOURCE_ID] C preprocessor macros">[SQLITE_VERSION_NUMBER], and [SQLITE_SOURCE_ID] C preprocessor macros</param>
+        ///<param name="but are associated with the library instead of the header file.  ^(Cautious">but are associated with the library instead of the header file.  ^(Cautious</param>
+        ///<param name="programmers might include Debug.Assert() statements in their application to">programmers might include Debug.Assert() statements in their application to</param>
+        ///<param name="verify that values returned by these interfaces match the macros in">verify that values returned by these interfaces match the macros in</param>
+        ///<param name="the header, and thus insure that the application is">the header, and thus insure that the application is</param>
+        ///<param name="compiled with matching library and header files.">compiled with matching library and header files.</param>
+        ///<param name=""></param>
+        ///<param name="<blockquote><pre>"><blockquote><pre></param>
+        ///<param name="Debug.Assert( sqlite3_libversion_number()==SQLITE_VERSION_NUMBER );">Debug.Assert( sqlite3_libversion_number()==SQLITE_VERSION_NUMBER );</param>
+        ///<param name="Debug.Assert( strcmp(sqlite3_sourceid(),SQLITE_SOURCE_ID)==0 );">Debug.Assert( strcmp(sqlite3_sourceid(),SQLITE_SOURCE_ID)==0 );</param>
+        ///<param name="Debug.Assert( strcmp(sqlite3_libversion(),SQLITE_VERSION)==0 );">Debug.Assert( strcmp(sqlite3_libversion(),SQLITE_VERSION)==0 );</param>
+        ///<param name="</pre></blockquote>)^"></pre></blockquote>)^</param>
+        ///<param name=""></param>
+        ///<param name="^The sqlite3_version[] string constant contains the text of [SQLITE_VERSION]">^The sqlite3_version[] string constant contains the text of [SQLITE_VERSION]</param>
+        ///<param name="macro.  ^The sqlite3_libversion() function returns a pointer to the">macro.  ^The sqlite3_libversion() function returns a pointer to the</param>
+        ///<param name="to the sqlite3_version[] string constant.  The sqlite3_libversion()">to the sqlite3_version[] string constant.  The sqlite3_libversion()</param>
+        ///<param name="function is provided for use in DLLs since DLL users usually do not have">function is provided for use in DLLs since DLL users usually do not have</param>
+        ///<param name="direct access to string constants within the DLL.  ^The">direct access to string constants within the DLL.  ^The</param>
+        ///<param name="sqlite3_libversion_number() function returns an integer equal to">sqlite3_libversion_number() function returns an integer equal to</param>
+        ///<param name="[SQLITE_VERSION_NUMBER].  ^The sqlite3_sourceid() function returns ">[SQLITE_VERSION_NUMBER].  ^The sqlite3_sourceid() function returns </param>
+        ///<param name="a pointer to a string constant whose value is the same as the ">a pointer to a string constant whose value is the same as the </param>
+        ///<param name="[SQLITE_SOURCE_ID] C preprocessor macro.">[SQLITE_SOURCE_ID] C preprocessor macro.</param>
+        ///<param name=""></param>
+        ///<param name="See also: [sqlite_version()] and [sqlite_source_id()].">See also: [sqlite_version()] and [sqlite_source_id()].</param>
+        ///<param name=""></param>
 
-		//SQLITE_API SQLITE_EXTERN const char sqlite3_version[];
-		//SQLITE_API string sqlite3_libversion(void);
-		//SQLITE_API string sqlite3_sourceid(void);
-		//SQLITE_API int sqlite3_libversion_number(void);
-		///
-///<summary>
-///</summary>
-///<param name="CAPI3REF: Run">Time Library Compilation Options Diagnostics</param>
-///<param name=""></param>
-///<param name="^The sqlite3_compileoption_used() function returns 0 or 1 ">^The sqlite3_compileoption_used() function returns 0 or 1 </param>
-///<param name="indicating whether the specified option was defined at ">indicating whether the specified option was defined at </param>
-///<param name="compile time.  ^The SQLITE_ prefix may be omitted from the ">compile time.  ^The SQLITE_ prefix may be omitted from the </param>
-///<param name="option name passed to sqlite3_compileoption_used().  ">option name passed to sqlite3_compileoption_used().  </param>
-///<param name=""></param>
-///<param name="^The sqlite3_compileoption_get() function allows iterating">^The sqlite3_compileoption_get() function allows iterating</param>
-///<param name="over the list of options that were defined at compile time by">over the list of options that were defined at compile time by</param>
-///<param name="returning the N">th compile time option string.  ^If N is out of range,</param>
-///<param name="sqlite3_compileoption_get() returns a NULL pointer.  ^The SQLITE_ ">sqlite3_compileoption_get() returns a NULL pointer.  ^The SQLITE_ </param>
-///<param name="prefix is omitted from any strings returned by ">prefix is omitted from any strings returned by </param>
-///<param name="sqlite3_compileoption_get().">sqlite3_compileoption_get().</param>
-///<param name=""></param>
-///<param name="^Support for the diagnostic functions sqlite3_compileoption_used()">^Support for the diagnostic functions sqlite3_compileoption_used()</param>
-///<param name="and sqlite3_compileoption_get() may be omitted by specifying the ">and sqlite3_compileoption_get() may be omitted by specifying the </param>
-///<param name="[SQLITE_OMIT_COMPILEOPTION_DIAGS] option at compile time.">[SQLITE_OMIT_COMPILEOPTION_DIAGS] option at compile time.</param>
-///<param name=""></param>
-///<param name="See also: SQL functions [sqlite_compileoption_used()] and">See also: SQL functions [sqlite_compileoption_used()] and</param>
-///<param name="[sqlite_compileoption_get()] and the [compile_options pragma].">[sqlite_compileoption_get()] and the [compile_options pragma].</param>
-///<param name=""></param>
+        //SQLITE_API SQLITE_EXTERN const char sqlite3_version[];
+        //SQLITE_API string sqlite3_libversion(void);
+        //SQLITE_API string sqlite3_sourceid(void);
+        //SQLITE_API int sqlite3_libversion_number(void);
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="CAPI3REF: Run">Time Library Compilation Options Diagnostics</param>
+        ///<param name=""></param>
+        ///<param name="^The sqlite3_compileoption_used() function returns 0 or 1 ">^The sqlite3_compileoption_used() function returns 0 or 1 </param>
+        ///<param name="indicating whether the specified option was defined at ">indicating whether the specified option was defined at </param>
+        ///<param name="compile time.  ^The SQLITE_ prefix may be omitted from the ">compile time.  ^The SQLITE_ prefix may be omitted from the </param>
+        ///<param name="option name passed to sqlite3_compileoption_used().  ">option name passed to sqlite3_compileoption_used().  </param>
+        ///<param name=""></param>
+        ///<param name="^The sqlite3_compileoption_get() function allows iterating">^The sqlite3_compileoption_get() function allows iterating</param>
+        ///<param name="over the list of options that were defined at compile time by">over the list of options that were defined at compile time by</param>
+        ///<param name="returning the N">th compile time option string.  ^If N is out of range,</param>
+        ///<param name="sqlite3_compileoption_get() returns a NULL pointer.  ^The SQLITE_ ">sqlite3_compileoption_get() returns a NULL pointer.  ^The SQLITE_ </param>
+        ///<param name="prefix is omitted from any strings returned by ">prefix is omitted from any strings returned by </param>
+        ///<param name="sqlite3_compileoption_get().">sqlite3_compileoption_get().</param>
+        ///<param name=""></param>
+        ///<param name="^Support for the diagnostic functions sqlite3_compileoption_used()">^Support for the diagnostic functions sqlite3_compileoption_used()</param>
+        ///<param name="and sqlite3_compileoption_get() may be omitted by specifying the ">and sqlite3_compileoption_get() may be omitted by specifying the </param>
+        ///<param name="[SQLITE_OMIT_COMPILEOPTION_DIAGS] option at compile time.">[SQLITE_OMIT_COMPILEOPTION_DIAGS] option at compile time.</param>
+        ///<param name=""></param>
+        ///<param name="See also: SQL functions [sqlite_compileoption_used()] and">See also: SQL functions [sqlite_compileoption_used()] and</param>
+        ///<param name="[sqlite_compileoption_get()] and the [compile_options pragma].">[sqlite_compileoption_get()] and the [compile_options pragma].</param>
+        ///<param name=""></param>
 
-		//#if !SQLITE_OMIT_COMPILEOPTION_DIAGS
-		//SQLITE_API int sqlite3_compileoption_used(string zOptName);
-		//SQLITE_API string sqlite3_compileoption_get(int N);
-		//#endif
-		///
-///<summary>
-///CAPI3REF: Test To See If The Library Is Threadsafe
-///
-///^The sqlite3_threadsafe() function returns zero if and only if
-///SQLite was compiled mutexing code omitted due to the
-///</summary>
-///<param name="[SQLITE_THREADSAFE] compile">time option being set to 0.</param>
-///<param name=""></param>
-///<param name="SQLite can be compiled with or without mutexes.  When">SQLite can be compiled with or without mutexes.  When</param>
-///<param name="the [SQLITE_THREADSAFE] C preprocessor macro is 1 or 2, mutexes">the [SQLITE_THREADSAFE] C preprocessor macro is 1 or 2, mutexes</param>
-///<param name="are enabled and SQLite is threadsafe.  When the">are enabled and SQLite is threadsafe.  When the</param>
-///<param name="[SQLITE_THREADSAFE] macro is 0, ">[SQLITE_THREADSAFE] macro is 0, </param>
-///<param name="the mutexes are omitted.  Without the mutexes, it is not safe">the mutexes are omitted.  Without the mutexes, it is not safe</param>
-///<param name="to use SQLite concurrently from more than one thread.">to use SQLite concurrently from more than one thread.</param>
-///<param name=""></param>
-///<param name="Enabling mutexes incurs a measurable performance penalty.">Enabling mutexes incurs a measurable performance penalty.</param>
-///<param name="So if speed is of utmost importance, it makes sense to disable">So if speed is of utmost importance, it makes sense to disable</param>
-///<param name="the mutexes.  But for maximum safety, mutexes should be enabled.">the mutexes.  But for maximum safety, mutexes should be enabled.</param>
-///<param name="^The default behavior is for mutexes to be enabled.">^The default behavior is for mutexes to be enabled.</param>
-///<param name=""></param>
-///<param name="This interface can be used by an application to make sure that the">This interface can be used by an application to make sure that the</param>
-///<param name="version of SQLite that it is linking against was compiled with">version of SQLite that it is linking against was compiled with</param>
-///<param name="the desired setting of the [SQLITE_THREADSAFE] macro.">the desired setting of the [SQLITE_THREADSAFE] macro.</param>
-///<param name=""></param>
-///<param name="This interface only reports on the compile">time mutex setting</param>
-///<param name="of the [SQLITE_THREADSAFE] flag.  If SQLite is compiled with">of the [SQLITE_THREADSAFE] flag.  If SQLite is compiled with</param>
-///<param name="SQLITE_THREADSAFE=1 or =2 then mutexes are enabled by default but">SQLITE_THREADSAFE=1 or =2 then mutexes are enabled by default but</param>
-///<param name="can be fully or partially disabled using a call to [sqlite3_config()]">can be fully or partially disabled using a call to [sqlite3_config()]</param>
-///<param name="with the verbs [SQLITE_CONFIG_SINGLETHREAD], [SQLITE_CONFIG_MULTITHREAD],">with the verbs [SQLITE_CONFIG_SINGLETHREAD], [SQLITE_CONFIG_MULTITHREAD],</param>
-///<param name="or [SQLITE_CONFIG_MUTEX].  ^(The return value of the">or [SQLITE_CONFIG_MUTEX].  ^(The return value of the</param>
-///<param name="sqlite3_threadsafe() function shows only the compile">time setting of</param>
-///<param name="thread safety, not any run">time changes to that setting made by</param>
-///<param name="sqlite3_config(). In other words, the return value from sqlite3_threadsafe()">sqlite3_config(). In other words, the return value from sqlite3_threadsafe()</param>
-///<param name="is unchanged by calls to sqlite3_config().)^">is unchanged by calls to sqlite3_config().)^</param>
-///<param name=""></param>
-///<param name="See the [threading mode] documentation for additional information.">See the [threading mode] documentation for additional information.</param>
-///<param name=""></param>
+        //#if !SQLITE_OMIT_COMPILEOPTION_DIAGS
+        //SQLITE_API int sqlite3_compileoption_used(string zOptName);
+        //SQLITE_API string sqlite3_compileoption_get(int N);
+        //#endif
+        ///
+        ///<summary>
+        ///CAPI3REF: Test To See If The Library Is Threadsafe
+        ///
+        ///^The sqlite3_threadsafe() function returns zero if and only if
+        ///SQLite was compiled mutexing code omitted due to the
+        ///</summary>
+        ///<param name="[SQLITE_THREADSAFE] compile">time option being set to 0.</param>
+        ///<param name=""></param>
+        ///<param name="SQLite can be compiled with or without mutexes.  When">SQLite can be compiled with or without mutexes.  When</param>
+        ///<param name="the [SQLITE_THREADSAFE] C preprocessor macro is 1 or 2, mutexes">the [SQLITE_THREADSAFE] C preprocessor macro is 1 or 2, mutexes</param>
+        ///<param name="are enabled and SQLite is threadsafe.  When the">are enabled and SQLite is threadsafe.  When the</param>
+        ///<param name="[SQLITE_THREADSAFE] macro is 0, ">[SQLITE_THREADSAFE] macro is 0, </param>
+        ///<param name="the mutexes are omitted.  Without the mutexes, it is not safe">the mutexes are omitted.  Without the mutexes, it is not safe</param>
+        ///<param name="to use SQLite concurrently from more than one thread.">to use SQLite concurrently from more than one thread.</param>
+        ///<param name=""></param>
+        ///<param name="Enabling mutexes incurs a measurable performance penalty.">Enabling mutexes incurs a measurable performance penalty.</param>
+        ///<param name="So if speed is of utmost importance, it makes sense to disable">So if speed is of utmost importance, it makes sense to disable</param>
+        ///<param name="the mutexes.  But for maximum safety, mutexes should be enabled.">the mutexes.  But for maximum safety, mutexes should be enabled.</param>
+        ///<param name="^The default behavior is for mutexes to be enabled.">^The default behavior is for mutexes to be enabled.</param>
+        ///<param name=""></param>
+        ///<param name="This interface can be used by an application to make sure that the">This interface can be used by an application to make sure that the</param>
+        ///<param name="version of SQLite that it is linking against was compiled with">version of SQLite that it is linking against was compiled with</param>
+        ///<param name="the desired setting of the [SQLITE_THREADSAFE] macro.">the desired setting of the [SQLITE_THREADSAFE] macro.</param>
+        ///<param name=""></param>
+        ///<param name="This interface only reports on the compile">time mutex setting</param>
+        ///<param name="of the [SQLITE_THREADSAFE] flag.  If SQLite is compiled with">of the [SQLITE_THREADSAFE] flag.  If SQLite is compiled with</param>
+        ///<param name="SQLITE_THREADSAFE=1 or =2 then mutexes are enabled by default but">SQLITE_THREADSAFE=1 or =2 then mutexes are enabled by default but</param>
+        ///<param name="can be fully or partially disabled using a call to [sqlite3_config()]">can be fully or partially disabled using a call to [sqlite3_config()]</param>
+        ///<param name="with the verbs [SQLITE_CONFIG_SINGLETHREAD], [SQLITE_CONFIG_MULTITHREAD],">with the verbs [SQLITE_CONFIG_SINGLETHREAD], [SQLITE_CONFIG_MULTITHREAD],</param>
+        ///<param name="or [SQLITE_CONFIG_MUTEX].  ^(The return value of the">or [SQLITE_CONFIG_MUTEX].  ^(The return value of the</param>
+        ///<param name="sqlite3_threadsafe() function shows only the compile">time setting of</param>
+        ///<param name="thread safety, not any run">time changes to that setting made by</param>
+        ///<param name="sqlite3_config(). In other words, the return value from sqlite3_threadsafe()">sqlite3_config(). In other words, the return value from sqlite3_threadsafe()</param>
+        ///<param name="is unchanged by calls to sqlite3_config().)^">is unchanged by calls to sqlite3_config().)^</param>
+        ///<param name=""></param>
+        ///<param name="See the [threading mode] documentation for additional information.">See the [threading mode] documentation for additional information.</param>
+        ///<param name=""></param>
 
-		//SQLITE_API int sqlite3_threadsafe(void);
-		///
-///<summary>
-///CAPI3REF: Database Connection Handle
-///KEYWORDS: {database connection} {database connections}
-///
-///Each open SQLite database is represented by a pointer to an instance of
-///the opaque structure named "sqlite3".  It is useful to think of an sqlite3
-///pointer as an object.  The [sqlite3_open()], [sqlite3_open16()], and
-///[sqlite3_open_v2()] interfaces are its constructors, and [sqlite3_close()]
-///is its destructor.  There are many other interfaces (such as
-///[sqlite3_prepare_v2()], [sqlite3_create_function()], and
-///[sqlite3_busy_timeout()] to name but three) that are methods on an
-///sqlite3 object.
-///
-///</summary>
+        //SQLITE_API int sqlite3_threadsafe(void);
+        ///
+        ///<summary>
+        ///CAPI3REF: Database Connection Handle
+        ///KEYWORDS: {database connection} {database connections}
+        ///
+        ///Each open SQLite database is represented by a pointer to an instance of
+        ///the opaque structure named "sqlite3".  It is useful to think of an sqlite3
+        ///pointer as an object.  The [sqlite3_open()], [sqlite3_open16()], and
+        ///[sqlite3_open_v2()] interfaces are its constructors, and [sqlite3_close()]
+        ///is its destructor.  There are many other interfaces (such as
+        ///[sqlite3_prepare_v2()], [sqlite3_create_function()], and
+        ///[sqlite3_busy_timeout()] to name but three) that are methods on an
+        ///sqlite3 object.
+        ///
+        ///</summary>
 
-		//typedef struct sqlite3 sqlite3;
-		///
-///<summary>
-///</summary>
-///<param name="CAPI3REF: 64">Bit Integer Types</param>
-///<param name="KEYWORDS: sqlite_int64 sqlite_uint64">KEYWORDS: sqlite_int64 sqlite_uint64</param>
-///<param name=""></param>
-///<param name="Because there is no cross">bit integer types</param>
-///<param name="SQLite includes typedefs for 64">bit signed and unsigned integers.</param>
-///<param name=""></param>
-///<param name="The sqlite3_int64 and sqlite3_uint64 are the preferred type definitions.">The sqlite3_int64 and sqlite3_uint64 are the preferred type definitions.</param>
-///<param name="The sqlite_int64 and sqlite_uint64 types are supported for backwards">The sqlite_int64 and sqlite_uint64 types are supported for backwards</param>
-///<param name="compatibility only.">compatibility only.</param>
-///<param name=""></param>
-///<param name="^The sqlite3_int64 and sqlite_int64 types can store integer values">^The sqlite3_int64 and sqlite_int64 types can store integer values</param>
-///<param name="between ">9223372036854775808 and +9223372036854775807 inclusive.  ^The</param>
-///<param name="sqlite3_uint64 and sqlite_uint64 types can store integer values ">sqlite3_uint64 and sqlite_uint64 types can store integer values </param>
-///<param name="between 0 and +18446744073709551615 inclusive.">between 0 and +18446744073709551615 inclusive.</param>
-///<param name=""></param>
+        //typedef struct sqlite3 sqlite3;
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="CAPI3REF: 64">Bit Integer Types</param>
+        ///<param name="KEYWORDS: sqlite_int64 sqlite_uint64">KEYWORDS: sqlite_int64 sqlite_uint64</param>
+        ///<param name=""></param>
+        ///<param name="Because there is no cross">bit integer types</param>
+        ///<param name="SQLite includes typedefs for 64">bit signed and unsigned integers.</param>
+        ///<param name=""></param>
+        ///<param name="The sqlite3_int64 and sqlite3_uint64 are the preferred type definitions.">The sqlite3_int64 and sqlite3_uint64 are the preferred type definitions.</param>
+        ///<param name="The sqlite_int64 and sqlite_uint64 types are supported for backwards">The sqlite_int64 and sqlite_uint64 types are supported for backwards</param>
+        ///<param name="compatibility only.">compatibility only.</param>
+        ///<param name=""></param>
+        ///<param name="^The sqlite3_int64 and sqlite_int64 types can store integer values">^The sqlite3_int64 and sqlite_int64 types can store integer values</param>
+        ///<param name="between ">9223372036854775808 and +9223372036854775807 inclusive.  ^The</param>
+        ///<param name="sqlite3_uint64 and sqlite_uint64 types can store integer values ">sqlite3_uint64 and sqlite_uint64 types can store integer values </param>
+        ///<param name="between 0 and +18446744073709551615 inclusive.">between 0 and +18446744073709551615 inclusive.</param>
+        ///<param name=""></param>
 
-		//#if SQLITE_INT64_TYPE
-		//  typedef SQLITE_INT64_TYPE sqlite_int64;
-		//  typedef unsigned SQLITE_INT64_TYPE sqlite_uint64;
-		//#elif defined(_MSC_VER) || defined(__BORLANDC__)
-		//  typedef __int64 sqlite_int64;
-		//  typedef unsigned __int64 sqlite_uint64;
-		//#else
-		//  typedef long long int sqlite_int64;
-		//  typedef unsigned long long int sqlite_uint64;
-		//#endif
-		//typedef sqlite_int64 sqlite3_int64;
-		//typedef sqlite_uint64 sqlite3_uint64;
-		///
-///<summary>
-///If compiling for a processor that lacks floating point support,
-///</summary>
-///<param name="substitute integer for floating">point.</param>
-///<param name=""></param>
+        //#if SQLITE_INT64_TYPE
+        //  typedef SQLITE_INT64_TYPE sqlite_int64;
+        //  typedef unsigned SQLITE_INT64_TYPE sqlite_uint64;
+        //#elif defined(_MSC_VER) || defined(__BORLANDC__)
+        //  typedef __int64 sqlite_int64;
+        //  typedef unsigned __int64 sqlite_uint64;
+        //#else
+        //  typedef long long int sqlite_int64;
+        //  typedef unsigned long long int sqlite_uint64;
+        //#endif
+        //typedef sqlite_int64 sqlite3_int64;
+        //typedef sqlite_uint64 sqlite3_uint64;
+        ///
+        ///<summary>
+        ///If compiling for a processor that lacks floating point support,
+        ///</summary>
+        ///<param name="substitute integer for floating">point.</param>
+        ///<param name=""></param>
 
-		//#if SQLITE_OMIT_FLOATING_POINT
-		//# define double sqlite3_int64
-		//#endif
-		///
-///<summary>
-///CAPI3REF: Closing A Database Connection
-///
-///^The sqlite3_close() routine is the destructor for the [sqlite3] object.
-///^Calls to sqlite3_close() return SqlResult.SQLITE_OK if the [sqlite3] object is
-///successfully destroyed and all associated resources are deallocated.
-///
-///Applications must [sqlite3_finalize | finalize] all [prepared statements]
-///and [sqlite3_blob_close | close] all [BLOB handles] associated with
-///the [sqlite3] object prior to attempting to close the object.  ^If
-///sqlite3_close() is called on a [database connection] that still has
-///outstanding [prepared statements] or [BLOB handles], then it returns
-///SQLITE_BUSY.
-///
-///^If [sqlite3_close()] is invoked while a transaction is open,
-///the transaction is automatically rolled back.
-///
-///The C parameter to [sqlite3_close(C)] must be either a NULL
-///pointer or an [sqlite3] object pointer obtained
-///from [sqlite3_open()], [sqlite3_open16()], or
-///[sqlite3_open_v2()], and not previously closed.
-///^Calling sqlite3_close() with a NULL pointer argument is a 
-///</summary>
-///<param name="harmless no">op.</param>
-///<param name=""></param>
+        //#if SQLITE_OMIT_FLOATING_POINT
+        //# define double sqlite3_int64
+        //#endif
+        ///
+        ///<summary>
+        ///CAPI3REF: Closing A Database Connection
+        ///
+        ///^The sqlite3_close() routine is the destructor for the [sqlite3] object.
+        ///^Calls to sqlite3_close() return SqlResult.SQLITE_OK if the [sqlite3] object is
+        ///successfully destroyed and all associated resources are deallocated.
+        ///
+        ///Applications must [sqlite3_finalize | finalize] all [prepared statements]
+        ///and [sqlite3_blob_close | close] all [BLOB handles] associated with
+        ///the [sqlite3] object prior to attempting to close the object.  ^If
+        ///sqlite3_close() is called on a [database connection] that still has
+        ///outstanding [prepared statements] or [BLOB handles], then it returns
+        ///SQLITE_BUSY.
+        ///
+        ///^If [sqlite3_close()] is invoked while a transaction is open,
+        ///the transaction is automatically rolled back.
+        ///
+        ///The C parameter to [sqlite3_close(C)] must be either a NULL
+        ///pointer or an [sqlite3] object pointer obtained
+        ///from [sqlite3_open()], [sqlite3_open16()], or
+        ///[sqlite3_open_v2()], and not previously closed.
+        ///^Calling sqlite3_close() with a NULL pointer argument is a 
+        ///</summary>
+        ///<param name="harmless no">op.</param>
+        ///<param name=""></param>
 
-		//SQLITE_API int sqlite3_close(sqlite3 );
-		///
-///<summary>
-///The type for a callback function.
-///This is legacy and deprecated.  It is included for historical
-///compatibility and is not documented.
-///
-///</summary>
+        //SQLITE_API int sqlite3_close(sqlite3 );
+        ///
+        ///<summary>
+        ///The type for a callback function.
+        ///This is legacy and deprecated.  It is included for historical
+        ///compatibility and is not documented.
+        ///
+        ///</summary>
 
-		//typedef int (*sqlite3_callback)(void*,int,char**, char*);
-		
-		///
+        //typedef int (*sqlite3_callback)(void*,int,char**, char*);
+
+        ///
 
         ///
         ///<summary>
@@ -412,7 +412,7 @@ namespace Community.CsharpSqlite
         ///<summary>
         ///Reserved:                           0x00F00000 
         ///</summary>
-
+        //TODO:public enum
         public const int SQLITE_OPEN_READONLY = 0x00000001;
 
 		public const int SQLITE_OPEN_READWRITE = 0x00000002;

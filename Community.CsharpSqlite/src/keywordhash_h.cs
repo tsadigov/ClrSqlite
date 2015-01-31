@@ -2016,7 +2016,7 @@ namespace Community.CsharpSqlite
 			return Sqlite3.TK_ID;
 		}
 
-		static int sqlite3KeywordCode (string z, int n)
+		public static int sqlite3KeywordCode (string z, int n)
 		{
 			return innerKeywordCode (z, 0, n);
 		}

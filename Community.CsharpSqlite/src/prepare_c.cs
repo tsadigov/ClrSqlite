@@ -93,7 +93,7 @@ namespace Community.CsharpSqlite {
 			sqlite3 db=pData.db;
 			int iDb=pData.iDb;
 			Debug.Assert(argc==3);
-			Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed,argc);
+			sqliteinth.UNUSED_PARAMETER2(NotUsed,argc);
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			db.DbClearProperty(iDb,sqliteinth.DB_Empty);
             
@@ -279,7 +279,7 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			pDb=db.aDb[iDb];
 			if(pDb.pBt==null) {
-                if (Sqlite3.sqliteinth.OMIT_TEMPDB == 0 && Sqlite3.ALWAYS(iDb == 1))
+                if (sqliteinth.OMIT_TEMPDB == 0 && Sqlite3.ALWAYS(iDb == 1))
                 {
                     db.DbSetProperty(1, sqliteinth.DB_SchemaLoaded);
 				}
@@ -531,7 +531,7 @@ db.xAuth = 0;
 		/// Otherwise, the schema is loaded. An error code is returned.
 		///
 		///</summary>
-		static SqlResult sqlite3ReadSchema(Parse pParse) {
+		public static SqlResult sqlite3ReadSchema(Parse pParse) {
 			SqlResult rc=SqlResult.SQLITE_OK;
 			sqlite3 db=pParse.db;
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
@@ -615,7 +615,7 @@ db.xAuth = 0;
 		/// attached database is returned.
 		///
 		///</summary>
-		public static int sqlite3SchemaToIndex(sqlite3 db,Schema pSchema) {
+		public static int sqlite3SchemaToIndex(sqlite3 db,Schema pSchema) {//TODO: extension method
 			int i=-1000000;
 			///
 			///<summary>
@@ -935,7 +935,7 @@ db.xAuth = 0;
             {
 				ppStmt=null;
 				pzTail=null;
-				return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			db.mutex.sqlite3_mutex_enter();
 			sqlite3BtreeEnterAll(db);
@@ -1137,7 +1137,7 @@ var rc = SqlResult.SQLITE_OK;
 assert( ppStmt );
 *ppStmt = 0;
 if( !sqlite3SafetyCheckOk(db) ){
-return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT;
+return sqliteinth.SQLITE_MISUSE_BKPT;
 }
 db.mutex.sqlite3_mutex_enter();
 zSql8 = sqlite3Utf16to8(db, zSql, nBytes, SqliteEncoding.UTF16NATIVE);

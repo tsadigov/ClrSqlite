@@ -178,7 +178,7 @@ namespace Community.CsharpSqlite
 				int i;
 				for (i = 0; i < pPager.nSavepoint; i++) {
 					PagerSavepoint p = pPager.aSavepoint [i];
-					if (p.nOrig >= pgno && 0 == sqlite3BitvecTest (p.pInSavepoint, pgno)) {
+					if (p.nOrig >= pgno && 0 == p.pInSavepoint.sqlite3BitvecTest (pgno)) {
 						return true;
 					}
 				}
@@ -191,7 +191,7 @@ namespace Community.CsharpSqlite
 			///</summary>
 			bool pageInJournal ()
 			{
-				return sqlite3BitvecTest (this.pPager.pInJournal, this.pgno) != 0;
+				return this.pPager.pInJournal.sqlite3BitvecTest(this.pgno) != 0;
 			}
 
 			public int pager_pagehash ()

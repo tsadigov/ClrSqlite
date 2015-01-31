@@ -151,7 +151,7 @@ timeDiff(&sBegin.ru_stime, &sEnd.ru_stime));
 	///<summary>
 	/// Used to prevent warnings about unused parameters
 	///</summary>
-	//#define Sqlite3.sqliteinth.UNUSED_PARAMETER(x) (void)(x)
+	//#define sqliteinth.UNUSED_PARAMETER(x) (void)(x)
 	static void UNUSED_PARAMETER<T> (T x)
 	{
 	}
@@ -306,8 +306,8 @@ malloc_cs.sqlite3_free(ref z);
 	{
 		Debug.Assert (0 == argc);
 		Debug.Assert (zShellStatic != null);
-		Sqlite3.sqliteinth.UNUSED_PARAMETER (argc);
-		Sqlite3.sqliteinth.UNUSED_PARAMETER (argv);
+		sqliteinth.UNUSED_PARAMETER (argc);
+		sqliteinth.UNUSED_PARAMETER (argv);
 		context.sqlite3_result_text (zShellStatic, -1, Sqlite3.SQLITE_STATIC);
 	}
 
@@ -1073,7 +1073,7 @@ malloc_cs.sqlite3_free(ref z);
 ** This routine runs when the user presses Ctrl-C
 */
 static void interrupt_handler(int NotUsed){
-Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+sqliteinth.UNUSED_PARAMETER(NotUsed);
 seenInterrupt = 1;
 if( db ) sqlite3_interrupt(db);
 }
@@ -1398,7 +1398,7 @@ if( db ) sqlite3_interrupt(db);
 		string zType;
 		string zSql;
 		callback_data p = (callback_data)pArg;
-		Sqlite3.sqliteinth.UNUSED_PARAMETER (azCol);
+		sqliteinth.UNUSED_PARAMETER (azCol);
 		if (nArg != 3)
 			return 1;
 		zTable = ((string[])azArg) [0];
@@ -1422,7 +1422,7 @@ if( db ) sqlite3_interrupt(db);
 							fprintf (p._out, "PRAGMA writable_schema=ON;\n");
 							p.writableSchema = true;
 						}
-						zIns = Sqlite3.io.sqlite3_mprintf ("INSERT INTO sqlite_master(type,name,tbl_name,rootpage,sql)" + "VALUES('table','%q','%q',0,'%q');", zTable, zTable, zSql);
+						zIns = io.sqlite3_mprintf ("INSERT INTO sqlite_master(type,name,tbl_name,rootpage,sql)" + "VALUES('table','%q','%q',0,'%q');", zTable, zTable, zSql);
 						fprintf (p._out, "%s\n", zIns);
 						//sqlite.malloc_cs.sqlite3_free( ref zIns );
 						return 0;
@@ -1503,7 +1503,7 @@ if( db ) sqlite3_interrupt(db);
 			// malloc( len + 100 );
 			if (zQ2 == null)
 				return rc;
-			Sqlite3.io.sqlite3_snprintf (zQ2.Capacity, zQ2, "%s ORDER BY rowid DESC", zQuery);
+			io.sqlite3_snprintf (zQ2.Capacity, zQ2, "%s ORDER BY rowid DESC", zQuery);
             rc = legacy.sqlite3_exec(p.db, zQ2.ToString(), (dxCallback)dump_callback, p, ref pzErrMsg);
 			free (ref zQ2);
 		}
@@ -1966,7 +1966,7 @@ if( db ) sqlite3_interrupt(db);
 													fprintf (stderr, "non-null separator required for import\n");
 													return 0;
 												}
-												zSql = new StringBuilder (Sqlite3.io.sqlite3_mprintf ("SELECT * FROM '%q'", zTable));
+												zSql = new StringBuilder (io.sqlite3_mprintf ("SELECT * FROM '%q'", zTable));
 												if (zSql == null)
 													return 0;
 												nByte = strlen30 (zSql);
@@ -1988,7 +1988,7 @@ if( db ) sqlite3_interrupt(db);
 												//malloc( nByte + 20 + nCol * 2 );
 												if (zSql == null)
 													return 0;
-												Sqlite3.io.sqlite3_snprintf (nByte + 20, zSql, "INSERT INTO '%q' VALUES(?", zTable);
+												io.sqlite3_snprintf (nByte + 20, zSql, "INSERT INTO '%q' VALUES(?", zTable);
 												int j = strlen30 (zSql);
 												for (i = 1; i < nCol; i++) {
 													zSql.Append (',');
@@ -2185,7 +2185,7 @@ sqlite3IoTrace = iotracePrintf;
 																	}
 																	if (strcmp (azArg [1], "stdout") == 0) {
 																		p._out = stdout;
-																		Sqlite3.io.sqlite3_snprintf (p.outfile.Capacity, p.outfile, "stdout");
+																		io.sqlite3_snprintf (p.outfile.Capacity, p.outfile, "stdout");
 																	}
 																	else {
 																		p._out = new StreamWriter (azArg [1].ToString ());
@@ -2195,7 +2195,7 @@ sqlite3IoTrace = iotracePrintf;
 																			p._out = stdout;
 																		}
 																		else {
-																			Sqlite3.io.sqlite3_snprintf (p.outfile.Capacity, p.outfile, "%s", azArg [1]);
+																			io.sqlite3_snprintf (p.outfile.Capacity, p.outfile, "%s", azArg [1]);
 																		}
 																	}
 																}
@@ -3179,12 +3179,12 @@ return 0;
 	//
 	static void fprintf (TextWriter tw, string zFormat, params va_list[] ap)
 	{
-		tw.Write (Sqlite3.io.sqlite3_mprintf (zFormat, ap));
+		tw.Write (io.sqlite3_mprintf (zFormat, ap));
 	}
 
 	static void printf (string zFormat, params va_list[] ap)
 	{
-		stdout.Write (Sqlite3.io.sqlite3_mprintf (zFormat, ap));
+		stdout.Write (io.sqlite3_mprintf (zFormat, ap));
 	}
 
 	public static void Main (string[] args)
@@ -3206,7 +3206,7 @@ return 0;
 	private static void snprintf (int n, ref string zBuf, string zFormat, params va_list[] ap)
 	{
 		StringBuilder sbBuf = new StringBuilder (100);
-		Sqlite3.io.sqlite3_snprintf (n, sbBuf, zFormat, ap);
+		io.sqlite3_snprintf (n, sbBuf, zFormat, ap);
 		zBuf = sbBuf.ToString ();
 	}
 }

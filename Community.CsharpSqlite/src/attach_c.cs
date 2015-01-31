@@ -30,7 +30,7 @@ namespace Community.CsharpSqlite {
 			Db aNew=null;
 			string zErrDyn="";
 			sqlite3_vfs pVfs=null;
-			Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+			sqliteinth.UNUSED_PARAMETER(NotUsed);
 			zFile=argv[0].z!=null&&(argv[0].z.Length>0)&&argv[0].flags!=MemFlags.MEM_Null?vdbeapi.sqlite3_value_text(argv[0]):"";
 			zName=argv[1].z!=null&&(argv[1].z.Length>0)&&argv[1].flags!=MemFlags.MEM_Null?vdbeapi.sqlite3_value_text(argv[1]):"";
 			//if( zFile==null ) zFile = "";
@@ -118,7 +118,7 @@ namespace Community.CsharpSqlite {
 			else
 				if(rc==SqlResult.SQLITE_OK) {
 					Pager pPager;
-					aNew.pSchema=sqlite3SchemaGet(db,aNew.pBt);
+					aNew.pSchema= aNew.pBt.sqlite3SchemaGet(db);
 					//if ( aNew.pSchema == null )
 					//{
 					//  rc = SQLITE_NOMEM;
@@ -235,7 +235,7 @@ namespace Community.CsharpSqlite {
 			int i;
 			Db pDb=null;
 			StringBuilder zErr=new StringBuilder(200);
-			Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+			sqliteinth.UNUSED_PARAMETER(NotUsed);
 			if(zName==null)
 				zName="";
 			for(i=0;i<db.nDb;i++) {

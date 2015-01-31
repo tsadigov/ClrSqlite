@@ -611,7 +611,7 @@ namespace Community.CsharpSqlite
 
 			}
 			#if !SQLITE_OMIT_TRIGGER
-			if (sqlite3TriggerList (pParse, pDest) != null) {
+			if (pDest.sqlite3TriggerList(pParse) != null) {
 				return 0;
 				///
 ///<summary>

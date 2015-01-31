@@ -923,11 +923,11 @@ static int pcache1MemSize(object p){
 		///</summary>
 		static SqlResult pcache1Init<T> (T NotUsed)
 		{
-			Sqlite3.sqliteinth.UNUSED_PARAMETER (NotUsed);
+			sqliteinth.UNUSED_PARAMETER (NotUsed);
 			Debug.Assert (pcache1.isInit == false);
 			pcache1 = new PCacheGlobal ();
 			//memset(&pcache1, 0, sizeof(pcache1));
-			if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex) {
+			if (sqliteinth.sqlite3GlobalConfig.bCoreMutex) {
 				pcache1.grp.mutex = sqlite3_mutex_alloc (SQLITE_MUTEX_STATIC_LRU);
 				pcache1.mutex = sqlite3_mutex_alloc (SQLITE_MUTEX_STATIC_PMEM);
 			}
@@ -944,7 +944,7 @@ static int pcache1MemSize(object p){
 		///</summary>
 		static void pcache1Shutdown<T> (T NotUsed)
 		{
-			Sqlite3.sqliteinth.UNUSED_PARAMETER (NotUsed);
+			sqliteinth.UNUSED_PARAMETER (NotUsed);
 			Debug.Assert (pcache1.isInit);
 			pcache1 = new PCacheGlobal ();
 			//;memset( &pcache1, 0, sizeof( pcache1 ) );
@@ -994,7 +994,7 @@ static int pcache1MemSize(object p){
 			#if (SQLITE_ENABLE_MEMORY_MANAGEMENT) || !SQLITE_THREADSAF
 			const int separateCache = 0;
 			#else
-																																																									  int separateCache = Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex>0;
+																																																									  int separateCache = sqliteinth.sqlite3GlobalConfig.bCoreMutex>0;
 #endif
 			//sz = sizeof( PCache1 ) + sizeof( PGroup ) * separateCache;
 			pCache = new PCache1 ();

@@ -39,10 +39,7 @@ namespace Community.CsharpSqlite
     using Parse = Sqlite3.Parse;
     using Btree = Sqlite3.Btree;
     using os = Sqlite3.os;
-    using io = Sqlite3.io;
     using BtCursor = Sqlite3.BtCursor;
-    using utilc = Sqlite3.utilc;
-    using sqliteinth = Sqlite3.sqliteinth;
     //public partial class Sqlite3
     //{
 
@@ -1803,7 +1800,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 																																																																								      /* With this option, sqlite3VtabSync() is defined to be simply
 ** SqlResult.SQLITE_OK so p is not used.
 */
-      Sqlite3.sqliteinth.UNUSED_PARAMETER( p );
+      sqliteinth.UNUSED_PARAMETER( p );
 #endif
                 ///
                 ///<summary>
@@ -3380,7 +3377,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 Mem m = null;
                 Mem v = null;
                 v = malloc_cs.sqlite3Malloc(v);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(db);
+                sqliteinth.UNUSED_PARAMETER(db);
                 ///
                 ///<summary>
                 ///Get the size of the index entry.  Only indices entries of less

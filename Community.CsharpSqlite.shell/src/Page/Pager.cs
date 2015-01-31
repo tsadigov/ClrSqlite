@@ -1811,7 +1811,7 @@ return (pPager->pWal!=0);
                         PagerSavepoint p = this.aSavepoint[ii];
                         if (pgno <= p.nOrig)
                         {
-                            rc |= sqlite3BitvecSet(p.pInSavepoint, pgno);
+                            rc |= p.pInSavepoint.sqlite3BitvecSet( pgno);
                             sqliteinth.testcase(rc == SqlResult.SQLITE_NOMEM);
                             Debug.Assert(rc == SqlResult.SQLITE_OK || rc == SqlResult.SQLITE_NOMEM);
                         }
@@ -1835,7 +1835,7 @@ return (pPager->pWal!=0);
 
                     for (ii = 0; ii < this.nSavepoint; ii++)
                     {
-                        sqlite3BitvecDestroy(ref this.aSavepoint[ii].pInSavepoint);
+                    BitvecExtensions.sqlite3BitvecDestroy(ref this.aSavepoint[ii].pInSavepoint);
                     }
                     if (!this.exclusiveMode || memjrnl.sqlite3IsMemJournal(this.sjfd))
                     {
@@ -1868,7 +1868,7 @@ return (pPager->pWal!=0);
                 void pager_unlock()
                 {
                     Debug.Assert(this.eState == PagerState.PAGER_READER || this.eState == PagerState.PAGER_OPEN || this.eState == PagerState.PAGER_ERROR);
-                    sqlite3BitvecDestroy(ref this.pInJournal);
+                    BitvecExtensions.sqlite3BitvecDestroy(ref this.pInJournal);
                     this.pInJournal = null;
                     this.releaseAllSavepoints();
                     if (this.pagerUseWal())
@@ -2153,7 +2153,7 @@ PagerMethods.sqlite3PagerUnref(p);
 }
 }
 #endif
-                    sqlite3BitvecDestroy(ref this.pInJournal);
+                BitvecExtensions.sqlite3BitvecDestroy(ref this.pInJournal);
                     this.pInJournal = null;
                     this.nRec = 0;
                     PCacheMethods.sqlite3PcacheCleanAll(this.pPCache);
@@ -2430,7 +2430,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         Debug.Assert(0 == isSavepnt);
                         return SqlResult.SQLITE_DONE;
                     }
-                    if (pgno > this.dbSize || sqlite3BitvecTest(pDone, pgno) != 0)
+                    if (pgno > this.dbSize || pDone.sqlite3BitvecTest( pgno) != 0)
                     {
                         return SqlResult.SQLITE_OK;
                     }
@@ -2451,7 +2451,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///
                     ///</summary>
 
-                    if (pDone != null && (rc = sqlite3BitvecSet(pDone, pgno)) != SqlResult.SQLITE_OK)
+                    if (pDone != null && (rc = pDone.sqlite3BitvecSet( pgno)) != SqlResult.SQLITE_OK)
                     {
                         return rc;
                     }
@@ -3579,7 +3579,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         }
                         Debug.Assert(rc != SqlResult.SQLITE_DONE);
                     }
-                    sqlite3BitvecDestroy(ref pDone);
+                    BitvecExtensions.sqlite3BitvecDestroy(ref pDone);
                     if (rc == SqlResult.SQLITE_OK)
                     {
                         this.journalOff = (int)szJ;
@@ -5198,7 +5198,7 @@ this.memDb != 0
 #if !NDEBUG || SQLITE_COVERAGE_TEST
 																																																																																																																																																		              rc = sqlite3BitvecSet( pPager.pInJournal, pgno );          //TESTONLY( rc = ) sqlite3BitvecSet(pPager.pInJournal, pgno);
 #else
-                                    sqlite3BitvecSet(this.pInJournal, pgno);
+                                this.pInJournal.sqlite3BitvecSet( pgno);
 #endif
                                     sqliteinth.testcase(rc == SqlResult.SQLITE_NOMEM);
                                 }
@@ -5369,7 +5369,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                     }
                     if (rc != SqlResult.SQLITE_OK)
                     {
-                        sqlite3BitvecDestroy(ref this.pInJournal);
+                        BitvecExtensions.sqlite3BitvecDestroy(ref this.pInJournal);
                         this.pInJournal = null;
                     }
                     else
@@ -5529,7 +5529,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                     //# define DIRECT_MODE 0
                     bool DIRECT_MODE = false;
                     Debug.Assert(isDirectMode == false);
-                    Sqlite3.sqliteinth.UNUSED_PARAMETER(isDirectMode);
+                    sqliteinth.UNUSED_PARAMETER(isDirectMode);
 #else
 																																																																						// define DIRECT_MODE isDirectMode
 int DIRECT_MODE = isDirectMode;
@@ -5879,7 +5879,7 @@ rc = pager_incr_changecounter(pPager, 0);
                                 this.dbSize = this.dbOrigSize;
                                 for (i = dbSize + 1; i <= this.dbOrigSize; i++)
                                 {
-                                    if (0 == sqlite3BitvecTest(this.pInJournal, i) && i != iSkip)
+                                    if (0 == this.pInJournal.sqlite3BitvecTest( i) && i != iSkip)
                                     {
                                         PgHdr pPage = null;
                                         ///
@@ -6334,7 +6334,7 @@ rc = pager_incr_changecounter(pPager, 0);
                         nNew = iSavepoint + ((op == sqliteinth.SAVEPOINT_RELEASE) ? 0 : 1);
                         for (ii = nNew; ii < this.nSavepoint; ii++)
                         {
-                            sqlite3BitvecDestroy(ref this.aSavepoint[ii].pInSavepoint);
+                            BitvecExtensions.sqlite3BitvecDestroy(ref this.aSavepoint[ii].pInSavepoint);
                         }
                         this.nSavepoint = nNew;
                         ///
@@ -6652,7 +6652,7 @@ this.memDb != 0
                             {
                                 Debug.Assert(this.pTmpSpace != null);
                                 u32[] pTemp = new u32[this.pTmpSpace.Length];
-                                sqlite3BitvecClear(this.pInJournal, needSyncPgno, pTemp);
+                                this.pInJournal.sqlite3BitvecClear(needSyncPgno, pTemp);
                                 //pPager.pTmpSpace );
                             }
                             return rc;

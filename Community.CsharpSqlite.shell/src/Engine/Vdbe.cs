@@ -32,7 +32,7 @@ namespace Community.CsharpSqlite {
 	using System.Text;
 	using sqlite3_value=Mem;
 	using System.Collections.Generic;
-    using sqliteinth = Sqlite3.sqliteinth;
+    
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -2224,12 +2224,12 @@ start = sqlite3Hwtime();
 							if(pOp.p4.z!=null) {
 								Debug.Assert(this.rc!=SqlResult.SQLITE_OK);
 								malloc_cs.sqlite3SetString(ref this.zErrMsg,db,"%s",pOp.p4.z);
-								sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog!=null);
+								sqliteinth.testcase(sqliteinth.sqlite3GlobalConfig.xLog!=null);
 								io.sqlite3_log(pOp.p1,"abort at %d in [%s]: %s",opcodeIndex,this.zSql,pOp.p4.z);
 							}
 							else
 								if(this.rc!=0) {
-									sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog!=null);
+									sqliteinth.testcase(sqliteinth.sqlite3GlobalConfig.xLog!=null);
 									io.sqlite3_log(pOp.p1,"constraint failed at %d in [%s]",opcodeIndex,this.zSql);
 								}
 							rc=this.sqlite3VdbeHalt();
@@ -6891,7 +6891,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 						///<param name="schema consistent with what is on disk.">schema consistent with what is on disk.</param>
 						///<param name=""></param>
 						case OpCode.OP_DropTrigger: {
-							sqlite3UnlinkAndDeleteTrigger(db,pOp.p1,pOp.p4.z);
+							TriggerParser.sqlite3UnlinkAndDeleteTrigger(db,pOp.p1,pOp.p4.z);
 							break;
 						}
 						#if !SQLITE_OMIT_INTEGRITY_CHECK
@@ -8355,7 +8355,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					vdbe_error_halt:
 					Debug.Assert(rc!=0);
 					this.rc=rc;
-					sqliteinth.testcase(Sqlite3.sqliteinth.sqlite3GlobalConfig.xLog!=null);
+					sqliteinth.testcase(sqliteinth.sqlite3GlobalConfig.xLog!=null);
 					io.sqlite3_log(rc,"statement aborts at %d: [%s] %s",opcodeIndex,this.zSql,this.zErrMsg);
 					this.sqlite3VdbeHalt();
 					//if ( rc == SQLITE_IOERR_NOMEM ) db.mallocFailed = 1;

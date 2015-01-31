@@ -317,7 +317,7 @@ if( p.sharable ){
 sqlite3_mutex *mutexShared;
 pBt.nRef = 1;
 mutexShared = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
-if( SQLITE_THREADSAFE && Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex ){
+if( SQLITE_THREADSAFE && sqliteinth.sqlite3GlobalConfig.bCoreMutex ){
 pBt.mutex = sqlite3MutexAlloc(SQLITE_MUTEX_FAST);
 if( pBt.mutex==null ){
 rc = SQLITE_NOMEM;
@@ -1623,14 +1623,14 @@ sqlite3BtreeTripAllCursors(p, rc);
             USER_VERSION = 6,
             INCR_VACUUM = 7
         }
-        const int BTREE_FREE_PAGE_COUNT = 0;
-        const int BTREE_SCHEMA_VERSION = 1;
-        const int BTREE_FILE_FORMAT = 2;
-        const int BTREE_DEFAULT_CACHE_SIZE = 3;
-        const int BTREE_LARGEST_ROOT_PAGE = 4;
-        const int BTREE_TEXT_ENCODING = 5;
-        const int BTREE_USER_VERSION = 6;
-        const int BTREE_INCR_VACUUM = 7;
+        public const int BTREE_FREE_PAGE_COUNT = 0;
+        public const int BTREE_SCHEMA_VERSION = 1;
+        public const int BTREE_FILE_FORMAT = 2;
+        public const int BTREE_DEFAULT_CACHE_SIZE = 3;
+        public const int BTREE_LARGEST_ROOT_PAGE = 4;
+        public const int BTREE_TEXT_ENCODING = 5;
+        public const int BTREE_USER_VERSION = 6;
+        public const int BTREE_INCR_VACUUM = 7;
 
 
 

@@ -192,7 +192,7 @@ namespace Community.CsharpSqlite
 		/// the macro again restores the address.
 		///</summary>
 		//#define ADDR(X)  (-1-(X))
-		static int ADDR (int x)
+		public static int ADDR (int x)
 		{
 			return -1 - x;
 		}

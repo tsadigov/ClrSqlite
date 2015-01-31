@@ -187,7 +187,7 @@ namespace Community.CsharpSqlite
                 ///<param name=""></param>
 
                 Debug.Assert(iOfst == p.endpoint.iOffset);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(iOfst);
+                sqliteinth.UNUSED_PARAMETER(iOfst);
                 while (nWrite > 0)
                 {
                     FileChunk pChunk = p.endpoint.pChunk;
@@ -238,7 +238,7 @@ namespace Community.CsharpSqlite
                 MemJournal p = (MemJournal)pJfd;
                 FileChunk pChunk;
                 Debug.Assert(size == 0);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(size);
+                sqliteinth.UNUSED_PARAMETER(size);
                 pChunk = p.pFirst;
                 while (pChunk != null)
                 {
@@ -271,7 +271,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static SqlResult memjrnlSync(sqlite3_file NotUsed, int NotUsed2)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 return SqlResult.SQLITE_OK;
             }
 

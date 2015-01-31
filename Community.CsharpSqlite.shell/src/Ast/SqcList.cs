@@ -21,7 +21,7 @@ namespace Community.CsharpSqlite
     using sqlite3_value = Mem;
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     
-    using sqliteinth = Sqlite3.sqliteinth;
+    
 
         public class SrcList
         {

@@ -1912,10 +1912,10 @@ nextPage = pCur.aOverflow[iIdx+1];
             }
         }
         
-        const int CURSOR_INVALID = 0;
-        const int CURSOR_VALID = 1;
-        const int CURSOR_REQUIRESEEK = 2;
-        const int CURSOR_FAULT = 3;
+        public const int CURSOR_INVALID = 0;
+        public const int CURSOR_VALID = 1;
+        public const int CURSOR_REQUIRESEEK = 2;
+        public const int CURSOR_FAULT = 3;
 	}
     ///
     ///<summary>

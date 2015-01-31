@@ -6,10 +6,6 @@ namespace Community.CsharpSqlite
 {
 
     using _Custom = Sqlite3._Custom;
-    using utilc = Sqlite3.utilc;
-    using build = Sqlite3.build;
-    using sqliteinth = Sqlite3.sqliteinth;
-    using io = Sqlite3.io;
     using Parse = Sqlite3.Parse;
     using malloc_cs = Sqlite3.malloc_cs;
     
@@ -100,7 +96,7 @@ namespace Community.CsharpSqlite
                     pMod.pModule = pModule;
                     pMod.pAux = pAux;
                     pMod.xDestroy = xDestroy;
-                    pDel = (Module)Sqlite3.sqlite3HashInsert(ref db.aModule, zCopy, nName, pMod);
+                    pDel = (Module)HashExtensions.sqlite3HashInsert(ref db.aModule, zCopy, nName, pMod);
                     if (pDel != null && pDel.xDestroy != null)
                     {
                         build.sqlite3ResetInternalSchema(db, -1);
@@ -642,7 +638,7 @@ namespace Community.CsharpSqlite
                 {
                     utilc.sqlite3Error(db, SqlResult.SQLITE_MISUSE, 0);
                     db.mutex.sqlite3_mutex_leave();
-                    return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+                    return sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 Debug.Assert((pTab.tabFlags & TableFlags.TF_Virtual) != 0);
                 pParse = new Parse();
@@ -1094,7 +1090,7 @@ namespace Community.CsharpSqlite
                             VtabCtx p = db.pVtabCtx;
                             if (null == p)
                             {
-                                rc = Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+                                rc = sqliteinth.SQLITE_MISUSE_BKPT();
                             }
                             else
                             {
@@ -1104,7 +1100,7 @@ namespace Community.CsharpSqlite
                             break;
                         }
                     default:
-                        rc = Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+                        rc = sqliteinth.SQLITE_MISUSE_BKPT();
                         break;
                 }
                 _Custom.va_end(ref ap);

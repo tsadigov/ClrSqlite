@@ -219,7 +219,7 @@ namespace Community.CsharpSqlite
                         {
                             FKey p = pFKey.pNextTo;
                             string z = (p != null ? pFKey.pNextTo.zTo : pFKey.zTo);
-                            Sqlite3.sqlite3HashInsert( ref pTab.pSchema.fkeyHash, z, StringExtensions.sqlite3Strlen30(z), p);
+                            HashExtensions.sqlite3HashInsert( ref pTab.pSchema.fkeyHash, z, StringExtensions.sqlite3Strlen30(z), p);
                         }
                         if (pFKey.pNextTo != null)
                         {

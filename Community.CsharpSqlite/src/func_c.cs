@@ -92,7 +92,7 @@ namespace Community.CsharpSqlite {
             static void typeofFunc(sqlite3_context context, int NotUsed, sqlite3_value[] argv)
             {
                 string z = "";
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+                sqliteinth.UNUSED_PARAMETER(NotUsed);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
                     case FoundationalType.SQLITE_INTEGER:
@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite {
             {
                 int len;
                 Debug.Assert(argc == 1);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
                     case FoundationalType.SQLITE_BLOB:
@@ -163,7 +163,7 @@ namespace Community.CsharpSqlite {
             static void absFunc(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
                 Debug.Assert(argc == 1);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
                     case FoundationalType.SQLITE_INTEGER:
@@ -437,7 +437,7 @@ namespace Community.CsharpSqlite {
                 string z1;
                 string z2;
                 int i, n;
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 z2 = vdbeapi.sqlite3_value_text(argv[0]);
                 n = vdbeapi.sqlite3_value_bytes(argv[0]);
                 ///
@@ -465,7 +465,7 @@ namespace Community.CsharpSqlite {
                 string z1;
                 string z2;
                 int i, n;
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 z2 = vdbeapi.sqlite3_value_text(argv[0]);
                 n = vdbeapi.sqlite3_value_bytes(argv[0]);
                 ///
@@ -525,7 +525,7 @@ break;
             static void randomFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
                 sqlite_int64 r = 0;
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 sqlite3_randomness(sizeof(sqlite_int64), ref r);
                 if (r < 0)
                 {
@@ -554,7 +554,7 @@ break;
                 int n;
                 char[] p;
                 Debug.Assert(argc == 1);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 n = vdbeapi.sqlite3_value_int(argv[0]);
                 if (n < 1)
                 {
@@ -590,7 +590,7 @@ break;
             static void last_insert_rowid(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
                 ///</summary>
@@ -610,7 +610,7 @@ break;
             static void changes(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 context.sqlite3_result_int(sqlite3_changes(db));
             }
             ///<summary>
@@ -621,7 +621,7 @@ break;
             static void total_changes(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
                 sqlite3 db = (sqlite3)vdbeapi.sqlite3_context_db_handle(context);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
                 ///</summary>
@@ -984,7 +984,7 @@ break;
             static void nullifFunc(sqlite3_context context, int NotUsed, sqlite3_value[] argv)
             {
                 CollSeq pColl = sqlite3GetFuncCollSeq(context);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+                sqliteinth.UNUSED_PARAMETER(NotUsed);
                 if (vdbemem_cs.sqlite3MemCompare(argv[0], argv[1], pColl) != 0)
                 {
                     context.sqlite3_result_value(argv[0]);
@@ -997,7 +997,7 @@ break;
             ///</summary>
             static void versionFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
                 ///</summary>
@@ -1013,7 +1013,7 @@ break;
             ///</summary>
             static void sourceidFunc(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
                 ///</summary>
@@ -1030,8 +1030,8 @@ break;
             ///<param name=""></param>
             static void errlogFunc(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(context);
+                sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(context);
                 io.sqlite3_log(vdbeapi.sqlite3_value_int(argv[0]), "%s", vdbeapi.sqlite3_value_text(argv[1]));
             }
             ///<summary>
@@ -1045,7 +1045,7 @@ break;
             {
                 string zOptName;
                 Debug.Assert(argc == 1);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 ///
                 ///<summary>
                 ///</summary>
@@ -1069,7 +1069,7 @@ break;
             {
                 int n;
                 Debug.Assert(argc == 1);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 ///
                 ///<summary>
                 ///</summary>
@@ -1117,7 +1117,7 @@ break;
             static void quoteFunc(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
                 Debug.Assert(argc == 1);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 switch (vdbeapi.sqlite3_value_type(argv[0]))
                 {
                     case FoundationalType.SQLITE_INTEGER:
@@ -1212,7 +1212,7 @@ break;
                 byte[] pBlob;
                 //string zHex, z;
                 Debug.Assert(argc == 1);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 pBlob = vdbeapi.sqlite3_value_blob(argv[0]);
                 n = vdbeapi.sqlite3_value_bytes(argv[0]);
                 Debug.Assert(n == (pBlob == null ? 0 : pBlob.Length));
@@ -1244,7 +1244,7 @@ break;
                 i64 n;
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
                 Debug.Assert(argc == 1);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 n = vdbeapi.sqlite3_value_int64(argv[0]);
                 sqliteinth.testcase(n == db.aLimit[SQLITE_LIMIT_LENGTH]);
                 sqliteinth.testcase(n == db.aLimit[SQLITE_LIMIT_LENGTH] + 1);
@@ -1317,7 +1317,7 @@ break;
                 ///Loop counters 
                 ///</summary>
                 Debug.Assert(argc == 3);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 zStr = vdbeapi.sqlite3_value_text(argv[0]);
                 if (zStr == null)
                     return;
@@ -1680,7 +1680,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
                 SumCtx p;
                 FoundationalType type;
                 Debug.Assert(argc == 1);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(argc);
+                sqliteinth.UNUSED_PARAMETER(argc);
                 Mem pMem = vdbeapi.sqlite3_aggregate_context(context, 1);
                 //sizeof(*p));
                 if (pMem._SumCtx == null)
@@ -1831,7 +1831,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             {
                 Mem pArg = (Mem)argv[0];
                 Mem pBest;
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+                sqliteinth.UNUSED_PARAMETER(NotUsed);
                 if (vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL)
                     return;
                 pBest = (Mem)vdbeapi.sqlite3_aggregate_context(context, 1);

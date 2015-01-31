@@ -19,7 +19,6 @@ using ynVar=System.Int16;
 using ynVar = System.Int32; 
 #endif
 namespace Community.CsharpSqlite {
-    using sqliteinth = Sqlite3.sqliteinth;
 		///
 		///<summary>
 		///</summary>

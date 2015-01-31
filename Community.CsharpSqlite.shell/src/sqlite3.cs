@@ -23,9 +23,8 @@ using ynVar = System.Int32;
 namespace Community.CsharpSqlite
 {
     using Vdbe = Sqlite3.Vdbe;
-    using sqliteinth = Sqlite3.sqliteinth;
     
-    using io = Sqlite3.io;
+    
 
     public static class Sqlite3Extensions{
         public static void sqlite3DbFree(this sqlite3 th,ref string pString)

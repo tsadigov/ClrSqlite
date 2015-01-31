@@ -7,6 +7,7 @@ using u8=System.Byte;
 using u16=System.UInt16;
 using u32=System.UInt32;
 using Pgno=System.UInt32;
+
 ///
 ///<summary>
 ///The yDbMask datatype for the bitmask of all attached databases.
@@ -20,9 +21,13 @@ using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
-        public class build
+    using Parse = Sqlite3.Parse;
+    using Vdbe = Sqlite3.Vdbe;
+    using _Custom = Sqlite3._Custom;
+    using Btree = Sqlite3.Btree;
+    //public partial class Sqlite3
+    //{
+    public class build
         {
             ///<summary>
             /// 2001 September 15
@@ -215,7 +220,7 @@ p.zName,  P4Usage.P4_STATIC );
                             v.sqlite3VdbeAddOp2((int) OpCode.OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
                             if (db.init.busy == 0)
                             {
-                                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                                 v.sqlite3VdbeAddOp3(OpCode.OP_VerifyCookie, iDb, pParse.cookieValue[iDb], (int)db.aDb[iDb].pSchema.iGeneration);
                             }
                         }
@@ -371,7 +376,7 @@ p.zName,  P4Usage.P4_STATIC );
                 ///<summary>
                 ///All mutexes are required for schema access.  Make sure we hold them. 
                 ///</summary>
-                Debug.Assert(zDatabase != null || sqlite3BtreeHoldsAllMutexes(db));
+                Debug.Assert(zDatabase != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
                 for (i = sqliteinth.OMIT_TEMPDB; i < db.nDb; i++)
                 {
                     int j = (i < 2) ? i ^ 1 : i;
@@ -381,7 +386,7 @@ p.zName,  P4Usage.P4_STATIC );
                     ///</summary>
                     if (zDatabase != null && !zDatabase.Equals(db.aDb[j].zName, StringComparison.InvariantCultureIgnoreCase))
                         continue;
-                    Debug.Assert(sqlite3SchemaMutexHeld(db, j, null));
+                    Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
                     p = db.aDb[j].pSchema.tblHash.sqlite3HashFind(zName, nName, (Table)null);
                     if (p != null)
                         break;
@@ -423,7 +428,7 @@ p.zName,  P4Usage.P4_STATIC );
                 ///Read the database schema. If an error occurs, leave an error message
                 ///and code in pParse and return NULL. 
                 ///</summary>
-                if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
                 {
                     return null;
                 }
@@ -465,7 +470,7 @@ p.zName,  P4Usage.P4_STATIC );
                 ///<summary>
                 ///All mutexes are required for schema access.  Make sure we hold them. 
                 ///</summary>
-                Debug.Assert(zDb != null || sqlite3BtreeHoldsAllMutexes(db));
+                Debug.Assert(zDb != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
                 for (i = sqliteinth.OMIT_TEMPDB; i < db.nDb; i++)
                 {
                     int j = (i < 2) ? i ^ 1 : i;
@@ -477,7 +482,7 @@ p.zName,  P4Usage.P4_STATIC );
                     Debug.Assert(pSchema != null);
                     if (zDb != null && !zDb.Equals(db.aDb[j].zName, StringComparison.InvariantCultureIgnoreCase))
                         continue;
-                    Debug.Assert(sqlite3SchemaMutexHeld(db, j, null));
+                    Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
                     p = pSchema.idxHash.sqlite3HashFind(zName, nName, (Index)null);
                     if (p != null)
                         break;
@@ -491,7 +496,7 @@ p.zName,  P4Usage.P4_STATIC );
             static void freeIndex(sqlite3 db, ref Index p)
             {
 #if !SQLITE_OMIT_ANALYZE
-                sqlite3DeleteIndexSamples(db, p);
+                Sqlite3.sqlite3DeleteIndexSamples(db, p);
 #endif
                 db.sqlite3DbFree(ref p.zColAff);
                 db.sqlite3DbFree(ref p);
@@ -508,10 +513,10 @@ p.zName,  P4Usage.P4_STATIC );
                 Index pIndex;
                 int len;
                 Hash pHash;
-                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 pHash = db.aDb[iDb].pSchema.idxHash;
                 len = StringExtensions.sqlite3Strlen30(zIdxName);
-                pIndex = sqlite3HashInsert(ref pHash, zIdxName, len, (Index)null);
+                pIndex = HashExtensions.sqlite3HashInsert(ref pHash, zIdxName, len, (Index)null);
                 if (Sqlite3.ALWAYS(pIndex))
                 {
                     if (pIndex.pTable.pIndex == pIndex)
@@ -563,9 +568,11 @@ p.zName,  P4Usage.P4_STATIC );
                     ///Case 1:  Reset the single schema identified by iDb 
                     ///</summary>
                     Db pDb = db.aDb[iDb];
-                    Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                    Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                     Debug.Assert(pDb.pSchema != null);
-                    sqlite3SchemaClear(pDb.pSchema);
+                    pDb.pSchema.sqlite3SchemaClear();
+                
+
                     ///
                     ///<summary>
                     ///If any database other than TEMP is reset, then also reset TEMP
@@ -573,11 +580,11 @@ p.zName,  P4Usage.P4_STATIC );
                     ///other database.
                     ///
                     ///</summary>
-                    if (iDb != 1)
+                if (iDb != 1)
                     {
                         pDb = db.aDb[1];
                         Debug.Assert(pDb.pSchema != null);
-                        sqlite3SchemaClear(pDb.pSchema);
+                        pDb.pSchema.sqlite3SchemaClear();
                     }
                     return;
                 }
@@ -587,18 +594,18 @@ p.zName,  P4Usage.P4_STATIC );
                 ///databases. 
                 ///</summary>
                 Debug.Assert(iDb < 0);
-                sqlite3BtreeEnterAll(db);
+                Sqlite3.sqlite3BtreeEnterAll(db);
                 for (i = 0; i < db.nDb; i++)
                 {
                     Db pDb = db.aDb[i];
                     if (pDb.pSchema != null)
                     {
-                        sqlite3SchemaClear(pDb.pSchema);
+                        pDb.pSchema.sqlite3SchemaClear();
                     }
                 }
                 db.flags &= ~SqliteFlags.SQLITE_InternChanges;
                 vtab.sqlite3VtabUnlockList(db);
-                sqlite3BtreeLeaveAll(db);
+                Sqlite3.sqlite3BtreeLeaveAll(db);
                 ///
                 ///<summary>
                 ///If one or more of the auxiliary database files has been closed,
@@ -713,7 +720,7 @@ p.zName,  P4Usage.P4_STATIC );
                     //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
                     //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
                     //  );
-                    sqlite3HashInsert(ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), (Index)null);
+                    HashExtensions.sqlite3HashInsert(ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), (Index)null);
 #endif
                     //}
                     freeIndex(db, ref pIndex);
@@ -752,14 +759,14 @@ p.zName,  P4Usage.P4_STATIC );
                 Debug.Assert(db != null);
                 Debug.Assert(iDb >= 0 && iDb < db.nDb);
                 Debug.Assert(zTabName != null);
-                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 sqliteinth.testcase(zTabName.Length == 0);
                 ///
                 ///<summary>
                 ///</summary>
                 ///<param name="Zero">length table names are allowed </param>
                 pDb = db.aDb[iDb];
-                p = sqlite3HashInsert(ref pDb.pSchema.tblHash, zTabName, StringExtensions.sqlite3Strlen30(zTabName), (Table)null);
+                p = HashExtensions.sqlite3HashInsert(ref pDb.pSchema.tblHash, zTabName, StringExtensions.sqlite3Strlen30(zTabName), (Table)null);
                 build.sqlite3DeleteTable(db, ref p);
                 db.flags |= SqliteFlags.SQLITE_InternChanges;
             }
@@ -1098,7 +1105,7 @@ goto begin_table_error;
                 if (!sqliteinth.IN_DECLARE_VTAB(pParse))
                 {
                     String zDb = db.aDb[iDb].zName;
-                    if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                    if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
                     {
                         goto begin_table_error;
                     }
@@ -1148,7 +1155,7 @@ goto begin_table_error;
 #if !SQLITE_OMIT_AUTOINCREMENT
                 if (pParse.nested == 0 && zName == "sqlite_sequence")
                 {
-                    Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                    Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                     pTable.pSchema.pSeqTab = pTable;
                 }
 #endif
@@ -1181,14 +1188,14 @@ goto begin_table_error;
                     reg1 = pParse.regRowid = ++pParse.nMem;
                     reg2 = pParse.regRoot = ++pParse.nMem;
                     reg3 = ++pParse.nMem;
-                    v.sqlite3VdbeAddOp3( OpCode.OP_ReadCookie, iDb, reg3, BTREE_FILE_FORMAT);
+                    v.sqlite3VdbeAddOp3( OpCode.OP_ReadCookie, iDb, reg3, Sqlite3.BTREE_FILE_FORMAT);
                     vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
                     j1 = v.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
                     fileFormat = (db.flags & SqliteFlags.SQLITE_LegacyFileFmt) != 0 ? 1 : sqliteinth.SQLITE_MAX_FILE_FORMAT;
                     v.sqlite3VdbeAddOp2(OpCode.OP_Integer, fileFormat, reg3);
-                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTREE_FILE_FORMAT, reg3);
+                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, Sqlite3.BTREE_FILE_FORMAT, reg3);
                     v.sqlite3VdbeAddOp2(OpCode.OP_Integer, (int)sqliteinth.ENC(db), reg3);
-                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTREE_TEXT_ENCODING, reg3);
+                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, Sqlite3.BTREE_TEXT_ENCODING, reg3);
                     v.sqlite3VdbeJumpHere(j1);
                     ///
                     ///<summary>
@@ -1260,7 +1267,7 @@ goto begin_table_error;
                 if ((p = pParse.pNewTable) == null)
                     return;
 #if SQLITE_MAX_COLUMN || !SQLITE_MAX_COLUMN
-                if (p.nCol + 1 > db.aLimit[SQLITE_LIMIT_COLUMN])
+                if (p.nCol + 1 > db.aLimit[Sqlite3.SQLITE_LIMIT_COLUMN])
                 {
                     utilc.sqlite3ErrorMsg(pParse, "too many columns on %s", p.zName);
                     return;
@@ -1313,7 +1320,7 @@ goto begin_table_error;
             {
                 Table p;
                 p = pParse.pNewTable;
-                if (p == null || NEVER(p.nCol < 1))
+                if (p == null || Sqlite3.NEVER(p.nCol < 1))
                     return;
                 p.aCol[p.nCol - 1].notNull = (u8)onError;
             }
@@ -1403,7 +1410,7 @@ goto begin_table_error;
                 Table p;
                 Column pCol;
                 p = pParse.pNewTable;
-                if (p == null || NEVER(p.nCol < 1))
+                if (p == null || Sqlite3.NEVER(p.nCol < 1))
                     return;
                 pCol = p.aCol[p.nCol - 1];
                 Debug.Assert(pCol.zType == null);
@@ -1445,7 +1452,7 @@ goto begin_table_error;
                         ///
                         ///</summary>
                         exprc.sqlite3ExprDelete(db, ref pCol.pDflt);
-                        pCol.pDflt = exprc.sqlite3ExprDup(db, pSpan.pExpr, EXPRDUP_REDUCE);
+                        pCol.pDflt = exprc.sqlite3ExprDup(db, pSpan.pExpr, Sqlite3.EXPRDUP_REDUCE);
                         db.sqlite3DbFree(ref pCol.zDflt);
                         pCol.zDflt = pSpan.zStart.Substring(0, pSpan.zStart.Length - pSpan.zEnd.Length);
                         //sqlite3DbStrNDup( db, pSpan.zStart,
@@ -1672,7 +1679,7 @@ goto begin_table_error;
                 pColl = db.sqlite3FindCollSeq( enc, zName, initbusy);
                 if (0 == initbusy && (pColl == null || pColl.xCmp == null))
                 {
-                    pColl = sqlite3GetCollSeq(db, enc, pColl, zName);
+                    pColl = Sqlite3.sqlite3GetCollSeq(db, enc, pColl, zName);
                     if (pColl == null)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "no such collation sequence: %s", zName);
@@ -1702,9 +1709,9 @@ goto begin_table_error;
                 int r1 = pParse.sqlite3GetTempReg();
                 sqlite3 db = pParse.db;
                 Vdbe v = pParse.pVdbe;
-                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 v.sqlite3VdbeAddOp2(OpCode.OP_Integer, db.aDb[iDb].pSchema.schema_cookie + 1, r1);
-                v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTREE_SCHEMA_VERSION, r1);
+                v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, Sqlite3.BTREE_SCHEMA_VERSION, r1);
                 pParse.sqlite3ReleaseTempReg(r1);
             }
             ///<summary>
@@ -1754,7 +1761,7 @@ goto begin_table_error;
                     if (!CharExtensions.sqlite3Isalnum(zIdent[j]) && zIdent[j] != '_')
                         break;
                 }
-                needQuote = CharExtensions.sqlite3Isdigit(zIdent[0]) || sqlite3KeywordCode(zIdent, j) != Sqlite3.TK_ID;
+                needQuote = CharExtensions.sqlite3Isdigit(zIdent[0]) || Sqlite3.sqlite3KeywordCode(zIdent, j) != Sqlite3.TK_ID;
                 if (!needQuote)
                 {
                     needQuote = (j < zIdent.Length && zIdent[j] != 0);
@@ -1955,7 +1962,7 @@ goto begin_table_error;
                 if (p == null)
                     return;
                 Debug.Assert(0 == db.init.busy || pSelect == null);
-                iDb = sqlite3SchemaToIndex(db, p.pSchema);
+                iDb = Sqlite3.sqlite3SchemaToIndex(db, p.pSchema);
 #if !SQLITE_OMIT_CHECK
                 ///
                 ///<summary>
@@ -1986,7 +1993,7 @@ goto begin_table_error;
                     sNC.pParse = pParse;
                     sNC.pSrcList = sSrc;
                     sNC.isCheck = 1;
-                    if (ResolveExtensions.sqlite3ResolveExprNames(sNC, ref p.pCheck) != 0)
+                    if (Sqlite3.ResolveExtensions.sqlite3ResolveExprNames(sNC, ref p.pCheck) != 0)
                     {
                         return;
                     }
@@ -2033,7 +2040,7 @@ goto begin_table_error;
                     ///Text of the CREATE TABLE or CREATE VIEW statement 
                     ///</summary>
                     v = pParse.sqlite3GetVdbe();
-                    if (NEVER(v == null))
+                    if (Sqlite3.NEVER(v == null))
                         return;
                     v.sqlite3VdbeAddOp1(OpCode.OP_Close, 0);
                     ///
@@ -2133,7 +2140,7 @@ goto begin_table_error;
                     if ((p.tabFlags & TableFlags.TF_Autoincrement) != 0)
                     {
                         Db pDb = db.aDb[iDb];
-                        Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                        Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                         if (pDb.pSchema.pSeqTab == null)
                         {
                             build.sqlite3NestedParse(pParse, "CREATE TABLE %Q.sqlite_sequence(name,seq)", pDb.zName);
@@ -2155,8 +2162,8 @@ goto begin_table_error;
                 {
                     Table pOld;
                     Schema pSchema = p.pSchema;
-                    Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
-                    pOld = sqlite3HashInsert(ref pSchema.tblHash, p.zName, StringExtensions.sqlite3Strlen30(p.zName), p);
+                    Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
+                    pOld = HashExtensions.sqlite3HashInsert(ref pSchema.tblHash, p.zName, StringExtensions.sqlite3Strlen30(p.zName), p);
                     if (pOld != null)
                     {
                         Debug.Assert(p == pOld);
@@ -2244,7 +2251,7 @@ goto begin_table_error;
                     return;
                 }
                 build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
-                iDb = sqlite3SchemaToIndex(db, p.pSchema);
+                iDb = Sqlite3.sqlite3SchemaToIndex(db, p.pSchema);
                 if (sFix.sqlite3FixInit(pParse, iDb, "view", pName) != 0 && sFix.sqlite3FixSelect(pSelect) != 0)
                 {
                     SelectMethods.sqlite3SelectDelete(db, ref pSelect);
@@ -2258,7 +2265,7 @@ goto begin_table_error;
                 ///<param name="allocated rather than point to the input string "> which means that</param>
                 ///<param name="they will persist after the current sqlite3_exec() call returns.">they will persist after the current sqlite3_exec() call returns.</param>
                 ///<param name=""></param>
-                p.pSelect = exprc.sqlite3SelectDup(db, pSelect, EXPRDUP_REDUCE);
+                p.pSelect = exprc.sqlite3SelectDup(db, pSelect, Sqlite3.EXPRDUP_REDUCE);
                 SelectMethods.sqlite3SelectDelete(db, ref pSelect);
                 //if ( db.mallocFailed != 0 )
                 //{
@@ -2422,7 +2429,7 @@ db.xAuth = xAuth;
                         pSelTab.nCol = 0;
                         pSelTab.aCol = null;
                         build.sqlite3DeleteTable(db, ref pSelTab);
-                        Debug.Assert(sqlite3SchemaMutexHeld(db, 0, pTable.pSchema));
+                        Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, 0, pTable.pSchema));
                         pTable.pSchema.flags |= sqliteinth.DB_UnresetViews;
                     }
                     else
@@ -2448,7 +2455,7 @@ db.xAuth = xAuth;
             static void sqliteViewResetAll(sqlite3 db, int idx)
             {
                 HashElem i;
-                Debug.Assert(sqlite3SchemaMutexHeld(db, idx, null));
+                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, idx, null));
                 if (!db.DbHasProperty(idx, sqliteinth.DB_UnresetViews))
                     return;
                 //for(i=sqliteHashFirst(&db.aDb[idx].pSchema.tblHash); i;i=sqliteHashNext(i)){
@@ -2494,7 +2501,7 @@ db.xAuth = xAuth;
                 HashElem pElem;
                 Hash pHash;
                 Db pDb;
-                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 pDb = db.aDb[iDb];
                 pHash = pDb.pSchema.tblHash;
                 for (pElem = pHash.first; pElem != null; pElem = pElem.next)// ( pElem = sqliteHashFirst( pHash ) ; pElem ; pElem = sqliteHashNext( pElem ) )
@@ -2607,7 +2614,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     }
                     else
                     {
-                        int iDb = sqlite3SchemaToIndex(pParse.db, pTab.pSchema);
+                        int iDb = Sqlite3.sqlite3SchemaToIndex(pParse.db, pTab.pSchema);
                         destroyRootPage(pParse, iLargest, iDb);
                         iDestroyed = iLargest;
                     }
@@ -2643,7 +2650,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                         sqlite3CodeVerifyNamedSchema(pParse, pName.a[0].zDatabase);
                     goto exit_drop_table;
                 }
-                iDb = sqlite3SchemaToIndex(db, pTab.pSchema);
+                iDb = Sqlite3.sqlite3SchemaToIndex(db, pTab.pSchema);
                 Debug.Assert(iDb >= 0 && iDb < db.nDb);
                 ///
                 ///<summary>
@@ -2735,11 +2742,11 @@ goto exit_drop_table;
                     ///sqlite_temp_master if required.
                     ///
                     ///</summary>
-                    pTrigger = sqlite3TriggerList(pParse, pTab);
+                    pTrigger = pTab.sqlite3TriggerList(pParse);
                     while (pTrigger != null)
                     {
                         Debug.Assert(pTrigger.pSchema == pTab.pSchema || pTrigger.pSchema == db.aDb[1].pSchema);
-                        sqlite3DropTriggerPtr(pParse, pTrigger);
+                        TriggerParser.sqlite3DropTriggerPtr(pParse, pTrigger);
                         pTrigger = pTrigger.pNext;
                     }
 #if !SQLITE_OMIT_AUTOINCREMENT
@@ -2853,7 +2860,7 @@ goto exit_drop_table;
                 if (pFromCol == null)
                 {
                     int iCol = p.nCol - 1;
-                    if (NEVER(iCol < 0))
+                    if (Sqlite3.NEVER(iCol < 0))
                         goto fk_end;
                     if (pToCol != null && pToCol.nExpr != 1)
                     {
@@ -2949,8 +2956,8 @@ goto exit_drop_table;
                 pFKey.aAction[1] = (OnConstraintError)((flags >> 8) & 0xff);
                 
                 
-                Debug.Assert(sqlite3SchemaMutexHeld(db, 0, p.pSchema));
-                pNextTo = sqlite3HashInsert(ref p.pSchema.fkeyHash, pFKey.zTo, StringExtensions.sqlite3Strlen30(pFKey.zTo), pFKey);
+                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, 0, p.pSchema));
+                pNextTo = HashExtensions.sqlite3HashInsert(ref p.pSchema.fkeyHash, pFKey.zTo, StringExtensions.sqlite3Strlen30(pFKey.zTo), pFKey);
                 //if( pNextTo==pFKey ){
                 //  db.mallocFailed = 1;
                 //  goto fk_end;
@@ -3062,7 +3069,7 @@ goto exit_drop_table;
                 ///<summary>
                 ///The database connection 
                 ///</summary>
-                int iDb = sqlite3SchemaToIndex(db, pIndex.pSchema);
+                int iDb = Sqlite3.sqlite3SchemaToIndex(db, pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
 db.aDb[iDb].zName ) ){
@@ -3276,7 +3283,7 @@ return;
                 {
                     goto exit_create_index;
                 }
-                if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
                 {
                     goto exit_create_index;
                 }
@@ -3338,7 +3345,7 @@ return;
                     pTab = pParse.pNewTable;
                     if (pTab == null)
                         goto exit_create_index;
-                    iDb = sqlite3SchemaToIndex(db, pTab.pSchema);
+                    iDb = Sqlite3.sqlite3SchemaToIndex(db, pTab.pSchema);
                 }
                 pDb = db.aDb[iDb];
                 Debug.Assert(pTab != null);
@@ -3520,7 +3527,7 @@ goto exit_create_index;
                 pIndex.onError = onError;
                 pIndex.autoIndex = (u8)(pName == null ? 1 : 0);
                 pIndex.pSchema = db.aDb[iDb].pSchema;
-                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 ///
                 ///<summary>
                 ///Check to see if we should honor DESC requests on index columns
@@ -3694,8 +3701,8 @@ goto exit_create_index;
                 if (db.init.busy != 0)
                 {
                     Index p;
-                    Debug.Assert(sqlite3SchemaMutexHeld(db, 0, pIndex.pSchema));
-                    p = sqlite3HashInsert(ref pIndex.pSchema.idxHash, pIndex.zName, StringExtensions.sqlite3Strlen30(pIndex.zName), pIndex);
+                    Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, 0, pIndex.pSchema));
+                    p = HashExtensions.sqlite3HashInsert(ref pIndex.pSchema.idxHash, pIndex.zName, StringExtensions.sqlite3Strlen30(pIndex.zName), pIndex);
                     if (p != null)
                     {
                         Debug.Assert(p == pIndex);
@@ -3898,7 +3905,7 @@ goto exit_create_index;
                 //  goto exit_drop_index;
                 //}
                 Debug.Assert(pName.nSrc == 1);
-                if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
                 {
                     goto exit_drop_index;
                 }
@@ -3921,7 +3928,7 @@ goto exit_create_index;
                     utilc.sqlite3ErrorMsg(pParse, "index associated with UNIQUE " + "or PRIMARY KEY constraint cannot be dropped", 0);
                     goto exit_drop_index;
                 }
-                iDb = sqlite3SchemaToIndex(db, pIndex.pSchema);
+                iDb = Sqlite3.sqlite3SchemaToIndex(db, pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	{
 int code = SQLITE_DROP_INDEX;
@@ -4494,7 +4501,7 @@ goto exit_drop_index;
                 ///<summary>
                 ///if( db.aDb[0].pBt==0 ) return; 
                 ///</summary>
-                if (sqliteinth.sqlite3AuthCheck(pParse, SQLITE_TRANSACTION, "BEGIN", null, null) != 0)
+                if (sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_TRANSACTION, "BEGIN", null, null) != 0)
                 {
                     return;
                 }
@@ -4526,7 +4533,7 @@ goto exit_drop_index;
                 ///<summary>
                 ///if( db.aDb[0].pBt==0 ) return; 
                 ///</summary>
-                if (sqliteinth.sqlite3AuthCheck(pParse, SQLITE_TRANSACTION, "COMMIT", null, null) != 0)
+                if (sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_TRANSACTION, "COMMIT", null, null) != 0)
                 {
                     return;
                 }
@@ -4552,7 +4559,7 @@ goto exit_drop_index;
                 ///<summary>
                 ///if( db.aDb[0].pBt==0 ) return; 
                 ///</summary>
-                if (sqliteinth.sqlite3AuthCheck(pParse, SQLITE_TRANSACTION, "ROLLBACK", null, null) != 0)
+                if (sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_TRANSACTION, "ROLLBACK", null, null) != 0)
                 {
                     return;
                 }
@@ -4603,7 +4610,7 @@ goto exit_drop_index;
                 {
                     SqlResult rc;
                     Btree pBt = null;
-                    const int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_EXCLUSIVE | SQLITE_OPEN_DELETEONCLOSE | SQLITE_OPEN_TEMP_DB;
+                    const int flags = Sqlite3.SQLITE_OPEN_READWRITE | Sqlite3.SQLITE_OPEN_CREATE | Sqlite3.SQLITE_OPEN_EXCLUSIVE | Sqlite3.SQLITE_OPEN_DELETEONCLOSE | Sqlite3.SQLITE_OPEN_TEMP_DB;
                     rc = (SqlResult)Btree.Open(db.pVfs, null, db, ref pBt, 0, flags);
                     if (rc != SqlResult.SQLITE_OK)
                     {
@@ -4663,8 +4670,8 @@ goto exit_drop_index;
                     yDbMask mask;
                     Debug.Assert(iDb < db.nDb);
                     Debug.Assert(db.aDb[iDb].pBt != null || iDb == 1);
-                    Debug.Assert(iDb < SQLITE_MAX_ATTACHED + 2);
-                    Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                    Debug.Assert(iDb < Sqlite3.SQLITE_MAX_ATTACHED + 2);
+                    Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                     mask = ((yDbMask)1) << iDb;
                     if ((pToplevel.cookieMask & mask) == 0)
                     {
@@ -4814,7 +4821,7 @@ goto exit_drop_index;
                 {
                     if (zColl == null || collationMatch(zColl, pIndex))
                     {
-                        int iDb = sqlite3SchemaToIndex(pParse.db, pTab.pSchema);
+                        int iDb = Sqlite3.sqlite3SchemaToIndex(pParse.db, pTab.pSchema);
                         sqlite3BeginWriteOperation(pParse, 0, iDb);
                         sqlite3RefillIndex(pParse, pIndex, -1);
                     }
@@ -4854,7 +4861,7 @@ goto exit_drop_index;
                 ///<summary>
                 ///A table in the database 
                 ///</summary>
-                Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
+                Debug.Assert(Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
                 ///
                 ///<summary>
                 ///Needed for schema access 
@@ -4938,7 +4945,7 @@ goto exit_drop_index;
                 ///Read the database schema. If an error occurs, leave an error message
                 ///and code in pParse and return NULL. 
                 ///</summary>
-                if (SqlResult.SQLITE_OK != sqlite3ReadSchema(pParse))
+                if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
                 {
                     return;
                 }
@@ -4948,7 +4955,7 @@ goto exit_drop_index;
                     return;
                 }
                 else
-                    if (NEVER(pName2 == null) || pName2.zRestSql == null || pName2.zRestSql.Length == 0)
+                    if (Sqlite3.NEVER(pName2 == null) || pName2.zRestSql == null || pName2.zRestSql.Length == 0)
                     {
                         string zColl;
                         Debug.Assert(pName1.zRestSql != null);
@@ -5032,5 +5039,5 @@ goto exit_drop_index;
                 return pKey;
             }
         }
-    }
+ //   }
 }

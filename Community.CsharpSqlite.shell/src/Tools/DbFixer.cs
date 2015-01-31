@@ -10,7 +10,7 @@ namespace Community.CsharpSqlite
     using sqlite3_value = Mem;
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
-    using utilc = Sqlite3.utilc;
+    
     using System.Diagnostics;
 
     ///<summary>

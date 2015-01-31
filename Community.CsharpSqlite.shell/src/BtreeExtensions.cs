@@ -23,14 +23,14 @@ namespace Community.CsharpSqlite
 		public static bool sqlite3BtreeIsInTrans (this Community.CsharpSqlite.Sqlite3.Btree _this)
 		{
 			Debug.Assert (_this == null || _this.db.mutex.sqlite3_mutex_held());
-            return (_this != null && (_this.inTrans == Sqlite3.TransType.TRANS_WRITE));
+            return (_this != null && (_this.inTrans == TransType.TRANS_WRITE));
 		}
 
 		public static bool sqlite3BtreeIsInReadTrans (this Community.CsharpSqlite.Sqlite3.Btree _this)
 		{
 			Debug.Assert (_this != null);
 			Debug.Assert (_this.db.mutex.sqlite3_mutex_held());
-            return _this.inTrans != Sqlite3.TransType.TRANS_NONE;
+            return _this.inTrans != TransType.TRANS_NONE;
 		}
 
 		public static bool sqlite3BtreeIsInBackup (this Community.CsharpSqlite.Sqlite3.Btree _this)

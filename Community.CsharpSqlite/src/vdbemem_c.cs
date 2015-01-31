@@ -10,11 +10,9 @@ namespace Community.CsharpSqlite
 {
     using sqlite3_value = Mem;
     using System.Globalization;
-    using sqliteinth = Sqlite3.sqliteinth;
     using BtCursor = Sqlite3.BtCursor;
     using _Custom = Sqlite3._Custom;
     using malloc_cs = Sqlite3.malloc_cs;
-    using io = Sqlite3.io;
 
     public static class MemExtensions {
         ///<summary>

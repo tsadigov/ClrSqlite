@@ -106,7 +106,7 @@ return ( p == null || p.expired ) ? 1 : 0;
 																																																																																												        sqlite3_mutex mutex;
 #endif
                     if (v.vdbeSafety())
-                        return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+                        return sqliteinth.SQLITE_MISUSE_BKPT();
 #if SQLITE_THREADSAFE
 																																																																																												        mutex = v.db.mutex;
 #endif
@@ -337,7 +337,7 @@ rc = db->xWalCallback(db->pWalArg, db, db->aDb[i].zName, nEntry);
 																																																																																												if( p.rc==SQLITE_BUSY || p.rc==SQLITE_LOCKED ){
 sqlite3_reset((sqlite3_stmt)p);
 }else{
-return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+return sqliteinth.SQLITE_MISUSE_BKPT();
 }
 #else
                     sqlite3_reset((sqlite3_stmt)p);
@@ -504,7 +504,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
 
                 if (v.vdbeSafetyNotNull())
                 {
-                    return (SqlResult)Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+                    return (SqlResult)sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 db = v.db;
                 db.mutex.sqlite3_mutex_enter();
@@ -602,7 +602,7 @@ return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
             {
                 string zName = context.pFunc.zName;
                 string zErr;
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 zErr = io.sqlite3_mprintf("unable to use function %s in the requested context", zName);
                 context.sqlite3_result_error(zErr, -1);
                 //malloc_cs.sqlite3_free( ref zErr );
@@ -1107,7 +1107,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 Mem pVar;
                 if (p.vdbeSafetyNotNull())
                 {
-                    return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+                    return sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 p.db.mutex.sqlite3_mutex_enter();
                 if (p.magic != VdbeMagic.VDBE_MAGIC_RUN || p.currentOpCodeIndex >= 0)
@@ -1115,7 +1115,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                     utilc.sqlite3Error(p.db, SqlResult.SQLITE_MISUSE, 0);
                     p.db.mutex.sqlite3_mutex_leave();
                     io.sqlite3_log(SqlResult.SQLITE_MISUSE, "bind on a busy prepared statement: [%s]", p.zSql);
-                    return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+                    return sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 if (i < 1 || i > p.nVar)
                 {

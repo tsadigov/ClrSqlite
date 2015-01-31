@@ -1430,7 +1430,7 @@ else
 																											HashElem x;
 																											Hash pTbls;
 																											int cnt=0;
-																											if(Sqlite3.sqliteinth.OMIT_TEMPDB!=0&&i==1)
+																											if(sqliteinth.OMIT_TEMPDB!=0&&i==1)
 																												continue;
 																											build.sqlite3CodeVerifySchema(pParse,i);
 																											addr=v.sqlite3VdbeAddOp1(OpCode.OP_IfPos,1);

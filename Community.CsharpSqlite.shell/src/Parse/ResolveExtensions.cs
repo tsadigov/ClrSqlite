@@ -204,7 +204,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///Loop counter 
                 ///</summary>
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(pParse);
+                sqliteinth.UNUSED_PARAMETER(pParse);
                 if (pE.Operator == TokenType.TK_ID)
                 {
                     string zCol = pE.u.zToken;

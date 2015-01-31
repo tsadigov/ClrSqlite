@@ -8,7 +8,7 @@ namespace Community.CsharpSqlite
     using System.Linq;
     using sqlite3_stmt = Sqlite3.Vdbe;
     using malloc_cs = Sqlite3.malloc_cs;
-    using utilc = Sqlite3.utilc;
+    
     using vdbeapi = Sqlite3.vdbeapi;
 
     public class legacy
@@ -231,7 +231,7 @@ namespace Community.CsharpSqlite
 
 
             if (!utilc.sqlite3SafetyCheckOk(db))
-                return Sqlite3.sqliteinth.SQLITE_MISUSE_BKPT();
+                return sqliteinth.SQLITE_MISUSE_BKPT();
             if (zSql == null)
                 zSql = "";
             db.mutex.sqlite3_mutex_enter();

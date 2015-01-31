@@ -7264,7 +7264,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 				///</summary>
 				{
 					//#line 1210"parse.y"
-					sqlite3DeleteTriggerStep(pParse.db,ref (yypminor.yy203));
+					TriggerParser.sqlite3DeleteTriggerStep(pParse.db,ref (yypminor.yy203));
 					//#line 1466 "parse.c"
 				}
 				break;
@@ -7472,7 +7472,7 @@ return;
 				///stack every overflows 
 				///</summary>
 				//#line 38 "parse.y"
-				Sqlite3.sqliteinth.UNUSED_PARAMETER(yypMinor);
+				sqliteinth.UNUSED_PARAMETER(yypMinor);
 				///
 				///<summary>
 				///Silence some compiler warnings 
@@ -7523,7 +7523,7 @@ return;
 				//       sqlite3ParserARG_FETCH;
 				//#define TOKEN (yyminor.yy0)
 				//#line 32 "parse.y"
-				Sqlite3.sqliteinth.UNUSED_PARAMETER(yymajor);
+				sqliteinth.UNUSED_PARAMETER(yymajor);
 				///
 				///<summary>
 				///Silence some compiler warnings 
@@ -11298,19 +11298,19 @@ return yy_default[stateno];
 			//#line 3298 "parse.c"
 			break;
 			case 270:
-			///
-			///<summary>
-			///cmd ::= createkw trigger_decl BEGIN trigger_cmd_list END 
-			///</summary>
-			//#line 1175 "parse.y"
-			{
-				Token all=new Token();
-				//all.z = yymsp[-3].minor.yy0.z;
-				//all.n = (int)(yymsp[0].minor.yy0.z - yymsp[-3].minor.yy0.z) + yymsp[0].minor.yy0.n;
-				all.Length=(int)(yymsp[-3].minor.yy0Token.zRestSql.Length-yymsp[0].minor.yy0Token.zRestSql.Length)+yymsp[0].minor.yy0Token.Length;
-				all.zRestSql=yymsp[-3].minor.yy0Token.zRestSql.Substring(0,all.Length);
-				sqlite3FinishTrigger(pParse,yymsp[-1].minor.yy203,all);
-			}
+                    ///
+                    ///<summary>
+                    ///cmd ::= createkw trigger_decl BEGIN trigger_cmd_list END 
+                    ///</summary>
+                    //#line 1175 "parse.y"
+                    {
+                        Token all = new Token();
+                        //all.z = yymsp[-3].minor.yy0.z;
+                        //all.n = (int)(yymsp[0].minor.yy0.z - yymsp[-3].minor.yy0.z) + yymsp[0].minor.yy0.n;
+                        all.Length = (int)(yymsp[-3].minor.yy0Token.zRestSql.Length - yymsp[0].minor.yy0Token.zRestSql.Length) + yymsp[0].minor.yy0Token.Length;
+                        all.zRestSql = yymsp[-3].minor.yy0Token.zRestSql.Substring(0, all.Length);
+                        TriggerParser.sqlite3FinishTrigger(pParse, yymsp[-1].minor.yy203, all);
+                    }
 			//#line 3308 "parse.c"
 			break;
 			case 271:
@@ -11320,7 +11320,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1184 "parse.y"
 			{
-				sqlite3BeginTrigger(pParse,yymsp[-7].minor.yy0Token,yymsp[-6].minor.yy0Token,yymsp[-5].minor.yy4,yymsp[-4].minor.yy90.a,yymsp[-4].minor.yy90.b,yymsp[-2].minor.yy259,yymsp[0].minor.yy314,yymsp[-10].minor.yy4,yymsp[-8].minor.yy4);
+				TriggerParser.sqlite3BeginTrigger(pParse,yymsp[-7].minor.yy0Token,yymsp[-6].minor.yy0Token,yymsp[-5].minor.yy4,yymsp[-4].minor.yy90.a,yymsp[-4].minor.yy90.b,yymsp[-2].minor.yy259,yymsp[0].minor.yy314,yymsp[-10].minor.yy4,yymsp[-8].minor.yy4);
 				yygotominor.yy0Token=(yymsp[-6].minor.yy0Token.Length==0?yymsp[-7].minor.yy0Token:yymsp[-6].minor.yy0Token);
 			}
 			//#line 3316 "parse.c"
@@ -11496,7 +11496,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1259 "parse.y"
 			{
-				yygotominor.yy203=sqlite3TriggerUpdateStep(pParse.db,yymsp[-4].minor.yy0Token,yymsp[-1].minor.yy322,yymsp[0].minor.yy314,(OnConstraintError)yymsp[-5].minor.yy210);
+				yygotominor.yy203= TriggerParser.sqlite3TriggerUpdateStep(pParse.db,yymsp[-4].minor.yy0Token,yymsp[-1].minor.yy322,yymsp[0].minor.yy314,(OnConstraintError)yymsp[-5].minor.yy210);
 			}
 			//#line 3407 "parse.c"
 			break;
@@ -11507,7 +11507,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1264 "parse.y"
 			{
-				yygotominor.yy203=sqlite3TriggerInsertStep( pParse.db,yymsp[-5].minor.yy0Token,yymsp[-4].minor.yy384,yymsp[-1].minor.yy322,0,(OnConstraintError)yymsp[-7].minor.yy210);
+				yygotominor.yy203=TriggerParser.sqlite3TriggerInsertStep( pParse.db,yymsp[-5].minor.yy0Token,yymsp[-4].minor.yy384,yymsp[-1].minor.yy322,0,(OnConstraintError)yymsp[-7].minor.yy210);
 			}
 			//#line 3412 "parse.c"
 			break;
@@ -11518,7 +11518,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1267 "parse.y"
 			{
-				yygotominor.yy203=sqlite3TriggerInsertStep(pParse.db,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy384,0,yymsp[0].minor.yy387,(OnConstraintError)yymsp[-4].minor.yy210);
+				yygotominor.yy203= TriggerParser.sqlite3TriggerInsertStep(pParse.db,yymsp[-2].minor.yy0Token,yymsp[-1].minor.yy384,0,yymsp[0].minor.yy387,(OnConstraintError)yymsp[-4].minor.yy210);
 			}
 			//#line 3417 "parse.c"
 			break;
@@ -11529,7 +11529,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1271 "parse.y"
 			{
-				yygotominor.yy203=sqlite3TriggerDeleteStep(pParse.db,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy314);
+				yygotominor.yy203= TriggerParser.sqlite3TriggerDeleteStep(pParse.db,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy314);
 			}
 			//#line 3422 "parse.c"
 			break;
@@ -11540,7 +11540,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1274 "parse.y"
 			{
-				yygotominor.yy203=sqlite3TriggerSelectStep(pParse.db,yymsp[0].minor.yy387);
+				yygotominor.yy203= TriggerParser.sqlite3TriggerSelectStep(pParse.db,yymsp[0].minor.yy387);
 			}
 			//#line 3427 "parse.c"
 			break;
@@ -11607,7 +11607,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1303 "parse.y"
 			{
-				sqlite3DropTrigger(pParse,yymsp[0].minor.yy259,yymsp[-1].minor.yy4);
+                        TriggerParser.sqlite3DropTrigger(pParse,yymsp[0].minor.yy259,yymsp[-1].minor.yy4);
 			}
 			//#line 3468 "parse.c"
 			break;

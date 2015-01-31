@@ -67,7 +67,7 @@ namespace Community.CsharpSqlite
                 int len = 0;
                 string zRet;
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+                sqliteinth.UNUSED_PARAMETER(NotUsed);
                 
                 ///The principle used to locate the table name in the CREATE TABLE
                 ///statement is that the table name is the first non-space token that
@@ -164,7 +164,7 @@ namespace Community.CsharpSqlite
                 ///Type of token 
                 ///</summary>
 
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+                sqliteinth.UNUSED_PARAMETER(NotUsed);
                 for (zIdx = 0; zIdx < zInput.Length; zIdx += n)//z=zInput; *z; z=z+n)
                 {
                     n = Lexer.sqlite3GetToken(zInput, zIdx, ref token);
@@ -223,7 +223,7 @@ namespace Community.CsharpSqlite
                 int len = 1;
                 string zRet;
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+                sqliteinth.UNUSED_PARAMETER(NotUsed);
                 ///
                 ///<summary>
                 ///The principle used to locate the table name in the CREATE TRIGGER

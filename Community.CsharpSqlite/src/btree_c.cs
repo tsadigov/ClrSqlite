@@ -54,7 +54,7 @@ namespace Community.CsharpSqlite
 static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf(X, ap); }
 #else
         //# define TRACE(X)
-        static void TRACE(string X, params object[] ap)
+        public static void TRACE(string X, params object[] ap)
         {
         }
 #endif
@@ -101,7 +101,7 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
 /// sqlite3_open(), sqlite3_open16(), or sqlite3_open_v2().
 ///</summary>
 int sqlite3_enable_shared_cache(int enable){
-Sqlite3.sqliteinth.sqlite3GlobalConfig.sharedCacheEnabled = enable;
+sqliteinth.sqlite3GlobalConfig.sharedCacheEnabled = enable;
 return SqlResult.SQLITE_OK;
 }
 #endif
@@ -513,7 +513,7 @@ p.eState = CURSOR_INVALID;
             ///Stub functions when INCRBLOB is omitted 
             ///</summary>
             //#define invalidateOverflowCache(x)
-            public static void invalidateOverflowCache(BtCursor pCur)
+            public static void invalidateOverflowCache(Sqlite3.BtCursor pCur)
             {
             }
             //#define invalidateAllOverflowCache(x)

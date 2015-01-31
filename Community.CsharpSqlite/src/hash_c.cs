@@ -4,7 +4,7 @@ using System.Text;
 using u8=System.Byte;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+	public static partial class HashExtensions {
 		///<summary>
 		/// 2001 September 22
 		///
@@ -42,7 +42,7 @@ namespace Community.CsharpSqlite {
 		/// to the empty state.
 		///
 		///</summary>
-		public static void sqlite3HashClear(Hash pH) {
+		public static void sqlite3HashClear(this Hash pH) {
 			HashElem elem;
 			///
 			///<summary>
@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(nKey>=0);
 			int _z=0;
 			while(nKey>0) {
-				h=(h<<3)^h^((_z<z.Length)?(int)_Custom.sqlite3UpperToLower[(byte)z[_z++]]:0);
+				h=(h<<3)^h^((_z<z.Length)?(int)Sqlite3._Custom.sqlite3UpperToLower[(byte)z[_z++]]:0);
 				nKey--;
 			}
 			return (u32)h;
@@ -80,7 +80,7 @@ namespace Community.CsharpSqlite {
 		/// insert pNew into the pEntry hash bucket.
 		///
 		///</summary>
-		static void insertElement(Hash pH,///
+		static void insertElement(this Hash pH,///
 		///<summary>
 		///The complete hash table 
 		///</summary>
@@ -159,12 +159,12 @@ if( new_size==pH->htsize ) return false;
 			///is benign (since failing to resize a hash table is a performance
 			///hit only, not a fatal error).
 			///</summary>
-			sqlite3BeginBenignMalloc();
+			Sqlite3.sqlite3BeginBenignMalloc();
 			new_ht=new _ht[new_size];
 			//(struct _ht )malloc_cs.sqlite3Malloc( new_size*sizeof(struct _ht) );
 			for(int i=0;i<new_size;i++)
 				new_ht[i]=new _ht();
-			sqlite3EndBenignMalloc();
+            Sqlite3.sqlite3EndBenignMalloc();
 			if(new_ht==null)
 				return false;
 			//malloc_cs.sqlite3_free( ref pH.ht );
@@ -190,7 +190,7 @@ if( new_size==pH->htsize ) return false;
 		/// element and a hash on the element's key.
 		///
 		///</summary>
-		static void removeElementGivenHash(Hash pH,///
+		static void removeElementGivenHash(this Hash pH,///
 		///<summary>
 		///The pH containing "elem" 
 		///</summary>

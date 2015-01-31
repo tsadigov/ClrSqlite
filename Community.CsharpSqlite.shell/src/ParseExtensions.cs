@@ -52,7 +52,7 @@ namespace Community.CsharpSqlite
 		///</summary>
 		) {
 			if(pParse.explain==2) {
-				string zEqp=Sqlite3.io.sqlite3MPrintf(pParse.db,"SCAN TABLE %s %s%s(~%d rows)",pTab.zName,pIdx!=null?"USING COVERING INDEX ":"",pIdx!=null?pIdx.zName:"",pTab.nRowEst);
+				string zEqp=io.sqlite3MPrintf(pParse.db,"SCAN TABLE %s %s%s(~%d rows)",pTab.zName,pIdx!=null?"USING COVERING INDEX ":"",pIdx!=null?pIdx.zName:"",pTab.nRowEst);
                 pParse.pVdbe.sqlite3VdbeAddOp4(OpCode.OP_Explain, pParse.iSelectId, 0, 0, zEqp, P4Usage.P4_DYNAMIC);
 			}
 		}

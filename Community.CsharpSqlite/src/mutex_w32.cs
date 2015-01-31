@@ -367,7 +367,7 @@ p.nRef++;
 rc = SqlResult.SQLITE_OK;
 }
 #else
-																			      Sqlite3.sqliteinth.UNUSED_PARAMETER( p );
+																			      sqliteinth.UNUSED_PARAMETER( p );
 #endif
 																			#if SQLITE_DEBUG
 																			      if ( rc == SqlResult.SQLITE_OK && p.trace != 0 )

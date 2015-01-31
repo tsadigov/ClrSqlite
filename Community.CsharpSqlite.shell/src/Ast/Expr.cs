@@ -26,7 +26,7 @@ using ynVar = System.Int32;
 namespace Community.CsharpSqlite
 {
 
-    using sqliteinth=Sqlite3.sqliteinth;
+    
     
 
     ///
@@ -941,7 +941,7 @@ set { _op = value; }
             if (op == TokenType.TK_CAST)
             {
                 Debug.Assert(!this.ExprHasProperty(ExprFlags.EP_IntValue));
-                return Sqlite3.build.sqlite3AffinityType(this.u.zToken);
+                return build.sqlite3AffinityType(this.u.zToken);
             }
 #endif
             if ((op == TokenType.TK_AGG_COLUMN || op == TokenType.TK_COLUMN || op == TokenType.TK_REGISTER) && this.pTab != null)

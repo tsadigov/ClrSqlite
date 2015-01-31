@@ -50,7 +50,7 @@ namespace Community.CsharpSqlite
 nRet += sqlite3PcacheReleaseMemory(n-nRet);
 return nRet;
 #else
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(n);
+                sqliteinth.UNUSED_PARAMETER(n);
                 return SqlResult.SQLITE_OK;
 #endif
             }
@@ -96,8 +96,8 @@ return nRet;
 
                 ///
                 ///<summary>
-                ///Pointers to the end of Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch and
-                ///Sqlite3.sqliteinth.sqlite3GlobalConfig.pPage to a block of memory that records
+                ///Pointers to the end of sqliteinth.sqlite3GlobalConfig.pScratch and
+                ///sqliteinth.sqlite3GlobalConfig.pPage to a block of memory that records
                 ///which pages are available.
                 ///
                 ///</summary>
@@ -199,7 +199,7 @@ return nRet;
             ///</summary>
             static void softHeapLimitEnforcer(object NotUsed, sqlite3_int64 NotUsed2, int allocSize)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 sqlite3_release_memory(allocSize);
             }
 
@@ -259,37 +259,37 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
             ///</summary>
             public static SqlResult sqlite3MallocInit()
             {
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc == null)
+                if (sqliteinth.sqlite3GlobalConfig.m.xMalloc == null)
                 {
                     mempoolMethods.sqlite3MemSetDefault();
                 }
                 mem0 = new Mem0Global(0, 0, null, 0, null, null, 1, 1, 8, 8);
                 //memset(&mem0, 0, sizeof(mem0));
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bCoreMutex)
+                if (sqliteinth.sqlite3GlobalConfig.bCoreMutex)
                 {
                     mem0.mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MEM);
                 }
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch != null && Sqlite3.sqliteinth.sqlite3GlobalConfig.szScratch >= 100 && Sqlite3.sqliteinth.sqlite3GlobalConfig.nScratch >= 0)
+                if (sqliteinth.sqlite3GlobalConfig.pScratch != null && sqliteinth.sqlite3GlobalConfig.szScratch >= 100 && sqliteinth.sqlite3GlobalConfig.nScratch >= 0)
                 {
                     int i;
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.szScratch = MathExtensions.ROUNDDOWN8(Sqlite3.sqliteinth.sqlite3GlobalConfig.szScratch - 4);
-                    //mem0.aScratchFree = (u32)&((char)Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch)
-                    //  [Sqlite3.sqliteinth.sqlite3GlobalConfig.szScratch*Sqlite3.sqliteinth.sqlite3GlobalConfig.nScratch];
-                    //for(i=0; i<Sqlite3.sqliteinth.sqlite3GlobalConfig.nScratch; i++){ mem0.aScratchFree[i] = i; }
-                    //mem0.nScratchFree = Sqlite3.sqliteinth.sqlite3GlobalConfig.nScratch;
+                    sqliteinth.sqlite3GlobalConfig.szScratch = MathExtensions.ROUNDDOWN8(sqliteinth.sqlite3GlobalConfig.szScratch - 4);
+                    //mem0.aScratchFree = (u32)&((char)sqliteinth.sqlite3GlobalConfig.pScratch)
+                    //  [sqliteinth.sqlite3GlobalConfig.szScratch*sqliteinth.sqlite3GlobalConfig.nScratch];
+                    //for(i=0; i<sqliteinth.sqlite3GlobalConfig.nScratch; i++){ mem0.aScratchFree[i] = i; }
+                    //mem0.nScratchFree = sqliteinth.sqlite3GlobalConfig.nScratch;
                 }
                 else
                 {
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch = null;
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.szScratch = 0;
+                    sqliteinth.sqlite3GlobalConfig.pScratch = null;
+                    sqliteinth.sqlite3GlobalConfig.szScratch = 0;
                 }
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pPage == null || Sqlite3.sqliteinth.sqlite3GlobalConfig.szPage < 512 || Sqlite3.sqliteinth.sqlite3GlobalConfig.nPage < 1)
+                if (sqliteinth.sqlite3GlobalConfig.pPage == null || sqliteinth.sqlite3GlobalConfig.szPage < 512 || sqliteinth.sqlite3GlobalConfig.nPage < 1)
                 {
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.pPage = null;
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.szPage = 0;
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.nPage = 0;
+                    sqliteinth.sqlite3GlobalConfig.pPage = null;
+                    sqliteinth.sqlite3GlobalConfig.szPage = 0;
+                    sqliteinth.sqlite3GlobalConfig.nPage = 0;
                 }
-                return Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xInit(Sqlite3.sqliteinth.sqlite3GlobalConfig.m.pAppData);
+                return sqliteinth.sqlite3GlobalConfig.m.xInit(sqliteinth.sqlite3GlobalConfig.m.pAppData);
             }
 
             ///<summary>
@@ -309,9 +309,9 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
             ///</summary>
             public static void sqlite3MallocEnd()
             {
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xShutdown != null)
+                if (sqliteinth.sqlite3GlobalConfig.m.xShutdown != null)
                 {
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xShutdown(Sqlite3.sqliteinth.sqlite3GlobalConfig.m.pAppData);
+                    sqliteinth.sqlite3GlobalConfig.m.xShutdown(sqliteinth.sqlite3GlobalConfig.m.pAppData);
                 }
                 mem0 = new Mem0Global();
                 //memset(&mem0, 0, sizeof(mem0));
@@ -407,7 +407,7 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
                 int nFull;
                 int[] p;
                 Debug.Assert(mem0.mutex.sqlite3_mutex_held());
-                nFull = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xRoundup(n);
+                nFull = sqliteinth.sqlite3GlobalConfig.m.xRoundup(n);
                 sqlite3StatusSet(SQLITE_STATUS_MALLOC_SIZE, n);
                 if (mem0.alarmCallback != null)
                 {
@@ -422,11 +422,11 @@ return sqlite3MemoryAlarm(xCallback, pArg, iThreshold);
                         mem0.nearlyFull = false;
                     }
                 }
-                p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMallocInt(nFull);
+                p = sqliteinth.sqlite3GlobalConfig.m.xMallocInt(nFull);
 #if SQLITE_ENABLE_MEMORY_MANAGEMENT
 																																																												if( p==null && mem0.alarmCallback!=null ){
 malloc_cs.sqlite3MallocAlarm(nFull);
-p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
+p = sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
 }
 #endif
                 if (p != null)
@@ -443,7 +443,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                 int nFull;
                 byte[] p;
                 Debug.Assert(mem0.mutex.sqlite3_mutex_held());
-                nFull = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xRoundup(n);
+                nFull = sqliteinth.sqlite3GlobalConfig.m.xRoundup(n);
                 sqlite3StatusSet(SQLITE_STATUS_MALLOC_SIZE, n);
                 if (mem0.alarmCallback != null)
                 {
@@ -453,11 +453,11 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                         malloc_cs.sqlite3MallocAlarm(nFull);
                     }
                 }
-                p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
+                p = sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                 if (p == null && mem0.alarmCallback != null)
                 {
                     malloc_cs.sqlite3MallocAlarm(nFull);
-                    p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
+                    p = sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                 }
                 if (p != null)
                 {
@@ -476,7 +476,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
             ///</summary>
             public static Mem sqlite3Malloc(Mem pMem)
             {
-                return Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMallocMem(pMem);
+                return sqliteinth.sqlite3GlobalConfig.m.xMallocMem(pMem);
             }
 
             public static int[] sqlite3Malloc(int[] pInt, u32 n)
@@ -501,7 +501,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                     p = null;
                 }
                 else
-                    if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat)
+                    if (sqliteinth.sqlite3GlobalConfig.bMemstat)
                     {
                         mem0.mutex.sqlite3_mutex_enter();
                         mallocWithAlarm(n, ref p);
@@ -509,7 +509,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                     }
                     else
                     {
-                        p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMallocInt(n);
+                        p = sqliteinth.sqlite3GlobalConfig.m.xMallocInt(n);
                     }
                 return p;
             }
@@ -536,7 +536,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                     p = null;
                 }
                 else
-                    if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat)
+                    if (sqliteinth.sqlite3GlobalConfig.bMemstat)
                     {
                         mem0.mutex.sqlite3_mutex_enter();
                         mallocWithAlarm(n, ref p);
@@ -544,7 +544,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                     }
                     else
                     {
-                        p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(n);
+                        p = sqliteinth.sqlite3GlobalConfig.m.xMalloc(n);
                     }
                 return p;
             }
@@ -586,13 +586,13 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
             ///</summary>
             public static byte[][] sqlite3ScratchMalloc(byte[][] apCell, int n)
             {
-                apCell = Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch2;
+                apCell = sqliteinth.sqlite3GlobalConfig.pScratch2;
                 if (apCell == null)
                     apCell = new byte[n < 200 ? 200 : n][];
                 else
                     if (apCell.Length < n)
                         Array.Resize(ref apCell, n);
-                Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch2 = null;
+                sqliteinth.sqlite3GlobalConfig.pScratch2 = null;
                 return apCell;
             }
 
@@ -607,7 +607,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
 ** would be much more complicated.) */
       Debug.Assert( scratchAllocOut <= 1 );
 #endif
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.szScratch < n)
+                if (sqliteinth.sqlite3GlobalConfig.szScratch < n)
                 {
                     goto scratch_overflow;
                 }
@@ -623,14 +623,14 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                     {
                         int i;
                         //i = mem0.aScratchFree[--mem0.nScratchFree];
-                        //i *= Sqlite3.sqliteinth.sqlite3GlobalConfig.szScratch;
-                        for (i = 0; i < Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch.Length; i++)
+                        //i *= sqliteinth.sqlite3GlobalConfig.szScratch;
+                        for (i = 0; i < sqliteinth.sqlite3GlobalConfig.pScratch.Length; i++)
                         {
-                            if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch[i] == null || Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch[i].Length < n)
+                            if (sqliteinth.sqlite3GlobalConfig.pScratch[i] == null || sqliteinth.sqlite3GlobalConfig.pScratch[i].Length < n)
                                 continue;
-                            p = Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch[i];
-                            // (void)&((char)Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch)[i];
-                            Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch[i] = null;
+                            p = sqliteinth.sqlite3GlobalConfig.pScratch[i];
+                            // (void)&((char)sqliteinth.sqlite3GlobalConfig.pScratch)[i];
+                            sqliteinth.sqlite3GlobalConfig.pScratch[i] = null;
                             break;
                         }
                         mem0.mutex.sqlite3_mutex_leave();
@@ -646,7 +646,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
 #endif
                 return p;
             scratch_overflow:
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat)
+                if (sqliteinth.sqlite3GlobalConfig.bMemstat)
                 {
                     mem0.mutex.sqlite3_mutex_enter();
                     sqlite3StatusSet(SQLITE_STATUS_SCRATCH_SIZE, n);
@@ -657,7 +657,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                 }
                 else
                 {
-                    p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(n);
+                    p = sqliteinth.sqlite3GlobalConfig.m.xMalloc(n);
                 }
                 sqliteinth.sqlite3MemdebugSetType(p, MemType.SCRATCH);
 #if SQLITE_THREADSAFE && !(NDEBUG)
@@ -670,12 +670,12 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
             {
                 if (p != null)
                 {
-                    if (Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch2 == null || Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch2.Length < p.Length)
+                    if (sqliteinth.sqlite3GlobalConfig.pScratch2 == null || sqliteinth.sqlite3GlobalConfig.pScratch2.Length < p.Length)
                     {
                         Debug.Assert(sqliteinth.sqlite3MemdebugHasType(p, MemType.SCRATCH));
                         Debug.Assert(sqliteinth.sqlite3MemdebugNoType(p, ~MemType.SCRATCH));
                         sqliteinth.sqlite3MemdebugSetType(p, MemType.HEAP);
-                        if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat)
+                        if (sqliteinth.sqlite3GlobalConfig.bMemstat)
                         {
                             int iSize = malloc_cs.sqlite3MallocSize(p);
                             mem0.mutex.sqlite3_mutex_enter();
@@ -683,23 +683,23 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                             sqlite3StatusAdd(SQLITE_STATUS_MEMORY_USED, -iSize);
                             sqlite3StatusAdd(SQLITE_STATUS_MALLOC_COUNT, -1);
                             sqliteinth.sqlite3GlobalConfig.pScratch2 = p;
-                            // Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xFree(ref p);
+                            // sqliteinth.sqlite3GlobalConfig.m.xFree(ref p);
                             mem0.mutex.sqlite3_mutex_leave();
                         }
                         else
                         {
-                            Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch2 = p;
-                            //Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xFree(ref p);
+                            sqliteinth.sqlite3GlobalConfig.pScratch2 = p;
+                            //sqliteinth.sqlite3GlobalConfig.m.xFree(ref p);
                         }
                     }
                     else// larger Scratch 2 already in use, let the C# GC handle
                     {
                         //int i;
-                        //i = (int)((u8)p - (u8)Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch);
-                        //i /= Sqlite3.sqliteinth.sqlite3GlobalConfig.szScratch;
-                        //Debug.Assert(i >= 0 && i < Sqlite3.sqliteinth.sqlite3GlobalConfig.nScratch);
+                        //i = (int)((u8)p - (u8)sqliteinth.sqlite3GlobalConfig.pScratch);
+                        //i /= sqliteinth.sqlite3GlobalConfig.szScratch;
+                        //Debug.Assert(i >= 0 && i < sqliteinth.sqlite3GlobalConfig.nScratch);
                         //mem0.mutex.sqlite3_mutex_enter();
-                        //Debug.Assert(mem0.nScratchFree < (u32)Sqlite3.sqliteinth.sqlite3GlobalConfig.nScratch);
+                        //Debug.Assert(mem0.nScratchFree < (u32)sqliteinth.sqlite3GlobalConfig.nScratch);
                         //mem0.aScratchFree[mem0.nScratchFree++] = i;
                         //sqlite3StatusAdd(SQLITE_STATUS_SCRATCH_USED, -1);
                         //mem0.mutex.sqlite3_mutex_leave();
@@ -712,7 +712,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
           scratchAllocOut = 0;
 #endif
                     }
-                    //if( p>=Sqlite3.sqliteinth.sqlite3GlobalConfig.pScratch && p<mem0.pScratchEnd ){
+                    //if( p>=sqliteinth.sqlite3GlobalConfig.pScratch && p<mem0.pScratchEnd ){
                     //  /* Release memory from the SQLITE_CONFIG_SCRATCH allocation */
                     //  ScratchFreeslot *pSlot;
                     //  pSlot = (ScratchFreeslot)p;
@@ -720,7 +720,7 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                     //  pSlot->pNext = mem0.pScratchFree;
                     //  mem0.pScratchFree = pSlot;
                     //  mem0.nScratchFree++;
-                    //  Debug.Assert( mem0.nScratchFree <= (u32)Sqlite3.sqliteinth.sqlite3GlobalConfig.nScratch );
+                    //  Debug.Assert( mem0.nScratchFree <= (u32)sqliteinth.sqlite3GlobalConfig.nScratch );
                     //  sqlite3StatusAdd(SQLITE_STATUS_SCRATCH_USED, -1);
                     //  mem0.mutex.sqlite3_mutex_leave();
                     //}else{
@@ -728,16 +728,16 @@ p = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xMalloc(nFull);
                     //  Debug.Assert( sqlite3MemdebugHasType(p, MemType.SCRATCH) );
                     //  Debug.Assert( sqliteinth.sqlite3MemdebugNoType(p, ~MemType.SCRATCH) );
                     //  sqlite3MemdebugSetType(p, MemType.HEAP);
-                    //  if( Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat ){
+                    //  if( sqliteinth.sqlite3GlobalConfig.bMemstat ){
                     //    int iSize = malloc_cs.sqlite3MallocSize(p);
                     //    mem0.mutex.sqlite3_mutex_enter();
                     //    sqlite3StatusAdd(SQLITE_STATUS_SCRATCH_OVERFLOW, -iSize);
                     //    sqlite3StatusAdd(SQLITE_STATUS_MEMORY_USED, -iSize);
                     //    sqlite3StatusAdd(SQLITE_STATUS_MALLOC_COUNT, -1);
-                    //    Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xFree(p);
+                    //    sqliteinth.sqlite3GlobalConfig.m.xFree(p);
                     //    mem0.mutex.sqlite3_mutex_leave();
                     //  }else{
-                    //    Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xFree(p);
+                    //    sqliteinth.sqlite3GlobalConfig.m.xFree(p);
                     //  }
                     p = null;
                 }
@@ -767,7 +767,7 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
             //{
             //  Debug.Assert(sqlite3MemdebugHasType(p, MemType.HEAP));
             //  Debug.Assert( sqliteinth.sqlite3MemdebugNoType(p, MemType.DB) );
-            //  return Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xSize(p);
+            //  return sqliteinth.sqlite3GlobalConfig.m.xSize(p);
             //}
             public static int sqlite3MallocSize(byte[][] p)
             {
@@ -781,7 +781,7 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
 
             public static int sqlite3MallocSize(byte[] p)
             {
-                return Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xSize(p);
+                return sqliteinth.sqlite3GlobalConfig.m.xSize(p);
             }
 
             static int sqlite3DbMallocSize(sqlite3 db, byte[] p)
@@ -796,7 +796,7 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
                     Debug.Assert(sqliteinth.sqlite3MemdebugHasType(p, MemType.DB));
                     Debug.Assert(sqliteinth.sqlite3MemdebugHasType(p, MemType.LOOKASIDE | MemType.HEAP));
                     Debug.Assert(db != null || sqliteinth.sqlite3MemdebugNoType(p, MemType.LOOKASIDE));
-                    return Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xSize(p);
+                    return sqliteinth.sqlite3GlobalConfig.m.xSize(p);
                 }
             }
 
@@ -810,17 +810,17 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
                     return;
                 Debug.Assert(sqliteinth.sqlite3MemdebugNoType(p, MemType.DB));
                 Debug.Assert(sqliteinth.sqlite3MemdebugHasType(p, MemType.HEAP));
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat)
+                if (sqliteinth.sqlite3GlobalConfig.bMemstat)
                 {
                     mem0.mutex.sqlite3_mutex_enter();
                     sqlite3StatusAdd(SQLITE_STATUS_MEMORY_USED, -malloc_cs.sqlite3MallocSize(p));
                     sqlite3StatusAdd(SQLITE_STATUS_MALLOC_COUNT, -1);
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xFree(ref p);
+                    sqliteinth.sqlite3GlobalConfig.m.xFree(ref p);
                     mem0.mutex.sqlite3_mutex_leave();
                 }
                 else
                 {
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xFree(ref p);
+                    sqliteinth.sqlite3GlobalConfig.m.xFree(ref p);
                 }
                 p = null;
             }
@@ -829,16 +829,16 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
             {
                 if (p == null)
                     return;
-                if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat)
+                if (sqliteinth.sqlite3GlobalConfig.bMemstat)
                 {
                     mem0.mutex.sqlite3_mutex_enter();
                     //sqlite3StatusAdd( SQLITE_STATUS_MEMORY_USED, -malloc_cs.sqlite3MallocSize( p ) );
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xFreeMem(ref p);
+                    sqliteinth.sqlite3GlobalConfig.m.xFreeMem(ref p);
                     mem0.mutex.sqlite3_mutex_leave();
                 }
                 else
                 {
-                    Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xFreeMem(ref p);
+                    sqliteinth.sqlite3GlobalConfig.m.xFreeMem(ref p);
                 }
                 p = null;
             }
@@ -908,13 +908,13 @@ db.lookaside.nOut--;
                     return null;
                 }
                 nOld = malloc_cs.sqlite3MallocSize(pOld);
-                nNew = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xRoundup(nBytes);
+                nNew = sqliteinth.sqlite3GlobalConfig.m.xRoundup(nBytes);
                 if (nOld == nNew)
                 {
                     pNew = pOld;
                 }
                 else
-                    if (Sqlite3.sqliteinth.sqlite3GlobalConfig.bMemstat)
+                    if (sqliteinth.sqlite3GlobalConfig.bMemstat)
                     {
                         mem0.mutex.sqlite3_mutex_enter();
                         sqlite3StatusSet(SQLITE_STATUS_MALLOC_SIZE, nBytes);
@@ -925,11 +925,11 @@ db.lookaside.nOut--;
                         }
                         Debug.Assert(sqliteinth.sqlite3MemdebugHasType(pOld, MemType.HEAP));
                         Debug.Assert(sqliteinth.sqlite3MemdebugNoType(pOld, ~MemType.HEAP));
-                        pNew = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xRealloc(pOld, nNew);
+                        pNew = sqliteinth.sqlite3GlobalConfig.m.xRealloc(pOld, nNew);
                         if (pNew == null && mem0.alarmCallback != null)
                         {
                             malloc_cs.sqlite3MallocAlarm(nBytes);
-                            pNew = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xRealloc(pOld, nNew);
+                            pNew = sqliteinth.sqlite3GlobalConfig.m.xRealloc(pOld, nNew);
                         }
                         if (pNew != null)
                         {
@@ -940,7 +940,7 @@ db.lookaside.nOut--;
                     }
                     else
                     {
-                        pNew = Sqlite3.sqliteinth.sqlite3GlobalConfig.m.xRealloc(pOld, nNew);
+                        pNew = sqliteinth.sqlite3GlobalConfig.m.xRealloc(pOld, nNew);
                     }
                 return pNew;
             }

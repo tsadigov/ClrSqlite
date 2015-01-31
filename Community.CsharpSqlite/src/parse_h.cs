@@ -1112,7 +1112,7 @@ goto exit_rename_table;
 				///<summary>
 				///Drop any table triggers from the internal schema. 
 				///</summary>
-				for(pTrig=sqlite3TriggerList(this,pTab);pTrig!=null;pTrig=pTrig.pNext) {
+				for(pTrig= pTab.sqlite3TriggerList(this);pTrig!=null;pTrig=pTrig.pNext) {
 					int iTrigDb=sqlite3SchemaToIndex(this.db,pTrig.pSchema);
 					Debug.Assert(iTrigDb==iDb||iTrigDb==1);
 					v.sqlite3VdbeAddOp4( OpCode.OP_DropTrigger,iTrigDb,0,0,pTrig.zName,0);
@@ -1165,7 +1165,7 @@ goto exit_rename_table;
 				///</summary>
 				if(pTab.pSchema!=pTempSchema) {
 					sqlite3 db=this.db;
-					for(pTrig=sqlite3TriggerList(this,pTab);pTrig!=null;pTrig=pTrig.pNext) {
+					for(pTrig= pTab.sqlite3TriggerList(this);pTrig!=null;pTrig=pTrig.pNext) {
 						if(pTrig.pSchema==pTempSchema) {
 							zWhere=alter.whereOrName(db,zWhere,pTrig.zName);
 						}
@@ -3318,7 +3318,7 @@ goto attach_end;
 					for(pFKey=fkeyc.sqlite3FkReferences(pTab);pFKey!=null;pFKey=pFKey.pNextTo) {
 						Trigger pAction=this.fkActionTrigger(pTab,pFKey,pChanges);
 						if(pAction!=null) {
-							sqlite3CodeRowTriggerDirect(this,pAction,pTab,regOld,OnConstraintError.OE_Abort,0);
+							TriggerParser.sqlite3CodeRowTriggerDirect(this,pAction,pTab,regOld,OnConstraintError.OE_Abort,0);
 						}
 					}
 				}
@@ -3485,8 +3485,8 @@ pParse.nTableLock = 0;
 					///</summary>
 					build.sqlite3DeleteTable(db,ref this.pNewTable);
 				}
-				#if !SQLITE_OMIT_TRIGGER
-				sqlite3DeleteTrigger(db,ref this.pNewTrigger);
+#if !SQLITE_OMIT_TRIGGER
+                TriggerParser.sqlite3DeleteTrigger(db,ref this.pNewTrigger);
 				#endif
 				//for ( i = pParse.nzVar - 1; i >= 0; i-- )
 				//  sqlite3DbFree( db, pParse.azVar[i] );
@@ -3748,7 +3748,7 @@ goto insert_cleanup;
 				///inserted into is a view
 				///</summary>
 				#if !SQLITE_OMIT_TRIGGER
-				pTrigger=sqlite3TriggersExist(this,pTab,Sqlite3.TK_INSERT,null,out tmask);
+				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_INSERT,null,out tmask);
 				isView=pTab.pSelect!=null;
 				#else
 																																																																																																					      Trigger pTrigger = null;  // define pTrigger 0
@@ -4226,11 +4226,11 @@ isView = false;
                         v.sqlite3VdbeAddOp2(OpCode.OP_Affinity, regCols + 1, pTab.nCol);
 						v.sqlite3TableAffinityStr(pTab);
 					}
-					///
-					///<summary>
-					///Fire BEFORE or INSTEAD OF triggers 
-					///</summary>
-					sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_INSERT,null,TriggerType.TRIGGER_BEFORE,pTab,regCols-pTab.nCol-1,onError,endOfLoop);
+                    ///
+                    ///<summary>
+                    ///Fire BEFORE or INSTEAD OF triggers 
+                    ///</summary>
+                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_INSERT,null,TriggerType.TRIGGER_BEFORE,pTab,regCols-pTab.nCol-1,onError,endOfLoop);
 					this.sqlite3ReleaseTempRange(regCols,pTab.nCol+1);
 				}
 				#endif
@@ -4388,11 +4388,11 @@ isView = false;
 				}
 				#if !SQLITE_OMIT_TRIGGER
 				if(pTrigger!=null) {
-					///
-					///<summary>
-					///Code AFTER triggers 
-					///</summary>
-					sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_INSERT,null,TriggerType.TRIGGER_AFTER,pTab,regData-2-pTab.nCol,onError,endOfLoop);
+                    ///
+                    ///<summary>
+                    ///Code AFTER triggers 
+                    ///</summary>
+                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_INSERT,null,TriggerType.TRIGGER_AFTER,pTab,regData-2-pTab.nCol,onError,endOfLoop);
 				}
 				#endif
 				///
@@ -4793,7 +4793,7 @@ isView = false;
                         if ((this.db.flags & SqliteFlags.SQLITE_RecTriggers) != 0)
                         {
 							TriggerType iDummy;
-							pTrigger=sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
+							pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
 						}
 						if(pTrigger!=null||this.sqlite3FkRequired(pTab,null,0)!=0) {
 							build.sqlite3MultiWrite(this);
@@ -4928,7 +4928,7 @@ isView = false;
                         if ((this.db.flags & SqliteFlags.SQLITE_RecTriggers) != 0)
                         {
 							TriggerType iDummy;
-							pTrigger=sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
+							pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
 						}
 						this.sqlite3GenerateRowDelete(pTab,baseCur,regR,0,pTrigger,OnConstraintError.OE_Replace);
 						seenReplace=true;
@@ -5374,7 +5374,7 @@ isView = false;
 				///
 				///</summary>
 				#if !SQLITE_OMIT_TRIGGER
-				pTrigger=sqlite3TriggersExist(this,pTab,Sqlite3.TK_UPDATE,pChanges,out tmask);
+				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_UPDATE,pChanges,out tmask);
 				isView=pTab.pSelect!=null;
 				Debug.Assert(pTrigger!=null||tmask==0);
 				#else
@@ -5665,7 +5665,7 @@ aXRef[j] = -1;
 				///</summary>
 				if(hasFK||pTrigger!=null) {
 					u32 oldmask=(hasFK?this.sqlite3FkOldmask(pTab):0);
-					oldmask|=sqlite3TriggerColmask(this,pTrigger,pChanges,0,TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER,pTab,onError);
+					oldmask|= TriggerParser.sqlite3TriggerColmask(this,pTrigger,pChanges,0,TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER,pTab,onError);
 					for(i=0;i<pTab.nCol;i++) {
 						if(aXRef[i]<0||oldmask==0xffffffff||(i<32&&0!=(oldmask&(1<<i)))) {
 							v.sqlite3ExprCodeGetColumnOfTable(pTab,iCur,i,regOld+i);
@@ -5694,7 +5694,7 @@ aXRef[j] = -1;
 				///be used eliminates some redundant opcodes.
 				///
 				///</summary>
-				newmask=(int)sqlite3TriggerColmask(this,pTrigger,pChanges,1,TriggerType.TRIGGER_BEFORE,pTab,onError);
+				newmask=(int)TriggerParser.sqlite3TriggerColmask(this,pTrigger,pChanges,1,TriggerType.TRIGGER_BEFORE,pTab,onError);
 				for(i=0;i<pTab.nCol;i++) {
 					if(i==pTab.iPKey) {
                         v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regNew + i);
@@ -5730,7 +5730,7 @@ aXRef[j] = -1;
 				if((tmask&TriggerType.TRIGGER_BEFORE)!=0) {
                     v.sqlite3VdbeAddOp2(OpCode.OP_Affinity, regNew, pTab.nCol);
 					v.sqlite3TableAffinityStr(pTab);
-					sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_UPDATE,pChanges,TriggerType.TRIGGER_BEFORE,pTab,regOldRowid,onError,addr);
+                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_UPDATE,pChanges,TriggerType.TRIGGER_BEFORE,pTab,regOldRowid,onError,addr);
 					///
 					///<summary>
 					///</summary>
@@ -5816,7 +5816,7 @@ aXRef[j] = -1;
                 {
 					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regRowCount,1);
 				}
-				sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_UPDATE,pChanges,TriggerType.TRIGGER_AFTER,pTab,regOldRowid,onError,addr);
+                TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_UPDATE,pChanges,TriggerType.TRIGGER_AFTER,pTab,regOldRowid,onError,addr);
 				///
 				///<summary>
 				///Repeat the above with the next record to be updated, until
@@ -6228,7 +6228,7 @@ aXRef[j] = -1;
 				///</summary>
 				#if !SQLITE_OMIT_TRIGGER
 				TriggerType iDummy;
-				pTrigger=sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
+				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
 				isView=pTab.pSelect!=null;
 				#else
 																																																																																																					      const Trigger pTrigger = null;
@@ -6541,7 +6541,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 					///TODO: Could use temporary registers here. Also could attempt to
 					///avoid copying the contents of the rowid register.  
 					///</summary>
-					mask=sqlite3TriggerColmask(this,pTrigger,null,0,TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER,pTab,onconf);
+					mask= TriggerParser.sqlite3TriggerColmask(this,pTrigger,null,0,TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER,pTab,onconf);
 					mask|=this.sqlite3FkOldmask(pTab);
 					iOld=this.nMem+1;
 					this.nMem+=(1+pTab.nCol);
@@ -6556,11 +6556,11 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 							v.sqlite3ExprCodeGetColumnOfTable(pTab,iCur,iCol,iOld+iCol+1);
 						}
 					}
-					///
-					///<summary>
-					///Invoke BEFORE DELETE trigger programs. 
-					///</summary>
-					sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_DELETE,null,TriggerType.TRIGGER_BEFORE,pTab,iOld,onconf,iLabel);
+                    ///
+                    ///<summary>
+                    ///Invoke BEFORE DELETE trigger programs. 
+                    ///</summary>
+                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_DELETE,null,TriggerType.TRIGGER_BEFORE,pTab,iOld,onconf,iLabel);
 					///
 					///<summary>
 					///Seek the cursor to the row to be deleted again. It may be that
@@ -6597,11 +6597,11 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///to the row just deleted. 
 				///</summary>
 				this.sqlite3FkActions(pTab,null,iOld);
-				///
-				///<summary>
-				///Invoke AFTER DELETE trigger programs. 
-				///</summary>
-				sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_DELETE,null,TriggerType.TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
+                ///
+                ///<summary>
+                ///Invoke AFTER DELETE trigger programs. 
+                ///</summary>
+                TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_DELETE,null,TriggerType.TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
 				///
 				///<summary>
 				///Jump here if the row had already been deleted before any BEFORE
@@ -9480,9 +9480,9 @@ return;
       }
 range_est_fallback:
 #else
-				Sqlite3.sqliteinth.UNUSED_PARAMETER(this);
-				Sqlite3.sqliteinth.UNUSED_PARAMETER(p);
-				Sqlite3.sqliteinth.UNUSED_PARAMETER(nEq);
+				sqliteinth.UNUSED_PARAMETER(this);
+				sqliteinth.UNUSED_PARAMETER(p);
+				sqliteinth.UNUSED_PARAMETER(nEq);
 				#endif
 				Debug.Assert(pLower!=null||pUpper!=null);
 				piEst=100;
@@ -12515,7 +12515,7 @@ range_est_fallback:
 					string zName=pTab.zName;
 					int nName=StringExtensions.sqlite3Strlen30(zName);
 					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pSchema));
-					pOld=sqlite3HashInsert(ref pSchema.tblHash,zName,nName,pTab);
+					pOld=HashExtensions.sqlite3HashInsert(ref pSchema.tblHash,zName,nName,pTab);
 					if(pOld!=null) {
 						//db.mallocFailed = 1;
 						Debug.Assert(pTab==pOld);

@@ -15,10 +15,9 @@ using ynVar = System.Int32;
 #endif
 namespace Community.CsharpSqlite
 {
-    using sqliteinth=Sqlite3.sqliteinth;
     using Vdbe=Sqlite3.Vdbe;
     using Parse=Sqlite3.Parse;
-    using build=Sqlite3.build;
+    
 
         public class exprc
         {
@@ -832,7 +831,7 @@ return null;
             }
             public static WRC selectNodeIsConstant(Walker pWalker, Select NotUsed)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER(NotUsed);
+                sqliteinth.UNUSED_PARAMETER(NotUsed);
                 pWalker.u.i = 0;
                 return WRC.WRC_Abort;
             }

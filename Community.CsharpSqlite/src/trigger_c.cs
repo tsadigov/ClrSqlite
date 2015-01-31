@@ -4,7 +4,10 @@ using System.Text;
 using u8=System.Byte;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite {
-	public partial class Sqlite3 {
+    using Parse=Sqlite3.Parse;
+    using Vdbe = Sqlite3.Vdbe;
+    public static partial class TriggerParser {
+        
 		///<summary>
 		///
 		/// The author disclaims copyright to this source code.  In place of
@@ -30,7 +33,7 @@ namespace Community.CsharpSqlite {
 		///<summary>
 		/// Delete a linked list of TriggerStep structures.
 		///</summary>
-		static void sqlite3DeleteTriggerStep(sqlite3 db,ref TriggerStep pTriggerStep) {
+		public static void sqlite3DeleteTriggerStep(sqlite3 db,ref TriggerStep pTriggerStep) {
 			while(pTriggerStep!=null) {
 				TriggerStep pTmp=pTriggerStep;
 				pTriggerStep=pTriggerStep.pNext;
@@ -57,7 +60,7 @@ namespace Community.CsharpSqlite {
 		/// pTab as well as the triggers lised in pTab.pTrigger.
 		///
 		///</summary>
-		static Trigger sqlite3TriggerList(Parse pParse,Table pTab) {
+		public static Trigger sqlite3TriggerList(this Table pTab,Parse pParse) {
 			Schema pTmpSchema=pParse.db.aDb[1].pSchema;
 			Trigger pList=null;
 			///
@@ -69,9 +72,9 @@ namespace Community.CsharpSqlite {
 			}
 			if(pTmpSchema!=pTab.pSchema) {
 				HashElem p;
-				Debug.Assert(sqlite3SchemaMutexHeld(pParse.db,0,pTmpSchema));
-				for(p=sqliteHashFirst(pTmpSchema.trigHash);p!=null;p=sqliteHashNext(p)) {
-					Trigger pTrig=(Trigger)sqliteHashData(p);
+				Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(pParse.db,0,pTmpSchema));
+				for(p= pTmpSchema.trigHash.sqliteHashFirst();p!=null;p=p.sqliteHashNext()) {
+					Trigger pTrig=(Trigger)p.sqliteHashData();
 					if(pTrig.pTabSchema==pTab.pSchema&&pTrig.table.Equals(pTab.zName,StringComparison.InvariantCultureIgnoreCase)) {
 						pTrig.pNext=(pList!=null?pList:pTab.pTrigger);
 						pList=pTrig;
@@ -89,7 +92,7 @@ namespace Community.CsharpSqlite {
 		/// construction process.
 		///
 		///</summary>
-		static void sqlite3BeginTrigger(Parse pParse,///
+		public static void sqlite3BeginTrigger(Parse pParse,///
 		///<summary>
 		///The parse context of the CREATE TRIGGER statement 
 		///</summary>
@@ -282,7 +285,7 @@ namespace Community.CsharpSqlite {
 			if(zName==null||SqlResult.SQLITE_OK!=build.sqlite3CheckObjectName(pParse,zName)) {
 				goto trigger_cleanup;
 			}
-			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
+			Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db,iDb,null));
 			if((db.aDb[iDb].pSchema.trigHash).sqlite3HashFind(zName,StringExtensions.sqlite3Strlen30(zName),(Trigger)null)!=null) {
 				if(noErr==0) {
 					utilc.sqlite3ErrorMsg(pParse,"trigger %T already exists",pName);
@@ -316,7 +319,7 @@ namespace Community.CsharpSqlite {
 				utilc.sqlite3ErrorMsg(pParse,"cannot create INSTEAD OF"+" trigger on table: %S",pTableName,0);
 				goto trigger_cleanup;
 			}
-			iTabDb=sqlite3SchemaToIndex(db,pTab.pSchema);
+			iTabDb=Sqlite3.sqlite3SchemaToIndex(db,pTab.pSchema);
 			#if !SQLITE_OMIT_AUTHORIZATION
 																																																																								{
 int code = SQLITE_CREATE_TRIGGER;
@@ -356,7 +359,7 @@ goto trigger_cleanup;
 			pTrigger.pTabSchema=pTab.pSchema;
 			pTrigger.op=(u8)op;
 			pTrigger.tr_tm=tr_tm==Sqlite3.TK_BEFORE?TriggerType.TRIGGER_BEFORE:TriggerType.TRIGGER_AFTER;
-			pTrigger.pWhen=exprc.sqlite3ExprDup(db,pWhen,EXPRDUP_REDUCE);
+			pTrigger.pWhen=exprc.sqlite3ExprDup(db,pWhen,Sqlite3.EXPRDUP_REDUCE);
 			pTrigger.pColumns=exprc.sqlite3IdListDup(db,pColumns);
 			Debug.Assert(pParse.pNewTrigger==null);
 			pParse.pNewTrigger=pTrigger;
@@ -372,12 +375,13 @@ goto trigger_cleanup;
 				Debug.Assert(pParse.pNewTrigger==pTrigger);
 			}
 		}
-		///<summary>
+	
+        ///<summary>
 		/// This routine is called after all of the trigger actions have been parsed
 		/// in order to complete the process of building the trigger.
 		///
 		///</summary>
-		static void sqlite3FinishTrigger(Parse pParse,///
+		public static void sqlite3FinishTrigger(Parse pParse,///
 		///<summary>
 		///Parser context 
 		///</summary>
@@ -421,10 +425,10 @@ goto trigger_cleanup;
 			///Trigger name for error reporting 
 			///</summary>
 			pParse.pNewTrigger=null;
-			if(NEVER(pParse.nErr!=0)||pTrig==null)
+			if(Sqlite3.NEVER(pParse.nErr!=0)||pTrig==null)
 				goto triggerfinish_cleanup;
 			zName=pTrig.zName;
-			iDb=sqlite3SchemaToIndex(pParse.db,pTrig.pSchema);
+			iDb=Sqlite3.sqlite3SchemaToIndex(pParse.db,pTrig.pSchema);
 			pTrig.step_list=pStepList;
 			while(pStepList!=null) {
 				pStepList.pTrig=pTrig;
@@ -462,8 +466,8 @@ goto trigger_cleanup;
 			if(db.init.busy!=0) {
 				Trigger pLink=pTrig;
 				Hash pHash=db.aDb[iDb].pSchema.trigHash;
-				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-				pTrig=sqlite3HashInsert(ref pHash,zName,StringExtensions.sqlite3Strlen30(zName),pTrig);
+				Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db,iDb,null));
+				pTrig= HashExtensions.sqlite3HashInsert(ref pHash,zName,StringExtensions.sqlite3Strlen30(zName),pTrig);
 				if(pTrig!=null) {
 					//db.mallocFailed = 1;
 				}
@@ -490,7 +494,7 @@ goto trigger_cleanup;
 		/// body of a TRIGGER.
 		///
 		///</summary>
-		static TriggerStep sqlite3TriggerSelectStep(sqlite3 db,Select pSelect) {
+		public static TriggerStep sqlite3TriggerSelectStep(sqlite3 db,Select pSelect) {
 			TriggerStep pTriggerStep=new TriggerStep();
 			// sqlite3DbMallocZero( db, sizeof(TriggerStep ))
 			if(pTriggerStep==null) {
@@ -547,16 +551,16 @@ goto trigger_cleanup;
 		///
 		///</summary>
 		// OVERLOADS, so I don't need to rewrite parse.c
-		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,int null_4,int null_5,OnConstraintError orconf) {
+		public static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,int null_4,int null_5,OnConstraintError orconf) {
 			return sqlite3TriggerInsertStep(db,pTableName,pColumn,null,null,orconf);
 		}
-		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,ExprList pEList,int null_5,OnConstraintError orconf) {
+        public static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,ExprList pEList,int null_5,OnConstraintError orconf) {
 			return sqlite3TriggerInsertStep(db,pTableName,pColumn,pEList,null,orconf);
 		}
-		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,int null_4,Select pSelect,OnConstraintError orconf) {
+        public static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,Token pTableName,IdList pColumn,int null_4,Select pSelect,OnConstraintError orconf) {
 			return sqlite3TriggerInsertStep(db,pTableName,pColumn,null,pSelect,orconf);
 		}
-		static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,///
+        public static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,///
 		///<summary>
 		///The database connection 
 		///</summary>
@@ -591,9 +595,9 @@ goto trigger_cleanup;
 			pTriggerStep=triggerStepAllocate(db,Sqlite3.TK_INSERT,pTableName);
 			//if ( pTriggerStep != null )
 			//{
-			pTriggerStep.pSelect=exprc.sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
+			pTriggerStep.pSelect=exprc.sqlite3SelectDup(db,pSelect,Sqlite3.EXPRDUP_REDUCE);
 			pTriggerStep.pIdList=pColumn;
-			pTriggerStep.pExprList=exprc.sqlite3ExprListDup(db,pEList,EXPRDUP_REDUCE);
+			pTriggerStep.pExprList=exprc.sqlite3ExprListDup(db,pEList, Sqlite3.EXPRDUP_REDUCE);
 			pTriggerStep.orconf=orconf;
 			//}
 			//else
@@ -610,7 +614,7 @@ goto trigger_cleanup;
 		/// sees an UPDATE statement inside the body of a CREATE TRIGGER.
 		///
 		///</summary>
-		static TriggerStep sqlite3TriggerUpdateStep(sqlite3 db,///
+		public static TriggerStep sqlite3TriggerUpdateStep(sqlite3 db,///
 		///<summary>
 		///The database connection 
 		///</summary>
@@ -635,8 +639,8 @@ goto trigger_cleanup;
 			pTriggerStep=triggerStepAllocate(db,Sqlite3.TK_UPDATE,pTableName);
 			//if ( pTriggerStep != null )
 			//{
-			pTriggerStep.pExprList=exprc.sqlite3ExprListDup(db,pEList,EXPRDUP_REDUCE);
-			pTriggerStep.pWhere=exprc.sqlite3ExprDup(db,pWhere,EXPRDUP_REDUCE);
+			pTriggerStep.pExprList=exprc.sqlite3ExprListDup(db,pEList,Sqlite3.EXPRDUP_REDUCE);
+			pTriggerStep.pWhere=exprc.sqlite3ExprDup(db,pWhere, Sqlite3.EXPRDUP_REDUCE);
 			pTriggerStep.orconf=orconf;
 			//}
 			exprc.sqlite3ExprListDelete(db,ref pEList);
@@ -649,7 +653,7 @@ goto trigger_cleanup;
 		/// sees a DELETE statement inside the body of a CREATE TRIGGER.
 		///
 		///</summary>
-		static TriggerStep sqlite3TriggerDeleteStep(sqlite3 db,///
+		public static TriggerStep sqlite3TriggerDeleteStep(sqlite3 db,///
 		///<summary>
 		///Database connection 
 		///</summary>
@@ -666,7 +670,7 @@ goto trigger_cleanup;
 			pTriggerStep=triggerStepAllocate(db,Sqlite3.TK_DELETE,pTableName);
 			//if ( pTriggerStep != null )
 			//{
-			pTriggerStep.pWhere=exprc.sqlite3ExprDup(db,pWhere,EXPRDUP_REDUCE);
+			pTriggerStep.pWhere=exprc.sqlite3ExprDup(db,pWhere, Sqlite3.EXPRDUP_REDUCE);
 			pTriggerStep.orconf=OnConstraintError.OE_Default;
 			//}
 			exprc.sqlite3ExprDelete(db,ref pWhere);
@@ -676,7 +680,7 @@ goto trigger_cleanup;
 		/// Recursively delete a Trigger structure
 		///
 		///</summary>
-		static void sqlite3DeleteTrigger(sqlite3 db,ref Trigger pTrigger) {
+		public static void sqlite3DeleteTrigger(sqlite3 db,ref Trigger pTrigger) {
 			if(pTrigger==null)
 				return;
 			sqlite3DeleteTriggerStep(db,ref pTrigger.step_list);
@@ -687,16 +691,16 @@ goto trigger_cleanup;
 			pTrigger=null;
 			db.sqlite3DbFree(ref pTrigger);
 		}
-		///<summary>
-		/// This function is called to drop a trigger from the database schema.
-		///
-		/// This may be called directly from the parser and therefore identifies
-		/// the trigger by name.  The sqlite3DropTriggerPtr() routine does the
-		/// same job as this routine except it takes a pointer to the trigger
-		/// instead of the trigger name.
-		///
-		///</summary>
-		static void sqlite3DropTrigger(Parse pParse,SrcList pName,int noErr) {
+        ///<summary>
+        /// This function is called to drop a trigger from the database schema.
+        ///
+        /// This may be called directly from the parser and therefore identifies
+        /// the trigger by name.  The sqlite3DropTriggerPtr() routine does the
+        /// same job as this routine except it takes a pointer to the trigger
+        /// instead of the trigger name.
+        ///
+        ///</summary>
+        public static void sqlite3DropTrigger(Parse pParse,SrcList pName,int noErr) {
 			Trigger pTrigger=null;
 			int i;
 			string zDb;
@@ -704,14 +708,14 @@ goto trigger_cleanup;
 			int nName;
 			sqlite3 db=pParse.db;
 			//      if ( db.mallocFailed != 0 ) goto drop_trigger_cleanup;
-			if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+			if(SqlResult.SQLITE_OK!=Sqlite3.sqlite3ReadSchema(pParse)) {
 				goto drop_trigger_cleanup;
 			}
 			Debug.Assert(pName.nSrc==1);
 			zDb=pName.a[0].zDatabase;
 			zName=pName.a[0].zName;
 			nName=StringExtensions.sqlite3Strlen30(zName);
-			Debug.Assert(zDb!=null||sqlite3BtreeHoldsAllMutexes(db));
+			Debug.Assert(zDb!=null|| Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
 			for(i=sqliteinth.OMIT_TEMPDB;i<db.nDb;i++) {
 				int j=(i<2)?i^1:i;
 				///
@@ -720,7 +724,7 @@ goto trigger_cleanup;
 				///</summary>
 				if(zDb!=null&&!db.aDb[j].zName.Equals(zDb,StringComparison.InvariantCultureIgnoreCase))
 					continue;
-				Debug.Assert(sqlite3SchemaMutexHeld(db,j,null));
+				Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db,j,null));
 				pTrigger=(db.aDb[j].pSchema.trigHash).sqlite3HashFind(zName,nName,(Trigger)null);
 				if(pTrigger!=null)
 					break;
@@ -752,12 +756,12 @@ goto trigger_cleanup;
 		/// Drop a trigger given a pointer to that trigger.
 		///
 		///</summary>
-		static void sqlite3DropTriggerPtr(Parse pParse,Trigger pTrigger) {
+		public static void sqlite3DropTriggerPtr(Parse pParse,Trigger pTrigger) {
 			Table pTable;
 			Vdbe v;
 			sqlite3 db=pParse.db;
 			int iDb;
-			iDb=sqlite3SchemaToIndex(pParse.db,pTrigger.pSchema);
+			iDb= Sqlite3.sqlite3SchemaToIndex(pParse.db,pTrigger.pSchema);
 			Debug.Assert(iDb>=0&&iDb<db.nDb);
 			pTable=tableOfTrigger(pTrigger);
 			Debug.Assert(pTable!=null);
@@ -782,23 +786,23 @@ return;
 			if((v=pParse.sqlite3GetVdbe())!=null) {
 				int _base;
 				VdbeOpList[] dropTrigger=new VdbeOpList[] {
-					new VdbeOpList(OpCode.OP_Rewind,0,ADDR(9),0),
+					new VdbeOpList(OpCode.OP_Rewind,0,Sqlite3.ADDR(9),0),
 					new VdbeOpList(OpCode.OP_String8,0,1,0),
 					///
 					///<summary>
 					///1 
 					///</summary>
 					new VdbeOpList(OpCode.OP_Column,0,1,2),
-					new VdbeOpList(OpCode.OP_Ne,2,ADDR(8),1),
+					new VdbeOpList(OpCode.OP_Ne,2,Sqlite3.ADDR(8),1),
 					new VdbeOpList(OpCode.OP_String8,0,1,0),
 					///
 					///<summary>
 					///4: "trigger" 
 					///</summary>
 					new VdbeOpList(OpCode.OP_Column,0,0,2),
-					new VdbeOpList(OpCode.OP_Ne,2,ADDR(8),1),
+					new VdbeOpList(OpCode.OP_Ne,2,Sqlite3.ADDR(8),1),
 					new VdbeOpList(OpCode.OP_Delete,0,0,0),
-					new VdbeOpList(OpCode.OP_Next,0,ADDR(1),0),
+					new VdbeOpList(OpCode.OP_Next,0,Sqlite3.ADDR(1),0),
 				///
 				///<summary>
 				///8 
@@ -817,16 +821,16 @@ return;
 				}
 			}
 		}
-		///<summary>
-		/// Remove a trigger from the hash tables of the sqlite* pointer.
-		///
-		///</summary>
-		static void sqlite3UnlinkAndDeleteTrigger(sqlite3 db,int iDb,string zName) {
+        ///<summary>
+        /// Remove a trigger from the hash tables of the sqlite* pointer.
+        ///
+        ///</summary>
+        public static void sqlite3UnlinkAndDeleteTrigger(sqlite3 db,int iDb,string zName) {
 			Trigger pTrigger;
 			Hash pHash;
-			Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
+			Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db,iDb,null));
 			pHash=(db.aDb[iDb].pSchema.trigHash);
-			pTrigger=sqlite3HashInsert(ref pHash,zName,StringExtensions.sqlite3Strlen30(zName),(Trigger)null);
+			pTrigger= HashExtensions.sqlite3HashInsert(ref pHash,zName,StringExtensions.sqlite3Strlen30(zName),(Trigger)null);
 			if(Sqlite3.ALWAYS(pTrigger!=null)) {
 				if(pTrigger.pSchema==pTrigger.pTabSchema) {
 					Table pTab=tableOfTrigger(pTrigger);
@@ -852,19 +856,19 @@ return;
                 db.flags |= SqliteFlags.SQLITE_InternChanges;
 			}
 		}
-		///<summary>
-		/// pEList is the SET clause of an UPDATE statement.  Each entry
-		/// in pEList is of the format <id>=<expr>.  If any of the entries
-		/// in pEList have an <id> which matches an identifier in pIdList,
-		/// then return TRUE.  If pIdList==NULL, then it is considered a
-		/// wildcard that matches anything.  Likewise if pEList==NULL then
-		/// it matches anything so always return true.  Return false only
-		/// if there is no match.
-		///
-		///</summary>
-		static int checkColumnOverlap(IdList pIdList,ExprList pEList) {
+        ///<summary>
+        /// pEList is the SET clause of an UPDATE statement.  Each entry
+        /// in pEList is of the format <id>=<expr>.  If any of the entries
+        /// in pEList have an <id> which matches an identifier in pIdList,
+        /// then return TRUE.  If pIdList==NULL, then it is considered a
+        /// wildcard that matches anything.  Likewise if pEList==NULL then
+        /// it matches anything so always return true.  Return false only
+        /// if there is no match.
+        ///
+        ///</summary>
+        public static int checkColumnOverlap(IdList pIdList,ExprList pEList) {
 			int e;
-			if(pIdList==null||NEVER(pEList==null))
+			if(pIdList==null||Sqlite3.NEVER(pEList==null))
 				return 1;
 			for(e=0;e<pEList.nExpr;e++) {
 				if(build.sqlite3IdListIndex(pIdList,pEList.a[e].zName)>=0)
@@ -879,7 +883,7 @@ return;
 		/// least one of the columns in pChanges is being modified.
 		///
 		///</summary>
-		static Trigger sqlite3TriggersExist(Parse pParse,///
+		public static Trigger sqlite3TriggersExist(Parse pParse,///
 		///<summary>
 		///Parse context 
 		///</summary>
@@ -905,7 +909,7 @@ return;
 			Trigger p;
             if ((pParse.db.flags & SqliteFlags.SQLITE_EnableTrigger) != 0)
             {
-				pList=sqlite3TriggerList(pParse,pTab);
+				pList=sqlite3TriggerList(pTab,pParse);
 			}
 			Debug.Assert(pList==null||pTab.IsVirtual()==false);
 			for(p=pList;p!=null;p=p.pNext) {
@@ -954,7 +958,7 @@ return;
 			//{
 			Debug.Assert(pSrc.nSrc>0);
 			Debug.Assert(pSrc.a!=null);
-			iDb=sqlite3SchemaToIndex(pParse.db,pStep.pTrig.pSchema);
+			iDb= Sqlite3.sqlite3SchemaToIndex(pParse.db,pStep.pTrig.pSchema);
 			if(iDb==0||iDb>=2) {
 				sqlite3 db=pParse.db;
 				Debug.Assert(iDb<pParse.db.nDb);
@@ -964,12 +968,12 @@ return;
 			//}
 			return pSrc;
 		}
-		///<summary>
-		/// Generate VDBE code for the statements inside the body of a single
-		/// trigger.
-		///
-		///</summary>
-		static int codeTriggerProgram(Parse pParse,///
+        ///<summary>
+        /// Generate VDBE code for the statements inside the body of a single
+        /// trigger.
+        ///
+        ///</summary>
+        public static int codeTriggerProgram(Parse pParse,///
 		///<summary>
 		///The parser context 
 		///</summary>
@@ -1036,7 +1040,7 @@ return;
 			}
 			return 0;
 		}
-		#if SQLITE_DEBUG
+#if SQLITE_DEBUG
 																																																    /*
 ** This function is used to add VdbeComment() annotations to a VDBE
 ** program. It is not used in production code, only for debugging.
@@ -1061,12 +1065,12 @@ return;
       return "n/a";
     }
 #endif
-		///<summary>
-		/// Parse context structure pFrom has just been used to create a sub-vdbe
-		/// (trigger program). If an error has occurred, transfer error information
-		/// from pFrom to pTo.
-		///</summary>
-		static void transferParseError(Parse pTo,Parse pFrom) {
+        ///<summary>
+        /// Parse context structure pFrom has just been used to create a sub-vdbe
+        /// (trigger program). If an error has occurred, transfer error information
+        /// from pFrom to pTo.
+        ///</summary>
+        public static void transferParseError(Parse pTo,Parse pFrom) {
 			Debug.Assert(String.IsNullOrEmpty(pFrom.zErrMsg)||pFrom.nErr!=0);
 			Debug.Assert(String.IsNullOrEmpty(pTo.zErrMsg)||pTo.nErr!=0);
 			if(pTo.nErr==0) {
@@ -1077,12 +1081,12 @@ return;
 				pFrom.db.sqlite3DbFree(ref pFrom.zErrMsg);
 			}
 		}
-		///<summary>
-		/// Create and populate a new TriggerPrg object with a sub-program
-		/// implementing trigger pTrigger with ON CONFLICT policy orconf.
-		///
-		///</summary>
-		static TriggerPrg codeRowTrigger(Parse pParse,///
+        ///<summary>
+        /// Create and populate a new TriggerPrg object with a sub-program
+        /// implementing trigger pTrigger with ON CONFLICT policy orconf.
+        ///
+        ///</summary>
+        public static TriggerPrg codeRowTrigger(Parse pParse,///
 		///<summary>
 		///Current parse context 
 		///</summary>
@@ -1201,7 +1205,7 @@ return;
 				///<param name="OP_Halt inserted at the end of the program.  ">OP_Halt inserted at the end of the program.  </param>
 				if(pTrigger.pWhen!=null) {
 					pWhen=exprc.sqlite3ExprDup(db,pTrigger.pWhen,0);
-					if(SqlResult.SQLITE_OK==ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
+					if(SqlResult.SQLITE_OK== Sqlite3.ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pWhen)//&& db.mallocFailed==0 
 					) {
 						iEndTrigger=v.sqlite3VdbeMakeLabel();
 						pSubParse.sqlite3ExprIfFalse(pWhen,iEndTrigger,sqliteinth.SQLITE_JUMPIFNULL);
@@ -1240,14 +1244,14 @@ return;
 			//sqlite3StackFree(db, pSubParse);
 			return pPrg;
 		}
-		///<summary>
-		/// Return a pointer to a TriggerPrg object containing the sub-program for
-		/// trigger pTrigger with default ON CONFLICT algorithm orconf. If no such
-		/// TriggerPrg object exists, a new object is allocated and populated before
-		/// being returned.
-		///
-		///</summary>
-		static TriggerPrg getRowTrigger(Parse pParse,///
+        ///<summary>
+        /// Return a pointer to a TriggerPrg object containing the sub-program for
+        /// trigger pTrigger with default ON CONFLICT algorithm orconf. If no such
+        /// TriggerPrg object exists, a new object is allocated and populated before
+        /// being returned.
+        ///
+        ///</summary>
+        public static TriggerPrg getRowTrigger(Parse pParse,///
 		///<summary>
 		///Current parse context 
 		///</summary>
@@ -1292,7 +1296,7 @@ return;
 		/// sqlite3CodeRowTrigger()
 		///
 		///</summary>
-		static void sqlite3CodeRowTriggerDirect(Parse pParse,///
+		public static void sqlite3CodeRowTriggerDirect(Parse pParse,///
 		///<summary>
 		///Parse context 
 		///</summary>
@@ -1391,7 +1395,7 @@ return;
 		/// raises an IGNORE exception.
 		///
 		///</summary>
-		static void sqlite3CodeRowTrigger(Parse pParse,///
+		public static void sqlite3CodeRowTrigger(Parse pParse,///
 		///<summary>
 		///Parse context 
 		///</summary>
@@ -1482,7 +1486,7 @@ return;
 		///<param name="tr_tm parameter. Similarly, values accessed by AFTER triggers are only">tr_tm parameter. Similarly, values accessed by AFTER triggers are only</param>
 		///<param name="included in the returned mask if the TriggerType.TRIGGER_AFTER bit is set in tr_tm.">included in the returned mask if the TriggerType.TRIGGER_AFTER bit is set in tr_tm.</param>
 		///<param name=""></param>
-		static u32 sqlite3TriggerColmask(Parse pParse,///
+		public static u32 sqlite3TriggerColmask(Parse pParse,///
 		///<summary>
 		///Parse context 
 		///</summary>

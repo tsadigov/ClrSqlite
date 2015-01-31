@@ -2100,7 +2100,7 @@ szPageDflt = ii;
                             pPager.journalOff += 8 + pPager.pageSize;
                             pPager.nRec++;
                             Debug.Assert(pPager.pInJournal != null);
-                            rc = sqlite3BitvecSet(pPager.pInJournal, pPg.pgno);
+                            rc = pPager.pInJournal.sqlite3BitvecSet( pPg.pgno);
                             sqliteinth.testcase(rc == SqlResult.SQLITE_NOMEM);
                             Debug.Assert(rc == SqlResult.SQLITE_OK || rc == SqlResult.SQLITE_NOMEM);
                             rc |= pPager.addToSavepointBitvecs(pPg.pgno);
@@ -2232,7 +2232,7 @@ szPageDflt = ii;
                     {
                         u32 pg = (u32)(pg1 + ii);
                         PgHdr pPage = new PgHdr();
-                        if (pg == pPg.pgno || sqlite3BitvecTest(pPager.pInJournal, pg) == 0)
+                        if (pg == pPg.pgno || pPager.pInJournal.sqlite3BitvecTest(pg) == 0)
                         {
                             if (pg != ((PENDING_BYTE / (pPager.pageSize)) + 1))//PAGER_MJ_PGNO(pPager))
                             {

@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite {
 				Debug.Assert(pKey!=null);
 				Debug.Assert(nKey>=0);
 				if(this.ht!=null) {
-					h=Sqlite3.strHash(pKey,nKey)%this.htsize;
+					h=HashExtensions.strHash(pKey,nKey)%this.htsize;
 				}
 				else {
 					h=0;
@@ -234,7 +234,7 @@ namespace Community.CsharpSqlite {
 		///Key associated with this element 
 		///</summary>
 		};
-        public partial class Sqlite3
+        public static partial class HashExtensions
         {
 		///
 		///<summary>
@@ -259,15 +259,15 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		//#define sqliteHashFirst(H)  ((H).first)
-		static HashElem sqliteHashFirst(Hash H) {
+		public static HashElem sqliteHashFirst(this Hash H) {
 			return H.first;
 		}
 		//#define sqliteHashNext(E)   ((E).next)
-		static HashElem sqliteHashNext(HashElem E) {
+		public static HashElem sqliteHashNext(this HashElem E) {
 			return E.next;
 		}
 		//#define sqliteHashData(E)   ((E).data)
-		static object sqliteHashData(HashElem E) {
+		public static object sqliteHashData(this HashElem E) {
 			return E.data;
 		}
 	///

@@ -101,7 +101,7 @@ namespace Community.CsharpSqlite
 			int v;
 			string z;
 			Debug.Assert (argc == 3);
-			Sqlite3.sqliteinth.UNUSED_PARAMETER2 (NotUsed, argc);
+			sqliteinth.UNUSED_PARAMETER2 (NotUsed, argc);
 			if (argv == null || argv [0] == null || argv [2] == null) {
 				return 0;
 			}
@@ -144,7 +144,7 @@ namespace Community.CsharpSqlite
 		/// If the Index.aSample variable is not NULL, delete the aSample[] array
 		/// and its contents.
 		///</summary>
-		static void sqlite3DeleteIndexSamples (sqlite3 db, Index pIdx)
+		public static void sqlite3DeleteIndexSamples (sqlite3 db, Index pIdx)
 		{
 			#if SQLITE_ENABLE_STAT2
 																																																												  if ( pIdx.aSample != null )
@@ -162,8 +162,8 @@ namespace Community.CsharpSqlite
     sqlite3DbFree( db, ref pIdx.aSample );
   }
 #else
-			Sqlite3.sqliteinth.UNUSED_PARAMETER (db);
-			Sqlite3.sqliteinth.UNUSED_PARAMETER (pIdx);
+			sqliteinth.UNUSED_PARAMETER (db);
+			sqliteinth.UNUSED_PARAMETER (pIdx);
 			#endif
 		}
 

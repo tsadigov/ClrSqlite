@@ -13,10 +13,6 @@ namespace Community.CsharpSqlite {
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     
-    using utilc = Community.CsharpSqlite.Sqlite3.utilc;
-    using io = Sqlite3.io;
-    using build = Community.CsharpSqlite.Sqlite3.build;
-    using sqliteinth = Sqlite3.sqliteinth;
     using ResolveExtensions = Sqlite3.ResolveExtensions;
 
         public class SelectMethods
@@ -3651,7 +3647,7 @@ break;
             ///</summary>
             public static WRC exprWalkNoop(Walker NotUsed, ref Expr NotUsed2)
             {
-                Sqlite3.sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
+                sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 return WRC.WRC_Continue;
             }
 

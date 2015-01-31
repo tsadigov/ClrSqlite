@@ -16,8 +16,6 @@ namespace Community.CsharpSqlite {
 
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     
-    using sqliteinth = Sqlite3.sqliteinth;
-    
 
 		///
 		///<summary>

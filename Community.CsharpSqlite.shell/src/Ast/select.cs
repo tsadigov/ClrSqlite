@@ -27,10 +27,7 @@ namespace Community.CsharpSqlite
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     using sqlite3_value = Mem;
     
-    using utilc = Community.CsharpSqlite.Sqlite3.utilc;
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
-    using build = Sqlite3.build;
-    using sqliteinth = Sqlite3.sqliteinth;
     
     using ResolveExtensions = Sqlite3.ResolveExtensions;
 
@@ -296,7 +293,7 @@ namespace Community.CsharpSqlite
                 ///the FROM clause of the SELECT statement.
                 ///
                 ///</summary>
-                Sqlite3.build.sqlite3SrcListAssignCursors(pParse, pTabList);
+                build.sqlite3SrcListAssignCursors(pParse, pTabList);
                 ///
                 ///<summary>
                 ///Look up every table named in the FROM clause of the select.  If
@@ -334,7 +331,7 @@ namespace Community.CsharpSqlite
                         if (pTab == null)
                             return WRC.WRC_Abort;
                         pTab.nRef = 1;
-                        pTab.zName = Sqlite3.io.sqlite3MPrintf(db, "sqlite_subquery_%p_", pTab);
+                        pTab.zName = io.sqlite3MPrintf(db, "sqlite_subquery_%p_", pTab);
                         while (pSel.pPrior != null)
                         {
                             pSel = pSel.pPrior;
@@ -352,7 +349,7 @@ namespace Community.CsharpSqlite
                         ///An ordinary table or view name in the FROM clause 
                         ///</summary>
                         Debug.Assert(pFrom.pTab == null);
-                        pFrom.pTab = pTab = Sqlite3.build.sqlite3LocateTable(pParse, 0, pFrom.zName, pFrom.zDatabase);
+                        pFrom.pTab = pTab = build.sqlite3LocateTable(pParse, 0, pFrom.zName, pFrom.zDatabase);
                         if (pTab == null)
                             return WRC.WRC_Abort;
                         pTab.nRef++;
@@ -363,7 +360,7 @@ namespace Community.CsharpSqlite
                             ///<summary>
                             ///We reach here if the named table is a really a view 
                             ///</summary>
-                            if (Sqlite3.build.sqlite3ViewGetColumnNames(pParse, pTab) != 0)
+                            if (build.sqlite3ViewGetColumnNames(pParse, pTab) != 0)
                                 return WRC.WRC_Abort;
                             pFrom.pSelect = exprc.sqlite3SelectDup(db, pTab.pSelect, 0);
                             pWalker.sqlite3WalkSelect(pFrom.pSelect);
@@ -554,7 +551,7 @@ namespace Community.CsharpSqlite
                                         pExpr = pParse.sqlite3PExpr(Sqlite3.TK_DOT, pLeft, pRight, 0);
                                         if (longNames)
                                         {
-                                            zColname = Sqlite3.io.sqlite3MPrintf(db, "%s.%s", zTabName, zName);
+                                            zColname = io.sqlite3MPrintf(db, "%s.%s", zTabName, zName);
                                             zToFree = zColname;
                                         }
                                     }
