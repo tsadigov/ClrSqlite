@@ -7,7 +7,7 @@ using u32=System.UInt32;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
 	using sqlite3_int64=System.Int64;
-	using DbPage=Sqlite3.PgHdr;
+	using DbPage=PgHdr;
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -559,7 +559,7 @@ namespace Community.CsharpSqlite {
 						///</summary>
 						Buffer.BlockCopy(zSrcData,(int)(iOff%nSrcPgsz),zDestData,(int)(iOff%nDestPgsz),nCopy);
 						// memcpy( zOut, zIn, nCopy );
-						 PagerMethods.sqlite3PagerGetExtra (pDestPg).isInit=0;
+						 PagerMethods.sqlite3PagerGetExtra (pDestPg).isInit=false;
 						// (  PagerMethods.sqlite3PagerGetExtra ( pDestPg ) )[0] = 0;
 					}
 					PagerMethods.sqlite3PagerUnref(pDestPg);

@@ -10,7 +10,7 @@ using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite
 {
-    using DbPage = Sqlite3.PgHdr;
+    using DbPage = PgHdr;
     public partial class Sqlite3
     {
 
@@ -716,10 +716,10 @@ static u16 cellSize( MemPage pPage, int iCell )
                 MemPage pPage;
                 pPage =  PagerMethods.sqlite3PagerGetExtra (pData);
                 Debug.Assert(pData.sqlite3PagerPageRefcount() > 0);
-                if (pPage.isInit != 0)
+                if (pPage.isInit != false)
                 {
                     Debug.Assert(pPage.pBt.mutex.sqlite3_mutex_held());
-                    pPage.isInit = 0;
+                    pPage.isInit = false;
                     if (pData.sqlite3PagerPageRefcount() > 1)
                     {
                         ///
@@ -2750,7 +2750,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                         BTreeMethods.releasePage(ppPage);
                         return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
-                    (ppPage).isInit = 0;
+                    (ppPage).isInit = false;
                 }
                 else
                 {
@@ -2945,7 +2945,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
             freepage_out:
                 if (pPage != null)
                 {
-                    pPage.isInit = 0;
+                    pPage.isInit = false;
                 }
                 BTreeMethods.releasePage(pPage);
                 BTreeMethods.releasePage(pTrunk);
@@ -3417,7 +3417,7 @@ return rc;
                     int iCell = pPage.findCell(i);
                     pCell = pPage.aData;
                     //        pCell = findCell( pPage, i );
-                    if (0 == pPage.leaf)
+                    if (false == pPage.leaf)
                     {
                         rc = clearDatabasePage(pBt, Converter.sqlite3Get4byte(pCell, iCell), 1, ref pnChange);
                         if (rc != 0)
@@ -3427,7 +3427,7 @@ return rc;
                     if (rc != 0)
                         goto cleardatabasepage_out;
                 }
-                if (0 == pPage.leaf)
+                if (false == pPage.leaf)
                 {
                     rc = clearDatabasePage(pBt, Converter.sqlite3Get4byte(pPage.aData, 8), 1, ref pnChange);
                     if (rc != 0)

@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Community.CsharpSqlite</RootNamespace>
-    <AssemblyName>C#-SQLite3.12</AssemblyName>
+    <AssemblyName>C#-SQLite3.123</AssemblyName>
     <StartupObject>Shell</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -324,6 +324,7 @@
     <Compile Include="src\BtCursor.cs" />
     <Compile Include="src\BTree.cs" />
     <Compile Include="src\BtreeExtensions.cs" />
+    <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Db.cs" />
     <Compile Include="src\Engine\Agg.cs" />
     <Compile Include="src\Engine\BusyHandler.cs" />
@@ -374,6 +375,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\NewFolder1\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

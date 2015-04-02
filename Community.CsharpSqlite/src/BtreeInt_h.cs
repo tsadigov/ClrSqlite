@@ -11,12 +11,11 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using DbPage = Sqlite3.PgHdr;
+	using DbPage = PgHdr;
 	using System.Text;
     using Pager = Sqlite3.Pager;
     using MemPage = Sqlite3.MemPage;
     using BtCursor = Sqlite3.BtCursor;
-    using PgHdr=Sqlite3.PgHdr;
     using PagerMethods=Sqlite3.PagerMethods;
     ///<summary>
     /// Btree.inTrans may take one of the following values.
@@ -1263,7 +1262,7 @@ public static bool ISAUTOVACUUM =false;
 ///btreeInitPage() is executed.  
 ///</summary>
 
-				pPage.isInit = 0;
+				pPage.isInit = false;
 				if ((rc = pPage.btreeInitPage ()) != 0) {
 					Debug.Assert (rc == SqlResult.SQLITE_CORRUPT);
 					///
@@ -1299,7 +1298,7 @@ public static bool ISAUTOVACUUM =false;
 					pPage.btreeParseCellPtr (iCell, ref info);
 					//btreeParseCellPtr( pPage, pCell, info );
 					sz = info.nData;
-					if (0 == pPage.intKey)
+					if (false == pPage.intKey)
 						sz += (u32)info.nKey;
 					///
 ///<summary>
@@ -1334,7 +1333,7 @@ public static bool ISAUTOVACUUM =false;
 ///
 ///</summary>
 
-					if (0 == pPage.leaf) {
+					if (false == pPage.leaf) {
 						pgno = (int)Converter.sqlite3Get4byte (pCell, iCell);
 						//sqlite3Get4byte( pCell );
 						#if !SQLITE_OMIT_AUTOVACUUM
@@ -1352,7 +1351,7 @@ public static bool ISAUTOVACUUM =false;
 						depth = d2;
 					}
 				}
-				if (0 == pPage.leaf) {
+				if (false == pPage.leaf) {
 					pgno = (int)Converter.sqlite3Get4byte (pPage.aData, pPage.hdrOffset + 8);
 					io.sqlite3_snprintf (200, zContext, "On page %d at right child: ", iPage);
 					#if !SQLITE_OMIT_AUTOVACUUM
@@ -1373,7 +1372,7 @@ public static bool ISAUTOVACUUM =false;
 ///
 ///</summary>
 
-				if (pPage.leaf != 0 && pPage.intKey != 0) {
+				if (pPage.leaf != false && pPage.intKey != false) {
 					///
 ///<summary>
 ///if we are a left child page 
@@ -1438,7 +1437,7 @@ public static bool ISAUTOVACUUM =false;
 						hit [iLoop] = 1;
 					//memset(hit, 1, contentOffset);
 					nCell = get2byte (data, hdr + 3);
-					cellStart = hdr + 12 - 4 * pPage.leaf;
+					cellStart = hdr + 12 -  (pPage.leaf?4:0) ;
 					for (i = 0; i < nCell; i++) {
 						int pc = get2byte (data, cellStart + i * 2);
 						u32 size = 65536;
@@ -1506,31 +1505,11 @@ public static bool ISAUTOVACUUM =false;
 				return depth + 1;
 			}
 
-			public void checkList (///
-///<summary>
-///Integrity checking context 
-///</summary>
-
-			int isFreeList, ///
-///<summary>
-///True for a freelist.  False for overflow page list 
-///</summary>
-
-			int iPage, ///
-///<summary>
-///Page number for first page in the list 
-///</summary>
-
-			int N, ///
-///<summary>
-///Expected number of pages in the list 
-///</summary>
-
-			string zContext///
-///<summary>
-///Context for error messages 
-///</summary>
-
+			public void checkList (
+			    int isFreeList, ///True for a freelist.  False for overflow page list 
+			    int iPage, ///Page number for first page in the list 
+			    int N, ///Expected number of pages in the list 
+			    string zContext///Context for error messages 
 			)
 			{
 				int i;
@@ -1595,31 +1574,11 @@ public static bool ISAUTOVACUUM =false;
 				}
 			}
 
-			public void checkPtrmap (///
-///<summary>
-///Integrity check context 
-///</summary>
-
-			Pgno iChild, ///
-///<summary>
-///Child page number 
-///</summary>
-
-			u8 eType, ///
-///<summary>
-///Expected pointer map type 
-///</summary>
-
-			Pgno iParent, ///
-///<summary>
-///Expected pointer map parent page number 
-///</summary>
-
-			string zContext///
-///<summary>
-///Context description (used for error msg) 
-///</summary>
-
+			public void checkPtrmap (
+			    Pgno iChild, ///Child page number 
+			    u8 eType, ///Expected pointer map type 
+			    Pgno iParent,///Expected pointer map parent page number 
+			    string zContext///Context description (used for error msg) 
 			)
 			{
 				SqlResult rc;
@@ -1683,102 +1642,4 @@ public static bool ISAUTOVACUUM =false;
 	//#define put4byte sqlite3Put4byte
 	}
 
-
-
-    ///<summary>
-    /// An instance of the following structure is used to hold information
-    /// about a cell.  The parseCellPtr() function fills in this structure
-    /// based on information extract from the raw disk page.
-    ///
-    ///</summary>
-    //typedef struct CellInfo CellInfo;
-    public struct CellInfo
-    {
-        int _iCell;
-        public int iCell
-        {
-            get
-            {
-                return _iCell;
-            }
-            set
-            {
-                _iCell = value;
-            }
-        }
-
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="Offset to start of cell content "> Needed for C# </param>
-
-        public byte[] pCell;
-
-        ///
-        ///<summary>
-        ///Pointer to the start of cell content 
-        ///</summary>
-
-        public i64 nKey;
-
-        ///
-        ///<summary>
-        ///The key for INTKEY tables, or number of bytes in key 
-        ///</summary>
-
-        public u32 nData;
-
-        ///
-        ///<summary>
-        ///Number of bytes of data 
-        ///</summary>
-
-        public u32 nPayload;
-
-        ///
-        ///<summary>
-        ///Total amount of payload 
-        ///</summary>
-
-        public u16 nHeader;
-
-        ///
-        ///<summary>
-        ///Size of the cell content header in bytes 
-        ///</summary>
-
-        public u16 nLocal;
-
-        ///
-        ///<summary>
-        ///Amount of payload held locally 
-        ///</summary>
-
-        public u16 iOverflow;
-
-        ///<summary>
-        ///Offset to overflow page number.  Zero if no overflow
-        ///</summary>
-        public u16 nSize;
-
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="Size of the cell content on the main b">tree page </param>
-
-        public bool Equals(CellInfo ci)
-        {
-            if (ci.iCell >= ci.pCell.Length || iCell >= this.pCell.Length)
-                return false;
-            if (ci.pCell[ci.iCell] != this.pCell[iCell])
-                return false;
-            if (ci.nKey != this.nKey || ci.nData != this.nData || ci.nPayload != this.nPayload)
-                return false;
-            if (ci.nHeader != this.nHeader || ci.nLocal != this.nLocal)
-                return false;
-            if (ci.iOverflow != this.iOverflow || ci.nSize != this.nSize)
-                return false;
-            return true;
-        }
-    }
 }

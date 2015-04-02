@@ -15,12 +15,11 @@ using u32 = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using DbPage = Sqlite3.PgHdr;
+	using DbPage = PgHdr;
 	using sqlite3_pcache = Sqlite3.PCache1;
 	using sqlite3_stmt = Sqlite3.Vdbe;
 	using sqlite3_value = Mem;
     using codec_ctx=Sqlite3.crypto.codec_ctx;
-    using PgHdr=Sqlite3.PgHdr;
     using Btree = Sqlite3.Btree;
     using sqlite3_api_routines=Sqlite3.sqlite3_api_routines;
 

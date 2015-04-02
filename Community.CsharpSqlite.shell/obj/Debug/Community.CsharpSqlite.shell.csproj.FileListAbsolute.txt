@@ -1,6 +1,6 @@
 X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\Community.CsharpSqlite.shell.csprojResolveAssemblyReference.cache
-X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.12.exe.config
-X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.12.exe
-X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.12.pdb
-X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.12.exe
-X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.12.pdb
+X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.123.exe.config
+X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.123.exe
+X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.123.pdb
+X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.123.exe
+X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.123.pdb
