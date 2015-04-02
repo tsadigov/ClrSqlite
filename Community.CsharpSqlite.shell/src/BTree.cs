@@ -9,7 +9,7 @@ using u64=System.UInt64;
 using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
-	using DbPage=Sqlite3.PgHdr;
+	using DbPage=PgHdr;
 	using System.Text;
 	public partial class Sqlite3 {
 

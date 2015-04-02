@@ -14,7 +14,7 @@ using sqlite3_int64 = System.Int64;
 namespace Community.CsharpSqlite
 {
     using System.Text;
-    using DbPage = Sqlite3.PgHdr;
+    using DbPage = PgHdr;
     using System.Diagnostics;
     using codec_ctx = Sqlite3.crypto.codec_ctx;
 

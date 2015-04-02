@@ -13,7 +13,7 @@ using sqlite3_int64 = System.Int64;
 
 namespace Community.CsharpSqlite
 {
-    using DbPage = Sqlite3.PgHdr;
+    using DbPage = PgHdr;
     ///<summary>
     /// An instance of the following structure is allocated for each active
     /// savepoint and statement transaction in the system. All such structures

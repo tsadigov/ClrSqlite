@@ -11,8 +11,9 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using DbPage = Sqlite3.PgHdr;
+	using DbPage = PgHdr;
 	using System.Text;
+    using System.Linq;
 
 	public partial class Sqlite3
 	{
@@ -23,89 +24,95 @@ namespace Community.CsharpSqlite
 				Log.WriteLine ("page .ctor");
 			}
 
-			///
 ///<summary>
 ///True if previously initialized. MUST BE FIRST! 
 ///</summary>
 
-			public u8 isInit;
+			public bool isInit;
 
-			///
 ///<summary>
 ///Number of overflow cell bodies in aCell[] 
 ///</summary>
+            u8 m_nOverflow;
+            public u8 nOverflow {
+                get {
+                    return m_nOverflow;
+                }
+                set {
+                    m_nOverflow = value;
+                }
+            }
 
-			public u8 nOverflow;
 
-			///
-///<summary>
-///True if u8key flag is set 
-///</summary>
 
-			public u8 intKey;
+            ///<summary>
+            ///True if u8key flag is set 
+            ///</summary>
+            public bool intKey
+            {
+                get;
+                set;
+            }
 
-			///
 ///<summary>
 ///1 if leaf flag is set 
 ///</summary>
+            bool m_leaf;
+            public bool leaf {
+                get { return m_leaf; }
+                set { m_leaf = value; }
+            }
 
-			public u8 leaf;
-
-			///
 ///<summary>
 ///True if this page stores data 
 ///</summary>
 
-			public u8 hasData;
+			public bool hasData;
 
-			///
 ///<summary>
 ///100 for page 1.  0 otherwise 
 ///</summary>
 
 			public u8 hdrOffset;
 
-			///
 ///<summary>
 ///0 if leaf==1.  4 if leaf==0 
 ///</summary>
 
-			public u8 childPtrSize;
+            public u8 childPtrSize {
+                get { return  (u8)(4 - (this.leaf ? 4 : 0)); }
+            }
 
-			///
 ///<summary>
 ///Copy of BtShared.maxLocal or BtShared.maxLeaf 
 ///</summary>
 
 			public u16 maxLocal;
 
-			///
 ///<summary>
 ///Copy of BtShared.minLocal or BtShared.minLeaf 
 ///</summary>
 
 			public u16 minLocal;
 
-			///
 ///<summary>
 ///Index in aData of first cell pou16er 
 ///</summary>
 
 			public u16 cellOffset;
 
-			///
 ///<summary>
 ///Number of free bytes on the page 
 ///</summary>
 
 			public u16 nFree;
 
-			///
 ///<summary>
 ///Number of cells on this page, local and ovfl 
 ///</summary>
 
-			public u16 nCell;
+            u16 n_ncell;
+            public u16 nCell { get { return n_ncell; } set { Console.WriteLine("number of cells : "+value); n_ncell = value; } }
 
 			///
 ///<summary>
@@ -118,21 +125,24 @@ namespace Community.CsharpSqlite
 
 			public BtShared pBt;
 
-			///
+            public class Offsets
+            {
+                public const int nCell = 3;
+                public const int cellbody = 5;
+            }
+
+
 ///<summary>
 ///Pointer to BtShared that this page is part of 
 ///</summary>
-
 			public byte[] aData;
 
-			///
 ///<summary>
 ///Pointer to disk image of the page data 
 ///</summary>
 
 			public DbPage pDbPage;
 
-			///
 ///<summary>
 ///Pager page handle 
 ///</summary>
@@ -158,10 +168,9 @@ namespace Community.CsharpSqlite
 			public MemPage Copy ()
 			{
 				MemPage cp = (MemPage)MemberwiseClone ();
-				if (aOvfl != null) {
-					cp.aOvfl = new _OvflCell[aOvfl.Length];
-					for (int i = 0; i < aOvfl.Length; i++)
-						cp.aOvfl [i] = aOvfl [i].Copy ();
+                if (aOvfl != null)
+                {
+                    cp.aOvfl = aOvfl.Select(c=>c.Copy()).ToArray();
 				}
 				if (aData != null) {
 					cp.aData = malloc_cs.sqlite3Malloc (aData.Length);
@@ -170,12 +179,11 @@ namespace Community.CsharpSqlite
 				return cp;
 			}
 
-			/**
 ///<summary>
 ///This a more complex version of findCell() that works for
 ///pages that do contain overflow cells.
 ///</summary>
-*/public int findOverflowCell (int iCell)
+            public int findOverflowCell (int iCell)
 			{
 				int i;
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
@@ -196,99 +204,52 @@ namespace Community.CsharpSqlite
 				return this.findCell (iCell);
 			}
 
-			public///<summary>
-			/// Parse a cell content block and fill in the CellInfo structure.  There
-			/// are two versions of this function.  btreeParseCell() takes a
-			/// cell index as the second argument and btreeParseCellPtr()
-			/// takes a pointer to the body of the cell as its second argument.
-			///
-			/// Within this file, the parseCell() macro can be called instead of
-			/// btreeParseCellPtr(). Using some compilers, this will be faster.
-			///</summary>
-			//OVERLOADS
-			void btreeParseCellPtr (///
-///<summary>
-///Page containing the cell 
-///</summary>
-
-			int iCell, ///
-///<summary>
-///Pointer to the cell text. 
-///</summary>
-
-			ref CellInfo pInfo///
-///<summary>
-///Fill in this structure 
-///</summary>
-
+  ///<summary>
+  /// Parse a cell content block and fill in the CellInfo structure.  There
+  /// are two versions of this function.  btreeParseCell() takes a
+  /// cell index as the second argument and btreeParseCellPtr()
+  /// takes a pointer to the body of the cell as its second argument.
+  ///
+  /// Within this file, the parseCell() macro can be called instead of
+  /// btreeParseCellPtr(). Using some compilers, this will be faster.
+  ///</summary>
+  //OVERLOADS
+  ///
+			public void btreeParseCellPtr (
+			    int iPageContainingTheCell, ///Pointer to the cell text. 
+			    ref CellInfo pCellText///Fill in this structure 
 			)
 			{
-				this.btreeParseCellPtr (this.aData, iCell, ref pInfo);
+				this.btreeParseCellPtr (this.aData, iPageContainingTheCell, ref pCellText);
 			}
 
-			public void btreeParseCellPtr (///
-///<summary>
-///Page containing the cell 
-///</summary>
-
-			byte[] pCell, ///
-///<summary>
-///The actual data 
-///</summary>
-
-			ref CellInfo pInfo///
-///<summary>
-///Fill in this structure 
-///</summary>
-
+			public void btreeParseCellPtr (
+    			byte[] pCell, ///The actual data 
+    			ref CellInfo pInfo///Fill in this structure 
 			)
 			{
 				this.btreeParseCellPtr (pCell, 0, ref pInfo);
 			}
 
-			public void btreeParseCellPtr (///
-///<summary>
-///Page containing the cell 
-///</summary>
-
-			u8[] pCell, ///
-///<summary>
-///Pointer to the cell text. 
-///</summary>
-
-			int iCell, ///
-///<summary>
-///Pointer to the cell text. 
-///</summary>
-
-			ref CellInfo pInfo///
-///<summary>
-///Fill in this structure 
-///</summary>
-
+			public void btreeParseCellPtr (
+			    u8[] pCell, ///Pointer to the cell text. 
+			    int iCell, ///Pointer to the cell text. 
+			    ref CellInfo pInfo////Fill in this structure 
 			)
 			{
-				u16 n;
-				///
-///<summary>
-///Number bytes in cell content header 
-///</summary>
-
-				u32 nPayload = 0;
-				///
-///<summary>
-///Number of bytes of cell payload 
-///</summary>
+				u32 nPayload = 0;///Number of bytes of cell payload 
 
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
-				if (pInfo.pCell != pCell)
+				if (pInfo.pCell != pCell)//
 					pInfo.pCell = pCell;
 				pInfo.iCell = iCell;
-				Debug.Assert (this.leaf == 0 || this.leaf == 1);
-				n = this.childPtrSize;
-				Debug.Assert (n == 4 - 4 * this.leaf);
-				if (this.intKey != 0) {
-					if (this.hasData != 0) {
+				Debug.Assert (this.leaf == false || this.leaf == true);
+
+                u16 n = this.childPtrSize;///Number bytes in cell content header 
+
+				Debug.Assert (n == 4 -  (this.leaf?4:0));
+				if (this.intKey ) {
+					if (this.hasData ) {
                         n += (u16)utilc.getVarint32(pCell, iCell + n, out nPayload);
 					}
 					else {
@@ -307,12 +268,8 @@ namespace Community.CsharpSqlite
 				sqliteinth.testcase (nPayload == this.maxLocal);
 				sqliteinth.testcase (nPayload == this.maxLocal + 1);
 				if (sqliteinth.likely (nPayload <= this.maxLocal)) {
-					///
-///<summary>
 ///This is the (easy) common case where the entire payload fits
 ///on the local page.  No overflow is required.
-///
-///</summary>
 
 					if ((pInfo.nSize = (u16)(n + nPayload)) < 4)
 						pInfo.nSize = 4;
@@ -320,8 +277,6 @@ namespace Community.CsharpSqlite
 					pInfo.iOverflow = 0;
 				}
 				else {
-					///
-///<summary>
 ///If the payload will not fit completely on the local page, we have
 ///to decide how much to store locally and how much to spill onto
 ///overflow pages.  The strategy is to minimize the amount of unused
@@ -330,30 +285,17 @@ namespace Community.CsharpSqlite
 ///
 ///Warning:  changing the way overflow payload is distributed in any
 ///way will result in an incompatible file format.
-///
-///</summary>
 
-					int minLocal;
-					///
-///<summary>
+                    int minLocal = this.minLocal;
 ///Minimum amount of payload held locally 
-///</summary>
 
-					int maxLocal;
-					///
-///<summary>
+                    int maxLocal = this.maxLocal;
 ///Maximum amount of payload held locally 
-///</summary>
 
-					int surplus;
-					///
-///<summary>
+                    int surplus = surplus = (int)(minLocal + (nPayload - minLocal) % (this.pBt.usableSize - 4));
 ///Overflow payload available for local storage 
-///</summary>
 
-					minLocal = this.minLocal;
-					maxLocal = this.maxLocal;
-					surplus = (int)(minLocal + (nPayload - minLocal) % (this.pBt.usableSize - 4));
+					
 					sqliteinth.testcase (surplus == maxLocal);
 					sqliteinth.testcase (surplus == maxLocal + 1);
 					if (surplus <= maxLocal) {
@@ -373,14 +315,14 @@ namespace Community.CsharpSqlite
 				this.btreeParseCellPtr (this.findCell (iCell), ref pInfo);
 			}
 
-			public///<summary>
-			/// Compute the total number of bytes that a Cell needs in the cell
-			/// data area of the btree-page.  The return number includes the cell
-			/// data header and the local payload, but not any overflow page or
-			/// the space used by the cell pointer.
-			///</summary>
-			// Alternative form for C#
-			u16 cellSizePtr (int iCell)
+            ///<summary>
+            /// Compute the total number of bytes that a Cell needs in the cell
+            /// data area of the btree-page.  The return number includes the cell
+            /// data header and the local payload, but not any overflow page or
+            /// the space used by the cell pointer.
+            ///</summary>
+            // Alternative form for C#
+			public u16 cellSizePtr (int iCell)
 			{
 				CellInfo info = new CellInfo ();
 				byte[] pCell = new byte[13];
@@ -397,21 +339,9 @@ namespace Community.CsharpSqlite
 				return info.nSize;
 			}
 
-			public void btreeParseCell (///
-///<summary>
-///Page containing the cell 
-///</summary>
-
-			int iCell, ///
-///<summary>
-///The cell index.  First cell is 0 
-///</summary>
-
-			ref CellInfo pInfo///
-///<summary>
-///Fill in this structure 
-///</summary>
-
+			public void btreeParseCell (
+			    int iCell, ///The cell index.  First cell is 0 
+			    ref CellInfo pInfo///Fill in this structure 
 			)
 			{
 				this.parseCell (iCell, ref pInfo);
@@ -442,9 +372,9 @@ namespace Community.CsharpSqlite
 #else
 				CellInfo debuginfo = new CellInfo ();
 				#endif
-				if (this.intKey != 0) {
+				if (this.intKey != false) {
 					int pEnd;
-					if (this.hasData != 0) {
+					if (this.hasData != false) {
                         _pIter += utilc.getVarint32(pCell, out nSize);
 						// pIter += utilc.getVarint32( pIter, out nSize );
 					}
@@ -511,7 +441,7 @@ namespace Community.CsharpSqlite
 				CellInfo info = new CellInfo ();
 				Debug.Assert (pCell != 0);
 				this.btreeParseCellPtr (pCell, ref info);
-				Debug.Assert ((info.nData + (this.intKey != 0 ? 0 : info.nKey)) == info.nPayload);
+				Debug.Assert ((info.nData + ( this.intKey  ? 0 : info.nKey)) == info.nPayload);
 				if (info.iOverflow != 0) {
 					Pgno ovfl = Converter.sqlite3Get4byte (this.aData, pCell, info.iOverflow);
 					this.pBt.ptrmapPut (ovfl, PTRMAP_OVERFLOW1, this.pgno, ref pRC);
@@ -525,7 +455,7 @@ namespace Community.CsharpSqlite
 				CellInfo info = new CellInfo ();
 				Debug.Assert (pCell != null);
 				this.btreeParseCellPtr (pCell, ref info);
-				Debug.Assert ((info.nData + (this.intKey != 0 ? 0 : info.nKey)) == info.nPayload);
+				Debug.Assert ((info.nData + (this.intKey  ? 0 : info.nKey)) == info.nPayload);
 				if (info.iOverflow != 0) {
 					Pgno ovfl = Converter.sqlite3Get4byte (pCell, info.iOverflow);
 					this.pBt.ptrmapPut (ovfl, PTRMAP_OVERFLOW1, this.pgno, ref pRC);
@@ -541,82 +471,43 @@ namespace Community.CsharpSqlite
 			SqlResult defragmentPage ()
 			{
 				int i;
-				///
-///<summary>
 ///Loop counter 
-///</summary>
 
 				int pc;
-				///
-///<summary>
-///</summary>
 ///<param name="Address of a i">th cell </param>
 
 				int addr;
-				///
-///<summary>
 ///Offset of first byte after cell pointer array 
-///</summary>
 
 				int hdr;
-				///
-///<summary>
 ///Offset to the page header 
-///</summary>
 
 				int size;
-				///
-///<summary>
 ///Size of a cell 
-///</summary>
 
 				int usableSize;
-				///
-///<summary>
 ///Number of usable bytes on a page 
-///</summary>
 
 				int cellOffset;
-				///
-///<summary>
 ///Offset to the cell pointer array 
-///</summary>
 
 				int cbrk;
-				///
-///<summary>
 ///Offset to the cell content area 
-///</summary>
 
 				int nCell;
-				///
-///<summary>
 ///Number of cells on the page 
-///</summary>
 
 				byte[] data;
-				///
-///<summary>
 ///The page data 
-///</summary>
 
 				byte[] temp;
-				///
-///<summary>
 ///Temp area for cell content 
-///</summary>
 
 				int iCellFirst;
-				///
-///<summary>
 ///First allowable cell index 
-///</summary>
 
 				int iCellLast;
-				///
-///<summary>
 ///Last possible cell index 
-///</summary>
 
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (this.pBt != null);
@@ -638,9 +529,6 @@ namespace Community.CsharpSqlite
 				iCellLast = usableSize - 4;
 				for (i = 0; i < nCell; i++) {
 					int pAddr;
-					///
-///<summary>
-///</summary>
 ///<param name="The i">th cell pointer </param>
 
 					pAddr = cellOffset + i * 2;
@@ -649,11 +537,8 @@ namespace Community.CsharpSqlite
 					sqliteinth.testcase (pc == iCellFirst);
 					sqliteinth.testcase (pc == iCellLast);
 					#if !(SQLITE_ENABLE_OVERSIZE_CELL_CHECK)
-					///
-///<summary>
 ///These conditions have already been verified in btreeInitPage()
 ///if SQLITE_ENABLE_OVERSIZE_CELL_CHECK is defined
-///</summary>
 
 					if (pc < iCellFirst || pc > iCellLast) {
 						return sqliteinth.SQLITE_CORRUPT_BKPT();
@@ -710,62 +595,38 @@ namespace Community.CsharpSqlite
 			SqlResult allocateSpace (int nByte, ref int pIdx)
 			{
 				int hdr = this.hdrOffset;
-				///
-///<summary>
 ///Local cache of pPage.hdrOffset 
-///</summary>
 
 				u8[] data = this.aData;
-				///
-///<summary>
 ///Local cache of pPage.aData 
-///</summary>
 
 				int nFrag;
-				///
-///<summary>
 ///Number of fragmented bytes on pPage 
-///</summary>
 
 				int top;
-				///
-///<summary>
 ///First byte of cell content area 
-///</summary>
 
 				int gap;
-				///
-///<summary>
 ///First byte of gap between cell pointers and cell content 
-///</summary>
 
 				SqlResult rc;
-				///
-///<summary>
 ///Integer return code 
-///</summary>
 
 				u32 usableSize;
-				///
-///<summary>
 ///Usable size of the page 
-///</summary>
 
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (this.pBt != null);
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (nByte >= 0);
-				///
-///<summary>
 ///Minimum cell size is 4 
-///</summary>
 
 				Debug.Assert (this.nFree >= nByte);
 				Debug.Assert (this.nOverflow == 0);
 				usableSize = this.pBt.usableSize;
 				Debug.Assert (nByte < usableSize - 8);
 				nFrag = data [hdr + 7];
-				Debug.Assert (this.cellOffset == hdr + 12 - 4 * this.leaf);
+				Debug.Assert (this.cellOffset == hdr + 12 - (this.leaf?4:0));
 				gap = this.cellOffset + 2 * this.nCell;
                 top = BTreeMethods.get2byteNotZero(data, hdr + 5);
 				if (gap > top)
@@ -774,10 +635,7 @@ namespace Community.CsharpSqlite
 				sqliteinth.testcase (gap + 1 == top);
 				sqliteinth.testcase (gap == top);
 				if (nFrag >= 60) {
-					///
-///<summary>
 ///Always defragment highly fragmented pages 
-///</summary>
 
 					rc = this.defragmentPage ();
 					if (rc != 0)
@@ -786,22 +644,14 @@ namespace Community.CsharpSqlite
 				}
 				else
 					if (gap + 2 <= top) {
-						///
-///<summary>
 ///Search the freelist looking for a free slot big enough to satisfy
 ///the request. The allocation is made from the first free slot in
 ///the list that is large enough to accomadate it.
-///
-///</summary>
 
 						int pc, addr;
 						for (addr = hdr + 1; (pc = get2byte (data, addr)) > 0; addr = pc) {
 							int size;
-							///
-///<summary>
 ///Size of free slot 
-///</summary>
-
 							if (pc > usableSize - 4 || pc < addr + 4) {
 								return sqliteinth.SQLITE_CORRUPT_BKPT();
 							}
@@ -811,9 +661,6 @@ namespace Community.CsharpSqlite
 								sqliteinth.testcase (x == 4);
 								sqliteinth.testcase (x == 3);
 								if (x < 4) {
-									///
-///<summary>
-///</summary>
 ///<param name="Remove the slot from the free">list. Update the number of</param>
 ///<param name="fragmented bytes within the page. ">fragmented bytes within the page. </param>
 
@@ -836,6 +683,7 @@ namespace Community.CsharpSqlite
 										put2byte (data, pc + 2, x);
 									}
 								pIdx = pc + x;
+                                Console.WriteLine("allocated space index "+pIdx);
 								return SqlResult.SQLITE_OK;
 							}
 						}
@@ -1013,21 +861,21 @@ namespace Community.CsharpSqlite
 
 				Debug.Assert (this.hdrOffset == (this.pgno == 1 ? 100 : 0));
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
-				this.leaf = (u8)(flagByte >> 3);
+				this.leaf = 1== (u8)(flagByte >> 3);
 				Debug.Assert (PTF_LEAF == 1 << 3);
 				flagByte &= ~PTF_LEAF;
-				this.childPtrSize = (u8)(4 - 4 * this.leaf);
+				
 				pBt = this.pBt;
 				if (flagByte == (PTF_LEAFDATA | PTF_INTKEY)) {
-					this.intKey = 1;
+					this.intKey = true;
 					this.hasData = this.leaf;
 					this.maxLocal = pBt.maxLeaf;
 					this.minLocal = pBt.minLeaf;
 				}
 				else
 					if (flagByte == PTF_ZERODATA) {
-						this.intKey = 0;
-						this.hasData = 0;
+						this.intKey = false;
+						this.hasData = false;
 						this.maxLocal = pBt.maxLocal;
 						this.minLocal = pBt.minLocal;
 					}
@@ -1053,98 +901,38 @@ namespace Community.CsharpSqlite
 				Debug.Assert (this.pgno == PagerMethods.sqlite3PagerPagenumber (this.pDbPage));
 				Debug.Assert (this ==  PagerMethods.sqlite3PagerGetExtra  (this.pDbPage));
                 Debug.Assert(this.aData == this.pDbPage.sqlite3PagerGetData());
-				if (0 == this.isInit) {
-					u16 pc;
-					///
-///<summary>
-///Address of a freeblock within pPage.aData[] 
-///</summary>
+				if (false == this.isInit) {
+					u16 pc;///Address of a freeblock within pPage.aData[] 
+                    u8 hdr = this.hdrOffset;///Offset to beginning of page header 
+					u8[] data = this.aData;;///Equal to pPage.aData 
+                    BtShared pBt = this.pBt;///The main btree structure 
+                    int usableSize = (int)pBt.usableSize;///Amount of usable space on each page 
+					u16 cellOffset;///Offset from start of page to first cell pointer 
+					int nFree;///Number of unused bytes on the page 
+                    int top = BTreeMethods.get2byteNotZero(data, hdr + 5);///First byte of the cell content area 
+					int iCellFirst;///First allowable cell or freeblock offset 
+					int iCellLast;///Last possible cell or freeblock offset 
 
-					u8 hdr;
-					///
-///<summary>
-///Offset to beginning of page header 
-///</summary>
-
-					u8[] data;
-					///
-///<summary>
-///Equal to pPage.aData 
-///</summary>
-
-					BtShared pBt;
-					///
-///<summary>
-///The main btree structure 
-///</summary>
-
-					int usableSize;
-					///
-///<summary>
-///Amount of usable space on each page 
-///</summary>
-
-					u16 cellOffset;
-					///
-///<summary>
-///Offset from start of page to first cell pointer 
-///</summary>
-
-					int nFree;
-					///
-///<summary>
-///Number of unused bytes on the page 
-///</summary>
-
-					int top;
-					///
-///<summary>
-///First byte of the cell content area 
-///</summary>
-
-					int iCellFirst;
-					///
-///<summary>
-///First allowable cell or freeblock offset 
-///</summary>
-
-					int iCellLast;
-					///
-///<summary>
-///Last possible cell or freeblock offset 
-///</summary>
-
-					pBt = this.pBt;
-					hdr = this.hdrOffset;
-					data = this.aData;
 					if (this.decodeFlags (data [hdr]) != 0)
 						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					Debug.Assert (pBt.pageSize >= 512 && pBt.pageSize <= 65536);
 					this.maskPage = (u16)(pBt.pageSize - 1);
 					this.nOverflow = 0;
-					usableSize = (int)pBt.usableSize;
-					this.cellOffset = (cellOffset = (u16)(hdr + 12 - 4 * this.leaf));
-                    top = BTreeMethods.get2byteNotZero(data, hdr + 5);
+					this.cellOffset = (cellOffset = (u16)(hdr + 12 - (this.leaf?4:0)));
+                    
 					this.nCell = (u16)(get2byte (data, hdr + 3));
 					if (this.nCell > MX_CELL (pBt)) {
-						///
-///<summary>
 ///To many cells for a single page.  The page must be corrupt 
-///</summary>
 
 						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
 					sqliteinth.testcase (this.nCell == MX_CELL (pBt));
-					///
-///<summary>
 ///A malformed database page might cause us to read past the end
 ///of page when parsing a cell.
 ///
 ///The following block of code checks early to see if a cell extends
 ///past the end of a page boundary and causes SQLITE_CORRUPT to be
 ///returned if it does.
-///
-///</summary>
 
 					iCellFirst = cellOffset + 2 * this.nCell;
 					iCellLast = usableSize - 4;
@@ -1221,7 +1009,7 @@ namespace Community.CsharpSqlite
 						return sqliteinth.SQLITE_CORRUPT_BKPT();
 					}
 					this.nFree = (u16)(nFree - iCellFirst);
-					this.isInit = 1;
+					this.isInit = true;
 				}
 				return SqlResult.SQLITE_OK;
 			}
@@ -1259,7 +1047,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert (pBt.pageSize >= 512 && pBt.pageSize <= 65536);
 				this.maskPage = (u16)(pBt.pageSize - 1);
 				this.nCell = 0;
-				this.isInit = 1;
+				this.isInit = true;
 			}
 
 			/**
@@ -1289,7 +1077,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				BtShared pBt = this.pBt;
-				u8 isInitOrig = this.isInit;
+				bool isInitOrig = this.isInit;
 				Pgno pgno = this.pgno;
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				rc = this.btreeInitPage ();
@@ -1300,12 +1088,12 @@ namespace Community.CsharpSqlite
 				for (i = 0; i < nCell; i++) {
 					int pCell = this.findCell (i);
 					this.ptrmapPutOvflPtr (pCell, ref rc);
-					if (0 == this.leaf) {
+					if (false == this.leaf) {
 						Pgno childPgno = Converter.sqlite3Get4byte (this.aData, pCell);
 						pBt.ptrmapPut (childPgno, PTRMAP_BTREE, pgno, ref rc);
 					}
 				}
-				if (0 == this.leaf) {
+				if (false == this.leaf) {
 					Pgno childPgno = Converter.sqlite3Get4byte (this.aData, this.hdrOffset + 8);
 					pBt.ptrmapPut (childPgno, PTRMAP_BTREE, pgno, ref rc);
 				}
@@ -1346,7 +1134,7 @@ namespace Community.CsharpSqlite
 					Converter.sqlite3Put4byte (this.aData, iTo);
 				}
 				else {
-					u8 isInitOrig = this.isInit;
+					bool isInitOrig = this.isInit;
 					int i;
 					int nCell;
 					this.btreeInitPage ();
@@ -1400,39 +1188,15 @@ namespace Community.CsharpSqlite
 ///later.
 ///</summary>
 */
-            public SqlResult fillInCell (///
-///<summary>
-///The page that contains the cell 
-///</summary>
-
-			byte[] pCell, ///
-///<summary>
-///Complete text of the cell 
-///</summary>
-
-			byte[] pKey, i64 nKey, ///
-///<summary>
-///The key 
-///</summary>
-
-			byte[] pData, int nData, ///
-///<summary>
-///The data 
-///</summary>
-
-			int nZero, ///
-///<summary>
-///Extra zero bytes to append to pData 
-///</summary>
-
-			ref int pnSize///
-///<summary>
-///Write cell size here 
-///</summary>
-
+            public SqlResult fillInCell (
+			    byte[] pCell, ///Complete text of the cell 
+    			byte[] pKey, i64 nKey, ///The key 
+    			byte[] pData, int nData, ///The data 
+			    int nZero,///Extra zero bytes to append to pData 
+    			ref int pnSize///Write cell size here 
 			)
 			{
-				int nPayload;
+				
 				u8[] pSrc;
 				int pSrcIndex = 0;
 				int nSrc, n;
@@ -1449,25 +1213,20 @@ namespace Community.CsharpSqlite
 				int nHeader;
 				CellInfo info = new CellInfo ();
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
-				///
-///<summary>
 ///pPage is not necessarily writeable since pCell might be auxiliary
 ///buffer space that is separate from the pPage buffer area 
-///</summary>
 
 				// TODO -- Determine if the following Assert is needed under c#
 				//Debug.Assert( pCell < pPage.aData || pCell >= &pPage.aData[pBt.pageSize]
 				//          || sqlite3PagerIswriteable(pPage.pDbPage) );
 				///
-///<summary>
 ///Fill in the header. 
-///</summary>
 
 				nHeader = 0;
-				if (0 == this.leaf) {
+				if (false == this.leaf) {
 					nHeader += 4;
 				}
-				if (this.hasData != 0) {
+				if (this.hasData != false) {
                     nHeader += (int)utilc.putVarint(pCell, nHeader, (int)(nData + nZero));
 					//putVarint( pCell[nHeader], nData + nZero );
 				}
@@ -1485,8 +1244,8 @@ namespace Community.CsharpSqlite
 ///Fill in the payload 
 ///</summary>
 
-				nPayload = nData + nZero;
-				if (this.intKey != 0) {
+				int nPayload = nData + nZero;
+				if (this.intKey != false) {
 					pSrc = pData;
 					nSrc = nData;
 					nData = 0;
@@ -1633,43 +1392,16 @@ namespace Community.CsharpSqlite
 ///<param name="removes the reference to the cell from pPage.">removes the reference to the cell from pPage.</param>
 ///<param name=""></param>
 ///<param name=""sz" must be the number of bytes in the cell.">"sz" must be the number of bytes in the cell.</param>
-*/public void dropCell (int idx, int sz, ref SqlResult pRC)
+*/
+            public void dropCell (int idx, int sz, ref SqlResult pRC)
 			{
-				u32 pc;
-				///
-///<summary>
-///Offset to cell content of cell being deleted 
-///</summary>
+				u32 pc;///Offset to cell content of cell being deleted 
 
-				u8[] data;
-				///
-///<summary>
-///pPage.aData 
-///</summary>
-
-				int ptr;
-				///
-///<summary>
-///Used to move bytes around within data[] 
-///</summary>
-
-				int endPtr;
-                ///
-                ///<summary>
-                ///End of loop 
-                ///</summary>
-
-                SqlResult rc;
-				///
-///<summary>
-///The return code 
-///</summary>
-
-				int hdr;
-				///
-///<summary>
-///Beginning of the header.  0 most pages.  100 page 1 
-///</summary>
+				u8[] data;///pPage.aData 
+				int ptr;///Used to move bytes around within data[] 
+				int endPtr;///End of loop 
+                SqlResult rc;///The return code 
+				int hdr;///Beginning of the header.  0 most pages.  100 page 1 
 
 				if (pRC != 0)
 					return;
@@ -1726,123 +1458,52 @@ namespace Community.CsharpSqlite
 ///<param name="cell. The caller will overwrite them after this function returns. If">cell. The caller will overwrite them after this function returns. If</param>
 ///<param name="nSkip is non">zero, then pCell may not point to an invalid memory location</param>
 ///<param name="(but pCell+nSkip is always valid).">(but pCell+nSkip is always valid).</param>
-*/public void insertCell (///
-///<summary>
-///Page into which we are copying 
-///</summary>
-
-			int i, ///
-///<summary>
-///</summary>
-///<param name="New cell becomes the i">th cell of the page </param>
-
-			u8[] pCell, ///
-///<summary>
-///Content of the new cell 
-///</summary>
-
-			int sz, ///
-///<summary>
-///Bytes of content in pCell 
-///</summary>
-
-			u8[] pTemp, ///
-///<summary>
-///Temp storage space for pCell, if needed 
-///</summary>
-
-			Pgno iChild, ///
-///<summary>
-///</summary>
-///<param name="If non">zero, replace first 4 bytes with this value </param>
-
-			ref SqlResult pRC///
-                             ///<summary>
-                             ///Read and write return code from here 
-                             ///</summary>
-
+*/
+            public void insertCell (
+			    int idxCell, ///New cell becomes the i-th cell of the page >
+			    u8[] pCell,///Content of the new cell 
+			    int sz, ///Bytes of content in pCell 
+			    u8[] pTemp, ///Temp storage space for pCell, if needed 
+			    Pgno iChild,///If non-zero, replace first 4 bytes with this value 
+			    ref SqlResult pRC////Read and write return code from here 
             )
 			{
-				int idx = 0;
-				///
-///<summary>
-///Where to write new cell content in data[] 
-///</summary>
-
-				int j;
-				///
-///<summary>
-///Loop counter 
-///</summary>
-
-				int end;
-				///
-///<summary>
-///First byte past the last cell pointer in data[] 
-///</summary>
-
-				int ins;
-				///
-///<summary>
-///Index in data[] where new cell pointer is inserted 
-///</summary>
-
-				int cellOffset;
-				///
-///<summary>
-///Address of first cell pointer in data[] 
-///</summary>
-
-				u8[] data;
-				///
-///<summary>
-///The content of the whole page 
-///</summary>
-
-				u8 ptr;
-				///
-///<summary>
-///Used for moving information around in data[] 
-///</summary>
-
-				u8 endPtr;
-				///
-///<summary>
-///End of the loop 
-///</summary>
-
 				int nSkip = (iChild != 0 ? 4 : 0);
 				if (pRC != 0)
 					return;
-				Debug.Assert (i >= 0 && i <= this.nCell + this.nOverflow);
+				Debug.Assert (idxCell >= 0 && idxCell <= this.nCell + this.nOverflow);
 				Debug.Assert (this.nCell <= MX_CELL (this.pBt) && MX_CELL (this.pBt) <= 10921);
 				Debug.Assert (this.nOverflow <= Sqlite3.ArraySize (this.aOvfl));
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
-				///
-///<summary>
 ///The cell should normally be sized correctly.  However, when moving a
 ///malformed cell from a leaf page to an interior page, if the cell size
 ///wanted to be less than 4 but got rounded up to 4 on the leaf, then size
-///</summary>
-///<param name="might be less than 8 (leaf">size + pointer) on the interior node.  Hence</param>
-///<param name="the term after the || in the following assert(). ">the term after the || in the following assert(). </param>
+///might be less than 8 (leaf">size + pointer) on the interior node.  Hence</param>
+///the term after the || in the following assert(). the term after the || in the following assert(). 
 
 				Debug.Assert (sz == this.cellSizePtr (pCell) || (sz == 8 && iChild > 0));
-				if (this.nOverflow != 0 || sz + 2 > this.nFree) {
-					if (pTemp != null) {
-						Buffer.BlockCopy (pCell, nSkip, pTemp, nSkip, sz - nSkip);
-						//memcpy(pTemp+nSkip, pCell+nSkip, sz-nSkip);
-						pCell = pTemp;
-					}
-					if (iChild != 0) {
-						Converter.sqlite3Put4byte (pCell, iChild);
-					}
-					j = this.nOverflow++;
-					Debug.Assert (j < this.aOvfl.Length);
-					//(int)(sizeof(pPage.aOvfl)/sizeof(pPage.aOvfl[0])) );
-					this.aOvfl [j].pCell = pCell;
-					this.aOvfl [j].idx = (u16)i;
-				}
+
+                if (this.nOverflow != 0 || sz + 2 > this.nFree)//does not fit
+                {
+                    if (pTemp != null)
+                    {
+                        Buffer.BlockCopy(pCell, nSkip, pTemp, nSkip, sz - nSkip);
+                        //memcpy(pTemp+nSkip, pCell+nSkip, sz-nSkip);
+                        pCell = pTemp;
+                    }
+                    if (iChild != 0)
+                    {
+                        Converter.sqlite3Put4byte(pCell, iChild);
+                    }
+                    {
+                        int i = this.nOverflow++;
+                        Debug.Assert(i < this.aOvfl.Length);
+                        //(int)(sizeof(pPage.aOvfl)/sizeof(pPage.aOvfl[0])) );
+                        this.aOvfl[i].pCell = pCell;
+                        this.aOvfl[i].idx = (u16)idxCell;
+                    }
+                }
+                    //if dtata fits in page
 				else {
 					var rc = PagerMethods.sqlite3PagerWrite (this.pDbPage);
 					if (rc != SqlResult.SQLITE_OK) {
@@ -1850,11 +1511,16 @@ namespace Community.CsharpSqlite
 						return;
 					}
 					Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
-					data = this.aData;
-					cellOffset = this.cellOffset;
-					end = cellOffset + 2 * this.nCell;
-					ins = cellOffset + 2 * i;
-					rc = this.allocateSpace (sz, ref idx);
+
+                    int newCellDataLocation = 0;///Where to write new cell content in data[] 
+                    int cellOffset = this.cellOffset;///Address of first cell pointer in data[] 
+                    int end = cellOffset + 2 * this.nCell;///First byte past the last cell pointer in data[] 
+                    int cellPointerLocation = cellOffset + 2 * idxCell;///Index in data[] where new cell pointer is inserted 
+                    u8[] pageDataBuffer = this.aData; ;///The content of the whole page 
+                    u8 ptr;///Used for moving information around in data[] 
+                    u8 endPtr;///End of the loop 
+                           
+					rc = this.allocateSpace (sz, ref newCellDataLocation);
 					if (rc != 0) {
 						pRC = rc;
 						return;
@@ -1865,14 +1531,14 @@ namespace Community.CsharpSqlite
 ///if it returns success 
 ///</summary>
 
-					Debug.Assert (idx >= end + 2);
-					Debug.Assert (idx + sz <= (int)this.pBt.usableSize);
+					Debug.Assert (newCellDataLocation >= end + 2);
+					Debug.Assert (newCellDataLocation + sz <= (int)this.pBt.usableSize);
 					this.nCell++;
 					this.nFree -= (u16)(2 + sz);
-					Buffer.BlockCopy (pCell, nSkip, data, idx + nSkip, sz - nSkip);
+					Buffer.BlockCopy (pCell, nSkip, pageDataBuffer, newCellDataLocation + nSkip, sz - nSkip);
 					//memcpy( data[idx + nSkip], pCell + nSkip, sz - nSkip );
 					if (iChild != 0) {
-						Converter.sqlite3Put4byte (data, idx, iChild);
+						Converter.sqlite3Put4byte (pageDataBuffer, newCellDataLocation, iChild);
 					}
 					//ptr = &data[end];
 					//endPtr = &data[ins];
@@ -1882,180 +1548,53 @@ namespace Community.CsharpSqlite
 					//  *(u16*)ptr = *(u16*)&ptr[-2];
 					//  ptr -= 2;
 					//}
-					for (j = end; j > ins; j -= 2) {
-						data [j + 0] = data [j - 2];
-						data [j + 1] = data [j - 1];
+
+                    //shifting array by 2 bytes
+                    //SubArray<>
+					for (int j = end; j > cellPointerLocation; j --) {
+						pageDataBuffer [j + 0] = pageDataBuffer [j - 2];
 					}
-					put2byte (data, ins, idx);
-					put2byte (data, this.hdrOffset + 3, this.nCell);
+					put2byte (pageDataBuffer, cellPointerLocation, newCellDataLocation);
+					put2byte (pageDataBuffer, this.hdrOffset + Offsets.nCell, this.nCell);
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if (this.pBt.autoVacuum) {
-						///
-///<summary>
 ///The cell may contain a pointer to an overflow page. If so, write
 ///the entry for the overflow page into the pointer map.
-///
-///</summary>
-
 						this.ptrmapPutOvflPtr (pCell, ref pRC);
 					}
 					#endif
 				}
 			}
 
-			/**
-///<summary>
+            #region assemblePage
+            ///<summary>
 ///Add a list of cells to a page.  The page should be initially empty.
 ///The cells are guaranteed to fit on the page.
 ///</summary>
-*/public void assemblePage (///
-///<summary>
-///The page to be assemblied 
-///</summary>
 
-			int nCell, ///
-///<summary>
-///The number of cells to add to this page 
-///</summary>
-
-			u8[] apCell, ///
-///<summary>
-///Pointer to a single the cell bodies 
-///</summary>
-
-			int[] aSize///
-///<summary>
-///Sizes of the cells bodie
-///</summary>
-
+            public void assemblePage (
+                int nCell, ///The number of cells to add to this page
+                u8[] apCell,///Pointer to a single the cell bodies   
+                int[] aSize///Sizes of the cells bodie
 			)
 			{
-				int i;
-				///
-///<summary>
-///Loop counter 
-///</summary>
-
-				int pCellptr;
-				///
-///<summary>
-///Address of next cell pointer 
-///</summary>
-
-				int cellbody;
-				///
-///<summary>
-///Address of next cell body 
-///</summary>
-
-				byte[] data = this.aData;
-				///
-///<summary>
-///Pointer to data for pPage 
-///</summary>
-
-				int hdr = this.hdrOffset;
-				///
-///<summary>
-///Offset of header on pPage 
-///</summary>
-
-				int nUsable = (int)this.pBt.usableSize;
-				///
-///<summary>
-///Usable size of page 
-///</summary>
-
-				Debug.Assert (this.nOverflow == 0);
-				Debug.Assert (  pBt.mutex.sqlite3_mutex_held());
-				Debug.Assert (nCell >= 0 && nCell <= (int)MX_CELL (this.pBt) && (int)MX_CELL (this.pBt) <= 10921);
-				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
-				///
-///<summary>
-///Check that the page has just been zeroed by zeroPage() 
-///</summary>
-
-				Debug.Assert (this.nCell == 0);
-				Debug.Assert (BTreeMethods.get2byteNotZero (data, hdr + 5) == nUsable);
-				pCellptr = this.cellOffset + nCell * 2;
-				//data[pPage.cellOffset + nCell * 2];
-				cellbody = nUsable;
-				for (i = nCell - 1; i >= 0; i--) {
-					u16 sz = (u16)aSize [i];
-					pCellptr -= 2;
-					cellbody -= sz;
-					put2byte (data, pCellptr, cellbody);
-					Buffer.BlockCopy (apCell, 0, data, cellbody, sz);
-					// memcpy(&data[cellbody], apCell[i], sz);
-				}
-				put2byte (data, hdr + 3, nCell);
-				put2byte (data, hdr + 5, cellbody);
-				this.nFree -= (u16)(nCell * 2 + nUsable - cellbody);
-				this.nCell = (u16)nCell;
+                assemblePage(nCell,apCell ,Array.ConvertAll( aSize,i=>(u16)i));
 			}
 
-			public void assemblePage (///
-///<summary>
-///The page to be assemblied 
-///</summary>
-
-			int nCell, ///
-///<summary>
-///The number of cells to add to this page 
-///</summary>
-
-			u8[][] apCell, ///
-///<summary>
-///Pointers to cell bodies 
-///</summary>
-
-			u16[] aSize, ///
-///<summary>
-///Sizes of the cells 
-///</summary>
-
-			int offset///
-///<summary>
-///Offset into the cell bodies, for c#  
-///</summary>
-
-			)
+			public void assemblePage (
+                int nCell, ///The number of cells to add to this page 
+                u8[][] apCell, ///Pointers to cell bodies 
+                u16[] aSize, ///Sizes of the cells 
+                int offset///Offset into the cell bodies, for c#  
+            )
 			{
-				int i;
-				///
-///<summary>
-///Loop counter 
-///</summary>
+                int i;///Loop counter
 
-				int pCellptr;
-				///
-///<summary>
-///Address of next cell pointer 
-///</summary>
-
-				int cellbody;
-				///
-///<summary>
-///Address of next cell body 
-///</summary>
-
-				byte[] data = this.aData;
-				///
-///<summary>
-///Pointer to data for pPage 
-///</summary>
-
-				int hdr = this.hdrOffset;
-				///
-///<summary>
-///Offset of header on pPage 
-///</summary>
-
-				int nUsable = (int)this.pBt.usableSize;
-				///
-///<summary>
-///Usable size of page 
-///</summary>
+                int pCellptr;///Address of next cell pointer 
+				int cellbody;///Address of next cell body 
+				byte[] data = this.aData;///Pointer to data for pPage 
+				int hdr = this.hdrOffset;///Offset of header on pPage 
+				int nUsable = (int)this.pBt.usableSize;///Usable size of page 
 
 				Debug.Assert (this.nOverflow == 0);
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
@@ -2078,97 +1617,49 @@ namespace Community.CsharpSqlite
 					Buffer.BlockCopy (apCell [offset + i], 0, data, cellbody, aSize [i + offset]);
 					//          memcpy(&data[cellbody], apCell[i], aSize[i]);
 				}
-				put2byte (data, hdr + 3, nCell);
-				put2byte (data, hdr + 5, cellbody);
+				put2byte (data, hdr + Offsets.nCell, nCell);
+				put2byte (data, hdr + Offsets.cellbody, cellbody);
 				this.nFree -= (u16)(nCell * 2 + nUsable - cellbody);
 				this.nCell = (u16)nCell;
 			}
 
-			public void assemblePage (///
-///<summary>
-///The page to be assemblied 
-///</summary>
-
-			int nCell, ///
-///<summary>
-///The number of cells to add to this page 
-///</summary>
-
-			u8[] apCell, ///
-///<summary>
-///Pointers to cell bodies 
-///</summary>
-
-			u16[] aSize///
-///<summary>
-///Sizes of the cells 
-///</summary>
-
+			public void assemblePage (
+			    int nCell, ///The number of cells to add to this page 
+			    u8[] apCell, ///Pointers to cell bodies 
+			    u16[] aSize///Sizes of the cells 
 			)
 			{
-				int i;
-				///
-///<summary>
-///Loop counter 
-///</summary>
-
-				int pCellptr;
-				///
-///<summary>
-///Address of next cell pointer 
-///</summary>
-
-				int cellbody;
-				///
-///<summary>
-///Address of next cell body 
-///</summary>
-
-				u8[] data = this.aData;
-				///
-///<summary>
-///Pointer to data for pPage 
-///</summary>
-
-				int hdr = this.hdrOffset;
-				///
-///<summary>
-///Offset of header on pPage 
-///</summary>
-
-				int nUsable = (int)this.pBt.usableSize;
-				///
-///<summary>
-///Usable size of page 
-///</summary>
+                Console.WriteLine("-----------Assemble page with " + nCell);
 
 				Debug.Assert (this.nOverflow == 0);
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				Debug.Assert (nCell >= 0 && nCell <= MX_CELL (this.pBt) && MX_CELL (this.pBt) <= 5460);
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
-				///
-///<summary>
 ///Check that the page has just been zeroed by zeroPage() 
-///</summary>
 
 				Debug.Assert (this.nCell == 0);
-				Debug.Assert (get2byte (data, hdr + 5) == nUsable);
-				pCellptr = this.cellOffset + nCell * 2;
-				//&data[pPage.cellOffset + nCell * 2];
-				cellbody = nUsable;
-				for (i = nCell - 1; i >= 0; i--) {
+                Debug.Assert(get2byte(this.aData, this.hdrOffset + 5) == this.pBt.usableSize);
+                int pCellptr = this.cellOffset + nCell * 2; ///Address of next cell pointer 
+                int cellbody =(int) this.pBt.usableSize;///Address of next cell body 
+                //&data[pPage.cellOffset + nCell * 2];
+                
+				
+				for (int i = nCell - 1; i >= 0; i--) {
 					pCellptr -= 2;
 					cellbody -= aSize [i];
-					put2byte (data, pCellptr, cellbody);
-					Buffer.BlockCopy (apCell, 0, data, cellbody, aSize [i]);
+                    put2byte(this.aData, pCellptr, cellbody);
+                    Buffer.BlockCopy(apCell, 0, this.aData, cellbody, aSize[i]);
 					//memcpy( data[cellbody], apCell[i], aSize[i] );
 				}
-				put2byte (data, hdr + 3, nCell);
-				put2byte (data, hdr + 5, cellbody);
-				this.nFree -= (u16)(nCell * 2 + nUsable - cellbody);
+                put2byte(this.aData, this.hdrOffset + Offsets.nCell, nCell);
+                put2byte(this.aData, this.hdrOffset + Offsets.cellbody, cellbody);
+                this.nFree -= (u16)(nCell * 2 + this.pBt.usableSize - cellbody);
 				this.nCell = (u16)nCell;
 			}
 
+#endregion
+
+           
 			/**
 ///<summary>
 ///This version of balance() handles the common special case where
@@ -2328,11 +1819,9 @@ namespace Community.CsharpSqlite
 			}
 
 			/**
-///<summary>
-///</summary>
-///<param name="This function is used to copy the contents of the b">tree node stored</param>
-///<param name="on page pFrom to page pTo. If page pFrom was not a leaf page, then">on page pFrom to page pTo. If page pFrom was not a leaf page, then</param>
-///<param name="the pointer">map entries for each child page are updated so that the</param>
+///This function is used to copy the contents of the b">tree node stored</param>
+///on page pFrom to page pTo. If page pFrom was not a leaf page, then 
+///the pointer map entries for each child page are updated so that the
 ///<param name="parent page stored in the pointer map is page pTo. If pFrom contained">parent page stored in the pointer map is page pTo. If pFrom contained</param>
 ///<param name="any cells with overflow page pointers, then the corresponding pointer">any cells with overflow page pointers, then the corresponding pointer</param>
 ///<param name="map entries are also updated so that the parent page is page pTo.">map entries are also updated so that the parent page is page pTo.</param>
@@ -2355,7 +1844,7 @@ namespace Community.CsharpSqlite
 					int iToHdr = ((pTo.pgno == 1) ? 100 : 0);
 					SqlResult rc;
 					int iData;
-					Debug.Assert (this.isInit != 0);
+					Debug.Assert (this.isInit != false);
 					Debug.Assert (this.nFree >= iToHdr);
 					Debug.Assert (get2byte (aFrom, iFromHdr + 5) <= (int)pBt.usableSize);
 					///
@@ -2377,7 +1866,7 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-					pTo.isInit = 0;
+					pTo.isInit = false;
 					rc = pTo.btreeInitPage ();
 					if (rc != SqlResult.SQLITE_OK) {
 						pRC = rc;
@@ -2731,8 +2220,8 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-				leafCorrection = (u16)(apOld [0].leaf * 4);
-				leafData = apOld [0].hasData;
+				leafCorrection = (u16)(apOld [0].leaf ?4:0);
+				leafData = apOld [0].hasData?1:0;
 				for (i = 0; i < nOld; i++) {
 					int limit;
 					///
@@ -2799,7 +2288,7 @@ namespace Community.CsharpSqlite
 						//apCell[nCell] = pTemp + leafCorrection;
 						Debug.Assert (leafCorrection == 0 || leafCorrection == 4);
 						szCell [nCell] = (u16)(szCell [nCell] - leafCorrection);
-						if (0 == pOld.leaf) {
+						if (false == pOld.leaf) {
 							Debug.Assert (leafCorrection == 0);
 							Debug.Assert (pOld.hdrOffset == 0);
 							///
@@ -3062,7 +2551,7 @@ namespace Community.CsharpSqlite
 						sz = szCell [j] + leafCorrection;
 						pTemp = malloc_cs.sqlite3Malloc (sz);
 						//&aOvflSpace[iOvflSpace];
-						if (0 == pNew.leaf) {
+						if (false == pNew.leaf) {
 							Buffer.BlockCopy (pCell, 0, pNew.aData, 8, 4);
 							//memcpy( pNew.aData[8], pCell, 4 );
 						}
@@ -3285,7 +2774,7 @@ ptrmapCheckPages(apNew, nNew);
 ptrmapCheckPages(pParent, 1);
 #endif
 					}
-				Debug.Assert (this.isInit != 0);
+				Debug.Assert (this.isInit != false);
 				TRACE ("BALANCE: finished: old=%d new=%d cells=%d\n", nOld, nNew, nCell);
 				///
 ///<summary>
@@ -3407,7 +2896,6 @@ ptrmapCheckPages(pParent, 1);
 **
 ** This routine works only for pages that do not contain overflow cells.
 */
-
 			public int findCell (int iCell)
 			{
 				return get2byte (this.aData, this.cellOffset + 2 * (iCell));

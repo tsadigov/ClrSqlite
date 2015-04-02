@@ -5806,59 +5806,34 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 						///</summary>
 						case OpCode.OP_Insert:
 						case OpCode.OP_InsertInt: {
-							Mem pData;
-							///
-							///<summary>
+                            Mem pData = aMem[pOp.p2] ;
+                            Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
+                            Debug.Assert(pData.memIsValid());
+
 							///MEM cell holding data for the record to be inserted 
-							///</summary>
 							Mem pKey;
-							///
-							///<summary>
 							///MEM cell holding key  for the record 
-							///</summary>
 							i64 iKey;
-							///
-							///<summary>
 							///The integer ROWID or key for the record to be inserted 
-							///</summary>
-							VdbeCursor pC;
-							///
-							///<summary>
+                            VdbeCursor pC = this.apCsr[pOp.p1];
+                                Debug.Assert(pC != null);
+                                Debug.Assert(pC.pCursor != null);
+                                Debug.Assert(pC.pseudoTableReg == 0);
+                                Debug.Assert(pC.isTable);
+
 							///Cursor to table into which insert is written 
-							///</summary>
 							int nZero;
-							///
-							///<summary>
-							///</summary>
 							///<param name="Number of zero">bytes to append </param>
 							int seekResult;
-							///
-							///<summary>
 							///Result of prior seek or 0 if no USESEEKRESULT flag 
-							///</summary>
 							string zDb;
-							///
-							///<summary>
-							///</summary>
 							///<param name="database name "> used by the update hook </param>
 							string zTbl;
-							///
-							///<summary>
-							///</summary>
 							///<param name="Table name "> used by the opdate hook </param>
 							int op;
-							///
-							///<summary>
 							///Opcode for update hook: SQLITE_UPDATE or SQLITE_INSERT 
-							///</summary>
-							pData=aMem[pOp.p2];
-							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							Debug.Assert(pData.memIsValid());
-							pC=this.apCsr[pOp.p1];
-							Debug.Assert(pC!=null);
-							Debug.Assert(pC.pCursor!=null);
-							Debug.Assert(pC.pseudoTableReg==0);
-							Debug.Assert(pC.isTable);
+							
+							
 							REGISTER_TRACE(this,pOp.p2,pData);
 							if(pOp.OpCode==OpCode.OP_Insert) {
 								pKey=aMem[pOp.p3];
@@ -5894,9 +5869,6 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							pC.rowidIsValid=false;
 							pC.deferredMoveto=false;
 							pC.cacheStatus=CACHE_STALE;
-							///
-							///<summary>
-							///</summary>
 							///<param name="Invoke the update">hook if required. </param>
 							if(rc==SqlResult.SQLITE_OK&&db.xUpdateCallback!=null&&pOp.p4.z!=null) {
 								zDb=db.aDb[pC.iDb].zName;
@@ -5912,6 +5884,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							}
 							break;
 						}
+
 						///
 						///<summary>
 						///Opcode: Delete P1 P2 * P4 *

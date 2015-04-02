@@ -9,7 +9,7 @@ using u64=System.UInt64;
 using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
-	using DbPage=Sqlite3.PgHdr;
+	using DbPage=PgHdr;
 	using System.Text;
 	public partial class Sqlite3 {
 
@@ -182,7 +182,7 @@ aOverflow= null;
                 ///table, then malloc space for and store the pCur.nKey bytes of key
                 ///data.
                 ///</summary>
-                if (0 == this.apPage[0].intKey)
+                if (false == this.apPage[0].intKey)
                 {
                     byte[] pKey = malloc_cs.sqlite3Malloc((int)this.nKey);
                     //if( pKey !=null){
@@ -198,7 +198,7 @@ aOverflow= null;
                     //  rc = SQLITE_NOMEM;
                     //}
                 }
-                Debug.Assert(0 == this.apPage[0].intKey || null == this.pKey);
+                Debug.Assert(false == this.apPage[0].intKey || null == this.pKey);
                 if (rc == SqlResult.SQLITE_OK)
                 {
                     int i;
@@ -391,7 +391,7 @@ aOverflow= null;
                     ///<param name="accordingly.">accordingly.</param>
                     ///<param name=""></param>
                     pPage = this.apPage[this.iPage];
-                    if (pPage.leaf != 0 || 0 == pPage.intKey)
+                    if (pPage.leaf != false || false == pPage.intKey)
                     {
                         nEntry += pPage.nCell;
                     }
@@ -408,7 +408,7 @@ aOverflow= null;
                     ///<param name="If all pages in the tree have been visited, return SqlResult.SQLITE_OK to the">If all pages in the tree have been visited, return SqlResult.SQLITE_OK to the</param>
                     ///<param name="caller.">caller.</param>
                     ///<param name=""></param>
-                    if (pPage.leaf != 0)
+                    if (pPage.leaf != false)
                     {
                         do
                         {
@@ -515,7 +515,7 @@ aOverflow= null;
                 ///</summary>
                 ///<param name="sub">tree headed by the child page of the cell being deleted. This makes</param>
                 ///<param name="balancing the tree following the delete operation easier.  ">balancing the tree following the delete operation easier.  </param>
-                if (0 == pPage.leaf)
+                if (false == pPage.leaf)
                 {
                     int notUsed = 0;
                     rc = this.sqlite3BtreePrevious(ref notUsed);
@@ -548,7 +548,7 @@ aOverflow= null;
                 ///<param name="by the child">page of the cell that was just deleted from an internal</param>
                 ///<param name="node. The cell from the leaf node needs to be moved to the internal">node. The cell from the leaf node needs to be moved to the internal</param>
                 ///<param name="node to replace the deleted cell.  ">node to replace the deleted cell.  </param>
-                if (0 == pPage.leaf)
+                if (false == pPage.leaf)
                 {
                     MemPage pLeaf = this.apPage[this.iPage];
                     int nCell;
@@ -601,7 +601,7 @@ aOverflow= null;
                 }
                 return rc;
             }
-            public SqlResult sqlite3BtreeInsert(///
+            public SqlResult sqlite3BtreeInsert(
                 ///<summary>
                 ///Insert data into the table of this cursor 
                 ///</summary>
@@ -629,10 +629,7 @@ aOverflow= null;
             {
                 SqlResult rc;
                 int loc = seekResult;
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="">1: before desired location  +1: after </param>
+                ///1: before desired location  +1: after 
                 int szNew = 0;
                 int idx;
                 MemPage pPage;
@@ -648,18 +645,14 @@ aOverflow= null;
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.wrFlag != 0 && pBt.inTransaction == TransType.TRANS_WRITE && !pBt.readOnly);
                 Debug.Assert(p.hasSharedCacheTableLock(this.pgnoRoot, this.pKeyInfo != null ? 1 : 0, 2));
-                ///
-                ///<summary>
+                
                 ///Assert that the caller has been consistent. If this cursor was opened
-                ///</summary>
                 ///<param name="expecting an index b">tree, then the caller should be inserting blob</param>
                 ///<param name="keys with no associated data. If the cursor was opened expecting an">keys with no associated data. If the cursor was opened expecting an</param>
                 ///<param name="intkey table, the caller should be inserting integer keys with a">intkey table, the caller should be inserting integer keys with a</param>
                 ///<param name="blob of associated data.  ">blob of associated data.  </param>
                 Debug.Assert((pKey == null) == (this.pKeyInfo == null));
-                ///
-                ///<summary>
-                ///</summary>
+                
                 ///<param name="If this is an insert into a table b">tree, invalidate any incrblob</param>
                 ///<param name="cursors open on the row being replaced (assuming this is a replace">cursors open on the row being replaced (assuming this is a replace</param>
                 ///<param name="operation ">op).  </param>
@@ -667,20 +660,16 @@ aOverflow= null;
                 {
                     p.invalidateIncrblobCursors(nKey, 0);
                 }
-                ///
-                ///<summary>
+                
                 ///Save the positions of any other cursors open on this table.
-                ///
-                ///</summary>
-                ///<param name="In some cases, the call to btreeMoveto() below is a no">op. For</param>
-                ///<param name="example, when inserting data into a table with auto">generated integer</param>
-                ///<param name="keys, the VDBE layer invokes sqlite3BtreeLast() to figure out the">keys, the VDBE layer invokes sqlite3BtreeLast() to figure out the</param>
-                ///<param name="integer key to use. It then calls this function to actually insert the">integer key to use. It then calls this function to actually insert the</param>
-                ///<param name="data into the intkey B">Tree. In this case btreeMoveto() recognizes</param>
-                ///<param name="that the cursor is already where it needs to be and returns without">that the cursor is already where it needs to be and returns without</param>
-                ///<param name="doing any work. To avoid thwarting these optimizations, it is important">doing any work. To avoid thwarting these optimizations, it is important</param>
-                ///<param name="not to clear the cursor here.">not to clear the cursor here.</param>
-                ///<param name=""></param>
+                ///In some cases, the call to btreeMoveto() below is a no">op. For</param>
+                ///example, when inserting data into a table with auto">generated integer</param>
+                ///keys, the VDBE layer invokes sqlite3BtreeLast() to figure out the">keys, the VDBE layer invokes sqlite3BtreeLast() to figure out the</param>
+                ///integer key to use. It then calls this function to actually insert the
+                ///data into the intkey B">Tree. In this case btreeMoveto() recognizes</param>
+                ///that the cursor is already where it needs to be and returns without">that the cursor is already where it needs to be and returns without</param>
+                ///doing any work. To avoid thwarting these optimizations, it is important">doing any work. To avoid thwarting these optimizations, it is important</param>
+                ///not to clear the cursor here.">not to clear the cursor here.</param>
                 rc = pBt.saveAllCursors(this.pgnoRoot, this);
                 if (rc != 0)
                     return rc;
@@ -692,10 +681,10 @@ aOverflow= null;
                 }
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID || (this.State == BtCursorState.CURSOR_INVALID && loc != 0));
                 pPage = this.apPage[this.iPage];
-                Debug.Assert(pPage.intKey != 0 || nKey >= 0);
-                Debug.Assert(pPage.leaf != 0 || 0 == pPage.intKey);
+                Debug.Assert(pPage.intKey != false || nKey >= 0);
+                Debug.Assert(pPage.leaf != false || false == pPage.intKey);
                 TRACE("INSERT: table=%d nkey=%lld ndata=%d page=%d %s\n", this.pgnoRoot, nKey, nData, pPage.pgno, loc == 0 ? "overwrite" : "new entry");
-                Debug.Assert(pPage.isInit != 0);
+                Debug.Assert(pPage.isInit != false);
                 BTreeMethods.allocateTempSpace(pBt);
                 newCell = pBt.pTmpSpace;
                 //if (newCell == null) return SQLITE_NOMEM;
@@ -715,7 +704,7 @@ aOverflow= null;
                         goto end_insert;
                     }
                     oldCell = pPage.findCell(idx);
-                    if (0 == pPage.leaf)
+                    if (false == pPage.leaf)
                     {
                         //memcpy(newCell, oldCell, 4);
                         newCell[0] = pPage.aData[oldCell + 0];
@@ -732,12 +721,12 @@ aOverflow= null;
                 else
                     if (loc < 0 && pPage.nCell > 0)
                     {
-                        Debug.Assert(pPage.leaf != 0);
+                        Debug.Assert(pPage.leaf != false);
                         idx = ++this.aiIdx[this.iPage];
                     }
                     else
                     {
-                        Debug.Assert(pPage.leaf != 0);
+                        Debug.Assert(pPage.leaf != false);
                     }
                 pPage.insertCell(idx, newCell, szNew, null, 0, ref rc);
                 Debug.Assert(rc != SqlResult.SQLITE_OK || pPage.nCell > 0 || pPage.nOverflow > 0);
@@ -839,7 +828,7 @@ aOverflow= null;
                             if (rc == SqlResult.SQLITE_OK)
                             {
 #if !SQLITE_OMIT_QUICKBALANCE
-                                if (pPage.hasData != 0 && pPage.nOverflow == 1 && pPage.aOvfl[0].idx == pPage.nCell && pParent.pgno != 1 && pParent.nCell == iIdx)
+                                if (pPage.hasData != false && pPage.nOverflow == 1 && pPage.aOvfl[0].idx == pPage.nCell && pParent.pgno != 1 && pParent.nCell == iIdx)
                                 {
                                     ///
                                     ///<summary>
@@ -943,8 +932,8 @@ aOverflow= null;
                 }
                 this.skipNext = 0;
                 pPage = this.apPage[this.iPage];
-                Debug.Assert(pPage.isInit != 0);
-                if (0 == pPage.leaf)
+                Debug.Assert(pPage.isInit != false);
+                if (false == pPage.leaf)
                 {
                     int idx = this.aiIdx[this.iPage];
                     rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(idx)));
@@ -970,7 +959,7 @@ aOverflow= null;
                     this.validNKey = false;
                     this.aiIdx[this.iPage]--;
                     pPage = this.apPage[this.iPage];
-                    if (pPage.intKey != 0 && 0 == pPage.leaf)
+                    if (pPage.intKey != false && false == pPage.leaf)
                     {
                         rc = this.sqlite3BtreePrevious(ref pRes);
                     }
@@ -1008,13 +997,13 @@ aOverflow= null;
                 this.skipNext = 0;
                 pPage = this.apPage[this.iPage];
                 idx = ++this.aiIdx[this.iPage];
-                Debug.Assert(pPage.isInit != 0);
+                Debug.Assert(pPage.isInit != false);
                 Debug.Assert(idx <= pPage.nCell);
                 this.info.nSize = 0;
                 this.validNKey = false;
                 if (idx >= pPage.nCell)
                 {
-                    if (0 == pPage.leaf)
+                    if (false == pPage.leaf)
                     {
                         rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8));
                         if (rc != 0)
@@ -1036,7 +1025,7 @@ aOverflow= null;
                     }
                     while (this.aiIdx[this.iPage] >= pPage.nCell);
                     pRes = 0;
-                    if (pPage.intKey != 0)
+                    if (pPage.intKey != false)
                     {
                         rc = this.sqlite3BtreeNext(ref pRes);
                     }
@@ -1047,7 +1036,7 @@ aOverflow= null;
                     return rc;
                 }
                 pRes = 0;
-                if (pPage.leaf != 0)
+                if (pPage.leaf != false)
                 {
                     return SqlResult.SQLITE_OK;
                 }
@@ -1097,7 +1086,7 @@ aOverflow= null;
                 ///If the cursor is already positioned at the point we are trying
                 ///to move to, then just return without doing any work 
                 ///</summary>
-                if (this.State == BtCursorState.CURSOR_VALID && this.validNKey && this.apPage[0].intKey != 0)
+                if (this.State == BtCursorState.CURSOR_VALID && this.validNKey && this.apPage[0].intKey != false)
                 {
                     if (this.info.nKey == intKey)
                     {
@@ -1116,7 +1105,7 @@ aOverflow= null;
                     return rc;
                 }
                 Debug.Assert(this.apPage[this.iPage] != null);
-                Debug.Assert(this.apPage[this.iPage].isInit != 0);
+                Debug.Assert(this.apPage[this.iPage].isInit != false);
                 Debug.Assert(this.apPage[this.iPage].nCell > 0 || this.State == BtCursorState.CURSOR_INVALID);
                 if (this.State == BtCursorState.CURSOR_INVALID)
                 {
@@ -1124,7 +1113,7 @@ aOverflow= null;
                     Debug.Assert(this.apPage[this.iPage].nCell == 0);
                     return SqlResult.SQLITE_OK;
                 }
-                Debug.Assert(this.apPage[0].intKey != 0 || pIdxKey != null);
+                Debug.Assert(this.apPage[0].intKey != false || pIdxKey != null);
                 for (; ; )
                 {
                     int lwr, upr, idx;
@@ -1141,7 +1130,7 @@ aOverflow= null;
                     ///<param name="be the right kind (index or table) of b">tree page. Otherwise</param>
                     ///<param name="a moveToChild() or moveToRoot() call would have detected corruption.  ">a moveToChild() or moveToRoot() call would have detected corruption.  </param>
                     Debug.Assert(pPage.nCell > 0);
-                    Debug.Assert(pPage.intKey == ((pIdxKey == null) ? 1 : 0));
+                    Debug.Assert(pPage.intKey == (pIdxKey == null));
                     lwr = 0;
                     upr = pPage.nCell - 1;
                     if (biasRight != 0)
@@ -1162,10 +1151,10 @@ aOverflow= null;
                         Debug.Assert(idx == this.aiIdx[this.iPage]);
                         this.info.nSize = 0;
                         pCell = pPage.findCell(idx) + pPage.childPtrSize;
-                        if (pPage.intKey != 0)
+                        if (pPage.intKey != false)
                         {
                             i64 nCellKey = 0;
-                            if (pPage.hasData != 0)
+                            if (pPage.hasData != false)
                             {
                                 u32 Dummy0 = 0;
                                 pCell += utilc.getVarint32(pPage.aData, pCell, out Dummy0);
@@ -1262,7 +1251,7 @@ aOverflow= null;
                         }
                         if (c == 0)
                         {
-                            if (pPage.intKey != 0 && 0 == pPage.leaf)
+                            if (pPage.intKey != false && false == pPage.leaf)
                             {
                                 lwr = idx;
                                 upr = lwr - 1;
@@ -1290,8 +1279,8 @@ aOverflow= null;
                         this.aiIdx[this.iPage] = (u16)(idx = (lwr + upr) / 2);
                     }
                     Debug.Assert(lwr == upr + 1);
-                    Debug.Assert(pPage.isInit != 0);
-                    if (pPage.leaf != 0)
+                    Debug.Assert(pPage.isInit != false);
+                    if (pPage.leaf != false)
                     {
                         chldPg = 0;
                     }
@@ -1393,7 +1382,7 @@ aOverflow= null;
                 MemPage pPage = null;
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                while (rc == SqlResult.SQLITE_OK && 0 == (pPage = this.apPage[this.iPage]).leaf)
+                while (rc == SqlResult.SQLITE_OK && false == (pPage = this.apPage[this.iPage]).leaf)
                 {
                     pgno = Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8);
                     this.aiIdx[this.iPage] = pPage.nCell;
@@ -1414,7 +1403,7 @@ aOverflow= null;
                 MemPage pPage;
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                while (rc == SqlResult.SQLITE_OK && 0 == (pPage = this.apPage[this.iPage]).leaf)
+                while (rc == SqlResult.SQLITE_OK && false == (pPage = this.apPage[this.iPage]).leaf)
                 {
                     Debug.Assert(this.aiIdx[this.iPage] < pPage.nCell);
                     pgno = Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(this.aiIdx[this.iPage]));
@@ -1466,8 +1455,8 @@ aOverflow= null;
                     ///<param name="expected to open it on an index b">tree. Otherwise, if pKeyInfo is</param>
                     ///<param name="NULL, the caller expects a table b">tree. If this is not the case,</param>
                     ///<param name="return an SQLITE_CORRUPT error.  ">return an SQLITE_CORRUPT error.  </param>
-                    Debug.Assert(this.apPage[0].intKey == 1 || this.apPage[0].intKey == 0);
-                    if ((this.pKeyInfo == null) != (this.apPage[0].intKey != 0))
+                    Debug.Assert(this.apPage[0].intKey == false || this.apPage[0].intKey == false);
+                    if ((this.pKeyInfo == null) != (this.apPage[0].intKey != false))
                     {
                         return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
@@ -1483,12 +1472,12 @@ aOverflow= null;
                 ///<param name="to the page.  ">to the page.  </param>
                 pRoot = this.apPage[0];
                 Debug.Assert(pRoot.pgno == this.pgnoRoot);
-                Debug.Assert(pRoot.isInit != 0 && (this.pKeyInfo == null) == (pRoot.intKey != 0));
+                Debug.Assert(pRoot.isInit != false && (this.pKeyInfo == null) == (pRoot.intKey != false));
                 this.aiIdx[0] = 0;
                 this.info.nSize = 0;
                 this.atLast = 0;
                 this.validNKey = false;
-                if (pRoot.nCell == 0 && 0 == pRoot.leaf)
+                if (pRoot.nCell == 0 && false == pRoot.leaf)
                 {
                     Pgno subpage;
                     if (pRoot.pgno != 1)
@@ -1599,7 +1588,7 @@ aOverflow= null;
                 //aPayload = pCur.info.pCell;
                 //aPayload += pCur.info.nHeader;
                 aPayload = malloc_cs.sqlite3Malloc(this.info.nSize - this.info.nHeader);
-                if (pPage.intKey != 0)
+                if (pPage.intKey != false)
                 {
                     nKey = 0;
                 }
@@ -1695,7 +1684,7 @@ return SQLITE_ABORT;
                 this.getCellInfo();
                 aPayload = this.info.pCell;
                 //pCur.info.pCell + pCur.info.nHeader;
-                nKey = (u32)(pPage.intKey != 0 ? 0 : (int)this.info.nKey);
+                nKey = (u32)(pPage.intKey != false ? 0 : (int)this.info.nKey);
                 if (NEVER(offset + amt > nKey + this.info.nData) || this.info.nLocal > pBt.usableSize//&aPayload[pCur.info.nLocal] > &pPage.aData[pBt.usableSize]
                 )
                 {
