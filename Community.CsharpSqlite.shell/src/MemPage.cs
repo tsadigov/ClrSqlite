@@ -1404,27 +1404,27 @@ namespace Community.CsharpSqlite
 */
             public void dropCell (int idx, int sz, ref SqlResult pRC)
 			{
-				u32 pc;///Offset to cell content of cell being deleted 
+                if (pRC != 0)
+                    return;
 
-				u8[] data;///pPage.aData 
-				int ptr;///Used to move bytes around within data[] 
-				int endPtr;///End of loop 
+
+                u8[] data = this.aData; ;///pPage.aData 
+                int ptr = this.cellOffset + 2 * idx; ;///Used to move bytes around within data[] 
+                u32 pc = (u32)get2byte(data, ptr);///Offset to cell content of cell being deleted 
+				
+                int endPtr;///End of loop 
                 SqlResult rc;///The return code 
-				int hdr;///Beginning of the header.  0 most pages.  100 page 1 
+                int hdr = this.hdrOffset;///Beginning of the header.  0 most pages.  100 page 1 
 
-				if (pRC != 0)
-					return;
+				
 				Debug.Assert (idx >= 0 && idx < this.nCell);
 				#if SQLITE_DEBUG
 																																																																																								  Debug.Assert( sz == cellSize( pPage, idx ) );
 #endif
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
-				data = this.aData;
-				ptr = this.cellOffset + 2 * idx;
-				//ptr = &data[pPage.cellOffset + 2 * idx];
-				pc = (u32)get2byte (data, ptr);
-				hdr = this.hdrOffset;
+				
+				
 				sqliteinth.testcase (pc == get2byte (data, hdr + 5));
 				sqliteinth.testcase (pc + sz == this.pBt.usableSize);
 				if (pc < (u32)get2byte (data, hdr + 5) || pc + sz > this.pBt.usableSize) {
@@ -1443,8 +1443,7 @@ namespace Community.CsharpSqlite
 				//  ptr += 2;
 				Buffer.BlockCopy (data, ptr + 2, data, ptr, (this.nCell - 1 - idx) * 2);
 				this.nCell--;
-				data [this.hdrOffset + 3] = (byte)(this.nCell >> 8);
-				data [this.hdrOffset + 4] = (byte)(this.nCell);
+                SaveNCell(this.nCell);
 				//put2byte( data, hdr + 3, pPage.nCell );
 				this.nFree += 2;
 			}
@@ -1526,8 +1525,6 @@ namespace Community.CsharpSqlite
                     int end = cellOffset + 2 * this.nCell;///First byte past the last cell pointer in data[] 
                     int cellPointerLocation = cellOffset + 2 * idxCell;///Index in data[] where new cell pointer is inserted 
                     u8[] pageDataBuffer = this.aData; ;///The content of the whole page 
-                    u8 ptr;///Used for moving information around in data[] 
-                    u8 endPtr;///End of the loop 
                            
 					rc = this.allocateSpace (sz, ref newCellDataLocation);
 					if (rc != 0) {
@@ -1564,7 +1561,7 @@ namespace Community.CsharpSqlite
 						pageDataBuffer [j + 0] = pageDataBuffer [j - 2];
 					}
 					put2byte (pageDataBuffer, cellPointerLocation, newCellDataLocation);
-					put2byte (pageDataBuffer, this.hdrOffset + Offsets.nCell, this.nCell);
+                    SaveNCell(this.nCell);
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if (this.pBt.autoVacuum) {
 ///The cell may contain a pointer to an overflow page. If so, write
