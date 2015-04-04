@@ -1774,97 +1774,48 @@ fclose(out);
 				var lOp=this.lOp;
 				Log.WriteHeader("Plan VdbeExec");
 				Log.Indent();
-				foreach(var item in lOp) {
-					Log.WriteLine(item.ToString(this));
-				}
-				Log.WriteHeader("---");
+				//foreach(var item in lOp) {
+					//Log.WriteLine(item.ToString(this));
+				//}
+				//Log.WriteHeader("---");
 				try {
-					///
-					///<summary>
 					///Copy of p.aOp 
-					///</summary>
 					Op pOp;
-                    ///
-                    ///<summary>
                     ///Current operation 
-                    ///</summary>
                     SqlResult rc =SqlResult.SQLITE_OK;
-					///
-					///<summary>
 					///Value to return 
-					///</summary>
 					sqlite3 db=this.db;
-					///
-					///<summary>
 					///The database 
-					///</summary>
 					u8 resetSchemaOnFault=0;
-					///
-					///<summary>
 					///Reset schema after an error if positive 
-					///</summary>
 					SqliteEncoding encoding=sqliteinth.ENC(db);
-					///
-					///<summary>
 					///The database encoding 
-					///</summary>
 					#if !SQLITE_OMIT_PROGRESS_CALLBACK
 					bool checkProgress;
-					///
-					///<summary>
 					///True if progress callbacks are enabled 
-					///</summary>
 					int nProgressOps=0;
-					///
-					///<summary>
 					///Opcodes executed since progress callback. 
-					///</summary>
 					#endif
 					Mem[] aMem=this.aMem;
-					///
-					///<summary>
 					///Copy of p.aMem 
-					///</summary>
 					Mem pIn1=null;
-					///
-					///<summary>
 					///1st input operand 
-					///</summary>
 					Mem pIn2=null;
-					///
-					///<summary>
 					///2nd input operand 
-					///</summary>
 					Mem pIn3=null;
-					///
-					///<summary>
 					///3rd input operand 
-					///</summary>
 					Mem pOut=null;
-					///
-					///<summary>
 					///Output operand 
-					///</summary>
 					int iCompare=0;
-					///
-					///<summary>
 					///Result of last  OpCode.OP_Compare operation 
-					///</summary>
 					int[] aPermute=null;
-					///
-					///<summary>
 					///Permutation of columns for  OpCode.OP_Compare 
-					///</summary>
 					i64 lastRowid=db.lastRowid;
-					///
-					///<summary>
 					///Saved value of the last insert ROWID 
-					///</summary>
 					#if VDBE_PROFILE
 																																																																																		u64 start;                   /* CPU clock count at start of opcode */
 int origPc;                  /* Program counter at start of opcode */
 #endif
-					///
 					///<summary>
 					///INSERT STACK UNION HERE **
 					///</summary>
@@ -1875,11 +1826,8 @@ int origPc;                  /* Program counter at start of opcode */
 					///</summary>
 					this.sqlite3VdbeEnter();
 					if(this.rc== SqlResult.SQLITE_NOMEM) {
-						///
-						///<summary>
 						///This happens if a malloc() inside a call to sqlite3_column_text() or
 						///sqlite3_column_text16() failed.  
-						///</summary>
 						goto no_mem;
 					}
 					Debug.Assert(this.rc==SqlResult.SQLITE_OK||this.rc==SqlResult.SQLITE_BUSY);
@@ -2042,7 +1990,7 @@ start = sqlite3Hwtime();
           memAboutToChange( p, aMem[pOp.p3] );
         }
 #endif
-						Log.WriteLine(opcodeIndex.ToString().PadLeft(2)+":\t"+pOp.ToString(this));
+						//Log.WriteLine(opcodeIndex.ToString().PadLeft(2)+":\t"+pOp.ToString(this));
 						switch(pOp.OpCode) {
 						///
 						///<summary>

@@ -438,7 +438,6 @@ namespace Community.CsharpSqlite
 				pPage.pDbPage = this;
 				pPage.pBt = pBt;
 				pPage.pgno = pgno;
-				pPage.hdrOffset = (u8)(pPage.pgno == 1 ? 100 : 0);
 				return pPage;
 			}
 

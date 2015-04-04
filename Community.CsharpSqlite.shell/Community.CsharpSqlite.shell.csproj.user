@@ -4,6 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>testdb</StartArguments>
+    <StartArguments>testdb2</StartArguments>
   </PropertyGroup>
 </Project>

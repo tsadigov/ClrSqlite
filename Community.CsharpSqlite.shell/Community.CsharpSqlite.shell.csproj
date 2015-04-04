@@ -341,8 +341,8 @@
     <Compile Include="src\Engine\VdbeOpList.cs" />
     <Compile Include="src\Index.cs" />
     <Compile Include="src\Mem.cs" />
-    <Compile Include="src\MemType.cs" />
-    <Compile Include="src\MemPage.cs" />
+    <Compile Include="src\Page\MemType.cs" />
+    <Compile Include="src\Page\MemPage.cs" />
     <Compile Include="src\MyHelpers.cs" />
     <Compile Include="src\Os\sqlite3_file.cs" />
     <Compile Include="src\Page\Pager.cs" />
@@ -371,6 +371,7 @@
     <Compile Include="src\Tools\AuthContext.cs" />
     <Compile Include="src\Tools\DbFixer.cs" />
     <Compile Include="src\Utils\StreAccum.cs" />
+    <Compile Include="src\Utils\SubArray.cs" />
     <Compile Include="src\Walker.cs" />
   </ItemGroup>
   <ItemGroup>

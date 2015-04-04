@@ -1333,7 +1333,7 @@ public static bool ISAUTOVACUUM =false;
 ///
 ///</summary>
 
-					if (false == pPage.leaf) {
+					if (false == pPage.IsLeaf) {
 						pgno = (int)Converter.sqlite3Get4byte (pCell, iCell);
 						//sqlite3Get4byte( pCell );
 						#if !SQLITE_OMIT_AUTOVACUUM
@@ -1351,7 +1351,7 @@ public static bool ISAUTOVACUUM =false;
 						depth = d2;
 					}
 				}
-				if (false == pPage.leaf) {
+				if (false == pPage.IsLeaf) {
 					pgno = (int)Converter.sqlite3Get4byte (pPage.aData, pPage.hdrOffset + 8);
 					io.sqlite3_snprintf (200, zContext, "On page %d at right child: ", iPage);
 					#if !SQLITE_OMIT_AUTOVACUUM
@@ -1372,7 +1372,7 @@ public static bool ISAUTOVACUUM =false;
 ///
 ///</summary>
 
-				if (pPage.leaf != false && pPage.intKey != false) {
+				if (pPage.IsLeaf != false && pPage.intKey != false) {
 					///
 ///<summary>
 ///if we are a left child page 
@@ -1437,7 +1437,7 @@ public static bool ISAUTOVACUUM =false;
 						hit [iLoop] = 1;
 					//memset(hit, 1, contentOffset);
 					nCell = get2byte (data, hdr + 3);
-					cellStart = hdr + 12 -  (pPage.leaf?4:0) ;
+					cellStart = hdr + 12 -  (pPage.IsLeaf?4:0) ;
 					for (i = 0; i < nCell; i++) {
 						int pc = get2byte (data, cellStart + i * 2);
 						u32 size = 65536;
