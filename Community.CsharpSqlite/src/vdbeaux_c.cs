@@ -32,7 +32,6 @@ namespace Community.CsharpSqlite
     using sqlite3_stmt = Sqlite3.Vdbe;
     using sqlite3_value = Mem;
     using Vdbe = Sqlite3.Vdbe;
-    using malloc_cs = Sqlite3.malloc_cs;    
     using System;
     using BTreeMethods=Sqlite3.BTreeMethods;     
     using System.Collections.Generic;

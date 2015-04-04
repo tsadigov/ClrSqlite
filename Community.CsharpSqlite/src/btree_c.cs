@@ -1147,7 +1147,7 @@ rc = SQLITE_NOTADB;
                 pBt.minLocal = (u16)((pBt.usableSize - 12) * 32 / 255 - 23);
                 pBt.maxLeaf = (u16)(pBt.usableSize - 35);
                 pBt.minLeaf = (u16)((pBt.usableSize - 12) * 32 / 255 - 23);
-                Debug.Assert(pBt.maxLeaf + 23 <= MX_CELL_SIZE(pBt));
+                Debug.Assert(pBt.maxLeaf + 23 <= pBt.MX_CELL_SIZE);
                 pBt.pPage1 = pPage1;
                 pBt.nPage = nPage;
                 return SqlResult.SQLITE_OK;

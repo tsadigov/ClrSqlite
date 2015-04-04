@@ -4999,25 +4999,25 @@ namespace Community.CsharpSqlite
 		//#define SQLITE_STATUS_PAGECACHE_SIZE       7
 		//#define SQLITE_STATUS_SCRATCH_SIZE         8
 		//#define SQLITE_STATUS_MALLOC_COUNT         9
-		const int SQLITE_STATUS_MEMORY_USED = 0;
+		public const int SQLITE_STATUS_MEMORY_USED = 0;
 
-		const int SQLITE_STATUS_PAGECACHE_USED = 1;
+        public const int SQLITE_STATUS_PAGECACHE_USED = 1;
 
-		const int SQLITE_STATUS_PAGECACHE_OVERFLOW = 2;
+        public const int SQLITE_STATUS_PAGECACHE_OVERFLOW = 2;
 
-		const int SQLITE_STATUS_SCRATCH_USED = 3;
+        public const int SQLITE_STATUS_SCRATCH_USED = 3;
 
-		const int SQLITE_STATUS_SCRATCH_OVERFLOW = 4;
+        public const int SQLITE_STATUS_SCRATCH_OVERFLOW = 4;
 
-		const int SQLITE_STATUS_MALLOC_SIZE = 5;
+        public const int SQLITE_STATUS_MALLOC_SIZE = 5;
 
-		const int SQLITE_STATUS_PARSER_STACK = 6;
+        public const int SQLITE_STATUS_PARSER_STACK = 6;
 
-		const int SQLITE_STATUS_PAGECACHE_SIZE = 7;
+        public const int SQLITE_STATUS_PAGECACHE_SIZE = 7;
 
-		const int SQLITE_STATUS_SCRATCH_SIZE = 8;
+        public const int SQLITE_STATUS_SCRATCH_SIZE = 8;
 
-		const int SQLITE_STATUS_MALLOC_COUNT = 9;
+        public const int SQLITE_STATUS_MALLOC_COUNT = 9;
 
 		///
 ///<summary>

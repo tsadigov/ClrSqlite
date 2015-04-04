@@ -7,7 +7,6 @@ namespace Community.CsharpSqlite
 
     using System.Linq;
     using sqlite3_stmt = Sqlite3.Vdbe;
-    using malloc_cs = Sqlite3.malloc_cs;
     
     using vdbeapi = Sqlite3.vdbeapi;
 

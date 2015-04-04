@@ -38,7 +38,6 @@ namespace Community.CsharpSqlite
 	using System.Collections.Generic;
     using BtCursor = Sqlite3.BtCursor;
     using Btree = Sqlite3.Btree;
-    using malloc_cs = Sqlite3.malloc_cs;    
     ///<summary>
     ///A cursor is a pointer into a single BTree within a database file.
     ///The cursor can seek to a BTree entry with a particular key, or

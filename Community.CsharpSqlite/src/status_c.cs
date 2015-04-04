@@ -69,7 +69,7 @@ namespace Community.CsharpSqlite {
 		///<summary>
 		/// Return the current value of a status parameter.
 		///</summary>
-		static int sqlite3StatusValue(int op) {
+		public static int sqlite3StatusValue(int op) {
 			wsdStatInit();
 			Debug.Assert(op>=0&&op<Sqlite3.ArraySize(wsdStat.nowValue));
 			return wsdStat.nowValue[op];
@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite {
 		/// caller holds appropriate locks.
 		///
 		///</summary>
-		static void sqlite3StatusAdd(int op,int N) {
+		public static void sqlite3StatusAdd(int op,int N) {
 			wsdStatInit();
 			Debug.Assert(op>=0&&op<Sqlite3.ArraySize(wsdStat.nowValue));
 			wsdStat.nowValue[op]+=N;
@@ -91,7 +91,7 @@ namespace Community.CsharpSqlite {
 		/// Set the value of a status to X.
 		///
 		///</summary>
-		static void sqlite3StatusSet(int op,int X) {
+		public static void sqlite3StatusSet(int op,int X) {
 			wsdStatInit();
 			Debug.Assert(op>=0&&op<Sqlite3.ArraySize(wsdStat.nowValue));
 			wsdStat.nowValue[op]=X;
@@ -107,7 +107,7 @@ namespace Community.CsharpSqlite {
 		/// then this routine is not threadsafe.
 		///
 		///</summary>
-        static SqlResult sqlite3_status(int op, ref int pCurrent, ref int pHighwater, int resetFlag)
+        public static SqlResult sqlite3_status(int op, ref int pCurrent, ref int pHighwater, int resetFlag)
         {
 			wsdStatInit();
 			if(op<0||op>=Sqlite3.ArraySize(wsdStat.nowValue)) {

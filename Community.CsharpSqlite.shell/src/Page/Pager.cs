@@ -275,7 +275,7 @@ namespace Community.CsharpSqlite
         /// to change the content of the page.
         ///
         ///</summary>
-        static bool sqlite3PagerIswriteable(PgHdr pPg)
+        public static bool sqlite3PagerIswriteable(PgHdr pPg)
 #if !NDEBUG
 																																						    static bool sqlite3PagerIswriteable( DbPage pPg )
     {

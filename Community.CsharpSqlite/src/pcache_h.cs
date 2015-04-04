@@ -7,10 +7,8 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-    using MemPage = Sqlite3.MemPage;
     using Pager = Sqlite3.Pager;
     using u8 = Byte;
-    using malloc_cs = Sqlite3.malloc_cs;
     using PCache = Sqlite3.PCache;
     using PagerMethods = Sqlite3.PagerMethods;
     public partial class Sqlite3

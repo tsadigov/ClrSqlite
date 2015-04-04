@@ -190,7 +190,7 @@ namespace Community.CsharpSqlite
 		//# undef SQLITE_MAX_PAGE_SIZE
 		//#endif
 		//#define SQLITE_MAX_PAGE_SIZE 65536
-		const int SQLITE_MAX_PAGE_SIZE = 65535;
+		public const int SQLITE_MAX_PAGE_SIZE = 65535;
 
 		///
 ///<summary>

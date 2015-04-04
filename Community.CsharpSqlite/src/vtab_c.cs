@@ -7,7 +7,6 @@ namespace Community.CsharpSqlite
 
     using _Custom = Sqlite3._Custom;
     using Parse = Sqlite3.Parse;
-    using malloc_cs = Sqlite3.malloc_cs;
     
         //#include "sqliteInt.h"
         ///<summary>

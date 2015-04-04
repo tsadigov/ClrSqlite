@@ -12,7 +12,6 @@ namespace Community.CsharpSqlite
     using System.Globalization;
     using BtCursor = Sqlite3.BtCursor;
     using _Custom = Sqlite3._Custom;
-    using malloc_cs = Sqlite3.malloc_cs;
 
     public static class MemExtensions {
         ///<summary>
@@ -130,7 +129,7 @@ namespace Community.CsharpSqlite
             Debug.Assert(enc == 0);
             {
                 pMem.z = null;
-                pMem.zBLOB = Sqlite3.malloc_cs.sqlite3Malloc(n);
+                pMem.zBLOB = malloc_cs.sqlite3Malloc(n);
                 Buffer.BlockCopy(zBlob, offset, pMem.zBLOB, 0, n);
             }
             pMem.n = nByte;
@@ -162,7 +161,7 @@ namespace Community.CsharpSqlite
                 pMem.u.pRowSet.sqlite3RowSetClear();
             }
             pMem.MemSetTypeFlag(MemFlags.MEM_Null);
-            Sqlite3.malloc_cs.sqlite3_free(ref pMem.zBLOB);
+            malloc_cs.sqlite3_free(ref pMem.zBLOB);
             pMem.z = null;
             pMem.type = FoundationalType.SQLITE_NULL;
         }

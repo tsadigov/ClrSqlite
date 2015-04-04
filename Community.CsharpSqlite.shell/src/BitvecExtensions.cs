@@ -371,7 +371,7 @@ namespace Community.CsharpSqlite
             ///</summary>
 
             pBitvec = Bitvec.sqlite3BitvecCreate(sz);
-            pV = Sqlite3.malloc_cs.sqlite3_malloc((int)(sz + 7) / 8 + 1);
+            pV = malloc_cs.sqlite3_malloc((int)(sz + 7) / 8 + 1);
             pTmpSpace = new u32[BITVEC_SZ];
             // sqlite3_malloc( BITVEC_SZ );
             if (pBitvec == null || pV == null || pTmpSpace == null)

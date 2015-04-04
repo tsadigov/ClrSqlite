@@ -454,27 +454,22 @@ aOverflow= null;
                 Btree p = this.pBtree;
                 BtShared pBt = p.pBt;
                 SqlResult rc;
-                ///
                 ///<summary>
                 ///Return code 
                 ///</summary>
                 MemPage pPage;
-                ///
                 ///<summary>
                 ///Page to delete cell from 
                 ///</summary>
                 int pCell;
-                ///
                 ///<summary>
                 ///Pointer to cell to delete 
                 ///</summary>
                 int iCellIdx;
-                ///
                 ///<summary>
                 ///Index of cell to delete 
                 ///</summary>
                 int iCellDepth;
-                ///
                 ///<summary>
                 ///Depth of node containing pCell 
                 ///</summary>
@@ -487,14 +482,11 @@ aOverflow= null;
                 if (NEVER(this.aiIdx[this.iPage] >= this.apPage[this.iPage].nCell) || NEVER(this.eState != CURSOR_VALID))
                 {
                     return SqlResult.SQLITE_ERROR;
-                    ///
                     ///<summary>
                     ///Something has gone awry. 
                     ///</summary>
                 }
                 ///
-                ///<summary>
-                ///</summary>
                 ///<param name="If this is a delete operation to remove a row from a table b">tree,</param>
                 ///<param name="invalidate any incrblob cursors open on the row being deleted.  ">invalidate any incrblob cursors open on the row being deleted.  </param>
                 if (this.pKeyInfo == null)
@@ -556,7 +548,7 @@ aOverflow= null;
                     //byte[] pTmp;
                     pCell = pLeaf.findCell(pLeaf.nCell - 1);
                     nCell = pLeaf.cellSizePtr(pCell);
-                    Debug.Assert(MX_CELL_SIZE(pBt) >= nCell);
+                    Debug.Assert(pBt.MX_CELL_SIZE >= nCell);
                     //allocateTempSpace(pBt);
                     //pTmp = pBt.pTmpSpace;
                     rc = PagerMethods.sqlite3PagerWrite(pLeaf.pDbPage);
@@ -692,7 +684,7 @@ aOverflow= null;
                 if (rc != 0)
                     goto end_insert;
                 Debug.Assert(szNew == pPage.cellSizePtr(newCell));
-                Debug.Assert(szNew <= MX_CELL_SIZE(pBt));
+                Debug.Assert(szNew <= pBt.MX_CELL_SIZE);
                 idx = this.aiIdx[this.iPage];
                 if (loc == 0)
                 {

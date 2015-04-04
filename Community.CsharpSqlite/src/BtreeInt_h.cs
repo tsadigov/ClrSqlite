@@ -14,7 +14,6 @@ namespace Community.CsharpSqlite
 	using DbPage = PgHdr;
 	using System.Text;
     using Pager = Sqlite3.Pager;
-    using MemPage = Sqlite3.MemPage;
     using BtCursor = Sqlite3.BtCursor;
     using PagerMethods=Sqlite3.PagerMethods;
     ///<summary>
@@ -74,7 +73,7 @@ namespace Community.CsharpSqlite
             _OvflCell cp = new _OvflCell();
             if (pCell != null)
             {
-                cp.pCell = Sqlite3.malloc_cs.sqlite3Malloc(pCell.Length);
+                cp.pCell = malloc_cs.sqlite3Malloc(pCell.Length);
                 Buffer.BlockCopy(pCell, 0, cp.pCell, 0, pCell.Length);
             }
             cp.idx = idx;
@@ -650,6 +649,35 @@ public u8 isPending;            /* If waiting for read-locks to clear */
         {
             return this.nPage;
         }
+
+
+
+
+
+        //#include "sqliteInt.h"
+        ///<summary>
+        ///The following value is the maximum cell size assuming a maximum page
+        /// size give above.
+        ///
+        ///</summary>
+        //#define MX_CELL_SIZE(pBt)  ((int)(pBt->pageSize-8))
+        public int MX_CELL_SIZE
+        {
+            get { return (int)(this.pageSize - 8); }
+        }
+
+        ///<summary>
+        ///The maximum number of cells on a single page of the database.  This
+        /// assumes a minimum cell size of 6 bytes  (4 bytes for the cell itself
+        /// plus 2 bytes for the index to the cell in the page header).  Such
+        /// small cells will be rare, but they are possible.
+        ///
+        ///</summary>
+        //#define MX_CELL(pBt) ((pBt.pageSize-8)/6)
+        public int MX_CELL
+        {
+            get { return ((int)(this.pageSize - 8) / 6); }
+        }
     }
 
 
@@ -884,30 +912,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 ///<param name=""></param>
 ///<param name=""></param>
 
-		//#include "sqliteInt.h"
-		///<summary>
-		///The following value is the maximum cell size assuming a maximum page
-		/// size give above.
-		///
-		///</summary>
-		//#define MX_CELL_SIZE(pBt)  ((int)(pBt->pageSize-8))
-		static int MX_CELL_SIZE (BtShared pBt)
-		{
-			return (int)(pBt.pageSize - 8);
-		}
-
-		///<summary>
-		///The maximum number of cells on a single page of the database.  This
-		/// assumes a minimum cell size of 6 bytes  (4 bytes for the cell itself
-		/// plus 2 bytes for the index to the cell in the page header).  Such
-		/// small cells will be rare, but they are possible.
-		///
-		///</summary>
-		//#define MX_CELL(pBt) ((pBt.pageSize-8)/6)
-		static int MX_CELL (BtShared pBt)
-		{
-			return ((int)(pBt.pageSize - 8) / 6);
-		}
+		
 
 		///
 ///<summary>
@@ -935,18 +940,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 		const string SQLITE_FILE_HEADER = "SQLite format 3\0";
 
 		#endif
-		///<summary>
-		/// Page type flags.  An ORed combination of these flags appear as the
-		/// first byte of on-disk image of every BTree page.
-		///</summary>
-		const byte PTF_INTKEY = 0x01;
-
-		const byte PTF_ZERODATA = 0x02;
-
-		const byte PTF_LEAFDATA = 0x04;
-
-		const byte PTF_LEAF = 0x08;
-
+		
 
 
 
@@ -1060,15 +1054,15 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 		//#define PTRMAP_OVERFLOW1 3
 		//#define PTRMAP_OVERFLOW2 4
 		//#define PTRMAP_BTREE 5
-		const int PTRMAP_ROOTPAGE = 1;
+        public const int PTRMAP_ROOTPAGE = 1;
 
-		const int PTRMAP_FREEPAGE = 2;
+        public const int PTRMAP_FREEPAGE = 2;
 
-		const int PTRMAP_OVERFLOW1 = 3;
+        public const int PTRMAP_OVERFLOW1 = 3;
 
-		const int PTRMAP_OVERFLOW2 = 4;
+        public const int PTRMAP_OVERFLOW2 = 4;
 
-		const int PTRMAP_BTREE = 5;
+		public const int PTRMAP_BTREE = 5;
 
 		///<summary>
 		///A bunch of Debug.Assert() statements to check the transaction state variables
