@@ -600,26 +600,13 @@ namespace Community.CsharpSqlite
 			///</summary>
 			SqlResult allocateSpace (int nByte, ref int pIdx)
 			{
-				int hdr = this.hdrOffset;
-///Local cache of pPage.hdrOffset 
-
-				u8[] data = this.aData;
-///Local cache of pPage.aData 
-
-				int nFrag;
-///Number of fragmented bytes on pPage 
-
-				int top;
-///First byte of cell content area 
-
-				int gap;
-///First byte of gap between cell pointers and cell content 
-
-				SqlResult rc;
-///Integer return code 
-
-				u32 usableSize;
-///Usable size of the page 
+				int hdr = this.hdrOffset;///Local cache of pPage.hdrOffset 
+				u8[] data = this.aData;///Local cache of pPage.aData 
+				int nFrag;///Number of fragmented bytes on pPage
+				int top;///First byte of cell content area 
+				int gap;///First byte of gap between cell pointers and cell content 
+				SqlResult rc;///Integer return code 
+				u32 usableSize;///Usable size of the page 
 
 				Debug.Assert (sqlite3PagerIswriteable (this.pDbPage));
 				Debug.Assert (this.pBt != null);
@@ -663,17 +650,17 @@ namespace Community.CsharpSqlite
 							}
 							size = get2byte (data, pc + 2);
 							if (size >= nByte) {
-								int x = size - nByte;
-								sqliteinth.testcase (x == 4);
-								sqliteinth.testcase (x == 3);
-								if (x < 4) {
+								int leftBytes = size - nByte;
+								sqliteinth.testcase (leftBytes == 4);
+								sqliteinth.testcase (leftBytes == 3);
+								if (leftBytes < 4) {
 ///<param name="Remove the slot from the free">list. Update the number of</param>
 ///<param name="fragmented bytes within the page. ">fragmented bytes within the page. </param>
 
 									data [addr + 0] = data [pc + 0];
 									data [addr + 1] = data [pc + 1];
 									//memcpy( data[addr], ref data[pc], 2 );
-									data [hdr + 7] = (u8)(nFrag + x);
+									data [hdr + 7] = (u8)(nFrag + leftBytes);
 								}
 								else
 									if (size + pc > usableSize) {
@@ -686,9 +673,9 @@ namespace Community.CsharpSqlite
 ///<param name="The slot remains on the free">list. Reduce its size to account</param>
 ///<param name="for the portion used by the new allocation. ">for the portion used by the new allocation. </param>
 
-										put2byte (data, pc + 2, x);
+										put2byte (data, pc + 2, leftBytes);
 									}
-								pIdx = pc + x;
+								pIdx = pc + leftBytes;
                                 Console.WriteLine("allocated space index "+pIdx);
 								return SqlResult.SQLITE_OK;
 							}
