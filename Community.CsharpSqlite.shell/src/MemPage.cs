@@ -75,7 +75,10 @@ namespace Community.CsharpSqlite
 ///100 for page 1.  0 otherwise 
 ///</summary>
 
-			public u8 hdrOffset;
+            public u8 hdrOffset
+            {
+                get { return (u8)(this.pgno == 1 ? 100 : 0); }
+            }
 
 ///<summary>
 ///0 if leaf==1.  4 if leaf==0 
@@ -1048,7 +1051,6 @@ namespace Community.CsharpSqlite
 				put2byte (data, hdr + 5, pBt.usableSize);
 				this.nFree = (u16)(pBt.usableSize - first);
 				this.decodeFlags (flags);
-				this.hdrOffset = hdr;
 				this.cellOffset = first;
 				this.nOverflow = 0;
 				Debug.Assert (pBt.pageSize >= 512 && pBt.pageSize <= 65536);
