@@ -391,7 +391,7 @@ aOverflow= null;
                     ///<param name="accordingly.">accordingly.</param>
                     ///<param name=""></param>
                     pPage = this.apPage[this.iPage];
-                    if (pPage.leaf != false || false == pPage.intKey)
+                    if (pPage.IsLeaf != false || false == pPage.intKey)
                     {
                         nEntry += pPage.nCell;
                     }
@@ -408,7 +408,7 @@ aOverflow= null;
                     ///<param name="If all pages in the tree have been visited, return SqlResult.SQLITE_OK to the">If all pages in the tree have been visited, return SqlResult.SQLITE_OK to the</param>
                     ///<param name="caller.">caller.</param>
                     ///<param name=""></param>
-                    if (pPage.leaf != false)
+                    if (pPage.IsLeaf != false)
                     {
                         do
                         {
@@ -515,7 +515,7 @@ aOverflow= null;
                 ///</summary>
                 ///<param name="sub">tree headed by the child page of the cell being deleted. This makes</param>
                 ///<param name="balancing the tree following the delete operation easier.  ">balancing the tree following the delete operation easier.  </param>
-                if (false == pPage.leaf)
+                if (false == pPage.IsLeaf)
                 {
                     int notUsed = 0;
                     rc = this.sqlite3BtreePrevious(ref notUsed);
@@ -548,7 +548,7 @@ aOverflow= null;
                 ///<param name="by the child">page of the cell that was just deleted from an internal</param>
                 ///<param name="node. The cell from the leaf node needs to be moved to the internal">node. The cell from the leaf node needs to be moved to the internal</param>
                 ///<param name="node to replace the deleted cell.  ">node to replace the deleted cell.  </param>
-                if (false == pPage.leaf)
+                if (false == pPage.IsLeaf)
                 {
                     MemPage pLeaf = this.apPage[this.iPage];
                     int nCell;
@@ -682,7 +682,7 @@ aOverflow= null;
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID || (this.State == BtCursorState.CURSOR_INVALID && loc != 0));
                 pPage = this.apPage[this.iPage];
                 Debug.Assert(pPage.intKey != false || nKey >= 0);
-                Debug.Assert(pPage.leaf != false || false == pPage.intKey);
+                Debug.Assert(pPage.IsLeaf != false || false == pPage.intKey);
                 TRACE("INSERT: table=%d nkey=%lld ndata=%d page=%d %s\n", this.pgnoRoot, nKey, nData, pPage.pgno, loc == 0 ? "overwrite" : "new entry");
                 Debug.Assert(pPage.isInit != false);
                 BTreeMethods.allocateTempSpace(pBt);
@@ -704,7 +704,7 @@ aOverflow= null;
                         goto end_insert;
                     }
                     oldCell = pPage.findCell(idx);
-                    if (false == pPage.leaf)
+                    if (false == pPage.IsLeaf)
                     {
                         //memcpy(newCell, oldCell, 4);
                         newCell[0] = pPage.aData[oldCell + 0];
@@ -721,12 +721,12 @@ aOverflow= null;
                 else
                     if (loc < 0 && pPage.nCell > 0)
                     {
-                        Debug.Assert(pPage.leaf != false);
+                        Debug.Assert(pPage.IsLeaf != false);
                         idx = ++this.aiIdx[this.iPage];
                     }
                     else
                     {
-                        Debug.Assert(pPage.leaf != false);
+                        Debug.Assert(pPage.IsLeaf != false);
                     }
                 pPage.insertCell(idx, newCell, szNew, null, 0, ref rc);
                 Debug.Assert(rc != SqlResult.SQLITE_OK || pPage.nCell > 0 || pPage.nOverflow > 0);
@@ -933,7 +933,7 @@ aOverflow= null;
                 this.skipNext = 0;
                 pPage = this.apPage[this.iPage];
                 Debug.Assert(pPage.isInit != false);
-                if (false == pPage.leaf)
+                if (false == pPage.IsLeaf)
                 {
                     int idx = this.aiIdx[this.iPage];
                     rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(idx)));
@@ -959,7 +959,7 @@ aOverflow= null;
                     this.validNKey = false;
                     this.aiIdx[this.iPage]--;
                     pPage = this.apPage[this.iPage];
-                    if (pPage.intKey != false && false == pPage.leaf)
+                    if (pPage.intKey != false && false == pPage.IsLeaf)
                     {
                         rc = this.sqlite3BtreePrevious(ref pRes);
                     }
@@ -1003,7 +1003,7 @@ aOverflow= null;
                 this.validNKey = false;
                 if (idx >= pPage.nCell)
                 {
-                    if (false == pPage.leaf)
+                    if (false == pPage.IsLeaf)
                     {
                         rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8));
                         if (rc != 0)
@@ -1036,7 +1036,7 @@ aOverflow= null;
                     return rc;
                 }
                 pRes = 0;
-                if (pPage.leaf != false)
+                if (pPage.IsLeaf != false)
                 {
                     return SqlResult.SQLITE_OK;
                 }
@@ -1251,7 +1251,7 @@ aOverflow= null;
                         }
                         if (c == 0)
                         {
-                            if (pPage.intKey != false && false == pPage.leaf)
+                            if (pPage.intKey != false && false == pPage.IsLeaf)
                             {
                                 lwr = idx;
                                 upr = lwr - 1;
@@ -1280,7 +1280,7 @@ aOverflow= null;
                     }
                     Debug.Assert(lwr == upr + 1);
                     Debug.Assert(pPage.isInit != false);
-                    if (pPage.leaf != false)
+                    if (pPage.IsLeaf != false)
                     {
                         chldPg = 0;
                     }
@@ -1382,7 +1382,7 @@ aOverflow= null;
                 MemPage pPage = null;
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                while (rc == SqlResult.SQLITE_OK && false == (pPage = this.apPage[this.iPage]).leaf)
+                while (rc == SqlResult.SQLITE_OK && false == (pPage = this.apPage[this.iPage]).IsLeaf)
                 {
                     pgno = Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8);
                     this.aiIdx[this.iPage] = pPage.nCell;
@@ -1403,7 +1403,7 @@ aOverflow= null;
                 MemPage pPage;
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                while (rc == SqlResult.SQLITE_OK && false == (pPage = this.apPage[this.iPage]).leaf)
+                while (rc == SqlResult.SQLITE_OK && false == (pPage = this.apPage[this.iPage]).IsLeaf)
                 {
                     Debug.Assert(this.aiIdx[this.iPage] < pPage.nCell);
                     pgno = Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(this.aiIdx[this.iPage]));
@@ -1477,7 +1477,7 @@ aOverflow= null;
                 this.info.nSize = 0;
                 this.atLast = 0;
                 this.validNKey = false;
-                if (pRoot.nCell == 0 && false == pRoot.leaf)
+                if (pRoot.nCell == 0 && false == pRoot.IsLeaf)
                 {
                     Pgno subpage;
                     if (pRoot.pgno != 1)

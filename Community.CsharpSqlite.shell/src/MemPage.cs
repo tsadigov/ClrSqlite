@@ -58,7 +58,7 @@ namespace Community.CsharpSqlite
 ///1 if leaf flag is set 
 ///</summary>
             bool m_leaf;
-            public bool leaf {
+            public bool IsLeaf {
                 get { return m_leaf; }
                 set { m_leaf = value; }
             }
@@ -80,7 +80,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
             public u8 childPtrSize {
-                get { return  (u8)(4 - (this.leaf ? 4 : 0)); }
+                get { return  (u8)(4 - (this.IsLeaf ? 4 : 0)); }
             }
 
 ///<summary>
@@ -243,11 +243,11 @@ namespace Community.CsharpSqlite
 				if (pInfo.pCell != pCell)//
 					pInfo.pCell = pCell;
 				pInfo.iCell = iCell;
-				Debug.Assert (this.leaf == false || this.leaf == true);
+				Debug.Assert (this.IsLeaf == false || this.IsLeaf == true);
 
                 u16 n = this.childPtrSize;///Number bytes in cell content header 
 
-				Debug.Assert (n == 4 -  (this.leaf?4:0));
+				Debug.Assert (n == 4 -  (this.IsLeaf?4:0));
 				if (this.intKey ) {
 					if (this.hasData ) {
                         n += (u16)utilc.getVarint32(pCell, iCell + n, out nPayload);
@@ -626,7 +626,7 @@ namespace Community.CsharpSqlite
 				usableSize = this.pBt.usableSize;
 				Debug.Assert (nByte < usableSize - 8);
 				nFrag = data [hdr + 7];
-				Debug.Assert (this.cellOffset == hdr + 12 - (this.leaf?4:0));
+				Debug.Assert (this.cellOffset == hdr + 12 - (this.IsLeaf?4:0));
 				gap = this.cellOffset + 2 * this.nCell;
                 top = BTreeMethods.get2byteNotZero(data, hdr + 5);
 				if (gap > top)
@@ -861,14 +861,14 @@ namespace Community.CsharpSqlite
 
 				Debug.Assert (this.hdrOffset == (this.pgno == 1 ? 100 : 0));
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
-				this.leaf = 1== (u8)(flagByte >> 3);
+				this.IsLeaf = 1== (u8)(flagByte >> 3);
 				Debug.Assert (PTF_LEAF == 1 << 3);
 				flagByte &= ~PTF_LEAF;
 				
 				pBt = this.pBt;
 				if (flagByte == (PTF_LEAFDATA | PTF_INTKEY)) {
 					this.intKey = true;
-					this.hasData = this.leaf;
+					this.hasData = this.IsLeaf;
 					this.maxLocal = pBt.maxLeaf;
 					this.minLocal = pBt.minLeaf;
 				}
@@ -918,7 +918,7 @@ namespace Community.CsharpSqlite
 					Debug.Assert (pBt.pageSize >= 512 && pBt.pageSize <= 65536);
 					this.maskPage = (u16)(pBt.pageSize - 1);
 					this.nOverflow = 0;
-					this.cellOffset = (cellOffset = (u16)(hdr + 12 - (this.leaf?4:0)));
+					this.cellOffset = (cellOffset = (u16)(hdr + 12 - (this.IsLeaf?4:0)));
                     
 					this.nCell = (u16)(get2byte (data, hdr + 3));
 					if (this.nCell > MX_CELL (pBt)) {
@@ -1088,12 +1088,12 @@ namespace Community.CsharpSqlite
 				for (i = 0; i < nCell; i++) {
 					int pCell = this.findCell (i);
 					this.ptrmapPutOvflPtr (pCell, ref rc);
-					if (false == this.leaf) {
+					if (false == this.IsLeaf) {
 						Pgno childPgno = Converter.sqlite3Get4byte (this.aData, pCell);
 						pBt.ptrmapPut (childPgno, PTRMAP_BTREE, pgno, ref rc);
 					}
 				}
-				if (false == this.leaf) {
+				if (false == this.IsLeaf) {
 					Pgno childPgno = Converter.sqlite3Get4byte (this.aData, this.hdrOffset + 8);
 					pBt.ptrmapPut (childPgno, PTRMAP_BTREE, pgno, ref rc);
 				}
@@ -1223,7 +1223,7 @@ namespace Community.CsharpSqlite
 ///Fill in the header. 
 
 				nHeader = 0;
-				if (false == this.leaf) {
+				if (false == this.IsLeaf) {
 					nHeader += 4;
 				}
 				if (this.hasData != false) {
@@ -2220,7 +2220,7 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-				leafCorrection = (u16)(apOld [0].leaf ?4:0);
+				leafCorrection = (u16)(apOld [0].IsLeaf ?4:0);
 				leafData = apOld [0].hasData?1:0;
 				for (i = 0; i < nOld; i++) {
 					int limit;
@@ -2288,7 +2288,7 @@ namespace Community.CsharpSqlite
 						//apCell[nCell] = pTemp + leafCorrection;
 						Debug.Assert (leafCorrection == 0 || leafCorrection == 4);
 						szCell [nCell] = (u16)(szCell [nCell] - leafCorrection);
-						if (false == pOld.leaf) {
+						if (false == pOld.IsLeaf) {
 							Debug.Assert (leafCorrection == 0);
 							Debug.Assert (pOld.hdrOffset == 0);
 							///
@@ -2551,7 +2551,7 @@ namespace Community.CsharpSqlite
 						sz = szCell [j] + leafCorrection;
 						pTemp = malloc_cs.sqlite3Malloc (sz);
 						//&aOvflSpace[iOvflSpace];
-						if (false == pNew.leaf) {
+						if (false == pNew.IsLeaf) {
 							Buffer.BlockCopy (pCell, 0, pNew.aData, 8, 4);
 							//memcpy( pNew.aData[8], pCell, 4 );
 						}

@@ -3417,7 +3417,7 @@ return rc;
                     int iCell = pPage.findCell(i);
                     pCell = pPage.aData;
                     //        pCell = findCell( pPage, i );
-                    if (false == pPage.leaf)
+                    if (false == pPage.IsLeaf)
                     {
                         rc = clearDatabasePage(pBt, Converter.sqlite3Get4byte(pCell, iCell), 1, ref pnChange);
                         if (rc != 0)
@@ -3427,7 +3427,7 @@ return rc;
                     if (rc != 0)
                         goto cleardatabasepage_out;
                 }
-                if (false == pPage.leaf)
+                if (false == pPage.IsLeaf)
                 {
                     rc = clearDatabasePage(pBt, Converter.sqlite3Get4byte(pPage.aData, 8), 1, ref pnChange);
                     if (rc != 0)
