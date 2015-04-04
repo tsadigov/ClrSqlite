@@ -345,6 +345,8 @@
     <Compile Include="src\MemPage.cs" />
     <Compile Include="src\MyHelpers.cs" />
     <Compile Include="src\Os\sqlite3_file.cs" />
+    <Compile Include="src\Page\BufferExtensions.cs" />
+    <Compile Include="src\Page\FreeSpaceHeader.cs" />
     <Compile Include="src\Page\Pager.cs" />
     <Compile Include="src\Page\PagerSavepoint.cs" />
     <Compile Include="src\ParseExtensions.cs" />

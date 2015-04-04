@@ -1475,7 +1475,7 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 #endif
     }
     //--------------------------------------------------------- 
-    public partial class Converter
+    public  static class Converter
 	{
 		///<summary>
 		/// If zNum represents an integer that will fit in 32-bits, then set
@@ -1595,7 +1595,7 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 			p [3 + offset] = (byte)(v & 0xFF);
 		}
 
-		public static void sqlite3Put4byte (byte[] p, int offset, u64 v)
+		public static void sqlite3Put4byte (this byte[] p, int offset, u64 v)
 		{
 			p [0 + offset] = (byte)(v >> 24 & 0xFF);
 			p [1 + offset] = (byte)(v >> 16 & 0xFF);
