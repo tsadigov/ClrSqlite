@@ -17,6 +17,8 @@ namespace Community.CsharpSqlite
 
 	public partial class Sqlite3
 	{
+        ///[---hdr|first block location:x-----next block location:y|current free size of x--------next block location:z|crrent free size of y]
+
 		public class MemPage
 		{
 			public MemPage ()
@@ -105,7 +107,7 @@ namespace Community.CsharpSqlite
 ///Number of free bytes on the page 
 ///</summary>
 
-			public u16 nFree;
+            public u16 nFree { get; set; } 
 
 ///<summary>
 ///Number of cells on this page, local and ovfl 
@@ -129,6 +131,7 @@ namespace Community.CsharpSqlite
             {
                 public const int nCell = 3;
                 public const int cellbody = 5;
+                public static int nFrag = 7;
             }
 
 
@@ -720,6 +723,12 @@ namespace Community.CsharpSqlite
 				return SqlResult.SQLITE_OK;
 			}
 
+
+
+
+
+
+
 			public///<summary>
 			/// Return a section of the pPage.aData to the freelist.
 			/// The first byte of the new free block is pPage.aDisk[start]
@@ -984,9 +993,7 @@ namespace Community.CsharpSqlite
 						size = (u16)get2byte (data, pc + 2);
 						if ((next > 0 && next <= pc + size + 3) || pc + size > usableSize) {
 							///
-///<summary>
 ///Free blocks must be in ascending order. And the last byte of
-///</summary>
 ///<param name="the free">block must lie on the database page.  </param>
 
 							return sqliteinth.SQLITE_CORRUPT_BKPT();
@@ -1565,6 +1572,14 @@ namespace Community.CsharpSqlite
 					#endif
 				}
 			}
+
+            private void SaveNCell(UInt16 ncell)
+            {
+                this.nCell = ncell;
+                put2byte(this.aData, this.hdrOffset + Offsets.nCell, this.nCell);
+                //data[this.hdrOffset + 3] = (byte)(this.nCell >> 8);
+                //data[this.hdrOffset + 4] = (byte)(this.nCell);
+            }
 
             #region assemblePage
             ///<summary>
