@@ -177,7 +177,7 @@ namespace Community.CsharpSqlite {
 						///
 						///</summary>
 						Index pIndex;
-						pIndex=build.sqlite3FindIndex(db,argv[0],db.aDb[iDb].zName);
+						pIndex=IndexBuilder.sqlite3FindIndex(db,argv[0],db.aDb[iDb].zName);
 						if(pIndex==null) {
 							///
 							///<summary>
@@ -268,7 +268,7 @@ namespace Community.CsharpSqlite {
 				rc=initData.rc;
 				goto error_out;
 			}
-			pTab=build.sqlite3FindTable(db,zMasterName,db.aDb[iDb].zName);
+			pTab=TableBuilder.sqlite3FindTable(db,zMasterName,db.aDb[iDb].zName);
 			if(Sqlite3.ALWAYS(pTab)) {
 				pTab.tabFlags|=TableFlags.TF_Readonly;
 			}
@@ -756,7 +756,7 @@ db.xAuth = 0;
 			pParse.nQueryLoop=(double)1;
 			if(nBytes>=0&&(nBytes==0||zSql[nBytes-1]!=0)) {
 				string zSqlCopy;
-				int mxLen=db.aLimit[SQLITE_LIMIT_SQL_LENGTH];
+				int mxLen=db.aLimit[Globals.SQLITE_LIMIT_SQL_LENGTH];
 				sqliteinth.testcase(nBytes==mxLen);
 				sqliteinth.testcase(nBytes==mxLen+1);
 				if(nBytes>mxLen) {

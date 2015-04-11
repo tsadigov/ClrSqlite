@@ -2193,18 +2193,18 @@ return z;
 			///<param name="macro called SQLITE_MAX_NAME. (The "_LIMIT_" in the name is changed to">macro called SQLITE_MAX_NAME. (The "_LIMIT_" in the name is changed to</param>
 			///<param name=""_MAX_".)">"_MAX_".)</param>
 			///<param name=""></param>
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_LENGTH]==SQLITE_MAX_LENGTH);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_SQL_LENGTH]==SQLITE_MAX_SQL_LENGTH);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_COLUMN]==SQLITE_MAX_COLUMN);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_EXPR_DEPTH]==SQLITE_MAX_EXPR_DEPTH);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_COMPOUND_SELECT]==SQLITE_MAX_COMPOUND_SELECT);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_VDBE_OP]==SQLITE_MAX_VDBE_OP);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_FUNCTION_ARG]==SQLITE_MAX_FUNCTION_ARG);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_ATTACHED]==SQLITE_MAX_ATTACHED);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH]==SQLITE_MAX_LIKE_PATTERN_LENGTH);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_VARIABLE_NUMBER]==SQLITE_MAX_VARIABLE_NUMBER);
-			Debug.Assert(aHardLimit[SQLITE_LIMIT_TRIGGER_DEPTH]==SQLITE_MAX_TRIGGER_DEPTH);
-            Debug.Assert(SQLITE_LIMIT_TRIGGER_DEPTH == (sqliteinth.SQLITE_N_LIMIT - 1));
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_LENGTH]==SQLITE_MAX_LENGTH);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_SQL_LENGTH]==SQLITE_MAX_SQL_LENGTH);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_COLUMN]==SQLITE_MAX_COLUMN);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_EXPR_DEPTH]==SQLITE_MAX_EXPR_DEPTH);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_COMPOUND_SELECT]==SQLITE_MAX_COMPOUND_SELECT);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_VDBE_OP]==SQLITE_MAX_VDBE_OP);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_FUNCTION_ARG]==SQLITE_MAX_FUNCTION_ARG);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_ATTACHED]==SQLITE_MAX_ATTACHED);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_LIKE_PATTERN_LENGTH]==SQLITE_MAX_LIKE_PATTERN_LENGTH);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]==SQLITE_MAX_VARIABLE_NUMBER);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_TRIGGER_DEPTH]==SQLITE_MAX_TRIGGER_DEPTH);
+            Debug.Assert(Globals.SQLITE_LIMIT_TRIGGER_DEPTH == (sqliteinth.SQLITE_N_LIMIT - 1));
 			if(limitId<0||limitId>=sqliteinth.SQLITE_N_LIMIT) {
 				return -1;
 			}

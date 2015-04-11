@@ -55,33 +55,17 @@ namespace Community.CsharpSqlite
             /// sqlite3_create_module_v2() interfaces.
             ///
             ///</summary>
-            static SqlResult createModule(sqlite3 db,///
-                ///<summary>
-                ///Database in which module is registered 
-                ///</summary>
-            string zName,///
-                ///<summary>
-                ///Name assigned to this module 
-                ///</summary>
-            sqlite3_module pModule,///
-                ///<summary>
-                ///The definition of the module 
-                ///</summary>
-            object pAux,///
-                ///<summary>
-                ///Context pointer for xCreate/xConnect 
-                ///</summary>
-            smdxDestroy xDestroy///
-                ///<summary>
-                ///Module destructor function 
-                ///</summary>
+            static SqlResult createModule(sqlite3 db,///Database in which module is registered 
+                string zName,///Name assigned to this module 
+                sqlite3_module pModule,///The definition of the module 
+                object pAux,///Context pointer for xCreate/xConnect 
+                smdxDestroy xDestroy///Module destructor function 
             )
             {
                 SqlResult rc;
-                int nName;
                 Module pMod;
                 db.mutex.sqlite3_mutex_enter();
-                nName = StringExtensions.sqlite3Strlen30(zName);
+                var nName = StringExtensions.sqlite3Strlen30(zName);
                 pMod = new Module();
                 //  (Module)sqlite3DbMallocRaw( db, sizeof( Module ) + nName + 1 );
                 if (pMod != null)
@@ -119,22 +103,10 @@ namespace Community.CsharpSqlite
             /// External API function used to create a new virtual-table module.
             ///
             ///</summary>
-            static SqlResult sqlite3_create_module(sqlite3 db,///
-                ///<summary>
-                ///Database in which module is registered 
-                ///</summary>
-            string zName,///
-                ///<summary>
-                ///Name assigned to this module 
-                ///</summary>
-            sqlite3_module pModule,///
-                ///<summary>
-                ///The definition of the module 
-                ///</summary>
-            object pAux///
-                ///<summary>
-                ///Context pointer for xCreate/xConnect 
-                ///</summary>
+            static SqlResult sqlite3_create_module(sqlite3 db,///Database in which module is registered 
+                string zName,///Name assigned to this module 
+                sqlite3_module pModule,///The definition of the module 
+                object pAux///Context pointer for xCreate/xConnect 
             )
             {
                 return createModule(db, zName, pModule, pAux, null);
@@ -143,26 +115,11 @@ namespace Community.CsharpSqlite
             /// External API function used to create a new virtual-table module.
             ///
             ///</summary>
-            static SqlResult sqlite3_create_module_v2(sqlite3 db,///
-                ///<summary>
-                ///Database in which module is registered 
-                ///</summary>
-            string zName,///
-                ///<summary>
-                ///Name assigned to this module 
-                ///</summary>
-            sqlite3_module pModule,///
-                ///<summary>
-                ///The definition of the module 
-                ///</summary>
-            sqlite3_vtab pAux,///
-                ///<summary>
-                ///Context pointer for xCreate/xConnect 
-                ///</summary>
-            smdxDestroy xDestroy///
-                ///<summary>
-                ///Module destructor function 
-                ///</summary>
+            static SqlResult sqlite3_create_module_v2(sqlite3 db,///Database in which module is registered 
+            string zName,///Name assigned to this module 
+            sqlite3_module pModule,///The definition of the module 
+            sqlite3_vtab pAux,///Context pointer for xCreate/xConnect 
+            smdxDestroy xDestroy///Module destructor function 
             )
             {
                 return createModule(db, zName, pModule, pAux, xDestroy);
@@ -417,10 +374,7 @@ namespace Community.CsharpSqlite
                 //}
                 pVTable.db = db;
                 pVTable.pMod = pMod;
-                ///
-                ///<summary>
                 ///Invoke the virtual table constructor 
-                ///</summary>
                 //assert( &db->pVtabCtx );
                 Debug.Assert(xConstruct != null);
                 sCtx.pTab = pTab;
@@ -447,11 +401,8 @@ namespace Community.CsharpSqlite
                 else
                     if (Sqlite3.ALWAYS(pVTable.pVtab))
                     {
-                        ///
-                        ///<summary>
                         ///Justification of Sqlite3.ALWAYS():  A correct vtab constructor must allocate
                         ///the sqlite3_vtab object if successful.  
-                        ///</summary>
                         pVTable.pVtab.pModule = pMod.pModule;
                         pVTable.nRef = 1;
                         if (sCtx.pTab != null)
@@ -581,7 +532,7 @@ namespace Community.CsharpSqlite
                 Table pTab;
                 Module pMod;
                 string zMod;
-                pTab = build.sqlite3FindTable(db, zTab, db.aDb[iDb].zName);
+                pTab = TableBuilder.sqlite3FindTable(db, zTab, db.aDb[iDb].zName);
                 Debug.Assert(pTab != null && (pTab.tabFlags & TableFlags.TF_Virtual) != 0 && null == pTab.pVTable);
                 ///
                 ///<summary>
@@ -675,7 +626,7 @@ namespace Community.CsharpSqlite
                     {
                         vdbeaux.sqlite3VdbeFinalize(ref pParse.pVdbe);
                     }
-                    build.sqlite3DeleteTable(db, ref pParse.pNewTable);
+                    TableBuilder.sqlite3DeleteTable(db, ref pParse.pNewTable);
                     //sqlite3StackFree( db, pParse );
                 }
                 Debug.Assert((rc & (SqlResult)0xff) == rc);
@@ -695,7 +646,7 @@ namespace Community.CsharpSqlite
             {
                 var rc = SqlResult.SQLITE_OK;
                 Table pTab;
-                pTab = build.sqlite3FindTable(db, zTab, db.aDb[iDb].zName);
+                pTab = TableBuilder.sqlite3FindTable(db, zTab, db.aDb[iDb].zName);
                 if (Sqlite3.ALWAYS(pTab != null && pTab.pVTable != null))
                 {
                     VTable p = vtabDisconnectAll(db, pTab);

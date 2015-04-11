@@ -970,7 +970,7 @@ return WRC.WRC_Prune;
                     return 0;
                 db = pParse.db;
                 //#if SQLITE_MAX_COLUMN
-                if (pOrderBy.nExpr > db.aLimit[SQLITE_LIMIT_COLUMN])
+                if (pOrderBy.nExpr > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
                 {
                     utilc.sqlite3ErrorMsg(pParse, "too many terms in ORDER BY clause");
                     return 1;
@@ -1088,7 +1088,7 @@ return WRC.WRC_Prune;
                 )
                     return 0;
                 //#if SQLITE_MAX_COLUMN
-                if (pOrderBy.nExpr > db.aLimit[SQLITE_LIMIT_COLUMN])
+                if (pOrderBy.nExpr > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
                 {
                     utilc.sqlite3ErrorMsg(pParse, "too many terms in %s BY clause", zType);
                     return 1;

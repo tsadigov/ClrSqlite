@@ -28,7 +28,7 @@ namespace Community.CsharpSqlite
                 {
                     n += p.u.nZero;
                 }
-                return n > p.db.aLimit[Sqlite3.SQLITE_LIMIT_LENGTH];
+                return n > p.db.aLimit[Globals.SQLITE_LIMIT_LENGTH];
             }
             return false;
         }
@@ -97,7 +97,7 @@ namespace Community.CsharpSqlite
             }
             if (pMem.db != null)
             {
-                iLimit = pMem.db.aLimit[Sqlite3.SQLITE_LIMIT_LENGTH];
+                iLimit = pMem.db.aLimit[Globals.SQLITE_LIMIT_LENGTH];
             }
             else
             {

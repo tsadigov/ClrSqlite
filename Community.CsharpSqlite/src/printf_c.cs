@@ -1681,7 +1681,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                 return zFormat;
             //string z;
             Debug.Assert(db != null);
-            sqlite3StrAccumInit(acc, null, SQLITE_PRINT_BUF_SIZE, db.aLimit[Sqlite3.SQLITE_LIMIT_LENGTH]);
+            sqlite3StrAccumInit(acc, null, SQLITE_PRINT_BUF_SIZE, db.aLimit[Globals.SQLITE_LIMIT_LENGTH]);
             acc.db = db;
             acc.zText.Length = 0;
             io.sqlite3VXPrintf(acc, 1, zFormat, ap);

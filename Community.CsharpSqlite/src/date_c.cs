@@ -1273,14 +1273,14 @@ namespace Community.CsharpSqlite
                     }
                     sqliteinth.testcase(n == (u64)(zdtBuf.Length - 1));
                     sqliteinth.testcase(n == (u64)zdtBuf.Length);
-                    sqliteinth.testcase(n == (u64)db.aLimit[SQLITE_LIMIT_LENGTH] + 1);
-                    sqliteinth.testcase(n == (u64)db.aLimit[SQLITE_LIMIT_LENGTH]);
+                    sqliteinth.testcase(n == (u64)db.aLimit[Globals.SQLITE_LIMIT_LENGTH] + 1);
+                    sqliteinth.testcase(n == (u64)db.aLimit[Globals.SQLITE_LIMIT_LENGTH]);
                     if (n < (u64)zdtBuf.Capacity)
                     {
                         z = zdtBuf;
                     }
                     else
-                        if (n > (u64)db.aLimit[SQLITE_LIMIT_LENGTH])
+                        if (n > (u64)db.aLimit[Globals.SQLITE_LIMIT_LENGTH])
                         {
                             context.sqlite3_result_error_toobig();
                             return;

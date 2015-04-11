@@ -324,21 +324,36 @@
     <Compile Include="src\BtCursor.cs" />
     <Compile Include="src\BTree.cs" />
     <Compile Include="src\BtreeExtensions.cs" />
+    <Compile Include="src\build\IndexBuilder.cs" />
+    <Compile Include="src\build\TableBuilder.cs" />
+    <Compile Include="src\build\TiggerBuilder.cs" />
     <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Db.cs" />
     <Compile Include="src\Engine\Agg.cs" />
     <Compile Include="src\Engine\BusyHandler.cs" />
     <Compile Include="src\Engine\Context.cs" />
+    <Compile Include="src\Engine\Op\BTree.cs" />
+    <Compile Include="src\Engine\Op\Cast.cs" />
+    <Compile Include="src\Engine\Op\ControlFlow.cs" />
+    <Compile Include="src\Engine\Op\CPU.cs" />
     <Compile Include="src\Engine\Cursor.cs" />
+    <Compile Include="src\Engine\Extensions.cs" />
     <Compile Include="src\Engine\InitData.cs" />
     <Compile Include="src\Engine\Lookaside.cs" />
     <Compile Include="src\Engine\Module.cs" />
+    <Compile Include="src\Engine\Op\Cursor.cs" />
+    <Compile Include="src\Engine\Op\Idx.cs" />
+    <Compile Include="src\Engine\Op\Logical.cs" />
+    <Compile Include="src\Engine\Op\Math.cs" />
+    <Compile Include="src\Engine\Op\Schema.cs" />
     <Compile Include="src\Engine\Savepoint.cs" />
     <Compile Include="src\Engine\SubProgram.cs" />
     <Compile Include="src\Engine\Vdbe.cs" />
     <Compile Include="src\Engine\VdbeFrame.cs" />
+    <Compile Include="src\Engine\Op\VdbeHelper.cs" />
     <Compile Include="src\Engine\VdbeOp.cs" />
     <Compile Include="src\Engine\VdbeOpList.cs" />
+    <Compile Include="src\Globals.cs" />
     <Compile Include="src\Index.cs" />
     <Compile Include="src\Page\Mem.cs" />
     <Compile Include="src\Page\MemType.cs" />
@@ -372,6 +387,7 @@
     <Compile Include="src\TextEncodings.cs" />
     <Compile Include="src\Tools\AuthContext.cs" />
     <Compile Include="src\Tools\DbFixer.cs" />
+    <Compile Include="src\Utils\ILinkedListNode.cs" />
     <Compile Include="src\Utils\MyLinqExtensions.cs" />
     <Compile Include="src\Utils\Str.cs" />
     <Compile Include="src\Utils\StreAccum.cs" />
@@ -381,6 +397,7 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="src\Engine\Utill\" />
     <Folder Include="src\NewFolder1\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

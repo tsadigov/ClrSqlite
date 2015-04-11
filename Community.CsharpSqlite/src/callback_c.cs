@@ -513,7 +513,7 @@ sqlite3ValueFree(ref pTmp);
             {
                 Table pTab = (Table)pElem.data;
                 //sqliteHashData(pElem);
-                build.sqlite3DeleteTable(null, ref pTab);
+                TableBuilder.sqlite3DeleteTable(null, ref pTab);
             }
             temp1.sqlite3HashClear();
             pSchema.fkeyHash.sqlite3HashClear();

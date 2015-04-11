@@ -332,7 +332,7 @@ namespace Community.CsharpSqlite
                         ///An ordinary table or view name in the FROM clause 
                         ///</summary>
                         Debug.Assert(pFrom.pTab == null);
-                        pFrom.pTab = pTab = build.sqlite3LocateTable(pParse, 0, pFrom.zName, pFrom.zDatabase);
+                        pFrom.pTab = pTab = TableBuilder.sqlite3LocateTable(pParse, 0, pFrom.zName, pFrom.zDatabase);
                         if (pTab == null)
                             return WRC.WRC_Abort;
                         pTab.nRef++;
@@ -566,7 +566,7 @@ namespace Community.CsharpSqlite
                     p.pEList = pNew;
                 }
                 //#if SQLITE_MAX_COLUMN
-                if (p.pEList != null && p.pEList.nExpr > db.aLimit[Sqlite3.SQLITE_LIMIT_COLUMN])
+                if (p.pEList != null && p.pEList.nExpr > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
                 {
                     utilc.sqlite3ErrorMsg(pParse, "too many columns in result set");
                 }
@@ -824,7 +824,7 @@ namespace Community.CsharpSqlite
                             pLoop.pNext = pRight;
                             pRight = pLoop;
                         }
-                        mxSelect = db.aLimit[Sqlite3.SQLITE_LIMIT_COMPOUND_SELECT];
+                        mxSelect = db.aLimit[Globals.SQLITE_LIMIT_COMPOUND_SELECT];
                         if (mxSelect != 0 && cnt > mxSelect)
                         {
                             utilc.sqlite3ErrorMsg(pParse, "too many terms in compound SELECT");

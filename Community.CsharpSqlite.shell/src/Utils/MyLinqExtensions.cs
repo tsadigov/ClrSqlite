@@ -14,6 +14,19 @@ namespace Community.CsharpSqlite
                 yield return itr;
         }
 
+        public static IEnumerable<T> linkedList<T>(this T start) where T:ILinkedListNode<T>
+        {
+            return start.path(t=>t.pNext);
+        }
+
+        public static void ForEach<T>(
+            this IEnumerable<T> source,
+            Action<T> action)
+        {
+            foreach (T element in source)
+                action(element);
+        }
+
         public static void removeFromLinkedList<T>(this T itemToRemove, ref T start, Func<T, T> prop, Action<T, T> setter) where T : class
         {
 
@@ -33,7 +46,10 @@ namespace Community.CsharpSqlite
                 }
             }
         }
-
+        public static Str sub(this String buffer)
+        {
+            return new Str(buffer, StringExtensions.sqlite3Strlen30(buffer));
+        }
         public static Str sub(this String buffer,int len) {
             return new Str(buffer, len);
         }

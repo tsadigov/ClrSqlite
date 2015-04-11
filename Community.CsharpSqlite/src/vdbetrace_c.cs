@@ -153,7 +153,7 @@ namespace Community.CsharpSqlite
 
 			int izRawSql = 0;
 			db = p.db;
-			io.sqlite3StrAccumInit (_out, null, 100, db.aLimit [SQLITE_LIMIT_LENGTH]);
+			io.sqlite3StrAccumInit (_out, null, 100, db.aLimit [Globals.SQLITE_LIMIT_LENGTH]);
 			_out.db = db;
 			if (db.callStackDepth > 1) {
 				while (izRawSql < zRawSql.Length) {

@@ -8933,7 +8933,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 145 "parse.y"
 			{
-				build.sqlite3StartTable(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token,yymsp[-4].minor.yy4,0,0,yymsp[-2].minor.yy4);
+				TableBuilder.sqlite3StartTable(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token,yymsp[-4].minor.yy4,0,0,yymsp[-2].minor.yy4);
 			}
 			//#line 2180 "parse.c"
 			break;
@@ -9737,7 +9737,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 376 "parse.y"
 			{
-				build.sqlite3DropTable(pParse,yymsp[0].minor.yy259,0,yymsp[-1].minor.yy4);
+				TableBuilder.sqlite3DropTable(pParse,yymsp[0].minor.yy259,0,yymsp[-1].minor.yy4);
 			}
 			//#line 2489 "parse.c"
 			break;
@@ -9759,7 +9759,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 389 "parse.y"
 			{
-				build.sqlite3DropTable(pParse,yymsp[0].minor.yy259,1,yymsp[-1].minor.yy4);
+				TableBuilder.sqlite3DropTable(pParse,yymsp[0].minor.yy259,1,yymsp[-1].minor.yy4);
 			}
 			//#line 2503 "parse.c"
 			break;
@@ -10665,7 +10665,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 793 "parse.y"
 			{
-				if(yymsp[-1].minor.yy322!=null&&yymsp[-1].minor.yy322.nExpr>pParse.db.aLimit[SQLITE_LIMIT_FUNCTION_ARG]) {
+				if(yymsp[-1].minor.yy322!=null&&yymsp[-1].minor.yy322.nExpr>pParse.db.aLimit[Globals.SQLITE_LIMIT_FUNCTION_ARG]) {
 					utilc.sqlite3ErrorMsg(pParse,"too many arguments on function %T",yymsp[-4].minor.yy0Token);
 				}
 				yygotominor.yy118.pExpr=pParse.sqlite3ExprFunction(yymsp[-1].minor.yy322,yymsp[-4].minor.yy0Token);

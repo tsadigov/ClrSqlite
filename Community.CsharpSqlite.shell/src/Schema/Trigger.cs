@@ -23,9 +23,6 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-
-
-
         ///<summary>
         /// At least one instance of the following structure is created for each
         /// trigger that may be fired while parsing an INSERT, UPDATE or DELETE
@@ -44,42 +41,36 @@ namespace Community.CsharpSqlite
         /// statements). Similarly, the TriggerPrg.aColmask[1] variable is set to
         /// a mask of new.* columns used by the program.
         ///</summary>
-        public class TriggerPrg
+        public class TriggerPrg : ILinkedListNode<TriggerPrg>
         {
-            public Trigger pTrigger;
-
-            ///
             ///<summary>
             ///Trigger this program was coded from 
             ///</summary>
-
-            public OnConstraintError orconf;
-
-            ///
+            public Trigger pTrigger;
+            
             ///<summary>
             ///Default ON CONFLICT policy 
             ///</summary>
+            public OnConstraintError orconf;
 
-            public SubProgram pProgram;
 
-            ///
             ///<summary>
             ///Program implementing pTrigger/orconf 
             ///</summary>
+            public SubProgram pProgram;
 
-            public u32[] aColmask = new u32[2];
 
-            ///
             ///<summary>
             ///Masks of old.*, new.* columns accessed 
             ///</summary>
+            public u32[] aColmask = new u32[2];
 
-            public TriggerPrg pNext;
-            ///
+
             ///<summary>
             ///Next entry in Parse.pTriggerPrg list 
             ///</summary>
-
+            public TriggerPrg pNext { get; set; }
+            
         };
 
 
@@ -104,113 +95,97 @@ namespace Community.CsharpSqlite
         ///<summary>
         ///An instance of struct TriggerStep is used to store a single SQL statement
         ///</summary>
-        ///<param name="that is a part of a trigger">program.</param>
-        ///<param name=""></param>
-        ///<param name="Instances of struct TriggerStep are stored in a singly linked list (linked">Instances of struct TriggerStep are stored in a singly linked list (linked</param>
-        ///<param name="using the "pNext" member) referenced by the "step_list" member of the">using the "pNext" member) referenced by the "step_list" member of the</param>
-        ///<param name="associated struct Trigger instance. The first element of the linked list is">associated struct Trigger instance. The first element of the linked list is</param>
+        ///that is a part of a trigger">program.</param>
+        ///Instances of struct TriggerStep are stored in a singly linked list (linked">Instances of struct TriggerStep are stored in a singly linked list (linked</param>
+        ///using the "pNext" member) referenced by the "step_list" member of the
+        ///associated struct Trigger instance. The first element of the linked list is
         ///<param name="the first step of the trigger">program.</param>
         ///<param name=""></param>
         ///<param name="The "op" member indicates whether this is a "DELETE", "INSERT", "UPDATE" or">The "op" member indicates whether this is a "DELETE", "INSERT", "UPDATE" or</param>
         ///<param name=""SELECT" statement. The meanings of the other members is determined by the">"SELECT" statement. The meanings of the other members is determined by the</param>
         ///<param name="value of "op" as follows:">value of "op" as follows:</param>
-        ///<param name=""></param>
-        ///<param name="(op == Sqlite3.TK_INSERT)">(op == Sqlite3.TK_INSERT)</param>
-        ///<param name="orconf    ">> stores the ON CONFLICT algorithm</param>
-        ///<param name="pSelect   ">> If this is an INSERT INTO ... SELECT ... statement, then</param>
-        ///<param name="this stores a pointer to the SELECT statement. Otherwise NULL.">this stores a pointer to the SELECT statement. Otherwise NULL.</param>
-        ///<param name="target    ">> A token holding the quoted name of the table to insert into.</param>
-        ///<param name="pExprList ">> If this is an INSERT INTO ... VALUES ... statement, then</param>
-        ///<param name="this stores values to be inserted. Otherwise NULL.">this stores values to be inserted. Otherwise NULL.</param>
-        ///<param name="pIdList   ">names>) VALUES ...</param>
-        ///<param name="statement, then this stores the column">names to be</param>
-        ///<param name="inserted into.">inserted into.</param>
-        ///<param name=""></param>
-        ///<param name="(op == Sqlite3.TK_DELETE)">(op == Sqlite3.TK_DELETE)</param>
-        ///<param name="target    ">> A token holding the quoted name of the table to delete from.</param>
-        ///<param name="pWhere    ">> The WHERE clause of the DELETE statement if one is specified.</param>
-        ///<param name="Otherwise NULL.">Otherwise NULL.</param>
-        ///<param name=""></param>
-        ///<param name="(op == Sqlite3.TK_UPDATE)">(op == Sqlite3.TK_UPDATE)</param>
-        ///<param name="target    ">> A token holding the quoted name of the table to update rows of.</param>
-        ///<param name="pWhere    ">> The WHERE clause of the UPDATE statement if one is specified.</param>
-        ///<param name="Otherwise NULL.">Otherwise NULL.</param>
-        ///<param name="pExprList ">> A list of the columns to update and the expressions to update</param>
-        ///<param name="them to. See sqlite3Update() documentation of "pChanges"">them to. See sqlite3Update() documentation of "pChanges"</param>
-        ///<param name="argument.">argument.</param>
-        ///<param name=""></param>
-        ///<param name=""></param>
+        ///
+        ///(op == Sqlite3.TK_INSERT)</param>
+        ///orconf    ">> stores the ON CONFLICT algorithm</param>
+        ///pSelect   ">> If this is an INSERT INTO ... SELECT ... statement, then</param>
+        ///this stores a pointer to the SELECT statement. Otherwise NULL.</param>
+        ///target    ">> A token holding the quoted name of the table to insert into.</param>
+        ///pExprList ">> If this is an INSERT INTO ... VALUES ... statement, then</param>
+        ///this stores values to be inserted. Otherwise NULL.">this stores values to be inserted. Otherwise NULL.</param>
+        ///pIdList   ">names>) VALUES ...</param>
+        ///statement, then this stores the column-names to be</param>
+        ///inserted into.">inserted into.</param>
+        ///
+        ///(op == Sqlite3.TK_DELETE)</param>
+        ///target    ">> A token holding the quoted name of the table to delete from.</param>
+        ///pWhere    ">> The WHERE clause of the DELETE statement if one is specified.</param>
+        ///Otherwise NULL.">Otherwise NULL.</param>
+        ///
+        ///(op == Sqlite3.TK_UPDATE)</param>
+        ///target    ">> A token holding the quoted name of the table to update rows of.</param>
+        ///pWhere    ">> The WHERE clause of the UPDATE statement if one is specified.</param>
+        ///Otherwise NULL.</param>
+        ///pExprList ">> A list of the columns to update and the expressions to update</param>
+        ///them to. See sqlite3Update() documentation of "pChanges"</param>
+        ///argument.</param>
 
-        public class TriggerStep
+        public class TriggerStep : ILinkedListNode<TriggerStep>
         {
-            public u8 op;
-
-            ///
             ///<summary>
             ///One of Sqlite3.TK_DELETE, Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT, Sqlite3.TK_SELECT 
             ///</summary>
+            public u8 op;
 
-            public OnConstraintError orconf;
-
-            ///
             ///<summary>
             ///OE_Rollback etc. 
             ///</summary>
+            public OnConstraintError orconf;
 
-            public Trigger pTrig;
 
-            ///
             ///<summary>
             ///The trigger that this step is a part of 
             ///</summary>
+            public Trigger pTrig;
 
-            public Select pSelect;
 
-            ///
             ///<summary>
             ///SELECT statment or RHS of INSERT INTO .. SELECT ... 
             ///</summary>
+            public Select pSelect;
 
-            public Token target;
 
-            ///
             ///<summary>
             ///Target table for DELETE, UPDATE, INSERT 
             ///</summary>
+            public Token target;
 
-            public Expr pWhere;
 
-            ///
             ///<summary>
             ///The WHERE clause for DELETE or UPDATE steps 
             ///</summary>
+            public Expr pWhere;
 
-            public ExprList pExprList;
 
-            ///
             ///<summary>
             ///SET clause for UPDATE.  VALUES clause for INSERT 
             ///</summary>
+            public ExprList pExprList;
 
-            public IdList pIdList;
-
-            ///
             ///<summary>
             ///Column names for INSERT 
             ///</summary>
+            public IdList pIdList;
 
-            public TriggerStep pNext;
 
-            ///
-            ///<summary>
-            ///</summary>
             ///<param name="Next in the link">list </param>
+            public TriggerStep pNext { get; set; }
 
-            public TriggerStep pLast;
 
             ///<summary>
             ///Last element in link-list. Valid for 1st elem only
             ///</summary>
+            public TriggerStep pLast;
+
             public TriggerStep()
             {
                 target = new Token();
@@ -247,77 +222,65 @@ namespace Community.CsharpSqlite
         ///
         ///</summary>
 
-        public class Trigger
+        public class Trigger:ILinkedListNode<Trigger>
         {
-            public string zName;
-
-            ///
             ///<summary>
             ///The name of the trigger                        
             ///</summary>
+            public string zName;
 
-            public string table;
-
-            ///
             ///<summary>
             ///The table or view to which the trigger applies 
             ///</summary>
+            public string table;
 
-            public u8 op;
-
-            ///
             ///<summary>
             ///One of Sqlite3.TK_DELETE, Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT         
             ///</summary>
+            public u8 op;
 
-            public TriggerType tr_tm;
 
-            ///
             ///<summary>
             ///One of TriggerType.TRIGGER_BEFORE, TriggerType.TRIGGER_AFTER 
             ///</summary>
+            public TriggerType tr_tm;
 
-            public Expr pWhen;
 
-            ///
             ///<summary>
             ///The WHEN clause of the expression (may be NULL) 
             ///</summary>
+            public Expr pWhen;
 
+
+            ///If this is an UPDATE OF <column-list> trigger,
+            ///the column list is stored here 
             public IdList pColumns;
 
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="If this is an UPDATE OF <column">list> trigger,</param>
-            ///<param name="the <column">list> is stored here </param>
 
-            public Schema pSchema;
-
-            ///
             ///<summary>
             ///Schema containing the trigger 
             ///</summary>
+            public Schema pSchema;
 
-            public Schema pTabSchema;
 
-            ///
+
             ///<summary>
             ///Schema containing the table 
             ///</summary>
+            public Schema pTabSchema;
 
-            public TriggerStep step_list;
 
             ///<summary>
             ///Link list of trigger program steps
             ///</summary>
-            public Trigger pNext;
+            public TriggerStep step_list;
 
-            ///
             ///<summary>
             ///Next trigger associated with the table 
             ///</summary>
+            public Trigger pNext { get; set; }
 
+            
             public Trigger Copy()
             {
                 if (this == null)
@@ -341,8 +304,5 @@ namespace Community.CsharpSqlite
                 }
             }
         };
-
-
-
 
 }

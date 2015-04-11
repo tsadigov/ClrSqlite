@@ -825,7 +825,8 @@ return;
         /// Remove a trigger from the hash tables of the sqlite* pointer.
         ///
         ///</summary>
-        public static void sqlite3UnlinkAndDeleteTrigger(sqlite3 db,int iDb,string zName) {
+        public static void sqlite3UnlinkAndDeleteTrigger(sqlite3 db, int iDb, string zName)//OPCODE:OP_DropTrigger
+        {
 			Trigger pTrigger;
 			Hash pHash;
 			Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db,iDb,null));

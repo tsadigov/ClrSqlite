@@ -1156,7 +1156,7 @@ else
 																			Table pTab;
 																			if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																				goto pragma_out;
-																			pTab=build.sqlite3FindTable(db,zRight,zDb);
+																			pTab=TableBuilder.sqlite3FindTable(db,zRight,zDb);
 																			if(pTab!=null) {
 																				int i;
 																				int nHidden=0;
@@ -1198,7 +1198,7 @@ else
 																				Table pTab;
 																				if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																					goto pragma_out;
-																				pIdx=build.sqlite3FindIndex(db,zRight,zDb);
+																				pIdx=IndexBuilder.sqlite3FindIndex(db,zRight,zDb);
 																				if(pIdx!=null) {
 																					int i;
 																					pTab=pIdx.pTable;
@@ -1223,7 +1223,7 @@ else
 																					Table pTab;
 																					if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																						goto pragma_out;
-																					pTab=build.sqlite3FindTable(db,zRight,zDb);
+																					pTab=TableBuilder.sqlite3FindTable(db,zRight,zDb);
 																					if(pTab!=null) {
 																						v=pParse.sqlite3GetVdbe();
 																						pIdx=pTab.pIndex;
@@ -1290,7 +1290,7 @@ else
 																								Table pTab;
 																								if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																									goto pragma_out;
-																								pTab=build.sqlite3FindTable(db,zRight,zDb);
+																								pTab=TableBuilder.sqlite3FindTable(db,zRight,zDb);
 																								if(pTab!=null) {
 																									v=pParse.sqlite3GetVdbe();
 																									pFK=pTab.pFKey;

@@ -278,7 +278,7 @@ namespace Community.CsharpSqlite {
                 }
                 else
                 {
-                    p2 = (vdbeapi.sqlite3_context_db_handle(context)).aLimit[SQLITE_LIMIT_LENGTH];
+                    p2 = (vdbeapi.sqlite3_context_db_handle(context)).aLimit[Globals.SQLITE_LIMIT_LENGTH];
                 }
                 if (p1 < 0)
                 {
@@ -560,7 +560,7 @@ break;
                 {
                     n = 1;
                 }
-                if (n > vdbeapi.sqlite3_context_db_handle(context).aLimit[SQLITE_LIMIT_LENGTH])
+                if (n > vdbeapi.sqlite3_context_db_handle(context).aLimit[Globals.SQLITE_LIMIT_LENGTH])
                 {
                     context.sqlite3_result_error_toobig();
                     p = null;
@@ -936,9 +936,9 @@ break;
                 ///
                 ///</summary>
                 nPat = vdbeapi.sqlite3_value_bytes(argv[0]);
-                sqliteinth.testcase(nPat == db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH]);
-                sqliteinth.testcase(nPat == db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH] + 1);
-                if (nPat > db.aLimit[SQLITE_LIMIT_LIKE_PATTERN_LENGTH])
+                sqliteinth.testcase(nPat == db.aLimit[Globals.SQLITE_LIMIT_LIKE_PATTERN_LENGTH]);
+                sqliteinth.testcase(nPat == db.aLimit[Globals.SQLITE_LIMIT_LIKE_PATTERN_LENGTH] + 1);
+                if (nPat > db.aLimit[Globals.SQLITE_LIMIT_LIKE_PATTERN_LENGTH])
                 {
                     context.sqlite3_result_error("LIKE or GLOB pattern too complex", -1);
                     return;
@@ -1246,9 +1246,9 @@ break;
                 Debug.Assert(argc == 1);
                 sqliteinth.UNUSED_PARAMETER(argc);
                 n = vdbeapi.sqlite3_value_int64(argv[0]);
-                sqliteinth.testcase(n == db.aLimit[SQLITE_LIMIT_LENGTH]);
-                sqliteinth.testcase(n == db.aLimit[SQLITE_LIMIT_LENGTH] + 1);
-                if (n > db.aLimit[SQLITE_LIMIT_LENGTH])
+                sqliteinth.testcase(n == db.aLimit[Globals.SQLITE_LIMIT_LENGTH]);
+                sqliteinth.testcase(n == db.aLimit[Globals.SQLITE_LIMIT_LENGTH] + 1);
+                if (n > db.aLimit[Globals.SQLITE_LIMIT_LENGTH])
                 {
                     context.sqlite3_result_error_toobig();
                 }
@@ -1353,7 +1353,7 @@ break;
                 Debug.Assert(zRep == vdbeapi.sqlite3_value_text(argv[2]));
                 nOut = nStr + 1;
                 Debug.Assert(nOut < SQLITE_MAX_LENGTH);
-                if (nOut <= vdbeapi.sqlite3_context_db_handle(context).aLimit[SQLITE_LIMIT_LENGTH])
+                if (nOut <= vdbeapi.sqlite3_context_db_handle(context).aLimit[Globals.SQLITE_LIMIT_LENGTH])
                 {
                     //zOut = contextMalloc(context, (i64)nOut);
                     //if( zOut==0 ){
@@ -1401,7 +1401,7 @@ break;
                         j = 0;
                     }
                 }
-                if (j == 0 || j > vdbeapi.sqlite3_context_db_handle(context).aLimit[SQLITE_LIMIT_LENGTH])
+                if (j == 0 || j > vdbeapi.sqlite3_context_db_handle(context).aLimit[Globals.SQLITE_LIMIT_LENGTH])
                 {
                     context.sqlite3_result_error_toobig();
                 }
@@ -1901,7 +1901,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
                 //int firstTerm = pMem._StrAccum.useMalloc == 0 ? 1 : 0;
                 //pMem._StrAccum.useMalloc = 2;
-                pMem._StrAccum.mxAlloc = db.aLimit[SQLITE_LIMIT_LENGTH];
+                pMem._StrAccum.mxAlloc = db.aLimit[Globals.SQLITE_LIMIT_LENGTH];
                 if (pMem._StrAccum.Context == null)
                     // first term
                     pMem._StrAccum.Context = pMem;

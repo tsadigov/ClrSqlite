@@ -153,12 +153,12 @@ namespace Community.CsharpSqlite
             ///</summary>
 
 #if !SQLITE_OMIT_CHECK
-            public Expr pCheck;
-
-            ///
             ///<summary>
             ///The AND of all CHECK constraints 
             ///</summary>
+            public Expr pCheck;
+
+            
 
 #endif
 #if !SQLITE_OMIT_ALTERTABLE

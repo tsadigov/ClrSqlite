@@ -1053,7 +1053,7 @@ void *sqlite3_wsd_find(void *K, int L);
         ///
         ///</summary>
         //#define SQLITE_N_LIMIT (SQLITE_LIMIT_TRIGGER_DEPTH+1)
-        public const int SQLITE_N_LIMIT = Sqlite3.SQLITE_LIMIT_TRIGGER_DEPTH + 1;
+        public const int SQLITE_N_LIMIT = Globals.SQLITE_LIMIT_TRIGGER_DEPTH + 1;
 
 
 

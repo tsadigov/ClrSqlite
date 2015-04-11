@@ -634,7 +634,7 @@ set { _flags = value; }
             }
             if (pMem.db != null)
             {
-                iLimit = pMem.db.aLimit[Sqlite3.SQLITE_LIMIT_LENGTH];
+                iLimit = pMem.db.aLimit[Globals.SQLITE_LIMIT_LENGTH];
             }
             else
             {

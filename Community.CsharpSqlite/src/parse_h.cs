@@ -317,33 +317,34 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 			///<summary>
 			///Pointers to names of parameters 
 			///</summary>
-			public Vdbe pReprepare;
-			///
+            
+            
+            ///<summary>
+            ///VM being reprepared (sqlite3Reprepare()) 
+            ///</summary>
+            public Vdbe pReprepare;
 			///<summary>
-			///VM being reprepared (sqlite3Reprepare()) 
-			///</summary>
-			public int nAlias;
-			///
+            ///Number of aliased result set columns 
+            ///</summary>
+            public int nAlias;
 			///<summary>
-			///Number of aliased result set columns 
-			///</summary>
-			public int nAliasAlloc;
-			///
+            ///Number of allocated slots for aAlias[] 
+            ///</summary>
+            public int nAliasAlloc;
 			///<summary>
-			///Number of allocated slots for aAlias[] 
-			///</summary>
-			public int[] aAlias;
-			///
+            ///Register used to hold aliased result 
+            ///</summary>
+            public int[] aAlias;
 			///<summary>
-			///Register used to hold aliased result 
-			///</summary>
-			public u8 explain;
-			///
-			///<summary>
-			///True if the EXPLAIN flag is found on the query 
-			///</summary>
+            ///True if the EXPLAIN flag is found on the query 
+            ///</summary>
+            public u8 explain;
 			Token _sNameToken;
-			public Token sNameToken {
+            ///<summary>
+            ///Token with unqualified schema object name 
+            ///</summary>
+            public Token sNameToken
+            {
 				get {
 					return _sNameToken;
 				}
@@ -353,28 +354,24 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 						Log.WriteHeader("Parse name : "+_sNameToken.Text);
 				}
 			}
-			///
 			///<summary>
-			///Token with unqualified schema object name 
-			///</summary>
-			public Token sLastToken;
-			///
+            ///The last token parsed 
+            ///</summary>
+            public Token sLastToken;
 			///<summary>
-			///The last token parsed 
-			///</summary>
-			public StringBuilder zTail {
+            ///All SQL text past the last semicolon parsed 
+            ///</summary>
+            public StringBuilder zTail
+            {
 				get;
 				set;
 			}
 			///
 			///<summary>
-			///All SQL text past the last semicolon parsed 
-			///</summary>
-			public Table pNewTable;
-			///
-			///<summary>
-			///A table being constructed by CREATE TABLE 
-			///</summary>
+            ///A table being constructed by CREATE TABLE 
+            ///</summary>
+            public Table pNewTable;
+			
 			public Trigger pNewTrigger;
 			///
 			///<summary>
@@ -566,7 +563,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				Debug.Assert(this.pNewTable==null);
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
 				//      if ( db.mallocFailed != 0 ) goto exit_begin_add_column;
-				pTab=build.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
+				pTab=TableBuilder.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
 				if(pTab==null)
 					goto exit_begin_add_column;
 				if(pTab.IsVirtual()) {
@@ -709,7 +706,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				// zTab = &pNew->zName[16]; /* Skip the "sqlite_altertab_" prefix on the name */
 				pCol=pNew.aCol[pNew.nCol-1];
 				pDflt=pCol.pDflt;
-				pTab=build.sqlite3FindTable(db,zTab,zDb);
+				pTab=TableBuilder.sqlite3FindTable(db,zTab,zDb);
 				Debug.Assert(pTab!=null);
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																																																/* Invoke the authorization callback. */
@@ -916,7 +913,7 @@ return;
 				//if ( NEVER( db.mallocFailed != 0 ) ) goto exit_rename_table;
 				Debug.Assert(pSrc.nSrc==1);
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				pTab=build.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
+				pTab=TableBuilder.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
 				if(pTab==null)
 					goto exit_rename_table;
 				iDb=sqlite3SchemaToIndex(this.db,pTab.pSchema);
@@ -935,7 +932,7 @@ return;
 				///in database iDb. If so, this is an error.
 				///
 				///</summary>
-				if(build.sqlite3FindTable(db,zName,zDb)!=null||build.sqlite3FindIndex(db,zName,zDb)!=null) {
+				if(TableBuilder.sqlite3FindTable(db,zName,zDb)!=null||IndexBuilder.sqlite3FindIndex(db,zName,zDb)!=null) {
 					utilc.sqlite3ErrorMsg(this,"there is already another table or index with this name: %s",zName);
 					goto exit_rename_table;
 				}
@@ -1045,7 +1042,7 @@ goto exit_rename_table;
 				///If the sqlite_sequence table exists in this database, then update
 				///it with the new table name.
 				///</summary>
-				if(build.sqlite3FindTable(db,"sqlite_sequence",zDb)!=null) {
+				if(TableBuilder.sqlite3FindTable(db,"sqlite_sequence",zDb)!=null) {
 					build.sqlite3NestedParse(this,"UPDATE \"%w\".sqlite_sequence set name = %Q WHERE name = %Q",zDb,zName,pTab.zName);
 				}
 				#endif
@@ -1234,7 +1231,7 @@ goto exit_rename_table;
 				for(i=0;i<Sqlite3.ArraySize(aTable);i++) {
 					string zTab=aTable[i].zName;
 					Table pStat;
-					if((pStat=build.sqlite3FindTable(db,zTab,pDb.zName))==null) {
+					if((pStat=TableBuilder.sqlite3FindTable(db,zTab,pDb.zName))==null) {
 						///
 						///<summary>
 						///The sqlite_stat[12] table does not exist. Create it. Note that a 
@@ -1772,11 +1769,11 @@ return;
 						else {
 							z=build.sqlite3NameFromToken(db,pName1);
 							if(z!=null) {
-								if((pIdx=build.sqlite3FindIndex(db,z,null))!=null) {
+								if((pIdx=IndexBuilder.sqlite3FindIndex(db,z,null))!=null) {
 									this.analyzeTable(pIdx.pTable,pIdx);
 								}
 								else
-									if((pTab=build.sqlite3LocateTable(this,0,z,null))!=null) {
+									if((pTab=TableBuilder.sqlite3LocateTable(this,0,z,null))!=null) {
 										this.analyzeTable(pTab,null);
 									}
 								z=null;
@@ -1794,11 +1791,11 @@ return;
 							zDb=db.aDb[iDb].zName;
 							z=build.sqlite3NameFromToken(db,pTableName);
 							if(z!=null) {
-								if((pIdx=build.sqlite3FindIndex(db,z,zDb))!=null) {
+								if((pIdx=IndexBuilder.sqlite3FindIndex(db,z,zDb))!=null) {
 									this.analyzeTable(pIdx.pTable,pIdx);
 								}
 								else
-									if((pTab=build.sqlite3LocateTable(this,0,z,zDb))!=null) {
+									if((pTab=TableBuilder.sqlite3LocateTable(this,0,z,zDb))!=null) {
 										this.analyzeTable(pTab,null);
 									}
 								z=null;
@@ -2740,10 +2737,10 @@ goto attach_end;
 					///early.  
 					///</summary>
 					if(this.disableTriggers!=0) {
-						pTo=build.sqlite3FindTable(db,pFKey.zTo,zDb);
+						pTo=TableBuilder.sqlite3FindTable(db,pFKey.zTo,zDb);
 					}
 					else {
-						pTo=build.sqlite3LocateTable(this,0,pFKey.zTo,zDb);
+						pTo=TableBuilder.sqlite3LocateTable(this,0,pFKey.zTo,zDb);
 					}
 					if(null==pTo||this.locateFkeyIndex(pTo,pFKey,out pIdx,out aiFree)!=0) {
 						if(0==isIgnoreErrors///
@@ -3330,7 +3327,7 @@ goto attach_end;
                 int i = 0;///Loop counter 
 
                 int mxSqlLen;///Max length of an SQL string 
-                mxSqlLen = db.aLimit[SQLITE_LIMIT_SQL_LENGTH];
+                mxSqlLen = db.aLimit[Globals.SQLITE_LIMIT_SQL_LENGTH];
 
                 while (
                     ///0 == db.mallocFailed && 
@@ -3467,7 +3464,7 @@ pParse.nTableLock = 0;
 					///will take responsibility for freeing the Table structure.
 					///
 					///</summary>
-					build.sqlite3DeleteTable(db,ref this.pNewTable);
+					TableBuilder.sqlite3DeleteTable(db,ref this.pNewTable);
 				}
 #if !SQLITE_OMIT_TRIGGER
                 TriggerParser.sqlite3DeleteTrigger(db,ref this.pNewTrigger);
@@ -3484,7 +3481,7 @@ pParse.nTableLock = 0;
 				while(this.pZombieTab!=null) {
 					Table p=this.pZombieTab;
 					this.pZombieTab=p.pNextZombie;
-					build.sqlite3DeleteTable(db,ref p);
+					TableBuilder.sqlite3DeleteTable(db,ref p);
 				}
 				if(nErr>0&&this.rc==SqlResult.SQLITE_OK) {
 					this.rc=SqlResult.SQLITE_ERROR;
@@ -6000,8 +5997,8 @@ aXRef[j] = -1;
 				SrcList_item pItem=pSrc.a[0];
 				Table pTab;
 				Debug.Assert(pItem!=null&&pSrc.nSrc==1);
-				pTab=build.sqlite3LocateTable(this,0,pItem.zName,pItem.zDatabase);
-				build.sqlite3DeleteTable(this.db,ref pItem.pTab);
+				pTab=TableBuilder.sqlite3LocateTable(this,0,pItem.zName,pItem.zDatabase);
+				TableBuilder.sqlite3DeleteTable(this.db,ref pItem.pTab);
 				pItem.pTab=pTab;
 				if(pTab!=null) {
 					pTab.nRef++;
@@ -6804,7 +6801,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			}
 			public SqlResult sqlite3ExprCheckHeight(int nHeight) {
 				var rc=SqlResult.SQLITE_OK;
-				int mxHeight=this.db.aLimit[SQLITE_LIMIT_EXPR_DEPTH];
+				int mxHeight=this.db.aLimit[Globals.SQLITE_LIMIT_EXPR_DEPTH];
 				if(nHeight>mxHeight) {
 					utilc.sqlite3ErrorMsg(this,"Expression tree is too large (maximum depth %d)",mxHeight);
 					rc=SqlResult.SQLITE_ERROR;
@@ -8423,7 +8420,7 @@ return;
 				}
 			}
 			public void sqlite3ExprListCheckLength(ExprList pEList,string zObject) {
-				int mx=this.db.aLimit[SQLITE_LIMIT_COLUMN];
+				int mx=this.db.aLimit[Globals.SQLITE_LIMIT_COLUMN];
 				sqliteinth.testcase(pEList!=null&&pEList.nExpr==mx);
 				sqliteinth.testcase(pEList!=null&&pEList.nExpr==mx+1);
 				if(pEList!=null&&pEList.nExpr>mx) {
@@ -8485,10 +8482,10 @@ return;
 						pExpr.iColumn=x=(ynVar)i;
 						sqliteinth.testcase(i==0);
 						sqliteinth.testcase(i==1);
-						sqliteinth.testcase(i==db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]-1);
-						sqliteinth.testcase(i==db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]);
-						if(bOk==false||i<1||i>db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]) {
-							utilc.sqlite3ErrorMsg(this,"variable number must be between ?1 and ?%d",db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]);
+						sqliteinth.testcase(i==db.aLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]-1);
+						sqliteinth.testcase(i==db.aLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]);
+						if(bOk==false||i<1||i>db.aLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]) {
+							utilc.sqlite3ErrorMsg(this,"variable number must be between ?1 and ?%d",db.aLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]);
 							x=0;
 						}
 						if(i>this.nVar) {
@@ -8531,7 +8528,7 @@ return;
 						}
 					}
 				}
-				if(this.nErr==0&&this.nVar>db.aLimit[SQLITE_LIMIT_VARIABLE_NUMBER]) {
+				if(this.nErr==0&&this.nVar>db.aLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]) {
 					utilc.sqlite3ErrorMsg(this,"too many SQL variables");
 				}
 			}
@@ -12386,7 +12383,7 @@ range_est_fallback:
 				///<summary>
 				///Database connection 
 				///</summary>
-				build.sqlite3StartTable(this,pName1,pName2,0,0,1,0);
+				TableBuilder.sqlite3StartTable(this,pName1,pName2,0,0,1,0);
 				pTable=this.pNewTable;
 				if(pTable==null)
 					return;

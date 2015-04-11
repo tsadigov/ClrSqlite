@@ -44,8 +44,8 @@ namespace Community.CsharpSqlite {
 			///Specified database name already being used.
 			///
 			///</summary>
-			if(db.nDb>=db.aLimit[SQLITE_LIMIT_ATTACHED]+2) {
-				zErrDyn=io.sqlite3MPrintf(db,"too many attached databases - max %d",db.aLimit[SQLITE_LIMIT_ATTACHED]);
+			if(db.nDb>=db.aLimit[Globals.SQLITE_LIMIT_ATTACHED]+2) {
+				zErrDyn=io.sqlite3MPrintf(db,"too many attached databases - max %d",db.aLimit[Globals.SQLITE_LIMIT_ATTACHED]);
 				goto attach_error;
 			}
 			if(0==db.autoCommit) {

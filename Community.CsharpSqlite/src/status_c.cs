@@ -240,7 +240,7 @@ namespace Community.CsharpSqlite {
 						}
 						for(p= pSchema.tblHash.sqliteHashFirst();p!=null;p=p.sqliteHashNext()) {
 							Table t=(Table)p.sqliteHashData();
-							build.sqlite3DeleteTable(db,ref t);
+							TableBuilder.sqlite3DeleteTable(db,ref t);
 						}
 					}
 				}

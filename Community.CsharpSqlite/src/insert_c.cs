@@ -749,7 +749,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			pItem = pSelect.pSrc.a [0];
-			pSrc = build.sqlite3LocateTable (pParse, 0, pItem.zName, pItem.zDatabase);
+			pSrc = TableBuilder.sqlite3LocateTable (pParse, 0, pItem.zName, pItem.zDatabase);
 			if (pSrc == null) {
 				return 0;
 				///

@@ -142,11 +142,7 @@ namespace Community.CsharpSqlite
 
     // #define  P4Usage.P4_KEYINFO_STATIC  (-17)
     
-        
-    public  static partial class Globals{
-        	
-		
-    }
+     
 		
 
 	public partial class Sqlite3

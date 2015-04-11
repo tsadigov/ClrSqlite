@@ -102,7 +102,7 @@ namespace Community.CsharpSqlite
 		//#define BTREE_MEMORY        4  /* This is an in-memory DB */
 		//#define BTREE_SINGLE        8  /* The file contains at most 1 b-tree */
 		//#define BTREE_UNORDERED    16  /* Use of a hash implementation is OK */
-		const int BTREE_OMIT_JOURNAL = 1;
+		public const int BTREE_OMIT_JOURNAL = 1;
 
 		///
 ///<summary>
@@ -123,7 +123,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 ///<param name="This is an in">memory DB </param>
 
-		const int BTREE_SINGLE = 8;
+		public const int BTREE_SINGLE = 8;
 
 		///
 ///<summary>
@@ -173,19 +173,16 @@ namespace Community.CsharpSqlite
 ///of the flags shown below.
 ///
 ///Every SQLite table must have either BTREE_INTKEY or BTREE_BLOBKEY set.
-///</summary>
-///<param name="With BTREE_INTKEY, the table key is a 64">bit integer and arbitrary data</param>
-///<param name="is stored in the leaves.  (BTREE_INTKEY is used for SQL tables.)  With">is stored in the leaves.  (BTREE_INTKEY is used for SQL tables.)  With</param>
-///<param name="BTREE_BLOBKEY, the key is an arbitrary BLOB and no content is stored">BTREE_BLOBKEY, the key is an arbitrary BLOB and no content is stored</param>
-///<param name="anywhere "> the key is the content.  (BTREE_BLOBKEY is used for SQL</param>
-///<param name="indices.)">indices.)</param>
-///<param name=""></param>
+///With BTREE_INTKEY, the table key is a 64-bit integer and arbitrary data
+///is stored in the leaves.  (BTREE_INTKEY is used for SQL tables.)  With
+///BTREE_BLOBKEY, the key is an arbitrary BLOB and no content is stored
+///anywhere - the key is the content.  (BTREE_BLOBKEY is used for SQL ndices.)
 
 		//#define BTREE_INTKEY     1    /* Table has only 64-bit signed integer keys */
 		//#define BTREE_BLOBKEY    2    /* Table has keys only - no data */
-		const int BTREE_INTKEY = 1;
+        public const int BTREE_INTKEY = 1;
 
-		const int BTREE_BLOBKEY = 2;
+		public const int BTREE_BLOBKEY = 2;
 
 		//int sqlite3BtreeDropTable(Btree*, int, int);
 		//int sqlite3BtreeClearTable(Btree*, int, int);
