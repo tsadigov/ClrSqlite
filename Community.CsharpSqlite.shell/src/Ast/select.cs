@@ -56,13 +56,11 @@ namespace Community.CsharpSqlite
 
         public class Select
         {
-            public ExprList pEList;
-
-            ///
             ///<summary>
             ///The fields of the result 
             ///</summary>
-
+            public ExprList pEList;
+            
             public u8 tk_op { get; set; }
             public TokenType TokenOp {
                 get { return (TokenType)tk_op; }
@@ -76,7 +74,6 @@ namespace Community.CsharpSqlite
 
             public char affinity;
 
-            ///
             ///<summary>
             ///MakeRecord with this affinity for SelectResultType.Set 
             ///</summary>
@@ -1809,21 +1806,13 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
             public static void selectAddColumnTypeAndCollation(Sqlite3.Parse pParse,///
-                ///<summary>
                 ///Parsing contexts 
-                ///</summary>
             int nCol,///
-                ///<summary>
                 ///Number of columns 
-                ///</summary>
             Column[] aCol,///
-                ///<summary>
                 ///List of columns 
-                ///</summary>
             Select pSelect///
-                ///<summary>
                 ///SELECT used to determine types and collations 
-                ///</summary>
             )
             {
                 sqlite3 db = pParse.db;
@@ -1885,10 +1874,7 @@ namespace Community.CsharpSqlite
                 //sqlite3DbMallocZero(db, sizeof(*pNew) );
                 Debug.Assert(//db.mallocFailed != 0 ||
                 null == pOffset || pLimit != null);
-                ///
-                ///<summary>
                 ///OFFSET implies LIMIT 
-                ///</summary>
                 //if( pNew==null   ){
                 //  pNew = standin;
                 //  memset(pNew, 0, sizeof(*pNew));
@@ -1936,41 +1922,17 @@ namespace Community.CsharpSqlite
         public enum SelectFlags : ushort
         {
             Distinct = 0x0001,
-            ///
-            ///<summary>
             ///Output should be DISTINCT 
-            ///</summary>
-
             Resolved = 0x0002,
-            ///
-            ///<summary>
             ///Identifiers have been resolved 
-            ///</summary>
-
             Aggregate = 0x0004,
-            ///
-            ///<summary>
             ///Contains aggregate functions 
-            ///</summary>
-
             UsesEphemeral = 0x0008,
-            ///
-            ///<summary>
             ///Uses the OpenEphemeral opcode 
-            ///</summary>
-
             Expanded = 0x0010,
-            ///
-            ///<summary>
             ///sqlite3SelectExpand() called on this 
-            ///</summary>
-
             HasTypeInfo = 0x0020
-            ///
-            ///<summary>
             ///FROM subqueries have Table metadata 
-            ///</summary>
-
         }
 
 
@@ -1996,21 +1958,22 @@ namespace Community.CsharpSqlite
         ///</summary>
         public class SrcList_item
         {
-            public string zDatabase;
-            ///
             ///<summary>
             ///Name of database holding this table 
             ///</summary>
-            public string zName;
+            public string zDatabase;
+
             ///
             ///<summary>
             ///Name of the table 
             ///</summary>
-            public string zAlias;
-            ///
+            public string zName;
+
             ///<summary>
             ///The "B" part of a "A AS B" phrase.  zName is the "A" 
             ///</summary>
+            public string zAlias;
+            
             public Table pTab;
             ///
             ///<summary>
@@ -2097,13 +2060,6 @@ namespace Community.CsharpSqlite
             JT_ERROR = 0x0040
             //#define JT_ERROR     0x0040    /* unknown or unsupported join type */
         }
-
-
-
-
-
-
-
 
         ///<summary>
         /// Given 1 to 3 identifiers preceeding the JOIN keyword, determine the

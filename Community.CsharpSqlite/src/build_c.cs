@@ -25,6 +25,7 @@ namespace Community.CsharpSqlite
     using Vdbe = Sqlite3.Vdbe;
     using _Custom = Sqlite3._Custom;
     using Btree = Sqlite3.Btree;
+    using System.Linq;
     //public partial class Sqlite3
     //{
     public class build
@@ -368,22 +369,14 @@ p.zName,  P4Usage.P4_STATIC );
             public static Table sqlite3FindTable(sqlite3 db, string zName, string zDatabase)
             {
                 Table p = null;
-                int i;
-                int nName;
                 Debug.Assert(zName != null);
-                nName = StringExtensions.sqlite3Strlen30(zName);
-                ///
-                ///<summary>
+                var nName = StringExtensions.sqlite3Strlen30(zName);
                 ///All mutexes are required for schema access.  Make sure we hold them. 
-                ///</summary>
                 Debug.Assert(zDatabase != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
-                for (i = sqliteinth.OMIT_TEMPDB; i < db.nDb; i++)
+                for (int i = sqliteinth.OMIT_TEMPDB; i < db.nDb; i++)
                 {
                     int j = (i < 2) ? i ^ 1 : i;
-                    ///
-                    ///<summary>
                     ///Search TEMP before MAIN 
-                    ///</summary>
                     if (zDatabase != null && !zDatabase.Equals(db.aDb[j].zName, StringComparison.InvariantCultureIgnoreCase))
                         continue;
                     Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
@@ -405,34 +398,22 @@ p.zName,  P4Usage.P4_STATIC );
             ///
             ///</summary>
             public static Table sqlite3LocateTable(Parse pParse,///
-                ///<summary>
                 ///context in which to report errors 
-                ///</summary>
             int isView,///
-                ///<summary>
                 ///True if looking for a VIEW rather than a TABLE 
-                ///</summary>
             string zName,///
-                ///<summary>
                 ///Name of the table we are looking for 
-                ///</summary>
             string zDbase///
-                ///<summary>
                 ///Name of the database.  Might be NULL 
-                ///</summary>
             )
-            {
-                Table p;
-                ///
-                ///<summary>
+            {   
                 ///Read the database schema. If an error occurs, leave an error message
                 ///and code in pParse and return NULL. 
-                ///</summary>
                 if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
                 {
                     return null;
                 }
-                p = build.sqlite3FindTable(pParse.db, zName, zDbase);
+                Table p = build.sqlite3FindTable(pParse.db, zName, zDbase);
                 if (p == null)
                 {
                     string zMsg = isView != 0 ? "no such view" : "no such table";
@@ -464,20 +445,13 @@ p.zName,  P4Usage.P4_STATIC );
             public static Index sqlite3FindIndex(sqlite3 db, string zName, string zDb)
             {
                 Index p = null;
-                int i;
                 int nName = StringExtensions.sqlite3Strlen30(zName);
-                ///
-                ///<summary>
                 ///All mutexes are required for schema access.  Make sure we hold them. 
-                ///</summary>
                 Debug.Assert(zDb != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
-                for (i = sqliteinth.OMIT_TEMPDB; i < db.nDb; i++)
+                for (int i = sqliteinth.OMIT_TEMPDB; i < db.nDb; i++)
                 {
                     int j = (i < 2) ? i ^ 1 : i;
-                    ///
-                    ///<summary>
                     ///Search TEMP before MAIN 
-                    ///</summary>
                     Schema pSchema = db.aDb[j].pSchema;
                     Debug.Assert(pSchema != null);
                     if (zDb != null && !zDb.Equals(db.aDb[j].zName, StringComparison.InvariantCultureIgnoreCase))
@@ -510,41 +484,27 @@ p.zName,  P4Usage.P4_STATIC );
             ///</summary>
             public static void sqlite3UnlinkAndDeleteIndex(sqlite3 db, int iDb, string zIdxName)
             {
-                Index pIndex;
-                int len;
-                Hash pHash;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-                pHash = db.aDb[iDb].pSchema.idxHash;
-                len = StringExtensions.sqlite3Strlen30(zIdxName);
-                pIndex = HashExtensions.sqlite3HashInsert(ref pHash, zIdxName, len, (Index)null);
+                var pHash = db.aDb[iDb].pSchema.idxHash;
+                var pIndex = HashExtensions.sqlite3HashInsert(ref pHash, zIdxName, zIdxName.sqlite3Strlen30(), (Index)null);
+
+                sqlite3UnlinkAndDeleteIndex(db, pIndex);
+            }
+            /// <summary>
+            /// remove pIndex from linked-list
+            /// starting from pIndex.pTable.pIndex
+            /// moving by pNext
+            /// </summary>
+            public static void sqlite3UnlinkAndDeleteIndex(sqlite3 db,  Index pIndex) {
                 if (Sqlite3.ALWAYS(pIndex))
                 {
-                    if (pIndex.pTable.pIndex == pIndex)
-                    {
-                        pIndex.pTable.pIndex = pIndex.pNext;
-                    }
-                    else
-                    {
-                        Index p;
-                        ///
-                        ///<summary>
-                        ///Justification of Sqlite3.ALWAYS();  The index must be on the list of
-                        ///indices. 
-                        ///</summary>
-                        p = pIndex.pTable.pIndex;
-                        while (Sqlite3.ALWAYS(p != null) && p.pNext != pIndex)
-                        {
-                            p = p.pNext;
-                        }
-                        if (Sqlite3.ALWAYS(p != null && p.pNext == pIndex))
-                        {
-                            p.pNext = pIndex.pNext;
-                        }
-                    }
+                    pIndex.removeFromLinkedList(ref pIndex.pTable.pIndex,idx => idx.pNext,(node,next)=>node.pNext=next);
                     freeIndex(db, ref pIndex);
                 }
-                db.flags |= SqliteFlags.SQLITE_InternChanges;
+                db.flags |= SqliteFlags.SQLITE_InternChanges; 
             }
+
+            
             ///<summary>
             /// Erase all schema information from the in-memory hash tables of
             /// a single database.  This routine is called to reclaim memory
@@ -563,23 +523,15 @@ p.zName,  P4Usage.P4_STATIC );
                 Debug.Assert(iDb < db.nDb);
                 if (iDb >= 0)
                 {
-                    ///
-                    ///<summary>
                     ///Case 1:  Reset the single schema identified by iDb 
-                    ///</summary>
                     Db pDb = db.aDb[iDb];
                     Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                     Debug.Assert(pDb.pSchema != null);
                     pDb.pSchema.sqlite3SchemaClear();
                 
-
-                    ///
-                    ///<summary>
                     ///If any database other than TEMP is reset, then also reset TEMP
                     ///since TEMP might be holding triggers that reference tables in the
                     ///other database.
-                    ///
-                    ///</summary>
                 if (iDb != 1)
                     {
                         pDb = db.aDb[1];
@@ -588,11 +540,8 @@ p.zName,  P4Usage.P4_STATIC );
                     }
                     return;
                 }
-                ///
-                ///<summary>
                 ///Case 2 (from here to the end): Reset all schemas for all attached
                 ///databases. 
-                ///</summary>
                 Debug.Assert(iDb < 0);
                 Sqlite3.sqlite3BtreeEnterAll(db);
                 for (i = 0; i < db.nDb; i++)
@@ -684,25 +633,16 @@ p.zName,  P4Usage.P4_STATIC );
             ///</summary>
             public static void sqlite3DeleteTable(sqlite3 db, ref Table pTable)
             {
-                Index pIndex;
-                Index pNext;
                 Debug.Assert(null == pTable || pTable.nRef > 0);
-                ///
-                ///<summary>
                 ///Do not delete the table until the reference count reaches zero. 
-                ///</summary>
                 if (null == pTable)
                     return;
                 if ((// ( !db || db->pnBytesFreed == 0 ) && 
                 (--pTable.nRef) > 0))
                     return;
-                ///
-                ///<summary>
                 ///Delete all indices associated with this table. 
-                ///</summary>
-                for (pIndex = pTable.pIndex; pIndex != null; pIndex = pNext)
+                foreach (var pIndex in pTable.pIndex.path(x=>x.pNext) )
                 {
-                    pNext = pIndex.pNext;
                     Debug.Assert(pIndex.pSchema == pTable.pSchema);
                     //if( null==db || db.pnBytesFreed==0 ){
                     string zName = pIndex.zName;
@@ -723,17 +663,12 @@ p.zName,  P4Usage.P4_STATIC );
                     HashExtensions.sqlite3HashInsert(ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), (Index)null);
 #endif
                     //}
-                    freeIndex(db, ref pIndex);
+                    var index = pIndex;
+                    freeIndex(db, ref index);
                 }
-                ///
-                ///<summary>
                 ///Delete any foreign keys attached to this table. 
-                ///</summary>
                 fkeyc.sqlite3FkDelete(db, pTable);
-                ///
-                ///<summary>
                 ///Delete the Table structure itself.
-                ///</summary>
                 sqliteDeleteColumnNames(db, pTable);
                 db.sqlite3DbFree(ref pTable.zName);
                 db.sqlite3DbFree(ref pTable.zColAff);
@@ -3020,55 +2955,25 @@ goto exit_drop_table;
             static void sqlite3RefillIndex(Parse pParse, Index pIndex, int memRootPage)
             {
                 Table pTab = pIndex.pTable;
-                ///
-                ///<summary>
                 ///The table that is indexed 
-                ///</summary>
                 int iTab = pParse.nTab++;
-                ///
-                ///<summary>
                 ///Btree cursor used for pTab 
-                ///</summary>
                 int iIdx = pParse.nTab++;
-                ///
-                ///<summary>
                 ///Btree cursor used for pIndex 
-                ///</summary>
                 int addr1;
-                ///
-                ///<summary>
                 ///Address of top of loop 
-                ///</summary>
                 int tnum;
-                ///
-                ///<summary>
                 ///Root page of index 
-                ///</summary>
                 Vdbe v;
-                ///
-                ///<summary>
                 ///Generate code into this virtual machine 
-                ///</summary>
                 KeyInfo pKey;
-                ///
-                ///<summary>
                 ///KeyInfo for index 
-                ///</summary>
                 int regIdxKey;
-                ///
-                ///<summary>
                 ///Registers containing the index key 
-                ///</summary>
                 int regRecord;
-                ///
-                ///<summary>
                 ///Register holding assemblied index record 
-                ///</summary>
                 sqlite3 db = pParse.db;
-                ///
-                ///<summary>
                 ///The database connection 
-                ///</summary>
                 int iDb = Sqlite3.sqlite3SchemaToIndex(db, pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
@@ -3076,9 +2981,6 @@ db.aDb[iDb].zName ) ){
 return;
 }
 #endif
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Require a write">lock on the table to perform this operation </param>
                 sqliteinth.sqlite3TableLock(pParse, iDb, pTab.tnum, 1, pTab.zName);
                 v = pParse.sqlite3GetVdbe();
@@ -3110,7 +3012,6 @@ return;
                     int pRegKey = regIdxKey;
                     // SQLITE_INT_TO_PTR( regIdxKey );
                     ///
-                    ///<summary>
                     ///The registers accessed by the  OpCode.OP_IsUnique opcode were allocated
                     ///using sqlite3GetTempRange() inside of the sqlite3GenerateIndexKey()
                     ///call above. Just before that function was freed they were released
@@ -3119,8 +3020,6 @@ return;
                     ///opcode use the values stored within seems dangerous. However, since
                     ///we can be sure that no other temp registers have been allocated
                     ///since sqlite3ReleaseTempRange() was called, it is safe to do so.
-                    ///
-                    ///</summary>
                     v.sqlite3VdbeAddOp4( OpCode.OP_IsUnique, iIdx, j2, regRowid, pRegKey,  P4Usage.P4_INT32);
                     build.sqlite3HaltConstraint(pParse, OnConstraintError.OE_Abort, "indexed columns are not unique",  P4Usage.P4_STATIC);
                 }
@@ -3159,126 +3058,63 @@ return;
                 return sqlite3CreateIndex(pParse, null, null, null, pList, onError, null, null, sortOrder, ifNotExist);
             }
             public static Index sqlite3CreateIndex(Parse pParse,///
-                ///<summary>
                 ///All information about this Parse 
-                ///</summary>
             Token pName1,///
-                ///<summary>
                 ///First part of index name. May be NULL 
-                ///</summary>
             Token pName2,///
-                ///<summary>
                 ///Second part of index name. May be NULL 
-                ///</summary>
             SrcList pTblName,///
-                ///<summary>
                 ///Table to index. Use pParse.pNewTable if 0 
-                ///</summary>
             ExprList pList,///
-                ///<summary>
                 ///A list of columns to be indexed 
-                ///</summary>
             OnConstraintError onError,///
-                ///<summary>
                 ///OE_Abort, OnConstraintError.OE_Ignore, OnConstraintError.OE_Replace, or OnConstraintError.OE_None 
-                ///</summary>
             Token pStart,///
-                ///<summary>
                 ///The CREATE token that begins this statement 
                 ///</summary>
             Token pEnd,///
-                ///<summary>
                 ///The ")" that closes the CREATE INDEX statement 
-                ///</summary>
             SortOrder sortOrder,///
-                ///<summary>
                 ///Sort order of primary key when pList==NULL 
-                ///</summary>
             int ifNotExist///
-                ///<summary>
                 ///Omit error if index already exists 
-                ///</summary>
             )
             {
                 Index pRet = null;
-                ///
-                ///<summary>
                 ///Pointer to return 
-                ///</summary>
                 Table pTab = null;
-                ///
-                ///<summary>
                 ///Table to be indexed 
-                ///</summary>
                 Index pIndex = null;
-                ///
-                ///<summary>
                 ///The index to be created 
-                ///</summary>
                 string zName = null;
-                ///
-                ///<summary>
                 ///Name of the index 
-                ///</summary>
                 int nName;
-                ///
-                ///<summary>
                 ///Number of characters in zName 
-                ///</summary>
                 int i, j;
                 Token nullId = new Token();
-                ///
-                ///<summary>
                 ///Fake token for an empty ID list 
-                ///</summary>
                 DbFixer sFix = new DbFixer();
-                ///
-                ///<summary>
                 ///For assigning database names to pTable 
-                ///</summary>
                 SortOrder sortOrderMask;
-                ///
-                ///<summary>
                 ///1 to honor DESC in index.  0 to ignore. 
-                ///</summary>
                 sqlite3 db = pParse.db;
                 Db pDb;
-                ///
-                ///<summary>
                 ///The specific table containing the indexed database 
-                ///</summary>
                 int iDb;
-                ///
-                ///<summary>
                 ///Index of the database that is being written 
-                ///</summary>
                 Token pName = null;
-                ///
-                ///<summary>
                 ///Unqualified name of the index to create 
-                ///</summary>
                 ExprList_item pListItem;
-                ///
-                ///<summary>
                 ///For looping over pList 
-                ///</summary>
                 int nCol;
                 int nExtra = 0;
                 StringBuilder zExtra = new StringBuilder();
                 Debug.Assert(pStart == null || pEnd != null);
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="pEnd must be non">NULL if pStart is </param>
                 Debug.Assert(pParse.nErr == 0);
-                ///
-                ///<summary>
                 ///Never called with prior errors 
-                ///</summary>
                 if (///
-                    ///<summary>
                     ///db.mallocFailed != 0  || 
-                    ///</summary>
                 sqliteinth.IN_DECLARE_VTAB(pParse))
                 {
                     goto exit_create_index;
@@ -3287,16 +3123,9 @@ return;
                 {
                     goto exit_create_index;
                 }
-                ///
-                ///<summary>
                 ///Find the table that is to be indexed.  Return early if not found.
-                ///
-                ///</summary>
                 if (pTblName != null)
                 {
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="Use the two">part index name to determine the database</param>
                     ///<param name="to search for the table. 'Fix' the table name to this db">to search for the table. 'Fix' the table name to this db</param>
                     ///<param name="before looking up the table.">before looking up the table.</param>
@@ -3306,12 +3135,9 @@ return;
                     if (iDb < 0)
                         goto exit_create_index;
 #if !SQLITE_OMIT_TEMPDB
-                    ///
-                    ///<summary>
                     ///If the index name was unqualified, check if the the table
                     ///is a temp table. If so, set the database to 1. Do not do this
                     ///if initialising a database schema.
-                    ///</summary>
                     if (0 == db.init.busy)
                     {
                         pTab = pParse.sqlite3SrcListLookup(pTblName);
@@ -3323,11 +3149,8 @@ return;
 #endif
                     if (sFix.sqlite3FixInit(pParse, iDb, "index", pName) != 0 && sFix.sqlite3FixSrcList(pTblName) != 0)
                     {
-                        ///
-                        ///<summary>
                         ///Because the parser constructs pTblName from a single identifier,
                         ///sqlite3FixSrcList can never fail. 
-                        ///</summary>
                         Debugger.Break();
                     }
                     pTab = build.sqlite3LocateTable(pParse, 0, pTblName.a[0].zName, pTblName.a[0].zDatabase);
@@ -3426,11 +3249,7 @@ return;
                         goto exit_create_index;
                     }
                 }
-                ///
-                ///<summary>
                 ///Check for authorization to create an index.
-                ///
-                ///</summary>
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	{
 string zDb = pDb.zName;
@@ -3444,12 +3263,9 @@ goto exit_create_index;
 }
 }
 #endif
-                ///
-                ///<summary>
                 ///If pList==0, it means this routine was called to make a primary
                 ///key out of the last column added to the table under construction.
                 ///So create a fake list to simulate this.
-                ///</summary>
                 if (pList == null)
                 {
                     nullId.zRestSql = pTab.aCol[pTab.nCol - 1].zName;
@@ -3460,34 +3276,23 @@ goto exit_create_index;
                     pParse.sqlite3ExprListSetName(pList, nullId, 0);
                     pList.a[0].sortOrder = sortOrder;
                 }
-                ///
-                ///<summary>
                 ///Figure out how many bytes of space are required to store explicitly
                 ///specified collation sequence names.
-                ///
-                ///</summary>
                 for (i = 0; i < pList.nExpr; i++)
                 {
                     Expr pExpr = pList.a[i].pExpr;
                     if (pExpr != null)
                     {
                         CollSeq pColl = pExpr.pColl;
-                        ///
-                        ///<summary>
                         ///Either pColl!=0 or there was an OOM failure.  But if an OOM
                         ///failure we have quit before reaching this point. 
-                        ///</summary>
                         if (Sqlite3.ALWAYS(pColl != null))
                         {
                             nExtra += (1 + StringExtensions.sqlite3Strlen30(pColl.zName));
                         }
                     }
                 }
-                ///
-                ///<summary>
                 ///Allocate the index structure.
-                ///
-                ///</summary>
                 nName = StringExtensions.sqlite3Strlen30(zName);
                 nCol = pList.nExpr;
                 pIndex = new Index();
@@ -3528,11 +3333,7 @@ goto exit_create_index;
                 pIndex.autoIndex = (u8)(pName == null ? 1 : 0);
                 pIndex.pSchema = db.aDb[iDb].pSchema;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-                ///
-                ///<summary>
                 ///Check to see if we should honor DESC requests on index columns
-                ///
-                ///</summary>
                 if (pDb.pSchema.file_format >= 4)
                 {
                     ///Honor DESC 
@@ -3543,8 +3344,6 @@ goto exit_create_index;
                     ///Ignore DESC 
                     sortOrderMask = SortOrder.SQLITE_SO_ASC;
                 }
-                ///
-                ///<summary>
                 ///Scan the names of the columns of the table to be indexed and
                 ///load the column indices into the Index structure.  Report an error
                 ///if any column is not found.
@@ -3553,7 +3352,6 @@ goto exit_create_index;
                 ///more than once within the same index.  Only the first instance of
                 ///the column will ever be used by the optimizer.  Note that using the
                 ///same column more than once cannot be an error because that would
-                ///</summary>
                 ///<param name="break backwards compatibility "> it needs to be a warning.</param>
                 ///<param name=""></param>
                 for (i = 0; i < pList.nExpr; i++)
@@ -3564,10 +3362,7 @@ goto exit_create_index;
                     Column pTabCol;
                     SortOrder requestedSortOrder;
                     string zColl;
-                    ///
-                    ///<summary>
                     ///Collation sequence name 
-                    ///</summary>
                     for (j = 0; j < pTab.nCol; j++)
                     {
                         //, pTabCol++){
@@ -3621,8 +3416,6 @@ goto exit_create_index;
                 sqlite3DefaultRowEst(pIndex);
                 if (pTab == pParse.pNewTable)
                 {
-                    ///
-                    ///<summary>
                     ///This routine has been called to create an automatic index as a
                     ///result of a PRIMARY KEY or UNIQUE clause on a column definition, or
                     ///a PRIMARY KEY or UNIQUE clause following the column definitions.
@@ -3643,10 +3436,7 @@ goto exit_create_index;
                     ///If there are different collating sequences or if the columns of
                     ///the constraint occur in different orders, then the constraints are
                     ///considered distinct and both result in separate indices.
-                    ///
-                    ///</summary>
-                    Index pIdx;
-                    for (pIdx = pTab.pIndex; pIdx != null; pIdx = pIdx.pNext)
+                    foreach (var pIdx in pTab.pIndex.path(pid=>pid.pNext))
                     {
                         int k;
                         Debug.Assert(pIdx.onError != OnConstraintError.OE_None);
@@ -3669,16 +3459,12 @@ goto exit_create_index;
                         {
                             if (pIdx.onError != pIndex.onError)
                             {
-                                ///
-                                ///<summary>
                                 ///This constraint creates the same index as a previous
                                 ///constraint specified somewhere in the CREATE TABLE statement.
                                 ///However the ON CONFLICT clauses are different. If both this
                                 ///constraint and the previous equivalent constraint have explicit
                                 ///ON CONFLICT clauses this is an error. Otherwise, use the
                                 ///explicitly specified behavior for the index.
-                                ///
-                                ///</summary>
                                 if (!(pIdx.onError == OnConstraintError.OE_Default || pIndex.onError == OnConstraintError.OE_Default))
                                 {
                                     utilc.sqlite3ErrorMsg(pParse, "conflicting ON CONFLICT clauses specified", 0);
@@ -3692,8 +3478,6 @@ goto exit_create_index;
                         }
                     }
                 }
-                ///
-                ///<summary>
                 ///Link the new Index structure to its table and to the other
                 ///</summary>
                 ///<param name="in">memory database structures.</param>
@@ -3706,10 +3490,7 @@ goto exit_create_index;
                     if (p != null)
                     {
                         Debug.Assert(p == pIndex);
-                        ///
-                        ///<summary>
                         ///Malloc must have failed 
-                        ///</summary>
                         //        db.mallocFailed = 1;
                         goto exit_create_index;
                     }
@@ -3719,8 +3500,6 @@ goto exit_create_index;
                         pIndex.tnum = db.init.newTnum;
                     }
                 }
-                ///
-                ///<summary>
                 ///If the db.init.busy is 0 then create the index on disk.  This
                 ///involves writing the index into the master table and filling in the
                 ///index with the current table contents.
@@ -3735,8 +3514,6 @@ goto exit_create_index;
                 ///or UNIQUE constraint of a CREATE TABLE statement.  Since the table
                 ///has just been created, it contains no data and the index initialization
                 ///step can be skipped.
-                ///
-                ///</summary>
                 else//if ( 0 == db.init.busy )
                 {
                     Vdbe v;
@@ -3745,51 +3522,27 @@ goto exit_create_index;
                     v = pParse.sqlite3GetVdbe();
                     if (v == null)
                         goto exit_create_index;
-                    ///
-                    ///<summary>
                     ///Create the rootpage for the index
-                    ///
-                    ///</summary>
                     sqlite3BeginWriteOperation(pParse, 1, iDb);
                     v.sqlite3VdbeAddOp2( OpCode.OP_CreateIndex, iDb, iMem);
-                    ///
-                    ///<summary>
                     ///Gather the complete text of the CREATE INDEX statement into
                     ///the zStmt variable
-                    ///
-                    ///</summary>
                     if (pStart != null)
                     {
                         Debug.Assert(pEnd != null);
-                        ///
-                        ///<summary>
                         ///A named index with an explicit CREATE INDEX statement 
-                        ///</summary>
                         zStmt = io.sqlite3MPrintf(db, "CREATE%s INDEX %.*s", onError == OnConstraintError.OE_None ? "" : " UNIQUE", (int)(pName.zRestSql.Length - pEnd.zRestSql.Length) + 1, pName.zRestSql);
                     }
                     else
                     {
-                        ///
-                        ///<summary>
                         ///An automatic index created by a PRIMARY KEY or UNIQUE constraint 
-                        ///</summary>
-                        ///
-                        ///<summary>
                         ///zStmt = io.sqlite3MPrintf(""); 
-                        ///</summary>
                         zStmt = null;
                     }
-                    ///
-                    ///<summary>
                     ///Add an entry in sqlite_master for this index
-                    ///
-                    ///</summary>
                     build.sqlite3NestedParse(pParse, "INSERT INTO %Q.%s VALUES('index',%Q,%Q,#%d,%Q);", db.aDb[iDb].zName, sqliteinth.SCHEMA_TABLE(iDb), pIndex.zName, pTab.zName, iMem, zStmt);
                     db.sqlite3DbFree(ref zStmt);
-                    ///
-                    ///<summary>
                     ///Fill the index with data and reparse the schema. Code an  OpCode.OP_Expire
-                    ///</summary>
                     ///<param name="to invalidate all pre">compiled statements.</param>
                     ///<param name=""></param>
                     if (pTblName != null)
@@ -3800,15 +3553,11 @@ goto exit_create_index;
                         v.sqlite3VdbeAddOp1(OpCode.OP_Expire, 0);
                     }
                 }
-                ///
-                ///<summary>
                 ///When adding an index to the list of indices for a table, make
                 ///sure all indices labeled OnConstraintError.OE_Replace come after all those labeled
                 ///OE_Ignore.  This is necessary for the correct constraint check
                 ///processing (in sqlite3GenerateConstraintChecks()) as part of
                 ///UPDATE and INSERT statements.
-                ///
-                ///</summary>
                 if (db.init.busy != 0 || pTblName == null)
                 {
                     if (onError != OnConstraintError.OE_Replace || pTab.pIndex == null || pTab.pIndex.onError == OnConstraintError.OE_Replace)
@@ -3829,10 +3578,7 @@ goto exit_create_index;
                     pRet = pIndex;
                     pIndex = null;
                 }
-            ///
-            ///<summary>
             ///Clean up before exiting 
-            ///</summary>
             exit_create_index:
                 if (pIndex != null)
                 {
@@ -4368,37 +4114,21 @@ goto exit_drop_index;
                 return build.sqlite3SrcListAppendFromTerm(pParse, p, pTable, pDatabase, pAlias, null, pOn, pUsing);
             }
             public static SrcList sqlite3SrcListAppendFromTerm(Parse pParse,///
-                ///<summary>
                 ///Parsing context 
-                ///</summary>
             SrcList p,///
-                ///<summary>
                 ///The left part of the FROM clause already seen 
-                ///</summary>
             Token pTable,///
-                ///<summary>
                 ///Name of the table to add to the FROM clause 
-                ///</summary>
             Token pDatabase,///
-                ///<summary>
                 ///Name of the database containing pTable 
-                ///</summary>
             Token pAlias,///
-                ///<summary>
-                ///</summary>
                 ///<param name="The right">hand side of the AS subexpression </param>
             Select pSubquery,///
-                ///<summary>
                 ///A subquery used in place of a table name 
-                ///</summary>
             Expr pOn,///
-                ///<summary>
                 ///The ON clause of a join 
-                ///</summary>
             IdList pUsing///
-                ///<summary>
                 ///The USING clause of a join 
-                ///</summary>
             )
             {
                 SrcList_item pItem;
@@ -4791,12 +4521,8 @@ goto exit_drop_index;
 #if !SQLITE_OMIT_REINDEX
             static void reindexTable(Parse pParse, Table pTab, string zColl)
             {
-                Index pIndex;
-                ///
-                ///<summary>
                 ///An index associated with pTab 
-                ///</summary>
-                for (pIndex = pTab.pIndex; pIndex != null; pIndex = pIndex.pNext)
+                foreach (var pIndex in pTab.pIndex.path(pi=>pi.pNext))
                 {
                     if (zColl == null || collationMatch(zColl, pIndex))
                     {
@@ -4815,46 +4541,17 @@ goto exit_drop_index;
 #if !SQLITE_OMIT_REINDEX
             static void reindexDatabases(Parse pParse, string zColl)
             {
-                Db pDb;
-                ///
-                ///<summary>
-                ///A single database 
-                ///</summary>
-                int iDb;
-                ///
-                ///<summary>
-                ///The database index number 
-                ///</summary>
-                sqlite3 db = pParse.db;
-                ///
-                ///<summary>
-                ///The database connection 
-                ///</summary>
-                HashElem k;
-                ///
-                ///<summary>
-                ///For looping over tables in pDb 
-                ///</summary>
-                Table pTab;
-                ///
-                ///<summary>
-                ///A table in the database 
-                ///</summary>
+                sqlite3 db = pParse.db;///The database connection 
+                Table pTab;///A table in the database 
                 Debug.Assert(Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
-                ///
-                ///<summary>
                 ///Needed for schema access 
-                ///</summary>
-                for (iDb = 0; iDb < db.nDb; iDb++)//, pDb++ )
+                foreach (var pDb in db.aDb.Take(db.nDb))//, pDb++ )
                 {
-                    pDb = db.aDb[iDb];
                     Debug.Assert(pDb != null);
-                    for (k = pDb.pSchema.tblHash.first; k != null; k = k.next)//for ( k = sqliteHashFirst( pDb.pSchema.tblHash ) ; k != null ; k = sqliteHashNext( k ) )
-                    {
-                        pTab = (Table)k.data;
-                        // sqliteHashData( k );
-                        reindexTable(pParse, pTab, zColl);
-                    }
+                    //HashElem k;///For looping over tables in pDb 
+                    foreach (var k in pDb.pSchema.tblHash.first.path(h => h.next))//for ( k = sqliteHashFirst( pDb.pSchema.tblHash ) ; k != null ; k = sqliteHashNext( k ) )
+                        reindexTable(pParse, (Table)k.data, zColl);
+                    
                 }
             }
 #endif
@@ -4880,50 +4577,24 @@ goto exit_drop_index;
             public static void sqlite3Reindex(Parse pParse, Token pName1, Token pName2)
             {
                 CollSeq pColl;
-                ///
-                ///<summary>
                 ///Collating sequence to be reindexed, or NULL 
-                ///</summary>
                 string z;
-                ///
-                ///<summary>
                 ///Name of a table or index 
-                ///</summary>
                 string zDb;
-                ///
-                ///<summary>
                 ///Name of the database 
-                ///</summary>
                 Table pTab;
-                ///
-                ///<summary>
                 ///A table in the database 
-                ///</summary>
                 Index pIndex;
-                ///
-                ///<summary>
                 ///An index associated with pTab 
-                ///</summary>
                 int iDb;
-                ///
-                ///<summary>
                 ///The database index number 
-                ///</summary>
                 sqlite3 db = pParse.db;
-                ///
-                ///<summary>
                 ///The database connection 
-                ///</summary>
                 Token pObjName = new Token();
-                ///
-                ///<summary>
                 ///Name of the table or index to be reindexed 
-                ///</summary>
                 ///
-                ///<summary>
                 ///Read the database schema. If an error occurs, leave an error message
                 ///and code in pParse and return NULL. 
-                ///</summary>
                 if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
                 {
                     return;

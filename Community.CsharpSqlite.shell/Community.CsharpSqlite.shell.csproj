@@ -373,6 +373,7 @@
     <Compile Include="src\Tools\AuthContext.cs" />
     <Compile Include="src\Tools\DbFixer.cs" />
     <Compile Include="src\Utils\MyLinqExtensions.cs" />
+    <Compile Include="src\Utils\Str.cs" />
     <Compile Include="src\Utils\StreAccum.cs" />
     <Compile Include="src\Walker.cs" />
   </ItemGroup>

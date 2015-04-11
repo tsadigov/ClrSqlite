@@ -27,14 +27,12 @@ namespace Community.CsharpSqlite
     
 
     public static class Sqlite3Extensions{
-        public static void sqlite3DbFree(this sqlite3 th,ref string pString)
-        {
-            pString = null;
-        }
-
+        
         public static void sqlite3DbFree<T>(this sqlite3 th,ref T pT) where T : class
         {
+            pT = null;
         }
+
     }
         ///
         ///<summary>

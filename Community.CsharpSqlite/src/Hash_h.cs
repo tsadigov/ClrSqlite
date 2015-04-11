@@ -106,56 +106,40 @@ namespace Community.CsharpSqlite {
 					return cp;
 				}
 			}
-			public T sqlite3HashFind<T>(string pKey,int nKey,T nullType) where T : class {
-				HashElem elem;
-				///
-				///<summary>
+            public T sqlite3HashFind<T>(string pKey, int nKey, T nullType) where T : class {
+                Debug.Assert(this != null);
+                Debug.Assert(pKey != null);
+                Debug.Assert(nKey >= 0);
+                return sqlite3HashFind(pKey.sub(nKey), nullType);
+            }
+			public T sqlite3HashFind<T>(Str key,T nullType) where T : class {
 				///The element that matches key 
-				///</summary>
 				u32 h;
-				///
-				///<summary>
 				///A hash on key 
-				///</summary>
-				Debug.Assert(this!=null);
-				Debug.Assert(pKey!=null);
-				Debug.Assert(nKey>=0);
 				if(this.ht!=null) {
-					h=HashExtensions.strHash(pKey,nKey)%this.htsize;
+					h=key.Hash%this.htsize;
 				}
 				else {
 					h=0;
 				}
-				elem=this.findElementGivenHash(pKey,nKey,h);
+				var elem=this.findElementGivenHash(key,h);
 				return elem!=null?(T)elem.data:nullType;
 			}
-			public HashElem findElementGivenHash(///
-			///<summary>
-			///The pH to be searched 
-			///</summary>
-			string pKey,///
-			///<summary>
-			///The key we are searching for 
-			///</summary>
-			int nKey,///
-			///<summary>
-			///Bytes in key (not counting zero terminator) 
-			///</summary>
-			u32 h///
-			///<summary>
-			///The hash for this key. 
-			///</summary>
+            public HashElem findElementGivenHash(
+                string pKey,///The key we are searching for 
+                int nKey,///Bytes in key (not counting zero terminator) 
+                u32 h///The hash for this key. 
+            ) {
+                return findElementGivenHash(pKey.sub(nKey),h);
+            }
+            public HashElem findElementGivenHash(
+			    Str key,
+                u32 h///The hash for this key. 
 			) {
 				HashElem elem;
-				///
-				///<summary>
 				///Used to loop thru the element list 
-				///</summary>
 				int count;
-				///
-				///<summary>
 				///Number of elements left to test 
-				///</summary>
 				if(this.ht!=null&&this.ht[h]!=null) {
 					_ht pEntry=this.ht[h];
 					elem=pEntry.chain;
@@ -166,13 +150,14 @@ namespace Community.CsharpSqlite {
 					count=(int)this.count;
 				}
 				while(count-->0&&Sqlite3.ALWAYS(elem)) {
-					if(elem.nKey==nKey&&elem.pKey.Equals(pKey,StringComparison.InvariantCultureIgnoreCase)) {
+					if(elem.key==key ) {
 						return elem;
 					}
 					elem=elem.next;
 				}
 				return null;
 			}
+
 			public void sqlite3HashInit() {
 				Debug.Assert(this!=null);
 				this.first=null;
@@ -180,7 +165,216 @@ namespace Community.CsharpSqlite {
 				this.htsize=0;
 				this.ht=null;
 			}
-		}
+
+            ///<summary>
+            ///This function (for internal use only) locates an element in an
+            /// hash table that matches the given key.  The hash for this key has
+            /// already been computed and is passed as the 4th parameter.
+            ///
+            ///Remove a single entry from the hash table given a pointer to that
+            /// element and a hash on the element's key.
+            ///
+            ///</summary>
+            void removeElementGivenHash(
+                ref HashElem elem,///The element to be removed from the pH 
+                u32 h///Hash value for the element 
+            )
+            {
+                Hash pH = this;
+
+                _ht pEntry;
+                if (elem.prev != null)
+                {
+                    elem.prev.next = elem.next;
+                }
+                else
+                {
+                    pH.first = elem.next;
+                }
+                if (elem.next != null)
+                {
+                    elem.next.prev = elem.prev;
+                }
+                if (pH.ht != null && pH.ht[h] != null)
+                {
+                    pEntry = pH.ht[h];
+                    if (pEntry.chain == elem)
+                    {
+                        pEntry.chain = elem.next;
+                    }
+                    pEntry.count--;
+                    Debug.Assert(pEntry.count >= 0);
+                }
+                //malloc_cs.sqlite3_free( ref elem );
+                pH.count--;
+                if (pH.count <= 0)
+                {
+                    Debug.Assert(pH.first == null);
+                    Debug.Assert(pH.count == 0);
+                    pH.sqlite3HashClear();
+                }
+            }
+
+            public T HashInsert<T>(Str str, T data) where T:class
+            {
+                var pH = this;
+                u32 h;
+                if (pH.htsize != 0)
+                {
+                    h = str.Hash % pH.htsize;
+                }
+                else
+                {
+                    h = 0;
+                }
+
+                ///the hash of the key modulo hash table size 
+                var elem = pH.findElementGivenHash(str.buffer, str.length, h);
+                if (elem != null)
+                {
+                    T old_data = (T)elem.data;
+                    if (data == null)
+                    {
+                        removeElementGivenHash(ref elem, h);
+                    }
+                    else
+                    {
+                        elem.data = data;
+                        elem.pKey = str.buffer;
+                        Debug.Assert(str.length == elem.key.length);
+                    }
+                    return old_data;
+                }
+                if (data == null)
+                    return data;
+
+                ///Used to loop thru the element list 
+                var new_elem = new HashElem();
+                //(HashElem)malloc_cs.sqlite3Malloc( sizeof(HashElem) );
+                if (new_elem == null)
+                    return data;
+                new_elem.key = str;
+                new_elem.data = data;
+                pH.count++;
+                if (pH.count >= 10 && pH.count > 2 * pH.htsize)
+                {
+                    if (pH.rehash(pH.count * 2))
+                    {
+                        Debug.Assert(pH.htsize > 0);
+                        h = str.Hash % pH.htsize;
+                    }
+                }
+                if (pH.ht != null)
+                {
+                    insertElement( pH.ht[h], new_elem);
+                }
+                else
+                {
+                    insertElement( null, new_elem);
+                }
+                return null;
+            }
+            ///<summary>
+            ///Resize the hash table so that it cantains "new_size" buckets.
+            ///
+            /// The hash table might fail to resize if sqlite3_malloc() fails or
+            /// if the new size is the same as the prior size.
+            /// Return TRUE if the resize occurs and false if not.
+            ///
+            ///</summary>
+            public bool rehash( u32 new_size)
+            {
+                Hash pH = this;
+                _ht[] new_ht;
+                ///The new hash table 
+                HashElem next_elem;
+                ///For looping over existing elements 
+#if SQLITE_MALLOC_SOFT_LIMIT
+																																																												if( new_size*sizeof(struct _ht)>SQLITE_MALLOC_SOFT_LIMIT ){
+new_size = SQLITE_MALLOC_SOFT_LIMIT/sizeof(struct _ht);
+}
+if( new_size==pH->htsize ) return false;
+#endif
+                ///There is a call to malloc_cs.sqlite3Malloc() inside rehash(). If there is
+                ///already an allocation at pH.ht, then if this malloc() fails it
+                ///is benign (since failing to resize a hash table is a performance
+                ///hit only, not a fatal error).
+                Sqlite3.sqlite3BeginBenignMalloc();
+                new_ht = new _ht[new_size];
+                //(struct _ht )malloc_cs.sqlite3Malloc( new_size*sizeof(struct _ht) );
+                for (int i = 0; i < new_size; i++)
+                    new_ht[i] = new _ht();
+                Sqlite3.sqlite3EndBenignMalloc();
+                if (new_ht == null)
+                    return false;
+                //malloc_cs.sqlite3_free( ref pH.ht );
+                pH.ht = new_ht;
+                // pH.htsize = new_size = malloc_cs.sqlite3MallocSize(new_ht)/sizeof(struct _ht);
+                //memset(new_ht, 0, new_size*sizeof(struct _ht));
+                pH.htsize = new_size;
+                var oldstart=pH.first;
+                pH.first =null;
+                //for (var elem = pH.first, pH.first = null; elem != null; elem = next_elem)
+                foreach (var elem in oldstart.path(x => x.next))
+                {
+                    u32 h = elem.key.Hash % new_size;
+                    insertElement( new_ht[h], elem);
+                }
+                return true;
+            }
+
+
+            ///<summary>
+            ///Link pNew element into the hash table pH.  If pEntry!=0 then also
+            /// insert pNew into the pEntry hash bucket.
+            ///
+            ///</summary>
+            void insertElement(
+                _ht pEntry,///The entry into which pNew is inserted 
+                HashElem pNew///The element to be inserted 
+            )
+            {
+                Hash pH = this;
+                HashElem pHead;
+                ///First element already in pEntry 
+                if (pEntry != null)
+                {
+                    pHead = pEntry.count != 0 ? pEntry.chain : null;
+                    pEntry.count++;
+                    pEntry.chain = pNew;
+                }
+                else
+                {
+                    pHead = null;
+                }
+                if (pHead != null)
+                {
+                    pNew.next = pHead;
+                    pNew.prev = pHead.prev;
+                    if (pHead.prev != null)
+                    {
+                        pHead.prev.next = pNew;
+                    }
+                    else
+                    {
+                        pH.first = pNew;
+                    }
+                    pHead.prev = pNew;
+                }
+                else
+                {
+                    pNew.next = pH.first;
+                    if (pH.first != null)
+                    {
+                        pH.first.prev = pNew;
+                    }
+                    pNew.prev = null;
+                    pH.first = pNew;
+                }
+            }
+        }
+
+
 		
         ///
 		///<summary>
@@ -207,32 +401,33 @@ namespace Community.CsharpSqlite {
 					_data=value;
 				}
 			}
+
+            public Str key = new Str("",0);
 			///
 			///<summary>
 			///Data associated with this element 
 			///</summary>
-			private string _pKey;
 			public string pKey {
 				get {
-					return _pKey;
+					return key.buffer;
 				}
 				set {
-					_pKey=value;
+                    key.buffer = value; ;
 				}
 			}
-			private int _nKey;
-			public int nKey {
+
+            ///<summary>
+            ///Key associated with this element 
+            ///</summary>
+            public int nKey {
 				get {
-					return _nKey;
+                    return key.length;
 				}
 				set {
-					_nKey=value;
+                    key.length = value;
 				}
 			}
-		///
-		///<summary>
-		///Key associated with this element 
-		///</summary>
+		
 		};
         public static partial class HashExtensions
         {
@@ -290,3 +485,91 @@ namespace Community.CsharpSqlite {
 	//#endif // * _SQLITE_HASH_H_ */
 	}
 }
+
+
+
+
+
+
+///<summary>
+///Attempt to locate an element of the hash table pH with a key
+/// that matches pKey,nKey.  Return the data for this element if it is
+/// found, or NULL if there is no match.
+///
+///</summary>
+///
+///<summary>
+///Insert an element into the hash table pH.  The key is pKey,nKey
+///and the data is "data".
+///
+///If no element exists with a matching key, then a new
+///element is created and NULL is returned.
+///
+///If another element already exists with the same key, then the
+///new data replaces the old data and the old data is returned.
+///The key is not copied in this instance.  If a malloc fails, then
+///the new data is returned and the hash table is unchanged.
+///
+///If the "data" parameter to this function is NULL, then the
+///element corresponding to "key" is removed from the hash table.
+///
+///</summary>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///<summary>
+/// 2001 September 22
+///
+/// The author disclaims copyright to this source code.  In place of
+/// a legal notice, here is a blessing:
+///
+///    May you do good and not evil.
+///    May you find forgiveness for yourself and forgive others.
+///    May you share freely, never taking more than you give.
+///
+///
+/// This is the implementation of generic hash-tables
+/// used in SQLite.
+///
+///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+///  C#-SQLite is an independent reimplementation of the SQLite software library
+///
+///  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
+///
+///
+///
+///</summary>
+//#include "sqliteInt.h"
+//#include <assert.h>
+///<summary>
+///Turn bulk memory into a hash table object by initializing the
+/// fields of the Hash structure.
+///
+/// "pNew" is a pointer to the hash table that is to be initialized.
+///
+///</summary>
+///<summary>
+///Remove all entries from a hash table.  Reclaim all memory.
+/// Call this routine to delete a hash table or to reset a hash table
+/// to the empty state.
+///
+///</summary>
