@@ -12,9 +12,6 @@ namespace Community.CsharpSqlite {
 	using DbPage=PgHdr;
 	using System.Text;
 	public partial class Sqlite3 {
-
-
-
         ///
         ///<summary>
         ///A cursor is a pointer to a particular entry within a particular
@@ -33,32 +30,31 @@ namespace Community.CsharpSqlite {
         ///<param name=""></param>
         public class BtCursor
         {
-            public Btree pBtree;
-            ///
             ///<summary>
             ///The Btree to which this cursor belongs 
             ///</summary>
-            public BtShared pBt;
+            public Btree pBtree;
+
             ///
             ///<summary>
             ///The BtShared this cursor points to 
             ///</summary>
-            public BtCursor pNext;
-            public BtCursor pPrev;
-            ///
+            public BtShared pBt;
             ///<summary>
             ///Forms a linked list of all cursors 
             ///</summary>
-            public KeyInfo pKeyInfo;
-            ///
+            public BtCursor pNext;
+            public BtCursor pPrev;
+            
             ///<summary>
             ///Argument passed to comparison function 
             ///</summary>
-            public Pgno pgnoRoot;
-            ///
+            public KeyInfo pKeyInfo;
+
             ///<summary>
             ///The root page of this tree 
             ///</summary>
+            public Pgno pgnoRoot;
             public sqlite3_int64 cachedRowid;
             ///
             ///<summary>
@@ -99,7 +95,7 @@ namespace Community.CsharpSqlite {
             ///<summary>
             ///True if info.nKey is valid 
             ///</summary>
-            public int eState;
+            public int eState { get; set; }
             public BtCursorState State
             {
                 get
@@ -219,38 +215,22 @@ aOverflow= null;
                 malloc_cs.sqlite3_free(ref this.pKey);
                 this.eState = CURSOR_INVALID;
             }
-            public SqlResult btreeMoveto(///
-                ///<summary>
-                ///Cursor open on the btree to be searched 
-                ///</summary>
-            byte[] pKey,///
-                ///<summary>
-                ///Packed key if the btree is an index 
-                ///</summary>
-            i64 nKey,///
-                ///<summary>
-                ///Integer key for tables.  Size of pKey for indices 
-                ///</summary>
-            int bias,///
-                ///<summary>
-                ///Bias search to the high end 
-                ///</summary>
-            ref int pRes///
-                ///<summary>
-                ///Write search results here 
-                ///</summary>
+            public SqlResult btreeMoveto(
+                byte[] pKey,///Packed key if the btree is an index 
+
+                i64 nKey,///Integer key for tables.  Size of pKey for indices 
+
+                    ///Bias search to the high end 
+                int bias,///
+                    ///Write search results here 
+                ref int pRes///
+                
             )
             {
                 SqlResult rc;
-                ///
-                ///<summary>
                 ///Status code 
-                ///</summary>
                 UnpackedRecord pIdxKey;
-                ///
-                ///<summary>
                 ///Unpacked index key 
-                ///</summary>
                 UnpackedRecord aSpace = new UnpackedRecord();
                 //char aSpace[150]; /* Temp space for pIdxKey - to avoid a malloc */
                 if (pKey != null)

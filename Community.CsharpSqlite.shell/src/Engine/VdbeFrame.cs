@@ -199,7 +199,7 @@ namespace Community.CsharpSqlite
             v.nOp = this.nOp;
             v.aMem = this.aMem;
             v.nMem = this.nMem;
-            v.apCsr = this.apCsr;
+            v.OpenCursors = this.apCsr;
             v.nCursor = this.nCursor;
             v.db.lastRowid = this.lastRowid;
             v.nChange = this.nChange;

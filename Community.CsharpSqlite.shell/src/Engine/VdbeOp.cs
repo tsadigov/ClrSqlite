@@ -239,7 +239,7 @@ public u64 cycles;         /* Total time spend executing this instruction */
 
                 case OpCode.OP_Column:
 
-                    var vdbeCursor = vdbe.apCsr[p1];
+                    var vdbeCursor = vdbe.OpenCursors[p1];
                     str = "nField:" + vdbeCursor.nField + "\tpayloadSize" + vdbeCursor.payloadSize + "\taRow:" + vdbeCursor.aRow + "\taOffset:" + (vdbeCursor.aOffset==null?"":String.Join(",", vdbeCursor.aOffset.Select(x => "x" + x.ToString()).ToArray()));
 
                     break;
@@ -294,7 +294,7 @@ public u64 cycles;         /* Total time spend executing this instruction */
                     str = ((Sqlite3.BTreeProp)p3).ToString();
                     break;
                 case OpCode.OP_NewRowid:
-                    var pC = vdbe.apCsr[p1];
+                    var pC = vdbe.OpenCursors[p1];
                     if (null != pC && null != pC.pCursor)
                     {
                         int id = 0;

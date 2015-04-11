@@ -1430,10 +1430,10 @@ public static bool ISAUTOVACUUM =false;
 					for (int iLoop = contentOffset - 1; iLoop >= 0; iLoop--)
 						hit [iLoop] = 1;
 					//memset(hit, 1, contentOffset);
-					nCell = get2byte (data, hdr + 3);
+                    nCell = data.get2byte(hdr + 3);
 					cellStart = hdr + 12 -  (pPage.IsLeaf?4:0) ;
 					for (i = 0; i < nCell; i++) {
-						int pc = get2byte (data, cellStart + i * 2);
+                        int pc = data.get2byte(cellStart + i * 2);
 						u32 size = 65536;
 						int j;
 						if (pc <= usableSize - 4) {
@@ -1447,7 +1447,7 @@ public static bool ISAUTOVACUUM =false;
 								hit [j]++;
 						}
 					}
-					i = get2byte (data, hdr + 1);
+					i = data.get2byte ( hdr + 1);
 					while (i > 0) {
 						int size, j;
 						Debug.Assert (i <= usableSize - 4);
@@ -1456,7 +1456,7 @@ public static bool ISAUTOVACUUM =false;
 ///Enforced by btreeInitPage() 
 ///</summary>
 
-						size = get2byte (data, i + 2);
+						size = data.get2byte ( i + 2);
 						Debug.Assert (i + size <= usableSize);
 						///
 ///<summary>
@@ -1465,7 +1465,7 @@ public static bool ISAUTOVACUUM =false;
 
 						for (j = i + size - 1; j >= i; j--)
 							hit [j]++;
-						j = get2byte (data, i);
+                        j = data.get2byte(i);
 						Debug.Assert (j == 0 || j > i + size);
 						///
 ///<summary>
@@ -1610,16 +1610,7 @@ public static bool ISAUTOVACUUM =false;
 			}
 		}
 
-		///<summary>
-		/// Read or write a two- and four-byte big-endian integer values.
-		///
-		///</summary>
-		//#define get2byte(x)   ((x)[0]<<8 | (x)[1])
-		static int get2byte (byte[] p, int offset)
-		{
-			return p [offset + 0] << 8 | p [offset + 1];
-		}
-
+		
 		//#define put2byte(p,v) ((p)[0] = (u8)((v)>>8), (p)[1] = (u8)(v))
 		static void put2byte (byte[] pData, int Offset, u32 v)
 		{

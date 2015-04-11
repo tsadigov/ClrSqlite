@@ -959,7 +959,7 @@ return p.pMem.n;
             /// or a constant) then useTypes 2, 3, and 4 return NULL.
             ///
             ///</summary>
-            public static string columnName(sqlite3_stmt pStmt, int N, dxColname xFunc, int useType)
+            public static string columnName(sqlite3_stmt pStmt, int N, dxColname xFunc, ColName useType)
             {
                 string ret = null;
                 Vdbe p = pStmt;
@@ -969,7 +969,7 @@ return p.pMem.n;
                 n = pStmt.getColumnCount();
                 if (N < n && N >= 0)
                 {
-                    N += useType * n;
+                    N += (int)useType * n;
                     db.mutex.sqlite3_mutex_enter();
                     //Debug.Assert( db.mallocFailed == 0 );
                     ret = xFunc(p.aColName[N]);
@@ -997,7 +997,7 @@ return p.pMem.n;
             ///</summary>
             public static string sqlite3_column_name(sqlite3_stmt pStmt, int N)
             {
-                return columnName(pStmt, N, vdbeapi.sqlite3_value_text, COLNAME_NAME);
+                return columnName(pStmt, N, vdbeapi.sqlite3_value_text, ColName.NAME);
             }
 
 #if !SQLITE_OMIT_UTF16
@@ -1022,7 +1022,7 @@ pStmt, N,  vdbeapi.sqlite3_value_text16, COLNAME_NAME);
 
             public static string sqlite3_column_decltype(sqlite3_stmt pStmt, int N)
             {
-                return columnName(pStmt, N, vdbeapi.sqlite3_value_text, COLNAME_DECLTYPE);
+                return columnName(pStmt, N, vdbeapi.sqlite3_value_text, ColName.DECLTYPE);
             }
 
 #if !SQLITE_OMIT_UTF16

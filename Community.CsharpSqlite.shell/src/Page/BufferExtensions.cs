@@ -18,6 +18,8 @@ namespace Community.CsharpSqlite
             return (UInt16)(p[offset + 0] << 8 | p[offset + 1]);
         }
 
+
+
         //#define put2byte(p,v) ((p)[0] = (u8)((v)>>8), (p)[1] = (u8)(v))
         public static void put2byte(this byte[] pData, int Offset, UInt32 v)
         {

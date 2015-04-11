@@ -1617,9 +1617,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 p.apArg = new Mem[nArg == 0 ? 1 : nArg];
                 //p.apArg = (Mem*)p.aVar[nVar];
                 //
-                p.apCsr = new VdbeCursor[nCursor == 0 ? 1 : nCursor];
+                p.OpenCursors = new VdbeCursor[nCursor == 0 ? 1 : nCursor];
                 //p.apCsr = (VdbeCursor*)p.azVar[nVar];
-                p.apCsr[0] = new VdbeCursor();
+                p.OpenCursors[0] = new VdbeCursor();
                 p.nCursor = (u16)nCursor;
                 if (p.aVar != null)
                 {
@@ -1665,11 +1665,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 if (pCx.pBt != null)
                 {
                     BTreeMethods.sqlite3BtreeClose(ref pCx.pBt);
-                    ///
-                    ///<summary>
                     ///The pCx.pCursor will be close automatically, if it exists, by
                     ///the call above. 
-                    ///</summary>
                 }
                 else
                     if (pCx.pCursor != null)
@@ -1713,16 +1710,16 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 }
                 p.pFrame = null;
                 p.nFrame = 0;
-                if (p.apCsr != null)
+                if (p.OpenCursors != null)
                 {
                     int i;
                     for (i = 0; i < p.nCursor; i++)
                     {
-                        VdbeCursor pC = p.apCsr[i];
+                        VdbeCursor pC = p.OpenCursors[i];
                         if (pC != null)
                         {
                             sqlite3VdbeFreeCursor(p, pC);
-                            p.apCsr[i] = null;
+                            p.OpenCursors[i] = null;
                         }
                     }
                 }
@@ -2238,7 +2235,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 int i;
                 Debug.Assert(p.db == null || p.db == db);
                 releaseMemArray(p.aVar, p.nVar);
-                releaseMemArray(p.aColName, p.nResColumn, Sqlite3.COLNAME_N);
+                releaseMemArray(p.aColName, p.nResColumn, Vdbe.COLNAME_N);
                 for (pSub = p.pProgram; pSub != null; pSub = pNext)
                 {
                     pNext = pSub.pNext;
@@ -2261,11 +2258,10 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             public static void sqlite3VdbeDelete(ref Vdbe p)
             {
-                sqlite3 db;
                 if (Sqlite3.NEVER(p == null))
                     return;
                 Cleanup(p);
-                db = p.db;
+                sqlite3 db = p.db;
                 if (p.pPrev != null)
                 {
                     p.pPrev.pNext = p.pNext;

@@ -45,6 +45,9 @@ namespace Community.CsharpSqlite
         ///</summary>
         public class UnpackedRecord
         {
+            public UnpackedRecord() { 
+            
+            }
             public KeyInfo pKeyInfo;
             ///
             ///<summary>

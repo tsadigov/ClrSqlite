@@ -4471,7 +4471,6 @@ goto exit_drop_index;
             /// The operator is "natural cross join".  The A and B operands are stored
             /// in p.a[0] and p.a[1], respectively.  The parser initially stores the
             /// operator with A.  This routine shifts that operator over to B.
-            ///
             ///</summary>
             public static void sqlite3SrcListShiftJoinType(SrcList p)
             {
@@ -4485,32 +4484,27 @@ goto exit_drop_index;
                     p.a[0].jointype = 0;
                 }
             }
+
+            
             ///<summary>
             /// Begin a transaction
-            ///
             ///</summary>
             public static void sqlite3BeginTransaction(Parse pParse, int type)
-            {
-                sqlite3 db;
-                Vdbe v;
-                int i;
+            {   
                 Debug.Assert(pParse != null);
-                db = pParse.db;
+                sqlite3 db = pParse.db;
                 Debug.Assert(db != null);
-                ///
-                ///<summary>
                 ///if( db.aDb[0].pBt==0 ) return; 
-                ///</summary>
                 if (sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_TRANSACTION, "BEGIN", null, null) != 0)
-                {
                     return;
-                }
-                v = pParse.sqlite3GetVdbe();
+                
+                Vdbe v = pParse.sqlite3GetVdbe();
                 if (v == null)
                     return;
+                
                 if (type != Sqlite3.TK_DEFERRED)
                 {
-                    for (i = 0; i < db.nDb; i++)
+                    for (int i = 0; i < db.nDb; i++)
                     {
                         v.sqlite3VdbeAddOp2(OpCode.OP_Transaction, i, (type == Sqlite3.TK_EXCLUSIVE) ? 2 : 1);
                         vdbeaux.sqlite3VdbeUsesBtree(v, i);
@@ -4518,57 +4512,50 @@ goto exit_drop_index;
                 }
                 v.sqlite3VdbeAddOp2(OpCode.OP_AutoCommit, 0, 0);
             }
+
             ///<summary>
             /// Commit a transaction
-            ///
             ///</summary>
             public static void sqlite3CommitTransaction(Parse pParse)
-            {
-                sqlite3 db;
-                Vdbe v;
-                Debug.Assert(pParse != null);
-                db = pParse.db;
-                Debug.Assert(db != null);
-                ///
-                ///<summary>
-                ///if( db.aDb[0].pBt==0 ) return; 
-                ///</summary>
-                if (sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_TRANSACTION, "COMMIT", null, null) != 0)
-                {
-                    return;
-                }
-                v = pParse.sqlite3GetVdbe();
-                if (v != null)
-                {
-                    v.sqlite3VdbeAddOp2(OpCode.OP_AutoCommit, 1, 0);
-                }
+            {   
+                trans(pParse,TransAction.COMMIT);
             }
-            ///
+
             ///<summary>
             ///Rollback a transaction
-            ///
             ///</summary>
             public static void sqlite3RollbackTransaction(Parse pParse)
             {
-                sqlite3 db;
-                Vdbe v;
+                trans(pParse, TransAction.ROLLBACK);
+            }
+
+            enum TransAction
+            {
+                COMMIT,
+                ROLLBACK
+            }
+            static int[,] transParams = {{1,0},{1,1}};
+            //commit 1, 0
+            //rollback 1,1
+            static void trans(Parse pParse, TransAction action)
+            {
                 Debug.Assert(pParse != null);
-                db = pParse.db;
+                sqlite3 db = pParse.db;
                 Debug.Assert(db != null);
-                ///
-                ///<summary>
                 ///if( db.aDb[0].pBt==0 ) return; 
-                ///</summary>
-                if (sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_TRANSACTION, "ROLLBACK", null, null) != 0)
+                if (sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_TRANSACTION, action.ToString(), null, null) != 0)
                 {
                     return;
                 }
-                v = pParse.sqlite3GetVdbe();
+                Vdbe v = pParse.sqlite3GetVdbe();
                 if (v != null)
                 {
-                    v.sqlite3VdbeAddOp2(OpCode.OP_AutoCommit, 1, 1);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_AutoCommit, transParams[(int)TransAction.COMMIT, 0], transParams[(int)TransAction.COMMIT, 1]);
                 }
             }
+
+        
+
             ///<summary>
             /// This function is called by the parser when it parses a command to create,
             /// release or rollback an SQL savepoint.
@@ -4658,10 +4645,7 @@ goto exit_drop_index;
                     Vdbe v = pToplevel.sqlite3GetVdbe();
                     if (v == null)
                         return;
-                    ///
-                    ///<summary>
                     ///This only happens if there was a prior error 
-                    ///</summary>
                     pToplevel.cookieGoto = v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, 0) + 1;
                 }
                 if (iDb >= 0)
@@ -4687,7 +4671,6 @@ goto exit_drop_index;
             ///<summary>
             /// If argument zDb is NULL, then call sqlite3CodeVerifySchema() for each
             /// attached database. Otherwise, invoke it for the database named zDb only.
-            ///
             ///</summary>
             public static void sqlite3CodeVerifyNamedSchema(Parse pParse, string zDb)
             {
@@ -4714,7 +4697,6 @@ goto exit_drop_index;
             /// rollback the whole transaction.  For operations where all constraints
             /// can be checked before any changes are made to the database, it is never
             /// necessary to undo a write and the checkpoint should not be set.
-            ///
             ///</summary>
             public static void sqlite3BeginWriteOperation(Parse pParse, int setStatement, int iDb)
             {
@@ -4729,7 +4711,6 @@ goto exit_drop_index;
             /// inserting multiple rows in a table, or inserting a row and index entries.)
             /// If an abort occurs after some of these writes have completed, then it will
             /// be necessary to undo the completed writes.
-            ///
             ///</summary>
             public static void sqlite3MultiWrite(Parse pParse)
             {
@@ -4752,7 +4733,6 @@ goto exit_drop_index;
             /// particular, it prevents us from writing an effective
             /// implementation of sqlite3AssertMayAbort()) and so we have chosen
             /// to take the safe route and skip the optimization.
-            ///
             ///</summary>
             public static void sqlite3MayAbort(Parse pParse)
             {
@@ -4763,7 +4743,6 @@ goto exit_drop_index;
             /// Code an  OpCode.OP_Halt that causes the vdbe to return an SQLITE_CONSTRAINT
             /// error. The onError parameter determines which (if any) of the statement
             /// and/or current transaction is rolled back.
-            ///
             ///</summary>
             public static void sqlite3HaltConstraint(Parse pParse, OnConstraintError onError, string p4, P4Usage p4type)
             {

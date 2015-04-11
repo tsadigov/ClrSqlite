@@ -264,30 +264,30 @@ namespace Community.CsharpSqlite
     }
     #endregion
 
-
-    
-    public partial class Sqlite3
-    {
-
+    public static class PagerExtensions {
         ///<summary>
         /// Return TRUE if the page given in the argument was previously passed
         /// to PagerMethods.sqlite3PagerWrite().  In other words, return TRUE if it is ok
         /// to change the content of the page.
-        ///
         ///</summary>
-        public static bool sqlite3PagerIswriteable(PgHdr pPg)
+        public static bool sqlite3PagerIswriteable(this PgHdr pPg)
 #if !NDEBUG
-																																						    static bool sqlite3PagerIswriteable( DbPage pPg )
     {
       return ( pPg.flags & PGHDR_DIRTY ) != 0;
     }
 #else
-
         {
             return true;
         }
 
 #endif
+
+    }
+    
+    public partial class Sqlite3
+    {
+
+        
 
         
 
@@ -451,30 +451,30 @@ namespace Community.CsharpSqlite
         public  class Pager
         {
 
-            public sqlite3_vfs pVfs;
-
             ///<summary>
             ///OS functions to use for IO 
             ///</summary>
+            public sqlite3_vfs pVfs;
 
-            public bool exclusiveMode;
 
             ///<summary>
             ///Boolean. True if locking_mode==EXCLUSIVE 
             ///</summary>
+            public bool exclusiveMode;
 
-            public u8 journalMode;
 
             ///<summary>
             ///One of the PAGER_JOURNALMODE_* values 
             ///</summary>
+            public u8 journalMode;
 
-            public u8 useJournal;
 
             ///<summary>
             ///Use a rollback journal on this file 
             ///</summary>
+            public u8 useJournal;
 
+            
             public u8 noReadlock;
 
             ///<summary>
@@ -616,7 +616,11 @@ namespace Community.CsharpSqlite
             ///Number of pages in the database file 
             ///</summary>
 
-            public Pgno dbHintSize;
+            public Pgno dbHintSize {
+                get { return _dbHintSize; }
+                set { _dbHintSize = value; Log.WriteLine("----Number of pages in the database file  : "+value); }
+            }
+            Pgno _dbHintSize;
 
             ///
             ///<summary>
@@ -5380,7 +5384,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                     return rc;
                 }
 
-                public///<summary>
+                ///<summary>
                     /// Begin a write-transaction on the specified pager object. If a
                     /// write-transaction has already been opened, this function is a no-op.
                     ///
@@ -5398,7 +5402,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                     /// or using a temporary file otherwise.
                     ///
                     ///</summary>
-                SqlResult sqlite3PagerBegin(bool exFlag, int subjInMemory)
+                public SqlResult sqlite3PagerBegin(bool exFlag, int subjInMemory)
                 {
                     var rc = SqlResult.SQLITE_OK;
                     if (this.errCode != 0)
@@ -5511,19 +5515,14 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                     var rc = SqlResult.SQLITE_OK;
                     Debug.Assert(this.eState == PagerState.PAGER_WRITER_CACHEMOD || this.eState == PagerState.PAGER_WRITER_DBMOD);
                     Debug.Assert(this.assert_pager_state());
-                    ///
-                    ///<summary>
                     ///Declare and initialize constant integer 'isDirect'. If the
-                    ///</summary>
-                    ///<param name="atomic">write optimization is enabled in this build, then isDirect</param>
-                    ///<param name="is initialized to the value passed as the isDirectMode parameter">is initialized to the value passed as the isDirectMode parameter</param>
-                    ///<param name="to this function. Otherwise, it is always set to zero.">to this function. Otherwise, it is always set to zero.</param>
-                    ///<param name=""></param>
-                    ///<param name="The idea is that if the atomic">write optimization is not</param>
-                    ///<param name="enabled at compile time, the compiler can omit the tests of">enabled at compile time, the compiler can omit the tests of</param>
-                    ///<param name="'isDirect' below, as well as the block enclosed in the">'isDirect' below, as well as the block enclosed in the</param>
-                    ///<param name=""if( isDirect )" condition.">"if( isDirect )" condition.</param>
-                    ///<param name=""></param>
+                    ///atomic-write optimization is enabled in this build, then isDirect</param>
+                    ///is initialized to the value passed as the isDirectMode parameter
+                    ///to this function. Otherwise, it is always set to zero.
+                    ///The idea is that if the atomic-write optimization is not
+                    ///enabled at compile time, the compiler can omit the tests of
+                    ///'isDirect' below, as well as the block enclosed in the
+                    ///"if( isDirect )" condition."
 
 #if !SQLITE_ENABLE_ATOMIC_WRITE
                     //# define DIRECT_MODE 0
@@ -5537,26 +5536,17 @@ int DIRECT_MODE = isDirectMode;
                     if (!this.changeCountDone && this.dbSize > 0)
                     {
                         PgHdr pPgHdr = null;
-                        ///
-                        ///<summary>
                         ///Reference to page 1 
-                        ///</summary>
 
                         Debug.Assert(!this.tempFile && this.fd.isOpen  );
-                        ///
-                        ///<summary>
                         ///Open page 1 of the file for writing. 
-                        ///</summary>
 
                         rc = this.sqlite3PagerGet(1, ref pPgHdr);
                         Debug.Assert(pPgHdr == null || rc == SqlResult.SQLITE_OK);
-                        ///
-                        ///<summary>
                         ///If page one was fetched successfully, and this function is not
-                        ///</summary>
-                        ///<param name="operating in direct">mode, make page 1 writable.  When not in </param>
-                        ///<param name="direct mode, page 1 is always held in cache and hence the PagerGet()">direct mode, page 1 is always held in cache and hence the PagerGet()</param>
-                        ///<param name="above is always successful "> hence the ALWAYS on rc==SqlResult.SQLITE_OK.</param>
+                        ///operating in direct">mode, make page 1 writable.  When not in </param>
+                        ///direct mode, page 1 is always held in cache and hence the PagerGet()
+                        ///above is always successful "> hence the ALWAYS on rc==SqlResult.SQLITE_OK.</param>
                         ///<param name=""></param>
 
                         if (!DIRECT_MODE && Sqlite3.ALWAYS(rc == SqlResult.SQLITE_OK))
@@ -5696,11 +5686,7 @@ int DIRECT_MODE = isDirectMode;
                       /// journal file in this case.
                       ///
                       ///</summary>
-                SqlResult sqlite3PagerCommitPhaseOne(///
-                    ///<summary>
-                    ///Pager object 
-                    ///</summary>
-
+                SqlResult sqlite3PagerCommitPhaseOne(
                 string zMaster, ///
                     ///<summary>
                     ///If not NULL, the master journal name 

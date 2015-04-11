@@ -138,54 +138,22 @@ namespace Community.CsharpSqlite
 		 P4_KEYINFO_STATIC = (-17)
 
     }
+
+
+    // #define  P4Usage.P4_KEYINFO_STATIC  (-17)
+    
+        
+    public  static partial class Globals{
+        	
+		
+    }
 		
 
 	public partial class Sqlite3
 	{
 
-		// #define  P4Usage.P4_KEYINFO_STATIC  (-17)
-		///
-///<summary>
-///The Vdbe.aColName array contains 5n Mem structures, where n is the
-///number of columns of data returned by the statement.
-///
-///</summary>
-
-		//#define COLNAME_NAME     0
-		//#define COLNAME_DECLTYPE 1
-		//#define COLNAME_DATABASE 2
-		//#define COLNAME_TABLE    3
-		//#define COLNAME_COLUMN   4
-		//#if SQLITE_ENABLE_COLUMN_METADATA
-		//# define COLNAME_N        5      /* Number of COLNAME_xxx symbols */
-		//#else
-		//# ifdef SQLITE_OMIT_DECLTYPE
-		//#   define COLNAME_N      1      /* Store only the name */
-		//# else
-		//#   define COLNAME_N      2      /* Store the name and decltype */
-		//# endif
-		//#endif
-        public const int COLNAME_NAME = 0;
-
-        public const int COLNAME_DECLTYPE = 1;
-
-        public const int COLNAME_DATABASE = 2;
-
-        public const int COLNAME_TABLE = 3;
-
-        public const int COLNAME_COLUMN = 4;
-
-		#if SQLITE_ENABLE_COLUMN_METADATA
-																																						const int COLNAME_N = 5;     /* Number of COLNAME_xxx symbols */
-#else
-		#if SQLITE_OMIT_DECLTYPE
-																																						const int COLNAME_N = 1;     /* Number of COLNAME_xxx symbols */
-#else
-		public const int COLNAME_N = 2;
-
-		#endif
-		#endif
-		///<summary>
+		
+	///<summary>
 		/// The following macro converts a relative address in the p2 field
 		/// of a VdbeOp structure into a negative number so that
 		/// sqlite3VdbeAddOpList() knows that the address is relative.  Calling

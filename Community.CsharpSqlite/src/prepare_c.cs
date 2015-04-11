@@ -831,7 +831,7 @@ db.xAuth = 0;
 					mx=8;
 				}
 				for(i=iFirst;i<mx;i++) {
-					pParse.pVdbe.sqlite3VdbeSetColName(i-iFirst,COLNAME_NAME,azColName[i],SQLITE_STATIC);
+                    pParse.pVdbe.sqlite3VdbeSetColName(i - iFirst, ColName.NAME, azColName[i], SQLITE_STATIC);
 				}
 			}
 			Debug.Assert(db.init.busy==0||saveSqlFlag==0);

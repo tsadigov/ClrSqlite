@@ -203,7 +203,7 @@ namespace Community.CsharpSqlite {
 			//sqlite3VdbeAddOp4( v,  OpCode.OP_Int64, 0, mem, 0, (char*)pI64,  P4Usage.P4_INT64 );
 			v.sqlite3VdbeAddOp4(OpCode.OP_Int64,0,mem,0,value, P4Usage.P4_INT64);
 			v.sqlite3VdbeSetNumCols(1);
-			v.sqlite3VdbeSetColName(0,COLNAME_NAME,zLabel,SQLITE_STATIC);
+            v.sqlite3VdbeSetColName(0, ColName.NAME, zLabel, SQLITE_STATIC);
 			v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,mem,1);
 		}
 		#if !SQLITE_OMIT_FLAG_PRAGMAS
@@ -547,7 +547,7 @@ goto pragma_out;
                 vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 				if(null==zRight) {
 					v.sqlite3VdbeSetNumCols(1);
-					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"cache_size",SQLITE_STATIC);
+                    v.sqlite3VdbeSetColName(0, ColName.NAME, "cache_size", SQLITE_STATIC);
 					pParse.nMem+=2;
 					addr=v.sqlite3VdbeAddOpList(getCacheSize.Length,getCacheSize);
 					v.sqlite3VdbeChangeP1(addr,iDb);
@@ -653,7 +653,7 @@ goto pragma_out;
 							}
 							v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,iReg,1);
 							v.sqlite3VdbeSetNumCols(1);
-							v.sqlite3VdbeSetColName(0,COLNAME_NAME,zLeft,SQLITE_TRANSIENT);
+                            v.sqlite3VdbeSetColName(0, ColName.NAME, zLeft, SQLITE_TRANSIENT);
 						}
 						else
 							///
@@ -674,7 +674,7 @@ goto pragma_out;
 								_v.sqlite3VdbeAddOp2( OpCode.OP_Pagecount,iDb,iReg);
 								_v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,iReg,1);
 								_v.sqlite3VdbeSetNumCols(1);
-								_v.sqlite3VdbeSetColName(0,COLNAME_NAME,"page_count",SQLITE_STATIC);
+                                _v.sqlite3VdbeSetColName(0, ColName.NAME, "page_count", SQLITE_STATIC);
 							}
 							else
 								///
@@ -726,7 +726,7 @@ goto pragma_out;
 										zRet="exclusive";
 									}
 									v.sqlite3VdbeSetNumCols(1);
-									v.sqlite3VdbeSetColName(0,COLNAME_NAME,"locking_mode",SQLITE_STATIC);
+                                    v.sqlite3VdbeSetColName(0, ColName.NAME, "locking_mode", SQLITE_STATIC);
 									v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,1,0,zRet,0);
 									v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,1,1);
 								}
@@ -758,7 +758,7 @@ goto pragma_out;
 											goto pragma_out;
 										}
 										v.sqlite3VdbeSetNumCols(1);
-										v.sqlite3VdbeSetColName(0,COLNAME_NAME,"journal_mode",SQLITE_STATIC);
+                                        v.sqlite3VdbeSetColName(0, ColName.NAME, "journal_mode", SQLITE_STATIC);
 										if(null==zRight) {
 											///
 											///<summary>
@@ -1008,7 +1008,7 @@ goto pragma_out;
 																if(null==zRight) {
 																	if(sqlite3_temp_directory!="") {
 																		v.sqlite3VdbeSetNumCols(1);
-																		v.sqlite3VdbeSetColName(0,COLNAME_NAME,"temp_store_directory",SQLITE_STATIC);
+                                                                        v.sqlite3VdbeSetColName(0, ColName.NAME, "temp_store_directory", SQLITE_STATIC);
 																		v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,1,0,sqlite3_temp_directory,0);
 																		v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,1,1);
 																	}
@@ -1163,12 +1163,12 @@ else
 																				Column pCol;
 																				v.sqlite3VdbeSetNumCols(6);
 																				pParse.nMem=6;
-																				v.sqlite3VdbeSetColName(0,COLNAME_NAME,"cid",SQLITE_STATIC);
-																				v.sqlite3VdbeSetColName(1,COLNAME_NAME,"name",SQLITE_STATIC);
-																				v.sqlite3VdbeSetColName(2,COLNAME_NAME,"type",SQLITE_STATIC);
-																				v.sqlite3VdbeSetColName(3,COLNAME_NAME,"notnull",SQLITE_STATIC);
-																				v.sqlite3VdbeSetColName(4,COLNAME_NAME,"dflt_value",SQLITE_STATIC);
-																				v.sqlite3VdbeSetColName(5,COLNAME_NAME,"pk",SQLITE_STATIC);
+                                                                                v.sqlite3VdbeSetColName(0, ColName.NAME, "cid", SQLITE_STATIC);
+                                                                                v.sqlite3VdbeSetColName(1, ColName.NAME, "name", SQLITE_STATIC);
+                                                                                v.sqlite3VdbeSetColName(2, ColName.NAME, "type", SQLITE_STATIC);
+                                                                                v.sqlite3VdbeSetColName(3, ColName.NAME, "notnull", SQLITE_STATIC);
+                                                                                v.sqlite3VdbeSetColName(4, ColName.NAME, "dflt_value", SQLITE_STATIC);
+                                                                                v.sqlite3VdbeSetColName(5, ColName.NAME, "pk", SQLITE_STATIC);
 																				build.sqlite3ViewGetColumnNames(pParse,pTab);
 																				for(i=0;i<pTab.nCol;i++)//, pCol++)
 																				 {
@@ -1204,9 +1204,9 @@ else
 																					pTab=pIdx.pTable;
 																					v.sqlite3VdbeSetNumCols(3);
 																					pParse.nMem=3;
-																					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"seqno",SQLITE_STATIC);
-																					v.sqlite3VdbeSetColName(1,COLNAME_NAME,"cid",SQLITE_STATIC);
-																					v.sqlite3VdbeSetColName(2,COLNAME_NAME,"name",SQLITE_STATIC);
+                                                                                    v.sqlite3VdbeSetColName(0, ColName.NAME, "seqno", SQLITE_STATIC);
+                                                                                    v.sqlite3VdbeSetColName(1, ColName.NAME, "cid", SQLITE_STATIC);
+                                                                                    v.sqlite3VdbeSetColName(2, ColName.NAME, "name", SQLITE_STATIC);
 																					for(i=0;i<pIdx.nColumn;i++) {
 																						int cnum=pIdx.aiColumn[i];
 																						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,1);
@@ -1231,9 +1231,9 @@ else
 																							int i=0;
 																							v.sqlite3VdbeSetNumCols(3);
 																							pParse.nMem=3;
-																							v.sqlite3VdbeSetColName(0,COLNAME_NAME,"seq",SQLITE_STATIC);
-																							v.sqlite3VdbeSetColName(1,COLNAME_NAME,"name",SQLITE_STATIC);
-																							v.sqlite3VdbeSetColName(2,COLNAME_NAME,"unique",SQLITE_STATIC);
+                                                                                            v.sqlite3VdbeSetColName(0, ColName.NAME, "seq", SQLITE_STATIC);
+                                                                                            v.sqlite3VdbeSetColName(1, ColName.NAME, "name", SQLITE_STATIC);
+                                                                                            v.sqlite3VdbeSetColName(2, ColName.NAME, "unique", SQLITE_STATIC);
 																							while(pIdx!=null) {
 																								v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,1);
 																								v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,2,0,pIdx.zName,0);
@@ -1252,9 +1252,9 @@ else
 																							goto pragma_out;
 																						v.sqlite3VdbeSetNumCols(3);
 																						pParse.nMem=3;
-																						v.sqlite3VdbeSetColName(0,COLNAME_NAME,"seq",SQLITE_STATIC);
-																						v.sqlite3VdbeSetColName(1,COLNAME_NAME,"name",SQLITE_STATIC);
-																						v.sqlite3VdbeSetColName(2,COLNAME_NAME,"file",SQLITE_STATIC);
+                                                                                        v.sqlite3VdbeSetColName(0, ColName.NAME, "seq", SQLITE_STATIC);
+                                                                                        v.sqlite3VdbeSetColName(1, ColName.NAME, "name", SQLITE_STATIC);
+                                                                                        v.sqlite3VdbeSetColName(2, ColName.NAME, "file", SQLITE_STATIC);
 																						for(i=0;i<db.nDb;i++) {
 																							if(db.aDb[i].pBt==null)
 																								continue;
@@ -1271,8 +1271,8 @@ else
 																							HashElem p;
 																							v.sqlite3VdbeSetNumCols(2);
 																							pParse.nMem=2;
-																							v.sqlite3VdbeSetColName(0,COLNAME_NAME,"seq",SQLITE_STATIC);
-																							v.sqlite3VdbeSetColName(1,COLNAME_NAME,"name",SQLITE_STATIC);
+                                                                                            v.sqlite3VdbeSetColName(0, ColName.NAME, "seq", SQLITE_STATIC);
+                                                                                            v.sqlite3VdbeSetColName(1, ColName.NAME, "name", SQLITE_STATIC);
 																							for(p=db.aCollSeq.first;p!=null;p=p.next)//( p = sqliteHashFirst( db.aCollSeq ) ; p; p = sqliteHashNext( p ) )
 																							 {
 																								CollSeq pColl=((CollSeq[])p.data)[0];
@@ -1298,14 +1298,14 @@ else
 																										int i=0;
 																										v.sqlite3VdbeSetNumCols(8);
 																										pParse.nMem=8;
-																										v.sqlite3VdbeSetColName(0,COLNAME_NAME,"id",SQLITE_STATIC);
-																										v.sqlite3VdbeSetColName(1,COLNAME_NAME,"seq",SQLITE_STATIC);
-																										v.sqlite3VdbeSetColName(2,COLNAME_NAME,"table",SQLITE_STATIC);
-																										v.sqlite3VdbeSetColName(3,COLNAME_NAME,"from",SQLITE_STATIC);
-																										v.sqlite3VdbeSetColName(4,COLNAME_NAME,"to",SQLITE_STATIC);
-																										v.sqlite3VdbeSetColName(5,COLNAME_NAME,"on_update",SQLITE_STATIC);
-																										v.sqlite3VdbeSetColName(6,COLNAME_NAME,"on_delete",SQLITE_STATIC);
-																										v.sqlite3VdbeSetColName(7,COLNAME_NAME,"match",SQLITE_STATIC);
+																										v.sqlite3VdbeSetColName(0, ColName.NAME, "id",SQLITE_STATIC);
+                                                                                                        v.sqlite3VdbeSetColName(1, ColName.NAME, "seq", SQLITE_STATIC);
+                                                                                                        v.sqlite3VdbeSetColName(2, ColName.NAME, "table", SQLITE_STATIC);
+                                                                                                        v.sqlite3VdbeSetColName(3, ColName.NAME, "from", SQLITE_STATIC);
+                                                                                                        v.sqlite3VdbeSetColName(4, ColName.NAME, "to", SQLITE_STATIC);
+                                                                                                        v.sqlite3VdbeSetColName(5, ColName.NAME, "on_update", SQLITE_STATIC);
+                                                                                                        v.sqlite3VdbeSetColName(6, ColName.NAME, "on_delete", SQLITE_STATIC);
+                                                                                                        v.sqlite3VdbeSetColName(7, ColName.NAME, "match", SQLITE_STATIC);
 																										while(pFK!=null) {
 																											int j;
 																											for(j=0;j<pFK.nCol;j++) {
@@ -1405,7 +1405,7 @@ else
 																											goto pragma_out;
 																										pParse.nMem=6;
 																										v.sqlite3VdbeSetNumCols(1);
-																										v.sqlite3VdbeSetColName(0,COLNAME_NAME,"integrity_check",SQLITE_STATIC);
+                                                                                                        v.sqlite3VdbeSetColName(0, ColName.NAME, "integrity_check", SQLITE_STATIC);
 																										///
 																										///<summary>
 																										///Set the maximum error count 
@@ -1643,7 +1643,7 @@ else
 																													//  reset errors goto pragma_out;
 																												}
 																												v.sqlite3VdbeSetNumCols(1);
-																												v.sqlite3VdbeSetColName(0,COLNAME_NAME,"encoding",SQLITE_STATIC);
+                                                                                                                v.sqlite3VdbeSetColName(0, ColName.NAME, "encoding", SQLITE_STATIC);
 																												v.sqlite3VdbeAddOp2(OpCode.OP_String8,0,1);
 																												Debug.Assert(encnames[(int)SqliteEncoding.UTF8].enc==SqliteEncoding.UTF8);
 																												Debug.Assert(encnames[(int)SqliteEncoding.UTF16LE].enc==SqliteEncoding.UTF16LE);
@@ -1781,7 +1781,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																													v.sqlite3VdbeChangeP1(addr+1,iDb);
 																													v.sqlite3VdbeChangeP3(addr+1,iCookie);
 																													v.sqlite3VdbeSetNumCols(1);
-																													v.sqlite3VdbeSetColName(0,COLNAME_NAME,zLeft,SQLITE_TRANSIENT);
+                                                                                                                    v.sqlite3VdbeSetColName(0, ColName.NAME, zLeft, SQLITE_TRANSIENT);
 																												}
 																											}
 																											else
@@ -1812,7 +1812,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																															string zOpt;
 																															v.sqlite3VdbeSetNumCols(1);
 																															pParse.nMem=1;
-																															v.sqlite3VdbeSetColName(0,COLNAME_NAME,"compile_option",SQLITE_STATIC);
+                                                                                                                            v.sqlite3VdbeSetColName(0, ColName.NAME, "compile_option", SQLITE_STATIC);
 																															while((zOpt=sqlite3_compileoption_get(i++))!=null) {
 																																v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,1,0,zOpt,0);
 																																v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,1,1);

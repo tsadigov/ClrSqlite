@@ -77,42 +77,23 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
             public static void resolveAlias(Parse pParse,///
-                ///<summary>
                 ///Parsing context 
-                ///</summary>
             ExprList pEList,///
-                ///<summary>
                 ///A result set 
-                ///</summary>
             int iCol,///
-                ///<summary>
-                ///</summary>
                 ///<param name="A column in the result set.  0..pEList.nExpr">1 </param>
             Expr pExpr,///
-                ///<summary>
                 ///Transform this into an alias to the result set 
-                ///</summary>
             string zType///
-                ///<summary>
                 ///"GROUP" or "ORDER" or "" 
-                ///</summary>
             )
             {
                 Expr pOrig;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="The iCol">th column of the result set </param>
                 Expr pDup;
-                ///
-                ///<summary>
                 ///Copy of pOrig 
-                ///</summary>
                 sqlite3 db;
-                ///
-                ///<summary>
                 ///The database connection 
-                ///</summary>
                 Debug.Assert(iCol >= 0 && iCol < pEList.nExpr);
                 pOrig = pEList.a[iCol].pExpr;
                 Debug.Assert(pOrig != null);
@@ -156,13 +137,9 @@ namespace Community.CsharpSqlite
                     pDup.pColl = pExpr.pColl;
                     pDup.Flags |= ExprFlags.EP_ExpCollate;
                 }
-                ///
-                ///<summary>
                 ///Before calling exprc.sqlite3ExprDelete(), set the ExprFlags.EP_Static flag. This 
                 ///prevents ExprDelete() from deleting the Expr structure itself,
                 ///allowing it to be repopulated by the memcpy() on the following line.
-                ///
-                ///</summary>
                 pExpr.ExprSetProperty(ExprFlags.EP_Static);
                 exprc.sqlite3ExprDelete(db, ref pExpr);
                 pExpr.CopyFrom(pDup);
@@ -186,17 +163,11 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
             public static int resolveAsName(Parse pParse,///
-                ///<summary>
                 ///Parsing context for error messages 
-                ///</summary>
             ExprList pEList,///
-                ///<summary>
                 ///List of expressions to scan 
-                ///</summary>
             Expr pE///
-                ///<summary>
                 ///Expression we are trying to match 
-                ///</summary>
             )
             {
                 int i;
@@ -243,56 +214,28 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
             public static int resolveOrderByTermToExprList(Parse pParse,///
-                ///<summary>
                 ///Parsing context for error messages 
-                ///</summary>
             Select pSelect,///
-                ///<summary>
                 ///The SELECT statement with the ORDER BY clause 
-                ///</summary>
             Expr pE///
-                ///<summary>
                 ///The specific ORDER BY term 
-                ///</summary>
             )
             {
                 int i = 0;
-                ///
-                ///<summary>
                 ///Loop counter 
-                ///</summary>
                 ExprList pEList;
-                ///
-                ///<summary>
                 ///The columns of the result set 
-                ///</summary>
                 NameContext nc;
-                ///
-                ///<summary>
                 ///Name context for resolving pE 
-                ///</summary>
                 sqlite3 db;
-                ///
-                ///<summary>
                 ///Database connection 
-                ///</summary>
                 SqlResult rc;
-                ///
-                ///<summary>
                 ///Return code from subprocedures 
-                ///</summary>
                 u8 savedSuppErr;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Saved value of db">>suppressErr </param>
                 Debug.Assert( ! pE.sqlite3ExprIsInteger(ref i) );
                 pEList = pSelect.pEList;
-                ///
-                ///<summary>
                 ///Resolve all names in the ORDER BY term expression
-                ///
-                ///</summary>
                 nc = new NameContext();
                 // memset( &nc, 0, sizeof( nc ) );
                 nc.pParse = pParse;
@@ -307,13 +250,9 @@ namespace Community.CsharpSqlite
                 db.suppressErr = savedSuppErr;
                 if (rc != 0)
                     return 0;
-                ///
-                ///<summary>
                 ///Try to match the ORDER BY expression against an expression
-                ///</summary>
                 ///<param name="in the result set.  Return an 1">based index of the matching</param>
                 ///<param name="result">set entry.</param>
-                ///<param name=""></param>
                 for (i = 0; i < pEList.nExpr; i++)
                 {
                     if (exprc.sqlite3ExprCompare(pEList.a[i].pExpr, pE) < 2)
@@ -321,19 +260,10 @@ namespace Community.CsharpSqlite
                         return i + 1;
                     }
                 }
-                ///
-                ///<summary>
                 ///If no match, return 0. 
-                ///</summary>
                 return 0;
             }
 		
-
-
-
-
-
-
 
             ///<summary>
             /// Allocate and return a pointer to an expression to load the column iCol
@@ -408,66 +338,31 @@ namespace Community.CsharpSqlite
             )
             {
                 int i, j;
-                ///
-                ///<summary>
                 ///Loop counters 
-                ///</summary>
                 int cnt = 0;
-                ///
-                ///<summary>
                 ///Number of matching column names 
-                ///</summary>
                 int cntTab = 0;
-                ///
-                ///<summary>
                 ///Number of matching table names 
-                ///</summary>
                 sqlite3 db = pParse.db;
-                ///
-                ///<summary>
                 ///The database connection 
-                ///</summary>
                 SrcList_item pItem;
-                ///
-                ///<summary>
                 ///Use for looping over pSrcList items 
-                ///</summary>
                 SrcList_item pMatch = null;
-                ///
-                ///<summary>
                 ///The matching pSrcList item 
-                ///</summary>
                 NameContext pTopNC = pNC;
-                ///
-                ///<summary>
                 ///First namecontext in the list 
-                ///</summary>
                 Schema pSchema = null;
-                ///
-                ///<summary>
                 ///Schema of the expression 
-                ///</summary>
                 int isTrigger = 0;
                 Debug.Assert(pNC != null);
-                ///
-                ///<summary>
                 ///the name context cannot be NULL. 
-                ///</summary>
                 Debug.Assert(zCol != null);
-                ///
-                ///<summary>
                 ///The Z in X.Y.Z cannot be NULL 
-                ///</summary>
                 Debug.Assert(!pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly | ExprFlags.EP_Reduced));
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Initialize the node to no">match </param>
                 pExpr.iTable = -1;
                 pExpr.pTab = null;
                 pExpr.ExprSetIrreducible();
-                ///
-                ///<summary>
                 ///</summary>
                 ///<param name="Start at the inner">most context and move outward until a match is found </param>
                 while (pNC != null && cnt == 0)
@@ -525,17 +420,12 @@ namespace Community.CsharpSqlite
                                     pExpr.pTab = pTab;
                                     pMatch = pItem;
                                     pSchema = pTab.pSchema;
-                                    ///
-                                    ///<summary>
-                                    ///</summary>
                                     ///<param name="Substitute the rowid (column ">1) for the INTEGER PRIMARY KEY </param>
                                     pExpr.iColumn = (short)(j == pTab.iPKey ? -1 : j);
                                     if (i < pSrcList.nSrc - 1)
                                     {
                                         if ((pSrcList.a[i + 1].jointype &  JoinType.JT_NATURAL) != 0)// pItem[1].jointype
                                         {
-                                            ///
-                                            ///<summary>
                                             ///If this match occurred in the left table of a natural join,
                                             ///then skip the right table to avoid a duplicate match 
                                             ///</summary>
@@ -545,12 +435,9 @@ namespace Community.CsharpSqlite
                                         else
                                             if ((pUsing = pSrcList.a[i + 1].pUsing) != null)//pItem[1].pUsing
                                             {
-                                                ///
-                                                ///<summary>
                                                 ///If this match occurs on a column that is in the USING clause
                                                 ///of a join, skip the search of the right table of the join
                                                 ///to avoid a duplicate match there. 
-                                                ///</summary>
                                                 int k;
                                                 for (k = 0; k < pUsing.nId; k++)
                                                 {
@@ -643,18 +530,11 @@ namespace Community.CsharpSqlite
                         }
                     }
 #endif
-                    ///
-                    ///<summary>
                     ///Perhaps the name is a reference to the ROWID
-                    ///
-                    ///</summary>
                     if (cnt == 0 && cntTab == 1 && exprc.sqlite3IsRowid(zCol))
                     {
                         cnt = 1;
                         pExpr.iColumn = -1;
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="IMP: R">55124 </param>
                         pExpr.affinity = sqliteinth.SQLITE_AFF_INTEGER;
                     }
@@ -772,11 +652,7 @@ namespace Community.CsharpSqlite
                     Debug.Assert(pMatch.iCursor == pExpr.iTable);
                     pMatch.colUsed |= ((Bitmask)1) << n;
                 }
-                ///
-                ///<summary>
                 ///Clean up and return
-                ///
-                ///</summary>
                 exprc.sqlite3ExprDelete(db, ref pExpr.pLeft);
                 pExpr.pLeft = null;
                 exprc.sqlite3ExprDelete(db, ref pExpr.pRight);
@@ -787,11 +663,8 @@ namespace Community.CsharpSqlite
                 {
                     Debug.Assert(pNC != null);
                     sqliteinth.sqlite3AuthRead(pParse, pExpr, pSchema, pNC.pSrcList);
-                    ///
-                    ///<summary>
                     ///Increment the nRef value on all name contexts from TopNC up to
                     ///the point where the name matched. 
-                    ///</summary>
                     for (; ; )
                     {
                         Debug.Assert(pTopNC != null);
@@ -807,12 +680,6 @@ namespace Community.CsharpSqlite
                     return WRC.WRC_Abort;
                 }
             }
-
-
-
-
-
-
 
             ///<summary>
             /// This routine is callback for sqlite3WalkExpr().
@@ -868,20 +735,13 @@ pExpr.affinity = SQLITE_AFF_INTEGER;
 break;
 }
 #endif
-                    ///
-                    ///<summary>
                     ///A lone identifier is the name of a column.
-                    ///</summary>
                     case TokenType.TK_ID:
                         {
                             return ResolveExtensions.lookupName(pParse, null, null, pExpr.u.zToken, pNC, pExpr);
                         }
-                    ///
-                    ///<summary>
                     ///A table name and column name:     ID.ID
                     ///Or a database, table and column:  ID.ID.ID
-                    ///
-                    ///</summary>
                     case TokenType.TK_DOT:
                         {
                             string zColumn;
@@ -917,50 +777,23 @@ break;
                     case TokenType.TK_FUNCTION:
                         {
                             ExprList pList = pExpr.x.pList;
-                            ///
-                            ///<summary>
                             ///The argument list 
-                            ///</summary>
                             int n = pList != null ? pList.nExpr : 0;
-                            ///
-                            ///<summary>
                             ///Number of arguments 
-                            ///</summary>
                             bool no_such_func = false;
-                            ///
-                            ///<summary>
                             ///True if no such function exists 
-                            ///</summary>
                             bool wrong_num_args = false;
-                            ///
-                            ///<summary>
                             ///True if wrong number of arguments 
-                            ///</summary>
                             bool is_agg = false;
-                            ///
-                            ///<summary>
                             ///True if is an aggregate function 
-                            ///</summary>
                             int auth;
-                            ///
-                            ///<summary>
                             ///Authorization to use the function 
-                            ///</summary>
                             int nId;
-                            ///
-                            ///<summary>
                             ///Number of characters in function name 
-                            ///</summary>
                             string zId;
-                            ///
-                            ///<summary>
                             ///The function name. 
-                            ///</summary>
                             FuncDef pDef;
-                            ///
-                            ///<summary>
                             ///Information about the function 
-                            ///</summary>
                             SqliteEncoding enc = pParse.db.aDbStatic[0].pSchema.enc;
                             // ENC( pParse.db );   /* The database encoding */
                             sqliteinth.testcase(pExpr.Operator == TokenType.TK_CONST_FUNC);
@@ -1026,12 +859,8 @@ return WRC.WRC_Prune;
                             pWalker.sqlite3WalkExprList(pList);
                             if (is_agg)
                                 pNC.allowAgg = 1;
-                            ///
-                            ///<summary>
                             ///FIX ME:  Compute pExpr.affinity based on the expected return
                             ///type of the function
-                            ///
-                            ///</summary>
                             return WRC.WRC_Prune;
                         }
 #if !SQLITE_OMIT_SUBQUERY

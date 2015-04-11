@@ -325,13 +325,13 @@ namespace Community.CsharpSqlite {
 			//( isBtreeCursor ? sqlite3BtreeCursorSize() : 0 ) +
 			//2 * nField * sizeof( u32 );
 			Debug.Assert(iCur<p.nCursor);
-			if(p.apCsr[iCur]!=null) {
-                vdbeaux.sqlite3VdbeFreeCursor(p, p.apCsr[iCur]);
-				p.apCsr[iCur]=null;
+			if(p.OpenCursors[iCur]!=null) {
+                vdbeaux.sqlite3VdbeFreeCursor(p, p.OpenCursors[iCur]);
+				p.OpenCursors[iCur]=null;
 			}
 			//if ( SqlResult.SQLITE_OK == sqlite3VdbeMemGrow( pMem, nByte, 0 ) )
 			{
-				p.apCsr[iCur]=pCx=new VdbeCursor();
+				p.OpenCursors[iCur]=pCx=new VdbeCursor();
 				// (VdbeCursor)pMem.z;
 				//memset(pCx, 0, sizeof(VdbeCursor));
 				pCx.iDb=iDb;

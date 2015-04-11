@@ -75,7 +75,7 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
             //#define get2byteNotZero(X)  (((((int)get2byte(X))-1)&0xffff)+1)
             public static int get2byteNotZero(byte[] X, int offset)
             {
-                return (((((int)get2byte(X, offset)) - 1) & 0xffff) + 1);
+                return (((((int)X.get2byte(offset)) - 1) & 0xffff) + 1);
             }
 #if !SQLITE_OMIT_SHARED_CACHE
 																																																		///<summary>
@@ -2597,7 +2597,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                                         BTreeMethods.releasePage(pNewTrunk);
                                         if (null == pPrevTrunk)
                                         {
-                                            Debug.Assert(sqlite3PagerIswriteable(pPage1.pDbPage));
+                                            Debug.Assert(pPage1.pDbPage.sqlite3PagerIswriteable());
                                             Converter.sqlite3Put4byte(pPage1.aData, (u32)32, iNewTrunk);
                                         }
                                         else
@@ -2756,7 +2756,7 @@ static void assertParentIndex( MemPage pParent, int iIdx, Pgno iChild )
                 {
                     ppPage = null;
                 }
-                Debug.Assert(rc != SqlResult.SQLITE_OK || sqlite3PagerIswriteable((ppPage).pDbPage));
+                Debug.Assert(rc != SqlResult.SQLITE_OK || (ppPage).pDbPage.sqlite3PagerIswriteable());
                 return rc;
             }
             ///
@@ -3346,7 +3346,7 @@ return rc;
                     ///freelist count.  Hence, the sqlite3BtreeUpdateMeta() call cannot fail.
                     ///
                     ///</summary>
-                    Debug.Assert(sqlite3PagerIswriteable(pBt.pPage1.pDbPage));
+                    Debug.Assert(pBt.pPage1.pDbPage.sqlite3PagerIswriteable());
                     rc = p.sqlite3BtreeUpdateMeta(4, pgnoRoot);
                     if (NEVER(rc != 0))
                     {
@@ -3361,7 +3361,7 @@ return rc;
                         return rc;
                 }
 #endif
-                Debug.Assert(sqlite3PagerIswriteable(pRoot.pDbPage));
+                Debug.Assert(pRoot.pDbPage.sqlite3PagerIswriteable());
                 if ((createTabFlags & BTREE_INTKEY) != 0)
                 {
                     ptfFlags = PTF_INTKEY | PTF_LEAFDATA | PTF_LEAF;

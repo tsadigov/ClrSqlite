@@ -688,7 +688,7 @@ namespace Community.CsharpSqlite
                 pNew.pGroupBy = exprc.sqlite3ExprListDup(db, p.pGroupBy, flags);
                 pNew.pHaving = exprc.sqlite3ExprDup(db, p.pHaving, flags);
                 pNew.pOrderBy = exprc.sqlite3ExprListDup(db, p.pOrderBy, flags);
-                pNew.tk_op = p.tk_op;
+                pNew.TokenOp  = p.TokenOp ;
                 pNew.pPrior = exprc.sqlite3SelectDup(db, p.pPrior, flags);
                 pNew.pLimit = exprc.sqlite3ExprDup(db, p.pLimit, flags);
                 pNew.pOffset = exprc.sqlite3ExprDup(db, p.pOffset, flags);

@@ -40,6 +40,7 @@ using yDbMask = System.Int64;
 #else
 	//  typedef unsigned int yDbMask;
 	using yDbMask=System.Int32;
+using System.Collections.Generic;
 	#endif
 	public partial class Sqlite3 {
 		public class Parse {
@@ -3323,51 +3324,44 @@ goto attach_end;
 					}
 				}
 			}
+
+            IEnumerable<Token> lex(String zSql)
+            {
+                int i = 0;///Loop counter 
+
+                int mxSqlLen;///Max length of an SQL string 
+                mxSqlLen = db.aLimit[SQLITE_LIMIT_SQL_LENGTH];
+
+                while (
+                    ///0 == db.mallocFailed && 
+                i < zSql.Length)
+                {
+                    Debug.Assert(i >= 0);
+
+                    //pParse->sLastToken.z = &zSql[i];
+                    i += (this.sLastToken = Sqlite3.Lexer.GetToken(zSql, i)).Length;
+                    //Log.WriteLine("token :" + this.sLastToken);
+                    if (i > mxSqlLen)
+                    {
+                        this.rc = SqlResult.SQLITE_TOOBIG;
+                        break;
+                    }
+
+                    yield return this.sLastToken;
+                }
+            }
 			public SqlResult sqlite3RunParser(string zSql,ref string pzErrMsg) {
 				Log.WriteHeader("sqlite3RunParser:"+zSql);
 				//Log.Indent();
-                SqlResult nErr = (SqlResult)0;
-				///
-				///<summary>
-				///Number of errors encountered 
-				///</summary>
-				int i;
-				///
-				///<summary>
-				///Loop counter 
-				///</summary>
-				yyParser pEngine;
-				///
-				///<summary>
-				///type of the next token 
-				///</summary>
-				int lastTokenParsed=-1;
-				///
-				///<summary>
-				///type of the previous token 
-				///</summary>
-				byte enableLookaside;
-				///
-				///<summary>
-				///</summary>
-				///<param name="Saved value of db">>lookaside.bEnabled </param>
-				sqlite3 db=this.db;
-				///
-				///<summary>
-				///The database connection 
-				///</summary>
-				int mxSqlLen;
-				///
-				///<summary>
-				///Max length of an SQL string 
-				///</summary>
-				mxSqlLen=db.aLimit[SQLITE_LIMIT_SQL_LENGTH];
-				if(db.activeVdbeCnt==0) {
+                SqlResult nErr = (SqlResult)0;///Number of errors encountered 
+				yyParser pEngine;///type of the next token 
+				int lastTokenParsed=-1;///type of the previous token 
+				byte enableLookaside;///<param name="Saved value of db">>lookaside.bEnabled </param>
+				sqlite3 db=this.db;///The database connection 
+								if(db.activeVdbeCnt==0) {
 					db.u1.isInterrupted=false;
 				}
 				this.rc=SqlResult.SQLITE_OK;
-				this.zTail=new StringBuilder(zSql);
-				i=0;
 				Debug.Assert(pzErrMsg!=null);
 				pEngine=sqlite3ParserAlloc();
 				//sqlite3ParserAlloc((void*(*)(size_t))malloc_cs.sqlite3Malloc);
@@ -3384,20 +3378,11 @@ goto attach_end;
 				enableLookaside=db.lookaside.bEnabled;
 				if(db.lookaside.pStart!=0)
 					db.lookaside.bEnabled=1;
-				while(///
-				///<summary>
-				///0 == db.mallocFailed && 
-				///</summary>
-				i<zSql.Length) {
-					Debug.Assert(i>=0);
-					//pParse->sLastToken.z = &zSql[i];
-                    i += (this.sLastToken = Sqlite3.Lexer.GetToken(zSql, i)).Length;
-					//Log.WriteLine("token :" + this.sLastToken);
-					if(i>mxSqlLen) {
-						this.rc=SqlResult.SQLITE_TOOBIG;
-						break;
-					}
-					switch(this.sLastToken.TokenType) {
+
+                int i = 0;
+				foreach(Token token in lex(zSql)){
+                    i += token.Length;
+					switch(token.TokenType) {
 					case TokenType.TK_SPACE: {
 						if(db.u1.isInterrupted) {
 							utilc.sqlite3ErrorMsg(this,"interrupt");
@@ -3408,20 +3393,17 @@ goto attach_end;
 					}
 					case TokenType.TK_ILLEGAL: {
 						db.sqlite3DbFree(ref pzErrMsg);
-						pzErrMsg=io.sqlite3MPrintf(db,"unrecognized token: \"%T\"",(object)this.sLastToken);
+						pzErrMsg=io.sqlite3MPrintf(db,"unrecognized token: \"%T\"",(object)token);
 						nErr++;
 						goto abort_parse;
 					}
 					case TokenType.TK_SEMI: {
 						//pParse.zTail = new StringBuilder(zSql.Substring( i,zSql.Length-i ));
-						///
-						///<summary>
 						///Fall thru into the default case 
-						///</summary>
 						goto default;
 					}
 					default: {
-						pEngine.sqlite3Parser(this.sLastToken.TokenType,this.sLastToken,this);
+						pEngine.sqlite3Parser(token.TokenType,token,this);
 						if(this.rc!=SqlResult.SQLITE_OK) {
 							goto abort_parse;
 						}
@@ -3429,6 +3411,8 @@ goto attach_end;
 					}
 					}
 				}
+                this.zTail = new StringBuilder(zSql);
+
 				abort_parse:
 				this.zTail=new StringBuilder(zSql.Length<=i?"":zSql.Substring(i,zSql.Length-i));
 				if(zSql.Length>=i&&nErr==0&&this.rc==SqlResult.SQLITE_OK) {
@@ -4443,7 +4427,7 @@ isView = false;
                 {
 					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,regRowCount,1);
 					v.sqlite3VdbeSetNumCols(1);
-					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows inserted",SQLITE_STATIC);
+					v.sqlite3VdbeSetColName(0,ColName.NAME,"rows inserted",SQLITE_STATIC);
 				}
 				insert_cleanup:
 				build.sqlite3SrcListDelete(db,ref pTabList);
@@ -5856,7 +5840,7 @@ aXRef[j] = -1;
                 {
 					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,regRowCount,1);
 					v.sqlite3VdbeSetNumCols(1);
-					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows updated",SQLITE_STATIC);
+                    v.sqlite3VdbeSetColName(0, ColName.NAME, "rows updated", SQLITE_STATIC);
 				}
 				update_cleanup:
 				#if !SQLITE_OMIT_AUTHORIZATION
@@ -6453,7 +6437,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
                 {
 					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,memCnt,1);
 					v.sqlite3VdbeSetNumCols(1);
-					v.sqlite3VdbeSetColName(0,COLNAME_NAME,"rows deleted",SQLITE_STATIC);
+                    v.sqlite3VdbeSetColName(0, ColName.NAME, "rows deleted", SQLITE_STATIC);
 				}
 				delete_from_cleanup:
 				#if !SQLITE_OMIT_AUTHORIZATION

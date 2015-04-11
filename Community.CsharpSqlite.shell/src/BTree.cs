@@ -62,11 +62,10 @@ namespace Community.CsharpSqlite {
 
             public SqlResult sqlite3BtreeCreateTable( ref int piTable, int flags)
             {
-                Btree p = this;
                 SqlResult rc;
-                sqlite3BtreeEnter(p);
-                rc = BTreeMethods.btreeCreateTable(p, ref piTable, flags);
-                sqlite3BtreeLeave(p);
+                sqlite3BtreeEnter(this);
+                rc = BTreeMethods.btreeCreateTable(this, ref piTable, flags);
+                sqlite3BtreeLeave(this);
                 return rc;
             }
 
@@ -76,28 +75,24 @@ namespace Community.CsharpSqlite {
             ///
             ///zFilename is the name of the database file.  If zFilename is NULL
             ///then an ephemeral database is created.  The ephemeral database might
-            ///</summary>
-            ///<param name="be exclusively in memory, or it might use a disk">based memory cache.</param>
-            ///<param name="Either way, the ephemeral database will be automatically deleted ">Either way, the ephemeral database will be automatically deleted </param>
-            ///<param name="when sqlite3BtreeClose() is called.">when sqlite3BtreeClose() is called.</param>
-            ///<param name=""></param>
-            ///<param name="If zFilename is ":memory:" then an in">memory database is created</param>
-            ///<param name="that is automatically destroyed when it is closed.">that is automatically destroyed when it is closed.</param>
-            ///<param name=""></param>
-            ///<param name="The "flags" parameter is a bitmask that might contain bits">The "flags" parameter is a bitmask that might contain bits</param>
-            ///<param name="BTREE_OMIT_JOURNAL and/or BTREE_NO_READLOCK.  The BTREE_NO_READLOCK">BTREE_OMIT_JOURNAL and/or BTREE_NO_READLOCK.  The BTREE_NO_READLOCK</param>
-            ///<param name="bit is also set if the SQLITE_NoReadlock flags is set in db">>flags.</param>
-            ///<param name="These flags are passed through into sqlite3PagerOpen() and must">These flags are passed through into sqlite3PagerOpen() and must</param>
-            ///<param name="be the same values as PAGER_OMIT_JOURNAL and PAGER_NO_READLOCK.">be the same values as PAGER_OMIT_JOURNAL and PAGER_NO_READLOCK.</param>
-            ///<param name=""></param>
-            ///<param name="If the database is already opened in the same database connection">If the database is already opened in the same database connection</param>
-            ///<param name="and we are in shared cache mode, then the open will fail with an">and we are in shared cache mode, then the open will fail with an</param>
-            ///<param name="SQLITE_CONSTRAINT error.  We cannot allow two or more BtShared">SQLITE_CONSTRAINT error.  We cannot allow two or more BtShared</param>
-            ///<param name="objects in the same database connection since doing so will lead">objects in the same database connection since doing so will lead</param>
-            ///<param name="to problems with locking.">to problems with locking.</param>
+            ///be exclusively in memory, or it might use a disk">based memory cache.</param>
+            ///Either way, the ephemeral database will be automatically deleted ">Either way, the ephemeral database will be automatically deleted </param>
+            ///when sqlite3BtreeClose() is called.">when sqlite3BtreeClose() is called.</param>
+            ///If zFilename is ":memory:" then an in">memory database is created</param>
+            ///that is automatically destroyed when it is closed.">that is automatically destroyed when it is closed.</param>
+            ///The "flags" parameter is a bitmask that might contain bits">The "flags" parameter is a bitmask that might contain bits</param>
+            ///BTREE_OMIT_JOURNAL and/or BTREE_NO_READLOCK.  The BTREE_NO_READLOCK">BTREE_OMIT_JOURNAL and/or BTREE_NO_READLOCK.  The BTREE_NO_READLOCK</param>
+            ///bit is also set if the SQLITE_NoReadlock flags is set in db">>flags.</param>
+            ///These flags are passed through into sqlite3PagerOpen() and must">These flags are passed through into sqlite3PagerOpen() and must</param>
+            ///be the same values as PAGER_OMIT_JOURNAL and PAGER_NO_READLOCK.">be the same values as PAGER_OMIT_JOURNAL and PAGER_NO_READLOCK.</param>
+            ///If the database is already opened in the same database connection">If the database is already opened in the same database connection</param>
+            ///and we are in shared cache mode, then the open will fail with an">and we are in shared cache mode, then the open will fail with an</param>
+            ///SQLITE_CONSTRAINT error.  We cannot allow two or more BtShared">SQLITE_CONSTRAINT error.  We cannot allow two or more BtShared</param>
+            ///objects in the same database connection since doing so will lead">objects in the same database connection since doing so will lead</param>
+            ///to problems with locking.">to problems with locking.</param>
             //sqlite3BtreeOpen
-            public static SqlResult Open(sqlite3_vfs pVfs,///
-                ///VFS to use for this b"tree 
+            public static SqlResult Open(
+                sqlite3_vfs pVfs,///VFS to use for this b"tree 
             string zFilename,
                 ///Name of the file containing the BTree database 
             sqlite3 db,
@@ -114,10 +109,9 @@ namespace Community.CsharpSqlite {
                 ///</summary>
             )
             {
-                ///Shared part of btree structure 
-                BtShared pBt = null;
+                
                 ///Handle to return 
-                Btree p;
+                Btree createdBTreeInstance;
                 ///Prevents a race condition. Ticket #3537 
                 sqlite3_mutex mutexOpen = null;
                 ///Result code from this function 
@@ -128,8 +122,8 @@ namespace Community.CsharpSqlite {
                 ///True if opening an ephemeral, temporary database 
                 byte[] zDbHeader = new byte[100];
                 //zFilename==0 || zFilename[0]==0;
-                ///<param name="Set the variable isMemdb to true for an in">memory database, or </param>
-                ///<param name="false for a file">based database.</param>
+                ///Set the variable isMemdb to true for an in-memory database, or 
+                ///false for a file">based database.
                 bool isTempDb = String.IsNullOrEmpty(zFilename);
 #if SQLITE_OMIT_MEMORYDB
 																																																																											bool isMemdb = false;
@@ -140,19 +134,12 @@ namespace Community.CsharpSqlite {
                 Debug.Assert(pVfs != null);
                 Debug.Assert(db.mutex.sqlite3_mutex_held());
                 Debug.Assert((flags & 0xff) == flags);
-                ///
-                ///<summary>
                 ///flags fit in 8 bits 
-                ///</summary>
-                ///
-                ///<summary>
+                
                 ///Only a BTREE_SINGLE database can be BTREE_UNORDERED 
-                ///</summary>
                 Debug.Assert((flags & BTREE_UNORDERED) == 0 || (flags & BTREE_SINGLE) != 0);
-                ///
-                ///<summary>
+                
                 ///A BTREE_SINGLE database is always a temporary and/or ephemeral 
-                ///</summary>
                 Debug.Assert((flags & BTREE_SINGLE) == 0 || isTempDb);
                 if ((db.flags & SqliteFlags.SQLITE_NoReadlock) != 0)
                 {
@@ -166,13 +153,13 @@ namespace Community.CsharpSqlite {
                 {
                     vfsFlags = (vfsFlags & ~SQLITE_OPEN_MAIN_DB) | SQLITE_OPEN_TEMP_DB;
                 }
-                p = new Btree();
+                createdBTreeInstance = new Btree();
                 //malloc_cs.sqlite3MallocZero(sizeof(Btree));
                 //if( !p ){
                 //  return SQLITE_NOMEM;
                 //}
-                p.inTrans = TransType.TRANS_NONE;
-                p.db = db;
+                createdBTreeInstance.inTrans = TransType.TRANS_NONE;
+                createdBTreeInstance.db = db;
 #if !SQLITE_OMIT_SHARED_CACHE
 																																																																											p.lock.pBtree = p;
 p.lock.iTable = 1;
@@ -232,6 +219,8 @@ p.sharable = 1;
 #endif
 																																																																											}
 #endif
+                ///Shared part of btree structure 
+                BtShared pBt = null;
                 if (pBt == null)
                 {
                     ///
@@ -264,7 +253,7 @@ p.sharable = 1;
                     pBt.openFlags = (u8)flags;
                     pBt.db = db;
                     pBt.pPager.sqlite3PagerSetBusyhandler(BTreeMethods.btreeInvokeBusyHandler, pBt);
-                    p.pBt = pBt;
+                    createdBTreeInstance.pBt = pBt;
                     pBt.pCursor = null;
                     pBt.pPage1 = null;
                     pBt.readOnly = pBt.pPager.sqlite3PagerIsreadonly();
@@ -363,7 +352,7 @@ break;
 }
 }
 #endif
-                ppBtree = p;
+                ppBtree = createdBTreeInstance;
             btree_open_out:
                 if (rc != SqlResult.SQLITE_OK)
                 {
@@ -373,7 +362,7 @@ break;
                     }
                     pBt = null;
                     //    malloc_cs.sqlite3_free(ref pBt);
-                    p = null;
+                    createdBTreeInstance = null;
                     //    malloc_cs.sqlite3_free(ref p);
                     ppBtree = null;
                 }
@@ -386,9 +375,9 @@ break;
                     ///<param name="default value. Except, when opening on an existing shared pager">cache,</param>
                     ///<param name="do not change the pager">cache size.</param>
                     ///<param name=""></param>
-                    if (p.sqlite3BtreeSchema(0, null) == null)
+                    if (createdBTreeInstance.sqlite3BtreeSchema(0, null) == null)
                     {
-                        p.pBt.pPager.sqlite3PagerSetCachesize(SQLITE_DEFAULT_CACHE_SIZE);
+                        createdBTreeInstance.pBt.pPager.sqlite3PagerSetCachesize(SQLITE_DEFAULT_CACHE_SIZE);
                     }
                 }
                 if (mutexOpen != null)

@@ -14,6 +14,8 @@ namespace Community.CsharpSqlite {
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     
     using ResolveExtensions = Sqlite3.ResolveExtensions;
+    using System.Collections.Generic;
+    using System.Linq;
 
         public class SelectMethods
         {
@@ -87,45 +89,22 @@ namespace Community.CsharpSqlite {
                 JoinType jointype = 0;
                 Token[] apAll = new Token[3];
                 Token p;
-                ///<summary>
                 ///0123456789 123456789 123456789 123 
-                ///</summary>
                 string zKeyText = "naturaleftouterightfullinnercross";
                 Keyword[] aKeyword = new Keyword[] {
-				///
-				///<summary>
 				///natural 
-				///</summary>
 				new Keyword(0,7, JoinType.JT_NATURAL),
-				///
-				///<summary>
 				///left    
-				///</summary>
 				new Keyword(6,4, JoinType.JT_LEFT| JoinType.JT_OUTER),
-				///
-				///<summary>
 				///outer   
-				///</summary>
 				new Keyword(10,5, JoinType.JT_OUTER),
-				///
-				///<summary>
 				///right   
-				///</summary>
 				new Keyword(14,5, JoinType.JT_RIGHT| JoinType.JT_OUTER),
-				///
-				///<summary>
 				///full    
-				///</summary>
 				new Keyword((u8)19,(u8)4, JoinType.JT_LEFT| JoinType.JT_RIGHT| JoinType.JT_OUTER),
-				///
-				///<summary>
 				///inner   
-				///</summary>
 				new Keyword(23,5, JoinType.JT_INNER),
-				///
-				///<summary>
 				///cross   
-				///</summary>
 				new Keyword(28,5, JoinType.JT_INNER| JoinType.JT_CROSS),
 			};
                 int i, j;
@@ -329,26 +308,14 @@ namespace Community.CsharpSqlite {
             public static int sqliteProcessJoin(Parse pParse, Select p)
             {
                 SrcList pSrc;
-                ///
-                ///<summary>
                 ///All tables in the FROM clause 
-                ///</summary>
                 int i;
                 int j;
-                ///
-                ///<summary>
                 ///Loop counters 
-                ///</summary>
                 SrcList_item pLeft;
-                ///
-                ///<summary>
                 ///Left table being joined 
-                ///</summary>
                 SrcList_item pRight;
-                ///
-                ///<summary>
                 ///Right table being joined 
-                ///</summary>
                 pSrc = p.pSrc;
                 //pLeft = pSrc.a[0];
                 //pRight = pLeft[1];
@@ -364,12 +331,8 @@ namespace Community.CsharpSqlite {
                     if (Sqlite3.NEVER(pLeftTab == null || pRightTab == null))
                         continue;
                     isOuter = (pRight.jointype &  JoinType.JT_OUTER) != 0;
-                    ///
-                    ///<summary>
                     ///When the NATURAL keyword is present, add WHERE clause terms for
                     ///every column that the two tables have in common.
-                    ///
-                    ///</summary>
                     if ((pRight.jointype &  JoinType.JT_NATURAL) != 0)
                     {
                         if (pRight.pOn != null || pRight.pUsing != null)
@@ -380,20 +343,11 @@ namespace Community.CsharpSqlite {
                         for (j = 0; j < pRightTab.nCol; j++)
                         {
                             string zName;
-                            ///
-                            ///<summary>
                             ///Name of column in the right table 
-                            ///</summary>
                             int iLeft = 0;
-                            ///
-                            ///<summary>
                             ///Matching left table 
-                            ///</summary>
                             int iLeftCol = 0;
-                            ///
-                            ///<summary>
                             ///Matching column in the left table 
-                            ///</summary>
                             zName = pRightTab.aCol[j].zName;
                             int iRightCol = pRightTab.columnIndex(zName);
                             if (SelectMethods.tableAndColumnIndex(pSrc, i + 1, zName, ref iLeft, ref iLeftCol) != 0)
@@ -402,22 +356,14 @@ namespace Community.CsharpSqlite {
                             }
                         }
                     }
-                    ///
-                    ///<summary>
                     ///Disallow both ON and USING clauses in the same join
-                    ///
-                    ///</summary>
                     if (pRight.pOn != null && pRight.pUsing != null)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "cannot have both ON and USING " + "clauses in the same join");
                         return 1;
                     }
-                    ///
-                    ///<summary>
                     ///Add the ON clause to the end of the WHERE clause, connected by
                     ///an AND operator.
-                    ///
-                    ///</summary>
                     if (pRight.pOn != null)
                     {
                         if (isOuter)
@@ -425,41 +371,25 @@ namespace Community.CsharpSqlite {
                         p.pWhere = exprc.sqlite3ExprAnd(pParse.db, p.pWhere, pRight.pOn);
                         pRight.pOn = null;
                     }
-                    ///
-                    ///<summary>
                     ///Create extra terms on the WHERE clause for each column named
                     ///in the USING clause.  Example: If the two tables to be joined are
                     ///A and B and the USING clause names X, Y, and Z, then add this
                     ///to the WHERE clause:    A.X=B.X AND A.Y=B.Y AND A.Z=B.Z
                     ///Report an error if any column mentioned in the USING clause is
                     ///not contained in both tables to be joined.
-                    ///
-                    ///</summary>
                     if (pRight.pUsing != null)
                     {
                         IdList pList = pRight.pUsing;
                         for (j = 0; j < pList.nId; j++)
                         {
                             string zName;
-                            ///
-                            ///<summary>
                             ///Name of the term in the USING clause 
-                            ///</summary>
                             int iLeft = 0;
-                            ///
-                            ///<summary>
                             ///Table on the left with matching column name 
-                            ///</summary>
                             int iLeftCol = 0;
-                            ///
-                            ///<summary>
                             ///Column number of matching column on the left 
-                            ///</summary>
                             int iRightCol;
-                            ///
-                            ///<summary>
                             ///Column number of matching column on the right 
-                            ///</summary>
                             zName = pList.a[j].zName;
                             iRightCol = pRightTab.columnIndex(zName);
                             if (iRightCol < 0 || 0 == SelectMethods.tableAndColumnIndex(pSrc, i + 1, zName, ref iLeft, ref iLeftCol))
@@ -1133,37 +1063,21 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             /// routine generates the code needed to do that.
             ///</summary>
             public static void generateSortTail(Parse pParse,///
-                ///<summary>
                 ///Parsing context 
-                ///</summary>
             Select p,///
-                ///<summary>
                 ///The SELECT statement 
-                ///</summary>
             Vdbe v,///
-                ///<summary>
                 ///Generate code into this VDBE 
-                ///</summary>
             int nColumn,///
-                ///<summary>
                 ///Number of columns of data 
-                ///</summary>
             SelectDest pDest///
-                ///<summary>
                 ///Write the sorted results here 
-                ///</summary>
             )
             {
                 int addrBreak = v.sqlite3VdbeMakeLabel();
-                ///
-                ///<summary>
                 ///Jump here to exit loop 
-                ///</summary>
                 int addrContinue = v.sqlite3VdbeMakeLabel();
-                ///
-                ///<summary>
                 ///Jump here for next cycle 
-                ///</summary>
                 int addr;
                 int iTab;
                 int pseudoTab = 0;
@@ -1248,11 +1162,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 }
                 pParse.sqlite3ReleaseTempReg(regRow);
                 pParse.sqlite3ReleaseTempReg(regRowid);
-                ///
-                ///<summary>
                 ///The bottom of the loop
-                ///
-                ///</summary>
                 v.sqlite3VdbeResolveLabel(addrContinue);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Next, iTab, addr);
                 v.sqlite3VdbeResolveLabel(addrBreak);
@@ -1274,17 +1184,11 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             ///
             ///</summary>
             static void generateColumnTypes(Parse pParse,///
-                ///<summary>
                 ///Parser context 
-                ///</summary>
             SrcList pTabList,///
-                ///<summary>
                 ///List of tables 
-                ///</summary>
             ExprList pEList///
-                ///<summary>
                 ///Expressions defining the result set 
-                ///</summary>
             )
             {
 #if !SQLITE_OMIT_DECLTYPE
@@ -1314,7 +1218,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     string sDummy = null;
                     zType = expr.columnType(sNC, ref sDummy, ref sDummy, ref sDummy);
 #endif
-                    v.sqlite3VdbeSetColName(i, Sqlite3.COLNAME_DECLTYPE, zType, Sqlite3.SQLITE_TRANSIENT);
+                    v.sqlite3VdbeSetColName(i, ColName.DECLTYPE, zType, Sqlite3.SQLITE_TRANSIENT);
                 }
 #endif
             }
@@ -1324,46 +1228,33 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             /// azCol[] values in the callback.
             ///
             ///</summary>
-            public static void generateColumnNames(Parse pParse,///
-                ///<summary>
-                ///Parser context 
-                ///</summary>
-            SrcList pTabList,///
-                ///<summary>
-                ///List of tables 
-                ///</summary>
-            ExprList pEList///
-                ///<summary>
-                ///Expressions defining the result set 
-                ///</summary>
+            public static void generateColumnNames(
+                Parse pParse,///Parser context 
+                SrcList pTabList,///List of tables 
+                ExprList pEList///Expressions defining the result set 
             )
             {
                 Vdbe v = pParse.pVdbe;
-                int i, j;
                 sqlite3 db = pParse.db;
                 bool fullNames;
                 bool shortNames;
 #if !SQLITE_OMIT_EXPLAIN
-                ///
-                ///<summary>
                 ///If this is an EXPLAIN, skip this step 
-                ///</summary>
                 if (pParse.explain != 0)
                 {
                     return;
                 }
 #endif
                 if (pParse.colNamesSet != 0 || Sqlite3.NEVER(v == null)///
-                    ///<summary>
                     ///|| db.mallocFailed != 0 
-                    ///</summary>
                 )
                     return;
                 pParse.colNamesSet = 1;
                 fullNames = (db.flags & SqliteFlags.SQLITE_FullColNames) != 0;
                 shortNames = (db.flags & SqliteFlags.SQLITE_ShortColNames) != 0;
                 v.sqlite3VdbeSetNumCols(pEList.nExpr);
-                for (i = 0; i < pEList.nExpr; i++)
+                
+                for (int i = 0; i < pEList.nExpr; i++)
                 {
                     Expr p;
                     p = pEList.a[i].pExpr;
@@ -1372,21 +1263,17 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     if (pEList.a[i].zName != null)
                     {
                         string zName = pEList.a[i].zName;
-                        v.sqlite3VdbeSetColName(i, Sqlite3.COLNAME_NAME, zName, Sqlite3.SQLITE_TRANSIENT);
+                        v.sqlite3VdbeSetColName(i, ColName.NAME, zName, Sqlite3.SQLITE_TRANSIENT);
                     }
                     else
-                        if ((p.op == Sqlite3.TK_COLUMN || p.op == Sqlite3.TK_AGG_COLUMN) && pTabList != null)
+                        if ((p.Operator == TokenType.TK_COLUMN || p.Operator == TokenType.TK_AGG_COLUMN) && pTabList != null)
                         {
                             Table pTab;
                             string zCol;
                             int iCol = p.iColumn;
-                            for (j = 0; Sqlite3.ALWAYS(j < pTabList.nSrc); j++)
-                            {
-                                if (pTabList.a[j].iCursor == p.iTable)
-                                    break;
-                            }
-                            Debug.Assert(j < pTabList.nSrc);
-                            pTab = pTabList.a[j].pTab;
+                            pTab = pTabList.a.Take(pTabList.nSrc).First(x => x.iCursor == p.iTable).pTab;
+                            //Sqlite3.ALWAYS(j < pTabList.nSrc)
+                            //Debug.Assert(j < pTabList.nSrc);
                             if (iCol < 0)
                                 iCol = pTab.iPKey;
                             Debug.Assert(iCol == -1 || (iCol >= 0 && iCol < pTab.nCol));
@@ -1400,7 +1287,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                             }
                             if (!shortNames && !fullNames)
                             {
-                                v.sqlite3VdbeSetColName(i, Sqlite3.COLNAME_NAME, pEList.a[i].zSpan, sqliteinth.SQLITE_DYNAMIC);
+                                v.sqlite3VdbeSetColName(i, ColName.NAME, pEList.a[i].zSpan, sqliteinth.SQLITE_DYNAMIC);
                                 //sqlite3DbStrDup(db, pEList->a[i].zSpan), SQLITE_DYNAMIC);
                             }
                             else
@@ -1408,16 +1295,16 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                                 {
                                     string zName;
                                     zName = io.sqlite3MPrintf(db, "%s.%s", pTab.zName, zCol);
-                                    v.sqlite3VdbeSetColName(i, Sqlite3.COLNAME_NAME, zName, sqliteinth.SQLITE_DYNAMIC);
+                                    v.sqlite3VdbeSetColName(i, ColName.NAME, zName, sqliteinth.SQLITE_DYNAMIC);
                                 }
                                 else
                                 {
-                                    v.sqlite3VdbeSetColName(i, Sqlite3.COLNAME_NAME, zCol, Sqlite3.SQLITE_TRANSIENT);
+                                    v.sqlite3VdbeSetColName(i, ColName.NAME, zCol, Sqlite3.SQLITE_TRANSIENT);
                                 }
                         }
                         else
                         {
-                            v.sqlite3VdbeSetColName(i, Sqlite3.COLNAME_NAME, pEList.a[i].zSpan, sqliteinth.SQLITE_DYNAMIC);
+                            v.sqlite3VdbeSetColName(i, ColName.NAME, pEList.a[i].zSpan, sqliteinth.SQLITE_DYNAMIC);
                             //sqlite3DbStrDup(db, pEList->a[i].zSpan), SQLITE_DYNAMIC);
                         }
                 }
@@ -1437,110 +1324,60 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             /// store NULL in paCol and 0 in pnCol and return SQLITE_NOMEM.
             ///
             ///</summary>
-            public static SqlResult selectColumnsFromExprList(Parse pParse,///
-                ///<summary>
-                ///Parsing context 
-                ///</summary>
-            ExprList pEList,///
-                ///<summary>
-                ///Expr list from which to derive column names 
-                ///</summary>
-            ref int pnCol,///
-                ///<summary>
-                ///Write the number of columns here 
-                ///</summary>
-            ref Column[] paCol///
-                ///<summary>
-                ///Write the new column list here 
-                ///</summary>
+            public static SqlResult selectColumnsFromExprList(
+                Parse pParse,///Parsing context 
+                ExprList pEList,///Expr list from which to derive column names 
+                ref int pnCol,///Write the number of columns here 
+                ref Column[] paCol///Write the new column list here 
             )
             {
                 sqlite3 db = pParse.db;
-                ///
-                ///<summary>
                 ///Database connection 
-                ///</summary>
-                int i, j;
-                ///
-                ///<summary>
-                ///Loop counters 
-                ///</summary>
                 int cnt;
-                ///
-                ///<summary>
                 ///Index added to make the name unique 
-                ///</summary>
                 Column[] aCol;
-                Column pCol;
-                ///
-                ///<summary>
                 ///For looping over result columns 
-                ///</summary>
                 int nCol;
-                ///
-                ///<summary>
                 ///Number of columns in the result set 
-                ///</summary>
                 Expr p;
-                ///
-                ///<summary>
                 ///Expression for a single result column 
-                ///</summary>
                 string zName;
-                ///
-                ///<summary>
                 ///Column name 
-                ///</summary>
                 int nName;
-                ///
-                ///<summary>
                 ///Size of name in zName[] 
-                ///</summary>
                 pnCol = nCol = pEList.nExpr;
                 aCol = paCol = new Column[nCol];
                 //sqlite3DbMallocZero(db, sizeof(aCol[0])*nCol);
                 //if ( aCol == null )
                 //  return SQLITE_NOMEM;
-                for (i = 0; i < nCol; i++)//, pCol++)
+                for (int i = 0; i < nCol; i++)//, pCol++)
                 {
                     if (aCol[i] == null)
                         aCol[i] = new Column();
-                    pCol = aCol[i];
-                    ///
-                    ///<summary>
+                    var pCol = aCol[i];
                     ///Get an appropriate name for the column
-                    ///
-                    ///</summary>
                     p = pEList.a[i].pExpr;
                     Debug.Assert(p.pRight == null || p.pRight.ExprHasProperty(ExprFlags.EP_IntValue) || p.pRight.u.zToken == null || p.pRight.u.zToken.Length > 0);
-                    if (pEList.a[i].zName != null && (zName = pEList.a[i].zName) != "")
+                    if (!String.IsNullOrEmpty( pEList.a[i].zName ))
                     {
-                        ///
-                        ///<summary>
                         ///If the column contains an "AS <name>" phrase, use <name> as the name 
-                        ///</summary>
                         //zName = sqlite3DbStrDup(db, zName);
+                        zName = pEList.a[i].zName;
                     }
                     else
                     {
                         Expr pColExpr = p;
-                        ///
-                        ///<summary>
                         ///The expression that is the result column name 
-                        ///</summary>
                         Table pTab;
-                        ///
-                        ///<summary>
                         ///Table associated with this expression 
-                        ///</summary>
-                        while (pColExpr.op == Sqlite3.TK_DOT)
+                        ///
+                        /// get the right most part
+                        while (pColExpr.Operator == TokenType.TK_DOT)
                             pColExpr = pColExpr.pRight;
-                        if (pColExpr.op == Sqlite3.TK_COLUMN && Sqlite3.ALWAYS(pColExpr.pTab != null))
+
+                        if (TokenType.TK_COLUMN == pColExpr.Operator && Sqlite3.ALWAYS(pColExpr.pTab != null))
                         {
-                            ///
-                            ///<summary>
                             ///For columns use the column name name 
-                            ///</summary>
                             int iCol = pColExpr.iColumn;
                             pTab = pColExpr.pTab;
                             if (iCol < 0)
@@ -1548,17 +1385,14 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                             zName = io.sqlite3MPrintf(db, "%s", iCol >= 0 ? pTab.aCol[iCol].zName : "rowid");
                         }
                         else
-                            if (pColExpr.op == Sqlite3.TK_ID)
+                            if (pColExpr.Operator == TokenType.TK_ID)
                             {
                                 Debug.Assert(!pColExpr.ExprHasProperty(ExprFlags.EP_IntValue));
                                 zName = io.sqlite3MPrintf(db, "%s", pColExpr.u.zToken);
                             }
                             else
                             {
-                                ///
-                                ///<summary>
                                 ///Use the original text of the column expression as its name 
-                                ///</summary>
                                 zName = io.sqlite3MPrintf(db, "%s", pEList.a[i].zSpan);
                             }
                     }
@@ -1567,14 +1401,10 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     //  sqlite3DbFree( db, ref zName );
                     //  break;
                     //}
-                    ///
-                    ///<summary>
                     ///Make sure the column name is unique.  If the name is not unique,
                     ///append a integer to the name so that it becomes unique.
-                    ///
-                    ///</summary>
                     nName = StringExtensions.sqlite3Strlen30(zName);
-                    for (j = cnt = 0; j < i; j++)
+                    for (int j = cnt = 0; j < i; j++)
                     {
                         if (aCol[j].zName.Equals(zName, StringComparison.InvariantCultureIgnoreCase))
                         {
@@ -1629,11 +1459,8 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 {
                     return null;
                 }
-                ///
-                ///<summary>
                 ///The SelectMethods.sqlite3ResultSetOfSelect() is only used n contexts where lookaside
                 ///is disabled 
-                ///</summary>
                 Debug.Assert(db.lookaside.bEnabled == 0);
                 pTab.nRef = 1;
                 pTab.zName = null;
@@ -1676,9 +1503,6 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 int addr1, n = 0;
                 if (p.iLimit != 0)
                     return;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name=""LIMIT ">1" always shows all rows.  There is some</param>
                 ///<param name="contraversy about what the correct behavior should be.">contraversy about what the correct behavior should be.</param>
                 ///<param name="The current implementation interprets "LIMIT 0" to mean">The current implementation interprets "LIMIT 0" to mean</param>
@@ -1803,43 +1627,24 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             ///
             ///If the LIMIT found in p.iLimit is reached, jump immediately to
             ///iBreak.
-            ///</summary>
             static int generateOutputSubroutine(Parse pParse,///
-                ///<summary>
                 ///Parsing context 
-                ///</summary>
             Select p,///
-                ///<summary>
                 ///The SELECT statement 
-                ///</summary>
             SelectDest pIn,///
-                ///<summary>
                 ///Coroutine supplying data 
-                ///</summary>
             SelectDest pDest,///
-                ///<summary>
                 ///Where to send the data 
-                ///</summary>
             int regReturn,///
-                ///<summary>
                 ///The return address register 
-                ///</summary>
             int regPrev,///
-                ///<summary>
                 ///Previous result register.  No uniqueness if 0 
-                ///</summary>
             KeyInfo pKeyInfo,///
-                ///<summary>
                 ///For comparing with previous entry 
-                ///</summary>
             P4Usage p4type,///
-                ///<summary>
                 ///The p4 type for pKeyInfo 
-                ///</summary>
             int iBreak///
-                ///<summary>
                 ///Jump here if we hit the LIMIT 
-                ///</summary>
             )
             {
                 Vdbe v = pParse.pVdbe;
@@ -2077,249 +1882,115 @@ break;
             ///</summary>
 #if !SQLITE_OMIT_COMPOUND_SELECT
             public static SqlResult multiSelectOrderBy(Parse pParse,///
-                ///<summary>
                 ///Parsing context 
-                ///</summary>
             Select p,///
-                ///<summary>
-                ///</summary>
                 ///<param name="The right">most of SELECTs to be coded </param>
             SelectDest pDest///
-                ///<summary>
                 ///What to do with query results 
-                ///</summary>
             )
-            {
-                int i, j;
-                ///
-                ///<summary>
-                ///Loop counters 
-                ///</summary>
-                Select pPrior;
-                ///
-                ///<summary>
-                ///Another SELECT immediately to our left 
-                ///</summary>
-                Vdbe v;
-                ///
-                ///<summary>
-                ///Generate code to this VDBE 
-                ///</summary>
+            {   
                 SelectDest destA = new SelectDest();
-                ///
-                ///<summary>
                 ///Destination for coroutine A 
-                ///</summary>
                 SelectDest destB = new SelectDest();
-                ///
-                ///<summary>
                 ///Destination for coroutine B 
-                ///</summary>
                 int regAddrA;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address register for select">A coroutine </param>
                 int regEofA;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Flag to indicate when select">A is complete </param>
                 int regAddrB;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address register for select">B coroutine </param>
                 int regEofB;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Flag to indicate when select">B is complete </param>
                 int addrSelectA;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address of the select">A coroutine </param>
                 int addrSelectB;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address of the select">B coroutine </param>
                 int regOutA;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address register for the output">A subroutine </param>
                 int regOutB;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address register for the output">B subroutine </param>
                 int addrOutA;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address of the output">A subroutine </param>
                 int addrOutB = 0;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address of the output">B subroutine </param>
                 int addrEofA;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address of the select">exhausted subroutine </param>
                 int addrEofB;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Address of the select">exhausted subroutine </param>
                 int addrAltB;
-                ///
-                ///<summary>
                 ///Address of the A<B subroutine 
-                ///</summary>
                 int addrAeqB;
-                ///
-                ///<summary>
                 ///Address of the A==B subroutine 
-                ///</summary>
                 int addrAgtB;
-                ///
-                ///<summary>
                 ///Address of the A>B subroutine 
-                ///</summary>
                 int regLimitA;
-                ///
-                ///<summary>
                 ///</summary>
                 ///<param name="Limit register for select">A </param>
                 int regLimitB;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Limit register for select">A </param>
                 int regPrev;
-                ///
-                ///<summary>
                 ///A range of registers to hold previous output 
-                ///</summary>
                 int savedLimit;
-                ///
-                ///<summary>
                 ///Saved value of p.iLimit 
-                ///</summary>
                 int savedOffset;
-                ///
-                ///<summary>
                 ///Saved value of p.iOffset 
-                ///</summary>
                 int labelCmpr;
-                ///
-                ///<summary>
                 ///Label for the start of the merge algorithm 
-                ///</summary>
                 int labelEnd;
-                ///
-                ///<summary>
                 ///Label for the end of the overall SELECT stmt 
-                ///</summary>
                 int j1;
-                ///
-                ///<summary>
-                ///Jump instructions that get retargetted 
-                ///</summary>
-                int op;
-                ///
-                ///<summary>
+                
                 ///One of Sqlite3.TK_ALL, Sqlite3.TK_UNION, Sqlite3.TK_EXCEPT, Sqlite3.TK_INTERSECT 
-                ///</summary>
                 KeyInfo pKeyDup = null;
-                ///
-                ///<summary>
                 ///Comparison information for duplicate removal 
-                ///</summary>
                 KeyInfo pKeyMerge;
-                ///
-                ///<summary>
                 ///Comparison information for merging rows 
-                ///</summary>
                 sqlite3 db;
-                ///
-                ///<summary>
                 ///Database connection 
-                ///</summary>
                 ExprList pOrderBy;
-                ///
-                ///<summary>
                 ///The ORDER BY clause 
-                ///</summary>
                 int nOrderBy;
-                ///
-                ///<summary>
                 ///Number of terms in the ORDER BY clause 
-                ///</summary>
                 int[] aPermute;
-                ///
-                ///<summary>
                 ///Mapping from ORDER BY terms to result set columns 
-                ///</summary>
 #if !SQLITE_OMIT_EXPLAIN
                 int iSub1 = 0;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="EQP id of left">hand query </param>
                 int iSub2 = 0;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="EQP id of right">hand query </param>
 #endif
                 Debug.Assert(p.pOrderBy != null);
                 Debug.Assert(pKeyDup == null);
-                ///
-                ///<summary>
                 ///"Managed" code needs this.  Ticket #3382. 
-                ///</summary>
                 db = pParse.db;
-                v = pParse.pVdbe;
+                Vdbe v = pParse.pVdbe;
+                ///Generate code to this VDBE 
+                
                 Debug.Assert(v != null);
-                ///
-                ///<summary>
                 ///Already thrown the error if VDBE alloc failed 
-                ///</summary>
                 labelEnd = v.sqlite3VdbeMakeLabel();
                 labelCmpr = v.sqlite3VdbeMakeLabel();
-                ///
-                ///<summary>
+
+                ///Another SELECT immediately to our left 
+
+                ///Jump instructions that get retargetted 
                 ///Patch up the ORDER BY clause
-                ///
-                ///</summary>
-                op = p.tk_op;
-                pPrior = p.pPrior;
+                var op = p.TokenOp;
+                Select pPrior = p.pPrior;
                 Debug.Assert(pPrior.pOrderBy == null);
                 pOrderBy = p.pOrderBy;
                 Debug.Assert(pOrderBy != null);
                 nOrderBy = pOrderBy.nExpr;
-                ///
-                ///<summary>
                 ///For operators other than UNION ALL we have to make sure that
                 ///the ORDER BY clause covers every term of the result set.  Add
                 ///terms to the ORDER BY clause as necessary.
-                ///
-                ///</summary>
-                if (op != Sqlite3.TK_ALL)
+                if (op != TokenType.TK_ALL)
                 {
-                    for (i = 1;///
-                        ///<summary>
-                        ///db.mallocFailed == 0 && 
-                        ///</summary>
-                    i <= p.pEList.nExpr; i++)
+                    for (int i = 1;i <= p.pEList.nExpr; i++)
                     {
                         ExprList_item pItem;
-                        for (j = 0; j < nOrderBy; j++)//, pItem++)
+                        int j;
+                        for ( j = 0; j < nOrderBy; j++)//, pItem++)
                         {
                             pItem = pOrderBy.a[j];
                             Debug.Assert(pItem.iCol > 0);
@@ -2353,7 +2024,7 @@ break;
                 if (aPermute != null)
                 {
                     ExprList_item pItem;
-                    for (i = 0; i < nOrderBy; i++)//, pItem++)
+                    for (int i = 0; i < nOrderBy; i++)//, pItem++)
                     {
                         pItem = pOrderBy.a[i];
                         Debug.Assert(pItem.iCol > 0 && pItem.iCol <= p.pEList.nExpr);
@@ -2368,7 +2039,7 @@ break;
                         //(u8)&pKeyMerge.aColl[nOrderBy];
                         pKeyMerge.nField = (u16)nOrderBy;
                         pKeyMerge.enc = sqliteinth.ENC(db);
-                        for (i = 0; i < nOrderBy; i++)
+                        for (int i = 0; i < nOrderBy; i++)
                         {
                             CollSeq pColl;
                             Expr pTerm = pOrderBy.a[i].pExpr;
@@ -2391,21 +2062,13 @@ break;
                 {
                     pKeyMerge = null;
                 }
-                ///
-                ///<summary>
                 ///Reattach the ORDER BY clause to the query.
-                ///
-                ///</summary>
                 p.pOrderBy = pOrderBy;
                 pPrior.pOrderBy = exprc.sqlite3ExprListDup(pParse.db, pOrderBy, 0);
-                ///
-                ///<summary>
                 ///Allocate a range of temporary registers and the KeyInfo needed
                 ///for the logic that removes duplicate result rows when the
                 ///operator is UNION, EXCEPT, or INTERSECT (but not UNION ALL).
-                ///
-                ///</summary>
-                if (op == Sqlite3.TK_ALL)
+                if (op == TokenType.TK_ALL)
                 {
                     regPrev = 0;
                 }
@@ -2429,7 +2092,7 @@ break;
                         //(u8)&pKeyDup.aColl[nExpr];
                         pKeyDup.nField = (u16)nExpr;
                         pKeyDup.enc = sqliteinth.ENC(db);
-                        for (i = 0; i < nExpr; i++)
+                        for (var i = 0; i < nExpr; i++)
                         {
                             pKeyDup.aColl[i] = multiSelectCollSeq(pParse, p, i);
                             pKeyDup.aSortOrder[i] = 0;
@@ -2452,7 +2115,7 @@ break;
                 ///Compute the limit registers 
                 ///</summary>
                 SelectMethods.computeLimitRegisters(pParse, p, labelEnd);
-                if (p.iLimit != 0 && op == Sqlite3.TK_ALL)
+                if (p.iLimit != 0 && op == TokenType.TK_ALL)
                 {
                     regLimitA = ++pParse.nMem;
                     regLimitB = ++pParse.nMem;
@@ -2529,7 +2192,7 @@ break;
                 ///select as the next output row of the compound select.
                 ///
                 ///</summary>
-                if (op == Sqlite3.TK_ALL || op == Sqlite3.TK_UNION)
+                if (op == TokenType.TK_ALL || op == TokenType.TK_UNION)
                 {
                     v.VdbeNoopComment( "Output routine for B");
                     addrOutB = generateOutputSubroutine(pParse, p, destB, pDest, regOutB, regPrev, pKeyDup,  P4Usage.P4_KEYINFO_STATIC, labelEnd);
@@ -2541,7 +2204,7 @@ break;
                 ///
                 ///</summary>
                 v.VdbeNoopComment( "eof-A subroutine");
-                if (op == Sqlite3.TK_EXCEPT || op == Sqlite3.TK_INTERSECT)
+                if (op == TokenType.TK_EXCEPT || op == TokenType.TK_INTERSECT)
                 {
                     addrEofA = v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, labelEnd);
                 }
@@ -2559,7 +2222,7 @@ break;
                 ///are exhausted and only data in select A remains.
                 ///
                 ///</summary>
-                if (op == Sqlite3.TK_INTERSECT)
+                if (op == TokenType.TK_INTERSECT)
                 {
                     addrEofB = addrEofA;
                     if (p.nSelectRow > pPrior.nSelectRow)
@@ -2588,12 +2251,12 @@ break;
                 ///Generate code to handle the case of A==B
                 ///
                 ///</summary>
-                if (op == Sqlite3.TK_ALL)
+                if (op == TokenType.TK_ALL)
                 {
                     addrAeqB = addrAltB;
                 }
                 else
-                    if (op == Sqlite3.TK_INTERSECT)
+                    if (op == TokenType.TK_INTERSECT)
                     {
                         addrAeqB = addrAltB;
                         addrAltB++;
@@ -2612,7 +2275,7 @@ break;
                 ///</summary>
                 v.VdbeNoopComment( "A-gt-B subroutine");
                 addrAgtB = v.sqlite3VdbeCurrentAddr();
-                if (op == Sqlite3.TK_ALL || op == Sqlite3.TK_UNION)
+                if (op == TokenType.TK_ALL || op == TokenType.TK_UNION)
                 {
                     v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regOutB, addrOutB);
                 }
@@ -2788,17 +2451,9 @@ break;
                 }
             }
             static void substSelect(sqlite3 db,///
-                ///<summary>
                 ///Report malloc errors here 
-                ///</summary>
-            Select p,///
-                ///<summary>
-                ///SELECT statement in which to make substitutions 
-                ///</summary>
-            int iTable,///
-                ///<summary>
-                ///Table to be replaced 
-                ///</summary>
+            Select p,///SELECT statement in which to make substitutions 
+            int iTable,///Table to be replaced 
             ExprList pEList///
                 ///<summary>
                 ///Substitute values 
@@ -2833,6 +2488,8 @@ break;
             }
 #endif
 #if !(SQLITE_OMIT_SUBQUERY) || !(SQLITE_OMIT_VIEW)
+
+
             ///<summary>
             /// This routine attempts to flatten subqueries in order to speed
             /// execution.  It returns 1 if it makes changes and 0 if no flattening
@@ -2943,195 +2600,96 @@ break;
             /// All of the expression analysis must occur on both the outer query and
             /// the subquery before this routine runs.
             ///</summary>
+            class SelectFlattenContext {
+                public bool isAgg;
+                public bool subqueryIsAgg;
+                public int iParent;
+                public SelectFlattenContext(Select p, int iFrom, bool isAgg, bool subqueryIsAgg)
+                {
+                    this.p = p;
+                    this.isAgg=isAgg;
+                    this.subqueryIsAgg=subqueryIsAgg;
+                    
+                    ///The FROM clause of the outer query 
+                    pSrc = p.pSrc;
+               
+
+                    Debug.Assert(pSrc != null && iFrom >= 0 && iFrom < pSrc.nSrc);
+                    pSubitem = pSrc.a[iFrom];
+
+                    ///VDBE cursor number of the pSub result set temp table 
+
+                    iParent = pSubitem.iCursor;
+
+                    pSub = pSubitem.pSelect;
+                    Debug.Assert(pSub != null);
+
+                    ///SrcList pSubSrc;
+                    ///The FROM clause of the subquery 
+                    pSubSrc = pSub.pSrc;
+                    Debug.Assert(pSubSrc != null);
+                
+
+                }
+                public Select pSub;
+                public Select p { get; set; }
+                public SrcList_item pSubitem { get; set; }
+                public SrcList pSrc { get; set; }
+                ///The subquery 
+
+                public SrcList pSubSrc { get; set; }
+            }
             public static int flattenSubquery(Parse pParse,///
-                ///<summary>
                 ///Parsing context 
-                ///</summary>
             Select p,///
-                ///<summary>
                 ///The parent or outer SELECT statement 
-                ///</summary>
             int iFrom,///
-                ///<summary>
                 ///Index in p.pSrc.a[] of the inner subquery 
-                ///</summary>
             bool isAgg,///
-                ///<summary>
                 ///True if outer SELECT uses aggregate functions 
-                ///</summary>
             bool subqueryIsAgg///
-                ///<summary>
                 ///True if the subquery uses aggregate functions 
-                ///</summary>
             )
             {
-                string zSavedAuthContext = pParse.zAuthContext;
-                Select pParent;
-                Select pSub;
-                ///
-                ///<summary>
-                ///The inner query or "subquery" 
-                ///</summary>
-                Select pSub1;
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Pointer to the rightmost select in sub">query </param>
-                SrcList pSrc;
-                ///
-                ///<summary>
-                ///The FROM clause of the outer query 
-                ///</summary>
-                SrcList pSubSrc;
-                ///
-                ///<summary>
-                ///The FROM clause of the subquery 
-                ///</summary>
+                ///Pointer to the rightmost select in sub-query
+                
                 ExprList pList;
-                ///
-                ///<summary>
                 ///The result set of the outer query 
-                ///</summary>
-                int iParent;
-                ///
-                ///<summary>
-                ///VDBE cursor number of the pSub result set temp table 
-                ///</summary>
                 int i;
-                ///
-                ///<summary>
                 ///Loop counter 
-                ///</summary>
                 Expr pWhere;
-                ///
-                ///<summary>
                 ///The WHERE clause 
-                ///</summary>
-                SrcList_item pSubitem;
-                ///
-                ///<summary>
-                ///The subquery 
-                ///</summary>
+                
                 sqlite3 db = pParse.db;
-                ///
-                ///<summary>
                 ///Check to see if flattening is permitted.  Return 0 if not.
-                ///
-                ///</summary>
                 Debug.Assert(p != null);
                 Debug.Assert(p.pPrior == null);
-                ///
-                ///<summary>
                 ///Unable to flatten compound queries 
-                ///</summary>
                 if ((db.flags & SqliteFlags.SQLITE_QueryFlattener) != 0)
                     return 0;
-                pSrc = p.pSrc;
-                Debug.Assert(pSrc != null && iFrom >= 0 && iFrom < pSrc.nSrc);
-                pSubitem = pSrc.a[iFrom];
-                iParent = pSubitem.iCursor;
-                pSub = pSubitem.pSelect;
-                Debug.Assert(pSub != null);
-                if (isAgg && subqueryIsAgg)
-                    return 0;
-                ///
-                ///<summary>
-                ///Restriction (1)  
-                ///</summary>
-                if (subqueryIsAgg && pSrc.nSrc > 1)
-                    return 0;
-                ///
-                ///<summary>
-                ///Restriction (2)  
-                ///</summary>
-                pSubSrc = pSub.pSrc;
-                Debug.Assert(pSubSrc != null);
-                ///
-                ///<summary>
+
+                #region applicability rules
+
+                var list = new List<Predicate<SelectFlattenContext>>(){
+                    ctx => (ctx.isAgg && ctx.subqueryIsAgg),///Restriction (1)  
+                    ctx => ctx.subqueryIsAgg && ctx.pSrc.nSrc > 1,/// Restriction (2)
+                    
                 ///Prior to version 3.1.2, when LIMIT and OFFSET had to be simple constants,
                 ///not arbitrary expresssions, we allowed some combining of LIMIT and OFFSET
-                ///</summary>
-                ///<param name="because they could be computed at compile">time.  But when LIMIT and OFFSET</param>
-                ///<param name="became arbitrary expressions, we were forced to add restrictions (13)">became arbitrary expressions, we were forced to add restrictions (13)</param>
-                ///<param name="and (14). ">and (14). </param>
-                if (pSub.pLimit != null && p.pLimit != null)
-                    return 0;
-                ///
-                ///<summary>
-                ///Restriction (13) 
-                ///</summary>
-                if (pSub.pOffset != null)
-                    return 0;
-                ///
-                ///<summary>
-                ///Restriction (14) 
-                ///</summary>
-                if (p.pRightmost != null && pSub.pLimit != null)
-                {
-                    return 0;
-                    ///
-                    ///<summary>
-                    ///Restriction (15) 
-                    ///</summary>
-                }
-                if (pSubSrc.nSrc == 0)
-                    return 0;
-                ///
-                ///<summary>
-                ///Restriction (7)  
-                ///</summary>
-                if ((pSub.selFlags & SelectFlags.Distinct) != 0)
-                    return 0;
-                ///
-                ///<summary>
-                ///Restriction (5)  
-                ///</summary>
-                if (pSub.pLimit != null && (pSrc.nSrc > 1 || isAgg))
-                {
-                    return 0;
-                    ///
-                    ///<summary>
-                    ///Restrictions (8)(9) 
-                    ///</summary>
-                }
-                if ((p.selFlags & SelectFlags.Distinct) != 0 && subqueryIsAgg)
-                {
-                    return 0;
-                    ///
-                    ///<summary>
-                    ///Restriction (6)  
-                    ///</summary>
-                }
-                if (p.pOrderBy != null && pSub.pOrderBy != null)
-                {
-                    return 0;
-                    ///
-                    ///<summary>
-                    ///Restriction (11) 
-                    ///</summary>
-                }
-                if (isAgg && pSub.pOrderBy != null)
-                    return 0;
-                ///
-                ///<summary>
-                ///Restriction (16) 
-                ///</summary>
-                if (pSub.pLimit != null && p.pWhere != null)
-                    return 0;
-                ///
-                ///<summary>
-                ///Restriction (19) 
-                ///</summary>
-                if (pSub.pLimit != null && (p.selFlags & SelectFlags.Distinct) != 0)
-                {
-                    return 0;
-                    ///
-                    ///<summary>
-                    ///Restriction (21) 
-                    ///</summary>
-                }
-                ///
-                ///<summary>
+                ///because they could be computed at compile-time.  But when LIMIT and OFFSET
+                ///became arbitrary expressions, we were forced to add restrictions (13) and (14).
+                    ctx => ctx.pSub.pLimit != null && ctx.p.pLimit != null,///Restriction (13) 
+                    ctx => ctx.pSub.pOffset != null,///Restriction (14) 
+                    ctx => ctx.p.pRightmost != null && ctx.pSub.pLimit != null,///Restriction (15) 
+                    ctx => ctx.pSubSrc.nSrc == 0,///Restriction (7)
+                    ctx => (ctx.pSub.selFlags & SelectFlags.Distinct) != 0,///Restriction (5)
+                    ctx => ctx.pSub.pLimit != null && (ctx.pSrc.nSrc > 1 || ctx.isAgg),///Restrictions (8)(9)
+                    ctx => (ctx.p.selFlags & SelectFlags.Distinct) != 0 && ctx.subqueryIsAgg,///Restriction (6)  
+                    ctx => ctx.p.pOrderBy != null && ctx.pSub.pOrderBy != null,///Restriction (11) 
+                    ctx => ctx.isAgg && ctx.pSub.pOrderBy != null,///Restriction (16) 
+                    ctx => ctx.pSub.pLimit != null && ctx.p.pWhere != null,///Restriction (19)
+                    ctx => ctx.pSub.pLimit != null && (p.selFlags & SelectFlags.Distinct) != 0,///Restriction (21) 
+                /**
                 ///OBSOLETE COMMENT 1:
                 ///Restriction 3:  If the subquery is a join, make sure the subquery is
                 ///not used as the right operand of an outer join.  Examples of why this
@@ -3165,104 +2723,74 @@ break;
                 ///is fraught with danger.  Best to avoid the whole thing.  If the
                 ///subquery is the right term of a LEFT JOIN, then do not flatten.
                 ///
-                ///</summary>
-                if ((pSubitem.jointype &  JoinType.JT_OUTER) != 0)
-                {
+                */
+                    ctx => (ctx.pSubitem.jointype &  JoinType.JT_OUTER) != 0,///Restriction 17: If the sub-query is a compound SELECT, then it must
+                                                                            ///use only the UNION ALL operator. And none of the simple select queries
+                                                                            ///that make up the compound SELECT are allowed to be aggregate or distinctqueries.
+                    ctx => ctx.pSub.pPrior != null && ctx.pSub.pOrderBy != null,///Restriction 20 ,///next rues will use this
+                    
+                    ctx => ctx.pSub.pPrior != null && isAgg || (ctx.p.selFlags & SelectFlags.Distinct) != 0 || ctx.pSrc.nSrc != 1,
+                    
+                    ctx => ctx.pSub.pPrior != null && ctx.pSub.path(ps=>ps.pPrior)
+                                                .Any(slct=>{
+                                                    sqliteinth.testcase((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct);
+                                                    sqliteinth.testcase((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Aggregate);
+                                                    if ((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0 || (slct.pPrior != null && slct.tk_op != Sqlite3.TK_ALL) || Sqlite3.NEVER(slct.pSrc == null) || slct.pSrc.nSrc != 1)
+                                                    {
+                                                        return true;
+                                                    }
+                                                    return false;
+                                                }) ,
+                    ///Restriction 18.
+                    ctx => ctx.pSub.pPrior != null && ctx.p.pOrderBy != null && ctx.p.pOrderBy.a.Take(ctx.p.pOrderBy.nExpr).Any(ord=>0==ord.iCol)
+
+                };
+
+                #endregion
+                var check = new SelectFlattenContext(p, iFrom, isAgg, subqueryIsAgg);
+                if (list.Any(rule => rule(check)))
                     return 0;
-                }
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Restriction 17: If the sub">query is a compound SELECT, then it must</param>
-                ///<param name="use only the UNION ALL operator. And none of the simple select queries">use only the UNION ALL operator. And none of the simple select queries</param>
-                ///<param name="that make up the compound SELECT are allowed to be aggregate or distinct">that make up the compound SELECT are allowed to be aggregate or distinct</param>
-                ///<param name="queries.">queries.</param>
-                ///<param name=""></param>
-                if (pSub.pPrior != null)
-                {
-                    if (pSub.pOrderBy != null)
-                    {
-                        return 0;
-                        ///
-                        ///<summary>
-                        ///Restriction 20 
-                        ///</summary>
-                    }
-                    if (isAgg || (p.selFlags & SelectFlags.Distinct) != 0 || pSrc.nSrc != 1)
-                    {
-                        return 0;
-                    }
-                    for (pSub1 = pSub; pSub1 != null; pSub1 = pSub1.pPrior)
-                    {
-                        sqliteinth.testcase((pSub1.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct);
-                        sqliteinth.testcase((pSub1.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Aggregate);
-                        if ((pSub1.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0 || (pSub1.pPrior != null && pSub1.tk_op != Sqlite3.TK_ALL) || Sqlite3.NEVER(pSub1.pSrc == null) || pSub1.pSrc.nSrc != 1)
-                        {
-                            return 0;
-                        }
-                    }
-                    ///
-                    ///<summary>
-                    ///Restriction 18. 
-                    ///</summary>
-                    if (p.pOrderBy != null)
-                    {
-                        int ii;
-                        for (ii = 0; ii < p.pOrderBy.nExpr; ii++)
-                        {
-                            if (p.pOrderBy.a[ii].iCol == 0)
-                                return 0;
-                        }
-                    }
-                }
-                ///
-                ///<summary>
+
+                #region auth
                 ///If we reach this point, flattening is permitted. ****
-                ///</summary>
-                ///
-                ///<summary>
                 ///Authorize the subquery 
-                ///</summary>
-                pParse.zAuthContext = pSubitem.zName;
+                string zSavedAuthContext = pParse.zAuthContext;                
+                pParse.zAuthContext = check.pSubitem.zName;
                 sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_SELECT, null, null, null);
                 pParse.zAuthContext = zSavedAuthContext;
+                #endregion
+
+                #region foo
+                ///If the sub-query is a compound SELECT statement, then (by restrictions
+                ///17 and 18 above) it must be a UNION ALL and the parent query must
+                ///be of the form:
+                ///SELECT <expr-clause>
+                ///followed by any ORDER BY, LIMIT and/or OFFSET clauses. This block-followed by any ORDER BY, LIMIT and/or OFFSET clauses. This block
+                ///creates N-1 copies of the parent query without any ORDER BY, LIMIT or
+                ///OFFSET clauses and joins them to the left-side of the original
+                ///using UNION ALL operators. In this case N is the number of simple
+                ///select statements in the compound sub-query.
+                ///Example:
+                ///SELECT a+1 FROM (
+                ///SELECT x FROM tab
+                ///UNION ALL
+                ///SELECT y FROM tab
+                ///UNION ALL
+                ///SELECT abs(z*2) FROM tab2
+                ///) WHERE a!=5 ORDER BY 1
                 ///
-                ///<summary>
-                ///</summary>
-                ///<param name="If the sub">query is a compound SELECT statement, then (by restrictions</param>
-                ///<param name="17 and 18 above) it must be a UNION ALL and the parent query must">17 and 18 above) it must be a UNION ALL and the parent query must</param>
-                ///<param name="be of the form:">be of the form:</param>
-                ///<param name=""></param>
-                ///<param name="SELECT <expr">clause></param>
-                ///<param name=""></param>
-                ///<param name="followed by any ORDER BY, LIMIT and/or OFFSET clauses. This block">followed by any ORDER BY, LIMIT and/or OFFSET clauses. This block</param>
-                ///<param name="creates N">1 copies of the parent query without any ORDER BY, LIMIT or</param>
-                ///<param name="OFFSET clauses and joins them to the left">side of the original</param>
-                ///<param name="using UNION ALL operators. In this case N is the number of simple">using UNION ALL operators. In this case N is the number of simple</param>
-                ///<param name="select statements in the compound sub">query.</param>
-                ///<param name=""></param>
-                ///<param name="Example:">Example:</param>
-                ///<param name=""></param>
-                ///<param name="SELECT a+1 FROM (">SELECT a+1 FROM (</param>
-                ///<param name="SELECT x FROM tab">SELECT x FROM tab</param>
-                ///<param name="UNION ALL">UNION ALL</param>
-                ///<param name="SELECT y FROM tab">SELECT y FROM tab</param>
-                ///<param name="UNION ALL">UNION ALL</param>
-                ///<param name="SELECT abs(z*2) FROM tab2">SELECT abs(z*2) FROM tab2</param>
-                ///<param name=") WHERE a!=5 ORDER BY 1">) WHERE a!=5 ORDER BY 1</param>
-                ///<param name=""></param>
-                ///<param name="Transformed into:">Transformed into:</param>
-                ///<param name=""></param>
-                ///<param name="SELECT x+1 FROM tab WHERE x+1!=5">SELECT x+1 FROM tab WHERE x+1!=5</param>
-                ///<param name="UNION ALL">UNION ALL</param>
-                ///<param name="SELECT y+1 FROM tab WHERE y+1!=5">SELECT y+1 FROM tab WHERE y+1!=5</param>
-                ///<param name="UNION ALL">UNION ALL</param>
-                ///<param name="SELECT abs(z*2)+1 FROM tab2 WHERE abs(z*2)+1!=5">SELECT abs(z*2)+1 FROM tab2 WHERE abs(z*2)+1!=5</param>
-                ///<param name="ORDER BY 1">ORDER BY 1</param>
-                ///<param name=""></param>
+                ///Transformed into:
+                ///SELECT x+1 FROM tab WHERE x+1!=5
+                ///UNION ALL
+                ///SELECT y+1 FROM tab WHERE y+1!=5
+                ///UNION ALL
+                ///SELECT abs(z*2)+1 FROM tab2 WHERE abs(z*2)+1!=5
+                ///ORDER BY 1
+                ///
                 ///<param name="We call this the "compound">subquery flattening".</param>
                 ///<param name=""></param>
-                for (pSub = pSub.pPrior; pSub != null; pSub = pSub.pPrior)
+                //TODOL anlamsiz bir loop , iterator iceride hic kullanmiyor
+                for (var pSub = check.pSub.pPrior; pSub != null; pSub = pSub.pPrior)
                 {
                     Select pNew;
                     ExprList pOrderBy = p.pOrderBy;
@@ -3275,8 +2803,8 @@ break;
                     pNew = exprc.sqlite3SelectDup(db, p, 0);
                     p.pLimit = pLimit;
                     p.pOrderBy = pOrderBy;
-                    p.pSrc = pSrc;
-                    p.tk_op = Sqlite3.TK_ALL;
+                    p.pSrc = check.pSrc;
+                    p.TokenOp = TokenType.TK_ALL;
                     p.pRightmost = null;
                     if (pNew == null)
                     {
@@ -3290,39 +2818,28 @@ break;
                     p.pPrior = pNew;
                     //        if ( db.mallocFailed != 0 ) return 1;
                 }
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Begin flattening the iFrom">th entry of the FROM clause</param>
-                ///<param name="in the outer query.">in the outer query.</param>
-                ///<param name=""></param>
-                pSub = pSub1 = pSubitem.pSelect;
-                ///
-                ///<summary>
+                #endregion
+
+
+
+                ///Begin flattening the iFrom-th entry of the FROM clause</param>
+                ///in the outer query.in the outer query.</param>
+                var pSub1 = check.pSub = check.pSubitem.pSelect;
+                
                 ///Delete the transient table structure associated with the
                 ///subquery
-                ///
-                ///</summary>
-                db.sqlite3DbFree(ref pSubitem.zDatabase);
-                db.sqlite3DbFree(ref pSubitem.zName);
-                db.sqlite3DbFree(ref pSubitem.zAlias);
-                pSubitem.zDatabase = null;
-                pSubitem.zName = null;
-                pSubitem.zAlias = null;
-                pSubitem.pSelect = null;
-                ///
-                ///<summary>
+                db.sqlite3DbFree(ref check.pSubitem.zDatabase);
+                db.sqlite3DbFree(ref check.pSubitem.zName);
+                db.sqlite3DbFree(ref check.pSubitem.zAlias);
+                check.pSubitem.pSelect = null;
                 ///Defer deleting the Table object associated with the
                 ///subquery until code generation is
                 ///complete, since there may still exist Expr.pTab entries that
                 ///refer to the subquery even after flattening.  Ticket #3346.
-                ///
-                ///</summary>
-                ///<param name="pSubitem">NULL by test restrictions and tests above.</param>
-                ///<param name=""></param>
-                if (Sqlite3.ALWAYS(pSubitem.pTab != null))
+                //pSubitem-NULL by test restrictions and tests above.
+                if (Sqlite3.ALWAYS(check.pSubitem.pTab != null))
                 {
-                    Table pTabToDel = pSubitem.pTab;
+                    Table pTabToDel = check.pSubitem.pTab;
                     if (pTabToDel.nRef == 1)
                     {
                         Parse pToplevel = sqliteinth.sqlite3ParseToplevel(pParse);
@@ -3333,68 +2850,47 @@ break;
                     {
                         pTabToDel.nRef--;
                     }
-                    pSubitem.pTab = null;
+                    check.pSubitem.pTab = null;
                 }
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="The following loop runs once for each term in a compound">subquery</param>
-                ///<param name="flattening (as described above).  If we are doing a different kind">flattening (as described above).  If we are doing a different kind</param>
-                ///<param name="of flattening "></param>
-                ///<param name="then this loop only runs once.">then this loop only runs once.</param>
-                ///<param name=""></param>
-                ///<param name="This loop moves all of the FROM elements of the subquery into the">This loop moves all of the FROM elements of the subquery into the</param>
-                ///<param name="the FROM clause of the outer query.  Before doing this, remember">the FROM clause of the outer query.  Before doing this, remember</param>
-                ///<param name="the cursor number for the original outer query FROM element in">the cursor number for the original outer query FROM element in</param>
-                ///<param name="iParent.  The iParent cursor will never be used.  Subsequent code">iParent.  The iParent cursor will never be used.  Subsequent code</param>
-                ///<param name="will scan expressions looking for iParent references and replace">will scan expressions looking for iParent references and replace</param>
-                ///<param name="those references with expressions that resolve to the subquery FROM">those references with expressions that resolve to the subquery FROM</param>
-                ///<param name="elements we are now copying in.">elements we are now copying in.</param>
-                ///<param name=""></param>
-                for (pParent = p; pParent != null; pParent = pParent.pPrior, pSub = pSub.pPrior)
+                ///The following loop runs once for each term in a compound">subquery</param>
+                ///flattening (as described above).  If we are doing a different kind</param>
+                ///of flattening 
+                ///then this loop only runs once.</param>
+                ///This loop moves all of the FROM elements of the subquery into the</param>
+                ///the FROM clause of the outer query.  Before doing this, remember</param>
+                ///the cursor number for the original outer query FROM element in</param>
+                ///iParent.  The iParent cursor will never be used.  Subsequent code</param>
+                ///will scan expressions looking for iParent references and replace</param>
+                ///those references with expressions that resolve to the subquery FROM</param>
+                ///elements we are now copying in.</param>
+
+                for (Select pParent = p; pParent != null; pParent = pParent.pPrior, check.pSub = check.pSub.pPrior)
                 {
                     int nSubSrc;
                     JoinType jointype = 0;
-                    pSubSrc = pSub.pSrc;
-                    ///
-                    ///<summary>
+                    check.pSubSrc = check.pSub.pSrc;
                     ///FROM clause of subquery 
-                    ///</summary>
-                    nSubSrc = pSubSrc.nSrc;
-                    ///
-                    ///<summary>
+                    nSubSrc = check.pSubSrc.nSrc;
                     ///Number of terms in subquery FROM clause 
-                    ///</summary>
-                    pSrc = pParent.pSrc;
-                    ///
-                    ///<summary>
+                    check.pSrc = pParent.pSrc;
                     ///FROM clause of the outer query 
-                    ///</summary>
-                    if (pSrc != null)
+                    if (check.pSrc != null)
                     {
                         Debug.Assert(pParent == p);
-                        ///
-                        ///<summary>
                         ///First time through the loop 
-                        ///</summary>
-                        jointype = pSubitem.jointype;
+                        jointype = check.pSubitem.jointype;
                     }
                     else
                     {
                         Debug.Assert(pParent != p);
-                        ///
-                        ///<summary>
                         ///2nd and subsequent times through the loop 
-                        ///</summary>
-                        pSrc = pParent.pSrc = build.sqlite3SrcListAppend(db, null, null, null);
+                        check.pSrc = pParent.pSrc = build.sqlite3SrcListAppend(db, null, null, null);
                         //if ( pSrc == null )
                         //{
                         //  //Debug.Assert( db.mallocFailed != 0 );
                         //  break;
                         //}
                     }
-                    ///
-                    ///<summary>
                     ///The subquery uses a single slot of the FROM clause of the outer
                     ///query.  If the subquery has more than one element in its FROM clause,
                     ///then expand the outer query to make space for it to hold all elements
@@ -3409,32 +2905,26 @@ break;
                     ///block of code will expand the out query to 4 slots.  The middle
                     ///slot is expanded to two slots in order to make space for the
                     ///two elements in the FROM clause of the subquery.
-                    ///
-                    ///</summary>
                     if (nSubSrc > 1)
                     {
-                        pParent.pSrc = pSrc = build.sqlite3SrcListEnlarge(db, pSrc, nSubSrc - 1, iFrom + 1);
+                        pParent.pSrc = check.pSrc = build.sqlite3SrcListEnlarge(db, check.pSrc, nSubSrc - 1, iFrom + 1);
                         //if ( db.mallocFailed != 0 )
                         //{
                         //  break;
                         //}
                     }
-                    ///
-                    ///<summary>
                     ///Transfer the FROM clause terms from the subquery into the
                     ///outer query.
-                    ///
-                    ///</summary>
                     for (i = 0; i < nSubSrc; i++)
                     {
-                        build.sqlite3IdListDelete(db, ref pSrc.a[i + iFrom].pUsing);
-                        pSrc.a[i + iFrom] = pSubSrc.a[i];
-                        pSubSrc.a[i] = new SrcList_item();
+                        build.sqlite3IdListDelete(db, ref check.pSrc.a[i + iFrom].pUsing);
+                        check.pSrc.a[i + iFrom] = check.pSubSrc.a[i];
+                        check.pSubSrc.a[i] = new SrcList_item();
                         //memset(pSubSrc.a[i], 0, sizeof(pSubSrc.a[i]));
                     }
-                    pSubitem = pSrc.a[iFrom];
+                    check.pSubitem = check.pSrc.a[iFrom];
                     // Reset for C#
-                    pSrc.a[iFrom].jointype = jointype;
+                    check.pSrc.a[iFrom].jointype = jointype;
                     ///
                     ///<summary>
                     ///Now begin substituting subquery result set expressions for
@@ -3463,26 +2953,27 @@ break;
                             }
                         }
                     }
-                    substExprList(db, pParent.pEList, iParent, pSub.pEList);
+                    int iParent = check.iParent;
+                    substExprList(db, pParent.pEList, check.iParent, check.pSub.pEList);
                     if (isAgg)
                     {
-                        substExprList(db, pParent.pGroupBy, iParent, pSub.pEList);
-                        pParent.pHaving = substExpr(db, pParent.pHaving, iParent, pSub.pEList);
+                        substExprList(db, pParent.pGroupBy, iParent, check.pSub.pEList);
+                        pParent.pHaving = substExpr(db, pParent.pHaving, iParent, check.pSub.pEList);
                     }
-                    if (pSub.pOrderBy != null)
+                    if (check.pSub.pOrderBy != null)
                     {
                         Debug.Assert(pParent.pOrderBy == null);
-                        pParent.pOrderBy = pSub.pOrderBy;
-                        pSub.pOrderBy = null;
+                        pParent.pOrderBy = check.pSub.pOrderBy;
+                        check.pSub.pOrderBy = null;
                     }
                     else
                         if (pParent.pOrderBy != null)
                         {
-                            substExprList(db, pParent.pOrderBy, iParent, pSub.pEList);
+                            substExprList(db, pParent.pOrderBy, iParent, check.pSub.pEList);
                         }
-                    if (pSub.pWhere != null)
+                    if (check.pSub.pWhere != null)
                     {
-                        pWhere = exprc.sqlite3ExprDup(db, pSub.pWhere, 0);
+                        pWhere = exprc.sqlite3ExprDup(db, check.pSub.pWhere, 0);
                     }
                     else
                     {
@@ -3493,44 +2984,32 @@ break;
                         Debug.Assert(pParent.pHaving == null);
                         pParent.pHaving = pParent.pWhere;
                         pParent.pWhere = pWhere;
-                        pParent.pHaving = substExpr(db, pParent.pHaving, iParent, pSub.pEList);
-                        pParent.pHaving = exprc.sqlite3ExprAnd(db, pParent.pHaving, exprc.sqlite3ExprDup(db, pSub.pHaving, 0));
+                        pParent.pHaving = substExpr(db, pParent.pHaving, iParent, check.pSub.pEList);
+                        pParent.pHaving = exprc.sqlite3ExprAnd(db, pParent.pHaving, exprc.sqlite3ExprDup(db, check.pSub.pHaving, 0));
                         Debug.Assert(pParent.pGroupBy == null);
-                        pParent.pGroupBy = exprc.sqlite3ExprListDup(db, pSub.pGroupBy, 0);
+                        pParent.pGroupBy = exprc.sqlite3ExprListDup(db, check.pSub.pGroupBy, 0);
                     }
                     else
                     {
-                        pParent.pWhere = substExpr(db, pParent.pWhere, iParent, pSub.pEList);
+                        pParent.pWhere = substExpr(db, pParent.pWhere, iParent, check.pSub.pEList);
                         pParent.pWhere = exprc.sqlite3ExprAnd(db, pParent.pWhere, pWhere);
                     }
-                    ///
-                    ///<summary>
                     ///The flattened query is distinct if either the inner or the
                     ///outer query is distinct.
-                    ///
-                    ///</summary>
-                    pParent.selFlags = (pParent.selFlags | pSub.selFlags & SelectFlags.Distinct);
-                    ///
-                    ///<summary>
+                    pParent.selFlags = (pParent.selFlags | check.pSub.selFlags & SelectFlags.Distinct);
                     ///SELECT ... FROM (SELECT ... LIMIT a OFFSET b) LIMIT x OFFSET y;
                     ///
                     ///One is tempted to try to add a and b to combine the limits.  But this
                     ///does not work if either limit is negative.
-                    ///
-                    ///</summary>
-                    if (pSub.pLimit != null)
+                    if (check.pSub.pLimit != null)
                     {
-                        pParent.pLimit = pSub.pLimit;
-                        pSub.pLimit = null;
+                        pParent.pLimit = check.pSub.pLimit;
+                        check.pSub.pLimit = null;
                     }
                 }
-                ///
-                ///<summary>
                 ///Finially, delete what is left of the subquery and return
                 ///success.
-                ///
-                ///</summary>
-                SelectMethods.sqlite3SelectDelete(db, ref pSub);
+                SelectMethods.sqlite3SelectDelete(db, ref check.pSub);
                 SelectMethods.sqlite3SelectDelete(db, ref pSub1);
                 return 1;
             }

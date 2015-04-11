@@ -32,7 +32,28 @@ namespace Community.CsharpSqlite {
 	using System.Text;
 	using sqlite3_value=Mem;
 	using System.Collections.Generic;
-    
+
+
+    ///
+    ///<summary>
+    ///The Vdbe.aColName array contains 5n Mem structures, where n is the
+    ///number of columns of data returned by the statement.
+    ///
+    ///</summary>
+
+    //#if SQLITE_ENABLE_COLUMN_METADATA
+    //# define COLNAME_N        5      /* Number of COLNAME_xxx symbols */
+    //#else
+    //# ifdef SQLITE_OMIT_DECLTYPE
+    //#   define COLNAME_N      1      /* Store only the name */
+    //# else
+    //#   define COLNAME_N      2      /* Store the name and decltype */
+    //# endif
+    //#endif
+
+    public enum ColName { NAME, DECLTYPE, DATABASE, TABLE, COLUMN }
+
+
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -52,6 +73,18 @@ namespace Community.CsharpSqlite {
 		///<param name="method function.">method function.</param>
 		///<param name=""></param>
 		public class Vdbe {
+
+
+#if SQLITE_ENABLE_COLUMN_METADATA
+																																						const int COLNAME_N = 5;     /* Number of COLNAME_xxx symbols */
+#else
+#if SQLITE_OMIT_DECLTYPE
+																																						const int COLNAME_N = 1;     /* Number of COLNAME_xxx symbols */
+#else
+            public const int COLNAME_N = 2;
+
+#endif
+#endif
 			public Vdbe() {
 			}
 			///
@@ -141,26 +174,32 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///Linked list of VDBEs with the same Vdbe.db 
 			///</summary>
-			public VdbeCursor[] apCsr;
+
+
+            ///<summary>
+            ///One element of this array for each open cursor 
+            ///</summary>
+            public VdbeCursor[] OpenCursors { 
+                get; 
+                set; 
+            }
+
+
+            ///
+            ///<summary>
+            ///Values for the  OpCode.OP_Variable opcode. 
+            ///</summary>
+            public Mem[] aVar;
+            ///<summary>
+            ///Name of variables 
+            ///</summary>
+            public string[] azVar;
 			///
-			///<summary>
-			///One element of this array for each open cursor 
-			///</summary>
-			public Mem[] aVar;
+            ///<summary>
+            ///Number of entries in aVar[] 
+            ///</summary>
+            public ynVar nVar;
 			///
-			///<summary>
-			///Values for the  OpCode.OP_Variable opcode. 
-			///</summary>
-			public string[] azVar;
-			///
-			///<summary>
-			///Name of variables 
-			///</summary>
-			public ynVar nVar;
-			///
-			///<summary>
-			///Number of entries in aVar[] 
-			///</summary>
 			public ynVar nzVar;
 			///
 			///<summary>
@@ -332,7 +371,7 @@ namespace Community.CsharpSqlite {
 				ct.apArg=apArg;
 				ct.aColName=aColName;
 				ct.nCursor=nCursor;
-				ct.apCsr=apCsr;
+				ct.OpenCursors=OpenCursors;
 				ct.aVar=aVar;
 				ct.azVar=azVar;
 				ct.nVar=nVar;
@@ -1280,38 +1319,23 @@ pOp.cnt = 0;
 					pColName.db=this.db;
 				}
 			}
-			public SqlResult sqlite3VdbeSetColName(///
-			///<summary>
-			///Vdbe being configured 
-			///</summary>
-			int idx,///
-			///<summary>
-			///Index of column zName applies to 
-			///</summary>
-			int var,///
-			///<summary>
-			///One of the COLNAME_* constants 
-			///</summary>
-			string zName,///
-			///<summary>
-			///Pointer to buffer containing name 
-			///</summary>
-			dxDel xDel///
-			///<summary>
-			///Memory management strategy for zName 
-			///</summary>
+			public SqlResult sqlite3VdbeSetColName(
+			int idx,///Index of column zName applies to 
+            ColName var,///One of the COLNAME_* constants 
+			string zName,///Pointer to buffer containing name 
+			dxDel xDel///Memory management strategy for zName 
 			) {
                 SqlResult rc;
 				Mem pColName;
 				Debug.Assert(idx<this.nResColumn);
-				Debug.Assert(var<COLNAME_N);
+				Debug.Assert((int)var<Vdbe.COLNAME_N);
 				//if ( p.db.mallocFailed != 0 )
 				//{
 				//  Debug.Assert( null == zName || xDel != SQLITE_DYNAMIC );
 				//  return SQLITE_NOMEM;
 				//}
 				Debug.Assert(this.aColName!=null);
-				pColName=this.aColName[idx+var*this.nResColumn];
+				pColName=this.aColName[idx+(int)var*this.nResColumn];
                 rc = pColName.sqlite3VdbeMemSetStr(zName, -1, SqliteEncoding.UTF8, xDel);
 				Debug.Assert(rc!=0||null==zName||(pColName.flags&MemFlags.MEM_Term)!=0);
 				return rc;
@@ -1772,94 +1796,49 @@ fclose(out);
 				///</summary>
 				Op[] aOp=this.aOp;
 				var lOp=this.lOp;
+                /*
 				Log.WriteHeader("Plan VdbeExec");
 				Log.Indent();
 				foreach(var item in lOp) {
 					Log.WriteLine(item.ToString(this));
 				}
 				Log.WriteHeader("---");
-				try {
-					///
-					///<summary>
+				
+                 */
+                 try {
 					///Copy of p.aOp 
-					///</summary>
 					Op pOp;
-                    ///
-                    ///<summary>
                     ///Current operation 
-                    ///</summary>
                     SqlResult rc =SqlResult.SQLITE_OK;
-					///
-					///<summary>
 					///Value to return 
-					///</summary>
 					sqlite3 db=this.db;
-					///
-					///<summary>
 					///The database 
-					///</summary>
 					u8 resetSchemaOnFault=0;
-					///
-					///<summary>
 					///Reset schema after an error if positive 
-					///</summary>
 					SqliteEncoding encoding=sqliteinth.ENC(db);
-					///
-					///<summary>
 					///The database encoding 
-					///</summary>
 					#if !SQLITE_OMIT_PROGRESS_CALLBACK
 					bool checkProgress;
-					///
-					///<summary>
 					///True if progress callbacks are enabled 
-					///</summary>
 					int nProgressOps=0;
-					///
-					///<summary>
 					///Opcodes executed since progress callback. 
-					///</summary>
 					#endif
 					Mem[] aMem=this.aMem;
-					///
-					///<summary>
 					///Copy of p.aMem 
-					///</summary>
 					Mem pIn1=null;
-					///
-					///<summary>
 					///1st input operand 
-					///</summary>
 					Mem pIn2=null;
-					///
-					///<summary>
 					///2nd input operand 
-					///</summary>
 					Mem pIn3=null;
-					///
-					///<summary>
 					///3rd input operand 
-					///</summary>
 					Mem pOut=null;
-					///
-					///<summary>
 					///Output operand 
-					///</summary>
 					int iCompare=0;
-					///
-					///<summary>
 					///Result of last  OpCode.OP_Compare operation 
-					///</summary>
 					int[] aPermute=null;
-					///
-					///<summary>
 					///Permutation of columns for  OpCode.OP_Compare 
-					///</summary>
 					i64 lastRowid=db.lastRowid;
-					///
-					///<summary>
 					///Saved value of the last insert ROWID 
-					///</summary>
 					#if VDBE_PROFILE
 																																																																																		u64 start;                   /* CPU clock count at start of opcode */
 int origPc;                  /* Program counter at start of opcode */
@@ -2042,7 +2021,7 @@ start = sqlite3Hwtime();
           memAboutToChange( p, aMem[pOp.p3] );
         }
 #endif
-						Log.WriteLine(opcodeIndex.ToString().PadLeft(2)+":\t"+pOp.ToString(this));
+						//Log.WriteLine(opcodeIndex.ToString().PadLeft(2)+":\t"+pOp.ToString(this));
 						switch(pOp.OpCode) {
 						///
 						///<summary>
@@ -4069,7 +4048,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///<param name="out2">prerelease </param>
 							i64 nEntry=0;
 							BtCursor pCrsr;
-							pCrsr=this.apCsr[pOp.p1].pCursor;
+							pCrsr=this.OpenCursors[pOp.p1].pCursor;
 							if(pCrsr!=null) {
 								rc=pCrsr.sqlite3BtreeCount(ref nEntry);
 							}
@@ -4851,8 +4830,8 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 						///<param name=""></param>
 						case OpCode.OP_Close: {
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-                            vdbeaux.sqlite3VdbeFreeCursor(this, this.apCsr[pOp.p1]);
-							this.apCsr[pOp.p1]=null;
+                            vdbeaux.sqlite3VdbeFreeCursor(this, this.OpenCursors[pOp.p1]);
+							this.OpenCursors[pOp.p1]=null;
 							break;
 						}
 						///
@@ -4953,7 +4932,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							r=new UnpackedRecord();
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
 							Debug.Assert(pOp.p2!=0);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							Debug.Assert(pC.pseudoTableReg==0);
                             Debug.Assert(OpCode.OP_SeekLe == OpCode.OP_SeekLt + 1);
@@ -5171,7 +5150,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///</summary>
 							VdbeCursor pC;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(Sqlite3.ALWAYS(pC!=null));
 							if(pC.pCursor!=null) {
 								Debug.Assert(pC.isTable);
@@ -5240,7 +5219,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							alreadyExists=0;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
 							Debug.Assert(pOp.p4type== P4Usage.P4_INT32);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							pIn3=aMem[pOp.p3];
 							if(Sqlite3.ALWAYS(pC.pCursor!=null)) {
@@ -5356,7 +5335,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///<summary>
 							///Find the index cursor. 
 							///</summary>
-							pCx=this.apCsr[pOp.p1];
+							pCx=this.OpenCursors[pOp.p1];
 							Debug.Assert(!pCx.deferredMoveto);
 							pCx.seekResult=0;
 							pCx.cacheStatus=CACHE_STALE;
@@ -5445,7 +5424,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							pIn3=aMem[pOp.p3];
 							Debug.Assert((pIn3.flags&MemFlags.MEM_Int)!=0);
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							Debug.Assert(pC.isTable);
 							Debug.Assert(pC.pseudoTableReg==0);
@@ -5494,8 +5473,8 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///</summary>
 							///<param name="out2">prerelease </param>
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							Debug.Assert(this.apCsr[pOp.p1]!=null);
-							pOut.u.i=(long)this.apCsr[pOp.p1].seqCount++;
+							Debug.Assert(this.OpenCursors[pOp.p1]!=null);
+							pOut.u.i=(long)this.OpenCursors[pOp.p1].seqCount++;
 							break;
 						}
 						///
@@ -5555,7 +5534,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							v=0;
 							res=0;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							if(NEVER(pC.pCursor==null)) {
 								///
@@ -5815,7 +5794,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///MEM cell holding key  for the record 
 							i64 iKey;
 							///The integer ROWID or key for the record to be inserted 
-                            VdbeCursor pC = this.apCsr[pOp.p1];
+                            VdbeCursor pC = this.OpenCursors[pOp.p1];
                                 Debug.Assert(pC != null);
                                 Debug.Assert(pC.pCursor != null);
                                 Debug.Assert(pC.pseudoTableReg == 0);
@@ -5913,7 +5892,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							VdbeCursor pC;
 							iKey=0;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							Debug.Assert(pC.pCursor!=null);
 							///
@@ -6021,7 +6000,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							///Note that RowKey and RowData are really exactly the same instruction 
 							///</summary>
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC.isTable||pOp.OpCode==OpCode.OP_RowKey);
 							Debug.Assert(pC.isIndex||pOp.OpCode==OpCode.OP_RowData);
 							Debug.Assert(pC!=null);
@@ -6114,7 +6093,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							sqlite3_module pModule;
 							v=0;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							Debug.Assert(pC.pseudoTableReg==0);
 							if(pC.nullRow) {
@@ -6167,7 +6146,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 						case OpCode.OP_NullRow: {
 							VdbeCursor pC;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							pC.nullRow=true;
 							pC.rowidIsValid=false;
@@ -6196,7 +6175,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							BtCursor pCrsr;
 							int res=0;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							pCrsr=pC.pCursor;
 							if(pCrsr==null) {
@@ -6270,7 +6249,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							BtCursor pCrsr;
 							int res=0;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							res=1;
 							if((pCrsr=pC.pCursor)!=null) {
@@ -6335,7 +6314,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							//CHECK_FOR_INTERRUPT;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
 							Debug.Assert(pOp.p5<=Sqlite3.ArraySize(this.aCounter));
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							if(pC==null) {
 								break;
 								///
@@ -6393,7 +6372,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							int nKey;
 							byte[] zKey;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							pIn2=aMem[pOp.p2];
 							Debug.Assert((pIn2.flags&MemFlags.MEM_Blob)!=0);
@@ -6430,7 +6409,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							Debug.Assert(pOp.p3>0);
 							Debug.Assert(pOp.p2>0&&pOp.p2+pOp.p3<=this.nMem+1);
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							pCrsr=pC.pCursor;
 							if(Sqlite3.ALWAYS(pCrsr!=null)) {
@@ -6474,7 +6453,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							i64 rowid;
 							rowid=0;
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							pCrsr=pC.pCursor;
 							pOut.flags=MemFlags.MEM_Null;
@@ -6543,7 +6522,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							res=0;
 							r=new UnpackedRecord();
 							Debug.Assert(pOp.p1>=0&&pOp.p1<this.nCursor);
-							pC=this.apCsr[pOp.p1];
+							pC=this.OpenCursors[pOp.p1];
 							Debug.Assert(pC!=null);
 							Debug.Assert(pC.isOrdered);
 							if(Sqlite3.ALWAYS(pC.pCursor!=null)) {
@@ -7207,7 +7186,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 								pFrame.currentOpCodeIndex=opcodeIndex;
 								pFrame.aMem=this.aMem;
 								pFrame.nMem=this.nMem;
-								pFrame.apCsr=this.apCsr;
+								pFrame.apCsr=this.OpenCursors;
 								pFrame.nCursor=this.nCursor;
 								pFrame.aOp=this.aOp;
 								pFrame.nOp=this.nOp;
@@ -7243,7 +7222,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
 							// &VdbeFrameMem( pFrame )[-1];
 							this.nMem=pFrame.nChildMem;
 							this.nCursor=(u16)pFrame.nChildCsr;
-							this.apCsr=pFrame.aChildCsr;
+							this.OpenCursors=pFrame.aChildCsr;
 							// (VdbeCursor *)&aMem[p->nMem+1];
 							this.lOp=lOp=new List<Op>(pProgram.aOp);
 							this.nOp=pProgram.nOp;
@@ -7910,7 +7889,7 @@ break;
 							pQuery=aMem[pOp.p3];
 							pArgc=aMem[pOp.p3+1];
 							// pQuery[1];
-							pCur=this.apCsr[pOp.p1];
+							pCur=this.OpenCursors[pOp.p1];
 							Debug.Assert(pQuery.memIsValid());
 							REGISTER_TRACE(this,pOp.p3,pQuery);
 							Debug.Assert(pCur.pVtabCursor!=null);
@@ -7965,7 +7944,7 @@ break;
 							sqlite3_module pModule;
 							Mem pDest;
 							sqlite3_context sContext;
-							VdbeCursor pCur=this.apCsr[pOp.p1];
+							VdbeCursor pCur=this.OpenCursors[pOp.p1];
 							Debug.Assert(pCur.pVtabCursor!=null);
 							Debug.Assert(pOp.p3>0&&pOp.p3<=this.nMem);
 							pDest=aMem[pOp.p3];
@@ -8031,7 +8010,7 @@ break;
 							int res;
 							VdbeCursor pCur;
 							res=0;
-							pCur=this.apCsr[pOp.p1];
+							pCur=this.OpenCursors[pOp.p1];
 							Debug.Assert(pCur.pVtabCursor!=null);
 							if(pCur.nullRow) {
 								break;
@@ -8393,7 +8372,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 					goto vdbe_error_halt;
 				}
 				finally {
-					Log.Unindent();
+					//Log.Unindent();
 				}
 			}
 
@@ -8406,13 +8385,8 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
             }
             private SqlResult OpCode_Column(Op pOp, SqlResult rc, sqlite3 db, SqliteEncoding encoding, Mem[] aMem)
             {
-                
-                
-
                 ///The length of the serialized data for the column 
-                ///
                 int len;
-
                 ///Number of bytes in the record 
                 u32 payloadSize = 0;
                 ///Pointer to complete record
@@ -8428,7 +8402,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///column number to retrieve 
                 int clumnNumber_p2=pOp.p2;
                 ///The VDBE cursor 
-                VdbeCursor vdbeCursor = this.apCsr[p1];
+                VdbeCursor vdbeCursor = this.OpenCursors[p1];
                 ///This block sets the variable payloadSize to be the total number of
                 ///bytes in the record.
                 ///
@@ -8448,8 +8422,6 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///aType[i] holds the numeric type of the i"th column 
                 u32[] columnTypes = vdbeCursor.aType;
 
-                //aOffset[i] is offset to start of data for i">th column
-                u32[] clumnOffsets;
                 
                 ///Loop counter 
                 int i;
@@ -8568,6 +8540,10 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 
 
                 Debug.Assert(clumnNumber_p2 < nField);
+
+                //aOffset[i] is offset to start of data for i">th column
+                u32[] clumnOffsets;
+                
                 ///Read and parse the table header.  Store the results of the parse
                 ///into the record header cache fields of the cursor.
                 
@@ -8794,20 +8770,15 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 //Mem[] pMem;
                 int i;
                
-                ///
-                ///<summary>
                 ///If this statement has violated immediate foreign key constraints, do
                 ///not return the number of rows modified. And do not RELEASE the statement
                 ///transaction. It needs to be rolled back.  
-                ///</summary>
                 if (SqlResult.SQLITE_OK != (rc = this.sqlite3VdbeCheckFk(0)))
                 {
                     Debug.Assert((db.flags & SqliteFlags.SQLITE_CountRows) != 0);
                     Debug.Assert(this.usesStmtJournal);
                     return rc;
                 }
-                ///
-                ///<summary>
                 ///If the SQLITE_CountRows flag is set in sqlite3.flags mask, then
                 ///DML statements invoke this opcode to return the number of rows
                 ///modified to the user. This is the only way that a VM that
@@ -8815,7 +8786,6 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///
                 ///In case this is such a statement, close any statement transaction
                 ///opened by this VM before returning control to the user. This is to
-                ///</summary>
                 ///<param name="ensure that statement">transactions are always nested, not overlapping.</param>
                 ///<param name="If the open statement">transaction is not closed here, then the user</param>
                 ///<param name="may step another VM that opens its own statement transaction. This">may step another VM that opens its own statement transaction. This</param>
@@ -8830,15 +8800,9 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 {
                     return rc;
                 }
-                ///
-                ///<summary>
                 ///Invalidate all ephemeral cursor row caches 
-                ///</summary>
                 this.cacheCtr = (this.cacheCtr + 2) | 1;
-                ///
-                ///<summary>
                 ///Make sure the results of the current row are \000 terminated
-                ///</summary>
                 ///<param name="and have an assigned type.  The results are de">ephemeralized as</param>
                 ///<param name="as side effect.">as side effect.</param>
                 ///<param name=""></param>
@@ -9025,20 +8989,11 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
             {
                 //char* zMalloc;   /* Holding variable for allocated memory */
                 int n;
-                ///
-                ///<summary>
                 ///Number of registers left to copy 
-                ///</summary>
                 int p1;
-                ///
-                ///<summary>
                 ///Register to copy from 
-                ///</summary>
                 int p2;
-                ///
-                ///<summary>
                 ///Register to copy to 
-                ///</summary>
                 n = pOp.p3;
                 p1 = pOp.p1;
                 p2 = pOp.p2;
