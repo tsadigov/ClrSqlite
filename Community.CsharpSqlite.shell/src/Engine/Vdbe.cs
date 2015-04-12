@@ -1903,9 +1903,10 @@ int origPc;                  /* Program counter at start of opcode */
                             Engine.Op.ControlFlow.Exec,
                             Engine.Op.Math.Exec,
                             Engine.Op.Schema.Exec,
-                    Engine.Op.Cast.Exec,
-                    Engine.Op.Cursor.Exec,
-                    Engine.Op.Idx.Exec};
+                            Engine.Op.Cast.Exec,
+                            Engine.Op.Cursor.Exec,
+                            Engine.Op.Idx.Exec
+                    };
                     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------					///
 
 					#region MAIN CPU LOOP
@@ -2044,6 +2045,8 @@ start = sqlite3Hwtime();
                         foreach(var handler in handlers){
                             exp=handler(cpu,pOp.OpCode,pOp);
                             if (RuntimeException.OK==exp) {
+                                Console.WriteLine("handled :" + pOp.OpCode);
+
                                 encoding=cpu.encoding;
                                 errorAction=cpu.errorAction;
                                 opcodeIndex=cpu.opcodeIndex;
@@ -2193,9 +2196,9 @@ start = sqlite3Hwtime();
 						///
 						///</summary>
 						///<param name="The registers P1 through P1+P2">1 contain a single row of</param>
-						///<param name="results. This opcode causes the sqlite3_step() call to terminate">results. This opcode causes the sqlite3_step() call to terminate</param>
-						///<param name="with an SQLITE_ROW return code and it sets up the sqlite3_stmt">with an SQLITE_ROW return code and it sets up the sqlite3_stmt</param>
-						///<param name="structure to provide access to the top P1 values as the result">structure to provide access to the top P1 values as the result</param>
+						///results. This opcode causes the sqlite3_step() call to terminate</param>
+						///with an SQLITE_ROW return code and it sets up the sqlite3_stmt</param>
+						///structure to provide access to the top P1 values as the result</param>
 						///<param name="row.">row.</param>
 						///<param name=""></param>
 						case OpCode.OP_ResultRow: {

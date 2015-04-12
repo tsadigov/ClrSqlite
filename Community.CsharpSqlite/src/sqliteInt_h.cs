@@ -654,6 +654,10 @@ namespace Community.CsharpSqlite
         public static void testcase<T>(T X)
         {
         }
+        public static void testcase(bool X)
+        {
+
+        }
 #endif
         ///
         ///<summary>

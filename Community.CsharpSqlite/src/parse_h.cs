@@ -361,10 +361,11 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 			///<summary>
             ///All SQL text past the last semicolon parsed 
             ///</summary>
+            StringBuilder m_zTail=new StringBuilder();
             public StringBuilder zTail
             {
-				get;
-				set;
+                get { return m_zTail; }
+                set { m_zTail = value; }
 			}
 			///
 			///<summary>

@@ -631,7 +631,7 @@ namespace Community.CsharpSqlite
 				int hdr = this.hdrOffset;///Local cache of pPage.hdrOffset 
 				u8[] data = this.aData;///Local cache of pPage.aData 
                 u8 nFrag = this.nFrag ;///Number of fragmented bytes on pPage
-                int top = Sqlite3.BTreeMethods.get2byteNotZero(data, hdr + 5); ;///First byte of cell content area 
+                int top = Sqlite3.BTreeMethods.get2byteNotZero(data, hdr + Offsets.cellbody); ;///First byte of cell content area 
                 int gap = this.cellOffset + 2 * this.nCell;///First byte of gap between cell pointers and cell content 
 				SqlResult rc;///Integer return code 
                 u32 usableSize = this.pBt.usableSize; ;///Usable size of the page 
@@ -833,12 +833,14 @@ namespace Community.CsharpSqlite
 ///<summary>
 ///If the cell content area begins with a freeblock, remove it. 
 ///</summary>
-
-				if (FirstFreeBlockAddress == CellBodyOffset ) {
-                    FirstFreeBlockAddress = data.get2byte(FirstFreeBlockAddress);
-					//memcpy( data[hdr + 1], ref data[pbegin], 2 );
-                    CellBodyOffset += data.get2byte(pbegin + 2);
-				}
+///
+                if (FirstFreeBlockAddress == CellBodyOffset)
+                {
+                            u16 sz = data.get2byte(FirstFreeBlockAddress + 2);
+                            FirstFreeBlockAddress= data.get2byte(FirstFreeBlockAddress);
+                            CellBodyOffset+=sz;
+                }
+                                
                 Debug.Assert(this.pDbPage.sqlite3PagerIswriteable());
 				return SqlResult.SQLITE_OK;
 			}
