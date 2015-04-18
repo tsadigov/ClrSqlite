@@ -29,5 +29,6 @@ namespace Community.CsharpSqlite.Engine
         public int opcodeIndex;
         public Community.CsharpSqlite.Sqlite3.Vdbe vdbe;
         public OnConstraintError errorAction;
+        public int iCompare;
     }
 }

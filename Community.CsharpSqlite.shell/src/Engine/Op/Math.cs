@@ -232,6 +232,22 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
                         break;
                     }
 
+                ///Opcode: AddImm  P1 P2 * * *
+                ///
+                ///Add the constant P2 to the value in register P1.
+                ///The result is always an integer.
+                ///
+                ///To force any register to be an integer, just add 0.
+                case OpCode.OP_AddImm:
+                    {
+                        ///in1 
+                        var pIn1 = aMem[pOp.p1];
+                        cpu.vdbe.memAboutToChange(pIn1);
+                        pIn1.sqlite3VdbeMemIntegerify();
+                        pIn1.u.i += pOp.p2;
+                        break;
+                    }
+
                 default: return RuntimeException.noop;
             }
             return RuntimeException.OK;
