@@ -3,6 +3,7 @@ using Pgno = System.UInt32;
 
 #if SQLITE_OMIT_WAL
 using Wal = System.Object;
+using Community.CsharpSqlite.Os;
 
 #endif
 namespace Community.CsharpSqlite

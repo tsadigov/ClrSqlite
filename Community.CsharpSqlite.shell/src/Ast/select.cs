@@ -30,6 +30,8 @@ namespace Community.CsharpSqlite
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     
     using ResolveExtensions = Sqlite3.ResolveExtensions;
+    using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.builder;
 
         ///
         ///<summary>
@@ -1263,7 +1265,7 @@ namespace Community.CsharpSqlite
                             if (pBest != null && pBest.nColumn < pTab.nCol)
                             {
                                 iRoot = pBest.tnum;
-                                pKeyInfo = build.sqlite3IndexKeyinfo(pParse, pBest);
+                                pKeyInfo = pBest.sqlite3IndexKeyinfo(pParse);
                             }
                             ///<param name="Open a read">only cursor, execute the OP_Count, close the cursor. </param>
                             v.sqlite3VdbeAddOp3(OpCode.OP_OpenRead, iCsr, iRoot, iDb);

@@ -12,9 +12,11 @@ using u32 = System.UInt32;
 using System.Threading;
 using DWORD = System.UInt64;
 using System.IO;
+using Community.CsharpSqlite.Os;
 
 namespace Community.CsharpSqlite
 {
+    namespace Os{
 
 
     //typedef struct sqlite3_mutex sqlite3_mutex;
@@ -598,6 +600,48 @@ winceLock *shared;      /* Global shared lock memory for the file  */
         }
     }
 
+
+
+    ///<summary>
+    ///VFS Delegates
+    ///
+    ///</summary>
+
+    public delegate SqlResult dxClose(sqlite3_file File_ID);
+
+    public delegate SqlResult dxCheckReservedLock(sqlite3_file File_ID, ref int pRes);
+
+    public delegate int dxDeviceCharacteristics(sqlite3_file File_ID);
+
+    public delegate SqlResult dxFileControl(sqlite3_file File_ID, int op, ref sqlite3_int64 pArgs);
+
+    public delegate SqlResult dxFileSize(sqlite3_file File_ID, ref long size);
+
+    public delegate SqlResult dxLock(sqlite3_file File_ID, int locktype);
+
+    public delegate SqlResult dxRead(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
+
+    public delegate int dxSectorSize(sqlite3_file File_ID);
+
+    public delegate SqlResult dxSync(sqlite3_file File_ID, int flags);
+
+    public delegate SqlResult dxTruncate(sqlite3_file File_ID, sqlite3_int64 size);
+
+    public delegate SqlResult dxUnlock(sqlite3_file File_ID, int locktype);
+
+    public delegate SqlResult dxWrite(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
+
+    public delegate int dxShmMap(sqlite3_file File_ID, int iPg, int pgsz, int pInt, out object pvolatile);
+
+    public delegate int dxShmLock(sqlite3_file File_ID, int offset, int n, int flags);
+
+    public delegate void dxShmBarrier(sqlite3_file File_ID);
+
+    public delegate int dxShmUnmap(sqlite3_file File_ID, int deleteFlag);
+
+
+
+}
     public partial class Sqlite3
     {
 
@@ -870,47 +914,6 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 
 
 
-
-
-
-
-        ///
-        ///<summary>
-        ///VFS Delegates
-        ///
-        ///</summary>
-
-        public delegate SqlResult dxClose(sqlite3_file File_ID);
-
-        public delegate SqlResult dxCheckReservedLock(sqlite3_file File_ID, ref int pRes);
-
-        public delegate int dxDeviceCharacteristics(sqlite3_file File_ID);
-
-        public delegate SqlResult dxFileControl(sqlite3_file File_ID, int op, ref sqlite3_int64 pArgs);
-
-        public delegate SqlResult dxFileSize(sqlite3_file File_ID, ref long size);
-
-        public delegate SqlResult dxLock(sqlite3_file File_ID, int locktype);
-
-        public delegate SqlResult dxRead(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
-
-        public delegate int dxSectorSize(sqlite3_file File_ID);
-
-        public delegate SqlResult dxSync(sqlite3_file File_ID, int flags);
-
-        public delegate SqlResult dxTruncate(sqlite3_file File_ID, sqlite3_int64 size);
-
-        public delegate SqlResult dxUnlock(sqlite3_file File_ID, int locktype);
-
-        public delegate SqlResult dxWrite(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
-
-        public delegate int dxShmMap(sqlite3_file File_ID, int iPg, int pgsz, int pInt, out object pvolatile);
-
-        public delegate int dxShmLock(sqlite3_file File_ID, int offset, int n, int flags);
-
-        public delegate void dxShmBarrier(sqlite3_file File_ID);
-
-        public delegate int dxShmUnmap(sqlite3_file File_ID, int deleteFlag);
 
 
 

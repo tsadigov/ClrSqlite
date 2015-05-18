@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Ast
 {
 	///<summary>
 	/// Each token coming out of the lexer is an instance of

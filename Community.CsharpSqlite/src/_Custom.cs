@@ -23,6 +23,7 @@ using time_t = System.Int64;
 namespace Community.CsharpSqlite
 {
 	using sqlite3_value = Mem;
+    using Community.CsharpSqlite.Ast;
 
     public partial class Sqlite3
     {

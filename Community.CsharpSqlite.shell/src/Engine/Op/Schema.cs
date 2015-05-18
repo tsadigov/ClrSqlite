@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Community.CsharpSqlite.builder;
+using Community.CsharpSqlite.Parsing;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Community.CsharpSqlite;
+using Community.CsharpSqlite.Ast;
+using Community.CsharpSqlite.Parsing;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Parse=Community.CsharpSqlite.Sqlite3.Parse;
-namespace Community.CsharpSqlite
+using Parse = Community.CsharpSqlite.Sqlite3.Parse;
+namespace Community.CsharpSqlite.builder
 {
         public static class TableBuilder
         {
@@ -645,6 +648,347 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 pTable = null;
                 //      sqlite3DbFree( db, ref pTable );
             }
+
+
+
+            ///
+            ///<summary>
+            ///Generate a CREATE TABLE statement appropriate for the given
+            ///table.  Memory to hold the text of the statement is obtained
+            ///from sqliteMalloc() and must be freed by the calling function.
+            ///
+            ///</summary>
+            public static string createTableStmt(this sqlite3 db, Table p)
+            {
+                int i, k, n;
+                StringBuilder zStmt;
+                string zSep;
+                string zSep2;
+                string zEnd;
+                Column pCol;
+                n = 0;
+                for (i = 0; i < p.nCol; i++)
+                {
+                    //, pCol++){
+                    pCol = p.aCol[i];
+                    n += build.identLength(pCol.zName) + 5;
+                }
+                n += build.identLength(p.zName);
+                if (n < 50)
+                {
+                    zSep = "";
+                    zSep2 = ",";
+                    zEnd = ")";
+                }
+                else
+                {
+                    zSep = "\n  ";
+                    zSep2 = ",\n  ";
+                    zEnd = "\n)";
+                }
+                n += 35 + 6 * p.nCol;
+                zStmt = new StringBuilder(n);
+                //zStmt = sqlite3DbMallocRaw(0, n);
+                //if( zStmt==0 ){
+                //  db.mallocFailed = 1;
+                //  return 0;
+                //}
+                //io.sqlite3_snprintf(n, zStmt,"CREATE TABLE ");
+                zStmt.Append("CREATE TABLE ");
+                k = StringExtensions.sqlite3Strlen30(zStmt);
+                build.identPut(zStmt, ref k, p.zName);
+                zStmt.Append('(');
+                //zStmt[k++] = '(';
+                for (i = 0; i < p.nCol; i++)
+                {
+                    //, pCol++){
+                    pCol = p.aCol[i];
+                    string[] azType = new string[] {
+					///
+					///<summary>
+					///sqliteinth.SQLITE_AFF_TEXT    
+					///</summary>
+					" TEXT",
+					///
+					///<summary>
+					///SQLITE_AFF_NONE    
+					///</summary>
+					"",
+					///
+					///<summary>
+					///SQLITE_AFF_NUMERIC 
+					///</summary>
+					" NUM",
+					///
+					///<summary>
+					///SQLITE_AFF_INTEGER 
+					///</summary>
+					" INT",
+					///
+					///<summary>
+					///SQLITE_AFF_REAL    
+					///</summary>
+					" REAL"
+				};
+                    int len;
+                    string zType;
+                    zStmt.Append(zSep);
+                    //  io.sqlite3_snprintf(n-k, zStmt[k], zSep);
+                    k = StringExtensions.sqlite3Strlen30(zStmt);
+                    //  k += strlen(zStmt[k]);
+                    zSep = zSep2;
+                    build.identPut(zStmt, ref k, pCol.zName);
+                    Debug.Assert(pCol.affinity - sqliteinth.SQLITE_AFF_TEXT >= 0);
+                    Debug.Assert(pCol.affinity - sqliteinth.SQLITE_AFF_TEXT < Sqlite3.ArraySize(azType));
+                    sqliteinth.testcase(pCol.affinity == sqliteinth.SQLITE_AFF_TEXT);
+                    sqliteinth.testcase(pCol.affinity == sqliteinth.SQLITE_AFF_NONE);
+                    sqliteinth.testcase(pCol.affinity == sqliteinth.SQLITE_AFF_NUMERIC);
+                    sqliteinth.testcase(pCol.affinity == sqliteinth.SQLITE_AFF_INTEGER);
+                    sqliteinth.testcase(pCol.affinity == sqliteinth.SQLITE_AFF_REAL);
+                    zType = azType[pCol.affinity - sqliteinth.SQLITE_AFF_TEXT];
+                    len = StringExtensions.sqlite3Strlen30(zType);
+                    Debug.Assert(pCol.affinity == sqliteinth.SQLITE_AFF_NONE || pCol.affinity == build.sqlite3AffinityType(zType));
+                    zStmt.Append(zType);
+                    // memcpy( &zStmt[k], zType, len );
+                    k += len;
+                    Debug.Assert(k <= n);
+                }
+                zStmt.Append(zEnd);
+                //sqlite3_snprintf(n-k, zStmt[k], "%s", zEnd);
+                return zStmt.ToString();
+            }
+            ///<summary>
+            /// This routine is called to report the final ")" that terminates
+            /// a CREATE TABLE statement.
+            ///
+            /// The table structure that other action routines have been building
+            /// is added to the internal hash tables, assuming no errors have
+            /// occurred.
+            ///
+            /// An entry for the table is made in the master table on disk, unless
+            /// this is a temporary table or db.init.busy==1.  When db.init.busy==1
+            /// it means we are reading the sqlite_master table because we just
+            /// connected to the database or because the sqlite_master table has
+            /// recently changed, so the entry for this table already exists in
+            /// the sqlite_master table.  We do not want to create it again.
+            ///
+            /// If the pSelect argument is not NULL, it means that this routine
+            /// was called to create a table generated from a
+            /// "CREATE TABLE ... AS SELECT ..." statement.  The column names of
+            /// the new table will match the result set of the SELECT.
+            ///
+            ///</summary>
+            // OVERLOADS, so I don't need to rewrite parse.c
+            public static void sqlite3EndTable(this Parse pParse, Token pCons, Token pEnd, int null_4)
+            {
+                sqlite3EndTable(pParse, pCons, pEnd, null);
+            }
+            public static void sqlite3EndTable(this Parse pParse, int null_2, int null_3, Select pSelect)
+            {
+                sqlite3EndTable(pParse, null, null, pSelect);
+            }
+            public static void sqlite3EndTable(this Parse pParse,///Parse context 
+                Token pCons,///The ',' token after the last column defn. 
+                Token pEnd,///The final ')' token in the CREATE TABLE 
+                Select pSelect///Select from a "CREATE ... AS SELECT" 
+            )
+            {
+                if ((pEnd == null && pSelect == null)///
+                    ///|| db.mallocFailed != 0 
+                )
+                {
+                    return;
+                }
+
+                var pNewTable = pParse.pNewTable;
+                if (pNewTable == null)
+                    return;
+                sqlite3 db = pParse.db;
+                Debug.Assert(0 == db.init.busy || pSelect == null);
+#if !SQLITE_OMIT_CHECK
+                ///Resolve names in all CHECK constraint expressions.
+                if (pNewTable.pCheck != null)
+                {
+                    // memset(sNC, 0, sizeof(sNC));
+                    ///Fake SrcList for pParse.pNewTable 
+                    var sSrc = new SrcList()
+                    {
+                        // memset(sSrc, 0, sizeof(sSrc));
+                        nSrc = 1,
+                        a = new SrcList_item[] {
+                            new SrcList_item(){
+                                zName = pNewTable.zName,
+                                pTab = pNewTable,
+                                iCursor = -1,
+                            }
+                        }
+                    };
+
+                    ///Name context for pParse.pNewTable 
+                    var sNC = new NameContext()
+                    {
+                        pParse = pParse,
+                        pSrcList = sSrc,
+                        isCheck = 1
+                    };
+
+                    if (Sqlite3.ResolveExtensions.sqlite3ResolveExprNames(sNC, ref pNewTable.pCheck) != 0)
+                    {
+                        return;
+                    }
+                }
+#endif
+                ///If the db.init.busy is 1 it means we are reading the SQL off the
+                ///"sqlite_master" or "sqlite_temp_master" table on the disk.
+                ///So do not write to the disk again.  Extract the root page number
+                ///for the table from the db.init.newTnum field.  (The page number
+                ///should have been put there by the sqliteOpenCb routine.)
+                if (db.init.busy != 0)
+                {
+                    pNewTable.tnum = db.init.newTnum;
+                }
+
+                var iDb = Sqlite3.sqlite3SchemaToIndex(db, pNewTable.pSchema);
+
+                ///If not initializing, then create a record for the new table
+                ///in the SQLITE_MASTER table of the database.
+                ///
+                ///If this is a TEMPORARY table, write the entry into the auxiliary
+                ///file instead of into the main database file.
+                if (0 == db.init.busy)
+                {
+                    int n;
+                    String zType = "";
+                    ///"view" or "table" 
+                    String zType2 = "";
+                    ///"VIEW" or "TABLE" 
+                    String zStmt = "";
+                    ///Text of the CREATE TABLE or CREATE VIEW statement 
+                    var v = pParse.sqlite3GetVdbe();
+                    if (Sqlite3.NEVER(v == null))
+                        return;
+                    v.sqlite3VdbeAddOp1(OpCode.OP_Close, 0);
+                    ///Initialize zType for the new view or table.
+                    if (pNewTable.pSelect == null)
+                    {
+                        ///A regular table 
+                        zType = "table";
+                        zType2 = "TABLE";
+#if !SQLITE_OMIT_VIEW
+                    }
+                    else
+                    {
+                        ///A view 
+                        zType = "view";
+                        zType2 = "VIEW";
+#endif
+                    }
+                    ///If this is a CREATE TABLE xx AS SELECT ..., execute the SELECT
+                    ///
+                    ///statement to populate the new table. The root">page number for the</param>
+                    ///new table is in register pParse">>regRoot.</param>
+                    ///
+                    ///Once the SELECT has been coded by sqlite3Select(), it is in a">Once the SELECT has been coded by sqlite3Select(), it is in a</param>
+                    ///suitable state to query for the column names and types to be used">suitable state to query for the column names and types to be used</param>
+                    ///by the new table.">by the new table.</param>
+                    ///
+                    ///A shared-lock is not required to write to the new table,
+                    ///lock must have already been obtained to create it. 
+                    ///Since a schema-lock would be redundant.
+
+                    if (pSelect != null)
+                    {
+                        Debug.Assert(pParse.nTab == 1);
+                        v.sqlite3VdbeAddOp3(OpCode.OP_OpenWrite, 1, pParse.regRoot, iDb);
+                        v.sqlite3VdbeChangeP5(1);
+                        SelectDest dest = new SelectDest();
+                        pParse.nTab = 2;
+                        dest.Init(SelectResultType.Table, 1);
+                        Select.sqlite3Select(pParse, pSelect, ref dest);
+                        v.sqlite3VdbeAddOp1(OpCode.OP_Close, 1);
+                        if (pParse.nErr == 0)
+                        {
+                            var pSelTab = SelectMethods.sqlite3ResultSetOfSelect(pParse, pSelect);
+                            if (pSelTab == null)
+                                return;
+                            Debug.Assert(pNewTable.aCol == null);
+                            pNewTable.nCol = pSelTab.nCol;
+                            pNewTable.aCol = pSelTab.aCol;
+                            pSelTab.nCol = 0;
+                            pSelTab.aCol = null;
+                            TableBuilder.sqlite3DeleteTable(db, ref pSelTab);
+                        }
+                    }
+
+                    ///Compute the complete text of the CREATE statement 
+                    if (pSelect != null)
+                    {
+                        zStmt = createTableStmt(db, pNewTable);
+                    }
+                    else
+                    {
+                        n = (int)(pParse.sNameToken.zRestSql.Length - pEnd.zRestSql.Length) + 1;
+                        zStmt = io.sqlite3MPrintf(db, "CREATE %s %.*s", zType2, n, pParse.sNameToken.zRestSql);
+                    }
+                    ///A slot for the record has already been allocated in the
+                    ///SQLITE_MASTER table.  We just need to update that slot with all
+                    ///the information we've collected.
+                    build.sqlite3NestedParse(pParse, "UPDATE %Q.%s " + "SET type='%s', name=%Q, tbl_name=%Q, rootpage=#%d, sql=%Q " + "WHERE rowid=#%d", db.aDb[iDb].zName, sqliteinth.SCHEMA_TABLE(iDb), zType, pNewTable.zName, pNewTable.zName, pParse.regRoot, zStmt, pParse.regRowid);
+                    db.sqlite3DbFree(ref zStmt);
+                    build.sqlite3ChangeCookie(pParse, iDb);
+#if !SQLITE_OMIT_AUTOINCREMENT
+                    ///Check to see if we need to create an sqlite_sequence table for
+                    ///keeping track of autoincrement keys.
+                    if ((pNewTable.tabFlags & TableFlags.TF_Autoincrement) != 0)
+                    {
+                        Db pDb = db.aDb[iDb];
+                        Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
+                        if (pDb.pSchema.pSeqTab == null)
+                        {
+                            build.sqlite3NestedParse(pParse, "CREATE TABLE %Q.sqlite_sequence(name,seq)", pDb.zName);
+                        }
+                    }
+#endif
+                    ///Reparse everything to update our internal data structures 
+                    v.sqlite3VdbeAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "tbl_name='%q'", pNewTable.zName));
+                }
+                ///Add the table to the in-memory representation of the database.</param>
+                ///<param name=""></param>
+                if (db.init.busy != 0)
+                {
+                    Table pOld;
+                    Schema pSchema = pNewTable.pSchema;
+                    Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
+                    pOld = pSchema.tblHash.HashInsert(pNewTable.zName.sub(), pNewTable);
+                    if (pOld != null)
+                    {
+                        Debug.Assert(pNewTable == pOld);
+                        ///Malloc must have failed inside HashInsert() 
+                        //        db.mallocFailed = 1;
+                        return;
+                    }
+                    pParse.pNewTable = null;
+                    db.nTable++;
+                    db.flags |= SqliteFlags.SQLITE_InternChanges;
+#if !SQLITE_OMIT_ALTERTABLE
+                    if (pNewTable.pSelect == null)
+                    {
+                        string zName = pParse.sNameToken.zRestSql;
+                        int nName;
+                        Debug.Assert(pSelect == null && pCons != null && pEnd != null);
+                        if (pCons.zRestSql == null)
+                        {
+                            pCons = pEnd;
+                        }
+                        nName = zName.Length - pCons.zRestSql.Length;
+                        pNewTable.addColOffset = 13 + nName;
+                        // sqlite3Utf8CharLen(zName, nName);
+                    }
+#endif
+                }
+            }
             
         }
+
+
 }

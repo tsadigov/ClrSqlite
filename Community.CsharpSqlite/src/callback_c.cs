@@ -6,6 +6,9 @@ using u8=System.Byte;
 using u16=System.UInt16;
 namespace Community.CsharpSqlite {
 	using sqlite3_value=Mem;
+    using Community.CsharpSqlite.Parsing;
+    using Community.CsharpSqlite.builder;
+    using Community.CsharpSqlite.Metadata;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2005 May 23

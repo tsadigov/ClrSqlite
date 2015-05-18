@@ -12,6 +12,8 @@ using Pgno=System.UInt32;
 using sqlite3_int64=System.Int64;
 namespace Community.CsharpSqlite {
 	using sqlite3_value=Mem;
+    using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Metadata;
 	public partial class Sqlite3 {
 		///
 		///<summary>

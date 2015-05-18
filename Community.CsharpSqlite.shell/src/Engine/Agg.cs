@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Community.CsharpSqlite.Ast;
+using Community.CsharpSqlite.Metadata;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +9,8 @@ using u8 = System.Byte;
 
 namespace Community.CsharpSqlite
 {
+    namespace Engine { 
+    }
 
     ///<summary>
     /// An instance of this structure contains information needed to generate

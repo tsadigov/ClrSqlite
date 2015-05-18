@@ -4,6 +4,8 @@ using System.Text;
 using Bitmask=System.UInt64;
 using u8=System.Byte;
 using u32=System.UInt32;
+using Community.CsharpSqlite.Metadata;
+using Community.CsharpSqlite.Ast;
 namespace Community.CsharpSqlite
 {
         public class fkeyc

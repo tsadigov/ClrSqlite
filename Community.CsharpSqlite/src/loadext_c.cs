@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using HANDLE = System.IntPtr;
 using System.Text;
+using Community.CsharpSqlite.Os;
 
 namespace Community.CsharpSqlite
 {

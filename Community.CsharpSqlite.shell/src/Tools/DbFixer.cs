@@ -12,6 +12,8 @@ namespace Community.CsharpSqlite
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     
     using System.Diagnostics;
+    using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.Metadata;
 
     ///<summary>
     /// The following structure contains information used by the sqliteFix...

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Community.CsharpSqlite;
+using System.Linq;
 
 using sqlite3_backup = Community.CsharpSqlite.Sqlite3.sqlite3_backup;
 
@@ -10,6 +11,8 @@ using sqlite3_int64 = System.Int64;
 using sqlite3_stmt = Community.CsharpSqlite.Sqlite3.Vdbe;
 using sqlite3_value = Community.CsharpSqlite.Mem;
 using va_list = System.Object;
+using System.Collections.Generic;
+using Community.CsharpSqlite.Ast;
 
 class Shell
 {
@@ -2666,12 +2669,15 @@ enableTimer = booleanValue(azArg[1]);
 
         int leftat = 0;
         int red = 0;
+        Console.Clear();
         do
         {
             red = testtokenize(zSql, leftat);
             leftat += red;
         }
         while (leftat < zSql.Length);
+        Console.CursorLeft = 1;
+        Console.CursorTop += 3;
 
     }
 
@@ -2717,16 +2723,9 @@ enableTimer = booleanValue(azArg[1]);
 ///
 ///</summary>
 
-	static void process_sqliterc (callback_data p, ///
-///<summary>
-///Configuration data 
-///</summary>
-
-	string sqliterc_override///
-///<summary>
-///Name of config file. null; to use default 
-///</summary>
-
+	static void process_sqliterc (
+        callback_data p, ///Configuration data 
+	    string sqliterc_override///Name of config file. null; to use default 
 	)
 	{
 		string home_dir = null;
@@ -3060,12 +3059,63 @@ return 0;
 		return rc;
 	}
 
+
+    static List<Tuple<List<TokenType>, ConsoleColor>> colors = new List<Tuple<List<TokenType>, ConsoleColor>>(){
+        new Tuple<List<TokenType>,ConsoleColor>(
+            new List<TokenType>{TokenType.TK_SELECT,TokenType.TK_FROM,TokenType.TK_WHERE,TokenType.TK_OR,TokenType.TK_ORDER,TokenType.TK_DISTINCT},
+            ConsoleColor.Blue
+        )
+        ,
+        new Tuple<List<TokenType>,ConsoleColor>(
+            new List<TokenType>{TokenType.TK_SEMI,TokenType.TK_UMINUS,TokenType.TK_COMMA},
+            ConsoleColor.Red
+        )
+        ,
+        new Tuple<List<TokenType>,ConsoleColor>(
+            new List<TokenType>{TokenType.TK_INTEGER,TokenType.TK_STRING,TokenType.TK_TABLE},
+            ConsoleColor.Cyan
+        )
+        ,
+        new Tuple<List<TokenType>,ConsoleColor>(
+            new List<TokenType>{TokenType.TK_ID,TokenType.TK_STAR},
+            ConsoleColor.Yellow
+        )
+        ,
+        new Tuple<List<TokenType>,ConsoleColor>(
+            Enum.GetValues(typeof(TokenType)).Cast<TokenType>().ToList(),
+            ConsoleColor.White
+        )
+    };
+
+    static string pad(String str, int length) {
+        var left=(length - str.Length) / 2;
+        var right = length-left-str.Length;
+        String s = new String(' ', left) + str + new String(' ', right);
+        return s;
+    }
+    static void print(TokenType tk,String tkn) {
+        var tkString = (tk == TokenType.TK_SPACE ? "." : tk.ToString().Replace("TK_", String.Empty));
+        int length = Math.Max(tkn.Length, tkString.Length + 2);
+
+        var clr = Console.ForegroundColor;
+        Console.ForegroundColor = colors.First(x => x.Item1.Contains(tk)).Item2;
+        var left = Console.CursorLeft;
+        Console.Write(pad(tkn.ToString(), length));
+        Console.CursorLeft = left;
+        Console.CursorTop += 2;
+        Console.CursorLeft = left;
+        //Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.Write(pad(tkString, length));
+        Console.CursorTop -= 2;
+        Console.ForegroundColor = clr;        
+    }
     private static int testtokenize(StringBuilder zFirstCmd,int leftAt)
     {
         TokenType tk = new TokenType();
         var result = Sqlite3.Lexer.sqlite3GetToken(zFirstCmd.ToString(), leftAt, ref tk);
         var tkn=zFirstCmd.ToString().Substring(leftAt, result);
-        Console.WriteLine("\tr: " + result + "   \ttk:" + tk+"  \t"+tkn);
+        print(tk, tkn);
+
         return result;
     }
 

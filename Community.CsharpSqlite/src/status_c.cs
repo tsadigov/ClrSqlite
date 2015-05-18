@@ -2,7 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Text;
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Mem;
+    using Community.CsharpSqlite.builder;
+    using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Parsing;
+    using sqlite3_value = Mem;
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -269,9 +272,12 @@ namespace Community.CsharpSqlite {
 				///Used to accumulate return value 
 				///</summary>
 				//db.pnBytesFreed = nByte;
-				for(pVdbe=db.pVdbe;pVdbe!=null;pVdbe=pVdbe.pNext) {
+                db.pVdbe.linkedList().ForEach(itr =>
+                {
+                    pVdbe = itr;
                     vdbeaux.sqlite3VdbeDeleteObject(db, ref pVdbe);
-				}
+                });
+				
 				db.pnBytesFreed=0;
 				pHighwater=0;
 				pCurrent=nByte;

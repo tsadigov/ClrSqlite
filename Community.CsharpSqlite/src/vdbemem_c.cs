@@ -12,6 +12,8 @@ namespace Community.CsharpSqlite
     using System.Globalization;
     using BtCursor = Sqlite3.BtCursor;
     using _Custom = Sqlite3._Custom;
+    using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.Metadata;
 
     public static class MemExtensions {
         ///<summary>

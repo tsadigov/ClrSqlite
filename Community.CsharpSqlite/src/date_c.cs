@@ -9,6 +9,7 @@ using u64 = System.UInt64;
 namespace Community.CsharpSqlite
 {
 	using sqlite3_value = Mem;
+    using Community.CsharpSqlite.Metadata;
 
     #if !SQLITE_OMIT_DATETIME_FUNCS
 		///<summary>

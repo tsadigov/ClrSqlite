@@ -10,6 +10,8 @@ using u32 = System.UInt32;
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar = System.Int16;
 using System.Diagnostics;
+using Community.CsharpSqlite.Ast;
+using Community.CsharpSqlite.Metadata;
 #else
 using ynVar = System.Int32; 
 #endif

@@ -13,6 +13,7 @@ namespace Community.CsharpSqlite
 {
     using System.Text;
     using DbPage = PgHdr;
+    using Community.CsharpSqlite.Os;
 
     public partial class Sqlite3
     {

@@ -301,7 +301,7 @@
       <Link>Community.CsharpSqlite\wal_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\where_c.cs">
-      <Link>Community.CsharpSqlite\where_c.cs</Link>
+      <Link>src\Ast\where_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\_Custom.cs">
       <Link>Community.CsharpSqlite\_Custom.cs</Link>
@@ -324,9 +324,10 @@
     <Compile Include="src\BtCursor.cs" />
     <Compile Include="src\BTree.cs" />
     <Compile Include="src\BtreeExtensions.cs" />
-    <Compile Include="src\build\IndexBuilder.cs" />
-    <Compile Include="src\build\TableBuilder.cs" />
-    <Compile Include="src\build\TiggerBuilder.cs" />
+    <Compile Include="src\builder\DbBuilder.cs" />
+    <Compile Include="src\builder\IndexBuilder.cs" />
+    <Compile Include="src\builder\TableBuilder.cs" />
+    <Compile Include="src\builder\TiggerBuilder.cs" />
     <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Db.cs" />
     <Compile Include="src\Engine\Agg.cs" />
@@ -346,6 +347,7 @@
     <Compile Include="src\Engine\Op\Logical.cs" />
     <Compile Include="src\Engine\Op\Math.cs" />
     <Compile Include="src\Engine\Op\Schema.cs" />
+    <Compile Include="src\Engine\P4Usage.cs" />
     <Compile Include="src\Engine\Savepoint.cs" />
     <Compile Include="src\Engine\SubProgram.cs" />
     <Compile Include="src\Engine\Vdbe.cs" />
@@ -365,8 +367,9 @@
     <Compile Include="src\Page\Pager.cs" />
     <Compile Include="src\Page\PagerSavepoint.cs" />
     <Compile Include="src\ParseExtensions.cs" />
-    <Compile Include="src\Parse\NameContext.cs" />
-    <Compile Include="src\Parse\ResolveExtensions.cs" />
+    <Compile Include="src\Parsing\NameContext.cs" />
+    <Compile Include="src\Parsing\ResolveExtensions.cs" />
+    <Compile Include="src\Parsing\TriggerParser.cs" />
     <Compile Include="src\Schema\AutoincInfo.cs" />
     <Compile Include="src\Schema\Column.cs" />
     <Compile Include="src\Schema\FKey.cs" />

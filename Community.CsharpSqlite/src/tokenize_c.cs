@@ -1,3 +1,4 @@
+using Community.CsharpSqlite.Ast;
 using System;
 using System.Diagnostics;
 using System.Text;

@@ -22,6 +22,7 @@ namespace Community.CsharpSqlite
     using codec_ctx=Sqlite3.crypto.codec_ctx;
     using Btree = Sqlite3.Btree;
     using sqlite3_api_routines=Sqlite3.sqlite3_api_routines;
+    using Community.CsharpSqlite.Ast;
 
 
 

@@ -58,49 +58,46 @@ namespace Community.CsharpSqlite
     /// A sub-routine used to implement a trigger program.
     ///
     ///</summary>
-    public class SubProgram
+    public class SubProgram : ILinkedListNode<SubProgram>
     {
-        public VdbeOp[] aOp;
+        public VdbeOp[] aOp;// { get; set; }
 
         ///
         ///<summary>
         ///</summary>
         ///<param name="Array of opcodes for sub">program </param>
 
-        public int nOp;
+        public int nOp;// { get; set; }
 
         ///
         ///<summary>
         ///Elements in aOp[] 
         ///</summary>
 
-        public int nMem;
+        public int nMem { get; set; }
 
         ///
         ///<summary>
         ///Number of memory cells required 
         ///</summary>
 
-        public int nCsr;
 
-        ///
         ///<summary>
         ///Number of cursors required 
         ///</summary>
+        public int nCsr { get; set; }
 
-        public int token;
-
-        ///
         ///<summary>
         ///id that may be used to recursive triggers 
         ///</summary>
+        public int token { get; set; }
 
-        public SubProgram pNext;
-        ///
+
         ///<summary>
         ///</summary>
         ///<param name="Next sub">program already visited </param>
-
+        public SubProgram pNext { get; set; }
+        
     };
 
 }

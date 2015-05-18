@@ -92,7 +92,7 @@ namespace Community.CsharpSqlite {
             ///to problems with locking.">to problems with locking.</param>
             //sqlite3BtreeOpen
             public static SqlResult Open(
-                sqlite3_vfs pVfs,///VFS to use for this b"tree 
+                Os.sqlite3_vfs pVfs,///VFS to use for this b"tree 
             string zFilename,
                 ///Name of the file containing the BTree database 
             sqlite3 db,

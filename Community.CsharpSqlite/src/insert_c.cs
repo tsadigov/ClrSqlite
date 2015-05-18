@@ -4,9 +4,12 @@ using System.Text;
 using Pgno = System.UInt32;
 using u8 = System.Byte;
 using u32 = System.UInt32;
+using Community.CsharpSqlite.Ast;
 
 namespace Community.CsharpSqlite
 {
+    using Parsing;
+    using Community.CsharpSqlite.builder;
 	public partial class Sqlite3
 	{
 		///<summary>
@@ -948,12 +951,12 @@ namespace Community.CsharpSqlite
 				Debug.Assert (pSrcIdx != null);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Close, iSrc, 0);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Close, iDest, 0);
-				pKey = build.sqlite3IndexKeyinfo (pParse, pSrcIdx);
+                pKey = pSrcIdx.sqlite3IndexKeyinfo(pParse);
 				v.sqlite3VdbeAddOp4 ( OpCode.OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pSrcIdx.zName );
 #endif
-				pKey = build.sqlite3IndexKeyinfo (pParse, pDestIdx);
+                pKey = pDestIdx.sqlite3IndexKeyinfo(pParse);
                 v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey, P4Usage.P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pDestIdx.zName );

@@ -25,6 +25,7 @@ namespace Community.CsharpSqlite {
 	using unsigned=System.UInt64;
 	using Pgno=System.UInt32;
 	using sqlite3_value=Mem;
+    using System.Linq;
 	#if !SQLITE_MAX_VARIABLE_NUMBER
 	using ynVar=System.Int16;
 	#else
@@ -41,6 +42,11 @@ using yDbMask = System.Int64;
 	//  typedef unsigned int yDbMask;
 	using yDbMask=System.Int32;
 using System.Collections.Generic;
+    using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.Parsing;
+    using Community.CsharpSqlite.builder;
+    using Community.CsharpSqlite.Metadata;
 	#endif
 	public partial class Sqlite3 {
 		public class Parse {
@@ -1429,7 +1435,7 @@ return;
 					if(pOnlyIdx!=null&&pOnlyIdx!=pIdx)
 						continue;
 					nCol=pIdx.nColumn;
-					pKey=build.sqlite3IndexKeyinfo(this,pIdx);
+                    pKey = pIdx.sqlite3IndexKeyinfo(this);
 					if(iMem+1+(nCol*2)>this.nMem) {
 						this.nMem=iMem+1+(nCol*2);
 					}
@@ -1763,7 +1769,7 @@ return;
 						///<summary>
 						///Form 2:  Analyze the database or table named 
 						///</summary>
-						iDb=build.sqlite3FindDb(db,pName1);
+						iDb=db.sqlite3FindDb(pName1);
 						if(iDb>=0) {
 							this.analyzeDatabase(iDb);
 						}
@@ -2281,7 +2287,7 @@ goto attach_end;
 						int nCol=pFKey.nCol;
 						int regTemp=this.sqlite3GetTempRange(nCol);
 						int regRec=this.sqlite3GetTempReg();
-						KeyInfo pKey=build.sqlite3IndexKeyinfo(this,pIdx);
+                        KeyInfo pKey = pIdx.sqlite3IndexKeyinfo(this);
 						v.sqlite3VdbeAddOp3( OpCode.OP_OpenRead,iCur,pIdx.tnum,iDb);
 						v.sqlite3VdbeChangeP4(-1,pKey, P4Usage.P4_KEYINFO_HANDOFF);
 						for(i=0;i<nCol;i++) {
@@ -3348,6 +3354,67 @@ goto attach_end;
                     yield return this.sLastToken;
                 }
             }
+
+
+
+            static List<Tuple<List<TokenType>, ConsoleColor>> colors = new List<Tuple<List<TokenType>, ConsoleColor>>(){
+        new Tuple<List<TokenType>,ConsoleColor>(
+            new List<TokenType>{TokenType.TK_SELECT,TokenType.TK_FROM,TokenType.TK_WHERE,TokenType.TK_OR,TokenType.TK_ORDER,TokenType.TK_DISTINCT,TokenType.TK_CREATE,TokenType.TK_TABLE},
+            ConsoleColor.Cyan
+        )
+        ,
+        new Tuple<List<TokenType>,ConsoleColor>(
+            new List<TokenType>{TokenType.TK_SEMI,TokenType.TK_UMINUS,TokenType.TK_COMMA,TokenType.TK_LP,TokenType.TK_RP},
+            ConsoleColor.Red
+        )
+        ,
+        new Tuple<List<TokenType>,ConsoleColor>(
+            new List<TokenType>{TokenType.TK_INTEGER,TokenType.TK_STRING},
+            ConsoleColor.White
+        )
+        ,
+        new Tuple<List<TokenType>,ConsoleColor>(
+            new List<TokenType>{TokenType.TK_ID,TokenType.TK_STAR},
+            ConsoleColor.Yellow
+        )
+        ,
+        new Tuple<List<TokenType>,ConsoleColor>(
+            Enum.GetValues(typeof(TokenType)).Cast<TokenType>().ToList(),
+            ConsoleColor.Gray
+        )
+    };
+            static string pad(String str, int length)
+            {
+                var left = (length - str.Length) / 2;
+                var right = length - left - str.Length;
+                String s = new String(' ', left) + str + new String(' ', right);
+                return s;
+            }
+
+            static void print(Token token)
+            {
+                TokenType tk = token.TokenType;
+                String tkn = token.Text;
+                var tkString = (tk == TokenType.TK_SPACE ? "." : tk.ToString().Replace("TK_", String.Empty));
+                int length = Math.Max(tkn.Length, tkString.Length + 2);
+                if ((length + Console.CursorLeft) >= Console.BufferWidth) {
+                    Console.CursorLeft = 0;
+                    Console.CursorTop += 3;
+                    Console.Write(">");
+                }
+                var clr = Console.ForegroundColor;
+                Console.ForegroundColor = colors.First(x => x.Item1.Contains(tk)).Item2;
+                var left = Console.CursorLeft;
+                Console.Write(pad(tkn.ToString(), length).ToLower());
+                Console.CursorLeft = left;
+                Console.CursorTop += 2;
+                Console.CursorLeft = left;
+                //Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write(pad(tkString, length).ToLower());
+                Console.CursorTop -= 2;
+                Console.ForegroundColor = clr;
+            }
+
 			public SqlResult sqlite3RunParser(string zSql,ref string pzErrMsg) {
 				Log.WriteHeader("sqlite3RunParser:"+zSql);
 				//Log.Indent();
@@ -3377,8 +3444,15 @@ goto attach_end;
 				if(db.lookaside.pStart!=0)
 					db.lookaside.bEnabled=1;
 
+
+                Console.Clear();
+                var tokens = lex(zSql).ToArray();
+                tokens.ForEach(itr => print(itr));
+                Console.CursorTop+=3;
+                Console.CursorLeft = 0;
+                Console.ReadKey();
                 int i = 0;
-				foreach(Token token in lex(zSql)){
+				foreach(Token token in tokens){
                     i += token.Length;
 					switch(token.TokenType) {
 					case TokenType.TK_SPACE: {
@@ -5034,7 +5108,7 @@ isView = false;
 				Debug.Assert(v!=null);
 				this.sqlite3OpenTable(baseCur,iDb,pTab,op);
 				for(i=1,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,i++) {
-					KeyInfo pKey=build.sqlite3IndexKeyinfo(this,pIdx);
+                    KeyInfo pKey = pIdx.sqlite3IndexKeyinfo(this);
 					Debug.Assert(pIdx.pSchema==pTab.pSchema);
 					v.sqlite3VdbeAddOp4(op,i+baseCur,pIdx.tnum,iDb,pKey, P4Usage.P4_KEYINFO_HANDOFF);
 					#if SQLITE_DEBUG
@@ -5603,7 +5677,7 @@ aXRef[j] = -1;
 					}
 					for(i=0,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,i++) {
 						if(openAll||aRegIdx[i]>0) {
-							KeyInfo pKey=build.sqlite3IndexKeyinfo(this,pIdx);
+                            KeyInfo pKey = pIdx.sqlite3IndexKeyinfo(this);
                             v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iCur + i + 1, pIdx.tnum, iDb, pKey, P4Usage.P4_KEYINFO_HANDOFF);
 							Debug.Assert(this.nTab>iCur+i+1);
 						}
@@ -9187,7 +9261,7 @@ return;
 				///<summary>
 				///Create the automatic index 
 				///</summary>
-				pKeyinfo=build.sqlite3IndexKeyinfo(this,pIdx);
+                pKeyinfo = pIdx.sqlite3IndexKeyinfo(this);
 				Debug.Assert(pLevel.iIdxCur>=0);
 				v.sqlite3VdbeAddOp4( OpCode.OP_OpenAutoindex,pLevel.iIdxCur,nColumn+1,0,pKeyinfo, P4Usage.P4_KEYINFO_HANDOFF);
 				v.VdbeComment("for %s",pTable.zName);
@@ -11360,7 +11434,7 @@ range_est_fallback:
 						#endif
 						if((pLevel.plan.wsFlags&wherec.WHERE_INDEXED)!=0) {
 							Index pIx=pLevel.plan.u.pIdx;
-							KeyInfo pKey=build.sqlite3IndexKeyinfo(this,pIx);
+                            KeyInfo pKey = pIx.sqlite3IndexKeyinfo(this);
 							int iIdxCur=pLevel.iIdxCur;
 							Debug.Assert(pIx.pSchema==pTab.pSchema);
 							Debug.Assert(iIdxCur>=0);
@@ -11820,7 +11894,7 @@ range_est_fallback:
 								int iMem=++this.nMem;
 								int iAddr;
 								KeyInfo pKey;
-								pKey=build.sqlite3IndexKeyinfo(this,pIdx);
+                                pKey = pIdx.sqlite3IndexKeyinfo(this);
 								iAddr=v.sqlite3VdbeAddOp1(OpCode.OP_If,iMem);
 								v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,iMem);
 								v.sqlite3VdbeAddOp4( OpCode.OP_OpenRead,iTab,pIdx.tnum,iDb,pKey, P4Usage.P4_KEYINFO_HANDOFF);

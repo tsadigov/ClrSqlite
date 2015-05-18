@@ -33,6 +33,7 @@ namespace Community.CsharpSqlite {
 	using sqlite3_value=Mem;
 	using System.Collections.Generic;
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Metadata;
 
 
     ///

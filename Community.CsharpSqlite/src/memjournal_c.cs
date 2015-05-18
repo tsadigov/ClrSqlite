@@ -9,8 +9,9 @@ using u32 = System.UInt32;
 namespace Community.CsharpSqlite
 {
 	using sqlite3_int64 = System.Int64;
-	using MemJournal = sqlite3_file;
-
+	using MemJournal = Os.sqlite3_file;
+    using Os;
+    
 
     ///<summary>
     /// The rollback journal is composed of a linked list of these structures.

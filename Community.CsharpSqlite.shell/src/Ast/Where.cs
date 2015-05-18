@@ -24,6 +24,7 @@ namespace Community.CsharpSqlite {
     
     
     using _Custom = Sqlite3._Custom;
+    using Community.CsharpSqlite.Ast;
 
 		///<summary>
 		/// A WherePlan object holds information that describes a lookup

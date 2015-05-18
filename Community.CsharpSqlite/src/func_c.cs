@@ -9,6 +9,8 @@ using u64=System.UInt64;
 namespace Community.CsharpSqlite {
 	using sqlite3_value=Mem;
 	using sqlite_int64=System.Int64;
+    using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.Metadata;
     public partial class Sqlite3
     {
         public class func

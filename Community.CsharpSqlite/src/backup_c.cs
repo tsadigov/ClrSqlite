@@ -8,6 +8,8 @@ using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
 	using sqlite3_int64=System.Int64;
 	using DbPage=PgHdr;
+    using Os;
+    using builder;
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -628,7 +630,7 @@ namespace Community.CsharpSqlite {
 		/// error message to pErrorDb.
 		///</summary>
 		static Btree findBtree(sqlite3 pErrorDb,sqlite3 pDb,string zDb) {
-			int i=build.sqlite3FindDbName(pDb,zDb);
+            int i = pDb.sqlite3FindDbName(zDb);
 			if(i==1) {
 				Parse pParse;
 				var rc=(SqlResult)0;

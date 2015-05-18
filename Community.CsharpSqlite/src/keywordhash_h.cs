@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System;
+using Community.CsharpSqlite.Ast;
 
 namespace Community.CsharpSqlite
 {

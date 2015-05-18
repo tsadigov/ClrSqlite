@@ -6,6 +6,8 @@ using u8=System.Byte;
 using Pgno=System.UInt32;
 using sqlite3_int64=System.Int64;
 using System.Globalization;
+using Community.CsharpSqlite.builder;
+using Community.CsharpSqlite.Ast;
 namespace Community.CsharpSqlite {
 	public partial class Sqlite3 {
 		///<summary>

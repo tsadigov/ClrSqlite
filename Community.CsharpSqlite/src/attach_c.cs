@@ -5,6 +5,8 @@ using u8=System.Byte;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite {
 	using sqlite3_value=Mem;
+    using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Metadata;
 	public partial class Sqlite3 {
 		#if !SQLITE_OMIT_ATTACH
 		///<summary>

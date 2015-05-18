@@ -16,6 +16,8 @@ namespace Community.CsharpSqlite {
     using ResolveExtensions = Sqlite3.ResolveExtensions;
     using System.Collections.Generic;
     using System.Linq;
+    using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.Metadata;
 
         public class SelectMethods
         {

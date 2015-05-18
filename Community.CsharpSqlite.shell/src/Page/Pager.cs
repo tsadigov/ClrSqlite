@@ -17,6 +17,7 @@ namespace Community.CsharpSqlite
     using DbPage = PgHdr;
     using System.Diagnostics;
     using codec_ctx = Sqlite3.crypto.codec_ctx;
+    using Community.CsharpSqlite.Os;
 
     #region enum
 
@@ -4843,7 +4844,7 @@ pPager.pWal = 0;
                                 ///True if journal file exists 
                                 ///</summary>
 
-                                rc = os.sqlite3OsAccess(pVfs, this.zJournal, SQLITE_ACCESS_EXISTS, ref bExists);
+                                rc = os.sqlite3OsAccess(pVfs, this.zJournal, Sqlite3.SQLITE_ACCESS_EXISTS, ref bExists);
                                 if (rc == SqlResult.SQLITE_OK && bExists != 0)
                                 {
                                     int fout = 0;

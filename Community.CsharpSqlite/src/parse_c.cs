@@ -6,7 +6,11 @@ using u8=System.Byte;
 using YYCODETYPE=System.Int32;
 using YYACTIONTYPE=System.Int32;
 namespace Community.CsharpSqlite {
-	using sqlite3ParserTOKENTYPE=Token;
+	using sqlite3ParserTOKENTYPE=Ast.Token;
+    using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.Parsing;
+    using Community.CsharpSqlite.builder;
+    using Community.CsharpSqlite.Metadata;
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -9086,7 +9090,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 160 "parse.y"
 			{
-				build.sqlite3EndTable(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token,0);
+				pParse.sqlite3EndTable(yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token,0);
 			}
 			//#line 2223 "parse.c"
 			break;
@@ -9097,7 +9101,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 163 "parse.y"
 			{
-				build.sqlite3EndTable(pParse,0,0,yymsp[0].minor.yy387);
+                pParse.sqlite3EndTable(0, 0, yymsp[0].minor.yy387);
 				SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387);
 			}
 			//#line 2231 "parse.c"
@@ -9393,7 +9397,7 @@ return yy_default[stateno];
 			///ccons ::= UNIQUE onconf 
 			//#line 297 "parse.y"
 			{
-				build.sqlite3CreateIndex( pParse,0,0,0,0,(OnConstraintError)yymsp[0].minor.yy4,0,0,(SortOrder)0,0);
+                pParse.sqlite3CreateIndex(0, 0, 0, 0, (OnConstraintError)yymsp[0].minor.yy4, 0, 0, (SortOrder)0, 0);
 			}
 			//#line 2345 "parse.c"
 			break;
@@ -9648,7 +9652,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 348 "parse.y"
 			{
-				build.sqlite3CreateIndex( pParse,0,0,0,yymsp[-2].minor.yy322, (OnConstraintError)yymsp[0].minor.yy4,0,0,(SortOrder)0,0);
+                pParse.sqlite3CreateIndex(0, 0, 0, yymsp[-2].minor.yy322, (OnConstraintError)yymsp[0].minor.yy4, 0, 0, (SortOrder)0, 0);
 			}
 			//#line 2444 "parse.c"
 			break;
@@ -11130,7 +11134,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1090 "parse.y"
 			{
-				build.sqlite3CreateIndex(pParse,yymsp[-6].minor.yy0Token,yymsp[-5].minor.yy0Token,build.sqlite3SrcListAppend(pParse.db,0,yymsp[-3].minor.yy0Token,0),yymsp[-1].minor.yy322, (OnConstraintError)yymsp[-9].minor.yy4,yymsp[-10].minor.yy0Token,yymsp[0].minor.yy0Token,SortOrder.SQLITE_SO_ASC,yymsp[-7].minor.yy4);
+                pParse.sqlite3CreateIndex(yymsp[-6].minor.yy0Token, yymsp[-5].minor.yy0Token, build.sqlite3SrcListAppend(pParse.db, 0, yymsp[-3].minor.yy0Token, 0), yymsp[-1].minor.yy322, (OnConstraintError)yymsp[-9].minor.yy4, yymsp[-10].minor.yy0Token, yymsp[0].minor.yy0Token, SortOrder.SQLITE_SO_ASC, yymsp[-7].minor.yy4);
 			}
 			//#line 3216 "parse.c"
 			break;
@@ -11640,7 +11644,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1328 "parse.y"
 			{
-				build.sqlite3Reindex(pParse,0,0);
+                pParse.sqlite3Reindex(0, 0);
 			}
 			//#line 3487 "parse.c"
 			break;
@@ -11651,7 +11655,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1329 "parse.y"
 			{
-				build.sqlite3Reindex(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token);
+                pParse.sqlite3Reindex(yymsp[-1].minor.yy0Token, yymsp[0].minor.yy0Token);
 			}
 			//#line 3492 "parse.c"
 			break;

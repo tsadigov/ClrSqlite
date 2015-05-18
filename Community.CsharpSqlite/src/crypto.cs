@@ -10,6 +10,7 @@ namespace Community.CsharpSqlite
     using sqlite3_stmt = Sqlite3.Vdbe;
     using System.Security.Cryptography;
     using System.IO;
+    using Community.CsharpSqlite.Os;
     public partial class Sqlite3
     {
         public class crypto

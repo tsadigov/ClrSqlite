@@ -39,6 +39,8 @@ namespace Community.CsharpSqlite
     using Btree = Sqlite3.Btree;
     using os = Sqlite3.os;
     using BtCursor = Sqlite3.BtCursor;
+    using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Metadata;
     //public partial class Sqlite3
     //{
 
