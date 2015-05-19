@@ -5,7 +5,7 @@ using u32 = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
 
 	public partial class Sqlite3
 	{

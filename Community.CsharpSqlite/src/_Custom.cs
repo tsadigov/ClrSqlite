@@ -22,8 +22,10 @@ using time_t = System.Int64;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
     using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
 
     public partial class Sqlite3
     {

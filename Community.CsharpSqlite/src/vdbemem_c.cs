@@ -8,12 +8,14 @@ using u32=System.UInt32;
 using Community.CsharpSqlite;
 namespace Community.CsharpSqlite
 {
-    using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
     using System.Globalization;
     using BtCursor = Sqlite3.BtCursor;
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
 
     public static class MemExtensions {
         ///<summary>

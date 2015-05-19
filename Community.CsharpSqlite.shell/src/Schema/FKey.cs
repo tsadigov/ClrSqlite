@@ -22,7 +22,7 @@ using Community.CsharpSqlite.Metadata;
 using ynVar = System.Int32; 
 #endif
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Metadata
 {
 
 

@@ -18,12 +18,13 @@ namespace Community.CsharpSqlite
 	using DbPage = PgHdr;
 	using sqlite3_pcache = Sqlite3.PCache1;
 	using sqlite3_stmt = Sqlite3.Vdbe;
-	using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
     using codec_ctx=Sqlite3.crypto.codec_ctx;
     using Btree = Sqlite3.Btree;
     using sqlite3_api_routines=Sqlite3.sqlite3_api_routines;
     using Community.CsharpSqlite.Ast;
-
+    using Metadata;
+    using Community.CsharpSqlite.Engine;
 
 
 

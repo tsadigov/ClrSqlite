@@ -6,7 +6,7 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
 	using sqlite3_pcache = Sqlite3.PCache1;
 
     public partial class Sqlite3

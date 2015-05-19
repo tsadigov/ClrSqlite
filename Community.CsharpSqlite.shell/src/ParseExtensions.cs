@@ -7,6 +7,8 @@ namespace Community.CsharpSqlite
 {
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     using Parse=Community.CsharpSqlite.Sqlite3.Parse;
+    using Metadata;
+    using Community.CsharpSqlite.Os;
     
 
         public static class ParserExtensions {

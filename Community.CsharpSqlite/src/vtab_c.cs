@@ -10,6 +10,7 @@ namespace Community.CsharpSqlite
     using _Custom = Sqlite3._Custom;
     using Parse = Sqlite3.Parse;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Os;
     
         //#include "sqliteInt.h"
         ///<summary>

@@ -12,7 +12,7 @@ using ynVar=System.Int16;
 using ynVar = System.Int32; 
 #endif
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Mem;
+    using sqlite3_value = Engine.Mem;
 	public partial class Sqlite3 {
 		
 		

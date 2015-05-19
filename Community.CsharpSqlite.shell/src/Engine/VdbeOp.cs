@@ -7,10 +7,11 @@ namespace Community.CsharpSqlite
 {
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     
-    using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Engine;
 
 	///<summary>
 	/// A single instruction of the virtual machine has an opcode

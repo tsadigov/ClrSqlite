@@ -371,6 +371,7 @@
     <Compile Include="src\Parsing\ResolveExtensions.cs" />
     <Compile Include="src\Parsing\TriggerParser.cs" />
     <Compile Include="src\Schema\AutoincInfo.cs" />
+    <Compile Include="src\Schema\ColName.cs" />
     <Compile Include="src\Schema\Column.cs" />
     <Compile Include="src\Schema\FKey.cs" />
     <Compile Include="src\Schema\Func.cs" />

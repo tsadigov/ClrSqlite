@@ -10,6 +10,8 @@ namespace Community.CsharpSqlite
 	using System;
     using BtCursor=Sqlite3.BtCursor;
     using _Custom = Sqlite3._Custom;
+    using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
    
         public class malloc_cs
         {

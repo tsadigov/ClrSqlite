@@ -9,11 +9,13 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
+    using Metadata;
 	using sqlite_int64 = System.Int64;
 	using System.Globalization;
     using System.Collections.Generic;
     using _Custom=Sqlite3._Custom;
     using Parse = Sqlite3.Parse;
+    using Community.CsharpSqlite.Os;
 
     public static partial class StringExtensions
 	{

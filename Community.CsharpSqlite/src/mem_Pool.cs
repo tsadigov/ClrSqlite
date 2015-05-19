@@ -9,6 +9,7 @@ namespace Community.CsharpSqlite
 {
     using BtCursor = Sqlite3.BtCursor;
     using sqlite3_mem_methods = Sqlite3.sqlite3_mem_methods;
+    using Community.CsharpSqlite.Engine;
         public class mempoolMethods
         {
 

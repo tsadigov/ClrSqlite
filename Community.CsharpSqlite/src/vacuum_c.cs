@@ -4,7 +4,8 @@ using System.Text;
 using Pgno=System.UInt32;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite {
-	using sqlite3_stmt=Sqlite3.Vdbe;
+    using Community.CsharpSqlite.Engine;
+    using sqlite3_stmt = Sqlite3.Vdbe;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2003 April 6

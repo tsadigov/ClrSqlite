@@ -5,8 +5,10 @@ using System.Text;
 namespace Community.CsharpSqlite
 {
     using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Metadata;
-    using sqlite3_value = Mem;
+    using Community.CsharpSqlite.Os;
+    using sqlite3_value = Engine.Mem;
 
     public partial class Sqlite3
     {

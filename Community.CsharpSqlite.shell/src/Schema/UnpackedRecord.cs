@@ -24,7 +24,8 @@ using ynVar = System.Int32;
 namespace Community.CsharpSqlite
 {
 
-
+    using Metadata;
+    using Community.CsharpSqlite.Engine;
 
 
         ///
@@ -68,7 +69,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Used by UNPACKED_PREFIX_SEARCH 
             ///</summary>
-            public Community.CsharpSqlite.Mem[] aMem;
+            public Mem[] aMem;
             ///
             ///<summary>
             ///Values 

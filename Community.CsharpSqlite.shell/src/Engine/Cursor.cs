@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Community.CsharpSqlite
 {
+    using Metadata;
 
 
     ///<summary>

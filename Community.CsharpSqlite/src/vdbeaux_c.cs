@@ -30,7 +30,7 @@ namespace Community.CsharpSqlite
 {
     using Op = VdbeOp;
     using sqlite3_stmt = Sqlite3.Vdbe;
-    using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
     using Vdbe = Sqlite3.Vdbe;
     using System;
     using BTreeMethods=Sqlite3.BTreeMethods;     
@@ -41,6 +41,7 @@ namespace Community.CsharpSqlite
     using BtCursor = Sqlite3.BtCursor;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Engine;
     //public partial class Sqlite3
     //{
 
@@ -494,7 +495,7 @@ namespace Community.CsharpSqlite
                                 }
                                 else
                                 {
-                                    Community.CsharpSqlite.Mem p = (Mem)p4;
+                                    Mem p = (Mem)p4;
                                     //sqlite3DbFree( db, ref p.zMalloc );
                                     db.sqlite3DbFree(ref p);
                                 }
@@ -1049,7 +1050,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 if (p.pResultSet == null)
                     p.pResultSet = new Mem[0];
                 //Mem* pMem = p.pResultSet = p.aMem[1];   /* First Mem of result set */
-                Community.CsharpSqlite.Mem pMem;
+                Mem pMem;
                 Debug.Assert(p.explain != 0);
                 Debug.Assert(p.magic == VdbeMagic.VDBE_MAGIC_RUN);
                 Debug.Assert(p.rc == SqlResult.SQLITE_OK || p.rc == SqlResult.SQLITE_BUSY || p.rc == SqlResult.SQLITE_NOMEM);

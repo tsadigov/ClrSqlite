@@ -21,7 +21,7 @@ using ynVar = System.Int32;
 namespace Community.CsharpSqlite {
     using Vdbe = Sqlite3.Vdbe;
     using Parse = Sqlite3.Parse;
-    
+    using Metadata;   
     
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Ast;

@@ -22,8 +22,9 @@ using System.Collections.Generic;
 using ynVar = System.Int32; 
 #endif
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Metadata
 {
+    using Metadata;
         ///
         ///<summary>
         ///An instance of the following structure stores a database schema.

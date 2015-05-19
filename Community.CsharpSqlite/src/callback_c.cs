@@ -5,7 +5,7 @@ using i16=System.Int16;
 using u8=System.Byte;
 using u16=System.UInt16;
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Mem;
+    using sqlite3_value = Engine.Mem;
     using Community.CsharpSqlite.Parsing;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;

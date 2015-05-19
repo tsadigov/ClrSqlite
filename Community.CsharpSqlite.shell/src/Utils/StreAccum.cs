@@ -14,6 +14,7 @@ using u64 = System.UInt64;
 using unsigned = System.UInt64;
 using Pgno = System.UInt32;
 using System.Diagnostics;
+using Community.CsharpSqlite.Engine;
 
 namespace Community.CsharpSqlite
 {

@@ -21,8 +21,9 @@ using ynVar = System.Int16;
 using ynVar = System.Int32; 
 #endif
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Metadata
 {
+    using Metadata;
 
         ///<summary>
         ///A prefix match is considered OK

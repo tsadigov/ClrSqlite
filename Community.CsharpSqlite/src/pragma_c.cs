@@ -9,6 +9,8 @@ using System.Globalization;
 using Community.CsharpSqlite.builder;
 using Community.CsharpSqlite.Ast;
 namespace Community.CsharpSqlite {
+    using Metadata;
+    using Community.CsharpSqlite.Os;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2003 April 6

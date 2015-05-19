@@ -11,6 +11,8 @@ using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
 	using DbPage=PgHdr;
 	using System.Text;
+    using Metadata;
+    using Community.CsharpSqlite.Os;
 	public partial class Sqlite3 {
 
 		///<summary>

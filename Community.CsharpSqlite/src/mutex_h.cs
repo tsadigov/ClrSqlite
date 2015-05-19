@@ -130,7 +130,7 @@ namespace Community.CsharpSqlite
 		#if SQLITE_MUTEX_OMIT
 	
 
-		static sqlite3_mutex mutex = null;
+		public static sqlite3_mutex mutex = null;
 
 		//sqlite3_mutex sqlite3_mutex;
 		public static sqlite3_mutex sqlite3MutexAlloc (int iType)

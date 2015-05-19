@@ -9,6 +9,8 @@ namespace Community.CsharpSqlite {
 	using sqlite3_stmt=Sqlite3.Vdbe;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2005 May 25
@@ -959,7 +961,7 @@ db.xAuth = 0;
 		/// occurs, return SQLITE_SCHEMA.
 		///
 		///</summary>
-		static SqlResult sqlite3Reprepare(Vdbe p) {
+		public static SqlResult sqlite3Reprepare(Vdbe p) {
             SqlResult rc;
 			sqlite3_stmt pNew=new sqlite3_stmt();
 			string zSql;

@@ -10,7 +10,7 @@ namespace Community.CsharpSqlite.Engine.Op
 
     using BtCursor = Sqlite3.BtCursor;
     using Community.CsharpSqlite.Engine;
-
+    using Metadata;
     public static class Cursor
     {
         public static RuntimeException Exec(CPU cpu,OpCode opcode,VdbeOp pOp)

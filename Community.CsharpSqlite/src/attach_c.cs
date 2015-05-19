@@ -4,9 +4,10 @@ using System.Text;
 using u8=System.Byte;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Mem;
+    using sqlite3_value = Engine.Mem;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Engine;
 	public partial class Sqlite3 {
 		#if !SQLITE_OMIT_ATTACH
 		///<summary>

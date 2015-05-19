@@ -23,10 +23,12 @@ using yDbMask = System.Int64;
 using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Mem;
+    using sqlite3_value = Engine.Mem;
 	using Op=VdbeOp;
 	using System;
 	using System.Collections.Generic;
+    using Metadata;
+    using Community.CsharpSqlite.Engine;
 	public partial class Sqlite3 {
 		///
 		///<summary>

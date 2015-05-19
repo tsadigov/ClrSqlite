@@ -8,7 +8,7 @@ namespace Community.CsharpSqlite
     using System.Linq;
     using sqlite3_stmt = Sqlite3.Vdbe;
     
-    using vdbeapi = Sqlite3.vdbeapi;
+    using vdbeapi = Engine.vdbeapi;
 
     public class legacy
     {

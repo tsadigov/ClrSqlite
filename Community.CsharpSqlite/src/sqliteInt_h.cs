@@ -32,10 +32,11 @@ using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite
 {
-    using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
     using Parse = Sqlite3.Parse;
     using Vdbe = Sqlite3.Vdbe;
     using Community.CsharpSqlite.Ast;
+    using Metadata;
     ///<summary>
     /// SQLite supports many different ways to resolve a constraint
     /// error.  ROLLBACK processing means that a constraint violation

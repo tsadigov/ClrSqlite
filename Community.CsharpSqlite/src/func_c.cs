@@ -7,10 +7,12 @@ using u8=System.Byte;
 using u32=System.UInt32;
 using u64=System.UInt64;
 namespace Community.CsharpSqlite {
-	using sqlite3_value=Mem;
+    using sqlite3_value = Engine.Mem;
 	using sqlite_int64=System.Int64;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
     public partial class Sqlite3
     {
         public class func
@@ -2251,8 +2253,8 @@ FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
         ///<summary>
         ///</summary>
         ///<param name="True if non">integer value was input to the sum </param>
-        public Community.CsharpSqlite.Mem _M;
-        public Community.CsharpSqlite.Mem Context
+        public Mem _M;
+        public Mem Context
         {
             get
             {

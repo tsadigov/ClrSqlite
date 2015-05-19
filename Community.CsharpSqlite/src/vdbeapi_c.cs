@@ -13,7 +13,11 @@ namespace Community.CsharpSqlite
 	using Op = VdbeOp;
 	using sqlite_int64 = System.Int64;
 	using sqlite3_stmt = Sqlite3.Vdbe;
-	using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
+    using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
+    using Vdbe=Community.CsharpSqlite.Sqlite3.Vdbe;
+    using Community.CsharpSqlite.Metadata;
 
     public static partial class VdbeExtensions
     {
@@ -26,7 +30,7 @@ namespace Community.CsharpSqlite
                 return pVm != null ? (int)pVm.nResColumn : 0;
             }
     }
-	public partial class Sqlite3
+	namespace Engine
 	{
         public static class vdbeapi
         {
@@ -110,10 +114,10 @@ return ( p == null || p.expired ) ? 1 : 0;
 #if SQLITE_THREADSAFE
 																																																																																												        mutex = v.db.mutex;
 #endif
-                    mutex.sqlite3_mutex_enter();
+                    Sqlite3.mutex.sqlite3_mutex_enter();
                     rc = vdbeaux.sqlite3VdbeFinalize(ref v);
                     rc = malloc_cs.sqlite3ApiExit(db, rc);
-                    mutex.sqlite3_mutex_leave();
+                    Sqlite3.mutex.sqlite3_mutex_leave();
                 }
                 return rc;
             }
@@ -159,7 +163,7 @@ return ( p == null || p.expired ) ? 1 : 0;
 #if SQLITE_THREADSAFE
 																																																																					      sqlite3_mutex mutex = ( (Vdbe)pStmt ).db.mutex;
 #endif
-                mutex.sqlite3_mutex_enter();
+                Sqlite3.mutex.sqlite3_mutex_enter();
                 for (i = 0; i < p.nVar; i++)
                 {
                     p.aVar[i].sqlite3VdbeMemRelease();
@@ -169,7 +173,7 @@ return ( p == null || p.expired ) ? 1 : 0;
                 {
                     p.expired = true;
                 }
-                mutex.sqlite3_mutex_leave();
+                Sqlite3.mutex.sqlite3_mutex_leave();
                 return rc;
             }
 
@@ -378,7 +382,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
 #if !SQLITE_OMIT_TRACE
                     if (db.xProfile != null && 0 == db.init.busy)
                     {
-                        os.sqlite3OsCurrentTimeInt64(db.pVfs, ref p.startTime);
+                        Sqlite3.os.sqlite3OsCurrentTimeInt64(db.pVfs, ref p.startTime);
                     }
 #endif
                     db.activeVdbeCnt++;
@@ -408,7 +412,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
                 if (rc != SqlResult.SQLITE_ROW && db.xProfile != null && 0 == db.init.busy && p.zSql != null)
                 {
                     sqlite3_int64 iNow = 0;
-                    os.sqlite3OsCurrentTimeInt64(db.pVfs, ref iNow);
+                    Sqlite3.os.sqlite3OsCurrentTimeInt64(db.pVfs, ref iNow);
                     db.xProfile(db.pProfileArg, p.zSql, (iNow - p.startTime) * 1000000);
                 }
 #endif
@@ -508,7 +512,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 db = v.db;
                 db.mutex.sqlite3_mutex_enter();
-                while ((rc = (SqlResult)sqlite3Step(v)) == SqlResult.SQLITE_SCHEMA && cnt++ < SQLITE_MAX_SCHEMA_RETRY && (rc2 = rc = (SqlResult)sqlite3Reprepare(v)) == SqlResult.SQLITE_OK)
+                while ((rc = (SqlResult)sqlite3Step(v)) == SqlResult.SQLITE_SCHEMA && cnt++ < SQLITE_MAX_SCHEMA_RETRY && (rc2 = rc = (SqlResult)Sqlite3.sqlite3Reprepare(v)) == SqlResult.SQLITE_OK)
                 {
                     sqlite3_reset(pStmt);
                     v.expired = false;
@@ -1262,7 +1266,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                     p.db.mutex.sqlite3_mutex_leave();
                 }
                 else
-                    if (xDel != SQLITE_STATIC && xDel != SQLITE_TRANSIENT)
+                    if (xDel != Sqlite3.SQLITE_STATIC && xDel != Sqlite3.SQLITE_TRANSIENT)
                     {
                         xDel(ref zData);
                     }
@@ -1356,13 +1360,13 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                             }
                             else
                             {
-                                rc = sqlite3_bind_blob(pStmt, i, pValue.zBLOB, pValue.n, SQLITE_TRANSIENT);
+                                rc = sqlite3_bind_blob(pStmt, i, pValue.zBLOB, pValue.n, Sqlite3.SQLITE_TRANSIENT);
                             }
                             break;
                         }
                     case FoundationalType.SQLITE_TEXT:
                         {
-                            rc = bindText(pStmt, i, pValue.z, pValue.n, SQLITE_TRANSIENT, pValue.enc);
+                            rc = bindText(pStmt, i, pValue.z, pValue.n, Sqlite3.SQLITE_TRANSIENT, pValue.enc);
                             break;
                         }
                     default:

@@ -24,7 +24,7 @@ namespace Community.CsharpSqlite {
 	using u64=System.UInt64;
 	using unsigned=System.UInt64;
 	using Pgno=System.UInt32;
-	using sqlite3_value=Mem;
+    using sqlite3_value = Engine.Mem;
     using System.Linq;
 	#if !SQLITE_MAX_VARIABLE_NUMBER
 	using ynVar=System.Int16;
@@ -47,6 +47,7 @@ using System.Collections.Generic;
     using Community.CsharpSqlite.Parsing;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Os;
 	#endif
 	public partial class Sqlite3 {
 		public class Parse {

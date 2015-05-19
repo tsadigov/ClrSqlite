@@ -23,15 +23,17 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
+    using Metadata;
 
     using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
-    using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     
     using ResolveExtensions = Sqlite3.ResolveExtensions;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.builder;
+    using Community.CsharpSqlite.Os;
 
         ///
         ///<summary>

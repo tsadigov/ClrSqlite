@@ -1,5 +1,6 @@
 namespace Community.CsharpSqlite
 {
+    using Metadata;
 	public partial class Sqlite3
 	{
 		///

@@ -5,7 +5,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Parsing;
-    using sqlite3_value = Mem;
+    using sqlite3_value = Engine.Mem;
 	public partial class Sqlite3 {
 		///
 		///<summary>

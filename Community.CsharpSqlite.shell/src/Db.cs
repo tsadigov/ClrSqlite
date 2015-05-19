@@ -24,6 +24,7 @@ using ynVar = System.Int32;
 namespace Community.CsharpSqlite
 {
     using Btree = Sqlite3.Btree;
+    using Metadata;
         //typedef struct AggInfo AggInfo;
         //typedef struct AuthContext AuthContext;
         //typedef struct AutoincInfo AutoincInfo;

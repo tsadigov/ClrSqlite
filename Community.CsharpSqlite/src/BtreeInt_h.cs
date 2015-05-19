@@ -16,6 +16,8 @@ namespace Community.CsharpSqlite
     using Pager = Sqlite3.Pager;
     using BtCursor = Sqlite3.BtCursor;
     using PagerMethods=Sqlite3.PagerMethods;
+    using Metadata;
+    using Community.CsharpSqlite.Os;
     ///<summary>
     /// Btree.inTrans may take one of the following values.
     ///

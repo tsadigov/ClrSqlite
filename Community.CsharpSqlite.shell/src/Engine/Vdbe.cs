@@ -30,30 +30,15 @@ using yDbMask=System.Int32;
 namespace Community.CsharpSqlite {
 	using Op=VdbeOp;
 	using System.Text;
-	using sqlite3_value=Mem;
+    using sqlite3_value = Engine.Mem;
 	using System.Collections.Generic;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Os;
+    using Metadata;
 
 
-    ///
-    ///<summary>
-    ///The Vdbe.aColName array contains 5n Mem structures, where n is the
-    ///number of columns of data returned by the statement.
-    ///
-    ///</summary>
-
-    //#if SQLITE_ENABLE_COLUMN_METADATA
-    //# define COLNAME_N        5      /* Number of COLNAME_xxx symbols */
-    //#else
-    //# ifdef SQLITE_OMIT_DECLTYPE
-    //#   define COLNAME_N      1      /* Store only the name */
-    //# else
-    //#   define COLNAME_N      2      /* Store the name and decltype */
-    //# endif
-    //#endif
-
-    public enum ColName { NAME, DECLTYPE, DATABASE, TABLE, COLUMN }
+    
     public enum RuntimeException
     {
         too_big, no_mem, abort_due_to_error, abort_due_to_interrupt, vdbe_error_halt,

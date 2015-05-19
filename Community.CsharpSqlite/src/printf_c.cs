@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Os
 {
 	using etByte = System.Boolean;
 	using i64 = System.Int64;
@@ -14,10 +14,7 @@ namespace Community.CsharpSqlite
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Ast;
 
-    public partial class Sqlite3
-    {
-    
-    }
+   
 
 
 

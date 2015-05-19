@@ -28,6 +28,8 @@ namespace Community.CsharpSqlite
     using System.Linq;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.builder;
+    using Metadata;
+    using Community.CsharpSqlite.Os;
     //public partial class Sqlite3
     //{
     public static class build

@@ -9,10 +9,12 @@ using sqlite3_backup = Community.CsharpSqlite.Sqlite3.sqlite3_backup;
 
 using sqlite3_int64 = System.Int64;
 using sqlite3_stmt = Community.CsharpSqlite.Sqlite3.Vdbe;
-using sqlite3_value = Community.CsharpSqlite.Mem;
+using sqlite3_value = Community.CsharpSqlite.Engine.Mem;
 using va_list = System.Object;
 using System.Collections.Generic;
 using Community.CsharpSqlite.Ast;
+using Community.CsharpSqlite.Os;
+using Community.CsharpSqlite.Engine;
 
 class Shell
 {
@@ -1379,12 +1381,12 @@ if( db ) sqlite3_interrupt(db);
 		if (rc != SqlResult.SQLITE_OK || null == pSelect) {
 			return rc;
 		}
-		rc = Sqlite3.vdbeapi.sqlite3_step (pSelect);
+		rc = vdbeapi.sqlite3_step(pSelect);
 		while (rc == SqlResult.SQLITE_ROW) {
-			fprintf (_out, "%s;\n", Sqlite3.vdbeapi.sqlite3_column_text (pSelect, 0));
-			rc = Sqlite3.vdbeapi.sqlite3_step (pSelect);
+			fprintf (_out, "%s;\n", vdbeapi.sqlite3_column_text (pSelect, 0));
+			rc = vdbeapi.sqlite3_step (pSelect);
 		}
-		return Sqlite3.vdbeapi.sqlite3_finalize (pSelect);
+		return vdbeapi.sqlite3_finalize (pSelect);
 	}
 
 	///<summary>
@@ -1453,12 +1455,12 @@ if( db ) sqlite3_interrupt(db);
 				appendText (zSelect, zTmp.ToString (), '\'');
 			}
 			appendText (zSelect, " || ' VALUES(' || ", '\0');
-			rc = Sqlite3.vdbeapi.sqlite3_step (pTableInfo);
+			rc = vdbeapi.sqlite3_step (pTableInfo);
 			while (rc == SqlResult.SQLITE_ROW) {
-				string zText = (string)Sqlite3.vdbeapi.sqlite3_column_text (pTableInfo, 1);
+				string zText = (string)vdbeapi.sqlite3_column_text (pTableInfo, 1);
 				appendText (zSelect, "quote(", '\0');
 				appendText (zSelect, zText, '"');
-				rc = Sqlite3.vdbeapi.sqlite3_step (pTableInfo);
+				rc = vdbeapi.sqlite3_step (pTableInfo);
 				if (rc == SqlResult.SQLITE_ROW) {
 					appendText (zSelect, ") || ',' || ", '\0');
 				}
@@ -1466,7 +1468,7 @@ if( db ) sqlite3_interrupt(db);
 					appendText (zSelect, ") ", '\0');
 				}
 			}
-			rc = Sqlite3.vdbeapi.sqlite3_finalize (pTableInfo);
+			rc = vdbeapi.sqlite3_finalize (pTableInfo);
 			if (rc != SqlResult.SQLITE_OK) {
 				//if ( zSelect ) free( ref zSelect );
 				return 1;
@@ -1984,7 +1986,7 @@ if( db ) sqlite3_interrupt(db);
 												else {
                                                     nCol = pStmt.getColumnCount();
 												}
-												Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
+												vdbeapi.sqlite3_finalize (pStmt);
 												if (nCol == 0)
 													return 0;
 												zSql = new StringBuilder (nByte + 20 + nCol * 2);
@@ -2002,7 +2004,7 @@ if( db ) sqlite3_interrupt(db);
 												free (ref zSql);
 												if (rc != 0) {
 													fprintf (stderr, "Error: %s\n", Sqlite3.sqlite3_errmsg (db));
-													Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
+													vdbeapi.sqlite3_finalize (pStmt);
 													return (SqlResult)1;
 												}
 												try {
@@ -2015,7 +2017,7 @@ if( db ) sqlite3_interrupt(db);
 												}
 												if (_in == null) {
 													fprintf (stderr, "cannot open file: %s\n", zFile);
-													Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
+													vdbeapi.sqlite3_finalize (pStmt);
 													return 0;
 												}
 												azCol = new string[nCol + 1];
@@ -2056,10 +2058,10 @@ if( db ) sqlite3_interrupt(db);
 														break;
 													}
 													for (i = 0; i < nCol; i++) {
-														Sqlite3.vdbeapi.sqlite3_bind_text (pStmt, i + 1, azCol [i], -1, Sqlite3.SQLITE_STATIC);
+														vdbeapi.sqlite3_bind_text (pStmt, i + 1, azCol [i], -1, Sqlite3.SQLITE_STATIC);
 													}
-													Sqlite3.vdbeapi.sqlite3_step (pStmt);
-													rc = Sqlite3.vdbeapi.sqlite3_reset (pStmt);
+													vdbeapi.sqlite3_step (pStmt);
+													rc = vdbeapi.sqlite3_reset (pStmt);
 													zLine.Length = 0;
 													// free(zLine);
 													if (rc != SqlResult.SQLITE_OK) {
@@ -2072,7 +2074,7 @@ if( db ) sqlite3_interrupt(db);
 												//free( ref azCol );
 												_in.Close ();
 												// fclose( _in );
-												Sqlite3.vdbeapi.sqlite3_finalize (pStmt);
+												vdbeapi.sqlite3_finalize (pStmt);
                                                 legacy.sqlite3_exec(p.db, zCommit.ToString(), null, null, ref sDummy);
 											}
 											else

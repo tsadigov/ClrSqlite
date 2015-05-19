@@ -10,6 +10,7 @@ namespace Community.CsharpSqlite
 {
     using Parsing;
     using Community.CsharpSqlite.builder;
+    using Metadata;
 	public partial class Sqlite3
 	{
 		///<summary>

@@ -26,6 +26,7 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
+    using Metadata;
 
 
     namespace Ast

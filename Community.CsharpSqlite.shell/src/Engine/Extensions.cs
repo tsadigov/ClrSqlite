@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using i64 = System.Int64;
 namespace Community.CsharpSqlite
 {
+    using Community.CsharpSqlite.Engine;
     using System.Diagnostics;
     using Vdbe = Sqlite3.Vdbe;
 

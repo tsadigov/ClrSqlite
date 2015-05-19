@@ -19,6 +19,7 @@ namespace Community.CsharpSqlite
     
     
     using Op = VdbeOp;
+    using Community.CsharpSqlite.Engine;
 
     //typedef struct VdbeCursor VdbeCursor;
     ///<summary>
