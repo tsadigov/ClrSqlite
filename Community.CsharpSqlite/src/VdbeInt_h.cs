@@ -640,7 +640,7 @@ set { _flags = value; }
                 }
                 else
                 {
-                    iLimit = Sqlite3.SQLITE_MAX_LENGTH;
+                    iLimit = Limits.SQLITE_MAX_LENGTH;
                 }
                 flags = (enc == 0 ? MemFlags.MEM_Blob : MemFlags.MEM_Str);
                 if (nByte < 0)

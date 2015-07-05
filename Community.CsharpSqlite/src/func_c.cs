@@ -1356,7 +1356,7 @@ break;
                 nRep = vdbeapi.sqlite3_value_bytes(argv[2]);
                 Debug.Assert(zRep == vdbeapi.sqlite3_value_text(argv[2]));
                 nOut = nStr + 1;
-                Debug.Assert(nOut < SQLITE_MAX_LENGTH);
+                Debug.Assert(nOut < Limits.SQLITE_MAX_LENGTH);
                 if (nOut <= vdbeapi.sqlite3_context_db_handle(context).aLimit[Globals.SQLITE_LIMIT_LENGTH])
                 {
                     //zOut = contextMalloc(context, (i64)nOut);

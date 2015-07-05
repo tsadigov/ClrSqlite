@@ -353,25 +353,25 @@ namespace Community.CsharpSqlite {
 				///
 				///</summary>
 				byte[] aCopy=new byte[] {
-					BTREE_SCHEMA_VERSION,
+					BTreeProp.SCHEMA_VERSION,
 					1,
 					///
 					///<summary>
 					///Add one to the old schema cookie 
 					///</summary>
-					BTREE_DEFAULT_CACHE_SIZE,
+					BTreeProp.DEFAULT_CACHE_SIZE,
 					0,
 					///
 					///<summary>
 					///Preserve the default page cache size 
 					///</summary>
-					BTREE_TEXT_ENCODING,
+					BTreeProp.TEXT_ENCODING,
 					0,
 					///
 					///<summary>
 					///Preserve the text encoding 
 					///</summary>
-					BTREE_USER_VERSION,
+					BTreeProp.USER_VERSION,
 					0,
 				///
 				///<summary>

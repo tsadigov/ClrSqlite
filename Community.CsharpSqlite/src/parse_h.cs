@@ -445,7 +445,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				for(int i=0;i<this.aColCache.Length;i++) {
 					this.aColCache[i]=new sqliteinth.yColCache();
 				}
-				cookieValue=new int[SQLITE_MAX_ATTACHED+2];
+				cookieValue=new int[Limits.SQLITE_MAX_ATTACHED+2];
 				///
 				///<summary>
 				///Values of cookies to verify 
@@ -822,11 +822,11 @@ return;
 					int r1=this.sqlite3GetTempReg();
 					int r2=this.sqlite3GetTempReg();
 					int j1;
-					v.sqlite3VdbeAddOp3( OpCode.OP_ReadCookie,iDb,r1,BTREE_FILE_FORMAT);
+                    v.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, r1, BTreeProp.FILE_FORMAT);
                     vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,minFormat,r2);
 					j1=v.sqlite3VdbeAddOp3(OpCode.OP_Ge,r2,0,r1);
-					v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie,iDb,BTREE_FILE_FORMAT,r2);
+                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTreeProp.FILE_FORMAT, r2);
 					v.sqlite3VdbeJumpHere(j1);
 					this.sqlite3ReleaseTempReg(r1);
 					this.sqlite3ReleaseTempReg(r2);
@@ -1821,7 +1821,7 @@ return;
 			///<summary>
 			///The parser context 
 			///</summary>
-			int type,///
+            AuthTarget type,///
 			///<summary>
 			///Either SQLITE_ATTACH or SQLITE_DETACH 
 			///</summary>
@@ -1894,7 +1894,7 @@ goto attach_end;
 					///statements).
 					///
 					///</summary>
-					v.sqlite3VdbeAddOp1(OpCode.OP_Expire,(type==SQLITE_ATTACH)?1:0);
+                    v.sqlite3VdbeAddOp1(OpCode.OP_Expire, (type == AuthTarget.SQLITE_ATTACH) ? 1 : 0);
 				}
 				attach_end:
 				exprc.sqlite3ExprDelete(db,ref pFilename);
@@ -1902,10 +1902,10 @@ goto attach_end;
 				exprc.sqlite3ExprDelete(db,ref pKey);
 			}
 			public void sqlite3Detach(Expr pDbname) {
-				this.codeAttach(SQLITE_DETACH,detach_func,pDbname,null,null,pDbname);
+                this.codeAttach(AuthTarget.SQLITE_DETACH, detach_func, pDbname, null, null, pDbname);
 			}
 			public void sqlite3Attach(Expr p,Expr pDbname,Expr pKey) {
-				this.codeAttach(SQLITE_ATTACH,attach_func,p,p,pDbname,pKey);
+                this.codeAttach(AuthTarget.SQLITE_ATTACH, attach_func, p, p, pDbname, pKey);
 			}
 			public///<summary>
 			/// VDBE Calling Convention

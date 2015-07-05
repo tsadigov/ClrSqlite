@@ -16,6 +16,40 @@ using Community.CsharpSqlite.Os;
 
 namespace Community.CsharpSqlite
 {
+    ///
+    ///<summary>
+    ///CAPI3REF: Flags for the xAccess VFS method
+    ///
+    ///These integer constants can be used as the third parameter to
+    ///the xAccess method of an [sqlite3_vfs] object.  They determine
+    ///what kind of permissions the xAccess method is looking for.
+    ///With SQLITE_ACCESS_EXISTS, the xAccess method
+    ///simply checks whether the file exists.
+    ///With SQLITE_ACCESS_READWRITE, the xAccess method
+    ///checks whether the named directory is both readable and writable
+    ///(in other words, if files can be added, removed, and renamed within
+    ///the directory).
+    ///The SQLITE_ACCESS_READWRITE constant is currently used only by the
+    ///[temp_store_directory pragma], though this could change in a future
+    ///release of SQLite.
+    ///With SQLITE_ACCESS_READ, the xAccess method
+    ///checks whether the file is readable.  The SQLITE_ACCESS_READ constant is
+    ///currently unused, though it might be used in a future release of
+    ///SQLite.
+    ///
+    ///</summary>
+
+    //#define SQLITE_ACCESS_EXISTS    0
+    //#define SQLITE_ACCESS_READWRITE 1   /* Used by PRAGMA temp_store_directory */
+    //#define SQLITE_ACCESS_READ      2   /* Unused */
+    public enum SQLITE_ACCESS
+    {
+        EXISTS = 0,
+        READWRITE = 1,
+        READ = 2
+    }
+
+
     namespace Os{
 
 
@@ -395,7 +429,7 @@ namespace Community.CsharpSqlite
 
     public delegate SqlResult dxDelete(sqlite3_vfs vfs, string zName, int syncDir);
 
-    public delegate SqlResult dxAccess(sqlite3_vfs vfs, string zName, int flags, out int pResOut);
+    public delegate SqlResult dxAccess(sqlite3_vfs vfs, string zName, SQLITE_ACCESS flags, out int pResOut);
 
     public delegate SqlResult dxFullPathname(sqlite3_vfs vfs, string zName, int nOut, StringBuilder zOut);
 
@@ -531,7 +565,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
             sectorSize = 0;
         }
 
-        public Sqlite3.sqlite3_io_methods pMethods;
+        public sqlite3_io_methods pMethods;
         ///
         ///<summary>
         ///Must be first 
@@ -642,6 +676,10 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 
 
 }
+
+    
+
+
     public partial class Sqlite3
     {
 
@@ -736,96 +774,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
         /// database corruption.
         ///
         ///</summary>
-        //typedef struct sqlite3_io_methods sqlite3_io_methods;
-        //struct sqlite3_io_methods {
-        //  int iVersion;
-        //  int (*xClose)(sqlite3_file);
-        //  int (*xRead)(sqlite3_file*, void*, int iAmt, sqlite3_int64 iOfst);
-        //  int (*xWrite)(sqlite3_file*, const void*, int iAmt, sqlite3_int64 iOfst);
-        //  int (*xTruncate)(sqlite3_file*, sqlite3_int64 size);
-        //  int (*xSync)(sqlite3_file*, int flags);
-        //  int (*xFileSize)(sqlite3_file*, sqlite3_int64 *pSize);
-        //  int (*xLock)(sqlite3_file*, int);
-        //  int (*xUnlock)(sqlite3_file*, int);
-        //  int (*xCheckReservedLock)(sqlite3_file*, int *pResOut);
-        //  int (*xFileControl)(sqlite3_file*, int op, object  *pArg);
-        //  int (*xSectorSize)(sqlite3_file);
-        //  int (*xDeviceCharacteristics)(sqlite3_file);
-        //  /* Methods above are valid for version 1 */
-        //  int (*xShmMap)(sqlite3_file*, int iPg, int pgsz, int, object  volatile*);
-        //  int (*xShmLock)(sqlite3_file*, int offset, int n, int flags);
-        //  void (*xShmBarrier)(sqlite3_file);
-        //  int (*xShmUnmap)(sqlite3_file*, int deleteFlag);
-        //  /* Methods above are valid for version 2 */
-        //  /* Additional methods may be added in future releases */
-        //};
-        public class sqlite3_io_methods
-        {
-            public int iVersion;
-
-            public dxClose xClose;
-
-            public dxRead xRead;
-
-            public dxWrite xWrite;
-
-            public dxTruncate xTruncate;
-
-            public dxSync xSync;
-
-            public dxFileSize xFileSize;
-
-            public dxLock xLock;
-
-            public dxUnlock xUnlock;
-
-            public dxCheckReservedLock xCheckReservedLock;
-
-            public dxFileControl xFileControl;
-
-            public dxSectorSize xSectorSize;
-
-            public dxDeviceCharacteristics xDeviceCharacteristics;
-
-            public dxShmMap xShmMap;
-
-            //int (*xShmMap)(sqlite3_file*, int iPg, int pgsz, int, object  volatile*);
-            public dxShmLock xShmLock;
-
-            //int (*xShmLock)(sqlite3_file*, int offset, int n, int flags);
-            public dxShmBarrier xShmBarrier;
-
-            //void (*xShmBarrier)(sqlite3_file);
-            public dxShmUnmap xShmUnmap;
-
-            //int (*xShmUnmap)(sqlite3_file*, int deleteFlag);
-            ///
-            ///<summary>
-            ///Additional methods may be added in future releases 
-            ///</summary>
-
-            public sqlite3_io_methods(int iVersion, dxClose xClose, dxRead xRead, dxWrite xWrite, dxTruncate xTruncate, dxSync xSync, dxFileSize xFileSize, dxLock xLock, dxUnlock xUnlock, dxCheckReservedLock xCheckReservedLock, dxFileControl xFileControl, dxSectorSize xSectorSize, dxDeviceCharacteristics xDeviceCharacteristics, dxShmMap xShmMap, dxShmLock xShmLock, dxShmBarrier xShmBarrier, dxShmUnmap xShmUnmap)
-            {
-                this.iVersion = iVersion;
-                this.xClose = xClose;
-                this.xRead = xRead;
-                this.xWrite = xWrite;
-                this.xTruncate = xTruncate;
-                this.xSync = xSync;
-                this.xFileSize = xFileSize;
-                this.xLock = xLock;
-                this.xUnlock = xUnlock;
-                this.xCheckReservedLock = xCheckReservedLock;
-                this.xFileControl = xFileControl;
-                this.xSectorSize = xSectorSize;
-                this.xDeviceCharacteristics = xDeviceCharacteristics;
-                this.xShmMap = xShmMap;
-                this.xShmLock = xShmLock;
-                this.xShmBarrier = xShmBarrier;
-                this.xShmUnmap = xShmUnmap;
-            }
-        }
-
+       
         ///
         ///<summary>
         ///CAPI3REF: Standard File Control Opcodes
@@ -940,37 +889,8 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 
 
 
-        ///
-        ///<summary>
-        ///CAPI3REF: Flags for the xAccess VFS method
-        ///
-        ///These integer constants can be used as the third parameter to
-        ///the xAccess method of an [sqlite3_vfs] object.  They determine
-        ///what kind of permissions the xAccess method is looking for.
-        ///With SQLITE_ACCESS_EXISTS, the xAccess method
-        ///simply checks whether the file exists.
-        ///With SQLITE_ACCESS_READWRITE, the xAccess method
-        ///checks whether the named directory is both readable and writable
-        ///(in other words, if files can be added, removed, and renamed within
-        ///the directory).
-        ///The SQLITE_ACCESS_READWRITE constant is currently used only by the
-        ///[temp_store_directory pragma], though this could change in a future
-        ///release of SQLite.
-        ///With SQLITE_ACCESS_READ, the xAccess method
-        ///checks whether the file is readable.  The SQLITE_ACCESS_READ constant is
-        ///currently unused, though it might be used in a future release of
-        ///SQLite.
-        ///
-        ///</summary>
-
-        //#define SQLITE_ACCESS_EXISTS    0
-        //#define SQLITE_ACCESS_READWRITE 1   /* Used by PRAGMA temp_store_directory */
-        //#define SQLITE_ACCESS_READ      2   /* Unused */
-        public const int SQLITE_ACCESS_EXISTS = 0;
-
-        public const int SQLITE_ACCESS_READWRITE = 1;
-
-        public const int SQLITE_ACCESS_READ = 2;
+        
+        
 
         ///
         ///<summary>
@@ -1001,13 +921,14 @@ winceLock *shared;      /* Global shared lock memory for the file  */
         //#define SQLITE_SHM_LOCK         2
         //#define SQLITE_SHM_SHARED       4
         //#define SQLITE_SHM_EXCLUSIVE    8
-        private const int SQLITE_SHM_UNLOCK = 1;
 
-        private const int SQLITE_SHM_LOCK = 2;
-
-        private const int SQLITE_SHM_SHARED = 4;
-
-        private const int SQLITE_SHM_EXCLUSIVE = 8;
+        public enum SQLITE_SHM {
+            UNLOCK = 1,
+            LOCK = 2,
+            SHARED = 4,
+            EXCLUSIVE = 8
+        }
+        
 
     }
 

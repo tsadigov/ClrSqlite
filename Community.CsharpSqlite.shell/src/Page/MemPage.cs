@@ -536,7 +536,7 @@ namespace Community.CsharpSqlite
 
                 Debug.Assert(this.pDbPage.sqlite3PagerIswriteable());
 				Debug.Assert (this.pBt != null);
-				Debug.Assert (this.pBt.usableSize <= Sqlite3.SQLITE_MAX_PAGE_SIZE);
+				Debug.Assert (this.pBt.usableSize <= Limits.SQLITE_MAX_PAGE_SIZE);
 				Debug.Assert (this.nOverflow == 0);
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
 				temp = this.pBt.pPager.sqlite3PagerTempSpace ();

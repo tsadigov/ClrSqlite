@@ -105,7 +105,7 @@ namespace Community.CsharpSqlite
             }
             else
             {
-                iLimit = Sqlite3.SQLITE_MAX_LENGTH;
+                iLimit = Limits.SQLITE_MAX_LENGTH;
             }
             if (nByte < 0)
             {

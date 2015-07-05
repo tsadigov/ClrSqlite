@@ -1598,7 +1598,7 @@ return (pPager->pWal!=0);
                         ///<param name="respective compile time maximum limits.">respective compile time maximum limits.</param>
                         ///<param name=""></param>
 
-                        if (iPageSize < 512 || iSectorSize < 32 || iPageSize > SQLITE_MAX_PAGE_SIZE || iSectorSize > MAX_SECTOR_SIZE || ((iPageSize - 1) & iPageSize) != 0 || ((iSectorSize - 1) & iSectorSize) != 0)
+                        if (iPageSize < 512 || iSectorSize < 32 || iPageSize > Limits.SQLITE_MAX_PAGE_SIZE || iSectorSize > MAX_SECTOR_SIZE || ((iPageSize - 1) & iPageSize) != 0 || ((iSectorSize - 1) & iSectorSize) != 0)
                         {
                             ///
                             ///<summary>
@@ -3091,7 +3091,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     rc = PagerMethods.readMasterJournal(this.jfd, zMaster, (u32)this.pVfs.mxPathname + 1);
                     if (rc == SqlResult.SQLITE_OK && zMaster[0] != 0)
                     {
-                        rc = os.sqlite3OsAccess(pVfs, Encoding.UTF8.GetString(zMaster, 0, zMaster.Length), SQLITE_ACCESS_EXISTS, ref res);
+                        rc = os.sqlite3OsAccess(pVfs, Encoding.UTF8.GetString(zMaster, 0, zMaster.Length), SQLITE_ACCESS.EXISTS, ref res);
                     }
                     zMaster = null;
                     if (rc != SqlResult.SQLITE_OK || res == 0)
@@ -3847,7 +3847,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///<param name=""></param>
 
                     u32 pageSize = pPageSize;
-                    Debug.Assert(pageSize == 0 || (pageSize >= 512 && pageSize <= SQLITE_MAX_PAGE_SIZE));
+                    Debug.Assert(pageSize == 0 || (pageSize >= 512 && pageSize <= Limits.SQLITE_MAX_PAGE_SIZE));
                     if ((this.memDb == 0 || this.dbSize == 0) && PCacheMethods.sqlite3PcacheRefCount(this.pPCache) == 0 && pageSize != 0 && pageSize != (u32)this.pageSize)
                     {
                         //char *pNew = NULL;             /* New temp space */
@@ -4582,7 +4582,7 @@ pPager.pWal = 0;
                     pExists = 0;
                     if (0 == jrnlOpen)
                     {
-                        rc = os.sqlite3OsAccess(pVfs, this.zJournal, SQLITE_ACCESS_EXISTS, ref exists);
+                        rc = os.sqlite3OsAccess(pVfs, this.zJournal, SQLITE_ACCESS.EXISTS, ref exists);
                     }
                     if (rc == SqlResult.SQLITE_OK && exists != 0)
                     {
@@ -4844,7 +4844,7 @@ pPager.pWal = 0;
                                 ///True if journal file exists 
                                 ///</summary>
 
-                                rc = os.sqlite3OsAccess(pVfs, this.zJournal, Sqlite3.SQLITE_ACCESS_EXISTS, ref bExists);
+                                rc = os.sqlite3OsAccess(pVfs, this.zJournal, SQLITE_ACCESS.EXISTS, ref bExists);
                                 if (rc == SqlResult.SQLITE_OK && bExists != 0)
                                 {
                                     int fout = 0;

@@ -1087,7 +1087,7 @@ rc = SQLITE_NOTADB;
                         goto page1_init_failed;
                     }
                     pageSize = (u32)((page1[16] << 8) | (page1[17] << 16));
-                    if (((pageSize - 1) & pageSize) != 0 || pageSize > SQLITE_MAX_PAGE_SIZE || pageSize <= 256)
+                    if (((pageSize - 1) & pageSize) != 0 || pageSize > Limits.SQLITE_MAX_PAGE_SIZE || pageSize <= 256)
                     {
                         goto page1_init_failed;
                     }
@@ -3243,7 +3243,7 @@ return rc;
                     ///<param name="root page of the new table should go. meta[3] is the largest root">page</param>
                     ///<param name="created so far, so the new root">page is (meta[3]+1).</param>
                     ///<param name=""></param>
-                    pgnoRoot = p.sqlite3BtreeGetMeta(BTREE_LARGEST_ROOT_PAGE);
+                    pgnoRoot = p.sqlite3BtreeGetMeta(BTreeProp.LARGEST_ROOT_PAGE);
                     pgnoRoot++;
                     ///
                     ///<summary>

@@ -1532,7 +1532,7 @@ return rc;
                 ///Bytes to allocate for PCache 
                 ///</summary>
 
-                u32 szPageDflt = SQLITE_DEFAULT_PAGE_SIZE;
+                u32 szPageDflt = Limits.SQLITE_DEFAULT_PAGE_SIZE;
                 ///
                 ///<summary>
                 ///Default page size 
@@ -1740,12 +1740,12 @@ memcpy(&pPager.zWal[nPathname], "-wal", 4);
                     if (rc == SqlResult.SQLITE_OK && !readOnly)
                     {
                         pPager.setSectorSize();
-                        Debug.Assert(SQLITE_DEFAULT_PAGE_SIZE <= SQLITE_MAX_DEFAULT_PAGE_SIZE);
+                        Debug.Assert(Limits.SQLITE_DEFAULT_PAGE_SIZE <= Limits.SQLITE_MAX_DEFAULT_PAGE_SIZE);
                         if (szPageDflt < pPager.sectorSize)
                         {
-                            if (pPager.sectorSize > SQLITE_MAX_DEFAULT_PAGE_SIZE)
+                            if (pPager.sectorSize > Limits.SQLITE_MAX_DEFAULT_PAGE_SIZE)
                             {
-                                szPageDflt = SQLITE_MAX_DEFAULT_PAGE_SIZE;
+                                szPageDflt = Limits.SQLITE_MAX_DEFAULT_PAGE_SIZE;
                             }
                             else
                             {
@@ -1856,7 +1856,7 @@ szPageDflt = ii;
                 ///pPager.nPage = 0; 
                 ///</summary>
 
-                pPager.mxPgno = SQLITE_MAX_PAGE_COUNT;
+                pPager.mxPgno = Limits.SQLITE_MAX_PAGE_COUNT;
                 ///
                 ///<summary>
                 ///pPager.state = PAGER_UNLOCK; 

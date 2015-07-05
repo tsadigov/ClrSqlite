@@ -446,25 +446,27 @@ namespace Community.CsharpSqlite
             }
         }
 
-        //Mutex Methods
-        public delegate SqlResult dxMutexInit();
-
-        public delegate SqlResult dxMutexEnd();
-
-        public delegate sqlite3_mutex dxMutexAlloc(int iNumber);
-
-        public delegate void dxMutexFree(sqlite3_mutex sm);
-
-        public delegate void dxMutexEnter(sqlite3_mutex sm);
-
-        public delegate SqlResult dxMutexTry(sqlite3_mutex sm);
-
-        public delegate void dxMutexLeave(sqlite3_mutex sm);
-
-        public delegate bool dxMutexHeld(sqlite3_mutex sm);
-
-        public delegate bool dxMutexNotheld(sqlite3_mutex sm);
+        
 
 
 	}
+
+    //Mutex Methods
+    public delegate SqlResult dxMutexInit();
+
+    public delegate SqlResult dxMutexEnd();
+
+    public delegate sqlite3_mutex dxMutexAlloc(int iNumber);
+
+    public delegate void dxMutexFree(sqlite3_mutex sm);
+
+    public delegate void dxMutexEnter(sqlite3_mutex sm);
+
+    public delegate SqlResult dxMutexTry(sqlite3_mutex sm);
+
+    public delegate void dxMutexLeave(sqlite3_mutex sm);
+
+    public delegate bool dxMutexHeld(sqlite3_mutex sm);
+
+    public delegate bool dxMutexNotheld(sqlite3_mutex sm);
 }

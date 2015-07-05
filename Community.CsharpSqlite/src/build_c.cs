@@ -1085,7 +1085,7 @@ p.zName,  P4Usage.P4_STATIC );
                 Vdbe v = pParse.pVdbe;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 v.sqlite3VdbeAddOp2(OpCode.OP_Integer, db.aDb[iDb].pSchema.schema_cookie + 1, r1);
-                v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, Sqlite3.BTREE_SCHEMA_VERSION, r1);
+                v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTreeProp.SCHEMA_VERSION, r1);
                 pParse.sqlite3ReleaseTempReg(r1);
             }
             ///<summary>
@@ -2306,7 +2306,7 @@ goto exit_drop_index;
                 sqlite3 db = pParse.db;
                 Debug.Assert(db != null);
                 ///if( db.aDb[0].pBt==0 ) return; 
-                if (sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_TRANSACTION, "BEGIN", null, null) != 0)
+                if (sqliteinth.sqlite3AuthCheck(pParse, AuthTarget.SQLITE_TRANSACTION, "BEGIN", null, null) != 0)
                     return;
                 
                 Vdbe v = pParse.sqlite3GetVdbe();
@@ -2354,7 +2354,7 @@ goto exit_drop_index;
                 sqlite3 db = pParse.db;
                 Debug.Assert(db != null);
                 ///if( db.aDb[0].pBt==0 ) return; 
-                if (sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_TRANSACTION, action.ToString(), null, null) != 0)
+                if (sqliteinth.sqlite3AuthCheck(pParse, AuthTarget.SQLITE_TRANSACTION, action.ToString(), null, null) != 0)
                 {
                     return;
                 }
@@ -2465,7 +2465,7 @@ goto exit_drop_index;
                     yDbMask mask;
                     Debug.Assert(iDb < db.nDb);
                     Debug.Assert(db.aDb[iDb].pBt != null || iDb == 1);
-                    Debug.Assert(iDb < Sqlite3.SQLITE_MAX_ATTACHED + 2);
+                    Debug.Assert(iDb < Limits.SQLITE_MAX_ATTACHED + 2);
                     Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                     mask = ((yDbMask)1) << iDb;
                     if ((pToplevel.cookieMask & mask) == 0)

@@ -644,7 +644,7 @@ namespace Community.CsharpSqlite
 ///pPage 
 ///</summary>
 
-		SQLITE_DEFAULT_PAGE_SIZE, ///
+		Limits.SQLITE_DEFAULT_PAGE_SIZE, ///
 ///<summary>
 ///szPage 
 ///</summary>

@@ -1749,7 +1749,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
         {
         }
         //# define sqlite3AuthCheck(a,b,c,d,e)    SqlResult.SQLITE_OK
-        public static SqlResult sqlite3AuthCheck(Parse a, int b, string c, byte[] d, byte[] e)
+        public static SqlResult sqlite3AuthCheck(Parse a, AuthTarget b, string c, byte[] d, byte[] e)
         {
             return SqlResult.SQLITE_OK;
         }

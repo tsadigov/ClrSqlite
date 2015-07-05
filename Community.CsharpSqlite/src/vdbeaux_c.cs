@@ -1926,7 +1926,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         //  return SQLITE_NOMEM;
                         //}
                         sqliteinth.sqlite3FileSuffix3(zMainFile, zMaster);
-                        rc = os.sqlite3OsAccess(pVfs, zMaster, Sqlite3.SQLITE_ACCESS_EXISTS, ref res);
+                        rc = os.sqlite3OsAccess(pVfs, zMaster, SQLITE_ACCESS.EXISTS, ref res);
                     }
                     while (rc == SqlResult.SQLITE_OK && res == 1);
                     if (rc == SqlResult.SQLITE_OK)

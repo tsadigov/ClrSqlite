@@ -334,7 +334,7 @@ namespace Community.CsharpSqlite {
 			for(i=0;i<Sqlite3.ArraySize(meta);i++) {
 				meta[i]=pDb.pBt.sqlite3BtreeGetMeta(i+1);
 			}
-			pDb.pSchema.schema_cookie=(int)meta[BTREE_SCHEMA_VERSION-1];
+            pDb.pSchema.schema_cookie = (int)meta[BTreeProp.SCHEMA_VERSION - 1];
 			///
 			///<summary>
 			///</summary>
@@ -343,7 +343,8 @@ namespace Community.CsharpSqlite {
 			///<param name="For an attached db, it is an error if the encoding is not the same">For an attached db, it is an error if the encoding is not the same</param>
 			///<param name="as sqlite3.enc.">as sqlite3.enc.</param>
 			///<param name=""></param>
-			if(meta[BTREE_TEXT_ENCODING-1]!=0) {
+            if (meta[BTreeProp.TEXT_ENCODING - 1] != 0)
+            {
 				///
 				///<summary>
 				///text encoding 
@@ -354,7 +355,7 @@ namespace Community.CsharpSqlite {
 					///<summary>
 					///If opening the main database, set ENC(db). 
 					///</summary>
-					encoding=(SqliteEncoding)(meta[BTREE_TEXT_ENCODING-1]&3);
+                    encoding = (SqliteEncoding)(meta[BTreeProp.TEXT_ENCODING - 1] & 3);
 					if(encoding==0)
 						encoding=SqliteEncoding.UTF8;
 					db.aDb[0].pSchema.enc=encoding;
@@ -366,7 +367,7 @@ namespace Community.CsharpSqlite {
 					///<summary>
 					///If opening an attached database, the encoding much match ENC(db) 
 					///</summary>
-                    if ((SqliteEncoding)meta[BTREE_TEXT_ENCODING - 1] != sqliteinth.ENC(db))
+                    if ((SqliteEncoding)meta[BTreeProp.TEXT_ENCODING - 1] != sqliteinth.ENC(db))
                     {
 						malloc_cs.sqlite3SetString(ref pzErrMsg,db,"attached databases must use the same"+" text encoding as main database");
 						rc=SqlResult.SQLITE_ERROR;
@@ -379,9 +380,9 @@ namespace Community.CsharpSqlite {
 			}
             pDb.pSchema.enc = sqliteinth.ENC(db);
 			if(pDb.pSchema.cache_size==0) {
-                size = utilc.sqlite3AbsInt32((int)meta[BTREE_DEFAULT_CACHE_SIZE - 1]);
+                size = utilc.sqlite3AbsInt32((int)meta[BTreeProp.DEFAULT_CACHE_SIZE - 1]);
 				if(size==0) {
-					size=SQLITE_DEFAULT_CACHE_SIZE;
+					size=Globals.SQLITE_DEFAULT_CACHE_SIZE;
 				}
 				pDb.pSchema.cache_size=size;
 				pDb.pBt.SetCacheSize(pDb.pSchema.cache_size);
@@ -394,7 +395,7 @@ namespace Community.CsharpSqlite {
 			///<param name="file_format==3    Version 3.1.4.  // ditto but with non">NULL defaults</param>
 			///<param name="file_format==4    Version 3.3.0.  // DESC indices.  Boolean constants">file_format==4    Version 3.3.0.  // DESC indices.  Boolean constants</param>
 			///<param name=""></param>
-			pDb.pSchema.file_format=(u8)meta[BTREE_FILE_FORMAT-1];
+            pDb.pSchema.file_format = (u8)meta[BTreeProp.FILE_FORMAT - 1];
 			if(pDb.pSchema.file_format==0) {
 				pDb.pSchema.file_format=1;
 			}
@@ -412,7 +413,8 @@ namespace Community.CsharpSqlite {
 			///indices that the user might have created.
 			///
 			///</summary>
-			if(iDb==0&&meta[BTREE_FILE_FORMAT-1]>=4) {
+            if (iDb == 0 && meta[BTreeProp.FILE_FORMAT - 1] >= 4)
+            {
                 db.flags &= ~SqliteFlags.SQLITE_LegacyFileFmt;
 			}
 			///
@@ -596,7 +598,7 @@ db.xAuth = 0;
 				///</summary>
 				///<param name="value stored as part of the in">memory schema representation,</param>
 				///<param name="set Parse.rc to SQLITE_SCHEMA. ">set Parse.rc to SQLITE_SCHEMA. </param>
-				cookie=pBt.sqlite3BtreeGetMeta(BTREE_SCHEMA_VERSION);
+                cookie = pBt.sqlite3BtreeGetMeta(BTreeProp.SCHEMA_VERSION);
 				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 				if(cookie!=db.aDb[iDb].pSchema.schema_cookie) {
 					build.sqlite3ResetInternalSchema(db,iDb);

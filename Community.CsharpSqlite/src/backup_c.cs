@@ -183,7 +183,7 @@ namespace Community.CsharpSqlite {
 					///</summary>
 					if(SqlResult.SQLITE_OK==rc&&this.bDestLocked==0&&SqlResult.SQLITE_OK==(rc=this.pDest.sqlite3BtreeBeginTrans(2))) {
 						this.bDestLocked=1;
-						this.iDestSchema=this.pDest.sqlite3BtreeGetMeta(BTREE_SCHEMA_VERSION);
+                        this.iDestSchema = this.pDest.sqlite3BtreeGetMeta(BTreeProp.SCHEMA_VERSION);
 					}
 					///
 					///<summary>

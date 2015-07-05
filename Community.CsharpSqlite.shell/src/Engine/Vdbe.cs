@@ -3266,7 +3266,7 @@ start = sqlite3Hwtime();
 							Debug.Assert(sqlite3SchemaMutexHeld(db,pOp.p1,null));
 							pBt=db.aDb[pOp.p1].pBt;
 							if(pBt!=null) {
-								iMeta=pBt.sqlite3BtreeGetMeta(BTREE_SCHEMA_VERSION);
+                                iMeta = pBt.sqlite3BtreeGetMeta(BTreeProp.SCHEMA_VERSION);
 								iGen=db.aDb[pOp.p1].pSchema.iGeneration;
 							}
 							else {
@@ -3895,7 +3895,7 @@ start = sqlite3Hwtime();
 							///<param name="database name "> used by the update hook </param>
 							string zTbl;
 							///<param name="Table name "> used by the opdate hook </param>
-							int op;
+                            AuthTarget op;
 							///Opcode for update hook: SQLITE_UPDATE or SQLITE_INSERT 
 							
 							
@@ -3940,8 +3940,8 @@ start = sqlite3Hwtime();
 								zTbl=pOp.p4.z;
                                 op = ((
                                     ((OpFlag)pOp.p5)
-                                    .Has(OpFlag.OPFLAG_ISUPDATE) 
-                                    ? SQLITE_UPDATE : SQLITE_INSERT
+                                    .Has(OpFlag.OPFLAG_ISUPDATE)
+                                    ? AuthTarget.SQLITE_UPDATE : AuthTarget.SQLITE_INSERT
                                     ));
 								Debug.Assert(pC.isTable);
 								db.xUpdateCallback(db.pUpdateArg,op,zDb,zTbl,iKey);
@@ -4023,7 +4023,7 @@ start = sqlite3Hwtime();
 							if(rc==SqlResult.SQLITE_OK&&db.xUpdateCallback!=null&&pOp.p4.z!=null) {
 								string zDb=db.aDb[pC.iDb].zName;
 								string zTbl=pOp.p4.z;
-								db.xUpdateCallback(db.pUpdateArg,SQLITE_DELETE,zDb,zTbl,iKey);
+                                db.xUpdateCallback(db.pUpdateArg, AuthTarget.SQLITE_DELETE, zDb, zTbl, iKey);
 								Debug.Assert(pC.iDb>=0);
 							}
                             if ((pOp.p2 & (int)OpFlag.OPFLAG_NCHANGE) != 0)

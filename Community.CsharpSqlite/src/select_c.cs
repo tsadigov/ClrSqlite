@@ -2759,7 +2759,7 @@ break;
                 ///Authorize the subquery 
                 string zSavedAuthContext = pParse.zAuthContext;                
                 pParse.zAuthContext = check.pSubitem.zName;
-                sqliteinth.sqlite3AuthCheck(pParse, Sqlite3.SQLITE_SELECT, null, null, null);
+                sqliteinth.sqlite3AuthCheck(pParse, AuthTarget.SQLITE_SELECT, null, null, null);
                 pParse.zAuthContext = zSavedAuthContext;
                 #endregion
 

@@ -263,7 +263,7 @@ p.sharable = 1;
 																																																																																																				pBt.secureDelete = true;
 #endif
                     pBt.pageSize = (u32)((zDbHeader[16] << 8) | (zDbHeader[17] << 16));
-                    if (pBt.pageSize < 512 || pBt.pageSize > SQLITE_MAX_PAGE_SIZE || ((pBt.pageSize - 1) & pBt.pageSize) != 0)
+                    if (pBt.pageSize < 512 || pBt.pageSize > Limits.SQLITE_MAX_PAGE_SIZE || ((pBt.pageSize - 1) & pBt.pageSize) != 0)
                     {
                         pBt.pageSize = 0;
 #if !SQLITE_OMIT_AUTOVACUUM
@@ -379,7 +379,7 @@ break;
                     ///<param name=""></param>
                     if (createdBTreeInstance.sqlite3BtreeSchema(0, null) == null)
                     {
-                        createdBTreeInstance.pBt.pPager.sqlite3PagerSetCachesize(SQLITE_DEFAULT_CACHE_SIZE);
+                        createdBTreeInstance.pBt.pPager.sqlite3PagerSetCachesize(Globals.SQLITE_DEFAULT_CACHE_SIZE);
                     }
                 }
                 if (mutexOpen != null)
@@ -765,7 +765,7 @@ releasePage(pPage);
                     if (pBt.autoVacuum)
                     {
                         Pgno maxRootPgno = 0;
-                        maxRootPgno = this.sqlite3BtreeGetMeta(BTREE_LARGEST_ROOT_PAGE);
+                        maxRootPgno = this.sqlite3BtreeGetMeta(BTreeProp.LARGEST_ROOT_PAGE);
                         if (iTable == maxRootPgno)
                         {
                             ///
@@ -894,7 +894,7 @@ releasePage(pPage);
                 {
                     Converter.sqlite3Put4byte(pP1, 36 + idx * 4, iMeta);
 #if !SQLITE_OMIT_AUTOVACUUM
-                    if (idx == BTREE_INCR_VACUUM)
+                    if (idx == BTreeProp.INCR_VACUUM)
                     {
                         Debug.Assert(pBt.autoVacuum || iMeta == 0);
                         Debug.Assert(iMeta == 0 || iMeta == 1);
@@ -973,7 +973,7 @@ releasePage(pPage);
                     nReserve = (int)(pBt.pageSize - pBt.usableSize);
                 }
                 Debug.Assert(nReserve >= 0 && nReserve <= 255);
-                if (pageSize >= 512 && pageSize <= SQLITE_MAX_PAGE_SIZE && ((pageSize - 1) & pageSize) == 0)
+                if (pageSize >= 512 && pageSize <= Limits.SQLITE_MAX_PAGE_SIZE && ((pageSize - 1) & pageSize) == 0)
                 {
                     Debug.Assert((pageSize & 7) == 0);
                     Debug.Assert(null == pBt.pPage1 && null == pBt.pCursor);
@@ -1588,40 +1588,8 @@ sqlite3BtreeTripAllCursors(p, rc);
                 return this.pBt.pPager;
             }
         }
-        ///
-        ///<summary>
-        ///The second parameter to sqlite3BtreeGetMeta or sqlite3BtreeUpdateMeta
-        ///should be one of the following values. The integer values are assigned
-        ///to constants so that the offset of the corresponding field in an
-        ///SQLite database header may be found using the following formula:
-        ///
-        ///offset = 36 + (idx * 4)
-        ///
-        ///</summary>
-        ///<param name="For example, the free">count field is located at byte offset 36 of</param>
-        ///<param name="the database file header. The incr">flag field is located at</param>
-        ///<param name="byte offset 64 (== 36+4*7).">byte offset 64 (== 36+4*7).</param>
-        ///<param name=""></param>
-    
-        public enum BTreeProp
-        {
-            FREE_PAGE_COUNT = 0,
-            SCHEMA_VERSION = 1,
-            FILE_FORMAT = 2,
-            DEFAULT_CACHE_SIZE = 3,
-            LARGEST_ROOT_PAGE = 4,
-            TEXT_ENCODING = 5,
-            USER_VERSION = 6,
-            INCR_VACUUM = 7
-        }
-        public const int BTREE_FREE_PAGE_COUNT = 0;
-        public const int BTREE_SCHEMA_VERSION = 1;
-        public const int BTREE_FILE_FORMAT = 2;
-        public const int BTREE_DEFAULT_CACHE_SIZE = 3;
-        public const int BTREE_LARGEST_ROOT_PAGE = 4;
-        public const int BTREE_TEXT_ENCODING = 5;
-        public const int BTREE_USER_VERSION = 6;
-        public const int BTREE_INCR_VACUUM = 7;
+        
+       
 
 
 
@@ -1631,4 +1599,31 @@ sqlite3BtreeTripAllCursors(p, rc);
 
 
 	}
+
+    ///
+    ///<summary>
+    ///The second parameter to sqlite3BtreeGetMeta or sqlite3BtreeUpdateMeta
+    ///should be one of the following values. The integer values are assigned
+    ///to constants so that the offset of the corresponding field in an
+    ///SQLite database header may be found using the following formula:
+    ///
+    ///offset = 36 + (idx * 4)
+    ///
+    ///</summary>
+    ///<param name="For example, the free">count field is located at byte offset 36 of</param>
+    ///<param name="the database file header. The incr">flag field is located at</param>
+    ///<param name="byte offset 64 (== 36+4*7).">byte offset 64 (== 36+4*7).</param>
+    ///<param name=""></param>
+
+    public static class BTreeProp
+    {
+        public static byte FREE_PAGE_COUNT = 0;
+        public static byte SCHEMA_VERSION = 1;
+        public static byte FILE_FORMAT = 2;
+        public static byte DEFAULT_CACHE_SIZE = 3;
+        public static byte LARGEST_ROOT_PAGE = 4;
+        public static byte TEXT_ENCODING = 5;
+        public static byte USER_VERSION = 6;
+        public static byte INCR_VACUUM = 7;
+    }
 }

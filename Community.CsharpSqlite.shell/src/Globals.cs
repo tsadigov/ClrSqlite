@@ -97,5 +97,16 @@ namespace Community.CsharpSqlite
         public const int SQLITE_LIMIT_VARIABLE_NUMBER = 9;
 
         public const int SQLITE_LIMIT_TRIGGER_DEPTH = 10;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="The maximum number of in">memory pages to use for the main database</param>
+        ///<param name="table and for temporary tables.  The SQLITE_DEFAULT_CACHE_SIZE">table and for temporary tables.  The SQLITE_DEFAULT_CACHE_SIZE</param>
+
+#if !SQLITE_DEFAULT_CACHE_SIZE
+        public const int SQLITE_DEFAULT_CACHE_SIZE = 2000;
+
+#endif
     }
 }

@@ -590,7 +590,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                         PagerMethods.CODEC2(pBt.pPager, zDbHeader, 2, SQLITE_DECRYPT, ref zDbHeader);
                         byte nReserve = zDbHeader[20];
                         pBt.pageSize = (uint)((zDbHeader[16] << 8) | (zDbHeader[17] << 16));
-                        if (pBt.pageSize < 512 || pBt.pageSize > SQLITE_MAX_PAGE_SIZE || ((pBt.pageSize - 1) & pBt.pageSize) != 0)
+                        if (pBt.pageSize < 512 || pBt.pageSize > Limits.SQLITE_MAX_PAGE_SIZE || ((pBt.pageSize - 1) & pBt.pageSize) != 0)
                             pBt.pageSize = 0;
                         pBt.pageSizeFixed = true;
 #if !SQLITE_OMIT_AUTOVACUUM

@@ -3202,7 +3202,7 @@ pFile.zDeleteOnClose = zConverted;
 ///Name of file to check 
 ///</summary>
 
-		int flags, ///
+		SQLITE_ACCESS flags, ///
 ///<summary>
 ///Type of test to make on this file 
 ///</summary>
@@ -3234,7 +3234,7 @@ pFile.zDeleteOnClose = zConverted;
 			//{
 			//
 			// Do a quick test to prevent the try/catch block
-			if (flags == SQLITE_ACCESS_EXISTS) {
+			if (flags == SQLITE_ACCESS.EXISTS) {
 				#if WINDOWS_PHONE
 																																																																												          pResOut = System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForApplication().FileExists(zFilename) ? 1 : 0;
 #elif SQLITE_SILVERLIGHT
@@ -3310,12 +3310,12 @@ pFile.zDeleteOnClose = zConverted;
 			}
 			//  free(zConverted);
 			switch (flags) {
-			case SQLITE_ACCESS_READ:
-			case SQLITE_ACCESS_EXISTS:
+			case SQLITE_ACCESS.READ:
+			case SQLITE_ACCESS.EXISTS:
 				rc = attr != 0 ? 1 : 0;
 				// != INVALID_FILE_ATTRIBUTES;
 				break;
-			case SQLITE_ACCESS_READWRITE:
+			case SQLITE_ACCESS.READWRITE:
 				rc = attr == 0 ? 0 : (int)(attr & FileAttributes.ReadOnly) != 0 ? 0 : 1;
 				//FILE_ATTRIBUTE_READONLY ) == 0;
 				break;

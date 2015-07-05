@@ -293,7 +293,7 @@ public u64 cycles;         /* Total time spend executing this instruction */
                     break;
                 case OpCode.OP_ReadCookie:
                 case OpCode.OP_SetCookie:
-                    str = ((Sqlite3.BTreeProp)p3).ToString();
+                    str = p3.ToString();
                     break;
                 case OpCode.OP_NewRowid:
                     var pC = vdbe.OpenCursors[p1];

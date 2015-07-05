@@ -4,10 +4,9 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_pcache = Sqlite3.PCache1;
+	using sqlite3_pcache = PCache1;
 
-	public partial class Sqlite3
-	{
+	
 		///<summary>
 		/// 2008 November 05
 		///
@@ -113,7 +112,7 @@ namespace Community.CsharpSqlite
 				mutex = new sqlite3_mutex ();
 			}
 		};
-
+        
 
 		///<summary>
 		///Each page cache is an instance of the following object.  Every
@@ -228,7 +227,7 @@ namespace Community.CsharpSqlite
 			}
 		};
 
-
+        
 		///<summary>
 		/// Each cache entry is represented by an instance of the following
 		/// structure. A buffer of PgHdr1.pCache.szPage bytes is allocated
@@ -288,7 +287,7 @@ namespace Community.CsharpSqlite
 			}
 		};
 
-
+    
 		///<summary>
 		/// Free slots in the allocator used to divide up the buffer provided using
 		/// the SQLITE_CONFIG_PAGECACHE mechanism.
@@ -419,6 +418,9 @@ namespace Community.CsharpSqlite
 			}
 		}
 
+
+        public partial class Sqlite3
+        {
 		static PCacheGlobal pcache = new PCacheGlobal ();
 
 		///

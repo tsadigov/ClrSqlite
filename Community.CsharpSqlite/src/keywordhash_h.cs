@@ -16,78 +16,30 @@ namespace Community.CsharpSqlite
 ///
 ///The code in this file implements a function that determines whether
 ///or not a given identifier is really an SQL keyword.  The same thing
-///</summary>
-///<param name="might be implemented more directly using a hand">written hash table.</param>
-///<param name="But by using this automatically generated code, the size of the code">But by using this automatically generated code, the size of the code</param>
-///<param name="is substantially reduced.  This is important for embedded applications">is substantially reduced.  This is important for embedded applications</param>
-///<param name="on platforms with limited memory.">on platforms with limited memory.</param>
-///<param name=""></param>
-///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+///might be implemented more directly using a hand-written hash table.
+///But by using this automatically generated code, the size of the code
+///is substantially reduced.  This is important for embedded applications
+///on platforms with limited memory.
+///Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
 ///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
 ///<param name=""></param>
 ///<param name="SQLITE_SOURCE_ID: 2010">23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3</param>
-///<param name=""></param>
-///<param name=""></param>
-///<param name=""></param>
 
-		///
-///<summary>
 ///Hash score: 175 
-///</summary>
 
-		///
-///<summary>
 ///zText[] encodes 811 bytes of keywords in 541 bytes 
-///</summary>
-
-		///
-///<summary>
 ///REINDEXEDESCAPEACHECKEYBEFOREIGNOREGEXPLAINSTEADDATABASELECT       
-///</summary>
 
-		///
-///<summary>
 ///ABLEFTHENDEFERRABLELSEXCEPTRANSACTIONATURALTERAISEXCLUSIVE         
-///</summary>
 
-		///
-///<summary>
 ///XISTSAVEPOINTERSECTRIGGEREFERENCESCONSTRAINTOFFSETEMPORARY         
-///</summary>
-
-		///
-///<summary>
 ///UNIQUERYATTACHAVINGROUPDATEBEGINNERELEASEBETWEENOTNULLIKE          
-///</summary>
-
-		///
-///<summary>
 ///CASCADELETECASECOLLATECREATECURRENT_DATEDETACHIMMEDIATEJOIN        
-///</summary>
-
-		///
-///<summary>
 ///SERTMATCHPLANALYZEPRAGMABORTVALUESVIRTUALIMITWHENWHERENAME         
-///</summary>
-
-		///
-///<summary>
 ///AFTEREPLACEANDEFAULTAUTOINCREMENTCASTCOLUMNCOMMITCONFLICTCROSS     
-///</summary>
-
-		///
-///<summary>
 ///CURRENT_TIMESTAMPRIMARYDEFERREDISTINCTDROPFAILFROMFULLGLOBYIF      
-///</summary>
-
-		///
-///<summary>
 ///ISNULLORDERESTRICTOUTERIGHTROLLBACKROWUNIONUSINGVACUUMVIEW         
-///</summary>
-
-		///<summary>
-		///INITIALLY
-		///</summary>
+///INITIALLY
 		static string zText = new string (new char[540] {
 			'R',
 			'E',
@@ -770,6 +722,7 @@ namespace Community.CsharpSqlite
 			52,
 		};
 
+        
 		static byte[] aNext =  {
 			//aNext[121]
 			0,

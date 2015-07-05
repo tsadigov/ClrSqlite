@@ -219,7 +219,7 @@ namespace Community.CsharpSqlite
                 return pVfs.xDelete(pVfs, zPath, dirSync);
             }
 
-            public static SqlResult sqlite3OsAccess(sqlite3_vfs pVfs, string zPath, int flags, ref int pResOut)
+            public static SqlResult sqlite3OsAccess(sqlite3_vfs pVfs, string zPath, SQLITE_ACCESS flags, ref int pResOut)
             {
                 DO_OS_MALLOC_TEST(null);
                 return pVfs.xAccess(pVfs, zPath, flags, out pResOut);

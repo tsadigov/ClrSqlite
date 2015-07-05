@@ -529,7 +529,7 @@ goto pragma_out;
 					///<summary>
 					///0 
 					///</summary>
-					new VdbeOpList(OpCode.OP_ReadCookie,0,1,BTREE_DEFAULT_CACHE_SIZE),
+					new VdbeOpList(OpCode.OP_ReadCookie,0,1,BTreeProp.DEFAULT_CACHE_SIZE),
 					///
 					///<summary>
 					///1 
@@ -556,13 +556,13 @@ goto pragma_out;
 					addr=v.sqlite3VdbeAddOpList(getCacheSize.Length,getCacheSize);
 					v.sqlite3VdbeChangeP1(addr,iDb);
 					v.sqlite3VdbeChangeP1(addr+1,iDb);
-					v.sqlite3VdbeChangeP1(addr+6,SQLITE_DEFAULT_CACHE_SIZE);
+					v.sqlite3VdbeChangeP1(addr+6,Globals.SQLITE_DEFAULT_CACHE_SIZE);
 				}
 				else {
                     int size = utilc.sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
 					build.sqlite3BeginWriteOperation(pParse,0,iDb);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,size,1);
-					v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie,iDb,BTREE_DEFAULT_CACHE_SIZE,1);
+                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTreeProp.DEFAULT_CACHE_SIZE, 1);
 					Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 					pDb.pSchema.cache_size=size;
 					pDb.pBt.SetCacheSize(pDb.pSchema.cache_size);
@@ -879,7 +879,7 @@ goto pragma_out;
 																///<summary>
 																///0 
 																///</summary>
-																new VdbeOpList(OpCode.OP_ReadCookie,0,1,BTREE_LARGEST_ROOT_PAGE),
+																new VdbeOpList(OpCode.OP_ReadCookie,0,1,BTreeProp.LARGEST_ROOT_PAGE),
 																///
 																///<summary>
 																///1 
@@ -899,7 +899,7 @@ goto pragma_out;
 																///<summary>
 																///4 
 																///</summary>
-																new VdbeOpList(OpCode.OP_SetCookie,0,BTREE_INCR_VACUUM,1),
+																new VdbeOpList(OpCode.OP_SetCookie,0,BTreeProp.INCR_VACUUM,1),
 															///
 															///<summary>
 															///5 
@@ -1022,7 +1022,7 @@ goto pragma_out;
 																	if(zRight.Length>0) {
 																		SqlResult rc;
 																		int res=0;
-																		rc=os.sqlite3OsAccess(db.pVfs,zRight,SQLITE_ACCESS_READWRITE,ref res);
+																		rc=os.sqlite3OsAccess(db.pVfs,zRight,SQLITE_ACCESS.READWRITE,ref res);
 																		if(rc!=SqlResult.SQLITE_OK||res==0) {
 																			utilc.sqlite3ErrorMsg(pParse,"not a writable directory");
 																			goto pragma_out;
@@ -1723,17 +1723,18 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																												switch(zLeft[0]) {
 																												case 'f':
 																												case 'F':
-																												iCookie=BTREE_FREE_PAGE_COUNT;
+                                                                                                                    iCookie = BTreeProp.FREE_PAGE_COUNT;
 																												break;
 																												case 's':
 																												case 'S':
-																												iCookie=BTREE_SCHEMA_VERSION;
+                                                                                                                iCookie = BTreeProp.SCHEMA_VERSION;
 																												break;
 																												default:
-																												iCookie=BTREE_USER_VERSION;
+                                                                                                                iCookie = BTreeProp.USER_VERSION;
 																												break;
 																												}
-																												if(zRight!=null&&iCookie!=BTREE_FREE_PAGE_COUNT) {
+                                                                                                                if (zRight != null && iCookie != BTreeProp.FREE_PAGE_COUNT)
+                                                                                                                {
 																													///
 																													///<summary>
 																													///Write the specified cookie value 

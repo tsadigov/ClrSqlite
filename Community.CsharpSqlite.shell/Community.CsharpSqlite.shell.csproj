@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Community.CsharpSqlite</RootNamespace>
-    <AssemblyName>C#-SQLite3.1234</AssemblyName>
+    <AssemblyName>C#-SQLite3.123456</AssemblyName>
     <StartupObject>Shell</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -319,11 +319,14 @@
     <Compile Include="src\Ast\SqcList.cs" />
     <Compile Include="src\Ast\Token.cs" />
     <Compile Include="src\Ast\Where.cs" />
+    <Compile Include="src\Auth\AuthRelaed.cs" />
     <Compile Include="src\BackupExtensions.cs" />
     <Compile Include="src\BitvecExtensions.cs" />
     <Compile Include="src\BtCursor.cs" />
-    <Compile Include="src\BTree.cs" />
-    <Compile Include="src\BtreeExtensions.cs" />
+    <Compile Include="src\Limits.cs" />
+    <Compile Include="src\Os\sqlite3_io_methods.cs" />
+    <Compile Include="src\Storage\BTree.cs" />
+    <Compile Include="src\Storage\BtreeExtensions.cs" />
     <Compile Include="src\builder\DbBuilder.cs" />
     <Compile Include="src\builder\IndexBuilder.cs" />
     <Compile Include="src\builder\TableBuilder.cs" />

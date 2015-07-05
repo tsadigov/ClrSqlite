@@ -359,7 +359,7 @@ namespace Community.CsharpSqlite
 ///Previous element in list of dirty pages 
 ///</summary>
 
-			public Sqlite3.PgHdr1 pPgHdr1;
+			public PgHdr1 pPgHdr1;
 
 			///<summary>
 			///Cache page header this this page

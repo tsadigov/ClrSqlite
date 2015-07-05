@@ -16,7 +16,7 @@ using u32 = System.UInt32;
 namespace Community.CsharpSqlite
 {
 	using DbPage = PgHdr;
-	using sqlite3_pcache = Sqlite3.PCache1;
+	using sqlite3_pcache = PCache1;
 	using sqlite3_stmt = Sqlite3.Vdbe;
     using sqlite3_value = Engine.Mem;
     using codec_ctx=Sqlite3.crypto.codec_ctx;
@@ -185,7 +185,7 @@ namespace Community.CsharpSqlite
 
     public delegate void dxTrace(object pTraceArg, string msg);
 
-    public delegate void dxUpdateCallback(object pUpdateArg, int b, string c, string d, sqlite3_int64 e);
+    public delegate void dxUpdateCallback(object pUpdateArg, AuthTarget b, string c, string d, sqlite3_int64 e);
 
     public delegate int dxWalCallback(object pWalArg, sqlite3 db, string zDb, int nEntry);
 

@@ -1439,7 +1439,8 @@ return 1;
 			FuncDef p;
 			int nName;
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
-			if(zFunctionName==null||(xFunc!=null&&(xFinal!=null||xStep!=null))||(xFunc==null&&(xFinal!=null&&xStep==null))||(xFunc==null&&(xFinal==null&&xStep!=null))||(nArg<-1||nArg>SQLITE_MAX_FUNCTION_ARG)||(255<(nName=StringExtensions.sqlite3Strlen30(zFunctionName)))) {
+            if (zFunctionName == null || (xFunc != null && (xFinal != null || xStep != null)) || (xFunc == null && (xFinal != null && xStep == null)) || (xFunc == null && (xFinal == null && xStep != null)) || (nArg < -1 || nArg > Limits.SQLITE_MAX_FUNCTION_ARG) || (255 < (nName = StringExtensions.sqlite3Strlen30(zFunctionName))))
+            {
 				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			#if !SQLITE_OMIT_UTF16
@@ -2127,17 +2128,17 @@ return z;
 		///
 		///</summary>
 		static int[] aHardLimit=new int[] {
-			SQLITE_MAX_LENGTH,
-			SQLITE_MAX_SQL_LENGTH,
-			SQLITE_MAX_COLUMN,
-			SQLITE_MAX_EXPR_DEPTH,
-			SQLITE_MAX_COMPOUND_SELECT,
-			SQLITE_MAX_VDBE_OP,
-			SQLITE_MAX_FUNCTION_ARG,
-			SQLITE_MAX_ATTACHED,
-			SQLITE_MAX_LIKE_PATTERN_LENGTH,
-			SQLITE_MAX_VARIABLE_NUMBER,
-			SQLITE_MAX_TRIGGER_DEPTH,
+			Limits.SQLITE_MAX_LENGTH,
+			Limits.SQLITE_MAX_SQL_LENGTH,
+			Limits.SQLITE_MAX_COLUMN,
+			Limits.SQLITE_MAX_EXPR_DEPTH,
+			Limits.SQLITE_MAX_COMPOUND_SELECT,
+			Limits.SQLITE_MAX_VDBE_OP,
+			Limits.SQLITE_MAX_FUNCTION_ARG,
+			Limits.SQLITE_MAX_ATTACHED,
+			Limits.SQLITE_MAX_LIKE_PATTERN_LENGTH,
+			Limits.SQLITE_MAX_VARIABLE_NUMBER,
+			Limits.SQLITE_MAX_TRIGGER_DEPTH,
 		};
 		///
 		///<summary>
@@ -2196,17 +2197,17 @@ return z;
 			///<param name="macro called SQLITE_MAX_NAME. (The "_LIMIT_" in the name is changed to">macro called SQLITE_MAX_NAME. (The "_LIMIT_" in the name is changed to</param>
 			///<param name=""_MAX_".)">"_MAX_".)</param>
 			///<param name=""></param>
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_LENGTH]==SQLITE_MAX_LENGTH);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_SQL_LENGTH]==SQLITE_MAX_SQL_LENGTH);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_COLUMN]==SQLITE_MAX_COLUMN);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_EXPR_DEPTH]==SQLITE_MAX_EXPR_DEPTH);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_COMPOUND_SELECT]==SQLITE_MAX_COMPOUND_SELECT);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_VDBE_OP]==SQLITE_MAX_VDBE_OP);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_FUNCTION_ARG]==SQLITE_MAX_FUNCTION_ARG);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_ATTACHED]==SQLITE_MAX_ATTACHED);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_LIKE_PATTERN_LENGTH]==SQLITE_MAX_LIKE_PATTERN_LENGTH);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]==SQLITE_MAX_VARIABLE_NUMBER);
-			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_TRIGGER_DEPTH]==SQLITE_MAX_TRIGGER_DEPTH);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_LENGTH]==Limits.SQLITE_MAX_LENGTH);
+            Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_SQL_LENGTH] == Limits.SQLITE_MAX_SQL_LENGTH);
+			Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_COLUMN]==Limits.SQLITE_MAX_COLUMN);
+            Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_EXPR_DEPTH] == Limits.SQLITE_MAX_EXPR_DEPTH);
+            Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_COMPOUND_SELECT] == Limits.SQLITE_MAX_COMPOUND_SELECT);
+            Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_VDBE_OP] == Limits.SQLITE_MAX_VDBE_OP);
+            Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_FUNCTION_ARG] == Limits.SQLITE_MAX_FUNCTION_ARG);
+            Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_ATTACHED] == Limits.SQLITE_MAX_ATTACHED);
+            Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_LIKE_PATTERN_LENGTH] == Limits.SQLITE_MAX_LIKE_PATTERN_LENGTH);
+            Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER] == Limits.SQLITE_MAX_VARIABLE_NUMBER);
+            Debug.Assert(aHardLimit[Globals.SQLITE_LIMIT_TRIGGER_DEPTH] == Limits.SQLITE_MAX_TRIGGER_DEPTH);
             Debug.Assert(Globals.SQLITE_LIMIT_TRIGGER_DEPTH == (sqliteinth.SQLITE_N_LIMIT - 1));
 			if(limitId<0||limitId>=sqliteinth.SQLITE_N_LIMIT) {
 				return -1;
@@ -2804,7 +2805,7 @@ SQLITE_DEFAULT_LOCKING_MODE);
 			///</summary>
 			///<param name="Enable the lookaside">malloc subsystem </param>
 			setupLookaside(db,null,sqliteinth.sqlite3GlobalConfig.szLookaside,sqliteinth.sqlite3GlobalConfig.nLookaside);
-			sqlite3_wal_autocheckpoint(db,SQLITE_DEFAULT_WAL_AUTOCHECKPOINT);
+			sqlite3_wal_autocheckpoint(db,Limits.SQLITE_DEFAULT_WAL_AUTOCHECKPOINT);
 			opendb_out:
 			//malloc_cs.sqlite3_free(zOpen);
 			if(db!=null) {

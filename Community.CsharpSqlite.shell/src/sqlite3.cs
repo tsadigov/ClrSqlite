@@ -87,7 +87,7 @@ namespace Community.CsharpSqlite
             ///Number of backends currently in use 
             ///</summary>
 
-            public Db[] aDb = new Db[Sqlite3.SQLITE_MAX_ATTACHED];
+            public Db[] aDb = new Db[Limits.SQLITE_MAX_ATTACHED];
 
             ///
             ///<summary>
@@ -594,7 +594,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 {
                     return null;
                 }
-                io.sqlite3StrAccumInit(txt, null, 0, Sqlite3.SQLITE_MAX_LENGTH);
+                io.sqlite3StrAccumInit(txt, null, 0, Limits.SQLITE_MAX_LENGTH);
                 txt.db = this;
                 txt.sqlite3StrAccumAppend(" (", 2);
                 for (i = 0; i < nEq; i++)
