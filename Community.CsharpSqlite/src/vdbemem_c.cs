@@ -10,7 +10,6 @@ namespace Community.CsharpSqlite
 {
     using sqlite3_value = Engine.Mem;
     using System.Globalization;
-    using BtCursor = Sqlite3.BtCursor;
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;

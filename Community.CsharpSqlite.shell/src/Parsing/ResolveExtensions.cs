@@ -287,9 +287,9 @@ namespace Community.CsharpSqlite
                     else
                     {
                         p.iColumn = (ynVar)iCol;
-                        sqliteinth.testcase(iCol == BMS);
-                        sqliteinth.testcase(iCol == BMS - 1);
-                        pItem.colUsed |= ((Bitmask)1) << (iCol >= BMS ? BMS - 1 : iCol);
+                        sqliteinth.testcase(iCol == Globals.BMS);
+                        sqliteinth.testcase(iCol == Globals.BMS - 1);
+                        pItem.colUsed |= ((Bitmask)1) << (iCol >= Globals.BMS ? Globals.BMS - 1 : iCol);
                     }
                     p.ExprSetProperty(ExprFlags.EP_Resolved);
                 }
@@ -646,10 +646,10 @@ namespace Community.CsharpSqlite
                 if (pExpr.iColumn >= 0 && pMatch != null)
                 {
                     int n = pExpr.iColumn;
-                    sqliteinth.testcase(n == BMS - 1);
-                    if (n >= BMS)
+                    sqliteinth.testcase(n == Globals.BMS - 1);
+                    if (n >= Globals.BMS)
                     {
-                        n = BMS - 1;
+                        n = Globals.BMS - 1;
                     }
                     Debug.Assert(pMatch.iCursor == pExpr.iTable);
                     pMatch.colUsed |= ((Bitmask)1) << n;

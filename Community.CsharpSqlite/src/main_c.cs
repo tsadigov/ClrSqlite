@@ -90,7 +90,7 @@ namespace Community.CsharpSqlite {
 		///<param name="the SQLITE_THREADSAFE compile">time option being set to 0.</param>
 		///<param name=""></param>
 		public static int sqlite3_threadsafe() {
-			return SQLITE_THREADSAFE;
+			return Globals.SQLITE_THREADSAFE;
 		}
 		#if !SQLITE_OMIT_TRACE && SQLITE_ENABLE_IOTRACE
 																																														/*
@@ -1356,7 +1356,7 @@ return 1;
 		/// returns 0, the operation aborts with an SQLITE_BUSY error.
 		///
 		///</summary>
-		static int sqlite3InvokeBusyHandler(BusyHandler p) {
+		public static int sqlite3InvokeBusyHandler(BusyHandler p) {
 			int rc;
 			if(NEVER(p==null)||p.xFunc==null||p.nBusy<0)
 				return 0;
@@ -3223,7 +3223,7 @@ error_out:
 				if(pBtree!=null) {
 					Pager pPager;
 					sqlite3_file fd;
-					sqlite3BtreeEnter(pBtree);
+                    pBtree.sqlite3BtreeEnter();
 					pPager=pBtree.sqlite3BtreePager();
 					Debug.Assert(pPager!=null);
 					fd=pPager.sqlite3PagerFile();
@@ -3243,7 +3243,7 @@ error_out:
 						else {
 							rc=SqlResult.SQLITE_NOTFOUND;
 						}
-					sqlite3BtreeLeave(pBtree);
+                    pBtree.sqlite3BtreeLeave();
 				}
 			}
 			db.mutex.sqlite3_mutex_leave();

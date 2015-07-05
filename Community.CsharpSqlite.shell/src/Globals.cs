@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Bitmask = System.UInt64;
 
 namespace Community.CsharpSqlite
 {
@@ -108,5 +109,130 @@ namespace Community.CsharpSqlite
         public const int SQLITE_DEFAULT_CACHE_SIZE = 2000;
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+        ///<summary>
+        ///The number of samples of an index that SQLite takes in order to 
+        ///construct a histogram of the table content when running ANALYZE
+        ///and with SQLITE_ENABLE_STAT2
+        ///</summary>
+        //#define SQLITE_INDEX_SAMPLES 10
+        public const int SQLITE_INDEX_SAMPLES = 10;
+
+
+        ///<summary>
+        ///The SQLITE_THREADSAFE macro must be defined as 0, 1, or 2.
+        ///0 means mutexes are permanently disable and the library is never
+        ///threadsafe.  1 means the library is serialized which is the highest
+        ///</summary>
+        ///<param name="level of threadsafety.  2 means the libary is multithreaded "> multiple</param>
+        ///<param name="threads can use SQLite as long as no two threads try to use the same">threads can use SQLite as long as no two threads try to use the same</param>
+        ///<param name="database connection at the same time.">database connection at the same time.</param>
+        ///<param name=""></param>
+        ///<param name="Older versions of SQLite used an optional THREADSAFE macro.">Older versions of SQLite used an optional THREADSAFE macro.</param>
+        ///<param name="We support that for legacy.">We support that for legacy.</param>
+        ///<param name=""></param>
+#if !SQLITE_THREADSAFE
+        //# define SQLITE_THREADSAFE 2
+        public const int SQLITE_THREADSAFE = 2;
+#else
+																																																												    const int SQLITE_THREADSAFE = 2; /* IMP: R-07272-22309 */
+#endif
+        ///
+        ///<summary>
+        ///The SQLITE_DEFAULT_MEMSTATUS macro must be defined as either 0 or 1.
+        ///It determines whether or not the features related to
+        ///SQLITE_CONFIG_MEMSTATUS are available by default or not. This value can
+        ///be overridden at runtime using the sqlite3_config() API.
+        ///</summary>
+#if !(SQLITE_DEFAULT_MEMSTATUS)
+        //# define SQLITE_DEFAULT_MEMSTATUS 1
+        public const int SQLITE_DEFAULT_MEMSTATUS = 0;
+#else
+																																																												const int SQLITE_DEFAULT_MEMSTATUS = 1;
+#endif
+        ///
+        ///<summary>
+        ///Exactly one of the following macros must be defined in order to
+        ///specify which memory allocation subsystem to use.
+        ///
+        ///SQLITE_SYSTEM_MALLOC          // Use normal system malloc()
+        ///SQLITE_MEMDEBUG               // Debugging version of system malloc()
+        ///
+        ///(Historical note:  There used to be several other options, but we've
+        ///pared it down to just these two.)
+        ///
+        ///If none of the above are defined, then set SQLITE_SYSTEM_MALLOC as
+        ///the default.
+        ///</summary>
+        //#if (SQLITE_SYSTEM_MALLOC)+defined(SQLITE_MEMDEBUG)+\
+        //# error "At most one of the following compile-time configuration options\
+        // is allows: SQLITE_SYSTEM_MALLOC, SQLITE_MEMDEBUG"
+        //#endif
+        //#if (SQLITE_SYSTEM_MALLOC)+defined(SQLITE_MEMDEBUG)+\
+        //# define SQLITE_SYSTEM_MALLOC 1
+        //#endif
+        ///
+        ///<summary>
+        ///If SQLITE_MALLOC_SOFT_LIMIT is not zero, then try to keep the
+        ///sizes of memory allocations below this value where possible.
+        ///
+        ///</summary>
+#if !(SQLITE_MALLOC_SOFT_LIMIT)
+        public const int SQLITE_MALLOC_SOFT_LIMIT = 1024;
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ///
+        ///<summary>
+        ///The bitmask datatype defined below is used for various optimizations.
+        ///
+        ///</summary>
+        ///<param name="Changing this from a 64">bit type limits the number of</param>
+        ///<param name="tables in a join to 32 instead of 64.  But it also reduces the size">tables in a join to 32 instead of 64.  But it also reduces the size</param>
+        ///<param name="of the library by 738 bytes on ix86.">of the library by 738 bytes on ix86.</param>
+        ///<param name=""></param>
+        //typedef u64 Bitmask;
+        ///<summary>
+        /// The number of bits in a Bitmask.  "BMS" means "BitMask Size".
+        ///
+        ///</summary>
+        //#define BMS  ((int)(sizeof(Bitmask)*8))
+        public const int BMS = ((int)(sizeof(Bitmask) * 8));
+
+
     }
 }

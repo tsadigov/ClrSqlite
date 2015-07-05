@@ -33,12 +33,11 @@ namespace Community.CsharpSqlite
     using sqlite3_value = Engine.Mem;
     using Vdbe = Sqlite3.Vdbe;
     using System;
-    using BTreeMethods=Sqlite3.BTreeMethods;     
+    
     using System.Collections.Generic;
     using Parse = Sqlite3.Parse;
     using Btree = Sqlite3.Btree;
     using os = Sqlite3.os;
-    using BtCursor = Sqlite3.BtCursor;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;

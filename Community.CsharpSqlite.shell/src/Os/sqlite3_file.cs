@@ -497,7 +497,7 @@ namespace Community.CsharpSqlite
         ///</summary>
 
         // public HANDLE h;            /* Handle for accessing the file */
-        public int locktype;
+        public LockType locktype;
 
         ///
         ///<summary>
@@ -651,7 +651,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 
     public delegate SqlResult dxFileSize(sqlite3_file File_ID, ref long size);
 
-    public delegate SqlResult dxLock(sqlite3_file File_ID, int locktype);
+    public delegate SqlResult dxLock(sqlite3_file File_ID, LockType locktype);
 
     public delegate SqlResult dxRead(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
 
@@ -661,7 +661,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
 
     public delegate SqlResult dxTruncate(sqlite3_file File_ID, sqlite3_int64 size);
 
-    public delegate SqlResult dxUnlock(sqlite3_file File_ID, int locktype);
+    public delegate SqlResult dxUnlock(sqlite3_file File_ID, LockType locktype);
 
     public delegate SqlResult dxWrite(sqlite3_file File_ID, byte[] buffer, int amount, sqlite3_int64 offset);
 

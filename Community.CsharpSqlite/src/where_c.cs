@@ -599,7 +599,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Number of Debug.Assigned cursor values
             ///</summary>
-            public int[] ix = new int[Sqlite3.BMS];
+            public int[] ix = new int[Globals.BMS];
             ///
             ///<summary>
             ///Cursor Debug.Assigned to each bit 

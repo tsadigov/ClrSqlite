@@ -6,8 +6,37 @@ using System.Threading.Tasks;
 
 namespace Community.CsharpSqlite
 {
-    public class Limits
+    public static class Limits
     {
+        public static class Pager{
+            ///<summary>
+            ///Default maximum size for persistent journal files. A negative
+            ///value means no limit. This value may be overridden using the
+            ///sqlite3PagerJournalSizeLimit() API. See also "PRAGMA journal_size_limit".
+            ///
+            ///</summary>
+
+#if !SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT
+            public const int SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT = -1;
+
+            //#define SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT -1
+#endif
+        }
+
+        ///<summary>
+        /// Maximum depth of an SQLite B-Tree structure. Any B-Tree deeper than
+        /// this will be declared corrupt. This value is calculated based on a
+        /// maximum database size of 2^31 pages a minimum fanout of 2 for a
+        /// root-node and 3 for all other internal nodes.
+        ///
+        /// If a tree that appears to be taller than this is encountered, it is
+        /// assumed that the database is corrupt.
+        ///
+        ///</summary>
+        //#define BTCURSOR_MAX_DEPTH 20
+        public const int BTCURSOR_MAX_DEPTH = 20;
+
+
         ///The maximum length of a TEXT or BLOB in bytes.   This also
         ///limits the size of a row in a table or index.
         ///The hard limit is the ability of a 32-bit signed integer

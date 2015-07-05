@@ -36,7 +36,6 @@ namespace Community.CsharpSqlite
 	using System.Text;
     using sqlite3_value = Engine.Mem;
 	using System.Collections.Generic;
-    using BtCursor = Sqlite3.BtCursor;
     using Btree = Sqlite3.Btree;
     using Community.CsharpSqlite.Metadata;
     ///<summary>

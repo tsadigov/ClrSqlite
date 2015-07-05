@@ -33,23 +33,7 @@ namespace Community.CsharpSqlite {
 		///<param name=""></param>
 		//#include "sqliteInt.h"
 		//#include "vdbeInt.h"
-		///<summary>
-		/// Variables in which to record status information.
-		///
-		///</summary>
-		//typedef struct sqlite3StatType sqlite3StatType;
-		public class sqlite3StatType {
-			public int[] nowValue=new int[10];
-			///
-			///<summary>
-			///Current value 
-			///</summary>
-			public int[] mxValue=new int[10];
-		///
-		///<summary>
-		///Maximum value 
-		///</summary>
-		}
+		
 		public static sqlite3StatType sqlite3Stat=new sqlite3StatType();
 		///<summary>
 		///The "wsdStat" macro will resolve to the status information
@@ -190,7 +174,7 @@ namespace Community.CsharpSqlite {
 			case SQLITE_DBSTATUS_CACHE_USED: {
 				int totalUsed=0;
 				int i;
-				sqlite3BtreeEnterAll(db);
+                db.sqlite3BtreeEnterAll();
 				for(i=0;i<db.nDb;i++) {
 					Btree pBt=db.aDb[i].pBt;
 					if(pBt!=null) {
@@ -221,7 +205,7 @@ namespace Community.CsharpSqlite {
 				///<summary>
 				///Used to accumulate return value 
 				///</summary>
-				sqlite3BtreeEnterAll(db);
+                db.sqlite3BtreeEnterAll();
 				//db.pnBytesFreed = nByte;
 				for(i=0;i<db.nDb;i++) {
 					Schema pSchema=db.aDb[i].pSchema;
@@ -292,4 +276,22 @@ namespace Community.CsharpSqlite {
 			return rc;
 		}
 	}
+    ///<summary>
+    /// Variables in which to record status information.
+    ///
+    ///</summary>
+    //typedef struct sqlite3StatType sqlite3StatType;
+    public class sqlite3StatType
+    {
+        public int[] nowValue = new int[10];
+        ///
+        ///<summary>
+        ///Current value 
+        ///</summary>
+        public int[] mxValue = new int[10];
+        ///
+        ///<summary>
+        ///Maximum value 
+        ///</summary>
+    }
 }

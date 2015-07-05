@@ -134,7 +134,7 @@ namespace Community.CsharpSqlite {
 				///Destination page size 
 				///</summary>
 				this.pSrcDb.mutex.sqlite3_mutex_enter();
-				sqlite3BtreeEnter(this.pSrc);
+                this.pSrc.sqlite3BtreeEnter();
 				if(this.pDestDb!=null) {
 					this.pDestDb.mutex.sqlite3_mutex_enter();
 				}
@@ -221,7 +221,8 @@ namespace Community.CsharpSqlite {
 						///<summary>
 						///Source page number 
 						///</summary>
-						if(iSrcPg!=PENDING_BYTE_PAGE(this.pSrc.pBt)) {
+                        if (iSrcPg != this.pSrc.pBt.PENDING_BYTE_PAGE)
+                        {
 							DbPage pSrcPg=null;
 							///
 							///<summary>
@@ -280,7 +281,8 @@ namespace Community.CsharpSqlite {
 						if(pgszSrc<pgszDest) {
 							int ratio=pgszDest/pgszSrc;
 							nDestTruncate=(Pgno)((nSrcPage+ratio-1)/ratio);
-							if(nDestTruncate==(int)PENDING_BYTE_PAGE(this.pDest.pBt)) {
+                            if (nDestTruncate == (int)(this.pDest.pBt.PENDING_BYTE_PAGE))
+                            {
 								nDestTruncate--;
 							}
 						}
@@ -306,7 +308,7 @@ namespace Community.CsharpSqlite {
 							i64 iOff;
 							i64 iEnd;
 							Debug.Assert(pFile!=null);
-							Debug.Assert((i64)nDestTruncate*(i64)pgszDest>=iSize||(nDestTruncate==(int)(PENDING_BYTE_PAGE(this.pDest.pBt)-1)&&iSize>=PENDING_BYTE&&iSize<=PENDING_BYTE+pgszDest));
+                            Debug.Assert((i64)nDestTruncate * (i64)pgszDest >= iSize || (nDestTruncate == (int)(this.pDest.pBt.PENDING_BYTE_PAGE - 1) && iSize >= PENDING_BYTE && iSize <= PENDING_BYTE + pgszDest));
 							///
 							///<summary>
 							///This call ensures that all data required to recreate the original
@@ -384,7 +386,7 @@ namespace Community.CsharpSqlite {
 				if(this.pDestDb!=null) {
 					this.pDestDb.mutex.sqlite3_mutex_leave();
 				}
-				sqlite3BtreeLeave(this.pSrc);
+                this.pSrc.sqlite3BtreeLeave();
 				this.pSrcDb.mutex.sqlite3_mutex_leave();
 				return rc;
 			}
@@ -414,7 +416,7 @@ namespace Community.CsharpSqlite {
 				if(this==null)
 					return SqlResult.SQLITE_OK;
 				this.pSrcDb.mutex.sqlite3_mutex_enter();
-				sqlite3BtreeEnter(this.pSrc);
+                this.pSrc.sqlite3BtreeEnter();
 				mutex=this.pSrcDb.mutex;
 				if(this.pDestDb!=null) {
 					this.pDestDb.mutex.sqlite3_mutex_enter();
@@ -451,7 +453,7 @@ namespace Community.CsharpSqlite {
 				if(this.pDestDb!=null) {
 					this.pDestDb.mutex.sqlite3_mutex_leave();
 				}
-				sqlite3BtreeLeave(this.pSrc);
+                this.pSrc.sqlite3BtreeLeave();
 				if(this.pDestDb!=null) {
 					///
 					///<summary>
@@ -497,7 +499,7 @@ namespace Community.CsharpSqlite {
 				i64 iOff;
 				Debug.Assert(this.bDestLocked!=0);
 				Debug.Assert(!isFatalError(this.rc));
-				Debug.Assert(iSrcPg!=PENDING_BYTE_PAGE(this.pSrc.pBt));
+                Debug.Assert(iSrcPg != this.pSrc.pBt.PENDING_BYTE_PAGE);
 				Debug.Assert(zSrcData!=null);
 				///
 				///<summary>
@@ -543,7 +545,7 @@ namespace Community.CsharpSqlite {
 				for(iOff=iEnd-(i64)nSrcPgsz;rc==SqlResult.SQLITE_OK&&iOff<iEnd;iOff+=nDestPgsz) {
 					DbPage pDestPg=null;
 					u32 iDest=(u32)(iOff/nDestPgsz)+1;
-					if(iDest==PENDING_BYTE_PAGE(this.pDest.pBt))
+                    if (iDest == this.pDest.pBt.PENDING_BYTE_PAGE)
 						continue;
 					if(SqlResult.SQLITE_OK==(rc=pDestPager.sqlite3PagerGet(iDest,ref pDestPg))&&SqlResult.SQLITE_OK==(rc=PagerMethods.sqlite3PagerWrite(pDestPg))) {
 						//string zIn = &zSrcData[iOff%nSrcPgsz];

@@ -9,7 +9,6 @@ using i64 = System.Int64;
 
 namespace Community.CsharpSqlite.Engine.Op
 {
-    using BtCursor = Sqlite3.BtCursor;
     using Community.CsharpSqlite.Engine;
 
     public static class Idx

@@ -14,8 +14,6 @@ namespace Community.CsharpSqlite
 	using DbPage = PgHdr;
 	using System.Text;
     using Pager = Sqlite3.Pager;
-    using BtCursor = Sqlite3.BtCursor;
-    using PagerMethods=Sqlite3.PagerMethods;
     using Metadata;
     using Community.CsharpSqlite.Os;
     ///<summary>
@@ -450,7 +448,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
             Debug.Assert(pExcept == null || pExcept.pBt == this);
             for (p = this.pCursor; p != null; p = p.pNext)
             {
-                if (p != pExcept && (0 == iRoot || p.pgnoRoot == iRoot) && p.eState == Sqlite3.CURSOR_VALID)
+                if (p != pExcept && (0 == iRoot || p.pgnoRoot == iRoot) && p.eState == BtCursorState.CURSOR_VALID)
                 {
                     SqlResult rc = p.saveCursorPosition();
                     if (SqlResult.SQLITE_OK != rc)
@@ -474,7 +472,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
             nPagesPerMapPage = (int)(this.usableSize / 5 + 1);
             iPtrMap = (Pgno)((pgno - 2) / nPagesPerMapPage);
             ret = (Pgno)(iPtrMap * nPagesPerMapPage) + 2;
-            if (ret == Sqlite3.PENDING_BYTE_PAGE(this))
+            if (ret == this.PENDING_BYTE_PAGE)
             {
                 ret++;
             }
@@ -521,21 +519,21 @@ public u8 isPending;            /* If waiting for read-locks to clear */
             ///</summary>
             ///<param name="The master">journal page number must never be used as a pointer map page </param>
 
-            Debug.Assert(false == Sqlite3.PTRMAP_ISPAGE(this, Sqlite3.PENDING_BYTE_PAGE(this)));
+            Debug.Assert(false == this.PTRMAP_ISPAGE(this.PENDING_BYTE_PAGE));
             Debug.Assert(this.autoVacuum);
             if (key == 0)
             {
                 pRC = sqliteinth.SQLITE_CORRUPT_BKPT();
                 return;
             }
-            iPtrmap = Sqlite3.PTRMAP_PAGENO(this, key);
+            iPtrmap = this.PTRMAP_PAGENO(key);
             rc = this.pPager.sqlite3PagerGet(iPtrmap, ref pDbPage);
             if (rc != SqlResult.SQLITE_OK)
             {
                 pRC = rc;
                 return;
             }
-            offset = (int)Sqlite3.PTRMAP_PTROFFSET(iPtrmap, key);
+            offset = (int)BTreeMethods.PTRMAP_PTROFFSET(iPtrmap, key);
             if (offset < 0)
             {
                 pRC = sqliteinth.SQLITE_CORRUPT_BKPT();
@@ -585,14 +583,14 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 
             SqlResult rc;
             Debug.Assert(this.mutex.sqlite3_mutex_held());
-            iPtrmap = (int)Sqlite3.PTRMAP_PAGENO(this, key);
+            iPtrmap = (int)this.PTRMAP_PAGENO(key);
             rc = this.pPager.sqlite3PagerGet((u32)iPtrmap, ref pDbPage);
             if (rc != 0)
             {
                 return rc;
             }
             pPtrmap = pDbPage.sqlite3PagerGetData();
-            offset = (int)Sqlite3.PTRMAP_PTROFFSET((u32)iPtrmap, key);
+            offset = (int)BTreeMethods.PTRMAP_PTROFFSET((u32)iPtrmap, key);
             if (offset < 0)
             {
                 PagerMethods.sqlite3PagerUnref(pDbPage);
@@ -680,6 +678,24 @@ public u8 isPending;            /* If waiting for read-locks to clear */
         {
             get { return ((int)(this.pageSize - 8) / 6); }
         }
+
+
+        ///<summary>
+        /// The database page the PENDING_BYTE occupies. This page is never used.
+        ///
+        ///</summary>
+        //# define PENDING_BYTE_PAGE(pBt) PAGER_MJ_PGNO(pBt)
+        // TODO -- Convert PENDING_BYTE_PAGE to inline
+        public u32 PENDING_BYTE_PAGE
+        {
+            get
+            {
+                BtShared pBt = this;
+                return (u32)pBt.pPager.PAGER_MJ_PGNO;
+            }
+        }
+
+
     }
 
 
@@ -971,101 +987,8 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 		
 		
 
-	
-		///<summary>
-		/// The database page the PENDING_BYTE occupies. This page is never used.
-		///
-		///</summary>
-		//# define PENDING_BYTE_PAGE(pBt) PAGER_MJ_PGNO(pBt)
-		// TODO -- Convert PENDING_BYTE_PAGE to inline
-		public static u32 PENDING_BYTE_PAGE (BtShared pBt)
-		{
-			return (u32)PAGER_MJ_PGNO (pBt.pPager);
-		}
 
-		///<summary>
-		/// These macros define the location of the pointer-map entry for a
-		/// database page. The first argument to each is the number of usable
-		/// bytes on each page of the database (often 1024). The second is the
-		/// page number to look up in the pointer map.
-		///
-		/// PTRMAP_PAGENO returns the database page number of the pointer-map
-		/// page that stores the required pointer. PTRMAP_PTROFFSET returns
-		/// the offset of the requested map entry.
-		///
-		/// If the pgno argument passed to PTRMAP_PAGENO is a pointer-map page,
-		/// then pgno is returned. So (pgno==PTRMAP_PAGENO(pgsz, pgno)) can be
-		/// used to test if pgno is a pointer-map page. PTRMAP_ISPAGE implements
-		/// this test.
-		///
-		///</summary>
-		//#define PTRMAP_PAGENO(pBt, pgno) ptrmapPageno(pBt, pgno)
-		public static Pgno PTRMAP_PAGENO (BtShared pBt, Pgno pgno)
-		{
-			return pBt.ptrmapPageno (pgno);
-		}
-
-		//#define PTRMAP_PTROFFSET(pgptrmap, pgno) (5*(pgno-pgptrmap-1))
-		public static u32 PTRMAP_PTROFFSET (u32 pgptrmap, u32 pgno)
-		{
-			return (5 * (pgno - pgptrmap - 1));
-		}
-
-		//#define PTRMAP_ISPAGE(pBt, pgno) (PTRMAP_PAGENO((pBt),(pgno))==(pgno))
-		public static bool PTRMAP_ISPAGE (BtShared pBt, u32 pgno)
-		{
-			return (PTRMAP_PAGENO ((pBt), (pgno)) == (pgno));
-		}
-
-		///
-///<summary>
-///The pointer map is a lookup table that identifies the parent page for
-///each child page in the database file.  The parent page is the page that
-///contains a pointer to the child.  Every page in the database contains
-///0 or 1 parent pages.  (In this context 'database page' refers
-///to any page that is not part of the pointer map itself.)  Each pointer map
-///entry consists of a single byte 'type' and a 4 byte parent page number.
-///The PTRMAP_XXX identifiers below are the valid types.
-///
-///The purpose of the pointer map is to facility moving pages from one
-///position in the file to another as part of autovacuum.  When a page
-///is moved, the pointer in its parent must be updated to point to the
-///new location.  The pointer map is used to locate the parent page quickly.
-///
-///</summary>
-///<param name="PTRMAP_ROOTPAGE: The database page is a root">number is not</param>
-///<param name="used in this case.">used in this case.</param>
-///<param name=""></param>
-///<param name="PTRMAP_FREEPAGE: The database page is an unused (free) page. The page">number</param>
-///<param name="is not used in this case.">is not used in this case.</param>
-///<param name=""></param>
-///<param name="PTRMAP_OVERFLOW1: The database page is the first page in a list of">PTRMAP_OVERFLOW1: The database page is the first page in a list of</param>
-///<param name="overflow pages. The page number identifies the page that">overflow pages. The page number identifies the page that</param>
-///<param name="contains the cell with a pointer to this overflow page.">contains the cell with a pointer to this overflow page.</param>
-///<param name=""></param>
-///<param name="PTRMAP_OVERFLOW2: The database page is the second or later page in a list of">PTRMAP_OVERFLOW2: The database page is the second or later page in a list of</param>
-///<param name="overflow pages. The page">number identifies the previous</param>
-///<param name="page in the overflow page list.">page in the overflow page list.</param>
-///<param name=""></param>
-///<param name="PTRMAP_BTREE: The database page is a non">root btree page. The page number</param>
-///<param name="identifies the parent page in the btree.">identifies the parent page in the btree.</param>
-///<param name=""></param>
-
-		//#define PTRMAP_ROOTPAGE 1
-		//#define PTRMAP_FREEPAGE 2
-		//#define PTRMAP_OVERFLOW1 3
-		//#define PTRMAP_OVERFLOW2 4
-		//#define PTRMAP_BTREE 5
-        public const int PTRMAP_ROOTPAGE = 1;
-
-        public const int PTRMAP_FREEPAGE = 2;
-
-        public const int PTRMAP_OVERFLOW1 = 3;
-
-        public const int PTRMAP_OVERFLOW2 = 4;
-
-		public const int PTRMAP_BTREE = 5;
-
+		
 		///<summary>
 		///A bunch of Debug.Assert() statements to check the transaction state variables
 		/// of handle p (type Btree*) are internally consistent.
@@ -1318,7 +1241,7 @@ public static bool ISAUTOVACUUM =false;
 						Pgno pgnoOvfl = Converter.sqlite3Get4byte (pCell, iCell, info.iOverflow);
 						#if !SQLITE_OMIT_AUTOVACUUM
 						if (pBt.autoVacuum) {
-							this.checkPtrmap (pgnoOvfl, PTRMAP_OVERFLOW1, (u32)iPage, zContext.ToString ());
+							this.checkPtrmap (pgnoOvfl, PTRMAP.OVERFLOW1, (u32)iPage, zContext.ToString ());
 						}
 						#endif
 						this.checkList (0, (int)pgnoOvfl, nPage, zContext.ToString ());
@@ -1334,7 +1257,7 @@ public static bool ISAUTOVACUUM =false;
 						//sqlite3Get4byte( pCell );
 						#if !SQLITE_OMIT_AUTOVACUUM
 						if (pBt.autoVacuum) {
-							this.checkPtrmap ((u32)pgno, PTRMAP_BTREE, (u32)iPage, zContext.ToString ());
+							this.checkPtrmap ((u32)pgno, PTRMAP.BTREE, (u32)iPage, zContext.ToString ());
 						}
 						#endif
 						if (i == 0)
@@ -1352,7 +1275,7 @@ public static bool ISAUTOVACUUM =false;
 					io.sqlite3_snprintf (200, zContext, "On page %d at right child: ", iPage);
 					#if !SQLITE_OMIT_AUTOVACUUM
 					if (pBt.autoVacuum) {
-						this.checkPtrmap ((u32)pgno, PTRMAP_BTREE, (u32)iPage, zContext.ToString ());
+						this.checkPtrmap ((u32)pgno, PTRMAP.BTREE, (u32)iPage, zContext.ToString ());
 					}
 					#endif
 					//    checkTreePage(pCheck, pgno, zContext, NULL, !pPage->nCell ? NULL : &nMaxKey);
@@ -1529,7 +1452,7 @@ public static bool ISAUTOVACUUM =false;
 						int n = (int)Converter.sqlite3Get4byte (pOvflData, 4);
 						#if !SQLITE_OMIT_AUTOVACUUM
 						if (this.pBt.autoVacuum) {
-							this.checkPtrmap ((u32)iPage, PTRMAP_FREEPAGE, 0, zContext);
+							this.checkPtrmap ((u32)iPage, PTRMAP.FREEPAGE, 0, zContext);
 						}
 						#endif
 						if (n > (int)this.pBt.usableSize / 4 - 2) {
@@ -1541,7 +1464,7 @@ public static bool ISAUTOVACUUM =false;
 								Pgno iFreePage = Converter.sqlite3Get4byte (pOvflData, 8 + i * 4);
 								#if !SQLITE_OMIT_AUTOVACUUM
 								if (this.pBt.autoVacuum) {
-									this.checkPtrmap (iFreePage, PTRMAP_FREEPAGE, 0, zContext);
+									this.checkPtrmap (iFreePage, PTRMAP.FREEPAGE, 0, zContext);
 								}
 								#endif
 								this.checkRef (iFreePage, zContext);
@@ -1561,7 +1484,7 @@ public static bool ISAUTOVACUUM =false;
 
 						if (this.pBt.autoVacuum && N > 0) {
 							i = (int)Converter.sqlite3Get4byte (pOvflData);
-							this.checkPtrmap ((u32)i, PTRMAP_OVERFLOW2, (u32)iPage, zContext);
+							this.checkPtrmap ((u32)i, PTRMAP.OVERFLOW2, (u32)iPage, zContext);
 						}
 					}
 					#endif
@@ -1628,5 +1551,58 @@ public static bool ISAUTOVACUUM =false;
 	//#define get4byte sqlite3Get4byte
 	//#define put4byte sqlite3Put4byte
 	}
+
+
+    ///
+    ///<summary>
+    ///The pointer map is a lookup table that identifies the parent page for
+    ///each child page in the database file.  The parent page is the page that
+    ///contains a pointer to the child.  Every page in the database contains
+    ///0 or 1 parent pages.  (In this context 'database page' refers
+    ///to any page that is not part of the pointer map itself.)  Each pointer map
+    ///entry consists of a single byte 'type' and a 4 byte parent page number.
+    ///The PTRMAP_XXX identifiers below are the valid types.
+    ///
+    ///The purpose of the pointer map is to facility moving pages from one
+    ///position in the file to another as part of autovacuum.  When a page
+    ///is moved, the pointer in its parent must be updated to point to the
+    ///new location.  The pointer map is used to locate the parent page quickly.
+    ///
+    ///</summary>
+    ///<param name="PTRMAP_ROOTPAGE: The database page is a root">number is not</param>
+    ///<param name="used in this case.">used in this case.</param>
+    ///<param name=""></param>
+    ///<param name="PTRMAP_FREEPAGE: The database page is an unused (free) page. The page">number</param>
+    ///<param name="is not used in this case.">is not used in this case.</param>
+    ///<param name=""></param>
+    ///<param name="PTRMAP_OVERFLOW1: The database page is the first page in a list of">PTRMAP_OVERFLOW1: The database page is the first page in a list of</param>
+    ///<param name="overflow pages. The page number identifies the page that">overflow pages. The page number identifies the page that</param>
+    ///<param name="contains the cell with a pointer to this overflow page.">contains the cell with a pointer to this overflow page.</param>
+    ///<param name=""></param>
+    ///<param name="PTRMAP_OVERFLOW2: The database page is the second or later page in a list of">PTRMAP_OVERFLOW2: The database page is the second or later page in a list of</param>
+    ///<param name="overflow pages. The page">number identifies the previous</param>
+    ///<param name="page in the overflow page list.">page in the overflow page list.</param>
+    ///<param name=""></param>
+    ///<param name="PTRMAP_BTREE: The database page is a non">root btree page. The page number</param>
+    ///<param name="identifies the parent page in the btree.">identifies the parent page in the btree.</param>
+    ///<param name=""></param>
+
+    //#define PTRMAP_ROOTPAGE 1
+    //#define PTRMAP_FREEPAGE 2
+    //#define PTRMAP_OVERFLOW1 3
+    //#define PTRMAP_OVERFLOW2 4
+    //#define PTRMAP_BTREE 5
+    public static class PTRMAP
+    {
+        public const int ROOTPAGE = 1;
+
+        public const int FREEPAGE = 2;
+
+        public const int OVERFLOW1 = 3;
+
+        public const int OVERFLOW2 = 4;
+
+        public const int BTREE = 5;
+    }
 
 }

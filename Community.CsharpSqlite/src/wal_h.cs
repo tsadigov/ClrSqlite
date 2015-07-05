@@ -8,8 +8,7 @@ using Community.CsharpSqlite.Os;
 #endif
 namespace Community.CsharpSqlite
 {
-    public partial class Sqlite3
-    {
+    
         public class wal
         {
             ///
@@ -251,4 +250,3 @@ int sqlite3WalHeapMemory(Wal *pWal);
             //#endif //* _WAL_H_ */
         }
     }
-}

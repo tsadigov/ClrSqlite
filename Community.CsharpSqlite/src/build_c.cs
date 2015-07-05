@@ -397,7 +397,7 @@ p.zName,  P4Usage.P4_STATIC );
                 ///Case 2 (from here to the end): Reset all schemas for all attached
                 ///databases. 
                 Debug.Assert(iDb < 0);
-                Sqlite3.sqlite3BtreeEnterAll(db);
+                db.sqlite3BtreeEnterAll();
                 for (i = 0; i < db.nDb; i++)
                 {
                     Db pDb = db.aDb[i];

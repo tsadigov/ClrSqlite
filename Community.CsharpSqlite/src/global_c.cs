@@ -559,7 +559,8 @@ namespace Community.CsharpSqlite
 ///the SQLite library.
 ///</summary>
 
-		static Sqlite3Config sqlite3Config = new Sqlite3Config (SQLITE_DEFAULT_MEMSTATUS, ///
+		static Sqlite3Config sqlite3Config = new Sqlite3Config (
+            Globals.SQLITE_DEFAULT_MEMSTATUS, ///
 ///<summary>
 ///bMemstat 
 ///</summary>
@@ -569,7 +570,7 @@ namespace Community.CsharpSqlite
 ///bCoreMutex 
 ///</summary>
 
-		SQLITE_THREADSAFE != 0, ///
+        Globals.SQLITE_THREADSAFE != 0, ///
 ///<summary>
 ///bFullMutex 
 ///</summary>

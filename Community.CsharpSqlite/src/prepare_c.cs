@@ -295,7 +295,7 @@ namespace Community.CsharpSqlite {
 			///<param name="If there is not already a read">write) transaction opened</param>
 			///<param name="on the b">tree database, open one now. If a transaction is opened, it </param>
 			///<param name="will be closed before this function returns.  ">will be closed before this function returns.  </param>
-			sqlite3BtreeEnter(pDb.pBt);
+            pDb.pBt.sqlite3BtreeEnter();
 			if(!pDb.pBt.sqlite3BtreeIsInReadTrans()) {
 				rc=pDb.pBt.sqlite3BtreeBeginTrans(0);
 				if(rc!=SqlResult.SQLITE_OK) {
@@ -478,7 +478,8 @@ db.xAuth = 0;
 			if(openedTransaction!=0) {
 				pDb.pBt.sqlite3BtreeCommit();
 			}
-			sqlite3BtreeLeave(pDb.pBt);
+            
+            pDb.pBt.sqlite3BtreeLeave();
 			error_out:
 			if(rc== SqlResult.SQLITE_NOMEM || rc== SqlResult.SQLITE_IOERR_NOMEM) {
 				//        db.mallocFailed = 1;
@@ -944,7 +945,7 @@ db.xAuth = 0;
 				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
 			db.mutex.sqlite3_mutex_enter();
-			sqlite3BtreeEnterAll(db);
+            db.sqlite3BtreeEnterAll();
 			rc=sqlite3Prepare(db,zSql,nBytes,saveSqlFlag,pOld,ref ppStmt,ref pzTail);
 			if(rc== SqlResult.SQLITE_SCHEMA) {
                 vdbeapi.sqlite3_finalize(ppStmt);

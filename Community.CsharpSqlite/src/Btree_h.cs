@@ -244,26 +244,7 @@ namespace Community.CsharpSqlite
 		#if !SQLITE_OMIT_WAL
 																																						//int sqlite3BtreeCheckpoint(Btree*, int, int *, int );
 #endif
-		///<summary>
-		/// If we are not using shared cache, then there is no need to
-		/// use mutexes to access the BtShared structures.  So make the
-		/// Enter and Leave procedures no-ops.
-		///</summary>
-		#if !SQLITE_OMIT_SHARED_CACHE
-																																						//void sqlite3BtreeEnter(Btree);
-//void sqlite3BtreeEnterAll(sqlite3);
-#else
-		//# define sqlite3BtreeEnter(X)
-		static void sqlite3BtreeEnter (Btree bt)
-		{
-		}
-
-		//# define sqlite3BtreeEnterAll(X)
-		public static void sqlite3BtreeEnterAll (sqlite3 p)
-		{
-		}
-
-		#endif
+		
 		#if !(SQLITE_OMIT_SHARED_CACHE) && SQLITE_THREADSAFE
 																																						//int sqlite3BtreeSharable(Btree);
 //void sqlite3BtreeLeave(Btree);
@@ -283,10 +264,7 @@ int sqlite3SchemaMutexHeld(sqlite3*,int,Schema);
 			return false;
 		}
 
-		//# define sqlite3BtreeLeave(X)
-		public static void sqlite3BtreeLeave (Btree X)
-		{
-		}
+		
 
 		//# define sqlite3BtreeEnterCursor(X)
 		public static void sqlite3BtreeEnterCursor (BtCursor X)
@@ -304,7 +282,7 @@ int sqlite3SchemaMutexHeld(sqlite3*,int,Schema);
 		}
 
 		//# define sqlite3BtreeHoldsMutex(X) 1
-		static bool sqlite3BtreeHoldsMutex (Btree X)
+		public static bool sqlite3BtreeHoldsMutex (Btree X)
 		{
 			return true;
 		}

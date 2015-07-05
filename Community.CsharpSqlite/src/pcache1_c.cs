@@ -679,7 +679,7 @@ static int pcache1MemSize(object p){
 		/// Free an allocated buffer obtained from sqlite3PageMalloc().
 		///
 		///</summary>
-		static void sqlite3PageFree (ref byte[] p)
+		public static void sqlite3PageFree (ref byte[] p)
 		{
 			if (p != null) {
 				malloc_cs.sqlite3_free (ref p);
@@ -687,7 +687,7 @@ static int pcache1MemSize(object p){
 			}
 		}
 
-		static void sqlite3PageFree (ref PgHdr p)
+		public static void sqlite3PageFree (ref PgHdr p)
 		{
 			pcache1Free (ref p);
 		}

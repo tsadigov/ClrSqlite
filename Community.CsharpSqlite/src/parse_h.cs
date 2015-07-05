@@ -9164,9 +9164,9 @@ return;
 					pTerm=pWC.a[ipTerm];
 					if(pTerm.termCanDriveIndex(pSrc,notReady)!=0) {
 						int iCol=pTerm.u.leftColumn;
-						Bitmask cMask=iCol>=BMS?((Bitmask)1)<<(BMS-1):((Bitmask)1)<<iCol;
-						sqliteinth.testcase(iCol==BMS);
-						sqliteinth.testcase(iCol==BMS-1);
+                        Bitmask cMask = iCol >= Globals.BMS ? ((Bitmask)1) << (Globals.BMS - 1) : ((Bitmask)1) << iCol;
+                        sqliteinth.testcase(iCol == Globals.BMS);
+                        sqliteinth.testcase(iCol == Globals.BMS - 1);
 						if((idxCols&cMask)==0) {
 							nColumn++;
 							idxCols|=cMask;
@@ -9186,16 +9186,17 @@ return;
 				///if they go out of sync.
 				///
 				///</summary>
-				extraCols=pSrc.colUsed&(~idxCols|(((Bitmask)1)<<(BMS-1)));
-				mxBitCol=(pTable.nCol>=BMS-1)?BMS-1:pTable.nCol;
-				sqliteinth.testcase(pTable.nCol==BMS-1);
-				sqliteinth.testcase(pTable.nCol==BMS-2);
+                extraCols = pSrc.colUsed & (~idxCols | (((Bitmask)1) << (Globals.BMS - 1)));
+                mxBitCol = (pTable.nCol >= Globals.BMS - 1) ? Globals.BMS - 1 : pTable.nCol;
+                sqliteinth.testcase(pTable.nCol == Globals.BMS - 1);
+                sqliteinth.testcase(pTable.nCol == Globals.BMS - 2);
 				for(i=0;i<mxBitCol;i++) {
 					if((extraCols&(((Bitmask)1)<<i))!=0)
 						nColumn++;
 				}
-				if((pSrc.colUsed&(((Bitmask)1)<<(Sqlite3.BMS-1)))!=0) {
-					nColumn+=pTable.nCol-BMS+1;
+                if ((pSrc.colUsed & (((Bitmask)1) << (Globals.BMS - 1))) != 0)
+                {
+                    nColumn += pTable.nCol - Globals.BMS + 1;
 				}
 				pLevel.plan.wsFlags|=wherec.WHERE_COLUMN_EQ|wherec.WHERE_IDX_ONLY|wherec.WO_EQ;
 				///
@@ -9226,7 +9227,7 @@ return;
 					pTerm=pWC.a[ipTerm];
 					if(pTerm.termCanDriveIndex(pSrc,notReady)!=0) {
 						int iCol=pTerm.u.leftColumn;
-						Bitmask cMask=iCol>=BMS?((Bitmask)1)<<(BMS-1):((Bitmask)1)<<iCol;
+                        Bitmask cMask = iCol >= Globals.BMS ? ((Bitmask)1) << (Globals.BMS - 1) : ((Bitmask)1) << iCol;
 						if((idxCols&cMask)==0) {
 							Expr pX=pTerm.pExpr;
 							idxCols|=cMask;
@@ -9250,8 +9251,10 @@ return;
 						n++;
 					}
 				}
-				if((pSrc.colUsed&(((Bitmask)1)<<(BMS-1)))!=0) {
-					for(i=BMS-1;i<pTable.nCol;i++) {
+                if ((pSrc.colUsed & (((Bitmask)1) << (Globals.BMS - 1))) != 0)
+                {
+                    for (i = Globals.BMS - 1; i < pTable.nCol; i++)
+                    {
 						pIdx.aiColumn[n]=i;
 						pIdx.azColl[n]="BINARY";
 						n++;
@@ -10120,7 +10123,8 @@ range_est_fallback:
 						int j;
 						for(j=0;j<pIdx.nColumn;j++) {
 							int x=pIdx.aiColumn[j];
-							if(x<BMS-1) {
+                            if (x < Globals.BMS - 1)
+                            {
 								m&=~(((Bitmask)1)<<x);
 							}
 						}
@@ -10915,9 +10919,10 @@ range_est_fallback:
 				///The number of tables in the FROM clause is limited by the number of
 				///bits in a Bitmask
 				///</summary>
-				sqliteinth.testcase(pTabList.nSrc==BMS);
-				if(pTabList.nSrc>BMS) {
-					utilc.sqlite3ErrorMsg(this,"at most %d tables in a join",BMS);
+                sqliteinth.testcase(pTabList.nSrc == Globals.BMS);
+                if (pTabList.nSrc > Globals.BMS)
+                {
+                    utilc.sqlite3ErrorMsg(this, "at most %d tables in a join", Globals.BMS);
 					return null;
 				}
 				///
@@ -11412,9 +11417,10 @@ range_est_fallback:
 							if((pLevel.plan.wsFlags&wherec.WHERE_IDX_ONLY)==0&&(wctrlFlags&wherec.WHERE_OMIT_OPEN)==0) {
                                 OpCode op = pWInfo.okOnePass != 0 ? OpCode.OP_OpenWrite :  OpCode.OP_OpenRead;
 								this.sqlite3OpenTable(pTabItem.iCursor,iDb,pTab,op);
-								sqliteinth.testcase(pTab.nCol==BMS-1);
-								sqliteinth.testcase(pTab.nCol==BMS);
-								if(0==pWInfo.okOnePass&&pTab.nCol<BMS) {
+								sqliteinth.testcase(pTab.nCol==Globals.BMS-1);
+                                sqliteinth.testcase(pTab.nCol == Globals.BMS);
+                                if (0 == pWInfo.okOnePass && pTab.nCol < Globals.BMS)
+                                {
 									Bitmask b=pTabItem.colUsed;
 									int n=0;
 									for(;b!=0;b=b>>1,n++) {

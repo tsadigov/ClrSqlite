@@ -8,7 +8,6 @@ namespace Community.CsharpSqlite.Engine.Op
 {
     using Btree = Sqlite3.Btree;
 
-    using BtCursor = Sqlite3.BtCursor;
     using Community.CsharpSqlite.Engine;
     using Metadata;
     public static class Cursor

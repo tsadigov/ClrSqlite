@@ -3,8 +3,42 @@ using u32 = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
+
+    ///
+    ///<summary>
+    ///The following values may be passed as the second argument to
+    ///sqlite3OsLock(). The various locks exhibit the following semantics:
+    ///
+    ///SHARED:    Any number of processes may hold a SHARED lock simultaneously.
+    ///RESERVED:  A single process may hold a RESERVED lock on a file at
+    ///any time. Other processes may hold and obtain new SHARED locks.
+    ///PENDING:   A single process may hold a PENDING lock on a file at
+    ///any one time. Existing SHARED locks may persist, but no new
+    ///SHARED locks may be obtained by other processes.
+    ///EXCLUSIVE: An EXCLUSIVE lock precludes all other locks.
+    ///
+    ///PENDING_LOCK may not be passed directly to sqlite3OsLock(). Instead, a
+    ///process that requests an EXCLUSIVE lock may actually obtain a PENDING
+    ///lock. This can be upgraded to an EXCLUSIVE lock by a subsequent call to
+    ///sqlite3OsLock().
+    ///</summary>
+    public enum LockType:byte
+    {
+
+        NO_LOCK = 0,
+
+        SHARED_LOCK = 1,
+
+        RESERVED_LOCK = 2,
+
+        PENDING_LOCK = 3,
+
+        EXCLUSIVE_LOCK = 4
+    }
+
 	public partial class Sqlite3
 	{
+
 		///
 ///<summary>
 ///2001 September 16
@@ -179,34 +213,7 @@ namespace Community.CsharpSqlite
 
 		//# define SQLITE_TEMP_FILE_PREFIX "etilqs_"
 		#endif
-		///
-///<summary>
-///The following values may be passed as the second argument to
-///sqlite3OsLock(). The various locks exhibit the following semantics:
-///
-///SHARED:    Any number of processes may hold a SHARED lock simultaneously.
-///RESERVED:  A single process may hold a RESERVED lock on a file at
-///any time. Other processes may hold and obtain new SHARED locks.
-///PENDING:   A single process may hold a PENDING lock on a file at
-///any one time. Existing SHARED locks may persist, but no new
-///SHARED locks may be obtained by other processes.
-///EXCLUSIVE: An EXCLUSIVE lock precludes all other locks.
-///
-///PENDING_LOCK may not be passed directly to sqlite3OsLock(). Instead, a
-///process that requests an EXCLUSIVE lock may actually obtain a PENDING
-///lock. This can be upgraded to an EXCLUSIVE lock by a subsequent call to
-///sqlite3OsLock().
-///</summary>
-
-		const int NO_LOCK = 0;
-
-		const int SHARED_LOCK = 1;
-
-		const int RESERVED_LOCK = 2;
-
-		const int PENDING_LOCK = 3;
-
-		const int EXCLUSIVE_LOCK = 4;
+		
 
 		///
 ///<summary>
@@ -271,7 +278,7 @@ namespace Community.CsharpSqlite
     static int PENDING_BYTE = 0x40000000; 
 #else
 		//# define PENDING_BYTE      sqlite3PendingByte
-		static int PENDING_BYTE = 0x40000000;
+		public static int PENDING_BYTE = 0x40000000;
 
 		#endif
 		static int RESERVED_BYTE = (PENDING_BYTE + 1);

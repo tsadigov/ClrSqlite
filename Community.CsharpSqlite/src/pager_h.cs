@@ -32,18 +32,7 @@ namespace Community.CsharpSqlite
 		//#if !_PAGER_H_
 		//#define _PAGER_H_
 		///
-///<summary>
-///Default maximum size for persistent journal files. A negative
-///value means no limit. This value may be overridden using the
-///sqlite3PagerJournalSizeLimit() API. See also "PRAGMA journal_size_limit".
-///
-///</summary>
 
-		#if !SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT
-		const int SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT = -1;
-
-		//#define SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT -1
-		#endif
 		///
 ///<summary>
 ///The type used to represent a page number.  The first page in a file
@@ -59,26 +48,7 @@ namespace Community.CsharpSqlite
 
 		//typedef struct Pager Pager;
 		///
-///<summary>
-///Handle type for pages.
-///
-///</summary>
 
-		//typedef struct PgHdr DbPage;
-		///<summary>
-		/// Page number PAGER_MJ_PGNO is never used in an SQLite database (it is
-		/// reserved for working around a windows/posix incompatibility). It is
-		/// used in the journal to signify that the remainder of the journal file
-		/// is devoted to storing a master journal name - there are no more pages to
-		/// roll back. See comments for function writeMasterJournal() in pager.c
-		/// for details.
-		///
-		///</summary>
-		//#define PAGER_MJ_PGNO(x) ((Pgno)((PENDING_BYTE/((x)->pageSize))+1))
-		static Pgno PAGER_MJ_PGNO (Pager x)
-		{
-			return ((Pgno)((PENDING_BYTE / ((x).pageSize)) + 1));
-		}
 
 		///
 ///<summary>
@@ -91,11 +61,11 @@ namespace Community.CsharpSqlite
 		//#define PAGER_OMIT_JOURNAL  0x0001    /* Do not use a rollback journal */
 		//#define PAGER_NO_READLOCK   0x0002    /* Omit readlocks on readonly files */
 		//#define PAGER_MEMORY        0x0004    /* In-memory database */
-		const int PAGER_OMIT_JOURNAL = 0x0001;
+		public const int PAGER_OMIT_JOURNAL = 0x0001;
 
-		const int PAGER_NO_READLOCK = 0x0002;
+		public const int PAGER_NO_READLOCK = 0x0002;
 
-		const int PAGER_MEMORY = 0x0004;
+		public const int PAGER_MEMORY = 0x0004;
 
 		///
 ///<summary>
@@ -106,11 +76,11 @@ namespace Community.CsharpSqlite
 		//#define PAGER_LOCKINGMODE_QUERY      -1
 		//#define PAGER_LOCKINGMODE_NORMAL      0
 		//#define PAGER_LOCKINGMODE_EXCLUSIVE   1
-		static int PAGER_LOCKINGMODE_QUERY = -1;
+        public static int PAGER_LOCKINGMODE_QUERY = -1;
 
-		static int PAGER_LOCKINGMODE_NORMAL = 0;
+        public static int PAGER_LOCKINGMODE_NORMAL = 0;
 
-		static int PAGER_LOCKINGMODE_EXCLUSIVE = 1;
+		public static int PAGER_LOCKINGMODE_EXCLUSIVE = 1;
 
 		///
 ///<summary>
@@ -125,19 +95,13 @@ namespace Community.CsharpSqlite
 		//#define PAGER_JOURNALMODE_TRUNCATE    3   /* Commit by truncating journal */
 		//#define PAGER_JOURNALMODE_MEMORY      4   /* In-memory journal file */
 		//#define PAGER_JOURNALMODE_WAL         5   /* Use write-ahead logging */
-		const int PAGER_JOURNALMODE_QUERY = -1;
-
-		const int PAGER_JOURNALMODE_DELETE = 0;
-
-		const int PAGER_JOURNALMODE_PERSIST = 1;
-
-		const int PAGER_JOURNALMODE_OFF = 2;
-
-		const int PAGER_JOURNALMODE_TRUNCATE = 3;
-
-		const int PAGER_JOURNALMODE_MEMORY = 4;
-
-		const int PAGER_JOURNALMODE_WAL = 5;
+		public const int PAGER_JOURNALMODE_QUERY = -1;
+		public const int PAGER_JOURNALMODE_DELETE = 0;
+		public const int PAGER_JOURNALMODE_PERSIST = 1;
+		public const int PAGER_JOURNALMODE_OFF = 2;
+		public const int PAGER_JOURNALMODE_TRUNCATE = 3;
+		public const int PAGER_JOURNALMODE_MEMORY = 4;
+		public const int PAGER_JOURNALMODE_WAL = 5;
 	///
 ///<summary>
 ///The remainder of this file contains the declarations of the functions

@@ -8,7 +8,6 @@ namespace Community.CsharpSqlite
 	using sqlite3_uint64 = System.UInt64;
 	using u32 = System.UInt32;
 	using System;
-    using BtCursor=Sqlite3.BtCursor;
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
@@ -122,7 +121,7 @@ return nRet;
 
                 public Mem[] aMem;
 
-                public Sqlite3.BtCursor[] aBtCursor;
+                public BtCursor[] aBtCursor;
 
                 public struct memstat
                 {

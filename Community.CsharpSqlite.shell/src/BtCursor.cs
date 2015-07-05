@@ -10,9 +10,11 @@ using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
 	using DbPage=PgHdr;
+    using Btree = Sqlite3.Btree;
 	using System.Text;
     using Metadata;
 	public partial class Sqlite3 {
+    }
         ///
         ///<summary>
         ///A cursor is a pointer to a particular entry within a particular
@@ -34,7 +36,7 @@ namespace Community.CsharpSqlite {
             ///<summary>
             ///The Btree to which this cursor belongs 
             ///</summary>
-            public Btree pBtree;
+            public Sqlite3.Btree pBtree;
 
             ///
             ///<summary>
@@ -96,7 +98,7 @@ namespace Community.CsharpSqlite {
             ///<summary>
             ///True if info.nKey is valid 
             ///</summary>
-            public int eState { get; set; }
+            public BtCursorState eState { get; set; }
             public BtCursorState State
             {
                 get
@@ -105,7 +107,7 @@ namespace Community.CsharpSqlite {
                 }
                 set
                 {
-                    eState = (int)value;
+                    eState = value;
                 }
             }
             ///
@@ -121,11 +123,11 @@ public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
             ///<summary>
             ///Index of current page in apPage 
             ///</summary>
-            public u16[] aiIdx = new u16[BTCURSOR_MAX_DEPTH];
+            public u16[] aiIdx = new u16[Limits.BTCURSOR_MAX_DEPTH];
             ///<summary>
             ///Current index in apPage[i]
             ///</summary>
-            public MemPage[] apPage = new MemPage[BTCURSOR_MAX_DEPTH];
+            public MemPage[] apPage = new MemPage[Limits.BTCURSOR_MAX_DEPTH];
             ///<summary>
             ///Pages from root to current page
             ///</summary>
@@ -162,7 +164,7 @@ aOverflow= null;
             public SqlResult saveCursorPosition()
             {
                 SqlResult rc;
-                Debug.Assert(CURSOR_VALID == this.eState);
+                Debug.Assert(BtCursorState.CURSOR_VALID == this.eState);
                 Debug.Assert(null == this.pKey);
                 Debug.Assert(this.cursorHoldsMutex());
                 rc = this.sqlite3BtreeKeySize(ref this.nKey);
@@ -205,7 +207,7 @@ aOverflow= null;
                         this.apPage[i] = null;
                     }
                     this.iPage = -1;
-                    this.eState = CURSOR_REQUIRESEEK;
+                    this.eState = BtCursorState.CURSOR_REQUIRESEEK;
                 }
                 BTreeMethods.invalidateOverflowCache(this);
                 return rc;
@@ -214,7 +216,7 @@ aOverflow= null;
             {
                 Debug.Assert(this.cursorHoldsMutex());
                 malloc_cs.sqlite3_free(ref this.pKey);
-                this.eState = CURSOR_INVALID;
+                this.eState = BtCursorState.CURSOR_INVALID;
             }
             public SqlResult btreeMoveto(
                 byte[] pKey,///Packed key if the btree is an index 
@@ -257,24 +259,24 @@ aOverflow= null;
             {
                 SqlResult rc;
                 Debug.Assert(this.cursorHoldsMutex());
-                Debug.Assert(this.eState >= CURSOR_REQUIRESEEK);
-                if (this.eState == CURSOR_FAULT)
+                Debug.Assert(this.eState >= BtCursorState.CURSOR_REQUIRESEEK);
+                if (this.eState == BtCursorState.CURSOR_FAULT)
                 {
                     return (SqlResult)this.skipNext;
                 }
-                this.eState = CURSOR_INVALID;
+                this.eState = BtCursorState.CURSOR_INVALID;
                 rc = this.btreeMoveto(this.pKey, this.nKey, 0, ref this.skipNext);
                 if (rc == SqlResult.SQLITE_OK)
                 {
                     //malloc_cs.sqlite3_free(ref pCur.pKey);
                     this.pKey = null;
-                    Debug.Assert(this.eState == CURSOR_VALID || this.eState == CURSOR_INVALID);
+                    Debug.Assert(this.eState == BtCursorState.CURSOR_VALID || this.eState == BtCursorState.CURSOR_INVALID);
                 }
                 return rc;
             }
             public SqlResult restoreCursorPosition()
             {
-                if (this.eState >= CURSOR_REQUIRESEEK)
+                if (this.eState >= BtCursorState.CURSOR_REQUIRESEEK)
                     return this.btreeRestoreCursorPosition();
                 else
                     return SqlResult.SQLITE_OK;
@@ -288,7 +290,7 @@ aOverflow= null;
                     pHasMoved = 1;
                     return rc;
                 }
-                if (this.eState != CURSOR_VALID || this.skipNext != 0)
+                if (this.eState != BtCursorState.CURSOR_VALID || this.skipNext != 0)
                 {
                     pHasMoved = 1;
                 }
@@ -460,7 +462,7 @@ aOverflow= null;
                 Debug.Assert(this.wrFlag != 0);
                 Debug.Assert(p.hasSharedCacheTableLock(this.pgnoRoot, this.pKeyInfo != null ? 1 : 0, 2));
                 Debug.Assert(!p.hasReadConflicts(this.pgnoRoot));
-                if (NEVER(this.aiIdx[this.iPage] >= this.apPage[this.iPage].nCell) || NEVER(this.eState != CURSOR_VALID))
+                if (NEVER(this.aiIdx[this.iPage] >= this.apPage[this.iPage].nCell) || NEVER(this.eState != BtCursorState.CURSOR_VALID))
                 {
                     return SqlResult.SQLITE_ERROR;
                     ///<summary>
@@ -574,6 +576,11 @@ aOverflow= null;
                 }
                 return rc;
             }
+
+            private bool NEVER(bool p)
+            {
+                return Sqlite3.NEVER(p);
+            }
             public SqlResult sqlite3BtreeInsert(
                 ///<summary>
                 ///Insert data into the table of this cursor 
@@ -656,7 +663,7 @@ aOverflow= null;
                 pPage = this.apPage[this.iPage];
                 Debug.Assert(pPage.intKey != false || nKey >= 0);
                 Debug.Assert(pPage.IsLeaf != false || false == pPage.intKey);
-                TRACE("INSERT: table=%d nkey=%lld ndata=%d page=%d %s\n", this.pgnoRoot, nKey, nData, pPage.pgno, loc == 0 ? "overwrite" : "new entry");
+                Log.TRACE("INSERT: table=%d nkey=%lld ndata=%d page=%d %s\n", this.pgnoRoot, nKey, nData, pPage.pgno, loc == 0 ? "overwrite" : "new entry");
                 Debug.Assert(pPage.isInit != false);
                 BTreeMethods.allocateTempSpace(pBt);
                 newCell = pBt.pTmpSpace;
@@ -892,7 +899,7 @@ aOverflow= null;
                     return rc;
                 }
                 this.atLast = 0;
-                if (CURSOR_INVALID == this.eState)
+                if (BtCursorState.CURSOR_INVALID == this.eState)
                 {
                     pRes = 1;
                     return SqlResult.SQLITE_OK;
@@ -956,7 +963,7 @@ aOverflow= null;
                     return rc;
                 }
                 // Not needed in C# // Debug.Assert( pRes != 0 );
-                if (CURSOR_INVALID == this.eState)
+                if (BtCursorState.CURSOR_INVALID == this.eState)
                 {
                     pRes = 1;
                     return SqlResult.SQLITE_OK;
@@ -1391,10 +1398,10 @@ aOverflow= null;
                 Btree p = this.pBtree;
                 BtShared pBt = p.pBt;
                 Debug.Assert(this.cursorHoldsMutex());
-                Debug.Assert(CURSOR_INVALID < CURSOR_REQUIRESEEK);
-                Debug.Assert(CURSOR_VALID < CURSOR_REQUIRESEEK);
-                Debug.Assert(CURSOR_FAULT > CURSOR_REQUIRESEEK);
-                if (this.eState >= CURSOR_REQUIRESEEK)
+                Debug.Assert(BtCursorState.CURSOR_INVALID < BtCursorState.CURSOR_REQUIRESEEK);
+                Debug.Assert(BtCursorState.CURSOR_VALID < BtCursorState.CURSOR_REQUIRESEEK);
+                Debug.Assert(BtCursorState.CURSOR_FAULT > BtCursorState.CURSOR_REQUIRESEEK);
+                if (this.eState >= BtCursorState.CURSOR_REQUIRESEEK)
                 {
                     if (this.State == BtCursorState.CURSOR_FAULT)
                     {
@@ -1485,8 +1492,8 @@ aOverflow= null;
                 BtShared pBt = this.pBt;
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                Debug.Assert(this.iPage < BTCURSOR_MAX_DEPTH);
-                if (this.iPage >= (BTCURSOR_MAX_DEPTH - 1))
+                Debug.Assert(this.iPage < Limits.BTCURSOR_MAX_DEPTH);
+                if (this.iPage >= (Limits.BTCURSOR_MAX_DEPTH - 1))
                 {
                     return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
@@ -1836,7 +1843,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                 {
                     int i;
                     BtShared pBt = this.pBt;
-                    sqlite3BtreeEnter(pBtree);
+                    pBtree.sqlite3BtreeEnter();
                     this.sqlite3BtreeClearCursor();
                     if (this.pPrev != null)
                     {
@@ -1860,7 +1867,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                     ///<summary>
                     ///malloc_cs.sqlite3_free(ref pCur); 
                     ///</summary>
-                    sqlite3BtreeLeave(pBtree);
+                    pBtree.sqlite3BtreeLeave();
                 }
                 return SqlResult.SQLITE_OK;
             }
@@ -1874,11 +1881,7 @@ nextPage = pCur.aOverflow[iIdx+1];
             }
         }
         
-        public const int CURSOR_INVALID = 0;
-        public const int CURSOR_VALID = 1;
-        public const int CURSOR_REQUIRESEEK = 2;
-        public const int CURSOR_FAULT = 3;
-	}
+	
     ///
     ///<summary>
     ///Potential values for BtCursor.eState.

@@ -184,7 +184,7 @@ namespace Community.CsharpSqlite {
 			///we found it.
 			///</summary>
 			if(rc==SqlResult.SQLITE_OK) {
-				sqlite3BtreeEnterAll(db);
+                db.sqlite3BtreeEnterAll();
 				rc=sqlite3Init(db,ref zErrDyn);
 				sqlite3BtreeLeaveAll(db);
 			}

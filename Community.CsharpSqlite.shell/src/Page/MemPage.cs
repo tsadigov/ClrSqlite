@@ -14,8 +14,7 @@ namespace Community.CsharpSqlite
 	using DbPage = PgHdr;
 	using System.Text;
     using System.Linq;
-    using BTreeMethods = Sqlite3.BTreeMethods;
-    using PagerMethods = Sqlite3.PagerMethods;
+    
 
         ///[---hdr|first block location:x-----next block location:y|current free size of x--------next block location:z|crrent free size of y]
 
@@ -502,7 +501,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert ((info.nData + ( this.intKey  ? 0 : info.nKey)) == info.nPayload);
 				if (info.iOverflow != 0) {
 					Pgno ovfl = Converter.sqlite3Get4byte (this.aData, pCell, info.iOverflow);
-                    this.pBt.ptrmapPut(ovfl, Sqlite3.PTRMAP_OVERFLOW1, this.pgno, ref pRC);
+                    this.pBt.ptrmapPut(ovfl, PTRMAP.OVERFLOW1, this.pgno, ref pRC);
 				}
 			}
 
@@ -516,7 +515,7 @@ namespace Community.CsharpSqlite
 				Debug.Assert ((info.nData + (this.intKey  ? 0 : info.nKey)) == info.nPayload);
 				if (info.iOverflow != 0) {
 					Pgno ovfl = Converter.sqlite3Get4byte (pCell, info.iOverflow);
-					this.pBt.ptrmapPut (ovfl, Sqlite3.PTRMAP_OVERFLOW1, this.pgno, ref pRC);
+					this.pBt.ptrmapPut (ovfl, PTRMAP.OVERFLOW1, this.pgno, ref pRC);
 				}
 			}
 
@@ -631,7 +630,7 @@ namespace Community.CsharpSqlite
 				int hdr = this.hdrOffset;///Local cache of pPage.hdrOffset 
 				u8[] data = this.aData;///Local cache of pPage.aData 
                 u8 nFrag = this.nFrag ;///Number of fragmented bytes on pPage
-                int top = Sqlite3.BTreeMethods.get2byteNotZero(data, hdr + Offsets.cellbody); ;///First byte of cell content area 
+                int top = BTreeMethods.get2byteNotZero(data, hdr + Offsets.cellbody); ;///First byte of cell content area 
                 int gap = this.cellOffset + 2 * this.nCell;///First byte of gap between cell pointers and cell content 
 				SqlResult rc;///Integer return code 
                 u32 usableSize = this.pBt.usableSize; ;///Usable size of the page 
@@ -1097,12 +1096,12 @@ namespace Community.CsharpSqlite
 					this.ptrmapPutOvflPtr (pCell, ref rc);
 					if (false == this.IsLeaf) {
 						Pgno childPgno = Converter.sqlite3Get4byte (this.aData, pCell);
-						pBt.ptrmapPut (childPgno, Sqlite3.PTRMAP_BTREE, pgno, ref rc);
+						pBt.ptrmapPut (childPgno, PTRMAP.BTREE, pgno, ref rc);
 					}
 				}
 				if (false == this.IsLeaf) {
 					Pgno childPgno = Converter.sqlite3Get4byte (this.aData, this.hdrOffset + 8);
-                    pBt.ptrmapPut(childPgno, Sqlite3.PTRMAP_BTREE, pgno, ref rc);
+                    pBt.ptrmapPut(childPgno, PTRMAP.BTREE, pgno, ref rc);
 				}
 				set_child_ptrmaps_out:
 				this.isInit = isInitOrig;
@@ -1129,7 +1128,7 @@ namespace Community.CsharpSqlite
 			{
 				Debug.Assert (this.pBt.mutex.sqlite3_mutex_held());
                 Debug.Assert(this.pDbPage.sqlite3PagerIswriteable());
-                if (eType == Sqlite3.PTRMAP_OVERFLOW2)
+                if (eType == PTRMAP.OVERFLOW2)
                 {
 					///
 ///<summary>
@@ -1149,7 +1148,7 @@ namespace Community.CsharpSqlite
 					nCell = this.nCell;
 					for (i = 0; i < nCell; i++) {
 						int pCell = this.findCell (i);
-                        if (eType == Sqlite3.PTRMAP_OVERFLOW1)
+                        if (eType == PTRMAP.OVERFLOW1)
                         {
 							CellInfo info = new CellInfo ();
 							this.btreeParseCellPtr (pCell, ref info);
@@ -1168,7 +1167,7 @@ namespace Community.CsharpSqlite
 						}
 					}
 					if (i == nCell) {
-                        if (eType != Sqlite3.PTRMAP_BTREE || Converter.sqlite3Get4byte(this.aData, this.hdrOffset + 8) != iFrom)
+                        if (eType != PTRMAP.BTREE || Converter.sqlite3Get4byte(this.aData, this.hdrOffset + 8) != iFrom)
                         {
 							return sqliteinth.SQLITE_CORRUPT_BKPT();
 						}
@@ -1290,7 +1289,7 @@ namespace Community.CsharpSqlite
 							do {
 								pgnoOvfl++;
 							}
-                            while (Sqlite3.PTRMAP_ISPAGE(pBt, pgnoOvfl) || pgnoOvfl == Sqlite3.PENDING_BYTE_PAGE(pBt));
+                            while (pBt.PTRMAP_ISPAGE(pgnoOvfl) || pgnoOvfl == pBt.PENDING_BYTE_PAGE);
 						}
 						#endif
                         rc = BTreeMethods.allocateBtreePage(pBt, ref pOvfl, ref pgnoOvfl, pgnoOvfl, 0);
@@ -1309,7 +1308,7 @@ namespace Community.CsharpSqlite
 ///<param name="wrong pages from the database.">wrong pages from the database.</param>
 
 						if (pBt.autoVacuum && rc == SqlResult.SQLITE_OK) {
-                            u8 eType = (u8)(pgnoPtrmap != 0 ? Sqlite3.PTRMAP_OVERFLOW2 : Sqlite3.PTRMAP_OVERFLOW1);
+                            u8 eType = (u8)(pgnoPtrmap != 0 ? PTRMAP.OVERFLOW2 : PTRMAP.OVERFLOW1);
 							pBt.ptrmapPut (pgnoOvfl, eType, pgnoPtrmap, ref rc);
 							if (rc != 0) {
                                 BTreeMethods.releasePage(pOvfl);
@@ -1733,7 +1732,7 @@ public SqlResult balance_quick (MemPage pPage, u8[] pSpace)
 																																																																																																															if (false)
 #endif
 					 {
-                         pBt.ptrmapPut(pgnoNew, Sqlite3.PTRMAP_BTREE, this.pgno, ref rc);
+                         pBt.ptrmapPut(pgnoNew, PTRMAP.BTREE, this.pgno, ref rc);
 						if (szCell [0] > pNew.minLocal) {
 							pNew.ptrmapPutOvflPtr (pCell, ref rc);
 						}
@@ -2278,7 +2277,7 @@ public SqlResult balance_quick (MemPage pPage, u8[] pSpace)
 																																																																																																																																						if (false)
 #endif
 						 {
-                             pBt.ptrmapPut(pNew.pgno, Sqlite3.PTRMAP_BTREE, this.pgno, ref rc);
+                             pBt.ptrmapPut(pNew.pgno, PTRMAP.BTREE, this.pgno, ref rc);
 							if (rc != SqlResult.SQLITE_OK) {
 								goto balance_cleanup;
 							}
@@ -2574,7 +2573,7 @@ public SqlResult balance_quick (MemPage pPage, u8[] pSpace)
 
 							if (isDivider != 0 || pOld.pgno != pNew.pgno) {
 								if (0 == leafCorrection) {
-                                    pBt.ptrmapPut(Converter.sqlite3Get4byte(apCell[i]), Sqlite3.PTRMAP_BTREE, pNew.pgno, ref rc);
+                                    pBt.ptrmapPut(Converter.sqlite3Get4byte(apCell[i]), PTRMAP.BTREE, pNew.pgno, ref rc);
 								}
 								if (szCell [i] > pNew.minLocal) {
 									pNew.ptrmapPutOvflPtr (apCell [i], ref rc);
@@ -2584,7 +2583,7 @@ public SqlResult balance_quick (MemPage pPage, u8[] pSpace)
 						if (0 == leafCorrection) {
 							for (i = 0; i < nNew; i++) {
 								u32 key = Converter.sqlite3Get4byte (apNew [i].aData, 8);
-                                pBt.ptrmapPut(key, Sqlite3.PTRMAP_BTREE, apNew[i].pgno, ref rc);
+                                pBt.ptrmapPut(key, PTRMAP.BTREE, apNew[i].pgno, ref rc);
 							}
 						}
 						#if FALSE
@@ -2651,7 +2650,7 @@ public SqlResult balance_deeper (ref MemPage ppChild)
 					#else
                     #endif
 					 {
-                         pBt.ptrmapPut(pgnoChild, Sqlite3.PTRMAP_BTREE, this.pgno, ref rc);
+                         pBt.ptrmapPut(pgnoChild, PTRMAP.BTREE, this.pgno, ref rc);
 					}
 				}
 				if (rc != 0) {
@@ -2702,18 +2701,18 @@ public SqlResult balance_deeper (ref MemPage ppChild)
         }
 
 
-        public partial class Sqlite3 {
+        public static class PTF {
             ///<summary>
             /// Page type flags.  An ORed combination of these flags appear as the
             /// first byte of on-disk image of every BTree page.
             ///</summary>
-            const byte PTF_INTKEY = 0x01;
+            public const byte INTKEY = 0x01;
 
-            const byte PTF_ZERODATA = 0x02;
+            public const byte ZERODATA = 0x02;
 
-            const byte PTF_LEAFDATA = 0x04;
+            public const byte LEAFDATA = 0x04;
 
-            const byte PTF_LEAF = 0x08;
+            public const byte LEAF = 0x08;
 
         }
 	}

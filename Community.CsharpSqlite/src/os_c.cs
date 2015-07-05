@@ -124,13 +124,13 @@ namespace Community.CsharpSqlite
                 return id.pMethods.xFileSize(id, ref pSize);
             }
 
-            public static SqlResult sqlite3OsLock(sqlite3_file id, int lockType)
+            public static SqlResult sqlite3OsLock(sqlite3_file id, LockType lockType)
             {
                 DO_OS_MALLOC_TEST(id);
                 return id.pMethods.xLock(id, lockType);
             }
 
-            public static SqlResult sqlite3OsUnlock(sqlite3_file id, int lockType)
+            public static SqlResult sqlite3OsUnlock(sqlite3_file id, LockType lockType)
             {
                 return id.pMethods.xUnlock(id, lockType);
             }

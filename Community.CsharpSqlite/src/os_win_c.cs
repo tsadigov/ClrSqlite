@@ -1370,7 +1370,7 @@ free(pFile.zDeleteOnClose);
 		/// must go straight to locking level 0.
 		///
 		///</summary>
-		static SqlResult winLock (sqlite3_file id, int locktype)
+		static SqlResult winLock (sqlite3_file id, LockType locktype)
 		{
 			var rc = SqlResult.SQLITE_OK;
 			///
@@ -1384,7 +1384,7 @@ free(pFile.zDeleteOnClose);
 ///Result of a windows lock call 
 ///</summary>
 
-			int newLocktype;
+            LockType newLocktype;
 			///
 ///<summary>
 ///Set pFile.locktype to this value before exiting 
@@ -1419,9 +1419,9 @@ free(pFile.zDeleteOnClose);
 ///
 ///</summary>
 
-			Debug.Assert (pFile.locktype != NO_LOCK || locktype == SHARED_LOCK);
-			Debug.Assert (locktype != PENDING_LOCK);
-			Debug.Assert (locktype != RESERVED_LOCK || pFile.locktype == SHARED_LOCK);
+            Debug.Assert(pFile.locktype != LockType.NO_LOCK || locktype == LockType.SHARED_LOCK);
+            Debug.Assert(locktype != LockType.PENDING_LOCK);
+            Debug.Assert(locktype != LockType.RESERVED_LOCK || pFile.locktype == LockType.SHARED_LOCK);
 			///
 ///<summary>
 ///Lock the PENDING_LOCK byte if we need to acquire a PENDING lock or
@@ -1431,7 +1431,8 @@ free(pFile.zDeleteOnClose);
 ///</summary>
 
 			newLocktype = pFile.locktype;
-			if (pFile.locktype == NO_LOCK || ((locktype == EXCLUSIVE_LOCK) && (pFile.locktype == RESERVED_LOCK))) {
+            if (pFile.locktype == LockType.NO_LOCK || ((locktype == LockType.EXCLUSIVE_LOCK) && (pFile.locktype == LockType.RESERVED_LOCK)))
+            {
 				int cnt = 3;
 				res = 0;
 				while (cnt-- > 0 && res == 0)//(res = LockFile(pFile.fs.SafeFileHandle.DangerousGetHandle().ToInt32(), PENDING_BYTE, 0, 1, 0)) == 0)
@@ -1469,11 +1470,12 @@ free(pFile.zDeleteOnClose);
 ///
 ///</summary>
 
-			if (locktype == SHARED_LOCK && res != 0) {
-				Debug.Assert (pFile.locktype == NO_LOCK);
+            if (locktype == LockType.SHARED_LOCK && res != 0)
+            {
+                Debug.Assert(pFile.locktype == LockType.NO_LOCK);
 				res = getReadLock (pFile);
 				if (res != 0) {
-					newLocktype = SHARED_LOCK;
+                    newLocktype = LockType.SHARED_LOCK;
 				}
 				else {
 					#if SQLITE_SILVERLIGHT
@@ -1489,12 +1491,13 @@ free(pFile.zDeleteOnClose);
 ///
 ///</summary>
 
-			if ((locktype == RESERVED_LOCK) && res != 0) {
-				Debug.Assert (pFile.locktype == SHARED_LOCK);
+            if ((locktype == LockType.RESERVED_LOCK) && res != 0)
+            {
+                Debug.Assert(pFile.locktype == LockType.SHARED_LOCK);
 				try {
 					lockingStrategy.LockFile (pFile, RESERVED_BYTE, 1);
 					//res = LockFile(pFile.fs.SafeFileHandle.DangerousGetHandle().ToInt32(), RESERVED_BYTE, 0, 1, 0);
-					newLocktype = RESERVED_LOCK;
+                    newLocktype = LockType.RESERVED_LOCK;
 					res = 1;
 				}
 				catch (Exception e) {
@@ -1506,7 +1509,7 @@ free(pFile.zDeleteOnClose);
 					#endif
 				}
 				if (res != 0) {
-					newLocktype = RESERVED_LOCK;
+                    newLocktype = LockType.RESERVED_LOCK;
 				}
 				else {
 					#if SQLITE_SILVERLIGHT
@@ -1522,8 +1525,9 @@ free(pFile.zDeleteOnClose);
 ///
 ///</summary>
 
-			if (locktype == EXCLUSIVE_LOCK && res != 0) {
-				newLocktype = PENDING_LOCK;
+            if (locktype == LockType.EXCLUSIVE_LOCK && res != 0)
+            {
+                newLocktype = LockType.PENDING_LOCK;
 				gotPendingLock = false;
 			}
 			///
@@ -1532,8 +1536,9 @@ free(pFile.zDeleteOnClose);
 ///
 ///</summary>
 
-			if (locktype == EXCLUSIVE_LOCK && res != 0) {
-				Debug.Assert (pFile.locktype >= SHARED_LOCK);
+            if (locktype == LockType.EXCLUSIVE_LOCK && res != 0)
+            {
+                Debug.Assert(pFile.locktype >= LockType.SHARED_LOCK);
 				res = unlockReadLock (pFile);
 				#if SQLITE_DEBUG
 																																																																												        OSTRACE( "unreadlock = %d\n", res );
@@ -1541,14 +1546,14 @@ free(pFile.zDeleteOnClose);
 				//res = LockFile(pFile.fs.SafeFileHandle.DangerousGetHandle().ToInt32(), SHARED_FIRST, 0, SHARED_SIZE, 0);
 				try {
 					lockingStrategy.LockFile (pFile, SHARED_FIRST, SHARED_SIZE);
-					newLocktype = EXCLUSIVE_LOCK;
+                    newLocktype = LockType.EXCLUSIVE_LOCK;
 					res = 1;
 				}
 				catch (Exception e) {
 					res = 0;
 				}
 				if (res != 0) {
-					newLocktype = EXCLUSIVE_LOCK;
+                    newLocktype = LockType.EXCLUSIVE_LOCK;
 				}
 				else {
 					#if SQLITE_SILVERLIGHT
@@ -1569,7 +1574,8 @@ free(pFile.zDeleteOnClose);
 ///
 ///</summary>
 
-			if (gotPendingLock && locktype == SHARED_LOCK) {
+            if (gotPendingLock && locktype == LockType.SHARED_LOCK)
+            {
 				lockingStrategy.UnlockFile (pFile, PENDING_BYTE, 1);
 			}
 			///
@@ -1590,7 +1596,7 @@ free(pFile.zDeleteOnClose);
 				pFile.lastErrno = error;
 				rc = SqlResult.SQLITE_BUSY;
 			}
-			pFile.locktype = (u8)newLocktype;
+			pFile.locktype = newLocktype;
 			return rc;
 		}
 
@@ -1607,7 +1613,8 @@ free(pFile.zDeleteOnClose);
 			if (SimulateIOError ())
                 return SqlResult.SQLITE_IOERR_CHECKRESERVEDLOCK;
 			Debug.Assert (id != null);
-			if (pFile.locktype >= RESERVED_LOCK) {
+            if (pFile.locktype >= LockType.RESERVED_LOCK)
+            {
 				rc = 1;
 				#if SQLITE_DEBUG
 																																																																												        OSTRACE( "TEST WR-LOCK %d %d (local)\n", pFile.fs.Name, rc );
@@ -1644,22 +1651,24 @@ free(pFile.zDeleteOnClose);
 		/// might return SQLITE_IOERR;
 		///
 		///</summary>
-		static SqlResult winUnlock (sqlite3_file id, int locktype)
+		static SqlResult winUnlock (sqlite3_file id, LockType locktype)
 		{
-			int type;
+            LockType type;
 			sqlite3_file pFile = (sqlite3_file)id;
 			var rc = SqlResult.SQLITE_OK;
 			Debug.Assert (pFile != null);
-			Debug.Assert (locktype <= SHARED_LOCK);
+            Debug.Assert(locktype <= LockType.SHARED_LOCK);
 			#if SQLITE_DEBUG
 																																																									      OSTRACE( "UNLOCK %d to %d was %d(%d)\n", pFile.fs.GetHashCode(), locktype,
       pFile.locktype, pFile.sharedLockByte );
 #endif
 			type = pFile.locktype;
-			if (type >= EXCLUSIVE_LOCK) {
+            if (type >= LockType.EXCLUSIVE_LOCK)
+            {
 				lockingStrategy.UnlockFile (pFile, SHARED_FIRST, SHARED_SIZE);
 				// UnlockFile(pFile.h, SHARED_FIRST, 0, SHARED_SIZE, 0);
-				if (locktype == SHARED_LOCK && getReadLock (pFile) == 0) {
+                if (locktype == LockType.SHARED_LOCK && getReadLock(pFile) == 0)
+                {
 					///
 ///<summary>
 ///This should never happen.  We should always be able to
@@ -1669,7 +1678,8 @@ free(pFile.zDeleteOnClose);
                     rc = winLogError(SqlResult.SQLITE_IOERR_UNLOCK, "winUnlock", pFile.zPath);
 				}
 			}
-			if (type >= RESERVED_LOCK) {
+            if (type >= LockType.RESERVED_LOCK)
+            {
 				try {
 					lockingStrategy.UnlockFile (pFile, RESERVED_BYTE, 1);
 					// UnlockFile(pFile.h, RESERVED_BYTE, 0, 1, 0);
@@ -1677,10 +1687,12 @@ free(pFile.zDeleteOnClose);
 				catch (Exception e) {
 				}
 			}
-			if (locktype == NO_LOCK && type >= SHARED_LOCK) {
+            if (locktype == LockType.NO_LOCK && type >= LockType.SHARED_LOCK)
+            {
 				unlockReadLock (pFile);
 			}
-			if (type >= PENDING_LOCK) {
+            if (type >= LockType.PENDING_LOCK)
+            {
 				try {
 					lockingStrategy.UnlockFile (pFile, PENDING_BYTE, 1);
 					//    UnlockFile(pFile.h, PENDING_BYTE, 0, 1, 0);
@@ -1688,7 +1700,7 @@ free(pFile.zDeleteOnClose);
 				catch (Exception e) {
 				}
 			}
-			pFile.locktype = (u8)locktype;
+			pFile.locktype = locktype;
 			return rc;
 		}
 

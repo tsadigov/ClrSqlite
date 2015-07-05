@@ -9,8 +9,113 @@ namespace Community.CsharpSqlite
     using sqlite3_value = Engine.Mem;
 	using sqlite3_pcache = PCache1;
 
+
+    ///
+    ///<summary>
+    ///A complete page cache is an instance of this structure.
+    ///
+    ///</summary>
+
+    public class PCache
+    {
+        public PgHdr pDirty, pDirtyTail;
+
+        ///
+        ///<summary>
+        ///List of dirty pages in LRU order 
+        ///</summary>
+
+        public PgHdr pSynced;
+
+        ///
+        ///<summary>
+        ///Last synced page in dirty page list 
+        ///</summary>
+
+        public int _nRef;
+
+        ///
+        ///<summary>
+        ///Number of referenced pages 
+        ///</summary>
+
+        public int nMax;
+
+        ///
+        ///<summary>
+        ///Configured cache size 
+        ///</summary>
+
+        public int szPage;
+
+        ///
+        ///<summary>
+        ///Size of every page in this cache 
+        ///</summary>
+
+        public int szExtra;
+
+        ///
+        ///<summary>
+        ///Size of extra space for each page 
+        ///</summary>
+
+        public bool bPurgeable;
+
+        ///
+        ///<summary>
+        ///True if pages are on backing store 
+        ///</summary>
+
+        public dxStress xStress;
+
+        //int (*xStress)(void*,PgHdr*);       /* Call to try make a page clean */
+        public object pStress;
+
+        ///
+        ///<summary>
+        ///Argument to xStress 
+        ///</summary>
+
+        public sqlite3_pcache pCache;
+
+        ///
+        ///<summary>
+        ///Pluggable cache module 
+        ///</summary>
+
+        public PgHdr pPage1;
+
+        ///<summary>
+        ///Reference to page 1
+        ///</summary>
+        public int nRef ///
+        ///<summary>
+        ///Number of referenced pages 
+        ///</summary>
+        {
+            get
+            {
+                return _nRef;
+            }
+            set
+            {
+                _nRef = value;
+            }
+        }
+
+        public void Clear()
+        {
+            pDirty = null;
+            pDirtyTail = null;
+            pSynced = null;
+            nRef = 0;
+        }
+    };
+
     public partial class Sqlite3
     {
+    }
         ///<summary>
         /// 2008 August 05
         ///
@@ -33,109 +138,7 @@ namespace Community.CsharpSqlite
         ///
         ///</summary>
         //#include "sqliteInt.h"
-        ///
-        ///<summary>
-        ///A complete page cache is an instance of this structure.
-        ///
-        ///</summary>
-
-        public class PCache
-        {
-            public PgHdr pDirty, pDirtyTail;
-
-            ///
-            ///<summary>
-            ///List of dirty pages in LRU order 
-            ///</summary>
-
-            public PgHdr pSynced;
-
-            ///
-            ///<summary>
-            ///Last synced page in dirty page list 
-            ///</summary>
-
-            public int _nRef;
-
-            ///
-            ///<summary>
-            ///Number of referenced pages 
-            ///</summary>
-
-            public int nMax;
-
-            ///
-            ///<summary>
-            ///Configured cache size 
-            ///</summary>
-
-            public int szPage;
-
-            ///
-            ///<summary>
-            ///Size of every page in this cache 
-            ///</summary>
-
-            public int szExtra;
-
-            ///
-            ///<summary>
-            ///Size of extra space for each page 
-            ///</summary>
-
-            public bool bPurgeable;
-
-            ///
-            ///<summary>
-            ///True if pages are on backing store 
-            ///</summary>
-
-            public dxStress xStress;
-
-            //int (*xStress)(void*,PgHdr*);       /* Call to try make a page clean */
-            public object pStress;
-
-            ///
-            ///<summary>
-            ///Argument to xStress 
-            ///</summary>
-
-            public sqlite3_pcache pCache;
-
-            ///
-            ///<summary>
-            ///Pluggable cache module 
-            ///</summary>
-
-            public PgHdr pPage1;
-
-            ///<summary>
-            ///Reference to page 1
-            ///</summary>
-            public int nRef ///
-            ///<summary>
-            ///Number of referenced pages 
-            ///</summary>
-            {
-                get
-                {
-                    return _nRef;
-                }
-                set
-                {
-                    _nRef = value;
-                }
-            }
-
-            public void Clear()
-            {
-                pDirty = null;
-                pDirtyTail = null;
-                pSynced = null;
-                nRef = 0;
-            }
-        };
-
+        
         public class PCacheMethods
         {
             ///
@@ -167,9 +170,9 @@ static void expensive_assert( bool x ) { Debug.Assert( x ); }
 static int pcacheCheckSynced(PCache pCache){
 PgHdr p ;
 for(p=pCache.pDirtyTail; p!=pCache.pSynced; p=p.pDirtyPrev){
-Debug.Assert( p.nRef !=0|| (p.flags&PGHDR_NEED_SYNC) !=0);
+Debug.Assert( p.nRef !=0|| (p.flags&PGHDR.NEED_SYNC) !=0);
 }
-return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
+return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
 }
 #endif
             ///<summary>
@@ -188,7 +191,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 if (p.pSynced == pPage)
                 {
                     PgHdr pSynced = pPage.pDirtyPrev;
-                    while (pSynced != null && (pSynced.flags & PGHDR_NEED_SYNC) != 0)
+                    while (pSynced != null && (pSynced.flags & PGHDR.NEED_SYNC) != 0)
                     {
                         pSynced = pSynced.pDirtyPrev;
                     }
@@ -239,7 +242,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 {
                     p.pDirtyTail = pPage;
                 }
-                if (null == p.pSynced && 0 == (pPage.flags & PGHDR_NEED_SYNC))
+                if (null == p.pSynced && 0 == (pPage.flags & PGHDR.NEED_SYNC))
                 {
                     p.pSynced = pPage;
                 }
@@ -284,7 +287,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     ///<param name="built">in default page cache is used instead of the application defined</param>
                     ///<param name="page cache. ">page cache. </param>
 
-                    sqlite3PCacheSetDefault();
+                    Sqlite3.sqlite3PCacheSetDefault();
                 }
                 return sqliteinth.sqlite3GlobalConfig.pcache.xInit(sqliteinth.sqlite3GlobalConfig.pcache.pArg);
             }
@@ -437,7 +440,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                     ///<summary>
                     ///</summary>
                     ///<param name="Find a dirty page to write">out and recycle. First try to find a</param>
-                    ///<param name="page that does not require a journal">sync (one with PGHDR_NEED_SYNC</param>
+                    ///<param name="page that does not require a journal">sync (one with PGHDR.NEED_SYNC</param>
                     ///<param name="cleared), but if that is not possible settle for any other">cleared), but if that is not possible settle for any other</param>
                     ///<param name="unreferenced dirty page.">unreferenced dirty page.</param>
                     ///<param name=""></param>
@@ -445,7 +448,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
 #if SQLITE_ENABLE_EXPENSIVE_ASSERT
 																																																																												expensive_assert( pcacheCheckSynced(pCache) );
 #endif
-                    for (pPg = pCache.pSynced; pPg != null && (pPg.nRef != 0 || (pPg.flags & PGHDR_NEED_SYNC) != 0); pPg = pPg.pDirtyPrev)
+                    for (pPg = pCache.pSynced; pPg != null && (pPg.nRef != 0 || (pPg.flags & PGHDR.NEED_SYNC) != 0); pPg = pPg.pDirtyPrev)
                         ;
                     pCache.pSynced = pPg;
                     if (null == pPg)
@@ -514,7 +517,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 {
                     PCache pCache = p.pCache;
                     pCache.nRef--;
-                    if ((p.flags & PGHDR_DIRTY) == 0)
+                    if ((p.flags & PGHDR.DIRTY) == 0)
                     {
                         pcacheUnpin(p);
                     }
@@ -543,7 +546,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
             {
                 PCache pCache;
                 Debug.Assert(p.nRef == 1);
-                if ((p.flags & PGHDR_DIRTY) != 0)
+                if ((p.flags & PGHDR.DIRTY) != 0)
                 {
                     pcacheRemoveFromDirtyList(p);
                 }
@@ -563,11 +566,11 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
             ///</summary>
             public static void sqlite3PcacheMakeDirty(PgHdr p)
             {
-                p.flags &= ~PGHDR_DONT_WRITE;
+                p.flags &= ~PGHDR.DONT_WRITE;
                 Debug.Assert(p.nRef > 0);
-                if (0 == (p.flags & PGHDR_DIRTY))
+                if (0 == (p.flags & PGHDR.DIRTY))
                 {
-                    p.flags |= PGHDR_DIRTY;
+                    p.flags |= PGHDR.DIRTY;
                     pcacheAddToDirtyList(p);
                 }
             }
@@ -579,10 +582,10 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
             ///</summary>
             public static void sqlite3PcacheMakeClean(PgHdr p)
             {
-                if ((p.flags & PGHDR_DIRTY) != 0)
+                if ((p.flags & PGHDR.DIRTY) != 0)
                 {
                     pcacheRemoveFromDirtyList(p);
-                    p.flags &= ~(PGHDR_DIRTY | PGHDR_NEED_SYNC);
+                    p.flags &= ~(PGHDR.DIRTY | PGHDR.NEED_SYNC);
                     if (p.nRef == 0)
                     {
                         pcacheUnpin(p);
@@ -604,7 +607,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
             }
 
             ///<summary>
-            /// Clear the PGHDR_NEED_SYNC flag from all dirty pages.
+            /// Clear the PGHDR.NEED_SYNC flag from all dirty pages.
             ///
             ///</summary>
             public static void sqlite3PcacheClearSyncFlags(PCache pCache)
@@ -612,7 +615,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 PgHdr p;
                 for (p = pCache.pDirty; p != null; p = p.pDirtyNext)
                 {
-                    p.flags &= ~PGHDR_NEED_SYNC;
+                    p.flags &= ~PGHDR.NEED_SYNC;
                 }
                 pCache.pSynced = pCache.pDirtyTail;
             }
@@ -628,7 +631,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                 Debug.Assert(newPgno > 0);
                 sqliteinth.sqlite3GlobalConfig.pcache.xRekey(pCache.pCache, p, p.pgno, newPgno);
                 p.pgno = newPgno;
-                if ((p.flags & PGHDR_DIRTY) != 0 && (p.flags & PGHDR_NEED_SYNC) != 0)
+                if ((p.flags & PGHDR.DIRTY) != 0 && (p.flags & PGHDR.NEED_SYNC) != 0)
                 {
                     pcacheRemoveFromDirtyList(p);
                     pcacheAddToDirtyList(p);
@@ -665,7 +668,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                         Debug.Assert(p.pgno > 0);
                         if (Sqlite3.ALWAYS(p.pgno > pgno))
                         {
-                            Debug.Assert((p.flags & PGHDR_DIRTY) != 0);
+                            Debug.Assert((p.flags & PGHDR.DIRTY) != 0);
                             sqlite3PcacheMakeClean(p);
                         }
                     }
@@ -782,7 +785,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
                             a[i] = null;
                         }
                     }
-                    if (NEVER(i == N_SORT_BUCKET - 1))
+                    if (Sqlite3.NEVER(i == N_SORT_BUCKET - 1))
                     {
                         ///
                         ///<summary>
@@ -879,5 +882,5 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR_NEED_SYNC)==0)?1:0;
     }
 #endif
         }
-    }
+    
 }
