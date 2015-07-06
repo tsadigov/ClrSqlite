@@ -19,9 +19,9 @@ namespace Community.CsharpSqlite
 		/// corresponding to the source database is held when this function is
 		/// called.
 		///</summary>
-		static void sqlite3BackupRestart (this Sqlite3.sqlite3_backup _this)
+		static void sqlite3BackupRestart (this sqlite3_backup _this)
 		{
-			Community.CsharpSqlite.Sqlite3.sqlite3_backup p;
+			sqlite3_backup p;
 			///
 ///<summary>
 ///Iterator variable 

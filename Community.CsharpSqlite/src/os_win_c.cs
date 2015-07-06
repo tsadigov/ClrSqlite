@@ -3983,7 +3983,7 @@ static int winDlClose(ref sqlite3_vfs vfs, object data) { return 0; }
 ///
 ///</summary>
 
-		static SqlResult sqlite3_os_init ()
+		public static SqlResult sqlite3_os_init ()
 		{
 			#if !SQLITE_OMIT_WAL
 																																																									/* get memory map allocation granularity */
@@ -4006,70 +4006,79 @@ Debug.Assert(winSysInfo.dwAllocationGranularity > 0);
 		//
 		const int NO_ERROR = 0;
 
-		/// <summary>
-		/// Basic locking strategy for Console/Winform applications
-		/// </summary>
-		private class LockingStrategy
-		{
-			#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
-			[DllImport ("kernel32.dll")]
-			static extern bool LockFileEx (IntPtr hFile, uint dwFlags, uint dwReserved, uint nNumberOfBytesToLockLow, uint nNumberOfBytesToLockHigh, [In] ref System.Threading.NativeOverlapped lpOverlapped);
+		
 
-			const int LOCKFILE_FAIL_IMMEDIATELY = 1;
+		
+	}
 
-			#endif
-			public virtual void LockFile (sqlite3_file pFile, long offset, long length)
-			{
-				#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
-				pFile.fs.Lock (offset, length);
-				#endif
-			}
 
-			public virtual int SharedLockFile (sqlite3_file pFile, long offset, long length)
-			{
-				#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
-				Debug.Assert (length == SHARED_SIZE);
-				Debug.Assert (offset == SHARED_FIRST);
-				NativeOverlapped ovlp = new NativeOverlapped ();
-				ovlp.OffsetLow = (int)offset;
-				ovlp.OffsetHigh = 0;
-				ovlp.EventHandle = IntPtr.Zero;
-				return LockFileEx (pFile.fs.Handle, LOCKFILE_FAIL_IMMEDIATELY, 0, (uint)length, 0, ref ovlp) ? 1 : 0;
-				#else
+
+    /// <summary>
+    /// Basic locking strategy for Console/Winform applications
+    /// </summary>
+    public class LockingStrategy
+    {
+#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
+        [DllImport("kernel32.dll")]
+        static extern bool LockFileEx(IntPtr hFile, uint dwFlags, uint dwReserved, uint nNumberOfBytesToLockLow, uint nNumberOfBytesToLockHigh, [In] ref System.Threading.NativeOverlapped lpOverlapped);
+
+        const int LOCKFILE_FAIL_IMMEDIATELY = 1;
+
+#endif
+        public virtual void LockFile(sqlite3_file pFile, long offset, long length)
+        {
+#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
+            pFile.fs.Lock(offset, length);
+#endif
+        }
+
+        public virtual int SharedLockFile(sqlite3_file pFile, long offset, long length)
+        {
+#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
+            Debug.Assert(length == Sqlite3.SHARED_SIZE);
+            Debug.Assert(offset == Sqlite3.SHARED_FIRST);
+            NativeOverlapped ovlp = new NativeOverlapped();
+            ovlp.OffsetLow = (int)offset;
+            ovlp.OffsetHigh = 0;
+            ovlp.EventHandle = IntPtr.Zero;
+            return LockFileEx(pFile.fs.Handle, LOCKFILE_FAIL_IMMEDIATELY, 0, (uint)length, 0, ref ovlp) ? 1 : 0;
+#else
 																																																																												            return 1;
 #endif
-			}
+        }
 
-			public virtual void UnlockFile (sqlite3_file pFile, long offset, long length)
-			{
-				#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
-				pFile.fs.Unlock (offset, length);
-				#endif
-			}
-		}
+        public virtual void UnlockFile(sqlite3_file pFile, long offset, long length)
+        {
+#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
+            pFile.fs.Unlock(offset, length);
+#endif
+        }
+    }
 
-		/// <summary>
-		/// Locking strategy for Medium Trust. It uses the same trick used in the native code for WIN_CE
-		/// which doesn't support LockFileEx as well.
-		/// </summary>
-		private class MediumTrustLockingStrategy : LockingStrategy
-		{
-			public override int SharedLockFile (sqlite3_file pFile, long offset, long length)
-			{
-				#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
-				Debug.Assert (length == SHARED_SIZE);
-				Debug.Assert (offset == SHARED_FIRST);
-				try {
-					pFile.fs.Lock (offset + pFile.sharedLockByte, 1);
-				}
-				catch (IOException) {
-					return 0;
-				}
-				#endif
-				return 1;
-			}
-		}
-	}
+    /// <summary>
+    /// Locking strategy for Medium Trust. It uses the same trick used in the native code for WIN_CE
+    /// which doesn't support LockFileEx as well.
+    /// </summary>
+    public class MediumTrustLockingStrategy : LockingStrategy
+    {
+        public override int SharedLockFile(sqlite3_file pFile, long offset, long length)
+        {
+#if !(SQLITE_SILVERLIGHT || WINDOWS_MOBILE)
+            Debug.Assert(length == Sqlite3.SHARED_SIZE);
+            Debug.Assert(offset == Sqlite3.SHARED_FIRST);
+            try
+            {
+                pFile.fs.Lock(offset + pFile.sharedLockByte, 1);
+            }
+            catch (IOException)
+            {
+                return 0;
+            }
+#endif
+            return 1;
+        }
+    }
+
 	internal static class HelperMethods
 	{
 		public static bool IsRunningMediumTrust ()

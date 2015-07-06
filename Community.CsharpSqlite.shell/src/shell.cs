@@ -5,7 +5,6 @@ using System.Text;
 using Community.CsharpSqlite;
 using System.Linq;
 
-using sqlite3_backup = Community.CsharpSqlite.Sqlite3.sqlite3_backup;
 
 using sqlite3_int64 = System.Int64;
 using sqlite3_stmt = Community.CsharpSqlite.Sqlite3.Vdbe;
@@ -2798,8 +2797,8 @@ enableTimer = booleanValue(azArg[1]);
         sqlite3 pSrc = null;
         var zSrcFile = "hehehe";
         var r=Sqlite3.sqlite3_open(zSrcFile, out pSrc);
-        Sqlite3.Btree btree = null;
-        r = Sqlite3.Btree.Open(pSrc.pVfs, "hehehe", pSrc, ref btree, 0, 262);
+        Btree btree = null;
+        r = Btree.Open(pSrc.pVfs, "hehehe", pSrc, ref btree, 0, 262);
 		/*
          
         Community.CsharpSqlite.Sqlite3.Parse pParse = new Community.CsharpSqlite.Sqlite3.Parse ();

@@ -77,6 +77,37 @@ namespace Community.CsharpSqlite
 
     public class Globals
     {
+        public static class MemJournal {
+            ///<summary>
+            ///Forward references to internal structures 
+            ///</summary>
+
+            //typedef struct MemJournal MemJournal;
+            //typedef struct FilePoint FilePoint;
+            //typedef struct FileChunk FileChunk;
+            ///<summary>
+            ///Space to hold the rollback journal is allocated in increments of
+            /// this many bytes.
+            ///
+            /// The size chosen is a little less than a power of two.  That way,
+            /// the FileChunk object will have a size that almost exactly fills
+            /// a power-of-two allocation.  This mimimizes wasted space in power-of-two
+            /// memory allocators.
+            ///
+            ///</summary>
+            //#define JOURNAL_CHUNKSIZE ((int)(1024-sizeof(FileChunk*)))
+            public const int JOURNAL_CHUNKSIZE = 4096;
+        }
+        public static class BTree {
+            ///<summary>
+            /// The in-memory image of a disk page has the auxiliary information appended
+            /// to the end.  EXTRA_SIZE is the number of bytes of space needed to hold
+            /// that extra information.
+            ///
+            ///</summary>
+            public const int EXTRA_SIZE = 0;
+
+        }
         public const int SQLITE_LIMIT_LENGTH = 0;
 
         public const int SQLITE_LIMIT_SQL_LENGTH = 1;

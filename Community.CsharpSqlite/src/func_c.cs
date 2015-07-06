@@ -13,8 +13,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
-    public partial class Sqlite3
-    {
+    using _Custom = Sqlite3._Custom;    
         public class func
         {
             ///<summary>
@@ -115,7 +114,7 @@ namespace Community.CsharpSqlite {
                         z = "null";
                         break;
                 }
-                context.sqlite3_result_text(z, -1, SQLITE_STATIC);
+                context.sqlite3_result_text(z, -1, Sqlite3.SQLITE_STATIC);
             }
             ///<summary>
             /// Implementation of the length() function
@@ -326,7 +325,7 @@ namespace Community.CsharpSqlite {
                     //{
                     //  sqliteinth.SQLITE_SKIP_UTF8( ref z2 );
                     //}
-                    context.sqlite3_result_text(z, p1, p2 <= z.Length - p1 ? p2 : z.Length - p1, SQLITE_TRANSIENT);
+                    context.sqlite3_result_text(z, p1, p2 <= z.Length - p1 ? p2 : z.Length - p1, Sqlite3.SQLITE_TRANSIENT);
                 }
                 else
                 {
@@ -346,7 +345,7 @@ namespace Community.CsharpSqlite {
                             sb.Append((char)zBLOB[i]);
                         }
                     }
-                    context.sqlite3_result_blob(sb.ToString(), (int)p2, SQLITE_TRANSIENT);
+                    context.sqlite3_result_blob(sb.ToString(), (int)p2, Sqlite3.SQLITE_TRANSIENT);
                 }
             }
             ///<summary>
@@ -530,7 +529,7 @@ break;
             {
                 sqlite_int64 r = 0;
                 sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
-                sqlite3_randomness(sizeof(sqlite_int64), ref r);
+                Sqlite3.sqlite3_randomness(sizeof(sqlite_int64), ref r);
                 if (r < 0)
                 {
                     ///
@@ -579,7 +578,7 @@ break;
                     i64 _p = 0;
                     for (int i = 0; i < n; i++)
                     {
-                        sqlite3_randomness(sizeof(u8), ref _p);
+                        Sqlite3.sqlite3_randomness(sizeof(u8), ref _p);
                         p[i] = (char)(_p & 0x7F);
                     }
                     context.sqlite3_result_blob(new string(p), n, null);
@@ -601,7 +600,7 @@ break;
                 ///<param name="IMP: R">12026 The last_insert_rowid() SQL function is a</param>
                 ///<param name="wrapper around the sqlite3_last_insert_rowid() C/C++ interface">wrapper around the sqlite3_last_insert_rowid() C/C++ interface</param>
                 ///<param name="function. ">function. </param>
-                context.sqlite3_result_int64(sqlite3_last_insert_rowid(db));
+                context.sqlite3_result_int64(Sqlite3.sqlite3_last_insert_rowid(db));
             }
             ///<summary>
             /// Implementation of the changes() SQL function.
@@ -615,7 +614,7 @@ break;
             {
                 sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
                 sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
-                context.sqlite3_result_int(sqlite3_changes(db));
+                context.sqlite3_result_int(Sqlite3.sqlite3_changes(db));
             }
             ///<summary>
             /// Implementation of the total_changes() SQL function.  The return value is
@@ -631,7 +630,7 @@ break;
                 ///</summary>
                 ///<param name="IMP: R">41993 This function is a wrapper around the</param>
                 ///<param name="sqlite3_total_changes() C/C++ interface. ">sqlite3_total_changes() C/C++ interface. </param>
-                context.sqlite3_result_int(sqlite3_total_changes(db));
+                context.sqlite3_result_int(Sqlite3.sqlite3_total_changes(db));
             }
             ///
             ///<summary>
@@ -661,7 +660,7 @@ break;
             ///<param name="whereas only characters less than 0x80 do in ASCII.">whereas only characters less than 0x80 do in ASCII.</param>
             ///<param name=""></param>
             //#if defined(SQLITE_EBCDIC)
-            //# define sqlite3Utf8Read(A,C)  (*(A++))
+            //# define Sqlite3.sqlite3Utf8Read(A,C)  (*(A++))
             //# define GlogUpperToLower(A)   A = _Custom.sqlite3UpperToLower[A]
             //#else
             //# define GlogUpperToLower(A)   if( !((A)&~0x7f) ){ A = _Custom.sqlite3UpperToLower[A]; }
@@ -740,13 +739,13 @@ break;
                 ///</summary>
                 string inPattern = zPattern;
                 //Entered Pattern
-                while ((c = sqlite3Utf8Read(zPattern, ref zPattern)) != 0)
+                while ((c = Sqlite3.sqlite3Utf8Read(zPattern, ref zPattern)) != 0)
                 {
                     if (!prevEscape && c == matchAll)
                     {
-                        while ((c = sqlite3Utf8Read(zPattern, ref zPattern)) == matchAll || c == matchOne)
+                        while ((c = Sqlite3.sqlite3Utf8Read(zPattern, ref zPattern)) == matchAll || c == matchOne)
                         {
-                            if (c == matchOne && sqlite3Utf8Read(zString, ref zString) == 0)
+                            if (c == matchOne && Sqlite3.sqlite3Utf8Read(zString, ref zString) == 0)
                             {
                                 return false;
                             }
@@ -758,7 +757,7 @@ break;
                         else
                             if (c == esc)
                             {
-                                c = sqlite3Utf8Read(zPattern, ref zPattern);
+                                c = Sqlite3.sqlite3Utf8Read(zPattern, ref zPattern);
                                 if (c == 0)
                                 {
                                     return false;
@@ -784,7 +783,7 @@ break;
                                     }
                                     return len < zString.Length;
                                 }
-                        while ((c2 = sqlite3Utf8Read(zString, ref zString)) != 0)
+                        while ((c2 = Sqlite3.sqlite3Utf8Read(zString, ref zString)) != 0)
                         {
                             if (noCase)
                             {
@@ -796,7 +795,7 @@ break;
                                 //GlogUpperToLower(c);
                                 while (c2 != 0 && c2 != c)
                                 {
-                                    c2 = sqlite3Utf8Read(zString, ref zString);
+                                    c2 = Sqlite3.sqlite3Utf8Read(zString, ref zString);
                                     if (0 == ((c2) & ~0x7f))
                                         c2 = (u32)_Custom.sqlite3UpperToLower[c2];
                                     //GlogUpperToLower(c2);
@@ -806,7 +805,7 @@ break;
                             {
                                 while (c2 != 0 && c2 != c)
                                 {
-                                    c2 = sqlite3Utf8Read(zString, ref zString);
+                                    c2 = Sqlite3.sqlite3Utf8Read(zString, ref zString);
                                 }
                             }
                             if (c2 == 0)
@@ -819,7 +818,7 @@ break;
                     else
                         if (!prevEscape && c == matchOne)
                         {
-                            if (sqlite3Utf8Read(zString, ref zString) == 0)
+                            if (Sqlite3.sqlite3Utf8Read(zString, ref zString) == 0)
                             {
                                 return false;
                             }
@@ -835,26 +834,26 @@ break;
                                 ///</summary>
                                 seen = 0;
                                 invert = 0;
-                                c = sqlite3Utf8Read(zString, ref zString);
+                                c = Sqlite3.sqlite3Utf8Read(zString, ref zString);
                                 if (c == 0)
                                     return false;
-                                c2 = sqlite3Utf8Read(zPattern, ref zPattern);
+                                c2 = Sqlite3.sqlite3Utf8Read(zPattern, ref zPattern);
                                 if (c2 == '^')
                                 {
                                     invert = 1;
-                                    c2 = sqlite3Utf8Read(zPattern, ref zPattern);
+                                    c2 = Sqlite3.sqlite3Utf8Read(zPattern, ref zPattern);
                                 }
                                 if (c2 == ']')
                                 {
                                     if (c == ']')
                                         seen = 1;
-                                    c2 = sqlite3Utf8Read(zPattern, ref zPattern);
+                                    c2 = Sqlite3.sqlite3Utf8Read(zPattern, ref zPattern);
                                 }
                                 while (c2 != 0 && c2 != ']')
                                 {
                                     if (c2 == '-' && zPattern[0] != ']' && zPattern[0] != 0 && prior_c > 0)
                                     {
-                                        c2 = sqlite3Utf8Read(zPattern, ref zPattern);
+                                        c2 = Sqlite3.sqlite3Utf8Read(zPattern, ref zPattern);
                                         if (c >= prior_c && c <= c2)
                                             seen = 1;
                                         prior_c = 0;
@@ -867,7 +866,7 @@ break;
                                         }
                                         prior_c = c2;
                                     }
-                                    c2 = sqlite3Utf8Read(zPattern, ref zPattern);
+                                    c2 = Sqlite3.sqlite3Utf8Read(zPattern, ref zPattern);
                                 }
                                 if (c2 == 0 || (seen ^ invert) == 0)
                                 {
@@ -881,7 +880,7 @@ break;
                                 }
                                 else
                                 {
-                                    c2 = sqlite3Utf8Read(zString, ref zString);
+                                    c2 = Sqlite3.sqlite3Utf8Read(zString, ref zString);
                                     if (noCase)
                                     {
                                         if (c < 0x80)
@@ -959,12 +958,12 @@ break;
                     string zEsc = vdbeapi.sqlite3_value_text(argv[2]);
                     if (zEsc == null)
                         return;
-                    if (sqlite3Utf8CharLen(zEsc, -1) != 1)
+                    if (Sqlite3.sqlite3Utf8CharLen(zEsc, -1) != 1)
                     {
                         context.sqlite3_result_error("ESCAPE expression must be a single character", -1);
                         return;
                     }
-                    escape = sqlite3Utf8Read(zEsc, ref zEsc);
+                    escape = Sqlite3.sqlite3Utf8Read(zEsc, ref zEsc);
                 }
                 if (zA != null && zB != null)
                 {
@@ -1007,7 +1006,7 @@ break;
                 ///</summary>
                 ///<param name="IMP: R">48617 This function is an SQL wrapper around the</param>
                 ///<param name="sqlite3_libversion() C">interface. </param>
-                context.sqlite3_result_text(sqlite3_libversion(), -1, SQLITE_STATIC);
+                context.sqlite3_result_text(Sqlite3.sqlite3_libversion(), -1, Sqlite3.SQLITE_STATIC);
             }
             ///<summary>
             /// Implementation of the sqlite_source_id() function. The result is a string
@@ -1023,7 +1022,7 @@ break;
                 ///</summary>
                 ///<param name="IMP: R">31136 This function is an SQL wrapper around the</param>
                 ///<param name="sqlite3_sourceid() C interface. ">sqlite3_sourceid() C interface. </param>
-                context.sqlite3_result_text(sqlite3_sourceid(), -1, SQLITE_STATIC);
+                context.sqlite3_result_text(Sqlite3.sqlite3_sourceid(), -1, Sqlite3.SQLITE_STATIC);
             }
             ///
             ///<summary>
@@ -1059,7 +1058,7 @@ break;
                 ///<param name=""></param>
                 if ((zOptName = vdbeapi.sqlite3_value_text(argv[0])) != null)
                 {
-                    context.sqlite3_result_int(sqlite3_compileoption_used(zOptName));
+                    context.sqlite3_result_int(Sqlite3.sqlite3_compileoption_used(zOptName));
                 }
             }
 #endif
@@ -1081,7 +1080,7 @@ break;
                 ///<param name="is a wrapper around the sqlite3_compileoption_get() C/C++ function.">is a wrapper around the sqlite3_compileoption_get() C/C++ function.</param>
                 ///<param name=""></param>
                 n = vdbeapi.sqlite3_value_int(argv[0]);
-                context.sqlite3_result_text(sqlite3_compileoption_get(n), -1, SQLITE_STATIC);
+                context.sqlite3_result_text(Sqlite3.sqlite3_compileoption_get(n), -1, Sqlite3.SQLITE_STATIC);
             }
 #endif
             ///<summary>
@@ -1156,7 +1155,7 @@ break;
                                 //zText[( nBlob * 2 ) + 3] = '\0';
                                 //zText[0] = 'X';
                                 //zText[1] = '\'';
-                                context.sqlite3_result_text(zText, -1, SQLITE_TRANSIENT);
+                                context.sqlite3_result_text(zText, -1, Sqlite3.SQLITE_TRANSIENT);
                                 //malloc_cs.sqlite3_free( zText );
                             }
                             break;
@@ -1200,7 +1199,7 @@ break;
                     default:
                         {
                             Debug.Assert(vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL);
-                            context.sqlite3_result_text("NULL", 4, SQLITE_STATIC);
+                            context.sqlite3_result_text("NULL", 4, Sqlite3.SQLITE_STATIC);
                             break;
                         }
                 }
@@ -1576,7 +1575,7 @@ break;
                 StringBuilder sb = new StringBuilder(nIn);
                 for (i = 0; i < nIn; i++)
                     sb.Append((char)zBlob[izIn + i]);
-                context.sqlite3_result_text(sb, nIn, SQLITE_TRANSIENT);
+                context.sqlite3_result_text(sb, nIn, Sqlite3.SQLITE_TRANSIENT);
             }
             ///<summary>
             ///IMP: R-25361-16150 This function is omitted from SQLite by default. It
@@ -1633,11 +1632,11 @@ while( j<4 ){
 zResult[j++] = '0';
 }
 zResult[j] = 0;
-sqlite3_result_text(context, zResult, 4, SQLITE_TRANSIENT);
+sqlite3_result_text(context, zResult, 4, Sqlite3.SQLITE_TRANSIENT);
 }else{
 /* IMP: R-64894-50321 The string "?000" is returned if the argument
 ** is NULL or contains no ASCII alphabetic characters. */
-sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
+sqlite3_result_text(context, "?000", 4, Sqlite3.SQLITE_STATIC);
 }
 }
 #endif
@@ -1659,7 +1658,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
                 {
                     zProc = "";
                 }
-                if (zFile != null && sqlite3_load_extension(db, zFile, zProc, ref zErrMsg) != 0)
+                if (zFile != null && Sqlite3.sqlite3_load_extension(db, zFile, zProc, ref zErrMsg) != 0)
                 {
                     context.sqlite3_result_error(zErrMsg, -1);
                     db.sqlite3DbFree(ref zErrMsg);
@@ -1692,7 +1691,7 @@ sqlite3_result_text(context, "?000", 4, SQLITE_STATIC);
                 p = pMem._SumCtx;
                 if (p.Context == null)
                     p.Context = pMem;
-                type = sqlite3_value_numeric_type(argv[0]);
+                type = Sqlite3.sqlite3_value_numeric_type(argv[0]);
                 if (p != null && type != FoundationalType.SQLITE_NULL)
                 {
                     p.cnt++;
@@ -2012,7 +2011,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             }
             public static void sqlite3RegisterBuiltinFunctions(sqlite3 db)
             {
-                var rc = sqlite3_overload_function(db, "MATCH", 2);
+                var rc = Sqlite3.sqlite3_overload_function(db, "MATCH", 2);
                 Debug.Assert(rc == SqlResult.SQLITE_NOMEM || rc == SqlResult.SQLITE_OK);
                 if (rc == SqlResult.SQLITE_NOMEM)
                 {
@@ -2026,7 +2025,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             static void setLikeOptFlag(sqlite3 db, string zName, FuncFlags flagVal)
             {
                 FuncDef pDef;
-                pDef = sqlite3FindFunction(db, zName, StringExtensions.sqlite3Strlen30(zName), 2, SqliteEncoding.UTF8, 0);
+                pDef = Sqlite3.sqlite3FindFunction(db, zName, StringExtensions.sqlite3Strlen30(zName), 2, SqliteEncoding.UTF8, 0);
                 if (Sqlite3.ALWAYS(pDef != null))
                 {
                     pDef.flags = flagVal;
@@ -2049,9 +2048,9 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 {
                     pInfo = likeInfoNorm;
                 }
-                sqlite3CreateFunc(db, "like", 2, SqliteEncoding.UTF8, pInfo, (dxFunc)likeFunc, null, null, null);
-                sqlite3CreateFunc(db, "like", 3, SqliteEncoding.UTF8, pInfo, (dxFunc)likeFunc, null, null, null);
-                sqlite3CreateFunc(db, "glob", 2, SqliteEncoding.UTF8, globInfo, (dxFunc)likeFunc, null, null, null);
+                Sqlite3.sqlite3CreateFunc(db, "like", 2, SqliteEncoding.UTF8, pInfo, (dxFunc)likeFunc, null, null, null);
+                Sqlite3.sqlite3CreateFunc(db, "like", 3, SqliteEncoding.UTF8, pInfo, (dxFunc)likeFunc, null, null, null);
+                Sqlite3.sqlite3CreateFunc(db, "glob", 2, SqliteEncoding.UTF8, globInfo, (dxFunc)likeFunc, null, null, null);
                 setLikeOptFlag(db, "glob", FuncFlags.SQLITE_FUNC_LIKE | FuncFlags.SQLITE_FUNC_CASE);
                 setLikeOptFlag(db, "like", caseSensitive != 0 ? (FuncFlags.SQLITE_FUNC_LIKE | FuncFlags.SQLITE_FUNC_CASE) : FuncFlags.SQLITE_FUNC_LIKE);
             }
@@ -2071,8 +2070,8 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                     return false;
                 }
                 Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
-                pDef = sqlite3FindFunction(db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), 2, SqliteEncoding.UTF8, 0);
-                if (NEVER(pDef == null) || (pDef.flags & FuncFlags.SQLITE_FUNC_LIKE) == 0)
+                pDef = Sqlite3.sqlite3FindFunction(db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), 2, SqliteEncoding.UTF8, 0);
+                if (Sqlite3.NEVER(pDef == null) || (pDef.flags & FuncFlags.SQLITE_FUNC_LIKE) == 0)
                 {
                     return false;
                 }
@@ -2203,23 +2202,23 @@ LIKEFUNC("like", 3, likeInfoAlt, FuncFlags.SQLITE_FUNC_LIKE|FuncFlags.SQLITE_FUN
 			};
                 int i;
 #if SQLITE_OMIT_WSD
-																																																															FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
+																																																															FuncDefHash pHash = GLOBAL( FuncDefHash, Sqlite3.sqlite3GlobalFunctions );
 FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
 #else
-                FuncDefHash pHash = sqlite3GlobalFunctions;
+                FuncDefHash pHash = Sqlite3.sqlite3GlobalFunctions;
                 FuncDef[] aFunc = aBuiltinFunc;
 #endif
                 for (i = 0; i < Sqlite3.ArraySize(aBuiltinFunc); i++)
                 {
-                    sqlite3FuncDefInsert(pHash, aFunc[i]);
+                    Sqlite3.sqlite3FuncDefInsert(pHash, aFunc[i]);
                 }
-                DateUtils.sqlite3RegisterDateTimeFunctions();
+                Sqlite3.DateUtils.sqlite3RegisterDateTimeFunctions();
 #if !SQLITE_OMIT_ALTERTABLE
-                alter.sqlite3AlterFunctions();
+                Sqlite3.alter.sqlite3AlterFunctions();
 #endif
             }
         }
-    }
+    
 
     ///<summary>
     /// An instance of the following structure holds the context of a

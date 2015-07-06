@@ -47,24 +47,24 @@ namespace Community.CsharpSqlite
 ///<param name=""></param>
 
 		#if !SQLITE_DEFAULT_AUTOVACUUM
-		const int SQLITE_DEFAULT_AUTOVACUUM = 0;
+        public const int SQLITE_DEFAULT_AUTOVACUUM = 0;
 
 		#endif
-		const int BTREE_AUTOVACUUM_NONE = 0;
+        public const int BTREE_AUTOVACUUM_NONE = 0;
 
 		///
 ///<summary>
 ///</summary>
 ///<param name="Do not do auto">vacuum </param>
 
-		const int BTREE_AUTOVACUUM_FULL = 1;
+        public const int BTREE_AUTOVACUUM_FULL = 1;
 
 		///
 ///<summary>
 ///</summary>
 ///<param name="Do full auto">vacuum </param>
 
-		const int BTREE_AUTOVACUUM_INCR = 2;
+		public const int BTREE_AUTOVACUUM_INCR = 2;
 
 		///
 ///<summary>
@@ -110,14 +110,14 @@ namespace Community.CsharpSqlite
 ///Do not create or use a rollback journal 
 ///</summary>
 
-		const int BTREE_NO_READLOCK = 2;
+		public const int BTREE_NO_READLOCK = 2;
 
 		///
 ///<summary>
 ///Omit readlocks on readonly files 
 ///</summary>
 
-		const int BTREE_MEMORY = 4;
+        public const int BTREE_MEMORY = 4;
 
 		///
 ///<summary>

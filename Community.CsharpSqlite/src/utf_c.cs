@@ -235,7 +235,7 @@ namespace Community.CsharpSqlite
 		//        || (c&0xFFFFF800)==0xD800                          \
 		//        || (c&0xFFFFFFFE)==0xFFFE ){  c = 0xFFFD; }        \
 		//  }
-		static u32 sqlite3Utf8Read (string zIn, ///
+		public static u32 sqlite3Utf8Read (string zIn, ///
 ///<summary>
 ///</summary>
 ///<param name="First byte of UTF">8 character </param>
@@ -494,7 +494,7 @@ return rc;
 ///<param name="number of unicode characters in the first nByte of pZ (or up to">number of unicode characters in the first nByte of pZ (or up to</param>
 ///<param name="the first 0x00, whichever comes first).">the first 0x00, whichever comes first).</param>
 
-		static int sqlite3Utf8CharLen (string zIn, int nByte)
+		public static int sqlite3Utf8CharLen (string zIn, int nByte)
 		{
 			//int r = 0;
 			//string z = zIn;

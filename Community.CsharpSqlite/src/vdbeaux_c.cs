@@ -36,8 +36,6 @@ namespace Community.CsharpSqlite
     
     using System.Collections.Generic;
     using Parse = Sqlite3.Parse;
-    using Btree = Sqlite3.Btree;
-    using os = Sqlite3.os;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;

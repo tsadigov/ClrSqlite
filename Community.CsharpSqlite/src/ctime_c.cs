@@ -390,7 +390,7 @@ namespace Community.CsharpSqlite
 		/// is not required for a match.
 		///
 		///</summary>
-		static int sqlite3_compileoption_used (string zOptName)
+		public static int sqlite3_compileoption_used (string zOptName)
 		{
 			if (zOptName.EndsWith ("="))
 				return 0;
@@ -420,7 +420,7 @@ namespace Community.CsharpSqlite
 ///<param name="return a NULL pointer.">return a NULL pointer.</param>
 ///<param name=""></param>
 
-		static string sqlite3_compileoption_get (int N)
+		public static string sqlite3_compileoption_get (int N)
 		{
 			if (N >= 0 && N < Sqlite3.ArraySize (azCompileOpt)) {
 				return azCompileOpt [N];

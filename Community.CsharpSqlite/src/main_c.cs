@@ -733,22 +733,6 @@ break;
 		static sqlite3_mutex sqlite3_db_mutex(sqlite3 db) {
 			return db.mutex;
 		}
-		public class _aFlagOp {
-			public int op;
-			///
-			///<summary>
-			///The opcode 
-			///</summary>
-			public SqliteFlags mask;
-			///
-			///<summary>
-			///Mask of the bit in sqlite3.flags to set/clear 
-			///</summary>
-			public _aFlagOp(int op,SqliteFlags mask) {
-				this.op=op;
-				this.mask=mask;
-			}
-		}
 		///<summary>
 		/// Configuration settings for an individual database connection
 		///
@@ -1432,7 +1416,7 @@ return 1;
 		/// is returned and the mallocFailed flag cleared.
 		///
 		///</summary>
-		static SqlResult sqlite3CreateFunc(sqlite3 db,string zFunctionName,int nArg,SqliteEncoding enc,object pUserData,dxFunc xFunc,//)(sqlite3_context*,int,sqlite3_value *),
+		public static SqlResult sqlite3CreateFunc(sqlite3 db,string zFunctionName,int nArg,SqliteEncoding enc,object pUserData,dxFunc xFunc,//)(sqlite3_context*,int,sqlite3_value *),
 		dxStep xStep,//)(sqlite3_context*,int,sqlite3_value *),
 		dxFinal xFinal,//)(sqlite3_context),
 		FuncDestructor pDestructor) {
@@ -1589,7 +1573,7 @@ return rc;
 		/// A global function must exist in order for name resolution to work
 		/// properly.
 		///</summary>
-		static SqlResult sqlite3_overload_function(sqlite3 db,string zName,int nArg) {
+		public static SqlResult sqlite3_overload_function(sqlite3 db,string zName,int nArg) {
 			int nName=StringExtensions.sqlite3Strlen30(zName);
             SqlResult rc;
 			db.mutex.sqlite3_mutex_enter();
@@ -1917,7 +1901,8 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 		///   3                     any                memory    (return 1)
 		///
 		///</summary>
-		static bool sqlite3TempInMemory(sqlite3 db) {
+        public  static bool sqlite3TempInMemory(sqlite3 db)
+        {
 			//#if SQLITE_TEMP_STORE==1
             if (sqliteinth.SQLITE_TEMP_STORE == 1)
 				return (db.temp_store==2);
@@ -2233,14 +2218,7 @@ return z;
 			///</summary>
 			///<param name="IMP: R">35419 </param>
 		}
-		class OpenMode {
-			public string z;
-			public int mode;
-			public OpenMode(string z,int mode) {
-				this.z=z;
-				this.mode=mode;
-			}
-		}
+		
 		///
 		///<summary>
 		///</summary>
@@ -3538,4 +3516,33 @@ error_out:
 			return null;
 		}
 	}
+    class OpenMode
+    {
+        public string z;
+        public int mode;
+        public OpenMode(string z, int mode)
+        {
+            this.z = z;
+            this.mode = mode;
+        }
+    }
+    public class _aFlagOp
+    {
+        public int op;
+        ///
+        ///<summary>
+        ///The opcode 
+        ///</summary>
+        public SqliteFlags mask;
+        ///
+        ///<summary>
+        ///Mask of the bit in sqlite3.flags to set/clear 
+        ///</summary>
+        public _aFlagOp(int op, SqliteFlags mask)
+        {
+            this.op = op;
+            this.mask = mask;
+        }
+    }
+		
 }

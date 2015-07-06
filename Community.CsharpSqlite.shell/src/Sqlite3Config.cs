@@ -5,9 +5,6 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-    using sqlite3_mem_methods = Sqlite3.sqlite3_mem_methods;
-    using sqlite3_mutex_methods = Sqlite3.sqlite3_mutex_methods;
-    using sqlite3_pcache_methods = Sqlite3.sqlite3_pcache_methods;
 
     public class config_cs
     {

@@ -16,8 +16,9 @@ namespace Community.CsharpSqlite
     using System.Text;
     using DbPage = PgHdr;
     using System.Diagnostics;
-    using codec_ctx = Sqlite3.crypto.codec_ctx;
+    using codec_ctx = crypto.codec_ctx;
     using Community.CsharpSqlite.Os;
+    using _Custom = Sqlite3._Custom;
 
     #region enum
 
@@ -285,9 +286,6 @@ namespace Community.CsharpSqlite
 
     }
     
-    public partial class Sqlite3
-    {
-
         
 
         
@@ -465,7 +463,7 @@ namespace Community.CsharpSqlite
 
 
             ///<summary>
-            ///One of the PAGER_JOURNALMODE_* values 
+            ///One of the Sqlite3.PAGER_JOURNALMODE_* values 
             ///</summary>
             public u8 journalMode;
 
@@ -988,8 +986,8 @@ return (pPager->pWal!=0);
                     ///<param name="And if the journal">mode is "OFF", the journal file must not be open.</param>
                     ///<param name=""></param>
 
-                    Debug.Assert(this.journalMode == PAGER_JOURNALMODE_OFF || this.useJournal != 0);
-                    Debug.Assert(this.journalMode != PAGER_JOURNALMODE_OFF || !this.jfd.isOpen);
+                    Debug.Assert(this.journalMode == Sqlite3.PAGER_JOURNALMODE_OFF || this.useJournal != 0);
+                    Debug.Assert(this.journalMode != Sqlite3.PAGER_JOURNALMODE_OFF || !this.jfd.isOpen);
                     ///
                     ///<summary>
                     ///</summary>
@@ -1011,7 +1009,7 @@ return (pPager->pWal!=0);
 )
                     {
                         Debug.Assert(this.noSync);
-                        Debug.Assert(this.journalMode == PAGER_JOURNALMODE_OFF || this.journalMode == PAGER_JOURNALMODE_MEMORY);
+                        Debug.Assert(this.journalMode == Sqlite3.PAGER_JOURNALMODE_OFF || this.journalMode == Sqlite3.PAGER_JOURNALMODE_MEMORY);
                         Debug.Assert(this.eState != PagerState.PAGER_ERROR && this.eState != PagerState.PAGER_OPEN);
                         Debug.Assert(this.pagerUseWal() == false);
                     }
@@ -1039,11 +1037,11 @@ return (pPager->pWal!=0);
                             break;
                         case PagerState.PAGER_READER:
                             Debug.Assert(pPager.errCode == SqlResult.SQLITE_OK);
-                            Debug.Assert(this.eLock != UNKNOWN_LOCK);
+                            Debug.Assert(this.eLock != Sqlite3.UNKNOWN_LOCK);
                             Debug.Assert(this.eLock >= LockType.SHARED_LOCK || this.noReadlock != 0);
                             break;
                         case PagerState.PAGER_WRITER_LOCKED:
-                            Debug.Assert(this.eLock != UNKNOWN_LOCK);
+                            Debug.Assert(this.eLock != Sqlite3.UNKNOWN_LOCK);
                             Debug.Assert(pPager.errCode == SqlResult.SQLITE_OK);
                             if (!pPager.pagerUseWal())
                             {
@@ -1055,7 +1053,7 @@ return (pPager->pWal!=0);
                             Debug.Assert(pPager.setMaster == 0);
                             break;
                         case PagerState.PAGER_WRITER_CACHEMOD:
-                            Debug.Assert(this.eLock != UNKNOWN_LOCK);
+                            Debug.Assert(this.eLock != Sqlite3.UNKNOWN_LOCK);
                             Debug.Assert(pPager.errCode == SqlResult.SQLITE_OK);
                             if (!pPager.pagerUseWal())
                             {
@@ -1069,7 +1067,7 @@ return (pPager->pWal!=0);
                                 ///</summary>
 
                                 Debug.Assert(this.eLock >= LockType.RESERVED_LOCK);
-                                Debug.Assert(this.jfd.isOpen || this.journalMode == PAGER_JOURNALMODE_OFF || this.journalMode == PAGER_JOURNALMODE_WAL);
+                                Debug.Assert(this.jfd.isOpen || this.journalMode == Sqlite3.PAGER_JOURNALMODE_OFF || this.journalMode == Sqlite3.PAGER_JOURNALMODE_WAL);
                             }
                             Debug.Assert(pPager.dbOrigSize == pPager.dbFileSize);
                             Debug.Assert(pPager.dbOrigSize == pPager.dbHintSize);
@@ -1079,14 +1077,14 @@ return (pPager->pWal!=0);
                             Debug.Assert(pPager.errCode == SqlResult.SQLITE_OK);
                             Debug.Assert(!pPager.pagerUseWal());
                             Debug.Assert(this.eLock >= LockType.EXCLUSIVE_LOCK);
-                            Debug.Assert(this.jfd.isOpen || this.journalMode == PAGER_JOURNALMODE_OFF || this.journalMode == PAGER_JOURNALMODE_WAL);
+                            Debug.Assert(this.jfd.isOpen || this.journalMode == Sqlite3.PAGER_JOURNALMODE_OFF || this.journalMode == Sqlite3.PAGER_JOURNALMODE_WAL);
                             Debug.Assert(pPager.dbOrigSize <= pPager.dbHintSize);
                             break;
                         case PagerState.PAGER_WRITER_FINISHED:
                             Debug.Assert(this.eLock == LockType.EXCLUSIVE_LOCK);
                             Debug.Assert(pPager.errCode == SqlResult.SQLITE_OK);
                             Debug.Assert(!pPager.pagerUseWal());
-                            Debug.Assert(this.jfd.isOpen || this.journalMode == PAGER_JOURNALMODE_OFF || this.journalMode == PAGER_JOURNALMODE_WAL);
+                            Debug.Assert(this.jfd.isOpen || this.journalMode == Sqlite3.PAGER_JOURNALMODE_OFF || this.journalMode == Sqlite3.PAGER_JOURNALMODE_WAL);
                             break;
                         case PagerState.PAGER_ERROR:
                             ///
@@ -1124,7 +1122,7 @@ return (pPager->pWal!=0);
                     {
                         Debug.Assert(this.eLock >= eLock);
                         rc = os.sqlite3OsUnlock(this.fd, eLock);
-                        if (this.eLock != UNKNOWN_LOCK)
+                        if (this.eLock != Sqlite3.UNKNOWN_LOCK)
                         {
                             this.eLock = eLock;
                         }
@@ -1137,10 +1135,10 @@ return (pPager->pWal!=0);
                 {
                     SqlResult rc = SqlResult.SQLITE_OK;
                     Debug.Assert(eLock == LockType.SHARED_LOCK || eLock == LockType.RESERVED_LOCK || eLock == LockType.EXCLUSIVE_LOCK);
-                    if (this.eLock < eLock || this.eLock == UNKNOWN_LOCK)
+                    if (this.eLock < eLock || this.eLock == Sqlite3.UNKNOWN_LOCK)
                     {
                         rc = os.sqlite3OsLock(this.fd, eLock);
-                        if (rc == SqlResult.SQLITE_OK && (this.eLock != UNKNOWN_LOCK || eLock == LockType.EXCLUSIVE_LOCK))
+                        if (rc == SqlResult.SQLITE_OK && (this.eLock != Sqlite3.UNKNOWN_LOCK || eLock == LockType.EXCLUSIVE_LOCK))
                         {
                             this.eLock = eLock;
                             sqliteinth.IOTRACE("LOCK %p %d\n", this, eLock);
@@ -1239,7 +1237,7 @@ return (pPager->pWal!=0);
                         }
                         if (rc == SqlResult.SQLITE_OK && !this.noSync)
                         {
-                            rc = os.sqlite3OsSync(this.jfd, SQLITE_SYNC_DATAONLY | this.syncFlags);
+                            rc = os.sqlite3OsSync(this.jfd, Sqlite3.SQLITE_SYNC_DATAONLY | this.syncFlags);
                         }
                         ///
                         ///<summary>
@@ -1363,21 +1361,21 @@ return (pPager->pWal!=0);
                     ///<param name="When the pager is in no">sync mode. Corruption can follow a</param>
                     ///<param name="power failure in this case anyway.">power failure in this case anyway.</param>
                     ///<param name=""></param>
-                    ///<param name="When the SQLITE_IOCAP_SAFE_APPEND flag is set. This guarantees">When the SQLITE_IOCAP_SAFE_APPEND flag is set. This guarantees</param>
+                    ///<param name="When the Sqlite3.SQLITE_IOCAP_SAFE_APPEND flag is set. This guarantees">When the Sqlite3.SQLITE_IOCAP_SAFE_APPEND flag is set. This guarantees</param>
                     ///<param name="that garbage data is never appended to the journal file.">that garbage data is never appended to the journal file.</param>
                     ///<param name=""></param>
 
                     Debug.Assert(this.fd.isOpen   || this.noSync);
-                    if (this.noSync || (this.journalMode == PAGER_JOURNALMODE_MEMORY) || (os.sqlite3OsDeviceCharacteristics(this.fd) & SQLITE_IOCAP_SAFE_APPEND) != 0)
+                    if (this.noSync || (this.journalMode == Sqlite3.PAGER_JOURNALMODE_MEMORY) || (os.sqlite3OsDeviceCharacteristics(this.fd) & Sqlite3.SQLITE_IOCAP_SAFE_APPEND) != 0)
                     {
-                        aJournalMagic.CopyTo(zHeader, 0);
-                        // memcpy(zHeader, aJournalMagic, sizeof(aJournalMagic));
-                         Converter.put32bits(zHeader, aJournalMagic.Length, 0xffffffff);
+                        Sqlite3.aJournalMagic.CopyTo(zHeader, 0);
+                        // memcpy(zHeader, Sqlite3.aJournalMagic, sizeof(Sqlite3.aJournalMagic));
+                         Converter.put32bits(zHeader, Sqlite3.aJournalMagic.Length, 0xffffffff);
                     }
                     else
                     {
-                        Array.Clear(zHeader, 0, aJournalMagic.Length + 4);
-                        //memset(zHeader, 0, sizeof(aJournalMagic)+4);
+                        Array.Clear(zHeader, 0, Sqlite3.aJournalMagic.Length + 4);
+                        //memset(zHeader, 0, sizeof(Sqlite3.aJournalMagic)+4);
                     }
                     ///
                     ///<summary>
@@ -1385,27 +1383,27 @@ return (pPager->pWal!=0);
                     ///<param name="The random check">hash initialiser </param>
 
                     i64 i64Temp = 0;
-                    sqlite3_randomness(sizeof(i64), ref i64Temp);
+                    Sqlite3.sqlite3_randomness(sizeof(i64), ref i64Temp);
                     this.cksumInit = (u32)i64Temp;
-                    Converter.put32bits(zHeader, aJournalMagic.Length + 4, this.cksumInit);
+                    Converter.put32bits(zHeader, Sqlite3.aJournalMagic.Length + 4, this.cksumInit);
                     ///
                     ///<summary>
                     ///The initial database size 
                     ///</summary>
 
-                    Converter.put32bits(zHeader, aJournalMagic.Length + 8, this.dbOrigSize);
+                    Converter.put32bits(zHeader, Sqlite3.aJournalMagic.Length + 8, this.dbOrigSize);
                     ///
                     ///<summary>
                     ///The assumed sector size for this process 
                     ///</summary>
 
-                    Converter.put32bits(zHeader, aJournalMagic.Length + 12, this.sectorSize);
+                    Converter.put32bits(zHeader, Sqlite3.aJournalMagic.Length + 12, this.sectorSize);
                     ///
                     ///<summary>
                     ///The page size 
                     ///</summary>
 
-                    Converter.put32bits(zHeader, aJournalMagic.Length + 16, (u32)this.pageSize);
+                    Converter.put32bits(zHeader, Sqlite3.aJournalMagic.Length + 16, (u32)this.pageSize);
                     ///
                     ///<summary>
                     ///Initializing the tail of the buffer is not necessary.  Everything
@@ -1415,9 +1413,9 @@ return (pPager->pWal!=0);
                     ///
                     ///</summary>
 
-                    //  memset(&zHeader[sizeof(aJournalMagic)+20], 0,
-                    //  nHeader-(sizeof(aJournalMagic)+20));
-                    Array.Clear(zHeader, aJournalMagic.Length + 20, (int)nHeader - (aJournalMagic.Length + 20));
+                    //  memset(&zHeader[sizeof(Sqlite3.aJournalMagic)+20], 0,
+                    //  nHeader-(sizeof(Sqlite3.aJournalMagic)+20));
+                    Array.Clear(zHeader, Sqlite3.aJournalMagic.Length + 20, (int)nHeader - (Sqlite3.aJournalMagic.Length + 20));
                     ///
                     ///<summary>
                     ///In theory, it is only necessary to write the 28 bytes that the
@@ -1537,7 +1535,7 @@ return (pPager->pWal!=0);
                         {
                             return rc;
                         }
-                        if (_Custom.memcmp(aMagic, aJournalMagic, aMagic.Length) != 0)
+                        if (_Custom.memcmp(aMagic, Sqlite3.aJournalMagic, aMagic.Length) != 0)
                         {
                             return SqlResult.SQLITE_DONE;
                         }
@@ -1598,7 +1596,7 @@ return (pPager->pWal!=0);
                         ///<param name="respective compile time maximum limits.">respective compile time maximum limits.</param>
                         ///<param name=""></param>
 
-                        if (iPageSize < 512 || iSectorSize < 32 || iPageSize > Limits.SQLITE_MAX_PAGE_SIZE || iSectorSize > MAX_SECTOR_SIZE || ((iPageSize - 1) & iPageSize) != 0 || ((iSectorSize - 1) & iSectorSize) != 0)
+                        if (iPageSize < 512 || iSectorSize < 32 || iPageSize > Limits.SQLITE_MAX_PAGE_SIZE || iSectorSize > Limits.Pager.MAX_SECTOR_SIZE || ((iPageSize - 1) & iPageSize) != 0 || ((iSectorSize - 1) & iSectorSize) != 0)
                         {
                             ///
                             ///<summary>
@@ -1650,7 +1648,7 @@ return (pPager->pWal!=0);
                     ///   + N bytes: Master journal filename in utf-8.
                     ///   + 4 bytes: N (length of master journal name in bytes, no nul-terminator).
                     ///   + 4 bytes: Master journal name checksum.
-                    ///   + 8 bytes: aJournalMagic[].
+                    ///   + 8 bytes: Sqlite3.aJournalMagic[].
                     ///
                     /// The master journal page checksum is the sum of the bytes in the master
                     /// journal name, where each byte is interpreted as a signed 8-bit integer.
@@ -1693,7 +1691,7 @@ return (pPager->pWal!=0);
 
                     Debug.Assert(this.setMaster == 0);
                     Debug.Assert(!this.pagerUseWal());
-                    if (null == zMaster || this.journalMode == PAGER_JOURNALMODE_MEMORY || this.journalMode == PAGER_JOURNALMODE_OFF)
+                    if (null == zMaster || this.journalMode == Sqlite3.PAGER_JOURNALMODE_MEMORY || this.journalMode == Sqlite3.PAGER_JOURNALMODE_OFF)
                     {
                         return SqlResult.SQLITE_OK;
                     }
@@ -1729,7 +1727,7 @@ return (pPager->pWal!=0);
                     ///
                     ///</summary>
 
-                    if ((0 != (rc = PagerMethods.write32bits(this.jfd, iHdrOff, (u32)this.PAGER_MJ_PGNO))) || (0 != (rc = os.sqlite3OsWrite(this.jfd, Encoding.UTF8.GetBytes(zMaster), nMaster, iHdrOff + 4))) || (0 != (rc = PagerMethods.write32bits(this.jfd, iHdrOff + 4 + nMaster, (u32)nMaster))) || (0 != (rc = PagerMethods.write32bits(this.jfd, iHdrOff + 4 + nMaster + 4, cksum))) || (0 != (rc = os.sqlite3OsWrite(this.jfd, aJournalMagic, 8, iHdrOff + 4 + nMaster + 8))))
+                    if ((0 != (rc = PagerMethods.write32bits(this.jfd, iHdrOff, (u32)this.PAGER_MJ_PGNO))) || (0 != (rc = os.sqlite3OsWrite(this.jfd, Encoding.UTF8.GetBytes(zMaster), nMaster, iHdrOff + 4))) || (0 != (rc = PagerMethods.write32bits(this.jfd, iHdrOff + 4 + nMaster, (u32)nMaster))) || (0 != (rc = PagerMethods.write32bits(this.jfd, iHdrOff + 4 + nMaster + 4, cksum))) || (0 != (rc = os.sqlite3OsWrite(this.jfd, Sqlite3.aJournalMagic, 8, iHdrOff + 4 + nMaster + 8))))
                     {
                         return rc;
                     }
@@ -1901,13 +1899,13 @@ return (pPager->pWal!=0);
                             ///
                             ///</summary>
 
-                            Debug.Assert((PAGER_JOURNALMODE_MEMORY & 5) != 1);
-                            Debug.Assert((PAGER_JOURNALMODE_OFF & 5) != 1);
-                            Debug.Assert((PAGER_JOURNALMODE_WAL & 5) != 1);
-                            Debug.Assert((PAGER_JOURNALMODE_DELETE & 5) != 1);
-                            Debug.Assert((PAGER_JOURNALMODE_TRUNCATE & 5) == 1);
-                            Debug.Assert((PAGER_JOURNALMODE_PERSIST & 5) == 1);
-                            if (0 == (iDc & SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN) || 1 != (this.journalMode & 5))
+                            Debug.Assert((Sqlite3.PAGER_JOURNALMODE_MEMORY & 5) != 1);
+                            Debug.Assert((Sqlite3.PAGER_JOURNALMODE_OFF & 5) != 1);
+                            Debug.Assert((Sqlite3.PAGER_JOURNALMODE_WAL & 5) != 1);
+                            Debug.Assert((Sqlite3.PAGER_JOURNALMODE_DELETE & 5) != 1);
+                            Debug.Assert((Sqlite3.PAGER_JOURNALMODE_TRUNCATE & 5) == 1);
+                            Debug.Assert((Sqlite3.PAGER_JOURNALMODE_PERSIST & 5) == 1);
+                            if (0 == (iDc & Sqlite3.SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN) || 1 != (this.journalMode & 5))
                             {
                                 os.sqlite3OsClose(this.jfd);
                             }
@@ -1923,7 +1921,7 @@ return (pPager->pWal!=0);
                             rc = this.pagerUnlockDb(LockType.NO_LOCK);
                             if (rc != SqlResult.SQLITE_OK && this.eState == PagerState.PAGER_ERROR)
                             {
-                                this.eLock = UNKNOWN_LOCK;
+                                this.eLock = Sqlite3.UNKNOWN_LOCK;
                             }
                             ///
                             ///<summary>
@@ -2107,11 +2105,11 @@ return (pPager->pWal!=0);
 
                         if (memjrnl.sqlite3IsMemJournal(this.jfd))
                         {
-                            Debug.Assert(this.journalMode == PAGER_JOURNALMODE_MEMORY);
+                            Debug.Assert(this.journalMode == Sqlite3.PAGER_JOURNALMODE_MEMORY);
                             os.sqlite3OsClose(this.jfd);
                         }
                         else
-                            if (this.journalMode == PAGER_JOURNALMODE_TRUNCATE)
+                            if (this.journalMode == Sqlite3.PAGER_JOURNALMODE_TRUNCATE)
                             {
                                 if (this.journalOff == 0)
                                 {
@@ -2124,7 +2122,7 @@ return (pPager->pWal!=0);
                                 this.journalOff = 0;
                             }
                             else
-                                if (this.journalMode == PAGER_JOURNALMODE_PERSIST || (this.exclusiveMode && this.journalMode != PAGER_JOURNALMODE_WAL))
+                                if (this.journalMode == Sqlite3.PAGER_JOURNALMODE_PERSIST || (this.exclusiveMode && this.journalMode != Sqlite3.PAGER_JOURNALMODE_WAL))
                                 {
                                     rc = this.zeroJournalHdr(hasMaster);
                                     this.journalOff = 0;
@@ -2140,7 +2138,7 @@ return (pPager->pWal!=0);
                                     ///<param name="the database file, it will do so using an in">memory journal. </param>
                                     ///<param name=""></param>
 
-                                    Debug.Assert(this.journalMode == PAGER_JOURNALMODE_DELETE || this.journalMode == PAGER_JOURNALMODE_MEMORY || this.journalMode == PAGER_JOURNALMODE_WAL);
+                                    Debug.Assert(this.journalMode == Sqlite3.PAGER_JOURNALMODE_DELETE || this.journalMode == Sqlite3.PAGER_JOURNALMODE_MEMORY || this.journalMode == Sqlite3.PAGER_JOURNALMODE_WAL);
                                     os.sqlite3OsClose(this.jfd);
                                     if (!this.tempFile)
                                     {
@@ -2211,9 +2209,9 @@ PagerMethods.sqlite3PagerUnref(p);
                         Debug.Assert(this.assert_pager_state());
                         if (this.eState >= PagerState.PAGER_WRITER_LOCKED)
                         {
-                            sqlite3BeginBenignMalloc();
+                            Sqlite3.sqlite3BeginBenignMalloc();
                             this.sqlite3PagerRollback();
-                            sqlite3EndBenignMalloc();
+                            Sqlite3.sqlite3EndBenignMalloc();
                         }
                         else
                             if (!this.exclusiveMode)
@@ -2659,6 +2657,11 @@ PagerMethods.sqlite3PagerUnref(p);
                     return rc;
                 }
 
+            private void PAGERTRACE(string p1, int p2, Pgno pgno, int p3, string p4)
+            {
+                throw new NotImplementedException();
+            }
+
                 public///<summary>
                       /// Parameter zMaster is the name of a master journal file. A single journal
                       /// file that referred to the master journal file has just been rolled back.
@@ -2766,7 +2769,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     //}
                     //else
                     {
-                        const int flags = (SQLITE_OPEN_READONLY | SQLITE_OPEN_MASTER_JOURNAL);
+                        const int flags = (Sqlite3.SQLITE_OPEN_READONLY | Sqlite3.SQLITE_OPEN_MASTER_JOURNAL);
                         int iDummy = 0;
                         rc = os.sqlite3OsOpen(pVfs, zMaster, pMaster, flags, ref iDummy);
                         //TODO --
@@ -2808,7 +2811,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         //      ** so, return without deleting the master journal file.
                         //      */
                         //      int c;
-                        //      int flags = ( SQLITE_OPEN_READONLY | SQLITE_OPEN_MAIN_JOURNAL );
+                        //      int flags = ( Sqlite3.SQLITE_OPEN_READONLY | Sqlite3.SQLITE_OPEN_MAIN_JOURNAL );
                         //      rc = os.sqlite3OsOpen( pVfs, zJournal, pJournal, flags, 0 );
                         //      if ( rc != SqlResult.SQLITE_OK )
                         //      {
@@ -2943,12 +2946,12 @@ PagerMethods.sqlite3PagerUnref(p);
                     }
                     if (this.sectorSize < 32)
                     {
-                        Debug.Assert(MAX_SECTOR_SIZE >= 512);
+                        Debug.Assert(Limits.Pager.MAX_SECTOR_SIZE >= 512);
                         this.sectorSize = 512;
                     }
-                    if (this.sectorSize > MAX_SECTOR_SIZE)
+                    if (this.sectorSize > Limits.Pager.MAX_SECTOR_SIZE)
                     {
-                        this.sectorSize = MAX_SECTOR_SIZE;
+                        this.sectorSize = Limits.Pager.MAX_SECTOR_SIZE;
                     }
                 }
 
@@ -2958,7 +2961,7 @@ PagerMethods.sqlite3PagerUnref(p);
                       ///
                       /// The journal file format is as follows:
                       ///
-                      ///  (1)  8 byte prefix.  A copy of aJournalMagic[].
+                      ///  (1)  8 byte prefix.  A copy of Sqlite3.aJournalMagic[].
                       ///  (2)  4 byte big-endian integer which is the number of valid page records
                       ///       in the journal.  If this value is 0xffffffff, then compute the
                       ///       number of page records from the journal size.
@@ -3250,7 +3253,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///<param name=""></param>
 
                     sqlite3_int64 iDummy = 0;
-                    Debug.Assert(this.fd.pMethods == null || os.sqlite3OsFileControl(this.fd, SQLITE_FCNTL_DB_UNCHANGED, ref iDummy) >= SqlResult.SQLITE_OK);
+                    Debug.Assert(this.fd.pMethods == null || os.sqlite3OsFileControl(this.fd, Sqlite3.SQLITE_FCNTL_DB_UNCHANGED, ref iDummy) >= SqlResult.SQLITE_OK);
                     ///
                     ///<summary>
                     ///If this playback is happening automatically as a result of an IO or
@@ -3479,7 +3482,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///<summary>
                     ///Use pPager.journalOff as the effective size of the main rollback
                     ///journal.  The actual file might be larger than this in
-                    ///PAGER_JOURNALMODE_TRUNCATE or PAGER_JOURNALMODE_PERSIST.  But anything
+                    ///Sqlite3.PAGER_JOURNALMODE_TRUNCATE or Sqlite3.PAGER_JOURNALMODE_PERSIST.  But anything
                     ///</summary>
                     ///<param name="past pPager.journalOff is off">limits to us.</param>
                     ///<param name=""></param>
@@ -3629,11 +3632,11 @@ PagerMethods.sqlite3PagerUnref(p);
                     /// file is synced following each commit operation, in addition to the
                     /// syncs associated with NORMAL.
                     ///
-                    /// Do not confuse synchronous=FULL with SQLITE_SYNC_FULL.  The
-                    /// SQLITE_SYNC_FULL macro means to use the MacOSX-style full-fsync
-                    /// using fcntl(F_FULLFSYNC).  SQLITE_SYNC_NORMAL means to do an
-                    /// ordinary fsync() call.  There is no difference between SQLITE_SYNC_FULL
-                    /// and SQLITE_SYNC_NORMAL on platforms other than MacOSX.  But the
+                    /// Do not confuse synchronous=FULL with Sqlite3.SQLITE_SYNC_FULL.  The
+                    /// Sqlite3.SQLITE_SYNC_FULL macro means to use the MacOSX-style full-fsync
+                    /// using fcntl(F_FULLFSYNC).  Sqlite3.SQLITE_SYNC_NORMAL means to do an
+                    /// ordinary fsync() call.  There is no difference between Sqlite3.SQLITE_SYNC_FULL
+                    /// and Sqlite3.SQLITE_SYNC_NORMAL on platforms other than MacOSX.  But the
                     /// synchronous=FULL versus synchronous=NORMAL setting determines when
                     /// the xSync primitive is called and is relevant to all platforms.
                     ///
@@ -3675,19 +3678,19 @@ PagerMethods.sqlite3PagerUnref(p);
                     else
                         if (bFullFsync != 0)
                         {
-                            this.syncFlags = SQLITE_SYNC_FULL;
-                            this.ckptSyncFlags = SQLITE_SYNC_FULL;
+                            this.syncFlags = Sqlite3.SQLITE_SYNC_FULL;
+                            this.ckptSyncFlags = Sqlite3.SQLITE_SYNC_FULL;
                         }
                         else
                             if (bCkptFullFsync != 0)
                             {
-                                this.syncFlags = SQLITE_SYNC_NORMAL;
-                                this.ckptSyncFlags = SQLITE_SYNC_FULL;
+                                this.syncFlags = Sqlite3.SQLITE_SYNC_NORMAL;
+                                this.ckptSyncFlags = Sqlite3.SQLITE_SYNC_FULL;
                             }
                             else
                             {
-                                this.syncFlags = SQLITE_SYNC_NORMAL;
-                                this.ckptSyncFlags = SQLITE_SYNC_NORMAL;
+                                this.syncFlags = Sqlite3.SQLITE_SYNC_NORMAL;
+                                this.ckptSyncFlags = Sqlite3.SQLITE_SYNC_NORMAL;
                             }
                 }
 
@@ -3713,10 +3716,10 @@ PagerMethods.sqlite3PagerUnref(p);
                     /// The flags passed to the VFS layer xOpen() call are those specified
                     /// by parameter vfsFlags ORed with the following:
                     ///
-                    ///     SQLITE_OPEN_READWRITE
-                    ///     SQLITE_OPEN_CREATE
-                    ///     SQLITE_OPEN_EXCLUSIVE
-                    ///     SQLITE_OPEN_DELETEONCLOSE
+                    ///     Sqlite3.SQLITE_OPEN_READWRITE
+                    ///     Sqlite3.SQLITE_OPEN_CREATE
+                    ///     Sqlite3.SQLITE_OPEN_EXCLUSIVE
+                    ///     Sqlite3.SQLITE_OPEN_DELETEONCLOSE
                     ///</summary>
                 SqlResult pagerOpentemp(///
                     ///<summary>
@@ -3748,7 +3751,7 @@ PagerMethods.sqlite3PagerUnref(p);
 																																																																						      sqlite3_opentemp_count.iValue++;  /* Used for testing and analysis only */
 #endif
 #endif
-                    vfsFlags |= SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_EXCLUSIVE | SQLITE_OPEN_DELETEONCLOSE;
+                    vfsFlags |= Sqlite3.SQLITE_OPEN_READWRITE | Sqlite3.SQLITE_OPEN_CREATE | Sqlite3.SQLITE_OPEN_EXCLUSIVE | Sqlite3.SQLITE_OPEN_DELETEONCLOSE;
                     int dummy = 0;
                     rc = os.sqlite3OsOpen(this.pVfs, null, pFile, vfsFlags, ref dummy);
                     Debug.Assert(rc != SqlResult.SQLITE_OK || pFile.isOpen);
@@ -3866,7 +3869,7 @@ PagerMethods.sqlite3PagerUnref(p);
                             this.pager_reset();
                             this.dbSize = (Pgno)(nByte / pageSize);
                             this.pageSize = (int)pageSize;
-                            sqlite3PageFree(ref this.pTmpSpace);
+                            Sqlite3.sqlite3PageFree(ref this.pTmpSpace);
                             this.pTmpSpace = malloc_cs.sqlite3Malloc(pageSize);
                             // pNew;
                             PCacheMethods.sqlite3PcacheSetPageSize(this.pPCache, (int)pageSize);
@@ -4075,7 +4078,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     var rc = SqlResult.SQLITE_OK;
                     if (!this.noSync)
                     {
-                        rc = os.sqlite3OsSync(this.jfd, SQLITE_SYNC_NORMAL);
+                        rc = os.sqlite3OsSync(this.jfd, Sqlite3.SQLITE_SYNC_NORMAL);
                     }
                     if (rc == SqlResult.SQLITE_OK)
                     {
@@ -4105,7 +4108,7 @@ PagerMethods.sqlite3PagerUnref(p);
 #if SQLITE_TEST
 																																																																						      disable_simulated_io_errors();
 #endif
-                    sqlite3BeginBenignMalloc();
+                    Sqlite3.sqlite3BeginBenignMalloc();
                     ///
                     ///<summary>
                     ///pPager.errCode = 0; 
@@ -4150,7 +4153,7 @@ pPager.pWal = 0;
                         }
                         this.pagerUnlockAndRollback();
                     }
-                    sqlite3EndBenignMalloc();
+                    Sqlite3.sqlite3EndBenignMalloc();
 #if SQLITE_TEST
 																																																																						      enable_simulated_io_errors();
 #endif
@@ -4218,11 +4221,11 @@ pPager.pWal = 0;
                     if (!this.noSync)
                     {
                         Debug.Assert(!this.tempFile);
-                        if (this.jfd.isOpen && this.journalMode != PAGER_JOURNALMODE_MEMORY)
+                        if (this.jfd.isOpen && this.journalMode != Sqlite3.PAGER_JOURNALMODE_MEMORY)
                         {
                             int iDc = os.sqlite3OsDeviceCharacteristics(this.fd);
                             Debug.Assert(this.jfd.isOpen);
-                            if (0 == (iDc & SQLITE_IOCAP_SAFE_APPEND))
+                            if (0 == (iDc & Sqlite3.SQLITE_IOCAP_SAFE_APPEND))
                             {
                                 ///
                                 ///<summary>
@@ -4252,13 +4255,13 @@ pPager.pWal = 0;
 
                                 i64 iNextHdrOffset;
                                 u8[] aMagic = new u8[8];
-                                u8[] zHeader = new u8[aJournalMagic.Length + 4];
-                                aJournalMagic.CopyTo(zHeader, 0);
-                                // memcpy(zHeader, aJournalMagic, sizeof(aJournalMagic));
-                                Converter.put32bits(zHeader, aJournalMagic.Length, this.nRec);
+                                u8[] zHeader = new u8[Sqlite3.aJournalMagic.Length + 4];
+                                Sqlite3.aJournalMagic.CopyTo(zHeader, 0);
+                                // memcpy(zHeader, Sqlite3.aJournalMagic, sizeof(Sqlite3.aJournalMagic));
+                                Converter.put32bits(zHeader, Sqlite3.aJournalMagic.Length, this.nRec);
                                 iNextHdrOffset = this.journalHdrOffset();
                                 rc = os.sqlite3OsRead(this.jfd, aMagic, 8, iNextHdrOffset);
-                                if (rc == SqlResult.SQLITE_OK && 0 == _Custom.memcmp(aMagic, aJournalMagic, 8))
+                                if (rc == SqlResult.SQLITE_OK && 0 == _Custom.memcmp(aMagic, Sqlite3.aJournalMagic, 8))
                                 {
                                     u8[] zerobyte = new u8[1];
                                     rc = os.sqlite3OsWrite(this.jfd, zerobyte, 1, iNextHdrOffset);
@@ -4282,7 +4285,7 @@ pPager.pWal = 0;
                                 ///<param name="and never needs to be updated.">and never needs to be updated.</param>
                                 ///<param name=""></param>
 
-                                if (this.fullSync && 0 == (iDc & SQLITE_IOCAP_SEQUENTIAL))
+                                if (this.fullSync && 0 == (iDc & Sqlite3.SQLITE_IOCAP_SEQUENTIAL))
                                 {
                                     PAGERTRACE("SYNC journal of %d\n", PagerMethods.PAGERID(this));
                                     sqliteinth.IOTRACE("JSYNC %p\n", this);
@@ -4295,16 +4298,16 @@ pPager.pWal = 0;
                                 if (rc != SqlResult.SQLITE_OK)
                                     return rc;
                             }
-                            if (0 == (iDc & SQLITE_IOCAP_SEQUENTIAL))
+                            if (0 == (iDc & Sqlite3.SQLITE_IOCAP_SEQUENTIAL))
                             {
                                 PAGERTRACE("SYNC journal of %d\n", PagerMethods.PAGERID(this));
                                 sqliteinth.IOTRACE("JSYNC %p\n", this);
-                                rc = os.sqlite3OsSync(this.jfd, this.syncFlags | (this.syncFlags == SQLITE_SYNC_FULL ? SQLITE_SYNC_DATAONLY : 0));
+                                rc = os.sqlite3OsSync(this.jfd, this.syncFlags | (this.syncFlags == Sqlite3.SQLITE_SYNC_FULL ? Sqlite3.SQLITE_SYNC_DATAONLY : 0));
                                 if (rc != SqlResult.SQLITE_OK)
                                     return rc;
                             }
                             this.journalHdr = this.journalOff;
-                            if (newHdr != 0 && 0 == (iDc & SQLITE_IOCAP_SAFE_APPEND))
+                            if (newHdr != 0 && 0 == (iDc & Sqlite3.SQLITE_IOCAP_SAFE_APPEND))
                             {
                                 this.nRec = 0;
                                 rc = this.writeJournalHdr();
@@ -4329,6 +4332,11 @@ pPager.pWal = 0;
                     this.eState = PagerState.PAGER_WRITER_DBMOD;
                     Debug.Assert(this.assert_pager_state());
                     return SqlResult.SQLITE_OK;
+                }
+
+                private void PAGERTRACE(string p1, int p2)
+                {
+                    throw new NotImplementedException();
                 }
 
                 public///<summary>
@@ -4404,7 +4412,7 @@ pPager.pWal = 0;
                     if (rc == SqlResult.SQLITE_OK && this.dbSize > this.dbHintSize)
                     {
                         sqlite3_int64 szFile = this.pageSize * (sqlite3_int64)this.dbSize;
-                        os.sqlite3OsFileControl(this.fd, SQLITE_FCNTL_SIZE_HINT, ref szFile);
+                        os.sqlite3OsFileControl(this.fd, Sqlite3.SQLITE_FCNTL_SIZE_HINT, ref szFile);
                         this.dbHintSize = this.dbSize;
                     }
                     while (rc == SqlResult.SQLITE_OK && pList)
@@ -4501,6 +4509,16 @@ pPager.pWal = 0;
                     return rc;
                 }
 
+                private void PAGERTRACE(string p1, int p2, Pgno pgno)
+                {
+                    throw new NotImplementedException();
+                }
+
+                private void PAGERTRACE(string p1, int p2, Pgno pgno, int p3)
+                {
+                    throw new NotImplementedException();
+                }
+
                 public///<summary>
                     /// Ensure that the sub-journal file is open. If it is already open, this
                     /// function is a no-op.
@@ -4515,13 +4533,13 @@ pPager.pWal = 0;
                     SqlResult rc = SqlResult.SQLITE_OK;
                     if (!this.sjfd.isOpen )
                     {
-                        if (this.journalMode == PAGER_JOURNALMODE_MEMORY || this.subjInMemory != 0)
+                        if (this.journalMode == Sqlite3.PAGER_JOURNALMODE_MEMORY || this.subjInMemory != 0)
                         {
                             memjrnl.sqlite3MemJournalOpen(this.sjfd);
                         }
                         else
                         {
-                            rc = this.pagerOpentemp(ref this.sjfd, SQLITE_OPEN_SUBJOURNAL);
+                            rc = this.pagerOpentemp(ref this.sjfd, Sqlite3.SQLITE_OPEN_SUBJOURNAL);
                         }
                     }
                     return rc;
@@ -4578,7 +4596,7 @@ pPager.pWal = 0;
                     Debug.Assert(this.useJournal != 0);
                     Debug.Assert(this.fd.isOpen  );
                     Debug.Assert(this.eState == PagerState.PAGER_OPEN);
-                    Debug.Assert(jrnlOpen == 0 || (os.sqlite3OsDeviceCharacteristics(this.jfd) & SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN) != 0);
+                    Debug.Assert(jrnlOpen == 0 || (os.sqlite3OsDeviceCharacteristics(this.jfd) & Sqlite3.SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN) != 0);
                     pExists = 0;
                     if (0 == jrnlOpen)
                     {
@@ -4628,14 +4646,14 @@ pPager.pWal = 0;
                             {
                                 if (nPage == 0)
                                 {
-                                    sqlite3BeginBenignMalloc();
+                                    Sqlite3.sqlite3BeginBenignMalloc();
                                     if (this.pagerLockDb(LockType.RESERVED_LOCK) == SqlResult.SQLITE_OK)
                                     {
                                         os.sqlite3OsDelete(pVfs, this.zJournal, 0);
                                         if (!this.exclusiveMode)
                                             this.pagerUnlockDb(LockType.SHARED_LOCK);
                                     }
-                                    sqlite3EndBenignMalloc();
+                                    Sqlite3.sqlite3EndBenignMalloc();
                                 }
                                 else
                                 {
@@ -4651,7 +4669,7 @@ pPager.pWal = 0;
 
                                     if (0 == jrnlOpen)
                                     {
-                                        int f = SQLITE_OPEN_READONLY | SQLITE_OPEN_MAIN_JOURNAL;
+                                        int f = Sqlite3.SQLITE_OPEN_READONLY | Sqlite3.SQLITE_OPEN_MAIN_JOURNAL;
                                         rc = os.sqlite3OsOpen(pVfs, this.zJournal, this.jfd, f, ref f);
                                     }
                                     if (rc == SqlResult.SQLITE_OK)
@@ -4742,6 +4760,7 @@ pPager.pWal = 0;
                     Debug.Assert(PCacheMethods.sqlite3PcacheRefCount(this.pPCache) == 0);
                     Debug.Assert(this.assert_pager_state());
                     Debug.Assert(this.eState == PagerState.PAGER_OPEN || this.eState == PagerState.PAGER_READER);
+                    
                     if (NEVER(
 #if SQLITE_OMIT_MEMORYDB
 																																																																						0!=MEMDB
@@ -4773,7 +4792,7 @@ pPager.pWal = 0;
                             rc = this.pager_wait_on_lock(LockType.SHARED_LOCK);
                             if (rc != SqlResult.SQLITE_OK)
                             {
-                                Debug.Assert(this.eLock == LockType.NO_LOCK || this.eLock == UNKNOWN_LOCK);
+                                Debug.Assert(this.eLock == LockType.NO_LOCK || this.eLock == Sqlite3.UNKNOWN_LOCK);
                                 goto failed;
                             }
                         }
@@ -4848,11 +4867,11 @@ pPager.pWal = 0;
                                 if (rc == SqlResult.SQLITE_OK && bExists != 0)
                                 {
                                     int fout = 0;
-                                    int f = SQLITE_OPEN_READWRITE | SQLITE_OPEN_MAIN_JOURNAL;
+                                    int f = Sqlite3.SQLITE_OPEN_READWRITE | Sqlite3.SQLITE_OPEN_MAIN_JOURNAL;
                                     Debug.Assert(!this.tempFile);
                                     rc = os.sqlite3OsOpen(pVfs, this.zJournal, this.jfd, f, ref fout);
                                     Debug.Assert(rc != SqlResult.SQLITE_OK || this.jfd.isOpen);
-                                    if (rc == SqlResult.SQLITE_OK && (fout & SQLITE_OPEN_READONLY) != 0)
+                                    if (rc == SqlResult.SQLITE_OK && (fout & Sqlite3.SQLITE_OPEN_READONLY) != 0)
                                     {
                                         rc = sqliteinth.SQLITE_CANTOPEN_BKPT();
                                         os.sqlite3OsClose(this.jfd);
@@ -5142,7 +5161,7 @@ pPager.pWal = 0;
                         ///the page. Return without further ado.  
                         ///</summary>
 
-                        Debug.Assert(pgno <= PAGER_MAX_PGNO && pgno != (this.PAGER_MJ_PGNO));
+                        Debug.Assert(pgno <= Limits.Pager.PAGER_MAX_PGNO && pgno != (this.PAGER_MJ_PGNO));
                         PagerMethods.PAGER_INCR(ref this.nHit);
                         return SqlResult.SQLITE_OK;
                     }
@@ -5167,7 +5186,7 @@ pPager.pWal = 0;
                         ///</summary>
                         ///<param name="number greater than this, or the unused locking">page, is requested. </param>
 
-                        if (pgno > PAGER_MAX_PGNO || pgno == (this.PAGER_MJ_PGNO))
+                        if (pgno > Limits.Pager.PAGER_MAX_PGNO || pgno == (this.PAGER_MJ_PGNO))
                         {
                             rc = sqliteinth.SQLITE_CORRUPT_BKPT();
                             goto pager_acquire_err;
@@ -5197,7 +5216,7 @@ this.memDb != 0
                                 ///<param name="a bit in a bit vector.">a bit in a bit vector.</param>
                                 ///<param name=""></param>
 
-                                sqlite3BeginBenignMalloc();
+                                Sqlite3.sqlite3BeginBenignMalloc();
                                 if (pgno <= this.dbOrigSize)
                                 {
 #if !NDEBUG || SQLITE_COVERAGE_TEST
@@ -5213,7 +5232,7 @@ this.memDb != 0
                                 this.addToSavepointBitvecs(pgno);
 #endif
                                 sqliteinth.testcase(rc == SqlResult.SQLITE_NOMEM);
-                                sqlite3EndBenignMalloc();
+                                Sqlite3.sqlite3EndBenignMalloc();
                             }
                             //memset(pPg.pData, 0, pPager.pageSize);
                             Array.Clear(pPg.pData, 0, this.pageSize);
@@ -5314,7 +5333,7 @@ this.memDb != 0
 
                     if (NEVER((int)this.errCode) != 0)
                         return this.errCode;
-                    if (!this.pagerUseWal() && this.journalMode != PAGER_JOURNALMODE_OFF)
+                    if (!this.pagerUseWal() && this.journalMode != Sqlite3.PAGER_JOURNALMODE_OFF)
                     {
                         this.pInJournal = Bitvec.sqlite3BitvecCreate(this.dbSize);
                         //if (pPager.pInJournal == null)
@@ -5328,7 +5347,7 @@ this.memDb != 0
 
                         if (!this.jfd.isOpen)
                         {
-                            if (this.journalMode == PAGER_JOURNALMODE_MEMORY)
+                            if (this.journalMode == Sqlite3.PAGER_JOURNALMODE_MEMORY)
                             {
                                 memjrnl.sqlite3MemJournalOpen(this.jfd);
                             }
@@ -5339,7 +5358,7 @@ this.memDb != 0
                                     ///VFS flags to open journal file 
                                     ///</summary>
 
-                                SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | (this.tempFile ? (SQLITE_OPEN_DELETEONCLOSE | SQLITE_OPEN_TEMP_JOURNAL) : (SQLITE_OPEN_MAIN_JOURNAL));
+                                Sqlite3.SQLITE_OPEN_READWRITE | Sqlite3.SQLITE_OPEN_CREATE | (this.tempFile ? (Sqlite3.SQLITE_OPEN_DELETEONCLOSE | Sqlite3.SQLITE_OPEN_TEMP_JOURNAL) : (Sqlite3.SQLITE_OPEN_MAIN_JOURNAL));
 #if SQLITE_ENABLE_ATOMIC_WRITE
 																																																																																																																															rc = sqlite3JournalOpen(
 pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
@@ -5631,7 +5650,7 @@ int DIRECT_MODE = isDirectMode;
 #endif
 );
                             long sz=0;
-                            os.sqlite3OsFileControl(this.fd, SQLITE_FCNTL_SYNC_OMITTED, ref sz);
+                            os.sqlite3OsFileControl(this.fd, Sqlite3.SQLITE_FCNTL_SYNC_OMITTED, ref sz);
                         }
                     return rc;
                 }
@@ -5802,8 +5821,8 @@ int DIRECT_MODE = isDirectMode;
 #if SQLITE_ENABLE_ATOMIC_WRITE
 																																																																																																												PgHdr *pPg;
 Debug.Assert( isOpen(pPager.jfd) 
-|| pPager.journalMode==PAGER_JOURNALMODE_OFF 
-|| pPager.journalMode==PAGER_JOURNALMODE_WAL 
+|| pPager.journalMode==Sqlite3.PAGER_JOURNALMODE_OFF 
+|| pPager.journalMode==Sqlite3.PAGER_JOURNALMODE_WAL 
 );
 if( !zMaster && isOpen(pPager.jfd)
 && pPager.journalOff==jrnlBufferSize(pPager)
@@ -5843,7 +5862,7 @@ rc = pager_incr_changecounter(pPager, 0);
                             ///<param name=""></param>
 
 #if !SQLITE_OMIT_AUTOVACUUM
-                            if (this.dbSize < this.dbOrigSize && this.journalMode != PAGER_JOURNALMODE_OFF)
+                            if (this.dbSize < this.dbOrigSize && this.journalMode != Sqlite3.PAGER_JOURNALMODE_OFF)
                             {
                                 Pgno i;
                                 ///
@@ -5956,6 +5975,7 @@ rc = pager_incr_changecounter(pPager, 0);
                     return rc;
                 }
 
+
                 public///<summary>
                     /// When this function is called, the database file has been completely
                     /// updated to reflect the changes made by the current transaction and
@@ -6006,7 +6026,7 @@ rc = pager_incr_changecounter(pPager, 0);
                     ///<param name="to drop any locks either.">to drop any locks either.</param>
                     ///<param name=""></param>
 
-                    if (this.eState == PagerState.PAGER_WRITER_LOCKED && this.exclusiveMode && this.journalMode == PAGER_JOURNALMODE_PERSIST)
+                    if (this.eState == PagerState.PAGER_WRITER_LOCKED && this.exclusiveMode && this.journalMode == Sqlite3.PAGER_JOURNALMODE_PERSIST)
                     {
                         Debug.Assert(this.journalOff == this.JOURNAL_HDR_SZ() || 0 == this.journalOff);
                         this.eState = PagerState.PAGER_READER;
@@ -6015,6 +6035,11 @@ rc = pager_incr_changecounter(pPager, 0);
                     PAGERTRACE("COMMIT %d\n", PagerMethods.PAGERID(this));
                     rc = this.pager_end_transaction(this.setMaster);
                     return this.pager_error(rc);
+                }
+
+                private int NEVER(int p)
+                {
+                    throw new NotImplementedException();
                 }
 
                 public///<summary>
@@ -6115,6 +6140,11 @@ rc = pager_incr_changecounter(pPager, 0);
                     ///</summary>
 
                     return this.pager_error(rc);
+                }
+
+                private void PAGERTRACE(string p1, int[] p2)
+                {
+                    Sqlite3.PAGERTRACE(p1,p2);
                 }
 
                 public///<summary>
@@ -6651,22 +6681,27 @@ this.memDb != 0
                     return SqlResult.SQLITE_OK;
                 }
 
+                private void PAGERTRACE(string p1, int p2, Pgno p3, int p4, Pgno pgno)
+                {
+                    throw new NotImplementedException();
+                }
+
                 public///<summary>
                     /// Get/set the locking-mode for this pager. Parameter eMode must be one
-                    /// of PAGER_LOCKINGMODE_QUERY, PAGER_LOCKINGMODE_NORMAL or
-                    /// PAGER_LOCKINGMODE_EXCLUSIVE. If the parameter is not _QUERY, then
+                    /// of Sqlite3.PAGER_LOCKINGMODE_QUERY, Sqlite3.PAGER_LOCKINGMODE_NORMAL or
+                    /// Sqlite3.PAGER_LOCKINGMODE_EXCLUSIVE. If the parameter is not _QUERY, then
                     /// the locking-mode is set to the value specified.
                     ///
-                    /// The returned value is either PAGER_LOCKINGMODE_NORMAL or
-                    /// PAGER_LOCKINGMODE_EXCLUSIVE, indicating the current (possibly updated)
+                    /// The returned value is either Sqlite3.PAGER_LOCKINGMODE_NORMAL or
+                    /// Sqlite3.PAGER_LOCKINGMODE_EXCLUSIVE, indicating the current (possibly updated)
                     /// locking-mode.
                     ///
                     ///</summary>
                 bool sqlite3PagerLockingMode(int eMode)
                 {
-                    Debug.Assert(eMode == PAGER_LOCKINGMODE_QUERY || eMode == PAGER_LOCKINGMODE_NORMAL || eMode == PAGER_LOCKINGMODE_EXCLUSIVE);
-                    Debug.Assert(PAGER_LOCKINGMODE_QUERY < 0);
-                    Debug.Assert(PAGER_LOCKINGMODE_NORMAL >= 0 && PAGER_LOCKINGMODE_EXCLUSIVE >= 0);
+                    Debug.Assert(eMode == Sqlite3.PAGER_LOCKINGMODE_QUERY || eMode == Sqlite3.PAGER_LOCKINGMODE_NORMAL || eMode == Sqlite3.PAGER_LOCKINGMODE_EXCLUSIVE);
+                    Debug.Assert(Sqlite3.PAGER_LOCKINGMODE_QUERY < 0);
+                    Debug.Assert(Sqlite3.PAGER_LOCKINGMODE_NORMAL >= 0 && Sqlite3.PAGER_LOCKINGMODE_EXCLUSIVE >= 0);
                     Debug.Assert(this.exclusiveMode || false == wal.sqlite3WalHeapMemory(this.pWal));
                     if (eMode >= 0 && !this.tempFile && !wal.sqlite3WalHeapMemory(this.pWal))
                     {
@@ -6678,12 +6713,12 @@ this.memDb != 0
                 public///<summary>
                     /// Set the journal-mode for this pager. Parameter eMode must be one of:
                     ///
-                    ///    PAGER_JOURNALMODE_DELETE
-                    ///    PAGER_JOURNALMODE_TRUNCATE
-                    ///    PAGER_JOURNALMODE_PERSIST
-                    ///    PAGER_JOURNALMODE_OFF
-                    ///    PAGER_JOURNALMODE_MEMORY
-                    ///    PAGER_JOURNALMODE_WAL
+                    ///    Sqlite3.PAGER_JOURNALMODE_DELETE
+                    ///    Sqlite3.PAGER_JOURNALMODE_TRUNCATE
+                    ///    Sqlite3.PAGER_JOURNALMODE_PERSIST
+                    ///    Sqlite3.PAGER_JOURNALMODE_OFF
+                    ///    Sqlite3.PAGER_JOURNALMODE_MEMORY
+                    ///    Sqlite3.PAGER_JOURNALMODE_WAL
                     ///
                     /// The journalmode is set to the value specified if the change is allowed.
                     /// The change may be disallowed for the following reasons:
@@ -6714,7 +6749,7 @@ this.memDb != 0
                     ///The eMode parameter is always valid 
                     ///</summary>
 
-                    Debug.Assert(eMode == PAGER_JOURNALMODE_DELETE || eMode == PAGER_JOURNALMODE_TRUNCATE || eMode == PAGER_JOURNALMODE_PERSIST || eMode == PAGER_JOURNALMODE_OFF || eMode == PAGER_JOURNALMODE_WAL || eMode == PAGER_JOURNALMODE_MEMORY);
+                    Debug.Assert(eMode == Sqlite3.PAGER_JOURNALMODE_DELETE || eMode == Sqlite3.PAGER_JOURNALMODE_TRUNCATE || eMode == Sqlite3.PAGER_JOURNALMODE_PERSIST || eMode == Sqlite3.PAGER_JOURNALMODE_OFF || eMode == Sqlite3.PAGER_JOURNALMODE_WAL || eMode == Sqlite3.PAGER_JOURNALMODE_MEMORY);
                     ///
                     ///<summary>
                     ///This routine is only called from the OP_JournalMode opcode, and
@@ -6723,7 +6758,7 @@ this.memDb != 0
                     ///
                     ///</summary>
 
-                    Debug.Assert(this.tempFile == false || eMode != PAGER_JOURNALMODE_WAL);
+                    Debug.Assert(this.tempFile == false || eMode != Sqlite3.PAGER_JOURNALMODE_WAL);
                     ///
                     ///<summary>
                     ///</summary>
@@ -6731,16 +6766,15 @@ this.memDb != 0
                     ///<param name="anything other than MEMORY or OFF">anything other than MEMORY or OFF</param>
                     ///<param name=""></param>
 
-                    if (
-//#if SQLITE_OMIT_MEMORYDB
-1==MEMDB
+                    if (//#if SQLITE_OMIT_MEMORYDB
+1==Sqlite3.MEMDB
 #else
 1 == this.memDb
 #endif
 )
                     {
-                        Debug.Assert(eOld == PAGER_JOURNALMODE_MEMORY || eOld == PAGER_JOURNALMODE_OFF);
-                        if (eMode != PAGER_JOURNALMODE_MEMORY && eMode != PAGER_JOURNALMODE_OFF)
+                        Debug.Assert(eOld == Sqlite3.PAGER_JOURNALMODE_MEMORY || eOld == Sqlite3.PAGER_JOURNALMODE_OFF);
+                        if (eMode != Sqlite3.PAGER_JOURNALMODE_MEMORY && eMode != Sqlite3.PAGER_JOURNALMODE_OFF)
                         {
                             eMode = eOld;
                         }
@@ -6762,12 +6796,12 @@ this.memDb != 0
                         ///
                         ///</summary>
 
-                        Debug.Assert((PAGER_JOURNALMODE_TRUNCATE & 5) == 1);
-                        Debug.Assert((PAGER_JOURNALMODE_PERSIST & 5) == 1);
-                        Debug.Assert((PAGER_JOURNALMODE_DELETE & 5) == 0);
-                        Debug.Assert((PAGER_JOURNALMODE_MEMORY & 5) == 4);
-                        Debug.Assert((PAGER_JOURNALMODE_OFF & 5) == 0);
-                        Debug.Assert((PAGER_JOURNALMODE_WAL & 5) == 5);
+                        Debug.Assert((Sqlite3.PAGER_JOURNALMODE_TRUNCATE & 5) == 1);
+                        Debug.Assert((Sqlite3.PAGER_JOURNALMODE_PERSIST & 5) == 1);
+                        Debug.Assert((Sqlite3.PAGER_JOURNALMODE_DELETE & 5) == 0);
+                        Debug.Assert((Sqlite3.PAGER_JOURNALMODE_MEMORY & 5) == 4);
+                        Debug.Assert((Sqlite3.PAGER_JOURNALMODE_OFF & 5) == 0);
+                        Debug.Assert((Sqlite3.PAGER_JOURNALMODE_WAL & 5) == 5);
                         Debug.Assert(this.fd.isOpen   || this.exclusiveMode);
                         if (!this.exclusiveMode && (eOld & 5) == 1 && (eMode & 1) == 0)
                         {
@@ -6922,10 +6956,21 @@ this.memDb != 0
                     get
                     {
                         Pager x = this;
-                        return ((Pgno)((PENDING_BYTE / ((x).pageSize)) + 1));
+                        return ((Pgno)((Sqlite3.PENDING_BYTE / ((x).pageSize)) + 1));
                     }
+                }
+
+
+                private bool NEVER(bool p)
+                {
+                    return Sqlite3.NEVER(p);
+                }
+
+                private void PAGERTRACE(string p1, params object[] p2)
+                {
+                    Sqlite3.PAGERTRACE(p1, p2);
                 }
         }
 #endif
-    }
+    
 }

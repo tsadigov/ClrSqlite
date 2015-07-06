@@ -40,37 +40,7 @@ namespace Community.CsharpSqlite
 		/// This structure is the current state of the generator.
 		///
 		///</summary>
-		public class sqlite3PrngType
-		{
-			public bool isInit;
-
-			///
-///<summary>
-///True if initialized 
-///</summary>
-
-			public int i;
-
-			public int j;
-
-			///<summary>
-			///State variables
-			///</summary>
-			public u8[] s = new u8[256];
-
-			///
-///<summary>
-///State variables 
-///</summary>
-
-			public sqlite3PrngType Copy ()
-			{
-				sqlite3PrngType cp = (sqlite3PrngType)MemberwiseClone ();
-				cp.s = new u8[s.Length];
-				Array.Copy (s, cp.s, s.Length);
-				return cp;
-			}
-		}
+		
 
 		public static sqlite3PrngType sqlite3Prng = new sqlite3PrngType ();
 
@@ -228,4 +198,36 @@ namespace Community.CsharpSqlite
 		}
 	#endif
 	}
+
+    public class sqlite3PrngType
+    {
+        public bool isInit;
+
+        ///
+        ///<summary>
+        ///True if initialized 
+        ///</summary>
+
+        public int i;
+
+        public int j;
+
+        ///<summary>
+        ///State variables
+        ///</summary>
+        public u8[] s = new u8[256];
+
+        ///
+        ///<summary>
+        ///State variables 
+        ///</summary>
+
+        public sqlite3PrngType Copy()
+        {
+            sqlite3PrngType cp = (sqlite3PrngType)MemberwiseClone();
+            cp.s = new u8[s.Length];
+            Array.Copy(s, cp.s, s.Length);
+            return cp;
+        }
+    }
 }

@@ -7,7 +7,6 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-    using Pager = Sqlite3.Pager;
     using u8 = Byte;
 
 

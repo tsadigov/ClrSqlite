@@ -4963,244 +4963,6 @@ namespace Community.CsharpSqlite
 
         public const int SQLITE_STMTSTATUS_AUTOINDEX = 3;
 
-		///
-///<summary>
-///CAPI3REF: Custom Page Cache Object
-///
-///The sqlite3_pcache type is opaque.  It is implemented by
-///the pluggable module.  The SQLite core has no knowledge of
-///its size or internal structure and never deals with the
-///sqlite3_pcache object except by holding and passing pointers
-///to the object.
-///
-///See [sqlite3_pcache_methods] for additional information.
-///
-///</summary>
-
-		//typedef struct sqlite3_pcache sqlite3_pcache;
-		///<summary>
-		/// CAPI3REF: Application Defined Page Cache.
-		/// KEYWORDS: {page cache}
-		///
-		/// ^(The [sqlite3_config]([SQLITE_CONFIG_PCACHE], ...) interface can
-		/// register an alternative page cache implementation by passing in an
-		/// instance of the sqlite3_pcache_methods structure.)^
-		/// In many applications, most of the heap memory allocated by
-		/// SQLite is used for the page cache.
-		/// By implementing a
-		/// custom page cache using this API, an application can better control
-		/// the amount of memory consumed by SQLite, the way in which
-		/// that memory is allocated and released, and the policies used to
-		/// determine exactly which parts of a database file are cached and for
-		/// how long.
-		///
-		/// The alternative page cache mechanism is an
-		/// extreme measure that is only needed by the most demanding applications.
-		/// The built-in page cache is recommended for most uses.
-		///
-		/// ^(The contents of the sqlite3_pcache_methods structure are copied to an
-		/// internal buffer by SQLite within the call to [sqlite3_config].  Hence
-		/// the application may discard the parameter after the call to
-		/// [sqlite3_config()] returns.)^
-		///
-		/// [[the xInit() page cache method]]
-		/// ^(The xInit() method is called once for each effective
-		/// call to [sqlite3_initialize()])^
-		/// (usually only once during the lifetime of the process). ^(The xInit()
-		/// method is passed a copy of the sqlite3_pcache_methods.pArg value.)^
-		/// The intent of the xInit() method is to set up global data structures
-		/// required by the custom page cache implementation.
-		/// ^(If the xInit() method is NULL, then the
-		/// built-in default page cache is used instead of the application defined
-		/// page cache.)^
-		///
-		/// [[the xShutdown() page cache method]]
-		/// ^The xShutdown() method is called by [sqlite3_shutdown()].
-		/// It can be used to clean up
-		/// any outstanding resources before process shutdown, if required.
-		/// ^The xShutdown() method may be NULL.
-		///
-		/// ^SQLite automatically serializes calls to the xInit method,
-		/// so the xInit method need not be threadsafe.  ^The
-		/// xShutdown method is only called from [sqlite3_shutdown()] so it does
-		/// not need to be threadsafe either.  All other methods must be threadsafe
-		/// in multithreaded applications.
-		///
-		/// ^SQLite will never invoke xInit() more than once without an intervening
-		/// call to xShutdown().
-		///
-		/// [[the xCreate() page cache methods]]
-		/// ^SQLite invokes the xCreate() method to construct a new cache instance.
-		/// SQLite will typically create one cache instance for each open database file,
-		/// though this is not guaranteed. ^The
-		/// first parameter, szPage, is the size in bytes of the pages that must
-		/// be allocated by the cache.  ^szPage will not be a power of two.  ^szPage
-		/// will the page size of the database file that is to be cached plus an
-		/// increment (here called "R") of less than 250.  SQLite will use the
-		/// extra R bytes on each page to store metadata about the underlying
-		/// database page on disk.  The value of R depends
-		/// on the SQLite version, the target platform, and how SQLite was compiled.
-		/// ^(R is constant for a particular build of SQLite. Except, there are two
-		/// distinct values of R when SQLite is compiled with the proprietary
-		/// ZIPVFS extension.)^  ^The second argument to
-		/// xCreate(), bPurgeable, is true if the cache being created will
-		/// be used to cache database pages of a file stored on disk, or
-		/// false if it is used for an in-memory database. The cache implementation
-		/// does not have to do anything special based with the value of bPurgeable;
-		/// it is purely advisory.  ^On a cache where bPurgeable is false, SQLite will
-		/// never invoke xUnpin() except to deliberately delete a page.
-		/// ^In other words, calls to xUnpin() on a cache with bPurgeable set to
-		/// false will always have the "discard" flag set to true.
-		/// ^Hence, a cache created with bPurgeable false will
-		/// never contain any unpinned pages.
-		///
-		/// [[the xCachesize() page cache method]]
-		/// ^(The xCachesize() method may be called at any time by SQLite to set the
-		/// suggested maximum cache-size (number of pages stored by) the cache
-		/// instance passed as the first argument. This is the value configured using
-		/// the SQLite "[PRAGMA cache_size]" command.)^  As with the bPurgeable
-		/// parameter, the implementation is not required to do anything with this
-		/// value; it is advisory only.
-		///
-		/// [[the xPagecount() page cache methods]]
-		/// The xPagecount() method must return the number of pages currently
-		/// stored in the cache, both pinned and unpinned.
-		///
-		/// [[the xFetch() page cache methods]]
-		/// The xFetch() method locates a page in the cache and returns a pointer to
-		/// the page, or a NULL pointer.
-		/// A "page", in this context, means a buffer of szPage bytes aligned at an
-		/// 8-byte boundary. The page to be fetched is determined by the key. ^The
-		/// minimum key value is 1.  After it has been retrieved using xFetch, the page
-		/// is considered to be "pinned".
-		///
-		/// If the requested page is already in the page cache, then the page cache
-		/// implementation must return a pointer to the page buffer with its content
-		/// intact.  If the requested page is not already in the cache, then the
-		/// cache implementation should use the value of the createFlag
-		/// parameter to help it determined what action to take:
-		///
-		/// <table border=1 width=85% align=center>
-		/// <tr><th> createFlag <th> Behaviour when page is not already in cache
-		/// <tr><td> 0 <td> Do not allocate a new page.  Return NULL.
-		/// <tr><td> 1 <td> Allocate a new page if it easy and convenient to do so.
-		///                 Otherwise return NULL.
-		/// <tr><td> 2 <td> Make every effort to allocate a new page.  Only return
-		///                 NULL if allocating a new page is effectively impossible.
-		/// </table>
-		///
-		/// ^(SQLite will normally invoke xFetch() with a createFlag of 0 or 1.  SQLite
-		/// will only use a createFlag of 2 after a prior call with a createFlag of 1
-		/// failed.)^  In between the to xFetch() calls, SQLite may
-		/// attempt to unpin one or more cache pages by spilling the content of
-		/// pinned pages to disk and synching the operating system disk cache.
-		///
-		/// [[the xUnpin() page cache method]]
-		/// ^xUnpin() is called by SQLite with a pointer to a currently pinned page
-		/// as its second argument.  If the third parameter, discard, is non-zero,
-		/// then the page must be evicted from the cache.
-		/// ^If the discard parameter is
-		/// zero, then the page may be discarded or retained at the discretion of
-		/// page cache implementation. ^The page cache implementation
-		/// may choose to evict unpinned pages at any time.
-		///
-		/// The cache must not perform any reference counting. A single
-		/// call to xUnpin() unpins the page regardless of the number of prior calls
-		/// to xFetch().
-		///
-		/// [[the xRekey() page cache methods]]
-		/// The xRekey() method is used to change the key value associated with the
-		/// page passed as the second argument. If the cache
-		/// previously contains an entry associated with newKey, it must be
-		/// discarded. ^Any prior cache entry associated with newKey is guaranteed not
-		/// to be pinned.
-		///
-		/// When SQLite calls the xTruncate() method, the cache must discard all
-		/// existing cache entries with page numbers (keys) greater than or equal
-		/// to the value of the iLimit parameter passed to xTruncate(). If any
-		/// of these pages are pinned, they are implicitly unpinned, meaning that
-		/// they can be safely discarded.
-		///
-		/// [[the xDestroy() page cache method]]
-		/// ^The xDestroy() method is used to delete a cache allocated by xCreate().
-		/// All resources associated with the specified cache should be freed. ^After
-		/// calling the xDestroy() method, SQLite considers the [sqlite3_pcache*]
-		/// handle invalid, and will not use it with any other sqlite3_pcache_methods
-		/// functions.
-		///
-		///</summary>
-		//typedef struct sqlite3_pcache_methods sqlite3_pcache_methods;
-		//struct sqlite3_pcache_methods {
-		//  void *pArg;
-		//  int (*xInit)(void);
-		//  void (*xShutdown)(void);
-		//  sqlite3_pcache *(*xCreate)(int szPage, int bPurgeable);
-		//  void (*xCachesize)(sqlite3_pcache*, int nCachesize);
-		//  int (*xPagecount)(sqlite3_pcache);
-		//  void *(*xFetch)(sqlite3_pcache*, unsigned key, int createFlag);
-		//  void (*xUnpin)(sqlite3_pcache*, void*, int discard);
-		//  void (*xRekey)(sqlite3_pcache*, void*, unsigned oldKey, unsigned newKey);
-		//  void (*xTruncate)(sqlite3_pcache*, unsigned iLimit);
-		//  void (*xDestroy)(sqlite3_pcache);
-		//};
-		public class sqlite3_pcache_methods
-		{
-			public object pArg;
-
-            dxPC_Init m_xInit;
-            public dxPC_Init xInit {
-                get { return m_xInit; }
-                set { m_xInit = value; }
-            }
-
-			//int (*xInit)(void);
-			public dxPC_Shutdown xShutdown;
-
-			//public void (*xShutdown)(void);
-			public dxPC_Create xCreate;
-
-			//public sqlite3_pcache *(*xCreate)(int szPage, int bPurgeable);
-			public dxPC_Cachesize xCachesize;
-
-			//public void (*xCachesize)(sqlite3_pcache*, int nCachesize);
-			public dxPC_Pagecount xPagecount;
-
-			//public int (*xPagecount)(sqlite3_pcache);
-			public dxPC_Fetch xFetch;
-
-			//public void *(*xFetch)(sqlite3_pcache*, unsigned key, int createFlag);
-			public dxPC_Unpin xUnpin;
-
-			//public void (*xUnpin)(sqlite3_pcache*, void*, int discard);
-			public dxPC_Rekey xRekey;
-
-			//public void (*xRekey)(sqlite3_pcache*, void*, unsigned oldKey, unsigned newKey);
-			public dxPC_Truncate xTruncate;
-
-			//public void (*xTruncate)(sqlite3_pcache*, unsigned iLimit);
-			public dxPC_Destroy xDestroy;
-
-			//public void (*xDestroy)(sqlite3_pcache);
-			public sqlite3_pcache_methods ()
-			{
-			}
-
-			public sqlite3_pcache_methods (object pArg, dxPC_Init xInit, dxPC_Shutdown xShutdown, dxPC_Create xCreate, dxPC_Cachesize xCachesize, dxPC_Pagecount xPagecount, dxPC_Fetch xFetch, dxPC_Unpin xUnpin, dxPC_Rekey xRekey, dxPC_Truncate xTruncate, dxPC_Destroy xDestroy)
-			{
-				this.pArg = pArg;
-				this.xInit = xInit;
-				this.xShutdown = xShutdown;
-				this.xCreate = xCreate;
-				this.xCachesize = xCachesize;
-				this.xPagecount = xPagecount;
-				this.xFetch = xFetch;
-				this.xUnpin = xUnpin;
-				this.xRekey = xRekey;
-				this.xTruncate = xTruncate;
-				this.xDestroy = xDestroy;
-			}
-		};
-
 
 		///
 ///<summary>
@@ -5907,5 +5669,245 @@ namespace Community.CsharpSqlite
 	//#endif
 	//#endif  /* ifndef _SQLITE3RTREE_H_ */
 	}
+
+    ///
+    ///<summary>
+    ///CAPI3REF: Custom Page Cache Object
+    ///
+    ///The sqlite3_pcache type is opaque.  It is implemented by
+    ///the pluggable module.  The SQLite core has no knowledge of
+    ///its size or internal structure and never deals with the
+    ///sqlite3_pcache object except by holding and passing pointers
+    ///to the object.
+    ///
+    ///See [sqlite3_pcache_methods] for additional information.
+    ///
+    ///</summary>
+
+    //typedef struct sqlite3_pcache sqlite3_pcache;
+    ///<summary>
+    /// CAPI3REF: Application Defined Page Cache.
+    /// KEYWORDS: {page cache}
+    ///
+    /// ^(The [sqlite3_config]([SQLITE_CONFIG_PCACHE], ...) interface can
+    /// register an alternative page cache implementation by passing in an
+    /// instance of the sqlite3_pcache_methods structure.)^
+    /// In many applications, most of the heap memory allocated by
+    /// SQLite is used for the page cache.
+    /// By implementing a
+    /// custom page cache using this API, an application can better control
+    /// the amount of memory consumed by SQLite, the way in which
+    /// that memory is allocated and released, and the policies used to
+    /// determine exactly which parts of a database file are cached and for
+    /// how long.
+    ///
+    /// The alternative page cache mechanism is an
+    /// extreme measure that is only needed by the most demanding applications.
+    /// The built-in page cache is recommended for most uses.
+    ///
+    /// ^(The contents of the sqlite3_pcache_methods structure are copied to an
+    /// internal buffer by SQLite within the call to [sqlite3_config].  Hence
+    /// the application may discard the parameter after the call to
+    /// [sqlite3_config()] returns.)^
+    ///
+    /// [[the xInit() page cache method]]
+    /// ^(The xInit() method is called once for each effective
+    /// call to [sqlite3_initialize()])^
+    /// (usually only once during the lifetime of the process). ^(The xInit()
+    /// method is passed a copy of the sqlite3_pcache_methods.pArg value.)^
+    /// The intent of the xInit() method is to set up global data structures
+    /// required by the custom page cache implementation.
+    /// ^(If the xInit() method is NULL, then the
+    /// built-in default page cache is used instead of the application defined
+    /// page cache.)^
+    ///
+    /// [[the xShutdown() page cache method]]
+    /// ^The xShutdown() method is called by [sqlite3_shutdown()].
+    /// It can be used to clean up
+    /// any outstanding resources before process shutdown, if required.
+    /// ^The xShutdown() method may be NULL.
+    ///
+    /// ^SQLite automatically serializes calls to the xInit method,
+    /// so the xInit method need not be threadsafe.  ^The
+    /// xShutdown method is only called from [sqlite3_shutdown()] so it does
+    /// not need to be threadsafe either.  All other methods must be threadsafe
+    /// in multithreaded applications.
+    ///
+    /// ^SQLite will never invoke xInit() more than once without an intervening
+    /// call to xShutdown().
+    ///
+    /// [[the xCreate() page cache methods]]
+    /// ^SQLite invokes the xCreate() method to construct a new cache instance.
+    /// SQLite will typically create one cache instance for each open database file,
+    /// though this is not guaranteed. ^The
+    /// first parameter, szPage, is the size in bytes of the pages that must
+    /// be allocated by the cache.  ^szPage will not be a power of two.  ^szPage
+    /// will the page size of the database file that is to be cached plus an
+    /// increment (here called "R") of less than 250.  SQLite will use the
+    /// extra R bytes on each page to store metadata about the underlying
+    /// database page on disk.  The value of R depends
+    /// on the SQLite version, the target platform, and how SQLite was compiled.
+    /// ^(R is constant for a particular build of SQLite. Except, there are two
+    /// distinct values of R when SQLite is compiled with the proprietary
+    /// ZIPVFS extension.)^  ^The second argument to
+    /// xCreate(), bPurgeable, is true if the cache being created will
+    /// be used to cache database pages of a file stored on disk, or
+    /// false if it is used for an in-memory database. The cache implementation
+    /// does not have to do anything special based with the value of bPurgeable;
+    /// it is purely advisory.  ^On a cache where bPurgeable is false, SQLite will
+    /// never invoke xUnpin() except to deliberately delete a page.
+    /// ^In other words, calls to xUnpin() on a cache with bPurgeable set to
+    /// false will always have the "discard" flag set to true.
+    /// ^Hence, a cache created with bPurgeable false will
+    /// never contain any unpinned pages.
+    ///
+    /// [[the xCachesize() page cache method]]
+    /// ^(The xCachesize() method may be called at any time by SQLite to set the
+    /// suggested maximum cache-size (number of pages stored by) the cache
+    /// instance passed as the first argument. This is the value configured using
+    /// the SQLite "[PRAGMA cache_size]" command.)^  As with the bPurgeable
+    /// parameter, the implementation is not required to do anything with this
+    /// value; it is advisory only.
+    ///
+    /// [[the xPagecount() page cache methods]]
+    /// The xPagecount() method must return the number of pages currently
+    /// stored in the cache, both pinned and unpinned.
+    ///
+    /// [[the xFetch() page cache methods]]
+    /// The xFetch() method locates a page in the cache and returns a pointer to
+    /// the page, or a NULL pointer.
+    /// A "page", in this context, means a buffer of szPage bytes aligned at an
+    /// 8-byte boundary. The page to be fetched is determined by the key. ^The
+    /// minimum key value is 1.  After it has been retrieved using xFetch, the page
+    /// is considered to be "pinned".
+    ///
+    /// If the requested page is already in the page cache, then the page cache
+    /// implementation must return a pointer to the page buffer with its content
+    /// intact.  If the requested page is not already in the cache, then the
+    /// cache implementation should use the value of the createFlag
+    /// parameter to help it determined what action to take:
+    ///
+    /// <table border=1 width=85% align=center>
+    /// <tr><th> createFlag <th> Behaviour when page is not already in cache
+    /// <tr><td> 0 <td> Do not allocate a new page.  Return NULL.
+    /// <tr><td> 1 <td> Allocate a new page if it easy and convenient to do so.
+    ///                 Otherwise return NULL.
+    /// <tr><td> 2 <td> Make every effort to allocate a new page.  Only return
+    ///                 NULL if allocating a new page is effectively impossible.
+    /// </table>
+    ///
+    /// ^(SQLite will normally invoke xFetch() with a createFlag of 0 or 1.  SQLite
+    /// will only use a createFlag of 2 after a prior call with a createFlag of 1
+    /// failed.)^  In between the to xFetch() calls, SQLite may
+    /// attempt to unpin one or more cache pages by spilling the content of
+    /// pinned pages to disk and synching the operating system disk cache.
+    ///
+    /// [[the xUnpin() page cache method]]
+    /// ^xUnpin() is called by SQLite with a pointer to a currently pinned page
+    /// as its second argument.  If the third parameter, discard, is non-zero,
+    /// then the page must be evicted from the cache.
+    /// ^If the discard parameter is
+    /// zero, then the page may be discarded or retained at the discretion of
+    /// page cache implementation. ^The page cache implementation
+    /// may choose to evict unpinned pages at any time.
+    ///
+    /// The cache must not perform any reference counting. A single
+    /// call to xUnpin() unpins the page regardless of the number of prior calls
+    /// to xFetch().
+    ///
+    /// [[the xRekey() page cache methods]]
+    /// The xRekey() method is used to change the key value associated with the
+    /// page passed as the second argument. If the cache
+    /// previously contains an entry associated with newKey, it must be
+    /// discarded. ^Any prior cache entry associated with newKey is guaranteed not
+    /// to be pinned.
+    ///
+    /// When SQLite calls the xTruncate() method, the cache must discard all
+    /// existing cache entries with page numbers (keys) greater than or equal
+    /// to the value of the iLimit parameter passed to xTruncate(). If any
+    /// of these pages are pinned, they are implicitly unpinned, meaning that
+    /// they can be safely discarded.
+    ///
+    /// [[the xDestroy() page cache method]]
+    /// ^The xDestroy() method is used to delete a cache allocated by xCreate().
+    /// All resources associated with the specified cache should be freed. ^After
+    /// calling the xDestroy() method, SQLite considers the [sqlite3_pcache*]
+    /// handle invalid, and will not use it with any other sqlite3_pcache_methods
+    /// functions.
+    ///
+    ///</summary>
+    //typedef struct sqlite3_pcache_methods sqlite3_pcache_methods;
+    //struct sqlite3_pcache_methods {
+    //  void *pArg;
+    //  int (*xInit)(void);
+    //  void (*xShutdown)(void);
+    //  sqlite3_pcache *(*xCreate)(int szPage, int bPurgeable);
+    //  void (*xCachesize)(sqlite3_pcache*, int nCachesize);
+    //  int (*xPagecount)(sqlite3_pcache);
+    //  void *(*xFetch)(sqlite3_pcache*, unsigned key, int createFlag);
+    //  void (*xUnpin)(sqlite3_pcache*, void*, int discard);
+    //  void (*xRekey)(sqlite3_pcache*, void*, unsigned oldKey, unsigned newKey);
+    //  void (*xTruncate)(sqlite3_pcache*, unsigned iLimit);
+    //  void (*xDestroy)(sqlite3_pcache);
+    //};
+    public class sqlite3_pcache_methods
+    {
+        public object pArg;
+
+        dxPC_Init m_xInit;
+        public dxPC_Init xInit
+        {
+            get { return m_xInit; }
+            set { m_xInit = value; }
+        }
+
+        //int (*xInit)(void);
+        public dxPC_Shutdown xShutdown;
+
+        //public void (*xShutdown)(void);
+        public dxPC_Create xCreate;
+
+        //public sqlite3_pcache *(*xCreate)(int szPage, int bPurgeable);
+        public dxPC_Cachesize xCachesize;
+
+        //public void (*xCachesize)(sqlite3_pcache*, int nCachesize);
+        public dxPC_Pagecount xPagecount;
+
+        //public int (*xPagecount)(sqlite3_pcache);
+        public dxPC_Fetch xFetch;
+
+        //public void *(*xFetch)(sqlite3_pcache*, unsigned key, int createFlag);
+        public dxPC_Unpin xUnpin;
+
+        //public void (*xUnpin)(sqlite3_pcache*, void*, int discard);
+        public dxPC_Rekey xRekey;
+
+        //public void (*xRekey)(sqlite3_pcache*, void*, unsigned oldKey, unsigned newKey);
+        public dxPC_Truncate xTruncate;
+
+        //public void (*xTruncate)(sqlite3_pcache*, unsigned iLimit);
+        public dxPC_Destroy xDestroy;
+
+        //public void (*xDestroy)(sqlite3_pcache);
+        public sqlite3_pcache_methods()
+        {
+        }
+
+        public sqlite3_pcache_methods(object pArg, dxPC_Init xInit, dxPC_Shutdown xShutdown, dxPC_Create xCreate, dxPC_Cachesize xCachesize, dxPC_Pagecount xPagecount, dxPC_Fetch xFetch, dxPC_Unpin xUnpin, dxPC_Rekey xRekey, dxPC_Truncate xTruncate, dxPC_Destroy xDestroy)
+        {
+            this.pArg = pArg;
+            this.xInit = xInit;
+            this.xShutdown = xShutdown;
+            this.xCreate = xCreate;
+            this.xCachesize = xCachesize;
+            this.xPagecount = xPagecount;
+            this.xFetch = xFetch;
+            this.xUnpin = xUnpin;
+            this.xRekey = xRekey;
+            this.xTruncate = xTruncate;
+            this.xDestroy = xDestroy;
+        }
+    };
+
 	
 }

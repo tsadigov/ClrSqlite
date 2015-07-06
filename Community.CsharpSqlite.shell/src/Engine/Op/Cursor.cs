@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Community.CsharpSqlite.Engine.Op
 {
-    using Btree = Sqlite3.Btree;
 
     using Community.CsharpSqlite.Engine;
     using Metadata;

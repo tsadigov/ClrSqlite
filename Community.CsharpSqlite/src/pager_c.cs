@@ -10,14 +10,10 @@ using Pgno = System.UInt32;
 using sqlite3_int64 = System.Int64;
 namespace Community.CsharpSqlite
 {
-    using os = Sqlite3.os;
-    using crypto = Sqlite3.crypto;
     using System.Text;
     using DbPage = PgHdr;
     using Community.CsharpSqlite.Os;
-    using Pager = Sqlite3.Pager;
     using _Custom = Sqlite3._Custom;
-    using memjrnl = Sqlite3.memjrnl;
     public partial class Sqlite3
     {
 
@@ -70,20 +66,12 @@ namespace Community.CsharpSqlite
 
 #if !SQLITE_OMIT_MEMORYDB
 																																						// define MEMDB 0
-const int MEMDB = 0;
+public const int MEMDB = 0;
 #else
         //# define MEMDB pPager.memDb
 #endif
             
 
-
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="The maximum legal page number is (2^31 "> 1).</param>
-
-        //#define PAGER_MAX_PGNO 2147483647
-        const int PAGER_MAX_PGNO = 2147483647;
 
         ///
         ///<summary>
@@ -137,7 +125,7 @@ const int MEMDB = 0;
         ///<param name=""></param>
 
         //#define UNKNOWN_LOCK                (EXCLUSIVE_LOCK+1)
-        const LockType UNKNOWN_LOCK = (LockType.EXCLUSIVE_LOCK + 1);
+        public const LockType UNKNOWN_LOCK = (LockType.EXCLUSIVE_LOCK + 1);
 
 #if TRACE
 																																						
@@ -152,17 +140,6 @@ static void PAGERTRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace 
         }
 
 #endif
-
-        ///
-        ///<summary>
-        ///The maximum allowed sector size. 64KiB. If the xSectorsize() method 
-        ///returns a value larger than this, then MAX_SECTOR_SIZE is used instead.
-        ///This could conceivably cause corruption following a power failure on
-        ///such a system. This is currently an undocumented limit.
-        ///</summary>
-
-        //#define MAX_SECTOR_SIZE 0x10000
-        const int MAX_SECTOR_SIZE = 0x10000;
 
 
 

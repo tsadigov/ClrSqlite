@@ -9,6 +9,28 @@ namespace Community.CsharpSqlite
     public static class Limits
     {
         public static class Pager{
+
+
+            ///
+            ///<summary>
+            ///The maximum allowed sector size. 64KiB. If the xSectorsize() method 
+            ///returns a value larger than this, then MAX_SECTOR_SIZE is used instead.
+            ///This could conceivably cause corruption following a power failure on
+            ///such a system. This is currently an undocumented limit.
+            ///</summary>
+
+            //#define MAX_SECTOR_SIZE 0x10000
+            public const int MAX_SECTOR_SIZE = 0x10000;
+
+
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="The maximum legal page number is (2^31 "> 1).</param>
+
+            //#define PAGER_MAX_PGNO 2147483647
+            public const int PAGER_MAX_PGNO = 2147483647;
+
             ///<summary>
             ///Default maximum size for persistent journal files. A negative
             ///value means no limit. This value may be overridden using the

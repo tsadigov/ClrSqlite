@@ -625,10 +625,10 @@ winceLock *shared;      /* Global shared lock memory for the file  */
         SqlResult backupTruncateFile(int iSize)
         {
             long iCurrent = 0;
-            SqlResult rc = Sqlite3.os.sqlite3OsFileSize(this, ref iCurrent);
+            SqlResult rc = os.sqlite3OsFileSize(this, ref iCurrent);
             if (rc == SqlResult.SQLITE_OK && iCurrent > iSize)
             {
-                rc = Sqlite3.os.sqlite3OsTruncate(this, iSize);
+                rc = os.sqlite3OsTruncate(this, iSize);
             }
             return rc;
         }
@@ -831,21 +831,14 @@ winceLock *shared;      /* Global shared lock memory for the file  */
         //#define SQLITE_FCNTL_CHUNK_SIZE       6
         //#define SQLITE_FCNTL_FILE_POINTER     7
         //#define SQLITE_FCNTL_SYNC_OMITTED     8
-        private const int SQLITE_FCNTL_LOCKSTATE = 1;
-
-        private const int SQLITE_GET_LOCKPROXYFILE = 2;
-
-        private const int SQLITE_SET_LOCKPROXYFILE = 3;
-
-        private const int SQLITE_LAST_ERRNO = 4;
-
-        private const int SQLITE_FCNTL_SIZE_HINT = 5;
-
-        private const int SQLITE_FCNTL_CHUNK_SIZE = 6;
-
-        private const int SQLITE_FCNTL_FILE_POINTER = 7;
-
-        private const int SQLITE_FCNTL_SYNC_OMITTED = 8;
+        public const int SQLITE_FCNTL_LOCKSTATE = 1;
+        public const int SQLITE_GET_LOCKPROXYFILE = 2;
+        public const int SQLITE_SET_LOCKPROXYFILE = 3;
+        public const int SQLITE_LAST_ERRNO = 4;
+        public const int SQLITE_FCNTL_SIZE_HINT = 5;
+        public const int SQLITE_FCNTL_CHUNK_SIZE = 6;
+        public const int SQLITE_FCNTL_FILE_POINTER = 7;
+        public const int SQLITE_FCNTL_SYNC_OMITTED = 8;
 
 
 

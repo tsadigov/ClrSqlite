@@ -10,7 +10,6 @@ using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
 	using DbPage=PgHdr;
-    using Btree = Sqlite3.Btree;
 	using System.Text;
     using Metadata;
 	public partial class Sqlite3 {
@@ -36,7 +35,7 @@ namespace Community.CsharpSqlite {
             ///<summary>
             ///The Btree to which this cursor belongs 
             ///</summary>
-            public Sqlite3.Btree pBtree;
+            public Btree pBtree;
 
             ///
             ///<summary>

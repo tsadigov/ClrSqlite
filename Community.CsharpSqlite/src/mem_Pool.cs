@@ -7,7 +7,6 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-    using sqlite3_mem_methods = Sqlite3.sqlite3_mem_methods;
     using Community.CsharpSqlite.Engine;
         public class mempoolMethods
         {

@@ -13,8 +13,6 @@ using _Custom=Community.CsharpSqlite.Sqlite3._Custom;
 namespace Community.CsharpSqlite
 {
     using DbPage = PgHdr;
-    using Btree = Sqlite3.Btree;
-    using Pager = Sqlite3.Pager;
 
     public partial class Sqlite3
     {

@@ -24,7 +24,6 @@ namespace Community.CsharpSqlite
     using Parse = Sqlite3.Parse;
     using Vdbe = Sqlite3.Vdbe;
     using _Custom = Sqlite3._Custom;
-    using Btree = Sqlite3.Btree;
     using System.Linq;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.builder;

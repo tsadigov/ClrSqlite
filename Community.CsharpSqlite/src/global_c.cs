@@ -730,7 +730,7 @@ namespace Community.CsharpSqlite
 ///<param name="read">only.</param>
 ///<param name=""></param>
 
-		static FuncDefHash sqlite3GlobalFunctions;
+		public static FuncDefHash sqlite3GlobalFunctions;
 
 		///
 ///<summary>

@@ -11,8 +11,7 @@ namespace Community.CsharpSqlite
     using System.Security.Cryptography;
     using System.IO;
     using Community.CsharpSqlite.Os;
-    public partial class Sqlite3
-    {
+   
         public class crypto
         {
             ///
@@ -467,8 +466,8 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                     case SQLITE_DECRYPT:
                         codec_cipher(ctx.read_ctx, pgno, CIPHER_DECRYPT, pg_sz, pData, ctx.buffer);
                         if (pgno == 1)
-                            Buffer.BlockCopy(Encoding.UTF8.GetBytes(SQLITE_FILE_HEADER), 0, ctx.buffer, 0, FILE_HEADER_SZ);
-                        // memcpy( ctx.buffer, SQLITE_FILE_HEADER, FILE_HEADER_SZ ); /* copy file header to the first 16 bytes of the page */
+                            Buffer.BlockCopy(Encoding.UTF8.GetBytes(Sqlite3.SQLITE_FILE_HEADER), 0, ctx.buffer, 0, FILE_HEADER_SZ);
+                        // memcpy( ctx.buffer, Sqlite3.SQLITE_FILE_HEADER, FILE_HEADER_SZ ); /* copy file header to the first 16 bytes of the page */
                         Buffer.BlockCopy(ctx.buffer, 0, pData, 0, pg_sz);
                         //memcpy( pData, ctx.buffer, pg_sz ); /* copy buffer data back to pData and return */
                         return pData;
@@ -544,7 +543,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                     ctx.read_ctx.iv_sz = FILE_HEADER_SZ;
                     ctx.read_ctx.iv = new byte[ctx.read_ctx.iv_sz];
                     //malloc_cs.sqlite3Malloc( ctx.iv_sz );
-                    Buffer.BlockCopy(Encoding.UTF8.GetBytes(SQLITE_FILE_HEADER), 0, ctx.read_ctx.iv, 0, FILE_HEADER_SZ);
+                    Buffer.BlockCopy(Encoding.UTF8.GetBytes(Sqlite3.SQLITE_FILE_HEADER), 0, ctx.read_ctx.iv, 0, FILE_HEADER_SZ);
                     pDb.pBt.sqlite3BtreePager().sqlite3pager_sqlite3PagerSetCodec(sqlite3Codec, null, sqlite3FreeCodecArg, ctx);
                     codec_set_cipher_name(db, nDb, CIPHER, 0);
                     codec_set_pass_key(db, nDb, zKey, nKey, 0);
@@ -651,7 +650,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                             ///<summary>
                             ///prepare this setup as if it had already been initialized 
                             ///</summary>
-                            Buffer.BlockCopy(Encoding.UTF8.GetBytes(SQLITE_FILE_HEADER), 0, ctx.read_ctx.iv, 0, FILE_HEADER_SZ);
+                            Buffer.BlockCopy(Encoding.UTF8.GetBytes(Sqlite3.SQLITE_FILE_HEADER), 0, ctx.read_ctx.iv, 0, FILE_HEADER_SZ);
                             ctx.read_ctx.key_sz = ctx.read_ctx.iv_sz = ctx.read_ctx.pass_sz = 0;
                         }
                         //if ( ctx.read_ctx.iv_sz != ctx.write_ctx.iv_sz )
@@ -774,5 +773,5 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
             ///Decode page 
             ///</summary>
         }
-    }
+    
 }

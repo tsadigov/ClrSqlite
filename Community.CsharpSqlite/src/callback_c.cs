@@ -324,7 +324,7 @@ sqlite3ValueFree(ref pTmp);
 		/// Insert a new FuncDef into a FuncDefHash hash table.
 		///
 		///</summary>
-		static void sqlite3FuncDefInsert(FuncDefHash pHash,///
+		public static void sqlite3FuncDefInsert(FuncDefHash pHash,///
 		///<summary>
 		///The hash table into which to insert 
 		///</summary>
@@ -534,7 +534,7 @@ sqlite3ValueFree(ref pTmp);
         ///a new one if necessary.
         ///
         ///</summary>
-        public static Schema sqlite3SchemaGet(this Sqlite3.Btree pBt, sqlite3 db)
+        public static Schema sqlite3SchemaGet(this Btree pBt, sqlite3 db)
         {
             Schema p;
             if (pBt != null)

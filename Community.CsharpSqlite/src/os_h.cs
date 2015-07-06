@@ -181,7 +181,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 		#if !SQLITE_DEFAULT_SECTOR_SIZE
-		const int SQLITE_DEFAULT_SECTOR_SIZE = 512;
+		public const int SQLITE_DEFAULT_SECTOR_SIZE = 512;
 
 		//# define SQLITE_DEFAULT_SECTOR_SIZE 512
 		#endif
@@ -283,9 +283,9 @@ namespace Community.CsharpSqlite
 		#endif
 		static int RESERVED_BYTE = (PENDING_BYTE + 1);
 
-		static int SHARED_FIRST = (PENDING_BYTE + 2);
+		public static int SHARED_FIRST = (PENDING_BYTE + 2);
 
-		static int SHARED_SIZE = 510;
+		public static int SHARED_SIZE = 510;
 
 		///
 ///<summary>
@@ -311,7 +311,7 @@ namespace Community.CsharpSqlite
 		//int sqlite3OsCheckReservedLock(sqlite3_file *id, int pResOut);
 		//int sqlite3OsFileControl(sqlite3_file*,int,void);
 		//#define SQLITE_FCNTL_DB_UNCHANGED 0xca093fa0
-		const u32 SQLITE_FCNTL_DB_UNCHANGED = 0xca093fa0;
+		public const u32 SQLITE_FCNTL_DB_UNCHANGED = 0xca093fa0;
 	//int sqlite3OsSectorSize(sqlite3_file *id);
 	//int sqlite3OsDeviceCharacteristics(sqlite3_file *id);
 	//int sqlite3OsShmMap(sqlite3_file *,int,int,int,object volatile *);

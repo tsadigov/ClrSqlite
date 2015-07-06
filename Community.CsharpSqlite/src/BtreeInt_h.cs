@@ -13,9 +13,9 @@ namespace Community.CsharpSqlite
 {
 	using DbPage = PgHdr;
 	using System.Text;
-    using Pager = Sqlite3.Pager;
     using Metadata;
     using Community.CsharpSqlite.Os;
+    using _Custom = Sqlite3._Custom;
     ///<summary>
     /// Btree.inTrans may take one of the following values.
     ///
@@ -31,6 +31,569 @@ namespace Community.CsharpSqlite
         TRANS_READ = 1,
 
         TRANS_WRITE = 2
+    }
+
+
+    ///<summary>
+    /// This structure is passed around through all the sanity checking routines
+    /// in order to keep track of some global state information.
+    ///</summary>
+    //typedef struct IntegrityCk IntegrityCk;
+    public class IntegrityCk
+    {
+        public BtShared pBt;
+
+        ///
+        ///<summary>
+        ///The tree being checked out 
+        ///</summary>
+
+        public Pager pPager;
+
+        ///
+        ///<summary>
+        ///The associated pager.  Also accessible by pBt.pPager 
+        ///</summary>
+
+        public Pgno nPage;
+
+        ///
+        ///<summary>
+        ///Number of pages in the database 
+        ///</summary>
+
+        public int[] anRef;
+
+        ///
+        ///<summary>
+        ///Number of times each page is referenced 
+        ///</summary>
+
+        public int mxErr;
+
+        ///
+        ///<summary>
+        ///Stop accumulating errors when this reaches zero 
+        ///</summary>
+
+        public int nErr;
+
+        ///
+        ///<summary>
+        ///Number of messages written to zErrMsg so far 
+        ///</summary>
+
+        //public int mallocFailed;  /* A memory allocation error has occurred */
+        public StrAccum errMsg = new StrAccum(100);
+
+        ///
+        ///<summary>
+        ///Accumulate the error message text here 
+        ///</summary>
+
+        public void checkAppendMsg(StringBuilder zMsg1, string zFormat, params object[] ap)
+        {
+            if (0 == this.mxErr)
+                return;
+            //va_list ap;
+            lock (_Custom.lock_va_list)
+            {
+                this.mxErr--;
+                this.nErr++;
+                _Custom.va_start(ap, zFormat);
+                if (this.errMsg.zText.Length != 0)
+                {
+                    this.errMsg.sqlite3StrAccumAppend("\n", 1);
+                }
+                if (zMsg1.Length > 0)
+                {
+                    this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
+                }
+                io.sqlite3VXPrintf(this.errMsg, 1, zFormat, ap);
+                _Custom.va_end(ref ap);
+            }
+            //if( pCheck.errMsg.mallocFailed ){
+            //  pCheck.mallocFailed = 1;
+            //}
+        }
+
+        public int checkRef(Pgno iPage, string zContext)
+        {
+            if (iPage == 0)
+                return 1;
+            if (iPage > this.nPage)
+            {
+                this.checkAppendMsg(zContext, "invalid page number %d", iPage);
+                return 1;
+            }
+            if (this.anRef[iPage] == 1)
+            {
+                this.checkAppendMsg(zContext, "2nd reference to page %d", iPage);
+                return 1;
+            }
+            return ((this.anRef[iPage]++) > 1) ? 1 : 0;
+        }
+
+        public int checkTreePage(///
+            ///<summary>
+            ///Context for the sanity check 
+            ///</summary>
+
+        int iPage, ///
+            ///<summary>
+            ///Page number of the page to check 
+            ///</summary>
+
+        string zParentContext, ///
+            ///<summary>
+            ///Parent context 
+            ///</summary>
+
+        ref i64 pnParentMinKey, ref i64 pnParentMaxKey, object _pnParentMinKey, ///
+            ///<summary>
+            ///C# Needed to determine if content passed
+            ///</summary>
+
+        object _pnParentMaxKey///
+            ///<summary>
+            ///C# Needed to determine if content passed
+            ///</summary>
+
+        )
+        {
+            MemPage pPage = new MemPage();
+            int i, depth, d2, pgno, cnt;
+            SqlResult rc;
+            int hdr, cellStart;
+            int nCell;
+            u8[] data;
+            BtShared pBt;
+            int usableSize;
+            StringBuilder zContext = new StringBuilder(100);
+            byte[] hit = null;
+            i64 nMinKey = 0;
+            i64 nMaxKey = 0;
+            io.sqlite3_snprintf(200, zContext, "Page %d: ", iPage);
+            ///
+            ///<summary>
+            ///Check that the page exists
+            ///
+            ///</summary>
+
+            pBt = this.pBt;
+            usableSize = (int)pBt.usableSize;
+            if (iPage == 0)
+                return 0;
+            if (this.checkRef((u32)iPage, zParentContext) != 0)
+                return 0;
+            if ((rc = pBt.btreeGetPage((Pgno)iPage, ref pPage, 0)) != 0)
+            {
+                this.checkAppendMsg(zContext.ToString(), "unable to get the page. error code=%d", rc);
+                return 0;
+            }
+            ///
+            ///<summary>
+            ///Clear MemPage.isInit to make sure the corruption detection code in
+            ///btreeInitPage() is executed.  
+            ///</summary>
+
+            pPage.isInit = false;
+            if ((rc = pPage.btreeInitPage()) != 0)
+            {
+                Debug.Assert(rc == SqlResult.SQLITE_CORRUPT);
+                ///
+                ///<summary>
+                ///The only possible error from InitPage 
+                ///</summary>
+
+                this.checkAppendMsg(zContext.ToString(), "btreeInitPage() returns error code %d", rc);
+                BTreeMethods.releasePage(pPage);
+                return 0;
+            }
+            ///
+            ///<summary>
+            ///Check out all the cells.
+            ///
+            ///</summary>
+
+            depth = 0;
+            for (i = 0; i < pPage.nCell && this.mxErr != 0; i++)
+            {
+                u8[] pCell;
+                u32 sz;
+                CellInfo info = new CellInfo();
+                ///
+                ///<summary>
+                ///Check payload overflow pages
+                ///
+                ///</summary>
+
+                io.sqlite3_snprintf(200, zContext, "On tree page %d cell %d: ", iPage, i);
+                int iCell = pPage.findCell(i);
+                //pCell = findCell( pPage, i );
+                pCell = pPage.aData;
+                pPage.btreeParseCellPtr(iCell, ref info);
+                //btreeParseCellPtr( pPage, pCell, info );
+                sz = info.nData;
+                if (false == pPage.intKey)
+                    sz += (u32)info.nKey;
+                ///
+                ///<summary>
+                ///For intKey pages, check that the keys are in order.
+                ///
+                ///</summary>
+
+                else
+                    if (i == 0)
+                        nMinKey = nMaxKey = info.nKey;
+                    else
+                    {
+                        if (info.nKey <= nMaxKey)
+                        {
+                            this.checkAppendMsg(zContext.ToString(), "Rowid %lld out of order (previous was %lld)", info.nKey, nMaxKey);
+                        }
+                        nMaxKey = info.nKey;
+                    }
+                Debug.Assert(sz == info.nPayload);
+                if ((sz > info.nLocal)//&& (pCell[info.iOverflow]<=&pPage.aData[pBt.usableSize])
+                )
+                {
+                    int nPage = (int)(sz - info.nLocal + usableSize - 5) / (usableSize - 4);
+                    Pgno pgnoOvfl = Converter.sqlite3Get4byte(pCell, iCell, info.iOverflow);
+#if !SQLITE_OMIT_AUTOVACUUM
+                    if (pBt.autoVacuum)
+                    {
+                        this.checkPtrmap(pgnoOvfl, PTRMAP.OVERFLOW1, (u32)iPage, zContext.ToString());
+                    }
+#endif
+                    this.checkList(0, (int)pgnoOvfl, nPage, zContext.ToString());
+                }
+                ///
+                ///<summary>
+                ///Check sanity of left child page.
+                ///
+                ///</summary>
+
+                if (false == pPage.IsLeaf)
+                {
+                    pgno = (int)Converter.sqlite3Get4byte(pCell, iCell);
+                    //sqlite3Get4byte( pCell );
+#if !SQLITE_OMIT_AUTOVACUUM
+                    if (pBt.autoVacuum)
+                    {
+                        this.checkPtrmap((u32)pgno, PTRMAP.BTREE, (u32)iPage, zContext.ToString());
+                    }
+#endif
+                    if (i == 0)
+                        d2 = this.checkTreePage(pgno, zContext.ToString(), ref nMinKey, ref BTreeMethods.refNULL, this, null);
+                    else
+                        d2 = this.checkTreePage(pgno, zContext.ToString(), ref nMinKey, ref nMaxKey, this, this);
+                    if (i > 0 && d2 != depth)
+                    {
+                        this.checkAppendMsg(zContext, "Child page depth differs");
+                    }
+                    depth = d2;
+                }
+            }
+            if (false == pPage.IsLeaf)
+            {
+                pgno = (int)Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8);
+                io.sqlite3_snprintf(200, zContext, "On page %d at right child: ", iPage);
+#if !SQLITE_OMIT_AUTOVACUUM
+                if (pBt.autoVacuum)
+                {
+                    this.checkPtrmap((u32)pgno, PTRMAP.BTREE, (u32)iPage, zContext.ToString());
+                }
+#endif
+                //    checkTreePage(pCheck, pgno, zContext, NULL, !pPage->nCell ? NULL : &nMaxKey);
+                if (0 == pPage.nCell)
+                    this.checkTreePage(pgno, zContext.ToString(), ref BTreeMethods.refNULL, ref BTreeMethods.refNULL, null, null);
+                else
+                    this.checkTreePage(pgno, zContext.ToString(), ref BTreeMethods.refNULL, ref nMaxKey, null, this);
+            }
+            ///
+            ///<summary>
+            ///For intKey leaf pages, check that the min/max keys are in order
+            ///with any left/parent/right pages.
+            ///
+            ///</summary>
+
+            if (pPage.IsLeaf != false && pPage.intKey != false)
+            {
+                ///
+                ///<summary>
+                ///if we are a left child page 
+                ///</summary>
+
+                if (_pnParentMinKey != null)
+                {
+                    ///
+                    ///<summary>
+                    ///if we are the left most child page 
+                    ///</summary>
+
+                    if (_pnParentMaxKey == null)
+                    {
+                        if (nMaxKey > pnParentMinKey)
+                        {
+                            this.checkAppendMsg(zContext, "Rowid %lld out of order (max larger than parent min of %lld)", nMaxKey, pnParentMinKey);
+                        }
+                    }
+                    else
+                    {
+                        if (nMinKey <= pnParentMinKey)
+                        {
+                            this.checkAppendMsg(zContext, "Rowid %lld out of order (min less than parent min of %lld)", nMinKey, pnParentMinKey);
+                        }
+                        if (nMaxKey > pnParentMaxKey)
+                        {
+                            this.checkAppendMsg(zContext, "Rowid %lld out of order (max larger than parent max of %lld)", nMaxKey, pnParentMaxKey);
+                        }
+                        pnParentMinKey = nMaxKey;
+                    }
+                    ///
+                    ///<summary>
+                    ///else if we're a right child page 
+                    ///</summary>
+
+                }
+                else
+                    if (_pnParentMaxKey != null)
+                    {
+                        if (nMinKey <= pnParentMaxKey)
+                        {
+                            this.checkAppendMsg(zContext, "Rowid %lld out of order (min less than parent max of %lld)", nMinKey, pnParentMaxKey);
+                        }
+                    }
+            }
+            ///
+            ///<summary>
+            ///Check for complete coverage of the page
+            ///
+            ///</summary>
+
+            data = pPage.aData;
+            hdr = pPage.hdrOffset;
+            hit = malloc_cs.sqlite3Malloc(pBt.pageSize);
+            //if( hit==null ){
+            //  pCheck.mallocFailed = 1;
+            //}else
+            {
+                int contentOffset = BTreeMethods.get2byteNotZero(data, hdr + 5);
+                Debug.Assert(contentOffset <= usableSize);
+                ///
+                ///<summary>
+                ///Enforced by btreeInitPage() 
+                ///</summary>
+
+                Array.Clear(hit, contentOffset, usableSize - contentOffset);
+                //memset(hit+contentOffset, 0, usableSize-contentOffset);
+                for (int iLoop = contentOffset - 1; iLoop >= 0; iLoop--)
+                    hit[iLoop] = 1;
+                //memset(hit, 1, contentOffset);
+                nCell = data.get2byte(hdr + 3);
+                cellStart = hdr + 12 - (pPage.IsLeaf ? 4 : 0);
+                for (i = 0; i < nCell; i++)
+                {
+                    int pc = data.get2byte(cellStart + i * 2);
+                    u32 size = 65536;
+                    int j;
+                    if (pc <= usableSize - 4)
+                    {
+                        size = pPage.cellSizePtr(data, pc);
+                    }
+                    if ((int)(pc + size - 1) >= usableSize)
+                    {
+                        this.checkAppendMsg("", "Corruption detected in cell %d on page %d", i, iPage);
+                    }
+                    else
+                    {
+                        for (j = (int)(pc + size - 1); j >= pc; j--)
+                            hit[j]++;
+                    }
+                }
+                i = data.get2byte(hdr + 1);
+                while (i > 0)
+                {
+                    int size, j;
+                    Debug.Assert(i <= usableSize - 4);
+                    ///
+                    ///<summary>
+                    ///Enforced by btreeInitPage() 
+                    ///</summary>
+
+                    size = data.get2byte(i + 2);
+                    Debug.Assert(i + size <= usableSize);
+                    ///
+                    ///<summary>
+                    ///Enforced by btreeInitPage() 
+                    ///</summary>
+
+                    for (j = i + size - 1; j >= i; j--)
+                        hit[j]++;
+                    j = data.get2byte(i);
+                    Debug.Assert(j == 0 || j > i + size);
+                    ///
+                    ///<summary>
+                    ///Enforced by btreeInitPage() 
+                    ///</summary>
+
+                    Debug.Assert(j <= usableSize - 4);
+                    ///
+                    ///<summary>
+                    ///Enforced by btreeInitPage() 
+                    ///</summary>
+
+                    i = j;
+                }
+                for (i = cnt = 0; i < usableSize; i++)
+                {
+                    if (hit[i] == 0)
+                    {
+                        cnt++;
+                    }
+                    else
+                        if (hit[i] > 1)
+                        {
+                            this.checkAppendMsg("", "Multiple uses for byte %d of page %d", i, iPage);
+                            break;
+                        }
+                }
+                if (cnt != data[hdr + 7])
+                {
+                    this.checkAppendMsg("", "Fragmentation of %d bytes reported as %d on page %d", cnt, data[hdr + 7], iPage);
+                }
+            }
+            Sqlite3.sqlite3PageFree(ref hit);
+            BTreeMethods.releasePage(pPage);
+            return depth + 1;
+        }
+
+        public void checkList(
+            int isFreeList, ///True for a freelist.  False for overflow page list 
+            int iPage, ///Page number for first page in the list 
+            int N, ///Expected number of pages in the list 
+            string zContext///Context for error messages 
+        )
+        {
+            int i;
+            int expected = N;
+            int iFirst = iPage;
+            while (N-- > 0 && this.mxErr != 0)
+            {
+                PgHdr pOvflPage = new PgHdr();
+                byte[] pOvflData;
+                if (iPage < 1)
+                {
+                    this.checkAppendMsg(zContext, "%d of %d pages missing from overflow list starting at %d", N + 1, expected, iFirst);
+                    break;
+                }
+                if (this.checkRef((u32)iPage, zContext) != 0)
+                    break;
+                if (this.pPager.sqlite3PagerGet((Pgno)iPage, ref pOvflPage) != 0)
+                {
+                    this.checkAppendMsg(zContext, "failed to get page %d", iPage);
+                    break;
+                }
+                pOvflData = pOvflPage.sqlite3PagerGetData();
+                if (isFreeList != 0)
+                {
+                    int n = (int)Converter.sqlite3Get4byte(pOvflData, 4);
+#if !SQLITE_OMIT_AUTOVACUUM
+                    if (this.pBt.autoVacuum)
+                    {
+                        this.checkPtrmap((u32)iPage, PTRMAP.FREEPAGE, 0, zContext);
+                    }
+#endif
+                    if (n > (int)this.pBt.usableSize / 4 - 2)
+                    {
+                        this.checkAppendMsg(zContext, "freelist leaf count too big on page %d", iPage);
+                        N--;
+                    }
+                    else
+                    {
+                        for (i = 0; i < n; i++)
+                        {
+                            Pgno iFreePage = Converter.sqlite3Get4byte(pOvflData, 8 + i * 4);
+#if !SQLITE_OMIT_AUTOVACUUM
+                            if (this.pBt.autoVacuum)
+                            {
+                                this.checkPtrmap(iFreePage, PTRMAP.FREEPAGE, 0, zContext);
+                            }
+#endif
+                            this.checkRef(iFreePage, zContext);
+                        }
+                        N -= n;
+                    }
+                }
+#if !SQLITE_OMIT_AUTOVACUUM
+                else
+                {
+                    ///
+                    ///<summary>
+                    ///</summary>
+                    ///<param name="If this database supports auto">vacuum and iPage is not the last</param>
+                    ///<param name="page in this overflow list, check that the pointer">map entry for</param>
+                    ///<param name="the following page matches iPage.">the following page matches iPage.</param>
+                    ///<param name=""></param>
+
+                    if (this.pBt.autoVacuum && N > 0)
+                    {
+                        i = (int)Converter.sqlite3Get4byte(pOvflData);
+                        this.checkPtrmap((u32)i, PTRMAP.OVERFLOW2, (u32)iPage, zContext);
+                    }
+                }
+#endif
+                iPage = (int)Converter.sqlite3Get4byte(pOvflData);
+                PagerMethods.sqlite3PagerUnref(pOvflPage);
+            }
+        }
+
+        public void checkPtrmap(
+            Pgno iChild, ///Child page number 
+            u8 eType, ///Expected pointer map type 
+            Pgno iParent,///Expected pointer map parent page number 
+            string zContext///Context description (used for error msg) 
+        )
+        {
+            SqlResult rc;
+            u8 ePtrmapType = 0;
+            Pgno iPtrmapParent = 0;
+            rc = this.pBt.ptrmapGet(iChild, ref ePtrmapType, ref iPtrmapParent);
+            if (rc != SqlResult.SQLITE_OK)
+            {
+                //if( rc==SQLITE_NOMEM || rc==SQLITE_IOERR_NOMEM ) pCheck.mallocFailed = 1;
+                this.checkAppendMsg(zContext, "Failed to read ptrmap key=%d", iChild);
+                return;
+            }
+            if (ePtrmapType != eType || iPtrmapParent != iParent)
+            {
+                this.checkAppendMsg(zContext, "Bad ptr map entry key=%d expected=(%d,%d) got=(%d,%d)", iChild, eType, iParent, ePtrmapType, iPtrmapParent);
+            }
+        }
+
+        public void checkAppendMsg(string zMsg1, string zFormat, params object[] ap)
+        {
+            if (0 == this.mxErr)
+                return;
+            //va_list ap;
+            lock (_Custom.lock_va_list)
+            {
+                this.mxErr--;
+                this.nErr++;
+                _Custom.va_start(ap, zFormat);
+                if (this.errMsg.zText.Length != 0)
+                {
+                    this.errMsg.sqlite3StrAccumAppend("\n", 1);
+                }
+                if (zMsg1.Length > 0)
+                {
+                    this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
+                }
+                io.sqlite3VXPrintf(this.errMsg, 1, zFormat, ap);
+                _Custom.va_end(ref ap);
+            }
+        }
     }
 
 
@@ -97,7 +660,7 @@ namespace Community.CsharpSqlite
 
     public class BtLock
     {
-        Sqlite3.Btree pBtree;
+        Btree pBtree;
 
         ///
         ///<summary>
@@ -955,7 +1518,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 ///<param name=""></param>
 
 		#if !SQLITE_FILE_HEADER
-		const string SQLITE_FILE_HEADER = "SQLite format 3\0";
+		public const string SQLITE_FILE_HEADER = "SQLite format 3\0";
 
 		#endif
 		
@@ -965,24 +1528,9 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 
 
 
-		///<summary>
-		/// The in-memory image of a disk page has the auxiliary information appended
-		/// to the end.  EXTRA_SIZE is the number of bytes of space needed to hold
-		/// that extra information.
-		///
-		///</summary>
-		const int EXTRA_SIZE = 0;
-
+		
 		
 
-		///<summary>
-		///Candidate values for BtLock.eLock
-		///</summary>
-		//#define READ_LOCK     1
-		//#define WRITE_LOCK    2
-		const int READ_LOCK = 1;
-
-		const int WRITE_LOCK = 2;
 
 		
 		
@@ -1004,7 +1552,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
       Debug.Assert( p.pBt.inTransaction >= p.inTrans );
     }
 #else
-		static void btreeIntegrity (Btree p)
+		public static void btreeIntegrity (Btree p)
 		{
 		}
 
@@ -1024,516 +1572,6 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 																																														//define ISAUTOVACUUM 0
 public static bool ISAUTOVACUUM =false;
 #endif
-		///<summary>
-		/// This structure is passed around through all the sanity checking routines
-		/// in order to keep track of some global state information.
-		///</summary>
-		//typedef struct IntegrityCk IntegrityCk;
-		public class IntegrityCk
-		{
-			public BtShared pBt;
-
-			///
-///<summary>
-///The tree being checked out 
-///</summary>
-
-			public Pager pPager;
-
-			///
-///<summary>
-///The associated pager.  Also accessible by pBt.pPager 
-///</summary>
-
-			public Pgno nPage;
-
-			///
-///<summary>
-///Number of pages in the database 
-///</summary>
-
-			public int[] anRef;
-
-			///
-///<summary>
-///Number of times each page is referenced 
-///</summary>
-
-			public int mxErr;
-
-			///
-///<summary>
-///Stop accumulating errors when this reaches zero 
-///</summary>
-
-			public int nErr;
-
-			///
-///<summary>
-///Number of messages written to zErrMsg so far 
-///</summary>
-
-			//public int mallocFailed;  /* A memory allocation error has occurred */
-			public StrAccum errMsg = new StrAccum (100);
-
-			///
-///<summary>
-///Accumulate the error message text here 
-///</summary>
-
-			public void checkAppendMsg (StringBuilder zMsg1, string zFormat, params object[] ap)
-			{
-				if (0 == this.mxErr)
-					return;
-				//va_list ap;
-				lock (_Custom.lock_va_list) {
-					this.mxErr--;
-					this.nErr++;
-					_Custom.va_start (ap, zFormat);
-					if (this.errMsg.zText.Length != 0) {
-                        this.errMsg.sqlite3StrAccumAppend("\n", 1);
-					}
-					if (zMsg1.Length > 0) {
-                        this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
-					}
-					io.sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
-					_Custom.va_end (ref ap);
-				}
-				//if( pCheck.errMsg.mallocFailed ){
-				//  pCheck.mallocFailed = 1;
-				//}
-			}
-
-			public int checkRef (Pgno iPage, string zContext)
-			{
-				if (iPage == 0)
-					return 1;
-				if (iPage > this.nPage) {
-					this.checkAppendMsg (zContext, "invalid page number %d", iPage);
-					return 1;
-				}
-				if (this.anRef [iPage] == 1) {
-					this.checkAppendMsg (zContext, "2nd reference to page %d", iPage);
-					return 1;
-				}
-				return ((this.anRef [iPage]++) > 1) ? 1 : 0;
-			}
-
-			public int checkTreePage (///
-///<summary>
-///Context for the sanity check 
-///</summary>
-
-			int iPage, ///
-///<summary>
-///Page number of the page to check 
-///</summary>
-
-			string zParentContext, ///
-///<summary>
-///Parent context 
-///</summary>
-
-			ref i64 pnParentMinKey, ref i64 pnParentMaxKey, object _pnParentMinKey, ///
-///<summary>
-///C# Needed to determine if content passed
-///</summary>
-
-			object _pnParentMaxKey///
-///<summary>
-///C# Needed to determine if content passed
-///</summary>
-
-			)
-			{
-				MemPage pPage = new MemPage ();
-				int i, depth, d2, pgno, cnt;
-                SqlResult rc;
-				int hdr, cellStart;
-				int nCell;
-				u8[] data;
-				BtShared pBt;
-				int usableSize;
-				StringBuilder zContext = new StringBuilder (100);
-				byte[] hit = null;
-				i64 nMinKey = 0;
-				i64 nMaxKey = 0;
-				io.sqlite3_snprintf (200, zContext, "Page %d: ", iPage);
-				///
-///<summary>
-///Check that the page exists
-///
-///</summary>
-
-				pBt = this.pBt;
-				usableSize = (int)pBt.usableSize;
-				if (iPage == 0)
-					return 0;
-				if (this.checkRef ((u32)iPage, zParentContext) != 0)
-					return 0;
-				if ((rc = pBt.btreeGetPage ((Pgno)iPage, ref pPage, 0)) != 0) {
-					this.checkAppendMsg (zContext.ToString (), "unable to get the page. error code=%d", rc);
-					return 0;
-				}
-				///
-///<summary>
-///Clear MemPage.isInit to make sure the corruption detection code in
-///btreeInitPage() is executed.  
-///</summary>
-
-				pPage.isInit = false;
-				if ((rc = pPage.btreeInitPage ()) != 0) {
-					Debug.Assert (rc == SqlResult.SQLITE_CORRUPT);
-					///
-///<summary>
-///The only possible error from InitPage 
-///</summary>
-
-					this.checkAppendMsg (zContext.ToString (), "btreeInitPage() returns error code %d", rc);
-					BTreeMethods.releasePage(pPage);
-					return 0;
-				}
-				///
-///<summary>
-///Check out all the cells.
-///
-///</summary>
-
-				depth = 0;
-				for (i = 0; i < pPage.nCell && this.mxErr != 0; i++) {
-					u8[] pCell;
-					u32 sz;
-					CellInfo info = new CellInfo ();
-					///
-///<summary>
-///Check payload overflow pages
-///
-///</summary>
-
-					io.sqlite3_snprintf (200, zContext, "On tree page %d cell %d: ", iPage, i);
-					int iCell = pPage.findCell (i);
-					//pCell = findCell( pPage, i );
-					pCell = pPage.aData;
-					pPage.btreeParseCellPtr (iCell, ref info);
-					//btreeParseCellPtr( pPage, pCell, info );
-					sz = info.nData;
-					if (false == pPage.intKey)
-						sz += (u32)info.nKey;
-					///
-///<summary>
-///For intKey pages, check that the keys are in order.
-///
-///</summary>
-
-					else
-						if (i == 0)
-							nMinKey = nMaxKey = info.nKey;
-						else {
-							if (info.nKey <= nMaxKey) {
-								this.checkAppendMsg (zContext.ToString (), "Rowid %lld out of order (previous was %lld)", info.nKey, nMaxKey);
-							}
-							nMaxKey = info.nKey;
-						}
-					Debug.Assert (sz == info.nPayload);
-					if ((sz > info.nLocal)//&& (pCell[info.iOverflow]<=&pPage.aData[pBt.usableSize])
-					) {
-						int nPage = (int)(sz - info.nLocal + usableSize - 5) / (usableSize - 4);
-						Pgno pgnoOvfl = Converter.sqlite3Get4byte (pCell, iCell, info.iOverflow);
-						#if !SQLITE_OMIT_AUTOVACUUM
-						if (pBt.autoVacuum) {
-							this.checkPtrmap (pgnoOvfl, PTRMAP.OVERFLOW1, (u32)iPage, zContext.ToString ());
-						}
-						#endif
-						this.checkList (0, (int)pgnoOvfl, nPage, zContext.ToString ());
-					}
-					///
-///<summary>
-///Check sanity of left child page.
-///
-///</summary>
-
-					if (false == pPage.IsLeaf) {
-						pgno = (int)Converter.sqlite3Get4byte (pCell, iCell);
-						//sqlite3Get4byte( pCell );
-						#if !SQLITE_OMIT_AUTOVACUUM
-						if (pBt.autoVacuum) {
-							this.checkPtrmap ((u32)pgno, PTRMAP.BTREE, (u32)iPage, zContext.ToString ());
-						}
-						#endif
-						if (i == 0)
-                            d2 = this.checkTreePage(pgno, zContext.ToString(), ref nMinKey, ref BTreeMethods.refNULL, this, null);
-						else
-							d2 = this.checkTreePage (pgno, zContext.ToString (), ref nMinKey, ref nMaxKey, this, this);
-						if (i > 0 && d2 != depth) {
-							this.checkAppendMsg (zContext, "Child page depth differs");
-						}
-						depth = d2;
-					}
-				}
-				if (false == pPage.IsLeaf) {
-					pgno = (int)Converter.sqlite3Get4byte (pPage.aData, pPage.hdrOffset + 8);
-					io.sqlite3_snprintf (200, zContext, "On page %d at right child: ", iPage);
-					#if !SQLITE_OMIT_AUTOVACUUM
-					if (pBt.autoVacuum) {
-						this.checkPtrmap ((u32)pgno, PTRMAP.BTREE, (u32)iPage, zContext.ToString ());
-					}
-					#endif
-					//    checkTreePage(pCheck, pgno, zContext, NULL, !pPage->nCell ? NULL : &nMaxKey);
-					if (0 == pPage.nCell)
-                        this.checkTreePage(pgno, zContext.ToString(), ref BTreeMethods.refNULL, ref BTreeMethods.refNULL, null, null);
-					else
-						this.checkTreePage (pgno, zContext.ToString (), ref BTreeMethods.refNULL, ref nMaxKey, null, this);
-				}
-				///
-///<summary>
-///For intKey leaf pages, check that the min/max keys are in order
-///with any left/parent/right pages.
-///
-///</summary>
-
-				if (pPage.IsLeaf != false && pPage.intKey != false) {
-					///
-///<summary>
-///if we are a left child page 
-///</summary>
-
-					if (_pnParentMinKey != null) {
-						///
-///<summary>
-///if we are the left most child page 
-///</summary>
-
-						if (_pnParentMaxKey == null) {
-							if (nMaxKey > pnParentMinKey) {
-								this.checkAppendMsg (zContext, "Rowid %lld out of order (max larger than parent min of %lld)", nMaxKey, pnParentMinKey);
-							}
-						}
-						else {
-							if (nMinKey <= pnParentMinKey) {
-								this.checkAppendMsg (zContext, "Rowid %lld out of order (min less than parent min of %lld)", nMinKey, pnParentMinKey);
-							}
-							if (nMaxKey > pnParentMaxKey) {
-								this.checkAppendMsg (zContext, "Rowid %lld out of order (max larger than parent max of %lld)", nMaxKey, pnParentMaxKey);
-							}
-							pnParentMinKey = nMaxKey;
-						}
-						///
-///<summary>
-///else if we're a right child page 
-///</summary>
-
-					}
-					else
-						if (_pnParentMaxKey != null) {
-							if (nMinKey <= pnParentMaxKey) {
-								this.checkAppendMsg (zContext, "Rowid %lld out of order (min less than parent max of %lld)", nMinKey, pnParentMaxKey);
-							}
-						}
-				}
-				///
-///<summary>
-///Check for complete coverage of the page
-///
-///</summary>
-
-				data = pPage.aData;
-				hdr = pPage.hdrOffset;
-				hit = malloc_cs.sqlite3Malloc (pBt.pageSize);
-				//if( hit==null ){
-				//  pCheck.mallocFailed = 1;
-				//}else
-				{
-					int contentOffset = BTreeMethods.get2byteNotZero (data, hdr + 5);
-					Debug.Assert (contentOffset <= usableSize);
-					///
-///<summary>
-///Enforced by btreeInitPage() 
-///</summary>
-
-					Array.Clear (hit, contentOffset, usableSize - contentOffset);
-					//memset(hit+contentOffset, 0, usableSize-contentOffset);
-					for (int iLoop = contentOffset - 1; iLoop >= 0; iLoop--)
-						hit [iLoop] = 1;
-					//memset(hit, 1, contentOffset);
-                    nCell = data.get2byte(hdr + 3);
-					cellStart = hdr + 12 -  (pPage.IsLeaf?4:0) ;
-					for (i = 0; i < nCell; i++) {
-                        int pc = data.get2byte(cellStart + i * 2);
-						u32 size = 65536;
-						int j;
-						if (pc <= usableSize - 4) {
-							size = pPage.cellSizePtr (data, pc);
-						}
-						if ((int)(pc + size - 1) >= usableSize) {
-							this.checkAppendMsg ("", "Corruption detected in cell %d on page %d", i, iPage);
-						}
-						else {
-							for (j = (int)(pc + size - 1); j >= pc; j--)
-								hit [j]++;
-						}
-					}
-					i = data.get2byte ( hdr + 1);
-					while (i > 0) {
-						int size, j;
-						Debug.Assert (i <= usableSize - 4);
-						///
-///<summary>
-///Enforced by btreeInitPage() 
-///</summary>
-
-						size = data.get2byte ( i + 2);
-						Debug.Assert (i + size <= usableSize);
-						///
-///<summary>
-///Enforced by btreeInitPage() 
-///</summary>
-
-						for (j = i + size - 1; j >= i; j--)
-							hit [j]++;
-                        j = data.get2byte(i);
-						Debug.Assert (j == 0 || j > i + size);
-						///
-///<summary>
-///Enforced by btreeInitPage() 
-///</summary>
-
-						Debug.Assert (j <= usableSize - 4);
-						///
-///<summary>
-///Enforced by btreeInitPage() 
-///</summary>
-
-						i = j;
-					}
-					for (i = cnt = 0; i < usableSize; i++) {
-						if (hit [i] == 0) {
-							cnt++;
-						}
-						else
-							if (hit [i] > 1) {
-								this.checkAppendMsg ("", "Multiple uses for byte %d of page %d", i, iPage);
-								break;
-							}
-					}
-					if (cnt != data [hdr + 7]) {
-						this.checkAppendMsg ("", "Fragmentation of %d bytes reported as %d on page %d", cnt, data [hdr + 7], iPage);
-					}
-				}
-				sqlite3PageFree (ref hit);
-				BTreeMethods.releasePage(pPage);
-				return depth + 1;
-			}
-
-			public void checkList (
-			    int isFreeList, ///True for a freelist.  False for overflow page list 
-			    int iPage, ///Page number for first page in the list 
-			    int N, ///Expected number of pages in the list 
-			    string zContext///Context for error messages 
-			)
-			{
-				int i;
-				int expected = N;
-				int iFirst = iPage;
-				while (N-- > 0 && this.mxErr != 0) {
-					PgHdr pOvflPage = new PgHdr ();
-					byte[] pOvflData;
-					if (iPage < 1) {
-						this.checkAppendMsg (zContext, "%d of %d pages missing from overflow list starting at %d", N + 1, expected, iFirst);
-						break;
-					}
-					if (this.checkRef ((u32)iPage, zContext) != 0)
-						break;
-					if (this.pPager.sqlite3PagerGet ((Pgno)iPage, ref pOvflPage) != 0) {
-						this.checkAppendMsg (zContext, "failed to get page %d", iPage);
-						break;
-					}
-                    pOvflData = pOvflPage.sqlite3PagerGetData();
-					if (isFreeList != 0) {
-						int n = (int)Converter.sqlite3Get4byte (pOvflData, 4);
-						#if !SQLITE_OMIT_AUTOVACUUM
-						if (this.pBt.autoVacuum) {
-							this.checkPtrmap ((u32)iPage, PTRMAP.FREEPAGE, 0, zContext);
-						}
-						#endif
-						if (n > (int)this.pBt.usableSize / 4 - 2) {
-							this.checkAppendMsg (zContext, "freelist leaf count too big on page %d", iPage);
-							N--;
-						}
-						else {
-							for (i = 0; i < n; i++) {
-								Pgno iFreePage = Converter.sqlite3Get4byte (pOvflData, 8 + i * 4);
-								#if !SQLITE_OMIT_AUTOVACUUM
-								if (this.pBt.autoVacuum) {
-									this.checkPtrmap (iFreePage, PTRMAP.FREEPAGE, 0, zContext);
-								}
-								#endif
-								this.checkRef (iFreePage, zContext);
-							}
-							N -= n;
-						}
-					}
-					#if !SQLITE_OMIT_AUTOVACUUM
-					else {
-						///
-///<summary>
-///</summary>
-///<param name="If this database supports auto">vacuum and iPage is not the last</param>
-///<param name="page in this overflow list, check that the pointer">map entry for</param>
-///<param name="the following page matches iPage.">the following page matches iPage.</param>
-///<param name=""></param>
-
-						if (this.pBt.autoVacuum && N > 0) {
-							i = (int)Converter.sqlite3Get4byte (pOvflData);
-							this.checkPtrmap ((u32)i, PTRMAP.OVERFLOW2, (u32)iPage, zContext);
-						}
-					}
-					#endif
-					iPage = (int)Converter.sqlite3Get4byte (pOvflData);
-					PagerMethods.sqlite3PagerUnref (pOvflPage);
-				}
-			}
-
-			public void checkPtrmap (
-			    Pgno iChild, ///Child page number 
-			    u8 eType, ///Expected pointer map type 
-			    Pgno iParent,///Expected pointer map parent page number 
-			    string zContext///Context description (used for error msg) 
-			)
-			{
-				SqlResult rc;
-				u8 ePtrmapType = 0;
-				Pgno iPtrmapParent = 0;
-				rc = this.pBt.ptrmapGet (iChild, ref ePtrmapType, ref iPtrmapParent);
-				if (rc != SqlResult.SQLITE_OK) {
-					//if( rc==SQLITE_NOMEM || rc==SQLITE_IOERR_NOMEM ) pCheck.mallocFailed = 1;
-					this.checkAppendMsg (zContext, "Failed to read ptrmap key=%d", iChild);
-					return;
-				}
-				if (ePtrmapType != eType || iPtrmapParent != iParent) {
-					this.checkAppendMsg (zContext, "Bad ptr map entry key=%d expected=(%d,%d) got=(%d,%d)", iChild, eType, iParent, ePtrmapType, iPtrmapParent);
-				}
-			}
-
-			public void checkAppendMsg (string zMsg1, string zFormat, params object[] ap)
-			{
-				if (0 == this.mxErr)
-					return;
-				//va_list ap;
-				lock (_Custom.lock_va_list) {
-					this.mxErr--;
-					this.nErr++;
-					_Custom.va_start (ap, zFormat);
-					if (this.errMsg.zText.Length != 0) {
-                        this.errMsg.sqlite3StrAccumAppend("\n", 1);
-					}
-					if (zMsg1.Length > 0) {
-                        this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
-					}
-					io.sqlite3VXPrintf (this.errMsg, 1, zFormat, ap);
-					_Custom.va_end (ref ap);
-				}
-			}
-		}
 
 		
 		//#define put2byte(p,v) ((p)[0] = (u8)((v)>>8), (p)[1] = (u8)(v))
@@ -1604,5 +1642,18 @@ public static bool ISAUTOVACUUM =false;
 
         public const int BTREE = 5;
     }
+
+
+    ///<summary>
+    ///Candidate values for BtLock.eLock
+    ///</summary>
+    //#define READ_LOCK     1
+    //#define WRITE_LOCK    2
+    public enum BtLockType
+    {
+        READ_LOCK = 1,
+
+        WRITE_LOCK = 2
+    };
 
 }

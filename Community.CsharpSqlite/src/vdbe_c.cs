@@ -324,7 +324,7 @@ namespace Community.CsharpSqlite {
 		/// loss of information and return the revised type of the argument.
 		///
 		///</summary>
-		static FoundationalType sqlite3_value_numeric_type(sqlite3_value pVal) {
+		public static FoundationalType sqlite3_value_numeric_type(sqlite3_value pVal) {
 			Mem pMem=(Mem)pVal;
             if (pMem.type == FoundationalType.SQLITE_TEXT)
             {

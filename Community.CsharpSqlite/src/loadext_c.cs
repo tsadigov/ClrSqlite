@@ -607,37 +607,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		#if SQLITE_OMIT_LOAD_EXTENSION
 																																								const sqlite3_api_routines sqlite3Apis = null;
 #endif
-		///<summary>
-		/// The following object holds the list of automatically loaded
-		/// extensions.
-		///
-		/// This list is shared across threads.  The SQLITE_MUTEX_STATIC_MASTER
-		/// mutex must be held while accessing this list.
-		///</summary>
-		//typedef struct sqlite3AutoExtList sqlite3AutoExtList;
-		public class sqlite3AutoExtList
-		{
-			public int nExt = 0;
-
-			///
-///<summary>
-///Number of entries in aExt[] 
-///</summary>
-
-			public dxInit[] aExt = null;
-
-			///
-///<summary>
-///Pointers to the extension init functions 
-///</summary>
-
-			public sqlite3AutoExtList (int nExt, dxInit[] aExt)
-			{
-				this.nExt = nExt;
-				this.aExt = aExt;
-			}
-		}
-
+	
 		static sqlite3AutoExtList sqlite3Autoext = new sqlite3AutoExtList (0, null);
 
 		///<summary>
@@ -790,4 +760,36 @@ wsdAutoext.nExt = 0;
 			}
 		}
 	}
+
+    ///<summary>
+    /// The following object holds the list of automatically loaded
+    /// extensions.
+    ///
+    /// This list is shared across threads.  The SQLITE_MUTEX_STATIC_MASTER
+    /// mutex must be held while accessing this list.
+    ///</summary>
+    //typedef struct sqlite3AutoExtList sqlite3AutoExtList;
+    public class sqlite3AutoExtList
+    {
+        public int nExt = 0;
+
+        ///
+        ///<summary>
+        ///Number of entries in aExt[] 
+        ///</summary>
+
+        public dxInit[] aExt = null;
+
+        ///
+        ///<summary>
+        ///Pointers to the extension init functions 
+        ///</summary>
+
+        public sqlite3AutoExtList(int nExt, dxInit[] aExt)
+        {
+            this.nExt = nExt;
+            this.aExt = aExt;
+        }
+    }
+
 }
