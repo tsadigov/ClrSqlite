@@ -11,7 +11,7 @@ namespace Community.CsharpSqlite.Engine.Op
     {
         public static RuntimeException Exec(CPU cpu,OpCode opcode,VdbeOp pOp)
         {
-        //public static RuntimeException Exec(Community.CsharpSqlite.Sqlite3.Vdbe vdbe, SqliteEncoding encoding,OpCode opcode,VdbeOp pOp,Mem [] aMem,ref SqlResult rc) {
+        //public static RuntimeException Exec(Community.CsharpSqlite.Vdbe vdbe, SqliteEncoding encoding,OpCode opcode,VdbeOp pOp,Mem [] aMem,ref SqlResult rc) {
 
             var aMem = cpu.aMem;
             var vdbe = cpu.vdbe;

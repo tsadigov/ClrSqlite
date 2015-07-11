@@ -12,11 +12,10 @@ namespace Community.CsharpSqlite
 {
 	using Op = VdbeOp;
 	using sqlite_int64 = System.Int64;
-	using sqlite3_stmt = Sqlite3.Vdbe;
+	using sqlite3_stmt = Vdbe;
     using sqlite3_value = Engine.Mem;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
-    using Vdbe=Community.CsharpSqlite.Sqlite3.Vdbe;
     using Community.CsharpSqlite.Metadata;
 
     public static partial class VdbeExtensions
@@ -26,7 +25,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static int getColumnCount(this sqlite3_stmt pStmt)
             {
-                Sqlite3.Vdbe pVm = pStmt;
+                Vdbe pVm = pStmt;
                 return pVm != null ? (int)pVm.nResColumn : 0;
             }
     }

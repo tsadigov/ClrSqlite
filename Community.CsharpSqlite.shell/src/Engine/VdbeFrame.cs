@@ -15,7 +15,6 @@ using i32 = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    using Vdbe = Sqlite3.Vdbe;
     
     
     using Op = VdbeOp;

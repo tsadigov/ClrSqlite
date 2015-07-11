@@ -8,7 +8,6 @@ using u16=System.UInt16;
 using u32=System.UInt32;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
-    using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     using sqlite3_value = Engine.Mem;
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;

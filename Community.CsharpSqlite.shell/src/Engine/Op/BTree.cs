@@ -14,7 +14,7 @@ namespace Community.CsharpSqlite.Engine.Op
     public static class BTree
     {
         public static RuntimeException Exec(CPU cpu,OpCode opcode,VdbeOp pOp)
-        //(Community.CsharpSqlite.Sqlite3.Vdbe vdbe, OpCode opcode, ref int opcodeIndex,Mem [] aMem,VdbeOp pOp,ref SqlResult rc)
+        //(Community.CsharpSqlite.Vdbe vdbe, OpCode opcode, ref int opcodeIndex,Mem [] aMem,VdbeOp pOp,ref SqlResult rc)
         {
             var vdbe = cpu.vdbe;
             var aMem = vdbe.aMem;

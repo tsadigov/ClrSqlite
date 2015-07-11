@@ -6,7 +6,7 @@ namespace Community.CsharpSqlite
 {
 
     using System.Linq;
-    using sqlite3_stmt = Sqlite3.Vdbe;
+    using sqlite3_stmt = Vdbe;
     
     using vdbeapi = Engine.vdbeapi;
 

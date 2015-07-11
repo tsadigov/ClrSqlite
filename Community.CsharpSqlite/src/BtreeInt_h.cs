@@ -117,6 +117,30 @@ namespace Community.CsharpSqlite
             //}
         }
 
+
+        public void checkAppendMsg(string zMsg1, string zFormat, params object[] ap)
+        {
+            if (0 == this.mxErr)
+                return;
+            //va_list ap;
+            lock (_Custom.lock_va_list)
+            {
+                this.mxErr--;
+                this.nErr++;
+                _Custom.va_start(ap, zFormat);
+                if (this.errMsg.zText.Length != 0)
+                {
+                    this.errMsg.sqlite3StrAccumAppend("\n", 1);
+                }
+                if (zMsg1.Length > 0)
+                {
+                    this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
+                }
+                io.sqlite3VXPrintf(this.errMsg, 1, zFormat, ap);
+                _Custom.va_end(ref ap);
+            }
+        }
+
         public int checkRef(Pgno iPage, string zContext)
         {
             if (iPage == 0)
@@ -572,28 +596,6 @@ namespace Community.CsharpSqlite
             }
         }
 
-        public void checkAppendMsg(string zMsg1, string zFormat, params object[] ap)
-        {
-            if (0 == this.mxErr)
-                return;
-            //va_list ap;
-            lock (_Custom.lock_va_list)
-            {
-                this.mxErr--;
-                this.nErr++;
-                _Custom.va_start(ap, zFormat);
-                if (this.errMsg.zText.Length != 0)
-                {
-                    this.errMsg.sqlite3StrAccumAppend("\n", 1);
-                }
-                if (zMsg1.Length > 0)
-                {
-                    this.errMsg.sqlite3StrAccumAppend(zMsg1.ToString(), -1);
-                }
-                io.sqlite3VXPrintf(this.errMsg, 1, zFormat, ap);
-                _Custom.va_end(ref ap);
-            }
-        }
     }
 
 

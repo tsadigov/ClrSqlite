@@ -11,7 +11,6 @@ using i64 = System.Int64;
 namespace Community.CsharpSqlite.Engine.Op
 {
 
-    using Vdbe=Community.CsharpSqlite.Sqlite3.Vdbe;
     using Community.CsharpSqlite.Engine;
     public class Logical
     {

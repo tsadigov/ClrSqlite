@@ -5,7 +5,7 @@ using Pgno=System.UInt32;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Engine;
-    using sqlite3_stmt = Sqlite3.Vdbe;
+    using sqlite3_stmt = Vdbe;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2003 April 6
@@ -116,7 +116,7 @@ namespace Community.CsharpSqlite {
 		///This routine implements the  OpCode.OP_Vacuum opcode of the VDBE.
 		///
 		///</summary>
-        static SqlResult sqlite3RunVacuum(ref string pzErrMsg, sqlite3 db)
+        public static SqlResult sqlite3RunVacuum(ref string pzErrMsg, sqlite3 db)
         {
 			var rc=SqlResult.SQLITE_OK;
 			///

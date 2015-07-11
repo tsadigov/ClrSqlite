@@ -196,7 +196,7 @@ namespace Community.CsharpSqlite {
     }
 #else
 		//# define UPDATE_MAX_BLOBSIZE(P)
-		static void UPDATE_MAX_BLOBSIZE(Mem P) {
+		public static void UPDATE_MAX_BLOBSIZE(Mem P) {
 		}
 		#endif
 		///
@@ -223,7 +223,7 @@ namespace Community.CsharpSqlite {
 		//#define Deephemeralize(P) \
 		//   if( ((P).flags&MEM.MEM_Ephem)!=0 \
 		//       && sqlite3VdbeMemMakeWriteable(P) ){ goto no_mem;}
-		static void Deephemeralize(Mem P) {
+		public static void Deephemeralize(Mem P) {
 		}
 		
 		///<summary>
@@ -551,7 +551,7 @@ namespace Community.CsharpSqlite {
       return 1;
     }
 #else
-		static int checkSavepointCount(sqlite3 db) {
+		public static int checkSavepointCount(sqlite3 db) {
 			return 1;
 		}
 		#endif
@@ -560,7 +560,7 @@ namespace Community.CsharpSqlite {
 		/// in memory obtained from sqlite3_malloc) into a Vdbe.zErrMsg (text stored
 		/// in memory obtained from sqlite3DbMalloc).
 		///</summary>
-		static void importVtabErrMsg(Vdbe p,sqlite3_vtab pVtab) {
+		public static void importVtabErrMsg(Vdbe p,sqlite3_vtab pVtab) {
 			sqlite3 db=p.db;
 			db.sqlite3DbFree(ref p.zErrMsg);
 			p.zErrMsg=pVtab.zErrMsg;

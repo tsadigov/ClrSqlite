@@ -7,7 +7,6 @@ using u32 = System.UInt32;
 namespace Community.CsharpSqlite.Parsing
 {
     using Parse = Sqlite3.Parse;
-    using Vdbe = Sqlite3.Vdbe;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;

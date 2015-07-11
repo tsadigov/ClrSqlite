@@ -6,7 +6,7 @@ using u16=System.UInt16;
 using u32=System.UInt32;
 using sqlite3_int64=System.Int64;
 namespace Community.CsharpSqlite {
-	using sqlite3_stmt=Sqlite3.Vdbe;
+	using sqlite3_stmt=Vdbe;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
@@ -91,7 +91,7 @@ namespace Community.CsharpSqlite {
 		///
 		///
 		///</summary>
-		static int sqlite3InitCallback(object pInit,sqlite3_int64 argc,object p2,object NotUsed) {
+		public static int sqlite3InitCallback(object pInit,sqlite3_int64 argc,object p2,object NotUsed) {
 			string[] argv=(string[])p2;
 			InitData pData=(InitData)pInit;
 			sqlite3 db=pData.db;

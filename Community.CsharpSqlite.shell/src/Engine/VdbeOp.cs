@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-    using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
+    
     
     using sqlite3_value = Engine.Mem;
     
@@ -228,7 +228,7 @@ public u64 cycles;         /* Total time spend executing this instruction */
 			return ToString (vdbe);
 		}
 
-		internal string ToString (Sqlite3.Vdbe vdbe)
+		internal string ToString (Vdbe vdbe)
 		{
             var p1 = this.p1;
 

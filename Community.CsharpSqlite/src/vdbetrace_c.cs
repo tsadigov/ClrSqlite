@@ -88,7 +88,7 @@ namespace Community.CsharpSqlite
 ///<param name="the value as a literal in place of the host parameter name.">the value as a literal in place of the host parameter name.</param>
 ///<param name=""></param>
 
-		static string sqlite3VdbeExpandSql (Vdbe p, ///
+		public static string sqlite3VdbeExpandSql (Vdbe p, ///
 ///<summary>
 ///The prepared statement being evaluated 
 ///</summary>

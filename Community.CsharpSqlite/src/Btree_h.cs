@@ -37,7 +37,7 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-		const int SQLITE_N_BTREE_META = 10;
+		public const int SQLITE_N_BTREE_META = 10;
 
 		///
 ///<summary>

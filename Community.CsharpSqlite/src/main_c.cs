@@ -883,7 +883,7 @@ break;
 		/// at the b-tree/pager level.
 		///
 		///</summary>
-		static void sqlite3CloseSavepoints(sqlite3 db) {
+		public static void sqlite3CloseSavepoints(sqlite3 db) {
 			while(db.pSavepoint!=null) {
 				Savepoint pTmp=db.pSavepoint;
 				db.pSavepoint=pTmp.pNext;
@@ -1066,7 +1066,7 @@ break;
 		/// Rollback all database files.
 		///
 		///</summary>
-		static void sqlite3RollbackAll(sqlite3 db) {
+		public static void sqlite3RollbackAll(sqlite3 db) {
 			int i;
 			int inTrans=0;
 			Debug.Assert(db.mutex.sqlite3_mutex_held());

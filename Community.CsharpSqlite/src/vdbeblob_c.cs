@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_stmt = Sqlite3.Vdbe;
+	using sqlite3_stmt = Vdbe;
 
 	public partial class Sqlite3
 	{

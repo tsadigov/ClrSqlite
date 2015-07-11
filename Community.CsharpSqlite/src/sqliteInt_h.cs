@@ -34,7 +34,6 @@ namespace Community.CsharpSqlite
 {
     using sqlite3_value = Engine.Mem;
     using Parse = Sqlite3.Parse;
-    using Vdbe = Sqlite3.Vdbe;
     using Community.CsharpSqlite.Ast;
     using Metadata;
     ///<summary>

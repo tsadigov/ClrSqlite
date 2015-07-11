@@ -17,7 +17,6 @@ using System.Diagnostics;
 
 namespace Community.CsharpSqlite.Ast
 {
-    using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     using sqlite3_value = Engine.Mem;
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using Community.CsharpSqlite.Ast;

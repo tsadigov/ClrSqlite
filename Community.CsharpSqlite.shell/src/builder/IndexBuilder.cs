@@ -13,7 +13,6 @@ using u16 = System.UInt16;
 using u32 = System.UInt32;
 using Pgno = System.UInt32;
 using Parse = Community.CsharpSqlite.Sqlite3.Parse;
-using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
 using Community.CsharpSqlite.Ast;
 
 namespace Community.CsharpSqlite.builder

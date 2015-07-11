@@ -361,7 +361,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 		/// defined in pager.h. This function returns the associated lowercase
 		/// journal-mode name.
 		///</summary>
-		static string sqlite3JournalModename(int eMode) {
+		public static string sqlite3JournalModename(int eMode) {
 			string[] azModeName= {
 				"delete",
 				"persist",

@@ -29,9 +29,9 @@ using yDbMask=System.Int32;
 namespace Community.CsharpSqlite
 {
     using Op = VdbeOp;
-    using sqlite3_stmt = Sqlite3.Vdbe;
+    using sqlite3_stmt = Vdbe;
     using sqlite3_value = Engine.Mem;
-    using Vdbe = Sqlite3.Vdbe;
+    
     using System;
     
     using System.Collections.Generic;

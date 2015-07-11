@@ -15,7 +15,6 @@ namespace Community.CsharpSqlite
 {
     using sqlite3_value = Engine.Mem;
     using Metadata;
-    using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     using Community.CsharpSqlite.Ast;
 
     namespace Ast

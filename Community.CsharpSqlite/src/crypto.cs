@@ -7,7 +7,7 @@ using Pgno=System.UInt32;
 namespace Community.CsharpSqlite
 {
     using sqlite3_int64 = System.Int64;
-    using sqlite3_stmt = Sqlite3.Vdbe;
+    using sqlite3_stmt = Vdbe;
     using System.Security.Cryptography;
     using System.IO;
     using Community.CsharpSqlite.Os;

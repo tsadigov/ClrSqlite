@@ -8,7 +8,6 @@ namespace Community.CsharpSqlite
 {
     using Community.CsharpSqlite.Engine;
     using System.Diagnostics;
-    using Vdbe = Sqlite3.Vdbe;
 
     public static class Extensions
     {

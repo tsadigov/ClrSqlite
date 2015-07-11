@@ -7,7 +7,7 @@ namespace Community.CsharpSqlite
 {
     using Community.CsharpSqlite.builder;
     using sqlite3_int64 = System.Int64;
-    using sqlite3_stmt = Sqlite3.Vdbe;
+    using sqlite3_stmt = Vdbe;
     using Metadata;
     using Community.CsharpSqlite.Os;
 
@@ -192,7 +192,7 @@ namespace Community.CsharpSqlite
 ///code may be ignored.
 ///</summary>
 
-		static SqlResult sqlite3AnalysisLoad (sqlite3 db, int iDb)
+		public static SqlResult sqlite3AnalysisLoad (sqlite3 db, int iDb)
 		{
 			analysisInfo sInfo;
 			HashElem i;

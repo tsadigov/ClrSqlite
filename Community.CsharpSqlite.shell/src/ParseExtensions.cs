@@ -5,7 +5,6 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
-    using Vdbe = Community.CsharpSqlite.Sqlite3.Vdbe;
     using Parse=Community.CsharpSqlite.Sqlite3.Parse;
     using Metadata;
     using Community.CsharpSqlite.Os;
@@ -22,7 +21,7 @@ namespace Community.CsharpSqlite
                 Vdbe v = pParse.pVdbe;
                 if (v == null)
                 {
-                    v = pParse.pVdbe = Sqlite3.Vdbe.Create(pParse.db);
+                    v = pParse.pVdbe = Vdbe.Create(pParse.db);
 #if !SQLITE_OMIT_TRACE
                     if (v != null)
                     {

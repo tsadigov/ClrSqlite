@@ -27,7 +27,7 @@ namespace Community.CsharpSqlite.Engine
         ///3rd input operand 
         public Mem pOut = null;
         public int opcodeIndex;
-        public Community.CsharpSqlite.Sqlite3.Vdbe vdbe;
+        public Vdbe vdbe;
         public OnConstraintError errorAction;
         public int iCompare;
     }
