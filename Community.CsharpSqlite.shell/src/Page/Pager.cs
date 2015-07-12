@@ -11,7 +11,7 @@ using Pgno = System.UInt32;
 using sqlite3_int64 = System.Int64;
 
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Paging
 {
     using System.Text;
     using DbPage = PgHdr;

@@ -15,8 +15,8 @@ using u32 = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using DbPage = PgHdr;
-	using sqlite3_pcache = PCache1;
+	using DbPage = Paging.PgHdr;
+	using sqlite3_pcache = Paging.PCache1;
 	using sqlite3_stmt = Engine.Vdbe;
     using sqlite3_value = Engine.Mem;
     using codec_ctx=crypto.codec_ctx;
@@ -24,6 +24,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Ast;
     using Metadata;
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Paging;
 
 
 
@@ -133,20 +134,7 @@ namespace Community.CsharpSqlite
 
 
 
-    ///
-    ///<summary>
-    ///FUNCTIONS
-    ///
-    ///
-    ///</summary>
 
-    public delegate void dxFunc(sqlite3_context ctx, int intValue, sqlite3_value[] value);
-
-    public delegate void dxStep(sqlite3_context ctx, int intValue, sqlite3_value[] value);
-
-    public delegate void dxFinal(sqlite3_context ctx);
-
-    public delegate void dxFDestroy(object pArg);
 
 
 
@@ -328,29 +316,31 @@ namespace Community.CsharpSqlite
 ///Callback for SELECTs 
 ///</summary>
 
-		// pcache Methods
-		public delegate SqlResult dxPC_Init (object NotUsed);
+        namespace Paging
+        {
+            // pcache Methods
+            public delegate SqlResult dxPC_Init(object NotUsed);
 
-		public delegate void dxPC_Shutdown (object NotUsed);
+            public delegate void dxPC_Shutdown(object NotUsed);
 
-		public delegate sqlite3_pcache dxPC_Create (int szPage, bool bPurgeable);
+            public delegate sqlite3_pcache dxPC_Create(int szPage, bool bPurgeable);
 
-		public delegate void dxPC_Cachesize (sqlite3_pcache pCache, int nCachesize);
+            public delegate void dxPC_Cachesize(sqlite3_pcache pCache, int nCachesize);
 
-		public delegate int dxPC_Pagecount (sqlite3_pcache pCache);
+            public delegate int dxPC_Pagecount(sqlite3_pcache pCache);
 
-		public delegate PgHdr dxPC_Fetch (sqlite3_pcache pCache, u32 key, int createFlag);
+            public delegate PgHdr dxPC_Fetch(sqlite3_pcache pCache, u32 key, int createFlag);
 
-		public delegate void dxPC_Unpin (sqlite3_pcache pCache, PgHdr p2, bool discard);
+            public delegate void dxPC_Unpin(sqlite3_pcache pCache, PgHdr p2, bool discard);
 
-		public delegate void dxPC_Rekey (sqlite3_pcache pCache, PgHdr p2, u32 oldKey, u32 newKey);
+            public delegate void dxPC_Rekey(sqlite3_pcache pCache, PgHdr p2, u32 oldKey, u32 newKey);
 
-		public delegate void dxPC_Truncate (sqlite3_pcache pCache, u32 iLimit);
+            public delegate void dxPC_Truncate(sqlite3_pcache pCache, u32 iLimit);
 
-		public delegate void dxPC_Destroy (ref sqlite3_pcache pCache);
+            public delegate void dxPC_Destroy(ref sqlite3_pcache pCache);
 
-		public delegate void dxIter (PgHdr p);
-
+            public delegate void dxIter(PgHdr p);
+        }
 
         public partial class Sqlite3
         {

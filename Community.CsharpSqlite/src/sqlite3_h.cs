@@ -5850,64 +5850,66 @@ namespace Community.CsharpSqlite
     //  void (*xTruncate)(sqlite3_pcache*, unsigned iLimit);
     //  void (*xDestroy)(sqlite3_pcache);
     //};
-    public class sqlite3_pcache_methods
+    namespace Paging
     {
-        public object pArg;
-
-        dxPC_Init m_xInit;
-        public dxPC_Init xInit
+        public class sqlite3_pcache_methods
         {
-            get { return m_xInit; }
-            set { m_xInit = value; }
-        }
+            public object pArg;
 
-        //int (*xInit)(void);
-        public dxPC_Shutdown xShutdown;
+            dxPC_Init m_xInit;
+            public dxPC_Init xInit
+            {
+                get { return m_xInit; }
+                set { m_xInit = value; }
+            }
 
-        //public void (*xShutdown)(void);
-        public dxPC_Create xCreate;
+            //int (*xInit)(void);
+            public dxPC_Shutdown xShutdown;
 
-        //public sqlite3_pcache *(*xCreate)(int szPage, int bPurgeable);
-        public dxPC_Cachesize xCachesize;
+            //public void (*xShutdown)(void);
+            public dxPC_Create xCreate;
 
-        //public void (*xCachesize)(sqlite3_pcache*, int nCachesize);
-        public dxPC_Pagecount xPagecount;
+            //public sqlite3_pcache *(*xCreate)(int szPage, int bPurgeable);
+            public dxPC_Cachesize xCachesize;
 
-        //public int (*xPagecount)(sqlite3_pcache);
-        public dxPC_Fetch xFetch;
+            //public void (*xCachesize)(sqlite3_pcache*, int nCachesize);
+            public dxPC_Pagecount xPagecount;
 
-        //public void *(*xFetch)(sqlite3_pcache*, unsigned key, int createFlag);
-        public dxPC_Unpin xUnpin;
+            //public int (*xPagecount)(sqlite3_pcache);
+            public dxPC_Fetch xFetch;
 
-        //public void (*xUnpin)(sqlite3_pcache*, void*, int discard);
-        public dxPC_Rekey xRekey;
+            //public void *(*xFetch)(sqlite3_pcache*, unsigned key, int createFlag);
+            public dxPC_Unpin xUnpin;
 
-        //public void (*xRekey)(sqlite3_pcache*, void*, unsigned oldKey, unsigned newKey);
-        public dxPC_Truncate xTruncate;
+            //public void (*xUnpin)(sqlite3_pcache*, void*, int discard);
+            public dxPC_Rekey xRekey;
 
-        //public void (*xTruncate)(sqlite3_pcache*, unsigned iLimit);
-        public dxPC_Destroy xDestroy;
+            //public void (*xRekey)(sqlite3_pcache*, void*, unsigned oldKey, unsigned newKey);
+            public dxPC_Truncate xTruncate;
 
-        //public void (*xDestroy)(sqlite3_pcache);
-        public sqlite3_pcache_methods()
-        {
-        }
+            //public void (*xTruncate)(sqlite3_pcache*, unsigned iLimit);
+            public dxPC_Destroy xDestroy;
 
-        public sqlite3_pcache_methods(object pArg, dxPC_Init xInit, dxPC_Shutdown xShutdown, dxPC_Create xCreate, dxPC_Cachesize xCachesize, dxPC_Pagecount xPagecount, dxPC_Fetch xFetch, dxPC_Unpin xUnpin, dxPC_Rekey xRekey, dxPC_Truncate xTruncate, dxPC_Destroy xDestroy)
-        {
-            this.pArg = pArg;
-            this.xInit = xInit;
-            this.xShutdown = xShutdown;
-            this.xCreate = xCreate;
-            this.xCachesize = xCachesize;
-            this.xPagecount = xPagecount;
-            this.xFetch = xFetch;
-            this.xUnpin = xUnpin;
-            this.xRekey = xRekey;
-            this.xTruncate = xTruncate;
-            this.xDestroy = xDestroy;
-        }
-    };
+            //public void (*xDestroy)(sqlite3_pcache);
+            public sqlite3_pcache_methods()
+            {
+            }
 
+            public sqlite3_pcache_methods(object pArg, dxPC_Init xInit, dxPC_Shutdown xShutdown, dxPC_Create xCreate, dxPC_Cachesize xCachesize, dxPC_Pagecount xPagecount, dxPC_Fetch xFetch, dxPC_Unpin xUnpin, dxPC_Rekey xRekey, dxPC_Truncate xTruncate, dxPC_Destroy xDestroy)
+            {
+                this.pArg = pArg;
+                this.xInit = xInit;
+                this.xShutdown = xShutdown;
+                this.xCreate = xCreate;
+                this.xCachesize = xCachesize;
+                this.xPagecount = xPagecount;
+                this.xFetch = xFetch;
+                this.xUnpin = xUnpin;
+                this.xRekey = xRekey;
+                this.xTruncate = xTruncate;
+                this.xDestroy = xDestroy;
+            }
+        };
+    }
 	
 }

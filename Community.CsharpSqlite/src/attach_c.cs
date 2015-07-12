@@ -9,6 +9,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Paging;
 	public partial class Sqlite3 {
 		#if !SQLITE_OMIT_ATTACH
 		///<summary>

@@ -18,7 +18,7 @@ using ynVar=System.Int16;
 #else
 using ynVar = System.Int32; 
 #endif
-namespace Community.CsharpSqlite {
+namespace Community.CsharpSqlite.Ast {
     using Parse = Sqlite3.Parse;
     using Metadata;
     using Engine;

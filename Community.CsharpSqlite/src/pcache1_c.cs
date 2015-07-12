@@ -4,9 +4,11 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using sqlite3_pcache = PCache1;
+	using sqlite3_pcache = Paging.PCache1;
+    using Community.CsharpSqlite.Paging;
 
-	
+    namespace Paging
+    { 
 		///<summary>
 		/// 2008 November 05
 		///
@@ -112,8 +114,8 @@ namespace Community.CsharpSqlite
 				mutex = new sqlite3_mutex ();
 			}
 		};
-        
 
+       
 		///<summary>
 		///Each page cache is an instance of the following object.  Every
 		/// open database file (including each in-memory database and each
@@ -227,6 +229,7 @@ namespace Community.CsharpSqlite
 			}
 		};
 
+
         
 		///<summary>
 		/// Each cache entry is represented by an instance of the following
@@ -286,7 +289,7 @@ namespace Community.CsharpSqlite
 				this.pPgHdr.Clear ();
 			}
 		};
-
+    }
     
 		///<summary>
 		/// Free slots in the allocator used to divide up the buffer provided using

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Linq;
 using Bitmask = System.UInt64;
 using i16 = System.Int16;
 using i64 = System.Int64;
@@ -21,17 +22,7 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-	public static class MyHelpers
-	{
-		public static VdbeFrame GetRoot (this VdbeFrame _this)
-		{
-			VdbeFrame pFrame = null;
-			if (null != pFrame)
-				for (pFrame = _this; pFrame.pParent != null; pFrame = pFrame.pParent)
-					;
-			return pFrame;
-		}
-	}
+	
 
     public partial class CharExtensions
     {

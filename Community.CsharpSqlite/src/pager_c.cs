@@ -11,7 +11,7 @@ using sqlite3_int64 = System.Int64;
 namespace Community.CsharpSqlite
 {
     using System.Text;
-    using DbPage = PgHdr;
+    using DbPage = Paging.PgHdr;
     using Community.CsharpSqlite.Os;
     using _Custom = Sqlite3._Custom;
     public partial class Sqlite3
@@ -146,6 +146,8 @@ static void PAGERTRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace 
 
         
     }
+
+    namespace Paging{
     public class PagerMethods
     {
         ///
@@ -2571,5 +2573,5 @@ return aData;
 #endif
 
     }
-
+        }
 }

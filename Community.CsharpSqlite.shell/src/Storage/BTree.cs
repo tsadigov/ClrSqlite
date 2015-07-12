@@ -9,10 +9,11 @@ using u64=System.UInt64;
 using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
-	using DbPage=PgHdr;
+	using DbPage=Paging.PgHdr;
 	using System.Text;
     using Metadata;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Paging;
 
 
 

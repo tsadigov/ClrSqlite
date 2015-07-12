@@ -13,11 +13,11 @@ using Pgno = System.UInt32;
 using i32 = System.Int32;
 
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Engine
 {
 
 
-    using Op = Engine.VdbeOp;
+    using Operation = Engine.VdbeOp;
     using Community.CsharpSqlite.Engine;
 
     //typedef struct VdbeCursor VdbeCursor;
@@ -76,7 +76,7 @@ namespace Community.CsharpSqlite
             }
         }
 
-        public Op[] aOp;
+        public Operation[] aOp;
 
         ///
         ///<summary>

@@ -7,10 +7,11 @@ using u32=System.UInt32;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
 	using sqlite3_int64=System.Int64;
-	using DbPage=PgHdr;
+	using DbPage=Paging.PgHdr;
     using Os;
     using builder;
     using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Paging;
 	public partial class Sqlite3 {
 		///
 		///<summary>

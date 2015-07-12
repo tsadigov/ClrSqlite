@@ -11,6 +11,14 @@ namespace Community.CsharpSqlite
 
     public static class Extensions
     {
+        public static Engine.VdbeFrame GetRoot(this Engine.VdbeFrame _this)
+        {
+            Engine.VdbeFrame pFrame = null;
+            if (null != pFrame)
+                pFrame = MyLinqExtensions.path(pFrame, x => x.pParent).Last();
+
+            return pFrame;
+        }
         ///<summary>
         /// Try to convert a value into a numeric representation if we can
         /// do so without loss of information.  In other words, if the string

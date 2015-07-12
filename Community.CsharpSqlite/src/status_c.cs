@@ -4,6 +4,7 @@ using System.Text;
 namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Parsing;
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Utils;

@@ -6,16 +6,34 @@ using i64=System.Int64;
 using u8=System.Byte;
 using u32=System.UInt32;
 using u64=System.UInt64;
-namespace Community.CsharpSqlite {
+namespace Community.CsharpSqlite.Metadata {
     using sqlite3_value = Engine.Mem;
 	using sqlite_int64=System.Int64;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
-    using _Custom = Sqlite3._Custom;    
+    using _Custom = Sqlite3._Custom;
+
+    ///
+    ///<summary>
+    ///FUNCTIONS
+    ///
+    ///
+    ///</summary>
+
+    public delegate void dxFunc(sqlite3_context ctx, int intValue, sqlite3_value[] value);
+
+    public delegate void dxStep(sqlite3_context ctx, int intValue, sqlite3_value[] value);
+
+    public delegate void dxFinal(sqlite3_context ctx);
+
+    public delegate void dxFDestroy(object pArg);
+
         public class PredefinedFunctions
         {
+
+            
             ///<summary>
             /// 2002 February 23
             ///
@@ -1421,62 +1439,35 @@ break;
             ///
             ///</summary>
             static void trimFunc(sqlite3_context context, int argc, sqlite3_value[] argv)
-            {
-                string zIn;
-                ///
-                ///<summary>
-                ///Input string 
-                ///</summary>
+            {   
                 string zCharSet;
-                ///
-                ///<summary>
                 ///Set of characters to trim 
-                ///</summary>
-                int nIn;
-                ///
-                ///<summary>
-                ///Number of bytes in input 
-                ///</summary>
+                
                 int izIn = 0;
-                ///
-                ///<summary>
                 ///C# string pointer 
-                ///</summary>
                 int flags;
-                ///
-                ///<summary>
                 ///1: trimleft  2: trimright  3: trim 
-                ///</summary>
-                int i;
-                ///
-                ///<summary>
-                ///Loop counter 
-                ///</summary>
+
                 int[] aLen = null;
-                ///
-                ///<summary>
                 ///Length of each character in zCharSet 
-                ///</summary>
                 byte[][] azChar = null;
-                ///
-                ///<summary>
                 ///Individual characters in zCharSet 
-                ///</summary>
                 int nChar = 0;
-                ///
-                ///<summary>
                 ///Number of characters in zCharSet 
-                ///</summary>
                 byte[] zBytes = null;
                 byte[] zBlob = null;
                 if (vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL)
                 {
                     return;
                 }
-                zIn = vdbeapi.sqlite3_value_text(argv[0]);
+
+                ///Input string 
+                var zIn = vdbeapi.sqlite3_value_text(argv[0]);
                 if (zIn == null)
                     return;
-                nIn = vdbeapi.sqlite3_value_bytes(argv[0]);
+
+                ///Number of bytes in input 
+                var nIn = vdbeapi.sqlite3_value_bytes(argv[0]);
                 zBlob = vdbeapi.sqlite3_value_blob(argv[0]);
                 //Debug.Assert( zIn == vdbeapi.sqlite3_value_text( argv[0] ) );
                 if (argc == 1)
@@ -1539,6 +1530,8 @@ break;
                         while (nIn > 0)
                         {
                             int len = 0;
+                            int i;
+                            ///Loop counter 
                             for (i = 0; i < nChar; i++)
                             {
                                 len = aLen[i];
@@ -1556,6 +1549,8 @@ break;
                         while (nIn > 0)
                         {
                             int len = 0;
+                            int i;
+                            ///Loop counter 
                             for (i = 0; i < nChar; i++)
                             {
                                 len = aLen[i];
@@ -1573,7 +1568,7 @@ break;
                     }
                 }
                 StringBuilder sb = new StringBuilder(nIn);
-                for (i = 0; i < nIn; i++)
+                for (int i = 0; i < nIn; i++)
                     sb.Append((char)zBlob[izIn + i]);
                 context.sqlite3_result_text(sb, nIn, Sqlite3.SQLITE_TRANSIENT);
             }

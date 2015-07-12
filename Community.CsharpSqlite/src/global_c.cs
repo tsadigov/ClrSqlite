@@ -6,6 +6,7 @@ namespace Community.CsharpSqlite
 {
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Paging;
     using sqlite3_value = Engine.Mem;
 
 	public partial class Sqlite3

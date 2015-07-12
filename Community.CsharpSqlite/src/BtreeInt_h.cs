@@ -11,12 +11,13 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using DbPage = PgHdr;
+	using DbPage = Paging.PgHdr;
 	using System.Text;
     using Metadata;
     using Community.CsharpSqlite.Os;
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Paging;
     ///<summary>
     /// Btree.inTrans may take one of the following values.
     ///

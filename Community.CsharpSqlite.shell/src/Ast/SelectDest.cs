@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Ast
 {
     ///<summary>
     /// A structure used to customize the behavior of sqlite3Select(). See

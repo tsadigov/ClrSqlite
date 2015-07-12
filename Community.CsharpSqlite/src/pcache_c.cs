@@ -4,7 +4,7 @@ using System.Text;
 using u32 = System.UInt32;
 using Pgno = System.UInt32;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Paging
 {
     using sqlite3_value = Engine.Mem;
 	using sqlite3_pcache = PCache1;
@@ -113,9 +113,7 @@ namespace Community.CsharpSqlite
         }
     };
 
-    public partial class Sqlite3
-    {
-    }
+   
         ///<summary>
         /// 2008 August 05
         ///

@@ -52,6 +52,7 @@ namespace Community.CsharpSqlite
     {
         using Operation = VdbeOp;
         using Community.CsharpSqlite.tree;
+        using Community.CsharpSqlite.Paging;
         ///
         ///<summary>
         ///An instance of the virtual machine.  This structure contains the complete

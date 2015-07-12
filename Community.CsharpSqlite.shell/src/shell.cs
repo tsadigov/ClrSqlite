@@ -1549,7 +1549,7 @@ if( db ) sqlite3_interrupt(db);
 			Sqlite3.sqlite3_open (p.zDbFilename, out p.db);
 			db = p.db;
 			if (db != null && Sqlite3.sqlite3_errcode (db) == SqlResult.SQLITE_OK) {
-				Sqlite3.sqlite3_create_function (db, "shellstatic", 0, SqliteEncoding.UTF8, 0, (dxFunc)shellstaticFunc, null, null);
+				Sqlite3.sqlite3_create_function (db, "shellstatic", 0, SqliteEncoding.UTF8, 0, (Community.CsharpSqlite.Metadata.dxFunc)shellstaticFunc, null, null);
 			}
 			if (db == null || SqlResult.SQLITE_OK != Sqlite3.sqlite3_errcode (db)) {
 				fprintf (stderr, "Unable to open database \"%s\": %s\n", p.zDbFilename, Sqlite3.sqlite3_errmsg (db));
