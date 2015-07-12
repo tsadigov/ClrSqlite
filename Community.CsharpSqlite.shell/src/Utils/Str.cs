@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Community.CsharpSqlite.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using u32=System.UInt32;
+using u32 = System.UInt32;
 
 namespace Community.CsharpSqlite
 {

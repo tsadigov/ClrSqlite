@@ -5,6 +5,7 @@ using Pgno=System.UInt32;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.tree;
     using sqlite3_stmt = Engine.Vdbe;
 	public partial class Sqlite3 {
 		///<summary>

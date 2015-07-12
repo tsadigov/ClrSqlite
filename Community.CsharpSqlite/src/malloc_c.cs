@@ -11,6 +11,7 @@ namespace Community.CsharpSqlite
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.tree;
    
         public class malloc_cs
         {

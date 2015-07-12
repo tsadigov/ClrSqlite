@@ -51,6 +51,7 @@ namespace Community.CsharpSqlite
     namespace Engine
     {
         using Operation = VdbeOp;
+        using Community.CsharpSqlite.tree;
         ///
         ///<summary>
         ///An instance of the virtual machine.  This structure contains the complete

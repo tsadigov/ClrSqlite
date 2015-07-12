@@ -13,11 +13,7 @@ namespace Community.CsharpSqlite {
 	using System.Text;
     using Metadata;
     using Community.CsharpSqlite.Os;
-    public partial class Sqlite3
-    {
 
-
-    }
 
 
         ///
@@ -44,10 +40,12 @@ namespace Community.CsharpSqlite {
         ///they often do so without holding sqlite3.mutex.
         ///
         ///</summary>
+    namespace tree
+    {
         public class Btree
         {
-            
-            
+
+
 
             public Btree()
             {
@@ -55,7 +53,7 @@ namespace Community.CsharpSqlite {
             }
 
 
-            public SqlResult sqlite3BtreeCreateTable( ref int piTable, int flags)
+            public SqlResult sqlite3BtreeCreateTable(ref int piTable, int flags)
             {
                 SqlResult rc;
                 this.sqlite3BtreeEnter();
@@ -104,7 +102,7 @@ namespace Community.CsharpSqlite {
                 ///</summary>
             )
             {
-                
+
                 ///Handle to return 
                 Btree createdBTreeInstance;
                 ///Prevents a race condition. Ticket #3537 
@@ -130,10 +128,10 @@ namespace Community.CsharpSqlite {
                 Debug.Assert(db.mutex.sqlite3_mutex_held());
                 Debug.Assert((flags & 0xff) == flags);
                 ///flags fit in 8 bits 
-                
+
                 ///Only a BTREE_SINGLE database can be BTREE_UNORDERED 
                 Debug.Assert((flags & Sqlite3.BTREE_UNORDERED) == 0 || (flags & Sqlite3.BTREE_SINGLE) != 0);
-                
+
                 ///A BTREE_SINGLE database is always a temporary and/or ephemeral 
                 Debug.Assert((flags & Sqlite3.BTREE_SINGLE) == 0 || isTempDb);
                 if ((db.flags & SqliteFlags.SQLITE_NoReadlock) != 0)
@@ -1436,7 +1434,7 @@ sqlite3BtreeTripAllCursors(p, rc);
             }
             public SqlResult sqlite3BtreeBeginStmt(int iStatement)
             {
-                SqlResult  rc;
+                SqlResult rc;
                 BtShared pBt = this.pBt;
                 this.sqlite3BtreeEnter();
                 Debug.Assert(this.inTrans == TransType.TRANS_WRITE);
@@ -1591,9 +1589,9 @@ sqlite3BtreeTripAllCursors(p, rc);
                 return this.pBt.pPager;
             }
         }
-        
-       
 
+
+    
 
 
 
@@ -1629,4 +1627,5 @@ sqlite3BtreeTripAllCursors(p, rc);
         public static byte USER_VERSION = 6;
         public static byte INCR_VACUUM = 7;
     }
+}
 }

@@ -13,6 +13,7 @@ using _Custom=Community.CsharpSqlite.Sqlite3._Custom;
 namespace Community.CsharpSqlite
 {
     using DbPage = PgHdr;
+    using tree;
 
     public partial class Sqlite3
     {
@@ -63,6 +64,10 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
 #endif
     }
 
+
+
+    namespace tree
+    {
         public static class BTreeMethods
         {
             //# define sqlite3BtreeLeave(X)
@@ -779,7 +784,7 @@ static u16 cellSize( MemPage pPage, int iCell )
             public static void pageReinit(DbPage pData)
             {
                 MemPage pPage;
-                pPage =  PagerMethods.sqlite3PagerGetExtra (pData);
+                pPage = PagerMethods.sqlite3PagerGetExtra(pData);
                 Debug.Assert(pData.sqlite3PagerPageRefcount() > 0);
                 if (pPage.isInit != false)
                 {
@@ -3827,5 +3832,5 @@ pCur.isIncrblobHandle = 1;
             ///header to iVersion.
             ///</summary>
         }
-    
+    }
 }

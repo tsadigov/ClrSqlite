@@ -12,6 +12,9 @@ namespace Community.CsharpSqlite {
     using Metadata;
     using Vdbe = Engine.Vdbe;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Utils;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2003 April 6
@@ -1359,7 +1362,7 @@ else
 																								///</summary>
 																								if(zLeft.Equals("case_sensitive_like",StringComparison.InvariantCultureIgnoreCase)) {
 																									if(zRight!=null) {
-																										func.sqlite3RegisterLikeFunctions(db,sqlite3GetBoolean(zRight));
+																										PredefinedFunctions.sqlite3RegisterLikeFunctions(db,sqlite3GetBoolean(zRight));
 																									}
 																								}
 																								else

@@ -6,11 +6,13 @@ using u8 = System.Byte;
 using u32 = System.UInt32;
 using u64 = System.UInt64;
 using Pgno = System.UInt32;
+using Community.CsharpSqlite;
+using sqlite_int64 = System.Int64;
 
-namespace Community.CsharpSqlite
+namespace Community
 {
+    namespace CsharpSqlite{
     using Metadata;
-	using sqlite_int64 = System.Int64;
 	using System.Globalization;
     using System.Collections.Generic;
     using _Custom=Sqlite3._Custom;
@@ -345,12 +347,7 @@ namespace Community.CsharpSqlite
 		}
 	#endif
 	}
-    public partial class Sqlite3
-    {
-        
-    }
-
-
+ 
 
 
 
@@ -1476,6 +1473,7 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 }
 #endif
     }
+}
     //--------------------------------------------------------- 
     public  static class Converter
 	{
@@ -2162,4 +2160,6 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 
 
 	}
+
+
 }

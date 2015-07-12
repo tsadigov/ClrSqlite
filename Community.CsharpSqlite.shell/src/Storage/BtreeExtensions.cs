@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.tree
 {
 	public static class BtreeExtensions
 	{

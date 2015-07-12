@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
 using Bitmask = System.UInt64;
@@ -33,6 +32,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
 
         ///
         ///<summary>

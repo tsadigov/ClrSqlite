@@ -11,6 +11,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.tree;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2005 May 25

@@ -95,7 +95,7 @@ namespace Community.CsharpSqlite
             ///Name of this database  
             ///</summary>
 
-            public Btree pBt;
+            public tree.Btree pBt;
 
             ///
             ///<summary>

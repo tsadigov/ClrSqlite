@@ -10,7 +10,10 @@ using System.Threading.Tasks;
 using Parse = Community.CsharpSqlite.Sqlite3.Parse;
 namespace Community.CsharpSqlite.builder
 {
+    using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Utils;
     using Metadata;
         public static class TableBuilder
         {

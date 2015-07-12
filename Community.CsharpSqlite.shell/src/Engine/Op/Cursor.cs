@@ -8,6 +8,7 @@ namespace Community.CsharpSqlite.Engine.Op
 {
 
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.tree;
     using Metadata;
     public static class Cursor
     {

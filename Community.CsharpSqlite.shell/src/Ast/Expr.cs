@@ -2,7 +2,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
 using Bitmask = System.UInt64;
@@ -27,6 +26,7 @@ using ynVar = System.Int32;
 namespace Community.CsharpSqlite
 {
     using Metadata;
+    using Community.CsharpSqlite.Engine;
 
 
     namespace Ast

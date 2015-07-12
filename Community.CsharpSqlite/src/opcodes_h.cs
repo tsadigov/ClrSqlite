@@ -1,5 +1,7 @@
 namespace Community.CsharpSqlite
 {
+    namespace Engine
+    {
 	public enum OpCode : byte
 	{
 		 OP_Goto = 1,
@@ -306,6 +308,7 @@ namespace Community.CsharpSqlite
 		 OP_NotUsed_139 = 139,
 		 OP_NotUsed_140 = 140
 	}
+    }
 	public partial class Sqlite3
 	{
 

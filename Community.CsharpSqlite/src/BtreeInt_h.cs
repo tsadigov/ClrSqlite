@@ -16,6 +16,7 @@ namespace Community.CsharpSqlite
     using Metadata;
     using Community.CsharpSqlite.Os;
     using _Custom = Sqlite3._Custom;
+    using Community.CsharpSqlite.tree;
     ///<summary>
     /// Btree.inTrans may take one of the following values.
     ///
@@ -648,7 +649,7 @@ namespace Community.CsharpSqlite
 
 
 
-
+    namespace tree { 
     // No used in C#, since we use create a class; was MemPage.Length;
     ///
     ///<summary>
@@ -1263,7 +1264,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 
     }
 
-
+}
     //----------------------------------------------------------------
 
     public partial class Sqlite3

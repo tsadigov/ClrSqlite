@@ -11,6 +11,7 @@ namespace Community.CsharpSqlite
     using System.Security.Cryptography;
     using System.IO;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.tree;
    
         public class crypto
         {
@@ -139,7 +140,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                 //typedef struct {
                 public int mode_rekey;
                 public byte[] buffer;
-                public Btree pBt;
+                public tree.Btree pBt;
                 public cipher_ctx read_ctx;
                 public cipher_ctx write_ctx;
                 public codec_ctx Copy()

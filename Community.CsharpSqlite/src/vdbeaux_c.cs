@@ -40,6 +40,7 @@ namespace Community.CsharpSqlite.Engine
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
     using Metadata;
+    using Community.CsharpSqlite.tree;
     //public partial class Sqlite3
     //{
 

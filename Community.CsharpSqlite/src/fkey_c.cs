@@ -6,6 +6,7 @@ using u8=System.Byte;
 using u32=System.UInt32;
 using Community.CsharpSqlite.Metadata;
 using Community.CsharpSqlite.Ast;
+using Community.CsharpSqlite.Utils;
 namespace Community.CsharpSqlite
 {
         public class fkeyc

@@ -11,6 +11,7 @@ namespace Community.CsharpSqlite
     using Parse = Sqlite3.Parse;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Utils;
     
         //#include "sqliteInt.h"
         ///<summary>

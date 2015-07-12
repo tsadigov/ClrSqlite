@@ -10,6 +10,7 @@ namespace Community.CsharpSqlite {
 	using DbPage=PgHdr;
     using Os;
     using builder;
+    using Community.CsharpSqlite.tree;
 	public partial class Sqlite3 {
 		///
 		///<summary>

@@ -15,6 +15,8 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Utils;
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -259,7 +261,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					sqlite3GlobalFunctions=new FuncDefHash();
 					FuncDefHash pHash=sqlite3GlobalFunctions;
 					#endif
-					func.sqlite3RegisterGlobalFunctions();
+					PredefinedFunctions.sqlite3RegisterGlobalFunctions();
 					if(sqliteinth.sqlite3GlobalConfig.isPCacheInit==0) {
 						rc=PCacheMethods.sqlite3PcacheInitialize();
 					}
@@ -2725,7 +2727,7 @@ return z;
 			///<param name="is accessed.">is accessed.</param>
 			///<param name=""></param>
 			utilc.sqlite3Error(db,SqlResult.SQLITE_OK,0);
-			func.sqlite3RegisterBuiltinFunctions(db);
+			PredefinedFunctions.sqlite3RegisterBuiltinFunctions(db);
 			///
 			///<summary>
 			///</summary>

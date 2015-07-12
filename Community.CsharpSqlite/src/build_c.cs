@@ -29,6 +29,9 @@ namespace Community.CsharpSqlite
     using Metadata;
     using Vdbe = Engine.Vdbe;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Utils;
     //public partial class Sqlite3
     //{
     public static class build

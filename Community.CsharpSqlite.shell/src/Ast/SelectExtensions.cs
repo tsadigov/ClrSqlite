@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Community.CsharpSqlite
 {
+    using Ast;
     public static class SelectExtensions
     {
         public static void heightOfSelect(this Select _this,ref int pnHeight)

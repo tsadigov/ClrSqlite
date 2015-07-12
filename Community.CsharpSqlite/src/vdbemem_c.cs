@@ -928,7 +928,7 @@ return r;
             /// to read from the disk) then the pMem is left in an inconsistent state.
             ///
             ///</summary>
-            public static SqlResult sqlite3VdbeMemFromBtree(BtCursor pCur,///
+            public static SqlResult sqlite3VdbeMemFromBtree(tree.BtCursor pCur,///
                 ///<summary>
                 ///Cursor pointing at record to retrieve. 
                 ///</summary>

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using u8=System.Byte;
 using u32=System.UInt32;
-namespace Community.CsharpSqlite {
+namespace Community.CsharpSqlite.Utils {
 	public static partial class HashExtensions {
 		
 		public static void sqlite3HashClear(this Hash pH) {

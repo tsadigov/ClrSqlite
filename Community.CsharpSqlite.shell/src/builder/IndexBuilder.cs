@@ -20,6 +20,8 @@ namespace Community.CsharpSqlite.builder
     using Metadata;
     using Vdbe=Engine.Vdbe;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Utils;
     public static class IndexBuilder
     {
 

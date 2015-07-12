@@ -14,7 +14,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
     using _Custom = Sqlite3._Custom;    
-        public class func
+        public class PredefinedFunctions
         {
             ///<summary>
             /// 2002 February 23

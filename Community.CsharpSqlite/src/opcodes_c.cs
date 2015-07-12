@@ -22,7 +22,7 @@ namespace Community.CsharpSqlite
 		///See the mkopcodec.awk script for details.
 		///</summary>
 		#if !SQLITE_OMIT_EXPLAIN || !NDEBUG || VDBE_PROFILE || SQLITE_DEBUG
-		public static string sqlite3OpcodeName (OpCode opcode)
+		public static string sqlite3OpcodeName (Engine.OpCode opcode)
 		{
 			return sqlite3OpcodeName ((int)opcode);
 		}

@@ -8,6 +8,7 @@ using System.Text;
 namespace Community.CsharpSqlite
 {
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.tree;
         public class mempoolMethods
         {
 
@@ -372,7 +373,7 @@ namespace Community.CsharpSqlite
             {
             }
 
-            public static BtCursor sqlite3MemMallocBtCursor(BtCursor dummy)
+            public static tree.BtCursor sqlite3MemMallocBtCursor(BtCursor dummy)
             {
                 return new BtCursor();
             }

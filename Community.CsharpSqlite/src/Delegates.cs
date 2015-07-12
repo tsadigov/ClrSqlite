@@ -206,7 +206,7 @@ namespace Community.CsharpSqlite
 		//
 		public delegate string dxColname (sqlite3_value pVal);
 
-		public delegate int dxFuncBtree (Btree p);
+		public delegate int dxFuncBtree (tree.Btree p);
 
 		public delegate int dxExprTreeFunction (ref int pArg, Expr pExpr);
 

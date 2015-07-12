@@ -8,12 +8,11 @@ using u32=System.UInt32;
 using u64=System.UInt64;
 using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
-namespace Community.CsharpSqlite {
+namespace Community.CsharpSqlite.tree {
 	using DbPage=PgHdr;
 	using System.Text;
     using Metadata;
-	public partial class Sqlite3 {
-    }
+
         ///
         ///<summary>
         ///A cursor is a pointer to a particular entry within a particular

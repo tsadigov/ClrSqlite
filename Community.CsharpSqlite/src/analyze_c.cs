@@ -10,6 +10,7 @@ namespace Community.CsharpSqlite
     using sqlite3_stmt = Engine.Vdbe;
     using Metadata;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Utils;
 
 	public partial class Sqlite3
 	{

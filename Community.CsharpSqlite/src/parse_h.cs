@@ -11,7 +11,6 @@
 namespace Community.CsharpSqlite {
 	using System;
 	using System.Diagnostics;
-	using System.Reflection.Emit;
 	using System.Runtime.InteropServices;
 	using System.Text;
 	using Bitmask=System.UInt64;
@@ -48,6 +47,8 @@ using System.Collections.Generic;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Utils;
 	#endif
 	public partial class Sqlite3 {
 		public class Parse {
@@ -8689,7 +8690,7 @@ return;
 				///<summary>
 				///Opcode of pRight 
 				///</summary>
-				if(!func.sqlite3IsLikeFunction(db,pExpr,ref pnoCase,wc)) {
+				if(!PredefinedFunctions.sqlite3IsLikeFunction(db,pExpr,ref pnoCase,wc)) {
 					return 0;
 				}
 				//#if SQLITE_EBCDIC

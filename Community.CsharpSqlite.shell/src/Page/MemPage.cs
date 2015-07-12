@@ -14,6 +14,7 @@ namespace Community.CsharpSqlite
 	using DbPage = PgHdr;
 	using System.Text;
     using System.Linq;
+    using Community.CsharpSqlite.tree;
     
 
         ///[---hdr|first block location:x-----next block location:y|current free size of x--------next block location:z|crrent free size of y]
@@ -181,7 +182,7 @@ namespace Community.CsharpSqlite
 
 			public _OvflCell[] aOvfl = new _OvflCell[5];
 
-			public BtShared pBt;
+			public tree.BtShared pBt;
 
             public class Offsets
             {

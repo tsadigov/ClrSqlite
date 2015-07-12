@@ -11,6 +11,8 @@ namespace Community.CsharpSqlite.Parsing
     using Metadata;
     using Os;
     using Vdbe = Engine.Vdbe;
+    using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Utils;
     public static partial class TriggerParser
     {
 

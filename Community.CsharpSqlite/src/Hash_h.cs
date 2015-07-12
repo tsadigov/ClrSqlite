@@ -2,7 +2,7 @@ using u8=System.Byte;
 using u32=System.UInt32;
 using System;
 using System.Diagnostics;
-namespace Community.CsharpSqlite {
+namespace Community.CsharpSqlite.Utils {
 	
 		///
 		///<summary>

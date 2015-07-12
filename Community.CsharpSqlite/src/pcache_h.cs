@@ -429,7 +429,7 @@ public static class PGHDR{
 			{
 			}
 
-			public MemPage btreePageFromDbPage (Pgno pgno, BtShared pBt)
+			public MemPage btreePageFromDbPage (Pgno pgno, tree.BtShared pBt)
 			{
 				MemPage pPage = (MemPage) PagerMethods.sqlite3PagerGetExtra(this);
                 pPage.aData = this.sqlite3PagerGetData();

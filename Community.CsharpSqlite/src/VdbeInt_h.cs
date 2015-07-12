@@ -37,6 +37,7 @@ namespace Community.CsharpSqlite
     using sqlite3_value = Engine.Mem;
 	using System.Collections.Generic;
     using Metadata;
+    using Community.CsharpSqlite.tree;
     ///<summary>
     ///A cursor is a pointer into a single BTree within a database file.
     ///The cursor can seek to a BTree entry with a particular key, or
@@ -48,215 +49,216 @@ namespace Community.CsharpSqlite
     ///instance of the following structure.
     ///
     ///</summary>
-
-    public class VdbeCursor
+    namespace Engine
     {
-        public VdbeCursor()
+        public class VdbeCursor
         {
-        }
+            public VdbeCursor()
+            {
+            }
 
-        public BtCursor pCursor;
+            public BtCursor pCursor;
 
-        ///
-        ///<summary>
-        ///The cursor structure of the backend 
-        ///</summary>
+            ///
+            ///<summary>
+            ///The cursor structure of the backend 
+            ///</summary>
 
-        public Btree pBt;
+            public Btree pBt;
 
-        ///
-        ///<summary>
-        ///Separate file holding temporary table 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Separate file holding temporary table 
+            ///</summary>
 
-        public KeyInfo pKeyInfo;
+            public KeyInfo pKeyInfo;
 
-        ///
-        ///<summary>
-        ///Info about index keys needed by index cursors 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Info about index keys needed by index cursors 
+            ///</summary>
 
-        public int iDb;
+            public int iDb;
 
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="Index of cursor database in db">1) </param>
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Index of cursor database in db">1) </param>
 
-        public int pseudoTableReg;
+            public int pseudoTableReg;
 
-        ///
-        ///<summary>
-        ///Register holding pseudotable content. 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Register holding pseudotable content. 
+            ///</summary>
 
-        public int nField;
+            public int nField;
 
-        ///
-        ///<summary>
-        ///Number of fields in the header 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Number of fields in the header 
+            ///</summary>
 
-        public bool zeroed;
+            public bool zeroed;
 
-        ///
-        ///<summary>
-        ///True if zeroed out and ready for reuse 
-        ///</summary>
+            ///
+            ///<summary>
+            ///True if zeroed out and ready for reuse 
+            ///</summary>
 
-        public bool rowidIsValid;
+            public bool rowidIsValid;
 
-        ///
-        ///<summary>
-        ///True if lastRowid is valid 
-        ///</summary>
+            ///
+            ///<summary>
+            ///True if lastRowid is valid 
+            ///</summary>
 
-        public bool atFirst;
+            public bool atFirst;
 
-        ///
-        ///<summary>
-        ///True if pointing to first entry 
-        ///</summary>
+            ///
+            ///<summary>
+            ///True if pointing to first entry 
+            ///</summary>
 
-        public bool useRandomRowid;
+            public bool useRandomRowid;
 
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="Generate new record numbers semi">randomly </param>
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Generate new record numbers semi">randomly </param>
 
-        public bool nullRow;
+            public bool nullRow;
 
-        ///
-        ///<summary>
-        ///True if pointing to a row with no data 
-        ///</summary>
+            ///
+            ///<summary>
+            ///True if pointing to a row with no data 
+            ///</summary>
 
-        public bool deferredMoveto;
+            public bool deferredMoveto;
 
-        ///
-        ///<summary>
-        ///A call to sqlite3BtreeMoveto() is needed 
-        ///</summary>
+            ///
+            ///<summary>
+            ///A call to sqlite3BtreeMoveto() is needed 
+            ///</summary>
 
-        public bool isTable;
+            public bool isTable;
 
-        ///
-        ///<summary>
-        ///True if a table requiring integer keys 
-        ///</summary>
+            ///
+            ///<summary>
+            ///True if a table requiring integer keys 
+            ///</summary>
 
-        public bool isIndex;
+            public bool isIndex;
 
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="True if an index containing keys only "> no data </param>
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="True if an index containing keys only "> no data </param>
 
-        public bool isOrdered;
+            public bool isOrdered;
 
-        ///
-        ///<summary>
-        ///True if the underlying table is BTREE_UNORDERED 
-        ///</summary>
+            ///
+            ///<summary>
+            ///True if the underlying table is BTREE_UNORDERED 
+            ///</summary>
 
 #if !SQLITE_OMIT_VIRTUALTABLE
-        public sqlite3_vtab_cursor pVtabCursor;
+            public sqlite3_vtab_cursor pVtabCursor;
 
-        ///
-        ///<summary>
-        ///The cursor for a virtual table 
-        ///</summary>
+            ///
+            ///<summary>
+            ///The cursor for a virtual table 
+            ///</summary>
 
-        public sqlite3_module pModule;
+            public sqlite3_module pModule;
 
-        ///
-        ///<summary>
-        ///Module for cursor pVtabCursor 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Module for cursor pVtabCursor 
+            ///</summary>
 
 #endif
-        public i64 seqCount;
+            public i64 seqCount;
 
-        ///
-        ///<summary>
-        ///Sequence counter 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Sequence counter 
+            ///</summary>
 
-        public i64 movetoTarget;
+            public i64 movetoTarget;
 
-        ///
-        ///<summary>
-        ///Argument to the deferred sqlite3BtreeMoveto() 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Argument to the deferred sqlite3BtreeMoveto() 
+            ///</summary>
 
-        public i64 lastRowid;
+            public i64 lastRowid;
 
-        ///
-        ///<summary>
-        ///Last rowid from a Next or NextIdx operation 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Last rowid from a Next or NextIdx operation 
+            ///</summary>
 
-        ///
-        ///<summary>
-        ///Result of last sqlite3BtreeMoveto() done by an OP_NotExists or
-        ///OP_IsUnique opcode on this cursor. 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Result of last sqlite3BtreeMoveto() done by an OP_NotExists or
+            ///OP_IsUnique opcode on this cursor. 
+            ///</summary>
 
-        public int seekResult;
+            public int seekResult;
 
-        ///
-        ///<summary>
-        ///Cached information about the header for the data record that the
-        ///cursor is currently pointing to.  Only valid if cacheStatus matches
-        ///Vdbe.cacheCtr.  Vdbe.cacheCtr will never take on the value of
-        ///CACHE_STALE and so setting cacheStatus=CACHE_STALE guarantees that
-        ///the cache is out of date.
-        ///
-        ///aRow might point to (ephemeral) data for the current row, or it might
-        ///be NULL.
-        ///
-        ///</summary>
+            ///
+            ///<summary>
+            ///Cached information about the header for the data record that the
+            ///cursor is currently pointing to.  Only valid if cacheStatus matches
+            ///Vdbe.cacheCtr.  Vdbe.cacheCtr will never take on the value of
+            ///CACHE_STALE and so setting cacheStatus=CACHE_STALE guarantees that
+            ///the cache is out of date.
+            ///
+            ///aRow might point to (ephemeral) data for the current row, or it might
+            ///be NULL.
+            ///
+            ///</summary>
 
-        public u32 cacheStatus;
+            public u32 cacheStatus;
 
-        ///
-        ///<summary>
-        ///Cache is valid if this matches Vdbe.cacheCtr 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Cache is valid if this matches Vdbe.cacheCtr 
+            ///</summary>
 
-        public Pgno payloadSize;
+            public Pgno payloadSize;
 
-        ///
-        ///<summary>
-        ///Total number of bytes in the record 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Total number of bytes in the record 
+            ///</summary>
 
-        public u32[] aType;
+            public u32[] aType;
 
-        ///
-        ///<summary>
-        ///Type values for all entries in the record 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Type values for all entries in the record 
+            ///</summary>
 
-        public u32[] aOffset;
+            public u32[] aOffset;
 
-        ///<summary>
-        ///Cached offsets to the start of each columns data
-        ///</summary>
-        public int aRow;
+            ///<summary>
+            ///Cached offsets to the start of each columns data
+            ///</summary>
+            public int aRow;
 
-        ///
-        ///<summary>
-        ///Pointer to Data for the current row, if all on one page 
-        ///</summary>
+            ///
+            ///<summary>
+            ///Pointer to Data for the current row, if all on one page 
+            ///</summary>
 
-        public VdbeCursor Copy()
-        {
-            return (VdbeCursor)MemberwiseClone();
-        }
-    };
-
+            public VdbeCursor Copy()
+            {
+                return (VdbeCursor)MemberwiseClone();
+            }
+        };
+    }
 
 
     namespace Engine
