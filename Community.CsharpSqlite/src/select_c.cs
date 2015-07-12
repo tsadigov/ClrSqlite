@@ -11,7 +11,7 @@ namespace Community.CsharpSqlite {
     using sqlite3_value = Engine.Mem;
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
-    
+    using Engine;
     using ResolveExtensions = Sqlite3.ResolveExtensions;
     using System.Collections.Generic;
     using System.Linq;

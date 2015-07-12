@@ -74,7 +74,7 @@ namespace Community.CsharpSqlite.Engine.Op
                 case OpCode.OP_OpenWrite:
                     {
                         int nField;
-                        KeyInfo pKeyInfo;
+                        Community.CsharpSqlite.Metadata.KeyInfo pKeyInfo=null;
                         int wrFlag;
                         if (cpu.vdbe.expired)
                         {
@@ -82,7 +82,6 @@ namespace Community.CsharpSqlite.Engine.Op
                             break;
                         }
                         nField = 0;
-                        pKeyInfo = null;
                         var p2 = pOp.p2;
                         var iDb = pOp.p3;
                         Debug.Assert(iDb >= 0 && iDb < cpu.db.nDb);

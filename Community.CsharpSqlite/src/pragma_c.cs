@@ -10,6 +10,7 @@ using Community.CsharpSqlite.builder;
 using Community.CsharpSqlite.Ast;
 namespace Community.CsharpSqlite {
     using Metadata;
+    using Vdbe = Engine.Vdbe;
     using Community.CsharpSqlite.Os;
 	public partial class Sqlite3 {
 		///<summary>
@@ -197,7 +198,7 @@ namespace Community.CsharpSqlite {
 		/// Generate code to return a single integer value.
 		///</summary>
 		static void returnSingleInt(Parse pParse,string zLabel,i64 value) {
-			Vdbe v=pParse.sqlite3GetVdbe();
+			var v=pParse.sqlite3GetVdbe();
 			int mem=++pParse.nMem;
 			//i64* pI64 = sqlite3DbMallocRaw( pParse->db, sizeof( value ) );
 			//if ( pI64 )
@@ -464,7 +465,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			///</summary>
 			sqlite3 db=pParse.db;
 			Db pDb;
-			Vdbe v=pParse.pVdbe=Vdbe.Create(db);
+			var v=pParse.pVdbe=Vdbe.Create(db);
 			if(v==null)
 				return;
 			v.sqlite3VdbeRunOnlyOnce();
@@ -548,7 +549,7 @@ goto pragma_out;
 				int addr;
 				if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 					goto pragma_out;
-                vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 				if(null==zRight) {
 					v.sqlite3VdbeSetNumCols(1);
                     v.sqlite3VdbeSetColName(0, ColName.NAME, "cache_size", SQLITE_STATIC);
@@ -797,7 +798,7 @@ goto pragma_out;
 										}
 										for(ii=db.nDb-1;ii>=0;ii--) {
 											if(db.aDb[ii].pBt!=null&&(ii==iDb||pId2.Length==0)) {
-                                                vdbeaux.sqlite3VdbeUsesBtree(v, ii);
+                                                Engine.vdbeaux.sqlite3VdbeUsesBtree(v, ii);
                                                 v.sqlite3VdbeAddOp3(OpCode.OP_JournalMode, ii, 1, eMode);
 											}
 										}
@@ -912,7 +913,7 @@ goto pragma_out;
 															v.sqlite3VdbeChangeP2(iAddr+2,iAddr+4);
 															v.sqlite3VdbeChangeP1(iAddr+4,eAuto-1);
 															v.sqlite3VdbeChangeP1(iAddr+5,iDb);
-                                                            vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                                                            Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 														}
 													}
 												}
@@ -1719,7 +1720,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																												///<summary>
 																												///</summary>
 																												///<param name="Cookie index. 1 for schema">cookie. </param>
-                                                                                                                vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                                                                                                                Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 																												switch(zLeft[0]) {
 																												case 'f':
 																												case 'F':

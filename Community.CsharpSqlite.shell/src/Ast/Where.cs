@@ -20,8 +20,8 @@ using ynVar = System.Int32;
 #endif
 namespace Community.CsharpSqlite {
     using Parse = Sqlite3.Parse;
-    using Metadata;   
-    
+    using Metadata;
+    using Engine;
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Ast;
 

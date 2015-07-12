@@ -26,10 +26,10 @@ using yDbMask = System.Int64;
 //  typedef unsigned int yDbMask;
 using yDbMask=System.Int32;
 #endif
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Engine
 {
-    using Op = VdbeOp;
-    using sqlite3_stmt = Vdbe;
+    using Operation = Engine.VdbeOp;
+    using sqlite3_stmt = Engine.Vdbe;
     using sqlite3_value = Engine.Mem;
     
     using System;
@@ -39,6 +39,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
+    using Metadata;
     //public partial class Sqlite3
     //{
 
@@ -240,7 +241,7 @@ namespace Community.CsharpSqlite
 ** in a Vdbe main program and each of the sub-programs (triggers) it may 
 ** invoke directly or indirectly. It should be used as follows:
 **
-**   Op *pOp;
+**   Operation *pOp;
 **   VdbeOpIter sIter;
 **
 **   memset(&sIter, 0, sizeof(sIter));
@@ -261,11 +262,11 @@ namespace Community.CsharpSqlite
       public int iSub;                  /* 0 = main program, 1 = first sub-program etc. */
     };
 
-    static Op opIterNext( VdbeOpIter p )
+    static Operation opIterNext( VdbeOpIter p )
     {
       Vdbe v = p.v;
-      Op pRet = null;
-      Op[] aOp;
+      Operation pRet = null;
+      Operation[] aOp;
       int nOp;
 
       if ( p.iSub <= p.nSub )
@@ -338,7 +339,7 @@ namespace Community.CsharpSqlite
     static int sqlite3VdbeAssertMayAbort( Vdbe v, int mayAbort )
     {
       int hasAbort = 0;
-      Op pOp;
+      Operation pOp;
       VdbeOpIter sIter;
       sIter = new VdbeOpIter();// memset( &sIter, 0, sizeof( sIter ) );
       sIter.v = v;
@@ -379,7 +380,7 @@ namespace Community.CsharpSqlite
             /// to an OP_Function, OP_AggStep or OP_VFilter opcode. This is used by
             /// sqlite3VdbeMakeReady() to size the Vdbe.apArg[] array.
             ///
-            /// The Op.opflags field is set on all opcodes.
+            /// The Operation.opflags field is set on all opcodes.
             ///</summary>
             ///<summary>
             /// Return the address of the next instruction to be inserted.
@@ -441,7 +442,7 @@ namespace Community.CsharpSqlite
                     db.sqlite3DbFree(ref pDef);
                 }
             }
-            //static void vdbeFreeOpArray(sqlite3 *, Op *, int);
+            //static void vdbeFreeOpArray(sqlite3 *, Operation *, int);
             ///<summary>
             /// Delete a P4 value if necessary.
             ///
@@ -513,11 +514,11 @@ namespace Community.CsharpSqlite
             /// nOp entries.
             ///
             ///</summary>
-            static void vdbeFreeOpArray(sqlite3 db, ref Op[] aOp, int nOp)
+            static void vdbeFreeOpArray(sqlite3 db, ref Operation[] aOp, int nOp)
             {
                 if (aOp != null)
                 {
-                    //Op pOp;
+                    //Operation pOp;
                     //    for(pOp=aOp; pOp<&aOp[nOp]; pOp++){
                     //      freeP4(db, pOp.p4type, pOp.p4.p);
                     //#if SQLITE_DEBUG
@@ -529,7 +530,7 @@ namespace Community.CsharpSqlite
                     aOp = null;
                 }
             }
-            static void vdbeFreeOpArray(sqlite3 db, List<Op> lOp)
+            static void vdbeFreeOpArray(sqlite3 db, List<Operation> lOp)
             {
                 if (lOp != null)
                 {
@@ -680,7 +681,7 @@ namespace Community.CsharpSqlite
             /// Use zTemp for any required temporary buffer space.
             ///</summary>
             static StringBuilder zTemp = new StringBuilder(100);
-            public static string displayP4(Op pOp, string notUsedParam, int nTemp)
+            public static string displayP4(Operation pOp, string notUsedParam, int nTemp)
             {
                 zTemp.Length = 0;
                 Debug.Assert(nTemp >= 20);
@@ -823,7 +824,7 @@ namespace Community.CsharpSqlite
             /// is maintained in p->btreeMask and is used for locking and other purposes.
             ///
             ///</summary>
-            public static void sqlite3VdbeUsesBtree(Vdbe p, int i)
+            public static void sqlite3VdbeUsesBtree(this Vdbe p, int i)
             {
                 Debug.Assert(i >= 0 && i < p.db.nDb && i < (int)sizeof(yDbMask) * 8);
                 Debug.Assert(i < (int)sizeof(yDbMask) * 8);
@@ -897,7 +898,7 @@ void sqlite3VdbeLeave(Vdbe *p){
 																																																    /*
 ** Print a single opcode.  This routine is used for debugging only.
 */
-    static void sqlite3VdbePrintOp( FILE pOut, int pc, Op pOp )
+    static void sqlite3VdbePrintOp( FILE pOut, int pc, Operation pOp )
     {
       string zP4;
       string zPtr = null;
@@ -1133,7 +1134,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                     else
                     {
                         string z;
-                        Op pOp;
+                        Operation pOp;
                         if (i < p.nOp)
                         {
                             ///
@@ -3017,7 +3018,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// sqlite3VdbeDeleteUnpackedRecord().
             ///
             ///</summary>
-            public static UnpackedRecord sqlite3VdbeRecordUnpack(KeyInfo pKeyInfo,///
+            public static UnpackedRecord sqlite3VdbeRecordUnpack(this KeyInfo pKeyInfo,///
                 ///<summary>
                 ///Information about the record format 
                 ///</summary>

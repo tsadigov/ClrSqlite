@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Engine
 {
     
     
     using sqlite3_value = Engine.Mem;
-    
+    using Metadata;
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;

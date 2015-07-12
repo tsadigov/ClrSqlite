@@ -250,7 +250,7 @@ namespace Community.CsharpSqlite
                 Debug.Assert(db.mutex.sqlite3_mutex_held());
                 if (p != null)
                 {
-                    vdbeaux.sqlite3ExpirePreparedStatements(db);
+                    Engine.vdbeaux.sqlite3ExpirePreparedStatements(db);
                     do
                     {
                         VTable pNext = p.pNext;
@@ -628,7 +628,7 @@ namespace Community.CsharpSqlite
                     pParse.declareVtab = 0;
                     if (pParse.pVdbe != null)
                     {
-                        vdbeaux.sqlite3VdbeFinalize(ref pParse.pVdbe);
+                        Engine.vdbeaux.sqlite3VdbeFinalize(ref pParse.pVdbe);
                     }
                     TableBuilder.sqlite3DeleteTable(db, ref pParse.pNewTable);
                     //sqlite3StackFree( db, pParse );

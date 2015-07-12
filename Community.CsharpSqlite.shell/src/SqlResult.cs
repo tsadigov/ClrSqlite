@@ -178,7 +178,7 @@ namespace Community.CsharpSqlite
     //#define SQLITE_LOCKED       6   /* A table in the database is locked */
     //#define SQLITE_NOMEM        7   /* A malloc() failed */
     //#define SQLITE_READONLY     8   /* Attempt to write a readonly database */
-    //#define SQLITE_INTERRUPT    9   /* Operation terminated by sqlite3_interrupt()*/
+    //#define SQLITE_INTERRUPT    9   /* Op terminated by sqlite3_interrupt()*/
     //#define SQLITE_IOERR       10   /* Some kind of disk I/O error occurred */
     //#define SQLITE_CORRUPT     11   /* The database disk image is malformed */
     //#define SQLITE_NOTFOUND    12   /* Unknown opcode in sqlite3_file_control() */

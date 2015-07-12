@@ -15,9 +15,9 @@ using i32 = System.Int32;
 
 namespace Community.CsharpSqlite
 {
-    
-    
-    using Op = VdbeOp;
+
+
+    using Op = Engine.VdbeOp;
     using Community.CsharpSqlite.Engine;
 
     //typedef struct VdbeCursor VdbeCursor;

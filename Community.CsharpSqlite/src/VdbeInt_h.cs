@@ -32,7 +32,7 @@ using yDbMask = System.Int32;
 #endif
 namespace Community.CsharpSqlite
 {
-	using Op = VdbeOp;
+	using Op = Community.CsharpSqlite.Engine.VdbeOp;
 	using System.Text;
     using sqlite3_value = Engine.Mem;
 	using System.Collections.Generic;
@@ -1382,27 +1382,5 @@ static int sqlite3VdbeCheckFk( Vdbe p, int i ) { return 0; }
     };
 
 
-    public class VdbeFunc : FuncDef
-    {
-        public FuncDef pFunc;
-
-        ///
-        ///<summary>
-        ///The definition of the function 
-        ///</summary>
-
-        public int nAux;
-
-        ///
-        ///<summary>
-        ///Number of entries allocated for apAux[] 
-        ///</summary>
-
-        public AuxData[] apAux = new AuxData[2];
-        ///
-        ///<summary>
-        ///One slot for each function argument 
-        ///</summary>
-
-    };
+    
 }

@@ -18,6 +18,7 @@ using Community.CsharpSqlite.Ast;
 namespace Community.CsharpSqlite.builder
 {
     using Metadata;
+    using Vdbe=Engine.Vdbe;
     using Community.CsharpSqlite.Os;
     public static class IndexBuilder
     {

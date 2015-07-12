@@ -7,7 +7,7 @@ using System.Linq;
 
 
 using sqlite3_int64 = System.Int64;
-using sqlite3_stmt = Community.CsharpSqlite.Vdbe;
+using sqlite3_stmt = Community.CsharpSqlite.Engine.Vdbe;
 using sqlite3_value = Community.CsharpSqlite.Engine.Mem;
 using va_list = System.Object;
 using System.Collections.Generic;

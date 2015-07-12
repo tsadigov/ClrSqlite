@@ -6,7 +6,7 @@ using u16=System.UInt16;
 using u32=System.UInt32;
 using sqlite3_int64=System.Int64;
 namespace Community.CsharpSqlite {
-	using sqlite3_stmt=Vdbe;
+	using sqlite3_stmt=Engine.Vdbe;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;

@@ -36,6 +36,7 @@ namespace Community.CsharpSqlite
     using Parse = Sqlite3.Parse;
     using Community.CsharpSqlite.Ast;
     using Metadata;
+    using Vdbe = Engine.Vdbe;
     ///<summary>
     /// SQLite supports many different ways to resolve a constraint
     /// error.  ROLLBACK processing means that a constraint violation

@@ -7,9 +7,10 @@ using u32 = System.UInt32;
 namespace Community.CsharpSqlite.Parsing
 {
     using Parse = Sqlite3.Parse;
-    using Community.CsharpSqlite.Ast;
-    using Community.CsharpSqlite.Metadata;
-    using Community.CsharpSqlite.Os;
+    using Ast;
+    using Metadata;
+    using Os;
+    using Vdbe = Engine.Vdbe;
     public static partial class TriggerParser
     {
 
@@ -1327,7 +1328,7 @@ return;
                 pProgram.token = pTrigger.GetHashCode();
                 pPrg.aColmask[0] = pSubParse.oldmask;
                 pPrg.aColmask[1] = pSubParse.newmask;
-                vdbeaux.sqlite3VdbeDelete(ref v);
+                Engine.vdbeaux.sqlite3VdbeDelete(ref v);
             }
             Debug.Assert(null == pSubParse.pAinc && null == pSubParse.pZombieTab);
             Debug.Assert(null == pSubParse.pTriggerPrg && 0 == pSubParse.nMaxArg);

@@ -238,7 +238,7 @@ aOverflow= null;
                 if (pKey != null)
                 {
                     Debug.Assert(nKey == (i64)(int)nKey);
-                    pIdxKey = vdbeaux.sqlite3VdbeRecordUnpack(this.pKeyInfo, (int)nKey, pKey, aSpace, 16);
+                    pIdxKey = Engine.vdbeaux.sqlite3VdbeRecordUnpack(this.pKeyInfo,(int)nKey, pKey, aSpace, 16);
                     //sizeof( aSpace ) );
                     //if ( pIdxKey == null )
                     //  return SQLITE_NOMEM;
@@ -250,7 +250,7 @@ aOverflow= null;
                 rc = this.sqlite3BtreeMovetoUnpacked(pIdxKey, nKey, bias != 0 ? 1 : 0, ref pRes);
                 if (pKey != null)
                 {
-                    vdbeaux.sqlite3VdbeDeleteUnpackedRecord(pIdxKey);
+                    Engine.vdbeaux.sqlite3VdbeDeleteUnpackedRecord(pIdxKey);//vdbeaux
                 }
                 return rc;
             }
@@ -1179,7 +1179,7 @@ aOverflow= null;
                                 ///<param name="This branch runs if the record">size field of the cell is a</param>
                                 ///<param name="single byte varint and the record fits entirely on the main">single byte varint and the record fits entirely on the main</param>
                                 ///<param name="b">tree page.  </param>
-                                c = vdbeaux.sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 1, pIdxKey);
+                                c = Engine.vdbeaux.sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 1, pIdxKey);
                                 //c = sqlite3VdbeRecordCompare( nCell, (void*)&pCell[1], pIdxKey );
                             }
                             else
@@ -1192,7 +1192,7 @@ aOverflow= null;
                                     ///</summary>
                                     ///<param name="The record">size field is a 2 byte varint and the record</param>
                                     ///<param name="fits entirely on the main b">tree page.  </param>
-                                    c = vdbeaux.sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 2, pIdxKey);
+                                    c = Engine.vdbeaux.sqlite3VdbeRecordCompare(nCell, pPage.aData, pCell + 2, pIdxKey);
                                     //c = sqlite3VdbeRecordCompare( nCell, (void*)&pCell[2], pIdxKey );
                                 }
                                 else
@@ -1223,7 +1223,7 @@ aOverflow= null;
                                         // malloc_cs.sqlite3_free(ref pCellKey );
                                         goto moveto_finish;
                                     }
-                                    c = vdbeaux.sqlite3VdbeRecordCompare(nCell, pCellKey, pIdxKey);
+                                    c = Engine.vdbeaux.sqlite3VdbeRecordCompare(nCell, pCellKey, pIdxKey);
                                     pCellKey = null;
                                     // malloc_cs.sqlite3_free(ref pCellKey );
                                 }

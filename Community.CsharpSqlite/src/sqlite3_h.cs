@@ -4570,7 +4570,7 @@ namespace Community.CsharpSqlite
 		//SQLITE_API int sqlite3_test_control(int op, ...);
 		///
 ///<summary>
-///CAPI3REF: Testing Interface Operation Codes
+///CAPI3REF: Testing Interface Op Codes
 ///
 ///These constants are the valid operation code parameters used
 ///as the first argument to [sqlite3_test_control()].

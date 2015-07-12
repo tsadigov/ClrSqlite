@@ -2156,7 +2156,7 @@ goto attach_end;
 			/// special action is taken. Otherwise, if the parent row can *not* be
 			/// found in the parent table:
 			///
-			///   Operation | FK type   | Action taken
+			///   Op | FK type   | Action taken
 			///   --------------------------------------------------------------------------
 			///   INSERT      immediate   Increment the "immediate constraint counter".
 			///
@@ -2363,7 +2363,7 @@ goto attach_end;
 			/// table that correspond to the parent table row being deleted or inserted.
 			/// For each child row found, one of the following actions is taken:
 			///
-			///   Operation | FK type   | Action taken
+			///   Op | FK type   | Action taken
 			///   --------------------------------------------------------------------------
 			///   DELETE      immediate   Increment the "immediate constraint counter".
 			///                           Or, if the ON (UPDATE|DELETE) action is RESTRICT,

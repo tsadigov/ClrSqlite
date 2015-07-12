@@ -16,14 +16,14 @@ using u64 = System.UInt64;
 
 
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Engine
 {
     using sqlite3_value = Engine.Mem;
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
-
+    using Metadata;
 
     ///<summary>
     /// The "context" argument for a installable function.  A pointer to an

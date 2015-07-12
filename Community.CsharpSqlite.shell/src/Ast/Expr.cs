@@ -475,7 +475,7 @@ namespace Community.CsharpSqlite
             {
             }
 #if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
-																																																																																										public u8 _op;                      /* Operation performed by this node */
+																																																																																										public u8 _op;                      /* Op performed by this node */
 public u8 op
 {
 get { return _op; }
@@ -496,7 +496,7 @@ set { _op = value; }
                 }
             }
             ///<summary>
-            ///Operation performed by this node 
+            ///Op performed by this node 
             ///</summary>
             public u8 op
             {

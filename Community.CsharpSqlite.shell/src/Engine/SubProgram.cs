@@ -60,7 +60,7 @@ namespace Community.CsharpSqlite
     ///</summary>
     public class SubProgram : ILinkedListNode<SubProgram>
     {
-        public VdbeOp[] aOp;// { get; set; }
+        public Engine.VdbeOp[] aOp;// { get; set; }
 
         ///
         ///<summary>

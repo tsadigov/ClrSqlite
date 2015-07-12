@@ -7,7 +7,7 @@ namespace Community.CsharpSqlite
 {
     using Community.CsharpSqlite.builder;
     using sqlite3_int64 = System.Int64;
-    using sqlite3_stmt = Vdbe;
+    using sqlite3_stmt = Engine.Vdbe;
     using Metadata;
     using Community.CsharpSqlite.Os;
 

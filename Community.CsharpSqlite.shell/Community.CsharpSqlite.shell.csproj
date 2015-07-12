@@ -323,6 +323,7 @@
     <Compile Include="src\BackupExtensions.cs" />
     <Compile Include="src\BitvecExtensions.cs" />
     <Compile Include="src\BtCursor.cs" />
+    <Compile Include="src\Engine\Metadata\VdbeFunc.cs" />
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Os\sqlite3_io_methods.cs" />
     <Compile Include="src\Storage\BTree.cs" />

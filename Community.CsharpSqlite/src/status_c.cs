@@ -6,6 +6,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Parsing;
     using sqlite3_value = Engine.Mem;
+    using Vdbe = Engine.Vdbe;
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -259,7 +260,7 @@ namespace Community.CsharpSqlite {
                 db.pVdbe.linkedList().ForEach(itr =>
                 {
                     pVdbe = itr;
-                    vdbeaux.sqlite3VdbeDeleteObject(db, ref pVdbe);
+                    Engine.vdbeaux.sqlite3VdbeDeleteObject(db, ref pVdbe);
                 });
 				
 				db.pnBytesFreed=0;

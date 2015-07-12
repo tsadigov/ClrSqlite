@@ -78,7 +78,7 @@ namespace Community.CsharpSqlite
 		//# define sqlite3_prepare16_v2           0
 		//# define sqlite3_result_error16         0
 		//# define sqlite3_result_text16          0
-		static void sqlite3_result_text16 (sqlite3_context pCtx, string z, int n, dxDel xDel)
+		static void sqlite3_result_text16 (Engine.sqlite3_context pCtx, string z, int n, dxDel xDel)
 		{
 		}
 

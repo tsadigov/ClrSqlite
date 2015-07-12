@@ -27,6 +27,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.builder;
     using Metadata;
+    using Vdbe = Engine.Vdbe;
     using Community.CsharpSqlite.Os;
     //public partial class Sqlite3
     //{
@@ -219,7 +220,7 @@ p.zName,  P4Usage.P4_STATIC );
                         {
                             if ((mask & pParse.cookieMask) == 0)
                                 continue;
-                            vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                            Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
                             v.sqlite3VdbeAddOp2((int) OpCode.OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
                             if (db.init.busy == 0)
                             {
@@ -285,7 +286,7 @@ p.zName,  P4Usage.P4_STATIC );
                     ///</summary>
                     if (pParse.pAinc != null && pParse.nTab == 0)
                         pParse.nTab = 1;
-                    vdbeaux.sqlite3VdbeMakeReady(v, pParse);
+                    Engine.vdbeaux.sqlite3VdbeMakeReady(v, pParse);
                     pParse.rc = SqlResult.SQLITE_DONE;
                     pParse.colNamesSet = 0;
                 }
@@ -2316,7 +2317,7 @@ goto exit_drop_index;
                     for (int i = 0; i < db.nDb; i++)
                     {
                         v.sqlite3VdbeAddOp2(OpCode.OP_Transaction, i, (type == Sqlite3.TK_EXCLUSIVE) ? 2 : 1);
-                        vdbeaux.sqlite3VdbeUsesBtree(v, i);
+                        Engine.vdbeaux.sqlite3VdbeUsesBtree(v, i);
                     }
                 }
                 v.sqlite3VdbeAddOp2(OpCode.OP_AutoCommit, 0, 0);

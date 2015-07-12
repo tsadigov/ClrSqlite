@@ -7,6 +7,7 @@ namespace Community.CsharpSqlite
 {
     using Parse=Community.CsharpSqlite.Sqlite3.Parse;
     using Metadata;
+    using Engine;
     using Community.CsharpSqlite.Os;
     
 

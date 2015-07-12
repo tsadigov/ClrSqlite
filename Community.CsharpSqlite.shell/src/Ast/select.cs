@@ -24,7 +24,7 @@ using ynVar = System.Int32;
 namespace Community.CsharpSqlite
 {
     using Metadata;
-
+    using Vdbe = Engine.Vdbe;
     using sqlite3_value = Engine.Mem;
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
@@ -919,7 +919,7 @@ namespace Community.CsharpSqlite
                     ///into an OpCode.OP_Noop.
                     if (addrSortIndex >= 0 && pOrderBy == null)
                     {
-                        vdbeaux.sqlite3VdbeChangeToNoop(v, addrSortIndex, 1);
+                        Engine.vdbeaux.sqlite3VdbeChangeToNoop(v, addrSortIndex, 1);
                         p.addrOpenEphm[2] = -1;
                     }
                     ///Use the standard inner loop
@@ -1176,7 +1176,7 @@ namespace Community.CsharpSqlite
                         else
                         {
                             pWInfo.sqlite3WhereEnd();
-                            vdbeaux.sqlite3VdbeChangeToNoop(v, addrSortingIdx, 1);
+                            Engine.vdbeaux.sqlite3VdbeChangeToNoop(v, addrSortingIdx, 1);
                         }
                         ///Output the final row of result
                         v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regOutputRow, addrOutputRow);
