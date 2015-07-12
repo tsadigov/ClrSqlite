@@ -12,6 +12,7 @@ using u32=System.UInt32;
 using u64=System.UInt64;
 using unsigned = System.UInt64;
 using Community.CsharpSqlite.Ast;
+using Community.CsharpSqlite.Utils;
 
 namespace Community.CsharpSqlite
 {

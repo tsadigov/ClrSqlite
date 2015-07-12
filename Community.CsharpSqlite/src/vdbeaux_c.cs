@@ -41,6 +41,7 @@ namespace Community.CsharpSqlite.Engine
     using Community.CsharpSqlite.Engine;
     using Metadata;
     using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Utils;
     //public partial class Sqlite3
     //{
 
@@ -503,7 +504,7 @@ namespace Community.CsharpSqlite.Engine
                         case P4Usage.P4_VTAB:
                             {
                                 if (db.pnBytesFreed == 0)
-                                    vtab.sqlite3VtabUnlock((VTable)p4);
+                                    VTableMethodsExtensions.sqlite3VtabUnlock((VTable)p4);
                                 break;
                             }
                     }
@@ -1808,7 +1809,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///required, as an xSync() callback may add an attached database
                 ///to the transaction.
                 ///</summary>
-                rc = vtab.sqlite3VtabSync(db, ref p.zErrMsg);
+                rc = VTableMethodsExtensions.sqlite3VtabSync(db, ref p.zErrMsg);
                 ///
                 ///<summary>
                 ///This loop determines (a) if the commit hook should be invoked and
@@ -1885,7 +1886,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     }
                     if (rc == SqlResult.SQLITE_OK)
                     {
-                        vtab.sqlite3VtabCommit(db);
+                        VTableMethodsExtensions.sqlite3VtabCommit(db);
                     }
                 }
                 ///
@@ -2061,7 +2062,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 #if SQLITE_TEST
 																																																																																																        enable_simulated_io_errors();
 #endif
-                    vtab.sqlite3VtabCommit(db);
+                    VTableMethodsExtensions.sqlite3VtabCommit(db);
                 }
 #endif
                 return rc;

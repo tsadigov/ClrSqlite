@@ -236,7 +236,7 @@ p.zName,  P4Usage.P4_STATIC );
                             int i;
                             for (i = 0; i < pParse.nVtabLock; i++)
                             {
-                                VTable vtable = vtab.sqlite3GetVTable(db, pParse.apVtabLock[i]);
+                                VTable vtable = VTableMethodsExtensions.sqlite3GetVTable(db, pParse.apVtabLock[i]);
                                 v.sqlite3VdbeAddOp4(OpCode.OP_VBegin, 0, 0, 0, vtable,  P4Usage.P4_VTAB);
                             }
                             pParse.nVtabLock = 0;
@@ -409,7 +409,7 @@ p.zName,  P4Usage.P4_STATIC );
                     }
                 }
                 db.flags &= ~SqliteFlags.SQLITE_InternChanges;
-                vtab.sqlite3VtabUnlockList(db);
+                VTableMethodsExtensions.sqlite3VtabUnlockList(db);
                 Sqlite3.sqlite3BtreeLeaveAll(db);
                 ///
                 ///<summary>

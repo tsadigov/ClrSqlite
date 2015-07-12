@@ -1223,7 +1223,7 @@ namespace Community.CsharpSqlite
 			Sqlite3.TK_ALL,
 		};
 
-		static TokenType keywordCode (string z, int iOffset, int n)
+		public static TokenType keywordCode (string z, int iOffset, int n)
 		{
 			return (TokenType)innerKeywordCode (z, iOffset, n);
 		}

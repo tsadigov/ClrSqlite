@@ -49,6 +49,7 @@ using System.Collections.Generic;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Utils;
+    using Community.CsharpSqlite.Metadata.Traverse;
 	#endif
 	public partial class Sqlite3 {
 		public class Parse {
@@ -974,7 +975,7 @@ goto exit_rename_table;
 				}
 				#if !SQLITE_OMIT_VIRTUALTABLE
 				if(pTab.IsVirtual()) {
-                    pVTab = vtab.sqlite3GetVTable(db, pTab);
+                    pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, pTab);
 					if(pVTab.pVtab.pModule.xRename==null) {
 						pVTab=null;
 					}
@@ -1119,11 +1120,15 @@ goto exit_rename_table;
 				///<summary>
 				///Drop any table triggers from the internal schema. 
 				///</summary>
-				for(pTrig= pTab.sqlite3TriggerList(this);pTrig!=null;pTrig=pTrig.pNext) {
-					int iTrigDb=sqlite3SchemaToIndex(this.db,pTrig.pSchema);
-					Debug.Assert(iTrigDb==iDb||iTrigDb==1);
-					v.sqlite3VdbeAddOp4( OpCode.OP_DropTrigger,iTrigDb,0,0,pTrig.zName,0);
-				}
+                pTab.sqlite3TriggerList(this).linkedList().ForEach(
+                    trg => {
+                        int iTrigDb = sqlite3SchemaToIndex(this.db, trg.pSchema);
+                        Debug.Assert(iTrigDb == iDb || iTrigDb == 1);
+                        v.sqlite3VdbeAddOp4(OpCode.OP_DropTrigger, iTrigDb, 0, 0, trg.zName, 0);
+                    }
+                );
+
+                
 				#endif
 				///
 				///<summary>
@@ -3345,7 +3350,7 @@ goto attach_end;
                     Debug.Assert(i >= 0);
 
                     //pParse->sLastToken.z = &zSql[i];
-                    i += (this.sLastToken = Sqlite3.Lexer.GetToken(zSql, i)).Length;
+                    i += (this.sLastToken = Lexer.GetToken(zSql, i)).Length;
                     //Log.WriteLine("token :" + this.sLastToken);
                     if (i > mxSqlLen)
                     {
@@ -4416,7 +4421,7 @@ isView = false;
 					///</summary>
 					#if !SQLITE_OMIT_VIRTUALTABLE
 					if(pTab.IsVirtual()) {
-                        VTable pVTab = vtab.sqlite3GetVTable(db, pTab);
+                        VTable pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, pTab);
 						this.sqlite3VtabMakeWritable(pTab);
                         v.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 1, pTab.nCol + 2, regIns, pVTab,  P4Usage.P4_VTAB);
 						v.sqlite3VdbeChangeP5((byte)(onError==OnConstraintError.OE_Default?OnConstraintError.OE_Abort:onError));
@@ -5180,7 +5185,7 @@ isView = false;
 				int i;
 				int iEnd=v.sqlite3VdbeCurrentAddr();
 				#if !SQLITE_OMIT_VIRTUALTABLE
-                VTable pVTab = pTab.IsVirtual() ? vtab.sqlite3GetVTable(this.db, pTab) : null;
+                VTable pVTab = pTab.IsVirtual() ? VTableMethodsExtensions.sqlite3GetVTable(this.db, pTab) : null;
 				#endif
 				for(i=iStartAddr;i<iEnd;i++) {
 					VdbeOp pOp=v.sqlite3VdbeGetOp(i);
@@ -6005,7 +6010,7 @@ aXRef[j] = -1;
 				///<summary>
 				///Database connection 
 				///</summary>
-                VTable pVTab = vtab.sqlite3GetVTable(db, pTab);
+                VTable pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, pTab);
 				SelectDest dest=new SelectDest();
 				///
 				///<summary>
@@ -6101,7 +6106,7 @@ aXRef[j] = -1;
 				///</summary>
 				///<param name="In either case leave an error message in pParse and return non">zero.</param>
 				///<param name=""></param>
-				if((pTab.IsVirtual()&&vtab.sqlite3GetVTable(this.db,pTab).pMod.pModule.xUpdate==null)
+				if((pTab.IsVirtual()&&VTableMethodsExtensions.sqlite3GetVTable(this.db,pTab).pMod.pModule.xUpdate==null)
                     ||
                     ((pTab.tabFlags & TableFlags.TF_Readonly) != 0 && (this.db.flags & SqliteFlags.SQLITE_WriteSchema) == 0 && this.nested == 0))
                 {
@@ -6457,7 +6462,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 					///Delete the row 
 					#if !SQLITE_OMIT_VIRTUALTABLE
 					if(pTab.IsVirtual()) {
-                        VTable pVTab = vtab.sqlite3GetVTable(db, pTab);
+                        VTable pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, pTab);
 						this.sqlite3VtabMakeWritable(pTab);
                         v.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 0, 1, iRowid, pVTab,  P4Usage.P4_VTAB);
 						v.sqlite3VdbeChangeP5((byte)OnConstraintError.OE_Abort);
@@ -7521,7 +7526,7 @@ return;
 					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
 					zId=pExpr.u.zToken;
 					nId=StringExtensions.sqlite3Strlen30(zId);
-					pDef=sqlite3FindFunction(this.db,zId,nId,nFarg,enc,0);
+                    pDef = FuncDefTraverse.sqlite3FindFunction(this.db, zId, nId, nFarg, enc, 0);
 					if(pDef==null) {
 						utilc.sqlite3ErrorMsg(this,"unknown function: %.*s()",nId,zId);
 						break;
@@ -7581,11 +7586,11 @@ return;
 					///for function overloading.  But we use the B term in "glob(B,A)".
 					///</summary>
 					if(nFarg>=2&&(pExpr.Flags&ExprFlags.EP_InfixFunc)!=0) {
-                        pDef = vtab.sqlite3VtabOverloadFunction(db, pDef, nFarg, pFarg.a[1].pExpr);
+                        pDef = VTableMethodsExtensions.sqlite3VtabOverloadFunction(db, pDef, nFarg, pFarg.a[1].pExpr);
 					}
 					else
 						if(nFarg>0) {
-                            pDef = vtab.sqlite3VtabOverloadFunction(db, pDef, nFarg, pFarg.a[0].pExpr);
+                            pDef = VTableMethodsExtensions.sqlite3VtabOverloadFunction(db, pDef, nFarg, pFarg.a[0].pExpr);
 						}
 					#endif
 					for(i=0;i<nFarg;i++) {
@@ -9410,7 +9415,7 @@ return;
 				return pIdxInfo;
 			}
 			public int vtabBestIndex(Table pTab,sqlite3_index_info p) {
-				sqlite3_vtab pVtab=vtab.sqlite3GetVTable(this.db,pTab).pVtab;
+				sqlite3_vtab pVtab=VTableMethodsExtensions.sqlite3GetVTable(this.db,pTab).pVtab;
 				int i;
 				int rc;
 				#if (SQLITE_TEST) && (SQLITE_DEBUG)
@@ -9634,7 +9639,7 @@ range_est_fallback:
 				///
 				///</summary>
 				Debug.Assert(pTab.azModuleArg!=null&&pTab.azModuleArg[0]!=null);
-                Debug.Assert(vtab.sqlite3GetVTable(this.db, pTab) != null);
+                Debug.Assert(VTableMethodsExtensions.sqlite3GetVTable(this.db, pTab) != null);
 				///
 				///<summary>
 				///Set the aConstraint[].usable fields and initialize all
@@ -11409,7 +11414,7 @@ range_est_fallback:
 					else
 						#if !SQLITE_OMIT_VIRTUALTABLE
 						if((pLevel.plan.wsFlags&wherec.WHERE_VIRTUALTABLE)!=0) {
-							VTable pVTab=vtab.sqlite3GetVTable(db,pTab);
+							VTable pVTab=VTableMethodsExtensions.sqlite3GetVTable(db,pTab);
 							int iCur=pTabItem.iCursor;
                             v.sqlite3VdbeAddOp4(OpCode.OP_VOpen, iCur, 0, 0, pVTab,  P4Usage.P4_VTAB);
 						}
@@ -12476,10 +12481,10 @@ range_est_fallback:
 				Debug.Assert(iDb>=0);
 				pTable.tabFlags|=TableFlags.TF_Virtual;
 				pTable.nModuleArg=0;
-                vtab.addModuleArgument(db, pTable, build.sqlite3NameFromToken(db, pModuleName));
-                vtab.addModuleArgument(db, pTable, db.aDb[iDb].zName);
+                VTableMethodsExtensions.addModuleArgument(db, pTable, build.sqlite3NameFromToken(db, pModuleName));
+                VTableMethodsExtensions.addModuleArgument(db, pTable, db.aDb[iDb].zName);
 				//sqlite3DbStrDup( db, db.aDb[iDb].zName ) );
-				vtab.addModuleArgument(db,pTable,pTable.zName);
+				VTableMethodsExtensions.addModuleArgument(db,pTable,pTable.zName);
 				//sqlite3DbStrDup( db, pTable.zName ) );
 				this.sNameToken.Length=this.sNameToken.zRestSql.Length;
 				//      (int)[pModuleName.n] - pName1.z );
@@ -12500,7 +12505,7 @@ range_est_fallback:
 					string z=this.sArg.zRestSql.Substring(0,this.sArg.Length);
 					int n=this.sArg.Length;
 					sqlite3 db=this.db;
-                    vtab.addModuleArgument(db, this.pNewTable, z);
+                    VTableMethodsExtensions.addModuleArgument(db, this.pNewTable, z);
 					///sqlite3DbStrNDup( db, z, n ) );
 				}
 			}
@@ -12615,7 +12620,7 @@ range_est_fallback:
 				Module pMod;
 				SqlResult rc;
 				Debug.Assert(pTab!=null);
-				if((pTab.tabFlags&TableFlags.TF_Virtual)==0||vtab.sqlite3GetVTable(db,pTab)!=null) {
+				if((pTab.tabFlags&TableFlags.TF_Virtual)==0||VTableMethodsExtensions.sqlite3GetVTable(db,pTab)!=null) {
 					return SqlResult.SQLITE_OK;
 				}
 				///
@@ -12631,7 +12636,7 @@ range_est_fallback:
 				}
 				else {
 					string zErr=null;
-					rc=vtab.vtabCallConstructor(db,pTab,pMod,pMod.pModule.xConnect,ref zErr);
+					rc=VTableMethodsExtensions.vtabCallConstructor(db,pTab,pMod,pMod.pModule.xConnect,ref zErr);
 					if(rc!=SqlResult.SQLITE_OK) {
 						utilc.sqlite3ErrorMsg(this,"%s",zErr);
 					}

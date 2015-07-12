@@ -13,6 +13,7 @@ namespace Community.CsharpSqlite.Os
 	using va_list = System.Object;
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Ast;
+    using Community.CsharpSqlite.Utils;
 
    
 

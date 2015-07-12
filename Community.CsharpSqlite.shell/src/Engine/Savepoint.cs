@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using i64 = System.Int64;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Engine
 {
     using u64 = System.UInt64;
     ///<summary>

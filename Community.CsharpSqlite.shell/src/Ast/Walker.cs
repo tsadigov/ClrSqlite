@@ -19,7 +19,7 @@ using Community.CsharpSqlite.Ast;
 #else
 using ynVar = System.Int32; 
 #endif
-namespace Community.CsharpSqlite {
+namespace Community.CsharpSqlite.Ast {
 		///
 		///<summary>
 		///</summary>

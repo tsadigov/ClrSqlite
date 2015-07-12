@@ -53,6 +53,7 @@ namespace Community.CsharpSqlite
         using Operation = VdbeOp;
         using Community.CsharpSqlite.tree;
         using Community.CsharpSqlite.Paging;
+        using Community.CsharpSqlite.Utils;
         ///
         ///<summary>
         ///An instance of the virtual machine.  This structure contains the complete
@@ -1137,7 +1138,7 @@ pOp.cnt = 0;
                                                                 {
                                                                     pOp.p4.pVtab = _p4.pVtab;
                                                                     pOp.p4type = P4Usage.P4_VTAB;
-                                                                    vtab.sqlite3VtabLock(_p4.pVtab);
+                                                                    VTableMethodsExtensions.sqlite3VtabLock(_p4.pVtab);
                                                                     Debug.Assert((_p4.pVtab).db == this.db);
                                                                 }
                                                                 else
@@ -1494,11 +1495,11 @@ pOp.cnt = 0;
                     {
                         if (eOp == sqliteinth.SAVEPOINT_ROLLBACK)
                         {
-                            rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_ROLLBACK, iSavepoint);
+                            rc = VTableMethodsExtensions.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_ROLLBACK, iSavepoint);
                         }
                         if (rc == SqlResult.SQLITE_OK)
                         {
-                            rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_RELEASE, iSavepoint);
+                            rc = VTableMethodsExtensions.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_RELEASE, iSavepoint);
                         }
                     }
                     ///
@@ -3082,7 +3083,7 @@ start = sqlite3Hwtime();
                                                 ///</summary>
                                                 ///<param name="that the db">>aVTrans[] array is empty.  </param>
                                                 Debug.Assert(db.autoCommit == 0 || db.nVTrans == 0);
-                                                rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, db.nStatement + db.nSavepoint);
+                                                rc = VTableMethodsExtensions.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, db.nStatement + db.nSavepoint);
                                                 if (rc != SqlResult.SQLITE_OK)
                                                     goto abort_due_to_error;
 #endif
@@ -3231,7 +3232,7 @@ start = sqlite3Hwtime();
                                                     }
                                                     if (0 == isTransaction)
                                                     {
-                                                        rc = vtab.sqlite3VtabSavepoint(db, p1, iSavepoint);
+                                                        rc = VTableMethodsExtensions.sqlite3VtabSavepoint(db, p1, iSavepoint);
                                                         if (rc != SqlResult.SQLITE_OK)
                                                             goto abort_due_to_error;
                                                     }
@@ -3395,7 +3396,7 @@ start = sqlite3Hwtime();
                                                     db.nStatement++;
                                                     this.iStatement = db.nSavepoint + db.nStatement;
                                                 }
-                                                rc = vtab.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, this.iStatement - 1);
+                                                rc = VTableMethodsExtensions.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, this.iStatement - 1);
                                                 if (rc == SqlResult.SQLITE_OK)
                                                 {
                                                     rc = pBt.sqlite3BtreeBeginStmt(this.iStatement);
@@ -5495,12 +5496,12 @@ cDebug.Ase  OpCode.OP_Checkpoint: {
                                         string zFilename;
                                         ///Name of database file for pPager 
                                         eNew = pOp.p3;
-                                        Debug.Assert(eNew == Sqlite3.PAGER_JOURNALMODE_DELETE || eNew == Sqlite3.PAGER_JOURNALMODE_TRUNCATE || eNew == Sqlite3.PAGER_JOURNALMODE_PERSIST || eNew == Sqlite3.PAGER_JOURNALMODE_OFF || eNew == Sqlite3.PAGER_JOURNALMODE_MEMORY || eNew == Sqlite3.PAGER_JOURNALMODE_WAL || eNew == Sqlite3.PAGER_JOURNALMODE_QUERY);
+                                        Debug.Assert(eNew == Globals.Paging.PAGER_JOURNALMODE_DELETE || eNew == Globals.Paging.PAGER_JOURNALMODE_TRUNCATE || eNew == Globals.Paging.PAGER_JOURNALMODE_PERSIST || eNew == Globals.Paging.PAGER_JOURNALMODE_OFF || eNew == Globals.Paging.PAGER_JOURNALMODE_MEMORY || eNew == Globals.Paging.PAGER_JOURNALMODE_WAL || eNew == Globals.Paging.PAGER_JOURNALMODE_QUERY);
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.nDb);
                                         pBt = db.aDb[pOp.p1].pBt;
                                         pPager = pBt.sqlite3BtreePager();
                                         eOld = pPager.sqlite3PagerGetJournalMode();
-                                        if (eNew == Sqlite3.PAGER_JOURNALMODE_QUERY)
+                                        if (eNew == Globals.Paging.PAGER_JOURNALMODE_QUERY)
                                             eNew = eOld;
                                         if (0 == pPager.sqlite3PagerOkToChangeJournalMode())
                                             eNew = eOld;
@@ -5682,7 +5683,7 @@ break;
                                     {
                                         VTable pVTab;
                                         pVTab = pOp.p4.pVtab;
-                                        rc = vtab.sqlite3VtabBegin(db, pVTab);
+                                        rc = VTableMethodsExtensions.sqlite3VtabBegin(db, pVTab);
                                         if (pVTab != null)
                                             Sqlite3.importVtabErrMsg(this, pVTab.pVtab);
                                         break;
@@ -5698,7 +5699,7 @@ break;
                                 ///</summary>
                                 case OpCode.OP_VCreate:
                                     {
-                                        rc = vtab.sqlite3VtabCallCreate(db, pOp.p1, pOp.p4.z, ref this.zErrMsg);
+                                        rc = VTableMethodsExtensions.sqlite3VtabCallCreate(db, pOp.p1, pOp.p4.z, ref this.zErrMsg);
                                         break;
                                     }
 #endif
@@ -5713,7 +5714,7 @@ break;
                                 case OpCode.OP_VDestroy:
                                     {
                                         this.inVtabMethod = 2;
-                                        rc = vtab.sqlite3VtabCallDestroy(db, pOp.p1, pOp.p4.z);
+                                        rc = VTableMethodsExtensions.sqlite3VtabCallDestroy(db, pOp.p1, pOp.p4.z);
                                         this.inVtabMethod = 0;
                                         break;
                                     }

@@ -48,7 +48,7 @@ namespace Community.CsharpSqlite.Metadata
         ///points to a linked list of these structures.
         ///
         ///</summary>
-        public class FuncDef
+        public class FuncDef:ILinkedListNode<FuncDef>
         {
             public i16 nArg;
             ///
@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite.Metadata
             ///<summary>
             ///User data parameter 
             ///</summary>
-            public FuncDef pNext;
+            public FuncDef pNext { get; set; }
             ///
             ///<summary>
             ///Next function with same name 

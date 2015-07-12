@@ -13,10 +13,12 @@ using u32 = System.UInt32;
 using u64 = System.UInt64;
 using unsigned = System.UInt64;
 using Pgno = System.UInt32;
+using Community.CsharpSqlite.Engine;
 
-namespace Community.CsharpSqlite.Metadata
+namespace Community.CsharpSqlite
+
 {
-
+    namespace Metadata{
         ///<summary>
         /// An object of this type is created for each virtual table present in
         /// the database schema.
@@ -60,100 +62,103 @@ namespace Community.CsharpSqlite.Metadata
         /// the first argument.
         ///
         ///</summary>
-        public class VTable
+        public class VTable:ILinkedListNode<VTable>
         {
-            public Community.CsharpSqlite.sqlite3 db;
-            ///
             ///<summary>
             ///Database connection associated with this table 
             ///</summary>
-            public Module pMod;
-            ///
+            public Community.CsharpSqlite.sqlite3 db;
+
             ///<summary>
             ///Pointer to module implementation 
             ///</summary>
-            public sqlite3_vtab pVtab;
-            ///
+            public Module pMod;
+
             ///<summary>
             ///Pointer to vtab instance 
             ///</summary>
-            public int nRef;
-            ///
+            public sqlite3_vtab pVtab;
+
             ///<summary>
             ///Number of pointers to this structure 
             ///</summary>
-            public u8 bConstraint;
-            ///
+            public int nRef;
+
             ///<summary>
             ///True if constraints are supported 
             ///</summary>
-            public int iSavepoint;
-            ///
+            public u8 bConstraint;
+
             ///<summary>
             ///Depth of the SAVEPOINT stack 
             ///</summary>
-            public VTable pNext;
-            ///
+            public int iSavepoint;
+
             ///<summary>
             ///Next in linked list (see above) 
             ///</summary>
+            public VTable pNext { get; set; }
+
         };
 
 
 
+
+
+        
+    }
+namespace Engine{
+    ///<summary>
+    /// CAPI3REF: Virtual Table Instance Object
+    /// KEYWORDS: sqlite3_vtab
+    ///
+    /// Every [virtual table module] implementation uses a subclass
+    /// of this object to describe a particular instance
+    /// of the [virtual table].  Each subclass will
+    /// be tailored to the specific needs of the module implementation.
+    /// The purpose of this superclass is to define certain fields that are
+    /// common to all module implementations.
+    ///
+    /// ^Virtual tables methods can set an error message by assigning a
+    /// string obtained from [io.sqlite3_mprintf()] to zErrMsg.  The method should
+    /// take care that any prior string is freed by a call to [malloc_cs.sqlite3_free()]
+    /// prior to assigning a new string to zErrMsg.  ^After the error message
+    /// is delivered up to the client application, the string will be automatically
+    /// freed by malloc_cs.sqlite3_free() and the zErrMsg field will be zeroed.
+    ///
+    ///</summary>
+    //struct sqlite3_vtab {
+    //  const sqlite3_module *pModule;  /* The module for this virtual table */
+    //  int nRef;                       /* NO LONGER USED */
+    //  string zErrMsg;                  /* Error message from io.sqlite3_mprintf() */
+    //  /* Virtual table implementations will typically add additional fields */
+    //};
+    public class sqlite3_vtab
+    {
+        ///<summary>
+        ///The module for this virtual table 
+        ///</summary>
+        public sqlite3_module pModule;
 
 
         ///<summary>
-        /// CAPI3REF: Virtual Table Instance Object
-        /// KEYWORDS: sqlite3_vtab
-        ///
-        /// Every [virtual table module] implementation uses a subclass
-        /// of this object to describe a particular instance
-        /// of the [virtual table].  Each subclass will
-        /// be tailored to the specific needs of the module implementation.
-        /// The purpose of this superclass is to define certain fields that are
-        /// common to all module implementations.
-        ///
-        /// ^Virtual tables methods can set an error message by assigning a
-        /// string obtained from [io.sqlite3_mprintf()] to zErrMsg.  The method should
-        /// take care that any prior string is freed by a call to [malloc_cs.sqlite3_free()]
-        /// prior to assigning a new string to zErrMsg.  ^After the error message
-        /// is delivered up to the client application, the string will be automatically
-        /// freed by malloc_cs.sqlite3_free() and the zErrMsg field will be zeroed.
-        ///
+        ///Used internally 
         ///</summary>
-        //struct sqlite3_vtab {
-        //  const sqlite3_module *pModule;  /* The module for this virtual table */
-        //  int nRef;                       /* NO LONGER USED */
-        //  string zErrMsg;                  /* Error message from io.sqlite3_mprintf() */
-        //  /* Virtual table implementations will typically add additional fields */
-        //};
-        public class sqlite3_vtab
-        {
-            public sqlite3_module pModule;
+        public int nRef;
 
-            ///
-            ///<summary>
-            ///The module for this virtual table 
-            ///</summary>
 
-            public int nRef;
+        ///<summary>
+        ///Error message from io.sqlite3_mprintf() 
+        ///</summary>
+        public string zErrMsg;
+        
 
-            ///
-            ///<summary>
-            ///Used internally 
-            ///</summary>
+        ///<summary>
+        ///Virtual table implementations will typically add additional fields 
+        ///</summary>
 
-            public string zErrMsg;
-            ///
-            ///<summary>
-            ///Error message from io.sqlite3_mprintf() 
-            ///</summary>
+    };
 
-            ///
-            ///<summary>
-            ///Virtual table implementations will typically add additional fields 
-            ///</summary>
+}
 
-        };
-    }
+}

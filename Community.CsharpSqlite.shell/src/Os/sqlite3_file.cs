@@ -13,6 +13,7 @@ using System.Threading;
 using DWORD = System.UInt64;
 using System.IO;
 using Community.CsharpSqlite.Os;
+using Community.CsharpSqlite.Paging;
 
 namespace Community.CsharpSqlite
 {

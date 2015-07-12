@@ -321,6 +321,7 @@ namespace Community.CsharpSqlite
 
         public const int TK_UPLUS = 157;
 
+    }
 
         public class Lexer
         {
@@ -738,7 +739,7 @@ namespace Community.CsharpSqlite
                                 tokenType = TokenType.TK_FLOAT;
                             }
 #endif
-                            while (iOffset + i < z.Length && IdChar((byte)z[iOffset + i]))
+                            while (iOffset + i < z.Length && Sqlite3.IdChar((byte)z[iOffset + i]))
                             {
                                 tokenType = TokenType.TK_ILLEGAL;
                                 i++;
@@ -803,7 +804,7 @@ namespace Community.CsharpSqlite
                             tokenType = TokenType.TK_VARIABLE;
                             for (i = 1; z.Length > iOffset + i && (c = (byte)z[iOffset + i]) != 0; i++)
                             {
-                                if (IdChar(c))
+                                if (Sqlite3.IdChar(c))
                                 {
                                     n++;
 #if !SQLITE_OMIT_TCL_VARIABLE
@@ -875,14 +876,14 @@ namespace Community.CsharpSqlite
 #endif
                     default:
                         {
-                            if (!IdChar((byte)z[iOffset]))
+                            if (!Sqlite3.IdChar((byte)z[iOffset]))
                             {
                                 break;
                             }
-                            for (i = 1; i < z.Length - iOffset && IdChar((byte)z[iOffset + i]); i++)
+                            for (i = 1; i < z.Length - iOffset && Sqlite3.IdChar((byte)z[iOffset + i]); i++)
                             {
                             }
-                            tokenType = keywordCode(z, iOffset, i);
+                            tokenType = Sqlite3.keywordCode(z, iOffset, i);
                             return i;
                         }
                 }
@@ -915,5 +916,4 @@ namespace Community.CsharpSqlite
             ///</summary>
 
         }
-    }
 }

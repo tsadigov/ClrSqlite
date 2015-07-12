@@ -18,6 +18,7 @@ namespace Community.CsharpSqlite.Ast {
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Utils;
 
         public class SelectMethods
         {

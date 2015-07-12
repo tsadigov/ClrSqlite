@@ -648,7 +648,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 exprc.sqlite3ExprDelete(db, ref pTable.pCheck);
 #endif
 #if !SQLITE_OMIT_VIRTUALTABLE
-                vtab.sqlite3VtabClear(db, pTable);
+                VTableMethodsExtensions.sqlite3VtabClear(db, pTable);
 #endif
                 pTable = null;
                 //      sqlite3DbFree( db, ref pTable );

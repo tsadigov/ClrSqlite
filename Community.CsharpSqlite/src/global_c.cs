@@ -96,25 +96,25 @@ namespace Community.CsharpSqlite
 		///
 ///<summary>
 ///</summary>
-///<param name="The following 256 byte lookup table is used to support SQLites built">in</param>
-///<param name="equivalents to the following standard library functions:">equivalents to the following standard library functions:</param>
-///<param name=""></param>
-///<param name="isspace()                        0x01">isspace()                        0x01</param>
-///<param name="isalpha()                        0x02">isalpha()                        0x02</param>
-///<param name="isdigit()                        0x04">isdigit()                        0x04</param>
-///<param name="isalnum()                        0x06">isalnum()                        0x06</param>
-///<param name="isxdigit()                       0x08">isxdigit()                       0x08</param>
-///<param name="toupper()                        0x20">toupper()                        0x20</param>
-///<param name="SQLite identifier character      0x40">SQLite identifier character      0x40</param>
-///<param name=""></param>
-///<param name="Bit 0x20 is set if the mapped character requires translation to upper">Bit 0x20 is set if the mapped character requires translation to upper</param>
-///<param name="case. i.e. if the character is a lower">case ASCII character.</param>
-///<param name="If x is a lower">case equivalent</param>
-///<param name="is (x "> 0x20). Therefore toupper() can be implemented as:</param>
-///<param name=""></param>
-///<param name="(x & ~(map[x]&0x20))">(x & ~(map[x]&0x20))</param>
-///<param name=""></param>
-///<param name="Standard function tolower() is implemented using the _Custom.sqlite3UpperToLower[]">Standard function tolower() is implemented using the _Custom.sqlite3UpperToLower[]</param>
+///The following 256 byte lookup table is used to support SQLites built">in</param>
+///equivalents to the following standard library functions:">equivalents to the following standard library functions:</param>
+///
+///isspace()                        0x01
+///isalpha()                        0x02
+///isdigit()                        0x04
+///isalnum()                        0x06
+///isxdigit()                       0x08
+///toupper()                        0x20
+///SQLite identifier character      0x40
+///
+///Bit 0x20 is set if the mapped character requires translation to upper
+///case. i.e. if the character is a lower-case ASCII character.
+///If x is a lower-case equivalent
+///is (x "> 0x20). Therefore toupper() can be implemented as:
+///
+///(x & ~(map[x]&0x20))
+///
+///Standard function tolower() is implemented using the _Custom.sqlite3UpperToLower[]">Standard function tolower() is implemented using the _Custom.sqlite3UpperToLower[]</param>
 ///<param name="array. tolower() is used more often than toupper() by SQLite.">array. tolower() is used more often than toupper() by SQLite.</param>
 ///<param name=""></param>
 ///<param name="Bit 0x40 is set if the character non">alphanumeric and can be used in an </param>

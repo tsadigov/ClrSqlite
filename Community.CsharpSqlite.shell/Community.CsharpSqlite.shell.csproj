@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Community.CsharpSqlite</RootNamespace>
-    <AssemblyName>C#-SQLite3.123456</AssemblyName>
+    <AssemblyName>C#-SQLite3.1234567</AssemblyName>
     <StartupObject>Shell</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -61,7 +61,7 @@
       <Link>Community.CsharpSqlite\attach_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\auth_c.cs">
-      <Link>Community.CsharpSqlite\auth_c.cs</Link>
+      <Link>Community.CsharpSqlite\empty\auth_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\backup_c.cs">
       <Link>Community.CsharpSqlite\backup_c.cs</Link>
@@ -133,7 +133,7 @@
       <Link>Community.CsharpSqlite\insert_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\journal_c.cs">
-      <Link>Community.CsharpSqlite\journal_c.cs</Link>
+      <Link>Community.CsharpSqlite\empty\journal_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\keywordhash_h.cs">
       <Link>Community.CsharpSqlite\keywordhash_h.cs</Link>
@@ -151,7 +151,7 @@
       <Link>Community.CsharpSqlite\malloc_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\memjournal_c.cs">
-      <Link>Community.CsharpSqlite\memjournal_c.cs</Link>
+      <Link>src\Paging\memjournal_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\mem_Pool.cs">
       <Link>Community.CsharpSqlite\mem_Pool.cs</Link>
@@ -178,22 +178,22 @@
       <Link>Community.CsharpSqlite\opcodes_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\os_c.cs">
-      <Link>Community.CsharpSqlite\os_c.cs</Link>
+      <Link>src\Os\os_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\os_common_h.cs">
       <Link>Community.CsharpSqlite\os_common_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\os_h.cs">
-      <Link>Community.CsharpSqlite\os_h.cs</Link>
+      <Link>src\Os\os_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\os_win_c.cs">
       <Link>Community.CsharpSqlite\os_win_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pager_c.cs">
-      <Link>Community.CsharpSqlite\pager_c.cs</Link>
+      <Link>src\Paging\pager_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pager_h.cs">
-      <Link>Community.CsharpSqlite\pager_h.cs</Link>
+      <Link>Community.CsharpSqlite\empty\pager_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\parse_c.cs">
       <Link>Community.CsharpSqlite\parse_c.cs</Link>
@@ -222,14 +222,11 @@
     <Compile Include="..\Community.CsharpSqlite\src\random_c.cs">
       <Link>Community.CsharpSqlite\random_c.cs</Link>
     </Compile>
-    <Compile Include="..\Community.CsharpSqlite\src\resolve_c.cs">
-      <Link>Community.CsharpSqlite\resolve_c.cs</Link>
-    </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\rowset_c.cs">
       <Link>Community.CsharpSqlite\rowset_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\select_c.cs">
-      <Link>Community.CsharpSqlite\select_c.cs</Link>
+      <Link>src\Ast\select_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\sqlite3_h.cs">
       <Link>Community.CsharpSqlite\sqlite3_h.cs</Link>
@@ -265,7 +262,7 @@
       <Link>Community.CsharpSqlite\vacuum_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbeapi_c.cs">
-      <Link>Community.CsharpSqlite\vdbeapi_c.cs</Link>
+      <Link>src\Engine\vdbeapi_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbeaux_c.cs">
       <Link>Community.CsharpSqlite\vdbeaux_c.cs</Link>
@@ -274,19 +271,19 @@
       <Link>Community.CsharpSqlite\vdbeblob_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\VdbeInt_h.cs">
-      <Link>Community.CsharpSqlite\VdbeInt_h.cs</Link>
+      <Link>src\Engine\VdbeInt_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbemem_c.cs">
-      <Link>Community.CsharpSqlite\vdbemem_c.cs</Link>
+      <Link>src\Engine\vdbemem_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbetrace_c.cs">
-      <Link>Community.CsharpSqlite\vdbetrace_c.cs</Link>
+      <Link>src\Engine\vdbetrace_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbe_c.cs">
       <Link>Community.CsharpSqlite\vdbe_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\Vdbe_h.cs">
-      <Link>Community.CsharpSqlite\Vdbe_h.cs</Link>
+      <Link>Community.CsharpSqlite\empty\Vdbe_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vtab_c.cs">
       <Link>Community.CsharpSqlite\vtab_c.cs</Link>
@@ -295,7 +292,7 @@
       <Link>Community.CsharpSqlite\walker_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\wal_c.cs">
-      <Link>Community.CsharpSqlite\wal_c.cs</Link>
+      <Link>Community.CsharpSqlite\empty\wal_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\wal_h.cs">
       <Link>Community.CsharpSqlite\wal_h.cs</Link>
@@ -318,14 +315,18 @@
     <Compile Include="src\Ast\SelectResultType.cs" />
     <Compile Include="src\Ast\SqcList.cs" />
     <Compile Include="src\Ast\Token.cs" />
+    <Compile Include="src\Ast\WalkerExtensions.cs" />
     <Compile Include="src\Ast\Where.cs" />
     <Compile Include="src\Auth\AuthRelaed.cs" />
     <Compile Include="src\BackupExtensions.cs" />
     <Compile Include="src\BitvecExtensions.cs" />
     <Compile Include="src\BtCursor.cs" />
+    <Compile Include="src\Engine\Delegates.cs" />
     <Compile Include="src\Engine\Metadata\VdbeFunc.cs" />
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Os\sqlite3_io_methods.cs" />
+    <Compile Include="src\Paging\Delegates.cs" />
+    <Compile Include="src\Schema\Traverse\FuncDefTraverse.cs" />
     <Compile Include="src\Storage\BTree.cs" />
     <Compile Include="src\Storage\BtreeExtensions.cs" />
     <Compile Include="src\builder\DbBuilder.cs" />
@@ -334,7 +335,7 @@
     <Compile Include="src\builder\TiggerBuilder.cs" />
     <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Db.cs" />
-    <Compile Include="src\Engine\Agg.cs" />
+    <Compile Include="src\Ast\Agg.cs" />
     <Compile Include="src\Engine\BusyHandler.cs" />
     <Compile Include="src\Engine\Context.cs" />
     <Compile Include="src\Engine\Op\BTree.cs" />
@@ -361,15 +362,15 @@
     <Compile Include="src\Engine\VdbeOpList.cs" />
     <Compile Include="src\Globals.cs" />
     <Compile Include="src\Index.cs" />
-    <Compile Include="src\Page\Mem.cs" />
-    <Compile Include="src\Page\MemType.cs" />
-    <Compile Include="src\Page\MemPage.cs" />
+    <Compile Include="src\Paging\Mem.cs" />
+    <Compile Include="src\Paging\MemType.cs" />
+    <Compile Include="src\Paging\MemPage.cs" />
     <Compile Include="src\MyHelpers.cs" />
     <Compile Include="src\Os\sqlite3_file.cs" />
-    <Compile Include="src\Page\BufferExtensions.cs" />
-    <Compile Include="src\Page\FreeSpaceHeader.cs" />
-    <Compile Include="src\Page\Pager.cs" />
-    <Compile Include="src\Page\PagerSavepoint.cs" />
+    <Compile Include="src\Paging\BufferExtensions.cs" />
+    <Compile Include="src\Paging\FreeSpaceHeader.cs" />
+    <Compile Include="src\Paging\Pager.cs" />
+    <Compile Include="src\Paging\PagerSavepoint.cs" />
     <Compile Include="src\ParseExtensions.cs" />
     <Compile Include="src\Parsing\NameContext.cs" />
     <Compile Include="src\Parsing\ResolveExtensions.cs" />
@@ -399,7 +400,7 @@
     <Compile Include="src\Utils\MyLinqExtensions.cs" />
     <Compile Include="src\Utils\Str.cs" />
     <Compile Include="src\Utils\StreAccum.cs" />
-    <Compile Include="src\Walker.cs" />
+    <Compile Include="src\Ast\Walker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

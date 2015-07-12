@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Engine
 {
+    using Community.CsharpSqlite.Metadata;
     using Metadata;
 
 

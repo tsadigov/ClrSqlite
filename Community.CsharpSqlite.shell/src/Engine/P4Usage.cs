@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Community.CsharpSqlite//.Engine
+namespace Community.CsharpSqlite.Engine
 {
     public enum P4Usage
     {

@@ -12,6 +12,8 @@ using ynVar = System.Int16;
 using System.Diagnostics;
 using Community.CsharpSqlite.Ast;
 using Community.CsharpSqlite.Metadata;
+using Community.CsharpSqlite.Utils;
+using Community.CsharpSqlite.Metadata.Traverse;
 #else
 using ynVar = System.Int32; 
 #endif
@@ -802,10 +804,10 @@ break;
                             Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
                             zId = pExpr.u.zToken;
                             nId = StringExtensions.sqlite3Strlen30(zId);
-                            pDef = sqlite3FindFunction(pParse.db, zId, nId, n, enc, 0);
+                            pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, n, enc, 0);
                             if (pDef == null)
                             {
-                                pDef = sqlite3FindFunction(pParse.db, zId, nId, -1, enc, 0);
+                                pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, -1, enc, 0);
                                 if (pDef == null)
                                 {
                                     no_such_func = true;

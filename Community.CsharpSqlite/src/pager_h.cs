@@ -51,57 +51,7 @@ namespace Community.CsharpSqlite
 
 
 		///
-///<summary>
-///Allowed values for the flags parameter to sqlite3PagerOpen().
-///
-///NOTE: These values must match the corresponding BTREE_ values in btree.h.
-///
-///</summary>
 
-		//#define PAGER_OMIT_JOURNAL  0x0001    /* Do not use a rollback journal */
-		//#define PAGER_NO_READLOCK   0x0002    /* Omit readlocks on readonly files */
-		//#define PAGER_MEMORY        0x0004    /* In-memory database */
-		public const int PAGER_OMIT_JOURNAL = 0x0001;
-
-		public const int PAGER_NO_READLOCK = 0x0002;
-
-		public const int PAGER_MEMORY = 0x0004;
-
-		///
-///<summary>
-///Valid values for the second argument to sqlite3PagerLockingMode().
-///
-///</summary>
-
-		//#define PAGER_LOCKINGMODE_QUERY      -1
-		//#define PAGER_LOCKINGMODE_NORMAL      0
-		//#define PAGER_LOCKINGMODE_EXCLUSIVE   1
-        public static int PAGER_LOCKINGMODE_QUERY = -1;
-
-        public static int PAGER_LOCKINGMODE_NORMAL = 0;
-
-		public static int PAGER_LOCKINGMODE_EXCLUSIVE = 1;
-
-		///
-///<summary>
-///Numeric constants that encode the journalmode.  
-///
-///</summary>
-
-		//#define PAGER_JOURNALMODE_QUERY     (-1)  /* Query the value of journalmode */
-		//#define PAGER_JOURNALMODE_DELETE      0   /* Commit by deleting journal file */
-		//#define PAGER_JOURNALMODE_PERSIST     1   /* Commit by zeroing journal header */
-		//#define PAGER_JOURNALMODE_OFF         2   /* Journal omitted.  */
-		//#define PAGER_JOURNALMODE_TRUNCATE    3   /* Commit by truncating journal */
-		//#define PAGER_JOURNALMODE_MEMORY      4   /* In-memory journal file */
-		//#define PAGER_JOURNALMODE_WAL         5   /* Use write-ahead logging */
-		public const int PAGER_JOURNALMODE_QUERY = -1;
-		public const int PAGER_JOURNALMODE_DELETE = 0;
-		public const int PAGER_JOURNALMODE_PERSIST = 1;
-		public const int PAGER_JOURNALMODE_OFF = 2;
-		public const int PAGER_JOURNALMODE_TRUNCATE = 3;
-		public const int PAGER_JOURNALMODE_MEMORY = 4;
-		public const int PAGER_JOURNALMODE_WAL = 5;
 	///
 ///<summary>
 ///The remainder of this file contains the declarations of the functions

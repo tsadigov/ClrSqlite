@@ -3,7 +3,7 @@ using u32 = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-
+    namespace Os { 
     ///
     ///<summary>
     ///The following values may be passed as the second argument to
@@ -35,6 +35,8 @@ namespace Community.CsharpSqlite
 
         EXCLUSIVE_LOCK = 4
     }
+
+}
 
 	public partial class Sqlite3
 	{

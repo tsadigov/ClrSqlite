@@ -12,6 +12,8 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Utils;
+    using Community.CsharpSqlite.Metadata.Traverse;
 
     #if !SQLITE_OMIT_DATETIME_FUNCS
 		///<summary>
@@ -1552,7 +1554,7 @@ FuncDef[] aFunc = (FuncDef)GLOBAL( FuncDef, aDateTimeFuncs );
 #endif
                 for (i = 0; i < Sqlite3.ArraySize(aDateTimeFuncs); i++)
                 {
-                    sqlite3FuncDefInsert(pHash, aFunc[i]);
+                    FuncDefTraverse.sqlite3FuncDefInsert(pHash, aFunc[i]);
                 }
             }
 

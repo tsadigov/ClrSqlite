@@ -4,10 +4,13 @@ using System.IO;
 using i16 = System.Int16;
 using u32 = System.UInt32;
 using Pgno = System.UInt32;
+using u8 = System.Byte;
+
 
 namespace Community.CsharpSqlite
 {
-    using u8 = Byte;
+    using Utils;
+
     namespace Paging
     {
 
@@ -60,9 +63,7 @@ namespace Community.CsharpSqlite
             ///</summary>
         }
 
-    }
-    namespace Paging
-    {
+   
         ///<summary>
         /// 2008 August 05
         ///

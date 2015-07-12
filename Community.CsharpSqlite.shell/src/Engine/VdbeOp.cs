@@ -107,7 +107,7 @@ namespace Community.CsharpSqlite.Engine
 ///Used when p4type is  P4Usage.P4_INTARRAY 
 ///</summary>
 
-		public Community.CsharpSqlite.SubProgram pProgram;
+		public SubProgram pProgram;
 
 		///
 ///<summary>

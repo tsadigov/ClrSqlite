@@ -38,6 +38,7 @@ namespace Community.CsharpSqlite
 	using System.Collections.Generic;
     using Metadata;
     using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Utils;
     ///<summary>
     ///A cursor is a pointer into a single BTree within a database file.
     ///The cursor can seek to a BTree entry with a particular key, or
@@ -1260,6 +1261,27 @@ return SQLITE_NOMEM;
             VDBE_MAGIC_DEAD = 0xb606c3c8
         }
 
+        ///<summary>
+        ///A VdbeFunc is just a FuncDef (defined in sqliteInt.h) that contains
+        /// additional information about auxiliary information bound to arguments
+        /// of the function.  This is used to implement the sqlite3_get_auxdata()
+        /// and sqlite3_set_auxdata() APIs.  The "auxdata" is some auxiliary data
+        /// that can be associated with a constant argument to a function.  This
+        /// allows functions such as "regexp" to compile their constant regular
+        /// expression argument once and reused the compiled code for multiple
+        /// invocations.
+        ///</summary>
+        public class AuxData
+        {
+            public object pAux;
+            ///
+            ///<summary>
+            ///</summary>
+            ///<param name="Aux data for the i">th argument </param>
+
+            //(void );      /* Destructor for the aux data */
+        };
+
     }
 	public partial class Sqlite3
 	{
@@ -1362,26 +1384,7 @@ static int sqlite3VdbeCheckFk( Vdbe p, int i ) { return 0; }
 
 
 
-    ///<summary>
-    ///A VdbeFunc is just a FuncDef (defined in sqliteInt.h) that contains
-    /// additional information about auxiliary information bound to arguments
-    /// of the function.  This is used to implement the sqlite3_get_auxdata()
-    /// and sqlite3_set_auxdata() APIs.  The "auxdata" is some auxiliary data
-    /// that can be associated with a constant argument to a function.  This
-    /// allows functions such as "regexp" to compile their constant regular
-    /// expression argument once and reused the compiled code for multiple
-    /// invocations.
-    ///</summary>
-    public class AuxData
-    {
-        public object pAux;
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="Aux data for the i">th argument </param>
-
-        //(void );      /* Destructor for the aux data */
-    };
+   
 
 
     

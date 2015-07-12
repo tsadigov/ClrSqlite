@@ -18,6 +18,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Paging;
+    using Community.CsharpSqlite.Metadata.Traverse;
 	public partial class Sqlite3 {
 		///
 		///<summary>
@@ -946,7 +947,7 @@ break;
 			///<param name="SQL statements below, as the v">table implementation may be storing</param>
 			///<param name="some prepared statements internally.">some prepared statements internally.</param>
 			///<param name=""></param>
-            vtab.sqlite3VtabRollback(db);
+            VTableMethodsExtensions.sqlite3VtabRollback(db);
 			///
 			///<summary>
 			///If there are any outstanding VMs, return SQLITE_BUSY. 
@@ -1083,7 +1084,7 @@ break;
 					db.aDb[i].inTrans=0;
 				}
 			}
-            vtab.sqlite3VtabRollback(db);
+            VTableMethodsExtensions.sqlite3VtabRollback(db);
 			sqlite3EndBenignMalloc();
             if ((db.flags & SqliteFlags.SQLITE_InternChanges) != 0)
             {
@@ -1463,7 +1464,7 @@ enc = SqliteEncoding.UTF16BE;
 			///is being overridden/deleted but there are no active VMs, allow the
 			///operation to continue but invalidate all precompiled statements.
 			///</summary>
-			p=sqlite3FindFunction(db,zFunctionName,nName,nArg,enc,0);
+            p = FuncDefTraverse.sqlite3FindFunction(db, zFunctionName, nName, nArg, enc, 0);
 			if(p!=null&&p.iPrefEnc==enc&&p.nArg==nArg) {
 				if(db.activeVdbeCnt!=0) {
 					utilc.sqlite3Error(db, SqlResult.SQLITE_BUSY, "unable to delete/modify user-function due to active statements");
@@ -1474,7 +1475,7 @@ enc = SqliteEncoding.UTF16BE;
                     vdbeaux.sqlite3ExpirePreparedStatements(db);
 				}
 			}
-			p=sqlite3FindFunction(db,zFunctionName,nName,nArg,enc,1);
+            p = FuncDefTraverse.sqlite3FindFunction(db, zFunctionName, nName, nArg, enc, 1);
 			Debug.Assert(p!=null///
 			///<summary>
 			///|| db.mallocFailed != 0 
@@ -1580,7 +1581,8 @@ return rc;
 			int nName=StringExtensions.sqlite3Strlen30(zName);
             SqlResult rc;
 			db.mutex.sqlite3_mutex_enter();
-			if(sqlite3FindFunction(db,zName,nName,nArg,SqliteEncoding.UTF8,0)==null) {
+            if (FuncDefTraverse.sqlite3FindFunction(db, zName, nName, nArg, SqliteEncoding.UTF8, 0) == null)
+            {
                 sqlite3CreateFunc(db, zName, nArg, SqliteEncoding.UTF8, 0, (dxFunc)vdbeapi.sqlite3InvalidFunction, null, null, null);
 			}
 			rc=malloc_cs.sqlite3ApiExit(db,SqlResult.SQLITE_OK);

@@ -33,6 +33,7 @@ namespace Community.CsharpSqlite.Ast
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Utils;
 
         ///
         ///<summary>

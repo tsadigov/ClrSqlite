@@ -6,6 +6,7 @@ namespace Community.CsharpSqlite
 {
 	using sqlite3_pcache = Paging.PCache1;
     using Community.CsharpSqlite.Paging;
+    using Utils;
 
     namespace Paging
     { 

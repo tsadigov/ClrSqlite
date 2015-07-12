@@ -17,6 +17,7 @@ using Pgno = System.UInt32;
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar = System.Int16;
 using Community.CsharpSqlite.Ast;
+using Community.CsharpSqlite.Engine;
 
 #else
 using ynVar = System.Int32; 
@@ -95,16 +96,14 @@ namespace Community.CsharpSqlite.Metadata
         ///
         ///<summary>
         ///An instance of struct TriggerStep is used to store a single SQL statement
-        ///</summary>
-        ///that is a part of a trigger">program.</param>
-        ///Instances of struct TriggerStep are stored in a singly linked list (linked">Instances of struct TriggerStep are stored in a singly linked list (linked</param>
+        ///that is a part of a trigger-program.
+        ///Instances of struct TriggerStep are stored in a singly linked list (linked">
         ///using the "pNext" member) referenced by the "step_list" member of the
         ///associated struct Trigger instance. The first element of the linked list is
-        ///<param name="the first step of the trigger">program.</param>
-        ///<param name=""></param>
-        ///<param name="The "op" member indicates whether this is a "DELETE", "INSERT", "UPDATE" or">The "op" member indicates whether this is a "DELETE", "INSERT", "UPDATE" or</param>
-        ///<param name=""SELECT" statement. The meanings of the other members is determined by the">"SELECT" statement. The meanings of the other members is determined by the</param>
-        ///<param name="value of "op" as follows:">value of "op" as follows:</param>
+        ///the first step of the trigger-program.        
+        ///The "op" member indicates whether this is a "DELETE", "INSERT", "UPDATE" or">The "op" member indicates whether this is a "DELETE", "INSERT", "UPDATE" or</param>
+        ///"SELECT" statement. The meanings of the other members is determined by the
+        ///"value of "op" as follows:"
         ///
         ///(op == Sqlite3.TK_INSERT)</param>
         ///orconf    ">> stores the ON CONFLICT algorithm</param>
@@ -129,6 +128,8 @@ namespace Community.CsharpSqlite.Metadata
         ///pExprList ">> A list of the columns to update and the expressions to update</param>
         ///them to. See sqlite3Update() documentation of "pChanges"</param>
         ///argument.</param>
+        ///</summary>
+        
 
         public class TriggerStep : ILinkedListNode<TriggerStep>
         {

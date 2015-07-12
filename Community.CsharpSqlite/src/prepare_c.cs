@@ -12,6 +12,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Utils;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2005 May 25
@@ -759,7 +760,7 @@ db.xAuth = 0;
 					}
 				}
 			}
-            vtab.sqlite3VtabUnlockList(db);
+            VTableMethodsExtensions.sqlite3VtabUnlockList(db);
 			pParse.db=db;
 			pParse.nQueryLoop=(double)1;
 			if(nBytes>=0&&(nBytes==0||zSql[nBytes-1]!=0)) {

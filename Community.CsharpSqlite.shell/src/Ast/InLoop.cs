@@ -21,7 +21,7 @@ using ynVar = System.Int16;
 using ynVar = System.Int32; 
 #endif
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Ast
 {
 
 

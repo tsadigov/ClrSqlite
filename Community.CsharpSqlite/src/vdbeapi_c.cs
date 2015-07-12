@@ -22,6 +22,7 @@ namespace Community.CsharpSqlite
 	namespace Engine
 	{
         using Metadata;
+        using Community.CsharpSqlite.Utils;
 
         public static partial class VdbeExtensions
         {

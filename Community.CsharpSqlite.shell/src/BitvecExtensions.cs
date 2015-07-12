@@ -7,8 +7,9 @@ using i64 = System.Int64;
 using u32 = System.UInt32;
 using BITVEC_TELEM = System.Byte;
 using System.Diagnostics;
+using Community.CsharpSqlite.Utils;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Utils
 {
 	public static partial class BitvecExtensions
 	{

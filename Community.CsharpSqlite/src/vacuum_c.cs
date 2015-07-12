@@ -261,7 +261,8 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///Do not attempt to change the page size for a WAL database 
 			///</summary>
-			if(pMain.sqlite3BtreePager().sqlite3PagerGetJournalMode()==PAGER_JOURNALMODE_WAL) {
+            if (pMain.sqlite3BtreePager().sqlite3PagerGetJournalMode() == Globals.Paging.PAGER_JOURNALMODE_WAL)
+            {
 				db.nextPagesize=0;
 			}
 			if(pTemp.sqlite3BtreeSetPageSize(pMain.GetPageSize(),nRes,0)!=0||(!isMemDb&&pTemp.sqlite3BtreeSetPageSize(db.nextPagesize,nRes,0)!=0)//|| NEVER( db.mallocFailed != 0 )

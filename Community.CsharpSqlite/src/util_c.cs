@@ -8,10 +8,11 @@ using u64 = System.UInt64;
 using Pgno = System.UInt32;
 using Community.CsharpSqlite;
 using sqlite_int64 = System.Int64;
+using Community.CsharpSqlite.Utils;
 
 namespace Community
 {
-    namespace CsharpSqlite{
+    namespace CsharpSqlite.Utils{
     using Metadata;
 	using System.Globalization;
     using System.Collections.Generic;

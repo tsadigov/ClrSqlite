@@ -10,6 +10,7 @@ namespace Community.CsharpSqlite
     using sqlite3_stmt = Engine.Vdbe;
     
     using vdbeapi = Engine.vdbeapi;
+    using Community.CsharpSqlite.Utils;
 
     public class legacy
     {

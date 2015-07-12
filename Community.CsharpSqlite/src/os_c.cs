@@ -6,12 +6,9 @@ using u32 = System.UInt32;
 using sqlite3_int64 = System.Int64;
 using Community.CsharpSqlite.Os;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Os
 {
-    public partial class Sqlite3
-    {
 
-    }
         public class os
         {
             ///

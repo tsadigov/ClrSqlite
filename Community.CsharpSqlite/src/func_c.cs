@@ -14,6 +14,8 @@ namespace Community.CsharpSqlite.Metadata {
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
     using _Custom = Sqlite3._Custom;
+    using Community.CsharpSqlite.Utils;
+    using Community.CsharpSqlite.Metadata.Traverse;
 
     ///
     ///<summary>
@@ -2020,7 +2022,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             static void setLikeOptFlag(sqlite3 db, string zName, FuncFlags flagVal)
             {
                 FuncDef pDef;
-                pDef = Sqlite3.sqlite3FindFunction(db, zName, StringExtensions.sqlite3Strlen30(zName), 2, SqliteEncoding.UTF8, 0);
+                pDef = FuncDefTraverse.sqlite3FindFunction(db, zName, StringExtensions.sqlite3Strlen30(zName), 2, SqliteEncoding.UTF8, 0);
                 if (Sqlite3.ALWAYS(pDef != null))
                 {
                     pDef.flags = flagVal;
@@ -2065,7 +2067,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                     return false;
                 }
                 Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
-                pDef = Sqlite3.sqlite3FindFunction(db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), 2, SqliteEncoding.UTF8, 0);
+                pDef = FuncDefTraverse.sqlite3FindFunction(db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), 2, SqliteEncoding.UTF8, 0);
                 if (Sqlite3.NEVER(pDef == null) || (pDef.flags & FuncFlags.SQLITE_FUNC_LIKE) == 0)
                 {
                     return false;
@@ -2205,11 +2207,11 @@ FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
 #endif
                 for (i = 0; i < Sqlite3.ArraySize(aBuiltinFunc); i++)
                 {
-                    Sqlite3.sqlite3FuncDefInsert(pHash, aFunc[i]);
+                    FuncDefTraverse.sqlite3FuncDefInsert(pHash, aFunc[i]);
                 }
                 Sqlite3.DateUtils.sqlite3RegisterDateTimeFunctions();
 #if !SQLITE_OMIT_ALTERTABLE
-                Sqlite3.alter.sqlite3AlterFunctions();
+                alter.RegisterPredefinedFunctions();
 #endif
             }
         }

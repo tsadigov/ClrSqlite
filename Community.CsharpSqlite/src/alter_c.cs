@@ -7,12 +7,15 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Metadata.Traverse;
     using Community.CsharpSqlite.Os;
+    using Community.CsharpSqlite.Utils;
     using sqlite3_value = Engine.Mem;
 
     public partial class Sqlite3
     {
 
+    }
 
         public class alter
         {
@@ -311,29 +314,28 @@ namespace Community.CsharpSqlite
             ///</summary>
             static FuncDef[] aAlterTableFuncs;
 
-            public static void sqlite3AlterFunctions()
+            /// <summary>
+            /// sqlite3AlterFunctions
+            /// </summary>
+            public static void RegisterPredefinedFunctions()
             {
                 aAlterTableFuncs = new FuncDef[] {
-				FuncDef.FUNCTION ("sqlite_rename_table", 2, 0, 0, renameTableFunc),
-				#if !SQLITE_OMIT_TRIGGER
-				FuncDef.FUNCTION ("sqlite_rename_trigger", 2, 0, 0, renameTriggerFunc),
-				#endif
-				#if !SQLITE_OMIT_FOREIGN_KEY
-				FuncDef.FUNCTION ("sqlite_rename_parent", 3, 0, 0, renameParentFunc),
-			#endif
-			};
-                int i;
+				    FuncDef.FUNCTION ("sqlite_rename_table", 2, 0, 0, renameTableFunc),
+				    #if !SQLITE_OMIT_TRIGGER
+				    FuncDef.FUNCTION ("sqlite_rename_trigger", 2, 0, 0, renameTriggerFunc),
+				    #endif
+				    #if !SQLITE_OMIT_FOREIGN_KEY
+				    FuncDef.FUNCTION ("sqlite_rename_parent", 3, 0, 0, renameParentFunc),
+			        #endif
+			    };
 #if SQLITE_OMIT_WSD
 																																																												  FuncDefHash pHash = GLOBAL(FuncDefHash, sqlite3GlobalFunctions);
   FuncDef[] aFunc = GLOBAL(FuncDef, aAlterTableFuncs);
 #else
-                FuncDefHash pHash = sqlite3GlobalFunctions;
+                FuncDefHash pHash = Sqlite3.sqlite3GlobalFunctions;
                 FuncDef[] aFunc = aAlterTableFuncs;
 #endif
-                for (i = 0; i < Sqlite3.ArraySize(aAlterTableFuncs); i++)
-                {
-                    sqlite3FuncDefInsert(pHash, aFunc[i]);
-                }
+                aFunc.ForEach(f => FuncDefTraverse.sqlite3FuncDefInsert(pHash, f));                
             }
 
             ///<summary>
@@ -370,5 +372,4 @@ namespace Community.CsharpSqlite
 #endif
 #endif
         }
-    }
 }

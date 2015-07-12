@@ -14,119 +14,13 @@ namespace Community.CsharpSqlite
     using DbPage = Paging.PgHdr;
     using Community.CsharpSqlite.Os;
     using _Custom = Sqlite3._Custom;
+    using Utils;
+
     public partial class Sqlite3
     {
 
 
-        ///
-            ///<summary>
-            ///Journal files begin with the following magic string.  The data
-            ///was obtained from /dev/random.  It is used only as a sanity check.
-            ///
-            ///Since version 2.8.0, the journal format contains additional sanity
-            ///checking information.  If the power fails while the journal is being
-            ///</summary>
-            ///<param name="written, semi">random garbage data might appear in the journal</param>
-            ///<param name="file after power is restored.  If an attempt is then made">file after power is restored.  If an attempt is then made</param>
-            ///<param name="to roll the journal back, the database could be corrupted.  The additional">to roll the journal back, the database could be corrupted.  The additional</param>
-            ///<param name="sanity checking data is an attempt to discover the garbage in the">sanity checking data is an attempt to discover the garbage in the</param>
-            ///<param name="journal and ignore it.">journal and ignore it.</param>
-            ///<param name=""></param>
-            ///<param name="The sanity checking information for the new journal format consists">The sanity checking information for the new journal format consists</param>
-            ///<param name="of a 32">bit checksum on each page of data.  The checksum covers both</param>
-            ///<param name="the page number and the pPager.pageSize bytes of data for the page.">the page number and the pPager.pageSize bytes of data for the page.</param>
-            ///<param name="This cksum is initialized to a 32">bit random value that appears in the</param>
-            ///<param name="journal file right after the header.  The random initializer is important,">journal file right after the header.  The random initializer is important,</param>
-            ///<param name="because garbage data that appears at the end of a journal is likely">because garbage data that appears at the end of a journal is likely</param>
-            ///<param name="data that was once in other files that have now been deleted.  If the">data that was once in other files that have now been deleted.  If the</param>
-            ///<param name="garbage data came from an obsolete journal file, the checksums might">garbage data came from an obsolete journal file, the checksums might</param>
-            ///<param name="be correct.  But by initializing the checksum to random value which">be correct.  But by initializing the checksum to random value which</param>
-            ///<param name="is different for every journal, we minimize that risk.">is different for every journal, we minimize that risk.</param>
-
-        public static byte[] aJournalMagic = new byte[] {
-			0xd9,
-			0xd5,
-			0x05,
-			0xf9,
-			0x20,
-			0xa1,
-			0x63,
-			0xd7,
-		};
-
-
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="The macro MEMDB is true if we are dealing with an in">memory database.</param>
-        ///<param name="We do this as a macro so that if the SQLITE_OMIT_MEMORYDB macro is set,">We do this as a macro so that if the SQLITE_OMIT_MEMORYDB macro is set,</param>
-        ///<param name="the value of MEMDB will be a constant and the compiler will optimize">the value of MEMDB will be a constant and the compiler will optimize</param>
-        ///<param name="out code that would never execute.">out code that would never execute.</param>
-        ///<param name=""></param>
-
-#if !SQLITE_OMIT_MEMORYDB
-																																						// define MEMDB 0
-public const int MEMDB = 0;
-#else
-        //# define MEMDB pPager.memDb
-#endif
-            
-
-
-        ///
-        ///<summary>
-        ///The Pager.eLock variable is almost always set to one of the 
-        ///</summary>
-        ///<param name="following locking">states, according to the lock currently held on</param>
-        ///<param name="the database file: NO_LOCK, SHARED_LOCK, RESERVED_LOCK or EXCLUSIVE_LOCK.">the database file: NO_LOCK, SHARED_LOCK, RESERVED_LOCK or EXCLUSIVE_LOCK.</param>
-        ///<param name="This variable is kept up to date as locks are taken and released by">This variable is kept up to date as locks are taken and released by</param>
-        ///<param name="the pagerLockDb() and pagerUnlockDb() wrappers.">the pagerLockDb() and pagerUnlockDb() wrappers.</param>
-        ///<param name=""></param>
-        ///<param name="If the VFS xLock() or xUnlock() returns an error other than SQLITE_BUSY">If the VFS xLock() or xUnlock() returns an error other than SQLITE_BUSY</param>
-        ///<param name="(i.e. one of the SQLITE_IOERR subtypes), it is not clear whether or not">(i.e. one of the SQLITE_IOERR subtypes), it is not clear whether or not</param>
-        ///<param name="the operation was successful. In these circumstances pagerLockDb() and">the operation was successful. In these circumstances pagerLockDb() and</param>
-        ///<param name="pagerUnlockDb() take a conservative approach "> eLock is always updated</param>
-        ///<param name="when unlocking the file, and only updated when locking the file if the">when unlocking the file, and only updated when locking the file if the</param>
-        ///<param name="VFS call is successful. This way, the Pager.eLock variable may be set">VFS call is successful. This way, the Pager.eLock variable may be set</param>
-        ///<param name="to a less exclusive (lower) value than the lock that is actually held">to a less exclusive (lower) value than the lock that is actually held</param>
-        ///<param name="at the system level, but it is never set to a more exclusive value.">at the system level, but it is never set to a more exclusive value.</param>
-        ///<param name=""></param>
-        ///<param name="This is usually safe. If an xUnlock fails or appears to fail, there may ">This is usually safe. If an xUnlock fails or appears to fail, there may </param>
-        ///<param name="be a few redundant xLock() calls or a lock may be held for longer than">be a few redundant xLock() calls or a lock may be held for longer than</param>
-        ///<param name="required, but nothing really goes wrong.">required, but nothing really goes wrong.</param>
-        ///<param name=""></param>
-        ///<param name="The exception is when the database file is unlocked as the pager moves">The exception is when the database file is unlocked as the pager moves</param>
-        ///<param name="from ERROR to OPEN state. At this point there may be a hot">journal file </param>
-        ///<param name="in the file">>SHARED</param>
-        ///<param name="transition, by the same pager or any other). If the call to xUnlock()">transition, by the same pager or any other). If the call to xUnlock()</param>
-        ///<param name="fails at this point and the pager is left holding an EXCLUSIVE lock, this">fails at this point and the pager is left holding an EXCLUSIVE lock, this</param>
-        ///<param name="can confuse the call to xCheckReservedLock() call made later as part">can confuse the call to xCheckReservedLock() call made later as part</param>
-        ///<param name="of hot">journal detection.</param>
-        ///<param name=""></param>
-        ///<param name="xCheckReservedLock() is defined as returning true "if there is a RESERVED ">xCheckReservedLock() is defined as returning true "if there is a RESERVED </param>
-        ///<param name="lock held by this process or any others". So xCheckReservedLock may ">lock held by this process or any others". So xCheckReservedLock may </param>
-        ///<param name="return true because the caller itself is holding an EXCLUSIVE lock (but">return true because the caller itself is holding an EXCLUSIVE lock (but</param>
-        ///<param name="doesn't know it because of a previous error in xUnlock). If this happens">doesn't know it because of a previous error in xUnlock). If this happens</param>
-        ///<param name="a hot">journal may be mistaken for a journal being created by an active</param>
-        ///<param name="transaction in another process, causing SQLite to read from the database">transaction in another process, causing SQLite to read from the database</param>
-        ///<param name="without rolling it back.">without rolling it back.</param>
-        ///<param name=""></param>
-        ///<param name="To work around this, if a call to xUnlock() fails when unlocking the">To work around this, if a call to xUnlock() fails when unlocking the</param>
-        ///<param name="database in the ERROR state, Pager.eLock is set to UNKNOWN_LOCK. It">database in the ERROR state, Pager.eLock is set to UNKNOWN_LOCK. It</param>
-        ///<param name="is only changed back to a real locking state after a successful call">is only changed back to a real locking state after a successful call</param>
-        ///<param name="to xLock(EXCLUSIVE). Also, the code to do the OPEN">>SHARED state transition</param>
-        ///<param name="omits the check for a hot">journal if Pager.eLock is set to UNKNOWN_LOCK </param>
-        ///<param name="lock. Instead, it assumes a hot">journal exists and obtains an EXCLUSIVE</param>
-        ///<param name="lock on the database file before attempting to roll it back. See function">lock on the database file before attempting to roll it back. See function</param>
-        ///<param name="PagerSharedLock() for more detail.">PagerSharedLock() for more detail.</param>
-        ///<param name=""></param>
-        ///<param name="Pager.eLock may only be set to UNKNOWN_LOCK when the pager is in ">Pager.eLock may only be set to UNKNOWN_LOCK when the pager is in </param>
-        ///<param name="PagerState.PAGER_OPEN state.">PagerState.PAGER_OPEN state.</param>
-        ///<param name=""></param>
-
-        //#define UNKNOWN_LOCK                (EXCLUSIVE_LOCK+1)
-        public const LockType UNKNOWN_LOCK = (LockType.EXCLUSIVE_LOCK + 1);
-
+       
 #if TRACE
 																																						
 static bool sqlite3PagerTrace = false;  /* True to enable tracing */
@@ -680,7 +574,7 @@ assert( (pPg->flags&PGHDR.DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
             ///</summary>
 
             zMaster[0] = 0;
-            if (SqlResult.SQLITE_OK != (rc = os.sqlite3OsFileSize(pJrnl, ref szJ)) || szJ < 16 || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, (int)(szJ - 16), ref len)) || len >= nMaster || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, szJ - 12, ref cksum)) || SqlResult.SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, aMagic, 8, szJ - 8)) || _Custom.memcmp(aMagic, Sqlite3.aJournalMagic, 8) != 0 || SqlResult.SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, zMaster, len, (long)(szJ - 16 - len))))
+            if (SqlResult.SQLITE_OK != (rc = os.sqlite3OsFileSize(pJrnl, ref szJ)) || szJ < 16 || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, (int)(szJ - 16), ref len)) || len >= nMaster || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(pJrnl, szJ - 12, ref cksum)) || SqlResult.SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, aMagic, 8, szJ - 8)) || _Custom.memcmp(aMagic, Globals.Paging.aJournalMagic, 8) != 0 || SqlResult.SQLITE_OK != (rc = os.sqlite3OsRead(pJrnl, zMaster, len, (long)(szJ - 16 - len))))
             {
                 return rc;
             }
@@ -1199,7 +1093,7 @@ return rc;
         {
             SqlResult rc = SqlResult.SQLITE_OK;
             Pager pPager = pPg.pPager;
-            if (pPager.journalMode != Sqlite3.PAGER_JOURNALMODE_OFF)
+            if (pPager.journalMode != Globals.Paging.PAGER_JOURNALMODE_OFF)
             {
                 ///
                 ///<summary>
@@ -1510,13 +1404,13 @@ return rc;
             ///Number of bytes in zPathname 
             ///</summary>
 
-            bool useJournal = (flags & (int)Sqlite3.PAGER_OMIT_JOURNAL) == 0;
+            bool useJournal = (flags & (int)Globals.Paging.PAGER_OMIT_JOURNAL) == 0;
             ///
             ///<summary>
             ///False to omit journal 
             ///</summary>
 
-            bool noReadlock = (flags & (int)Sqlite3.PAGER_NO_READLOCK) != 0;
+            bool noReadlock = (flags & (int)Globals.Paging.PAGER_NO_READLOCK) != 0;
             ///
             ///<summary>
             ///</summary>
@@ -1573,7 +1467,7 @@ return rc;
 
             ppPager = null;
 #if !SQLITE_OMIT_MEMORYDB
-            if ((flags & Sqlite3.PAGER_MEMORY) != 0)
+            if ((flags & Globals.Paging.PAGER_MEMORY) != 0)
             {
                 memDb = 1;
                 zFilename = null;
@@ -1867,8 +1761,8 @@ szPageDflt = ii;
             ///</summary>
 
             pPager.tempFile = tempFile != 0;
-            Debug.Assert(tempFile == Sqlite3.PAGER_LOCKINGMODE_NORMAL || tempFile == Sqlite3.PAGER_LOCKINGMODE_EXCLUSIVE);
-            Debug.Assert(Sqlite3.PAGER_LOCKINGMODE_EXCLUSIVE == 1);
+            Debug.Assert(tempFile == Globals.Paging.PAGER_LOCKINGMODE_NORMAL || tempFile == Globals.Paging.PAGER_LOCKINGMODE_EXCLUSIVE);
+            Debug.Assert(Globals.Paging.PAGER_LOCKINGMODE_EXCLUSIVE == 1);
             pPager.exclusiveMode = tempFile != 0;
             pPager.changeCountDone = pPager.tempFile;
             pPager.memDb = memDb;
@@ -1899,12 +1793,12 @@ szPageDflt = ii;
             pPager.setSectorSize();
             if (!useJournal)
             {
-                pPager.journalMode = Sqlite3.PAGER_JOURNALMODE_OFF;
+                pPager.journalMode = Globals.Paging.PAGER_JOURNALMODE_OFF;
             }
             else
                 if (memDb != 0)
                 {
-                    pPager.journalMode = Sqlite3.PAGER_JOURNALMODE_MEMORY;
+                    pPager.journalMode = Globals.Paging.PAGER_JOURNALMODE_MEMORY;
                 }
             ///
             ///<summary>

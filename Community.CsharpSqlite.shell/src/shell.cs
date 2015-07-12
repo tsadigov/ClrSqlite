@@ -3114,7 +3114,7 @@ return 0;
     private static int testtokenize(StringBuilder zFirstCmd,int leftAt)
     {
         TokenType tk = new TokenType();
-        var result = Sqlite3.Lexer.sqlite3GetToken(zFirstCmd.ToString(), leftAt, ref tk);
+        var result = Lexer.sqlite3GetToken(zFirstCmd.ToString(), leftAt, ref tk);
         var tkn=zFirstCmd.ToString().Substring(leftAt, result);
         print(tk, tkn);
 

@@ -13,6 +13,7 @@ namespace Community.CsharpSqlite.tree {
 	using System.Text;
     using Metadata;
     using Community.CsharpSqlite.Paging;
+    using Community.CsharpSqlite.Utils;
 
         ///
         ///<summary>

@@ -248,46 +248,7 @@ namespace Community.CsharpSqlite
 		//AutoExtention
 		public delegate int dxInit (sqlite3 db, ref string zMessage, sqlite3_api_routines sar);
 
-		#if !SQLITE_OMIT_VIRTUALTABLE
-		public delegate int dmxCreate (sqlite3 db, object pAux, int argc, string p4, object argv, sqlite3_vtab ppVTab, char p7);
-
-		public delegate int dmxConnect (sqlite3 db, object pAux, int argc, string p4, object argv, sqlite3_vtab ppVTab, char p7);
-
-		public delegate int dmxBestIndex (sqlite3_vtab pVTab, ref sqlite3_index_info pIndexInfo);
-
-		public delegate int dmxDisconnect (sqlite3_vtab pVTab);
-
-		public delegate int dmxDestroy (sqlite3_vtab pVTab);
-
-		public delegate int dmxOpen (sqlite3_vtab pVTab, sqlite3_vtab_cursor ppCursor);
-
-		public delegate int dmxClose (sqlite3_vtab_cursor pCursor);
-
-		public delegate int dmxFilter (sqlite3_vtab_cursor pCursor, int idmxNum, string idmxStr, int argc, sqlite3_value argv);
-
-		public delegate int dmxNext (sqlite3_vtab_cursor pCursor);
-
-		public delegate int dmxEof (sqlite3_vtab_cursor pCursor);
-
-		public delegate int dmxColumn (sqlite3_vtab_cursor pCursor, sqlite3_context ctx, int i3);
-
-		public delegate int dmxRowid (sqlite3_vtab_cursor pCursor, sqlite3_int64 pRowid);
-
-		public delegate int dmxUpdate (sqlite3_vtab pVTab, int i2, sqlite3_value sv3, sqlite3_int64 v4);
-
-		public delegate int dmxBegin (sqlite3_vtab pVTab);
-
-		public delegate int dmxSync (sqlite3_vtab pVTab);
-
-		public delegate int dmxCommit (sqlite3_vtab pVTab);
-
-		public delegate int dmxRollback (sqlite3_vtab pVTab);
-
-		public delegate int dmxFindFunction (sqlite3_vtab pVtab, int nArg, string zName);
-
-		public delegate int dmxRename (sqlite3_vtab pVtab, string zNew);
-
-		#endif
+		
 		//Faults
 		public delegate void void_function ();
 
@@ -316,31 +277,7 @@ namespace Community.CsharpSqlite
 ///Callback for SELECTs 
 ///</summary>
 
-        namespace Paging
-        {
-            // pcache Methods
-            public delegate SqlResult dxPC_Init(object NotUsed);
-
-            public delegate void dxPC_Shutdown(object NotUsed);
-
-            public delegate sqlite3_pcache dxPC_Create(int szPage, bool bPurgeable);
-
-            public delegate void dxPC_Cachesize(sqlite3_pcache pCache, int nCachesize);
-
-            public delegate int dxPC_Pagecount(sqlite3_pcache pCache);
-
-            public delegate PgHdr dxPC_Fetch(sqlite3_pcache pCache, u32 key, int createFlag);
-
-            public delegate void dxPC_Unpin(sqlite3_pcache pCache, PgHdr p2, bool discard);
-
-            public delegate void dxPC_Rekey(sqlite3_pcache pCache, PgHdr p2, u32 oldKey, u32 newKey);
-
-            public delegate void dxPC_Truncate(sqlite3_pcache pCache, u32 iLimit);
-
-            public delegate void dxPC_Destroy(ref sqlite3_pcache pCache);
-
-            public delegate void dxIter(PgHdr p);
-        }
+  
 
         public partial class Sqlite3
         {

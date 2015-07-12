@@ -15,6 +15,7 @@ namespace Community.CsharpSqlite
     using DbPage = Paging.PgHdr;
     using tree;
     using Community.CsharpSqlite.Paging;
+    using Community.CsharpSqlite.Utils;
 
     public partial class Sqlite3
     {
@@ -44,11 +45,7 @@ namespace Community.CsharpSqlite
         ///<param name=""></param>
         //#include "btreeInt.h"
         ///
-        ///<summary>
-        ///The header string that appears at the beginning of every
-        ///SQLite database.
-        ///</summary>
-        public static byte[] zMagicHeader = Encoding.UTF8.GetBytes(SQLITE_FILE_HEADER);
+        
         ///<summary>
         /// Set this global variable to 1 to enable tracing using the TRACE
         /// macro.
@@ -1104,7 +1101,7 @@ if( p.pNext ) p.pNext.pPrev = p.pPrev;
                     u32 usableSize;
                     u8[] page1 = pPage1.aData;
                     rc = SqlResult.SQLITE_NOTADB;
-                    if (_Custom.memcmp(page1, Sqlite3.zMagicHeader, 16) != 0)
+                    if (_Custom.memcmp(page1, Globals.zMagicHeader, 16) != 0)
                     {
                         goto page1_init_failed;
                     }
@@ -1270,9 +1267,9 @@ rc = SQLITE_NOTADB;
                 rc = PagerMethods.sqlite3PagerWrite(pP1.pDbPage);
                 if (rc != 0)
                     return rc;
-                Buffer.BlockCopy(Sqlite3.zMagicHeader, 0, data, 0, 16);
+                Buffer.BlockCopy(Globals.zMagicHeader, 0, data, 0, 16);
                 // memcpy(data, zMagicHeader, sizeof(zMagicHeader));
-                Debug.Assert(Sqlite3.zMagicHeader.Length == 16);
+                Debug.Assert(Globals.zMagicHeader.Length == 16);
                 data[16] = (u8)((pBt.pageSize >> 8) & 0xff);
                 data[17] = (u8)((pBt.pageSize >> 16) & 0xff);
                 data[18] = 1;
@@ -1343,29 +1340,17 @@ rc = SQLITE_NOTADB;
             ///page.
             ///</summary>
             public static SqlResult relocatePage(BtShared pBt,///
-                ///<summary>
                 ///Btree 
-                ///</summary>
             MemPage pDbPage,///
-                ///<summary>
                 ///Open page to move 
-                ///</summary>
             u8 eType,///
-                ///<summary>
                 ///Pointer map 'type' entry for pDbPage 
-                ///</summary>
             Pgno iPtrPage,///
-                ///<summary>
-                ///</summary>
                 ///<param name="Pointer map 'page">no' entry for pDbPage </param>
             Pgno iFreePage,///
-                ///<summary>
                 ///The location to move pDbPage to 
-                ///</summary>
             int isCommit///
-                ///<summary>
                 ///isCommit flag passed to sqlite3PagerMovepage 
-                ///</summary>
             )
             {
                 MemPage pPtrPage = new MemPage();

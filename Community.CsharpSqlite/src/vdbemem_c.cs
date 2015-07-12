@@ -15,6 +15,7 @@ namespace Community.CsharpSqlite.Engine
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Utils;
 
     public static class MemExtensions {
         ///<summary>

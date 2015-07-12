@@ -20,7 +20,8 @@ namespace Community.CsharpSqlite.Ast
     using sqlite3_value = Engine.Mem;
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using Community.CsharpSqlite.Ast;
-    using Metadata;    
+    using Metadata;
+    using Community.CsharpSqlite.Utils;    
     
 
         public class SrcList

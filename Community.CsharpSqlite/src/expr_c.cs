@@ -18,6 +18,8 @@ namespace Community.CsharpSqlite.Ast
     using Parse=Sqlite3.Parse;
     using Metadata;
     using Engine;
+    using Community.CsharpSqlite.Utils;
+    using Community.CsharpSqlite.Metadata.Traverse;
 
         public class exprc
         {
@@ -1732,7 +1734,7 @@ return null;
                                         pItem.pExpr = pExpr;
                                         pItem.iMem = ++pParse.nMem;
                                         Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
-                                        pItem.pFunc = Sqlite3.sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0);
+                                        pItem.pFunc = FuncDefTraverse.sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0);
                                         if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)
                                         {
                                             pItem.iDistinct = pParse.nTab++;

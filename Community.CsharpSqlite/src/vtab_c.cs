@@ -12,6 +12,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Utils;
+    using Community.CsharpSqlite.Engine;
     
         //#include "sqliteInt.h"
         ///<summary>
@@ -28,7 +29,7 @@ namespace Community.CsharpSqlite
             public VTable pVTable;
         };
 
-        public class vtab
+        public static class VTableMethodsExtensions//vtab_c
         {
             ///<summary>
             /// 2006 June 10
@@ -191,15 +192,11 @@ namespace Community.CsharpSqlite
                 VTable pRet = null;
                 VTable pVTable = p.pVTable;
                 p.pVTable = null;
-                ///
-                ///<summary>
                 ///Assert that the mutex (if any) associated with the BtShared database 
                 ///that contains table p is held by the caller. See header comments 
                 ///above function sqlite3VtabUnlockList() for an explanation of why
                 ///this makes it safe to access the sqlite3.pDisconnect list of any
                 ///database connection that may have an entry in the p.pVTable list.
-                ///
-                ///</summary>
                 Debug.Assert(db == null || Sqlite3.sqlite3SchemaMutexHeld(db, 0, p.pSchema));
                 while (pVTable != null)
                 {

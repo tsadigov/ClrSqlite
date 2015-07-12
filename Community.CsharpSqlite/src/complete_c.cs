@@ -2,7 +2,8 @@ using System.Diagnostics;
 
 namespace Community.CsharpSqlite
 {
-	using u8 = System.Byte;
+    using Community.CsharpSqlite.Utils;
+    using u8 = System.Byte;
 
 	public partial class Sqlite3
 	{
@@ -44,7 +45,7 @@ namespace Community.CsharpSqlite
 		#if !SQLITE_AMALGAMATION
 		#if SQLITE_ASCII
 		//#define IdChar(C)  ((sqlite3CtypeMap[(unsigned char)C]&0x46)!=0)
-		static bool IdChar (u8 C)
+		public static bool IdChar (u8 C)
 		{
 			return (sqlite3CtypeMap [(char)C] & 0x46) != 0;
 		}

@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace Community.CsharpSqlite
 {
+    using u32 = System.UInt32;
+
     public static class BufferExtensions
     {
+
+
+
         ///<summary>
         /// Read or write a two- and four-byte big-endian integer values.
         ///
@@ -32,5 +37,18 @@ namespace Community.CsharpSqlite
             pData[Offset + 0] = (byte)(v >> 8);
             pData[Offset + 1] = (byte)v;
         }
+
+        ////#define put2byte(p,v) ((p)[0] = (u8)((v)>>8), (p)[1] = (u8)(v))
+        //static void put2byte(byte[] pData, int Offset, u32 v)
+        //{
+        //    pData[Offset + 0] = (byte)(v >> 8);
+        //    pData[Offset + 1] = (byte)v;
+        //}
+
+        //static void put2byte(byte[] pData, int Offset, int v)
+        //{
+        //    pData[Offset + 0] = (byte)(v >> 8);
+        //    pData[Offset + 1] = (byte)v;
+        //}
     }
 }

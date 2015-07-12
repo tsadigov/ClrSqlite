@@ -13,6 +13,7 @@ namespace Community.CsharpSqlite
     using System.Diagnostics;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Utils;
 
     ///<summary>
     /// The following structure contains information used by the sqliteFix...

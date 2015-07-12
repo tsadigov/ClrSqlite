@@ -15,6 +15,7 @@ namespace Community.CsharpSqlite
 	using System.Text;
     using System.Linq;
     using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Utils;
 
     namespace Paging
     {

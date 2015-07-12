@@ -113,11 +113,11 @@ namespace Community.CsharpSqlite {
 		static int getLockingMode(string z) {
 			if(z!=null) {
 				if(z.Equals("exclusive",StringComparison.InvariantCultureIgnoreCase))
-					return PAGER_LOCKINGMODE_EXCLUSIVE;
+					return Globals.Paging.PAGER_LOCKINGMODE_EXCLUSIVE;
 				if(z.Equals("normal",StringComparison.InvariantCultureIgnoreCase))
-					return PAGER_LOCKINGMODE_NORMAL;
+					return Globals.Paging.PAGER_LOCKINGMODE_NORMAL;
 			}
-			return PAGER_LOCKINGMODE_QUERY;
+			return Globals.Paging.PAGER_LOCKINGMODE_QUERY;
 		}
 		#if !SQLITE_OMIT_AUTOVACUUM
 		///<summary>
@@ -362,7 +362,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 		}
 		#endif
 		///<summary>
-		/// Parameter eMode must be one of the PAGER_JOURNALMODE_XXX constants
+		/// Parameter eMode must be one of the Globals.Paging.PAGER_JOURNALMODE_XXX constants
 		/// defined in pager.h. This function returns the associated lowercase
 		/// journal-mode name.
 		///</summary>
@@ -377,12 +377,12 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 																																																																														, "wal"
 #endif
 			};
-			Debug.Assert(PAGER_JOURNALMODE_DELETE==0);
-			Debug.Assert(PAGER_JOURNALMODE_PERSIST==1);
-			Debug.Assert(PAGER_JOURNALMODE_OFF==2);
-			Debug.Assert(PAGER_JOURNALMODE_TRUNCATE==3);
-			Debug.Assert(PAGER_JOURNALMODE_MEMORY==4);
-			Debug.Assert(PAGER_JOURNALMODE_WAL==5);
+			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_DELETE==0);
+			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_PERSIST==1);
+			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_OFF==2);
+			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_TRUNCATE==3);
+			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_MEMORY==4);
+			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_WAL==5);
 			Debug.Assert(eMode>=0&&eMode<=Sqlite3.ArraySize(azModeName));
 			if(eMode==Sqlite3.ArraySize(azModeName))
 				return null;
@@ -695,7 +695,7 @@ goto pragma_out;
 								if(zLeft.Equals("locking_mode",StringComparison.InvariantCultureIgnoreCase)) {
 									string zRet="normal";
 									int eMode=getLockingMode(zRight);
-									if(pId2.Length==0&&eMode==PAGER_LOCKINGMODE_QUERY) {
+									if(pId2.Length==0&&eMode==Globals.Paging.PAGER_LOCKINGMODE_QUERY) {
 										///
 										///<summary>
 										///Simple "PRAGMA locking_mode;" statement. This is a query for
@@ -730,8 +730,8 @@ goto pragma_out;
 										pPager=pDb.pBt.sqlite3BtreePager();
 										eMode=pPager.sqlite3PagerLockingMode(eMode)?1:0;
 									}
-									Debug.Assert(eMode==PAGER_LOCKINGMODE_NORMAL||eMode==PAGER_LOCKINGMODE_EXCLUSIVE);
-									if(eMode==PAGER_LOCKINGMODE_EXCLUSIVE) {
+									Debug.Assert(eMode==Globals.Paging.PAGER_LOCKINGMODE_NORMAL||eMode==Globals.Paging.PAGER_LOCKINGMODE_EXCLUSIVE);
+									if(eMode==Globals.Paging.PAGER_LOCKINGMODE_EXCLUSIVE) {
 										zRet="exclusive";
 									}
 									v.sqlite3VdbeSetNumCols(1);
@@ -751,7 +751,7 @@ goto pragma_out;
 										int eMode;
 										///
 										///<summary>
-										///One of the PAGER_JOURNALMODE_XXX symbols 
+										///One of the Globals.Paging.PAGER_JOURNALMODE_XXX symbols 
 										///</summary>
 										int ii;
 										///
@@ -774,7 +774,7 @@ goto pragma_out;
 											///If there is no "=MODE" part of the pragma, do a query for the
 											///current mode 
 											///</summary>
-											eMode=PAGER_JOURNALMODE_QUERY;
+											eMode=Globals.Paging.PAGER_JOURNALMODE_QUERY;
 										}
 										else {
 											string zMode;
@@ -789,10 +789,10 @@ goto pragma_out;
 												///If the "=MODE" part does not match any known journal mode,
 												///then do a query 
 												///</summary>
-												eMode=PAGER_JOURNALMODE_QUERY;
+												eMode=Globals.Paging.PAGER_JOURNALMODE_QUERY;
 											}
 										}
-										if(eMode==PAGER_JOURNALMODE_QUERY&&pId2.Length==0) {
+										if(eMode==Globals.Paging.PAGER_JOURNALMODE_QUERY&&pId2.Length==0) {
 											///
 											///<summary>
 											///Convert "PRAGMA journal_mode" into "PRAGMA main.journal_mode" 

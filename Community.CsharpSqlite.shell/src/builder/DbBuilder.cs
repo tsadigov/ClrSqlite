@@ -1,4 +1,5 @@
 ﻿using Community.CsharpSqlite.Ast;
+using Community.CsharpSqlite.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;

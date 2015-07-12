@@ -6,27 +6,22 @@ using i64 = System.Int64;
 using u32 = System.UInt32;
 using BITVEC_TELEM = System.Byte;
 
-namespace Community.CsharpSqlite
-{
+namespace Community.CsharpSqlite.Utils{
 
     public class Bitvec
     {
-        public u32 iSize;
-
-        ///
         ///<summary>
         ///Maximum bit index.  Max iSize is 4,294,967,296. 
         ///</summary>
+        public u32 iSize;
 
-        public u32 nSet;
 
-        ///
-        ///<summary>
-        ///</summary>
         ///<param name="Number of bits that are set "> only valid for aHash</param>
         ///<param name="element.  Max is BITVEC_NINT.  For BITVEC_SZ of 512,">element.  Max is BITVEC_NINT.  For BITVEC_SZ of 512,</param>
         ///<param name="this would be 125. ">this would be 125. </param>
+        public u32 nSet;
 
+        
         public u32 iDivisor;
 
         ///
