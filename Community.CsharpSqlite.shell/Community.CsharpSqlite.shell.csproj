@@ -76,7 +76,7 @@
       <Link>Community.CsharpSqlite\BtreeInt_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\btree_c.cs">
-      <Link>Community.CsharpSqlite\btree_c.cs</Link>
+      <Link>src\tree\btree_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\Btree_h.cs">
       <Link>Community.CsharpSqlite\Btree_h.cs</Link>
@@ -103,10 +103,10 @@
       <Link>Community.CsharpSqlite\Delegates.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\delete_c.cs">
-      <Link>Community.CsharpSqlite\delete_c.cs</Link>
+      <Link>Community.CsharpSqlite\empty\delete_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\expr_c.cs">
-      <Link>Community.CsharpSqlite\expr_c.cs</Link>
+      <Link>src\Ast\expr_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\fault_c.cs">
       <Link>Community.CsharpSqlite\fault_c.cs</Link>
@@ -115,16 +115,16 @@
       <Link>Community.CsharpSqlite\fkey_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\func_c.cs">
-      <Link>Community.CsharpSqlite\func_c.cs</Link>
+      <Link>src\Schema\func_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\global_c.cs">
       <Link>Community.CsharpSqlite\global_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\hash_c.cs">
-      <Link>Community.CsharpSqlite\hash_c.cs</Link>
+      <Link>src\Utils\hash_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\Hash_h.cs">
-      <Link>Community.CsharpSqlite\Hash_h.cs</Link>
+      <Link>src\Utils\Hash_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\hwtime_c.cs">
       <Link>Community.CsharpSqlite\hwtime_c.cs</Link>
@@ -172,10 +172,10 @@
       <Link>Community.CsharpSqlite\notify_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\opcodes_c.cs">
-      <Link>Community.CsharpSqlite\opcodes_c.cs</Link>
+      <Link>src\Engine\opcodes_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\opcodes_h.cs">
-      <Link>Community.CsharpSqlite\opcodes_h.cs</Link>
+      <Link>src\Engine\opcodes_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\os_c.cs">
       <Link>src\Os\os_c.cs</Link>
@@ -202,13 +202,13 @@
       <Link>Community.CsharpSqlite\parse_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pcache1_c.cs">
-      <Link>Community.CsharpSqlite\pcache1_c.cs</Link>
+      <Link>src\Paging\pcache1_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pcache_c.cs">
-      <Link>Community.CsharpSqlite\pcache_c.cs</Link>
+      <Link>src\Paging\pcache_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pcache_h.cs">
-      <Link>Community.CsharpSqlite\pcache_h.cs</Link>
+      <Link>src\Paging\pcache_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pragma_c.cs">
       <Link>Community.CsharpSqlite\pragma_c.cs</Link>
@@ -235,7 +235,7 @@
       <Link>Community.CsharpSqlite\sqliteInt_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\sqliteLimit_h.cs">
-      <Link>Community.CsharpSqlite\sqliteLimit_h.cs</Link>
+      <Link>Community.CsharpSqlite\empty\sqliteLimit_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\status_c.cs">
       <Link>Community.CsharpSqlite\status_c.cs</Link>
@@ -246,9 +246,6 @@
     <Compile Include="..\Community.CsharpSqlite\src\tokenize_c.cs">
       <Link>Community.CsharpSqlite\tokenize_c.cs</Link>
     </Compile>
-    <Compile Include="..\Community.CsharpSqlite\src\trigger_c.cs">
-      <Link>Community.CsharpSqlite\trigger_c.cs</Link>
-    </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\update_c.cs">
       <Link>Community.CsharpSqlite\update_c.cs</Link>
     </Compile>
@@ -256,7 +253,7 @@
       <Link>Community.CsharpSqlite\utf_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\util_c.cs">
-      <Link>Community.CsharpSqlite\util_c.cs</Link>
+      <Link>src\Utils\util_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vacuum_c.cs">
       <Link>Community.CsharpSqlite\vacuum_c.cs</Link>
@@ -265,7 +262,7 @@
       <Link>src\Engine\vdbeapi_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbeaux_c.cs">
-      <Link>Community.CsharpSqlite\vdbeaux_c.cs</Link>
+      <Link>src\Engine\vdbeaux_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbeblob_c.cs">
       <Link>Community.CsharpSqlite\vdbeblob_c.cs</Link>
@@ -287,9 +284,6 @@
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vtab_c.cs">
       <Link>Community.CsharpSqlite\vtab_c.cs</Link>
-    </Compile>
-    <Compile Include="..\Community.CsharpSqlite\src\walker_c.cs">
-      <Link>Community.CsharpSqlite\walker_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\wal_c.cs">
       <Link>Community.CsharpSqlite\empty\wal_c.cs</Link>
