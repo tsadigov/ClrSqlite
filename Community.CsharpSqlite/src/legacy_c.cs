@@ -198,18 +198,13 @@ namespace Community.CsharpSqlite
         //);
         ///
 
-        static public SqlResult sqlite3_exec(sqlite3 db, ///
-                                                   ///The database on which the SQL executes 
-
-        string zSql, ///The SQL to be executed 
-
+        static public SqlResult sqlite3_exec(
+            sqlite3 db, ///The database on which the SQL executes 
+            string zSql, ///The SQL to be executed 
             //sqlite3_callback 
             dxCallback xCallback, ///Invoke this callback routine 
-
-        object pArg, ///First argument to xCallback() 
-
-        ref string pzErrMsg///Write error messages here 
-
+            object pArg, ///First argument to xCallback() 
+            ref string pzErrMsg///Write error messages here 
         )
         {
             ///Return code 

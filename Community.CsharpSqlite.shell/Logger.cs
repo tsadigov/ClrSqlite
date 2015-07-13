@@ -41,29 +41,10 @@ namespace Community
 			Console.ForegroundColor = ConsoleColor.White;
 		}
 
-        internal static void TRACE(string p1, uint p2, long nKey, int nData, uint p3, string p4)
+        internal static void TRACE(string x, params object [] ap)
         {
-            throw new NotImplementedException();
-        }
+            CsharpSqlite.Sqlite3.TRACE(x,ap);
 
-        internal static void TRACE(string p, uint iDbPage, uint iFreePage, uint iPtrPage, byte eType)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal static void TRACE(string p1, uint pPgno, uint p2)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal static void TRACE(string p1, uint pPgno, uint p2, uint k, uint p3, uint p4)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal static void TRACE(string p, uint pPgno)
-        {
-            throw new NotImplementedException();
         }
     }
 }

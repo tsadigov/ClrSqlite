@@ -2044,7 +2044,7 @@ szPageDflt = ii;
 
         private static int NEVER(int p)
         {
-            throw new NotImplementedException();
+            return Sqlite3.NEVER(p);
         }
 
         ///
@@ -2225,12 +2225,7 @@ szPageDflt = ii;
             }
         }
 
-        private static void PAGERTRACE(string p1, Pgno p2, int p3)
-        {
-            throw new NotImplementedException();
-        }
-
-
+     
 
 #if SQLITE_TEST
 																																						    /*

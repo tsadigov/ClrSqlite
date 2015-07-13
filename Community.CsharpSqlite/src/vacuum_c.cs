@@ -7,6 +7,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.tree;
     using sqlite3_stmt = Engine.Vdbe;
+    using Ast;
 	public partial class Sqlite3 {
 		///<summary>
 		/// 2003 April 6

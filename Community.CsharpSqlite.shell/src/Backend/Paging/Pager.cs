@@ -2658,10 +2658,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     return rc;
                 }
 
-            private void PAGERTRACE(string p1, int p2, Pgno pgno, int p3, string p4)
-            {
-                throw new NotImplementedException();
-            }
+           
 
                 public///<summary>
                       /// Parameter zMaster is the name of a master journal file. A single journal
@@ -4337,7 +4334,7 @@ pPager.pWal = 0;
 
                 private void PAGERTRACE(string p1, int p2)
                 {
-                    throw new NotImplementedException();
+                    Sqlite3.PAGERTRACE(p1,p2);
                 }
 
                 public///<summary>
@@ -4510,15 +4507,7 @@ pPager.pWal = 0;
                     return rc;
                 }
 
-                private void PAGERTRACE(string p1, int p2, Pgno pgno)
-                {
-                    throw new NotImplementedException();
-                }
-
-                private void PAGERTRACE(string p1, int p2, Pgno pgno, int p3)
-                {
-                    throw new NotImplementedException();
-                }
+               
 
                 public///<summary>
                     /// Ensure that the sub-journal file is open. If it is already open, this
@@ -6040,7 +6029,7 @@ rc = pager_incr_changecounter(pPager, 0);
 
                 private int NEVER(int p)
                 {
-                    throw new NotImplementedException();
+                    return Sqlite3.NEVER(p);
                 }
 
                 public///<summary>
@@ -6143,7 +6132,7 @@ rc = pager_incr_changecounter(pPager, 0);
                     return this.pager_error(rc);
                 }
 
-                private void PAGERTRACE(string p1, int[] p2)
+                private void PAGERTRACE(string p1, params object[] p2)
                 {
                     Sqlite3.PAGERTRACE(p1,p2);
                 }
@@ -6682,11 +6671,7 @@ this.memDb != 0
                     return SqlResult.SQLITE_OK;
                 }
 
-                private void PAGERTRACE(string p1, int p2, Pgno p3, int p4, Pgno pgno)
-                {
-                    throw new NotImplementedException();
-                }
-
+         
                 public///<summary>
                     /// Get/set the locking-mode for this pager. Parameter eMode must be one
                     /// of Globals.Paging.PAGER_LOCKINGMODE_QUERY, Globals.Paging.PAGER_LOCKINGMODE_NORMAL or
@@ -6967,10 +6952,7 @@ this.memDb != 0
                     return Sqlite3.NEVER(p);
                 }
 
-                private void PAGERTRACE(string p1, params object[] p2)
-                {
-                    Sqlite3.PAGERTRACE(p1, p2);
-                }
+             
         }
 #endif
     

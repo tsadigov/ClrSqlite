@@ -3435,7 +3435,7 @@ return rc;
 
             private static bool NEVER(bool p)
             {
-                throw new NotImplementedException();
+                return Sqlite3.NEVER(p);
             }
 
             ///

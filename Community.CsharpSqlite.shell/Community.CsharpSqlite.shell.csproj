@@ -52,13 +52,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Community.CsharpSqlite\src\alter_c.cs">
-      <Link>Community.CsharpSqlite\alter_c.cs</Link>
+      <Link>src\Compiler\CodeGeneration\alter_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\analyze_c.cs">
       <Link>Community.CsharpSqlite\analyze_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\attach_c.cs">
-      <Link>Community.CsharpSqlite\attach_c.cs</Link>
+      <Link>src\Compiler\CodeGeneration\attach_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\auth_c.cs">
       <Link>Community.CsharpSqlite\empty\auth_c.cs</Link>
@@ -70,19 +70,19 @@
       <Link>Community.CsharpSqlite\bitvec_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\btmutex_c.cs">
-      <Link>Community.CsharpSqlite\btmutex_c.cs</Link>
+      <Link>Community.CsharpSqlite\empty\btmutex_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\BtreeInt_h.cs">
-      <Link>Community.CsharpSqlite\BtreeInt_h.cs</Link>
+      <Link>src\Backend\tree\BtreeInt_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\btree_c.cs">
       <Link>src\tree\btree_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\Btree_h.cs">
-      <Link>Community.CsharpSqlite\Btree_h.cs</Link>
+      <Link>src\Backend\tree\Btree_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\build_c.cs">
-      <Link>Community.CsharpSqlite\build_c.cs</Link>
+      <Link>src\Compiler\CodeGeneration\build_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\callback_c.cs">
       <Link>Community.CsharpSqlite\callback_c.cs</Link>
@@ -106,7 +106,7 @@
       <Link>Community.CsharpSqlite\empty\delete_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\expr_c.cs">
-      <Link>src\Ast\expr_c.cs</Link>
+      <Link>src\Compiler\CodeGeneration\expr_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\fault_c.cs">
       <Link>Community.CsharpSqlite\fault_c.cs</Link>
@@ -127,10 +127,10 @@
       <Link>src\Utils\Hash_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\hwtime_c.cs">
-      <Link>Community.CsharpSqlite\hwtime_c.cs</Link>
+      <Link>src\Accessories\Utils\hwtime_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\insert_c.cs">
-      <Link>Community.CsharpSqlite\insert_c.cs</Link>
+      <Link>src\Compiler\CodeGeneration\insert_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\journal_c.cs">
       <Link>Community.CsharpSqlite\empty\journal_c.cs</Link>
@@ -139,13 +139,13 @@
       <Link>Community.CsharpSqlite\keywordhash_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\legacy_c.cs">
-      <Link>Community.CsharpSqlite\legacy_c.cs</Link>
+      <Link>src\Core\Interface\legacy_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\loadext_c.cs">
       <Link>Community.CsharpSqlite\loadext_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\main_c.cs">
-      <Link>Community.CsharpSqlite\main_c.cs</Link>
+      <Link>src\Core\Interface\main_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\malloc_c.cs">
       <Link>Community.CsharpSqlite\malloc_c.cs</Link>
@@ -181,13 +181,13 @@
       <Link>src\Os\os_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\os_common_h.cs">
-      <Link>Community.CsharpSqlite\os_common_h.cs</Link>
+      <Link>src\Backend\Os\os_common_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\os_h.cs">
       <Link>src\Os\os_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\os_win_c.cs">
-      <Link>Community.CsharpSqlite\os_win_c.cs</Link>
+      <Link>src\Backend\Os\os_win_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pager_c.cs">
       <Link>src\Paging\pager_c.cs</Link>
@@ -196,10 +196,10 @@
       <Link>Community.CsharpSqlite\empty\pager_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\parse_c.cs">
-      <Link>Community.CsharpSqlite\parse_c.cs</Link>
+      <Link>src\Compiler\Parse\parse_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\parse_h.cs">
-      <Link>Community.CsharpSqlite\parse_h.cs</Link>
+      <Link>src\Compiler\Parse\parse_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pcache1_c.cs">
       <Link>src\Paging\pcache1_c.cs</Link>
@@ -217,7 +217,7 @@
       <Link>Community.CsharpSqlite\prepare_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\printf_c.cs">
-      <Link>Community.CsharpSqlite\printf_c.cs</Link>
+      <Link>src\Accessories\Utils\printf_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\random_c.cs">
       <Link>Community.CsharpSqlite\random_c.cs</Link>
@@ -241,25 +241,25 @@
       <Link>Community.CsharpSqlite\status_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\table_c.cs">
-      <Link>Community.CsharpSqlite\table_c.cs</Link>
+      <Link>Community.CsharpSqlite\empty\table_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\tokenize_c.cs">
-      <Link>Community.CsharpSqlite\tokenize_c.cs</Link>
+      <Link>src\Compiler\Tokenizer\tokenize_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\update_c.cs">
-      <Link>Community.CsharpSqlite\update_c.cs</Link>
+      <Link>src\Compiler\CodeGeneration\update_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\utf_c.cs">
-      <Link>Community.CsharpSqlite\utf_c.cs</Link>
+      <Link>src\Accessories\Utils\utf_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\util_c.cs">
       <Link>src\Utils\util_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vacuum_c.cs">
-      <Link>Community.CsharpSqlite\vacuum_c.cs</Link>
+      <Link>src\Compiler\CodeGeneration\vacuum_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbeapi_c.cs">
-      <Link>src\Engine\vdbeapi_c.cs</Link>
+      <Link>src\Core\Interface\vdbeapi_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbeaux_c.cs">
       <Link>src\Engine\vdbeaux_c.cs</Link>
@@ -277,7 +277,7 @@
       <Link>src\Engine\vdbetrace_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbe_c.cs">
-      <Link>Community.CsharpSqlite\vdbe_c.cs</Link>
+      <Link>src\Core\Engine\vdbe_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\Vdbe_h.cs">
       <Link>Community.CsharpSqlite\empty\Vdbe_h.cs</Link>
@@ -292,83 +292,83 @@
       <Link>Community.CsharpSqlite\wal_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\where_c.cs">
-      <Link>src\Ast\where_c.cs</Link>
+      <Link>src\Compiler\CodeGeneration\where_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\_Custom.cs">
       <Link>Community.CsharpSqlite\_Custom.cs</Link>
     </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\Ast\Expr.cs" />
-    <Compile Include="src\Ast\ExprExtensions.cs" />
-    <Compile Include="src\Ast\IdentifierList.cs" />
-    <Compile Include="src\Ast\InLoop.cs" />
-    <Compile Include="src\Ast\select.cs" />
-    <Compile Include="src\Ast\SelectDest.cs" />
-    <Compile Include="src\Ast\SelectExtensions.cs" />
-    <Compile Include="src\Ast\SelectResultType.cs" />
-    <Compile Include="src\Ast\SqcList.cs" />
-    <Compile Include="src\Ast\Token.cs" />
-    <Compile Include="src\Ast\WalkerExtensions.cs" />
-    <Compile Include="src\Ast\Where.cs" />
+    <Compile Include="src\Compiler\Ast\Expr.cs" />
+    <Compile Include="src\Compiler\Ast\ExprExtensions.cs" />
+    <Compile Include="src\Compiler\Ast\IdentifierList.cs" />
+    <Compile Include="src\Compiler\Ast\InLoop.cs" />
+    <Compile Include="src\Compiler\Ast\select.cs" />
+    <Compile Include="src\Compiler\Ast\SelectDest.cs" />
+    <Compile Include="src\Compiler\Ast\SelectExtensions.cs" />
+    <Compile Include="src\Compiler\Ast\SelectResultType.cs" />
+    <Compile Include="src\Compiler\Ast\SqcList.cs" />
+    <Compile Include="src\Compiler\Ast\Token.cs" />
+    <Compile Include="src\Compiler\Ast\WalkerExtensions.cs" />
+    <Compile Include="src\Compiler\Ast\Where.cs" />
     <Compile Include="src\Auth\AuthRelaed.cs" />
     <Compile Include="src\BackupExtensions.cs" />
     <Compile Include="src\BitvecExtensions.cs" />
     <Compile Include="src\BtCursor.cs" />
-    <Compile Include="src\Engine\Delegates.cs" />
-    <Compile Include="src\Engine\Metadata\VdbeFunc.cs" />
+    <Compile Include="src\Core\Engine\Delegates.cs" />
+    <Compile Include="src\Core\Engine\Metadata\VdbeFunc.cs" />
     <Compile Include="src\Limits.cs" />
-    <Compile Include="src\Os\sqlite3_io_methods.cs" />
-    <Compile Include="src\Paging\Delegates.cs" />
+    <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
+    <Compile Include="src\Backend\Paging\Delegates.cs" />
     <Compile Include="src\Schema\Traverse\FuncDefTraverse.cs" />
-    <Compile Include="src\Storage\BTree.cs" />
-    <Compile Include="src\Storage\BtreeExtensions.cs" />
-    <Compile Include="src\builder\DbBuilder.cs" />
-    <Compile Include="src\builder\IndexBuilder.cs" />
-    <Compile Include="src\builder\TableBuilder.cs" />
-    <Compile Include="src\builder\TiggerBuilder.cs" />
+    <Compile Include="src\Backend\tree\BTree.cs" />
+    <Compile Include="src\Backend\tree\BtreeExtensions.cs" />
+    <Compile Include="src\Compiler\CodeGeneration\builder\DbBuilder.cs" />
+    <Compile Include="src\Compiler\CodeGeneration\builder\IndexBuilder.cs" />
+    <Compile Include="src\Compiler\CodeGeneration\builder\TableBuilder.cs" />
+    <Compile Include="src\Compiler\CodeGeneration\builder\TiggerBuilder.cs" />
     <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Db.cs" />
-    <Compile Include="src\Ast\Agg.cs" />
-    <Compile Include="src\Engine\BusyHandler.cs" />
-    <Compile Include="src\Engine\Context.cs" />
-    <Compile Include="src\Engine\Op\BTree.cs" />
-    <Compile Include="src\Engine\Op\Cast.cs" />
-    <Compile Include="src\Engine\Op\ControlFlow.cs" />
-    <Compile Include="src\Engine\Op\CPU.cs" />
-    <Compile Include="src\Engine\Cursor.cs" />
-    <Compile Include="src\Engine\Extensions.cs" />
-    <Compile Include="src\Engine\InitData.cs" />
-    <Compile Include="src\Engine\Lookaside.cs" />
-    <Compile Include="src\Engine\Module.cs" />
-    <Compile Include="src\Engine\Op\Cursor.cs" />
-    <Compile Include="src\Engine\Op\Idx.cs" />
-    <Compile Include="src\Engine\Op\Logical.cs" />
-    <Compile Include="src\Engine\Op\Math.cs" />
-    <Compile Include="src\Engine\Op\Schema.cs" />
-    <Compile Include="src\Engine\P4Usage.cs" />
-    <Compile Include="src\Engine\Savepoint.cs" />
-    <Compile Include="src\Engine\SubProgram.cs" />
-    <Compile Include="src\Engine\Vdbe.cs" />
-    <Compile Include="src\Engine\VdbeFrame.cs" />
-    <Compile Include="src\Engine\Op\VdbeHelper.cs" />
-    <Compile Include="src\Engine\VdbeOp.cs" />
-    <Compile Include="src\Engine\VdbeOpList.cs" />
+    <Compile Include="src\Compiler\Ast\Agg.cs" />
+    <Compile Include="src\Core\Engine\BusyHandler.cs" />
+    <Compile Include="src\Core\Engine\Context.cs" />
+    <Compile Include="src\Core\Engine\Op\BTree.cs" />
+    <Compile Include="src\Core\Engine\Op\Cast.cs" />
+    <Compile Include="src\Core\Engine\Op\ControlFlow.cs" />
+    <Compile Include="src\Core\Engine\Op\CPU.cs" />
+    <Compile Include="src\Core\Engine\Cursor.cs" />
+    <Compile Include="src\Core\Engine\Extensions.cs" />
+    <Compile Include="src\Core\Engine\InitData.cs" />
+    <Compile Include="src\Core\Engine\Lookaside.cs" />
+    <Compile Include="src\Core\Engine\Module.cs" />
+    <Compile Include="src\Core\Engine\Op\Cursor.cs" />
+    <Compile Include="src\Core\Engine\Op\Idx.cs" />
+    <Compile Include="src\Core\Engine\Op\Logical.cs" />
+    <Compile Include="src\Core\Engine\Op\Math.cs" />
+    <Compile Include="src\Core\Engine\Op\Schema.cs" />
+    <Compile Include="src\Core\Engine\P4Usage.cs" />
+    <Compile Include="src\Core\Engine\Savepoint.cs" />
+    <Compile Include="src\Core\Engine\SubProgram.cs" />
+    <Compile Include="src\Core\Engine\Vdbe.cs" />
+    <Compile Include="src\Core\Engine\VdbeFrame.cs" />
+    <Compile Include="src\Core\Engine\Op\VdbeHelper.cs" />
+    <Compile Include="src\Core\Engine\VdbeOp.cs" />
+    <Compile Include="src\Core\Engine\VdbeOpList.cs" />
     <Compile Include="src\Globals.cs" />
     <Compile Include="src\Index.cs" />
-    <Compile Include="src\Paging\Mem.cs" />
-    <Compile Include="src\Paging\MemType.cs" />
-    <Compile Include="src\Paging\MemPage.cs" />
+    <Compile Include="src\Backend\Paging\Mem.cs" />
+    <Compile Include="src\Backend\Paging\MemType.cs" />
+    <Compile Include="src\Backend\Paging\MemPage.cs" />
     <Compile Include="src\MyHelpers.cs" />
-    <Compile Include="src\Os\sqlite3_file.cs" />
-    <Compile Include="src\Paging\BufferExtensions.cs" />
-    <Compile Include="src\Paging\FreeSpaceHeader.cs" />
-    <Compile Include="src\Paging\Pager.cs" />
-    <Compile Include="src\Paging\PagerSavepoint.cs" />
-    <Compile Include="src\ParseExtensions.cs" />
-    <Compile Include="src\Parsing\NameContext.cs" />
-    <Compile Include="src\Parsing\ResolveExtensions.cs" />
-    <Compile Include="src\Parsing\TriggerParser.cs" />
+    <Compile Include="src\Backend\Os\sqlite3_file.cs" />
+    <Compile Include="src\Backend\Paging\BufferExtensions.cs" />
+    <Compile Include="src\Backend\Paging\FreeSpaceHeader.cs" />
+    <Compile Include="src\Backend\Paging\Pager.cs" />
+    <Compile Include="src\Backend\Paging\PagerSavepoint.cs" />
+    <Compile Include="src\Compiler\Parser\ParseExtensions.cs" />
+    <Compile Include="src\Compiler\Parser\NameContext.cs" />
+    <Compile Include="src\Compiler\Parser\ResolveExtensions.cs" />
+    <Compile Include="src\Compiler\Parser\TriggerParser.cs" />
     <Compile Include="src\Schema\AutoincInfo.cs" />
     <Compile Include="src\Schema\ColName.cs" />
     <Compile Include="src\Schema\Column.cs" />
@@ -388,20 +388,19 @@
     <Compile Include="src\Sqlite3_backup.cs" />
     <Compile Include="src\SqlResult.cs" />
     <Compile Include="src\TextEncodings.cs" />
-    <Compile Include="src\Tools\AuthContext.cs" />
-    <Compile Include="src\Tools\DbFixer.cs" />
-    <Compile Include="src\Utils\ILinkedListNode.cs" />
-    <Compile Include="src\Utils\MyLinqExtensions.cs" />
-    <Compile Include="src\Utils\Str.cs" />
-    <Compile Include="src\Utils\StreAccum.cs" />
-    <Compile Include="src\Ast\Walker.cs" />
+    <Compile Include="src\Accessories\Tools\AuthContext.cs" />
+    <Compile Include="src\Accessories\Tools\DbFixer.cs" />
+    <Compile Include="src\Accessories\Utils\ILinkedListNode.cs" />
+    <Compile Include="src\Accessories\Utils\MyLinqExtensions.cs" />
+    <Compile Include="src\Accessories\Utils\Str.cs" />
+    <Compile Include="src\Accessories\Utils\StreAccum.cs" />
+    <Compile Include="src\Compiler\Ast\Walker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\Engine\Utill\" />
-    <Folder Include="src\NewFolder1\" />
+    <Folder Include="src\Core\Engine\Utill\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -850,7 +850,7 @@ releasePage(pPage);
 
             private bool NEVER(BtCursor btCursor)
             {
-                throw new NotImplementedException();
+                return Sqlite3.NEVER(btCursor);
             }
             public SqlResult sqlite3BtreeDropTable(int iTable, ref int piMoved)
             {
