@@ -55,7 +55,7 @@
       <Link>src\Compiler\CodeGeneration\alter_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\analyze_c.cs">
-      <Link>Community.CsharpSqlite\analyze_c.cs</Link>
+      <Link>src\Compiler\CodeGeneration\analyze_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\attach_c.cs">
       <Link>src\Compiler\CodeGeneration\attach_c.cs</Link>
@@ -317,6 +317,7 @@
     <Compile Include="src\BtCursor.cs" />
     <Compile Include="src\Core\Engine\Delegates.cs" />
     <Compile Include="src\Core\Engine\Metadata\VdbeFunc.cs" />
+    <Compile Include="src\Core\Engine\Op\Others.cs" />
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
     <Compile Include="src\Backend\Paging\Delegates.cs" />

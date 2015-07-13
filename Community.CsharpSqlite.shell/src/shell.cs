@@ -328,6 +328,7 @@ malloc_cs.sqlite3_free(ref z);
 	///</summary>
 	static string local_getline (string zPrompt, TextReader _in)
 	{
+        
 		StringBuilder zIn = new StringBuilder ();
 		StringBuilder zLine;
 		int nLine;

@@ -862,25 +862,15 @@ p.zName,  P4Usage.P4_STATIC );
                 build.sqlite3AddPrimaryKey(pParse, null, onError, autoInc, sortOrder);
             }
             public static void sqlite3AddPrimaryKey(Parse pParse,///
-                ///<summary>
-                ///Parsing context 
-                ///</summary>
-            ExprList pList,///
-                ///<summary>
-                ///List of field names to be indexed 
-                ///</summary>
-            OnConstraintError onError,///
-                ///<summary>
-                ///What to do with a uniqueness conflict 
-                ///</summary>
-            int autoInc,///
-                ///<summary>
-                ///True if the AUTOINCREMENT keyword is present 
-                ///</summary>
-            SortOrder sortOrder///
-                ///<summary>
-                ///SQLITE_SO_ASC or SQLITE_SO_DESC 
-                ///</summary>
+                    ///Parsing context 
+                ExprList pList,///
+                    ///List of field names to be indexed 
+                OnConstraintError onError,///
+                    ///What to do with a uniqueness conflict 
+                int autoInc,///
+                    ///True if the AUTOINCREMENT keyword is present 
+                SortOrder sortOrder///
+                    ///SQLITE_SO_ASC or SQLITE_SO_DESC 
             )
             {
                 Table pTab = pParse.pNewTable;
@@ -899,8 +889,8 @@ p.zName,  P4Usage.P4_STATIC );
                     iCol = pTab.nCol - 1;
                     pTab.aCol[iCol].isPrimKey = 1;
                 }
-                else
-                {
+                else //mark columns in pList as PK
+                {   
                     for (i = 0; i < pList.nExpr; i++)
                     {
                         for (iCol = 0; iCol < pTab.nCol; iCol++)
@@ -955,13 +945,9 @@ p.zName,  P4Usage.P4_STATIC );
             ///
             ///</summary>
             public static void sqlite3AddCheckConstraint(Parse pParse,///
-                ///<summary>
                 ///Parsing context 
-                ///</summary>
-            Expr pCheckExpr///
-                ///<summary>
+                Expr pCheckExpr///
                 ///The check expression 
-                ///</summary>
             )
             {
                 sqlite3 db = pParse.db;

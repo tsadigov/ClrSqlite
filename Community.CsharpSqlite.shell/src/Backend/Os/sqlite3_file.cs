@@ -246,7 +246,7 @@ namespace Community.CsharpSqlite
     //  ** value will increment whenever this happens. 
     //  */
     //};
-    public class sqlite3_vfs
+    public class sqlite3_vfs:ILinkedListNode<sqlite3_vfs>
     {
 
 
@@ -271,7 +271,7 @@ namespace Community.CsharpSqlite
         ///Maximum file pathname length 
         ///</summary>
 
-        public sqlite3_vfs pNext;
+        public sqlite3_vfs pNext { get; set; }
 
         ///
         ///<summary>

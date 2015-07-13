@@ -5,9 +5,11 @@ using i64 = System.Int64;
 using u32 = System.UInt32;
 using sqlite3_int64 = System.Int64;
 using Community.CsharpSqlite.Os;
+using System.Linq;
 
 namespace Community.CsharpSqlite.Os
 {
+
 
         public class os
         {
@@ -374,14 +376,9 @@ namespace Community.CsharpSqlite.Os
 																																																									      mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #endif
                 Sqlite3.mutex.sqlite3_mutex_enter();
-                for (pVfs = vfsList; pVfs != null; pVfs = pVfs.pNext)
-                {
-                    if (zVfs == null || zVfs == "")
-                        break;
-                    if (zVfs == pVfs.zName)
-                        break;
-                    //strcmp(zVfs, pVfs.zName) == null) break;
-                }
+
+                pVfs = vfsList.linkedList().FirstOrDefault(f => (zVfs == null || zVfs == "") || (zVfs == pVfs.zName));//strcmp(zVfs, pVfs.zName) == null) break;
+                
                 Sqlite3.mutex.sqlite3_mutex_leave();
                 return pVfs;
             }

@@ -480,34 +480,19 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
             public static SqlResult sqlite3_step(sqlite3_stmt pStmt)
             {
                 SqlResult rc = SqlResult.SQLITE_OK;
-                ///
-                ///<summary>
                 ///Result from sqlite3Step() 
-                ///</summary>
 
                 SqlResult rc2 = SqlResult.SQLITE_OK;
-                ///
-                ///<summary>
                 ///Result from sqlite3Reprepare() 
-                ///</summary>
 
                 Vdbe v = (Vdbe)pStmt;
-                ///
-                ///<summary>
                 ///the prepared statement 
-                ///</summary>
 
                 int cnt = 0;
-                ///
-                ///<summary>
                 ///Counter to prevent infinite loop of reprepares 
-                ///</summary>
 
                 sqlite3 db;
-                ///
-                ///<summary>
                 ///The database connection 
-                ///</summary>
 
                 if (v.vdbeSafetyNotNull())
                 {

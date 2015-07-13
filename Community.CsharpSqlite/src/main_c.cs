@@ -2226,53 +2226,36 @@ return z;
 		
 		///
 		///<summary>
-		///</summary>
-		///<param name="This function is used to parse both URIs and non">URI filenames passed by the</param>
-		///<param name="user to API functions sqlite3_open() or sqlite3_open_v2(), and for database">user to API functions sqlite3_open() or sqlite3_open_v2(), and for database</param>
-		///<param name="URIs specified as part of ATTACH statements.">URIs specified as part of ATTACH statements.</param>
-		///<param name=""></param>
-		///<param name="The first argument to this function is the name of the VFS to use (or">The first argument to this function is the name of the VFS to use (or</param>
-		///<param name="a NULL to signify the default VFS) if the URI does not contain a "vfs=xxx"">a NULL to signify the default VFS) if the URI does not contain a "vfs=xxx"</param>
-		///<param name="query parameter. The second argument contains the URI (or non">URI filename)</param>
-		///<param name="itself. When this function is called the *pFlags variable should contain">itself. When this function is called the *pFlags variable should contain</param>
-		///<param name="the default flags to open the database handle with. The value stored in">the default flags to open the database handle with. The value stored in</param>
-		///<param name="pFlags may be updated before returning if the URI filename contains ">pFlags may be updated before returning if the URI filename contains </param>
-		///<param name=""cache=xxx" or "mode=xxx" query parameters.">"cache=xxx" or "mode=xxx" query parameters.</param>
-		///<param name=""></param>
-		///<param name="If successful, SqlResult.SQLITE_OK is returned. In this case *ppVfs is set to point to">If successful, SqlResult.SQLITE_OK is returned. In this case *ppVfs is set to point to</param>
-		///<param name="the VFS that should be used to open the database file. *pzFile is set to">the VFS that should be used to open the database file. *pzFile is set to</param>
-		///<param name="point to a buffer containing the name of the file to open. It is the ">point to a buffer containing the name of the file to open. It is the </param>
-		///<param name="responsibility of the caller to eventually call malloc_cs.sqlite3_free() to release">responsibility of the caller to eventually call malloc_cs.sqlite3_free() to release</param>
-		///<param name="this buffer.">this buffer.</param>
-		///<param name=""></param>
-		///<param name="If an error occurs, then an SQLite error code is returned and *pzErrMsg">If an error occurs, then an SQLite error code is returned and *pzErrMsg</param>
+		///This function is used to parse both URIs and non-URI filenames passed by the
+		///user to API functions sqlite3_open() or sqlite3_open_v2(), and for database
+		///URIs specified as part of ATTACH statements.
+        ///
+		///The first argument to this function is the name of the VFS to use (or
+		///a NULL to signify the default VFS) if the URI does not contain a "vfs=xxx""
+		///query parameter. The second argument contains the URI (or non-URI filename)
+		///itself. When this function is called the *pFlags variable should contain
+		///the default flags to open the database handle with. The value stored in
+		///pFlags may be updated before returning if the URI filename contains 
+		///"cache=xxx" or "mode=xxx" query parameters.
+        ///
+		///If successful, SqlResult.SQLITE_OK is returned. In this case *ppVfs is set to point to
+		///the VFS that should be used to open the database file. *pzFile is set to
+		///point to a buffer containing the name of the file to open. It is the 
+		///responsibility of the caller to eventually call malloc_cs.sqlite3_free() to release
+		///this buffer.
+        ///
+		///If an error occurs, then an SQLite error code is returned and *pzErrMsg">If an error occurs, then an SQLite error code is returned and *pzErrMsg</param>
 		///<param name="may be set to point to a buffer containing an English language error ">may be set to point to a buffer containing an English language error </param>
 		///<param name="message. It is the responsibility of the caller to eventually release">message. It is the responsibility of the caller to eventually release</param>
 		///<param name="this buffer by calling malloc_cs.sqlite3_free().">this buffer by calling malloc_cs.sqlite3_free().</param>
-		static SqlResult sqlite3ParseUri(string zDefaultVfs,///
-		///<summary>
-		///VFS to use if no "vfs=xxx" query option 
-		///</summary>
-		string zUri,///
-		///<summary>
-		///</summary>
-		///<param name="Nul">terminated URI to parse </param>
-		ref int pFlags,///
-		///<summary>
-		///IN/OUT: SQLITE_OPEN_XXX flags 
-		///</summary>
-		ref sqlite3_vfs ppVfs,///
-		///<summary>
-		///OUT: VFS to use 
-		///</summary>
-		ref string pzFile,///
-		///<summary>
-		///OUT: Filename component of URI 
-		///</summary>
-		ref string pzErrMsg///
-		///<summary>
-		///OUT: Error message (if rc!=SqlResult.SQLITE_OK) 
-		///</summary>
+        ///</summary>
+        static SqlResult sqlite3ParseUri(
+            string zDefaultVfs,///VFS to use if no "vfs=xxx" query option 
+		    string zUri,///Nul-terminated URI to parse
+		    ref int pFlags,///IN/OUT: SQLITE_OPEN_XXX flags 
+		    ref sqlite3_vfs ppVfs,///OUT: VFS to use 
+		    ref string pzFile,///OUT: Filename component of URI 
+		    ref string pzErrMsg///OUT: Error message (if rc!=SqlResult.SQLITE_OK) 
 		) {
 			var rc=SqlResult.SQLITE_OK;
 			int flags=pFlags;
@@ -2285,26 +2268,14 @@ return z;
 			if(((flags&SQLITE_OPEN_URI)!=0||sqliteinth.sqlite3GlobalConfig.bOpenUri)&&nUri>=5&&_Custom.memcmp(zUri,"file:",5)==0) {
 				string zOpt;
 				int eState;
-				///
-				///<summary>
 				///Parser state when parsing URI 
-				///</summary>
 				int iIn;
-				///
-				///<summary>
 				///Input character index 
-				///</summary>
 				//int iOut = 0;                 /* Output character index */
 				int nByte=nUri+2;
-				///
-				///<summary>
 				///Bytes of space to allocate 
-				///</summary>
-				///
-				///<summary>
 				///Make sure the SQLITE_OPEN_URI flag is set to indicate to the VFS xOpen 
-				///</summary>
-				///<param name="method that there may be extra parameters following the file">name.  </param>
+				///method that there may be extra parameters following the file-name.
 				flags|=SQLITE_OPEN_URI;
 				for(iIn=0;iIn<nUri;iIn++)
 					nByte+=(zUri[iIn]=='&')?1:0;
@@ -2496,52 +2467,24 @@ return z;
 		///
 		///<summary>
 		///This routine does the work of opening a database on behalf of
-		///sqlite3_open() and sqlite3_open16(). The database filename "zFilename"
-		///</summary>
-		///<param name="is UTF">8 encoded.</param>
-		///<param name=""></param>
-		static SqlResult openDatabase(string zFilename,///
-		///<summary>
-		///</summary>
-		///<param name="Database filename UTF">8 encoded </param>
-		out sqlite3 ppDb,///
-		///<summary>
-		///OUT: Returned database handle 
-		///</summary>
-		int flags,///
-		///<summary>
-		///Operational flags 
-		///</summary>
-		string zVfs///
-		///<summary>
-		///Name of the VFS to use 
-		///</summary>
+		///sqlite3_open() and sqlite3_open16(). The database filename "zFilename" is UTF-8 encoded.
+        ///</summary>
+		static SqlResult openDatabase(
+            string zFilename,///Database filename UTF-8 encoded </param>
+		    out sqlite3 ppDb,///OUT: Returned database handle 		
+		    int flags,///Operational flags 
+		    string zVfs///Name of the VFS to use 
 		) {
 			sqlite3 db;
-			///
-			///<summary>
 			///Store allocated handle here 
-			///</summary>
 			SqlResult rc;
-			///
-			///<summary>
 			///Return code 
-			///</summary>
 			int isThreadsafe;
-			///
-			///<summary>
 			///True for threadsafe connections 
-			///</summary>
 			string zOpen="";
-			///
-			///<summary>
 			///Filename argument to pass to BtreeOpen() 
-			///</summary>
 			string zErrMsg="";
-			///
-			///<summary>
 			///Error message from sqlite3ParseUri() 
-			///</summary>
 			ppDb=null;
 			#if !SQLITE_OMIT_AUTOINIT
 			rc=sqlite3_initialize();
@@ -2551,33 +2494,23 @@ return z;
 			///
 			///<summary>
 			///Only allow sensible combinations of bits in the flags argument.
-			///</summary>
-			///<param name="Throw an error if any non">sense combination is used.  If we</param>
-			///<param name="do not block illegal combinations here, it could trigger">do not block illegal combinations here, it could trigger</param>
-			///<param name="Debug.Assert() statements in deeper layers.  Sensible combinations">Debug.Assert() statements in deeper layers.  Sensible combinations</param>
-			///<param name="are:">are:</param>
-			///<param name=""></param>
-			///<param name="1:  SQLITE_OPEN_READONLY">1:  SQLITE_OPEN_READONLY</param>
-			///<param name="2:  SQLITE_OPEN_READWRITE">2:  SQLITE_OPEN_READWRITE</param>
-			///<param name="6:  SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE">6:  SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE</param>
+			///Throw an error if any non-sense combination is used.  If we
+			///do not block illegal combinations here, it could trigger
+			///Debug.Assert() statements in deeper layers.  Sensible combinations
+			///are:
+			///
+			///1:  SQLITE_OPEN_READONLY
+			///2:  SQLITE_OPEN_READWRITE
+			///6:  SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE
 			Debug.Assert(SQLITE_OPEN_READONLY==0x01);
 			Debug.Assert(SQLITE_OPEN_READWRITE==0x02);
 			Debug.Assert(SQLITE_OPEN_CREATE==0x04);
 			sqliteinth.testcase((1<<(flags&7))==0x02);
-			///
-			///<summary>
 			///READONLY 
-			///</summary>
 			sqliteinth.testcase((1<<(flags&7))==0x04);
-			///
-			///<summary>
 			///READWRITE 
-			///</summary>
 			sqliteinth.testcase((1<<(flags&7))==0x40);
-			///
-			///<summary>
 			///READWRITE | CREATE 
-			///</summary>
 			if(((1<<(flags&7))&0x46)==0)
 				return sqliteinth.SQLITE_MISUSE_BKPT();
 			if(sqliteinth.sqlite3GlobalConfig.bCoreMutex==false) {
@@ -2659,9 +2592,6 @@ return z;
 			db.aModule=new Hash();
 			db.aModule.sqlite3HashInit();
 			#endif
-			///
-			///<summary>
-			///</summary>
 			///<param name="Add the default collation sequence BINARY. BINARY works for both UTF">8</param>
 			///<param name="and UTF">16, so add a version for each to avoid any unnecessary</param>
 			///<param name="conversions. The only error that can occur here is a malloc() failure.">conversions. The only error that can occur here is a malloc() failure.</param>
@@ -2676,15 +2606,9 @@ return z;
 			//}
 			db.pDfltColl=db.sqlite3FindCollSeq(SqliteEncoding.UTF8,"BINARY",0);
 			Debug.Assert(db.pDfltColl!=null);
-			///
-			///<summary>
-			///</summary>
 			///<param name="Also add a UTF">insensitive collation sequence. </param>
 			createCollation(db,"NOCASE",SqliteEncoding.UTF8,CollationType.NOCASE,0,nocaseCollatingFunc,null);
-			///
-			///<summary>
 			///Parse the filename/URI argument. 
-			///</summary>
 			db.openFlags=flags;
 			rc=sqlite3ParseUri(zVfs,zFilename,ref flags,ref db.pVfs,ref zOpen,ref zErrMsg);
 			if(rc!=SqlResult.SQLITE_OK) {
@@ -2707,12 +2631,9 @@ return z;
 			}
 			db.aDb[0].pSchema= SchemaExtensions.sqlite3SchemaGet(db.aDb[0].pBt, db);
             db.aDb[1].pSchema = SchemaExtensions.sqlite3SchemaGet(null, db);
-			///
-			///<summary>
-			///The default safety_level for the main database is 'full'; for the temp
+			
+            ///The default safety_level for the main database is 'full'; for the temp
 			///database it is 'NONE'. This matches the pager layer defaults.
-			///
-			///</summary>
 			db.aDb[0].zName="main";
 			db.aDb[0].safety_level=3;
 			db.aDb[1].zName="temp";
@@ -2723,20 +2644,14 @@ return z;
 			//  goto opendb_out;
 			//}
 			///
-			///<summary>
-			///</summary>
-			///<param name="Register all built">in functions, but do not attempt to read the</param>
-			///<param name="database schema yet. This is delayed until the first time the database">database schema yet. This is delayed until the first time the database</param>
-			///<param name="is accessed.">is accessed.</param>
-			///<param name=""></param>
+			///Register all built-in functions, but do not attempt to read the
+			///database schema yet. This is delayed until the first time the database
+			///is accessed.
 			utilc.sqlite3Error(db,SqlResult.SQLITE_OK,0);
 			PredefinedFunctions.sqlite3RegisterBuiltinFunctions(db);
-			///
-			///<summary>
-			///</summary>
-			///<param name="Load automatic extensions "> extensions that have been registered</param>
-			///<param name="using the sqlite3_automatic_extension() API.">using the sqlite3_automatic_extension() API.</param>
-			///<param name=""></param>
+
+			///Load automatic extensions - extensions that have been registered</param>
+			///using the sqlite3_automatic_extension() API.
 			sqlite3AutoLoadExtensions(db);
 			rc=sqlite3_errcode(db);
 			if(rc!=SqlResult.SQLITE_OK) {
@@ -2771,21 +2686,14 @@ rc = sqlite3RtreeInit(db);
 }
 #endif
 			utilc.sqlite3Error(db,rc,0);
-			///
-			///<summary>
-			///</summary>
-			///<param name="">DSQLITE_DEFAULT_LOCKING_MODE=1 makes EXCLUSIVE the default locking</param>
-			///<param name="mode.  ">DSQLITE_DEFAULT_LOCKING_MODE=0 make NORMAL the default locking</param>
-			///<param name="mode.  Doing nothing at all also makes NORMAL the default.">mode.  Doing nothing at all also makes NORMAL the default.</param>
-			///<param name=""></param>
+			///-DSQLITE_DEFAULT_LOCKING_MODE=1 makes EXCLUSIVE the default locking mode.  
+            ///-DSQLITE_DEFAULT_LOCKING_MODE=0 make NORMAL the default locking mode.  
+            ///-Doing nothing at all also makes NORMAL the default mode.
 			#if SQLITE_DEFAULT_LOCKING_MODE
 																																																																					db.dfltLockMode = SQLITE_DEFAULT_LOCKING_MODE;
 sqlite3PagerLockingMode(sqlite3BtreePager(db.aDb[0].pBt),
 SQLITE_DEFAULT_LOCKING_MODE);
 #endif
-			///
-			///<summary>
-			///</summary>
 			///<param name="Enable the lookaside">malloc subsystem </param>
 			setupLookaside(db,null,sqliteinth.sqlite3GlobalConfig.szLookaside,sqliteinth.sqlite3GlobalConfig.nLookaside);
 			sqlite3_wal_autocheckpoint(db,Limits.SQLITE_DEFAULT_WAL_AUTOCHECKPOINT);
@@ -2807,30 +2715,21 @@ SQLITE_DEFAULT_LOCKING_MODE);
 			ppDb=db;
 			return malloc_cs.sqlite3ApiExit(0,rc);
 		}
-		///
-		///<summary>
+		
+        
+        ///<summary>
 		///Open a new database handle.
-		///
 		///</summary>
 		static public SqlResult sqlite3_open(string zFilename,out sqlite3 ppDb) {
 			return openDatabase(zFilename,out ppDb,SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE,null);
 		}
-		static public SqlResult sqlite3_open_v2(string filename,///
-		///<summary>
-		///</summary>
-		///<param name="Database filename (UTF">8) </param>
-		out sqlite3 ppDb,///
-		///<summary>
-		///OUT: SQLite db handle 
-		///</summary>
-		int flags,///
-		///<summary>
-		///Flags 
-		///</summary>
-		string zVfs///
-		///<summary>
-		///Name of VFS module to use 
-		///</summary>
+
+
+		static public SqlResult sqlite3_open_v2(
+            string filename,///<param name="Database filename (UTF">8) </param>
+		    out sqlite3 ppDb,///OUT: SQLite db handle 
+		    int flags,///Flags 
+		    string zVfs///Name of VFS module to use 
 		) {
 			return openDatabase(filename,out ppDb,flags,zVfs);
 		}
@@ -2872,7 +2771,6 @@ sqlite3ValueFree(pVal);
 return malloc_cs.sqlite3ApiExit(0, rc);
 }
 #endif
-		///
 		///<summary>
 		///Register a new collation sequence with the database handle db.
 		///</summary>
@@ -2885,10 +2783,9 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 			db.mutex.sqlite3_mutex_leave();
 			return rc;
 		}
-		///
-		///<summary>
+		
+        ///<summary>
 		///Register a new collation sequence with the database handle db.
-		///
 		///</summary>
 		static SqlResult sqlite3_create_collation_v2(sqlite3 db,string zName,SqliteEncoding enc,object pCtx,dxCompare xCompare,//int(*xCompare)(void*,int,const void*,int,const void),
 		dxDelCollSeq xDel//void(*xDel)(void)
@@ -2926,7 +2823,6 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 //  return rc;
 //}
 #endif
-		///
 		///<summary>
 		///Register a collation sequence factory callback with the database handle
 		///db. Replace any previously installed collation sequence factory.
@@ -2979,6 +2875,8 @@ return SqlResult.SQLITE_OK;
 		static u8 sqlite3_get_autocommit(sqlite3 db) {
 			return db.autoCommit;
 		}
+
+
 		///
 		///<summary>
 		///The following routines are subtitutes for constants SQLITE_CORRUPT,
@@ -2989,10 +2887,9 @@ return SqlResult.SQLITE_OK;
 		///to detect when version error conditions occurs.
 		///
 		///2.  Invoke io.sqlite3_log() to provide the source code location where
-		///</summary>
-		///<param name="a low">level error is first detected.</param>
-		///<param name=""></param>
-		static SqlResult sqlite3CorruptError(int lineno) {
+		///a low-level error is first detected.
+        ///</summary>		
+        static SqlResult sqlite3CorruptError(int lineno) {
 			sqliteinth.testcase(sqliteinth.sqlite3GlobalConfig.xLog!=null);
 			io.sqlite3_log(SqlResult.SQLITE_CORRUPT,"database corruption at line %d of [%.10s]",lineno,20+sqlite3_sourceid());
 			return SqlResult.SQLITE_CORRUPT;
