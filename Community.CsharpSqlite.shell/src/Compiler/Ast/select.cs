@@ -276,7 +276,7 @@ namespace Community.CsharpSqlite.Ast
                 SrcList pTabList;
                 ExprList pEList;
                 SrcList_item pFrom;
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 //if ( db.mallocFailed != 0 )
                 //{
                 //  return WRC.WRC_Abort;
@@ -587,7 +587,7 @@ namespace Community.CsharpSqlite.Ast
                 ///Name context for container 
         )
             {
-                sqlite3 db;
+                Connection db;
                 if (Sqlite3.NEVER(p == null))
                     return;
                 db = pParse.db;
@@ -707,7 +707,7 @@ namespace Community.CsharpSqlite.Ast
                 pParse.iSelectId = pParse.iNextSelectId++;
 #endif
                 ///The database connection 
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 if (p == null/*|| db.mallocFailed != 0 */|| pParse.nErr != 0)
                 {
                     return (SqlResult)1;
@@ -1429,7 +1429,7 @@ namespace Community.CsharpSqlite.Ast
                 ///Alternative data destination 
                 Select pDelete = null;
                 ///Chain of simple selects to delete 
-                sqlite3 db;
+                Connection db;
                 ///Database connection 
 #if !SQLITE_OMIT_EXPLAIN
                 int iSub1 = 0;
@@ -1819,7 +1819,7 @@ namespace Community.CsharpSqlite.Ast
                 ///SELECT used to determine types and collations 
             )
             {
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 NameContext sNC;
                 Column pCol;
                 CollSeq pColl;
@@ -1873,7 +1873,7 @@ namespace Community.CsharpSqlite.Ast
             {
                 Select pNew;
                 //           Select standin;
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 pNew = new Select();
                 //sqlite3DbMallocZero(db, sizeof(*pNew) );
                 Debug.Assert(//db.mallocFailed != 0 ||

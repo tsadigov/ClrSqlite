@@ -73,13 +73,13 @@ namespace Community.CsharpSqlite
             ///</summary>
         )
         {
-            sqlite3 db;
+            Connection db;
             if (Sqlite3.NEVER(iDb < 0) || iDb == 1)
                 return 0;
             db = pParse.db;
-            Debug.Assert(db.nDb > iDb);
+            Debug.Assert(db.BackendCount > iDb);
             this.pParse = pParse;
-            this.zDb = db.aDb[iDb].zName;
+            this.zDb = db.Backends[iDb].Name;
             this.zType = zType;
             this.pName = pName;
             return 1;

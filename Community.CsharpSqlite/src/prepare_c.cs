@@ -56,7 +56,7 @@ namespace Community.CsharpSqlite {
 		///Error information 
 		///</summary>
 		) {
-			sqlite3 db=pData.db;
+			Connection db=pData.db;
 			if(///
 			///<summary>
 			///0 == db.mallocFailed && 
@@ -96,7 +96,7 @@ namespace Community.CsharpSqlite {
 		public static int sqlite3InitCallback(object pInit,sqlite3_int64 argc,object p2,object NotUsed) {
 			string[] argv=(string[])p2;
 			InitData pData=(InitData)pInit;
-			sqlite3 db=pData.db;
+			Connection db=pData.db;
 			int iDb=pData.iDb;
 			Debug.Assert(argc==3);
 			sqliteinth.UNUSED_PARAMETER2(NotUsed,argc);
@@ -108,7 +108,7 @@ namespace Community.CsharpSqlite {
 			//  corruptSchema( pData, argv[0], "" );
 			//  return 1;
 			//}
-			Debug.Assert(iDb>=0&&iDb<db.nDb);
+			Debug.Assert(iDb>=0&&iDb<db.BackendCount);
 			if(argv==null)
 				return 0;
 			///
@@ -183,7 +183,7 @@ namespace Community.CsharpSqlite {
 						///
 						///</summary>
 						Index pIndex;
-						pIndex=IndexBuilder.sqlite3FindIndex(db,argv[0],db.aDb[iDb].zName);
+						pIndex=IndexBuilder.sqlite3FindIndex(db,argv[0],db.Backends[iDb].Name);
 						if(pIndex==null) {
 							///
 							///<summary>
@@ -215,12 +215,12 @@ namespace Community.CsharpSqlite {
 		/// indicate success or failure.
 		///
 		///</summary>
-		static SqlResult sqlite3InitOne(sqlite3 db,int iDb,ref string pzErrMsg) {
+		static SqlResult sqlite3InitOne(Connection db,int iDb,ref string pzErrMsg) {
             SqlResult rc;
 			int i;
 			int size;
 			Table pTab;
-			Db pDb;
+			DbBackend pDb;
 			string[] azArg=new string[4];
 			u32[] meta=new u32[5];
 			InitData initData=new InitData();
@@ -238,10 +238,10 @@ namespace Community.CsharpSqlite {
 			#else
 																																																																								//define temp_master_schema 0
 #endif
-			Debug.Assert(iDb>=0&&iDb<db.nDb);
-			Debug.Assert(db.aDb[iDb].pSchema!=null);
+			Debug.Assert(iDb>=0&&iDb<db.BackendCount);
+			Debug.Assert(db.Backends[iDb].pSchema!=null);
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
-			Debug.Assert(iDb==1||sqlite3BtreeHoldsMutex(db.aDb[iDb].pBt));
+			Debug.Assert(iDb==1||sqlite3BtreeHoldsMutex(db.Backends[iDb].BTree));
 			///
 			///<summary>
 			///zMasterSchema and zInitScript are set to point at the master schema
@@ -274,7 +274,7 @@ namespace Community.CsharpSqlite {
 				rc=initData.rc;
 				goto error_out;
 			}
-			pTab=TableBuilder.sqlite3FindTable(db,zMasterName,db.aDb[iDb].zName);
+			pTab=TableBuilder.sqlite3FindTable(db,zMasterName,db.Backends[iDb].Name);
 			if(Sqlite3.ALWAYS(pTab)) {
 				pTab.tabFlags|=TableFlags.TF_Readonly;
 			}
@@ -283,8 +283,8 @@ namespace Community.CsharpSqlite {
 			///Create a cursor to hold the database open
 			///
 			///</summary>
-			pDb=db.aDb[iDb];
-			if(pDb.pBt==null) {
+			pDb=db.Backends[iDb];
+			if(pDb.BTree==null) {
                 if (sqliteinth.OMIT_TEMPDB == 0 && Sqlite3.ALWAYS(iDb == 1))
                 {
                     db.DbSetProperty(1, sqliteinth.DB_SchemaLoaded);
@@ -297,12 +297,12 @@ namespace Community.CsharpSqlite {
 			///<param name="If there is not already a read">write) transaction opened</param>
 			///<param name="on the b">tree database, open one now. If a transaction is opened, it </param>
 			///<param name="will be closed before this function returns.  ">will be closed before this function returns.  </param>
-            pDb.pBt.sqlite3BtreeEnter();
-			if(!pDb.pBt.sqlite3BtreeIsInReadTrans()) {
-				rc=pDb.pBt.sqlite3BtreeBeginTrans(0);
+            pDb.BTree.sqlite3BtreeEnter();
+			if(!pDb.BTree.sqlite3BtreeIsInReadTrans()) {
+				rc=pDb.BTree.sqlite3BtreeBeginTrans(0);
 				if(rc!=SqlResult.SQLITE_OK) {
 					#if SQLITE_OMIT_WAL
-					if(pDb.pBt.pBt.pSchema.file_format==2)
+					if(pDb.BTree.pBt.pSchema.file_format==2)
 						malloc_cs.sqlite3SetString(ref pzErrMsg,db,"%s (wal format detected)",sqlite3ErrStr(rc));
 					else
 						malloc_cs.sqlite3SetString(ref pzErrMsg,db,"%s",sqlite3ErrStr(rc));
@@ -334,7 +334,7 @@ namespace Community.CsharpSqlite {
 			///<param name="the possible values of meta[BTREE_TEXT_ENCODING">1].</param>
 			///<param name=""></param>
 			for(i=0;i<Sqlite3.ArraySize(meta);i++) {
-				meta[i]=pDb.pBt.sqlite3BtreeGetMeta(i+1);
+				meta[i]=pDb.BTree.sqlite3BtreeGetMeta(i+1);
 			}
             pDb.pSchema.schema_cookie = (int)meta[BTreeProp.SCHEMA_VERSION - 1];
 			///
@@ -360,7 +360,7 @@ namespace Community.CsharpSqlite {
                     encoding = (SqliteEncoding)(meta[BTreeProp.TEXT_ENCODING - 1] & 3);
 					if(encoding==0)
 						encoding=SqliteEncoding.UTF8;
-					db.aDb[0].pSchema.enc=encoding;
+					db.Backends[0].pSchema.enc=encoding;
 					//ENC( db ) = encoding;
 					db.pDfltColl=db.sqlite3FindCollSeq(SqliteEncoding.UTF8,"BINARY",0);
 				}
@@ -387,7 +387,7 @@ namespace Community.CsharpSqlite {
 					size=Globals.SQLITE_DEFAULT_CACHE_SIZE;
 				}
 				pDb.pSchema.cache_size=size;
-				pDb.pBt.SetCacheSize(pDb.pSchema.cache_size);
+				pDb.BTree.SetCacheSize(pDb.pSchema.cache_size);
 			}
 			///
 			///<summary>
@@ -427,7 +427,7 @@ namespace Community.CsharpSqlite {
 			Debug.Assert(db.init.busy!=0);
 			{
 				string zSql;
-				zSql=io.sqlite3MPrintf(db,"SELECT name, rootpage, sql FROM '%q'.%s ORDER BY rowid",db.aDb[iDb].zName,zMasterName);
+				zSql=io.sqlite3MPrintf(db,"SELECT name, rootpage, sql FROM '%q'.%s ORDER BY rowid",db.Backends[iDb].Name,zMasterName);
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																{
 int (*xAuth)(void*,int,const char*,const char*,const char*,const char*);
@@ -478,10 +478,10 @@ db.xAuth = 0;
 			}
 			initone_error_out:
 			if(openedTransaction!=0) {
-				pDb.pBt.sqlite3BtreeCommit();
+				pDb.BTree.sqlite3BtreeCommit();
 			}
             
-            pDb.pBt.sqlite3BtreeLeave();
+            pDb.BTree.sqlite3BtreeLeave();
 			error_out:
 			if(rc== SqlResult.SQLITE_NOMEM || rc== SqlResult.SQLITE_IOERR_NOMEM) {
 				//        db.mallocFailed = 1;
@@ -499,14 +499,14 @@ db.xAuth = 0;
 		/// file was of zero-length, then the DB_Empty flag is also set.
 		///
 		///</summary>
-		static SqlResult sqlite3Init(sqlite3 db,ref string pzErrMsg) {
+		static SqlResult sqlite3Init(Connection db,ref string pzErrMsg) {
             int i;
             SqlResult rc;
             bool commit_internal = !((db.flags & SqliteFlags.SQLITE_InternChanges) != 0);
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			rc=SqlResult.SQLITE_OK;
 			db.init.busy=1;
-			for(i=0;rc==SqlResult.SQLITE_OK&&i<db.nDb;i++) {
+			for(i=0;rc==SqlResult.SQLITE_OK&&i<db.BackendCount;i++) {
 				if(db.DbHasProperty(i,sqliteinth.DB_SchemaLoaded)||i==1)
 					continue;
 				rc=sqlite3InitOne(db,i,ref pzErrMsg);
@@ -522,7 +522,7 @@ db.xAuth = 0;
 			///
 			///</summary>
 			#if !SQLITE_OMIT_TEMPDB
-			if(rc==SqlResult.SQLITE_OK&&Sqlite3.ALWAYS(db.nDb>1)&&!db.DbHasProperty(1,sqliteinth.DB_SchemaLoaded)) {
+			if(rc==SqlResult.SQLITE_OK&&Sqlite3.ALWAYS(db.BackendCount>1)&&!db.DbHasProperty(1,sqliteinth.DB_SchemaLoaded)) {
 				rc=sqlite3InitOne(db,1,ref pzErrMsg);
 				if(rc!=0) {
 					build.sqlite3ResetInternalSchema(db,1);
@@ -542,7 +542,7 @@ db.xAuth = 0;
 		///</summary>
 		public static SqlResult sqlite3ReadSchema(Parse pParse) {
 			SqlResult rc=SqlResult.SQLITE_OK;
-			sqlite3 db=pParse.db;
+			Connection db=pParse.db;
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			if(0==db.init.busy) {
 				rc=(SqlResult)sqlite3Init(db,ref pParse.zErrMsg);
@@ -560,19 +560,19 @@ db.xAuth = 0;
 		///
 		///</summary>
 		static void schemaIsValid(Parse pParse) {
-			sqlite3 db=pParse.db;
+			Connection db=pParse.db;
 			int iDb;
             SqlResult rc;
 			u32 cookie=0;
 			Debug.Assert(pParse.checkSchema!=0);
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
-			for(iDb=0;iDb<db.nDb;iDb++) {
+			for(iDb=0;iDb<db.BackendCount;iDb++) {
 				int openedTransaction=0;
 				///
 				///<summary>
 				///True if a transaction is opened 
 				///</summary>
-				Btree pBt=db.aDb[iDb].pBt;
+				Btree pBt=db.Backends[iDb].BTree;
 				///
 				///<summary>
 				///Btree database to read cookie from 
@@ -603,7 +603,7 @@ db.xAuth = 0;
 				///<param name="set Parse.rc to SQLITE_SCHEMA. ">set Parse.rc to SQLITE_SCHEMA. </param>
                 cookie = pBt.sqlite3BtreeGetMeta(BTreeProp.SCHEMA_VERSION);
 				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-				if(cookie!=db.aDb[iDb].pSchema.schema_cookie) {
+				if(cookie!=db.Backends[iDb].pSchema.schema_cookie) {
 					build.sqlite3ResetInternalSchema(db,iDb);
 					pParse.rc=SqlResult.SQLITE_SCHEMA;
 				}
@@ -624,7 +624,7 @@ db.xAuth = 0;
 		/// attached database is returned.
 		///
 		///</summary>
-		public static int sqlite3SchemaToIndex(sqlite3 db,Schema pSchema) {//TODO: extension method
+		public static int sqlite3SchemaToIndex(Connection db,Schema pSchema) {//TODO: extension method
 			int i=-1000000;
 			///
 			///<summary>
@@ -641,12 +641,12 @@ db.xAuth = 0;
 			///<param name=""></param>
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			if(pSchema!=null) {
-				for(i=0;Sqlite3.ALWAYS(i<db.nDb);i++) {
-					if(db.aDb[i].pSchema==pSchema) {
+				for(i=0;Sqlite3.ALWAYS(i<db.BackendCount);i++) {
+					if(db.Backends[i].pSchema==pSchema) {
 						break;
 					}
 				}
-				Debug.Assert(i>=0&&i<db.nDb);
+				Debug.Assert(i>=0&&i<db.BackendCount);
 			}
 			return i;
 		}
@@ -654,7 +654,7 @@ db.xAuth = 0;
 		/// Compile the UTF-8 encoded SQL statement zSql into a statement handle.
 		///
 		///</summary>
-		static SqlResult sqlite3Prepare(sqlite3 db,///
+		static SqlResult sqlite3Prepare(Connection db,///
 		///<summary>
 		///Database handle. 
 		///</summary>
@@ -747,13 +747,13 @@ db.xAuth = 0;
 			///<param name="but it does *not* override schema lock detection, so this all still">but it does *not* override schema lock detection, so this all still</param>
 			///<param name="works even if READ_UNCOMMITTED is set.">works even if READ_UNCOMMITTED is set.</param>
 			///<param name=""></param>
-			for(i=0;i<db.nDb;i++) {
-				Btree pBt=db.aDb[i].pBt;
+			for(i=0;i<db.BackendCount;i++) {
+				Btree pBt=db.Backends[i].BTree;
 				if(pBt!=null) {
 					Debug.Assert(sqlite3BtreeHoldsMutex(pBt));
 					rc=pBt.sqlite3BtreeSchemaLocked();
 					if(rc!=0) {
-						string zDb=db.aDb[i].zName;
+						string zDb=db.Backends[i].Name;
 						utilc.sqlite3Error(db,rc,"database schema is locked: %s",zDb);
                         sqliteinth.testcase(db.flags & SqliteFlags.SQLITE_ReadUncommitted);
 						goto end_prepare;
@@ -877,7 +877,7 @@ db.xAuth = 0;
 			return rc;
 		}
 		//C# Version w/o End of Parsed String
-		static SqlResult sqlite3LockAndPrepare(sqlite3 db,///
+		static SqlResult sqlite3LockAndPrepare(Connection db,///
 		///<summary>
 		///Database handle. 
 		///</summary>
@@ -909,7 +909,7 @@ db.xAuth = 0;
 			string sOut=null;
 			return sqlite3LockAndPrepare(db,zSql,nBytes,saveSqlFlag,pOld,ref ppStmt,ref sOut);
 		}
-		static SqlResult sqlite3LockAndPrepare(sqlite3 db,///
+		static SqlResult sqlite3LockAndPrepare(Connection db,///
 		///<summary>
 		///Database handle. 
 		///</summary>
@@ -970,7 +970,7 @@ db.xAuth = 0;
             SqlResult rc;
 			sqlite3_stmt pNew=new sqlite3_stmt();
 			string zSql;
-			sqlite3 db;
+			Connection db;
             Debug.Assert(p.sqlite3VdbeDb().mutex.sqlite3_mutex_held());
             zSql = vdbeaux.sqlite3_sql((sqlite3_stmt)p);
 			Debug.Assert(zSql!=null);
@@ -998,7 +998,7 @@ db.xAuth = 0;
 			return SqlResult.SQLITE_OK;
 		}
 		//C# Overload for ignore error out
-		static public SqlResult sqlite3_prepare(sqlite3 db,///
+		static public SqlResult sqlite3_prepare(Connection db,///
 		///<summary>
 		///Database handle. 
 		///</summary>
@@ -1031,7 +1031,7 @@ db.xAuth = 0;
 		/// occurs.
 		///
 		///</summary>
-		static public SqlResult sqlite3_prepare(sqlite3 db,///
+		static public SqlResult sqlite3_prepare(Connection db,///
 		///<summary>
 		///Database handle. 
 		///</summary>
@@ -1061,7 +1061,7 @@ db.xAuth = 0;
 			///</summary>
 			return rc;
 		}
-		public static SqlResult sqlite3_prepare_v2(sqlite3 db,///
+		public static SqlResult sqlite3_prepare_v2(Connection db,///
 		///<summary>
 		///Database handle. 
 		///</summary>
@@ -1092,7 +1092,7 @@ db.xAuth = 0;
 			///</summary>
 			return rc;
 		}
-		public static SqlResult sqlite3_prepare_v2(sqlite3 db,///
+		public static SqlResult sqlite3_prepare_v2(Connection db,///
 		///<summary>
 		///Database handle. 
 		///</summary>

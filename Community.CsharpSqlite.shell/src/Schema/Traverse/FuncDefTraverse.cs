@@ -126,7 +126,7 @@ namespace Community.CsharpSqlite.Metadata.Traverse
         /// match that requested.
         ///
         ///</summary>
-        public static FuncDef sqlite3FindFunction(sqlite3 db,///
+        public static FuncDef sqlite3FindFunction(Connection db,///
             ///An open database 
         string zName,///
             ///<param name="Name of the function.  Not null">terminated </param>

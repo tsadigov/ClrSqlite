@@ -34,7 +34,7 @@ namespace Community.CsharpSqlite.Metadata
         ///</summary>
         public class KeyInfo
         {
-            public sqlite3 db;
+            public Connection db;
             ///
             ///<summary>
             ///The database connection 

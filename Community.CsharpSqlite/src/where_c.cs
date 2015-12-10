@@ -336,7 +336,7 @@ namespace Community.CsharpSqlite
             {
                 int i;
                 WhereTerm a;
-                sqlite3 db = this.pParse.db;
+                Connection db = this.pParse.db;
                 for (i = this.nTerm - 1; i >= 0; i--)//, a++)
                 {
                     a = this.a[i];
@@ -412,7 +412,7 @@ namespace Community.CsharpSqlite
                 if (this.nTerm >= this.nSlot)
                 {
                     //WhereTerm pOld = pWC.a;
-                    sqlite3 db = this.pParse.db;
+                    Connection db = this.pParse.db;
                     Array.Resize(ref this.a, this.nSlot * 2);
                     //pWC.a = sqlite3DbMallocRaw(db, sizeof(pWC.a[0])*pWC.nSlot*2 );
                     //if( pWC.a==null ){

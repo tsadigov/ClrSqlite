@@ -1428,7 +1428,7 @@ set { _op = value; }
                                     if (pNC.pParse != null)
                                     {
                                         int iDb = Sqlite3.sqlite3SchemaToIndex(pNC.pParse.db, pTab.pSchema);
-                                        zOriginDb = pNC.pParse.db.aDb[iDb].zName;
+                                        zOriginDb = pNC.pParse.db.Backends[iDb].Name;
                                     }
                                 }
                             break;

@@ -15,7 +15,7 @@ namespace Community.CsharpSqlite.Engine
         {
             Mem[]aMem=cpu.aMem;
             SqliteEncoding encoding = cpu.encoding;
-            sqlite3 db=cpu.db;
+            Connection db=cpu.db;
             Mem pOut = cpu.pOut;
             var vdbe = cpu.vdbe;
 

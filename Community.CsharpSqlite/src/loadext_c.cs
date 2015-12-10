@@ -69,7 +69,7 @@ namespace Community.CsharpSqlite
 		//# define sqlite3_create_collation16     0
 		//# define sqlite3_create_function16      0
 		//# define sqlite3_errmsg16               0
-		static string sqlite3_errmsg16 (sqlite3 db)
+		static string sqlite3_errmsg16 (Connection db)
 		{
 			return "";
 		}
@@ -119,7 +119,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		#if SQLITE_OMIT_GET_TABLE
 		//# define //malloc_cs.sqlite3_free_table    0
 		//# define sqlite3_get_table     0
-		static public SqlResult sqlite3_get_table (sqlite3 db, ///
+		static public SqlResult sqlite3_get_table (Connection db, ///
 ///An open database 
 
 		string zSql, ///
@@ -168,7 +168,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		///</summary>
 		public class sqlite3_api_routines
 		{
-			public sqlite3 context_db_handle;
+			public Connection context_db_handle;
 		};
 
 
@@ -430,7 +430,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		/// by calling sqlite3DbFree(db, ).
 		///
 		///</summary>
-		static SqlResult sqlite3LoadExtension (sqlite3 db, ///
+		static SqlResult sqlite3LoadExtension (Connection db, ///
 ///<summary>
 ///Load the extension into this database connection 
 ///</summary>
@@ -529,7 +529,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			return SqlResult.SQLITE_OK;
 		}
 
-		static public SqlResult sqlite3_load_extension (sqlite3 db, ///
+		static public SqlResult sqlite3_load_extension (Connection db, ///
 ///<summary>
 ///Load the extension into this database connection 
 ///</summary>
@@ -565,7 +565,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		/// to clean up loaded extensions
 		///
 		///</summary>
-		static void sqlite3CloseExtensions (sqlite3 db)
+		static void sqlite3CloseExtensions (Connection db)
 		{
 			int i;
 			Debug.Assert (db.mutex.sqlite3_mutex_held());
@@ -582,7 +582,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 ///
 ///</summary>
 
-		static public SqlResult sqlite3_enable_load_extension (sqlite3 db, int onoff)
+		static public SqlResult sqlite3_enable_load_extension (Connection db, int onoff)
 		{
 			db.mutex.sqlite3_mutex_enter();
 			if (onoff != 0) {
@@ -716,7 +716,7 @@ wsdAutoext.nExt = 0;
 ///
 ///</summary>
 
-		static void sqlite3AutoLoadExtensions (sqlite3 db)
+		static void sqlite3AutoLoadExtensions (Connection db)
 		{
 			int i;
 			bool go = true;

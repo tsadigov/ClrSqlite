@@ -436,7 +436,7 @@ namespace Community.CsharpSqlite.Engine
             /// the FuncDef is not ephermal, then do nothing.
             ///
             ///</summary>
-            static void freeEphemeralFunction(sqlite3 db, FuncDef pDef)
+            static void freeEphemeralFunction(Connection db, FuncDef pDef)
             {
                 if (Sqlite3.ALWAYS(pDef) && (pDef.flags & FuncFlags.SQLITE_FUNC_EPHEM) != 0)
                 {
@@ -449,7 +449,7 @@ namespace Community.CsharpSqlite.Engine
             /// Delete a P4 value if necessary.
             ///
             ///</summary>
-            public static void freeP4(sqlite3 db, P4Usage p4type, object p4)
+            public static void freeP4(Connection db, P4Usage p4type, object p4)
             {
                 if (p4 != null)
                 {
@@ -516,7 +516,7 @@ namespace Community.CsharpSqlite.Engine
             /// nOp entries.
             ///
             ///</summary>
-            static void vdbeFreeOpArray(sqlite3 db, ref Operation[] aOp, int nOp)
+            static void vdbeFreeOpArray(Connection db, ref Operation[] aOp, int nOp)
             {
                 if (aOp != null)
                 {
@@ -532,7 +532,7 @@ namespace Community.CsharpSqlite.Engine
                     aOp = null;
                 }
             }
-            static void vdbeFreeOpArray(sqlite3 db, List<Operation> lOp)
+            static void vdbeFreeOpArray(Connection db, List<Operation> lOp)
             {
                 if (lOp != null)
                 {
@@ -554,7 +554,7 @@ namespace Community.CsharpSqlite.Engine
             {
                 if (p.lOp != null)
                 {
-                    sqlite3 db = p.db;
+                    Connection db = p.db;
                     while (N-- > 0)
                     {
                         VdbeOp pOp = p.lOp[addr + N];
@@ -828,10 +828,10 @@ namespace Community.CsharpSqlite.Engine
             ///</summary>
             public static void sqlite3VdbeUsesBtree(this Vdbe p, int i)
             {
-                Debug.Assert(i >= 0 && i < p.db.nDb && i < (int)sizeof(yDbMask) * 8);
+                Debug.Assert(i >= 0 && i < p.db.BackendCount && i < (int)sizeof(yDbMask) * 8);
                 Debug.Assert(i < (int)sizeof(yDbMask) * 8);
                 p.btreeMask |= ((yDbMask)1) << i;
-                if (i != 1 && Sqlite3.sqlite3BtreeSharable(p.db.aDb[i].pBt))
+                if (i != 1 && Sqlite3.sqlite3BtreeSharable(p.db.Backends[i].BTree))
                 {
                     p.lockMask |= ((yDbMask)1) << i;
                 }
@@ -933,7 +933,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 if (p != null && p.Length > starting && p[starting] != null && N != 0)
                 {
                     Mem pEnd;
-                    sqlite3 db = p[starting].db;
+                    Connection db = p[starting].db;
                     //u8 malloc_failed =  db.mallocFailed;
                     //if ( db != null ) //&&  db.pnBytesFreed != 0 )
                     //{
@@ -1032,7 +1032,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 ///<summary>
                 ///Memory cell hold array of subprogs 
                 ///</summary>
-                sqlite3 db = p.db;
+                Connection db = p.db;
                 ///
                 ///<summary>
                 ///The database connection 
@@ -1465,7 +1465,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///</summary>
             )
             {
-                sqlite3 db;
+                Connection db;
                 ///
                 ///<summary>
                 ///The database connection 
@@ -1747,7 +1747,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             public static void Cleanup(Vdbe p)
             {
-                sqlite3 db = p.db;
+                Connection db = p.db;
 #if SQLITE_DEBUG
 																																																																								      /* Execute Debug.Assert() statements to ensure that the Vdbe.apCsr[] and 
 ** Vdbe.aMem[] arrays have already been cleaned up.  */
@@ -1785,7 +1785,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///<param name="write">transaction spanning more than one database file, this routine</param>
             ///<param name="takes care of the master journal trickery.">takes care of the master journal trickery.</param>
             ///<param name=""></param>
-            public static SqlResult vdbeCommit(sqlite3 db, Vdbe p)
+            public static SqlResult vdbeCommit(Connection db, Vdbe p)
             {
                 int i;
                 int nTrans = 0;
@@ -1819,9 +1819,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///file is required for an atomic commit.
                 ///
                 ///</summary>
-                for (i = 0; rc == SqlResult.SQLITE_OK && i < db.nDb; i++)
+                for (i = 0; rc == SqlResult.SQLITE_OK && i < db.BackendCount; i++)
                 {
-                    Btree pBt = db.aDb[i].pBt;
+                    Btree pBt = db.Backends[i].BTree;
                     if (pBt.sqlite3BtreeIsInTrans())
                     {
                         needXcommit = true;
@@ -1858,11 +1858,11 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<param name="that case we do not support atomic multi">file commits, so use the</param>
                 ///<param name="simple case then too.">simple case then too.</param>
                 ///<param name=""></param>
-                if (0 == StringExtensions.sqlite3Strlen30(db.aDb[0].pBt.GetFilename()) || nTrans <= 1)
+                if (0 == StringExtensions.sqlite3Strlen30(db.Backends[0].BTree.GetFilename()) || nTrans <= 1)
                 {
-                    for (i = 0; rc == SqlResult.SQLITE_OK && i < db.nDb; i++)
+                    for (i = 0; rc == SqlResult.SQLITE_OK && i < db.BackendCount; i++)
                     {
-                        Btree pBt = db.aDb[i].pBt;
+                        Btree pBt = db.Backends[i].BTree;
                         if (pBt != null)
                         {
                             rc = pBt.sqlite3BtreeCommitPhaseOne(null);
@@ -1876,9 +1876,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///but could happen. In this case abandon processing and return the error.
                     ///
                     ///</summary>
-                    for (i = 0; rc == SqlResult.SQLITE_OK && i < db.nDb; i++)
+                    for (i = 0; rc == SqlResult.SQLITE_OK && i < db.BackendCount; i++)
                     {
-                        Btree pBt = db.aDb[i].pBt;
+                        Btree pBt = db.Backends[i].BTree;
                         if (pBt != null)
                         {
                             rc = pBt.sqlite3BtreeCommitPhaseTwo(0);
@@ -1906,7 +1906,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///<summary>
                     ///</summary>
                     ///<param name="File">name for the master journal </param>
-                    string zMainFile = db.aDb[0].pBt.GetFilename();
+                    string zMainFile = db.Backends[0].BTree.GetFilename();
                     sqlite3_file pMaster = null;
                     i64 offset = 0;
                     int res = 0;
@@ -1952,9 +1952,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///back independently if a failure occurs.
                     ///
                     ///</summary>
-                    for (i = 0; i < db.nDb; i++)
+                    for (i = 0; i < db.BackendCount; i++)
                     {
-                        Btree pBt = db.aDb[i].pBt;
+                        Btree pBt = db.Backends[i].BTree;
                         if (pBt.sqlite3BtreeIsInTrans())
                         {
                             string zFile = pBt.GetJournalname();
@@ -2008,9 +2008,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///file before the failure occurred.
                     ///
                     ///</summary>
-                    for (i = 0; rc == SqlResult.SQLITE_OK && i < db.nDb; i++)
+                    for (i = 0; rc == SqlResult.SQLITE_OK && i < db.BackendCount; i++)
                     {
-                        Btree pBt = db.aDb[i].pBt;
+                        Btree pBt = db.Backends[i].BTree;
                         if (pBt != null)
                         {
                             rc = pBt.sqlite3BtreeCommitPhaseOne(zMaster);
@@ -2050,9 +2050,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 																																																																																																        disable_simulated_io_errors();
 #endif
                     Sqlite3.sqlite3BeginBenignMalloc();
-                    for (i = 0; i < db.nDb; i++)
+                    for (i = 0; i < db.BackendCount; i++)
                     {
-                        Btree pBt = db.aDb[i].pBt;
+                        Btree pBt = db.Backends[i].BTree;
                         if (pBt != null)
                         {
                             pBt.sqlite3BtreeCommitPhaseTwo(0);
@@ -2099,7 +2099,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
     }
 #else
             //#define checkActiveVdbeCnt(x)
-            public static void checkActiveVdbeCnt(sqlite3 db)
+            public static void checkActiveVdbeCnt(Connection db)
             {
             }
 #endif
@@ -2119,12 +2119,12 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// the state of the cursor.  We have to invalidate the cursor
             /// so that it is never used again.
             ///</summary>
-            public static void invalidateCursorsOnModifiedBtrees(sqlite3 db)
+            public static void invalidateCursorsOnModifiedBtrees(Connection db)
             {
                 int i;
-                for (i = 0; i < db.nDb; i++)
+                for (i = 0; i < db.BackendCount; i++)
                 {
-                    Btree p = db.aDb[i].pBt;
+                    Btree p = db.Backends[i].BTree;
                     if (p != null && p.sqlite3BtreeIsInTrans())
                     {
                         p.sqlite3BtreeTripAllCursors(SqlResult.SQLITE_ABORT);
@@ -2232,7 +2232,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// the database connection.
             ///
             ///</summary>
-            public static void sqlite3VdbeDeleteObject(sqlite3 db, ref Vdbe p)
+            public static void sqlite3VdbeDeleteObject(Connection db, ref Vdbe p)
             {
                 SubProgram pSub, pNext;
                 int i;
@@ -2264,7 +2264,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 if (Sqlite3.NEVER(p == null))
                     return;
                 Cleanup(p);
-                sqlite3 db = p.db;
+                Connection db = p.db;
                 if (p.pPrev != null)
                 {
                     p.pPrev.pNext = p.pNext;
@@ -3353,7 +3353,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// So the content cannot be trusted.  Do appropriate checks on the content.
             ///
             ///</summary>
-            public static SqlResult sqlite3VdbeIdxRowid(sqlite3 db, BtCursor pCur, ref i64 rowid)
+            public static SqlResult sqlite3VdbeIdxRowid(Connection db, BtCursor pCur, ref i64 rowid)
             {
                 i64 nCellKey = 0;
                 SqlResult rc;
@@ -3520,7 +3520,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// sqlite3_changes() on the database handle 'db'.
             ///
             ///</summary>
-            public static void sqlite3VdbeSetChanges(sqlite3 db, int nChange)
+            public static void sqlite3VdbeSetChanges(Connection db, int nChange)
             {
                 Debug.Assert(db.mutex.sqlite3_mutex_held());
                 db.nChange = nChange;
@@ -3542,7 +3542,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// things that make prepared statements obsolete.
             ///
             ///</summary>
-            public static void sqlite3ExpirePreparedStatements(sqlite3 db)
+            public static void sqlite3ExpirePreparedStatements(Connection db)
             {
                 Vdbe p;
                 for (p = db.pVdbe; p != null; p = p.pNext)

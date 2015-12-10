@@ -38,19 +38,19 @@ namespace Community.CsharpSqlite.builder
         /// using the ATTACH command.
         ///
         ///</summary>
-        public static Index sqlite3FindIndex(sqlite3 db, string zName, string zDb)
+        public static Index sqlite3FindIndex(Connection db, string zName, string zDb)
         {
             Index p = null;
             int nName = StringExtensions.sqlite3Strlen30(zName);
             ///All mutexes are required for schema access.  Make sure we hold them. 
             Debug.Assert(zDb != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
-            for (int i = sqliteinth.OMIT_TEMPDB; i < db.nDb; i++)
+            for (int i = sqliteinth.OMIT_TEMPDB; i < db.BackendCount; i++)
             {
                 int j = (i < 2) ? i ^ 1 : i;
                 ///Search TEMP before MAIN 
-                Schema pSchema = db.aDb[j].pSchema;
+                Schema pSchema = db.Backends[j].pSchema;
                 Debug.Assert(pSchema != null);
-                if (zDb != null && !zDb.Equals(db.aDb[j].zName, StringComparison.InvariantCultureIgnoreCase))
+                if (zDb != null && !zDb.Equals(db.Backends[j].Name, StringComparison.InvariantCultureIgnoreCase))
                     continue;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
                 p = pSchema.idxHash.sqlite3HashFind(zName, nName, (Index)null);
@@ -63,7 +63,7 @@ namespace Community.CsharpSqlite.builder
         /// Reclaim the memory used by an index
         ///
         ///</summary>
-        public static void freeIndex(this sqlite3 db, ref Index p)
+        public static void freeIndex(this Connection db, ref Index p)
         {
 #if !SQLITE_OMIT_ANALYZE
             Sqlite3.sqlite3DeleteIndexSamples(db, p);
@@ -78,10 +78,10 @@ namespace Community.CsharpSqlite.builder
         /// with the index.
         ///
         ///</summary>
-        public static void sqlite3UnlinkAndDeleteIndex(sqlite3 db, int iDb, string zIdxName)//OPCODE:OP_DropIndex
+        public static void sqlite3UnlinkAndDeleteIndex(Connection db, int iDb, string zIdxName)//OPCODE:OP_DropIndex
         {
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-            var pHash = db.aDb[iDb].pSchema.idxHash;
+            var pHash = db.Backends[iDb].pSchema.idxHash;
             var pIndex = HashExtensions.sqlite3HashInsert(ref pHash, zIdxName, zIdxName.sqlite3Strlen30(), (Index)null);
 
             sqlite3UnlinkAndDeleteIndex(db, pIndex);
@@ -91,7 +91,7 @@ namespace Community.CsharpSqlite.builder
         /// starting from pIndex.pTable.pIndex
         /// moving by pNext
         /// </summary>
-        public static void sqlite3UnlinkAndDeleteIndex(sqlite3 db, Index pIndex)
+        public static void sqlite3UnlinkAndDeleteIndex(Connection db, Index pIndex)
         {
             if (Sqlite3.ALWAYS(pIndex))
             {
@@ -116,7 +116,7 @@ namespace Community.CsharpSqlite.builder
             int i;
             int nCol = pIdx.nColumn;
             //int nBytes = KeyInfo.Length + (nCol - 1) * CollSeq*.Length + nCol;
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             KeyInfo pKey = new KeyInfo();
             // (KeyInfo)sqlite3DbMallocZero(db, nBytes);
             if (pKey != null)
@@ -201,7 +201,7 @@ namespace Community.CsharpSqlite.builder
             ///An index associated with pTab 
             int iDb;
             ///The database index number 
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             ///The database connection 
             Token pObjName = new Token();
             ///Name of the table or index to be reindexed 
@@ -240,7 +240,7 @@ namespace Community.CsharpSqlite.builder
             z = build.sqlite3NameFromToken(db, pObjName);
             if (z == null)
                 return;
-            zDb = db.aDb[iDb].zName;
+            zDb = db.Backends[iDb].Name;
             pTab = TableBuilder.sqlite3FindTable(db, z, zDb);
             if (pTab != null)
             {
@@ -287,11 +287,11 @@ namespace Community.CsharpSqlite.builder
 #if !SQLITE_OMIT_REINDEX
         static void reindexDatabases(this Community.CsharpSqlite.Sqlite3.Parse pParse, string zColl)
         {
-            sqlite3 db = pParse.db;///The database connection 
+            Connection db = pParse.db;///The database connection 
             Table pTab;///A table in the database 
             Debug.Assert(Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
             ///Needed for schema access 
-            foreach (var pDb in db.aDb.Take(db.nDb))//, pDb++ )
+            foreach (var pDb in db.Backends.Take(db.BackendCount))//, pDb++ )
             {
                 Debug.Assert(pDb != null);
                 //HashElem k;///For looping over tables in pDb 
@@ -335,7 +335,7 @@ namespace Community.CsharpSqlite.builder
             ///Registers containing the index key 
             int regRecord;
             ///Register holding assemblied index record 
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             ///The database connection 
             int iDb = Sqlite3.sqlite3SchemaToIndex(db, pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
@@ -463,8 +463,8 @@ return;
             ///For assigning database names to pTable 
             SortOrder sortOrderMask;
             ///1 to honor DESC in index.  0 to ignore. 
-            sqlite3 db = pParse.db;
-            Db pDb;
+            Connection db = pParse.db;
+            DbBackend pDb;
             ///The specific table containing the indexed database 
             int iDb;
             ///Index of the database that is being written 
@@ -507,7 +507,7 @@ return;
                 if (0 == db.init.busy)
                 {
                     pTab = pParse.sqlite3SrcListLookup(pTblName);
-                    if (pName2.Length == 0 && pTab != null && pTab.pSchema == db.aDb[1].pSchema)
+                    if (pName2.Length == 0 && pTab != null && pTab.pSchema == db.Backends[1].pSchema)
                     {
                         iDb = 1;
                     }
@@ -526,7 +526,7 @@ return;
                     ///</summary>
                 )
                     goto exit_create_index;
-                Debug.Assert(db.aDb[iDb].pSchema == pTab.pSchema);
+                Debug.Assert(db.Backends[iDb].pSchema == pTab.pSchema);
             }
             else
             {
@@ -536,7 +536,7 @@ return;
                     goto exit_create_index;
                 iDb = Sqlite3.sqlite3SchemaToIndex(db, pTab.pSchema);
             }
-            pDb = db.aDb[iDb];
+            pDb = db.Backends[iDb];
             Debug.Assert(pTab != null);
             Debug.Assert(pParse.nErr == 0);
             if (pTab.zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase) && !pTab.zName.StartsWith("sqlite_altertab_", System.StringComparison.InvariantCultureIgnoreCase))
@@ -588,7 +588,7 @@ return;
                         goto exit_create_index;
                     }
                 }
-                if (IndexBuilder.sqlite3FindIndex(db, zName, pDb.zName) != null)
+                if (IndexBuilder.sqlite3FindIndex(db, zName, pDb.Name) != null)
                 {
                     if (ifNotExist == 0)
                     {
@@ -697,7 +697,7 @@ goto exit_create_index;
             pIndex.nColumn = pList.nExpr;
             pIndex.onError = onError;
             pIndex.autoIndex = (u8)(pName == null ? 1 : 0);
-            pIndex.pSchema = db.aDb[iDb].pSchema;
+            pIndex.pSchema = db.Backends[iDb].pSchema;
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
             ///Check to see if we should honor DESC requests on index columns
             if (pDb.pSchema.file_format >= 4)
@@ -906,7 +906,7 @@ goto exit_create_index;
                     zStmt = null;
                 }
                 ///Add an entry in sqlite_master for this index
-                build.sqlite3NestedParse(pParse, "INSERT INTO %Q.%s VALUES('index',%Q,%Q,#%d,%Q);", db.aDb[iDb].zName, sqliteinth.SCHEMA_TABLE(iDb), pIndex.zName, pTab.zName, iMem, zStmt);
+                build.sqlite3NestedParse(pParse, "INSERT INTO %Q.%s VALUES('index',%Q,%Q,#%d,%Q);", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), pIndex.zName, pTab.zName, iMem, zStmt);
                 db.sqlite3DbFree(ref zStmt);
                 ///Fill the index with data and reparse the schema. Code an  OpCode.OP_Expire
                 ///<param name="to invalidate all pre">compiled statements.</param>

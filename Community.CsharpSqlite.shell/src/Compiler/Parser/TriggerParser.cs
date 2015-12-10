@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite.Parsing
         ///<summary>
         /// Delete a linked list of TriggerStep structures.
         ///</summary>
-        public static void sqlite3DeleteTriggerStep(sqlite3 db, ref TriggerStep pTriggerStep)
+        public static void sqlite3DeleteTriggerStep(Connection db, ref TriggerStep pTriggerStep)
         {
             while (pTriggerStep != null)
             {
@@ -72,7 +72,7 @@ namespace Community.CsharpSqlite.Parsing
         ///</summary>
         public static Trigger sqlite3TriggerList(this Table pTab, Parse pParse)
         {
-            Schema pTmpSchema = pParse.db.aDb[1].pSchema;
+            Schema pTmpSchema = pParse.db.Backends[1].pSchema;
             Trigger pList = null;
             ///
             ///<summary>
@@ -164,7 +164,7 @@ namespace Community.CsharpSqlite.Parsing
             ///<summary>
             ///Name of the trigger 
             ///</summary>
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             ///
             ///<summary>
             ///The database connection 
@@ -260,7 +260,7 @@ namespace Community.CsharpSqlite.Parsing
                 goto trigger_cleanup;
             }
             pTab = pParse.sqlite3SrcListLookup(pTableName);
-            if (db.init.busy == 0 && pName2.Length == 0 && pTab != null && pTab.pSchema == db.aDb[1].pSchema)
+            if (db.init.busy == 0 && pName2.Length == 0 && pTab != null && pTab.pSchema == db.Backends[1].pSchema)
             {
                 iDb = 1;
             }
@@ -314,7 +314,7 @@ namespace Community.CsharpSqlite.Parsing
                 goto trigger_cleanup;
             }
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-            if ((db.aDb[iDb].pSchema.trigHash).sqlite3HashFind(zName, StringExtensions.sqlite3Strlen30(zName), (Trigger)null) != null)
+            if ((db.Backends[iDb].pSchema.trigHash).sqlite3HashFind(zName, StringExtensions.sqlite3Strlen30(zName), (Trigger)null) != null)
             {
                 if (noErr == 0)
                 {
@@ -390,7 +390,7 @@ goto trigger_cleanup;
             pTrigger.zName = zName;
             pTrigger.table = pTableName.a[0].zName;
             // sqlite3DbStrDup( db, pTableName.a[0].zName );
-            pTrigger.pSchema = db.aDb[iDb].pSchema;
+            pTrigger.pSchema = db.Backends[iDb].pSchema;
             pTrigger.pTabSchema = pTab.pSchema;
             pTrigger.op = (u8)op;
             pTrigger.tr_tm = tr_tm == Sqlite3.TK_BEFORE ? TriggerType.TRIGGER_BEFORE : TriggerType.TRIGGER_AFTER;
@@ -442,7 +442,7 @@ goto trigger_cleanup;
             ///<summary>
             ///Name of trigger 
             ///</summary>
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             ///
             ///<summary>
             ///The database 
@@ -499,7 +499,7 @@ goto trigger_cleanup;
                 build.sqlite3BeginWriteOperation(pParse, 0, iDb);
                 z = pAll.zRestSql.Substring(0, pAll.Length);
                 //sqlite3DbStrNDup( db, (char*)pAll.z, pAll.n );
-                build.sqlite3NestedParse(pParse, "INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')", db.aDb[iDb].zName, sqliteinth.SCHEMA_TABLE(iDb), zName, pTrig.table, z);
+                build.sqlite3NestedParse(pParse, "INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), zName, pTrig.table, z);
                 db.sqlite3DbFree(ref z);
                 build.sqlite3ChangeCookie(pParse, iDb);
                 v.sqlite3VdbeAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "type='trigger' AND name='%q'", zName));
@@ -507,7 +507,7 @@ goto trigger_cleanup;
             if (db.init.busy != 0)
             {
                 Trigger pLink = pTrig;
-                Hash pHash = db.aDb[iDb].pSchema.trigHash;
+                Hash pHash = db.Backends[iDb].pSchema.trigHash;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 pTrig = HashExtensions.sqlite3HashInsert(ref pHash, zName, StringExtensions.sqlite3Strlen30(zName), pTrig);
                 if (pTrig != null)
@@ -538,7 +538,7 @@ goto trigger_cleanup;
         /// body of a TRIGGER.
         ///
         ///</summary>
-        public static TriggerStep sqlite3TriggerSelectStep(sqlite3 db, Select pSelect)
+        public static TriggerStep sqlite3TriggerSelectStep(Connection db, Select pSelect)
         {
             TriggerStep pTriggerStep = new TriggerStep();
             // sqlite3DbMallocZero( db, sizeof(TriggerStep ))
@@ -560,7 +560,7 @@ goto trigger_cleanup;
         ///If an OOM error occurs, NULL is returned and db.mallocFailed is set.
         ///
         ///</summary>
-        static TriggerStep triggerStepAllocate(sqlite3 db,///
+        static TriggerStep triggerStepAllocate(Connection db,///
             ///<summary>
             ///Database connection 
             ///</summary>
@@ -598,19 +598,19 @@ goto trigger_cleanup;
         ///
         ///</summary>
         // OVERLOADS, so I don't need to rewrite parse.c
-        public static TriggerStep sqlite3TriggerInsertStep(sqlite3 db, Token pTableName, IdList pColumn, int null_4, int null_5, OnConstraintError orconf)
+        public static TriggerStep sqlite3TriggerInsertStep(Connection db, Token pTableName, IdList pColumn, int null_4, int null_5, OnConstraintError orconf)
         {
             return sqlite3TriggerInsertStep(db, pTableName, pColumn, null, null, orconf);
         }
-        public static TriggerStep sqlite3TriggerInsertStep(sqlite3 db, Token pTableName, IdList pColumn, ExprList pEList, int null_5, OnConstraintError orconf)
+        public static TriggerStep sqlite3TriggerInsertStep(Connection db, Token pTableName, IdList pColumn, ExprList pEList, int null_5, OnConstraintError orconf)
         {
             return sqlite3TriggerInsertStep(db, pTableName, pColumn, pEList, null, orconf);
         }
-        public static TriggerStep sqlite3TriggerInsertStep(sqlite3 db, Token pTableName, IdList pColumn, int null_4, Select pSelect, OnConstraintError orconf)
+        public static TriggerStep sqlite3TriggerInsertStep(Connection db, Token pTableName, IdList pColumn, int null_4, Select pSelect, OnConstraintError orconf)
         {
             return sqlite3TriggerInsertStep(db, pTableName, pColumn, null, pSelect, orconf);
         }
-        public static TriggerStep sqlite3TriggerInsertStep(sqlite3 db,///
+        public static TriggerStep sqlite3TriggerInsertStep(Connection db,///
             ///<summary>
             ///The database connection 
             ///</summary>
@@ -665,7 +665,7 @@ goto trigger_cleanup;
         /// sees an UPDATE statement inside the body of a CREATE TRIGGER.
         ///
         ///</summary>
-        public static TriggerStep sqlite3TriggerUpdateStep(sqlite3 db,///
+        public static TriggerStep sqlite3TriggerUpdateStep(Connection db,///
             ///<summary>
             ///The database connection 
             ///</summary>
@@ -705,7 +705,7 @@ goto trigger_cleanup;
         /// sees a DELETE statement inside the body of a CREATE TRIGGER.
         ///
         ///</summary>
-        public static TriggerStep sqlite3TriggerDeleteStep(sqlite3 db,///
+        public static TriggerStep sqlite3TriggerDeleteStep(Connection db,///
             ///<summary>
             ///Database connection 
             ///</summary>
@@ -733,7 +733,7 @@ goto trigger_cleanup;
         /// Recursively delete a Trigger structure
         ///
         ///</summary>
-        public static void sqlite3DeleteTrigger(sqlite3 db, ref Trigger pTrigger)
+        public static void sqlite3DeleteTrigger(Connection db, ref Trigger pTrigger)
         {
             if (pTrigger == null)
                 return;
@@ -761,7 +761,7 @@ goto trigger_cleanup;
             string zDb;
             string zName;
             int nName;
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             //      if ( db.mallocFailed != 0 ) goto drop_trigger_cleanup;
             if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
             {
@@ -772,17 +772,17 @@ goto trigger_cleanup;
             zName = pName.a[0].zName;
             nName = StringExtensions.sqlite3Strlen30(zName);
             Debug.Assert(zDb != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
-            for (i = sqliteinth.OMIT_TEMPDB; i < db.nDb; i++)
+            for (i = sqliteinth.OMIT_TEMPDB; i < db.BackendCount; i++)
             {
                 int j = (i < 2) ? i ^ 1 : i;
                 ///
                 ///<summary>
                 ///Search TEMP before MAIN 
                 ///</summary>
-                if (zDb != null && !db.aDb[j].zName.Equals(zDb, StringComparison.InvariantCultureIgnoreCase))
+                if (zDb != null && !db.Backends[j].Name.Equals(zDb, StringComparison.InvariantCultureIgnoreCase))
                     continue;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
-                pTrigger = (db.aDb[j].pSchema.trigHash).sqlite3HashFind(zName, nName, (Trigger)null);
+                pTrigger = (db.Backends[j].pSchema.trigHash).sqlite3HashFind(zName, nName, (Trigger)null);
                 if (pTrigger != null)
                     break;
             }
@@ -821,10 +821,10 @@ goto trigger_cleanup;
         {
             Table pTable;
             Vdbe v;
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             int iDb;
             iDb = Sqlite3.sqlite3SchemaToIndex(pParse.db, pTrigger.pSchema);
-            Debug.Assert(iDb >= 0 && iDb < db.nDb);
+            Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
             pTable = tableOfTrigger(pTrigger);
             Debug.Assert(pTable != null);
             Debug.Assert(pTable.pSchema == pTrigger.pSchema || iDb == 1);
@@ -889,12 +889,12 @@ return;
         /// Remove a trigger from the hash tables of the sqlite* pointer.
         ///
         ///</summary>
-        public static void sqlite3UnlinkAndDeleteTrigger(sqlite3 db, int iDb, string zName)//OPCODE:OP_DropTrigger
+        public static void sqlite3UnlinkAndDeleteTrigger(Connection db, int iDb, string zName)//OPCODE:OP_DropTrigger
         {
             Trigger pTrigger;
             Hash pHash;
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-            pHash = (db.aDb[iDb].pSchema.trigHash);
+            pHash = (db.Backends[iDb].pSchema.trigHash);
             pTrigger = HashExtensions.sqlite3HashInsert(ref pHash, zName, StringExtensions.sqlite3Strlen30(zName), (Trigger)null);
             if (Sqlite3.ALWAYS(pTrigger != null))
             {
@@ -1038,9 +1038,9 @@ return;
             iDb = Sqlite3.sqlite3SchemaToIndex(pParse.db, pStep.pTrig.pSchema);
             if (iDb == 0 || iDb >= 2)
             {
-                sqlite3 db = pParse.db;
-                Debug.Assert(iDb < pParse.db.nDb);
-                pSrc.a[pSrc.nSrc - 1].zDatabase = db.aDb[iDb].zName;
+                Connection db = pParse.db;
+                Debug.Assert(iDb < pParse.db.BackendCount);
+                pSrc.a[pSrc.nSrc - 1].zDatabase = db.Backends[iDb].Name;
                 // sqlite3DbStrDup( db, db.aDb[iDb].zName );
             }
             //}
@@ -1067,7 +1067,7 @@ return;
         {
             TriggerStep pStep;
             Vdbe v = pParse.pVdbe;
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             Debug.Assert(pParse.pTriggerTab != null && pParse.pToplevel != null);
             Debug.Assert(pStepList != null);
             Debug.Assert(v != null);
@@ -1193,7 +1193,7 @@ return;
         )
         {
             Parse pTop = sqliteinth.sqlite3ParseToplevel(pParse);
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             ///
             ///<summary>
             ///Database handle 
@@ -1505,7 +1505,7 @@ return;
                 ///or else it must be a TEMP trigger. 
                 Debug.Assert(p.pSchema != null);
                 Debug.Assert(p.pTabSchema != null);
-                Debug.Assert(p.pSchema == p.pTabSchema || p.pSchema == pParse.db.aDb[1].pSchema);
+                Debug.Assert(p.pSchema == p.pTabSchema || p.pSchema == pParse.db.Backends[1].pSchema);
                 ///
                 ///<summary>
                 ///Determine whether we should code this trigger 

@@ -85,10 +85,10 @@ namespace Community.CsharpSqlite.Engine.Op
                         nField = 0;
                         var p2 = pOp.p2;
                         var iDb = pOp.p3;
-                        Debug.Assert(iDb >= 0 && iDb < cpu.db.nDb);
+                        Debug.Assert(iDb >= 0 && iDb < cpu.db.BackendCount);
                         //Debug.Assert((vdbe.btreeMask & (((yDbMask)1) << iDb)) != 0);
-                        var pDb = cpu.db.aDb[iDb];
-                        var pX = pDb.pBt;
+                        var pDb = cpu.db.Backends[iDb];
+                        var pX = pDb.BTree;
                         Debug.Assert(pX != null);
                         if (pOp.OpCode == OpCode.OP_OpenWrite)
                         {

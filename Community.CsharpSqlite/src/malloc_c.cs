@@ -756,7 +756,7 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
 }
 #else
             //#define isLookaside(A,B) 0
-            static bool isLookaside(sqlite3 db, object p)
+            static bool isLookaside(Connection db, object p)
             {
                 return false;
             }
@@ -787,7 +787,7 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
                 return sqliteinth.sqlite3GlobalConfig.m.xSize(p);
             }
 
-            static int sqlite3DbMallocSize(sqlite3 db, byte[] p)
+            static int sqlite3DbMallocSize(Connection db, byte[] p)
             {
                 Debug.Assert(db == null || db.mutex.sqlite3_mutex_held());
                 if (db != null && isLookaside(db, p))
@@ -851,7 +851,7 @@ return p && p>=db.lookaside.pStart && p<db.lookaside.pEnd;
             /// connection.
             ///
             ///</summary>
-            public static void sqlite3DbFree(sqlite3 db, ref byte[] p)
+            public static void sqlite3DbFree(Connection db, ref byte[] p)
             {
                 Debug.Assert(db == null || db.mutex.sqlite3_mutex_held());
                 if (db != null)
@@ -982,12 +982,12 @@ db.lookaside.nOut--;
             /// the mallocFailed flag in the connection pointer.
             ///
             ///</summary>
-            public static Mem sqlite3DbMallocZero(sqlite3 db, Mem m)
+            public static Mem sqlite3DbMallocZero(Connection db, Mem m)
             {
                 return new Mem();
             }
 
-            public static byte[] sqlite3DbMallocZero(sqlite3 db, int n)
+            public static byte[] sqlite3DbMallocZero(Connection db, int n)
             {
                 byte[] p = sqlite3DbMallocRaw(db, n);
                 if (p != null)
@@ -1017,7 +1017,7 @@ db.lookaside.nOut--;
             /// that all prior mallocs (ex: "a") worked too.
             ///
             ///</summary>
-            static byte[] sqlite3DbMallocRaw(sqlite3 db, int n)
+            static byte[] sqlite3DbMallocRaw(Connection db, int n)
             {
                 byte[] p;
                 Debug.Assert(db == null || db.mutex.sqlite3_mutex_held());
@@ -1067,7 +1067,7 @@ return (void)pBuf;
             ///
             ///</summary>
 
-            static byte[] sqlite3DbRealloc(sqlite3 db, byte[] p, int n)
+            static byte[] sqlite3DbRealloc(Connection db, byte[] p, int n)
             {
                 byte[] pNew = null;
                 Debug.Assert(db != null);
@@ -1116,7 +1116,7 @@ sqlite3DbFree(db, ref p);
             ///
             ///</summary>
 
-            static byte[] sqlite3DbReallocOrFree(sqlite3 db, byte[] p, int n)
+            static byte[] sqlite3DbReallocOrFree(Connection db, byte[] p, int n)
             {
                 byte[] pNew;
                 pNew = sqlite3DbRealloc(db, p, n);
@@ -1172,7 +1172,7 @@ sqlite3DbFree(db, ref p);
             ///
             ///</summary>
 
-            public static void sqlite3SetString(ref string pz, sqlite3 db, string zFormat, params string[] ap)
+            public static void sqlite3SetString(ref string pz, Connection db, string zFormat, params string[] ap)
             {
                 //va_list ap;
                 lock (_Custom.lock_va_list)
@@ -1204,11 +1204,11 @@ sqlite3DbFree(db, ref p);
 
             public static SqlResult sqlite3ApiExit(int zero, SqlResult rc)
             {
-                sqlite3 db = null;
+                Connection db = null;
                 return malloc_cs.sqlite3ApiExit(db, rc);
             }
 
-            public static SqlResult sqlite3ApiExit(sqlite3 db, SqlResult rc)
+            public static SqlResult sqlite3ApiExit(Connection db, SqlResult rc)
             {
                 ///
                 ///<summary>

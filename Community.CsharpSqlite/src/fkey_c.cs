@@ -169,7 +169,7 @@ namespace Community.CsharpSqlite
             /// the lookaside buffer belonging to database handle dbMem.
             ///
             ///</summary>
-            static void fkTriggerDelete(sqlite3 dbMem, Trigger p)
+            static void fkTriggerDelete(Connection dbMem, Trigger p)
             {
                 if (p != null)
                 {
@@ -193,7 +193,7 @@ namespace Community.CsharpSqlite
             ///table pTab. Remove the deleted foreign keys from the Schema.fkeyHash
             ///hash table.
             ///</summary>
-            public static void sqlite3FkDelete(sqlite3 db, Table pTab)
+            public static void sqlite3FkDelete(Connection db, Table pTab)
             {
                 FKey pFKey;
                 ///

@@ -11,7 +11,7 @@ namespace Community.CsharpSqlite.Engine
     {
         public SqlResult rc = SqlResult.SQLITE_OK;
         ///Value to return 
-        public sqlite3 db ;
+        public Connection db ;
         ///The database 
         public u8 resetSchemaOnFault = 0;
         ///Reset schema after an error if positive 

@@ -43,7 +43,7 @@ namespace Community.CsharpSqlite {
 		/// in the encoding enc of name zName, length nName.
 		///
 		///</summary>
-		static void callCollNeeded(sqlite3 db,SqliteEncoding enc,string zName) {
+		static void callCollNeeded(Connection db,SqliteEncoding enc,string zName) {
 			Debug.Assert(db.xCollNeeded==null||db.xCollNeeded16==null);
 			if(db.xCollNeeded!=null) {
 				string zExternal=zName;
@@ -74,7 +74,7 @@ sqlite3ValueFree(ref pTmp);
 		/// possible.
 		///
 		///</summary>
-		static SqlResult synthCollSeq(sqlite3 db,CollSeq pColl) {
+		static SqlResult synthCollSeq(Connection db,CollSeq pColl) {
 			CollSeq pColl2;
 			string z=pColl.zName;
 			int i;
@@ -113,7 +113,7 @@ sqlite3ValueFree(ref pTmp);
 		/// See also: build.sqlite3LocateCollSeq(), sqlite3FindCollSeq()
 		///
 		///</summary>
-		public static CollSeq sqlite3GetCollSeq(sqlite3 db,///
+		public static CollSeq sqlite3GetCollSeq(Connection db,///
 		///<summary>
 		///The database connection 
 		///</summary>
@@ -166,7 +166,7 @@ sqlite3ValueFree(ref pTmp);
 		static SqlResult sqlite3CheckCollSeq(Parse pParse,CollSeq pColl) {
 			if(pColl!=null) {
 				string zName=pColl.zName;
-				sqlite3 db=pParse.db;
+				Connection db=pParse.db;
                 CollSeq p = sqlite3GetCollSeq(db, sqliteinth.ENC(db), pColl, zName);
 				if(null==p) {
 					utilc.sqlite3ErrorMsg(pParse,"no such collation sequence: %s",zName);
@@ -200,7 +200,7 @@ sqlite3ValueFree(ref pTmp);
 		/// each collation sequence structure.
 		///
 		///</summary>
-		public static CollSeq[] findCollSeqEntry(sqlite3 db,///
+		public static CollSeq[] findCollSeqEntry(Connection db,///
 		///<summary>
 		///Database connection 
 		///</summary>
@@ -258,82 +258,5 @@ sqlite3ValueFree(ref pTmp);
 	}
 
 
-    public static partial class SchemaExtensions {
-        ///<summary>
-        /// Free all resources held by the schema structure. The void* argument points
-        /// at a Schema struct. This function does not call sqlite3DbFree(db, ) on the
-        /// pointer itself, it just cleans up subsidiary resources (i.e. the contents
-        /// of the schema hash tables).
-        ///
-        /// The Schema.cache_size variable is not cleared.
-        ///
-        ///</summary>    
-		public static void sqlite3SchemaClear(this Schema p)
-        {
-            Hash temp1;
-            Hash temp2;
-            HashElem pElem;
-            Schema pSchema = p;
-            temp1 = pSchema.tblHash;
-            temp2 = pSchema.trigHash;
-            pSchema.trigHash.sqlite3HashInit();
-            pSchema.idxHash.sqlite3HashClear();
-            for (pElem = temp2.sqliteHashFirst(); pElem != null; pElem = pElem.sqliteHashNext())
-            {
-                Trigger pTrigger = (Trigger)pElem.sqliteHashData();
-                TriggerParser.sqlite3DeleteTrigger(null, ref pTrigger);
-            }
-            temp2.sqlite3HashClear();
-            pSchema.trigHash.sqlite3HashInit();
-            for (pElem = temp1.first; pElem != null; pElem = pElem.next)//sqliteHashFirst(&temp1); pElem; pElem = sqliteHashNext(pElem))
-            {
-                Table pTab = (Table)pElem.data;
-                //sqliteHashData(pElem);
-                TableBuilder.sqlite3DeleteTable(null, ref pTab);
-            }
-            temp1.sqlite3HashClear();
-            pSchema.fkeyHash.sqlite3HashClear();
-            pSchema.pSeqTab = null;
-            if ((pSchema.flags & sqliteinth.DB_SchemaLoaded) != 0)
-            {
-                pSchema.iGeneration++;
-                pSchema.flags = (u16)(pSchema.flags & (~sqliteinth.DB_SchemaLoaded));
-            }
-            p.Clear();
-        }
-        ///
-        ///<summary>
-        ///Find and return the schema associated with a BTree.  Create
-        ///a new one if necessary.
-        ///
-        ///</summary>
-        public static Schema sqlite3SchemaGet(this Btree pBt, sqlite3 db)
-        {
-            Schema p;
-            if (pBt != null)
-            {
-                p = pBt.sqlite3BtreeSchema(-1, (dxFreeSchema)sqlite3SchemaClear);
-                //Schema.Length, sqlite3SchemaFree);
-            }
-            else
-            {
-                p = new Schema();
-                // (Schema *)sqlite3DbMallocZero(0, sizeof(Schema));
-            }
-            if (p == null)
-            {
-                ////        db.mallocFailed = 1;
-            }
-            else
-                if (0 == p.file_format)
-            {
-                p.tblHash.sqlite3HashInit();
-                p.idxHash.sqlite3HashInit();
-                p.trigHash.sqlite3HashInit();
-                p.fkeyHash.sqlite3HashInit();
-                p.enc = SqliteEncoding.UTF8;
-            }
-            return p;
-        }
-    }
+    
 }

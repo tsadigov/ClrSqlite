@@ -90,7 +90,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///The database connection that owns this statement 
             ///</summary>
-            public sqlite3 db;
+            public Connection db;
             /** Space to hold the virtual machine's program */
             public Operation[] aOp;
             ///
@@ -1007,7 +1007,7 @@ pOp.cnt = 0;
             public void sqlite3VdbeChangeP4(int addr, union_p4 _p4, P4Usage n)
             {
                 Operation pOp;
-                sqlite3 db;
+                Connection db;
                 Debug.Assert(this != null);
                 db = this.db;
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
@@ -1201,7 +1201,7 @@ pOp.cnt = 0;
                     ///</summary>
                     int n;
                     Table pTab = pIdx.pTable;
-                    sqlite3 db = this.sqlite3VdbeDb();
+                    Connection db = this.sqlite3VdbeDb();
                     StringBuilder pIdx_zColAff = new StringBuilder(pIdx.nColumn + 2);
                     // (char )sqlite3DbMallocRaw(0, pIdx->nColumn+2);
                     //      if ( pIdx_zColAff == null )
@@ -1235,7 +1235,7 @@ pOp.cnt = 0;
                 {
                     StringBuilder zColAff;
                     int i;
-                    sqlite3 db = this.sqlite3VdbeDb();
+                    Connection db = this.sqlite3VdbeDb();
                     zColAff = new StringBuilder(pTab.nCol + 1);
                     // (char)sqlite3DbMallocRaw(0, pTab->nCol+1);
                     if (zColAff == null)
@@ -1361,7 +1361,7 @@ pOp.cnt = 0;
                 int j;
                 int addr = this.sqlite3VdbeAddOp3(OpCode.OP_ParseSchema, iDb, 0, 0);
                 this.sqlite3VdbeChangeP4(addr, zWhere, P4Usage.P4_DYNAMIC);
-                for (j = 0; j < this.db.nDb; j++)
+                for (j = 0; j < this.db.BackendCount; j++)
                     vdbeaux.sqlite3VdbeUsesBtree(this, j);
             }
             public void sqlite3VdbeLinkSubProgram(SubProgram p)
@@ -1412,7 +1412,7 @@ pOp.cnt = 0;
             {
                 Mem pColName;
                 int n;
-                sqlite3 db = this.db;
+                Connection db = this.db;
                 vdbeaux.releaseMemArray(this.aColName, this.nResColumn * COLNAME_N);
                 db.sqlite3DbFree(ref this.aColName);
                 n = nResColumn * COLNAME_N;
@@ -1452,7 +1452,7 @@ pOp.cnt = 0;
             }
             public SqlResult sqlite3VdbeCloseStatement(int eOp)
             {
-                sqlite3 db = this.db;
+                Connection db = this.db;
                 SqlResult rc = SqlResult.SQLITE_OK;
                 ///
                 ///<summary>
@@ -1469,10 +1469,10 @@ pOp.cnt = 0;
                     Debug.Assert(eOp == sqliteinth.SAVEPOINT_ROLLBACK || eOp == sqliteinth.SAVEPOINT_RELEASE);
                     Debug.Assert(db.nStatement > 0);
                     Debug.Assert(this.iStatement == (db.nStatement + db.nSavepoint));
-                    for (i = 0; i < db.nDb; i++)
+                    for (i = 0; i < db.BackendCount; i++)
                     {
                         SqlResult rc2 = SqlResult.SQLITE_OK;
-                        Btree pBt = db.aDb[i].pBt;
+                        Btree pBt = db.Backends[i].BTree;
                         if (pBt != null)
                         {
                             if (eOp == sqliteinth.SAVEPOINT_ROLLBACK)
@@ -1517,7 +1517,7 @@ pOp.cnt = 0;
             }
             public SqlResult sqlite3VdbeCheckFk(int deferred)
             {
-                sqlite3 db = this.db;
+                Connection db = this.db;
                 if ((deferred != 0 && db.nDeferredCons > 0) || (0 == deferred && this.nFkConstraint > 0))
                 {
                     this.rc = SqlResult.SQLITE_CONSTRAINT;
@@ -1534,7 +1534,7 @@ pOp.cnt = 0;
                 ///<summary>
                 ///Used to store transient return codes 
                 ///</summary>
-                sqlite3 db = this.db;
+                Connection db = this.db;
                 ///
                 ///<summary>
                 ///This function contains the logic that determines if a statement or
@@ -1818,7 +1818,7 @@ pOp.cnt = 0;
             }
             public SqlResult sqlite3VdbeReset()
             {
-                sqlite3 db;
+                Connection db;
                 db = this.db;
                 ///
                 ///<summary>
@@ -1909,7 +1909,7 @@ fclose(out);
                 this.magic = VdbeMagic.VDBE_MAGIC_INIT;
                 return this.rc & db.errMask;
             }
-            public sqlite3 sqlite3VdbeDb()
+            public Connection sqlite3VdbeDb()
             {
                 return this.db;
             }
@@ -3027,9 +3027,9 @@ start = sqlite3Hwtime();
                                                     else
                                                     {
                                                         iSavepoint = db.nSavepoint - iSavepoint - 1;
-                                                        for (ii = 0; ii < db.nDb; ii++)
+                                                        for (ii = 0; ii < db.BackendCount; ii++)
                                                         {
-                                                            rc = db.aDb[ii].pBt.sqlite3BtreeSavepoint(p1, iSavepoint);
+                                                            rc = db.Backends[ii].BTree.sqlite3BtreeSavepoint(p1, iSavepoint);
                                                             if (rc != SqlResult.SQLITE_OK)
                                                             {
                                                                 goto abort_due_to_error;
@@ -3216,9 +3216,9 @@ start = sqlite3Hwtime();
                                 case OpCode.OP_Transaction:
                                     {
                                         Btree pBt;
-                                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.nDb);
+                                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.BackendCount);
                                         Debug.Assert((this.btreeMask & (((yDbMask)1) << pOp.p1)) != 0);
-                                        pBt = db.aDb[pOp.p1].pBt;
+                                        pBt = db.Backends[pOp.p1].BTree;
                                         if (pBt != null)
                                         {
                                             rc = pBt.sqlite3BtreeBeginTrans(pOp.p2);
@@ -3926,7 +3926,7 @@ start = sqlite3Hwtime();
                                         ///<param name="Invoke the update">hook if required. </param>
                                         if (rc == SqlResult.SQLITE_OK && db.xUpdateCallback != null && pOp.p4.z != null)
                                         {
-                                            zDb = db.aDb[pC.iDb].zName;
+                                            zDb = db.Backends[pC.iDb].Name;
                                             zTbl = pOp.p4.z;
                                             op = ((
                                                 ((OpFlag)pOp.p5)
@@ -4014,7 +4014,7 @@ start = sqlite3Hwtime();
                                         ///<param name="Invoke the update">hook if required. </param>
                                         if (rc == SqlResult.SQLITE_OK && db.xUpdateCallback != null && pOp.p4.z != null)
                                         {
-                                            string zDb = db.aDb[pC.iDb].zName;
+                                            string zDb = db.Backends[pC.iDb].Name;
                                             string zTbl = pOp.p4.z;
                                             db.xUpdateCallback(db.pUpdateArg, AuthTarget.SQLITE_DELETE, zDb, zTbl, iKey);
                                             Debug.Assert(pC.iDb >= 0);
@@ -4721,8 +4721,8 @@ cDebug.Ase  OpCode.OP_Checkpoint: {
                                         ///Name of database file for pPager 
                                         eNew = pOp.p3;
                                         Debug.Assert(eNew == Globals.Paging.PAGER_JOURNALMODE_DELETE || eNew == Globals.Paging.PAGER_JOURNALMODE_TRUNCATE || eNew == Globals.Paging.PAGER_JOURNALMODE_PERSIST || eNew == Globals.Paging.PAGER_JOURNALMODE_OFF || eNew == Globals.Paging.PAGER_JOURNALMODE_MEMORY || eNew == Globals.Paging.PAGER_JOURNALMODE_WAL || eNew == Globals.Paging.PAGER_JOURNALMODE_QUERY);
-                                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.nDb);
-                                        pBt = db.aDb[pOp.p1].pBt;
+                                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.BackendCount);
+                                        pBt = db.Backends[pOp.p1].BTree;
                                         pPager = pBt.sqlite3BtreePager();
                                         eOld = pPager.sqlite3PagerGetJournalMode();
                                         if (eNew == Globals.Paging.PAGER_JOURNALMODE_QUERY)
@@ -4823,9 +4823,9 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
                                         ///jump 
                                         ///</summary>
                                         Btree pBt;
-                                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.nDb);
+                                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.BackendCount);
                                         Debug.Assert((this.btreeMask & (((yDbMask)1) << pOp.p1)) != 0);
-                                        pBt = db.aDb[pOp.p1].pBt;
+                                        pBt = db.Backends[pOp.p1].BTree;
                                         rc = pBt.sqlite3BtreeIncrVacuum();
                                         if (rc == SqlResult.SQLITE_DONE)
                                         {
@@ -5477,7 +5477,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 too_big
 
             }
-            private SqlResult OpCode_Column(Operation pOp, SqlResult rc, sqlite3 db, SqliteEncoding encoding, Mem[] aMem)
+            private SqlResult OpCode_Column(Operation pOp, SqlResult rc, Connection db, SqliteEncoding encoding, Mem[] aMem)
             {
                 ///The length of the serialized data for the column 
                 int len;
@@ -5994,7 +5994,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
             ///<summary>
             /// Create a new virtual database engine.
             ///</summary>
-            public static Vdbe Create(sqlite3 db)
+            public static Vdbe Create(Connection db)
             {
                 Vdbe p;
                 p = new Vdbe();

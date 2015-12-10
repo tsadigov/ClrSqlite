@@ -32,7 +32,7 @@ namespace Community.CsharpSqlite
 
     public static class Sqlite3Extensions{
         
-        public static void sqlite3DbFree<T>(this sqlite3 th,ref T pT) where T : class
+        public static void sqlite3DbFree<T>(this Connection th,ref T pT) where T : class
         {
             pT = null;
         }
@@ -67,56 +67,58 @@ namespace Community.CsharpSqlite
         ///<param name="consistently.">consistently.</param>
         ///<param name=""></param>
 
-        public class sqlite3
+        public class Connection
         {
-            public sqlite3()
+            public Connection()
             {
             }
-
-            public sqlite3_vfs pVfs;
-
-            ///
-            ///<summary>
+///<summary>
             ///OS Interface 
             ///</summary>
-
-            public int nDb;
+            public Os.sqlite3_vfs pVfs;
 
             ///
             ///<summary>
             ///Number of backends currently in use 
             ///</summary>
 
-            public Db[] aDb = new Db[Limits.SQLITE_MAX_ATTACHED];
+
+            public int BackendCount;
 
             ///
             ///<summary>
+            ///aDb
             ///All backends 
             ///</summary>
-            public SqliteFlags flags;
+            public DbBackend[] Backends = new DbBackend[Limits.SQLITE_MAX_ATTACHED];
 
             ///
             ///<summary>
             ///Miscellaneous flags. See below 
             ///</summary>
+            public SqliteFlags flags;
 
+            ///
+            
+///<summary>
+            ///Flags passed to sqlite3_vfs.xOpen() 
+            ///</summary>
             public int openFlags;
 
             ///
-            ///<summary>
-            ///Flags passed to sqlite3_vfs.xOpen() 
-            ///</summary>
+            
 
             public SqlResult errCode;
+            ///<summary>
+            ///Most recent error code (SQLITE_) 
+            ///</summary>
             public SqlResult ErrCode {
                 get { return (SqlResult)errCode; }
                 set { errCode = (SqlResult)value; }
             }
 
             ///
-            ///<summary>
-            ///Most recent error code (SQLITE_) 
-            ///</summary>
+            
 
             public SqlResult errMask;
 
@@ -171,24 +173,26 @@ namespace Community.CsharpSqlite
 
             public int nextPagesize;
 
+        ///
+        ///<summary>
+        ///Pagesize after VACUUM if >0 
+        ///</summary>
+
+
+        ///<summary>
+        ///Number of tables in the database 
+        ///</summary>
+        public int nTable;
+
+        ///
+
+        ///<summary>
+        ///The default collating sequence (BINARY) 
+        ///</summary>
+        public CollSeq pDfltColl;
+
             ///
-            ///<summary>
-            ///Pagesize after VACUUM if >0 
-            ///</summary>
-
-            public int nTable;
-
-            ///
-            ///<summary>
-            ///Number of tables in the database 
-            ///</summary>
-
-            public CollSeq pDfltColl;
-
-            ///
-            ///<summary>
-            ///The default collating sequence (BINARY) 
-            ///</summary>
+            
 
             public i64 lastRowid;
 
@@ -269,12 +273,13 @@ namespace Community.CsharpSqlite
 
             public sqlite3InitInfo init = new sqlite3InitInfo();
 
-            public int nExtension;
+        ///<summary>
+        ///Number of loaded extensions 
+        ///</summary>
+        public int nExtension;
 
             ///
-            ///<summary>
-            ///Number of loaded extensions 
-            ///</summary>
+            
 
             public object[] aExtension;
 
@@ -466,49 +471,53 @@ public object pAuthArg;               /* 1st argument to the access auth functio
 
             public VTable pDisconnect;
 
-            ///
-            ///<summary>
-            ///Disconnect these in next sqlite3_prepare() 
-            ///</summary>
+        ///
+        ///<summary>
+        ///Disconnect these in next sqlite3_prepare() 
+        ///</summary>
 
 #endif
-            public FuncDefHash aFunc = new FuncDefHash();
+        ///<summary>
+        ///Hash table of connection functions 
+        ///</summary>
 
-            ///
-            ///<summary>
-            ///Hash table of connection functions 
-            ///</summary>
+        public FuncDefHash aFunc = new FuncDefHash();
 
-            public Hash aCollSeq = new Hash();
+        ///
+        
 
-            ///
-            ///<summary>
-            ///All collating sequences 
-            ///</summary>
+        ///<summary>
+        ///All collating sequences 
+        ///</summary>
+        public Hash aCollSeq = new Hash();
 
-            public BusyHandler busyHandler = new BusyHandler();
+        ///
+        
+        ///<summary>
+        ///Busy callback 
+        ///</summary>
+        public BusyHandler busyHandler = new BusyHandler();
 
-            ///
-            ///<summary>
-            ///Busy callback 
-            ///</summary>
+        ///
+        
+        ///<summary>
+        ///Busy handler timeout, in msec 
+        ///</summary>
 
-            public int busyTimeout;
+        public int busyTimeout;
 
-            ///
-            ///<summary>
-            ///Busy handler timeout, in msec 
-            ///</summary>
-
-            public Db[] aDbStatic = new Db[] {
-				new Db (),
-				new Db ()
+        ///
+        
+        ///<summary>
+        ///Static space for the 2 default backends 
+        ///</summary>
+        public DbBackend[] aDbStatic = new DbBackend[] {
+				new DbBackend (),
+				new DbBackend ()
 			};
 
             ///
-            ///<summary>
-            ///Static space for the 2 default backends 
-            ///</summary>
+            
 
             public Savepoint pSavepoint;
 
@@ -681,19 +690,19 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             //#define DbHasProperty(D,I,P)     (((D)->aDb[I].pSchema->flags&(P))==(P))
             public bool DbHasProperty( int I, ushort P)
             {
-                sqlite3 D = this;
-                return (D.aDb[I].pSchema.flags & P) == P;
+                Connection D = this;
+                return (D.Backends[I].pSchema.flags & P) == P;
             }
             //#define DbHasAnyProperty(D,I,P)  (((D)->aDb[I].pSchema->flags&(P))!=0)
             //#define DbSetProperty(D,I,P)     (D)->aDb[I].pSchema->flags|=(P)
             public void DbSetProperty(int I, ushort P)
             {
-                this.aDb[I].pSchema.flags = (u16)(this.aDb[I].pSchema.flags | P);
+                this.Backends[I].pSchema.flags = (u16)(this.Backends[I].pSchema.flags | P);
             }
             //#define DbClearProperty(D,I,P)   (D)->aDb[I].pSchema->flags&=~(P)
             public void DbClearProperty( int I, ushort P)
             {
-                this.aDb[I].pSchema.flags = (u16)(this.aDb[I].pSchema.flags & ~P);
+                this.Backends[I].pSchema.flags = (u16)(this.Backends[I].pSchema.flags & ~P);
             }
 
 
@@ -716,7 +725,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             ///</summary>
             public CollSeq sqlite3FindCollSeq( SqliteEncoding enc, string zName, u8 create)
             {
-                sqlite3 db = this;
+                Connection db = this;
                 CollSeq[] pColl;
                 if (zName != null)
                 {

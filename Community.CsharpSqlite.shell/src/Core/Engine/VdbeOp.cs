@@ -285,8 +285,8 @@ public u64 cycles;         /* Total time spend executing this instruction */
                 case OpCode.OP_OpenRead:
                 case OpCode.OP_OpenWrite:
                     var iDb = this.p3;
-                    var pDb = vdbe.db.aDb[iDb];
-                    str = pDb.zName;
+                    var pDb = vdbe.db.Backends[iDb];
+                    str = pDb.Name;
                     break;
                 case OpCode.OP_ParseSchema:
                     str = vdbeaux.displayP4(this, "", 30);

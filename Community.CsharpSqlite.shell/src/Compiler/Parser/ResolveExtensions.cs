@@ -96,7 +96,7 @@ namespace Community.CsharpSqlite
                 ///<param name="The iCol">th column of the result set </param>
                 Expr pDup;
                 ///Copy of pOrig 
-                sqlite3 db;
+                Connection db;
                 ///The database connection 
                 Debug.Assert(iCol >= 0 && iCol < pEList.nExpr);
                 pOrig = pEList.a[iCol].pExpr;
@@ -231,7 +231,7 @@ namespace Community.CsharpSqlite
                 ///The columns of the result set 
                 NameContext nc;
                 ///Name context for resolving pE 
-                sqlite3 db;
+                Connection db;
                 ///Database connection 
                 SqlResult rc;
                 ///Return code from subprocedures 
@@ -274,7 +274,7 @@ namespace Community.CsharpSqlite
             /// from datasource iSrc in SrcList pSrc.
             ///
             ///</summary>
-            public static Expr sqlite3CreateColumnExpr(sqlite3 db, SrcList pSrc, int iSrc, int iCol)
+            public static Expr sqlite3CreateColumnExpr(Connection db, SrcList pSrc, int iSrc, int iCol)
             {
                 Expr p = exprc.CreateExpr(db, Sqlite3.TK_COLUMN, null, false);
                 if (p != null)
@@ -347,7 +347,7 @@ namespace Community.CsharpSqlite
                 ///Number of matching column names 
                 int cntTab = 0;
                 ///Number of matching table names 
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 ///The database connection 
                 SrcList_item pItem;
                 ///Use for looping over pSrcList items 
@@ -400,7 +400,7 @@ namespace Community.CsharpSqlite
                                     {
                                         continue;
                                     }
-                                    if (zDb != null && !db.aDb[iDb].zName.Equals(zDb, StringComparison.InvariantCultureIgnoreCase))
+                                    if (zDb != null && !db.Backends[iDb].Name.Equals(zDb, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         continue;
                                     }
@@ -967,7 +967,7 @@ return WRC.WRC_Prune;
                 int i;
                 ExprList pOrderBy;
                 ExprList pEList;
-                sqlite3 db;
+                Connection db;
                 int moreToDo = 1;
                 pOrderBy = pSelect.pOrderBy;
                 if (pOrderBy == null)
@@ -1082,7 +1082,7 @@ return WRC.WRC_Prune;
             )
             {
                 int i;
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 ExprList pEList;
                 ExprList_item pItem;
                 if (pOrderBy == null///
@@ -1254,7 +1254,7 @@ return WRC.WRC_Prune;
                 ///The GROUP BY clause 
                 Select pLeftmost;
                 ///Left most of SELECT of a compound 
-                sqlite3 db;
+                Connection db;
                 ///Database connection 
                 Debug.Assert(p != null);
                 if ((p.selFlags & SelectFlags.Resolved) != 0)

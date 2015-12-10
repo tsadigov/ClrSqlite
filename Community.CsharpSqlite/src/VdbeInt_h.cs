@@ -273,7 +273,7 @@ namespace Community.CsharpSqlite
 
         public class Mem
         {
-            public sqlite3 db;
+            public Connection db;
 
             ///
             ///<summary>
@@ -458,7 +458,7 @@ set { _flags = value; }
             {
             }
 
-            public Mem(sqlite3 db, string z, double r, int i, int n, MemFlags flags, FoundationalType type, SqliteEncoding enc
+            public Mem(Connection db, string z, double r, int i, int n, MemFlags flags, FoundationalType type, SqliteEncoding enc
 #if SQLITE_DEBUG
 																																																																								         , Mem pScopyFrom, object pFiller  /* pScopyFrom, pFiller */
 #endif
@@ -826,7 +826,7 @@ return SQLITE_NOMEM;
             public void sqlite3VdbeMemSetRowSet()
             {
                 Mem pMem = this;
-                sqlite3 db = pMem.db;
+                Connection db = pMem.db;
                 Debug.Assert(db != null);
                 Debug.Assert((pMem.flags & MemFlags.MEM_RowSet) == 0);
                 pMem.sqlite3VdbeMemRelease();

@@ -100,7 +100,7 @@ namespace Community.CsharpSqlite
 
 		)
 		{
-			sqlite3 db;
+			Connection db;
 			///
 ///<summary>
 ///The database connection 

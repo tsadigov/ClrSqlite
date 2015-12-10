@@ -64,7 +64,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             iDb = pOp.p3;
                             Debug.Assert(iCnt == 1);
                             //Debug.Assert((vdbe.btreeMask & (((yDbMask)1) << iDb)) != 0);//TODO:ERROR
-                            cpu.rc = db.aDb[iDb].pBt.sqlite3BtreeDropTable(pOp.p1, ref iMoved);
+                            cpu.rc = db.Backends[iDb].BTree.sqlite3BtreeDropTable(pOp.p1, ref iMoved);
                             pOut.flags = MemFlags.MEM_Int;
                             pOut.u.i = iMoved;
 #if !SQLITE_OMIT_AUTOVACUUM
@@ -162,10 +162,10 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///<param name="out2">prerelease </param>
                         int flags;
                         var pgno = 0;
-                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.nDb);
+                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.BackendCount);
                         //Debug.Assert((this.btreeMask & (((yDbMask)1) << pOp.p1)) != 0);//TODO:ERROR
-                        var pDb = db.aDb[pOp.p1];
-                        Debug.Assert(pDb.pBt != null);
+                        var pDb = db.Backends[pOp.p1];
+                        Debug.Assert(pDb.BTree != null);
                         if (pOp.OpCode == OpCode.OP_CreateTable)
                         {
                             ///flags = BTREE_INTKEY; 
@@ -175,7 +175,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         {
                             flags = Sqlite3.BTREE_BLOBKEY;
                         }
-                        cpu.rc = pDb.pBt.sqlite3BtreeCreateTable(ref pgno, flags);
+                        cpu.rc = pDb.BTree.sqlite3BtreeCreateTable(ref pgno, flags);
                         pOut.u.i = pgno;
                         break;
                     }

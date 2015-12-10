@@ -167,14 +167,14 @@ namespace Community.CsharpSqlite {
 		/// from default, or when 'file' and the temp_store_directory has changed
 		///</summary>
 		static SqlResult invalidateTempStorage(Parse pParse) {
-			sqlite3 db=pParse.db;
-			if(db.aDb[1].pBt!=null) {
-				if(0==db.autoCommit||db.aDb[1].pBt.sqlite3BtreeIsInReadTrans()) {
+			Connection db=pParse.db;
+			if(db.Backends[1].BTree!=null) {
+				if(0==db.autoCommit||db.Backends[1].BTree.sqlite3BtreeIsInReadTrans()) {
 					utilc.sqlite3ErrorMsg(pParse,"temporary storage cannot be changed "+"from within a transaction");
 					return SqlResult.SQLITE_ERROR;
 				}
-				BTreeMethods.sqlite3BtreeClose(ref db.aDb[1].pBt);
-				db.aDb[1].pBt=null;
+				BTreeMethods.sqlite3BtreeClose(ref db.Backends[1].BTree);
+				db.Backends[1].BTree=null;
 				build.sqlite3ResetInternalSchema(db,-1);
 			}
 			return SqlResult.SQLITE_OK;
@@ -188,7 +188,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static SqlResult changeTempStorage(Parse pParse,string zStorageType) {
 			int ts=getTempStore(zStorageType);
-			sqlite3 db=pParse.db;
+			Connection db=pParse.db;
 			if(db.temp_store==ts)
 				return SqlResult.SQLITE_OK;
 			if(invalidateTempStorage(pParse)!=SqlResult.SQLITE_OK) {
@@ -286,7 +286,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			 {
 				p=aPragma[i];
 				if(zLeft.Equals(p.zName,StringComparison.InvariantCultureIgnoreCase)) {
-					sqlite3 db=pParse.db;
+					Connection db=pParse.db;
 					Vdbe v;
 					v=pParse.sqlite3GetVdbe();
 					Debug.Assert(v!=null);
@@ -467,8 +467,8 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			///<summary>
 			///Database index for <database> 
 			///</summary>
-			sqlite3 db=pParse.db;
-			Db pDb;
+			Connection db=pParse.db;
+			DbBackend pDb;
 			var v=pParse.pVdbe=Vdbe.Create(db);
 			if(v==null)
 				return;
@@ -482,7 +482,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			iDb=build.sqlite3TwoPartName(pParse,pId1,pId2,ref pId);
 			if(iDb<0)
 				return;
-			pDb=db.aDb[iDb];
+			pDb=db.Backends[iDb];
 			///
 			///<summary>
 			///If the temp database has been explicitly named as part of the
@@ -502,7 +502,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 				zRight=build.sqlite3NameFromToken(db,pValue);
 			}
 			Debug.Assert(pId2!=null);
-			zDb=pId2.Length>0?pDb.zName:null;
+			zDb=pId2.Length>0?pDb.Name:null;
 			#if !SQLITE_OMIT_AUTHORIZATION
 																																																																														if ( sqlite3AuthCheck( pParse, SQLITE_PRAGMA, zLeft, zRight, zDb ) )
 {
@@ -570,7 +570,7 @@ goto pragma_out;
                     v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTreeProp.DEFAULT_CACHE_SIZE, 1);
 					Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 					pDb.pSchema.cache_size=size;
-					pDb.pBt.SetCacheSize(pDb.pSchema.cache_size);
+					pDb.BTree.SetCacheSize(pDb.pSchema.cache_size);
 				}
 			}
 			else
@@ -586,7 +586,7 @@ goto pragma_out;
 				///
 				///</summary>
 				if(zLeft.Equals("page_size",StringComparison.InvariantCultureIgnoreCase)) {
-					Btree pBt=pDb.pBt;
+					Btree pBt=pDb.BTree;
 					Debug.Assert(pBt!=null);
 					if(null==zRight) {
 						int size=Sqlite3.ALWAYS(pBt)?pBt.GetPageSize():0;
@@ -617,7 +617,7 @@ goto pragma_out;
 					///
 					///</summary>
 					if(zLeft.Equals("secure_delete",StringComparison.InvariantCultureIgnoreCase)) {
-						Btree pBt=pDb.pBt;
+						Btree pBt=pDb.BTree;
 						int b=-1;
 						Debug.Assert(pBt!=null);
 						if(zRight!=null) {
@@ -625,8 +625,8 @@ goto pragma_out;
 						}
 						if(pId2.Length==0&&b>=0) {
 							int ii;
-							for(ii=0;ii<db.nDb;ii++) {
-								db.aDb[ii].pBt.sqlite3BtreeSecureDelete(b);
+							for(ii=0;ii<db.BackendCount;ii++) {
+								db.Backends[ii].BTree.sqlite3BtreeSecureDelete(b);
 							}
 						}
 						b=pBt.sqlite3BtreeSecureDelete(b);
@@ -720,14 +720,14 @@ goto pragma_out;
 											///<param name="locking mode.">locking mode.</param>
 											///<param name=""></param>
 											int ii;
-											Debug.Assert(pDb==db.aDb[0]);
-											for(ii=2;ii<db.nDb;ii++) {
-												pPager=db.aDb[ii].pBt.sqlite3BtreePager();
+											Debug.Assert(pDb==db.Backends[0]);
+											for(ii=2;ii<db.BackendCount;ii++) {
+												pPager=db.Backends[ii].BTree.sqlite3BtreePager();
 												pPager.sqlite3PagerLockingMode(eMode);
 											}
 											db.dfltLockMode=(u8)eMode;
 										}
-										pPager=pDb.pBt.sqlite3BtreePager();
+										pPager=pDb.BTree.sqlite3BtreePager();
 										eMode=pPager.sqlite3PagerLockingMode(eMode)?1:0;
 									}
 									Debug.Assert(eMode==Globals.Paging.PAGER_LOCKINGMODE_NORMAL||eMode==Globals.Paging.PAGER_LOCKINGMODE_EXCLUSIVE);
@@ -800,8 +800,8 @@ goto pragma_out;
 											iDb=0;
 											pId2.Length=1;
 										}
-										for(ii=db.nDb-1;ii>=0;ii--) {
-											if(db.aDb[ii].pBt!=null&&(ii==iDb||pId2.Length==0)) {
+										for(ii=db.BackendCount-1;ii>=0;ii--) {
+											if(db.Backends[ii].BTree!=null&&(ii==iDb||pId2.Length==0)) {
                                                 Engine.vdbeaux.sqlite3VdbeUsesBtree(v, ii);
                                                 v.sqlite3VdbeAddOp3(OpCode.OP_JournalMode, ii, 1, eMode);
 											}
@@ -818,7 +818,7 @@ goto pragma_out;
 										///
 										///</summary>
 										if(zLeft.Equals("journal_size_limit",StringComparison.InvariantCultureIgnoreCase)) {
-											Pager pPager=pDb.pBt.sqlite3BtreePager();
+											Pager pPager=pDb.BTree.sqlite3BtreePager();
 											i64 iLimit=-2;
 											if(!String.IsNullOrEmpty(zRight)) {
 												Converter.sqlite3Atoi64(zRight,ref iLimit,1000000,SqliteEncoding.UTF8);
@@ -840,7 +840,7 @@ goto pragma_out;
 											///<param name="The value is one of:  0 NONE 1 FULL 2 INCREMENTAL">The value is one of:  0 NONE 1 FULL 2 INCREMENTAL</param>
 											#if !SQLITE_OMIT_AUTOVACUUM
 											if(zLeft.Equals("auto_vacuum",StringComparison.InvariantCultureIgnoreCase)) {
-												Btree pBt=pDb.pBt;
+												Btree pBt=pDb.BTree;
 												Debug.Assert(pBt!=null);
 												if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
 													goto pragma_out;
@@ -975,7 +975,7 @@ goto pragma_out;
 														else {
                                                             int size = utilc.sqlite3AbsInt32(Converter.sqlite3Atoi(zRight));
 															pDb.pSchema.cache_size=size;
-															pDb.pBt.SetCacheSize(pDb.pSchema.cache_size);
+															pDb.BTree.SetCacheSize(pDb.pSchema.cache_size);
 														}
 													}
 													else
@@ -1264,13 +1264,13 @@ else
                                                                                         v.sqlite3VdbeSetColName(0, ColName.NAME, "seq", SQLITE_STATIC);
                                                                                         v.sqlite3VdbeSetColName(1, ColName.NAME, "name", SQLITE_STATIC);
                                                                                         v.sqlite3VdbeSetColName(2, ColName.NAME, "file", SQLITE_STATIC);
-																						for(i=0;i<db.nDb;i++) {
-																							if(db.aDb[i].pBt==null)
+																						for(i=0;i<db.BackendCount;i++) {
+																							if(db.Backends[i].BTree==null)
 																								continue;
-																							Debug.Assert(db.aDb[i].zName!=null);
+																							Debug.Assert(db.Backends[i].Name!=null);
 																							v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,1);
-																							v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,2,0,db.aDb[i].zName,0);
-																							v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,3,0,db.aDb[i].pBt.GetFilename(),0);
+																							v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,2,0,db.Backends[i].Name,0);
+																							v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,3,0,db.Backends[i].BTree.GetFilename(),0);
 																							v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,1,3);
 																						}
 																					}
@@ -1435,7 +1435,7 @@ else
 																										///<summary>
 																										///Do an integrity check on each database file 
 																										///</summary>
-																										for(i=0;i<db.nDb;i++) {
+																										for(i=0;i<db.BackendCount;i++) {
 																											HashElem x;
 																											Hash pTbls;
 																											int cnt=0;
@@ -1458,7 +1458,7 @@ else
 																											///<param name="for all tables and indices in the database.">for all tables and indices in the database.</param>
 																											///<param name=""></param>
 																											Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-																											pTbls=db.aDb[i].pSchema.tblHash;
+																											pTbls=db.Backends[i].pSchema.tblHash;
 																											for(x=pTbls.first;x!=null;x=x.next) {
 																												//          for(x=sqliteHashFirst(pTbls); x; x=sqliteHashNext(x)){
 																												Table pTab=(Table)x.data;
@@ -1482,7 +1482,7 @@ else
 																											v.sqlite3VdbeAddOp3( OpCode.OP_IntegrityCk,2,cnt,1);
 																											v.sqlite3VdbeChangeP5((u8)i);
 																											addr=v.sqlite3VdbeAddOp1(OpCode.OP_IsNull,2);
-																											v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,3,0,io.sqlite3MPrintf(db,"*** in database %s ***\n",db.aDb[i].zName), P4Usage.P4_DYNAMIC);
+																											v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,3,0,io.sqlite3MPrintf(db,"*** in database %s ***\n",db.Backends[i].Name), P4Usage.P4_DYNAMIC);
                                                                                                             v.sqlite3VdbeAddOp3(OpCode.OP_Move, 2, 4, 1);
 																											v.sqlite3VdbeAddOp3(OpCode.OP_Concat,4,3,2);
 																											v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,2,1);
@@ -1974,7 +1974,7 @@ sqlite3_activate_cerod(&zRight[6]);
 			///</summary>
 			#if !SQLITE_OMIT_PAGER_PRAGMAS
 			if(db.autoCommit!=0) {
-                pDb.pBt.sqlite3BtreeSetSafetyLevel(pDb.safety_level, ((db.flags & SqliteFlags.SQLITE_FullFSync) != 0) ? 1 : 0, ((db.flags & SqliteFlags.SQLITE_CkptFullFSync) != 0) ? 1 : 0);
+                pDb.BTree.sqlite3BtreeSetSafetyLevel(pDb.safety_level, ((db.flags & SqliteFlags.SQLITE_FullFSync) != 0) ? 1 : 0, ((db.flags & SqliteFlags.SQLITE_CkptFullFSync) != 0) ? 1 : 0);
 			}
 			#endif
 			pragma_out:

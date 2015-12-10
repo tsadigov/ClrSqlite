@@ -17,7 +17,7 @@ namespace Community.CsharpSqlite.builder
         /// -1 if the named db cannot be found.
         ///
         ///</summary>
-        public static int sqlite3FindDbName(this sqlite3 db, string zName)
+        public static int sqlite3FindDbName(this Connection db, string zName)
         {
             int i = -1;
             ///
@@ -26,12 +26,12 @@ namespace Community.CsharpSqlite.builder
             ///</summary>
             if (zName != null)
             {
-                Db pDb;
+                DbBackend pDb;
                 int n = StringExtensions.sqlite3Strlen30(zName);
-                for (i = (db.nDb - 1); i >= 0; i--)
+                for (i = (db.BackendCount - 1); i >= 0; i--)
                 {
-                    pDb = db.aDb[i];
-                    if ((sqliteinth.OMIT_TEMPDB == 0 || i != 1) && n == StringExtensions.sqlite3Strlen30(pDb.zName) && pDb.zName.Equals(zName, StringComparison.InvariantCultureIgnoreCase))
+                    pDb = db.Backends[i];
+                    if ((sqliteinth.OMIT_TEMPDB == 0 || i != 1) && n == StringExtensions.sqlite3Strlen30(pDb.Name) && pDb.Name.Equals(zName, StringComparison.InvariantCultureIgnoreCase))
                     {
                         break;
                     }
@@ -46,7 +46,7 @@ namespace Community.CsharpSqlite.builder
         /// does not exist.
         ///
         ///</summary>
-        public static int sqlite3FindDb(this sqlite3 db, Token pName)
+        public static int sqlite3FindDb(this Connection db, Token pName)
         {
             int i;
             ///

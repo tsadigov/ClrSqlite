@@ -500,7 +500,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static void setDateTimeToCurrent(sqlite3_context context, DateTime p)
             {
-                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = vdbeapi.sqlite3_context_db_handle(context);
                 os.sqlite3OsCurrentTimeInt64(db.pVfs, ref p.iJD);
                 p.validJD = 1;
             }
@@ -1219,7 +1219,7 @@ namespace Community.CsharpSqlite
                     u64 n;
                     int i, j;
                     StringBuilder z;
-                    sqlite3 db;
+                    Connection db;
                     string zFmt = vdbeapi.sqlite3_value_text(argv[0]);
                     StringBuilder zdtBuf = new StringBuilder(100);
                     sqlite3_value[] argv1 = new sqlite3_value[argc - 1];

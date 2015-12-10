@@ -34,11 +34,10 @@ namespace Community.CsharpSqlite.Metadata
         ///</summary>
         public class FuncDefHash
         {
-            public FuncDef[] a = new FuncDef[23];
-            ///
             ///<summary>
             ///Hash table for functions 
             ///</summary>
+            public FuncDef[] a = new FuncDef[23];
         };
 
         ///<summary>

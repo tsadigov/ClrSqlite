@@ -107,7 +107,7 @@ namespace Community.CsharpSqlite
         ///List of all chunk allocations 
         ///</summary>
 
-        public sqlite3 db;
+        public Connection db;
 
         ///
         ///<summary>
@@ -163,7 +163,7 @@ namespace Community.CsharpSqlite
         ///Current insert batch 
         ///</summary>
 
-        public RowSet(sqlite3 db, int N)
+        public RowSet(Connection db, int N)
         {
             this.pChunk = null;
             this.db = db;
@@ -193,7 +193,7 @@ namespace Community.CsharpSqlite
         /// allocation of entries available to be filled.
         ///
         ///</summary>
-        public RowSet sqlite3RowSetInit(sqlite3 db, object pSpace, u32 N)
+        public RowSet sqlite3RowSetInit(Connection db, object pSpace, u32 N)
         {
             RowSet p = new RowSet(db, (int)N);
             //Debug.Assert(N >= ROUND8(sizeof(*p)) );

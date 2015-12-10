@@ -235,7 +235,7 @@ namespace Community.CsharpSqlite.Ast {
 				int i;
 				WhereLevel pLevel;
 				SrcList pTabList=this.pTabList;
-				sqlite3 db=pParse.db;
+				Connection db=pParse.db;
 				///
 				///<summary>
 				///Generate loop termination code.

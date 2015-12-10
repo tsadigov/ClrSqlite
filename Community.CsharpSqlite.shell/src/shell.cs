@@ -187,7 +187,7 @@ timeDiff(&sBegin.ru_stime, &sEnd.ru_stime));
 ///
 ///</summary>
 
-	static sqlite3 db = null;
+	static Connection db = null;
 
 	///
 ///<summary>
@@ -433,7 +433,7 @@ malloc_cs.sqlite3_free(ref z);
 
 	class callback_data
 	{
-		public sqlite3 db;
+		public Connection db;
 
 		///
 ///<summary>
@@ -1373,7 +1373,7 @@ if( db ) sqlite3_interrupt(db);
 	/// querying the sqlite.SQLITE_MASTER table.
 	///
 	///</summary>
-	static SqlResult run_table_dump_query (TextWriter _out, sqlite3 db, string zSelect)
+	static SqlResult run_table_dump_query (TextWriter _out, Connection db, string zSelect)
 	{
 		sqlite3_stmt pSelect = new sqlite3_stmt ();
         SqlResult rc;
@@ -1701,7 +1701,7 @@ if( db ) sqlite3_interrupt(db);
 		if (c == 'b' && n >= 3 && strncmp (azArg [0], "backup", n) == 0 && nArg > 1) {
 			string zDestFile;
 			string zDb;
-			sqlite3 pDest = null;
+			Connection pDest = null;
 			sqlite3_backup pBackup;
 			//int rc;
 			if (nArg == 2) {
@@ -2243,7 +2243,7 @@ sqlite3IoTrace = iotracePrintf;
 																				if (c == 'r' && n >= 3 && strncmp (azArg [0], "restore", n) == 0 && nArg > 1) {
 																					string zSrcFile;
 																					string zDb;
-																					sqlite3 pSrc = null;
+																					Connection pSrc = null;
 																					sqlite3_backup pBackup;
 																					//int rc;
 																					int nTimeout = 0;
@@ -2796,7 +2796,7 @@ enableTimer = booleanValue(azArg[1]);
 
 	static SqlResult main (int argc, string[] argv)
 	{
-        sqlite3 pSrc = null;
+        Connection pSrc = null;
         var zSrcFile = "hehehe";
         var r=Sqlite3.sqlite3_open(zSrcFile, out pSrc);
         Btree btree = null;

@@ -50,7 +50,7 @@ namespace Community.CsharpSqlite.Ast {
             /// the select structure itself.
             ///
             ///</summary>
-            static void clearSelect(sqlite3 db, Select p)
+            static void clearSelect(Connection db, Select p)
             {
                 exprc.sqlite3ExprListDelete(db, ref p.pEList);
                 build.sqlite3SrcListDelete(db, ref p.pSrc);
@@ -69,7 +69,7 @@ namespace Community.CsharpSqlite.Ast {
             /// Delete the given Select structure and all of its substructures.
             ///
             ///</summary>
-            public static void sqlite3SelectDelete(sqlite3 db, ref Select p)
+            public static void sqlite3SelectDelete(Connection db, ref Select p)
             {
                 if (p != null)
                 {
@@ -234,7 +234,7 @@ namespace Community.CsharpSqlite.Ast {
                 ///IN/OUT: The WHERE clause to add to 
             )
             {
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 Expr pE1;
                 Expr pE2;
                 Expr pEq;
@@ -904,7 +904,7 @@ namespace Community.CsharpSqlite.Ast {
             ///</summary>
             public static KeyInfo keyInfoFromExprList(Parse pParse, ExprList pList)
             {
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 int nExpr;
                 KeyInfo pInfo;
                 ExprList_item pItem;
@@ -1238,7 +1238,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             )
             {
                 Vdbe v = pParse.pVdbe;
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 bool fullNames;
                 bool shortNames;
 #if !SQLITE_OMIT_EXPLAIN
@@ -1334,7 +1334,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 ref Column[] paCol///Write the new column list here 
             )
             {
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 ///Database connection 
                 int cnt;
                 ///Index added to make the name unique 
@@ -1445,7 +1445,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
             public static Table sqlite3ResultSetOfSelect(Parse pParse, Select pSelect)
             {
                 Table pTab;
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 SqliteFlags savedFlags;
                 savedFlags = db.flags;
                 db.flags &= ~SqliteFlags.SQLITE_FullColNames;
@@ -1948,7 +1948,7 @@ break;
                 ///Comparison information for duplicate removal 
                 KeyInfo pKeyMerge;
                 ///Comparison information for merging rows 
-                sqlite3 db;
+                Connection db;
                 ///Database connection 
                 ExprList pOrderBy;
                 ///The ORDER BY clause 
@@ -2374,7 +2374,7 @@ break;
             /// of the subquery rather the result set of the subquery.
             ///
             ///</summary>
-            static Expr substExpr(sqlite3 db,///
+            static Expr substExpr(Connection db,///
                 ///<summary>
                 ///Report malloc errors to this connection 
                 ///</summary>
@@ -2429,7 +2429,7 @@ break;
                 }
                 return pExpr;
             }
-            static void substExprList(sqlite3 db,///
+            static void substExprList(Connection db,///
                 ///<summary>
                 ///Report malloc errors here 
                 ///</summary>
@@ -2455,7 +2455,7 @@ break;
                     pList.a[i].pExpr = substExpr(db, pList.a[i].pExpr, iTable, pEList);
                 }
             }
-            static void substSelect(sqlite3 db,///
+            static void substSelect(Connection db,///
                 ///Report malloc errors here 
             Select p,///SELECT statement in which to make substitutions 
             int iTable,///Table to be replaced 
@@ -2665,7 +2665,7 @@ break;
                 Expr pWhere;
                 ///The WHERE clause 
                 
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 ///Check to see if flattening is permitted.  Return 0 if not.
                 Debug.Assert(p != null);
                 Debug.Assert(p.pPrior == null);

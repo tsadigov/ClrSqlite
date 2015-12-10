@@ -421,17 +421,17 @@ dummy += (uint)x;
         ///
         ///</summary>
         //Overloads
-        public static void sqlite3Error(sqlite3 db, int err_code, int noString)
+        public static void sqlite3Error(Connection db, int err_code, int noString)
         {
             utilc.sqlite3Error(db, (SqlResult)err_code, err_code == 0 ? null : "");
         }
-        public static void sqlite3Error(sqlite3 db, SqlResult err, int noString)
+        public static void sqlite3Error(Connection db, SqlResult err, int noString)
         {
             utilc.sqlite3Error(db, (int)err, noString);
         }
 
 
-        public static void sqlite3Error(sqlite3 db, SqlResult err_code, string zFormat, params object[] ap)
+        public static void sqlite3Error(Connection db, SqlResult err_code, string zFormat, params object[] ap)
         {
             if (db != null && (db.pErr != null || (db.pErr = Engine.vdbemem_cs.sqlite3ValueNew(db)) != null))
             {
@@ -475,7 +475,7 @@ dummy += (uint)x;
         public static void sqlite3ErrorMsg(Parse pParse, string zFormat, params object[] ap)
         {
             string zMsg;
-            sqlite3 db = pParse.db;
+            Connection db = pParse.db;
             //va_list ap;
             lock (_Custom.lock_va_list)
             {
@@ -1310,7 +1310,7 @@ return n;
         /// used as an argument to sqlite3_errmsg() or sqlite3_close().
         ///
         ///</summary>
-        public static bool sqlite3SafetyCheckOk(sqlite3 db)
+        public static bool sqlite3SafetyCheckOk(Connection db)
         {
             u32 magic;
             if (db == null)
@@ -1334,7 +1334,7 @@ return n;
             }
         }
 
-        public static bool sqlite3SafetyCheckSickOrOk(sqlite3 db)
+        public static bool sqlite3SafetyCheckSickOrOk(Connection db)
         {
             u32 magic;
             magic = db.magic;
@@ -2102,7 +2102,7 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
 		/// binary value has been obtained from malloc and must be freed by
 		/// the calling routine.
 		///</summary>
-		public static byte[] sqlite3HexToBlob (sqlite3 db, string z, int n)
+		public static byte[] sqlite3HexToBlob (Connection db, string z, int n)
 		{
 			StringBuilder zBlob;
 			int i;

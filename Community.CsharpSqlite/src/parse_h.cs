@@ -53,8 +53,8 @@ using System.Collections.Generic;
 	#endif
 	public partial class Sqlite3 {
 		public class Parse {
-			sqlite3 _db;
-			public sqlite3 db {
+			Connection _db;
+			public Connection db {
 				get {
 					return _db;
 				}
@@ -234,31 +234,28 @@ using System.Collections.Generic;
 			///Address of OpCode.OP_Goto to cookie verifier subroutine 
 			///</summary>
 			public int[] cookieValue;
-			///
-			///<summary>
-			///Values of cookies to verify 
-			///</summary>
-			#if !SQLITE_OMIT_SHARED_CACHE
+            ///
+            ///<summary>
+            ///Values of cookies to verify 
+            ///</summary>
+#if !SQLITE_OMIT_SHARED_CACHE
 																																																																																																public int nTableLock;         /* Number of locks in aTableLock */
 public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 #endif
-			public int regRowid;
-			///
-			///<summary>
-			///Register holding rowid of CREATE TABLE entry 
-			///</summary>
-			public int regRoot;
+            ///<summary>
+            ///Register holding rowid of CREATE TABLE entry 
+            ///</summary>
+            public int regRowid;
 			///
 			///<summary>
 			///Register holding root page number for new objects 
 			///</summary>
-			public AutoincInfo pAinc;
+			public int regRoot;
 			///
 			///<summary>
 			///Information about AUTOINCREMENT counters 
 			///</summary>
-			public int nMaxArg;
-			///
+			public AutoincInfo pAinc;
 			///<summary>
 			///</summary>
 			///<param name="Max args passed to user function by sub">program </param>
@@ -266,36 +263,40 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 			///<summary>
 			///Information used while coding trigger programs. 
 			///</summary>
-			public Parse pToplevel;
+			
+			public int nMaxArg;
 			///
 			///<summary>
 			///Parse structure for main program (or NULL) 
 			///</summary>
-			public Table pTriggerTab;
+			public Parse pToplevel;
 			///
 			///<summary>
 			///Table triggers are being coded for 
 			///</summary>
-			public u32 oldmask;
+			public Table pTriggerTab;
 			///
 			///<summary>
 			///Mask of old.* columns referenced 
 			///</summary>
-			public u32 newmask;
+			public u32 oldmask;
 			///
 			///<summary>
 			///Mask of new.* columns referenced 
 			///</summary>
-			public u8 eTriggerOp;
-			///
+			public u32 newmask;
 			///<summary>
 			///Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT or Sqlite3.TK_DELETE 
 			///</summary>
-			public OnConstraintError eOrconf;
+			
+			public u8 eTriggerOp;
 			///
 			///<summary>
 			///Default ON CONFLICT policy for trigger steps 
 			///</summary>
+			public OnConstraintError eOrconf;
+			///
+			
 			public u8 disableTriggers;
 			///
 			///<summary>
@@ -565,7 +566,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				int iDb;
 				int i;
 				int nAlloc;
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///Look up the table being altered. 
@@ -630,7 +631,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 					pCol.zDflt=null;
 					pNew.aCol[i]=pCol;
 				}
-				pNew.pSchema=db.aDb[iDb].pSchema;
+				pNew.pSchema=db.Backends[iDb].pSchema;
 				pNew.addColOffset=pTab.addColOffset;
 				pNew.nRef=1;
 				///
@@ -695,7 +696,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				///<summary>
 				///Default value for the new column 
 				///</summary>
-				sqlite3 db;
+				Connection db;
 				///
 				///<summary>
 				///The database connection; 
@@ -711,7 +712,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				Debug.Assert(pNew!=null);
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
 				iDb=sqlite3SchemaToIndex(db,pNew.pSchema);
-				zDb=db.aDb[iDb].zName;
+				zDb=db.Backends[iDb].Name;
 				zTab=pNew.zName.Substring(16);
 				// zTab = &pNew->zName[16]; /* Skip the "sqlite_altertab_" prefix on the name */
 				pCol=pNew.aCol[pNew.nCol-1];
@@ -886,7 +887,7 @@ return;
 				///<summary>
 				///</summary>
 				///<param name="NULL">terminated version of pName </param>
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///Database connection 
@@ -927,7 +928,7 @@ return;
 				if(pTab==null)
 					goto exit_rename_table;
 				iDb=sqlite3SchemaToIndex(this.db,pTab.pSchema);
-				zDb=db.aDb[iDb].zName;
+				zDb=db.Backends[iDb].Name;
                 db.flags |= SqliteFlags.SQLITE_PreferBuiltin;
 				///
 				///<summary>
@@ -1163,7 +1164,7 @@ goto exit_rename_table;
 			string whereTempTriggers(Table pTab) {
 				Trigger pTrig;
 				string zWhere="";
-				Schema pTempSchema=this.db.aDb[1].pSchema;
+				Schema pTempSchema=this.db.Backends[1].pSchema;
 				///
 				///<summary>
 				///Temp db schema 
@@ -1176,7 +1177,7 @@ goto exit_rename_table;
 				///expression being built up in zWhere.
 				///</summary>
 				if(pTab.pSchema!=pTempSchema) {
-					sqlite3 db=this.db;
+					Connection db=this.db;
 					for(pTrig= pTab.sqlite3TriggerList(this);pTrig!=null;pTrig=pTrig.pNext) {
 						if(pTrig.pSchema==pTempSchema) {
 							zWhere=alter.whereOrName(db,zWhere,pTrig.zName);
@@ -1234,18 +1235,18 @@ goto exit_rename_table;
 					0
 				};
 				int i;
-				sqlite3 db=this.db;
-				Db pDb;
+				Connection db=this.db;
+				DbBackend pDb;
 				Vdbe v=this.sqlite3GetVdbe();
 				if(v==null)
 					return;
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
 				Debug.Assert(v.sqlite3VdbeDb()==db);
-				pDb=db.aDb[iDb];
+				pDb=db.Backends[iDb];
 				for(i=0;i<Sqlite3.ArraySize(aTable);i++) {
 					string zTab=aTable[i].zName;
 					Table pStat;
-					if((pStat=TableBuilder.sqlite3FindTable(db,zTab,pDb.zName))==null) {
+					if((pStat=TableBuilder.sqlite3FindTable(db,zTab,pDb.Name))==null) {
 						///
 						///<summary>
 						///The sqlite_stat[12] table does not exist. Create it. Note that a 
@@ -1253,7 +1254,7 @@ goto exit_rename_table;
 						///<param name="side">effect of the CREATE TABLE statement is to leave the rootpage </param>
 						///<param name="of the new table in register pParse.regRoot. This is important ">of the new table in register pParse.regRoot. This is important </param>
 						///<param name="because the OpenWrite opcode below will be needing it. ">because the OpenWrite opcode below will be needing it. </param>
-						build.sqlite3NestedParse(this,"CREATE TABLE %Q.%s(%s)",pDb.zName,zTab,aTable[i].zCols);
+						build.sqlite3NestedParse(this,"CREATE TABLE %Q.%s(%s)",pDb.Name,zTab,aTable[i].zCols);
 						aRoot[i]=this.regRoot;
 						aCreateTbl[i]=1;
 					}
@@ -1267,7 +1268,7 @@ goto exit_rename_table;
 						aRoot[i]=pStat.tnum;
 						sqliteinth.sqlite3TableLock(this,iDb,aRoot[i],1,zTab);
 						if(!String.IsNullOrEmpty(zWhere)) {
-							build.sqlite3NestedParse(this,"DELETE FROM %Q.%s WHERE %s=%Q",pDb.zName,zTab,zWhereType,zWhere);
+							build.sqlite3NestedParse(this,"DELETE FROM %Q.%s WHERE %s=%Q",pDb.Name,zTab,zWhereType,zWhere);
 						}
 						else {
 							///
@@ -1313,7 +1314,7 @@ goto exit_rename_table;
 			///Available memory locations begin here 
 			///</summary>
 			) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///Database handle 
@@ -1674,8 +1675,8 @@ return;
 			/// Generate code that will do an analysis of an entire database
 			///</summary>
 			void analyzeDatabase(int iDb) {
-				sqlite3 db=this.db;
-				Schema pSchema=db.aDb[iDb].pSchema;
+				Connection db=this.db;
+				Schema pSchema=db.Backends[iDb].pSchema;
 				///
 				///<summary>
 				///Schema of database iDb 
@@ -1738,7 +1739,7 @@ return;
 				this.sqlite3Analyze(null,null);
 			}
 			public void sqlite3Analyze(Token pName1,Token pName2) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				int iDb;
 				int i;
 				string z,zDb;
@@ -1760,7 +1761,7 @@ return;
 					///<summary>
 					///Form 1:  Analyze everything 
 					///</summary>
-					for(i=0;i<db.nDb;i++) {
+					for(i=0;i<db.BackendCount;i++) {
 						if(i==1)
 							continue;
 						///
@@ -1802,7 +1803,7 @@ return;
 						///</summary>
 						iDb=build.sqlite3TwoPartName(this,pName1,pName2,ref pTableName);
 						if(iDb>=0) {
-							zDb=db.aDb[iDb].zName;
+							zDb=db.Backends[iDb].Name;
 							z=build.sqlite3NameFromToken(db,pTableName);
 							if(z!=null) {
 								if((pIdx=IndexBuilder.sqlite3FindIndex(db,z,zDb))!=null) {
@@ -1855,7 +1856,7 @@ return;
 				SqlResult rc;
 				NameContext sName;
 				Vdbe v;
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				int regArgs;
 				sName=new NameContext();
 				// memset( &sName, 0, sizeof(NameContext));
@@ -2416,7 +2417,7 @@ goto attach_end;
 			///Amount to increment deferred counter by 
 			///</summary>
 			) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///Database handle 
@@ -2604,7 +2605,7 @@ goto attach_end;
 			///
 			///</summary>
 			void sqlite3FkDropTable(SrcList pName,Table pTab) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
                 if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0 && !pTab.IsVirtual() && null == pTab.pSelect)
                 {
 					int iSkip=0;
@@ -2688,7 +2689,7 @@ goto attach_end;
 			///New row data is stored here 
 			///</summary>
 			) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///Database handle 
@@ -2721,7 +2722,7 @@ goto attach_end;
                 if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) == 0)
 					return;
 				iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-				zDb=db.aDb[iDb].zName;
+				zDb=db.Backends[iDb].Name;
 				///
 				///<summary>
 				///Loop through all the foreign key constraints for which pTab is the
@@ -3051,7 +3052,7 @@ goto attach_end;
 			///</summary>
 			///<param name="Change">list for UPDATE, NULL for DELETE </param>
 			) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///Database handle 
@@ -3429,7 +3430,7 @@ goto attach_end;
 				yyParser pEngine;///type of the next token 
 				int lastTokenParsed=-1;///type of the previous token 
 				byte enableLookaside;///<param name="Saved value of db">>lookaside.bEnabled </param>
-				sqlite3 db=this.db;///The database connection 
+				Connection db=this.db;///The database connection 
 								if(db.activeVdbeCnt==0) {
 					db.u1.isInterrupted=false;
 				}
@@ -3605,7 +3606,7 @@ pParse.nTableLock = 0;
 			///How to handle constraint errors 
 			///</summary>
 			) {
-				sqlite3 db;
+				Connection db;
 				///
 				///<summary>
 				///The main database structure 
@@ -3702,7 +3703,7 @@ pParse.nTableLock = 0;
 				///<summary>
 				///Index of database holding TABLE 
 				///</summary>
-				Db pDb;
+				DbBackend pDb;
 				///
 				///<summary>
 				///The database containing table being inserted into 
@@ -3797,9 +3798,9 @@ pParse.nTableLock = 0;
 					goto insert_cleanup;
 				}
 				iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-				Debug.Assert(iDb<db.nDb);
-				pDb=db.aDb[iDb];
-				zDb=pDb.zName;
+				Debug.Assert(iDb<db.BackendCount);
+				pDb=db.Backends[iDb];
+				zDb=pDb.Name;
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																					if( sqlite3AuthCheck(pParse, SQLITE_INSERT, pTab.zName, 0, zDb) ){
 goto insert_cleanup;
@@ -4521,12 +4522,12 @@ isView = false;
 				///<summary>
 				///Information about an AUTOINCREMENT 
 				///</summary>
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///The database connection 
 				///</summary>
-				Db pDb;
+				DbBackend pDb;
 				///
 				///<summary>
 				///Database only autoinc table 
@@ -4559,7 +4560,7 @@ isView = false;
 				///We failed long ago if this is not so 
 				///</summary>
 				for(p=this.pAinc;p!=null;p=p.pNext) {
-					pDb=db.aDb[p.iDb];
+					pDb=db.Backends[p.iDb];
 					memId=p.regCtr;
 					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pDb.pSchema));
 					this.sqlite3OpenTable(0,p.iDb,pDb.pSchema.pSeqTab,OpCode.OP_OpenRead);
@@ -4580,10 +4581,10 @@ isView = false;
 			public void sqlite3AutoincrementEnd() {
 				AutoincInfo p;
 				Vdbe v=this.pVdbe;
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				Debug.Assert(v!=null);
 				for(p=this.pAinc;p!=null;p=p.pNext) {
-					Db pDb=db.aDb[p.iDb];
+					DbBackend pDb=db.Backends[p.iDb];
 					int j1,j2,j3,j4,j5;
 					int iRec;
 					int memId=p.regCtr;
@@ -5305,7 +5306,7 @@ isView = false;
 				///<summary>
 				///VDBE Cursor number of pTab 
 				///</summary>
-				sqlite3 db;
+				Connection db;
 				///
 				///<summary>
 				///The database structure 
@@ -6005,7 +6006,7 @@ aXRef[j] = -1;
 				///<summary>
 				///First register in set passed to  OpCode.OP_VUpdate 
 				///</summary>
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///Database connection 
@@ -6141,7 +6142,7 @@ aXRef[j] = -1;
 			) {
 				SelectDest dest=new SelectDest();
 				Select pDup;
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				pDup=exprc.sqlite3SelectDup(db,pView.pSelect,0);
 				if(pWhere!=null) {
 					SrcList pFrom;
@@ -6219,7 +6220,7 @@ aXRef[j] = -1;
 				///<summary>
 				///VDBE VdbeCursor number for pTab 
 				///</summary>
-				sqlite3 db;
+				Connection db;
 				///
 				///<summary>
 				///Main database structure 
@@ -6312,8 +6313,8 @@ isView = false;
 					goto delete_from_cleanup;
 				}
 				iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-				Debug.Assert(iDb<db.nDb);
-				zDb=db.aDb[iDb].zName;
+				Debug.Assert(iDb<db.BackendCount);
+				zDb=db.Backends[iDb].Name;
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																					rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
 #else
@@ -6781,7 +6782,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///Dequoted name of collation sequence 
 				///</summary>
 				CollSeq pColl;
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				zColl=build.sqlite3NameFromToken(db,pCollName);
 				pColl=build.sqlite3LocateCollSeq(this,zColl);
 				pExpr.sqlite3ExprSetColl(pColl);
@@ -6806,7 +6807,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 						string zColl;
 						int j=p.iColumn;
 						if(j>=0) {
-							sqlite3 db=this.db;
+							Connection db=this.db;
 							zColl=p.pTab.aCol[j].zColl;
 							pColl=db.sqlite3FindCollSeq(sqliteinth.ENC(db),zColl,0);
 							pExpr.pColl=pColl;
@@ -7189,7 +7190,7 @@ return;
 				///<summary>
 				///Various register numbers 
 				///</summary>
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///The database connection 
@@ -8398,7 +8399,7 @@ return;
 			///Expression to be appended. Might be NULL 
 			///</summary>
 			) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				if(pList==null) {
 					pList=new ExprList();
 					//sqlite3DbMallocZero(db, ExprList).Length;
@@ -8448,7 +8449,7 @@ return;
 			///The span to be added 
 			///</summary>
 			) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				Debug.Assert(pList!=null///
 				///<summary>
 				///|| db.mallocFailed != 0 
@@ -8517,7 +8518,7 @@ return;
 			}
 			public Expr sqlite3ExprFunction(ExprList pList,Token pToken) {
 				Expr pNew;
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				Debug.Assert(pToken!=null);
 				pNew=exprc.CreateExpr(db,Sqlite3.TK_FUNCTION,pToken,true);
 				if(pNew==null) {
@@ -8534,7 +8535,7 @@ return;
 				return pNew;
 			}
 			public void sqlite3ExprAssignVarNumber(Expr pExpr) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				string z;
 				if(pExpr==null)
 					return;
@@ -8684,7 +8685,7 @@ return;
 				///<summary>
 				///Wildcard characters 
 				///</summary>
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///Data_base connection 
@@ -10754,7 +10755,7 @@ range_est_fallback:
 					///<summary>
 					///VM being constructed 
 					///</summary>
-					sqlite3 db=this.db;
+					Connection db=this.db;
 					///
 					///<summary>
 					///Database handle 
@@ -10915,7 +10916,7 @@ range_est_fallback:
 				///<summary>
 				///</summary>
 				///<param name="AND">ed combination of all pWC.a[].wtFlags </param>
-				sqlite3 db;
+				Connection db;
 				///
 				///<summary>
 				///Data_base connection 
@@ -11616,7 +11617,7 @@ range_est_fallback:
 				///<summary>
 				///A term of the ORDER BY clause 
 				///</summary>
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				Debug.Assert(pOrderBy!=null);
 				nTerm=pOrderBy.nExpr;
 				Debug.Assert(nTerm>0);
@@ -11784,7 +11785,7 @@ range_est_fallback:
 				return false;
 			}
 			public void binaryToUnaryIfNull(Expr pY,Expr pA,int op) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				if(///
 				///<summary>
 				///db.mallocFailed == null && 
@@ -11826,7 +11827,7 @@ range_est_fallback:
 				///</summary>
 				p=(pX.ExprHasProperty(ExprFlags.EP_xIsSelect)?pX.x.pSelect:null);
 				if(Sqlite3.ALWAYS(this.nErr==0)&&exprc.isCandidateForInOpt(p)!=0) {
-					sqlite3 db=this.db;
+					Connection db=this.db;
 					///
 					///<summary>
 					///Database connection 
@@ -12466,7 +12467,7 @@ range_est_fallback:
 				///<summary>
 				///The new virtual table 
 				///</summary>
-				sqlite3 db;
+				Connection db;
 				///
 				///<summary>
 				///Database connection 
@@ -12482,7 +12483,7 @@ range_est_fallback:
 				pTable.tabFlags|=TableFlags.TF_Virtual;
 				pTable.nModuleArg=0;
                 VTableMethodsExtensions.addModuleArgument(db, pTable, build.sqlite3NameFromToken(db, pModuleName));
-                VTableMethodsExtensions.addModuleArgument(db, pTable, db.aDb[iDb].zName);
+                VTableMethodsExtensions.addModuleArgument(db, pTable, db.Backends[iDb].Name);
 				//sqlite3DbStrDup( db, db.aDb[iDb].zName ) );
 				VTableMethodsExtensions.addModuleArgument(db,pTable,pTable.zName);
 				//sqlite3DbStrDup( db, pTable.zName ) );
@@ -12504,7 +12505,7 @@ range_est_fallback:
 				if(this.sArg.zRestSql!=null&&Sqlite3.ALWAYS(this.pNewTable)) {
 					string z=this.sArg.zRestSql.Substring(0,this.sArg.Length);
 					int n=this.sArg.Length;
-					sqlite3 db=this.db;
+					Connection db=this.db;
                     VTableMethodsExtensions.addModuleArgument(db, this.pNewTable, z);
 					///sqlite3DbStrNDup( db, z, n ) );
 				}
@@ -12515,7 +12516,7 @@ range_est_fallback:
 				///<summary>
 				///The table being constructed 
 				///</summary>
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				///
 				///<summary>
 				///The database connection 
@@ -12561,7 +12562,7 @@ range_est_fallback:
 					///
 					///</summary>
 					iDb=sqlite3SchemaToIndex(db,pTab.pSchema);
-                    build.sqlite3NestedParse(this, "UPDATE %Q.%s " + "SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q " + "WHERE rowid=#%d", db.aDb[iDb].zName, sqliteinth.SCHEMA_TABLE(iDb), pTab.zName, pTab.zName, zStmt, this.regRowid);
+                    build.sqlite3NestedParse(this, "UPDATE %Q.%s " + "SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q " + "WHERE rowid=#%d", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), pTab.zName, pTab.zName, zStmt, this.regRowid);
 					db.sqlite3DbFree(ref zStmt);
 					v=this.sqlite3GetVdbe();
 					build.sqlite3ChangeCookie(this,iDb);
@@ -12615,7 +12616,7 @@ range_est_fallback:
 				}
 			}
 			public SqlResult sqlite3VtabCallConnect(Table pTab) {
-				sqlite3 db=this.db;
+				Connection db=this.db;
 				string zMod;
 				Module pMod;
 				SqlResult rc;

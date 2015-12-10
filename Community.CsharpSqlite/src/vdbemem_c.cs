@@ -1089,7 +1089,7 @@ return r;
             /// Create a new sqlite3_value object.
             ///
             ///</summary>
-            public static sqlite3_value sqlite3ValueNew(sqlite3 db)
+            public static sqlite3_value sqlite3ValueNew(Connection db)
             {
                 Mem p = null;
                 p = malloc_cs.sqlite3DbMallocZero(db, p);
@@ -1112,7 +1112,7 @@ return r;
             /// cannot be converted to a value, then ppVal is set to NULL.
             ///
             ///</summary>
-            public static SqlResult sqlite3ValueFromExpr(sqlite3 db,///
+            public static SqlResult sqlite3ValueFromExpr(Connection db,///
                 ///<summary>
                 ///The database connection 
                 ///</summary>

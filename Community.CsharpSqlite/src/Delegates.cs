@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite
 
     public delegate void dxalarmCallback(object pNotUsed, sqlite3_int64 iNotUsed, int size);
 
-    public delegate void dxCollNeeded(object pCollNeededArg, sqlite3 db, int eTextRep, string collationName);
+    public delegate void dxCollNeeded(object pCollNeededArg, Connection db, int eTextRep, string collationName);
 
     public delegate SqlResult dxCommitCallback(object pCommitArg);
 
@@ -95,7 +95,7 @@ namespace Community.CsharpSqlite
 
 
     //sqlite3_module
-    public delegate SqlResult smdxCreateConnect(sqlite3 db, object pAux, int argc, string[] constargv, out sqlite3_vtab ppVTab, out string pError);
+    public delegate SqlResult smdxCreateConnect(Connection db, object pAux, int argc, string[] constargv, out sqlite3_vtab ppVTab, out string pError);
 
     public delegate int smdxBestIndex(sqlite3_vtab pVTab, ref sqlite3_index_info pIndex);
 
@@ -174,7 +174,7 @@ namespace Community.CsharpSqlite
 
     public delegate void dxUpdateCallback(object pUpdateArg, AuthTarget b, string c, string d, sqlite3_int64 e);
 
-    public delegate int dxWalCallback(object pWalArg, sqlite3 db, string zDb, int nEntry);
+    public delegate int dxWalCallback(object pWalArg, Connection db, string zDb, int nEntry);
 
 
 
@@ -246,7 +246,7 @@ namespace Community.CsharpSqlite
 
 		
 		//AutoExtention
-		public delegate int dxInit (sqlite3 db, ref string zMessage, sqlite3_api_routines sar);
+		public delegate int dxInit (Connection db, ref string zMessage, sqlite3_api_routines sar);
 
 		
 		//Faults

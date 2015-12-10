@@ -307,9 +307,9 @@ namespace Community.CsharpSqlite
                 return (Object)ap[vaNEXT++];
             }
 
-            public static sqlite3 va_arg(object[] ap, sqlite3 sysType)
+            public static Connection va_arg(object[] ap, Connection sysType)
             {
-                return (sqlite3)ap[vaNEXT++];
+                return (Connection)ap[vaNEXT++];
             }
 
             public static sqlite3_mem_methods va_arg(object[] ap, sqlite3_mem_methods sysType)

@@ -89,7 +89,7 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
             }
 
             //# define sqlite3BtreeEnterAll(X)
-            public static void sqlite3BtreeEnterAll(this sqlite3 p)
+            public static void sqlite3BtreeEnterAll(this Connection p)
             {
             }
 

@@ -87,7 +87,7 @@ namespace Community.CsharpSqlite.Ast
                 ///<summary>
                 ///Parser context 
                 ///</summary>
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 ///
                 ///<summary>
                 ///Data_base connection 
@@ -526,7 +526,7 @@ namespace Community.CsharpSqlite.Ast
                 ///<summary>
                 ///Parsing context 
                 ///</summary>
-                sqlite3 db = pParse.db;
+                Connection db = pParse.db;
                 ///
                 ///<summary>
                 ///Data_base connection 

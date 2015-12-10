@@ -116,7 +116,7 @@ namespace Community.CsharpSqlite {
 		///Query status information for a single database connection
 		///
 		///</summary>
-		static SqlResult sqlite3_db_status(sqlite3 db,///
+		static SqlResult sqlite3_db_status(Connection db,///
 		///<summary>
 		///The database connection whose status is desired 
 		///</summary>
@@ -179,8 +179,8 @@ namespace Community.CsharpSqlite {
 				int totalUsed=0;
 				int i;
                 db.sqlite3BtreeEnterAll();
-				for(i=0;i<db.nDb;i++) {
-					Btree pBt=db.aDb[i].pBt;
+				for(i=0;i<db.BackendCount;i++) {
+					Btree pBt=db.Backends[i].BTree;
 					if(pBt!=null) {
 						Pager pPager=pBt.sqlite3BtreePager();
 						totalUsed+=pPager.sqlite3PagerMemUsed();
@@ -211,8 +211,8 @@ namespace Community.CsharpSqlite {
 				///</summary>
                 db.sqlite3BtreeEnterAll();
 				//db.pnBytesFreed = nByte;
-				for(i=0;i<db.nDb;i++) {
-					Schema pSchema=db.aDb[i].pSchema;
+				for(i=0;i<db.BackendCount;i++) {
+					Schema pSchema=db.Backends[i].pSchema;
 					if(Sqlite3.ALWAYS(pSchema!=null)) {
 						HashElem p;
 						//nByte += (int)(sqliteinth.sqlite3GlobalConfig.m.xRoundup(sizeof(HashElem)) * (

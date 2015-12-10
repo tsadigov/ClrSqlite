@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite
 		//typedef struct analysisInfo analysisInfo;
 		public struct analysisInfo
 		{
-			public sqlite3 db;
+			public Connection db;
 
 			public string zDatabase;
 		}
@@ -148,7 +148,7 @@ namespace Community.CsharpSqlite
 		/// If the Index.aSample variable is not NULL, delete the aSample[] array
 		/// and its contents.
 		///</summary>
-		public static void sqlite3DeleteIndexSamples (sqlite3 db, Index pIdx)
+		public static void sqlite3DeleteIndexSamples (Connection db, Index pIdx)
 		{
 			#if SQLITE_ENABLE_STAT2
 																																																												  if ( pIdx.aSample != null )
@@ -193,14 +193,14 @@ namespace Community.CsharpSqlite
 ///code may be ignored.
 ///</summary>
 
-		public static SqlResult sqlite3AnalysisLoad (sqlite3 db, int iDb)
+		public static SqlResult sqlite3AnalysisLoad (Connection db, int iDb)
 		{
 			analysisInfo sInfo;
 			HashElem i;
 			string zSql;
             SqlResult rc;
-			Debug.Assert (iDb >= 0 && iDb < db.nDb);
-			Debug.Assert (db.aDb [iDb].pBt != null);
+			Debug.Assert (iDb >= 0 && iDb < db.BackendCount);
+			Debug.Assert (db.Backends [iDb].BTree != null);
 			///
 ///<summary>
 ///Clear any prior statistics 
@@ -208,7 +208,7 @@ namespace Community.CsharpSqlite
 
 			Debug.Assert (sqlite3SchemaMutexHeld (db, iDb, null));
 			//for(i=sqliteHashFirst(&db.aDb[iDb].pSchema.idxHash);i;i=sqliteHashNext(i)){
-			for (i = db.aDb [iDb].pSchema.idxHash.first; i != null; i = i.next) {
+			for (i = db.Backends [iDb].pSchema.idxHash.first; i != null; i = i.next) {
 				Index pIdx = (Index)i.data;
 				// sqliteHashData( i );
 				build.sqlite3DefaultRowEst (pIdx);
@@ -221,7 +221,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			sInfo.db = db;
-			sInfo.zDatabase = db.aDb [iDb].zName;
+			sInfo.zDatabase = db.Backends [iDb].Name;
 			if (TableBuilder.sqlite3FindTable (db, "sqlite_stat1", sInfo.zDatabase) == null) {
 				return SqlResult.SQLITE_ERROR;
 			}

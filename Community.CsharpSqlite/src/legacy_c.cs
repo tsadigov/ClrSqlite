@@ -54,7 +54,7 @@ namespace Community.CsharpSqlite
         ///
         ///</summary>
         //C# Alias
-        static public SqlResult exec(sqlite3 db,
+        static public SqlResult exec(Connection db,
             ///The database on which the SQL executes                 
             string zSql,
             ///The SQL to be executed 
@@ -65,7 +65,7 @@ namespace Community.CsharpSqlite
         }
 
         static public SqlResult exec(
-            /*The database on which the SQL executes */sqlite3 db,
+            /*The database on which the SQL executes */Connection db,
             /*The SQL to be executed */string zSql,
             /*Invoke this callback routine *///sqlite3_callback 
             dxCallback xCallback,
@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite
 
         static public SqlResult exec(
             /*The database on which the SQL executes */
-            sqlite3 db,
+            Connection db,
             /*The SQL to be executed */
             string zSql,
             /*Invoke this callback routine */
@@ -97,7 +97,7 @@ namespace Community.CsharpSqlite
 
         //OVERLOADS 
         public static SqlResult sqlite3_exec(
-            /*The database on which the SQL executes */ sqlite3 db,
+            /*The database on which the SQL executes */ Connection db,
             /*The SQL to be executed */string zSql,
             int NoCallback, int NoArgs, int NoErrors)
         {
@@ -105,7 +105,7 @@ namespace Community.CsharpSqlite
             return sqlite3_exec(db, zSql, null, null, ref Errors);
         }
 
-        public static SqlResult sqlite3_exec(sqlite3 db,
+        public static SqlResult sqlite3_exec(Connection db,
             ///The database on which the SQL executes 
             string zSql,
             ///The SQL to be executed 
@@ -199,7 +199,7 @@ namespace Community.CsharpSqlite
         ///
 
         static public SqlResult sqlite3_exec(
-            sqlite3 db, ///The database on which the SQL executes 
+            Connection db, ///The database on which the SQL executes 
             string zSql, ///The SQL to be executed 
             //sqlite3_callback 
             dxCallback xCallback, ///Invoke this callback routine 

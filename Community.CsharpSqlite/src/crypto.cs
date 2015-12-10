@@ -387,15 +387,15 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
         * when for_ctx == 1 then it will change for write
         * when for_ctx == 2 then it will change for both
         */
-            static SqlResult codec_set_cipher_name(sqlite3 db, int nDb, string cipher_name, int for_ctx)
+            static SqlResult codec_set_cipher_name(Connection db, int nDb, string cipher_name, int for_ctx)
             {
-                Db pDb = db.aDb[nDb];
+                DbBackend pDb = db.Backends[nDb];
                 CODEC_TRACE("codec_set_cipher_name: entered db=%d nDb=%d cipher_name=%s for_ctx=%d\n", db, nDb, cipher_name, for_ctx);
-                if (pDb.pBt != null)
+                if (pDb.BTree != null)
                 {
                     codec_ctx ctx = null;
                     cipher_ctx c_ctx;
-                    pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
+                    pDb.BTree.pBt.pPager.sqlite3pager_get_codec(ref ctx);
                     c_ctx = for_ctx != 0 ? ctx.write_ctx : ctx.read_ctx;
                     c_ctx.derive_key = true;
                     if (for_ctx == 2)
@@ -404,15 +404,15 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                 }
                 return SqlResult.SQLITE_ERROR;
             }
-            static SqlResult codec_set_pass_key(sqlite3 db, int nDb, string zKey, int nKey, int for_ctx)
+            static SqlResult codec_set_pass_key(Connection db, int nDb, string zKey, int nKey, int for_ctx)
             {
-                Db pDb = db.aDb[nDb];
+                DbBackend pDb = db.Backends[nDb];
                 CODEC_TRACE("codec_set_pass_key: entered db=%d nDb=%d cipher_name=%s nKey=%d for_ctx=%d\n", db, nDb, zKey, nKey, for_ctx);
-                if (pDb.pBt != null)
+                if (pDb.BTree != null)
                 {
                     codec_ctx ctx = null;
                     cipher_ctx c_ctx;
-                    pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
+                    pDb.BTree.pBt.pPager.sqlite3pager_get_codec(ref ctx);
                     c_ctx = for_ctx != 0 ? ctx.write_ctx : ctx.read_ctx;
                     cipher_ctx_set_pass(c_ctx, zKey, nKey);
                     c_ctx.derive_key = true;
@@ -501,12 +501,12 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                         return pData;
                 }
             }
-            public static SqlResult sqlite3CodecAttach(sqlite3 db, int nDb, string zKey, int nKey)
+            public static SqlResult sqlite3CodecAttach(Connection db, int nDb, string zKey, int nKey)
             {
-                Db pDb = db.aDb[nDb];
+                DbBackend pDb = db.Backends[nDb];
                 CODEC_TRACE("sqlite3CodecAttach: entered nDb=%d zKey=%s, nKey=%d\n", nDb, zKey, nKey);
                 //activate_openssl();
-                if (zKey != null && pDb.pBt != null)
+                if (zKey != null && pDb.BTree != null)
                 {
                     Aes.KeySize = 256;
 #if !SQLITE_SILVERLIGHT
@@ -514,13 +514,13 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
 #endif
                     codec_ctx ctx;
                     SqlResult rc;
-                    Pager pPager = pDb.pBt.pBt.pPager;
+                    Pager pPager = pDb.BTree.pBt.pPager;
                     sqlite3_file fd;
                     ctx = new codec_ctx();
                     //malloc_cs.sqlite3Malloc(sizeof(codec_ctx);
                     //if(ctx == null) return SQLITE_NOMEM;
                     //memset(ctx, 0, sizeof(codec_ctx); /* initialize all pointers and values to 0 */
-                    ctx.pBt = pDb.pBt;
+                    ctx.pBt = pDb.BTree;
                     ///
                     ///<summary>
                     ///assign pointer to database btree structure 
@@ -546,7 +546,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                     ctx.read_ctx.iv = new byte[ctx.read_ctx.iv_sz];
                     //malloc_cs.sqlite3Malloc( ctx.iv_sz );
                     Buffer.BlockCopy(Encoding.UTF8.GetBytes(Globals.SQLITE_FILE_HEADER), 0, ctx.read_ctx.iv, 0, FILE_HEADER_SZ);
-                    pDb.pBt.sqlite3BtreePager().sqlite3pager_sqlite3PagerSetCodec(sqlite3Codec, null, sqlite3FreeCodecArg, ctx);
+                    pDb.BTree.sqlite3BtreePager().sqlite3pager_sqlite3PagerSetCodec(sqlite3Codec, null, sqlite3FreeCodecArg, ctx);
                     codec_set_cipher_name(db, nDb, CIPHER, 0);
                     codec_set_pass_key(db, nDb, zKey, nKey, 0);
                     cipher_ctx_copy(ctx.write_ctx, ctx.read_ctx);
@@ -568,7 +568,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                 ///do nothing, security enhancements are always active 
                 ///</summary>
             }
-            public static SqlResult sqlite3_key(sqlite3 db, string pKey, int nKey)
+            public static SqlResult sqlite3_key(Connection db, string pKey, int nKey)
             {
                 CODEC_TRACE("sqlite3_key: entered db=%d pKey=%s nKey=%d\n", db, pKey, nKey);
                 ///
@@ -582,7 +582,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                     //
                     // If we are reopening an existing database, redo the header information setup 
                     //
-                    BtShared pBt = db.aDb[0].pBt.pBt;
+                    BtShared pBt = db.Backends[0].BTree.pBt;
                     byte[] zDbHeader = mempoolMethods.sqlite3MemMalloc((int)pBt.pageSize);
                     // pBt.pPager.pCodec.buffer;
                     pBt.pPager.sqlite3PagerReadFileheader(zDbHeader.Length, zDbHeader);
@@ -622,23 +622,23 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
             ///
             ///
             ///</summary>
-            public static SqlResult sqlite3_rekey(sqlite3 db, string pKey, int nKey)
+            public static SqlResult sqlite3_rekey(Connection db, string pKey, int nKey)
             {
                 CODEC_TRACE("sqlite3_rekey: entered db=%d pKey=%s, nKey=%d\n", db, pKey, nKey);
                 //activate_openssl();
                 if (db != null && pKey != null)
                 {
-                    Db pDb = db.aDb[0];
+                    DbBackend pDb = db.Backends[0];
                     CODEC_TRACE("sqlite3_rekey: database pDb=%d\n", pDb);
-                    if (pDb.pBt != null)
+                    if (pDb.BTree != null)
                     {
                         codec_ctx ctx = null;
                         SqlResult rc;
                         Pgno page_count = 0;
                         Pgno pgno;
                         PgHdr page = null;
-                        Pager pPager = pDb.pBt.pBt.pPager;
-                        pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
+                        Pager pPager = pDb.BTree.pBt.pPager;
+                        pDb.BTree.pBt.pPager.sqlite3pager_get_codec(ref ctx);
                         if (ctx == null)
                         {
                             CODEC_TRACE("sqlite3_rekey: no codec attached to db, attaching now\n");
@@ -647,7 +647,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                             ///there was no codec attached to this database,so attach one now with a null password 
                             ///</summary>
                             sqlite3CodecAttach(db, 0, pKey, nKey);
-                            pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
+                            pDb.BTree.pBt.pPager.sqlite3pager_get_codec(ref ctx);
                             ///
                             ///<summary>
                             ///prepare this setup as if it had already been initialized 
@@ -675,7 +675,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                         ///note: don't deallocate rekey since it may be used in a subsequent iteration
                         ///
                         ///</summary>
-                        rc = pDb.pBt.sqlite3BtreeBeginTrans(1);
+                        rc = pDb.BTree.sqlite3BtreeBeginTrans(1);
                         ///
                         ///<summary>
                         ///begin write transaction 
@@ -716,15 +716,15 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                         if (rc == SqlResult.SQLITE_OK)
                         {
                             CODEC_TRACE("sqlite3_rekey: committing\n");
-                            db.nextPagesize = pDb.pBt.GetPageSize();
-                            rc = pDb.pBt.sqlite3BtreeCommit();
+                            db.nextPagesize = pDb.BTree.GetPageSize();
+                            rc = pDb.BTree.sqlite3BtreeCommit();
                             if (ctx != null)
                                 cipher_ctx_copy(ctx.read_ctx, ctx.write_ctx);
                         }
                         else
                         {
                             CODEC_TRACE("sqlite3_rekey: rollback\n");
-                            pDb.pBt.sqlite3BtreeRollback();
+                            pDb.BTree.sqlite3BtreeRollback();
                         }
                         ctx.mode_rekey = 0;
                     }
@@ -732,14 +732,14 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                 }
                 return SqlResult.SQLITE_ERROR;
             }
-            public static void sqlite3CodecGetKey(sqlite3 db, int nDb, out string zKey, out int nKey)
+            public static void sqlite3CodecGetKey(Connection db, int nDb, out string zKey, out int nKey)
             {
-                Db pDb = db.aDb[nDb];
+                DbBackend pDb = db.Backends[nDb];
                 CODEC_TRACE("sqlite3CodecGetKey: entered db=%d, nDb=%d\n", db, nDb);
-                if (pDb.pBt != null)
+                if (pDb.BTree != null)
                 {
                     codec_ctx ctx = null;
-                    pDb.pBt.pBt.pPager.sqlite3pager_get_codec(ref ctx);
+                    pDb.BTree.pBt.pPager.sqlite3pager_get_codec(ref ctx);
                     if (ctx != null)
                     {
                         ///

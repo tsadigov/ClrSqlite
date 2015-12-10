@@ -1672,7 +1672,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
         ///</summary>
         static StrAccum acc = new StrAccum(SQLITE_PRINT_BUF_SIZE);
 
-        public static string sqlite3VMPrintf(sqlite3 db, string zFormat, params va_list[] ap)
+        public static string sqlite3VMPrintf(Connection db, string zFormat, params va_list[] ap)
         {
             if (zFormat == null)
                 return null;
@@ -1696,7 +1696,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
         /// %-conversion extensions.
         ///
         ///</summary>
-        public static string sqlite3MPrintf(sqlite3 db, string zFormat, params va_list[] ap)
+        public static string sqlite3MPrintf(Connection db, string zFormat, params va_list[] ap)
         {
             string z;
             //va_list ap;
@@ -1718,7 +1718,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
         ///
         ///
         ///</summary>
-        public static string sqlite3MAppendf(sqlite3 db, string zStr, string zFormat, params va_list[] ap)
+        public static string sqlite3MAppendf(Connection db, string zStr, string zFormat, params va_list[] ap)
         {
             string z;
             //va_list ap;

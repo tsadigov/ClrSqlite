@@ -551,7 +551,7 @@ namespace Community.CsharpSqlite {
       return 1;
     }
 #else
-		public static int checkSavepointCount(sqlite3 db) {
+		public static int checkSavepointCount(Connection db) {
 			return 1;
 		}
 		#endif
@@ -561,7 +561,7 @@ namespace Community.CsharpSqlite {
 		/// in memory obtained from sqlite3DbMalloc).
 		///</summary>
 		public static void importVtabErrMsg(Vdbe p,sqlite3_vtab pVtab) {
-			sqlite3 db=p.db;
+			Connection db=p.db;
 			db.sqlite3DbFree(ref p.zErrMsg);
 			p.zErrMsg=pVtab.zErrMsg;
 			// sqlite3DbStrDup( db, pVtab.zErrMsg );

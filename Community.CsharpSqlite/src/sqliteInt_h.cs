@@ -901,20 +901,20 @@ void *sqlite3_wsd_find(void *K, int L);
         ///
         ///</summary>
         //#define DbHasProperty(D,I,P)     (((D)->aDb[I].pSchema->flags&(P))==(P))
-        private static bool DbHasProperty(sqlite3 D, int I, ushort P)
+        private static bool DbHasProperty(Connection D, int I, ushort P)
         {
-            return (D.aDb[I].pSchema.flags & P) == P;
+            return (D.Backends[I].pSchema.flags & P) == P;
         }
         //#define DbHasAnyProperty(D,I,P)  (((D)->aDb[I].pSchema->flags&(P))!=0)
         //#define DbSetProperty(D,I,P)     (D)->aDb[I].pSchema->flags|=(P)
-        private static void DbSetProperty(sqlite3 D, int I, ushort P)
+        private static void DbSetProperty(Connection D, int I, ushort P)
         {
-            D.aDb[I].pSchema.flags = (u16)(D.aDb[I].pSchema.flags | P);
+            D.Backends[I].pSchema.flags = (u16)(D.Backends[I].pSchema.flags | P);
         }
         //#define DbClearProperty(D,I,P)   (D)->aDb[I].pSchema->flags&=~(P)
-        public static void DbClearProperty(sqlite3 D, int I, ushort P)
+        public static void DbClearProperty(Connection D, int I, ushort P)
         {
-            D.aDb[I].pSchema.flags = (u16)(D.aDb[I].pSchema.flags & ~P);
+            D.Backends[I].pSchema.flags = (u16)(D.Backends[I].pSchema.flags & ~P);
         }
         ///
         ///<summary>
@@ -950,9 +950,9 @@ void *sqlite3_wsd_find(void *K, int L);
         ///
         ///</summary>
         //#define ENC(db) ((db)->aDb[0].pSchema->enc)
-        public static SqliteEncoding ENC(sqlite3 db)
+        public static SqliteEncoding ENC(Connection db)
         {
-            return db.aDb[0].pSchema.enc;
+            return db.Backends[0].pSchema.enc;
         }
         ///
 
@@ -1906,7 +1906,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
         //void sqlite3VtabUnlockList(sqlite3);
         //int sqlite3VtabSavepoint(sqlite3 *, int, int);
         //#  define sqlite3VtabInSync(db) ((db)->nVTrans>0 && (db)->aVTrans==0)
-        public static bool sqlite3VtabInSync(sqlite3 db)
+        public static bool sqlite3VtabInSync(Connection db)
         {
             return (db.nVTrans > 0 && db.aVTrans == null);
         }
@@ -2019,15 +2019,15 @@ static void sqlite3FkDelete(sqlite3 a, Table b) {}
 void sqlite3ConnectionUnlocked(sqlite3 db);
 void sqlite3ConnectionClosed(sqlite3 db);
 #else
-        public static void sqlite3ConnectionBlocked(sqlite3 x, sqlite3 y)
+        public static void sqlite3ConnectionBlocked(Connection x, Connection y)
         {
         }
         //#define sqlite3ConnectionBlocked(x,y)
-        public static void sqlite3ConnectionUnlocked(sqlite3 x)
+        public static void sqlite3ConnectionUnlocked(Connection x)
         {
         }
         //#define sqlite3ConnectionUnlocked(x)
-        public static void sqlite3ConnectionClosed(sqlite3 x)
+        public static void sqlite3ConnectionClosed(Connection x)
         {
         }
         //#define sqlite3ConnectionClosed(x)

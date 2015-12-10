@@ -73,7 +73,7 @@ namespace Community.CsharpSqlite
                 int zLoc = 0;
                 int len = 0;
                 string zRet;
-                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = vdbeapi.sqlite3_context_db_handle(context);
                 sqliteinth.UNUSED_PARAMETER(NotUsed);
                 
                 ///The principle used to locate the table name in the CREATE TABLE
@@ -141,7 +141,7 @@ namespace Community.CsharpSqlite
 #if !SQLITE_OMIT_FOREIGN_KEY
             static void renameParentFunc(sqlite3_context context, int NotUsed, sqlite3_value[] argv)
             {
-                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = vdbeapi.sqlite3_context_db_handle(context);
                 string zOutput = "";
                 string zResult;
                 string zInput = vdbeapi.sqlite3_value_text(argv[0]);
@@ -229,7 +229,7 @@ namespace Community.CsharpSqlite
                 int zLoc = 0;
                 int len = 1;
                 string zRet;
-                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = vdbeapi.sqlite3_context_db_handle(context);
                 sqliteinth.UNUSED_PARAMETER(NotUsed);
                 ///
                 ///<summary>
@@ -354,7 +354,7 @@ namespace Community.CsharpSqlite
             /// In this case zWhere is passed to sqlite3DbFree() before returning.
             ///
             ///</summary>
-            public static string whereOrName(sqlite3 db, string zWhere, string zConstant)
+            public static string whereOrName(Connection db, string zWhere, string zConstant)
             {
                 string zNew;
                 if (String.IsNullOrEmpty(zWhere))

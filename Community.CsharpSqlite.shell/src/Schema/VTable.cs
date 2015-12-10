@@ -67,7 +67,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Database connection associated with this table 
             ///</summary>
-            public Community.CsharpSqlite.sqlite3 db;
+            public Community.CsharpSqlite.Connection db;
 
             ///<summary>
             ///Pointer to module implementation 

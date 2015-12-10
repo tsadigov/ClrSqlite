@@ -748,7 +748,7 @@ namespace Community.CsharpSqlite
         ///Database connection currently using this Btree 
         ///</summary>
 
-        public sqlite3 db;
+        public Connection db;
 
         ///
         ///<summary>

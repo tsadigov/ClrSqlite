@@ -86,41 +86,45 @@ namespace Community.CsharpSqlite
         /// databases may be attached.
         ///
         ///</summary>
-        public class Db
+        public class DbBackend
         {
-            public string zName;
+        ///<summary>
+        ///Name of this database  
+        ///</summary>
+        public string Name;
 
-            ///
-            ///<summary>
-            ///Name of this database  
-            ///</summary>
+        ///
+        
 
-            public tree.Btree pBt;
+        ///<summary>
+        ///The B Tree structure for this database file  
+        ///</summary>
+        public tree.Btree BTree;
 
-            ///
-            ///<summary>
-            ///The B Tree structure for this database file  
-            ///</summary>
+        ///
+        
 
-            public u8 inTrans;
+        ///<summary>
+        ///0: not writable.  1: Transaction.  2: Checkpoint  
+        ///</summary>
+        public u8 inTrans;
 
-            ///
-            ///<summary>
-            ///0: not writable.  1: Transaction.  2: Checkpoint  
-            ///</summary>
+        ///
+        
+        ///<summary>
+        ///How aggressive at syncing data to disk  
+        ///</summary>
 
-            public u8 safety_level;
+        public u8 safety_level;
 
-            ///
-            ///<summary>
-            ///How aggressive at syncing data to disk  
-            ///</summary>
+        ///
+        
 
-            public Schema pSchema;
-            ///
-            ///<summary>
-            ///Pointer to database schema (possibly shared)  
-            ///</summary>
+        ///<summary>
+        ///Pointer to database schema (possibly shared)  
+        ///</summary>
+        public Schema pSchema;
+            
 
         };
 

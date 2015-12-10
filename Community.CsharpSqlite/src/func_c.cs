@@ -612,7 +612,7 @@ break;
             ///</summary>
             static void last_insert_rowid(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = vdbeapi.sqlite3_context_db_handle(context);
                 sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
@@ -632,7 +632,7 @@ break;
             ///</summary>
             static void changes(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = vdbeapi.sqlite3_context_db_handle(context);
                 sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 context.sqlite3_result_int(Sqlite3.sqlite3_changes(db));
             }
@@ -643,7 +643,7 @@ break;
             ///</summary>
             static void total_changes(sqlite3_context context, int NotUsed, sqlite3_value[] NotUsed2)
             {
-                sqlite3 db = (sqlite3)vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = (Connection)vdbeapi.sqlite3_context_db_handle(context);
                 sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 ///
                 ///<summary>
@@ -949,7 +949,7 @@ break;
                 string zA, zB;
                 u32 escape = 0;
                 int nPat;
-                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = vdbeapi.sqlite3_context_db_handle(context);
                 zB = vdbeapi.sqlite3_value_text(argv[0]);
                 zA = vdbeapi.sqlite3_value_text(argv[1]);
                 ///
@@ -1265,7 +1265,7 @@ break;
             static void zeroblobFunc(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
                 i64 n;
-                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = vdbeapi.sqlite3_context_db_handle(context);
                 Debug.Assert(argc == 1);
                 sqliteinth.UNUSED_PARAMETER(argc);
                 n = vdbeapi.sqlite3_value_int64(argv[0]);
@@ -1645,7 +1645,7 @@ sqlite3_result_text(context, "?000", 4, Sqlite3.SQLITE_STATIC);
             {
                 string zFile = vdbeapi.sqlite3_value_text(argv[0]);
                 string zProc;
-                sqlite3 db = (sqlite3)vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = (Connection)vdbeapi.sqlite3_context_db_handle(context);
                 string zErrMsg = "";
                 if (argc == 2)
                 {
@@ -1898,7 +1898,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 //pAccum = pMem._StrAccum;
                 //if ( pMem._StrAccum != null )
                 //{
-                sqlite3 db = vdbeapi.sqlite3_context_db_handle(context);
+                Connection db = vdbeapi.sqlite3_context_db_handle(context);
                 //int firstTerm = pMem._StrAccum.useMalloc == 0 ? 1 : 0;
                 //pMem._StrAccum.useMalloc = 2;
                 pMem._StrAccum.mxAlloc = db.aLimit[Globals.SQLITE_LIMIT_LENGTH];
@@ -2006,7 +2006,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                     this.xFinalize = xFinalize;
                 }
             }
-            public static void sqlite3RegisterBuiltinFunctions(sqlite3 db)
+            public static void sqlite3RegisterBuiltinFunctions(Connection db)
             {
                 var rc = Sqlite3.sqlite3_overload_function(db, "MATCH", 2);
                 Debug.Assert(rc == SqlResult.SQLITE_NOMEM || rc == SqlResult.SQLITE_OK);
@@ -2019,7 +2019,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             /// Set the LIKEOPT flag on the 2-argument function with the given name.
             ///
             ///</summary>
-            static void setLikeOptFlag(sqlite3 db, string zName, FuncFlags flagVal)
+            static void setLikeOptFlag(Connection db, string zName, FuncFlags flagVal)
             {
                 FuncDef pDef;
                 pDef = FuncDefTraverse.sqlite3FindFunction(db, zName, StringExtensions.sqlite3Strlen30(zName), 2, SqliteEncoding.UTF8, 0);
@@ -2034,7 +2034,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             /// sensitive.  GLOB is always case sensitive.
             ///
             ///</summary>
-            public static void sqlite3RegisterLikeFunctions(sqlite3 db, int caseSensitive)
+            public static void sqlite3RegisterLikeFunctions(Connection db, int caseSensitive)
             {
                 compareInfo pInfo;
                 if (caseSensitive != 0)
@@ -2059,7 +2059,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             /// return FALSE.
             ///
             ///</summary>
-            public static bool sqlite3IsLikeFunction(sqlite3 db, Expr pExpr, ref bool pIsNocase, char[] aWc)
+            public static bool sqlite3IsLikeFunction(Connection db, Expr pExpr, ref bool pIsNocase, char[] aWc)
             {
                 FuncDef pDef;
                 if (pExpr.Operator != TokenType.TK_FUNCTION || null == pExpr.x.pList || pExpr.x.pList.nExpr != 2)

@@ -26,13 +26,13 @@ namespace Community.CsharpSqlite {
 		static void attachFunc(sqlite3_context context,int NotUsed,sqlite3_value[] argv) {
 			int i;
             SqlResult rc =(SqlResult)0;
-			sqlite3 db=vdbeapi.sqlite3_context_db_handle(context);
+			Connection db=vdbeapi.sqlite3_context_db_handle(context);
 			string zName;
 			string zFile;
 			string zPath="";
 			string zErr="";
 			int flags;
-			Db aNew=null;
+			DbBackend aNew=null;
 			string zErrDyn="";
 			sqlite3_vfs pVfs=null;
 			sqliteinth.UNUSED_PARAMETER(NotUsed);
@@ -49,7 +49,7 @@ namespace Community.CsharpSqlite {
 			///Specified database name already being used.
 			///
 			///</summary>
-			if(db.nDb>=db.aLimit[Globals.SQLITE_LIMIT_ATTACHED]+2) {
+			if(db.BackendCount>=db.aLimit[Globals.SQLITE_LIMIT_ATTACHED]+2) {
 				zErrDyn=io.sqlite3MPrintf(db,"too many attached databases - max %d",db.aLimit[Globals.SQLITE_LIMIT_ATTACHED]);
 				goto attach_error;
 			}
@@ -57,8 +57,8 @@ namespace Community.CsharpSqlite {
 				zErrDyn=io.sqlite3MPrintf(db,"cannot ATTACH database within transaction");
 				goto attach_error;
 			}
-			for(i=0;i<db.nDb;i++) {
-				string z=db.aDb[i].zName;
+			for(i=0;i<db.BackendCount;i++) {
+				string z=db.Backends[i].Name;
 				Debug.Assert(z!=null&&zName!=null);
 				if(z.Equals(zName,StringComparison.InvariantCultureIgnoreCase)) {
 					zErrDyn=io.sqlite3MPrintf(db,"database %s is already in use",zName);
@@ -82,16 +82,16 @@ namespace Community.CsharpSqlite {
 			//  if( aNew==0 ) return;
 			//  memcpy(aNew, db.aDb, sizeof(db.aDb[0])*2);
 			//}else {
-			if(db.aDb.Length<=db.nDb)
-				Array.Resize(ref db.aDb,db.nDb+1);
+			if(db.Backends.Length<=db.BackendCount)
+				Array.Resize(ref db.Backends,db.BackendCount+1);
 			//aNew = sqlite3DbRealloc(db, db.aDb, sizeof(db.aDb[0])*(db.nDb+1) );
-			if(db.aDb==null)
+			if(db.Backends==null)
 				return;
 			// if( aNew==0 ) return;
 			//}
-			db.aDb[db.nDb]=new Db();
+			db.Backends[db.BackendCount]=new DbBackend();
 			//db.aDb = aNew;
-			aNew=db.aDb[db.nDb];
+			aNew=db.Backends[db.BackendCount];
 			//memset(aNew, 0, sizeof(*aNew));
 			//  memset(aNew, 0, sizeof(*aNew));
 			///
@@ -112,9 +112,9 @@ namespace Community.CsharpSqlite {
 			}
 			Debug.Assert(pVfs!=null);
 			flags|=SQLITE_OPEN_MAIN_DB;
-			rc=Btree.Open(pVfs,zPath,db,ref aNew.pBt,0,(int)flags);
+			rc=Btree.Open(pVfs,zPath,db,ref aNew.BTree,0,(int)flags);
 			//malloc_cs.sqlite3_free( zPath );
-			db.nDb++;
+			db.BackendCount++;
             if (rc == SqlResult.SQLITE_CONSTRAINT)
             {
 				rc=SqlResult.SQLITE_ERROR;
@@ -123,7 +123,7 @@ namespace Community.CsharpSqlite {
 			else
 				if(rc==SqlResult.SQLITE_OK) {
 					Pager pPager;
-					aNew.pSchema= aNew.pBt.sqlite3SchemaGet(db);
+					aNew.pSchema= aNew.BTree.sqlite3SchemaGet(db);
 					//if ( aNew.pSchema == null )
 					//{
 					//  rc = SQLITE_NOMEM;
@@ -133,12 +133,12 @@ namespace Community.CsharpSqlite {
 						zErrDyn=io.sqlite3MPrintf(db,"attached databases must use the same text encoding as main database");
 						rc=SqlResult.SQLITE_ERROR;
 					}
-					pPager=aNew.pBt.sqlite3BtreePager();
+					pPager=aNew.BTree.sqlite3BtreePager();
 					pPager.sqlite3PagerLockingMode(db.dfltLockMode);
-					aNew.pBt.sqlite3BtreeSecureDelete(db.aDb[0].pBt.sqlite3BtreeSecureDelete(-1));
+					aNew.BTree.sqlite3BtreeSecureDelete(db.Backends[0].BTree.sqlite3BtreeSecureDelete(-1));
 				}
 			aNew.safety_level=3;
-			aNew.zName=zName;
+			aNew.Name=zName;
 			//sqlite3DbStrDup(db, zName);
 			//if( rc==SqlResult.SQLITE_OK && aNew.zName==0 ){
 			//  rc = SQLITE_NOMEM;
@@ -162,7 +162,7 @@ namespace Community.CsharpSqlite {
 				nKey=vdbeapi.sqlite3_value_bytes(argv[2]);
                 zKey = vdbeapi.sqlite3_value_blob(argv[2]).ToString();
 				// (char *)sqlite3_value_blob(argv[2]);
-                rc = crypto.sqlite3CodecAttach(db, db.nDb - 1, zKey, nKey);
+                rc = crypto.sqlite3CodecAttach(db, db.BackendCount - 1, zKey, nKey);
 				break;
                     case FoundationalType.SQLITE_NULL:
 				///
@@ -171,8 +171,8 @@ namespace Community.CsharpSqlite {
 				///</summary>
 				crypto.sqlite3CodecGetKey(db,0,out zKey,out nKey);
 				//sqlite3CodecGetKey(db, 0, (void**)&zKey, nKey);
-				if(nKey>0||db.aDb[0].pBt.GetReserve()>0) {
-                    rc = crypto.sqlite3CodecAttach(db, db.nDb - 1, zKey, nKey);
+				if(nKey>0||db.Backends[0].BTree.GetReserve()>0) {
+                    rc = crypto.sqlite3CodecAttach(db, db.BackendCount - 1, zKey, nKey);
 				}
 				break;
 				}
@@ -191,15 +191,15 @@ namespace Community.CsharpSqlite {
 				sqlite3BtreeLeaveAll(db);
 			}
 			if(rc!=0) {
-				int iDb=db.nDb-1;
+				int iDb=db.BackendCount-1;
 				Debug.Assert(iDb>=2);
-				if(db.aDb[iDb].pBt!=null) {
-					BTreeMethods.sqlite3BtreeClose(ref db.aDb[iDb].pBt);
-					db.aDb[iDb].pBt=null;
-					db.aDb[iDb].pSchema=null;
+				if(db.Backends[iDb].BTree!=null) {
+					BTreeMethods.sqlite3BtreeClose(ref db.Backends[iDb].BTree);
+					db.Backends[iDb].BTree=null;
+					db.Backends[iDb].pSchema=null;
 				}
 				build.sqlite3ResetInternalSchema(db,-1);
-				db.nDb=iDb;
+				db.BackendCount=iDb;
                 if (rc == SqlResult.SQLITE_NOMEM || rc == SqlResult.SQLITE_IOERR_NOMEM)
                 {
 					////        db.mallocFailed = 1;
@@ -236,21 +236,21 @@ namespace Community.CsharpSqlite {
 		static void detachFunc(sqlite3_context context,int NotUsed,sqlite3_value[] argv) {
 			string zName=zName=argv[0].z!=null&&(argv[0].z.Length>0)?vdbeapi.sqlite3_value_text(argv[0]):"";
 			//(vdbeapi.sqlite3_value_text(argv[0]);
-			sqlite3 db=vdbeapi.sqlite3_context_db_handle(context);
+			Connection db=vdbeapi.sqlite3_context_db_handle(context);
 			int i;
-			Db pDb=null;
+			DbBackend pDb=null;
 			StringBuilder zErr=new StringBuilder(200);
 			sqliteinth.UNUSED_PARAMETER(NotUsed);
 			if(zName==null)
 				zName="";
-			for(i=0;i<db.nDb;i++) {
-				pDb=db.aDb[i];
-				if(pDb.pBt==null)
+			for(i=0;i<db.BackendCount;i++) {
+				pDb=db.Backends[i];
+				if(pDb.BTree==null)
 					continue;
-				if(pDb.zName.Equals(zName,StringComparison.InvariantCultureIgnoreCase))
+				if(pDb.Name.Equals(zName,StringComparison.InvariantCultureIgnoreCase))
 					break;
 			}
-			if(i>=db.nDb) {
+			if(i>=db.BackendCount) {
 				 io.sqlite3_snprintf(200,zErr,"no such database: %s",zName);
 				goto detach_error;
 			}
@@ -262,12 +262,12 @@ namespace Community.CsharpSqlite {
 				io.sqlite3_snprintf(200,zErr,"cannot DETACH database within transaction");
 				goto detach_error;
 			}
-			if(pDb.pBt.sqlite3BtreeIsInReadTrans()||pDb.pBt.sqlite3BtreeIsInBackup()) {
+			if(pDb.BTree.sqlite3BtreeIsInReadTrans()||pDb.BTree.sqlite3BtreeIsInBackup()) {
 				io.sqlite3_snprintf(200,zErr,"database %s is locked",zName);
 				goto detach_error;
 			}
-			BTreeMethods.sqlite3BtreeClose(ref pDb.pBt);
-			pDb.pBt=null;
+			BTreeMethods.sqlite3BtreeClose(ref pDb.BTree);
+			pDb.BTree=null;
 			pDb.pSchema=null;
 			build.sqlite3ResetInternalSchema(db,-1);
 			return;

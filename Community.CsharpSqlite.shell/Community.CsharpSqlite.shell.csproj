@@ -350,6 +350,7 @@
     <Compile Include="src\MyHelpers.cs" />
     <Compile Include="src\Os\OpenMode.cs" />
     <Compile Include="src\Schema\Builtin.cs" />
+    <Compile Include="src\Schema\SchemaExtensions.cs" />
     <Compile Include="src\Schema\Traverse\FuncDefTraverse.cs" />
     <Compile Include="src\Backend\tree\BTree.cs" />
     <Compile Include="src\Backend\tree\BtreeExtensions.cs" />

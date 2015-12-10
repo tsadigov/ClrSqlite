@@ -82,7 +82,7 @@ namespace Community.CsharpSqlite {
 		/// function. If an error occurs while doing so, return 0 and write an
 		/// error message to pErrorDb.
 		///</summary>
-		static Btree findBtree(sqlite3 pErrorDb,sqlite3 pDb,string zDb) {
+		static Btree findBtree(Connection pErrorDb,Connection pDb,string zDb) {
             int i = pDb.sqlite3FindDbName(zDb);
 			if(i==1) {
 				Parse pParse;
@@ -110,7 +110,7 @@ namespace Community.CsharpSqlite {
 				utilc.sqlite3Error(pErrorDb,SqlResult.SQLITE_ERROR,"unknown database %s",zDb);
 				return null;
 			}
-			return pDb.aDb[i].pBt;
+			return pDb.Backends[i].BTree;
 		}
 		///<summary>
 		/// Create an sqlite3_backup process to copy the contents of zSrcDb from
@@ -120,7 +120,7 @@ namespace Community.CsharpSqlite {
 		/// If an error occurs, NULL is returned and an error code and error message
 		/// stored in database handle pDestDb.
 		///</summary>
-		static public sqlite3_backup sqlite3_backup_init(sqlite3 pDestDb,///
+		static public sqlite3_backup sqlite3_backup_init(Connection pDestDb,///
 		///<summary>
 		///Database to write to 
 		///</summary>
@@ -128,7 +128,7 @@ namespace Community.CsharpSqlite {
 		///<summary>
 		///Name of database within pDestDb 
 		///</summary>
-		sqlite3 pSrcDb,///
+		Connection pSrcDb,///
 		///<summary>
 		///Database connection to read from 
 		///</summary>
@@ -225,7 +225,7 @@ namespace Community.CsharpSqlite {
     ///</summary>
     public class sqlite3_backup
     {
-        public sqlite3 pDestDb;
+        public Connection pDestDb;
         ///
         ///<summary>
         ///Destination database handle 
@@ -250,7 +250,7 @@ namespace Community.CsharpSqlite {
         ///<summary>
         ///Page number of the next source page to copy 
         ///</summary>
-        public sqlite3 pSrcDb;
+        public Connection pSrcDb;
         ///
         ///<summary>
         ///Source database handle 

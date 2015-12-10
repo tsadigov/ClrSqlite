@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Text;
+using System.Linq;
 using sqlite_int64=System.Int64;
 using unsigned=System.Int32;
 using i16=System.Int16;
@@ -669,7 +670,7 @@ break;
 		/// the lookaside memory.
 		///
 		///</summary>
-		static SqlResult setupLookaside(sqlite3 db,byte[] pBuf,int sz,int cnt) {
+		static SqlResult setupLookaside(Connection db,byte[] pBuf,int sz,int cnt) {
 			//void* pStart;
 			//if ( db.lookaside.nOut )
 			//{
@@ -734,14 +735,14 @@ break;
 		/// Return the mutex associated with a database connection.
 		///
 		///</summary>
-		static sqlite3_mutex sqlite3_db_mutex(sqlite3 db) {
+		static sqlite3_mutex sqlite3_db_mutex(Connection db) {
 			return db.mutex;
 		}
 		///<summary>
 		/// Configuration settings for an individual database connection
 		///
 		///</summary>
-		static SqlResult sqlite3_db_config(sqlite3 db,int op,params object[] ap) {
+		static SqlResult sqlite3_db_config(Connection db,int op,params object[] ap) {
 			SqlResult rc;
 			//va_list ap;
 			lock(_Custom.lock_va_list) {
@@ -864,21 +865,21 @@ break;
 		/// Return the ROWID of the most recent insert
 		///
 		///</summary>
-		static public sqlite_int64 sqlite3_last_insert_rowid(sqlite3 db) {
+		static public sqlite_int64 sqlite3_last_insert_rowid(Connection db) {
 			return db.lastRowid;
 		}
 		///<summary>
 		/// Return the number of changes in the most recent call to sqlite3_exec().
 		///
 		///</summary>
-		static public int sqlite3_changes(sqlite3 db) {
+		static public int sqlite3_changes(Connection db) {
 			return db.nChange;
 		}
 		///<summary>
 		/// Return the number of changes since the database handle was opened.
 		///
 		///</summary>
-		static public int sqlite3_total_changes(sqlite3 db) {
+		static public int sqlite3_total_changes(Connection db) {
 			return db.nTotalChange;
 		}
 		///<summary>
@@ -887,7 +888,7 @@ break;
 		/// at the b-tree/pager level.
 		///
 		///</summary>
-		public static void sqlite3CloseSavepoints(sqlite3 db) {
+		public static void sqlite3CloseSavepoints(Connection db) {
 			while(db.pSavepoint!=null) {
 				Savepoint pTmp=db.pSavepoint;
 				db.pSavepoint=pTmp.pNext;
@@ -904,7 +905,7 @@ break;
 		/// with SqliteEncoding.ANY as the encoding.
 		///
 		///</summary>
-		static void functionDestroy(sqlite3 db,FuncDef p) {
+		static void functionDestroy(Connection db,FuncDef p) {
 			FuncDestructor pDestructor=p.pDestructor;
 			if(pDestructor!=null) {
 				pDestructor.nRef--;
@@ -918,7 +919,7 @@ break;
 		/// Close an existing SQLite database
 		///
 		///</summary>
-		public static SqlResult sqlite3_close(sqlite3 db) {
+		public static SqlResult sqlite3_close(Connection db) {
 			HashElem i;
 			///
 			///<summary>
@@ -958,8 +959,13 @@ break;
 				return SqlResult.SQLITE_BUSY;
 			}
 			Debug.Assert(utilc.sqlite3SafetyCheckSickOrOk(db));
-			for(j=0;j<db.nDb;j++) {
-				Btree pBt=db.aDb[j].pBt;
+
+
+            var backends = db.Backends.Take(db.BackendCount);
+
+            
+			foreach(var backend in backends) {
+				Btree pBt=backend.BTree;
 				if(pBt!=null&&pBt.sqlite3BtreeIsInBackup()) {
 					utilc.sqlite3Error(db, SqlResult.SQLITE_BUSY, "unable to close due to unfinished backup operation");
 					db.mutex.sqlite3_mutex_leave();
@@ -971,11 +977,11 @@ break;
 			///Free any outstanding Savepoint structures. 
 			///</summary>
 			sqlite3CloseSavepoints(db);
-			for(j=0;j<db.nDb;j++) {
-				Db pDb=db.aDb[j];
-				if(pDb.pBt!=null) {
-                    BTreeMethods.sqlite3BtreeClose(ref pDb.pBt);
-					pDb.pBt=null;
+			for(j=0;j<db.BackendCount;j++) {
+				DbBackend pDb=db.Backends[j];
+				if(pDb.BTree!=null) {
+                    BTreeMethods.sqlite3BtreeClose(ref pDb.BTree);
+					pDb.BTree=null;
 					if(j!=1) {
 						pDb.pSchema=null;
 					}
@@ -989,8 +995,8 @@ break;
 			///<param name="locks and does not require any further unlock">notify callbacks.</param>
 			///<param name=""></param>
 			sqliteinth.sqlite3ConnectionClosed(db);
-			Debug.Assert(db.nDb<=2);
-			Debug.Assert(db.aDb[0].Equals(db.aDbStatic[0]));
+			Debug.Assert(db.BackendCount<=2);
+			Debug.Assert(db.Backends[0].Equals(db.aDbStatic[0]));
 			for(j=0;j<Sqlite3.ArraySize(db.aFunc.a);j++) {
 				FuncDef pNext,pHash,p;
 				for(p=db.aFunc.a[j];p!=null;p=pHash) {
@@ -1050,7 +1056,7 @@ break;
 			///structure?
 			///
 			///</summary>
-			db.sqlite3DbFree(ref db.aDb[1].pSchema);
+			db.sqlite3DbFree(ref db.Backends[1].pSchema);
 			db.mutex.sqlite3_mutex_leave();
             db.magic = Sqlite3.SQLITE_MAGIC_CLOSED;
 			sqlite3_mutex_free(db.mutex);
@@ -1066,24 +1072,30 @@ break;
 			//malloc_cs.sqlite3_free( ref db );
 			return SqlResult.SQLITE_OK;
 		}
-		///<summary>
-		/// Rollback all database files.
-		///
-		///</summary>
-		public static void sqlite3RollbackAll(sqlite3 db) {
-			int i;
-			int inTrans=0;
-			Debug.Assert(db.mutex.sqlite3_mutex_held());
-			sqlite3BeginBenignMalloc();
-			for(i=0;i<db.nDb;i++) {
-				if(db.aDb[i].pBt!=null) {
-					if(db.aDb[i].pBt.sqlite3BtreeIsInTrans()) {
-						inTrans=1;
-					}
-					db.aDb[i].pBt.sqlite3BtreeRollback();
-					db.aDb[i].inTrans=0;
-				}
-			}
+        ///<summary>
+        /// Rollback all database files.
+        ///
+        ///</summary>
+        public static void sqlite3RollbackAll(Connection db) {
+            int i;
+            int inTrans = 0;
+            Debug.Assert(db.mutex.sqlite3_mutex_held());
+            sqlite3BeginBenignMalloc();
+
+            db.Backends.Take(db.BackendCount).ForEach(
+                    dbFile => {
+                        if (dbFile.BTree != null)
+                        {
+                            if (dbFile.BTree.sqlite3BtreeIsInTrans())
+                            {
+                                inTrans = 1;
+                            }
+                            dbFile.BTree.sqlite3BtreeRollback();
+                            dbFile.inTrans = 0;
+                        }
+                    }
+                );
+			
             VTableMethodsExtensions.sqlite3VtabRollback(db);
 			sqlite3EndBenignMalloc();
             if ((db.flags & SqliteFlags.SQLITE_InternChanges) != 0)
@@ -1091,15 +1103,9 @@ break;
                 vdbeaux.sqlite3ExpirePreparedStatements(db);
 				build.sqlite3ResetInternalSchema(db,-1);
 			}
-			///
-			///<summary>
 			///Any deferred constraint violations have now been resolved. 
-			///</summary>
 			db.nDeferredCons=0;
-			///
-			///<summary>
-			///</summary>
-			///<param name="If one has been configured, invoke the rollback">hook callback </param>
+			///If one has been configured, invoke the rollback-hook callback 
 			if(db.xRollbackCallback!=null&&(inTrans!=0||0==db.autoCommit)) {
 				db.xRollbackCallback(db.pRollbackArg);
 			}
@@ -1306,7 +1312,7 @@ break;
 			};
 			//# define NDELAY Sqlite3.ArraySize(delays)
 			int NDELAY=Sqlite3.ArraySize(delays);
-			sqlite3 db=(sqlite3)ptr;
+			Connection db=(Connection)ptr;
 			int timeout=db.busyTimeout;
 			int delay,prior;
 			Debug.Assert(count>=0);
@@ -1362,7 +1368,7 @@ return 1;
 		/// given callback function with the given argument.
 		///
 		///</summary>
-		static SqlResult sqlite3_busy_handler(sqlite3 db,dxBusy xBusy,object pArg) {
+		static SqlResult sqlite3_busy_handler(Connection db,dxBusy xBusy,object pArg) {
 			db.mutex.sqlite3_mutex_enter();
 			db.busyHandler.xFunc=xBusy;
 			db.busyHandler.pArg=pArg;
@@ -1376,7 +1382,7 @@ return 1;
 		/// given callback function with the given argument. The progress callback will
 		/// be invoked every nOps opcodes.
 		///</summary>
-		static void sqlite3_progress_handler(sqlite3 db,int nOps,dxProgress xProgress,//int (xProgress)(void),
+		static void sqlite3_progress_handler(Connection db,int nOps,dxProgress xProgress,//int (xProgress)(void),
 		object pArg) {
 			db.mutex.sqlite3_mutex_enter();
 			if(nOps>0) {
@@ -1396,7 +1402,7 @@ return 1;
 		/// This routine installs a default busy handler that waits for the
 		/// specified number of milliseconds before returning 0.
 		///</summary>
-		static public SqlResult sqlite3_busy_timeout(sqlite3 db,int ms) {
+		static public SqlResult sqlite3_busy_timeout(Connection db,int ms) {
 			if(ms>0) {
 				db.busyTimeout=ms;
 				sqlite3_busy_handler(db,sqliteDefaultBusyCallback,db);
@@ -1410,7 +1416,7 @@ return 1;
 		/// Cause any pending operation to stop at its earliest opportunity.
 		///
 		///</summary>
-		static void sqlite3_interrupt(sqlite3 db) {
+		static void sqlite3_interrupt(Connection db) {
 			db.u1.isInterrupted=true;
 		}
 		///<summary>
@@ -1420,7 +1426,7 @@ return 1;
 		/// is returned and the mallocFailed flag cleared.
 		///
 		///</summary>
-		public static SqlResult sqlite3CreateFunc(sqlite3 db,string zFunctionName,int nArg,SqliteEncoding enc,object pUserData,dxFunc xFunc,//)(sqlite3_context*,int,sqlite3_value *),
+		public static SqlResult sqlite3CreateFunc(Connection db,string zFunctionName,int nArg,SqliteEncoding enc,object pUserData,dxFunc xFunc,//)(sqlite3_context*,int,sqlite3_value *),
 		dxStep xStep,//)(sqlite3_context*,int,sqlite3_value *),
 		dxFinal xFinal,//)(sqlite3_context),
 		FuncDestructor pDestructor) {
@@ -1507,13 +1513,13 @@ enc = SqliteEncoding.UTF16BE;
 		/// Create new user functions.
 		///
 		///</summary>
-		static public SqlResult sqlite3_create_function(sqlite3 db,string zFunc,int nArg,SqliteEncoding enc,object p,dxFunc xFunc,//)(sqlite3_context*,int,sqlite3_value *),
+		static public SqlResult sqlite3_create_function(Connection db,string zFunc,int nArg,SqliteEncoding enc,object p,dxFunc xFunc,//)(sqlite3_context*,int,sqlite3_value *),
 		dxStep xStep,//)(sqlite3_context*,int,sqlite3_value *),
 		dxFinal xFinal//)(sqlite3_context)
 		) {
 			return sqlite3_create_function_v2(db,zFunc,nArg,enc,p,xFunc,xStep,xFinal,null);
 		}
-		static SqlResult sqlite3_create_function_v2(sqlite3 db,string zFunc,int nArg,SqliteEncoding enc,object p,dxFunc xFunc,//)(sqlite3_context*,int,sqlite3_value *),
+		static SqlResult sqlite3_create_function_v2(Connection db,string zFunc,int nArg,SqliteEncoding enc,object p,dxFunc xFunc,//)(sqlite3_context*,int,sqlite3_value *),
 		dxStep xStep,//)(sqlite3_context*,int,sqlite3_value *),
 		dxFinal xFinal,//)(sqlite3_context)
 		dxFDestroy xDestroy//)(void )
@@ -1577,7 +1583,7 @@ return rc;
 		/// A global function must exist in order for name resolution to work
 		/// properly.
 		///</summary>
-		public static SqlResult sqlite3_overload_function(sqlite3 db,string zName,int nArg) {
+		public static SqlResult sqlite3_overload_function(Connection db,string zName,int nArg) {
 			int nName=StringExtensions.sqlite3Strlen30(zName);
             SqlResult rc;
 			db.mutex.sqlite3_mutex_enter();
@@ -1598,7 +1604,7 @@ return rc;
 		/// trace is a pointer to a function that is invoked at the start of each
 		/// SQL statement.
 		///</summary>
-		static object sqlite3_trace(sqlite3 db,dxTrace xTrace,object pArg) {
+		static object sqlite3_trace(Connection db,dxTrace xTrace,object pArg) {
 			// (*xTrace)(void*,const char), object pArg){
 			object pOld;
 			db.mutex.sqlite3_mutex_enter();
@@ -1617,7 +1623,7 @@ return rc;
 		/// each SQL statement that is run.
 		///
 		///</summary>
-		static object sqlite3_profile(sqlite3 db,dxProfile xProfile,//void (*xProfile)(void*,const char*,sqlite_u3264),
+		static object sqlite3_profile(Connection db,dxProfile xProfile,//void (*xProfile)(void*,const char*,sqlite_u3264),
 		object pArg) {
 			object pOld;
 			db.mutex.sqlite3_mutex_enter();
@@ -1635,7 +1641,7 @@ return rc;
 		/// If the invoked function returns non-zero, then the commit becomes a
 		/// rollback.
 		///</summary>
-		static object sqlite3_commit_hook(sqlite3 db,///
+		static object sqlite3_commit_hook(Connection db,///
 		///<summary>
 		///Attach the hook to this database 
 		///</summary>
@@ -1658,7 +1664,7 @@ return rc;
 		/// inserted or deleted using this database connection.
 		///
 		///</summary>
-		static object sqlite3_update_hook(sqlite3 db,///
+		static object sqlite3_update_hook(Connection db,///
 		///<summary>
 		///Attach the hook to this database 
 		///</summary>
@@ -1681,7 +1687,7 @@ return rc;
 		/// back by this database connection.
 		///
 		///</summary>
-		static object sqlite3_rollback_hook(sqlite3 db,///
+		static object sqlite3_rollback_hook(Connection db,///
 		///<summary>
 		///Attach the hook to this database 
 		///</summary>
@@ -1731,7 +1737,7 @@ return SqlResult.SQLITE_OK;
 		/// using sqlite3_wal_hook() disables the automatic checkpoint mechanism
 		/// configured by this function.
 		///</summary>
-		static SqlResult sqlite3_wal_autocheckpoint(sqlite3 db,int nFrame) {
+		static SqlResult sqlite3_wal_autocheckpoint(Connection db,int nFrame) {
 			#if SQLITE_OMIT_WAL
 			sqliteinth.UNUSED_PARAMETER(db);
 			sqliteinth.UNUSED_PARAMETER(nFrame);
@@ -1749,7 +1755,7 @@ sqlite3_wal_hook(db, 0, 0);
 		/// into the write-ahead-log by this database connection.
 		///
 		///</summary>
-		static object sqlite3_wal_hook(sqlite3 db,///
+		static object sqlite3_wal_hook(Connection db,///
 		///<summary>
 		///Attach the hook to this db handle 
 		///</summary>
@@ -1775,7 +1781,7 @@ return pRet;
 		/// Checkpoint database zDb.
 		///
 		///</summary>
-		static SqlResult sqlite3_wal_checkpoint_v2(sqlite3 db,///
+		static SqlResult sqlite3_wal_checkpoint_v2(Connection db,///
 		///<summary>
 		///Database handle 
 		///</summary>
@@ -1837,7 +1843,7 @@ return pRet;
 		/// checkpointed.
 		///
 		///</summary>
-		static SqlResult sqlite3_wal_checkpoint(sqlite3 db,string zDb) {
+		static SqlResult sqlite3_wal_checkpoint(Connection db,string zDb) {
 			int dummy;
 			return sqlite3_wal_checkpoint_v2(db,zDb,SQLITE_CHECKPOINT_PASSIVE,out dummy,out dummy);
 		}
@@ -1906,7 +1912,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 		///   3                     any                memory    (return 1)
 		///
 		///</summary>
-        public  static bool sqlite3TempInMemory(sqlite3 db)
+        public  static bool sqlite3TempInMemory(Connection db)
         {
 			//#if SQLITE_TEMP_STORE==1
             if (sqliteinth.SQLITE_TEMP_STORE == 1)
@@ -1932,7 +1938,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 		///<param name="Return UTF">8 encoded English language explanation of the most recent</param>
 		///<param name="error.">error.</param>
 		///<param name=""></param>
-		public static string sqlite3_errmsg(sqlite3 db) {
+		public static string sqlite3_errmsg(Connection db) {
 			string z;
 			if(db==null) {
 				return sqlite3ErrStr(SqlResult.SQLITE_NOMEM);
@@ -2007,7 +2013,7 @@ return z;
 		///Return the most recent error code generated by an SQLite routine. If NULL is
 		///passed to this function, we assume a malloc() failed during sqlite3_open().
 		///</summary>
-		static public SqlResult sqlite3_errcode(sqlite3 db) {
+		static public SqlResult sqlite3_errcode(Connection db) {
 			if(db!=null&&!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
@@ -2020,7 +2026,7 @@ return z;
 			}
 			return db.errCode&db.errMask;
 		}
-		static SqlResult sqlite3_extended_errcode(sqlite3 db) {
+		static SqlResult sqlite3_extended_errcode(Connection db) {
 			if(db!=null&&!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
@@ -2039,20 +2045,16 @@ return z;
 		///and the encoding is enc.
 		///
 		///</summary>
-		static SqlResult createCollation(sqlite3 db,string zName,SqliteEncoding enc,CollationType collType,object pCtx,dxCompare xCompare,//)(void*,int,const void*,int,const void),
+		static SqlResult createCollation(Connection db,string zName,SqliteEncoding enc,CollationType collType,object pCtx,dxCompare xCompare,//)(void*,int,const void*,int,const void),
 		dxDelCollSeq xDel//)(void)
 		) {
 			CollSeq pColl;
 			SqliteEncoding enc2;
 			int nName=StringExtensions.sqlite3Strlen30(zName);
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
-			///
-			///<summary>
 			///If SqliteEncoding.UTF16 is specified as the encoding type, transform this
 			///to one of SqliteEncoding.UTF16LE or SqliteEncoding.UTF16BE using the
 			///SqliteEncoding.UTF16NATIVE macro. SqliteEncoding.UTF16 is not used internally.
-			///
-			///</summary>
 			enc2=enc;
 			sqliteinth.testcase(enc2==SqliteEncoding.UTF16);
 			sqliteinth.testcase(enc2==SqliteEncoding.UTF16_ALIGNED);
@@ -2062,13 +2064,9 @@ return z;
 			if(enc2<SqliteEncoding.UTF8||enc2>SqliteEncoding.UTF16BE) {
 				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
-			///
-			///<summary>
 			///Check if this call is removing or replacing an existing collation
 			///sequence. If so, and there are active VMs, return busy. If there
-			///</summary>
-			///<param name="are no active VMs, invalidate any pre">compiled statements.</param>
-			///<param name=""></param>
+			///are no active VMs, invalidate any pre-compiled statements.
 			pColl=db.sqlite3FindCollSeq(enc2,zName,0);
 			if(pColl!=null&&pColl.xCmp!=null) {
 				if(db.activeVdbeCnt!=0) {
@@ -2177,7 +2175,7 @@ return z;
 		///<param name="It merely prevents new constructs that exceed the limit">It merely prevents new constructs that exceed the limit</param>
 		///<param name="from forming.">from forming.</param>
 		///<param name=""></param>
-		static int sqlite3_limit(sqlite3 db,int limitId,int newLimit) {
+		static int sqlite3_limit(Connection db,int limitId,int newLimit) {
 			int oldLimit;
 			///
 			///<summary>
@@ -2471,11 +2469,11 @@ return z;
         ///</summary>
 		static SqlResult openDatabase(
             string zFilename,///Database filename UTF-8 encoded </param>
-		    out sqlite3 ppDb,///OUT: Returned database handle 		
+		    out Connection ppDb,///OUT: Returned database handle 		
 		    int flags,///Operational flags 
 		    string zVfs///Name of the VFS to use 
 		) {
-			sqlite3 db;
+			Connection connection;
 			///Store allocated handle here 
 			SqlResult rc;
 			///Return code 
@@ -2551,32 +2549,32 @@ return z;
 			///<summary>
 			///Allocate the sqlite data structure 
 			///</summary>
-			db=new sqlite3();
+			connection=new Connection();
 			//malloc_cs.sqlite3MallocZero( sqlite3.Length );
-			if(db==null)
+			if(connection==null)
 				goto opendb_out;
 			if(sqliteinth.sqlite3GlobalConfig.bFullMutex&&isThreadsafe!=0) {
-				db.mutex=sqlite3MutexAlloc(SQLITE_MUTEX_RECURSIVE);
-				if(db.mutex==null) {
+				connection.mutex=sqlite3MutexAlloc(SQLITE_MUTEX_RECURSIVE);
+				if(connection.mutex==null) {
 					//malloc_cs.sqlite3_free( ref db );
 					goto opendb_out;
 				}
 			}
-			db.mutex.sqlite3_mutex_enter();
-			db.errMask=(SqlResult)0xff;
-			db.nDb=2;
-            db.magic = Sqlite3.SQLITE_MAGIC_BUSY;
-			Array.Copy(db.aDbStatic,db.aDb,db.aDbStatic.Length);
+			connection.mutex.sqlite3_mutex_enter();
+			connection.errMask=(SqlResult)0xff;
+			connection.BackendCount=2;
+            connection.magic = Sqlite3.SQLITE_MAGIC_BUSY;
+			Array.Copy(connection.aDbStatic,connection.Backends,connection.aDbStatic.Length);
 			// db.aDb = db.aDbStatic;
-			Debug.Assert(db.aLimit.Length==aHardLimit.Length);
-			Buffer.BlockCopy(aHardLimit,0,db.aLimit,0,aHardLimit.Length*sizeof(int));
+			Debug.Assert(connection.aLimit.Length==aHardLimit.Length);
+			Buffer.BlockCopy(aHardLimit,0,connection.aLimit,0,aHardLimit.Length*sizeof(int));
 			//memcpy(db.aLimit, aHardLimit, sizeof(db.aLimit));
-			db.autoCommit=1;
-			db.nextAutovac=-1;
-			db.nextPagesize=0;
-            db.flags |= SqliteFlags.SQLITE_ShortColNames | SqliteFlags.SQLITE_AutoIndex | SqliteFlags.SQLITE_EnableTrigger;
+			connection.autoCommit=1;
+			connection.nextAutovac=-1;
+			connection.nextPagesize=0;
+            connection.flags |= SqliteFlags.SQLITE_ShortColNames | SqliteFlags.SQLITE_AutoIndex | SqliteFlags.SQLITE_EnableTrigger;
 			if(sqliteinth.SQLITE_DEFAULT_FILE_FORMAT<4)
-                db.flags |= SqliteFlags.SQLITE_LegacyFileFmt
+                connection.flags |= SqliteFlags.SQLITE_LegacyFileFmt
 				#if SQLITE_ENABLE_LOAD_EXTENSION
 																																																																																												| SQLITE_LoadExtension
 #endif
@@ -2587,33 +2585,33 @@ return z;
 																																																																																												   | SQLITE_ForeignKeys
 #endif
 				;
-			db.aCollSeq.sqlite3HashInit();
+			connection.aCollSeq.sqlite3HashInit();
 			#if !SQLITE_OMIT_VIRTUALTABLE
-			db.aModule=new Hash();
-			db.aModule.sqlite3HashInit();
+			connection.aModule=new Hash();
+			connection.aModule.sqlite3HashInit();
 			#endif
 			///<param name="Add the default collation sequence BINARY. BINARY works for both UTF">8</param>
 			///<param name="and UTF">16, so add a version for each to avoid any unnecessary</param>
 			///<param name="conversions. The only error that can occur here is a malloc() failure.">conversions. The only error that can occur here is a malloc() failure.</param>
 			///<param name=""></param>
-			createCollation(db,"BINARY",SqliteEncoding.UTF8,CollationType.BINARY,0,binCollFunc,null);
-			createCollation(db,"BINARY",SqliteEncoding.UTF16BE,CollationType.BINARY,0,binCollFunc,null);
-			createCollation(db,"BINARY",SqliteEncoding.UTF16LE,CollationType.BINARY,0,binCollFunc,null);
-			createCollation(db,"RTRIM",SqliteEncoding.UTF8,CollationType.USER,1,binCollFunc,null);
+			createCollation(connection,"BINARY",SqliteEncoding.UTF8,CollationType.BINARY,0,binCollFunc,null);
+			createCollation(connection,"BINARY",SqliteEncoding.UTF16BE,CollationType.BINARY,0,binCollFunc,null);
+			createCollation(connection,"BINARY",SqliteEncoding.UTF16LE,CollationType.BINARY,0,binCollFunc,null);
+			createCollation(connection,"RTRIM",SqliteEncoding.UTF8,CollationType.USER,1,binCollFunc,null);
 			//if ( db.mallocFailed != 0 )
 			//{
 			//  goto opendb_out;
 			//}
-			db.pDfltColl=db.sqlite3FindCollSeq(SqliteEncoding.UTF8,"BINARY",0);
-			Debug.Assert(db.pDfltColl!=null);
+			connection.pDfltColl=connection.sqlite3FindCollSeq(SqliteEncoding.UTF8,"BINARY",0);
+			Debug.Assert(connection.pDfltColl!=null);
 			///<param name="Also add a UTF">insensitive collation sequence. </param>
-			createCollation(db,"NOCASE",SqliteEncoding.UTF8,CollationType.NOCASE,0,nocaseCollatingFunc,null);
+			createCollation(connection,"NOCASE",SqliteEncoding.UTF8,CollationType.NOCASE,0,nocaseCollatingFunc,null);
 			///Parse the filename/URI argument. 
-			db.openFlags=flags;
-			rc=sqlite3ParseUri(zVfs,zFilename,ref flags,ref db.pVfs,ref zOpen,ref zErrMsg);
+			connection.openFlags=flags;
+			rc=sqlite3ParseUri(zVfs,zFilename,ref flags,ref connection.pVfs,ref zOpen,ref zErrMsg);
 			if(rc!=SqlResult.SQLITE_OK) {
 				//if( rc==SQLITE_NOMEM ) db.mallocFailed = 1;
-				utilc.sqlite3Error(db,rc,zErrMsg.Length>0?"%s":"",zErrMsg);
+				utilc.sqlite3Error(connection,rc,zErrMsg.Length>0?"%s":"",zErrMsg);
 				//malloc_cs.sqlite3_free(zErrMsg);
 				goto opendb_out;
 			}
@@ -2621,24 +2619,31 @@ return z;
 			///<summary>
 			///Open the backend database driver 
 			///</summary>
-			rc=Btree.Open(db.pVfs,zOpen,db,ref db.aDb[0].pBt,0,flags|SQLITE_OPEN_MAIN_DB);
+			rc=Btree.Open(connection.pVfs,zOpen,connection,ref connection.Backends[0].BTree,0,flags|SQLITE_OPEN_MAIN_DB);
 			if(rc!=SqlResult.SQLITE_OK) {
 				if(rc== SqlResult.SQLITE_IOERR_NOMEM) {
 					rc=SqlResult.SQLITE_NOMEM;
 				}
-				utilc.sqlite3Error(db,rc,0);
+				utilc.sqlite3Error(connection,rc,0);
 				goto opendb_out;
 			}
-			db.aDb[0].pSchema= SchemaExtensions.sqlite3SchemaGet(db.aDb[0].pBt, db);
-            db.aDb[1].pSchema = SchemaExtensions.sqlite3SchemaGet(null, db);
-			
+
             ///The default safety_level for the main database is 'full'; for the temp
-			///database it is 'NONE'. This matches the pager layer defaults.
-			db.aDb[0].zName="main";
-			db.aDb[0].safety_level=3;
-			db.aDb[1].zName="temp";
-			db.aDb[1].safety_level=1;
-            db.magic = Sqlite3.SQLITE_MAGIC_OPEN;
+            ///database it is 'NONE'. This matches the pager layer defaults.
+            {
+                var main = connection.Backends[0];
+                main.pSchema=SchemaExtensions.sqlite3SchemaGet(main.BTree, connection);
+                main.Name = "main";
+                main.safety_level = 3;
+            }
+            {
+                var temp = connection.Backends[1];
+                temp.pSchema = SchemaExtensions.sqlite3SchemaGet(null, connection);
+                temp.Name = "temp";
+                temp.safety_level = 1;
+            }
+
+            connection.magic = Sqlite3.SQLITE_MAGIC_OPEN;
 			//if ( db.mallocFailed != 0 )
 			//{
 			//  goto opendb_out;
@@ -2647,13 +2652,13 @@ return z;
 			///Register all built-in functions, but do not attempt to read the
 			///database schema yet. This is delayed until the first time the database
 			///is accessed.
-			utilc.sqlite3Error(db,SqlResult.SQLITE_OK,0);
-			PredefinedFunctions.sqlite3RegisterBuiltinFunctions(db);
+			utilc.sqlite3Error(connection,SqlResult.SQLITE_OK,0);
+			PredefinedFunctions.sqlite3RegisterBuiltinFunctions(connection);
 
 			///Load automatic extensions - extensions that have been registered</param>
 			///using the sqlite3_automatic_extension() API.
-			sqlite3AutoLoadExtensions(db);
-			rc=sqlite3_errcode(db);
+			sqlite3AutoLoadExtensions(connection);
+			rc=sqlite3_errcode(connection);
 			if(rc!=SqlResult.SQLITE_OK) {
 				goto opendb_out;
 			}
@@ -2685,7 +2690,7 @@ rc = sqlite3IcuInit(db);
 rc = sqlite3RtreeInit(db);
 }
 #endif
-			utilc.sqlite3Error(db,rc,0);
+			utilc.sqlite3Error(connection,rc,0);
 			///-DSQLITE_DEFAULT_LOCKING_MODE=1 makes EXCLUSIVE the default locking mode.  
             ///-DSQLITE_DEFAULT_LOCKING_MODE=0 make NORMAL the default locking mode.  
             ///-Doing nothing at all also makes NORMAL the default mode.
@@ -2695,24 +2700,24 @@ sqlite3PagerLockingMode(sqlite3BtreePager(db.aDb[0].pBt),
 SQLITE_DEFAULT_LOCKING_MODE);
 #endif
 			///<param name="Enable the lookaside">malloc subsystem </param>
-			setupLookaside(db,null,sqliteinth.sqlite3GlobalConfig.szLookaside,sqliteinth.sqlite3GlobalConfig.nLookaside);
-			sqlite3_wal_autocheckpoint(db,Limits.SQLITE_DEFAULT_WAL_AUTOCHECKPOINT);
+			setupLookaside(connection,null,sqliteinth.sqlite3GlobalConfig.szLookaside,sqliteinth.sqlite3GlobalConfig.nLookaside);
+			sqlite3_wal_autocheckpoint(connection,Limits.SQLITE_DEFAULT_WAL_AUTOCHECKPOINT);
 			opendb_out:
 			//malloc_cs.sqlite3_free(zOpen);
-			if(db!=null) {
-				Debug.Assert(db.mutex!=null||isThreadsafe==0||!sqliteinth.sqlite3GlobalConfig.bFullMutex);
-				db.mutex.sqlite3_mutex_leave();
+			if(connection!=null) {
+				Debug.Assert(connection.mutex!=null||isThreadsafe==0||!sqliteinth.sqlite3GlobalConfig.bFullMutex);
+				connection.mutex.sqlite3_mutex_leave();
 			}
-			rc=sqlite3_errcode(db);
+			rc=sqlite3_errcode(connection);
 			if(rc==SqlResult.SQLITE_NOMEM) {
-				sqlite3_close(db);
-				db=null;
+				sqlite3_close(connection);
+				connection=null;
 			}
 			else
 				if(rc!=SqlResult.SQLITE_OK) {
-                    db.magic = Sqlite3.SQLITE_MAGIC_SICK;
+                    connection.magic = Sqlite3.SQLITE_MAGIC_SICK;
 				}
-			ppDb=db;
+			ppDb=connection;
 			return malloc_cs.sqlite3ApiExit(0,rc);
 		}
 		
@@ -2720,14 +2725,14 @@ SQLITE_DEFAULT_LOCKING_MODE);
         ///<summary>
 		///Open a new database handle.
 		///</summary>
-		static public SqlResult sqlite3_open(string zFilename,out sqlite3 ppDb) {
+		static public SqlResult sqlite3_open(string zFilename,out Connection ppDb) {
 			return openDatabase(zFilename,out ppDb,SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE,null);
 		}
 
 
 		static public SqlResult sqlite3_open_v2(
             string filename,///<param name="Database filename (UTF">8) </param>
-		    out sqlite3 ppDb,///OUT: SQLite db handle 
+		    out Connection ppDb,///OUT: SQLite db handle 
 		    int flags,///Flags 
 		    string zVfs///Name of VFS module to use 
 		) {
@@ -2774,7 +2779,7 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 		///<summary>
 		///Register a new collation sequence with the database handle db.
 		///</summary>
-		static SqlResult sqlite3_create_collation(sqlite3 db,string zName,SqliteEncoding enc,object pCtx,dxCompare xCompare) {
+		static SqlResult sqlite3_create_collation(Connection db,string zName,SqliteEncoding enc,object pCtx,dxCompare xCompare) {
             SqlResult rc;
 			db.mutex.sqlite3_mutex_enter();
 			//Debug.Assert( 0 == db.mallocFailed );
@@ -2787,7 +2792,7 @@ return malloc_cs.sqlite3ApiExit(0, rc);
         ///<summary>
 		///Register a new collation sequence with the database handle db.
 		///</summary>
-		static SqlResult sqlite3_create_collation_v2(sqlite3 db,string zName,SqliteEncoding enc,object pCtx,dxCompare xCompare,//int(*xCompare)(void*,int,const void*,int,const void),
+		static SqlResult sqlite3_create_collation_v2(Connection db,string zName,SqliteEncoding enc,object pCtx,dxCompare xCompare,//int(*xCompare)(void*,int,const void*,int,const void),
 		dxDelCollSeq xDel//void(*xDel)(void)
 		) {
             SqlResult rc;
@@ -2827,7 +2832,7 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 		///Register a collation sequence factory callback with the database handle
 		///db. Replace any previously installed collation sequence factory.
 		///</summary>
-		static SqlResult sqlite3_collation_needed(sqlite3 db,object pCollNeededArg,dxCollNeeded xCollNeeded) {
+		static SqlResult sqlite3_collation_needed(Connection db,object pCollNeededArg,dxCollNeeded xCollNeeded) {
 			db.mutex.sqlite3_mutex_enter();
 			db.xCollNeeded=xCollNeeded;
 			db.xCollNeeded16=null;
@@ -2872,7 +2877,7 @@ return SqlResult.SQLITE_OK;
 		///
 		///THIS IS AN EXPERIMENTAL API AND IS SUBJECT TO CHANGE ******
 		///</summary>
-		static u8 sqlite3_get_autocommit(sqlite3 db) {
+		static u8 sqlite3_get_autocommit(Connection db) {
 			return db.autoCommit;
 		}
 
@@ -3074,7 +3079,7 @@ error_out:
 		///Enable or disable the extended result codes.
 		///
 		///</summary>
-		static SqlResult sqlite3_extended_result_codes(sqlite3 db,bool onoff) {
+		static SqlResult sqlite3_extended_result_codes(Connection db,bool onoff) {
 			db.mutex.sqlite3_mutex_enter();
 			db.errMask=(SqlResult)(onoff?0xffffffff:0xff);
 			db.mutex.sqlite3_mutex_leave();
@@ -3085,7 +3090,7 @@ error_out:
 		///Invoke the xFileControl method on a particular database.
 		///
 		///</summary>
-		static SqlResult sqlite3_file_control(sqlite3 db,string zDbName,int op,ref sqlite3_int64 pArg) {
+		static SqlResult sqlite3_file_control(Connection db,string zDbName,int op,ref sqlite3_int64 pArg) {
 			var rc=SqlResult.SQLITE_ERROR;
 			int iDb;
 			db.mutex.sqlite3_mutex_enter();
@@ -3093,13 +3098,13 @@ error_out:
 				iDb=0;
 			}
 			else {
-				for(iDb=0;iDb<db.nDb;iDb++) {
-					if(db.aDb[iDb].zName==zDbName)
+				for(iDb=0;iDb<db.BackendCount;iDb++) {
+					if(db.Backends[iDb].Name==zDbName)
 						break;
 				}
 			}
-			if(iDb<db.nDb) {
-				Btree pBtree=db.aDb[iDb].pBt;
+			if(iDb<db.BackendCount) {
+				Btree pBtree=db.Backends[iDb].BTree;
 				if(pBtree!=null) {
 					Pager pPager;
 					sqlite3_file fd;
@@ -3298,10 +3303,10 @@ error_out:
 				///
 				///</summary>
 				case SQLITE_TESTCTRL_RESERVE: {
-					sqlite3 db=_Custom.va_arg(ap,(sqlite3)null);
+					Connection db=_Custom.va_arg(ap,(Connection)null);
 					int x=_Custom.va_arg(ap,(Int32)0);
 					db.mutex.sqlite3_mutex_enter();
-					db.aDb[0].pBt.sqlite3BtreeSetPageSize(0,x,0);
+					db.Backends[0].BTree.sqlite3BtreeSetPageSize(0,x,0);
 					db.mutex.sqlite3_mutex_leave();
 					break;
 				}
@@ -3318,7 +3323,7 @@ error_out:
 				///
 				///</summary>
 				case SQLITE_TESTCTRL_OPTIMIZATIONS: {
-					sqlite3 db=_Custom.va_arg(ap,(sqlite3)null);
+					Connection db=_Custom.va_arg(ap,(Connection)null);
 					//sqlite3 db = _Custom.va_arg(ap, sqlite3);
 					int x=_Custom.va_arg(ap,(Int32)0);
 					//int x = _Custom.va_arg(ap,int);

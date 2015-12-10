@@ -108,7 +108,7 @@ return ( p == null || p.expired ) ? 1 : 0;
                 else
                 {
                     Vdbe v = pStmt;
-                    sqlite3 db = v.db;
+                    Connection db = v.db;
 #if SQLITE_THREADSAFE
 																																																																																												        sqlite3_mutex mutex;
 #endif
@@ -302,7 +302,7 @@ sqlite3VdbeMemSetStr(pCtx.s, z, n, SqliteEncoding.UTF16LE, xDel);
             /// invokes callbacks registered with sqlite3_wal_hook() as required.
             ///
             ///</summary>
-            static SqlResult doWalCallbacks(sqlite3 db)
+            static SqlResult doWalCallbacks(Connection db)
             {
                 var rc = SqlResult.SQLITE_OK;
 #if !SQLITE_OMIT_WAL
@@ -334,7 +334,7 @@ rc = db->xWalCallback(db->pWalArg, db, db->aDb[i].zName, nEntry);
 
             static SqlResult sqlite3Step(Vdbe p)
             {
-                sqlite3 db;
+                Connection db;
                 SqlResult rc;
                 #region error check
                 Debug.Assert(p != null);
@@ -491,7 +491,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
                 int cnt = 0;
                 ///Counter to prevent infinite loop of reprepares 
 
-                sqlite3 db;
+                Connection db;
                 ///The database connection 
 
                 if (v.vdbeSafetyNotNull())
@@ -560,7 +560,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
             /// pointer to it.
             ///
             ///</summary>
-            public static sqlite3 sqlite3_context_db_handle(sqlite3_context p)
+            public static Connection sqlite3_context_db_handle(sqlite3_context p)
             {
                 Debug.Assert(p != null && p.pFunc != null);
                 return p.s.db;
@@ -956,7 +956,7 @@ return p.pMem.n;
                 string ret = null;
                 Vdbe p = pStmt;
                 int n;
-                sqlite3 db = p.db;
+                Connection db = p.db;
                 Debug.Assert(db != null);
                 n = pStmt.getColumnCount();
                 if (N < n && N >= 0)
@@ -1495,7 +1495,7 @@ return sqlite3TransferBindings( pFromStmt, pToStmt );
             /// the first argument to the sqlite3_prepare() that was used to create
             /// the statement in the first place.
             ///</summary>
-            public static sqlite3 sqlite3_db_handle(sqlite3_stmt pStmt)
+            public static Connection sqlite3_db_handle(sqlite3_stmt pStmt)
             {
                 return pStmt != null ? ((Vdbe)pStmt).db : null;
             }
@@ -1517,7 +1517,7 @@ return sqlite3TransferBindings( pFromStmt, pToStmt );
             /// are no more.
             ///
             ///</summary>
-            public static sqlite3_stmt sqlite3_next_stmt(sqlite3 pDb, sqlite3_stmt pStmt)
+            public static sqlite3_stmt sqlite3_next_stmt(Connection pDb, sqlite3_stmt pStmt)
             {
                 sqlite3_stmt pNext;
                 pDb.mutex.sqlite3_mutex_enter();

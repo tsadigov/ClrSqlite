@@ -26,7 +26,7 @@ namespace Community.CsharpSqlite
         ///</summary>
         public class StrAccum
         {
-            public sqlite3 db;
+            public Connection db;
             ///
             ///<summary>
             ///Optional database for lookaside.  Can be NULL 

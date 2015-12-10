@@ -89,7 +89,7 @@ namespace Community.CsharpSqlite {
                 Os.sqlite3_vfs pVfs,///VFS to use for this b"tree 
             string zFilename,
                 ///Name of the file containing the BTree database 
-            sqlite3 db,
+            Connection db,
                 ///Associated database handle 
             ref Btree ppBtree,
                 ///Pointer to new Btree object written here 
@@ -383,7 +383,7 @@ break;
             }
 
 
-            public sqlite3 db;
+            public Connection db;
             ///
             ///<summary>
             ///The database connection holding this Btree 

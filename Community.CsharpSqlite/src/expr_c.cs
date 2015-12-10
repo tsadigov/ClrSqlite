@@ -151,7 +151,7 @@ namespace Community.CsharpSqlite.Ast
             /// into u.iValue and the ExprFlags.EP_IntValue flag is set.  No extra storage
             /// is allocated to hold the integer text and the dequote flag is ignored.
             ///</summary>
-            public static Expr CreateExpr(sqlite3 db,///
+            public static Expr CreateExpr(Connection db,///
                 ///<summary>
                 ///Handle for sqlite3DbMallocZero() (may be null) 
                 ///</summary>
@@ -229,7 +229,7 @@ namespace Community.CsharpSqlite.Ast
             /// already been dequoted.
             ///
             ///</summary>
-            public static Expr sqlite3Expr(sqlite3 db,///
+            public static Expr sqlite3Expr(Connection db,///
                 ///<summary>
                 ///Handle for sqlite3DbMallocZero() (may be null) 
                 ///</summary>
@@ -256,7 +256,7 @@ namespace Community.CsharpSqlite.Ast
             ///In that case, delete the subtrees pLeft and pRight.
             ///
             ///</summary>
-            public static void sqlite3ExprAttachSubtrees(sqlite3 db, Expr pRoot, Expr pLeft, Expr pRight)
+            public static void sqlite3ExprAttachSubtrees(Connection db, Expr pRoot, Expr pLeft, Expr pRight)
             {
                 if (pRoot == null)
                 {
@@ -302,7 +302,7 @@ namespace Community.CsharpSqlite.Ast
             ///NULL, then just return the other expression.
             ///
             ///</summary>
-            public static Expr sqlite3ExprAnd(sqlite3 db, Expr pLeft, Expr pRight)
+            public static Expr sqlite3ExprAnd(Connection db, Expr pLeft, Expr pRight)
             {
                 if (pLeft == null)
                 {
@@ -347,7 +347,7 @@ namespace Community.CsharpSqlite.Ast
             /// Recursively delete an expression tree.
             ///
             ///</summary>
-            public static void sqlite3ExprDelete(sqlite3 db, ref Expr p)
+            public static void sqlite3ExprDelete(Connection db, ref Expr p)
             {
                 if (p == null)
                     return;
@@ -405,7 +405,7 @@ namespace Community.CsharpSqlite.Ast
             /// portion of the buffer copied into by this function.
             ///
             ///</summary>
-            static Expr exprDup(sqlite3 db, Expr p, int flags, ref Expr pzBuffer)
+            static Expr exprDup(Connection db, Expr p, int flags, ref Expr pzBuffer)
             {
                 Expr pNew = null;
                 ///
@@ -550,12 +550,12 @@ namespace Community.CsharpSqlite.Ast
             /// part of the in-memory representation of the database schema.
             ///
             ///</summary>
-            public static Expr sqlite3ExprDup(sqlite3 db, Expr p, int flags)
+            public static Expr sqlite3ExprDup(Connection db, Expr p, int flags)
             {
                 Expr ExprDummy = null;
                 return exprDup(db, p, flags, ref ExprDummy);
             }
-            public static ExprList sqlite3ExprListDup(sqlite3 db, ExprList p, int flags)
+            public static ExprList sqlite3ExprListDup(Connection db, ExprList p, int flags)
             {
                 ExprList pNew;
                 ExprList_item pItem;
@@ -601,7 +601,7 @@ namespace Community.CsharpSqlite.Ast
             ///
             ///</summary>
 #if !SQLITE_OMIT_VIEW || !SQLITE_OMIT_TRIGGER  || !SQLITE_OMIT_SUBQUERY
-            public static SrcList sqlite3SrcListDup(sqlite3 db, SrcList p, int flags)
+            public static SrcList sqlite3SrcListDup(Connection db, SrcList p, int flags)
             {
                 SrcList pNew;
                 int i;
@@ -647,7 +647,7 @@ namespace Community.CsharpSqlite.Ast
                 }
                 return pNew;
             }
-            public static IdList sqlite3IdListDup(sqlite3 db, IdList p)
+            public static IdList sqlite3IdListDup(Connection db, IdList p)
             {
                 IdList pNew;
                 int i;
@@ -676,7 +676,7 @@ namespace Community.CsharpSqlite.Ast
                 }
                 return pNew;
             }
-            public static Select sqlite3SelectDup(sqlite3 db, Select p, int flags)
+            public static Select sqlite3SelectDup(Connection db, Select p, int flags)
             {
                 Select pNew;
                 if (p == null)
@@ -745,7 +745,7 @@ return null;
             /// Delete an entire expression list.
             ///
             ///</summary>
-            public static void sqlite3ExprListDelete(sqlite3 db, ref ExprList pList)
+            public static void sqlite3ExprListDelete(Connection db, ref ExprList pList)
             {
                 int i;
                 ExprList_item pItem;
@@ -1556,7 +1556,7 @@ return null;
             /// the new element.  Return a negative number if malloc fails.
             ///
             ///</summary>
-            static int addAggInfoColumn(sqlite3 db, AggInfo pInfo)
+            static int addAggInfoColumn(Connection db, AggInfo pInfo)
             {
                 int i = 0;
                 pInfo.aCol = build.sqlite3ArrayAllocate(db, pInfo.aCol, -1,//sizeof(pInfo.aCol[0]),
@@ -1568,7 +1568,7 @@ return null;
             /// the new element.  Return a negative number if malloc fails.
             ///
             ///</summary>
-            static int addAggInfoFunc(sqlite3 db, AggInfo pInfo)
+            static int addAggInfoFunc(Connection db, AggInfo pInfo)
             {
                 int i = 0;
                 pInfo.aFunc = build.sqlite3ArrayAllocate(db, pInfo.aFunc, -1,//sizeof(pInfo.aFunc[0]),

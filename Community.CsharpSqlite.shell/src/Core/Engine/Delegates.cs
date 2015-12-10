@@ -23,9 +23,9 @@ namespace Community.CsharpSqlite.Engine
 
 
 #if !SQLITE_OMIT_VIRTUALTABLE
-    public delegate int dmxCreate(sqlite3 db, object pAux, int argc, string p4, object argv, sqlite3_vtab ppVTab, char p7);
+    public delegate int dmxCreate(Connection db, object pAux, int argc, string p4, object argv, sqlite3_vtab ppVTab, char p7);
 
-    public delegate int dmxConnect(sqlite3 db, object pAux, int argc, string p4, object argv, sqlite3_vtab ppVTab, char p7);
+    public delegate int dmxConnect(Connection db, object pAux, int argc, string p4, object argv, sqlite3_vtab ppVTab, char p7);
 
     public delegate int dmxBestIndex(sqlite3_vtab pVTab, ref sqlite3_index_info pIndexInfo);
 

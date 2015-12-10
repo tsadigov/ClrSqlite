@@ -40,7 +40,7 @@ namespace Community.CsharpSqlite {
 		/// Finalize a prepared statement.  If there was an error, store the
 		/// text of the error message in *pzErrMsg.  Return the result code.
 		///</summary>
-        static SqlResult vacuumFinalize(sqlite3 db, sqlite3_stmt pStmt, string pzErrMsg)
+        static SqlResult vacuumFinalize(Connection db, sqlite3_stmt pStmt, string pzErrMsg)
         {
             SqlResult rc;
             rc = vdbeaux.sqlite3VdbeFinalize(ref pStmt);
@@ -52,7 +52,7 @@ namespace Community.CsharpSqlite {
 		///<summary>
 		/// Execute zSql on database db. Return an error code.
 		///</summary>
-		static SqlResult execSql(sqlite3 db,string pzErrMsg,string zSql) {
+		static SqlResult execSql(Connection db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
 			#if !NDEBUG
 																																																																		      int rc;
@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite {
 		/// one column. Execute this as SQL on the same database.
 		///
 		///</summary>
-		static SqlResult execExecSql(sqlite3 db,string pzErrMsg,string zSql) {
+		static SqlResult execExecSql(Connection db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
             SqlResult rc;
 			rc=sqlite3_prepare(db,zSql,-1,ref pStmt,0);
@@ -118,7 +118,7 @@ namespace Community.CsharpSqlite {
 		///This routine implements the  OpCode.OP_Vacuum opcode of the VDBE.
 		///
 		///</summary>
-        public static SqlResult sqlite3RunVacuum(ref string pzErrMsg, sqlite3 db)
+        public static SqlResult sqlite3RunVacuum(ref string pzErrMsg, Connection db)
         {
 			var rc=SqlResult.SQLITE_OK;
 			///
@@ -157,7 +157,7 @@ namespace Community.CsharpSqlite {
 			///</summary>
 			dxTrace saved_xTrace;
 			//void (*saved_xTrace)(void*,const char*);  /* Saved db->xTrace */
-			Db pDb=null;
+			DbBackend pDb=null;
 			///
 			///<summary>
 			///Database to detach at end of vacuum 
@@ -198,7 +198,7 @@ namespace Community.CsharpSqlite {
             db.flags |= SqliteFlags.SQLITE_WriteSchema | SqliteFlags.SQLITE_IgnoreChecks | SqliteFlags.SQLITE_PreferBuiltin;
             db.flags &= ~(SqliteFlags.SQLITE_ForeignKeys | SqliteFlags.SQLITE_ReverseOrder);
 			db.xTrace=null;
-			pMain=db.aDb[0].pBt;
+			pMain=db.Backends[0].BTree;
 			isMemDb=pMain.sqlite3BtreePager().sqlite3PagerIsMemdb();
 			///
 			///<summary>
@@ -217,7 +217,7 @@ namespace Community.CsharpSqlite {
 			///<param name="time to parse and run the PRAGMA to turn journalling off than it does">time to parse and run the PRAGMA to turn journalling off than it does</param>
 			///<param name="to write the journal header file.">to write the journal header file.</param>
 			///<param name=""></param>
-			nDb=db.nDb;
+			nDb=db.BackendCount;
 			if(sqlite3TempInMemory(db)) {
 				zSql="ATTACH ':memory:' AS vacuum_db;";
 			}
@@ -225,15 +225,15 @@ namespace Community.CsharpSqlite {
 				zSql="ATTACH '' AS vacuum_db;";
 			}
 			rc=execSql(db,pzErrMsg,zSql);
-			if(db.nDb>nDb) {
-				pDb=db.aDb[db.nDb-1];
-				Debug.Assert(pDb.zName=="vacuum_db");
+			if(db.BackendCount>nDb) {
+				pDb=db.Backends[db.BackendCount-1];
+				Debug.Assert(pDb.Name=="vacuum_db");
 			}
 			if(rc!=SqlResult.SQLITE_OK)
 				goto end_of_vacuum;
-			pDb=db.aDb[db.nDb-1];
-			Debug.Assert(db.aDb[db.nDb-1].zName=="vacuum_db");
-			pTemp=db.aDb[db.nDb-1].pBt;
+			pDb=db.Backends[db.BackendCount-1];
+			Debug.Assert(db.Backends[db.BackendCount-1].Name=="vacuum_db");
+			pTemp=db.Backends[db.BackendCount-1].BTree;
 			///
 			///<summary>
 			///The call to execSql() to attach the temp database has left the file
@@ -437,8 +437,8 @@ namespace Community.CsharpSqlite {
 			pMain.sqlite3BtreeSetPageSize(-1,-1,1);
 			db.autoCommit=1;
 			if(pDb!=null) {
-                BTreeMethods.sqlite3BtreeClose(ref pDb.pBt);
-				pDb.pBt=null;
+                BTreeMethods.sqlite3BtreeClose(ref pDb.BTree);
+				pDb.BTree=null;
 				pDb.pSchema=null;
 			}
 			build.sqlite3ResetInternalSchema(db,-1);
