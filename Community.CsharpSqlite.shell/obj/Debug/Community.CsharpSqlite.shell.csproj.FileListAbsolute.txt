@@ -4,3 +4,8 @@ X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.1234567.ex
 X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.1234567.pdb
 X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.1234567.exe
 X:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.1234567.pdb
+E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.12345678.exe.config
+E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.12345678.exe
+E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.12345678.pdb
+E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.12345678.exe
+E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.12345678.pdb

@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Community.CsharpSqlite</RootNamespace>
-    <AssemblyName>C#-SQLite3.1234567</AssemblyName>
+    <AssemblyName>C#-SQLite3.12345678</AssemblyName>
     <StartupObject>Shell</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -154,7 +154,7 @@
       <Link>src\Paging\memjournal_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\mem_Pool.cs">
-      <Link>Community.CsharpSqlite\mem_Pool.cs</Link>
+      <Link>src\Os\mem_Pool.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\mutex_c.cs">
       <Link>Community.CsharpSqlite\mutex_c.cs</Link>
@@ -217,7 +217,7 @@
       <Link>Community.CsharpSqlite\prepare_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\printf_c.cs">
-      <Link>src\Accessories\Utils\printf_c.cs</Link>
+      <Link>src\Os\printf_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\random_c.cs">
       <Link>Community.CsharpSqlite\random_c.cs</Link>
@@ -299,6 +299,7 @@
     </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Compiler\Ast\Expr.cs" />
     <Compile Include="src\Compiler\Ast\ExprExtensions.cs" />
     <Compile Include="src\Compiler\Ast\IdentifierList.cs" />
@@ -315,12 +316,40 @@
     <Compile Include="src\BackupExtensions.cs" />
     <Compile Include="src\BitvecExtensions.cs" />
     <Compile Include="src\BtCursor.cs" />
+    <Compile Include="src\Core\Engine\BusyHandler.cs" />
+    <Compile Include="src\Core\Engine\Context.cs" />
+    <Compile Include="src\Core\Engine\Cursor.cs" />
     <Compile Include="src\Core\Engine\Delegates.cs" />
+    <Compile Include="src\Core\Engine\Extensions.cs" />
+    <Compile Include="src\Core\Engine\InitData.cs" />
+    <Compile Include="src\Core\Engine\Lookaside.cs" />
     <Compile Include="src\Core\Engine\Metadata\VdbeFunc.cs" />
+    <Compile Include="src\Core\Engine\Module.cs" />
+    <Compile Include="src\Core\Engine\Op\BTree.cs" />
+    <Compile Include="src\Core\Engine\Op\Cast.cs" />
+    <Compile Include="src\Core\Engine\Op\ControlFlow.cs" />
+    <Compile Include="src\Core\Engine\Op\CPU.cs" />
+    <Compile Include="src\Core\Engine\Op\Cursor.cs" />
+    <Compile Include="src\Core\Engine\Op\Idx.cs" />
+    <Compile Include="src\Core\Engine\Op\Logical.cs" />
+    <Compile Include="src\Core\Engine\Op\Math.cs" />
     <Compile Include="src\Core\Engine\Op\Others.cs" />
+    <Compile Include="src\Core\Engine\Op\Schema.cs" />
+    <Compile Include="src\Core\Engine\Op\VdbeHelper.cs" />
+    <Compile Include="src\Core\Engine\P4Usage.cs" />
+    <Compile Include="src\Core\Engine\Savepoint.cs" />
+    <Compile Include="src\Core\Engine\SubProgram.cs" />
+    <Compile Include="src\Core\Engine\Vdbe.cs" />
+    <Compile Include="src\Core\Engine\VdbeFrame.cs" />
+    <Compile Include="src\Core\Engine\VdbeOp.cs" />
+    <Compile Include="src\Core\Engine\VdbeOpList.cs" />
+    <Compile Include="src\Engine\Core\SortOrder.cs" />
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
     <Compile Include="src\Backend\Paging\Delegates.cs" />
+    <Compile Include="src\MyHelpers.cs" />
+    <Compile Include="src\Os\OpenMode.cs" />
+    <Compile Include="src\Schema\Builtin.cs" />
     <Compile Include="src\Schema\Traverse\FuncDefTraverse.cs" />
     <Compile Include="src\Backend\tree\BTree.cs" />
     <Compile Include="src\Backend\tree\BtreeExtensions.cs" />
@@ -328,39 +357,13 @@
     <Compile Include="src\Compiler\CodeGeneration\builder\IndexBuilder.cs" />
     <Compile Include="src\Compiler\CodeGeneration\builder\TableBuilder.cs" />
     <Compile Include="src\Compiler\CodeGeneration\builder\TiggerBuilder.cs" />
-    <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Db.cs" />
     <Compile Include="src\Compiler\Ast\Agg.cs" />
-    <Compile Include="src\Core\Engine\BusyHandler.cs" />
-    <Compile Include="src\Core\Engine\Context.cs" />
-    <Compile Include="src\Core\Engine\Op\BTree.cs" />
-    <Compile Include="src\Core\Engine\Op\Cast.cs" />
-    <Compile Include="src\Core\Engine\Op\ControlFlow.cs" />
-    <Compile Include="src\Core\Engine\Op\CPU.cs" />
-    <Compile Include="src\Core\Engine\Cursor.cs" />
-    <Compile Include="src\Core\Engine\Extensions.cs" />
-    <Compile Include="src\Core\Engine\InitData.cs" />
-    <Compile Include="src\Core\Engine\Lookaside.cs" />
-    <Compile Include="src\Core\Engine\Module.cs" />
-    <Compile Include="src\Core\Engine\Op\Cursor.cs" />
-    <Compile Include="src\Core\Engine\Op\Idx.cs" />
-    <Compile Include="src\Core\Engine\Op\Logical.cs" />
-    <Compile Include="src\Core\Engine\Op\Math.cs" />
-    <Compile Include="src\Core\Engine\Op\Schema.cs" />
-    <Compile Include="src\Core\Engine\P4Usage.cs" />
-    <Compile Include="src\Core\Engine\Savepoint.cs" />
-    <Compile Include="src\Core\Engine\SubProgram.cs" />
-    <Compile Include="src\Core\Engine\Vdbe.cs" />
-    <Compile Include="src\Core\Engine\VdbeFrame.cs" />
-    <Compile Include="src\Core\Engine\Op\VdbeHelper.cs" />
-    <Compile Include="src\Core\Engine\VdbeOp.cs" />
-    <Compile Include="src\Core\Engine\VdbeOpList.cs" />
     <Compile Include="src\Globals.cs" />
     <Compile Include="src\Index.cs" />
     <Compile Include="src\Backend\Paging\Mem.cs" />
     <Compile Include="src\Backend\Paging\MemType.cs" />
     <Compile Include="src\Backend\Paging\MemPage.cs" />
-    <Compile Include="src\MyHelpers.cs" />
     <Compile Include="src\Backend\Os\sqlite3_file.cs" />
     <Compile Include="src\Backend\Paging\BufferExtensions.cs" />
     <Compile Include="src\Backend\Paging\FreeSpaceHeader.cs" />
@@ -396,12 +399,15 @@
     <Compile Include="src\Accessories\Utils\Str.cs" />
     <Compile Include="src\Accessories\Utils\StreAccum.cs" />
     <Compile Include="src\Compiler\Ast\Walker.cs" />
+    <Compile Include="src\Utils\StringUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\Core\Engine\Utill\" />
+    <Folder Include="src\Engine\Core\Engine\Metadata\" />
+    <Folder Include="src\Engine\Core\Engine\Op\" />
+    <Folder Include="src\Engine\Core\Engine\Utill\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -2352,6 +2352,8 @@ break;
                 return SqlResult.SQLITE_OK;
             }
 #endif
+
+
 #if !(SQLITE_OMIT_SUBQUERY) || !(SQLITE_OMIT_VIEW)
             ///<summary>
             ///Forward Declarations
