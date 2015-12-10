@@ -1356,53 +1356,29 @@ return rc;
         {
             u8 pPtr;
             Pager pPager = null;
-            ///
-            ///<summary>
             ///Pager object to allocate and return 
-            ///</summary>
 
             var rc = SqlResult.SQLITE_OK;
-            ///
-            ///<summary>
             ///Return code 
-            ///</summary>
 
             u8 tempFile = 0;
-            ///
-            ///<summary>
-            ///</summary>
             ///<param name="True for temp files (incl. in">memory files) </param>
 
             // Needs to be u8 for later tests
             u8 memDb = 0;
-            ///
-            ///<summary>
-            ///</summary>
             ///<param name="True if this is an in">memory file </param>
 
             bool readOnly = false;
-            ///
-            ///<summary>
-            ///</summary>
             ///<param name="True if this is a read">only file </param>
 
             int journalFileSize;
-            ///
-            ///<summary>
             ///Bytes to allocate for each journal fd 
-            ///</summary>
 
             StringBuilder zPathname = null;
-            ///
-            ///<summary>
             ///Full path to database file 
-            ///</summary>
 
             int nPathname = 0;
-            ///
-            ///<summary>
             ///Number of bytes in zPathname 
-            ///</summary>
 
             bool useJournal = (flags & (int)Globals.Paging.PAGER_OMIT_JOURNAL) == 0;
             ///

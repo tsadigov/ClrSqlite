@@ -9,3 +9,4 @@ E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.12345678.e
 E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\bin\Debug\C#-SQLite3.12345678.pdb
 E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.12345678.exe
 E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\C#-SQLite3.12345678.pdb
+E:\Garage\ClrSqlite\Community.CsharpSqlite.shell\obj\Debug\Community.CsharpSqlite.shell.csprojResolveAssemblyReference.cache

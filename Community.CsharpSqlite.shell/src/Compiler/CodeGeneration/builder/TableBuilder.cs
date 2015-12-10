@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite.builder
                     if (zDatabase != null && !zDatabase.Equals(db.Backends[j].Name, StringComparison.InvariantCultureIgnoreCase))
                         continue;
                     Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
-                    p = db.Backends[j].pSchema.tblHash.sqlite3HashFind(zName, nName, (Table)null);
+                    p = db.Backends[j].pSchema.tblHash.Find(zName, nName, (Table)null);
                     if (p != null)
                         break;
                 }

@@ -91,7 +91,7 @@ namespace Community.CsharpSqlite {
                 ///Name of the file containing the BTree database 
             Connection db,
                 ///Associated database handle 
-            ref Btree ppBtree,
+            ref Btree refBtree,
                 ///Pointer to new Btree object written here 
             int flags,
                 ///<summary>
@@ -147,13 +147,15 @@ namespace Community.CsharpSqlite {
                 {
                     vfsFlags = (vfsFlags & ~Sqlite3.SQLITE_OPEN_MAIN_DB) | Sqlite3.SQLITE_OPEN_TEMP_DB;
                 }
-                createdBTreeInstance = new Btree();
+                createdBTreeInstance = new Btree()
+                {
+                    inTrans = TransType.TRANS_NONE,
+                    db = db
+                };
                 //malloc_cs.sqlite3MallocZero(sizeof(Btree));
                 //if( !p ){
                 //  return SQLITE_NOMEM;
                 //}
-                createdBTreeInstance.inTrans = TransType.TRANS_NONE;
-                createdBTreeInstance.db = db;
 #if !SQLITE_OMIT_SHARED_CACHE
 																																																																											p.lock.pBtree = p;
 p.lock.iTable = 1;
@@ -217,13 +219,9 @@ p.sharable = 1;
                 BtShared pBt = null;
                 if (pBt == null)
                 {
-                    ///
-                    ///<summary>
                     ///The following asserts make sure that structures used by the btree are
                     ///the right size.  This is to guard against size changes that result
                     ///when compiling on a different architecture.
-                    ///
-                    ///</summary>
                     Debug.Assert(sizeof(i64) == 8 || sizeof(i64) == 4);
                     Debug.Assert(sizeof(u64) == 8 || sizeof(u64) == 4);
                     Debug.Assert(sizeof(u32) == 4);
@@ -259,9 +257,6 @@ p.sharable = 1;
                     {
                         pBt.pageSize = 0;
 #if !SQLITE_OMIT_AUTOVACUUM
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="If the magic name ":memory:" will create an in">memory database, then</param>
                         ///<param name="leave the autoVacuum mode at 0 (do not auto">vacuum), even if</param>
                         ///<param name="SQLITE_DEFAULT_AUTOVACUUM is true. On the other hand, if">SQLITE_DEFAULT_AUTOVACUUM is true. On the other hand, if</param>
@@ -346,7 +341,7 @@ break;
 }
 }
 #endif
-                ppBtree = createdBTreeInstance;
+                refBtree = createdBTreeInstance;
             btree_open_out:
                 if (rc != SqlResult.SQLITE_OK)
                 {
@@ -358,17 +353,14 @@ break;
                     //    malloc_cs.sqlite3_free(ref pBt);
                     createdBTreeInstance = null;
                     //    malloc_cs.sqlite3_free(ref p);
-                    ppBtree = null;
+                    refBtree = null;
                 }
                 else
                 {
-                    ///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="If the B">cache size to the</param>
-                    ///<param name="default value. Except, when opening on an existing shared pager">cache,</param>
-                    ///<param name="do not change the pager">cache size.</param>
-                    ///<param name=""></param>
+                    
+                    ///If the B">cache size to the</param>
+                    ///default value. Except, when opening on an existing shared pager">cache,</param>
+                    ///do not change the pager">cache size.</param>
                     if (createdBTreeInstance.sqlite3BtreeSchema(0, null) == null)
                     {
                         createdBTreeInstance.pBt.pPager.sqlite3PagerSetCachesize(Globals.SQLITE_DEFAULT_CACHE_SIZE);

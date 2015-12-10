@@ -2084,7 +2084,7 @@ return z;
 				///<param name="to be called.">to be called.</param>
 				///<param name=""></param>
 				if((pColl.enc&~SqliteEncoding.UTF16_ALIGNED)==enc2) {
-					CollSeq[] aColl=db.aCollSeq.sqlite3HashFind(zName,nName,(CollSeq[])null);
+					CollSeq[] aColl=db.aCollSeq.Find(zName,nName,(CollSeq[])null);
 					int j;
 					for(j=0;j<3;j++) {
 						CollSeq p=aColl[j];

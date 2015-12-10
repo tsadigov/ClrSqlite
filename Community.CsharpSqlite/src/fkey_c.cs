@@ -158,7 +158,7 @@ namespace Community.CsharpSqlite
             public static FKey sqlite3FkReferences(Table pTab)
             {
                 int nName = StringExtensions.sqlite3Strlen30(pTab.zName);
-                return pTab.pSchema.fkeyHash.sqlite3HashFind(pTab.zName, nName, (FKey)null);
+                return pTab.pSchema.fkeyHash.Find(pTab.zName, nName, (FKey)null);
             }
             ///<summary>
             /// The second argument is a Trigger structure allocated by the

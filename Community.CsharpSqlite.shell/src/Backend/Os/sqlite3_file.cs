@@ -249,48 +249,48 @@ namespace Community.CsharpSqlite
     public class sqlite3_vfs:ILinkedListNode<sqlite3_vfs>
     {
 
-
+///<summary>
+        ///Structure version number (currently 3) 
+        ///</summary>
         public int iVersion;
 
         ///
-        ///<summary>
-        ///Structure version number (currently 3) 
+        
+///<summary>
+        ///Size of subclassed sqlite3_file 
         ///</summary>
-
         public int szOsFile;
 
         ///
-        ///<summary>
-        ///Size of subclassed sqlite3_file 
+        
+///<summary>
+        ///Maximum file pathname length 
         ///</summary>
-
         public int mxPathname;
 
         ///
-        ///<summary>
-        ///Maximum file pathname length 
-        ///</summary>
-
-        public sqlite3_vfs pNext { get; set; }
-
-        ///
+        
         ///<summary>
         ///Next registered VFS 
         ///</summary>
-
-        public string zName;
+        public sqlite3_vfs pNext { get; set; }
 
         ///
+
         ///<summary>
         ///Name of this virtual file system 
         ///</summary>
+        public string zName;
 
-        public object pAppData;
+        ///
 
         ///
         ///<summary>
         ///</summary>
         ///<param name="Pointer to application">specific data </param>
+        public object pAppData;
+
+
 
         public dxOpen xOpen;
 

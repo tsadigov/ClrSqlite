@@ -541,7 +541,7 @@ namespace Community.CsharpSqlite
                 ///Locate the required virtual table module 
                 ///</summary>
                 zMod = pTab.azModuleArg[0];
-                pMod = (Module)db.aModule.sqlite3HashFind(zMod, StringExtensions.sqlite3Strlen30(zMod), (Module)null);
+                pMod = (Module)db.aModule.Find(zMod, StringExtensions.sqlite3Strlen30(zMod), (Module)null);
                 ///
                 ///<summary>
                 ///If the module has been registered and includes a Create method, 

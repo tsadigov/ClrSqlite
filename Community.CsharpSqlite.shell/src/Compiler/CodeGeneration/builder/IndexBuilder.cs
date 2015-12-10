@@ -53,7 +53,7 @@ namespace Community.CsharpSqlite.builder
                 if (zDb != null && !zDb.Equals(db.Backends[j].Name, StringComparison.InvariantCultureIgnoreCase))
                     continue;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
-                p = pSchema.idxHash.sqlite3HashFind(zName, nName, (Index)null);
+                p = pSchema.idxHash.Find(zName, nName, (Index)null);
                 if (p != null)
                     break;
             }

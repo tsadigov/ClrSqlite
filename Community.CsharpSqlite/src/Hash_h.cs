@@ -106,7 +106,7 @@ namespace Community.CsharpSqlite.Utils {
 					return cp;
 				}
 			}
-            public T sqlite3HashFind<T>(string pKey, int nKey, T nullType) where T : class {
+            public T Find<T>(string pKey, int nKey, T nullType) where T : class {
                 Debug.Assert(this != null);
                 Debug.Assert(pKey != null);
                 Debug.Assert(nKey >= 0);

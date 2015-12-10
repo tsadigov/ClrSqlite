@@ -314,7 +314,7 @@ namespace Community.CsharpSqlite.Parsing
                 goto trigger_cleanup;
             }
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-            if ((db.Backends[iDb].pSchema.trigHash).sqlite3HashFind(zName, StringExtensions.sqlite3Strlen30(zName), (Trigger)null) != null)
+            if ((db.Backends[iDb].pSchema.trigHash).Find(zName, StringExtensions.sqlite3Strlen30(zName), (Trigger)null) != null)
             {
                 if (noErr == 0)
                 {
@@ -519,7 +519,7 @@ goto trigger_cleanup;
                     {
                         Table pTab;
                         int n = StringExtensions.sqlite3Strlen30(pLink.table);
-                        pTab = pLink.pTabSchema.tblHash.sqlite3HashFind(pLink.table, n, (Table)null);
+                        pTab = pLink.pTabSchema.tblHash.Find(pLink.table, n, (Table)null);
                         Debug.Assert(pTab != null);
                         pLink.pNext = pTab.pTrigger;
                         pTab.pTrigger = pLink;
@@ -782,7 +782,7 @@ goto trigger_cleanup;
                 if (zDb != null && !db.Backends[j].Name.Equals(zDb, StringComparison.InvariantCultureIgnoreCase))
                     continue;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
-                pTrigger = (db.Backends[j].pSchema.trigHash).sqlite3HashFind(zName, nName, (Trigger)null);
+                pTrigger = (db.Backends[j].pSchema.trigHash).Find(zName, nName, (Trigger)null);
                 if (pTrigger != null)
                     break;
             }
@@ -811,7 +811,7 @@ goto trigger_cleanup;
         static Table tableOfTrigger(Trigger pTrigger)
         {
             int n = StringExtensions.sqlite3Strlen30(pTrigger.table);
-            return pTrigger.pTabSchema.tblHash.sqlite3HashFind(pTrigger.table, n, (Table)null);
+            return pTrigger.pTabSchema.tblHash.Find(pTrigger.table, n, (Table)null);
         }
         ///<summary>
         /// Drop a trigger given a pointer to that trigger.
