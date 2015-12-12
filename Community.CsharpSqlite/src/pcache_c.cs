@@ -137,7 +137,7 @@ namespace Community.CsharpSqlite.Paging
         ///</summary>
         //#include "sqliteInt.h"
         
-        public class PCacheMethods
+        public static class PCacheMethods
         {
             ///
             ///<summary>
@@ -378,7 +378,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
             /// Try to obtain a page from the cache.
             ///
             ///</summary>
-            public static SqlResult sqlite3PcacheFetch(PCache pCache, ///
+            public static SqlResult sqlite3PcacheFetch(this PCache pCache, ///
                 ///<summary>
                 ///Obtain the page from this cache 
                 ///</summary>

@@ -649,7 +649,7 @@ goto exit_create_index;
                 Expr pExpr = pList.a[i].pExpr;
                 if (pExpr != null)
                 {
-                    CollSeq pColl = pExpr.pColl;
+                    CollSeq pColl = pExpr.CollatingSequence;
                     ///Either pColl!=0 or there was an OOM failure.  But if an OOM
                     ///failure we have quit before reaching this point. 
                     if (Sqlite3.ALWAYS(pColl != null))
@@ -751,10 +751,10 @@ goto exit_create_index;
                 ///<param name="if pListItem">>pColl</param>
                 ///<param name="must exist or else there must have been an OOM error.  But if there">must exist or else there must have been an OOM error.  But if there</param>
                 ///<param name="was an OOM error, we would never reach this point. ">was an OOM error, we would never reach this point. </param>
-                if (pListItem.pExpr != null && Sqlite3.ALWAYS(pListItem.pExpr.pColl))
+                if (pListItem.pExpr != null && Sqlite3.ALWAYS(pListItem.pExpr.CollatingSequence))
                 {
                     int nColl;
-                    zColl = pListItem.pExpr.pColl.zName;
+                    zColl = pListItem.pExpr.CollatingSequence.zName;
                     nColl = StringExtensions.sqlite3Strlen30(zColl);
                     Debug.Assert(nExtra >= nColl);
                     zExtra = new StringBuilder(zColl.Substring(0, nColl));

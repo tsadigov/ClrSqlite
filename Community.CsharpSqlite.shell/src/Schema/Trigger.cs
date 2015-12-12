@@ -291,7 +291,7 @@ namespace Community.CsharpSqlite.Metadata
                 {
                     Trigger cp = (Trigger)MemberwiseClone();
                     if (pWhen != null)
-                        cp.pWhen = pWhen.Copy();
+                        cp.pWhen = pWhen.Clone();
                     if (pColumns != null)
                         cp.pColumns = pColumns.Copy();
                     if (pSchema != null)

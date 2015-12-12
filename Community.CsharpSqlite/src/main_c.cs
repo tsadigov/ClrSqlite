@@ -1091,7 +1091,7 @@ break;
                                 inTrans = 1;
                             }
                             dbFile.BTree.sqlite3BtreeRollback();
-                            dbFile.inTrans = 0;
+                            dbFile.inTrans = DbBackendState.NotWritable;
                         }
                     }
                 );

@@ -79,30 +79,34 @@ namespace Community.CsharpSqlite
                 //Log.Unindent();
             }
 
-            public void spanBinaryExpr(///
-                ///<summary>
-                ///Write the result here 
-                ///</summary>
+            ///<summary>
+            ///Write the result here 
+            ///</summary>
+            public void spanBinaryExpr(
+            
 
-            Sqlite3.Parse pParse, ///
-                ///<summary>
-                ///The parsing context.  Errors accumulate here 
-                ///</summary>
+            ///<summary>
+            ///The parsing context.  Errors accumulate here 
+            ///</summary>
+            Sqlite3.Parse pParse, 
+                                  
 
-            int op, ///
-                ///<summary>
-                ///The binary operation 
-                ///</summary>
+            ///<summary>
+            ///The binary operation 
+            ///</summary>
+            int op, 
+                    
 
-            ExprSpan pLeft, ///
-                ///<summary>
-                ///The left operand 
-                ///</summary>
-
-            ExprSpan pRight///
-                ///<summary>
-                ///The right operand 
-                ///</summary>
+            ///<summary>
+            ///The left operand 
+            ///</summary>
+            ExprSpan pLeft, 
+                            
+                            ///<summary>
+                            ///The right operand 
+                            ///</summary>
+            ExprSpan pRight
+                
 
             )
             {
@@ -539,16 +543,15 @@ public int iValue;            /* Non-negative integer value if ExprFlags.EP_IntV
 #else
             public struct _u
             {
-                public string zToken;
-                ///
                 ///<summary>
                 ///Token value. Zero terminated and dequoted 
                 ///</summary>
-                public int iValue;
-                ///
+                public string zToken;
+
                 ///<summary>
+                ///Non-negative integer value if ExprFlags.EP_IntValue 
                 ///</summary>
-                ///<param name="Non">negative integer value if ExprFlags.EP_IntValue </param>
+                public int iValue;
             }
             public ExprFlags Flags
             {
@@ -588,23 +591,25 @@ public int iValue;            /* Non-negative integer value if ExprFlags.EP_IntV
             ///</summary>
             public struct _x
             {
+                ///<summary>
+                ///Function arguments or in "<expr> IN (<expr">list)"
+                ///</summary>
                 public ExprList pList;
-                ///
+
                 ///<summary>
+                ///Used for sub">selects and "<expr> IN (<select>)"
                 ///</summary>
-                ///<param name="Function arguments or in "<expr> IN (<expr">list)" </param>
                 public Select pSelect;
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Used for sub">selects and "<expr> IN (<select>)" </param>
             }
             public _x x;
-            public CollSeq pColl;
-            ///
+
             ///<summary>
+            ///Collating Sequence
             ///The collation type of the column or 0 
             ///</summary>
+            public CollSeq CollatingSequence;
+            
+            
             ///
             ///<summary>
             ///If the ExprFlags.EP_Reduced flag is set in the Expr.flags mask, then no
@@ -654,7 +659,7 @@ public int iValue;            /* Non-negative integer value if ExprFlags.EP_IntV
             ///
             ///<summary>
             ///Table for Sqlite3.TK_COLUMN expressions. 
-            ///</summary>
+            ///</summary>            
 #if SQLITE_MAX_EXPR_DEPTH
             public int nHeight;
             ///
@@ -675,11 +680,11 @@ set { _op = value; }
 #endif
             public void CopyFrom(Expr cf)
             {
-                op = cf.op;
+                Operator = cf.Operator;
                 affinity = cf.affinity;
                 flags = cf.flags;
                 u = cf.u;
-                pColl = cf.pColl == null ? null : cf.pColl.Copy();
+                CollatingSequence = cf.CollatingSequence == null ? null : cf.CollatingSequence.Copy();
                 iTable = cf.iTable;
                 iColumn = cf.iColumn;
                 pAggInfo = cf.pAggInfo == null ? null : cf.pAggInfo.Copy();
@@ -691,41 +696,45 @@ set { _op = value; }
                 nHeight = cf.nHeight;
                 pZombieTab = cf.pZombieTab;
 #endif
-                pLeft = cf.pLeft == null ? null : cf.pLeft.Copy();
-                pRight = cf.pRight == null ? null : cf.pRight.Copy();
+                pLeft = cf.pLeft == null ? null : cf.pLeft.Clone();
+                pRight = cf.pRight == null ? null : cf.pRight.Clone();
                 x.pList = cf.x.pList == null ? null : cf.x.pList.Copy();
                 x.pSelect = cf.x.pSelect == null ? null : cf.x.pSelect.Copy();
             }
-            public Expr Copy()
+            public Expr Clone()
             {
                 if (this == null)
                     return null;
                 else
-                    return Copy(flags);
+                    return Clone(flags);
             }
-            public Expr Copy(ExprFlags flag)
+            public Expr Clone(ExprFlags flag)
             {
                 Expr cp = new Expr();
-                cp.op = op;
+                cp.Operator = Operator;
                 cp.affinity = affinity;
                 cp.flags = flags;
                 cp.u = u;
+
                 if ((flag & ExprFlags.EP_TokenOnly) != 0)
                     return cp;
+
                 if (pLeft != null)
-                    cp.pLeft = pLeft.Copy();
+                    cp.pLeft = pLeft.Clone();
                 if (pRight != null)
-                    cp.pRight = pRight.Copy();
+                    cp.pRight = pRight.Clone();
                 cp.x = x;
-                cp.pColl = pColl;
+                cp.CollatingSequence = CollatingSequence;
+
                 if ((flag & ExprFlags.EP_Reduced) != 0)
                     return cp;
+
                 cp.iTable = iTable;
                 cp.iColumn = iColumn;
                 cp.iAgg = iAgg;
                 cp.iRightJoinTable = iRightJoinTable;
                 cp.flags2 = flags2;
-                cp.op2 = op2;
+                cp.Operator2 = Operator2;
                 cp.pAggInfo = pAggInfo;
                 cp.pTab = pTab;
 #if SQLITE_MAX_EXPR_DEPTH
@@ -871,7 +880,7 @@ set { _op = value; }
                 ///</summary>
                 if (0 == (flags & Sqlite3.EXPRDUP_REDUCE))
                 {
-                    nSize = Sqlite3.EXPR_FULLSIZE;
+                    nSize = (int)ExprSize.EXPR_FULLSIZE;
                 }
                 else
                 {
@@ -879,13 +888,13 @@ set { _op = value; }
                     Debug.Assert(!this.ExprHasProperty(ExprFlags.EP_FromJoin));
                     Debug.Assert((this.flags2 & Sqlite3.EP2_MallocedToken) == 0);
                     Debug.Assert((this.flags2 & Sqlite3.EP2_Irreducible) == 0);
-                    if (this.pLeft != null || this.pRight != null || this.pColl != null || this.x.pList != null || this.x.pSelect != null)
+                    if (this.pLeft != null || this.pRight != null || this.CollatingSequence != null || this.x.pList != null || this.x.pSelect != null)
                     {
-                        nSize = Sqlite3.EXPR_REDUCEDSIZE | (int)ExprFlags.EP_Reduced;
+                        nSize = (int)ExprSize.EXPR_REDUCEDSIZE | (int)ExprFlags.EP_Reduced;
                     }
                     else
                     {
-                        nSize = Sqlite3.EXPR_TOKENONLYSIZE | (int)ExprFlags.EP_TokenOnly;
+                        nSize = (int)ExprSize.EXPR_TOKENONLYSIZE | (int)ExprFlags.EP_TokenOnly;
                     }
                 }
                 return nSize;
@@ -1003,14 +1012,14 @@ set { _op = value; }
                     pValue = (int)this.u.iValue;
                     return true;
                 }
-                switch (this.op)
+                switch (this.Operator)
                 {
-                    case Sqlite3.TK_UPLUS:
+                    case TokenType.TK_UPLUS:
                         {
                             rc = this.pLeft.sqlite3ExprIsInteger(ref pValue) ? 1 : 0;
                             break;
                         }
-                    case Sqlite3.TK_UMINUS:
+                    case TokenType.TK_UMINUS:
                         {
                             int v = 0;
                             if (this.pLeft.sqlite3ExprIsInteger(ref v))
@@ -1080,44 +1089,38 @@ set { _op = value; }
                 /// avoid the OP_SCopy.
                 ///
                 ///</summary>
-            int isAppropriateForFactoring()
+            bool isAppropriateForFactoring()
             {
                 Expr expr = this;
                 if (expr.sqlite3ExprIsConstantNotJoin() == 0)
                 {
-                    return 0;
-                    ///
-                    ///<summary>
+                    return false;
                     ///Only constant expressions are appropriate for factoring 
-                    ///</summary>
                 }
                 if ((expr.flags & ExprFlags.EP_FixedDest) == 0)
                 {
-                    return 1;
-                    ///
-                    ///<summary>
+                    return true;
                     ///Any constant without a fixed destination is appropriate 
-                    ///</summary>
                 }
-                while (expr.op == Sqlite3.TK_UPLUS)
+                while (expr.Operator == TokenType.TK_UPLUS)
                     expr = expr.pLeft;
-                switch (expr.op)
+                switch (expr.Operator)
                 {
 #if !SQLITE_OMIT_BLOB_LITERAL
-                    case Sqlite3.TK_BLOB:
+                    case TokenType.TK_BLOB:
 #endif
-                    case Sqlite3.TK_VARIABLE:
-                    case Sqlite3.TK_INTEGER:
-                    case Sqlite3.TK_FLOAT:
-                    case Sqlite3.TK_NULL:
-                    case Sqlite3.TK_STRING:
+                    case TokenType.TK_VARIABLE:
+                    case TokenType.TK_INTEGER:
+                    case TokenType.TK_FLOAT:
+                    case TokenType.TK_NULL:
+                    case TokenType.TK_STRING:
                         {
-                            sqliteinth.testcase(expr.op == Sqlite3.TK_BLOB);
-                            sqliteinth.testcase(expr.op == Sqlite3.TK_VARIABLE);
-                            sqliteinth.testcase(expr.op == Sqlite3.TK_INTEGER);
-                            sqliteinth.testcase(expr.op == Sqlite3.TK_FLOAT);
-                            sqliteinth.testcase(expr.op == Sqlite3.TK_NULL);
-                            sqliteinth.testcase(expr.op == Sqlite3.TK_STRING);
+                            sqliteinth.testcase(expr.Operator == TokenType.TK_BLOB);
+                            sqliteinth.testcase(expr.Operator == TokenType.TK_VARIABLE);
+                            sqliteinth.testcase(expr.Operator == TokenType.TK_INTEGER);
+                            sqliteinth.testcase(expr.Operator == TokenType.TK_FLOAT);
+                            sqliteinth.testcase(expr.Operator == TokenType.TK_NULL);
+                            sqliteinth.testcase(expr.Operator == TokenType.TK_STRING);
                             ///
                             ///<summary>
                             ///</summary>
@@ -1125,13 +1128,13 @@ set { _op = value; }
                             ///<param name="better done in">line.  If we factor them, they will just end</param>
                             ///<param name="up generating an OP_SCopy to move the value to the destination">up generating an OP_SCopy to move the value to the destination</param>
                             ///<param name="register. ">register. </param>
-                            return 0;
+                            return false;
                         }
-                    case Sqlite3.TK_UMINUS:
+                    case TokenType.TK_UMINUS:
                         {
                             if (expr.pLeft.op == Sqlite3.TK_FLOAT || expr.pLeft.op == Sqlite3.TK_INTEGER)
                             {
-                                return 0;
+                                return false;
                             }
                             break;
                         }
@@ -1140,7 +1143,7 @@ set { _op = value; }
                             break;
                         }
                 }
-                return 1;
+                return true;
             }
             public char sqlite3ExprAffinity()
             {
@@ -1176,7 +1179,7 @@ set { _op = value; }
             {
                 if (this != null && pColl != null)
                 {
-                    this.pColl = pColl;
+                    this.CollatingSequence = pColl;
                     this.flags |= ExprFlags.EP_ExpCollate;
                 }
                 return this;
@@ -1202,31 +1205,31 @@ set { _op = value; }
                 }
                 this.nHeight = nHeight + 1;
             }
-            public int isMatchOfColumn(///
+            public bool isMatchOfColumn(///
                 ///<summary>
                 ///Test this expression 
                 ///</summary>
             )
             {
                 ExprList pList;
-                if (this.op != Sqlite3.TK_FUNCTION)
+                if (this.Operator != TokenType.TK_FUNCTION)
                 {
-                    return 0;
+                    return false;
                 }
                 if (!this.u.zToken.Equals("match", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return 0;
+                    return false;
                 }
                 pList = this.x.pList;
                 if (pList.nExpr != 2)
                 {
-                    return 0;
+                    return false;
                 }
                 if (pList.a[1].pExpr.op != Sqlite3.TK_COLUMN)
                 {
-                    return 0;
+                    return false;
                 }
-                return 1;
+                return true;
             }
             public void transferJoinMarkings(Expr pBase)
             {
@@ -1473,24 +1476,29 @@ set { _op = value; }
      
     }
 
+    ///<summary>
+    ///Macros to determine the number of bytes required by a normal Expr
+    ///struct, an Expr struct with the .EP_Reduced flag set in Expr.flags
+    ///and an Expr struct with the .EP_TokenOnly flag set.
+    ///
+    ///</summary>
+    //#define EXPR_FULLSIZE           sizeof(Expr)           /* Full size */
+    //#define EXPR_REDUCEDSIZE        offsetof(Expr,iTable)  /* Common features */
+    //#define EXPR_TOKENONLYSIZE      offsetof(Expr,pLeft)   /* Fewer features */
+    // We don't use these in C#, but define them anyway,
+    public enum ExprSize
+    {
+        EXPR_FULLSIZE = 48,
+        EXPR_REDUCEDSIZE = 24,
+        EXPR_TOKENONLYSIZE = 8
+    }
+
     public partial class Sqlite3
     {
 
 
 
-        ///<summary>
-        ///Macros to determine the number of bytes required by a normal Expr
-        ///struct, an Expr struct with the .EP_Reduced flag set in Expr.flags
-        ///and an Expr struct with the .EP_TokenOnly flag set.
-        ///
-        ///</summary>
-        //#define EXPR_FULLSIZE           sizeof(Expr)           /* Full size */
-        //#define EXPR_REDUCEDSIZE        offsetof(Expr,iTable)  /* Common features */
-        //#define EXPR_TOKENONLYSIZE      offsetof(Expr,pLeft)   /* Fewer features */
-        // We don't use these in C#, but define them anyway,
-        public const int EXPR_FULLSIZE = 48;
-        public const int EXPR_REDUCEDSIZE = 24;
-        public const int EXPR_TOKENONLYSIZE = 8;
+        
         ///<summary>
         /// Flags passed to the exprc.sqlite3ExprDup() function. See the header comment
         /// above exprc.sqlite3ExprDup() for details.

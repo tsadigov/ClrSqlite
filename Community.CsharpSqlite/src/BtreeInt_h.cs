@@ -977,7 +977,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
             }
             if (rc == SqlResult.SQLITE_OK && pgno <= this.pHasContent.sqlite3BitvecSize())
             {
-                rc = this.pHasContent.sqlite3BitvecSet(pgno);
+                rc = this.pHasContent.setBit(pgno);
             }
             return rc;
         }
@@ -1177,18 +1177,10 @@ public u8 isPending;            /* If waiting for read-locks to clear */
             return SqlResult.SQLITE_OK;
         }
 
-        public SqlResult btreeGetPage(///
-                                      ///The btree 
-
-        Pgno pgno, ///
-                   ///Number of the page to fetch 
-
-        ref MemPage ppPage, ///
-                            ///Return the page in this parameter 
-
-        int noContent///
-                     ///Do not load page content if true 
-
+        public SqlResult btreeGetPage(
+            Pgno pgno, ///Number of the page to fetch 
+            ref MemPage ppPage, ///Return the page in this parameter 
+            int noContent///Do not load page content if true 
         )
         {
             SqlResult rc;

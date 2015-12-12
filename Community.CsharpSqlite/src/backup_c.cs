@@ -298,7 +298,7 @@ namespace Community.CsharpSqlite {
         public SqlResult sqlite3_backup_step(int nPage)
         {
             SqlResult rc;
-            int destMode;
+            JournalMode destMode;
             ///
             ///<summary>
             ///Destination journal mode 
@@ -390,7 +390,7 @@ namespace Community.CsharpSqlite {
                 pgszSrc = this.pSrc.GetPageSize();
                 pgszDest = this.pDest.GetPageSize();
                 destMode = this.pDest.sqlite3BtreePager().sqlite3PagerGetJournalMode();
-                if (SqlResult.SQLITE_OK == rc && destMode == Globals.Paging.PAGER_JOURNALMODE_WAL && pgszSrc != pgszDest)
+                if (SqlResult.SQLITE_OK == rc && destMode == JournalMode.PAGER_JOURNALMODE_WAL && pgszSrc != pgszDest)
                 {
                     rc = SqlResult.SQLITE_READONLY;
                 }

@@ -611,26 +611,10 @@ namespace Community.CsharpSqlite.Ast {
 								///
 								///</summary>
 								OpCode[] aMoveOp=new OpCode[] {
-									///
-									///<summary>
-									///Sqlite3.TK_GT 
-									///</summary>
-									OpCode.OP_SeekGt,
-									///
-									///<summary>
-									///Sqlite3.TK_LE 
-									///</summary>
-									OpCode.OP_SeekLe,
-									///
-									///<summary>
-									///Sqlite3.TK_LT 
-									///</summary>
-									OpCode.OP_SeekLt,
-									///
-									///<summary>
-									///Sqlite3.TK_GE 
-									///</summary>
-									OpCode.OP_SeekGe
+									OpCode.OP_SeekGt,///Sqlite3.TK_GT 
+									OpCode.OP_SeekLe,///Sqlite3.TK_LE 
+									OpCode.OP_SeekLt,///Sqlite3.TK_LT 
+									OpCode.OP_SeekGe///Sqlite3.TK_GE 
 								};
 								Debug.Assert(Sqlite3.TK_LE==Sqlite3.TK_GT+1);
 								///

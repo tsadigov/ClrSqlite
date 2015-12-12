@@ -646,34 +646,19 @@ assert( (pPg->flags&PGHDR.DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
         public static SqlResult readDbPage(PgHdr pPg)
         {
             Pager pPager = pPg.pPager;
-            ///
-            ///<summary>
             ///Pager object associated with page pPg 
-            ///</summary>
 
             Pgno pgno = pPg.pgno;
-            ///
-            ///<summary>
             ///Page number to read 
-            ///</summary>
 
             var rc = SqlResult.SQLITE_OK;
-            ///
-            ///<summary>
             ///Return code 
-            ///</summary>
 
             int isInWal = 0;
-            ///
-            ///<summary>
             ///True if page is in log file 
-            ///</summary>
 
             int pgsz = pPager.pageSize;
-            ///
-            ///<summary>
             ///Number of bytes to read 
-            ///</summary>
 
             Debug.Assert(pPager.eState >= PagerState.PAGER_READER &&
 #if SQLITE_OMIT_MEMORYDB
@@ -682,8 +667,8 @@ assert( (pPg->flags&PGHDR.DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
  0 == pPager.memDb
 #endif
 );
-            Debug.Assert(pPager.fd.isOpen);
-            if (NEVER(!pPager.fd.isOpen))
+            Debug.Assert(pPager.fileDescriptor.isOpen);
+            if (NEVER(!pPager.fileDescriptor.isOpen))
             {
                 Debug.Assert(pPager.tempFile);
                 Array.Clear(pPg.pData, 0, pPager.pageSize);
@@ -692,17 +677,15 @@ assert( (pPg->flags&PGHDR.DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
             }
             if (pPager.pagerUseWal())
             {
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Try to pull the page from the write">ahead log. </param>
+                
+                ///Try to pull the page from the write-ahead log. 
 
                 rc = wal.sqlite3WalRead(pPager.pWal, pgno, ref isInWal, pgsz, pPg.pData);
             }
             if (rc == SqlResult.SQLITE_OK && 0 == isInWal)
             {
                 i64 iOffset = (pgno - 1) * (i64)pPager.pageSize;
-                rc = os.sqlite3OsRead(pPager.fd, pPg.pData, pgsz, iOffset);
+                rc = os.sqlite3OsRead(pPager.fileDescriptor, pPg.pData, pgsz, iOffset);
                 if (rc == SqlResult.SQLITE_IOERR_SHORT_READ)
                 {
                     rc = SqlResult.SQLITE_OK;
@@ -1093,16 +1076,16 @@ return rc;
         {
             SqlResult rc = SqlResult.SQLITE_OK;
             Pager pPager = pPg.pPager;
-            if (pPager.journalMode != Globals.Paging.PAGER_JOURNALMODE_OFF)
+            if (pPager.journalMode != (int)JournalMode.PAGER_JOURNALMODE_OFF)
             {
                 ///
                 ///<summary>
                 ///</summary>
                 ///<param name="Open the sub">journal, if it has not already been opened </param>
 
-                Debug.Assert(pPager.useJournal != 0);
-                Debug.Assert(pPager.jfd.isOpen || pPager.pagerUseWal());
-                Debug.Assert(pPager.sjfd.isOpen || pPager.nSubRec == 0);
+                Debug.Assert(pPager.useJournal != false);
+                Debug.Assert(pPager.JournalFileDescriptor.isOpen || pPager.pagerUseWal());
+                Debug.Assert(pPager.SubJournalFileDescriptor.isOpen || pPager.nSubRec == 0);
                 Debug.Assert(pPager.pagerUseWal() || pPg.pageInJournal() || pPg.pgno > pPager.dbOrigSize);
                 rc = pPager.openSubJournal();
                 ///
@@ -1120,10 +1103,10 @@ return rc;
                         return SqlResult.SQLITE_NOMEM;
                     //CODEC2(pPager, pData, pPg.pgno, 7, return SQLITE_NOMEM, pData2);
                     PAGERTRACE("STMT-JOURNAL %d page %d\n", PagerMethods.PAGERID(pPager), pPg.pgno);
-                    rc = write32bits(pPager.sjfd, offset, pPg.pgno);
+                    rc = write32bits(pPager.SubJournalFileDescriptor, offset, pPg.pgno);
                     if (rc == SqlResult.SQLITE_OK)
                     {
-                        rc = os.sqlite3OsWrite(pPager.sjfd, pData2, pPager.pageSize, offset + 4);
+                        rc = os.sqlite3OsWrite(pPager.SubJournalFileDescriptor, pData2, pPager.pageSize, offset + 4);
                     }
                 }
             }
@@ -1535,11 +1518,11 @@ return rc;
             //(Pager*)(pPtr);
             pPager.pPCache = new PCache();
             //(PCache*)(pPtr += ROUND8(sizeof(*pPager)));
-            pPager.fd = new sqlite3_file();
+            pPager.fileDescriptor = new sqlite3_file();
             //(sqlite3_file*)(pPtr += ROUND8(pcacheSize));
-            pPager.sjfd = new sqlite3_file();
+            pPager.SubJournalFileDescriptor = new sqlite3_file();
             //(sqlite3_file*)(pPtr += ROUND8(pVfs.szOsFile));
-            pPager.jfd = new sqlite3_file();
+            pPager.JournalFileDescriptor = new sqlite3_file();
             //(sqlite3_file*)(pPtr += journalFileSize);
             //pPager.zFilename =    (char*)(pPtr += journalFileSize);
             //Debug.Assert( EIGHT_BYTE_ALIGNMENT(pPager.jfd) );
@@ -1588,7 +1571,7 @@ memcpy(&pPager.zWal[nPathname], "-wal", 4);
                 ///VFS flags returned by xOpen() 
                 ///</summary>
 
-                rc = os.sqlite3OsOpen(pVfs, pPager.zFilename, pPager.fd, vfsFlags, ref fout);
+                rc = os.sqlite3OsOpen(pVfs, pPager.zFilename, pPager.fileDescriptor, vfsFlags, ref fout);
                 Debug.Assert(0 == memDb);
                 readOnly = (fout & Sqlite3.SQLITE_OPEN_READONLY) != 0;
                 ///
@@ -1676,7 +1659,7 @@ szPageDflt = ii;
             if (rc != SqlResult.SQLITE_OK)
             {
                 Debug.Assert(null == pPager.pTmpSpace);
-                os.sqlite3OsClose(pPager.fd);
+                os.sqlite3OsClose(pPager.fileDescriptor);
                 //malloc_cs.sqlite3_free( ref pPager );
                 return rc;
             }
@@ -1688,9 +1671,9 @@ szPageDflt = ii;
             Debug.Assert(nExtra < 1000);
             nExtra = nExtra.ROUND8();
             PCacheMethods.sqlite3PcacheOpen((int)szPageDflt, nExtra, 0 == memDb, 0 == memDb ? (dxStress)pagerStress : null, pPager, pPager.pPCache);
-            PAGERTRACE("OPEN %d %s\n", FILEHANDLEID(pPager.fd), pPager.zFilename);
+            PAGERTRACE("OPEN %d %s\n", FILEHANDLEID(pPager.fileDescriptor), pPager.zFilename);
             sqliteinth.IOTRACE("OPEN %p %s\n", pPager, pPager.zFilename);
-            pPager.useJournal = (u8)(useJournal ? 1 : 0);
+            pPager.useJournal = useJournal ;
             pPager.noReadlock = (u8)(noReadlock && readOnly ? 1 : 0);
             ///
             ///<summary>
@@ -1765,16 +1748,16 @@ szPageDflt = ii;
 
             pPager.nExtra = (u16)nExtra;
             pPager.journalSizeLimit = Limits.Pager.SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT;
-            Debug.Assert(pPager.fd.isOpen || tempFile != 0);
+            Debug.Assert(pPager.fileDescriptor.isOpen || tempFile != 0);
             pPager.setSectorSize();
             if (!useJournal)
             {
-                pPager.journalMode = Globals.Paging.PAGER_JOURNALMODE_OFF;
+                pPager.journalMode = (int)JournalMode.PAGER_JOURNALMODE_OFF;
             }
             else
                 if (memDb != 0)
                 {
-                    pPager.journalMode = Globals.Paging.PAGER_JOURNALMODE_MEMORY;
+                    pPager.journalMode = (int)JournalMode.PAGER_JOURNALMODE_MEMORY;
                 }
             ///
             ///<summary>
@@ -1918,7 +1901,7 @@ szPageDflt = ii;
                 if (!pPg.pageInJournal() && !pPager.pagerUseWal())
                 {
                     Debug.Assert(pPager.pagerUseWal() == false);
-                    if (pPg.pgno <= pPager.dbOrigSize && pPager.jfd.isOpen)
+                    if (pPg.pgno <= pPager.dbOrigSize && pPager.JournalFileDescriptor.isOpen)
                     {
                         u32 cksum;
                         byte[] pData2 = null;
@@ -1949,13 +1932,13 @@ szPageDflt = ii;
                         ///<param name=""></param>
 
                         pPg.flags |= PGHDR.NEED_SYNC;
-                        rc = write32bits(pPager.jfd, iOff, pPg.pgno);
+                        rc = write32bits(pPager.JournalFileDescriptor, iOff, pPg.pgno);
                         if (rc != SqlResult.SQLITE_OK)
                             return rc;
-                        rc = os.sqlite3OsWrite(pPager.jfd, pData2, pPager.pageSize, iOff + 4);
+                        rc = os.sqlite3OsWrite(pPager.JournalFileDescriptor, pData2, pPager.pageSize, iOff + 4);
                         if (rc != SqlResult.SQLITE_OK)
                             return rc;
-                        rc = write32bits(pPager.jfd, iOff + pPager.pageSize + 4, cksum);
+                        rc = write32bits(pPager.JournalFileDescriptor, iOff + pPager.pageSize + 4, cksum);
                         if (rc != SqlResult.SQLITE_OK)
                             return rc;
                         sqliteinth.IOTRACE("JOUT %p %d %lld %d\n", pPager, pPg.pgno, pPager.journalOff, pPager.pageSize);
@@ -1972,7 +1955,7 @@ szPageDflt = ii;
                         pPager.journalOff += 8 + pPager.pageSize;
                         pPager.nRec++;
                         Debug.Assert(pPager.pInJournal != null);
-                        rc = pPager.pInJournal.sqlite3BitvecSet(pPg.pgno);
+                        rc = pPager.pInJournal.setBit(pPg.pgno);
                         sqliteinth.testcase(rc == SqlResult.SQLITE_NOMEM);
                         Debug.Assert(rc == SqlResult.SQLITE_OK || rc == SqlResult.SQLITE_NOMEM);
                         rc |= pPager.addToSavepointBitvecs(pPg.pgno);

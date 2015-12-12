@@ -76,7 +76,7 @@
       <Link>src\Backend\tree\BtreeInt_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\btree_c.cs">
-      <Link>src\tree\btree_c.cs</Link>
+      <Link>src\Backend\tree\btree_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\Btree_h.cs">
       <Link>src\Backend\tree\Btree_h.cs</Link>
@@ -226,7 +226,7 @@
       <Link>Community.CsharpSqlite\rowset_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\select_c.cs">
-      <Link>src\Ast\select_c.cs</Link>
+      <Link>src\Compiler\Ast\select_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\sqlite3_h.cs">
       <Link>Community.CsharpSqlite\sqlite3_h.cs</Link>
@@ -299,6 +299,7 @@
     </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\Backend\Paging\PagingJournalMode.cs" />
     <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Compiler\Ast\Expr.cs" />
     <Compile Include="src\Compiler\Ast\ExprExtensions.cs" />

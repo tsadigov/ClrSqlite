@@ -245,7 +245,7 @@ namespace Community.CsharpSqlite.Ast
             {
                 Token x = new Token();
                 x.zRestSql = zToken;
-                x.Length = !String.IsNullOrEmpty(zToken) ? StringExtensions.sqlite3Strlen30(zToken) : 0;
+                x.Length = !String.IsNullOrEmpty(zToken) ? zToken.sqlite3Strlen30() : 0;
                 return CreateExpr(db, op, x, false);
             }
             ///
@@ -272,7 +272,7 @@ namespace Community.CsharpSqlite.Ast
                         if ((pRight.Flags & ExprFlags.EP_ExpCollate) != 0)
                         {
                             pRoot.Flags |= ExprFlags.EP_ExpCollate;
-                            pRoot.pColl = pRight.pColl;
+                            pRoot.CollatingSequence = pRight.CollatingSequence;
                         }
                     }
                     if (pLeft != null)
@@ -281,7 +281,7 @@ namespace Community.CsharpSqlite.Ast
                         if ((pLeft.Flags & ExprFlags.EP_ExpCollate) != 0)
                         {
                             pRoot.Flags |= ExprFlags.EP_ExpCollate;
-                            pRoot.pColl = pLeft.pColl;
+                            pRoot.CollatingSequence = pLeft.CollatingSequence;
                         }
                     }
                     pRoot.exprSetHeight();
@@ -370,7 +370,7 @@ namespace Community.CsharpSqlite.Ast
                     }
                     if (p.ExprHasProperty(ExprFlags.EP_xIsSelect))
                     {
-                        SelectMethods.sqlite3SelectDelete(db, ref p.x.pSelect);
+                        SelectMethods.SelectDestructor(db, ref p.x.pSelect);
                     }
                     else
                     {
@@ -388,13 +388,13 @@ namespace Community.CsharpSqlite.Ast
             /// EXPR_REDUCEDSIZE or EXPR_TOKENONLYSIZE.
             ///
             ///</summary>
-            static int exprStructSize(Expr p)
+            static ExprSize exprStructSize(Expr p)
             {
                 if (p.ExprHasProperty(ExprFlags.EP_TokenOnly))
-                    return Sqlite3.EXPR_TOKENONLYSIZE;
+                    return ExprSize.EXPR_TOKENONLYSIZE;
                 if (p.ExprHasProperty(ExprFlags.EP_Reduced))
-                    return Sqlite3.EXPR_REDUCEDSIZE;
-                return Sqlite3.EXPR_FULLSIZE;
+                    return ExprSize.EXPR_REDUCEDSIZE;
+                return ExprSize.EXPR_FULLSIZE;
             }
             ///<summary>
             /// This function is similar to exprc.sqlite3ExprDup(), except that if pzBuffer
@@ -456,14 +456,14 @@ namespace Community.CsharpSqlite.Ast
                         if (isReduced)
                         {
                             Debug.Assert(!p.ExprHasProperty(ExprFlags.EP_Reduced));
-                            pNew = p.Copy((ExprFlags)Sqlite3.EXPR_TOKENONLYSIZE);
+                            pNew = p.Clone((ExprFlags)ExprSize.EXPR_TOKENONLYSIZE);
                             //memcpy( zAlloc, p, nNewSize );
                         }
                         else
                         {
-                            int nSize = exprStructSize(p);
+                            int nSize = (int)exprStructSize(p);
                             //memcpy( zAlloc, p, nSize );
-                            pNew = p.Copy();
+                            pNew = p.Clone();
                             //memset( &zAlloc[nSize], 0, EXPR_FULLSIZE - nSize );
                         }
                         ///
@@ -1378,7 +1378,7 @@ return null;
                             break;
                         }
                 }
-                if (pExpr.isAppropriateForFactoring() != 0)
+                if (pExpr.isAppropriateForFactoring() != false)
                 {
                     int r1 = ++pParse.nMem;
                     int r2;
@@ -1514,7 +1514,7 @@ return null;
                     }
                 if ((pA.Flags & ExprFlags.EP_ExpCollate) != (pB.Flags & ExprFlags.EP_ExpCollate))
                     return 1;
-                if ((pA.Flags & ExprFlags.EP_ExpCollate) != 0 && pA.pColl != pB.pColl)
+                if ((pA.Flags & ExprFlags.EP_ExpCollate) != 0 && pA.CollatingSequence != pB.CollatingSequence)
                     return 2;
                 return 0;
             }

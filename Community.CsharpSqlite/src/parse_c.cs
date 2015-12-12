@@ -7078,7 +7078,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 				///</summary>
 				{
 					//#line 403 "parse.y"
-					SelectMethods.sqlite3SelectDelete(pParse.db,ref (yypminor.yy387_Select));
+					SelectMethods.SelectDestructor(pParse.db,ref (yypminor.yy387_Select));
 					//#line 1399 "parse.c"
 				}
 				break;
@@ -9103,7 +9103,7 @@ return yy_default[stateno];
 			//#line 163 "parse.y"
 			{
                 pParse.sqlite3EndTable(0, 0, yymsp[0].minor.yy387_Select);
-				SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387_Select);
+				SelectMethods.SelectDestructor(pParse.db,ref yymsp[0].minor.yy387_Select);
 			}
 			//#line 2231 "parse.c"
 			break;
@@ -9777,7 +9777,7 @@ return yy_default[stateno];
 			{
 				SelectDest dest=new SelectDest(SelectResultType.Output,'\0',0,0,0);
 				Select.sqlite3Select(pParse,yymsp[0].minor.yy387_Select,ref dest);
-				SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[0].minor.yy387_Select);
+				SelectMethods.SelectDestructor(pParse.db,ref yymsp[0].minor.yy387_Select);
 			}
 			//#line 2512 "parse.c"
 			break;
@@ -9804,7 +9804,7 @@ return yy_default[stateno];
 					yymsp[0].minor.yy387_Select.pPrior=yymsp[-2].minor.yy387_Select;
 				}
 				else {
-					SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[-2].minor.yy387_Select);
+					SelectMethods.SelectDestructor(pParse.db,ref yymsp[-2].minor.yy387_Select);
 				}
 				yygotominor.yy387_Select=yymsp[0].minor.yy387_Select;
 			}
@@ -11005,7 +11005,7 @@ return yy_default[stateno];
 					pParse.sqlite3ExprSetHeight(yygotominor.yy118_ExprSpan.pExpr);
 				}
 				else {
-					SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387_Select);
+					SelectMethods.SelectDestructor(pParse.db,ref yymsp[-1].minor.yy387_Select);
 				}
 				yygotominor.yy118_ExprSpan.zStart=yymsp[-2].minor.yy0Token.zRestSql;
 				yygotominor.yy118_ExprSpan.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);
@@ -11027,7 +11027,7 @@ return yy_default[stateno];
 					pParse.sqlite3ExprSetHeight(yygotominor.yy118_ExprSpan.pExpr);
 				}
 				else {
-					SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387_Select);
+					SelectMethods.SelectDestructor(pParse.db,ref yymsp[-1].minor.yy387_Select);
 				}
 				if(yymsp[-3].minor.yy4!=0)
 					yygotominor.yy118_ExprSpan.pExpr=pParse.sqlite3PExpr(Sqlite3.TK_NOT,yygotominor.yy118_ExprSpan.pExpr,0,0);
@@ -11075,7 +11075,7 @@ return yy_default[stateno];
 					pParse.sqlite3ExprSetHeight(p);
 				}
 				else {
-					SelectMethods.sqlite3SelectDelete(pParse.db,ref yymsp[-1].minor.yy387_Select);
+					SelectMethods.SelectDestructor(pParse.db,ref yymsp[-1].minor.yy387_Select);
 				}
 				yygotominor.yy118_ExprSpan.zStart=yymsp[-3].minor.yy0Token.zRestSql;
 				yygotominor.yy118_ExprSpan.zEnd=yymsp[0].minor.yy0Token.zRestSql.Substring(yymsp[0].minor.yy0Token.Length);

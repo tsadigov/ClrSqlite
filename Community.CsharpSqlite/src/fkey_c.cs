@@ -176,7 +176,7 @@ namespace Community.CsharpSqlite
                     TriggerStep pStep = p.step_list;
                     exprc.sqlite3ExprDelete(dbMem, ref pStep.pWhere);
                     exprc.sqlite3ExprListDelete(dbMem, ref pStep.pExprList);
-                    SelectMethods.sqlite3SelectDelete(dbMem, ref pStep.pSelect);
+                    SelectMethods.SelectDestructor(dbMem, ref pStep.pSelect);
                     exprc.sqlite3ExprDelete(dbMem, ref p.pWhen);
                     dbMem.sqlite3DbFree(ref p);
                 }

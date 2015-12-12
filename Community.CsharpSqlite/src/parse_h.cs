@@ -2504,7 +2504,7 @@ goto attach_end;
 								iCol=-1;
 							pLeft.iTable=regData+iCol+1;
 							pLeft.affinity=pCol.affinity;
-							pLeft.pColl=build.sqlite3LocateCollSeq(this,pCol.zColl);
+							pLeft.CollatingSequence=build.sqlite3LocateCollSeq(this,pCol.zColl);
 						}
 						else {
 							pLeft.iTable=regData;
@@ -3269,7 +3269,7 @@ goto attach_end;
 					exprc.sqlite3ExprDelete(db,ref pWhere);
 					exprc.sqlite3ExprDelete(db,ref pWhen);
 					exprc.sqlite3ExprListDelete(db,ref pList);
-					SelectMethods.sqlite3SelectDelete(db,ref pSelect);
+					SelectMethods.SelectDestructor(db,ref pSelect);
 					switch(action) {
 					case OnConstraintError.OE_Restrict:
 					pStep.op=Sqlite3.TK_SELECT;
@@ -4512,7 +4512,7 @@ isView = false;
 				insert_cleanup:
 				build.sqlite3SrcListDelete(db,ref pTabList);
 				exprc.sqlite3ExprListDelete(db,ref pList);
-				SelectMethods.sqlite3SelectDelete(db,ref pSelect);
+				SelectMethods.SelectDestructor(db,ref pSelect);
 				build.sqlite3IdListDelete(db,ref pColumn);
 				db.sqlite3DbFree(ref aRegIdx);
 			}
@@ -6074,7 +6074,7 @@ aXRef[j] = -1;
 				///<summary>
 				///Cleanup 
 				///</summary>
-				SelectMethods.sqlite3SelectDelete(db,ref pSelect);
+				SelectMethods.SelectDestructor(db,ref pSelect);
 			}
 			public Table sqlite3SrcListLookup(SrcList pSrc) {
 				SrcList_item pItem=pSrc.a[0];
@@ -6165,7 +6165,7 @@ aXRef[j] = -1;
 				}
                 dest.Init( SelectResultType.EphemTab, iCur);
 				Select.sqlite3Select(this,pDup,ref dest);
-				SelectMethods.sqlite3SelectDelete(db,ref pDup);
+				SelectMethods.SelectDestructor(db,ref pDup);
 			}
 			public void sqlite3DeleteFrom(///
 			///<summary>
@@ -6794,7 +6794,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				Expr p=pExpr;
 				while(Sqlite3.ALWAYS(p)) {
 					TokenType op;
-					pColl=pExpr.pColl;
+					pColl=pExpr.CollatingSequence;
 					if(pColl!=null)
 						break;
 					op=p.Operator;
@@ -6810,7 +6810,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 							Connection db=this.db;
 							zColl=p.pTab.aCol[j].zColl;
 							pColl=db.sqlite3FindCollSeq(sqliteinth.ENC(db),zColl,0);
-							pExpr.pColl=pColl;
+							pExpr.CollatingSequence=pColl;
 						}
 						break;
 					}
@@ -6828,13 +6828,13 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				CollSeq pColl;
 				Debug.Assert(pLeft!=null);
 				if((pLeft.Flags&ExprFlags.EP_ExpCollate)!=0) {
-					Debug.Assert(pLeft.pColl!=null);
-					pColl=pLeft.pColl;
+					Debug.Assert(pLeft.CollatingSequence!=null);
+					pColl=pLeft.CollatingSequence;
 				}
 				else
 					if(pRight!=null&&((pRight.Flags&ExprFlags.EP_ExpCollate)!=0)) {
-						Debug.Assert(pRight.pColl!=null);
-						pColl=pRight.pColl;
+						Debug.Assert(pRight.CollatingSequence!=null);
+						pColl=pRight.CollatingSequence;
 					}
 					else {
 						pColl=this.sqlite3ExprCollSeq(pLeft);
@@ -6911,9 +6911,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				return this.sqlite3PExpr(op,pLeft,pRight,null);
 			}
 			public Expr sqlite3PExpr(///
-			///<summary>
-			///Parsing context 
-			///</summary>
+			
 			int op,///
 			///<summary>
 			///Expression opcode 
@@ -8045,7 +8043,7 @@ return;
 				///Temporary use register 
 				///</summary>
 				Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
-				exprX=pExpr.pLeft.Copy();
+				exprX=pExpr.pLeft.Clone();
 				exprAnd.op=Sqlite3.TK_AND;
 				exprAnd.pLeft=compLeft;
 				exprAnd.pRight=compRight;
@@ -8619,9 +8617,9 @@ return;
 				ExprFlags expRight=(pExpr.pRight.Flags&ExprFlags.EP_ExpCollate);
 				ExprFlags expLeft=(pExpr.pLeft.Flags&ExprFlags.EP_ExpCollate);
 				Debug.Assert(wherec.allowedOp(pExpr.op)&&pExpr.op!=Sqlite3.TK_IN);
-				pExpr.pRight.pColl=this.sqlite3ExprCollSeq(pExpr.pRight);
-				pExpr.pLeft.pColl=this.sqlite3ExprCollSeq(pExpr.pLeft);
-				_Custom.SWAP(ref pExpr.pRight.pColl,ref pExpr.pLeft.pColl);
+				pExpr.pRight.CollatingSequence=this.sqlite3ExprCollSeq(pExpr.pRight);
+				pExpr.pLeft.CollatingSequence=this.sqlite3ExprCollSeq(pExpr.pLeft);
+				_Custom.SWAP(ref pExpr.pRight.CollatingSequence,ref pExpr.pLeft.CollatingSequence);
 				pExpr.pRight.Flags=((pExpr.pRight.Flags&~ExprFlags.EP_ExpCollate)|expLeft);
 				pExpr.pLeft.Flags=((pExpr.pLeft.Flags&~ExprFlags.EP_ExpCollate)|expRight);
                 _Custom.SWAP(ref pExpr.pRight, ref pExpr.pLeft);

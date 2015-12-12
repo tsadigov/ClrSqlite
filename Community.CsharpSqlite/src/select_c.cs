@@ -58,18 +58,19 @@ namespace Community.CsharpSqlite.Ast {
                 exprc.sqlite3ExprListDelete(db, ref p.pGroupBy);
                 exprc.sqlite3ExprDelete(db, ref p.pHaving);
                 exprc.sqlite3ExprListDelete(db, ref p.pOrderBy);
-                SelectMethods.sqlite3SelectDelete(db, ref p.pPrior);
+                SelectMethods.SelectDestructor(db, ref p.pPrior);
                 exprc.sqlite3ExprDelete(db, ref p.pLimit);
                 exprc.sqlite3ExprDelete(db, ref p.pOffset);
             }
 
 
 
-            ///<summary>
-            /// Delete the given Select structure and all of its substructures.
-            ///
-            ///</summary>
-            public static void sqlite3SelectDelete(Connection db, ref Select p)
+        ///<summary>
+        ///sqlite3SelectDelete
+        /// Delete the given Select structure and all of its substructures.
+        ///
+        ///</summary>
+        public static void SelectDestructor(Connection db, ref Select p)
             {
                 if (p != null)
                 {
@@ -2048,13 +2049,13 @@ break;
                             Expr pTerm = pOrderBy.a[i].pExpr;
                             if ((pTerm.Flags & ExprFlags.EP_ExpCollate) != 0)
                             {
-                                pColl = pTerm.pColl;
+                                pColl = pTerm.CollatingSequence;
                             }
                             else
                             {
                                 pColl = multiSelectCollSeq(pParse, p, aPermute[i]);
                                 pTerm.Flags |= ExprFlags.EP_ExpCollate;
-                                pTerm.pColl = pColl;
+                                pTerm.CollatingSequence = pColl;
                             }
                             pKeyMerge.aColl[i] = pColl;
                             pKeyMerge.aSortOrder[i] = pOrderBy.a[i].sortOrder;
@@ -2340,7 +2341,7 @@ break;
                 ///</summary>
                 if (p.pPrior != null)
                 {
-                    SelectMethods.sqlite3SelectDelete(db, ref p.pPrior);
+                    SelectMethods.SelectDestructor(db, ref p.pPrior);
                 }
                 p.pPrior = pPrior;
                 ///
@@ -2406,9 +2407,9 @@ break;
                         Debug.Assert(pEList != null && pExpr.iColumn < pEList.nExpr);
                         Debug.Assert(pExpr.pLeft == null && pExpr.pRight == null);
                         pNew = exprc.sqlite3ExprDup(db, pEList.a[pExpr.iColumn].pExpr, 0);
-                        if (pExpr.pColl != null)
+                        if (pExpr.CollatingSequence != null)
                         {
-                            pNew.pColl = pExpr.pColl;
+                            pNew.CollatingSequence = pExpr.CollatingSequence;
                         }
                         exprc.sqlite3ExprDelete(db, ref pExpr);
                         pExpr = pNew;
@@ -3014,8 +3015,8 @@ break;
                 }
                 ///Finially, delete what is left of the subquery and return
                 ///success.
-                SelectMethods.sqlite3SelectDelete(db, ref check.pSub);
-                SelectMethods.sqlite3SelectDelete(db, ref pSub1);
+                SelectMethods.SelectDestructor(db, ref check.pSub);
+                SelectMethods.SelectDestructor(db, ref pSub1);
                 return 1;
             }
 #endif

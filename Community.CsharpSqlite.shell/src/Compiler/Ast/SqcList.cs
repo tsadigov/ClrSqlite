@@ -775,7 +775,7 @@ namespace Community.CsharpSqlite.Ast
                 ///virtual tables.  The native query optimizer does not attempt
                 ///to do anything with MATCH functions.
                 ///</summary>
-                if (pExpr.isMatchOfColumn() != 0)
+                if (pExpr.isMatchOfColumn() != false)
                 {
                     int idxNew;
                     Expr pRight, pLeft;

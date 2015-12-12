@@ -32,33 +32,32 @@ namespace Community.CsharpSqlite
     //typedef struct PagerSavepoint PagerSavepoint;
     public class PagerSavepoint
     {
-        public i64 iOffset;
-
-        ///
         ///<summary>
         ///Starting offset in main journal 
         ///</summary>
+        public i64 iOffset;
+        
 
-        public i64 iHdrOffset;
-
-        ///
         ///<summary>
         ///See above 
         ///</summary>
+        public i64 iHdrOffset;
 
-        public Bitvec pInSavepoint;
+        
 
-        ///
+
         ///<summary>
         ///Set of pages in this savepoint 
         ///</summary>
-
-        public Pgno nOrig;
-
-        ///
+        public Bitvec pInSavepoint;
+        
         ///<summary>
         ///Original number of pages in file 
         ///</summary>
+        public Pgno nOrig;
+
+        ///
+        
 
         public Pgno iSubRec;
 

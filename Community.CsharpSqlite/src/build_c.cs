@@ -1177,21 +1177,21 @@ p.zName,  P4Usage.P4_STATIC );
                 if (pParse.nVar > 0)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "parameters are not allowed in views");
-                    SelectMethods.sqlite3SelectDelete(db, ref pSelect);
+                    SelectMethods.SelectDestructor(db, ref pSelect);
                     return;
                 }
                 TableBuilder.sqlite3StartTable(pParse, pName1, pName2, isTemp, 1, 0, noErr);
                 var p = pParse.pNewTable;
                 if (p == null || pParse.nErr != 0)
                 {
-                    SelectMethods.sqlite3SelectDelete(db, ref pSelect);
+                    SelectMethods.SelectDestructor(db, ref pSelect);
                     return;
                 }
                 build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
                 var iDb = Sqlite3.sqlite3SchemaToIndex(db, p.pSchema);
                 if (sFix.sqlite3FixInit(pParse, iDb, "view", pName) != 0 && sFix.sqlite3FixSelect(pSelect) != 0)
                 {
-                    SelectMethods.sqlite3SelectDelete(db, ref pSelect);
+                    SelectMethods.SelectDestructor(db, ref pSelect);
                     return;
                 }
                 ///Make a copy of the entire SELECT statement that defines the view.
@@ -1200,7 +1200,7 @@ p.zName,  P4Usage.P4_STATIC );
                 ///<param name="they will persist after the current sqlite3_exec() call returns.">they will persist after the current sqlite3_exec() call returns.</param>
                 ///<param name=""></param>
                 p.pSelect = exprc.sqlite3SelectDup(db, pSelect, Sqlite3.EXPRDUP_REDUCE);
-                SelectMethods.sqlite3SelectDelete(db, ref pSelect);
+                SelectMethods.SelectDestructor(db, ref pSelect);
                 //if ( db.mallocFailed != 0 )
                 //{
                 //  return;
@@ -1338,7 +1338,7 @@ db.xAuth = xAuth;
                         pTable.nCol = 0;
                         nErr++;
                     }
-                    SelectMethods.sqlite3SelectDelete(db, ref pSel);
+                    SelectMethods.SelectDestructor(db, ref pSel);
                 }
                 else
                 {
@@ -2150,7 +2150,7 @@ goto exit_drop_index;
                     db.sqlite3DbFree(ref pItem.zAlias);
                     db.sqlite3DbFree(ref pItem.zIndex);
                     TableBuilder.sqlite3DeleteTable(db, ref pItem.pTab);
-                    SelectMethods.sqlite3SelectDelete(db, ref pItem.pSelect);
+                    SelectMethods.SelectDestructor(db, ref pItem.pSelect);
                     exprc.sqlite3ExprDelete(db, ref pItem.pOn);
                     build.sqlite3IdListDelete(db, ref pItem.pUsing);
                 }
@@ -2226,7 +2226,7 @@ goto exit_drop_index;
                 Debug.Assert(p == null);
                 exprc.sqlite3ExprDelete(db, ref pOn);
                 build.sqlite3IdListDelete(db, ref pUsing);
-                SelectMethods.sqlite3SelectDelete(db, ref pSubquery);
+                SelectMethods.SelectDestructor(db, ref pSubquery);
                 return null;
             }
             ///<summary>

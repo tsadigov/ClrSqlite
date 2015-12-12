@@ -643,7 +643,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 build.sqliteDeleteColumnNames(db, pTable);
                 db.sqlite3DbFree(ref pTable.zName);
                 db.sqlite3DbFree(ref pTable.zColAff);
-                SelectMethods.sqlite3SelectDelete(db, ref pTable.pSelect);
+                SelectMethods.SelectDestructor(db, ref pTable.pSelect);
 #if !SQLITE_OMIT_CHECK
                 exprc.sqlite3ExprDelete(db, ref pTable.pCheck);
 #endif

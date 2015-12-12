@@ -4713,19 +4713,19 @@ cDebug.Ase  OpCode.OP_Checkpoint: {
                                         ///Btree to change journal mode of 
                                         Pager pPager;
                                         ///Pager associated with pBt 
-                                        int eNew;
+                                        JournalMode eNew;
                                         ///New journal mode 
-                                        int eOld;
+                                        JournalMode eOld;
                                         ///The old journal mode 
                                         string zFilename;
                                         ///Name of database file for pPager 
-                                        eNew = pOp.p3;
-                                        Debug.Assert(eNew == Globals.Paging.PAGER_JOURNALMODE_DELETE || eNew == Globals.Paging.PAGER_JOURNALMODE_TRUNCATE || eNew == Globals.Paging.PAGER_JOURNALMODE_PERSIST || eNew == Globals.Paging.PAGER_JOURNALMODE_OFF || eNew == Globals.Paging.PAGER_JOURNALMODE_MEMORY || eNew == Globals.Paging.PAGER_JOURNALMODE_WAL || eNew == Globals.Paging.PAGER_JOURNALMODE_QUERY);
+                                        eNew =(JournalMode) pOp.p3;
+                                        Debug.Assert(eNew == JournalMode.PAGER_JOURNALMODE_DELETE || eNew == JournalMode.PAGER_JOURNALMODE_TRUNCATE || eNew == JournalMode.PAGER_JOURNALMODE_PERSIST || eNew == JournalMode.PAGER_JOURNALMODE_OFF || eNew == JournalMode.PAGER_JOURNALMODE_MEMORY || eNew == JournalMode.PAGER_JOURNALMODE_WAL || eNew == JournalMode.PAGER_JOURNALMODE_QUERY);
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.BackendCount);
                                         pBt = db.Backends[pOp.p1].BTree;
                                         pPager = pBt.sqlite3BtreePager();
                                         eOld = pPager.sqlite3PagerGetJournalMode();
-                                        if (eNew == Globals.Paging.PAGER_JOURNALMODE_QUERY)
+                                        if (eNew == JournalMode.PAGER_JOURNALMODE_QUERY)
                                             eNew = eOld;
                                         if (0 == pPager.sqlite3PagerOkToChangeJournalMode())
                                             eNew = eOld;

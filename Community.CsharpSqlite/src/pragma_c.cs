@@ -366,7 +366,8 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 		/// defined in pager.h. This function returns the associated lowercase
 		/// journal-mode name.
 		///</summary>
-		public static string sqlite3JournalModename(int eMode) {
+		public static string sqlite3JournalModename(JournalMode Mode) {
+            int eMode = (int)Mode;
 			string[] azModeName= {
 				"delete",
 				"persist",
@@ -377,12 +378,12 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 																																																																														, "wal"
 #endif
 			};
-			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_DELETE==0);
-			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_PERSIST==1);
-			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_OFF==2);
-			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_TRUNCATE==3);
-			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_MEMORY==4);
-			Debug.Assert(Globals.Paging.PAGER_JOURNALMODE_WAL==5);
+			Debug.Assert((int)JournalMode.PAGER_JOURNALMODE_DELETE==0);
+			Debug.Assert((int)JournalMode.PAGER_JOURNALMODE_PERSIST==1);
+			Debug.Assert((int)JournalMode.PAGER_JOURNALMODE_OFF==2);
+			Debug.Assert((int)JournalMode.PAGER_JOURNALMODE_TRUNCATE==3);
+			Debug.Assert((int)JournalMode.PAGER_JOURNALMODE_MEMORY==4);
+			Debug.Assert((int)JournalMode.PAGER_JOURNALMODE_WAL==5);
 			Debug.Assert(eMode>=0&&eMode<=Sqlite3.ArraySize(azModeName));
 			if(eMode==Sqlite3.ArraySize(azModeName))
 				return null;
@@ -748,21 +749,13 @@ goto pragma_out;
 									///
 									///</summary>
 									if(zLeft=="journal_mode") {
-										int eMode;
-										///
-										///<summary>
+                                        JournalMode eMode;
 										///One of the Globals.Paging.PAGER_JOURNALMODE_XXX symbols 
-										///</summary>
 										int ii;
-										///
-										///<summary>
 										///Loop counter 
-										///</summary>
-										///
-										///<summary>
-										///Force the schema to be loaded on all databases.  This cases all
+										
+                                        ///Force the schema to be loaded on all databases.  This cases all
 										///database files to be opened and the journal_modes set. 
-										///</summary>
 										if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
 											goto pragma_out;
 										}
@@ -774,7 +767,7 @@ goto pragma_out;
 											///If there is no "=MODE" part of the pragma, do a query for the
 											///current mode 
 											///</summary>
-											eMode=Globals.Paging.PAGER_JOURNALMODE_QUERY;
+											eMode=JournalMode.PAGER_JOURNALMODE_QUERY;
 										}
 										else {
 											string zMode;
@@ -789,10 +782,10 @@ goto pragma_out;
 												///If the "=MODE" part does not match any known journal mode,
 												///then do a query 
 												///</summary>
-												eMode=Globals.Paging.PAGER_JOURNALMODE_QUERY;
+												eMode= JournalMode.PAGER_JOURNALMODE_QUERY;
 											}
 										}
-										if(eMode==Globals.Paging.PAGER_JOURNALMODE_QUERY&&pId2.Length==0) {
+										if(eMode== JournalMode.PAGER_JOURNALMODE_QUERY&&pId2.Length==0) {
 											///
 											///<summary>
 											///Convert "PRAGMA journal_mode" into "PRAGMA main.journal_mode" 
@@ -803,7 +796,7 @@ goto pragma_out;
 										for(ii=db.BackendCount-1;ii>=0;ii--) {
 											if(db.Backends[ii].BTree!=null&&(ii==iDb||pId2.Length==0)) {
                                                 Engine.vdbeaux.sqlite3VdbeUsesBtree(v, ii);
-                                                v.sqlite3VdbeAddOp3(OpCode.OP_JournalMode, ii, 1, eMode);
+                                                v.sqlite3VdbeAddOp3(OpCode.OP_JournalMode, ii, 1, (int)eMode);
 											}
 										}
 										v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,1,1);

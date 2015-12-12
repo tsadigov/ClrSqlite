@@ -233,41 +233,30 @@ namespace Community.CsharpSqlite
             ///</summary>
             public int[] aLimit = new int[sqliteinth.SQLITE_N_LIMIT];
 
-
-            public class sqlite3InitInfo
-            {
-                ///
-                ///<summary>
+///<summary>
                 ///Information used during initialization 
                 ///</summary>
-
-                public int iDb;
-
-                ///
+            public class sqlite3InitInfo
+            {
                 ///<summary>
                 ///When back is being initialized 
                 ///</summary>
+                public int iDb;
 
-                public int newTnum;
-
-                ///
                 ///<summary>
                 ///Rootpage of table being initialized 
                 ///</summary>
+                public int newTnum;
 
-                public u8 busy;
-
-                ///
                 ///<summary>
                 ///TRUE if currently initializing 
                 ///</summary>
+                public u8 busy;
 
-                public u8 orphanTrigger;
-                ///
                 ///<summary>
                 ///Last statement is orphaned TEMP trigger 
                 ///</summary>
-
+                public u8 orphanTrigger;
             };
 
 

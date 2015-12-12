@@ -286,456 +286,454 @@ namespace Community.CsharpSqlite.Paging
 #endif
 
     }
-    
-        
 
-        
+
+
+
+
+    ///
+    ///<summary>
+    ///A open page cache is an instance of struct Pager. A description of
+    ///some of the more important member variables follows:
+    ///
+    ///eState
+    ///
+    ///The current 'state' of the pager object. See the comment and state
+    ///diagram above for a description of the pager state.
+    ///
+    ///eLock
+    ///
+    ///</summary>
+    ///For a real on
+    ///NO_LOCK, SHARED_LOCK, RESERVED_LOCK or EXCLUSIVE_LOCK.
+    ///        
+    ///For a temporary or in-memory database (neither of which require any
+    ///locks), this variable is always set to EXCLUSIVE_LOCK. Since such">locks), this variable is always set to EXCLUSIVE_LOCK. Since such
+    ///databases always have Pager.exclusiveMode==1, this tricks the pager
+    ///logic into thinking that it already has all the locks it will ever
+    ///need (and no reason to release them).
+    ///        
+    ///In some (obscure) circumstances, this variable may also be set to
+    ///UNKNOWN_LOCK. See the comment above the #define of UNKNOWN_LOCK for
+    ///details.
+    ///<param name=""></param>
+    ///<param name="changeCountDone">changeCountDone</param>
+    ///<param name=""></param>
+    ///<param name="This boolean variable is used to make sure that the change">counter </param>
+    ///<param name="(the 4">byte header field at byte offset 24 of the database file) is </param>
+    ///<param name="not updated more often than necessary. ">not updated more often than necessary. </param>
+    ///<param name=""></param>
+    ///<param name="It is set to true when the change">counter field is updated, which </param>
+    ///<param name="can only happen if an exclusive lock is held on the database file.">can only happen if an exclusive lock is held on the database file.</param>
+    ///<param name="It is cleared (set to false) whenever an exclusive lock is ">It is cleared (set to false) whenever an exclusive lock is </param>
+    ///<param name="relinquished on the database file. Each time a transaction is committed,">relinquished on the database file. Each time a transaction is committed,</param>
+    ///<param name="The changeCountDone flag is inspected. If it is true, the work of">The changeCountDone flag is inspected. If it is true, the work of</param>
+    ///<param name="updating the change">counter is omitted for the current transaction.</param>
+    ///<param name=""></param>
+    ///<param name="This mechanism means that when running in exclusive mode, a connection ">This mechanism means that when running in exclusive mode, a connection </param>
+    ///<param name="need only update the change">counter once, for the first transaction</param>
+    ///<param name="committed.">committed.</param>
+    ///<param name=""></param>
+    ///<param name="setMaster">setMaster</param>
+    ///<param name=""></param>
+    ///<param name="When PagerCommitPhaseOne() is called to commit a transaction, it may">When PagerCommitPhaseOne() is called to commit a transaction, it may</param>
+    ///<param name="(or may not) specify a master">journal name to be written into the </param>
+    ///<param name="journal file before it is synced to disk.">journal file before it is synced to disk.</param>
+    ///<param name=""></param>
+    ///<param name="Whether or not a journal file contains a master">journal pointer affects </param>
+    ///<param name="the way in which the journal file is finalized after the transaction is ">the way in which the journal file is finalized after the transaction is </param>
+    ///<param name="committed or rolled back when running in "journal_mode=PERSIST" mode.">committed or rolled back when running in "journal_mode=PERSIST" mode.</param>
+    ///<param name="If a journal file does not contain a master">journal pointer, it is</param>
+    ///<param name="finalized by overwriting the first journal header with zeroes. If">finalized by overwriting the first journal header with zeroes. If</param>
+    ///<param name="it does contain a master">journal pointer the journal file is finalized </param>
+    ///<param name="by truncating it to zero bytes, just as if the connection were ">by truncating it to zero bytes, just as if the connection were </param>
+    ///<param name="running in "journal_mode=truncate" mode.">running in "journal_mode=truncate" mode.</param>
+    ///<param name=""></param>
+    ///<param name="Journal files that contain master journal pointers cannot be finalized">Journal files that contain master journal pointers cannot be finalized</param>
+    ///<param name="simply by overwriting the first journal">header with zeroes, as the</param>
+    ///<param name="master journal pointer could interfere with hot">journal rollback of any</param>
+    ///<param name="subsequently interrupted transaction that reuses the journal file.">subsequently interrupted transaction that reuses the journal file.</param>
+    ///<param name=""></param>
+    ///<param name="The flag is cleared as soon as the journal file is finalized (either">The flag is cleared as soon as the journal file is finalized (either</param>
+    ///<param name="by PagerCommitPhaseTwo or PagerRollback). If an IO error prevents the">by PagerCommitPhaseTwo or PagerRollback). If an IO error prevents the</param>
+    ///<param name="journal file from being successfully finalized, the setMaster flag">journal file from being successfully finalized, the setMaster flag</param>
+    ///<param name="is cleared anyway (and the pager will move to ERROR state).">is cleared anyway (and the pager will move to ERROR state).</param>
+    ///<param name=""></param>
+    ///<param name="doNotSpill, doNotSyncSpill">doNotSpill, doNotSyncSpill</param>
+    ///<param name=""></param>
+    ///<param name="These two boolean variables control the behaviour of cache">spills</param>
+    ///<param name="(calls made by the pcache module to the pagerStress() routine to">(calls made by the pcache module to the pagerStress() routine to</param>
+    ///<param name="write cached data to the file">system in order to free up memory).</param>
+    ///<param name=""></param>
+    ///<param name="When doNotSpill is non">zero, writing to the database from pagerStress()</param>
+    ///<param name="is disabled altogether. This is done in a very obscure case that">is disabled altogether. This is done in a very obscure case that</param>
+    ///<param name="comes up during savepoint rollback that requires the pcache module">comes up during savepoint rollback that requires the pcache module</param>
+    ///<param name="to allocate a new page to prevent the journal file from being written">to allocate a new page to prevent the journal file from being written</param>
+    ///<param name="while it is being traversed by code in pager_playback().">while it is being traversed by code in pager_playback().</param>
+    ///<param name=""></param>
+    ///<param name="If doNotSyncSpill is non">zero, writing to the database from pagerStress()</param>
+    ///<param name="is permitted, but syncing the journal file is not. This flag is set">is permitted, but syncing the journal file is not. This flag is set</param>
+    ///<param name="by PagerMethods.sqlite3PagerWrite() when the file">size is larger than</param>
+    ///<param name="the database page">size in order to prevent a journal sync from happening </param>
+    ///<param name="in between the journalling of two pages on the same sector. ">in between the journalling of two pages on the same sector. </param>
+    ///<param name=""></param>
+    ///<param name="subjInMemory">subjInMemory</param>
+    ///<param name=""></param>
+    ///<param name="This is a boolean variable. If true, then any required sub">journal</param>
+    ///<param name="is opened as an in">memory</param>
+    ///<param name="sub">memory pager files.</param>
+    ///<param name=""></param>
+    ///<param name="This variable is updated by the upper layer each time a new ">This variable is updated by the upper layer each time a new </param>
+    ///<param name="write">transaction is opened.</param>
+    ///<param name=""></param>
+    ///<param name="dbSize, dbOrigSize, dbFileSize">dbSize, dbOrigSize, dbFileSize</param>
+    ///<param name=""></param>
+    ///<param name="Variable dbSize is set to the number of pages in the database file.">Variable dbSize is set to the number of pages in the database file.</param>
+    ///<param name="It is valid in PagerState.PAGER_READER and higher states (all states except for">It is valid in PagerState.PAGER_READER and higher states (all states except for</param>
+    ///<param name="OPEN and ERROR). ">OPEN and ERROR). </param>
+    ///<param name=""></param>
+    ///<param name="dbSize is set based on the size of the database file, which may be ">dbSize is set based on the size of the database file, which may be </param>
+    ///<param name="larger than the size of the database (the value stored at offset">larger than the size of the database (the value stored at offset</param>
+    ///<param name="28 of the database header by the btree). If the size of the file">28 of the database header by the btree). If the size of the file</param>
+    ///<param name="is not an integer multiple of the page">size, the value stored in</param>
+    ///<param name="dbSize is rounded down (i.e. a 5KB file with 2K page">size has dbSize==2).</param>
+    ///<param name="Except, any file that is greater than 0 bytes in size is considered">Except, any file that is greater than 0 bytes in size is considered</param>
+    ///<param name="to have at least one page. (i.e. a 1KB file with 2K page">size leads</param>
+    ///<param name="to dbSize==1).">to dbSize==1).</param>
+    ///<param name=""></param>
+    ///<param name="During a write">numbers greater than</param>
+    ///<param name="dbSize are modified in the cache, dbSize is updated accordingly.">dbSize are modified in the cache, dbSize is updated accordingly.</param>
+    ///<param name="Similarly, if the database is truncated using PagerTruncateImage(), ">Similarly, if the database is truncated using PagerTruncateImage(), </param>
+    ///<param name="dbSize is updated.">dbSize is updated.</param>
+    ///<param name=""></param>
+    ///<param name="Variables dbOrigSize and dbFileSize are valid in states ">Variables dbOrigSize and dbFileSize are valid in states </param>
+    ///<param name="PagerState.PAGER_WRITER_LOCKED and higher. dbOrigSize is a copy of the dbSize">PagerState.PAGER_WRITER_LOCKED and higher. dbOrigSize is a copy of the dbSize</param>
+    ///<param name="variable at the start of the transaction. It is used during rollback,">variable at the start of the transaction. It is used during rollback,</param>
+    ///<param name="and to determine whether or not pages need to be journalled before">and to determine whether or not pages need to be journalled before</param>
+    ///<param name="being modified.">being modified.</param>
+    ///<param name=""></param>
+    ///<param name="Throughout a write">transaction, dbFileSize contains the size of</param>
+    ///<param name="the file on disk in pages. It is set to a copy of dbSize when the">the file on disk in pages. It is set to a copy of dbSize when the</param>
+    ///<param name="write">transaction is first opened, and updated when VFS calls are made</param>
+    ///<param name="to write or truncate the database file on disk. ">to write or truncate the database file on disk. </param>
+    ///<param name=""></param>
+    ///<param name="The only reason the dbFileSize variable is required is to suppress ">The only reason the dbFileSize variable is required is to suppress </param>
+    ///<param name="unnecessary calls to xTruncate() after committing a transaction. If, ">unnecessary calls to xTruncate() after committing a transaction. If, </param>
+    ///<param name="when a transaction is committed, the dbFileSize variable indicates ">when a transaction is committed, the dbFileSize variable indicates </param>
+    ///<param name="that the database file is larger than the database image (Pager.dbSize), ">that the database file is larger than the database image (Pager.dbSize), </param>
+    ///<param name="pager_truncate() is called. The pager_truncate() call uses xFilesize()">pager_truncate() is called. The pager_truncate() call uses xFilesize()</param>
+    ///<param name="to measure the database file on disk, and then truncates it if required.">to measure the database file on disk, and then truncates it if required.</param>
+    ///<param name="dbFileSize is not used when rolling back a transaction. In this case">dbFileSize is not used when rolling back a transaction. In this case</param>
+    ///<param name="pager_truncate() is called unconditionally (which means there may be">pager_truncate() is called unconditionally (which means there may be</param>
+    ///<param name="a call to xFilesize() that is not strictly required). In either case,">a call to xFilesize() that is not strictly required). In either case,</param>
+    ///<param name="pager_truncate() may cause the file to become smaller or larger.">pager_truncate() may cause the file to become smaller or larger.</param>
+    ///<param name=""></param>
+    ///<param name="dbHintSize">dbHintSize</param>
+    ///<param name=""></param>
+    ///<param name="The dbHintSize variable is used to limit the number of calls made to">The dbHintSize variable is used to limit the number of calls made to</param>
+    ///<param name="the VFS xFileControl(FCNTL_SIZE_HINT) method. ">the VFS xFileControl(FCNTL_SIZE_HINT) method. </param>
+    ///<param name=""></param>
+    ///<param name="dbHintSize is set to a copy of the dbSize variable when a">dbHintSize is set to a copy of the dbSize variable when a</param>
+    ///<param name="write">transaction is opened (at the same time as dbFileSize and</param>
+    ///<param name="dbOrigSize). If the xFileControl(FCNTL_SIZE_HINT) method is called,">dbOrigSize). If the xFileControl(FCNTL_SIZE_HINT) method is called,</param>
+    ///<param name="dbHintSize is increased to the number of pages that correspond to the">dbHintSize is increased to the number of pages that correspond to the</param>
+    ///<param name="size">hint passed to the method call. See pager_write_pagelist() for </param>
+    ///<param name="details.">details.</param>
+    ///<param name=""></param>
+    ///<param name="errCode">errCode</param>
+    ///<param name=""></param>
+    ///<param name="The Pager.errCode variable is only ever used in PagerState.PAGER_ERROR state. It">The Pager.errCode variable is only ever used in PagerState.PAGER_ERROR state. It</param>
+    ///<param name="is set to zero in all other states. In PagerState.PAGER_ERROR state, Pager.errCode ">is set to zero in all other states. In PagerState.PAGER_ERROR state, Pager.errCode </param>
+    ///<param name="is always set to SQLITE_FULL, SQLITE_IOERR or one of the SQLITE_IOERR_XXX ">is always set to SQLITE_FULL, SQLITE_IOERR or one of the SQLITE_IOERR_XXX </param>
+    ///<param name="sub">codes.</param>
+    ///<param name=""></param>
+
+    public class Pager
+    {
+
+        ///<summary>
+        ///OS functions to use for IO 
+        ///</summary>
+        public sqlite3_vfs pVfs;
+
+
+        ///<summary>
+        ///Boolean. True if locking_mode==EXCLUSIVE 
+        ///</summary>
+        public bool exclusiveMode;
+
+
+        ///<summary>
+        ///One of the Globals.Paging.PAGER_JOURNALMODE_* values 
+        ///</summary>
+        public u8 journalMode;
+
+
+        ///<summary>
+        ///Use a rollback journal on this file 
+        ///</summary>
+        public bool useJournal;
+
+
+        ///<summary>
+        ///Do not bother to obtain readlocks 
+        ///</summary>
+        public u8 noReadlock;
+
+
+
+        public bool noSync;
+
+        ///<summary>
+        ///Do not sync the journal if true 
+        ///</summary>
+
+        public bool fullSync;
+
+        ///<summary>
+        ///Do extra syncs of the journal for robustness 
+        ///</summary>
+
+        public u8 ckptSyncFlags;
+
+        ///<summary>
+        ///SYNC_NORMAL or SYNC_FULL for checkpoint 
+        ///</summary>
+
+        public u8 syncFlags;
+
+        ///<summary>
+        ///SYNC_NORMAL or SYNC_FULL otherwise 
+        ///</summary>
+
+        public bool tempFile;
 
         ///
         ///<summary>
-        ///A open page cache is an instance of struct Pager. A description of
-        ///some of the more important member variables follows:
+        ///zFilename is a temporary file 
+        ///</summary>
+
+        public bool readOnly;
+
         ///
-        ///eState
+        ///<summary>
+        ///</summary>
+        ///<param name="True for a read">only database </param>
+
+        public bool alwaysRollback;
+
         ///
-        ///The current 'state' of the pager object. See the comment and state
-        ///diagram above for a description of the pager state.
+        ///<summary>
+        ///Disable DontRollback() for all pages 
+        ///</summary>
+
+        public u8 memDb;
+
         ///
-        ///eLock
+        ///<summary>
+        ///True to inhibit all file I/O 
+        ///</summary>
+
+        ///
+        ///<summary>
+        ///
+        ///The following block contains those class members that change during
+        ///routine opertion.  Class members not in this block are either fixed
+        ///when the pager is first created or else only change when there is a
+        ///significant mode change (such as changing the page_size, locking_mode,
+        ///or the journal_mode).  From another view, these class members describe
+        ///the "state" of the pager, while other class members describe the
+        ///"configuration" of the pager.
         ///
         ///</summary>
-        ///<param name="For a real on"></param>
-        ///<param name="NO_LOCK, SHARED_LOCK, RESERVED_LOCK or EXCLUSIVE_LOCK.">NO_LOCK, SHARED_LOCK, RESERVED_LOCK or EXCLUSIVE_LOCK.</param>
-        ///<param name=""></param>
-        ///<param name="For a temporary or in">memory database (neither of which require any</param>
-        ///<param name="locks), this variable is always set to EXCLUSIVE_LOCK. Since such">locks), this variable is always set to EXCLUSIVE_LOCK. Since such</param>
-        ///<param name="databases always have Pager.exclusiveMode==1, this tricks the pager">databases always have Pager.exclusiveMode==1, this tricks the pager</param>
-        ///<param name="logic into thinking that it already has all the locks it will ever">logic into thinking that it already has all the locks it will ever</param>
-        ///<param name="need (and no reason to release them).">need (and no reason to release them).</param>
-        ///<param name=""></param>
-        ///<param name="In some (obscure) circumstances, this variable may also be set to">In some (obscure) circumstances, this variable may also be set to</param>
-        ///<param name="UNKNOWN_LOCK. See the comment above the #define of UNKNOWN_LOCK for">UNKNOWN_LOCK. See the comment above the #define of UNKNOWN_LOCK for</param>
-        ///<param name="details.">details.</param>
-        ///<param name=""></param>
-        ///<param name="changeCountDone">changeCountDone</param>
-        ///<param name=""></param>
-        ///<param name="This boolean variable is used to make sure that the change">counter </param>
-        ///<param name="(the 4">byte header field at byte offset 24 of the database file) is </param>
-        ///<param name="not updated more often than necessary. ">not updated more often than necessary. </param>
-        ///<param name=""></param>
-        ///<param name="It is set to true when the change">counter field is updated, which </param>
-        ///<param name="can only happen if an exclusive lock is held on the database file.">can only happen if an exclusive lock is held on the database file.</param>
-        ///<param name="It is cleared (set to false) whenever an exclusive lock is ">It is cleared (set to false) whenever an exclusive lock is </param>
-        ///<param name="relinquished on the database file. Each time a transaction is committed,">relinquished on the database file. Each time a transaction is committed,</param>
-        ///<param name="The changeCountDone flag is inspected. If it is true, the work of">The changeCountDone flag is inspected. If it is true, the work of</param>
-        ///<param name="updating the change">counter is omitted for the current transaction.</param>
-        ///<param name=""></param>
-        ///<param name="This mechanism means that when running in exclusive mode, a connection ">This mechanism means that when running in exclusive mode, a connection </param>
-        ///<param name="need only update the change">counter once, for the first transaction</param>
-        ///<param name="committed.">committed.</param>
-        ///<param name=""></param>
-        ///<param name="setMaster">setMaster</param>
-        ///<param name=""></param>
-        ///<param name="When PagerCommitPhaseOne() is called to commit a transaction, it may">When PagerCommitPhaseOne() is called to commit a transaction, it may</param>
-        ///<param name="(or may not) specify a master">journal name to be written into the </param>
-        ///<param name="journal file before it is synced to disk.">journal file before it is synced to disk.</param>
-        ///<param name=""></param>
-        ///<param name="Whether or not a journal file contains a master">journal pointer affects </param>
-        ///<param name="the way in which the journal file is finalized after the transaction is ">the way in which the journal file is finalized after the transaction is </param>
-        ///<param name="committed or rolled back when running in "journal_mode=PERSIST" mode.">committed or rolled back when running in "journal_mode=PERSIST" mode.</param>
-        ///<param name="If a journal file does not contain a master">journal pointer, it is</param>
-        ///<param name="finalized by overwriting the first journal header with zeroes. If">finalized by overwriting the first journal header with zeroes. If</param>
-        ///<param name="it does contain a master">journal pointer the journal file is finalized </param>
-        ///<param name="by truncating it to zero bytes, just as if the connection were ">by truncating it to zero bytes, just as if the connection were </param>
-        ///<param name="running in "journal_mode=truncate" mode.">running in "journal_mode=truncate" mode.</param>
-        ///<param name=""></param>
-        ///<param name="Journal files that contain master journal pointers cannot be finalized">Journal files that contain master journal pointers cannot be finalized</param>
-        ///<param name="simply by overwriting the first journal">header with zeroes, as the</param>
-        ///<param name="master journal pointer could interfere with hot">journal rollback of any</param>
-        ///<param name="subsequently interrupted transaction that reuses the journal file.">subsequently interrupted transaction that reuses the journal file.</param>
-        ///<param name=""></param>
-        ///<param name="The flag is cleared as soon as the journal file is finalized (either">The flag is cleared as soon as the journal file is finalized (either</param>
-        ///<param name="by PagerCommitPhaseTwo or PagerRollback). If an IO error prevents the">by PagerCommitPhaseTwo or PagerRollback). If an IO error prevents the</param>
-        ///<param name="journal file from being successfully finalized, the setMaster flag">journal file from being successfully finalized, the setMaster flag</param>
-        ///<param name="is cleared anyway (and the pager will move to ERROR state).">is cleared anyway (and the pager will move to ERROR state).</param>
-        ///<param name=""></param>
-        ///<param name="doNotSpill, doNotSyncSpill">doNotSpill, doNotSyncSpill</param>
-        ///<param name=""></param>
-        ///<param name="These two boolean variables control the behaviour of cache">spills</param>
-        ///<param name="(calls made by the pcache module to the pagerStress() routine to">(calls made by the pcache module to the pagerStress() routine to</param>
-        ///<param name="write cached data to the file">system in order to free up memory).</param>
-        ///<param name=""></param>
-        ///<param name="When doNotSpill is non">zero, writing to the database from pagerStress()</param>
-        ///<param name="is disabled altogether. This is done in a very obscure case that">is disabled altogether. This is done in a very obscure case that</param>
-        ///<param name="comes up during savepoint rollback that requires the pcache module">comes up during savepoint rollback that requires the pcache module</param>
-        ///<param name="to allocate a new page to prevent the journal file from being written">to allocate a new page to prevent the journal file from being written</param>
-        ///<param name="while it is being traversed by code in pager_playback().">while it is being traversed by code in pager_playback().</param>
-        ///<param name=""></param>
-        ///<param name="If doNotSyncSpill is non">zero, writing to the database from pagerStress()</param>
-        ///<param name="is permitted, but syncing the journal file is not. This flag is set">is permitted, but syncing the journal file is not. This flag is set</param>
-        ///<param name="by PagerMethods.sqlite3PagerWrite() when the file">size is larger than</param>
-        ///<param name="the database page">size in order to prevent a journal sync from happening </param>
-        ///<param name="in between the journalling of two pages on the same sector. ">in between the journalling of two pages on the same sector. </param>
-        ///<param name=""></param>
-        ///<param name="subjInMemory">subjInMemory</param>
-        ///<param name=""></param>
-        ///<param name="This is a boolean variable. If true, then any required sub">journal</param>
-        ///<param name="is opened as an in">memory</param>
-        ///<param name="sub">memory pager files.</param>
-        ///<param name=""></param>
-        ///<param name="This variable is updated by the upper layer each time a new ">This variable is updated by the upper layer each time a new </param>
-        ///<param name="write">transaction is opened.</param>
-        ///<param name=""></param>
-        ///<param name="dbSize, dbOrigSize, dbFileSize">dbSize, dbOrigSize, dbFileSize</param>
-        ///<param name=""></param>
-        ///<param name="Variable dbSize is set to the number of pages in the database file.">Variable dbSize is set to the number of pages in the database file.</param>
-        ///<param name="It is valid in PagerState.PAGER_READER and higher states (all states except for">It is valid in PagerState.PAGER_READER and higher states (all states except for</param>
-        ///<param name="OPEN and ERROR). ">OPEN and ERROR). </param>
-        ///<param name=""></param>
-        ///<param name="dbSize is set based on the size of the database file, which may be ">dbSize is set based on the size of the database file, which may be </param>
-        ///<param name="larger than the size of the database (the value stored at offset">larger than the size of the database (the value stored at offset</param>
-        ///<param name="28 of the database header by the btree). If the size of the file">28 of the database header by the btree). If the size of the file</param>
-        ///<param name="is not an integer multiple of the page">size, the value stored in</param>
-        ///<param name="dbSize is rounded down (i.e. a 5KB file with 2K page">size has dbSize==2).</param>
-        ///<param name="Except, any file that is greater than 0 bytes in size is considered">Except, any file that is greater than 0 bytes in size is considered</param>
-        ///<param name="to have at least one page. (i.e. a 1KB file with 2K page">size leads</param>
-        ///<param name="to dbSize==1).">to dbSize==1).</param>
-        ///<param name=""></param>
-        ///<param name="During a write">numbers greater than</param>
-        ///<param name="dbSize are modified in the cache, dbSize is updated accordingly.">dbSize are modified in the cache, dbSize is updated accordingly.</param>
-        ///<param name="Similarly, if the database is truncated using PagerTruncateImage(), ">Similarly, if the database is truncated using PagerTruncateImage(), </param>
-        ///<param name="dbSize is updated.">dbSize is updated.</param>
-        ///<param name=""></param>
-        ///<param name="Variables dbOrigSize and dbFileSize are valid in states ">Variables dbOrigSize and dbFileSize are valid in states </param>
-        ///<param name="PagerState.PAGER_WRITER_LOCKED and higher. dbOrigSize is a copy of the dbSize">PagerState.PAGER_WRITER_LOCKED and higher. dbOrigSize is a copy of the dbSize</param>
-        ///<param name="variable at the start of the transaction. It is used during rollback,">variable at the start of the transaction. It is used during rollback,</param>
-        ///<param name="and to determine whether or not pages need to be journalled before">and to determine whether or not pages need to be journalled before</param>
-        ///<param name="being modified.">being modified.</param>
-        ///<param name=""></param>
-        ///<param name="Throughout a write">transaction, dbFileSize contains the size of</param>
-        ///<param name="the file on disk in pages. It is set to a copy of dbSize when the">the file on disk in pages. It is set to a copy of dbSize when the</param>
-        ///<param name="write">transaction is first opened, and updated when VFS calls are made</param>
-        ///<param name="to write or truncate the database file on disk. ">to write or truncate the database file on disk. </param>
-        ///<param name=""></param>
-        ///<param name="The only reason the dbFileSize variable is required is to suppress ">The only reason the dbFileSize variable is required is to suppress </param>
-        ///<param name="unnecessary calls to xTruncate() after committing a transaction. If, ">unnecessary calls to xTruncate() after committing a transaction. If, </param>
-        ///<param name="when a transaction is committed, the dbFileSize variable indicates ">when a transaction is committed, the dbFileSize variable indicates </param>
-        ///<param name="that the database file is larger than the database image (Pager.dbSize), ">that the database file is larger than the database image (Pager.dbSize), </param>
-        ///<param name="pager_truncate() is called. The pager_truncate() call uses xFilesize()">pager_truncate() is called. The pager_truncate() call uses xFilesize()</param>
-        ///<param name="to measure the database file on disk, and then truncates it if required.">to measure the database file on disk, and then truncates it if required.</param>
-        ///<param name="dbFileSize is not used when rolling back a transaction. In this case">dbFileSize is not used when rolling back a transaction. In this case</param>
-        ///<param name="pager_truncate() is called unconditionally (which means there may be">pager_truncate() is called unconditionally (which means there may be</param>
-        ///<param name="a call to xFilesize() that is not strictly required). In either case,">a call to xFilesize() that is not strictly required). In either case,</param>
-        ///<param name="pager_truncate() may cause the file to become smaller or larger.">pager_truncate() may cause the file to become smaller or larger.</param>
-        ///<param name=""></param>
-        ///<param name="dbHintSize">dbHintSize</param>
-        ///<param name=""></param>
-        ///<param name="The dbHintSize variable is used to limit the number of calls made to">The dbHintSize variable is used to limit the number of calls made to</param>
-        ///<param name="the VFS xFileControl(FCNTL_SIZE_HINT) method. ">the VFS xFileControl(FCNTL_SIZE_HINT) method. </param>
-        ///<param name=""></param>
-        ///<param name="dbHintSize is set to a copy of the dbSize variable when a">dbHintSize is set to a copy of the dbSize variable when a</param>
-        ///<param name="write">transaction is opened (at the same time as dbFileSize and</param>
-        ///<param name="dbOrigSize). If the xFileControl(FCNTL_SIZE_HINT) method is called,">dbOrigSize). If the xFileControl(FCNTL_SIZE_HINT) method is called,</param>
-        ///<param name="dbHintSize is increased to the number of pages that correspond to the">dbHintSize is increased to the number of pages that correspond to the</param>
-        ///<param name="size">hint passed to the method call. See pager_write_pagelist() for </param>
-        ///<param name="details.">details.</param>
-        ///<param name=""></param>
-        ///<param name="errCode">errCode</param>
-        ///<param name=""></param>
-        ///<param name="The Pager.errCode variable is only ever used in PagerState.PAGER_ERROR state. It">The Pager.errCode variable is only ever used in PagerState.PAGER_ERROR state. It</param>
-        ///<param name="is set to zero in all other states. In PagerState.PAGER_ERROR state, Pager.errCode ">is set to zero in all other states. In PagerState.PAGER_ERROR state, Pager.errCode </param>
-        ///<param name="is always set to SQLITE_FULL, SQLITE_IOERR or one of the SQLITE_IOERR_XXX ">is always set to SQLITE_FULL, SQLITE_IOERR or one of the SQLITE_IOERR_XXX </param>
-        ///<param name="sub">codes.</param>
-        ///<param name=""></param>
 
-        public  class Pager
+        public PagerState eState;
+
+        ///
+        ///<summary>
+        ///Pager state (OPEN, READER, WRITER_LOCKED..) 
+        ///</summary>
+
+        public LockType eLock;
+
+        ///
+        ///<summary>
+        ///Current lock held on database file 
+        ///</summary>
+
+        public bool changeCountDone;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="Set after incrementing the change">counter </param>
+
+        public int setMaster;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="True if a m">j name has been written to jrnl </param>
+
+        public u8 doNotSpill;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="Do not spill the cache when non">zero </param>
+
+        public u8 doNotSyncSpill;
+
+        ///
+        ///<summary>
+        ///Do not do a spill that requires jrnl sync 
+        ///</summary>
+
+        public u8 subjInMemory;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="True to use in">journals </param>
+
+        public Pgno dbSize;
+
+        ///
+        ///<summary>
+        ///Number of pages in the database 
+        ///</summary>
+
+        public Pgno dbOrigSize;
+
+        ///
+        ///<summary>
+        ///dbSize before the current transaction 
+        ///</summary>
+
+        public Pgno dbFileSize;
+
+        ///
+        ///<summary>
+        ///Number of pages in the database file 
+        ///</summary>
+
+        public Pgno dbHintSize {
+            get { return _dbHintSize; }
+            set { _dbHintSize = value; Log.WriteLine("----Number of pages in the database file  : " + value); }
+        }
+        Pgno _dbHintSize;
+
+        ///
+        ///<summary>
+        ///Value passed to FCNTL_SIZE_HINT call 
+        ///</summary>
+
+        public SqlResult errCode;
+
+        ///
+        ///<summary>
+        ///One of several kinds of errors 
+        ///</summary>
+
+        public int nRec;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="Pages journalled since last j">header written </param>
+
+        public u32 cksumInit;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="Quasi">random value added to every checksum </param>
+
+        public u32 nSubRec;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="Number of records written to sub">journal </param>
+
+        ///<summary>
+        ///One bit for each page in the database file 
+        ///</summary>
+        public Bitvec pInJournal;
+
+
+        ///<summary>
+        ///File descriptor for database 
+        ///</summary>
+        public sqlite3_file fileDescriptor;
+
+
+        ///<summary>
+        ///File descriptor for main journal 
+        ///</summary>
+        public sqlite3_file JournalFileDescriptor;
+
+
+        public sqlite3_file SubJournalFileDescriptor;
+
+        ///
+        ///<summary>
+        ///</summary>
+        ///<param name="File descriptor for sub">journal </param>
+
+        public i64 journalOff;
+
+        ///
+        ///<summary>
+        ///Current write offset in the journal file 
+        ///</summary>
+
+        public i64 journalHdr;
+
+        ///
+        ///<summary>
+        ///Byte offset to previous journal header 
+        ///</summary>
+
+        sqlite3_backup _pBackup;
+
+        ///
+        ///<summary>
+        ///Pointer to list of ongoing backup processes 
+        ///</summary>
+
+        public sqlite3_backup pBackup
         {
-
-            ///<summary>
-            ///OS functions to use for IO 
-            ///</summary>
-            public sqlite3_vfs pVfs;
-
-
-            ///<summary>
-            ///Boolean. True if locking_mode==EXCLUSIVE 
-            ///</summary>
-            public bool exclusiveMode;
-
-
-            ///<summary>
-            ///One of the Globals.Paging.PAGER_JOURNALMODE_* values 
-            ///</summary>
-            public u8 journalMode;
-
-
-            ///<summary>
-            ///Use a rollback journal on this file 
-            ///</summary>
-            public u8 useJournal;
-
-            
-            public u8 noReadlock;
-
-            ///<summary>
-            ///Do not bother to obtain readlocks 
-            ///</summary>
-
-            public bool noSync;
-
-            ///<summary>
-            ///Do not sync the journal if true 
-            ///</summary>
-
-            public bool fullSync;
-
-            ///<summary>
-            ///Do extra syncs of the journal for robustness 
-            ///</summary>
-
-            public u8 ckptSyncFlags;
-
-            ///<summary>
-            ///SYNC_NORMAL or SYNC_FULL for checkpoint 
-            ///</summary>
-
-            public u8 syncFlags;
-
-            ///<summary>
-            ///SYNC_NORMAL or SYNC_FULL otherwise 
-            ///</summary>
-
-            public bool tempFile;
-
-            ///
-            ///<summary>
-            ///zFilename is a temporary file 
-            ///</summary>
-
-            public bool readOnly;
-
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="True for a read">only database </param>
-
-            public bool alwaysRollback;
-
-            ///
-            ///<summary>
-            ///Disable DontRollback() for all pages 
-            ///</summary>
-
-            public u8 memDb;
-
-            ///
-            ///<summary>
-            ///True to inhibit all file I/O 
-            ///</summary>
-
-            ///
-            ///<summary>
-            ///
-            ///The following block contains those class members that change during
-            ///routine opertion.  Class members not in this block are either fixed
-            ///when the pager is first created or else only change when there is a
-            ///significant mode change (such as changing the page_size, locking_mode,
-            ///or the journal_mode).  From another view, these class members describe
-            ///the "state" of the pager, while other class members describe the
-            ///"configuration" of the pager.
-            ///
-            ///</summary>
-
-            public PagerState eState;
-
-            ///
-            ///<summary>
-            ///Pager state (OPEN, READER, WRITER_LOCKED..) 
-            ///</summary>
-
-            public LockType eLock;
-
-            ///
-            ///<summary>
-            ///Current lock held on database file 
-            ///</summary>
-
-            public bool changeCountDone;
-
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="Set after incrementing the change">counter </param>
-
-            public int setMaster;
-
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="True if a m">j name has been written to jrnl </param>
-
-            public u8 doNotSpill;
-
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="Do not spill the cache when non">zero </param>
-
-            public u8 doNotSyncSpill;
-
-            ///
-            ///<summary>
-            ///Do not do a spill that requires jrnl sync 
-            ///</summary>
-
-            public u8 subjInMemory;
-
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="True to use in">journals </param>
-
-            public Pgno dbSize;
-
-            ///
-            ///<summary>
-            ///Number of pages in the database 
-            ///</summary>
-
-            public Pgno dbOrigSize;
-
-            ///
-            ///<summary>
-            ///dbSize before the current transaction 
-            ///</summary>
-
-            public Pgno dbFileSize;
-
-            ///
-            ///<summary>
-            ///Number of pages in the database file 
-            ///</summary>
-
-            public Pgno dbHintSize {
-                get { return _dbHintSize; }
-                set { _dbHintSize = value; Log.WriteLine("----Number of pages in the database file  : "+value); }
-            }
-            Pgno _dbHintSize;
-
-            ///
-            ///<summary>
-            ///Value passed to FCNTL_SIZE_HINT call 
-            ///</summary>
-
-            public SqlResult errCode;
-
-            ///
-            ///<summary>
-            ///One of several kinds of errors 
-            ///</summary>
-
-            public int nRec;
-
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="Pages journalled since last j">header written </param>
-
-            public u32 cksumInit;
-
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="Quasi">random value added to every checksum </param>
-
-            public u32 nSubRec;
-
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="Number of records written to sub">journal </param>
-
-            public Bitvec pInJournal;
-
-            ///
-            ///<summary>
-            ///One bit for each page in the database file 
-            ///</summary>
-
-            public sqlite3_file fd;
-
-            ///
-            ///<summary>
-            ///File descriptor for database 
-            ///</summary>
-
-            public sqlite3_file jfd;
-
-            ///
-            ///<summary>
-            ///File descriptor for main journal 
-            ///</summary>
-
-            public sqlite3_file sjfd;
-
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="File descriptor for sub">journal </param>
-
-            public i64 journalOff;
-
-            ///
-            ///<summary>
-            ///Current write offset in the journal file 
-            ///</summary>
-
-            public i64 journalHdr;
-
-            ///
-            ///<summary>
-            ///Byte offset to previous journal header 
-            ///</summary>
-
-            sqlite3_backup _pBackup;
-
-            ///
-            ///<summary>
-            ///Pointer to list of ongoing backup processes 
-            ///</summary>
-
-            public sqlite3_backup pBackup
+            get
             {
-                get
-                {
-                    return _pBackup;
-                }
-                set
-                {
-                    _pBackup = value;
-                }
+                return _pBackup;
             }
+            set
+            {
+                _pBackup = value;
+            }
+        }
 
-            public PagerSavepoint[] aSavepoint;
+        ///<summary>
+        ///Array of active savepoints 
+        ///</summary>
+        public PagerSavepoint[] aSavepoint;
+        public IEnumerable<PagerSavepoint> SavePoints { get { if (0 == nSavepoint) return new PagerSavepoint[0];return aSavepoint.Take(nSavepoint); } }
+        
+    
 
-            ///
-            ///<summary>
-            ///Array of active savepoints 
-            ///</summary>
 
-            public int nSavepoint;
+        ///<summary>
+        ///Number of elements in aSavepoint[] 
+        ///</summary>
+        public int nSavepoint;
 
-            ///
-            ///<summary>
-            ///Number of elements in aSavepoint[] 
-            ///</summary>
 
-            public u8[] dbFileVers = new u8[16];
-
-            ///
-            ///<summary>
-            ///Changes whenever database file changes 
-            ///</summary>
+        ///<summary>
+        ///Changes whenever database file changes 
+        ///</summary>
+        public u8[] dbFileVers = new u8[16];        
+            
 
             ///
             ///<summary>
@@ -964,19 +962,13 @@ return (pPager->pWal!=0);
                 public bool assert_pager_state()
                 {
                     Pager pPager = this;
-                    ///
-                    ///<summary>
                     ///State must be valid. 
-                    ///</summary>
 
                     Debug.Assert(this.eState == PagerState.PAGER_OPEN || this.eState == PagerState.PAGER_READER || this.eState == PagerState.PAGER_WRITER_LOCKED || this.eState == PagerState.PAGER_WRITER_CACHEMOD || this.eState == PagerState.PAGER_WRITER_DBMOD || this.eState == PagerState.PAGER_WRITER_FINISHED || this.eState == PagerState.PAGER_ERROR);
-                    ///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="Regardless of the current state, a temp">file connection always behaves</param>
-                    ///<param name="as if it has an exclusive lock on the database file. It never updates">as if it has an exclusive lock on the database file. It never updates</param>
-                    ///<param name="the change">counter field, so the changeCountDone flag is always set.</param>
-                    ///<param name=""></param>
+                   /* Regardless of the current state, a temp-file connection always behaves
+                   ** as if it has an exclusive lock on the database file. It never updates
+                   ** the change-counter field, so the changeCountDone flag is always set.
+                   */
 
                     Debug.Assert(this.tempFile == false || this.eLock == LockType.EXCLUSIVE_LOCK);
                     Debug.Assert(this.tempFile == false || pPager.changeCountDone);
@@ -987,8 +979,8 @@ return (pPager->pWal!=0);
                     ///<param name="And if the journal">mode is "OFF", the journal file must not be open.</param>
                     ///<param name=""></param>
 
-                    Debug.Assert(this.journalMode == Globals.Paging.PAGER_JOURNALMODE_OFF || this.useJournal != 0);
-                    Debug.Assert(this.journalMode != Globals.Paging.PAGER_JOURNALMODE_OFF || !this.jfd.isOpen);
+                    Debug.Assert(this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_OFF || this.useJournal != false);
+                    Debug.Assert(this.journalMode != (int)Paging.JournalMode.PAGER_JOURNALMODE_OFF || !this.JournalFileDescriptor.isOpen);
                     ///
                     ///<summary>
                     ///</summary>
@@ -1010,7 +1002,7 @@ return (pPager->pWal!=0);
 )
                     {
                         Debug.Assert(this.noSync);
-                        Debug.Assert(this.journalMode == Globals.Paging.PAGER_JOURNALMODE_OFF || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_MEMORY);
+                        Debug.Assert(this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_OFF || this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_MEMORY);
                         Debug.Assert(this.eState != PagerState.PAGER_ERROR && this.eState != PagerState.PAGER_OPEN);
                         Debug.Assert(this.pagerUseWal() == false);
                     }
@@ -1068,7 +1060,7 @@ return (pPager->pWal!=0);
                                 ///</summary>
 
                                 Debug.Assert(this.eLock >= LockType.RESERVED_LOCK);
-                                Debug.Assert(this.jfd.isOpen || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_OFF || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_WAL);
+                                Debug.Assert(this.JournalFileDescriptor.isOpen || this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_OFF || (int)this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_WAL);
                             }
                             Debug.Assert(pPager.dbOrigSize == pPager.dbFileSize);
                             Debug.Assert(pPager.dbOrigSize == pPager.dbHintSize);
@@ -1078,14 +1070,14 @@ return (pPager->pWal!=0);
                             Debug.Assert(pPager.errCode == SqlResult.SQLITE_OK);
                             Debug.Assert(!pPager.pagerUseWal());
                             Debug.Assert(this.eLock >= LockType.EXCLUSIVE_LOCK);
-                            Debug.Assert(this.jfd.isOpen || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_OFF || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_WAL);
+                            Debug.Assert(this.JournalFileDescriptor.isOpen || this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_OFF || this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_WAL);
                             Debug.Assert(pPager.dbOrigSize <= pPager.dbHintSize);
                             break;
                         case PagerState.PAGER_WRITER_FINISHED:
                             Debug.Assert(this.eLock == LockType.EXCLUSIVE_LOCK);
                             Debug.Assert(pPager.errCode == SqlResult.SQLITE_OK);
                             Debug.Assert(!pPager.pagerUseWal());
-                            Debug.Assert(this.jfd.isOpen || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_OFF || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_WAL);
+                            Debug.Assert(this.JournalFileDescriptor.isOpen || this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_OFF || this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_WAL);
                             break;
                         case PagerState.PAGER_ERROR:
                             ///
@@ -1113,16 +1105,16 @@ return (pPager->pWal!=0);
                 /// UNKNOWN_LOCK for an explanation of this.
                 ///
                 ///</summary>
-                public SqlResult pagerUnlockDb(LockType eLock)
+                public SqlResult UnlockDbFile(LockType eLock)
                 {
                     SqlResult rc = SqlResult.SQLITE_OK;
                     Debug.Assert(!this.exclusiveMode || this.eLock == eLock);
                     Debug.Assert(eLock == LockType.NO_LOCK || eLock == LockType.SHARED_LOCK);
                     Debug.Assert(eLock != LockType.NO_LOCK || this.pagerUseWal() == false);
-                    if (this.fd.isOpen  )
+                    if (this.fileDescriptor.isOpen  )
                     {
                         Debug.Assert(this.eLock >= eLock);
-                        rc = os.sqlite3OsUnlock(this.fd, eLock);
+                        rc = os.sqlite3OsUnlock(this.fileDescriptor, eLock);
                         if (this.eLock != Globals.Paging.UNKNOWN_LOCK)
                         {
                             this.eLock = eLock;
@@ -1132,13 +1124,13 @@ return (pPager->pWal!=0);
                     return rc;
                 }
 
-                public SqlResult pagerLockDb(LockType eLock)
+                public SqlResult LockDbFile(LockType eLock)
                 {
                     SqlResult rc = SqlResult.SQLITE_OK;
                     Debug.Assert(eLock == LockType.SHARED_LOCK || eLock == LockType.RESERVED_LOCK || eLock == LockType.EXCLUSIVE_LOCK);
                     if (this.eLock < eLock || this.eLock == Globals.Paging.UNKNOWN_LOCK)
                     {
-                        rc = os.sqlite3OsLock(this.fd, eLock);
+                        rc = os.sqlite3OsLock(this.fileDescriptor, eLock);
                         if (rc == SqlResult.SQLITE_OK && (this.eLock != Globals.Paging.UNKNOWN_LOCK || eLock == LockType.EXCLUSIVE_LOCK))
                         {
                             this.eLock = eLock;
@@ -1211,52 +1203,41 @@ return (pPager->pWal!=0);
                 SqlResult zeroJournalHdr(int doTruncate)
                 {
                     SqlResult rc = SqlResult.SQLITE_OK;
-                    ///
-                    ///<summary>
                     ///Return code 
-                    ///</summary>
 
-                    Debug.Assert(this.jfd.isOpen);
+                    Debug.Assert(this.JournalFileDescriptor.isOpen);
                     if (this.journalOff != 0)
                     {
                         i64 iLimit = this.journalSizeLimit;
-                        ///
-                        ///<summary>
                         ///Local cache of jsl 
-                        ///</summary>
 
                         sqliteinth.IOTRACE("JZEROHDR %p\n", this);
                         if (doTruncate != 0 || iLimit == 0)
                         {
-                            rc = os.sqlite3OsTruncate(this.jfd, 0);
+                            rc = os.sqlite3OsTruncate(this.JournalFileDescriptor, 0);
                         }
                         else
                         {
-                            byte[] zeroHdr = new byte[28];
-                            // = {0};
-                            rc = os.sqlite3OsWrite(this.jfd, zeroHdr, zeroHdr.Length, 0);
+                            byte[] zeroHdr = new byte[28];// = {0};
+                            rc = os.sqlite3OsWrite(this.JournalFileDescriptor, zeroHdr, zeroHdr.Length, 0);
                         }
                         if (rc == SqlResult.SQLITE_OK && !this.noSync)
                         {
-                            rc = os.sqlite3OsSync(this.jfd, Sqlite3.SQLITE_SYNC_DATAONLY | this.syncFlags);
+                            rc = os.sqlite3OsSync(this.JournalFileDescriptor, Sqlite3.SQLITE_SYNC_DATAONLY | this.syncFlags);
                         }
-                        ///
-                        ///<summary>
                         ///At this point the transaction is committed but the write lock
                         ///is still held on the file. If there is a size limit configured for
                         ///the persistent journal and the journal file currently consumes more
                         ///space than that limit allows for, truncate it now. There is no need
                         ///to sync the file following this operation.
-                        ///
-                        ///</summary>
 
                         if (rc == SqlResult.SQLITE_OK && iLimit > 0)
                         {
                             i64 sz = 0;
-                            rc = os.sqlite3OsFileSize(this.jfd, ref sz);
+                            rc = os.sqlite3OsFileSize(this.JournalFileDescriptor, ref sz);
                             if (rc == SqlResult.SQLITE_OK && sz > iLimit)
                             {
-                                rc = os.sqlite3OsTruncate(this.jfd, iLimit);
+                                rc = os.sqlite3OsTruncate(this.JournalFileDescriptor, iLimit);
                             }
                         }
                     }
@@ -1287,65 +1268,26 @@ return (pPager->pWal!=0);
                 ///</summary>
                 public SqlResult writeJournalHdr()//-----<<-----<<-----<<-----<<
                 {
-                    SqlResult rc = SqlResult.SQLITE_OK;
-                    ///
-                    ///<summary>
-                    ///Return code 
-                    ///</summary>
+                    SqlResult rc = SqlResult.SQLITE_OK;     ///Return code 
+                    byte[] zHeader = this.pTmpSpace;        ///Temporary space used to build header 
+                    u32 nHeader = (u32)this.pageSize;       ///Size of buffer pointed to by zHeader 
+                    u32 nWrite;                             ///Bytes of header sector written 
 
-                    byte[] zHeader = this.pTmpSpace;
-                    ///
-                    ///<summary>
-                    ///Temporary space used to build header 
-                    ///</summary>
-
-                    u32 nHeader = (u32)this.pageSize;
-                    ///
-                    ///<summary>
-                    ///Size of buffer pointed to by zHeader 
-                    ///</summary>
-
-                    u32 nWrite;
-                    ///
-                    ///<summary>
-                    ///Bytes of header sector written 
-                    ///</summary>
-
-                    int ii;
-                    ///
-                    ///<summary>
-                    ///Loop counter 
-                    ///</summary>
-
-                    Debug.Assert(this.jfd.isOpen);
-                    ///
-                    ///<summary>
+                    Debug.Assert(this.JournalFileDescriptor.isOpen);
                     ///Journal file must be open. 
-                    ///</summary>
 
                     if (nHeader > this.JOURNAL_HDR_SZ())
                     {
                         nHeader = this.JOURNAL_HDR_SZ();
                     }
-                    ///
-                    ///<summary>
-                    ///If there are active savepoints and any of them were created
-                    ///since the most recent journal header was written, update the
-                    ///PagerSavepoint.iHdrOffset fields now.
-                    ///
-                    ///</summary>
+            ///If there are active savepoints and any of them were created
+            ///since the most recent journal header was written, update the
+            ///PagerSavepoint.iHdrOffset fields now.
+            this.SavePoints
+                .Where(s => 0 == s.iHdrOffset)
+                .ForEach(s => s.iHdrOffset = this.journalOff);
 
-                    for (ii = 0; ii < this.nSavepoint; ii++)
-                    {
-                        if (this.aSavepoint[ii].iHdrOffset == 0)
-                        {
-                            this.aSavepoint[ii].iHdrOffset = this.journalOff;
-                        }
-                    }
                     this.journalHdr = this.journalOff = this.journalHdrOffset();
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="Write the nRec Field "> the number of page records that follow this</param>
                     ///<param name="journal header. Normally, zero is written to this value at this time.">journal header. Normally, zero is written to this value at this time.</param>
                     ///<param name="After the records are added to the journal (and the journal synced,">After the records are added to the journal (and the journal synced,</param>
@@ -1366,8 +1308,8 @@ return (pPager->pWal!=0);
                     ///<param name="that garbage data is never appended to the journal file.">that garbage data is never appended to the journal file.</param>
                     ///<param name=""></param>
 
-                    Debug.Assert(this.fd.isOpen   || this.noSync);
-                    if (this.noSync || (this.journalMode == Globals.Paging.PAGER_JOURNALMODE_MEMORY) || (os.sqlite3OsDeviceCharacteristics(this.fd) & Sqlite3.SQLITE_IOCAP_SAFE_APPEND) != 0)
+                    Debug.Assert(this.fileDescriptor.isOpen   || this.noSync);
+                    if (this.noSync || (this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_MEMORY) || (os.sqlite3OsDeviceCharacteristics(this.fileDescriptor) & Sqlite3.SQLITE_IOCAP_SAFE_APPEND) != 0)
                     {
                         Globals.Paging.aJournalMagic.CopyTo(zHeader, 0);
                         // memcpy(zHeader, Globals.Paging.aJournalMagic, sizeof(Globals.Paging.aJournalMagic));
@@ -1378,41 +1320,25 @@ return (pPager->pWal!=0);
                         Array.Clear(zHeader, 0, Globals.Paging.aJournalMagic.Length + 4);
                         //memset(zHeader, 0, sizeof(Globals.Paging.aJournalMagic)+4);
                     }
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="The random check">hash initialiser </param>
 
                     i64 i64Temp = 0;
                     Sqlite3.sqlite3_randomness(sizeof(i64), ref i64Temp);
                     this.cksumInit = (u32)i64Temp;
                     Converter.put32bits(zHeader, Globals.Paging.aJournalMagic.Length + 4, this.cksumInit);
-                    ///
-                    ///<summary>
                     ///The initial database size 
-                    ///</summary>
 
                     Converter.put32bits(zHeader, Globals.Paging.aJournalMagic.Length + 8, this.dbOrigSize);
-                    ///
-                    ///<summary>
                     ///The assumed sector size for this process 
-                    ///</summary>
 
                     Converter.put32bits(zHeader, Globals.Paging.aJournalMagic.Length + 12, this.sectorSize);
-                    ///
-                    ///<summary>
                     ///The page size 
-                    ///</summary>
 
                     Converter.put32bits(zHeader, Globals.Paging.aJournalMagic.Length + 16, (u32)this.pageSize);
-                    ///
-                    ///<summary>
                     ///Initializing the tail of the buffer is not necessary.  Everything
                     ///works find if the following memset() is omitted.  But initializing
                     ///the memory prevents valgrind from complaining, so we are willing to
                     ///take the performance hit.
-                    ///
-                    ///</summary>
 
                     //  memset(&zHeader[sizeof(Globals.Paging.aJournalMagic)+20], 0,
                     //  nHeader-(sizeof(Globals.Paging.aJournalMagic)+20));
@@ -1441,7 +1367,7 @@ return (pPager->pWal!=0);
                     for (nWrite = 0; rc == SqlResult.SQLITE_OK && nWrite < this.JOURNAL_HDR_SZ(); nWrite += nHeader)
                     {
                         sqliteinth.IOTRACE("JHDR %p %lld %d\n", this, this.journalHdr, nHeader);
-                        rc = os.sqlite3OsWrite(this.jfd, zHeader, (int)nHeader, this.journalOff);
+                        rc = os.sqlite3OsWrite(this.JournalFileDescriptor, zHeader, (int)nHeader, this.journalOff);
                         Debug.Assert(this.journalHdr <= this.journalOff);
                         this.journalOff += (int)nHeader;
                     }
@@ -1481,38 +1407,22 @@ return (pPager->pWal!=0);
                 )
                 {
                     SqlResult rc;
-                    ///
-                    ///<summary>
                     ///Return code 
-                    ///</summary>
 
                     byte[] aMagic = new byte[8];
-                    ///
-                    ///<summary>
                     ///A buffer to hold the magic header 
-                    ///</summary>
 
                     i64 iHdrOff;
-                    ///
-                    ///<summary>
                     ///Offset of journal header being read 
-                    ///</summary>
 
-                    Debug.Assert(this.jfd.isOpen);
-                    ///
-                    ///<summary>
+                    Debug.Assert(this.JournalFileDescriptor.isOpen);
                     ///Journal file must be open. 
-                    ///</summary>
 
                     pNRec = 0;
                     pDbSize = 0;
-                    ///
-                    ///<summary>
                     ///Advance Pager.journalOff to the start of the next sector. If the
                     ///journal file is too small for there to be a header stored at this
                     ///point, return SQLITE_DONE.
-                    ///
-                    ///</summary>
 
                     this.journalOff = this.journalHdrOffset();
                     if (this.journalOff + this.JOURNAL_HDR_SZ() > journalSize)
@@ -1531,7 +1441,7 @@ return (pPager->pWal!=0);
 
                     if (isHot != 0 || iHdrOff != this.journalHdr)
                     {
-                        rc = os.sqlite3OsRead(this.jfd, aMagic, aMagic.Length, iHdrOff);
+                        rc = os.sqlite3OsRead(this.JournalFileDescriptor, aMagic, aMagic.Length, iHdrOff);
                         if (rc != (SqlResult)0)
                         {
                             return rc;
@@ -1541,44 +1451,28 @@ return (pPager->pWal!=0);
                             return SqlResult.SQLITE_DONE;
                         }
                     }
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="Read the first three 32">bit fields of the journal header: The nRec</param>
                     ///<param name="field, the checksum">initializer and the database size at the start</param>
                     ///<param name="of the transaction. Return an error code if anything goes wrong.">of the transaction. Return an error code if anything goes wrong.</param>
-                    ///<param name=""></param>
 
-                    if (SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.jfd, iHdrOff + 8, ref pNRec)) || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.jfd, iHdrOff + 12, ref this.cksumInit)) || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.jfd, iHdrOff + 16, ref pDbSize)))
+                    if (SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.JournalFileDescriptor, iHdrOff + 8, ref pNRec)) || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.JournalFileDescriptor, iHdrOff + 12, ref this.cksumInit)) || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.JournalFileDescriptor, iHdrOff + 16, ref pDbSize)))
                     {
                         return rc;
                     }
                     if (this.journalOff == 0)
                     {
                         u32 iPageSize = 0;
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="Page">size field of journal header </param>
 
                         u32 iSectorSize = 0;
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="Sector">size field of journal header </param>
 
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="Read the page">size journal header fields. </param>
 
-                        if (SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.jfd, iHdrOff + 20, ref iSectorSize)) || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.jfd, iHdrOff + 24, ref iPageSize)))
+                        if (SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.JournalFileDescriptor, iHdrOff + 20, ref iSectorSize)) || SqlResult.SQLITE_OK != (rc = PagerMethods.read32bits(this.JournalFileDescriptor, iHdrOff + 24, ref iPageSize)))
                         {
                             return rc;
                         }
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="Versions of SQLite prior to 3.5.8 set the page">size field of the</param>
                         ///<param name="journal header to zero. In this case, assume that the Pager.pageSize">journal header to zero. In this case, assume that the Pager.pageSize</param>
                         ///<param name="variable is already set to the correct page size.">variable is already set to the correct page size.</param>
@@ -1588,9 +1482,6 @@ return (pPager->pWal!=0);
                         {
                             iPageSize = (u32)this.pageSize;
                         }
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="Check that the values read from the page">size fields</param>
                         ///<param name="are within range. To be 'in range', both values need to be a power">are within range. To be 'in range', both values need to be a power</param>
                         ///<param name="of two greater than or equal to 512 or 32, and not greater than their ">of two greater than or equal to 512 or 32, and not greater than their </param>
@@ -1599,9 +1490,6 @@ return (pPager->pWal!=0);
 
                         if (iPageSize < 512 || iSectorSize < 32 || iPageSize > Limits.SQLITE_MAX_PAGE_SIZE || iSectorSize > Limits.Pager.MAX_SECTOR_SIZE || ((iPageSize - 1) & iPageSize) != 0 || ((iSectorSize - 1) & iSectorSize) != 0)
                         {
-                            ///
-                            ///<summary>
-                            ///</summary>
                             ///<param name="If the either the page">header is</param>
                             ///<param name="invalid, then the process that wrote the journal">header must have</param>
                             ///<param name="crashed before the header was synced. In this case stop reading">crashed before the header was synced. In this case stop reading</param>
@@ -1610,9 +1498,6 @@ return (pPager->pWal!=0);
 
                             return SqlResult.SQLITE_DONE;
                         }
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="Update the page">size to match the value read from the journal.</param>
                         ///<param name="Use a sqliteinth.testcase() macro to make sure that malloc failure within">Use a sqliteinth.testcase() macro to make sure that malloc failure within</param>
                         ///<param name="PagerSetPagesize() is tested.">PagerSetPagesize() is tested.</param>
@@ -1620,15 +1505,11 @@ return (pPager->pWal!=0);
 
                         rc = this.sqlite3PagerSetPagesize(ref iPageSize, -1);
                         sqliteinth.testcase(rc != SqlResult.SQLITE_OK);
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="Update the assumed sector">size to match the value used by</param>
                         ///<param name="the process that created this journal. If this journal was">the process that created this journal. If this journal was</param>
                         ///<param name="created by a process other than this one, then this routine">created by a process other than this one, then this routine</param>
                         ///<param name="is being called from within pager_playback(). The local value">is being called from within pager_playback(). The local value</param>
                         ///<param name="of Pager.sectorSize is restored at the end of that routine.">of Pager.sectorSize is restored at the end of that routine.</param>
-                        ///<param name=""></param>
 
                         this.sectorSize = iSectorSize;
                     }
@@ -1661,43 +1542,27 @@ return (pPager->pWal!=0);
                 SqlResult writeMasterJournal(string zMaster)
                 {
                     SqlResult rc;
-                    ///
-                    ///<summary>
-                    ///Return code 
-                    ///</summary>
 
                     int nMaster;
-                    ///
-                    ///<summary>
                     ///Length of string zMaster 
-                    ///</summary>
 
                     i64 iHdrOff;
-                    ///
-                    ///<summary>
                     ///Offset of header in journal file 
-                    ///</summary>
 
                     i64 jrnlSize = 0;
-                    ///
-                    ///<summary>
                     ///Size of journal file on disk 
-                    ///</summary>
 
                     u32 cksum = 0;
-                    ///
-                    ///<summary>
                     ///Checksum of string zMaster 
-                    ///</summary>
 
                     Debug.Assert(this.setMaster == 0);
                     Debug.Assert(!this.pagerUseWal());
-                    if (null == zMaster || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_MEMORY || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_OFF)
+                    if (null == zMaster || this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_MEMORY || this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_OFF)
                     {
                         return SqlResult.SQLITE_OK;
                     }
                     this.setMaster = 1;
-                    Debug.Assert(this.jfd.isOpen);
+                    Debug.Assert(this.JournalFileDescriptor.isOpen);
                     Debug.Assert(this.journalHdr <= this.journalOff);
                     ///
                     ///<summary>
@@ -1728,7 +1593,7 @@ return (pPager->pWal!=0);
                     ///
                     ///</summary>
 
-                    if ((0 != (rc = PagerMethods.write32bits(this.jfd, iHdrOff, (u32)this.PAGER_MJ_PGNO))) || (0 != (rc = os.sqlite3OsWrite(this.jfd, Encoding.UTF8.GetBytes(zMaster), nMaster, iHdrOff + 4))) || (0 != (rc = PagerMethods.write32bits(this.jfd, iHdrOff + 4 + nMaster, (u32)nMaster))) || (0 != (rc = PagerMethods.write32bits(this.jfd, iHdrOff + 4 + nMaster + 4, cksum))) || (0 != (rc = os.sqlite3OsWrite(this.jfd, Globals.Paging.aJournalMagic, 8, iHdrOff + 4 + nMaster + 8))))
+                    if ((0 != (rc = PagerMethods.write32bits(this.JournalFileDescriptor, iHdrOff, (u32)this.PAGER_MJ_PGNO))) || (0 != (rc = os.sqlite3OsWrite(this.JournalFileDescriptor, Encoding.UTF8.GetBytes(zMaster), nMaster, iHdrOff + 4))) || (0 != (rc = PagerMethods.write32bits(this.JournalFileDescriptor, iHdrOff + 4 + nMaster, (u32)nMaster))) || (0 != (rc = PagerMethods.write32bits(this.JournalFileDescriptor, iHdrOff + 4 + nMaster + 4, cksum))) || (0 != (rc = os.sqlite3OsWrite(this.JournalFileDescriptor, Globals.Paging.aJournalMagic, 8, iHdrOff + 4 + nMaster + 8))))
                     {
                         return rc;
                     }
@@ -1747,43 +1612,36 @@ return (pPager->pWal!=0);
                     ///<param name="file to the required size.">file to the required size.</param>
                     ///<param name=""></param>
 
-                    if (SqlResult.SQLITE_OK == (rc = os.sqlite3OsFileSize(this.jfd, ref jrnlSize)) && jrnlSize > this.journalOff)
+                    if (SqlResult.SQLITE_OK == (rc = os.sqlite3OsFileSize(this.JournalFileDescriptor, ref jrnlSize)) && jrnlSize > this.journalOff)
                     {
-                        rc = os.sqlite3OsTruncate(this.jfd, this.journalOff);
+                        rc = os.sqlite3OsTruncate(this.JournalFileDescriptor, this.journalOff);
                     }
                     return rc;
                 }
 
-                public///<summary>
-                    /// Find a page in the hash table given its page number. Return
-                    /// a pointer to the page or NULL if the requested page is not
-                    /// already in memory.
-                    ///
-                    ///</summary>
-                PgHdr pager_lookup(u32 pgno)
+        ///<summary>
+        /// Find a page in the hash table given its page number. Return
+        /// a pointer to the page or NULL if the requested page is not
+        /// already in memory.
+        ///
+        ///</summary>
+
+        public PgHdr pager_lookup(u32 pgno)
                 {
                     PgHdr p = null;
-                    ///
-                    ///<summary>
                     ///Return value 
-                    ///</summary>
 
-                    ///
-                    ///<summary>
                     ///It is not possible for a call to PcacheFetch() with createFlag==0 to
                     ///fail, since no attempt to allocate dynamic memory will be made.
-                    ///
-                    ///</summary>
 
                     PCacheMethods.sqlite3PcacheFetch(this.pPCache, pgno, 0, ref p);
                     return p;
                 }
 
-                public///<summary>
-                    /// Discard the entire contents of the in-memory page-cache.
-                    ///
-                    ///</summary>
-                void pager_reset()
+        ///<summary>
+        /// Discard the entire contents of the in-memory page-cache.                    /
+        ///</summary>
+        public void pager_reset()
                 {
                     if (null != this.pBackup)
                         this.pBackup.sqlite3BackupRestart();
@@ -1799,77 +1657,67 @@ return (pPager->pWal!=0);
                 SqlResult addToSavepointBitvecs(u32 pgno)
                 {
                     int ii;
-                    ///
-                    ///<summary>
                     ///Loop counter 
-                    ///</summary>
 
                     var rc = SqlResult.SQLITE_OK;
-                    ///
-                    ///<summary>
-                    ///Result code 
-                    ///</summary>
+            ///Result code 
 
-                    for (ii = 0; ii < this.nSavepoint; ii++)
-                    {
-                        PagerSavepoint p = this.aSavepoint[ii];
-                        if (pgno <= p.nOrig)
-                        {
-                            rc |= p.pInSavepoint.sqlite3BitvecSet( pgno);
-                            sqliteinth.testcase(rc == SqlResult.SQLITE_NOMEM);
-                            Debug.Assert(rc == SqlResult.SQLITE_OK || rc == SqlResult.SQLITE_NOMEM);
-                        }
+            this.SavePoints
+                .Where(p=>pgno <= p.nOrig)
+                .ForEach(
+                    p=> {                    
+                        rc |= p.pInSavepoint.setBit(pgno);
+                        sqliteinth.testcase(rc == SqlResult.SQLITE_NOMEM);
+                        Debug.Assert(rc == SqlResult.SQLITE_OK || rc == SqlResult.SQLITE_NOMEM);                    
                     }
+            );
+                    
                     return rc;
                 }
-
-                public///<summary>
+///<summary>
                     /// Free all structures in the Pager.aSavepoint[] array and set both
                     /// Pager.aSavepoint and Pager.nSavepoint to zero. Close the sub-journal
                     /// if it is open and the pager is not in exclusive mode.
                     ///
                     ///</summary>
-                void releaseAllSavepoints()
+                public void releaseAllSavepoints()
                 {
-                    int ii;
-                    ///
-                    ///<summary>
-                    ///Iterator for looping through Pager.aSavepoint 
-                    ///</summary>
+                    int ii;///Iterator for looping through Pager.aSavepoint 
 
-                    for (ii = 0; ii < this.nSavepoint; ii++)
+                    this.SavePoints.ForEach(
+                        savepoint=> BitvecExtensions.sqlite3BitvecDestroy(ref savepoint.pInSavepoint)
+                    );
+
+            
+                    if (!this.exclusiveMode || memjrnl.sqlite3IsMemJournal(this.SubJournalFileDescriptor))
                     {
-                    BitvecExtensions.sqlite3BitvecDestroy(ref this.aSavepoint[ii].pInSavepoint);
-                    }
-                    if (!this.exclusiveMode || memjrnl.sqlite3IsMemJournal(this.sjfd))
-                    {
-                        os.sqlite3OsClose(this.sjfd);
+                        os.sqlite3OsClose(this.SubJournalFileDescriptor);
                     }
                     //malloc_cs.sqlite3_free( ref pPager.aSavepoint );
-                    this.aSavepoint = null;
+                    this.aSavepoint = new PagerSavepoint[0];
                     this.nSavepoint = 0;
                     this.nSubRec = 0;
                 }
 
-                public///<summary>
-                    /// This function is a no-op if the pager is in exclusive mode and not
-                    /// in the ERROR state. Otherwise, it switches the pager to PagerState.PAGER_OPEN
-                    /// state.
-                    ///
-                    /// If the pager is not in exclusive-access mode, the database file is
-                    /// completely unlocked. If the file is unlocked and the file-system does
-                    /// not exhibit the UNDELETABLE_WHEN_OPEN property, the journal file is
-                    /// closed (if it is open).
-                    ///
-                    /// If the pager is in ERROR state when this function is called, the
-                    /// contents of the pager cache are discarded before switching back to
-                    /// the OPEN state. Regardless of whether the pager is in exclusive-mode
-                    /// or not, any journal file left in the file-system will be treated
-                    /// as a hot-journal and rolled back the next time a read-transaction
-                    /// is opened (by this or by any other connection).
-                    ///
-                    ///</summary>
-                void pager_unlock()
+        ///<summary>
+        /// This function is a no-op if the pager is in exclusive mode and not
+        /// in the ERROR state. Otherwise, it switches the pager to PagerState.PAGER_OPEN
+        /// state.
+        ///
+        /// If the pager is not in exclusive-access mode, the database file is
+        /// completely unlocked. If the file is unlocked and the file-system does
+        /// not exhibit the UNDELETABLE_WHEN_OPEN property, the journal file is
+        /// closed (if it is open).
+        ///
+        /// If the pager is in ERROR state when this function is called, the
+        /// contents of the pager cache are discarded before switching back to
+        /// the OPEN state. Regardless of whether the pager is in exclusive-mode
+        /// or not, any journal file left in the file-system will be treated
+        /// as a hot-journal and rolled back the next time a read-transaction
+        /// is opened (by this or by any other connection).
+        ///
+        ///</summary>
+        public void pager_unlock()
                 {
                     Debug.Assert(this.eState == PagerState.PAGER_READER || this.eState == PagerState.PAGER_OPEN || this.eState == PagerState.PAGER_ERROR);
                     BitvecExtensions.sqlite3BitvecDestroy(ref this.pInJournal);
@@ -1877,7 +1725,7 @@ return (pPager->pWal!=0);
                     this.releaseAllSavepoints();
                     if (this.pagerUseWal())
                     {
-                        Debug.Assert(!this.jfd.isOpen);
+                        Debug.Assert(!this.JournalFileDescriptor.isOpen);
                         wal.sqlite3WalEndReadTransaction(this.pWal);
                         this.eState = PagerState.PAGER_OPEN;
                     }
@@ -1885,30 +1733,23 @@ return (pPager->pWal!=0);
                         if (!this.exclusiveMode)
                         {
                             SqlResult rc;
-                            ///
-                            ///<summary>
                             ///Error code returned by pagerUnlockDb() 
-                            ///</summary>
 
-                            int iDc = this.fd.isOpen   ? os.sqlite3OsDeviceCharacteristics(this.fd) : 0;
-                            ///
-                            ///<summary>
+                            int iDc = this.fileDescriptor.isOpen   ? os.sqlite3OsDeviceCharacteristics(this.fileDescriptor) : 0;
                             ///If the operating system support deletion of open files, then
                             ///close the journal file when dropping the database lock.  Otherwise
                             ///another connection with journal_mode=delete might delete the file
                             ///out from under us.
-                            ///
-                            ///</summary>
 
-                            Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_MEMORY & 5) != 1);
-                            Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_OFF & 5) != 1);
-                            Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_WAL & 5) != 1);
-                            Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_DELETE & 5) != 1);
-                            Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_TRUNCATE & 5) == 1);
-                            Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_PERSIST & 5) == 1);
+                            Debug.Assert(((int)JournalMode.PAGER_JOURNALMODE_MEMORY & 5) != 1);
+                            Debug.Assert(((int)JournalMode.PAGER_JOURNALMODE_OFF & 5) != 1);
+                            Debug.Assert(((int)JournalMode.PAGER_JOURNALMODE_WAL & 5) != 1);
+                            Debug.Assert(((int)JournalMode.PAGER_JOURNALMODE_DELETE & 5) != 1);
+                            Debug.Assert(((int)JournalMode.PAGER_JOURNALMODE_TRUNCATE & 5) == 1);
+                            Debug.Assert(((int)JournalMode.PAGER_JOURNALMODE_PERSIST & 5) == 1);
                             if (0 == (iDc & Sqlite3.SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN) || 1 != (this.journalMode & 5))
                             {
-                                os.sqlite3OsClose(this.jfd);
+                                os.sqlite3OsClose(this.JournalFileDescriptor);
                             }
                             ///
                             ///<summary>
@@ -1919,7 +1760,7 @@ return (pPager->pWal!=0);
                             ///
                             ///</summary>
 
-                            rc = this.pagerUnlockDb(LockType.NO_LOCK);
+                            rc = this.UnlockDbFile(LockType.NO_LOCK);
                             if (rc != SqlResult.SQLITE_OK && this.eState == PagerState.PAGER_ERROR)
                             {
                                 this.eLock = Globals.Paging.UNKNOWN_LOCK;
@@ -2095,8 +1936,8 @@ return (pPager->pWal!=0);
                         return SqlResult.SQLITE_OK;
                     }
                     this.releaseAllSavepoints();
-                    Debug.Assert(this.jfd.isOpen || this.pInJournal == null);
-                    if (this.jfd.isOpen)
+                    Debug.Assert(this.JournalFileDescriptor.isOpen || this.pInJournal == null);
+                    if (this.JournalFileDescriptor.isOpen)
                     {
                         Debug.Assert(!this.pagerUseWal());
                         ///
@@ -2104,13 +1945,13 @@ return (pPager->pWal!=0);
                         ///Finalize the journal file. 
                         ///</summary>
 
-                        if (memjrnl.sqlite3IsMemJournal(this.jfd))
+                        if (memjrnl.sqlite3IsMemJournal(this.JournalFileDescriptor))
                         {
-                            Debug.Assert(this.journalMode == Globals.Paging.PAGER_JOURNALMODE_MEMORY);
-                            os.sqlite3OsClose(this.jfd);
+                            Debug.Assert(this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_MEMORY);
+                            os.sqlite3OsClose(this.JournalFileDescriptor);
                         }
                         else
-                            if (this.journalMode == Globals.Paging.PAGER_JOURNALMODE_TRUNCATE)
+                            if (this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_TRUNCATE)
                             {
                                 if (this.journalOff == 0)
                                 {
@@ -2118,12 +1959,12 @@ return (pPager->pWal!=0);
                                 }
                                 else
                                 {
-                                    rc = os.sqlite3OsTruncate(this.jfd, 0);
+                                    rc = os.sqlite3OsTruncate(this.JournalFileDescriptor, 0);
                                 }
                                 this.journalOff = 0;
                             }
                             else
-                                if (this.journalMode == Globals.Paging.PAGER_JOURNALMODE_PERSIST || (this.exclusiveMode && this.journalMode != Globals.Paging.PAGER_JOURNALMODE_WAL))
+                                if (this.journalMode == (int)Paging.JournalMode.PAGER_JOURNALMODE_PERSIST || (this.exclusiveMode && this.journalMode != (int)Paging.JournalMode.PAGER_JOURNALMODE_WAL))
                                 {
                                     rc = this.zeroJournalHdr(hasMaster);
                                     this.journalOff = 0;
@@ -2139,8 +1980,8 @@ return (pPager->pWal!=0);
                                     ///<param name="the database file, it will do so using an in">memory journal. </param>
                                     ///<param name=""></param>
 
-                                    Debug.Assert(this.journalMode == Globals.Paging.PAGER_JOURNALMODE_DELETE || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_MEMORY || this.journalMode == Globals.Paging.PAGER_JOURNALMODE_WAL);
-                                    os.sqlite3OsClose(this.jfd);
+                                    Debug.Assert(this.journalMode == (int)JournalMode.PAGER_JOURNALMODE_DELETE || this.journalMode == (int)JournalMode.PAGER_JOURNALMODE_MEMORY || this.journalMode == (int)JournalMode.PAGER_JOURNALMODE_WAL);
+                                    os.sqlite3OsClose(this.JournalFileDescriptor);
                                     if (!this.tempFile)
                                     {
                                         rc = os.sqlite3OsDelete(this.pVfs, this.zJournal, 0);
@@ -2177,7 +2018,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     }
                     if (!this.exclusiveMode && (!this.pagerUseWal() || wal.sqlite3WalExclusiveMode(this.pWal, 0)))
                     {
-                        rc2 = this.pagerUnlockDb(LockType.SHARED_LOCK);
+                        rc2 = this.UnlockDbFile(LockType.SHARED_LOCK);
                         this.changeCountDone = false;
                     }
                     this.eState = PagerState.PAGER_READER;
@@ -2297,69 +2138,48 @@ PagerMethods.sqlite3PagerUnref(p);
             /// allocated by this function. If this is the case and an allocation fails,
             /// SQLITE_NOMEM is returned.
             ///</summary>
-            public SqlResult pager_playback_one_page(///
-                    ///<summary>
-                    ///The pager being played back 
-                    ///</summary>
-
+            public SqlResult pager_playback_one_page(
+                ///<summary>
+                ///Offset of record to playback 
+                ///</summary>
                 ref i64 pOffset, ///
-                    ///<summary>
-                    ///Offset of record to playback 
-                    ///</summary>
 
+                ///<summary>
+                ///Bitvec of pages already played back 
+                ///</summary>
                 Bitvec pDone, ///
-                    ///<summary>
-                    ///Bitvec of pages already played back 
-                    ///</summary>
 
+                ///<summary>
+                ///True for main rollback journal. False for Stmt jrnl 
+                ///</summary>
                 int isMainJrnl, ///
-                    ///<summary>
-                    ///True for main rollback journal. False for Stmt jrnl 
-                    ///</summary>
 
+                ///<summary>
+                ///True for a savepoint rollback 
+                ///</summary>
                 int isSavepnt///
-                    ///<summary>
-                    ///True for a savepoint rollback 
-                    ///</summary>
+
 
                 )
                 {
                     SqlResult rc;
                     PgHdr pPg;
-                    ///
-                    ///<summary>
                     ///An existing page in the cache 
-                    ///</summary>
 
                     Pgno pgno = 0;
-                    ///
-                    ///<summary>
                     ///The page number of a page in journal 
-                    ///</summary>
 
                     u32 cksum = 0;
-                    ///
-                    ///<summary>
                     ///Checksum used for sanity checking 
-                    ///</summary>
 
                     byte[] aData;
-                    ///
-                    ///<summary>
                     ///Temporary storage for the page 
-                    ///</summary>
 
-                    sqlite3_file jfd;
-                    ///
-                    ///<summary>
+                    sqlite3_file journalFileDecriptor;
                     ///The file descriptor for the journal file 
-                    ///</summary>
 
                     bool isSynced;
-                    ///
-                    ///<summary>
                     ///True if journal page is synced 
-                    ///</summary>
 
                     Debug.Assert((isMainJrnl & ~1) == 0);
                     ///
@@ -2412,11 +2232,11 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///<param name="file. Return an error code to the caller if an IO error occurs.">file. Return an error code to the caller if an IO error occurs.</param>
                     ///<param name=""></param>
 
-                    jfd = isMainJrnl != 0 ? this.jfd : this.sjfd;
-                    rc = PagerMethods.read32bits(jfd, pOffset, ref pgno);
+                    journalFileDecriptor = isMainJrnl != 0 ? this.JournalFileDescriptor : this.SubJournalFileDescriptor;
+                    rc = PagerMethods.read32bits(journalFileDecriptor, pOffset, ref pgno);
                     if (rc != SqlResult.SQLITE_OK)
                         return rc;
-                    rc = os.sqlite3OsRead(jfd, aData, this.pageSize, (pOffset) + 4);
+                    rc = os.sqlite3OsRead(journalFileDecriptor, aData, this.pageSize, (pOffset) + 4);
                     if (rc != SqlResult.SQLITE_OK)
                         return rc;
                     pOffset += this.pageSize + 4 + isMainJrnl * 4;
@@ -2440,7 +2260,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     }
                     if (isMainJrnl != 0)
                     {
-                        rc = PagerMethods.read32bits(jfd, (pOffset) - 4, ref cksum);
+                        rc = PagerMethods.read32bits(journalFileDecriptor, (pOffset) - 4, ref cksum);
                         if (rc != 0)
                             return rc;
                         if (0 == isSavepnt && this.pager_cksum(aData) != cksum)
@@ -2448,22 +2268,14 @@ PagerMethods.sqlite3PagerUnref(p);
                             return SqlResult.SQLITE_DONE;
                         }
                     }
-                    ///
-                    ///<summary>
                     ///If this page has already been played by before during the current
                     ///rollback, then don't bother to play it back again.
-                    ///
-                    ///</summary>
 
-                    if (pDone != null && (rc = pDone.sqlite3BitvecSet( pgno)) != SqlResult.SQLITE_OK)
+                    if (pDone != null && (rc = pDone.setBit( pgno)) != SqlResult.SQLITE_OK)
                     {
                         return rc;
                     }
-                    ///
-                    ///<summary>
                     ///When playing back page 1, restore the nReserve setting
-                    ///
-                    ///</summary>
 
                     if (pgno == 1 && this.nReserve != (aData)[20])
                     {
@@ -2534,12 +2346,12 @@ PagerMethods.sqlite3PagerUnref(p);
                     {
                         isSynced = (pPg == null || 0 == (pPg.flags & PGHDR.NEED_SYNC));
                     }
-                    if (this.fd.isOpen   && (this.eState >= PagerState.PAGER_WRITER_DBMOD || this.eState == PagerState.PAGER_OPEN) && isSynced)
+                    if (this.fileDescriptor.isOpen   && (this.eState >= PagerState.PAGER_WRITER_DBMOD || this.eState == PagerState.PAGER_OPEN) && isSynced)
                     {
                         i64 ofst = (pgno - 1) * this.pageSize;
                         sqliteinth.testcase(0 == isSavepnt && pPg != null && (pPg.flags & PGHDR.NEED_SYNC) != 0);
                         Debug.Assert(!this.pagerUseWal());
-                        rc = os.sqlite3OsWrite(this.fd, aData, this.pageSize, ofst);
+                        rc = os.sqlite3OsWrite(this.fileDescriptor, aData, this.pageSize, ofst);
                         if (pgno > this.dbFileSize)
                         {
                             this.dbFileSize = pgno;
@@ -2708,54 +2520,29 @@ PagerMethods.sqlite3PagerUnref(p);
                 {
                     sqlite3_vfs pVfs = this.pVfs;
                     SqlResult rc;
-                    ///
-                    ///<summary>
                     ///Return code 
-                    ///</summary>
 
                     sqlite3_file pMaster;
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="Malloc'd master">journal file descriptor </param>
 
                     sqlite3_file pJournal;
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="Malloc'd child">journal file descriptor </param>
 
                     //string zMasterJournal = null; /* Contents of master journal file */
                     i64 nMasterJournal;
-                    ///
-                    ///<summary>
                     ///Size of master journal file 
-                    ///</summary>
 
                     string zJournal;
-                    ///
-                    ///<summary>
                     ///Pointer to one journal within MJ file 
-                    ///</summary>
 
                     string zMasterPtr;
-                    ///
-                    ///<summary>
                     ///Space to hold MJ filename from a journal file 
-                    ///</summary>
 
                     int nMasterPtr;
-                    ///
-                    ///<summary>
                     ///Amount of space allocated to zMasterPtr[] 
-                    ///</summary>
 
-                    ///
-                    ///<summary>
                     ///Allocate space for both the pJournal and pMaster file descriptors.
                     ///If successful, open the master journal file for reading.
-                    ///
-                    ///</summary>
 
                     pMaster = new sqlite3_file();
                     // (sqlite3_file*)malloc_cs.sqlite3MallocZero( pVfs.szOsFile * 2 );
@@ -2875,7 +2662,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     var rc = SqlResult.SQLITE_OK;
                     Debug.Assert(this.eState != PagerState.PAGER_ERROR);
                     Debug.Assert(this.eState != PagerState.PAGER_READER);
-                    if (this.fd.isOpen   && (this.eState >= PagerState.PAGER_WRITER_DBMOD || this.eState == PagerState.PAGER_OPEN))
+                    if (this.fileDescriptor.isOpen   && (this.eState >= PagerState.PAGER_WRITER_DBMOD || this.eState == PagerState.PAGER_OPEN))
                     {
                         i64 currentSize = 0, newSize;
                         int szPage = this.pageSize;
@@ -2885,13 +2672,13 @@ PagerMethods.sqlite3PagerUnref(p);
                         ///TODO: Is it safe to use Pager.dbFileSize here? 
                         ///</summary>
 
-                        rc = os.sqlite3OsFileSize(this.fd, ref currentSize);
+                        rc = os.sqlite3OsFileSize(this.fileDescriptor, ref currentSize);
                         newSize = szPage * nPage;
                         if (rc == SqlResult.SQLITE_OK && currentSize != newSize)
                         {
                             if (currentSize > newSize)
                             {
-                                rc = os.sqlite3OsTruncate(this.fd, newSize);
+                                rc = os.sqlite3OsTruncate(this.fileDescriptor, newSize);
                             }
                             else
                             {
@@ -2901,7 +2688,7 @@ PagerMethods.sqlite3PagerUnref(p);
                                 sqliteinth.testcase((newSize - szPage) < currentSize);
                                 sqliteinth.testcase((newSize - szPage) == currentSize);
                                 sqliteinth.testcase((newSize - szPage) > currentSize);
-                                rc = os.sqlite3OsWrite(this.fd, pTmp, szPage, newSize - szPage);
+                                rc = os.sqlite3OsWrite(this.fileDescriptor, pTmp, szPage, newSize - szPage);
                             }
                             if (rc == SqlResult.SQLITE_OK)
                             {
@@ -2929,7 +2716,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///</summary>
                 void setSectorSize()
                 {
-                    Debug.Assert(this.fd.isOpen   || this.tempFile);
+                    Debug.Assert(this.fileDescriptor.isOpen   || this.tempFile);
                     if (!this.tempFile)
                     {
                         ///
@@ -2940,7 +2727,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         ///
                         ///</summary>
 
-                        this.sectorSize = (u32)os.sqlite3OsSectorSize(this.fd);
+                        this.sectorSize = (u32)os.sqlite3OsSectorSize(this.fileDescriptor);
                     }
                     if (this.sectorSize < 32)
                     {
@@ -3066,8 +2853,8 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///
                     ///</summary>
 
-                    Debug.Assert(this.jfd.isOpen);
-                    rc = os.sqlite3OsFileSize(this.jfd, ref szJ);
+                    Debug.Assert(this.JournalFileDescriptor.isOpen);
+                    rc = os.sqlite3OsFileSize(this.JournalFileDescriptor, ref szJ);
                     if (rc != SqlResult.SQLITE_OK)
                     {
                         goto end_playback;
@@ -3089,7 +2876,7 @@ PagerMethods.sqlite3PagerUnref(p);
 
                     zMaster = new byte[this.pVfs.mxPathname + 1];
                     // pPager.pTmpSpace );
-                    rc = PagerMethods.readMasterJournal(this.jfd, zMaster, (u32)this.pVfs.mxPathname + 1);
+                    rc = PagerMethods.readMasterJournal(this.JournalFileDescriptor, zMaster, (u32)this.pVfs.mxPathname + 1);
                     if (rc == SqlResult.SQLITE_OK && zMaster[0] != 0)
                     {
                         rc = os.sqlite3OsAccess(pVfs, Encoding.UTF8.GetString(zMaster, 0, zMaster.Length), SQLITE_ACCESS.EXISTS, ref res);
@@ -3251,7 +3038,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///<param name=""></param>
 
                     sqlite3_int64 iDummy = 0;
-                    Debug.Assert(this.fd.pMethods == null || os.sqlite3OsFileControl(this.fd, Sqlite3.SQLITE_FCNTL_DB_UNCHANGED, ref iDummy) >= SqlResult.SQLITE_OK);
+                    Debug.Assert(this.fileDescriptor.pMethods == null || os.sqlite3OsFileControl(this.fileDescriptor, Sqlite3.SQLITE_FCNTL_DB_UNCHANGED, ref iDummy) >= SqlResult.SQLITE_OK);
                     ///
                     ///<summary>
                     ///If this playback is happening automatically as a result of an IO or
@@ -3270,7 +3057,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     {
                         zMaster = new byte[this.pVfs.mxPathname + 1];
                         //pPager.pTmpSpace );
-                        rc = PagerMethods.readMasterJournal(this.jfd, zMaster, (u32)this.pVfs.mxPathname + 1);
+                        rc = PagerMethods.readMasterJournal(this.JournalFileDescriptor, zMaster, (u32)this.pVfs.mxPathname + 1);
                         sqliteinth.testcase(rc != SqlResult.SQLITE_OK);
                     }
                     if (rc == SqlResult.SQLITE_OK && (this.eState >= PagerState.PAGER_WRITER_DBMOD || this.eState == PagerState.PAGER_OPEN))
@@ -3355,10 +3142,10 @@ PagerMethods.sqlite3PagerUnref(p);
                         ///Size of db file in bytes 
                         ///</summary>
 
-                        Debug.Assert(this.fd.isOpen   || this.tempFile);
-                        if (this.fd.isOpen  )
+                        Debug.Assert(this.fileDescriptor.isOpen   || this.tempFile);
+                        if (this.fileDescriptor.isOpen  )
                         {
-                            var rc = os.sqlite3OsFileSize(this.fd, ref n);
+                            var rc = os.sqlite3OsFileSize(this.fileDescriptor, ref n);
                             if (rc != SqlResult.SQLITE_OK)
                             {
                                 return rc;
@@ -3425,35 +3212,20 @@ PagerMethods.sqlite3PagerUnref(p);
                 SqlResult pagerPlaybackSavepoint(PagerSavepoint pSavepoint)
                 {
                     i64 szJ;
-                    ///
-                    ///<summary>
                     ///Effective size of the main journal 
-                    ///</summary>
 
                     i64 iHdrOff;
-                    ///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="End of first segment of main">journal records </param>
+                    ///End of first segment of main-journal records 
 
                     SqlResult rc = SqlResult.SQLITE_OK;
-                    ///
-                    ///<summary>
                     ///Return code 
-                    ///</summary>
 
                     Bitvec pDone = null;
-                    ///
-                    ///<summary>
                     ///Bitvec to ensure pages played back only once 
-                    ///</summary>
 
                     Debug.Assert(this.eState != PagerState.PAGER_ERROR);
                     Debug.Assert(this.eState >= PagerState.PAGER_WRITER_LOCKED);
-                    ///
-                    ///<summary>
                     ///Allocate a bitvec to use to store the set of pages rolled back 
-                    ///</summary>
 
                     if (pSavepoint != null)
                     {
@@ -3463,12 +3235,8 @@ PagerMethods.sqlite3PagerUnref(p);
                         //  return SQLITE_NOMEM;
                         //}
                     }
-                    ///
-                    ///<summary>
                     ///Set the database size back to the value it was before the savepoint
                     ///being reverted was opened.
-                    ///
-                    ///</summary>
 
                     this.dbSize = pSavepoint != null ? pSavepoint.nOrig : this.dbOrigSize;
                     this.changeCountDone = this.tempFile;
@@ -3476,14 +3244,12 @@ PagerMethods.sqlite3PagerUnref(p);
                     {
                         return this.pagerRollbackWal();
                     }
-                    ///
-                    ///<summary>
                     ///Use pPager.journalOff as the effective size of the main rollback
                     ///journal.  The actual file might be larger than this in
                     ///Globals.Paging.PAGER_JOURNALMODE_TRUNCATE or Globals.Paging.PAGER_JOURNALMODE_PERSIST.  But anything
-                    ///</summary>
-                    ///<param name="past pPager.journalOff is off">limits to us.</param>
-                    ///<param name=""></param>
+                    ///
+                    ///past pPager.journalOff is off-limits to us.
+                    
 
                     szJ = this.journalOff;
                     Debug.Assert(this.pagerUseWal() == false || szJ == 0);
@@ -3524,27 +3290,16 @@ PagerMethods.sqlite3PagerUnref(p);
                     while (rc == SqlResult.SQLITE_OK && this.journalOff < szJ)
                     {
                         u32 ii;
-                        ///
-                        ///<summary>
-                        ///Loop counter 
-                        ///</summary>
 
                         u32 nJRec;
-                        ///
-                        ///<summary>
                         ///Number of Journal Records 
-                        ///</summary>
 
                         u32 dummy;
                         rc = this.readJournalHdr(0, (int)szJ, out nJRec, out dummy);
                         Debug.Assert(rc != SqlResult.SQLITE_DONE);
-                        ///
-                        ///<summary>
                         ///The "pPager.journalHdr+JOURNAL_HDR_SZ(pPager)==pPager.journalOff"
                         ///test is related to ticket #2565.  See the discussion in the
                         ///pager_playback() function for additional information.
-                        ///
-                        ///</summary>
 
                         if (nJRec == 0 && this.journalHdr + this.JOURNAL_HDR_SZ() >= this.journalOff)
                         {
@@ -3853,9 +3608,9 @@ PagerMethods.sqlite3PagerUnref(p);
                     {
                         //char *pNew = NULL;             /* New temp space */
                         i64 nByte = 0;
-                        if (this.eState > PagerState.PAGER_OPEN && this.fd.isOpen  )
+                        if (this.eState > PagerState.PAGER_OPEN && this.fileDescriptor.isOpen  )
                         {
-                            rc = os.sqlite3OsFileSize(this.fd, ref nByte);
+                            rc = os.sqlite3OsFileSize(this.fileDescriptor, ref nByte);
                         }
                         //if ( rc == SqlResult.SQLITE_OK )
                         //{
@@ -3975,7 +3730,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     SqlResult rc = SqlResult.SQLITE_OK;
                     Array.Clear(pDest, 0, N);
                     //memset(pDest, 0, N);
-                    Debug.Assert(this.fd.isOpen   || this.tempFile);
+                    Debug.Assert(this.fileDescriptor.isOpen   || this.tempFile);
                     ///
                     ///<summary>
                     ///This routine is only called by btree immediately after creating
@@ -3985,10 +3740,10 @@ PagerMethods.sqlite3PagerUnref(p);
                     ///</summary>
 
                     Debug.Assert(!this.pagerUseWal());
-                    if (this.fd.isOpen  )
+                    if (this.fileDescriptor.isOpen  )
                     {
                         sqliteinth.IOTRACE("DBHDR %p 0 %d\n", this, N);
-                        rc = os.sqlite3OsRead(this.fd, pDest, N, 0);
+                        rc = os.sqlite3OsRead(this.fileDescriptor, pDest, N, 0);
                         if (rc == SqlResult.SQLITE_IOERR_SHORT_READ)
                         {
                             rc = SqlResult.SQLITE_OK;
@@ -4032,7 +3787,7 @@ PagerMethods.sqlite3PagerUnref(p);
                     Debug.Assert((this.eLock >= locktype) || (this.eLock == LockType.NO_LOCK && locktype == LockType.SHARED_LOCK) || (this.eLock == LockType.RESERVED_LOCK && locktype == LockType.EXCLUSIVE_LOCK));
                     do
                     {
-                        rc = this.pagerLockDb(locktype);
+                        rc = this.LockDbFile(locktype);
                     }
                     while (rc == SqlResult.SQLITE_BUSY && this.xBusyHandler(this.pBusyHandlerArg) != 0);
                     return rc;
@@ -4076,11 +3831,11 @@ PagerMethods.sqlite3PagerUnref(p);
                     var rc = SqlResult.SQLITE_OK;
                     if (!this.noSync)
                     {
-                        rc = os.sqlite3OsSync(this.jfd, Sqlite3.SQLITE_SYNC_NORMAL);
+                        rc = os.sqlite3OsSync(this.JournalFileDescriptor, Sqlite3.SQLITE_SYNC_NORMAL);
                     }
                     if (rc == SqlResult.SQLITE_OK)
                     {
-                        rc = os.sqlite3OsFileSize(this.jfd, ref this.journalHdr);
+                        rc = os.sqlite3OsFileSize(this.JournalFileDescriptor, ref this.journalHdr);
                     }
                     return rc;
                 }
@@ -4145,7 +3900,7 @@ pPager.pWal = 0;
                         ///<param name="rollback before accessing the database file.">rollback before accessing the database file.</param>
                         ///<param name=""></param>
 
-                        if (this.jfd.isOpen)
+                        if (this.JournalFileDescriptor.isOpen)
                         {
                             this.pager_error(this.pagerSyncHotJournal());
                         }
@@ -4157,8 +3912,8 @@ pPager.pWal = 0;
 #endif
                     PAGERTRACE("CLOSE %d\n", PagerMethods.PAGERID(this));
                     sqliteinth.IOTRACE("CLOSE %p\n", this);
-                    os.sqlite3OsClose(this.jfd);
-                    os.sqlite3OsClose(this.fd);
+                    os.sqlite3OsClose(this.JournalFileDescriptor);
+                    os.sqlite3OsClose(this.fileDescriptor);
                     //malloc_cs.sqlite3_free( ref pTmp );
                     PCacheMethods.sqlite3PcacheClose(this.pPCache);
 #if SQLITE_HAS_CODEC
@@ -4166,7 +3921,7 @@ pPager.pWal = 0;
                         this.xCodecFree(ref this.pCodec);
 #endif
                     Debug.Assert(null == this.aSavepoint && !this.pInJournal);
-                    Debug.Assert(!this.jfd.isOpen && !this.sjfd.isOpen);
+                    Debug.Assert(!this.JournalFileDescriptor.isOpen && !this.SubJournalFileDescriptor.isOpen);
                     //malloc_cs.sqlite3_free( ref pPager );
                     return SqlResult.SQLITE_OK;
                 }
@@ -4219,10 +3974,10 @@ pPager.pWal = 0;
                     if (!this.noSync)
                     {
                         Debug.Assert(!this.tempFile);
-                        if (this.jfd.isOpen && this.journalMode != Globals.Paging.PAGER_JOURNALMODE_MEMORY)
+                        if (this.JournalFileDescriptor.isOpen && this.journalMode != (int)JournalMode.PAGER_JOURNALMODE_MEMORY)
                         {
-                            int iDc = os.sqlite3OsDeviceCharacteristics(this.fd);
-                            Debug.Assert(this.jfd.isOpen);
+                            int iDc = os.sqlite3OsDeviceCharacteristics(this.fileDescriptor);
+                            Debug.Assert(this.JournalFileDescriptor.isOpen);
                             if (0 == (iDc & Sqlite3.SQLITE_IOCAP_SAFE_APPEND))
                             {
                                 ///
@@ -4258,11 +4013,11 @@ pPager.pWal = 0;
                                 // memcpy(zHeader, Globals.Paging.aJournalMagic, sizeof(Globals.Paging.aJournalMagic));
                                 Converter.put32bits(zHeader, Globals.Paging.aJournalMagic.Length, this.nRec);
                                 iNextHdrOffset = this.journalHdrOffset();
-                                rc = os.sqlite3OsRead(this.jfd, aMagic, 8, iNextHdrOffset);
+                                rc = os.sqlite3OsRead(this.JournalFileDescriptor, aMagic, 8, iNextHdrOffset);
                                 if (rc == SqlResult.SQLITE_OK && 0 == _Custom.memcmp(aMagic, Globals.Paging.aJournalMagic, 8))
                                 {
                                     u8[] zerobyte = new u8[1];
-                                    rc = os.sqlite3OsWrite(this.jfd, zerobyte, 1, iNextHdrOffset);
+                                    rc = os.sqlite3OsWrite(this.JournalFileDescriptor, zerobyte, 1, iNextHdrOffset);
                                 }
                                 if (rc != SqlResult.SQLITE_OK && rc != SqlResult.SQLITE_IOERR_SHORT_READ)
                                 {
@@ -4287,12 +4042,12 @@ pPager.pWal = 0;
                                 {
                                     PAGERTRACE("SYNC journal of %d\n", PagerMethods.PAGERID(this));
                                     sqliteinth.IOTRACE("JSYNC %p\n", this);
-                                    rc = os.sqlite3OsSync(this.jfd, this.syncFlags);
+                                    rc = os.sqlite3OsSync(this.JournalFileDescriptor, this.syncFlags);
                                     if (rc != SqlResult.SQLITE_OK)
                                         return rc;
                                 }
                                 sqliteinth.IOTRACE("JHDR %p %lld\n", this, this.journalHdr);
-                                rc = os.sqlite3OsWrite(this.jfd, zHeader, zHeader.Length, this.journalHdr);
+                                rc = os.sqlite3OsWrite(this.JournalFileDescriptor, zHeader, zHeader.Length, this.journalHdr);
                                 if (rc != SqlResult.SQLITE_OK)
                                     return rc;
                             }
@@ -4300,7 +4055,7 @@ pPager.pWal = 0;
                             {
                                 PAGERTRACE("SYNC journal of %d\n", PagerMethods.PAGERID(this));
                                 sqliteinth.IOTRACE("JSYNC %p\n", this);
-                                rc = os.sqlite3OsSync(this.jfd, this.syncFlags | (this.syncFlags == Sqlite3.SQLITE_SYNC_FULL ? Sqlite3.SQLITE_SYNC_DATAONLY : 0));
+                                rc = os.sqlite3OsSync(this.JournalFileDescriptor, this.syncFlags | (this.syncFlags == Sqlite3.SQLITE_SYNC_FULL ? Sqlite3.SQLITE_SYNC_DATAONLY : 0));
                                 if (rc != SqlResult.SQLITE_OK)
                                     return rc;
                             }
@@ -4337,135 +4092,102 @@ pPager.pWal = 0;
                     Sqlite3.PAGERTRACE(p1,p2);
                 }
 
-                public///<summary>
-                      /// The argument is the first in a linked list of dirty pages connected
-                      /// by the PgHdr.pDirty pointer. This function writes each one of the
-                      /// in-memory pages in the list to the database file. The argument may
-                      /// be NULL, representing an empty list. In this case this function is
-                      /// a no-op.
-                      ///
-                      /// The pager must hold at least a RESERVED lock when this function
-                      /// is called. Before writing anything to the database file, this lock
-                      /// is upgraded to an EXCLUSIVE lock. If the lock cannot be obtained,
-                      /// SQLITE_BUSY is returned and no data is written to the database file.
-                      ///
-                      /// If the pager is a temp-file pager and the actual file-system file
-                      /// is not yet open, it is created and opened before any data is
-                      /// written out.
-                      ///
-                      /// Once the lock has been upgraded and, if necessary, the file opened,
-                      /// the pages are written out to the database file in list order. Writing
-                      /// a page is skipped if it meets either of the following criteria:
-                      ///
-                      ///   * The page number is greater than Pager.dbSize, or
-                      ///   * The PGHDR.DONT_WRITE flag is set on the page.
-                      ///
-                      /// If writing out a page causes the database file to grow, Pager.dbFileSize
-                      /// is updated accordingly. If page 1 is written out, then the value cached
-                      /// in Pager.dbFileVers[] is updated to match the new value stored in
-                      /// the database file.
-                      ///
-                      /// If everything is successful, SqlResult.SQLITE_OK is returned. If an IO error
-                      /// occurs, an IO error code is returned. Or, if the EXCLUSIVE lock cannot
-                      /// be obtained, SQLITE_BUSY is returned.
-                      ///
-                      ///</summary>
-                SqlResult pager_write_pagelist(PgHdr pList)
+        ///<summary>
+        /// The argument is the first in a linked list of dirty pages connected
+        /// by the PgHdr.pDirty pointer. This function writes each one of the
+        /// in-memory pages in the list to the database file. The argument may
+        /// be NULL, representing an empty list. In this case this function is
+        /// a no-op.
+        ///
+        /// The pager must hold at least a RESERVED lock when this function
+        /// is called. Before writing anything to the database file, this lock
+        /// is upgraded to an EXCLUSIVE lock. If the lock cannot be obtained,
+        /// SQLITE_BUSY is returned and no data is written to the database file.
+        ///
+        /// If the pager is a temp-file pager and the actual file-system file
+        /// is not yet open, it is created and opened before any data is
+        /// written out.
+        ///
+        /// Once the lock has been upgraded and, if necessary, the file opened,
+        /// the pages are written out to the database file in list order. Writing
+        /// a page is skipped if it meets either of the following criteria:
+        ///
+        ///   * The page number is greater than Pager.dbSize, or
+        ///   * The PGHDR.DONT_WRITE flag is set on the page.
+        ///
+        /// If writing out a page causes the database file to grow, Pager.dbFileSize
+        /// is updated accordingly. If page 1 is written out, then the value cached
+        /// in Pager.dbFileVers[] is updated to match the new value stored in
+        /// the database file.
+        ///
+        /// If everything is successful, SqlResult.SQLITE_OK is returned. If an IO error
+        /// occurs, an IO error code is returned. Or, if the EXCLUSIVE lock cannot
+        /// be obtained, SQLITE_BUSY is returned.
+        ///
+        ///</summary>
+        public SqlResult pager_write_pagelist(PgHdr pList)
                 {
                     var rc = SqlResult.SQLITE_OK;
-                    ///
-                    ///<summary>
                     ///Return code 
-                    ///</summary>
 
-                    ///
-                    ///<summary>
                     ///This function is only called for rollback pagers in WRITER_DBMOD state. 
-                    ///</summary>
 
                     Debug.Assert(!this.pagerUseWal());
                     Debug.Assert(this.eState == PagerState.PAGER_WRITER_DBMOD);
                     Debug.Assert(this.eLock == LockType.EXCLUSIVE_LOCK);
-                    ///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="If the file is a temp">file has not yet been opened, open it now. It</param>
-                    ///<param name="is not possible for rc to be other than SqlResult.SQLITE_OK if this branch">is not possible for rc to be other than SqlResult.SQLITE_OK if this branch</param>
-                    ///<param name="is taken, as pager_wait_on_lock() is a no">files.</param>
-                    ///<param name=""></param>
+                    ///If the file is a temp">file has not yet been opened, open it now. It</param>
+                    ///is not possible for rc to be other than SqlResult.SQLITE_OK if this branch">is not possible for rc to be other than SqlResult.SQLITE_OK if this branch</param>
+                    ///is taken, as pager_wait_on_lock() is a no">files.</param>
 
-                    if (!this.fd.isOpen  )
+                    if (!this.fileDescriptor.isOpen  )
                     {
                         Debug.Assert(this.tempFile && rc == SqlResult.SQLITE_OK);
-                        rc = this.pagerOpentemp(ref this.fd, (int)this.vfsFlags);
+                        rc = this.pagerOpentemp(ref this.fileDescriptor, (int)this.vfsFlags);
                     }
-                    ///
-                    ///<summary>
                     ///Before the first write, give the VFS a hint of what the final
                     ///file size will be.
-                    ///
-                    ///</summary>
 
-                    Debug.Assert(rc != SqlResult.SQLITE_OK || this.fd.isOpen  );
+                    Debug.Assert(rc != SqlResult.SQLITE_OK || this.fileDescriptor.isOpen  );
                     if (rc == SqlResult.SQLITE_OK && this.dbSize > this.dbHintSize)
                     {
                         sqlite3_int64 szFile = this.pageSize * (sqlite3_int64)this.dbSize;
-                        os.sqlite3OsFileControl(this.fd, Sqlite3.SQLITE_FCNTL_SIZE_HINT, ref szFile);
+                        os.sqlite3OsFileControl(this.fileDescriptor, Sqlite3.SQLITE_FCNTL_SIZE_HINT, ref szFile);
                         this.dbHintSize = this.dbSize;
                     }
                     while (rc == SqlResult.SQLITE_OK && pList)
                     {
                         Pgno pgno = pList.pgno;
-                        ///
-                        ///<summary>
                         ///If there are dirty pages in the page cache with page numbers greater
                         ///than Pager.dbSize, this means sqlite3PagerTruncateImage() was called to
-                        ///</summary>
-                        ///<param name="make the file smaller (presumably by auto">vacuum code). Do not write</param>
-                        ///<param name="any such pages to the file.">any such pages to the file.</param>
-                        ///<param name=""></param>
-                        ///<param name="Also, do not write out any page that has the PGHDR.DONT_WRITE flag">Also, do not write out any page that has the PGHDR.DONT_WRITE flag</param>
-                        ///<param name="set (set by sqlite3PagerDontWrite()).">set (set by sqlite3PagerDontWrite()).</param>
-                        ///<param name=""></param>
+                        ///
+                        ///make the file smaller (presumably by auto">vacuum code). Do not write</param>
+                        ///any such pages to the file.">any such pages to the file.</param>
+                        ///
+                        ///Also, do not write out any page that has the PGHDR.DONT_WRITE flag">Also, do not write out any page that has the PGHDR.DONT_WRITE flag</param>
+                        ///set (set by sqlite3PagerDontWrite()).">set (set by sqlite3PagerDontWrite()).</param>
 
                         if (pList.pgno <= this.dbSize && 0 == (pList.flags & PGHDR.DONT_WRITE))
                         {
                             i64 offset = (pList.pgno - 1) * (i64)this.pageSize;
-                            ///
-                            ///<summary>
                             ///Offset to write 
-                            ///</summary>
 
                             byte[] pData = null;
-                            ///
-                            ///<summary>
                             ///Data to write 
-                            ///</summary>
 
                             Debug.Assert((pList.flags & PGHDR.NEED_SYNC) == 0);
                             if (pList.pgno == 1)
                                 pList.pager_write_changecounter();
-                            ///
-                            ///<summary>
                             ///Encode the database 
-                            ///</summary>
 
                             if (PagerMethods.CODEC2(this, pList.pData, pgno, crypto.SQLITE_ENCRYPT_WRITE_CTX, ref pData))
                                 return SqlResult.SQLITE_NOMEM;
                             //     PagerMethods.CODEC2(pPager, pList.pData, pgno, 6, return SQLITE_NOMEM, pData);
-                            ///
-                            ///<summary>
                             ///Write out the page data. 
-                            ///</summary>
 
-                            rc = os.sqlite3OsWrite(this.fd, pData, this.pageSize, offset);
-                            ///
-                            ///<summary>
+                            rc = os.sqlite3OsWrite(this.fileDescriptor, pData, this.pageSize, offset);
                             ///If page 1 was just written, update Pager.dbFileVers to match
                             ///the value now stored in the database file. If writing this
                             ///page caused the database file to grow, update dbFileSize.
-                            ///
-                            ///</summary>
 
                             if (pgno == 1)
                             {
@@ -4476,10 +4198,7 @@ pPager.pWal = 0;
                             {
                                 this.dbFileSize = pgno;
                             }
-                            ///
-                            ///<summary>
                             ///Update any backup objects copying the contents of this pager. 
-                            ///</summary>
 
                             this.pBackup.sqlite3BackupUpdate(pgno, pList.pData);
                             PAGERTRACE("STORE %d page %d hash(%08x)\n", PagerMethods.PAGERID(this), pgno, pList.pager_pagehash());
@@ -4521,15 +4240,15 @@ pPager.pWal = 0;
                 SqlResult openSubJournal()
                 {
                     SqlResult rc = SqlResult.SQLITE_OK;
-                    if (!this.sjfd.isOpen )
+                    if (!this.SubJournalFileDescriptor.isOpen )
                     {
-                        if (this.journalMode == Globals.Paging.PAGER_JOURNALMODE_MEMORY || this.subjInMemory != 0)
+                        if (this.journalMode == (int)JournalMode.PAGER_JOURNALMODE_MEMORY || this.subjInMemory != 0)
                         {
-                            memjrnl.sqlite3MemJournalOpen(this.sjfd);
+                            memjrnl.sqlite3MemJournalOpen(this.SubJournalFileDescriptor);
                         }
                         else
                         {
-                            rc = this.pagerOpentemp(ref this.sjfd, Sqlite3.SQLITE_OPEN_SUBJOURNAL);
+                            rc = this.pagerOpentemp(ref this.SubJournalFileDescriptor, Sqlite3.SQLITE_OPEN_SUBJOURNAL);
                         }
                     }
                     return rc;
@@ -4582,11 +4301,11 @@ pPager.pWal = 0;
                     ///True if a journal file is present 
                     ///</summary>
 
-                    int jrnlOpen = this.jfd.isOpen ? 1 : 0;
-                    Debug.Assert(this.useJournal != 0);
-                    Debug.Assert(this.fd.isOpen  );
+                    int jrnlOpen = this.JournalFileDescriptor.isOpen ? 1 : 0;
+                    Debug.Assert(this.useJournal != false);
+                    Debug.Assert(this.fileDescriptor.isOpen  );
                     Debug.Assert(this.eState == PagerState.PAGER_OPEN);
-                    Debug.Assert(jrnlOpen == 0 || (os.sqlite3OsDeviceCharacteristics(this.jfd) & Sqlite3.SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN) != 0);
+                    Debug.Assert(jrnlOpen == 0 || (os.sqlite3OsDeviceCharacteristics(this.JournalFileDescriptor) & Sqlite3.SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN) != 0);
                     pExists = 0;
                     if (0 == jrnlOpen)
                     {
@@ -4612,7 +4331,7 @@ pPager.pWal = 0;
                         ///<param name="be dealt with by the playback routine.  Ticket #3883.">be dealt with by the playback routine.  Ticket #3883.</param>
                         ///<param name=""></param>
 
-                        rc = os.sqlite3OsCheckReservedLock(this.fd, ref locked);
+                        rc = os.sqlite3OsCheckReservedLock(this.fileDescriptor, ref locked);
                         if (rc == SqlResult.SQLITE_OK && locked == 0)
                         {
                             Pgno nPage = 0;
@@ -4637,11 +4356,11 @@ pPager.pWal = 0;
                                 if (nPage == 0)
                                 {
                                     Sqlite3.sqlite3BeginBenignMalloc();
-                                    if (this.pagerLockDb(LockType.RESERVED_LOCK) == SqlResult.SQLITE_OK)
+                                    if (this.LockDbFile(LockType.RESERVED_LOCK) == SqlResult.SQLITE_OK)
                                     {
                                         os.sqlite3OsDelete(pVfs, this.zJournal, 0);
                                         if (!this.exclusiveMode)
-                                            this.pagerUnlockDb(LockType.SHARED_LOCK);
+                                            this.UnlockDbFile(LockType.SHARED_LOCK);
                                     }
                                     Sqlite3.sqlite3EndBenignMalloc();
                                 }
@@ -4660,19 +4379,19 @@ pPager.pWal = 0;
                                     if (0 == jrnlOpen)
                                     {
                                         int f = Sqlite3.SQLITE_OPEN_READONLY | Sqlite3.SQLITE_OPEN_MAIN_JOURNAL;
-                                        rc = os.sqlite3OsOpen(pVfs, this.zJournal, this.jfd, f, ref f);
+                                        rc = os.sqlite3OsOpen(pVfs, this.zJournal, this.JournalFileDescriptor, f, ref f);
                                     }
                                     if (rc == SqlResult.SQLITE_OK)
                                     {
                                         u8[] first = new u8[1];
-                                        rc = os.sqlite3OsRead(this.jfd, first, 1, 0);
+                                        rc = os.sqlite3OsRead(this.JournalFileDescriptor, first, 1, 0);
                                         if (rc == SqlResult.SQLITE_IOERR_SHORT_READ)
                                         {
                                             rc = SqlResult.SQLITE_OK;
                                         }
                                         if (0 == jrnlOpen)
                                         {
-                                            os.sqlite3OsClose(this.jfd);
+                                            os.sqlite3OsClose(this.JournalFileDescriptor);
                                         }
                                         pExists = (first[0] != 0) ? 1 : 0;
                                     }
@@ -4822,7 +4541,7 @@ pPager.pWal = 0;
                             ///<param name="downgraded to SHARED_LOCK before this function returns.">downgraded to SHARED_LOCK before this function returns.</param>
                             ///<param name=""></param>
 
-                            rc = this.pagerLockDb(LockType.EXCLUSIVE_LOCK);
+                            rc = this.LockDbFile(LockType.EXCLUSIVE_LOCK);
                             if (rc != SqlResult.SQLITE_OK)
                             {
                                 goto failed;
@@ -4844,7 +4563,7 @@ pPager.pWal = 0;
                             ///<param name="function was called and the journal file does not exist.">function was called and the journal file does not exist.</param>
                             ///<param name=""></param>
 
-                            if (!this.jfd.isOpen)
+                            if (!this.JournalFileDescriptor.isOpen)
                             {
                                 sqlite3_vfs pVfs = this.pVfs;
                                 int bExists = 0;
@@ -4859,12 +4578,12 @@ pPager.pWal = 0;
                                     int fout = 0;
                                     int f = Sqlite3.SQLITE_OPEN_READWRITE | Sqlite3.SQLITE_OPEN_MAIN_JOURNAL;
                                     Debug.Assert(!this.tempFile);
-                                    rc = os.sqlite3OsOpen(pVfs, this.zJournal, this.jfd, f, ref fout);
-                                    Debug.Assert(rc != SqlResult.SQLITE_OK || this.jfd.isOpen);
+                                    rc = os.sqlite3OsOpen(pVfs, this.zJournal, this.JournalFileDescriptor, f, ref fout);
+                                    Debug.Assert(rc != SqlResult.SQLITE_OK || this.JournalFileDescriptor.isOpen);
                                     if (rc == SqlResult.SQLITE_OK && (fout & Sqlite3.SQLITE_OPEN_READONLY) != 0)
                                     {
                                         rc = sqliteinth.SQLITE_CANTOPEN_BKPT();
-                                        os.sqlite3OsClose(this.jfd);
+                                        os.sqlite3OsClose(this.JournalFileDescriptor);
                                     }
                                 }
                             }
@@ -4880,7 +4599,7 @@ pPager.pWal = 0;
                             ///<param name="the journal before playing it back.">the journal before playing it back.</param>
                             ///<param name=""></param>
 
-                            if (this.jfd.isOpen)
+                            if (this.JournalFileDescriptor.isOpen)
                             {
                                 Debug.Assert(rc == SqlResult.SQLITE_OK);
                                 rc = this.pagerSyncHotJournal();
@@ -4893,7 +4612,7 @@ pPager.pWal = 0;
                             else
                                 if (!this.exclusiveMode)
                                 {
-                                    this.pagerUnlockDb(LockType.SHARED_LOCK);
+                                    this.UnlockDbFile(LockType.SHARED_LOCK);
                                 }
                             if (rc != SqlResult.SQLITE_OK)
                             {
@@ -4953,7 +4672,7 @@ pPager.pWal = 0;
                             if (nPage > 0)
                             {
                                 sqliteinth.IOTRACE("CKVERS %p %d\n", this, dbFileVers.Length);
-                                rc = os.sqlite3OsRead(this.fd, dbFileVers, dbFileVers.Length, 24);
+                                rc = os.sqlite3OsRead(this.fileDescriptor, dbFileVers, dbFileVers.Length, 24);
                                 if (rc != SqlResult.SQLITE_OK)
                                 {
                                     goto failed;
@@ -5085,26 +4804,21 @@ pPager.pWal = 0;
                     return this.sqlite3PagerAcquire(pgno, ref ppPage, 0);
                 }
 
-                public SqlResult sqlite3PagerAcquire(///
-                    ///<summary>
-                    ///The pager open on the database file 
-                    ///</summary>
-
-                u32 pgno, ///
+                public SqlResult sqlite3PagerAcquire(
                     ///<summary>
                     ///Page number to fetch 
                     ///</summary>
+                    u32 pgno, 
 
-                ref DbPage ppPage, ///
                     ///<summary>
                     ///Write a pointer to the page here 
                     ///</summary>
+                    ref DbPage ppPage, 
 
-                u8 noContent///
                     ///<summary>
                     ///Do not bother reading content from disk if true 
                     ///</summary>
-
+                    u8 noContent
                 )
                 {
                     SqlResult rc;
@@ -5127,7 +4841,7 @@ pPager.pWal = 0;
                     }
                     else
                     {
-                        rc = PCacheMethods.sqlite3PcacheFetch(this.pPCache, pgno, 1, ref ppPage);
+                        rc = this.pPCache.sqlite3PcacheFetch( pgno, 1, ref ppPage);
                     }
                     if (rc != SqlResult.SQLITE_OK)
                     {
@@ -5145,11 +4859,8 @@ pPager.pWal = 0;
                     Debug.Assert((ppPage).pPager == this || (ppPage).pPager == null);
                     if ((ppPage).pPager != null && 0 == noContent)
                     {
-                        ///
-                        ///<summary>
                         ///In this case the pcache already contains an initialized copy of
                         ///the page. Return without further ado.  
-                        ///</summary>
 
                         Debug.Assert(pgno <= Limits.Pager.PAGER_MAX_PGNO && pgno != (this.PAGER_MJ_PGNO));
                         PagerMethods.PAGER_INCR(ref this.nHit);
@@ -5157,11 +4868,8 @@ pPager.pWal = 0;
                     }
                     else
                     {
-                        ///
-                        ///<summary>
                         ///The pager cache has created a new page. Its content needs to 
                         ///be initialized.  
-                        ///</summary>
 
 #if SQLITE_TEST
 																																																																																									        PAGER_INCR( ref pPager.nMiss );
@@ -5171,10 +4879,8 @@ pPager.pWal = 0;
                         pPg.pExtra = new MemPage();
                         //memset(pPg.pExtra, 0, pPager.nExtra);
                         ///
-                        ///<summary>
                         ///The maximum page number is 2^31. Return SQLITE_CORRUPT if a page
-                        ///</summary>
-                        ///<param name="number greater than this, or the unused locking">page, is requested. </param>
+                        ///number greater than this, or the unused locking-page, is requested. 
 
                         if (pgno > Limits.Pager.PAGER_MAX_PGNO || pgno == (this.PAGER_MJ_PGNO))
                         {
@@ -5187,7 +4893,7 @@ pPager.pWal = 0;
 #else
 this.memDb != 0
 #endif
- || this.dbSize < pgno || noContent != 0 || !this.fd.isOpen  )
+ || this.dbSize < pgno || noContent != 0 || !this.fileDescriptor.isOpen  )
                         {
                             if (pgno > this.mxPgno)
                             {
@@ -5196,23 +4902,19 @@ this.memDb != 0
                             }
                             if (noContent != 0)
                             {
-                                ///
-                                ///<summary>
-                                ///</summary>
-                                ///<param name="Failure to set the bits in the InJournal bit">vectors is benign.</param>
-                                ///<param name="It merely means that we might do some extra work to journal a">It merely means that we might do some extra work to journal a</param>
-                                ///<param name="page that does not need to be journaled.  Nevertheless, be sure">page that does not need to be journaled.  Nevertheless, be sure</param>
-                                ///<param name="to test the case where a malloc error occurs while trying to set">to test the case where a malloc error occurs while trying to set</param>
-                                ///<param name="a bit in a bit vector.">a bit in a bit vector.</param>
-                                ///<param name=""></param>
+                                ///Failure to set the bits in the InJournal bit-vectors is benign.
+                                ///It merely means that we might do some extra work to journal a-It merely means that we might do some extra work to journal a
+                                ///page that does not need to be journaled.  Nevertheless, be sure-page that does not need to be journaled.  Nevertheless, be sure
+                                ///to test the case where a malloc error occurs while trying to set-to test the case where a malloc error occurs while trying to set
+                                ///a bit in a bit vector.-a bit in a bit vector.
 
                                 Sqlite3.sqlite3BeginBenignMalloc();
                                 if (pgno <= this.dbOrigSize)
                                 {
 #if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																																																																																		              rc = sqlite3BitvecSet( pPager.pInJournal, pgno );          //TESTONLY( rc = ) sqlite3BitvecSet(pPager.pInJournal, pgno);
+rc = sqlite3BitvecSet( pPager.pInJournal, pgno );          //TESTONLY( rc = ) sqlite3BitvecSet(pPager.pInJournal, pgno);
 #else
-                                this.pInJournal.sqlite3BitvecSet( pgno);
+                                    this.pInJournal.setBit( pgno);
 #endif
                                     sqliteinth.testcase(rc == SqlResult.SQLITE_NOMEM);
                                 }
@@ -5323,7 +5025,7 @@ this.memDb != 0
 
                     if (NEVER((int)this.errCode) != 0)
                         return this.errCode;
-                    if (!this.pagerUseWal() && this.journalMode != Globals.Paging.PAGER_JOURNALMODE_OFF)
+                    if (!this.pagerUseWal() && this.journalMode != (int)JournalMode.PAGER_JOURNALMODE_OFF)
                     {
                         this.pInJournal = Bitvec.sqlite3BitvecCreate(this.dbSize);
                         //if (pPager.pInJournal == null)
@@ -5335,11 +5037,11 @@ this.memDb != 0
                         ///Open the journal file if it is not already open. 
                         ///</summary>
 
-                        if (!this.jfd.isOpen)
+                        if (!this.JournalFileDescriptor.isOpen)
                         {
-                            if (this.journalMode == Globals.Paging.PAGER_JOURNALMODE_MEMORY)
+                            if (this.journalMode == (int)JournalMode.PAGER_JOURNALMODE_MEMORY)
                             {
-                                memjrnl.sqlite3MemJournalOpen(this.jfd);
+                                memjrnl.sqlite3MemJournalOpen(this.JournalFileDescriptor);
                             }
                             else
                             {
@@ -5355,10 +5057,10 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
 );
 #else
                                 int int0 = 0;
-                                rc = os.sqlite3OsOpen(pVfs, this.zJournal, this.jfd, flags, ref int0);
+                                rc = os.sqlite3OsOpen(pVfs, this.zJournal, this.JournalFileDescriptor, flags, ref int0);
 #endif
                             }
-                            Debug.Assert(rc != SqlResult.SQLITE_OK || this.jfd.isOpen);
+                            Debug.Assert(rc != SqlResult.SQLITE_OK || this.JournalFileDescriptor.isOpen);
                         }
                         ///
                         ///<summary>
@@ -5433,7 +5135,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
 
                             if (this.exclusiveMode && wal.sqlite3WalExclusiveMode(this.pWal, -1))
                             {
-                                rc = this.pagerLockDb(LockType.EXCLUSIVE_LOCK);
+                                rc = this.LockDbFile(LockType.EXCLUSIVE_LOCK);
                                 if (rc != SqlResult.SQLITE_OK)
                                 {
                                     return rc;
@@ -5462,7 +5164,7 @@ pVfs, pPager.zJournal, pPager.jfd, flags, jrnlBufferSize(pPager)
                             ///<param name="lock, but not when obtaining the RESERVED lock.">lock, but not when obtaining the RESERVED lock.</param>
                             ///<param name=""></param>
 
-                            rc = this.pagerLockDb(LockType.RESERVED_LOCK);
+                            rc = this.LockDbFile(LockType.RESERVED_LOCK);
                             if (rc == SqlResult.SQLITE_OK && exFlag)
                             {
                                 rc = this.pager_wait_on_lock(LockType.EXCLUSIVE_LOCK);
@@ -5548,7 +5250,7 @@ int DIRECT_MODE = isDirectMode;
                         PgHdr pPgHdr = null;
                         ///Reference to page 1 
 
-                        Debug.Assert(!this.tempFile && this.fd.isOpen  );
+                        Debug.Assert(!this.tempFile && this.fileDescriptor.isOpen  );
                         ///Open page 1 of the file for writing. 
 
                         rc = this.sqlite3PagerGet(1, ref pPgHdr);
@@ -5585,7 +5287,7 @@ int DIRECT_MODE = isDirectMode;
                                 //PagerMethods.CODEC2(pPager, pPgHdr.pData, 1, 6, rc=SQLITE_NOMEM, zBuf);
                                 if (rc == SqlResult.SQLITE_OK)
                                 {
-                                    rc = os.sqlite3OsWrite(this.fd, zBuf, this.pageSize, 0);
+                                    rc = os.sqlite3OsWrite(this.fileDescriptor, zBuf, this.pageSize, 0);
                                 }
                                 if (rc == SqlResult.SQLITE_OK)
                                 {
@@ -5627,10 +5329,10 @@ int DIRECT_MODE = isDirectMode;
 0 == this.memDb
 #endif
 );
-                        rc = os.sqlite3OsSync(this.fd, this.syncFlags);
+                        rc = os.sqlite3OsSync(this.fileDescriptor, this.syncFlags);
                     }
                     else
-                        if (this.fd.isOpen  )
+                        if (this.fileDescriptor.isOpen  )
                         {
                             Debug.Assert(
 #if SQLITE_OMIT_MEMORYDB
@@ -5640,7 +5342,7 @@ int DIRECT_MODE = isDirectMode;
 #endif
 );
                             long sz=0;
-                            os.sqlite3OsFileControl(this.fd, Sqlite3.SQLITE_FCNTL_SYNC_OMITTED, ref sz);
+                            os.sqlite3OsFileControl(this.fileDescriptor, Sqlite3.SQLITE_FCNTL_SYNC_OMITTED, ref sz);
                         }
                     return rc;
                 }
@@ -5852,7 +5554,7 @@ rc = pager_incr_changecounter(pPager, 0);
                             ///<param name=""></param>
 
 #if !SQLITE_OMIT_AUTOVACUUM
-                            if (this.dbSize < this.dbOrigSize && this.journalMode != Globals.Paging.PAGER_JOURNALMODE_OFF)
+                            if (this.dbSize < this.dbOrigSize && this.journalMode != (int)JournalMode.PAGER_JOURNALMODE_OFF)
                             {
                                 Pgno i;
                                 ///
@@ -6016,7 +5718,7 @@ rc = pager_incr_changecounter(pPager, 0);
                     ///<param name="to drop any locks either.">to drop any locks either.</param>
                     ///<param name=""></param>
 
-                    if (this.eState == PagerState.PAGER_WRITER_LOCKED && this.exclusiveMode && this.journalMode == Globals.Paging.PAGER_JOURNALMODE_PERSIST)
+                    if (this.eState == PagerState.PAGER_WRITER_LOCKED && this.exclusiveMode && this.journalMode == (int)JournalMode.PAGER_JOURNALMODE_PERSIST)
                     {
                         Debug.Assert(this.journalOff == this.JOURNAL_HDR_SZ() || 0 == this.journalOff);
                         this.eState = PagerState.PAGER_READER;
@@ -6091,7 +5793,7 @@ rc = pager_incr_changecounter(pPager, 0);
                         rc = this.pager_error(rc);
                     }
                     else
-                        if (!this.jfd.isOpen || this.eState == PagerState.PAGER_WRITER_LOCKED)
+                        if (!this.JournalFileDescriptor.isOpen || this.eState == PagerState.PAGER_WRITER_LOCKED)
                         {
                             var eState = this.eState;
                             rc = this.pager_end_transaction(0);
@@ -6195,40 +5897,23 @@ rc = pager_incr_changecounter(pPager, 0);
                 SqlResult sqlite3PagerOpenSavepoint(int nSavepoint)
                 {
                     SqlResult rc = SqlResult.SQLITE_OK;
-                    ///
-                    ///<summary>
-                    ///Return code 
-                    ///</summary>
 
                     int nCurrent = this.nSavepoint;
-                    ///
-                    ///<summary>
                     ///Current number of savepoints 
-                    ///</summary>
 
                     Debug.Assert(this.eState >= PagerState.PAGER_WRITER_LOCKED);
                     Debug.Assert(this.assert_pager_state());
-                    if (nSavepoint > nCurrent && this.useJournal != 0)
+                    if (nSavepoint > nCurrent && this.useJournal != false)
                     {
                         int ii;
-                        ///
-                        ///<summary>
                         ///Iterator variable 
-                        ///</summary>
 
                         PagerSavepoint[] aNew;
-                        ///
-                        ///<summary>
                         ///New Pager.aSavepoint array 
-                        ///</summary>
 
-                        ///
-                        ///<summary>
                         ///Grow the Pager.aSavepoint array using realloc(). Return SQLITE_NOMEM
                         ///if the allocation fails. Otherwise, zero the new portion in case a 
                         ///malloc failure occurs while populating it in the for(...) loop below.
-                        ///
-                        ///</summary>
 
                         //aNew = (PagerSavepoint *)sqlite3Realloc(
                         //    pPager.aSavepoint, sizeof(PagerSavepoint)*nSavepoint
@@ -6249,7 +5934,7 @@ rc = pager_incr_changecounter(pPager, 0);
                         {
                             aNew[ii] = new PagerSavepoint();
                             aNew[ii].nOrig = this.dbSize;
-                            if (this.jfd.isOpen && this.journalOff > 0)
+                            if (this.JournalFileDescriptor.isOpen && this.journalOff > 0)
                             {
                                 aNew[ii].iOffset = this.journalOff;
                             }
@@ -6309,75 +5994,48 @@ rc = pager_incr_changecounter(pPager, 0);
                 SqlResult sqlite3PagerSavepoint(int op, int iSavepoint)
                 {
                     SqlResult rc = this.errCode;
-                    ///
-                    ///<summary>
-                    ///Return code 
-                    ///</summary>
 
                     Debug.Assert(op == sqliteinth.SAVEPOINT_RELEASE || op == sqliteinth.SAVEPOINT_ROLLBACK);
                     Debug.Assert(iSavepoint >= 0 || op == sqliteinth.SAVEPOINT_ROLLBACK);
                     if (rc == SqlResult.SQLITE_OK && iSavepoint < this.nSavepoint)
                     {
                         int ii;
-                        ///
-                        ///<summary>
                         ///Iterator variable 
-                        ///</summary>
 
                         int nNew;
-                        ///
-                        ///<summary>
                         ///Number of remaining savepoints after this op. 
-                        ///</summary>
 
-                        ///
-                        ///<summary>
                         ///Figure out how many savepoints will still be active after this
                         ///operation. Store this value in nNew. Then free resources associated
                         ///with any savepoints that are destroyed by this operation.
-                        ///
-                        ///</summary>
 
                         nNew = iSavepoint + ((op == sqliteinth.SAVEPOINT_RELEASE) ? 0 : 1);
-                        for (ii = nNew; ii < this.nSavepoint; ii++)
-                        {
-                            BitvecExtensions.sqlite3BitvecDestroy(ref this.aSavepoint[ii].pInSavepoint);
-                        }
+                        SavePoints.ForEach(sp=> BitvecExtensions.sqlite3BitvecDestroy(ref sp.pInSavepoint));
+                        
                         this.nSavepoint = nNew;
-                        ///
-                        ///<summary>
                         ///If this is a release of the outermost savepoint, truncate 
-                        ///</summary>
-                        ///<param name="the sub">journal to zero bytes in size. </param>
+                        //the sub-journal to zero bytes in size. 
 
                         if (op == sqliteinth.SAVEPOINT_RELEASE)
                         {
-                            if (nNew == 0 && this.sjfd.isOpen)
+                            if (nNew == 0 && this.SubJournalFileDescriptor.isOpen)
                             {
-                                ///
-                                ///<summary>
-                                ///</summary>
-                                ///<param name="Only truncate if it is an in">journal. </param>
+                                ///Only truncate if it is an in-memory journal.
 
-                                if (memjrnl.sqlite3IsMemJournal(this.sjfd))
+                                if (memjrnl.sqlite3IsMemJournal(this.SubJournalFileDescriptor))
                                 {
-                                    rc = os.sqlite3OsTruncate(this.sjfd, 0);
+                                    rc = os.sqlite3OsTruncate(this.SubJournalFileDescriptor, 0);
                                     Debug.Assert(rc == SqlResult.SQLITE_OK);
                                 }
                                 this.nSubRec = 0;
                             }
                         }
-                        ///
-                        ///<summary>
                         ///Else this is a rollback operation, playback the specified savepoint.
-                        ///</summary>
-                        ///<param name="If this is a temp">file, it is possible that the journal file has</param>
-                        ///<param name="not yet been opened. In this case there have been no changes to">not yet been opened. In this case there have been no changes to</param>
-                        ///<param name="the database file, so the playback operation can be skipped.">the database file, so the playback operation can be skipped.</param>
-                        ///<param name=""></param>
-
+                        ///If this is a temp">file, it is possible that the journal file has</param>
+                        ///not yet been opened. In this case there have been no changes to</param>
+                        ///the database file, so the playback operation can be skipped.</param>
                         else
-                            if (this.pagerUseWal() || this.jfd.isOpen)
+                            if (this.pagerUseWal() || this.JournalFileDescriptor.isOpen)
                             {
                                 PagerSavepoint pSavepoint = (nNew == 0) ? null : this.aSavepoint[nNew - 1];
                                 rc = this.pagerPlaybackSavepoint(pSavepoint);
@@ -6413,7 +6071,7 @@ rc = pager_incr_changecounter(pPager, 0);
                     ///</summary>
                 sqlite3_file sqlite3PagerFile()
                 {
-                    return this.fd;
+                    return this.fileDescriptor;
                 }
 
                 public///<summary>
@@ -6717,8 +6375,9 @@ this.memDb != 0
                     /// The returned indicate the current (possibly updated) journal-mode.
                     ///
                     ///</summary>
-                int sqlite3PagerSetJournalMode(int eMode)
+                JournalMode sqlite3PagerSetJournalMode(JournalMode Mode)
                 {
+            int eMode = (int)Mode;
                     u8 eOld = this.journalMode;
                     ///
                     ///<summary>
@@ -6735,7 +6394,7 @@ this.memDb != 0
                     ///The eMode parameter is always valid 
                     ///</summary>
 
-                    Debug.Assert(eMode == Globals.Paging.PAGER_JOURNALMODE_DELETE || eMode == Globals.Paging.PAGER_JOURNALMODE_TRUNCATE || eMode == Globals.Paging.PAGER_JOURNALMODE_PERSIST || eMode == Globals.Paging.PAGER_JOURNALMODE_OFF || eMode == Globals.Paging.PAGER_JOURNALMODE_WAL || eMode == Globals.Paging.PAGER_JOURNALMODE_MEMORY);
+                    Debug.Assert(eMode == (int)JournalMode.PAGER_JOURNALMODE_DELETE || eMode == (int)JournalMode.PAGER_JOURNALMODE_TRUNCATE || eMode == (int)JournalMode.PAGER_JOURNALMODE_PERSIST || eMode == (int)JournalMode.PAGER_JOURNALMODE_OFF || eMode == (int)JournalMode.PAGER_JOURNALMODE_WAL || eMode == (int)JournalMode.PAGER_JOURNALMODE_MEMORY);
                     ///
                     ///<summary>
                     ///This routine is only called from the OP_JournalMode opcode, and
@@ -6744,7 +6403,7 @@ this.memDb != 0
                     ///
                     ///</summary>
 
-                    Debug.Assert(this.tempFile == false || eMode != Globals.Paging.PAGER_JOURNALMODE_WAL);
+                    Debug.Assert(this.tempFile == false || eMode != (int)JournalMode.PAGER_JOURNALMODE_WAL);
                     ///
                     ///<summary>
                     ///</summary>
@@ -6759,8 +6418,8 @@ this.memDb != 0
 #endif
 )
                     {
-                        Debug.Assert(eOld == Globals.Paging.PAGER_JOURNALMODE_MEMORY || eOld == Globals.Paging.PAGER_JOURNALMODE_OFF);
-                        if (eMode != Globals.Paging.PAGER_JOURNALMODE_MEMORY && eMode != Globals.Paging.PAGER_JOURNALMODE_OFF)
+                        Debug.Assert(eOld ==(int)JournalMode.PAGER_JOURNALMODE_MEMORY || eOld == (int)JournalMode.PAGER_JOURNALMODE_OFF);
+                        if (eMode != (int)JournalMode.PAGER_JOURNALMODE_MEMORY && eMode != (int)JournalMode.PAGER_JOURNALMODE_OFF)
                         {
                             eMode = eOld;
                         }
@@ -6782,13 +6441,13 @@ this.memDb != 0
                         ///
                         ///</summary>
 
-                        Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_TRUNCATE & 5) == 1);
-                        Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_PERSIST & 5) == 1);
-                        Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_DELETE & 5) == 0);
-                        Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_MEMORY & 5) == 4);
-                        Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_OFF & 5) == 0);
-                        Debug.Assert((Globals.Paging.PAGER_JOURNALMODE_WAL & 5) == 5);
-                        Debug.Assert(this.fd.isOpen   || this.exclusiveMode);
+                        Debug.Assert(((int)Paging.JournalMode.PAGER_JOURNALMODE_TRUNCATE & 5) == 1);
+                        Debug.Assert(((int)Paging.JournalMode.PAGER_JOURNALMODE_PERSIST & 5) == 1);
+                        Debug.Assert(((int)Paging.JournalMode.PAGER_JOURNALMODE_DELETE & 5) == 0);
+                        Debug.Assert(((int)Paging.JournalMode.PAGER_JOURNALMODE_MEMORY & 5) == 4);
+                        Debug.Assert(((int)Paging.JournalMode.PAGER_JOURNALMODE_OFF & 5) == 0);
+                        Debug.Assert(((int)Paging.JournalMode.PAGER_JOURNALMODE_WAL & 5) == 5);
+                        Debug.Assert(this.fileDescriptor.isOpen   || this.exclusiveMode);
                         if (!this.exclusiveMode && (eOld & 5) == 1 && (eMode & 1) == 0)
                         {
                             ///
@@ -6803,7 +6462,7 @@ this.memDb != 0
                             ///
                             ///</summary>
 
-                            os.sqlite3OsClose(this.jfd);
+                            os.sqlite3OsClose(this.JournalFileDescriptor);
                             if (this.eLock >= LockType.RESERVED_LOCK)
                             {
                                 os.sqlite3OsDelete(this.pVfs, this.zJournal, 0);
@@ -6820,7 +6479,7 @@ this.memDb != 0
                                 if (this.eState == PagerState.PAGER_READER)
                                 {
                                     Debug.Assert(rc == SqlResult.SQLITE_OK);
-                                    rc = this.pagerLockDb(LockType.RESERVED_LOCK);
+                                    rc = this.LockDbFile(LockType.RESERVED_LOCK);
                                 }
                                 if (rc == SqlResult.SQLITE_OK)
                                 {
@@ -6828,7 +6487,7 @@ this.memDb != 0
                                 }
                                 if (rc == SqlResult.SQLITE_OK && state == PagerState.PAGER_READER)
                                 {
-                                    this.pagerUnlockDb(LockType.SHARED_LOCK);
+                                    this.UnlockDbFile(LockType.SHARED_LOCK);
                                 }
                                 else
                                     if (state == PagerState.PAGER_OPEN)
@@ -6844,16 +6503,16 @@ this.memDb != 0
                     ///Return the new journal mode 
                     ///</summary>
 
-                    return (int)this.journalMode;
+                    return (JournalMode)this.journalMode;
                 }
 
-                public///<summary>
+        public///<summary>
                     /// Return the current journal mode.
                     ///
                     ///</summary>
-                int sqlite3PagerGetJournalMode()
+                Paging.JournalMode sqlite3PagerGetJournalMode()
                 {
-                    return (int)this.journalMode;
+                    return (Paging.JournalMode)this.journalMode;
                 }
 
                 public///<summary>
@@ -6867,7 +6526,7 @@ this.memDb != 0
                     Debug.Assert(this.assert_pager_state());
                     if (this.eState >= PagerState.PAGER_WRITER_CACHEMOD)
                         return 0;
-                    if (NEVER(this.jfd.isOpen && this.journalOff > 0))
+                    if (NEVER(this.JournalFileDescriptor.isOpen && this.journalOff > 0))
                         return 0;
                     return 1;
                 }
@@ -6913,7 +6572,7 @@ this.memDb != 0
 
                 public sqlite3_file sqlite3Pager_get_fd()
                 {
-                    return (this.fd.isOpen  ) ? this.fd : null;
+                    return (this.fileDescriptor.isOpen  ) ? this.fileDescriptor : null;
                 }
 
                 public void sqlite3pager_sqlite3PagerSetCodec(dxCodec xCodec, dxCodecSizeChng xCodecSizeChng, dxCodecFree xCodecFree, codec_ctx pCodec)

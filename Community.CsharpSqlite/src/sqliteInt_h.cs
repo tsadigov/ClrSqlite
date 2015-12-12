@@ -2051,6 +2051,7 @@ static void sqliteinth.IOTRACE( string X, params object[] ap ) { if ( SQLite3IoT
         //#define sqliteinth.IOTRACE(A)
         public static void IOTRACE(string F, params object[] ap)
         {
+            Trace.WriteLine(String.Format(F,ap));
         }
         //#define sqlite3VdbeIOTraceSql(X)
         public static void sqlite3VdbeIOTraceSql(Vdbe X)

@@ -94,7 +94,7 @@ namespace Community.CsharpSqlite.Metadata
             {
                 Column cp = (Column)MemberwiseClone();
                 if (cp.pDflt != null)
-                    cp.pDflt = pDflt.Copy();
+                    cp.pDflt = pDflt.Clone();
                 return cp;
             }
 

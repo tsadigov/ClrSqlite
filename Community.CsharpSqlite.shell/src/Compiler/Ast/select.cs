@@ -192,11 +192,11 @@ namespace Community.CsharpSqlite.Ast
                     if (pSrc != null)
                         cp.pSrc = pSrc.Copy();
                     if (pWhere != null)
-                        cp.pWhere = pWhere.Copy();
+                        cp.pWhere = pWhere.Clone();
                     if (pGroupBy != null)
                         cp.pGroupBy = pGroupBy.Copy();
                     if (pHaving != null)
-                        cp.pHaving = pHaving.Copy();
+                        cp.pHaving = pHaving.Clone();
                     if (pOrderBy != null)
                         cp.pOrderBy = pOrderBy.Copy();
                     if (pPrior != null)
@@ -206,9 +206,9 @@ namespace Community.CsharpSqlite.Ast
                     if (pRightmost != null)
                         cp.pRightmost = pRightmost.Copy();
                     if (pLimit != null)
-                        cp.pLimit = pLimit.Copy();
+                        cp.pLimit = pLimit.Clone();
                     if (pOffset != null)
-                        cp.pOffset = pOffset.Copy();
+                        cp.pOffset = pOffset.Clone();
                     return cp;
                 }
             }
@@ -309,7 +309,7 @@ namespace Community.CsharpSqlite.Ast
                     {
 #if !SQLITE_OMIT_SUBQUERY
                         Select pSel = pFrom.pSelect;
-                        ///<param name="A sub">query in the FROM clause of a SELECT </param>
+                        ///A sub-query in the FROM clause of a SELECT 
                         Debug.Assert(pSel != null);
                         Debug.Assert(pFrom.pTab == null);
                         pWalker.sqlite3WalkSelect(pSel);
@@ -354,21 +354,14 @@ namespace Community.CsharpSqlite.Ast
                         }
 #endif
                     }
-                    ///
-                    ///<summary>
                     ///Locate the index named by the INDEXED BY clause, if any. 
-                    ///</summary>
                     if (SelectMethods.sqlite3IndexedByLookup(pParse, pFrom) != 0)
                     {
                         return WRC.WRC_Abort;
                     }
                 }
-                ///
-                ///<summary>
                 ///Process NATURAL keywords, and ON and USING clauses of joins.
-                ///
-                ///</summary>
-                if (///
+                if (
                     ///<summary>
                     ///db.mallocFailed != 0 || 
                     ///</summary>
@@ -376,8 +369,6 @@ namespace Community.CsharpSqlite.Ast
                 {
                     return WRC.WRC_Abort;
                 }
-                ///
-                ///<summary>
                 ///For every "*" that occurs in the column list, insert the names of
                 ///all columns in all tables.  And for every TABLE.* insert the names
                 ///of all columns in TABLE.  The parser inserted a special expression
@@ -387,16 +378,14 @@ namespace Community.CsharpSqlite.Ast
                 ///
                 ///The first loop just checks to see if there are any "*" operators
                 ///that need expanding.
-                ///
-                ///</summary>
                 for (k = 0; k < pEList.nExpr; k++)
                 {
                     Expr pE = pEList.a[k].pExpr;
-                    if (pE.op == Sqlite3.TK_ALL)
+                    if (pE.Operator == TokenType.TK_ALL)
                         break;
-                    Debug.Assert(pE.op != Sqlite3.TK_DOT || pE.pRight != null);
-                    Debug.Assert(pE.op != Sqlite3.TK_DOT || (pE.pLeft != null && pE.pLeft.op == Sqlite3.TK_ID));
-                    if (pE.op == Sqlite3.TK_DOT && pE.pRight.op == Sqlite3.TK_ALL)
+                    Debug.Assert(pE.Operator != TokenType.TK_DOT || pE.pRight != null);
+                    Debug.Assert(pE.Operator != TokenType.TK_DOT || (pE.pLeft != null && pE.pLeft.Operator == TokenType.TK_ID));
+                    if (pE.Operator == TokenType.TK_DOT && pE.pRight.Operator == TokenType.TK_ALL)
                         break;
                 }
                 if (k < pEList.nExpr)
@@ -1789,7 +1778,7 @@ namespace Community.CsharpSqlite.Ast
             multi_select_end:
                 pDest.iMem = dest.iMem;
                 pDest.nMem = dest.nMem;
-                SelectMethods.sqlite3SelectDelete(db, ref pDelete);
+                SelectMethods.SelectDestructor(db, ref pDelete);
                 return rc;
             }
 #endif
@@ -1967,7 +1956,7 @@ namespace Community.CsharpSqlite.Ast
             ///</summary>
             public string zDatabase;
 
-            ///
+            
             ///<summary>
             ///Name of the table 
             ///</summary>

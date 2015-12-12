@@ -138,7 +138,7 @@ namespace Community.CsharpSqlite
                     }
                 if ((pExpr.Flags & ExprFlags.EP_ExpCollate) != 0)
                 {
-                    pDup.pColl = pExpr.pColl;
+                    pDup.CollatingSequence = pExpr.CollatingSequence;
                     pDup.Flags |= ExprFlags.EP_ExpCollate;
                 }
                 ///Before calling exprc.sqlite3ExprDelete(), set the ExprFlags.EP_Static flag. This 
@@ -1028,13 +1028,13 @@ return WRC.WRC_Prune;
                         }
                         if (iCol > 0)
                         {
-                            CollSeq pColl = pE.pColl;
+                            CollSeq pColl = pE.CollatingSequence;
                             ExprFlags flags = pE.Flags & ExprFlags.EP_ExpCollate;
                             exprc.sqlite3ExprDelete(db, ref pE);
                             pItem.pExpr = pE = exprc.sqlite3Expr(db, Sqlite3.TK_INTEGER, null);
                             if (pE == null)
                                 return 1;
-                            pE.pColl = pColl;
+                            pE.CollatingSequence = pColl;
                             pE.Flags = (pE.Flags | ExprFlags.EP_IntValue | flags);
                             pE.u.iValue = iCol;
                             pItem.iCol = (u16)iCol;

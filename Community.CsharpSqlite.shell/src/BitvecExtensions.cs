@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite.Utils
         /// and that the value for "i" is within range of the Bitvec object.
         /// Otherwise the behavior is undefined.
         ///</summary>
-        public static SqlResult sqlite3BitvecSet(this Bitvec p, u32 i)
+        public static SqlResult setBit(this Bitvec p, u32 i)
         {
             u32 h;
             if (p == null)
@@ -145,11 +145,11 @@ namespace Community.CsharpSqlite.Utils
                     p.u.apSub = new Bitvec[BITVEC_NPTR];
                     //memset(p->u.apSub, 0, sizeof(p->u.apSub));
                     p.iDivisor = (u32)((p.iSize + BITVEC_NPTR - 1) / BITVEC_NPTR);
-                    rc = sqlite3BitvecSet(p, i);
+                    rc = setBit(p, i);
                     for (j = 0; j < BITVEC_NINT; j++)
                     {
                         if (aiValues[j] != 0)
-                            rc |= sqlite3BitvecSet(p, aiValues[j]);
+                            rc |= setBit(p, aiValues[j]);
                     }
                     //sqlite3StackFree( null, aiValues );
                     return rc;
@@ -384,7 +384,7 @@ namespace Community.CsharpSqlite.Utils
             ///NULL pBitvec tests 
             ///</summary>
 
-            sqlite3BitvecSet(null, (u32)1);
+            setBit(null, (u32)1);
             sqlite3BitvecClear(null, 1, pTmpSpace);
             ///
             ///<summary>
@@ -425,7 +425,7 @@ namespace Community.CsharpSqlite.Utils
                     SETBIT(pV, (i + 1));
                     if (op != 5)
                     {
-                        if (sqlite3BitvecSet(pBitvec, (u32)i + 1) != 0)
+                        if (setBit(pBitvec, (u32)i + 1) != 0)
                             goto bitvec_end;
                     }
                 }
