@@ -21,252 +21,7 @@ namespace Community.CsharpSqlite.Paging
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Utils;
 
-    #region enum
-
-    ///
-    ///<summary>
-    ///The Pager.eState variable stores the current 'state' of a pager. A
-    ///pager may be in any one of the seven states shown in the following
-    ///state diagram.
-    ///
-    ///</summary>
-    ///<param name="OPEN <">+</param>
-    ///<param name="|         |      |">|         |      |</param>
-    ///<param name="V         |      |">V         |      |</param>
-    ///<param name="+">+      |</param>
-    ///<param name="|              |                |">|              |                |</param>
-    ///<param name="|              V                |">|              V                |</param>
-    ///<param name="|<">> ERROR</param>
-    ///<param name="|              |                ^  ">|              |                ^  </param>
-    ///<param name="|              V                |">|              V                |</param>
-    ///<param name="|<">>|</param>
-    ///<param name="|              |                |">|              |                |</param>
-    ///<param name="|              V                |">|              V                |</param>
-    ///<param name="|<">>|</param>
-    ///<param name="|              |                |">|              |                |</param>
-    ///<param name="|              V                |">|              V                |</param>
-    ///<param name="+<">>+</param>
-    ///<param name=""></param>
-    ///<param name=""></param>
-    ///<param name="List of state transitions and the C [function] that performs each:">List of state transitions and the C [function] that performs each:</param>
-    ///<param name=""></param>
-    ///<param name="OPEN              ">> READER              [sqlite3PagerSharedLock]</param>
-    ///<param name="READER            ">> OPEN                [pager_unlock]</param>
-    ///<param name=""></param>
-    ///<param name="READER            ">> WRITER_LOCKED       [sqlite3PagerBegin]</param>
-    ///<param name="WRITER_LOCKED     ">> WRITER_CACHEMOD     [pager_open_journal]</param>
-    ///<param name="WRITER_CACHEMOD   ">> WRITER_DBMOD        [syncJournal]</param>
-    ///<param name="WRITER_DBMOD      ">> WRITER_FINISHED     [sqlite3PagerCommitPhaseOne]</param>
-    ///<param name="WRITER_***        ">> READER              [pager_end_transaction]</param>
-    ///<param name=""></param>
-    ///<param name="WRITER_***        ">> ERROR               [pager_error]</param>
-    ///<param name="ERROR             ">> OPEN                [pager_unlock]</param>
-    ///OPEN:
-    ///<param name=""></param>
-    ///The pager starts up in this state. Nothing is guaranteed in this
-    ///state the file may or may not be locked and the database size is
-    ///unknown. The database may not be read or written.
-
-    ///<param name="No read or write transaction is active.">No read or write transaction is active.</param>
-    ///<param name="Any lock, or no lock at all, may be held on the database file.">Any lock, or no lock at all, may be held on the database file.</param>
-    ///<param name="The dbSize, dbOrigSize and dbFileSize variables may not be trusted.">The dbSize, dbOrigSize and dbFileSize variables may not be trusted.</param>
-    ///<param name=""></param>
-    ///<param name="READER:">READER:</param>
-    ///<param name=""></param>
-    ///<param name="In this state all the requirements for reading the database in ">In this state all the requirements for reading the database in </param>
-    ///<param name="rollback (non">WAL) mode are met. Unless the pager is (or recently</param>
-    ///<param name="was) in exclusive">level read transaction is </param>
-    ///<param name="open. The database size is known in this state.">open. The database size is known in this state.</param>
-    ///<param name=""></param>
-    ///<param name="A connection running with locking_mode=normal enters this state when">A connection running with locking_mode=normal enters this state when</param>
-    ///<param name="it opens a read">transaction on the database and returns to state</param>
-    ///<param name="OPEN after the read">transaction is completed. However a connection</param>
-    ///<param name="running in locking_mode=exclusive (including temp databases) remains in">running in locking_mode=exclusive (including temp databases) remains in</param>
-    ///<param name="this state even after the read">transaction is closed. The only way</param>
-    ///<param name="a locking_mode=exclusive connection can transition from READER to OPEN">a locking_mode=exclusive connection can transition from READER to OPEN</param>
-    ///<param name="is via the ERROR state (see below).">is via the ERROR state (see below).</param>
-    ///<param name=""></param>
-    ///<param name="A read transaction may be active (but a write">transaction cannot).</param>
-    ///<param name="A SHARED or greater lock is held on the database file.">A SHARED or greater lock is held on the database file.</param>
-    ///<param name="The dbSize variable may be trusted (even if a user">level read </param>
-    ///<param name="transaction is not active). The dbOrigSize and dbFileSize variables">transaction is not active). The dbOrigSize and dbFileSize variables</param>
-    ///<param name="may not be trusted at this point.">may not be trusted at this point.</param>
-    ///<param name="If the database is a WAL database, then the WAL connection is open.">If the database is a WAL database, then the WAL connection is open.</param>
-    ///<param name="Even if a read">transaction is not open, it is guaranteed that </param>
-    ///<param name="there is no hot">system.</param>
-    ///<param name=""></param>
-    ///<param name="WRITER_LOCKED:">WRITER_LOCKED:</param>
-    ///<param name=""></param>
-    ///<param name="The pager moves to this state from READER when a write">transaction</param>
-    ///<param name="is first opened on the database. In WRITER_LOCKED state, all locks ">is first opened on the database. In WRITER_LOCKED state, all locks </param>
-    ///<param name="required to start a write">transaction are held, but no actual </param>
-    ///<param name="modifications to the cache or database have taken place.">modifications to the cache or database have taken place.</param>
-    ///<param name=""></param>
-    ///<param name="In rollback mode, a RESERVED or (if the transaction was opened with ">In rollback mode, a RESERVED or (if the transaction was opened with </param>
-    ///<param name="BEGIN EXCLUSIVE) EXCLUSIVE lock is obtained on the database file when">BEGIN EXCLUSIVE) EXCLUSIVE lock is obtained on the database file when</param>
-    ///<param name="moving to this state, but the journal file is not written to or opened ">moving to this state, but the journal file is not written to or opened </param>
-    ///<param name="to in this state. If the transaction is committed or rolled back while ">to in this state. If the transaction is committed or rolled back while </param>
-    ///<param name="in WRITER_LOCKED state, all that is required is to unlock the database ">in WRITER_LOCKED state, all that is required is to unlock the database </param>
-    ///<param name="file.">file.</param>
-    ///<param name=""></param>
-    ///<param name="IN WAL mode, WalBeginWriteTransaction() is called to lock the log file.">IN WAL mode, WalBeginWriteTransaction() is called to lock the log file.</param>
-    ///<param name="If the connection is running with locking_mode=exclusive, an attempt">If the connection is running with locking_mode=exclusive, an attempt</param>
-    ///<param name="is made to obtain an EXCLUSIVE lock on the database file.">is made to obtain an EXCLUSIVE lock on the database file.</param>
-    ///<param name=""></param>
-    ///<param name="A write transaction is active.">A write transaction is active.</param>
-    ///<param name="If the connection is open in rollback">mode, a RESERVED or greater </param>
-    ///<param name="lock is held on the database file.">lock is held on the database file.</param>
-    ///<param name="If the connection is open in WAL">mode, a WAL write transaction</param>
-    ///<param name="is open (i.e. sqlite3WalBeginWriteTransaction() has been successfully">is open (i.e. sqlite3WalBeginWriteTransaction() has been successfully</param>
-    ///<param name="called).">called).</param>
-    ///<param name="The dbSize, dbOrigSize and dbFileSize variables are all valid.">The dbSize, dbOrigSize and dbFileSize variables are all valid.</param>
-    ///<param name="The contents of the pager cache have not been modified.">The contents of the pager cache have not been modified.</param>
-    ///<param name="The journal file may or may not be open.">The journal file may or may not be open.</param>
-    ///<param name="Nothing (not even the first header) has been written to the journal.">Nothing (not even the first header) has been written to the journal.</param>
-    ///<param name=""></param>
-    ///<param name="WRITER_CACHEMOD:">WRITER_CACHEMOD:</param>
-    ///<param name=""></param>
-    ///<param name="A pager moves from WRITER_LOCKED state to this state when a page is">A pager moves from WRITER_LOCKED state to this state when a page is</param>
-    ///<param name="first modified by the upper layer. In rollback mode the journal file">first modified by the upper layer. In rollback mode the journal file</param>
-    ///<param name="is opened (if it is not already open) and a header written to the">is opened (if it is not already open) and a header written to the</param>
-    ///<param name="start of it. The database file on disk has not been modified.">start of it. The database file on disk has not been modified.</param>
-    ///<param name=""></param>
-    ///<param name="A write transaction is active.">A write transaction is active.</param>
-    ///<param name="A RESERVED or greater lock is held on the database file.">A RESERVED or greater lock is held on the database file.</param>
-    ///<param name="The journal file is open and the first header has been written ">The journal file is open and the first header has been written </param>
-    ///<param name="to it, but the header has not been synced to disk.">to it, but the header has not been synced to disk.</param>
-    ///<param name="The contents of the page cache have been modified.">The contents of the page cache have been modified.</param>
-    ///<param name=""></param>
-    ///<param name="WRITER_DBMOD:">WRITER_DBMOD:</param>
-    ///<param name=""></param>
-    ///<param name="The pager transitions from WRITER_CACHEMOD into WRITER_DBMOD state">The pager transitions from WRITER_CACHEMOD into WRITER_DBMOD state</param>
-    ///<param name="when it modifies the contents of the database file. WAL connections">when it modifies the contents of the database file. WAL connections</param>
-    ///<param name="never enter this state (since they do not modify the database file,">never enter this state (since they do not modify the database file,</param>
-    ///<param name="just the log file).">just the log file).</param>
-    ///<param name=""></param>
-    ///<param name="A write transaction is active.">A write transaction is active.</param>
-    ///<param name="An EXCLUSIVE or greater lock is held on the database file.">An EXCLUSIVE or greater lock is held on the database file.</param>
-    ///<param name="The journal file is open and the first header has been written ">The journal file is open and the first header has been written </param>
-    ///<param name="and synced to disk.">and synced to disk.</param>
-    ///<param name="The contents of the page cache have been modified (and possibly">The contents of the page cache have been modified (and possibly</param>
-    ///<param name="written to disk).">written to disk).</param>
-    ///<param name=""></param>
-    ///<param name="WRITER_FINISHED:">WRITER_FINISHED:</param>
-    ///<param name=""></param>
-    ///<param name="It is not possible for a WAL connection to enter this state.">It is not possible for a WAL connection to enter this state.</param>
-    ///<param name=""></param>
-    ///<param name="A rollback">mode pager changes to WRITER_FINISHED state from WRITER_DBMOD</param>
-    ///<param name="state after the entire transaction has been successfully written into the">state after the entire transaction has been successfully written into the</param>
-    ///<param name="database file. In this state the transaction may be committed simply">database file. In this state the transaction may be committed simply</param>
-    ///<param name="by finalizing the journal file. Once in WRITER_FINISHED state, it is ">by finalizing the journal file. Once in WRITER_FINISHED state, it is </param>
-    ///<param name="not possible to modify the database further. At this point, the upper ">not possible to modify the database further. At this point, the upper </param>
-    ///<param name="layer must either commit or rollback the transaction.">layer must either commit or rollback the transaction.</param>
-    ///<param name=""></param>
-    ///<param name="A write transaction is active.">A write transaction is active.</param>
-    ///<param name="An EXCLUSIVE or greater lock is held on the database file.">An EXCLUSIVE or greater lock is held on the database file.</param>
-    ///<param name="All writing and syncing of journal and database data has finished.">All writing and syncing of journal and database data has finished.</param>
-    ///<param name="If no error occured, all that remains is to finalize the journal to">If no error occured, all that remains is to finalize the journal to</param>
-    ///<param name="commit the transaction. If an error did occur, the caller will need">commit the transaction. If an error did occur, the caller will need</param>
-    ///<param name="to rollback the transaction. ">to rollback the transaction. </param>
-    ///<param name=""></param>
-    ///<param name="ERROR:">ERROR:</param>
-    ///<param name=""></param>
-    ///<param name="The ERROR state is entered when an IO or disk">full error (including</param>
-    ///<param name="SQLITE_IOERR_NOMEM) occurs at a point in the code that makes it ">SQLITE_IOERR_NOMEM) occurs at a point in the code that makes it </param>
-    ///<param name="difficult to be sure that the in">memory pager state (cache contents, </param>
-    ///<param name="db size etc.) are consistent with the contents of the file">system.</param>
-    ///<param name=""></param>
-    ///<param name="Temporary pager files may enter the ERROR state, but in">memory pagers</param>
-    ///<param name="cannot.">cannot.</param>
-    ///<param name=""></param>
-    ///<param name="For example, if an IO error occurs while performing a rollback, ">For example, if an IO error occurs while performing a rollback, </param>
-    ///<param name="the contents of the page">cache may be left in an inconsistent state.</param>
-    ///<param name="At this point it would be dangerous to change back to READER state">At this point it would be dangerous to change back to READER state</param>
-    ///<param name="(as usually happens after a rollback). Any subsequent readers might">(as usually happens after a rollback). Any subsequent readers might</param>
-    ///<param name="report database corruption (due to the inconsistent cache), and if">report database corruption (due to the inconsistent cache), and if</param>
-    ///<param name="they upgrade to writers, they may inadvertently corrupt the database">they upgrade to writers, they may inadvertently corrupt the database</param>
-    ///<param name="file. To avoid this hazard, the pager switches into the ERROR state">file. To avoid this hazard, the pager switches into the ERROR state</param>
-    ///<param name="instead of READER following such an error.">instead of READER following such an error.</param>
-    ///<param name=""></param>
-    ///<param name="Once it has entered the ERROR state, any attempt to use the pager">Once it has entered the ERROR state, any attempt to use the pager</param>
-    ///<param name="to read or write data returns an error. Eventually, once all ">to read or write data returns an error. Eventually, once all </param>
-    ///<param name="outstanding transactions have been abandoned, the pager is able to">outstanding transactions have been abandoned, the pager is able to</param>
-    ///<param name="transition back to OPEN state, discarding the contents of the ">transition back to OPEN state, discarding the contents of the </param>
-    ///<param name="page">memory state at the same time. Everything</param>
-    ///<param name="is reloaded from disk (and, if necessary, hot">journal rollback peformed)</param>
-    ///<param name="when a read">transaction is next opened on the pager (transitioning</param>
-    ///<param name="the pager into READER state). At that point the system has recovered ">the pager into READER state). At that point the system has recovered </param>
-    ///<param name="from the error.">from the error.</param>
-    ///<param name=""></param>
-    ///<param name="Specifically, the pager jumps into the ERROR state if:">Specifically, the pager jumps into the ERROR state if:</param>
-    ///<param name=""></param>
-    ///<param name="1. An error occurs while attempting a rollback. This happens in">1. An error occurs while attempting a rollback. This happens in</param>
-    ///<param name="function sqlite3PagerRollback().">function sqlite3PagerRollback().</param>
-    ///<param name=""></param>
-    ///<param name="2. An error occurs while attempting to finalize a journal file">2. An error occurs while attempting to finalize a journal file</param>
-    ///<param name="following a commit in function sqlite3PagerCommitPhaseTwo().">following a commit in function sqlite3PagerCommitPhaseTwo().</param>
-    ///<param name=""></param>
-    ///<param name="3. An error occurs while attempting to write to the journal or">3. An error occurs while attempting to write to the journal or</param>
-    ///<param name="database file in function pagerStress() in order to free up">database file in function pagerStress() in order to free up</param>
-    ///<param name="memory.">memory.</param>
-    ///<param name=""></param>
-    ///<param name="In other cases, the error is returned to the b">tree</param>
-    ///<param name="layer then attempts a rollback operation. If the error condition ">layer then attempts a rollback operation. If the error condition </param>
-    ///<param name="persists, the pager enters the ERROR state via condition (1) above.">persists, the pager enters the ERROR state via condition (1) above.</param>
-    ///<param name=""></param>
-    ///<param name="Condition (3) is necessary because it can be triggered by a read">only</param>
-    ///<param name="statement executed within a transaction. In this case, if the error">statement executed within a transaction. In this case, if the error</param>
-    ///<param name="code were simply returned to the user, the b">tree layer would not</param>
-    ///<param name="automatically attempt a rollback, as it assumes that an error in a">automatically attempt a rollback, as it assumes that an error in a</param>
-    ///<param name="read">only statement cannot leave the pager in an internally inconsistent </param>
-    ///<param name="state.">state.</param>
-    ///<param name=""></param>
-    ///<param name="The Pager.errCode variable is set to something other than SqlResult.SQLITE_OK.">The Pager.errCode variable is set to something other than SqlResult.SQLITE_OK.</param>
-    ///<param name="There are one or more outstanding references to pages (after the">There are one or more outstanding references to pages (after the</param>
-    ///<param name="last reference is dropped the pager should move back to OPEN state).">last reference is dropped the pager should move back to OPEN state).</param>
-    ///<param name="The pager is not an in">memory pager.</param>
-    ///<param name=""></param>
-    ///<param name=""></param>
-    ///<param name="Notes:">Notes:</param>
-    ///<param name=""></param>
-    ///<param name="A pager is never in WRITER_DBMOD or WRITER_FINISHED state if the">A pager is never in WRITER_DBMOD or WRITER_FINISHED state if the</param>
-    ///<param name="connection is open in WAL mode. A WAL connection is always in one">connection is open in WAL mode. A WAL connection is always in one</param>
-    ///<param name="of the first four states.">of the first four states.</param>
-    ///<param name=""></param>
-    ///<param name="Normally, a connection open in exclusive mode is never in PagerState.PAGER_OPEN">Normally, a connection open in exclusive mode is never in PagerState.PAGER_OPEN</param>
-    ///<param name="state. There are two exceptions: immediately after exclusive">mode has</param>
-    ///<param name="been turned on (and before any read or write transactions are ">been turned on (and before any read or write transactions are </param>
-    ///<param name="executed), and when the pager is leaving the "error state".">executed), and when the pager is leaving the "error state".</param>
-    ///<param name=""></param>
-    ///<param name="See also: assert_pager_state().">See also: assert_pager_state().</param>
-    ///<param name=""></param>
-
-    //#define PagerState.PAGER_OPEN                  0
-    //#define PagerState.PAGER_READER                1
-    //#define PagerState.PAGER_WRITER_LOCKED         2
-    //#define PagerState.PAGER_WRITER_CACHEMOD       3
-    //#define PagerState.PAGER_WRITER_DBMOD          4
-    //#define PagerState.PAGER_WRITER_FINISHED       5
-    //#define PagerState.PAGER_ERROR                 6
-
-    public enum PagerState : byte
-    {
-        PAGER_OPEN = 0,
-
-        PAGER_READER = 1,
-
-        PAGER_WRITER_LOCKED = 2,
-
-        PAGER_WRITER_CACHEMOD = 3,
-
-        PAGER_WRITER_DBMOD = 4,
-
-        PAGER_WRITER_FINISHED = 5,
-
-        PAGER_ERROR = 6,
-    }
-    #endregion
-
+   
     public static class PagerExtensions {
         ///<summary>
         /// Return TRUE if the page given in the argument was previously passed
@@ -289,167 +44,167 @@ namespace Community.CsharpSqlite.Paging
 
 
 
-
-
-    ///
-    ///<summary>
-    ///A open page cache is an instance of struct Pager. A description of
-    ///some of the more important member variables follows:
-    ///
-    ///eState
-    ///
-    ///The current 'state' of the pager object. See the comment and state
-    ///diagram above for a description of the pager state.
-    ///
-    ///eLock
-    ///
-    ///</summary>
-    ///For a real on
-    ///NO_LOCK, SHARED_LOCK, RESERVED_LOCK or EXCLUSIVE_LOCK.
-    ///        
-    ///For a temporary or in-memory database (neither of which require any
-    ///locks), this variable is always set to EXCLUSIVE_LOCK. Since such">locks), this variable is always set to EXCLUSIVE_LOCK. Since such
-    ///databases always have Pager.exclusiveMode==1, this tricks the pager
-    ///logic into thinking that it already has all the locks it will ever
-    ///need (and no reason to release them).
-    ///        
-    ///In some (obscure) circumstances, this variable may also be set to
-    ///UNKNOWN_LOCK. See the comment above the #define of UNKNOWN_LOCK for
-    ///details.
-    ///<param name=""></param>
-    ///<param name="changeCountDone">changeCountDone</param>
-    ///<param name=""></param>
-    ///<param name="This boolean variable is used to make sure that the change">counter </param>
-    ///<param name="(the 4">byte header field at byte offset 24 of the database file) is </param>
-    ///<param name="not updated more often than necessary. ">not updated more often than necessary. </param>
-    ///<param name=""></param>
-    ///<param name="It is set to true when the change">counter field is updated, which </param>
-    ///<param name="can only happen if an exclusive lock is held on the database file.">can only happen if an exclusive lock is held on the database file.</param>
-    ///<param name="It is cleared (set to false) whenever an exclusive lock is ">It is cleared (set to false) whenever an exclusive lock is </param>
-    ///<param name="relinquished on the database file. Each time a transaction is committed,">relinquished on the database file. Each time a transaction is committed,</param>
-    ///<param name="The changeCountDone flag is inspected. If it is true, the work of">The changeCountDone flag is inspected. If it is true, the work of</param>
-    ///<param name="updating the change">counter is omitted for the current transaction.</param>
-    ///<param name=""></param>
-    ///<param name="This mechanism means that when running in exclusive mode, a connection ">This mechanism means that when running in exclusive mode, a connection </param>
-    ///<param name="need only update the change">counter once, for the first transaction</param>
-    ///<param name="committed.">committed.</param>
-    ///<param name=""></param>
-    ///<param name="setMaster">setMaster</param>
-    ///<param name=""></param>
-    ///<param name="When PagerCommitPhaseOne() is called to commit a transaction, it may">When PagerCommitPhaseOne() is called to commit a transaction, it may</param>
-    ///<param name="(or may not) specify a master">journal name to be written into the </param>
-    ///<param name="journal file before it is synced to disk.">journal file before it is synced to disk.</param>
-    ///<param name=""></param>
-    ///<param name="Whether or not a journal file contains a master">journal pointer affects </param>
-    ///<param name="the way in which the journal file is finalized after the transaction is ">the way in which the journal file is finalized after the transaction is </param>
-    ///<param name="committed or rolled back when running in "journal_mode=PERSIST" mode.">committed or rolled back when running in "journal_mode=PERSIST" mode.</param>
-    ///<param name="If a journal file does not contain a master">journal pointer, it is</param>
-    ///<param name="finalized by overwriting the first journal header with zeroes. If">finalized by overwriting the first journal header with zeroes. If</param>
-    ///<param name="it does contain a master">journal pointer the journal file is finalized </param>
-    ///<param name="by truncating it to zero bytes, just as if the connection were ">by truncating it to zero bytes, just as if the connection were </param>
-    ///<param name="running in "journal_mode=truncate" mode.">running in "journal_mode=truncate" mode.</param>
-    ///<param name=""></param>
-    ///<param name="Journal files that contain master journal pointers cannot be finalized">Journal files that contain master journal pointers cannot be finalized</param>
-    ///<param name="simply by overwriting the first journal">header with zeroes, as the</param>
-    ///<param name="master journal pointer could interfere with hot">journal rollback of any</param>
-    ///<param name="subsequently interrupted transaction that reuses the journal file.">subsequently interrupted transaction that reuses the journal file.</param>
-    ///<param name=""></param>
-    ///<param name="The flag is cleared as soon as the journal file is finalized (either">The flag is cleared as soon as the journal file is finalized (either</param>
-    ///<param name="by PagerCommitPhaseTwo or PagerRollback). If an IO error prevents the">by PagerCommitPhaseTwo or PagerRollback). If an IO error prevents the</param>
-    ///<param name="journal file from being successfully finalized, the setMaster flag">journal file from being successfully finalized, the setMaster flag</param>
-    ///<param name="is cleared anyway (and the pager will move to ERROR state).">is cleared anyway (and the pager will move to ERROR state).</param>
-    ///<param name=""></param>
-    ///<param name="doNotSpill, doNotSyncSpill">doNotSpill, doNotSyncSpill</param>
-    ///<param name=""></param>
-    ///<param name="These two boolean variables control the behaviour of cache">spills</param>
-    ///<param name="(calls made by the pcache module to the pagerStress() routine to">(calls made by the pcache module to the pagerStress() routine to</param>
-    ///<param name="write cached data to the file">system in order to free up memory).</param>
-    ///<param name=""></param>
-    ///<param name="When doNotSpill is non">zero, writing to the database from pagerStress()</param>
-    ///<param name="is disabled altogether. This is done in a very obscure case that">is disabled altogether. This is done in a very obscure case that</param>
-    ///<param name="comes up during savepoint rollback that requires the pcache module">comes up during savepoint rollback that requires the pcache module</param>
-    ///<param name="to allocate a new page to prevent the journal file from being written">to allocate a new page to prevent the journal file from being written</param>
-    ///<param name="while it is being traversed by code in pager_playback().">while it is being traversed by code in pager_playback().</param>
-    ///<param name=""></param>
-    ///<param name="If doNotSyncSpill is non">zero, writing to the database from pagerStress()</param>
-    ///<param name="is permitted, but syncing the journal file is not. This flag is set">is permitted, but syncing the journal file is not. This flag is set</param>
-    ///<param name="by PagerMethods.sqlite3PagerWrite() when the file">size is larger than</param>
-    ///<param name="the database page">size in order to prevent a journal sync from happening </param>
-    ///<param name="in between the journalling of two pages on the same sector. ">in between the journalling of two pages on the same sector. </param>
-    ///<param name=""></param>
-    ///<param name="subjInMemory">subjInMemory</param>
-    ///<param name=""></param>
-    ///<param name="This is a boolean variable. If true, then any required sub">journal</param>
-    ///<param name="is opened as an in">memory</param>
-    ///<param name="sub">memory pager files.</param>
-    ///<param name=""></param>
-    ///<param name="This variable is updated by the upper layer each time a new ">This variable is updated by the upper layer each time a new </param>
-    ///<param name="write">transaction is opened.</param>
-    ///<param name=""></param>
-    ///<param name="dbSize, dbOrigSize, dbFileSize">dbSize, dbOrigSize, dbFileSize</param>
-    ///<param name=""></param>
-    ///<param name="Variable dbSize is set to the number of pages in the database file.">Variable dbSize is set to the number of pages in the database file.</param>
-    ///<param name="It is valid in PagerState.PAGER_READER and higher states (all states except for">It is valid in PagerState.PAGER_READER and higher states (all states except for</param>
-    ///<param name="OPEN and ERROR). ">OPEN and ERROR). </param>
-    ///<param name=""></param>
-    ///<param name="dbSize is set based on the size of the database file, which may be ">dbSize is set based on the size of the database file, which may be </param>
-    ///<param name="larger than the size of the database (the value stored at offset">larger than the size of the database (the value stored at offset</param>
-    ///<param name="28 of the database header by the btree). If the size of the file">28 of the database header by the btree). If the size of the file</param>
-    ///<param name="is not an integer multiple of the page">size, the value stored in</param>
-    ///<param name="dbSize is rounded down (i.e. a 5KB file with 2K page">size has dbSize==2).</param>
-    ///<param name="Except, any file that is greater than 0 bytes in size is considered">Except, any file that is greater than 0 bytes in size is considered</param>
-    ///<param name="to have at least one page. (i.e. a 1KB file with 2K page">size leads</param>
-    ///<param name="to dbSize==1).">to dbSize==1).</param>
-    ///<param name=""></param>
-    ///<param name="During a write">numbers greater than</param>
-    ///<param name="dbSize are modified in the cache, dbSize is updated accordingly.">dbSize are modified in the cache, dbSize is updated accordingly.</param>
-    ///<param name="Similarly, if the database is truncated using PagerTruncateImage(), ">Similarly, if the database is truncated using PagerTruncateImage(), </param>
-    ///<param name="dbSize is updated.">dbSize is updated.</param>
-    ///<param name=""></param>
-    ///<param name="Variables dbOrigSize and dbFileSize are valid in states ">Variables dbOrigSize and dbFileSize are valid in states </param>
-    ///<param name="PagerState.PAGER_WRITER_LOCKED and higher. dbOrigSize is a copy of the dbSize">PagerState.PAGER_WRITER_LOCKED and higher. dbOrigSize is a copy of the dbSize</param>
-    ///<param name="variable at the start of the transaction. It is used during rollback,">variable at the start of the transaction. It is used during rollback,</param>
-    ///<param name="and to determine whether or not pages need to be journalled before">and to determine whether or not pages need to be journalled before</param>
-    ///<param name="being modified.">being modified.</param>
-    ///<param name=""></param>
-    ///<param name="Throughout a write">transaction, dbFileSize contains the size of</param>
-    ///<param name="the file on disk in pages. It is set to a copy of dbSize when the">the file on disk in pages. It is set to a copy of dbSize when the</param>
-    ///<param name="write">transaction is first opened, and updated when VFS calls are made</param>
-    ///<param name="to write or truncate the database file on disk. ">to write or truncate the database file on disk. </param>
-    ///<param name=""></param>
-    ///<param name="The only reason the dbFileSize variable is required is to suppress ">The only reason the dbFileSize variable is required is to suppress </param>
-    ///<param name="unnecessary calls to xTruncate() after committing a transaction. If, ">unnecessary calls to xTruncate() after committing a transaction. If, </param>
-    ///<param name="when a transaction is committed, the dbFileSize variable indicates ">when a transaction is committed, the dbFileSize variable indicates </param>
-    ///<param name="that the database file is larger than the database image (Pager.dbSize), ">that the database file is larger than the database image (Pager.dbSize), </param>
-    ///<param name="pager_truncate() is called. The pager_truncate() call uses xFilesize()">pager_truncate() is called. The pager_truncate() call uses xFilesize()</param>
-    ///<param name="to measure the database file on disk, and then truncates it if required.">to measure the database file on disk, and then truncates it if required.</param>
-    ///<param name="dbFileSize is not used when rolling back a transaction. In this case">dbFileSize is not used when rolling back a transaction. In this case</param>
-    ///<param name="pager_truncate() is called unconditionally (which means there may be">pager_truncate() is called unconditionally (which means there may be</param>
-    ///<param name="a call to xFilesize() that is not strictly required). In either case,">a call to xFilesize() that is not strictly required). In either case,</param>
-    ///<param name="pager_truncate() may cause the file to become smaller or larger.">pager_truncate() may cause the file to become smaller or larger.</param>
-    ///<param name=""></param>
-    ///<param name="dbHintSize">dbHintSize</param>
-    ///<param name=""></param>
-    ///<param name="The dbHintSize variable is used to limit the number of calls made to">The dbHintSize variable is used to limit the number of calls made to</param>
-    ///<param name="the VFS xFileControl(FCNTL_SIZE_HINT) method. ">the VFS xFileControl(FCNTL_SIZE_HINT) method. </param>
-    ///<param name=""></param>
-    ///<param name="dbHintSize is set to a copy of the dbSize variable when a">dbHintSize is set to a copy of the dbSize variable when a</param>
-    ///<param name="write">transaction is opened (at the same time as dbFileSize and</param>
-    ///<param name="dbOrigSize). If the xFileControl(FCNTL_SIZE_HINT) method is called,">dbOrigSize). If the xFileControl(FCNTL_SIZE_HINT) method is called,</param>
-    ///<param name="dbHintSize is increased to the number of pages that correspond to the">dbHintSize is increased to the number of pages that correspond to the</param>
-    ///<param name="size">hint passed to the method call. See pager_write_pagelist() for </param>
-    ///<param name="details.">details.</param>
-    ///<param name=""></param>
-    ///<param name="errCode">errCode</param>
-    ///<param name=""></param>
-    ///<param name="The Pager.errCode variable is only ever used in PagerState.PAGER_ERROR state. It">The Pager.errCode variable is only ever used in PagerState.PAGER_ERROR state. It</param>
-    ///<param name="is set to zero in all other states. In PagerState.PAGER_ERROR state, Pager.errCode ">is set to zero in all other states. In PagerState.PAGER_ERROR state, Pager.errCode </param>
-    ///<param name="is always set to SQLITE_FULL, SQLITE_IOERR or one of the SQLITE_IOERR_XXX ">is always set to SQLITE_FULL, SQLITE_IOERR or one of the SQLITE_IOERR_XXX </param>
-    ///<param name="sub">codes.</param>
-    ///<param name=""></param>
+    /*
+** A open page cache is an instance of struct Pager. A description of
+** some of the more important member variables follows:
+**
+** eState
+**
+**   The current 'state' of the pager object. See the comment and state
+**   diagram above for a description of the pager state.
+**
+** eLock
+**
+**   For a real on-disk database, the current lock held on the database file -
+**   NO_LOCK, SHARED_LOCK, RESERVED_LOCK or EXCLUSIVE_LOCK.
+**
+**   For a temporary or in-memory database (neither of which require any
+**   locks), this variable is always set to EXCLUSIVE_LOCK. Since such
+**   databases always have Pager.exclusiveMode==1, this tricks the pager
+**   logic into thinking that it already has all the locks it will ever
+**   need (and no reason to release them).
+**
+**   In some (obscure) circumstances, this variable may also be set to
+**   UNKNOWN_LOCK. See the comment above the #define of UNKNOWN_LOCK for
+**   details.
+**
+** changeCountDone
+**
+**   This boolean variable is used to make sure that the change-counter 
+**   (the 4-byte header field at byte offset 24 of the database file) is 
+**   not updated more often than necessary. 
+**
+**   It is set to true when the change-counter field is updated, which 
+**   can only happen if an exclusive lock is held on the database file.
+**   It is cleared (set to false) whenever an exclusive lock is 
+**   relinquished on the database file. Each time a transaction is committed,
+**   The changeCountDone flag is inspected. If it is true, the work of
+**   updating the change-counter is omitted for the current transaction.
+**
+**   This mechanism means that when running in exclusive mode, a connection 
+**   need only update the change-counter once, for the first transaction
+**   committed.
+**
+** setMaster
+**
+**   When PagerCommitPhaseOne() is called to commit a transaction, it may
+**   (or may not) specify a master-journal name to be written into the 
+**   journal file before it is synced to disk.
+**
+**   Whether or not a journal file contains a master-journal pointer affects 
+**   the way in which the journal file is finalized after the transaction is 
+**   committed or rolled back when running in "journal_mode=PERSIST" mode.
+**   If a journal file does not contain a master-journal pointer, it is
+**   finalized by overwriting the first journal header with zeroes. If
+**   it does contain a master-journal pointer the journal file is finalized 
+**   by truncating it to zero bytes, just as if the connection were 
+**   running in "journal_mode=truncate" mode.
+**
+**   Journal files that contain master journal pointers cannot be finalized
+**   simply by overwriting the first journal-header with zeroes, as the
+**   master journal pointer could interfere with hot-journal rollback of any
+**   subsequently interrupted transaction that reuses the journal file.
+**
+**   The flag is cleared as soon as the journal file is finalized (either
+**   by PagerCommitPhaseTwo or PagerRollback). If an IO error prevents the
+**   journal file from being successfully finalized, the setMaster flag
+**   is cleared anyway (and the pager will move to ERROR state).
+**
+** doNotSpill, doNotSyncSpill
+**
+**   These two boolean variables control the behaviour of cache-spills
+**   (calls made by the pcache module to the pagerStress() routine to
+**   write cached data to the file-system in order to free up memory).
+**
+**   When doNotSpill is non-zero, writing to the database from pagerStress()
+**   is disabled altogether. This is done in a very obscure case that
+**   comes up during savepoint rollback that requires the pcache module
+**   to allocate a new page to prevent the journal file from being written
+**   while it is being traversed by code in pager_playback().
+** 
+**   If doNotSyncSpill is non-zero, writing to the database from pagerStress()
+**   is permitted, but syncing the journal file is not. This flag is set
+**   by sqlite3PagerWrite() when the file-system sector-size is larger than
+**   the database page-size in order to prevent a journal sync from happening 
+**   in between the journalling of two pages on the same sector. 
+**
+** subjInMemory
+**
+**   This is a boolean variable. If true, then any required sub-journal
+**   is opened as an in-memory journal file. If false, then in-memory
+**   sub-journals are only used for in-memory pager files.
+**
+**   This variable is updated by the upper layer each time a new 
+**   write-transaction is opened.
+**
+** dbSize, dbOrigSize, dbFileSize
+**
+**   Variable dbSize is set to the number of pages in the database file.
+**   It is valid in PAGER_READER and higher states (all states except for
+**   OPEN and ERROR). 
+**
+**   dbSize is set based on the size of the database file, which may be 
+**   larger than the size of the database (the value stored at offset
+**   28 of the database header by the btree). If the size of the file
+**   is not an integer multiple of the page-size, the value stored in
+**   dbSize is rounded down (i.e. a 5KB file with 2K page-size has dbSize==2).
+**   Except, any file that is greater than 0 bytes in size is considered
+**   to have at least one page. (i.e. a 1KB file with 2K page-size leads
+**   to dbSize==1).
+**
+**   During a write-transaction, if pages with page-numbers greater than
+**   dbSize are modified in the cache, dbSize is updated accordingly.
+**   Similarly, if the database is truncated using PagerTruncateImage(), 
+**   dbSize is updated.
+**
+**   Variables dbOrigSize and dbFileSize are valid in states 
+**   PAGER_WRITER_LOCKED and higher. dbOrigSize is a copy of the dbSize
+**   variable at the start of the transaction. It is used during rollback,
+**   and to determine whether or not pages need to be journalled before
+**   being modified.
+**
+**   Throughout a write-transaction, dbFileSize contains the size of
+**   the file on disk in pages. It is set to a copy of dbSize when the
+**   write-transaction is first opened, and updated when VFS calls are made
+**   to write or truncate the database file on disk. 
+**
+**   The only reason the dbFileSize variable is required is to suppress 
+**   unnecessary calls to xTruncate() after committing a transaction. If, 
+**   when a transaction is committed, the dbFileSize variable indicates 
+**   that the database file is larger than the database image (Pager.dbSize), 
+**   pager_truncate() is called. The pager_truncate() call uses xFilesize()
+**   to measure the database file on disk, and then truncates it if required.
+**   dbFileSize is not used when rolling back a transaction. In this case
+**   pager_truncate() is called unconditionally (which means there may be
+**   a call to xFilesize() that is not strictly required). In either case,
+**   pager_truncate() may cause the file to become smaller or larger.
+**
+** dbHintSize
+**
+**   The dbHintSize variable is used to limit the number of calls made to
+**   the VFS xFileControl(FCNTL_SIZE_HINT) method. 
+**
+**   dbHintSize is set to a copy of the dbSize variable when a
+**   write-transaction is opened (at the same time as dbFileSize and
+**   dbOrigSize). If the xFileControl(FCNTL_SIZE_HINT) method is called,
+**   dbHintSize is increased to the number of pages that correspond to the
+**   size-hint passed to the method call. See pager_write_pagelist() for 
+**   details.
+**
+** errCode
+**
+**   The Pager.errCode variable is only ever used in PAGER_ERROR state. It
+**   is set to zero in all other states. In PAGER_ERROR state, Pager.errCode 
+**   is always set to SQLITE_FULL, SQLITE_IOERR or one of the SQLITE_IOERR_XXX 
+**   sub-codes.
+*/
 
     public class Pager
     {
+        public Pager()
+        {
+
+        }
 
         ///<summary>
         ///OS functions to use for IO 
@@ -821,7 +576,7 @@ namespace Community.CsharpSqlite.Paging
 
 #if SQLITE_TEST || DEBUG
 																																																									      public int nHit, nMiss;              /* Cache hits and missing */
-      public int nRead, nWrite;            /* Database pages read/written */
+    public int nRead, nWrite;            /* Database pages read/written */
 #else
             public int nHit;
 
@@ -4290,16 +4045,10 @@ pPager.pWal = 0;
                 {
                     sqlite3_vfs pVfs = this.pVfs;
                     var rc = SqlResult.SQLITE_OK;
-                    ///
-                    ///<summary>
                     ///Return code 
-                    ///</summary>
 
                     int exists = 1;
-                    ///
-                    ///<summary>
                     ///True if a journal file is present 
-                    ///</summary>
 
                     int jrnlOpen = this.JournalFileDescriptor.isOpen ? 1 : 0;
                     Debug.Assert(this.useJournal != false);
@@ -4314,19 +4063,13 @@ pPager.pWal = 0;
                     if (rc == SqlResult.SQLITE_OK && exists != 0)
                     {
                         int locked = 0;
-                        ///
-                        ///<summary>
                         ///True if some process holds a RESERVED lock 
-                        ///</summary>
 
-                        ///
-                        ///<summary>
                         ///Race condition here:  Another process might have been holding the
                         ///the RESERVED lock and have a journal open at the os.sqlite3OsAccess()
                         ///call above, but then delete the journal and drop the lock before
                         ///we get to the following os.sqlite3OsCheckReservedLock() call.  If that
                         ///is the case, this routine might think there is a hot journal when
-                        ///</summary>
                         ///<param name="in fact there is none.  This results in a false">positive which will</param>
                         ///<param name="be dealt with by the playback routine.  Ticket #3883.">be dealt with by the playback routine.  Ticket #3883.</param>
                         ///<param name=""></param>
@@ -4335,20 +4078,13 @@ pPager.pWal = 0;
                         if (rc == SqlResult.SQLITE_OK && locked == 0)
                         {
                             Pgno nPage = 0;
-                            ///
-                            ///<summary>
                             ///Number of pages in database file 
-                            ///</summary>
 
-                            ///
-                            ///<summary>
                             ///Check the size of the database file. If it consists of 0 pages,
                             ///then delete the journal file. See the header comment above for
                             ///the reasoning here.  Delete the obsolete journal file under
                             ///a RESERVED lock to avoid race conditions and to avoid violating
                             ///[H33020].
-                            ///
-                            ///</summary>
 
                             rc = this.pagerPagecount(ref nPage);
                             if (rc == SqlResult.SQLITE_OK)
@@ -4452,14 +4188,8 @@ pPager.pWal = 0;
                 SqlResult sqlite3PagerSharedLock()
                 {
                     SqlResult rc = SqlResult.SQLITE_OK;
-                    ///
-                    ///<summary>
                     ///Return code 
-                    ///</summary>
 
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="This routine is only called from b">tree and only when there are no</param>
                     ///<param name="outstanding pages. This implies that the pager state should either">outstanding pages. This implies that the pager state should either</param>
                     ///<param name="be OPEN or READER. READER is only possible if the pager is or was in ">be OPEN or READER. READER is only possible if the pager is or was in </param>

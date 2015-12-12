@@ -2495,7 +2495,7 @@ shmpage_out:
 ///
 ///</summary>
 
-		static sqlite3_io_methods winIoMethod = new sqlite3_io_methods (2, ///
+		public static sqlite3_io_methods winIoMethod = new sqlite3_io_methods (2, ///
 ///<summary>
 ///iVersion 
 ///</summary>
@@ -2772,42 +2772,23 @@ shmpage_out:
 #endif
 			//winFile* pFile = (winFile)id;
 			string zConverted;
-			///
-///<summary>
 ///Filename in OS encoding 
-///</summary>
 
 			string zUtf8Name = zName;
-			///
-///<summary>
-///</summary>
 ///<param name="Filename in UTF">8 encoding </param>
 
 			pOutFlags = 0;
-			///
-///<summary>
 ///If argument zPath is a NULL pointer, this function is required to open
 ///a temporary file. Use this buffer to store the file name in.
-///
-///</summary>
 
 			StringBuilder zTmpname = new StringBuilder (MAX_PATH + 1);
-			///
-///<summary>
 ///Buffer used to create temp filename 
-///</summary>
 
 			var rc = SqlResult.SQLITE_OK;
-			///
-///<summary>
 ///Function Return Code 
-///</summary>
 
 			int eType = (int)(flags & 0xFFFFFF00);
-			///
-///<summary>
 ///Type of file to open 
-///</summary>
 
 			bool isExclusive = (flags & SQLITE_OPEN_EXCLUSIVE) != 0;
 			bool isDelete = (flags & SQLITE_OPEN_DELETEONCLOSE) != 0;
@@ -2815,15 +2796,11 @@ shmpage_out:
 			bool isReadonly = (flags & SQLITE_OPEN_READONLY) != 0;
 			bool isReadWrite = (flags & SQLITE_OPEN_READWRITE) != 0;
 			bool isOpenJournal = (isCreate && (eType == SQLITE_OPEN_MASTER_JOURNAL || eType == SQLITE_OPEN_MAIN_JOURNAL || eType == SQLITE_OPEN_WAL));
-			///
-///<summary>
 ///Check the following statements are true:
-///
 ///(a) Exactly one of the READWRITE and READONLY flags must be set, and
 ///(b) if CREATE is set, then READWRITE must also be set, and
 ///(c) if EXCLUSIVE is set, then CREATE must also be set.
 ///(d) if DELETEONCLOSE is set, then CREATE must also be set.
-///</summary>
 
 			Debug.Assert ((isReadonly == false || isReadWrite == false) && (isReadWrite || isReadonly));
 			Debug.Assert (isCreate == false || isReadWrite);
@@ -2904,20 +2881,12 @@ shmpage_out:
 				// CREATE_NEW;
 			}
 			else
-				if (isCreate) {
-					///
-///<summary>
-///Open existing file, or create if it doesn't exist 
-///</summary>
+				if (isCreate) {///Open existing file, or create if it doesn't exist 
 
 					dwCreationDisposition = FileMode.OpenOrCreate;
 					// OPEN_ALWAYS;
 				}
-				else {
-					///
-///<summary>
-///Opens a file, only if it exists. 
-///</summary>
+				else {///Opens a file, only if it exists. 
 
 					dwCreationDisposition = FileMode.Open;
 					//OPEN_EXISTING;
@@ -2943,11 +2912,8 @@ isTemp = 1;
 				// FILE_ATTRIBUTE_NORMAL;
 				#endif
 			}
-			///
-///<summary>
 ///Reports from the internet are that performance is always
 ///better if FILE_FLAG_RANDOM_ACCESS is used.  Ticket #2699. 
-///</summary>
 
 			#if SQLITE_OS_WINCE
 																																																									dwFlagsAndAttributes |= FileOptions.RandomAccess; // FILE_FLAG_RANDOM_ACCESS;

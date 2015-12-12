@@ -2796,11 +2796,7 @@ enableTimer = booleanValue(azArg[1]);
 
 	static SqlResult main (int argc, string[] argv)
 	{
-        Connection pSrc = null;
-        var zSrcFile = "hehehe";
-        var r=Sqlite3.sqlite3_open(zSrcFile, out pSrc);
-        Btree btree = null;
-        r = Btree.Open(pSrc.pVfs, "hehehe", pSrc, ref btree, 0, 262);
+        
 		/*
          
         Community.CsharpSqlite.Sqlite3.Parse pParse = new Community.CsharpSqlite.Sqlite3.Parse ();

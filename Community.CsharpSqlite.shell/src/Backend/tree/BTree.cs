@@ -233,7 +233,7 @@ p.sharable = 1;
                     //  rc = SQLITE_NOMEM;
                     //  goto btree_open_out;
                     //}
-                    rc = PagerMethods.sqlite3PagerOpen(pVfs, out pBt.pPager, zFilename, Globals.BTree.EXTRA_SIZE, flags, vfsFlags, BTreeMethods.pageReinit);
+                    rc = PagerMethods.PagerOpen(pVfs, out pBt.pPager, zFilename, Globals.BTree.EXTRA_SIZE, flags, vfsFlags, BTreeMethods.pageReinit);
                     if (rc == SqlResult.SQLITE_OK)
                     {
                         rc = pBt.pPager.sqlite3PagerReadFileheader(zDbHeader.Length, zDbHeader);

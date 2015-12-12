@@ -237,7 +237,7 @@ namespace Community.CsharpSqlite
             //    Debug.Assert( pgno != 1 || pDbPage.pData == _aData );
             //  }
             //}
-            public MemPage Copy()
+            public MemPage Clone()
             {
                 MemPage cp = (MemPage)MemberwiseClone();
                 if (aOvfl != null)
@@ -2174,7 +2174,7 @@ namespace Community.CsharpSqlite
                     //memcpy(pOld, apOld[i], sizeof(MemPage));
                     //pOld.aData = (void*)&pOld[1];
                     //memcpy(pOld.aData, apOld[i].aData, pBt.pageSize);
-                    MemPage pOld = apCopy[i] = apOld[i].Copy();
+                    MemPage pOld = apCopy[i] = apOld[i].Clone();
                     limit = pOld.nCell + pOld.nOverflow;
                     if (pOld.nOverflow > 0 || true)
                     {

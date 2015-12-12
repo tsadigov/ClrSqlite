@@ -202,7 +202,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static void sqlite3MemJournalOpen(sqlite3_file pJfd)
             {
-                MemJournal p = (MemJournal)pJfd;
+                MemJournal p = pJfd;
                 //memset( p, 0, sqlite3MemJournalSize() );
                 p.pFirst = null;
                 p.endpoint = new FilePoint();

@@ -566,7 +566,7 @@ winceLock *shared;      /* Global shared lock memory for the file  */
             sectorSize = 0;
         }
 
-        public sqlite3_io_methods pMethods;
+        public sqlite3_io_methods pMethods { get; set; }
         ///
         ///<summary>
         ///Must be first 

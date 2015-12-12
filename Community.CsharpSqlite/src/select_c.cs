@@ -2352,6 +2352,7 @@ break;
                 SelectMethods.explainComposite(pParse, p.tk_op, iSub1, iSub2, false);
                 return SqlResult.SQLITE_OK;
             }
+
 #endif
 
 

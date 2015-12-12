@@ -1300,35 +1300,37 @@ return rc;
         /// various SQLITE_IO_XXX errors.
         ///
         ///</summary>
-        public static SqlResult sqlite3PagerOpen(sqlite3_vfs pVfs, ///
-            ///<summary>
-            ///The virtual file system to use 
-            ///</summary>
+        public static SqlResult PagerOpen(
+        ///<summary>
+        ///The virtual file system to use 
+        ///</summary>
+        sqlite3_vfs pVfs,
 
+        ///<summary>
+        ///OUT: Return the Pager structure here 
+        ///</summary>
         out Pager ppPager, ///
-            ///<summary>
-            ///OUT: Return the Pager structure here 
-            ///</summary>
 
+        ///<summary>
+        ///Name of the database file to open 
+        ///</summary>
         string zFilename, ///
-            ///<summary>
-            ///Name of the database file to open 
-            ///</summary>
 
+        ///<summary>
+        ///</summary>
+        ///<param name="Extra bytes append to each in">memory page </param>
         int nExtra, ///
-            ///<summary>
-            ///</summary>
-            ///<param name="Extra bytes append to each in">memory page </param>
 
+        ///<summary>
+        ///flags controlling this file 
+        ///</summary>
         int flags, ///
-            ///<summary>
-            ///flags controlling this file 
-            ///</summary>
 
+        ///<summary>
+        ///flags passed through to sqlite3_vfs.xOpen() 
+        ///</summary>
         int vfsFlags, ///
-            ///<summary>
-            ///flags passed through to sqlite3_vfs.xOpen() 
-            ///</summary>
+            
 
         dxReiniter xReinit///
             ///<summary>
