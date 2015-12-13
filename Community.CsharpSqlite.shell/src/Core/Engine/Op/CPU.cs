@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using u8 = System.Byte;
+using i64 = System.Int64;
 
 namespace Community.CsharpSqlite.Engine
 {
@@ -26,9 +27,43 @@ namespace Community.CsharpSqlite.Engine
         public Mem[] aMem ;
         ///3rd input operand 
         public Mem pOut = null;
-        public int opcodeIndex;
+        int _opcodeIndex;
+        public int opcodeIndex {
+            get { return _opcodeIndex; }
+            set {
+                _opcodeIndex = value;
+                Log.WriteLine("CPU:OpCodeIndex>>>"+value);
+            }
+        }
+
+
+        ///
+        ///<summary>
+        ///VdbeCursor row cache generation counter 
+        ///</summary>
+        /// <summary>
+        /// The program counter 
+        /// </summary>
+        int _currentOpCodeIndex;
+        public int currentOpCodeIndex
+        {
+            get { return _currentOpCodeIndex; }
+            set
+            {
+                _currentOpCodeIndex = value;
+                Log.WriteLine("CPU:currentOpCodeIndex>>>" + value);
+            }
+        }
+
+
         public Vdbe vdbe;
         public OnConstraintError errorAction;
         public int iCompare;
+
+        public i64 lastRowid;
+        ///Saved value of the last insert ROWID 
+        ///
+        public int[] aPermute = null;
+        ///Permutation of columns for  OpCode.OP_Compare 
     }
 }

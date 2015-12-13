@@ -1,11 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using i64 = System.Int64;
+using u8 = System.Byte;
+using u16 = System.UInt16;
+using u32 = System.UInt32;
+using u64 = System.UInt64;
+using unsigned = System.UIntPtr;
+using Pgno = System.UInt32;
+using i32 = System.Int32;
+using sqlite_int64 = System.Int64;
+using Community.CsharpSqlite.Engine;
+using Community.CsharpSqlite.Utils;
+using Community.CsharpSqlite.Metadata;
 
 namespace Community.CsharpSqlite.Engine.Op
 {
+    using System.Text;
+    using sqlite3_value = Engine.Mem;
+    using System.Collections.Generic;
+    using Community.CsharpSqlite.Engine;
+    using Community.CsharpSqlite.Metadata;
+    using Community.CsharpSqlite.Os;
+    using Vdbe = Engine.Vdbe;
+
     public class VirtualTable
     {
 
@@ -15,7 +36,9 @@ namespace Community.CsharpSqlite.Engine.Op
         {
             var vdbe = cpu.vdbe;
             var aMem = vdbe.aMem;
+            var db = cpu.db;
 
+            SqlResult rc;
             switch (opcode)
             {
                 
@@ -27,7 +50,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///P4 may be a pointer to an sqlite3_vtab structure. If so, call the
                                 ///xBegin method for that table.
                                 ///
-                                ///Also, whether or not P4 is set, check that this is not being called from
+                                ///Also, whether or not P4 is set, check that vdbe is not being called from
                                 ///within a callback to a virtual table xSync() method. If it is, the error
                                 ///code will be set to SQLITE_LOCKED.
                                 ///</summary>
@@ -37,7 +60,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         pVTab = pOp.p4.pVtab;
                                         rc = VTableMethodsExtensions.sqlite3VtabBegin(db, pVTab);
                                         if (pVTab != null)
-                                            Sqlite3.importVtabErrMsg(this, pVTab.pVtab);
+                                            Sqlite3.importVtabErrMsg(vdbe, pVTab.pVtab);
                                         break;
                                     }
 #endif
@@ -51,7 +74,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///</summary>
                                 case OpCode.OP_VCreate:
                                     {
-                                        rc = VTableMethodsExtensions.sqlite3VtabCallCreate(db, pOp.p1, pOp.p4.z, ref this.zErrMsg);
+                                        rc = VTableMethodsExtensions.sqlite3VtabCallCreate(db, pOp.p1, pOp.p4.z, ref vdbe.zErrMsg);
                                         break;
                                     }
 #endif
@@ -65,9 +88,9 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///</summary>
                                 case OpCode.OP_VDestroy:
                                     {
-                                        this.inVtabMethod = 2;
+                                        vdbe.inVtabMethod = 2;
                                         rc = VTableMethodsExtensions.sqlite3VtabCallDestroy(db, pOp.p1, pOp.p4.z);
-                                        this.inVtabMethod = 0;
+                                        vdbe.inVtabMethod = 0;
                                         break;
                                     }
 #endif
@@ -77,7 +100,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///Opcode: VOpen P1 * * P4 *
                                 ///
                                 ///P4 is a pointer to a virtual table object, an sqlite3_vtab structure.
-                                ///P1 is a cursor number.  This opcode opens a cursor to the virtual
+                                ///P1 is a cursor number.  vdbe opcode opens a cursor to the virtual
                                 ///table and stores that cursor in P1.
                                 ///</summary>
                                 case OpCode.OP_VOpen:
@@ -91,7 +114,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         pModule = (sqlite3_module)pVtab.pModule;
                                         Debug.Assert(pVtab != null && pModule != null);
                                         rc = pModule.xOpen(pVtab, out pVtabCursor);
-                                        Sqlite3.importVtabErrMsg(this, pVtab);
+                                        Sqlite3.importVtabErrMsg(vdbe, pVtab);
                                         if (SqlResult.SQLITE_OK == rc)
                                         {
                                             ///
@@ -103,7 +126,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                             ///<summary>
                                             ///Initialise vdbe cursor object 
                                             ///</summary>
-                                            pCur = Sqlite3.allocateCursor(this, pOp.p1, 0, -1, 0);
+                                            pCur = Sqlite3.allocateCursor(vdbe, pOp.p1, 0, -1, 0);
                                             if (pCur != null)
                                             {
                                                 pCur.pVtabCursor = pVtabCursor;
@@ -130,7 +153,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///method of the module.  The interpretation of the P4 string is left
                                 ///to the module implementation.
                                 ///
-                                ///This opcode invokes the xFilter method on the virtual table specified
+                                ///vdbe opcode invokes the xFilter method on the virtual table specified
                                 ///by P1.  The integer query plan parameter to xFilter is stored in register
                                 ///P3. Register P3+1 stores the argc parameter to be passed to the
                                 ///xFilter method. Registers P3+2..P3+1+argc are the argc
@@ -159,9 +182,9 @@ namespace Community.CsharpSqlite.Engine.Op
                                         pQuery = aMem[pOp.p3];
                                         pArgc = aMem[pOp.p3 + 1];
                                         // pQuery[1];
-                                        pCur = this.OpenCursors[pOp.p1];
+                                        pCur = vdbe.OpenCursors[pOp.p1];
                                         Debug.Assert(pQuery.memIsValid());
-                                        Sqlite3.REGISTER_TRACE(this, pOp.p3, pQuery);
+                                        Sqlite3.REGISTER_TRACE(vdbe, pOp.p3, pQuery);
                                         Debug.Assert(pCur.pVtabCursor != null);
                                         pVtabCursor = pCur.pVtabCursor;
                                         pVtab = pVtabCursor.pVtab;
@@ -179,24 +202,24 @@ namespace Community.CsharpSqlite.Engine.Op
                                         ///</summary>
                                         {
                                             res = 0;
-                                            apArg = this.apArg;
+                                            apArg = vdbe.apArg;
                                             for (i = 0; i < nArg; i++)
                                             {
                                                 apArg[i] = aMem[(pOp.p3 + 1) + i + 1];
                                                 //apArg[i] = pArgc[i + 1];
                                                 Sqlite3.sqlite3VdbeMemStoreType(apArg[i]);
                                             }
-                                            this.inVtabMethod = 1;
+                                            vdbe.inVtabMethod = 1;
                                             rc = pModule.xFilter(pVtabCursor, iQuery, pOp.p4.z, nArg, apArg);
-                                            this.inVtabMethod = 0;
-                                            Sqlite3.importVtabErrMsg(this, pVtab);
+                                            vdbe.inVtabMethod = 0;
+                                            Sqlite3.importVtabErrMsg(vdbe, pVtab);
                                             if (rc == SqlResult.SQLITE_OK)
                                             {
                                                 res = pModule.xEof(pVtabCursor);
                                             }
                                             if (res != 0)
                                             {
-                                                opcodeIndex = pOp.p2 - 1;
+                                                cpu.opcodeIndex = pOp.p2 - 1;
                                             }
                                         }
                                         pCur.nullRow = false;
@@ -218,11 +241,11 @@ namespace Community.CsharpSqlite.Engine.Op
                                         sqlite3_module pModule;
                                         Mem pDest;
                                         sqlite3_context sContext;
-                                        VdbeCursor pCur = this.OpenCursors[pOp.p1];
+                                        VdbeCursor pCur = vdbe.OpenCursors[pOp.p1];
                                         Debug.Assert(pCur.pVtabCursor != null);
-                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.nMem);
+                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.nMem);
                                         pDest = aMem[pOp.p3];
-                                        this.memAboutToChange(pDest);
+                                        vdbe.memAboutToChange(pDest);
                                         if (pCur.nullRow)
                                         {
                                             pDest.sqlite3VdbeMemSetNull();
@@ -244,7 +267,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         vdbemem_cs.sqlite3VdbeMemMove(sContext.s, pDest);
                                         sContext.s.MemSetTypeFlag(MemFlags.MEM_Null);
                                         rc = pModule.xColumn(pCur.pVtabCursor, sContext, pOp.p2);
-                                        Sqlite3.importVtabErrMsg(this, pVtab);
+                                        Sqlite3.importVtabErrMsg(vdbe, pVtab);
                                         if (sContext.isError != 0)
                                         {
                                             rc = sContext.isError;
@@ -252,17 +275,17 @@ namespace Community.CsharpSqlite.Engine.Op
                                         ///
                                         ///<summary>
                                         ///Copy the result of the function to the P3 register. We
-                                        ///do this regardless of whether or not an error occurred to ensure any
+                                        ///do vdbe regardless of whether or not an error occurred to ensure any
                                         ///dynamic allocation in sContext.s (a Mem struct) is  released.
                                         ///
                                         ///</summary>
-                                        vdbemem_cs.sqlite3VdbeChangeEncoding(sContext.s, encoding);
+                                        vdbemem_cs.sqlite3VdbeChangeEncoding(sContext.s, vdbe.encoding);
                                         vdbemem_cs.sqlite3VdbeMemMove(pDest, sContext.s);
-                                        Sqlite3.REGISTER_TRACE(this, pOp.p3, pDest);
+                                        Sqlite3.REGISTER_TRACE(vdbe, pOp.p3, pDest);
                                         Sqlite3.UPDATE_MAX_BLOBSIZE(pDest);
                                         if (pDest.IsTooBig())
                                         {
-                                            goto too_big;
+                                            return RuntimeException.too_big;
                                         }
                                         break;
                                     }
@@ -287,7 +310,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         int res;
                                         VdbeCursor pCur;
                                         res = 0;
-                                        pCur = this.OpenCursors[pOp.p1];
+                                        pCur = vdbe.OpenCursors[pOp.p1];
                                         Debug.Assert(pCur.pVtabCursor != null);
                                         if (pCur.nullRow)
                                         {
@@ -305,10 +328,10 @@ namespace Community.CsharpSqlite.Engine.Op
                                         ///some other method is next invoked on the save virtual table cursor.
                                         ///
                                         ///</summary>
-                                        this.inVtabMethod = 1;
+                                        vdbe.inVtabMethod = 1;
                                         rc = pModule.xNext(pCur.pVtabCursor);
-                                        this.inVtabMethod = 0;
-                                        Sqlite3.importVtabErrMsg(this, pVtab);
+                                        vdbe.inVtabMethod = 0;
+                                        Sqlite3.importVtabErrMsg(vdbe, pVtab);
                                         if (rc == SqlResult.SQLITE_OK)
                                         {
                                             res = pModule.xEof(pCur.pVtabCursor);
@@ -319,7 +342,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                             ///<summary>
                                             ///If there is data, jump to P2 
                                             ///</summary>
-                                            opcodeIndex = pOp.p2 - 1;
+                                            cpu.opcodeIndex = pOp.p2 - 1;
                                         }
                                         break;
                                     }
@@ -330,7 +353,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///Opcode: VRename P1 * * P4 *
                                 ///
                                 ///P4 is a pointer to a virtual table object, an sqlite3_vtab structure.
-                                ///This opcode invokes the corresponding xRename method. The value
+                                ///vdbe opcode invokes the corresponding xRename method. The value
                                 ///in register P1 is passed as the zName argument to the xRename method.
                                 ///</summary>
                                 case OpCode.OP_VRename:
@@ -341,11 +364,11 @@ namespace Community.CsharpSqlite.Engine.Op
                                         pName = aMem[pOp.p1];
                                         Debug.Assert(pVtab.pModule.xRename != null);
                                         Debug.Assert(pName.memIsValid());
-                                        Sqlite3.REGISTER_TRACE(this, pOp.p1, pName);
+                                        Sqlite3.REGISTER_TRACE(vdbe, pOp.p1, pName);
                                         Debug.Assert((pName.flags & MemFlags.MEM_Str) != 0);
                                         rc = pVtab.pModule.xRename(pVtab, pName.z);
-                                        Sqlite3.importVtabErrMsg(this, pVtab);
-                                        this.expired = false;
+                                        Sqlite3.importVtabErrMsg(vdbe, pVtab);
+                                        vdbe.expired = false;
                                         break;
                                     }
 #endif
@@ -355,7 +378,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///Opcode: VUpdate P1 P2 P3 P4 *
                                 ///
                                 ///P4 is a pointer to a virtual table object, an sqlite3_vtab structure.
-                                ///This opcode invokes the corresponding xUpdate method. P2 values
+                                ///vdbe opcode invokes the corresponding xUpdate method. P2 values
                                 ///are contiguous memory cells starting at P3 to pass to the xUpdate
                                 ///</summary>
                                 ///<param name="invocation. The value in register (P3+P2">1) corresponds to the</param>
@@ -365,7 +388,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///<param name="The argv[0] element (which corresponds to memory cell P3)">The argv[0] element (which corresponds to memory cell P3)</param>
                                 ///<param name="is the rowid of a row to delete.  If argv[0] is NULL then no">is the rowid of a row to delete.  If argv[0] is NULL then no</param>
                                 ///<param name="deletion occurs.  The argv[1] element is the rowid of the new">deletion occurs.  The argv[1] element is the rowid of the new</param>
-                                ///<param name="row.  This can be NULL to have the virtual table select the new">row.  This can be NULL to have the virtual table select the new</param>
+                                ///<param name="row.  vdbe can be NULL to have the virtual table select the new">row.  vdbe can be NULL to have the virtual table select the new</param>
                                 ///<param name="rowid for itself.  The subsequent elements in the array are">rowid for itself.  The subsequent elements in the array are</param>
                                 ///<param name="the values of columns in the new row.">the values of columns in the new row.</param>
                                 ///<param name=""></param>
@@ -399,13 +422,13 @@ namespace Community.CsharpSqlite.Engine.Op
                                         if (Sqlite3.ALWAYS(pModule.xUpdate))
                                         {
                                             u8 vtabOnConflict = db.vtabOnConflict;
-                                            apArg = this.apArg;
+                                            apArg = vdbe.apArg;
                                             //pX = aMem[pOp.p3];
                                             for (i = 0; i < nArg; i++)
                                             {
                                                 pX = aMem[pOp.p3 + i];
                                                 Debug.Assert(pX.memIsValid());
-                                                this.memAboutToChange(pX);
+                                                vdbe.memAboutToChange(pX);
                                                 Sqlite3.sqlite3VdbeMemStoreType(pX);
                                                 apArg[i] = pX;
                                                 //pX++;
@@ -413,11 +436,11 @@ namespace Community.CsharpSqlite.Engine.Op
                                             db.vtabOnConflict = pOp.p5;
                                             rc = pModule.xUpdate(pVtab, nArg, apArg, out rowid);
                                             db.vtabOnConflict = vtabOnConflict;
-                                            Sqlite3.importVtabErrMsg(this, pVtab);
+                                            Sqlite3.importVtabErrMsg(vdbe, pVtab);
                                             if (rc == SqlResult.SQLITE_OK && pOp.p1 != 0)
                                             {
                                                 Debug.Assert(nArg > 1 && apArg[0] != null && (apArg[0].flags & MemFlags.MEM_Null) != 0);
-                                                db.lastRowid = lastRowid = rowid;
+                                                db.lastRowid = cpu.lastRowid = rowid;
                                             }
                                             if (rc == SqlResult.SQLITE_CONSTRAINT && pOp.p4.pVtab.bConstraint != 0)
                                             {
@@ -427,12 +450,12 @@ namespace Community.CsharpSqlite.Engine.Op
                                                 }
                                                 else
                                                 {
-                                                    this.errorAction = ((OnConstraintError)pOp.p5).Filter(OnConstraintError.OE_Replace, OnConstraintError.OE_Abort);
+                                                    vdbe.errorAction = ((OnConstraintError)pOp.p5).Filter(OnConstraintError.OE_Replace, OnConstraintError.OE_Abort);
                                                 }
                                             }
                                             else
                                             {
-                                                this.nChange++;
+                                                vdbe.nChange++;
                                             }
                                         }
                                         break;

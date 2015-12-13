@@ -403,7 +403,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
 #endif
                 {
                     db.callStackDepth++;
-                    rc = (SqlResult)p.sqlite3VdbeExec();
+                    rc = (SqlResult)p.Exec();
                     db.callStackDepth--;
                 }
 #if !SQLITE_OMIT_TRACE
