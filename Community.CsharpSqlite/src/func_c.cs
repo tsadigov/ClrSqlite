@@ -13,7 +13,6 @@ namespace Community.CsharpSqlite.Metadata {
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
-    using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Metadata.Traverse;
     using Compiler.CodeGeneration;
@@ -1655,7 +1654,7 @@ sqlite3_result_text(context, "?000", 4, Sqlite3.SQLITE_STATIC);
                 {
                     zProc = "";
                 }
-                if (zFile != null && Sqlite3.sqlite3_load_extension(db, zFile, zProc, ref zErrMsg) != 0)
+                if (zFile != null && Sqlite3ExtensionModule.sqlite3_load_extension(db, zFile, zProc, ref zErrMsg) != 0)
                 {
                     context.sqlite3_result_error(zErrMsg, -1);
                     db.sqlite3DbFree(ref zErrMsg);
@@ -2209,7 +2208,7 @@ FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
                 {
                     FuncDefTraverse.sqlite3FuncDefInsert(pHash, aFunc[i]);
                 }
-                Sqlite3.DateUtils.sqlite3RegisterDateTimeFunctions();
+                DateUtils.sqlite3RegisterDateTimeFunctions();
 #if !SQLITE_OMIT_ALTERTABLE
                 alter.RegisterPredefinedFunctions();
 #endif

@@ -19,7 +19,6 @@ namespace Community.CsharpSqlite.Paging
     using System.Diagnostics;
     using codec_ctx = crypto.codec_ctx;
     using Community.CsharpSqlite.Os;
-    using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Utils;
     using Cache;
 

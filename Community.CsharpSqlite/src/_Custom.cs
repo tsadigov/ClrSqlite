@@ -29,8 +29,6 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Paging;
     using Utils;
-    public partial class Sqlite3
-    {
 
         public partial class _Custom
         {
@@ -564,7 +562,7 @@ namespace Community.CsharpSqlite
                 }
                 else
                 {
-                    type = sqlite3_value_numeric_type(argv[0]);
+                    type = Sqlite3.sqlite3_value_numeric_type(argv[0]);
                     if (p != null && type != FoundationalType.SQLITE_NULL)
                     {
                         p.cnt++;
@@ -965,5 +963,5 @@ static void LeaveCriticalSection( Object mtx )
 
             public static SQLite3UpperToLower UpperToLower = _Custom.sqlite3UpperToLower;
         }
-    }
+    
 }

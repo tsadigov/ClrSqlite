@@ -11,7 +11,6 @@ namespace Community.CsharpSqlite.Os
 	using LONGDOUBLE_TYPE = System.Double;
 	using sqlite_u3264 = System.UInt64;
 	using va_list = System.Object;
-    using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Utils;
 

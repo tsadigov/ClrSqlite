@@ -10,7 +10,6 @@ using i16 = System.Int16;
 
 namespace Community.CsharpSqlite.Metadata.Traverse
 {
-    using _Custom = Sqlite3._Custom;
 
     public static class FuncDefTraverse
     {

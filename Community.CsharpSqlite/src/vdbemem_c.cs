@@ -10,282 +10,15 @@ namespace Community.CsharpSqlite.Engine
 {
     using sqlite3_value = Engine.Mem;
     using System.Globalization;
-    using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Utils;
 
-    public static class MemExtensions {
-        ///<summary>
-        ///Return true if the Mem object contains a TEXT or BLOB that is            
-        ///too large - whose size exceeds p.db.aLimit[SQLITE_LIMIT_LENGTH].
+   
 
-        public static bool sqlite3VdbeMemTooBig(this Mem p)
-        {
-            //Debug.Assert( p.db != null );
-            if ((p.flags & (MemFlags.MEM_Str | MemFlags.MEM_Blob)) != 0)
-            {
-                int n = p.n;
-                if ((p.flags & MemFlags.MEM_Zero) != 0)
-                {
-                    n += p.u.nZero;
-                }
-                return n > p.db.aLimit[Globals.SQLITE_LIMIT_LENGTH];
-            }
-            return false;
-        }
-
-        ///<summary>
-        /// Change the value of a Mem to be a string or a BLOB.
-        ///
-        /// The memory management strategy depends on the value of the xDel
-        /// parameter. If the value passed is SQLITE_TRANSIENT, then the
-        /// string is copied into a (possibly existing) buffer managed by the
-        /// Mem structure. Otherwise, any existing buffer is freed and the
-        /// pointer copied.
-        ///
-        /// If the string is too large (if it exceeds the SQLITE_LIMIT_LENGTH
-        /// size limit) then no memory allocation occurs.  If the string can be
-        /// stored without allocating memory, then it is.  If a memory allocation
-        /// is required to store the string, then value of pMem is unchanged.  In
-        /// either case, SQLITE_TOOBIG is returned.
-        ///
-        ///</summary>
-        public static SqlResult sqlite3VdbeMemSetBlob(this Mem pMem,///
-            ///Memory cell to set to string value 
-        byte[] zBlob,///
-            ///Blob pointer 
-        int n,///
-            ///Bytes in Blob 
-        SqliteEncoding enc,///
-            ///0 for BLOBs 
-        dxDel xDel///
-            ///Destructor function 
-        )
-        {
-            return pMem.sqlite3VdbeMemSetBlob( zBlob, 0, n >= 0 ? n : zBlob.Length, enc, xDel);
-        }
-        // Call w/o offset
-        public static SqlResult sqlite3VdbeMemSetBlob(this Mem pMem,///
-            ///Memory cell to set to string value 
-        byte[] zBlob,///
-            ///Blob pointer 
-        int offset,///
-            ///offset into string 
-        int n,///
-            ///Bytes in string, or negative 
-        SqliteEncoding enc,///
-            ///</summary>
-        dxDel xDel//)(void*)/* Destructor function */
-        )
-        {
-            int nByte = n;
-            ///New value for pMem>n
-            int iLimit;
-            ///
-            ///<summary>
-            ///Maximum allowed string or blob size 
-            ///</summary>
-            Debug.Assert(pMem.db == null || pMem.db.mutex.sqlite3_mutex_held());
-            Debug.Assert((pMem.flags & MemFlags.MEM_RowSet) == 0);
-            ///
-            ///<summary>
-            ///If zBlob is a NULL pointer, set pMem to contain an SQL NULL. 
-            ///</summary>
-            if (zBlob == null || zBlob.Length < offset)
-            {
-                pMem.sqlite3VdbeMemSetNull();
-                return SqlResult.SQLITE_OK;
-            }
-            if (pMem.db != null)
-            {
-                iLimit = pMem.db.aLimit[Globals.SQLITE_LIMIT_LENGTH];
-            }
-            else
-            {
-                iLimit = Limits.SQLITE_MAX_LENGTH;
-            }
-            if (nByte < 0)
-            {
-                Debug.Assert(enc != 0);
-                if (enc == SqliteEncoding.UTF8)
-                {
-                    for (nByte = 0; nByte <= iLimit && nByte < zBlob.Length - offset && zBlob[offset + nByte] != 0; nByte++)
-                    {
-                    }
-                }
-                else
-                {
-                    for (nByte = 0; nByte <= iLimit && zBlob[nByte + offset] != 0 || zBlob[offset + nByte + 1] != 0; nByte += 2)
-                    {
-                    }
-                }
-            }
-            ///
-            ///<summary>
-            ///The following block sets the new values of Mem.z and Mem.xDel. It
-            ///also sets a flag in local variable "flags" to indicate the memory
-            ///management (one of MEM.MEM_Dyn or MEM.MEM_Static).
-            ///
-            ///</summary>
-            Debug.Assert(enc == 0);
-            {
-                pMem.z = null;
-                pMem.zBLOB = malloc_cs.sqlite3Malloc(n);
-                Buffer.BlockCopy(zBlob, offset, pMem.zBLOB, 0, n);
-            }
-            pMem.n = nByte;
-            pMem.flags = MemFlags.MEM_Blob | MemFlags.MEM_Term;
-            pMem.enc = (enc == 0 ? SqliteEncoding.UTF8 : enc);
-            pMem.type = (enc == 0 ? FoundationalType.SQLITE_BLOB : FoundationalType.SQLITE_TEXT);
-            if (nByte > iLimit)
-            {
-                return SqlResult.SQLITE_TOOBIG;
-            }
-            return SqlResult.SQLITE_OK;
-        }
-
-
-#if !SQLITE_OMIT_FLOATING_POINT
-        ///<summary>
-        /// Delete any previous value and set the value stored in pMem to NULL.
-        ///</summary>
-        public static void sqlite3VdbeMemSetNull(this Mem pMem)
-        {
-            if ((pMem.flags & MemFlags.MEM_Frame) != 0)
-            {
-                VdbeFrame pFrame = pMem.u.pFrame;
-                pFrame.pParent = pFrame.v.pDelFrame;
-                pFrame.v.pDelFrame = pFrame;
-            }
-            if ((pMem.flags & MemFlags.MEM_RowSet) != 0)
-            {
-                pMem.u.pRowSet.sqlite3RowSetClear();
-            }
-            pMem.MemSetTypeFlag(MemFlags.MEM_Null);
-            malloc_cs.sqlite3_free(ref pMem.zBLOB);
-            pMem.z = null;
-            pMem.type = FoundationalType.SQLITE_NULL;
-        }
-#endif
-    }
-
-
-    ///
-    ///<summary>
-    ///CAPI3REF: Fundamental Datatypes
-    ///KEYWORDS: SQLITE_TEXT
-    ///
-    ///^(Every value in SQLite has one of five fundamental datatypes:
-    ///
-    ///<ul>
-    ///</summary>
-    ///<param name="<li> 64">bit signed integer</param>
-    ///<param name="<li> 64">bit IEEE floating point number</param>
-    ///<param name="<li> string"><li> string</param>
-    ///<param name="<li> BLOB"><li> BLOB</param>
-    ///<param name="<li> NULL"><li> NULL</param>
-    ///<param name="</ul>)^"></ul>)^</param>
-    ///<param name=""></param>
-    ///<param name="These constants are codes for each of those types.">These constants are codes for each of those types.</param>
-    ///<param name=""></param>
-    ///<param name="Note that the SQLITE_TEXT constant was also used in SQLite version 2">Note that the SQLITE_TEXT constant was also used in SQLite version 2</param>
-    ///<param name="for a completely different meaning.  Software that links against both">for a completely different meaning.  Software that links against both</param>
-    ///<param name="SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not">SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not</param>
-    ///<param name="SQLITE_TEXT.">SQLITE_TEXT.</param>
-    ///<param name=""></param>
-    //#define SQLITE_INTEGER  1
-    //#define SQLITE_FLOAT    2
-    //#define SQLITE_BLOB     4
-    //#define SQLITE_NULL     5
-    //#if SQLITE_TEXT
-    //# undef SQLITE_TEXT
-    //#else
-    //# define SQLITE_TEXT     3
-    //#endif
-    //#define SQLITE3_TEXT     3
-    public enum FoundationalType : byte
-    {
-        SQLITE_INTEGER = 1,
-        SQLITE_FLOAT = 2,
-        SQLITE_BLOB = 4,
-        SQLITE_NULL = 5,
-        SQLITE_TEXT = 3,
-        SQLITE3_TEXT = 3
-    };
-
-    ///<summary>
-    ///One or more of the following flags are set to indicate the validOK
-    ///representations of the value stored in the Mem struct.
-    ///
-    ///If the MEM.MEM_Null flag is set, then the value is an SQL NULL value.
-    ///No other flags may be set in this case.
-    ///
-    ///If the MEM.MEM_Str flag is set then Mem.z points at a string representation.
-    ///Usually this is encoded in the same unicode encoding as the main
-    ///database (see below for exceptions). If the MEM.MEM_Term flag is also
-    ///set, then the string is nul terminated. The MEM.MEM_Int and MEM.MEM_Real
-    ///flags may coexist with the MEM.MEM_Str flag.
-    ///
-    ///</summary>
-
-    [Flags]
-    public enum MemFlags : short
-    {
-        MEM_Null = 0x0001,
-
-        MEM_Str = 0x0002,
-
-        MEM_Int = 0x0004,
-
-        MEM_Real = 0x0008,
-
-        MEM_Blob = 0x0010,
-
-        MEM_RowSet = 0x0020,
-
-        MEM_Frame = 0x0040,
-
-        MEM_Invalid = 0x0080,
-
-        MEM_TypeMask = 0x00ff,
-
-        ///
-        ///<summary>
-        ///Whenever Mem contains a valid string or blob representation, one of
-        ///the following flags must be set to determine the memory management
-        ///policy for Mem.z.  The MEM_Term flag tells us whether or not the
-        ///string is \000 or \u0000 terminated
-        /////    
-        ///</summary>
-
-        //#define MEM_Term      0x0200   /* String rep is nul terminated */
-        //#define MEM_Dyn       0x0400   /* Need to call sqliteFree() on Mem.z */
-        //#define MEM_Static    0x0800   /* Mem.z points to a static string */
-        //#define MEM_Ephem     0x1000   /* Mem.z points to an ephemeral string */
-        //#define MEM_Agg       0x2000   /* Mem.z points to an agg function context */
-        //#define MEM_Zero      0x4000   /* Mem.i contains count of 0s appended to blob */
-        //#if SQLITE_OMIT_INCRBLOB
-        //  #undef MEM_Zero
-        //  #define MEM_Zero 0x0000
-        //#endif
-
-        MEM_Term = 0x0200,
-        MEM_Dyn = 0x0400,
-        MEM_Static = 0x0800,
-        MEM_Ephem = 0x1000,
-        MEM_Agg = 0x2000,
-
-#if !SQLITE_OMIT_INCRBLOB
-																																																const int MEM_Zero = 0x4000;  
-#else
-        MEM_Zero = 0x0000
-#endif
-        // TODO -- Convert back to inline for speed
-    }
-
+   
     
         public class vdbemem_cs
         {
@@ -360,70 +93,6 @@ Debug.Assert(rc==SQLITE_NOMEM || pMem.enc==desiredEnc);
 return rc;
 #endif
             }
-            ///<summary>
-            /// Make sure pMem.z points to a writable allocation of at least
-            /// n bytes.
-            ///
-            /// If the memory cell currently contains string or blob data
-            /// and the third argument passed to this function is true, the
-            /// current content of the cell is preserved. Otherwise, it may
-            /// be discarded.
-            ///
-            /// This function sets the MEM.MEM_Dyn flag and clears any xDel callback.
-            /// It also clears MEM.MEM_Ephem and MEM.MEM_Static. If the preserve flag is
-            /// not set, Mem.n is zeroed.
-            ///
-            ///</summary>
-            public static SqlResult sqlite3VdbeMemGrow(Mem pMem, int n, int preserve)
-            {
-                // TODO -- What do we want to do about this routine?
-                //Debug.Assert( 1 >=
-                //  ((pMem.zMalloc !=null )? 1 : 0) + //&& pMem.zMalloc==pMem.z) ? 1 : 0) +
-                //  (((pMem.flags & MEM.MEM_Dyn)!=0 && pMem.xDel!=null) ? 1 : 0) +
-                //  ((pMem.flags & MEM.MEM_Ephem)!=0 ? 1 : 0) +
-                //  ((pMem.flags & MEM.MEM_Static)!=0 ? 1 : 0)
-                //);
-                //assert( (pMem->flags&MEM.MEM_RowSet)==0 );
-                //if( n<32 ) n = 32;
-                //if( sqlite3DbMallocSize(pMem->db, pMem.zMalloc)<n ){
-                if (preserve != 0)
-                {
-                    //& pMem.z==pMem.zMalloc ){
-                    if (pMem.z == null)
-                        pMem.z = "";
-                    //      sqlite3DbReallocOrFree( pMem.db, pMem.z, n );
-                    else
-                        if (n < pMem.z.Length)
-                            pMem.z = pMem.z.Substring(0, n);
-                    preserve = 0;
-                }
-                else
-                {
-                    //  sqlite3DbFree(pMem->db,ref pMem.zMalloc);
-                    pMem.z = "";
-                    //   sqlite3DbMallocRaw( pMem.db, n );
-                }
-                //}
-                //  if( pMem->z && preserve && pMem->zMalloc && pMem->z!=pMem->zMalloc ){
-                // memcpy(pMem.zMalloc, pMem.z, pMem.n);
-                //}
-                if ((pMem.flags & MemFlags.MEM_Dyn) != 0 && pMem.xDel != null)
-                {
-                    pMem.xDel(ref pMem.z);
-                }
-                // TODO --pMem.z = pMem.zMalloc;
-                if (pMem.z == null)
-                {
-                    pMem.flags = MemFlags.MEM_Null;
-                }
-                else
-                {
-                    pMem.flags = (pMem.flags & ~(MemFlags.MEM_Ephem | MemFlags.MEM_Static));
-                }
-                pMem.xDel = null;
-                return pMem.z != null ? SqlResult.SQLITE_OK : SqlResult.SQLITE_NOMEM;
-            }
-            ///
             
             ///<summary>
             /// If the given Mem* has a zero-filled tail, turn it into an ordinary
@@ -519,7 +188,7 @@ return SqlResult.SQLITE_OK;
                 Debug.Assert((fg & (MemFlags.MEM_Int | MemFlags.MEM_Real)) != 0);
                 Debug.Assert((pMem.flags & MemFlags.MEM_RowSet) == 0);
                 //assert( EIGHT_BYTE_ALIGNMENT(pMem) );
-                if (sqlite3VdbeMemGrow(pMem, nByte, 0) != 0)
+                if (pMem.Grow(nByte, 0) != 0)
                 {
                     return SqlResult.SQLITE_NOMEM;
                 }
@@ -992,7 +661,7 @@ return r;
                     pMem.flags = MemFlags.MEM_Blob | MemFlags.MEM_Ephem;
                 }
                 else
-                    if (SqlResult.SQLITE_OK == (rc = sqlite3VdbeMemGrow(pMem, amt + 2, 0)))
+                    if (SqlResult.SQLITE_OK == (rc = pMem.Grow( amt + 2, 0)))
                     {
                         pMem.enc = 0;
                         pMem.type = FoundationalType.SQLITE_BLOB;

@@ -16,16 +16,15 @@ namespace Community
     using Metadata;
 	using System.Globalization;
     using System.Collections.Generic;
-    using _Custom=Sqlite3._Custom;
     using Parse = Sqlite3.Parse;
     using Community.CsharpSqlite.Os;
 
     public static partial class StringExtensions
 	{
 
-		private static Sqlite3._Custom.SQLite3UpperToLower UpperToLower {
+		private static _Custom.SQLite3UpperToLower UpperToLower {
 			get {
-				return Sqlite3._Custom.UpperToLower;
+				return _Custom.UpperToLower;
 			}
 		}
 
@@ -438,12 +437,12 @@ dummy += (uint)x;
                 db.errCode = err_code;
                 if (zFormat != null)
                 {
-                    lock (Sqlite3._Custom.lock_va_list)
+                    lock (_Custom.lock_va_list)
                     {
                         string z;
-                        Sqlite3._Custom.va_start(ap, zFormat);
+                        _Custom.va_start(ap, zFormat);
                         z = io.sqlite3VMPrintf(db, zFormat, ap);
-                        Sqlite3._Custom.va_end(ref ap);
+                        _Custom.va_end(ref ap);
                         Engine.vdbemem_cs.sqlite3ValueSetStr(db.pErr, -1, z, SqliteEncoding.UTF8, (dxDel)sqliteinth.SQLITE_DYNAMIC);
                     }
                 }

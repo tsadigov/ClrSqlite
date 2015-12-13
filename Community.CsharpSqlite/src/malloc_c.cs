@@ -8,7 +8,6 @@ namespace Community.CsharpSqlite
 	using sqlite3_uint64 = System.UInt64;
 	using u32 = System.UInt32;
 	using System;
-    using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.tree;

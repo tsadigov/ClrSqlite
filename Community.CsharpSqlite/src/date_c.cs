@@ -14,14 +14,15 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Metadata.Traverse;
+    
 
-    #if !SQLITE_OMIT_DATETIME_FUNCS
-		///<summary>
-		/// A structure for holding a single date and time.
-		///
-		///</summary>
-		//typedef struct DateTime DateTime;
-		public class DateTime
+#if !SQLITE_OMIT_DATETIME_FUNCS
+    ///<summary>
+    /// A structure for holding a single date and time.
+    ///
+    ///</summary>
+    //typedef struct DateTime DateTime;
+    public class DateTime
 		{
 			public sqlite3_int64 iJD;
 
@@ -101,74 +102,73 @@ namespace Community.CsharpSqlite
 			}
 		};
 #endif
-	public partial class Sqlite3
-	{
-		///<summary>
-		/// 2003 October 31
-		///
-		/// The author disclaims copyright to this source code.  In place of
-		/// a legal notice, here is a blessing:
-		///
-		///    May you do good and not evil.
-		///    May you find forgiveness for yourself and forgive others.
-		///    May you share freely, never taking more than you give.
-		///
-		///
-		/// This file contains the C functions that implement date and time
-		/// functions for SQLite.
-		///
-		/// There is only one exported symbol in this file - the function
-		/// sqlite3RegisterDateTimeFunctions() found at the bottom of the file.
-		/// All other code has file scope.
-		///
-		/// SQLite processes all times and dates as Julian Day numbers.  The
-		/// dates and times are stored as the number of days since noon
-		/// in Greenwich on November 24, 4714 B.C. according to the Gregorian
-		/// calendar system.
-		///
-		/// 1970-01-01 00:00:00 is JD 2440587.5
-		/// 2000-01-01 00:00:00 is JD 2451544.5
-		///
-		/// This implemention requires years to be expressed as a 4-digit number
-		/// which means that only dates between 0000-01-01 and 9999-12-31 can
-		/// be represented, even though julian day numbers allow a much wider
-		/// range of dates.
-		///
-		/// The Gregorian calendar system is used for all dates and times,
-		/// even those that predate the Gregorian calendar.  Historians usually
-		/// use the Julian calendar for dates prior to 1582-10-15 and for some
-		/// dates afterwards, depending on locale.  Beware of this difference.
-		///
-		/// The conversion algorithms are implemented based on descriptions
-		/// in the following text:
-		///
-		///      Jean Meeus
-		///      Astronomical Algorithms, 2nd Edition, 1998
-		///      ISBM 0-943396-61-1
-		///      Willmann-Bell, Inc
-		///      Richmond, Virginia (USA)
-		///
-		///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-		///  C#-SQLite is an independent reimplementation of the SQLite software library
-		///
-		///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-		///
-		///
-		///
-		///</summary>
-		//#include "sqliteInt.h"
-		//#include <stdlib.h>
-		//#include <assert.h>
-		//#include <time.h>
-		#if !SQLITE_OMIT_DATETIME_FUNCS
-		
-		// Temporary String for use in this module
-		static StringBuilder zdtTemp = new StringBuilder (100);
 
-		static StringBuilder zdtBuf = new StringBuilder (100);
+
+    namespace Utils
+    {
+
+        ///<summary>
+        /// 2003 October 31
+        ///
+        /// The author disclaims copyright to this source code.  In place of
+        /// a legal notice, here is a blessing:
+        ///
+        ///    May you do good and not evil.
+        ///    May you find forgiveness for yourself and forgive others.
+        ///    May you share freely, never taking more than you give.
+        ///
+        ///
+        /// This file contains the C functions that implement date and time
+        /// functions for SQLite.
+        ///
+        /// There is only one exported symbol in this file - the function
+        /// sqlite3RegisterDateTimeFunctions() found at the bottom of the file.
+        /// All other code has file scope.
+        ///
+        /// SQLite processes all times and dates as Julian Day numbers.  The
+        /// dates and times are stored as the number of days since noon
+        /// in Greenwich on November 24, 4714 B.C. according to the Gregorian
+        /// calendar system.
+        ///
+        /// 1970-01-01 00:00:00 is JD 2440587.5
+        /// 2000-01-01 00:00:00 is JD 2451544.5
+        ///
+        /// This implemention requires years to be expressed as a 4-digit number
+        /// which means that only dates between 0000-01-01 and 9999-12-31 can
+        /// be represented, even though julian day numbers allow a much wider
+        /// range of dates.
+        ///
+        /// The Gregorian calendar system is used for all dates and times,
+        /// even those that predate the Gregorian calendar.  Historians usually
+        /// use the Julian calendar for dates prior to 1582-10-15 and for some
+        /// dates afterwards, depending on locale.  Beware of this difference.
+        ///
+        /// The conversion algorithms are implemented based on descriptions
+        /// in the following text:
+        ///
+        ///      Jean Meeus
+        ///      Astronomical Algorithms, 2nd Edition, 1998
+        ///      ISBM 0-943396-61-1
+        ///      Willmann-Bell, Inc
+        ///      Richmond, Virginia (USA)
+        ///
+        ///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+        ///  C#-SQLite is an independent reimplementation of the SQLite software library
+        ///
+        ///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+        ///
+        ///
+        ///
+        ///</summary>
+        //#include "sqliteInt.h"
+        //#include <stdlib.h>
+        //#include <assert.h>
+        //#include <time.h>
+
 
         public class DateUtils
         {
+#if !SQLITE_OMIT_DATETIME_FUNCS
 
             ///<summary>
             /// Convert zDate into one or more integers.  Additional arguments
@@ -238,8 +238,8 @@ namespace Community.CsharpSqlite
                 pVal = val;
                 zIndex++;
                 cnt++;
-            //} while ( nextC != 0 && zIndex < zDate.Length );
-            end_getDigits:
+                //} while ( nextC != 0 && zIndex < zDate.Length );
+                end_getDigits:
                 //_Custom.va_end( ap );
                 return cnt;
             }
@@ -279,20 +279,20 @@ namespace Community.CsharpSqlite
                 }
                 else
                     if (c == '+')
-                    {
-                        sgn = +1;
-                    }
-                    else
+                {
+                    sgn = +1;
+                }
+                else
                         if (c == 'Z' || c == 'z')
-                        {
-                            zDate = zDate.Substring(1).Trim();
-                            //zDate++;
-                            goto zulu_time;
-                        }
-                        else
-                        {
-                            return c != '\0' ? 1 : 0;
-                        }
+                {
+                    zDate = zDate.Substring(1).Trim();
+                    //zDate++;
+                    goto zulu_time;
+                }
+                else
+                {
+                    return c != '\0' ? 1 : 0;
+                }
                 //zDate++;
                 if (getDigits(zDate.Substring(1), 2, 0, 14, ':', ref nHr, 2, 0, 59, '\0', ref nMn) != 2)
                 {
@@ -304,9 +304,9 @@ namespace Community.CsharpSqlite
                     zDate = "";
                 else
                     if (zDate.Length > 6)
-                        zDate = zDate.Substring(6).Trim();
-            // while ( CharExtensions.sqlite3Isspace( *(u8)zDate ) ) { zDate++; }
-            zulu_time:
+                    zDate = zDate.Substring(6).Trim();
+                // while ( CharExtensions.sqlite3Isspace( *(u8)zDate ) ) { zDate++; }
+                zulu_time:
                 return zDate != "" ? 1 : 0;
             }
 
@@ -475,13 +475,13 @@ namespace Community.CsharpSqlite
                 }
                 else
                     if (zIndex >= zDate.Length)// zDate[zIndex] == '\0')
-                    {
-                        p.validHMS = 0;
-                    }
-                    else
-                    {
-                        return 1;
-                    }
+                {
+                    p.validHMS = 0;
+                }
+                else
+                {
+                    return 1;
+                }
                 p.validJD = 0;
                 p.validYMD = 1;
                 p.Y = neg ? -Y : Y;
@@ -531,22 +531,22 @@ namespace Community.CsharpSqlite
                 }
                 else
                     if (parseHhMmSs(zDate, p) == 0)
-                    {
-                        return 0;
-                    }
-                    else
+                {
+                    return 0;
+                }
+                else
                         if (zDate.Equals("now", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            setDateTimeToCurrent(context, p);
-                            return 0;
-                        }
-                        else
+                {
+                    setDateTimeToCurrent(context, p);
+                    return 0;
+                }
+                else
                             if (Converter.sqlite3AtoF(zDate, ref r, StringExtensions.sqlite3Strlen30(zDate), SqliteEncoding.UTF8))
-                            {
-                                p.iJD = (sqlite3_int64)(r * 86400000.0 + 0.5);
-                                p.validJD = 1;
-                                return 0;
-                            }
+                {
+                    p.iJD = (sqlite3_int64)(r * 86400000.0 + 0.5);
+                    p.validJD = 1;
+                    return 0;
+                }
                 return 1;
             }
 
@@ -660,7 +660,7 @@ namespace Community.CsharpSqlite
                 int rc;
 #if (!(HAVE_LOCALTIME_R) || !HAVE_LOCALTIME_R) && (!(HAVE_LOCALTIME_S) || !HAVE_LOCALTIME_S)
                 _Custom.tm pX;
-                sqlite3_mutex mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_MASTER);
+                sqlite3_mutex mutex = Sqlite3.sqlite3MutexAlloc(Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
                 mutex.sqlite3_mutex_enter();
                 pX = _Custom.localtime(t);
 #if !SQLITE_OMIT_BUILTIN_TEST
@@ -695,19 +695,19 @@ namespace Community.CsharpSqlite
             /// is undefined in this case.
             ///</summary>
             static sqlite3_int64 localtimeOffset(DateTime p, ///
-                ///<summary>
-                ///Date at which to calculate offset 
-                ///</summary>
+                                                             ///<summary>
+                                                             ///Date at which to calculate offset 
+                                                             ///</summary>
 
             sqlite3_context pCtx, ///
-                ///<summary>
-                ///Write error here if one occurs 
-                ///</summary>
+                                  ///<summary>
+                                  ///Write error here if one occurs 
+                                  ///</summary>
 
             out SqlResult pRc///
-                ///<summary>
-                ///OUT: Error code. SqlResult.SQLITE_OK or ERROR 
-                ///</summary>
+                             ///<summary>
+                             ///OUT: Error code. SqlResult.SQLITE_OK or ERROR 
+                             ///</summary>
 
             )
             {
@@ -849,17 +849,17 @@ namespace Community.CsharpSqlite
 #if !SQLITE_OMIT_LOCALTIME
                             else
                                 if (z.ToString() == "utc")
+                            {
+                                long c1;
+                                computeJD(p);
+                                c1 = localtimeOffset(p, pCtx, out rc);
+                                if (rc == SqlResult.SQLITE_OK)
                                 {
-                                    long c1;
-                                    computeJD(p);
-                                    c1 = localtimeOffset(p, pCtx, out rc);
-                                    if (rc == SqlResult.SQLITE_OK)
-                                    {
-                                        p.iJD -= c1;
-                                        clearYMD_HMS_TZ(p);
-                                        p.iJD += c1 - localtimeOffset(p, pCtx, out rc);
-                                    }
+                                    p.iJD -= c1;
+                                    clearYMD_HMS_TZ(p);
+                                    p.iJD += c1 - localtimeOffset(p, pCtx, out rc);
                                 }
+                            }
 #endif
                             break;
                         }
@@ -920,17 +920,17 @@ namespace Community.CsharpSqlite
                             }
                             else
                                 if (z.ToString() == "year")
-                                {
-                                    computeYMD(p);
-                                    p.M = 1;
-                                    p.D = 1;
-                                    rc = 0;
-                                }
-                                else
+                            {
+                                computeYMD(p);
+                                p.M = 1;
+                                p.D = 1;
+                                rc = 0;
+                            }
+                            else
                                     if (z.ToString() == "day")
-                                    {
-                                        rc = 0;
-                                    }
+                            {
+                                rc = 0;
+                            }
                             break;
                         }
                     case '+':
@@ -1012,53 +1012,53 @@ namespace Community.CsharpSqlite
                             }
                             else
                                 if (n == 4 && z.ToString() == "hour")
-                                {
-                                    p.iJD += (long)(r * (86400000.0 / 24.0) + rRounder);
-                                }
-                                else
+                            {
+                                p.iJD += (long)(r * (86400000.0 / 24.0) + rRounder);
+                            }
+                            else
                                     if (n == 6 && z.ToString() == "minute")
-                                    {
-                                        p.iJD += (long)(r * (86400000.0 / (24.0 * 60.0)) + rRounder);
-                                    }
-                                    else
+                            {
+                                p.iJD += (long)(r * (86400000.0 / (24.0 * 60.0)) + rRounder);
+                            }
+                            else
                                         if (n == 6 && z.ToString() == "second")
-                                        {
-                                            p.iJD += (long)(r * (86400000.0 / (24.0 * 60.0 * 60.0)) + rRounder);
-                                        }
-                                        else
+                            {
+                                p.iJD += (long)(r * (86400000.0 / (24.0 * 60.0 * 60.0)) + rRounder);
+                            }
+                            else
                                             if (n == 5 && z.ToString() == "month")
-                                            {
-                                                int x, y;
-                                                computeYMD_HMS(p);
-                                                p.M += (int)r;
-                                                x = p.M > 0 ? (p.M - 1) / 12 : (p.M - 12) / 12;
-                                                p.Y += x;
-                                                p.M -= x * 12;
-                                                p.validJD = 0;
-                                                computeJD(p);
-                                                y = (int)r;
-                                                if (y != r)
-                                                {
-                                                    p.iJD += (long)((r - y) * 30.0 * 86400000.0 + rRounder);
-                                                }
-                                            }
-                                            else
+                            {
+                                int x, y;
+                                computeYMD_HMS(p);
+                                p.M += (int)r;
+                                x = p.M > 0 ? (p.M - 1) / 12 : (p.M - 12) / 12;
+                                p.Y += x;
+                                p.M -= x * 12;
+                                p.validJD = 0;
+                                computeJD(p);
+                                y = (int)r;
+                                if (y != r)
+                                {
+                                    p.iJD += (long)((r - y) * 30.0 * 86400000.0 + rRounder);
+                                }
+                            }
+                            else
                                                 if (n == 4 && z.ToString() == "year")
-                                                {
-                                                    int y = (int)r;
-                                                    computeYMD_HMS(p);
-                                                    p.Y += y;
-                                                    p.validJD = 0;
-                                                    computeJD(p);
-                                                    if (y != r)
-                                                    {
-                                                        p.iJD += (sqlite3_int64)((r - y) * 365.0 * 86400000.0 + rRounder);
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    rc = (SqlResult)1;
-                                                }
+                            {
+                                int y = (int)r;
+                                computeYMD_HMS(p);
+                                p.Y += y;
+                                p.validJD = 0;
+                                computeJD(p);
+                                if (y != r)
+                                {
+                                    p.iJD += (sqlite3_int64)((r - y) * 365.0 * 86400000.0 + rRounder);
+                                }
+                            }
+                            else
+                            {
+                                rc = (SqlResult)1;
+                            }
                             clearYMD_HMS_TZ(p);
                             break;
                         }
@@ -1096,18 +1096,18 @@ namespace Community.CsharpSqlite
                 }
                 else
                     if ((eType = vdbeapi.sqlite3_value_type(argv[0])) == FoundationalType.SQLITE_FLOAT || eType == FoundationalType.SQLITE_INTEGER)
+                {
+                    p.iJD = (long)(vdbeapi.sqlite3_value_double(argv[0]) * 86400000.0 + 0.5);
+                    p.validJD = 1;
+                }
+                else
+                {
+                    z = vdbeapi.sqlite3_value_text(argv[0]);
+                    if (String.IsNullOrEmpty(z) || parseDateOrTime(context, z, ref p) != 0)
                     {
-                        p.iJD = (long)(vdbeapi.sqlite3_value_double(argv[0]) * 86400000.0 + 0.5);
-                        p.validJD = 1;
+                        return 1;
                     }
-                    else
-                    {
-                        z = vdbeapi.sqlite3_value_text(argv[0]);
-                        if (String.IsNullOrEmpty(z) || parseDateOrTime(context, z, ref p) != 0)
-                        {
-                            return 1;
-                        }
-                    }
+                }
                 for (i = 1; i < argc; i++)
                 {
                     z = vdbeapi.sqlite3_value_text(argv[i]);
@@ -1152,7 +1152,7 @@ namespace Community.CsharpSqlite
                     zdtBuf.Length = 0;
                     computeYMD_HMS(x);
                     io.sqlite3_snprintf(100, zdtBuf, "%04d-%02d-%02d %02d:%02d:%02d", x.Y, x.M, x.D, x.h, x.m, (int)(x.s));
-                    context.sqlite3_result_text(zdtBuf, -1, SQLITE_TRANSIENT);
+                    context.sqlite3_result_text(zdtBuf, -1, Sqlite3.SQLITE_TRANSIENT);
                 }
             }
 
@@ -1170,7 +1170,7 @@ namespace Community.CsharpSqlite
                     zdtBuf.Length = 0;
                     computeHMS(x);
                     io.sqlite3_snprintf(100, zdtBuf, "%02d:%02d:%02d", x.h, x.m, (int)x.s);
-                    context.sqlite3_result_text(zdtBuf, -1, SQLITE_TRANSIENT);
+                    context.sqlite3_result_text(zdtBuf, -1, Sqlite3.SQLITE_TRANSIENT);
                 }
             }
 
@@ -1188,7 +1188,7 @@ namespace Community.CsharpSqlite
                     StringBuilder zdtBuf = new StringBuilder(100);
                     computeYMD(x);
                     io.sqlite3_snprintf(100, zdtBuf, "%04d-%02d-%02d", x.Y, x.M, x.D);
-                    context.sqlite3_result_text(zdtBuf, -1, SQLITE_TRANSIENT);
+                    context.sqlite3_result_text(zdtBuf, -1, Sqlite3.SQLITE_TRANSIENT);
                 }
             }
 
@@ -1267,10 +1267,10 @@ namespace Community.CsharpSqlite
                                     break;
                                 default:
                                     return;
-                                ///
-                                ///<summary>
-                                ///ERROR.  return a NULL 
-                                ///</summary>
+                                    ///
+                                    ///<summary>
+                                    ///ERROR.  return a NULL 
+                                    ///</summary>
 
                             }
                             i++;
@@ -1286,20 +1286,20 @@ namespace Community.CsharpSqlite
                     }
                     else
                         if (n > (u64)db.aLimit[Globals.SQLITE_LIMIT_LENGTH])
-                        {
-                            context.sqlite3_result_error_toobig();
-                            return;
-                        }
-                        else
-                        {
-                            z = new StringBuilder((int)n);
-                            // sqlite3DbMallocRaw( db, n );
-                            //if ( z == 0 )
-                            //{
-                            //  sqlite3_result_error_nomem( context );
-                            //  return;
-                            //}
-                        }
+                    {
+                        context.sqlite3_result_error_toobig();
+                        return;
+                    }
+                    else
+                    {
+                        z = new StringBuilder((int)n);
+                        // sqlite3DbMallocRaw( db, n );
+                        //if ( z == 0 )
+                        //{
+                        //  sqlite3_result_error_nomem( context );
+                        //  return;
+                        //}
+                    }
                     computeJD(x);
                     computeYMD_HMS(x);
                     for (i = j = 0; i < zFmt.Length; i++)
@@ -1424,7 +1424,7 @@ namespace Community.CsharpSqlite
                         }
                     }
                     //z[j] = 0;
-                    context.sqlite3_result_text(z, -1, z == zdtBuf ? SQLITE_TRANSIENT : sqliteinth.SQLITE_DYNAMIC);
+                    context.sqlite3_result_text(z, -1, z == zdtBuf ? Sqlite3.SQLITE_TRANSIENT : sqliteinth.SQLITE_DYNAMIC);
                 }
             }
 
@@ -1467,12 +1467,11 @@ namespace Community.CsharpSqlite
                 datetimeFunc(context, 0, null);
             }
 
-
-
-
-
-
 #endif
+
+
+
+
 #if SQLITE_OMIT_DATETIME_FUNCS
 																																						/*
 ** If the library is compiled to omit the full-scale date and time
@@ -1531,13 +1530,13 @@ db = vdbeapi.sqlite3_context_db_handle(context);
                 FuncDef[] aDateTimeFuncs = new FuncDef[] {
 				#if !SQLITE_OMIT_DATETIME_FUNCS
 				FuncDef.FUNCTION ("julianday", -1, 0, 0, (dxFunc)juliandayFunc),
-				FuncDef.FUNCTION ("date", -1, 0, 0, (dxFunc)dateFunc),
-				FuncDef.FUNCTION ("time", -1, 0, 0, (dxFunc)timeFunc),
-				FuncDef.FUNCTION ("datetime", -1, 0, 0, (dxFunc)datetimeFunc),
-				FuncDef.FUNCTION ("strftime", -1, 0, 0, (dxFunc)strftimeFunc),
-				FuncDef.FUNCTION ("current_time", 0, 0, 0, (dxFunc)ctimeFunc),
-				FuncDef.FUNCTION ("current_timestamp", 0, 0, 0, (dxFunc)ctimestampFunc),
-				FuncDef.FUNCTION ("current_date", 0, 0, 0, (dxFunc)cdateFunc),
+                FuncDef.FUNCTION ("date", -1, 0, 0, (dxFunc)dateFunc),
+                FuncDef.FUNCTION ("time", -1, 0, 0, (dxFunc)timeFunc),
+                FuncDef.FUNCTION ("datetime", -1, 0, 0, (dxFunc)datetimeFunc),
+                FuncDef.FUNCTION ("strftime", -1, 0, 0, (dxFunc)strftimeFunc),
+                FuncDef.FUNCTION ("current_time", 0, 0, 0, (dxFunc)ctimeFunc),
+                FuncDef.FUNCTION ("current_timestamp", 0, 0, 0, (dxFunc)ctimestampFunc),
+                FuncDef.FUNCTION ("current_date", 0, 0, 0, (dxFunc)cdateFunc),
 			#else
 																																																									STR_FUNCTION("current_time",      0, "%H:%M:%S",          0, currentTimeFunc),
 STR_FUNCTION("current_date",      0, "%Y-%m-%d",          0, currentTimeFunc),
@@ -1549,7 +1548,7 @@ STR_FUNCTION("current_timestamp", 0, "%Y-%m-%d %H:%M:%S", 0, currentTimeFunc),
 																																																									FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
 FuncDef[] aFunc = (FuncDef)GLOBAL( FuncDef, aDateTimeFuncs );
 #else
-                FuncDefHash pHash = sqlite3GlobalFunctions;
+                FuncDefHash pHash = Sqlite3.sqlite3GlobalFunctions;
                 FuncDef[] aFunc = aDateTimeFuncs;
 #endif
                 for (i = 0; i < Sqlite3.ArraySize(aDateTimeFuncs); i++)
@@ -1558,6 +1557,33 @@ FuncDef[] aFunc = (FuncDef)GLOBAL( FuncDef, aDateTimeFuncs );
                 }
             }
 
+
+
+
+            // Temporary String for use in this module
+            static StringBuilder zdtTemp = new StringBuilder(100);
+
+            static StringBuilder zdtBuf = new StringBuilder(100);
+        }
+    }
+        public partial class Sqlite3
+	{
+
+#if !SQLITE_OMIT_DATETIME_FUNCS
+            
+
+        public class DateUtils
+        {
+
+            
+
+
+
+
+
+
+
+#endif
 
 
 

@@ -8,7 +8,7 @@ using u32=System.UInt32;
 using u64=System.UInt64;
 using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
-using _Custom=Community.CsharpSqlite.Sqlite3._Custom;
+
 
 namespace Community.CsharpSqlite
 {

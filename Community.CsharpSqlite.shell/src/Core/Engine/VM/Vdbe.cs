@@ -36,7 +36,6 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
-    using Metadata;
     using Vdbe=Engine.Vdbe;
     
 
@@ -2589,7 +2588,7 @@ start = sqlite3Hwtime();
                                         ///</summary>
                                         vdbemem_cs.sqlite3VdbeChangeEncoding(ctx.s, encoding);
                                         vdbemem_cs.sqlite3VdbeMemMove(pOut, ctx.s);
-                                        if (pOut.sqlite3VdbeMemTooBig())
+                                        if (pOut.IsTooBig())
                                         {
                                             goto too_big;
                                         }
@@ -4114,7 +4113,7 @@ start = sqlite3Hwtime();
                                             {
                                                 goto too_big;
                                             }
-                                            if (vdbemem_cs.sqlite3VdbeMemGrow(pOut, (int)n, 0) != 0)
+                                            if (pOut.Grow((int)n, 0) != 0)
                                             {
                                                 goto no_mem;
                                             }
@@ -4656,7 +4655,7 @@ start = sqlite3Hwtime();
 #if SQLITE_TEST
 																																																																																																																																				              UPDATE_MAX_BLOBSIZE( pMem );
 #endif
-                                        if (pMem.sqlite3VdbeMemTooBig())
+                                        if (pMem.IsTooBig())
                                         {
                                             goto too_big;
                                         }
@@ -4891,6 +4890,7 @@ malloc_cs.sqlite3SetString( ref p.zErrMsg, db, "database table is locked: ", z )
 break;
 }
 #endif
+
 #if !SQLITE_OMIT_VIRTUALTABLE
                                 ///
                                 ///<summary>
@@ -5132,7 +5132,7 @@ break;
                                         vdbemem_cs.sqlite3VdbeMemMove(pDest, sContext.s);
                                         Sqlite3.REGISTER_TRACE(this, pOp.p3, pDest);
                                         Sqlite3.UPDATE_MAX_BLOBSIZE(pDest);
-                                        if (pDest.sqlite3VdbeMemTooBig())
+                                        if (pDest.IsTooBig())
                                         {
                                             goto too_big;
                                         }

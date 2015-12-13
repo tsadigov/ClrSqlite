@@ -324,6 +324,11 @@
     <Compile Include="src\Compiler\Ast\Where.cs" />
     <Compile Include="src\Auth\AuthRelaed.cs" />
     <Compile Include="src\BackupExtensions.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\VirtualTable.cs" />
+    <Compile Include="src\Core\Engine\VM\FoundationType.cs" />
+    <Compile Include="src\Core\Engine\VM\Mem.cs" />
+    <Compile Include="src\Core\Engine\VM\MemExtensions.cs" />
+    <Compile Include="src\Core\Engine\VM\MemFlags.cs" />
     <Compile Include="src\Utils\BitvecExtensions.cs" />
     <Compile Include="src\BtCursor.cs" />
     <Compile Include="src\Core\Engine\BusyHandler.cs" />

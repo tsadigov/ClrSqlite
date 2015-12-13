@@ -15,7 +15,7 @@ namespace Community.CsharpSqlite.Paging
     using sqlite3_stmt = Engine.Vdbe;
     using sqlite3_value = Engine.Mem;
     using codec_ctx = crypto.codec_ctx;
-    using sqlite3_api_routines = Sqlite3.sqlite3_api_routines;
+    using sqlite3_api_routines = Sqlite3ExtensionModule.sqlite3_api_routines;
     using Community.CsharpSqlite.Ast;
     using Metadata;
     using Community.CsharpSqlite.Engine;

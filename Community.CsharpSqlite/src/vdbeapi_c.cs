@@ -623,7 +623,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
                     }
                     else
                     {
-                        vdbemem_cs.sqlite3VdbeMemGrow(pMem, nByte, 0);
+                        pMem.Grow(nByte, 0);
                         pMem.flags = MemFlags.MEM_Agg;
                         pMem.u.pDef = p.pFunc;
                         if (pMem.z != null)
@@ -1185,7 +1185,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                     if (zData != null)
                     {
                         pVar = p.aVar[i - 1];
-                        rc = pVar.sqlite3VdbeMemSetBlob(zData, nData, encoding, xDel);
+                        rc = pVar.MakeBlob(zData, nData, encoding, xDel);
                         if (rc == SqlResult.SQLITE_OK && encoding != 0)
                         {
                             rc = vdbemem_cs.sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));

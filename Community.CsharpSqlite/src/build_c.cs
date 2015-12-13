@@ -22,7 +22,7 @@ using yDbMask=System.Int32;
 namespace Community.CsharpSqlite
 {
     using Parse = Sqlite3.Parse;
-    using _Custom = Sqlite3._Custom;
+    
     using System.Linq;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.builder;

@@ -161,7 +161,7 @@ pOp.p1 = pOut.n;
                         //Debug.Assert(pOp.p1 >= 0 && pOp.p1 <= this.nVar);
                         Debug.Assert(pOp.p4.z == null || pOp.p4.z == vdbe.azVar[pOp.p1 - 1]);
                         pVar = vdbe.aVar[pOp.p1 - 1];
-                        if (pVar.sqlite3VdbeMemTooBig())
+                        if (pVar.IsTooBig())
                         {
                             return RuntimeException.too_big;
                         }

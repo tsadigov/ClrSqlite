@@ -15,7 +15,7 @@ namespace Community.CsharpSqlite
     using System.Text;
     using Metadata;
     using Community.CsharpSqlite.Os;
-    using _Custom = Sqlite3._Custom;
+    
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Utils;

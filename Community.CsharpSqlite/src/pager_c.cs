@@ -14,7 +14,6 @@ namespace Community.CsharpSqlite
     using DbPage = Cache.PgHdr;
     using PgHdr = Cache.PgHdr;
     using Community.CsharpSqlite.Os;
-    using _Custom = Sqlite3._Custom;
     using Utils;
     using Cache;
 

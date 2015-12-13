@@ -22,7 +22,6 @@ namespace Community.CsharpSqlite.Ast {
     using Parse = Sqlite3.Parse;
     using Metadata;
     using Engine;
-    using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Ast;
 
 		///<summary>

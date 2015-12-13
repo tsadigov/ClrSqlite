@@ -1558,7 +1558,7 @@ if( db ) sqlite3_interrupt(db);
 				exit (1);
 			}
 			#if !SQLITE_OMIT_LOAD_EXTENSION
-			Sqlite3.sqlite3_enable_load_extension (p.db, 1);
+			Sqlite3ExtensionModule.sqlite3_enable_load_extension (p.db, 1);
 			#endif
 		}
 	}
@@ -2126,7 +2126,7 @@ sqlite3IoTrace = iotracePrintf;
 														zFile = azArg [1].ToString ();
 														zProc = nArg >= 3 ? azArg [2].ToString () : null;
 														open_db (p);
-														rc = Sqlite3.sqlite3_load_extension (p.db, zFile, zProc, ref zErrMsg);
+														rc = Sqlite3ExtensionModule.sqlite3_load_extension (p.db, zFile, zProc, ref zErrMsg);
 														if (rc != SqlResult.SQLITE_OK) {
 															fprintf (stderr, "%s\n", zErrMsg);
 															//malloc_cs.sqlite3_free( ref zErrMsg );
@@ -2366,12 +2366,12 @@ sqlite3IoTrace = iotracePrintf;
 																									open_db (p);
 																									if (nArg == 1) {
 																										int Dummy0 = 0;
-																										rc = Sqlite3.sqlite3_get_table (p.db, "SELECT name FROM sqlite_master " + "WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%'" + "UNION ALL " + "SELECT name FROM sqlite_temp_master " + "WHERE type IN ('table','view') " + "ORDER BY 1", ref azResult, ref nRow, ref Dummy0, ref zErrMsg);
+																										rc = Sqlite3ExtensionModule.sqlite3_get_table (p.db, "SELECT name FROM sqlite_master " + "WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%'" + "UNION ALL " + "SELECT name FROM sqlite_temp_master " + "WHERE type IN ('table','view') " + "ORDER BY 1", ref azResult, ref nRow, ref Dummy0, ref zErrMsg);
 																									}
 																									else {
 																										zShellStatic = azArg [1].ToString ();
 																										int Dummy0 = 0;
-																										rc = Sqlite3.sqlite3_get_table (p.db, "SELECT name FROM sqlite_master " + "WHERE type IN ('table','view') AND name LIKE '%'||shellstatic()||'%' " + "UNION ALL " + "SELECT name FROM sqlite_temp_master " + "WHERE type IN ('table','view') AND name LIKE '%'||shellstatic()||'%' " + "ORDER BY 1", ref azResult, ref nRow, ref Dummy0, ref zErrMsg);
+																										rc = Sqlite3ExtensionModule.sqlite3_get_table (p.db, "SELECT name FROM sqlite_master " + "WHERE type IN ('table','view') AND name LIKE '%'||shellstatic()||'%' " + "UNION ALL " + "SELECT name FROM sqlite_temp_master " + "WHERE type IN ('table','view') AND name LIKE '%'||shellstatic()||'%' " + "ORDER BY 1", ref azResult, ref nRow, ref Dummy0, ref zErrMsg);
 																										zShellStatic = "";
 																									}
 																									if (zErrMsg != "") {

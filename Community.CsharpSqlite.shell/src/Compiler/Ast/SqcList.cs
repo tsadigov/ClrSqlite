@@ -743,7 +743,7 @@ namespace Community.CsharpSqlite.Ast
                             ///<summary>
                             ///</summary>
                             ///<param name="EV: R">08207 </param>
-                            c = Sqlite3._Custom.sqlite3UpperToLower[c];
+                            c = _Custom.sqlite3UpperToLower[c];
                         }
                         pStr2.u.zToken = pStr2.u.zToken.Substring(0, StringExtensions.sqlite3Strlen30(pStr2.u.zToken) - 1) + (char)(c + 1);
                         // pC = c + 1;

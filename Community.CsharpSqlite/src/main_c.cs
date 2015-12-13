@@ -335,7 +335,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 		public static SqlResult sqlite3_shutdown() {
 			if(sqliteinth.sqlite3GlobalConfig.isInit!=0) {
 				sqlite3_os_end();
-				sqlite3_reset_auto_extension();
+				Sqlite3ExtensionModule.sqlite3_reset_auto_extension();
 				sqliteinth.sqlite3GlobalConfig.isInit=0;
 			}
 			if(sqliteinth.sqlite3GlobalConfig.isPCacheInit!=0) {
@@ -1045,7 +1045,7 @@ break;
                 vdbemem_cs.sqlite3ValueFree(ref db.pErr);
 			}
 			#if !SQLITE_OMIT_LOAD_EXTENSION
-			sqlite3CloseExtensions(db);
+			Sqlite3ExtensionModule.sqlite3CloseExtensions(db);
 			#endif
             db.magic = Sqlite3.SQLITE_MAGIC_ERROR;
 			///
@@ -2658,7 +2658,7 @@ return z;
 
 			///Load automatic extensions - extensions that have been registered</param>
 			///using the sqlite3_automatic_extension() API.
-			sqlite3AutoLoadExtensions(connection);
+			Sqlite3ExtensionModule.sqlite3AutoLoadExtensions(connection);
 			rc=sqlite3_errcode(connection);
 			if(rc!=SqlResult.SQLITE_OK) {
 				goto opendb_out;

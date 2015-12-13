@@ -7,7 +7,6 @@ namespace Community.CsharpSqlite
 
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Ast;
-    using _Custom = Sqlite3._Custom;
     using Parse = Sqlite3.Parse;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;

@@ -7,7 +7,7 @@ using Community.CsharpSqlite.Utils;
 
 namespace Community.CsharpSqlite
 {
-	public partial class Sqlite3
+	public partial class Sqlite3ExtensionModule
 	{
 		///
 ///<summary>
@@ -565,7 +565,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 		/// to clean up loaded extensions
 		///
 		///</summary>
-		static void sqlite3CloseExtensions (Connection db)
+		public static void sqlite3CloseExtensions (Connection db)
 		{
 			int i;
 			Debug.Assert (db.mutex.sqlite3_mutex_held());
@@ -641,7 +641,7 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 		{
 			var rc = SqlResult.SQLITE_OK;
 			#if !SQLITE_OMIT_AUTOINIT
-			rc = sqlite3_initialize ();
+			rc = Sqlite3.sqlite3_initialize ();
 			if (rc != 0) {
 				return rc;
 			}
@@ -652,7 +652,7 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 				#if SQLITE_THREADSAFE
 																																																																																        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #else
-				sqlite3_mutex mutex = sqlite3MutexAlloc (SQLITE_MUTEX_STATIC_MASTER);
+				sqlite3_mutex mutex = Sqlite3.sqlite3MutexAlloc (Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
 				#endif
 				wsdAutoextInit ();
 				mutex.sqlite3_mutex_enter();
@@ -682,16 +682,16 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 		/// Reset the automatic extension loading mechanism.
 		///
 		///</summary>
-		static void sqlite3_reset_auto_extension ()
+		public static void sqlite3_reset_auto_extension ()
 		{
 			#if !SQLITE_OMIT_AUTOINIT
-			if (sqlite3_initialize () == SqlResult.SQLITE_OK)
+			if (Sqlite3.sqlite3_initialize () == SqlResult.SQLITE_OK)
 			#endif
 			 {
 				#if SQLITE_THREADSAFE
 																																																																																        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #else
-				sqlite3_mutex mutex = sqlite3MutexAlloc (SQLITE_MUTEX_STATIC_MASTER);
+				sqlite3_mutex mutex = Sqlite3.sqlite3MutexAlloc (Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
 				#endif
 				wsdAutoextInit ();
 				mutex.sqlite3_mutex_enter();
@@ -716,7 +716,7 @@ wsdAutoext.nExt = 0;
 ///
 ///</summary>
 
-		static void sqlite3AutoLoadExtensions (Connection db)
+		public static void sqlite3AutoLoadExtensions (Connection db)
 		{
 			int i;
 			bool go = true;
@@ -741,7 +741,7 @@ wsdAutoext.nExt = 0;
 				#if SQLITE_THREADSAFE
 																																																																																        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #else
-				sqlite3_mutex mutex = sqlite3MutexAlloc (SQLITE_MUTEX_STATIC_MASTER);
+				sqlite3_mutex mutex = Sqlite3.sqlite3MutexAlloc (Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
 				#endif
 				mutex.sqlite3_mutex_enter();
 				if (i >= wsdAutoext.nExt) {
