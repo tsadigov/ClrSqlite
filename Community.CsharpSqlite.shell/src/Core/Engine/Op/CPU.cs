@@ -12,6 +12,11 @@ namespace Community.CsharpSqlite.Engine
     {
         public SqlResult rc = SqlResult.SQLITE_OK;
         ///Value to return 
+        ///
+
+        ///<summary>
+        ///The database connection that owns this statement 
+        ///</summary>
         public Connection db ;
         ///The database 
         public u8 resetSchemaOnFault = 0;
@@ -32,7 +37,8 @@ namespace Community.CsharpSqlite.Engine
             get { return _opcodeIndex; }
             set {
                 _opcodeIndex = value;
-                Log.WriteLine("CPU:OpCodeIndex>>>"+value);
+                ShowDebugInfo();
+                //Log.WriteLine("CPU:OpCodeIndex>>>"+value);
             }
         }
 
@@ -51,10 +57,14 @@ namespace Community.CsharpSqlite.Engine
             set
             {
                 _currentOpCodeIndex = value;
-                Log.WriteLine("CPU:currentOpCodeIndex>>>" + value);
+                ShowDebugInfo();
+                    //Log.WriteLine("CPU:currentOpCodeIndex>>>" + value);
             }
         }
 
+        public virtual void ShowDebugInfo()
+        {
+        }
 
         public Vdbe vdbe;
         public OnConstraintError errorAction;

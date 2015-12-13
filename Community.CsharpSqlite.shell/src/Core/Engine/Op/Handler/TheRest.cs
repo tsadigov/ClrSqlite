@@ -510,6 +510,7 @@ namespace Community.CsharpSqlite.Engine.Op
                 case OpCode.OP_Column:
                     {
                         rc = OpCode_Column(vdbe,pOp, rc, db, encoding, aMem);
+                        
                         switch (rc) { }
                         break;
                     }
@@ -2538,7 +2539,7 @@ break;
             ///Return SQLITE_ROW
             ///
             ///</summary>
-            vdbe.currentOpCodeIndex = opcodeIndex + 1;
+            vdbe.currentOpCodeIndex = vdbe.opcodeIndex + 1;
             rc = SqlResult.SQLITE_ROW;
             return rc;
         }

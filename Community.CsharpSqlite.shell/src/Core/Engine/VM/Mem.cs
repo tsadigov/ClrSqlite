@@ -972,6 +972,11 @@ return SQLITE_NOMEM;
 
 #endif
 
+        public override string ToString()
+        {
+            return String.Format("{0}\t\t{1}\t\t{2}]\t\t{3} ",this.type,this.u,this.z,this.zBLOB);
+        }
+
     }
 
 }

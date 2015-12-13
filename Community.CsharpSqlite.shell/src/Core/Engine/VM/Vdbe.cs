@@ -1,16 +1,11 @@
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using FILE=System.IO.TextWriter;
 using i64=System.Int64;
 using u8=System.Byte;
 using u16=System.UInt16;
 using u32=System.UInt32;
-using u64=System.UInt64;
-using unsigned=System.UIntPtr;
-using Pgno=System.UInt32;
 using i32=System.Int32;
-using sqlite_int64=System.Int64;
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar=System.Int16;
 #else
@@ -33,24 +28,16 @@ namespace Community.CsharpSqlite
     using System.Text;
     using sqlite3_value = Engine.Mem;
     using System.Collections.Generic;
-    using Community.CsharpSqlite.Engine;
-    using Community.CsharpSqlite.Metadata;
-    using Community.CsharpSqlite.Os;
-    using Vdbe=Engine.Vdbe;
-    
-
-
-    
+    using Metadata;
+    using Os;
+    using tree;
+    using Utils;
 
     namespace Engine
     {
 
         using Operation = VdbeOp;
-        using Community.CsharpSqlite.tree;
-        using Community.CsharpSqlite.Paging;
-        using Community.CsharpSqlite.Utils;
-
-
+        
 
         public enum RuntimeException
         {
@@ -78,6 +65,25 @@ namespace Community.CsharpSqlite
         ///<param name=""></param>
         public class Vdbe : CPU, ILinkedListNode<Vdbe>
         {
+
+            public override void ShowDebugInfo() {
+                Console.Clear();
+                for (int i = 0; i < nOp; i++)
+                {
+                    var clr = Console.BackgroundColor;
+                    var fclr = Console.ForegroundColor;
+                    Console.BackgroundColor = i == this.currentOpCodeIndex ? ConsoleColor.DarkMagenta : ConsoleColor.Black;
+                    Console.ForegroundColor= i == this.opcodeIndex ? ConsoleColor.Red : ConsoleColor.White;
+                    Console.WriteLine("{0} : {1} ({2} {3} {4} {5})", i,lOp[i].OpCode, lOp[i].p1, lOp[i].p2, lOp[i].p3, lOp[i].p4);
+                    Console.BackgroundColor = clr;
+                    Console.ForegroundColor= fclr;
+                    
+                    
+                }
+
+                Console.WriteLine();
+                aMem.ForEach(m => Console.WriteLine(m));
+            }
             #region hehehe
 #if SQLITE_ENABLE_COLUMN_METADATA
 																																						const int COLNAME_N = 5;     /* Number of COLNAME_xxx symbols */
@@ -91,49 +97,52 @@ namespace Community.CsharpSqlite
             public Vdbe()
             {
             }
-            ///
-            ///<summary>
-            ///The database connection that owns this statement 
-            ///</summary>
-            public Connection db;
+            
             /** Space to hold the virtual machine's program */
             public Operation[] aOp;
-            ///
-            ///<summary>
-            ///The memory locations 
-            ///</summary>
-            public List<Operation> lOp = new List<Operation>();
-            public Mem[] aMem;
-            public Mem[] apArg;
-            ///
-            ///<summary>
-            ///Arguments to currently executing user function 
-            ///</summary>
-            public Mem[] aColName;
-            ///
-            ///<summary>
-            ///Column names to return 
-            ///</summary>
-            public Mem[] pResultSet;
-            ///
-            ///<summary>
-            ///Pointer to an array of results 
-            ///</summary>
-            public int nMem;
-            ///
-            ///<summary>
-            ///Number of memory locations currently allocated 
-            ///</summary>
-            public int nOp;
-            ///
             ///<summary>
             ///Number of instructions in the program 
             ///</summary>
-            public int nOpAlloc;
-            ///
+            public int nOp;
+
+            public List<Operation> lOp = new List<Operation>();
+
+            
+            ///<summary>
+            ///The memory locations 
+            ///</summary>
+            public Mem[] aMem;
+
+            ///<summary>
+            ///Number of memory locations currently allocated 
+            ///</summary>
+            public int nMem;
+
+
+            ///<summary>
+            ///Arguments to currently executing user function 
+            ///</summary>
+            public Mem[] apArg;
+
+
+            ///<summary>
+            ///Column names to return 
+            ///</summary>
+            public Mem[] aColName;
+
+
+            ///<summary>
+            ///Pointer to an array of results 
+            ///</summary>
+            public Mem[] pResultSet;
+
+
+            
             ///<summary>
             ///Number of slots allocated for aOp[] 
             ///</summary>
+            public int nOpAlloc;
+            
             public int nLabel;
             ///
             ///<summary>
@@ -2048,8 +2057,9 @@ int origPc;                  /* Program counter at start of opcode */
                     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------					///
 
                     #region MAIN CPU LOOP
-                    for (opcodeIndex = this.currentOpCodeIndex; rc == SqlResult.SQLITE_OK; opcodeIndex++)
+                    for (int localOpCodeIndex = this.currentOpCodeIndex; rc == SqlResult.SQLITE_OK;localOpCodeIndex=opcodeIndex, localOpCodeIndex++)
                     {
+                        opcodeIndex = localOpCodeIndex;
                         Debug.Assert(opcodeIndex >= 0 && opcodeIndex < this.nOp);
                         //      if ( db.mallocFailed != 0 ) goto no_mem;
 #if VDBE_PROFILE
@@ -2174,7 +2184,6 @@ start = sqlite3Hwtime();
                         CPU cpu = this;
                         cpu.vdbe = this;
                         cpu.errorAction = errorAction;
-                        cpu.opcodeIndex = opcodeIndex;
                         cpu.aMem = aMem;
                         cpu.db = db;
                         //before try the plugged handlers
@@ -2193,7 +2202,6 @@ start = sqlite3Hwtime();
                                 
                                 aMem = cpu.aMem;
                                 errorAction = cpu.errorAction;
-                                opcodeIndex = cpu.opcodeIndex;
                             }
                             if (RuntimeException.noop != exp)
                             {
