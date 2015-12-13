@@ -83,6 +83,7 @@ namespace Community.CsharpSqlite
 
                 Console.WriteLine();
                 aMem.ForEach(m => Console.WriteLine(m));
+                Console.ReadKey();
             }
             #region hehehe
 #if SQLITE_ENABLE_COLUMN_METADATA
