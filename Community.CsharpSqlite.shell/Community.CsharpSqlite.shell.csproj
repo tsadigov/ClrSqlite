@@ -172,10 +172,10 @@
       <Link>Community.CsharpSqlite\notify_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\opcodes_c.cs">
-      <Link>src\Engine\opcodes_c.cs</Link>
+      <Link>src\Core\Engine\Op\opcodes_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\opcodes_h.cs">
-      <Link>src\Engine\opcodes_h.cs</Link>
+      <Link>src\Core\Engine\Op\opcodes_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\os_c.cs">
       <Link>src\Os\os_c.cs</Link>
@@ -262,19 +262,19 @@
       <Link>src\Core\Interface\vdbeapi_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbeaux_c.cs">
-      <Link>src\Engine\vdbeaux_c.cs</Link>
+      <Link>src\Core\Engine\vdbeaux_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbeblob_c.cs">
       <Link>Community.CsharpSqlite\vdbeblob_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\VdbeInt_h.cs">
-      <Link>src\Engine\VdbeInt_h.cs</Link>
+      <Link>src\Core\Engine\VdbeInt_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbemem_c.cs">
-      <Link>src\Engine\vdbemem_c.cs</Link>
+      <Link>src\Core\Engine\vdbemem_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbetrace_c.cs">
-      <Link>src\Engine\vdbetrace_c.cs</Link>
+      <Link>src\Core\Engine\vdbetrace_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vdbe_c.cs">
       <Link>src\Core\Engine\vdbe_c.cs</Link>
@@ -324,7 +324,7 @@
     <Compile Include="src\Compiler\Ast\Where.cs" />
     <Compile Include="src\Auth\AuthRelaed.cs" />
     <Compile Include="src\BackupExtensions.cs" />
-    <Compile Include="src\BitvecExtensions.cs" />
+    <Compile Include="src\Utils\BitvecExtensions.cs" />
     <Compile Include="src\BtCursor.cs" />
     <Compile Include="src\Core\Engine\BusyHandler.cs" />
     <Compile Include="src\Core\Engine\Context.cs" />
@@ -335,25 +335,25 @@
     <Compile Include="src\Core\Engine\Lookaside.cs" />
     <Compile Include="src\Core\Engine\Metadata\VdbeFunc.cs" />
     <Compile Include="src\Core\Engine\Module.cs" />
-    <Compile Include="src\Core\Engine\Op\BTree.cs" />
-    <Compile Include="src\Core\Engine\Op\Cast.cs" />
-    <Compile Include="src\Core\Engine\Op\ControlFlow.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\BTree.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\Cast.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\ControlFlow.cs" />
     <Compile Include="src\Core\Engine\Op\CPU.cs" />
-    <Compile Include="src\Core\Engine\Op\Cursor.cs" />
-    <Compile Include="src\Core\Engine\Op\Idx.cs" />
-    <Compile Include="src\Core\Engine\Op\Logical.cs" />
-    <Compile Include="src\Core\Engine\Op\Math.cs" />
-    <Compile Include="src\Core\Engine\Op\Others.cs" />
-    <Compile Include="src\Core\Engine\Op\Schema.cs" />
-    <Compile Include="src\Core\Engine\Op\VdbeHelper.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\Cursor.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\Idx.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\Logical.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\Math.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\Others.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\Schema.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\VdbeHelper.cs" />
     <Compile Include="src\Core\Engine\P4Usage.cs" />
     <Compile Include="src\Core\Engine\Savepoint.cs" />
     <Compile Include="src\Core\Engine\SubProgram.cs" />
-    <Compile Include="src\Core\Engine\Vdbe.cs" />
-    <Compile Include="src\Core\Engine\VdbeFrame.cs" />
-    <Compile Include="src\Core\Engine\VdbeOp.cs" />
-    <Compile Include="src\Core\Engine\VdbeOpList.cs" />
-    <Compile Include="src\Engine\Core\SortOrder.cs" />
+    <Compile Include="src\Core\Engine\VM\Vdbe.cs" />
+    <Compile Include="src\Core\Engine\VM\VdbeFrame.cs" />
+    <Compile Include="src\Core\Engine\VM\VdbeOp.cs" />
+    <Compile Include="src\Core\Engine\VM\VdbeOpList.cs" />
+    <Compile Include="src\Core\Engine\SortOrder.cs" />
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
     <Compile Include="src\Backend\Paging\Delegates.cs" />
@@ -416,11 +416,7 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\Engine\Core\Engine\Metadata\" />
-    <Folder Include="src\Engine\Core\Engine\Op\" />
-    <Folder Include="src\Engine\Core\Engine\Utill\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

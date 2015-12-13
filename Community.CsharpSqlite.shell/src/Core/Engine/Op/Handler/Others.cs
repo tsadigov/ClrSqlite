@@ -630,10 +630,6 @@ namespace Community.CsharpSqlite.Engine.Op
                 ///<param name=""></param>
                 case OpCode.OP_ParseSchema:
                     {
-                        int iDb;
-                        string zMaster;
-                        string zSql;
-                        InitData initData;
                         ///
                         ///<summary>
                         ///Any prepared statement that invokes this opcode will hold mutexes
@@ -649,7 +645,7 @@ namespace Community.CsharpSqlite.Engine.Op
 #endif
 
                         var db = vdbe.db;
-                        iDb = pOp.p1;
+                        var iDb = pOp.p1;
                         Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
                         Debug.Assert(db.DbHasProperty(iDb, sqliteinth.DB_SchemaLoaded));
                         ///
@@ -657,12 +653,12 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///Used to be a conditional 
                         ///</summary>
                         {
-                            zMaster = sqliteinth.SCHEMA_TABLE(iDb);
-                            initData = new InitData();
+                            var zMaster = sqliteinth.SCHEMA_TABLE(iDb);
+                            var initData = new InitData();
                             initData.db = db;
                             initData.iDb = pOp.p1;
                             initData.pzErrMsg = vdbe.zErrMsg;
-                            zSql = Os.io.sqlite3MPrintf(db, "SELECT name, rootpage, sql FROM '%q'.%s WHERE %s ORDER BY rowid", db.Backends[iDb].Name, zMaster, pOp.p4.z);
+                            var zSql = Os.io.sqlite3MPrintf(db, "SELECT name, rootpage, sql FROM '%q'.%s WHERE %s ORDER BY rowid", db.Backends[iDb].Name, zMaster, pOp.p4.z);
                             if (String.IsNullOrEmpty(zSql))
                             {
                                 cpu.rc = SqlResult.SQLITE_NOMEM;
