@@ -8,7 +8,7 @@ namespace Community.CsharpSqlite
 {
     using Community.CsharpSqlite.Engine;
     using System.Diagnostics;
-
+    using Utils;
     public static class Extensions
     {
         public static Engine.VdbeFrame GetRoot(this Engine.VdbeFrame _this)

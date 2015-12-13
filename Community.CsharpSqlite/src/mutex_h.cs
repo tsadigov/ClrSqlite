@@ -139,7 +139,7 @@ namespace Community.CsharpSqlite
 		}
 
 		//#define sqlite3MutexAlloc(X)      ((sqlite3_mutex*)8)
-		static sqlite3_mutex sqlite3_mutex_alloc (int iType)
+		public static sqlite3_mutex sqlite3_mutex_alloc (int iType)
 		{
 			return new sqlite3_mutex ();
 		}

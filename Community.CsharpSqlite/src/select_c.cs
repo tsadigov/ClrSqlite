@@ -9,7 +9,7 @@ using u32=System.UInt32;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite.Ast {
     using sqlite3_value = Engine.Mem;
-    
+
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using Engine;
     using ResolveExtensions = Sqlite3.ResolveExtensions;
@@ -19,8 +19,8 @@ namespace Community.CsharpSqlite.Ast {
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Utils;
-
-        public class SelectMethods
+    using Compiler.Parser;
+    public class SelectMethods
         {
             ///<summary>
             /// 2001 September 15
@@ -2353,7 +2353,10 @@ break;
                 return SqlResult.SQLITE_OK;
             }
 
+
+
 #endif
+
 
 
 #if !(SQLITE_OMIT_SUBQUERY) || !(SQLITE_OMIT_VIEW)

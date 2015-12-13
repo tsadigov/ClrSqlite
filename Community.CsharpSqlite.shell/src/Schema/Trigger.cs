@@ -13,6 +13,7 @@ using u32 = System.UInt32;
 using u64 = System.UInt64;
 using unsigned = System.UInt64;
 using Pgno = System.UInt32;
+using Community.CsharpSqlite.Utils;
 
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar = System.Int16;

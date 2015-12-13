@@ -8,7 +8,7 @@ using u32=System.UInt32;
 using u64=System.UInt64;
 namespace Community.CsharpSqlite.Metadata {
     using sqlite3_value = Engine.Mem;
-	using sqlite_int64=System.Int64;
+    using sqlite_int64 = System.Int64;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
@@ -16,7 +16,7 @@ namespace Community.CsharpSqlite.Metadata {
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Metadata.Traverse;
-
+    using Compiler.CodeGeneration;
     ///
     ///<summary>
     ///FUNCTIONS

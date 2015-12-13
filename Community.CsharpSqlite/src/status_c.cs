@@ -56,21 +56,31 @@ namespace Community.CsharpSqlite {
 		}
 		//# define wsdStat sqlite3Stat
 		static sqlite3StatType wsdStat=sqlite3Stat;
-		#endif
-		///<summary>
-		/// Return the current value of a status parameter.
-		///</summary>
-		public static int sqlite3StatusValue(int op) {
+#endif
+        ///<summary>
+        /// Return the current value of a status parameter.
+        ///</summary>
+        public static int sqlite3StatusValue(SqliteStatus op)
+        {
+            return sqlite3StatusValue((int)op);
+        }
+
+        public static int sqlite3StatusValue(int op) {
 			wsdStatInit();
 			Debug.Assert(op>=0&&op<Sqlite3.ArraySize(wsdStat.nowValue));
 			return wsdStat.nowValue[op];
 		}
-		///<summary>
-		/// Add N to the value of a status record.  It is assumed that the
-		/// caller holds appropriate locks.
-		///
-		///</summary>
-		public static void sqlite3StatusAdd(int op,int N) {
+        ///<summary>
+        /// Add N to the value of a status record.  It is assumed that the
+        /// caller holds appropriate locks.
+        ///
+        ///</summary>
+        public static void sqlite3StatusAdd(SqliteStatus op, int N)
+        {
+            sqlite3StatusAdd((int)op,N);
+        }
+
+        public static void sqlite3StatusAdd(int op,int N) {
 			wsdStatInit();
 			Debug.Assert(op>=0&&op<Sqlite3.ArraySize(wsdStat.nowValue));
 			wsdStat.nowValue[op]+=N;
@@ -78,11 +88,15 @@ namespace Community.CsharpSqlite {
 				wsdStat.mxValue[op]=wsdStat.nowValue[op];
 			}
 		}
-		///<summary>
-		/// Set the value of a status to X.
-		///
-		///</summary>
-		public static void sqlite3StatusSet(int op,int X) {
+        ///<summary>
+        /// Set the value of a status to X.
+        ///
+        ///</summary>
+        public static void sqlite3StatusSet(SqliteStatus op, int X) {
+            sqlite3StatusSet((int)op, X);
+        }
+
+        public static void sqlite3StatusSet(int op,int X) {
 			wsdStatInit();
 			Debug.Assert(op>=0&&op<Sqlite3.ArraySize(wsdStat.nowValue));
 			wsdStat.nowValue[op]=X;
@@ -98,9 +112,11 @@ namespace Community.CsharpSqlite {
 		/// then this routine is not threadsafe.
 		///
 		///</summary>
-        public static SqlResult sqlite3_status(int op, ref int pCurrent, ref int pHighwater, int resetFlag)
+        public static SqlResult sqlite3_status(SqliteStatus status, ref int pCurrent, ref int pHighwater, int resetFlag)
         {
-			wsdStatInit();
+            int op = (int)status;
+
+            wsdStatInit();
 			if(op<0||op>=Sqlite3.ArraySize(wsdStat.nowValue)) {
 				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
@@ -117,10 +133,10 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		static SqlResult sqlite3_db_status(Connection db,///
-		///<summary>
-		///The database connection whose status is desired 
-		///</summary>
-		int op,///
+                                                         ///<summary>
+                                                         ///The database connection whose status is desired 
+                                                         ///</summary>
+       SqliteDbStatus op,///
 		///<summary>
 		///Status verb 
 		///</summary>
@@ -143,8 +159,8 @@ namespace Community.CsharpSqlite {
 			///Return code 
 			///</summary>
 			db.mutex.sqlite3_mutex_enter();
-			switch(op) {
-			case SQLITE_DBSTATUS_LOOKASIDE_USED: {
+			switch((SqliteDbStatus)op) {
+			case SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_USED: {
 				pCurrent=db.lookaside.nOut;
 				pHighwater=db.lookaside.mxOut;
 				if(resetFlag!=0) {
@@ -152,18 +168,18 @@ namespace Community.CsharpSqlite {
 				}
 				break;
 			}
-			case SQLITE_DBSTATUS_LOOKASIDE_HIT:
-			case SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE:
-			case SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL: {
-				sqliteinth.testcase(op==SQLITE_DBSTATUS_LOOKASIDE_HIT);
-				sqliteinth.testcase(op==SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE);
-				sqliteinth.testcase(op==SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL);
-				Debug.Assert((op-SQLITE_DBSTATUS_LOOKASIDE_HIT)>=0);
-				Debug.Assert((op-SQLITE_DBSTATUS_LOOKASIDE_HIT)<3);
+			case SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_HIT:
+			case SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE:
+			case SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL: {
+				sqliteinth.testcase(op== SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_HIT);
+				sqliteinth.testcase(op== SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE);
+				sqliteinth.testcase(op== SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL);
+				Debug.Assert((op- SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_HIT)>=0);
+				Debug.Assert((op- SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_HIT)<3);
 				pCurrent=0;
-				pHighwater=db.lookaside.anStat[op-SQLITE_DBSTATUS_LOOKASIDE_HIT];
+				pHighwater=db.lookaside.anStat[op- SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_HIT];
 				if(resetFlag!=0) {
-					db.lookaside.anStat[op-SQLITE_DBSTATUS_LOOKASIDE_HIT]=0;
+					db.lookaside.anStat[op- SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_HIT]=0;
 				}
 				break;
 			}
@@ -175,7 +191,7 @@ namespace Community.CsharpSqlite {
 			///highwater mark is meaningless and is returned as zero.
 			///
 			///</summary>
-			case SQLITE_DBSTATUS_CACHE_USED: {
+			case SqliteDbStatus.SQLITE_DBSTATUS_CACHE_USED: {
 				int totalUsed=0;
 				int i;
                 db.sqlite3BtreeEnterAll();
@@ -198,7 +214,7 @@ namespace Community.CsharpSqlite {
 			///databases.  *pHighwater is set to zero.
 			///
 			///</summary>
-			case SQLITE_DBSTATUS_SCHEMA_USED: {
+			case SqliteDbStatus.SQLITE_DBSTATUS_SCHEMA_USED: {
 				int i;
 				///
 				///<summary>
@@ -248,7 +264,7 @@ namespace Community.CsharpSqlite {
 			///pHighwater is set to zero.
 			///
 			///</summary>
-			case SQLITE_DBSTATUS_STMT_USED: {
+			case SqliteDbStatus.SQLITE_DBSTATUS_STMT_USED: {
 				Vdbe pVdbe;
 				///
 				///<summary>

@@ -8,6 +8,8 @@ using u32 = System.UInt32;
 using Community.CsharpSqlite.Ast;
 using Community.CsharpSqlite.Os;
 using Community.CsharpSqlite.Engine;
+using Community.CsharpSqlite.Utils;
+using Community.CsharpSqlite.Compiler;
 
 namespace Community.CsharpSqlite
 {

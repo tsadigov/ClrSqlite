@@ -10,6 +10,7 @@ using u8 = System.Byte;
 
 namespace Community.CsharpSqlite.Engine.Op
 {
+    using Utils;
     public class Schema
     {
         public static RuntimeException Exec(CPU cpu, OpCode opcode, VdbeOp pOp) 

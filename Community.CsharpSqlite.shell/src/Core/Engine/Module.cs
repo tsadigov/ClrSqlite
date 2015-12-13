@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Metadata
 {
     ///<summary>
     /// Each SQLite module (virtual table definition) is defined by an

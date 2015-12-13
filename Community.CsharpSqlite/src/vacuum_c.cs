@@ -106,7 +106,7 @@ namespace Community.CsharpSqlite {
 		/// become a no-op.
 		///
 		///</summary>
-		static void sqlite3Vacuum(Parse pParse) {
+		public static void sqlite3Vacuum(Parse pParse) {
             Vdbe v = pParse.sqlite3GetVdbe();
 			if(v!=null) {
                 v.sqlite3VdbeAddOp2(OpCode.OP_Vacuum, 0, 0);

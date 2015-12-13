@@ -50,7 +50,7 @@ namespace Community.CsharpSqlite
                     {
                         if (sqliteinth.sqlite3GlobalConfig.pcache.xInit == null)
                         {
-                            Sqlite3.sqlite3PCacheSetDefault();
+                            Cache.CacheMethods.sqlite3PCacheSetDefault();
                         }
                         ap = sqliteinth.sqlite3GlobalConfig.pcache;
                         //_Custom.va_arg(ap, sqlite3_pcache_methods) = sqliteinth.sqlite3GlobalConfig.pcache;

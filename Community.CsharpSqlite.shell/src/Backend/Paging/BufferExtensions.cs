@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Paging
 {
     using u32 = System.UInt32;
 

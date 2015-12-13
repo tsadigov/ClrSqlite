@@ -12,45 +12,58 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Utils;
-	public partial class Sqlite3 {
-		///
-		///<summary>
-		///
-		///</summary>
-		///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
-		///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
-		///<param name=""></param>
-		///<param name="SQLITE_SOURCE_ID: 2010">23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3</param>
-		///<param name=""></param>
-		///<param name=""></param>
-		///<param name=""></param>
-		///
-		///<summary>
-		///Driver template for the LEMON parser generator.
-		///The author disclaims copyright to this source code.
-		///
-		///This version of "lempar.c" is modified, slightly, for use by SQLite.
-		///The only modifications are the addition of a couple of NEVER()
-		///macros to disable tests that are needed in the case of a general
-		///LALR(1) grammar but which are always false in the
-		///specific grammar used by SQLite.
-		///
-		///</summary>
-		///
-		///<summary>
-		///First off, code is included that follows the "include" declaration
-		///in the input grammar file. 
-		///</summary>
-		//#include <stdio.h>
-		//#line 51 "parse.y"
-		//#include "sqliteInt.h"
-		///<summary>
-		/// Disable all error recovery processing in the parser push-down
-		/// automaton.
-		///
-		///</summary>
-		//#define YYNOERRORRECOVERY 1
-		const int YYNOERRORRECOVERY=1;
+    using Parse=Sqlite3.Parse;
+    public  class ParseMethods {
+
+        ///
+        ///<summary>
+        ///Constant tokens for values 0 and 1.
+        ///
+        ///</summary>
+
+        public static Token[] sqlite3IntTokens =  {
+            new Token ("0", 1),
+            new Token ("1", 1)
+        };
+
+        ///
+        ///<summary>
+        ///
+        ///</summary>
+        ///<param name="Included in SQLite3 port to C#">SQLite;  2008 Noah B Hart</param>
+        ///<param name="C#">SQLite is an independent reimplementation of the SQLite software library</param>
+        ///<param name=""></param>
+        ///<param name="SQLITE_SOURCE_ID: 2010">23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3</param>
+        ///<param name=""></param>
+        ///<param name=""></param>
+        ///<param name=""></param>
+        ///
+        ///<summary>
+        ///Driver template for the LEMON parser generator.
+        ///The author disclaims copyright to this source code.
+        ///
+        ///This version of "lempar.c" is modified, slightly, for use by SQLite.
+        ///The only modifications are the addition of a couple of NEVER()
+        ///macros to disable tests that are needed in the case of a general
+        ///LALR(1) grammar but which are always false in the
+        ///specific grammar used by SQLite.
+        ///
+        ///</summary>
+        ///
+        ///<summary>
+        ///First off, code is included that follows the "include" declaration
+        ///in the input grammar file. 
+        ///</summary>
+        //#include <stdio.h>
+        //#line 51 "parse.y"
+        //#include "sqliteInt.h"
+        ///<summary>
+        /// Disable all error recovery processing in the parser push-down
+        /// automaton.
+        ///
+        ///</summary>
+        //#define YYNOERRORRECOVERY 1
+        const int YYNOERRORRECOVERY=1;
 		///<summary>
 		/// Make yysqliteinth.testcase() the same as sqliteinth.testcase()
 		///
@@ -7300,7 +7313,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 				///There is no mechanism by which the parser stack can be popped below
 				///empty in SQLite.  
 				///</summary>
-				if(NEVER(this.yyidx<0))
+				if(Sqlite3.NEVER(this.yyidx<0))
 					return 0;
 				#if !NDEBUG
 																																																																												      if ( yyTraceFILE != null && pParser.yyidx >= 0 )
@@ -7327,7 +7340,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 				///In SQLite, we never try to destroy a parser that was not successfully
 				///created in the first place. 
 				///</summary>
-				if(NEVER(pParser==null))
+				if(Sqlite3.NEVER(pParser==null))
 					return;
 				while(pParser.yyidx>=0)
 					pParser.yy_pop_parser_stack();
@@ -8222,7 +8235,7 @@ yyTracePrompt, p.yystksz);
 		/// A pointer to a parser.  This pointer is used in subsequent calls
 		/// to sqlite3Parser and sqlite3ParserFree.
 		///</summary>
-		static yyParser sqlite3ParserAlloc() {
+		public static yyParser sqlite3ParserAlloc() {
 			//void *(*mallocProc)(size_t)){
 			yyParser pParser=new yyParser();
 			//pParser = (yyParser*)(*mallocProc)( (size_t)yyParser.Length );
@@ -11243,7 +11256,7 @@ return yy_default[stateno];
 			//yysqliteinth.testcase(yyruleno==254);
 			//#line 1143 "parse.y"
 			{
-				sqlite3Vacuum(pParse);
+				Sqlite3.sqlite3Vacuum(pParse);
 			}
 			//#line 3273 "parse.c"
 			break;
@@ -11254,7 +11267,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1151 "parse.y"
 			{
-				sqlite3Pragma(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token,0,0);
+                        Sqlite3.sqlite3Pragma(pParse,yymsp[-1].minor.yy0Token,yymsp[0].minor.yy0Token,0,0);
 			}
 			//#line 3278 "parse.c"
 			break;
@@ -11265,7 +11278,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1152 "parse.y"
 			{
-				sqlite3Pragma(pParse,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token,0);
+                        Sqlite3.sqlite3Pragma(pParse,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token,0);
 			}
 			//#line 3283 "parse.c"
 			break;
@@ -11276,7 +11289,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1153 "parse.y"
 			{
-				sqlite3Pragma(pParse,yymsp[-4].minor.yy0Token,yymsp[-3].minor.yy0Token,yymsp[-1].minor.yy0Token,0);
+                        Sqlite3.sqlite3Pragma(pParse,yymsp[-4].minor.yy0Token,yymsp[-3].minor.yy0Token,yymsp[-1].minor.yy0Token,0);
 			}
 			//#line 3288 "parse.c"
 			break;
@@ -11287,7 +11300,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1155 "parse.y"
 			{
-				sqlite3Pragma(pParse,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token,1);
+                        Sqlite3.sqlite3Pragma(pParse,yymsp[-3].minor.yy0Token,yymsp[-2].minor.yy0Token,yymsp[0].minor.yy0Token,1);
 			}
 			//#line 3293 "parse.c"
 			break;
@@ -11298,7 +11311,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1157 "parse.y"
 			{
-				sqlite3Pragma(pParse,yymsp[-4].minor.yy0Token,yymsp[-3].minor.yy0Token,yymsp[-1].minor.yy0Token,1);
+                        Sqlite3.sqlite3Pragma(pParse,yymsp[-4].minor.yy0Token,yymsp[-3].minor.yy0Token,yymsp[-1].minor.yy0Token,1);
 			}
 			//#line 3298 "parse.c"
 			break;

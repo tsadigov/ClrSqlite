@@ -151,7 +151,7 @@
       <Link>Community.CsharpSqlite\malloc_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\memjournal_c.cs">
-      <Link>src\Paging\memjournal_c.cs</Link>
+      <Link>src\Backend\Paging\memjournal_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\mem_Pool.cs">
       <Link>src\Os\mem_Pool.cs</Link>
@@ -190,25 +190,25 @@
       <Link>src\Backend\Os\os_win_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pager_c.cs">
-      <Link>src\Paging\pager_c.cs</Link>
+      <Link>src\Backend\Paging\pager_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pager_h.cs">
       <Link>Community.CsharpSqlite\empty\pager_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\parse_c.cs">
-      <Link>src\Compiler\Parse\parse_c.cs</Link>
+      <Link>src\Compiler\Parser\parse_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\parse_h.cs">
-      <Link>src\Compiler\Parse\parse_h.cs</Link>
+      <Link>src\Compiler\Parser\parse_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pcache1_c.cs">
-      <Link>src\Paging\pcache1_c.cs</Link>
+      <Link>src\Backend\Cache\pcache1_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pcache_c.cs">
-      <Link>src\Paging\pcache_c.cs</Link>
+      <Link>src\Backend\Cache\pcache_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pcache_h.cs">
-      <Link>src\Paging\pcache_h.cs</Link>
+      <Link>src\Backend\Cache\pcache_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\pragma_c.cs">
       <Link>Community.CsharpSqlite\pragma_c.cs</Link>
@@ -238,7 +238,7 @@
       <Link>Community.CsharpSqlite\empty\sqliteLimit_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\status_c.cs">
-      <Link>Community.CsharpSqlite\status_c.cs</Link>
+      <Link>src\Status\status_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\table_c.cs">
       <Link>Community.CsharpSqlite\empty\table_c.cs</Link>
@@ -299,6 +299,14 @@
     </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\Backend\Cache\Comment.cs" />
+    <Compile Include="src\Backend\Cache\PCache1.cs" />
+    <Compile Include="src\Backend\Cache\PCacheGlobal.cs" />
+    <Compile Include="src\Backend\Cache\PgFreeslot.cs" />
+    <Compile Include="src\Backend\Cache\PgHdr.cs" />
+    <Compile Include="src\Backend\Cache\PgHdr1.cs" />
+    <Compile Include="src\Backend\Cache\PGHDR_.cs" />
+    <Compile Include="src\Backend\Cache\PGroup.cs" />
     <Compile Include="src\Backend\Paging\PagerState.cs" />
     <Compile Include="src\Backend\Paging\PagingJournalMode.cs" />
     <Compile Include="src\CellInfo.cs" />
@@ -349,7 +357,7 @@
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
     <Compile Include="src\Backend\Paging\Delegates.cs" />
-    <Compile Include="src\MyHelpers.cs" />
+    <Compile Include="src\Utils\MyHelpers.cs" />
     <Compile Include="src\Os\OpenMode.cs" />
     <Compile Include="src\Schema\Builtin.cs" />
     <Compile Include="src\Schema\SchemaExtensions.cs" />
@@ -394,6 +402,7 @@
     <Compile Include="src\Sqlite3Config.cs" />
     <Compile Include="src\Sqlite3_backup.cs" />
     <Compile Include="src\SqlResult.cs" />
+    <Compile Include="src\Status\SqliteStatus.cs" />
     <Compile Include="src\TextEncodings.cs" />
     <Compile Include="src\Accessories\Tools\AuthContext.cs" />
     <Compile Include="src\Accessories\Tools\DbFixer.cs" />
@@ -408,7 +417,6 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\Backend\Paging\NewFolder1\" />
     <Folder Include="src\Engine\Core\Engine\Metadata\" />
     <Folder Include="src\Engine\Core\Engine\Op\" />
     <Folder Include="src\Engine\Core\Engine\Utill\" />

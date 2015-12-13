@@ -10,8 +10,8 @@ using u32 = System.UInt32;
 
 namespace Community.CsharpSqlite.Paging
 {
-    using DbPage = Paging.PgHdr;
-    using sqlite3_pcache = Paging.PCache1;
+    using DbPage = Cache.PgHdr;
+    using sqlite3_pcache = Cache.PCache1;
     using sqlite3_stmt = Engine.Vdbe;
     using sqlite3_value = Engine.Mem;
     using codec_ctx = crypto.codec_ctx;
@@ -32,15 +32,15 @@ namespace Community.CsharpSqlite.Paging
 
     public delegate int dxPC_Pagecount(sqlite3_pcache pCache);
 
-    public delegate PgHdr dxPC_Fetch(sqlite3_pcache pCache, u32 key, int createFlag);
+    public delegate Cache.PgHdr dxPC_Fetch(sqlite3_pcache pCache, u32 key, int createFlag);
 
-    public delegate void dxPC_Unpin(sqlite3_pcache pCache, PgHdr p2, bool discard);
+    public delegate void dxPC_Unpin(sqlite3_pcache pCache, Cache.PgHdr p2, bool discard);
 
-    public delegate void dxPC_Rekey(sqlite3_pcache pCache, PgHdr p2, u32 oldKey, u32 newKey);
+    public delegate void dxPC_Rekey(sqlite3_pcache pCache, Cache.PgHdr p2, u32 oldKey, u32 newKey);
 
     public delegate void dxPC_Truncate(sqlite3_pcache pCache, u32 iLimit);
 
     public delegate void dxPC_Destroy(ref sqlite3_pcache pCache);
 
-    public delegate void dxIter(PgHdr p);
+    public delegate void dxIter(Cache.PgHdr p);
 }

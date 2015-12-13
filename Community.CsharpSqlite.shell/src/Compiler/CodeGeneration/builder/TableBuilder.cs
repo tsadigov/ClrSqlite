@@ -14,8 +14,9 @@ namespace Community.CsharpSqlite.builder
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Utils;
+    using Compiler.Parser;
     using Metadata;
-        public static class TableBuilder
+    public static class TableBuilder
         {
 
             ///<summary>

@@ -9,29 +9,29 @@ using u64=System.UInt64;
 using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite.tree {
-	using DbPage=Paging.PgHdr;
-	using System.Text;
+    using DbPage = Cache.PgHdr;
+    using System.Text;
     using Metadata;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Utils;
-
-        ///
-        ///<summary>
-        ///A cursor is a pointer to a particular entry within a particular
-        ///</summary>
-        ///<param name="b">tree within a database file.</param>
-        ///<param name=""></param>
-        ///<param name="The entry is identified by its MemPage and the index in">The entry is identified by its MemPage and the index in</param>
-        ///<param name="MemPage.aCell[] of the entry.">MemPage.aCell[] of the entry.</param>
-        ///<param name=""></param>
-        ///<param name="A single database file can shared by two more database connections,">A single database file can shared by two more database connections,</param>
-        ///<param name="but cursors cannot be shared.  Each cursor is associated with a">but cursors cannot be shared.  Each cursor is associated with a</param>
-        ///<param name="particular database connection identified BtCursor.pBtree.db.">particular database connection identified BtCursor.pBtree.db.</param>
-        ///<param name=""></param>
-        ///<param name="Fields in this structure are accessed under the BtShared.mutex">Fields in this structure are accessed under the BtShared.mutex</param>
-        ///<param name="found at self.pBt.mutex.">found at self.pBt.mutex.</param>
-        ///<param name=""></param>
-        public class BtCursor
+    using Cache;
+    ///
+    ///<summary>
+    ///A cursor is a pointer to a particular entry within a particular
+    ///</summary>
+    ///<param name="b">tree within a database file.</param>
+    ///<param name=""></param>
+    ///<param name="The entry is identified by its MemPage and the index in">The entry is identified by its MemPage and the index in</param>
+    ///<param name="MemPage.aCell[] of the entry.">MemPage.aCell[] of the entry.</param>
+    ///<param name=""></param>
+    ///<param name="A single database file can shared by two more database connections,">A single database file can shared by two more database connections,</param>
+    ///<param name="but cursors cannot be shared.  Each cursor is associated with a">but cursors cannot be shared.  Each cursor is associated with a</param>
+    ///<param name="particular database connection identified BtCursor.pBtree.db.">particular database connection identified BtCursor.pBtree.db.</param>
+    ///<param name=""></param>
+    ///<param name="Fields in this structure are accessed under the BtShared.mutex">Fields in this structure are accessed under the BtShared.mutex</param>
+    ///<param name="found at self.pBt.mutex.">found at self.pBt.mutex.</param>
+    ///<param name=""></param>
+    public class BtCursor
         {
             ///<summary>
             ///The Btree to which this cursor belongs 

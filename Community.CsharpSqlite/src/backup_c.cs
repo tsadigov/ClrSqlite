@@ -6,14 +6,15 @@ using u8=System.Byte;
 using u32=System.UInt32;
 using Pgno=System.UInt32;
 namespace Community.CsharpSqlite {
-	using sqlite3_int64=System.Int64;
-	using DbPage=Paging.PgHdr;
+    using sqlite3_int64 = System.Int64;
+    using DbPage = Cache.PgHdr;
     using Os;
     using builder;
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Utils;
-	public partial class Sqlite3 {
+    using Cache;
+    public partial class Sqlite3 {
 		///
 		///<summary>
 		///2009 January 28

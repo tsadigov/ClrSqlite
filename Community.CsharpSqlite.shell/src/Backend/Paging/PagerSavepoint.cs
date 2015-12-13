@@ -11,9 +11,9 @@ using Pgno = System.UInt32;
 using sqlite3_int64 = System.Int64;
 
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Paging
 {
-    using DbPage = Paging.PgHdr;
+    using DbPage = Cache.PgHdr;
     using Community.CsharpSqlite.Utils;
     ///<summary>
     /// An instance of the following structure is allocated for each active

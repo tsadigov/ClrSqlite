@@ -15,13 +15,13 @@ using ynVar = System.Int32;
 #endif
 namespace Community.CsharpSqlite.Ast
 {
-    using Parse=Sqlite3.Parse;
+    using Parse = Sqlite3.Parse;
     using Metadata;
     using Engine;
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Metadata.Traverse;
-
-        public class exprc
+    using Compiler.Parser;
+    public class exprc
         {
             ///<summary>
             /// 2001 September 15

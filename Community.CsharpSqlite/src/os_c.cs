@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace Community.CsharpSqlite.Os
 {
+    using Utils;
 
 
         public class os

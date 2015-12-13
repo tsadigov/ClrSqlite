@@ -4,7 +4,7 @@ using System.Text;
 using u32 = System.UInt32;
 using Pgno = System.UInt32;
 
-namespace Community.CsharpSqlite.Paging
+namespace Community.CsharpSqlite.Cache
 {
     using sqlite3_value = Engine.Mem;
 	using sqlite3_pcache = PCache1;
@@ -278,14 +278,14 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
             {
                 if (sqliteinth.sqlite3GlobalConfig.pcache.xInit == null)
                 {
-                    ///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="IMPLEMENTATION">64137 If the xInit() method is NULL, then the</param>
-                    ///<param name="built">in default page cache is used instead of the application defined</param>
-                    ///<param name="page cache. ">page cache. </param>
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="IMPLEMENTATION">64137 If the xInit() method is NULL, then the</param>
+                ///<param name="built">in default page cache is used instead of the application defined</param>
+                ///<param name="page cache. ">page cache. </param>
 
-                    Sqlite3.sqlite3PCacheSetDefault();
+                CacheMethods.sqlite3PCacheSetDefault();
                 }
                 return sqliteinth.sqlite3GlobalConfig.pcache.xInit(sqliteinth.sqlite3GlobalConfig.pcache.pArg);
             }

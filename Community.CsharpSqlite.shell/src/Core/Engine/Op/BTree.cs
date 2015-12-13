@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using u16 = System.UInt16;
 using i64 = System.Int64;
 using Community.CsharpSqlite.Engine;
-
+using Community.CsharpSqlite.Utils;
 
 namespace Community.CsharpSqlite.Engine.Op
 {

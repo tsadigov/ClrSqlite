@@ -17,7 +17,7 @@ using System.Diagnostics;
 using Community.CsharpSqlite.Engine;
 using Community.CsharpSqlite.Utils;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Utils
 {
         ///<summary>
         /// An objected used to accumulate the text of a string where we

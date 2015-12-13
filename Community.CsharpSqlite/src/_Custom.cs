@@ -28,7 +28,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Paging;
-
+    using Utils;
     public partial class Sqlite3
     {
 

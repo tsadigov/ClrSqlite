@@ -20,7 +20,8 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Metadata.Traverse;
-	public partial class Sqlite3 {
+    using Cache;
+    public partial class Sqlite3 {
 		///
 		///<summary>
 		///2001 September 15
@@ -273,7 +274,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 						rc=sqlite3_os_init();
 					}
 					if(rc==SqlResult.SQLITE_OK) {
-						sqlite3PCacheBufferSetup(sqliteinth.sqlite3GlobalConfig.pPage,sqliteinth.sqlite3GlobalConfig.szPage,sqliteinth.sqlite3GlobalConfig.nPage);
+                        CacheMethods.sqlite3PCacheBufferSetup(sqliteinth.sqlite3GlobalConfig.pPage,sqliteinth.sqlite3GlobalConfig.szPage,sqliteinth.sqlite3GlobalConfig.nPage);
 						sqliteinth.sqlite3GlobalConfig.isInit=1;
 					}
 					sqliteinth.sqlite3GlobalConfig.inProgress=0;
@@ -388,7 +389,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
           {
             if ( sqliteinth.sqlite3GlobalConfig.pcache.xInit == null )
             {
-              sqlite3PCacheSetDefault();
+                            CacheMethods.sqlite3PCacheSetDefault();
             }
             ap = sqliteinth.sqlite3GlobalConfig.pcache;//va_arg(ap, sqlite3_pcache_methods) = sqlite3GlobalConfig.pcache;
             break;
@@ -577,7 +578,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 				}
 				case SqliteConfig.GETPCACHE: {
 					if(sqliteinth.sqlite3GlobalConfig.pcache.xInit==null) {
-						sqlite3PCacheSetDefault();
+                                CacheMethods.sqlite3PCacheSetDefault();
 					}
 					Debugger.Break();
 					// TODO -- *_Custom.va_arg(ap, sqlite3_pcache_methods) = sqliteinth.sqlite3GlobalConfig.pcache;

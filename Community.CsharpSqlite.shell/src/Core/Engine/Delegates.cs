@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Community.CsharpSqlite.Engine
 {
-    using DbPage = Paging.PgHdr;
-    using sqlite3_pcache = Paging.PCache1;
+    using DbPage = Cache.PgHdr;
+    using sqlite3_pcache = Cache.PCache1;
     using sqlite3_stmt = Engine.Vdbe;
     using sqlite3_value = Engine.Mem;
     using codec_ctx = crypto.codec_ctx;

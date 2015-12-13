@@ -28,7 +28,7 @@ namespace Community.CsharpSqlite
     using Metadata;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Utils;
-
+    using Compiler.Parser;
 
     namespace Ast
     {

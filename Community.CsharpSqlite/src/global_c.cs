@@ -733,16 +733,7 @@ namespace Community.CsharpSqlite
 
 		public static FuncDefHash sqlite3GlobalFunctions;
 
-		///
-///<summary>
-///Constant tokens for values 0 and 1.
-///
-///</summary>
 
-		static Token[] sqlite3IntTokens =  {
-			new Token ("0", 1),
-			new Token ("1", 1)
-		};
 
 		///
 ///<summary>

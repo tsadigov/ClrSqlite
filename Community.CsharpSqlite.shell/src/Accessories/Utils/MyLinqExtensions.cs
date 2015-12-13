@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Utils
 {
     public static class MyLinqExtensions
     {

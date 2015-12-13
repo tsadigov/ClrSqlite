@@ -13,6 +13,7 @@ namespace Community.CsharpSqlite.Parsing
     using Vdbe = Engine.Vdbe;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Utils;
+    using Compiler.Parser;
     public static partial class TriggerParser
     {
 

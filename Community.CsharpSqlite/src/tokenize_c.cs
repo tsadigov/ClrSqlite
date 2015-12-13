@@ -1,11 +1,13 @@
 using Community.CsharpSqlite.Ast;
+using Community.CsharpSqlite.Utils;
 using System;
 using System.Diagnostics;
 using System.Text;
 
 namespace Community.CsharpSqlite
 {
-
+    namespace Compiler
+    {
 
         public class Lexer
         {
@@ -241,21 +243,21 @@ namespace Community.CsharpSqlite
                             }
                             else
                                 if (c == '>')
-                                {
-                                    tokenType = TokenType.TK_NE;
-                                    return 2;
-                                }
-                                else
+                            {
+                                tokenType = TokenType.TK_NE;
+                                return 2;
+                            }
+                            else
                                     if (c == '<')
-                                    {
-                                        tokenType = TokenType.TK_LSHIFT;
-                                        return 2;
-                                    }
-                                    else
-                                    {
-                                        tokenType = TokenType.TK_LT;
-                                        return 1;
-                                    }
+                            {
+                                tokenType = TokenType.TK_LSHIFT;
+                                return 2;
+                            }
+                            else
+                            {
+                                tokenType = TokenType.TK_LT;
+                                return 1;
+                            }
                         }
                     case '>':
                         {
@@ -266,15 +268,15 @@ namespace Community.CsharpSqlite
                             }
                             else
                                 if (c == '>')
-                                {
-                                    tokenType = TokenType.TK_RSHIFT;
-                                    return 2;
-                                }
-                                else
-                                {
-                                    tokenType = TokenType.TK_GT;
-                                    return 1;
-                                }
+                            {
+                                tokenType = TokenType.TK_RSHIFT;
+                                return 2;
+                            }
+                            else
+                            {
+                                tokenType = TokenType.TK_GT;
+                                return 1;
+                            }
                         }
                     case '!':
                         {
@@ -351,15 +353,15 @@ namespace Community.CsharpSqlite
                             }
                             else
                                 if (c != 0)
-                                {
-                                    tokenType = TokenType.TK_ID;
-                                    return i + 1;
-                                }
-                                else
-                                {
-                                    tokenType = TokenType.TK_ILLEGAL;
-                                    return i;
-                                }
+                            {
+                                tokenType = TokenType.TK_ID;
+                                return i + 1;
+                            }
+                            else
+                            {
+                                tokenType = TokenType.TK_ILLEGAL;
+                                return i;
+                            }
                         }
                     case '.':
                         {
@@ -495,32 +497,32 @@ namespace Community.CsharpSqlite
                                 }
                                 else
                                     if (c == '(' && n > 0)
+                                {
+                                    do
                                     {
-                                        do
-                                        {
-                                            i++;
-                                        }
-                                        while ((iOffset + i) < z.Length && (c = (byte)z[iOffset + i]) != 0 && !CharExtensions.sqlite3Isspace(c) && c != ')');
-                                        if (c == ')')
-                                        {
-                                            i++;
-                                        }
-                                        else
-                                        {
-                                            tokenType = TokenType.TK_ILLEGAL;
-                                        }
-                                        break;
+                                        i++;
+                                    }
+                                    while ((iOffset + i) < z.Length && (c = (byte)z[iOffset + i]) != 0 && !CharExtensions.sqlite3Isspace(c) && c != ')');
+                                    if (c == ')')
+                                    {
+                                        i++;
                                     }
                                     else
+                                    {
+                                        tokenType = TokenType.TK_ILLEGAL;
+                                    }
+                                    break;
+                                }
+                                else
                                         if (c == ':' && z[iOffset + i + 1] == ':')
-                                        {
-                                            i++;
+                                {
+                                    i++;
 #endif
-                                        }
-                                        else
-                                        {
-                                            break;
-                                        }
+                                }
+                                else
+                                {
+                                    break;
+                                }
                             }
                             if (n == 0)
                                 tokenType = TokenType.TK_ILLEGAL;
@@ -601,7 +603,7 @@ namespace Community.CsharpSqlite
 
         }
 
-
+    }
 
 
 

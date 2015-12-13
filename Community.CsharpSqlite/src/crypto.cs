@@ -13,8 +13,8 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Paging;
-   
-        public class crypto
+    using Cache;
+    public class crypto
         {
             ///
             ///<summary>

@@ -14,7 +14,7 @@ using unsigned = System.UInt64;
 using Community.CsharpSqlite.Ast;
 using Community.CsharpSqlite.Utils;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Compiler.Parser
 {
     
         ///<summary>

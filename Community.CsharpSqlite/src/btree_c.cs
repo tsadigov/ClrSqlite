@@ -12,7 +12,7 @@ using _Custom=Community.CsharpSqlite.Sqlite3._Custom;
 
 namespace Community.CsharpSqlite
 {
-    using DbPage = Paging.PgHdr;
+    using DbPage = Cache.PgHdr;
     using tree;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Utils;
@@ -874,7 +874,7 @@ return removed;
             ///</summary>
             static void freeTempSpace(BtShared pBt)
             {
-                Sqlite3.sqlite3PageFree(ref pBt.pTmpSpace);
+                Cache.CacheMethods.sqlite3PageFree(ref pBt.pTmpSpace);
             }
             ///
             ///<summary>

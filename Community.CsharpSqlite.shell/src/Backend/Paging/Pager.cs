@@ -14,14 +14,17 @@ using sqlite3_int64 = System.Int64;
 namespace Community.CsharpSqlite.Paging
 {
     using System.Text;
-    using DbPage = PgHdr;
+    using DbPage = Cache.PgHdr;
+    using PgHdr = Cache.PgHdr;
     using System.Diagnostics;
     using codec_ctx = crypto.codec_ctx;
     using Community.CsharpSqlite.Os;
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.Utils;
+    using Cache;
 
-   
+
+
     public static class PagerExtensions {
         ///<summary>
         /// Return TRUE if the page given in the argument was previously passed
@@ -3377,7 +3380,7 @@ PagerMethods.sqlite3PagerUnref(p);
                             this.pager_reset();
                             this.dbSize = (Pgno)(nByte / pageSize);
                             this.pageSize = (int)pageSize;
-                            Sqlite3.sqlite3PageFree(ref this.pTmpSpace);
+                    CacheMethods.sqlite3PageFree(ref this.pTmpSpace);
                             this.pTmpSpace = malloc_cs.sqlite3Malloc(pageSize);
                             // pNew;
                             PCacheMethods.sqlite3PcacheSetPageSize(this.pPCache, (int)pageSize);
@@ -4551,6 +4554,7 @@ pPager.pWal = 0;
                     u8 noContent
                 )
                 {
+            Log.WriteLine("Get page no "+pgno);
                     SqlResult rc;
                     PgHdr pPg = null;
                     Debug.Assert(this.eState >= PagerState.PAGER_READER);

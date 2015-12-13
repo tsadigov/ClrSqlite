@@ -15,18 +15,18 @@ using u32 = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using DbPage = Paging.PgHdr;
-	using sqlite3_pcache = Paging.PCache1;
-	using sqlite3_stmt = Engine.Vdbe;
+    using DbPage = Cache.PgHdr;
+    using sqlite3_pcache = Cache.PCache1;
+    using sqlite3_stmt = Engine.Vdbe;
     using sqlite3_value = Engine.Mem;
-    using codec_ctx=crypto.codec_ctx;
-    using sqlite3_api_routines=Sqlite3.sqlite3_api_routines;
+    using codec_ctx = crypto.codec_ctx;
+    using sqlite3_api_routines = Sqlite3.sqlite3_api_routines;
     using Community.CsharpSqlite.Ast;
     using Metadata;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Paging;
-
-
+    using Cache;
+    using Compiler.Parser;
 
 
 

@@ -11,10 +11,12 @@ using sqlite3_int64 = System.Int64;
 namespace Community.CsharpSqlite
 {
     using System.Text;
-    using DbPage = Paging.PgHdr;
+    using DbPage = Cache.PgHdr;
+    using PgHdr = Cache.PgHdr;
     using Community.CsharpSqlite.Os;
     using _Custom = Sqlite3._Custom;
     using Utils;
+    using Cache;
 
     public partial class Sqlite3
     {

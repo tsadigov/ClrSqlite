@@ -1,5 +1,6 @@
 using u8 = System.Byte;
 using Pgno = System.UInt32;
+using Community.CsharpSqlite.Cache;
 
 #if SQLITE_OMIT_WAL
 using Wal = System.Object;

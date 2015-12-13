@@ -11,22 +11,22 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using DbPage = Paging.PgHdr;
-	using System.Text;
+    using DbPage = Cache.PgHdr;
+    using System.Text;
     using Metadata;
     using Community.CsharpSqlite.Os;
     using _Custom = Sqlite3._Custom;
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Utils;
-    ///<summary>
-    /// Btree.inTrans may take one of the following values.
-    ///
-    /// If the shared-data extension is enabled, there may be multiple users
-    /// of the Btree structure. At most one of these may open a write transaction,
-    /// but any number may have active read transactions.
-    ///
-    ///</summary>
+    using Cache;    ///<summary>
+                    /// Btree.inTrans may take one of the following values.
+                    ///
+                    /// If the shared-data extension is enabled, there may be multiple users
+                    /// of the Btree structure. At most one of these may open a write transaction,
+                    /// but any number may have active read transactions.
+                    ///
+                    ///</summary>
     public enum TransType : byte
     {
         TRANS_NONE = 0,
@@ -491,7 +491,7 @@ namespace Community.CsharpSqlite
                     this.checkAppendMsg("", "Fragmentation of %d bytes reported as %d on page %d", cnt, data[hdr + 7], iPage);
                 }
             }
-            Sqlite3.sqlite3PageFree(ref hit);
+            CacheMethods.sqlite3PageFree(ref hit);
             BTreeMethods.releasePage(pPage);
             return depth + 1;
         }

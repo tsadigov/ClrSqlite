@@ -11,7 +11,7 @@ using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite
 {
-	using DbPage = Paging.PgHdr;
+	using DbPage = Cache.PgHdr;
 	using System.Text;
     using System.Linq;
     using Community.CsharpSqlite.tree;

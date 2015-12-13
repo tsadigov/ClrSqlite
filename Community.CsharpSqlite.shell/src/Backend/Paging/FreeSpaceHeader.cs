@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Paging
 {
     public class FreeSpaceHeader:IEnumerator
     {

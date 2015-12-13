@@ -25,40 +25,40 @@ namespace Community.CsharpSqlite.Ast
     using Metadata;
     using Vdbe = Engine.Vdbe;
     using sqlite3_value = Engine.Mem;
-    
+
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
-    
+
     using ResolveExtensions = Sqlite3.ResolveExtensions;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Utils;
+    using Compiler.Parser;
+    ///
+    ///<summary>
+    ///An instance of the following structure contains all information
+    ///needed to generate code for a single SELECT statement.
+    ///
+    ///</summary>
+    ///<param name="nLimit is set to ">1 if there is no LIMIT clause.  nOffset is set to 0.</param>
+    ///<param name="If there is a LIMIT clause, the parser sets nLimit to the value of the">If there is a LIMIT clause, the parser sets nLimit to the value of the</param>
+    ///<param name="limit and nOffset to the value of the offset (or 0 if there is not">limit and nOffset to the value of the offset (or 0 if there is not</param>
+    ///<param name="offset).  But later on, nLimit and nOffset become the memory locations">offset).  But later on, nLimit and nOffset become the memory locations</param>
+    ///<param name="in the VDBE that record the limit and offset counters.">in the VDBE that record the limit and offset counters.</param>
+    ///<param name=""></param>
+    ///<param name="addrOpenEphm[] entries contain the address of OP_OpenEphemeral opcodes.">addrOpenEphm[] entries contain the address of OP_OpenEphemeral opcodes.</param>
+    ///<param name="These addresses must be stored so that we can go back and fill in">These addresses must be stored so that we can go back and fill in</param>
+    ///<param name="the  P4Usage.P4_KEYINFO and P2 parameters later.  Neither the KeyInfo nor">the  P4Usage.P4_KEYINFO and P2 parameters later.  Neither the KeyInfo nor</param>
+    ///<param name="the number of columns in P2 can be computed at the same time">the number of columns in P2 can be computed at the same time</param>
+    ///<param name="as the OP_OpenEphm instruction is coded because not">as the OP_OpenEphm instruction is coded because not</param>
+    ///<param name="enough information about the compound query is known at that point.">enough information about the compound query is known at that point.</param>
+    ///<param name="The KeyInfo for addrOpenTran[0] and [1] contains collating sequences">The KeyInfo for addrOpenTran[0] and [1] contains collating sequences</param>
+    ///<param name="for the result set.  The KeyInfo for addrOpenTran[2] contains collating">for the result set.  The KeyInfo for addrOpenTran[2] contains collating</param>
+    ///<param name="sequences for the ORDER BY clause.">sequences for the ORDER BY clause.</param>
+    ///<param name=""></param>
 
-        ///
-        ///<summary>
-        ///An instance of the following structure contains all information
-        ///needed to generate code for a single SELECT statement.
-        ///
-        ///</summary>
-        ///<param name="nLimit is set to ">1 if there is no LIMIT clause.  nOffset is set to 0.</param>
-        ///<param name="If there is a LIMIT clause, the parser sets nLimit to the value of the">If there is a LIMIT clause, the parser sets nLimit to the value of the</param>
-        ///<param name="limit and nOffset to the value of the offset (or 0 if there is not">limit and nOffset to the value of the offset (or 0 if there is not</param>
-        ///<param name="offset).  But later on, nLimit and nOffset become the memory locations">offset).  But later on, nLimit and nOffset become the memory locations</param>
-        ///<param name="in the VDBE that record the limit and offset counters.">in the VDBE that record the limit and offset counters.</param>
-        ///<param name=""></param>
-        ///<param name="addrOpenEphm[] entries contain the address of OP_OpenEphemeral opcodes.">addrOpenEphm[] entries contain the address of OP_OpenEphemeral opcodes.</param>
-        ///<param name="These addresses must be stored so that we can go back and fill in">These addresses must be stored so that we can go back and fill in</param>
-        ///<param name="the  P4Usage.P4_KEYINFO and P2 parameters later.  Neither the KeyInfo nor">the  P4Usage.P4_KEYINFO and P2 parameters later.  Neither the KeyInfo nor</param>
-        ///<param name="the number of columns in P2 can be computed at the same time">the number of columns in P2 can be computed at the same time</param>
-        ///<param name="as the OP_OpenEphm instruction is coded because not">as the OP_OpenEphm instruction is coded because not</param>
-        ///<param name="enough information about the compound query is known at that point.">enough information about the compound query is known at that point.</param>
-        ///<param name="The KeyInfo for addrOpenTran[0] and [1] contains collating sequences">The KeyInfo for addrOpenTran[0] and [1] contains collating sequences</param>
-        ///<param name="for the result set.  The KeyInfo for addrOpenTran[2] contains collating">for the result set.  The KeyInfo for addrOpenTran[2] contains collating</param>
-        ///<param name="sequences for the ORDER BY clause.">sequences for the ORDER BY clause.</param>
-        ///<param name=""></param>
-
-        public class Select
+    public class Select
         {
             ///<summary>
             ///The fields of the result 

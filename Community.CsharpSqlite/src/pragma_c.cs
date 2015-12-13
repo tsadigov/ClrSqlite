@@ -423,10 +423,10 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			new EncName(null,0)
 		};
 		// OVERLOADS, so I don't need to rewrite parse.c
-		static void sqlite3Pragma(Parse pParse,Token pId1,Token pId2,int null_4,int minusFlag) {
+		public static void sqlite3Pragma(Parse pParse,Token pId1,Token pId2,int null_4,int minusFlag) {
 			sqlite3Pragma(pParse,pId1,pId2,null,minusFlag);
 		}
-		static void sqlite3Pragma(Parse pParse,Token pId1,///
+		public static void sqlite3Pragma(Parse pParse,Token pId1,///
 		///<summary>
 		///First part of [database.]id field 
 		///</summary>

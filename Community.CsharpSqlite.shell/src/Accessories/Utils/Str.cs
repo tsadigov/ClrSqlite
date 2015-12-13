@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using u32 = System.UInt32;
 
-namespace Community.CsharpSqlite
+namespace Community.CsharpSqlite.Utils
 {
     /// <summary>
     /// can use underlying buffer as seeral subtrings

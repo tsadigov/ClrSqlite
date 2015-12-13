@@ -9,38 +9,38 @@
 ///<param name=""></param>
 ///<param name=""></param>
 namespace Community.CsharpSqlite {
-	using System;
-	using System.Diagnostics;
-	using System.Runtime.InteropServices;
-	using System.Text;
-	using Bitmask=System.UInt64;
-	using i16=System.Int16;
-	using i64=System.Int64;
-	using sqlite3_int64=System.Int64;
-	using u8=System.Byte;
-	using u16=System.UInt16;
-	using u32=System.UInt32;
-	using u64=System.UInt64;
-	using unsigned=System.UInt64;
-	using Pgno=System.UInt32;
+    using System;
+    using System.Diagnostics;
+    using System.Runtime.InteropServices;
+    using System.Text;
+    using Bitmask = System.UInt64;
+    using i16 = System.Int16;
+    using i64 = System.Int64;
+    using sqlite3_int64 = System.Int64;
+    using u8 = System.Byte;
+    using u16 = System.UInt16;
+    using u32 = System.UInt32;
+    using u64 = System.UInt64;
+    using unsigned = System.UInt64;
+    using Pgno = System.UInt32;
     using sqlite3_value = Engine.Mem;
     using System.Linq;
-	#if !SQLITE_MAX_VARIABLE_NUMBER
-	using ynVar=System.Int16;
-	#else
+#if !SQLITE_MAX_VARIABLE_NUMBER
+    using ynVar = System.Int16;
+#else
 				using ynVar = System.Int32; 
 #endif
-	///
-	///<summary>
-	///The yDbMask datatype for the bitmask of all attached databases.
-	///</summary>
-	#if SQLITE_MAX_ATTACHED
+    ///
+    ///<summary>
+    ///The yDbMask datatype for the bitmask of all attached databases.
+    ///</summary>
+#if SQLITE_MAX_ATTACHED
 				//  typedef sqlite3_uint64 yDbMask;
 using yDbMask = System.Int64; 
 #else
-	//  typedef unsigned int yDbMask;
-	using yDbMask=System.Int32;
-using System.Collections.Generic;
+    //  typedef unsigned int yDbMask;
+    using yDbMask = System.Int32;
+    using System.Collections.Generic;
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.Parsing;
@@ -50,8 +50,11 @@ using System.Collections.Generic;
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Metadata.Traverse;
-	#endif
-	public partial class Sqlite3 {
+    using Compiler;
+    using Compiler.CodeGeneration;
+    using Compiler.Parser;
+#endif
+    public partial class Sqlite3 {
 		public class Parse {
 			Connection _db;
 			public Connection db {
@@ -3427,7 +3430,7 @@ goto attach_end;
 				Log.WriteHeader("sqlite3RunParser:"+zSql);
 				//Log.Indent();
                 SqlResult nErr = (SqlResult)0;///Number of errors encountered 
-				yyParser pEngine;///type of the next token 
+				ParseMethods.yyParser pEngine;///type of the next token 
 				int lastTokenParsed=-1;///type of the previous token 
 				byte enableLookaside;///<param name="Saved value of db">>lookaside.bEnabled </param>
 				Connection db=this.db;///The database connection 
@@ -3436,7 +3439,7 @@ goto attach_end;
 				}
 				this.rc=SqlResult.SQLITE_OK;
 				Debug.Assert(pzErrMsg!=null);
-				pEngine=sqlite3ParserAlloc();
+				pEngine=ParseMethods.sqlite3ParserAlloc();
 				//sqlite3ParserAlloc((void*(*)(size_t))malloc_cs.sqlite3Malloc);
 				//if ( pEngine == null )
 				//{
@@ -3455,10 +3458,10 @@ goto attach_end;
 
                 Console.Clear();
                 var tokens = lex(zSql).ToArray();
-                tokens.ForEach(itr => print(itr));
-                Console.CursorTop+=3;
-                Console.CursorLeft = 0;
-                Console.ReadKey();
+                //tokens.ForEach(itr => print(itr));
+                //Console.CursorTop+=3;
+                //Console.CursorLeft = 0;
+                //Console.ReadKey();
                 int i = 0;
 				foreach(Token token in tokens){
                     i += token.Length;
@@ -12200,7 +12203,7 @@ range_est_fallback:
 #endif
 					}
 					exprc.sqlite3ExprDelete(this.db,ref pSel.pLimit);
-					pSel.pLimit=this.sqlite3PExpr(Sqlite3.TK_INTEGER,null,null,sqlite3IntTokens[1]);
+					pSel.pLimit=this.sqlite3PExpr(Sqlite3.TK_INTEGER,null,null,ParseMethods.sqlite3IntTokens[1]);
 					pSel.iLimit=0;
 					if(Select.sqlite3Select(this,pSel,ref dest)!=0) {
 						return 0;
