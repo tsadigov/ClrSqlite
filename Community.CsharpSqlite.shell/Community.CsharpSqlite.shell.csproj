@@ -223,7 +223,7 @@
       <Link>Community.CsharpSqlite\random_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\rowset_c.cs">
-      <Link>Community.CsharpSqlite\rowset_c.cs</Link>
+      <Link>src\Core\Engine\rowset_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\select_c.cs">
       <Link>src\Compiler\Ast\select_c.cs</Link>
