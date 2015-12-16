@@ -245,7 +245,7 @@ namespace Community.CsharpSqlite.Ast {
                 Debug.Assert(pSrc.a[iRight].pTab != null);
                 pE1 = ResolveExtensions.sqlite3CreateColumnExpr(db, pSrc, iLeft, iColLeft);
                 pE2 = ResolveExtensions.sqlite3CreateColumnExpr(db, pSrc, iRight, iColRight);
-                pEq = pParse.sqlite3PExpr(Sqlite3.TK_EQ, pE1, pE2, 0);
+                pEq = pParse.sqlite3PExpr(TokenType.TK_EQ, pE1, pE2, 0);
                 if (pEq != null && isOuterJoin != 0)
                 {
                     pEq.ExprSetProperty(ExprFlags.EP_FromJoin);
@@ -1020,8 +1020,8 @@ static void SelectMethods.explainSetInteger(ref int a, int b){ a = b;}
             ///
             /// where iSub1 and iSub2 are the integers passed as the corresponding
             /// function parameters, and op is the text representation of the parameter
-            /// of the same name. The parameter "op" must be one of Sqlite3.TK_UNION, Sqlite3.TK_EXCEPT,
-            /// Sqlite3.TK_INTERSECT or Sqlite3.TK_ALL. The first form is used if argument bUseTmp is
+            /// of the same name. The parameter "op" must be one of TokenType.TK_UNION, TokenType.TK_EXCEPT,
+            /// TokenType.TK_INTERSECT or TokenType.TK_ALL. The first form is used if argument bUseTmp is
             /// false, or the second form if it is true.
             ///
             ///</summary>
@@ -1029,9 +1029,9 @@ static void SelectMethods.explainSetInteger(ref int a, int b){ a = b;}
                 ///<summary>
                 ///Parse context 
                 ///</summary>
-            int op,///
+            TokenType op,///
                 ///<summary>
-                ///One of Sqlite3.TK_UNION, Sqlite3.TK_EXCEPT etc. 
+                ///One of TokenType.TK_UNION, TokenType.TK_EXCEPT etc. 
                 ///</summary>
             int iSub1,///
                 ///<summary>
@@ -1047,7 +1047,7 @@ static void SelectMethods.explainSetInteger(ref int a, int b){ a = b;}
                 ///</summary>
             )
             {
-                Debug.Assert(op == Sqlite3.TK_UNION || op == Sqlite3.TK_EXCEPT || op == Sqlite3.TK_INTERSECT || op == Sqlite3.TK_ALL);
+                Debug.Assert(op == TokenType.TK_UNION || op == TokenType.TK_EXCEPT || op == TokenType.TK_INTERSECT || op == TokenType.TK_ALL);
                 if (pParse.explain == 2)
                 {
                     Vdbe v = pParse.pVdbe;
@@ -1407,7 +1407,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     //}
                     ///Make sure the column name is unique.  If the name is not unique,
                     ///append a integer to the name so that it becomes unique.
-                    nName = StringExtensions.sqlite3Strlen30(zName);
+                    nName = StringExtensions.Strlen30(zName);
                     for (int j = cnt = 0; j < i; j++)
                     {
                         if (aCol[j].zName.Equals(zName, StringComparison.InvariantCultureIgnoreCase))
@@ -1944,7 +1944,7 @@ break;
                 ///Label for the end of the overall SELECT stmt 
                 int j1;
                 
-                ///One of Sqlite3.TK_ALL, Sqlite3.TK_UNION, Sqlite3.TK_EXCEPT, Sqlite3.TK_INTERSECT 
+                ///One of TokenType.TK_ALL, TokenType.TK_UNION, TokenType.TK_EXCEPT, TokenType.TK_INTERSECT 
                 KeyInfo pKeyDup = null;
                 ///Comparison information for duplicate removal 
                 KeyInfo pKeyMerge;
@@ -2003,7 +2003,7 @@ break;
                         }
                         if (j == nOrderBy)
                         {
-                            Expr pNew = exprc.sqlite3Expr(db, Sqlite3.TK_INTEGER, null);
+                            Expr pNew = exprc.sqlite3Expr(db, TokenType.TK_INTEGER, null);
                             //if ( pNew == null )
                             //  return SQLITE_NOMEM;
                             pNew.Flags |= ExprFlags.EP_IntValue;
@@ -2349,7 +2349,7 @@ break;
                 ///TBD:  Insert subroutine calls to close cursors on incomplete
                 ///subqueries ***
                 ///</summary>
-                SelectMethods.explainComposite(pParse, p.tk_op, iSub1, iSub2, false);
+                SelectMethods.explainComposite(pParse, p.TokenOp, iSub1, iSub2, false);
                 return SqlResult.SQLITE_OK;
             }
 
@@ -2399,11 +2399,11 @@ break;
             {
                 if (pExpr == null)
                     return null;
-                if (pExpr.op == Sqlite3.TK_COLUMN && pExpr.iTable == iTable)
+                if (pExpr.Operator == TokenType.TK_COLUMN && pExpr.iTable == iTable)
                 {
                     if (pExpr.iColumn < 0)
                     {
-                        pExpr.op = Sqlite3.TK_NULL;
+                        pExpr.Operator = TokenType.TK_NULL;
                     }
                     else
                     {
@@ -2745,7 +2745,7 @@ break;
                                                 .Any(slct=>{
                                                     sqliteinth.testcase((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct);
                                                     sqliteinth.testcase((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Aggregate);
-                                                    if ((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0 || (slct.pPrior != null && slct.tk_op != Sqlite3.TK_ALL) || Sqlite3.NEVER(slct.pSrc == null) || slct.pSrc.nSrc != 1)
+                                                    if ((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0 || (slct.pPrior != null && slct.TokenOp != TokenType.TK_ALL) || Sqlite3.NEVER(slct.pSrc == null) || slct.pSrc.nSrc != 1)
                                                     {
                                                         return true;
                                                     }
@@ -3042,14 +3042,14 @@ break;
                 if (pEList.nExpr != 1)
                     return wherec.WHERE_ORDERBY_NORMAL;
                 pExpr = pEList.a[0].pExpr;
-                if (pExpr.op != Sqlite3.TK_AGG_FUNCTION)
+                if (pExpr.Operator != TokenType.TK_AGG_FUNCTION)
                     return 0;
                 if (Sqlite3.NEVER(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect)))
                     return 0;
                 pEList = pExpr.x.pList;
                 if (pEList == null || pEList.nExpr != 1)
                     return 0;
-                if (pEList.a[0].pExpr.op != Sqlite3.TK_AGG_COLUMN)
+                if (pEList.a[0].pExpr.Operator != TokenType.TK_AGG_COLUMN)
                     return wherec.WHERE_ORDERBY_NORMAL;
                 Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
                 if (pExpr.u.zToken.Equals("min", StringComparison.InvariantCultureIgnoreCase))
@@ -3089,7 +3089,7 @@ break;
                 Debug.Assert(pTab != null && null == pTab.pSelect && pExpr != null);
                 if (pTab.IsVirtual())
                     return null;
-                if (pExpr.op != Sqlite3.TK_AGG_FUNCTION)
+                if (pExpr.Operator != TokenType.TK_AGG_FUNCTION)
                     return null;
                 if ((pAggInfo.aFunc[0].pFunc.flags & FuncFlags.SQLITE_FUNC_COUNT) == 0)
                     return null;

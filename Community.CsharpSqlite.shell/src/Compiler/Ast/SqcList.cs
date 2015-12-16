@@ -145,7 +145,7 @@ namespace Community.CsharpSqlite.Ast
                 ///
                 ///</summary>
                 Debug.Assert((pTerm.wtFlags & (WhereTermFlags.TERM_DYNAMIC | WhereTermFlags.TERM_ORINFO | WhereTermFlags.TERM_ANDINFO)) == 0);
-                Debug.Assert(pExpr.op == Sqlite3.TK_OR);
+                Debug.Assert(pExpr.Operator == TokenType.TK_OR);
                 pTerm.u.pOrInfo = pOrInfo = new WhereOrInfo();
                 //sqlite3DbMallocZero(db, sizeof(*pOrInfo));
                 if (pOrInfo == null)
@@ -195,7 +195,7 @@ namespace Community.CsharpSqlite.Ast
                                 {
                                     pAndTerm = pAndWC.a[j];
                                     Debug.Assert(pAndTerm.pExpr != null);
-                                    if (wherec.allowedOp(pAndTerm.pExpr.op))
+                                    if (wherec.allowedOp(pAndTerm.pExpr.Operator))
                                     {
                                         b |= pMaskSet.getMask(pAndTerm.leftCursor);
                                     }
@@ -431,7 +431,7 @@ namespace Community.CsharpSqlite.Ast
                         }
                         Debug.Assert(pLeft != null);
                         pDup = exprc.sqlite3ExprDup(db, pLeft, 0);
-                        pNew = pParse.sqlite3PExpr(Sqlite3.TK_IN, pDup, null, null);
+                        pNew = pParse.sqlite3PExpr(TokenType.TK_IN, pDup, null, null);
                         if (pNew != null)
                         {
                             int idxNew;
@@ -512,11 +512,7 @@ namespace Community.CsharpSqlite.Ast
                 ///RHS of LIKE/GLOB ends with wildcard 
                 ///</summary>
                 bool noCase = false;
-                ///
-                ///<summary>
-                ///LIKE/GLOB distinguishes case 
-                ///</summary>
-                int op;
+                
                 ///
                 ///<summary>
                 ///</summary>
@@ -539,8 +535,14 @@ namespace Community.CsharpSqlite.Ast
                 pMaskSet = pWC.pMaskSet;
                 pExpr = pTerm.pExpr;
                 prereqLeft = pMaskSet.exprTableUsage(pExpr.pLeft);
-                op = pExpr.op;
-                if (op == Sqlite3.TK_IN)
+
+                ///
+                ///<summary>
+                ///LIKE/GLOB distinguishes case 
+                ///</summary>
+
+                var op = pExpr.Operator;
+                if (op == TokenType.TK_IN)
                 {
                     Debug.Assert(pExpr.pRight == null);
                     if (pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect))
@@ -553,7 +555,7 @@ namespace Community.CsharpSqlite.Ast
                     }
                 }
                 else
-                    if (op == Sqlite3.TK_ISNULL)
+                    if (op == TokenType.TK_ISNULL)
                     {
                         pTerm.prereqRight = 0;
                     }
@@ -581,13 +583,13 @@ namespace Community.CsharpSqlite.Ast
                 {
                     Expr pLeft = pExpr.pLeft;
                     Expr pRight = pExpr.pRight;
-                    if (pLeft.op == Sqlite3.TK_COLUMN)
+                    if (pLeft.Operator == TokenType.TK_COLUMN)
                     {
                         pTerm.leftCursor = pLeft.iTable;
                         pTerm.u.leftColumn = pLeft.iColumn;
                         pTerm.eOperator = wherec.operatorMask(op);
                     }
-                    if (pRight != null && pRight.op == Sqlite3.TK_COLUMN)
+                    if (pRight != null && pRight.Operator == TokenType.TK_COLUMN)
                     {
                         WhereTerm pNew;
                         Expr pDup;
@@ -621,7 +623,7 @@ namespace Community.CsharpSqlite.Ast
                         sqliteinth.testcase((prereqLeft | extraRight) != prereqLeft);
                         pNew.prereqRight = prereqLeft | extraRight;
                         pNew.prereqAll = prereqAll;
-                        pNew.eOperator = wherec.operatorMask(pDup.op);
+                        pNew.eOperator = wherec.operatorMask(pDup.Operator);
                     }
                 }
 #if !SQLITE_OMIT_BETWEEN_OPTIMIZATION
@@ -647,9 +649,9 @@ namespace Community.CsharpSqlite.Ast
                     {
                         ExprList pList = pExpr.x.pList;
                         int i;
-                        u8[] ops = new u8[] {
-							Sqlite3.TK_GE,
-							Sqlite3.TK_LE
+                        TokenType[] ops = new TokenType[] {
+							TokenType.TK_GE,
+							TokenType.TK_LE
 						};
                         Debug.Assert(pList != null);
                         Debug.Assert(pList.nExpr == 2);
@@ -676,7 +678,7 @@ namespace Community.CsharpSqlite.Ast
                     else
                         if (pExpr.Operator == TokenType.TK_OR)
                         {
-                            Debug.Assert(pWC.op == Sqlite3.TK_AND);
+                            Debug.Assert(pWC.Operator == TokenType.TK_AND);
                             this.exprAnalyzeOrTerm(pWC, idxTerm);
                             pTerm = pWC.a[idxTerm];
                         }
@@ -724,7 +726,7 @@ namespace Community.CsharpSqlite.Ast
                         ///<summary>
                         ///Last character before the first wildcard 
                         ///</summary>
-                        pC = pStr2.u.zToken[StringExtensions.sqlite3Strlen30(pStr2.u.zToken) - 1];
+                        pC = pStr2.u.zToken[StringExtensions.Strlen30(pStr2.u.zToken) - 1];
                         c = pC;
                         if (noCase)
                         {
@@ -745,15 +747,15 @@ namespace Community.CsharpSqlite.Ast
                             ///<param name="EV: R">08207 </param>
                             c = _Custom.sqlite3UpperToLower[c];
                         }
-                        pStr2.u.zToken = pStr2.u.zToken.Substring(0, StringExtensions.sqlite3Strlen30(pStr2.u.zToken) - 1) + (char)(c + 1);
+                        pStr2.u.zToken = pStr2.u.zToken.Substring(0, StringExtensions.Strlen30(pStr2.u.zToken) - 1) + (char)(c + 1);
                         // pC = c + 1;
                     }
                     pColl = db.sqlite3FindCollSeq( SqliteEncoding.UTF8, noCase ? "NOCASE" : "BINARY", 0);
-                    pNewExpr1 = pParse.sqlite3PExpr(Sqlite3.TK_GE, exprc.sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr1, 0);
+                    pNewExpr1 = pParse.sqlite3PExpr(TokenType.TK_GE, exprc.sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr1, 0);
                     idxNew1 = pWC.whereClauseInsert(pNewExpr1, WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC);
                     sqliteinth.testcase(idxNew1 == 0);
                     this.exprAnalyze(pWC, idxNew1);
-                    pNewExpr2 = pParse.sqlite3PExpr(Sqlite3.TK_LT, exprc.sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr2, null);
+                    pNewExpr2 = pParse.sqlite3PExpr(TokenType.TK_LT, exprc.sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr2, null);
                     idxNew2 = pWC.whereClauseInsert(pNewExpr2, WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC);
                     sqliteinth.testcase(idxNew2 == 0);
                     this.exprAnalyze(pWC, idxNew2);
@@ -788,7 +790,7 @@ namespace Community.CsharpSqlite.Ast
                     if ((prereqExpr & prereqColumn) == 0)
                     {
                         Expr pNewExpr;
-                        pNewExpr = pParse.sqlite3PExpr(Sqlite3.TK_MATCH, null, exprc.sqlite3ExprDup(db, pRight, 0), null);
+                        pNewExpr = pParse.sqlite3PExpr(TokenType.TK_MATCH, null, exprc.sqlite3ExprDup(db, pRight, 0), null);
                         idxNew = pWC.whereClauseInsert(pNewExpr, WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC);
                         sqliteinth.testcase(idxNew == 0);
                         pNewTerm = pWC.a[idxNew];
@@ -815,8 +817,8 @@ namespace Community.CsharpSqlite.Ast
   ** of the loop.  Without the WhereTermFlags.TERM_VNULL flag, the not-null check at
   ** the start of the loop will prevent any results from being returned.
   */
-      if ( pExpr.op == Sqlite3.TK_NOTNULL
-       && pExpr.pLeft.op == Sqlite3.TK_COLUMN
+      if ( pExpr.op == TokenType.TK_NOTNULL
+       && pExpr.pLeft.op == TokenType.TK_COLUMN
        && pExpr.pLeft.iColumn >= 0
       )
       {
@@ -825,9 +827,9 @@ namespace Community.CsharpSqlite.Ast
         int idxNew;
         WhereTerm pNewTerm;
 
-        pNewExpr = sqlite3PExpr( pParse, Sqlite3.TK_GT,
+        pNewExpr = sqlite3PExpr( pParse, TokenType.TK_GT,
                                 exprc.sqlite3ExprDup( db, pLeft, 0 ),
-                                sqlite3PExpr( pParse, Sqlite3.TK_NULL, 0, 0, 0 ), 0 );
+                                sqlite3PExpr( pParse, TokenType.TK_NULL, 0, 0, 0 ), 0 );
 
         idxNew = whereClauseInsert( pWC, pNewExpr,
                                   WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC | WhereTermFlags.TERM_VNULL );

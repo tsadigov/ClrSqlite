@@ -14,13 +14,13 @@ namespace Community.CsharpSqlite
 		 OP_Int64 = 8,
 		 OP_Real = 130///
 ///<summary>
-///same as Sqlite3.TK_FLOAT    
+///same as TokenType.TK_FLOAT    
 ///</summary>
 
 		,
 		 OP_String8 = 94///
 ///<summary>
-///same as Sqlite3.TK_STRING   
+///same as TokenType.TK_STRING   
 ///</summary>
 
 		,
@@ -34,37 +34,37 @@ namespace Community.CsharpSqlite
 		 OP_ResultRow = 16,
 		 OP_Concat = 91///
 ///<summary>
-///same as Sqlite3.TK_CONCAT   
+///same as TokenType.TK_CONCAT   
 ///</summary>
 
 		,
 		 OP_Add = 86///
 ///<summary>
-///same as Sqlite3.TK_PLUS     
+///same as TokenType.TK_PLUS     
 ///</summary>
 
 		,
 		 OP_Subtract = 87///
 ///<summary>
-///same as Sqlite3.TK_MINUS    
+///same as TokenType.TK_MINUS    
 ///</summary>
 
 		,
 		 OP_Multiply = 88///
 ///<summary>
-///same as Sqlite3.TK_STAR     
+///same as TokenType.TK_STAR     
 ///</summary>
 
 		,
 		 OP_Divide = 89///
 ///<summary>
-///same as Sqlite3.TK_SLASH    
+///same as TokenType.TK_SLASH    
 ///</summary>
 
 		,
 		 OP_Remainder = 90///
 ///<summary>
-///same as Sqlite3.TK_REM      
+///same as TokenType.TK_REM      
 ///</summary>
 
 		,
@@ -72,25 +72,25 @@ namespace Community.CsharpSqlite
 		 OP_Function = 18,
 		 OP_BitAnd = 82///
 ///<summary>
-///same as Sqlite3.TK_BITAND   
+///same as TokenType.TK_BITAND   
 ///</summary>
 
 		,
 		 OP_BitOr = 83///
 ///<summary>
-///same as Sqlite3.TK_BITOR    
+///same as TokenType.TK_BITOR    
 ///</summary>
 
 		,
 		 OP_ShiftLeft = 84///
 ///<summary>
-///same as Sqlite3.TK_LSHIFT   
+///same as TokenType.TK_LSHIFT   
 ///</summary>
 
 		,
 		 OP_ShiftRight = 85///
 ///<summary>
-///same as Sqlite3.TK_RSHIFT   
+///same as TokenType.TK_RSHIFT   
 ///</summary>
 
 		,
@@ -99,67 +99,67 @@ namespace Community.CsharpSqlite
 		 OP_RealAffinity = 22,
 		 OP_ToText = 141///
 ///<summary>
-///same as Sqlite3.TK_TO_TEXT  
+///same as TokenType.TK_TO_TEXT  
 ///</summary>
 
 		,
 		 OP_ToBlob = 142///
 ///<summary>
-///same as Sqlite3.TK_TO_BLOB  
+///same as TokenType.TK_TO_BLOB  
 ///</summary>
 
 		,
 		 OP_ToNumeric = 143///
 ///<summary>
-///same as Sqlite3.TK_TO_NUMERIC
+///same as TokenType.TK_TO_NUMERIC
 ///</summary>
 
 		,
 		 OP_ToInt = 144///
 ///<summary>
-///same as Sqlite3.TK_TO_INT   
+///same as TokenType.TK_TO_INT   
 ///</summary>
 
 		,
 		 OP_ToReal = 145///
 ///<summary>
-///same as Sqlite3.TK_TO_REAL  
+///same as TokenType.TK_TO_REAL  
 ///</summary>
 
 		,
 		 OP_Eq = 76///
 ///<summary>
-///same as Sqlite3.TK_EQ       
+///same as TokenType.TK_EQ       
 ///</summary>
 
 		,
 		 OP_Ne = 75///
 ///<summary>
-///same as Sqlite3.TK_NE       
+///same as TokenType.TK_NE       
 ///</summary>
 
 		,
 		 OP_Lt = 79///
 ///<summary>
-///same as Sqlite3.TK_LT       
+///same as TokenType.TK_LT       
 ///</summary>
 
 		,
 		 OP_Le = 78///
 ///<summary>
-///same as Sqlite3.TK_LE       
+///same as TokenType.TK_LE       
 ///</summary>
 
 		,
 		 OP_Gt = 77///
 ///<summary>
-///same as Sqlite3.TK_GT       
+///same as TokenType.TK_GT       
 ///</summary>
 
 		,
 		 OP_Ge = 80///
 ///<summary>
-///same as Sqlite3.TK_GE       
+///same as TokenType.TK_GE       
 ///</summary>
 
 		,
@@ -168,25 +168,25 @@ namespace Community.CsharpSqlite
 		 OP_Jump = 25,
 		 OP_And = 69///
 ///<summary>
-///same as Sqlite3.TK_AND      
+///same as TokenType.TK_AND      
 ///</summary>
 
 		,
 		 OP_Or = 68///
 ///<summary>
-///same as Sqlite3.TK_OR       
+///same as TokenType.TK_OR       
 ///</summary>
 
 		,
 		 OP_Not = 19///
 ///<summary>
-///same as Sqlite3.TK_NOT      
+///same as TokenType.TK_NOT      
 ///</summary>
 
 		,
 		 OP_BitNot = 93///
 ///<summary>
-///same as Sqlite3.TK_BITNOT   
+///same as TokenType.TK_BITNOT   
 ///</summary>
 
 		,
@@ -194,13 +194,13 @@ namespace Community.CsharpSqlite
 		 OP_IfNot = 27,
 		 OP_IsNull = 73///
 ///<summary>
-///same as Sqlite3.TK_ISNULL   
+///same as TokenType.TK_ISNULL   
 ///</summary>
 
 		,
 		 OP_NotNull = 74///
 ///<summary>
-///same as Sqlite3.TK_NOTNULL  
+///same as TokenType.TK_NOTNULL  
 ///</summary>
 
 		,

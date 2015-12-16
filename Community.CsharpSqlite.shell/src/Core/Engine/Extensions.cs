@@ -15,7 +15,7 @@ namespace Community.CsharpSqlite
         {
             Engine.VdbeFrame pFrame = null;
             if (null != pFrame)
-                pFrame = MyLinqExtensions.path(pFrame, x => x.pParent).Last();
+                pFrame = pFrame.path( x => x.pParent).Last();
 
             return pFrame;
         }

@@ -49,7 +49,7 @@ namespace Community.CsharpSqlite.Utils
         }
         public static Str sub(this String buffer)
         {
-            return new Str(buffer, StringExtensions.sqlite3Strlen30(buffer));
+            return new Str(buffer, StringExtensions.Strlen30(buffer));
         }
         public static Str sub(this String buffer,int len) {
             return new Str(buffer, len);

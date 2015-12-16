@@ -34,7 +34,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_TO_TEXT, in1 
+                        ///same as TokenType.TK_TO_TEXT, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
                         vdbe.memAboutToChange(pIn1);
@@ -71,7 +71,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_TO_BLOB, in1 
+                        ///same as TokenType.TK_TO_BLOB, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
                         if ((pIn1.flags & MemFlags.MEM_Null) != 0)
@@ -110,7 +110,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_TO_NUMERIC, in1 
+                        ///same as TokenType.TK_TO_NUMERIC, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
                         pIn1.sqlite3VdbeMemNumerify();
@@ -132,7 +132,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_TO_INT, in1 
+                        ///same as TokenType.TK_TO_INT, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
                         if ((pIn1.flags & MemFlags.MEM_Null) == 0)
@@ -157,7 +157,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_TO_REAL, in1 
+                        ///same as TokenType.TK_TO_REAL, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
                         vdbe.memAboutToChange(pIn1);

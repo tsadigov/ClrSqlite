@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite
                 SqlResult rc;
                 Module pMod;
                 db.mutex.sqlite3_mutex_enter();
-                var nName = StringExtensions.sqlite3Strlen30(zName);
+                var nName = StringExtensions.Strlen30(zName);
                 pMod = new Module();
                 //  (Module)sqlite3DbMallocRaw( db, sizeof( Module ) + nName + 1 );
                 if (pMod != null)
@@ -540,7 +540,7 @@ namespace Community.CsharpSqlite
                 ///Locate the required virtual table module 
                 ///</summary>
                 zMod = pTab.azModuleArg[0];
-                pMod = (Module)db.aModule.Find(zMod, StringExtensions.sqlite3Strlen30(zMod), (Module)null);
+                pMod = (Module)db.aModule.Find(zMod, StringExtensions.Strlen30(zMod), (Module)null);
                 ///
                 ///<summary>
                 ///If the module has been registered and includes a Create method, 
@@ -929,7 +929,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
                 if (Sqlite3.NEVER(pExpr == null))
                     return pDef;
-                if (pExpr.op != Sqlite3.TK_COLUMN)
+                if (pExpr.Operator != TokenType.TK_COLUMN)
                     return pDef;
                 pTab = pExpr.pTab;
                 if (Sqlite3.NEVER(pTab == null))

@@ -111,7 +111,7 @@ return pWhere;
 **   );
 */
 
-pSelectRowid = sqlite3PExpr( pParse, Sqlite3.TK_ROW, null, null, null );
+pSelectRowid = sqlite3PExpr( pParse, TokenType.TK_ROW, null, null, null );
 if( pSelectRowid == null ) goto limit_where_cleanup_2;
 pEList = exprc.sqlite3ExprListAppend( pParse, null, pSelectRowid);
 if( pEList == null ) goto limit_where_cleanup_2;
@@ -130,9 +130,9 @@ pOrderBy, 0, pLimit, pOffset );
 if( pSelect == null ) return null;
 
 /* now generate the new WHERE rowid IN clause for the DELETE/UDPATE */
-pWhereRowid = sqlite3PExpr( pParse, Sqlite3.TK_ROW, null, null, null );
+pWhereRowid = sqlite3PExpr( pParse, TokenType.TK_ROW, null, null, null );
 if( pWhereRowid == null ) goto limit_where_cleanup_1;
-pInClause = sqlite3PExpr( pParse, Sqlite3.TK_IN, pWhereRowid, null, null );
+pInClause = sqlite3PExpr( pParse, TokenType.TK_IN, pWhereRowid, null, null );
 if( pInClause == null ) goto limit_where_cleanup_1;
 
 pInClause->x.pSelect = pSelect;

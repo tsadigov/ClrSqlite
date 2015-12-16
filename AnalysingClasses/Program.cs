@@ -26,10 +26,13 @@ namespace AnalysingClasses
             var zSrcFile = "hehehe";
             Btree btree = null;
             r = Btree.Open(fs, "hehehe", pSrc, ref btree, 0, 262);
-            var schema=btree.sqlite3SchemaGet(pSrc);
+            
 
             r = Sqlite3.sqlite3_open(zSrcFile, out pSrc);
-
+            String m="";
+            pSrc.init.busy = 1;
+            Sqlite3.sqlite3InitOne(pSrc, 0, ref m);
+            var schema = btree.sqlite3SchemaGet(pSrc);
 
 
             var zMaster = sqliteinth.SCHEMA_TABLE(1);
@@ -44,7 +47,7 @@ namespace AnalysingClasses
             }
             else
             {
-                Debug.Assert(0 == pSrc.init.busy);
+                //Debug.Assert(0 == pSrc.init.busy);
                 pSrc.init.busy = 1;
                 initData.rc = SqlResult.SQLITE_OK;
                 //Debug.Assert( 0 == db.mallocFailed );

@@ -87,7 +87,7 @@ namespace Community.CsharpSqlite.Metadata.Traverse
         )
         {
             FuncDef pOther;
-            int nName = StringExtensions.sqlite3Strlen30(pDef.zName);
+            int nName = StringExtensions.Strlen30(pDef.zName);
             u8 c1 = (u8)pDef.zName[0];
             int h = (_Custom.sqlite3UpperToLower[c1] + nName) % Sqlite3.ArraySize(pHash.a);
             pOther = functionSearch(pHash, h, pDef.zName, nName);

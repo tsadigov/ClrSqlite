@@ -224,7 +224,7 @@ p.zName,  P4Usage.P4_STATIC );
                             if ((mask & pParse.cookieMask) == 0)
                                 continue;
                             Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
-                            v.sqlite3VdbeAddOp2((int) OpCode.OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
+                            v.sqlite3VdbeAddOp2( OpCode.OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
                             if (db.init.busy == 0)
                             {
                                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
@@ -1123,7 +1123,7 @@ p.zName,  P4Usage.P4_STATIC );
                     if (!CharExtensions.sqlite3Isalnum(zIdent[j]) && zIdent[j] != '_')
                         break;
                 }
-                needQuote = CharExtensions.sqlite3Isdigit(zIdent[0]) || Sqlite3.sqlite3KeywordCode(zIdent, j) != Sqlite3.TK_ID;
+                needQuote = CharExtensions.sqlite3Isdigit(zIdent[0]) || (TokenType)Sqlite3.sqlite3KeywordCode(zIdent, j) != TokenType.TK_ID;
                 if (!needQuote)
                 {
                     needQuote = (j < zIdent.Length && zIdent[j] != 0);
@@ -1447,7 +1447,7 @@ db.xAuth = xAuth;
                 ///<param name="reflect this.">reflect this.</param>
                 ///<param name=""></param>
                 ///<param name="The "#NNN" in the SQL is a special constant that means whatever value">The "#NNN" in the SQL is a special constant that means whatever value</param>
-                ///<param name="is in register NNN.  See grammar rules associated with the Sqlite3.TK_REGISTER">is in register NNN.  See grammar rules associated with the Sqlite3.TK_REGISTER</param>
+                ///<param name="is in register NNN.  See grammar rules associated with the TokenType.TK_REGISTER">is in register NNN.  See grammar rules associated with the TokenType.TK_REGISTER</param>
                 ///<param name="token for additional information.">token for additional information.</param>
                 build.sqlite3NestedParse(pParse, "UPDATE %Q.%s SET rootpage=%d WHERE #%d AND rootpage=#%d", pParse.db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), iTable, r1, r1);
 #endif
@@ -1587,7 +1587,7 @@ db.xAuth = xAuth;
                 {
                     for (i = 0; i < nCol; i++)
                     {
-                        int n = StringExtensions.sqlite3Strlen30(pToCol.a[i].zName);
+                        int n = StringExtensions.Strlen30(pToCol.a[i].zName);
                         if (pFKey.aCol[i] == null)
                             pFKey.aCol[i] = new FKey.sColMap();
                         pFKey.aCol[i].zCol = pToCol.a[i].zName;
@@ -1611,7 +1611,7 @@ db.xAuth = xAuth;
                 
                 
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, 0, p.pSchema));
-                pNextTo = HashExtensions.sqlite3HashInsert(ref p.pSchema.fkeyHash, pFKey.zTo, StringExtensions.sqlite3Strlen30(pFKey.zTo), pFKey);
+                pNextTo = HashExtensions.sqlite3HashInsert(ref p.pSchema.fkeyHash, pFKey.zTo, StringExtensions.Strlen30(pFKey.zTo), pFKey);
                 //if( pNextTo==pFKey ){
                 //  db.mallocFailed = 1;
                 //  goto fk_end;
@@ -2301,11 +2301,11 @@ goto exit_drop_index;
                 if (v == null)
                     return;
                 
-                if (type != Sqlite3.TK_DEFERRED)
+                if (type != (int)TokenType.TK_DEFERRED)
                 {
                     for (int i = 0; i < db.BackendCount; i++)
                     {
-                        v.sqlite3VdbeAddOp2(OpCode.OP_Transaction, i, (type == Sqlite3.TK_EXCLUSIVE) ? 2 : 1);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Transaction, i, (type == (int)TokenType.TK_EXCLUSIVE) ? 2 : 1);
                         Engine.vdbeaux.sqlite3VdbeUsesBtree(v, i);
                     }
                 }

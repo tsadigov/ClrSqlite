@@ -115,33 +115,33 @@ namespace Community.CsharpSqlite.Engine.Op
                 case OpCode.OP_Eq:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_EQ, jump, in1, in3 
+                ///same as TokenType.TK_EQ, jump, in1, in3 
                 ///</summary>
                 case OpCode.OP_Ne:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_NE, jump, in1, in3 
+                ///same as TokenType.TK_NE, jump, in1, in3 
                 ///</summary>
                 case OpCode.OP_Lt:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_LT, jump, in1, in3 
+                ///same as TokenType.TK_LT, jump, in1, in3 
                 ///</summary>
                 case OpCode.OP_Le:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_LE, jump, in1, in3 
+                ///same as TokenType.TK_LE, jump, in1, in3 
                 ///</summary>
                 case OpCode.OP_Gt:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_GT, jump, in1, in3 
+                ///same as TokenType.TK_GT, jump, in1, in3 
                 ///</summary>
                 case OpCode.OP_Ge:
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_GE, jump, in1, in3 
+                        ///same as TokenType.TK_GE, jump, in1, in3 
                         ///</summary>
                         int res = 0;
                         ///
@@ -310,16 +310,16 @@ namespace Community.CsharpSqlite.Engine.Op
                 ///
                 ///</summary>
                 case OpCode.OP_BitAnd:
-                ///same as Sqlite3.TK_BITAND, in1, in2, ref3 
+                ///same as TokenType.TK_BITAND, in1, in2, ref3 
                 case OpCode.OP_BitOr:
-                ///same as Sqlite3.TK_BITOR, in1, in2, ref3 
+                ///same as TokenType.TK_BITOR, in1, in2, ref3 
                 case OpCode.OP_ShiftLeft:
-                ///same as Sqlite3.TK_LSHIFT, in1, in2, ref3 
+                ///same as TokenType.TK_LSHIFT, in1, in2, ref3 
                 case OpCode.OP_ShiftRight:
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_RSHIFT, in1, in2, ref3 
+                        ///same as TokenType.TK_RSHIFT, in1, in2, ref3 
                         ///</summary>
                         i64 iA;
                         u64 uA;
@@ -427,7 +427,7 @@ namespace Community.CsharpSqlite.Engine.Op
                 case OpCode.OP_And:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_AND, in1, in2, ref3 
+                ///same as TokenType.TK_AND, in1, in2, ref3 
                 ///</summary>
                 case OpCode.OP_Or:
                     {   
@@ -447,7 +447,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_NOT, in1 
+                        ///same as TokenType.TK_NOT, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
                         var pOut = aMem[pOp.p2];
@@ -474,7 +474,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_BITNOT, in1 
+                        ///same as TokenType.TK_BITNOT, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
                         var pOut = aMem[pOp.p2];
@@ -496,7 +496,7 @@ namespace Community.CsharpSqlite.Engine.Op
 
         private static void OpCode_AndOr(VdbeOp pOp, Mem[] aMem)
         {
-            ///same as Sqlite3.TK_OR, in1, in2, ref3 
+            ///same as TokenType.TK_OR, in1, in2, ref3 
             int v1;
             ///Left operand:  0==FALSE, 1==TRUE, 2==UNKNOWN or NULL 
             int v2;

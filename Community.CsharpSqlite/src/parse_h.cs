@@ -289,10 +289,18 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 			///</summary>
 			public u32 newmask;
 			///<summary>
-			///Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT or Sqlite3.TK_DELETE 
+			///TokenType.TK_UPDATE, TokenType.TK_INSERT or TokenType.TK_DELETE 
 			///</summary>
 			
 			public u8 eTriggerOp;
+            public TokenType eTriggerOperator
+            {
+                get
+                {
+                    return (TokenType)eTriggerOp;
+                }
+            }
+
 			///
 			///<summary>
 			///Default ON CONFLICT policy for trigger steps 
@@ -1871,7 +1879,7 @@ return;
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																																														if( pAuthArg ){
 char *zAuthArg;
-if( pAuthArg->op==Sqlite3.TK_STRING ){
+if( pAuthArg->op==TokenType.TK_STRING ){
   zAuthArg = pAuthArg->u.zToken;
 }else{
   zAuthArg = 0;
@@ -2492,11 +2500,11 @@ goto attach_end;
 					///<summary>
 					///Name of column in child table 
 					///</summary>
-					pLeft=exprc.sqlite3Expr(db,Sqlite3.TK_REGISTER,null);
+					pLeft=exprc.sqlite3Expr(db,TokenType.TK_REGISTER,null);
 					if(pLeft!=null) {
 						///
 						///<summary>
-						///Set the collation sequence and affinity of the LHS of each Sqlite3.TK_EQ
+						///Set the collation sequence and affinity of the LHS of each TokenType.TK_EQ
 						///expression to the parent key column defaults.  
 						///</summary>
 						if(pIdx!=null) {
@@ -2517,8 +2525,8 @@ goto attach_end;
 					iCol=aiCol!=null?aiCol[i]:pFKey.aCol[0].iFrom;
 					Debug.Assert(iCol>=0);
 					zCol=pFKey.pFrom.aCol[iCol].zName;
-					pRight=exprc.sqlite3Expr(db,Sqlite3.TK_ID,zCol);
-					pEq=this.sqlite3PExpr(Sqlite3.TK_EQ,pLeft,pRight,0);
+					pRight=exprc.sqlite3Expr(db,TokenType.TK_ID,zCol);
+					pEq=this.sqlite3PExpr(TokenType.TK_EQ,pLeft,pRight,0);
 					pWhere=exprc.sqlite3ExprAnd(db,pWhere,pEq);
 				}
 				///
@@ -2544,15 +2552,15 @@ goto attach_end;
 					///<summary>
 					///Column ref to child table 
 					///</summary>
-					pLeft=exprc.sqlite3Expr(db,Sqlite3.TK_REGISTER,null);
-					pRight=exprc.sqlite3Expr(db,Sqlite3.TK_COLUMN,null);
+					pLeft=exprc.sqlite3Expr(db,TokenType.TK_REGISTER,null);
+					pRight=exprc.sqlite3Expr(db,TokenType.TK_COLUMN,null);
 					if(pLeft!=null&&pRight!=null) {
                         pLeft.iTable = regData;
                         pLeft.affinity = sqliteinth.SQLITE_AFF_INTEGER;
 						pRight.iTable=pSrc.a[0].iCursor;
 						pRight.iColumn=-1;
 					}
-					pEq=this.sqlite3PExpr(Sqlite3.TK_NE,pLeft,pRight,0);
+					pEq=this.sqlite3PExpr(TokenType.TK_NE,pLeft,pRight,0);
 					pWhere=exprc.sqlite3ExprAnd(db,pWhere,pEq);
 				}
 				///
@@ -3171,8 +3179,8 @@ goto attach_end;
 						Debug.Assert(iFromCol>=0);
 						tToCol.zRestSql=pIdx!=null?pTab.aCol[pIdx.aiColumn[i]].zName:"oid";
 						tFromCol.zRestSql=pFKey.pFrom.aCol[iFromCol].zName;
-						tToCol.Length=StringExtensions.sqlite3Strlen30(tToCol.zRestSql);
-						tFromCol.Length=StringExtensions.sqlite3Strlen30(tFromCol.zRestSql);
+						tToCol.Length=StringExtensions.Strlen30(tToCol.zRestSql);
+						tFromCol.Length=StringExtensions.Strlen30(tFromCol.zRestSql);
 						///
 						///<summary>
 						///Create the expression "OLD.zToCol = zFromCol". It is important
@@ -3180,7 +3188,7 @@ goto attach_end;
 						///that the affinity and collation sequence associated with the
 						///parent table are used for the comparison. 
 						///</summary>
-						pEq=this.sqlite3PExpr(Sqlite3.TK_EQ,this.sqlite3PExpr(Sqlite3.TK_DOT,this.sqlite3PExpr(Sqlite3.TK_ID,null,null,tOld),this.sqlite3PExpr(Sqlite3.TK_ID,null,null,tToCol),0),this.sqlite3PExpr(Sqlite3.TK_ID,null,null,tFromCol),0);
+						pEq=this.sqlite3PExpr(TokenType.TK_EQ,this.sqlite3PExpr(TokenType.TK_DOT,this.sqlite3PExpr(TokenType.TK_ID,null,null,tOld),this.sqlite3PExpr(TokenType.TK_ID,null,null,tToCol),0),this.sqlite3PExpr(TokenType.TK_ID,null,null,tFromCol),0);
 						pWhere=exprc.sqlite3ExprAnd(db,pWhere,pEq);
 						///
 						///<summary>
@@ -3191,13 +3199,13 @@ goto attach_end;
 						///
 						///</summary>
 						if(pChanges!=null) {
-							pEq=this.sqlite3PExpr(Sqlite3.TK_IS,this.sqlite3PExpr(Sqlite3.TK_DOT,this.sqlite3PExpr(Sqlite3.TK_ID,null,null,tOld),this.sqlite3PExpr(Sqlite3.TK_ID,null,null,tToCol),0),this.sqlite3PExpr(Sqlite3.TK_DOT,this.sqlite3PExpr(Sqlite3.TK_ID,null,null,tNew),this.sqlite3PExpr(Sqlite3.TK_ID,null,null,tToCol),0),0);
+							pEq=this.sqlite3PExpr(TokenType.TK_IS,this.sqlite3PExpr(TokenType.TK_DOT,this.sqlite3PExpr(TokenType.TK_ID,null,null,tOld),this.sqlite3PExpr(TokenType.TK_ID,null,null,tToCol),0),this.sqlite3PExpr(TokenType.TK_DOT,this.sqlite3PExpr(TokenType.TK_ID,null,null,tNew),this.sqlite3PExpr(TokenType.TK_ID,null,null,tToCol),0),0);
 							pWhen=exprc.sqlite3ExprAnd(db,pWhen,pEq);
 						}
 						if(action!=OnConstraintError.OE_Restrict&&(action!=OnConstraintError.OE_Cascade||pChanges!=null)) {
 							Expr pNew;
 							if(action==OnConstraintError.OE_Cascade) {
-								pNew=this.sqlite3PExpr(Sqlite3.TK_DOT,this.sqlite3PExpr(Sqlite3.TK_ID,null,null,tNew),this.sqlite3PExpr(Sqlite3.TK_ID,null,null,tToCol),0);
+								pNew=this.sqlite3PExpr(TokenType.TK_DOT,this.sqlite3PExpr(TokenType.TK_ID,null,null,tNew),this.sqlite3PExpr(TokenType.TK_ID,null,null,tToCol),0);
 							}
 							else
 								if(action==OnConstraintError.OE_SetDflt) {
@@ -3206,11 +3214,11 @@ goto attach_end;
 										pNew=exprc.sqlite3ExprDup(db,pDflt,0);
 									}
 									else {
-										pNew=this.sqlite3PExpr(Sqlite3.TK_NULL,0,0,0);
+										pNew=this.sqlite3PExpr(TokenType.TK_NULL,0,0,0);
 									}
 								}
 								else {
-									pNew=this.sqlite3PExpr(Sqlite3.TK_NULL,0,0,0);
+									pNew=this.sqlite3PExpr(TokenType.TK_NULL,0,0,0);
 								}
 							pList=this.sqlite3ExprListAppend(pList,pNew);
 							this.sqlite3ExprListSetName(pList,tFromCol,0);
@@ -3218,13 +3226,13 @@ goto attach_end;
 					}
 					db.sqlite3DbFree(ref aiCol);
 					zFrom=pFKey.pFrom.zName;
-					nFrom=StringExtensions.sqlite3Strlen30(zFrom);
+					nFrom=StringExtensions.Strlen30(zFrom);
 					if(action==OnConstraintError.OE_Restrict) {
 						Token tFrom=new Token();
 						Expr pRaise;
 						tFrom.zRestSql=zFrom;
 						tFrom.Length=nFrom;
-						pRaise=exprc.sqlite3Expr(db,Sqlite3.TK_RAISE,"foreign key constraint failed");
+						pRaise=exprc.sqlite3Expr(db,TokenType.TK_RAISE,"foreign key constraint failed");
 						if(pRaise!=null) {
 							pRaise.affinity=(char)OnConstraintError.OE_Abort;
 						}
@@ -3255,7 +3263,7 @@ goto attach_end;
 						pStep.pExprList=exprc.sqlite3ExprListDup(db,pList,EXPRDUP_REDUCE);
 						pStep.pSelect=exprc.sqlite3SelectDup(db,pSelect,EXPRDUP_REDUCE);
 						if(pWhen!=null) {
-							pWhen=this.sqlite3PExpr(Sqlite3.TK_NOT,pWhen,0,0);
+							pWhen=this.sqlite3PExpr(TokenType.TK_NOT,pWhen,0,0);
 							pTrigger.pWhen=exprc.sqlite3ExprDup(db,pWhen,EXPRDUP_REDUCE);
 						}
 						///
@@ -3275,23 +3283,23 @@ goto attach_end;
 					SelectMethods.SelectDestructor(db,ref pSelect);
 					switch(action) {
 					case OnConstraintError.OE_Restrict:
-					pStep.op=Sqlite3.TK_SELECT;
+					pStep.Operator = TokenType.TK_SELECT;
 					break;
 					case OnConstraintError.OE_Cascade:
 					if(null==pChanges) {
-						pStep.op=Sqlite3.TK_DELETE;
+						pStep.Operator= TokenType.TK_DELETE;
 						break;
 					}
 					goto default;
 					default:
-					pStep.op=Sqlite3.TK_UPDATE;
+					pStep.Operator = TokenType.TK_UPDATE;
 					break;
 					}
 					pStep.pTrig=pTrigger;
 					pTrigger.pSchema=pTab.pSchema;
 					pTrigger.pTabSchema=pTab.pSchema;
 					pFKey.apTrigger[iAction]=pTrigger;
-					pTrigger.op=(byte)(pChanges!=null?Sqlite3.TK_UPDATE:Sqlite3.TK_DELETE);
+					pTrigger.op=(byte)(pChanges!=null?TokenType.TK_UPDATE:TokenType.TK_DELETE);
 				}
 				return pTrigger;
 			}
@@ -3431,7 +3439,7 @@ goto attach_end;
 				//Log.Indent();
                 SqlResult nErr = (SqlResult)0;///Number of errors encountered 
 				ParseMethods.yyParser pEngine;///type of the next token 
-				int lastTokenParsed=-1;///type of the previous token 
+				var lastTokenParsed=-1;///type of the previous token 
 				byte enableLookaside;///<param name="Saved value of db">>lookaside.bEnabled </param>
 				Connection db=this.db;///The database connection 
 								if(db.activeVdbeCnt==0) {
@@ -3499,7 +3507,7 @@ goto attach_end;
 				abort_parse:
 				this.zTail=new StringBuilder(zSql.Length<=i?"":zSql.Substring(i,zSql.Length-i));
 				if(zSql.Length>=i&&nErr==0&&this.rc==SqlResult.SQLITE_OK) {
-					if(lastTokenParsed!=Sqlite3.TK_SEMI) {
+					if((TokenType)lastTokenParsed!=TokenType.TK_SEMI) {
 						pEngine.sqlite3Parser(TokenType.TK_SEMI,this.sLastToken,this);
 					}
 					pEngine.sqlite3Parser(0,this.sLastToken,this);
@@ -3815,7 +3823,7 @@ goto insert_cleanup;
 				///inserted into is a view
 				///</summary>
 				#if !SQLITE_OMIT_TRIGGER
-				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_INSERT,null,out tmask);
+				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_INSERT,null,out tmask);
 				isView=pTab.pSelect!=null;
 				#else
 																																																																																																					      Trigger pTrigger = null;  // define pTrigger 0
@@ -4297,7 +4305,7 @@ isView = false;
                     ///<summary>
                     ///Fire BEFORE or INSTEAD OF triggers 
                     ///</summary>
-                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_INSERT,null,TriggerType.TRIGGER_BEFORE,pTab,regCols-pTab.nCol-1,onError,endOfLoop);
+                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_BEFORE,pTab,regCols-pTab.nCol-1,onError,endOfLoop);
 					this.sqlite3ReleaseTempRange(regCols,pTab.nCol+1);
 				}
 				#endif
@@ -4459,7 +4467,7 @@ isView = false;
                     ///<summary>
                     ///Code AFTER triggers 
                     ///</summary>
-                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_INSERT,null,TriggerType.TRIGGER_AFTER,pTab,regData-2-pTab.nCol,onError,endOfLoop);
+                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_AFTER,pTab,regData-2-pTab.nCol,onError,endOfLoop);
 				}
 				#endif
 				///
@@ -4860,7 +4868,7 @@ isView = false;
                         if ((this.db.flags & SqliteFlags.SQLITE_RecTriggers) != 0)
                         {
 							TriggerType iDummy;
-							pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
+							pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_DELETE,null,out iDummy);
 						}
 						if(pTrigger!=null||this.sqlite3FkRequired(pTab,null,0)!=0) {
 							build.sqlite3MultiWrite(this);
@@ -4995,7 +5003,7 @@ isView = false;
                         if ((this.db.flags & SqliteFlags.SQLITE_RecTriggers) != 0)
                         {
 							TriggerType iDummy;
-							pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
+							pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_DELETE,null,out iDummy);
 						}
 						this.sqlite3GenerateRowDelete(pTab,baseCur,regR,0,pTrigger,OnConstraintError.OE_Replace);
 						seenReplace=true;
@@ -5441,7 +5449,7 @@ isView = false;
 				///
 				///</summary>
 				#if !SQLITE_OMIT_TRIGGER
-				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_UPDATE,pChanges,out tmask);
+				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_UPDATE,pChanges,out tmask);
 				isView=pTab.pSelect!=null;
 				Debug.Assert(pTrigger!=null||tmask==0);
 				#else
@@ -5797,7 +5805,7 @@ aXRef[j] = -1;
 				if((tmask&TriggerType.TRIGGER_BEFORE)!=0) {
                     v.sqlite3VdbeAddOp2(OpCode.OP_Affinity, regNew, pTab.nCol);
 					v.sqlite3TableAffinityStr(pTab);
-                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_UPDATE,pChanges,TriggerType.TRIGGER_BEFORE,pTab,regOldRowid,onError,addr);
+                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_UPDATE,pChanges,TriggerType.TRIGGER_BEFORE,pTab,regOldRowid,onError,addr);
 					///
 					///<summary>
 					///</summary>
@@ -5883,7 +5891,7 @@ aXRef[j] = -1;
                 {
 					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regRowCount,1);
 				}
-                TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_UPDATE,pChanges,TriggerType.TRIGGER_AFTER,pTab,regOldRowid,onError,addr);
+                TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_UPDATE,pChanges,TriggerType.TRIGGER_AFTER,pTab,regOldRowid,onError,addr);
 				///
 				///<summary>
 				///Repeat the above with the next record to be updated, until
@@ -6022,7 +6030,7 @@ aXRef[j] = -1;
 				///all updated rows.
 				///
 				///</summary>
-				pEList=this.sqlite3ExprListAppend(0,exprc.sqlite3Expr(db,Sqlite3.TK_ID,"_rowid_"));
+				pEList=this.sqlite3ExprListAppend(0,exprc.sqlite3Expr(db,TokenType.TK_ID,"_rowid_"));
 				if(pRowid!=null) {
 					pEList=this.sqlite3ExprListAppend(pEList,exprc.sqlite3ExprDup(db,pRowid,0));
 				}
@@ -6032,7 +6040,7 @@ aXRef[j] = -1;
 						pExpr=exprc.sqlite3ExprDup(db,pChanges.a[aXRef[i]].pExpr,0);
 					}
 					else {
-						pExpr=exprc.sqlite3Expr(db,Sqlite3.TK_ID,pTab.aCol[i].zName);
+						pExpr=exprc.sqlite3Expr(db,TokenType.TK_ID,pTab.aCol[i].zName);
 					}
 					pEList=this.sqlite3ExprListAppend(pEList,pExpr);
 				}
@@ -6295,7 +6303,7 @@ aXRef[j] = -1;
 				///</summary>
 				#if !SQLITE_OMIT_TRIGGER
 				TriggerType iDummy;
-				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,Sqlite3.TK_DELETE,null,out iDummy);
+				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_DELETE,null,out iDummy);
 				isView=pTab.pSelect!=null;
 				#else
 																																																																																																					      const Trigger pTrigger = null;
@@ -6627,7 +6635,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
                     ///<summary>
                     ///Invoke BEFORE DELETE trigger programs. 
                     ///</summary>
-                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_DELETE,null,TriggerType.TRIGGER_BEFORE,pTab,iOld,onconf,iLabel);
+                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_DELETE,null,TriggerType.TRIGGER_BEFORE,pTab,iOld,onconf,iLabel);
 					///
 					///<summary>
 					///Seek the cursor to the row to be deleted again. It may be that
@@ -6668,7 +6676,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
                 ///<summary>
                 ///Invoke AFTER DELETE trigger programs. 
                 ///</summary>
-                TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,Sqlite3.TK_DELETE,null,TriggerType.TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
+                TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_DELETE,null,TriggerType.TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
 				///
 				///<summary>
 				///Jump here if the row had already been deleted before any BEFORE
@@ -6805,8 +6813,8 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 						///
 						///<summary>
 						///</summary>
-						///<param name="op==Sqlite3.TK_REGISTER && p">>pTab!=0 happens when pExpr was originally</param>
-						///<param name="a Sqlite3.TK_COLUMN but was previously evaluated and cached in a register ">a Sqlite3.TK_COLUMN but was previously evaluated and cached in a register </param>
+						///<param name="op==TokenType.TK_REGISTER && p">>pTab!=0 happens when pExpr was originally</param>
+						///<param name="a TokenType.TK_COLUMN but was previously evaluated and cached in a register ">a TokenType.TK_COLUMN but was previously evaluated and cached in a register </param>
 						string zColl;
 						int j=p.iColumn;
 						if(j>=0) {
@@ -6898,24 +6906,24 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				p.exprSetHeight();
 				this.sqlite3ExprCheckHeight(p.nHeight);
 			}
-			public Expr sqlite3PExpr(int op,int null_3,int null_4,int null_5) {
+			public Expr sqlite3PExpr(TokenType op,int null_3,int null_4,int null_5) {
 				return this.sqlite3PExpr(op,null,null,null);
 			}
-			public Expr sqlite3PExpr(int op,int null_3,int null_4,Token pToken) {
+			public Expr sqlite3PExpr(TokenType op,int null_3,int null_4,Token pToken) {
 				return this.sqlite3PExpr(op,null,null,pToken);
 			}
-			public Expr sqlite3PExpr(int op,Expr pLeft,int null_4,int null_5) {
+			public Expr sqlite3PExpr(TokenType op,Expr pLeft,int null_4,int null_5) {
 				return this.sqlite3PExpr(op,pLeft,null,null);
 			}
-			public Expr sqlite3PExpr(int op,Expr pLeft,int null_4,Token pToken) {
+			public Expr sqlite3PExpr(TokenType op,Expr pLeft,int null_4,Token pToken) {
 				return this.sqlite3PExpr(op,pLeft,null,pToken);
 			}
-			public Expr sqlite3PExpr(int op,Expr pLeft,Expr pRight,int null_5) {
+			public Expr sqlite3PExpr(TokenType op,Expr pLeft,Expr pRight,int null_5) {
 				return this.sqlite3PExpr(op,pLeft,pRight,null);
 			}
 			public Expr sqlite3PExpr(///
-			
-			int op,///
+
+            TokenType op,///
 			///<summary>
 			///Expression opcode 
 			///</summary>
@@ -7166,7 +7174,7 @@ return;
 				///<summary>
 				///The VM under construction 
 				///</summary>
-				int op;
+				TokenType op;
 				///
 				///<summary>
 				///The opcode being coded 
@@ -7202,13 +7210,13 @@ return;
 					return 0;
 				}
 				if(pExpr==null) {
-					op=Sqlite3.TK_NULL;
+					op=TokenType.TK_NULL;
 				}
 				else {
-					op=pExpr.op;
+					op=pExpr.Operator;
 				}
 				switch(op) {
-				case Sqlite3.TK_AGG_COLUMN:
+				case TokenType.TK_AGG_COLUMN:
 				{
 					AggInfo pAggInfo=pExpr.pAggInfo;
 					AggInfo_col pCol=pAggInfo.aCol[pExpr.iAgg];
@@ -7224,11 +7232,11 @@ return;
 						}
 					///
 					///<summary>
-					///Otherwise, fall thru into the Sqlite3.TK_COLUMN case 
+					///Otherwise, fall thru into the TokenType.TK_COLUMN case 
 					///</summary>
 				}
-				goto case Sqlite3.TK_COLUMN;
-				case Sqlite3.TK_COLUMN: {
+				goto case TokenType.TK_COLUMN;
+				case TokenType.TK_COLUMN: {
 					if(pExpr.iTable<0) {
 						///
 						///<summary>
@@ -7242,28 +7250,28 @@ return;
 					}
 					break;
 				}
-				case Sqlite3.TK_INTEGER: {
+				case TokenType.TK_INTEGER: {
 					this.codeInteger(pExpr,false,target);
 					break;
 				}
 				#if !SQLITE_OMIT_FLOATING_POINT
-				case Sqlite3.TK_FLOAT: {
+				case TokenType.TK_FLOAT: {
 					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
 					exprc.codeReal(v,pExpr.u.zToken,false,target);
 					break;
 				}
 				#endif
-				case Sqlite3.TK_STRING: {
+				case TokenType.TK_STRING: {
 					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
 					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,target,0,pExpr.u.zToken,0);
 					break;
 				}
-				case Sqlite3.TK_NULL: {
+				case TokenType.TK_NULL: {
                     v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, target);
 					break;
 				}
 				#if !SQLITE_OMIT_BLOB_LITERAL
-				case Sqlite3.TK_BLOB: {
+				case TokenType.TK_BLOB: {
 					int n;
 					string z;
 					byte[] zBlob;
@@ -7271,14 +7279,14 @@ return;
 					Debug.Assert(pExpr.u.zToken[0]=='x'||pExpr.u.zToken[0]=='X');
 					Debug.Assert(pExpr.u.zToken[1]=='\'');
 					z=pExpr.u.zToken.Substring(2);
-					n=StringExtensions.sqlite3Strlen30(z)-1;
+					n=StringExtensions.Strlen30(z)-1;
 					Debug.Assert(z[n]=='\'');
 					zBlob=Converter.sqlite3HexToBlob(v.sqlite3VdbeDb(),z,n);
                     v.sqlite3VdbeAddOp4(OpCode.OP_Blob, n / 2, target, 0, zBlob,  P4Usage.P4_DYNAMIC);
 					break;
 				}
 				#endif
-				case Sqlite3.TK_VARIABLE: {
+				case TokenType.TK_VARIABLE: {
 					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
 					Debug.Assert(pExpr.u.zToken!=null);
 					Debug.Assert(pExpr.u.zToken.Length!=0);
@@ -7289,16 +7297,16 @@ return;
 					}
 					break;
 				}
-				case Sqlite3.TK_REGISTER: {
+				case TokenType.TK_REGISTER: {
 					inReg=pExpr.iTable;
 					break;
 				}
-				case Sqlite3.TK_AS: {
+				case TokenType.TK_AS: {
 					inReg=this.sqlite3ExprCodeTarget(pExpr.pLeft,target);
 					break;
 				}
 				#if !SQLITE_OMIT_CAST
-				case Sqlite3.TK_CAST: {
+				case TokenType.TK_CAST: {
 					///
 					///<summary>
 					///Expressions of the form:   CAST(pLeft AS token) 
@@ -7329,24 +7337,24 @@ return;
 					break;
 				}
 				#endif
-				case Sqlite3.TK_LT:
-				case Sqlite3.TK_LE:
-				case Sqlite3.TK_GT:
-				case Sqlite3.TK_GE:
-				case Sqlite3.TK_NE:
-				case Sqlite3.TK_EQ: {
-					Debug.Assert(Sqlite3.TK_LT== (int)OpCode.OP_Lt);
-                    Debug.Assert(Sqlite3.TK_LE == (int)OpCode.OP_Le);
-                    Debug.Assert(Sqlite3.TK_GT == (int)OpCode.OP_Gt);
-                    Debug.Assert(Sqlite3.TK_GE == (int)OpCode.OP_Ge);
-                    Debug.Assert(Sqlite3.TK_EQ == (int)OpCode.OP_Eq);
-                    Debug.Assert(Sqlite3.TK_NE == (int)OpCode.OP_Ne);
-					sqliteinth.testcase(op==Sqlite3.TK_LT);
-					sqliteinth.testcase(op==Sqlite3.TK_LE);
-					sqliteinth.testcase(op==Sqlite3.TK_GT);
-					sqliteinth.testcase(op==Sqlite3.TK_GE);
-					sqliteinth.testcase(op==Sqlite3.TK_EQ);
-					sqliteinth.testcase(op==Sqlite3.TK_NE);
+				case TokenType.TK_LT:
+				case TokenType.TK_LE:
+				case TokenType.TK_GT:
+				case TokenType.TK_GE:
+				case TokenType.TK_NE:
+				case TokenType.TK_EQ: {
+					Debug.Assert(TokenType.TK_LT.Equals( OpCode.OP_Lt));
+                    Debug.Assert(TokenType.TK_LE.Equals(OpCode.OP_Le));
+                    Debug.Assert(TokenType.TK_GT.Equals(OpCode.OP_Gt));
+                    Debug.Assert(TokenType.TK_GE.Equals(OpCode.OP_Ge));
+                    Debug.Assert(TokenType.TK_EQ.Equals(OpCode.OP_Eq));
+                    Debug.Assert(TokenType.TK_NE.Equals(OpCode.OP_Ne));
+					sqliteinth.testcase(op==TokenType.TK_LT);
+					sqliteinth.testcase(op==TokenType.TK_LE);
+					sqliteinth.testcase(op==TokenType.TK_GT);
+					sqliteinth.testcase(op==TokenType.TK_GE);
+					sqliteinth.testcase(op==TokenType.TK_EQ);
+					sqliteinth.testcase(op==TokenType.TK_NE);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
                     this.codeCompare(pExpr.pLeft, pExpr.pRight, (OpCode)op, r1, r2, inReg, sqliteinth.SQLITE_STOREP2);
@@ -7354,52 +7362,52 @@ return;
 					sqliteinth.testcase(regFree2==0);
 					break;
 				}
-				case Sqlite3.TK_IS:
-				case Sqlite3.TK_ISNOT: {
-					sqliteinth.testcase(op==Sqlite3.TK_IS);
-					sqliteinth.testcase(op==Sqlite3.TK_ISNOT);
+				case TokenType.TK_IS:
+				case TokenType.TK_ISNOT: {
+					sqliteinth.testcase(op==TokenType.TK_IS);
+					sqliteinth.testcase(op==TokenType.TK_ISNOT);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
-					op=(op==Sqlite3.TK_IS)?Sqlite3.TK_EQ:Sqlite3.TK_NE;
+					op=(op==TokenType.TK_IS)?TokenType.TK_EQ:TokenType.TK_NE;
                     this.codeCompare(pExpr.pLeft, pExpr.pRight, (OpCode)op, r1, r2, inReg, sqliteinth.SQLITE_STOREP2 | sqliteinth.SQLITE_NULLEQ);
 					sqliteinth.testcase(regFree1==0);
 					sqliteinth.testcase(regFree2==0);
 					break;
 				}
-				case Sqlite3.TK_AND:
-				case Sqlite3.TK_OR:
-				case Sqlite3.TK_PLUS:
-				case Sqlite3.TK_STAR:
-				case Sqlite3.TK_MINUS:
-				case Sqlite3.TK_REM:
-				case Sqlite3.TK_BITAND:
-				case Sqlite3.TK_BITOR:
-				case Sqlite3.TK_SLASH:
-				case Sqlite3.TK_LSHIFT:
-				case Sqlite3.TK_RSHIFT:
-				case Sqlite3.TK_CONCAT: {
-                    Debug.Assert(Sqlite3.TK_AND == (int)OpCode.OP_And);
-                    Debug.Assert(Sqlite3.TK_OR == (int)OpCode.OP_Or);
-                    Debug.Assert(Sqlite3.TK_PLUS == (int)OpCode.OP_Add);
-                    Debug.Assert(Sqlite3.TK_MINUS == (int)OpCode.OP_Subtract);
-                    Debug.Assert(Sqlite3.TK_REM == (int)OpCode.OP_Remainder);
-                    Debug.Assert(Sqlite3.TK_BITAND == (int)OpCode.OP_BitAnd);
-                    Debug.Assert(Sqlite3.TK_BITOR == (int)OpCode.OP_BitOr);
-                    Debug.Assert(Sqlite3.TK_SLASH == (int)OpCode.OP_Divide);
-                    Debug.Assert(Sqlite3.TK_LSHIFT == (int)OpCode.OP_ShiftLeft);
-                    Debug.Assert(Sqlite3.TK_RSHIFT == (int)OpCode.OP_ShiftRight);
-                    Debug.Assert(Sqlite3.TK_CONCAT == (int)OpCode.OP_Concat);
-					sqliteinth.testcase(op==Sqlite3.TK_AND);
-					sqliteinth.testcase(op==Sqlite3.TK_OR);
-					sqliteinth.testcase(op==Sqlite3.TK_PLUS);
-					sqliteinth.testcase(op==Sqlite3.TK_MINUS);
-					sqliteinth.testcase(op==Sqlite3.TK_REM);
-					sqliteinth.testcase(op==Sqlite3.TK_BITAND);
-					sqliteinth.testcase(op==Sqlite3.TK_BITOR);
-					sqliteinth.testcase(op==Sqlite3.TK_SLASH);
-					sqliteinth.testcase(op==Sqlite3.TK_LSHIFT);
-					sqliteinth.testcase(op==Sqlite3.TK_RSHIFT);
-					sqliteinth.testcase(op==Sqlite3.TK_CONCAT);
+				case TokenType.TK_AND:
+				case TokenType.TK_OR:
+				case TokenType.TK_PLUS:
+				case TokenType.TK_STAR:
+				case TokenType.TK_MINUS:
+				case TokenType.TK_REM:
+				case TokenType.TK_BITAND:
+				case TokenType.TK_BITOR:
+				case TokenType.TK_SLASH:
+				case TokenType.TK_LSHIFT:
+				case TokenType.TK_RSHIFT:
+				case TokenType.TK_CONCAT: {
+                    Debug.Assert(TokenType.TK_AND.Equals(OpCode.OP_And));
+                    Debug.Assert(TokenType.TK_OR.Equals(OpCode.OP_Or));
+                    Debug.Assert(TokenType.TK_PLUS.Equals(OpCode.OP_Add));
+                    Debug.Assert(TokenType.TK_MINUS.Equals(OpCode.OP_Subtract));
+                    Debug.Assert(TokenType.TK_REM.Equals(OpCode.OP_Remainder));
+                    Debug.Assert(TokenType.TK_BITAND.Equals(OpCode.OP_BitAnd));
+                    Debug.Assert(TokenType.TK_BITOR.Equals(OpCode.OP_BitOr));
+                    Debug.Assert(TokenType.TK_SLASH.Equals(OpCode.OP_Divide));
+                    Debug.Assert(TokenType.TK_LSHIFT.Equals(OpCode.OP_ShiftLeft));
+                    Debug.Assert(TokenType.TK_RSHIFT.Equals(OpCode.OP_ShiftRight));
+                    Debug.Assert(TokenType.TK_CONCAT.Equals(OpCode.OP_Concat));
+					sqliteinth.testcase(op==TokenType.TK_AND);
+					sqliteinth.testcase(op==TokenType.TK_OR);
+					sqliteinth.testcase(op==TokenType.TK_PLUS);
+					sqliteinth.testcase(op==TokenType.TK_MINUS);
+					sqliteinth.testcase(op==TokenType.TK_REM);
+					sqliteinth.testcase(op==TokenType.TK_BITAND);
+					sqliteinth.testcase(op==TokenType.TK_BITOR);
+					sqliteinth.testcase(op==TokenType.TK_SLASH);
+					sqliteinth.testcase(op==TokenType.TK_LSHIFT);
+					sqliteinth.testcase(op==TokenType.TK_RSHIFT);
+					sqliteinth.testcase(op==TokenType.TK_CONCAT);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
 					v.sqlite3VdbeAddOp3(op,r2,r1,target);
@@ -7407,7 +7415,7 @@ return;
 					sqliteinth.testcase(regFree2==0);
 					break;
 				}
-				case Sqlite3.TK_UMINUS: {
+				case TokenType.TK_UMINUS: {
 					Expr pLeft=pExpr.pLeft;
 					Debug.Assert(pLeft!=null);
 					if(pLeft.Operator==TokenType.TK_INTEGER) {
@@ -7430,25 +7438,25 @@ return;
 					inReg=target;
 					break;
 				}
-				case Sqlite3.TK_BITNOT:
-				case Sqlite3.TK_NOT: {
-                    Debug.Assert(Sqlite3.TK_BITNOT == (int)OpCode.OP_BitNot);
-					Debug.Assert(Sqlite3.TK_NOT== (int)OpCode.OP_Not);
-					sqliteinth.testcase(op==Sqlite3.TK_BITNOT);
-					sqliteinth.testcase(op==Sqlite3.TK_NOT);
+				case TokenType.TK_BITNOT:
+				case TokenType.TK_NOT: {
+                    Debug.Assert(TokenType.TK_BITNOT.Equals(OpCode.OP_BitNot));
+					Debug.Assert(TokenType.TK_NOT.Equals(OpCode.OP_Not));
+					sqliteinth.testcase(op==TokenType.TK_BITNOT);
+					sqliteinth.testcase(op==TokenType.TK_NOT);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					sqliteinth.testcase(regFree1==0);
 					inReg=target;
 					v.sqlite3VdbeAddOp2(op,r1,inReg);
 					break;
 				}
-				case Sqlite3.TK_ISNULL:
-				case Sqlite3.TK_NOTNULL: {
+				case TokenType.TK_ISNULL:
+				case TokenType.TK_NOTNULL: {
 					int addr;
 					Debug.Assert((int)TokenType.TK_ISNULL==(int)OpCode.OP_IsNull);
 					Debug.Assert((int)TokenType.TK_NOTNULL==(int)OpCode.OP_NotNull);
-					sqliteinth.testcase(op==Sqlite3.TK_ISNULL);
-					sqliteinth.testcase(op==Sqlite3.TK_NOTNULL);
+					sqliteinth.testcase(op==TokenType.TK_ISNULL);
+					sqliteinth.testcase(op==TokenType.TK_NOTNULL);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,target);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					sqliteinth.testcase(regFree1==0);
@@ -7457,7 +7465,7 @@ return;
 					v.sqlite3VdbeJumpHere(addr);
 					break;
 				}
-				case Sqlite3.TK_AGG_FUNCTION: {
+				case TokenType.TK_AGG_FUNCTION: {
 					AggInfo pInfo=pExpr.pAggInfo;
 					if(pInfo==null) {
 						Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
@@ -7468,8 +7476,8 @@ return;
 					}
 					break;
 				}
-				case Sqlite3.TK_CONST_FUNC:
-				case Sqlite3.TK_FUNCTION: {
+				case TokenType.TK_CONST_FUNC:
+				case TokenType.TK_FUNCTION: {
 					ExprList pFarg;
 					///
 					///<summary>
@@ -7516,8 +7524,8 @@ return;
 					///A collating sequence 
 					///</summary>
 					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
-					sqliteinth.testcase(op==Sqlite3.TK_CONST_FUNC);
-					sqliteinth.testcase(op==Sqlite3.TK_FUNCTION);
+					sqliteinth.testcase(op==TokenType.TK_CONST_FUNC);
+					sqliteinth.testcase(op==TokenType.TK_FUNCTION);
 					if(pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly)) {
 						pFarg=null;
 					}
@@ -7527,7 +7535,7 @@ return;
 					nFarg=pFarg!=null?pFarg.nExpr:0;
 					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
 					zId=pExpr.u.zToken;
-					nId=StringExtensions.sqlite3Strlen30(zId);
+					nId=StringExtensions.Strlen30(zId);
                     pDef = FuncDefTraverse.sqlite3FindFunction(this.db, zId, nId, nFarg, enc, 0);
 					if(pDef==null) {
 						utilc.sqlite3ErrorMsg(this,"unknown function: %.*s()",nId,zId);
@@ -7617,14 +7625,14 @@ return;
 					break;
 				}
 				#if !SQLITE_OMIT_SUBQUERY
-				case Sqlite3.TK_EXISTS:
-				case Sqlite3.TK_SELECT: {
-					sqliteinth.testcase(op==Sqlite3.TK_EXISTS);
-					sqliteinth.testcase(op==Sqlite3.TK_SELECT);
+				case TokenType.TK_EXISTS:
+				case TokenType.TK_SELECT: {
+					sqliteinth.testcase(op==TokenType.TK_EXISTS);
+					sqliteinth.testcase(op==TokenType.TK_SELECT);
 					inReg=this.sqlite3CodeSubselect(pExpr,0,false);
 					break;
 				}
-				case Sqlite3.TK_IN: {
+				case TokenType.TK_IN: {
 					int destIfFalse=v.sqlite3VdbeMakeLabel();
 					int destIfNull=v.sqlite3VdbeMakeLabel();
                     v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, target);
@@ -7648,7 +7656,7 @@ return;
 				///Y is stored in pExpr.x.pList.a[0].pExpr.
 				///Z is stored in pExpr.x.pList.a[1].pExpr.
 				///</summary>
-				case Sqlite3.TK_BETWEEN: {
+				case TokenType.TK_BETWEEN: {
 					Expr pLeft=pExpr.pLeft;
 					ExprList_item pLItem=pExpr.x.pList.a[0];
 					Expr pRight=pLItem.pExpr;
@@ -7671,14 +7679,14 @@ return;
 					this.sqlite3ReleaseTempReg(r4);
 					break;
 				}
-				case Sqlite3.TK_UPLUS: {
+				case TokenType.TK_UPLUS: {
 					inReg=this.sqlite3ExprCodeTarget(pExpr.pLeft,target);
 					break;
 				}
-				case Sqlite3.TK_TRIGGER: {
+				case TokenType.TK_TRIGGER: {
 					///
 					///<summary>
-					///If the opcode is Sqlite3.TK_TRIGGER, then the expression is a reference
+					///If the opcode is TokenType.TK_TRIGGER, then the expression is a reference
 					///</summary>
 					///<param name="to a column in the new.* or old.* pseudo">tables available to</param>
 					///<param name="trigger programs. In this case Expr.iTable is set to 1 for the">trigger programs. In this case Expr.iTable is set to 1 for the</param>
@@ -7747,7 +7755,7 @@ return;
 				///
 				///</summary>
 				default: {
-					Debug.Assert(op==Sqlite3.TK_CASE);
+					Debug.Assert(op==TokenType.TK_CASE);
 					int endLabel;
 					///
 					///<summary>
@@ -7838,10 +7846,10 @@ return;
 							pTest=aListelem[i].pExpr;
 						}
 						nextCase=v.sqlite3VdbeMakeLabel();
-						sqliteinth.testcase(pTest.op==Sqlite3.TK_COLUMN);
+						sqliteinth.testcase(pTest.Operator == TokenType.TK_COLUMN);
 						this.sqlite3ExprIfFalse(pTest,nextCase,sqliteinth.SQLITE_JUMPIFNULL);
-						sqliteinth.testcase(aListelem[i+1].pExpr.op==Sqlite3.TK_COLUMN);
-						sqliteinth.testcase(aListelem[i+1].pExpr.op==Sqlite3.TK_REGISTER);
+						sqliteinth.testcase(aListelem[i+1].pExpr.Operator == TokenType.TK_COLUMN);
+						sqliteinth.testcase(aListelem[i+1].pExpr.Operator == TokenType.TK_REGISTER);
 						this.sqlite3ExprCode(aListelem[i+1].pExpr,target);
 						v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,endLabel);
 						this.sqlite3ExprCachePop(1);
@@ -7863,7 +7871,7 @@ return;
 					break;
 				}
 				#if !SQLITE_OMIT_TRIGGER
-				case Sqlite3.TK_RAISE: {
+				case TokenType.TK_RAISE: {
                     Debug.Assert(((OnConstraintError)pExpr.affinity)
                                         .In(OnConstraintError.OE_Rollback,
                                             OnConstraintError.OE_Abort,
@@ -7909,7 +7917,7 @@ return;
 			public int sqlite3ExprCode(Expr pExpr,int target) {
 				int inReg;
 				Debug.Assert(target>0&&target<=this.nMem);
-				if(pExpr!=null&&pExpr.op==Sqlite3.TK_REGISTER) {
+				if(pExpr!=null&&pExpr.Operator == TokenType.TK_REGISTER) {
                     this.pVdbe.sqlite3VdbeAddOp2(OpCode.OP_Copy, pExpr.iTable, target);
 				}
 				else {
@@ -7933,19 +7941,19 @@ return;
 				///
 				///<summary>
 				///This routine is called for terms to INSERT or UPDATE.  And the only
-				///other place where expressions can be converted into Sqlite3.TK_REGISTER is
+				///other place where expressions can be converted into TokenType.TK_REGISTER is
 				///in WHERE clause processing.  So as currently implemented, there is
-				///no way for a Sqlite3.TK_REGISTER to exist here.  But it seems prudent to
+				///no way for a TokenType.TK_REGISTER to exist here.  But it seems prudent to
 				///keep the Sqlite3.ALWAYS() in case the conditions above change with future
 				///modifications or enhancements. 
 				///</summary>
-				if(Sqlite3.ALWAYS(pExpr.op!=Sqlite3.TK_REGISTER)) {
+				if(Sqlite3.ALWAYS(pExpr.Operator != TokenType.TK_REGISTER)) {
 					int iMem;
 					iMem=++this.nMem;
                     v.sqlite3VdbeAddOp2(OpCode.OP_Copy, inReg, iMem);
 					pExpr.iTable=iMem;
 					pExpr.op2=pExpr.op;
-					pExpr.op=Sqlite3.TK_REGISTER;
+					pExpr.Operator = TokenType.TK_REGISTER;
 				}
 				return inReg;
 			}
@@ -8047,17 +8055,17 @@ return;
 				///</summary>
 				Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
 				exprX=pExpr.pLeft.Clone();
-				exprAnd.op=Sqlite3.TK_AND;
+				exprAnd.Operator=TokenType.TK_AND;
 				exprAnd.pLeft=compLeft;
 				exprAnd.pRight=compRight;
-				compLeft.op=Sqlite3.TK_GE;
+				compLeft.Operator = TokenType.TK_GE;
 				compLeft.pLeft=exprX;
 				compLeft.pRight=pExpr.x.pList.a[0].pExpr;
-				compRight.op=Sqlite3.TK_LE;
+				compRight.Operator = TokenType.TK_LE;
 				compRight.pLeft=exprX;
 				compRight.pRight=pExpr.x.pList.a[1].pExpr;
 				exprX.iTable=this.sqlite3ExprCodeTemp(exprX,ref regFree1);
-				exprX.op=Sqlite3.TK_REGISTER;
+				exprX.Operator = TokenType.TK_REGISTER;
 				if(jumpIfTrue!=0) {
 					this.sqlite3ExprIfTrue(exprAnd,dest,jumpIfNull);
 				}
@@ -8080,7 +8088,6 @@ return;
 			}
 			public void sqlite3ExprIfTrue(Expr pExpr,int dest,int jumpIfNull) {
 				Vdbe v=this.pVdbe;
-				int op=0;
 				int regFree1=0;
 				int regFree2=0;
 				int r1=0,r2=0;
@@ -8097,9 +8104,9 @@ return;
 				///<summary>
 				///No way this can happen 
 				///</summary>
-				op=pExpr.op;
+				var op=pExpr.Operator;
 				switch(op) {
-				case Sqlite3.TK_AND: {
+				case TokenType.TK_AND: {
 					int d2=v.sqlite3VdbeMakeLabel();
 					sqliteinth.testcase(jumpIfNull==0);
 					this.sqlite3ExprCachePush();
@@ -8109,35 +8116,35 @@ return;
 					this.sqlite3ExprCachePop(1);
 					break;
 				}
-				case Sqlite3.TK_OR: {
+				case TokenType.TK_OR: {
 					sqliteinth.testcase(jumpIfNull==0);
 					this.sqlite3ExprIfTrue(pExpr.pLeft,dest,jumpIfNull);
 					this.sqlite3ExprIfTrue(pExpr.pRight,dest,jumpIfNull);
 					break;
 				}
-				case Sqlite3.TK_NOT: {
+				case TokenType.TK_NOT: {
 					sqliteinth.testcase(jumpIfNull==0);
 					this.sqlite3ExprIfFalse(pExpr.pLeft,dest,jumpIfNull);
 					break;
 				}
-				case Sqlite3.TK_LT:
-				case Sqlite3.TK_LE:
-				case Sqlite3.TK_GT:
-				case Sqlite3.TK_GE:
-				case Sqlite3.TK_NE:
-				case Sqlite3.TK_EQ: {
-					Debug.Assert(Sqlite3.TK_LT== (int)OpCode.OP_Lt);
-					Debug.Assert(Sqlite3.TK_LE== (int)OpCode.OP_Le);
-					Debug.Assert(Sqlite3.TK_GT== (int)OpCode.OP_Gt);
-					Debug.Assert(Sqlite3.TK_GE== (int)OpCode.OP_Ge);
-					Debug.Assert(Sqlite3.TK_EQ== (int)OpCode.OP_Eq);
-                    Debug.Assert(Sqlite3.TK_NE == (int)OpCode.OP_Ne);
-					sqliteinth.testcase(op==Sqlite3.TK_LT);
-					sqliteinth.testcase(op==Sqlite3.TK_LE);
-					sqliteinth.testcase(op==Sqlite3.TK_GT);
-					sqliteinth.testcase(op==Sqlite3.TK_GE);
-					sqliteinth.testcase(op==Sqlite3.TK_EQ);
-					sqliteinth.testcase(op==Sqlite3.TK_NE);
+				case TokenType.TK_LT:
+				case TokenType.TK_LE:
+				case TokenType.TK_GT:
+				case TokenType.TK_GE:
+				case TokenType.TK_NE:
+				case TokenType.TK_EQ: {
+					Debug.Assert(TokenType.TK_LT== (TokenType)OpCode.OP_Lt);
+					Debug.Assert(TokenType.TK_LE== (TokenType)OpCode.OP_Le);
+					Debug.Assert(TokenType.TK_GT== (TokenType)OpCode.OP_Gt);
+					Debug.Assert(TokenType.TK_GE== (TokenType)OpCode.OP_Ge);
+					Debug.Assert(TokenType.TK_EQ== (TokenType)OpCode.OP_Eq);
+                    Debug.Assert(TokenType.TK_NE == (TokenType)OpCode.OP_Ne);
+					sqliteinth.testcase(op==TokenType.TK_LT);
+					sqliteinth.testcase(op==TokenType.TK_LE);
+					sqliteinth.testcase(op==TokenType.TK_GT);
+					sqliteinth.testcase(op==TokenType.TK_GE);
+					sqliteinth.testcase(op==TokenType.TK_EQ);
+					sqliteinth.testcase(op==TokenType.TK_NE);
 					sqliteinth.testcase(jumpIfNull==0);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
@@ -8146,36 +8153,36 @@ return;
 					sqliteinth.testcase(regFree2==0);
 					break;
 				}
-				case Sqlite3.TK_IS:
-				case Sqlite3.TK_ISNOT: {
-					sqliteinth.testcase(op==Sqlite3.TK_IS);
-					sqliteinth.testcase(op==Sqlite3.TK_ISNOT);
+				case TokenType.TK_IS:
+				case TokenType.TK_ISNOT: {
+					sqliteinth.testcase(op==TokenType.TK_IS);
+					sqliteinth.testcase(op==TokenType.TK_ISNOT);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
-					op=(op==Sqlite3.TK_IS)?Sqlite3.TK_EQ:Sqlite3.TK_NE;
+					op=(op==TokenType.TK_IS)?TokenType.TK_EQ:TokenType.TK_NE;
 					this.codeCompare(pExpr.pLeft,pExpr.pRight,(OpCode)op,r1,r2,dest,sqliteinth.SQLITE_NULLEQ);
 					sqliteinth.testcase(regFree1==0);
 					sqliteinth.testcase(regFree2==0);
 					break;
 				}
-				case Sqlite3.TK_ISNULL:
-				case Sqlite3.TK_NOTNULL: {
-                    Debug.Assert(Sqlite3.TK_ISNULL == (int)OpCode.OP_IsNull);
-                    Debug.Assert(Sqlite3.TK_NOTNULL == (int)OpCode.OP_NotNull);
-					sqliteinth.testcase((int)op==Sqlite3.TK_ISNULL);
-                    sqliteinth.testcase((int)op == Sqlite3.TK_NOTNULL);
+				case TokenType.TK_ISNULL:
+				case TokenType.TK_NOTNULL: {
+                    Debug.Assert(TokenType.TK_ISNULL == (TokenType)OpCode.OP_IsNull);
+                    Debug.Assert(TokenType.TK_NOTNULL == (TokenType)OpCode.OP_NotNull);
+					sqliteinth.testcase(op==TokenType.TK_ISNULL);
+                    sqliteinth.testcase(op == TokenType.TK_NOTNULL);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					v.sqlite3VdbeAddOp2(op,r1,dest);
 					sqliteinth.testcase(regFree1==0);
 					break;
 				}
-				case Sqlite3.TK_BETWEEN: {
+				case TokenType.TK_BETWEEN: {
 					sqliteinth.testcase(jumpIfNull==0);
 					this.exprCodeBetween(pExpr,dest,1,jumpIfNull);
 					break;
 				}
 				#if SQLITE_OMIT_SUBQUERY
-																																																																																																					        case Sqlite3.TK_IN:
+																																																																																																					        case TokenType.TK_IN:
           {
             int destIfFalse = sqlite3VdbeMakeLabel( v );
             int destIfNull = jumpIfNull != 0 ? dest : destIfFalse;
@@ -8198,7 +8205,7 @@ return;
 			}
 			public void sqlite3ExprIfFalse(Expr pExpr,int dest,int jumpIfNull) {
 				Vdbe v=this.pVdbe;
-				int op=0;
+				
 				int regFree1=0;
 				int regFree2=0;
 				int r1=0,r2=0;
@@ -8218,42 +8225,42 @@ return;
 				///pExpr.op            op
 				///</summary>
 				///<param name=""></param>
-				///<param name="Sqlite3.TK_ISNULL           OpCode.OP_NotNull">Sqlite3.TK_ISNULL           OpCode.OP_NotNull</param>
-				///<param name="Sqlite3.TK_NOTNULL          OpCode.OP_IsNull">Sqlite3.TK_NOTNULL          OpCode.OP_IsNull</param>
-				///<param name="Sqlite3.TK_NE               OpCode.OP_Eq">Sqlite3.TK_NE               OpCode.OP_Eq</param>
-				///<param name="Sqlite3.TK_EQ               OpCode.OP_Ne">Sqlite3.TK_EQ               OpCode.OP_Ne</param>
-				///<param name="Sqlite3.TK_GT               OpCode.OP_Le">Sqlite3.TK_GT               OpCode.OP_Le</param>
-				///<param name="Sqlite3.TK_LE               OpCode.OP_Gt">Sqlite3.TK_LE               OpCode.OP_Gt</param>
-				///<param name="Sqlite3.TK_GE               OpCode.OP_Lt">Sqlite3.TK_GE               OpCode.OP_Lt</param>
-				///<param name="Sqlite3.TK_LT               OpCode.OP_Ge">Sqlite3.TK_LT               OpCode.OP_Ge</param>
+				///<param name="TokenType.TK_ISNULL           OpCode.OP_NotNull">TokenType.TK_ISNULL           OpCode.OP_NotNull</param>
+				///<param name="TokenType.TK_NOTNULL          OpCode.OP_IsNull">TokenType.TK_NOTNULL          OpCode.OP_IsNull</param>
+				///<param name="TokenType.TK_NE               OpCode.OP_Eq">TokenType.TK_NE               OpCode.OP_Eq</param>
+				///<param name="TokenType.TK_EQ               OpCode.OP_Ne">TokenType.TK_EQ               OpCode.OP_Ne</param>
+				///<param name="TokenType.TK_GT               OpCode.OP_Le">TokenType.TK_GT               OpCode.OP_Le</param>
+				///<param name="TokenType.TK_LE               OpCode.OP_Gt">TokenType.TK_LE               OpCode.OP_Gt</param>
+				///<param name="TokenType.TK_GE               OpCode.OP_Lt">TokenType.TK_GE               OpCode.OP_Lt</param>
+				///<param name="TokenType.TK_LT               OpCode.OP_Ge">TokenType.TK_LT               OpCode.OP_Ge</param>
 				///<param name=""></param>
 				///<param name="For other values of pExpr.op, op is undefined and unused.">For other values of pExpr.op, op is undefined and unused.</param>
-				///<param name="The value of Sqlite3.TK_ and  OpCode.OP_ constants are arranged such that we">The value of Sqlite3.TK_ and  OpCode.OP_ constants are arranged such that we</param>
+				///<param name="The value of TokenType.TK_ and  OpCode.OP_ constants are arranged such that we">The value of TokenType.TK_ and  OpCode.OP_ constants are arranged such that we</param>
 				///<param name="can compute the mapping above using the following expression.">can compute the mapping above using the following expression.</param>
 				///<param name="Assert()s verify that the computation is correct.">Assert()s verify that the computation is correct.</param>
 				///<param name=""></param>
-				op=(((pExpr.op+(Sqlite3.TK_ISNULL&1))^1)-(Sqlite3.TK_ISNULL&1));
+				var op=(TokenType)((((int)pExpr.Operator+((int)TokenType.TK_ISNULL&1))^1)-((int)TokenType.TK_ISNULL&1));
 				///
 				///<summary>
-				///Verify correct alignment of Sqlite3.TK_ and  OpCode.OP_ constants
+				///Verify correct alignment of TokenType.TK_ and  OpCode.OP_ constants
 				///
 				///</summary>
-                Debug.Assert(pExpr.op != Sqlite3.TK_ISNULL || op == (int)OpCode.OP_NotNull);
-				Debug.Assert(pExpr.op!=Sqlite3.TK_NOTNULL||op== (int)OpCode.OP_IsNull);
-                Debug.Assert(pExpr.op != Sqlite3.TK_NE || op == (int)OpCode.OP_Eq);
-                Debug.Assert(pExpr.op != Sqlite3.TK_EQ || op == (int)OpCode.OP_Ne);
-                Debug.Assert(pExpr.op != Sqlite3.TK_LT || op == (int)OpCode.OP_Ge);
-                Debug.Assert(pExpr.op != Sqlite3.TK_LE || op == (int)OpCode.OP_Gt);
-                Debug.Assert(pExpr.op != Sqlite3.TK_GT || op == (int)OpCode.OP_Le);
-                Debug.Assert(pExpr.op != Sqlite3.TK_GE || op == (int)OpCode.OP_Lt);
-				switch(pExpr.op) {
-				case Sqlite3.TK_AND: {
+                Debug.Assert(pExpr.Operator != TokenType.TK_ISNULL || op == (TokenType)OpCode.OP_NotNull);
+				Debug.Assert(pExpr.Operator != TokenType.TK_NOTNULL||op== (TokenType)OpCode.OP_IsNull);
+                Debug.Assert(pExpr.Operator != TokenType.TK_NE || op == (TokenType)OpCode.OP_Eq);
+                Debug.Assert(pExpr.Operator != TokenType.TK_EQ || op == (TokenType)OpCode.OP_Ne);
+                Debug.Assert(pExpr.Operator != TokenType.TK_LT || op == (TokenType)OpCode.OP_Ge);
+                Debug.Assert(pExpr.Operator != TokenType.TK_LE || op == (TokenType)OpCode.OP_Gt);
+                Debug.Assert(pExpr.Operator != TokenType.TK_GT || op == (TokenType)OpCode.OP_Le);
+                Debug.Assert(pExpr.Operator != TokenType.TK_GE || op == (TokenType)OpCode.OP_Lt);
+				switch(pExpr.Operator) {
+				case TokenType.TK_AND: {
 					sqliteinth.testcase(jumpIfNull==0);
 					this.sqlite3ExprIfFalse(pExpr.pLeft,dest,jumpIfNull);
 					this.sqlite3ExprIfFalse(pExpr.pRight,dest,jumpIfNull);
 					break;
 				}
-				case Sqlite3.TK_OR: {
+				case TokenType.TK_OR: {
 					int d2=v.sqlite3VdbeMakeLabel();
 					sqliteinth.testcase(jumpIfNull==0);
 					this.sqlite3ExprCachePush();
@@ -8263,23 +8270,23 @@ return;
 					this.sqlite3ExprCachePop(1);
 					break;
 				}
-				case Sqlite3.TK_NOT: {
+				case TokenType.TK_NOT: {
 					sqliteinth.testcase(jumpIfNull==0);
 					this.sqlite3ExprIfTrue(pExpr.pLeft,dest,jumpIfNull);
 					break;
 				}
-				case Sqlite3.TK_LT:
-				case Sqlite3.TK_LE:
-				case Sqlite3.TK_GT:
-				case Sqlite3.TK_GE:
-				case Sqlite3.TK_NE:
-				case Sqlite3.TK_EQ: {
-					sqliteinth.testcase((int)op==Sqlite3.TK_LT);
-                    sqliteinth.testcase((int)op == Sqlite3.TK_LE);
-                    sqliteinth.testcase((int)op == Sqlite3.TK_GT);
-                    sqliteinth.testcase((int)op == Sqlite3.TK_GE);
-                    sqliteinth.testcase((int)op == Sqlite3.TK_EQ);
-                    sqliteinth.testcase((int)op == Sqlite3.TK_NE);
+				case TokenType.TK_LT:
+				case TokenType.TK_LE:
+				case TokenType.TK_GT:
+				case TokenType.TK_GE:
+				case TokenType.TK_NE:
+				case TokenType.TK_EQ: {
+					sqliteinth.testcase(op==TokenType.TK_LT);
+                    sqliteinth.testcase(op == TokenType.TK_LE);
+                    sqliteinth.testcase(op == TokenType.TK_GT);
+                    sqliteinth.testcase(op == TokenType.TK_GE);
+                    sqliteinth.testcase(op == TokenType.TK_EQ);
+                    sqliteinth.testcase(op == TokenType.TK_NE);
 					sqliteinth.testcase(jumpIfNull==0);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
@@ -8288,34 +8295,34 @@ return;
 					sqliteinth.testcase(regFree2==0);
 					break;
 				}
-				case Sqlite3.TK_IS:
-				case Sqlite3.TK_ISNOT: {
-					sqliteinth.testcase(pExpr.op==Sqlite3.TK_IS);
-					sqliteinth.testcase(pExpr.op==Sqlite3.TK_ISNOT);
+				case TokenType.TK_IS:
+				case TokenType.TK_ISNOT: {
+					sqliteinth.testcase(pExpr.Operator==TokenType.TK_IS);
+					sqliteinth.testcase(pExpr.Operator == TokenType.TK_ISNOT);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
-					op=(pExpr.op==Sqlite3.TK_IS)?Sqlite3.TK_NE:Sqlite3.TK_EQ;
+					op=(pExpr.Operator == TokenType.TK_IS)?TokenType.TK_NE:TokenType.TK_EQ;
 					this.codeCompare(pExpr.pLeft,pExpr.pRight,(OpCode)op,r1,r2,dest,sqliteinth.SQLITE_NULLEQ);
 					sqliteinth.testcase(regFree1==0);
 					sqliteinth.testcase(regFree2==0);
 					break;
 				}
-				case Sqlite3.TK_ISNULL:
-				case Sqlite3.TK_NOTNULL: {
-					sqliteinth.testcase((int)op==Sqlite3.TK_ISNULL);
-					sqliteinth.testcase((int)op==Sqlite3.TK_NOTNULL);
+				case TokenType.TK_ISNULL:
+				case TokenType.TK_NOTNULL: {
+					sqliteinth.testcase(op==TokenType.TK_ISNULL);
+					sqliteinth.testcase(op==TokenType.TK_NOTNULL);
 					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
 					v.sqlite3VdbeAddOp2(op,r1,dest);
 					sqliteinth.testcase(regFree1==0);
 					break;
 				}
-				case Sqlite3.TK_BETWEEN: {
+				case TokenType.TK_BETWEEN: {
 					sqliteinth.testcase(jumpIfNull==0);
 					this.exprCodeBetween(pExpr,dest,0,jumpIfNull);
 					break;
 				}
 				#if SQLITE_OMIT_SUBQUERY
-																																																																																																					        case Sqlite3.TK_IN:
+																																																																																																					        case TokenType.TK_IN:
           {
             if ( jumpIfNull != 0 )
             {
@@ -8521,7 +8528,7 @@ return;
 				Expr pNew;
 				Connection db=this.db;
 				Debug.Assert(pToken!=null);
-				pNew=exprc.CreateExpr(db,Sqlite3.TK_FUNCTION,pToken,true);
+				pNew=exprc.CreateExpr(db,TokenType.TK_FUNCTION,pToken,true);
 				if(pNew==null) {
 					exprc.sqlite3ExprListDelete(db,ref pList);
 					///
@@ -8554,7 +8561,7 @@ return;
 				}
 				else {
 					ynVar x=0;
-					int n=StringExtensions.sqlite3Strlen30(z);
+					int n=StringExtensions.Strlen30(z);
 					if(z[0]=='?') {
 						///
 						///<summary>
@@ -8619,20 +8626,20 @@ return;
 			public void exprCommute(Expr pExpr) {
 				ExprFlags expRight=(pExpr.pRight.Flags&ExprFlags.EP_ExpCollate);
 				ExprFlags expLeft=(pExpr.pLeft.Flags&ExprFlags.EP_ExpCollate);
-				Debug.Assert(wherec.allowedOp(pExpr.op)&&pExpr.op!=Sqlite3.TK_IN);
+				Debug.Assert(wherec.allowedOp(pExpr.Operator)&&pExpr.Operator!=TokenType.TK_IN);
 				pExpr.pRight.CollatingSequence=this.sqlite3ExprCollSeq(pExpr.pRight);
 				pExpr.pLeft.CollatingSequence=this.sqlite3ExprCollSeq(pExpr.pLeft);
 				_Custom.SWAP(ref pExpr.pRight.CollatingSequence,ref pExpr.pLeft.CollatingSequence);
 				pExpr.pRight.Flags=((pExpr.pRight.Flags&~ExprFlags.EP_ExpCollate)|expLeft);
 				pExpr.pLeft.Flags=((pExpr.pLeft.Flags&~ExprFlags.EP_ExpCollate)|expRight);
                 _Custom.SWAP(ref pExpr.pRight, ref pExpr.pLeft);
-				if(pExpr.op>=Sqlite3.TK_GT) {
-					Debug.Assert(Sqlite3.TK_LT==Sqlite3.TK_GT+2);
-					Debug.Assert(Sqlite3.TK_GE==Sqlite3.TK_LE+2);
-					Debug.Assert(Sqlite3.TK_GT>Sqlite3.TK_EQ);
-					Debug.Assert(Sqlite3.TK_GT<Sqlite3.TK_LE);
-					Debug.Assert(pExpr.op>=Sqlite3.TK_GT&&pExpr.op<=Sqlite3.TK_GE);
-					pExpr.op=(u8)(((pExpr.op-Sqlite3.TK_GT)^2)+Sqlite3.TK_GT);
+				if(pExpr.Operator>=TokenType.TK_GT) {
+					Debug.Assert(TokenType.TK_LT==TokenType.TK_GT+2);
+					Debug.Assert(TokenType.TK_GE==TokenType.TK_LE+2);
+					Debug.Assert(TokenType.TK_GT>TokenType.TK_EQ);
+					Debug.Assert(TokenType.TK_GT<TokenType.TK_LE);
+					Debug.Assert(pExpr.Operator>=TokenType.TK_GT&&pExpr.Operator<=TokenType.TK_GE);
+					pExpr.op=(u8)(((pExpr.op-(int)TokenType.TK_GT)^2)+(int)TokenType.TK_GT);
 				}
 			}
 			public int isLikeOrGlob(///
@@ -8645,7 +8652,7 @@ return;
 			///</summary>
 			ref Expr ppPrefix,///
 			///<summary>
-			///Pointer to Sqlite3.TK_STRING expression with pattern prefix 
+			///Pointer to TokenType.TK_STRING expression with pattern prefix 
 			///</summary>
 			ref bool pisComplete,///
 			///<summary>
@@ -8692,11 +8699,8 @@ return;
 				///Data_base connection 
 				///</summary>
 				sqlite3_value pVal=null;
-				int op;
-				///
-				///<summary>
-				///Opcode of pRight 
-				///</summary>
+				
+				
 				if(!PredefinedFunctions.sqlite3IsLikeFunction(db,pExpr,ref pnoCase,wc)) {
 					return 0;
 				}
@@ -8705,7 +8709,7 @@ return;
 				//#endif
 				pList=pExpr.x.pList;
 				pLeft=pList.a[1].pExpr;
-				if(pLeft.op!=Sqlite3.TK_COLUMN||pLeft.sqlite3ExprAffinity()!=sqliteinth.SQLITE_AFF_TEXT) {
+				if(pLeft.Operator!=TokenType.TK_COLUMN||pLeft.sqlite3ExprAffinity()!=sqliteinth.SQLITE_AFF_TEXT) {
 					///
 					///<summary>
 					///</summary>
@@ -8719,11 +8723,16 @@ return;
 				///Because IPK never has AFF_TEXT 
 				///</summary>
 				pRight=pList.a[0].pExpr;
-				op=pRight.op;
-				if(op==Sqlite3.TK_REGISTER) {
-					op=pRight.op2;
+
+                ///
+				///<summary>
+				///Opcode of pRight 
+				///</summary>
+				var op =pRight.Operator;
+				if(op==TokenType.TK_REGISTER) {
+					op=pRight.Operator2;
 				}
-				if(op==Sqlite3.TK_VARIABLE) {
+				if(op==TokenType.TK_VARIABLE) {
 					Vdbe pReprepare=this.pReprepare;
 					int iCol=pRight.iColumn;
                     pVal = pReprepare.sqlite3VdbeGetValue(iCol, (byte)sqliteinth.SQLITE_AFF_NONE);
@@ -8736,10 +8745,10 @@ return;
 					///<summary>
 					///</summary>
 					///<param name="IMP: R">02778 </param>
-					Debug.Assert(pRight.op==Sqlite3.TK_VARIABLE||pRight.op==Sqlite3.TK_REGISTER);
+					Debug.Assert(pRight.Operator==TokenType.TK_VARIABLE||pRight.Operator==TokenType.TK_REGISTER);
 				}
 				else
-					if(op==Sqlite3.TK_STRING) {
+					if(op==TokenType.TK_STRING) {
 						z=pRight.u.zToken;
 					}
 				if(!String.IsNullOrEmpty(z)) {
@@ -8750,11 +8759,11 @@ return;
 					if(cnt!=0&&255!=(u8)z[cnt-1]) {
 						Expr pPrefix;
 						pisComplete=c==wc[0]&&cnt==z.Length-1;
-						pPrefix=exprc.sqlite3Expr(db,Sqlite3.TK_STRING,z);
+						pPrefix=exprc.sqlite3Expr(db,TokenType.TK_STRING,z);
 						if(pPrefix!=null)
 							pPrefix.u.zToken=pPrefix.u.zToken.Substring(0,cnt);
 						ppPrefix=pPrefix;
-						if(op==Sqlite3.TK_VARIABLE) {
+						if(op==TokenType.TK_VARIABLE) {
 							Vdbe v=this.pVdbe;
 							v.sqlite3VdbeSetVarmask(pRight.iColumn);
 							///
@@ -8876,7 +8885,7 @@ return;
 									WhereClause tempWC=new WhereClause();
 									tempWC.pParse=pWC.pParse;
 									tempWC.pMaskSet=pWC.pMaskSet;
-									tempWC.op=Sqlite3.TK_AND;
+									tempWC.Operator=TokenType.TK_AND;
 									tempWC.a=new WhereTerm[2];
 									tempWC.a[0]=pOrTerm;
 									tempWC.nTerm=1;
@@ -9336,7 +9345,7 @@ return;
 				if(pOrderBy!=null) {
 					for(i=0;i<pOrderBy.nExpr;i++) {
 						Expr pExpr=pOrderBy.a[i].pExpr;
-						if(pExpr.op!=Sqlite3.TK_COLUMN||pExpr.iTable!=pSrc.iCursor)
+						if(pExpr.Operator!=TokenType.TK_COLUMN||pExpr.iTable!=pSrc.iCursor)
 							break;
 					}
 					if(i==pOrderBy.nExpr) {
@@ -12058,7 +12067,7 @@ range_est_fallback:
 					///<param name="is used.">is used.</param>
 					///<param name=""></param>
 					pExpr.iTable=this.nTab++;
-                    addr = v.sqlite3VdbeAddOp2((int)OpCode.OP_OpenEphemeral, (int)pExpr.iTable, !isRowid);
+                    addr = v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, (int)pExpr.iTable, !isRowid);
 					if(rMayHaveNull==0)
 						v.sqlite3VdbeChangeP5(BTREE_UNORDERED);
 					keyInfo=new KeyInfo();
@@ -12203,7 +12212,7 @@ range_est_fallback:
 #endif
 					}
 					exprc.sqlite3ExprDelete(this.db,ref pSel.pLimit);
-					pSel.pLimit=this.sqlite3PExpr(Sqlite3.TK_INTEGER,null,null,ParseMethods.sqlite3IntTokens[1]);
+					pSel.pLimit=this.sqlite3PExpr(TokenType.TK_INTEGER,null,null,ParseMethods.sqlite3IntTokens[1]);
 					pSel.iLimit=0;
 					if(Select.sqlite3Select(this,pSel,ref dest)!=0) {
 						return 0;
@@ -12416,7 +12425,7 @@ range_est_fallback:
 					i64 value=0;
 					string z=pExpr.u.zToken;
 					Debug.Assert(!String.IsNullOrEmpty(z));
-					c=Converter.sqlite3Atoi64(z,ref value,StringExtensions.sqlite3Strlen30(z),SqliteEncoding.UTF8);
+					c=Converter.sqlite3Atoi64(z,ref value,StringExtensions.Strlen30(z),SqliteEncoding.UTF8);
 					if(c==0||(c==2&&negFlag)) {
 						//char* zV;
 						if(negFlag) {
@@ -12570,7 +12579,7 @@ range_est_fallback:
 					v.sqlite3VdbeAddOp2( OpCode.OP_Expire,0,0);
 					zWhere=io.sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);
 					v.sqlite3VdbeAddParseSchemaOp(iDb,zWhere);
-                    v.sqlite3VdbeAddOp4(OpCode.OP_VCreate, iDb, 0, 0, pTab.zName, (P4Usage)(StringExtensions.sqlite3Strlen30(pTab.zName) + 1));
+                    v.sqlite3VdbeAddOp4(OpCode.OP_VCreate, iDb, 0, 0, pTab.zName, (P4Usage)(StringExtensions.Strlen30(pTab.zName) + 1));
 				}
 				///
 				///<summary>
@@ -12584,7 +12593,7 @@ range_est_fallback:
 					Table pOld;
 					Schema pSchema=pTab.pSchema;
 					string zName=pTab.zName;
-					int nName=StringExtensions.sqlite3Strlen30(zName);
+					int nName=StringExtensions.Strlen30(zName);
 					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pSchema));
 					pOld=HashExtensions.sqlite3HashInsert(ref pSchema.tblHash,zName,nName,pTab);
 					if(pOld!=null) {
@@ -12630,7 +12639,7 @@ range_est_fallback:
 				///Locate the required virtual table module 
 				///</summary>
 				zMod=pTab.azModuleArg[0];
-				pMod=(Module)db.aModule.Find(zMod,StringExtensions.sqlite3Strlen30(zMod),(Module)null);
+				pMod=(Module)db.aModule.Find(zMod,StringExtensions.Strlen30(zMod),(Module)null);
 				if(null==pMod) {
 					string zModule=pTab.azModuleArg[0];
 					utilc.sqlite3ErrorMsg(this,"no such module: %s",zModule);

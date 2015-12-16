@@ -119,7 +119,7 @@ namespace Community.CsharpSqlite.Compiler.Parser
                 var rc = SqlResult.SQLITE_OK;
                 if (pExpr != null)
                 {
-                    if (pExpr.op != Sqlite3.TK_ID)
+                    if (pExpr.Operator != TokenType.TK_ID)
                     {
                         rc = Sqlite3.ResolveExtensions.sqlite3ResolveExprNames(this, ref pExpr);
                         if (rc == SqlResult.SQLITE_OK && pExpr.sqlite3ExprIsConstant() == 0)
@@ -130,7 +130,7 @@ namespace Community.CsharpSqlite.Compiler.Parser
                     }
                     else
                     {
-                        pExpr.op = Sqlite3.TK_STRING;
+                        pExpr.Operator = TokenType.TK_STRING;
                     }
                 }
                 return rc;

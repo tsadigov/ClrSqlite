@@ -541,7 +541,7 @@ namespace Community.CsharpSqlite
                     return 0;
                 }
                 else
-                            if (Converter.sqlite3AtoF(zDate, ref r, StringExtensions.sqlite3Strlen30(zDate), SqliteEncoding.UTF8))
+                            if (Converter.sqlite3AtoF(zDate, ref r, StringExtensions.Strlen30(zDate), SqliteEncoding.UTF8))
                 {
                     p.iJD = (sqlite3_int64)(r * 86400000.0 + 0.5);
                     p.validJD = 1;
@@ -875,7 +875,7 @@ namespace Community.CsharpSqlite
                             ///<param name="date is already on the appropriate weekday, this is a no">op.</param>
                             ///<param name=""></param>
 
-                            if (z.ToString().StartsWith("weekday ") && Converter.sqlite3AtoF(z.ToString().Substring(8), ref r, StringExtensions.sqlite3Strlen30(z.ToString().Substring(8)), SqliteEncoding.UTF8) && (n = (int)r) == r && n >= 0 && r < 7)
+                            if (z.ToString().StartsWith("weekday ") && Converter.sqlite3AtoF(z.ToString().Substring(8), ref r, StringExtensions.Strlen30(z.ToString().Substring(8)), SqliteEncoding.UTF8) && (n = (int)r) == r && n >= 0 && r < 7)
                             {
                                 sqlite3_int64 Z;
                                 computeYMD_HMS(p);

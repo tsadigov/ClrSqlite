@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite.builder
         public static Index sqlite3FindIndex(Connection db, string zName, string zDb)
         {
             Index p = null;
-            int nName = StringExtensions.sqlite3Strlen30(zName);
+            int nName = StringExtensions.Strlen30(zName);
             ///All mutexes are required for schema access.  Make sure we hold them. 
             Debug.Assert(zDb != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
             for (int i = sqliteinth.OMIT_TEMPDB; i < db.BackendCount; i++)
@@ -82,7 +82,7 @@ namespace Community.CsharpSqlite.builder
         {
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
             var pHash = db.Backends[iDb].pSchema.idxHash;
-            var pIndex = HashExtensions.sqlite3HashInsert(ref pHash, zIdxName, zIdxName.sqlite3Strlen30(), (Index)null);
+            var pIndex = HashExtensions.sqlite3HashInsert(ref pHash, zIdxName, zIdxName.Strlen30(), (Index)null);
 
             sqlite3UnlinkAndDeleteIndex(db, pIndex);
         }
@@ -295,9 +295,10 @@ namespace Community.CsharpSqlite.builder
             {
                 Debug.Assert(pDb != null);
                 //HashElem k;///For looping over tables in pDb 
-                foreach (var k in pDb.pSchema.tblHash.first.path(h => h.next))//for ( k = sqliteHashFirst( pDb.pSchema.tblHash ) ; k != null ; k = sqliteHashNext( k ) )
-                    reindexTable(pParse, (Table)k.data, zColl);
-
+                pDb.pSchema.tblHash.first
+                    .path(h => h.next)
+                    .ForEach(k=> reindexTable(pParse, (Table)k.data, zColl));
+                //for ( k = sqliteHashFirst( pDb.pSchema.tblHash ) ; k != null ; k = sqliteHashNext( k ) )
             }
         }
 #endif
@@ -635,7 +636,7 @@ goto exit_create_index;
             if (pList == null)
             {
                 nullId.zRestSql = pTab.aCol[pTab.nCol - 1].zName;
-                nullId.Length = StringExtensions.sqlite3Strlen30(nullId.zRestSql);
+                nullId.Length = StringExtensions.Strlen30(nullId.zRestSql);
                 pList = pParse.sqlite3ExprListAppend(null, null);
                 if (pList == null)
                     goto exit_create_index;
@@ -654,12 +655,12 @@ goto exit_create_index;
                     ///failure we have quit before reaching this point. 
                     if (Sqlite3.ALWAYS(pColl != null))
                     {
-                        nExtra += (1 + StringExtensions.sqlite3Strlen30(pColl.zName));
+                        nExtra += (1 + StringExtensions.Strlen30(pColl.zName));
                     }
                 }
             }
             ///Allocate the index structure.
-            nName = StringExtensions.sqlite3Strlen30(zName);
+            nName = StringExtensions.Strlen30(zName);
             nCol = pList.nExpr;
             pIndex = new Index();
             // sqlite3DbMallocZero( db,
@@ -755,7 +756,7 @@ goto exit_create_index;
                 {
                     int nColl;
                     zColl = pListItem.pExpr.CollatingSequence.zName;
-                    nColl = StringExtensions.sqlite3Strlen30(zColl);
+                    nColl = StringExtensions.Strlen30(zColl);
                     Debug.Assert(nExtra >= nColl);
                     zExtra = new StringBuilder(zColl.Substring(0, nColl));
                     // memcpy( zExtra, zColl, nColl );
@@ -852,7 +853,7 @@ goto exit_create_index;
             {
                 Index p;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, 0, pIndex.pSchema));
-                p = HashExtensions.sqlite3HashInsert(ref pIndex.pSchema.idxHash, pIndex.zName, StringExtensions.sqlite3Strlen30(pIndex.zName), pIndex);
+                p = HashExtensions.sqlite3HashInsert(ref pIndex.pSchema.idxHash, pIndex.zName, StringExtensions.Strlen30(pIndex.zName), pIndex);
                 if (p != null)
                 {
                     Debug.Assert(p == pIndex);

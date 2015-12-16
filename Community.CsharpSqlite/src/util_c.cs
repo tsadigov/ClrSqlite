@@ -170,7 +170,7 @@ namespace Community
 			return 0x3fffffff & (iLen == -1 ? z.Length : iLen);
 		}
 
-		public static int sqlite3Strlen30 (this string z)
+		public static int Strlen30 (this string z)
 		{
 			//string z2 = z;
 			if (z == null)

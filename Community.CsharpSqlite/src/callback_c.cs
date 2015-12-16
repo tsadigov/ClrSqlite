@@ -214,7 +214,7 @@ sqlite3ValueFree(ref pTmp);
 		///</summary>
 		) {
 			CollSeq[] pColl;
-			int nName=StringExtensions.sqlite3Strlen30(zName);
+			int nName=StringExtensions.Strlen30(zName);
 			pColl=db.aCollSeq.Find(zName,nName,(CollSeq[])null);
 			if((null==pColl)&&create!=0) {
 				pColl=new CollSeq[3];

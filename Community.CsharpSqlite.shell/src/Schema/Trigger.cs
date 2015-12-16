@@ -106,7 +106,7 @@ namespace Community.CsharpSqlite.Metadata
         ///"SELECT" statement. The meanings of the other members is determined by the
         ///"value of "op" as follows:"
         ///
-        ///(op == Sqlite3.TK_INSERT)</param>
+        ///(op == TokenType.TK_INSERT)</param>
         ///orconf    ">> stores the ON CONFLICT algorithm</param>
         ///pSelect   ">> If this is an INSERT INTO ... SELECT ... statement, then</param>
         ///this stores a pointer to the SELECT statement. Otherwise NULL.</param>
@@ -117,12 +117,12 @@ namespace Community.CsharpSqlite.Metadata
         ///statement, then this stores the column-names to be</param>
         ///inserted into.">inserted into.</param>
         ///
-        ///(op == Sqlite3.TK_DELETE)</param>
+        ///(op == TokenType.TK_DELETE)</param>
         ///target    ">> A token holding the quoted name of the table to delete from.</param>
         ///pWhere    ">> The WHERE clause of the DELETE statement if one is specified.</param>
         ///Otherwise NULL.">Otherwise NULL.</param>
         ///
-        ///(op == Sqlite3.TK_UPDATE)</param>
+        ///(op == TokenType.TK_UPDATE)</param>
         ///target    ">> A token holding the quoted name of the table to update rows of.</param>
         ///pWhere    ">> The WHERE clause of the UPDATE statement if one is specified.</param>
         ///Otherwise NULL.</param>
@@ -135,9 +135,16 @@ namespace Community.CsharpSqlite.Metadata
         public class TriggerStep : ILinkedListNode<TriggerStep>
         {
             ///<summary>
-            ///One of Sqlite3.TK_DELETE, Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT, Sqlite3.TK_SELECT 
+            ///One of TokenType.TK_DELETE, TokenType.TK_UPDATE, TokenType.TK_INSERT, TokenType.TK_SELECT 
             ///</summary>
             public u8 op;
+            public TokenType Operator
+        {
+            get { return (TokenType)op; }
+            set {
+                op = (u8)value;
+            }
+        }
 
             ///<summary>
             ///OE_Rollback etc. 
@@ -238,15 +245,20 @@ namespace Community.CsharpSqlite.Metadata
             public string table;
 
             ///<summary>
-            ///One of Sqlite3.TK_DELETE, Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT         
+            ///One of TokenType.TK_DELETE, TokenType.TK_UPDATE, TokenType.TK_INSERT         
             ///</summary>
             public u8 op;
+        public TokenType Operator {
+            get {
+                return (TokenType)op;
+            }
+        }
 
 
             ///<summary>
             ///One of TriggerType.TRIGGER_BEFORE, TriggerType.TRIGGER_AFTER 
             ///</summary>
-            public TriggerType tr_tm;
+        public TriggerType tr_tm;
 
 
             ///<summary>

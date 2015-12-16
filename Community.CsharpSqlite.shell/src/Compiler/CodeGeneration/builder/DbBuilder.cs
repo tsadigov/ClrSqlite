@@ -27,11 +27,11 @@ namespace Community.CsharpSqlite.builder
             if (zName != null)
             {
                 DbBackend pDb;
-                int n = StringExtensions.sqlite3Strlen30(zName);
+                int n = StringExtensions.Strlen30(zName);
                 for (i = (db.BackendCount - 1); i >= 0; i--)
                 {
                     pDb = db.Backends[i];
-                    if ((sqliteinth.OMIT_TEMPDB == 0 || i != 1) && n == StringExtensions.sqlite3Strlen30(pDb.Name) && pDb.Name.Equals(zName, StringComparison.InvariantCultureIgnoreCase))
+                    if ((sqliteinth.OMIT_TEMPDB == 0 || i != 1) && n == StringExtensions.Strlen30(pDb.Name) && pDb.Name.Equals(zName, StringComparison.InvariantCultureIgnoreCase))
                     {
                         break;
                     }

@@ -67,7 +67,7 @@ namespace Community.CsharpSqlite
                 this.zEnd = pEnd.zRestSql.Substring(pEnd.Length);
             }
 
-            public void spanExpr(Sqlite3.Parse pParse, int op, Token pValue)
+            public void spanExpr(Sqlite3.Parse pParse, TokenType op, Token pValue)
             {
                 //Log.WriteLine(String.Empty);
                 //Log.WriteHeader("spanExpr");
@@ -94,7 +94,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///The binary operation 
             ///</summary>
-            int op, 
+            TokenType op, 
                     
 
             ///<summary>
@@ -142,7 +142,7 @@ namespace Community.CsharpSqlite
 
             )
             {
-                spanUnaryPostfix(pParse, (int)op, pOperand, pPostOp);
+                spanUnaryPostfix(pParse, op, pOperand, pPostOp);
             }
             public void spanUnaryPostfix(///
                 ///<summary>
@@ -154,7 +154,7 @@ namespace Community.CsharpSqlite
                 ///Parsing context to record errors 
                 ///</summary>
 
-            int op, ///
+            TokenType op, ///
                 ///<summary>
                 ///The operator 
                 ///</summary>
@@ -186,7 +186,7 @@ namespace Community.CsharpSqlite
                 ///Parsing context to record errors 
                 ///</summary>
 
-            int op, ///
+            TokenType op, ///
                 ///<summary>
                 ///The operator 
                 ///</summary>
@@ -415,15 +415,15 @@ namespace Community.CsharpSqlite
     ** of this structure.
     **
     ** Expr.op is the opcode.  The integer parser token codes are reused
-    ** as opcodes here.  For example, the parser defines Sqlite3.TK_GE to be an integer
+    ** as opcodes here.  For example, the parser defines TokenType.TK_GE to be an integer
     ** code representing the ">=" operator.  This same integer code is reused
     ** to represent the greater-than-or-equal-to operator in the expression
     ** tree.
     **
-    ** If the expression is an SQL literal (Sqlite3.TK_INTEGER, Sqlite3.TK_FLOAT, Sqlite3.TK_BLOB,
-    ** or Sqlite3.TK_STRING), then Expr.token contains the text of the SQL literal. If
-    ** the expression is a variable (Sqlite3.TK_VARIABLE), then Expr.token contains the
-    ** variable name. Finally, if the expression is an SQL function (Sqlite3.TK_FUNCTION),
+    ** If the expression is an SQL literal (TokenType.TK_INTEGER, TokenType.TK_FLOAT, TokenType.TK_BLOB,
+    ** or TokenType.TK_STRING), then Expr.token contains the text of the SQL literal. If
+    ** the expression is a variable (TokenType.TK_VARIABLE), then Expr.token contains the
+    ** variable name. Finally, if the expression is an SQL function (TokenType.TK_FUNCTION),
     ** then Expr.token contains the name of the function.
     **
     ** Expr.pRight and Expr.pLeft are the left and right subexpressions of a
@@ -437,7 +437,7 @@ namespace Community.CsharpSqlite
     ** valid.
     **
     ** An expression of the form ID or ID.ID refers to a column in a table.
-    ** For such expressions, Expr.op is set to Sqlite3.TK_COLUMN and Expr.iTable is
+    ** For such expressions, Expr.op is set to TokenType.TK_COLUMN and Expr.iTable is
     ** the integer cursor number of a VDBE cursor pointing to that table and
     ** Expr.iColumn is the column number for the specific column.  If the
     ** expression is used as a result in an aggregate SELECT, then the
@@ -620,16 +620,16 @@ public int iValue;            /* Non-negative integer value if ExprFlags.EP_IntV
             public int iTable;
             ///
             ///<summary>
-            ///Sqlite3.TK_COLUMN: cursor number of table holding column
-            ///Sqlite3.TK_REGISTER: register number
+            ///TokenType.TK_COLUMN: cursor number of table holding column
+            ///TokenType.TK_REGISTER: register number
             ///</summary>
-            ///<param name="Sqlite3.TK_TRIGGER: 1 ">> old </param>
+            ///<param name="TokenType.TK_TRIGGER: 1 ">> old </param>
             public ynVar iColumn;
             ///
             ///<summary>
             ///</summary>
-            ///<param name="Sqlite3.TK_COLUMN: column index.  ">1 for rowid.</param>
-            ///<param name="Sqlite3.TK_VARIABLE: variable number (always >= 1). ">Sqlite3.TK_VARIABLE: variable number (always >= 1). </param>
+            ///<param name="TokenType.TK_COLUMN: column index.  ">1 for rowid.</param>
+            ///<param name="TokenType.TK_VARIABLE: variable number (always >= 1). ">TokenType.TK_VARIABLE: variable number (always >= 1). </param>
             public i16 iAgg;
             ///
             ///<summary>
@@ -648,17 +648,17 @@ public int iValue;            /* Non-negative integer value if ExprFlags.EP_IntV
             public u8 op2;
             ///
             ///<summary>
-            ///If a Sqlite3.TK_REGISTER, the original value of Expr.op 
+            ///If a TokenType.TK_REGISTER, the original value of Expr.op 
             ///</summary>
             public AggInfo pAggInfo;
             ///
             ///<summary>
-            ///Used by Sqlite3.TK_AGG_COLUMN and Sqlite3.TK_AGG_FUNCTION 
+            ///Used by TokenType.TK_AGG_COLUMN and TokenType.TK_AGG_FUNCTION 
             ///</summary>
             public Table pTab;
             ///
             ///<summary>
-            ///Table for Sqlite3.TK_COLUMN expressions. 
+            ///Table for TokenType.TK_COLUMN expressions. 
             ///</summary>            
 #if SQLITE_MAX_EXPR_DEPTH
             public int nHeight;
@@ -795,7 +795,7 @@ set { _op = value; }
             char comparisonAffinity()
             {
                 char aff;
-                Debug.Assert(this.op == Sqlite3.TK_EQ || this.op == Sqlite3.TK_IN || this.op == Sqlite3.TK_LT || this.op == Sqlite3.TK_GT || this.op == Sqlite3.TK_GE || this.op == Sqlite3.TK_LE || this.op == Sqlite3.TK_NE || this.op == Sqlite3.TK_IS || this.op == Sqlite3.TK_ISNOT);
+                Debug.Assert(this.Operator == TokenType.TK_EQ || this.Operator == TokenType.TK_IN || this.Operator == TokenType.TK_LT || this.Operator == TokenType.TK_GT || this.Operator == TokenType.TK_GE || this.Operator == TokenType.TK_LE || this.Operator == TokenType.TK_NE || this.Operator == TokenType.TK_IS || this.Operator == TokenType.TK_ISNOT);
                 Debug.Assert(this.pLeft != null);
                 aff = this.pLeft.sqlite3ExprAffinity();
                 if (this.pRight != null)
@@ -937,7 +937,7 @@ set { _op = value; }
                 int nByte = this.dupedExprStructSize(flags) & 0xfff;
                 if (!this.ExprHasProperty(ExprFlags.EP_IntValue) && this.u.zToken != null)
                 {
-                    nByte += StringExtensions.sqlite3Strlen30(this.u.zToken) + 1;
+                    nByte += StringExtensions.Strlen30(this.u.zToken) + 1;
                 }
                 return nByte.ROUND8();
             }
@@ -1006,7 +1006,7 @@ set { _op = value; }
                 ///</summary>
                 ///<param name="If an expression is an integer literal that fits in a signed 32">bit</param>
                 ///<param name="integer, then the ExprFlags.EP_IntValue flag will have already been set ">integer, then the ExprFlags.EP_IntValue flag will have already been set </param>
-                Debug.Assert(this.op != Sqlite3.TK_INTEGER || (this.flags & ExprFlags.EP_IntValue) != 0 || !Converter.sqlite3GetInt32(this.u.zToken, ref rc));
+                Debug.Assert(this.Operator != TokenType.TK_INTEGER || (this.flags & ExprFlags.EP_IntValue) != 0 || !Converter.sqlite3GetInt32(this.u.zToken, ref rc));
                 if ((this.flags & ExprFlags.EP_IntValue) != 0)
                 {
                     pValue = (int)this.u.iValue;
@@ -1051,21 +1051,21 @@ set { _op = value; }
                 ///</summary>
             int sqlite3ExprCanBeNull()
             {
-                u8 op;
+                
                 Expr expr = this;
-                while (expr.op == Sqlite3.TK_UPLUS || expr.op == Sqlite3.TK_UMINUS)
+                while (expr.Operator == TokenType.TK_UPLUS || expr.Operator == TokenType.TK_UMINUS)
                 {
                     expr = expr.pLeft;
                 }
-                op = expr.op;
-                if (op == Sqlite3.TK_REGISTER)
-                    op = expr.op2;
+                var op = expr.Operator;
+                if (op == TokenType.TK_REGISTER)
+                    op = expr.Operator2;
                 switch (op)
                 {
-                    case Sqlite3.TK_INTEGER:
-                    case Sqlite3.TK_STRING:
-                    case Sqlite3.TK_FLOAT:
-                    case Sqlite3.TK_BLOB:
+                    case TokenType.TK_INTEGER:
+                    case TokenType.TK_STRING:
+                    case TokenType.TK_FLOAT:
+                    case TokenType.TK_BLOB:
                         return 0;
                     default:
                         return 1;
@@ -1132,7 +1132,7 @@ set { _op = value; }
                         }
                     case TokenType.TK_UMINUS:
                         {
-                            if (expr.pLeft.op == Sqlite3.TK_FLOAT || expr.pLeft.op == Sqlite3.TK_INTEGER)
+                            if (expr.pLeft.Operator == TokenType.TK_FLOAT || expr.pLeft.Operator == TokenType.TK_INTEGER)
                             {
                                 return false;
                             }
@@ -1164,8 +1164,8 @@ set { _op = value; }
                 {
                     ///
                     ///<summary>
-                    ///op==Sqlite3.TK_REGISTER && pExpr.pTab!=0 happens when pExpr was originally
-                    ///a Sqlite3.TK_COLUMN but was previously evaluated and cached in a register 
+                    ///op==TokenType.TK_REGISTER && pExpr.pTab!=0 happens when pExpr was originally
+                    ///a TokenType.TK_COLUMN but was previously evaluated and cached in a register 
                     ///</summary>
                     int j = this.iColumn;
                     if (j < 0)
@@ -1225,7 +1225,7 @@ set { _op = value; }
                 {
                     return false;
                 }
-                if (pList.a[1].pExpr.op != Sqlite3.TK_COLUMN)
+                if (pList.a[1].pExpr.Operator != TokenType.TK_COLUMN)
                 {
                     return false;
                 }
@@ -1311,10 +1311,10 @@ set { _op = value; }
                 int j;
                 if (Sqlite3.NEVER(pExpr == null) || pNC.pSrcList == null)
                     return null;
-                switch (pExpr.op)
+                switch (pExpr.Operator)
                 {
-                    case Sqlite3.TK_AGG_COLUMN:
-                    case Sqlite3.TK_COLUMN:
+                    case TokenType.TK_AGG_COLUMN:
+                    case TokenType.TK_COLUMN:
                         {
                             ///
                             ///<summary>
@@ -1338,8 +1338,8 @@ set { _op = value; }
                             ///<summary>
                             ///Index of column in pTab 
                             ///</summary>
-                            sqliteinth.testcase(pExpr.op == Sqlite3.TK_AGG_COLUMN);
-                            sqliteinth.testcase(pExpr.op == Sqlite3.TK_COLUMN);
+                            sqliteinth.testcase(pExpr.Operator == TokenType.TK_AGG_COLUMN);
+                            sqliteinth.testcase(pExpr.Operator == TokenType.TK_COLUMN);
                             while (pNC != null && pTab == null)
                             {
                                 SrcList pTabList = pNC.pSrcList;
@@ -1375,7 +1375,7 @@ set { _op = value; }
                                 ///<param name=""></param>
                                 ///<param name="This is not a problem, as the column type of "t1.col" is never">This is not a problem, as the column type of "t1.col" is never</param>
                                 ///<param name="used. When columnType() is called on the expression ">used. When columnType() is called on the expression </param>
-                                ///<param name=""(SELECT t1.col)", the correct type is returned (see the Sqlite3.TK_SELECT">"(SELECT t1.col)", the correct type is returned (see the Sqlite3.TK_SELECT</param>
+                                ///<param name=""(SELECT t1.col)", the correct type is returned (see the TokenType.TK_SELECT">"(SELECT t1.col)", the correct type is returned (see the TokenType.TK_SELECT</param>
                                 ///<param name="branch below.  ">branch below.  </param>
                                 break;
                             }
@@ -1437,7 +1437,7 @@ set { _op = value; }
                             break;
                         }
 #if !SQLITE_OMIT_SUBQUERY
-                    case Sqlite3.TK_SELECT:
+                    case TokenType.TK_SELECT:
                         {
                             ///
                             ///<summary>

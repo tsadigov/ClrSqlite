@@ -83,7 +83,7 @@ namespace Community.CsharpSqlite {
 			if(CharExtensions.sqlite3Isdigit(z[0])) {
 				return (u8)Converter.sqlite3Atoi(z);
 			}
-            n = z.sqlite3Strlen30();
+            n = z.Strlen30();
 			for(i=0;i<Sqlite3.ArraySize(iLength);i++) {
 				if(iLength[i]==n&&StringExtensions.sqlite3StrNICmp(zText.Substring(iOffset[i]),z,n)==0) {
 					return iValue[i];
@@ -771,7 +771,7 @@ goto pragma_out;
 										}
 										else {
 											string zMode;
-											int n=StringExtensions.sqlite3Strlen30(zRight);
+											int n=StringExtensions.Strlen30(zRight);
 											for(eMode=0;(zMode=sqlite3JournalModename(eMode))!=null;eMode++) {
 												if(StringExtensions.sqlite3StrNICmp(zRight,zMode,n)==0)
 													break;
@@ -1909,11 +1909,11 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																															#if SQLITE_HAS_CODEC
 																															// needed to support key/rekey/hexrekey with pragma cmds
 																															if(zLeft.Equals("key",StringComparison.InvariantCultureIgnoreCase)&&!String.IsNullOrEmpty(zRight)) {
-                                                                                                                                crypto.sqlite3_key(db, zRight, StringExtensions.sqlite3Strlen30(zRight));
+                                                                                                                                crypto.sqlite3_key(db, zRight, StringExtensions.Strlen30(zRight));
 																															}
 																															else
 																																if(zLeft.Equals("rekey",StringComparison.InvariantCultureIgnoreCase)&&!String.IsNullOrEmpty(zRight)) {
-																																	crypto.sqlite3_rekey(db,zRight,StringExtensions.sqlite3Strlen30(zRight));
+																																	crypto.sqlite3_rekey(db,zRight,StringExtensions.Strlen30(zRight));
 																																}
 																																else
 																																	if(!String.IsNullOrEmpty(zRight)&&(zLeft.Equals("hexkey",StringComparison.InvariantCultureIgnoreCase)||zLeft.Equals("hexrekey",StringComparison.InvariantCultureIgnoreCase))) {

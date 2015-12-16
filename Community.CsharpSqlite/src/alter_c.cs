@@ -80,7 +80,7 @@ namespace Community.CsharpSqlite
 
                 ///The principle used to locate the table name in the CREATE TABLE
                 ///statement is that the table name is the first non-space token that
-                ///is immediately followed by a Sqlite3.TK_LP or Sqlite3.TK_USING token.
+                ///is immediately followed by a TokenType.TK_LP or TokenType.TK_USING token.
 
                 if (!String.IsNullOrEmpty(zSql))
                 {
@@ -237,8 +237,8 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///The principle used to locate the table name in the CREATE TRIGGER
                 ///statement is that the table name is the first token that is immediatedly
-                ///preceded by either Sqlite3.TK_ON or Sqlite3.TK_DOT and immediatedly followed by one
-                ///of Sqlite3.TK_WHEN, Sqlite3.TK_BEGIN or Sqlite3.TK_FOR.
+                ///preceded by either TokenType.TK_ON or TokenType.TK_DOT and immediatedly followed by one
+                ///of TokenType.TK_WHEN, TokenType.TK_BEGIN or TokenType.TK_FOR.
                 ///
                 ///</summary>
 
@@ -281,7 +281,7 @@ namespace Community.CsharpSqlite
                         ///
                         ///<summary>
                         ///Variable 'dist' stores the number of tokens read since the most
-                        ///recent Sqlite3.TK_DOT or Sqlite3.TK_ON. This means that when a WHEN, FOR or BEGIN
+                        ///recent TokenType.TK_DOT or TokenType.TK_ON. This means that when a WHEN, FOR or BEGIN
                         ///token is read and 'dist' equals 2, the condition stated above
                         ///to be met.
                         ///

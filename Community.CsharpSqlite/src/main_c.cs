@@ -21,6 +21,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Metadata.Traverse;
     using Cache;
+    using Ast;
     public partial class Sqlite3 {
 		///
 		///<summary>
@@ -1434,7 +1435,7 @@ return 1;
 			FuncDef p;
 			int nName;
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
-            if (zFunctionName == null || (xFunc != null && (xFinal != null || xStep != null)) || (xFunc == null && (xFinal != null && xStep == null)) || (xFunc == null && (xFinal == null && xStep != null)) || (nArg < -1 || nArg > Limits.SQLITE_MAX_FUNCTION_ARG) || (255 < (nName = StringExtensions.sqlite3Strlen30(zFunctionName))))
+            if (zFunctionName == null || (xFunc != null && (xFinal != null || xStep != null)) || (xFunc == null && (xFinal != null && xStep == null)) || (xFunc == null && (xFinal == null && xStep != null)) || (nArg < -1 || nArg > Limits.SQLITE_MAX_FUNCTION_ARG) || (255 < (nName = StringExtensions.Strlen30(zFunctionName))))
             {
 				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
@@ -1585,7 +1586,7 @@ return rc;
 		/// properly.
 		///</summary>
 		public static SqlResult sqlite3_overload_function(Connection db,string zName,int nArg) {
-			int nName=StringExtensions.sqlite3Strlen30(zName);
+			int nName=StringExtensions.Strlen30(zName);
             SqlResult rc;
 			db.mutex.sqlite3_mutex_enter();
             if (FuncDefTraverse.sqlite3FindFunction(db, zName, nName, nArg, SqliteEncoding.UTF8, 0) == null)
@@ -2051,7 +2052,7 @@ return z;
 		) {
 			CollSeq pColl;
 			SqliteEncoding enc2;
-			int nName=StringExtensions.sqlite3Strlen30(zName);
+			int nName=StringExtensions.Strlen30(zName);
 			Debug.Assert(db.mutex.sqlite3_mutex_held());
 			///If SqliteEncoding.UTF16 is specified as the encoding type, transform this
 			///to one of SqliteEncoding.UTF16LE or SqliteEncoding.UTF16BE using the
@@ -2261,7 +2262,7 @@ return z;
 			string zVfs=zDefaultVfs;
 			StringBuilder zFile=null;
 			char c;
-			int nUri=StringExtensions.sqlite3Strlen30(zUri);
+			int nUri=StringExtensions.Strlen30(zUri);
 			pzErrMsg=null;
 			ppVfs=null;
 			if(((flags&SQLITE_OPEN_URI)!=0||sqliteinth.sqlite3GlobalConfig.bOpenUri)&&nUri>=5&&_Custom.memcmp(zUri,"file:",5)==0) {
@@ -2378,10 +2379,10 @@ return z;
 				///</summary>
 				zOpt=zFile.ToString().Substring(StringExtensions.sqlite3Strlen30(zFile)+1);
 				while(zOpt.Length>0) {
-					int nOpt=StringExtensions.sqlite3Strlen30(zOpt);
+					int nOpt=StringExtensions.Strlen30(zOpt);
 					string zVal=zOpt.Substring(nOpt);
 					//zOpt[nOpt + 1];
-					int nVal=StringExtensions.sqlite3Strlen30(zVal);
+					int nVal=StringExtensions.Strlen30(zVal);
 					if(nOpt==3&&_Custom.memcmp("vfs",zOpt,3)==0) {
 						zVfs=zVal;
 					}
@@ -2418,7 +2419,7 @@ return z;
 							int mode=0;
 							for(i=0;aMode[i].z!=null;i++) {
 								string z=aMode[i].z;
-								if(nVal==StringExtensions.sqlite3Strlen30(z)&&0==_Custom.memcmp(zVal,z,nVal)) {
+								if(nVal==StringExtensions.Strlen30(z)&&0==_Custom.memcmp(zVal,z,nVal)) {
 									mode=aMode[i].mode;
 									break;
 								}
@@ -2460,7 +2461,7 @@ return z;
 				zFile=null;
 			}
 			pFlags=flags;
-			pzFile=zFile==null?null:zFile.ToString().Substring(0,StringExtensions.sqlite3Strlen30(zFile.ToString()));
+			pzFile=zFile==null?null:zFile.ToString().Substring(0,StringExtensions.Strlen30(zFile.ToString()));
 			return rc;
 		}
 		///
@@ -3346,8 +3347,8 @@ error_out:
 				///</summary>
 				case SQLITE_TESTCTRL_ISKEYWORD: {
 					string zWord=(string)_Custom.va_arg(ap,"char*");
-					int n=StringExtensions.sqlite3Strlen30(zWord);
-					rc=(sqlite3KeywordCode(zWord,n)!=Sqlite3.TK_ID)?SQLITE_N_KEYWORD:0;
+					int n=StringExtensions.Strlen30(zWord);
+					rc=((TokenType)sqlite3KeywordCode(zWord,n)!=TokenType.TK_ID)?SQLITE_N_KEYWORD:0;
 					break;
 				}
 				//#endif 

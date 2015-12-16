@@ -60,14 +60,14 @@ namespace Community.CsharpSqlite
             /// If the result set column is a simple column reference, then this routine
             /// makes an exact copy.  But for any other kind of expression, this
             /// routine make a copy of the result set column as the argument to the
-            /// Sqlite3.TK_AS operator.  The Sqlite3.TK_AS operator causes the expression to be
+            /// TokenType.TK_AS operator.  The TokenType.TK_AS operator causes the expression to be
             /// evaluated just once and then reused for each alias.
             ///
-            /// The reason for suppressing the Sqlite3.TK_AS term when the expression is a simple
+            /// The reason for suppressing the TokenType.TK_AS term when the expression is a simple
             /// column reference is so that the column reference will be recognized as
             /// usable by indices within the WHERE clause processing logic.
             ///
-            /// Hack:  The Sqlite3.TK_AS operator is inhibited if zType[0]=='G'.  This means
+            /// Hack:  The TokenType.TK_AS operator is inhibited if zType[0]=='G'.  This means
             /// that in a GROUP BY clause, the expression is evaluated twice.  Hence:
             ///
             ///     SELECT random()%5 AS x, count(*) FROM tab GROUP BY x
@@ -107,7 +107,7 @@ namespace Community.CsharpSqlite
                 if (pOrig.Operator != TokenType.TK_COLUMN && (zType.Length == 0 || zType[0] != 'G'))
                 {
                     pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
-                    pDup = pParse.sqlite3PExpr(Sqlite3.TK_AS, pDup, null, null);
+                    pDup = pParse.sqlite3PExpr(TokenType.TK_AS, pDup, null, null);
                     if (pDup == null)
                         return;
                     if (pEList.a[iCol].iAlias == 0)
@@ -277,7 +277,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static Expr sqlite3CreateColumnExpr(Connection db, SrcList pSrc, int iSrc, int iCol)
             {
-                Expr p = exprc.CreateExpr(db, Sqlite3.TK_COLUMN, null, false);
+                Expr p = exprc.CreateExpr(db, TokenType.TK_COLUMN, null, false);
                 if (p != null)
                 {
                     SrcList_item pItem = pSrc.a[iSrc];
@@ -313,7 +313,7 @@ namespace Community.CsharpSqlite
             ///    pExpr->pTab          Points to the Table structure of X.Y (even if
             ///                         X and/or Y are implied.)
             ///    pExpr->iColumn       Set to the column number within the table.
-            ///    pExpr->op            Set to Sqlite3.TK_COLUMN.
+            ///    pExpr->op            Set to TokenType.TK_COLUMN.
             ///    pExpr->pLeft         Any expression this points to is deleted
             ///    pExpr->pRight        Any expression this points to is deleted.
             ///
@@ -469,16 +469,16 @@ namespace Community.CsharpSqlite
                     ///</summary>
                     if (zDb == null && zTab != null && cnt == 0 && pParse.pTriggerTab != null)
                     {
-                        int op = pParse.eTriggerOp;
+                        var op = pParse.eTriggerOperator;
                         Table pTab = null;
-                        Debug.Assert(op == Sqlite3.TK_DELETE || op == Sqlite3.TK_UPDATE || op == Sqlite3.TK_INSERT);
-                        if (op != Sqlite3.TK_DELETE && "new".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
+                        Debug.Assert(op == TokenType.TK_DELETE || op == TokenType.TK_UPDATE || op == TokenType.TK_INSERT);
+                        if (op != TokenType.TK_DELETE && "new".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
                         {
                             pExpr.iTable = 1;
                             pTab = pParse.pTriggerTab;
                         }
                         else
-                            if (op != Sqlite3.TK_INSERT && "old".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
+                            if (op != TokenType.TK_INSERT && "old".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 pExpr.iTable = 0;
                                 pTab = pParse.pTriggerTab;
@@ -689,13 +689,13 @@ namespace Community.CsharpSqlite
             ///<summary>
             /// This routine is callback for sqlite3WalkExpr().
             ///
-            /// Resolve symbolic names into Sqlite3.TK_COLUMN operators for the current
+            /// Resolve symbolic names into TokenType.TK_COLUMN operators for the current
             /// node in the expression tree.  Return 0 to continue the search down
             /// the tree or 2 to abort the tree walk.
             ///
             /// This routine also does error checking and name resolution for
             /// function names.  The operator for aggregate functions is changed
-            /// to Sqlite3.TK_AGG_FUNCTION.
+            /// to TokenType.TK_AGG_FUNCTION.
             ///
             ///</summary>
             public static WRC resolveExprStep(Walker pWalker, ref Expr pExpr)
@@ -723,16 +723,16 @@ namespace Community.CsharpSqlite
                 switch (pExpr.Operator)
                 {
 #if (SQLITE_ENABLE_UPDATE_DELETE_LIMIT) && !(SQLITE_OMIT_SUBQUERY)
-																																																																		/* The special operator Sqlite3.TK_ROW means use the rowid for the first
+																																																																		/* The special operator TokenType.TK_ROW means use the rowid for the first
 ** column in the FROM clause.  This is used by the LIMIT and ORDER BY
 ** clause processing on UPDATE and DELETE statements.
 */
-case Sqlite3.TK_ROW: {
+case TokenType.TK_ROW: {
 SrcList pSrcList = pNC.pSrcList;
 SrcList_item pItem;
 Debug.Assert( pSrcList !=null && pSrcList.nSrc==1 );
 pItem = pSrcList.a[0];
-pExpr.op = Sqlite3.TK_COLUMN;
+pExpr.op = TokenType.TK_COLUMN;
 pExpr.pTab = pItem.pTab;
 pExpr.iTable = pItem.iCursor;
 pExpr.iColumn = -1;
@@ -804,7 +804,7 @@ break;
                             sqliteinth.testcase(pExpr.Operator == TokenType.TK_CONST_FUNC);
                             Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
                             zId = pExpr.u.zToken;
-                            nId = StringExtensions.sqlite3Strlen30(zId);
+                            nId = StringExtensions.Strlen30(zId);
                             pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, n, enc, 0);
                             if (pDef == null)
                             {
@@ -831,7 +831,7 @@ utilc.sqlite3ErrorMsg(pParse, "not authorized to use function: %s",
 pDef.zName);
 pNC.nErr++;
 }
-pExpr.op = Sqlite3.TK_NULL;
+pExpr.op = TokenType.TK_NULL;
 return WRC.WRC_Prune;
 }
 }
@@ -1032,7 +1032,7 @@ return WRC.WRC_Prune;
                             CollSeq pColl = pE.CollatingSequence;
                             ExprFlags flags = pE.Flags & ExprFlags.EP_ExpCollate;
                             exprc.sqlite3ExprDelete(db, ref pE);
-                            pItem.pExpr = pE = exprc.sqlite3Expr(db, Sqlite3.TK_INTEGER, null);
+                            pItem.pExpr = pE = exprc.sqlite3Expr(db, TokenType.TK_INTEGER, null);
                             if (pE == null)
                                 return 1;
                             pE.CollatingSequence = pColl;
@@ -1489,7 +1489,7 @@ return WRC.WRC_Prune;
             ///
             /// The node at the root of the subtree is modified as follows:
             ///
-            ///    Expr.op        Changed to Sqlite3.TK_COLUMN
+            ///    Expr.op        Changed to TokenType.TK_COLUMN
             ///    Expr.pTab      Points to the Table object for X.Y
             ///    Expr.iColumn   The column index in X.Y.  -1 for the rowid.
             ///    Expr.iTable    The VDBE cursor number for X.Y
@@ -1511,7 +1511,7 @@ return WRC.WRC_Prune;
             /// Function calls are checked to make sure that the function is
             /// defined and that the correct number of arguments are specified.
             /// If the function is an aggregate function, then the pNC.hasAgg is
-            /// set and the opcode is changed from Sqlite3.TK_FUNCTION to Sqlite3.TK_AGG_FUNCTION.
+            /// set and the opcode is changed from TokenType.TK_FUNCTION to TokenType.TK_AGG_FUNCTION.
             /// If an expression contains aggregate functions then the ExprFlags.EP_Agg
             /// property on the expression is set.
             ///

@@ -130,12 +130,12 @@ sqliteAuthBadReturnCode(pParse);
 }
 
 ///<summary>
-/// The pExpr should be a Sqlite3.TK_COLUMN expression.  The table referred to
+/// The pExpr should be a TokenType.TK_COLUMN expression.  The table referred to
 /// is in pTabList or else it is the NEW or OLD table of a trigger.
 /// Check to see if it is OK to read this particular column.
 ///
-/// If the auth function returns SQLITE_IGNORE, change the Sqlite3.TK_COLUMN
-/// instruction into a Sqlite3.TK_NULL.  If the auth function returns SQLITE_DENY,
+/// If the auth function returns SQLITE_IGNORE, change the TokenType.TK_COLUMN
+/// instruction into a TokenType.TK_NULL.  If the auth function returns SQLITE_DENY,
 /// then generate an error.
 ///</summary>
 void sqlite3AuthRead(
@@ -158,8 +158,8 @@ if( iDb<0 ){
 ** temporary table. */
 return;
 }
-  Debug.Assert( pExpr->op==Sqlite3.TK_COLUMN || pExpr->op==Sqlite3.TK_TRIGGER );
-  if( pExpr->op==Sqlite3.TK_TRIGGER ){
+  Debug.Assert( pExpr->op==TokenType.TK_COLUMN || pExpr->op==TokenType.TK_TRIGGER );
+  if( pExpr->op==TokenType.TK_TRIGGER ){
 pTab = pParse->pTriggerTab;
   }else{
 Debug.Assert( pTabList );
@@ -184,7 +184,7 @@ zCol = "ROWID";
 }
 Debug.Assert( iDb>=0 && iDb<db->nDb );
   if( SQLITE_IGNORE==sqlite3AuthReadCol(pParse, pTab->zName, zCol, iDb) ){
-pExpr->op = Sqlite3.TK_NULL;
+pExpr->op = TokenType.TK_NULL;
 }
 }
 

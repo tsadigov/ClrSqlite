@@ -215,7 +215,7 @@ namespace Community.CsharpSqlite {
 		/// indicate success or failure.
 		///
 		///</summary>
-		static SqlResult sqlite3InitOne(Connection db,int iDb,ref string pzErrMsg) {
+		public static SqlResult sqlite3InitOne(Connection db,int iDb,ref string pzErrMsg) {
             SqlResult rc;
 			int i;
 			int size;

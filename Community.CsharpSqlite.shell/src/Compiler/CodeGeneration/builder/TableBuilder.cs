@@ -38,7 +38,7 @@ namespace Community.CsharpSqlite.builder
                 ///</summary>
                 ///<param name="Zero">length table names are allowed </param>
                 pDb = db.Backends[iDb];
-                p = HashExtensions.sqlite3HashInsert(ref pDb.pSchema.tblHash, zTabName, StringExtensions.sqlite3Strlen30(zTabName), (Table)null);
+                p = HashExtensions.sqlite3HashInsert(ref pDb.pSchema.tblHash, zTabName, StringExtensions.Strlen30(zTabName), (Table)null);
                 TableBuilder.sqlite3DeleteTable(db, ref p);
                 db.flags |= SqliteFlags.SQLITE_InternChanges;
             }
@@ -61,7 +61,7 @@ namespace Community.CsharpSqlite.builder
             {
                 Table p = null;
                 Debug.Assert(zName != null);
-                var nName = StringExtensions.sqlite3Strlen30(zName);
+                var nName = StringExtensions.Strlen30(zName);
                 ///All mutexes are required for schema access.  Make sure we hold them. 
                 Debug.Assert(zDatabase != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
                 for (int i = sqliteinth.OMIT_TEMPDB; i < db.BackendCount; i++)
@@ -632,7 +632,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
                     //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
                     //  );
-                    HashExtensions.sqlite3HashInsert(ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), (Index)null);
+                    HashExtensions.sqlite3HashInsert(ref pIndex.pSchema.idxHash, zName, StringExtensions.Strlen30(zName), (Index)null);
 #endif
                     //}
                     var index = pIndex;
@@ -752,7 +752,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     sqliteinth.testcase(pCol.affinity == sqliteinth.SQLITE_AFF_INTEGER);
                     sqliteinth.testcase(pCol.affinity == sqliteinth.SQLITE_AFF_REAL);
                     zType = azType[pCol.affinity - sqliteinth.SQLITE_AFF_TEXT];
-                    len = StringExtensions.sqlite3Strlen30(zType);
+                    len = StringExtensions.Strlen30(zType);
                     Debug.Assert(pCol.affinity == sqliteinth.SQLITE_AFF_NONE || pCol.affinity == build.sqlite3AffinityType(zType));
                     zStmt.Append(zType);
                     // memcpy( &zStmt[k], zType, len );

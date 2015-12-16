@@ -241,7 +241,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_ISNULL, jump, in1 
+                        ///same as TokenType.TK_ISNULL, jump, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
                         if ((pIn1.flags & MemFlags.MEM_Null) != 0)
@@ -261,7 +261,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_NOTNULL, jump, in1 
+                        ///same as TokenType.TK_NOTNULL, jump, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
                         if ((pIn1.flags & MemFlags.MEM_Null) == 0)

@@ -76,7 +76,7 @@ namespace Community.CsharpSqlite.Engine
                 ///<param name="Write that value into register P2.">Write that value into register P2.</param>
                 case OpCode.OP_Real:
                     {
-                        ///<param name="same as Sqlite3.TK_FLOAT, ref2">prerelease </param>
+                        ///<param name="same as TokenType.TK_FLOAT, ref2">prerelease </param>
                         pOut.flags = MemFlags.MEM_Real;
                         Debug.Assert(!MathExtensions.sqlite3IsNaN(pOp.p4.pReal));
                         pOut.r = pOp.p4.pReal;
@@ -91,10 +91,10 @@ namespace Community.CsharpSqlite.Engine
                 ///<param name="into an  OpCode.OP_String before it is executed for the first time.">into an  OpCode.OP_String before it is executed for the first time.</param>
                 case OpCode.OP_String8:
                     {
-                        ///<param name="same as Sqlite3.TK_STRING, ref2">prerelease </param>
+                        ///<param name="same as TokenType.TK_STRING, ref2">prerelease </param>
                         Debug.Assert(pOp.p4.z != null);
                         pOp.OpCode = OpCode.OP_String;
-                        pOp.p1 = StringExtensions.sqlite3Strlen30(pOp.p4.z);
+                        pOp.p1 = StringExtensions.Strlen30(pOp.p4.z);
 #if !SQLITE_OMIT_UTF16
 																																																																																																																																				if( encoding!=SqliteEncoding.UTF8 ){
 rc = sqlite3VdbeMemSetStr(pOut, pOp.p4.z, -1, SqliteEncoding.UTF8, SQLITE_STATIC);

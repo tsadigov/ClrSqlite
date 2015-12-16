@@ -605,27 +605,27 @@ namespace Community.CsharpSqlite.Ast {
 								///</summary>
 								///
 								///<summary>
-								///The following constant maps Sqlite3.TK_xx codes into corresponding
-								///seek opcodes.  It depends on a particular ordering of Sqlite3.TK_xx
+								///The following constant maps TokenType.TK_xx codes into corresponding
+								///seek opcodes.  It depends on a particular ordering of TokenType.TK_xx
 								///
 								///</summary>
 								OpCode[] aMoveOp=new OpCode[] {
-									OpCode.OP_SeekGt,///Sqlite3.TK_GT 
-									OpCode.OP_SeekLe,///Sqlite3.TK_LE 
-									OpCode.OP_SeekLt,///Sqlite3.TK_LT 
-									OpCode.OP_SeekGe///Sqlite3.TK_GE 
+									OpCode.OP_SeekGt,///TokenType.TK_GT 
+									OpCode.OP_SeekLe,///TokenType.TK_LE 
+									OpCode.OP_SeekLt,///TokenType.TK_LT 
+									OpCode.OP_SeekGe///TokenType.TK_GE 
 								};
-								Debug.Assert(Sqlite3.TK_LE==Sqlite3.TK_GT+1);
+								Debug.Assert(TokenType.TK_LE==TokenType.TK_GT+1);
 								///
 								///<summary>
 								///Make sure the ordering.. 
 								///</summary>
-								Debug.Assert(Sqlite3.TK_LT==Sqlite3.TK_GT+2);
+								Debug.Assert(TokenType.TK_LT==TokenType.TK_GT+2);
 								///
 								///<summary>
-								///... of the Sqlite3.TK_xx values... 
+								///... of the TokenType.TK_xx values... 
 								///</summary>
-								Debug.Assert(Sqlite3.TK_GE==Sqlite3.TK_GT+3);
+								Debug.Assert(TokenType.TK_GE==TokenType.TK_GT+3);
 								///
 								///<summary>
 								///... is correcct. 
@@ -639,7 +639,7 @@ namespace Community.CsharpSqlite.Ast {
 								Debug.Assert(pX!=null);
 								Debug.Assert(pStart.leftCursor==iCur);
 								r1=pParse.sqlite3ExprCodeTemp(pX.pRight,ref rTemp);
-								v.sqlite3VdbeAddOp3(aMoveOp[pX.op-Sqlite3.TK_GT],iCur,addrBrk,r1);
+								v.sqlite3VdbeAddOp3(aMoveOp[pX.op-(int)TokenType.TK_GT],iCur,addrBrk,r1);
 								#if SQLITE_DEBUG
 																																																																																																																																																																																																												            VdbeComment( v, "pk" );
 #endif
@@ -662,7 +662,7 @@ namespace Community.CsharpSqlite.Ast {
 								///<param name="EV: R">11662 </param>
 								memEndValue=++pParse.nMem;
 								pParse.sqlite3ExprCode(pX.pRight,memEndValue);
-								if(pX.op==Sqlite3.TK_LT||pX.op==Sqlite3.TK_GT) {
+								if(pX.Operator==TokenType.TK_LT||pX.Operator==TokenType.TK_GT) {
 									testOp=bRev!=0?OpCode.OP_Le:OpCode.OP_Ge;
 								}
 								else {
@@ -977,7 +977,7 @@ namespace Community.CsharpSqlite.Ast {
                                 sqliteinth.testcase(op == OpCode.OP_SeekGe);
                                 sqliteinth.testcase(op == OpCode.OP_SeekLe);
                                 sqliteinth.testcase(op == OpCode.OP_SeekLt);
-								v.sqlite3VdbeAddOp4Int((u8)op,iIdxCur,addrNxt,regBase,nConstraint);
+								v.sqlite3VdbeAddOp4Int(op,iIdxCur,addrNxt,regBase,nConstraint);
 								///
 								///<summary>
 								///Load the value for the inequality constraint at the end of the
@@ -1031,7 +1031,7 @@ namespace Community.CsharpSqlite.Ast {
                                 sqliteinth.testcase(op == OpCode.OP_IdxGE);
                                 sqliteinth.testcase(op == OpCode.OP_IdxLT);
 								if(op!=OpCode.OP_Noop) {
-									v.sqlite3VdbeAddOp4Int((u8)op,iIdxCur,addrNxt,regBase,nConstraint);
+									v.sqlite3VdbeAddOp4Int(op,iIdxCur,addrNxt,regBase,nConstraint);
 									v.sqlite3VdbeChangeP5((u8)(endEq!=bRev?1:0));
 								}
 								///

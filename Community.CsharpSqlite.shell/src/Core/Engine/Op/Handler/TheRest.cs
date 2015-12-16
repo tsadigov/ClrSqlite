@@ -223,7 +223,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///
                         ///<summary>
-                        ///same as Sqlite3.TK_CONCAT, in1, in2, ref3 
+                        ///same as TokenType.TK_CONCAT, in1, in2, ref3 
                         ///</summary>
                         i64 nByte;
                         pIn1 = aMem[pOp.p1];
@@ -2007,7 +2007,7 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
                         cpu.pOut = aMem[pOp.p2];
                         cpu.pOut.flags = MemFlags.MEM_Str | MemFlags.MEM_Static | MemFlags.MEM_Term;
                         cpu.pOut.z = Sqlite3.sqlite3JournalModename(eNew);
-                        cpu.pOut.n = StringExtensions.sqlite3Strlen30(cpu.pOut.z);
+                        cpu.pOut.n = StringExtensions.Strlen30(cpu.pOut.z);
                         cpu.pOut.enc = SqliteEncoding.UTF8;
                         vdbemem_cs.sqlite3VdbeChangeEncoding(cpu.pOut, encoding);
                         break;

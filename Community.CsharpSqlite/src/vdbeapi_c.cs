@@ -403,7 +403,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
 #endif
                 {
                     db.callStackDepth++;
-                    rc = (SqlResult)p.Exec();
+                    rc = (SqlResult)p.sqlite3VdbeExec();
                     db.callStackDepth--;
                 }
 #if !SQLITE_OMIT_TRACE
@@ -1436,7 +1436,7 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
 
             public static int sqlite3_bind_parameter_index(sqlite3_stmt pStmt, string zName)
             {
-                return vdbeapi.sqlite3VdbeParameterIndex((Vdbe)pStmt, zName, StringExtensions.sqlite3Strlen30(zName));
+                return vdbeapi.sqlite3VdbeParameterIndex((Vdbe)pStmt, zName, StringExtensions.Strlen30(zName));
             }
 
             ///<summary>

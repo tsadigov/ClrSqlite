@@ -111,7 +111,7 @@ namespace Community.CsharpSqlite.Utils
                 }
                 if (N < 0)
                 {
-                    N = StringExtensions.sqlite3Strlen30(z);
+                    N = StringExtensions.Strlen30(z);
                 }
                 if (N == 0 || Sqlite3.NEVER(z == null))
                 {

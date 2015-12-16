@@ -17,7 +17,7 @@ namespace Community.CsharpSqlite
         /// An instance of this structure contains information needed to generate
         /// code for a SELECT that contains aggregate functions.
         ///
-        /// If Expr.op==Sqlite3.TK_AGG_COLUMN or Sqlite3.TK_AGG_FUNCTION then Expr.pAggInfo is a
+        /// If Expr.op==TokenType.TK_AGG_COLUMN or TokenType.TK_AGG_FUNCTION then Expr.pAggInfo is a
         /// pointer to this structure.  The Expr.iColumn field is the index in
         /// AggInfo.aCol[] or AggInfo.aFunc[] of information needed to generate
         /// code for that node.

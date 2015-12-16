@@ -97,7 +97,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             }
                             else
                             {
-                                nName = StringExtensions.sqlite3Strlen30(zName);
+                                nName = StringExtensions.Strlen30(zName);
 #if !SQLITE_OMIT_VIRTUALTABLE
                                 ///
                                 ///<summary>

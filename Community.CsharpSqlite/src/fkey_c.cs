@@ -157,7 +157,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static FKey sqlite3FkReferences(Table pTab)
             {
-                int nName = StringExtensions.sqlite3Strlen30(pTab.zName);
+                int nName = StringExtensions.Strlen30(pTab.zName);
                 return pTab.pSchema.fkeyHash.Find(pTab.zName, nName, (FKey)null);
             }
             ///<summary>
@@ -222,7 +222,7 @@ namespace Community.CsharpSqlite
                         {
                             FKey p = pFKey.pNextTo;
                             string z = (p != null ? pFKey.pNextTo.zTo : pFKey.zTo);
-                            HashExtensions.sqlite3HashInsert( ref pTab.pSchema.fkeyHash, z, StringExtensions.sqlite3Strlen30(z), p);
+                            HashExtensions.sqlite3HashInsert( ref pTab.pSchema.fkeyHash, z, StringExtensions.Strlen30(z), p);
                         }
                         if (pFKey.pNextTo != null)
                         {

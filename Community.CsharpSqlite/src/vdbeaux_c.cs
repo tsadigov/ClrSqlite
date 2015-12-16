@@ -701,7 +701,7 @@ namespace Community.CsharpSqlite.Engine
                                 CollSeq pColl = pKeyInfo.aColl[j];
                                 if (pColl != null)
                                 {
-                                    int n = StringExtensions.sqlite3Strlen30(pColl.zName);
+                                    int n = StringExtensions.Strlen30(pColl.zName);
                                     if (i + n > nTemp)
                                     {
                                         zTemp.Append(",...");
@@ -1191,7 +1191,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             ///Opcode 
                             ///</summary>
                             Debug.Assert(pMem.z != null);
-                            pMem.n = StringExtensions.sqlite3Strlen30(pMem.z);
+                            pMem.n = StringExtensions.Strlen30(pMem.z);
                             pMem.ValType = FoundationalType.SQLITE_TEXT;
                             pMem.enc = SqliteEncoding.UTF8;
                             if (p.pResultSet[i_pMem] == null)
@@ -1279,7 +1279,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         else
                         {
                             Debug.Assert(pMem.z != null);
-                            pMem.n = StringExtensions.sqlite3Strlen30(pMem.z);
+                            pMem.n = StringExtensions.Strlen30(pMem.z);
                             pMem.enc = SqliteEncoding.UTF8;
                         }
                         pMem.type = FoundationalType.SQLITE_TEXT;
@@ -1858,7 +1858,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<param name="that case we do not support atomic multi">file commits, so use the</param>
                 ///<param name="simple case then too.">simple case then too.</param>
                 ///<param name=""></param>
-                if (0 == StringExtensions.sqlite3Strlen30(db.Backends[0].BTree.GetFilename()) || nTrans <= 1)
+                if (0 == StringExtensions.Strlen30(db.Backends[0].BTree.GetFilename()) || nTrans <= 1)
                 {
                     for (i = 0; rc == SqlResult.SQLITE_OK && i < db.BackendCount; i++)
                     {
@@ -1971,8 +1971,8 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             {
                                 needSync = true;
                             }
-                            rc = os.sqlite3OsWrite(pMaster, Encoding.UTF8.GetBytes(zFile), StringExtensions.sqlite3Strlen30(zFile), offset);
-                            offset += StringExtensions.sqlite3Strlen30(zFile);
+                            rc = os.sqlite3OsWrite(pMaster, Encoding.UTF8.GetBytes(zFile), StringExtensions.Strlen30(zFile), offset);
+                            offset += StringExtensions.Strlen30(zFile);
                             if (rc != SqlResult.SQLITE_OK)
                             {
                                 os.sqlite3OsCloseFree(pMaster);

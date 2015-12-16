@@ -145,7 +145,7 @@ namespace Community.CsharpSqlite.Ast
             /// appear to be quoted.  If the quotes were of the form "..." (double-quotes)
             /// then the ExprFlags.EP_DblQuoted flag is set on the expression node.
             ///
-            /// Special case:  If op==Sqlite3.TK_INTEGER and pToken points to a string that
+            /// Special case:  If op==TokenType.TK_INTEGER and pToken points to a string that
             /// can be translated into a 32-bit integer, then the token is not
             /// stored in u.zToken.  Instead, the integer values is written
             /// into u.iValue and the ExprFlags.EP_IntValue flag is set.  No extra storage
@@ -155,7 +155,7 @@ namespace Community.CsharpSqlite.Ast
                 ///<summary>
                 ///Handle for sqlite3DbMallocZero() (may be null) 
                 ///</summary>
-            int op,///
+            TokenType op,///
                 ///<summary>
                 ///Expression opcode 
                 ///</summary>
@@ -233,7 +233,7 @@ namespace Community.CsharpSqlite.Ast
                 ///<summary>
                 ///Handle for sqlite3DbMallocZero() (may be null) 
                 ///</summary>
-            int op,///
+            TokenType op,///
                 ///<summary>
                 ///Expression opcode 
                 ///</summary>
@@ -245,7 +245,7 @@ namespace Community.CsharpSqlite.Ast
             {
                 Token x = new Token();
                 x.zRestSql = zToken;
-                x.Length = !String.IsNullOrEmpty(zToken) ? zToken.sqlite3Strlen30() : 0;
+                x.Length = !String.IsNullOrEmpty(zToken) ? zToken.Strlen30() : 0;
                 return CreateExpr(db, op, x, false);
             }
             ///
@@ -315,7 +315,7 @@ namespace Community.CsharpSqlite.Ast
                     }
                     else
                     {
-                        Expr pNew = CreateExpr(db, Sqlite3.TK_AND, null, false);
+                        Expr pNew = CreateExpr(db, (TokenType)OpCode.OP_And, null, false);
                         exprc.sqlite3ExprAttachSubtrees(db, pNew, pLeft, pRight);
                         return pNew;
                     }
@@ -447,7 +447,7 @@ namespace Community.CsharpSqlite.Ast
                         int nToken;
                         if (!p.ExprHasProperty(ExprFlags.EP_IntValue) && !String.IsNullOrEmpty(p.u.zToken))
                         {
-                            nToken = StringExtensions.sqlite3Strlen30(p.u.zToken);
+                            nToken = StringExtensions.Strlen30(p.u.zToken);
                         }
                         else
                         {
@@ -1182,7 +1182,7 @@ return null;
                 {
                     double value = 0;
                     //string zV;
-                    Converter.sqlite3AtoF(z, ref value, StringExtensions.sqlite3Strlen30(z), SqliteEncoding.UTF8);
+                    Converter.sqlite3AtoF(z, ref value, StringExtensions.Strlen30(z), SqliteEncoding.UTF8);
                     Debug.Assert(!MathExtensions.sqlite3IsNaN(value));
                     ///
                     ///<summary>
@@ -1335,7 +1335,7 @@ return null;
             ///<summary>
             /// If pExpr is a constant expression that is appropriate for
             /// factoring out of a loop, then evaluate the expression
-            /// into a register and convert the expression into a Sqlite3.TK_REGISTER
+            /// into a register and convert the expression into a TokenType.TK_REGISTER
             /// expression.
             ///
             ///</summary>
@@ -1395,7 +1395,7 @@ return null;
             ///<summary>
             /// Preevaluate constant subexpressions within pExpr and store the
             /// results in registers.  Modify pExpr so that the constant subexpresions
-            /// are Sqlite3.TK_REGISTER opcodes that refer to the precomputed values.
+            /// are TokenType.TK_REGISTER opcodes that refer to the precomputed values.
             ///
             /// This routine is a no-op if the jump to the cookie-check code has
             /// already occur.  Since the cookie-check jump is generated prior to
@@ -1437,7 +1437,7 @@ return null;
             /// If the expression evaluates to NULL (neither true nor false), then
             /// take the jump if the jumpIfNull flag is sqliteinth.SQLITE_JUMPIFNULL.
             ///
-            /// This code depends on the fact that certain token values (ex: Sqlite3.TK_EQ)
+            /// This code depends on the fact that certain token values (ex: TokenType.TK_EQ)
             /// are the same as opcode values (ex:  OpCode.OP_Eq) that implement the corresponding
             /// operation.  Special comments in vdbe.c and the mkopcodeh.awk script in
             /// the make process cause these values to align.  Assert()s in the code
@@ -1669,7 +1669,7 @@ return null;
                                         ///<summary>
                                         ///There is now an entry for pExpr in pAggInfo.aCol[] (either
                                         ///because it was there before or because we just created it).
-                                        ///Convert the pExpr to be a Sqlite3.TK_AGG_COLUMN referring to that
+                                        ///Convert the pExpr to be a TokenType.TK_AGG_COLUMN referring to that
                                         ///pAggInfo.aCol[] entry.
                                         ///
                                         ///</summary>
@@ -1734,7 +1734,7 @@ return null;
                                         pItem.pExpr = pExpr;
                                         pItem.iMem = ++pParse.nMem;
                                         Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
-                                        pItem.pFunc = FuncDefTraverse.sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0);
+                                        pItem.pFunc = FuncDefTraverse.sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0);
                                         if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)
                                         {
                                             pItem.iDistinct = pParse.nTab++;

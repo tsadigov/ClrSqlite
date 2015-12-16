@@ -291,7 +291,7 @@ namespace Community.CsharpSqlite
             public u8 op;
             ///
             ///<summary>
-            ///Split operator.  Sqlite3.TK_AND or Sqlite3.TK_OR 
+            ///Split operator.  TokenType.TK_AND or TokenType.TK_OR 
             ///</summary>
             public int nTerm;
             ///
@@ -631,7 +631,7 @@ namespace Community.CsharpSqlite
                 Bitmask mask = 0;
                 if (p == null)
                     return 0;
-                if (p.op == Sqlite3.TK_COLUMN)
+                if (p.Operator == TokenType.TK_COLUMN)
                 {
                     mask = this.getMask(p.iTable);
                     return mask;
@@ -762,10 +762,10 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
             ///<param name=""></param>
             //#define wherec.WO_IN     0x001
             //#define wherec.WO_EQ     0x002
-            //#define wherec.WO_LT     (wherec.WO_EQ<<(Sqlite3.TK_LT-Sqlite3.TK_EQ))
-            //#define wherec.WO_LE     (wherec.WO_EQ<<(Sqlite3.TK_LE-Sqlite3.TK_EQ))
-            //#define wherec.WO_GT     (wherec.WO_EQ<<(Sqlite3.TK_GT-Sqlite3.TK_EQ))
-            //#define wherec.WO_GE     (wherec.WO_EQ<<(Sqlite3.TK_GE-Sqlite3.TK_EQ))
+            //#define wherec.WO_LT     (wherec.WO_EQ<<(TokenType.TK_LT-TokenType.TK_EQ))
+            //#define wherec.WO_LE     (wherec.WO_EQ<<(TokenType.TK_LE-TokenType.TK_EQ))
+            //#define wherec.WO_GT     (wherec.WO_EQ<<(TokenType.TK_GT-TokenType.TK_EQ))
+            //#define wherec.WO_GE     (wherec.WO_EQ<<(TokenType.TK_GE-TokenType.TK_EQ))
             //#define wherec.WO_MATCH  0x040
             //#define wherec.WO_ISNULL 0x080
             //#define wherec.WO_OR     0x100       /* Two or more OR-connected terms */
@@ -775,10 +775,10 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
             //#define wherec.WO_SINGLE 0x0ff       /* Mask of all non-compound wherec.WO_* values */
             public const int WO_IN = 0x001;
             public const int WO_EQ = 0x002;
-            public const int WO_LT = (wherec.WO_EQ << (Sqlite3.TK_LT - Sqlite3.TK_EQ));
-            public const int WO_LE = (wherec.WO_EQ << (Sqlite3.TK_LE - Sqlite3.TK_EQ));
-            public const int WO_GT = (wherec.WO_EQ << (Sqlite3.TK_GT - Sqlite3.TK_EQ));
-            public const int WO_GE = (wherec.WO_EQ << (Sqlite3.TK_GE - Sqlite3.TK_EQ));
+            public const int WO_LT = (wherec.WO_EQ << (TokenType.TK_LT - TokenType.TK_EQ));
+            public const int WO_LE = (wherec.WO_EQ << (TokenType.TK_LE - TokenType.TK_EQ));
+            public const int WO_GT = (wherec.WO_EQ << (TokenType.TK_GT - TokenType.TK_EQ));
+            public const int WO_GE = (wherec.WO_EQ << (TokenType.TK_GE - TokenType.TK_EQ));
             public const int WO_MATCH = 0x040;
             public const int WO_ISNULL = 0x080;
             public const int WO_OR = 0x100;
@@ -923,7 +923,7 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
             /// previously invoked sqlite3ResolveExprNames() on the expression.  See
             /// the header comment on that routine for additional information.
             /// The sqlite3ResolveExprNames() routines looks for column names and
-            /// sets their opcodes to Sqlite3.TK_COLUMN and their Expr.iTable fields to
+            /// sets their opcodes to TokenType.TK_COLUMN and their Expr.iTable fields to
             /// the VDBE cursor number of the table.  This routine just has to
             /// translate the cursor numbers into bitmask values and OR all
             /// the bitmasks together.
@@ -945,13 +945,13 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
             ///<param name="expression < column expression <= column column IN">expression < column expression <= column column IN</param>
             ///<param name="(expression">list) column IN (subquery) column IS NULL</param>
             ///<param name=""></param>
-            public static bool allowedOp(int op)
+            public static bool allowedOp(TokenType op)
             {
-                Debug.Assert(Sqlite3.TK_GT > Sqlite3.TK_EQ && Sqlite3.TK_GT < Sqlite3.TK_GE);
-                Debug.Assert(Sqlite3.TK_LT > Sqlite3.TK_EQ && Sqlite3.TK_LT < Sqlite3.TK_GE);
-                Debug.Assert(Sqlite3.TK_LE > Sqlite3.TK_EQ && Sqlite3.TK_LE < Sqlite3.TK_GE);
-                Debug.Assert(Sqlite3.TK_GE == Sqlite3.TK_EQ + 4);
-                return op == Sqlite3.TK_IN || (op >= Sqlite3.TK_EQ && op <= Sqlite3.TK_GE) || op == Sqlite3.TK_ISNULL;
+                Debug.Assert(TokenType.TK_GT > TokenType.TK_EQ && TokenType.TK_GT < TokenType.TK_GE);
+                Debug.Assert(TokenType.TK_LT > TokenType.TK_EQ && TokenType.TK_LT < TokenType.TK_GE);
+                Debug.Assert(TokenType.TK_LE > TokenType.TK_EQ && TokenType.TK_LE < TokenType.TK_GE);
+                Debug.Assert(TokenType.TK_GE == TokenType.TK_EQ + 4);
+                return op == TokenType.TK_IN || (op >= TokenType.TK_EQ && op <= TokenType.TK_GE) || op == TokenType.TK_ISNULL;
             }
             ///<summary>
             /// Swap two objects of type TYPE.
@@ -972,34 +972,34 @@ static void WHERETRACE( string X, params object[] ap ) { if ( sqlite3WhereTrace 
             ///
             ///</summary>
             ///<summary>
-            /// Translate from Sqlite3.TK_xx operator to WO_xx bitmask.
+            /// Translate from TokenType.TK_xx operator to WO_xx bitmask.
             ///
             ///</summary>
-            public static u16 operatorMask(int op)
+            public static u16 operatorMask(TokenType op)
             {
                 u16 c;
                 Debug.Assert(allowedOp(op));
-                if (op == Sqlite3.TK_IN)
+                if (op == TokenType.TK_IN)
                 {
                     c = wherec.WO_IN;
                 }
                 else
-                    if (op == Sqlite3.TK_ISNULL)
+                    if (op == TokenType.TK_ISNULL)
                     {
                         c = wherec.WO_ISNULL;
                     }
                     else
                     {
-                        Debug.Assert((wherec.WO_EQ << (op - Sqlite3.TK_EQ)) < 0x7fff);
-                        c = (u16)(wherec.WO_EQ << (op - Sqlite3.TK_EQ));
+                        Debug.Assert((wherec.WO_EQ << (op - TokenType.TK_EQ)) < 0x7fff);
+                        c = (u16)(wherec.WO_EQ << (op - TokenType.TK_EQ));
                     }
-                Debug.Assert(op != Sqlite3.TK_ISNULL || c == wherec.WO_ISNULL);
-                Debug.Assert(op != Sqlite3.TK_IN || c == wherec.WO_IN);
-                Debug.Assert(op != Sqlite3.TK_EQ || c == wherec.WO_EQ);
-                Debug.Assert(op != Sqlite3.TK_LT || c == wherec.WO_LT);
-                Debug.Assert(op != Sqlite3.TK_LE || c == wherec.WO_LE);
-                Debug.Assert(op != Sqlite3.TK_GT || c == wherec.WO_GT);
-                Debug.Assert(op != Sqlite3.TK_GE || c == wherec.WO_GE);
+                Debug.Assert(op != TokenType.TK_ISNULL || c == wherec.WO_ISNULL);
+                Debug.Assert(op != TokenType.TK_IN || c == wherec.WO_IN);
+                Debug.Assert(op != TokenType.TK_EQ || c == wherec.WO_EQ);
+                Debug.Assert(op != TokenType.TK_LT || c == wherec.WO_LT);
+                Debug.Assert(op != TokenType.TK_LE || c == wherec.WO_LE);
+                Debug.Assert(op != TokenType.TK_GT || c == wherec.WO_GT);
+                Debug.Assert(op != TokenType.TK_GE || c == wherec.WO_GE);
                 return c;
             }
             ///
@@ -1475,8 +1475,8 @@ sqlite3DbFree(db, ref zSample);
     ref sqlite3_value pp
     )
     {
-      if ( pExpr.op == Sqlite3.TK_VARIABLE
-      || ( pExpr.op == Sqlite3.TK_REGISTER && pExpr.op2 == Sqlite3.TK_VARIABLE )
+      if ( pExpr.op == TokenType.TK_VARIABLE
+      || ( pExpr.op == TokenType.TK_REGISTER && pExpr.op2 == TokenType.TK_VARIABLE )
       )
       {
         int iVar = pExpr.iColumn;

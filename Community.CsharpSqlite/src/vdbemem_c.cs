@@ -224,7 +224,7 @@ return SqlResult.SQLITE_OK;
                                 else
                                     pMem.z = pMem.r.ToString(CultureInfo.InvariantCulture) + ".0";
                 }
-                pMem.n = StringExtensions.sqlite3Strlen30(pMem.z);
+                pMem.n = StringExtensions.Strlen30(pMem.z);
                 pMem.enc = SqliteEncoding.UTF8;
                 pMem.flags |= MemFlags.MEM_Str | MemFlags.MEM_Term;
                 sqlite3VdbeChangeEncoding(pMem, enc);
@@ -803,7 +803,7 @@ return r;
                 ///</summary>
             )
             {
-                int op;
+                
                 string zVal = "";
                 sqlite3_value pVal = null;
                 int negInt = 1;
@@ -813,34 +813,34 @@ return r;
                     ppVal = null;
                     return SqlResult.SQLITE_OK;
                 }
-                op = pExpr.op;
-                ///
-                ///<summary>
-                ///op can only be Sqlite3.TK_REGISTER if we have compiled with SQLITE_ENABLE_STAT2.
-                ///The ifdef here is to enable us to achieve 100% branch test coverage even
-                ///when SQLITE_ENABLE_STAT2 is omitted.
-                ///
-                ///</summary>
+                var op = pExpr.Operator;
+            ///
+            ///<summary>
+            ///op can only be TokenType.TK_REGISTER if we have compiled with SQLITE_ENABLE_STAT2.
+            ///The ifdef here is to enable us to achieve 100% branch test coverage even
+            ///when SQLITE_ENABLE_STAT2 is omitted.
+            ///
+            ///</summary>
 #if SQLITE_ENABLE_STAT2
-																																																																		      if ( op == Sqlite3.TK_REGISTER )
+																																																																		      if ( op == TokenType.TK_REGISTER )
         op = pExpr.op2;
 #else
-                if (Sqlite3.NEVER(op == Sqlite3.TK_REGISTER))
-                    op = pExpr.op2;
+            if (Sqlite3.NEVER(op == TokenType.TK_REGISTER))
+                op = pExpr.Operator2;
 #endif
                 ///
                 ///<summary>
                 ///Handle negative integers in a single step.  This is needed in the
                 ///</summary>
                 ///<param name="case when the value is ">9223372036854775808.</param>
-                if (op == Sqlite3.TK_UMINUS && (pExpr.pLeft.op == Sqlite3.TK_INTEGER || pExpr.pLeft.op == Sqlite3.TK_FLOAT))
+                if (op == TokenType.TK_UMINUS && (pExpr.pLeft.Operator == TokenType.TK_INTEGER || pExpr.pLeft.Operator == TokenType.TK_FLOAT))
                 {
                     pExpr = pExpr.pLeft;
-                    op = pExpr.op;
+                    op = pExpr.Operator;
                     negInt = -1;
                     zNeg = "-";
                 }
-                if (op == Sqlite3.TK_STRING || op == Sqlite3.TK_FLOAT || op == Sqlite3.TK_INTEGER)
+                if (op == TokenType.TK_STRING || op == TokenType.TK_FLOAT || op == TokenType.TK_INTEGER)
                 {
                     pVal = sqlite3ValueNew(db);
                     if (pVal == null)
@@ -854,10 +854,10 @@ return r;
                         zVal = io.sqlite3MPrintf(db, "%s%s", zNeg, pExpr.u.zToken);
                         //if ( zVal == null ) goto no_mem;
                         sqlite3ValueSetStr(pVal, -1, zVal, SqliteEncoding.UTF8, sqliteinth.SQLITE_DYNAMIC);
-                        if (op == Sqlite3.TK_FLOAT)
+                        if (op == TokenType.TK_FLOAT)
                             pVal.type = FoundationalType.SQLITE_FLOAT;
                     }
-                    if ((op == Sqlite3.TK_INTEGER || op == Sqlite3.TK_FLOAT) && affinity == sqliteinth.SQLITE_AFF_NONE)
+                    if ((op == TokenType.TK_INTEGER || op == TokenType.TK_FLOAT) && affinity == sqliteinth.SQLITE_AFF_NONE)
                     {
                         Sqlite3.sqlite3ValueApplyAffinity(pVal, sqliteinth.SQLITE_AFF_NUMERIC, SqliteEncoding.UTF8);
                     }
@@ -877,7 +877,7 @@ return r;
                     sqlite3VdbeChangeEncoding(pVal, enc);
                 }
                 else
-                    if (op == Sqlite3.TK_UMINUS)
+                    if (op == TokenType.TK_UMINUS)
                     {
                         ///
                         ///<summary>
@@ -901,7 +901,7 @@ return r;
                         }
                     }
                     else
-                        if (op == Sqlite3.TK_NULL)
+                        if (op == TokenType.TK_NULL)
                         {
                             pVal = sqlite3ValueNew(db);
                             if (pVal == null)
@@ -909,7 +909,7 @@ return r;
                         }
 #if !SQLITE_OMIT_BLOB_LITERAL
                         else
-                            if (op == Sqlite3.TK_BLOB)
+                            if (op == TokenType.TK_BLOB)
                             {
                                 int nVal;
                                 Debug.Assert(pExpr.u.zToken[0] == 'x' || pExpr.u.zToken[0] == 'X');
@@ -918,7 +918,7 @@ return r;
                                 if (null == pVal)
                                     goto no_mem;
                                 zVal = pExpr.u.zToken.Substring(2);
-                                nVal = StringExtensions.sqlite3Strlen30(zVal) - 1;
+                                nVal = StringExtensions.Strlen30(zVal) - 1;
                                 Debug.Assert(zVal[nVal] == '\'');
                                 byte[] blob = Converter.sqlite3HexToBlob(db, zVal, nVal);
                                 pVal.sqlite3VdbeMemSetStr(Encoding.UTF8.GetString(blob, 0, blob.Length), nVal / 2, 0, sqliteinth.SQLITE_DYNAMIC);

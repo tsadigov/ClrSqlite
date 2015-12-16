@@ -415,7 +415,7 @@ namespace Community.CsharpSqlite.Metadata {
                             context.sqlite3_result_error_nomem();
                             return;
                         }
-                        Converter.sqlite3AtoF(zBuf, ref r, StringExtensions.sqlite3Strlen30(zBuf), SqliteEncoding.UTF8);
+                        Converter.sqlite3AtoF(zBuf, ref r, StringExtensions.Strlen30(zBuf), SqliteEncoding.UTF8);
                         //malloc_cs.sqlite3_free( ref zBuf );
                     }
                 context.sqlite3_result_double(r);
@@ -2021,7 +2021,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             static void setLikeOptFlag(Connection db, string zName, FuncFlags flagVal)
             {
                 FuncDef pDef;
-                pDef = FuncDefTraverse.sqlite3FindFunction(db, zName, StringExtensions.sqlite3Strlen30(zName), 2, SqliteEncoding.UTF8, 0);
+                pDef = FuncDefTraverse.sqlite3FindFunction(db, zName, StringExtensions.Strlen30(zName), 2, SqliteEncoding.UTF8, 0);
                 if (Sqlite3.ALWAYS(pDef != null))
                 {
                     pDef.flags = flagVal;
@@ -2066,7 +2066,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                     return false;
                 }
                 Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
-                pDef = FuncDefTraverse.sqlite3FindFunction(db, pExpr.u.zToken, StringExtensions.sqlite3Strlen30(pExpr.u.zToken), 2, SqliteEncoding.UTF8, 0);
+                pDef = FuncDefTraverse.sqlite3FindFunction(db, pExpr.u.zToken, StringExtensions.Strlen30(pExpr.u.zToken), 2, SqliteEncoding.UTF8, 0);
                 if (Sqlite3.NEVER(pDef == null) || (pDef.flags & FuncFlags.SQLITE_FUNC_LIKE) == 0)
                 {
                     return false;

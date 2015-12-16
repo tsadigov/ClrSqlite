@@ -120,13 +120,13 @@ namespace Community.CsharpSqlite.Parsing
             ///<summary>
             ///The name of the trigger 
             ///</summary>
-        int tr_tm,///
+        TokenType tr_tm,///
+                  ///<summary>
+                  ///One of TokenType.TK_BEFORE, TokenType.TK_AFTER, TokenType.TK_INSTEAD 
+                  ///</summary>
+        TokenType op,///
             ///<summary>
-            ///One of Sqlite3.TK_BEFORE, Sqlite3.TK_AFTER, Sqlite3.TK_INSTEAD 
-            ///</summary>
-        int op,///
-            ///<summary>
-            ///One of Sqlite3.TK_INSERT, Sqlite3.TK_UPDATE, Sqlite3.TK_DELETE 
+            ///One of TokenType.TK_INSERT, TokenType.TK_UPDATE, TokenType.TK_DELETE 
             ///</summary>
         IdList pColumns,///
             ///<summary>
@@ -196,8 +196,8 @@ namespace Community.CsharpSqlite.Parsing
             ///pName1.z might be NULL, but not pName1 itself 
             ///</summary>
             Debug.Assert(pName2 != null);
-            Debug.Assert(op == Sqlite3.TK_INSERT || op == Sqlite3.TK_UPDATE || op == Sqlite3.TK_DELETE);
-            Debug.Assert(op > 0 && op < 0xff);
+            Debug.Assert(op == TokenType.TK_INSERT || op == TokenType.TK_UPDATE || op == TokenType.TK_DELETE);
+            Debug.Assert(op > 0 && (int)op < 0xff);
             if (isTemp != 0)
             {
                 ///
@@ -315,7 +315,7 @@ namespace Community.CsharpSqlite.Parsing
                 goto trigger_cleanup;
             }
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-            if ((db.Backends[iDb].pSchema.trigHash).Find(zName, StringExtensions.sqlite3Strlen30(zName), (Trigger)null) != null)
+            if ((db.Backends[iDb].pSchema.trigHash).Find(zName, StringExtensions.Strlen30(zName), (Trigger)null) != null)
             {
                 if (noErr == 0)
                 {
@@ -344,12 +344,12 @@ namespace Community.CsharpSqlite.Parsing
             ///of triggers.
             ///
             ///</summary>
-            if (pTab.pSelect != null && tr_tm != Sqlite3.TK_INSTEAD)
+            if (pTab.pSelect != null && tr_tm != TokenType.TK_INSTEAD)
             {
-                utilc.sqlite3ErrorMsg(pParse, "cannot create %s trigger on view: %S", (tr_tm == Sqlite3.TK_BEFORE) ? "BEFORE" : "AFTER", pTableName, 0);
+                utilc.sqlite3ErrorMsg(pParse, "cannot create %s trigger on view: %S", (tr_tm == TokenType.TK_BEFORE) ? "BEFORE" : "AFTER", pTableName, 0);
                 goto trigger_cleanup;
             }
-            if (pTab.pSelect == null && tr_tm == Sqlite3.TK_INSTEAD)
+            if (pTab.pSelect == null && tr_tm == TokenType.TK_INSTEAD)
             {
                 utilc.sqlite3ErrorMsg(pParse, "cannot create INSTEAD OF" + " trigger on table: %S", pTableName, 0);
                 goto trigger_cleanup;
@@ -376,9 +376,9 @@ goto trigger_cleanup;
             ///INSTEAD OF trigger into a BEFORE trigger.  It simplifies code
             ///elsewhere.
             ///</summary>
-            if (tr_tm == Sqlite3.TK_INSTEAD)
+            if (tr_tm == TokenType.TK_INSTEAD)
             {
-                tr_tm = Sqlite3.TK_BEFORE;
+                tr_tm = TokenType.TK_BEFORE;
             }
             ///
             ///<summary>
@@ -394,7 +394,7 @@ goto trigger_cleanup;
             pTrigger.pSchema = db.Backends[iDb].pSchema;
             pTrigger.pTabSchema = pTab.pSchema;
             pTrigger.op = (u8)op;
-            pTrigger.tr_tm = tr_tm == Sqlite3.TK_BEFORE ? TriggerType.TRIGGER_BEFORE : TriggerType.TRIGGER_AFTER;
+            pTrigger.tr_tm = tr_tm == TokenType.TK_BEFORE ? TriggerType.TRIGGER_BEFORE : TriggerType.TRIGGER_AFTER;
             pTrigger.pWhen = exprc.sqlite3ExprDup(db, pWhen, Sqlite3.EXPRDUP_REDUCE);
             pTrigger.pColumns = exprc.sqlite3IdListDup(db, pColumns);
             Debug.Assert(pParse.pNewTrigger == null);
@@ -475,7 +475,7 @@ goto trigger_cleanup;
                 pStepList = pStepList.pNext;
             }
             nameToken.zRestSql = pTrig.zName;
-            nameToken.Length = StringExtensions.sqlite3Strlen30(nameToken.zRestSql);
+            nameToken.Length = StringExtensions.Strlen30(nameToken.zRestSql);
             if (sFix.sqlite3FixInit(pParse, iDb, "trigger", nameToken) != 0 && sFix.sqlite3FixTriggerStep(pTrig.step_list) != 0)
             {
                 goto triggerfinish_cleanup;
@@ -510,7 +510,7 @@ goto trigger_cleanup;
                 Trigger pLink = pTrig;
                 Hash pHash = db.Backends[iDb].pSchema.trigHash;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-                pTrig = HashExtensions.sqlite3HashInsert(ref pHash, zName, StringExtensions.sqlite3Strlen30(zName), pTrig);
+                pTrig = HashExtensions.sqlite3HashInsert(ref pHash, zName, StringExtensions.Strlen30(zName), pTrig);
                 if (pTrig != null)
                 {
                     //db.mallocFailed = 1;
@@ -519,7 +519,7 @@ goto trigger_cleanup;
                     if (pLink.pSchema == pLink.pTabSchema)
                     {
                         Table pTab;
-                        int n = StringExtensions.sqlite3Strlen30(pLink.table);
+                        int n = StringExtensions.Strlen30(pLink.table);
                         pTab = pLink.pTabSchema.tblHash.Find(pLink.table, n, (Table)null);
                         Debug.Assert(pTab != null);
                         pLink.pNext = pTab.pTrigger;
@@ -548,7 +548,7 @@ goto trigger_cleanup;
                 SelectMethods.SelectDestructor(db, ref pSelect);
                 return null;
             }
-            pTriggerStep.op = Sqlite3.TK_SELECT;
+            pTriggerStep.Operator = TokenType.TK_SELECT;
             pTriggerStep.pSelect = pSelect;
             pTriggerStep.orconf = OnConstraintError.OE_Default;
             return pTriggerStep;
@@ -565,7 +565,7 @@ goto trigger_cleanup;
             ///<summary>
             ///Database connection 
             ///</summary>
-        u8 op,///
+        TokenType op,///
             ///<summary>
             ///Trigger opcode 
             ///</summary>
@@ -586,7 +586,7 @@ goto trigger_cleanup;
             // memcpy( z, pName.z, pName.n );
             pTriggerStep.target.zRestSql = z;
             pTriggerStep.target.Length = pName.Length;
-            pTriggerStep.op = op;
+            pTriggerStep.Operator = op;
             //}
             return pTriggerStep;
         }
@@ -644,7 +644,7 @@ goto trigger_cleanup;
                 ///|| db.mallocFailed != 0 
                 ///</summary>
             );
-            pTriggerStep = triggerStepAllocate(db, Sqlite3.TK_INSERT, pTableName);
+            pTriggerStep = triggerStepAllocate(db, TokenType.TK_INSERT, pTableName);
             //if ( pTriggerStep != null )
             //{
             pTriggerStep.pSelect = exprc.sqlite3SelectDup(db, pSelect, Sqlite3.EXPRDUP_REDUCE);
@@ -689,7 +689,7 @@ goto trigger_cleanup;
         )
         {
             TriggerStep pTriggerStep;
-            pTriggerStep = triggerStepAllocate(db, Sqlite3.TK_UPDATE, pTableName);
+            pTriggerStep = triggerStepAllocate(db, TokenType.TK_UPDATE, pTableName);
             //if ( pTriggerStep != null )
             //{
             pTriggerStep.pExprList = exprc.sqlite3ExprListDup(db, pEList, Sqlite3.EXPRDUP_REDUCE);
@@ -721,7 +721,7 @@ goto trigger_cleanup;
         )
         {
             TriggerStep pTriggerStep;
-            pTriggerStep = triggerStepAllocate(db, Sqlite3.TK_DELETE, pTableName);
+            pTriggerStep = triggerStepAllocate(db, TokenType.TK_DELETE, pTableName);
             //if ( pTriggerStep != null )
             //{
             pTriggerStep.pWhere = exprc.sqlite3ExprDup(db, pWhere, Sqlite3.EXPRDUP_REDUCE);
@@ -771,7 +771,7 @@ goto trigger_cleanup;
             Debug.Assert(pName.nSrc == 1);
             zDb = pName.a[0].zDatabase;
             zName = pName.a[0].zName;
-            nName = StringExtensions.sqlite3Strlen30(zName);
+            nName = StringExtensions.Strlen30(zName);
             Debug.Assert(zDb != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
             for (i = sqliteinth.OMIT_TEMPDB; i < db.BackendCount; i++)
             {
@@ -811,7 +811,7 @@ goto trigger_cleanup;
         ///</summary>
         static Table tableOfTrigger(Trigger pTrigger)
         {
-            int n = StringExtensions.sqlite3Strlen30(pTrigger.table);
+            int n = StringExtensions.Strlen30(pTrigger.table);
             return pTrigger.pTabSchema.tblHash.Find(pTrigger.table, n, (Table)null);
         }
         ///<summary>
@@ -896,7 +896,7 @@ return;
             Hash pHash;
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
             pHash = (db.Backends[iDb].pSchema.trigHash);
-            pTrigger = HashExtensions.sqlite3HashInsert(ref pHash, zName, StringExtensions.sqlite3Strlen30(zName), (Trigger)null);
+            pTrigger = HashExtensions.sqlite3HashInsert(ref pHash, zName, StringExtensions.Strlen30(zName), (Trigger)null);
             if (Sqlite3.ALWAYS(pTrigger != null))
             {
                 if (pTrigger.pSchema == pTrigger.pTabSchema)
@@ -965,9 +965,9 @@ return;
             ///<summary>
             ///The table the contains the triggers 
             ///</summary>
-        int op,///
+        TokenType op,///
             ///<summary>
-            ///one of Sqlite3.TK_DELETE, Sqlite3.TK_INSERT, Sqlite3.TK_UPDATE 
+            ///one of TokenType.TK_DELETE, TokenType.TK_INSERT, TokenType.TK_UPDATE 
             ///</summary>
         ExprList pChanges,///
             ///<summary>
@@ -989,7 +989,7 @@ return;
             Debug.Assert(pList == null || pTab.IsVirtual() == false);
             for (p = pList; p != null; p = p.pNext)
             {
-                if (p.op == op && checkColumnOverlap(p.pColumns, pChanges) != 0)
+                if (p.Operator == op && checkColumnOverlap(p.pColumns, pChanges) != 0)
                 {
                     mask |= p.tr_tm;
                 }
@@ -1091,25 +1091,25 @@ return;
                 ///<param name="INSERT OR IGNORE INTO t1 ... ;  "> insert into t2 uses IGNORE policy</param>
                 ///<param name=""></param>
                 pParse.eOrconf = orconf.Filter(OnConstraintError.OE_Default, pStep.orconf);
-                switch (pStep.op)
+                switch (pStep.Operator)
                 {
-                    case Sqlite3.TK_UPDATE:
+                    case TokenType.TK_UPDATE:
                         {
                             pParse.sqlite3Update(targetSrcList(pParse, pStep), exprc.sqlite3ExprListDup(db, pStep.pExprList, 0), exprc.sqlite3ExprDup(db, pStep.pWhere, 0), pParse.eOrconf);
                             break;
                         }
-                    case Sqlite3.TK_INSERT:
+                    case TokenType.TK_INSERT:
                         {
                             pParse.sqlite3Insert(targetSrcList(pParse, pStep), exprc.sqlite3ExprListDup(db, pStep.pExprList, 0), exprc.sqlite3SelectDup(db, pStep.pSelect, 0), exprc.sqlite3IdListDup(db, pStep.pIdList), pParse.eOrconf);
                             break;
                         }
-                    case Sqlite3.TK_DELETE:
+                    case TokenType.TK_DELETE:
                         {
                             pParse.sqlite3DeleteFrom(targetSrcList(pParse, pStep), exprc.sqlite3ExprDup(db, pStep.pWhere, 0));
                             break;
                         }
                     default:
-                        Debug.Assert(pStep.op == Sqlite3.TK_SELECT);
+                        Debug.Assert(pStep.Operator == TokenType.TK_SELECT);
                         {
                             SelectDest sDest = new SelectDest();
                             Select pSelect = exprc.sqlite3SelectDup(db, pStep.pSelect, 0);
@@ -1119,7 +1119,7 @@ return;
                             break;
                         }
                 }
-                if (pStep.op != Sqlite3.TK_SELECT)
+                if (pStep.Operator != TokenType.TK_SELECT)
                 {
                     v.sqlite3VdbeAddOp0(OpCode.OP_ResetCount);
                 }
@@ -1279,9 +1279,9 @@ return;
 																																																																																																        VdbeComment( v, "Start: %s.%s (%s %s%s%s ON %s)",
           pTrigger.zName != null ? pTrigger.zName : "", onErrorText( orconf ),
           ( pTrigger.tr_tm == TriggerType.TRIGGER_BEFORE ? "BEFORE" : "AFTER" ),
-            ( pTrigger.op == Sqlite3.TK_UPDATE ? "UPDATE" : "" ),
-            ( pTrigger.op == Sqlite3.TK_INSERT ? "INSERT" : "" ),
-            ( pTrigger.op == Sqlite3.TK_DELETE ? "DELETE" : "" ),
+            ( pTrigger.op == TokenType.TK_UPDATE ? "UPDATE" : "" ),
+            ( pTrigger.op == TokenType.TK_INSERT ? "INSERT" : "" ),
+            ( pTrigger.op == TokenType.TK_DELETE ? "DELETE" : "" ),
           pTab.zName
         );
 #endif
@@ -1477,8 +1477,8 @@ return;
             Parse pParse,
             ///List of triggers on table pTab 
             Trigger pTrigger,
-            ///One of Sqlite3.TK_UPDATE, Sqlite3.TK_INSERT, Sqlite3.TK_DELETE 
-            int op,
+            ///One of TokenType.TK_UPDATE, TokenType.TK_INSERT, TokenType.TK_DELETE 
+            TokenType op,
             ///Changes list for any UPDATE OF triggers 
             ExprList pChanges,
             ///One of TriggerType.TRIGGER_BEFORE, TriggerType.TRIGGER_AFTER 		
@@ -1495,9 +1495,9 @@ return;
         {
             Trigger p;
             ///Used to iterate through pTrigger list 
-            Debug.Assert(op == Sqlite3.TK_UPDATE || op == Sqlite3.TK_INSERT || op == Sqlite3.TK_DELETE);
+            Debug.Assert(op == TokenType.TK_UPDATE || op == TokenType.TK_INSERT || op == TokenType.TK_DELETE);
             Debug.Assert(tr_tm == TriggerType.TRIGGER_BEFORE || tr_tm == TriggerType.TRIGGER_AFTER);
-            Debug.Assert((op == Sqlite3.TK_UPDATE) == (pChanges != null));
+            Debug.Assert((op == TokenType.TK_UPDATE) == (pChanges != null));
             pTrigger.linkedList().ForEach(itr =>
             {
                 p = itr;
@@ -1511,7 +1511,7 @@ return;
                 ///<summary>
                 ///Determine whether we should code this trigger 
                 ///</summary>
-                if (p.op == op && p.tr_tm == tr_tm && checkColumnOverlap(p.pColumns, pChanges) != 0)
+                if (p.Operator == op && p.tr_tm == tr_tm && checkColumnOverlap(p.pColumns, pChanges) != 0)
                 {
                     sqlite3CodeRowTriggerDirect(pParse, p, pTab, reg, orconf, ignoreJump);
                 }
@@ -1575,13 +1575,13 @@ return;
             ///</summary>
         )
         {
-            int op = pChanges != null ? Sqlite3.TK_UPDATE : Sqlite3.TK_DELETE;
+            var op = pChanges != null ? TokenType.TK_UPDATE : TokenType.TK_DELETE;
             u32 mask = 0;
             Trigger p;
             Debug.Assert(isNew == 1 || isNew == 0);
             for (p = pTrigger; p != null; p = p.pNext)
             {
-                if (p.op == op && (tr_tm & p.tr_tm) != 0 && checkColumnOverlap(p.pColumns, pChanges) != 0)
+                if (p.Operator == op && (tr_tm & p.tr_tm) != 0 && checkColumnOverlap(p.pColumns, pChanges) != 0)
                 {
                     TriggerPrg pPrg;
                     pPrg = getRowTrigger(pParse, p, pTab, orconf);

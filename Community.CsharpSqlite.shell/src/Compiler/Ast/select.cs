@@ -73,7 +73,7 @@ namespace Community.CsharpSqlite.Ast
 
             ///
             ///<summary>
-            ///One of: Sqlite3.TK_UNION Sqlite3.TK_ALL Sqlite3.TK_INTERSECT Sqlite3.TK_EXCEPT 
+            ///One of: TokenType.TK_UNION TokenType.TK_ALL TokenType.TK_INTERSECT TokenType.TK_EXCEPT 
             ///</summary>
 
             public char affinity;
@@ -372,8 +372,8 @@ namespace Community.CsharpSqlite.Ast
                 ///For every "*" that occurs in the column list, insert the names of
                 ///all columns in all tables.  And for every TABLE.* insert the names
                 ///of all columns in TABLE.  The parser inserted a special expression
-                ///with the Sqlite3.TK_ALL operator for each "*" that it found in the column list.
-                ///The following code just has to locate the Sqlite3.TK_ALL expressions and expand
+                ///with the TokenType.TK_ALL operator for each "*" that it found in the column list.
+                ///The following code just has to locate the TokenType.TK_ALL expressions and expand
                 ///each one to the list of all columns in all tables.
                 ///
                 ///The first loop just checks to see if there are any "*" operators
@@ -404,8 +404,8 @@ namespace Community.CsharpSqlite.Ast
                     for (k = 0; k < pEList.nExpr; k++)
                     {
                         Expr pE = a[k].pExpr;
-                        Debug.Assert(pE.op != Sqlite3.TK_DOT || pE.pRight != null);
-                        if (pE.op != Sqlite3.TK_ALL && (pE.op != Sqlite3.TK_DOT || pE.pRight.op != Sqlite3.TK_ALL))
+                        Debug.Assert(pE.Operator != TokenType.TK_DOT || pE.pRight != null);
+                        if (pE.Operator != TokenType.TK_ALL && (pE.Operator != TokenType.TK_DOT || pE.pRight.Operator != TokenType.TK_ALL))
                         {
                             ///
                             ///<summary>
@@ -439,7 +439,7 @@ namespace Community.CsharpSqlite.Ast
                             ///<summary>
                             ///text of name of TABLE 
                             ///</summary>
-                            if (pE.op == Sqlite3.TK_DOT)
+                            if (pE.Operator == TokenType.TK_DOT)
                             {
                                 Debug.Assert(pE.pLeft != null);
                                 Debug.Assert(!pE.pLeft.ExprHasProperty(ExprFlags.EP_IntValue));
@@ -517,14 +517,14 @@ namespace Community.CsharpSqlite.Ast
                                             continue;
                                         }
                                     }
-                                    pRight = exprc.sqlite3Expr(db, Sqlite3.TK_ID, zName);
+                                    pRight = exprc.sqlite3Expr(db, TokenType.TK_ID, zName);
                                     zColname = zName;
                                     zToFree = "";
                                     if (longNames || pTabList.nSrc > 1)
                                     {
                                         Expr pLeft;
-                                        pLeft = exprc.sqlite3Expr(db, Sqlite3.TK_ID, zTabName);
-                                        pExpr = pParse.sqlite3PExpr(Sqlite3.TK_DOT, pLeft, pRight, 0);
+                                        pLeft = exprc.sqlite3Expr(db, TokenType.TK_ID, zTabName);
+                                        pExpr = pParse.sqlite3PExpr(TokenType.TK_DOT, pLeft, pRight, 0);
                                         if (longNames)
                                         {
                                             zColname = io.sqlite3MPrintf(db, "%s.%s", zTabName, zName);
@@ -537,7 +537,7 @@ namespace Community.CsharpSqlite.Ast
                                     }
                                     pNew = pParse.sqlite3ExprListAppend(pNew, pExpr);
                                     sColname.zRestSql = zColname;
-                                    sColname.Length = StringExtensions.sqlite3Strlen30(zColname);
+                                    sColname.Length = StringExtensions.Strlen30(zColname);
                                     pParse.sqlite3ExprListSetName(pNew, sColname, 0);
                                     db.sqlite3DbFree(ref zToFree);
                                 }
@@ -964,8 +964,8 @@ namespace Community.CsharpSqlite.Ast
                     }
                     ///Create a label to jump to when we want to abort the query 
                     addrEnd = v.sqlite3VdbeMakeLabel();
-                    ///Convert Sqlite3.TK_COLUMN nodes into Sqlite3.TK_AGG_COLUMN and make entries in
-                    ///sAggInfo for all Sqlite3.TK_AGG_FUNCTION nodes in expressions of the
+                    ///Convert TokenType.TK_COLUMN nodes into TokenType.TK_AGG_COLUMN and make entries in
+                    ///sAggInfo for all TokenType.TK_AGG_FUNCTION nodes in expressions of the
                     ///SELECT statement.
                     sNC = new NameContext();
                     // memset(sNC, 0, sNC).Length;
@@ -1305,7 +1305,7 @@ namespace Community.CsharpSqlite.Ast
                                 if (pMinMax != null)///* && 0 == db.mallocFailed */ )
                                 {
                                     pMinMax.a[0].sortOrder = (SortOrder)(flag != wherec.WHERE_ORDERBY_MIN ? 1 : 0);
-                                    pMinMax.a[0].pExpr.op = Sqlite3.TK_COLUMN;
+                                    pMinMax.a[0].pExpr.Operator = TokenType.TK_COLUMN;
                                 }
                             }
                             ///This case runs if the aggregate has no GROUP BY clause.  The
@@ -1395,7 +1395,7 @@ namespace Community.CsharpSqlite.Ast
             ///
             /// The arrows in the diagram above represent the Select.pPrior pointer.
             /// So if this routine is called with p equal to the t3 query, then
-            /// pPrior will be the t2 query.  p.op will be Sqlite3.TK_UNION in this case.
+            /// pPrior will be the t2 query.  p.op will be TokenType.TK_UNION in this case.
             ///
             /// Notice that because of the way SQLite parses compound SELECTs, the
             /// individual selects always group from left to right.
@@ -1474,9 +1474,9 @@ namespace Community.CsharpSqlite.Ast
                     return SelectMethods.multiSelectOrderBy(pParse, p, pDest);
                 }
                 ///Generate code for the left and right SELECT statements.
-                switch (p.tk_op)
+                switch ((TokenType)p.tk_op)
                 {
-                    case Sqlite3.TK_ALL:
+                    case TokenType.TK_ALL:
                         {
                             int addr = 0;
                             int nLimit = 0;
@@ -1517,8 +1517,8 @@ namespace Community.CsharpSqlite.Ast
                             }
                             break;
                         }
-                    case Sqlite3.TK_EXCEPT:
-                    case Sqlite3.TK_UNION:
+                    case TokenType.TK_EXCEPT:
+                    case TokenType.TK_UNION:
                         {
                             int unionTab;
                             ///VdbeCursor number of the temporary table holding result 
@@ -1530,8 +1530,8 @@ namespace Community.CsharpSqlite.Ast
                             ///Saved values of p.nLimit and p.nOffset 
                             int addr;
                             SelectDest uniondest = new SelectDest();
-                            sqliteinth.testcase(p.tk_op == Sqlite3.TK_EXCEPT);
-                            sqliteinth.testcase(p.tk_op == Sqlite3.TK_UNION);
+                            sqliteinth.testcase(p.TokenOp== TokenType.TK_EXCEPT);
+                            sqliteinth.testcase(p.TokenOp == TokenType.TK_UNION);
                             priorOp = SelectResultType.Union;
                             if (dest.eDest == priorOp && Sqlite3.ALWAYS(null == p.pLimit && null == p.pOffset))
                             {
@@ -1568,13 +1568,13 @@ namespace Community.CsharpSqlite.Ast
                                 goto multi_select_end;
                             }
                             ///Code the current SELECT statement
-                            if (p.tk_op == Sqlite3.TK_EXCEPT)
+                            if (p.TokenOp == TokenType.TK_EXCEPT)
                             {
                                 op = SelectResultType.Except;
                             }
                             else
                             {
-                                Debug.Assert(p.tk_op == Sqlite3.TK_UNION);
+                                Debug.Assert(p.TokenOp == TokenType.TK_UNION);
                                 op = SelectResultType.Union;
                             }
                             p.pPrior = null;
@@ -1595,7 +1595,7 @@ namespace Community.CsharpSqlite.Ast
                             pDelete = p.pPrior;
                             p.pPrior = pPrior;
                             p.pOrderBy = null;
-                            if (p.tk_op == Sqlite3.TK_UNION)
+                            if (p.TokenOp == TokenType.TK_UNION)
                                 p.nSelectRow += pPrior.nSelectRow;
                             exprc.sqlite3ExprDelete(db, ref p.pLimit);
                             p.pLimit = pLimit;
@@ -1634,7 +1634,7 @@ namespace Community.CsharpSqlite.Ast
                             break;
                         }
                     default:
-                        Debug.Assert(p.tk_op == Sqlite3.TK_INTERSECT);
+                        Debug.Assert(p.TokenOp == TokenType.TK_INTERSECT);
                         {
                             int tab1, tab2;
                             int iCont, iBreak, iStart;
@@ -1707,7 +1707,7 @@ namespace Community.CsharpSqlite.Ast
                             break;
                         }
                 }
-                SelectMethods.explainComposite(pParse, p.tk_op, iSub1, iSub2, p.tk_op != Sqlite3.TK_ALL);
+                SelectMethods.explainComposite(pParse, p.TokenOp, iSub1, iSub2, p.TokenOp != TokenType.TK_ALL);
                 ///
                 ///<summary>
                 ///Compute collating sequences used by
@@ -1874,7 +1874,7 @@ namespace Community.CsharpSqlite.Ast
                 //}
                 if (pEList == null)
                 {
-                    pEList = pParse.sqlite3ExprListAppend(null, exprc.sqlite3Expr(db, Sqlite3.TK_ALL, null));
+                    pEList = pParse.sqlite3ExprListAppend(null, exprc.sqlite3Expr(db, TokenType.TK_ALL, null));
                 }
                 pNew.pEList = pEList;
                 pNew.pSrc = pSrc;
@@ -1883,7 +1883,7 @@ namespace Community.CsharpSqlite.Ast
                 pNew.pHaving = pHaving;
                 pNew.pOrderBy = pOrderBy;
                 pNew.selFlags = (isDistinct != 0 ? SelectFlags.Distinct : 0);
-                pNew.tk_op = Sqlite3.TK_SELECT;
+                pNew.TokenOp = TokenType.TK_SELECT;
                 pNew.pLimit = pLimit;
                 pNew.pOffset = pOffset;
                 Debug.Assert(pOffset == null || pLimit != null);

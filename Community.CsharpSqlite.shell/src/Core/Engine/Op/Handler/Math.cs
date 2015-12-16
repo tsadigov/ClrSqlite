@@ -77,26 +77,26 @@ namespace Community.CsharpSqlite.Engine.Op
                 case OpCode.OP_Add:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_PLUS, in1, in2, ref3 
+                ///same as TokenType.TK_PLUS, in1, in2, ref3 
                 ///</summary>
                 case OpCode.OP_Subtract:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_MINUS, in1, in2, ref3 
+                ///same as TokenType.TK_MINUS, in1, in2, ref3 
                 ///</summary>
                 case OpCode.OP_Multiply:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_STAR, in1, in2, ref3 
+                ///same as TokenType.TK_STAR, in1, in2, ref3 
                 ///</summary>
                 case OpCode.OP_Divide:
                 ///
                 ///<summary>
-                ///same as Sqlite3.TK_SLASH, in1, in2, ref3 
+                ///same as TokenType.TK_SLASH, in1, in2, ref3 
                 ///</summary>
                 case OpCode.OP_Remainder:
                     {
-                        ///same as Sqlite3.TK_REM, in1, in2, ref3 
+                        ///same as TokenType.TK_REM, in1, in2, ref3 
                         MemFlags flags;
                         ///Combined MEM.MEM_* flags from both inputs 
                         i64 iA;

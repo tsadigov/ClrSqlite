@@ -251,7 +251,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///TRUE if currently initializing 
                 ///</summary>
-                public u8 busy;
+                public u8 busy { get; set; }
 
                 ///<summary>
                 ///Last statement is orphaned TEMP trigger 
