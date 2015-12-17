@@ -87,7 +87,7 @@ namespace Community.CsharpSqlite {
 				return rc;
             while (SqlResult.SQLITE_ROW == vdbeapi.sqlite3_step(pStmt))
             {
-				rc=execSql(db,pzErrMsg,vdbeapi.sqlite3_column_text(pStmt,0));
+				rc=execSql(db,pzErrMsg,vdbeapi.get_column_text(pStmt,0));
 				if(rc!=SqlResult.SQLITE_OK) {
 					vacuumFinalize(db,pStmt,pzErrMsg);
 					return rc;

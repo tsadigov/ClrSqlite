@@ -893,7 +893,7 @@ namespace Community.CsharpSqlite
 																																																															      sqlite3_xferopt_count.iValue++;
 #endif
 																																																															#endif
-			iDbSrc = sqlite3SchemaToIndex (pParse.db, pSrc.pSchema);
+			iDbSrc = indexOf (pParse.db, pSrc.pSchema);
 			v = pParse.sqlite3GetVdbe ();
 			build.sqlite3CodeVerifySchema (pParse, iDbSrc);
 			iSrc = pParse.nTab++;

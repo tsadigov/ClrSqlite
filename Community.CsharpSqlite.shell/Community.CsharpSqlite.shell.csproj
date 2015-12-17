@@ -366,6 +366,8 @@
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
     <Compile Include="src\Backend\Paging\Delegates.cs" />
+    <Compile Include="src\Utils\CollectionExtensions.cs" />
+    <Compile Include="src\Utils\MyCollection.cs" />
     <Compile Include="src\Utils\MyHelpers.cs" />
     <Compile Include="src\Os\OpenMode.cs" />
     <Compile Include="src\Schema\Builtin.cs" />

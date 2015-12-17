@@ -259,6 +259,7 @@ namespace Community.CsharpSqlite
                     ///Invoke the callback function if required 
                     if (xCallback != null && (SqlResult.SQLITE_ROW == result || (SqlResult.SQLITE_DONE == result && callbackIsInit == 0 && (db.flags & SqliteFlags.SQLITE_NullCallback) != 0)))
                     {
+                        #region get column names
                         if (0 == callbackIsInit)
                         {
                             //sqlite3DbMallocZero(db, 2*nCol*sizeof(const char*) + 1);
@@ -269,7 +270,7 @@ namespace Community.CsharpSqlite
 
                             azCols = Enumerable.Range(0, nCol)
                                 .Select(idx => {
-                                    var name = vdbeapi.sqlite3_column_name(pStmt, idx);
+                                    var name = pStmt.get_column_name(idx);
                                         ///sqlite3VdbeSetColName() installs column names as UTF8
                                         ///strings so there is no way for vdbeapi.sqlite3_column_name() to fail.
                                         Debug.Assert(null != name);
@@ -281,20 +282,25 @@ namespace Community.CsharpSqlite
 
                             callbackIsInit = 1;
                         }
+                        #endregion
+
+                        #region get field values
                         if (result == SqlResult.SQLITE_ROW)
                         {
                             azVals = new string[nCol];
                             // azCols[nCol];
                             for (i = 0; i < nCol; i++)
                             {
-                                azVals[i] = vdbeapi.sqlite3_column_text(pStmt, i);
-                                if (azVals[i] == null && vdbeapi.sqlite3_column_type(pStmt, i) != FoundationalType.SQLITE_NULL)
+                                azVals[i] = pStmt.get_column_text( i);
+                                if (azVals[i] == null && pStmt.get_column_type( i) != FoundationalType.SQLITE_NULL)
                                 {
                                     //db.mallocFailed = 1;
                                     //goto exec_out;
                                 }
                             }
                         }
+                        #endregion
+
                         if (xCallback(pArg, nCol, azVals, azCols) != 0)//-----<<----------<<----------<<----------<<-----
                         {
                             result = SqlResult.SQLITE_ABORT;

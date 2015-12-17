@@ -151,59 +151,28 @@ namespace Community.CsharpSqlite.Parsing
         )
         {
             Trigger pTrigger = null;
-            ///
-            ///<summary>
             ///The new trigger 
-            ///</summary>
-            Table pTab;
-            ///
-            ///<summary>
-            ///Table that the trigger fires off of 
-            ///</summary>
+            
             string zName = null;
-            ///
-            ///<summary>
             ///Name of the trigger 
-            ///</summary>
             Connection db = pParse.db;
-            ///
-            ///<summary>
             ///The database connection 
-            ///</summary>
             int iDb;
-            ///
-            ///<summary>
             ///The database to store the trigger in 
-            ///</summary>
             Token pName = null;
-            ///
-            ///<summary>
             ///The unqualified db name 
-            ///</summary>
             DbFixer sFix = new DbFixer();
-            ///
-            ///<summary>
             ///State vector for the DB fixer 
-            ///</summary>
             int iTabDb;
-            ///
-            ///<summary>
             ///Index of the database holding pTab 
-            ///</summary>
             Debug.Assert(pName1 != null);
-            ///
-            ///<summary>
             ///pName1.z might be NULL, but not pName1 itself 
-            ///</summary>
             Debug.Assert(pName2 != null);
             Debug.Assert(op == TokenType.TK_INSERT || op == TokenType.TK_UPDATE || op == TokenType.TK_DELETE);
             Debug.Assert(op > 0 && (int)op < 0xff);
             if (isTemp != 0)
             {
-                ///
-                ///<summary>
                 ///If TEMP was specified, then the trigger name may not be qualified. 
-                ///</summary>
                 if (pName2.Length > 0)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "temporary trigger may not have qualified name");
@@ -214,10 +183,7 @@ namespace Community.CsharpSqlite.Parsing
             }
             else
             {
-                ///
-                ///<summary>
                 ///Figure out the db that the the trigger will be created in 
-                ///</summary>
                 iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
                 if (iDb < 0)
                 {
@@ -228,9 +194,6 @@ namespace Community.CsharpSqlite.Parsing
             {
                 goto trigger_cleanup;
             }
-            ///
-            ///<summary>
-            ///</summary>
             ///<param name="A long">standing parser bug is that this syntax was allowed:</param>
             ///<param name=""></param>
             ///<param name="CREATE TRIGGER attached.demo AFTER INSERT ON attached.tab ....">CREATE TRIGGER attached.demo AFTER INSERT ON attached.tab ....</param>
@@ -244,23 +207,19 @@ namespace Community.CsharpSqlite.Parsing
                 //sqlite3DbFree( db, pTableName.a[0].zDatabase );
                 pTableName.a[0].zDatabase = null;
             }
-            ///
-            ///<summary>
             ///If the trigger name was unqualified, and the table is a temp table,
             ///then set iDb to 1 to create the trigger in the temporary database.
             ///If sqlite3SrcListLookup() returns 0, indicating the table does not
             ///exist, the error is caught by the block below.
-            ///
-            ///</summary>
-            if (pTableName == null///
-                ///<summary>
-                ///|| db.mallocFailed != 0 
-                ///</summary>
+            if (pTableName == null                
+                ///|| db.mallocFailed != 0                 
             )
             {
                 goto trigger_cleanup;
             }
-            pTab = pParse.sqlite3SrcListLookup(pTableName);
+
+            ///Table that the trigger fires off of 
+            var pTab = pParse.sqlite3SrcListLookup(pTableName);
             if (db.init.busy == 0 && pName2.Length == 0 && pTab != null && pTab.pSchema == db.Backends[1].pSchema)
             {
                 iDb = 1;
@@ -354,7 +313,7 @@ namespace Community.CsharpSqlite.Parsing
                 utilc.sqlite3ErrorMsg(pParse, "cannot create INSTEAD OF" + " trigger on table: %S", pTableName, 0);
                 goto trigger_cleanup;
             }
-            iTabDb = Sqlite3.sqlite3SchemaToIndex(db, pTab.pSchema);
+            iTabDb = Sqlite3.indexOf(db, pTab.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																								{
 int code = SQLITE_CREATE_TRIGGER;
@@ -419,81 +378,60 @@ goto trigger_cleanup;
         /// in order to complete the process of building the trigger.
         ///
         ///</summary>
-        public static void sqlite3FinishTrigger(Parse pParse,///
+        public static void sqlite3FinishTrigger(
             ///<summary>
             ///Parser context 
             ///</summary>
-        TriggerStep pStepList,///
+            Parse pParse,
+
             ///<summary>
             ///The triggered program 
             ///</summary>
-        Token pAll///
+            TriggerStep pStepList,///
+
             ///<summary>
             ///Token that describes the complete CREATE TRIGGER 
             ///</summary>
+            Token pAll///
         )
         {
             Trigger pTrig = pParse.pNewTrigger;
-            ///
-            ///<summary>
             ///Trigger being finished 
-            ///</summary>
-            string zName;
-            ///
-            ///<summary>
-            ///Name of trigger 
-            ///</summary>
+            
             Connection db = pParse.db;
-            ///
-            ///<summary>
             ///The database 
-            ///</summary>
             DbFixer sFix = new DbFixer();
-            ///
-            ///<summary>
             ///Fixer object 
-            ///</summary>
-            int iDb;
-            ///
-            ///<summary>
-            ///Database containing the trigger 
-            ///</summary>
             Token nameToken = new Token();
-            ///
-            ///<summary>
             ///Trigger name for error reporting 
-            ///</summary>
             pParse.pNewTrigger = null;
             if (Sqlite3.NEVER(pParse.nErr != 0) || pTrig == null)
                 goto triggerfinish_cleanup;
-            zName = pTrig.zName;
-            iDb = Sqlite3.sqlite3SchemaToIndex(pParse.db, pTrig.pSchema);
+
+            var zName = pTrig.zName;
+            ///Name of trigger 
+            var iDb = Sqlite3.indexOf(pParse.db, pTrig.pSchema);
+            ///Database containing the trigger 
+
+
             pTrig.step_list = pStepList;
-            while (pStepList != null)
-            {
-                pStepList.pTrig = pTrig;
-                pStepList = pStepList.pNext;
-            }
+
+            pStepList.linkedList()
+                .ForEach(step=>step.pTrig=pTrig);
+            
             nameToken.zRestSql = pTrig.zName;
             nameToken.Length = StringExtensions.Strlen30(nameToken.zRestSql);
             if (sFix.sqlite3FixInit(pParse, iDb, "trigger", nameToken) != 0 && sFix.sqlite3FixTriggerStep(pTrig.step_list) != 0)
             {
                 goto triggerfinish_cleanup;
             }
-            ///
-            ///<summary>
             ///if we are not initializing,
             ///build the sqlite_master entry
-            ///
-            ///</summary>
             if (0 == db.init.busy)
             {
                 Vdbe v;
                 string z;
-                ///
-                ///<summary>
                 ///Make an entry in the sqlite_master table 
-                ///</summary>
                 v = pParse.sqlite3GetVdbe();
                 if (v == null)
                     goto triggerfinish_cleanup;
@@ -510,7 +448,7 @@ goto trigger_cleanup;
                 Trigger pLink = pTrig;
                 Hash pHash = db.Backends[iDb].pSchema.trigHash;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-                pTrig = HashExtensions.sqlite3HashInsert(ref pHash, zName, StringExtensions.Strlen30(zName), pTrig);
+                pTrig = HashExtensions.sqlite3HashInsert(ref pHash, zName, zName.Strlen30(), pTrig);
                 if (pTrig != null)
                 {
                     //db.mallocFailed = 1;
@@ -519,7 +457,7 @@ goto trigger_cleanup;
                     if (pLink.pSchema == pLink.pTabSchema)
                     {
                         Table pTab;
-                        int n = StringExtensions.Strlen30(pLink.table);
+                        int n = pLink.table.Strlen30();
                         pTab = pLink.pTabSchema.tblHash.Find(pLink.table, n, (Table)null);
                         Debug.Assert(pTab != null);
                         pLink.pNext = pTab.pTrigger;
@@ -531,6 +469,8 @@ goto trigger_cleanup;
             Debug.Assert(pParse.pNewTrigger == null);
             sqlite3DeleteTriggerStep(db, ref pStepList);
         }
+
+
         ///<summary>
         /// Turn a SELECT statement (that the pSelect parameter points to) into
         /// a trigger step.  Return a pointer to a TriggerStep structure.
@@ -824,7 +764,7 @@ goto trigger_cleanup;
             Vdbe v;
             Connection db = pParse.db;
             int iDb;
-            iDb = Sqlite3.sqlite3SchemaToIndex(pParse.db, pTrigger.pSchema);
+            iDb = Sqlite3.indexOf(pParse.db, pTrigger.pSchema);
             Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
             pTable = tableOfTrigger(pTrigger);
             Debug.Assert(pTable != null);
@@ -1036,7 +976,7 @@ return;
             //{
             Debug.Assert(pSrc.nSrc > 0);
             Debug.Assert(pSrc.a != null);
-            iDb = Sqlite3.sqlite3SchemaToIndex(pParse.db, pStep.pTrig.pSchema);
+            iDb = Sqlite3.indexOf(pParse.db, pStep.pTrig.pSchema);
             if (iDb == 0 || iDb >= 2)
             {
                 Connection db = pParse.db;

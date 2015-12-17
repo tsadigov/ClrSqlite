@@ -2917,7 +2917,7 @@ break;
                     ///two elements in the FROM clause of the subquery.
                     if (nSubSrc > 1)
                     {
-                        pParent.pSrc = check.pSrc = build.sqlite3SrcListEnlarge(db, check.pSrc, nSubSrc - 1, iFrom + 1);
+                        pParent.pSrc = check.pSrc = check.pSrc.Enlarge( nSubSrc - 1, iFrom + 1, () => new SrcList_item() { iCursor = -1 });
                         //if ( db.mallocFailed != 0 )
                         //{
                         //  break;

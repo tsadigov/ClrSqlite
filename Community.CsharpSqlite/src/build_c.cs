@@ -7,7 +7,7 @@ using u8=System.Byte;
 using u16=System.UInt16;
 using u32=System.UInt32;
 using Pgno=System.UInt32;
-
+using System.Linq;
 ///
 ///<summary>
 ///The yDbMask datatype for the bitmask of all attached databases.
@@ -21,8 +21,9 @@ using yDbMask=System.Int32;
 #endif
 namespace Community.CsharpSqlite
 {
+    using Utils;
     using Parse = Sqlite3.Parse;
-    
+
     using System.Linq;
     using Community.CsharpSqlite.Ast;
     using Community.CsharpSqlite.builder;
@@ -32,7 +33,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Utils;
-    //public partial class Sqlite3
+    using System.Collections.Generic;    //public partial class Sqlite3
     //{
     public static class build
         {
@@ -671,18 +672,16 @@ p.zName,  P4Usage.P4_STATIC );
                     //}
                     Array.Resize(ref p.aCol, p.nCol + 8);
                 }
-                p.aCol[p.nCol] = new Column();
-                pCol = p.aCol[p.nCol];
-                //memset(pCol, 0, sizeof(p.aCol[0]));
-                pCol.zName = z;
-                ///
-                ///<summary>
-                ///If there is no type specified, columns have the default affinity
-                ///'NONE'. If there is a type specified, then build.sqlite3AddColumnType() will
-                ///be called next to set pCol.affinity correctly.
-                ///
-                ///</summary>
-                pCol.affinity = sqliteinth.SQLITE_AFF_NONE;
+                pCol = p.aCol[p.nCol] = new Column()
+                {
+
+                    //memset(pCol, 0, sizeof(p.aCol[0]));
+                    zName = z,
+                    ///If there is no type specified, columns have the default affinity
+                    ///'NONE'. If there is a type specified, then build.sqlite3AddColumnType() will
+                    ///be called next to set pCol.affinity correctly.
+                    affinity = sqliteinth.SQLITE_AFF_NONE
+                };
                 p.nCol++;
             }
             ///<summary>
@@ -1188,7 +1187,7 @@ p.zName,  P4Usage.P4_STATIC );
                     return;
                 }
                 build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
-                var iDb = Sqlite3.sqlite3SchemaToIndex(db, p.pSchema);
+                var iDb = Sqlite3.indexOf(db, p.pSchema);
                 if (sFix.sqlite3FixInit(pParse, iDb, "view", pName) != 0 && sFix.sqlite3FixSelect(pSelect) != 0)
                 {
                     SelectMethods.SelectDestructor(db, ref pSelect);
@@ -1743,7 +1742,7 @@ db.xAuth = xAuth;
                     utilc.sqlite3ErrorMsg(pParse, "index associated with UNIQUE " + "or PRIMARY KEY constraint cannot be dropped", 0);
                     goto exit_drop_index;
                 }
-                iDb = Sqlite3.sqlite3SchemaToIndex(db, pIndex.pSchema);
+                iDb = Sqlite3.indexOf(db, pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	{
 int code = SQLITE_DROP_INDEX;
@@ -1916,95 +1915,7 @@ goto exit_drop_index;
                 }
                 return -1;
             }
-            ///
-            ///<summary>
-            ///Expand the space allocated for the given SrcList object by
-            ///creating nExtra new slots beginning at iStart.  iStart is zero based.
-            ///New slots are zeroed.
-            ///
-            ///For example, suppose a SrcList initially contains two entries: A,B.
-            ///To append 3 new entries onto the end, do this:
-            ///
-            ///build.sqlite3SrcListEnlarge(db, pSrclist, 3, 2);
-            ///
-            ///After the call above it would contain:  A, B, nil, nil, nil.
-            ///If the iStart argument had been 1 instead of 2, then the result
-            ///would have been:  A, nil, nil, nil, B.  To prepend the new slots,
-            ///the iStart value would be 0.  The result then would
-            ///be: nil, nil, nil, A, B.
-            ///
-            ///If a memory allocation fails the SrcList is unchanged.  The
-            ///db.mallocFailed flag will be set to true.
-            ///
-            ///</summary>
-            public static SrcList sqlite3SrcListEnlarge(Connection db,///
-                ///<summary>
-                ///Database connection to notify of OOM errors 
-                ///</summary>
-            SrcList pSrc,///
-                ///<summary>
-                ///The SrcList to be enlarged 
-                ///</summary>
-            int nExtra,///
-                ///<summary>
-                ///Number of new slots to add to pSrc.a[] 
-                ///</summary>
-            int iStart///
-                ///<summary>
-                ///Index in pSrc.a[] of first new slot 
-                ///</summary>
-            )
-            {
-                int i;
-                ///
-                ///<summary>
-                ///Sanity checking on calling parameters 
-                ///</summary>
-                Debug.Assert(iStart >= 0);
-                Debug.Assert(nExtra >= 1);
-                Debug.Assert(pSrc != null);
-                Debug.Assert(iStart <= pSrc.nSrc);
-                ///
-                ///<summary>
-                ///Allocate additional space if needed 
-                ///</summary>
-                if (pSrc.nSrc + nExtra > pSrc.nAlloc)
-                {
-                    int nAlloc = pSrc.nSrc + nExtra;
-                    int nGot;
-                    // sqlite3DbRealloc(db, pSrc,
-                    //     sizeof(*pSrc) + (nAlloc-1)*sizeof(pSrc.a[0]) );
-                    pSrc.nAlloc = (i16)nAlloc;
-                    Array.Resize(ref pSrc.a, nAlloc);
-                    //    nGot = (sqlite3DbMallocSize(db, pNew) - sizeof(*pSrc))/sizeof(pSrc->a[0])+1;
-                    //pSrc->nAlloc = (u16)nGot;
-                }
-                ///
-                ///<summary>
-                ///Move existing slots that come after the newly inserted slots
-                ///out of the way 
-                ///</summary>
-                for (i = pSrc.nSrc - 1; i >= iStart; i--)
-                {
-                    pSrc.a[i + nExtra] = pSrc.a[i];
-                }
-                pSrc.nSrc += (i16)nExtra;
-                ///
-                ///<summary>
-                ///Zero the newly allocated slots 
-                ///</summary>
-                //memset(&pSrc.a[iStart], 0, sizeof(pSrc.a[0])*nExtra);
-                for (i = iStart; i < iStart + nExtra; i++)
-                {
-                    pSrc.a[i] = new SrcList_item();
-                    pSrc.a[i].iCursor = -1;
-                }
-                ///
-                ///<summary>
-                ///Return a pointer to the enlarged SrcList 
-                ///</summary>
-                return pSrc;
-            }
+            
             ///<summary>
             /// Append a new table name to the given SrcList.  Create a new SrcList if
             /// need be.  A new entry is created in the SrcList even if pTable is NULL.
@@ -2061,74 +1972,66 @@ goto exit_drop_index;
                 ///<summary>
                 ///Table to append 
                 ///</summary>
-            Token pDatabase///
+            Token pDatabase,///
                 ///<summary>
                 ///Database of the table 
                 ///</summary>
-            )
+            Action<SrcList_item> action=null
+                )
+        {
+            
+            if (pDatabase != null && String.IsNullOrEmpty(pDatabase.zRestSql))
             {
-                SrcList_item pItem;
-                Debug.Assert(pDatabase == null || pTable != null);
-                ///
-                ///<summary>
-                ///Cannot have C without B 
-                ///</summary>
-                if (pList == null)
-                {
-                    pList = new SrcList();
-                    //sqlite3DbMallocZero(db, SrcList.Length );
-                    //if ( pList == null ) return null;
-                    pList.nAlloc = 1;
-                    pList.a = new SrcList_item[1];
-                }
-                pList = build.sqlite3SrcListEnlarge(db, pList, 1, pList.nSrc);
-                //if ( db.mallocFailed != 0 )
-                //{
-                //  build.sqlite3SrcListDelete( db, ref pList );
-                //  return null;
-                //}
-                pItem = pList.a[pList.nSrc - 1];
-                if (pDatabase != null && String.IsNullOrEmpty(pDatabase.zRestSql))
-                {
-                    pDatabase = null;
-                }
-                if (pDatabase != null)
-                {
-                    Token pTemp = pDatabase;
-                    pDatabase = pTable;
-                    pTable = pTemp;
-                }
-                pItem.zName = build.sqlite3NameFromToken(db, pTable);
-                pItem.zDatabase = build.sqlite3NameFromToken(db, pDatabase);
-                return pList;
+                pDatabase = null;
             }
-            ///<summary>
-            /// Assign VdbeCursor index numbers to all tables in a SrcList
-            ///
-            ///</summary>
-            public static void sqlite3SrcListAssignCursors(Parse pParse, SrcList pList)
+            if (pDatabase != null)
             {
-                int i;
-                SrcList_item pItem;
+                Token pTemp = pDatabase;
+                pDatabase = pTable;
+                pTable = pTemp;
+            }
+
+            pList = pList.Append<SrcList, SrcList_item>(
+                ()=> {
+                    var r = new SrcList_item()
+                    {
+                        zName = build.sqlite3NameFromToken(db, pTable),
+                        zDatabase = build.sqlite3NameFromToken(db, pDatabase)
+                    };
+                    if (null != action) action(r);
+                    return r;
+                }
+
+            );
+            
+            return pList;
+        }
+        
+
+        ///<summary>
+        /// Assign VdbeCursor index numbers to all tables in a SrcList
+        ///
+        ///</summary>
+        public static void sqlite3SrcListAssignCursors(Parse pParse, SrcList pList)
+            {
                 Debug.Assert(pList != null///
                     ///<summary>
                     ///|| pParse.db.mallocFailed != 0 
                     ///</summary>
                 );
-                if (pList != null)
-                {
-                    for (i = 0; i < pList.nSrc; i++)
-                    {
-                        pItem = pList.a[i];
-                        if (pItem.iCursor >= 0)
-                            break;
+
+                pList.a.ForEach(
+                    pItem => {
+                        if (0 <= pItem.iCursor)
+                            return;
                         pItem.iCursor = pParse.nTab++;
                         if (pItem.pSelect != null)
                         {
                             sqlite3SrcListAssignCursors(pParse, pItem.pSelect.pSrc);
                         }
                     }
-                }
+                );
+                
             }
             ///
             ///<summary>
@@ -2137,14 +2040,7 @@ goto exit_drop_index;
             ///</summary>
             public static void sqlite3SrcListDelete(Connection db, ref SrcList pList)
             {
-                int i;
-                SrcList_item pItem;
-                if (pList == null)
-                    return;
-                for (i = 0; i < pList.nSrc; i++)
-                {
-                    //, pItem++){
-                    pItem = pList.a[i];
+                Action<SrcList_item> delete = pItem => {
                     db.sqlite3DbFree(ref pItem.zDatabase);
                     db.sqlite3DbFree(ref pItem.zName);
                     db.sqlite3DbFree(ref pItem.zAlias);
@@ -2153,9 +2049,18 @@ goto exit_drop_index;
                     SelectMethods.SelectDestructor(db, ref pItem.pSelect);
                     exprc.sqlite3ExprDelete(db, ref pItem.pOn);
                     build.sqlite3IdListDelete(db, ref pItem.pUsing);
-                }
+                };
+
+                if (pList == null)
+                    return;
+
+                pList.a.ForEach(delete);
+                
                 db.sqlite3DbFree(ref pList);
             }
+
+        
+
             ///<summary>
             /// This routine is called by the parser to add a new term to the
             /// end of a growing FROM clause.  The "p" parameter is the part of
@@ -2173,8 +2078,8 @@ goto exit_drop_index;
             /// term added.
             ///
             ///</summary>
-            // OVERLOADS, so I don't need to rewrite parse.c
-            public static SrcList sqlite3SrcListAppendFromTerm(Parse pParse, SrcList p, int null_3, int null_4, Token pAlias, Select pSubquery, Expr pOn, IdList pUsing)
+        // OVERLOADS, so I don't need to rewrite parse.c
+        public static SrcList sqlite3SrcListAppendFromTerm(Parse pParse, SrcList p, int null_3, int null_4, Token pAlias, Select pSubquery, Expr pOn, IdList pUsing)
             {
                 return build.sqlite3SrcListAppendFromTerm(pParse, p, null, null, pAlias, pSubquery, pOn, pUsing);
             }
@@ -2200,27 +2105,29 @@ goto exit_drop_index;
                 ///The USING clause of a join 
             )
             {
-                SrcList_item pItem;
                 Connection db = pParse.db;
                 if (null == p && (pOn != null || pUsing != null))
                 {
                     utilc.sqlite3ErrorMsg(pParse, "a JOIN clause is required before %s", (pOn != null ? "ON" : "USING"));
                     goto append_from_error;
                 }
-                p = build.sqlite3SrcListAppend(db, p, pTable, pDatabase);
+                p = build.sqlite3SrcListAppend(db, p, pTable, pDatabase,
+                    pItem=> {
+                        Debug.Assert(pAlias != null);
+                        if (pAlias.Length != 0)
+                        {
+                            pItem.zAlias = build.sqlite3NameFromToken(db, pAlias);
+                        }
+                        pItem.pSelect = pSubquery;
+                        pItem.pOn = pOn;
+                        pItem.pUsing = pUsing;
+                    });
                 //if ( p == null || NEVER( p.nSrc == 0 ) )
                 //{
                 //  goto append_from_error;
                 //}
-                pItem = p.a[p.nSrc - 1];
-                Debug.Assert(pAlias != null);
-                if (pAlias.Length != 0)
-                {
-                    pItem.zAlias = build.sqlite3NameFromToken(db, pAlias);
-                }
-                pItem.pSelect = pSubquery;
-                pItem.pOn = pOn;
-                pItem.pUsing = pUsing;
+                
+                
                 return p;
             append_from_error:
                 Debug.Assert(p == null);

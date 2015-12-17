@@ -23,23 +23,23 @@ namespace Community.CsharpSqlite.Ast {
     using Metadata;
     using Engine;
     using Community.CsharpSqlite.Ast;
-
-		///<summary>
-		/// A WherePlan object holds information that describes a lookup
-		/// strategy.
-		///
-		/// This object is intended to be opaque outside of the where.c module.
-		/// It is included here only so that that compiler will know how big it
-		/// is.  None of the fields in this object should be used outside of
-		/// the where.c module.
-		///
-		/// Within the union, pIdx is only used when wsFlags&wherec.WHERE_INDEXED is true.
-		/// pTerm is only used when wsFlags&wherec.WHERE_MULTI_OR is true.  And pVtabIdx
-		/// is only used when wsFlags&wherec.WHERE_VIRTUALTABLE is true.  It is never the
-		/// case that more than one of these conditions is true.
-		///
-		///</summary>
-		public class WherePlan {
+    using System.Collections.Generic;
+    ///<summary>
+    /// A WherePlan object holds information that describes a lookup
+    /// strategy.
+    ///
+    /// This object is intended to be opaque outside of the where.c module.
+    /// It is included here only so that that compiler will know how big it
+    /// is.  None of the fields in this object should be used outside of
+    /// the where.c module.
+    ///
+    /// Within the union, pIdx is only used when wsFlags&wherec.WHERE_INDEXED is true.
+    /// pTerm is only used when wsFlags&wherec.WHERE_MULTI_OR is true.  And pVtabIdx
+    /// is only used when wsFlags&wherec.WHERE_VIRTUALTABLE is true.  It is never the
+    /// case that more than one of these conditions is true.
+    ///
+    ///</summary>
+    public class WherePlan {
             ///
             ///<summary>
             ///wherec.WHERE_* flags that describe the strategy 
@@ -1185,11 +1185,7 @@ namespace Community.CsharpSqlite.Ast {
 									///</summary>
 									if(this.nLevel>1) {
 										int nNotReady;
-										///
-										///<summary>
-										///The number of notReady tables 
-										///</summary>
-										SrcList_item[] origSrc;
+										
 										///
 										///<summary>
 										///Original list of tables 
@@ -1198,13 +1194,17 @@ namespace Community.CsharpSqlite.Ast {
 										//sqlite3StackAllocRaw(pParse.db,
 										//sizeof(*pOrTab)+ nNotReady*sizeof(pOrTab.a[0]));
 										pOrTab=new SrcList();
-										pOrTab.a=new SrcList_item[nNotReady+1];
+										pOrTab.a=new List<SrcList_item>(nNotReady+1);
 										//if( pOrTab==0 ) return notReady;
 										pOrTab.nAlloc=(i16)(nNotReady+1);
 										pOrTab.nSrc=pOrTab.nAlloc;
 										pOrTab.a[0]=pTabItem;
-										//memcpy(pOrTab.a, pTabItem, sizeof(*pTabItem));
-										origSrc=this.pTabList.a;
+                                        //memcpy(pOrTab.a, pTabItem, sizeof(*pTabItem));
+
+                                        ///<summary>
+                                        ///The number of notReady tables 
+                                        ///</summary>
+                                        var origSrc =this.pTabList.a;
 										for(k=1;k<=nNotReady;k++) {
 											pOrTab.a[k]=origSrc[this.a[iLevel+k].iFrom];
 											// memcpy(&pOrTab.a[k], &origSrc[pLevel[k].iFrom], sizeof(pOrTab.a[k]));

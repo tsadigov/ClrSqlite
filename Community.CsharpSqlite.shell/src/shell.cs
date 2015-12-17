@@ -1385,7 +1385,7 @@ if( db ) sqlite3_interrupt(db);
 		}
 		rc = vdbeapi.sqlite3_step(pSelect);
 		while (rc == SqlResult.SQLITE_ROW) {
-			fprintf (_out, "%s;\n", vdbeapi.sqlite3_column_text (pSelect, 0));
+			fprintf (_out, "%s;\n", vdbeapi.get_column_text (pSelect, 0));
 			rc = vdbeapi.sqlite3_step (pSelect);
 		}
 		return vdbeapi.sqlite3_finalize (pSelect);
@@ -1459,7 +1459,7 @@ if( db ) sqlite3_interrupt(db);
 			appendText (zSelect, " || ' VALUES(' || ", '\0');
 			rc = vdbeapi.sqlite3_step (pTableInfo);
 			while (rc == SqlResult.SQLITE_ROW) {
-				string zText = (string)vdbeapi.sqlite3_column_text (pTableInfo, 1);
+				string zText = (string)vdbeapi.get_column_text (pTableInfo, 1);
 				appendText (zSelect, "quote(", '\0');
 				appendText (zSelect, zText, '"');
 				rc = vdbeapi.sqlite3_step (pTableInfo);

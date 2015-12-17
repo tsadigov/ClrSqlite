@@ -272,7 +272,7 @@ namespace Community.CsharpSqlite.builder
             {
                 if (zColl == null || collationMatch(zColl, pIndex))
                 {
-                    int iDb = Sqlite3.sqlite3SchemaToIndex(pParse.db, pTab.pSchema);
+                    int iDb = Sqlite3.indexOf(pParse.db, pTab.pSchema);
                     Community.CsharpSqlite.build.sqlite3BeginWriteOperation(pParse, 0, iDb);
                     pParse.sqlite3RefillIndex(pIndex, -1);
                 }
@@ -338,7 +338,7 @@ namespace Community.CsharpSqlite.builder
             ///Register holding assemblied index record 
             Connection db = pParse.db;
             ///The database connection 
-            int iDb = Sqlite3.sqlite3SchemaToIndex(db, pIndex.pSchema);
+            int iDb = Sqlite3.indexOf(db, pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
 db.aDb[iDb].zName ) ){
@@ -535,7 +535,7 @@ return;
                 pTab = pParse.pNewTable;
                 if (pTab == null)
                     goto exit_create_index;
-                iDb = Sqlite3.sqlite3SchemaToIndex(db, pTab.pSchema);
+                iDb = Sqlite3.indexOf(db, pTab.pSchema);
             }
             pDb = db.Backends[iDb];
             Debug.Assert(pTab != null);

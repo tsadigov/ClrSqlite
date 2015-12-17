@@ -1430,7 +1430,7 @@ set { _op = value; }
                                     zOriginTab = pTab.zName;
                                     if (pNC.pParse != null)
                                     {
-                                        int iDb = Sqlite3.sqlite3SchemaToIndex(pNC.pParse.db, pTab.pSchema);
+                                        int iDb = Sqlite3.indexOf(pNC.pParse.db, pTab.pSchema);
                                         zOriginDb = pNC.pParse.db.Backends[iDb].Name;
                                     }
                                 }

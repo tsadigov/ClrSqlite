@@ -21,6 +21,7 @@ namespace Community.CsharpSqlite.Ast
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Metadata.Traverse;
     using Compiler.Parser;
+    using System.Collections.Generic;
     public class exprc
         {
             ///<summary>
@@ -612,7 +613,7 @@ namespace Community.CsharpSqlite.Ast
                 pNew = new SrcList();
                 //sqlite3DbMallocRaw(db, nByte );
                 if (p.nSrc > 0)
-                    pNew.a = new SrcList_item[p.nSrc];
+                    pNew.a = new List<SrcList_item>(p.nSrc);
                 if (pNew == null)
                     return null;
                 pNew.nSrc = pNew.nAlloc = p.nSrc;

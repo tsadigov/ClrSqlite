@@ -117,7 +117,7 @@ namespace Community.CsharpSqlite {
 		///
 		///</summary>
 		public struct TrigEvent {
-			public int a;
+			public TokenType a;
 			public IdList b;
 		}
 		///<summary>
@@ -7005,7 +7005,7 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///</summary>
 			///<param name="The state">number </param>
-			public YYCODETYPE major;
+			public TokenType major;
 			///
 			///<summary>
 			///The major token value.  This is the code
@@ -7306,7 +7306,7 @@ public yyStackEntry *yystack;        /* The parser's stack */
 				}
 			}
 			public int yy_pop_parser_stack() {
-				YYCODETYPE yymajor;
+                TokenType yymajor;
 				yyStackEntry yytos=this.yystack[this.yyidx];
 				///
 				///<summary>
@@ -7324,9 +7324,9 @@ public yyStackEntry *yystack;        /* The parser's stack */
       }
 #endif
 				yymajor=yytos.major;
-				this.yy_destructor(yymajor,yytos.minor);
+				this.yy_destructor((YYCODETYPE)yymajor,yytos.minor);
 				this.yyidx--;
-				return yymajor;
+				return (YYCODETYPE)yymajor;
 			}
 			public void sqlite3ParserFree(///
 			///<summary>
@@ -7421,10 +7421,10 @@ public yyStackEntry *yystack;        /* The parser's stack */
 			///The parser to be shifted 
 			///</summary>
 			int yyNewState,///
-			///<summary>
-			///The new state to shift in 
-			///</summary>
-			int yyMajor,///
+                           ///<summary>
+                           ///The new state to shift in 
+                           ///</summary>
+         TokenType yyMajor,///
 			///<summary>
 			///The major token to shift in 
 			///</summary>
@@ -7457,7 +7457,7 @@ return;
 				this.yystack[this.yyidx]=yytos;
 				//yytos = yypParser.yystack[yypParser.yyidx];
 				yytos.stateno=(YYACTIONTYPE)yyNewState;
-				yytos.major=(YYCODETYPE)yyMajor;
+				yytos.major=yyMajor;
 				yytos.minor=yypMinor;
 				#if !NDEBUG
 																																																																												      if ( yyTraceFILE != null && yypParser.yyidx > 0 )
@@ -7528,7 +7528,7 @@ return;
 			///<summary>
 			///The parser 
 			///</summary>
-			int yymajor,///
+			TokenType yymajor,///
 			///<summary>
 			///The major type of the error token 
 			///</summary>
@@ -7592,7 +7592,7 @@ return;
 			///</summary>
 			,Parse pParse//sqlite3ParserARG_PDECL           /* Optional %extra_argument parameter */
 			) {
-				int yymajor=(int)_yymajor;
+				var yymajor=_yymajor;
 				YYMINORTYPE yyminorunion=new YYMINORTYPE();
 				int yyact;
 				///
@@ -7651,7 +7651,7 @@ return;
 						///</summary>
 						yypParser.yy_shift(yyact,yymajor,yyminorunion);
 						yypParser.yyerrcnt--;
-						yymajor=YYNOCODE;
+						yymajor=(TokenType)YYNOCODE;
 					}
 					else
 						if(yyact<YYNSTATE+YYNRULE) {
@@ -7754,11 +7754,11 @@ yymajor = YYNOCODE;
 							if(yyendofinput) {
 								yypParser.yy_parse_failed();
 							}
-							yymajor=YYNOCODE;
+							yymajor=(TokenType)YYNOCODE;
 							#endif
 						}
 				}
-				while(yymajor!=YYNOCODE&&yypParser.yyidx>=0);
+				while(yymajor!=(TokenType)YYNOCODE&&yypParser.yyidx>=0);
 				return;
 			}
 		}
@@ -8354,7 +8354,7 @@ return yy_default[stateno];
 		///
 		///</summary>
 		public struct _yyRuleInfo {
-			public YYCODETYPE lhs;
+			public TokenType lhs;
 			///
 			///<summary>
 			///</summary>
@@ -8365,7 +8365,7 @@ return yy_default[stateno];
 			///</summary>
 			///<param name="Number of right">hand side symbols in the rule </param>
 			public _yyRuleInfo(YYCODETYPE lhs,byte nrhs) {
-				this.lhs=lhs;
+				this.lhs=(TokenType)lhs;
 				this.nrhs=nrhs;
 			}
 		}
@@ -8718,7 +8718,7 @@ return yy_default[stateno];
 		///Number of the rule by which to reduce 
 		///</summary>
 		) {
-			int yygoto;
+            TokenType yygoto;
 			///
 			///<summary>
 			///The next state 
@@ -8879,7 +8879,7 @@ return yy_default[stateno];
 			//yysqliteinth.testcase(yyruleno==116);
 			//#line 123 "parse.y"
 			{
-				yygotominor.yy4=yymsp[0].major;
+				yygotominor.yy4=(YYCODETYPE)yymsp[0].major;
 			}
 			//#line 2141 "parse.c"
 			break;
@@ -11407,7 +11407,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 1199 "parse.y"
 			{
-				yygotominor.yy90_TrigEvent.a=(int)TokenType.TK_UPDATE;
+				yygotominor.yy90_TrigEvent.a=TokenType.TK_UPDATE;
 				yygotominor.yy90_TrigEvent.b=yymsp[0].minor.yy384_IdList;
 			}
 			//#line 3343 "parse.c"
@@ -12016,8 +12016,8 @@ return yy_default[stateno];
 				if(yysize!=0) {
 					yypParser.yyidx++;
 					yymsp._yyidx-=yysize-1;
-					yymsp[0].stateno=(YYACTIONTYPE)yyact;
-					yymsp[0].major=(YYCODETYPE)yygoto;
+					yymsp[0].stateno=yyact;
+					yymsp[0].major=yygoto;
 					yymsp[0].minor=yygotominor;
 				}
 				else

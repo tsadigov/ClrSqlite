@@ -616,19 +616,17 @@ db.xAuth = 0;
 				}
 			}
 		}
-		///<summary>
-		/// Convert a schema pointer into the iDb index that indicates
-		/// which database file in db.aDb[] the schema refers to.
-		///
-		/// If the same database is attached more than once, the first
-		/// attached database is returned.
-		///
-		///</summary>
-		public static int sqlite3SchemaToIndex(Connection db,Schema pSchema) {//TODO: extension method
+        ///<summary>
+        ///sqlite3SchemaToIndex
+        /// Convert a schema pointer into the iDb index that indicates
+        /// which database file in db.aDb[] the schema refers to.
+        ///
+        /// If the same database is attached more than once, the first
+        /// attached database is returned.
+        ///
+        ///</summary>
+        public static int indexOf( Connection db,Schema pSchema) {//TODO: extension method
 			int i=-1000000;
-			///
-			///<summary>
-			///</summary>
 			///<param name="If pSchema is NULL, then return ">1000000. This happens when code in</param>
 			///<param name="expr.c is trying to resolve a reference to a transient table (i.e. one">expr.c is trying to resolve a reference to a transient table (i.e. one</param>
 			///<param name="created by a sub">select). In this case the return value of this</param>

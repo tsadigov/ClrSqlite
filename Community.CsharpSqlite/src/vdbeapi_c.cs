@@ -882,21 +882,21 @@ return p.pMem.n;
                 return val;
             }
 
-            public static sqlite_int64 sqlite3_column_int64(sqlite3_stmt pStmt, int i)
+            public static sqlite_int64 sqlite3_column_int64(this sqlite3_stmt pStmt, int i)
             {
                 sqlite_int64 val = sqlite3_value_int64(columnMem(pStmt, i));
                 columnMallocFailure(pStmt);
                 return val;
             }
 
-            public static string sqlite3_column_text(sqlite3_stmt pStmt, int i)
+            public static string get_column_text(this sqlite3_stmt pStmt, int i)
             {
                 string val = vdbeapi.sqlite3_value_text(columnMem(pStmt, i));
                 columnMallocFailure(pStmt);
                 return val;
             }
 
-            public static sqlite3_value sqlite3_column_value(sqlite3_stmt pStmt, int i)
+            public static sqlite3_value sqlite3_column_value(this sqlite3_stmt pStmt, int i)
             {
                 Mem pOut = columnMem(pStmt, i);
                 if ((pOut.flags & MemFlags.MEM_Static) != 0)
@@ -915,7 +915,7 @@ return p.pMem.n;
 //  return val;
 //}
 #endif
-            public static FoundationalType sqlite3_column_type(sqlite3_stmt pStmt, int i)
+            public static FoundationalType get_column_type(this sqlite3_stmt pStmt, int i)
             {
                 FoundationalType iType = vdbeapi.sqlite3_value_type(columnMem(pStmt, i));
                 columnMallocFailure(pStmt);
@@ -987,7 +987,7 @@ return p.pMem.n;
             /// statement pStmt.
             ///
             ///</summary>
-            public static string sqlite3_column_name(sqlite3_stmt pStmt, int N)
+            public static string get_column_name(this sqlite3_stmt pStmt, int N)
             {
                 return columnName(pStmt, N, vdbeapi.sqlite3_value_text, ColName.NAME);
             }

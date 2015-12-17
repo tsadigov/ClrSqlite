@@ -398,7 +398,7 @@ goto begin_table_error;
                         build.sqlite3CodeVerifyNamedSchema(pParse, pName.a[0].zDatabase);
                     goto exit_drop_table;
                 }
-                var iDb = Sqlite3.sqlite3SchemaToIndex(db, pTab.pSchema);
+                var iDb = Sqlite3.indexOf(db, pTab.pSchema);
                 Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
                 ///If pTab is a virtual table, call ViewGetColumnNames() to ensure
                 ///it is initialized.
@@ -584,7 +584,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     }
                     else
                     {
-                        int iDb = Sqlite3.sqlite3SchemaToIndex(pParse.db, pTab.pSchema);
+                        int iDb = Sqlite3.indexOf(pParse.db, pTab.pSchema);
                         build.destroyRootPage(pParse, iLargest, iDb);
                         iDestroyed = iLargest;
                     }
@@ -820,8 +820,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     var sSrc = new SrcList()
                     {
                         // memset(sSrc, 0, sizeof(sSrc));
-                        nSrc = 1,
-                        a = new SrcList_item[] {
+                        a = new List<SrcList_item> {
                             new SrcList_item(){
                                 zName = pNewTable.zName,
                                 pTab = pNewTable,
@@ -854,7 +853,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     pNewTable.tnum = db.init.newTnum;
                 }
 
-                var iDb = Sqlite3.sqlite3SchemaToIndex(db, pNewTable.pSchema);
+                var iDb = Sqlite3.indexOf(db, pNewTable.pSchema);
 
                 ///If not initializing, then create a record for the new table
                 ///in the SQLITE_MASTER table of the database.

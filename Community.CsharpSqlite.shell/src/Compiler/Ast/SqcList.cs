@@ -24,22 +24,9 @@ namespace Community.CsharpSqlite.Ast
     using Community.CsharpSqlite.Utils;    
     
 
-        public class SrcList
+        public class SrcList:MyCollection<SrcList_item>
         {
-            public i16 nSrc;
-            ///
-            ///<summary>
-            ///Number of tables or subqueries in the FROM clause 
-            ///</summary>
-            public i16 nAlloc;
-            ///<summary>
-            ///Number of entries allocated in a[] below
-            ///</summary>
-            public SrcList_item[] a;
-            ///
-            ///<summary>
-            ///One entry for each identifier on the list 
-            ///</summary>
+            
             public SrcList Copy()
             {
                 if (this == null)
@@ -48,7 +35,8 @@ namespace Community.CsharpSqlite.Ast
                 {
                     SrcList cp = (SrcList)MemberwiseClone();
                     if (a != null)
-                        a.CopyTo(cp.a, 0);
+                        cp.a = new List<SrcList_item>(a);
+                        
                     return cp;
                 }
             }
