@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using FILE = System.IO.TextWriter;
@@ -138,8 +139,7 @@ namespace Community.CsharpSqlite
             ///The database connection that owns this statement 
             ///</summary>
             public Connection db;
-            /** Space to hold the virtual machine's program */
-            public Operation[] aOp;
+            
             ///
             ///<summary>
             ///The memory locations 
@@ -176,21 +176,29 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Number of slots allocated for aOp[] 
             ///</summary>
-            public int nLabel;
+            //** Space to hold the virtual machine's program */
+            public Operation[] aOp;
+
+
+            #region refactored
             ///
             ///<summary>
             ///Number of labels used 
             ///</summary>
-            public int nLabelAlloc;
+            //public int nLabelAlloc;
+            //public int nLabel;
             ///
             ///<summary>
             ///Number of slots allocated in aLabel[] 
             ///</summary>
-            public int[] aLabel;
-            ///
+            #endregion
+
             ///<summary>
             ///Space to hold the labels 
             ///</summary>
+            public List<int> aLabel=new List<i32>();
+            
+            
             public u16 nResColumn;
             ///
             ///<summary>
@@ -411,8 +419,8 @@ namespace Community.CsharpSqlite
                 ct.nOp = nOp;
                 ct.nOpAlloc = nOpAlloc;
                 ct.lOp = lOp;
-                ct.nLabel = nLabel;
-                ct.nLabelAlloc = nLabelAlloc;
+                //ct.nLabel = nLabel;
+                //ct.nLabelAlloc = nLabelAlloc;
                 ct.aLabel = aLabel;
                 ct.apArg = apArg;
                 ct.aColName = aColName;
@@ -775,33 +783,16 @@ pOp.cnt = 0;
             }
 
             public int sqlite3VdbeMakeLabel()
-            {
-                int i;
-                i = this.nLabel++;
+            {   
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
-                if (i >= this.nLabelAlloc)
-                {
-                    int n = this.nLabelAlloc == 0 ? 15 : this.nLabelAlloc * 2 + 5;
-                    if (this.aLabel == null)
-                        this.aLabel = malloc_cs.sqlite3Malloc(this.aLabel, n);
-                    else
-                        Array.Resize(ref this.aLabel, n);
-                    //p.aLabel = sqlite3DbReallocOrFree(p.db, p.aLabel,
-                    //                                       n*sizeof(p.aLabel[0]));
-                    this.nLabelAlloc = this.aLabel.Length;
-                    //sqlite3DbMallocSize(p.db, p.aLabel)/sizeof(p.aLabel[0]);
-                }
-                if (this.aLabel != null)
-                {
-                    this.aLabel[i] = -1;
-                }
-                return -1 - i;
+                aLabel.Add(-1);
+                return  - aLabel.Count();
             }
             public void sqlite3VdbeResolveLabel(int x)
             {
                 int j = -1 - x;
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
-                Debug.Assert(j >= 0 && j < this.nLabel);
+                Debug.Assert(j >= 0 && j < this.aLabel.Count());
                 if (this.aLabel != null)
                 {
                     this.aLabel[j] = this.nOp;
@@ -816,7 +807,7 @@ pOp.cnt = 0;
                 int i;
                 int nMaxArgs = pMaxFuncArgs;
                 Operation pOp;
-                int[] aLabel = this.aLabel;
+                var aLabel = this.aLabel;
                 this.readOnly = true;
                 for (i = 0; i < this.nOp; i++)//  for(pOp=p->aOp, i=p->nOp-1; i>=0; i--, pOp++)
                 {
@@ -855,7 +846,7 @@ pOp.cnt = 0;
                     }
                     if (((int)pOp.opflags & Sqlite3.OPFLG_JUMP) != 0 && pOp.p2 < 0)
                     {
-                        Debug.Assert(-1 - pOp.p2 < this.nLabel);
+                        Debug.Assert(-1 - pOp.p2 < this.aLabel.Count());
                         pOp.p2 = aLabel[-1 - pOp.p2];
                     }
                 }
