@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq;
 using System.IO;
 using System.Text;
 using FILE=System.IO.TextWriter;
@@ -924,13 +925,13 @@ void sqlite3VdbeLeave(Vdbe *p){
             ///<summary>
             /// Release an array of N Mem elements
             ///</summary>
-            public static void releaseMemArray(Mem[] p, int N)
+            public static void releaseMemArray(IList<Mem> p, int N)
             {
                 releaseMemArray(p, 0, N);
             }
-            static void releaseMemArray(Mem[] p, int starting, int N)
+            static void releaseMemArray(IList<Mem>  p, int starting, int N)
             {
-                if (p != null && p.Length > starting && p[starting] != null && N != 0)
+                if (p != null && p.Count() > starting && p[starting] != null && N != 0)
                 {
                     Mem pEnd;
                     Connection db = p[starting].db;
@@ -947,7 +948,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                     {
                         pEnd = p[i];
                         Debug.Assert(//( p[1] ) == pEnd ||
-                        N == 1 || i == p.Length - 1 || p[starting].db == p[starting + 1].db);
+                        N == 1 || i == p.Count() - 1 || p[starting].db == p[starting + 1].db);
                         ///
                         ///<summary>
                         ///This block is really an inlined version of sqlite3VdbeMemRelease()
@@ -1079,7 +1080,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                 ///</summary>
                 ///<param name="encountered, but p">>pc will eventually catch up to nRow.</param>
                 ///<param name=""></param>
-                nRow = p.nOp;
+                nRow = p.aOp.Count();
                 int i_pMem;
                 if (p.explain == 1)
                 {
@@ -1090,7 +1091,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                     ///to trigger subprograms.  The VDBE is guaranteed to have at least 9
                     ///cells.  
                     ///</summary>
-                    Debug.Assert(p.nMem > 9);
+                    Debug.Assert(p.aMem.Count() > 9);
                     pSub = p.aMem[9];
                     if ((pSub.flags & MemFlags.MEM_Blob) != 0)
                     {
@@ -1137,7 +1138,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                     {
                         string z;
                         Operation pOp;
-                        if (i < p.nOp)
+                        if (i < p.aOp.Count())
                         {
                             ///
                             ///<summary>
@@ -1154,7 +1155,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             ///pick up the appropriate opcode. 
                             ///</summary>
                             int j;
-                            i -= p.nOp;
+                            i -= p.aOp.Count();
                             for (j = 0; i >= apSub[j].nOp; j++)
                             {
                                 i -= apSub[j].nOp;
@@ -1597,14 +1598,16 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 //
                 // C# -- Replace allocation with individual Dims
                 // aMem is 1 based, so allocate 1 extra cell under C#
-                p.aMem = new Mem[nMem + 1];
+                p.aMem = new List<Mem>(nMem + 1);
                 for (n = 0; n <= nMem; n++)
                 {
-                    p.aMem[n] = malloc_cs.sqlite3Malloc(p.aMem[n]);
-                    p.aMem[n].db = db;
+                    var mem = new Mem();
+                    mem=malloc_cs.sqlite3Malloc(mem);
+                    p.aMem.Add(mem);
+                    mem.db = db;
                 }
                 //p.aMem--;         /* aMem[] goes from 1..nMem */
-                p.nMem = nMem;
+                //p.nMem = nMem;
                 ///
                 ///<summary>
                 ///</summary>
@@ -1637,7 +1640,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 if (p.aMem != null)
                 {
                     //p.aMem--;                    /* aMem[] goes from 1..nMem */
-                    p.nMem = nMem;
+                    //p.nMem = nMem;
                     ///
                     ///<summary>
                     ///</summary>
@@ -1728,7 +1731,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 }
                 if (p.aMem != null)
                 {
-                    releaseMemArray(p.aMem, 1, p.nMem);
+                    releaseMemArray(p.aMem, 1, p.aMem.Count());
                 }
                 while (p.pDelFrame != null)
                 {
@@ -2247,7 +2250,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 }
                 //for ( i = p->nzVar - 1; i >= 0; i-- )
                 //  sqlite3DbFree( db, p.azVar[i] );
-                vdbeFreeOpArray(db, ref p.aOp, p.nOp);
+                //vdbeFreeOpArray(db, ref p.aOp, p.aOp.Count());
                 db.sqlite3DbFree(ref p.aLabel);
                 db.sqlite3DbFree(ref p.aColName);
                 db.sqlite3DbFree(ref p.zSql);

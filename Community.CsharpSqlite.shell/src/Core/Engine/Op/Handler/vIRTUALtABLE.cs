@@ -243,7 +243,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         sqlite3_context sContext;
                                         VdbeCursor pCur = vdbe.OpenCursors[pOp.p1];
                                         Debug.Assert(pCur.pVtabCursor != null);
-                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.nMem);
+                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.aMem.Count());
                                         pDest = aMem[pOp.p3];
                                         vdbe.memAboutToChange(pDest);
                                         if (pCur.nullRow)

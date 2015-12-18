@@ -106,7 +106,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         if (pOp.p5 != 0)
                         {
                             Debug.Assert(p2 > 0);
-                            Debug.Assert(p2 <= cpu.vdbe.nMem);
+                            Debug.Assert(p2 <= cpu.vdbe.aMem.Count());
                             var pIn2 = cpu.aMem[p2];
                             Debug.Assert(pIn2.memIsValid());
                             Debug.Assert((pIn2.flags & MemFlags.MEM_Int) != 0);
@@ -452,7 +452,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             pC.rowidIsValid = false;
                         }
                         pC.nullRow = res == 1 ? true : false;
-                        Debug.Assert(pOp.p2 > 0 && pOp.p2 < vdbe.nOp);
+                        Debug.Assert(pOp.p2 > 0 && pOp.p2 < vdbe.aOp.Count());
                         if (res != 0)
                         {
                             cpu.opcodeIndex = pOp.p2 - 1;

@@ -29,7 +29,7 @@ namespace Community.CsharpSqlite.Engine
         int nProgressOps = 0;
         ///Opcodes executed since progress callback. 
 #endif
-        public Mem[] aMem ;
+        public List<Mem> aMem ;
         ///3rd input operand 
         public Mem pOut = null;
         int _opcodeIndex;

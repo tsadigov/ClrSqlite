@@ -76,28 +76,28 @@ namespace Community.CsharpSqlite.Engine
             }
         }
 
-        public Operation[] aOp;
+        public List<Operation> aOp=new List<Operation>();
 
         ///
         ///<summary>
         ///Program instructions for parent frame 
         ///</summary>
 
-        public int nOp;
+        //public int nOp;
 
         ///
         ///<summary>
         ///Size of aOp array 
         ///</summary>
 
-        public Mem[] aMem;
+        public List<Mem> aMem;
 
         ///
         ///<summary>
         ///Array of memory cells for parent frame 
         ///</summary>
 
-        public int nMem;
+        //public int nMem;
 
         ///
         ///<summary>
@@ -168,7 +168,7 @@ namespace Community.CsharpSqlite.Engine
         ///Array of memory cells for child frame 
         ///</summary>
 
-        public Mem[] aChildMem;
+        public List<Mem> aChildMem;
 
         ///
         ///<summary>
@@ -196,9 +196,9 @@ namespace Community.CsharpSqlite.Engine
         {
             Vdbe v = this.v;
             v.aOp = this.aOp;
-            v.nOp = this.nOp;
+            //v.nOp = this.nOp;
             v.aMem = this.aMem;
-            v.nMem = this.nMem;
+            //v.nMem = this.nMem;
             v.OpenCursors = this.apCsr;
             v.nCursor = this.nCursor;
             v.db.lastRowid = this.lastRowid;

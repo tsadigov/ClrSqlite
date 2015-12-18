@@ -705,7 +705,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         // sqlite3DbMallocRaw(db, sizeof(int) * (nRoot + 1));
                         if (aRoot == null)
                             return RuntimeException.no_mem;
-                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.nMem);
+                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.aMem.Count());
                         pnErr = aMem[pOp.p3];
                         Debug.Assert((pnErr.flags & MemFlags.MEM_Int) != 0);
                         Debug.Assert((pnErr.flags & (MemFlags.MEM_Str | MemFlags.MEM_Blob)) == 0);

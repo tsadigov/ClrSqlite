@@ -200,7 +200,7 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         Debug.Assert(vdbe.nResColumn == pOp.p2);
                         Debug.Assert(pOp.p1 > 0);
-                        Debug.Assert(pOp.p1 + pOp.p2 <= vdbe.nMem + 1);
+                        Debug.Assert(pOp.p1 + pOp.p2 <= vdbe.aMem.Count() + 1);
 
                         rc = OpCode_ResultRow(vdbe,cpu.opcodeIndex, pOp.p1, pOp.p2, rc, aMem);
                         return RuntimeException.vdbe_return;
@@ -329,10 +329,10 @@ namespace Community.CsharpSqlite.Engine.Op
                         n = pOp.p5;
                         apVal = vdbe.apArg;
                         Debug.Assert(apVal != null || n == 0);
-                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.nMem);
+                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.aMem.Count());
                         cpu.pOut = aMem[pOp.p3];
                         vdbe.memAboutToChange(cpu.pOut);
-                        Debug.Assert(n == 0 || (pOp.p2 > 0 && pOp.p2 + n <= vdbe.nMem + 1));
+                        Debug.Assert(n == 0 || (pOp.p2 > 0 && pOp.p2 + n <= vdbe.aMem.Count() + 1));
                         Debug.Assert(pOp.p3 < pOp.p2 || pOp.p3 >= pOp.p2 + n);
                         //pArg = aMem[pOp.p2];
                         for (i = 0; i < n; i++)//, pArg++)
@@ -579,7 +579,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///Number of zero bytes at the end of the record 
                         nField = pOp.p1;
                         zAffinity = (pOp.p4.z == null || pOp.p4.z.Length == 0) ? "" : pOp.p4.z;
-                        Debug.Assert(nField > 0 && pOp.p2 > 0 && pOp.p2 + nField <= vdbe.nMem + 1);
+                        Debug.Assert(nField > 0 && pOp.p2 > 0 && pOp.p2 + nField <= vdbe.aMem.Count() + 1);
                         //pData0 = aMem[nField];
                         nField = pOp.p2;
                         //pLast =  pData0[nField - 1];
@@ -677,7 +677,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             i += (int)vdbeaux.sqlite3VdbeSerialPut(zNewRecord, i, (int)nByte - i, pRec, file_format);
                         }
                         //TODO -- Remove vdbe  for testing Debug.Assert( i == nByte );
-                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.nMem);
+                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.aMem.Count());
                         cpu.pOut.zBLOB = zNewRecord;
                         cpu.pOut.z = null;
                         cpu.pOut.n = (int)nByte;
@@ -879,7 +879,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///Assert that the values of parameters P1 and P4 are in range. 
                         ///</summary>
                         Debug.Assert(pOp.p4type == P4Usage.P4_INT32);
-                        Debug.Assert(pOp.p4.i > 0 && pOp.p4.i <= vdbe.nMem);
+                        Debug.Assert(pOp.p4.i > 0 && pOp.p4.i <= vdbe.aMem.Count());
                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
                         ///
                         ///<summary>
@@ -1144,7 +1144,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         ///<summary>
                                         ///Assert that P3 is a valid memory cell. 
                                         ///</summary>
-                                        Debug.Assert(pOp.p3 <= rootFrame.nMem);
+                                        Debug.Assert(pOp.p3 <= rootFrame.aMem.Count());
                                         pMem = rootFrame.aMem[pOp.p3];
                                     }
                                     else
@@ -1153,7 +1153,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         ///<summary>
                                         ///Assert that P3 is a valid memory cell. 
                                         ///</summary>
-                                        Debug.Assert(pOp.p3 <= vdbe.nMem);
+                                        Debug.Assert(pOp.p3 <= vdbe.aMem.Count());
                                         pMem = aMem[pOp.p3];
                                         vdbe.memAboutToChange(pMem);
                                     }
@@ -1604,16 +1604,16 @@ namespace Community.CsharpSqlite.Engine.Op
                             pFrame.nChildCsr = pProgram.nCsr;
                             pFrame.currentOpCodeIndex = cpu.opcodeIndex;
                             pFrame.aMem = vdbe.aMem;
-                            pFrame.nMem = vdbe.nMem;
+                            
                             pFrame.apCsr = vdbe.OpenCursors;
                             pFrame.nCursor = vdbe.nCursor;
                             pFrame.aOp = vdbe.aOp;
-                            pFrame.nOp = vdbe.nOp;
+                            //pFrame.nOp = vdbe.nOp;
                             pFrame.token = pProgram.token;
                             // &VdbeFrameMem( pFrame )[pFrame.nChildMem];
                             // aMem is 1 based, so allocate 1 extra cell under C#
-                            pFrame.aChildMem = new Mem[pFrame.nChildMem + 1];
-                            for (int i = 0; i < pFrame.aChildMem.Length; i++)//pMem = VdbeFrameMem( pFrame ) ; pMem != pEnd ; pMem++ )
+                            pFrame.aChildMem = new List<Mem>(pFrame.nChildMem + 1);
+                            for (int i = 0; i < pFrame.aChildMem.Count(); i++)//pMem = VdbeFrameMem( pFrame ) ; pMem != pEnd ; pMem++ )
                             {
                                 //pFrame.aMem[i] = pFrame.aMem[pFrame.nMem+i];
                                 pMem = malloc_cs.sqlite3Malloc(pMem);
@@ -1640,12 +1640,12 @@ namespace Community.CsharpSqlite.Engine.Op
                         vdbe.pFrame = pFrame;
                         vdbe.aMem = aMem = pFrame.aChildMem;
                         // &VdbeFrameMem( pFrame )[-1];
-                        vdbe.nMem = pFrame.nChildMem;
+                        //vdbe.aMem.Count() = pFrame.nChildMem;
                         vdbe.nCursor = (u16)pFrame.nChildCsr;
                         vdbe.OpenCursors = pFrame.aChildCsr;
                         // (VdbeCursor *)&aMem[p->nMem+1];
                         vdbe.lOp = lOp = new List<Operation>(pProgram.aOp);
-                        vdbe.nOp = pProgram.nOp;
+                        //vdbe.nOp = pProgram.nOp;
                         cpu.opcodeIndex = -1;
                         break;
                     }
@@ -1809,7 +1809,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             Sqlite3.sqlite3VdbeMemStoreType(pRec);
                         }
                         ctx.pFunc = pOp.p4.pFunc;
-                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.nMem);
+                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.aMem.Count());
                         ctx.pMem = pMem = aMem[pOp.p3];
                         pMem.n++;
                         ctx.s.flags = MemFlags.MEM_Null;
@@ -1862,7 +1862,7 @@ namespace Community.CsharpSqlite.Engine.Op
                 case OpCode.OP_AggFinal:
                     {
                         Mem pMem;
-                        Debug.Assert(pOp.p1 > 0 && pOp.p1 <= vdbe.nMem);
+                        Debug.Assert(pOp.p1 > 0 && pOp.p1 <= vdbe.aMem.Count());
                         pMem = aMem[pOp.p1];
                         Debug.Assert((pMem.flags & ~(MemFlags.MEM_Null | MemFlags.MEM_Agg)) == 0);
                         rc = vdbemem_cs.sqlite3VdbeMemFinalize(pMem, pOp.p4.pFunc);
@@ -2090,7 +2090,7 @@ break;
             too_big
 
         }
-        private static SqlResult OpCode_Column(Vdbe vdbe, Operation pOp, SqlResult rc, Connection db, SqliteEncoding encoding, Mem[] aMem)
+        private static SqlResult OpCode_Column(Vdbe vdbe, Operation pOp, SqlResult rc, Connection db, SqliteEncoding encoding, IList<Mem> aMem)
         {
             ///The length of the serialized data for the column 
             int len;
@@ -2135,7 +2135,7 @@ break;
             ///Part of the record being decoded 
             byte[] zData = null;
             ///Where to write the extracted value 
-            Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.nMem);
+            Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.aMem.Count());
             Mem pDest = aMem[pOp.p3];
             ///For storing the record being decoded 
             Mem sMem = null;
@@ -2477,7 +2477,7 @@ break;
 
 
         //yDbMask 
-        private static SqlResult OpCode_ResultRow(Vdbe vdbe,int opcodeIndex, int dataOffset, int columnCount, SqlResult rc, Mem[] memoryBuffer)
+        private static SqlResult OpCode_ResultRow(Vdbe vdbe,int opcodeIndex, int dataOffset, int columnCount, SqlResult rc, IList< Mem> memoryBuffer)
         {
             var db = vdbe.db;
             //Mem[] pMem;
@@ -2545,7 +2545,7 @@ break;
         }
 
 
-        private static void OCode_Compare(Vdbe vdbe,Operation pOp, Mem[] aMem, ref int iCompare, ref int[] aPermute)
+        private static void OCode_Compare(Vdbe vdbe,Operation pOp, List<Mem> aMem, ref int iCompare, ref int[] aPermute)
         {
             int n;
             int i;

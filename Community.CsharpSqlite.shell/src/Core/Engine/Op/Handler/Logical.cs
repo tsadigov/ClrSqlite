@@ -494,7 +494,7 @@ namespace Community.CsharpSqlite.Engine.Op
             return RuntimeException.OK;
         }
 
-        private static void OpCode_AndOr(VdbeOp pOp, Mem[] aMem)
+        private static void OpCode_AndOr(VdbeOp pOp, IList<Mem> aMem)
         {
             ///same as TokenType.TK_OR, in1, in2, ref3 
             int v1;

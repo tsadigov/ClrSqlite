@@ -5,8 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Community.CsharpSqlite.Engine.Op
 {
+    using CsharpSqlite.Metadata;
+    using sqlite3_value = Engine.Mem;
     public static class ControlFlow
     {
         public static RuntimeException Exec(CPU cpu, OpCode opcode, VdbeOp pOp)
@@ -268,6 +271,150 @@ namespace Community.CsharpSqlite.Engine.Op
                         {
                             cpu.opcodeIndex = pOp.p2 - 1;
                         }
+                        break;
+                    }
+
+
+
+
+                ///
+                ///<summary>
+                ///Opcode: Function P1 P2 P3 P4 P5
+                ///
+                ///Invoke a user function (P4 is a pointer to a Function structure that
+                ///defines the function) with P5 arguments taken from register P2 and
+                ///successors.  The result of the function is stored in register P3.
+                ///Register P3 must not be one of the function inputs.
+                ///
+                ///</summary>
+                ///<param name="P1 is a 32">bit bitmask indicating whether or not each argument to the</param>
+                ///<param name="function was determined to be constant at compile time. If the first">function was determined to be constant at compile time. If the first</param>
+                ///<param name="argument was constant then bit 0 of P1 is set. This is used to determine">argument was constant then bit 0 of P1 is set. This is used to determine</param>
+                ///<param name="whether meta data associated with a user function argument using the">whether meta data associated with a user function argument using the</param>
+                ///<param name="sqlite3_set_auxdata() API may be safely retained until the next">sqlite3_set_auxdata() API may be safely retained until the next</param>
+                ///<param name="invocation of this opcode.">invocation of this opcode.</param>
+                ///<param name=""></param>
+                ///<param name="See also: AggStep and AggFinal">See also: AggStep and AggFinal</param>
+                ///<param name=""></param>
+                case OpCode.OP_Function:
+                    {
+                        var vdbe = cpu.vdbe;
+                        var db = vdbe.db;
+                        int i;
+                        Mem pArg;
+                        sqlite3_context ctx = new sqlite3_context();
+                        sqlite3_value[] apVal;
+                        int n;
+                        n = pOp.p5;
+                        apVal = vdbe.apArg;
+                        Debug.Assert(apVal != null || n == 0);
+                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= vdbe.aMem.Count());
+                        cpu.pOut = aMem[pOp.p3];
+                        vdbe.memAboutToChange(cpu.pOut);
+                        Debug.Assert(n == 0 || (pOp.p2 > 0 && pOp.p2 + n <= vdbe.aMem.Count() + 1));
+                        Debug.Assert(pOp.p3 < pOp.p2 || pOp.p3 >= pOp.p2 + n);
+                        //pArg = aMem[pOp.p2];
+                        for (i = 0; i < n; i++)//, pArg++)
+                        {
+                            pArg = aMem[pOp.p2 + i];
+                            Debug.Assert(pArg.memIsValid());
+                            apVal[i] = pArg;
+                            Sqlite3.Deephemeralize(pArg);
+                            Sqlite3.sqlite3VdbeMemStoreType(pArg);
+                            Sqlite3.REGISTER_TRACE(vdbe, pOp.p2 + i, pArg);
+                        }
+                        Debug.Assert(pOp.p4type == P4Usage.P4_FUNCDEF || pOp.p4type == P4Usage.P4_VDBEFUNC);
+                        if (pOp.p4type == P4Usage.P4_FUNCDEF)
+                        {
+                            ctx.pFunc = pOp.p4.pFunc;
+                            ctx.pVdbeFunc = null;
+                        }
+                        else
+                        {
+                            ctx.pVdbeFunc = (Metadata.VdbeFunc)pOp.p4.pVdbeFunc;
+                            ctx.pFunc = ctx.pVdbeFunc.pFunc;
+                        }
+                        ctx.s.flags = MemFlags.MEM_Null;
+                        ctx.s.db = db;
+                        ctx.s.xDel = null;
+                        //ctx.s.zMalloc = null;
+                        ///
+                        ///<summary>
+                        ///The output cell may already have a buffer allocated. Move
+                        ///</summary>
+                        ///<param name="the pointer to ctx.s so in case the user">function can use</param>
+                        ///<param name="the already allocated buffer instead of allocating a new one.">the already allocated buffer instead of allocating a new one.</param>
+                        ///<param name=""></param>
+                        vdbemem_cs.sqlite3VdbeMemMove(ctx.s, cpu.pOut);
+                        ctx.s.MemSetTypeFlag(MemFlags.MEM_Null);
+                        ctx.isError = 0;
+                        if ((ctx.pFunc.flags & FuncFlags.SQLITE_FUNC_NEEDCOLL) != 0)
+                        {
+                            Debug.Assert(cpu.opcodeIndex > 1);
+                            //Debug.Assert(pOp > aOp);
+                            Debug.Assert(vdbe.lOp[cpu.opcodeIndex - 1].p4type == P4Usage.P4_COLLSEQ);
+                            //Debug.Assert(pOp[-1].p4type ==  P4Usage.P4_COLLSEQ);
+                            Debug.Assert(vdbe.lOp[cpu.opcodeIndex - 1].OpCode == OpCode.OP_CollSeq);
+                            //Debug.Assert(pOp[-1].opcode ==  OpCode.OP_CollSeq);
+                            ctx.pColl = vdbe.lOp[cpu.opcodeIndex - 1].p4.pColl;
+                            //ctx.pColl = pOp[-1].p4.pColl;
+                        }
+                        db.lastRowid = cpu.lastRowid;
+                        ctx.pFunc.xFunc(ctx, n, apVal);
+                        ///* IMP: R-24505-23230 */
+                        cpu.lastRowid = db.lastRowid;
+                        ///
+                        ///<summary>
+                        ///If any auxillary data functions have been called by this user function,
+                        ///</summary>
+                        ///<param name="immediately call the destructor for any non">static values.</param>
+                        ///<param name=""></param>
+                        if (ctx.pVdbeFunc != null)
+                        {
+                            vdbeaux.sqlite3VdbeDeleteAuxData(ctx.pVdbeFunc, pOp.p1);
+                            pOp.p4.pVdbeFunc = ctx.pVdbeFunc;
+                            pOp.p4type = P4Usage.P4_VDBEFUNC;
+                        }
+                        //if ( db->mallocFailed )
+                        //{
+                        //  /* Even though a malloc() has failed, the implementation of the
+                        //  ** user function may have called an sqlite3_result_XXX() function
+                        //  ** to return a value. The following call releases any resources
+                        //  ** associated with such a value.
+                        //  */
+                        //   &u.ag.ctx.s .sqlite3VdbeMemRelease();
+                        //  goto no_mem;
+                        //}
+                        ///
+                        ///<summary>
+                        ///If the function returned an error, throw an exception 
+                        ///</summary>
+                        if (ctx.isError != 0)
+                        {
+                            malloc_cs.sqlite3SetString(ref vdbe.zErrMsg, db, vdbeapi.sqlite3_value_text(ctx.s));
+                            cpu.rc = ctx.isError;
+                        }
+                        ///
+                        ///<summary>
+                        ///Copy the result of the function into register P3 
+                        ///</summary>
+                        vdbemem_cs.sqlite3VdbeChangeEncoding(ctx.s, vdbe.encoding);
+                        vdbemem_cs.sqlite3VdbeMemMove(cpu.pOut, ctx.s);
+                        if (cpu.pOut.IsTooBig())
+                        {
+                            return RuntimeException.too_big;
+                        }
+#if FALSE
+																																																																																																																																				  /* The app-defined function has done something that as caused this
+  ** statement to expire.  (Perhaps the function called sqlite3_exec()
+  ** with a CREATE TABLE statement.)
+  */
+  if( p.expired ) rc = SQLITE_ABORT;
+#endif
+                        Sqlite3.REGISTER_TRACE(vdbe, pOp.p3, cpu.pOut);
+#if SQLITE_TEST
+																																																																																																																																				              UPDATE_MAX_BLOBSIZE( pOut );
+#endif
                         break;
                     }
                 default: return RuntimeException.noop;

@@ -77,7 +77,7 @@ namespace Community.CsharpSqlite
             public override void ShowDebugInfo()
             {
                 Console.Clear();
-                for (int i = 0; i < nOp; i++)
+                for (int i = 0; i < aOp.Count(); i++)
                 {
                     var clr = Console.ForegroundColor;
                     var bgclr = Console.BackgroundColor;
@@ -108,17 +108,18 @@ namespace Community.CsharpSqlite
             {
                 Console.WriteLine();
                 tabcount++;
-                for (int i = 0; i < frame.nOp; i++)
-                {
-                    var clr = Console.ForegroundColor;
-                    var bgclr = Console.BackgroundColor;
-                    //Console.ForegroundColor = i == frame.opcodeIndex ? ConsoleColor.Red : ConsoleColor.White;
-                    Console.BackgroundColor = i == frame.currentOpCodeIndex ? ConsoleColor.DarkMagenta : ConsoleColor.Black;
-                    Console.WriteLine(tab[tabcount] + lOp[i].OpCode);
-                    Console.ForegroundColor = clr;
-                    Console.BackgroundColor = bgclr;
-
-                }
+                frame.aOp.ForEach(
+                    op => {
+                        var clr = Console.ForegroundColor;
+                        var bgclr = Console.BackgroundColor;
+                        //Console.ForegroundColor = i == frame.opcodeIndex ? ConsoleColor.Red : ConsoleColor.White;
+                        //Console.BackgroundColor = i == frame.currentOpCodeIndex ? ConsoleColor.DarkMagenta : ConsoleColor.Black;
+                        Console.WriteLine(tab[tabcount] + op.OpCode);
+                        Console.ForegroundColor = clr;
+                        Console.BackgroundColor = bgclr;
+                    }
+                );
+                
             }
 
             #region hehehe
@@ -145,7 +146,7 @@ namespace Community.CsharpSqlite
             ///The memory locations 
             ///</summary>
             public List<Operation> lOp = new List<Operation>();
-            public Mem[] aMem;
+            
             public Mem[] apArg;
             ///
             ///<summary>
@@ -161,23 +162,23 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Pointer to an array of results 
             ///</summary>
-            public int nMem;
+            //public int nMem;
             ///
             ///<summary>
             ///Number of memory locations currently allocated 
             ///</summary>
-            public int nOp;
+            //public int nOp;
             ///
             ///<summary>
             ///Number of instructions in the program 
             ///</summary>
-            public int nOpAlloc;
+            //public int nOpAlloc;
             ///
             ///<summary>
             ///Number of slots allocated for aOp[] 
             ///</summary>
             //** Space to hold the virtual machine's program */
-            public Operation[] aOp;
+            public List<Operation> aOp { get { return lOp; } set { lOp = value; } }
 
 
             #region refactored
@@ -416,8 +417,8 @@ namespace Community.CsharpSqlite
                 ct.db = db;
                 ct.pPrev = pPrev;
                 ct.pNext = pNext;
-                ct.nOp = nOp;
-                ct.nOpAlloc = nOpAlloc;
+                //ct.nOp = nOp;
+                //ct.nOpAlloc = nOpAlloc;
                 ct.lOp = lOp;
                 //ct.nLabel = nLabel;
                 //ct.nLabelAlloc = nLabelAlloc;
@@ -431,7 +432,7 @@ namespace Community.CsharpSqlite
                 ct.nVar = nVar;
                 ct.nzVar = nzVar;
                 ct.magic = magic;
-                ct.nMem = nMem;
+                //ct.nMem = nMem;
                 ct.aMem = aMem;
                 ct.cacheCtr = cacheCtr;
                 ct.currentOpCodeIndex = currentOpCodeIndex;
@@ -552,13 +553,11 @@ ct.pLruNext=pLruNext;
                 return sqlite3VdbeAddOp3((OpCode)op, p1, p2, p3);
             }
             public int sqlite3VdbeAddOp3(OpCode op, int p1, int p2, int p3)
-            {
-                int i;
-                VdbeOp pOp;
-                i = this.nOp;
+            {   
+                //var i = this.nOp;
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
                 //Debug.Assert(op>0&&op<0xff);
-                if (this.nOpAlloc <= i)
+                /*if (this.nOpAlloc <= i)
                 {
                     if (this.growOpArray() != 0)
                     {
@@ -566,14 +565,17 @@ ct.pLruNext=pLruNext;
                     }
                 }
                 this.nOp++;
-                pOp = new Operation();
-                pOp.OpCode = op;
-                pOp.p5 = 0;
-                pOp.p1 = p1;
-                pOp.p2 = p2;
-                pOp.p3 = p3;
-                pOp.p4.p = null;
-                pOp.p4type = P4Usage.P4_NOTUSED;
+                */
+                var pOp = new Operation()
+                {
+                    OpCode = op,
+                    p5 = 0,
+                    p1 = p1,
+                    p2 = p2,
+                    p3 = p3,
+                    p4type = P4Usage.P4_NOTUSED
+                };
+                pOp.p4.p = null;                
                 lOp.Add(pOp);
 #if SQLITE_DEBUG
 																																																																																									      pOp.zComment = null;
@@ -584,7 +586,7 @@ ct.pLruNext=pLruNext;
 																																																																																									pOp.cycles = 0;
 pOp.cnt = 0;
 #endif
-                return i;
+                return aOp.Count()-1;
             }
 
             public int sqlite3VdbeAddOp0(OpCode op)
@@ -795,7 +797,7 @@ pOp.cnt = 0;
                 Debug.Assert(j >= 0 && j < this.aLabel.Count());
                 if (this.aLabel != null)
                 {
-                    this.aLabel[j] = this.nOp;
+                    this.aLabel[j] = this.aOp.Count();
                 }
             }
             public void sqlite3VdbeRunOnlyOnce()
@@ -809,7 +811,7 @@ pOp.cnt = 0;
                 Operation pOp;
                 var aLabel = this.aLabel;
                 this.readOnly = true;
-                for (i = 0; i < this.nOp; i++)//  for(pOp=p->aOp, i=p->nOp-1; i>=0; i--, pOp++)
+                for (i = 0; i < this.aOp.Count(); i++)//  for(pOp=p->aOp, i=p->nOp-1; i>=0; i--, pOp++)
                 {
                     pOp = this.lOp[i];
                     OpCode opcode = pOp.OpCode;
@@ -835,7 +837,7 @@ pOp.cnt = 0;
                                 if (opcode == OpCode.OP_VFilter)
                     {
                         int n;
-                        Debug.Assert(this.nOp - i >= 3);
+                        Debug.Assert(this.aOp.Count() - i >= 3);
                         Debug.Assert(this.lOp[i - 1].OpCode == OpCode.OP_Integer);
                         //pOp[-1].opcode==OpCode.OP_Integer );
                         n = this.lOp[i - 1].p1;
@@ -856,7 +858,7 @@ pOp.cnt = 0;
             public int sqlite3VdbeCurrentAddr()
             {
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
-                return this.nOp;
+                return this.aOp.Count();
             }
             public VdbeOp[] sqlite3VdbeTakeOpArray(ref int pnOp, ref int pnMaxArg)
             {
@@ -869,7 +871,7 @@ pOp.cnt = 0;
                 ///</summary>
                 Debug.Assert(this.btreeMask == 0);
                 this.resolveP2Values(ref pnMaxArg);
-                pnOp = this.nOp;
+                pnOp = this.aOp.Count();
                 this.lOp = null;
                 return lOp.ToArray();
             }
@@ -877,11 +879,11 @@ pOp.cnt = 0;
             {
                 int addr;
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
-                if (this.nOp + nOp > this.nOpAlloc && this.growOpArray() != 0)
+                if (this.aOp.Count() + nOp > this.aOp.Capacity && this.growOpArray() != 0)
                 {
                     return 0;
                 }
-                addr = this.nOp;
+                addr = this.aOp.Count();
                 if (Sqlite3.ALWAYS(nOp > 0))
                 {
                     int i;
@@ -890,24 +892,17 @@ pOp.cnt = 0;
                     {
                         pIn = aOp[i];
                         int p2 = pIn.p2;
-                        if (this.lOp[i + addr] == null)
-                            this.lOp[i + addr] = new VdbeOp();
-                        VdbeOp pOut = this.lOp[i + addr];
-                        pOut.opcode = pIn.opcode;
-                        pOut.p1 = pIn.p1;
-                        if (p2 < 0 && (Sqlite3.sqlite3OpcodeProperty[pOut.opcode] & (OpFlag)Sqlite3.OPFLG_JUMP) != 0)
+                        //if (this.lOp[i + addr] == null)
+                        var pOut = this.lOp[i + addr] = new VdbeOp()
                         {
-                            pOut.p2 = addr + (-1 - p2);
-                            // ADDR(p2);
-                        }
-                        else
-                        {
-                            pOut.p2 = p2;
-                        }
-                        pOut.p3 = pIn.p3;
-                        pOut.p4type = P4Usage.P4_NOTUSED;
+                            opcode = pIn.opcode,
+                            p1 = pIn.p1,
+                            p2 = (p2 < 0 && (Sqlite3.sqlite3OpcodeProperty[pIn.opcode] & (OpFlag)Sqlite3.OPFLG_JUMP) != 0) ? addr + (-1 - p2) : p2,
+                            p3 = pIn.p3,
+                            p4type = P4Usage.P4_NOTUSED,
+                            p5 = 0
+                        };                    
                         pOut.p4.p = null;
-                        pOut.p5 = 0;
 #if SQLITE_DEBUG
 																																																																																																																																															          pOut.zComment = null;
           if ( sqlite3VdbeAddopTrace )
@@ -916,7 +911,7 @@ pOp.cnt = 0;
           }
 #endif
                     }
-                    this.nOp += nOp;
+                    
                 }
                 return addr;
             }
@@ -924,7 +919,7 @@ pOp.cnt = 0;
             {
                 Debug.Assert(this != null);
                 Debug.Assert(addr >= 0);
-                if (this.nOp > addr)
+                if (this.aOp.Count() > addr)
                 {
                     this.lOp[addr].p1 = val;
                 }
@@ -933,7 +928,7 @@ pOp.cnt = 0;
             {
                 Debug.Assert(this != null);
                 Debug.Assert(addr >= 0);
-                if (this.nOp > addr)
+                if (this.aOp.Count() > addr)
                 {
                     this.lOp[addr].p2 = val;
                 }
@@ -942,7 +937,7 @@ pOp.cnt = 0;
             {
                 Debug.Assert(this != null);
                 Debug.Assert(addr >= 0);
-                if (this.nOp > addr)
+                if (this.aOp.Count() > addr)
                 {
                     this.lOp[addr].p3 = val;
                 }
@@ -952,8 +947,8 @@ pOp.cnt = 0;
                 Debug.Assert(this != null);
                 if (this.lOp != null)
                 {
-                    Debug.Assert(this.nOp > 0);
-                    this.lOp[this.nOp - 1].p5 = val;
+                    Debug.Assert(this.aOp.Count() > 0);
+                    this.lOp[this.aOp.Count() - 1].p5 = val;
                 }
             }
             public void sqlite3VdbeChangeP5(OpFlag val)
@@ -965,14 +960,14 @@ pOp.cnt = 0;
                 Debug.Assert(this != null);
                 if (this.lOp != null)
                 {
-                    Debug.Assert(this.nOp > 0);
-                    this.lOp[this.nOp - 1].p5 = (u8)val;
+                    Debug.Assert(this.aOp.Count() > 0);
+                    this.lOp[this.aOp.Count() - 1].p5 = (u8)val;
                 }
             }
             public void sqlite3VdbeJumpHere(int addr)
             {
                 Debug.Assert(addr >= 0);
-                this.sqlite3VdbeChangeP2(addr, this.nOp);
+                this.sqlite3VdbeChangeP2(addr, this.aOp.Count());
             }
             public void sqlite3VdbeChangeP4(int addr, CollSeq pColl, P4Usage n)
             {
@@ -1054,11 +1049,11 @@ pOp.cnt = 0;
                     }
                     return;
                 }
-                Debug.Assert(this.nOp > 0);
-                Debug.Assert(addr < this.nOp);
+                Debug.Assert(this.aOp.Count() > 0);
+                Debug.Assert(addr < this.aOp.Count());
                 if (addr < 0)
                 {
-                    addr = this.nOp - 1;
+                    addr = this.aOp.Count() - 1;
                 }
                 pOp = this.lOp[addr];
                 vdbeaux.freeP4(db, pOp.p4type, pOp.p4.p);
@@ -1199,12 +1194,12 @@ pOp.cnt = 0;
 #if SQLITE_OMIT_TRACE
 																																																																																																																				if( p.nOp==0 ) return dummy;
 #endif
-                    addr = this.nOp - 1;
+                    addr = this.aOp.Count() - 1;
                 }
-                Debug.Assert((addr >= 0 && addr < this.nOp)///
-                                                           ///<summary>
-                                                           ///|| p.db.mallocFailed != 0 
-                                                           ///</summary>
+                Debug.Assert((addr >= 0 && addr < this.aOp.Count())///
+                                                                   ///<summary>
+                                                                   ///|| p.db.mallocFailed != 0 
+                                                                   ///</summary>
                 );
                 //if ( p.db.mallocFailed != 0 )
                 //{
@@ -1369,7 +1364,7 @@ pOp.cnt = 0;
                 }
             }
             public SqlResult growOpArray()
-            {
+            {/*
                 //VdbeOp pNew;
                 int nNew = (this.nOpAlloc != 0 ? this.nOpAlloc * 2 : 1024 / 4);
                 //(int)(1024/sizeof(Operation)));
@@ -1383,7 +1378,7 @@ pOp.cnt = 0;
                 if (this.aOp == null)
                     this.aOp = new VdbeOp[nNew];
                 else
-                    Array.Resize(ref this.aOp, nNew);
+                    Array.Resize(ref this.aOp, nNew);*/
                 return (this.aOp != null ? SqlResult.SQLITE_OK : SqlResult.SQLITE_NOMEM);
                 //  return (pNew ? SqlResult.SQLITE_OK : SQLITE_NOMEM);
             }
@@ -1412,7 +1407,7 @@ pOp.cnt = 0;
                 ///There should be at least one opcode.
                 ///
                 ///</summary>
-                Debug.Assert(this.nOp > 0);
+                Debug.Assert(this.aOp.Count() > 0);
                 ///
                 ///<summary>
                 ///Set the magic to VdbeMagic.VDBE_MAGIC_RUN sooner rather than later. 
@@ -1986,7 +1981,7 @@ fclose(out);
             {
 
                 ///The program counter 
-                Operation[] aOp = this.aOp;
+                var aOp = this.aOp;
                 var lOp = this.lOp;
                 /*
                 Log.WriteHeader("Plan VdbeExec");
@@ -1999,8 +1994,7 @@ fclose(out);
                  */
                 try
                 {
-                    ///Copy of p.aOp 
-                    Operation pOp;
+                    
                     ///Current operation 
                     ///Value to return 
                     rc = SqlResult.SQLITE_OK;
@@ -2016,7 +2010,7 @@ fclose(out);
                     int nProgressOps = 0;
                     ///Opcodes executed since progress callback. 
 #endif
-                    Mem[] aMem = this.aMem;
+                    //var aMem = this.aMem;
                     ///Copy of p.aMem 
                     Mem pIn1 = null;
                     ///1st input operand 
@@ -2088,15 +2082,16 @@ int origPc;                  /* Program counter at start of opcode */
                     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------					///
 
                     #region MAIN CPU LOOP
-                    for (opcodeIndex = this.currentOpCodeIndex; rc == SqlResult.SQLITE_OK; opcodeIndex++)
+                    for (this.opcodeIndex = this.currentOpCodeIndex; rc == SqlResult.SQLITE_OK; this.opcodeIndex++)
                     {
-                        Debug.Assert(opcodeIndex >= 0 && opcodeIndex < this.nOp);
+                        Debug.Assert(opcodeIndex >= 0 && opcodeIndex < this.aOp.Count());
                         //      if ( db.mallocFailed != 0 ) goto no_mem;
 #if VDBE_PROFILE
 																																																																																																											origPc = pc;
 start = sqlite3Hwtime();
 #endif
-                        pOp = lOp[opcodeIndex];
+                        ///Copy of p.aOp 
+                        var pOp = lOp[opcodeIndex];
                         ///Only allow tracing if SQLITE_DEBUG is defined.
 #if SQLITE_DEBUG
 																																																																																																											        if ( p.trace != null )
@@ -2160,7 +2155,7 @@ start = sqlite3Hwtime();
                         if (((int)pOp.opflags & Sqlite3.OPFLG_OUT2_PRERELEASE) != 0)
                         {
                             Debug.Assert(pOp.p2 > 0);
-                            Debug.Assert(pOp.p2 <= this.nMem);
+                            Debug.Assert(pOp.p2 <= this.aMem.Count());
                             pOut = aMem[pOp.p2];
                             this.memAboutToChange(pOut);
                             pOut.sqlite3VdbeMemReleaseExternal();
@@ -2391,7 +2386,7 @@ start = sqlite3Hwtime();
                                     {
                                         Debug.Assert(this.nResColumn == pOp.p2);
                                         Debug.Assert(pOp.p1 > 0);
-                                        Debug.Assert(pOp.p1 + pOp.p2 <= this.nMem + 1);
+                                        Debug.Assert(pOp.p1 + pOp.p2 <= this.aMem.Count() + 1);
 
                                         rc = OpCode_ResultRow(opcodeIndex, pOp.p1, pOp.p2, rc, aMem);
                                         goto vdbe_return;
@@ -2491,144 +2486,7 @@ start = sqlite3Hwtime();
                                     }
 
 
-                                ///
-                                ///<summary>
-                                ///Opcode: Function P1 P2 P3 P4 P5
-                                ///
-                                ///Invoke a user function (P4 is a pointer to a Function structure that
-                                ///defines the function) with P5 arguments taken from register P2 and
-                                ///successors.  The result of the function is stored in register P3.
-                                ///Register P3 must not be one of the function inputs.
-                                ///
-                                ///</summary>
-                                ///<param name="P1 is a 32">bit bitmask indicating whether or not each argument to the</param>
-                                ///<param name="function was determined to be constant at compile time. If the first">function was determined to be constant at compile time. If the first</param>
-                                ///<param name="argument was constant then bit 0 of P1 is set. This is used to determine">argument was constant then bit 0 of P1 is set. This is used to determine</param>
-                                ///<param name="whether meta data associated with a user function argument using the">whether meta data associated with a user function argument using the</param>
-                                ///<param name="sqlite3_set_auxdata() API may be safely retained until the next">sqlite3_set_auxdata() API may be safely retained until the next</param>
-                                ///<param name="invocation of this opcode.">invocation of this opcode.</param>
-                                ///<param name=""></param>
-                                ///<param name="See also: AggStep and AggFinal">See also: AggStep and AggFinal</param>
-                                ///<param name=""></param>
-                                case OpCode.OP_Function:
-                                    {
-                                        int i;
-                                        Mem pArg;
-                                        sqlite3_context ctx = new sqlite3_context();
-                                        sqlite3_value[] apVal;
-                                        int n;
-                                        n = pOp.p5;
-                                        apVal = this.apArg;
-                                        Debug.Assert(apVal != null || n == 0);
-                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.nMem);
-                                        pOut = aMem[pOp.p3];
-                                        this.memAboutToChange(pOut);
-                                        Debug.Assert(n == 0 || (pOp.p2 > 0 && pOp.p2 + n <= this.nMem + 1));
-                                        Debug.Assert(pOp.p3 < pOp.p2 || pOp.p3 >= pOp.p2 + n);
-                                        //pArg = aMem[pOp.p2];
-                                        for (i = 0; i < n; i++)//, pArg++)
-                                        {
-                                            pArg = aMem[pOp.p2 + i];
-                                            Debug.Assert(pArg.memIsValid());
-                                            apVal[i] = pArg;
-                                            Sqlite3.Deephemeralize(pArg);
-                                            Sqlite3.sqlite3VdbeMemStoreType(pArg);
-                                            Sqlite3.REGISTER_TRACE(this, pOp.p2 + i, pArg);
-                                        }
-                                        Debug.Assert(pOp.p4type == P4Usage.P4_FUNCDEF || pOp.p4type == P4Usage.P4_VDBEFUNC);
-                                        if (pOp.p4type == P4Usage.P4_FUNCDEF)
-                                        {
-                                            ctx.pFunc = pOp.p4.pFunc;
-                                            ctx.pVdbeFunc = null;
-                                        }
-                                        else
-                                        {
-                                            ctx.pVdbeFunc = (Metadata.VdbeFunc)pOp.p4.pVdbeFunc;
-                                            ctx.pFunc = ctx.pVdbeFunc.pFunc;
-                                        }
-                                        ctx.s.flags = MemFlags.MEM_Null;
-                                        ctx.s.db = db;
-                                        ctx.s.xDel = null;
-                                        //ctx.s.zMalloc = null;
-                                        ///
-                                        ///<summary>
-                                        ///The output cell may already have a buffer allocated. Move
-                                        ///</summary>
-                                        ///<param name="the pointer to ctx.s so in case the user">function can use</param>
-                                        ///<param name="the already allocated buffer instead of allocating a new one.">the already allocated buffer instead of allocating a new one.</param>
-                                        ///<param name=""></param>
-                                        vdbemem_cs.sqlite3VdbeMemMove(ctx.s, pOut);
-                                        ctx.s.MemSetTypeFlag(MemFlags.MEM_Null);
-                                        ctx.isError = 0;
-                                        if ((ctx.pFunc.flags & FuncFlags.SQLITE_FUNC_NEEDCOLL) != 0)
-                                        {
-                                            Debug.Assert(opcodeIndex > 1);
-                                            //Debug.Assert(pOp > aOp);
-                                            Debug.Assert(this.lOp[opcodeIndex - 1].p4type == P4Usage.P4_COLLSEQ);
-                                            //Debug.Assert(pOp[-1].p4type ==  P4Usage.P4_COLLSEQ);
-                                            Debug.Assert(this.lOp[opcodeIndex - 1].OpCode == OpCode.OP_CollSeq);
-                                            //Debug.Assert(pOp[-1].opcode ==  OpCode.OP_CollSeq);
-                                            ctx.pColl = this.lOp[opcodeIndex - 1].p4.pColl;
-                                            //ctx.pColl = pOp[-1].p4.pColl;
-                                        }
-                                        db.lastRowid = lastRowid;
-                                        ctx.pFunc.xFunc(ctx, n, apVal);
-                                        ///* IMP: R-24505-23230 */
-                                        lastRowid = db.lastRowid;
-                                        ///
-                                        ///<summary>
-                                        ///If any auxillary data functions have been called by this user function,
-                                        ///</summary>
-                                        ///<param name="immediately call the destructor for any non">static values.</param>
-                                        ///<param name=""></param>
-                                        if (ctx.pVdbeFunc != null)
-                                        {
-                                            vdbeaux.sqlite3VdbeDeleteAuxData(ctx.pVdbeFunc, pOp.p1);
-                                            pOp.p4.pVdbeFunc = ctx.pVdbeFunc;
-                                            pOp.p4type = P4Usage.P4_VDBEFUNC;
-                                        }
-                                        //if ( db->mallocFailed )
-                                        //{
-                                        //  /* Even though a malloc() has failed, the implementation of the
-                                        //  ** user function may have called an sqlite3_result_XXX() function
-                                        //  ** to return a value. The following call releases any resources
-                                        //  ** associated with such a value.
-                                        //  */
-                                        //   &u.ag.ctx.s .sqlite3VdbeMemRelease();
-                                        //  goto no_mem;
-                                        //}
-                                        ///
-                                        ///<summary>
-                                        ///If the function returned an error, throw an exception 
-                                        ///</summary>
-                                        if (ctx.isError != 0)
-                                        {
-                                            malloc_cs.sqlite3SetString(ref this.zErrMsg, db, vdbeapi.sqlite3_value_text(ctx.s));
-                                            rc = ctx.isError;
-                                        }
-                                        ///
-                                        ///<summary>
-                                        ///Copy the result of the function into register P3 
-                                        ///</summary>
-                                        vdbemem_cs.sqlite3VdbeChangeEncoding(ctx.s, encoding);
-                                        vdbemem_cs.sqlite3VdbeMemMove(pOut, ctx.s);
-                                        if (pOut.IsTooBig())
-                                        {
-                                            goto too_big;
-                                        }
-#if FALSE
-																																																																																																																																				  /* The app-defined function has done something that as caused this
-  ** statement to expire.  (Perhaps the function called sqlite3_exec()
-  ** with a CREATE TABLE statement.)
-  */
-  if( p.expired ) rc = SQLITE_ABORT;
-#endif
-                                        Sqlite3.REGISTER_TRACE(this, pOp.p3, pOut);
-#if SQLITE_TEST
-																																																																																																																																				              UPDATE_MAX_BLOBSIZE( pOut );
-#endif
-                                        break;
-                                    }
+                                
 
 
 
@@ -2769,7 +2627,7 @@ start = sqlite3Hwtime();
                                         ///Number of zero bytes at the end of the record 
                                         nField = pOp.p1;
                                         zAffinity = (pOp.p4.z == null || pOp.p4.z.Length == 0) ? "" : pOp.p4.z;
-                                        Debug.Assert(nField > 0 && pOp.p2 > 0 && pOp.p2 + nField <= this.nMem + 1);
+                                        Debug.Assert(nField > 0 && pOp.p2 > 0 && pOp.p2 + nField <= this.aMem.Count() + 1);
                                         //pData0 = aMem[nField];
                                         nField = pOp.p2;
                                         //pLast =  pData0[nField - 1];
@@ -2865,7 +2723,7 @@ start = sqlite3Hwtime();
                                             i += (int)vdbeaux.sqlite3VdbeSerialPut(zNewRecord, i, (int)nByte - i, pRec, file_format);
                                         }
                                         //TODO -- Remove this  for testing Debug.Assert( i == nByte );
-                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.nMem);
+                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.aMem.Count());
                                         pOut.zBLOB = zNewRecord;
                                         pOut.z = null;
                                         pOut.n = (int)nByte;
@@ -3460,7 +3318,7 @@ start = sqlite3Hwtime();
                                         ///Assert that the values of parameters P1 and P4 are in range. 
                                         ///</summary>
                                         Debug.Assert(pOp.p4type == P4Usage.P4_INT32);
-                                        Debug.Assert(pOp.p4.i > 0 && pOp.p4.i <= this.nMem);
+                                        Debug.Assert(pOp.p4.i > 0 && pOp.p4.i <= this.aMem.Count());
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
                                         ///
                                         ///<summary>
@@ -3725,7 +3583,7 @@ start = sqlite3Hwtime();
                                                         ///<summary>
                                                         ///Assert that P3 is a valid memory cell. 
                                                         ///</summary>
-                                                        Debug.Assert(pOp.p3 <= rootFrame.nMem);
+                                                        Debug.Assert(pOp.p3 <= rootFrame.aMem.Count());
                                                         pMem = rootFrame.aMem[pOp.p3];
                                                     }
                                                     else
@@ -3734,7 +3592,7 @@ start = sqlite3Hwtime();
                                                         ///<summary>
                                                         ///Assert that P3 is a valid memory cell. 
                                                         ///</summary>
-                                                        Debug.Assert(pOp.p3 <= this.nMem);
+                                                        Debug.Assert(pOp.p3 <= this.aMem.Count());
                                                         pMem = aMem[pOp.p3];
                                                         this.memAboutToChange(pMem);
                                                     }
@@ -4408,16 +4266,16 @@ start = sqlite3Hwtime();
                                             pFrame.nChildCsr = pProgram.nCsr;
                                             pFrame.currentOpCodeIndex = opcodeIndex;
                                             pFrame.aMem = this.aMem;
-                                            pFrame.nMem = this.nMem;
+                                            //pFrame.nMem = this.nMem;
                                             pFrame.apCsr = this.OpenCursors;
                                             pFrame.nCursor = this.nCursor;
                                             pFrame.aOp = this.aOp;
-                                            pFrame.nOp = this.nOp;
+                                            //pFrame.nOp = this.nOp;
                                             pFrame.token = pProgram.token;
                                             // &VdbeFrameMem( pFrame )[pFrame.nChildMem];
                                             // aMem is 1 based, so allocate 1 extra cell under C#
-                                            pFrame.aChildMem = new Mem[pFrame.nChildMem + 1];
-                                            for (int i = 0; i < pFrame.aChildMem.Length; i++)//pMem = VdbeFrameMem( pFrame ) ; pMem != pEnd ; pMem++ )
+                                            pFrame.aChildMem = new List<Mem>(pFrame.nChildMem + 1);
+                                            for (int i = 0; i < pFrame.aChildMem.Count(); i++)//pMem = VdbeFrameMem( pFrame ) ; pMem != pEnd ; pMem++ )
                                             {
                                                 //pFrame.aMem[i] = pFrame.aMem[pFrame.nMem+i];
                                                 pMem = malloc_cs.sqlite3Malloc(pMem);
@@ -4444,12 +4302,12 @@ start = sqlite3Hwtime();
                                         this.pFrame = pFrame;
                                         this.aMem = aMem = pFrame.aChildMem;
                                         // &VdbeFrameMem( pFrame )[-1];
-                                        this.nMem = pFrame.nChildMem;
+                                        //this.nMem = pFrame.nChildMem;
                                         this.nCursor = (u16)pFrame.nChildCsr;
                                         this.OpenCursors = pFrame.aChildCsr;
                                         // (VdbeCursor *)&aMem[p->nMem+1];
                                         this.lOp = lOp = new List<Operation>(pProgram.aOp);
-                                        this.nOp = pProgram.nOp;
+                                        //this.nOp = pProgram.nOp;
                                         opcodeIndex = -1;
                                         break;
                                     }
@@ -4613,7 +4471,7 @@ start = sqlite3Hwtime();
                                             Sqlite3.sqlite3VdbeMemStoreType(pRec);
                                         }
                                         ctx.pFunc = pOp.p4.pFunc;
-                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.nMem);
+                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.aMem.Count());
                                         ctx.pMem = pMem = aMem[pOp.p3];
                                         pMem.n++;
                                         ctx.s.flags = MemFlags.MEM_Null;
@@ -4666,7 +4524,7 @@ start = sqlite3Hwtime();
                                 case OpCode.OP_AggFinal:
                                     {
                                         Mem pMem;
-                                        Debug.Assert(pOp.p1 > 0 && pOp.p1 <= this.nMem);
+                                        Debug.Assert(pOp.p1 > 0 && pOp.p1 <= this.aMem.Count());
                                         pMem = aMem[pOp.p1];
                                         Debug.Assert((pMem.flags & ~(MemFlags.MEM_Null | MemFlags.MEM_Agg)) == 0);
                                         rc = vdbemem_cs.sqlite3VdbeMemFinalize(pMem, pOp.p4.pFunc);
@@ -5115,7 +4973,7 @@ break;
                                         sqlite3_context sContext;
                                         VdbeCursor pCur = this.OpenCursors[pOp.p1];
                                         Debug.Assert(pCur.pVtabCursor != null);
-                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.nMem);
+                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.aMem.Count());
                                         pDest = aMem[pOp.p3];
                                         this.memAboutToChange(pDest);
                                         if (pCur.nullRow)
@@ -5500,7 +5358,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 too_big
 
             }
-            private SqlResult OpCode_Column(Operation pOp, SqlResult rc, Connection db, SqliteEncoding encoding, Mem[] aMem)
+            private SqlResult OpCode_Column(Operation pOp, SqlResult rc, Connection db, SqliteEncoding encoding, IList<Mem> aMem)
             {
                 ///The length of the serialized data for the column 
                 int len;
@@ -5545,7 +5403,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///Part of the record being decoded 
                 byte[] zData = null;
                 ///Where to write the extracted value 
-                Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.nMem);
+                Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.aMem.Count());
                 Mem pDest = aMem[pOp.p3];
                 ///For storing the record being decoded 
                 Mem sMem = null;
@@ -5885,7 +5743,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
             }
 
             //yDbMask 
-            private SqlResult OpCode_ResultRow(int opcodeIndex, int dataOffset, int columnCount, SqlResult rc, Mem[] memoryBuffer)
+            private SqlResult OpCode_ResultRow(int opcodeIndex, int dataOffset, int columnCount, SqlResult rc, IList<Mem> memoryBuffer)
             {
                 //Mem[] pMem;
                 int i;
@@ -5952,7 +5810,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
             }
 
 
-            private void OCode_Compare(Operation pOp, Mem[] aMem, ref int iCompare, ref int[] aPermute)
+            private void OCode_Compare(Operation pOp, IList<Mem> aMem, ref int iCompare, ref int[] aPermute)
             {
                 int n;
                 int i;
@@ -6080,24 +5938,4 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 
 
     }
-    public partial class Sqlite3
-    {
-    }
 }
-
-
-/*                            _OpCode.Exec,
-                            Engine.Op.BTree.Exec,
-                            Engine.Op.ControlFlow.Exec,
-                            Engine.Op.Math.Exec,
-                            Engine.Op.Schema.Exec,
-                            Engine.Op.Cast.Exec,
-                            Engine.Op.Cursor.Exec,
-                            Engine.Op.Idx.Exec,
-                            Engine.Op.Others.Exec,
-                            Engine.Op.VirtualTable.Exec,
-                            Engine.Op.Crud.Exec,
-                            Engine.Op.AutoVacuum.Exec,
-                            Engine.Op.Transaction.Exec,
-                            Engine.Op.TheRest.Exec
-                            */

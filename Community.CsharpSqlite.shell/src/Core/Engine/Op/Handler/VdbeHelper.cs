@@ -13,7 +13,7 @@ namespace Community.CsharpSqlite.Engine
     {
         public static RuntimeException Exec(CPU cpu,OpCode opcode,VdbeOp pOp)
         {
-            Mem[]aMem=cpu.aMem;
+            var aMem=cpu.aMem;
             SqliteEncoding encoding = cpu.encoding;
             Connection db=cpu.db;
             Mem pOut = cpu.pOut;
@@ -239,7 +239,7 @@ pOp.p1 = pOut.n;
             return RuntimeException.OK;
         }
 
-        static  void OpCode_SCopy(Vdbe vdbe ,VdbeOp pOp, Mem[] aMem)
+        static  void OpCode_SCopy(Vdbe vdbe ,VdbeOp pOp, IList<Mem> aMem)
         {
             ///
             ///<summary>
@@ -256,7 +256,7 @@ pOp.p1 = pOut.n;
             Sqlite3.REGISTER_TRACE(vdbe, pOp.p2, pOut);
         }
 
-        static void OpCode_Move(Vdbe vdbe,VdbeOp pOp, Mem[] aMem)
+        static void OpCode_Move(Vdbe vdbe,VdbeOp pOp, IList<Mem> aMem)
         {
             //char* zMalloc;   /* Holding variable for allocated memory */
             int n;
