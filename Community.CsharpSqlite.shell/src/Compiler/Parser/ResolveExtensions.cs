@@ -239,7 +239,7 @@ namespace Community.CsharpSqlite
                 u8 savedSuppErr;
                 ///<param name="Saved value of db">>suppressErr </param>
                 Debug.Assert( ! pE.sqlite3ExprIsInteger(ref i) );
-                pEList = pSelect.pEList;
+                pEList = pSelect.ResultingFieldList;
                 ///Resolve all names in the ORDER BY term expression
                 nc = new NameContext();
                 // memset( &nc, 0, sizeof( nc ) );
@@ -995,7 +995,7 @@ return WRC.WRC_Prune;
                 {
                     ExprList_item pItem;
                     moreToDo = 0;
-                    pEList = pSelect.pEList;
+                    pEList = pSelect.ResultingFieldList;
                     Debug.Assert(pEList != null);
                     for (i = 0; i < pOrderBy.nExpr; i++)//, pItem++)
                     {
@@ -1099,7 +1099,7 @@ return WRC.WRC_Prune;
                     return 1;
                 }
                 //#endif
-                pEList = pSelect.pEList;
+                pEList = pSelect.ResultingFieldList;
                 Debug.Assert(pEList != null);
                 ///
                 ///<summary>
@@ -1181,13 +1181,13 @@ return WRC.WRC_Prune;
                 ///</summary>
                 if (pOrderBy == null)
                     return 0;
-                nResult = pSelect.pEList.nExpr;
+                nResult = pSelect.ResultingFieldList.nExpr;
                 pParse = pNC.pParse;
                 for (i = 0; i < pOrderBy.nExpr; i++)//, pItem++ )
                 {
                     pItem = pOrderBy.a[i];
                     Expr pE = pItem.pExpr;
-                    iCol = ResolveExtensions.resolveAsName(pParse, pSelect.pEList, pE);
+                    iCol = ResolveExtensions.resolveAsName(pParse, pSelect.ResultingFieldList, pE);
                     if (iCol > 0)
                     {
                         ///
@@ -1319,7 +1319,7 @@ return WRC.WRC_Prune;
                     ///<summary>
                     ///Resolve names in the result set. 
                     ///</summary>
-                    pEList = p.pEList;
+                    pEList = p.ResultingFieldList;
                     Debug.Assert(pEList != null);
                     for (i = 0; i < pEList.nExpr; i++)
                     {
@@ -1389,7 +1389,7 @@ return WRC.WRC_Prune;
                     ///<param name="Minor point: If this is the case, then the expression will be">Minor point: If this is the case, then the expression will be</param>
                     ///<param name="re">evaluated for each reference to it.</param>
                     ///<param name=""></param>
-                    sNC.pEList = p.pEList;
+                    sNC.pEList = p.ResultingFieldList;
                     if (sqlite3ResolveExprNames(sNC, ref p.pWhere) != 0 || sqlite3ResolveExprNames(sNC, ref p.pHaving) != 0)
                     {
                         return WRC.WRC_Abort;

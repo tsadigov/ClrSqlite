@@ -52,7 +52,7 @@ namespace Community.CsharpSqlite.Ast {
             ///</summary>
             static void clearSelect(Connection db, Select p)
             {
-                exprc.sqlite3ExprListDelete(db, ref p.pEList);
+                exprc.sqlite3ExprListDelete(db, ref p.ResultingFieldList);
                 build.sqlite3SrcListDelete(db, ref p.pSrc);
                 exprc.sqlite3ExprDelete(db, ref p.pWhere);
                 exprc.sqlite3ExprListDelete(db, ref p.pGroupBy);
@@ -1469,7 +1469,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 pTab.nRef = 1;
                 pTab.zName = null;
                 pTab.nRowEst = 1000000;
-                selectColumnsFromExprList(pParse, pSelect.pEList, ref pTab.nCol, ref pTab.aCol);
+                selectColumnsFromExprList(pParse, pSelect.ResultingFieldList, ref pTab.nCol, ref pTab.aCol);
                 Select.selectAddColumnTypeAndCollation(pParse, pTab.nCol, pTab.aCol, pSelect);
                 pTab.iPKey = -1;
                 //if ( db.mallocFailed != 0 )
@@ -1595,9 +1595,9 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     pRet = null;
                 }
                 Debug.Assert(iCol >= 0);
-                if (pRet == null && iCol < p.pEList.nExpr)
+                if (pRet == null && iCol < p.ResultingFieldList.nExpr)
                 {
-                    pRet = pParse.sqlite3ExprCollSeq(p.pEList.a[iCol].pExpr);
+                    pRet = pParse.sqlite3ExprCollSeq(p.ResultingFieldList.a[iCol].pExpr);
                 }
                 return pRet;
             }
@@ -1711,7 +1711,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                         {
                             int r1;
                             Debug.Assert(pIn.nMem == 1);
-                            p.affinity = p.pEList.a[0].pExpr.sqlite3CompareAffinity(pDest.affinity);
+                            p.affinity = p.ResultingFieldList.a[0].pExpr.sqlite3CompareAffinity(pDest.affinity);
                             r1 = pParse.sqlite3GetTempReg();
                             v.sqlite3VdbeAddOp4(OpCode.OP_MakeRecord, pIn.iMem, 1, r1, p.affinity, (P4Usage)1);
                             pParse.sqlite3ExprCacheAffinityChange(pIn.iMem, 1);
@@ -1990,7 +1990,7 @@ break;
                 ///terms to the ORDER BY clause as necessary.
                 if (op != TokenType.TK_ALL)
                 {
-                    for (int i = 1;i <= p.pEList.nExpr; i++)
+                    for (int i = 1;i <= p.ResultingFieldList.nExpr; i++)
                     {
                         ExprList_item pItem;
                         int j;
@@ -2031,7 +2031,7 @@ break;
                     for (int i = 0; i < nOrderBy; i++)//, pItem++)
                     {
                         pItem = pOrderBy.a[i];
-                        Debug.Assert(pItem.iCol > 0 && pItem.iCol <= p.pEList.nExpr);
+                        Debug.Assert(pItem.iCol > 0 && pItem.iCol <= p.ResultingFieldList.nExpr);
                         aPermute[i] = pItem.iCol - 1;
                     }
                     pKeyMerge = new KeyInfo();
@@ -2078,7 +2078,7 @@ break;
                 }
                 else
                 {
-                    int nExpr = p.pEList.nExpr;
+                    int nExpr = p.ResultingFieldList.nExpr;
                     Debug.Assert(nOrderBy >= nExpr///
                         ///<summary>
                         ///|| db.mallocFailed != 0 
@@ -2332,7 +2332,7 @@ break;
                     Select pFirst = pPrior;
                     while (pFirst.pPrior != null)
                         pFirst = pFirst.pPrior;
-                    SelectMethods.generateColumnNames(pParse, null, pFirst.pEList);
+                    SelectMethods.generateColumnNames(pParse, null, pFirst.ResultingFieldList);
                 }
                 ///
                 ///<summary>
@@ -2475,7 +2475,7 @@ break;
                 int i;
                 if (p == null)
                     return;
-                substExprList(db, p.pEList, iTable, pEList);
+                substExprList(db, p.ResultingFieldList, iTable, pEList);
                 substExprList(db, p.pGroupBy, iTable, pEList);
                 substExprList(db, p.pOrderBy, iTable, pEList);
                 p.pHaving = substExpr(db, p.pHaving, iTable, pEList);
@@ -2950,7 +2950,7 @@ break;
                     ///"a" we substitute "x*3" and every place we see "b" we substitute "y+10".
                     ///
                     ///</summary>
-                    pList = pParent.pEList;
+                    pList = pParent.ResultingFieldList;
                     for (i = 0; i < pList.nExpr; i++)
                     {
                         if (pList.a[i].zName == null)
@@ -2964,11 +2964,11 @@ break;
                         }
                     }
                     int iParent = check.iParent;
-                    substExprList(db, pParent.pEList, check.iParent, check.pSub.pEList);
+                    substExprList(db, pParent.ResultingFieldList, check.iParent, check.pSub.ResultingFieldList);
                     if (isAgg)
                     {
-                        substExprList(db, pParent.pGroupBy, iParent, check.pSub.pEList);
-                        pParent.pHaving = substExpr(db, pParent.pHaving, iParent, check.pSub.pEList);
+                        substExprList(db, pParent.pGroupBy, iParent, check.pSub.ResultingFieldList);
+                        pParent.pHaving = substExpr(db, pParent.pHaving, iParent, check.pSub.ResultingFieldList);
                     }
                     if (check.pSub.pOrderBy != null)
                     {
@@ -2979,7 +2979,7 @@ break;
                     else
                         if (pParent.pOrderBy != null)
                         {
-                            substExprList(db, pParent.pOrderBy, iParent, check.pSub.pEList);
+                            substExprList(db, pParent.pOrderBy, iParent, check.pSub.ResultingFieldList);
                         }
                     if (check.pSub.pWhere != null)
                     {
@@ -2994,14 +2994,14 @@ break;
                         Debug.Assert(pParent.pHaving == null);
                         pParent.pHaving = pParent.pWhere;
                         pParent.pWhere = pWhere;
-                        pParent.pHaving = substExpr(db, pParent.pHaving, iParent, check.pSub.pEList);
+                        pParent.pHaving = substExpr(db, pParent.pHaving, iParent, check.pSub.ResultingFieldList);
                         pParent.pHaving = exprc.sqlite3ExprAnd(db, pParent.pHaving, exprc.sqlite3ExprDup(db, check.pSub.pHaving, 0));
                         Debug.Assert(pParent.pGroupBy == null);
                         pParent.pGroupBy = exprc.sqlite3ExprListDup(db, check.pSub.pGroupBy, 0);
                     }
                     else
                     {
-                        pParent.pWhere = substExpr(db, pParent.pWhere, iParent, check.pSub.pEList);
+                        pParent.pWhere = substExpr(db, pParent.pWhere, iParent, check.pSub.ResultingFieldList);
                         pParent.pWhere = exprc.sqlite3ExprAnd(db, pParent.pWhere, pWhere);
                     }
                     ///The flattened query is distinct if either the inner or the
@@ -3038,7 +3038,7 @@ break;
             public static u8 minMaxQuery(Select p)
             {
                 Expr pExpr;
-                ExprList pEList = p.pEList;
+                ExprList pEList = p.ResultingFieldList;
                 if (pEList.nExpr != 1)
                     return wherec.WHERE_ORDERBY_NORMAL;
                 pExpr = pEList.a[0].pExpr;
@@ -3080,12 +3080,12 @@ break;
                 Table pTab;
                 Expr pExpr;
                 Debug.Assert(null == p.pGroupBy);
-                if (p.pWhere != null || p.pEList.nExpr != 1 || p.pSrc.nSrc != 1 || p.pSrc.a[0].pSelect != null)
+                if (p.pWhere != null || p.ResultingFieldList.nExpr != 1 || p.pSrc.nSrc != 1 || p.pSrc.a[0].pSelect != null)
                 {
                     return null;
                 }
                 pTab = p.pSrc.a[0].pTab;
-                pExpr = p.pEList.a[0].pExpr;
+                pExpr = p.ResultingFieldList.a[0].pExpr;
                 Debug.Assert(pTab != null && null == pTab.pSelect && pExpr != null);
                 if (pTab.IsVirtual())
                     return null;

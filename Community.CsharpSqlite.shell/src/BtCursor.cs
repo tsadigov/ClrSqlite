@@ -118,11 +118,11 @@ namespace Community.CsharpSqlite.tree {
 																																																																								public Pgno[] aOverflow;         /* Cache of overflow page locations */
 public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 #endif
-            public i16 iPage;
-            ///
             ///<summary>
             ///Index of current page in apPage 
             ///</summary>
+            public i16 iPage;
+            
             public u16[] aiIdx = new u16[Limits.BTCURSOR_MAX_DEPTH];
             ///<summary>
             ///Current index in apPage[i]
@@ -338,54 +338,30 @@ aOverflow= null;
             public SqlResult sqlite3BtreeCount(ref i64 pnEntry)
             {
                 i64 nEntry = 0;
-                ///
-                ///<summary>
                 ///Value to return in pnEntry 
-                ///</summary>
                 SqlResult rc;
-                ///
-                ///<summary>
                 ///Return code 
-                ///</summary>
                 rc = this.moveToRoot();
-                ///
-                ///<summary>
                 ///Unless an error occurs, the following loop runs one iteration for each
-                ///</summary>
                 ///<param name="page in the B">Tree structure (not including overflow pages).</param>
-                ///<param name=""></param>
                 while (rc == SqlResult.SQLITE_OK)
                 {
                     int iIdx;
-                    ///
-                    ///<summary>
-                    ///Index of child node in parent 
-                    ///</summary>
-                    MemPage pPage;
-                    ///
-                    ///<summary>
-                    ///</summary>
+                    ///Index of child node in parent                     
                     ///<param name="Current page of the b">tree </param>
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="If this is a leaf page or the tree is not an int">key tree, then</param>
                     ///<param name="this page contains countable entries. Increment the entry counter">this page contains countable entries. Increment the entry counter</param>
                     ///<param name="accordingly.">accordingly.</param>
-                    ///<param name=""></param>
-                    pPage = this.apPage[this.iPage];
+                    var pPage = this.apPage[this.iPage];
                     if (pPage.IsLeaf != false || false == pPage.intKey)
                     {
                         nEntry += pPage.nCell;
                     }
-                    ///
-                    ///<summary>
                     ///pPage is a leaf node. This loop navigates the cursor so that it
                     ///points to the first interior cell that it points to the parent of
                     ///the next page in the tree that has not yet been visited. The
                     ///pCur.aiIdx[pCur.iPage] value is set to the index of the parent cell
                     ///of the page, or to the number of cells in the page if the next page
-                    ///</summary>
                     ///<param name="to visit is the right">child of its parent.</param>
                     ///<param name=""></param>
                     ///<param name="If all pages in the tree have been visited, return SqlResult.SQLITE_OK to the">If all pages in the tree have been visited, return SqlResult.SQLITE_OK to the</param>
@@ -397,10 +373,7 @@ aOverflow= null;
                         {
                             if (this.iPage == 0)
                             {
-                                ///
-                                ///<summary>
-                                ///</summary>
-                                ///<param name="All pages of the b">tree have been visited. Return successfully. </param>
+                                ///All pages of the b-tree have been visited. Return successfully. 
                                 pnEntry = nEntry;
                                 return SqlResult.SQLITE_OK;
                             }
@@ -410,12 +383,9 @@ aOverflow= null;
                         this.aiIdx[this.iPage]++;
                         pPage = this.apPage[this.iPage];
                     }
-                    ///
-                    ///<summary>
+
                     ///Descend to the child node of the cell that the cursor currently
-                    ///</summary>
-                    ///<param name="points at. This is the right">child if (iIdx==pPage.nCell).</param>
-                    ///<param name=""></param>
+                    ///points at. This is the right child if (iIdx==pPage.nCell).
                     iIdx = this.aiIdx[this.iPage];
                     if (iIdx == pPage.nCell)
                     {

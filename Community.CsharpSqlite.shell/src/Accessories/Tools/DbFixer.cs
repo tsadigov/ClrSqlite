@@ -150,7 +150,7 @@ namespace Community.CsharpSqlite
         {
             while (pSelect != null)
             {
-                if (this.sqlite3FixExprList(pSelect.pEList) != 0)
+                if (this.sqlite3FixExprList(pSelect.ResultingFieldList) != 0)
                 {
                     return 1;
                 }

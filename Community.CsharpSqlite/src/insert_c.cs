@@ -727,7 +727,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			}
-			pEList = pSelect.pEList;
+			pEList = pSelect.ResultingFieldList;
 			Debug.Assert (pEList != null);
 			if (pEList.nExpr != 1) {
 				return 0;

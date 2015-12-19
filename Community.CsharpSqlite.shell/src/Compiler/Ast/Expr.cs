@@ -29,6 +29,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Utils;
     using Compiler.Parser;
+    using System.Collections.Generic;
 
     namespace Ast
     {
@@ -334,16 +335,19 @@ namespace Community.CsharpSqlite
 
 
 
-        public class ExprList
+        public class ExprList:MyCollection<ExprList_item>
         {
-            public int nExpr;
+            public int nExpr {
+                get { return nSrc; }
+                set { nSrc = (Int16)value; }
+            }
 
             ///
             ///<summary>
             ///Number of expressions on the list 
             ///</summary>
 
-            public int nAlloc;
+            //public int nAlloc;
 
             ///
             ///<summary>
@@ -352,10 +356,16 @@ namespace Community.CsharpSqlite
 
             public int iECursor;
 
+            public ExprList() { }
+            public ExprList(int nExpr)
+            {
+                this.nExpr = nExpr;
+            }
+
             ///<summary>
             ///VDBE VdbeCursor associated with this ExprList
             ///</summary>
-            public ExprList_item[] a;
+            //public ExprList_item[] a;
 
             ///
             ///<summary>
@@ -369,7 +379,7 @@ namespace Community.CsharpSqlite
                 else
                 {
                     ExprList cp = (ExprList)MemberwiseClone();
-                    a.CopyTo(cp.a, 0);
+                    cp.a = new List<ExprList_item>(a);
                     return cp;
                 }
             }
@@ -406,6 +416,8 @@ namespace Community.CsharpSqlite
                 }
                 return false;
             }
+
+            
         }
 
 
@@ -805,7 +817,7 @@ set { _op = value; }
                 else
                     if (this.ExprHasProperty(ExprFlags.EP_xIsSelect))
                     {
-                        aff = this.x.pSelect.pEList.a[0].pExpr.sqlite3CompareAffinity(aff);
+                        aff = this.x.pSelect.ResultingFieldList.a[0].pExpr.sqlite3CompareAffinity(aff);
                     }
                     else
                         if (aff == '\0')
@@ -1151,7 +1163,7 @@ set { _op = value; }
                 if (op == TokenType.TK_SELECT)
                 {
                     Debug.Assert(((ExprFlags)this.flags & ExprFlags.EP_xIsSelect) != 0);
-                    return this.x.pSelect.pEList.a[0].pExpr.sqlite3ExprAffinity();
+                    return this.x.pSelect.ResultingFieldList.a[0].pExpr.sqlite3ExprAffinity();
                 }
 #if !SQLITE_OMIT_CAST
                 if (op == TokenType.TK_CAST)
@@ -1389,7 +1401,7 @@ set { _op = value; }
                                 ///<param name="of the SELECT statement. Return the declaration type and origin">of the SELECT statement. Return the declaration type and origin</param>
                                 ///<param name="data for the result">select.</param>
                                 ///<param name=""></param>
-                                if (iCol >= 0 && Sqlite3.ALWAYS(iCol < pS.pEList.nExpr))
+                                if (iCol >= 0 && Sqlite3.ALWAYS(iCol < pS.ResultingFieldList.nExpr))
                                 {
                                     ///
                                     ///<summary>
@@ -1399,7 +1411,7 @@ set { _op = value; }
                                     ///<param name="test case misc2.2.2) "> it always evaluates to NULL.</param>
                                     ///<param name=""></param>
                                     NameContext sNC = new NameContext();
-                                    Expr expr = pS.pEList.a[iCol].pExpr;
+                                    Expr expr = pS.ResultingFieldList.a[iCol].pExpr;
                                     sNC.pSrcList = pS.pSrc;
                                     sNC.pNext = pNC;
                                     sNC.pParse = pNC.pParse;
@@ -1448,7 +1460,7 @@ set { _op = value; }
                             ///<param name=""></param>
                             NameContext sNC = new NameContext();
                             Select pS = pExpr.x.pSelect;
-                            Expr expr = pS.pEList.a[0].pExpr;
+                            Expr expr = pS.ResultingFieldList.a[0].pExpr;
                             Debug.Assert(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
                             sNC.pSrcList = pS.pSrc;
                             sNC.pNext = pNC;

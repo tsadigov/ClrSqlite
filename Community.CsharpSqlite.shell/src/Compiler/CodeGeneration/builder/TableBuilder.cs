@@ -122,85 +122,85 @@ namespace Community.CsharpSqlite.builder
             }
 
 
-            ///<summary>
-            ///Begin constructing a new table representation in memory.  This is
-            ///the first of several action routines that get called in response
-            ///to a CREATE TABLE statement.  In particular, this routine is called
-            ///after seeing tokens "CREATE" and "TABLE" and the table name. The isTemp
-            ///flag is true if the table should be stored in the auxiliary database
-            ///file instead of in the main database file.  This is normally the case
-            ///when the "TEMP" or "TEMPORARY" keyword occurs in between
-            ///CREATE and TABLE.
-            ///
-            ///The new table record is initialized and put in pParse.pNewTable.
-            ///As more of the CREATE TABLE statement is parsed, additional action
-            ///routines will be called to add more information to this record.
-            ///At the end of the CREATE TABLE statement, the sqlite3EndTable() routine
-            ///is called to complete the construction of the new table record.
-            ///
-            ///</summary>
-            public static void sqlite3StartTable(Parse pParse,///
-                ///Parser context 
+        ///<summary>
+        ///Begin constructing a new table representation in memory.  This is
+        ///the first of several action routines that get called in response
+        ///to a CREATE TABLE statement.  In particular, this routine is called
+        ///after seeing tokens "CREATE" and "TABLE" and the table name. The isTemp
+        ///flag is true if the table should be stored in the auxiliary database
+        ///file instead of in the main database file.  This is normally the case
+        ///when the "TEMP" or "TEMPORARY" keyword occurs in between
+        ///CREATE and TABLE.
+        ///
+        ///The new table record is initialized and put in pParse.pNewTable.
+        ///As more of the CREATE TABLE statement is parsed, additional action
+        ///routines will be called to add more information to this record.
+        ///At the end of the CREATE TABLE statement, the sqlite3EndTable() routine
+        ///is called to complete the construction of the new table record.
+        ///
+        ///</summary>
+        public static void sqlite3StartTable(Parse pParse,///
+                                                          ///Parser context 
             Token pName1,///
-                ///First part of the name of the table or view 
+                         ///First part of the name of the table or view 
             Token pName2,///
-                ///Second part of the name of the table or view 
+                         ///Second part of the name of the table or view 
             int isTemp,///
-                ///True if this is a TEMP table 
+                       ///True if this is a TEMP table 
             int isView,///
-                ///True if this is a VIEW 
+                       ///True if this is a VIEW 
             int isVirtual,///
-                ///True if this is a VIRTUAL table 
+                          ///True if this is a VIRTUAL table 
             int noErr///
-                ///Do nothing if table already exists 
+                     ///Do nothing if table already exists 
             )
+        {
+            Table pTable;
+            string zName = null;
+            ///The name of the new table 
+            Connection db = pParse.db;
+            int iDb;
+            ///Database number to create the table in 
+            Token pName = new Token();
+            ///Unqualified name of the table to create 
+            ///The table or view name to create is passed to this routine via tokens
+            ///pName1 and pName2. If the table name was fully qualified, for example:
+            ///
+            ///CREATE TABLE xxx.yyy (...);
+            ///
+            ///Then pName1 is set to "xxx" and pName2 "yyy". On the other hand if
+            ///the table name is not fully qualified, i.e.:
+            ///
+            ///CREATE TABLE yyy(...);
+            ///
+            ///Then pName1 is set to "yyy" and pName2 is "".
+            ///
+            ///The call below sets the pName pointer to point at the token (pName1 or
+            ///pName2) that stores the unqualified table name. The variable iDb is
+            ///set to the index of the database that the table or view is to be
+            ///created in.
+            iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
+            if (iDb < 0)
+                return;
+            if (0 == sqliteinth.OMIT_TEMPDB && isTemp != 0 && pName2.Length > 0 && iDb != 1)
             {
-                Table pTable;
-                string zName = null;
-                ///The name of the new table 
-                Connection db = pParse.db;
-                int iDb;
-                ///Database number to create the table in 
-                Token pName = new Token();
-                ///Unqualified name of the table to create 
-                ///The table or view name to create is passed to this routine via tokens
-                ///pName1 and pName2. If the table name was fully qualified, for example:
-                ///
-                ///CREATE TABLE xxx.yyy (...);
-                ///
-                ///Then pName1 is set to "xxx" and pName2 "yyy". On the other hand if
-                ///the table name is not fully qualified, i.e.:
-                ///
-                ///CREATE TABLE yyy(...);
-                ///
-                ///Then pName1 is set to "yyy" and pName2 is "".
-                ///
-                ///The call below sets the pName pointer to point at the token (pName1 or
-                ///pName2) that stores the unqualified table name. The variable iDb is
-                ///set to the index of the database that the table or view is to be
-                ///created in.
-                iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
-                if (iDb < 0)
-                    return;
-                if (0 == sqliteinth.OMIT_TEMPDB && isTemp != 0 && pName2.Length > 0 && iDb != 1)
-                {
-                    ///If creating a temp table, the name may not be qualified. Unless 
-                    ///the database name is "temp" anyway.  
-                    utilc.sqlite3ErrorMsg(pParse, "temporary table name must be unqualified");
-                    return;
-                }
-                if (sqliteinth.OMIT_TEMPDB == 0 && isTemp != 0)
-                    iDb = 1;
-                pParse.sNameToken = pName;
-                zName = build.sqlite3NameFromToken(db, pName);
-                if (zName == null)
-                    return;
-                if (SqlResult.SQLITE_OK != build.sqlite3CheckObjectName(pParse, zName))
-                {
-                    goto begin_table_error;
-                }
-                if (db.init.iDb == 1)
-                    isTemp = 1;
+                ///If creating a temp table, the name may not be qualified. Unless 
+                ///the database name is "temp" anyway.  
+                utilc.sqlite3ErrorMsg(pParse, "temporary table name must be unqualified");
+                return;
+            }
+            if (sqliteinth.OMIT_TEMPDB == 0 && isTemp != 0)
+                iDb = 1;
+            pParse.sNameToken = pName;
+            zName = build.sqlite3NameFromToken(db, pName);
+            if (zName == null)
+                return;
+            if (SqlResult.SQLITE_OK != build.sqlite3CheckObjectName(pParse, zName))
+            {
+                goto begin_table_error;
+            }
+            if (db.init.iDb == 1)
+                isTemp = 1;
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	Debug.Assert( (isTemp & 1)==isTemp );
 {
@@ -227,67 +227,70 @@ goto begin_table_error;
 }
 }
 #endif
-                ///
-                ///<summary>
-                ///Make sure the new table name does not collide with an existing
-                ///index or table name in the same database.  Issue an error message if
-                ///it does. The exception is if the statement being parsed was passed
-                ///to an sqlite3_declare_vtab() call. In that case only the column names
-                ///and types will be used, so there is no need to test for namespace
-                ///collisions.
-                ///</summary>
-                if (!sqliteinth.IN_DECLARE_VTAB(pParse))
+            ///
+            ///<summary>
+            ///Make sure the new table name does not collide with an existing
+            ///index or table name in the same database.  Issue an error message if
+            ///it does. The exception is if the statement being parsed was passed
+            ///to an sqlite3_declare_vtab() call. In that case only the column names
+            ///and types will be used, so there is no need to test for namespace
+            ///collisions.
+            ///</summary>
+            if (!sqliteinth.IN_DECLARE_VTAB(pParse))
+            {
+                String zDb = db.Backends[iDb].Name;
+                if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
                 {
-                    String zDb = db.Backends[iDb].Name;
-                    if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
-                    {
-                        goto begin_table_error;
-                    }
-                    pTable = TableBuilder.sqlite3FindTable(db, zName, zDb);
-                    if (pTable != null)
-                    {
-                        if (noErr == 0)
-                        {
-                            utilc.sqlite3ErrorMsg(pParse, "table %T already exists", pName);
-                        }
-                        else
-                        {
-                            Debug.Assert(0 == db.init.busy);
-                            build.sqlite3CodeVerifySchema(pParse, iDb);
-                        }
-                        goto begin_table_error;
-                    }
-                    if (IndexBuilder.sqlite3FindIndex(db, zName, zDb) != null)
-                    {
-                        utilc.sqlite3ErrorMsg(pParse, "there is already an index named %s", zName);
-                        goto begin_table_error;
-                    }
+                    goto begin_table_error;
                 }
-                pTable = new Table();
-                // sqlite3DbMallocZero(db, Table).Length;
-                //if ( pTable == null )
-                //{
-                //  db.mallocFailed = 1;
-                //  pParse.rc = SQLITE_NOMEM;
-                //  pParse.nErr++;
-                //  goto begin_table_error;
-                //}
-                pTable.zName = zName;
-                pTable.iPKey = -1;
-                pTable.pSchema = db.Backends[iDb].pSchema;
-                pTable.nRef = 1;
-                pTable.nRowEst = 1000000;
-                Debug.Assert(pParse.pNewTable == null);
-                pParse.pNewTable = pTable;
-                ///
-                ///<summary>
-                ///If this is the magic sqlite_sequence table used by autoincrement,
-                ///then record a pointer to this table in the main database structure
-                ///so that INSERT can find the table easily.
-                ///
-                ///</summary>
+                pTable = TableBuilder.sqlite3FindTable(db, zName, zDb);
+                if (pTable != null)
+                {
+                    if (noErr == 0)
+                    {
+                        utilc.sqlite3ErrorMsg(pParse, "table %T already exists", pName);
+                    }
+                    else
+                    {
+                        Debug.Assert(0 == db.init.busy);
+                        build.sqlite3CodeVerifySchema(pParse, iDb);
+                    }
+                    goto begin_table_error;
+                }
+                if (IndexBuilder.sqlite3FindIndex(db, zName, zDb) != null)
+                {
+                    utilc.sqlite3ErrorMsg(pParse, "there is already an index named %s", zName);
+                    goto begin_table_error;
+                }
+            }
+
+            Debug.Assert(pParse.pNewTable == null);
+            pParse.pNewTable = pTable = new Table()
+            {
+                zName = zName,
+                iPKey = -1,
+                pSchema = db.Backends[iDb].pSchema,
+                nRef = 1,
+                nRowEst = 1000000
+            }; 
+            // sqlite3DbMallocZero(db, Table).Length;
+            //if ( pTable == null )
+            //{
+            //  db.mallocFailed = 1;
+            //  pParse.rc = SQLITE_NOMEM;
+            //  pParse.nErr++;
+            //  goto begin_table_error;
+            //}
+
+            ///
+            ///<summary>
+            ///If this is the magic sqlite_sequence table used by autoincrement,
+            ///then record a pointer to this table in the main database structure
+            ///so that INSERT can find the table easily.
+            ///
+            ///</summary>
 #if !SQLITE_OMIT_AUTOINCREMENT
-                if (pParse.nested == 0 && zName == "sqlite_sequence")
+            if (pParse.nested == 0 && zName == "sqlite_sequence")
                 {
                     Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                     pTable.pSchema.pSeqTab = pTable;
@@ -303,8 +306,8 @@ goto begin_table_error;
                 ///indices.  Hence, the record number for the table must be allocated
                 ///now.
                 ///</summary>
-                var v = pParse.sqlite3GetVdbe();
-                if (0 == db.init.busy && v != null)
+                var vdbEngine = pParse.sqlite3GetVdbe();
+                if (0 == db.init.busy && vdbEngine != null)
                 {
                     int j1;
                     int fileFormat;
@@ -312,7 +315,7 @@ goto begin_table_error;
                     build.sqlite3BeginWriteOperation(pParse, 0, iDb);
                     if (isVirtual != 0)
                     {
-                        v.sqlite3VdbeAddOp0(OpCode.OP_VBegin);
+                        vdbEngine.sqlite3VdbeAddOp0(OpCode.OP_VBegin);
                     }
                     ///
                     ///<summary>
@@ -323,15 +326,15 @@ goto begin_table_error;
                     reg1 = pParse.regRowid = ++pParse.nMem;
                     reg2 = pParse.regRoot = ++pParse.nMem;
                     reg3 = ++pParse.nMem;
-                    v.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, reg3,(int) BTreeProp.FILE_FORMAT);
-                    Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
-                    j1 = v.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
+                    vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, reg3,(int) BTreeProp.FILE_FORMAT);
+                    Engine.vdbeaux.sqlite3VdbeUsesBtree(vdbEngine, iDb);
+                    j1 = vdbEngine.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
                     fileFormat = (db.flags & SqliteFlags.SQLITE_LegacyFileFmt) != 0 ? 1 : sqliteinth.SQLITE_MAX_FILE_FORMAT;
-                    v.sqlite3VdbeAddOp2(OpCode.OP_Integer, fileFormat, reg3);
-                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, reg3);
-                    v.sqlite3VdbeAddOp2(OpCode.OP_Integer, (int)sqliteinth.ENC(db), reg3);
-                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.TEXT_ENCODING, reg3);
-                    v.sqlite3VdbeJumpHere(j1);
+                    vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Integer, fileFormat, reg3);
+                    vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, reg3);
+                    vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Integer, (int)sqliteinth.ENC(db), reg3);
+                    vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.TEXT_ENCODING, reg3);
+                    vdbEngine.sqlite3VdbeJumpHere(j1);
                     ///
                     ///<summary>
                     ///</summary>
@@ -344,18 +347,18 @@ goto begin_table_error;
                     ///sqlite3EndTable will generate.
                     if (isView != 0 || isVirtual != 0)
                     {
-                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, reg2);
+                        vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, reg2);
                     }
                     else
                     {
-                        v.sqlite3VdbeAddOp2(OpCode.OP_CreateTable, iDb, reg2);
+                        vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_CreateTable, iDb, reg2);
                     }
                     build.sqlite3OpenMasterTable(pParse, iDb);
-                    v.sqlite3VdbeAddOp2(OpCode.OP_NewRowid, 0, reg1);
-                    v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, reg3);
-                    v.sqlite3VdbeAddOp3(OpCode.OP_Insert, 0, reg3, reg1);
-                    v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_APPEND);
-                    v.sqlite3VdbeAddOp0(OpCode.OP_Close);
+                    vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_NewRowid, 0, reg1);
+                    vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, reg3);
+                    vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_Insert, 0, reg3, reg1);
+                    vdbEngine.sqlite3VdbeChangeP5(OpFlag.OPFLAG_APPEND);
+                    vdbEngine.sqlite3VdbeAddOp0(OpCode.OP_Close);
                 }
                 ///
                 ///<summary>

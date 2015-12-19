@@ -200,48 +200,57 @@ sqlite3ValueFree(ref pTmp);
 		/// each collation sequence structure.
 		///
 		///</summary>
-		public static CollSeq[] findCollSeqEntry(Connection db,///
-		///<summary>
-		///Database connection 
-		///</summary>
-		string zName,///
-		///<summary>
-		///Name of the collating sequence 
-		///</summary>
-		int create///
-		///<summary>
-		///Create a new entry if true 
-		///</summary>
-		) {
+		public static CollSeq[] findCollSeqEntry(
+            ///<summary>
+            ///Database connection 
+            ///</summary>
+            Connection db,
+
+            ///<summary>
+            ///Name of the collating sequence 
+            ///</summary>
+            string zName,///
+
+            ///<summary>
+            ///Create a new entry if true 
+            ///</summary>
+            int create///
+      )
+        {
 			CollSeq[] pColl;
 			int nName=StringExtensions.Strlen30(zName);
 			pColl=db.aCollSeq.Find(zName,nName,(CollSeq[])null);
 			if((null==pColl)&&create!=0) {
-				pColl=new CollSeq[3];
+                pColl = new CollSeq[] {
+                    new CollSeq()
+                    {
+                        zName = zName,
+                        enc = SqliteEncoding.UTF8
+                    },
+                    new CollSeq()
+                    {
+                        zName = zName,
+                        enc = SqliteEncoding.UTF16LE
+                    },
+                    new CollSeq()
+                    {
+                        zName = zName,
+                        enc = SqliteEncoding.UTF16BE
+                    }
+                };
 				//sqlite3DbMallocZero(db, 3*sizeof(*pColl) + nName + 1 );
 				if(pColl!=null) {
 					CollSeq pDel=null;
-					pColl[0]=new CollSeq();
-					pColl[0].zName=zName;
-					pColl[0].enc=SqliteEncoding.UTF8;
-					pColl[1]=new CollSeq();
-					pColl[1].zName=zName;
-					pColl[1].enc=SqliteEncoding.UTF16LE;
-					pColl[2]=new CollSeq();
-					pColl[2].zName=zName;
-					pColl[2].enc=SqliteEncoding.UTF16BE;
+                    
 					//memcpy(pColl[0].zName, zName, nName);
 					//pColl[0].zName[nName] = 0;
 					CollSeq[] pDelArray=HashExtensions.sqlite3HashInsert(ref db.aCollSeq,pColl[0].zName,nName,pColl);
 					if(pDelArray!=null)
 						pDel=pDelArray[0];
-					///
-					///<summary>
+					
 					///If a malloc() failure occurred in sqlite3HashInsert(), it will
 					///return the pColl pointer to be deleted (because it wasn't added
 					///to the hash table).
-					///
-					///</summary>
 					Debug.Assert(pDel==null||pDel==pColl[0]);
 					if(pDel!=null) {
 						////        db.mallocFailed = 1;

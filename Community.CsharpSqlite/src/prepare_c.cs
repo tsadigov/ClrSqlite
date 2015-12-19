@@ -221,9 +221,9 @@ namespace Community.CsharpSqlite {
 			int size;
 			Table pTab;
 			DbBackend pDb;
-			string[] azArg=new string[4];
+			
 			u32[] meta=new u32[5];
-			InitData initData=new InitData();
+			
 			string zMasterSchema;
 			string zMasterName;
 			int openedTransaction=0;
@@ -257,18 +257,25 @@ namespace Community.CsharpSqlite {
 				zMasterSchema=master_schema;
 			}
             zMasterName = sqliteinth.SCHEMA_TABLE(iDb);
-			///
-			///<summary>
-			///Construct the schema tables.  
-			///</summary>
-			azArg[0]=zMasterName;
-			azArg[1]="1";
-			azArg[2]=zMasterSchema;
-			azArg[3]="";
-			initData.db=db;
-			initData.iDb=iDb;
-			initData.rc=SqlResult.SQLITE_OK;
-			initData.pzErrMsg=pzErrMsg;
+            ///
+            ///<summary>
+            ///Construct the schema tables.  
+            ///</summary>
+            string[] azArg = new string[] {
+                zMasterName,
+                "1",
+                zMasterSchema,
+                ""
+            };
+            
+            InitData initData = new InitData()
+            {
+                db = db,
+                iDb = iDb,
+                rc = SqlResult.SQLITE_OK,
+                pzErrMsg = pzErrMsg
+            };
+
 			sqlite3InitCallback(initData,3,azArg,null);
 			if(initData.rc!=0) {
 				rc=initData.rc;

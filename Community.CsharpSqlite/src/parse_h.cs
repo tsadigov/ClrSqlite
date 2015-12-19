@@ -3979,8 +3979,8 @@ isView = false;
 					///label B: 
 					///</summary>
 					regFromSelect=dest.iMem;
-					Debug.Assert(pSelect.pEList!=null);
-					nColumn=pSelect.pEList.nExpr;
+					Debug.Assert(pSelect.ResultingFieldList!=null);
+					nColumn=pSelect.ResultingFieldList.nExpr;
 					Debug.Assert(dest.nMem==nColumn);
 					///
 					///<summary>
@@ -7781,7 +7781,7 @@ return;
 					///<summary>
 					///List of WHEN terms 
 					///</summary>
-					ExprList_item[] aListelem;
+					IList<ExprList_item> aListelem;
 					///
 					///<summary>
 					///Array of WHEN terms 
@@ -8420,13 +8420,13 @@ return;
 				if(pList.nAlloc<=pList.nExpr) {
 					ExprList_item a;
 					int n=pList.nAlloc*2+4;
-					//a = sqlite3DbRealloc(db, pList.a, n*sizeof(pList.a[0]));
-					//if( a==0 ){
-					//  goto no_mem;
-					//}
-					Array.Resize(ref pList.a,n);
+                    //a = sqlite3DbRealloc(db, pList.a, n*sizeof(pList.a[0]));
+                    //if( a==0 ){
+                    //  goto no_mem;
+                    //}
+                    pList.Resize(n);
 					// = a;
-					pList.nAlloc=pList.a.Length;
+					
 					// sqlite3DbMallocSize(db, a)/sizeof(a[0]);
 				}
 				Debug.Assert(pList.a!=null);
@@ -11842,7 +11842,7 @@ range_est_fallback:
 					///<summary>
 					///Database connection 
 					///</summary>
-					Expr pExpr=p.pEList.a[0].pExpr;
+					Expr pExpr=p.ResultingFieldList.a[0].pExpr;
 					///
 					///<summary>
 					///Expression <column> 
@@ -12092,7 +12092,7 @@ range_est_fallback:
 						if(Select.sqlite3Select(this,pExpr.x.pSelect,ref dest)!=0) {
 							return 0;
 						}
-						pEList=pExpr.x.pSelect.pEList;
+						pEList=pExpr.x.pSelect.ResultingFieldList;
 						if(Sqlite3.ALWAYS(pEList!=null)&&pEList.nExpr>0) {
 							keyInfo.aColl[0]=this.sqlite3BinaryCompareCollSeq(pExpr.pLeft,pEList.a[0].pExpr);
 						}

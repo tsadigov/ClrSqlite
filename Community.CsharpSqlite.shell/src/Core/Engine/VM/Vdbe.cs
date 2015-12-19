@@ -132,8 +132,10 @@ namespace Community.CsharpSqlite
             public const int COLNAME_N = 2;
 #endif
 #endif
+            public static List<Vdbe> s_instances = new List<Vdbe>();
             public Vdbe()
             {
+                s_instances.Add(this);
             }
             ///
             ///<summary>

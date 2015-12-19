@@ -564,12 +564,13 @@ namespace Community.CsharpSqlite.Ast
                 int i;
                 if (p == null)
                     return null;
-                pNew = new ExprList();
+
+                pNew = new ExprList(p.nExpr) {
+                    iECursor = 0
+                };
                 //sqlite3DbMallocRaw(db, sizeof(*pNew) );
                 //if ( pNew == null ) return null;
-                pNew.iECursor = 0;
-                pNew.nExpr = pNew.nAlloc = p.nExpr;
-                pNew.a = new ExprList_item[p.nExpr];
+                
                 //sqlite3DbMallocRaw(db,  p.nExpr*sizeof(p.a[0]) );
                 //if( pItem==null ){
                 //  sqlite3DbFree(db,ref pNew);
@@ -685,7 +686,7 @@ namespace Community.CsharpSqlite.Ast
                 pNew = new Select();
                 //sqlite3DbMallocRaw(db, sizeof(*p) );
                 //if ( pNew == null ) return null;
-                pNew.pEList = exprc.sqlite3ExprListDup(db, p.pEList, flags);
+                pNew.ResultingFieldList = exprc.sqlite3ExprListDup(db, p.ResultingFieldList, flags);
                 pNew.pSrc = exprc.sqlite3SrcListDup(db, p.pSrc, flags);
                 pNew.pWhere = exprc.sqlite3ExprDup(db, p.pWhere, flags);
                 pNew.pGroupBy = exprc.sqlite3ExprListDup(db, p.pGroupBy, flags);
@@ -1031,7 +1032,7 @@ return null;
                 ///<summary>
                 ///FROM clause not a virtual table 
                 ///</summary>
-                pEList = p.pEList;
+                pEList = p.ResultingFieldList;
                 if (pEList.nExpr != 1)
                     return 0;
                 ///

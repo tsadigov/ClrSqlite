@@ -46,5 +46,10 @@ namespace Community.CsharpSqlite.Utils
         ///<summary>
         ///One entry for each identifier on the list 
         ///</summary>
+
+        public void Resize(int n)
+        {
+            nSrc = (i16)n;
+        }
     }
 }

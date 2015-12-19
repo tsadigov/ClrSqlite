@@ -16,7 +16,7 @@ namespace Community.CsharpSqlite
                 _this.pHaving.heightOfExpr(ref pnHeight);
                 _this.pLimit.heightOfExpr(ref pnHeight);
                 _this.pOffset.heightOfExpr(ref pnHeight);
-                _this.pEList.heightOfExprList(ref pnHeight);
+                _this.ResultingFieldList.heightOfExprList(ref pnHeight);
                 _this.pGroupBy.heightOfExprList(ref pnHeight);
                 _this.pOrderBy.heightOfExprList(ref pnHeight);
                 _this.pPrior.heightOfSelect(ref pnHeight);

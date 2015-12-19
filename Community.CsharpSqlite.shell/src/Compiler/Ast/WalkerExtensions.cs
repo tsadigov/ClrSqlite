@@ -110,7 +110,7 @@ namespace Community.CsharpSqlite.Ast
         ///</summary>
         static WRC sqlite3WalkSelectExpr(Walker pWalker, Select p)
         {
-            if (sqlite3WalkExprList(pWalker, p.pEList) != 0)
+            if (sqlite3WalkExprList(pWalker, p.ResultingFieldList) != 0)
                 return WRC.WRC_Abort;
             if (sqlite3WalkExpr(pWalker, ref p.pWhere) != 0)
                 return WRC.WRC_Abort;

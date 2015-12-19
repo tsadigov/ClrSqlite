@@ -666,7 +666,7 @@ namespace Community.CsharpSqlite
                 Bitmask mask = 0;
                 while (pS != null)
                 {
-                    mask |= this.exprListTableUsage(pS.pEList);
+                    mask |= this.exprListTableUsage(pS.ResultingFieldList);
                     mask |= this.exprListTableUsage(pS.pGroupBy);
                     mask |= this.exprListTableUsage(pS.pOrderBy);
                     mask |= this.exprTableUsage(pS.pWhere);
