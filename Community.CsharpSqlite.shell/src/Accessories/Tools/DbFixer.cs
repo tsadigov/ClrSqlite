@@ -114,10 +114,10 @@ namespace Community.CsharpSqlite
             if (Sqlite3.NEVER(pList == null))
                 return 0;
             zDb = this.zDb;
-            for (i = 0; i < pList.nSrc; i++)
+            for (i = 0; i < pList.Count; i++)
             {
                 //, pItem++){
-                pItem = pList.a[i];
+                pItem = pList[i];
                 if (pItem.zDatabase == null)
                 {
                     pItem.zDatabase = zDb;
@@ -216,9 +216,9 @@ namespace Community.CsharpSqlite
             ExprList_item pItem;
             if (pList == null)
                 return 0;
-            for (i = 0; i < pList.nExpr; i++)//, pItem++ )
+            for (i = 0; i < pList.Count; i++)//, pItem++ )
             {
-                pItem = pList.a[i];
+                pItem = pList[i];
                 if (this.sqlite3FixExpr(pItem.pExpr) != 0)
                 {
                     return 1;

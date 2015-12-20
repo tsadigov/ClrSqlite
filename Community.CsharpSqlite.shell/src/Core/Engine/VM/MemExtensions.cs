@@ -39,18 +39,18 @@ namespace Community.CsharpSqlite.Engine
             if (preserve != 0)
             {
                 //& pMem.z==pMem.zMalloc ){
-                if (pMem.z == null)
-                    pMem.z = "";
+                if (pMem.AsString == null)
+                    pMem.AsString = "";
                 //      sqlite3DbReallocOrFree( pMem.db, pMem.z, n );
                 else
-                    if (n < pMem.z.Length)
-                    pMem.z = pMem.z.Substring(0, n);
+                    if (n < pMem.AsString.Length)
+                    pMem.AsString = pMem.AsString.Substring(0, n);
                 preserve = 0;
             }
             else
             {
                 //  sqlite3DbFree(pMem->db,ref pMem.zMalloc);
-                pMem.z = "";
+                pMem.AsString = "";
                 //   sqlite3DbMallocRaw( pMem.db, n );
             }
             //}
@@ -59,10 +59,10 @@ namespace Community.CsharpSqlite.Engine
             //}
             if ((pMem.flags & MemFlags.MEM_Dyn) != 0 && pMem.xDel != null)
             {
-                pMem.xDel(ref pMem.z);
+                pMem.xDel(ref pMem.AsString);
             }
             // TODO --pMem.z = pMem.zMalloc;
-            if (pMem.z == null)
+            if (pMem.AsString == null)
             {
                 pMem.flags = MemFlags.MEM_Null;
             }
@@ -71,7 +71,7 @@ namespace Community.CsharpSqlite.Engine
                 pMem.flags = (pMem.flags & ~(MemFlags.MEM_Ephem | MemFlags.MEM_Static));
             }
             pMem.xDel = null;
-            return pMem.z != null ? SqlResult.SQLITE_OK : SqlResult.SQLITE_NOMEM;
+            return pMem.AsString != null ? SqlResult.SQLITE_OK : SqlResult.SQLITE_NOMEM;
         }
         ///
 
@@ -81,17 +81,17 @@ namespace Community.CsharpSqlite.Engine
         ///Return true if the Mem object contains a TEXT or BLOB that is            
         ///too large - whose size exceeds p.db.aLimit[SQLITE_LIMIT_LENGTH].
 
-        public static bool IsTooBig(this Mem p)
+        public static bool IsTooBig(this Mem mem)
         {
             //Debug.Assert( p.db != null );
-            if ((p.flags & (MemFlags.MEM_Str | MemFlags.MEM_Blob)) != 0)
+            if ((mem.flags & (MemFlags.MEM_Str | MemFlags.MEM_Blob)) != 0)
             {
-                int n = p.n;
-                if ((p.flags & MemFlags.MEM_Zero) != 0)
+                int n = mem.CharacterCount;
+                if ((mem.flags & MemFlags.MEM_Zero) != 0)
                 {
-                    n += p.u.nZero;
+                    n += mem.u.nZero;
                 }
-                return n > p.db.aLimit[Globals.SQLITE_LIMIT_LENGTH];
+                return n > mem.db.aLimit[Globals.SQLITE_LIMIT_LENGTH];
             }
             return false;
         }
@@ -177,11 +177,11 @@ namespace Community.CsharpSqlite.Engine
             ///</summary>
             Debug.Assert(enc == 0);
             {
-                pMem.z = null;
+                pMem.AsString = null;
                 pMem.zBLOB = malloc_cs.sqlite3Malloc(n);
                 Buffer.BlockCopy(zBlob, offset, pMem.zBLOB, 0, n);
             }
-            pMem.n = nByte;
+            pMem.CharacterCount = nByte;
             pMem.flags = MemFlags.MEM_Blob | MemFlags.MEM_Term;
             pMem.enc = (enc == 0 ? SqliteEncoding.UTF8 : enc);
             pMem.type = (enc == 0 ? FoundationalType.SQLITE_BLOB : FoundationalType.SQLITE_TEXT);
@@ -211,7 +211,7 @@ namespace Community.CsharpSqlite.Engine
             }
             pMem.MemSetTypeFlag(MemFlags.MEM_Null);
             malloc_cs.sqlite3_free(ref pMem.zBLOB);
-            pMem.z = null;
+            pMem.AsString = null;
             pMem.type = FoundationalType.SQLITE_NULL;
         }
 #endif

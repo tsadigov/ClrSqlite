@@ -83,7 +83,7 @@ namespace Community.CsharpSqlite
                     var bgclr = Console.BackgroundColor;
                     Console.ForegroundColor = i == this.opcodeIndex ? ConsoleColor.Red : ConsoleColor.White;
                     Console.BackgroundColor = i == this.currentOpCodeIndex ? ConsoleColor.DarkBlue : ConsoleColor.Black;
-                    Console.WriteLine(i + ": " + lOp[i].OpCode);
+                    Console.WriteLine(i + ": " + lOp[i].ToString(this));
                     Console.ForegroundColor = clr;
                     Console.BackgroundColor = bgclr;
 
@@ -2393,103 +2393,7 @@ start = sqlite3Hwtime();
                                         rc = OpCode_ResultRow(opcodeIndex, pOp.p1, pOp.p2, rc, aMem);
                                         goto vdbe_return;
                                     }
-                                ///<summary>
-                                ///Opcode: Concat P1 P2 P3 * *
-                                ///
-                                ///Add the text in register P1 onto the end of the text in
-                                ///register P2 and store the result in register P3.
-                                ///If either the P1 or P2 text are NULL then store NULL in P3.
-                                ///
-                                ///P3 = P2 || P1
-                                ///
-                                ///It is illegal for P1 and P3 to be the same register. Sometimes,
-                                ///if P3 is the same register as P2, the implementation is able
-                                ///to avoid a memcpy().
-                                ///
-                                ///</summary>
-                                case OpCode.OP_Concat:
-                                    {
-                                        ///
-                                        ///<summary>
-                                        ///same as TokenType.TK_CONCAT, in1, in2, ref3 
-                                        ///</summary>
-                                        i64 nByte;
-                                        pIn1 = aMem[pOp.p1];
-                                        pIn2 = aMem[pOp.p2];
-                                        pOut = aMem[pOp.p3];
-                                        Debug.Assert(pIn1 != pOut);
-                                        if (((pIn1.flags | pIn2.flags) & MemFlags.MEM_Null) != 0)
-                                        {
-                                            pOut.sqlite3VdbeMemSetNull();
-                                            break;
-                                        }
-                                        if (pIn1.ExpandBlob() != 0 || pIn2.ExpandBlob() != 0)
-                                            goto no_mem;
-                                        if (((pIn1.flags & (MemFlags.MEM_Str | MemFlags.MEM_Blob)) == 0) && vdbemem_cs.sqlite3VdbeMemStringify(pIn1, encoding) != 0)
-                                        {
-                                            goto no_mem;
-                                        }
-                                        // Stringify(pIn1, encoding);
-                                        if (((pIn2.flags & (MemFlags.MEM_Str | MemFlags.MEM_Blob)) == 0) && vdbemem_cs.sqlite3VdbeMemStringify(pIn2, encoding) != 0)
-                                        {
-                                            goto no_mem;
-                                        }
-                                        // Stringify(pIn2, encoding);
-                                        nByte = pIn1.n + pIn2.n;
-                                        if (nByte > db.aLimit[Globals.SQLITE_LIMIT_LENGTH])
-                                        {
-                                            goto too_big;
-                                        }
-                                        pOut.MemSetTypeFlag(MemFlags.MEM_Str);
-                                        //if ( sqlite3VdbeMemGrow( pOut, (int)nByte + 2, ( pOut == pIn2 ) ? 1 : 0 ) != 0 )
-                                        //{
-                                        //  goto no_mem;
-                                        //}
-                                        //if ( pOut != pIn2 )
-                                        //{
-                                        //  memcpy( pOut.z, pIn2.z, pIn2.n );
-                                        //}
-                                        //memcpy( &pOut.z[pIn2.n], pIn1.z, pIn1.n );
-                                        if (pIn2.z != null && pIn2.z.Length >= pIn2.n)
-                                            if (pIn1.z != null)
-                                                pOut.z = pIn2.z.Substring(0, pIn2.n) + (pIn1.n < pIn1.z.Length ? pIn1.z.Substring(0, pIn1.n) : pIn1.z);
-                                            else
-                                            {
-                                                if ((pIn1.flags & MemFlags.MEM_Blob) == 0)//String as Blob
-                                                {
-                                                    StringBuilder sb = new StringBuilder(pIn1.n);
-                                                    for (int i = 0; i < pIn1.n; i++)
-                                                        sb.Append((byte)pIn1.zBLOB[i]);
-                                                    pOut.z = pIn2.z.Substring(0, pIn2.n) + sb.ToString();
-                                                }
-                                                else
-                                                    // UTF-8 Blob
-                                                    pOut.z = pIn2.z.Substring(0, pIn2.n) + Encoding.UTF8.GetString(pIn1.zBLOB, 0, pIn1.zBLOB.Length);
-                                            }
-                                        else
-                                        {
-                                            pOut.zBLOB = malloc_cs.sqlite3Malloc(pIn1.n + pIn2.n);
-                                            Buffer.BlockCopy(pIn2.zBLOB, 0, pOut.zBLOB, 0, pIn2.n);
-                                            if (pIn1.zBLOB != null)
-                                                Buffer.BlockCopy(pIn1.zBLOB, 0, pOut.zBLOB, pIn2.n, pIn1.n);
-                                            else
-                                                for (int i = 0; i < pIn1.n; i++)
-                                                    pOut.zBLOB[pIn2.n + i] = (byte)pIn1.z[i];
-                                        }
-                                        //pOut.z[nByte] = 0;
-                                        //pOut.z[nByte + 1] = 0;
-                                        pOut.flags |= MemFlags.MEM_Term;
-                                        pOut.n = (int)nByte;
-                                        pOut.enc = encoding;
-#if SQLITE_TEST
-																																																																																																																																				              UPDATE_MAX_BLOBSIZE( pOut );
-#endif
-                                        break;
-                                    }
-
-
                                 
-
 
 
 
@@ -2649,7 +2553,7 @@ start = sqlite3Hwtime();
                                             {
                                                 pRec.applyAffinity((char)zAffinity[pD0], encoding);
                                             }
-                                            if ((pRec.flags & MemFlags.MEM_Zero) != 0 && pRec.n > 0)
+                                            if ((pRec.flags & MemFlags.MEM_Zero) != 0 && pRec.CharacterCount > 0)
                                             {
                                                 pRec.sqlite3VdbeMemExpandBlob();
                                             }
@@ -2727,8 +2631,8 @@ start = sqlite3Hwtime();
                                         //TODO -- Remove this  for testing Debug.Assert( i == nByte );
                                         Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.aMem.Count());
                                         pOut.zBLOB = zNewRecord;
-                                        pOut.z = null;
-                                        pOut.n = (int)nByte;
+                                        pOut.AsString = null;
+                                        pOut.CharacterCount = (int)nByte;
                                         pOut.flags = MemFlags.MEM_Blob | MemFlags.MEM_Dyn;
                                         pOut.xDel = null;
                                         if (nZero != 0)
@@ -3229,7 +3133,7 @@ start = sqlite3Hwtime();
                                                 ///<summary>
                                                 ///zeroblobs already expanded 
                                                 ///</summary>
-                                                pIdxKey = vdbeaux.sqlite3VdbeRecordUnpack(pC.pKeyInfo, pIn3.n, pIn3.zBLOB, aTempRec, 0);
+                                                pIdxKey = vdbeaux.sqlite3VdbeRecordUnpack(pC.pKeyInfo, pIn3.CharacterCount, pIn3.zBLOB, aTempRec, 0);
                                                 //sizeof( aTempRec ) );
                                                 if (pIdxKey == null)
                                                 {
@@ -3372,7 +3276,7 @@ start = sqlite3Hwtime();
                                             ///</summary>
 
                                             pIn3.sqlite3VdbeMemIntegerify();
-                                            R = pIn3.u.i;
+                                            R = pIn3.u.AsInteger;
                                             ///
                                             ///<summary>
                                             ///</summary>
@@ -3386,7 +3290,7 @@ start = sqlite3Hwtime();
                                             }
                                             else
                                             {
-                                                pIn3.u.i = r.rowid;
+                                                pIn3.u.AsInteger = r.rowid;
                                             }
                                         }
                                         break;
@@ -3429,9 +3333,9 @@ start = sqlite3Hwtime();
                                         if (pCrsr != null)
                                         {
                                             res = 0;
-                                            iKey = pIn3.u.i;
+                                            iKey = pIn3.u.AsInteger;
                                             rc = pCrsr.sqlite3BtreeMovetoUnpacked(null, (long)iKey, 0, ref res);
-                                            pC.lastRowid = pIn3.u.i;
+                                            pC.lastRowid = pIn3.u.AsInteger;
                                             pC.rowidIsValid = res == 0 ? true : false;
                                             pC.nullRow = false;
                                             pC.cacheStatus = Sqlite3.CACHE_STALE;
@@ -3606,7 +3510,7 @@ start = sqlite3Hwtime();
                                                     ///<summary>
                                                     ///mem(P3) holds an integer 
                                                     ///</summary>
-                                                    if (pMem.u.i == MAX_ROWID || pC.useRandomRowid)
+                                                    if (pMem.u.AsInteger == MAX_ROWID || pC.useRandomRowid)
                                                     {
                                                         rc = SqlResult.SQLITE_FULL;
                                                         ///
@@ -3615,11 +3519,11 @@ start = sqlite3Hwtime();
                                                         ///<param name="IMP: R">61338 </param>
                                                         goto abort_due_to_error;
                                                     }
-                                                    if (v < (pMem.u.i + 1))
+                                                    if (v < (pMem.u.AsInteger + 1))
                                                     {
-                                                        v = (int)(pMem.u.i + 1);
+                                                        v = (int)(pMem.u.AsInteger + 1);
                                                     }
-                                                    pMem.u.i = (long)v;
+                                                    pMem.u.AsInteger = (long)v;
                                                 }
 #endif
                                                 pC.pCursor.sqlite3BtreeSetCachedRowid(v < MAX_ROWID ? v + 1 : 0);
@@ -3676,7 +3580,7 @@ start = sqlite3Hwtime();
                                             pC.deferredMoveto = false;
                                             pC.cacheStatus = Sqlite3.CACHE_STALE;
                                         }
-                                        pOut.u.i = (long)v;
+                                        pOut.u.AsInteger = (long)v;
                                         break;
                                     }
 #endregion
@@ -3772,7 +3676,7 @@ start = sqlite3Hwtime();
                                             Debug.Assert((pKey.flags & MemFlags.MEM_Int) != 0);
                                             Debug.Assert(pKey.memIsValid());
                                             Sqlite3.REGISTER_TRACE(this, pOp.p3, pKey);
-                                            iKey = pKey.u.i;
+                                            iKey = pKey.u.AsInteger;
                                         }
                                         else
                                         {
@@ -3786,8 +3690,8 @@ start = sqlite3Hwtime();
                                         if ((pData.flags & MemFlags.MEM_Null) != 0)
                                         {
                                             malloc_cs.sqlite3_free(ref pData.zBLOB);
-                                            pData.z = null;
-                                            pData.n = 0;
+                                            pData.AsString = null;
+                                            pData.CharacterCount = 0;
                                         }
                                         else
                                         {
@@ -3802,7 +3706,7 @@ start = sqlite3Hwtime();
                                         {
                                             nZero = 0;
                                         }
-                                        rc = pC.pCursor.sqlite3BtreeInsert(null, iKey, pData.zBLOB, pData.n, nZero, ((OpFlag)pOp.p5 & OpFlag.OPFLAG_APPEND) != 0 ? 1 : 0, seekResult);
+                                        rc = pC.pCursor.sqlite3BtreeInsert(null, iKey, pData.zBLOB, pData.CharacterCount, nZero, ((OpFlag)pOp.p5 & OpFlag.OPFLAG_APPEND) != 0 ? 1 : 0, seekResult);
                                         pC.rowidIsValid = false;
                                         pC.deferredMoveto = false;
                                         pC.cacheStatus = Sqlite3.CACHE_STALE;
@@ -4002,7 +3906,7 @@ start = sqlite3Hwtime();
                                                 goto no_mem;
                                             }
                                         }
-                                        pOut.n = (int)n;
+                                        pOut.CharacterCount = (int)n;
                                         if (pC.isIndex)
                                         {
                                             pOut.zBLOB = malloc_cs.sqlite3Malloc((int)n);
@@ -4093,7 +3997,7 @@ start = sqlite3Hwtime();
                                                 ///</summary>
                                             }
                                         }
-                                        pOut.u.i = (long)v;
+                                        pOut.u.AsInteger = (long)v;
                                         break;
                                     }
 
@@ -4156,7 +4060,7 @@ start = sqlite3Hwtime();
                                         Debug.Assert(iSet == -1 || iSet >= 0);
                                         if (iSet != 0)
                                         {
-                                            exists = pIn1.u.pRowSet.sqlite3RowSetTest((u8)(iSet >= 0 ? iSet & 0xf : 0xff), pIn3.u.i);
+                                            exists = pIn1.u.pRowSet.sqlite3RowSetTest((u8)(iSet >= 0 ? iSet & 0xf : 0xff), pIn3.u.AsInteger);
                                             if (exists != 0)
                                             {
                                                 opcodeIndex = pOp.p2 - 1;
@@ -4165,7 +4069,7 @@ start = sqlite3Hwtime();
                                         }
                                         if (iSet >= 0)
                                         {
-                                            pIn1.u.pRowSet.sqlite3RowSetInsert(pIn3.u.i);
+                                            pIn1.u.pRowSet.sqlite3RowSetInsert(pIn3.u.AsInteger);
                                         }
                                         break;
                                     }
@@ -4432,9 +4336,9 @@ start = sqlite3Hwtime();
                                         _pIn1.sqlite3VdbeMemIntegerify();
                                         pIn2 = aMem[pOp.p2];
                                         pIn2.sqlite3VdbeMemIntegerify();
-                                        if (_pIn1.u.i < pIn2.u.i)
+                                        if (_pIn1.u.AsInteger < pIn2.u.AsInteger)
                                         {
-                                            _pIn1.u.i = pIn2.u.i;
+                                            _pIn1.u.AsInteger = pIn2.u.AsInteger;
                                         }
                                         break;
                                     }
@@ -4475,9 +4379,9 @@ start = sqlite3Hwtime();
                                         ctx.pFunc = pOp.p4.pFunc;
                                         Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.aMem.Count());
                                         ctx.pMem = pMem = aMem[pOp.p3];
-                                        pMem.n++;
+                                        pMem.CharacterCount++;
                                         ctx.s.flags = MemFlags.MEM_Null;
-                                        ctx.s.z = null;
+                                        ctx.s.AsString = null;
                                         //ctx.s.zMalloc = null;
                                         ctx.s.xDel = null;
                                         ctx.s.db = db;
@@ -4670,8 +4574,8 @@ rc = sqlite3BtreeSetVersion(pBt, (eNew==PAGER_JOURNALMODE_WAL ? 2 : 1));
                                         eNew = pPager.sqlite3PagerSetJournalMode(eNew);
                                         pOut = aMem[pOp.p2];
                                         pOut.flags = MemFlags.MEM_Str | MemFlags.MEM_Static | MemFlags.MEM_Term;
-                                        pOut.z = Sqlite3.sqlite3JournalModename(eNew);
-                                        pOut.n = StringExtensions.Strlen30(pOut.z);
+                                        pOut.AsString = Sqlite3.sqlite3JournalModename(eNew);
+                                        pOut.CharacterCount = StringExtensions.Strlen30(pOut.AsString);
                                         pOut.enc = SqliteEncoding.UTF8;
                                         vdbemem_cs.sqlite3VdbeChangeEncoding(pOut, encoding);
                                         break;
@@ -4926,8 +4830,8 @@ break;
                                         ///Grab the index number and argc parameters 
                                         ///</summary>
                                         Debug.Assert((pQuery.flags & MemFlags.MEM_Int) != 0 && pArgc.flags == MemFlags.MEM_Int);
-                                        nArg = (int)pArgc.u.i;
-                                        iQuery = (int)pQuery.u.i;
+                                        nArg = (int)pArgc.u.AsInteger;
+                                        iQuery = (int)pQuery.u.AsInteger;
                                         ///
                                         ///<summary>
                                         ///Invoke the xFilter method 
@@ -5098,7 +5002,7 @@ break;
                                         Debug.Assert(pName.memIsValid());
                                         Sqlite3.REGISTER_TRACE(this, pOp.p1, pName);
                                         Debug.Assert((pName.flags & MemFlags.MEM_Str) != 0);
-                                        rc = pVtab.pModule.xRename(pVtab, pName.z);
+                                        rc = pVtab.pModule.xRename(pVtab, pName.AsString);
                                         Sqlite3.importVtabErrMsg(this, pVtab);
                                         this.expired = false;
                                         break;
@@ -5492,7 +5396,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                         pReg = aMem[vdbeCursor.pseudoTableReg];
                         Debug.Assert((pReg.flags & MemFlags.MEM_Blob) != 0);
                         Debug.Assert(pReg.memIsValid());
-                        payloadSize = (u32)pReg.n;
+                        payloadSize = (u32)pReg.CharacterCount;
                         zRecord = pReg.zBLOB;
                         vdbeCursor.cacheStatus = ((OpFlag)pOp.p5 & OpFlag.OPFLAG_CLEARCACHE) != 0 ? Sqlite3.CACHE_STALE : this.cacheCtr;
                         Debug.Assert(payloadSize == 0 || zRecord != null);
@@ -5731,7 +5635,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 //  pDest.z = sMem.z;
                 //  pDest.zMalloc = sMem.zMalloc;
                 //}
-                rc = pDest.sqlite3VdbeMemMakeWriteable();
+                rc = pDest.MakeWriteable();
                 op_column_out:
 #if SQLITE_TEST
 																																																																																																																																				              UPDATE_MAX_BLOBSIZE( pDest );

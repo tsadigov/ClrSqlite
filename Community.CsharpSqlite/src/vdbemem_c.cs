@@ -74,8 +74,8 @@ namespace Community.CsharpSqlite.Engine
                 Debug.Assert(desiredEnc == SqliteEncoding.UTF8 || desiredEnc == SqliteEncoding.UTF16LE || desiredEnc == SqliteEncoding.UTF16BE);
                 if ((pMem.flags & MemFlags.MEM_Str) == 0 || pMem.enc == desiredEnc)
                 {
-                    if (String.IsNullOrEmpty(pMem.z) && pMem.zBLOB != null)
-                        pMem.z = Encoding.UTF8.GetString(pMem.zBLOB, 0, pMem.zBLOB.Length);
+                    if (String.IsNullOrEmpty(pMem.AsString) && pMem.zBLOB != null)
+                        pMem.AsString = Encoding.UTF8.GetString(pMem.zBLOB, 0, pMem.zBLOB.Length);
                     return SqlResult.SQLITE_OK;
                 }
                 Debug.Assert(pMem.db == null || pMem.db.mutex.sqlite3_mutex_held());
@@ -158,8 +158,8 @@ return SqlResult.SQLITE_OK;
                 //}
                 //  pMem.z[pMem->n] = 0;
                 //  pMem.z[pMem->n+1] = 0;
-                if (pMem.z != null && pMem.n < pMem.z.Length)
-                    pMem.z = pMem.z.Substring(0, pMem.n);
+                if (pMem.AsString != null && pMem.CharacterCount < pMem.AsString.Length)
+                    pMem.AsString = pMem.AsString.Substring(0, pMem.CharacterCount);
                 pMem.flags |= MemFlags.MEM_Term;
                 return SqlResult.SQLITE_OK;
             }
@@ -203,28 +203,28 @@ return SqlResult.SQLITE_OK;
                 ///<param name=""></param>
                 if ((fg & MemFlags.MEM_Int) != 0)
                 {
-                    pMem.z = pMem.u.i.ToString();
+                    pMem.AsString = pMem.u.AsInteger.ToString();
                     //sqlite3_snprintf(nByte, pMem.z, "%lld", pMem->u.i);
                 }
                 else
                 {
                     Debug.Assert((fg & MemFlags.MEM_Real) != 0);
-                    if (Double.IsNegativeInfinity(pMem.r))
-                        pMem.z = "-Inf";
+                    if (Double.IsNegativeInfinity(pMem.AsReal))
+                        pMem.AsString = "-Inf";
                     else
-                        if (Double.IsInfinity(pMem.r))
-                            pMem.z = "Inf";
+                        if (Double.IsInfinity(pMem.AsReal))
+                            pMem.AsString = "Inf";
                         else
-                            if (Double.IsPositiveInfinity(pMem.r))
-                                pMem.z = "+Inf";
+                            if (Double.IsPositiveInfinity(pMem.AsReal))
+                                pMem.AsString = "+Inf";
                             else
-                                if (pMem.r.ToString(CultureInfo.InvariantCulture).Contains("."))
-                                    pMem.z = pMem.r.ToString(CultureInfo.InvariantCulture).ToLower();
+                                if (pMem.AsReal.ToString(CultureInfo.InvariantCulture).Contains("."))
+                                    pMem.AsString = pMem.AsReal.ToString(CultureInfo.InvariantCulture).ToLower();
                                 //sqlite3_snprintf(nByte, pMem.z, "%!.15g", pMem->r);
                                 else
-                                    pMem.z = pMem.r.ToString(CultureInfo.InvariantCulture) + ".0";
+                                    pMem.AsString = pMem.AsReal.ToString(CultureInfo.InvariantCulture) + ".0";
                 }
-                pMem.n = StringExtensions.Strlen30(pMem.z);
+                pMem.CharacterCount = StringExtensions.Strlen30(pMem.AsString);
                 pMem.enc = SqliteEncoding.UTF8;
                 pMem.flags |= MemFlags.MEM_Str | MemFlags.MEM_Term;
                 sqlite3VdbeChangeEncoding(pMem, enc);
@@ -389,7 +389,7 @@ return r;
                     if (0 == (pFrom.flags & MemFlags.MEM_Static))
                     {
                         pTo.flags |= MemFlags.MEM_Ephem;
-                        rc = pTo.sqlite3VdbeMemMakeWriteable();
+                        rc = pTo.MakeWriteable();
                     }
                 }
                 return rc;
@@ -411,7 +411,7 @@ return r;
                 // memcpy(pTo, pFrom, Mem).Length;
                 pFrom.flags = MemFlags.MEM_Null;
                 pFrom.xDel = null;
-                pFrom.z = null;
+                pFrom.AsString = null;
                 malloc_cs.sqlite3_free(ref pFrom.zBLOB);
                 //pFrom.zMalloc=0;
             }
@@ -471,19 +471,19 @@ return r;
                         double r1, r2;
                         if ((f1 & MemFlags.MEM_Real) == 0)
                         {
-                            r1 = (double)pMem1.u.i;
+                            r1 = (double)pMem1.u.AsInteger;
                         }
                         else
                         {
-                            r1 = pMem1.r;
+                            r1 = pMem1.AsReal;
                         }
                         if ((f2 & MemFlags.MEM_Real) == 0)
                         {
-                            r2 = (double)pMem2.u.i;
+                            r2 = (double)pMem2.u.AsInteger;
                         }
                         else
                         {
-                            r2 = pMem2.r;
+                            r2 = pMem2.AsReal;
                         }
                         if (r1 < r2)
                             return -1;
@@ -495,9 +495,9 @@ return r;
                     {
                         Debug.Assert((f1 & MemFlags.MEM_Int) != 0);
                         Debug.Assert((f2 & MemFlags.MEM_Int) != 0);
-                        if (pMem1.u.i < pMem2.u.i)
+                        if (pMem1.u.AsInteger < pMem2.u.AsInteger)
                             return -1;
-                        if (pMem1.u.i > pMem2.u.i)
+                        if (pMem1.u.AsInteger > pMem2.u.AsInteger)
                             return 1;
                         return 0;
                     }
@@ -537,7 +537,7 @@ return r;
                             ///The strings are already in the correct encoding.  Call the
                             ///comparison function directly 
                             ///</summary>
-                            return pColl.xCmp(pColl.pUser, pMem1.n, pMem1.z, pMem2.n, pMem2.z);
+                            return pColl.xCmp(pColl.pUser, pMem1.CharacterCount, pMem1.AsString, pMem2.CharacterCount, pMem2.AsString);
                         }
                         else
                         {
@@ -552,9 +552,9 @@ return r;
                             sqlite3VdbeMemShallowCopy(c1, pMem1, MemFlags.MEM_Ephem);
                             sqlite3VdbeMemShallowCopy(c2, pMem2, MemFlags.MEM_Ephem);
                             v1 = sqlite3ValueText((sqlite3_value)c1, pColl.enc);
-                            n1 = v1 == null ? 0 : c1.n;
+                            n1 = v1 == null ? 0 : c1.CharacterCount;
                             v2 = sqlite3ValueText((sqlite3_value)c2, pColl.enc);
-                            n2 = v2 == null ? 0 : c2.n;
+                            n2 = v2 == null ? 0 : c2.CharacterCount;
                             rc = pColl.xCmp(pColl.pUser, n1, v1, n2, v2);
                             c1.sqlite3VdbeMemRelease();
                             c2.sqlite3VdbeMemRelease();
@@ -573,14 +573,14 @@ return r;
                 ///</summary>
                 if ((pMem1.flags & MemFlags.MEM_Blob) != 0)
                     if (pMem1.zBLOB != null)
-                        rc = _Custom.memcmp(pMem1.zBLOB, pMem2.zBLOB, (pMem1.n > pMem2.n) ? pMem2.n : pMem1.n);
+                        rc = _Custom.memcmp(pMem1.zBLOB, pMem2.zBLOB, (pMem1.CharacterCount > pMem2.CharacterCount) ? pMem2.CharacterCount : pMem1.CharacterCount);
                     else
-                        rc = _Custom.memcmp(pMem1.z, pMem2.zBLOB, (pMem1.n > pMem2.n) ? pMem2.n : pMem1.n);
+                        rc = _Custom.memcmp(pMem1.AsString, pMem2.zBLOB, (pMem1.CharacterCount > pMem2.CharacterCount) ? pMem2.CharacterCount : pMem1.CharacterCount);
                 else
-                    rc = _Custom.memcmp(pMem1.z, pMem2.z, (pMem1.n > pMem2.n) ? pMem2.n : pMem1.n);
+                    rc = _Custom.memcmp(pMem1.AsString, pMem2.AsString, (pMem1.CharacterCount > pMem2.CharacterCount) ? pMem2.CharacterCount : pMem1.CharacterCount);
                 if (rc == 0)
                 {
-                    rc = pMem1.n - pMem2.n;
+                    rc = pMem1.CharacterCount - pMem2.CharacterCount;
                 }
                 return rc;
             }
@@ -665,7 +665,7 @@ return r;
                     {
                         pMem.enc = 0;
                         pMem.type = FoundationalType.SQLITE_BLOB;
-                        pMem.z = null;
+                        pMem.AsString = null;
                         pMem.zBLOB = malloc_cs.sqlite3Malloc(amt);
                         pMem.flags = MemFlags.MEM_Blob | MemFlags.MEM_Dyn | MemFlags.MEM_Term;
                         if (key)
@@ -684,7 +684,7 @@ return r;
                             pMem.sqlite3VdbeMemRelease();
                         }
                     }
-                pMem.n = amt;
+                pMem.CharacterCount = amt;
                 malloc_cs.sqlite3_free(ref zData);
                 return rc;
             }
@@ -723,10 +723,10 @@ return r;
                         return null;
                         // Encoding Error
                     }
-                    if ((enc & SqliteEncoding.UTF16_ALIGNED) != 0 && 1 == (1 & (pVal.z[0])))//1==(1&SQLITE_PTR_TO_INT(pVal.z))
+                    if ((enc & SqliteEncoding.UTF16_ALIGNED) != 0 && 1 == (1 & (pVal.AsString[0])))//1==(1&SQLITE_PTR_TO_INT(pVal.z))
                     {
                         Debug.Assert((pVal.flags & (MemFlags.MEM_Ephem | MemFlags.MEM_Static)) != 0);
-                        if (pVal.sqlite3VdbeMemMakeWriteable() != SqlResult.SQLITE_OK)
+                        if (pVal.MakeWriteable() != SqlResult.SQLITE_OK)
                         {
                             return null;
                         }
@@ -747,7 +747,7 @@ return r;
                 );
                 if (pVal.enc == (enc & ~SqliteEncoding.UTF16_ALIGNED))
                 {
-                    return pVal.z;
+                    return pVal.AsString;
                 }
                 else
                 {
@@ -847,7 +847,7 @@ return r;
                         goto no_mem;
                     if (pExpr.ExprHasProperty(ExprFlags.EP_IntValue))
                     {
-                        pVal.sqlite3VdbeMemSetInt64((i64)pExpr.u.iValue * negInt);
+                        pVal.Set((i64)pExpr.u.iValue * negInt);
                     }
                     else
                     {
@@ -885,18 +885,18 @@ return r;
                         ///<param name="This branch happens for multiple negative signs.  Ex: ">5) </param>
                         if (SqlResult.SQLITE_OK == sqlite3ValueFromExpr(db, pExpr.pLeft, enc, affinity, ref pVal))
                         {
-                            pVal.sqlite3VdbeMemNumerify();
-                            if (pVal.u.i == IntegerExtensions.SMALLEST_INT64)
+                            pVal.Numerify();
+                            if (pVal.u.AsInteger == IntegerExtensions.SMALLEST_INT64)
                             {
                                 pVal.flags &= MemFlags.MEM_Int;
                                 pVal.flags |= MemFlags.MEM_Real;
-                                pVal.r = (double)IntegerExtensions.LARGEST_INT64;
+                                pVal.AsReal = (double)IntegerExtensions.LARGEST_INT64;
                             }
                             else
                             {
-                                pVal.u.i = -pVal.u.i;
+                                pVal.u.AsInteger = -pVal.u.AsInteger;
                             }
-                            pVal.r = -pVal.r;
+                            pVal.AsReal = -pVal.AsReal;
                             Sqlite3.sqlite3ValueApplyAffinity(pVal, affinity, enc);
                         }
                     }
@@ -988,11 +988,11 @@ return r;
                 {
                     if ((p.flags & MemFlags.MEM_Zero) != 0)
                     {
-                        return p.n + p.u.nZero;
+                        return p.CharacterCount + p.u.nZero;
                     }
                     else
                     {
-                        return p.z == null ? p.zBLOB.Length : p.n;
+                        return p.AsString == null ? p.zBLOB.Length : p.CharacterCount;
                     }
                 }
                 return 0;

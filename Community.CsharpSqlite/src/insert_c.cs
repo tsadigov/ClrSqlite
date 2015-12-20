@@ -651,7 +651,7 @@ namespace Community.CsharpSqlite
 ///allocated even if there is no FROM clause 
 ///</summary>
 
-			if (pSelect.pSrc.nSrc != 1) {
+			if (pSelect.pSrc.Count != 1) {
 				return 0;
 				///
 ///<summary>
@@ -729,7 +729,7 @@ namespace Community.CsharpSqlite
 			}
 			pEList = pSelect.ResultingFieldList;
 			Debug.Assert (pEList != null);
-			if (pEList.nExpr != 1) {
+			if (pEList.Count != 1) {
 				return 0;
 				///
 ///<summary>

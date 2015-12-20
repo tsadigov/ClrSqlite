@@ -337,41 +337,18 @@ namespace Community.CsharpSqlite
 
         public class ExprList:MyCollection<ExprList_item>
         {
-            public int nExpr {
-                get { return nSrc; }
-                set { nSrc = (Int16)value; }
-            }
-
-            ///
             ///<summary>
-            ///Number of expressions on the list 
+            ///VDBE VdbeCursor associated with this ExprList
             ///</summary>
-
-            //public int nAlloc;
-
-            ///
-            ///<summary>
-            ///Number of entries allocated below 
-            ///</summary>
-
             public int iECursor;
 
             public ExprList() { }
             public ExprList(int nExpr)
             {
-                this.nExpr = nExpr;
+                this.Count = nExpr;
             }
 
-            ///<summary>
-            ///VDBE VdbeCursor associated with this ExprList
-            ///</summary>
-            //public ExprList_item[] a;
-
-            ///
-            ///<summary>
-            ///One entry for each expression 
-            ///</summary>
-
+            
             public ExprList Copy()
             {
                 if (this == null)
@@ -407,7 +384,7 @@ namespace Community.CsharpSqlite
             )
             {
                 Bitmask allowed = ~pMaskSet.getMask(iBase);
-                while (iFirst < this.nExpr)
+                while (iFirst < this.Count)
                 {
                     if ((pMaskSet.exprTableUsage(this.a[iFirst++].pExpr) & allowed) != 0)
                     {
@@ -817,7 +794,7 @@ set { _op = value; }
                 else
                     if (this.ExprHasProperty(ExprFlags.EP_xIsSelect))
                     {
-                        aff = this.x.pSelect.ResultingFieldList.a[0].pExpr.sqlite3CompareAffinity(aff);
+                        aff = this.x.pSelect.ResultingFieldList[0].pExpr.sqlite3CompareAffinity(aff);
                     }
                     else
                         if (aff == '\0')
@@ -1163,7 +1140,7 @@ set { _op = value; }
                 if (op == TokenType.TK_SELECT)
                 {
                     Debug.Assert(((ExprFlags)this.flags & ExprFlags.EP_xIsSelect) != 0);
-                    return this.x.pSelect.ResultingFieldList.a[0].pExpr.sqlite3ExprAffinity();
+                    return this.x.pSelect.ResultingFieldList[0].pExpr.sqlite3ExprAffinity();
                 }
 #if !SQLITE_OMIT_CAST
                 if (op == TokenType.TK_CAST)
@@ -1233,11 +1210,11 @@ set { _op = value; }
                     return false;
                 }
                 pList = this.x.pList;
-                if (pList.nExpr != 2)
+                if (pList.Count != 2)
                 {
                     return false;
                 }
-                if (pList.a[1].pExpr.Operator != TokenType.TK_COLUMN)
+                if (pList[1].pExpr.Operator != TokenType.TK_COLUMN)
                 {
                     return false;
                 }
@@ -1355,12 +1332,12 @@ set { _op = value; }
                             while (pNC != null && pTab == null)
                             {
                                 SrcList pTabList = pNC.pSrcList;
-                                for (j = 0; j < pTabList.nSrc && pTabList.a[j].iCursor != pExpr.iTable; j++)
+                                for (j = 0; j < pTabList.Count && pTabList[j].iCursor != pExpr.iTable; j++)
                                     ;
-                                if (j < pTabList.nSrc)
+                                if (j < pTabList.Count)
                                 {
-                                    pTab = pTabList.a[j].pTab;
-                                    pS = pTabList.a[j].pSelect;
+                                    pTab = pTabList[j].pTab;
+                                    pS = pTabList[j].pSelect;
                                 }
                                 else
                                 {
@@ -1401,7 +1378,7 @@ set { _op = value; }
                                 ///<param name="of the SELECT statement. Return the declaration type and origin">of the SELECT statement. Return the declaration type and origin</param>
                                 ///<param name="data for the result">select.</param>
                                 ///<param name=""></param>
-                                if (iCol >= 0 && Sqlite3.ALWAYS(iCol < pS.ResultingFieldList.nExpr))
+                                if (iCol >= 0 && Sqlite3.ALWAYS(iCol < pS.ResultingFieldList.Count))
                                 {
                                     ///
                                     ///<summary>
@@ -1411,7 +1388,7 @@ set { _op = value; }
                                     ///<param name="test case misc2.2.2) "> it always evaluates to NULL.</param>
                                     ///<param name=""></param>
                                     NameContext sNC = new NameContext();
-                                    Expr expr = pS.ResultingFieldList.a[iCol].pExpr;
+                                    Expr expr = pS.ResultingFieldList[iCol].pExpr;
                                     sNC.pSrcList = pS.pSrc;
                                     sNC.pNext = pNC;
                                     sNC.pParse = pNC.pParse;
@@ -1460,7 +1437,7 @@ set { _op = value; }
                             ///<param name=""></param>
                             NameContext sNC = new NameContext();
                             Select pS = pExpr.x.pSelect;
-                            Expr expr = pS.ResultingFieldList.a[0].pExpr;
+                            Expr expr = pS.ResultingFieldList[0].pExpr;
                             Debug.Assert(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
                             sNC.pSrcList = pS.pSrc;
                             sNC.pNext = pNC;
@@ -1506,11 +1483,7 @@ set { _op = value; }
     }
 
     public partial class Sqlite3
-    {
-
-
-
-        
+    {        
         ///<summary>
         /// Flags passed to the exprc.sqlite3ExprDup() function. See the header comment
         /// above exprc.sqlite3ExprDup() for details.
@@ -1518,36 +1491,6 @@ set { _op = value; }
         ///</summary>
         //#define EXPRDUP_REDUCE         0x0001  /* Used reduced-size Expr nodes */
         public const int EXPRDUP_REDUCE = 0x0001;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-///////////////-------------------------expr
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ///
         ///<summary>
         ///The following are the meanings of bits in the Expr.flags2 field.
@@ -1560,45 +1503,6 @@ set { _op = value; }
 
         public const u8 EP2_Irreducible = 0x0002;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
-
-
-
-
-   
 
 }

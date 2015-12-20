@@ -933,7 +933,7 @@ return;
 				///<param name="Saved value of db">>flags </param>
 				savedDbFlags=db.flags;
 				//if ( NEVER( db.mallocFailed != 0 ) ) goto exit_rename_table;
-				Debug.Assert(pSrc.nSrc==1);
+				Debug.Assert(pSrc.Count==1);
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
 				pTab=TableBuilder.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
 				if(pTab==null)
@@ -3220,7 +3220,7 @@ goto attach_end;
 								else {
 									pNew=this.sqlite3PExpr(TokenType.TK_NULL,0,0,0);
 								}
-							pList=this.sqlite3ExprListAppend(pList,pNew);
+							pList= pList.Append(pNew);
 							this.sqlite3ExprListSetName(pList,tFromCol,0);
 						}
 					}
@@ -3236,7 +3236,7 @@ goto attach_end;
 						if(pRaise!=null) {
 							pRaise.affinity=(char)OnConstraintError.OE_Abort;
 						}
-						pSelect=Select.sqlite3SelectNew(this,this.sqlite3ExprListAppend(0,pRaise),build.sqlite3SrcListAppend(db,0,tFrom,null),pWhere,null,null,null,0,null,null);
+						pSelect=Select.sqlite3SelectNew(this,CollectionExtensions.Append(null,pRaise),build.sqlite3SrcListAppend(db,0,tFrom,null),pWhere,null,null,null,0,null,null);
 						pWhere=null;
 					}
 					///
@@ -3800,7 +3800,7 @@ pParse.nTableLock = 0;
 				///Locate the table into which we will be inserting new information.
 				///
 				///</summary>
-				Debug.Assert(pTabList.nSrc==1);
+				Debug.Assert(pTabList.Count==1);
 				zTab=pTabList.a[0].zName;
 				if(NEVER(zTab==null))
 					goto insert_cleanup;
@@ -3980,7 +3980,7 @@ isView = false;
 					///</summary>
 					regFromSelect=dest.iMem;
 					Debug.Assert(pSelect.ResultingFieldList!=null);
-					nColumn=pSelect.ResultingFieldList.nExpr;
+					nColumn=pSelect.ResultingFieldList.Count;
 					Debug.Assert(dest.nMem==nColumn);
 					///
 					///<summary>
@@ -4060,7 +4060,7 @@ isView = false;
 					sNC.pParse=this;
 					srcTab=-1;
 					Debug.Assert(!useTempTable);
-					nColumn=pList!=null?pList.nExpr:0;
+					nColumn=pList!=null?pList.Count:0;
 					for(i=0;i<nColumn;i++) {
 						if(ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pList.a[i].pExpr)!=0) {
 							goto insert_cleanup;
@@ -5432,7 +5432,7 @@ isView = false;
 				) {
 					goto update_cleanup;
 				}
-				Debug.Assert(pTabList.nSrc==1);
+				Debug.Assert(pTabList.Count==1);
 				///
 				///<summary>
 				///Locate the table which we want to update.
@@ -5501,7 +5501,7 @@ isView = false;
 				///
 				///</summary>
 				chngRowid=false;
-				for(i=0;i<pChanges.nExpr;i++) {
+				for(i=0;i<pChanges.Count;i++) {
 					if(ResolveExtensions.sqlite3ResolveExprNames(sNC,ref pChanges.a[i].pExpr)!=0) {
 						goto update_cleanup;
 					}
@@ -6030,9 +6030,9 @@ aXRef[j] = -1;
 				///all updated rows.
 				///
 				///</summary>
-				pEList=this.sqlite3ExprListAppend(0,exprc.sqlite3Expr(db,TokenType.TK_ID,"_rowid_"));
+				pEList=CollectionExtensions.Append(null,exprc.sqlite3Expr(db,TokenType.TK_ID,"_rowid_"));
 				if(pRowid!=null) {
-					pEList=this.sqlite3ExprListAppend(pEList,exprc.sqlite3ExprDup(db,pRowid,0));
+					pEList=pEList.Append(exprc.sqlite3ExprDup(db,pRowid,0));
 				}
 				Debug.Assert(pTab.iPKey<0);
 				for(i=0;i<pTab.nCol;i++) {
@@ -6042,7 +6042,7 @@ aXRef[j] = -1;
 					else {
 						pExpr=exprc.sqlite3Expr(db,TokenType.TK_ID,pTab.aCol[i].zName);
 					}
-					pEList=this.sqlite3ExprListAppend(pEList,pExpr);
+					pEList=pEList.Append(pExpr);
 				}
 				pSelect=Select.sqlite3SelectNew(this,pEList,pSrc,pWhere,null,null,null,0,null,null);
 				///
@@ -6090,7 +6090,7 @@ aXRef[j] = -1;
 			public Table sqlite3SrcListLookup(SrcList pSrc) {
 				SrcList_item pItem=pSrc.a[0];
 				Table pTab;
-				Debug.Assert(pItem!=null&&pSrc.nSrc==1);
+				Debug.Assert(pItem!=null&&pSrc.Count==1);
 				pTab=TableBuilder.sqlite3LocateTable(this,0,pItem.zName,pItem.zDatabase);
 				TableBuilder.sqlite3DeleteTable(this.db,ref pItem.pTab);
 				pItem.pTab=pTab;
@@ -6161,7 +6161,7 @@ aXRef[j] = -1;
 					pFrom=build.sqlite3SrcListAppend(db,null,null,null);
 					//if ( pFrom != null )
 					//{
-					Debug.Assert(pFrom.nSrc==1);
+					Debug.Assert(pFrom.Count==1);
 					pFrom.a[0].zAlias=pView.zName;
 					// sqlite3DbStrDup( db, pView.zName );
 					pFrom.a[0].pSelect=pDup;
@@ -6283,7 +6283,7 @@ aXRef[j] = -1;
 				) {
 					goto delete_from_cleanup;
 				}
-				Debug.Assert(pTabList.nSrc==1);
+				Debug.Assert(pTabList.Count==1);
 				///
 				///<summary>
 				///Locate the table which we want to delete.  This table has to be
@@ -6342,7 +6342,7 @@ isView = false;
 				///Assign  cursor number to the table and all its indices.
 				///
 				///</summary>
-				Debug.Assert(pTabList.nSrc==1);
+				Debug.Assert(pTabList.Count==1);
 				iCur=pTabList.a[0].iCursor=this.nTab++;
 				for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
 					this.nTab++;
@@ -7532,7 +7532,7 @@ return;
 					else {
 						pFarg=pExpr.x.pList;
 					}
-					nFarg=pFarg!=null?pFarg.nExpr:0;
+					nFarg=pFarg!=null?pFarg.Count:0;
 					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
 					zId=pExpr.u.zToken;
 					nId=StringExtensions.Strlen30(zId);
@@ -7658,7 +7658,7 @@ return;
 				///</summary>
 				case TokenType.TK_BETWEEN: {
 					Expr pLeft=pExpr.pLeft;
-					ExprList_item pLItem=pExpr.x.pList.a[0];
+					ExprList_item pLItem=pExpr.x.pList[0];
 					Expr pRight=pLItem.pExpr;
 					r1=this.sqlite3ExprCodeTemp(pLeft,ref regFree1);
 					r2=this.sqlite3ExprCodeTemp(pRight,ref regFree2);
@@ -7667,7 +7667,7 @@ return;
 					r3=this.sqlite3GetTempReg();
 					r4=this.sqlite3GetTempReg();
                     this.codeCompare(pLeft, pRight,  OpCode.OP_Ge, r1, r2, r3, sqliteinth.SQLITE_STOREP2);
-					pLItem=pExpr.x.pList.a[1];
+					pLItem=pExpr.x.pList[1];
 					// pLItem++;
 					pRight=pLItem.pExpr;
 					this.sqlite3ReleaseTempReg(regFree2);
@@ -7811,11 +7811,11 @@ return;
             //VVA_ONLY( int iCacheLevel = pParse.iCacheLevel; )
 #endif
 					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect)&&pExpr.x.pList!=null);
-					Debug.Assert((pExpr.x.pList.nExpr%2)==0);
-					Debug.Assert(pExpr.x.pList.nExpr>0);
+					Debug.Assert((pExpr.x.pList.Count%2)==0);
+					Debug.Assert(pExpr.x.pList.Count>0);
 					pEList=pExpr.x.pList;
 					aListelem=pEList.a;
-					nExpr=pEList.nExpr;
+					nExpr=pEList.Count;
 					endLabel=v.sqlite3VdbeMakeLabel();
 					if((pX=pExpr.pLeft)!=null) {
 						cacheX=pX;
@@ -7995,7 +7995,7 @@ return;
 				///<summary>
 				///Never gets this far otherwise 
 				///</summary>
-				n=pList.nExpr;
+				n=pList.Count;
 				for(i=0;i<n;i++)// pItem++)
 				 {
 					pItem=pList.a[i];
@@ -8391,59 +8391,7 @@ return;
 					this.iRangeReg=iReg;
 				}
 			}
-			public ExprList sqlite3ExprListAppend(int null_2,Expr pExpr) {
-				return this.sqlite3ExprListAppend(null,pExpr);
-			}
-			public ExprList sqlite3ExprListAppend(///
-			///<summary>
-			///Parsing context 
-			///</summary>
-			ExprList pList,///
-			///<summary>
-			///List to which to append. Might be NULL 
-			///</summary>
-			Expr pExpr///
-			///<summary>
-			///Expression to be appended. Might be NULL 
-			///</summary>
-			) {
-				Connection db=this.db;
-				if(pList==null) {
-					pList=new ExprList();
-					//sqlite3DbMallocZero(db, ExprList).Length;
-					//if ( pList == null )
-					//{
-					//  goto no_mem;
-					//}
-					Debug.Assert(pList.nAlloc==0);
-				}
-				if(pList.nAlloc<=pList.nExpr) {
-					ExprList_item a;
-					int n=pList.nAlloc*2+4;
-                    //a = sqlite3DbRealloc(db, pList.a, n*sizeof(pList.a[0]));
-                    //if( a==0 ){
-                    //  goto no_mem;
-                    //}
-                    pList.Resize(n);
-					// = a;
-					
-					// sqlite3DbMallocSize(db, a)/sizeof(a[0]);
-				}
-				Debug.Assert(pList.a!=null);
-				if(true) {
-					pList.a[pList.nExpr]=new ExprList_item();
-					//ExprList_item pItem = pList.a[pList.nExpr++];
-					//pItem = new ExprList_item();//memset(pItem, 0, sizeof(*pItem));
-					//pItem.pExpr = pExpr;
-					pList.a[pList.nExpr++].pExpr=pExpr;
-				}
-				return pList;
-				//no_mem:
-				//  /* Avoid leaking memory if malloc has failed. */
-				//  exprc.sqlite3ExprDelete( db, ref pExpr );
-				//  exprc.sqlite3ExprListDelete( db, ref pList );
-				//  return null;
-			}
+			
 			public void sqlite3ExprListSetSpan(///
 			///<summary>
 			///Parsing context 
@@ -8464,8 +8412,8 @@ return;
 				///</summary>
 				);
 				if(pList!=null) {
-					ExprList_item pItem=pList.a[pList.nExpr-1];
-					Debug.Assert(pList.nExpr>0);
+					ExprList_item pItem=pList.a[pList.Count-1];
+					Debug.Assert(pList.Count>0);
 					Debug.Assert(///
 					///<summary>
 					///db.mallocFailed != 0 || 
@@ -8501,8 +8449,8 @@ return;
 				);
 				if(pList!=null) {
 					ExprList_item pItem;
-					Debug.Assert(pList.nExpr>0);
-					pItem=pList.a[pList.nExpr-1];
+					Debug.Assert(pList.Count>0);
+					pItem=pList.a[pList.Count-1];
 					Debug.Assert(pItem.zName==null);
 					pItem.zName=pName.zRestSql.Substring(0,pName.Length);
 					//sqlite3DbStrNDup(pParse.db, pName.z, pName.n);
@@ -8512,9 +8460,9 @@ return;
 			}
 			public void sqlite3ExprListCheckLength(ExprList pEList,string zObject) {
 				int mx=this.db.aLimit[Globals.SQLITE_LIMIT_COLUMN];
-				sqliteinth.testcase(pEList!=null&&pEList.nExpr==mx);
-				sqliteinth.testcase(pEList!=null&&pEList.nExpr==mx+1);
-				if(pEList!=null&&pEList.nExpr>mx) {
+				sqliteinth.testcase(pEList!=null&&pEList.Count==mx);
+				sqliteinth.testcase(pEList!=null&&pEList.Count==mx+1);
+				if(pEList!=null&&pEList.Count>mx) {
 					utilc.sqlite3ErrorMsg(this,"too many columns in %s",zObject);
 				}
 			}
@@ -9343,13 +9291,13 @@ return;
 				///</summary>
 				nOrderBy=0;
 				if(pOrderBy!=null) {
-					for(i=0;i<pOrderBy.nExpr;i++) {
+					for(i=0;i<pOrderBy.Count;i++) {
 						Expr pExpr=pOrderBy.a[i].pExpr;
 						if(pExpr.Operator!=TokenType.TK_COLUMN||pExpr.iTable!=pSrc.iCursor)
 							break;
 					}
-					if(i==pOrderBy.nExpr) {
-						nOrderBy=pOrderBy.nExpr;
+					if(i==pOrderBy.Count) {
+						nOrderBy=pOrderBy.Count;
 					}
 				}
 				///
@@ -10062,12 +10010,12 @@ range_est_fallback:
 								bInEst=1;
 							}
 							else
-								if(Sqlite3.ALWAYS(pExpr.x.pList!=null)&&pExpr.x.pList.nExpr!=0) {
+								if(Sqlite3.ALWAYS(pExpr.x.pList!=null)&&pExpr.x.pList.Count!=0) {
 									///
 									///<summary>
 									///"x IN (value, value, ...)" 
 									///</summary>
-									nInMul*=pExpr.x.pList.nExpr;
+									nInMul*=pExpr.x.pList.Count;
 								}
 						}
 						else
@@ -10936,8 +10884,8 @@ range_est_fallback:
 				///The number of tables in the FROM clause is limited by the number of
 				///bits in a Bitmask
 				///</summary>
-                sqliteinth.testcase(pTabList.nSrc == Globals.BMS);
-                if (pTabList.nSrc > Globals.BMS)
+                sqliteinth.testcase(pTabList.Count == Globals.BMS);
+                if (pTabList.Count > Globals.BMS)
                 {
                     utilc.sqlite3ErrorMsg(this, "at most %d tables in a join", Globals.BMS);
 					return null;
@@ -10950,7 +10898,7 @@ range_est_fallback:
 				///any cursors associated with subsequent tables are uninitialized.
 				///
 				///</summary>
-				nTabList=((wctrlFlags&wherec.WHERE_ONETABLE_ONLY)!=0)?1:(int)pTabList.nSrc;
+				nTabList=((wctrlFlags&wherec.WHERE_ONETABLE_ONLY)!=0)?1:(int)pTabList.Count;
 				///
 				///<summary>
 				///Allocate and initialize the WhereInfo structure that will become the
@@ -10969,7 +10917,7 @@ range_est_fallback:
 				//    sizeof( WhereClause ) +
 				//    sizeof( WhereMaskSet )
 				//);
-				pWInfo.a=new WhereLevel[pTabList.nSrc];
+				pWInfo.a=new WhereLevel[pTabList.Count];
 				for(int ai=0;ai<pWInfo.a.Length;ai++) {
 					pWInfo.a[ai]=new WhereLevel();
 				}
@@ -11037,7 +10985,7 @@ range_est_fallback:
 				///<param name="wherec.WHERE_ONETABLE_ONLY flag is set.">wherec.WHERE_ONETABLE_ONLY flag is set.</param>
 				///<param name=""></param>
 				Debug.Assert(pWC.vmask==0&&pMaskSet.n==0);
-				for(i=0;i<pTabList.nSrc;i++) {
+				for(i=0;i<pTabList.Count;i++) {
 					pMaskSet.createMask(pTabList.a[i].iCursor);
 					#if !SQLITE_OMIT_VIRTUALTABLE
                     if (Sqlite3.ALWAYS(pTabList.a[i].pTab) && pTabList.a[i].pTab.IsVirtual())
@@ -11629,7 +11577,7 @@ range_est_fallback:
 				///</summary>
 				Connection db=this.db;
 				Debug.Assert(pOrderBy!=null);
-				nTerm=pOrderBy.nExpr;
+				nTerm=pOrderBy.Count;
 				Debug.Assert(nTerm>0);
 				///
 				///<summary>
@@ -12093,7 +12041,7 @@ range_est_fallback:
 							return 0;
 						}
 						pEList=pExpr.x.pSelect.ResultingFieldList;
-						if(Sqlite3.ALWAYS(pEList!=null)&&pEList.nExpr>0) {
+						if(Sqlite3.ALWAYS(pEList!=null)&&pEList.Count>0) {
 							keyInfo.aColl[0]=this.sqlite3BinaryCompareCollSeq(pExpr.pLeft,pEList.a[0].pExpr);
 						}
 					}
@@ -12124,7 +12072,7 @@ range_est_fallback:
 							r1=this.sqlite3GetTempReg();
 							r2=this.sqlite3GetTempReg();
                             v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, r2);
-							for(i=0;i<pList.nExpr;i++) {
+							for(i=0;i<pList.Count;i++) {
 								//, pItem++){
 								pItem=pList.a[i];
 								Expr pE2=pItem.pExpr;

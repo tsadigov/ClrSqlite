@@ -60,6 +60,12 @@ namespace Community.CsharpSqlite.Ast
 
     public class Select
         {
+
+
+        public void ShowDebugInfo() {
+            //this.ResultingFieldList.a[0].pExpr
+        }
+
         ///<summary>
         ///pEList
         ///The fields of the result 
@@ -295,9 +301,9 @@ namespace Community.CsharpSqlite.Ast
                 ///Look up every table named in the FROM clause of the select.  If
                 ///an entry of the FROM clause is a subquery instead of a table or view,
                 ///then create a transient table ure to describe the subquery.
-                for (i = 0; i < pTabList.nSrc; i++)// pFrom++ )
+                for (i = 0; i < pTabList.Count; i++)// pFrom++ )
                 {
-                    pFrom = pTabList.a[i];
+                    pFrom = pTabList[i];
                     Table pTab;
                     if (pFrom.pTab != null)
                     {
@@ -379,9 +385,9 @@ namespace Community.CsharpSqlite.Ast
                 ///
                 ///The first loop just checks to see if there are any "*" operators
                 ///that need expanding.
-                for (k = 0; k < pEList.nExpr; k++)
+                for (k = 0; k < pEList.Count; k++)
                 {
-                    Expr pE = pEList.a[k].pExpr;
+                    Expr pE = pEList[k].pExpr;
                     if (pE.Operator == TokenType.TK_ALL)
                         break;
                     Debug.Assert(pE.Operator != TokenType.TK_DOT || pE.pRight != null);
@@ -389,7 +395,7 @@ namespace Community.CsharpSqlite.Ast
                     if (pE.Operator == TokenType.TK_DOT && pE.pRight.Operator == TokenType.TK_ALL)
                         break;
                 }
-                if (k < pEList.nExpr)
+                if (k < pEList.Count)
                 {
                     ///
                     ///<summary>
@@ -402,7 +408,7 @@ namespace Community.CsharpSqlite.Ast
                     ExprList pNew = null;
                     SqliteFlags flags = pParse.db.flags;
                     bool longNames = (flags & SqliteFlags.SQLITE_FullColNames) != 0 && (flags & SqliteFlags.SQLITE_ShortColNames) == 0;
-                    for (k = 0; k < pEList.nExpr; k++)
+                    for (k = 0; k < pEList.Count; k++)
                     {
                         Expr pE = a[k].pExpr;
                         Debug.Assert(pE.Operator != TokenType.TK_DOT || pE.pRight != null);
@@ -413,11 +419,11 @@ namespace Community.CsharpSqlite.Ast
                             ///This particular expression does not need to be expanded.
                             ///
                             ///</summary>
-                            pNew = pParse.sqlite3ExprListAppend(pNew, a[k].pExpr);
+                            pNew = pNew.Append( a[k].pExpr);
                             if (pNew != null)
                             {
-                                pNew.a[pNew.nExpr - 1].zName = a[k].zName;
-                                pNew.a[pNew.nExpr - 1].zSpan = a[k].zSpan;
+                                pNew[pNew.Count - 1].zName = a[k].zName;
+                                pNew[pNew.Count - 1].zSpan = a[k].zSpan;
                                 a[k].zName = null;
                                 a[k].zSpan = null;
                             }
@@ -450,7 +456,7 @@ namespace Community.CsharpSqlite.Ast
                             {
                                 zTName = null;
                             }
-                            for (i = 0; i < pTabList.nSrc; i++)//, pFrom++ )
+                            for (i = 0; i < pTabList.Count; i++)//, pFrom++ )
                             {
                                 pFrom = pTabList.a[i];
                                 Table pTab = pFrom.pTab;
@@ -521,7 +527,7 @@ namespace Community.CsharpSqlite.Ast
                                     pRight = exprc.sqlite3Expr(db, TokenType.TK_ID, zName);
                                     zColname = zName;
                                     zToFree = "";
-                                    if (longNames || pTabList.nSrc > 1)
+                                    if (longNames || pTabList.Count > 1)
                                     {
                                         Expr pLeft;
                                         pLeft = exprc.sqlite3Expr(db, TokenType.TK_ID, zTabName);
@@ -536,7 +542,7 @@ namespace Community.CsharpSqlite.Ast
                                     {
                                         pExpr = pRight;
                                     }
-                                    pNew = pParse.sqlite3ExprListAppend(pNew, pExpr);
+                                    pNew = pNew.Append( pExpr);
                                     sColname.zRestSql = zColname;
                                     sColname.Length = StringExtensions.Strlen30(zColname);
                                     pParse.sqlite3ExprListSetName(pNew, sColname, 0);
@@ -560,7 +566,7 @@ namespace Community.CsharpSqlite.Ast
                     p.ResultingFieldList = pNew;
                 }
                 //#if SQLITE_MAX_COLUMN
-                if (p.ResultingFieldList != null && p.ResultingFieldList.nExpr > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
+                if (p.ResultingFieldList != null && p.ResultingFieldList.Count > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
                 {
                     utilc.sqlite3ErrorMsg(pParse, "too many columns in result set");
                 }
@@ -741,7 +747,7 @@ namespace Community.CsharpSqlite.Ast
                 ///only a single column may be output.
                 
 #if !SQLITE_OMIT_SUBQUERY
-                if (SelectMethods.checkForMultiColumnSelectError(pParse, pDest, pEList.nExpr))
+                if (SelectMethods.checkForMultiColumnSelectError(pParse, pDest, pEList.Count))
                 {
                     goto select_end;
                 }
@@ -749,7 +755,7 @@ namespace Community.CsharpSqlite.Ast
 
                 ///Generate code for all subqueries in the FROM clause
 #if !SQLITE_OMIT_SUBQUERY || !SQLITE_OMIT_VIEW
-                for (i = 0; p.pPrior == null && i < SelectSourceList.nSrc; i++)
+                for (i = 0; p.pPrior == null && i < SelectSourceList.Count; i++)
                 {
                     SrcList_item pItem = SelectSourceList.a[i];
                     SelectDest dest = new SelectDest();
@@ -865,7 +871,7 @@ namespace Community.CsharpSqlite.Ast
                     KeyInfo pKeyInfo;
                     pKeyInfo = SelectMethods.keyInfoFromExprList(pParse, pOrderBy);
                     pOrderBy.iECursor = pParse.nTab++;
-                    p.addrOpenEphm[2] = addrSortIndex = v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, pOrderBy.iECursor, pOrderBy.nExpr + 2, 0, pKeyInfo, P4Usage.P4_KEYINFO_HANDOFF);
+                    p.addrOpenEphm[2] = addrSortIndex = v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, pOrderBy.iECursor, pOrderBy.Count + 2, 0, pKeyInfo, P4Usage.P4_KEYINFO_HANDOFF);
                 }
                 else
                 {
@@ -874,7 +880,7 @@ namespace Community.CsharpSqlite.Ast
                 ///If the output is destined for a temporary table, open that table.
                 if (pDest.eDest == SelectResultType.EphemTab)
                 {
-                    v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, pDest.iParm, pEList.nExpr);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, pDest.iParm, pEList.Count);
                 }
                 ///Set the limiter.
                 iEnd = v.sqlite3VdbeMakeLabel();
@@ -946,14 +952,14 @@ namespace Community.CsharpSqlite.Ast
                         ///Loop counter 
                         ExprList_item pItem;
                         ///For looping over expression in a list 
-                        for (k = p.ResultingFieldList.nExpr; k > 0; k--)//, pItem++)
+                        for (k = p.ResultingFieldList.Count; k > 0; k--)//, pItem++)
                         {
-                            pItem = p.ResultingFieldList.a[p.ResultingFieldList.nExpr - k];
+                            pItem = p.ResultingFieldList.a[p.ResultingFieldList.Count - k];
                             pItem.iAlias = 0;
                         }
-                        for (k = pGroupBy.nExpr; k > 0; k--)//, pItem++ )
+                        for (k = pGroupBy.Count; k > 0; k--)//, pItem++ )
                         {
-                            pItem = pGroupBy.a[pGroupBy.nExpr - k];
+                            pItem = pGroupBy.a[pGroupBy.Count - k];
                             pItem.iAlias = 0;
                         }
                         if (p.nSelectRow > (double)100)
@@ -973,7 +979,7 @@ namespace Community.CsharpSqlite.Ast
                     sNC.pParse = pParse;
                     sNC.pSrcList = SelectSourceList;
                     sNC.pAggInfo = sAggInfo;
-                    sAggInfo.nSortingColumn = pGroupBy != null ? pGroupBy.nExpr + 1 : 0;
+                    sAggInfo.nSortingColumn = pGroupBy != null ? pGroupBy.Count + 1 : 0;
                     sAggInfo.pGroupBy = pGroupBy;
                     exprc.sqlite3ExprAnalyzeAggList(sNC, pEList);
                     exprc.sqlite3ExprAnalyzeAggList(sNC, pOrderBy);
@@ -1026,9 +1032,9 @@ namespace Community.CsharpSqlite.Ast
                         regReset = ++pParse.nMem;
                         addrReset = v.sqlite3VdbeMakeLabel();
                         iAMem = pParse.nMem + 1;
-                        pParse.nMem += pGroupBy.nExpr;
+                        pParse.nMem += pGroupBy.Count;
                         iBMem = pParse.nMem + 1;
-                        pParse.nMem += pGroupBy.nExpr;
+                        pParse.nMem += pGroupBy.Count;
                         v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, iAbortFlag);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "clear abort flag" );
@@ -1065,7 +1071,7 @@ namespace Community.CsharpSqlite.Ast
                             int nGroupBy;
                             SelectMethods.explainTempTable(pParse, isDistinct && 0 == (p.selFlags & SelectFlags.Distinct) ? "DISTINCT" : "GROUP BY");
                             groupBySort = 1;
-                            nGroupBy = pGroupBy.nExpr;
+                            nGroupBy = pGroupBy.Count;
                             nCol = nGroupBy + 1;
                             j = nGroupBy + 1;
                             for (i = 0; i < sAggInfo.nColumn; i++)
@@ -1115,7 +1121,7 @@ namespace Community.CsharpSqlite.Ast
                         ///from the previous row currently stored in a0, a1, a2...
                         addrTopOfLoop = v.sqlite3VdbeCurrentAddr();
                         pParse.sqlite3ExprCacheClear();
-                        for (j = 0; j < pGroupBy.nExpr; j++)
+                        for (j = 0; j < pGroupBy.Count; j++)
                         {
                             if (groupBySort != 0)
                             {
@@ -1127,7 +1133,7 @@ namespace Community.CsharpSqlite.Ast
                                 pParse.sqlite3ExprCode(pGroupBy.a[j].pExpr, iBMem + j);
                             }
                         }
-                        v.sqlite3VdbeAddOp4(OpCode.OP_Compare, iAMem, iBMem, pGroupBy.nExpr, pKeyInfo, P4Usage.P4_KEYINFO);
+                        v.sqlite3VdbeAddOp4(OpCode.OP_Compare, iAMem, iBMem, pGroupBy.Count, pKeyInfo, P4Usage.P4_KEYINFO);
                         j1 = v.sqlite3VdbeCurrentAddr();
                         v.sqlite3VdbeAddOp3(OpCode.OP_Jump, j1 + 1, 0, j1 + 1);
                         ///Generate code that runs whenever the GROUP BY changes.
@@ -1138,7 +1144,7 @@ namespace Community.CsharpSqlite.Ast
                         ///over to a0,a1,a2.  It then calls the output subroutine
                         ///and resets the aggregate accumulator registers in preparation
                         ///for the next GROUP BY batch.
-                        pParse.sqlite3ExprCodeMove(iBMem, iAMem, pGroupBy.nExpr);
+                        pParse.sqlite3ExprCodeMove(iBMem, iAMem, pGroupBy.Count);
                         v.sqlite3VdbeAddOp2(OpCode.OP_Gosub, regOutputRow, addrOutputRow);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "output one row" );
@@ -1348,7 +1354,7 @@ namespace Community.CsharpSqlite.Ast
                 if (pOrderBy != null)
                 {
                     SelectMethods.explainTempTable(pParse, "ORDER BY");
-                    SelectMethods.generateSortTail(pParse, p, v, pEList.nExpr, pDest);
+                    SelectMethods.generateSortTail(pParse, p, v, pEList.Count, pDest);
                 }
                 ///Jump here to skip this query
                 v.sqlite3VdbeResolveLabel(iEnd);
@@ -1456,14 +1462,14 @@ namespace Community.CsharpSqlite.Ast
                 if (dest.eDest == SelectResultType.EphemTab)
                 {
                     Debug.Assert(p.ResultingFieldList != null);
-                    v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, dest.iParm, p.ResultingFieldList.nExpr);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, dest.iParm, p.ResultingFieldList.Count);
                     v.sqlite3VdbeChangeP5(Sqlite3.BTREE_UNORDERED);
                     dest.eDest = SelectResultType.Table;
                 }
                 ///Make sure all SELECTs in the statement have the same number of elements
                 ///in their result sets.
                 Debug.Assert(p.ResultingFieldList != null && pPrior.ResultingFieldList != null);
-                if (p.ResultingFieldList.nExpr != pPrior.ResultingFieldList.nExpr)
+                if (p.ResultingFieldList.Count != pPrior.ResultingFieldList.Count)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "SELECTs to the left and right of %s" + " do not have the same number of result columns", SelectMethods.selectOpName(p.TokenOp));
                     rc = (SqlResult)1;
@@ -1626,7 +1632,7 @@ namespace Community.CsharpSqlite.Ast
                                 SelectMethods.computeLimitRegisters(pParse, p, iBreak);
                                 v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, unionTab, iBreak);
                                 iStart = v.sqlite3VdbeCurrentAddr();
-                                SelectMethods.selectInnerLoop(pParse, p, p.ResultingFieldList, unionTab, p.ResultingFieldList.nExpr, null, -1, dest, iCont, iBreak);
+                                SelectMethods.selectInnerLoop(pParse, p, p.ResultingFieldList, unionTab, p.ResultingFieldList.Count, null, -1, dest, iCont, iBreak);
                                 v.sqlite3VdbeResolveLabel(iCont);
                                 v.sqlite3VdbeAddOp2(OpCode.OP_Next, unionTab, iStart);
                                 v.sqlite3VdbeResolveLabel(iBreak);
@@ -1699,7 +1705,7 @@ namespace Community.CsharpSqlite.Ast
                             iStart = v.sqlite3VdbeAddOp2(OpCode.OP_RowKey, tab1, r1);
                             v.sqlite3VdbeAddOp4Int(OpCode.OP_NotFound, tab2, iCont, r1, 0);
                             pParse.sqlite3ReleaseTempReg(r1);
-                            SelectMethods.selectInnerLoop(pParse, p, p.ResultingFieldList, tab1, p.ResultingFieldList.nExpr, null, -1, dest, iCont, iBreak);
+                            SelectMethods.selectInnerLoop(pParse, p, p.ResultingFieldList, tab1, p.ResultingFieldList.Count, null, -1, dest, iCont, iBreak);
                             v.sqlite3VdbeResolveLabel(iCont);
                             v.sqlite3VdbeAddOp2(OpCode.OP_Next, tab1, iStart);
                             v.sqlite3VdbeResolveLabel(iBreak);
@@ -1734,7 +1740,7 @@ namespace Community.CsharpSqlite.Ast
                     int nCol;
                     ///Number of columns in result set 
                     Debug.Assert(p.pRightmost == p);
-                    nCol = p.ResultingFieldList.nExpr;
+                    nCol = p.ResultingFieldList.Count;
                     pKeyInfo = new KeyInfo();
                     //sqlite3DbMallocZero(db,
                     pKeyInfo.aColl = new CollSeq[nCol];
@@ -1818,7 +1824,7 @@ namespace Community.CsharpSqlite.Ast
                 
                 Debug.Assert(pSelect != null);
                 Debug.Assert((pSelect.selFlags & SelectFlags.Resolved) != 0);
-                Debug.Assert(nCol == pSelect.ResultingFieldList.nExpr///
+                Debug.Assert(nCol == pSelect.ResultingFieldList.Count///
                     ///<summary>
                     ///|| db.mallocFailed != 0 
                     ///</summary>
@@ -1875,7 +1881,7 @@ namespace Community.CsharpSqlite.Ast
                 //}
                 if (pEList == null)
                 {
-                    pEList = pParse.sqlite3ExprListAppend(null, exprc.sqlite3Expr(db, TokenType.TK_ALL, null));
+                    pEList = CollectionExtensions.Append(null, exprc.sqlite3Expr(db, TokenType.TK_ALL, null));
                 }
                 pNew.ResultingFieldList = pEList;
                 pNew.pSrc = pSrc;

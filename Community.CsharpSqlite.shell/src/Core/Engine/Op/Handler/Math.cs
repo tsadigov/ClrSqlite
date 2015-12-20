@@ -118,8 +118,8 @@ namespace Community.CsharpSqlite.Engine.Op
                         bool fp_math;
                         if (!(fp_math = !((pIn1.Flags & pIn2.Flags & MemFlags.MEM_Int) == MemFlags.MEM_Int)))
                         {
-                            iA = pIn1.u.i;
-                            iB = pIn2.u.i;
+                            iA = pIn1.u.AsInteger;
+                            iB = pIn2.u.AsInteger;
                             switch (pOp.OpCode)
                             {
                                 case OpCode.OP_Add:
@@ -169,14 +169,14 @@ namespace Community.CsharpSqlite.Engine.Op
                         }
                         if (!fp_math)
                         {
-                            pOut.u.i = iB;
+                            pOut.u.AsInteger = iB;
                             pOut.MemSetTypeFlag(MemFlags.MEM_Int);
                         }
                         else
                         {
                             //fp_math:
-                            rA = pIn1.sqlite3VdbeRealValue();
-                            rB = pIn2.sqlite3VdbeRealValue();
+                            rA = pIn1.ToReal();
+                            rB = pIn2.ToReal();
                             switch (pOp.OpCode)
                             {
                                 case OpCode.OP_Add:
@@ -219,7 +219,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
                             {
                                 goto arithmetic_result_is_null;
                             }
-                            pOut.r = rB;
+                            pOut.AsReal = rB;
                             pOut.MemSetTypeFlag(MemFlags.MEM_Real);
                             if ((flags & MemFlags.MEM_Real) == 0)
                             {
@@ -245,7 +245,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
                         var pIn1 = aMem[pOp.p1];
                         cpu.vdbe.memAboutToChange(pIn1);
                         pIn1.sqlite3VdbeMemIntegerify();
-                        pIn1.u.i += pOp.p2;
+                        pIn1.u.AsInteger += pOp.p2;
                         break;
                     }
 

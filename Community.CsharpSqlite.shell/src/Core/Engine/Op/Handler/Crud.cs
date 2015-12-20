@@ -132,7 +132,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             Debug.Assert((pKey.flags & MemFlags.MEM_Int) != 0);
                             Debug.Assert(pKey.memIsValid());
                             Sqlite3.REGISTER_TRACE(vdbe, pOp.p3, pKey);
-                            iKey = pKey.u.i;
+                            iKey = pKey.u.AsInteger;
                         }
                         else
                         {
@@ -146,8 +146,8 @@ namespace Community.CsharpSqlite.Engine.Op
                         if ((pData.flags & MemFlags.MEM_Null) != 0)
                         {
                             malloc_cs.sqlite3_free(ref pData.zBLOB);
-                            pData.z = null;
-                            pData.n = 0;
+                            pData.AsString = null;
+                            pData.CharacterCount = 0;
                         }
                         else
                         {
@@ -162,7 +162,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         {
                             nZero = 0;
                         }
-                        rc = pC.pCursor.sqlite3BtreeInsert(null, iKey, pData.zBLOB, pData.n, nZero, ((OpFlag)pOp.p5 & OpFlag.OPFLAG_APPEND) != 0 ? 1 : 0, seekResult);
+                        rc = pC.pCursor.sqlite3BtreeInsert(null, iKey, pData.zBLOB, pData.CharacterCount, nZero, ((OpFlag)pOp.p5 & OpFlag.OPFLAG_APPEND) != 0 ? 1 : 0, seekResult);
                         pC.rowidIsValid = false;
                         pC.deferredMoveto = false;
                         pC.cacheStatus = Sqlite3.CACHE_STALE;

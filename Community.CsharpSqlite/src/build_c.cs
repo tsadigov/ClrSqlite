@@ -890,7 +890,7 @@ p.zName,  P4Usage.P4_STATIC );
                 }
                 else //mark columns in pList as PK
                 {   
-                    for (i = 0; i < pList.nExpr; i++)
+                    for (i = 0; i < pList.Count; i++)
                     {
                         for (iCol = 0; iCol < pTab.nCol; iCol++)
                         {
@@ -904,7 +904,7 @@ p.zName,  P4Usage.P4_STATIC );
                             pTab.aCol[iCol].isPrimKey = 1;
                         }
                     }
-                    if (pList.nExpr > 1)
+                    if (pList.Count > 1)
                         iCol = -1;
                 }
                 if (iCol >= 0 && iCol < pTab.nCol)
@@ -1515,7 +1515,7 @@ db.xAuth = xAuth;
                     int iCol = p.nCol - 1;
                     if (Sqlite3.NEVER(iCol < 0))
                         goto fk_end;
-                    if (pToCol != null && pToCol.nExpr != 1)
+                    if (pToCol != null && pToCol.Count != 1)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "foreign key on %s" + " should reference only one column of table %T", p.aCol[iCol].zName, pTo);
                         goto fk_end;
@@ -1523,14 +1523,14 @@ db.xAuth = xAuth;
                     nCol = 1;
                 }
                 else
-                    if (pToCol != null && pToCol.nExpr != pFromCol.nExpr)
+                    if (pToCol != null && pToCol.Count != pFromCol.Count)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "number of columns in foreign key does not match the number of " + "columns in the referenced table");
                         goto fk_end;
                     }
                     else
                     {
-                        nCol = pFromCol.nExpr;
+                        nCol = pFromCol.Count;
                     }
                 //nByte = sizeof(*pFKey) + (nCol-1)*sizeof(pFKey.aCol[0]) + pTo.n + 1;
                 //if( pToCol ){
@@ -1718,7 +1718,7 @@ db.xAuth = xAuth;
                 //{
                 //  goto exit_drop_index;
                 //}
-                Debug.Assert(pName.nSrc == 1);
+                Debug.Assert(pName.Count == 1);
                 if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
                 {
                     goto exit_drop_index;
@@ -2144,9 +2144,9 @@ goto exit_drop_index;
             public static void sqlite3SrcListIndexedBy(Parse pParse, SrcList p, Token pIndexedBy)
             {
                 Debug.Assert(pIndexedBy != null);
-                if (p != null && Sqlite3.ALWAYS(p.nSrc > 0))
+                if (p != null && Sqlite3.ALWAYS(p.Count > 0))
                 {
-                    SrcList_item pItem = p.a[p.nSrc - 1];
+                    SrcList_item pItem = p.a[p.Count - 1];
                     Debug.Assert(0 == pItem.notIndexed && pItem.zIndex == null);
                     if (pIndexedBy.Length == 1 && null == pIndexedBy.zRestSql)
                     {
@@ -2183,7 +2183,7 @@ goto exit_drop_index;
                 if (p != null && p.a != null)
                 {
                     int i;
-                    for (i = p.nSrc - 1; i > 0; i--)
+                    for (i = p.Count - 1; i > 0; i--)
                     {
                         p.a[i].jointype = p.a[i - 1].jointype;
                     }

@@ -240,7 +240,7 @@ namespace Community.CsharpSqlite.Ast {
                 Expr pE2;
                 Expr pEq;
                 Debug.Assert(iLeft < iRight);
-                Debug.Assert(pSrc.nSrc > iRight);
+                Debug.Assert(pSrc.Count > iRight);
                 Debug.Assert(pSrc.a[iLeft].pTab != null);
                 Debug.Assert(pSrc.a[iRight].pTab != null);
                 pE1 = ResolveExtensions.sqlite3CreateColumnExpr(db, pSrc, iLeft, iColLeft);
@@ -323,11 +323,11 @@ namespace Community.CsharpSqlite.Ast {
                 pSrc = p.pSrc;
                 //pLeft = pSrc.a[0];
                 //pRight = pLeft[1];
-                for (i = 0; i < pSrc.nSrc - 1; i++)
+                for (i = 0; i < pSrc.Count - 1; i++)
                 {
-                    pLeft = pSrc.a[i];
+                    pLeft = pSrc[i];
                     // pLeft ++
-                    pRight = pSrc.a[i + 1];
+                    pRight = pSrc[i + 1];
                     //Right++,
                     Table pLeftTab = pLeft.pTab;
                     Table pRightTab = pRight.pTab;
@@ -423,7 +423,7 @@ namespace Community.CsharpSqlite.Ast {
             )
             {
                 Vdbe v = pParse.pVdbe;
-                int nExpr = pOrderBy.nExpr;
+                int nExpr = pOrderBy.Count;
                 int regBase = pParse.sqlite3GetTempRange(nExpr + 2);
                 int regRecord = pParse.sqlite3GetTempReg();
                 pParse.sqlite3ExprCacheClear();
@@ -652,7 +652,7 @@ namespace Community.CsharpSqlite.Ast {
                 }
                 else
                 {
-                    nResultCol = pEList.nExpr;
+                    nResultCol = pEList.Count;
                 }
                 if (pDest.iMem == 0)
                 {
@@ -695,7 +695,7 @@ namespace Community.CsharpSqlite.Ast {
                 if (hasDistinct)
                 {
                     Debug.Assert(pEList != null);
-                    Debug.Assert(pEList.nExpr == nColumn);
+                    Debug.Assert(pEList.Count == nColumn);
                     codeDistinct(pParse, distinct, iContinue, nColumn, regResult);
                     if (pOrderBy == null)
                     {
@@ -769,7 +769,7 @@ namespace Community.CsharpSqlite.Ast {
                     case SelectResultType.Set:
                         {
                             Debug.Assert(nColumn == 1);
-                            p.affinity = pEList.a[0].pExpr.sqlite3CompareAffinity(pDest.affinity);
+                            p.affinity = pEList[0].pExpr.sqlite3CompareAffinity(pDest.affinity);
                             if (pOrderBy != null)
                             {
                                 ///
@@ -910,7 +910,7 @@ namespace Community.CsharpSqlite.Ast {
                 KeyInfo pInfo;
                 ExprList_item pItem;
                 int i;
-                nExpr = pList.nExpr;
+                nExpr = pList.Count;
                 pInfo = new KeyInfo();
                 //sqlite3DbMallocZero(db, sizeof(*pInfo) + nExpr*(CollSeq*.Length+1) );
                 if (pInfo != null)
@@ -925,7 +925,7 @@ namespace Community.CsharpSqlite.Ast {
                     for (i = 0; i < nExpr; i++)
                     {
                         //, pItem++){
-                        pItem = pList.a[i];
+                        pItem = pList[i];
                         CollSeq pColl;
                         pColl = pParse.sqlite3ExprCollSeq(pItem.pExpr);
                         if (pColl == null)
@@ -1104,7 +1104,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 }
                 addr = 1 + v.sqlite3VdbeAddOp2(OpCode.OP_Sort, iTab, addrBreak);
                 codeOffset(v, p, addrContinue);
-                v.sqlite3VdbeAddOp3(OpCode.OP_Column, iTab, pOrderBy.nExpr + 1, regRow);
+                v.sqlite3VdbeAddOp3(OpCode.OP_Column, iTab, pOrderBy.Count + 1, regRow);
                 switch (eDest)
                 {
                     case SelectResultType.Table:
@@ -1201,9 +1201,9 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 NameContext sNC = new NameContext();
                 sNC.pSrcList = pTabList;
                 sNC.pParse = pParse;
-                for (i = 0; i < pEList.nExpr; i++)
+                for (i = 0; i < pEList.Count; i++)
                 {
-                    Expr expr = pEList.a[i].pExpr;
+                    Expr expr = pEList[i].pExpr;
                     string zType;
 #if SQLITE_ENABLE_COLUMN_METADATA
 																																																																																																				        string zOrigDb = null;
@@ -1256,17 +1256,17 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 pParse.colNamesSet = 1;
                 fullNames = (db.flags & SqliteFlags.SQLITE_FullColNames) != 0;
                 shortNames = (db.flags & SqliteFlags.SQLITE_ShortColNames) != 0;
-                v.sqlite3VdbeSetNumCols(pEList.nExpr);
+                v.sqlite3VdbeSetNumCols(pEList.Count);
                 
-                for (int i = 0; i < pEList.nExpr; i++)
+                for (int i = 0; i < pEList.Count; i++)
                 {
                     Expr p;
-                    p = pEList.a[i].pExpr;
+                    p = pEList[i].pExpr;
                     if (Sqlite3.NEVER(p == null))
                         continue;
-                    if (pEList.a[i].zName != null)
+                    if (pEList[i].zName != null)
                     {
-                        string zName = pEList.a[i].zName;
+                        string zName = pEList[i].zName;
                         v.sqlite3VdbeSetColName(i, ColName.NAME, zName, Sqlite3.SQLITE_TRANSIENT);
                     }
                     else
@@ -1275,7 +1275,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                             Table pTab;
                             string zCol;
                             int iCol = p.iColumn;
-                            pTab = pTabList.a.Take(pTabList.nSrc).First(x => x.iCursor == p.iTable).pTab;
+                            pTab = pTabList.Take(pTabList.Count).First(x => x.iCursor == p.iTable).pTab;
                             //Sqlite3.ALWAYS(j < pTabList.nSrc)
                             //Debug.Assert(j < pTabList.nSrc);
                             if (iCol < 0)
@@ -1291,7 +1291,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                             }
                             if (!shortNames && !fullNames)
                             {
-                                v.sqlite3VdbeSetColName(i, ColName.NAME, pEList.a[i].zSpan, sqliteinth.SQLITE_DYNAMIC);
+                                v.sqlite3VdbeSetColName(i, ColName.NAME, pEList[i].zSpan, sqliteinth.SQLITE_DYNAMIC);
                                 //sqlite3DbStrDup(db, pEList->a[i].zSpan), SQLITE_DYNAMIC);
                             }
                             else
@@ -1308,7 +1308,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                         }
                         else
                         {
-                            v.sqlite3VdbeSetColName(i, ColName.NAME, pEList.a[i].zSpan, sqliteinth.SQLITE_DYNAMIC);
+                            v.sqlite3VdbeSetColName(i, ColName.NAME, pEList[i].zSpan, sqliteinth.SQLITE_DYNAMIC);
                             //sqlite3DbStrDup(db, pEList->a[i].zSpan), SQLITE_DYNAMIC);
                         }
                 }
@@ -1349,7 +1349,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 ///Column name 
                 int nName;
                 ///Size of name in zName[] 
-                pnCol = nCol = pEList.nExpr;
+                pnCol = nCol = pEList.Count;
                 aCol = paCol = new Column[nCol];
                 //sqlite3DbMallocZero(db, sizeof(aCol[0])*nCol);
                 //if ( aCol == null )
@@ -1360,13 +1360,13 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                         aCol[i] = new Column();
                     var pCol = aCol[i];
                     ///Get an appropriate name for the column
-                    p = pEList.a[i].pExpr;
+                    p = pEList[i].pExpr;
                     Debug.Assert(p.pRight == null || p.pRight.ExprHasProperty(ExprFlags.EP_IntValue) || p.pRight.u.zToken == null || p.pRight.u.zToken.Length > 0);
-                    if (!String.IsNullOrEmpty( pEList.a[i].zName ))
+                    if (!String.IsNullOrEmpty( pEList[i].zName ))
                     {
                         ///If the column contains an "AS <name>" phrase, use <name> as the name 
                         //zName = sqlite3DbStrDup(db, zName);
-                        zName = pEList.a[i].zName;
+                        zName = pEList[i].zName;
                     }
                     else
                     {
@@ -1397,7 +1397,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                             else
                             {
                                 ///Use the original text of the column expression as its name 
-                                zName = io.sqlite3MPrintf(db, "%s", pEList.a[i].zSpan);
+                                zName = io.sqlite3MPrintf(db, "%s", pEList[i].zSpan);
                             }
                     }
                     //if ( db.mallocFailed != 0 )
@@ -1595,9 +1595,9 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     pRet = null;
                 }
                 Debug.Assert(iCol >= 0);
-                if (pRet == null && iCol < p.ResultingFieldList.nExpr)
+                if (pRet == null && iCol < p.ResultingFieldList.Count)
                 {
-                    pRet = pParse.sqlite3ExprCollSeq(p.ResultingFieldList.a[iCol].pExpr);
+                    pRet = pParse.sqlite3ExprCollSeq(p.ResultingFieldList[iCol].pExpr);
                 }
                 return pRet;
             }
@@ -1711,7 +1711,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                         {
                             int r1;
                             Debug.Assert(pIn.nMem == 1);
-                            p.affinity = p.ResultingFieldList.a[0].pExpr.sqlite3CompareAffinity(pDest.affinity);
+                            p.affinity = p.ResultingFieldList[0].pExpr.sqlite3CompareAffinity(pDest.affinity);
                             r1 = pParse.sqlite3GetTempReg();
                             v.sqlite3VdbeAddOp4(OpCode.OP_MakeRecord, pIn.iMem, 1, r1, p.affinity, (P4Usage)1);
                             pParse.sqlite3ExprCacheAffinityChange(pIn.iMem, 1);
@@ -1984,19 +1984,19 @@ break;
                 Debug.Assert(pPrior.pOrderBy == null);
                 pOrderBy = p.pOrderBy;
                 Debug.Assert(pOrderBy != null);
-                nOrderBy = pOrderBy.nExpr;
+                nOrderBy = pOrderBy.Count;
                 ///For operators other than UNION ALL we have to make sure that
                 ///the ORDER BY clause covers every term of the result set.  Add
                 ///terms to the ORDER BY clause as necessary.
                 if (op != TokenType.TK_ALL)
                 {
-                    for (int i = 1;i <= p.ResultingFieldList.nExpr; i++)
+                    for (int i = 1;i <= p.ResultingFieldList.Count; i++)
                     {
                         ExprList_item pItem;
                         int j;
                         for ( j = 0; j < nOrderBy; j++)//, pItem++)
                         {
-                            pItem = pOrderBy.a[j];
+                            pItem = pOrderBy[j];
                             Debug.Assert(pItem.iCol > 0);
                             if (pItem.iCol == i)
                                 break;
@@ -2008,8 +2008,8 @@ break;
                             //  return SQLITE_NOMEM;
                             pNew.Flags |= ExprFlags.EP_IntValue;
                             pNew.u.iValue = i;
-                            pOrderBy = pParse.sqlite3ExprListAppend(pOrderBy, pNew);
-                            pOrderBy.a[nOrderBy++].iCol = (u16)i;
+                            pOrderBy = pOrderBy.Append( pNew);
+                            pOrderBy[nOrderBy++].iCol = (u16)i;
                         }
                     }
                 }
@@ -2030,8 +2030,8 @@ break;
                     ExprList_item pItem;
                     for (int i = 0; i < nOrderBy; i++)//, pItem++)
                     {
-                        pItem = pOrderBy.a[i];
-                        Debug.Assert(pItem.iCol > 0 && pItem.iCol <= p.ResultingFieldList.nExpr);
+                        pItem = pOrderBy[i];
+                        Debug.Assert(pItem.iCol > 0 && pItem.iCol <= p.ResultingFieldList.Count);
                         aPermute[i] = pItem.iCol - 1;
                     }
                     pKeyMerge = new KeyInfo();
@@ -2046,7 +2046,7 @@ break;
                         for (int i = 0; i < nOrderBy; i++)
                         {
                             CollSeq pColl;
-                            Expr pTerm = pOrderBy.a[i].pExpr;
+                            Expr pTerm = pOrderBy[i].pExpr;
                             if ((pTerm.Flags & ExprFlags.EP_ExpCollate) != 0)
                             {
                                 pColl = pTerm.CollatingSequence;
@@ -2058,7 +2058,7 @@ break;
                                 pTerm.CollatingSequence = pColl;
                             }
                             pKeyMerge.aColl[i] = pColl;
-                            pKeyMerge.aSortOrder[i] = pOrderBy.a[i].sortOrder;
+                            pKeyMerge.aSortOrder[i] = pOrderBy[i].sortOrder;
                         }
                     }
                 }
@@ -2078,7 +2078,7 @@ break;
                 }
                 else
                 {
-                    int nExpr = p.ResultingFieldList.nExpr;
+                    int nExpr = p.ResultingFieldList.Count;
                     Debug.Assert(nOrderBy >= nExpr///
                         ///<summary>
                         ///|| db.mallocFailed != 0 
@@ -2408,9 +2408,9 @@ break;
                     else
                     {
                         Expr pNew;
-                        Debug.Assert(pEList != null && pExpr.iColumn < pEList.nExpr);
+                        Debug.Assert(pEList != null && pExpr.iColumn < pEList.Count);
                         Debug.Assert(pExpr.pLeft == null && pExpr.pRight == null);
-                        pNew = exprc.sqlite3ExprDup(db, pEList.a[pExpr.iColumn].pExpr, 0);
+                        pNew = exprc.sqlite3ExprDup(db, pEList[pExpr.iColumn].pExpr, 0);
                         if (pExpr.CollatingSequence != null)
                         {
                             pNew.CollatingSequence = pExpr.CollatingSequence;
@@ -2455,7 +2455,7 @@ break;
                 int i;
                 if (pList == null)
                     return;
-                for (i = 0; i < pList.nExpr; i++)
+                for (i = 0; i < pList.Count; i++)
                 {
                     pList.a[i].pExpr = substExpr(db, pList.a[i].pExpr, iTable, pEList);
                 }
@@ -2489,9 +2489,9 @@ break;
                 ///<param name="Even for (SELECT 1) we have: pSrc!=0 but pSrc">>nSrc==0 </param>
                 if (Sqlite3.ALWAYS(pSrc))
                 {
-                    for (i = pSrc.nSrc; i > 0; i--)//, pItem++ )
+                    for (i = pSrc.Count; i > 0; i--)//, pItem++ )
                     {
-                        pItem = pSrc.a[pSrc.nSrc - i];
+                        pItem = pSrc.a[pSrc.Count - i];
                         substSelect(db, pItem.pSelect, iTable, pEList);
                     }
                 }
@@ -2624,7 +2624,7 @@ break;
                     pSrc = p.pSrc;
                
 
-                    Debug.Assert(pSrc != null && iFrom >= 0 && iFrom < pSrc.nSrc);
+                    Debug.Assert(pSrc != null && iFrom >= 0 && iFrom < pSrc.Count);
                     pSubitem = pSrc.a[iFrom];
 
                     ///VDBE cursor number of the pSub result set temp table 
@@ -2682,7 +2682,7 @@ break;
 
                 var list = new List<Predicate<SelectFlattenContext>>(){
                     ctx => (ctx.isAgg && ctx.subqueryIsAgg),///Restriction (1)  
-                    ctx => ctx.subqueryIsAgg && ctx.pSrc.nSrc > 1,/// Restriction (2)
+                    ctx => ctx.subqueryIsAgg && ctx.pSrc.Count > 1,/// Restriction (2)
                     
                 ///Prior to version 3.1.2, when LIMIT and OFFSET had to be simple constants,
                 ///not arbitrary expresssions, we allowed some combining of LIMIT and OFFSET
@@ -2691,9 +2691,9 @@ break;
                     ctx => ctx.pSub.pLimit != null && ctx.p.pLimit != null,///Restriction (13) 
                     ctx => ctx.pSub.pOffset != null,///Restriction (14) 
                     ctx => ctx.p.pRightmost != null && ctx.pSub.pLimit != null,///Restriction (15) 
-                    ctx => ctx.pSubSrc.nSrc == 0,///Restriction (7)
+                    ctx => ctx.pSubSrc.Count == 0,///Restriction (7)
                     ctx => (ctx.pSub.selFlags & SelectFlags.Distinct) != 0,///Restriction (5)
-                    ctx => ctx.pSub.pLimit != null && (ctx.pSrc.nSrc > 1 || ctx.isAgg),///Restrictions (8)(9)
+                    ctx => ctx.pSub.pLimit != null && (ctx.pSrc.Count > 1 || ctx.isAgg),///Restrictions (8)(9)
                     ctx => (ctx.p.selFlags & SelectFlags.Distinct) != 0 && ctx.subqueryIsAgg,///Restriction (6)  
                     ctx => ctx.p.pOrderBy != null && ctx.pSub.pOrderBy != null,///Restriction (11) 
                     ctx => ctx.isAgg && ctx.pSub.pOrderBy != null,///Restriction (16) 
@@ -2739,20 +2739,20 @@ break;
                                                                             ///that make up the compound SELECT are allowed to be aggregate or distinctqueries.
                     ctx => ctx.pSub.pPrior != null && ctx.pSub.pOrderBy != null,///Restriction 20 ,///next rues will use this
                     
-                    ctx => ctx.pSub.pPrior != null && isAgg || (ctx.p.selFlags & SelectFlags.Distinct) != 0 || ctx.pSrc.nSrc != 1,
+                    ctx => ctx.pSub.pPrior != null && isAgg || (ctx.p.selFlags & SelectFlags.Distinct) != 0 || ctx.pSrc.Count != 1,
                     
                     ctx => ctx.pSub.pPrior != null && ctx.pSub.path(ps=>ps.pPrior)
                                                 .Any(slct=>{
                                                     sqliteinth.testcase((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct);
                                                     sqliteinth.testcase((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Aggregate);
-                                                    if ((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0 || (slct.pPrior != null && slct.TokenOp != TokenType.TK_ALL) || Sqlite3.NEVER(slct.pSrc == null) || slct.pSrc.nSrc != 1)
+                                                    if ((slct.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0 || (slct.pPrior != null && slct.TokenOp != TokenType.TK_ALL) || Sqlite3.NEVER(slct.pSrc == null) || slct.pSrc.Count != 1)
                                                     {
                                                         return true;
                                                     }
                                                     return false;
                                                 }) ,
                     ///Restriction 18.
-                    ctx => ctx.pSub.pPrior != null && ctx.p.pOrderBy != null && ctx.p.pOrderBy.a.Take(ctx.p.pOrderBy.nExpr).Any(ord=>0==ord.iCol)
+                    ctx => ctx.pSub.pPrior != null && ctx.p.pOrderBy != null && ctx.p.pOrderBy.a.Take(ctx.p.pOrderBy.Count).Any(ord=>0==ord.iCol)
 
                 };
 
@@ -2880,7 +2880,7 @@ break;
                     JoinType jointype = 0;
                     check.pSubSrc = check.pSub.pSrc;
                     ///FROM clause of subquery 
-                    nSubSrc = check.pSubSrc.nSrc;
+                    nSubSrc = check.pSubSrc.Count;
                     ///Number of terms in subquery FROM clause 
                     check.pSrc = pParent.pSrc;
                     ///FROM clause of the outer query 
@@ -2951,7 +2951,7 @@ break;
                     ///
                     ///</summary>
                     pList = pParent.ResultingFieldList;
-                    for (i = 0; i < pList.nExpr; i++)
+                    for (i = 0; i < pList.Count; i++)
                     {
                         if (pList.a[i].zName == null)
                         {
@@ -3039,7 +3039,7 @@ break;
             {
                 Expr pExpr;
                 ExprList pEList = p.ResultingFieldList;
-                if (pEList.nExpr != 1)
+                if (pEList.Count != 1)
                     return wherec.WHERE_ORDERBY_NORMAL;
                 pExpr = pEList.a[0].pExpr;
                 if (pExpr.Operator != TokenType.TK_AGG_FUNCTION)
@@ -3047,7 +3047,7 @@ break;
                 if (Sqlite3.NEVER(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect)))
                     return 0;
                 pEList = pExpr.x.pList;
-                if (pEList == null || pEList.nExpr != 1)
+                if (pEList == null || pEList.Count != 1)
                     return 0;
                 if (pEList.a[0].pExpr.Operator != TokenType.TK_AGG_COLUMN)
                     return wherec.WHERE_ORDERBY_NORMAL;
@@ -3080,7 +3080,7 @@ break;
                 Table pTab;
                 Expr pExpr;
                 Debug.Assert(null == p.pGroupBy);
-                if (p.pWhere != null || p.ResultingFieldList.nExpr != 1 || p.pSrc.nSrc != 1 || p.pSrc.a[0].pSelect != null)
+                if (p.pWhere != null || p.ResultingFieldList.Count != 1 || p.pSrc.Count != 1 || p.pSrc.a[0].pSelect != null)
                 {
                     return null;
                 }
@@ -3166,7 +3166,7 @@ break;
                     p.selFlags |= SelectFlags.HasTypeInfo;
                     pParse = pWalker.pParse;
                     pTabList = p.pSrc;
-                    for (i = 0; i < pTabList.nSrc; i++)//, pFrom++ )
+                    for (i = 0; i < pTabList.Count; i++)//, pFrom++ )
                     {
                         pFrom = pTabList.a[i];
                         Table pTab = pFrom.pTab;
@@ -3248,7 +3248,7 @@ break;
                     {
                         Expr pE = pFunc.pExpr;
                         Debug.Assert(!pE.ExprHasProperty(ExprFlags.EP_xIsSelect));
-                        if (pE.x.pList == null || pE.x.pList.nExpr != 1)
+                        if (pE.x.pList == null || pE.x.pList.Count != 1)
                         {
                             utilc.sqlite3ErrorMsg(pParse, "DISTINCT aggregates must have exactly one " + "argument");
                             pFunc.iDistinct = -1;
@@ -3277,7 +3277,7 @@ break;
                     pF = pAggInfo.aFunc[i];
                     ExprList pList = pF.pExpr.x.pList;
                     Debug.Assert(!pF.pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
-                    v.sqlite3VdbeAddOp4(OpCode.OP_AggFinal, pF.iMem, pList != null ? pList.nExpr : 0, 0, pF.pFunc,  P4Usage.P4_FUNCDEF);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_AggFinal, pF.iMem, pList != null ? pList.Count : 0, 0, pF.pFunc,  P4Usage.P4_FUNCDEF);
                 }
             }
             ///
@@ -3305,7 +3305,7 @@ break;
                     ExprList pList = pF.pExpr.x.pList;
                     if (pList != null)
                     {
-                        nArg = pList.nExpr;
+                        nArg = pList.Count;
                         regAgg = pParse.sqlite3GetTempRange(nArg);
                         pParse.sqlite3ExprCodeExprList(pList, regAgg, true);
                     }

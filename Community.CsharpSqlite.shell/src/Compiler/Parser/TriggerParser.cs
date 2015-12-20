@@ -229,7 +229,7 @@ namespace Community.CsharpSqlite.Parsing
             ///Ensure the table name matches database name and that the table exists 
             ///</summary>
             //      if ( db.mallocFailed != 0 ) goto trigger_cleanup;
-            Debug.Assert(pTableName.nSrc == 1);
+            Debug.Assert(pTableName.Count == 1);
             if (sFix.sqlite3FixInit(pParse, iDb, "trigger", pName) != 0 && sFix.sqlite3FixSrcList(pTableName) != 0)
             {
                 goto trigger_cleanup;
@@ -708,7 +708,7 @@ goto trigger_cleanup;
             {
                 goto drop_trigger_cleanup;
             }
-            Debug.Assert(pName.nSrc == 1);
+            Debug.Assert(pName.Count == 1);
             zDb = pName.a[0].zDatabase;
             zName = pName.a[0].zName;
             nName = StringExtensions.Strlen30(zName);
@@ -883,7 +883,7 @@ return;
             int e;
             if (pIdList == null || Sqlite3.NEVER(pEList == null))
                 return 1;
-            for (e = 0; e < pEList.nExpr; e++)
+            for (e = 0; e < pEList.Count; e++)
             {
                 if (build.sqlite3IdListIndex(pIdList, pEList.a[e].zName) >= 0)
                     return 1;
@@ -974,14 +974,14 @@ return;
             pSrc = build.sqlite3SrcListAppend(pParse.db, 0, pStep.target, 0);
             //if ( pSrc != null )
             //{
-            Debug.Assert(pSrc.nSrc > 0);
+            Debug.Assert(pSrc.Count > 0);
             Debug.Assert(pSrc.a != null);
             iDb = Sqlite3.indexOf(pParse.db, pStep.pTrig.pSchema);
             if (iDb == 0 || iDb >= 2)
             {
                 Connection db = pParse.db;
                 Debug.Assert(iDb < pParse.db.BackendCount);
-                pSrc.a[pSrc.nSrc - 1].zDatabase = db.Backends[iDb].Name;
+                pSrc.a[pSrc.Count - 1].zDatabase = db.Backends[iDb].Name;
                 // sqlite3DbStrDup( db, db.aDb[iDb].zName );
             }
             //}

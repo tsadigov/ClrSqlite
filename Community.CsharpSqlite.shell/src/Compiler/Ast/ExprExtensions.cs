@@ -30,8 +30,8 @@ namespace Community.CsharpSqlite.Ast
 		{
 			if (_this != null) {
 				int i;
-				for (i = 0; i < _this.nExpr; i++) {
-					_this.a [i].pExpr.heightOfExpr (ref pnHeight);
+				for (i = 0; i < _this.Count; i++) {
+					_this[i].pExpr.heightOfExpr (ref pnHeight);
 				}
 			}
 		}

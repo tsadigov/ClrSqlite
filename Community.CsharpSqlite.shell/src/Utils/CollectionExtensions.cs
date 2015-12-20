@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Community.CsharpSqlite.Ast;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +10,46 @@ namespace Community.CsharpSqlite.Utils
 {
     public static class CollectionExtensions
     {
+        //public ExprList sqlite3ExprListAppend(int null_2, Expr pExpr)
+        //{
+        //    return this.sqlite3ExprListAppend(null, pExpr);
+        //}
+        
+
+        public static  ExprList Append(
+              this ExprList pList,///
+                               ///<summary>
+                               ///List to which to append. Might be NULL 
+                               ///</summary>
+             Expr pExpr///
+                          ///<summary>
+                          ///Expression to be appended. Might be NULL 
+                          ///</summary>
+          )
+        {
+            
+            if (pList == null)
+            {
+                pList = new ExprList();
+                //sqlite3DbMallocZero(db, ExprList).Length;
+                //if ( pList == null )
+                //{
+                //  goto no_mem;
+                //}
+                Debug.Assert(pList.nAlloc == 0);
+            }
+
+            Debug.Assert(pList.a != null);
+            pList.a.Add(new ExprList_item() { pExpr = pExpr });
+
+            return pList;
+            //no_mem:
+            //  /* Avoid leaking memory if malloc has failed. */
+            //  exprc.sqlite3ExprDelete( db, ref pExpr );
+            //  exprc.sqlite3ExprListDelete( db, ref pList );
+            //  return null;
+        }
+
         ///
         ///<summary>
         ///sqlite3SrcListEnlarge
@@ -59,7 +101,7 @@ namespace Community.CsharpSqlite.Utils
             if (null == pSrc)
                 pSrc = new TCollection();
             if (-1 == iStart)
-                iStart = pSrc.nSrc;
+                iStart = pSrc.Count;
 
             pSrc.a.InsertRange(iStart, Enumerable.Range(0, nExtra).Select(x => factory()));
             #region refactored

@@ -113,7 +113,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///same as TokenType.TK_TO_NUMERIC, in1 
                         ///</summary>
                         var pIn1 = aMem[pOp.p1];
-                        pIn1.sqlite3VdbeMemNumerify();
+                        pIn1.Numerify();
                         break;
                     }
 #endif
@@ -163,7 +163,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         vdbe.memAboutToChange(pIn1);
                         if ((pIn1.flags & MemFlags.MEM_Null) == 0)
                         {
-                            pIn1.sqlite3VdbeMemRealify();
+                            pIn1.Realify();
                         }
                         break;
                     }

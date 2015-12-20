@@ -565,7 +565,7 @@ namespace Community.CsharpSqlite.Ast
                 if (p == null)
                     return null;
 
-                pNew = new ExprList(p.nExpr) {
+                pNew = new ExprList(p.Count) {
                     iECursor = 0
                 };
                 //sqlite3DbMallocRaw(db, sizeof(*pNew) );
@@ -577,7 +577,7 @@ namespace Community.CsharpSqlite.Ast
                 //  return null;
                 //}
                 //pOldItem = p.a;
-                for (i = 0; i < p.nExpr; i++)
+                for (i = 0; i < p.Count; i++)
                 {
                     //pItem++, pOldItem++){
                     pItem = pNew.a[i] = new ExprList_item();
@@ -613,12 +613,12 @@ namespace Community.CsharpSqlite.Ast
                 //nByte = sizeof(*p) + (p.nSrc>0 ? sizeof(p.a[0]) * (p.nSrc-1) : 0);
                 pNew = new SrcList();
                 //sqlite3DbMallocRaw(db, nByte );
-                if (p.nSrc > 0)
-                    pNew.a = new List<SrcList_item>(p.nSrc);
+                if (p.Count > 0)
+                    pNew.a = new List<SrcList_item>(p.Count);
                 if (pNew == null)
                     return null;
-                pNew.nSrc = pNew.nAlloc = p.nSrc;
-                for (i = 0; i < p.nSrc; i++)
+                pNew.Count = pNew.nAlloc = p.Count;
+                for (i = 0; i < p.Count; i++)
                 {
                     pNew.a[i] = new SrcList_item();
                     SrcList_item pNewItem = pNew.a[i];
@@ -753,9 +753,9 @@ return null;
                 ExprList_item pItem;
                 if (pList == null)
                     return;
-                Debug.Assert(pList.a != null || (pList.nExpr == 0 && pList.nAlloc == 0));
-                Debug.Assert(pList.nExpr <= pList.nAlloc);
-                for (i = 0; i < pList.nExpr; i++)
+                Debug.Assert(pList.a != null || (pList.Count == 0 && pList.nAlloc == 0));
+                Debug.Assert(pList.Count <= pList.nAlloc);
+                for (i = 0; i < pList.Count; i++)
                 {
                     if ((pItem = pList.a[i]) != null)
                     {
@@ -1006,7 +1006,7 @@ return null;
                 ///</summary>
                 pSrc = p.pSrc;
                 Debug.Assert(pSrc != null);
-                if (pSrc.nSrc != 1)
+                if (pSrc.Count != 1)
                     return 0;
                 ///
                 ///<summary>
@@ -1033,7 +1033,7 @@ return null;
                 ///FROM clause not a virtual table 
                 ///</summary>
                 pEList = p.ResultingFieldList;
-                if (pEList.nExpr != 1)
+                if (pEList.Count != 1)
                     return 0;
                 ///
                 ///<summary>
@@ -1366,13 +1366,13 @@ return null;
                             Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
                             if (pList != null)
                             {
-                                int i = pList.nExpr;
+                                int i = pList.Count;
                                 ExprList_item pItem;
                                 //= pList.a;
                                 for (; i > 0; i--)
                                 {
                                     //, pItem++){
-                                    pItem = pList.a[pList.nExpr - i];
+                                    pItem = pList.a[pList.Count - i];
                                     if (Sqlite3.ALWAYS(pItem.pExpr != null))
                                         pItem.pExpr.Flags |= ExprFlags.EP_FixedDest;
                                 }
@@ -1540,9 +1540,9 @@ return null;
                     return 0;
                 if (pA == null || pB == null)
                     return 1;
-                if (pA.nExpr != pB.nExpr)
+                if (pA.Count != pB.Count)
                     return 1;
-                for (i = 0; i < pA.nExpr; i++)
+                for (i = 0; i < pA.Count; i++)
                 {
                     Expr pExprA = pA.a[i].pExpr;
                     Expr pExprB = pB.a[i].pExpr;
@@ -1606,7 +1606,7 @@ return null;
                             {
                                 SrcList_item pItem;
                                 // = pSrcList.a;
-                                for (i = 0; i < pSrcList.nSrc; i++)
+                                for (i = 0; i < pSrcList.Count; i++)
                                 {
                                     //, pItem++){
                                     pItem = pSrcList.a[i];
@@ -1649,7 +1649,7 @@ return null;
                                                 ExprList pGB = pAggInfo.pGroupBy;
                                                 ExprList_item pTerm;
                                                 // = pGB.a;
-                                                n = pGB.nExpr;
+                                                n = pGB.Count;
                                                 for (j = 0; j < n; j++)
                                                 {
                                                     //, pTerm++){
@@ -1736,7 +1736,7 @@ return null;
                                         pItem.pExpr = pExpr;
                                         pItem.iMem = ++pParse.nMem;
                                         Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
-                                        pItem.pFunc = FuncDefTraverse.sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.nExpr : 0, enc, 0);
+                                        pItem.pFunc = FuncDefTraverse.sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.Count : 0, enc, 0);
                                         if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)
                                         {
                                             pItem.iDistinct = pParse.nTab++;
@@ -1809,7 +1809,7 @@ return null;
                 int i;
                 if (pList != null)
                 {
-                    for (i = 0; i < pList.nExpr; i++)//, pItem++)
+                    for (i = 0; i < pList.Count; i++)//, pItem++)
                     {
                         pItem = pList.a[i];
                         exprc.sqlite3ExprAnalyzeAggregates(pNC, ref pItem.pExpr);

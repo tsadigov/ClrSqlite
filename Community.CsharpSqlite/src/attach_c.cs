@@ -36,8 +36,8 @@ namespace Community.CsharpSqlite {
 			string zErrDyn="";
 			sqlite3_vfs pVfs=null;
 			sqliteinth.UNUSED_PARAMETER(NotUsed);
-			zFile=argv[0].z!=null&&(argv[0].z.Length>0)&&argv[0].flags!=MemFlags.MEM_Null?vdbeapi.sqlite3_value_text(argv[0]):"";
-			zName=argv[1].z!=null&&(argv[1].z.Length>0)&&argv[1].flags!=MemFlags.MEM_Null?vdbeapi.sqlite3_value_text(argv[1]):"";
+			zFile=argv[0].AsString!=null&&(argv[0].AsString.Length>0)&&argv[0].flags!=MemFlags.MEM_Null?vdbeapi.sqlite3_value_text(argv[0]):"";
+			zName=argv[1].AsString!=null&&(argv[1].AsString.Length>0)&&argv[1].flags!=MemFlags.MEM_Null?vdbeapi.sqlite3_value_text(argv[1]):"";
 			//if( zFile==null ) zFile = "";
 			//if ( zName == null ) zName = "";
 			///
@@ -234,7 +234,7 @@ namespace Community.CsharpSqlite {
 		///     SELECT sqlite_detach(x)
 		///</summary>
 		static void detachFunc(sqlite3_context context,int NotUsed,sqlite3_value[] argv) {
-			string zName=zName=argv[0].z!=null&&(argv[0].z.Length>0)?vdbeapi.sqlite3_value_text(argv[0]):"";
+			string zName=zName=argv[0].AsString!=null&&(argv[0].AsString.Length>0)?vdbeapi.sqlite3_value_text(argv[0]):"";
 			//(vdbeapi.sqlite3_value_text(argv[0]);
 			Connection db=vdbeapi.sqlite3_context_db_handle(context);
 			int i;

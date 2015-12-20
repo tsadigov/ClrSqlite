@@ -194,8 +194,8 @@ namespace Community.CsharpSqlite.Engine.Op
                                         ///Grab the index number and argc parameters 
                                         ///</summary>
                                         Debug.Assert((pQuery.flags & MemFlags.MEM_Int) != 0 && pArgc.flags == MemFlags.MEM_Int);
-                                        nArg = (int)pArgc.u.i;
-                                        iQuery = (int)pQuery.u.i;
+                                        nArg = (int)pArgc.u.AsInteger;
+                                        iQuery = (int)pQuery.u.AsInteger;
                                         ///
                                         ///<summary>
                                         ///Invoke the xFilter method 
@@ -366,7 +366,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         Debug.Assert(pName.memIsValid());
                                         Sqlite3.REGISTER_TRACE(vdbe, pOp.p1, pName);
                                         Debug.Assert((pName.flags & MemFlags.MEM_Str) != 0);
-                                        rc = pVtab.pModule.xRename(pVtab, pName.z);
+                                        rc = pVtab.pModule.xRename(pVtab, pName.AsString);
                                         Sqlite3.importVtabErrMsg(vdbe, pVtab);
                                         vdbe.expired = false;
                                         break;

@@ -293,7 +293,7 @@ namespace Community.CsharpSqlite.Ast {
 				///Close all of the cursors that were opened by sqlite3WhereBegin.
 				///
 				///</summary>
-				Debug.Assert(this.nLevel==1||this.nLevel==pTabList.nSrc);
+				Debug.Assert(this.nLevel==1||this.nLevel==pTabList.Count);
 				for(i=0;i<this.nLevel;i++)//  for(i=0, pLevel=pWInfo.a; i<pWInfo.nLevel; i++, pLevel++){
 				 {
 					pLevel=this.a[i];
@@ -1197,7 +1197,7 @@ namespace Community.CsharpSqlite.Ast {
 										pOrTab.a=new List<SrcList_item>(nNotReady+1);
 										//if( pOrTab==0 ) return notReady;
 										pOrTab.nAlloc=(i16)(nNotReady+1);
-										pOrTab.nSrc=pOrTab.nAlloc;
+										pOrTab.Count=pOrTab.nAlloc;
 										pOrTab.a[0]=pTabItem;
                                         //memcpy(pOrTab.a, pTabItem, sizeof(*pTabItem));
 

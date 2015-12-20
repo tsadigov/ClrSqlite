@@ -205,11 +205,11 @@ namespace Community.CsharpSqlite
 					}
 					else
 						if ((pVar.flags & MemFlags.MEM_Int) != 0) {
-							io.sqlite3XPrintf (_out, "%lld", pVar.u.i);
+							io.sqlite3XPrintf (_out, "%lld", pVar.u.AsInteger);
 						}
 						else
 							if ((pVar.flags & MemFlags.MEM_Real) != 0) {
-								io.sqlite3XPrintf (_out, "%!.15g", pVar.r);
+								io.sqlite3XPrintf (_out, "%!.15g", pVar.AsReal);
 							}
 							else
 								if ((pVar.flags & MemFlags.MEM_Str) != 0) {
@@ -226,7 +226,7 @@ io.sqlite3XPrintf(_out, "'%.*q'", utf8.n, utf8.z);
 }else
 #endif
 									{
-										io.sqlite3XPrintf (_out, "'%.*q'", pVar.n, pVar.z);
+										io.sqlite3XPrintf (_out, "'%.*q'", pVar.CharacterCount, pVar.AsString);
 									}
 								}
 								else
@@ -236,7 +236,7 @@ io.sqlite3XPrintf(_out, "'%.*q'", utf8.n, utf8.z);
 									else {
 										Debug.Assert ((pVar.flags & MemFlags.MEM_Blob) != 0);
                                         _out.sqlite3StrAccumAppend("x'", 2);
-										for (i = 0; i < pVar.n; i++) {
+										for (i = 0; i < pVar.CharacterCount; i++) {
 											io.sqlite3XPrintf (_out, "%02x", pVar.zBLOB [i] & 0xff);
 										}
                                         _out.sqlite3StrAccumAppend( "'", 1);

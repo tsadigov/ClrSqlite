@@ -387,7 +387,7 @@ goto begin_table_error;
                 //  goto exit_drop_table;
                 //}
                 Debug.Assert(pParse.nErr == 0);
-                Debug.Assert(pName.nSrc == 1);
+                Debug.Assert(pName.Count == 1);
 
                 Connection db = pParse.db;
                 if (noErr != 0)

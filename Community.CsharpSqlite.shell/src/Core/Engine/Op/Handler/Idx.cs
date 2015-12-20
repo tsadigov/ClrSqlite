@@ -57,8 +57,8 @@ namespace Community.CsharpSqlite.Engine.Op
                             pIn2.ExpandBlob();
                             if (cpu.rc == SqlResult.SQLITE_OK)
                             {
-                                nKey = pIn2.n;
-                                zKey = (pIn2.flags & MemFlags.MEM_Blob) != 0 ? pIn2.zBLOB : Encoding.UTF8.GetBytes(pIn2.z);
+                                nKey = pIn2.CharacterCount;
+                                zKey = (pIn2.flags & MemFlags.MEM_Blob) != 0 ? pIn2.zBLOB : Encoding.UTF8.GetBytes(pIn2.AsString);
                                 cpu.rc = pCrsr.sqlite3BtreeInsert(zKey, nKey, null, 0, 0, (pOp.p3 != 0) ? 1 : 0, (((OpFlag)pOp.p5 & OpFlag.OPFLAG_USESEEKRESULT) != 0 ? pC.seekResult : 0));
                                 Debug.Assert(!pC.deferredMoveto);
                                 pC.cacheStatus = Sqlite3.CACHE_STALE;
@@ -145,7 +145,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 {
                                     return RuntimeException.abort_due_to_error;
                                 }
-                                cpu.pOut.u.i = rowid;
+                                cpu.pOut.u.AsInteger = rowid;
                                 cpu.pOut.flags = MemFlags.MEM_Int;
                             }
                         }

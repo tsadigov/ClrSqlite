@@ -164,7 +164,7 @@ namespace Community.CsharpSqlite.Engine
         public void sqlite3_result_double(double rVal)
         {
             Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
-            this.s.sqlite3VdbeMemSetDouble(rVal);
+            this.s.Set(rVal);
         }
 
         public void sqlite3_result_error(string z, int n)
@@ -177,13 +177,13 @@ namespace Community.CsharpSqlite.Engine
         public void sqlite3_result_int(int iVal)
         {
             Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
-            this.s.sqlite3VdbeMemSetInt64((i64)iVal);
+            this.s.Set((i64)iVal);
         }
 
         public void sqlite3_result_int64(i64 iVal)
         {
             Debug.Assert(this.s.db.mutex.sqlite3_mutex_held());
-            this.s.sqlite3VdbeMemSetInt64(iVal);
+            this.s.Set(iVal);
         }
 
         public void sqlite3_result_null()

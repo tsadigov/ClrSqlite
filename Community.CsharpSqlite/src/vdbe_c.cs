@@ -236,7 +236,7 @@ namespace Community.CsharpSqlite {
 		public static void sqlite3VdbeMemStoreType(Mem pMem) {
 			if((pMem.Flags&MemFlags.MEM_Null)!=0) {
 				pMem.ValType=FoundationalType.SQLITE_NULL;
-				pMem.z=null;
+				pMem.AsString=null;
 				pMem.zBLOB=null;
 			}
 			else

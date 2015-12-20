@@ -31,7 +31,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///jump, in1 
                         var pIn1 = cpu.aMem[pOp.p1];
                         Debug.Assert((pIn1.flags & MemFlags.MEM_Int) != 0);
-                        if (pIn1.u.i > 0)
+                        if (pIn1.u.AsInteger > 0)
                         {
                             cpu.opcodeIndex = pOp.p2 - 1;
                         }
@@ -55,7 +55,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///</summary>
                         var pIn1 = cpu.aMem[pOp.p1];
                         Debug.Assert((pIn1.flags & MemFlags.MEM_Int) != 0);
-                        if (pIn1.u.i < 0)
+                        if (pIn1.u.AsInteger < 0)
                         {
                             cpu.opcodeIndex = pOp.p2 - 1;
                         }
@@ -80,8 +80,8 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///</summary>
                         var pIn1 = cpu.aMem[pOp.p1];
                         Debug.Assert((pIn1.flags & MemFlags.MEM_Int) != 0);
-                        pIn1.u.i += pOp.p3;
-                        if (pIn1.u.i == 0)
+                        pIn1.u.AsInteger += pOp.p3;
+                        if (pIn1.u.AsInteger == 0)
                         {
                             cpu.opcodeIndex = pOp.p2 - 1;
                         }
@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         Debug.Assert((pIn1.flags & MemFlags.MEM_Dyn) == 0);
                         cpu.vdbe.memAboutToChange(pIn1);
                         pIn1.flags = MemFlags.MEM_Int;
-                        pIn1.u.i = cpu.opcodeIndex;
+                        pIn1.u.AsInteger = cpu.opcodeIndex;
                         Sqlite3.REGISTER_TRACE(cpu.vdbe, pOp.p1, pIn1);
                         cpu.opcodeIndex = pOp.p2 - 1;
                         break;
@@ -222,7 +222,7 @@ namespace Community.CsharpSqlite.Engine.Op
 #if SQLITE_OMIT_FLOATING_POINT
 																																																																																																																																																													c = pIn1.sqlite3VdbeIntValue()!=0;
 #else
-                            c = (pIn1.sqlite3VdbeRealValue() != 0.0) ? 1 : 0;
+                            c = (pIn1.ToReal() != 0.0) ? 1 : 0;
 #endif
                             if (pOp.OpCode == OpCode.OP_IfNot)
                                 c = (c == 0) ? 1 : 0;
@@ -426,7 +426,7 @@ namespace Community.CsharpSqlite.Engine.Op
             ///in1 
             var pIn1 = cpu.aMem[pOp.p1];
             Debug.Assert((pIn1.flags & MemFlags.MEM_Int) != 0);
-            cpu.opcodeIndex = (int)pIn1.u.i;
+            cpu.opcodeIndex = (int)pIn1.u.AsInteger;
         }
 
 
@@ -437,8 +437,8 @@ namespace Community.CsharpSqlite.Engine.Op
             var pIn1 = cpu.aMem[pOp.p1];
             Debug.Assert((pIn1.flags & MemFlags.MEM_Dyn) == 0);
             pIn1.flags = MemFlags.MEM_Int;
-            pcDest = (int)pIn1.u.i;
-            pIn1.u.i = cpu.opcodeIndex;
+            pcDest = (int)pIn1.u.AsInteger;
+            pIn1.u.AsInteger = cpu.opcodeIndex;
             Sqlite3.REGISTER_TRACE(cpu.vdbe, pOp.p1, pIn1);
             cpu.opcodeIndex = pcDest;
         }

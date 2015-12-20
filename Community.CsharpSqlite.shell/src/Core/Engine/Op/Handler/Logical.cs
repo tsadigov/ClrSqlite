@@ -252,7 +252,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             var pOut = aMem[pOp.p2];
                             vdbe.memAboutToChange(pOut);
                             pOut.MemSetTypeFlag(MemFlags.MEM_Int);
-                            pOut.u.i = res;
+                            pOut.u.AsInteger = res;
                             Sqlite3.REGISTER_TRACE(vdbe, pOp.p2, pOut);
                         }
                         else
@@ -333,8 +333,8 @@ namespace Community.CsharpSqlite.Engine.Op
                             pOut.sqlite3VdbeMemSetNull();
                             break;
                         }
-                        iA = pIn2.sqlite3VdbeIntValue();
-                        iB = pIn1.sqlite3VdbeIntValue();
+                        iA = pIn2.ToInt();
+                        iB = pIn1.ToInt();
                         op = pOp.OpCode;
                         if (op == OpCode.OP_BitAnd)
                         {
@@ -383,7 +383,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         //iA = (long)( uA << 0 ); //memcpy( &iA, &uA, sizeof( iA ) );
                                     }
                                 }
-                        pOut.u.i = iA;
+                        pOut.u.AsInteger = iA;
                         pOut.MemSetTypeFlag(MemFlags.MEM_Int);
                         break;
                     }
@@ -457,7 +457,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         }
                         else
                         {
-                            pOut.sqlite3VdbeMemSetInt64(pIn1.sqlite3VdbeIntValue() == 0 ? 1 : 0);
+                            pOut.Set(pIn1.ToInt() == 0 ? 1 : 0);
                         }
                         break;
                     }
@@ -484,7 +484,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         }
                         else
                         {
-                            pOut.sqlite3VdbeMemSetInt64(~pIn1.sqlite3VdbeIntValue());
+                            pOut.Set(~pIn1.ToInt());
                         }
                         break;
                     }
@@ -508,7 +508,7 @@ namespace Community.CsharpSqlite.Engine.Op
             }
             else
             {
-                v1 = (pIn1.sqlite3VdbeIntValue() != 0) ? 1 : 0;
+                v1 = (pIn1.ToInt() != 0) ? 1 : 0;
             }
             var pIn2 = aMem[pOp.p2];
             if ((pIn2.flags & MemFlags.MEM_Null) != 0)
@@ -517,7 +517,7 @@ namespace Community.CsharpSqlite.Engine.Op
             }
             else
             {
-                v2 = (pIn2.sqlite3VdbeIntValue() != 0) ? 1 : 0;
+                v2 = (pIn2.ToInt() != 0) ? 1 : 0;
             }
             if (pOp.OpCode == OpCode.OP_And)
             {
@@ -556,7 +556,7 @@ namespace Community.CsharpSqlite.Engine.Op
             }
             else
             {
-                pOut.u.i = v1;
+                pOut.u.AsInteger = v1;
                 pOut.MemSetTypeFlag(MemFlags.MEM_Int);
             }
         }

@@ -414,7 +414,7 @@ namespace Community.CsharpSqlite.Ast
                             Debug.Assert(pOrTerm.leftCursor == iCursor);
                             Debug.Assert(pOrTerm.u.leftColumn == iColumn);
                             pDup = exprc.sqlite3ExprDup(db, pOrTerm.pExpr.pRight, 0);
-                            pList = pWC.pParse.sqlite3ExprListAppend(pList, pDup);
+                            pList = pList.Append( pDup);
                             pLeft = pOrTerm.pExpr.pLeft;
                         }
                         Debug.Assert(pLeft != null);
@@ -642,7 +642,7 @@ namespace Community.CsharpSqlite.Ast
 							TokenType.TK_LE
 						};
                         Debug.Assert(pList != null);
-                        Debug.Assert(pList.nExpr == 2);
+                        Debug.Assert(pList.Count == 2);
                         for (i = 0; i < 2; i++)
                         {
                             Expr pNewExpr;

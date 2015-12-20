@@ -1774,10 +1774,10 @@ sqlite3_result_text(context, "?000", 4, Sqlite3.SQLITE_STATIC);
                     set
                     {
                         _M = value;
-                        if (_M == null || _M.z == null)
+                        if (_M == null || _M.AsString == null)
                             _n = 0;
                         else
-                            _n = Convert.ToInt64(_M.z);
+                            _n = Convert.ToInt64(_M.AsString);
                     }
                 }
                 public i64 n
@@ -1790,7 +1790,7 @@ sqlite3_result_text(context, "?000", 4, Sqlite3.SQLITE_STATIC);
                     {
                         _n = value;
                         if (_M != null)
-                            _M.z = _n.ToString();
+                            _M.AsString = _n.ToString();
                     }
                 }
             }
@@ -2061,7 +2061,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
             public static bool sqlite3IsLikeFunction(Connection db, Expr pExpr, ref bool pIsNocase, char[] aWc)
             {
                 FuncDef pDef;
-                if (pExpr.Operator != TokenType.TK_FUNCTION || null == pExpr.x.pList || pExpr.x.pList.nExpr != 2)
+                if (pExpr.Operator != TokenType.TK_FUNCTION || null == pExpr.x.pList || pExpr.x.pList.Count != 2)
                 {
                     return false;
                 }
@@ -2258,10 +2258,10 @@ FuncDef[] aFunc = (FuncDef[])GLOBAL( FuncDef, aBuiltinFunc );
             set
             {
                 _M = value;
-                if (_M == null || _M.z == null)
+                if (_M == null || _M.AsString == null)
                     iSum = 0;
                 else
-                    iSum = Convert.ToInt64(_M.z);
+                    iSum = Convert.ToInt64(_M.AsString);
             }
         }
     };

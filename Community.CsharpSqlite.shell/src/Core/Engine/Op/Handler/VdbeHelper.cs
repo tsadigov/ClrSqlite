@@ -55,7 +55,7 @@ namespace Community.CsharpSqlite.Engine
                 case OpCode.OP_Integer:
                     {
                         ///<param name="out2">prerelease </param>
-                        pOut.u.i = pOp.p1;
+                        pOut.u.AsInteger = pOp.p1;
                         break;
                     }
                 ///Opcode: Int64 * P2 * P4 *
@@ -66,7 +66,7 @@ namespace Community.CsharpSqlite.Engine
                     {
                         ///<param name="out2">prerelease </param>
                         // Integer pointer always exists Debug.Assert( pOp.p4.pI64 != 0 );
-                        pOut.u.i = pOp.p4.pI64;
+                        pOut.u.AsInteger = pOp.p4.pI64;
                         break;
                     }
 
@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite.Engine
                         ///<param name="same as TokenType.TK_FLOAT, ref2">prerelease </param>
                         pOut.flags = MemFlags.MEM_Real;
                         Debug.Assert(!MathExtensions.sqlite3IsNaN(pOp.p4.pReal));
-                        pOut.r = pOp.p4.pReal;
+                        pOut.AsReal = pOp.p4.pReal;
                         break;
                     }
 #endif
@@ -134,8 +134,8 @@ pOp.p1 = pOut.n;
                         Debug.Assert(pOp.p4.z != null);
                         pOut.flags = MemFlags.MEM_Str | MemFlags.MEM_Static | MemFlags.MEM_Term;
                         malloc_cs.sqlite3_free(ref pOut.zBLOB);
-                        pOut.z = pOp.p4.z;
-                        pOut.n = pOp.p1;
+                        pOut.AsString = pOp.p4.z;
+                        pOut.CharacterCount = pOp.p1;
 #if SQLITE_OMIT_UTF16
                         pOut.enc = SqliteEncoding.UTF8;
 #else
@@ -205,7 +205,7 @@ pOp.p1 = pOut.n;
                         pOut = aMem[pOp.p2];
                         Debug.Assert(pOut != pIn1);
                         vdbemem_cs.sqlite3VdbeMemShallowCopy(pOut, pIn1, MemFlags.MEM_Ephem);
-                        if ((pOut.flags & MemFlags.MEM_Ephem) != 0 && pOut.sqlite3VdbeMemMakeWriteable() != 0)
+                        if ((pOut.flags & MemFlags.MEM_Ephem) != 0 && pOut.MakeWriteable() != 0)
                         {
                             return RuntimeException.no_mem;
                         }

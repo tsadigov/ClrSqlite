@@ -67,7 +67,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             //Debug.Assert((vdbe.btreeMask & (((yDbMask)1) << iDb)) != 0);//TODO:ERROR
                             cpu.rc = db.Backends[iDb].BTree.sqlite3BtreeDropTable(pOp.p1, ref iMoved);
                             pOut.flags = MemFlags.MEM_Int;
-                            pOut.u.i = iMoved;
+                            pOut.u.AsInteger = iMoved;
 #if !SQLITE_OMIT_AUTOVACUUM
                             if (cpu.rc == SqlResult.SQLITE_OK && iMoved != 0)
                             {
@@ -177,7 +177,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             flags = Sqlite3.BTREE_BLOBKEY;
                         }
                         cpu.rc = pDb.BTree.sqlite3BtreeCreateTable(ref pgno, flags);
-                        pOut.u.i = pgno;
+                        pOut.u.AsInteger = pgno;
                         break;
                     }
                 default: return RuntimeException.noop;

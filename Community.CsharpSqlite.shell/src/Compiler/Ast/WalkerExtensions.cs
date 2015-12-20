@@ -91,10 +91,10 @@ namespace Community.CsharpSqlite.Ast
             ExprList_item pItem;
             if (p != null)
             {
-                for (i = p.nExpr; i > 0; i--)
+                for (i = p.Count; i > 0; i--)
                 {
                     //, pItem++){
-                    pItem = p.a[p.nExpr - i];
+                    pItem = p.a[p.Count - i];
                     if (sqlite3WalkExpr(pWalker, ref pItem.pExpr) != 0)
                         return WRC.WRC_Abort;
                 }
@@ -142,9 +142,9 @@ namespace Community.CsharpSqlite.Ast
             pSrc = p.pSrc;
             if (Sqlite3.ALWAYS(pSrc))
             {
-                for (i = pSrc.nSrc; i > 0; i--)// pItem++ )
+                for (i = pSrc.Count; i > 0; i--)// pItem++ )
                 {
-                    pItem = pSrc.a[pSrc.nSrc - i];
+                    pItem = pSrc.a[pSrc.Count - i];
                     if (sqlite3WalkSelect(pWalker, pItem.pSelect) != 0)
                     {
                         return WRC.WRC_Abort;

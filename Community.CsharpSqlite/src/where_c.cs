@@ -654,7 +654,7 @@ namespace Community.CsharpSqlite
                 Bitmask mask = 0;
                 if (pList != null)
                 {
-                    for (i = 0; i < pList.nExpr; i++)
+                    for (i = 0; i < pList.Count; i++)
                     {
                         mask |= this.exprTableUsage(pList.a[i].pExpr);
                     }

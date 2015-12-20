@@ -238,25 +238,35 @@ public u64 cycles;         /* Total time spend executing this instruction */
                 case OpCode.OP_MakeRecord:
 
                     break;
+                case OpCode.OP_ResultRow:
+
+                    if(null!= vdbe.pResultSet)
+                        str = String.Join("\t\t"+Environment.NewLine,vdbe.pResultSet.Select(m=>m.ToString()).ToArray());
+
+                    
+                    break;
 
                 case OpCode.OP_Column:
 
                     var vdbeCursor = vdbe.OpenCursors[p1];
-                    str = "nField:" + vdbeCursor.nField + "\tpayloadSize" + vdbeCursor.payloadSize + "\taRow:" + vdbeCursor.aRow + "\taOffset:" + (vdbeCursor.aOffset==null?"":String.Join(",", vdbeCursor.aOffset.Select(x => "x" + x.ToString()).ToArray()));
+                    str =(null==vdbeCursor)?"": ("nField:" + vdbeCursor.nField + "\tpayloadSize" + vdbeCursor.payloadSize + "\taRow:" + vdbeCursor.aRow + "\taOffset:" + (vdbeCursor.aOffset==null?"":String.Join(",", vdbeCursor.aOffset.Select(x => "x" + x.ToString()).ToArray())));
+                    
+                    var pdest = vdbe.aMem[this.p3];
+                    str += Environment.NewLine +"\t\t"+ pdest;
 
                     break;
 
                 case OpCode.OP_Insert:
                     var pData = vdbe.aMem[p2];
                     var pKey = vdbe.aMem[p3];
-                    str = pKey.u.i + "<<";
+                    str = pKey.u.AsInteger + "<<";
                     if (null != pData.zBLOB)
                         str += String.Join(",", pData.zBLOB.Select(x => "x" + x.ToString()).ToArray());// Converter.ToH(pData.zBLOB);
                     break;
 
                 case OpCode.OP_Yield:
                     var pIn1 = vdbe.aMem[this.p1];
-                    str = pIn1.u.i.ToString();
+                    str = pIn1.u.AsInteger.ToString();
                     break;
 
                 case OpCode.OP_Goto:
@@ -272,14 +282,14 @@ public u64 cycles;         /* Total time spend executing this instruction */
                     {
                         var mem1 = vdbe.aMem[p1];
                         var mem2 = vdbe.aMem[p2];
-                        str = mem2.u.i + "+" + mem1.u.i;
+                        str = mem2.u.AsInteger + "+" + mem1.u.AsInteger;
                     }
                     break;
                 case OpCode.OP_Divide:
                     {
                         var mem1 = vdbe.aMem[p1];
                         var mem2 = vdbe.aMem[p2];
-                        str = mem2.u.i + "/" + mem1.u.i;
+                        str = mem2.u.AsInteger + "/" + mem1.u.AsInteger;
                     }
                     break;
                 case OpCode.OP_OpenRead:
@@ -307,7 +317,7 @@ public u64 cycles;         /* Total time spend executing this instruction */
                     }
                     break;
             }
-			return OpCode.ToString () + " \t\t:\t " + str+Environment.NewLine;
+			return OpCode.ToString () + " \t\t:\t " + str;
 		}
 	}
 }

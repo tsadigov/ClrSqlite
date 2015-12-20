@@ -192,22 +192,22 @@ return ( p == null || p.expired ) ? 1 : 0;
                 if ((p.flags & (MemFlags.MEM_Blob | MemFlags.MEM_Str)) != 0)
                 {
                     p.sqlite3VdbeMemExpandBlob();
-                    if (p.zBLOB == null && p.z != null)
+                    if (p.zBLOB == null && p.AsString != null)
                     {
-                        if (p.z.Length == 0)
+                        if (p.AsString.Length == 0)
                             p.zBLOB = malloc_cs.sqlite3Malloc(1);
                         else
                         {
-                            p.zBLOB = malloc_cs.sqlite3Malloc(p.z.Length);
-                            Debug.Assert(p.zBLOB.Length == p.z.Length);
+                            p.zBLOB = malloc_cs.sqlite3Malloc(p.AsString.Length);
+                            Debug.Assert(p.zBLOB.Length == p.AsString.Length);
                             for (int i = 0; i < p.zBLOB.Length; i++)
-                                p.zBLOB[i] = (u8)p.z[i];
+                                p.zBLOB[i] = (u8)p.AsString[i];
                         }
-                        p.z = null;
+                        p.AsString = null;
                     }
                     p.flags = (p.flags & ~MemFlags.MEM_Str);
                     p.flags |= MemFlags.MEM_Blob;
-                    return p.n > 0 ? p.zBLOB : null;
+                    return p.CharacterCount > 0 ? p.zBLOB : null;
                 }
                 else
                 {
@@ -227,17 +227,17 @@ return ( p == null || p.expired ) ? 1 : 0;
 
             public static double sqlite3_value_double(sqlite3_value pVal)
             {
-                return pVal.sqlite3VdbeRealValue();
+                return pVal.ToReal();
             }
 
             public static int sqlite3_value_int(sqlite3_value pVal)
             {
-                return (int)pVal.sqlite3VdbeIntValue();
+                return (int)pVal.ToInt();
             }
 
             public static sqlite_int64 sqlite3_value_int64(sqlite3_value pVal)
             {
-                return pVal.sqlite3VdbeIntValue();
+                return pVal.ToInt();
             }
 
             public static string sqlite3_value_text(sqlite3_value pVal)
@@ -619,20 +619,20 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
                     {
                         pMem.sqlite3VdbeMemReleaseExternal();
                         pMem.flags = 0;
-                        pMem.z = null;
+                        pMem.AsString = null;
                     }
                     else
                     {
                         pMem.Grow(nByte, 0);
                         pMem.flags = MemFlags.MEM_Agg;
                         pMem.u.pDef = p.pFunc;
-                        if (pMem.z != null)
+                        if (pMem.AsString != null)
                         {
-                            pMem.z = null;
+                            pMem.AsString = null;
                         }
                         pMem._Mem = malloc_cs.sqlite3Malloc(pMem._Mem);
                         pMem._Mem.flags = 0;
-                        pMem._Mem.z = null;
+                        pMem._Mem.AsString = null;
                     }
                 }
                 return pMem._Mem;
@@ -1268,7 +1268,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 rc = vdbeUnbind(p, i);
                 if (rc == SqlResult.SQLITE_OK)
                 {
-                    p.aVar[i - 1].sqlite3VdbeMemSetDouble( rValue);
+                    p.aVar[i - 1].Set( rValue);
                     p.db.mutex.sqlite3_mutex_leave();
                 }
                 return rc;
@@ -1286,7 +1286,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 rc = vdbeUnbind(p, i);
                 if (rc == SqlResult.SQLITE_OK)
                 {
-                    p.aVar[i - 1].sqlite3VdbeMemSetInt64( iValue);
+                    p.aVar[i - 1].Set( iValue);
                     p.db.mutex.sqlite3_mutex_leave();
                 }
                 return rc;
@@ -1332,12 +1332,12 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                 {
                     case FoundationalType.SQLITE_INTEGER:
                         {
-                            rc = sqlite3_bind_int64(pStmt, i, pValue.u.i);
+                            rc = sqlite3_bind_int64(pStmt, i, pValue.u.AsInteger);
                             break;
                         }
                     case FoundationalType.SQLITE_FLOAT:
                         {
-                            rc = sqlite3_bind_double(pStmt, i, pValue.r);
+                            rc = sqlite3_bind_double(pStmt, i, pValue.AsReal);
                             break;
                         }
                     case FoundationalType.SQLITE_BLOB:
@@ -1348,13 +1348,13 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                             }
                             else
                             {
-                                rc = sqlite3_bind_blob(pStmt, i, pValue.zBLOB, pValue.n, Sqlite3.SQLITE_TRANSIENT);
+                                rc = sqlite3_bind_blob(pStmt, i, pValue.zBLOB, pValue.CharacterCount, Sqlite3.SQLITE_TRANSIENT);
                             }
                             break;
                         }
                     case FoundationalType.SQLITE_TEXT:
                         {
-                            rc = bindText(pStmt, i, pValue.z, pValue.n, Sqlite3.SQLITE_TRANSIENT, pValue.enc);
+                            rc = bindText(pStmt, i, pValue.AsString, pValue.CharacterCount, Sqlite3.SQLITE_TRANSIENT, pValue.enc);
                             break;
                         }
                     default:

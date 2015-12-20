@@ -637,7 +637,7 @@ goto exit_create_index;
             {
                 nullId.zRestSql = pTab.aCol[pTab.nCol - 1].zName;
                 nullId.Length = StringExtensions.Strlen30(nullId.zRestSql);
-                pList = pParse.sqlite3ExprListAppend(null, null);
+                pList = CollectionExtensions.Append(null, null);
                 if (pList == null)
                     goto exit_create_index;
                 pParse.sqlite3ExprListSetName(pList, nullId, 0);
@@ -645,7 +645,7 @@ goto exit_create_index;
             }
             ///Figure out how many bytes of space are required to store explicitly
             ///specified collation sequence names.
-            for (i = 0; i < pList.nExpr; i++)
+            for (i = 0; i < pList.Count; i++)
             {
                 Expr pExpr = pList.a[i].pExpr;
                 if (pExpr != null)
@@ -661,7 +661,7 @@ goto exit_create_index;
             }
             ///Allocate the index structure.
             nName = StringExtensions.Strlen30(zName);
-            nCol = pList.nExpr;
+            nCol = pList.Count;
             pIndex = new Index();
             // sqlite3DbMallocZero( db,
             //    Index.Length +              /* Index structure  */
@@ -695,7 +695,7 @@ goto exit_create_index;
             }
             // memcpy( pIndex.zName, zName, nName + 1 );
             pIndex.pTable = pTab;
-            pIndex.nColumn = pList.nExpr;
+            pIndex.nColumn = pList.Count;
             pIndex.onError = onError;
             pIndex.autoIndex = (u8)(pName == null ? 1 : 0);
             pIndex.pSchema = db.Backends[iDb].pSchema;
@@ -721,7 +721,7 @@ goto exit_create_index;
             ///same column more than once cannot be an error because that would
             ///<param name="break backwards compatibility "> it needs to be a warning.</param>
             ///<param name=""></param>
-            for (i = 0; i < pList.nExpr; i++)
+            for (i = 0; i < pList.Count; i++)
             {
                 //, pListItem++){
                 pListItem = pList.a[i];

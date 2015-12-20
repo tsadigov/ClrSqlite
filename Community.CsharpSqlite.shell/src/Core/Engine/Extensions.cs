@@ -35,16 +35,16 @@ namespace Community.CsharpSqlite
                 SqliteEncoding enc = pRec.enc;
                 if ((pRec.flags & MemFlags.MEM_Str) == 0)
                     return;
-                if (Converter.sqlite3AtoF(pRec.z, ref rValue, pRec.n, enc) == false)
+                if (Converter.sqlite3AtoF(pRec.AsString, ref rValue, pRec.CharacterCount, enc) == false)
                     return;
-                if (0 == Converter.sqlite3Atoi64(pRec.z, ref iValue, pRec.n, enc))
+                if (0 == Converter.sqlite3Atoi64(pRec.AsString, ref iValue, pRec.CharacterCount, enc))
                 {
-                    pRec.u.i = iValue;
+                    pRec.u.AsInteger = iValue;
                     pRec.flags |= MemFlags.MEM_Int;
                 }
                 else
                 {
-                    pRec.r = rValue;
+                    pRec.AsReal = rValue;
                     pRec.flags |= MemFlags.MEM_Real;
                 }
             }
@@ -113,7 +113,7 @@ namespace Community.CsharpSqlite
                     StringBuilder sb = new StringBuilder(pRec.zBLOB.Length);
                     for (int i = 0; i < pRec.zBLOB.Length; i++)
                         sb.Append((char)pRec.zBLOB[i]);
-                    pRec.z = sb.ToString();
+                    pRec.AsString = sb.ToString();
                     malloc_cs.sqlite3_free(ref pRec.zBLOB);
                     pRec.flags = (pRec.flags & ~MemFlags.MEM_Blob);
                 }

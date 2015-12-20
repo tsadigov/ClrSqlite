@@ -127,7 +127,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///the seek, so convert it. 
                                 var pIn3 = aMem[pOp.p3];
                                 pIn3.applyNumericAffinity();
-                                iKey = pIn3.sqlite3VdbeIntValue();
+                                iKey = pIn3.ToInt();
                                 pC.rowidIsValid = false;
                                 ///If the P3 value could not be converted into an integer without
                                 ///loss of information, then special processing is required... 
@@ -143,12 +143,12 @@ namespace Community.CsharpSqlite.Engine.Op
                                     ///If we reach vdbe point, then the P3 value must be a floating
                                     ///point number. 
                                     Debug.Assert((pIn3.flags & MemFlags.MEM_Real) != 0);
-                                    if (iKey == IntegerExtensions.SMALLEST_INT64 && (pIn3.r < (double)iKey || pIn3.r > 0))
+                                    if (iKey == IntegerExtensions.SMALLEST_INT64 && (pIn3.AsReal < (double)iKey || pIn3.AsReal > 0))
                                     {
                                         ///The P3 value is too large in magnitude to be expressed as an
                                         ///integer. 
                                         res = 1;
-                                        if (pIn3.r < 0)
+                                        if (pIn3.AsReal < 0)
                                         {
                                             if (oc >= OpCode.OP_SeekGe)
                                             {
@@ -181,7 +181,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                             ///<summary>
                                             ///Use the ceiling() function to convert real.int 
                                             ///</summary>
-                                            if (pIn3.r > (double)iKey)
+                                            if (pIn3.AsReal > (double)iKey)
                                                 iKey++;
                                         }
                                         else
@@ -191,7 +191,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                             ///Use the floor() function to convert real.int 
                                             ///</summary>
                                             Debug.Assert(oc == OpCode.OP_SeekLe || oc == OpCode.OP_SeekGt);
-                                            if (pIn3.r < (double)iKey)
+                                            if (pIn3.AsReal < (double)iKey)
                                                 iKey--;
                                         }
                                 }
@@ -331,7 +331,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             Debug.Assert(pC.isTable);
                             pC.nullRow = false;
                             var pIn2 = aMem[pOp.p2];
-                            pC.movetoTarget = pIn2.sqlite3VdbeIntValue();
+                            pC.movetoTarget = pIn2.ToInt();
                             pC.rowidIsValid = false;
                             pC.deferredMoveto = true;
                         }

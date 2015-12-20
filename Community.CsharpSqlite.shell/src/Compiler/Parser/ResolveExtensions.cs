@@ -99,7 +99,7 @@ namespace Community.CsharpSqlite
                 ///Copy of pOrig 
                 Connection db;
                 ///The database connection 
-                Debug.Assert(iCol >= 0 && iCol < pEList.nExpr);
+                Debug.Assert(iCol >= 0 && iCol < pEList.Count);
                 pOrig = pEList.a[iCol].pExpr;
                 Debug.Assert(pOrig != null);
                 Debug.Assert((pOrig.Flags & ExprFlags.EP_Resolved) != 0);
@@ -184,7 +184,7 @@ namespace Community.CsharpSqlite
                 if (pE.Operator == TokenType.TK_ID)
                 {
                     string zCol = pE.u.zToken;
-                    for (i = 0; i < pEList.nExpr; i++)
+                    for (i = 0; i < pEList.Count; i++)
                     {
                         string zAs = pEList.a[i].zName;
                         if (zAs != null && zAs.Equals(zCol, StringComparison.InvariantCultureIgnoreCase))
@@ -258,7 +258,7 @@ namespace Community.CsharpSqlite
                 ///Try to match the ORDER BY expression against an expression
                 ///<param name="in the result set.  Return an 1">based index of the matching</param>
                 ///<param name="result">set entry.</param>
-                for (i = 0; i < pEList.nExpr; i++)
+                for (i = 0; i < pEList.Count; i++)
                 {
                     if (exprc.sqlite3ExprCompare(pEList.a[i].pExpr, pE) < 2)
                     {
@@ -376,7 +376,7 @@ namespace Community.CsharpSqlite
                     SrcList pSrcList = pNC.pSrcList;
                     if (pSrcList != null)
                     {
-                        for (i = 0; i < pSrcList.nSrc; i++)//, pItem++ )
+                        for (i = 0; i < pSrcList.Count; i++)//, pItem++ )
                         {
                             pItem = pSrcList.a[i];
                             Table pTab;
@@ -427,7 +427,7 @@ namespace Community.CsharpSqlite
                                     pSchema = pTab.pSchema;
                                     ///<param name="Substitute the rowid (column ">1) for the INTEGER PRIMARY KEY </param>
                                     pExpr.iColumn = (short)(j == pTab.iPKey ? -1 : j);
-                                    if (i < pSrcList.nSrc - 1)
+                                    if (i < pSrcList.Count - 1)
                                     {
                                         if ((pSrcList.a[i + 1].jointype &  JoinType.JT_NATURAL) != 0)// pItem[1].jointype
                                         {
@@ -559,7 +559,7 @@ namespace Community.CsharpSqlite
                     ///<param name=""></param>
                     if (cnt == 0 && (pEList = pNC.pEList) != null && zTab == null)
                     {
-                        for (j = 0; j < pEList.nExpr; j++)
+                        for (j = 0; j < pEList.Count; j++)
                         {
                             string zAs = pEList.a[j].zName;
                             if (zAs != null && zAs.Equals(zCol, StringComparison.InvariantCultureIgnoreCase))
@@ -783,7 +783,7 @@ break;
                         {
                             ExprList pList = pExpr.x.pList;
                             ///The argument list 
-                            int n = pList != null ? pList.nExpr : 0;
+                            int n = pList != null ? pList.Count : 0;
                             ///Number of arguments 
                             bool no_such_func = false;
                             ///True if no such function exists 
@@ -975,13 +975,13 @@ return WRC.WRC_Prune;
                     return 0;
                 db = pParse.db;
                 //#if SQLITE_MAX_COLUMN
-                if (pOrderBy.nExpr > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
+                if (pOrderBy.Count > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
                 {
                     utilc.sqlite3ErrorMsg(pParse, "too many terms in ORDER BY clause");
                     return 1;
                 }
                 //#endif
-                for (i = 0; i < pOrderBy.nExpr; i++)
+                for (i = 0; i < pOrderBy.Count; i++)
                 {
                     pOrderBy.a[i].done = 0;
                 }
@@ -997,7 +997,7 @@ return WRC.WRC_Prune;
                     moreToDo = 0;
                     pEList = pSelect.ResultingFieldList;
                     Debug.Assert(pEList != null);
-                    for (i = 0; i < pOrderBy.nExpr; i++)//, pItem++)
+                    for (i = 0; i < pOrderBy.Count; i++)//, pItem++)
                     {
                         pItem = pOrderBy.a[i];
                         int iCol = -1;
@@ -1007,9 +1007,9 @@ return WRC.WRC_Prune;
                         pE = pItem.pExpr;
                         if (pE.sqlite3ExprIsInteger(ref iCol) )
                         {
-                            if (iCol <= 0 || iCol > pEList.nExpr)
+                            if (iCol <= 0 || iCol > pEList.Count)
                             {
-                                resolveOutOfRangeError(pParse, "ORDER", i + 1, pEList.nExpr);
+                                resolveOutOfRangeError(pParse, "ORDER", i + 1, pEList.Count);
                                 return 1;
                             }
                         }
@@ -1048,7 +1048,7 @@ return WRC.WRC_Prune;
                     }
                     pSelect = pSelect.pNext;
                 }
-                for (i = 0; i < pOrderBy.nExpr; i++)
+                for (i = 0; i < pOrderBy.Count; i++)
                 {
                     if (pOrderBy.a[i].done == 0)
                     {
@@ -1093,7 +1093,7 @@ return WRC.WRC_Prune;
                 )
                     return 0;
                 //#if SQLITE_MAX_COLUMN
-                if (pOrderBy.nExpr > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
+                if (pOrderBy.Count > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
                 {
                     utilc.sqlite3ErrorMsg(pParse, "too many terms in %s BY clause", zType);
                     return 1;
@@ -1105,14 +1105,14 @@ return WRC.WRC_Prune;
                 ///<summary>
                 ///sqlite3SelectNew() guarantees this 
                 ///</summary>
-                for (i = 0; i < pOrderBy.nExpr; i++)//, pItem++)
+                for (i = 0; i < pOrderBy.Count; i++)//, pItem++)
                 {
                     pItem = pOrderBy.a[i];
                     if (pItem.iCol != 0)
                     {
-                        if (pItem.iCol > pEList.nExpr)
+                        if (pItem.iCol > pEList.Count)
                         {
-                            resolveOutOfRangeError(pParse, zType, i + 1, pEList.nExpr);
+                            resolveOutOfRangeError(pParse, zType, i + 1, pEList.Count);
                             return 1;
                         }
                         ResolveExtensions.resolveAlias(pParse, pEList, pItem.iCol - 1, pItem.pExpr, zType);
@@ -1181,9 +1181,9 @@ return WRC.WRC_Prune;
                 ///</summary>
                 if (pOrderBy == null)
                     return 0;
-                nResult = pSelect.ResultingFieldList.nExpr;
+                nResult = pSelect.ResultingFieldList.Count;
                 pParse = pNC.pParse;
-                for (i = 0; i < pOrderBy.nExpr; i++)//, pItem++ )
+                for (i = 0; i < pOrderBy.Count; i++)//, pItem++ )
                 {
                     pItem = pOrderBy.a[i];
                     Expr pE = pItem.pExpr;
@@ -1321,7 +1321,7 @@ return WRC.WRC_Prune;
                     ///</summary>
                     pEList = p.ResultingFieldList;
                     Debug.Assert(pEList != null);
-                    for (i = 0; i < pEList.nExpr; i++)
+                    for (i = 0; i < pEList.Count; i++)
                     {
                         Expr pX = pEList.a[i].pExpr;
                         if (sqlite3ResolveExprNames(sNC, ref pX) != 0)
@@ -1334,7 +1334,7 @@ return WRC.WRC_Prune;
                     ///Recursively resolve names in all subqueries
                     ///
                     ///</summary>
-                    for (i = 0; i < p.pSrc.nSrc; i++)
+                    for (i = 0; i < p.pSrc.Count; i++)
                     {
                         SrcList_item pItem = p.pSrc.a[i];
                         if (pItem.pSelect != null)
@@ -1435,7 +1435,7 @@ return WRC.WRC_Prune;
                         {
                             return WRC.WRC_Abort;
                         }
-                        for (i = 0; i < pGroupBy.nExpr; i++)//, pItem++)
+                        for (i = 0; i < pGroupBy.Count; i++)//, pItem++)
                         {
                             pItem = pGroupBy.a[i];
                             if ((pItem.pExpr.Flags & ExprFlags.EP_Agg) != 0)//HasProperty(pItem.pExpr, ExprFlags.EP_Agg) )

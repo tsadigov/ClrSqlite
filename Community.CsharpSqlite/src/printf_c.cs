@@ -1523,7 +1523,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                             SrcList pSrc = _Custom.va_arg(ap, (SrcList)null);
                             int k = _Custom.va_arg(ap, (Int32)0);
                             SrcList_item pItem = pSrc.a[k];
-                            Debug.Assert(k >= 0 && k < pSrc.nSrc);
+                            Debug.Assert(k >= 0 && k < pSrc.Count);
                             if (pItem.zDatabase != null)
                             {
                                 pAccum.sqlite3StrAccumAppend(pItem.zDatabase, -1);

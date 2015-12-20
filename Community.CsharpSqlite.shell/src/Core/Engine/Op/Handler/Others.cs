@@ -105,7 +105,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         var pIn1 = aMem[pOp.p1];
                         if ((pIn1.flags & MemFlags.MEM_Int) != 0)
                         {
-                            pIn1.sqlite3VdbeMemRealify();
+                            pIn1.Realify();
                         }
                         break;
                     }
@@ -179,7 +179,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         {
                             nEntry = 0;
                         }
-                        cpu.pOut.u.i = nEntry;
+                        cpu.pOut.u.AsInteger = nEntry;
                         break;
                     }
 #endif
@@ -226,7 +226,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         Debug.Assert(vdbe.db.Backends[iDb].BTree != null);
                         Debug.Assert((vdbe.btreeMask & (((yDbMask)1) << iDb)) != 0);
                         iMeta = vdbe.db.Backends[iDb].BTree.sqlite3BtreeGetMeta(iCookie);
-                        cpu.pOut.u.i = (int)iMeta;
+                        cpu.pOut.u.AsInteger = (int)iMeta;
                         break;
                     }
                 ///
@@ -261,14 +261,14 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///<summary>
                         ///See note about index shifting on  OpCode.OP_ReadCookie 
                         ///</summary>
-                        cpu.rc = pDb.BTree.sqlite3BtreeUpdateMeta(pOp.p2, (u32)pIn3.u.i);
+                        cpu.rc = pDb.BTree.sqlite3BtreeUpdateMeta(pOp.p2, (u32)pIn3.u.AsInteger);
                         if (pOp.p2 == (int)BTreeProp.SCHEMA_VERSION)
                         {
                             ///
                             ///<summary>
                             ///When the schema cookie changes, record the new cookie internally 
                             ///</summary>
-                            pDb.pSchema.schema_cookie = (int)pIn3.u.i;
+                            pDb.pSchema.schema_cookie = (int)pIn3.u.AsInteger;
                             vdbe.db.flags |= SqliteFlags.SQLITE_InternChanges;
                         }
                         else
@@ -278,7 +278,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///<summary>
                                 ///Record changes in the file format 
                                 ///</summary>
-                                pDb.pSchema.file_format = (u8)pIn3.u.i;
+                                pDb.pSchema.file_format = (u8)pIn3.u.AsInteger;
                             }
                         if (pOp.p1 == 1)
                         {
@@ -386,7 +386,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///<param name="out2">prerelease </param>
                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
                         Debug.Assert(vdbe.OpenCursors[pOp.p1] != null);
-                        cpu.pOut.u.i = (long)vdbe.OpenCursors[pOp.p1].seqCount++;
+                        cpu.pOut.u.AsInteger = (long)vdbe.OpenCursors[pOp.p1].seqCount++;
                         break;
                     }
 
@@ -712,15 +712,15 @@ namespace Community.CsharpSqlite.Engine.Op
                         var pIn1 = aMem[pOp.p1];
                         for (j = 0; j < nRoot; j++)
                         {
-                            aRoot[j] = (int)vdbe.aMem[pOp.p1 + j].sqlite3VdbeIntValue();
+                            aRoot[j] = (int)vdbe.aMem[pOp.p1 + j].ToInt();
                             // pIn1[j]);
                         }
                         aRoot[j] = 0;
                         Debug.Assert(pOp.p5 < vdbe.db.BackendCount);
                         Debug.Assert((vdbe.btreeMask & (((yDbMask)1) << pOp.p5)) != 0);
-                        z = vdbe.db.Backends[pOp.p5].BTree.sqlite3BtreeIntegrityCheck(aRoot, nRoot, (int)pnErr.u.i, ref nErr);
+                        z = vdbe.db.Backends[pOp.p5].BTree.sqlite3BtreeIntegrityCheck(aRoot, nRoot, (int)pnErr.u.AsInteger, ref nErr);
                         vdbe.db.sqlite3DbFree(ref aRoot);
-                        pnErr.u.i -= nErr;
+                        pnErr.u.AsInteger -= nErr;
                         pIn1.sqlite3VdbeMemSetNull();
                         if (nErr == 0)
                         {
@@ -799,7 +799,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         else
                         {
                             ///A value was pulled from the index 
-                            aMem[pOp.p3].sqlite3VdbeMemSetInt64(val);
+                            aMem[pOp.p3].Set(val);
                         }
                         break;
                     }
@@ -861,7 +861,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             {
                                 Debug.Assert(aMem[pOp.p3].memIsValid());
                                 vdbe.memAboutToChange(aMem[pOp.p3]);
-                                aMem[pOp.p3].u.i += nChange;
+                                aMem[pOp.p3].u.AsInteger += nChange;
                             }
                         }
                         break;
@@ -888,7 +888,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             if ((pIn1.flags & MemFlags.MEM_RowSet) == 0)
                                 return RuntimeException.no_mem;
                         }
-                        pIn1.u.pRowSet.sqlite3RowSetInsert(pIn2.u.i);
+                        pIn1.u.pRowSet.sqlite3RowSetInsert(pIn2.u.AsInteger);
                         break;
                     }
                                
@@ -929,7 +929,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                         ///<summary>
                                         ///</summary>
                                         ///<param name="out2">prerelease </param>
-                                        cpu.pOut.u.i = vdbe.db.Backends[pOp.p1].BTree.sqlite3BtreeLastPage();
+                                        cpu.pOut.u.AsInteger = vdbe.db.Backends[pOp.p1].BTree.sqlite3BtreeLastPage();
                                         break;
                                     }
 #endif
@@ -960,7 +960,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                             if (newMax < pOp.p3)
                                                 newMax = pOp.p3;
                                         }
-                                        cpu.pOut.u.i = (i64)pBt.GetMaxPageCount((int)newMax);
+                                        cpu.pOut.u.AsInteger = (i64)pBt.GetMaxPageCount((int)newMax);
                                         break;
                                     }
 #endif
