@@ -174,11 +174,11 @@ namespace Community.CsharpSqlite
                 if (p != null)
                 {
                     TriggerStep pStep = p.step_list;
-                    exprc.sqlite3ExprDelete(dbMem, ref pStep.pWhere);
-                    exprc.sqlite3ExprListDelete(dbMem, ref pStep.pExprList);
+                    exprc.Delete(dbMem, ref pStep.pWhere);
+                    exprc.Delete(dbMem, ref pStep.pExprList);
                     SelectMethods.SelectDestructor(dbMem, ref pStep.pSelect);
-                    exprc.sqlite3ExprDelete(dbMem, ref p.pWhen);
-                    dbMem.sqlite3DbFree(ref p);
+                    exprc.Delete(dbMem, ref p.pWhen);
+                    dbMem.DbFree(ref p);
                 }
             }
             //#define COLUMN_MASK(x) (((x)>31) ? 0xffffffff : ((u32)1<<(x)))
@@ -245,7 +245,7 @@ namespace Community.CsharpSqlite
                     fkTriggerDelete(db, pFKey.apTrigger[0]);
                     fkTriggerDelete(db, pFKey.apTrigger[1]);
                     pNext = pFKey.pNextFrom;
-                    db.sqlite3DbFree(ref pFKey);
+                    db.DbFree(ref pFKey);
                 }
             }
 #endif

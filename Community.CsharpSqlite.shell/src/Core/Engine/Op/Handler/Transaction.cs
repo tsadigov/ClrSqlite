@@ -230,7 +230,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 {
                                     pTmp = db.pSavepoint;
                                     db.pSavepoint = pTmp.pNext;
-                                    db.sqlite3DbFree(ref pTmp);
+                                    db.DbFree(ref pTmp);
                                     db.nSavepoint--;
                                 }
                                 ///
@@ -244,7 +244,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 {
                                     Debug.Assert(pSavepoint == db.pSavepoint);
                                     db.pSavepoint = pSavepoint.pNext;
-                                    db.sqlite3DbFree(ref pSavepoint);
+                                    db.DbFree(ref pSavepoint);
                                     if (0 == isTransaction)
                                     {
                                         db.nSavepoint--;

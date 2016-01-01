@@ -52,15 +52,15 @@ namespace Community.CsharpSqlite.Ast {
             ///</summary>
             static void clearSelect(Connection db, Select p)
             {
-                exprc.sqlite3ExprListDelete(db, ref p.ResultingFieldList);
+                exprc.Delete(db, ref p.ResultingFieldList);
                 build.sqlite3SrcListDelete(db, ref p.pSrc);
-                exprc.sqlite3ExprDelete(db, ref p.pWhere);
-                exprc.sqlite3ExprListDelete(db, ref p.pGroupBy);
-                exprc.sqlite3ExprDelete(db, ref p.pHaving);
-                exprc.sqlite3ExprListDelete(db, ref p.pOrderBy);
+                exprc.Delete(db, ref p.pWhere);
+                exprc.Delete(db, ref p.pGroupBy);
+                exprc.Delete(db, ref p.pHaving);
+                exprc.Delete(db, ref p.pOrderBy);
                 SelectMethods.SelectDestructor(db, ref p.pPrior);
-                exprc.sqlite3ExprDelete(db, ref p.pLimit);
-                exprc.sqlite3ExprDelete(db, ref p.pOffset);
+                exprc.Delete(db, ref p.pLimit);
+                exprc.Delete(db, ref p.pOffset);
             }
 
 
@@ -75,7 +75,7 @@ namespace Community.CsharpSqlite.Ast {
                 if (p != null)
                 {
                     clearSelect(db, p);
-                    db.sqlite3DbFree(ref p);
+                    db.DbFree(ref p);
                 }
             }
 
@@ -1361,7 +1361,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     var pCol = aCol[i];
                     ///Get an appropriate name for the column
                     p = pEList[i].pExpr;
-                    Debug.Assert(p.pRight == null || p.pRight.ExprHasProperty(ExprFlags.EP_IntValue) || p.pRight.u.zToken == null || p.pRight.u.zToken.Length > 0);
+                    Debug.Assert(p.pRight == null || p.pRight.HasProperty(ExprFlags.EP_IntValue) || p.pRight.u.zToken == null || p.pRight.u.zToken.Length > 0);
                     if (!String.IsNullOrEmpty( pEList[i].zName ))
                     {
                         ///If the column contains an "AS <name>" phrase, use <name> as the name 
@@ -1391,7 +1391,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                         else
                             if (pColExpr.Operator == TokenType.TK_ID)
                             {
-                                Debug.Assert(!pColExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+                                Debug.Assert(!pColExpr.HasProperty(ExprFlags.EP_IntValue));
                                 zName = io.sqlite3MPrintf(db, "%s", pColExpr.u.zToken);
                             }
                             else
@@ -1415,7 +1415,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                             string zNewName;
                             //zName[nName] = 0;
                             zNewName = io.sqlite3MPrintf(db, "%s:%d", zName.Substring(0, nName), ++cnt);
-                            db.sqlite3DbFree(ref zName);
+                            db.DbFree(ref zName);
                             zName = zNewName;
                             j = -1;
                             if (zName == "")
@@ -2130,9 +2130,9 @@ break;
                 {
                     regLimitA = regLimitB = 0;
                 }
-                exprc.sqlite3ExprDelete(db, ref p.pLimit);
+                exprc.Delete(db, ref p.pLimit);
                 p.pLimit = null;
-                exprc.sqlite3ExprDelete(db, ref p.pOffset);
+                exprc.Delete(db, ref p.pOffset);
                 p.pOffset = null;
                 regAddrA = ++pParse.nMem;
                 regEofA = ++pParse.nMem;
@@ -2415,7 +2415,7 @@ break;
                         {
                             pNew.CollatingSequence = pExpr.CollatingSequence;
                         }
-                        exprc.sqlite3ExprDelete(db, ref pExpr);
+                        exprc.Delete(db, ref pExpr);
                         pExpr = pNew;
                     }
                 }
@@ -2423,7 +2423,7 @@ break;
                 {
                     pExpr.pLeft = substExpr(db, pExpr.pLeft, iTable, pEList);
                     pExpr.pRight = substExpr(db, pExpr.pRight, iTable, pEList);
-                    if (pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect))
+                    if (pExpr.HasProperty(ExprFlags.EP_xIsSelect))
                     {
                         substSelect(db, pExpr.x.pSelect, iTable, pEList);
                     }
@@ -2838,9 +2838,9 @@ break;
                 
                 ///Delete the transient table structure associated with the
                 ///subquery
-                db.sqlite3DbFree(ref check.pSubitem.zDatabase);
-                db.sqlite3DbFree(ref check.pSubitem.zName);
-                db.sqlite3DbFree(ref check.pSubitem.zAlias);
+                db.DbFree(ref check.pSubitem.zDatabase);
+                db.DbFree(ref check.pSubitem.zName);
+                db.DbFree(ref check.pSubitem.zAlias);
                 check.pSubitem.pSelect = null;
                 ///Defer deleting the Table object associated with the
                 ///subquery until code generation is
@@ -3044,14 +3044,14 @@ break;
                 pExpr = pEList.a[0].pExpr;
                 if (pExpr.Operator != TokenType.TK_AGG_FUNCTION)
                     return 0;
-                if (Sqlite3.NEVER(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect)))
+                if (Sqlite3.NEVER(pExpr.HasProperty(ExprFlags.EP_xIsSelect)))
                     return 0;
                 pEList = pExpr.x.pList;
                 if (pEList == null || pEList.Count != 1)
                     return 0;
                 if (pEList.a[0].pExpr.Operator != TokenType.TK_AGG_COLUMN)
                     return wherec.WHERE_ORDERBY_NORMAL;
-                Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+                Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
                 if (pExpr.u.zToken.Equals("min", StringComparison.InvariantCultureIgnoreCase))
                 {
                     return wherec.WHERE_ORDERBY_MIN;
@@ -3247,7 +3247,7 @@ break;
                     if (pFunc.iDistinct >= 0)
                     {
                         Expr pE = pFunc.pExpr;
-                        Debug.Assert(!pE.ExprHasProperty(ExprFlags.EP_xIsSelect));
+                        Debug.Assert(!pE.HasProperty(ExprFlags.EP_xIsSelect));
                         if (pE.x.pList == null || pE.x.pList.Count != 1)
                         {
                             utilc.sqlite3ErrorMsg(pParse, "DISTINCT aggregates must have exactly one " + "argument");
@@ -3276,7 +3276,7 @@ break;
                     //, pF++){
                     pF = pAggInfo.aFunc[i];
                     ExprList pList = pF.pExpr.x.pList;
-                    Debug.Assert(!pF.pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
+                    Debug.Assert(!pF.pExpr.HasProperty(ExprFlags.EP_xIsSelect));
                     v.sqlite3VdbeAddOp4(OpCode.OP_AggFinal, pF.iMem, pList != null ? pList.Count : 0, 0, pF.pFunc,  P4Usage.P4_FUNCDEF);
                 }
             }
@@ -3301,7 +3301,7 @@ break;
                     int nArg;
                     int addrNext = 0;
                     int regAgg;
-                    Debug.Assert(!pF.pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
+                    Debug.Assert(!pF.pExpr.HasProperty(ExprFlags.EP_xIsSelect));
                     ExprList pList = pF.pExpr.x.pList;
                     if (pList != null)
                     {

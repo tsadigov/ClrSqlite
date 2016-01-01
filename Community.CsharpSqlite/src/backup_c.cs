@@ -100,7 +100,7 @@ namespace Community.CsharpSqlite {
 						utilc.sqlite3Error(pErrorDb,pParse.rc,"%s",pParse.zErrMsg);
 						rc=SqlResult.SQLITE_ERROR;
 					}
-					pErrorDb.sqlite3DbFree(ref pParse.zErrMsg);
+					pErrorDb.DbFree(ref pParse.zErrMsg);
 					//sqlite3StackFree( pErrorDb, pParse );
 				}
 				if(rc!=0) {
@@ -315,7 +315,7 @@ namespace Community.CsharpSqlite {
             ///Destination page size 
             ///</summary>
             this.pSrcDb.mutex.sqlite3_mutex_enter();
-            this.pSrc.sqlite3BtreeEnter();
+            this.pSrc.Enter();
             if (this.pDestDb != null)
             {
                 this.pDestDb.mutex.sqlite3_mutex_enter();
@@ -448,7 +448,7 @@ namespace Community.CsharpSqlite {
                 ///<param name="the case where the source and destination databases have the">the case where the source and destination databases have the</param>
                 ///<param name="same schema version.">same schema version.</param>
                 ///<param name=""></param>
-                if (rc == SqlResult.SQLITE_DONE && (rc = this.pDest.sqlite3BtreeUpdateMeta(1, this.iDestSchema + 1)) == SqlResult.SQLITE_OK)
+                if (rc == SqlResult.SQLITE_DONE && (rc = this.pDest.sqlite3BtreeUpdateMeta(BTreeProp.SCHEMA_VERSION, this.iDestSchema + 1)) == SqlResult.SQLITE_OK)
                 {
                     Pgno nDestTruncate;
                     if (this.pDestDb != null)
@@ -592,7 +592,7 @@ namespace Community.CsharpSqlite {
             {
                 this.pDestDb.mutex.sqlite3_mutex_leave();
             }
-            this.pSrc.sqlite3BtreeLeave();
+            this.pSrc.Exit();
             this.pSrcDb.mutex.sqlite3_mutex_leave();
             return rc;
         }
@@ -623,7 +623,7 @@ namespace Community.CsharpSqlite {
             if (this == null)
                 return SqlResult.SQLITE_OK;
             this.pSrcDb.mutex.sqlite3_mutex_enter();
-            this.pSrc.sqlite3BtreeEnter();
+            this.pSrc.Enter();
             mutex = this.pSrcDb.mutex;
             if (this.pDestDb != null)
             {
@@ -665,7 +665,7 @@ namespace Community.CsharpSqlite {
             {
                 this.pDestDb.mutex.sqlite3_mutex_leave();
             }
-            this.pSrc.sqlite3BtreeLeave();
+            this.pSrc.Exit();
             if (this.pDestDb != null)
             {
                 ///

@@ -1,5 +1,6 @@
 #define SQLITE_OS_WIN
 using Community.CsharpSqlite.Os;
+using Community.CsharpSqlite.Utils;
 using System;
 using System.Diagnostics;
 using System.IO;

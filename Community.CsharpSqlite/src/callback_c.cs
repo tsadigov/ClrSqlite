@@ -51,7 +51,7 @@ namespace Community.CsharpSqlite {
 				if(zExternal==null)
 					return;
 				db.xCollNeeded(db.pCollNeededArg,db,(int)enc,zExternal);
-				db.sqlite3DbFree(ref zExternal);
+				db.DbFree(ref zExternal);
 			}
 			#if !SQLITE_OMIT_UTF16
 																																																															if( db.xCollNeeded16!=null ){

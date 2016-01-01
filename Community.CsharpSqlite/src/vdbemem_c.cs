@@ -845,7 +845,7 @@ return r;
                     pVal = sqlite3ValueNew(db);
                     if (pVal == null)
                         goto no_mem;
-                    if (pExpr.ExprHasProperty(ExprFlags.EP_IntValue))
+                    if (pExpr.HasProperty(ExprFlags.EP_IntValue))
                     {
                         pVal.Set((i64)pExpr.u.iValue * negInt);
                     }
@@ -932,7 +932,7 @@ return r;
                 return SqlResult.SQLITE_OK;
             no_mem:
                 //db.mallocFailed = 1;
-                db.sqlite3DbFree(ref zVal);
+                db.DbFree(ref zVal);
                 pVal = null;
                 // sqlite3ValueFree(pVal);
                 ppVal = null;

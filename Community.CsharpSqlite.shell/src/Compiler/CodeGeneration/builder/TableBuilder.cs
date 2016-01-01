@@ -57,24 +57,25 @@ namespace Community.CsharpSqlite.builder
             /// See also build.sqlite3LocateTable().
             ///
             ///</summary>
-            public static Table sqlite3FindTable(Connection db, string zName, string zDatabase)
-            {
+            public static Table sqlite3FindTable(this Connection db, string zDatabase, string zName)
+        {
                 Table p = null;
                 Debug.Assert(zName != null);
                 var nName = StringExtensions.Strlen30(zName);
                 ///All mutexes are required for schema access.  Make sure we hold them. 
                 Debug.Assert(zDatabase != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
-                for (int i = sqliteinth.OMIT_TEMPDB; i < db.BackendCount; i++)
-                {
-                    int j = (i < 2) ? i ^ 1 : i;
-                    ///Search TEMP before MAIN 
-                    if (zDatabase != null && !zDatabase.Equals(db.Backends[j].Name, StringComparison.InvariantCultureIgnoreCase))
-                        continue;
-                    Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
-                    p = db.Backends[j].pSchema.tblHash.Find(zName, nName, (Table)null);
-                    if (p != null)
-                        break;
-                }
+
+                var backend = db.Backends.Take(db.BackendCount)
+                    .Swap(0,1)///Search TEMP before MAIN //        int j = (i < 2) ? i ^ 1 : i;
+                    .Where(
+                        b => !(zDatabase != null && !zDatabase.Equals(b.Name, StringComparison.InvariantCultureIgnoreCase))
+                    )
+                    .Select(b => { Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, b, null)); return b; })//Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));)
+                    .FirstOrDefault(
+                        b => null != (p = b.pSchema.tblHash.Find(zName, nName, (Table)null))
+                    );
+
+                
                 return p;
             }
             ///<summary>
@@ -104,7 +105,7 @@ namespace Community.CsharpSqlite.builder
                 {
                     return null;
                 }
-                Table p = TableBuilder.sqlite3FindTable(pParse.db, zName, zDbase);
+                Table p = pParse.db.sqlite3FindTable(zDbase, zName);
                 if (p == null)
                 {
                     string zMsg = isView != 0 ? "no such view" : "no such table";
@@ -243,7 +244,7 @@ goto begin_table_error;
                 {
                     goto begin_table_error;
                 }
-                pTable = TableBuilder.sqlite3FindTable(db, zName, zDb);
+                pTable = TableBuilder.sqlite3FindTable(db, zDb, zName);
                 if (pTable != null)
                 {
                     if (noErr == 0)
@@ -370,7 +371,7 @@ goto begin_table_error;
             ///If an error occurs, we jump here 
             ///</summary>
             begin_table_error:
-                db.sqlite3DbFree(ref zName);
+                db.DbFree(ref zName);
                 return;
             }
            
@@ -504,7 +505,7 @@ goto exit_drop_table;
                     ///database.
                     build.sqlite3NestedParse(pParse, "DELETE FROM %Q.%s WHERE tbl_name=%Q and type!='trigger'", pDb.Name, sqliteinth.SCHEMA_TABLE(iDb), pTab.zName);
                     ///Drop any statistics from the sqlite_stat1 table, if it exists 
-                    if (TableBuilder.sqlite3FindTable(db, "sqlite_stat1", db.Backends[iDb].Name) != null)
+                    if (TableBuilder.sqlite3FindTable(db, db.Backends[iDb].Name, "sqlite_stat1") != null)
                     {
                         build.sqlite3NestedParse(pParse, "DELETE FROM %Q.sqlite_stat1 WHERE tbl=%Q", pDb.Name, pTab.zName);
                     }
@@ -645,11 +646,11 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 fkeyc.sqlite3FkDelete(db, pTable);
                 ///Delete the Table structure itself.
                 build.sqliteDeleteColumnNames(db, pTable);
-                db.sqlite3DbFree(ref pTable.zName);
-                db.sqlite3DbFree(ref pTable.zColAff);
+                db.DbFree(ref pTable.zName);
+                db.DbFree(ref pTable.zColAff);
                 SelectMethods.SelectDestructor(db, ref pTable.pSelect);
 #if !SQLITE_OMIT_CHECK
-                exprc.sqlite3ExprDelete(db, ref pTable.pCheck);
+                exprc.Delete(db, ref pTable.pCheck);
 #endif
 #if !SQLITE_OMIT_VIRTUALTABLE
                 VTableMethodsExtensions.sqlite3VtabClear(db, pTable);
@@ -942,7 +943,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     ///SQLITE_MASTER table.  We just need to update that slot with all
                     ///the information we've collected.
                     build.sqlite3NestedParse(pParse, "UPDATE %Q.%s " + "SET type='%s', name=%Q, tbl_name=%Q, rootpage=#%d, sql=%Q " + "WHERE rowid=#%d", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), zType, pNewTable.zName, pNewTable.zName, pParse.regRoot, zStmt, pParse.regRowid);
-                    db.sqlite3DbFree(ref zStmt);
+                    db.DbFree(ref zStmt);
                     build.sqlite3ChangeCookie(pParse, iDb);
 #if !SQLITE_OMIT_AUTOINCREMENT
                     ///Check to see if we need to create an sqlite_sequence table for

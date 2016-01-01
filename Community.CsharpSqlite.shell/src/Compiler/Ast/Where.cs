@@ -140,7 +140,7 @@ namespace Community.CsharpSqlite.Ast {
 			///</summary>
 			///<param name="Index info for n">th source table </param>
 			public void disableTerm(WhereTerm pTerm) {
-				if(pTerm!=null&&(pTerm.wtFlags&WhereTermFlags.TERM_CODED)==0&&(this.iLeftJoin==0||pTerm.pExpr.ExprHasProperty(ExprFlags.EP_FromJoin))) {
+				if(pTerm!=null&&(pTerm.wtFlags&WhereTermFlags.TERM_CODED)==0&&(this.iLeftJoin==0||pTerm.pExpr.HasProperty(ExprFlags.EP_FromJoin))) {
 					pTerm.wtFlags|=WhereTermFlags.TERM_CODED;
 					if(pTerm.iParent>=0) {
 						WhereTerm pOther=pTerm.pWC.a[pTerm.iParent];
@@ -259,7 +259,7 @@ namespace Community.CsharpSqlite.Ast {
 							v.sqlite3VdbeAddOp2( OpCode.OP_Next,pIn.iCur,pIn.addrInTop);
 							v.sqlite3VdbeJumpHere(pIn.addrInTop-1);
 						}
-						db.sqlite3DbFree(ref pLevel.u._in.aInLoop);
+						db.DbFree(ref pLevel.u._in.aInLoop);
 					}
 					v.sqlite3VdbeResolveLabel(pLevel.addrBrk);
 					if(pLevel.iLeftJoin!=0) {
@@ -1015,8 +1015,8 @@ namespace Community.CsharpSqlite.Ast {
 									///</summary>
 									///<param name="EV: R">11662 </param>
 								}
-								pParse.db.sqlite3DbFree(ref zStartAff);
-								pParse.db.sqlite3DbFree(ref zEndAff);
+								pParse.db.DbFree(ref zStartAff);
+								pParse.db.DbFree(ref zEndAff);
 								///
 								///<summary>
 								///Top of the loop body 
@@ -1278,7 +1278,7 @@ namespace Community.CsharpSqlite.Ast {
 									v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,pLevel.addrBrk);
 									v.sqlite3VdbeResolveLabel(iLoopBody);
 									if(this.nLevel>1)
-										pParse.db.sqlite3DbFree(ref pOrTab);
+										pParse.db.DbFree(ref pOrTab);
 									//sqlite3DbFree(pParse.db, pOrTab)
 									if(0==untestedTerms)
 										pLevel.disableTerm(pTerm);

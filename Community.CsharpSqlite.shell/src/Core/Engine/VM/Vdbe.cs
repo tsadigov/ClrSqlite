@@ -72,7 +72,7 @@ namespace Community.CsharpSqlite
                           ///<param name="malloc failure when SQLite is invoked recursively by a virtual table">malloc failure when SQLite is invoked recursively by a virtual table</param>
                           ///<param name="method function.">method function.</param>
                           ///<param name=""></param>
-        public class Vdbe : CPU, ILinkedListNode<Vdbe>
+        public class Vdbe : CPU, ILinkedListNode<Vdbe>, IBackwardLinkedListNode<Vdbe>
         {
             public override void ShowDebugInfo()
             {
@@ -222,7 +222,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Error message written here 
             ///</summary>
-            public Vdbe pPrev;
+            public Vdbe pPrev { get; set; }
             ///
             ///<summary>
             ///Linked list of VDBEs with the same Vdbe.db 
@@ -301,7 +301,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///True if the VM needs to be recompiled 
             ///</summary>
-            public u8 runOnlyOnce;
+            public u8 runOnlyOnce { get; set; }
             ///
             ///<summary>
             ///Automatically expire on reset 
@@ -549,6 +549,14 @@ ct.pLruNext=pLruNext;
             }
             public void sqlite3VdbeLeave()
             {
+            }
+
+            public int sqlite3VdbeAddOp3(OpCode op, int p1, BTreeProp p2, int p3)
+            {
+                return sqlite3VdbeAddOp3(op, p1, (int)p2, p3);
+            }
+            public int sqlite3VdbeAddOp3(OpCode op, int p1, int p2, BTreeProp p3) {
+                return sqlite3VdbeAddOp3(op,p1,p2,(int)p3);
             }
             public int sqlite3VdbeAddOp3(TokenType op, int p1, int p2, int p3)
             {
@@ -854,7 +862,7 @@ pOp.cnt = 0;
                         pOp.p2 = aLabel[-1 - pOp.p2];
                     }
                 }
-                this.db.sqlite3DbFree(ref this.aLabel);
+                this.db.DbFree(ref this.aLabel);
                 pMaxFuncArgs = nMaxArgs;
             }
             public int sqlite3VdbeCurrentAddr()
@@ -1765,7 +1773,7 @@ pOp.cnt = 0;
                             if (this.rc == SqlResult.SQLITE_OK || this.rc == SqlResult.SQLITE_CONSTRAINT)
                             {
                                 this.rc = rc;
-                                db.sqlite3DbFree(ref this.zErrMsg);
+                                db.DbFree(ref this.zErrMsg);
                                 this.zErrMsg = null;
                             }
                             vdbeaux.invalidateCursorsOnModifiedBtrees(db);
@@ -1872,7 +1880,7 @@ pOp.cnt = 0;
                         vdbemem_cs.sqlite3ValueSetStr(db.pErr, -1, this.zErrMsg == null ? "" : this.zErrMsg, SqliteEncoding.UTF8, Sqlite3.SQLITE_TRANSIENT);
                         Sqlite3.sqlite3EndBenignMalloc();
                         db.errCode = this.rc;
-                        db.sqlite3DbFree(ref this.zErrMsg);
+                        db.DbFree(ref this.zErrMsg);
                         this.zErrMsg = "";
                         //else if ( p.rc != 0 )
                         //{
@@ -1898,7 +1906,7 @@ pOp.cnt = 0;
                     ///</summary>
                     utilc.sqlite3Error(db, this.rc, 0);
                     vdbemem_cs.sqlite3ValueSetStr(db.pErr, -1, this.zErrMsg, SqliteEncoding.UTF8, Sqlite3.SQLITE_TRANSIENT);
-                    db.sqlite3DbFree(ref this.zErrMsg);
+                    db.DbFree(ref this.zErrMsg);
                     this.zErrMsg = "";
                 }
                 ///
@@ -2838,7 +2846,7 @@ start = sqlite3Hwtime();
                                                 {
                                                     pTmp = db.pSavepoint;
                                                     db.pSavepoint = pTmp.pNext;
-                                                    db.sqlite3DbFree(ref pTmp);
+                                                    db.DbFree(ref pTmp);
                                                     db.nSavepoint--;
                                                 }
                                                 ///
@@ -2852,7 +2860,7 @@ start = sqlite3Hwtime();
                                                 {
                                                     Debug.Assert(pSavepoint == db.pSavepoint);
                                                     db.pSavepoint = pSavepoint.pNext;
-                                                    db.sqlite3DbFree(ref pSavepoint);
+                                                    db.DbFree(ref pSavepoint);
                                                     if (0 == isTransaction)
                                                     {
                                                         db.nSavepoint--;
@@ -5784,19 +5792,16 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
             public static Vdbe Create(Connection db)
             {
                 Vdbe p;
-                p = new Vdbe();
-                // sqlite3DbMallocZero(db, Vdbe).Length;
-                if (p == null)
-                    return null;
-                p.db = db;
-                if (db.pVdbe != null)
+                p = new Vdbe()
                 {
-                    db.pVdbe.pPrev = p;
-                }
-                p.pNext = db.pVdbe;
-                p.pPrev = null;
-                db.pVdbe = p;
-                p.magic = VdbeMagic.VDBE_MAGIC_INIT;
+                    db=db,
+                    pNext = db.pVdbe,
+                    pPrev = null,
+                    magic = VdbeMagic.VDBE_MAGIC_INIT
+                };
+                
+                MyLinqExtensions.push(ref db.pVdbe,p);
+                                
                 return p;
             }
 #if !NDEBUG

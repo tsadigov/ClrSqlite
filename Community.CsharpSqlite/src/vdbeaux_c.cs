@@ -442,7 +442,7 @@ namespace Community.CsharpSqlite.Engine
                 if (Sqlite3.ALWAYS(pDef) && (pDef.flags & FuncFlags.SQLITE_FUNC_EPHEM) != 0)
                 {
                     pDef = null;
-                    db.sqlite3DbFree(ref pDef);
+                    db.DbFree(ref pDef);
                 }
             }
             //static void vdbeFreeOpArray(sqlite3 *, Operation *, int);
@@ -463,7 +463,7 @@ namespace Community.CsharpSqlite.Engine
                         case P4Usage.P4_INTARRAY:
                         case P4Usage.P4_KEYINFO_HANDOFF:
                             {
-                                db.sqlite3DbFree(ref p4);
+                                db.DbFree(ref p4);
                                 break;
                             }
                         case P4Usage.P4_MPRINTF:
@@ -479,7 +479,7 @@ namespace Community.CsharpSqlite.Engine
                                 freeEphemeralFunction(db, pVdbeFunc.pFunc);
                                 if (db.pnBytesFreed == 0)
                                     sqlite3VdbeDeleteAuxData(pVdbeFunc, 0);
-                                db.sqlite3DbFree(ref pVdbeFunc);
+                                db.DbFree(ref pVdbeFunc);
                                 break;
                             }
                         case P4Usage.P4_FUNCDEF:
@@ -1759,7 +1759,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
       for ( i = 1; i <= p.nMem; i++ )
         Debug.Assert( p.aMem != null || p.aMem[i].flags == MEM.MEM_Null );
 #endif
-                db.sqlite3DbFree(ref p.zErrMsg);
+                db.DbFree(ref p.zErrMsg);
                 p.pResultSet = null;
             }
             ///<summary>
@@ -1920,7 +1920,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     do
                     {
                         i64 iRandom = 0;
-                        db.sqlite3DbFree(ref zMaster);
+                        db.DbFree(ref zMaster);
                         Sqlite3.sqlite3_randomness(sizeof(u32), ref iRandom);
                         //random.Length
                         zMaster = io.sqlite3MPrintf(db, "%s-mj%08X", zMainFile, iRandom & 0x7fffffff);
@@ -1943,7 +1943,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     }
                     if (rc != SqlResult.SQLITE_OK)
                     {
-                        db.sqlite3DbFree(ref zMaster);
+                        db.DbFree(ref zMaster);
                         return rc;
                     }
                     ///
@@ -1980,7 +1980,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                             {
                                 os.sqlite3OsCloseFree(pMaster);
                                 os.sqlite3OsDelete(pVfs, zMaster, 0);
-                                db.sqlite3DbFree(ref zMaster);
+                                db.DbFree(ref zMaster);
                                 return rc;
                             }
                         }
@@ -1995,7 +1995,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     {
                         os.sqlite3OsCloseFree(pMaster);
                         os.sqlite3OsDelete(pVfs, zMaster, 0);
-                        db.sqlite3DbFree(ref zMaster);
+                        db.DbFree(ref zMaster);
                         return rc;
                     }
                     ///
@@ -2023,7 +2023,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     Debug.Assert(rc != SqlResult.SQLITE_BUSY);
                     if (rc != SqlResult.SQLITE_OK)
                     {
-                        db.sqlite3DbFree(ref zMaster);
+                        db.DbFree(ref zMaster);
                         return rc;
                     }
                     ///
@@ -2034,7 +2034,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     ///
                     ///</summary>
                     rc = os.sqlite3OsDelete(pVfs, zMaster, 1);
-                    db.sqlite3DbFree(ref zMaster);
+                    db.DbFree(ref zMaster);
                     if (rc != 0)
                     {
                         return rc;
@@ -2246,15 +2246,15 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 {
                     pNext = pSub.pNext;
                     vdbeFreeOpArray(db, ref pSub.aOp, pSub.nOp);
-                    db.sqlite3DbFree(ref pSub);
+                    db.DbFree(ref pSub);
                 }
                 //for ( i = p->nzVar - 1; i >= 0; i-- )
                 //  sqlite3DbFree( db, p.azVar[i] );
                 //vdbeFreeOpArray(db, ref p.aOp, p.aOp.Count());
-                db.sqlite3DbFree(ref p.aLabel);
+                db.DbFree(ref p.aLabel);
                 db.sqlite3DbFree(ref p.aColName);
-                db.sqlite3DbFree(ref p.zSql);
-                db.sqlite3DbFree(ref p.pFree);
+                db.DbFree(ref p.zSql);
+                db.DbFree(ref p.pFree);
                 // Free memory allocated from db within p
                 //sqlite3DbFree( db, p );
             }

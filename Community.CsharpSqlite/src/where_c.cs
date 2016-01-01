@@ -342,7 +342,7 @@ namespace Community.CsharpSqlite
                     a = this.a[i];
                     if ((a.wtFlags & WhereTermFlags.TERM_DYNAMIC) != 0)
                     {
-                        exprc.sqlite3ExprDelete(db, ref a.pExpr);
+                        exprc.Delete(db, ref a.pExpr);
                     }
                     if ((a.wtFlags & WhereTermFlags.TERM_ORINFO) != 0)
                     {
@@ -356,7 +356,7 @@ namespace Community.CsharpSqlite
                 }
                 if (this.a != this.aStatic)
                 {
-                    db.sqlite3DbFree(ref this.a);
+                    db.DbFree(ref this.a);
                 }
             }
             public void whereClauseInit(///
@@ -638,7 +638,7 @@ namespace Community.CsharpSqlite
                 }
                 mask = this.exprTableUsage(p.pRight);
                 mask |= this.exprTableUsage(p.pLeft);
-                if (p.ExprHasProperty(ExprFlags.EP_xIsSelect))
+                if (p.HasProperty(ExprFlags.EP_xIsSelect))
                 {
                     mask |= this.exprSelectTableUsage(p.x.pSelect);
                 }

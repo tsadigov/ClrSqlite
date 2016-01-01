@@ -14,6 +14,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Paging;
     using Cache;
+    using Utils;
     public class crypto
         {
             ///

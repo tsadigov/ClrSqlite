@@ -329,13 +329,13 @@ namespace Community.CsharpSqlite
                         break;
                     }
                 }
-                db.sqlite3DbFree(ref azCols);
+                db.DbFree(ref azCols);
                 azCols = null;
             }
         exec_out:
             if (pStmt != null)
                 vdbeaux.sqlite3VdbeFinalize(ref pStmt);
-            db.sqlite3DbFree(ref azCols);
+            db.DbFree(ref azCols);
             result = (SqlResult)malloc_cs.sqlite3ApiExit(db, result);
             if (result != SqlResult.SQLITE_OK && Sqlite3.ALWAYS(result == (SqlResult)Sqlite3.sqlite3_errcode(db)) && pzErrMsg != null)
             {

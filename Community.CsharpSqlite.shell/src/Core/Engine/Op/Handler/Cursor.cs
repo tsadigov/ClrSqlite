@@ -4,11 +4,17 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using i64 = System.Int64;
+using u8 = System.Byte;
+using u32 = System.UInt32;
+using yDbMask = System.Int32;
+
 namespace Community.CsharpSqlite.Engine.Op
 {
 
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.tree;
+    using CsharpSqlite.Metadata;
     using Metadata;
     public static class Cursor
     {
@@ -20,6 +26,140 @@ namespace Community.CsharpSqlite.Engine.Op
             var vdbe = cpu.vdbe;
             switch (opcode)
             {
+
+
+                ///
+                ///<summary>
+                ///Opcode: Count P1 P2 * * *
+                ///
+                ///Store the number of entries (an integer value) in the table or index
+                ///opened by cursor P1 in register P2
+                ///
+                ///</summary>
+#if !SQLITE_OMIT_BTREECOUNT
+                case OpCode.OP_Count:
+                    {
+                        ///
+                        ///<summary>
+                        ///</summary>
+                        ///<param name="out2">prerelease </param>
+                        i64 nEntry = 0;
+                        BtCursor pCrsr;
+                        pCrsr = vdbe.OpenCursors[pOp.p1].pCursor;
+                        if (pCrsr != null)
+                        {
+                            cpu.rc = pCrsr.sqlite3BtreeCount(ref nEntry);
+                        }
+                        else
+                        {
+                            nEntry = 0;
+                        }
+                        cpu.pOut.u.AsInteger = nEntry;
+                        break;
+                    }
+#endif
+
+
+
+                ///
+                ///<summary>
+                ///Opcode: Sequence P1 P2 * * *
+                ///
+                ///Find the next available sequence number for cursor P1.
+                ///Write the sequence number into register P2.
+                ///The sequence number on the cursor is incremented after this
+                ///instruction.
+                ///
+                ///</summary>
+                case OpCode.OP_Sequence:
+                    {
+                        ///
+                        ///<summary>
+                        ///</summary>
+                        ///<param name="out2">prerelease </param>
+                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
+                        Debug.Assert(vdbe.OpenCursors[pOp.p1] != null);
+                        cpu.pOut.u.AsInteger = (long)vdbe.OpenCursors[pOp.p1].seqCount++;
+                        break;
+                    }
+
+
+
+                ///
+                ///<summary>
+                ///Opcode: NullRow P1 * * * *
+                ///
+                ///Move the cursor P1 to a null row.  Any  OpCode.OP_Column operations
+                ///that occur while the cursor is on the null row will always
+                ///write a NULL.
+                ///
+                ///</summary>
+                case OpCode.OP_NullRow:
+                    {
+                        VdbeCursor pC;
+                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
+                        pC = vdbe.OpenCursors[pOp.p1];
+                        Debug.Assert(pC != null);
+                        pC.nullRow = true;
+                        pC.rowidIsValid = false;
+                        if (pC.pCursor != null)
+                        {
+                            pC.pCursor.sqlite3BtreeClearCursor();
+                        }
+                        break;
+                    }
+
+
+
+
+                ///
+                ///<summary>
+                ///Opcode: Last P1 P2 * * *
+                ///
+                ///The next use of the Rowid or Column or Next instruction for P1
+                ///will refer to the last entry in the database table or index.
+                ///If the table or index is empty and P2>0, then jump immediately to P2.
+                ///If P2 is 0 or if the table or index is not empty, fall through
+                ///to the following instruction.
+                ///
+                ///</summary>
+                case OpCode.OP_Last:
+                    {
+                        ///
+                        ///<summary>
+                        ///jump 
+                        ///</summary>
+                        VdbeCursor pC;
+                        BtCursor pCrsr;
+                        int res = 0;
+                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
+                        pC = vdbe.OpenCursors[pOp.p1];
+                        Debug.Assert(pC != null);
+                        pCrsr = pC.pCursor;
+                        if (pCrsr == null)
+                        {
+                            res = 1;
+                        }
+                        else
+                        {
+                            cpu.rc = pCrsr.sqlite3BtreeLast(ref res);
+                        }
+                        pC.nullRow = res == 1 ? true : false;
+                        pC.deferredMoveto = false;
+                        pC.rowidIsValid = false;
+                        pC.cacheStatus = Sqlite3.CACHE_STALE;
+                        if (pOp.p2 > 0 && res != 0)
+                        {
+                            cpu.opcodeIndex = pOp.p2 - 1;
+                        }
+                        break;
+                    }
+
+
+
+
+
+
                 ///Opcode: OpenRead P1 P2 P3 P4 P5
                 ///
                 ///Open a read-only cursor for the database table whose root page is</param>
@@ -74,15 +214,14 @@ namespace Community.CsharpSqlite.Engine.Op
                 case OpCode.OP_OpenRead:
                 case OpCode.OP_OpenWrite:
                     {
-                        int nField;
-                        Community.CsharpSqlite.Metadata.KeyInfo pKeyInfo=null;
-                        int wrFlag;
+                        KeyInfo pKeyInfo=null;
+                        CursorMode wrFlag;
                         if (cpu.vdbe.expired)
                         {
                             cpu.rc = SqlResult.SQLITE_ABORT;
                             break;
                         }
-                        nField = 0;
+                        var nField = 0;
                         var p2 = pOp.p2;
                         var iDb = pOp.p3;
                         Debug.Assert(iDb >= 0 && iDb < cpu.db.BackendCount);
@@ -92,7 +231,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         Debug.Assert(pX != null);
                         if (pOp.OpCode == OpCode.OP_OpenWrite)
                         {
-                            wrFlag = 1;
+                            wrFlag = CursorMode.ReadWrite;
                             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(cpu.db, iDb, null));
                             if (pDb.pSchema.file_format < cpu.vdbe.minWriteFileFormat)
                             {
@@ -101,7 +240,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         }
                         else
                         {
-                            wrFlag = 0;
+                            wrFlag = CursorMode.ReadOnly;
                         }
                         if (pOp.p5 != 0)
                         {
@@ -152,10 +291,9 @@ namespace Community.CsharpSqlite.Engine.Op
                             cpu.rc = SqlResult.SQLITE_OK;
                         }
                         ///Set the VdbeCursor.isTable and isIndex variables. Previous versions of
-                        ///</summary>
-                        ///<param name="SQLite used to check if the root">page flags were sane at vdbe point</param>
-                        ///<param name="and report database corruption if they were not, but vdbe check has">and report database corruption if they were not, but vdbe check has</param>
-                        ///<param name="since moved into the btree layer.  ">since moved into the btree layer.  </param>
+                        ///SQLite used to check if the root">page flags were sane at vdbe point</param>
+                        ///and report database corruption if they were not, but vdbe check has">and report database corruption if they were not, but vdbe check has</param>
+                        ///since moved into the btree layer.  ">since moved into the btree layer.  </param>
                         pCur.isTable = pOp.p4type != P4Usage.P4_KEYINFO;
                         pCur.isIndex = !pCur.isTable;
                         break;
@@ -222,7 +360,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 if (cpu.rc == SqlResult.SQLITE_OK)
                                 {
                                     Debug.Assert(pgno == sqliteinth.MASTER_ROOT + 1);
-                                   cpu.rc = pCx.pBt.sqlite3BtreeCursor(pgno, 1, pOp.p4.pKeyInfo, pCx.pCursor);
+                                   cpu.rc = pCx.pBt.sqlite3BtreeCursor(pgno, CursorMode.ReadWrite, pOp.p4.pKeyInfo, pCx.pCursor);
                                     pCx.pKeyInfo = pOp.p4.pKeyInfo;
                                     pCx.pKeyInfo.enc = sqliteinth.ENC(cpu.vdbe.db);
                                 }
@@ -230,7 +368,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             }
                             else
                             {
-                                cpu.rc = pCx.pBt.sqlite3BtreeCursor(sqliteinth.MASTER_ROOT, 1, null, pCx.pCursor);
+                                cpu.rc = pCx.pBt.sqlite3BtreeCursor(sqliteinth.MASTER_ROOT, CursorMode.ReadWrite, null, pCx.pCursor);
                                 pCx.isTable = true;
                             }
                         }

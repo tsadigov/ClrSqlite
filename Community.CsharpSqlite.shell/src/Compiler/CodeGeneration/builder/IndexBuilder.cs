@@ -68,8 +68,8 @@ namespace Community.CsharpSqlite.builder
 #if !SQLITE_OMIT_ANALYZE
             Sqlite3.sqlite3DeleteIndexSamples(db, p);
 #endif
-            db.sqlite3DbFree(ref p.zColAff);
-            db.sqlite3DbFree(ref p);
+            db.DbFree(ref p.zColAff);
+            db.DbFree(ref p);
         }
         ///<summary>
         /// For the index called zIdxName which is found in the database iDb,
@@ -138,7 +138,7 @@ namespace Community.CsharpSqlite.builder
             if (pParse.nErr != 0)
             {
                 pKey = null;
-                db.sqlite3DbFree(ref pKey);
+                db.DbFree(ref pKey);
             }
             return pKey;
         }
@@ -229,10 +229,10 @@ namespace Community.CsharpSqlite.builder
                     if (pColl != null)
                     {
                         reindexDatabases(pParse, zColl);
-                        db.sqlite3DbFree(ref zColl);
+                        db.DbFree(ref zColl);
                         return;
                     }
-                    db.sqlite3DbFree(ref zColl);
+                    db.DbFree(ref zColl);
                 }
             iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pObjName);
             if (iDb < 0)
@@ -241,15 +241,15 @@ namespace Community.CsharpSqlite.builder
             if (z == null)
                 return;
             zDb = db.Backends[iDb].Name;
-            pTab = TableBuilder.sqlite3FindTable(db, z, zDb);
+            pTab = TableBuilder.sqlite3FindTable(db, zDb, z);
             if (pTab != null)
             {
                 reindexTable(pParse, pTab, null);
-                db.sqlite3DbFree(ref z);
+                db.DbFree(ref z);
                 return;
             }
             pIndex = IndexBuilder.sqlite3FindIndex(db, z, zDb);
-            db.sqlite3DbFree(ref z);
+            db.DbFree(ref z);
             if (pIndex != null)
             {
                 Community.CsharpSqlite.build.sqlite3BeginWriteOperation(pParse, 0, iDb);
@@ -583,7 +583,7 @@ return;
                 }
                 if (0 == db.init.busy)
                 {
-                    if (TableBuilder.sqlite3FindTable(db, zName, null) != null)
+                    if (TableBuilder.sqlite3FindTable(db, null, zName) != null)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "there is already a table named %s", zName);
                         goto exit_create_index;
@@ -908,7 +908,7 @@ goto exit_create_index;
                 }
                 ///Add an entry in sqlite_master for this index
                 build.sqlite3NestedParse(pParse, "INSERT INTO %Q.%s VALUES('index',%Q,%Q,#%d,%Q);", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), pIndex.zName, pTab.zName, iMem, zStmt);
-                db.sqlite3DbFree(ref zStmt);
+                db.DbFree(ref zStmt);
                 ///Fill the index with data and reparse the schema. Code an  OpCode.OP_Expire
                 ///<param name="to invalidate all pre">compiled statements.</param>
                 ///<param name=""></param>
@@ -950,11 +950,11 @@ goto exit_create_index;
             if (pIndex != null)
             {
                 //sqlite3DbFree(db, ref pIndex.zColAff );
-                db.sqlite3DbFree(ref pIndex);
+                db.DbFree(ref pIndex);
             }
-            exprc.sqlite3ExprListDelete(db, ref pList);
+            exprc.Delete(db, ref pList);
             build.sqlite3SrcListDelete(db, ref pTblName);
-            db.sqlite3DbFree(ref zName);
+            db.DbFree(ref zName);
             return pRet;
         }
 

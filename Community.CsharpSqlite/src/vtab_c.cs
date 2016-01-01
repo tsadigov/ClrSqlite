@@ -90,7 +90,7 @@ namespace Community.CsharpSqlite
                         build.sqlite3ResetInternalSchema(db, -1);
                         pDel.xDestroy(ref pDel.pAux);
                     }
-                    db.sqlite3DbFree(ref pDel);
+                    db.DbFree(ref pDel);
                     //if( pDel==pMod ){
                     //  db.mallocFailed = 1;
                     //}
@@ -175,7 +175,7 @@ namespace Community.CsharpSqlite
                     {
                         ((sqlite3_vtab)p).pModule.xDisconnect(ref p);
                     }
-                    db.sqlite3DbFree(ref pVTab);
+                    db.DbFree(ref pVTab);
                 }
             }
             ///<summary>
@@ -281,9 +281,9 @@ namespace Community.CsharpSqlite
                     int i;
                     for (i = 0; i < p.nModuleArg; i++)
                     {
-                        db.sqlite3DbFree(ref p.azModuleArg[i]);
+                        db.DbFree(ref p.azModuleArg[i]);
                     }
-                    db.sqlite3DbFree(ref p.azModuleArg);
+                    db.DbFree(ref p.azModuleArg);
                 }
             }
             ///<summary>
@@ -397,7 +397,7 @@ namespace Community.CsharpSqlite
                         zErr = null;
                         //malloc_cs.sqlite3_free( zErr );
                     }
-                    db.sqlite3DbFree(ref pVTable);
+                    db.DbFree(ref pVTable);
                 }
                 else
                     if (Sqlite3.ALWAYS(pVTable.pVtab))
@@ -467,7 +467,7 @@ namespace Community.CsharpSqlite
                             }
                         }
                     }
-                db.sqlite3DbFree(ref zModuleName);
+                db.DbFree(ref zModuleName);
                 return rc;
             }
             ///<summary>
@@ -533,7 +533,7 @@ namespace Community.CsharpSqlite
                 Table pTab;
                 Module pMod;
                 string zMod;
-                pTab = TableBuilder.sqlite3FindTable(db, zTab, db.Backends[iDb].Name);
+                pTab = TableBuilder.sqlite3FindTable(db, db.Backends[iDb].Name, zTab);
                 Debug.Assert(pTab != null && (pTab.tabFlags & TableFlags.TF_Virtual) != 0 && null == pTab.pVTable);
                 ///
                 ///<summary>
@@ -647,7 +647,7 @@ namespace Community.CsharpSqlite
             {
                 var rc = SqlResult.SQLITE_OK;
                 Table pTab;
-                pTab = TableBuilder.sqlite3FindTable(db, zTab, db.Backends[iDb].Name);
+                pTab = TableBuilder.sqlite3FindTable(db, db.Backends[iDb].Name, zTab);
                 if (Sqlite3.ALWAYS(pTab != null && pTab.pVTable != null))
                 {
                     VTable p = vtabDisconnectAll(db, pTab);
@@ -706,7 +706,7 @@ namespace Community.CsharpSqlite
                         pVTab.iSavepoint = 0;
                         sqlite3VtabUnlock(pVTab);
                     }
-                    db.sqlite3DbFree(ref db.aVTrans);
+                    db.DbFree(ref db.aVTrans);
                     db.nVTrans = 0;
                     db.aVTrans = null;
                 }
@@ -956,7 +956,7 @@ namespace Community.CsharpSqlite
                     //  *z = _Custom.sqlite3UpperToLower[*z];
                     //}
                     rc = pMod.xFindFunction(pVtab, nArg, zLowerName.ToLowerInvariant(), ref xFunc, ref pArg);
-                    db.sqlite3DbFree(ref zLowerName);
+                    db.DbFree(ref zLowerName);
                 }
                 if (rc == 0)
                 {

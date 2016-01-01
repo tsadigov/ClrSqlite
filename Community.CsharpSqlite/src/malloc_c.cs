@@ -1180,7 +1180,7 @@ sqlite3DbFree(db, ref p);
                     _Custom.va_start(ap, zFormat);
                     z = io.sqlite3VMPrintf(db, zFormat, ap);
                     _Custom.va_end(ref ap);
-                    db.sqlite3DbFree(ref pz);
+                    db.DbFree(ref pz);
                     pz = z;
                 }
             }

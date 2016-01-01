@@ -299,7 +299,11 @@ int sqlite3SchemaMutexHeld(sqlite3*,int,Schema);
 		{
 			return true;
 		}
-	#endif
-	//#endif // * _BTREE_H_ */
-	}
+        public static bool sqlite3SchemaMutexHeld(Connection X, DbBackend y, Schema z)
+        {
+            return true;
+        }
+#endif
+        //#endif // * _BTREE_H_ */
+    }
 }

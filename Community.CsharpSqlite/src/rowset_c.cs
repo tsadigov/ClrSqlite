@@ -223,7 +223,7 @@ namespace Community.CsharpSqlite
             for (pChunk = p.pChunk; pChunk != null; pChunk = pNextChunk)
             {
                 pNextChunk = pChunk.pNextChunk;
-                p.db.sqlite3DbFree(ref pChunk);
+                p.db.DbFree(ref pChunk);
             }
             p.pChunk = null;
             p.nFresh = 0;

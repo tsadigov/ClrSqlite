@@ -71,67 +71,31 @@ namespace Community.CsharpSqlite.Ast
             )
             {
                 Parse pParse = pWC.pParse;
-                ///
-                ///<summary>
                 ///Parser context 
-                ///</summary>
                 Connection db = pParse.db;
-                ///
-                ///<summary>
                 ///Data_base connection 
-                ///</summary>
                 WhereTerm pTerm = pWC.a[idxTerm];
-                ///
-                ///<summary>
                 ///The term to be analyzed 
-                ///</summary>
                 Expr pExpr = pTerm.pExpr;
-                ///
-                ///<summary>
                 ///The expression of the term 
-                ///</summary>
                 WhereMaskSet pMaskSet = pWC.pMaskSet;
-                ///
-                ///<summary>
                 ///Table use masks 
-                ///</summary>
                 int i;
-                ///
-                ///<summary>
                 ///Loop counters 
-                ///</summary>
                 WhereClause pOrWc;
-                ///
-                ///<summary>
                 ///Breakup of pTerm into subterms 
-                ///</summary>
                 WhereTerm pOrTerm;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="A Sub">term within the pOrWc </param>
                 WhereOrInfo pOrInfo;
-                ///
-                ///<summary>
                 ///Additional information Debug.Associated with pTerm 
-                ///</summary>
                 Bitmask chngToIN;
-                ///
-                ///<summary>
                 ///Tables that might satisfy case 1 
-                ///</summary>
                 Bitmask indexable;
-                ///
-                ///<summary>
                 ///Tables that are indexable, satisfying case 2 
-                ///</summary>
                 ///
-                ///<summary>
                 ///Break the OR clause into its separate subterms.  The subterms are
                 ///stored in a WhereClause structure containing within the WhereOrInfo
                 ///object that is attached to the original OR clause term.
-                ///
-                ///</summary>
                 Debug.Assert((pTerm.wtFlags & (WhereTermFlags.TERM_DYNAMIC | WhereTermFlags.TERM_ORINFO | WhereTermFlags.TERM_ANDINFO)) == 0);
                 Debug.Assert(pExpr.Operator == TokenType.TK_OR);
                 pTerm.u.pOrInfo = pOrInfo = new WhereOrInfo();
@@ -145,11 +109,7 @@ namespace Community.CsharpSqlite.Ast
                 this.exprAnalyzeAll(pOrWc);
                 //      if ( db.mallocFailed != 0 ) return;
                 Debug.Assert(pOrWc.nTerm >= 2);
-                ///
-                ///<summary>
                 ///Compute the set of tables that might satisfy cases 1 or 2.
-                ///
-                ///</summary>
                 indexable = ~(Bitmask)0;
                 chngToIN = ~(pWC.vmask);
                 for (i = pOrWc.nTerm - 1; i >= 0 && indexable != 0; i--)//, pOrTerm++ )
@@ -195,11 +155,8 @@ namespace Community.CsharpSqlite.Ast
                     else
                         if ((pOrTerm.wtFlags & WhereTermFlags.TERM_COPIED) != 0)
                         {
-                            ///
-                            ///<summary>
                             ///Skip this term for now.  We revisit it when we process the
                             ///corresponding WhereTermFlags.TERM_VIRTUAL term 
-                            ///</summary>
                         }
                         else
                         {
@@ -221,21 +178,13 @@ namespace Community.CsharpSqlite.Ast
                             }
                         }
                 }
-                ///
-                ///<summary>
                 ///Record the set of tables that satisfy case 2.  The set might be
                 ///empty.
-                ///
-                ///</summary>
                 pOrInfo.indexable = indexable;
                 pTerm.eOperator = (u16)(indexable == 0 ? 0 : wherec.WO_OR);
-                ///
-                ///<summary>
                 ///chngToIN holds a set of tables that *might* satisfy case 1.  But
                 ///we have to do some additional checking to see if case 1 really
                 ///is satisfied.
-                ///
-                ///</summary>
                 ///<param name="chngToIN will hold either 0, 1, or 2 bits.  The 0">bit case means</param>
                 ///<param name="that there is no possibility of transforming the OR clause into an">that there is no possibility of transforming the OR clause into an</param>
                 ///<param name="IN operator because one or more terms in the OR clause contain">IN operator because one or more terms in the OR clause contain</param>
@@ -251,38 +200,22 @@ namespace Community.CsharpSqlite.Ast
                 ///<param name=""></param>
                 ///<param name="Note that terms of the form "table.column1=table.column2" (the">Note that terms of the form "table.column1=table.column2" (the</param>
                 ///<param name="same table on both sizes of the ==) cannot be optimized.">same table on both sizes of the ==) cannot be optimized.</param>
-                ///<param name=""></param>
                 if (chngToIN != 0)
                 {
                     int okToChngToIN = 0;
-                    ///
-                    ///<summary>
                     ///True if the conversion to IN is valid 
-                    ///</summary>
                     int iColumn = -1;
-                    ///
-                    ///<summary>
                     ///Column index on lhs of IN operator 
-                    ///</summary>
                     int iCursor = -1;
-                    ///
-                    ///<summary>
                     ///Table cursor common to all terms 
-                    ///</summary>
                     int j = 0;
-                    ///
-                    ///<summary>
                     ///Loop counter 
-                    ///</summary>
                     ///
-                    ///<summary>
                     ///Search for a table and column that appears on one side or the
                     ///other of the == operator in every subterm.  That table and column
                     ///will be recorded in iCursor and iColumn.  There might not be any
                     ///such table and column.  Set okToChngToIN if an appropriate table
                     ///and column is found but leave okToChngToIN false if not found.
-                    ///
-                    ///</summary>
                     for (j = 0; j < 2 && 0 == okToChngToIN; j++)
                     {
                         //pOrTerm = pOrWc.a;
@@ -293,9 +226,6 @@ namespace Community.CsharpSqlite.Ast
                             pOrTerm.wtFlags = (pOrTerm.wtFlags & ~WhereTermFlags.TERM_OR_OK);
                             if (pOrTerm.leftCursor == iCursor)
                             {
-                                ///
-                                ///<summary>
-                                ///</summary>
                                 ///<param name="This is the 2">bit case and we are on the second iteration and</param>
                                 ///<param name="current term is from the first iteration.  So skip this term. ">current term is from the first iteration.  So skip this term. </param>
                                 Debug.Assert(j == 1);
@@ -303,13 +233,10 @@ namespace Community.CsharpSqlite.Ast
                             }
                             if ((chngToIN & pMaskSet.getMask(pOrTerm.leftCursor)) == 0)
                             {
-                                ///
-                                ///<summary>
                                 ///This term must be of the form t1.a==t2.b where t2 is in the
                                 ///chngToIN set but t1 is not.  This term will be either preceeded
                                 ///or follwed by an inverted copy (t2.b==t1.a).  Skip this term
                                 ///and use its inversion. 
-                                ///</summary>
                                 sqliteinth.testcase(pOrTerm.wtFlags & WhereTermFlags.TERM_COPIED);
                                 sqliteinth.testcase(pOrTerm.wtFlags & WhereTermFlags.TERM_VIRTUAL);
                                 Debug.Assert((pOrTerm.wtFlags & (WhereTermFlags.TERM_COPIED | WhereTermFlags.TERM_VIRTUAL)) != 0);
@@ -321,22 +248,16 @@ namespace Community.CsharpSqlite.Ast
                         }
                         if (i < 0)
                         {
-                            ///
-                            ///<summary>
                             ///No candidate table+column was found.  This can only occur
                             ///on the second iteration 
-                            ///</summary>
                             Debug.Assert(j == 1);
                             Debug.Assert((chngToIN & (chngToIN - 1)) == 0);
                             Debug.Assert(chngToIN == pMaskSet.getMask(iCursor));
                             break;
                         }
                         sqliteinth.testcase(j == 1);
-                        ///
-                        ///<summary>
                         ///We have found a candidate table and column.  Check to see if that
                         ///table and column is common to every term in the OR clause 
-                        ///</summary>
                         okToChngToIN = 1;
                         for (; i >= 0 && okToChngToIN != 0; i--)//, pOrTerm++)
                         {
@@ -354,13 +275,9 @@ namespace Community.CsharpSqlite.Ast
                                 else
                                 {
                                     int affLeft, affRight;
-                                    ///
-                                    ///<summary>
-                                    ///</summary>
                                     ///<param name="If the right">hand side is also a column, then the affinities</param>
                                     ///<param name="of both right and left sides must be such that no type">of both right and left sides must be such that no type</param>
                                     ///<param name="conversions are required on the right.  (Ticket #2249)">conversions are required on the right.  (Ticket #2249)</param>
-                                    ///<param name=""></param>
                                     affRight = pOrTerm.pExpr.pRight.sqlite3ExprAffinity();
                                     affLeft = pOrTerm.pExpr.pLeft.sqlite3ExprAffinity();
                                     if (affRight != 0 && affRight != affLeft)
@@ -374,37 +291,21 @@ namespace Community.CsharpSqlite.Ast
                                 }
                         }
                     }
-                    ///
-                    ///<summary>
                     ///At this point, okToChngToIN is true if original pTerm satisfies
                     ///case 1.  In that case, construct a new virtual term that is
                     ///pTerm converted into an IN operator.
-                    ///
-                    ///</summary>
                     ///<param name="EV: R">15100</param>
                     ///<param name=""></param>
                     if (okToChngToIN != 0)
                     {
                         Expr pDup;
-                        ///
-                        ///<summary>
                         ///A transient duplicate expression 
-                        ///</summary>
                         ExprList pList = null;
-                        ///
-                        ///<summary>
                         ///The RHS of the IN operator 
-                        ///</summary>
                         Expr pLeft = null;
-                        ///
-                        ///<summary>
                         ///The LHS of the IN operator 
-                        ///</summary>
                         Expr pNew;
-                        ///
-                        ///<summary>
                         ///The complete IN operator 
-                        ///</summary>
                         for (i = pOrWc.nTerm - 1; i >= 0; i--)//, pOrTerm++)
                         {
                             pOrTerm = pOrWc.a[pOrWc.nTerm - 1 - i];
@@ -424,7 +325,7 @@ namespace Community.CsharpSqlite.Ast
                         {
                             int idxNew;
                             pNew.transferJoinMarkings(pExpr);
-                            Debug.Assert(!pNew.ExprHasProperty(ExprFlags.EP_xIsSelect));
+                            Debug.Assert(!pNew.HasProperty(ExprFlags.EP_xIsSelect));
                             pNew.x.pList = pList;
                             idxNew = pWC.whereClauseInsert(pNew, WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC);
                             sqliteinth.testcase(idxNew == 0);
@@ -435,17 +336,14 @@ namespace Community.CsharpSqlite.Ast
                         }
                         else
                         {
-                            exprc.sqlite3ExprListDelete(db, ref pList);
+                            exprc.Delete(db, ref pList);
                         }
                         pTerm.eOperator = wherec.WO_NOOP;
-                        ///
-                        ///<summary>
                         ///case 1 trumps case 2 
-                        ///</summary>
                     }
                 }
             }
-            public void exprAnalyze(///
+            public void exprAnalyze(
                 ///<summary>
                 ///the FROM clause 
                 ///</summary>
@@ -460,61 +358,28 @@ namespace Community.CsharpSqlite.Ast
             )
             {
                 WhereTerm pTerm;
-                ///
-                ///<summary>
                 ///The term to be analyzed 
-                ///</summary>
                 WhereMaskSet pMaskSet;
-                ///
-                ///<summary>
                 ///Set of table index masks 
-                ///</summary>
                 Expr pExpr;
-                ///
-                ///<summary>
                 ///The expression to be analyzed 
-                ///</summary>
                 Bitmask prereqLeft;
-                ///
-                ///<summary>
                 ///Prerequesites of the pExpr.pLeft 
-                ///</summary>
                 Bitmask prereqAll;
-                ///
-                ///<summary>
                 ///Prerequesites of pExpr 
-                ///</summary>
                 Bitmask extraRight = 0;
-                ///
-                ///<summary>
                 ///Extra dependencies on LEFT JOIN 
-                ///</summary>
                 Expr pStr1 = null;
-                ///
-                ///<summary>
                 ///RHS of LIKE/GLOB operator 
-                ///</summary>
                 bool isComplete = false;
-                ///
-                ///<summary>
                 ///RHS of LIKE/GLOB ends with wildcard 
-                ///</summary>
                 bool noCase = false;
                 
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Top">level operator.  pExpr.op </param>
                 Parse pParse = pWC.pParse;
-                ///
-                ///<summary>
                 ///Parsing context 
-                ///</summary>
                 Connection db = pParse.db;
-                ///
-                ///<summary>
                 ///Data_base connection 
-                ///</summary>
                 //if ( db.mallocFailed != 0 )
                 //{
                 //  return;
@@ -524,16 +389,13 @@ namespace Community.CsharpSqlite.Ast
                 pExpr = pTerm.pExpr;
                 prereqLeft = pMaskSet.exprTableUsage(pExpr.pLeft);
 
-                ///
-                ///<summary>
                 ///LIKE/GLOB distinguishes case 
-                ///</summary>
 
                 var op = pExpr.Operator;
                 if (op == TokenType.TK_IN)
                 {
                     Debug.Assert(pExpr.pRight == null);
-                    if (pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect))
+                    if (pExpr.HasProperty(ExprFlags.EP_xIsSelect))
                     {
                         pTerm.prereqRight = pMaskSet.exprSelectTableUsage(pExpr.x.pSelect);
                     }
@@ -552,16 +414,13 @@ namespace Community.CsharpSqlite.Ast
                         pTerm.prereqRight = pMaskSet.exprTableUsage(pExpr.pRight);
                     }
                 prereqAll = pMaskSet.exprTableUsage(pExpr);
-                if (pExpr.ExprHasProperty(ExprFlags.EP_FromJoin))
+                if (pExpr.HasProperty(ExprFlags.EP_FromJoin))
                 {
                     Bitmask x = pMaskSet.getMask(pExpr.iRightJoinTable);
                     prereqAll |= x;
                     extraRight = x - 1;
-                    ///
-                    ///<summary>
                     ///ON clause terms may not be used with an index
                     ///on left table of a LEFT JOIN.  Ticket #3015 
-                    ///</summary>
                 }
                 pTerm.prereqAll = prereqAll;
                 pTerm.leftCursor = -1;
@@ -615,8 +474,6 @@ namespace Community.CsharpSqlite.Ast
                     }
                 }
 #if !SQLITE_OMIT_BETWEEN_OPTIMIZATION
-                ///
-                ///<summary>
                 ///If a term is the BETWEEN operator, create two new virtual terms
                 ///that define the range that the BETWEEN implements.  For example:
                 ///
@@ -631,7 +488,6 @@ namespace Community.CsharpSqlite.Ast
                 ///term.  That means that if the BETWEEN term is coded, the children are
                 ///skipped.  Or, if the children are satisfied by an index, the original
                 ///BETWEEN term is skipped.
-                ///</summary>
                 else
                     if (pExpr.Operator == TokenType.TK_BETWEEN && pWC.Operator == TokenType.TK_AND)
                     {
@@ -658,11 +514,8 @@ namespace Community.CsharpSqlite.Ast
                     }
 #endif
 #if !(SQLITE_OMIT_OR_OPTIMIZATION) && !(SQLITE_OMIT_SUBQUERY)
-                    ///
-                    ///<summary>
                     ///Analyze a term that is composed of two or more subterms connected by
                     ///an OR operator.
-                    ///</summary>
                     else
                         if (pExpr.Operator == TokenType.TK_OR)
                         {
@@ -672,8 +525,6 @@ namespace Community.CsharpSqlite.Ast
                         }
 #endif
 #if !SQLITE_OMIT_LIKE_OPTIMIZATION
-                ///
-                ///<summary>
                 ///Add constraints to reduce the search space on a LIKE or GLOB
                 ///operator.
                 ///
@@ -683,55 +534,35 @@ namespace Community.CsharpSqlite.Ast
                 ///
                 ///The last character of the prefix "abc" is incremented to form the
                 ///termination condition "abd".
-                ///</summary>
                 if (pWC.Operator == TokenType.TK_AND && pParse.isLikeOrGlob(pExpr, ref pStr1, ref isComplete, ref noCase) != 0)
                 {
                     Expr pLeft;
-                    ///
-                    ///<summary>
                     ///LHS of LIKE/GLOB operator 
-                    ///</summary>
                     Expr pStr2;
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="Copy of pStr1 "> RHS of LIKE/GLOB operator </param>
                     Expr pNewExpr1;
                     Expr pNewExpr2;
                     int idxNew1;
                     int idxNew2;
                     CollSeq pColl;
-                    ///
-                    ///<summary>
                     ///Collating sequence to use 
-                    ///</summary>
                     pLeft = pExpr.x.pList.a[1].pExpr;
                     pStr2 = exprc.sqlite3ExprDup(db, pStr1, 0);
                     ////if ( 0 == db.mallocFailed )
                     {
                         int c, pC;
-                        ///
-                        ///<summary>
                         ///Last character before the first wildcard 
-                        ///</summary>
                         pC = pStr2.u.zToken[StringExtensions.Strlen30(pStr2.u.zToken) - 1];
                         c = pC;
                         if (noCase)
                         {
-                            ///
-                            ///<summary>
                             ///The point is to increment the last character before the first
                             ///wildcard.  But if we increment '@', that will push it into the
                             ///alphabetic range where case conversions will mess up the
                             ///inequality.  To avoid this, make sure to also run the full
                             ///LIKE on all candidate expressions by clearing the isComplete flag
-                            ///
-                            ///</summary>
                             if (c == 'A' - 1)
                                 isComplete = false;
-                            ///
-                            ///<summary>
-                            ///</summary>
                             ///<param name="EV: R">08207 </param>
                             c = _Custom.sqlite3UpperToLower[c];
                         }
@@ -757,14 +588,11 @@ namespace Community.CsharpSqlite.Ast
                 }
 #endif
 #if !SQLITE_OMIT_VIRTUALTABLE
-                ///
-                ///<summary>
                 ///Add a wherec.WO_MATCH auxiliary term to the constraint set if the
                 ///current expression is of the form:  column MATCH expr.
                 ///This information is used by the xBestIndex methods of
                 ///virtual tables.  The native query optimizer does not attempt
                 ///to do anything with MATCH functions.
-                ///</summary>
                 if (pExpr.isMatchOfColumn() != false)
                 {
                     int idxNew;
@@ -836,11 +664,8 @@ namespace Community.CsharpSqlite.Ast
         }
       }
 #endif
-                ///
-                ///<summary>
                 ///Prevent ON clause terms of a LEFT JOIN from being used to drive
                 ///an index for tables to the left of the join.
-                ///</summary>
                 pTerm.prereqRight |= extraRight;
             }
 

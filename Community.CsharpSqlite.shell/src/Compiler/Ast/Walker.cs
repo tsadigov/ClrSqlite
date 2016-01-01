@@ -102,8 +102,8 @@ namespace Community.CsharpSqlite.Ast {
 				WRC rc;
 				if(pExpr==null)
                     return WRC.WRC_Continue;
-				sqliteinth.testcase(pExpr.ExprHasProperty(ExprFlags.EP_TokenOnly));
-				sqliteinth.testcase(pExpr.ExprHasProperty(ExprFlags.EP_Reduced));
+				sqliteinth.testcase(pExpr.HasProperty(ExprFlags.EP_TokenOnly));
+				sqliteinth.testcase(pExpr.HasProperty(ExprFlags.EP_Reduced));
 				rc=this.xExprCallback(this,ref pExpr);
                 if (rc == WRC.WRC_Continue && !pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly))
                 {
@@ -111,7 +111,7 @@ namespace Community.CsharpSqlite.Ast {
                         return WRC.WRC_Abort;
 					if(this.sqlite3WalkExpr(ref pExpr.pRight)!=0)
                         return WRC.WRC_Abort;
-					if(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect)) {
+					if(pExpr.HasProperty(ExprFlags.EP_xIsSelect)) {
 						if(this.sqlite3WalkSelect(pExpr.x.pSelect)!=0)
                             return WRC.WRC_Abort;
 					}

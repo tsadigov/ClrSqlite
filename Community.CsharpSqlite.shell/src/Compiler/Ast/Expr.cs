@@ -792,7 +792,7 @@ set { _op = value; }
                     aff = this.pRight.sqlite3CompareAffinity(aff);
                 }
                 else
-                    if (this.ExprHasProperty(ExprFlags.EP_xIsSelect))
+                    if (this.HasProperty(ExprFlags.EP_xIsSelect))
                     {
                         aff = this.x.pSelect.ResultingFieldList[0].pExpr.sqlite3CompareAffinity(aff);
                     }
@@ -874,7 +874,7 @@ set { _op = value; }
                 else
                 {
                     Debug.Assert(!this.ExprHasAnyProperty(ExprFlags.EP_TokenOnly | ExprFlags.EP_Reduced));
-                    Debug.Assert(!this.ExprHasProperty(ExprFlags.EP_FromJoin));
+                    Debug.Assert(!this.HasProperty(ExprFlags.EP_FromJoin));
                     Debug.Assert((this.flags2 & Sqlite3.EP2_MallocedToken) == 0);
                     Debug.Assert((this.flags2 & Sqlite3.EP2_Irreducible) == 0);
                     if (this.pLeft != null || this.pRight != null || this.CollatingSequence != null || this.x.pList != null || this.x.pSelect != null)
@@ -924,7 +924,7 @@ set { _op = value; }
             int dupedExprNodeSize(int flags)
             {
                 int nByte = this.dupedExprStructSize(flags) & 0xfff;
-                if (!this.ExprHasProperty(ExprFlags.EP_IntValue) && this.u.zToken != null)
+                if (!this.HasProperty(ExprFlags.EP_IntValue) && this.u.zToken != null)
                 {
                     nByte += StringExtensions.Strlen30(this.u.zToken) + 1;
                 }
@@ -1145,7 +1145,7 @@ set { _op = value; }
 #if !SQLITE_OMIT_CAST
                 if (op == TokenType.TK_CAST)
                 {
-                    Debug.Assert(!this.ExprHasProperty(ExprFlags.EP_IntValue));
+                    Debug.Assert(!this.HasProperty(ExprFlags.EP_IntValue));
                     return build.sqlite3AffinityType(this.u.zToken);
                 }
 #endif
@@ -1184,7 +1184,7 @@ set { _op = value; }
                 int nHeight = 0;
                 this.pLeft.heightOfExpr(ref nHeight);
                 this.pRight.heightOfExpr(ref nHeight);
-                if (this.ExprHasProperty(ExprFlags.EP_xIsSelect))
+                if (this.HasProperty(ExprFlags.EP_xIsSelect))
                 {
                     this.x.pSelect.heightOfSelect(ref nHeight);
                 }
@@ -1240,7 +1240,7 @@ set { _op = value; }
             {
             }
 
-            public bool ExprHasProperty(ExprFlags P)
+            public bool HasProperty(ExprFlags P)
             {
                 return (this.flags & P) == P;
             }
@@ -1438,7 +1438,7 @@ set { _op = value; }
                             NameContext sNC = new NameContext();
                             Select pS = pExpr.x.pSelect;
                             Expr expr = pS.ResultingFieldList[0].pExpr;
-                            Debug.Assert(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
+                            Debug.Assert(pExpr.HasProperty(ExprFlags.EP_xIsSelect));
                             sNC.pSrcList = pS.pSrc;
                             sNC.pNext = pNC;
                             sNC.pParse = pNC.pParse;

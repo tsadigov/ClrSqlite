@@ -109,7 +109,7 @@ namespace Community.CsharpSqlite
 			if (argv == null || argv [0] == null || argv [2] == null) {
 				return 0;
 			}
-			pTable = TableBuilder.sqlite3FindTable (pInfo.db, argv [0], pInfo.zDatabase);
+			pTable = TableBuilder.sqlite3FindTable(pInfo.db, pInfo.zDatabase, argv[0]);
 			if (pTable == null) {
 				return 0;
 			}
@@ -222,7 +222,7 @@ namespace Community.CsharpSqlite
 
 			sInfo.db = db;
 			sInfo.zDatabase = db.Backends [iDb].Name;
-			if (TableBuilder.sqlite3FindTable (db, "sqlite_stat1", sInfo.zDatabase) == null) {
+			if (TableBuilder.sqlite3FindTable(db, sInfo.zDatabase, "sqlite_stat1") == null) {
 				return SqlResult.SQLITE_ERROR;
 			}
 			///
@@ -238,7 +238,7 @@ namespace Community.CsharpSqlite
 			//else
 			{
 				rc = legacy.sqlite3_exec (db, zSql, (dxCallback)analysisLoader, sInfo, 0);
-				db.sqlite3DbFree (ref zSql);
+				db.DbFree (ref zSql);
 				///
 ///<summary>
 ///Load the statistics from the sqlite_stat2 table. 

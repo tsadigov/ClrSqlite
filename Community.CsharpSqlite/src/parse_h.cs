@@ -728,7 +728,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				// zTab = &pNew->zName[16]; /* Skip the "sqlite_altertab_" prefix on the name */
 				pCol=pNew.aCol[pNew.nCol-1];
 				pDflt=pCol.pDflt;
-				pTab=TableBuilder.sqlite3FindTable(db,zTab,zDb);
+				pTab=TableBuilder.sqlite3FindTable(db, zDb, zTab);
 				Debug.Assert(pTab!=null);
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																																																/* Invoke the authorization callback. */
@@ -802,7 +802,7 @@ return;
 					//  }
                     db.flags |= SqliteFlags.SQLITE_PreferBuiltin;
 					build.sqlite3NestedParse(this,"UPDATE \"%w\".%s SET "+"sql = substr(sql,1,%d) || ', ' || %Q || substr(sql,%d) "+"WHERE type = 'table' AND name = %Q",zDb,sqliteinth.SCHEMA_TABLE(iDb),pNew.addColOffset,zCol,pNew.addColOffset+1,zTab);
-					db.sqlite3DbFree(ref zCol);
+					db.DbFree(ref zCol);
 					db.flags=savedDbFlags;
 				}
 				///
@@ -840,7 +840,7 @@ return;
                     vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,minFormat,r2);
 					j1=v.sqlite3VdbeAddOp3(OpCode.OP_Ge,r2,0,r1);
-                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTreeProp.FILE_FORMAT, r2);
+                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, r2);
 					v.sqlite3VdbeJumpHere(j1);
 					this.sqlite3ReleaseTempReg(r1);
 					this.sqlite3ReleaseTempReg(r2);
@@ -954,7 +954,7 @@ return;
 				///in database iDb. If so, this is an error.
 				///
 				///</summary>
-				if(TableBuilder.sqlite3FindTable(db,zName,zDb)!=null||IndexBuilder.sqlite3FindIndex(db,zName,zDb)!=null) {
+				if(TableBuilder.sqlite3FindTable(db, zDb, zName) != null||IndexBuilder.sqlite3FindIndex(db,zName,zDb)!=null) {
 					utilc.sqlite3ErrorMsg(this,"there is already another table or index with this name: %s",zName);
 					goto exit_rename_table;
 				}
@@ -1039,7 +1039,7 @@ goto exit_rename_table;
 					///<param name="for which the renamed table is the parent table.  ">for which the renamed table is the parent table.  </param>
 					if((zWhere=this.whereForeignKeys(pTab))!=null) {
 						build.sqlite3NestedParse(this,"UPDATE \"%w\".%s SET "+"sql = sqlite_rename_parent(sql, %Q, %Q) "+"WHERE %s;",zDb,sqliteinth.SCHEMA_TABLE(iDb),zTabName,zName,zWhere);
-						db.sqlite3DbFree(ref zWhere);
+						db.DbFree(ref zWhere);
 					}
 				}
 				#endif
@@ -1064,7 +1064,7 @@ goto exit_rename_table;
 				///If the sqlite_sequence table exists in this database, then update
 				///it with the new table name.
 				///</summary>
-				if(TableBuilder.sqlite3FindTable(db,"sqlite_sequence",zDb)!=null) {
+				if(TableBuilder.sqlite3FindTable(db, zDb, "sqlite_sequence") != null) {
 					build.sqlite3NestedParse(this,"UPDATE \"%w\".sqlite_sequence set name = %Q WHERE name = %Q",zDb,zName,pTab.zName);
 				}
 				#endif
@@ -1077,7 +1077,7 @@ goto exit_rename_table;
 				///</summary>
 				if((zWhere=this.whereTempTriggers(pTab))!="") {
 					build.sqlite3NestedParse(this,"UPDATE sqlite_temp_master SET "+"sql = sqlite_rename_trigger(sql, %Q), "+"tbl_name = %Q "+"WHERE %s;",zName,zName,zWhere);
-					db.sqlite3DbFree(ref zWhere);
+					db.DbFree(ref zWhere);
 				}
 				#endif
 				#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
@@ -1099,7 +1099,7 @@ goto exit_rename_table;
 				this.reloadTableSchema(pTab,zName);
 				exit_rename_table:
 				build.sqlite3SrcListDelete(db,ref pSrc);
-				db.sqlite3DbFree(ref zName);
+				db.DbFree(ref zName);
 				db.flags=savedDbFlags;
 			}
 			public///<summary>
@@ -1257,7 +1257,7 @@ goto exit_rename_table;
 				for(i=0;i<Sqlite3.ArraySize(aTable);i++) {
 					string zTab=aTable[i].zName;
 					Table pStat;
-					if((pStat=TableBuilder.sqlite3FindTable(db,zTab,pDb.Name))==null) {
+					if((pStat=TableBuilder.sqlite3FindTable(db, pDb.Name, zTab)) ==null) {
 						///
 						///<summary>
 						///The sqlite_stat[12] table does not exist. Create it. Note that a 
@@ -1915,9 +1915,9 @@ goto attach_end;
                     v.sqlite3VdbeAddOp1(OpCode.OP_Expire, (type == AuthTarget.SQLITE_ATTACH) ? 1 : 0);
 				}
 				attach_end:
-				exprc.sqlite3ExprDelete(db,ref pFilename);
-				exprc.sqlite3ExprDelete(db,ref pDbname);
-				exprc.sqlite3ExprDelete(db,ref pKey);
+				exprc.Delete(db,ref pFilename);
+				exprc.Delete(db,ref pDbname);
+				exprc.Delete(db,ref pKey);
 			}
 			public void sqlite3Detach(Expr pDbname) {
                 this.codeAttach(AuthTarget.SQLITE_DETACH, detach_func, pDbname, null, null, pDbname);
@@ -2592,7 +2592,7 @@ goto attach_end;
 				///<summary>
 				///Clean up the WHERE clause constructed above. 
 				///</summary>
-				exprc.sqlite3ExprDelete(db,ref pWhere);
+				exprc.Delete(db,ref pWhere);
 				if(iFkIfZero!=0) {
 					v.sqlite3VdbeJumpHere(iFkIfZero);
 				}
@@ -2763,7 +2763,7 @@ goto attach_end;
 					///early.  
 					///</summary>
 					if(this.disableTriggers!=0) {
-						pTo=TableBuilder.sqlite3FindTable(db,pFKey.zTo,zDb);
+						pTo=TableBuilder.sqlite3FindTable(db, zDb, pFKey.zTo);
 					}
 					else {
 						pTo=TableBuilder.sqlite3LocateTable(this,0,pFKey.zTo,zDb);
@@ -3277,9 +3277,9 @@ goto attach_end;
 						//}
 					}
 					db.lookaside.bEnabled=enableLookaside;
-					exprc.sqlite3ExprDelete(db,ref pWhere);
-					exprc.sqlite3ExprDelete(db,ref pWhen);
-					exprc.sqlite3ExprListDelete(db,ref pList);
+					exprc.Delete(db,ref pWhere);
+					exprc.Delete(db,ref pWhen);
+					exprc.Delete(db,ref pList);
 					SelectMethods.SelectDestructor(db,ref pSelect);
 					switch(action) {
 					case OnConstraintError.OE_Restrict:
@@ -3398,7 +3398,7 @@ goto attach_end;
         )
         ,
         new Tuple<List<TokenType>,ConsoleColor>(
-            Enum.GetValues(typeof(TokenType)).Cast<TokenType>().ToList(),
+            System.Enum.GetValues(typeof(TokenType)).Cast<TokenType>().ToList(),
             ConsoleColor.Gray
         )
     };
@@ -3466,6 +3466,7 @@ goto attach_end;
 
                 Console.Clear();
                 var tokens = lex(zSql).ToArray();
+                tokens.ForEach(t=>Shell.print(t.TokenType,t.Text));
                 //tokens.ForEach(itr => print(itr));
                 //Console.CursorTop+=3;
                 //Console.CursorLeft = 0;
@@ -3483,7 +3484,7 @@ goto attach_end;
 						break;
 					}
 					case TokenType.TK_ILLEGAL: {
-						db.sqlite3DbFree(ref pzErrMsg);
+						db.DbFree(ref pzErrMsg);
 						pzErrMsg=io.sqlite3MPrintf(db,"unrecognized token: \"%T\"",(object)token);
 						nErr++;
 						goto abort_parse;
@@ -3565,12 +3566,12 @@ pParse.nTableLock = 0;
 				#endif
 				//for ( i = pParse.nzVar - 1; i >= 0; i-- )
 				//  sqlite3DbFree( db, pParse.azVar[i] );
-				db.sqlite3DbFree(ref this.azVar);
+				db.DbFree(ref this.azVar);
 				db.sqlite3DbFree(ref this.aAlias);
 				while(this.pAinc!=null) {
 					AutoincInfo p=this.pAinc;
 					this.pAinc=p.pNext;
-					db.sqlite3DbFree(ref p);
+					db.DbFree(ref p);
 				}
 				while(this.pZombieTab!=null) {
 					Table p=this.pZombieTab;
@@ -4522,7 +4523,7 @@ isView = false;
 				}
 				insert_cleanup:
 				build.sqlite3SrcListDelete(db,ref pTabList);
-				exprc.sqlite3ExprListDelete(db,ref pList);
+				exprc.Delete(db,ref pList);
 				SelectMethods.SelectDestructor(db,ref pSelect);
 				build.sqlite3IdListDelete(db,ref pColumn);
 				db.sqlite3DbFree(ref aRegIdx);
@@ -4988,7 +4989,7 @@ isView = false;
                         errMsg.sqlite3StrAccumAppend(pIdx.nColumn > 1 ? " are not unique" : " is not unique", -1);
 						zErr=io.sqlite3StrAccumFinish(errMsg);
 						build.sqlite3HaltConstraint(this,onError,zErr,0);
-						errMsg.db.sqlite3DbFree(ref zErr);
+						errMsg.db.DbFree(ref zErr);
 						break;
 					}
 					case OnConstraintError.OE_Ignore: {
@@ -5940,8 +5941,8 @@ aXRef[j] = -1;
 				db.sqlite3DbFree(ref aRegIdx);
 				db.sqlite3DbFree(ref aXRef);
 				build.sqlite3SrcListDelete(db,ref pTabList);
-				exprc.sqlite3ExprListDelete(db,ref pChanges);
-				exprc.sqlite3ExprDelete(db,ref pWhere);
+				exprc.Delete(db,ref pChanges);
+				exprc.Delete(db,ref pWhere);
 				return;
 			}
 			public void updateVirtualTable(///
@@ -6535,7 +6536,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 																																																																																																					sqlite3AuthContextPop(sContext);
 #endif
 				build.sqlite3SrcListDelete(db,ref pTabList);
-				exprc.sqlite3ExprDelete(db,ref pWhere);
+				exprc.Delete(db,ref pWhere);
 				return;
 			}
 			public void sqlite3GenerateRowDelete(///
@@ -6797,7 +6798,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				zColl=build.sqlite3NameFromToken(db,pCollName);
 				pColl=build.sqlite3LocateCollSeq(this,zColl);
 				pExpr.sqlite3ExprSetColl(pColl);
-				db.sqlite3DbFree(ref zColl);
+				db.DbFree(ref zColl);
 				return pExpr;
 			}
 			public CollSeq sqlite3ExprCollSeq(Expr pExpr) {
@@ -7256,13 +7257,13 @@ return;
 				}
 				#if !SQLITE_OMIT_FLOATING_POINT
 				case TokenType.TK_FLOAT: {
-					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
 					exprc.codeReal(v,pExpr.u.zToken,false,target);
 					break;
 				}
 				#endif
 				case TokenType.TK_STRING: {
-					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
 					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,target,0,pExpr.u.zToken,0);
 					break;
 				}
@@ -7275,7 +7276,7 @@ return;
 					int n;
 					string z;
 					byte[] zBlob;
-					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
 					Debug.Assert(pExpr.u.zToken[0]=='x'||pExpr.u.zToken[0]=='X');
 					Debug.Assert(pExpr.u.zToken[1]=='\'');
 					z=pExpr.u.zToken.Substring(2);
@@ -7287,7 +7288,7 @@ return;
 				}
 				#endif
 				case TokenType.TK_VARIABLE: {
-					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
 					Debug.Assert(pExpr.u.zToken!=null);
 					Debug.Assert(pExpr.u.zToken.Length!=0);
                     v.sqlite3VdbeAddOp2(OpCode.OP_Variable, pExpr.iColumn, target);
@@ -7314,7 +7315,7 @@ return;
 					int aff;
                     OpCode to_op;
 					inReg=this.sqlite3ExprCodeTarget(pExpr.pLeft,target);
-					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
 					aff=build.sqlite3AffinityType(pExpr.u.zToken);
 					to_op=(OpCode)(aff-sqliteinth.SQLITE_AFF_TEXT+(int)OpCode.OP_ToText);
 					Debug.Assert(to_op==   OpCode.OP_ToText||aff!=sqliteinth.SQLITE_AFF_TEXT);
@@ -7424,7 +7425,7 @@ return;
 					}
 					else
 						if(pLeft.Operator==TokenType.TK_FLOAT) {
-							Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+							Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
 							exprc.codeReal(v,pLeft.u.zToken,true,target);
 							#endif
 						}
@@ -7468,7 +7469,7 @@ return;
 				case TokenType.TK_AGG_FUNCTION: {
 					AggInfo pInfo=pExpr.pAggInfo;
 					if(pInfo==null) {
-						Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+						Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
 						utilc.sqlite3ErrorMsg(this,"misuse of aggregate: %s()",pExpr.u.zToken);
 					}
 					else {
@@ -7523,7 +7524,7 @@ return;
 					///<summary>
 					///A collating sequence 
 					///</summary>
-					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
+					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
 					sqliteinth.testcase(op==TokenType.TK_CONST_FUNC);
 					sqliteinth.testcase(op==TokenType.TK_FUNCTION);
 					if(pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly)) {
@@ -7533,7 +7534,7 @@ return;
 						pFarg=pExpr.x.pList;
 					}
 					nFarg=pFarg!=null?pFarg.Count:0;
-					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
 					zId=pExpr.u.zToken;
 					nId=StringExtensions.Strlen30(zId);
                     pDef = FuncDefTraverse.sqlite3FindFunction(this.db, zId, nId, nFarg, enc, 0);
@@ -7810,7 +7811,7 @@ return;
 																																																																																																																																			            int iCacheLevel = pParse.iCacheLevel;
             //VVA_ONLY( int iCacheLevel = pParse.iCacheLevel; )
 #endif
-					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect)&&pExpr.x.pList!=null);
+					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect)&&pExpr.x.pList!=null);
 					Debug.Assert((pExpr.x.pList.Count%2)==0);
 					Debug.Assert(pExpr.x.pList.Count>0);
 					pEList=pExpr.x.pList;
@@ -7886,7 +7887,7 @@ return;
                     {
 						build.sqlite3MayAbort(this);
 					}
-					Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_IntValue));
+					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
                     if ((OnConstraintError)pExpr.affinity == OnConstraintError.OE_Ignore)
                     {
 						v.sqlite3VdbeAddOp4(OpCode.OP_Halt,(int)SqlResult.SQLITE_OK,(int)OnConstraintError.OE_Ignore,0,pExpr.u.zToken,0);
@@ -8053,7 +8054,7 @@ return;
 				///<summary>
 				///Temporary use register 
 				///</summary>
-				Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
+				Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
 				exprX=pExpr.pLeft.Clone();
 				exprAnd.Operator=TokenType.TK_AND;
 				exprAnd.pLeft=compLeft;
@@ -8419,7 +8420,7 @@ return;
 					///db.mallocFailed != 0 || 
 					///</summary>
 					pItem.pExpr==pSpan.pExpr);
-					db.sqlite3DbFree(ref pItem.zSpan);
+					db.DbFree(ref pItem.zSpan);
 					pItem.zSpan=pSpan.zStart.Substring(0,pSpan.zStart.Length<=pSpan.zEnd.Length?pSpan.zStart.Length:pSpan.zStart.Length-pSpan.zEnd.Length);
 					// sqlite3DbStrNDup( db, pSpan.zStart,
 					//(int)( pSpan.zEnd- pSpan.zStart) );
@@ -8478,7 +8479,7 @@ return;
 				Debug.Assert(pToken!=null);
 				pNew=exprc.CreateExpr(db,TokenType.TK_FUNCTION,pToken,true);
 				if(pNew==null) {
-					exprc.sqlite3ExprListDelete(db,ref pList);
+					exprc.Delete(db,ref pList);
 					///
 					///<summary>
 					///Avoid memory leak when malloc fails 
@@ -8486,7 +8487,7 @@ return;
 					return null;
 				}
 				pNew.x.pList=pList;
-				Debug.Assert(!pNew.ExprHasProperty(ExprFlags.EP_xIsSelect));
+				Debug.Assert(!pNew.HasProperty(ExprFlags.EP_xIsSelect));
 				this.sqlite3ExprSetHeight(pNew);
 				return pNew;
 			}
@@ -10001,7 +10002,7 @@ range_est_fallback:
 						if((pTerm.eOperator&wherec.WO_IN)!=0) {
 							Expr pExpr=pTerm.pExpr;
 							wsFlags|=wherec.WHERE_COLUMN_IN;
-							if(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect)) {
+							if(pExpr.HasProperty(ExprFlags.EP_xIsSelect)) {
 								///
 								///<summary>
 								///"x IN (SELECT ...)":  Assume the SELECT returns 25 rows 
@@ -10418,7 +10419,7 @@ range_est_fallback:
 					if(p.needToFreeIdxStr!=0) {
 						//malloc_cs.sqlite3_free(ref p.idxStr);
 					}
-					this.db.sqlite3DbFree(ref p);
+					this.db.DbFree(ref p);
 				}
 				else
 				#endif
@@ -10754,7 +10755,7 @@ range_est_fallback:
 					if((flags&wherec.WHERE_INDEXED)!=0) {
 						string zWhere=db.explainIndexRange(pLevel,pItem.pTab);
 						zMsg.Append(io.sqlite3MAppendf(db,null," USING %s%sINDEX%s%s%s",((flags&wherec.WHERE_TEMP_INDEX)!=0?"AUTOMATIC ":""),((flags&wherec.WHERE_IDX_ONLY)!=0?"COVERING ":""),((flags&wherec.WHERE_TEMP_INDEX)!=0?"":" "),((flags&wherec.WHERE_TEMP_INDEX)!=0?"":pLevel.plan.u.pIdx.zName),zWhere!=null?zWhere:""));
-						db.sqlite3DbFree(ref zWhere);
+						db.DbFree(ref zWhere);
 					}
 					else
 						if((flags&(wherec.WHERE_ROWID_EQ|wherec.WHERE_ROWID_RANGE))!=0) {
@@ -11750,7 +11751,7 @@ range_est_fallback:
 				///</summary>
 				pY.Operator==TokenType.TK_NULL) {
 					pA.Operator=(TokenType)op;
-					exprc.sqlite3ExprDelete(db,ref pA.pRight);
+					exprc.Delete(db,ref pA.pRight);
 					pA.pRight=null;
 				}
 			}
@@ -11783,7 +11784,7 @@ range_est_fallback:
 				///ephemeral table.
 				///
 				///</summary>
-				p=(pX.ExprHasProperty(ExprFlags.EP_xIsSelect)?pX.x.pSelect:null);
+				p=(pX.HasProperty(ExprFlags.EP_xIsSelect)?pX.x.pSelect:null);
 				if(Sqlite3.ALWAYS(this.nErr==0)&&exprc.isCandidateForInOpt(p)!=0) {
 					Connection db=this.db;
 					///
@@ -12021,7 +12022,7 @@ range_est_fallback:
 					keyInfo=new KeyInfo();
 					// memset( &keyInfo, 0, sizeof(keyInfo ));
 					keyInfo.nField=1;
-					if(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect)) {
+					if(pExpr.HasProperty(ExprFlags.EP_xIsSelect)) {
 						///
 						///<summary>
 						///Case 1:     expr IN (SELECT ...)
@@ -12142,7 +12143,7 @@ range_est_fallback:
 					sqliteinth.testcase(pExpr.Operator==TokenType.TK_EXISTS);
 					sqliteinth.testcase(pExpr.Operator==TokenType.TK_SELECT);
 					Debug.Assert(pExpr.Operator==TokenType.TK_EXISTS||pExpr.Operator==TokenType.TK_SELECT);
-					Debug.Assert(pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
+					Debug.Assert(pExpr.HasProperty(ExprFlags.EP_xIsSelect));
 					pSel=pExpr.x.pSelect;
 					dest.Init(0,++this.nMem);
 					if(pExpr.Operator==TokenType.TK_SELECT) {
@@ -12159,7 +12160,7 @@ range_est_fallback:
 																																																																																																																																														              VdbeComment( v, "Init EXISTS result" );
 #endif
 					}
-					exprc.sqlite3ExprDelete(this.db,ref pSel.pLimit);
+					exprc.Delete(this.db,ref pSel.pLimit);
 					pSel.pLimit=this.sqlite3PExpr(TokenType.TK_INTEGER,null,null,ParseMethods.sqlite3IntTokens[1]);
 					pSel.iLimit=0;
 					if(Select.sqlite3Select(this,pSel,ref dest)!=0) {
@@ -12521,7 +12522,7 @@ range_est_fallback:
 					///</summary>
 					iDb=indexOf(db,pTab.pSchema);
                     build.sqlite3NestedParse(this, "UPDATE %Q.%s " + "SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q " + "WHERE rowid=#%d", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), pTab.zName, pTab.zName, zStmt, this.regRowid);
-					db.sqlite3DbFree(ref zStmt);
+					db.DbFree(ref zStmt);
 					v=this.sqlite3GetVdbe();
 					build.sqlite3ChangeCookie(this,iDb);
 					v.sqlite3VdbeAddOp2( OpCode.OP_Expire,0,0);

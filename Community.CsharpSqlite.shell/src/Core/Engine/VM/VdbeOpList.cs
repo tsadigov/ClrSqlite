@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Community.CsharpSqlite.Engine
 {
+    using tree;
     using u8 = System.Byte;
 
 
@@ -52,6 +53,16 @@ namespace Community.CsharpSqlite.Engine
         ///Third parameter 
         ///</summary>
 
+        public VdbeOpList(OpCode opcode, int p1, int p2, BTreeProp p3)
+            :this(opcode,p1,p2,(int)p3)
+        {
+        
+        }
+        public VdbeOpList(OpCode opcode, int p1, BTreeProp p2, int p3)
+            : this(opcode, p1, (int)p2, p3)
+        {
+
+        }
         public VdbeOpList(OpCode opcode, int p1, int p2, int p3)
         {
             this.opcode = (u8)opcode;

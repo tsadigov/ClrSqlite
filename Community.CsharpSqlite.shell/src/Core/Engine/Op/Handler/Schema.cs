@@ -18,8 +18,84 @@ namespace Community.CsharpSqlite.Engine.Op
         {
             Mem pOut=cpu.pOut;
             var db = cpu.db;
+            var vdbe = cpu.vdbe;
+
             switch (opcode)
             {
+
+
+                ///
+                ///<summary>
+                ///Opcode: ParseSchema P1 * * P4 *
+                ///
+                ///Read and parse all entries from the SQLITE_MASTER table of database P1
+                ///that match the WHERE clause P4. 
+                ///
+                ///This opcode invokes the parser to create a new virtual machine,
+                ///</summary>
+                ///<param name="then runs the new virtual machine.  It is thus a re">entrant opcode.</param>
+                ///<param name=""></param>
+                case OpCode.OP_ParseSchema:
+                    {
+                        ///
+                        ///<summary>
+                        ///Any prepared statement that invokes this opcode will hold mutexes
+                        ///on every btree.  This is a prerequisite for invoking
+                        ///sqlite3InitCallback().
+                        ///
+                        ///</summary>
+#if SQLITE_DEBUG
+																																																																																																																																				              for ( iDb = 0; iDb < db.nDb; iDb++ )
+              {
+                Debug.Assert( iDb == 1 || sqlite3BtreeHoldsMutex( db.aDb[iDb].pBt ) );
+              }
+#endif
+
+                        var iDb = pOp.p1;
+                        Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
+                        Debug.Assert(db.DbHasProperty(iDb, sqliteinth.DB_SchemaLoaded));
+                        ///
+                        ///<summary>
+                        ///Used to be a conditional 
+                        ///</summary>
+                        {
+                            var zMaster = sqliteinth.SCHEMA_TABLE(iDb);
+                            var initData = new InitData();
+                            initData.db = db;
+                            initData.iDb = pOp.p1;
+                            initData.pzErrMsg = vdbe.zErrMsg;
+                            var zSql = Os.io.sqlite3MPrintf(db, "SELECT name, rootpage, sql FROM '%q'.%s WHERE %s ORDER BY rowid", db.Backends[iDb].Name, zMaster, pOp.p4.z);
+                            if (String.IsNullOrEmpty(zSql))
+                            {
+                                cpu.rc = SqlResult.SQLITE_NOMEM;
+                            }
+                            else
+                            {
+                                Debug.Assert(db.init.IsBusy);
+                                using (db.init.scope())
+                                {
+                                    initData.rc = SqlResult.SQLITE_OK;
+                                    //Debug.Assert( 0 == db.mallocFailed );
+                                    cpu.rc = legacy.sqlite3_exec(db, zSql, (dxCallback)Sqlite3.sqlite3InitCallback, (object)initData, 0);
+                                    if (cpu.rc == SqlResult.SQLITE_OK)
+                                        cpu.rc = initData.rc;
+                                    db.DbFree(ref zSql);
+                                }
+                            }
+                        }
+                        if (cpu.rc == SqlResult.SQLITE_NOMEM)
+                        {
+                            return RuntimeException.no_mem;
+                        }
+                        break;
+                    }
+
+
+
+
+
+
+
                 ///<summary>
                 ///Opcode: Destroy P1 P2 P3 * *
                 ///

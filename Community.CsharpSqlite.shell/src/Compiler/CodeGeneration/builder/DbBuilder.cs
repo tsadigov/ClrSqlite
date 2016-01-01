@@ -60,7 +60,7 @@ namespace Community.CsharpSqlite.builder
             ///</summary>
             zName = build.sqlite3NameFromToken(db, pName);
             i = db.sqlite3FindDbName(zName);
-            db.sqlite3DbFree(ref zName);
+            db.DbFree(ref zName);
             return i;
         }
     }

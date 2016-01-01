@@ -121,10 +121,10 @@
       <Link>Community.CsharpSqlite\global_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\hash_c.cs">
-      <Link>src\Utils\hash_c.cs</Link>
+      <Link>src\Accessories\Utils\hash_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\Hash_h.cs">
-      <Link>src\Utils\Hash_h.cs</Link>
+      <Link>src\Accessories\Utils\Hash_h.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\hwtime_c.cs">
       <Link>src\Accessories\Utils\hwtime_c.cs</Link>
@@ -253,7 +253,7 @@
       <Link>src\Accessories\Utils\utf_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\util_c.cs">
-      <Link>src\Utils\util_c.cs</Link>
+      <Link>src\Accessories\Utils\util_c.cs</Link>
     </Compile>
     <Compile Include="..\Community.CsharpSqlite\src\vacuum_c.cs">
       <Link>src\Compiler\CodeGeneration\vacuum_c.cs</Link>
@@ -299,6 +299,8 @@
     </Compile>
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\Accessories\Utils\Enum.cs" />
+    <Compile Include="src\Accessories\Utils\IBusyScope.cs" />
     <Compile Include="src\Backend\Cache\Comment.cs" />
     <Compile Include="src\Backend\Cache\PCache1.cs" />
     <Compile Include="src\Backend\Cache\PCacheGlobal.cs" />
@@ -334,8 +336,8 @@
     <Compile Include="src\Core\Engine\VM\Mem.cs" />
     <Compile Include="src\Core\Engine\VM\MemExtensions.cs" />
     <Compile Include="src\Core\Engine\VM\MemFlags.cs" />
-    <Compile Include="src\Utils\BitvecExtensions.cs" />
-    <Compile Include="src\BtCursor.cs" />
+    <Compile Include="src\Accessories\Utils\BitvecExtensions.cs" />
+    <Compile Include="src\Backend\tree\BtCursor.cs" />
     <Compile Include="src\Core\Engine\BusyHandler.cs" />
     <Compile Include="src\Core\Engine\Context.cs" />
     <Compile Include="src\Core\Engine\Cursor.cs" />
@@ -367,9 +369,13 @@
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
     <Compile Include="src\Backend\Paging\Delegates.cs" />
-    <Compile Include="src\Utils\CollectionExtensions.cs" />
-    <Compile Include="src\Utils\MyCollection.cs" />
-    <Compile Include="src\Utils\MyHelpers.cs" />
+    <Compile Include="src\Accessories\Utils\CharExtensions.cs" />
+    <Compile Include="src\Accessories\Utils\CollectionExtensions.cs" />
+    <Compile Include="src\Accessories\Utils\Converter.cs" />
+    <Compile Include="src\Accessories\Utils\IntegerExtensions.cs" />
+    <Compile Include="src\Accessories\Utils\MathExtensions.cs" />
+    <Compile Include="src\Accessories\Utils\MyCollection.cs" />
+    <Compile Include="src\Accessories\Utils\MyHelpers.cs" />
     <Compile Include="src\Os\OpenMode.cs" />
     <Compile Include="src\Schema\Builtin.cs" />
     <Compile Include="src\Schema\SchemaExtensions.cs" />
@@ -423,7 +429,8 @@
     <Compile Include="src\Accessories\Utils\Str.cs" />
     <Compile Include="src\Accessories\Utils\StreAccum.cs" />
     <Compile Include="src\Compiler\Ast\Walker.cs" />
-    <Compile Include="src\Utils\StringUtils.cs" />
+    <Compile Include="src\Accessories\Utils\StringExtensions.cs" />
+    <Compile Include="src\Accessories\Utils\StringUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

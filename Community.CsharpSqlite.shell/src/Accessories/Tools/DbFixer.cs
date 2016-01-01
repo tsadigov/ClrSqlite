@@ -184,7 +184,7 @@ namespace Community.CsharpSqlite
             {
                 if (pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly))
                     break;
-                if (pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect))
+                if (pExpr.HasProperty(ExprFlags.EP_xIsSelect))
                 {
                     if (this.sqlite3FixSelect(pExpr.x.pSelect) != 0)
                         return 1;

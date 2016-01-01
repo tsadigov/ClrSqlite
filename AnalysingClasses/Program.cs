@@ -2,6 +2,7 @@
 using Community.CsharpSqlite.Paging;
 using Community.CsharpSqlite.tree;
 using Community.CsharpSqlite.Metadata;
+using Community.CsharpSqlite.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,12 +49,12 @@ namespace AnalysingClasses
             else
             {
                 //Debug.Assert(0 == pSrc.init.busy);
-                pSrc.init.busy = 1;
-                initData.rc = SqlResult.SQLITE_OK;
-                //Debug.Assert( 0 == db.mallocFailed );
-                r=legacy.sqlite3_exec(pSrc, zSql, (dxCallback)Sqlite3.sqlite3InitCallback, (object)initData, 0);
-
-                pSrc.init.busy = 0;
+                using (pSrc.init.scope())
+                {
+                    initData.rc = SqlResult.SQLITE_OK;
+                    //Debug.Assert( 0 == db.mallocFailed );
+                    r = legacy.sqlite3_exec(pSrc, zSql, (dxCallback)Sqlite3.sqlite3InitCallback, (object)initData, 0);
+                }
             }
 
 

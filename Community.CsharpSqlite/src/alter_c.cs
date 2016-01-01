@@ -194,18 +194,18 @@ namespace Community.CsharpSqlite
                         if (zOld.Equals(zParent, StringComparison.InvariantCultureIgnoreCase))
                         {
                             string zOut = io.sqlite3MPrintf(db, "%s%.*s\"%w\"", zOutput, zIdx - zLeft, zInput.Substring(zLeft), zNew);
-                            db.sqlite3DbFree(ref zOutput);
+                            db.DbFree(ref zOutput);
                             zOutput = zOut;
                             zIdx += n;
                             // zInput = &z[n];
                             zLeft = zIdx;
                         }
-                        db.sqlite3DbFree(ref zParent);
+                        db.DbFree(ref zParent);
                     }
                 }
                 zResult = io.sqlite3MPrintf(db, "%s%s", zOutput, zInput.Substring(zLeft));
                 context.sqlite3_result_text(zResult, -1, sqliteinth.SQLITE_DYNAMIC);
-                db.sqlite3DbFree(ref zOutput);
+                db.DbFree(ref zOutput);
             }
 
 #endif
@@ -366,7 +366,7 @@ namespace Community.CsharpSqlite
                 else
                 {
                     zNew = io.sqlite3MPrintf(db, "%s OR name=%Q", zWhere, zConstant);
-                    db.sqlite3DbFree(ref zWhere);
+                    db.DbFree(ref zWhere);
                 }
                 return zNew;
             }

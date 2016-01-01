@@ -816,6 +816,12 @@ const int ;//define SQLITE_UTF16NATIVE  SqliteEncoding.UTF16LE
         ///
         ///</summary>
         public const int MASTER_ROOT = 1;
+
+        static bool IsTemp(int x)
+        {
+            return (OMIT_TEMPDB == 0) && (x == 1) ;
+        }
+
         //#define MASTER_ROOT       1
         ///
         ///<summary>
@@ -824,8 +830,54 @@ const int ;//define SQLITE_UTF16NATIVE  SqliteEncoding.UTF16LE
         ///</summary>
         public static string SCHEMA_TABLE(int x)//#define SCHEMA_TABLE(x)  ((!OMIT_TEMPDB)&&(x==1)?TEMP_MASTER_NAME:MASTER_NAME)
         {
-            return ((OMIT_TEMPDB == 0) && (x == 1) ? TEMP_MASTER_NAME : MASTER_NAME);
+            return IsTemp(x)?TEMP_MASTER_NAME: MASTER_NAME;
         }
+
+        /// <summary>
+        ///zMasterSchema and zInitScript are set to point at the master schema
+        ///and initialisation script appropriate for the database being
+        ///initialised. zMasterName is the name of the master table.
+        /// </summary>
+        /// <param name="iDb"></param>
+        /// <returns></returns>
+        public static string MasterSchemaTableCreateCommand(int iDb)
+        {
+            
+            String zMasterSchema = string.Empty;
+            ///The master database table has a structure like this
+
+            if (IsTemp(iDb))
+            {
+
+#if !SQLITE_OMIT_TEMPDB
+                zMasterSchema =
+                    @"CREATE TEMP TABLE 
+                        sqlite_temp_master(
+                            type text,
+                            name text,
+                            tbl_name text,
+                            rootpage integer,
+                            sql text
+                    )";
+#else                                                                                                                                                                                                                                                                              //define temp_master_schema 0
+#endif
+            }
+            else {
+                zMasterSchema =
+                    @"CREATE TABLE 
+                        sqlite_master(
+                            type text,
+                            name text,
+                            tbl_name text,
+                            rootpage integer,
+                            sql text
+                    )";
+            }
+            return zMasterSchema;
+
+        }
+
+        
 
         ///
         ///<summary>
@@ -864,6 +916,8 @@ void *sqlite3_wsd_find(void *K, int L);
         public static Sqlite3Config sqlite3GlobalConfig {
             get;
             set; }
+        
+    
 
 #endif
         ///<summary>

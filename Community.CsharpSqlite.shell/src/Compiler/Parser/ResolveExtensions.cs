@@ -117,7 +117,7 @@ namespace Community.CsharpSqlite
                     pDup.iTable = pEList.a[iCol].iAlias;
                 }
                 else
-                    if (pOrig.ExprHasProperty(ExprFlags.EP_IntValue) || pOrig.u.zToken == null)
+                    if (pOrig.HasProperty(ExprFlags.EP_IntValue) || pOrig.u.zToken == null)
                     {
                         pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
                         if (pDup == null)
@@ -146,10 +146,10 @@ namespace Community.CsharpSqlite
                 ///prevents ExprDelete() from deleting the Expr structure itself,
                 ///allowing it to be repopulated by the memcpy() on the following line.
                 pExpr.ExprSetProperty(ExprFlags.EP_Static);
-                exprc.sqlite3ExprDelete(db, ref pExpr);
+                exprc.Delete(db, ref pExpr);
                 pExpr.CopyFrom(pDup);
                 //memcpy(pExpr, pDup, sizeof(*pExpr));
-                db.sqlite3DbFree(ref pDup);
+                db.DbFree(ref pDup);
             }
 
 
@@ -569,7 +569,7 @@ namespace Community.CsharpSqlite
                                 Debug.Assert(pExpr.x.pList == null);
                                 Debug.Assert(pExpr.x.pSelect == null);
                                 pOrig = pEList.a[j].pExpr;
-                                if (0 == pNC.allowAgg && pOrig.ExprHasProperty(ExprFlags.EP_Agg))
+                                if (0 == pNC.allowAgg && pOrig.HasProperty(ExprFlags.EP_Agg))
                                 {
                                     utilc.sqlite3ErrorMsg(pParse, "misuse of aliased aggregate %s", zAs);
                                     return WRC.WRC_Abort;
@@ -605,7 +605,7 @@ namespace Community.CsharpSqlite
                 ///<param name="Because no reference was made to outer contexts, the pNC.nRef">Because no reference was made to outer contexts, the pNC.nRef</param>
                 ///<param name="fields are not changed in any context.">fields are not changed in any context.</param>
                 ///<param name=""></param>
-                if (cnt == 0 && zTab == null && pExpr.ExprHasProperty(ExprFlags.EP_DblQuoted))
+                if (cnt == 0 && zTab == null && pExpr.HasProperty(ExprFlags.EP_DblQuoted))
                 {
                     pExpr.Operator = TokenType.TK_STRING;
                     pExpr.pTab = null;
@@ -658,9 +658,9 @@ namespace Community.CsharpSqlite
                     pMatch.colUsed |= ((Bitmask)1) << n;
                 }
                 ///Clean up and return
-                exprc.sqlite3ExprDelete(db, ref pExpr.pLeft);
+                exprc.Delete(db, ref pExpr.pLeft);
                 pExpr.pLeft = null;
-                exprc.sqlite3ExprDelete(db, ref pExpr.pRight);
+                exprc.Delete(db, ref pExpr.pRight);
                 pExpr.pRight = null;
                 pExpr.Operator = (isTrigger != 0 ? TokenType.TK_TRIGGER : TokenType.TK_COLUMN);
             lookupname_end:
@@ -802,7 +802,7 @@ break;
                             SqliteEncoding enc = pParse.db.aDbStatic[0].pSchema.enc;
                             // ENC( pParse.db );   /* The database encoding */
                             sqliteinth.testcase(pExpr.Operator == TokenType.TK_CONST_FUNC);
-                            Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
+                            Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
                             zId = pExpr.u.zToken;
                             nId = StringExtensions.Strlen30(zId);
                             pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, n, enc, 0);
@@ -879,7 +879,7 @@ return WRC.WRC_Prune;
                     case TokenType.TK_IN:
                         {
                             sqliteinth.testcase(pExpr.Operator == TokenType.TK_IN);
-                            if (pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect))
+                            if (pExpr.HasProperty(ExprFlags.EP_xIsSelect))
                             {
                                 int nRef = pNC.nRef;
 #if !SQLITE_OMIT_CHECK
@@ -1024,14 +1024,14 @@ return WRC.WRC_Prune;
                                     Debug.Assert(pDup != null);
                                     iCol = ResolveExtensions.resolveOrderByTermToExprList(pParse, pSelect, pDup);
                                 }
-                                exprc.sqlite3ExprDelete(db, ref pDup);
+                                exprc.Delete(db, ref pDup);
                             }
                         }
                         if (iCol > 0)
                         {
                             CollSeq pColl = pE.CollatingSequence;
                             ExprFlags flags = pE.Flags & ExprFlags.EP_ExpCollate;
-                            exprc.sqlite3ExprDelete(db, ref pE);
+                            exprc.Delete(db, ref pE);
                             pItem.pExpr = pE = exprc.sqlite3Expr(db, TokenType.TK_INTEGER, null);
                             if (pE == null)
                                 return 1;
@@ -1565,7 +1565,7 @@ pParse.nHeight += pExpr.nHeight;
                     {
                         pNC.hasAgg = 1;
                     }
-                return (SqlResult) (pExpr.ExprHasProperty(ExprFlags.EP_Error) ? 1 : 0);
+                return (SqlResult) (pExpr.HasProperty(ExprFlags.EP_Error) ? 1 : 0);
             }
 
 

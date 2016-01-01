@@ -8,7 +8,8 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.tree;
     using sqlite3_stmt = Engine.Vdbe;
     using Ast;
-	public partial class Sqlite3 {
+    using System.Collections.Generic;
+    public partial class Sqlite3 {
 		///<summary>
 		/// 2003 April 6
 		///
@@ -346,58 +347,36 @@ namespace Community.CsharpSqlite {
 			{
 				u32 meta=0;
 				int i;
-				///
-				///<summary>
-				///This array determines which meta meta values are preserved in the
-				///vacuum.  Even entries are the meta value number and odd entries
-				///are an increment to apply to the meta value after the vacuum.
-				///The increment is used to increase the schema cookie so that other
-				///connections to the same database will know to reread the schema.
-				///
-				///</summary>
-				byte[] aCopy=new byte[] {
-					BTreeProp.SCHEMA_VERSION,
-					1,
-					///
-					///<summary>
-					///Add one to the old schema cookie 
-					///</summary>
-					BTreeProp.DEFAULT_CACHE_SIZE,
-					0,
-					///
-					///<summary>
-					///Preserve the default page cache size 
-					///</summary>
-					BTreeProp.TEXT_ENCODING,
-					0,
-					///
-					///<summary>
-					///Preserve the text encoding 
-					///</summary>
-					BTreeProp.USER_VERSION,
-					0,
-				///
-				///<summary>
-				///Preserve the user version 
-				///</summary>
-				};
+                ///
+                ///<summary>
+                ///This array determines which meta meta values are preserved in the
+                ///vacuum.  Even entries are the meta value number and odd entries
+                ///are an increment to apply to the meta value after the vacuum.
+                ///The increment is used to increase the schema cookie so that other
+                ///connections to the same database will know to reread the schema.
+                ///
+                ///</summary>
+                var dCopy =new Dictionary<BTreeProp, int>() {
+                    { BTreeProp.SCHEMA_VERSION, 1},         ///Add one to the old schema cookie 
+                    { BTreeProp.DEFAULT_CACHE_SIZE, 0},     ///Preserve the default page cache size 
+                    { BTreeProp.TEXT_ENCODING, 0},          ///Preserve the text encoding 
+                    { BTreeProp.USER_VERSION, 0}            ///Preserve the user version                     
+                };
 				Debug.Assert(pTemp.sqlite3BtreeIsInTrans());
 				Debug.Assert(pMain.sqlite3BtreeIsInTrans());
-				///
-				///<summary>
-				///Copy Btree meta values 
-				///</summary>
-				for(i=0;i<Sqlite3.ArraySize(aCopy);i+=2) {
-					///
-					///<summary>
-					///GetMeta() and UpdateMeta() cannot fail in this context because
-					///we already have page 1 loaded into cache and marked dirty. 
-					///</summary>
-					meta=pMain.sqlite3BtreeGetMeta(aCopy[i]);
-					rc=pTemp.sqlite3BtreeUpdateMeta(aCopy[i],(u32)(meta+aCopy[i+1]));
-					if(NEVER(rc!=SqlResult.SQLITE_OK))
-						goto end_of_vacuum;
-				}
+                ///
+                ///<summary>
+                ///Copy Btree meta values 
+                ///</summary>
+                foreach (var entry in dCopy) {
+                    ///GetMeta() and UpdateMeta() cannot fail in this context because
+                    ///we already have page 1 loaded into cache and marked dirty. 
+                    meta = pMain.sqlite3BtreeGetMeta(entry.Key);
+                    rc = pTemp.sqlite3BtreeUpdateMeta(entry.Key, (u32)(meta + entry.Value));
+                    if (NEVER(rc != SqlResult.SQLITE_OK))
+                        goto end_of_vacuum;
+                }
+				
 				rc=pMain.sqlite3BtreeCopyFile(pTemp);
 				if(rc!=SqlResult.SQLITE_OK)
 					goto end_of_vacuum;

@@ -572,7 +572,7 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			for (i = 0; i < db.nExtension; i++) {
 				os.sqlite3OsDlClose (db.pVfs, (HANDLE)db.aExtension [i]);
 			}
-			db.sqlite3DbFree (ref db.aExtension);
+			db.DbFree (ref db.aExtension);
 		}
 
 		///
@@ -757,7 +757,7 @@ wsdAutoext.nExt = 0;
                     utilc.sqlite3Error(db, SqlResult.SQLITE_ERROR, "automatic extension loading failed: %s", zErrmsg);
 					go = false;
 				}
-				db.sqlite3DbFree (ref zErrmsg);
+				db.DbFree (ref zErrmsg);
 			}
 		}
 	}

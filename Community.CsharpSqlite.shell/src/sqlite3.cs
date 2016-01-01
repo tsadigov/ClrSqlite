@@ -32,7 +32,7 @@ namespace Community.CsharpSqlite
 
     public static class Sqlite3Extensions{
         
-        public static void sqlite3DbFree<T>(this Connection th,ref T pT) where T : class
+        public static void DbFree<T>(this Connection th,ref T pT) where T : class
         {
             pT = null;
         }
@@ -236,7 +236,7 @@ namespace Community.CsharpSqlite
 ///<summary>
                 ///Information used during initialization 
                 ///</summary>
-            public class sqlite3InitInfo
+            public class sqlite3InitInfo:IBusyScope
             {
                 ///<summary>
                 ///When back is being initialized 
@@ -251,13 +251,24 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///TRUE if currently initializing 
                 ///</summary>
-                public u8 busy { get; set; }
+                public u8 busy { get { return (u8)(IsBusy ?1:0); } set { IsBusy = value!=0; } }
+                public bool IsBusy { get; set; }
 
                 ///<summary>
                 ///Last statement is orphaned TEMP trigger 
                 ///</summary>
                 public u8 orphanTrigger;
-            };
+
+            void IBusyScope.Enter()
+            {
+                IsBusy=true;
+            }
+
+            void IBusyScope.Exit()
+            {
+                IsBusy = false;
+            }
+        };
 
 
             public sqlite3InitInfo init = new sqlite3InitInfo();
@@ -570,13 +581,13 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             public void whereOrInfoDelete(WhereOrInfo p)
             {
                 p.wc.whereClauseClear();
-                this.sqlite3DbFree(ref p);
+                this.DbFree(ref p);
             }
 
             public void whereAndInfoDelete(WhereAndInfo p)
             {
                 p.wc.whereClauseClear();
-                this.sqlite3DbFree(ref p);
+                this.DbFree(ref p);
             }
 
             public string explainIndexRange(WhereLevel pLevel, Table pTab)
@@ -631,20 +642,20 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                             {
                                 //malloc_cs.sqlite3_free( ref pInfo.idxStr );
                             }
-                            this.sqlite3DbFree(ref pInfo);
+                            this.DbFree(ref pInfo);
                         }
                         if (pWInfo.a[i] != null && (pWInfo.a[i].plan.wsFlags & wherec.WHERE_TEMP_INDEX) != 0)
                         {
                             Index pIdx = pWInfo.a[i].plan.u.pIdx;
                             if (pIdx != null)
                             {
-                                this.sqlite3DbFree(ref pIdx.zColAff);
-                                this.sqlite3DbFree(ref pIdx);
+                                this.DbFree(ref pIdx.zColAff);
+                                this.DbFree(ref pIdx);
                             }
                         }
                     }
                     pWInfo.pWC.whereClauseClear();
-                    this.sqlite3DbFree(ref pWInfo);
+                    this.DbFree(ref pWInfo);
                 }
             }
 

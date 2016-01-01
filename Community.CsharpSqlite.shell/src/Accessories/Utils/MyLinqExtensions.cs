@@ -9,6 +9,13 @@ namespace Community.CsharpSqlite.Utils
 {
     public static class MyLinqExtensions
     {
+        public static IEnumerable<TSource> Swap<TSource>(this IEnumerable<TSource> source, int i1,int i2) {
+            var arr = source.ToArray();
+            var temp = arr[i1];
+            arr[i1] = arr[i2];
+            arr[i2] = temp;
+            return arr;
+        }
         public static IEnumerable<T> path<T>(this T start, Func<T, T> prop)
         {
             for(T itr=start;null!=itr;itr=prop(itr))
@@ -28,6 +35,15 @@ namespace Community.CsharpSqlite.Utils
                 action(element);
         }
 
+        public static void push<T>(ref T head, T p)where T : IBackwardLinkedListNode<T>
+        {
+            if (head != null)
+            {
+                head.pPrev = p;
+            }
+
+            head = p;
+        }
         public static void removeFromLinkedList<T>(this T itemToRemove, ref T start, Func<T, T> prop, Action<T, T> setter) where T : class
         {
 

@@ -26,51 +26,51 @@ namespace Community.CsharpSqlite.Metadata
 
 
 
+    ///<summary>
+    /// An instance of the following structure is passed as the first
+    /// argument to sqlite3VdbeKeyCompare and is used to control the
+    /// comparison of the two index keys.
+    ///
+    ///</summary>
+    public class KeyInfo
+    {
         ///<summary>
-        /// An instance of the following structure is passed as the first
-        /// argument to sqlite3VdbeKeyCompare and is used to control the
-        /// comparison of the two index keys.
-        ///
+        ///The database connection 
         ///</summary>
-        public class KeyInfo
+        public Connection db;
+
+        ///<summary>
+        ///Text encoding  one of the SQLITE_UTF* values
+        ///</summary>        
+        public SqliteEncoding enc;
+        
+        ///<summary>
+        ///Number of entries in aColl[] 
+        ///</summary>
+        public u16 nField;
+        
+        ///<summary>
+        ///Sort order for each column.  May be NULL
+        ///</summary>
+        public SortOrder[] aSortOrder;
+
+        CollSeq[] _aColl = new CollSeq[1];
+        ///<summary>
+        ///Collating sequence for each term of the key 
+        ///</summary>
+        public CollSeq[] aColl
         {
-            public Connection db;
-            ///
-            ///<summary>
-            ///The database connection 
-            ///</summary>
-            public SqliteEncoding enc;
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="Text encoding "> one of the SQLITE_UTF* values </param>
-            public u16 nField;
-            ///
-            ///<summary>
-            ///Number of entries in aColl[] 
-            ///</summary>
-            public SortOrder[] aSortOrder;
-            ///<summary>
-            ///Sort order for each column.  May be NULL
-            ///</summary>
-            private CollSeq[] _aColl = new CollSeq[1];
+            get { return _aColl; }
+            set { _aColl = value; }
+        }
 
-            public CollSeq[] aColl
-            {
-                get { return _aColl; }
-                set { _aColl = value; }
-            }
-            ///
-            ///<summary>
-            ///Collating sequence for each term of the key 
-            ///</summary>
-            public KeyInfo Copy()
-            {
-                return (KeyInfo)MemberwiseClone();
-            }
-        };
+        public KeyInfo Copy()
+        {
+            return (KeyInfo)MemberwiseClone();
+        }
+    };
 
 
 
 
-    }
+}

@@ -13,6 +13,7 @@ using yDbMask = System.Int32;
 
 namespace Community.CsharpSqlite.Engine.Op
 {
+    using Utils;
     public static class Others
     {
         public static RuntimeException Exec(CPU cpu,OpCode opcode,VdbeOp pOp)
@@ -153,37 +154,6 @@ namespace Community.CsharpSqlite.Engine.Op
 
 
 
-                ///
-                ///<summary>
-                ///Opcode: Count P1 P2 * * *
-                ///
-                ///Store the number of entries (an integer value) in the table or index
-                ///opened by cursor P1 in register P2
-                ///
-                ///</summary>
-#if !SQLITE_OMIT_BTREECOUNT
-                case OpCode.OP_Count:
-                    {
-                        ///
-                        ///<summary>
-                        ///</summary>
-                        ///<param name="out2">prerelease </param>
-                        i64 nEntry = 0;
-                        BtCursor pCrsr;
-                        pCrsr = vdbe.OpenCursors[pOp.p1].pCursor;
-                        if (pCrsr != null)
-                        {
-                            cpu.rc = pCrsr.sqlite3BtreeCount(ref nEntry);
-                        }
-                        else
-                        {
-                            nEntry = 0;
-                        }
-                        cpu.pOut.u.AsInteger = nEntry;
-                        break;
-                    }
-#endif
-
 
 
 
@@ -211,22 +181,14 @@ namespace Community.CsharpSqlite.Engine.Op
                 ///<param name=""></param>
                 case OpCode.OP_ReadCookie:
                     {
-                        ///
-                        ///<summary>
-                        ///</summary>
-                        ///<param name="out2">prerelease </param>
-                        u32 iMeta;
-                        int iDb;
-                        int iCookie;
-                        iMeta = 0;
-                        iDb = pOp.p1;
-                        iCookie = pOp.p3;
+                        ///"out2"-prerelease                         
+                        var iDb= pOp.p1;                        
+                        var iCookie = (BTreeProp)pOp.p3;
                         Debug.Assert(pOp.p3 < Sqlite3.SQLITE_N_BTREE_META);
                         Debug.Assert(iDb >= 0 && iDb < vdbe.db.BackendCount);
                         Debug.Assert(vdbe.db.Backends[iDb].BTree != null);
-                        Debug.Assert((vdbe.btreeMask & (((yDbMask)1) << iDb)) != 0);
-                        iMeta = vdbe.db.Backends[iDb].BTree.sqlite3BtreeGetMeta(iCookie);
-                        cpu.pOut.u.AsInteger = (int)iMeta;
+                        Debug.Assert((vdbe.btreeMask & (((yDbMask)1) << iDb)) != 0);                        
+                        cpu.pOut.u.AsInteger = (int)vdbe.db.Backends[iDb].BTree.sqlite3BtreeGetMeta(iCookie);
                         break;
                     }
                 ///
@@ -261,7 +223,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///<summary>
                         ///See note about index shifting on  OpCode.OP_ReadCookie 
                         ///</summary>
-                        cpu.rc = pDb.BTree.sqlite3BtreeUpdateMeta(pOp.p2, (u32)pIn3.u.AsInteger);
+                        cpu.rc = pDb.BTree.sqlite3BtreeUpdateMeta((BTreeProp)pOp.p2, (u32)pIn3.u.AsInteger);
                         if (pOp.p2 == (int)BTreeProp.SCHEMA_VERSION)
                         {
                             ///
@@ -333,7 +295,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         }
                         if (iMeta != pOp.p2 || iGen != pOp.p3)
                         {
-                            vdbe.db.sqlite3DbFree(ref vdbe.zErrMsg);
+                            vdbe.db.DbFree(ref vdbe.zErrMsg);
                             vdbe.zErrMsg = "database schema has changed";
                             // sqlite3DbStrDup(db, "database schema has changed");
                             ///
@@ -367,28 +329,6 @@ namespace Community.CsharpSqlite.Engine.Op
 
 
 
-
-                ///
-                ///<summary>
-                ///Opcode: Sequence P1 P2 * * *
-                ///
-                ///Find the next available sequence number for cursor P1.
-                ///Write the sequence number into register P2.
-                ///The sequence number on the cursor is incremented after this
-                ///instruction.
-                ///
-                ///</summary>
-                case OpCode.OP_Sequence:
-                    {
-                        ///
-                        ///<summary>
-                        ///</summary>
-                        ///<param name="out2">prerelease </param>
-                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
-                        Debug.Assert(vdbe.OpenCursors[pOp.p1] != null);
-                        cpu.pOut.u.AsInteger = (long)vdbe.OpenCursors[pOp.p1].seqCount++;
-                        break;
-                    }
 
 
 
@@ -426,195 +366,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         break;
                     }
 
-
-
-
-
-
-
-
-
-                ///
-                ///<summary>
-                ///Opcode: NullRow P1 * * * *
-                ///
-                ///Move the cursor P1 to a null row.  Any  OpCode.OP_Column operations
-                ///that occur while the cursor is on the null row will always
-                ///write a NULL.
-                ///
-                ///</summary>
-                case OpCode.OP_NullRow:
-                    {
-                        VdbeCursor pC;
-                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
-                        pC = vdbe.OpenCursors[pOp.p1];
-                        Debug.Assert(pC != null);
-                        pC.nullRow = true;
-                        pC.rowidIsValid = false;
-                        if (pC.pCursor != null)
-                        {
-                            pC.pCursor.sqlite3BtreeClearCursor();
-                        }
-                        break;
-                    }
-
-
-
-
-
-
-
-
-
-
-
-                ///
-                ///<summary>
-                ///Opcode: Last P1 P2 * * *
-                ///
-                ///The next use of the Rowid or Column or Next instruction for P1
-                ///will refer to the last entry in the database table or index.
-                ///If the table or index is empty and P2>0, then jump immediately to P2.
-                ///If P2 is 0 or if the table or index is not empty, fall through
-                ///to the following instruction.
-                ///
-                ///</summary>
-                case OpCode.OP_Last:
-                    {
-                        ///
-                        ///<summary>
-                        ///jump 
-                        ///</summary>
-                        VdbeCursor pC;
-                        BtCursor pCrsr;
-                        int res = 0;
-                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
-                        pC = vdbe.OpenCursors[pOp.p1];
-                        Debug.Assert(pC != null);
-                        pCrsr = pC.pCursor;
-                        if (pCrsr == null)
-                        {
-                            res = 1;
-                        }
-                        else
-                        {
-                            cpu.rc = pCrsr.sqlite3BtreeLast(ref res);
-                        }
-                        pC.nullRow = res == 1 ? true : false;
-                        pC.deferredMoveto = false;
-                        pC.rowidIsValid = false;
-                        pC.cacheStatus = Sqlite3.CACHE_STALE;
-                        if (pOp.p2 > 0 && res != 0)
-                        {
-                            cpu.opcodeIndex = pOp.p2 - 1;
-                        }
-                        break;
-                    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                ///
-                ///<summary>
-                ///Opcode: ParseSchema P1 * * P4 *
-                ///
-                ///Read and parse all entries from the SQLITE_MASTER table of database P1
-                ///that match the WHERE clause P4. 
-                ///
-                ///This opcode invokes the parser to create a new virtual machine,
-                ///</summary>
-                ///<param name="then runs the new virtual machine.  It is thus a re">entrant opcode.</param>
-                ///<param name=""></param>
-                case OpCode.OP_ParseSchema:
-                    {
-                        ///
-                        ///<summary>
-                        ///Any prepared statement that invokes this opcode will hold mutexes
-                        ///on every btree.  This is a prerequisite for invoking
-                        ///sqlite3InitCallback().
-                        ///
-                        ///</summary>
-#if SQLITE_DEBUG
-																																																																																																																																				              for ( iDb = 0; iDb < db.nDb; iDb++ )
-              {
-                Debug.Assert( iDb == 1 || sqlite3BtreeHoldsMutex( db.aDb[iDb].pBt ) );
-              }
-#endif
-
-                        var db = vdbe.db;
-                        var iDb = pOp.p1;
-                        Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
-                        Debug.Assert(db.DbHasProperty(iDb, sqliteinth.DB_SchemaLoaded));
-                        ///
-                        ///<summary>
-                        ///Used to be a conditional 
-                        ///</summary>
-                        {
-                            var zMaster = sqliteinth.SCHEMA_TABLE(iDb);
-                            var initData = new InitData();
-                            initData.db = db;
-                            initData.iDb = pOp.p1;
-                            initData.pzErrMsg = vdbe.zErrMsg;
-                            var zSql = Os.io.sqlite3MPrintf(db, "SELECT name, rootpage, sql FROM '%q'.%s WHERE %s ORDER BY rowid", db.Backends[iDb].Name, zMaster, pOp.p4.z);
-                            if (String.IsNullOrEmpty(zSql))
-                            {
-                                cpu.rc = SqlResult.SQLITE_NOMEM;
-                            }
-                            else
-                            {
-                                Debug.Assert(0 == db.init.busy);
-                                db.init.busy = 1;
-                                initData.rc = SqlResult.SQLITE_OK;
-                                //Debug.Assert( 0 == db.mallocFailed );
-                                cpu.rc = legacy.sqlite3_exec(db, zSql, (dxCallback)Sqlite3.sqlite3InitCallback, (object)initData, 0);
-                                if (cpu.rc == SqlResult.SQLITE_OK)
-                                    cpu.rc = initData.rc;
-                                db.sqlite3DbFree(ref zSql);
-                                db.init.busy = 0;
-                            }
-                        }
-                        if (cpu.rc == SqlResult.SQLITE_NOMEM)
-                        {
-                            return RuntimeException.no_mem;
-                        }
-                        break;
-                    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    
 
 
 #if !SQLITE_OMIT_ANALYZE

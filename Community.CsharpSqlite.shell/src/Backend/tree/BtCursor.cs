@@ -15,6 +15,10 @@ namespace Community.CsharpSqlite.tree {
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Utils;
     using Cache;
+    public enum CursorMode {
+        ReadOnly=0,
+        ReadWrite=1
+    }
     ///
     ///<summary>
     ///A cursor is a pointer to a particular entry within a particular
@@ -79,11 +83,11 @@ namespace Community.CsharpSqlite.tree {
             ///Size of pKey, or last integer key 
             ///</summary>
             public int skipNext;
-            ///
-            ///<summary>
-            ///Prev() is noop if negative. Next() is noop if positive 
-            ///</summary>
-            public u8 wrFlag;
+        ///
+        ///<summary>
+        ///Prev() is noop if negative. Next() is noop if positive 
+        ///</summary>
+        public CursorMode wrFlag;
             ///
             ///<summary>
             ///True if writable 
@@ -1813,7 +1817,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                 {
                     int i;
                     BtShared pBt = this.pBt;
-                    pBtree.sqlite3BtreeEnter();
+                    pBtree.Enter();
                     this.sqlite3BtreeClearCursor();
                     if (this.pPrev != null)
                     {
@@ -1837,7 +1841,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                     ///<summary>
                     ///malloc_cs.sqlite3_free(ref pCur); 
                     ///</summary>
-                    pBtree.sqlite3BtreeLeave();
+                    pBtree.Exit();
                 }
                 return SqlResult.SQLITE_OK;
             }

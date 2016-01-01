@@ -1657,7 +1657,7 @@ sqlite3_result_text(context, "?000", 4, Sqlite3.SQLITE_STATIC);
                 if (zFile != null && Sqlite3ExtensionModule.sqlite3_load_extension(db, zFile, zProc, ref zErrMsg) != 0)
                 {
                     context.sqlite3_result_error(zErrMsg, -1);
-                    db.sqlite3DbFree(ref zErrMsg);
+                    db.DbFree(ref zErrMsg);
                 }
             }
 #endif
@@ -2065,7 +2065,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 {
                     return false;
                 }
-                Debug.Assert(!pExpr.ExprHasProperty(ExprFlags.EP_xIsSelect));
+                Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
                 pDef = FuncDefTraverse.sqlite3FindFunction(db, pExpr.u.zToken, StringExtensions.Strlen30(pExpr.u.zToken), 2, SqliteEncoding.UTF8, 0);
                 if (Sqlite3.NEVER(pDef == null) || (pDef.flags & FuncFlags.SQLITE_FUNC_LIKE) == 0)
                 {

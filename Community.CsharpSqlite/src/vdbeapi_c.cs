@@ -520,7 +520,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
                     ///</summary>
 
                     string zErr = vdbeapi.sqlite3_value_text(db.pErr);
-                    db.sqlite3DbFree(ref v.zErrMsg);
+                    db.DbFree(ref v.zErrMsg);
                     //if ( 0 == db.mallocFailed )
                     {
                         v.zErrMsg = zErr;

@@ -1726,7 +1726,7 @@ for(idx=precision, rounder=0.4999; idx>0; idx--, rounder*=0.1);
                 _Custom.va_start(ap, zFormat);
                 z = io.sqlite3VMPrintf(db, zFormat, ap);
                 _Custom.va_end(ref ap);
-                db.sqlite3DbFree(ref zStr);
+                db.DbFree(ref zStr);
             }
             return z;
         }

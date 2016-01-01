@@ -226,7 +226,7 @@ p.zName,  P4Usage.P4_STATIC );
                                 continue;
                             Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
                             v.sqlite3VdbeAddOp2( OpCode.OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
-                            if (db.init.busy == 0)
+                            if (!db.init.IsBusy)
                             {
                                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                                 v.sqlite3VdbeAddOp3(OpCode.OP_VerifyCookie, iDb, pParse.cookieValue[iDb], (int)db.Backends[iDb].pSchema.iGeneration);
@@ -352,8 +352,8 @@ p.zName,  P4Usage.P4_STATIC );
                     pParse.ResetMembers();
                     //  memset(pParse.nVar, 0, SAVE_SZ);
                     pParse.sqlite3RunParser(zSql, ref zErrMsg);
-                    db.sqlite3DbFree(ref zErrMsg);
-                    db.sqlite3DbFree(ref zSql);
+                    db.DbFree(ref zErrMsg);
+                    db.DbFree(ref zSql);
                     pParse.RestoreMembers();
                     //  memcpy(pParse.nVar, saveBuf, SAVE_SZ);
                     pParse.nested--;
@@ -426,7 +426,7 @@ p.zName,  P4Usage.P4_STATIC );
                     DbBackend pDb = db.Backends[i];
                     if (pDb.BTree == null)
                     {
-                        db.sqlite3DbFree(ref pDb.Name);
+                        db.DbFree(ref pDb.Name);
                         continue;
                     }
                     if (j < i)
@@ -470,11 +470,11 @@ p.zName,  P4Usage.P4_STATIC );
                     pCol = pTable.aCol[i];
                     if (pCol != null && db != null)
                     {
-                        db.sqlite3DbFree(ref pCol.zName);
-                        exprc.sqlite3ExprDelete(db, ref pCol.pDflt);
-                        db.sqlite3DbFree(ref pCol.zDflt);
-                        db.sqlite3DbFree(ref pCol.zType);
-                        db.sqlite3DbFree(ref pCol.zColl);
+                        db.DbFree(ref pCol.zName);
+                        exprc.Delete(db, ref pCol.pDflt);
+                        db.DbFree(ref pCol.zDflt);
+                        db.DbFree(ref pCol.zType);
+                        db.DbFree(ref pCol.zColl);
                     }
                 }
             }
@@ -604,7 +604,10 @@ p.zName,  P4Usage.P4_STATIC );
             ///</summary>
             public static SqlResult sqlite3CheckObjectName(Parse pParse, string zName)
             {
-                if (0 == pParse.db.init.busy && pParse.nested == 0 && (pParse.db.flags & SqliteFlags.SQLITE_WriteSchema) == 0 && zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase))
+                if (0 == pParse.db.init.busy && 
+                    pParse.nested == 0 && 
+                    (pParse.db.flags & SqliteFlags.SQLITE_WriteSchema) == 0 && 
+                    zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase))
                 {
                     utilc.sqlite3ErrorMsg(pParse, "object name reserved for internal use: %s", zName);
                     return SqlResult.SQLITE_ERROR;
@@ -659,7 +662,7 @@ p.zName,  P4Usage.P4_STATIC );
                     {
                         //STRICMP(z, p.aCol[i].zName) ){
                         utilc.sqlite3ErrorMsg(pParse, "duplicate column name: %s", z);
-                        db.sqlite3DbFree(ref z);
+                        db.DbFree(ref z);
                         return;
                     }
                 }
@@ -826,15 +829,15 @@ p.zName,  P4Usage.P4_STATIC );
                         ///is required by pragma table_info.
                         ///
                         ///</summary>
-                        exprc.sqlite3ExprDelete(db, ref pCol.pDflt);
+                        exprc.Delete(db, ref pCol.pDflt);
                         pCol.pDflt = exprc.sqlite3ExprDup(db, pSpan.pExpr, Sqlite3.EXPRDUP_REDUCE);
-                        db.sqlite3DbFree(ref pCol.zDflt);
+                        db.DbFree(ref pCol.zDflt);
                         pCol.zDflt = pSpan.zStart.Substring(0, pSpan.zStart.Length - pSpan.zEnd.Length);
                         //sqlite3DbStrNDup( db, pSpan.zStart,
                         //                               (int)( pSpan.zEnd.Length - pSpan.zStart.Length ) );
                     }
                 }
-                exprc.sqlite3ExprDelete(db, ref pSpan.pExpr);
+                exprc.Delete(db, ref pSpan.pExpr);
             }
             ///<summary>
             /// Designate the PRIMARY KEY for the table.  pList is a list of names
@@ -936,7 +939,7 @@ p.zName,  P4Usage.P4_STATIC );
                         pList = null;
                     }
             primary_key_exit:
-                exprc.sqlite3ExprListDelete(pParse.db, ref pList);
+                exprc.Delete(pParse.db, ref pList);
                 return;
             }
             ///<summary>
@@ -959,7 +962,7 @@ p.zName,  P4Usage.P4_STATIC );
                 else
 #endif
                 {
-                    exprc.sqlite3ExprDelete(db, ref pCheckExpr);
+                    exprc.Delete(db, ref pCheckExpr);
                 }
             }
             ///<summary>
@@ -1006,7 +1009,7 @@ p.zName,  P4Usage.P4_STATIC );
                 }
                 else
                 {
-                    db.sqlite3DbFree(ref zColl);
+                    db.DbFree(ref zColl);
                 }
             }
             ///<summary>
@@ -1629,10 +1632,10 @@ db.xAuth = xAuth;
                 p.pFKey = pFKey;
                 pFKey = null;
             fk_end:
-                db.sqlite3DbFree(ref pFKey);
+                db.DbFree(ref pFKey);
 #endif
-                exprc.sqlite3ExprListDelete(db, ref pFromCol);
-                exprc.sqlite3ExprListDelete(db, ref pToCol);
+                exprc.Delete(db, ref pFromCol);
+                exprc.Delete(db, ref pToCol);
             }
             ///<summary>
             /// This routine is called when an INITIALLY IMMEDIATE or INITIALLY DEFERRED
@@ -1767,7 +1770,7 @@ goto exit_drop_index;
                 {
                     sqlite3BeginWriteOperation(pParse, 1, iDb);
                     build.sqlite3NestedParse(pParse, "DELETE FROM %Q.%s WHERE name=%Q AND type='index'", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), pIndex.zName);
-                    if (TableBuilder.sqlite3FindTable(db, "sqlite_stat1", db.Backends[iDb].Name) != null)
+                    if (TableBuilder.sqlite3FindTable(db, db.Backends[iDb].Name, "sqlite_stat1") != null)
                     {
                         build.sqlite3NestedParse(pParse, "DELETE FROM %Q.sqlite_stat1 WHERE idx=%Q", db.Backends[iDb].Name, pIndex.zName);
                     }
@@ -1893,10 +1896,10 @@ goto exit_drop_index;
                     return;
                 for (i = 0; i < pList.nId; i++)
                 {
-                    db.sqlite3DbFree(ref pList.a[i].zName);
+                    db.DbFree(ref pList.a[i].zName);
                 }
-                db.sqlite3DbFree(ref pList.a);
-                db.sqlite3DbFree(ref pList);
+                db.DbFree(ref pList.a);
+                db.DbFree(ref pList);
             }
             ///<summary>
             /// Return the index in pList of the identifier named zId.  Return -1
@@ -2041,13 +2044,13 @@ goto exit_drop_index;
             public static void sqlite3SrcListDelete(Connection db, ref SrcList pList)
             {
                 Action<SrcList_item> delete = pItem => {
-                    db.sqlite3DbFree(ref pItem.zDatabase);
-                    db.sqlite3DbFree(ref pItem.zName);
-                    db.sqlite3DbFree(ref pItem.zAlias);
-                    db.sqlite3DbFree(ref pItem.zIndex);
+                    db.DbFree(ref pItem.zDatabase);
+                    db.DbFree(ref pItem.zName);
+                    db.DbFree(ref pItem.zAlias);
+                    db.DbFree(ref pItem.zIndex);
                     TableBuilder.sqlite3DeleteTable(db, ref pItem.pTab);
                     SelectMethods.SelectDestructor(db, ref pItem.pSelect);
-                    exprc.sqlite3ExprDelete(db, ref pItem.pOn);
+                    exprc.Delete(db, ref pItem.pOn);
                     build.sqlite3IdListDelete(db, ref pItem.pUsing);
                 };
 
@@ -2056,7 +2059,7 @@ goto exit_drop_index;
 
                 pList.a.ForEach(delete);
                 
-                db.sqlite3DbFree(ref pList);
+                db.DbFree(ref pList);
             }
 
         
@@ -2131,7 +2134,7 @@ goto exit_drop_index;
                 return p;
             append_from_error:
                 Debug.Assert(p == null);
-                exprc.sqlite3ExprDelete(db, ref pOn);
+                exprc.Delete(db, ref pOn);
                 build.sqlite3IdListDelete(db, ref pUsing);
                 SelectMethods.SelectDestructor(db, ref pSubquery);
                 return null;
@@ -2285,7 +2288,7 @@ goto exit_drop_index;
 #endif
 )
                     {
-                        pParse.db.sqlite3DbFree(ref zName);
+                        pParse.db.DbFree(ref zName);
                         return;
                     }
                     v.sqlite3VdbeAddOp4( OpCode.OP_Savepoint, op, 0, 0, zName,  P4Usage.P4_DYNAMIC);

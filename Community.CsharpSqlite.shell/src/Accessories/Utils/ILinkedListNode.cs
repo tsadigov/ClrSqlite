@@ -10,4 +10,9 @@ namespace Community.CsharpSqlite.Utils
     {
         T pNext { get;set; }
     }
+
+    public interface IBackwardLinkedListNode<T> where T : IBackwardLinkedListNode<T>
+    {
+        T pPrev { get; set; }
+    }
 }

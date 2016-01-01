@@ -216,27 +216,7 @@ namespace Community.CsharpSqlite {
 			v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,mem,1);
 		}
 		#if !SQLITE_OMIT_FLAG_PRAGMAS
-		///<summary>
-		/// Check to see if zRight and zLeft refer to a pragma that queries
-		/// or changes one of the flags in db.flags.  Return 1 if so and 0 if not.
-		/// Also, implement the pragma.
-		///</summary>
-		struct sPragmaType {
-			public string zName;
-			///
-			///<summary>
-			///Name of the pragma 
-			///</summary>
-			public SqliteFlags mask;
-			///
-			///<summary>
-			///Mask for the db.flags value 
-			///</summary>
-			public sPragmaType(string zName,SqliteFlags mask) {
-				this.zName=zName;
-				this.mask=mask;
-			}
-		}
+		
 		static int flagPragma(Parse pParse,string zLeft,string zRight) {
 			sPragmaType[] aPragma=new sPragmaType[] {
 				new sPragmaType("full_column_names",SqliteFlags.SQLITE_FullColNames),
@@ -444,30 +424,15 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 		///<param name="True if a '">' sign preceded <value> </param>
 		) {
 			string zLeft=null;
-			///
-			///<summary>
-			///</summary>
 			///<param name="Nul">8 string <id> </param>
 			string zRight=null;
-			///
-			///<summary>
-			///</summary>
 			///<param name="Nul">8 string <value>, or NULL </param>
 			string zDb=null;
-			///
-			///<summary>
 			///The database name 
-			///</summary>
 			Token pId=new Token();
-			///
-			///<summary>
 			///Pointer to <id> token 
-			///</summary>
 			int iDb;
-			///
-			///<summary>
 			///Database index for <database> 
-			///</summary>
 			Connection db=pParse.db;
 			DbBackend pDb;
 			var v=pParse.pVdbe=Vdbe.Create(db);
@@ -475,21 +440,14 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 				return;
 			v.sqlite3VdbeRunOnlyOnce();
 			pParse.nMem=2;
-			///
-			///<summary>
 			///Interpret the [database.] part of the pragma statement. iDb is the
 			///index of the database this pragma is being applied to in db.aDb[]. 
-			///</summary>
 			iDb=build.sqlite3TwoPartName(pParse,pId1,pId2,ref pId);
 			if(iDb<0)
 				return;
 			pDb=db.Backends[iDb];
-			///
-			///<summary>
 			///If the temp database has been explicitly named as part of the
 			///pragma, make sure it is open.
-			///
-			///</summary>
 			if(iDb==1&&build.sqlite3OpenTempDatabase(pParse)!=0) {
 				return;
 			}
@@ -1158,7 +1116,7 @@ else
 																			Table pTab;
 																			if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																				goto pragma_out;
-																			pTab=TableBuilder.sqlite3FindTable(db,zRight,zDb);
+																			pTab= db.sqlite3FindTable( zDb, zRight);
 																			if(pTab!=null) {
 																				int i;
 																				int nHidden=0;
@@ -1225,7 +1183,7 @@ else
 																					Table pTab;
 																					if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																						goto pragma_out;
-																					pTab=TableBuilder.sqlite3FindTable(db,zRight,zDb);
+																					pTab=TableBuilder.sqlite3FindTable(db, zDb, zRight);
 																					if(pTab!=null) {
 																						v=pParse.sqlite3GetVdbe();
 																						pIdx=pTab.pIndex;
@@ -1292,7 +1250,7 @@ else
 																								Table pTab;
 																								if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
 																									goto pragma_out;
-																								pTab=TableBuilder.sqlite3FindTable(db,zRight,zDb);
+																								pTab=TableBuilder.sqlite3FindTable(db, zDb, zRight);
 																								if(pTab!=null) {
 																									v=pParse.sqlite3GetVdbe();
 																									pFK=pTab.pFKey;
@@ -1712,11 +1670,8 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																											///<param name="The user">version is not used internally by SQLite. It may be used by</param>
 																											///<param name="applications for any purpose.">applications for any purpose.</param>
 																											if(zLeft.Equals("schema_version",StringComparison.InvariantCultureIgnoreCase)||zLeft.Equals("user_version",StringComparison.InvariantCultureIgnoreCase)||zLeft.Equals("freelist_count",StringComparison.InvariantCultureIgnoreCase)) {
-																												int iCookie;
-																												///
-																												///<summary>
-																												///</summary>
-																												///<param name="Cookie index. 1 for schema">cookie. </param>
+                                                                                                                BTreeProp iCookie;
+																												///Cookie index. 1 for schema-cookie.
                                                                                                                 Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 																												switch(zLeft[0]) {
 																												case 'f':
@@ -1733,32 +1688,20 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																												}
                                                                                                                 if (zRight != null && iCookie != BTreeProp.FREE_PAGE_COUNT)
                                                                                                                 {
-																													///
-																													///<summary>
 																													///Write the specified cookie value 
-																													///</summary>
 																													VdbeOpList[] setCookie=new VdbeOpList[] {
 																														new VdbeOpList(OpCode.OP_Transaction,0,1,0),
-																														///
-																														///<summary>
 																														///0 
-																														///</summary>
 																														new VdbeOpList(OpCode.OP_Integer,0,1,0),
-																														///
-																														///<summary>
 																														///1 
-																														///</summary>
 																														new VdbeOpList(OpCode.OP_SetCookie,0,0,1),
-																													///
-																													///<summary>
-																													///2 
-																													///</summary>
+																													    ///2 
 																													};
 																													int addr=v.sqlite3VdbeAddOpList(Sqlite3.ArraySize(setCookie),setCookie);
 																													v.sqlite3VdbeChangeP1(addr,iDb);
 																													v.sqlite3VdbeChangeP1(addr+1,Converter.sqlite3Atoi(zRight));
 																													v.sqlite3VdbeChangeP1(addr+2,iDb);
-																													v.sqlite3VdbeChangeP2(addr+2,iCookie);
+																													v.sqlite3VdbeChangeP2(addr+2,(int)iCookie);
 																												}
 																												else {
 																													///
@@ -1782,7 +1725,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																													// Sqlite3.ArraySize(readCookie), readCookie);
 																													v.sqlite3VdbeChangeP1(addr,iDb);
 																													v.sqlite3VdbeChangeP1(addr+1,iDb);
-																													v.sqlite3VdbeChangeP3(addr+1,iCookie);
+																													v.sqlite3VdbeChangeP3(addr+1,(int)iCookie);
 																													v.sqlite3VdbeSetNumCols(1);
                                                                                                                     v.sqlite3VdbeSetColName(0, ColName.NAME, zLeft, SQLITE_TRANSIENT);
 																												}
@@ -1971,8 +1914,8 @@ sqlite3_activate_cerod(&zRight[6]);
 			}
 			#endif
 			pragma_out:
-			db.sqlite3DbFree(ref zLeft);
-			db.sqlite3DbFree(ref zRight);
+			db.DbFree(ref zLeft);
+			db.DbFree(ref zRight);
 			;
 		}
 	#endif
@@ -2004,4 +1947,31 @@ sqlite3_activate_cerod(&zRight[6]);
             this.enc = enc;
         }
     };
+
+
+#if !SQLITE_OMIT_FLAG_PRAGMAS
+    ///<summary>
+    /// Check to see if zRight and zLeft refer to a pragma that queries
+    /// or changes one of the flags in db.flags.  Return 1 if so and 0 if not.
+    /// Also, implement the pragma.
+    ///</summary>
+    struct sPragmaType
+    {
+        public string zName;
+        ///
+        ///<summary>
+        ///Name of the pragma 
+        ///</summary>
+        public SqliteFlags mask;
+        ///
+        ///<summary>
+        ///Mask for the db.flags value 
+        ///</summary>
+        public sPragmaType(string zName, SqliteFlags mask)
+        {
+            this.zName = zName;
+            this.mask = mask;
+        }
+    }
+#endif
 }

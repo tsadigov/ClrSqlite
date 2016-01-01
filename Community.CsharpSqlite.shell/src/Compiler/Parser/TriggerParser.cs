@@ -48,12 +48,12 @@ namespace Community.CsharpSqlite.Parsing
             {
                 TriggerStep pTmp = pTriggerStep;
                 pTriggerStep = pTriggerStep.pNext;
-                exprc.sqlite3ExprDelete(db, ref pTmp.pWhere);
-                exprc.sqlite3ExprListDelete(db, ref pTmp.pExprList);
+                exprc.Delete(db, ref pTmp.pWhere);
+                exprc.Delete(db, ref pTmp.pExprList);
                 SelectMethods.SelectDestructor(db, ref pTmp.pSelect);
                 build.sqlite3IdListDelete(db, ref pTmp.pIdList);
                 pTriggerStep = null;
-                db.sqlite3DbFree(ref pTmp);
+                db.DbFree(ref pTmp);
             }
         }
         ///<summary>
@@ -359,10 +359,10 @@ goto trigger_cleanup;
             Debug.Assert(pParse.pNewTrigger == null);
             pParse.pNewTrigger = pTrigger;
         trigger_cleanup:
-            db.sqlite3DbFree(ref zName);
+            db.DbFree(ref zName);
             build.sqlite3SrcListDelete(db, ref pTableName);
             build.sqlite3IdListDelete(db, ref pColumns);
-            exprc.sqlite3ExprDelete(db, ref pWhen);
+            exprc.Delete(db, ref pWhen);
             if (pParse.pNewTrigger == null)
             {
                 sqlite3DeleteTrigger(db, ref pTrigger);
@@ -439,7 +439,7 @@ goto trigger_cleanup;
                 z = pAll.zRestSql.Substring(0, pAll.Length);
                 //sqlite3DbStrNDup( db, (char*)pAll.z, pAll.n );
                 build.sqlite3NestedParse(pParse, "INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), zName, pTrig.table, z);
-                db.sqlite3DbFree(ref z);
+                db.DbFree(ref z);
                 build.sqlite3ChangeCookie(pParse, iDb);
                 v.sqlite3VdbeAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "type='trigger' AND name='%q'", zName));
             }
@@ -596,7 +596,7 @@ goto trigger_cleanup;
             //{
             //  build.sqlite3IdListDelete( db, ref pColumn );
             //}
-            exprc.sqlite3ExprListDelete(db, ref pEList);
+            exprc.Delete(db, ref pEList);
             SelectMethods.SelectDestructor(db, ref pSelect);
             return pTriggerStep;
         }
@@ -636,8 +636,8 @@ goto trigger_cleanup;
             pTriggerStep.pWhere = exprc.sqlite3ExprDup(db, pWhere, Sqlite3.EXPRDUP_REDUCE);
             pTriggerStep.orconf = orconf;
             //}
-            exprc.sqlite3ExprListDelete(db, ref pEList);
-            exprc.sqlite3ExprDelete(db, ref pWhere);
+            exprc.Delete(db, ref pEList);
+            exprc.Delete(db, ref pWhere);
             return pTriggerStep;
         }
         ///<summary>
@@ -667,7 +667,7 @@ goto trigger_cleanup;
             pTriggerStep.pWhere = exprc.sqlite3ExprDup(db, pWhere, Sqlite3.EXPRDUP_REDUCE);
             pTriggerStep.orconf = OnConstraintError.OE_Default;
             //}
-            exprc.sqlite3ExprDelete(db, ref pWhere);
+            exprc.Delete(db, ref pWhere);
             return pTriggerStep;
         }
         ///<summary>
@@ -679,12 +679,12 @@ goto trigger_cleanup;
             if (pTrigger == null)
                 return;
             sqlite3DeleteTriggerStep(db, ref pTrigger.step_list);
-            db.sqlite3DbFree(ref pTrigger.zName);
-            db.sqlite3DbFree(ref pTrigger.table);
-            exprc.sqlite3ExprDelete(db, ref pTrigger.pWhen);
+            db.DbFree(ref pTrigger.zName);
+            db.DbFree(ref pTrigger.table);
+            exprc.Delete(db, ref pTrigger.pWhen);
             build.sqlite3IdListDelete(db, ref pTrigger.pColumns);
             pTrigger = null;
-            db.sqlite3DbFree(ref pTrigger);
+            db.DbFree(ref pTrigger);
         }
         ///<summary>
         /// This function is called to drop a trigger from the database schema.
@@ -1107,7 +1107,7 @@ return;
             }
             else
             {
-                pFrom.db.sqlite3DbFree(ref pFrom.zErrMsg);
+                pFrom.db.DbFree(ref pFrom.zErrMsg);
             }
         }
         ///<summary>
@@ -1243,7 +1243,7 @@ return;
                         iEndTrigger = v.sqlite3VdbeMakeLabel();
                         pSubParse.sqlite3ExprIfFalse(pWhen, iEndTrigger, sqliteinth.SQLITE_JUMPIFNULL);
                     }
-                    exprc.sqlite3ExprDelete(db, ref pWhen);
+                    exprc.Delete(db, ref pWhen);
                 }
                 ///
                 ///<summary>

@@ -3093,7 +3093,7 @@ return 0;
         String s = new String(' ', left) + str + new String(' ', right);
         return s;
     }
-    static void print(TokenType tk,String tkn) {
+    public static void print(TokenType tk,String tkn) {
         var tkString = (tk == TokenType.TK_SPACE ? "." : tk.ToString().Replace("TK_", String.Empty));
         int length = Math.Max(tkn.Length, tkString.Length + 2);
 
@@ -3101,13 +3101,13 @@ return 0;
         Console.ForegroundColor = colors.First(x => x.Item1.Contains(tk)).Item2;
         var left = Console.CursorLeft;
         Console.Write(pad(tkn.ToString(), length));
-        Console.CursorLeft = left;
-        Console.CursorTop += 2;
-        Console.CursorLeft = left;
+        //Console.CursorLeft = left;
+        //Console.CursorTop += 2;
+        //Console.CursorLeft = left;
         //Console.ForegroundColor = ConsoleColor.DarkGray;
-        Console.Write(pad(tkString, length));
-        Console.CursorTop -= 2;
-        Console.ForegroundColor = clr;        
+        //Console.Write(pad(tkString, length));
+        //Console.CursorTop -= 2;
+        //Console.ForegroundColor = clr;        
     }
     private static int testtokenize(StringBuilder zFirstCmd,int leftAt)
     {

@@ -894,7 +894,7 @@ break;
 			while(db.pSavepoint!=null) {
 				Savepoint pTmp=db.pSavepoint;
 				db.pSavepoint=pTmp.pNext;
-				db.sqlite3DbFree(ref pTmp);
+				db.DbFree(ref pTmp);
 			}
 			db.nSavepoint=0;
 			db.nStatement=0;
@@ -913,7 +913,7 @@ break;
 				pDestructor.nRef--;
 				if(pDestructor.nRef==0) {
 					//pDestructor.xDestroy( pDestructor.pUserData );
-					db.sqlite3DbFree(ref pDestructor);
+					db.DbFree(ref pDestructor);
 				}
 			}
 		}
@@ -1006,7 +1006,7 @@ break;
 					while(p!=null) {
 						functionDestroy(db,p);
 						pNext=p.pNext;
-						db.sqlite3DbFree(ref p);
+						db.DbFree(ref p);
 						p=pNext;
 					}
 				}
@@ -1024,7 +1024,7 @@ break;
 						pColl[j].xDel(ref pColl[j].pUser);
 					}
 				}
-				db.sqlite3DbFree(ref pColl);
+				db.DbFree(ref pColl);
 			}
             db.aCollSeq.sqlite3HashClear();
 			#if !SQLITE_OMIT_VIRTUALTABLE
@@ -1033,7 +1033,7 @@ break;
 				if(pMod.xDestroy!=null) {
 					pMod.xDestroy(ref pMod.pAux);
 				}
-				db.sqlite3DbFree(ref pMod);
+				db.DbFree(ref pMod);
 			}
             db.aModule.sqlite3HashClear();
 			#endif
@@ -1058,7 +1058,7 @@ break;
 			///structure?
 			///
 			///</summary>
-			db.sqlite3DbFree(ref db.Backends[1].pSchema);
+			db.DbFree(ref db.Backends[1].pSchema);
 			db.mutex.sqlite3_mutex_leave();
             db.magic = Sqlite3.SQLITE_MAGIC_CLOSED;
 			sqlite3_mutex_free(db.mutex);
@@ -1543,7 +1543,7 @@ enc = SqliteEncoding.UTF16BE;
 			if(pArg!=null&&pArg.nRef==0) {
 				Debug.Assert(rc!=SqlResult.SQLITE_OK);
 				//xDestroy(p);
-				db.sqlite3DbFree(ref pArg);
+				db.DbFree(ref pArg);
 			}
 			//_out:
 			rc=malloc_cs.sqlite3ApiExit(db,rc);
@@ -3110,7 +3110,7 @@ error_out:
 				if(pBtree!=null) {
 					Pager pPager;
 					sqlite3_file fd;
-                    pBtree.sqlite3BtreeEnter();
+                    pBtree.Enter();
 					pPager=pBtree.sqlite3BtreePager();
 					Debug.Assert(pPager!=null);
 					fd=pPager.sqlite3PagerFile();
@@ -3130,7 +3130,7 @@ error_out:
 						else {
 							rc=SqlResult.SQLITE_NOTFOUND;
 						}
-                    pBtree.sqlite3BtreeLeave();
+                    pBtree.Exit();
 				}
 			}
 			db.mutex.sqlite3_mutex_leave();

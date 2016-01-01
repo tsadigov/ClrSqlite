@@ -562,7 +562,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		public static void importVtabErrMsg(Vdbe p,sqlite3_vtab pVtab) {
 			Connection db=p.db;
-			db.sqlite3DbFree(ref p.zErrMsg);
+			db.DbFree(ref p.zErrMsg);
 			p.zErrMsg=pVtab.zErrMsg;
 			// sqlite3DbStrDup( db, pVtab.zErrMsg );
 			//malloc_cs.sqlite3_free( pVtab.zErrMsg );

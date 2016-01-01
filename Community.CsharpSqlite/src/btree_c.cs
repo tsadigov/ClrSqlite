@@ -68,25 +68,11 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
     {
         public static class BTreeMethods
         {
-            //# define sqlite3BtreeLeave(X)
-            public static void sqlite3BtreeLeave(this Btree X)
-            {
-            }
-
-
-            ///<summary>
-            /// If we are not using shared cache, then there is no need to
-            /// use mutexes to access the BtShared structures.  So make the
-            /// Enter and Leave procedures no-ops.
-            ///</summary>
 #if !SQLITE_OMIT_SHARED_CACHE
 																																						//void sqlite3BtreeEnter(Btree);
 //void sqlite3BtreeEnterAll(sqlite3);
 #else
-            //# define sqlite3BtreeEnter(X)
-            public static void sqlite3BtreeEnter(this Btree bt)
-            {
-            }
+          
 
             //# define sqlite3BtreeEnterAll(X)
             public static void sqlite3BtreeEnterAll(this Connection p)
@@ -94,6 +80,7 @@ static void TRACE(string X, params object[] ap) { if (sqlite3BtreeTrace)  printf
             }
 
 #endif
+
 
             ///<summary>
             /// These macros define the location of the pointer-map entry for a
@@ -889,7 +876,7 @@ return removed;
                 ///Close all cursors opened via this handle.  
                 ///</summary>
                 Debug.Assert(p.db.mutex.sqlite3_mutex_held());
-                p.sqlite3BtreeEnter();
+                p.Enter();
                 pCur = pBt.pCursor;
                 while (pCur != null)
                 {
@@ -908,7 +895,7 @@ return removed;
                 ///<param name="this handle.">this handle.</param>
                 ///<param name=""></param>
                 p.sqlite3BtreeRollback();
-                p.sqlite3BtreeLeave();
+                p.Exit();
                 ///
                 ///<summary>
                 ///</summary>
@@ -3403,7 +3390,7 @@ return rc;
                     ///
                     ///</summary>
                     Debug.Assert(pBt.pPage1.pDbPage.sqlite3PagerIswriteable());
-                    rc = p.sqlite3BtreeUpdateMeta(4, pgnoRoot);
+                    rc = p.sqlite3BtreeUpdateMeta(BTreeProp.LARGEST_ROOT_PAGE, pgnoRoot);
                     if (NEVER(rc != 0))
                     {
                         BTreeMethods.releasePage(pRoot);
