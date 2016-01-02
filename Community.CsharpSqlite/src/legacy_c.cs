@@ -99,163 +99,125 @@ namespace Community.CsharpSqlite
 
         static public SqlResult Exec<T>(
             this Connection db, ///The database on which the SQL executes 
-            string zSql, ///The SQL to be executed 
-            //sqlite3_callback 
-            dxCallback<T> xCallback, ///Invoke this callback routine 
+            string zSql, ///The SQL to be executed             
+            dxCallback<T> xCallback, ///Invoke this callback routine  //sqlite3_callback 
             T pArg, ///First argument to xCallback() 
             ref string pzErrMsg///Write error messages here 
         )
         {
-            ///Return code 
-            SqlResult result = SqlResult.SQLITE_OK;
-
-            ///Tail of unprocessed SQL 
-            string zLeftover = "";
-
-            ///The current SQL statement 
-            sqlite3_stmt pStmt = null;
-
-            ///Names of result columns 
-            string[] azCols = null;
-
-            ///Number of retry attempts
-            int nRetry = 0;
-
-            ///True if callback data is initialized 
-            int callbackIsInit;
+            SqlResult result = SqlResult.SQLITE_OK;///Return code 
+            string zLeftover = "";///Tail of unprocessed SQL 
+            sqlite3_stmt pStmt = null;///The current SQL statement 
+            string[] ColumnNames = null;
+            int nRetry = 0;///Number of retry attempts
 
 
             if (!utilc.sqlite3SafetyCheckOk(db))
                 return sqliteinth.SQLITE_MISUSE_BKPT();
             if (zSql == null)
                 zSql = "";
-            db.mutex.Enter();
-            utilc.sqlite3Error(db, SqlResult.SQLITE_OK, 0);
-            while ((result == SqlResult.SQLITE_OK || (result == SqlResult.SQLITE_SCHEMA && (++nRetry) < 2)) && zSql != "")
+            using (db.mutex.scope())
             {
-                int nCol;
-                string[] azVals = null;
-                pStmt = null;
-                result = (SqlResult)Sqlite3.sqlite3_prepare(db, zSql, -1, ref pStmt, ref zLeftover);
-                Debug.Assert(result == SqlResult.SQLITE_OK || pStmt == null);
-                if (result != SqlResult.SQLITE_OK)
+                utilc.sqlite3Error(db, SqlResult.SQLITE_OK, 0);
+                while ((result == SqlResult.SQLITE_OK || (result == SqlResult.SQLITE_SCHEMA && (++nRetry) < 2)) && zSql != "")
                 {
-                    continue;
-                }
-                if (pStmt == null)
-                {
-                    ///this happens for a comment or white-space 
-                    zSql = zLeftover;
-                    continue;
-                }
-                callbackIsInit = 0;
-                nCol = pStmt.getColumnCount();
-                while (true)
-                {
-                    int i;
-                    result = vdbeapi.sqlite3_step(pStmt);
-
-                    ///Invoke the callback function if required 
-                    if (xCallback != null && (SqlResult.SQLITE_ROW == result || (SqlResult.SQLITE_DONE == result && callbackIsInit == 0 && (db.flags & SqliteFlags.SQLITE_NullCallback) != 0)))
+                    #region compile program
+                    pStmt = null;
+                    result = Sqlite3.sqlite3_prepare(db, zSql, -1, ref pStmt, ref zLeftover);
+                    Debug.Assert(result == SqlResult.SQLITE_OK || pStmt == null);
+                    if (result != SqlResult.SQLITE_OK)
                     {
-                        #region get column names
-                        if (0 == callbackIsInit)
+                        continue;
+                    }
+                    if (pStmt == null)
+                    {
+                        ///this happens for a comment or white-space 
+                        zSql = zLeftover;
+                        continue;
+                    }
+                    var callbackIsInit = false;///True if callback data is initialized 
+                    var nCol = pStmt.getColumnCount();
+                    #endregion
+
+                    while (true)
+                    {                        
+                        result = vdbeapi.sqlite3_step(pStmt);
+
+                        ///Invoke the callback function if required 
+                        if (xCallback != null && (SqlResult.SQLITE_ROW == result || (SqlResult.SQLITE_DONE == result && !callbackIsInit  && (db.flags & SqliteFlags.SQLITE_NullCallback) != 0)))
                         {
-                            //sqlite3DbMallocZero(db, 2*nCol*sizeof(const char*) + 1);
-                            //if ( azCols == null )
-                            //{
-                            //  goto exec_out;
-                            //}
+                            #region get column names
+                            if (!callbackIsInit)
+                            {                                
+                                ColumnNames = Enumerable.Range(0, nCol)
+                                    .Select(idx =>pStmt.get_column_name(idx)).ToArray();//GUARD: Debug.Assert(null != name);///sqlite3VdbeSetColName() installs column names as UTF8///strings so there is no way for vdbeapi.sqlite3_column_name() to fail.
+                                
+                                callbackIsInit = true;
+                            }
+                            #endregion
 
-                            azCols = Enumerable.Range(0, nCol)
-                                .Select(idx => {
-                                    var name = pStmt.get_column_name(idx);
-                                    ///sqlite3VdbeSetColName() installs column names as UTF8
-                                    ///strings so there is no way for vdbeapi.sqlite3_column_name() to fail.
-                                    Debug.Assert(null != name);
+                            ///get field values
+                            string[] rowData = SqlResult.SQLITE_ROW == result
+                                            ? Enumerable.Range(0, nCol).Select(i => pStmt.get_column_text(i)).ToArray()//GUARD://db.mallocFailed = 1;//goto exec_out;// azCols[nCol];
+                                            : null;
+                            
 
-                                    return name;
-                                })
-                                .ToArray();
-
-
-                            callbackIsInit = 1;
-                        }
-                        #endregion
-
-                        #region get field values
-                        if (result == SqlResult.SQLITE_ROW)
-                        {
-                            azVals = new string[nCol];
-                            // azCols[nCol];
-                            for (i = 0; i < nCol; i++)
+                            if (xCallback(pArg, nCol, rowData, ColumnNames) != 0)//-----<<----------<<----------<<----------<<-----
                             {
-                                azVals[i] = pStmt.get_column_text(i);
-                                if (azVals[i] == null && pStmt.get_column_type(i) != FoundationalType.SQLITE_NULL)
+                                result = SqlResult.SQLITE_ABORT;
+                                vdbeaux.sqlite3VdbeFinalize(ref pStmt);
+                                pStmt = null;
+                                utilc.sqlite3Error(db, SqlResult.SQLITE_ABORT, 0);
+                                goto exec_out;
+                            }
+                        }
+                        if (SqlResult.SQLITE_ROW != result)
+                        {
+                            result = (SqlResult)vdbeaux.sqlite3VdbeFinalize(ref pStmt);
+                            pStmt = null;
+                            if (SqlResult.SQLITE_SCHEMA != result)
+                            {
+                                nRetry = 0;
+                                if ((zSql = zLeftover) != "")
                                 {
-                                    //db.mallocFailed = 1;
-                                    //goto exec_out;
+                                    int zindex = 0;
+                                    while (zindex < zSql.Length && CharExtensions.sqlite3Isspace(zSql[zindex]))
+                                        zindex++;
+                                    if (zindex != 0)
+                                        zSql = zindex < zSql.Length ? zSql.Substring(zindex) : "";
                                 }
                             }
-                        }
-                        #endregion
-
-                        if (xCallback(pArg, nCol, azVals, azCols) != 0)//-----<<----------<<----------<<----------<<-----
-                        {
-                            result = SqlResult.SQLITE_ABORT;
-                            vdbeaux.sqlite3VdbeFinalize(ref pStmt);
-                            pStmt = null;
-                            utilc.sqlite3Error(db, SqlResult.SQLITE_ABORT, 0);
-                            goto exec_out;
+                            break;
                         }
                     }
-                    if (SqlResult.SQLITE_ROW != result)
-                    {
-                        result = (SqlResult)vdbeaux.sqlite3VdbeFinalize(ref pStmt);
-                        pStmt = null;
-                        if (SqlResult.SQLITE_SCHEMA != result)
-                        {
-                            nRetry = 0;
-                            if ((zSql = zLeftover) != "")
-                            {
-                                int zindex = 0;
-                                while (zindex < zSql.Length && CharExtensions.sqlite3Isspace(zSql[zindex]))
-                                    zindex++;
-                                if (zindex != 0)
-                                    zSql = zindex < zSql.Length ? zSql.Substring(zindex) : "";
-                            }
-                        }
-                        break;
-                    }
+                    db.DbFree(ref ColumnNames);
+                    ColumnNames = null;
                 }
-                db.DbFree(ref azCols);
-                azCols = null;
+                exec_out:
+                if (pStmt != null)
+                    vdbeaux.sqlite3VdbeFinalize(ref pStmt);
+                db.DbFree(ref ColumnNames);
+                result = (SqlResult)malloc_cs.sqlite3ApiExit(db, result);
+                if (result != SqlResult.SQLITE_OK && Sqlite3.ALWAYS(result == (SqlResult)Sqlite3.sqlite3_errcode(db)) && pzErrMsg != null)
+                {
+                    //int nErrMsg = 1 + StringExtensions.sqlite3Strlen30(sqlite3_errmsg(db));
+                    //pzErrMsg = malloc_cs.sqlite3Malloc(nErrMsg);
+                    //if (pzErrMsg)
+                    //{
+                    //   memcpy(pzErrMsg, sqlite3_errmsg(db), nErrMsg);
+                    //}else{
+                    //rc = SQLITE_NOMEM;
+                    //utilc.sqlite3Error(db, SQLITE_NOMEM, 0);
+                    //}
+                    pzErrMsg = Sqlite3.sqlite3_errmsg(db);
+                }
+                else
+                    if (pzErrMsg != "")
+                {
+                    pzErrMsg = "";
+                }
+                Debug.Assert((result & (SqlResult)db.errMask) == result);
             }
-            exec_out:
-            if (pStmt != null)
-                vdbeaux.sqlite3VdbeFinalize(ref pStmt);
-            db.DbFree(ref azCols);
-            result = (SqlResult)malloc_cs.sqlite3ApiExit(db, result);
-            if (result != SqlResult.SQLITE_OK && Sqlite3.ALWAYS(result == (SqlResult)Sqlite3.sqlite3_errcode(db)) && pzErrMsg != null)
-            {
-                //int nErrMsg = 1 + StringExtensions.sqlite3Strlen30(sqlite3_errmsg(db));
-                //pzErrMsg = malloc_cs.sqlite3Malloc(nErrMsg);
-                //if (pzErrMsg)
-                //{
-                //   memcpy(pzErrMsg, sqlite3_errmsg(db), nErrMsg);
-                //}else{
-                //rc = SQLITE_NOMEM;
-                //utilc.sqlite3Error(db, SQLITE_NOMEM, 0);
-                //}
-                pzErrMsg = Sqlite3.sqlite3_errmsg(db);
-            }
-            else
-                if (pzErrMsg != "")
-            {
-                pzErrMsg = "";
-            }
-            Debug.Assert((result & (SqlResult)db.errMask) == result);
-            db.mutex.Exit();
             return result;
         }
 

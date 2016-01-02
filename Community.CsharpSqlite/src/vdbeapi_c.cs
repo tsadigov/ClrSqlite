@@ -948,18 +948,17 @@ return p.pMem.n;
             /// or a constant) then useTypes 2, 3, and 4 return NULL.
             ///
             ///</summary>
-            public static string columnName(sqlite3_stmt pStmt, int N, dxColname xFunc, ColName useType)
+            public static string columnName(this sqlite3_stmt p, int idx, dxColname xFunc, ColName useType)
             {
                 string ret = null;
-                Vdbe p = pStmt;
                 var db = p.db;
                 Debug.Assert(db != null);
-                var n = pStmt.getColumnCount();
-                if (N < n && N >= 0)
+                var n = p.getColumnCount();
+                if (idx < n && idx >= 0)
                 {
-                    N += (int)useType * n;
+                    idx += (int)useType * n;
                     using (db.mutex.scope())
-                        ret = xFunc(p.aColName[N]);
+                        ret = xFunc(p.aColName[idx]);
                 }
                 return ret;
             }

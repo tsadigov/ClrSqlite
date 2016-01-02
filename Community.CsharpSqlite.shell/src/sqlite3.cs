@@ -257,7 +257,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///Last statement is orphaned TEMP trigger 
                 ///</summary>
-                public u8 orphanTrigger;
+                public bool orphanTrigger { get; set; }
 
             void IBusyScope.Enter()
             {

@@ -132,7 +132,8 @@ namespace Community.CsharpSqlite
 #endif
                         goto initone_error_out;
                     }
-                    openedTransaction = 1;
+                    else
+                        openedTransaction = 1;
                 }
 
                 #region setup btree meta properties
@@ -729,34 +730,13 @@ db.xAuth = 0;
             string sOut = null;
             return sqlite3LockAndPrepare(db, zSql, nBytes, saveSqlFlag, pOld, ref ppStmt, ref sOut);
         }
-        static SqlResult sqlite3LockAndPrepare(Connection db,///
-                                                             ///<summary>
-                                                             ///Database handle. 
-                                                             ///</summary>
-       string zSql,///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="UTF">8 encoded SQL statement. </param>
-        int nBytes,///
-                   ///<summary>
-                   ///Length of zSql in bytes. 
-                   ///</summary>
-     int saveSqlFlag,///
-                        ///<summary>
-                        ///True to copy SQL text into the sqlite3_stmt 
-                        ///</summary>
-        Vdbe pOld,///
-                  ///<summary>
-                  ///VM being reprepared 
-                  ///</summary>
-      ref sqlite3_stmt ppStmt,///
-                                ///<summary>
-                                ///OUT: A pointer to the prepared statement 
-                                ///</summary>
-        ref string pzTail///
-                         ///<summary>
-                         ///OUT: End of parsed string 
-                         ///</summary>
+        static SqlResult sqlite3LockAndPrepare(Connection db,///Database handle. 
+            string zSql, ///<param name="UTF">8 encoded SQL statement. </param>
+            int nBytes,///Length of zSql in bytes.                    
+            int saveSqlFlag,///True to copy SQL text into the sqlite3_stmt                      
+                    Vdbe pOld,///VM being reprepared 
+      ref sqlite3_stmt ppStmt,///OUT: A pointer to the prepared statement 
+        ref string pzTail///OUT: End of parsed string                          
        )
         {
             SqlResult rc;
@@ -798,10 +778,7 @@ db.xAuth = 0;
             Debug.Assert(p.sqlite3VdbeDb().mutex.sqlite3_mutex_held());
             zSql = vdbeaux.sqlite3_sql((sqlite3_stmt)p);
             Debug.Assert(zSql != null);
-            ///
-            ///<summary>
             ///Reprepare only called for prepare_v2() statements 
-            ///</summary>
             db = p.sqlite3VdbeDb();
             Debug.Assert(db.mutex.sqlite3_mutex_held());
             rc = sqlite3LockAndPrepare(db, zSql, -1, 0, p, ref pNew, 0);
@@ -824,26 +801,11 @@ db.xAuth = 0;
             return SqlResult.SQLITE_OK;
         }
         //C# Overload for ignore error out
-        static public SqlResult sqlite3_prepare(Connection db,///
-                                                              ///<summary>
-                                                              ///Database handle. 
-                                                              ///</summary>
-      string zSql,///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="UTF">8 encoded SQL statement. </param>
-        int nBytes,///
-                   ///<summary>
-                   ///Length of zSql in bytes. 
-                   ///</summary>
-     ref sqlite3_stmt ppStmt,///
-                                ///<summary>
-                                ///OUT: A pointer to the prepared statement 
-                                ///</summary>
-        int dummy///
-                 ///<summary>
-                 ///OUT: End of parsed string 
-                 ///</summary>
+        static public SqlResult sqlite3_prepare(Connection db,///Database handle. 
+            string zSql,///<param name="UTF">8 encoded SQL statement. </param>
+            int nBytes,///Length of zSql in bytes.                    
+            ref sqlite3_stmt ppStmt,///OUT: A pointer to the prepared statement 
+            int dummy///OUT: End of parsed string                  
        )
         {
             string sOut = null;
@@ -858,35 +820,17 @@ db.xAuth = 0;
         /// occurs.
         ///
         ///</summary>
-        static public SqlResult sqlite3_prepare(Connection db,///
-                                                              ///<summary>
-                                                              ///Database handle. 
-                                                              ///</summary>
-      string zSql,///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="UTF">8 encoded SQL statement. </param>
-        int nBytes,///
-                   ///<summary>
-                   ///Length of zSql in bytes. 
-                   ///</summary>
-     ref sqlite3_stmt ppStmt,///
-                                ///<summary>
-                                ///OUT: A pointer to the prepared statement 
-                                ///</summary>
-        ref string pzTail///
-                         ///<summary>
-                         ///OUT: End of parsed string 
-                         ///</summary>
+        static public SqlResult sqlite3_prepare(Connection db,///Database handle. 
+                string zSql,  ///<param name="UTF">8 encoded SQL statement. </param>
+                int nBytes,///Length of zSql in bytes.                    
+                ref sqlite3_stmt ppStmt,///OUT: A pointer to the prepared statement 
+                ref string pzTail///OUT: End of parsed string 
        )
         {
             SqlResult rc;
             rc = sqlite3LockAndPrepare(db, zSql, nBytes, 0, null, ref ppStmt, ref pzTail);
             Debug.Assert(rc == SqlResult.SQLITE_OK || ppStmt == null);
-            ///
-            ///<summary>
             ///VERIFY: F13021 
-            ///</summary>
             return rc;
         }
         public static SqlResult sqlite3_prepare_v2(Connection db,///

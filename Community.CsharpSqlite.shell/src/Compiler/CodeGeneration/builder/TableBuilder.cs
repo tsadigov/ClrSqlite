@@ -253,7 +253,7 @@ goto begin_table_error;
                     }
                     else
                     {
-                        Debug.Assert(0 == db.init.busy);
+                        Debug.Assert(db.init.IsBusy);
                         build.sqlite3CodeVerifySchema(pParse, iDb);
                     }
                     goto begin_table_error;
@@ -308,29 +308,22 @@ goto begin_table_error;
                 ///now.
                 ///</summary>
                 var vdbEngine = pParse.sqlite3GetVdbe();
-                if (0 == db.init.busy && vdbEngine != null)
+                if (!db.init.IsBusy && vdbEngine != null)
                 {
-                    int j1;
-                    int fileFormat;
-                    int reg1, reg2, reg3;
                     build.sqlite3BeginWriteOperation(pParse, 0, iDb);
                     if (isVirtual != 0)
                     {
                         vdbEngine.sqlite3VdbeAddOp0(OpCode.OP_VBegin);
                     }
-                    ///
-                    ///<summary>
                     ///If the file format and encoding in the database have not been set,
                     ///set them now.
-                    ///
-                    ///</summary>
-                    reg1 = pParse.regRowid = ++pParse.nMem;
-                    reg2 = pParse.regRoot = ++pParse.nMem;
-                    reg3 = ++pParse.nMem;
+                    var reg1 = pParse.regRowid = ++pParse.nMem;
+                    var reg2 = pParse.regRoot = ++pParse.nMem;
+                    var reg3 = ++pParse.nMem;
                     vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, reg3,(int) BTreeProp.FILE_FORMAT);
                     Engine.vdbeaux.sqlite3VdbeUsesBtree(vdbEngine, iDb);
-                    j1 = vdbEngine.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
-                    fileFormat = (db.flags & SqliteFlags.SQLITE_LegacyFileFmt) != 0 ? 1 : sqliteinth.SQLITE_MAX_FILE_FORMAT;
+                    var j1 = vdbEngine.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
+                    var fileFormat = (db.flags & SqliteFlags.SQLITE_LegacyFileFmt) != 0 ? 1 : sqliteinth.SQLITE_MAX_FILE_FORMAT;
                     vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Integer, fileFormat, reg3);
                     vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, reg3);
                     vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Integer, (int)sqliteinth.ENC(db), reg3);
@@ -814,7 +807,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 if (pNewTable == null)
                     return;
                 Connection db = pParse.db;
-                Debug.Assert(0 == db.init.busy || pSelect == null);
+                Debug.Assert(!db.init.IsBusy || pSelect == null);
 #if !SQLITE_OMIT_CHECK
                 ///Resolve names in all CHECK constraint expressions.
                 if (pNewTable.pCheck != null)
@@ -852,7 +845,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 ///So do not write to the disk again.  Extract the root page number
                 ///for the table from the db.init.newTnum field.  (The page number
                 ///should have been put there by the sqliteOpenCb routine.)
-                if (db.init.busy != 0)
+                if (db.init.IsBusy )
                 {
                     pNewTable.tnum = db.init.newTnum;
                 }
@@ -864,15 +857,14 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 ///
                 ///If this is a TEMPORARY table, write the entry into the auxiliary
                 ///file instead of into the main database file.
-                if (0 == db.init.busy)
+                if (! db.init.IsBusy)
                 {
                     int n;
                     String zType = "";
                     ///"view" or "table" 
                     String zType2 = "";
                     ///"VIEW" or "TABLE" 
-                    String zStmt = "";
-                    ///Text of the CREATE TABLE or CREATE VIEW statement 
+                     
                     var v = pParse.sqlite3GetVdbe();
                     if (Sqlite3.NEVER(v == null))
                         return;
@@ -929,8 +921,9 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                         }
                     }
 
-                    ///Compute the complete text of the CREATE statement 
-                    if (pSelect != null)
+                String zStmt = "";///Text of the CREATE TABLE or CREATE VIEW statement
+                ///Compute the complete text of the CREATE statement 
+                if (pSelect != null)
                     {
                         zStmt = createTableStmt(db, pNewTable);
                     }

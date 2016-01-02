@@ -74,7 +74,7 @@ namespace Community.CsharpSqlite.Metadata
                 Debug.Assert(db.init.IsBusy);
                 db.init.iDb = iDb;
                 db.init.newTnum = Converter.sqlite3Atoi(argv[1]);
-                db.init.orphanTrigger = 0;
+                db.init.orphanTrigger = false;
                 //TESTONLY(rcp = ) sqlite3_prepare(db, argv[2], -1, &pStmt, 0);
 #if !NDEBUG || SQLITE_COVERAGE_TEST
 																																																																																																																								        rcp = sqlite3_prepare( db, argv[2], -1, ref pStmt, 0 );
@@ -88,7 +88,7 @@ namespace Community.CsharpSqlite.Metadata
                 db.init.iDb = 0;
                 if (SqlResult.SQLITE_OK != rc)
                 {
-                    if (db.init.orphanTrigger != 0)
+                    if (db.init.orphanTrigger )
                     {
                         Debug.Assert(iDb == 1);
                     }
@@ -115,8 +115,7 @@ namespace Community.CsharpSqlite.Metadata
                 ///constraint for a CREATE TABLE.  The index should have already
                 ///been created when we processed the CREATE TABLE.  All we have
                 ///to do here is record the root page number for that index.
-                Index pIndex;
-                pIndex = IndexBuilder.sqlite3FindIndex(db, argv[0], db.Backends[iDb].Name);
+                var pIndex = IndexBuilder.sqlite3FindIndex(db, argv[0], db.Backends[iDb].Name);
                 if (pIndex == null)
                 {
                     ///This can occur if there exists an index on a TEMP table which

@@ -1019,35 +1019,17 @@ void sqlite3VdbeLeave(Vdbe *p){
                 ///Stop when row count reaches this 
                 ///</summary>
                 int nSub = 0;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Number of sub">vdbes seen so far </param>
                 SubProgram[] apSub = null;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Array of sub">vdbes </param>
                 Mem pSub = null;
-                ///
-                ///<summary>
                 ///Memory cell hold array of subprogs 
-                ///</summary>
                 Connection db = p.db;
-                ///
-                ///<summary>
                 ///The database connection 
-                ///</summary>
                 int i;
-                ///
-                ///<summary>
                 ///Loop counter 
-                ///</summary>
                 var rc = SqlResult.SQLITE_OK;
-                ///
-                ///<summary>
                 ///Return code 
-                ///</summary>
                 if (p.pResultSet == null)
                     p.pResultSet = new Mem[0];
                 //Mem* pMem = p.pResultSet = p.aMem[1];   /* First Mem of result set */
@@ -1055,11 +1037,8 @@ void sqlite3VdbeLeave(Vdbe *p){
                 Debug.Assert(p.explain != 0);
                 Debug.Assert(p.magic == VdbeMagic.VDBE_MAGIC_RUN);
                 Debug.Assert(p.rc == SqlResult.SQLITE_OK || p.rc == SqlResult.SQLITE_BUSY || p.rc == SqlResult.SQLITE_NOMEM);
-                ///
-                ///<summary>
                 ///Even though this opcode does not use dynamic strings for
                 ///the result, result columns may become dynamic if the user calls
-                ///</summary>
                 ///<param name="sqlite3_column_text16(), causing a translation to UTF">16 encoding.</param>
                 ///<param name=""></param>
                 releaseMemArray(p.pResultSet, 8);
@@ -1084,22 +1063,16 @@ void sqlite3VdbeLeave(Vdbe *p){
                 int i_pMem;
                 if (p.explain == 1)
                 {
-                    ///
-                    ///<summary>
                     ///The first 8 memory cells are used for the result set.  So we will
                     ///commandeer the 9th cell to use as storage for an array of pointers
                     ///to trigger subprograms.  The VDBE is guaranteed to have at least 9
                     ///cells.  
-                    ///</summary>
                     Debug.Assert(p.aMem.Count() > 9);
                     pSub = p.aMem[9];
                     if ((pSub.flags & MemFlags.MEM_Blob) != 0)
                     {
-                        ///
-                        ///<summary>
                         ///On the first call to sqlite3_step(), pSub will hold a NULL.  It is
                         ///initialized to a BLOB by the  P4Usage.P4_SUBPROGRAM processing logic below 
-                        ///</summary>
                         apSub = p.aMem[9]._SubProgram;
                         //    apSub = (SubProgram*)pSub->z;
                         nSub = apSub.Length;
@@ -1140,20 +1113,14 @@ void sqlite3VdbeLeave(Vdbe *p){
                         Operation pOp;
                         if (i < p.aOp.Count())
                         {
-                            ///
-                            ///<summary>
                             ///The output line number is small enough that we are still in the
                             ///main program. 
-                            ///</summary>
                             pOp = p.lOp[i];
                         }
                         else
                         {
-                            ///
-                            ///<summary>
                             ///We are currently listing subprograms.  Figure out which one and
                             ///pick up the appropriate opcode. 
-                            ///</summary>
                             int j;
                             i -= p.aOp.Count();
                             for (j = 0; i >= apSub[j].nOp; j++)
@@ -1167,10 +1134,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             pMem.flags = MemFlags.MEM_Int;
                             pMem.ValType = FoundationalType.SQLITE_INTEGER;
                             pMem.u.AsInteger = i;
-                            ///
-                            ///<summary>
                             ///Program counter 
-                            ///</summary>
                             if (p.pResultSet[i_pMem] == null)
                             {
                                 p.pResultSet[i_pMem] = malloc_cs.sqlite3Malloc(p.pResultSet[i_pMem]);
@@ -1178,7 +1142,6 @@ void sqlite3VdbeLeave(Vdbe *p){
                             pMem = p.pResultSet[i_pMem++];
                             //pMem++;
                             ///
-                            ///<summary>
                             ///When an OP_Program opcode is encounter (the only opcode that has
                             ///a  P4Usage.P4_SUBPROGRAM argument), expand the size of the array of subprograms
                             ///</summary>
@@ -1187,10 +1150,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                             ///<param name=""></param>
                             pMem.flags = MemFlags.MEM_Static | MemFlags.MEM_Str | MemFlags.MEM_Term;
                             pMem.AsString = Sqlite3.sqlite3OpcodeName(pOp.OpCode);
-                            ///
-                            ///<summary>
                             ///Opcode 
-                            ///</summary>
                             Debug.Assert(pMem.AsString != null);
                             pMem.CharacterCount = StringExtensions.Strlen30(pMem.AsString);
                             pMem.ValType = FoundationalType.SQLITE_TEXT;
@@ -1226,10 +1186,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         }
                         pMem.flags = MemFlags.MEM_Int;
                         pMem.u.AsInteger = pOp.p1;
-                        ///
-                        ///<summary>
                         ///P1 
-                        ///</summary>
                         pMem.ValType = FoundationalType.SQLITE_INTEGER;
                         if (p.pResultSet[i_pMem] == null)
                         {
@@ -1240,10 +1197,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         //pMem++;
                         pMem.flags = MemFlags.MEM_Int;
                         pMem.u.AsInteger = pOp.p2;
-                        ///
-                        ///<summary>
                         ///P2 
-                        ///</summary>
                         pMem.ValType = FoundationalType.SQLITE_INTEGER;
                         if (p.pResultSet[i_pMem] == null)
                         {
@@ -1254,10 +1208,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         //pMem++;
                         pMem.flags = MemFlags.MEM_Int;
                         pMem.u.AsInteger = pOp.p3;
-                        ///
-                        ///<summary>
                         ///P3 
-                        ///</summary>
                         pMem.ValType = FoundationalType.SQLITE_INTEGER;
                         if (p.pResultSet[i_pMem] == null)
                         {
@@ -1338,6 +1289,22 @@ void sqlite3VdbeLeave(Vdbe *p){
                 return rc;
             }
 #endif
+
+
+        public static void sqlite3VdbePrintSql(Vdbe p)
+        {
+            int nOp = p.aOp.Count;
+            VdbeOp pOp;
+            if (nOp < 1)
+                return;
+            pOp = p.aOp[0];
+            if (pOp.OpCode == OpCode.OP_Trace && pOp.p4.z != null)
+            {
+                string z = pOp.p4.z;
+                z = z.Trim();// while ( CharExtensions.sqlite3Isspace( *(u8)z ) ) z++;
+                Console.Write("SQL: [%s]\n", z);
+            }
+        }
 #if SQLITE_DEBUG
 																																																    /*
 ** Print the SQL that was used to generate a VDBE program.
@@ -1389,74 +1356,74 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
 }
 }
 #endif
-            ///<summary>
-            /// Allocate space from a fixed size buffer and return a pointer to
-            /// that space.  If insufficient space is available, return NULL.
-            ///
-            /// The pBuf parameter is the initial value of a pointer which will
-            /// receive the new memory.  pBuf is normally NULL.  If pBuf is not
-            /// NULL, it means that memory space has already been allocated and that
-            /// this routine should not allocate any new memory.  When pBuf is not
-            /// NULL simply return pBuf.  Only allocate new memory space when pBuf
-            /// is NULL.
-            ///
-            /// nByte is the number of bytes of space needed.
-            ///
-            /// *ppFrom points to available space and pEnd points to the end of the
-            /// available space.  When space is allocated, *ppFrom is advanced past
-            /// the end of the allocated space.
-            ///
-            /// *pnByte is a counter of the number of bytes of space that have failed
-            /// to allocate.  If there is insufficient space in *ppFrom to satisfy the
-            /// request, then increment *pnByte by the amount of the request.
-            ///</summary>
-            //static void* allocSpace(
-            //  void* pBuf,          /* Where return pointer will be stored */
-            //  int nByte,           /* Number of bytes to allocate */
-            //  u8** ppFrom,         /* IN/OUT: Allocate from *ppFrom */
-            //  u8* pEnd,            /* Pointer to 1 byte past the end of *ppFrom buffer */
-            //  int* pnByte          /* If allocation cannot be made, increment *pnByte */
-            //)
-            //{
-            //  Debug.Assert(EIGHT_BYTE_ALIGNMENT(*ppFrom));
-            //  if (pBuf) return pBuf;
-            //  nByte = ROUND8(nByte);
-            //  if (&(*ppFrom)[nByte] <= pEnd)
-            //  {
-            //    pBuf = (void)*ppFrom;
-            //    *ppFrom += nByte;
-            //  }
-            //  else
-            //  {
-            //    *pnByte += nByte;
-            //  }
-            //  return pBuf;
-            //}
-            ///<summary>
-            /// Rewind the VDBE back to the beginning in preparation for
-            /// running it.
-            ///
-            ///</summary>
-            ///<summary>
-            /// Prepare a virtual machine for execution for the first time after
-            /// creating the virtual machine.  This involves things such
-            /// as allocating stack space and initializing the program counter.
-            /// After the VDBE has be prepped, it can be executed by one or more
-            /// calls to sqlite3VdbeExec().
-            ///
-            /// This function may be called exact once on a each virtual machine.
-            /// After this routine is called the VM has been "packaged" and is ready
-            /// to run.  After this routine is called, futher calls to
-            /// sqlite3VdbeAddOp() functions are prohibited.  This routine disconnects
-            /// the Vdbe from the Parse object that helped generate it so that the
-            /// the Vdbe becomes an independent entity and the Parse object can be
-            /// destroyed.
-            ///
-            /// Use the sqlite3VdbeRewind() procedure to restore a virtual machine back
-            /// to its initial state after it has been run.
-            ///
-            ///</summary>
-            public static void sqlite3VdbeMakeReady(Vdbe p,///
+        ///<summary>
+        /// Allocate space from a fixed size buffer and return a pointer to
+        /// that space.  If insufficient space is available, return NULL.
+        ///
+        /// The pBuf parameter is the initial value of a pointer which will
+        /// receive the new memory.  pBuf is normally NULL.  If pBuf is not
+        /// NULL, it means that memory space has already been allocated and that
+        /// this routine should not allocate any new memory.  When pBuf is not
+        /// NULL simply return pBuf.  Only allocate new memory space when pBuf
+        /// is NULL.
+        ///
+        /// nByte is the number of bytes of space needed.
+        ///
+        /// *ppFrom points to available space and pEnd points to the end of the
+        /// available space.  When space is allocated, *ppFrom is advanced past
+        /// the end of the allocated space.
+        ///
+        /// *pnByte is a counter of the number of bytes of space that have failed
+        /// to allocate.  If there is insufficient space in *ppFrom to satisfy the
+        /// request, then increment *pnByte by the amount of the request.
+        ///</summary>
+        //static void* allocSpace(
+        //  void* pBuf,          /* Where return pointer will be stored */
+        //  int nByte,           /* Number of bytes to allocate */
+        //  u8** ppFrom,         /* IN/OUT: Allocate from *ppFrom */
+        //  u8* pEnd,            /* Pointer to 1 byte past the end of *ppFrom buffer */
+        //  int* pnByte          /* If allocation cannot be made, increment *pnByte */
+        //)
+        //{
+        //  Debug.Assert(EIGHT_BYTE_ALIGNMENT(*ppFrom));
+        //  if (pBuf) return pBuf;
+        //  nByte = ROUND8(nByte);
+        //  if (&(*ppFrom)[nByte] <= pEnd)
+        //  {
+        //    pBuf = (void)*ppFrom;
+        //    *ppFrom += nByte;
+        //  }
+        //  else
+        //  {
+        //    *pnByte += nByte;
+        //  }
+        //  return pBuf;
+        //}
+        ///<summary>
+        /// Rewind the VDBE back to the beginning in preparation for
+        /// running it.
+        ///
+        ///</summary>
+        ///<summary>
+        /// Prepare a virtual machine for execution for the first time after
+        /// creating the virtual machine.  This involves things such
+        /// as allocating stack space and initializing the program counter.
+        /// After the VDBE has be prepped, it can be executed by one or more
+        /// calls to sqlite3VdbeExec().
+        ///
+        /// This function may be called exact once on a each virtual machine.
+        /// After this routine is called the VM has been "packaged" and is ready
+        /// to run.  After this routine is called, futher calls to
+        /// sqlite3VdbeAddOp() functions are prohibited.  This routine disconnects
+        /// the Vdbe from the Parse object that helped generate it so that the
+        /// the Vdbe becomes an independent entity and the Parse object can be
+        /// destroyed.
+        ///
+        /// Use the sqlite3VdbeRewind() procedure to restore a virtual machine back
+        /// to its initial state after it has been run.
+        ///
+        ///</summary>
+        public static void sqlite3VdbeMakeReady(Vdbe p,///
                 ///<summary>
                 ///The VDBE 
                 ///</summary>

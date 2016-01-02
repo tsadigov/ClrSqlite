@@ -3508,7 +3508,7 @@ goto attach_end;
 					pEngine.sqlite3Parser(0,this.sLastToken,this);
 				}
 				#if YYTRACKMAXSTACKDEPTH
-																																																																																																										sqlite3StatusSet(SQLITE_STATUS_PARSER_STACK,
+sqlite3StatusSet(SQLITE_STATUS_PARSER_STACK,
 sqlite3ParserStackPeak(pEngine)
 );
 #endif

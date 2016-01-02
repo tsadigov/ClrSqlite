@@ -74,9 +74,15 @@ namespace Community.CsharpSqlite
                           ///<param name=""></param>
         public class Vdbe : CPU, ILinkedListNode<Vdbe>, IBackwardLinkedListNode<Vdbe>
         {
+            bool dbg = false;
             public override void ShowDebugInfo()
             {
+                if (dbg) return;
+                dbg = true;
+
                 Console.Clear();
+                vdbeaux.sqlite3VdbePrintSql(this);
+                //vdbeaux.sqlite3VdbeList(this);
                 for (int i = 0; i < aOp.Count(); i++)
                 {
                     var clr = Console.ForegroundColor;
@@ -98,13 +104,14 @@ namespace Community.CsharpSqlite
                 Console.WriteLine();
                 Console.WriteLine("Frame");
                 tabcount = 0;
-                pFrame.path(f => f.pParent).ForEach(PrintFrame);
+                pFrame.path(f => f.pParent).ForEach<VdbeFrame>(PrintFrame);
 
                 Console.ReadKey();
+                dbg = false;
             }
             int tabcount = 0;
             string[] tab = new string[] { "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t" };
-            public void PrintFrame(VdbeFrame frame)
+            public bool PrintFrame(VdbeFrame frame)
             {
                 Console.WriteLine();
                 tabcount++;
@@ -119,7 +126,7 @@ namespace Community.CsharpSqlite
                         Console.BackgroundColor = bgclr;
                     }
                 );
-                
+                return true;
             }
 
             #region hehehe
@@ -164,21 +171,22 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///Pointer to an array of results 
             ///</summary>
-            //public int nMem;
             ///
             ///<summary>
             ///Number of memory locations currently allocated 
             ///</summary>
-            //public int nOp;
+            //public int nMem;
+
             ///
             ///<summary>
             ///Number of instructions in the program 
             ///</summary>
-            //public int nOpAlloc;
+            //public int nOp;
             ///
             ///<summary>
             ///Number of slots allocated for aOp[] 
             ///</summary>
+            //public int nOpAlloc;
             //** Space to hold the virtual machine's program */
             public List<Operation> aOp { get { return lOp; } set { lOp = value; } }
 

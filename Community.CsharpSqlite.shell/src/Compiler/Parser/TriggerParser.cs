@@ -237,10 +237,7 @@ namespace Community.CsharpSqlite.Parsing
             pTab = pParse.sqlite3SrcListLookup(pTableName);
             if (pTab == null)
             {
-                ///
-                ///<summary>
                 ///The table does not exist. 
-                ///</summary>
                 if (db.init.iDb == 1)
                 {
                     ///
@@ -248,13 +245,12 @@ namespace Community.CsharpSqlite.Parsing
                     ///Ticket #3810.
                     ///Normally, whenever a table is dropped, all associated triggers are
                     ///</summary>
-                    ///<param name="dropped too.  But if a TEMP trigger is created on a non">TEMP table</param>
-                    ///<param name="and the table is dropped by a different database connection, the">and the table is dropped by a different database connection, the</param>
-                    ///<param name="trigger is not visible to the database connection that does the">trigger is not visible to the database connection that does the</param>
-                    ///<param name="drop so the trigger cannot be dropped.  This results in an">drop so the trigger cannot be dropped.  This results in an</param>
-                    ///<param name=""orphaned trigger" "> a trigger whose associated table is missing.</param>
-                    ///<param name=""></param>
-                    db.init.orphanTrigger = 1;
+                    ///dropped too.  But if a TEMP trigger is created on a non-TEMP table
+                    ///and the table is dropped by a different database connection, the
+                    ///trigger is not visible to the database connection that does the
+                    ///drop so the trigger cannot be dropped.  This results in an
+                    ///orphaned trigger" "> a trigger whose associated table is missing.                    
+                    db.init.orphanTrigger = true;
                 }
                 goto trigger_cleanup;
             }

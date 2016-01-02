@@ -1116,9 +1116,6 @@ releasePage(pPage);
                 SqlResult rc = SqlResult.SQLITE_OK;
                 this.Enter();
                 Sqlite3.btreeIntegrity(this);
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="If the btree is already in a write">transaction, or it</param>
                 ///<param name="is already in a read">transaction</param>
                 ///<param name="is requested, this is a no">op.</param>
@@ -1158,9 +1155,6 @@ rc = SQLITE_LOCKED_SHAREDCACHE;
 goto trans_begun;
 }
 #endif
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Any read">lock on</param>
                 ///<param name="page 1. So if some other shared">lock</param>
                 ///<param name="on page 1, the transaction cannot be opened. ">on page 1, the transaction cannot be opened. </param>
@@ -1170,12 +1164,9 @@ goto trans_begun;
                 pBt.initiallyEmpty = pBt.nPage == 0;
                 do
                 {
-                    ///
-                    ///<summary>
                     ///Call lockBtree() until either pBt.pPage1 is populated or
                     ///lockBtree() returns something other than SqlResult.SQLITE_OK. lockBtree()
                     ///may return SqlResult.SQLITE_OK but leave pBt.pPage1 set to 0 if after
-                    ///</summary>
                     ///<param name="reading page 1 it discovers that the page">size of the database</param>
                     ///<param name="file is not pBt.pageSize. In this case lockBtree() will update">file is not pBt.pageSize. In this case lockBtree() will update</param>
                     ///<param name="pBt.pageSize to the page">size of the file on disk.</param>
@@ -1230,9 +1221,6 @@ pBt.pLock = &p.lock;
 pBt.pWriter = p;
 pBt.isExclusive = (u8)(wrflag>1);
 #endif
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="If the db">size header field is incorrect (as it may be if an old</param>
                         ///<param name="client has been writing the database file), update it now. Doing">client has been writing the database file), update it now. Doing</param>
                         ///<param name="this sooner rather than later means the database size can safely ">this sooner rather than later means the database size can safely </param>
@@ -1251,11 +1239,8 @@ pBt.isExclusive = (u8)(wrflag>1);
             trans_begun:
                 if (rc == SqlResult.SQLITE_OK && wrflag != 0)
                 {
-                    ///
-                    ///<summary>
                     ///This call makes sure that the pager has the correct number of
                     ///open savepoints. If the second parameter is greater than 0 and
-                    ///</summary>
                     ///<param name="the sub">journal is not already open, then it will be opened here.</param>
                     ///<param name=""></param>
                     rc = pBt.pPager.sqlite3PagerOpenSavepoint(this.db.nSavepoint);
