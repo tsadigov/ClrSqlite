@@ -34,10 +34,10 @@ namespace Community.CsharpSqlite.Metadata
         ///
         ///
         ///</summary>
-        public static int InitTableDefinitionCallback(InitData pInit, sqlite3_int64 argc, object p2, object NotUsed)
+        public static int InitTableDefinitionCallback(InitData pData, sqlite3_int64 argc, object p2, object NotUsed)
         {
             string[] argv = (string[])p2;
-            InitData pData = (InitData)pInit;
+            
             Connection db = pData.db;
             int iDb = pData.iDb;
             Debug.Assert(argc == 3);

@@ -295,14 +295,12 @@ db.xAuth = 0;
             using (db.init.scope())
             {
                 Enumerable.Range(0, db.BackendCount)                    
-                    .Where(x => !(db.DbHasProperty(x, sqliteinth.DB_SchemaLoaded) || x == 1))
+                    .Where(x => !((db.DbHasProperty(x, sqliteinth.DB_SchemaLoaded) || x == 1)))
                     .ForEach(
                         idx => {
-                            rc = InitialiseSingleDatabase(db, idx, ref pzErrMsg);
+                            rc = InitialiseSingleDatabase(db, idx, ref pzErrMsg);//  <<<<<<<<<<<<<<<<<<<<<<<<<
                             if (rc != 0)
-                            {
                                 build.sqlite3ResetInternalSchema(db, idx);
-                            }
                             return rc == SqlResult.SQLITE_OK;
                         }
                     );
@@ -314,19 +312,15 @@ db.xAuth = 0;
 #if !SQLITE_OMIT_TEMPDB
                 if (rc == SqlResult.SQLITE_OK && Sqlite3.ALWAYS(db.BackendCount > 1) && !db.DbHasProperty(1, sqliteinth.DB_SchemaLoaded))
                 {
-                    rc = InitialiseSingleDatabase(db, 1, ref pzErrMsg);
+                    rc = InitialiseSingleDatabase(db, 1, ref pzErrMsg);//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     if (rc != 0)
-                    {
                         build.sqlite3ResetInternalSchema(db, 1);
-                    }
                 }
 #endif
             }
 
             if (rc == SqlResult.SQLITE_OK && commit_internal)
-            {
                 build.sqlite3CommitInternalChanges(db);
-            }
 
             return rc;
         }
@@ -368,23 +362,14 @@ db.xAuth = 0;
             for (iDb = 0; iDb < db.BackendCount; iDb++)
             {
                 int openedTransaction = 0;
-                ///
-                ///<summary>
                 ///True if a transaction is opened 
-                ///</summary>
                 Btree pBt = db.Backends[iDb].BTree;
-                ///
-                ///<summary>
                 ///Btree database to read cookie from 
-                ///</summary>
                 if (pBt == null)
                     continue;
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="If there is not already a read">write) transaction opened</param>
-                ///<param name="on the b">tree database, open one now. If a transaction is opened, it </param>
-                ///<param name="will be closed immediately after reading the meta">value. </param>
+                ///If there is not already a read">write) transaction opened</param>
+                ///on the b">tree database, open one now. If a transaction is opened, it </param>
+                ///will be closed immediately after reading the meta">value. </param>
                 if (!pBt.sqlite3BtreeIsInReadTrans())
                 {
                     rc = pBt.sqlite3BtreeBeginTrans(0);
@@ -396,12 +381,9 @@ db.xAuth = 0;
                         return;
                     openedTransaction = 1;
                 }
-                ///
-                ///<summary>
                 ///Read the schema cookie from the database. If it does not match the 
-                ///</summary>
-                ///<param name="value stored as part of the in">memory schema representation,</param>
-                ///<param name="set Parse.rc to SQLITE_SCHEMA. ">set Parse.rc to SQLITE_SCHEMA. </param>
+                ///value stored as part of the in-memory schema representation,
+                ///set Parse.rc to SQLITE_SCHEMA. ">set Parse.rc to SQLITE_SCHEMA.
                 cookie = pBt.sqlite3BtreeGetMeta(BTreeProp.SCHEMA_VERSION);
                 Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
                 if (cookie != db.Backends[iDb].pSchema.schema_cookie)
@@ -409,10 +391,7 @@ db.xAuth = 0;
                     build.sqlite3ResetInternalSchema(db, iDb);
                     pParse.rc = SqlResult.SQLITE_SCHEMA;
                 }
-                ///
-                ///<summary>
                 ///Close the transaction, if one was opened. 
-                ///</summary>
                 if (openedTransaction != 0)
                 {
                     pBt.sqlite3BtreeCommit();
