@@ -62,7 +62,7 @@ namespace Community.CsharpSqlite {
 			if(zSql==null) {
                 return SqlResult.SQLITE_NOMEM;
 			}
-			if(SqlResult.SQLITE_OK!=sqlite3_prepare(db,zSql,-1,ref pStmt,0)) {
+			if(SqlResult.SQLITE_OK!=prepare.sqlite3_prepare(db,zSql,-1,ref pStmt,0)) {
 				malloc_cs.sqlite3SetString(ref pzErrMsg,db,sqlite3_errmsg(db));
 				return sqlite3_errcode(db);
 			}
@@ -83,7 +83,7 @@ namespace Community.CsharpSqlite {
 		static SqlResult execExecSql(Connection db,string pzErrMsg,string zSql) {
 			sqlite3_stmt pStmt=null;
             SqlResult rc;
-			rc=sqlite3_prepare(db,zSql,-1,ref pStmt,0);
+			rc=prepare.sqlite3_prepare(db,zSql,-1,ref pStmt,0);
 			if(rc!=SqlResult.SQLITE_OK)
 				return rc;
             while (SqlResult.SQLITE_ROW == vdbeapi.sqlite3_step(pStmt))

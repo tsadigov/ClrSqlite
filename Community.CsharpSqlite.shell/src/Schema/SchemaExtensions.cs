@@ -79,7 +79,7 @@ namespace Community.CsharpSqlite.Metadata
 #if !NDEBUG || SQLITE_COVERAGE_TEST
 																																																																																																																								        rcp = sqlite3_prepare( db, argv[2], -1, ref pStmt, 0 );
 #else
-                Sqlite3.sqlite3_prepare(db, argv[2], -1, ref pStmt, 0);
+                prepare.sqlite3_prepare(db, argv[2], -1, ref pStmt, 0);
 #endif
                 rc = db.errCode;
 #if !NDEBUG || SQLITE_COVERAGE_TEST

@@ -123,7 +123,7 @@ namespace Community.CsharpSqlite
                 {
                     #region compile program
                     pStmt = null;
-                    result = Sqlite3.sqlite3_prepare(db, zSql, -1, ref pStmt, ref zLeftover);
+                    result = prepare.sqlite3_prepare(db, zSql, -1, ref pStmt, ref zLeftover);
                     Debug.Assert(result == SqlResult.SQLITE_OK || pStmt == null);
                     if (result != SqlResult.SQLITE_OK)
                     {

@@ -1216,7 +1216,7 @@ namespace Community.CsharpSqlite.Ast
                             ///contains the data for table <tbl> or on one of its indexes. It
                             ///is better to execute the op on an index, as indexes are almost
                             ///always spread across less pages than their corresponding tables.
-                            int iDb = Sqlite3.indexOf(pParse.db, pTab.pSchema);
+                            int iDb = pParse.db.indexOf( pTab.pSchema);
                             int iCsr = pParse.nTab++;
                             ///<param name="Cursor to scan b">tree </param>
                             Index pIdx;

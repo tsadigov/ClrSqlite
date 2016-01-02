@@ -1379,7 +1379,7 @@ if( db ) sqlite3_interrupt(db);
 		sqlite3_stmt pSelect = new sqlite3_stmt ();
         SqlResult rc;
 		string sDummy = null;
-		rc = Sqlite3.sqlite3_prepare (db, zSelect, -1, ref pSelect, ref sDummy);
+		rc = prepare.sqlite3_prepare (db, zSelect, -1, ref pSelect, ref sDummy);
 		if (rc != SqlResult.SQLITE_OK || null == pSelect) {
 			return rc;
 		}
@@ -1446,7 +1446,7 @@ if( db ) sqlite3_interrupt(db);
 			appendText (zTableInfo, zTable, '"');
 			appendText (zTableInfo, ");", '\0');
 			string sDummy = null;
-			rc = Sqlite3.sqlite3_prepare (p.db, zTableInfo.ToString (), -1, ref pTableInfo, ref sDummy);
+			rc = prepare.sqlite3_prepare (p.db, zTableInfo.ToString (), -1, ref pTableInfo, ref sDummy);
 			//if ( zTableInfo ) free( ref zTableInfo );
 			if (rc != SqlResult.SQLITE_OK || null == pTableInfo) {
 				return 1;
@@ -1978,7 +1978,7 @@ if( db ) sqlite3_interrupt(db);
 													return 0;
 												nByte = strlen30 (zSql);
 												string sDummy = null;
-												rc = Sqlite3.sqlite3_prepare (p.db, zSql.ToString (), -1, ref pStmt, ref sDummy);
+												rc = prepare.sqlite3_prepare (p.db, zSql.ToString (), -1, ref pStmt, ref sDummy);
 												//malloc_cs.sqlite3_free( ref zSql );
 												if (rc != 0) {
 													fprintf (stderr, "Error: %s\n", Sqlite3.sqlite3_errmsg (db));
@@ -2002,7 +2002,7 @@ if( db ) sqlite3_interrupt(db);
 													zSql.Append ('?');
 												}
 												zSql.Append (')');
-												rc = Sqlite3.sqlite3_prepare (p.db, zSql.ToString (), -1, ref pStmt, ref sDummy);
+												rc = prepare.sqlite3_prepare (p.db, zSql.ToString (), -1, ref pStmt, ref sDummy);
 												free (ref zSql);
 												if (rc != 0) {
 													fprintf (stderr, "Error: %s\n", Sqlite3.sqlite3_errmsg (db));
@@ -2830,7 +2830,7 @@ enableTimer = booleanValue(azArg[1]);
        
          */
          
-		//var rcc = Sqlite3.sqlite3_prepare(db, sql, -1, ref vdbe,  sDummy);
+		//var rcc = prepare.sqlite3_prepare(db, sql, -1, ref vdbe,  sDummy);
 		//Sqlite3.vdbeapi.sqlite3_step(vdbe);
 		//pParse.pVdbe.sqlite3VdbeExec();
 		string zErrMsg = null;

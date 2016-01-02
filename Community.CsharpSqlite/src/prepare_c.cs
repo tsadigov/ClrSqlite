@@ -16,7 +16,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Utils;
     using System.Collections.Generic;
     using System.Linq;
-    public partial class Sqlite3
+    public static class prepare
     {
         ///<summary>
         /// 2005 May 25
@@ -55,7 +55,7 @@ namespace Community.CsharpSqlite
         /// indicate success or failure.
         ///
         ///</summary>
-        public static SqlResult InitialiseSingleDatabase(Connection db, int iDb, ref string pzErrMsg)
+        public static SqlResult InitialiseSingleDatabase(this Connection db, int iDb, ref string pzErrMsg)
         {
             SqlResult rc;
 
@@ -66,7 +66,7 @@ namespace Community.CsharpSqlite
             Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
             Debug.Assert(db.Backends[iDb].pSchema != null);
             Debug.Assert(db.mutex.sqlite3_mutex_held());
-            Debug.Assert(iDb == 1 || sqlite3BtreeHoldsMutex(db.Backends[iDb].BTree));
+            Debug.Assert(iDb == 1 || db.Backends[iDb].BTree.sqlite3BtreeHoldsMutex());
 
             #region create schema for master table
             zMasterName = sqliteinth.SCHEMA_TABLE(iDb);
@@ -124,9 +124,9 @@ namespace Community.CsharpSqlite
                     {
 #if SQLITE_OMIT_WAL
                         if (pDb.BTree.pBt.pSchema.file_format == 2)
-                            malloc_cs.sqlite3SetString(ref pzErrMsg, db, "%s (wal format detected)", sqlite3ErrStr(rc));
+                            malloc_cs.sqlite3SetString(ref pzErrMsg, db, "%s (wal format detected)", rc.sqlite3ErrStr());
                         else
-                            malloc_cs.sqlite3SetString(ref pzErrMsg, db, "%s", sqlite3ErrStr(rc));
+                            malloc_cs.sqlite3SetString(ref pzErrMsg, db, "%s", rc.sqlite3ErrStr());
 #else
 																																																																																																																								          malloc_cs.sqlite3SetString( ref pzErrMsg, db, "%s", sqlite3ErrStr( rc ) );
 #endif
@@ -237,7 +237,7 @@ db.xAuth = 0;
 #if !SQLITE_OMIT_ANALYZE
                     if (rc == SqlResult.SQLITE_OK)
                     {
-                        sqlite3AnalysisLoad(db, iDb);
+                        Sqlite3.sqlite3AnalysisLoad(db, iDb);
                     }
 #endif                    
                     ///Jump here for an error that occurs after successfully allocating
@@ -283,7 +283,7 @@ db.xAuth = 0;
         /// file was of zero-length, then the DB_Empty flag is also set.
         ///
         ///</summary>
-        static SqlResult InitialiseAllDatabases(Connection db, ref string err)
+        public static SqlResult InitialiseAllDatabases(this Connection db, ref string err)
         {
             int i;
             SqlResult rc;
@@ -329,14 +329,14 @@ db.xAuth = 0;
         /// Otherwise, the schema is loaded. An error code is returned.
         ///
         ///</summary>
-        public static SqlResult sqlite3ReadSchema(Parse pParse)
+        public static SqlResult sqlite3ReadSchema(this Sqlite3.Parse pParse)
         {
             SqlResult rc = SqlResult.SQLITE_OK;
             Connection db = pParse.db;
             Debug.Assert(db.mutex.sqlite3_mutex_held());
             if (!db.init.IsBusy)
             {
-                rc = (SqlResult)InitialiseAllDatabases(db, ref pParse.zErrMsg);
+                rc = InitialiseAllDatabases(db, ref pParse.zErrMsg);
             }
             if (rc != SqlResult.SQLITE_OK)
             {
@@ -351,7 +351,7 @@ db.xAuth = 0;
         /// make no changes to pParse->rc.
         ///
         ///</summary>
-        static void schemaIsValid(Parse pParse)
+        static void schemaIsValid(Sqlite3.Parse pParse)
         {
             Connection db = pParse.db;
             int iDb;
@@ -385,7 +385,7 @@ db.xAuth = 0;
                 ///value stored as part of the in-memory schema representation,
                 ///set Parse.rc to SQLITE_SCHEMA. ">set Parse.rc to SQLITE_SCHEMA.
                 cookie = pBt.sqlite3BtreeGetMeta(BTreeProp.SCHEMA_VERSION);
-                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 if (cookie != db.Backends[iDb].pSchema.schema_cookie)
                 {
                     build.sqlite3ResetInternalSchema(db, iDb);
@@ -407,7 +407,7 @@ db.xAuth = 0;
         /// attached database is returned.
         ///
         ///</summary>
-        public static int indexOf(Connection db, Schema pSchema)
+        public static int indexOf(this Connection db, Schema pSchema)
         {//TODO: extension method
             int i = -1000000;
             ///<param name="If pSchema is NULL, then return ">1000000. This happens when code in</param>
@@ -468,33 +468,17 @@ db.xAuth = 0;
                          ///</summary>
        )
         {
-            Parse pParse;
-            ///
-            ///<summary>
             ///Parsing context 
-            ///</summary>
             string zErrMsg = "";
-            ///
-            ///<summary>
             ///Error message 
-            ///</summary>
             var rc = SqlResult.SQLITE_OK;
-            ///
-            ///<summary>
             ///Result code 
-            ///</summary>
             int i;
-            ///
-            ///<summary>
             ///Loop counter 
-            ///</summary>
             ppStmt = null;
             pzTail = null;
-            ///
-            ///<summary>
             ///Allocate the parsing context 
-            ///</summary>
-            pParse = new Parse();
+            var pParse = new Sqlite3.Parse();
             //sqlite3StackAllocZero(db, sizeof(*pParse));
             //if ( pParse == null )
             //{
@@ -537,7 +521,7 @@ db.xAuth = 0;
                 Btree pBt = db.Backends[i].BTree;
                 if (pBt != null)
                 {
-                    Debug.Assert(sqlite3BtreeHoldsMutex(pBt));
+                    Debug.Assert(Sqlite3.sqlite3BtreeHoldsMutex(pBt));
                     rc = pBt.sqlite3BtreeSchemaLocked();
                     if (rc != 0)
                     {
@@ -635,7 +619,7 @@ db.xAuth = 0;
                 }
                 for (i = iFirst; i < mx; i++)
                 {
-                    pParse.pVdbe.sqlite3VdbeSetColName(i - iFirst, ColName.NAME, azColName[i], SQLITE_STATIC);
+                    pParse.pVdbe.sqlite3VdbeSetColName(i - iFirst, ColName.NAME, azColName[i], Sqlite3.SQLITE_STATIC);
                 }
             }
             Debug.Assert(!db.init.IsBusy || saveSqlFlag == 0);
@@ -735,7 +719,7 @@ db.xAuth = 0;
                     vdbeapi.sqlite3_finalize(ppStmt);
                     rc = sqlite3Prepare(db, zSql, nBytes, saveSqlFlag, pOld, ref ppStmt, ref pzTail);
                 }
-                sqlite3BtreeLeaveAll(db);
+                Sqlite3.sqlite3BtreeLeaveAll(db);
             }
             return rc;
         }

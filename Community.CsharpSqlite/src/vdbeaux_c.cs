@@ -1105,7 +1105,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                     {
                         p.rc = SqlResult.SQLITE_INTERRUPT;
                         rc = SqlResult.SQLITE_ERROR;
-                        malloc_cs.sqlite3SetString(ref p.zErrMsg, db, Sqlite3.sqlite3ErrStr(p.rc));
+                        malloc_cs.sqlite3SetString(ref p.zErrMsg, db, p.rc.sqlite3ErrStr());
                     }
                     else
                     {

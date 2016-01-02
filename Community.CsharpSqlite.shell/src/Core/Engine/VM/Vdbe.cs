@@ -5225,7 +5225,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                             //if ( db.mallocFailed != 0 ) rc = SQLITE_NOMEM;
                             if (rc != SqlResult.SQLITE_IOERR_NOMEM)
                             {
-                                malloc_cs.sqlite3SetString(ref this.zErrMsg, db, "%s", Sqlite3.sqlite3ErrStr(rc));
+                                malloc_cs.sqlite3SetString(ref this.zErrMsg, db, "%s", rc.sqlite3ErrStr());
                             }
                             goto case RuntimeException.vdbe_error_halt;
                             break;
@@ -5235,7 +5235,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                             Debug.Assert(db.u1.isInterrupted);
                             rc = SqlResult.SQLITE_INTERRUPT;
                             this.rc = rc;
-                            malloc_cs.sqlite3SetString(ref this.zErrMsg, db, Sqlite3.sqlite3ErrStr(rc));
+                            malloc_cs.sqlite3SetString(ref this.zErrMsg, db, rc.sqlite3ErrStr());
                             goto case RuntimeException.vdbe_error_halt;
                             break;
                         case RuntimeException.vdbe_error_halt:

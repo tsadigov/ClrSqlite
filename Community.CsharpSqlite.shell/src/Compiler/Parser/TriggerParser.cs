@@ -309,7 +309,7 @@ namespace Community.CsharpSqlite.Parsing
                 utilc.sqlite3ErrorMsg(pParse, "cannot create INSTEAD OF" + " trigger on table: %S", pTableName, 0);
                 goto trigger_cleanup;
             }
-            iTabDb = Sqlite3.indexOf(db, pTab.pSchema);
+            iTabDb = db.indexOf( pTab.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																								{
 int code = SQLITE_CREATE_TRIGGER;
@@ -406,7 +406,7 @@ goto trigger_cleanup;
 
             var zName = pTrig.zName;
             ///Name of trigger 
-            var iDb = Sqlite3.indexOf(pParse.db, pTrig.pSchema);
+            var iDb = pParse.db.indexOf( pTrig.pSchema);
             ///Database containing the trigger 
 
 
@@ -700,7 +700,7 @@ goto trigger_cleanup;
             int nName;
             Connection db = pParse.db;
             //      if ( db.mallocFailed != 0 ) goto drop_trigger_cleanup;
-            if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
+            if (SqlResult.SQLITE_OK != pParse.sqlite3ReadSchema())
             {
                 goto drop_trigger_cleanup;
             }
@@ -760,7 +760,7 @@ goto trigger_cleanup;
             Vdbe v;
             Connection db = pParse.db;
             int iDb;
-            iDb = Sqlite3.indexOf(pParse.db, pTrigger.pSchema);
+            iDb = pParse.db.indexOf( pTrigger.pSchema);
             Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
             pTable = tableOfTrigger(pTrigger);
             Debug.Assert(pTable != null);
@@ -972,7 +972,7 @@ return;
             //{
             Debug.Assert(pSrc.Count > 0);
             Debug.Assert(pSrc.a != null);
-            iDb = Sqlite3.indexOf(pParse.db, pStep.pTrig.pSchema);
+            iDb = pParse.db.indexOf( pStep.pTrig.pSchema);
             if (iDb == 0 || iDb >= 2)
             {
                 Connection db = pParse.db;

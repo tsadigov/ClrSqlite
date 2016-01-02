@@ -22,7 +22,7 @@ namespace Community.CsharpSqlite.Engine
     
     using Parse = Community.CsharpSqlite.Sqlite3.Parse;
     using Community.CsharpSqlite.Metadata;
-    using Community.CsharpSqlite.Engine;
+    using Utils;
     using Metadata;
 
     ///<summary>
@@ -228,7 +228,7 @@ namespace Community.CsharpSqlite.Engine
             this.isError = errCode;
             if ((this.s.flags & MemFlags.MEM_Null) != 0)
             {
-                this.setResultStrOrError(Sqlite3.sqlite3ErrStr(errCode), -1, SqliteEncoding.UTF8, Sqlite3.SQLITE_STATIC);
+                this.setResultStrOrError(errCode.sqlite3ErrStr(), -1, SqliteEncoding.UTF8, Sqlite3.SQLITE_STATIC);
             }
         }
 

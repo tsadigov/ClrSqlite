@@ -497,7 +497,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 db = v.db;
                 db.mutex.Enter();
-                while ((rc = (SqlResult)sqlite3Step(v)) == SqlResult.SQLITE_SCHEMA && cnt++ < SQLITE_MAX_SCHEMA_RETRY && (rc2 = rc = (SqlResult)Sqlite3.sqlite3Reprepare(v)) == SqlResult.SQLITE_OK)
+                while ((rc = (SqlResult)sqlite3Step(v)) == SqlResult.SQLITE_SCHEMA && cnt++ < SQLITE_MAX_SCHEMA_RETRY && (rc2 = rc = (SqlResult)prepare.sqlite3Reprepare(v)) == SqlResult.SQLITE_OK)
                 {
                     sqlite3_reset(pStmt);
                     v.expired = false;

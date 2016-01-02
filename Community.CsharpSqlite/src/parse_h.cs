@@ -604,7 +604,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 					goto exit_begin_add_column;
 				}
 				Debug.Assert(pTab.addColOffset>0);
-				iDb=indexOf(db,pTab.pSchema);
+				iDb=db.indexOf(pTab.pSchema);
 				///
 				///<summary>
 				///Put a copy of the Table struct in Parse.pNewTable for the
@@ -722,7 +722,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				pNew=this.pNewTable;
 				Debug.Assert(pNew!=null);
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
-				iDb=indexOf(db,pNew.pSchema);
+				iDb=db.indexOf(pNew.pSchema);
 				zDb=db.Backends[iDb].Name;
 				zTab=pNew.zName.Substring(16);
 				// zTab = &pNew->zName[16]; /* Skip the "sqlite_altertab_" prefix on the name */
@@ -938,7 +938,7 @@ return;
 				pTab=TableBuilder.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
 				if(pTab==null)
 					goto exit_rename_table;
-				iDb=indexOf(this.db,pTab.pSchema);
+				iDb= this.db.indexOf(pTab.pSchema);
 				zDb=db.Backends[iDb].Name;
                 db.flags |= SqliteFlags.SQLITE_PreferBuiltin;
 				///
@@ -1125,7 +1125,7 @@ goto exit_rename_table;
 				if(NEVER(v==null))
 					return;
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				iDb=indexOf(this.db,pTab.pSchema);
+				iDb= this.db.indexOf(pTab.pSchema);
 				Debug.Assert(iDb>=0);
 				#if !SQLITE_OMIT_TRIGGER
 				///
@@ -1134,7 +1134,7 @@ goto exit_rename_table;
 				///</summary>
                 pTab.sqlite3TriggerList(this).linkedList().ForEach(
                     trg => {
-                        int iTrigDb = indexOf(this.db, trg.pSchema);
+                        int iTrigDb = this.db.indexOf( trg.pSchema);
                         Debug.Assert(iTrigDb == iDb || iTrigDb == 1);
                         v.sqlite3VdbeAddOp4(OpCode.OP_DropTrigger, iTrigDb, 0, 0, trg.zName, 0);
                     }
@@ -1432,7 +1432,7 @@ goto exit_rename_table;
 					return;
 				}
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
-				iDb=indexOf(db,pTab.pSchema);
+				iDb= db.indexOf(pTab.pSchema);
 				Debug.Assert(iDb>=0);
 				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 				#if !SQLITE_OMIT_AUTHORIZATION
@@ -1462,7 +1462,7 @@ return;
 					///<summary>
 					///Open a cursor to the index to be analyzed. 
 					///</summary>
-					Debug.Assert(iDb==indexOf(db,pIdx.pSchema));
+					Debug.Assert(iDb==db.indexOf(pIdx.pSchema));
 					v.sqlite3VdbeAddOp4( OpCode.OP_OpenRead,iIdxCur,pIdx.tnum,iDb,pKey, P4Usage.P4_KEYINFO_HANDOFF);
 					v.VdbeComment("%s",pIdx.zName);
 					///
@@ -1720,7 +1720,7 @@ return;
 				int iStatCur;
 				Debug.Assert(pTab!=null);
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				iDb=indexOf(this.db,pTab.pSchema);
+				iDb= this.db.indexOf(pTab.pSchema);
 				build.sqlite3BeginWriteOperation(this,0,iDb);
 				iStatCur=this.nTab;
 				this.nTab+=2;
@@ -1763,7 +1763,7 @@ return;
 				///and code in pParse and return NULL. 
 				///</summary>
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(this)) {
+				if(SqlResult.SQLITE_OK!=prepare.sqlite3ReadSchema(this)) {
 					return;
 				}
 				Debug.Assert(pName2!=null||pName1==null);
@@ -2732,7 +2732,7 @@ goto attach_end;
 				///<param name="If foreign">op. </param>
                 if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) == 0)
 					return;
-				iDb=indexOf(db,pTab.pSchema);
+				iDb=db.indexOf(pTab.pSchema);
 				zDb=db.Backends[iDb].Name;
 				///
 				///<summary>
@@ -3520,7 +3520,7 @@ sqlite3ParserStackPeak(pEngine)
 				//  pParse.rc = SQLITE_NOMEM;
 				//}
 				if(this.rc!=SqlResult.SQLITE_OK&&this.rc!=SqlResult.SQLITE_DONE&&this.zErrMsg=="") {
-					malloc_cs.sqlite3SetString(ref this.zErrMsg,db,sqlite3ErrStr(this.rc));
+					malloc_cs.sqlite3SetString(ref this.zErrMsg,db, this.rc.sqlite3ErrStr());
 				}
 				//assert( pzErrMsg!=0 );
 				if(this.zErrMsg!=null) {
@@ -3803,7 +3803,7 @@ pParse.nTableLock = 0;
 				if(pTab==null) {
 					goto insert_cleanup;
 				}
-				iDb=indexOf(db,pTab.pSchema);
+				iDb=db.indexOf(pTab.pSchema);
 				Debug.Assert(iDb<db.BackendCount);
 				pDb=db.Backends[iDb];
 				zDb=pDb.Name;
@@ -5117,7 +5117,7 @@ isView = false;
 				Vdbe v;
 				if(pTab.IsVirtual())
 					return 0;
-				iDb=indexOf(this.db,pTab.pSchema);
+				iDb= this.db.indexOf(pTab.pSchema);
 				v=this.sqlite3GetVdbe();
 				Debug.Assert(v!=null);
 				this.sqlite3OpenTable(baseCur,iDb,pTab,op);
@@ -5436,7 +5436,7 @@ isView = false;
 				pTab=this.sqlite3SrcListLookup(pTabList);
 				if(pTab==null)
 					goto update_cleanup;
-				iDb=indexOf(this.db,pTab.pSchema);
+				iDb= this.db.indexOf(pTab.pSchema);
 				///
 				///<summary>
 				///Figure out if we have any triggers and if the table being
@@ -6318,7 +6318,7 @@ isView = false;
 				if(this.sqlite3IsReadOnly(pTab,(TriggerType)(pTrigger!=null?1:0))) {
 					goto delete_from_cleanup;
 				}
-				iDb=indexOf(db,pTab.pSchema);
+				iDb=db.indexOf(pTab.pSchema);
 				Debug.Assert(iDb<db.BackendCount);
 				zDb=db.Backends[iDb].Name;
 				#if !SQLITE_OMIT_AUTHORIZATION
@@ -9400,7 +9400,13 @@ return;
 				}
 				return this.nErr;
 			}
-			public SqlResult whereRangeScanEst(///
+
+            private string sqlite3ErrStr(int rc)
+            {
+                return rc.sqlite3ErrStr();
+            }
+
+            public SqlResult whereRangeScanEst(///
 			///<summary>
 			///Parsing & code generating context 
 			///</summary>
@@ -11358,7 +11364,7 @@ range_est_fallback:
 					pTab=pTabItem.pTab;
 					pLevel.iTabCur=pTabItem.iCursor;
 					pWInfo.nRowOut*=pLevel.plan.nRow;
-					iDb=indexOf(db,pTab.pSchema);
+					iDb=db.indexOf(pTab.pSchema);
 					if((pTab.tabFlags&TableFlags.TF_Ephemeral)!=0||pTab.pSelect!=null) {
 						///
 						///<summary>
@@ -11814,7 +11820,7 @@ range_est_fallback:
 					///<summary>
 					///Code an  OpCode.OP_VerifyCookie and  OpCode.OP_TableLock for <table>. 
 					///</summary>
-					iDb=indexOf(db,pTab.pSchema);
+					iDb=db.indexOf(pTab.pSchema);
 					build.sqlite3CodeVerifySchema(this,iDb);
 					sqliteinth.sqlite3TableLock(this,iDb,pTab.tnum,0,pTab.zName);
 					///
@@ -12431,7 +12437,7 @@ range_est_fallback:
 					return;
 				Debug.Assert(null==pTable.pIndex);
 				db=this.db;
-				iDb=indexOf(db,pTable.pSchema);
+				iDb=db.indexOf(pTable.pSchema);
 				Debug.Assert(iDb>=0);
 				pTable.tabFlags|=TableFlags.TF_Virtual;
 				pTable.nModuleArg=0;
@@ -12514,7 +12520,7 @@ range_est_fallback:
 					///by build.sqlite3StartTable().
 					///
 					///</summary>
-					iDb=indexOf(db,pTab.pSchema);
+					iDb=db.indexOf(pTab.pSchema);
                     build.sqlite3NestedParse(this, "UPDATE %Q.%s " + "SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q " + "WHERE rowid=#%d", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), pTab.zName, pTab.zName, zStmt, this.regRowid);
 					db.DbFree(ref zStmt);
 					v=this.sqlite3GetVdbe();

@@ -510,7 +510,7 @@ goto pragma_out;
 					new VdbeOpList(OpCode.OP_ResultRow,1,1,0),
 				};
 				int addr;
-				if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+				if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 					goto pragma_out;
                 Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
 				if(null==zRight) {
@@ -609,7 +609,7 @@ goto pragma_out;
 						///</summary>
 						if(zLeft.Equals("page_count",StringComparison.InvariantCultureIgnoreCase)||zLeft.Equals("max_page_count",StringComparison.InvariantCultureIgnoreCase)) {
 							int iReg;
-							if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+							if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 								goto pragma_out;
 							build.sqlite3CodeVerifySchema(pParse,iDb);
 							iReg=++pParse.nMem;
@@ -635,7 +635,7 @@ goto pragma_out;
 								Vdbe _v;
 								int iReg;
 								_v=pParse.sqlite3GetVdbe();
-								if(_v==null||SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+								if(_v==null||SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 									goto pragma_out;
 								build.sqlite3CodeVerifySchema(pParse,iDb);
 								iReg=++pParse.nMem;
@@ -714,7 +714,7 @@ goto pragma_out;
 										
                                         ///Force the schema to be loaded on all databases.  This cases all
 										///database files to be opened and the journal_modes set. 
-										if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+										if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema()) {
 											goto pragma_out;
 										}
 										v.sqlite3VdbeSetNumCols(1);
@@ -793,7 +793,7 @@ goto pragma_out;
 											if(zLeft.Equals("auto_vacuum",StringComparison.InvariantCultureIgnoreCase)) {
 												Btree pBt=pDb.BTree;
 												Debug.Assert(pBt!=null);
-												if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+												if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema()) {
 													goto pragma_out;
 												}
 												if(null==zRight) {
@@ -884,7 +884,7 @@ goto pragma_out;
 												#if !SQLITE_OMIT_AUTOVACUUM
 												if(zLeft.Equals("incremental_vacuum",StringComparison.InvariantCultureIgnoreCase)) {
 													int iLimit=0,addr;
-													if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+													if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema()) {
 														goto pragma_out;
 													}
 													if(zRight==null||!Converter.sqlite3GetInt32(zRight,ref iLimit)||iLimit<=0) {
@@ -917,7 +917,7 @@ goto pragma_out;
 													///N should be a positive integer.
 													///</summary>
 													if(zLeft.Equals("cache_size",StringComparison.InvariantCultureIgnoreCase)) {
-														if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+														if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 															goto pragma_out;
 														Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
 														if(null==zRight) {
@@ -1072,7 +1072,7 @@ else
 																///opened.
 																///</summary>
 																if(zLeft.Equals("synchronous",StringComparison.InvariantCultureIgnoreCase)) {
-																	if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+																	if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																		goto pragma_out;
 																	if(null==zRight) {
 																		returnSingleInt(pParse,"synchronous",pDb.safety_level-1);
@@ -1114,7 +1114,7 @@ else
 																		///</summary>
 																		if(zLeft.Equals("table_info",StringComparison.InvariantCultureIgnoreCase)&&zRight!=null) {
 																			Table pTab;
-																			if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+																			if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																				goto pragma_out;
 																			pTab= db.sqlite3FindTable( zDb, zRight);
 																			if(pTab!=null) {
@@ -1156,7 +1156,7 @@ else
 																			if(zLeft.Equals("index_info",StringComparison.InvariantCultureIgnoreCase)&&zRight!=null) {
 																				Index pIdx;
 																				Table pTab;
-																				if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+																				if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																					goto pragma_out;
 																				pIdx=IndexBuilder.sqlite3FindIndex(db,zRight,zDb);
 																				if(pIdx!=null) {
@@ -1181,7 +1181,7 @@ else
 																				if(zLeft.Equals("index_list",StringComparison.InvariantCultureIgnoreCase)&&zRight!=null) {
 																					Index pIdx;
 																					Table pTab;
-																					if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+																					if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																						goto pragma_out;
 																					pTab=TableBuilder.sqlite3FindTable(db, zDb, zRight);
 																					if(pTab!=null) {
@@ -1208,7 +1208,7 @@ else
 																				else
 																					if(zLeft.Equals("database_list",StringComparison.InvariantCultureIgnoreCase)) {
 																						int i;
-																						if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+																						if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																							goto pragma_out;
 																						v.sqlite3VdbeSetNumCols(3);
 																						pParse.nMem=3;
@@ -1248,7 +1248,7 @@ else
 																							if(zLeft.Equals("foreign_key_list",StringComparison.InvariantCultureIgnoreCase)&&zRight!=null) {
 																								FKey pFK;
 																								Table pTab;
-																								if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+																								if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																									goto pragma_out;
 																								pTab=TableBuilder.sqlite3FindTable(db, zDb, zRight);
 																								if(pTab!=null) {
@@ -1361,7 +1361,7 @@ else
 																										///<summary>
 																										///Initialize the VDBE program 
 																										///</summary>
-																										if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse))
+																										if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																											goto pragma_out;
 																										pParse.nMem=6;
 																										v.sqlite3VdbeSetNumCols(1);
@@ -1596,7 +1596,7 @@ else
 																												///<summary>
 																												///"PRAGMA encoding" 
 																												///</summary>
-																												if(SqlResult.SQLITE_OK!=sqlite3ReadSchema(pParse)) {
+																												if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema()) {
 																													pParse.nErr=0;
 																													pParse.zErrMsg=null;
 																													pParse.rc=0;

@@ -1112,161 +1112,7 @@ break;
 				db.xRollbackCallback(db.pRollbackArg);
 			}
 		}
-		///<summary>
-		/// Return a static string that describes the kind of error specified in the
-		/// argument.
-		///
-		///</summary>
-		public static string sqlite3ErrStr(int rc) {
-			string[] aMsg=new string[] {
-				///
-				///<summary>
-				///SqlResult.SQLITE_OK          
-				///</summary>
-				"not an error",
-				///
-				///<summary>
-				///SqlResult.SQLITE_ERROR       
-				///</summary>
-				"SQL logic error or missing database",
-				///
-				///<summary>
-				///SQLITE_INTERNAL    
-				///</summary>
-				"",
-				///
-				///<summary>
-				///SQLITE_PERM        
-				///</summary>
-				"access permission denied",
-				///
-				///<summary>
-				///SQLITE_ABORT       
-				///</summary>
-				"callback requested query abort",
-				///
-				///<summary>
-				///SQLITE_BUSY        
-				///</summary>
-				"database is locked",
-				///
-				///<summary>
-				///SQLITE_LOCKED      
-				///</summary>
-				"database table is locked",
-				///
-				///<summary>
-				///SQLITE_NOMEM       
-				///</summary>
-				"out of memory",
-				///
-				///<summary>
-				///SQLITE_READONLY    
-				///</summary>
-				"attempt to write a readonly database",
-				///
-				///<summary>
-				///SQLITE_INTERRUPT   
-				///</summary>
-				"interrupted",
-				///
-				///<summary>
-				///SQLITE_IOERR       
-				///</summary>
-				"disk I/O error",
-				///
-				///<summary>
-				///SQLITE_CORRUPT     
-				///</summary>
-				"database disk image is malformed",
-				///
-				///<summary>
-				///SQLITE_NOTFOUND    
-				///</summary>
-				"unknown operation",
-				///
-				///<summary>
-				///SQLITE_FULL        
-				///</summary>
-				"database or disk is full",
-				///
-				///<summary>
-				///SQLITE_CANTOPEN    
-				///</summary>
-				"unable to open database file",
-				///
-				///<summary>
-				///SQLITE_PROTOCOL    
-				///</summary>
-				"locking protocol",
-				///
-				///<summary>
-				///SQLITE_EMPTY       
-				///</summary>
-				"table contains no data",
-				///
-				///<summary>
-				///SQLITE_SCHEMA      
-				///</summary>
-				"database schema has changed",
-				///
-				///<summary>
-				///SQLITE_TOOBIG      
-				///</summary>
-				"string or blob too big",
-				///
-				///<summary>
-				///SQLITE_CONSTRAINT  
-				///</summary>
-				"constraint failed",
-				///
-				///<summary>
-				///SQLITE_MISMATCH    
-				///</summary>
-				"datatype mismatch",
-				///
-				///<summary>
-				///SQLITE_MISUSE      
-				///</summary>
-				"library routine called out of sequence",
-				///
-				///<summary>
-				///SQLITE_NOLFS       
-				///</summary>
-				"large file support is disabled",
-				///
-				///<summary>
-				///SQLITE_AUTH        
-				///</summary>
-				"authorization denied",
-				///
-				///<summary>
-				///SQLITE_FORMAT      
-				///</summary>
-				"auxiliary database format error",
-				///
-				///<summary>
-				///SQLITE_RANGE       
-				///</summary>
-				"bind or column index out of range",
-				///
-				///<summary>
-				///SQLITE_NOTADB      
-				///</summary>
-				"file is encrypted or is not a database",
-			};
-			rc&=0xff;
-			if(Sqlite3.ALWAYS(rc>=0)&&rc<aMsg.Length&&aMsg[rc]!="")//(int)(sizeof(aMsg)/sizeof(aMsg[0]))
-			 {
-				return aMsg[rc];
-			}
-			else {
-				return "unknown error";
-			}
-		}
-		public static string sqlite3ErrStr(SqlResult rc) {
-			return sqlite3ErrStr((int)rc);
-		}
+		
 		///<summary>
 		/// This routine implements a busy callback that sleeps and tries
 		/// again until a timeout value is reached.  The timeout value is
@@ -1943,10 +1789,10 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 		public static string sqlite3_errmsg(Connection db) {
 			string z;
 			if(db==null) {
-				return sqlite3ErrStr(SqlResult.SQLITE_NOMEM);
+				return SqlResult.SQLITE_NOMEM.sqlite3ErrStr();
 			}
 			if(!utilc.sqlite3SafetyCheckSickOrOk(db)) {
-				return sqlite3ErrStr(sqliteinth.SQLITE_MISUSE_BKPT());
+				return sqliteinth.SQLITE_MISUSE_BKPT().sqlite3ErrStr();
 			}
 			db.mutex.Enter();
 			//if ( db.mallocFailed != 0 )
@@ -1958,7 +1804,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 				z=vdbeapi.sqlite3_value_text(db.pErr);
 				//Debug.Assert( 0 == db.mallocFailed );
 				if(String.IsNullOrEmpty(z)) {
-					z=sqlite3ErrStr(db.errCode);
+					z= db.errCode.sqlite3ErrStr();
 				}
 			}
 			db.mutex.Exit();

@@ -32,7 +32,7 @@ namespace AnalysingClasses
             r = Sqlite3.sqlite3_open(zSrcFile, out pSrc);
             String m="";
             pSrc.init.busy = 1;
-            Sqlite3.InitialiseSingleDatabase(pSrc, 0, ref m);
+            pSrc.InitialiseAllDatabases(  ref m);
             var schema = btree.sqlite3SchemaGet(pSrc);
 
 

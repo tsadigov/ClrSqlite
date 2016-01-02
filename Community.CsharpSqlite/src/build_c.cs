@@ -1190,7 +1190,7 @@ p.zName,  P4Usage.P4_STATIC );
                     return;
                 }
                 build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
-                var iDb = Sqlite3.indexOf(db, p.pSchema);
+                var iDb = db.indexOf( p.pSchema);
                 if (sFix.sqlite3FixInit(pParse, iDb, "view", pName) != 0 && sFix.sqlite3FixSelect(pSelect) != 0)
                 {
                     SelectMethods.SelectDestructor(db, ref pSelect);
@@ -1722,7 +1722,7 @@ db.xAuth = xAuth;
                 //  goto exit_drop_index;
                 //}
                 Debug.Assert(pName.Count == 1);
-                if (SqlResult.SQLITE_OK != Sqlite3.sqlite3ReadSchema(pParse))
+                if (SqlResult.SQLITE_OK != pParse.sqlite3ReadSchema())
                 {
                     goto exit_drop_index;
                 }
@@ -1745,7 +1745,7 @@ db.xAuth = xAuth;
                     utilc.sqlite3ErrorMsg(pParse, "index associated with UNIQUE " + "or PRIMARY KEY constraint cannot be dropped", 0);
                     goto exit_drop_index;
                 }
-                iDb = Sqlite3.indexOf(db, pIndex.pSchema);
+                iDb = db.indexOf( pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	{
 int code = SQLITE_DROP_INDEX;
