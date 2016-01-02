@@ -42,165 +42,7 @@ namespace Community.CsharpSqlite
         ///
         ///</summary>
         //#include "sqliteInt.h"
-        ///<summary>
-        /// Fill the InitData structure with an error message that indicates
-        /// that the database is corrupt.
-        ///
-        ///</summary>
-        static void corruptSchema(InitData pData,///
-                                                 ///<summary>
-                                                 ///Initialization context 
-                                                 ///</summary>
-       string zObj,///
-                    ///<summary>
-                    ///Object being parsed at the point of error 
-                    ///</summary>
-        string zExtra///
-                     ///<summary>
-                     ///Error information 
-                     ///</summary>
-       )
-        {
-            Connection db = pData.db;
-            if (///
-                ///<summary>
-                ///0 == db.mallocFailed && 
-                ///</summary>
-            (db.flags & SqliteFlags.SQLITE_RecoveryMode) == 0)
-            {
-                {
-                    if (zObj == null)
-                    {
-                        zObj = "?";
-#if SQLITE_OMIT_UTF16
-                        if (sqliteinth.ENC(db) != SqliteEncoding.UTF8)
-                            zObj = encnames[((int)sqliteinth.ENC(db))].zName;
-#endif
-                    }
-                    malloc_cs.sqlite3SetString(ref pData.pzErrMsg, db, "malformed database schema (%s)", zObj);
-                    if (!String.IsNullOrEmpty(zExtra))
-                    {
-                        pData.pzErrMsg = io.sqlite3MAppendf(db, pData.pzErrMsg, "%s - %s", pData.pzErrMsg, zExtra);
-                    }
-                }
-                pData.rc =//db.mallocFailed != 0 ? SQLITE_NOMEM :
-                sqliteinth.SQLITE_CORRUPT_BKPT();
-            }
-        }
-        ///<summary>
-        /// This is the callback routine for the code that initializes the
-        /// database.  See sqlite3Init() below for additional information.
-        /// This routine is also called from the OP_ParseSchema opcode of the VDBE.
-        ///
-        /// Each callback contains the following information:
-        ///
-        ///     argv[0] = name of thing being created
-        ///     argv[1] = root page number for table or index. 0 for trigger or view.
-        ///     argv[2] = SQL text for the CREATE statement.
-        ///
-        ///
-        ///</summary>
-        public static int sqlite3InitCallback(object pInit, sqlite3_int64 argc, object p2, object NotUsed)
-        {
-            string[] argv = (string[])p2;
-            InitData pData = (InitData)pInit;
-            Connection db = pData.db;
-            int iDb = pData.iDb;
-            Debug.Assert(argc == 3);
-            sqliteinth.UNUSED_PARAMETER2(NotUsed, argc);
-            Debug.Assert(db.mutex.sqlite3_mutex_held());
-            db.DbClearProperty(iDb, sqliteinth.DB_Empty);
 
-            //if ( db.mallocFailed != 0 )
-            //{
-            //  corruptSchema( pData, argv[0], "" );
-            //  return 1;
-            //}
-            Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
-            if (argv == null)
-                return 0;
-            ///Might happen if EMPTY_RESULT_CALLBACKS are on 
-            if (argv[1] == null)
-            {
-                corruptSchema(pData, argv[0], "");
-            }
-            else
-                if (!String.IsNullOrEmpty(argv[2]))
-            {
-                ///Call the parser to process a CREATE TABLE, INDEX or VIEW.
-                ///But because db.init.busy is set to 1, no VDBE code is generated
-                ///or executed.  All the parser does is build the internal data
-                ///structures that describe the table, index, or view.
-                SqlResult rc;
-                sqlite3_stmt pStmt = null;
-#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																																																								        //TESTONLY(int rcp);            /* Return code from sqlite3_prepare() */
-        int rcp;
-#endif
-                Debug.Assert(db.init.IsBusy);
-                db.init.iDb = iDb;
-                db.init.newTnum = Converter.sqlite3Atoi(argv[1]);
-                db.init.orphanTrigger = 0;
-                //TESTONLY(rcp = ) sqlite3_prepare(db, argv[2], -1, &pStmt, 0);
-#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																																																								        rcp = sqlite3_prepare( db, argv[2], -1, ref pStmt, 0 );
-#else
-                sqlite3_prepare(db, argv[2], -1, ref pStmt, 0);
-#endif
-                rc = db.errCode;
-#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																																																								        Debug.Assert( ( rc & 0xFF ) == ( rcp & 0xFF ) );
-#endif
-                db.init.iDb = 0;
-                if (SqlResult.SQLITE_OK != rc)
-                {
-                    if (db.init.orphanTrigger != 0)
-                    {
-                        Debug.Assert(iDb == 1);
-                    }
-                    else {
-                        pData.rc = rc;
-                        //if ( rc == SQLITE_NOMEM )db.mallocFailed = 1;							
-                        //else 
-                        if (rc != SqlResult.SQLITE_INTERRUPT && (rc & (SqlResult)0xFF) != SqlResult.SQLITE_LOCKED)
-                        {
-                            corruptSchema(pData, argv[0], sqlite3_errmsg(db));
-                        }
-                    }
-                }
-                vdbeapi.sqlite3_finalize(pStmt);
-            }
-            else
-                    if (argv[0] == null || argv[0] == "")
-            {
-                corruptSchema(pData, null, null);
-            }
-            else {
-                ///If the SQL column is blank it means this is an index that
-                ///was created to be the PRIMARY KEY or to fulfill a UNIQUE
-                ///constraint for a CREATE TABLE.  The index should have already
-                ///been created when we processed the CREATE TABLE.  All we have
-                ///to do here is record the root page number for that index.
-                Index pIndex;
-                pIndex = IndexBuilder.sqlite3FindIndex(db, argv[0], db.Backends[iDb].Name);
-                if (pIndex == null)
-                {
-                    ///This can occur if there exists an index on a TEMP table which
-                    ///has the same name as another index on a permanent index.  Since
-                    ///the permanent table is hidden by the TEMP table, we can also
-                    ///safely ignore the index on the permanent table.
-
-                    ///Do Nothing 
-                    ;
-                }
-                else
-                    if (Converter.sqlite3GetInt32(argv[1], ref pIndex.tnum) == false)
-                {
-                    corruptSchema(pData, argv[0], "invalid rootpage");
-                }
-            }
-            return 0;
-        }
 
 
 
@@ -213,13 +55,9 @@ namespace Community.CsharpSqlite
         /// indicate success or failure.
         ///
         ///</summary>
-        public static SqlResult sqlite3InitOne(Connection db, int iDb, ref string pzErrMsg)
+        public static SqlResult InitialiseSingleDatabase(Connection db, int iDb, ref string pzErrMsg)
         {
             SqlResult rc;
-            int i;
-            int size;
-            DbBackend pDb;
-
 
             string zMasterSchema = String.Empty;
             string zMasterName;
@@ -230,6 +68,7 @@ namespace Community.CsharpSqlite
             Debug.Assert(db.mutex.sqlite3_mutex_held());
             Debug.Assert(iDb == 1 || sqlite3BtreeHoldsMutex(db.Backends[iDb].BTree));
 
+            #region create schema for master table
             zMasterName = sqliteinth.SCHEMA_TABLE(iDb);
             ///Construct the schema tables.  
             string[] azArg = new string[] {
@@ -247,7 +86,8 @@ namespace Community.CsharpSqlite
                 pzErrMsg = pzErrMsg
             };
 
-            sqlite3InitCallback(initData, 3, azArg, null);
+            SchemaExtensions.InitTableDefinitionCallback(initData, 3, azArg, null);
+
             if (initData.rc != 0)
             {
                 rc = initData.rc;
@@ -258,12 +98,11 @@ namespace Community.CsharpSqlite
             {
                 pTab.tabFlags |= TableFlags.TF_Readonly;
             }
-            ///
-            ///<summary>
+            #endregion
+
+
             ///Create a cursor to hold the database open
-            ///
-            ///</summary>
-            pDb = db.Backends[iDb];
+            var pDb = db.Backends[iDb];
             if (pDb.BTree == null)
             {
                 if (sqliteinth.OMIT_TEMPDB == 0 && Sqlite3.ALWAYS(iDb == 1))
@@ -272,162 +111,159 @@ namespace Community.CsharpSqlite
                 }
                 return SqlResult.SQLITE_OK;
             }
-            ///<param name="If there is not already a read">write) transaction opened</param>
-            ///<param name="on the b">tree database, open one now. If a transaction is opened, it </param>
-            ///<param name="will be closed before this function returns.  ">will be closed before this function returns.  </param>
-            pDb.BTree.Enter();
-            if (!pDb.BTree.sqlite3BtreeIsInReadTrans())
+            ///If there is not already a read">write) transaction opened
+            ///on the b">tree database, open one now. If a transaction is opened, it 
+            ///will be closed before this function returns.
+            //pDb.BTree.Enter();
+            using (pDb.BTree.scope())
             {
-                rc = pDb.BTree.sqlite3BtreeBeginTrans(0);
-                if (rc != SqlResult.SQLITE_OK)
+                if (!pDb.BTree.sqlite3BtreeIsInReadTrans())
                 {
+                    rc = pDb.BTree.sqlite3BtreeBeginTrans(0);
+                    if (rc != SqlResult.SQLITE_OK)
+                    {
 #if SQLITE_OMIT_WAL
-                    if (pDb.BTree.pBt.pSchema.file_format == 2)
-                        malloc_cs.sqlite3SetString(ref pzErrMsg, db, "%s (wal format detected)", sqlite3ErrStr(rc));
-                    else
-                        malloc_cs.sqlite3SetString(ref pzErrMsg, db, "%s", sqlite3ErrStr(rc));
+                        if (pDb.BTree.pBt.pSchema.file_format == 2)
+                            malloc_cs.sqlite3SetString(ref pzErrMsg, db, "%s (wal format detected)", sqlite3ErrStr(rc));
+                        else
+                            malloc_cs.sqlite3SetString(ref pzErrMsg, db, "%s", sqlite3ErrStr(rc));
 #else
 																																																																																																																								          malloc_cs.sqlite3SetString( ref pzErrMsg, db, "%s", sqlite3ErrStr( rc ) );
 #endif
-                    goto initone_error_out;
-                }
-                openedTransaction = 1;
-            }
-
-            ///Note: The #defined SQLITE_UTF* symbols in sqliteInt.h correspond to
-            ///the possible values of meta[BTREE_TEXT_ENCODING">1].
-            var meta = Enum
-                .Range(BTreeProp.SCHEMA_VERSION, BTreeProp.TEXT_ENCODING)
-                .ToDictionary(p => p, p => pDb.BTree.sqlite3BtreeGetMeta(p));
-
-            pDb.pSchema.schema_cookie = (int)meta[BTreeProp.SCHEMA_VERSION];
-
-            ///If opening a non-empty database, check the text encoding. For the
-            ///main database, set sqlite3.enc to the encoding of the main database.
-            ///For an attached db, it is an error if the encoding is not the same
-            ///as sqlite3.enc.
-            if (meta[BTreeProp.TEXT_ENCODING] != 0)
-            {
-                ///text encoding 
-                if (iDb == 0)
-                {
-                    ///If opening the main database, set ENC(db). 
-                    var encoding = (SqliteEncoding)(meta[BTreeProp.TEXT_ENCODING] & 3);
-                    if (0==encoding)
-                        encoding = SqliteEncoding.UTF8;
-                    db.Backends[0].pSchema.enc = encoding;
-                    //ENC( db ) = encoding;
-                    db.pDfltColl = db.sqlite3FindCollSeq(SqliteEncoding.UTF8, "BINARY", 0);
-                }
-                else {
-                    ///If opening an attached database, the encoding much match ENC(db) 
-                    if ((SqliteEncoding)meta[BTreeProp.TEXT_ENCODING] != sqliteinth.ENC(db))
-                    {
-                        malloc_cs.sqlite3SetString(ref pzErrMsg, db, "attached databases must use the same text encoding as main database");
-                        rc = SqlResult.SQLITE_ERROR;
                         goto initone_error_out;
                     }
+                    openedTransaction = 1;
                 }
-            }
-            else {
-                db.DbSetProperty(iDb, sqliteinth.DB_Empty);
-            }
-            pDb.pSchema.enc = sqliteinth.ENC(db);
-            if (pDb.pSchema.cache_size == 0)
-            {
-                size = utilc.sqlite3AbsInt32((int)meta[BTreeProp.DEFAULT_CACHE_SIZE]);
-                if (size == 0)
+
+                #region setup btree meta properties
+                ///Note: The #defined SQLITE_UTF* symbols in sqliteInt.h correspond to
+                ///the possible values of meta[BTREE_TEXT_ENCODING">1].
+                /// get btree meta values for keys between SCHEMA_VERSION..TEXT_ENCODING
+
+                var meta = Enum
+                    .Range(BTreeProp.SCHEMA_VERSION, BTreeProp.TEXT_ENCODING)
+                    .ToDictionary(p => p, p => pDb.BTree.sqlite3BtreeGetMeta(p));
+
+                pDb.pSchema.schema_cookie = (int)meta[BTreeProp.SCHEMA_VERSION];
+
+                ///If opening a non-empty database, check the text encoding. For the
+                ///main database, set sqlite3.enc to the encoding of the main database.
+                ///For an attached db, it is an error if the encoding is not the same
+                ///as sqlite3.enc.
+                if (meta[BTreeProp.TEXT_ENCODING] != 0)
                 {
-                    size = Globals.SQLITE_DEFAULT_CACHE_SIZE;
+                    ///text encoding 
+                    if (iDb == 0)
+                    {
+                        ///If opening the main database, set ENC(db). 
+                        var encoding = (SqliteEncoding)(meta[BTreeProp.TEXT_ENCODING] & 3);
+                        if (0 == encoding)
+                            encoding = SqliteEncoding.UTF8;
+                        db.Backends[0].pSchema.enc = encoding;
+                        //ENC( db ) = encoding;
+                        db.pDfltColl = db.sqlite3FindCollSeq(SqliteEncoding.UTF8, "BINARY", 0);
+                    }
+                    else {
+                        ///If opening an attached database, the encoding much match ENC(db) 
+                        if ((SqliteEncoding)meta[BTreeProp.TEXT_ENCODING] != sqliteinth.ENC(db))
+                        {
+                            malloc_cs.sqlite3SetString(ref pzErrMsg, db, "attached databases must use the same text encoding as main database");
+                            rc = SqlResult.SQLITE_ERROR;
+                            goto initone_error_out;
+                        }
+                    }
                 }
-                pDb.pSchema.cache_size = size;
-                pDb.BTree.SetCacheSize(pDb.pSchema.cache_size);
-            }
-            ///file_format==1    Version 3.0.0.
-            ///file_format==2    Version 3.1.3.  // ALTER TABLE ADD COLUMN
-            ///<param name="file_format==3    Version 3.1.4.  // ditto but with non">NULL defaults</param>
-            ///<param name="file_format==4    Version 3.3.0.  // DESC indices.  Boolean constants">file_format==4    Version 3.3.0.  // DESC indices.  Boolean constants</param>
-            ///<param name=""></param>
-            pDb.pSchema.file_format = (u8)meta[BTreeProp.FILE_FORMAT];
-            if (pDb.pSchema.file_format == 0)
-            {
-                pDb.pSchema.file_format = 1;
-            }
-            if (pDb.pSchema.file_format > sqliteinth.SQLITE_MAX_FILE_FORMAT)
-            {
-                malloc_cs.sqlite3SetString(ref pzErrMsg, db, "unsupported file format");
-                rc = SqlResult.SQLITE_ERROR;
-                goto initone_error_out;
-            }
-            ///Ticket #2804:  When we open a database in the newer file format,
-            ///clear the legacy_file_format pragma flag so that a VACUUM will
-            ///not downgrade the database and thus invalidate any descending
-            ///indices that the user might have created.
-            if (iDb == 0 && meta[BTreeProp.FILE_FORMAT] >= 4)
-            {
-                db.flags &= ~SqliteFlags.SQLITE_LegacyFileFmt;
-            }
-            ///Read the schema information out of the schema tables
-            Debug.Assert(db.init.IsBusy);
-            {
-                string zSql;
-                zSql = io.sqlite3MPrintf(db, "SELECT name, rootpage, sql FROM '%q'.%s ORDER BY rowid", db.Backends[iDb].Name, zMasterName);
+                else {
+                    db.DbSetProperty(iDb, sqliteinth.DB_Empty);
+                }
+                pDb.pSchema.enc = sqliteinth.ENC(db);
+                if (pDb.pSchema.cache_size == 0)
+                {
+                    var size = utilc.sqlite3AbsInt32((int)meta[BTreeProp.DEFAULT_CACHE_SIZE]);
+                    if (size == 0)
+                    {
+                        size = Globals.SQLITE_DEFAULT_CACHE_SIZE;
+                    }
+                    pDb.pSchema.cache_size = size;
+                    pDb.BTree.SetCacheSize(pDb.pSchema.cache_size);
+                }
+                ///file_format==1    Version 3.0.0.
+                ///file_format==2    Version 3.1.3.  // ALTER TABLE ADD COLUMN
+                ///<param name="file_format==3    Version 3.1.4.  // ditto but with non">NULL defaults</param>
+                ///<param name="file_format==4    Version 3.3.0.  // DESC indices.  Boolean constants">file_format==4    Version 3.3.0.  // DESC indices.  Boolean constants</param>
+                ///<param name=""></param>
+                pDb.pSchema.file_format = (u8)meta[BTreeProp.FILE_FORMAT];
+                if (pDb.pSchema.file_format == 0)
+                {
+                    pDb.pSchema.file_format = 1;
+                }
+                if (pDb.pSchema.file_format > sqliteinth.SQLITE_MAX_FILE_FORMAT)
+                {
+                    malloc_cs.sqlite3SetString(ref pzErrMsg, db, "unsupported file format");
+                    rc = SqlResult.SQLITE_ERROR;
+                    goto initone_error_out;
+                }
+                ///Ticket #2804:  When we open a database in the newer file format,
+                ///clear the legacy_file_format pragma flag so that a VACUUM will
+                ///not downgrade the database and thus invalidate any descending
+                ///indices that the user might have created.
+                if (iDb == 0 && meta[BTreeProp.FILE_FORMAT] >= 4)
+                {
+                    db.flags &= ~SqliteFlags.SQLITE_LegacyFileFmt;
+                }
+
+                #endregion
+
+                ///Read the schema information out of the schema tables
+                Debug.Assert(db.init.IsBusy);
+                {
+                    var sqlSelectTableDefinitions = io.sqlite3MPrintf(db, "SELECT name, rootpage, sql FROM '%q'.%s ORDER BY rowid", db.Backends[iDb].Name, zMasterName);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																{
 int (*xAuth)(void*,int,const char*,const char*,const char*,const char*);
 xAuth = db.xAuth;
 db.xAuth = 0;
 #endif
-                rc = legacy.sqlite3_exec(db, zSql, (dxCallback)sqlite3InitCallback, initData, 0);
-                pzErrMsg = initData.pzErrMsg;
+                    rc = legacy.Exec(db:db, zSql:sqlSelectTableDefinitions, xCallback:SchemaExtensions.InitTableDefinitionCallback, pArg:initData, NoErrors:0);
+                    pzErrMsg = initData.pzErrMsg;
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																db.xAuth = xAuth;
 }
 #endif
-                if (rc == SqlResult.SQLITE_OK)
-                    rc = initData.rc;
-                db.DbFree(ref zSql);
+                    if (rc == SqlResult.SQLITE_OK)
+                        rc = initData.rc;
+                    db.DbFree(ref sqlSelectTableDefinitions);
 #if !SQLITE_OMIT_ANALYZE
-                if (rc == SqlResult.SQLITE_OK)
-                {
-                    sqlite3AnalysisLoad(db, iDb);
+                    if (rc == SqlResult.SQLITE_OK)
+                    {
+                        sqlite3AnalysisLoad(db, iDb);
+                    }
+#endif                    
+                    ///Jump here for an error that occurs after successfully allocating
+                    ///curMain and calling sqlite3BtreeEnter(). For an error that occurs
+                    ///before that point, jump to error_out.
                 }
-#endif
-                //if ( db.mallocFailed != 0 )
-                //{
-                //  rc = SQLITE_NOMEM;
-                //  build.sqlite3ResetInternalSchema( db, -1 );
-                //}
-                ///
-                ///<summary>
-                ///Jump here for an error that occurs after successfully allocating
-                ///curMain and calling sqlite3BtreeEnter(). For an error that occurs
-                ///before that point, jump to error_out.
-                ///</summary>
-            }
-            if (rc == SqlResult.SQLITE_OK || (db.flags & SqliteFlags.SQLITE_RecoveryMode) != 0)
-            {
-                ///
-                ///<summary>
-                ///Black magic: If the SQLITE_RecoveryMode flag is set, then consider
-                ///the schema loaded, even if errors occurred. In this situation the
-                ///current sqlite3_prepare() operation will fail, but the following one
-                ///will attempt to compile the supplied statement against whatever subset
-                ///of the schema was loaded before the error occurred. The primary
-                ///purpose of this is to allow access to the sqlite_master table
-                ///even when its contents have been corrupted.
-                ///
-                ///</summary>
-                db.DbSetProperty(iDb, sqliteinth.DB_SchemaLoaded);
-                rc = SqlResult.SQLITE_OK;
-            }
-            initone_error_out:
-            if (openedTransaction != 0)
-            {
-                pDb.BTree.sqlite3BtreeCommit();
-            }
+                if (rc == SqlResult.SQLITE_OK || (db.flags & SqliteFlags.SQLITE_RecoveryMode) != 0)
+                {
+                    ///Black magic: If the SQLITE_RecoveryMode flag is set, then consider
+                    ///the schema loaded, even if errors occurred. In this situation the
+                    ///current sqlite3_prepare() operation will fail, but the following one
+                    ///will attempt to compile the supplied statement against whatever subset
+                    ///of the schema was loaded before the error occurred. The primary
+                    ///purpose of this is to allow access to the sqlite_master table
+                    ///even when its contents have been corrupted.
+                    db.DbSetProperty(iDb, sqliteinth.DB_SchemaLoaded);
+                    rc = SqlResult.SQLITE_OK;
+                }
+                initone_error_out:
+                if (openedTransaction != 0)
+                {
+                    pDb.BTree.sqlite3BtreeCommit();
+                }
 
-            pDb.BTree.Exit();
+
+            }//BTree Scope
+
             error_out:
             if (rc == SqlResult.SQLITE_NOMEM || rc == SqlResult.SQLITE_IOERR_NOMEM)
             {
@@ -446,7 +282,7 @@ db.xAuth = 0;
         /// file was of zero-length, then the DB_Empty flag is also set.
         ///
         ///</summary>
-        static SqlResult sqlite3Init(Connection db, ref string err)
+        static SqlResult InitialiseAllDatabases(Connection db, ref string err)
         {
             int i;
             SqlResult rc;
@@ -455,27 +291,29 @@ db.xAuth = 0;
             rc = SqlResult.SQLITE_OK;
 
             String pzErrMsg = String.Empty;
-
-
             using (db.init.scope())
             {
-                for (i = 0; rc == SqlResult.SQLITE_OK && i < db.BackendCount; i++)
-                {
-                    if (db.DbHasProperty(i, sqliteinth.DB_SchemaLoaded) || i == 1)
-                        continue;
-                    rc = sqlite3InitOne(db, i, ref pzErrMsg);
-                    if (rc != 0)
-                    {
-                        build.sqlite3ResetInternalSchema(db, i);
-                    }
-                }
+                Enumerable.Range(0, db.BackendCount)                    
+                    .Where(x => !(db.DbHasProperty(x, sqliteinth.DB_SchemaLoaded) || x == 1))
+                    .ForEach(
+                        idx => {
+                            rc = InitialiseSingleDatabase(db, idx, ref pzErrMsg);
+                            if (rc != 0)
+                            {
+                                build.sqlite3ResetInternalSchema(db, idx);
+                            }
+                            return rc == SqlResult.SQLITE_OK;
+                        }
+                    );
+                
+                
                 ///Once all the other databases have been initialised, load the schema
                 ///for the TEMP database. This is loaded last, as the TEMP database
                 ///schema may contain references to objects in other databases.
 #if !SQLITE_OMIT_TEMPDB
                 if (rc == SqlResult.SQLITE_OK && Sqlite3.ALWAYS(db.BackendCount > 1) && !db.DbHasProperty(1, sqliteinth.DB_SchemaLoaded))
                 {
-                    rc = sqlite3InitOne(db, 1, ref pzErrMsg);
+                    rc = InitialiseSingleDatabase(db, 1, ref pzErrMsg);
                     if (rc != 0)
                     {
                         build.sqlite3ResetInternalSchema(db, 1);
@@ -484,13 +322,10 @@ db.xAuth = 0;
 #endif
             }
 
-
             if (rc == SqlResult.SQLITE_OK && commit_internal)
             {
                 build.sqlite3CommitInternalChanges(db);
             }
-
-
 
             return rc;
         }
@@ -506,7 +341,7 @@ db.xAuth = 0;
             Debug.Assert(db.mutex.sqlite3_mutex_held());
             if (!db.init.IsBusy)
             {
-                rc = (SqlResult)sqlite3Init(db, ref pParse.zErrMsg);
+                rc = (SqlResult)InitialiseAllDatabases(db, ref pParse.zErrMsg);
             }
             if (rc != SqlResult.SQLITE_OK)
             {
@@ -932,16 +767,17 @@ db.xAuth = 0;
                 pzTail = null;
                 return sqliteinth.SQLITE_MISUSE_BKPT();
             }
-            db.mutex.sqlite3_mutex_enter();
-            db.sqlite3BtreeEnterAll();
-            rc = sqlite3Prepare(db, zSql, nBytes, saveSqlFlag, pOld, ref ppStmt, ref pzTail);
-            if (rc == SqlResult.SQLITE_SCHEMA)
+            using (db.mutex.scope())
             {
-                vdbeapi.sqlite3_finalize(ppStmt);
+                db.sqlite3BtreeEnterAll();
                 rc = sqlite3Prepare(db, zSql, nBytes, saveSqlFlag, pOld, ref ppStmt, ref pzTail);
+                if (rc == SqlResult.SQLITE_SCHEMA)
+                {
+                    vdbeapi.sqlite3_finalize(ppStmt);
+                    rc = sqlite3Prepare(db, zSql, nBytes, saveSqlFlag, pOld, ref ppStmt, ref pzTail);
+                }
+                sqlite3BtreeLeaveAll(db);
             }
-            sqlite3BtreeLeaveAll(db);
-            db.mutex.sqlite3_mutex_leave();
             return rc;
         }
         ///<summary>

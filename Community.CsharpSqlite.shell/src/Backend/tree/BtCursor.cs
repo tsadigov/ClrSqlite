@@ -1507,33 +1507,23 @@ aOverflow= null;
                 }
                 return p;
             }
-            public byte[] fetchPayload(///
-                ///<summary>
+            public byte[] fetchPayload(
                 ///Cursor pointing to entry to read from 
-                ///</summary>
-            ref int pAmt,///
-                ///<summary>
+            ref int pAmt,
                 ///Write the number of available bytes here 
-                ///</summary>
-            ref int outOffset,///
-                ///<summary>
+            ref int outOffset,
                 ///Offset into Buffer 
-                ///</summary>
-            bool skipKey///
-                ///<summary>
+            bool skipKey
                 ///read beginning at data if this is true 
-                ///</summary>
             )
             {
-                byte[] aPayload;
-                MemPage pPage;
                 u32 nKey;
                 u32 nLocal;
                 Debug.Assert(this != null && this.iPage >= 0 && this.apPage[this.iPage] != null);
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
                 Debug.Assert(this.cursorHoldsMutex());
                 outOffset = -1;
-                pPage = this.apPage[this.iPage];
+                var pPage = this.apPage[this.iPage];
                 Debug.Assert(this.aiIdx[this.iPage] < pPage.nCell);
                 if (NEVER(this.info.nSize == 0))
                 {
@@ -1541,7 +1531,7 @@ aOverflow= null;
                 }
                 //aPayload = pCur.info.pCell;
                 //aPayload += pCur.info.nHeader;
-                aPayload = malloc_cs.sqlite3Malloc(this.info.nSize - this.info.nHeader);
+                var aPayload = malloc_cs.sqlite3Malloc(this.info.nSize - this.info.nHeader);
                 if (pPage.intKey != false)
                 {
                     nKey = 0;

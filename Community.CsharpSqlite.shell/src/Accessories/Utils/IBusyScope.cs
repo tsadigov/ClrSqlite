@@ -24,12 +24,14 @@ namespace Community.CsharpSqlite.Utils
             public BusyScope(IBusyScope owner)
             {
                 this.owner = owner;
-                owner.Enter();
+                if(null!=owner)
+                    owner.Enter();
             }
 
             public void Dispose()
             {
-                owner.Exit();
+                if (null != owner)
+                    owner.Exit();
             }
         }
     }

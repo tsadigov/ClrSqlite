@@ -661,15 +661,16 @@ namespace Community.CsharpSqlite
 #if (!(HAVE_LOCALTIME_R) || !HAVE_LOCALTIME_R) && (!(HAVE_LOCALTIME_S) || !HAVE_LOCALTIME_S)
                 _Custom.tm pX;
                 sqlite3_mutex mutex = Sqlite3.sqlite3MutexAlloc(Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
-                mutex.sqlite3_mutex_enter();
-                pX = _Custom.localtime(t);
+                using (mutex.scope())
+                {
+                    pX = _Custom.localtime(t);
 #if !SQLITE_OMIT_BUILTIN_TEST
-                if (sqliteinth.sqlite3GlobalConfig.bLocaltimeFault)
-                    pX = null;
+                    if (sqliteinth.sqlite3GlobalConfig.bLocaltimeFault)
+                        pX = null;
 #endif
-                if (pX != null)
-                    pTm = pX;
-                mutex.sqlite3_mutex_leave();
+                    if (pX != null)
+                        pTm = pX;
+                }
                 rc = pX == null ? 1 : 0;
 #else
 #if !SQLITE_OMIT_BUILTIN_TEST

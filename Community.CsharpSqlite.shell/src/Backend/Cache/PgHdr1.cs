@@ -1,4 +1,5 @@
-﻿using Pgno = System.UInt32;
+﻿using Community.CsharpSqlite.Utils;
+using Pgno = System.UInt32;
 
 namespace Community.CsharpSqlite.Cache
 {
@@ -10,7 +11,7 @@ namespace Community.CsharpSqlite.Cache
     /// macro below).
     ///
     ///</summary>
-    public class PgHdr1
+    public class PgHdr1:ILinkedListNode<PgHdr1>
     {
         ///<summary>
         ///Key value (page number) 
@@ -20,7 +21,7 @@ namespace Community.CsharpSqlite.Cache
         ///<summary>
         ///Next in hash table chain 
         ///</summary>
-        public PgHdr1 pNext;
+        public PgHdr1 pNext { get; set; }
 
         ///<summary>
         ///Cache that currently owns this page 

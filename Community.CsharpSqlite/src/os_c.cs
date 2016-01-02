@@ -376,11 +376,9 @@ namespace Community.CsharpSqlite.Os
 #if SQLITE_THREADSAFE
 																																																									      mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #endif
-                Sqlite3.mutex.sqlite3_mutex_enter();
-
+            using (Sqlite3.mutex.scope())
                 pVfs = vfsList.linkedList().FirstOrDefault(f => (zVfs == null || zVfs == "") || (zVfs == pVfs.zName));//strcmp(zVfs, pVfs.zName) == null) break;
                 
-                Sqlite3.mutex.sqlite3_mutex_leave();
                 return pVfs;
             }
 
@@ -427,14 +425,14 @@ namespace Community.CsharpSqlite.Os
             ///</summary>
             public static SqlResult sqlite3_vfs_register(sqlite3_vfs pVfs, int makeDflt)
             {
-                sqlite3_mutex mutex;
 #if !SQLITE_OMIT_AUTOINIT
                 SqlResult rc = Sqlite3.sqlite3_initialize();
                 if (rc != 0)
                     return rc;
 #endif
-                mutex = Sqlite3.sqlite3MutexAlloc(Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
-                mutex.sqlite3_mutex_enter();
+
+            using (Sqlite3.sqlite3MutexAlloc(Sqlite3.SQLITE_MUTEX_STATIC_MASTER).scope())
+            {
                 vfsUnlink(pVfs);
                 if (makeDflt != 0 || vfsList == null)
                 {
@@ -447,11 +445,10 @@ namespace Community.CsharpSqlite.Os
                     vfsList.pNext = pVfs;
                 }
                 Debug.Assert(vfsList != null);
-                mutex.sqlite3_mutex_leave();
+            }
                 return SqlResult.SQLITE_OK;
             }
 
-            ///
             ///<summary>
             ///Unregister a VFS so that it is no longer accessible.
             ///
@@ -462,9 +459,9 @@ namespace Community.CsharpSqlite.Os
 #if SQLITE_THREADSAFE
 																																																									      sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #endif
-                Sqlite3.mutex.sqlite3_mutex_enter();
+            using (Sqlite3.mutex.scope())
                 vfsUnlink(pVfs);
-                Sqlite3.mutex.sqlite3_mutex_leave();
+
                 return SqlResult.SQLITE_OK;
             }
         }

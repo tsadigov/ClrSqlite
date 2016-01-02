@@ -31,8 +31,14 @@ namespace Community.CsharpSqlite.Utils
             this IEnumerable<T> source,
             Action<T> action)
         {
+            ForEach(source,x=> { action(x);return true; });
+        }
+        public static void ForEach<T>(
+            this IEnumerable<T> source,
+            Func<T, bool> action)
+        {
             foreach (T element in source)
-                action(element);
+                if(!action(element)) break;
         }
 
         public static void push<T>(ref T head, T p)where T : IBackwardLinkedListNode<T>

@@ -97,12 +97,8 @@ return ( p == null || p.expired ) ? 1 : 0;
                 SqlResult rc;
                 if (pStmt == null)
                 {
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="IMPLEMENTATION">12904 Invoking sqlite3_finalize() on a NULL</param>
                     ///<param name="pointer is a harmless no">op. </param>
-
                     rc = SqlResult.SQLITE_OK;
                 }
                 else
@@ -117,10 +113,11 @@ return ( p == null || p.expired ) ? 1 : 0;
 #if SQLITE_THREADSAFE
 																																																																																												        mutex = v.db.mutex;
 #endif
-                    Sqlite3.mutex.sqlite3_mutex_enter();
-                    rc = vdbeaux.sqlite3VdbeFinalize(ref v);
-                    rc = malloc_cs.sqlite3ApiExit(db, rc);
-                    Sqlite3.mutex.sqlite3_mutex_leave();
+                    using (Sqlite3.mutex.scope())
+                    {
+                        rc = vdbeaux.sqlite3VdbeFinalize(ref v);
+                        rc = malloc_cs.sqlite3ApiExit(db, rc);
+                    }
                 }
                 return rc;
             }
@@ -144,12 +141,12 @@ return ( p == null || p.expired ) ? 1 : 0;
                 else
                 {
                     Vdbe v = (Vdbe)pStmt;
-                    v.db.mutex.sqlite3_mutex_enter();
+                    v.db.mutex.Enter();
                     rc = v.sqlite3VdbeReset();
                     v.sqlite3VdbeRewind();
                     Debug.Assert((rc & (v.db.errMask)) == rc);
                     rc = malloc_cs.sqlite3ApiExit(v.db, rc);
-                    v.db.mutex.sqlite3_mutex_leave();
+                    v.db.mutex.Exit();
                 }
                 return rc;
             }
@@ -166,7 +163,7 @@ return ( p == null || p.expired ) ? 1 : 0;
 #if SQLITE_THREADSAFE
 																																																																					      sqlite3_mutex mutex = ( (Vdbe)pStmt ).db.mutex;
 #endif
-                Sqlite3.mutex.sqlite3_mutex_enter();
+                Sqlite3.mutex.Enter();
                 for (i = 0; i < p.nVar; i++)
                 {
                     p.aVar[i].sqlite3VdbeMemRelease();
@@ -176,7 +173,7 @@ return ( p == null || p.expired ) ? 1 : 0;
                 {
                     p.expired = true;
                 }
-                Sqlite3.mutex.sqlite3_mutex_leave();
+                Sqlite3.mutex.Exit();
                 return rc;
             }
 
@@ -499,7 +496,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
                     return (SqlResult)sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 db = v.db;
-                db.mutex.sqlite3_mutex_enter();
+                db.mutex.Enter();
                 while ((rc = (SqlResult)sqlite3Step(v)) == SqlResult.SQLITE_SCHEMA && cnt++ < SQLITE_MAX_SCHEMA_RETRY && (rc2 = rc = (SqlResult)Sqlite3.sqlite3Reprepare(v)) == SqlResult.SQLITE_OK)
                 {
                     sqlite3_reset(pStmt);
@@ -534,7 +531,7 @@ return sqliteinth.SQLITE_MISUSE_BKPT();
                     }
                 }
                 rc = (SqlResult)malloc_cs.sqlite3ApiExit(db, rc);
-                db.mutex.sqlite3_mutex_leave();
+                db.mutex.Exit();
                 return rc;
             }
 
@@ -750,7 +747,7 @@ return p.pMem.n;
                 pVm = (Vdbe)pStmt;
                 if (pVm != null && pVm.pResultSet != null && i < pVm.nResColumn && i >= 0)
                 {
-                    pVm.db.mutex.sqlite3_mutex_enter();
+                    pVm.db.mutex.Enter();
                     pOut = pVm.pResultSet[i];
                 }
                 else
@@ -786,7 +783,7 @@ return p.pMem.n;
 );
                     if (pVm != null && Sqlite3.ALWAYS(pVm.db != null))
                     {
-                        pVm.db.mutex.sqlite3_mutex_enter();
+                        pVm.db.mutex.Enter();
                         utilc.sqlite3Error(pVm.db, SqlResult.SQLITE_RANGE, 0);
                     }
                     pOut = nullMem;
@@ -828,7 +825,7 @@ return p.pMem.n;
                 if (p != null)
                 {
                     p.rc = malloc_cs.sqlite3ApiExit(p.db, p.rc);
-                    p.db.mutex.sqlite3_mutex_leave();
+                    p.db.mutex.Exit();
                 }
             }
 
@@ -955,29 +952,14 @@ return p.pMem.n;
             {
                 string ret = null;
                 Vdbe p = pStmt;
-                int n;
-                Connection db = p.db;
+                var db = p.db;
                 Debug.Assert(db != null);
-                n = pStmt.getColumnCount();
+                var n = pStmt.getColumnCount();
                 if (N < n && N >= 0)
                 {
                     N += (int)useType * n;
-                    db.mutex.sqlite3_mutex_enter();
-                    //Debug.Assert( db.mallocFailed == 0 );
-                    ret = xFunc(p.aColName[N]);
-                    ///
-                    ///<summary>
-                    ///A malloc may have failed inside of the xFunc() call. If this
-                    ///is the case, clear the mallocFailed flag and return NULL.
-                    ///
-                    ///</summary>
-
-                    //if ( db.mallocFailed != 0 )
-                    //{
-                    //  //db.mallocFailed = 0;
-                    //  ret = null;
-                    //}
-                    db.mutex.sqlite3_mutex_leave();
+                    using (db.mutex.scope())
+                        ret = xFunc(p.aColName[N]);
                 }
                 return ret;
             }
@@ -1101,18 +1083,18 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 {
                     return sqliteinth.SQLITE_MISUSE_BKPT();
                 }
-                p.db.mutex.sqlite3_mutex_enter();
+                p.db.mutex.Enter();
                 if (p.magic != VdbeMagic.VDBE_MAGIC_RUN || p.currentOpCodeIndex >= 0)
                 {
                     utilc.sqlite3Error(p.db, SqlResult.SQLITE_MISUSE, 0);
-                    p.db.mutex.sqlite3_mutex_leave();
+                    p.db.mutex.Exit();
                     io.sqlite3_log(SqlResult.SQLITE_MISUSE, "bind on a busy prepared statement: [%s]", p.zSql);
                     return sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 if (i < 1 || i > p.nVar)
                 {
                     utilc.sqlite3Error(p.db, SqlResult.SQLITE_RANGE, 0);
-                    p.db.mutex.sqlite3_mutex_leave();
+                    p.db.mutex.Exit();
                     return SqlResult.SQLITE_RANGE;
                 }
                 i--;
@@ -1193,7 +1175,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                         utilc.sqlite3Error(p.db, rc, 0);
                         rc = malloc_cs.sqlite3ApiExit(p.db, rc);
                     }
-                    p.db.mutex.sqlite3_mutex_leave();
+                    p.db.mutex.Exit();
                 }
                 return rc;
             }
@@ -1251,7 +1233,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                         utilc.sqlite3Error(p.db, rc, 0);
                         rc = malloc_cs.sqlite3ApiExit(p.db, rc);
                     }
-                    p.db.mutex.sqlite3_mutex_leave();
+                    p.db.mutex.Exit();
                 }
                 else
                     if (xDel != Sqlite3.SQLITE_STATIC && xDel != Sqlite3.SQLITE_TRANSIENT)
@@ -1269,7 +1251,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 if (rc == SqlResult.SQLITE_OK)
                 {
                     p.aVar[i - 1].Set( rValue);
-                    p.db.mutex.sqlite3_mutex_leave();
+                    p.db.mutex.Exit();
                 }
                 return rc;
             }
@@ -1287,7 +1269,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 if (rc == SqlResult.SQLITE_OK)
                 {
                     p.aVar[i - 1].Set( iValue);
-                    p.db.mutex.sqlite3_mutex_leave();
+                    p.db.mutex.Exit();
                 }
                 return rc;
             }
@@ -1299,7 +1281,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 rc = vdbeUnbind(p, i);
                 if (rc == SqlResult.SQLITE_OK)
                 {
-                    p.db.mutex.sqlite3_mutex_leave();
+                    p.db.mutex.Exit();
                 }
                 return rc;
             }
@@ -1374,7 +1356,7 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                 if (rc == SqlResult.SQLITE_OK)
                 {
                     p.aVar[i - 1].sqlite3VdbeMemSetZeroBlob( n);
-                    p.db.mutex.sqlite3_mutex_leave();
+                    p.db.mutex.Exit();
                 }
                 return rc;
             }
@@ -1450,12 +1432,12 @@ return bindText(pStmt, i, zData, nData, xDel, SqliteEncoding.UTF16NATIVE);
                 int i;
                 Debug.Assert(pTo.db == pFrom.db);
                 Debug.Assert(pTo.nVar == pFrom.nVar);
-                pTo.db.mutex.sqlite3_mutex_enter();
+                pTo.db.mutex.Enter();
                 for (i = 0; i < pFrom.nVar; i++)
                 {
                     vdbemem_cs.sqlite3VdbeMemMove(pTo.aVar[i], pFrom.aVar[i]);
                 }
-                pTo.db.mutex.sqlite3_mutex_leave();
+                pTo.db.mutex.Exit();
                 return SqlResult.SQLITE_OK;
             }
 
@@ -1519,18 +1501,8 @@ return sqlite3TransferBindings( pFromStmt, pToStmt );
             ///</summary>
             public static sqlite3_stmt sqlite3_next_stmt(Connection pDb, sqlite3_stmt pStmt)
             {
-                sqlite3_stmt pNext;
-                pDb.mutex.sqlite3_mutex_enter();
-                if (pStmt == null)
-                {
-                    pNext = (sqlite3_stmt)pDb.pVdbe;
-                }
-                else
-                {
-                    pNext = (sqlite3_stmt)((Vdbe)pStmt).pNext;
-                }
-                pDb.mutex.sqlite3_mutex_leave();
-                return pNext;
+                using (pDb.mutex.scope())
+                    return null == pStmt ?pDb.pVdbe:((Vdbe)pStmt).pNext;                    
             }
 
             ///

@@ -3449,11 +3449,8 @@ goto attach_end;
 				Debug.Assert(pzErrMsg!=null);
 				pEngine=ParseMethods.sqlite3ParserAlloc();
 				//sqlite3ParserAlloc((void*(*)(size_t))malloc_cs.sqlite3Malloc);
-				//if ( pEngine == null )
-				//{
-				//  db.mallocFailed = 1;
-				//  return SQLITE_NOMEM;
-				//}
+				//if ( pEngine == null ){ db.mallocFailed = 1;return SQLITE_NOMEM;}
+
 				Debug.Assert(this.pNewTable==null);
 				Debug.Assert(this.pNewTrigger==null);
 				Debug.Assert(this.nVar==0);
@@ -3467,10 +3464,7 @@ goto attach_end;
                 Console.Clear();
                 var tokens = lex(zSql).ToArray();
                 tokens.ForEach(t=>Shell.print(t.TokenType,t.Text));
-                //tokens.ForEach(itr => print(itr));
-                //Console.CursorTop+=3;
-                //Console.CursorLeft = 0;
-                //Console.ReadKey();
+                
                 int i = 0;
 				foreach(Token token in tokens){
                     i += token.Length;

@@ -139,72 +139,73 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		) {
 			sqlite3_backup p;
-			///
-			///<summary>
-			///Value to return 
-			///</summary>
-			///
-			///<summary>
-			///Lock the source database handle. The destination database
-			///handle is not locked in this routine, but it is locked in
-			///sqlite3_backup_step(). The user is required to ensure that no
-			///other thread accesses the destination handle for the duration
-			///of the backup operation.  Any attempt to use the destination
-			///database connection while a backup is in progress may cause
-			///a malfunction or a deadlock.
-			///
-			///</summary>
-			pSrcDb.mutex.sqlite3_mutex_enter();
-			pDestDb.mutex.sqlite3_mutex_enter();
-			if(pSrcDb==pDestDb) {
-				utilc.sqlite3Error(pDestDb,SqlResult.SQLITE_ERROR,"source and destination must be distinct");
-				p=null;
-			}
-			else {
-				///
-				///<summary>
-				///Allocate space for a new sqlite3_backup object...
-				///</summary>
-				///<param name="EVIDENCE">21591 The sqlite3_backup object is created by a</param>
-				///<param name="call to sqlite3_backup_init() and is destroyed by a call to">call to sqlite3_backup_init() and is destroyed by a call to</param>
-				///<param name="sqlite3_backup_finish(). ">sqlite3_backup_finish(). </param>
-				p=new sqlite3_backup();
-				// (sqlite3_backup)sqlite3_malloc( sizeof( sqlite3_backup ) );
-				//if ( null == p )
-				//{
-				//  utilc.sqlite3Error( pDestDb, SQLITE_NOMEM, 0 );
-				//}
-			}
-			///
-			///<summary>
-			///If the allocation succeeded, populate the new object. 
-			///</summary>
-			if(p!=null) {
-				// memset( p, 0, sizeof( sqlite3_backup ) );
-				p.pSrc=findBtree(pDestDb,pSrcDb,zSrcDb);
-				p.pDest=findBtree(pDestDb,pDestDb,zDestDb);
-				p.pDestDb=pDestDb;
-				p.pSrcDb=pSrcDb;
-				p.iNext=1;
-				p.isAttached=0;
-				if(null==p.pSrc||null==p.pDest||p.setDestPgsz()==SqlResult.SQLITE_NOMEM) {
-					///
-					///<summary>
-					///One (or both) of the named databases did not exist or an OOM
-					///error was hit.  The error has already been written into the
-					///pDestDb handle.  All that is left to do here is free the
-					///sqlite3_backup structure.
-					///
-					///</summary>
-					//malloc_cs.sqlite3_free( ref p );
-					p=null;
-				}
-			}
-			if(p!=null) {
-				p.pSrc.nBackup++;
-			}
-			pDestDb.mutex.sqlite3_mutex_leave();
-			pSrcDb.mutex.sqlite3_mutex_leave();
+            ///Value to return 
+            
+            ///Lock the source database handle. The destination database
+            ///handle is not locked in this routine, but it is locked in
+            ///sqlite3_backup_step(). The user is required to ensure that no
+            ///other thread accesses the destination handle for the duration
+            ///of the backup operation.  Any attempt to use the destination
+            ///database connection while a backup is in progress may cause
+            ///a malfunction or a deadlock.
+            using (pSrcDb.mutex.scope())
+            using (pDestDb.mutex.scope())
+            {
+                if (pSrcDb == pDestDb)
+                {
+                    utilc.sqlite3Error(pDestDb, SqlResult.SQLITE_ERROR, "source and destination must be distinct");
+                    p = null;
+                }
+                else {
+                    ///
+                    ///<summary>
+                    ///Allocate space for a new sqlite3_backup object...
+                    ///</summary>
+                    ///<param name="EVIDENCE">21591 The sqlite3_backup object is created by a</param>
+                    ///<param name="call to sqlite3_backup_init() and is destroyed by a call to">call to sqlite3_backup_init() and is destroyed by a call to</param>
+                    ///<param name="sqlite3_backup_finish(). ">sqlite3_backup_finish(). </param>
+                    p = new sqlite3_backup();
+                    // (sqlite3_backup)sqlite3_malloc( sizeof( sqlite3_backup ) );
+                    //if ( null == p )
+                    //{
+                    //  utilc.sqlite3Error( pDestDb, SQLITE_NOMEM, 0 );
+                    //}
+                }
+                ///
+                ///<summary>
+                ///If the allocation succeeded, populate the new object. 
+                ///</summary>
+                if (p != null)
+                {
+                    // memset( p, 0, sizeof( sqlite3_backup ) );
+                    p.pSrc = findBtree(pDestDb, pSrcDb, zSrcDb);
+                    p.pDest = findBtree(pDestDb, pDestDb, zDestDb);
+                    p.pDestDb = pDestDb;
+                    p.pSrcDb = pSrcDb;
+                    p.iNext = 1;
+                    p.isAttached = 0;
+                    if (null == p.pSrc || null == p.pDest || p.setDestPgsz() == SqlResult.SQLITE_NOMEM)
+                    {
+                        ///
+                        ///<summary>
+                        ///One (or both) of the named databases did not exist or an OOM
+                        ///error was hit.  The error has already been written into the
+                        ///pDestDb handle.  All that is left to do here is free the
+                        ///sqlite3_backup structure.
+                        ///
+                        ///</summary>
+                        //malloc_cs.sqlite3_free( ref p );
+                        p = null;
+                    }
+                }
+                if (p != null)
+                {
+                    p.pSrc.nBackup++;
+                }
+            }
+
+                
+			
 			return p;
 		}
 		///<summary>
@@ -300,275 +301,210 @@ namespace Community.CsharpSqlite {
         {
             SqlResult rc;
             JournalMode destMode;
-            ///
-            ///<summary>
             ///Destination journal mode 
-            ///</summary>
             int pgszSrc = 0;
-            ///
-            ///<summary>
             ///Source page size 
-            ///</summary>
             int pgszDest = 0;
-            ///
-            ///<summary>
             ///Destination page size 
-            ///</summary>
-            this.pSrcDb.mutex.sqlite3_mutex_enter();
-            this.pSrc.Enter();
-            if (this.pDestDb != null)
+            using (this.pSrcDb.mutex.scope())
+            using (this.pSrc.scope())
             {
-                this.pDestDb.mutex.sqlite3_mutex_enter();
-            }
-            rc = this.rc;
-            if (!Sqlite3.isFatalError(rc))
-            {
-                Pager pSrcPager = this.pSrc.sqlite3BtreePager();
-                ///
-                ///<summary>
-                ///Source pager 
-                ///</summary>
-                Pager pDestPager = this.pDest.sqlite3BtreePager();
-                ///
-                ///<summary>
-                ///Dest pager 
-                ///</summary>
-                int ii;
-                ///
-                ///<summary>
-                ///Iterator variable 
-                ///</summary>
-                Pgno nSrcPage = 0;
-                ///
-                ///<summary>
-                ///Size of source db in pages 
-                ///</summary>
-                int bCloseTrans = 0;
-                ///
-                ///<summary>
-                ///True if src db requires unlocking 
-                ///</summary>
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="If the source pager is currently in a write">transaction, return</param>
-                ///<param name="SQLITE_BUSY immediately.">SQLITE_BUSY immediately.</param>
-                ///<param name=""></param>
-                if (this.pDestDb != null && this.pSrc.pBt.inTransaction == TransType.TRANS_WRITE)
+
+                using (this.pDestDb.scope())
                 {
-                    rc = SqlResult.SQLITE_BUSY;
-                }
-                else
-                {
-                    rc = SqlResult.SQLITE_OK;
-                }
-                ///
-                ///<summary>
-                ///Lock the destination database, if it is not locked already. 
-                ///</summary>
-                if (SqlResult.SQLITE_OK == rc && this.bDestLocked == 0 && SqlResult.SQLITE_OK == (rc = this.pDest.sqlite3BtreeBeginTrans(2)))
-                {
-                    this.bDestLocked = 1;
-                    this.iDestSchema = this.pDest.sqlite3BtreeGetMeta(BTreeProp.SCHEMA_VERSION);
-                }
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="If there is no open read">transaction on the source database, open</param>
-                ///<param name="one now. If a transaction is opened here, then it will be closed">one now. If a transaction is opened here, then it will be closed</param>
-                ///<param name="before this function exits.">before this function exits.</param>
-                ///<param name=""></param>
-                if (rc == SqlResult.SQLITE_OK && !this.pSrc.sqlite3BtreeIsInReadTrans())
-                {
-                    rc = this.pSrc.sqlite3BtreeBeginTrans(0);
-                    bCloseTrans = 1;
-                }
-                ///
-                ///<summary>
-                ///Do not allow backup if the destination database is in WAL mode
-                ///and the page sizes are different between source and destination 
-                ///</summary>
-                pgszSrc = this.pSrc.GetPageSize();
-                pgszDest = this.pDest.GetPageSize();
-                destMode = this.pDest.sqlite3BtreePager().sqlite3PagerGetJournalMode();
-                if (SqlResult.SQLITE_OK == rc && destMode == JournalMode.PAGER_JOURNALMODE_WAL && pgszSrc != pgszDest)
-                {
-                    rc = SqlResult.SQLITE_READONLY;
-                }
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Now that there is a read">lock on the source database, query the</param>
-                ///<param name="source pager for the number of pages in the database.">source pager for the number of pages in the database.</param>
-                ///<param name=""></param>
-                nSrcPage = this.pSrc.sqlite3BtreeLastPage();
-                Debug.Assert(nSrcPage >= 0);
-                for (ii = 0; (nPage < 0 || ii < nPage) && this.iNext <= nSrcPage && 0 == rc; ii++)
-                {
-                    Pgno iSrcPg = this.iNext;
-                    ///
-                    ///<summary>
-                    ///Source page number 
-                    ///</summary>
-                    if (iSrcPg != this.pSrc.pBt.PENDING_BYTE_PAGE)
+                    rc = this.rc;
+                    if (!Sqlite3.isFatalError(rc))
                     {
-                        DbPage pSrcPg = null;
-                        ///
-                        ///<summary>
-                        ///Source page object 
-                        ///</summary>
-                        rc = pSrcPager.sqlite3PagerGet((u32)iSrcPg, ref pSrcPg);
-                        if (rc == SqlResult.SQLITE_OK)
-                        {
-                            rc = this.backupOnePage(iSrcPg, pSrcPg.sqlite3PagerGetData());
-                            PagerMethods.sqlite3PagerUnref(pSrcPg);
-                        }
-                    }
-                    this.iNext++;
-                }
-                if (rc == SqlResult.SQLITE_OK)
-                {
-                    this.nPagecount = nSrcPage;
-                    this.nRemaining = (nSrcPage + 1 - this.iNext);
-                    if (this.iNext > nSrcPage)
-                    {
-                        rc = SqlResult.SQLITE_DONE;
-                    }
-                    else
-                        if (0 == this.isAttached)
-                        {
-                            this.attachBackupObject();
-                        }
-                }
-                ///
-                ///<summary>
-                ///Update the schema version field in the destination database. This
-                ///</summary>
-                ///<param name="is to make sure that the schema">version really does change in</param>
-                ///<param name="the case where the source and destination databases have the">the case where the source and destination databases have the</param>
-                ///<param name="same schema version.">same schema version.</param>
-                ///<param name=""></param>
-                if (rc == SqlResult.SQLITE_DONE && (rc = this.pDest.sqlite3BtreeUpdateMeta(BTreeProp.SCHEMA_VERSION, this.iDestSchema + 1)) == SqlResult.SQLITE_OK)
-                {
-                    Pgno nDestTruncate;
-                    if (this.pDestDb != null)
-                    {
-                        build.sqlite3ResetInternalSchema(this.pDestDb, -1);
-                    }
-                    ///
-                    ///<summary>
-                    ///Set nDestTruncate to the final number of pages in the destination
-                    ///database. The complication here is that the destination page
-                    ///size may be different to the source page size.
-                    ///
-                    ///If the source page size is smaller than the destination page size,
-                    ///round up. In this case the call to sqlite3OsTruncate() below will
-                    ///fix the size of the file. However it is important to call
-                    ///sqlite3PagerTruncateImage() here so that any pages in the
-                    ///destination file that lie beyond the nDestTruncate page mark are
-                    ///journalled by PagerCommitPhaseOne() before they are destroyed
-                    ///by the file truncation.
-                    ///
-                    ///</summary>
-                    Debug.Assert(pgszSrc == this.pSrc.GetPageSize());
-                    Debug.Assert(pgszDest == this.pDest.GetPageSize());
-                    if (pgszSrc < pgszDest)
-                    {
-                        int ratio = pgszDest / pgszSrc;
-                        nDestTruncate = (Pgno)((nSrcPage + ratio - 1) / ratio);
-                        if (nDestTruncate == (int)(this.pDest.pBt.PENDING_BYTE_PAGE))
-                        {
-                            nDestTruncate--;
-                        }
-                    }
-                    else
-                    {
-                        nDestTruncate = (Pgno)(nSrcPage * (pgszSrc / pgszDest));
-                    }
-                    pDestPager.sqlite3PagerTruncateImage(nDestTruncate);
-                    if (pgszSrc < pgszDest)
-                    {
-                        ///
-                        ///<summary>
-                        ///</summary>
-                        ///<param name="If the source page">size,</param>
-                        ///<param name="two extra things may need to happen:">two extra things may need to happen:</param>
+                        Pager pSrcPager = this.pSrc.sqlite3BtreePager();
+                        ///Source pager 
+                        Pager pDestPager = this.pDest.sqlite3BtreePager();
+                        ///Dest pager 
+                        int ii;
+                        ///Iterator variable 
+                        Pgno nSrcPage = 0;
+                        ///Size of source db in pages 
+                        int bCloseTrans = 0;
+                        ///True if src db requires unlocking 
+                        ///<param name="If the source pager is currently in a write">transaction, return</param>
+                        ///<param name="SQLITE_BUSY immediately.">SQLITE_BUSY immediately.</param>
                         ///<param name=""></param>
-                        ///<param name="The destination may need to be truncated, and">The destination may need to be truncated, and</param>
-                        ///<param name=""></param>
-                        ///<param name="Data stored on the pages immediately following the">Data stored on the pages immediately following the</param>
-                        ///<param name="pending">byte page in the source database may need to be</param>
-                        ///<param name="copied into the destination database.">copied into the destination database.</param>
-                        ///<param name=""></param>
-                        int iSize = (int)(pgszSrc * nSrcPage);
-                        sqlite3_file pFile = pDestPager.sqlite3PagerFile();
-                        i64 iOff;
-                        i64 iEnd;
-                        Debug.Assert(pFile != null);
-                        Debug.Assert((i64)nDestTruncate * (i64)pgszDest >= iSize || (nDestTruncate == (int)(this.pDest.pBt.PENDING_BYTE_PAGE - 1) && iSize >= Sqlite3.PENDING_BYTE && iSize <= Sqlite3.PENDING_BYTE + pgszDest));
-                        ///
-                        ///<summary>
-                        ///This call ensures that all data required to recreate the original
-                        ///database has been stored in the journal for pDestPager and the
-                        ///journal synced to disk. So at this point we may safely modify
-                        ///the database file in any way, knowing that if a power failure
-                        ///occurs, the original database will be reconstructed from the 
-                        ///journal file.  
-                        ///</summary>
-                        rc = pDestPager.sqlite3PagerCommitPhaseOne(null, true);
-                        ///
-                        ///<summary>
-                        ///Write the extra pages and truncate the database file as required. 
-                        ///</summary>
-                        iEnd = MathExtensions.MIN(Sqlite3.PENDING_BYTE + pgszDest, iSize);
-                        for (iOff = Sqlite3.PENDING_BYTE + pgszSrc; rc == SqlResult.SQLITE_OK && iOff < iEnd; iOff += pgszSrc)
+                        if (this.pDestDb != null && this.pSrc.pBt.inTransaction == TransType.TRANS_WRITE)
                         {
-                            PgHdr pSrcPg = null;
-                            u32 iSrcPg = (u32)((iOff / pgszSrc) + 1);
-                            rc = pSrcPager.sqlite3PagerGet(iSrcPg, ref pSrcPg);
-                            if (rc == SqlResult.SQLITE_OK)
+                            rc = SqlResult.SQLITE_BUSY;
+                        }
+                        else
+                        {
+                            rc = SqlResult.SQLITE_OK;
+                        }
+                        ///Lock the destination database, if it is not locked already. 
+                        if (SqlResult.SQLITE_OK == rc && this.bDestLocked == 0 && SqlResult.SQLITE_OK == (rc = this.pDest.sqlite3BtreeBeginTrans(2)))
+                        {
+                            this.bDestLocked = 1;
+                            this.iDestSchema = this.pDest.sqlite3BtreeGetMeta(BTreeProp.SCHEMA_VERSION);
+                        }
+                        ///<param name="If there is no open read">transaction on the source database, open</param>
+                        ///<param name="one now. If a transaction is opened here, then it will be closed">one now. If a transaction is opened here, then it will be closed</param>
+                        ///<param name="before this function exits.">before this function exits.</param>
+                        ///<param name=""></param>
+                        if (rc == SqlResult.SQLITE_OK && !this.pSrc.sqlite3BtreeIsInReadTrans())
+                        {
+                            rc = this.pSrc.sqlite3BtreeBeginTrans(0);
+                            bCloseTrans = 1;
+                        }
+                        ///
+                        ///<summary>
+                        ///Do not allow backup if the destination database is in WAL mode
+                        ///and the page sizes are different between source and destination 
+                        ///</summary>
+                        pgszSrc = this.pSrc.GetPageSize();
+                        pgszDest = this.pDest.GetPageSize();
+                        destMode = this.pDest.sqlite3BtreePager().sqlite3PagerGetJournalMode();
+                        if (SqlResult.SQLITE_OK == rc && destMode == JournalMode.PAGER_JOURNALMODE_WAL && pgszSrc != pgszDest)
+                        {
+                            rc = SqlResult.SQLITE_READONLY;
+                        }
+                        ///<param name="Now that there is a read">lock on the source database, query the</param>
+                        ///<param name="source pager for the number of pages in the database.">source pager for the number of pages in the database.</param>
+                        ///<param name=""></param>
+                        nSrcPage = this.pSrc.sqlite3BtreeLastPage();
+                        Debug.Assert(nSrcPage >= 0);
+                        for (ii = 0; (nPage < 0 || ii < nPage) && this.iNext <= nSrcPage && 0 == rc; ii++)
+                        {
+                            Pgno iSrcPg = this.iNext;
+                            ///Source page number 
+                            if (iSrcPg != this.pSrc.pBt.PENDING_BYTE_PAGE)
                             {
-                                byte[] zData = pSrcPg.sqlite3PagerGetData();
-                                rc = os.sqlite3OsWrite(pFile, zData, pgszSrc, iOff);
+                                DbPage pSrcPg = null;
+                                ///Source page object 
+                                rc = pSrcPager.sqlite3PagerGet((u32)iSrcPg, ref pSrcPg);
+                                if (rc == SqlResult.SQLITE_OK)
+                                {
+                                    rc = this.backupOnePage(iSrcPg, pSrcPg.sqlite3PagerGetData());
+                                    PagerMethods.sqlite3PagerUnref(pSrcPg);
+                                }
                             }
-                            PagerMethods.sqlite3PagerUnref(pSrcPg);
+                            this.iNext++;
                         }
                         if (rc == SqlResult.SQLITE_OK)
                         {
-                            rc = pFile.backupTruncateFile((int)iSize);
+                            this.nPagecount = nSrcPage;
+                            this.nRemaining = (nSrcPage + 1 - this.iNext);
+                            if (this.iNext > nSrcPage)
+                            {
+                                rc = SqlResult.SQLITE_DONE;
+                            }
+                            else
+                                if (0 == this.isAttached)
+                            {
+                                this.attachBackupObject();
+                            }
                         }
-                        ///
-                        ///<summary>
-                        ///Sync the database file to disk. 
-                        ///</summary>
-                        if (rc == SqlResult.SQLITE_OK)
+                        ///Update the schema version field in the destination database. This
+                        ///<param name="is to make sure that the schema">version really does change in</param>
+                        ///<param name="the case where the source and destination databases have the">the case where the source and destination databases have the</param>
+                        ///<param name="same schema version.">same schema version.</param>
+                        ///<param name=""></param>
+                        if (rc == SqlResult.SQLITE_DONE && (rc = this.pDest.sqlite3BtreeUpdateMeta(BTreeProp.SCHEMA_VERSION, this.iDestSchema + 1)) == SqlResult.SQLITE_OK)
                         {
-                            rc = pDestPager.sqlite3PagerSync();
+                            Pgno nDestTruncate;
+                            if (this.pDestDb != null)
+                            {
+                                build.sqlite3ResetInternalSchema(this.pDestDb, -1);
+                            }
+                            ///Set nDestTruncate to the final number of pages in the destination
+                            ///database. The complication here is that the destination page
+                            ///size may be different to the source page size.
+                            ///
+                            ///If the source page size is smaller than the destination page size,
+                            ///round up. In this case the call to sqlite3OsTruncate() below will
+                            ///fix the size of the file. However it is important to call
+                            ///sqlite3PagerTruncateImage() here so that any pages in the
+                            ///destination file that lie beyond the nDestTruncate page mark are
+                            ///journalled by PagerCommitPhaseOne() before they are destroyed
+                            ///by the file truncation.
+                            Debug.Assert(pgszSrc == this.pSrc.GetPageSize());
+                            Debug.Assert(pgszDest == this.pDest.GetPageSize());
+                            if (pgszSrc < pgszDest)
+                            {
+                                int ratio = pgszDest / pgszSrc;
+                                nDestTruncate = (Pgno)((nSrcPage + ratio - 1) / ratio);
+                                if (nDestTruncate == (int)(this.pDest.pBt.PENDING_BYTE_PAGE))
+                                {
+                                    nDestTruncate--;
+                                }
+                            }
+                            else
+                            {
+                                nDestTruncate = (Pgno)(nSrcPage * (pgszSrc / pgszDest));
+                            }
+                            pDestPager.sqlite3PagerTruncateImage(nDestTruncate);
+                            if (pgszSrc < pgszDest)
+                            {
+                                ///<param name="If the source page">size,</param>
+                                ///<param name="two extra things may need to happen:">two extra things may need to happen:</param>
+                                ///<param name=""></param>
+                                ///<param name="The destination may need to be truncated, and">The destination may need to be truncated, and</param>
+                                ///<param name=""></param>
+                                ///<param name="Data stored on the pages immediately following the">Data stored on the pages immediately following the</param>
+                                ///<param name="pending">byte page in the source database may need to be</param>
+                                ///<param name="copied into the destination database.">copied into the destination database.</param>
+                                int iSize = (int)(pgszSrc * nSrcPage);
+                                sqlite3_file pFile = pDestPager.sqlite3PagerFile();
+                                i64 iOff;
+                                i64 iEnd;
+                                Debug.Assert(pFile != null);
+                                Debug.Assert((i64)nDestTruncate * (i64)pgszDest >= iSize || (nDestTruncate == (int)(this.pDest.pBt.PENDING_BYTE_PAGE - 1) && iSize >= Sqlite3.PENDING_BYTE && iSize <= Sqlite3.PENDING_BYTE + pgszDest));
+                                ///This call ensures that all data required to recreate the original
+                                ///database has been stored in the journal for pDestPager and the
+                                ///journal synced to disk. So at this point we may safely modify
+                                ///the database file in any way, knowing that if a power failure
+                                ///occurs, the original database will be reconstructed from the 
+                                ///journal file.  
+                                rc = pDestPager.sqlite3PagerCommitPhaseOne(null, true);
+                                ///
+                                ///<summary>
+                                ///Write the extra pages and truncate the database file as required. 
+                                ///</summary>
+                                iEnd = MathExtensions.MIN(Sqlite3.PENDING_BYTE + pgszDest, iSize);
+                                for (iOff = Sqlite3.PENDING_BYTE + pgszSrc; rc == SqlResult.SQLITE_OK && iOff < iEnd; iOff += pgszSrc)
+                                {
+                                    PgHdr pSrcPg = null;
+                                    u32 iSrcPg = (u32)((iOff / pgszSrc) + 1);
+                                    rc = pSrcPager.sqlite3PagerGet(iSrcPg, ref pSrcPg);
+                                    if (rc == SqlResult.SQLITE_OK)
+                                    {
+                                        byte[] zData = pSrcPg.sqlite3PagerGetData();
+                                        rc = os.sqlite3OsWrite(pFile, zData, pgszSrc, iOff);
+                                    }
+                                    PagerMethods.sqlite3PagerUnref(pSrcPg);
+                                }
+                                if (rc == SqlResult.SQLITE_OK)
+                                {
+                                    rc = pFile.backupTruncateFile((int)iSize);
+                                }
+                                ///Sync the database file to disk. 
+                                if (rc == SqlResult.SQLITE_OK)
+                                {
+                                    rc = pDestPager.sqlite3PagerSync();
+                                }
+                            }
+                            else
+                            {
+                                rc = pDestPager.sqlite3PagerCommitPhaseOne(null, false);
+                            }
+                            ///Finish committing the transaction to the destination database. 
+                            if (SqlResult.SQLITE_OK == rc && SqlResult.SQLITE_OK == (rc = this.pDest.sqlite3BtreeCommitPhaseTwo(0)))
+                            {
+                                rc = SqlResult.SQLITE_DONE;
+                            }
                         }
-                    }
-                    else
-                    {
-                        rc = pDestPager.sqlite3PagerCommitPhaseOne(null, false);
-                    }
-                    ///
-                    ///<summary>
-                    ///Finish committing the transaction to the destination database. 
-                    ///</summary>
-                    if (SqlResult.SQLITE_OK == rc && SqlResult.SQLITE_OK == (rc = this.pDest.sqlite3BtreeCommitPhaseTwo(0)))
-                    {
-                        rc = SqlResult.SQLITE_DONE;
-                    }
-                }
-                ///
-                ///<summary>
-                ///If bCloseTrans is true, then this function opened a read transaction
-                ///on the source database. Close the read transaction here. There is
-                ///no need to check the return values of the btree methods here, as
-                ///</summary>
-                ///<param name=""committing" a read">only transaction cannot fail.</param>
-                ///<param name=""></param>
-                if (bCloseTrans != 0)
-                {
+                        ///If bCloseTrans is true, then this function opened a read transaction
+                        ///on the source database. Close the read transaction here. There is
+                        ///no need to check the return values of the btree methods here, as
+                        ///<param name=""committing" a read">only transaction cannot fail.</param>
+                        ///<param name=""></param>
+                        if (bCloseTrans != 0)
+                        {
 #if !NDEBUG || SQLITE_COVERAGE_TEST
 																																																																																																																																	      //TESTONLY( int rc2 );
       //TESTONLY( rc2  = ) sqlite3BtreeCommitPhaseOne(p.pSrc, 0);
@@ -578,22 +514,19 @@ namespace Community.CsharpSqlite {
       rc2 |= sqlite3BtreeCommitPhaseTwo( p.pSrc, 0 );
       Debug.Assert( rc2 == SqlResult.SQLITE_OK );
 #else
-                    this.pSrc.sqlite3BtreeCommitPhaseOne(null);
-                    this.pSrc.sqlite3BtreeCommitPhaseTwo(0);
+                            this.pSrc.sqlite3BtreeCommitPhaseOne(null);
+                            this.pSrc.sqlite3BtreeCommitPhaseTwo(0);
 #endif
+                        }
+                        if (rc == SqlResult.SQLITE_IOERR_NOMEM)
+                        {
+                            rc = SqlResult.SQLITE_NOMEM;
+                        }
+                        this.rc = rc;
+                    }
                 }
-                if (rc == SqlResult.SQLITE_IOERR_NOMEM)
-                {
-                    rc = SqlResult.SQLITE_NOMEM;
-                }
-                this.rc = rc;
             }
-            if (this.pDestDb != null)
-            {
-                this.pDestDb.mutex.sqlite3_mutex_leave();
-            }
-            this.pSrc.Exit();
-            this.pSrcDb.mutex.sqlite3_mutex_leave();
+
             return rc;
         }
         ///<summary>
@@ -601,84 +534,51 @@ namespace Community.CsharpSqlite {
         ///</summary>
         public SqlResult sqlite3_backup_finish()
         {
-            sqlite3_backup pp;
-            ///
-            ///<summary>
-            ///Ptr to head of pagers backup list 
-            ///</summary>
-            sqlite3_mutex mutex;
-            ///
-            ///<summary>
-            ///Mutex to protect source database 
-            ///</summary>
-            SqlResult rc;
-            ///
-            ///<summary>
-            ///Value to return 
-            ///</summary>
-            ///
-            ///<summary>
-            ///Enter the mutexes 
-            ///</summary>
+            sqlite3_backup pp;///Ptr to head of pagers backup list 
+            
+            SqlResult rc;///Value to return 
+            
             if (this == null)
                 return SqlResult.SQLITE_OK;
-            this.pSrcDb.mutex.sqlite3_mutex_enter();
-            this.pSrc.Enter();
-            mutex = this.pSrcDb.mutex;
-            if (this.pDestDb != null)
+
+            var mutex = this.pSrcDb.mutex;///Mutex to protect source database 
+            using (mutex.scope())///Enter the mutexes 
             {
-                this.pDestDb.mutex.sqlite3_mutex_enter();
-            }
-            ///
-            ///<summary>
-            ///Detach this backup from the source pager. 
-            ///</summary>
-            if (this.pDestDb != null)
-            {
-                this.pSrc.nBackup--;
-            }
-            if (this.isAttached != 0)
-            {
-                pp = this.pSrc.sqlite3BtreePager().sqlite3PagerBackupPtr();
-                while (pp != this)
-                {
-                    pp = (pp).pNext;
+                using (this.pSrc.scope())///Enter the mutexes 
+                using (this.pDestDb.scope())
+                {                    
+                    ///Detach this backup from the source pager. 
+                    if (this.pDestDb != null)
+                    {
+                        this.pSrc.nBackup--;
+                    }
+                    if (this.isAttached != 0)
+                    {
+                        pp = this.pSrc.sqlite3BtreePager().sqlite3PagerBackupPtr();
+                        while (pp != this)
+                        {
+                            pp = (pp).pNext;
+                        }
+                        this.pSrc.sqlite3BtreePager().pBackup = this.pNext;
+                    }
+                    ///If a transaction is still open on the Btree, roll it back. 
+                    this.pDest.sqlite3BtreeRollback();
+                    ///Set the error code of the destination database handle. 
+                    rc = (this.rc == SqlResult.SQLITE_DONE) ? SqlResult.SQLITE_OK : this.rc;
+                    utilc.sqlite3Error(this.pDestDb, rc, 0);
+                    ///Exit the mutexes and free the backup context structure.                  
                 }
-                this.pSrc.sqlite3BtreePager().pBackup = this.pNext;
+                if (this.pDestDb != null)
+                {
+                    ///<param name="EVIDENCE">21591 The sqlite3_backup object is created by a</param>
+                    ///<param name="call to sqlite3_backup_init() and is destroyed by a call to">call to sqlite3_backup_init() and is destroyed by a call to</param>
+                    ///<param name="sqlite3_backup_finish(). ">sqlite3_backup_finish(). </param>
+                    //malloc_cs.sqlite3_free( ref p );
+                }
             }
-            ///
-            ///<summary>
-            ///If a transaction is still open on the Btree, roll it back. 
-            ///</summary>
-            this.pDest.sqlite3BtreeRollback();
-            ///
-            ///<summary>
-            ///Set the error code of the destination database handle. 
-            ///</summary>
-            rc = (this.rc == SqlResult.SQLITE_DONE) ? SqlResult.SQLITE_OK : this.rc;
-            utilc.sqlite3Error(this.pDestDb, rc, 0);
-            ///
-            ///<summary>
-            ///Exit the mutexes and free the backup context structure. 
-            ///</summary>
-            if (this.pDestDb != null)
-            {
-                this.pDestDb.mutex.sqlite3_mutex_leave();
-            }
-            this.pSrc.Exit();
-            if (this.pDestDb != null)
-            {
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="EVIDENCE">21591 The sqlite3_backup object is created by a</param>
-                ///<param name="call to sqlite3_backup_init() and is destroyed by a call to">call to sqlite3_backup_init() and is destroyed by a call to</param>
-                ///<param name="sqlite3_backup_finish(). ">sqlite3_backup_finish(). </param>
-                //malloc_cs.sqlite3_free( ref p );
-            }
-            mutex.sqlite3_mutex_leave();
             return rc;
         }
+
         public///<summary>
             /// Return the number of pages still to be backed up as of the most recent
             /// call to sqlite3_backup_step().

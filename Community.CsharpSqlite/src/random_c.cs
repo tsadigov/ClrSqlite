@@ -7,6 +7,7 @@ using u64 = System.UInt64;
 
 namespace Community.CsharpSqlite
 {
+    using Utils;
 	public partial class Sqlite3
 	{
 		///<summary>
@@ -133,30 +134,32 @@ namespace Community.CsharpSqlite
 		{
 			u8[] zBuf = new u8[N];
 			pBuf = 0;
-			#if SQLITE_THREADSAFE
+#if SQLITE_THREADSAFE
 																																																									      sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_PRNG );
 #endif
-			mutex.sqlite3_mutex_enter();
-			while (N-- > 0) {
-				pBuf = (u32)((pBuf << 8) + randomu8 ());
-				//  zBuf[N] = randomu8();
-			}
-			mutex.sqlite3_mutex_leave();
+            using (mutex.scope())
+                while (N-- > 0)
+                {
+                    pBuf = (u32)((pBuf << 8) + randomu8());
+                    //  zBuf[N] = randomu8();
+                }
 		}
 
 		public static void sqlite3_randomness (byte[] pBuf, int Offset, int N)
 		{
 			i64 iBuf = System.DateTime.Now.Ticks;
-			#if SQLITE_THREADSAFE
+#if SQLITE_THREADSAFE
 																																																									  sqlite3_mutex mutex = sqlite3MutexAlloc(SQLITE_MUTEX_STATIC_PRNG);
 #endif
-			mutex.sqlite3_mutex_enter();
-			while (N-- > 0) {
-				iBuf = (u32)((iBuf << 8) + randomu8 ());
-				//  zBuf[N] = randomu8();
-				pBuf [Offset++] = (byte)iBuf;
-			}
-			mutex.sqlite3_mutex_leave();
+            using (mutex.scope())
+            {
+                while (N-- > 0)
+                {
+                    iBuf = (u32)((iBuf << 8) + randomu8());
+                    //  zBuf[N] = randomu8();
+                    pBuf[Offset++] = (byte)iBuf;
+                }
+            }
 		}
 
 		#if !SQLITE_OMIT_BUILTIN_TEST

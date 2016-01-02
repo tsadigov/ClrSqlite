@@ -1,4 +1,5 @@
 #define SQLITE_OS_WIN
+using Community.CsharpSqlite.Utils;
 using System.Diagnostics;
 namespace Community.CsharpSqlite
 {
@@ -10,20 +11,21 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 
-		public class sqlite3_mutex
+		public class sqlite3_mutex:IBusyScope
 		{
-            
-		}
-        public static class sqlite3_mutex_Extensions {
-            //#define sqlite3_mutex_free(X)
-            public static void sqlite3_mutex_enter(this sqlite3_mutex p)
-            {
-            }
+        //#define sqlite3_mutex_free(X)
+        public  void Enter()
+        {
+        }
 
-            //#define sqlite3_mutex_try(X)      SqlResult.SQLITE_OK
-            public static void sqlite3_mutex_leave(this sqlite3_mutex p)
-            {
-            }
+        //#define sqlite3_mutex_try(X)      SqlResult.SQLITE_OK
+        public void Exit()
+        {
+        }
+
+    }
+        public static class sqlite3_mutex_Extensions {
+            
 
             //#define X.sqlite3_mutex_leave()
             public static bool sqlite3_mutex_held(this sqlite3_mutex p)

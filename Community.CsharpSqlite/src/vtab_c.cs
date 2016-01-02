@@ -69,7 +69,7 @@ namespace Community.CsharpSqlite
             {
                 SqlResult rc;
                 Module pMod;
-                db.mutex.sqlite3_mutex_enter();
+                db.mutex.Enter();
                 var nName = StringExtensions.Strlen30(zName);
                 pMod = new Module();
                 //  (Module)sqlite3DbMallocRaw( db, sizeof( Module ) + nName + 1 );
@@ -101,7 +101,7 @@ namespace Community.CsharpSqlite
                         xDestroy(ref pAux);
                     }
                 rc = malloc_cs.sqlite3ApiExit(db, SqlResult.SQLITE_OK);
-                db.mutex.sqlite3_mutex_leave();
+                db.mutex.Exit();
                 return rc;
             }
             ///<summary>
@@ -584,11 +584,11 @@ namespace Community.CsharpSqlite
                 var rc = SqlResult.SQLITE_OK;
                 Table pTab;
                 string zErr = "";
-                db.mutex.sqlite3_mutex_enter();
+                db.mutex.Enter();
                 if (null == db.pVtabCtx || null == (pTab = db.pVtabCtx.pTab))
                 {
                     utilc.sqlite3Error(db, SqlResult.SQLITE_MISUSE, 0);
-                    db.mutex.sqlite3_mutex_leave();
+                    db.mutex.Exit();
                     return sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 Debug.Assert((pTab.tabFlags & TableFlags.TF_Virtual) != 0);
@@ -632,7 +632,7 @@ namespace Community.CsharpSqlite
                 }
                 Debug.Assert((rc & (SqlResult)0xff) == rc);
                 rc = malloc_cs.sqlite3ApiExit(db, rc);
-                db.mutex.sqlite3_mutex_leave();
+                db.mutex.Exit();
                 return rc;
             }
             ///<summary>
@@ -1032,7 +1032,7 @@ namespace Community.CsharpSqlite
                 // TODO ...){
                 //va_list ap;
                 var rc = SqlResult.SQLITE_OK;
-                db.mutex.sqlite3_mutex_enter();
+                db.mutex.Enter();
                 _Custom.va_start(ap, "op");
                 switch (op)
                 {
@@ -1057,7 +1057,7 @@ namespace Community.CsharpSqlite
                 _Custom.va_end(ref ap);
                 if (rc != SqlResult.SQLITE_OK)
                     utilc.sqlite3Error(db, rc, 0);
-                db.mutex.sqlite3_mutex_leave();
+                db.mutex.Exit();
                 return rc;
             }
 #endif

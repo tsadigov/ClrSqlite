@@ -934,7 +934,7 @@ break;
 			if(!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return sqliteinth.SQLITE_MISUSE_BKPT();
 			}
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			///
 			///<summary>
 			///Force xDestroy calls on all virtual tables 
@@ -957,7 +957,7 @@ break;
 			///</summary>
 			if(db.pVdbe!=null) {
 				utilc.sqlite3Error(db,SqlResult.SQLITE_BUSY,"unable to close due to unfinalised statements");
-				db.mutex.sqlite3_mutex_leave();
+				db.mutex.Exit();
 				return SqlResult.SQLITE_BUSY;
 			}
 			Debug.Assert(utilc.sqlite3SafetyCheckSickOrOk(db));
@@ -970,7 +970,7 @@ break;
 				Btree pBt=backend.BTree;
 				if(pBt!=null&&pBt.sqlite3BtreeIsInBackup()) {
 					utilc.sqlite3Error(db, SqlResult.SQLITE_BUSY, "unable to close due to unfinished backup operation");
-					db.mutex.sqlite3_mutex_leave();
+					db.mutex.Exit();
 					return SqlResult.SQLITE_BUSY;
 				}
 			}
@@ -1059,7 +1059,7 @@ break;
 			///
 			///</summary>
 			db.DbFree(ref db.Backends[1].pSchema);
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
             db.magic = Sqlite3.SQLITE_MAGIC_CLOSED;
 			sqlite3_mutex_free(db.mutex);
 			Debug.Assert(db.lookaside.nOut==0);
@@ -1371,11 +1371,11 @@ return 1;
 		///
 		///</summary>
 		static SqlResult sqlite3_busy_handler(Connection db,dxBusy xBusy,object pArg) {
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			db.busyHandler.xFunc=xBusy;
 			db.busyHandler.pArg=pArg;
 			db.busyHandler.nBusy=0;
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return SqlResult.SQLITE_OK;
 		}
 		#if !SQLITE_OMIT_PROGRESS_CALLBACK
@@ -1386,7 +1386,7 @@ return 1;
 		///</summary>
 		static void sqlite3_progress_handler(Connection db,int nOps,dxProgress xProgress,//int (xProgress)(void),
 		object pArg) {
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			if(nOps>0) {
 				db.xProgress=xProgress;
 				db.nProgressOps=nOps;
@@ -1397,7 +1397,7 @@ return 1;
 				db.nProgressOps=0;
 				db.pProgressArg=null;
 			}
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 		}
 		#endif
 		///<summary>
@@ -1528,7 +1528,7 @@ enc = SqliteEncoding.UTF16BE;
 		) {
 			var rc=SqlResult.SQLITE_ERROR;
 			FuncDestructor pArg=null;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			if(xDestroy!=null) {
 				pArg=new FuncDestructor();
 				//(FuncDestructor )sqlite3DbMallocZero(db, sizeof(FuncDestructor));
@@ -1547,7 +1547,7 @@ enc = SqliteEncoding.UTF16BE;
 			}
 			//_out:
 			rc=malloc_cs.sqlite3ApiExit(db,rc);
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return rc;
 		}
 		#if !SQLITE_OMIT_UTF16
@@ -1588,13 +1588,13 @@ return rc;
 		public static SqlResult sqlite3_overload_function(Connection db,string zName,int nArg) {
 			int nName=StringExtensions.Strlen30(zName);
             SqlResult rc;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
             if (FuncDefTraverse.sqlite3FindFunction(db, zName, nName, nArg, SqliteEncoding.UTF8, 0) == null)
             {
                 sqlite3CreateFunc(db, zName, nArg, SqliteEncoding.UTF8, 0, (dxFunc)vdbeapi.sqlite3InvalidFunction, null, null, null);
 			}
 			rc=malloc_cs.sqlite3ApiExit(db,SqlResult.SQLITE_OK);
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return rc;
 		}
 		#if !SQLITE_OMIT_TRACE
@@ -1609,11 +1609,11 @@ return rc;
 		static object sqlite3_trace(Connection db,dxTrace xTrace,object pArg) {
 			// (*xTrace)(void*,const char), object pArg){
 			object pOld;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			pOld=db.pTraceArg;
 			db.xTrace=xTrace;
 			db.pTraceArg=pArg;
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return pOld;
 		}
 		///<summary>
@@ -1628,11 +1628,11 @@ return rc;
 		static object sqlite3_profile(Connection db,dxProfile xProfile,//void (*xProfile)(void*,const char*,sqlite_u3264),
 		object pArg) {
 			object pOld;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			pOld=db.pProfileArg;
 			db.xProfile=xProfile;
 			db.pProfileArg=pArg;
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return pOld;
 		}
 		#endif
@@ -1654,11 +1654,11 @@ return rc;
 		///</summary>
 		) {
 			object pOld;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			pOld=db.pCommitArg;
 			db.xCommitCallback=xCallback;
 			db.pCommitArg=pArg;
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return pOld;
 		}
 		///<summary>
@@ -1677,11 +1677,11 @@ return rc;
 		///</summary>
 		) {
 			object pRet;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			pRet=db.pUpdateArg;
 			db.xUpdateCallback=xCallback;
 			db.pUpdateArg=pArg;
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return pRet;
 		}
 		///<summary>
@@ -1700,11 +1700,11 @@ return rc;
 		///</summary>
 		) {
 			object pRet;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			pRet=db.pRollbackArg;
 			db.xRollbackCallback=xCallback;
 			db.pRollbackArg=pArg;
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return pRet;
 		}
 		#if !SQLITE_OMIT_WAL
@@ -1948,7 +1948,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 			if(!utilc.sqlite3SafetyCheckSickOrOk(db)) {
 				return sqlite3ErrStr(sqliteinth.SQLITE_MISUSE_BKPT());
 			}
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			//if ( db.mallocFailed != 0 )
 			//{
 			//  z = sqlite3ErrStr( SQLITE_NOMEM );
@@ -1961,7 +1961,7 @@ int sqlite3Checkpoint(sqlite3 db, int iDb, int eMode, int *pnLog, int *pnCkpt){
 					z=sqlite3ErrStr(db.errCode);
 				}
 			}
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return z;
 		}
 		#if !SQLITE_OMIT_UTF16
@@ -2562,7 +2562,7 @@ return z;
 					goto opendb_out;
 				}
 			}
-			connection.mutex.sqlite3_mutex_enter();
+			connection.mutex.Enter();
 			connection.errMask=(SqlResult)0xff;
 			connection.BackendCount=2;
             connection.magic = Sqlite3.SQLITE_MAGIC_BUSY;
@@ -2708,7 +2708,7 @@ SQLITE_DEFAULT_LOCKING_MODE);
 			//malloc_cs.sqlite3_free(zOpen);
 			if(connection!=null) {
 				Debug.Assert(connection.mutex!=null||isThreadsafe==0||!sqliteinth.sqlite3GlobalConfig.bFullMutex);
-				connection.mutex.sqlite3_mutex_leave();
+				connection.mutex.Exit();
 			}
 			rc=sqlite3_errcode(connection);
 			if(rc==SqlResult.SQLITE_NOMEM) {
@@ -2783,11 +2783,11 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 		///</summary>
 		static SqlResult sqlite3_create_collation(Connection db,string zName,SqliteEncoding enc,object pCtx,dxCompare xCompare) {
             SqlResult rc;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			//Debug.Assert( 0 == db.mallocFailed );
 			rc=createCollation(db,zName,enc,CollationType.USER,pCtx,xCompare,null);
 			rc=malloc_cs.sqlite3ApiExit(db,rc);
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return rc;
 		}
 		
@@ -2798,11 +2798,11 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 		dxDelCollSeq xDel//void(*xDel)(void)
 		) {
             SqlResult rc;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			//Debug.Assert( 0 == db.mallocFailed );
 			rc=createCollation(db,zName,enc,CollationType.USER,pCtx,xCompare,xDel);
 			rc=malloc_cs.sqlite3ApiExit(db,rc);
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return rc;
 		}
 		#if !SQLITE_OMIT_UTF16
@@ -2835,11 +2835,11 @@ return malloc_cs.sqlite3ApiExit(0, rc);
 		///db. Replace any previously installed collation sequence factory.
 		///</summary>
 		static SqlResult sqlite3_collation_needed(Connection db,object pCollNeededArg,dxCollNeeded xCollNeeded) {
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			db.xCollNeeded=xCollNeeded;
 			db.xCollNeeded16=null;
 			db.pCollNeededArg=pCollNeededArg;
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return SqlResult.SQLITE_OK;
 		}
 		#if !SQLITE_OMIT_UTF16
@@ -3082,9 +3082,9 @@ error_out:
 		///
 		///</summary>
 		static SqlResult sqlite3_extended_result_codes(Connection db,bool onoff) {
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			db.errMask=(SqlResult)(onoff?0xffffffff:0xff);
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return SqlResult.SQLITE_OK;
 		}
 		///
@@ -3095,7 +3095,7 @@ error_out:
 		static SqlResult sqlite3_file_control(Connection db,string zDbName,int op,ref sqlite3_int64 pArg) {
 			var rc=SqlResult.SQLITE_ERROR;
 			int iDb;
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			if(zDbName==null) {
 				iDb=0;
 			}
@@ -3133,7 +3133,7 @@ error_out:
                     pBtree.Exit();
 				}
 			}
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return rc;
 		}
 		///
@@ -3307,9 +3307,9 @@ error_out:
 				case SQLITE_TESTCTRL_RESERVE: {
 					Connection db=_Custom.va_arg(ap,(Connection)null);
 					int x=_Custom.va_arg(ap,(Int32)0);
-					db.mutex.sqlite3_mutex_enter();
+					db.mutex.Enter();
 					db.Backends[0].BTree.sqlite3BtreeSetPageSize(0,x,0);
-					db.mutex.sqlite3_mutex_leave();
+					db.mutex.Exit();
 					break;
 				}
 				///

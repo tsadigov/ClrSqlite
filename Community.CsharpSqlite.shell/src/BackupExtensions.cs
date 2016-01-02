@@ -41,9 +41,9 @@ namespace Community.CsharpSqlite
                     ///</summary>
                     SqlResult rc;
                     Debug.Assert(p.pDestDb != null);
-                    p.pDestDb.mutex.sqlite3_mutex_enter();
+                    p.pDestDb.mutex.Enter();
                     rc = p.backupOnePage(iPage, aData);
-                    p.pDestDb.mutex.sqlite3_mutex_leave();
+                    p.pDestDb.mutex.Exit();
                     Debug.Assert(rc != SqlResult.SQLITE_BUSY && rc != SqlResult.SQLITE_LOCKED);
                     if (rc != SqlResult.SQLITE_OK)
                     {

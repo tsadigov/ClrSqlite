@@ -95,7 +95,7 @@ namespace Community.CsharpSqlite
 		/// Entries for which argv[1]==NULL simply record the number of rows in
 		/// the table.
 		///</summary>
-		static int analysisLoader (object pData, sqlite3_int64 argc, object Oargv, object NotUsed)
+		static int analysisLoader (analysisInfo pData, sqlite3_int64 argc, object Oargv, object NotUsed)
 		{
 			string[] argv = (string[])Oargv;
 			analysisInfo pInfo = (analysisInfo)pData;
@@ -237,7 +237,7 @@ namespace Community.CsharpSqlite
 			//}
 			//else
 			{
-				rc = legacy.sqlite3_exec (db, zSql, (dxCallback)analysisLoader, sInfo, 0);
+				rc = legacy.Exec (db, zSql, analysisLoader, sInfo, 0);
 				db.DbFree (ref zSql);
 				///
 ///<summary>

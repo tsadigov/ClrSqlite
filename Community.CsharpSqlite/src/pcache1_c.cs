@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using u32 = System.UInt32;
 using Pgno = System.UInt32;
+using System.Linq;
 
 namespace Community.CsharpSqlite
 {
@@ -45,13 +46,13 @@ namespace Community.CsharpSqlite
             //#define pcache1EnterMutex(X) sqlite3_mutex_enter((X).mutex)
             static void pcache1EnterMutex(PGroup X)
             {
-                X.mutex.sqlite3_mutex_enter();
+                X.mutex.Enter();
             }
 
             //#define pcache1LeaveMutex(X) sqlite3_mutex_leave((X).mutex)
             static void pcache1LeaveMutex(PGroup X)
             {
-                X.mutex.sqlite3_mutex_leave();
+                X.mutex.Exit();
             }
 
             ///
@@ -115,7 +116,7 @@ namespace Community.CsharpSqlite
                 Sqlite3.sqlite3StatusSet(SqliteStatus.SQLITE_STATUS_PAGECACHE_SIZE, nByte);
                 if (nByte <= pcache1.szSlot)
                 {
-                    pcache1.mutex.sqlite3_mutex_enter();
+                    pcache1.mutex.Enter();
                     p = pcache1.pFree._PgHdr;
                     if (p != null)
                     {
@@ -125,7 +126,7 @@ namespace Community.CsharpSqlite
                         Debug.Assert(pcache1.nFreeSlot >= 0);
                         Sqlite3.sqlite3StatusAdd(SqliteStatus.SQLITE_STATUS_PAGECACHE_USED, 1);
                     }
-                    pcache1.mutex.sqlite3_mutex_leave();
+                    pcache1.mutex.Exit();
                 }
                 if (p == null)
                 {
@@ -142,9 +143,9 @@ namespace Community.CsharpSqlite
                     {
                         int sz = nByte;
                         //malloc_cs.sqlite3MallocSize( p );
-                        pcache1.mutex.sqlite3_mutex_enter();
+                        pcache1.mutex.Enter();
                         Sqlite3.sqlite3StatusAdd(SqliteStatus.SQLITE_STATUS_PAGECACHE_OVERFLOW, sz);
-                        pcache1.mutex.sqlite3_mutex_leave();
+                        pcache1.mutex.Exit();
                     }
                     sqliteinth.sqlite3MemdebugSetType(p, MemType.PCACHE);
                 }
@@ -162,7 +163,7 @@ namespace Community.CsharpSqlite
                 if (p.CacheAllocated)//if ( p >= pcache1.pStart && p < pcache1.pEnd )
                 {
                     PgFreeslot pSlot = new PgFreeslot();
-                    pcache1.mutex.sqlite3_mutex_enter();
+                    pcache1.mutex.Enter();
                     Sqlite3.sqlite3StatusAdd(SqliteStatus.SQLITE_STATUS_PAGECACHE_USED, -1);
                     pSlot._PgHdr = p;
                     // pSlot = (PgFreeslot)p;
@@ -171,16 +172,16 @@ namespace Community.CsharpSqlite
                     pcache1.nFreeSlot++;
                     pcache1.bUnderPressure = pcache1.nFreeSlot < pcache1.nReserve;
                     Debug.Assert(pcache1.nFreeSlot <= pcache1.nSlot);
-                    pcache1.mutex.sqlite3_mutex_leave();
+                    pcache1.mutex.Exit();
                 }
                 else {
                     int iSize;
                     Debug.Assert(sqliteinth.sqlite3MemdebugHasType(p, MemType.PCACHE));
                     sqliteinth.sqlite3MemdebugSetType(p, MemType.HEAP);
                     iSize = malloc_cs.sqlite3MallocSize(p.pData);
-                    pcache1.mutex.sqlite3_mutex_enter();
+                    pcache1.mutex.Enter();
                     Sqlite3.sqlite3StatusAdd(SqliteStatus.SQLITE_STATUS_PAGECACHE_OVERFLOW, -iSize);
-                    pcache1.mutex.sqlite3_mutex_leave();
+                    pcache1.mutex.Exit();
                     malloc_cs.sqlite3_free(ref p.pData);
                 }
             }
@@ -768,8 +769,9 @@ static int pcache1MemSize(object p){
                 if (pCache.nHash > 0)
                 {
                     int h = (int)(iKey % pCache.nHash);
-                    for (pPage = pCache.apHash[h]; pPage != null && pPage.iKey != iKey; pPage = pPage.pNext)
-                        ;
+                    pPage = pCache.apHash[h]
+                        .linkedList()                        
+                        .FirstOrDefault(x=>x.iKey == iKey);                    
                 }
                 ///
                 ///<summary>

@@ -371,7 +371,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 		}
 		
 
-		static EncName[] encnames=new EncName[] {
+		public static EncName[] encnames=new EncName[] {
 			new EncName("UTF8",SqliteEncoding.UTF8),
 			new EncName("UTF-8",SqliteEncoding.UTF8),
 			///
@@ -1937,7 +1937,7 @@ sqlite3_activate_cerod(&zRight[6]);
     /// id and pId2 is any empty string.
     ///
     ///</summary>
-    class EncName
+    public class EncName
     {
         public string zName;
         public SqliteEncoding enc;

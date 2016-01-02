@@ -32,7 +32,7 @@ namespace AnalysingClasses
             r = Sqlite3.sqlite3_open(zSrcFile, out pSrc);
             String m="";
             pSrc.init.busy = 1;
-            Sqlite3.sqlite3InitOne(pSrc, 0, ref m);
+            Sqlite3.InitialiseSingleDatabase(pSrc, 0, ref m);
             var schema = btree.sqlite3SchemaGet(pSrc);
 
 
@@ -53,7 +53,7 @@ namespace AnalysingClasses
                 {
                     initData.rc = SqlResult.SQLITE_OK;
                     //Debug.Assert( 0 == db.mallocFailed );
-                    r = legacy.sqlite3_exec(pSrc, zSql, (dxCallback)Sqlite3.sqlite3InitCallback, (object)initData, 0);
+                    r = pSrc.Exec( zSql, SchemaExtensions.InitTableDefinitionCallback, initData, 0);
                 }
             }
 

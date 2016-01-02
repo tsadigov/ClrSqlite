@@ -10,6 +10,8 @@ using u8 = System.Byte;
 
 namespace Community.CsharpSqlite.Engine.Op
 {
+    using CsharpSqlite.Metadata;
+    using Metadata;
     using Utils;
     public class Schema
     {
@@ -76,7 +78,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 {
                                     initData.rc = SqlResult.SQLITE_OK;
                                     //Debug.Assert( 0 == db.mallocFailed );
-                                    cpu.rc = legacy.sqlite3_exec(db, zSql, (dxCallback)Sqlite3.sqlite3InitCallback, (object)initData, 0);
+                                    cpu.rc = legacy.Exec(db, zSql, SchemaExtensions.InitTableDefinitionCallback, initData, 0);
                                     if (cpu.rc == SqlResult.SQLITE_OK)
                                         cpu.rc = initData.rc;
                                     db.DbFree(ref zSql);

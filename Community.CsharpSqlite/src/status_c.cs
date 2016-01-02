@@ -158,7 +158,7 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///Return code 
 			///</summary>
-			db.mutex.sqlite3_mutex_enter();
+			db.mutex.Enter();
 			switch((SqliteDbStatus)op) {
 			case SqliteDbStatus.SQLITE_DBSTATUS_LOOKASIDE_USED: {
 				pCurrent=db.lookaside.nOut;
@@ -292,7 +292,7 @@ namespace Community.CsharpSqlite {
 				break;
 			}
 			}
-			db.mutex.sqlite3_mutex_leave();
+			db.mutex.Exit();
 			return rc;
 		}
 	}

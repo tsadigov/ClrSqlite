@@ -67,7 +67,7 @@ namespace Community.CsharpSqlite
         ///<param name="consistently.">consistently.</param>
         ///<param name=""></param>
 
-        public class Connection
+        public class Connection:IBusyScope
         {
             public Connection()
             {
@@ -747,7 +747,19 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 else
                     return null;
             }
+
+        public void Enter()
+        {
+            if(null!=mutex)
+                mutex.Enter();
         }
+
+        public void Exit()
+        {
+            if (null != mutex)
+                mutex.Exit();
+        }
+    }
 
 
         

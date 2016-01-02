@@ -36,8 +36,8 @@ namespace Community.CsharpSqlite
     public delegate int dxBusy(object pBtShared, int iValue);
 
     public delegate void dxFreeAux(object pAuxArg);
-
-    public delegate int dxCallback(object pCallbackArg, sqlite3_int64 argc, object p2, object p3);
+    
+    public delegate int dxCallback<T>(T pCallbackArg, sqlite3_int64 argc, object p2, object p3);
 
     public delegate void dxalarmCallback(object pNotUsed, sqlite3_int64 iNotUsed, int size);
 

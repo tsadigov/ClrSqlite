@@ -391,7 +391,7 @@ break;
                 if (mutexOpen != null)
                 {
                     Debug.Assert(mutexOpen.sqlite3_mutex_held());
-                    mutexOpen.sqlite3_mutex_leave();
+                    mutexOpen.Exit();
                 }
                 return rc;
             }
@@ -716,21 +716,19 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
             {
                 SqlResult rc;
                 BtShared pBt = this.pBt;
-                this.Enter();
-                Debug.Assert(this.inTrans == TransType.TRANS_WRITE);
-                ///
-                ///<summary>
-                ///Invalidate all incrblob cursors open on table iTable (assuming iTable
-                ///</summary>
-                ///<param name="is the root of a table b"> if it is not, the following call is</param>
-                ///<param name="a no">op).  </param>
-                this.invalidateIncrblobCursors(0, 1);
-                rc = pBt.saveAllCursors((Pgno)iTable, null);
-                if (SqlResult.SQLITE_OK == rc)
+                using (this.scope())
                 {
-                    rc = BTreeMethods.clearDatabasePage(pBt, (Pgno)iTable, 0, ref pnChange);
+                    Debug.Assert(this.inTrans == TransType.TRANS_WRITE);
+                    ///Invalidate all incrblob cursors open on table iTable (assuming iTable
+                    ///is the root of a table b"- if it is not, the following call is
+                    ///a no-op).
+                    this.invalidateIncrblobCursors(0, 1);
+                    rc = pBt.saveAllCursors((Pgno)iTable, null);
+                    if (SqlResult.SQLITE_OK == rc)
+                    {
+                        rc = BTreeMethods.clearDatabasePage(pBt, (Pgno)iTable, 0, ref pnChange);
+                    }
                 }
-                this.Exit();
                 return rc;
             }
             public SqlResult btreeDropTable(Pgno iTable, ref int piMoved)

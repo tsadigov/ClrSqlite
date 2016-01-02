@@ -529,35 +529,18 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 			return SqlResult.SQLITE_OK;
 		}
 
-		static public SqlResult sqlite3_load_extension (Connection db, ///
-///<summary>
-///Load the extension into this database connection 
-///</summary>
-
-		string zFile, ///
-///<summary>
-///Name of the shared library containing extension 
-///</summary>
-
-		string zProc, ///
-///<summary>
-///Entry point.  Use "sqlite3_extension_init" if 0 
-///</summary>
-
-		ref string pzErrMsg///
-///<summary>
-///Put error message here if not 0 
-///</summary>
-
+		static public SqlResult sqlite3_load_extension (
+            Connection db, ///Load the extension into this database connection 
+            string zFile, ///Name of the shared library containing extension 
+		    string zProc, ///Entry point.  Use "sqlite3_extension_init" if 0 
+		    ref string pzErrMsg///Put error message here if not 0 
 		)
 		{
-			SqlResult rc;
-			db.mutex.sqlite3_mutex_enter();
-			rc = sqlite3LoadExtension (db, zFile, zProc, ref pzErrMsg);
-			rc = malloc_cs.sqlite3ApiExit (db, rc);
-			db.mutex.sqlite3_mutex_leave();
-            db.mutex.sqlite3_mutex_leave();
-			return rc;
+            using (db.mutex.scope())
+            {
+                var rc = sqlite3LoadExtension(db, zFile, zProc, ref pzErrMsg);
+                return rc = malloc_cs.sqlite3ApiExit(db, rc);
+            }
 		}
 
 		///<summary>
@@ -584,14 +567,16 @@ static void sqlite3_progress_handler (sqlite3 db,       int nOps, dxProgress xPr
 
 		static public SqlResult sqlite3_enable_load_extension (Connection db, int onoff)
 		{
-			db.mutex.sqlite3_mutex_enter();
-			if (onoff != 0) {
-                db.flags |= SqliteFlags.SQLITE_LoadExtension;
-			}
-			else {
-                db.flags &= ~SqliteFlags.SQLITE_LoadExtension;
-			}
-			db.mutex.sqlite3_mutex_leave();
+            using (db.mutex.scope())
+            {
+                if (onoff != 0)
+                {
+                    db.flags |= SqliteFlags.SQLITE_LoadExtension;
+                }
+                else {
+                    db.flags &= ~SqliteFlags.SQLITE_LoadExtension;
+                }
+            }
             
 			return SqlResult.SQLITE_OK;
 		}
@@ -648,31 +633,22 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 			else
 			#endif
 			 {
-				int i;
 				#if SQLITE_THREADSAFE
-																																																																																        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
-#else
+                #else
 				sqlite3_mutex mutex = Sqlite3.sqlite3MutexAlloc (Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
 				#endif
 				wsdAutoextInit ();
-				mutex.sqlite3_mutex_enter();
-				for (i = 0; i < wsdAutoext.nExt; i++) {
-					if (wsdAutoext.aExt [i] == xInit)
-						break;
-				}
-				//if( i==wsdAutoext.nExt ){
-				//  int nByte = (wsdAutoext.nExt+1)*sizeof(wsdAutoext.aExt[0]);
-				//  void **aNew;
-				//  aNew = sqlite3_realloc(wsdAutoext.aExt, nByte);
-				//  if( aNew==0 ){
-				//    rc = SQLITE_NOMEM;
-				//  }else{
-				Array.Resize (ref wsdAutoext.aExt, wsdAutoext.nExt + 1);
-				//        wsdAutoext.aExt = aNew;
-				wsdAutoext.aExt [wsdAutoext.nExt] = xInit;
-				wsdAutoext.nExt++;
-				//}
-				mutex.sqlite3_mutex_leave();
+                using (mutex.scope())
+                {
+                    for (var i = 0; i < wsdAutoext.nExt; i++)
+                        if (wsdAutoext.aExt[i] == xInit)
+                            break;
+                    
+                    Array.Resize(ref wsdAutoext.aExt, wsdAutoext.nExt + 1);
+                    
+                    wsdAutoext.aExt[wsdAutoext.nExt] = xInit;
+                    wsdAutoext.nExt++;                    
+                }
 				Debug.Assert ((rc & (SqlResult)0xff) == rc);
 				return rc;
 			}
@@ -689,22 +665,21 @@ sqlite3AutoExtList *x = &GLOBAL(sqlite3AutoExtList,sqlite3Autoext)
 			#endif
 			 {
 				#if SQLITE_THREADSAFE
-																																																																																        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
-#else
+                sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
+                #else
 				sqlite3_mutex mutex = Sqlite3.sqlite3MutexAlloc (Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
 				#endif
 				wsdAutoextInit ();
-				mutex.sqlite3_mutex_enter();
-				#if SQLITE_OMIT_WSD
-																																																																																//malloc_cs.sqlite3_free( ref wsdAutoext.aExt );
-wsdAutoext.aExt = null;
-wsdAutoext.nExt = 0;
-#else
-				//malloc_cs.sqlite3_free( ref sqlite3Autoext.aExt );
-				sqlite3Autoext.aExt = null;
-				sqlite3Autoext.nExt = 0;
-				#endif
-				mutex.sqlite3_mutex_leave();
+                using (mutex.scope()) {
+                    #if SQLITE_OMIT_WSD																																																																																//malloc_cs.sqlite3_free( ref wsdAutoext.aExt );
+                    wsdAutoext.aExt = null;
+                    wsdAutoext.nExt = 0;
+                    #else
+                    //malloc_cs.sqlite3_free( ref sqlite3Autoext.aExt );
+                    sqlite3Autoext.aExt = null;
+                    sqlite3Autoext.nExt = 0;
+                    #endif
+                }
 			}
 		}
 
@@ -729,29 +704,27 @@ wsdAutoext.nExt = 0;
 			if (sqlite3Autoext.nExt == 0)
 			#endif
 			 {
-				///
-///<summary>
-///Common case: early out without every having to acquire a mutex 
-///</summary>
-
+                ///Common case: early out without every having to acquire a mutex 
 				return;
 			}
 			for (i = 0; go; i++) {
 				string zErrmsg = "";
 				#if SQLITE_THREADSAFE
 																																																																																        sqlite3_mutex mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
-#else
-				sqlite3_mutex mutex = Sqlite3.sqlite3MutexAlloc (Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
-				#endif
-				mutex.sqlite3_mutex_enter();
-				if (i >= wsdAutoext.nExt) {
-					xInit = null;
-					go = false;
-				}
-				else {
-					xInit = (dxInit)wsdAutoext.aExt [i];
-				}
-				mutex.sqlite3_mutex_leave();
+                #else
+				var mutex = Sqlite3.sqlite3MutexAlloc (Sqlite3.SQLITE_MUTEX_STATIC_MASTER);
+                #endif
+                using (mutex.scope())
+                {
+                    if (i >= wsdAutoext.nExt)
+                    {
+                        xInit = null;
+                        go = false;
+                    }
+                    else {
+                        xInit = (dxInit)wsdAutoext.aExt[i];
+                    }
+                }
 				zErrmsg = "";
 				if (xInit != null && xInit (db, ref zErrmsg, (sqlite3_api_routines)sqlite3Apis) != 0) {
                     utilc.sqlite3Error(db, SqlResult.SQLITE_ERROR, "automatic extension loading failed: %s", zErrmsg);
